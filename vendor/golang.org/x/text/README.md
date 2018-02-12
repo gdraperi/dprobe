@@ -81,7 +81,7 @@ Note that the code gets adapted over time to changes in the data and that
 backwards compatibility is not maintained.
 So updating to a different version may not work.
 
-The files in DATA/***REMOVED***iana|icu|w3|whatwg***REMOVED*** are currently not versioned.
+The files in DATA/{iana|icu|w3|whatwg} are currently not versioned.
 
 ## Report Issues / Send Patches
 

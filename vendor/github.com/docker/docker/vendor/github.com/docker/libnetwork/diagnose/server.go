@@ -14,97 +14,97 @@ import (
 )
 
 // HTTPHandlerFunc TODO
-type HTTPHandlerFunc func(interface***REMOVED******REMOVED***, http.ResponseWriter, *http.Request)
+type HTTPHandlerFunc func(interface{}, http.ResponseWriter, *http.Request)
 
-type httpHandlerCustom struct ***REMOVED***
-	ctx interface***REMOVED******REMOVED***
-	F   func(interface***REMOVED******REMOVED***, http.ResponseWriter, *http.Request)
-***REMOVED***
+type httpHandlerCustom struct {
+	ctx interface{}
+	F   func(interface{}, http.ResponseWriter, *http.Request)
+}
 
 // ServeHTTP TODO
-func (h httpHandlerCustom) ServeHTTP(w http.ResponseWriter, r *http.Request) ***REMOVED***
+func (h httpHandlerCustom) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.F(h.ctx, w, r)
-***REMOVED***
+}
 
-var diagPaths2Func = map[string]HTTPHandlerFunc***REMOVED***
+var diagPaths2Func = map[string]HTTPHandlerFunc{
 	"/":          notImplemented,
 	"/help":      help,
 	"/ready":     ready,
 	"/stackdump": stackTrace,
-***REMOVED***
+}
 
 // Server when the debug is enabled exposes a
 // This data structure is protected by the Agent mutex so does not require and additional mutex here
-type Server struct ***REMOVED***
+type Server struct {
 	enable            int32
 	srv               *http.Server
 	port              int
 	mux               *http.ServeMux
 	registeredHanders map[string]bool
 	sync.Mutex
-***REMOVED***
+}
 
 // New creates a new diagnose server
-func New() *Server ***REMOVED***
-	return &Server***REMOVED***
+func New() *Server {
+	return &Server{
 		registeredHanders: make(map[string]bool),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Init initialize the mux for the http handling and register the base hooks
-func (s *Server) Init() ***REMOVED***
+func (s *Server) Init() {
 	s.mux = http.NewServeMux()
 
 	// Register local handlers
 	s.RegisterHandler(s, diagPaths2Func)
-***REMOVED***
+}
 
 // RegisterHandler allows to register new handlers to the mux and to a specific path
-func (s *Server) RegisterHandler(ctx interface***REMOVED******REMOVED***, hdlrs map[string]HTTPHandlerFunc) ***REMOVED***
+func (s *Server) RegisterHandler(ctx interface{}, hdlrs map[string]HTTPHandlerFunc) {
 	s.Lock()
 	defer s.Unlock()
-	for path, fun := range hdlrs ***REMOVED***
-		if _, ok := s.registeredHanders[path]; ok ***REMOVED***
+	for path, fun := range hdlrs {
+		if _, ok := s.registeredHanders[path]; ok {
 			continue
-		***REMOVED***
-		s.mux.Handle(path, httpHandlerCustom***REMOVED***ctx, fun***REMOVED***)
+		}
+		s.mux.Handle(path, httpHandlerCustom{ctx, fun})
 		s.registeredHanders[path] = true
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // ServeHTTP this is the method called bu the ListenAndServe, and is needed to allow us to
 // use our custom mux
-func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) ***REMOVED***
+func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.mux.ServeHTTP(w, r)
-***REMOVED***
+}
 
 // EnableDebug opens a TCP socket to debug the passed network DB
-func (s *Server) EnableDebug(ip string, port int) ***REMOVED***
+func (s *Server) EnableDebug(ip string, port int) {
 	s.Lock()
 	defer s.Unlock()
 
 	s.port = port
 
-	if s.enable == 1 ***REMOVED***
+	if s.enable == 1 {
 		logrus.Info("The server is already up and running")
 		return
-	***REMOVED***
+	}
 
 	logrus.Infof("Starting the diagnose server listening on %d for commands", port)
-	srv := &http.Server***REMOVED***Addr: fmt.Sprintf("%s:%d", ip, port), Handler: s***REMOVED***
+	srv := &http.Server{Addr: fmt.Sprintf("%s:%d", ip, port), Handler: s}
 	s.srv = srv
 	s.enable = 1
-	go func(n *Server) ***REMOVED***
+	go func(n *Server) {
 		// Ingore ErrServerClosed that is returned on the Shutdown call
-		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed ***REMOVED***
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			logrus.Errorf("ListenAndServe error: %s", err)
 			atomic.SwapInt32(&n.enable, 0)
-		***REMOVED***
-	***REMOVED***(s)
-***REMOVED***
+		}
+	}(s)
+}
 
 // DisableDebug stop the dubug and closes the tcp socket
-func (s *Server) DisableDebug() ***REMOVED***
+func (s *Server) DisableDebug() {
 	s.Lock()
 	defer s.Unlock()
 
@@ -112,116 +112,116 @@ func (s *Server) DisableDebug() ***REMOVED***
 	s.srv = nil
 	s.enable = 0
 	logrus.Info("Disabling the diagnose server")
-***REMOVED***
+}
 
 // IsDebugEnable returns true when the debug is enabled
-func (s *Server) IsDebugEnable() bool ***REMOVED***
+func (s *Server) IsDebugEnable() bool {
 	s.Lock()
 	defer s.Unlock()
 	return s.enable == 1
-***REMOVED***
+}
 
-func notImplemented(ctx interface***REMOVED******REMOVED***, w http.ResponseWriter, r *http.Request) ***REMOVED***
+func notImplemented(ctx interface{}, w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	_, json := ParseHTTPFormOptions(r)
 	rsp := WrongCommand("not implemented", fmt.Sprintf("URL path: %s no method implemented check /help\n", r.URL.Path))
 
 	// audit logs
-	log := logrus.WithFields(logrus.Fields***REMOVED***"component": "diagnose", "remoteIP": r.RemoteAddr, "method": common.CallerName(0), "url": r.URL.String()***REMOVED***)
+	log := logrus.WithFields(logrus.Fields{"component": "diagnose", "remoteIP": r.RemoteAddr, "method": common.CallerName(0), "url": r.URL.String()})
 	log.Info("command not implemented done")
 
 	HTTPReply(w, rsp, json)
-***REMOVED***
+}
 
-func help(ctx interface***REMOVED******REMOVED***, w http.ResponseWriter, r *http.Request) ***REMOVED***
+func help(ctx interface{}, w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	_, json := ParseHTTPFormOptions(r)
 
 	// audit logs
-	log := logrus.WithFields(logrus.Fields***REMOVED***"component": "diagnose", "remoteIP": r.RemoteAddr, "method": common.CallerName(0), "url": r.URL.String()***REMOVED***)
+	log := logrus.WithFields(logrus.Fields{"component": "diagnose", "remoteIP": r.RemoteAddr, "method": common.CallerName(0), "url": r.URL.String()})
 	log.Info("help done")
 
 	n, ok := ctx.(*Server)
 	var result string
-	if ok ***REMOVED***
-		for path := range n.registeredHanders ***REMOVED***
+	if ok {
+		for path := range n.registeredHanders {
 			result += fmt.Sprintf("%s\n", path)
-		***REMOVED***
-		HTTPReply(w, CommandSucceed(&StringCmd***REMOVED***Info: result***REMOVED***), json)
-	***REMOVED***
-***REMOVED***
+		}
+		HTTPReply(w, CommandSucceed(&StringCmd{Info: result}), json)
+	}
+}
 
-func ready(ctx interface***REMOVED******REMOVED***, w http.ResponseWriter, r *http.Request) ***REMOVED***
+func ready(ctx interface{}, w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	_, json := ParseHTTPFormOptions(r)
 
 	// audit logs
-	log := logrus.WithFields(logrus.Fields***REMOVED***"component": "diagnose", "remoteIP": r.RemoteAddr, "method": common.CallerName(0), "url": r.URL.String()***REMOVED***)
+	log := logrus.WithFields(logrus.Fields{"component": "diagnose", "remoteIP": r.RemoteAddr, "method": common.CallerName(0), "url": r.URL.String()})
 	log.Info("ready done")
-	HTTPReply(w, CommandSucceed(&StringCmd***REMOVED***Info: "OK"***REMOVED***), json)
-***REMOVED***
+	HTTPReply(w, CommandSucceed(&StringCmd{Info: "OK"}), json)
+}
 
-func stackTrace(ctx interface***REMOVED******REMOVED***, w http.ResponseWriter, r *http.Request) ***REMOVED***
+func stackTrace(ctx interface{}, w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	_, json := ParseHTTPFormOptions(r)
 
 	// audit logs
-	log := logrus.WithFields(logrus.Fields***REMOVED***"component": "diagnose", "remoteIP": r.RemoteAddr, "method": common.CallerName(0), "url": r.URL.String()***REMOVED***)
+	log := logrus.WithFields(logrus.Fields{"component": "diagnose", "remoteIP": r.RemoteAddr, "method": common.CallerName(0), "url": r.URL.String()})
 	log.Info("stack trace")
 
 	path, err := stackdump.DumpStacks("/tmp/")
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.WithError(err).Error("failed to write goroutines dump")
 		HTTPReply(w, FailCommand(err), json)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		log.Info("stack trace done")
-		HTTPReply(w, CommandSucceed(&StringCmd***REMOVED***Info: fmt.Sprintf("goroutine stacks written to %s", path)***REMOVED***), json)
-	***REMOVED***
-***REMOVED***
+		HTTPReply(w, CommandSucceed(&StringCmd{Info: fmt.Sprintf("goroutine stacks written to %s", path)}), json)
+	}
+}
 
 // DebugHTTPForm helper to print the form url parameters
-func DebugHTTPForm(r *http.Request) ***REMOVED***
-	for k, v := range r.Form ***REMOVED***
+func DebugHTTPForm(r *http.Request) {
+	for k, v := range r.Form {
 		logrus.Debugf("Form[%q] = %q\n", k, v)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // JSONOutput contains details on JSON output printing
-type JSONOutput struct ***REMOVED***
+type JSONOutput struct {
 	enable      bool
 	prettyPrint bool
-***REMOVED***
+}
 
 // ParseHTTPFormOptions easily parse the JSON printing options
-func ParseHTTPFormOptions(r *http.Request) (bool, *JSONOutput) ***REMOVED***
+func ParseHTTPFormOptions(r *http.Request) (bool, *JSONOutput) {
 	_, unsafe := r.Form["unsafe"]
 	v, json := r.Form["json"]
 	var pretty bool
-	if len(v) > 0 ***REMOVED***
+	if len(v) > 0 {
 		pretty = v[0] == "pretty"
-	***REMOVED***
-	return unsafe, &JSONOutput***REMOVED***enable: json, prettyPrint: pretty***REMOVED***
-***REMOVED***
+	}
+	return unsafe, &JSONOutput{enable: json, prettyPrint: pretty}
+}
 
 // HTTPReply helper function that takes care of sending the message out
-func HTTPReply(w http.ResponseWriter, r *HTTPResult, j *JSONOutput) (int, error) ***REMOVED***
+func HTTPReply(w http.ResponseWriter, r *HTTPResult, j *JSONOutput) (int, error) {
 	var response []byte
-	if j.enable ***REMOVED***
+	if j.enable {
 		w.Header().Set("Content-Type", "application/json")
 		var err error
-		if j.prettyPrint ***REMOVED***
+		if j.prettyPrint {
 			response, err = json.MarshalIndent(r, "", "  ")
-			if err != nil ***REMOVED***
+			if err != nil {
 				response, _ = json.MarshalIndent(FailCommand(err), "", "  ")
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
+			}
+		} else {
 			response, err = json.Marshal(r)
-			if err != nil ***REMOVED***
+			if err != nil {
 				response, _ = json.Marshal(FailCommand(err))
-			***REMOVED***
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
+			}
+		}
+	} else {
 		response = []byte(r.String())
-	***REMOVED***
+	}
 	return fmt.Fprint(w, string(response))
-***REMOVED***
+}

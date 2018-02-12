@@ -4,35 +4,35 @@ import "testing"
 
 // GenerateKey generates a sandbox key based on the passed
 // container id.
-func GenerateKey(containerID string) string ***REMOVED***
+func GenerateKey(containerID string) string {
 	return containerID
-***REMOVED***
+}
 
 // NewSandbox provides a new sandbox instance created in an os specific way
 // provided a key which uniquely identifies the sandbox
-func NewSandbox(key string, osCreate, isRestore bool) (Sandbox, error) ***REMOVED***
+func NewSandbox(key string, osCreate, isRestore bool) (Sandbox, error) {
 	return nil, nil
-***REMOVED***
+}
 
-func GetSandboxForExternalKey(path string, key string) (Sandbox, error) ***REMOVED***
+func GetSandboxForExternalKey(path string, key string) (Sandbox, error) {
 	return nil, nil
-***REMOVED***
+}
 
 // GC triggers garbage collection of namespace path right away
 // and waits for it.
-func GC() ***REMOVED***
-***REMOVED***
+func GC() {
+}
 
 // InitOSContext initializes OS context while configuring network resources
-func InitOSContext() func() ***REMOVED***
-	return func() ***REMOVED******REMOVED***
-***REMOVED***
+func InitOSContext() func() {
+	return func() {}
+}
 
 // SetupTestOSContext sets up a separate test  OS context in which tests will be executed.
-func SetupTestOSContext(t *testing.T) func() ***REMOVED***
-	return func() ***REMOVED******REMOVED***
-***REMOVED***
+func SetupTestOSContext(t *testing.T) func() {
+	return func() {}
+}
 
 // SetBasePath sets the base url prefix for the ns path
-func SetBasePath(path string) ***REMOVED***
-***REMOVED***
+func SetBasePath(path string) {
+}

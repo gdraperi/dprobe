@@ -80,7 +80,7 @@ var (
 		`Minimal draft requirements (approved, contributed, provisional, unconfirmed).`)
 )
 
-func main() ***REMOVED***
+func main() {
 	gen.Init()
 
 	const pkg = "plural"
@@ -90,13 +90,13 @@ func main() ***REMOVED***
 	r := gen.OpenCLDRCoreZip()
 	defer r.Close()
 
-	d := &cldr.Decoder***REMOVED******REMOVED***
+	d := &cldr.Decoder{}
 	d.SetDirFilter("supplemental", "main")
 	d.SetSectionFilter("numbers", "plurals")
 	data, err := d.DecodeZip(r)
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatalf("DecodeZip: %v", err)
-	***REMOVED***
+	}
 
 	w := gen.NewCodeWriter()
 	defer w.WriteGoFile(*outputFile, pkg)
@@ -109,238 +109,238 @@ func main() ***REMOVED***
 	defer w.WriteGoFile(*outputTestFile, pkg)
 
 	genPluralsTests(w, data)
-***REMOVED***
+}
 
-type pluralTest struct ***REMOVED***
+type pluralTest struct {
 	locales string   // space-separated list of locales for this test
 	form    int      // Use int instead of Form to simplify generation.
 	integer []string // Entries of the form \d+ or \d+~\d+
 	decimal []string // Entries of the form \f+ or \f+ +~\f+, where f is \d+\.\d+
-***REMOVED***
+}
 
-func genPluralsTests(w *gen.CodeWriter, data *cldr.CLDR) ***REMOVED***
-	w.WriteType(pluralTest***REMOVED******REMOVED***)
+func genPluralsTests(w *gen.CodeWriter, data *cldr.CLDR) {
+	w.WriteType(pluralTest{})
 
-	for _, plurals := range data.Supplemental().Plurals ***REMOVED***
-		if plurals.Type == "" ***REMOVED***
+	for _, plurals := range data.Supplemental().Plurals {
+		if plurals.Type == "" {
 			// The empty type is reserved for plural ranges.
 			continue
-		***REMOVED***
-		tests := []pluralTest***REMOVED******REMOVED***
+		}
+		tests := []pluralTest{}
 
-		for _, pRules := range plurals.PluralRules ***REMOVED***
-			for _, rule := range pRules.PluralRule ***REMOVED***
-				test := pluralTest***REMOVED***
+		for _, pRules := range plurals.PluralRules {
+			for _, rule := range pRules.PluralRule {
+				test := pluralTest{
 					locales: pRules.Locales,
 					form:    int(countMap[rule.Count]),
-				***REMOVED***
+				}
 				scan := bufio.NewScanner(strings.NewReader(rule.Data()))
 				scan.Split(splitTokens)
 				var p *[]string
-				for scan.Scan() ***REMOVED***
-					switch t := scan.Text(); t ***REMOVED***
+				for scan.Scan() {
+					switch t := scan.Text(); t {
 					case "@integer":
 						p = &test.integer
 					case "@decimal":
 						p = &test.decimal
 					case ",", "…":
 					default:
-						if p != nil ***REMOVED***
+						if p != nil {
 							*p = append(*p, t)
-						***REMOVED***
-					***REMOVED***
-				***REMOVED***
+						}
+					}
+				}
 				tests = append(tests, test)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		w.WriteVar(plurals.Type+"Tests", tests)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func genPlurals(w *gen.CodeWriter, data *cldr.CLDR) ***REMOVED***
-	for _, plurals := range data.Supplemental().Plurals ***REMOVED***
-		if plurals.Type == "" ***REMOVED***
+func genPlurals(w *gen.CodeWriter, data *cldr.CLDR) {
+	for _, plurals := range data.Supplemental().Plurals {
+		if plurals.Type == "" {
 			continue
-		***REMOVED***
+		}
 		// Initialize setMap and inclusionMasks. They are already populated with
 		// a few entries to serve as an example and to assign nice numbers to
 		// common cases.
 
 		// setMap contains sets of numbers represented by boolean arrays where
 		// a true value for element i means that the number i is included.
-		setMap := map[[numN]bool]int***REMOVED***
+		setMap := map[[numN]bool]int{
 			// The above init func adds an entry for including all numbers.
-			[numN]bool***REMOVED***1: true***REMOVED***: 1, // fix ***REMOVED***1***REMOVED*** to a nice value
-			[numN]bool***REMOVED***2: true***REMOVED***: 2, // fix ***REMOVED***2***REMOVED*** to a nice value
-			[numN]bool***REMOVED***0: true***REMOVED***: 3, // fix ***REMOVED***0***REMOVED*** to a nice value
-		***REMOVED***
+			[numN]bool{1: true}: 1, // fix {1} to a nice value
+			[numN]bool{2: true}: 2, // fix {2} to a nice value
+			[numN]bool{0: true}: 3, // fix {0} to a nice value
+		}
 
 		// inclusionMasks contains bit masks for every number under numN to
 		// indicate in which set the number is included. Bit 1 << x will be set
 		// if it is included in set x.
-		inclusionMasks := [numN]uint64***REMOVED***
+		inclusionMasks := [numN]uint64{
 			// Note: these entries are not complete: more bits will be set along the way.
 			0: 1 << 3,
 			1: 1 << 1,
 			2: 1 << 2,
-		***REMOVED***
+		}
 
-		// Create set ***REMOVED***0..99***REMOVED***. We will assign this set the identifier 0.
+		// Create set {0..99}. We will assign this set the identifier 0.
 		var all [numN]bool
-		for i := range all ***REMOVED***
+		for i := range all {
 			// Mark number i as being included in the set (which has identifier 0).
 			inclusionMasks[i] |= 1 << 0
 			// Mark number i as included in the set.
 			all[i] = true
-		***REMOVED***
+		}
 		// Register the identifier for the set.
 		setMap[all] = 0
 
-		rules := []pluralCheck***REMOVED******REMOVED***
-		index := []byte***REMOVED***0***REMOVED***
-		langMap := map[int]byte***REMOVED***0: 0***REMOVED*** // From compact language index to index
+		rules := []pluralCheck{}
+		index := []byte{0}
+		langMap := map[int]byte{0: 0} // From compact language index to index
 
-		for _, pRules := range plurals.PluralRules ***REMOVED***
+		for _, pRules := range plurals.PluralRules {
 			// Parse the rules.
 			var conds []orCondition
-			for _, rule := range pRules.PluralRule ***REMOVED***
+			for _, rule := range pRules.PluralRule {
 				form := countMap[rule.Count]
 				conds = parsePluralCondition(conds, rule.Data(), form)
-			***REMOVED***
+			}
 			// Encode the rules.
-			for _, c := range conds ***REMOVED***
+			for _, c := range conds {
 				// If an or condition only has filters, we create an entry for
 				// this filter and the set that contains all values.
 				empty := true
-				for _, b := range c.used ***REMOVED***
+				for _, b := range c.used {
 					empty = empty && !b
-				***REMOVED***
-				if empty ***REMOVED***
-					rules = append(rules, pluralCheck***REMOVED***
+				}
+				if empty {
+					rules = append(rules, pluralCheck{
 						cat:   byte(opMod<<opShift) | byte(c.form),
 						setID: 0, // all values
-					***REMOVED***)
+					})
 					continue
-				***REMOVED***
+				}
 				// We have some entries with values.
-				for i, set := range c.set ***REMOVED***
-					if !c.used[i] ***REMOVED***
+				for i, set := range c.set {
+					if !c.used[i] {
 						continue
-					***REMOVED***
+					}
 					index, ok := setMap[set]
-					if !ok ***REMOVED***
+					if !ok {
 						index = len(setMap)
 						setMap[set] = index
-						for i := range inclusionMasks ***REMOVED***
-							if set[i] ***REMOVED***
+						for i := range inclusionMasks {
+							if set[i] {
 								inclusionMasks[i] |= 1 << uint64(index)
-							***REMOVED***
-						***REMOVED***
-					***REMOVED***
-					rules = append(rules, pluralCheck***REMOVED***
+							}
+						}
+					}
+					rules = append(rules, pluralCheck{
 						cat:   byte(i<<opShift | andNext),
 						setID: byte(index),
-					***REMOVED***)
-				***REMOVED***
+					})
+				}
 				// Now set the last entry to the plural form the rule matches.
 				rules[len(rules)-1].cat &^= formMask
 				rules[len(rules)-1].cat |= byte(c.form)
-			***REMOVED***
+			}
 			// Point the relevant locales to the created entries.
-			for _, loc := range strings.Split(pRules.Locales, " ") ***REMOVED***
-				if strings.TrimSpace(loc) == "" ***REMOVED***
+			for _, loc := range strings.Split(pRules.Locales, " ") {
+				if strings.TrimSpace(loc) == "" {
 					continue
-				***REMOVED***
+				}
 				lang, ok := language.CompactIndex(language.MustParse(loc))
-				if !ok ***REMOVED***
+				if !ok {
 					log.Printf("No compact index for locale %q", loc)
-				***REMOVED***
+				}
 				langMap[lang] = byte(len(index) - 1)
-			***REMOVED***
+			}
 			index = append(index, byte(len(rules)))
-		***REMOVED***
+		}
 		w.WriteVar(plurals.Type+"Rules", rules)
 		w.WriteVar(plurals.Type+"Index", index)
 		// Expand the values.
 		langToIndex := make([]byte, language.NumCompactTags)
-		for i := range langToIndex ***REMOVED***
-			for p := i; ; p = int(internal.Parent[p]) ***REMOVED***
-				if x, ok := langMap[p]; ok ***REMOVED***
+		for i := range langToIndex {
+			for p := i; ; p = int(internal.Parent[p]) {
+				if x, ok := langMap[p]; ok {
 					langToIndex[i] = x
 					break
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
+				}
+			}
+		}
 		w.WriteVar(plurals.Type+"LangToIndex", langToIndex)
 		// Need to convert array to slice because of golang.org/issue/7651.
 		// This will allow tables to be dropped when unused. This is especially
 		// relevant for the ordinal data, which I suspect won't be used as much.
 		w.WriteVar(plurals.Type+"InclusionMasks", inclusionMasks[:])
 
-		if len(rules) > 0xFF ***REMOVED***
+		if len(rules) > 0xFF {
 			log.Fatalf("Too many entries for rules: %#x", len(rules))
-		***REMOVED***
-		if len(index) > 0xFF ***REMOVED***
+		}
+		if len(index) > 0xFF {
 			log.Fatalf("Too many entries for index: %#x", len(index))
-		***REMOVED***
-		if len(setMap) > 64 ***REMOVED*** // maximum number of bits.
+		}
+		if len(setMap) > 64 { // maximum number of bits.
 			log.Fatalf("Too many entries for setMap: %d", len(setMap))
-		***REMOVED***
+		}
 		w.WriteComment(
 			"Slots used for %s: %X of 0xFF rules; %X of 0xFF indexes; %d of 64 sets",
 			plurals.Type, len(rules), len(index), len(setMap))
 		// Prevent comment from attaching to the next entry.
 		fmt.Fprint(w, "\n\n")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type orCondition struct ***REMOVED***
+type orCondition struct {
 	original string // for debugging
 
 	form Form
 	used [32]bool
 	set  [32][numN]bool
-***REMOVED***
+}
 
-func (o *orCondition) add(op opID, mod int, v []int) (ok bool) ***REMOVED***
+func (o *orCondition) add(op opID, mod int, v []int) (ok bool) {
 	ok = true
-	for _, x := range v ***REMOVED***
-		if x >= maxMod ***REMOVED***
+	for _, x := range v {
+		if x >= maxMod {
 			ok = false
 			break
-		***REMOVED***
-	***REMOVED***
-	for i := 0; i < numN; i++ ***REMOVED***
+		}
+	}
+	for i := 0; i < numN; i++ {
 		m := i
-		if mod != 0 ***REMOVED***
+		if mod != 0 {
 			m = i % mod
-		***REMOVED***
-		if !intIn(m, v) ***REMOVED***
+		}
+		if !intIn(m, v) {
 			o.set[op][i] = false
-		***REMOVED***
-	***REMOVED***
-	if ok ***REMOVED***
+		}
+	}
+	if ok {
 		o.used[op] = true
-	***REMOVED***
+	}
 	return ok
-***REMOVED***
+}
 
-func intIn(x int, a []int) bool ***REMOVED***
-	for _, y := range a ***REMOVED***
-		if x == y ***REMOVED***
+func intIn(x int, a []int) bool {
+	for _, y := range a {
+		if x == y {
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false
-***REMOVED***
+}
 
-var operandIndex = map[string]opID***REMOVED***
+var operandIndex = map[string]opID{
 	"i": opI,
 	"n": opN,
 	"f": opF,
 	"v": opV,
 	"w": opW,
-***REMOVED***
+}
 
 // parsePluralCondition parses the condition of a single pluralRule and appends
 // the resulting or conditions to conds.
@@ -358,23 +358,23 @@ var operandIndex = map[string]opID***REMOVED***
 //
 // @integer and @decimal are followed by examples and are not relevant for the
 // rule itself. The are used here to signal the termination of the rule.
-func parsePluralCondition(conds []orCondition, s string, f Form) []orCondition ***REMOVED***
+func parsePluralCondition(conds []orCondition, s string, f Form) []orCondition {
 	scan := bufio.NewScanner(strings.NewReader(s))
 	scan.Split(splitTokens)
-	for ***REMOVED***
-		cond := orCondition***REMOVED***original: s, form: f***REMOVED***
+	for {
+		cond := orCondition{original: s, form: f}
 		// Set all numbers to be allowed for all number classes and restrict
 		// from here on.
-		for i := range cond.set ***REMOVED***
-			for j := range cond.set[i] ***REMOVED***
+		for i := range cond.set {
+			for j := range cond.set[i] {
 				cond.set[i][j] = true
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 	andLoop:
-		for ***REMOVED***
+		for {
 			var token string
 			scan.Scan() // Must exist.
-			switch class := scan.Text(); class ***REMOVED***
+			switch class := scan.Text(); class {
 			case "t":
 				class = "w" // equal to w for t == 0
 				fallthrough
@@ -382,10 +382,10 @@ func parsePluralCondition(conds []orCondition, s string, f Form) []orCondition *
 				op := scanToken(scan)
 				opCode := operandIndex[class]
 				mod := 0
-				if op == "%" ***REMOVED***
+				if op == "%" {
 					opCode |= opMod
 
-					switch v := scanUint(scan); v ***REMOVED***
+					switch v := scanUint(scan); v {
 					case 10, 100:
 						mod = v
 					case 1000:
@@ -404,97 +404,97 @@ func parsePluralCondition(conds []orCondition, s string, f Form) []orCondition *
 
 					default:
 						log.Fatalf("Modulo value not supported %d", v)
-					***REMOVED***
+					}
 					op = scanToken(scan)
-				***REMOVED***
-				if op != "=" && op != "!=" ***REMOVED***
+				}
+				if op != "=" && op != "!=" {
 					log.Fatalf("Unexpected op %q", op)
-				***REMOVED***
-				if op == "!=" ***REMOVED***
+				}
+				if op == "!=" {
 					opCode |= opNotEqual
-				***REMOVED***
-				a := []int***REMOVED******REMOVED***
+				}
+				a := []int{}
 				v := scanUint(scan)
-				if class == "w" && v != 0 ***REMOVED***
+				if class == "w" && v != 0 {
 					log.Fatalf("Must compare against zero for operand type %q", class)
-				***REMOVED***
+				}
 				token = scanToken(scan)
-				for ***REMOVED***
-					switch token ***REMOVED***
+				for {
+					switch token {
 					case "..":
 						end := scanUint(scan)
-						for ; v <= end; v++ ***REMOVED***
+						for ; v <= end; v++ {
 							a = append(a, v)
-						***REMOVED***
+						}
 						token = scanToken(scan)
 					default: // ",", "or", "and", "@..."
 						a = append(a, v)
-					***REMOVED***
-					if token != "," ***REMOVED***
+					}
+					if token != "," {
 						break
-					***REMOVED***
+					}
 					v = scanUint(scan)
 					token = scanToken(scan)
-				***REMOVED***
-				if !cond.add(opCode, mod, a) ***REMOVED***
+				}
+				if !cond.add(opCode, mod, a) {
 					// Detected large numbers. As we ruled out Azerbaijan, this
 					// must be the many rule for Italian ordinals.
 					cond.set[opItalian800] = cond.set[opN]
 					cond.used[opItalian800] = true
-				***REMOVED***
+				}
 
 			case "@integer", "@decimal": // "other" entry: tests only.
 				return conds
 			default:
 				log.Fatalf("Unexpected operand class %q (%s)", class, s)
-			***REMOVED***
-			switch token ***REMOVED***
+			}
+			switch token {
 			case "or":
 				conds = append(conds, cond)
 				break andLoop
 			case "@integer", "@decimal": // examples
 				// There is always an example in practice, so we always terminate here.
-				if err := scan.Err(); err != nil ***REMOVED***
+				if err := scan.Err(); err != nil {
 					log.Fatal(err)
-				***REMOVED***
+				}
 				return append(conds, cond)
 			case "and":
 				// keep accumulating
 			default:
 				log.Fatalf("Unexpected token %q", token)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}
 
-func scanToken(scan *bufio.Scanner) string ***REMOVED***
+func scanToken(scan *bufio.Scanner) string {
 	scan.Scan()
 	return scan.Text()
-***REMOVED***
+}
 
-func scanUint(scan *bufio.Scanner) int ***REMOVED***
+func scanUint(scan *bufio.Scanner) int {
 	scan.Scan()
 	val, err := strconv.ParseUint(scan.Text(), 10, 32)
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatal(err)
-	***REMOVED***
+	}
 	return int(val)
-***REMOVED***
+}
 
 // splitTokens can be used with bufio.Scanner to tokenize CLDR plural rules.
-func splitTokens(data []byte, atEOF bool) (advance int, token []byte, err error) ***REMOVED***
-	condTokens := [][]byte***REMOVED***
+func splitTokens(data []byte, atEOF bool) (advance int, token []byte, err error) {
+	condTokens := [][]byte{
 		[]byte(".."),
 		[]byte(","),
 		[]byte("!="),
 		[]byte("="),
-	***REMOVED***
+	}
 	advance, token, err = bufio.ScanWords(data, atEOF)
-	for _, t := range condTokens ***REMOVED***
-		if len(t) >= len(token) ***REMOVED***
+	for _, t := range condTokens {
+		if len(t) >= len(token) {
 			continue
-		***REMOVED***
-		switch p := bytes.Index(token, t); ***REMOVED***
+		}
+		switch p := bytes.Index(token, t); {
 		case p == -1:
 		case p == 0:
 			advance = len(t)
@@ -502,12 +502,12 @@ func splitTokens(data []byte, atEOF bool) (advance int, token []byte, err error)
 			return advance - len(token) + len(t), token[:len(t)], err
 		case p < advance:
 			// Don't split when "=" overlaps "!=".
-			if t[0] == '=' && token[p-1] == '!' ***REMOVED***
+			if t[0] == '=' && token[p-1] == '!' {
 				continue
-			***REMOVED***
+			}
 			advance = p
 			token = token[:p]
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return advance, token, err
-***REMOVED***
+}

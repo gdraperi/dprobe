@@ -9,21 +9,21 @@ import (
 	"runtime"
 )
 
-type parser struct ***REMOVED***
+type parser struct {
 	lex *lexer
-***REMOVED***
+}
 
-func parse(input string) (properties *Properties, err error) ***REMOVED***
-	p := &parser***REMOVED***lex: lex(input)***REMOVED***
+func parse(input string) (properties *Properties, err error) {
+	p := &parser{lex: lex(input)}
 	defer p.recover(&err)
 
 	properties = NewProperties()
 	key := ""
-	comments := []string***REMOVED******REMOVED***
+	comments := []string{}
 
-	for ***REMOVED***
+	for {
 		token := p.expectOneOf(itemComment, itemKey, itemEOF)
-		switch token.typ ***REMOVED***
+		switch token.typ {
 		case itemEOF:
 			goto done
 		case itemComment:
@@ -31,65 +31,65 @@ func parse(input string) (properties *Properties, err error) ***REMOVED***
 			continue
 		case itemKey:
 			key = token.val
-			if _, ok := properties.m[key]; !ok ***REMOVED***
+			if _, ok := properties.m[key]; !ok {
 				properties.k = append(properties.k, key)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		token = p.expectOneOf(itemValue, itemEOF)
-		if len(comments) > 0 ***REMOVED***
+		if len(comments) > 0 {
 			properties.c[key] = comments
-			comments = []string***REMOVED******REMOVED***
-		***REMOVED***
-		switch token.typ ***REMOVED***
+			comments = []string{}
+		}
+		switch token.typ {
 		case itemEOF:
 			properties.m[key] = ""
 			goto done
 		case itemValue:
 			properties.m[key] = token.val
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 done:
 	return properties, nil
-***REMOVED***
+}
 
-func (p *parser) errorf(format string, args ...interface***REMOVED******REMOVED***) ***REMOVED***
+func (p *parser) errorf(format string, args ...interface{}) {
 	format = fmt.Sprintf("properties: Line %d: %s", p.lex.lineNumber(), format)
 	panic(fmt.Errorf(format, args...))
-***REMOVED***
+}
 
-func (p *parser) expect(expected itemType) (token item) ***REMOVED***
+func (p *parser) expect(expected itemType) (token item) {
 	token = p.lex.nextItem()
-	if token.typ != expected ***REMOVED***
+	if token.typ != expected {
 		p.unexpected(token)
-	***REMOVED***
+	}
 	return token
-***REMOVED***
+}
 
-func (p *parser) expectOneOf(expected ...itemType) (token item) ***REMOVED***
+func (p *parser) expectOneOf(expected ...itemType) (token item) {
 	token = p.lex.nextItem()
-	for _, v := range expected ***REMOVED***
-		if token.typ == v ***REMOVED***
+	for _, v := range expected {
+		if token.typ == v {
 			return token
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	p.unexpected(token)
 	panic("unexpected token")
-***REMOVED***
+}
 
-func (p *parser) unexpected(token item) ***REMOVED***
+func (p *parser) unexpected(token item) {
 	p.errorf(token.String())
-***REMOVED***
+}
 
 // recover is the handler that turns panics into returns from the top level of Parse.
-func (p *parser) recover(errp *error) ***REMOVED***
+func (p *parser) recover(errp *error) {
 	e := recover()
-	if e != nil ***REMOVED***
-		if _, ok := e.(runtime.Error); ok ***REMOVED***
+	if e != nil {
+		if _, ok := e.(runtime.Error); ok {
 			panic(e)
-		***REMOVED***
+		}
 		*errp = e.(error)
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}

@@ -11,20 +11,20 @@ import (
 )
 
 // GetSubreaper returns the subreaper setting for the calling process
-func GetSubreaper() (int, error) ***REMOVED***
+func GetSubreaper() (int, error) {
 	var i uintptr
 	// PR_GET_CHILD_SUBREAPER allows retrieving the current child
 	// subreaper.
 	// Returns the "child subreaper" setting of the caller, in the
 	// location pointed to by (int *) arg2.
-	if err := unix.Prctl(unix.PR_GET_CHILD_SUBREAPER, uintptr(unsafe.Pointer(&i)), 0, 0, 0); err != nil ***REMOVED***
+	if err := unix.Prctl(unix.PR_GET_CHILD_SUBREAPER, uintptr(unsafe.Pointer(&i)), 0, 0, 0); err != nil {
 		return -1, err
-	***REMOVED***
+	}
 	return int(i), nil
-***REMOVED***
+}
 
 // SetSubreaper sets the value i as the subreaper setting for the calling process
-func SetSubreaper(i int) error ***REMOVED***
+func SetSubreaper(i int) error {
 	// PR_SET_CHILD_SUBREAPER allows setting the child subreaper.
 	// If arg2 is nonzero, set the "child subreaper" attribute of the
 	// calling process; if arg2 is zero, unset the attribute.  When a
@@ -38,4 +38,4 @@ func SetSubreaper(i int) error ***REMOVED***
 	// signal and be able to wait(2) on the process to discover its
 	// termination status.
 	return unix.Prctl(unix.PR_SET_CHILD_SUBREAPER, uintptr(i), 0, 0, 0)
-***REMOVED***
+}

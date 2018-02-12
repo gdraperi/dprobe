@@ -13,25 +13,25 @@
 
 package mem
 
-type Dir interface ***REMOVED***
+type Dir interface {
 	Len() int
 	Names() []string
 	Files() []*FileData
 	Add(*FileData)
 	Remove(*FileData)
-***REMOVED***
+}
 
-func RemoveFromMemDir(dir *FileData, f *FileData) ***REMOVED***
+func RemoveFromMemDir(dir *FileData, f *FileData) {
 	dir.memDir.Remove(f)
-***REMOVED***
+}
 
-func AddToMemDir(dir *FileData, f *FileData) ***REMOVED***
+func AddToMemDir(dir *FileData, f *FileData) {
 	dir.memDir.Add(f)
-***REMOVED***
+}
 
-func InitializeDir(d *FileData) ***REMOVED***
-	if d.memDir == nil ***REMOVED***
+func InitializeDir(d *FileData) {
+	if d.memDir == nil {
 		d.dir = true
-		d.memDir = &DirMap***REMOVED******REMOVED***
-	***REMOVED***
-***REMOVED***
+		d.memDir = &DirMap{}
+	}
+}

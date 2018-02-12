@@ -32,23 +32,23 @@ const (
 	LogMetric_V1 LogMetric_ApiVersion = 1
 )
 
-var LogMetric_ApiVersion_name = map[int32]string***REMOVED***
+var LogMetric_ApiVersion_name = map[int32]string{
 	0: "V2",
 	1: "V1",
-***REMOVED***
-var LogMetric_ApiVersion_value = map[string]int32***REMOVED***
+}
+var LogMetric_ApiVersion_value = map[string]int32{
 	"V2": 0,
 	"V1": 1,
-***REMOVED***
+}
 
-func (x LogMetric_ApiVersion) String() string ***REMOVED***
+func (x LogMetric_ApiVersion) String() string {
 	return proto.EnumName(LogMetric_ApiVersion_name, int32(x))
-***REMOVED***
-func (LogMetric_ApiVersion) EnumDescriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor3, []int***REMOVED***0, 0***REMOVED*** ***REMOVED***
+}
+func (LogMetric_ApiVersion) EnumDescriptor() ([]byte, []int) { return fileDescriptor3, []int{0, 0} }
 
 // Describes a logs-based metric.  The value of the metric is the
 // number of log entries that match a logs filter in a given time interval.
-type LogMetric struct ***REMOVED***
+type LogMetric struct {
 	// Required. The client-assigned metric identifier.
 	// Examples: `"error_count"`, `"nginx/requests"`.
 	//
@@ -79,43 +79,43 @@ type LogMetric struct ***REMOVED***
 	// The version also dictates the syntax of the filter expression. When a value
 	// for this field is missing, the default value of V2 should be assumed.
 	Version LogMetric_ApiVersion `protobuf:"varint,4,opt,name=version,enum=google.logging.v2.LogMetric_ApiVersion" json:"version,omitempty"`
-***REMOVED***
+}
 
-func (m *LogMetric) Reset()                    ***REMOVED*** *m = LogMetric***REMOVED******REMOVED*** ***REMOVED***
-func (m *LogMetric) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*LogMetric) ProtoMessage()               ***REMOVED******REMOVED***
-func (*LogMetric) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor3, []int***REMOVED***0***REMOVED*** ***REMOVED***
+func (m *LogMetric) Reset()                    { *m = LogMetric{} }
+func (m *LogMetric) String() string            { return proto.CompactTextString(m) }
+func (*LogMetric) ProtoMessage()               {}
+func (*LogMetric) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{0} }
 
-func (m *LogMetric) GetName() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *LogMetric) GetName() string {
+	if m != nil {
 		return m.Name
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *LogMetric) GetDescription() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *LogMetric) GetDescription() string {
+	if m != nil {
 		return m.Description
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *LogMetric) GetFilter() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *LogMetric) GetFilter() string {
+	if m != nil {
 		return m.Filter
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *LogMetric) GetVersion() LogMetric_ApiVersion ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *LogMetric) GetVersion() LogMetric_ApiVersion {
+	if m != nil {
 		return m.Version
-	***REMOVED***
+	}
 	return LogMetric_V2
-***REMOVED***
+}
 
 // The parameters to ListLogMetrics.
-type ListLogMetricsRequest struct ***REMOVED***
+type ListLogMetricsRequest struct {
 	// Required. The name of the project containing the metrics:
 	//
 	//     "projects/[PROJECT_ID]"
@@ -129,85 +129,85 @@ type ListLogMetricsRequest struct ***REMOVED***
 	// Non-positive values are ignored.  The presence of `nextPageToken` in the
 	// response indicates that more results might be available.
 	PageSize int32 `protobuf:"varint,3,opt,name=page_size,json=pageSize" json:"page_size,omitempty"`
-***REMOVED***
+}
 
-func (m *ListLogMetricsRequest) Reset()                    ***REMOVED*** *m = ListLogMetricsRequest***REMOVED******REMOVED*** ***REMOVED***
-func (m *ListLogMetricsRequest) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*ListLogMetricsRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*ListLogMetricsRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor3, []int***REMOVED***1***REMOVED*** ***REMOVED***
+func (m *ListLogMetricsRequest) Reset()                    { *m = ListLogMetricsRequest{} }
+func (m *ListLogMetricsRequest) String() string            { return proto.CompactTextString(m) }
+func (*ListLogMetricsRequest) ProtoMessage()               {}
+func (*ListLogMetricsRequest) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{1} }
 
-func (m *ListLogMetricsRequest) GetParent() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ListLogMetricsRequest) GetParent() string {
+	if m != nil {
 		return m.Parent
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *ListLogMetricsRequest) GetPageToken() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ListLogMetricsRequest) GetPageToken() string {
+	if m != nil {
 		return m.PageToken
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *ListLogMetricsRequest) GetPageSize() int32 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ListLogMetricsRequest) GetPageSize() int32 {
+	if m != nil {
 		return m.PageSize
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
 // Result returned from ListLogMetrics.
-type ListLogMetricsResponse struct ***REMOVED***
+type ListLogMetricsResponse struct {
 	// A list of logs-based metrics.
 	Metrics []*LogMetric `protobuf:"bytes,1,rep,name=metrics" json:"metrics,omitempty"`
 	// If there might be more results than appear in this response, then
 	// `nextPageToken` is included.  To get the next set of results, call this
 	// method again using the value of `nextPageToken` as `pageToken`.
 	NextPageToken string `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken" json:"next_page_token,omitempty"`
-***REMOVED***
+}
 
-func (m *ListLogMetricsResponse) Reset()                    ***REMOVED*** *m = ListLogMetricsResponse***REMOVED******REMOVED*** ***REMOVED***
-func (m *ListLogMetricsResponse) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*ListLogMetricsResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*ListLogMetricsResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor3, []int***REMOVED***2***REMOVED*** ***REMOVED***
+func (m *ListLogMetricsResponse) Reset()                    { *m = ListLogMetricsResponse{} }
+func (m *ListLogMetricsResponse) String() string            { return proto.CompactTextString(m) }
+func (*ListLogMetricsResponse) ProtoMessage()               {}
+func (*ListLogMetricsResponse) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{2} }
 
-func (m *ListLogMetricsResponse) GetMetrics() []*LogMetric ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ListLogMetricsResponse) GetMetrics() []*LogMetric {
+	if m != nil {
 		return m.Metrics
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *ListLogMetricsResponse) GetNextPageToken() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ListLogMetricsResponse) GetNextPageToken() string {
+	if m != nil {
 		return m.NextPageToken
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
 // The parameters to GetLogMetric.
-type GetLogMetricRequest struct ***REMOVED***
+type GetLogMetricRequest struct {
 	// The resource name of the desired metric:
 	//
 	//     "projects/[PROJECT_ID]/metrics/[METRIC_ID]"
 	MetricName string `protobuf:"bytes,1,opt,name=metric_name,json=metricName" json:"metric_name,omitempty"`
-***REMOVED***
+}
 
-func (m *GetLogMetricRequest) Reset()                    ***REMOVED*** *m = GetLogMetricRequest***REMOVED******REMOVED*** ***REMOVED***
-func (m *GetLogMetricRequest) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*GetLogMetricRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*GetLogMetricRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor3, []int***REMOVED***3***REMOVED*** ***REMOVED***
+func (m *GetLogMetricRequest) Reset()                    { *m = GetLogMetricRequest{} }
+func (m *GetLogMetricRequest) String() string            { return proto.CompactTextString(m) }
+func (*GetLogMetricRequest) ProtoMessage()               {}
+func (*GetLogMetricRequest) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{3} }
 
-func (m *GetLogMetricRequest) GetMetricName() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *GetLogMetricRequest) GetMetricName() string {
+	if m != nil {
 		return m.MetricName
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
 // The parameters to CreateLogMetric.
-type CreateLogMetricRequest struct ***REMOVED***
+type CreateLogMetricRequest struct {
 	// The resource name of the project in which to create the metric:
 	//
 	//     "projects/[PROJECT_ID]"
@@ -217,29 +217,29 @@ type CreateLogMetricRequest struct ***REMOVED***
 	// The new logs-based metric, which must not have an identifier that
 	// already exists.
 	Metric *LogMetric `protobuf:"bytes,2,opt,name=metric" json:"metric,omitempty"`
-***REMOVED***
+}
 
-func (m *CreateLogMetricRequest) Reset()                    ***REMOVED*** *m = CreateLogMetricRequest***REMOVED******REMOVED*** ***REMOVED***
-func (m *CreateLogMetricRequest) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*CreateLogMetricRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*CreateLogMetricRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor3, []int***REMOVED***4***REMOVED*** ***REMOVED***
+func (m *CreateLogMetricRequest) Reset()                    { *m = CreateLogMetricRequest{} }
+func (m *CreateLogMetricRequest) String() string            { return proto.CompactTextString(m) }
+func (*CreateLogMetricRequest) ProtoMessage()               {}
+func (*CreateLogMetricRequest) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{4} }
 
-func (m *CreateLogMetricRequest) GetParent() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *CreateLogMetricRequest) GetParent() string {
+	if m != nil {
 		return m.Parent
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *CreateLogMetricRequest) GetMetric() *LogMetric ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *CreateLogMetricRequest) GetMetric() *LogMetric {
+	if m != nil {
 		return m.Metric
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // The parameters to UpdateLogMetric.
-type UpdateLogMetricRequest struct ***REMOVED***
+type UpdateLogMetricRequest struct {
 	// The resource name of the metric to update:
 	//
 	//     "projects/[PROJECT_ID]/metrics/[METRIC_ID]"
@@ -250,48 +250,48 @@ type UpdateLogMetricRequest struct ***REMOVED***
 	MetricName string `protobuf:"bytes,1,opt,name=metric_name,json=metricName" json:"metric_name,omitempty"`
 	// The updated metric.
 	Metric *LogMetric `protobuf:"bytes,2,opt,name=metric" json:"metric,omitempty"`
-***REMOVED***
+}
 
-func (m *UpdateLogMetricRequest) Reset()                    ***REMOVED*** *m = UpdateLogMetricRequest***REMOVED******REMOVED*** ***REMOVED***
-func (m *UpdateLogMetricRequest) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*UpdateLogMetricRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*UpdateLogMetricRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor3, []int***REMOVED***5***REMOVED*** ***REMOVED***
+func (m *UpdateLogMetricRequest) Reset()                    { *m = UpdateLogMetricRequest{} }
+func (m *UpdateLogMetricRequest) String() string            { return proto.CompactTextString(m) }
+func (*UpdateLogMetricRequest) ProtoMessage()               {}
+func (*UpdateLogMetricRequest) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{5} }
 
-func (m *UpdateLogMetricRequest) GetMetricName() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *UpdateLogMetricRequest) GetMetricName() string {
+	if m != nil {
 		return m.MetricName
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *UpdateLogMetricRequest) GetMetric() *LogMetric ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *UpdateLogMetricRequest) GetMetric() *LogMetric {
+	if m != nil {
 		return m.Metric
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // The parameters to DeleteLogMetric.
-type DeleteLogMetricRequest struct ***REMOVED***
+type DeleteLogMetricRequest struct {
 	// The resource name of the metric to delete:
 	//
 	//     "projects/[PROJECT_ID]/metrics/[METRIC_ID]"
 	MetricName string `protobuf:"bytes,1,opt,name=metric_name,json=metricName" json:"metric_name,omitempty"`
-***REMOVED***
+}
 
-func (m *DeleteLogMetricRequest) Reset()                    ***REMOVED*** *m = DeleteLogMetricRequest***REMOVED******REMOVED*** ***REMOVED***
-func (m *DeleteLogMetricRequest) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*DeleteLogMetricRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*DeleteLogMetricRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor3, []int***REMOVED***6***REMOVED*** ***REMOVED***
+func (m *DeleteLogMetricRequest) Reset()                    { *m = DeleteLogMetricRequest{} }
+func (m *DeleteLogMetricRequest) String() string            { return proto.CompactTextString(m) }
+func (*DeleteLogMetricRequest) ProtoMessage()               {}
+func (*DeleteLogMetricRequest) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{6} }
 
-func (m *DeleteLogMetricRequest) GetMetricName() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *DeleteLogMetricRequest) GetMetricName() string {
+	if m != nil {
 		return m.MetricName
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*LogMetric)(nil), "google.logging.v2.LogMetric")
 	proto.RegisterType((*ListLogMetricsRequest)(nil), "google.logging.v2.ListLogMetricsRequest")
 	proto.RegisterType((*ListLogMetricsResponse)(nil), "google.logging.v2.ListLogMetricsResponse")
@@ -300,7 +300,7 @@ func init() ***REMOVED***
 	proto.RegisterType((*UpdateLogMetricRequest)(nil), "google.logging.v2.UpdateLogMetricRequest")
 	proto.RegisterType((*DeleteLogMetricRequest)(nil), "google.logging.v2.DeleteLogMetricRequest")
 	proto.RegisterEnum("google.logging.v2.LogMetric_ApiVersion", LogMetric_ApiVersion_name, LogMetric_ApiVersion_value)
-***REMOVED***
+}
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
@@ -312,7 +312,7 @@ const _ = grpc.SupportPackageIsVersion4
 
 // Client API for MetricsServiceV2 service
 
-type MetricsServiceV2Client interface ***REMOVED***
+type MetricsServiceV2Client interface {
 	// Lists logs-based metrics.
 	ListLogMetrics(ctx context.Context, in *ListLogMetricsRequest, opts ...grpc.CallOption) (*ListLogMetricsResponse, error)
 	// Gets a logs-based metric.
@@ -323,64 +323,64 @@ type MetricsServiceV2Client interface ***REMOVED***
 	UpdateLogMetric(ctx context.Context, in *UpdateLogMetricRequest, opts ...grpc.CallOption) (*LogMetric, error)
 	// Deletes a logs-based metric.
 	DeleteLogMetric(ctx context.Context, in *DeleteLogMetricRequest, opts ...grpc.CallOption) (*google_protobuf5.Empty, error)
-***REMOVED***
+}
 
-type metricsServiceV2Client struct ***REMOVED***
+type metricsServiceV2Client struct {
 	cc *grpc.ClientConn
-***REMOVED***
+}
 
-func NewMetricsServiceV2Client(cc *grpc.ClientConn) MetricsServiceV2Client ***REMOVED***
-	return &metricsServiceV2Client***REMOVED***cc***REMOVED***
-***REMOVED***
+func NewMetricsServiceV2Client(cc *grpc.ClientConn) MetricsServiceV2Client {
+	return &metricsServiceV2Client{cc}
+}
 
-func (c *metricsServiceV2Client) ListLogMetrics(ctx context.Context, in *ListLogMetricsRequest, opts ...grpc.CallOption) (*ListLogMetricsResponse, error) ***REMOVED***
+func (c *metricsServiceV2Client) ListLogMetrics(ctx context.Context, in *ListLogMetricsRequest, opts ...grpc.CallOption) (*ListLogMetricsResponse, error) {
 	out := new(ListLogMetricsResponse)
 	err := grpc.Invoke(ctx, "/google.logging.v2.MetricsServiceV2/ListLogMetrics", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *metricsServiceV2Client) GetLogMetric(ctx context.Context, in *GetLogMetricRequest, opts ...grpc.CallOption) (*LogMetric, error) ***REMOVED***
+func (c *metricsServiceV2Client) GetLogMetric(ctx context.Context, in *GetLogMetricRequest, opts ...grpc.CallOption) (*LogMetric, error) {
 	out := new(LogMetric)
 	err := grpc.Invoke(ctx, "/google.logging.v2.MetricsServiceV2/GetLogMetric", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *metricsServiceV2Client) CreateLogMetric(ctx context.Context, in *CreateLogMetricRequest, opts ...grpc.CallOption) (*LogMetric, error) ***REMOVED***
+func (c *metricsServiceV2Client) CreateLogMetric(ctx context.Context, in *CreateLogMetricRequest, opts ...grpc.CallOption) (*LogMetric, error) {
 	out := new(LogMetric)
 	err := grpc.Invoke(ctx, "/google.logging.v2.MetricsServiceV2/CreateLogMetric", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *metricsServiceV2Client) UpdateLogMetric(ctx context.Context, in *UpdateLogMetricRequest, opts ...grpc.CallOption) (*LogMetric, error) ***REMOVED***
+func (c *metricsServiceV2Client) UpdateLogMetric(ctx context.Context, in *UpdateLogMetricRequest, opts ...grpc.CallOption) (*LogMetric, error) {
 	out := new(LogMetric)
 	err := grpc.Invoke(ctx, "/google.logging.v2.MetricsServiceV2/UpdateLogMetric", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *metricsServiceV2Client) DeleteLogMetric(ctx context.Context, in *DeleteLogMetricRequest, opts ...grpc.CallOption) (*google_protobuf5.Empty, error) ***REMOVED***
+func (c *metricsServiceV2Client) DeleteLogMetric(ctx context.Context, in *DeleteLogMetricRequest, opts ...grpc.CallOption) (*google_protobuf5.Empty, error) {
 	out := new(google_protobuf5.Empty)
 	err := grpc.Invoke(ctx, "/google.logging.v2.MetricsServiceV2/DeleteLogMetric", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
 // Server API for MetricsServiceV2 service
 
-type MetricsServiceV2Server interface ***REMOVED***
+type MetricsServiceV2Server interface {
 	// Lists logs-based metrics.
 	ListLogMetrics(context.Context, *ListLogMetricsRequest) (*ListLogMetricsResponse, error)
 	// Gets a logs-based metric.
@@ -391,134 +391,134 @@ type MetricsServiceV2Server interface ***REMOVED***
 	UpdateLogMetric(context.Context, *UpdateLogMetricRequest) (*LogMetric, error)
 	// Deletes a logs-based metric.
 	DeleteLogMetric(context.Context, *DeleteLogMetricRequest) (*google_protobuf5.Empty, error)
-***REMOVED***
+}
 
-func RegisterMetricsServiceV2Server(s *grpc.Server, srv MetricsServiceV2Server) ***REMOVED***
+func RegisterMetricsServiceV2Server(s *grpc.Server, srv MetricsServiceV2Server) {
 	s.RegisterService(&_MetricsServiceV2_serviceDesc, srv)
-***REMOVED***
+}
 
-func _MetricsServiceV2_ListLogMetrics_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _MetricsServiceV2_ListLogMetrics_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListLogMetricsRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(MetricsServiceV2Server).ListLogMetrics(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/google.logging.v2.MetricsServiceV2/ListLogMetrics",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MetricsServiceV2Server).ListLogMetrics(ctx, req.(*ListLogMetricsRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _MetricsServiceV2_GetLogMetric_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _MetricsServiceV2_GetLogMetric_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetLogMetricRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(MetricsServiceV2Server).GetLogMetric(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/google.logging.v2.MetricsServiceV2/GetLogMetric",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MetricsServiceV2Server).GetLogMetric(ctx, req.(*GetLogMetricRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _MetricsServiceV2_CreateLogMetric_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _MetricsServiceV2_CreateLogMetric_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateLogMetricRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(MetricsServiceV2Server).CreateLogMetric(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/google.logging.v2.MetricsServiceV2/CreateLogMetric",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MetricsServiceV2Server).CreateLogMetric(ctx, req.(*CreateLogMetricRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _MetricsServiceV2_UpdateLogMetric_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _MetricsServiceV2_UpdateLogMetric_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateLogMetricRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(MetricsServiceV2Server).UpdateLogMetric(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/google.logging.v2.MetricsServiceV2/UpdateLogMetric",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MetricsServiceV2Server).UpdateLogMetric(ctx, req.(*UpdateLogMetricRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _MetricsServiceV2_DeleteLogMetric_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _MetricsServiceV2_DeleteLogMetric_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteLogMetricRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(MetricsServiceV2Server).DeleteLogMetric(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/google.logging.v2.MetricsServiceV2/DeleteLogMetric",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MetricsServiceV2Server).DeleteLogMetric(ctx, req.(*DeleteLogMetricRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-var _MetricsServiceV2_serviceDesc = grpc.ServiceDesc***REMOVED***
+var _MetricsServiceV2_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "google.logging.v2.MetricsServiceV2",
 	HandlerType: (*MetricsServiceV2Server)(nil),
-	Methods: []grpc.MethodDesc***REMOVED***
-		***REMOVED***
+	Methods: []grpc.MethodDesc{
+		{
 			MethodName: "ListLogMetrics",
 			Handler:    _MetricsServiceV2_ListLogMetrics_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "GetLogMetric",
 			Handler:    _MetricsServiceV2_GetLogMetric_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "CreateLogMetric",
 			Handler:    _MetricsServiceV2_CreateLogMetric_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "UpdateLogMetric",
 			Handler:    _MetricsServiceV2_UpdateLogMetric_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "DeleteLogMetric",
 			Handler:    _MetricsServiceV2_DeleteLogMetric_Handler,
-		***REMOVED***,
-	***REMOVED***,
-	Streams:  []grpc.StreamDesc***REMOVED******REMOVED***,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
 	Metadata: "google/logging/v2/logging_metrics.proto",
-***REMOVED***
+}
 
-func init() ***REMOVED*** proto.RegisterFile("google/logging/v2/logging_metrics.proto", fileDescriptor3) ***REMOVED***
+func init() { proto.RegisterFile("google/logging/v2/logging_metrics.proto", fileDescriptor3) }
 
-var fileDescriptor3 = []byte***REMOVED***
+var fileDescriptor3 = []byte{
 	// 665 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x55, 0x4f, 0x4f, 0x13, 0x41,
 	0x14, 0x77, 0x0a, 0x14, 0x79, 0x28, 0xc5, 0x21, 0x94, 0xa6, 0x40, 0xa8, 0x7b, 0x80, 0xc2, 0x61,
@@ -562,4 +562,4 @@ var fileDescriptor3 = []byte***REMOVED***
 	0x64, 0x22, 0xf5, 0x2f, 0xf6, 0xdc, 0x1c, 0x7f, 0xe4, 0x16, 0x76, 0x75, 0xe9, 0x4e, 0x9b, 0x77,
 	0x5b, 0xb6, 0xf9, 0xbc, 0x5d, 0x77, 0x0f, 0xf3, 0xaa, 0xfc, 0xd1, 0xdf, 0x00, 0x00, 0x00, 0xff,
 	0xff, 0x22, 0xd3, 0x7f, 0x20, 0x03, 0x07, 0x00, 0x00,
-***REMOVED***
+}

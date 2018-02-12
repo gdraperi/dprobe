@@ -6,7 +6,7 @@ package http2
 
 import "testing"
 
-func TestRandomScheduler(t *testing.T) ***REMOVED***
+func TestRandomScheduler(t *testing.T) {
 	ws := NewRandomWriteScheduler()
 	ws.Push(makeWriteHeadersRequest(3))
 	ws.Push(makeWriteHeadersRequest(4))
@@ -18,27 +18,27 @@ func TestRandomScheduler(t *testing.T) ***REMOVED***
 	// Pop all frames. Should get the non-stream requests first,
 	// followed by the stream requests in any order.
 	var order []FrameWriteRequest
-	for ***REMOVED***
+	for {
 		wr, ok := ws.Pop()
-		if !ok ***REMOVED***
+		if !ok {
 			break
-		***REMOVED***
+		}
 		order = append(order, wr)
-	***REMOVED***
+	}
 	t.Logf("got frames: %v", order)
-	if len(order) != 6 ***REMOVED***
+	if len(order) != 6 {
 		t.Fatalf("got %d frames, expected 6", len(order))
-	***REMOVED***
-	if order[0].StreamID() != 0 || order[1].StreamID() != 0 ***REMOVED***
+	}
+	if order[0].StreamID() != 0 || order[1].StreamID() != 0 {
 		t.Fatal("expected non-stream frames first", order[0], order[1])
-	***REMOVED***
+	}
 	got := make(map[uint32]bool)
-	for _, wr := range order[2:] ***REMOVED***
+	for _, wr := range order[2:] {
 		got[wr.StreamID()] = true
-	***REMOVED***
-	for id := uint32(1); id <= 4; id++ ***REMOVED***
-		if !got[id] ***REMOVED***
+	}
+	for id := uint32(1); id <= 4; id++ {
+		if !got[id] {
 			t.Errorf("frame not found for stream %d", id)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

@@ -20,7 +20,7 @@ import (
 	pb "github.com/coreos/etcd/raft/raftpb"
 )
 
-type Status struct ***REMOVED***
+type Status struct {
 	ID uint64
 
 	pb.HardState
@@ -28,49 +28,49 @@ type Status struct ***REMOVED***
 
 	Applied  uint64
 	Progress map[uint64]Progress
-***REMOVED***
+}
 
 // getStatus gets a copy of the current raft status.
-func getStatus(r *raft) Status ***REMOVED***
-	s := Status***REMOVED***ID: r.id***REMOVED***
+func getStatus(r *raft) Status {
+	s := Status{ID: r.id}
 	s.HardState = r.hardState()
 	s.SoftState = *r.softState()
 
 	s.Applied = r.raftLog.applied
 
-	if s.RaftState == StateLeader ***REMOVED***
+	if s.RaftState == StateLeader {
 		s.Progress = make(map[uint64]Progress)
-		for id, p := range r.prs ***REMOVED***
+		for id, p := range r.prs {
 			s.Progress[id] = *p
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return s
-***REMOVED***
+}
 
 // MarshalJSON translates the raft status into JSON.
 // TODO: try to simplify this by introducing ID type into raft
-func (s Status) MarshalJSON() ([]byte, error) ***REMOVED***
-	j := fmt.Sprintf(`***REMOVED***"id":"%x","term":%d,"vote":"%x","commit":%d,"lead":"%x","raftState":%q,"progress":***REMOVED***`,
+func (s Status) MarshalJSON() ([]byte, error) {
+	j := fmt.Sprintf(`{"id":"%x","term":%d,"vote":"%x","commit":%d,"lead":"%x","raftState":%q,"progress":{`,
 		s.ID, s.Term, s.Vote, s.Commit, s.Lead, s.RaftState)
 
-	if len(s.Progress) == 0 ***REMOVED***
-		j += "***REMOVED******REMOVED***"
-	***REMOVED*** else ***REMOVED***
-		for k, v := range s.Progress ***REMOVED***
-			subj := fmt.Sprintf(`"%x":***REMOVED***"match":%d,"next":%d,"state":%q***REMOVED***,`, k, v.Match, v.Next, v.State)
+	if len(s.Progress) == 0 {
+		j += "}}"
+	} else {
+		for k, v := range s.Progress {
+			subj := fmt.Sprintf(`"%x":{"match":%d,"next":%d,"state":%q},`, k, v.Match, v.Next, v.State)
 			j += subj
-		***REMOVED***
+		}
 		// remove the trailing ","
-		j = j[:len(j)-1] + "***REMOVED******REMOVED***"
-	***REMOVED***
+		j = j[:len(j)-1] + "}}"
+	}
 	return []byte(j), nil
-***REMOVED***
+}
 
-func (s Status) String() string ***REMOVED***
+func (s Status) String() string {
 	b, err := s.MarshalJSON()
-	if err != nil ***REMOVED***
+	if err != nil {
 		raftLogger.Panicf("unexpected error: %v", err)
-	***REMOVED***
+	}
 	return string(b)
-***REMOVED***
+}

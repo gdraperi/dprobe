@@ -58,7 +58,7 @@ var _ = time.Kitchen
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
-type Container struct ***REMOVED***
+type Container struct {
 	// ID is the user-specified identifier.
 	//
 	// This field may not be updated.
@@ -106,40 +106,40 @@ type Container struct ***REMOVED***
 	// data, one should only update the specified extension using field paths
 	// to select a specific map key.
 	Extensions map[string]google_protobuf1.Any `protobuf:"bytes,10,rep,name=extensions" json:"extensions" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value"`
-***REMOVED***
+}
 
-func (m *Container) Reset()                    ***REMOVED*** *m = Container***REMOVED******REMOVED*** ***REMOVED***
-func (*Container) ProtoMessage()               ***REMOVED******REMOVED***
-func (*Container) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorContainers, []int***REMOVED***0***REMOVED*** ***REMOVED***
+func (m *Container) Reset()                    { *m = Container{} }
+func (*Container) ProtoMessage()               {}
+func (*Container) Descriptor() ([]byte, []int) { return fileDescriptorContainers, []int{0} }
 
-type Container_Runtime struct ***REMOVED***
+type Container_Runtime struct {
 	// Name is the name of the runtime.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Options specify additional runtime initialization options.
 	Options *google_protobuf1.Any `protobuf:"bytes,2,opt,name=options" json:"options,omitempty"`
-***REMOVED***
+}
 
-func (m *Container_Runtime) Reset()                    ***REMOVED*** *m = Container_Runtime***REMOVED******REMOVED*** ***REMOVED***
-func (*Container_Runtime) ProtoMessage()               ***REMOVED******REMOVED***
-func (*Container_Runtime) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorContainers, []int***REMOVED***0, 1***REMOVED*** ***REMOVED***
+func (m *Container_Runtime) Reset()                    { *m = Container_Runtime{} }
+func (*Container_Runtime) ProtoMessage()               {}
+func (*Container_Runtime) Descriptor() ([]byte, []int) { return fileDescriptorContainers, []int{0, 1} }
 
-type GetContainerRequest struct ***REMOVED***
+type GetContainerRequest struct {
 	ID string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-***REMOVED***
+}
 
-func (m *GetContainerRequest) Reset()                    ***REMOVED*** *m = GetContainerRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*GetContainerRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*GetContainerRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorContainers, []int***REMOVED***1***REMOVED*** ***REMOVED***
+func (m *GetContainerRequest) Reset()                    { *m = GetContainerRequest{} }
+func (*GetContainerRequest) ProtoMessage()               {}
+func (*GetContainerRequest) Descriptor() ([]byte, []int) { return fileDescriptorContainers, []int{1} }
 
-type GetContainerResponse struct ***REMOVED***
+type GetContainerResponse struct {
 	Container Container `protobuf:"bytes,1,opt,name=container" json:"container"`
-***REMOVED***
+}
 
-func (m *GetContainerResponse) Reset()                    ***REMOVED*** *m = GetContainerResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*GetContainerResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*GetContainerResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorContainers, []int***REMOVED***2***REMOVED*** ***REMOVED***
+func (m *GetContainerResponse) Reset()                    { *m = GetContainerResponse{} }
+func (*GetContainerResponse) ProtoMessage()               {}
+func (*GetContainerResponse) Descriptor() ([]byte, []int) { return fileDescriptorContainers, []int{2} }
 
-type ListContainersRequest struct ***REMOVED***
+type ListContainersRequest struct {
 	// Filters contains one or more filters using the syntax defined in the
 	// containerd filter package.
 	//
@@ -151,44 +151,44 @@ type ListContainersRequest struct ***REMOVED***
 	//
 	// If filters is zero-length or nil, all items will be returned.
 	Filters []string `protobuf:"bytes,1,rep,name=filters" json:"filters,omitempty"`
-***REMOVED***
+}
 
-func (m *ListContainersRequest) Reset()                    ***REMOVED*** *m = ListContainersRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*ListContainersRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*ListContainersRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorContainers, []int***REMOVED***3***REMOVED*** ***REMOVED***
+func (m *ListContainersRequest) Reset()                    { *m = ListContainersRequest{} }
+func (*ListContainersRequest) ProtoMessage()               {}
+func (*ListContainersRequest) Descriptor() ([]byte, []int) { return fileDescriptorContainers, []int{3} }
 
-type ListContainersResponse struct ***REMOVED***
+type ListContainersResponse struct {
 	Containers []Container `protobuf:"bytes,1,rep,name=containers" json:"containers"`
-***REMOVED***
+}
 
-func (m *ListContainersResponse) Reset()                    ***REMOVED*** *m = ListContainersResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*ListContainersResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*ListContainersResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorContainers, []int***REMOVED***4***REMOVED*** ***REMOVED***
+func (m *ListContainersResponse) Reset()                    { *m = ListContainersResponse{} }
+func (*ListContainersResponse) ProtoMessage()               {}
+func (*ListContainersResponse) Descriptor() ([]byte, []int) { return fileDescriptorContainers, []int{4} }
 
-type CreateContainerRequest struct ***REMOVED***
+type CreateContainerRequest struct {
 	Container Container `protobuf:"bytes,1,opt,name=container" json:"container"`
-***REMOVED***
+}
 
-func (m *CreateContainerRequest) Reset()                    ***REMOVED*** *m = CreateContainerRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*CreateContainerRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*CreateContainerRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorContainers, []int***REMOVED***5***REMOVED*** ***REMOVED***
+func (m *CreateContainerRequest) Reset()                    { *m = CreateContainerRequest{} }
+func (*CreateContainerRequest) ProtoMessage()               {}
+func (*CreateContainerRequest) Descriptor() ([]byte, []int) { return fileDescriptorContainers, []int{5} }
 
-type CreateContainerResponse struct ***REMOVED***
+type CreateContainerResponse struct {
 	Container Container `protobuf:"bytes,1,opt,name=container" json:"container"`
-***REMOVED***
+}
 
-func (m *CreateContainerResponse) Reset()      ***REMOVED*** *m = CreateContainerResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*CreateContainerResponse) ProtoMessage() ***REMOVED******REMOVED***
-func (*CreateContainerResponse) Descriptor() ([]byte, []int) ***REMOVED***
-	return fileDescriptorContainers, []int***REMOVED***6***REMOVED***
-***REMOVED***
+func (m *CreateContainerResponse) Reset()      { *m = CreateContainerResponse{} }
+func (*CreateContainerResponse) ProtoMessage() {}
+func (*CreateContainerResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptorContainers, []int{6}
+}
 
 // UpdateContainerRequest updates the metadata on one or more container.
 //
 // The operation should follow semantics described in
 // https://developers.google.com/protocol-buffers/docs/reference/csharp/class/google/protobuf/well-known-types/field-mask,
 // unless otherwise qualified.
-type UpdateContainerRequest struct ***REMOVED***
+type UpdateContainerRequest struct {
 	// Container provides the target values, as declared by the mask, for the update.
 	//
 	// The ID field must be set.
@@ -196,31 +196,31 @@ type UpdateContainerRequest struct ***REMOVED***
 	// UpdateMask specifies which fields to perform the update on. If empty,
 	// the operation applies to all fields.
 	UpdateMask *google_protobuf3.FieldMask `protobuf:"bytes,2,opt,name=update_mask,json=updateMask" json:"update_mask,omitempty"`
-***REMOVED***
+}
 
-func (m *UpdateContainerRequest) Reset()                    ***REMOVED*** *m = UpdateContainerRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*UpdateContainerRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*UpdateContainerRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorContainers, []int***REMOVED***7***REMOVED*** ***REMOVED***
+func (m *UpdateContainerRequest) Reset()                    { *m = UpdateContainerRequest{} }
+func (*UpdateContainerRequest) ProtoMessage()               {}
+func (*UpdateContainerRequest) Descriptor() ([]byte, []int) { return fileDescriptorContainers, []int{7} }
 
-type UpdateContainerResponse struct ***REMOVED***
+type UpdateContainerResponse struct {
 	Container Container `protobuf:"bytes,1,opt,name=container" json:"container"`
-***REMOVED***
+}
 
-func (m *UpdateContainerResponse) Reset()      ***REMOVED*** *m = UpdateContainerResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*UpdateContainerResponse) ProtoMessage() ***REMOVED******REMOVED***
-func (*UpdateContainerResponse) Descriptor() ([]byte, []int) ***REMOVED***
-	return fileDescriptorContainers, []int***REMOVED***8***REMOVED***
-***REMOVED***
+func (m *UpdateContainerResponse) Reset()      { *m = UpdateContainerResponse{} }
+func (*UpdateContainerResponse) ProtoMessage() {}
+func (*UpdateContainerResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptorContainers, []int{8}
+}
 
-type DeleteContainerRequest struct ***REMOVED***
+type DeleteContainerRequest struct {
 	ID string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-***REMOVED***
+}
 
-func (m *DeleteContainerRequest) Reset()                    ***REMOVED*** *m = DeleteContainerRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*DeleteContainerRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*DeleteContainerRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorContainers, []int***REMOVED***9***REMOVED*** ***REMOVED***
+func (m *DeleteContainerRequest) Reset()                    { *m = DeleteContainerRequest{} }
+func (*DeleteContainerRequest) ProtoMessage()               {}
+func (*DeleteContainerRequest) Descriptor() ([]byte, []int) { return fileDescriptorContainers, []int{9} }
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*Container)(nil), "containerd.services.containers.v1.Container")
 	proto.RegisterType((*Container_Runtime)(nil), "containerd.services.containers.v1.Container.Runtime")
 	proto.RegisterType((*GetContainerRequest)(nil), "containerd.services.containers.v1.GetContainerRequest")
@@ -232,7 +232,7 @@ func init() ***REMOVED***
 	proto.RegisterType((*UpdateContainerRequest)(nil), "containerd.services.containers.v1.UpdateContainerRequest")
 	proto.RegisterType((*UpdateContainerResponse)(nil), "containerd.services.containers.v1.UpdateContainerResponse")
 	proto.RegisterType((*DeleteContainerRequest)(nil), "containerd.services.containers.v1.DeleteContainerRequest")
-***REMOVED***
+}
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
@@ -244,223 +244,223 @@ const _ = grpc.SupportPackageIsVersion4
 
 // Client API for Containers service
 
-type ContainersClient interface ***REMOVED***
+type ContainersClient interface {
 	Get(ctx context.Context, in *GetContainerRequest, opts ...grpc.CallOption) (*GetContainerResponse, error)
 	List(ctx context.Context, in *ListContainersRequest, opts ...grpc.CallOption) (*ListContainersResponse, error)
 	Create(ctx context.Context, in *CreateContainerRequest, opts ...grpc.CallOption) (*CreateContainerResponse, error)
 	Update(ctx context.Context, in *UpdateContainerRequest, opts ...grpc.CallOption) (*UpdateContainerResponse, error)
 	Delete(ctx context.Context, in *DeleteContainerRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error)
-***REMOVED***
+}
 
-type containersClient struct ***REMOVED***
+type containersClient struct {
 	cc *grpc.ClientConn
-***REMOVED***
+}
 
-func NewContainersClient(cc *grpc.ClientConn) ContainersClient ***REMOVED***
-	return &containersClient***REMOVED***cc***REMOVED***
-***REMOVED***
+func NewContainersClient(cc *grpc.ClientConn) ContainersClient {
+	return &containersClient{cc}
+}
 
-func (c *containersClient) Get(ctx context.Context, in *GetContainerRequest, opts ...grpc.CallOption) (*GetContainerResponse, error) ***REMOVED***
+func (c *containersClient) Get(ctx context.Context, in *GetContainerRequest, opts ...grpc.CallOption) (*GetContainerResponse, error) {
 	out := new(GetContainerResponse)
 	err := grpc.Invoke(ctx, "/containerd.services.containers.v1.Containers/Get", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *containersClient) List(ctx context.Context, in *ListContainersRequest, opts ...grpc.CallOption) (*ListContainersResponse, error) ***REMOVED***
+func (c *containersClient) List(ctx context.Context, in *ListContainersRequest, opts ...grpc.CallOption) (*ListContainersResponse, error) {
 	out := new(ListContainersResponse)
 	err := grpc.Invoke(ctx, "/containerd.services.containers.v1.Containers/List", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *containersClient) Create(ctx context.Context, in *CreateContainerRequest, opts ...grpc.CallOption) (*CreateContainerResponse, error) ***REMOVED***
+func (c *containersClient) Create(ctx context.Context, in *CreateContainerRequest, opts ...grpc.CallOption) (*CreateContainerResponse, error) {
 	out := new(CreateContainerResponse)
 	err := grpc.Invoke(ctx, "/containerd.services.containers.v1.Containers/Create", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *containersClient) Update(ctx context.Context, in *UpdateContainerRequest, opts ...grpc.CallOption) (*UpdateContainerResponse, error) ***REMOVED***
+func (c *containersClient) Update(ctx context.Context, in *UpdateContainerRequest, opts ...grpc.CallOption) (*UpdateContainerResponse, error) {
 	out := new(UpdateContainerResponse)
 	err := grpc.Invoke(ctx, "/containerd.services.containers.v1.Containers/Update", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *containersClient) Delete(ctx context.Context, in *DeleteContainerRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) ***REMOVED***
+func (c *containersClient) Delete(ctx context.Context, in *DeleteContainerRequest, opts ...grpc.CallOption) (*google_protobuf2.Empty, error) {
 	out := new(google_protobuf2.Empty)
 	err := grpc.Invoke(ctx, "/containerd.services.containers.v1.Containers/Delete", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
 // Server API for Containers service
 
-type ContainersServer interface ***REMOVED***
+type ContainersServer interface {
 	Get(context.Context, *GetContainerRequest) (*GetContainerResponse, error)
 	List(context.Context, *ListContainersRequest) (*ListContainersResponse, error)
 	Create(context.Context, *CreateContainerRequest) (*CreateContainerResponse, error)
 	Update(context.Context, *UpdateContainerRequest) (*UpdateContainerResponse, error)
 	Delete(context.Context, *DeleteContainerRequest) (*google_protobuf2.Empty, error)
-***REMOVED***
+}
 
-func RegisterContainersServer(s *grpc.Server, srv ContainersServer) ***REMOVED***
+func RegisterContainersServer(s *grpc.Server, srv ContainersServer) {
 	s.RegisterService(&_Containers_serviceDesc, srv)
-***REMOVED***
+}
 
-func _Containers_Get_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _Containers_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetContainerRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(ContainersServer).Get(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/containerd.services.containers.v1.Containers/Get",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ContainersServer).Get(ctx, req.(*GetContainerRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _Containers_List_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _Containers_List_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListContainersRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(ContainersServer).List(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/containerd.services.containers.v1.Containers/List",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ContainersServer).List(ctx, req.(*ListContainersRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _Containers_Create_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _Containers_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateContainerRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(ContainersServer).Create(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/containerd.services.containers.v1.Containers/Create",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ContainersServer).Create(ctx, req.(*CreateContainerRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _Containers_Update_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _Containers_Update_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateContainerRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(ContainersServer).Update(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/containerd.services.containers.v1.Containers/Update",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ContainersServer).Update(ctx, req.(*UpdateContainerRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _Containers_Delete_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _Containers_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteContainerRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(ContainersServer).Delete(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/containerd.services.containers.v1.Containers/Delete",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ContainersServer).Delete(ctx, req.(*DeleteContainerRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-var _Containers_serviceDesc = grpc.ServiceDesc***REMOVED***
+var _Containers_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "containerd.services.containers.v1.Containers",
 	HandlerType: (*ContainersServer)(nil),
-	Methods: []grpc.MethodDesc***REMOVED***
-		***REMOVED***
+	Methods: []grpc.MethodDesc{
+		{
 			MethodName: "Get",
 			Handler:    _Containers_Get_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "List",
 			Handler:    _Containers_List_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "Create",
 			Handler:    _Containers_Create_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "Update",
 			Handler:    _Containers_Update_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "Delete",
 			Handler:    _Containers_Delete_Handler,
-		***REMOVED***,
-	***REMOVED***,
-	Streams:  []grpc.StreamDesc***REMOVED******REMOVED***,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
 	Metadata: "github.com/containerd/containerd/api/services/containers/v1/containers.proto",
-***REMOVED***
+}
 
-func (m *Container) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *Container) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *Container) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *Container) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ID) > 0 ***REMOVED***
+	if len(m.ID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintContainers(dAtA, i, uint64(len(m.ID)))
 		i += copy(dAtA[i:], m.ID)
-	***REMOVED***
-	if len(m.Labels) > 0 ***REMOVED***
-		for k, _ := range m.Labels ***REMOVED***
+	}
+	if len(m.Labels) > 0 {
+		for k, _ := range m.Labels {
 			dAtA[i] = 0x12
 			i++
 			v := m.Labels[k]
@@ -474,72 +474,72 @@ func (m *Container) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
 			i++
 			i = encodeVarintContainers(dAtA, i, uint64(len(v)))
 			i += copy(dAtA[i:], v)
-		***REMOVED***
-	***REMOVED***
-	if len(m.Image) > 0 ***REMOVED***
+		}
+	}
+	if len(m.Image) > 0 {
 		dAtA[i] = 0x1a
 		i++
 		i = encodeVarintContainers(dAtA, i, uint64(len(m.Image)))
 		i += copy(dAtA[i:], m.Image)
-	***REMOVED***
-	if m.Runtime != nil ***REMOVED***
+	}
+	if m.Runtime != nil {
 		dAtA[i] = 0x22
 		i++
 		i = encodeVarintContainers(dAtA, i, uint64(m.Runtime.Size()))
 		n1, err := m.Runtime.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n1
-	***REMOVED***
-	if m.Spec != nil ***REMOVED***
+	}
+	if m.Spec != nil {
 		dAtA[i] = 0x2a
 		i++
 		i = encodeVarintContainers(dAtA, i, uint64(m.Spec.Size()))
 		n2, err := m.Spec.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n2
-	***REMOVED***
-	if len(m.Snapshotter) > 0 ***REMOVED***
+	}
+	if len(m.Snapshotter) > 0 {
 		dAtA[i] = 0x32
 		i++
 		i = encodeVarintContainers(dAtA, i, uint64(len(m.Snapshotter)))
 		i += copy(dAtA[i:], m.Snapshotter)
-	***REMOVED***
-	if len(m.SnapshotKey) > 0 ***REMOVED***
+	}
+	if len(m.SnapshotKey) > 0 {
 		dAtA[i] = 0x3a
 		i++
 		i = encodeVarintContainers(dAtA, i, uint64(len(m.SnapshotKey)))
 		i += copy(dAtA[i:], m.SnapshotKey)
-	***REMOVED***
+	}
 	dAtA[i] = 0x42
 	i++
 	i = encodeVarintContainers(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)))
 	n3, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n3
 	dAtA[i] = 0x4a
 	i++
 	i = encodeVarintContainers(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)))
 	n4, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n4
-	if len(m.Extensions) > 0 ***REMOVED***
-		for k, _ := range m.Extensions ***REMOVED***
+	if len(m.Extensions) > 0 {
+		for k, _ := range m.Extensions {
 			dAtA[i] = 0x52
 			i++
 			v := m.Extensions[k]
 			msgSize := 0
-			if (&v) != nil ***REMOVED***
+			if (&v) != nil {
 				msgSize = (&v).Size()
 				msgSize += 1 + sovContainers(uint64(msgSize))
-			***REMOVED***
+			}
 			mapSize := 1 + len(k) + sovContainers(uint64(len(k))) + msgSize
 			i = encodeVarintContainers(dAtA, i, uint64(mapSize))
 			dAtA[i] = 0xa
@@ -550,84 +550,84 @@ func (m *Container) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
 			i++
 			i = encodeVarintContainers(dAtA, i, uint64((&v).Size()))
 			n5, err := (&v).MarshalTo(dAtA[i:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			i += n5
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *Container_Runtime) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *Container_Runtime) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *Container_Runtime) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *Container_Runtime) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Name) > 0 ***REMOVED***
+	if len(m.Name) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintContainers(dAtA, i, uint64(len(m.Name)))
 		i += copy(dAtA[i:], m.Name)
-	***REMOVED***
-	if m.Options != nil ***REMOVED***
+	}
+	if m.Options != nil {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintContainers(dAtA, i, uint64(m.Options.Size()))
 		n6, err := m.Options.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n6
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *GetContainerRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *GetContainerRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *GetContainerRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *GetContainerRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ID) > 0 ***REMOVED***
+	if len(m.ID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintContainers(dAtA, i, uint64(len(m.ID)))
 		i += copy(dAtA[i:], m.ID)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *GetContainerResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *GetContainerResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *GetContainerResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *GetContainerResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -636,87 +636,87 @@ func (m *GetContainerResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
 	i++
 	i = encodeVarintContainers(dAtA, i, uint64(m.Container.Size()))
 	n7, err := m.Container.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n7
 	return i, nil
-***REMOVED***
+}
 
-func (m *ListContainersRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *ListContainersRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *ListContainersRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *ListContainersRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Filters) > 0 ***REMOVED***
-		for _, s := range m.Filters ***REMOVED***
+	if len(m.Filters) > 0 {
+		for _, s := range m.Filters {
 			dAtA[i] = 0xa
 			i++
 			l = len(s)
-			for l >= 1<<7 ***REMOVED***
+			for l >= 1<<7 {
 				dAtA[i] = uint8(uint64(l)&0x7f | 0x80)
 				l >>= 7
 				i++
-			***REMOVED***
+			}
 			dAtA[i] = uint8(l)
 			i++
 			i += copy(dAtA[i:], s)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *ListContainersResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *ListContainersResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *ListContainersResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *ListContainersResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Containers) > 0 ***REMOVED***
-		for _, msg := range m.Containers ***REMOVED***
+	if len(m.Containers) > 0 {
+		for _, msg := range m.Containers {
 			dAtA[i] = 0xa
 			i++
 			i = encodeVarintContainers(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			i += n
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *CreateContainerRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *CreateContainerRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *CreateContainerRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *CreateContainerRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -725,24 +725,24 @@ func (m *CreateContainerRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED*
 	i++
 	i = encodeVarintContainers(dAtA, i, uint64(m.Container.Size()))
 	n8, err := m.Container.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n8
 	return i, nil
-***REMOVED***
+}
 
-func (m *CreateContainerResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *CreateContainerResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *CreateContainerResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *CreateContainerResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -751,24 +751,24 @@ func (m *CreateContainerResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED
 	i++
 	i = encodeVarintContainers(dAtA, i, uint64(m.Container.Size()))
 	n9, err := m.Container.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n9
 	return i, nil
-***REMOVED***
+}
 
-func (m *UpdateContainerRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *UpdateContainerRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *UpdateContainerRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *UpdateContainerRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -777,34 +777,34 @@ func (m *UpdateContainerRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED*
 	i++
 	i = encodeVarintContainers(dAtA, i, uint64(m.Container.Size()))
 	n10, err := m.Container.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n10
-	if m.UpdateMask != nil ***REMOVED***
+	if m.UpdateMask != nil {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintContainers(dAtA, i, uint64(m.UpdateMask.Size()))
 		n11, err := m.UpdateMask.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n11
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *UpdateContainerResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *UpdateContainerResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *UpdateContainerResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *UpdateContainerResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -813,237 +813,237 @@ func (m *UpdateContainerResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED
 	i++
 	i = encodeVarintContainers(dAtA, i, uint64(m.Container.Size()))
 	n12, err := m.Container.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n12
 	return i, nil
-***REMOVED***
+}
 
-func (m *DeleteContainerRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *DeleteContainerRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *DeleteContainerRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *DeleteContainerRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ID) > 0 ***REMOVED***
+	if len(m.ID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintContainers(dAtA, i, uint64(len(m.ID)))
 		i += copy(dAtA[i:], m.ID)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func encodeVarintContainers(dAtA []byte, offset int, v uint64) int ***REMOVED***
-	for v >= 1<<7 ***REMOVED***
+func encodeVarintContainers(dAtA []byte, offset int, v uint64) int {
+	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
-	***REMOVED***
+	}
 	dAtA[offset] = uint8(v)
 	return offset + 1
-***REMOVED***
-func (m *Container) Size() (n int) ***REMOVED***
+}
+func (m *Container) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovContainers(uint64(l))
-	***REMOVED***
-	if len(m.Labels) > 0 ***REMOVED***
-		for k, v := range m.Labels ***REMOVED***
+	}
+	if len(m.Labels) > 0 {
+		for k, v := range m.Labels {
 			_ = k
 			_ = v
 			mapEntrySize := 1 + len(k) + sovContainers(uint64(len(k))) + 1 + len(v) + sovContainers(uint64(len(v)))
 			n += mapEntrySize + 1 + sovContainers(uint64(mapEntrySize))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	l = len(m.Image)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovContainers(uint64(l))
-	***REMOVED***
-	if m.Runtime != nil ***REMOVED***
+	}
+	if m.Runtime != nil {
 		l = m.Runtime.Size()
 		n += 1 + l + sovContainers(uint64(l))
-	***REMOVED***
-	if m.Spec != nil ***REMOVED***
+	}
+	if m.Spec != nil {
 		l = m.Spec.Size()
 		n += 1 + l + sovContainers(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.Snapshotter)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovContainers(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.SnapshotKey)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovContainers(uint64(l))
-	***REMOVED***
+	}
 	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)
 	n += 1 + l + sovContainers(uint64(l))
 	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)
 	n += 1 + l + sovContainers(uint64(l))
-	if len(m.Extensions) > 0 ***REMOVED***
-		for k, v := range m.Extensions ***REMOVED***
+	if len(m.Extensions) > 0 {
+		for k, v := range m.Extensions {
 			_ = k
 			_ = v
 			l = v.Size()
 			mapEntrySize := 1 + len(k) + sovContainers(uint64(len(k))) + 1 + l + sovContainers(uint64(l))
 			n += mapEntrySize + 1 + sovContainers(uint64(mapEntrySize))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
+}
 
-func (m *Container_Runtime) Size() (n int) ***REMOVED***
+func (m *Container_Runtime) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.Name)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovContainers(uint64(l))
-	***REMOVED***
-	if m.Options != nil ***REMOVED***
+	}
+	if m.Options != nil {
 		l = m.Options.Size()
 		n += 1 + l + sovContainers(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *GetContainerRequest) Size() (n int) ***REMOVED***
+func (m *GetContainerRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovContainers(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *GetContainerResponse) Size() (n int) ***REMOVED***
+func (m *GetContainerResponse) Size() (n int) {
 	var l int
 	_ = l
 	l = m.Container.Size()
 	n += 1 + l + sovContainers(uint64(l))
 	return n
-***REMOVED***
+}
 
-func (m *ListContainersRequest) Size() (n int) ***REMOVED***
+func (m *ListContainersRequest) Size() (n int) {
 	var l int
 	_ = l
-	if len(m.Filters) > 0 ***REMOVED***
-		for _, s := range m.Filters ***REMOVED***
+	if len(m.Filters) > 0 {
+		for _, s := range m.Filters {
 			l = len(s)
 			n += 1 + l + sovContainers(uint64(l))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
+}
 
-func (m *ListContainersResponse) Size() (n int) ***REMOVED***
+func (m *ListContainersResponse) Size() (n int) {
 	var l int
 	_ = l
-	if len(m.Containers) > 0 ***REMOVED***
-		for _, e := range m.Containers ***REMOVED***
+	if len(m.Containers) > 0 {
+		for _, e := range m.Containers {
 			l = e.Size()
 			n += 1 + l + sovContainers(uint64(l))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
+}
 
-func (m *CreateContainerRequest) Size() (n int) ***REMOVED***
+func (m *CreateContainerRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = m.Container.Size()
 	n += 1 + l + sovContainers(uint64(l))
 	return n
-***REMOVED***
+}
 
-func (m *CreateContainerResponse) Size() (n int) ***REMOVED***
+func (m *CreateContainerResponse) Size() (n int) {
 	var l int
 	_ = l
 	l = m.Container.Size()
 	n += 1 + l + sovContainers(uint64(l))
 	return n
-***REMOVED***
+}
 
-func (m *UpdateContainerRequest) Size() (n int) ***REMOVED***
+func (m *UpdateContainerRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = m.Container.Size()
 	n += 1 + l + sovContainers(uint64(l))
-	if m.UpdateMask != nil ***REMOVED***
+	if m.UpdateMask != nil {
 		l = m.UpdateMask.Size()
 		n += 1 + l + sovContainers(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *UpdateContainerResponse) Size() (n int) ***REMOVED***
+func (m *UpdateContainerResponse) Size() (n int) {
 	var l int
 	_ = l
 	l = m.Container.Size()
 	n += 1 + l + sovContainers(uint64(l))
 	return n
-***REMOVED***
+}
 
-func (m *DeleteContainerRequest) Size() (n int) ***REMOVED***
+func (m *DeleteContainerRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovContainers(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func sovContainers(x uint64) (n int) ***REMOVED***
-	for ***REMOVED***
+func sovContainers(x uint64) (n int) {
+	for {
 		n++
 		x >>= 7
-		if x == 0 ***REMOVED***
+		if x == 0 {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
-func sozContainers(x uint64) (n int) ***REMOVED***
+}
+func sozContainers(x uint64) (n int) {
 	return sovContainers(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-***REMOVED***
-func (this *Container) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Container) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	keysForLabels := make([]string, 0, len(this.Labels))
-	for k, _ := range this.Labels ***REMOVED***
+	for k, _ := range this.Labels {
 		keysForLabels = append(keysForLabels, k)
-	***REMOVED***
+	}
 	github_com_gogo_protobuf_sortkeys.Strings(keysForLabels)
-	mapStringForLabels := "map[string]string***REMOVED***"
-	for _, k := range keysForLabels ***REMOVED***
+	mapStringForLabels := "map[string]string{"
+	for _, k := range keysForLabels {
 		mapStringForLabels += fmt.Sprintf("%v: %v,", k, this.Labels[k])
-	***REMOVED***
-	mapStringForLabels += "***REMOVED***"
+	}
+	mapStringForLabels += "}"
 	keysForExtensions := make([]string, 0, len(this.Extensions))
-	for k, _ := range this.Extensions ***REMOVED***
+	for k, _ := range this.Extensions {
 		keysForExtensions = append(keysForExtensions, k)
-	***REMOVED***
+	}
 	github_com_gogo_protobuf_sortkeys.Strings(keysForExtensions)
-	mapStringForExtensions := "map[string]google_protobuf1.Any***REMOVED***"
-	for _, k := range keysForExtensions ***REMOVED***
+	mapStringForExtensions := "map[string]google_protobuf1.Any{"
+	for _, k := range keysForExtensions {
 		mapStringForExtensions += fmt.Sprintf("%v: %v,", k, this.Extensions[k])
-	***REMOVED***
-	mapStringForExtensions += "***REMOVED***"
-	s := strings.Join([]string***REMOVED***`&Container***REMOVED***`,
+	}
+	mapStringForExtensions += "}"
+	s := strings.Join([]string{`&Container{`,
 		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
 		`Labels:` + mapStringForLabels + `,`,
 		`Image:` + fmt.Sprintf("%v", this.Image) + `,`,
@@ -1054,1603 +1054,1603 @@ func (this *Container) String() string ***REMOVED***
 		`CreatedAt:` + strings.Replace(strings.Replace(this.CreatedAt.String(), "Timestamp", "google_protobuf4.Timestamp", 1), `&`, ``, 1) + `,`,
 		`UpdatedAt:` + strings.Replace(strings.Replace(this.UpdatedAt.String(), "Timestamp", "google_protobuf4.Timestamp", 1), `&`, ``, 1) + `,`,
 		`Extensions:` + mapStringForExtensions + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *Container_Runtime) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Container_Runtime) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&Container_Runtime***REMOVED***`,
+	}
+	s := strings.Join([]string{`&Container_Runtime{`,
 		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
 		`Options:` + strings.Replace(fmt.Sprintf("%v", this.Options), "Any", "google_protobuf1.Any", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *GetContainerRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *GetContainerRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&GetContainerRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&GetContainerRequest{`,
 		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *GetContainerResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *GetContainerResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&GetContainerResponse***REMOVED***`,
+	}
+	s := strings.Join([]string{`&GetContainerResponse{`,
 		`Container:` + strings.Replace(strings.Replace(this.Container.String(), "Container", "Container", 1), `&`, ``, 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *ListContainersRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *ListContainersRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&ListContainersRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&ListContainersRequest{`,
 		`Filters:` + fmt.Sprintf("%v", this.Filters) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *ListContainersResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *ListContainersResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&ListContainersResponse***REMOVED***`,
+	}
+	s := strings.Join([]string{`&ListContainersResponse{`,
 		`Containers:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Containers), "Container", "Container", 1), `&`, ``, 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *CreateContainerRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *CreateContainerRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&CreateContainerRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&CreateContainerRequest{`,
 		`Container:` + strings.Replace(strings.Replace(this.Container.String(), "Container", "Container", 1), `&`, ``, 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *CreateContainerResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *CreateContainerResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&CreateContainerResponse***REMOVED***`,
+	}
+	s := strings.Join([]string{`&CreateContainerResponse{`,
 		`Container:` + strings.Replace(strings.Replace(this.Container.String(), "Container", "Container", 1), `&`, ``, 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *UpdateContainerRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *UpdateContainerRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&UpdateContainerRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&UpdateContainerRequest{`,
 		`Container:` + strings.Replace(strings.Replace(this.Container.String(), "Container", "Container", 1), `&`, ``, 1) + `,`,
 		`UpdateMask:` + strings.Replace(fmt.Sprintf("%v", this.UpdateMask), "FieldMask", "google_protobuf3.FieldMask", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *UpdateContainerResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *UpdateContainerResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&UpdateContainerResponse***REMOVED***`,
+	}
+	s := strings.Join([]string{`&UpdateContainerResponse{`,
 		`Container:` + strings.Replace(strings.Replace(this.Container.String(), "Container", "Container", 1), `&`, ``, 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *DeleteContainerRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *DeleteContainerRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&DeleteContainerRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&DeleteContainerRequest{`,
 		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func valueToStringContainers(v interface***REMOVED******REMOVED***) string ***REMOVED***
+}
+func valueToStringContainers(v interface{}) string {
 	rv := reflect.ValueOf(v)
-	if rv.IsNil() ***REMOVED***
+	if rv.IsNil() {
 		return "nil"
-	***REMOVED***
+	}
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
-***REMOVED***
-func (m *Container) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *Container) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowContainers
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: Container: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: Container: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowContainers
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthContainers
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Labels", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowContainers
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthContainers
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Labels == nil ***REMOVED***
+			}
+			if m.Labels == nil {
 				m.Labels = make(map[string]string)
-			***REMOVED***
+			}
 			var mapkey string
 			var mapvalue string
-			for iNdEx < postIndex ***REMOVED***
+			for iNdEx < postIndex {
 				entryPreIndex := iNdEx
 				var wire uint64
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return ErrIntOverflowContainers
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					wire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				fieldNum := int32(wire >> 3)
-				if fieldNum == 1 ***REMOVED***
+				if fieldNum == 1 {
 					var stringLenmapkey uint64
-					for shift := uint(0); ; shift += 7 ***REMOVED***
-						if shift >= 64 ***REMOVED***
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
 							return ErrIntOverflowContainers
-						***REMOVED***
-						if iNdEx >= l ***REMOVED***
+						}
+						if iNdEx >= l {
 							return io.ErrUnexpectedEOF
-						***REMOVED***
+						}
 						b := dAtA[iNdEx]
 						iNdEx++
 						stringLenmapkey |= (uint64(b) & 0x7F) << shift
-						if b < 0x80 ***REMOVED***
+						if b < 0x80 {
 							break
-						***REMOVED***
-					***REMOVED***
+						}
+					}
 					intStringLenmapkey := int(stringLenmapkey)
-					if intStringLenmapkey < 0 ***REMOVED***
+					if intStringLenmapkey < 0 {
 						return ErrInvalidLengthContainers
-					***REMOVED***
+					}
 					postStringIndexmapkey := iNdEx + intStringLenmapkey
-					if postStringIndexmapkey > l ***REMOVED***
+					if postStringIndexmapkey > l {
 						return io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
 					iNdEx = postStringIndexmapkey
-				***REMOVED*** else if fieldNum == 2 ***REMOVED***
+				} else if fieldNum == 2 {
 					var stringLenmapvalue uint64
-					for shift := uint(0); ; shift += 7 ***REMOVED***
-						if shift >= 64 ***REMOVED***
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
 							return ErrIntOverflowContainers
-						***REMOVED***
-						if iNdEx >= l ***REMOVED***
+						}
+						if iNdEx >= l {
 							return io.ErrUnexpectedEOF
-						***REMOVED***
+						}
 						b := dAtA[iNdEx]
 						iNdEx++
 						stringLenmapvalue |= (uint64(b) & 0x7F) << shift
-						if b < 0x80 ***REMOVED***
+						if b < 0x80 {
 							break
-						***REMOVED***
-					***REMOVED***
+						}
+					}
 					intStringLenmapvalue := int(stringLenmapvalue)
-					if intStringLenmapvalue < 0 ***REMOVED***
+					if intStringLenmapvalue < 0 {
 						return ErrInvalidLengthContainers
-					***REMOVED***
+					}
 					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
-					if postStringIndexmapvalue > l ***REMOVED***
+					if postStringIndexmapvalue > l {
 						return io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					mapvalue = string(dAtA[iNdEx:postStringIndexmapvalue])
 					iNdEx = postStringIndexmapvalue
-				***REMOVED*** else ***REMOVED***
+				} else {
 					iNdEx = entryPreIndex
 					skippy, err := skipContainers(dAtA[iNdEx:])
-					if err != nil ***REMOVED***
+					if err != nil {
 						return err
-					***REMOVED***
-					if skippy < 0 ***REMOVED***
+					}
+					if skippy < 0 {
 						return ErrInvalidLengthContainers
-					***REMOVED***
-					if (iNdEx + skippy) > postIndex ***REMOVED***
+					}
+					if (iNdEx + skippy) > postIndex {
 						return io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					iNdEx += skippy
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			m.Labels[mapkey] = mapvalue
 			iNdEx = postIndex
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Image", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowContainers
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthContainers
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Image = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 4:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Runtime", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowContainers
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthContainers
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Runtime == nil ***REMOVED***
-				m.Runtime = &Container_Runtime***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.Runtime.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.Runtime == nil {
+				m.Runtime = &Container_Runtime{}
+			}
+			if err := m.Runtime.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 5:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Spec", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowContainers
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthContainers
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Spec == nil ***REMOVED***
-				m.Spec = &google_protobuf1.Any***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.Spec.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.Spec == nil {
+				m.Spec = &google_protobuf1.Any{}
+			}
+			if err := m.Spec.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 6:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Snapshotter", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowContainers
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthContainers
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Snapshotter = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 7:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field SnapshotKey", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowContainers
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthContainers
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.SnapshotKey = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 8:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CreatedAt", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowContainers
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthContainers
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.CreatedAt, dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.CreatedAt, dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 9:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field UpdatedAt", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowContainers
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthContainers
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.UpdatedAt, dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.UpdatedAt, dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 10:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Extensions", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowContainers
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthContainers
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Extensions == nil ***REMOVED***
+			}
+			if m.Extensions == nil {
 				m.Extensions = make(map[string]google_protobuf1.Any)
-			***REMOVED***
+			}
 			var mapkey string
-			mapvalue := &google_protobuf1.Any***REMOVED******REMOVED***
-			for iNdEx < postIndex ***REMOVED***
+			mapvalue := &google_protobuf1.Any{}
+			for iNdEx < postIndex {
 				entryPreIndex := iNdEx
 				var wire uint64
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return ErrIntOverflowContainers
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					wire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				fieldNum := int32(wire >> 3)
-				if fieldNum == 1 ***REMOVED***
+				if fieldNum == 1 {
 					var stringLenmapkey uint64
-					for shift := uint(0); ; shift += 7 ***REMOVED***
-						if shift >= 64 ***REMOVED***
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
 							return ErrIntOverflowContainers
-						***REMOVED***
-						if iNdEx >= l ***REMOVED***
+						}
+						if iNdEx >= l {
 							return io.ErrUnexpectedEOF
-						***REMOVED***
+						}
 						b := dAtA[iNdEx]
 						iNdEx++
 						stringLenmapkey |= (uint64(b) & 0x7F) << shift
-						if b < 0x80 ***REMOVED***
+						if b < 0x80 {
 							break
-						***REMOVED***
-					***REMOVED***
+						}
+					}
 					intStringLenmapkey := int(stringLenmapkey)
-					if intStringLenmapkey < 0 ***REMOVED***
+					if intStringLenmapkey < 0 {
 						return ErrInvalidLengthContainers
-					***REMOVED***
+					}
 					postStringIndexmapkey := iNdEx + intStringLenmapkey
-					if postStringIndexmapkey > l ***REMOVED***
+					if postStringIndexmapkey > l {
 						return io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
 					iNdEx = postStringIndexmapkey
-				***REMOVED*** else if fieldNum == 2 ***REMOVED***
+				} else if fieldNum == 2 {
 					var mapmsglen int
-					for shift := uint(0); ; shift += 7 ***REMOVED***
-						if shift >= 64 ***REMOVED***
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
 							return ErrIntOverflowContainers
-						***REMOVED***
-						if iNdEx >= l ***REMOVED***
+						}
+						if iNdEx >= l {
 							return io.ErrUnexpectedEOF
-						***REMOVED***
+						}
 						b := dAtA[iNdEx]
 						iNdEx++
 						mapmsglen |= (int(b) & 0x7F) << shift
-						if b < 0x80 ***REMOVED***
+						if b < 0x80 {
 							break
-						***REMOVED***
-					***REMOVED***
-					if mapmsglen < 0 ***REMOVED***
+						}
+					}
+					if mapmsglen < 0 {
 						return ErrInvalidLengthContainers
-					***REMOVED***
+					}
 					postmsgIndex := iNdEx + mapmsglen
-					if mapmsglen < 0 ***REMOVED***
+					if mapmsglen < 0 {
 						return ErrInvalidLengthContainers
-					***REMOVED***
-					if postmsgIndex > l ***REMOVED***
+					}
+					if postmsgIndex > l {
 						return io.ErrUnexpectedEOF
-					***REMOVED***
-					mapvalue = &google_protobuf1.Any***REMOVED******REMOVED***
-					if err := mapvalue.Unmarshal(dAtA[iNdEx:postmsgIndex]); err != nil ***REMOVED***
+					}
+					mapvalue = &google_protobuf1.Any{}
+					if err := mapvalue.Unmarshal(dAtA[iNdEx:postmsgIndex]); err != nil {
 						return err
-					***REMOVED***
+					}
 					iNdEx = postmsgIndex
-				***REMOVED*** else ***REMOVED***
+				} else {
 					iNdEx = entryPreIndex
 					skippy, err := skipContainers(dAtA[iNdEx:])
-					if err != nil ***REMOVED***
+					if err != nil {
 						return err
-					***REMOVED***
-					if skippy < 0 ***REMOVED***
+					}
+					if skippy < 0 {
 						return ErrInvalidLengthContainers
-					***REMOVED***
-					if (iNdEx + skippy) > postIndex ***REMOVED***
+					}
+					if (iNdEx + skippy) > postIndex {
 						return io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					iNdEx += skippy
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			m.Extensions[mapkey] = *mapvalue
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipContainers(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthContainers
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *Container_Runtime) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *Container_Runtime) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowContainers
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: Runtime: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: Runtime: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowContainers
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthContainers
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Name = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Options", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowContainers
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthContainers
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Options == nil ***REMOVED***
-				m.Options = &google_protobuf1.Any***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.Options.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.Options == nil {
+				m.Options = &google_protobuf1.Any{}
+			}
+			if err := m.Options.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipContainers(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthContainers
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *GetContainerRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *GetContainerRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowContainers
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: GetContainerRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: GetContainerRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowContainers
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthContainers
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipContainers(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthContainers
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *GetContainerResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *GetContainerResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowContainers
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: GetContainerResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: GetContainerResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Container", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowContainers
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthContainers
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Container.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Container.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipContainers(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthContainers
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *ListContainersRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *ListContainersRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowContainers
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: ListContainersRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: ListContainersRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Filters", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowContainers
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthContainers
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Filters = append(m.Filters, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipContainers(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthContainers
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *ListContainersResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *ListContainersResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowContainers
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: ListContainersResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: ListContainersResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Containers", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowContainers
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthContainers
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.Containers = append(m.Containers, Container***REMOVED******REMOVED***)
-			if err := m.Containers[len(m.Containers)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			m.Containers = append(m.Containers, Container{})
+			if err := m.Containers[len(m.Containers)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipContainers(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthContainers
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *CreateContainerRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *CreateContainerRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowContainers
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: CreateContainerRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: CreateContainerRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Container", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowContainers
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthContainers
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Container.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Container.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipContainers(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthContainers
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *CreateContainerResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *CreateContainerResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowContainers
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: CreateContainerResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: CreateContainerResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Container", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowContainers
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthContainers
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Container.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Container.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipContainers(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthContainers
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *UpdateContainerRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *UpdateContainerRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowContainers
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: UpdateContainerRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: UpdateContainerRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Container", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowContainers
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthContainers
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Container.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Container.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field UpdateMask", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowContainers
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthContainers
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.UpdateMask == nil ***REMOVED***
-				m.UpdateMask = &google_protobuf3.FieldMask***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.UpdateMask.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.UpdateMask == nil {
+				m.UpdateMask = &google_protobuf3.FieldMask{}
+			}
+			if err := m.UpdateMask.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipContainers(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthContainers
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *UpdateContainerResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *UpdateContainerResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowContainers
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: UpdateContainerResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: UpdateContainerResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Container", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowContainers
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthContainers
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Container.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Container.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipContainers(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthContainers
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *DeleteContainerRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *DeleteContainerRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowContainers
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: DeleteContainerRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: DeleteContainerRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowContainers
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthContainers
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipContainers(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthContainers
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func skipContainers(dAtA []byte) (n int, err error) ***REMOVED***
+}
+func skipContainers(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return 0, ErrIntOverflowContainers
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return 0, io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		wireType := int(wire & 0x7)
-		switch wireType ***REMOVED***
+		switch wireType {
 		case 0:
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowContainers
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				iNdEx++
-				if dAtA[iNdEx-1] < 0x80 ***REMOVED***
+				if dAtA[iNdEx-1] < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return iNdEx, nil
 		case 1:
 			iNdEx += 8
 			return iNdEx, nil
 		case 2:
 			var length int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowContainers
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				length |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			iNdEx += length
-			if length < 0 ***REMOVED***
+			if length < 0 {
 				return 0, ErrInvalidLengthContainers
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 3:
-			for ***REMOVED***
+			for {
 				var innerWire uint64
 				var start int = iNdEx
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return 0, ErrIntOverflowContainers
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return 0, io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					innerWire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				innerWireType := int(innerWire & 0x7)
-				if innerWireType == 4 ***REMOVED***
+				if innerWireType == 4 {
 					break
-				***REMOVED***
+				}
 				next, err := skipContainers(dAtA[start:])
-				if err != nil ***REMOVED***
+				if err != nil {
 					return 0, err
-				***REMOVED***
+				}
 				iNdEx = start + next
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 4:
 			return iNdEx, nil
@@ -2659,21 +2659,21 @@ func skipContainers(dAtA []byte) (n int, err error) ***REMOVED***
 			return iNdEx, nil
 		default:
 			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	panic("unreachable")
-***REMOVED***
+}
 
 var (
 	ErrInvalidLengthContainers = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowContainers   = fmt.Errorf("proto: integer overflow")
 )
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterFile("github.com/containerd/containerd/api/services/containers/v1/containers.proto", fileDescriptorContainers)
-***REMOVED***
+}
 
-var fileDescriptorContainers = []byte***REMOVED***
+var fileDescriptorContainers = []byte{
 	// 776 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x56, 0xcd, 0x72, 0xd2, 0x50,
 	0x14, 0x26, 0x81, 0x86, 0x72, 0x70, 0x46, 0xe7, 0x8a, 0x18, 0xe3, 0x0c, 0x50, 0x56, 0x8c, 0xa3,
@@ -2724,4 +2724,4 @@ var fileDescriptorContainers = []byte***REMOVED***
 	0x77, 0x32, 0x28, 0x70, 0x3f, 0x06, 0x05, 0xee, 0x6c, 0x50, 0xe0, 0xde, 0xec, 0xfc, 0xc3, 0x9f,
 	0xbe, 0xf5, 0x30, 0x7a, 0x9d, 0x68, 0x08, 0xac, 0xe6, 0x83, 0xdf, 0x01, 0x00, 0x00, 0xff, 0xff,
 	0x95, 0x94, 0x84, 0xf2, 0x47, 0x0a, 0x00, 0x00,
-***REMOVED***
+}

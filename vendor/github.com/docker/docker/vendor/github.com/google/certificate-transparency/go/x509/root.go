@@ -11,7 +11,7 @@ var (
 	systemRoots *CertPool
 )
 
-func systemRootsPool() *CertPool ***REMOVED***
+func systemRootsPool() *CertPool {
 	once.Do(initSystemRoots)
 	return systemRoots
-***REMOVED***
+}

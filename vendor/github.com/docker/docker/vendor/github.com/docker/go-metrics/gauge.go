@@ -3,7 +3,7 @@ package metrics
 import "github.com/prometheus/client_golang/prometheus"
 
 // Gauge is a metric that allows incrementing and decrementing a value
-type Gauge interface ***REMOVED***
+type Gauge interface {
 	Inc(...float64)
 	Dec(...float64)
 
@@ -12,61 +12,61 @@ type Gauge interface ***REMOVED***
 
 	// Set replaces the gauge's current value with the provided value
 	Set(float64)
-***REMOVED***
+}
 
 // LabeledGauge describes a gauge the must have values populated before use.
-type LabeledGauge interface ***REMOVED***
+type LabeledGauge interface {
 	WithValues(labels ...string) Gauge
-***REMOVED***
+}
 
-type labeledGauge struct ***REMOVED***
+type labeledGauge struct {
 	pg *prometheus.GaugeVec
-***REMOVED***
+}
 
-func (lg *labeledGauge) WithValues(labels ...string) Gauge ***REMOVED***
-	return &gauge***REMOVED***pg: lg.pg.WithLabelValues(labels...)***REMOVED***
-***REMOVED***
+func (lg *labeledGauge) WithValues(labels ...string) Gauge {
+	return &gauge{pg: lg.pg.WithLabelValues(labels...)}
+}
 
-func (lg *labeledGauge) Describe(c chan<- *prometheus.Desc) ***REMOVED***
+func (lg *labeledGauge) Describe(c chan<- *prometheus.Desc) {
 	lg.pg.Describe(c)
-***REMOVED***
+}
 
-func (lg *labeledGauge) Collect(c chan<- prometheus.Metric) ***REMOVED***
+func (lg *labeledGauge) Collect(c chan<- prometheus.Metric) {
 	lg.pg.Collect(c)
-***REMOVED***
+}
 
-type gauge struct ***REMOVED***
+type gauge struct {
 	pg prometheus.Gauge
-***REMOVED***
+}
 
-func (g *gauge) Inc(vs ...float64) ***REMOVED***
-	if len(vs) == 0 ***REMOVED***
+func (g *gauge) Inc(vs ...float64) {
+	if len(vs) == 0 {
 		g.pg.Inc()
-	***REMOVED***
+	}
 
 	g.Add(sumFloat64(vs...))
-***REMOVED***
+}
 
-func (g *gauge) Dec(vs ...float64) ***REMOVED***
-	if len(vs) == 0 ***REMOVED***
+func (g *gauge) Dec(vs ...float64) {
+	if len(vs) == 0 {
 		g.pg.Dec()
-	***REMOVED***
+	}
 
 	g.Add(-sumFloat64(vs...))
-***REMOVED***
+}
 
-func (g *gauge) Add(v float64) ***REMOVED***
+func (g *gauge) Add(v float64) {
 	g.pg.Add(v)
-***REMOVED***
+}
 
-func (g *gauge) Set(v float64) ***REMOVED***
+func (g *gauge) Set(v float64) {
 	g.pg.Set(v)
-***REMOVED***
+}
 
-func (g *gauge) Describe(c chan<- *prometheus.Desc) ***REMOVED***
+func (g *gauge) Describe(c chan<- *prometheus.Desc) {
 	g.pg.Describe(c)
-***REMOVED***
+}
 
-func (g *gauge) Collect(c chan<- prometheus.Metric) ***REMOVED***
+func (g *gauge) Collect(c chan<- prometheus.Metric) {
 	g.pg.Collect(c)
-***REMOVED***
+}

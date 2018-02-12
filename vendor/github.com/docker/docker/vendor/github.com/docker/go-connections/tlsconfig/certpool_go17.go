@@ -9,10 +9,10 @@ import (
 
 // SystemCertPool returns a copy of the system cert pool,
 // returns an error if failed to load or empty pool on windows.
-func SystemCertPool() (*x509.CertPool, error) ***REMOVED***
+func SystemCertPool() (*x509.CertPool, error) {
 	certpool, err := x509.SystemCertPool()
-	if err != nil && runtime.GOOS == "windows" ***REMOVED***
+	if err != nil && runtime.GOOS == "windows" {
 		return x509.NewCertPool(), nil
-	***REMOVED***
+	}
 	return certpool, err
-***REMOVED***
+}

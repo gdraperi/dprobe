@@ -1,31 +1,31 @@
 package scheduler
 
-type nodeMaxHeap struct ***REMOVED***
+type nodeMaxHeap struct {
 	nodes    []NodeInfo
 	lessFunc func(*NodeInfo, *NodeInfo) bool
 	length   int
-***REMOVED***
+}
 
-func (h nodeMaxHeap) Len() int ***REMOVED***
+func (h nodeMaxHeap) Len() int {
 	return h.length
-***REMOVED***
+}
 
-func (h nodeMaxHeap) Swap(i, j int) ***REMOVED***
+func (h nodeMaxHeap) Swap(i, j int) {
 	h.nodes[i], h.nodes[j] = h.nodes[j], h.nodes[i]
-***REMOVED***
+}
 
-func (h nodeMaxHeap) Less(i, j int) bool ***REMOVED***
+func (h nodeMaxHeap) Less(i, j int) bool {
 	// reversed to make a max-heap
 	return h.lessFunc(&h.nodes[j], &h.nodes[i])
-***REMOVED***
+}
 
-func (h *nodeMaxHeap) Push(x interface***REMOVED******REMOVED***) ***REMOVED***
+func (h *nodeMaxHeap) Push(x interface{}) {
 	h.nodes = append(h.nodes, x.(NodeInfo))
 	h.length++
-***REMOVED***
+}
 
-func (h *nodeMaxHeap) Pop() interface***REMOVED******REMOVED*** ***REMOVED***
+func (h *nodeMaxHeap) Pop() interface{} {
 	h.length--
 	// return value is never used
 	return nil
-***REMOVED***
+}

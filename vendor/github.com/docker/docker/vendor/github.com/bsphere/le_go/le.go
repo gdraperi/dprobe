@@ -20,14 +20,14 @@ import (
 // all Logger operations are thread safe and blocking,
 // log operations can be invoked in a non-blocking way by calling them from
 // a goroutine.
-type Logger struct ***REMOVED***
+type Logger struct {
 	conn   net.Conn
 	flag   int
 	mu     sync.Mutex
 	prefix string
 	token  string
 	buf    []byte
-***REMOVED***
+}
 
 const lineSep = "\n"
 
@@ -35,42 +35,42 @@ const lineSep = "\n"
 // logentries.com,
 // The token can be generated at logentries.com by adding a new log,
 // choosing manual configuration and token based TCP connection.
-func Connect(token string) (*Logger, error) ***REMOVED***
-	logger := Logger***REMOVED***
+func Connect(token string) (*Logger, error) {
+	logger := Logger{
 		token: token,
-	***REMOVED***
+	}
 
-	if err := logger.openConnection(); err != nil ***REMOVED***
+	if err := logger.openConnection(); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	return &logger, nil
-***REMOVED***
+}
 
 // Close closes the TCP connection to logentries.com
-func (logger *Logger) Close() error ***REMOVED***
-	if logger.conn != nil ***REMOVED***
+func (logger *Logger) Close() error {
+	if logger.conn != nil {
 		return logger.conn.Close()
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // Opens a TCP connection to logentries.com
-func (logger *Logger) openConnection() error ***REMOVED***
-	conn, err := tls.Dial("tcp", "data.logentries.com:443", &tls.Config***REMOVED******REMOVED***)
-	if err != nil ***REMOVED***
+func (logger *Logger) openConnection() error {
+	conn, err := tls.Dial("tcp", "data.logentries.com:443", &tls.Config{})
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	logger.conn = conn
 	return nil
-***REMOVED***
+}
 
 // It returns if the TCP connection to logentries.com is open
-func (logger *Logger) isOpenConnection() bool ***REMOVED***
-	if logger.conn == nil ***REMOVED***
+func (logger *Logger) isOpenConnection() bool {
+	if logger.conn == nil {
 		return false
-	***REMOVED***
+	}
 
 	buf := make([]byte, 1)
 
@@ -78,118 +78,118 @@ func (logger *Logger) isOpenConnection() bool ***REMOVED***
 
 	_, err := logger.conn.Read(buf)
 
-	switch err.(type) ***REMOVED***
+	switch err.(type) {
 	case net.Error:
-		if err.(net.Error).Timeout() == true ***REMOVED***
-			logger.conn.SetReadDeadline(time.Time***REMOVED******REMOVED***)
+		if err.(net.Error).Timeout() == true {
+			logger.conn.SetReadDeadline(time.Time{})
 
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return false
-***REMOVED***
+}
 
 // It ensures that the TCP connection to logentries.com is open.
 // If the connection is closed, a new one is opened.
-func (logger *Logger) ensureOpenConnection() error ***REMOVED***
-	if !logger.isOpenConnection() ***REMOVED***
-		if err := logger.openConnection(); err != nil ***REMOVED***
+func (logger *Logger) ensureOpenConnection() error {
+	if !logger.isOpenConnection() {
+		if err := logger.openConnection(); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
 // Fatal is same as Print() but calls to os.Exit(1)
-func (logger *Logger) Fatal(v ...interface***REMOVED******REMOVED***) ***REMOVED***
+func (logger *Logger) Fatal(v ...interface{}) {
 	logger.Output(2, fmt.Sprint(v...))
 	os.Exit(1)
-***REMOVED***
+}
 
 // Fatalf is same as Printf() but calls to os.Exit(1)
-func (logger *Logger) Fatalf(format string, v ...interface***REMOVED******REMOVED***) ***REMOVED***
+func (logger *Logger) Fatalf(format string, v ...interface{}) {
 	logger.Output(2, fmt.Sprintf(format, v...))
 	os.Exit(1)
-***REMOVED***
+}
 
 // Fatalln is same as Println() but calls to os.Exit(1)
-func (logger *Logger) Fatalln(v ...interface***REMOVED******REMOVED***) ***REMOVED***
+func (logger *Logger) Fatalln(v ...interface{}) {
 	logger.Output(2, fmt.Sprintln(v...))
 	os.Exit(1)
-***REMOVED***
+}
 
 // Flags returns the logger flags
-func (logger *Logger) Flags() int ***REMOVED***
+func (logger *Logger) Flags() int {
 	return logger.flag
-***REMOVED***
+}
 
 // Output does the actual writing to the TCP connection
-func (logger *Logger) Output(calldepth int, s string) error ***REMOVED***
+func (logger *Logger) Output(calldepth int, s string) error {
 	_, err := logger.Write([]byte(s))
 
 	return err
-***REMOVED***
+}
 
 // Panic is same as Print() but calls to panic
-func (logger *Logger) Panic(v ...interface***REMOVED******REMOVED***) ***REMOVED***
+func (logger *Logger) Panic(v ...interface{}) {
 	s := fmt.Sprint(v...)
 	logger.Output(2, s)
 	panic(s)
-***REMOVED***
+}
 
 // Panicf is same as Printf() but calls to panic
-func (logger *Logger) Panicf(format string, v ...interface***REMOVED******REMOVED***) ***REMOVED***
+func (logger *Logger) Panicf(format string, v ...interface{}) {
 	s := fmt.Sprintf(format, v...)
 	logger.Output(2, s)
 	panic(s)
-***REMOVED***
+}
 
 // Panicln is same as Println() but calls to panic
-func (logger *Logger) Panicln(v ...interface***REMOVED******REMOVED***) ***REMOVED***
+func (logger *Logger) Panicln(v ...interface{}) {
 	s := fmt.Sprintln(v...)
 	logger.Output(2, s)
 	panic(s)
-***REMOVED***
+}
 
 // Prefix returns the logger prefix
-func (logger *Logger) Prefix() string ***REMOVED***
+func (logger *Logger) Prefix() string {
 	return logger.prefix
-***REMOVED***
+}
 
 // Print logs a message
-func (logger *Logger) Print(v ...interface***REMOVED******REMOVED***) ***REMOVED***
+func (logger *Logger) Print(v ...interface{}) {
 	logger.Output(2, fmt.Sprint(v...))
-***REMOVED***
+}
 
 // Printf logs a formatted message
-func (logger *Logger) Printf(format string, v ...interface***REMOVED******REMOVED***) ***REMOVED***
+func (logger *Logger) Printf(format string, v ...interface{}) {
 	logger.Output(2, fmt.Sprintf(format, v...))
-***REMOVED***
+}
 
 // Println logs a message with a linebreak
-func (logger *Logger) Println(v ...interface***REMOVED******REMOVED***) ***REMOVED***
+func (logger *Logger) Println(v ...interface{}) {
 	logger.Output(2, fmt.Sprintln(v...))
-***REMOVED***
+}
 
 // SetFlags sets the logger flags
-func (logger *Logger) SetFlags(flag int) ***REMOVED***
+func (logger *Logger) SetFlags(flag int) {
 	logger.flag = flag
-***REMOVED***
+}
 
 // SetPrefix sets the logger prefix
-func (logger *Logger) SetPrefix(prefix string) ***REMOVED***
+func (logger *Logger) SetPrefix(prefix string) {
 	logger.prefix = prefix
-***REMOVED***
+}
 
 // Write writes a bytes array to the Logentries TCP connection,
 // it adds the access token and prefix and also replaces
 // line breaks with the unicode \u2028 character
-func (logger *Logger) Write(p []byte) (n int, err error) ***REMOVED***
-	if err := logger.ensureOpenConnection(); err != nil ***REMOVED***
+func (logger *Logger) Write(p []byte) (n int, err error) {
+	if err := logger.ensureOpenConnection(); err != nil {
 		return 0, err
-	***REMOVED***
+	}
 
 	logger.mu.Lock()
 	defer logger.mu.Unlock()
@@ -197,11 +197,11 @@ func (logger *Logger) Write(p []byte) (n int, err error) ***REMOVED***
 	logger.makeBuf(p)
 
 	return logger.conn.Write(logger.buf)
-***REMOVED***
+}
 
 // makeBuf constructs the logger buffer
 // it is not safe to be used from within multiple concurrent goroutines
-func (logger *Logger) makeBuf(p []byte) ***REMOVED***
+func (logger *Logger) makeBuf(p []byte) {
 	count := strings.Count(string(p), lineSep)
 	p = []byte(strings.Replace(string(p), lineSep, "\u2028", count-1))
 
@@ -210,7 +210,7 @@ func (logger *Logger) makeBuf(p []byte) ***REMOVED***
 	logger.buf = append(logger.buf, (logger.prefix + " ")...)
 	logger.buf = append(logger.buf, p...)
 
-	if !strings.HasSuffix(string(logger.buf), lineSep) ***REMOVED***
+	if !strings.HasSuffix(string(logger.buf), lineSep) {
 		logger.buf = append(logger.buf, (lineSep)...)
-	***REMOVED***
-***REMOVED***
+	}
+}

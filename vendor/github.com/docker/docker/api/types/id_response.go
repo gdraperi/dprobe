@@ -5,9 +5,9 @@ package types
 
 // IDResponse Response to an API call that returns just an Id
 // swagger:model IdResponse
-type IDResponse struct ***REMOVED***
+type IDResponse struct {
 
 	// The id of the newly created object.
 	// Required: true
 	ID string `json:"Id"`
-***REMOVED***
+}

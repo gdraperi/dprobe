@@ -8,8 +8,8 @@ import "github.com/docker/swarmkit/api/types.proto";
 import "gogoproto/gogo.proto";
 import "github.com/docker/swarmkit/protobuf/plugin/plugin.proto";
 
-message Object ***REMOVED***
-	oneof Object ***REMOVED***
+message Object {
+	oneof Object {
 		Node node = 1;
 		Service service = 2;
 		Network network = 3;
@@ -19,27 +19,27 @@ message Object ***REMOVED***
 		Resource resource = 7;
 		Extension extension = 8;
 		Config config = 9;
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // FIXME(aaronl): These messages should ideally be embedded in SelectBy, but
 // protoc generates bad code for that.
-message SelectBySlot ***REMOVED***
+message SelectBySlot {
 	string service_id = 1 [(gogoproto.customname) = "ServiceID"];
 	uint64 slot = 2;
-***REMOVED***
+}
 
-message SelectByCustom ***REMOVED***
+message SelectByCustom {
 	string kind = 1;
 	string index = 2;
 	string value = 3;
-***REMOVED***
+}
 
-message SelectBy ***REMOVED***
+message SelectBy {
 	// TODO(aaronl): Are all of these things we want to expose in
 	// the API? Exposing them may commit us to maintaining those
 	// internal indices going forward.
-	oneof By ***REMOVED***
+	oneof By {
 		// supported by all object types
 		string id = 1 [(gogoproto.customname) = "ID"]; // not applicable for FindObjects - use GetObject instead
 		string id_prefix = 2 [(gogoproto.customname) = "IDPrefix"];
@@ -65,24 +65,24 @@ message SelectBy ***REMOVED***
 
 		// supported by: resource
 		string kind = 15;
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 
 // Watch defines the RPC methods for monitoring data store change.
-service Watch ***REMOVED***
+service Watch {
 	// Watch starts a stream that returns any changes to objects that match
 	// the specified selectors. When the stream begins, it immediately sends
 	// an empty message back to the client. It is important to wait for
 	// this message before taking any actions that depend on an established
 	// stream of changes for consistency.
-	rpc Watch(WatchRequest) returns (stream WatchMessage) ***REMOVED***
-		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED*** roles: "swarm-manager" ***REMOVED***;
-	***REMOVED***;
-***REMOVED***
+	rpc Watch(WatchRequest) returns (stream WatchMessage) {
+		option (docker.protobuf.plugin.tls_authorization) = { roles: "swarm-manager" };
+	};
+}
 
-message WatchRequest ***REMOVED***
-	message WatchEntry ***REMOVED***
+message WatchRequest {
+	message WatchEntry {
 		// Kind can contain a builtin type such as "node", "secret", etc. or
 		// the kind specified by a custom-defined object.
 		string kind = 1;
@@ -94,7 +94,7 @@ message WatchRequest ***REMOVED***
 		// Filters are combined using AND logic - an event must match
 		// all of them to pass the filter.
 		repeated SelectBy filters = 3;
-	***REMOVED***
+	}
 
 	// Multiple entries are combined using OR logic - i.e. if an event
 	// matches all of the selectors specified in any single watch entry,
@@ -113,13 +113,13 @@ message WatchRequest ***REMOVED***
 	// changes will include the old object (not historical changes
 	// retrieved using ResumeFrom).
 	bool include_old_object = 3;
-***REMOVED***
+}
 
 // WatchMessage is the type of the stream that's returned to the client by
 // Watch. Note that the first item of this stream will always be a WatchMessage
 // with a nil Object, to signal that the stream has started.
-message WatchMessage ***REMOVED***
-	message Event ***REMOVED***
+message WatchMessage {
+	message Event {
 		// Action (create/update/delete)
 		// Note that WatchMessage does not expose "commit" events that
 		// mark transaction boundaries.
@@ -132,23 +132,23 @@ message WatchMessage ***REMOVED***
 		// watch message, containing the previous version of the
 		// object, if IncludeOldObject was set in WatchRequest.
 		Object old_object = 3;
-	***REMOVED***
+	}
 
 	repeated Event events = 1;
 
 	// Index versions this change to the data store. It can be used to
 	// resume the watch from this point.
 	Version version = 2;
-***REMOVED***
+}
 
 // WatchActionKind distinguishes between creations, updates, and removals. It
 // is structured as a bitmap so multiple kinds of events can be requested with
 // a mask.
-enum WatchActionKind ***REMOVED***
+enum WatchActionKind {
 	option (gogoproto.goproto_enum_prefix) = false;
 	option (gogoproto.enum_customname) = "WatchActionKind";
 	WATCH_ACTION_UNKNOWN = 0 [(gogoproto.enumvalue_customname) = "WatchActionKindUnknown"]; // default value, invalid
 	WATCH_ACTION_CREATE = 1 [(gogoproto.enumvalue_customname) = "WatchActionKindCreate"];
 	WATCH_ACTION_UPDATE = 2 [(gogoproto.enumvalue_customname) = "WatchActionKindUpdate"];
 	WATCH_ACTION_REMOVE = 4 [(gogoproto.enumvalue_customname) = "WatchActionKindRemove"];
-***REMOVED***
+}

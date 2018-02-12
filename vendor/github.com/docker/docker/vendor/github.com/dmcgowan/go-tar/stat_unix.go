@@ -15,45 +15,45 @@ import (
 	"syscall"
 )
 
-func init() ***REMOVED***
+func init() {
 	sysStat = statUnix
-***REMOVED***
+}
 
 // userMap and groupMap caches UID and GID lookups for performance reasons.
 // The downside is that renaming uname or gname by the OS never takes effect.
 var userMap, groupMap sync.Map // map[int]string
 
-func statUnix(fi os.FileInfo, h *Header) error ***REMOVED***
+func statUnix(fi os.FileInfo, h *Header) error {
 	sys, ok := fi.Sys().(*syscall.Stat_t)
-	if !ok ***REMOVED***
+	if !ok {
 		return nil
-	***REMOVED***
+	}
 	h.Uid = int(sys.Uid)
 	h.Gid = int(sys.Gid)
 
 	// Best effort at populating Uname and Gname.
 	// The os/user functions may fail for any number of reasons
 	// (not implemented on that platform, cgo not enabled, etc).
-	if u, ok := userMap.Load(h.Uid); ok ***REMOVED***
+	if u, ok := userMap.Load(h.Uid); ok {
 		h.Uname = u.(string)
-	***REMOVED*** else if u, err := user.LookupId(strconv.Itoa(h.Uid)); err == nil ***REMOVED***
+	} else if u, err := user.LookupId(strconv.Itoa(h.Uid)); err == nil {
 		h.Uname = u.Username
 		userMap.Store(h.Uid, h.Uname)
-	***REMOVED***
-	if g, ok := groupMap.Load(h.Gid); ok ***REMOVED***
+	}
+	if g, ok := groupMap.Load(h.Gid); ok {
 		h.Gname = g.(string)
-	***REMOVED*** else if g, err := user.LookupGroupId(strconv.Itoa(h.Gid)); err == nil ***REMOVED***
+	} else if g, err := user.LookupGroupId(strconv.Itoa(h.Gid)); err == nil {
 		h.Gname = g.Name
 		groupMap.Store(h.Gid, h.Gname)
-	***REMOVED***
+	}
 
 	h.AccessTime = statAtime(sys)
 	h.ChangeTime = statCtime(sys)
 
 	// Best effort at populating Devmajor and Devminor.
-	if h.Typeflag == TypeChar || h.Typeflag == TypeBlock ***REMOVED***
+	if h.Typeflag == TypeChar || h.Typeflag == TypeBlock {
 		dev := uint64(sys.Rdev) // May be int32 or uint32
-		switch runtime.GOOS ***REMOVED***
+		switch runtime.GOOS {
 		case "linux":
 			// Copied from golang.org/x/sys/unix/dev_linux.go.
 			major := uint32((dev & 0x00000000000fff00) >> 8)
@@ -90,7 +90,7 @@ func statUnix(fi os.FileInfo, h *Header) error ***REMOVED***
 			h.Devmajor, h.Devminor = int64(major), int64(minor)
 		default:
 			// TODO: Implement solaris (see https://golang.org/issue/8106)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}

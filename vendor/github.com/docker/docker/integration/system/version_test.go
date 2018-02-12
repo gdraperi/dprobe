@@ -9,7 +9,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestVersion(t *testing.T) ***REMOVED***
+func TestVersion(t *testing.T) {
 	client := request.NewAPIClient(t)
 
 	version, err := client.ServerVersion(context.Background())
@@ -20,4 +20,4 @@ func TestVersion(t *testing.T) ***REMOVED***
 	assert.NotNil(t, version.MinAPIVersion)
 	assert.Equal(t, testEnv.DaemonInfo.ExperimentalBuild, version.Experimental)
 	assert.Equal(t, testEnv.OSType, version.Os)
-***REMOVED***
+}

@@ -6,7 +6,7 @@ const (
 	EXT_COPYUP = 1 << iota
 )
 
-type Mount struct ***REMOVED***
+type Mount struct {
 	// Source path for the mount.
 	Source string `json:"source"`
 
@@ -36,4 +36,4 @@ type Mount struct ***REMOVED***
 
 	// Optional Command to be run after Source is mounted.
 	PostmountCmds []Command `json:"postmount_cmds"`
-***REMOVED***
+}

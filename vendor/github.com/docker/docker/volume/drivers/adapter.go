@@ -14,71 +14,71 @@ var (
 	errNoSuchVolume = errors.New("no such volume")
 )
 
-type volumeDriverAdapter struct ***REMOVED***
+type volumeDriverAdapter struct {
 	name         string
 	baseHostPath string
 	capabilities *volume.Capability
 	proxy        *volumeDriverProxy
-***REMOVED***
+}
 
-func (a *volumeDriverAdapter) Name() string ***REMOVED***
+func (a *volumeDriverAdapter) Name() string {
 	return a.name
-***REMOVED***
+}
 
-func (a *volumeDriverAdapter) Create(name string, opts map[string]string) (volume.Volume, error) ***REMOVED***
-	if err := a.proxy.Create(name, opts); err != nil ***REMOVED***
+func (a *volumeDriverAdapter) Create(name string, opts map[string]string) (volume.Volume, error) {
+	if err := a.proxy.Create(name, opts); err != nil {
 		return nil, err
-	***REMOVED***
-	return &volumeAdapter***REMOVED***
+	}
+	return &volumeAdapter{
 		proxy:        a.proxy,
 		name:         name,
 		driverName:   a.name,
 		baseHostPath: a.baseHostPath,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-func (a *volumeDriverAdapter) Remove(v volume.Volume) error ***REMOVED***
+func (a *volumeDriverAdapter) Remove(v volume.Volume) error {
 	return a.proxy.Remove(v.Name())
-***REMOVED***
+}
 
-func hostPath(baseHostPath, path string) string ***REMOVED***
-	if baseHostPath != "" ***REMOVED***
+func hostPath(baseHostPath, path string) string {
+	if baseHostPath != "" {
 		path = filepath.Join(baseHostPath, path)
-	***REMOVED***
+	}
 	return path
-***REMOVED***
+}
 
-func (a *volumeDriverAdapter) List() ([]volume.Volume, error) ***REMOVED***
+func (a *volumeDriverAdapter) List() ([]volume.Volume, error) {
 	ls, err := a.proxy.List()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	var out []volume.Volume
-	for _, vp := range ls ***REMOVED***
-		out = append(out, &volumeAdapter***REMOVED***
+	for _, vp := range ls {
+		out = append(out, &volumeAdapter{
 			proxy:        a.proxy,
 			name:         vp.Name,
 			baseHostPath: a.baseHostPath,
 			driverName:   a.name,
 			eMount:       hostPath(a.baseHostPath, vp.Mountpoint),
-		***REMOVED***)
-	***REMOVED***
+		})
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (a *volumeDriverAdapter) Get(name string) (volume.Volume, error) ***REMOVED***
+func (a *volumeDriverAdapter) Get(name string) (volume.Volume, error) {
 	v, err := a.proxy.Get(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// plugin may have returned no volume and no error
-	if v == nil ***REMOVED***
+	if v == nil {
 		return nil, errNoSuchVolume
-	***REMOVED***
+	}
 
-	return &volumeAdapter***REMOVED***
+	return &volumeAdapter{
 		proxy:        a.proxy,
 		name:         v.Name,
 		driverName:   a.Name(),
@@ -86,99 +86,99 @@ func (a *volumeDriverAdapter) Get(name string) (volume.Volume, error) ***REMOVED
 		createdAt:    v.CreatedAt,
 		status:       v.Status,
 		baseHostPath: a.baseHostPath,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-func (a *volumeDriverAdapter) Scope() string ***REMOVED***
+func (a *volumeDriverAdapter) Scope() string {
 	cap := a.getCapabilities()
 	return cap.Scope
-***REMOVED***
+}
 
-func (a *volumeDriverAdapter) getCapabilities() volume.Capability ***REMOVED***
-	if a.capabilities != nil ***REMOVED***
+func (a *volumeDriverAdapter) getCapabilities() volume.Capability {
+	if a.capabilities != nil {
 		return *a.capabilities
-	***REMOVED***
+	}
 	cap, err := a.proxy.Capabilities()
-	if err != nil ***REMOVED***
+	if err != nil {
 		// `GetCapabilities` is a not a required endpoint.
 		// On error assume it's a local-only driver
 		logrus.Warnf("Volume driver %s returned an error while trying to query its capabilities, using default capabilities: %v", a.name, err)
-		return volume.Capability***REMOVED***Scope: volume.LocalScope***REMOVED***
-	***REMOVED***
+		return volume.Capability{Scope: volume.LocalScope}
+	}
 
 	// don't spam the warn log below just because the plugin didn't provide a scope
-	if len(cap.Scope) == 0 ***REMOVED***
+	if len(cap.Scope) == 0 {
 		cap.Scope = volume.LocalScope
-	***REMOVED***
+	}
 
 	cap.Scope = strings.ToLower(cap.Scope)
-	if cap.Scope != volume.LocalScope && cap.Scope != volume.GlobalScope ***REMOVED***
+	if cap.Scope != volume.LocalScope && cap.Scope != volume.GlobalScope {
 		logrus.Warnf("Volume driver %q returned an invalid scope: %q", a.Name(), cap.Scope)
 		cap.Scope = volume.LocalScope
-	***REMOVED***
+	}
 
 	a.capabilities = &cap
 	return cap
-***REMOVED***
+}
 
-type volumeAdapter struct ***REMOVED***
+type volumeAdapter struct {
 	proxy        *volumeDriverProxy
 	name         string
 	baseHostPath string
 	driverName   string
 	eMount       string    // ephemeral host volume path
 	createdAt    time.Time // time the directory was created
-	status       map[string]interface***REMOVED******REMOVED***
-***REMOVED***
+	status       map[string]interface{}
+}
 
-type proxyVolume struct ***REMOVED***
+type proxyVolume struct {
 	Name       string
 	Mountpoint string
 	CreatedAt  time.Time
-	Status     map[string]interface***REMOVED******REMOVED***
-***REMOVED***
+	Status     map[string]interface{}
+}
 
-func (a *volumeAdapter) Name() string ***REMOVED***
+func (a *volumeAdapter) Name() string {
 	return a.name
-***REMOVED***
+}
 
-func (a *volumeAdapter) DriverName() string ***REMOVED***
+func (a *volumeAdapter) DriverName() string {
 	return a.driverName
-***REMOVED***
+}
 
-func (a *volumeAdapter) Path() string ***REMOVED***
-	if len(a.eMount) == 0 ***REMOVED***
+func (a *volumeAdapter) Path() string {
+	if len(a.eMount) == 0 {
 		mountpoint, _ := a.proxy.Path(a.name)
 		a.eMount = hostPath(a.baseHostPath, mountpoint)
-	***REMOVED***
+	}
 	return a.eMount
-***REMOVED***
+}
 
-func (a *volumeAdapter) CachedPath() string ***REMOVED***
+func (a *volumeAdapter) CachedPath() string {
 	return a.eMount
-***REMOVED***
+}
 
-func (a *volumeAdapter) Mount(id string) (string, error) ***REMOVED***
+func (a *volumeAdapter) Mount(id string) (string, error) {
 	mountpoint, err := a.proxy.Mount(a.name, id)
 	a.eMount = hostPath(a.baseHostPath, mountpoint)
 	return a.eMount, err
-***REMOVED***
+}
 
-func (a *volumeAdapter) Unmount(id string) error ***REMOVED***
+func (a *volumeAdapter) Unmount(id string) error {
 	err := a.proxy.Unmount(a.name, id)
-	if err == nil ***REMOVED***
+	if err == nil {
 		a.eMount = ""
-	***REMOVED***
+	}
 	return err
-***REMOVED***
+}
 
-func (a *volumeAdapter) CreatedAt() (time.Time, error) ***REMOVED***
+func (a *volumeAdapter) CreatedAt() (time.Time, error) {
 	return a.createdAt, nil
-***REMOVED***
-func (a *volumeAdapter) Status() map[string]interface***REMOVED******REMOVED*** ***REMOVED***
-	out := make(map[string]interface***REMOVED******REMOVED***, len(a.status))
-	for k, v := range a.status ***REMOVED***
+}
+func (a *volumeAdapter) Status() map[string]interface{} {
+	out := make(map[string]interface{}, len(a.status))
+	for k, v := range a.status {
 		out[k] = v
-	***REMOVED***
+	}
 	return out
-***REMOVED***
+}

@@ -19,7 +19,7 @@ import (
 	"golang.org/x/net/websocket"
 )
 
-func (s *DockerSuite) TestGetContainersAttachWebsocket(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestGetContainersAttachWebsocket(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	out, _ := dockerCmd(c, "run", "-dit", "busybox", "cat")
 
@@ -41,38 +41,38 @@ func (s *DockerSuite) TestGetContainersAttachWebsocket(c *check.C) ***REMOVED***
 	actual := make([]byte, len(expected))
 
 	outChan := make(chan error)
-	go func() ***REMOVED***
+	go func() {
 		_, err := io.ReadFull(ws, actual)
 		outChan <- err
 		close(outChan)
-	***REMOVED***()
+	}()
 
 	inChan := make(chan error)
-	go func() ***REMOVED***
+	go func() {
 		_, err := ws.Write(expected)
 		inChan <- err
 		close(inChan)
-	***REMOVED***()
+	}()
 
-	select ***REMOVED***
+	select {
 	case err := <-inChan:
 		c.Assert(err, checker.IsNil)
 	case <-time.After(5 * time.Second):
 		c.Fatal("Timeout writing to ws")
-	***REMOVED***
+	}
 
-	select ***REMOVED***
+	select {
 	case err := <-outChan:
 		c.Assert(err, checker.IsNil)
 	case <-time.After(5 * time.Second):
 		c.Fatal("Timeout reading from ws")
-	***REMOVED***
+	}
 
 	c.Assert(actual, checker.DeepEquals, expected, check.Commentf("Websocket didn't return the expected data"))
-***REMOVED***
+}
 
 // regression gh14320
-func (s *DockerSuite) TestPostContainersAttachContainerNotFound(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestPostContainersAttachContainerNotFound(c *check.C) {
 	client, err := request.NewHTTPClient(daemonHost())
 	c.Assert(err, checker.IsNil)
 	req, err := request.New(daemonHost(), "/containers/doesnotexist/attach", request.Method(http.MethodPost))
@@ -83,9 +83,9 @@ func (s *DockerSuite) TestPostContainersAttachContainerNotFound(c *check.C) ***R
 	c.Assert(err, checker.IsNil)
 	expected := "No such container: doesnotexist\r\n"
 	c.Assert(string(content), checker.Equals, expected)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestGetContainersWsAttachContainerNotFound(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestGetContainersWsAttachContainerNotFound(c *check.C) {
 	res, body, err := request.Get("/containers/doesnotexist/attach/ws")
 	c.Assert(res.StatusCode, checker.Equals, http.StatusNotFound)
 	c.Assert(err, checker.IsNil)
@@ -93,12 +93,12 @@ func (s *DockerSuite) TestGetContainersWsAttachContainerNotFound(c *check.C) ***
 	c.Assert(err, checker.IsNil)
 	expected := "No such container: doesnotexist"
 	c.Assert(getErrorMessage(c, b), checker.Contains, expected)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestPostContainersAttach(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestPostContainersAttach(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 
-	expectSuccess := func(conn net.Conn, br *bufio.Reader, stream string, tty bool) ***REMOVED***
+	expectSuccess := func(conn net.Conn, br *bufio.Reader, stream string, tty bool) {
 		defer conn.Close()
 		expected := []byte("success")
 		_, err := conn.Write(expected)
@@ -106,26 +106,26 @@ func (s *DockerSuite) TestPostContainersAttach(c *check.C) ***REMOVED***
 
 		conn.SetReadDeadline(time.Now().Add(time.Second))
 		lenHeader := 0
-		if !tty ***REMOVED***
+		if !tty {
 			lenHeader = 8
-		***REMOVED***
+		}
 		actual := make([]byte, len(expected)+lenHeader)
 		_, err = io.ReadFull(br, actual)
 		c.Assert(err, checker.IsNil)
-		if !tty ***REMOVED***
-			fdMap := map[string]byte***REMOVED***
+		if !tty {
+			fdMap := map[string]byte{
 				"stdin":  0,
 				"stdout": 1,
 				"stderr": 2,
-			***REMOVED***
+			}
 			c.Assert(actual[0], checker.Equals, fdMap[stream])
-		***REMOVED***
+		}
 		c.Assert(actual[lenHeader:], checker.DeepEquals, expected, check.Commentf("Attach didn't return the expected data from %s", stream))
-	***REMOVED***
+	}
 
-	expectTimeout := func(conn net.Conn, br *bufio.Reader, stream string) ***REMOVED***
+	expectTimeout := func(conn net.Conn, br *bufio.Reader, stream string) {
 		defer conn.Close()
-		_, err := conn.Write([]byte***REMOVED***'t'***REMOVED***)
+		_, err := conn.Write([]byte{'t'})
 		c.Assert(err, checker.IsNil)
 
 		conn.SetReadDeadline(time.Now().Add(time.Second))
@@ -134,7 +134,7 @@ func (s *DockerSuite) TestPostContainersAttach(c *check.C) ***REMOVED***
 		opErr, ok := err.(*net.OpError)
 		c.Assert(ok, checker.Equals, true, check.Commentf("Error is expected to be *net.OpError, got %v", err))
 		c.Assert(opErr.Timeout(), checker.Equals, true, check.Commentf("Read from %s is expected to timeout", stream))
-	***REMOVED***
+	}
 
 	// Create a container that only emits stdout.
 	cid, _ := dockerCmd(c, "run", "-di", "busybox", "cat")
@@ -184,11 +184,11 @@ func (s *DockerSuite) TestPostContainersAttach(c *check.C) ***REMOVED***
 	cid, _ = dockerCmd(c, "run", "-di", "busybox", "/bin/sh", "-c", "echo hello; cat")
 	cid = strings.TrimSpace(cid)
 
-	attachOpts := types.ContainerAttachOptions***REMOVED***
+	attachOpts := types.ContainerAttachOptions{
 		Stream: true,
 		Stdin:  true,
 		Stdout: true,
-	***REMOVED***
+	}
 
 	resp, err := client.ContainerAttach(context.Background(), cid, attachOpts)
 	c.Assert(err, checker.IsNil)
@@ -209,4 +209,4 @@ func (s *DockerSuite) TestPostContainersAttach(c *check.C) ***REMOVED***
 	actualStderr := new(bytes.Buffer)
 	stdcopy.StdCopy(actualStdout, actualStderr, resp.Reader)
 	c.Assert(actualStdout.Bytes(), checker.DeepEquals, []byte("hello\nsuccess"), check.Commentf("Attach didn't return the expected data from stdout"))
-***REMOVED***
+}

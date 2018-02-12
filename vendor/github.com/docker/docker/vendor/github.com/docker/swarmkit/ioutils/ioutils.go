@@ -10,31 +10,31 @@ import (
 // todo: split docker/pkg/ioutils into a separate repo
 
 // AtomicWriteFile atomically writes data to a file specified by filename.
-func AtomicWriteFile(filename string, data []byte, perm os.FileMode) error ***REMOVED***
+func AtomicWriteFile(filename string, data []byte, perm os.FileMode) error {
 	f, err := ioutil.TempFile(filepath.Dir(filename), ".tmp-"+filepath.Base(filename))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	err = os.Chmod(f.Name(), perm)
-	if err != nil ***REMOVED***
+	if err != nil {
 		f.Close()
 		return err
-	***REMOVED***
+	}
 	n, err := f.Write(data)
-	if err == nil && n < len(data) ***REMOVED***
+	if err == nil && n < len(data) {
 		f.Close()
 		return io.ErrShortWrite
-	***REMOVED***
-	if err != nil ***REMOVED***
+	}
+	if err != nil {
 		f.Close()
 		return err
-	***REMOVED***
-	if err := f.Sync(); err != nil ***REMOVED***
+	}
+	if err := f.Sync(); err != nil {
 		f.Close()
 		return err
-	***REMOVED***
-	if err := f.Close(); err != nil ***REMOVED***
+	}
+	if err := f.Close(); err != nil {
 		return err
-	***REMOVED***
+	}
 	return os.Rename(f.Name(), filename)
-***REMOVED***
+}

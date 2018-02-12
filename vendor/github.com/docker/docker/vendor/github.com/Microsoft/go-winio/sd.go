@@ -18,81 +18,81 @@ const (
 	cERROR_NONE_MAPPED = syscall.Errno(1332)
 )
 
-type AccountLookupError struct ***REMOVED***
+type AccountLookupError struct {
 	Name string
 	Err  error
-***REMOVED***
+}
 
-func (e *AccountLookupError) Error() string ***REMOVED***
-	if e.Name == "" ***REMOVED***
+func (e *AccountLookupError) Error() string {
+	if e.Name == "" {
 		return "lookup account: empty account name specified"
-	***REMOVED***
+	}
 	var s string
-	switch e.Err ***REMOVED***
+	switch e.Err {
 	case cERROR_NONE_MAPPED:
 		s = "not found"
 	default:
 		s = e.Err.Error()
-	***REMOVED***
+	}
 	return "lookup account " + e.Name + ": " + s
-***REMOVED***
+}
 
-type SddlConversionError struct ***REMOVED***
+type SddlConversionError struct {
 	Sddl string
 	Err  error
-***REMOVED***
+}
 
-func (e *SddlConversionError) Error() string ***REMOVED***
+func (e *SddlConversionError) Error() string {
 	return "convert " + e.Sddl + ": " + e.Err.Error()
-***REMOVED***
+}
 
 // LookupSidByName looks up the SID of an account by name
-func LookupSidByName(name string) (sid string, err error) ***REMOVED***
-	if name == "" ***REMOVED***
-		return "", &AccountLookupError***REMOVED***name, cERROR_NONE_MAPPED***REMOVED***
-	***REMOVED***
+func LookupSidByName(name string) (sid string, err error) {
+	if name == "" {
+		return "", &AccountLookupError{name, cERROR_NONE_MAPPED}
+	}
 
 	var sidSize, sidNameUse, refDomainSize uint32
 	err = lookupAccountName(nil, name, nil, &sidSize, nil, &refDomainSize, &sidNameUse)
-	if err != nil && err != syscall.ERROR_INSUFFICIENT_BUFFER ***REMOVED***
-		return "", &AccountLookupError***REMOVED***name, err***REMOVED***
-	***REMOVED***
+	if err != nil && err != syscall.ERROR_INSUFFICIENT_BUFFER {
+		return "", &AccountLookupError{name, err}
+	}
 	sidBuffer := make([]byte, sidSize)
 	refDomainBuffer := make([]uint16, refDomainSize)
 	err = lookupAccountName(nil, name, &sidBuffer[0], &sidSize, &refDomainBuffer[0], &refDomainSize, &sidNameUse)
-	if err != nil ***REMOVED***
-		return "", &AccountLookupError***REMOVED***name, err***REMOVED***
-	***REMOVED***
+	if err != nil {
+		return "", &AccountLookupError{name, err}
+	}
 	var strBuffer *uint16
 	err = convertSidToStringSid(&sidBuffer[0], &strBuffer)
-	if err != nil ***REMOVED***
-		return "", &AccountLookupError***REMOVED***name, err***REMOVED***
-	***REMOVED***
+	if err != nil {
+		return "", &AccountLookupError{name, err}
+	}
 	sid = syscall.UTF16ToString((*[0xffff]uint16)(unsafe.Pointer(strBuffer))[:])
 	localFree(uintptr(unsafe.Pointer(strBuffer)))
 	return sid, nil
-***REMOVED***
+}
 
-func SddlToSecurityDescriptor(sddl string) ([]byte, error) ***REMOVED***
+func SddlToSecurityDescriptor(sddl string) ([]byte, error) {
 	var sdBuffer uintptr
 	err := convertStringSecurityDescriptorToSecurityDescriptor(sddl, 1, &sdBuffer, nil)
-	if err != nil ***REMOVED***
-		return nil, &SddlConversionError***REMOVED***sddl, err***REMOVED***
-	***REMOVED***
+	if err != nil {
+		return nil, &SddlConversionError{sddl, err}
+	}
 	defer localFree(sdBuffer)
 	sd := make([]byte, getSecurityDescriptorLength(sdBuffer))
 	copy(sd, (*[0xffff]byte)(unsafe.Pointer(sdBuffer))[:len(sd)])
 	return sd, nil
-***REMOVED***
+}
 
-func SecurityDescriptorToSddl(sd []byte) (string, error) ***REMOVED***
+func SecurityDescriptorToSddl(sd []byte) (string, error) {
 	var sddl *uint16
 	// The returned string length seems to including an aribtrary number of terminating NULs.
 	// Don't use it.
 	err := convertSecurityDescriptorToStringSecurityDescriptor(&sd[0], 1, 0xff, &sddl, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	defer localFree(uintptr(unsafe.Pointer(sddl)))
 	return syscall.UTF16ToString((*[0xffff]uint16)(unsafe.Pointer(sddl))[:]), nil
-***REMOVED***
+}

@@ -5,7 +5,7 @@ package types
 
 // GraphDriverData Information about a container's graph driver.
 // swagger:model GraphDriverData
-type GraphDriverData struct ***REMOVED***
+type GraphDriverData struct {
 
 	// data
 	// Required: true
@@ -14,4 +14,4 @@ type GraphDriverData struct ***REMOVED***
 	// name
 	// Required: true
 	Name string `json:"Name"`
-***REMOVED***
+}

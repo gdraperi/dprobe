@@ -46,135 +46,135 @@ import (
 )
 
 // TokenSource supplies PerRPCCredentials from an oauth2.TokenSource.
-type TokenSource struct ***REMOVED***
+type TokenSource struct {
 	oauth2.TokenSource
-***REMOVED***
+}
 
 // GetRequestMetadata gets the request metadata as a map from a TokenSource.
-func (ts TokenSource) GetRequestMetadata(ctx context.Context, uri ...string) (map[string]string, error) ***REMOVED***
+func (ts TokenSource) GetRequestMetadata(ctx context.Context, uri ...string) (map[string]string, error) {
 	token, err := ts.Token()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	return map[string]string***REMOVED***
+	}
+	return map[string]string{
 		"authorization": token.Type() + " " + token.AccessToken,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // RequireTransportSecurity indicates whether the credentials requires transport security.
-func (ts TokenSource) RequireTransportSecurity() bool ***REMOVED***
+func (ts TokenSource) RequireTransportSecurity() bool {
 	return true
-***REMOVED***
+}
 
-type jwtAccess struct ***REMOVED***
+type jwtAccess struct {
 	jsonKey []byte
-***REMOVED***
+}
 
 // NewJWTAccessFromFile creates PerRPCCredentials from the given keyFile.
-func NewJWTAccessFromFile(keyFile string) (credentials.PerRPCCredentials, error) ***REMOVED***
+func NewJWTAccessFromFile(keyFile string) (credentials.PerRPCCredentials, error) {
 	jsonKey, err := ioutil.ReadFile(keyFile)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("credentials: failed to read the service account key file: %v", err)
-	***REMOVED***
+	}
 	return NewJWTAccessFromKey(jsonKey)
-***REMOVED***
+}
 
 // NewJWTAccessFromKey creates PerRPCCredentials from the given jsonKey.
-func NewJWTAccessFromKey(jsonKey []byte) (credentials.PerRPCCredentials, error) ***REMOVED***
-	return jwtAccess***REMOVED***jsonKey***REMOVED***, nil
-***REMOVED***
+func NewJWTAccessFromKey(jsonKey []byte) (credentials.PerRPCCredentials, error) {
+	return jwtAccess{jsonKey}, nil
+}
 
-func (j jwtAccess) GetRequestMetadata(ctx context.Context, uri ...string) (map[string]string, error) ***REMOVED***
+func (j jwtAccess) GetRequestMetadata(ctx context.Context, uri ...string) (map[string]string, error) {
 	ts, err := google.JWTAccessTokenSourceFromJSON(j.jsonKey, uri[0])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	token, err := ts.Token()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	return map[string]string***REMOVED***
+	}
+	return map[string]string{
 		"authorization": token.TokenType + " " + token.AccessToken,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-func (j jwtAccess) RequireTransportSecurity() bool ***REMOVED***
+func (j jwtAccess) RequireTransportSecurity() bool {
 	return true
-***REMOVED***
+}
 
 // oauthAccess supplies PerRPCCredentials from a given token.
-type oauthAccess struct ***REMOVED***
+type oauthAccess struct {
 	token oauth2.Token
-***REMOVED***
+}
 
 // NewOauthAccess constructs the PerRPCCredentials using a given token.
-func NewOauthAccess(token *oauth2.Token) credentials.PerRPCCredentials ***REMOVED***
-	return oauthAccess***REMOVED***token: *token***REMOVED***
-***REMOVED***
+func NewOauthAccess(token *oauth2.Token) credentials.PerRPCCredentials {
+	return oauthAccess{token: *token}
+}
 
-func (oa oauthAccess) GetRequestMetadata(ctx context.Context, uri ...string) (map[string]string, error) ***REMOVED***
-	return map[string]string***REMOVED***
+func (oa oauthAccess) GetRequestMetadata(ctx context.Context, uri ...string) (map[string]string, error) {
+	return map[string]string{
 		"authorization": oa.token.TokenType + " " + oa.token.AccessToken,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-func (oa oauthAccess) RequireTransportSecurity() bool ***REMOVED***
+func (oa oauthAccess) RequireTransportSecurity() bool {
 	return true
-***REMOVED***
+}
 
 // NewComputeEngine constructs the PerRPCCredentials that fetches access tokens from
 // Google Compute Engine (GCE)'s metadata server. It is only valid to use this
 // if your program is running on a GCE instance.
 // TODO(dsymonds): Deprecate and remove this.
-func NewComputeEngine() credentials.PerRPCCredentials ***REMOVED***
-	return TokenSource***REMOVED***google.ComputeTokenSource("")***REMOVED***
-***REMOVED***
+func NewComputeEngine() credentials.PerRPCCredentials {
+	return TokenSource{google.ComputeTokenSource("")}
+}
 
 // serviceAccount represents PerRPCCredentials via JWT signing key.
-type serviceAccount struct ***REMOVED***
+type serviceAccount struct {
 	config *jwt.Config
-***REMOVED***
+}
 
-func (s serviceAccount) GetRequestMetadata(ctx context.Context, uri ...string) (map[string]string, error) ***REMOVED***
+func (s serviceAccount) GetRequestMetadata(ctx context.Context, uri ...string) (map[string]string, error) {
 	token, err := s.config.TokenSource(ctx).Token()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	return map[string]string***REMOVED***
+	}
+	return map[string]string{
 		"authorization": token.TokenType + " " + token.AccessToken,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-func (s serviceAccount) RequireTransportSecurity() bool ***REMOVED***
+func (s serviceAccount) RequireTransportSecurity() bool {
 	return true
-***REMOVED***
+}
 
 // NewServiceAccountFromKey constructs the PerRPCCredentials using the JSON key slice
 // from a Google Developers service account.
-func NewServiceAccountFromKey(jsonKey []byte, scope ...string) (credentials.PerRPCCredentials, error) ***REMOVED***
+func NewServiceAccountFromKey(jsonKey []byte, scope ...string) (credentials.PerRPCCredentials, error) {
 	config, err := google.JWTConfigFromJSON(jsonKey, scope...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	return serviceAccount***REMOVED***config: config***REMOVED***, nil
-***REMOVED***
+	}
+	return serviceAccount{config: config}, nil
+}
 
 // NewServiceAccountFromFile constructs the PerRPCCredentials using the JSON key file
 // of a Google Developers service account.
-func NewServiceAccountFromFile(keyFile string, scope ...string) (credentials.PerRPCCredentials, error) ***REMOVED***
+func NewServiceAccountFromFile(keyFile string, scope ...string) (credentials.PerRPCCredentials, error) {
 	jsonKey, err := ioutil.ReadFile(keyFile)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("credentials: failed to read the service account key file: %v", err)
-	***REMOVED***
+	}
 	return NewServiceAccountFromKey(jsonKey, scope...)
-***REMOVED***
+}
 
 // NewApplicationDefault returns "Application Default Credentials". For more
 // detail, see https://developers.google.com/accounts/docs/application-default-credentials.
-func NewApplicationDefault(ctx context.Context, scope ...string) (credentials.PerRPCCredentials, error) ***REMOVED***
+func NewApplicationDefault(ctx context.Context, scope ...string) (credentials.PerRPCCredentials, error) {
 	t, err := google.DefaultTokenSource(ctx, scope...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	return TokenSource***REMOVED***t***REMOVED***, nil
-***REMOVED***
+	}
+	return TokenSource{t}, nil
+}

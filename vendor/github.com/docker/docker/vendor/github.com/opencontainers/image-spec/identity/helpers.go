@@ -25,16 +25,16 @@ import (
 
 // FromReader consumes the content of rd until io.EOF, returning canonical
 // digest.
-func FromReader(rd io.Reader) (digest.Digest, error) ***REMOVED***
+func FromReader(rd io.Reader) (digest.Digest, error) {
 	return digest.Canonical.FromReader(rd)
-***REMOVED***
+}
 
 // FromBytes digests the input and returns a Digest.
-func FromBytes(p []byte) digest.Digest ***REMOVED***
+func FromBytes(p []byte) digest.Digest {
 	return digest.Canonical.FromBytes(p)
-***REMOVED***
+}
 
 // FromString digests the input and returns a Digest.
-func FromString(s string) digest.Digest ***REMOVED***
+func FromString(s string) digest.Digest {
 	return digest.Canonical.FromString(s)
-***REMOVED***
+}

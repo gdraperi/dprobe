@@ -26,14 +26,14 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type cmdOption struct ***REMOVED***
+type cmdOption struct {
 	Name         string
 	Shorthand    string `yaml:",omitempty"`
 	DefaultValue string `yaml:"default_value,omitempty"`
 	Usage        string `yaml:",omitempty"`
-***REMOVED***
+}
 
-type cmdDoc struct ***REMOVED***
+type cmdDoc struct {
 	Name             string
 	Synopsis         string      `yaml:",omitempty"`
 	Description      string      `yaml:",omitempty"`
@@ -41,129 +41,129 @@ type cmdDoc struct ***REMOVED***
 	InheritedOptions []cmdOption `yaml:"inherited_options,omitempty"`
 	Example          string      `yaml:",omitempty"`
 	SeeAlso          []string    `yaml:"see_also,omitempty"`
-***REMOVED***
+}
 
 // GenYamlTree creates yaml structured ref files for this command and all descendants
 // in the directory given. This function may not work
 // correctly if your command names have `-` in them. If you have `cmd` with two
 // subcmds, `sub` and `sub-third`, and `sub` has a subcommand called `third`
 // it is undefined which help output will be in the file `cmd-sub-third.1`.
-func GenYamlTree(cmd *cobra.Command, dir string) error ***REMOVED***
-	identity := func(s string) string ***REMOVED*** return s ***REMOVED***
-	emptyStr := func(s string) string ***REMOVED*** return "" ***REMOVED***
+func GenYamlTree(cmd *cobra.Command, dir string) error {
+	identity := func(s string) string { return s }
+	emptyStr := func(s string) string { return "" }
 	return GenYamlTreeCustom(cmd, dir, emptyStr, identity)
-***REMOVED***
+}
 
 // GenYamlTreeCustom creates yaml structured ref files.
-func GenYamlTreeCustom(cmd *cobra.Command, dir string, filePrepender, linkHandler func(string) string) error ***REMOVED***
-	for _, c := range cmd.Commands() ***REMOVED***
-		if !c.IsAvailableCommand() || c.IsAdditionalHelpTopicCommand() ***REMOVED***
+func GenYamlTreeCustom(cmd *cobra.Command, dir string, filePrepender, linkHandler func(string) string) error {
+	for _, c := range cmd.Commands() {
+		if !c.IsAvailableCommand() || c.IsAdditionalHelpTopicCommand() {
 			continue
-		***REMOVED***
-		if err := GenYamlTreeCustom(c, dir, filePrepender, linkHandler); err != nil ***REMOVED***
+		}
+		if err := GenYamlTreeCustom(c, dir, filePrepender, linkHandler); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	basename := strings.Replace(cmd.CommandPath(), " ", "_", -1) + ".yaml"
 	filename := filepath.Join(dir, basename)
 	f, err := os.Create(filename)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer f.Close()
 
-	if _, err := io.WriteString(f, filePrepender(filename)); err != nil ***REMOVED***
+	if _, err := io.WriteString(f, filePrepender(filename)); err != nil {
 		return err
-	***REMOVED***
-	if err := GenYamlCustom(cmd, f, linkHandler); err != nil ***REMOVED***
+	}
+	if err := GenYamlCustom(cmd, f, linkHandler); err != nil {
 		return err
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // GenYaml creates yaml output.
-func GenYaml(cmd *cobra.Command, w io.Writer) error ***REMOVED***
-	return GenYamlCustom(cmd, w, func(s string) string ***REMOVED*** return s ***REMOVED***)
-***REMOVED***
+func GenYaml(cmd *cobra.Command, w io.Writer) error {
+	return GenYamlCustom(cmd, w, func(s string) string { return s })
+}
 
 // GenYamlCustom creates custom yaml output.
-func GenYamlCustom(cmd *cobra.Command, w io.Writer, linkHandler func(string) string) error ***REMOVED***
+func GenYamlCustom(cmd *cobra.Command, w io.Writer, linkHandler func(string) string) error {
 	cmd.InitDefaultHelpCmd()
 	cmd.InitDefaultHelpFlag()
 
-	yamlDoc := cmdDoc***REMOVED******REMOVED***
+	yamlDoc := cmdDoc{}
 	yamlDoc.Name = cmd.CommandPath()
 
 	yamlDoc.Synopsis = forceMultiLine(cmd.Short)
 	yamlDoc.Description = forceMultiLine(cmd.Long)
 
-	if len(cmd.Example) > 0 ***REMOVED***
+	if len(cmd.Example) > 0 {
 		yamlDoc.Example = cmd.Example
-	***REMOVED***
+	}
 
 	flags := cmd.NonInheritedFlags()
-	if flags.HasFlags() ***REMOVED***
+	if flags.HasFlags() {
 		yamlDoc.Options = genFlagResult(flags)
-	***REMOVED***
+	}
 	flags = cmd.InheritedFlags()
-	if flags.HasFlags() ***REMOVED***
+	if flags.HasFlags() {
 		yamlDoc.InheritedOptions = genFlagResult(flags)
-	***REMOVED***
+	}
 
-	if hasSeeAlso(cmd) ***REMOVED***
-		result := []string***REMOVED******REMOVED***
-		if cmd.HasParent() ***REMOVED***
+	if hasSeeAlso(cmd) {
+		result := []string{}
+		if cmd.HasParent() {
 			parent := cmd.Parent()
 			result = append(result, parent.CommandPath()+" - "+parent.Short)
-		***REMOVED***
+		}
 		children := cmd.Commands()
 		sort.Sort(byName(children))
-		for _, child := range children ***REMOVED***
-			if !child.IsAvailableCommand() || child.IsAdditionalHelpTopicCommand() ***REMOVED***
+		for _, child := range children {
+			if !child.IsAvailableCommand() || child.IsAdditionalHelpTopicCommand() {
 				continue
-			***REMOVED***
+			}
 			result = append(result, child.Name()+" - "+child.Short)
-		***REMOVED***
+		}
 		yamlDoc.SeeAlso = result
-	***REMOVED***
+	}
 
 	final, err := yaml.Marshal(&yamlDoc)
-	if err != nil ***REMOVED***
+	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
-	***REMOVED***
+	}
 
-	if _, err := w.Write(final); err != nil ***REMOVED***
+	if _, err := w.Write(final); err != nil {
 		return err
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func genFlagResult(flags *pflag.FlagSet) []cmdOption ***REMOVED***
+func genFlagResult(flags *pflag.FlagSet) []cmdOption {
 	var result []cmdOption
 
-	flags.VisitAll(func(flag *pflag.Flag) ***REMOVED***
+	flags.VisitAll(func(flag *pflag.Flag) {
 		// Todo, when we mark a shorthand is deprecated, but specify an empty message.
 		// The flag.ShorthandDeprecated is empty as the shorthand is deprecated.
 		// Using len(flag.ShorthandDeprecated) > 0 can't handle this, others are ok.
-		if !(len(flag.ShorthandDeprecated) > 0) && len(flag.Shorthand) > 0 ***REMOVED***
-			opt := cmdOption***REMOVED***
+		if !(len(flag.ShorthandDeprecated) > 0) && len(flag.Shorthand) > 0 {
+			opt := cmdOption{
 				flag.Name,
 				flag.Shorthand,
 				flag.DefValue,
 				forceMultiLine(flag.Usage),
-			***REMOVED***
+			}
 			result = append(result, opt)
-		***REMOVED*** else ***REMOVED***
-			opt := cmdOption***REMOVED***
+		} else {
+			opt := cmdOption{
 				Name:         flag.Name,
 				DefaultValue: forceMultiLine(flag.DefValue),
 				Usage:        forceMultiLine(flag.Usage),
-			***REMOVED***
+			}
 			result = append(result, opt)
-		***REMOVED***
-	***REMOVED***)
+		}
+	})
 
 	return result
-***REMOVED***
+}

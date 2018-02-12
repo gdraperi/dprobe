@@ -15,28 +15,28 @@ import (
 	"github.com/go-check/check"
 )
 
-func (s *DockerSuite) TestEventsAPIEmptyOutput(c *check.C) ***REMOVED***
-	type apiResp struct ***REMOVED***
+func (s *DockerSuite) TestEventsAPIEmptyOutput(c *check.C) {
+	type apiResp struct {
 		resp *http.Response
 		err  error
-	***REMOVED***
+	}
 	chResp := make(chan *apiResp)
-	go func() ***REMOVED***
+	go func() {
 		resp, body, err := request.Get("/events")
 		body.Close()
-		chResp <- &apiResp***REMOVED***resp, err***REMOVED***
-	***REMOVED***()
+		chResp <- &apiResp{resp, err}
+	}()
 
-	select ***REMOVED***
+	select {
 	case r := <-chResp:
 		c.Assert(r.err, checker.IsNil)
 		c.Assert(r.resp.StatusCode, checker.Equals, http.StatusOK)
 	case <-time.After(3 * time.Second):
 		c.Fatal("timeout waiting for events api to respond, should have responded immediately")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *DockerSuite) TestEventsAPIBackwardsCompatible(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestEventsAPIBackwardsCompatible(c *check.C) {
 	since := daemonTime(c).Unix()
 	ts := strconv.FormatInt(since, 10)
 
@@ -44,7 +44,7 @@ func (s *DockerSuite) TestEventsAPIBackwardsCompatible(c *check.C) ***REMOVED***
 	containerID := strings.TrimSpace(out)
 	c.Assert(waitRun(containerID), checker.IsNil)
 
-	q := url.Values***REMOVED******REMOVED***
+	q := url.Values{}
 	q.Set("since", ts)
 
 	_, body, err := request.Get("/events?" + q.Encode())
@@ -53,22 +53,22 @@ func (s *DockerSuite) TestEventsAPIBackwardsCompatible(c *check.C) ***REMOVED***
 
 	dec := json.NewDecoder(body)
 	var containerCreateEvent *jsonmessage.JSONMessage
-	for ***REMOVED***
+	for {
 		var event jsonmessage.JSONMessage
-		if err := dec.Decode(&event); err != nil ***REMOVED***
-			if err == io.EOF ***REMOVED***
+		if err := dec.Decode(&event); err != nil {
+			if err == io.EOF {
 				break
-			***REMOVED***
+			}
 			c.Fatal(err)
-		***REMOVED***
-		if event.Status == "create" && event.ID == containerID ***REMOVED***
+		}
+		if event.Status == "create" && event.ID == containerID {
 			containerCreateEvent = &event
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	c.Assert(containerCreateEvent, checker.Not(checker.IsNil))
 	c.Assert(containerCreateEvent.Status, checker.Equals, "create")
 	c.Assert(containerCreateEvent.ID, checker.Equals, containerID)
 	c.Assert(containerCreateEvent.From, checker.Equals, "busybox")
-***REMOVED***
+}

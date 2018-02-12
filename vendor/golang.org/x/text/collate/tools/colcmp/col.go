@@ -13,85 +13,85 @@ import (
 )
 
 // Input holds an input string in both UTF-8 and UTF-16 format.
-type Input struct ***REMOVED***
+type Input struct {
 	index int // used for restoring to original random order
 	UTF8  []byte
 	UTF16 []uint16
 	key   []byte // used for sorting
-***REMOVED***
+}
 
-func (i Input) String() string ***REMOVED***
+func (i Input) String() string {
 	return string(i.UTF8)
-***REMOVED***
+}
 
-func makeInput(s8 []byte, s16 []uint16) Input ***REMOVED***
-	return Input***REMOVED***UTF8: s8, UTF16: s16***REMOVED***
-***REMOVED***
+func makeInput(s8 []byte, s16 []uint16) Input {
+	return Input{UTF8: s8, UTF16: s16}
+}
 
-func makeInputString(s string) Input ***REMOVED***
-	return Input***REMOVED***
+func makeInputString(s string) Input {
+	return Input{
 		UTF8:  []byte(s),
 		UTF16: utf16.Encode([]rune(s)),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Collator is an interface for architecture-specific implementations of collation.
-type Collator interface ***REMOVED***
+type Collator interface {
 	// Key generates a sort key for the given input.  Implemenations
 	// may return nil if a collator does not support sort keys.
 	Key(s Input) []byte
 
 	// Compare returns -1 if a < b, 1 if a > b and 0 if a == b.
 	Compare(a, b Input) int
-***REMOVED***
+}
 
 // CollatorFactory creates a Collator for a given language tag.
-type CollatorFactory struct ***REMOVED***
+type CollatorFactory struct {
 	name        string
 	makeFn      func(tag string) (Collator, error)
 	description string
-***REMOVED***
+}
 
-var collators = []CollatorFactory***REMOVED******REMOVED***
+var collators = []CollatorFactory{}
 
 // AddFactory registers f as a factory for an implementation of Collator.
-func AddFactory(f CollatorFactory) ***REMOVED***
+func AddFactory(f CollatorFactory) {
 	collators = append(collators, f)
-***REMOVED***
+}
 
-func getCollator(name, locale string) Collator ***REMOVED***
-	for _, f := range collators ***REMOVED***
-		if f.name == name ***REMOVED***
+func getCollator(name, locale string) Collator {
+	for _, f := range collators {
+		if f.name == name {
 			col, err := f.makeFn(locale)
-			if err != nil ***REMOVED***
+			if err != nil {
 				log.Fatal(err)
-			***REMOVED***
+			}
 			return col
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	log.Fatalf("collator of type %q not found", name)
 	return nil
-***REMOVED***
+}
 
 // goCollator is an implemention of Collator using go's own collator.
-type goCollator struct ***REMOVED***
+type goCollator struct {
 	c   *collate.Collator
 	buf collate.Buffer
-***REMOVED***
+}
 
-func init() ***REMOVED***
-	AddFactory(CollatorFactory***REMOVED***"go", newGoCollator, "Go's native collator implementation."***REMOVED***)
-***REMOVED***
+func init() {
+	AddFactory(CollatorFactory{"go", newGoCollator, "Go's native collator implementation."})
+}
 
-func newGoCollator(loc string) (Collator, error) ***REMOVED***
-	c := &goCollator***REMOVED***c: collate.New(language.Make(loc))***REMOVED***
+func newGoCollator(loc string) (Collator, error) {
+	c := &goCollator{c: collate.New(language.Make(loc))}
 	return c, nil
-***REMOVED***
+}
 
-func (c *goCollator) Key(b Input) []byte ***REMOVED***
+func (c *goCollator) Key(b Input) []byte {
 	return c.c.Key(&c.buf, b.UTF8)
-***REMOVED***
+}
 
-func (c *goCollator) Compare(a, b Input) int ***REMOVED***
+func (c *goCollator) Compare(a, b Input) int {
 	return c.c.Compare(a.UTF8, b.UTF8)
-***REMOVED***
+}

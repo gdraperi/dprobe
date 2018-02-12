@@ -11,85 +11,85 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestImageLoadError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestImageLoadError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
-	***REMOVED***
+	}
 
 	_, err := client.ImageLoad(context.Background(), nil, true)
-	if err == nil || err.Error() != "Error response from daemon: Server error" ***REMOVED***
+	if err == nil || err.Error() != "Error response from daemon: Server error" {
 		t.Fatalf("expected a Server Error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestImageLoad(t *testing.T) ***REMOVED***
+func TestImageLoad(t *testing.T) {
 	expectedURL := "/images/load"
 	expectedInput := "inputBody"
 	expectedOutput := "outputBody"
-	loadCases := []struct ***REMOVED***
+	loadCases := []struct {
 		quiet                bool
 		responseContentType  string
 		expectedResponseJSON bool
 		expectedQueryParams  map[string]string
-	***REMOVED******REMOVED***
-		***REMOVED***
+	}{
+		{
 			quiet:                false,
 			responseContentType:  "text/plain",
 			expectedResponseJSON: false,
-			expectedQueryParams: map[string]string***REMOVED***
+			expectedQueryParams: map[string]string{
 				"quiet": "0",
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			},
+		},
+		{
 			quiet:                true,
 			responseContentType:  "application/json",
 			expectedResponseJSON: true,
-			expectedQueryParams: map[string]string***REMOVED***
+			expectedQueryParams: map[string]string{
 				"quiet": "1",
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
-	for _, loadCase := range loadCases ***REMOVED***
-		client := &Client***REMOVED***
-			client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-				if !strings.HasPrefix(req.URL.Path, expectedURL) ***REMOVED***
+			},
+		},
+	}
+	for _, loadCase := range loadCases {
+		client := &Client{
+			client: newMockClient(func(req *http.Request) (*http.Response, error) {
+				if !strings.HasPrefix(req.URL.Path, expectedURL) {
 					return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, req.URL)
-				***REMOVED***
+				}
 				contentType := req.Header.Get("Content-Type")
-				if contentType != "application/x-tar" ***REMOVED***
+				if contentType != "application/x-tar" {
 					return nil, fmt.Errorf("content-type not set in URL headers properly. Expected 'application/x-tar', got %s", contentType)
-				***REMOVED***
+				}
 				query := req.URL.Query()
-				for key, expected := range loadCase.expectedQueryParams ***REMOVED***
+				for key, expected := range loadCase.expectedQueryParams {
 					actual := query.Get(key)
-					if actual != expected ***REMOVED***
+					if actual != expected {
 						return nil, fmt.Errorf("%s not set in URL query properly. Expected '%s', got %s", key, expected, actual)
-					***REMOVED***
-				***REMOVED***
-				headers := http.Header***REMOVED******REMOVED***
+					}
+				}
+				headers := http.Header{}
 				headers.Add("Content-Type", loadCase.responseContentType)
-				return &http.Response***REMOVED***
+				return &http.Response{
 					StatusCode: http.StatusOK,
 					Body:       ioutil.NopCloser(bytes.NewReader([]byte(expectedOutput))),
 					Header:     headers,
-				***REMOVED***, nil
-			***REMOVED***),
-		***REMOVED***
+				}, nil
+			}),
+		}
 
 		input := bytes.NewReader([]byte(expectedInput))
 		imageLoadResponse, err := client.ImageLoad(context.Background(), input, loadCase.quiet)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
-		if imageLoadResponse.JSON != loadCase.expectedResponseJSON ***REMOVED***
+		}
+		if imageLoadResponse.JSON != loadCase.expectedResponseJSON {
 			t.Fatalf("expected a JSON response, was not.")
-		***REMOVED***
+		}
 		body, err := ioutil.ReadAll(imageLoadResponse.Body)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
-		if string(body) != expectedOutput ***REMOVED***
+		}
+		if string(body) != expectedOutput {
 			t.Fatalf("expected %s, got %s", expectedOutput, string(body))
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

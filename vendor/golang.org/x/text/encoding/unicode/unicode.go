@@ -28,70 +28,70 @@ import (
 // UTF8 is the UTF-8 encoding.
 var UTF8 encoding.Encoding = utf8enc
 
-var utf8enc = &internal.Encoding***REMOVED***
-	&internal.SimpleEncoding***REMOVED***utf8Decoder***REMOVED******REMOVED***, runes.ReplaceIllFormed()***REMOVED***,
+var utf8enc = &internal.Encoding{
+	&internal.SimpleEncoding{utf8Decoder{}, runes.ReplaceIllFormed()},
 	"UTF-8",
 	identifier.UTF8,
-***REMOVED***
+}
 
-type utf8Decoder struct***REMOVED*** transform.NopResetter ***REMOVED***
+type utf8Decoder struct{ transform.NopResetter }
 
-func (utf8Decoder) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) ***REMOVED***
+func (utf8Decoder) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) {
 	var pSrc int // point from which to start copy in src
 	var accept utf8internal.AcceptRange
 
 	// The decoder can only make the input larger, not smaller.
 	n := len(src)
-	if len(dst) < n ***REMOVED***
+	if len(dst) < n {
 		err = transform.ErrShortDst
 		n = len(dst)
 		atEOF = false
-	***REMOVED***
-	for nSrc < n ***REMOVED***
+	}
+	for nSrc < n {
 		c := src[nSrc]
-		if c < utf8.RuneSelf ***REMOVED***
+		if c < utf8.RuneSelf {
 			nSrc++
 			continue
-		***REMOVED***
+		}
 		first := utf8internal.First[c]
 		size := int(first & utf8internal.SizeMask)
-		if first == utf8internal.FirstInvalid ***REMOVED***
+		if first == utf8internal.FirstInvalid {
 			goto handleInvalid // invalid starter byte
-		***REMOVED***
+		}
 		accept = utf8internal.AcceptRanges[first>>utf8internal.AcceptShift]
-		if nSrc+size > n ***REMOVED***
-			if !atEOF ***REMOVED***
+		if nSrc+size > n {
+			if !atEOF {
 				// We may stop earlier than necessary here if the short sequence
 				// has invalid bytes. Not checking for this simplifies the code
 				// and may avoid duplicate computations in certain conditions.
-				if err == nil ***REMOVED***
+				if err == nil {
 					err = transform.ErrShortSrc
-				***REMOVED***
+				}
 				break
-			***REMOVED***
+			}
 			// Determine the maximal subpart of an ill-formed subsequence.
-			switch ***REMOVED***
+			switch {
 			case nSrc+1 >= n || src[nSrc+1] < accept.Lo || accept.Hi < src[nSrc+1]:
 				size = 1
 			case nSrc+2 >= n || src[nSrc+2] < utf8internal.LoCB || utf8internal.HiCB < src[nSrc+2]:
 				size = 2
 			default:
 				size = 3 // As we are short, the maximum is 3.
-			***REMOVED***
+			}
 			goto handleInvalid
-		***REMOVED***
-		if c = src[nSrc+1]; c < accept.Lo || accept.Hi < c ***REMOVED***
+		}
+		if c = src[nSrc+1]; c < accept.Lo || accept.Hi < c {
 			size = 1
 			goto handleInvalid // invalid continuation byte
-		***REMOVED*** else if size == 2 ***REMOVED***
-		***REMOVED*** else if c = src[nSrc+2]; c < utf8internal.LoCB || utf8internal.HiCB < c ***REMOVED***
+		} else if size == 2 {
+		} else if c = src[nSrc+2]; c < utf8internal.LoCB || utf8internal.HiCB < c {
 			size = 2
 			goto handleInvalid // invalid continuation byte
-		***REMOVED*** else if size == 3 ***REMOVED***
-		***REMOVED*** else if c = src[nSrc+3]; c < utf8internal.LoCB || utf8internal.HiCB < c ***REMOVED***
+		} else if size == 3 {
+		} else if c = src[nSrc+3]; c < utf8internal.LoCB || utf8internal.HiCB < c {
 			size = 3
 			goto handleInvalid // invalid continuation byte
-		***REMOVED***
+		}
 		nSrc += size
 		continue
 
@@ -101,9 +101,9 @@ func (utf8Decoder) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err e
 
 		// Append RuneError to the destination.
 		const runeError = "\ufffd"
-		if nDst+len(runeError) > len(dst) ***REMOVED***
+		if nDst+len(runeError) > len(dst) {
 			return nDst, nSrc, transform.ErrShortDst
-		***REMOVED***
+		}
 		nDst += copy(dst[nDst:], runeError)
 
 		// Skip the maximal subpart of an ill-formed subsequence according to
@@ -113,14 +113,14 @@ func (utf8Decoder) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err e
 		pSrc = nSrc
 
 		// Recompute the maximum source length.
-		if sz := len(dst) - nDst; sz < len(src)-nSrc ***REMOVED***
+		if sz := len(dst) - nDst; sz < len(src)-nSrc {
 			err = transform.ErrShortDst
 			n = nSrc + sz
 			atEOF = false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nDst + copy(dst[nDst:], src[pSrc:nSrc]), nSrc, err
-***REMOVED***
+}
 
 // UTF16 returns a UTF-16 Encoding for the given default endianness and byte
 // order mark (BOM) policy.
@@ -149,35 +149,35 @@ func (utf8Decoder) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err e
 // corresponds to "Where the precise type of the data stream is known... the
 // BOM should not be used" and ExpectBOM corresponds to "A particular
 // protocol... may require use of the BOM".
-func UTF16(e Endianness, b BOMPolicy) encoding.Encoding ***REMOVED***
-	return utf16Encoding***REMOVED***config***REMOVED***e, b***REMOVED***, mibValue[e][b&bomMask]***REMOVED***
-***REMOVED***
+func UTF16(e Endianness, b BOMPolicy) encoding.Encoding {
+	return utf16Encoding{config{e, b}, mibValue[e][b&bomMask]}
+}
 
 // mibValue maps Endianness and BOMPolicy settings to MIB constants. Note that
 // some configurations map to the same MIB identifier. RFC 2781 has requirements
 // and recommendations. Some of the "configurations" are merely recommendations,
 // so multiple configurations could match.
-var mibValue = map[Endianness][numBOMValues]identifier.MIB***REMOVED***
-	BigEndian: [numBOMValues]identifier.MIB***REMOVED***
+var mibValue = map[Endianness][numBOMValues]identifier.MIB{
+	BigEndian: [numBOMValues]identifier.MIB{
 		IgnoreBOM: identifier.UTF16BE,
 		UseBOM:    identifier.UTF16, // BigEnding default is preferred by RFC 2781.
 		// TODO: acceptBOM | strictBOM would map to UTF16BE as well.
-	***REMOVED***,
-	LittleEndian: [numBOMValues]identifier.MIB***REMOVED***
+	},
+	LittleEndian: [numBOMValues]identifier.MIB{
 		IgnoreBOM: identifier.UTF16LE,
 		UseBOM:    identifier.UTF16, // LittleEndian default is allowed and preferred on Windows.
 		// TODO: acceptBOM | strictBOM would map to UTF16LE as well.
-	***REMOVED***,
+	},
 	// ExpectBOM is not widely used and has no valid MIB identifier.
-***REMOVED***
+}
 
 // All lists a configuration for each IANA-defined UTF-16 variant.
-var All = []encoding.Encoding***REMOVED***
+var All = []encoding.Encoding{
 	UTF8,
 	UTF16(BigEndian, UseBOM),
 	UTF16(BigEndian, IgnoreBOM),
 	UTF16(LittleEndian, IgnoreBOM),
-***REMOVED***
+}
 
 // BOMPolicy is a UTF-16 encoding's byte order mark policy.
 type BOMPolicy uint8
@@ -232,72 +232,72 @@ const (
 // starting byte order mark.
 var ErrMissingBOM = errors.New("encoding: missing byte order mark")
 
-type utf16Encoding struct ***REMOVED***
+type utf16Encoding struct {
 	config
 	mib identifier.MIB
-***REMOVED***
+}
 
-type config struct ***REMOVED***
+type config struct {
 	endianness Endianness
 	bomPolicy  BOMPolicy
-***REMOVED***
+}
 
-func (u utf16Encoding) NewDecoder() *encoding.Decoder ***REMOVED***
-	return &encoding.Decoder***REMOVED***Transformer: &utf16Decoder***REMOVED***
+func (u utf16Encoding) NewDecoder() *encoding.Decoder {
+	return &encoding.Decoder{Transformer: &utf16Decoder{
 		initial: u.config,
 		current: u.config,
-	***REMOVED******REMOVED***
-***REMOVED***
+	}}
+}
 
-func (u utf16Encoding) NewEncoder() *encoding.Encoder ***REMOVED***
-	return &encoding.Encoder***REMOVED***Transformer: &utf16Encoder***REMOVED***
+func (u utf16Encoding) NewEncoder() *encoding.Encoder {
+	return &encoding.Encoder{Transformer: &utf16Encoder{
 		endianness:       u.endianness,
 		initialBOMPolicy: u.bomPolicy,
 		currentBOMPolicy: u.bomPolicy,
-	***REMOVED******REMOVED***
-***REMOVED***
+	}}
+}
 
-func (u utf16Encoding) ID() (mib identifier.MIB, other string) ***REMOVED***
+func (u utf16Encoding) ID() (mib identifier.MIB, other string) {
 	return u.mib, ""
-***REMOVED***
+}
 
-func (u utf16Encoding) String() string ***REMOVED***
+func (u utf16Encoding) String() string {
 	e, b := "B", ""
-	if u.endianness == LittleEndian ***REMOVED***
+	if u.endianness == LittleEndian {
 		e = "L"
-	***REMOVED***
-	switch u.bomPolicy ***REMOVED***
+	}
+	switch u.bomPolicy {
 	case ExpectBOM:
 		b = "Expect"
 	case UseBOM:
 		b = "Use"
 	case IgnoreBOM:
 		b = "Ignore"
-	***REMOVED***
+	}
 	return "UTF-16" + e + "E (" + b + " BOM)"
-***REMOVED***
+}
 
-type utf16Decoder struct ***REMOVED***
+type utf16Decoder struct {
 	initial config
 	current config
-***REMOVED***
+}
 
-func (u *utf16Decoder) Reset() ***REMOVED***
+func (u *utf16Decoder) Reset() {
 	u.current = u.initial
-***REMOVED***
+}
 
-func (u *utf16Decoder) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) ***REMOVED***
-	if len(src) == 0 ***REMOVED***
-		if atEOF && u.current.bomPolicy&requireBOM != 0 ***REMOVED***
+func (u *utf16Decoder) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) {
+	if len(src) == 0 {
+		if atEOF && u.current.bomPolicy&requireBOM != 0 {
 			return 0, 0, ErrMissingBOM
-		***REMOVED***
+		}
 		return 0, 0, nil
-	***REMOVED***
-	if u.current.bomPolicy&acceptBOM != 0 ***REMOVED***
-		if len(src) < 2 ***REMOVED***
+	}
+	if u.current.bomPolicy&acceptBOM != 0 {
+		if len(src) < 2 {
 			return 0, 0, transform.ErrShortSrc
-		***REMOVED***
-		switch ***REMOVED***
+		}
+		switch {
 		case src[0] == 0xfe && src[1] == 0xff:
 			u.current.endianness = BigEndian
 			nSrc = 2
@@ -305,130 +305,130 @@ func (u *utf16Decoder) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, e
 			u.current.endianness = LittleEndian
 			nSrc = 2
 		default:
-			if u.current.bomPolicy&requireBOM != 0 ***REMOVED***
+			if u.current.bomPolicy&requireBOM != 0 {
 				return 0, 0, ErrMissingBOM
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		u.current.bomPolicy = IgnoreBOM
-	***REMOVED***
+	}
 
 	var r rune
 	var dSize, sSize int
-	for nSrc < len(src) ***REMOVED***
-		if nSrc+1 < len(src) ***REMOVED***
+	for nSrc < len(src) {
+		if nSrc+1 < len(src) {
 			x := uint16(src[nSrc+0])<<8 | uint16(src[nSrc+1])
-			if u.current.endianness == LittleEndian ***REMOVED***
+			if u.current.endianness == LittleEndian {
 				x = x>>8 | x<<8
-			***REMOVED***
+			}
 			r, sSize = rune(x), 2
-			if utf16.IsSurrogate(r) ***REMOVED***
-				if nSrc+3 < len(src) ***REMOVED***
+			if utf16.IsSurrogate(r) {
+				if nSrc+3 < len(src) {
 					x = uint16(src[nSrc+2])<<8 | uint16(src[nSrc+3])
-					if u.current.endianness == LittleEndian ***REMOVED***
+					if u.current.endianness == LittleEndian {
 						x = x>>8 | x<<8
-					***REMOVED***
+					}
 					// Save for next iteration if it is not a high surrogate.
-					if isHighSurrogate(rune(x)) ***REMOVED***
+					if isHighSurrogate(rune(x)) {
 						r, sSize = utf16.DecodeRune(r, rune(x)), 4
-					***REMOVED***
-				***REMOVED*** else if !atEOF ***REMOVED***
+					}
+				} else if !atEOF {
 					err = transform.ErrShortSrc
 					break
-				***REMOVED***
-			***REMOVED***
-			if dSize = utf8.RuneLen(r); dSize < 0 ***REMOVED***
+				}
+			}
+			if dSize = utf8.RuneLen(r); dSize < 0 {
 				r, dSize = utf8.RuneError, 3
-			***REMOVED***
-		***REMOVED*** else if atEOF ***REMOVED***
+			}
+		} else if atEOF {
 			// Single trailing byte.
 			r, dSize, sSize = utf8.RuneError, 3, 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			err = transform.ErrShortSrc
 			break
-		***REMOVED***
-		if nDst+dSize > len(dst) ***REMOVED***
+		}
+		if nDst+dSize > len(dst) {
 			err = transform.ErrShortDst
 			break
-		***REMOVED***
+		}
 		nDst += utf8.EncodeRune(dst[nDst:], r)
 		nSrc += sSize
-	***REMOVED***
+	}
 	return nDst, nSrc, err
-***REMOVED***
+}
 
-func isHighSurrogate(r rune) bool ***REMOVED***
+func isHighSurrogate(r rune) bool {
 	return 0xDC00 <= r && r <= 0xDFFF
-***REMOVED***
+}
 
-type utf16Encoder struct ***REMOVED***
+type utf16Encoder struct {
 	endianness       Endianness
 	initialBOMPolicy BOMPolicy
 	currentBOMPolicy BOMPolicy
-***REMOVED***
+}
 
-func (u *utf16Encoder) Reset() ***REMOVED***
+func (u *utf16Encoder) Reset() {
 	u.currentBOMPolicy = u.initialBOMPolicy
-***REMOVED***
+}
 
-func (u *utf16Encoder) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) ***REMOVED***
-	if u.currentBOMPolicy&writeBOM != 0 ***REMOVED***
-		if len(dst) < 2 ***REMOVED***
+func (u *utf16Encoder) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) {
+	if u.currentBOMPolicy&writeBOM != 0 {
+		if len(dst) < 2 {
 			return 0, 0, transform.ErrShortDst
-		***REMOVED***
+		}
 		dst[0], dst[1] = 0xfe, 0xff
 		u.currentBOMPolicy = IgnoreBOM
 		nDst = 2
-	***REMOVED***
+	}
 
 	r, size := rune(0), 0
-	for nSrc < len(src) ***REMOVED***
+	for nSrc < len(src) {
 		r = rune(src[nSrc])
 
 		// Decode a 1-byte rune.
-		if r < utf8.RuneSelf ***REMOVED***
+		if r < utf8.RuneSelf {
 			size = 1
 
-		***REMOVED*** else ***REMOVED***
+		} else {
 			// Decode a multi-byte rune.
 			r, size = utf8.DecodeRune(src[nSrc:])
-			if size == 1 ***REMOVED***
+			if size == 1 {
 				// All valid runes of size 1 (those below utf8.RuneSelf) were
 				// handled above. We have invalid UTF-8 or we haven't seen the
 				// full character yet.
-				if !atEOF && !utf8.FullRune(src[nSrc:]) ***REMOVED***
+				if !atEOF && !utf8.FullRune(src[nSrc:]) {
 					err = transform.ErrShortSrc
 					break
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
+				}
+			}
+		}
 
-		if r <= 0xffff ***REMOVED***
-			if nDst+2 > len(dst) ***REMOVED***
+		if r <= 0xffff {
+			if nDst+2 > len(dst) {
 				err = transform.ErrShortDst
 				break
-			***REMOVED***
+			}
 			dst[nDst+0] = uint8(r >> 8)
 			dst[nDst+1] = uint8(r)
 			nDst += 2
-		***REMOVED*** else ***REMOVED***
-			if nDst+4 > len(dst) ***REMOVED***
+		} else {
+			if nDst+4 > len(dst) {
 				err = transform.ErrShortDst
 				break
-			***REMOVED***
+			}
 			r1, r2 := utf16.EncodeRune(r)
 			dst[nDst+0] = uint8(r1 >> 8)
 			dst[nDst+1] = uint8(r1)
 			dst[nDst+2] = uint8(r2 >> 8)
 			dst[nDst+3] = uint8(r2)
 			nDst += 4
-		***REMOVED***
+		}
 		nSrc += size
-	***REMOVED***
+	}
 
-	if u.endianness == LittleEndian ***REMOVED***
-		for i := 0; i < nDst; i += 2 ***REMOVED***
+	if u.endianness == LittleEndian {
+		for i := 0; i < nDst; i += 2 {
 			dst[i], dst[i+1] = dst[i+1], dst[i]
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nDst, nSrc, err
-***REMOVED***
+}

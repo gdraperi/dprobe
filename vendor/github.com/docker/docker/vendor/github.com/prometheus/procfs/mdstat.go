@@ -14,7 +14,7 @@ var (
 )
 
 // MDStat holds info parsed from /proc/mdstat.
-type MDStat struct ***REMOVED***
+type MDStat struct {
 	// Name of the device.
 	Name string
 	// activity-state of the device.
@@ -27,112 +27,112 @@ type MDStat struct ***REMOVED***
 	BlocksTotal int64
 	// Number of blocks on the device that are in sync.
 	BlocksSynced int64
-***REMOVED***
+}
 
 // ParseMDStat parses an mdstat-file and returns a struct with the relevant infos.
-func (fs FS) ParseMDStat() (mdstates []MDStat, err error) ***REMOVED***
+func (fs FS) ParseMDStat() (mdstates []MDStat, err error) {
 	mdStatusFilePath := fs.Path("mdstat")
 	content, err := ioutil.ReadFile(mdStatusFilePath)
-	if err != nil ***REMOVED***
-		return []MDStat***REMOVED******REMOVED***, fmt.Errorf("error parsing %s: %s", mdStatusFilePath, err)
-	***REMOVED***
+	if err != nil {
+		return []MDStat{}, fmt.Errorf("error parsing %s: %s", mdStatusFilePath, err)
+	}
 
-	mdStates := []MDStat***REMOVED******REMOVED***
+	mdStates := []MDStat{}
 	lines := strings.Split(string(content), "\n")
-	for i, l := range lines ***REMOVED***
-		if l == "" ***REMOVED***
+	for i, l := range lines {
+		if l == "" {
 			continue
-		***REMOVED***
-		if l[0] == ' ' ***REMOVED***
+		}
+		if l[0] == ' ' {
 			continue
-		***REMOVED***
-		if strings.HasPrefix(l, "Personalities") || strings.HasPrefix(l, "unused") ***REMOVED***
+		}
+		if strings.HasPrefix(l, "Personalities") || strings.HasPrefix(l, "unused") {
 			continue
-		***REMOVED***
+		}
 
 		mainLine := strings.Split(l, " ")
-		if len(mainLine) < 3 ***REMOVED***
+		if len(mainLine) < 3 {
 			return mdStates, fmt.Errorf("error parsing mdline: %s", l)
-		***REMOVED***
+		}
 		mdName := mainLine[0]
 		activityState := mainLine[2]
 
-		if len(lines) <= i+3 ***REMOVED***
+		if len(lines) <= i+3 {
 			return mdStates, fmt.Errorf(
 				"error parsing %s: too few lines for md device %s",
 				mdStatusFilePath,
 				mdName,
 			)
-		***REMOVED***
+		}
 
 		active, total, size, err := evalStatusline(lines[i+1])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return mdStates, fmt.Errorf("error parsing %s: %s", mdStatusFilePath, err)
-		***REMOVED***
+		}
 
 		// j is the line number of the syncing-line.
 		j := i + 2
-		if strings.Contains(lines[i+2], "bitmap") ***REMOVED*** // skip bitmap line
+		if strings.Contains(lines[i+2], "bitmap") { // skip bitmap line
 			j = i + 3
-		***REMOVED***
+		}
 
 		// If device is syncing at the moment, get the number of currently
 		// synced bytes, otherwise that number equals the size of the device.
 		syncedBlocks := size
-		if strings.Contains(lines[j], "recovery") || strings.Contains(lines[j], "resync") ***REMOVED***
+		if strings.Contains(lines[j], "recovery") || strings.Contains(lines[j], "resync") {
 			syncedBlocks, err = evalBuildline(lines[j])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return mdStates, fmt.Errorf("error parsing %s: %s", mdStatusFilePath, err)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
-		mdStates = append(mdStates, MDStat***REMOVED***
+		mdStates = append(mdStates, MDStat{
 			Name:          mdName,
 			ActivityState: activityState,
 			DisksActive:   active,
 			DisksTotal:    total,
 			BlocksTotal:   size,
 			BlocksSynced:  syncedBlocks,
-		***REMOVED***)
-	***REMOVED***
+		})
+	}
 
 	return mdStates, nil
-***REMOVED***
+}
 
-func evalStatusline(statusline string) (active, total, size int64, err error) ***REMOVED***
+func evalStatusline(statusline string) (active, total, size int64, err error) {
 	matches := statuslineRE.FindStringSubmatch(statusline)
-	if len(matches) != 4 ***REMOVED***
+	if len(matches) != 4 {
 		return 0, 0, 0, fmt.Errorf("unexpected statusline: %s", statusline)
-	***REMOVED***
+	}
 
 	size, err = strconv.ParseInt(matches[1], 10, 64)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, 0, 0, fmt.Errorf("unexpected statusline %s: %s", statusline, err)
-	***REMOVED***
+	}
 
 	total, err = strconv.ParseInt(matches[2], 10, 64)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, 0, 0, fmt.Errorf("unexpected statusline %s: %s", statusline, err)
-	***REMOVED***
+	}
 
 	active, err = strconv.ParseInt(matches[3], 10, 64)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, 0, 0, fmt.Errorf("unexpected statusline %s: %s", statusline, err)
-	***REMOVED***
+	}
 
 	return active, total, size, nil
-***REMOVED***
+}
 
-func evalBuildline(buildline string) (syncedBlocks int64, err error) ***REMOVED***
+func evalBuildline(buildline string) (syncedBlocks int64, err error) {
 	matches := buildlineRE.FindStringSubmatch(buildline)
-	if len(matches) != 2 ***REMOVED***
+	if len(matches) != 2 {
 		return 0, fmt.Errorf("unexpected buildline: %s", buildline)
-	***REMOVED***
+	}
 
 	syncedBlocks, err = strconv.ParseInt(matches[1], 10, 64)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, fmt.Errorf("%s in buildline: %s", err, buildline)
-	***REMOVED***
+	}
 
 	return syncedBlocks, nil
-***REMOVED***
+}

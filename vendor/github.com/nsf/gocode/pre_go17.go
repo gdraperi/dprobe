@@ -2,6 +2,6 @@
 
 package main
 
-func init() ***REMOVED***
+func init() {
 	knownPackageIdents["context"] = "golang.org/x/net/context"
-***REMOVED***
+}

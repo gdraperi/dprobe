@@ -15,15 +15,15 @@ import (
 	"context"
 )
 
-func TestGo17Context(t *testing.T) ***REMOVED***
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) ***REMOVED***
+func TestGo17Context(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		io.WriteString(w, "ok")
-	***REMOVED***))
+	}))
 	defer ts.Close()
 	ctx := context.Background()
 	resp, err := Get(ctx, http.DefaultClient, ts.URL)
-	if resp == nil || err != nil ***REMOVED***
+	if resp == nil || err != nil {
 		t.Fatalf("error received from client: %v %v", err, resp)
-	***REMOVED***
+	}
 	resp.Body.Close()
-***REMOVED***
+}

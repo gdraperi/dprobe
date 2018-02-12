@@ -14,16 +14,16 @@ import (
 // ResetForTesting clears all flag state and sets the usage function as directed.
 // After calling ResetForTesting, parse errors in flag handling will not
 // exit the program.
-func ResetForTesting(usage func()) ***REMOVED***
-	CommandLine = &FlagSet***REMOVED***
+func ResetForTesting(usage func()) {
+	CommandLine = &FlagSet{
 		name:          os.Args[0],
 		errorHandling: ContinueOnError,
 		output:        ioutil.Discard,
-	***REMOVED***
+	}
 	Usage = usage
-***REMOVED***
+}
 
 // GetCommandLine returns the default FlagSet.
-func GetCommandLine() *FlagSet ***REMOVED***
+func GetCommandLine() *FlagSet {
 	return CommandLine
-***REMOVED***
+}

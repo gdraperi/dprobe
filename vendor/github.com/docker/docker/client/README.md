@@ -15,21 +15,21 @@ import (
 	"github.com/docker/docker/client"
 )
 
-func main() ***REMOVED***
+func main() {
 	cli, err := client.NewEnvClient()
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 
-	containers, err := cli.ContainerList(context.Background(), types.ContainerListOptions***REMOVED******REMOVED***)
-	if err != nil ***REMOVED***
+	containers, err := cli.ContainerList(context.Background(), types.ContainerListOptions{})
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 
-	for _, container := range containers ***REMOVED***
+	for _, container := range containers {
 		fmt.Printf("%s %s\n", container.ID[:10], container.Image)
-	***REMOVED***
-***REMOVED***
+	}
+}
 ```
 
 [Full documentation is available on GoDoc.](https://godoc.org/github.com/docker/docker/client)

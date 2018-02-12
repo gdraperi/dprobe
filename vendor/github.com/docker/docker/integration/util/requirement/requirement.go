@@ -9,18 +9,18 @@ import (
 
 // HasHubConnectivity checks to see if https://hub.docker.com is
 // accessible from the present environment
-func HasHubConnectivity(t *testing.T) bool ***REMOVED***
+func HasHubConnectivity(t *testing.T) bool {
 	// Set a timeout on the GET at 15s
 	var timeout = 15 * time.Second
 	var url = "https://hub.docker.com"
 
-	client := http.Client***REMOVED***Timeout: timeout***REMOVED***
+	client := http.Client{Timeout: timeout}
 	resp, err := client.Get(url)
-	if err != nil && strings.Contains(err.Error(), "use of closed network connection") ***REMOVED***
+	if err != nil && strings.Contains(err.Error(), "use of closed network connection") {
 		t.Fatalf("Timeout for GET request on %s", url)
-	***REMOVED***
-	if resp != nil ***REMOVED***
+	}
+	if resp != nil {
 		resp.Body.Close()
-	***REMOVED***
+	}
 	return err == nil
-***REMOVED***
+}

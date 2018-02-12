@@ -3,276 +3,276 @@ package mapstructure
 import "testing"
 
 // GH-1
-func TestDecode_NilValue(t *testing.T) ***REMOVED***
-	input := map[string]interface***REMOVED******REMOVED******REMOVED***
+func TestDecode_NilValue(t *testing.T) {
+	input := map[string]interface{}{
 		"vfoo":   nil,
 		"vother": nil,
-	***REMOVED***
+	}
 
 	var result Map
 	err := Decode(input, &result)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("should not error: %s", err)
-	***REMOVED***
+	}
 
-	if result.Vfoo != "" ***REMOVED***
+	if result.Vfoo != "" {
 		t.Fatalf("value should be default: %s", result.Vfoo)
-	***REMOVED***
+	}
 
-	if result.Vother != nil ***REMOVED***
+	if result.Vother != nil {
 		t.Fatalf("Vother should be nil: %s", result.Vother)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // GH-10
-func TestDecode_mapInterfaceInterface(t *testing.T) ***REMOVED***
-	input := map[interface***REMOVED******REMOVED***]interface***REMOVED******REMOVED******REMOVED***
+func TestDecode_mapInterfaceInterface(t *testing.T) {
+	input := map[interface{}]interface{}{
 		"vfoo":   nil,
 		"vother": nil,
-	***REMOVED***
+	}
 
 	var result Map
 	err := Decode(input, &result)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("should not error: %s", err)
-	***REMOVED***
+	}
 
-	if result.Vfoo != "" ***REMOVED***
+	if result.Vfoo != "" {
 		t.Fatalf("value should be default: %s", result.Vfoo)
-	***REMOVED***
+	}
 
-	if result.Vother != nil ***REMOVED***
+	if result.Vother != nil {
 		t.Fatalf("Vother should be nil: %s", result.Vother)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // #48
-func TestNestedTypePointerWithDefaults(t *testing.T) ***REMOVED***
+func TestNestedTypePointerWithDefaults(t *testing.T) {
 	t.Parallel()
 
-	input := map[string]interface***REMOVED******REMOVED******REMOVED***
+	input := map[string]interface{}{
 		"vfoo": "foo",
-		"vbar": map[string]interface***REMOVED******REMOVED******REMOVED***
+		"vbar": map[string]interface{}{
 			"vstring": "foo",
 			"vint":    42,
 			"vbool":   true,
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
-	result := NestedPointer***REMOVED***
-		Vbar: &Basic***REMOVED***
+	result := NestedPointer{
+		Vbar: &Basic{
 			Vuint: 42,
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 	err := Decode(input, &result)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("got an err: %s", err.Error())
-	***REMOVED***
+	}
 
-	if result.Vfoo != "foo" ***REMOVED***
+	if result.Vfoo != "foo" {
 		t.Errorf("vfoo value should be 'foo': %#v", result.Vfoo)
-	***REMOVED***
+	}
 
-	if result.Vbar.Vstring != "foo" ***REMOVED***
+	if result.Vbar.Vstring != "foo" {
 		t.Errorf("vstring value should be 'foo': %#v", result.Vbar.Vstring)
-	***REMOVED***
+	}
 
-	if result.Vbar.Vint != 42 ***REMOVED***
+	if result.Vbar.Vint != 42 {
 		t.Errorf("vint value should be 42: %#v", result.Vbar.Vint)
-	***REMOVED***
+	}
 
-	if result.Vbar.Vbool != true ***REMOVED***
+	if result.Vbar.Vbool != true {
 		t.Errorf("vbool value should be true: %#v", result.Vbar.Vbool)
-	***REMOVED***
+	}
 
-	if result.Vbar.Vextra != "" ***REMOVED***
+	if result.Vbar.Vextra != "" {
 		t.Errorf("vextra value should be empty: %#v", result.Vbar.Vextra)
-	***REMOVED***
+	}
 
 	// this is the error
-	if result.Vbar.Vuint != 42 ***REMOVED***
+	if result.Vbar.Vuint != 42 {
 		t.Errorf("vuint value should be 42: %#v", result.Vbar.Vuint)
-	***REMOVED***
+	}
 
-***REMOVED***
+}
 
-type NestedSlice struct ***REMOVED***
+type NestedSlice struct {
 	Vfoo   string
 	Vbars  []Basic
 	Vempty []Basic
-***REMOVED***
+}
 
 // #48
-func TestNestedTypeSliceWithDefaults(t *testing.T) ***REMOVED***
+func TestNestedTypeSliceWithDefaults(t *testing.T) {
 	t.Parallel()
 
-	input := map[string]interface***REMOVED******REMOVED******REMOVED***
+	input := map[string]interface{}{
 		"vfoo": "foo",
-		"vbars": []map[string]interface***REMOVED******REMOVED******REMOVED***
-			***REMOVED***"vstring": "foo", "vint": 42, "vbool": true***REMOVED***,
-			***REMOVED***"vint": 42, "vbool": true***REMOVED***,
-		***REMOVED***,
-		"vempty": []map[string]interface***REMOVED******REMOVED******REMOVED***
-			***REMOVED***"vstring": "foo", "vint": 42, "vbool": true***REMOVED***,
-			***REMOVED***"vint": 42, "vbool": true***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+		"vbars": []map[string]interface{}{
+			{"vstring": "foo", "vint": 42, "vbool": true},
+			{"vint": 42, "vbool": true},
+		},
+		"vempty": []map[string]interface{}{
+			{"vstring": "foo", "vint": 42, "vbool": true},
+			{"vint": 42, "vbool": true},
+		},
+	}
 
-	result := NestedSlice***REMOVED***
-		Vbars: []Basic***REMOVED***
-			***REMOVED***Vuint: 42***REMOVED***,
-			***REMOVED***Vstring: "foo"***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+	result := NestedSlice{
+		Vbars: []Basic{
+			{Vuint: 42},
+			{Vstring: "foo"},
+		},
+	}
 	err := Decode(input, &result)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("got an err: %s", err.Error())
-	***REMOVED***
+	}
 
-	if result.Vfoo != "foo" ***REMOVED***
+	if result.Vfoo != "foo" {
 		t.Errorf("vfoo value should be 'foo': %#v", result.Vfoo)
-	***REMOVED***
+	}
 
-	if result.Vbars[0].Vstring != "foo" ***REMOVED***
+	if result.Vbars[0].Vstring != "foo" {
 		t.Errorf("vstring value should be 'foo': %#v", result.Vbars[0].Vstring)
-	***REMOVED***
+	}
 	// this is the error
-	if result.Vbars[0].Vuint != 42 ***REMOVED***
+	if result.Vbars[0].Vuint != 42 {
 		t.Errorf("vuint value should be 42: %#v", result.Vbars[0].Vuint)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // #48 workaround
-func TestNestedTypeWithDefaults(t *testing.T) ***REMOVED***
+func TestNestedTypeWithDefaults(t *testing.T) {
 	t.Parallel()
 
-	input := map[string]interface***REMOVED******REMOVED******REMOVED***
+	input := map[string]interface{}{
 		"vfoo": "foo",
-		"vbar": map[string]interface***REMOVED******REMOVED******REMOVED***
+		"vbar": map[string]interface{}{
 			"vstring": "foo",
 			"vint":    42,
 			"vbool":   true,
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
-	result := Nested***REMOVED***
-		Vbar: Basic***REMOVED***
+	result := Nested{
+		Vbar: Basic{
 			Vuint: 42,
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 	err := Decode(input, &result)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("got an err: %s", err.Error())
-	***REMOVED***
+	}
 
-	if result.Vfoo != "foo" ***REMOVED***
+	if result.Vfoo != "foo" {
 		t.Errorf("vfoo value should be 'foo': %#v", result.Vfoo)
-	***REMOVED***
+	}
 
-	if result.Vbar.Vstring != "foo" ***REMOVED***
+	if result.Vbar.Vstring != "foo" {
 		t.Errorf("vstring value should be 'foo': %#v", result.Vbar.Vstring)
-	***REMOVED***
+	}
 
-	if result.Vbar.Vint != 42 ***REMOVED***
+	if result.Vbar.Vint != 42 {
 		t.Errorf("vint value should be 42: %#v", result.Vbar.Vint)
-	***REMOVED***
+	}
 
-	if result.Vbar.Vbool != true ***REMOVED***
+	if result.Vbar.Vbool != true {
 		t.Errorf("vbool value should be true: %#v", result.Vbar.Vbool)
-	***REMOVED***
+	}
 
-	if result.Vbar.Vextra != "" ***REMOVED***
+	if result.Vbar.Vextra != "" {
 		t.Errorf("vextra value should be empty: %#v", result.Vbar.Vextra)
-	***REMOVED***
+	}
 
 	// this is the error
-	if result.Vbar.Vuint != 42 ***REMOVED***
+	if result.Vbar.Vuint != 42 {
 		t.Errorf("vuint value should be 42: %#v", result.Vbar.Vuint)
-	***REMOVED***
+	}
 
-***REMOVED***
+}
 
 // #67 panic() on extending slices (decodeSlice with disabled ZeroValues)
-func TestDecodeSliceToEmptySliceWOZeroing(t *testing.T) ***REMOVED***
+func TestDecodeSliceToEmptySliceWOZeroing(t *testing.T) {
 	t.Parallel()
 
-	type TestStruct struct ***REMOVED***
+	type TestStruct struct {
 		Vfoo []string
-	***REMOVED***
+	}
 
-	decode := func(m interface***REMOVED******REMOVED***, rawVal interface***REMOVED******REMOVED***) error ***REMOVED***
-		config := &DecoderConfig***REMOVED***
+	decode := func(m interface{}, rawVal interface{}) error {
+		config := &DecoderConfig{
 			Metadata:   nil,
 			Result:     rawVal,
 			ZeroFields: false,
-		***REMOVED***
+		}
 
 		decoder, err := NewDecoder(config)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 
 		return decoder.Decode(m)
-	***REMOVED***
+	}
 
-	***REMOVED***
-		input := map[string]interface***REMOVED******REMOVED******REMOVED***
-			"vfoo": []string***REMOVED***"1"***REMOVED***,
-		***REMOVED***
+	{
+		input := map[string]interface{}{
+			"vfoo": []string{"1"},
+		}
 
-		result := &TestStruct***REMOVED******REMOVED***
-
-		err := decode(input, &result)
-		if err != nil ***REMOVED***
-			t.Fatalf("got an err: %s", err.Error())
-		***REMOVED***
-	***REMOVED***
-
-	***REMOVED***
-		input := map[string]interface***REMOVED******REMOVED******REMOVED***
-			"vfoo": []string***REMOVED***"1"***REMOVED***,
-		***REMOVED***
-
-		result := &TestStruct***REMOVED***
-			Vfoo: []string***REMOVED******REMOVED***,
-		***REMOVED***
+		result := &TestStruct{}
 
 		err := decode(input, &result)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("got an err: %s", err.Error())
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	***REMOVED***
-		input := map[string]interface***REMOVED******REMOVED******REMOVED***
-			"vfoo": []string***REMOVED***"2", "3"***REMOVED***,
-		***REMOVED***
+	{
+		input := map[string]interface{}{
+			"vfoo": []string{"1"},
+		}
 
-		result := &TestStruct***REMOVED***
-			Vfoo: []string***REMOVED***"1"***REMOVED***,
-		***REMOVED***
+		result := &TestStruct{
+			Vfoo: []string{},
+		}
 
 		err := decode(input, &result)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("got an err: %s", err.Error())
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+
+	{
+		input := map[string]interface{}{
+			"vfoo": []string{"2", "3"},
+		}
+
+		result := &TestStruct{
+			Vfoo: []string{"1"},
+		}
+
+		err := decode(input, &result)
+		if err != nil {
+			t.Fatalf("got an err: %s", err.Error())
+		}
+	}
+}
 
 // #70
-func TestNextSquashMapstructure(t *testing.T) ***REMOVED***
-	data := &struct ***REMOVED***
-		Level1 struct ***REMOVED***
-			Level2 struct ***REMOVED***
+func TestNextSquashMapstructure(t *testing.T) {
+	data := &struct {
+		Level1 struct {
+			Level2 struct {
 				Foo string
-			***REMOVED*** `mapstructure:",squash"`
-		***REMOVED*** `mapstructure:",squash"`
-	***REMOVED******REMOVED******REMOVED***
-	err := Decode(map[interface***REMOVED******REMOVED***]interface***REMOVED******REMOVED******REMOVED***"foo": "baz"***REMOVED***, &data)
-	if err != nil ***REMOVED***
+			} `mapstructure:",squash"`
+		} `mapstructure:",squash"`
+	}{}
+	err := Decode(map[interface{}]interface{}{"foo": "baz"}, &data)
+	if err != nil {
 		t.Fatalf("should not error: %s", err)
-	***REMOVED***
-	if data.Level1.Level2.Foo != "baz" ***REMOVED***
+	}
+	if data.Level1.Level2.Foo != "baz" {
 		t.Fatal("value should be baz")
-	***REMOVED***
-***REMOVED***
+	}
+}

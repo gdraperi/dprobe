@@ -8,8 +8,8 @@ package ct;
 ////////////////////////////////////////////////////////////////////////////////
 
 // RFC 5246
-message DigitallySigned ***REMOVED***
-  enum HashAlgorithm ***REMOVED***
+message DigitallySigned {
+  enum HashAlgorithm {
     NONE = 0;
     MD5 = 1;
     SHA1 = 2;
@@ -17,14 +17,14 @@ message DigitallySigned ***REMOVED***
     SHA256 = 4;
     SHA384 = 5;
     SHA512 = 6;
-  ***REMOVED***
+  }
 
-  enum SignatureAlgorithm ***REMOVED***
+  enum SignatureAlgorithm {
     ANONYMOUS = 0;
     RSA = 1;
     DSA = 2;
     ECDSA = 3;
-  ***REMOVED***
+  }
 
   // 1 byte
   optional HashAlgorithm hash_algorithm = 1 [ default = NONE ];
@@ -32,18 +32,18 @@ message DigitallySigned ***REMOVED***
   optional SignatureAlgorithm sig_algorithm = 2 [ default = ANONYMOUS ];
   // 0..2^16-1 bytes
   optional bytes signature = 3;
-***REMOVED***
+}
 
-enum LogEntryType ***REMOVED***
+enum LogEntryType {
   X509_ENTRY = 0;
   PRECERT_ENTRY = 1;
   PRECERT_ENTRY_V2 = 2;
   // Not part of the I-D, and outside the valid range.
   X_JSON_ENTRY = 32768;  // Experimental, don't rely on this!
   UNKNOWN_ENTRY_TYPE = 65536;
-***REMOVED***
+}
 
-message X509ChainEntry ***REMOVED***
+message X509ChainEntry {
   // For V1 this entry just includes the certificate in the leaf_certificate
   // field
   // <1..2^24-1>
@@ -55,28 +55,28 @@ message X509ChainEntry ***REMOVED***
   // A chain from the leaf to a trusted root
   // (excluding leaf and possibly root).
   repeated bytes certificate_chain = 2;
-***REMOVED***
+}
 
 // opaque TBSCertificate<1..2^16-1>;
-// struct ***REMOVED***
+// struct {
 //   opaque issuer_key_hash[32];
 //   TBSCertificate tbs_certificate;
-// ***REMOVED*** PreCert;
+// } PreCert;
 // Retained for V1 API compatibility. May be removed in a future release.
-message PreCert ***REMOVED***
+message PreCert {
   optional bytes issuer_key_hash = 1;
   optional bytes tbs_certificate = 2;
-***REMOVED***
+}
 
 // In V2 this is used for both certificates and precertificates in SCTs. It
 // replaces PreCert and has the same structure. The older message remains for
 // compatibility with existing code that depends on this proto.
-message CertInfo ***REMOVED***
+message CertInfo {
   optional bytes issuer_key_hash = 1;
   optional bytes tbs_certificate = 2;
-***REMOVED***
+}
 
-message PrecertChainEntry ***REMOVED***
+message PrecertChainEntry {
   // <1..2^24-1>
   optional bytes pre_certificate = 1;
   // <0..2^24-1>
@@ -90,14 +90,14 @@ message PrecertChainEntry ***REMOVED***
   // As above for V2 messages. Only one of these fields will be set in a
   // valid message
   optional CertInfo cert_info = 4;
-***REMOVED***
+}
 
-message XJSONEntry ***REMOVED***
+message XJSONEntry {
   optional string json = 1;
-***REMOVED***
+}
 
 // TODO(alcutter): Consider using extensions here instead.
-message LogEntry ***REMOVED***
+message LogEntry {
   optional LogEntryType type = 1 [ default = UNKNOWN_ENTRY_TYPE ];
 
   optional X509ChainEntry x509_entry = 2;
@@ -105,35 +105,35 @@ message LogEntry ***REMOVED***
   optional PrecertChainEntry precert_entry = 3;
 
   optional XJSONEntry x_json_entry = 4;
-***REMOVED***
+}
 
-enum SignatureType ***REMOVED***
+enum SignatureType {
   CERTIFICATE_TIMESTAMP = 0;
   // TODO(ekasper): called tree_hash in I-D.
   TREE_HEAD = 1;
-***REMOVED***
+}
 
-enum Version ***REMOVED***
+enum Version {
   V1 = 0;
   V2 = 1;
   // Not part of the I-D, and outside the valid range.
   UNKNOWN_VERSION = 256;
-***REMOVED***
+}
 
-message LogID ***REMOVED***
+message LogID {
   // 32 bytes
   optional bytes key_id = 1;
-***REMOVED***
+}
 
-message SctExtension ***REMOVED***
+message SctExtension {
   // Valid range is 0-65534
   optional uint32 sct_extension_type = 1;
   // Data is opaque and type specific. <0..2^16-1> bytes
   optional bytes sct_extension_data = 2;
-***REMOVED***
+}
 
 // TODO(ekasper): implement support for id.
-message SignedCertificateTimestamp ***REMOVED***
+message SignedCertificateTimestamp {
   optional Version version = 1 [ default = UNKNOWN_VERSION ];
   optional LogID id = 2;
   // UTC time in milliseconds, since January 1, 1970, 00:00.
@@ -143,19 +143,19 @@ message SignedCertificateTimestamp ***REMOVED***
   optional bytes extensions = 5;
   // V2 extensions <0..2^16-1>. Must be ordered by type (lowest first)
   repeated SctExtension sct_extension = 6;
-***REMOVED***
+}
 
-message SignedCertificateTimestampList ***REMOVED***
+message SignedCertificateTimestampList {
   // One or more SCTs, <1..2^16-1> bytes each
   repeated bytes sct_list = 1;
-***REMOVED***
+}
 
-enum MerkleLeafType ***REMOVED***
+enum MerkleLeafType {
   TIMESTAMPED_ENTRY = 0;
   UNKNOWN_LEAF_TYPE = 256;
-***REMOVED***
+}
 
-message SignedEntry ***REMOVED***
+message SignedEntry {
   // For V1 signed entries either the x509 or precert field will be set
   optional bytes x509 = 1;
   optional PreCert precert = 2;
@@ -163,9 +163,9 @@ message SignedEntry ***REMOVED***
   // For V2 all entries use the CertInfo field and the above fields are
   // not set
   optional CertInfo cert_info = 4;
-***REMOVED***
+}
 
-message TimestampedEntry ***REMOVED***
+message TimestampedEntry {
   optional uint64 timestamp = 1;
   optional LogEntryType entry_type = 2;
   optional SignedEntry signed_entry = 3;
@@ -173,15 +173,15 @@ message TimestampedEntry ***REMOVED***
   optional bytes extensions = 4;
   // V2 extensions <0..2^16-1>. Must be ordered by type (lowest first)
   repeated SctExtension sct_extension = 5;
-***REMOVED***
+}
 
 // Stuff that's hashed into a Merkle leaf.
-message MerkleTreeLeaf ***REMOVED***
+message MerkleTreeLeaf {
   // The version of the corresponding SCT.
   optional Version version = 1 [ default = UNKNOWN_VERSION ];
   optional MerkleLeafType type = 2 [ default = UNKNOWN_LEAF_TYPE ];
   optional TimestampedEntry timestamped_entry = 3;
-***REMOVED***
+}
 
 // TODO(benl): No longer needed?
 //
@@ -190,7 +190,7 @@ message MerkleTreeLeaf ***REMOVED***
 //
 // Used by cpp/server/blob-server: it uses one to call a variant of
 // LogLookup::AuditProof.
-message MerkleAuditProof ***REMOVED***
+message MerkleAuditProof {
   optional Version version = 1 [ default = UNKNOWN_VERSION ];
   optional LogID id = 2;
   optional int64 tree_size = 3;
@@ -198,12 +198,12 @@ message MerkleAuditProof ***REMOVED***
   optional int64 leaf_index = 5;
   repeated bytes path_node = 6;
   optional DigitallySigned tree_head_signature = 7;
-***REMOVED***
+}
 
-message ShortMerkleAuditProof ***REMOVED***
+message ShortMerkleAuditProof {
   required int64 leaf_index = 1;
   repeated bytes path_node = 2;
-***REMOVED***
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Finally, stuff that's not in the I-D but that we use internally            //
@@ -211,24 +211,24 @@ message ShortMerkleAuditProof ***REMOVED***
 ////////////////////////////////////////////////////////////////////////////////
 
 // TODO(alcutter): Come up with a better name :/
-message LoggedEntryPB ***REMOVED***
+message LoggedEntryPB {
   optional int64 sequence_number = 1;
   optional bytes merkle_leaf_hash = 2;
-  message Contents ***REMOVED***
+  message Contents {
     optional SignedCertificateTimestamp sct = 1;
     optional LogEntry entry = 2;
-  ***REMOVED***
+  }
   required Contents contents = 3;
-***REMOVED***
+}
 
-message SthExtension ***REMOVED***
+message SthExtension {
   // Valid range is 0-65534
   optional uint32 sth_extension_type = 1;
   // Data is opaque and type specific <0..2^16-1> bytes
   optional bytes sth_extension_data = 2;
-***REMOVED***
+}
 
-message SignedTreeHead ***REMOVED***
+message SignedTreeHead {
   // The version of the tree head signature.
   // (Note that each leaf has its own version, so a V2 tree
   // can contain V1 leaves, too.
@@ -240,22 +240,22 @@ message SignedTreeHead ***REMOVED***
   optional DigitallySigned signature = 6;
   // Only supported in V2. <0..2^16-1>
   repeated SthExtension sth_extension = 7;
-***REMOVED***
+}
 
 // Stuff the SSL client spits out from a connection.
-message SSLClientCTData ***REMOVED***
+message SSLClientCTData {
   optional LogEntry reconstructed_entry = 1;
   optional bytes certificate_sha256_hash = 2;
 
-  message SCTInfo ***REMOVED***
+  message SCTInfo {
     // There is an entry + sct -> leaf hash mapping.
     optional SignedCertificateTimestamp sct = 1;
     optional bytes merkle_leaf_hash = 2;
-  ***REMOVED***
+  }
   repeated SCTInfo attached_sct_info = 3;
-***REMOVED***
+}
 
-message ClusterNodeState ***REMOVED***
+message ClusterNodeState {
   optional string node_id = 1;
   optional int64 contiguous_tree_size = 2 [deprecated = true];
   optional SignedTreeHead newest_sth = 3;
@@ -268,13 +268,13 @@ message ClusterNodeState ***REMOVED***
   optional string hostname = 5;
   // port on which this log node is listening.
   optional int32 log_port = 6;
-***REMOVED***
+}
 
-message ClusterControl ***REMOVED***
+message ClusterControl {
   optional bool accept_new_entries = 1 [ default = true ];
-***REMOVED***
+}
 
-message ClusterConfig ***REMOVED***
+message ClusterConfig {
   /////////////////////////////////
   // This section of the config affects the selection of the cluster's current
   // serving STH.
@@ -308,13 +308,13 @@ message ClusterConfig ***REMOVED***
   // the log server will reject all calls to add-[pre-]chain to protect itself
   // and etcd.
   optional double etcd_reject_add_pending_threshold = 3 [default = 30000];
-***REMOVED***
+}
 
-message SequenceMapping ***REMOVED***
-  message Mapping ***REMOVED***
+message SequenceMapping {
+  message Mapping {
     optional bytes entry_hash = 1;
     optional int64 sequence_number = 2;
-  ***REMOVED***
+  }
 
   repeated Mapping mapping = 1;
-***REMOVED***
+}

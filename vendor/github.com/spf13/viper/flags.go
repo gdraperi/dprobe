@@ -4,54 +4,54 @@ import "github.com/spf13/pflag"
 
 // FlagValueSet is an interface that users can implement
 // to bind a set of flags to viper.
-type FlagValueSet interface ***REMOVED***
+type FlagValueSet interface {
 	VisitAll(fn func(FlagValue))
-***REMOVED***
+}
 
 // FlagValue is an interface that users can implement
 // to bind different flags to viper.
-type FlagValue interface ***REMOVED***
+type FlagValue interface {
 	HasChanged() bool
 	Name() string
 	ValueString() string
 	ValueType() string
-***REMOVED***
+}
 
 // pflagValueSet is a wrapper around *pflag.ValueSet
 // that implements FlagValueSet.
-type pflagValueSet struct ***REMOVED***
+type pflagValueSet struct {
 	flags *pflag.FlagSet
-***REMOVED***
+}
 
 // VisitAll iterates over all *pflag.Flag inside the *pflag.FlagSet.
-func (p pflagValueSet) VisitAll(fn func(flag FlagValue)) ***REMOVED***
-	p.flags.VisitAll(func(flag *pflag.Flag) ***REMOVED***
-		fn(pflagValue***REMOVED***flag***REMOVED***)
-	***REMOVED***)
-***REMOVED***
+func (p pflagValueSet) VisitAll(fn func(flag FlagValue)) {
+	p.flags.VisitAll(func(flag *pflag.Flag) {
+		fn(pflagValue{flag})
+	})
+}
 
 // pflagValue is a wrapper aroung *pflag.flag
 // that implements FlagValue
-type pflagValue struct ***REMOVED***
+type pflagValue struct {
 	flag *pflag.Flag
-***REMOVED***
+}
 
 // HasChanges returns whether the flag has changes or not.
-func (p pflagValue) HasChanged() bool ***REMOVED***
+func (p pflagValue) HasChanged() bool {
 	return p.flag.Changed
-***REMOVED***
+}
 
 // Name returns the name of the flag.
-func (p pflagValue) Name() string ***REMOVED***
+func (p pflagValue) Name() string {
 	return p.flag.Name
-***REMOVED***
+}
 
 // ValueString returns the value of the flag as a string.
-func (p pflagValue) ValueString() string ***REMOVED***
+func (p pflagValue) ValueString() string {
 	return p.flag.Value.String()
-***REMOVED***
+}
 
 // ValueType returns the type of the flag as a string.
-func (p pflagValue) ValueType() string ***REMOVED***
+func (p pflagValue) ValueType() string {
 	return p.flag.Value.Type()
-***REMOVED***
+}

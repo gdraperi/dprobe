@@ -10,27 +10,27 @@ const (
 )
 
 // ErrUnSupported signals that the graph-driver is not supported on the current configuration
-type ErrUnSupported interface ***REMOVED***
+type ErrUnSupported interface {
 	NotSupported()
-***REMOVED***
+}
 
 // NotSupportedError signals that the graph-driver is not supported on the current configuration
 type NotSupportedError string
 
-func (e NotSupportedError) Error() string ***REMOVED***
+func (e NotSupportedError) Error() string {
 	return string(e)
-***REMOVED***
+}
 
 // NotSupported signals that a graph-driver is not supported.
-func (e NotSupportedError) NotSupported() ***REMOVED******REMOVED***
+func (e NotSupportedError) NotSupported() {}
 
 // IsDriverNotSupported returns true if the error initializing
 // the graph driver is a non-supported error.
-func IsDriverNotSupported(err error) bool ***REMOVED***
-	switch err.(type) ***REMOVED***
+func IsDriverNotSupported(err error) bool {
+	switch err.(type) {
 	case ErrUnSupported:
 		return true
 	default:
 		return false
-	***REMOVED***
-***REMOVED***
+	}
+}

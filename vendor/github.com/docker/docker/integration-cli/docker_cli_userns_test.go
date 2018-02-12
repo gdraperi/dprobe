@@ -21,7 +21,7 @@ import (
 // user namespaces test: run daemon with remapped root setting
 // 1. validate uid/gid maps are set properly
 // 2. verify that files created are owned by remapped root
-func (s *DockerDaemonSuite) TestDaemonUserNamespaceRootSetting(c *check.C) ***REMOVED***
+func (s *DockerDaemonSuite) TestDaemonUserNamespaceRootSetting(c *check.C) {
 	testRequires(c, DaemonIsLinux, SameHostDaemon, UserNamespaceInKernel)
 
 	s.d.StartWithBusybox(c, "--userns-remap", "default")
@@ -57,7 +57,7 @@ func (s *DockerDaemonSuite) TestDaemonUserNamespaceRootSetting(c *check.C) ***RE
 	c.Assert(statNotExists.UID(), checker.Equals, uint32(uid), check.Commentf("Created directory not owned by remapped root UID"))
 	c.Assert(statNotExists.GID(), checker.Equals, uint32(gid), check.Commentf("Created directory not owned by remapped root GID"))
 
-	pid, err := s.d.Cmd("inspect", "--format=***REMOVED******REMOVED***.State.Pid***REMOVED******REMOVED***", "userns")
+	pid, err := s.d.Cmd("inspect", "--format={{.State.Pid}}", "userns")
 	c.Assert(err, checker.IsNil, check.Commentf("Could not inspect running container: out: %q", pid))
 	// check the uid and gid maps for the PID to ensure root is remapped
 	// (cmd = cat /proc/<pid>/uid_map | grep -E '0\s+9999\s+1')
@@ -83,16 +83,16 @@ func (s *DockerDaemonSuite) TestDaemonUserNamespaceRootSetting(c *check.C) ***RE
 	user = s.findUser(c, "userns_skip")
 	// userns are skipped, user is root
 	c.Assert(user, checker.Equals, "root")
-***REMOVED***
+}
 
 // findUser finds the uid or name of the user of the first process that runs in a container
-func (s *DockerDaemonSuite) findUser(c *check.C, container string) string ***REMOVED***
+func (s *DockerDaemonSuite) findUser(c *check.C, container string) string {
 	out, err := s.d.Cmd("top", container)
 	c.Assert(err, checker.IsNil, check.Commentf("Output: %s", out))
 	rows := strings.Split(out, "\n")
-	if len(rows) < 2 ***REMOVED***
+	if len(rows) < 2 {
 		// No process rows founds
 		c.FailNow()
-	***REMOVED***
+	}
 	return strings.Fields(rows[1])[0]
-***REMOVED***
+}

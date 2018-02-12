@@ -19,33 +19,33 @@ import (
 // untar is the entry-point for docker-untar on re-exec. This is not used on
 // Windows as it does not support chroot, hence no point sandboxing through
 // chroot and rexec.
-func untar() ***REMOVED***
+func untar() {
 	runtime.LockOSThread()
 	flag.Parse()
 
 	var options *archive.TarOptions
 
 	//read the options from the pipe "ExtraFiles"
-	if err := json.NewDecoder(os.NewFile(3, "options")).Decode(&options); err != nil ***REMOVED***
+	if err := json.NewDecoder(os.NewFile(3, "options")).Decode(&options); err != nil {
 		fatal(err)
-	***REMOVED***
+	}
 
-	if err := chroot(flag.Arg(0)); err != nil ***REMOVED***
+	if err := chroot(flag.Arg(0)); err != nil {
 		fatal(err)
-	***REMOVED***
+	}
 
-	if err := archive.Unpack(os.Stdin, "/", options); err != nil ***REMOVED***
+	if err := archive.Unpack(os.Stdin, "/", options); err != nil {
 		fatal(err)
-	***REMOVED***
+	}
 	// fully consume stdin in case it is zero padded
-	if _, err := flush(os.Stdin); err != nil ***REMOVED***
+	if _, err := flush(os.Stdin); err != nil {
 		fatal(err)
-	***REMOVED***
+	}
 
 	os.Exit(0)
-***REMOVED***
+}
 
-func invokeUnpack(decompressedArchive io.Reader, dest string, options *archive.TarOptions) error ***REMOVED***
+func invokeUnpack(decompressedArchive io.Reader, dest string, options *archive.TarOptions) error {
 
 	// We can't pass a potentially large exclude list directly via cmd line
 	// because we easily overrun the kernel's max argument/environment size
@@ -53,9 +53,9 @@ func invokeUnpack(decompressedArchive io.Reader, dest string, options *archive.T
 	// `docker load`). We will marshall the options via a pipe to the
 	// child
 	r, w, err := os.Pipe()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("Untar pipe failure: %v", err)
-	***REMOVED***
+	}
 
 	cmd := reexec.Command("docker-untar", dest)
 	cmd.Stdin = decompressedArchive
@@ -65,24 +65,24 @@ func invokeUnpack(decompressedArchive io.Reader, dest string, options *archive.T
 	cmd.Stdout = output
 	cmd.Stderr = output
 
-	if err := cmd.Start(); err != nil ***REMOVED***
+	if err := cmd.Start(); err != nil {
 		w.Close()
 		return fmt.Errorf("Untar error on re-exec cmd: %v", err)
-	***REMOVED***
+	}
 	//write the options to the pipe for the untar exec to read
-	if err := json.NewEncoder(w).Encode(options); err != nil ***REMOVED***
+	if err := json.NewEncoder(w).Encode(options); err != nil {
 		w.Close()
 		return fmt.Errorf("Untar json encode to pipe failed: %v", err)
-	***REMOVED***
+	}
 	w.Close()
 
-	if err := cmd.Wait(); err != nil ***REMOVED***
+	if err := cmd.Wait(); err != nil {
 		// when `xz -d -c -q | docker-untar ...` failed on docker-untar side,
 		// we need to exhaust `xz`'s output, otherwise the `xz` side will be
 		// pending on write pipe forever
 		io.Copy(ioutil.Discard, decompressedArchive)
 
 		return fmt.Errorf("Error processing tar file(%v): %s", err, output)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

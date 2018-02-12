@@ -12,71 +12,71 @@ import (
 	"golang.org/x/text/internal/testtext"
 )
 
-var benchData = []struct***REMOVED*** name, str string ***REMOVED******REMOVED***
-	***REMOVED***"ASCII", "Malvolio"***REMOVED***,
-	***REMOVED***"NotNormalized", "abcdefg\u0301\u031f"***REMOVED***,
-	***REMOVED***"Arabic", "دبي"***REMOVED***,
-	***REMOVED***"Hangul", "동일조건변경허락"***REMOVED***,
-***REMOVED***
+var benchData = []struct{ name, str string }{
+	{"ASCII", "Malvolio"},
+	{"NotNormalized", "abcdefg\u0301\u031f"},
+	{"Arabic", "دبي"},
+	{"Hangul", "동일조건변경허락"},
+}
 
-var benchProfiles = []struct ***REMOVED***
+var benchProfiles = []struct {
 	name string
 	p    *Profile
-***REMOVED******REMOVED***
-	***REMOVED***"FreeForm", NewFreeform()***REMOVED***,
-	***REMOVED***"Nickname", Nickname***REMOVED***,
-	***REMOVED***"OpaqueString", OpaqueString***REMOVED***,
-	***REMOVED***"UsernameCaseMapped", UsernameCaseMapped***REMOVED***,
-	***REMOVED***"UsernameCasePreserved", UsernameCasePreserved***REMOVED***,
-***REMOVED***
+}{
+	{"FreeForm", NewFreeform()},
+	{"Nickname", Nickname},
+	{"OpaqueString", OpaqueString},
+	{"UsernameCaseMapped", UsernameCaseMapped},
+	{"UsernameCasePreserved", UsernameCasePreserved},
+}
 
-func doBench(b *testing.B, f func(b *testing.B, p *Profile, s string)) ***REMOVED***
-	for _, bp := range benchProfiles ***REMOVED***
-		for _, d := range benchData ***REMOVED***
-			testtext.Bench(b, bp.name+"/"+d.name, func(b *testing.B) ***REMOVED***
+func doBench(b *testing.B, f func(b *testing.B, p *Profile, s string)) {
+	for _, bp := range benchProfiles {
+		for _, d := range benchData {
+			testtext.Bench(b, bp.name+"/"+d.name, func(b *testing.B) {
 				f(b, bp.p, d.str)
-			***REMOVED***)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			})
+		}
+	}
+}
 
-func BenchmarkString(b *testing.B) ***REMOVED***
-	doBench(b, func(b *testing.B, p *Profile, s string) ***REMOVED***
-		for i := 0; i < b.N; i++ ***REMOVED***
+func BenchmarkString(b *testing.B) {
+	doBench(b, func(b *testing.B, p *Profile, s string) {
+		for i := 0; i < b.N; i++ {
 			p.String(s)
-		***REMOVED***
-	***REMOVED***)
-***REMOVED***
+		}
+	})
+}
 
-func BenchmarkBytes(b *testing.B) ***REMOVED***
-	doBench(b, func(b *testing.B, p *Profile, s string) ***REMOVED***
+func BenchmarkBytes(b *testing.B) {
+	doBench(b, func(b *testing.B, p *Profile, s string) {
 		src := []byte(s)
 		b.ResetTimer()
-		for i := 0; i < b.N; i++ ***REMOVED***
+		for i := 0; i < b.N; i++ {
 			p.Bytes(src)
-		***REMOVED***
-	***REMOVED***)
-***REMOVED***
+		}
+	})
+}
 
-func BenchmarkAppend(b *testing.B) ***REMOVED***
-	doBench(b, func(b *testing.B, p *Profile, s string) ***REMOVED***
+func BenchmarkAppend(b *testing.B) {
+	doBench(b, func(b *testing.B, p *Profile, s string) {
 		src := []byte(s)
 		dst := make([]byte, 0, 4096)
 		b.ResetTimer()
-		for i := 0; i < b.N; i++ ***REMOVED***
+		for i := 0; i < b.N; i++ {
 			p.Append(dst, src)
-		***REMOVED***
-	***REMOVED***)
-***REMOVED***
+		}
+	})
+}
 
-func BenchmarkTransform(b *testing.B) ***REMOVED***
-	doBench(b, func(b *testing.B, p *Profile, s string) ***REMOVED***
+func BenchmarkTransform(b *testing.B) {
+	doBench(b, func(b *testing.B, p *Profile, s string) {
 		src := []byte(s)
 		dst := make([]byte, 2*len(s))
 		t := p.NewTransformer()
 		b.ResetTimer()
-		for i := 0; i < b.N; i++ ***REMOVED***
+		for i := 0; i < b.N; i++ {
 			t.Transform(dst, src, true)
-		***REMOVED***
-	***REMOVED***)
-***REMOVED***
+		}
+	})
+}

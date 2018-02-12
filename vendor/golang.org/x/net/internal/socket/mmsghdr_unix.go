@@ -10,33 +10,33 @@ import "net"
 
 type mmsghdrs []mmsghdr
 
-func (hs mmsghdrs) pack(ms []Message, parseFn func([]byte, string) (net.Addr, error), marshalFn func(net.Addr) []byte) error ***REMOVED***
-	for i := range hs ***REMOVED***
+func (hs mmsghdrs) pack(ms []Message, parseFn func([]byte, string) (net.Addr, error), marshalFn func(net.Addr) []byte) error {
+	for i := range hs {
 		vs := make([]iovec, len(ms[i].Buffers))
 		var sa []byte
-		if parseFn != nil ***REMOVED***
+		if parseFn != nil {
 			sa = make([]byte, sizeofSockaddrInet6)
-		***REMOVED***
-		if marshalFn != nil ***REMOVED***
+		}
+		if marshalFn != nil {
 			sa = marshalFn(ms[i].Addr)
-		***REMOVED***
+		}
 		hs[i].Hdr.pack(vs, ms[i].Buffers, ms[i].OOB, sa)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (hs mmsghdrs) unpack(ms []Message, parseFn func([]byte, string) (net.Addr, error), hint string) error ***REMOVED***
-	for i := range hs ***REMOVED***
+func (hs mmsghdrs) unpack(ms []Message, parseFn func([]byte, string) (net.Addr, error), hint string) error {
+	for i := range hs {
 		ms[i].N = int(hs[i].Len)
 		ms[i].NN = hs[i].Hdr.controllen()
 		ms[i].Flags = hs[i].Hdr.flags()
-		if parseFn != nil ***REMOVED***
+		if parseFn != nil {
 			var err error
 			ms[i].Addr, err = parseFn(hs[i].Hdr.name(), hint)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return nil
-***REMOVED***
+}

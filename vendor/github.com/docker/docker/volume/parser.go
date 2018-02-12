@@ -19,7 +19,7 @@ const (
 var ErrVolumeTargetIsRoot = errors.New("invalid specification: destination can't be '/'")
 
 // Parser represents a platform specific parser for mount expressions
-type Parser interface ***REMOVED***
+type Parser interface {
 	ParseMountRaw(raw, volumeDriver string) (*MountPoint, error)
 	ParseMountSpec(cfg mount.Mount) (*MountPoint, error)
 	ParseVolumesFrom(spec string) (string, string, error)
@@ -32,16 +32,16 @@ type Parser interface ***REMOVED***
 	HasResource(m *MountPoint, absPath string) bool
 	ValidateTmpfsMountDestination(dest string) error
 	ValidateMountConfig(mt *mount.Mount) error
-***REMOVED***
+}
 
 // NewParser creates a parser for a given container OS, depending on the current host OS (linux on a windows host will resolve to an lcowParser)
-func NewParser(containerOS string) Parser ***REMOVED***
-	switch containerOS ***REMOVED***
+func NewParser(containerOS string) Parser {
+	switch containerOS {
 	case OSWindows:
-		return &windowsParser***REMOVED******REMOVED***
-	***REMOVED***
-	if runtime.GOOS == OSWindows ***REMOVED***
-		return &lcowParser***REMOVED******REMOVED***
-	***REMOVED***
-	return &linuxParser***REMOVED******REMOVED***
-***REMOVED***
+		return &windowsParser{}
+	}
+	if runtime.GOOS == OSWindows {
+		return &lcowParser{}
+	}
+	return &linuxParser{}
+}

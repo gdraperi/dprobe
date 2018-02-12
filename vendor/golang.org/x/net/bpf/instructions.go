@@ -8,13 +8,13 @@ import "fmt"
 
 // An Instruction is one instruction executed by the BPF virtual
 // machine.
-type Instruction interface ***REMOVED***
+type Instruction interface {
 	// Assemble assembles the Instruction into a RawInstruction.
 	Assemble() (RawInstruction, error)
-***REMOVED***
+}
 
 // A RawInstruction is a raw BPF virtual machine instruction.
-type RawInstruction struct ***REMOVED***
+type RawInstruction struct {
 	// Operation to execute.
 	Op uint16
 	// For conditional jump instructions, the number of instructions
@@ -23,19 +23,19 @@ type RawInstruction struct ***REMOVED***
 	Jf uint8
 	// Constant parameter. The meaning depends on the Op.
 	K uint32
-***REMOVED***
+}
 
 // Assemble implements the Instruction Assemble method.
-func (ri RawInstruction) Assemble() (RawInstruction, error) ***REMOVED*** return ri, nil ***REMOVED***
+func (ri RawInstruction) Assemble() (RawInstruction, error) { return ri, nil }
 
 // Disassemble parses ri into an Instruction and returns it. If ri is
 // not recognized by this package, ri itself is returned.
-func (ri RawInstruction) Disassemble() Instruction ***REMOVED***
-	switch ri.Op & opMaskCls ***REMOVED***
+func (ri RawInstruction) Disassemble() Instruction {
+	switch ri.Op & opMaskCls {
 	case opClsLoadA, opClsLoadX:
 		reg := Register(ri.Op & opMaskLoadDest)
 		sz := 0
-		switch ri.Op & opMaskLoadWidth ***REMOVED***
+		switch ri.Op & opMaskLoadWidth {
 		case opLoadWidth4:
 			sz = 4
 		case opLoadWidth2:
@@ -44,242 +44,242 @@ func (ri RawInstruction) Disassemble() Instruction ***REMOVED***
 			sz = 1
 		default:
 			return ri
-		***REMOVED***
-		switch ri.Op & opMaskLoadMode ***REMOVED***
+		}
+		switch ri.Op & opMaskLoadMode {
 		case opAddrModeImmediate:
-			if sz != 4 ***REMOVED***
+			if sz != 4 {
 				return ri
-			***REMOVED***
-			return LoadConstant***REMOVED***Dst: reg, Val: ri.K***REMOVED***
+			}
+			return LoadConstant{Dst: reg, Val: ri.K}
 		case opAddrModeScratch:
-			if sz != 4 || ri.K > 15 ***REMOVED***
+			if sz != 4 || ri.K > 15 {
 				return ri
-			***REMOVED***
-			return LoadScratch***REMOVED***Dst: reg, N: int(ri.K)***REMOVED***
+			}
+			return LoadScratch{Dst: reg, N: int(ri.K)}
 		case opAddrModeAbsolute:
-			if ri.K > extOffset+0xffffffff ***REMOVED***
-				return LoadExtension***REMOVED***Num: Extension(-extOffset + ri.K)***REMOVED***
-			***REMOVED***
-			return LoadAbsolute***REMOVED***Size: sz, Off: ri.K***REMOVED***
+			if ri.K > extOffset+0xffffffff {
+				return LoadExtension{Num: Extension(-extOffset + ri.K)}
+			}
+			return LoadAbsolute{Size: sz, Off: ri.K}
 		case opAddrModeIndirect:
-			return LoadIndirect***REMOVED***Size: sz, Off: ri.K***REMOVED***
+			return LoadIndirect{Size: sz, Off: ri.K}
 		case opAddrModePacketLen:
-			if sz != 4 ***REMOVED***
+			if sz != 4 {
 				return ri
-			***REMOVED***
-			return LoadExtension***REMOVED***Num: ExtLen***REMOVED***
+			}
+			return LoadExtension{Num: ExtLen}
 		case opAddrModeMemShift:
-			return LoadMemShift***REMOVED***Off: ri.K***REMOVED***
+			return LoadMemShift{Off: ri.K}
 		default:
 			return ri
-		***REMOVED***
+		}
 
 	case opClsStoreA:
-		if ri.Op != opClsStoreA || ri.K > 15 ***REMOVED***
+		if ri.Op != opClsStoreA || ri.K > 15 {
 			return ri
-		***REMOVED***
-		return StoreScratch***REMOVED***Src: RegA, N: int(ri.K)***REMOVED***
+		}
+		return StoreScratch{Src: RegA, N: int(ri.K)}
 
 	case opClsStoreX:
-		if ri.Op != opClsStoreX || ri.K > 15 ***REMOVED***
+		if ri.Op != opClsStoreX || ri.K > 15 {
 			return ri
-		***REMOVED***
-		return StoreScratch***REMOVED***Src: RegX, N: int(ri.K)***REMOVED***
+		}
+		return StoreScratch{Src: RegX, N: int(ri.K)}
 
 	case opClsALU:
-		switch op := ALUOp(ri.Op & opMaskOperator); op ***REMOVED***
+		switch op := ALUOp(ri.Op & opMaskOperator); op {
 		case ALUOpAdd, ALUOpSub, ALUOpMul, ALUOpDiv, ALUOpOr, ALUOpAnd, ALUOpShiftLeft, ALUOpShiftRight, ALUOpMod, ALUOpXor:
-			if ri.Op&opMaskOperandSrc != 0 ***REMOVED***
-				return ALUOpX***REMOVED***Op: op***REMOVED***
-			***REMOVED***
-			return ALUOpConstant***REMOVED***Op: op, Val: ri.K***REMOVED***
+			if ri.Op&opMaskOperandSrc != 0 {
+				return ALUOpX{Op: op}
+			}
+			return ALUOpConstant{Op: op, Val: ri.K}
 		case aluOpNeg:
-			return NegateA***REMOVED******REMOVED***
+			return NegateA{}
 		default:
 			return ri
-		***REMOVED***
+		}
 
 	case opClsJump:
-		if ri.Op&opMaskJumpConst != opClsJump ***REMOVED***
+		if ri.Op&opMaskJumpConst != opClsJump {
 			return ri
-		***REMOVED***
-		switch ri.Op & opMaskJumpCond ***REMOVED***
+		}
+		switch ri.Op & opMaskJumpCond {
 		case opJumpAlways:
-			return Jump***REMOVED***Skip: ri.K***REMOVED***
+			return Jump{Skip: ri.K}
 		case opJumpEqual:
-			if ri.Jt == 0 ***REMOVED***
-				return JumpIf***REMOVED***
+			if ri.Jt == 0 {
+				return JumpIf{
 					Cond:      JumpNotEqual,
 					Val:       ri.K,
 					SkipTrue:  ri.Jf,
 					SkipFalse: 0,
-				***REMOVED***
-			***REMOVED***
-			return JumpIf***REMOVED***
+				}
+			}
+			return JumpIf{
 				Cond:      JumpEqual,
 				Val:       ri.K,
 				SkipTrue:  ri.Jt,
 				SkipFalse: ri.Jf,
-			***REMOVED***
+			}
 		case opJumpGT:
-			if ri.Jt == 0 ***REMOVED***
-				return JumpIf***REMOVED***
+			if ri.Jt == 0 {
+				return JumpIf{
 					Cond:      JumpLessOrEqual,
 					Val:       ri.K,
 					SkipTrue:  ri.Jf,
 					SkipFalse: 0,
-				***REMOVED***
-			***REMOVED***
-			return JumpIf***REMOVED***
+				}
+			}
+			return JumpIf{
 				Cond:      JumpGreaterThan,
 				Val:       ri.K,
 				SkipTrue:  ri.Jt,
 				SkipFalse: ri.Jf,
-			***REMOVED***
+			}
 		case opJumpGE:
-			if ri.Jt == 0 ***REMOVED***
-				return JumpIf***REMOVED***
+			if ri.Jt == 0 {
+				return JumpIf{
 					Cond:      JumpLessThan,
 					Val:       ri.K,
 					SkipTrue:  ri.Jf,
 					SkipFalse: 0,
-				***REMOVED***
-			***REMOVED***
-			return JumpIf***REMOVED***
+				}
+			}
+			return JumpIf{
 				Cond:      JumpGreaterOrEqual,
 				Val:       ri.K,
 				SkipTrue:  ri.Jt,
 				SkipFalse: ri.Jf,
-			***REMOVED***
+			}
 		case opJumpSet:
-			return JumpIf***REMOVED***
+			return JumpIf{
 				Cond:      JumpBitsSet,
 				Val:       ri.K,
 				SkipTrue:  ri.Jt,
 				SkipFalse: ri.Jf,
-			***REMOVED***
+			}
 		default:
 			return ri
-		***REMOVED***
+		}
 
 	case opClsReturn:
-		switch ri.Op ***REMOVED***
+		switch ri.Op {
 		case opClsReturn | opRetSrcA:
-			return RetA***REMOVED******REMOVED***
+			return RetA{}
 		case opClsReturn | opRetSrcConstant:
-			return RetConstant***REMOVED***Val: ri.K***REMOVED***
+			return RetConstant{Val: ri.K}
 		default:
 			return ri
-		***REMOVED***
+		}
 
 	case opClsMisc:
-		switch ri.Op ***REMOVED***
+		switch ri.Op {
 		case opClsMisc | opMiscTAX:
-			return TAX***REMOVED******REMOVED***
+			return TAX{}
 		case opClsMisc | opMiscTXA:
-			return TXA***REMOVED******REMOVED***
+			return TXA{}
 		default:
 			return ri
-		***REMOVED***
+		}
 
 	default:
 		panic("unreachable") // switch is exhaustive on the bit pattern
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // LoadConstant loads Val into register Dst.
-type LoadConstant struct ***REMOVED***
+type LoadConstant struct {
 	Dst Register
 	Val uint32
-***REMOVED***
+}
 
 // Assemble implements the Instruction Assemble method.
-func (a LoadConstant) Assemble() (RawInstruction, error) ***REMOVED***
+func (a LoadConstant) Assemble() (RawInstruction, error) {
 	return assembleLoad(a.Dst, 4, opAddrModeImmediate, a.Val)
-***REMOVED***
+}
 
 // String returns the the instruction in assembler notation.
-func (a LoadConstant) String() string ***REMOVED***
-	switch a.Dst ***REMOVED***
+func (a LoadConstant) String() string {
+	switch a.Dst {
 	case RegA:
 		return fmt.Sprintf("ld #%d", a.Val)
 	case RegX:
 		return fmt.Sprintf("ldx #%d", a.Val)
 	default:
 		return fmt.Sprintf("unknown instruction: %#v", a)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // LoadScratch loads scratch[N] into register Dst.
-type LoadScratch struct ***REMOVED***
+type LoadScratch struct {
 	Dst Register
 	N   int // 0-15
-***REMOVED***
+}
 
 // Assemble implements the Instruction Assemble method.
-func (a LoadScratch) Assemble() (RawInstruction, error) ***REMOVED***
-	if a.N < 0 || a.N > 15 ***REMOVED***
-		return RawInstruction***REMOVED******REMOVED***, fmt.Errorf("invalid scratch slot %d", a.N)
-	***REMOVED***
+func (a LoadScratch) Assemble() (RawInstruction, error) {
+	if a.N < 0 || a.N > 15 {
+		return RawInstruction{}, fmt.Errorf("invalid scratch slot %d", a.N)
+	}
 	return assembleLoad(a.Dst, 4, opAddrModeScratch, uint32(a.N))
-***REMOVED***
+}
 
 // String returns the the instruction in assembler notation.
-func (a LoadScratch) String() string ***REMOVED***
-	switch a.Dst ***REMOVED***
+func (a LoadScratch) String() string {
+	switch a.Dst {
 	case RegA:
 		return fmt.Sprintf("ld M[%d]", a.N)
 	case RegX:
 		return fmt.Sprintf("ldx M[%d]", a.N)
 	default:
 		return fmt.Sprintf("unknown instruction: %#v", a)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // LoadAbsolute loads packet[Off:Off+Size] as an integer value into
 // register A.
-type LoadAbsolute struct ***REMOVED***
+type LoadAbsolute struct {
 	Off  uint32
 	Size int // 1, 2 or 4
-***REMOVED***
+}
 
 // Assemble implements the Instruction Assemble method.
-func (a LoadAbsolute) Assemble() (RawInstruction, error) ***REMOVED***
+func (a LoadAbsolute) Assemble() (RawInstruction, error) {
 	return assembleLoad(RegA, a.Size, opAddrModeAbsolute, a.Off)
-***REMOVED***
+}
 
 // String returns the the instruction in assembler notation.
-func (a LoadAbsolute) String() string ***REMOVED***
-	switch a.Size ***REMOVED***
+func (a LoadAbsolute) String() string {
+	switch a.Size {
 	case 1: // byte
 		return fmt.Sprintf("ldb [%d]", a.Off)
 	case 2: // half word
 		return fmt.Sprintf("ldh [%d]", a.Off)
 	case 4: // word
-		if a.Off > extOffset+0xffffffff ***REMOVED***
-			return LoadExtension***REMOVED***Num: Extension(a.Off + 0x1000)***REMOVED***.String()
-		***REMOVED***
+		if a.Off > extOffset+0xffffffff {
+			return LoadExtension{Num: Extension(a.Off + 0x1000)}.String()
+		}
 		return fmt.Sprintf("ld [%d]", a.Off)
 	default:
 		return fmt.Sprintf("unknown instruction: %#v", a)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // LoadIndirect loads packet[X+Off:X+Off+Size] as an integer value
 // into register A.
-type LoadIndirect struct ***REMOVED***
+type LoadIndirect struct {
 	Off  uint32
 	Size int // 1, 2 or 4
-***REMOVED***
+}
 
 // Assemble implements the Instruction Assemble method.
-func (a LoadIndirect) Assemble() (RawInstruction, error) ***REMOVED***
+func (a LoadIndirect) Assemble() (RawInstruction, error) {
 	return assembleLoad(RegA, a.Size, opAddrModeIndirect, a.Off)
-***REMOVED***
+}
 
 // String returns the the instruction in assembler notation.
-func (a LoadIndirect) String() string ***REMOVED***
-	switch a.Size ***REMOVED***
+func (a LoadIndirect) String() string {
+	switch a.Size {
 	case 1: // byte
 		return fmt.Sprintf("ldb [x + %d]", a.Off)
 	case 2: // half word
@@ -288,8 +288,8 @@ func (a LoadIndirect) String() string ***REMOVED***
 		return fmt.Sprintf("ld [x + %d]", a.Off)
 	default:
 		return fmt.Sprintf("unknown instruction: %#v", a)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // LoadMemShift multiplies the first 4 bits of the byte at packet[Off]
 // by 4 and stores the result in register X.
@@ -297,37 +297,37 @@ func (a LoadIndirect) String() string ***REMOVED***
 // This instruction is mainly useful to load into X the length of an
 // IPv4 packet header in a single instruction, rather than have to do
 // the arithmetic on the header's first byte by hand.
-type LoadMemShift struct ***REMOVED***
+type LoadMemShift struct {
 	Off uint32
-***REMOVED***
+}
 
 // Assemble implements the Instruction Assemble method.
-func (a LoadMemShift) Assemble() (RawInstruction, error) ***REMOVED***
+func (a LoadMemShift) Assemble() (RawInstruction, error) {
 	return assembleLoad(RegX, 1, opAddrModeMemShift, a.Off)
-***REMOVED***
+}
 
 // String returns the the instruction in assembler notation.
-func (a LoadMemShift) String() string ***REMOVED***
+func (a LoadMemShift) String() string {
 	return fmt.Sprintf("ldx 4*([%d]&0xf)", a.Off)
-***REMOVED***
+}
 
 // LoadExtension invokes a linux-specific extension and stores the
 // result in register A.
-type LoadExtension struct ***REMOVED***
+type LoadExtension struct {
 	Num Extension
-***REMOVED***
+}
 
 // Assemble implements the Instruction Assemble method.
-func (a LoadExtension) Assemble() (RawInstruction, error) ***REMOVED***
-	if a.Num == ExtLen ***REMOVED***
+func (a LoadExtension) Assemble() (RawInstruction, error) {
+	if a.Num == ExtLen {
 		return assembleLoad(RegA, 4, opAddrModePacketLen, 0)
-	***REMOVED***
+	}
 	return assembleLoad(RegA, 4, opAddrModeAbsolute, uint32(extOffset+a.Num))
-***REMOVED***
+}
 
 // String returns the the instruction in assembler notation.
-func (a LoadExtension) String() string ***REMOVED***
-	switch a.Num ***REMOVED***
+func (a LoadExtension) String() string {
+	switch a.Num {
 	case ExtLen:
 		return "ld #len"
 	case ExtProto:
@@ -362,65 +362,65 @@ func (a LoadExtension) String() string ***REMOVED***
 		return "ld #rand"
 	default:
 		return fmt.Sprintf("unknown instruction: %#v", a)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // StoreScratch stores register Src into scratch[N].
-type StoreScratch struct ***REMOVED***
+type StoreScratch struct {
 	Src Register
 	N   int // 0-15
-***REMOVED***
+}
 
 // Assemble implements the Instruction Assemble method.
-func (a StoreScratch) Assemble() (RawInstruction, error) ***REMOVED***
-	if a.N < 0 || a.N > 15 ***REMOVED***
-		return RawInstruction***REMOVED******REMOVED***, fmt.Errorf("invalid scratch slot %d", a.N)
-	***REMOVED***
+func (a StoreScratch) Assemble() (RawInstruction, error) {
+	if a.N < 0 || a.N > 15 {
+		return RawInstruction{}, fmt.Errorf("invalid scratch slot %d", a.N)
+	}
 	var op uint16
-	switch a.Src ***REMOVED***
+	switch a.Src {
 	case RegA:
 		op = opClsStoreA
 	case RegX:
 		op = opClsStoreX
 	default:
-		return RawInstruction***REMOVED******REMOVED***, fmt.Errorf("invalid source register %v", a.Src)
-	***REMOVED***
+		return RawInstruction{}, fmt.Errorf("invalid source register %v", a.Src)
+	}
 
-	return RawInstruction***REMOVED***
+	return RawInstruction{
 		Op: op,
 		K:  uint32(a.N),
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // String returns the the instruction in assembler notation.
-func (a StoreScratch) String() string ***REMOVED***
-	switch a.Src ***REMOVED***
+func (a StoreScratch) String() string {
+	switch a.Src {
 	case RegA:
 		return fmt.Sprintf("st M[%d]", a.N)
 	case RegX:
 		return fmt.Sprintf("stx M[%d]", a.N)
 	default:
 		return fmt.Sprintf("unknown instruction: %#v", a)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // ALUOpConstant executes A = A <Op> Val.
-type ALUOpConstant struct ***REMOVED***
+type ALUOpConstant struct {
 	Op  ALUOp
 	Val uint32
-***REMOVED***
+}
 
 // Assemble implements the Instruction Assemble method.
-func (a ALUOpConstant) Assemble() (RawInstruction, error) ***REMOVED***
-	return RawInstruction***REMOVED***
+func (a ALUOpConstant) Assemble() (RawInstruction, error) {
+	return RawInstruction{
 		Op: opClsALU | opALUSrcConstant | uint16(a.Op),
 		K:  a.Val,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // String returns the the instruction in assembler notation.
-func (a ALUOpConstant) String() string ***REMOVED***
-	switch a.Op ***REMOVED***
+func (a ALUOpConstant) String() string {
+	switch a.Op {
 	case ALUOpAdd:
 		return fmt.Sprintf("add #%d", a.Val)
 	case ALUOpSub:
@@ -443,24 +443,24 @@ func (a ALUOpConstant) String() string ***REMOVED***
 		return fmt.Sprintf("rsh #%d", a.Val)
 	default:
 		return fmt.Sprintf("unknown instruction: %#v", a)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // ALUOpX executes A = A <Op> X
-type ALUOpX struct ***REMOVED***
+type ALUOpX struct {
 	Op ALUOp
-***REMOVED***
+}
 
 // Assemble implements the Instruction Assemble method.
-func (a ALUOpX) Assemble() (RawInstruction, error) ***REMOVED***
-	return RawInstruction***REMOVED***
+func (a ALUOpX) Assemble() (RawInstruction, error) {
+	return RawInstruction{
 		Op: opClsALU | opALUSrcX | uint16(a.Op),
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // String returns the the instruction in assembler notation.
-func (a ALUOpX) String() string ***REMOVED***
-	switch a.Op ***REMOVED***
+func (a ALUOpX) String() string {
+	switch a.Op {
 	case ALUOpAdd:
 		return "add x"
 	case ALUOpSub:
@@ -483,58 +483,58 @@ func (a ALUOpX) String() string ***REMOVED***
 		return "rsh x"
 	default:
 		return fmt.Sprintf("unknown instruction: %#v", a)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // NegateA executes A = -A.
-type NegateA struct***REMOVED******REMOVED***
+type NegateA struct{}
 
 // Assemble implements the Instruction Assemble method.
-func (a NegateA) Assemble() (RawInstruction, error) ***REMOVED***
-	return RawInstruction***REMOVED***
+func (a NegateA) Assemble() (RawInstruction, error) {
+	return RawInstruction{
 		Op: opClsALU | uint16(aluOpNeg),
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // String returns the the instruction in assembler notation.
-func (a NegateA) String() string ***REMOVED***
+func (a NegateA) String() string {
 	return fmt.Sprintf("neg")
-***REMOVED***
+}
 
 // Jump skips the following Skip instructions in the program.
-type Jump struct ***REMOVED***
+type Jump struct {
 	Skip uint32
-***REMOVED***
+}
 
 // Assemble implements the Instruction Assemble method.
-func (a Jump) Assemble() (RawInstruction, error) ***REMOVED***
-	return RawInstruction***REMOVED***
+func (a Jump) Assemble() (RawInstruction, error) {
+	return RawInstruction{
 		Op: opClsJump | opJumpAlways,
 		K:  a.Skip,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // String returns the the instruction in assembler notation.
-func (a Jump) String() string ***REMOVED***
+func (a Jump) String() string {
 	return fmt.Sprintf("ja %d", a.Skip)
-***REMOVED***
+}
 
 // JumpIf skips the following Skip instructions in the program if A
 // <Cond> Val is true.
-type JumpIf struct ***REMOVED***
+type JumpIf struct {
 	Cond      JumpTest
 	Val       uint32
 	SkipTrue  uint8
 	SkipFalse uint8
-***REMOVED***
+}
 
 // Assemble implements the Instruction Assemble method.
-func (a JumpIf) Assemble() (RawInstruction, error) ***REMOVED***
+func (a JumpIf) Assemble() (RawInstruction, error) {
 	var (
 		cond uint16
 		flip bool
 	)
-	switch a.Cond ***REMOVED***
+	switch a.Cond {
 	case JumpEqual:
 		cond = opJumpEqual
 	case JumpNotEqual:
@@ -552,23 +552,23 @@ func (a JumpIf) Assemble() (RawInstruction, error) ***REMOVED***
 	case JumpBitsNotSet:
 		cond, flip = opJumpSet, true
 	default:
-		return RawInstruction***REMOVED******REMOVED***, fmt.Errorf("unknown JumpTest %v", a.Cond)
-	***REMOVED***
+		return RawInstruction{}, fmt.Errorf("unknown JumpTest %v", a.Cond)
+	}
 	jt, jf := a.SkipTrue, a.SkipFalse
-	if flip ***REMOVED***
+	if flip {
 		jt, jf = jf, jt
-	***REMOVED***
-	return RawInstruction***REMOVED***
+	}
+	return RawInstruction{
 		Op: opClsJump | cond,
 		Jt: jt,
 		Jf: jf,
 		K:  a.Val,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // String returns the the instruction in assembler notation.
-func (a JumpIf) String() string ***REMOVED***
-	switch a.Cond ***REMOVED***
+func (a JumpIf) String() string {
+	switch a.Cond {
 	// K == A
 	case JumpEqual:
 		return conditionalJump(a, "jeq", "jneq")
@@ -589,105 +589,105 @@ func (a JumpIf) String() string ***REMOVED***
 		return fmt.Sprintf("jle #%d,%d", a.Val, a.SkipTrue)
 	// K & A != 0
 	case JumpBitsSet:
-		if a.SkipFalse > 0 ***REMOVED***
+		if a.SkipFalse > 0 {
 			return fmt.Sprintf("jset #%d,%d,%d", a.Val, a.SkipTrue, a.SkipFalse)
-		***REMOVED***
+		}
 		return fmt.Sprintf("jset #%d,%d", a.Val, a.SkipTrue)
 	// K & A == 0, there is no assembler instruction for JumpBitNotSet, use JumpBitSet and invert skips
 	case JumpBitsNotSet:
-		return JumpIf***REMOVED***Cond: JumpBitsSet, SkipTrue: a.SkipFalse, SkipFalse: a.SkipTrue, Val: a.Val***REMOVED***.String()
+		return JumpIf{Cond: JumpBitsSet, SkipTrue: a.SkipFalse, SkipFalse: a.SkipTrue, Val: a.Val}.String()
 	default:
 		return fmt.Sprintf("unknown instruction: %#v", a)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func conditionalJump(inst JumpIf, positiveJump, negativeJump string) string ***REMOVED***
-	if inst.SkipTrue > 0 ***REMOVED***
-		if inst.SkipFalse > 0 ***REMOVED***
+func conditionalJump(inst JumpIf, positiveJump, negativeJump string) string {
+	if inst.SkipTrue > 0 {
+		if inst.SkipFalse > 0 {
 			return fmt.Sprintf("%s #%d,%d,%d", positiveJump, inst.Val, inst.SkipTrue, inst.SkipFalse)
-		***REMOVED***
+		}
 		return fmt.Sprintf("%s #%d,%d", positiveJump, inst.Val, inst.SkipTrue)
-	***REMOVED***
+	}
 	return fmt.Sprintf("%s #%d,%d", negativeJump, inst.Val, inst.SkipFalse)
-***REMOVED***
+}
 
 // RetA exits the BPF program, returning the value of register A.
-type RetA struct***REMOVED******REMOVED***
+type RetA struct{}
 
 // Assemble implements the Instruction Assemble method.
-func (a RetA) Assemble() (RawInstruction, error) ***REMOVED***
-	return RawInstruction***REMOVED***
+func (a RetA) Assemble() (RawInstruction, error) {
+	return RawInstruction{
 		Op: opClsReturn | opRetSrcA,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // String returns the the instruction in assembler notation.
-func (a RetA) String() string ***REMOVED***
+func (a RetA) String() string {
 	return fmt.Sprintf("ret a")
-***REMOVED***
+}
 
 // RetConstant exits the BPF program, returning a constant value.
-type RetConstant struct ***REMOVED***
+type RetConstant struct {
 	Val uint32
-***REMOVED***
+}
 
 // Assemble implements the Instruction Assemble method.
-func (a RetConstant) Assemble() (RawInstruction, error) ***REMOVED***
-	return RawInstruction***REMOVED***
+func (a RetConstant) Assemble() (RawInstruction, error) {
+	return RawInstruction{
 		Op: opClsReturn | opRetSrcConstant,
 		K:  a.Val,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // String returns the the instruction in assembler notation.
-func (a RetConstant) String() string ***REMOVED***
+func (a RetConstant) String() string {
 	return fmt.Sprintf("ret #%d", a.Val)
-***REMOVED***
+}
 
 // TXA copies the value of register X to register A.
-type TXA struct***REMOVED******REMOVED***
+type TXA struct{}
 
 // Assemble implements the Instruction Assemble method.
-func (a TXA) Assemble() (RawInstruction, error) ***REMOVED***
-	return RawInstruction***REMOVED***
+func (a TXA) Assemble() (RawInstruction, error) {
+	return RawInstruction{
 		Op: opClsMisc | opMiscTXA,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // String returns the the instruction in assembler notation.
-func (a TXA) String() string ***REMOVED***
+func (a TXA) String() string {
 	return fmt.Sprintf("txa")
-***REMOVED***
+}
 
 // TAX copies the value of register A to register X.
-type TAX struct***REMOVED******REMOVED***
+type TAX struct{}
 
 // Assemble implements the Instruction Assemble method.
-func (a TAX) Assemble() (RawInstruction, error) ***REMOVED***
-	return RawInstruction***REMOVED***
+func (a TAX) Assemble() (RawInstruction, error) {
+	return RawInstruction{
 		Op: opClsMisc | opMiscTAX,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // String returns the the instruction in assembler notation.
-func (a TAX) String() string ***REMOVED***
+func (a TAX) String() string {
 	return fmt.Sprintf("tax")
-***REMOVED***
+}
 
-func assembleLoad(dst Register, loadSize int, mode uint16, k uint32) (RawInstruction, error) ***REMOVED***
+func assembleLoad(dst Register, loadSize int, mode uint16, k uint32) (RawInstruction, error) {
 	var (
 		cls uint16
 		sz  uint16
 	)
-	switch dst ***REMOVED***
+	switch dst {
 	case RegA:
 		cls = opClsLoadA
 	case RegX:
 		cls = opClsLoadX
 	default:
-		return RawInstruction***REMOVED******REMOVED***, fmt.Errorf("invalid target register %v", dst)
-	***REMOVED***
-	switch loadSize ***REMOVED***
+		return RawInstruction{}, fmt.Errorf("invalid target register %v", dst)
+	}
+	switch loadSize {
 	case 1:
 		sz = opLoadWidth1
 	case 2:
@@ -695,10 +695,10 @@ func assembleLoad(dst Register, loadSize int, mode uint16, k uint32) (RawInstruc
 	case 4:
 		sz = opLoadWidth4
 	default:
-		return RawInstruction***REMOVED******REMOVED***, fmt.Errorf("invalid load byte length %d", sz)
-	***REMOVED***
-	return RawInstruction***REMOVED***
+		return RawInstruction{}, fmt.Errorf("invalid load byte length %d", sz)
+	}
+	return RawInstruction{
 		Op: cls | sz | mode,
 		K:  k,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}

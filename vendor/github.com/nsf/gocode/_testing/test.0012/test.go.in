@@ -2,10 +2,10 @@ package main
 
 type MyMap map[string]int
 
-func main() ***REMOVED***
+func main() {
 	var m MyMap
-	for key, value := range m ***REMOVED***
+	for key, value := range m {
 		z := m["15"]
 		
-	***REMOVED***
-***REMOVED***
+	}
+}

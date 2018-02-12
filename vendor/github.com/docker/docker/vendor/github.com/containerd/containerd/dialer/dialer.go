@@ -7,45 +7,45 @@ import (
 	"github.com/pkg/errors"
 )
 
-type dialResult struct ***REMOVED***
+type dialResult struct {
 	c   net.Conn
 	err error
-***REMOVED***
+}
 
 // Dialer returns a GRPC net.Conn connected to the provided address
-func Dialer(address string, timeout time.Duration) (net.Conn, error) ***REMOVED***
+func Dialer(address string, timeout time.Duration) (net.Conn, error) {
 	var (
-		stopC = make(chan struct***REMOVED******REMOVED***)
+		stopC = make(chan struct{})
 		synC  = make(chan *dialResult)
 	)
-	go func() ***REMOVED***
+	go func() {
 		defer close(synC)
-		for ***REMOVED***
-			select ***REMOVED***
+		for {
+			select {
 			case <-stopC:
 				return
 			default:
 				c, err := dialer(address, timeout)
-				if isNoent(err) ***REMOVED***
+				if isNoent(err) {
 					<-time.After(10 * time.Millisecond)
 					continue
-				***REMOVED***
-				synC <- &dialResult***REMOVED***c, err***REMOVED***
+				}
+				synC <- &dialResult{c, err}
 				return
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***()
-	select ***REMOVED***
+			}
+		}
+	}()
+	select {
 	case dr := <-synC:
 		return dr.c, dr.err
 	case <-time.After(timeout):
 		close(stopC)
-		go func() ***REMOVED***
+		go func() {
 			dr := <-synC
-			if dr != nil ***REMOVED***
+			if dr != nil {
 				dr.c.Close()
-			***REMOVED***
-		***REMOVED***()
+			}
+		}()
 		return nil, errors.Errorf("dial %s: timeout", address)
-	***REMOVED***
-***REMOVED***
+	}
+}

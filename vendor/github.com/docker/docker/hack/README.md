@@ -39,7 +39,7 @@ or directly referenced when running tests inside a Docker development container.
 - When running on a local machine, `make test` to run all tests found in
 `test`, `test-unit`, `test-integration`, and `test-docker-py` on
 your local machine. The default timeout is set in `make.sh` to 60 minutes
-(`$***REMOVED***TIMEOUT:=60m***REMOVED***`), since it currently takes up to an hour to run
+(`${TIMEOUT:=60m}`), since it currently takes up to an hour to run
 all of the tests.
 - When running inside a Docker development container, `hack/make.sh` does
 not have a single target that runs all the tests. You need to provide a

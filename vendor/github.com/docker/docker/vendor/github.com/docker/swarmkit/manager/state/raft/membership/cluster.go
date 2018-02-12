@@ -27,7 +27,7 @@ var (
 
 // Cluster represents a set of active
 // raft Members
-type Cluster struct ***REMOVED***
+type Cluster struct {
 	mu      sync.RWMutex
 	members map[uint64]*Member
 
@@ -36,178 +36,178 @@ type Cluster struct ***REMOVED***
 	removed map[uint64]bool
 
 	PeersBroadcast *watch.Queue
-***REMOVED***
+}
 
 // Member represents a raft Cluster Member
-type Member struct ***REMOVED***
+type Member struct {
 	*api.RaftMember
-***REMOVED***
+}
 
 // NewCluster creates a new Cluster neighbors list for a raft Member.
-func NewCluster() *Cluster ***REMOVED***
+func NewCluster() *Cluster {
 	// TODO(abronan): generate Cluster ID for federation
 
-	return &Cluster***REMOVED***
+	return &Cluster{
 		members:        make(map[uint64]*Member),
 		removed:        make(map[uint64]bool),
 		PeersBroadcast: watch.NewQueue(),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Members returns the list of raft Members in the Cluster.
-func (c *Cluster) Members() map[uint64]*Member ***REMOVED***
+func (c *Cluster) Members() map[uint64]*Member {
 	members := make(map[uint64]*Member)
 	c.mu.RLock()
-	for k, v := range c.members ***REMOVED***
+	for k, v := range c.members {
 		members[k] = v
-	***REMOVED***
+	}
 	c.mu.RUnlock()
 	return members
-***REMOVED***
+}
 
 // Removed returns the list of raft Members removed from the Cluster.
-func (c *Cluster) Removed() []uint64 ***REMOVED***
+func (c *Cluster) Removed() []uint64 {
 	c.mu.RLock()
 	removed := make([]uint64, 0, len(c.removed))
-	for k := range c.removed ***REMOVED***
+	for k := range c.removed {
 		removed = append(removed, k)
-	***REMOVED***
+	}
 	c.mu.RUnlock()
 	return removed
-***REMOVED***
+}
 
 // GetMember returns informations on a given Member.
-func (c *Cluster) GetMember(id uint64) *Member ***REMOVED***
+func (c *Cluster) GetMember(id uint64) *Member {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 	return c.members[id]
-***REMOVED***
+}
 
-func (c *Cluster) broadcastUpdate() ***REMOVED***
+func (c *Cluster) broadcastUpdate() {
 	peers := make([]*api.Peer, 0, len(c.members))
-	for _, m := range c.members ***REMOVED***
-		peers = append(peers, &api.Peer***REMOVED***
+	for _, m := range c.members {
+		peers = append(peers, &api.Peer{
 			NodeID: m.NodeID,
 			Addr:   m.Addr,
-		***REMOVED***)
-	***REMOVED***
+		})
+	}
 	c.PeersBroadcast.Publish(peers)
-***REMOVED***
+}
 
 // AddMember adds a node to the Cluster Memberlist.
-func (c *Cluster) AddMember(member *Member) error ***REMOVED***
+func (c *Cluster) AddMember(member *Member) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	if c.removed[member.RaftID] ***REMOVED***
+	if c.removed[member.RaftID] {
 		return ErrIDRemoved
-	***REMOVED***
+	}
 
 	c.members[member.RaftID] = member
 
 	c.broadcastUpdate()
 	return nil
-***REMOVED***
+}
 
 // RemoveMember removes a node from the Cluster Memberlist, and adds it to
 // the removed list.
-func (c *Cluster) RemoveMember(id uint64) error ***REMOVED***
+func (c *Cluster) RemoveMember(id uint64) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.removed[id] = true
 
 	return c.clearMember(id)
-***REMOVED***
+}
 
 // UpdateMember updates member address.
-func (c *Cluster) UpdateMember(id uint64, m *api.RaftMember) error ***REMOVED***
+func (c *Cluster) UpdateMember(id uint64, m *api.RaftMember) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	if c.removed[id] ***REMOVED***
+	if c.removed[id] {
 		return ErrIDRemoved
-	***REMOVED***
+	}
 
 	oldMember, ok := c.members[id]
-	if !ok ***REMOVED***
+	if !ok {
 		return ErrIDNotFound
-	***REMOVED***
+	}
 
-	if oldMember.NodeID != m.NodeID ***REMOVED***
+	if oldMember.NodeID != m.NodeID {
 		// Should never happen; this is a sanity check
 		return errors.New("node ID mismatch match on node update")
-	***REMOVED***
+	}
 
-	if oldMember.Addr == m.Addr ***REMOVED***
+	if oldMember.Addr == m.Addr {
 		// nothing to do
 		return nil
-	***REMOVED***
+	}
 	oldMember.RaftMember = m
 	c.broadcastUpdate()
 	return nil
-***REMOVED***
+}
 
 // ClearMember removes a node from the Cluster Memberlist, but does NOT add it
 // to the removed list.
-func (c *Cluster) ClearMember(id uint64) error ***REMOVED***
+func (c *Cluster) ClearMember(id uint64) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
 	return c.clearMember(id)
-***REMOVED***
+}
 
-func (c *Cluster) clearMember(id uint64) error ***REMOVED***
-	if _, ok := c.members[id]; ok ***REMOVED***
+func (c *Cluster) clearMember(id uint64) error {
+	if _, ok := c.members[id]; ok {
 		delete(c.members, id)
 		c.broadcastUpdate()
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // IsIDRemoved checks if a Member is in the remove set.
-func (c *Cluster) IsIDRemoved(id uint64) bool ***REMOVED***
+func (c *Cluster) IsIDRemoved(id uint64) bool {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 	return c.removed[id]
-***REMOVED***
+}
 
 // Clear resets the list of active Members and removed Members.
-func (c *Cluster) Clear() ***REMOVED***
+func (c *Cluster) Clear() {
 	c.mu.Lock()
 
 	c.members = make(map[uint64]*Member)
 	c.removed = make(map[uint64]bool)
 	c.mu.Unlock()
-***REMOVED***
+}
 
 // ValidateConfigurationChange takes a proposed ConfChange and
 // ensures that it is valid.
-func (c *Cluster) ValidateConfigurationChange(cc raftpb.ConfChange) error ***REMOVED***
+func (c *Cluster) ValidateConfigurationChange(cc raftpb.ConfChange) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	if c.removed[cc.NodeID] ***REMOVED***
+	if c.removed[cc.NodeID] {
 		return ErrIDRemoved
-	***REMOVED***
-	switch cc.Type ***REMOVED***
+	}
+	switch cc.Type {
 	case raftpb.ConfChangeAddNode:
-		if c.members[cc.NodeID] != nil ***REMOVED***
+		if c.members[cc.NodeID] != nil {
 			return ErrIDExists
-		***REMOVED***
+		}
 	case raftpb.ConfChangeRemoveNode:
-		if c.members[cc.NodeID] == nil ***REMOVED***
+		if c.members[cc.NodeID] == nil {
 			return ErrIDNotFound
-		***REMOVED***
+		}
 	case raftpb.ConfChangeUpdateNode:
-		if c.members[cc.NodeID] == nil ***REMOVED***
+		if c.members[cc.NodeID] == nil {
 			return ErrIDNotFound
-		***REMOVED***
+		}
 	default:
 		return ErrConfigChangeInvalid
-	***REMOVED***
-	m := &api.RaftMember***REMOVED******REMOVED***
-	if err := proto.Unmarshal(cc.Context, m); err != nil ***REMOVED***
+	}
+	m := &api.RaftMember{}
+	if err := proto.Unmarshal(cc.Context, m); err != nil {
 		return ErrCannotUnmarshalConfig
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

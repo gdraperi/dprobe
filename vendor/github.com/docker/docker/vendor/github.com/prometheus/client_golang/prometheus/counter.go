@@ -26,7 +26,7 @@ import (
 // occurred, etc.
 //
 // To create Counter instances, use NewCounter.
-type Counter interface ***REMOVED***
+type Counter interface {
 	Metric
 	Collector
 
@@ -41,34 +41,34 @@ type Counter interface ***REMOVED***
 	// Add adds the given value to the counter. It panics if the value is <
 	// 0.
 	Add(float64)
-***REMOVED***
+}
 
 // CounterOpts is an alias for Opts. See there for doc comments.
 type CounterOpts Opts
 
 // NewCounter creates a new Counter based on the provided CounterOpts.
-func NewCounter(opts CounterOpts) Counter ***REMOVED***
+func NewCounter(opts CounterOpts) Counter {
 	desc := NewDesc(
 		BuildFQName(opts.Namespace, opts.Subsystem, opts.Name),
 		opts.Help,
 		nil,
 		opts.ConstLabels,
 	)
-	result := &counter***REMOVED***value: value***REMOVED***desc: desc, valType: CounterValue, labelPairs: desc.constLabelPairs***REMOVED******REMOVED***
+	result := &counter{value: value{desc: desc, valType: CounterValue, labelPairs: desc.constLabelPairs}}
 	result.Init(result) // Init self-collection.
 	return result
-***REMOVED***
+}
 
-type counter struct ***REMOVED***
+type counter struct {
 	value
-***REMOVED***
+}
 
-func (c *counter) Add(v float64) ***REMOVED***
-	if v < 0 ***REMOVED***
+func (c *counter) Add(v float64) {
+	if v < 0 {
 		panic(errors.New("counter cannot decrease in value"))
-	***REMOVED***
+	}
 	c.value.Add(v)
-***REMOVED***
+}
 
 // CounterVec is a Collector that bundles a set of Counters that all share the
 // same Desc, but have different values for their variable labels. This is used
@@ -78,82 +78,82 @@ func (c *counter) Add(v float64) ***REMOVED***
 //
 // CounterVec embeds MetricVec. See there for a full list of methods with
 // detailed documentation.
-type CounterVec struct ***REMOVED***
+type CounterVec struct {
 	MetricVec
-***REMOVED***
+}
 
 // NewCounterVec creates a new CounterVec based on the provided CounterOpts and
 // partitioned by the given label names. At least one label name must be
 // provided.
-func NewCounterVec(opts CounterOpts, labelNames []string) *CounterVec ***REMOVED***
+func NewCounterVec(opts CounterOpts, labelNames []string) *CounterVec {
 	desc := NewDesc(
 		BuildFQName(opts.Namespace, opts.Subsystem, opts.Name),
 		opts.Help,
 		labelNames,
 		opts.ConstLabels,
 	)
-	return &CounterVec***REMOVED***
-		MetricVec: MetricVec***REMOVED***
-			children: map[uint64]Metric***REMOVED******REMOVED***,
+	return &CounterVec{
+		MetricVec: MetricVec{
+			children: map[uint64]Metric{},
 			desc:     desc,
-			newMetric: func(lvs ...string) Metric ***REMOVED***
-				result := &counter***REMOVED***value: value***REMOVED***
+			newMetric: func(lvs ...string) Metric {
+				result := &counter{value: value{
 					desc:       desc,
 					valType:    CounterValue,
 					labelPairs: makeLabelPairs(desc, lvs),
-				***REMOVED******REMOVED***
+				}}
 				result.Init(result) // Init self-collection.
 				return result
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
-***REMOVED***
+			},
+		},
+	}
+}
 
 // GetMetricWithLabelValues replaces the method of the same name in
 // MetricVec. The difference is that this method returns a Counter and not a
 // Metric so that no type conversion is required.
-func (m *CounterVec) GetMetricWithLabelValues(lvs ...string) (Counter, error) ***REMOVED***
+func (m *CounterVec) GetMetricWithLabelValues(lvs ...string) (Counter, error) {
 	metric, err := m.MetricVec.GetMetricWithLabelValues(lvs...)
-	if metric != nil ***REMOVED***
+	if metric != nil {
 		return metric.(Counter), err
-	***REMOVED***
+	}
 	return nil, err
-***REMOVED***
+}
 
 // GetMetricWith replaces the method of the same name in MetricVec. The
 // difference is that this method returns a Counter and not a Metric so that no
 // type conversion is required.
-func (m *CounterVec) GetMetricWith(labels Labels) (Counter, error) ***REMOVED***
+func (m *CounterVec) GetMetricWith(labels Labels) (Counter, error) {
 	metric, err := m.MetricVec.GetMetricWith(labels)
-	if metric != nil ***REMOVED***
+	if metric != nil {
 		return metric.(Counter), err
-	***REMOVED***
+	}
 	return nil, err
-***REMOVED***
+}
 
 // WithLabelValues works as GetMetricWithLabelValues, but panics where
 // GetMetricWithLabelValues would have returned an error. By not returning an
 // error, WithLabelValues allows shortcuts like
 //     myVec.WithLabelValues("404", "GET").Add(42)
-func (m *CounterVec) WithLabelValues(lvs ...string) Counter ***REMOVED***
+func (m *CounterVec) WithLabelValues(lvs ...string) Counter {
 	return m.MetricVec.WithLabelValues(lvs...).(Counter)
-***REMOVED***
+}
 
 // With works as GetMetricWith, but panics where GetMetricWithLabels would have
 // returned an error. By not returning an error, With allows shortcuts like
-//     myVec.With(Labels***REMOVED***"code": "404", "method": "GET"***REMOVED***).Add(42)
-func (m *CounterVec) With(labels Labels) Counter ***REMOVED***
+//     myVec.With(Labels{"code": "404", "method": "GET"}).Add(42)
+func (m *CounterVec) With(labels Labels) Counter {
 	return m.MetricVec.With(labels).(Counter)
-***REMOVED***
+}
 
 // CounterFunc is a Counter whose value is determined at collect time by calling a
 // provided function.
 //
 // To create CounterFunc instances, use NewCounterFunc.
-type CounterFunc interface ***REMOVED***
+type CounterFunc interface {
 	Metric
 	Collector
-***REMOVED***
+}
 
 // NewCounterFunc creates a new CounterFunc based on the provided
 // CounterOpts. The value reported is determined by calling the given function
@@ -163,11 +163,11 @@ type CounterFunc interface ***REMOVED***
 // provided function must be concurrency-safe. The function should also honor
 // the contract for a Counter (values only go up, not down), but compliance will
 // not be checked.
-func NewCounterFunc(opts CounterOpts, function func() float64) CounterFunc ***REMOVED***
+func NewCounterFunc(opts CounterOpts, function func() float64) CounterFunc {
 	return newValueFunc(NewDesc(
 		BuildFQName(opts.Namespace, opts.Subsystem, opts.Name),
 		opts.Help,
 		nil,
 		opts.ConstLabels,
 	), CounterValue, function)
-***REMOVED***
+}

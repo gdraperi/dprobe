@@ -11,63 +11,63 @@ import (
 	"github.com/docker/docker/api/types/mount"
 )
 
-func TestValidateMount(t *testing.T) ***REMOVED***
+func TestValidateMount(t *testing.T) {
 	testDir, err := ioutil.TempDir("", "test-validate-mount")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	defer os.RemoveAll(testDir)
 
-	cases := []struct ***REMOVED***
+	cases := []struct {
 		input    mount.Mount
 		expected error
-	***REMOVED******REMOVED***
-		***REMOVED***mount.Mount***REMOVED***Type: mount.TypeVolume***REMOVED***, errMissingField("Target")***REMOVED***,
-		***REMOVED***mount.Mount***REMOVED***Type: mount.TypeVolume, Target: testDestinationPath, Source: "hello"***REMOVED***, nil***REMOVED***,
-		***REMOVED***mount.Mount***REMOVED***Type: mount.TypeVolume, Target: testDestinationPath***REMOVED***, nil***REMOVED***,
-		***REMOVED***mount.Mount***REMOVED***Type: mount.TypeBind***REMOVED***, errMissingField("Target")***REMOVED***,
-		***REMOVED***mount.Mount***REMOVED***Type: mount.TypeBind, Target: testDestinationPath***REMOVED***, errMissingField("Source")***REMOVED***,
-		***REMOVED***mount.Mount***REMOVED***Type: mount.TypeBind, Target: testDestinationPath, Source: testSourcePath, VolumeOptions: &mount.VolumeOptions***REMOVED******REMOVED******REMOVED***, errExtraField("VolumeOptions")***REMOVED***,
+	}{
+		{mount.Mount{Type: mount.TypeVolume}, errMissingField("Target")},
+		{mount.Mount{Type: mount.TypeVolume, Target: testDestinationPath, Source: "hello"}, nil},
+		{mount.Mount{Type: mount.TypeVolume, Target: testDestinationPath}, nil},
+		{mount.Mount{Type: mount.TypeBind}, errMissingField("Target")},
+		{mount.Mount{Type: mount.TypeBind, Target: testDestinationPath}, errMissingField("Source")},
+		{mount.Mount{Type: mount.TypeBind, Target: testDestinationPath, Source: testSourcePath, VolumeOptions: &mount.VolumeOptions{}}, errExtraField("VolumeOptions")},
 
-		***REMOVED***mount.Mount***REMOVED***Type: mount.TypeBind, Source: testDir, Target: testDestinationPath***REMOVED***, nil***REMOVED***,
-		***REMOVED***mount.Mount***REMOVED***Type: "invalid", Target: testDestinationPath***REMOVED***, errors.New("mount type unknown")***REMOVED***,
-		***REMOVED***mount.Mount***REMOVED***Type: mount.TypeBind, Source: testSourcePath, Target: testDestinationPath***REMOVED***, errBindNotExist***REMOVED***,
-	***REMOVED***
+		{mount.Mount{Type: mount.TypeBind, Source: testDir, Target: testDestinationPath}, nil},
+		{mount.Mount{Type: "invalid", Target: testDestinationPath}, errors.New("mount type unknown")},
+		{mount.Mount{Type: mount.TypeBind, Source: testSourcePath, Target: testDestinationPath}, errBindNotExist},
+	}
 
-	lcowCases := []struct ***REMOVED***
+	lcowCases := []struct {
 		input    mount.Mount
 		expected error
-	***REMOVED******REMOVED***
-		***REMOVED***mount.Mount***REMOVED***Type: mount.TypeVolume***REMOVED***, errMissingField("Target")***REMOVED***,
-		***REMOVED***mount.Mount***REMOVED***Type: mount.TypeVolume, Target: "/foo", Source: "hello"***REMOVED***, nil***REMOVED***,
-		***REMOVED***mount.Mount***REMOVED***Type: mount.TypeVolume, Target: "/foo"***REMOVED***, nil***REMOVED***,
-		***REMOVED***mount.Mount***REMOVED***Type: mount.TypeBind***REMOVED***, errMissingField("Target")***REMOVED***,
-		***REMOVED***mount.Mount***REMOVED***Type: mount.TypeBind, Target: "/foo"***REMOVED***, errMissingField("Source")***REMOVED***,
-		***REMOVED***mount.Mount***REMOVED***Type: mount.TypeBind, Target: "/foo", Source: "c:\\foo", VolumeOptions: &mount.VolumeOptions***REMOVED******REMOVED******REMOVED***, errExtraField("VolumeOptions")***REMOVED***,
-		***REMOVED***mount.Mount***REMOVED***Type: mount.TypeBind, Source: "c:\\foo", Target: "/foo"***REMOVED***, errBindNotExist***REMOVED***,
-		***REMOVED***mount.Mount***REMOVED***Type: mount.TypeBind, Source: testDir, Target: "/foo"***REMOVED***, nil***REMOVED***,
-		***REMOVED***mount.Mount***REMOVED***Type: "invalid", Target: "/foo"***REMOVED***, errors.New("mount type unknown")***REMOVED***,
-	***REMOVED***
+	}{
+		{mount.Mount{Type: mount.TypeVolume}, errMissingField("Target")},
+		{mount.Mount{Type: mount.TypeVolume, Target: "/foo", Source: "hello"}, nil},
+		{mount.Mount{Type: mount.TypeVolume, Target: "/foo"}, nil},
+		{mount.Mount{Type: mount.TypeBind}, errMissingField("Target")},
+		{mount.Mount{Type: mount.TypeBind, Target: "/foo"}, errMissingField("Source")},
+		{mount.Mount{Type: mount.TypeBind, Target: "/foo", Source: "c:\\foo", VolumeOptions: &mount.VolumeOptions{}}, errExtraField("VolumeOptions")},
+		{mount.Mount{Type: mount.TypeBind, Source: "c:\\foo", Target: "/foo"}, errBindNotExist},
+		{mount.Mount{Type: mount.TypeBind, Source: testDir, Target: "/foo"}, nil},
+		{mount.Mount{Type: "invalid", Target: "/foo"}, errors.New("mount type unknown")},
+	}
 	parser := NewParser(runtime.GOOS)
-	for i, x := range cases ***REMOVED***
+	for i, x := range cases {
 		err := parser.ValidateMountConfig(&x.input)
-		if err == nil && x.expected == nil ***REMOVED***
+		if err == nil && x.expected == nil {
 			continue
-		***REMOVED***
-		if (err == nil && x.expected != nil) || (x.expected == nil && err != nil) || !strings.Contains(err.Error(), x.expected.Error()) ***REMOVED***
+		}
+		if (err == nil && x.expected != nil) || (x.expected == nil && err != nil) || !strings.Contains(err.Error(), x.expected.Error()) {
 			t.Errorf("expected %q, got %q, case: %d", x.expected, err, i)
-		***REMOVED***
-	***REMOVED***
-	if runtime.GOOS == "windows" ***REMOVED***
-		parser = &lcowParser***REMOVED******REMOVED***
-		for i, x := range lcowCases ***REMOVED***
+		}
+	}
+	if runtime.GOOS == "windows" {
+		parser = &lcowParser{}
+		for i, x := range lcowCases {
 			err := parser.ValidateMountConfig(&x.input)
-			if err == nil && x.expected == nil ***REMOVED***
+			if err == nil && x.expected == nil {
 				continue
-			***REMOVED***
-			if (err == nil && x.expected != nil) || (x.expected == nil && err != nil) || !strings.Contains(err.Error(), x.expected.Error()) ***REMOVED***
+			}
+			if (err == nil && x.expected != nil) || (x.expected == nil && err != nil) || !strings.Contains(err.Error(), x.expected.Error()) {
 				t.Errorf("expected %q, got %q, case: %d", x.expected, err, i)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}

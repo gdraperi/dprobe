@@ -8,24 +8,24 @@ import (
 	"golang.org/x/crypto/nacl/box"
 )
 
-func Example() ***REMOVED***
+func Example() {
 	senderPublicKey, senderPrivateKey, err := box.GenerateKey(crypto_rand.Reader)
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 
 	recipientPublicKey, recipientPrivateKey, err := box.GenerateKey(crypto_rand.Reader)
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 
 	// You must use a different nonce for each message you encrypt with the
 	// same key. Since the nonce here is 192 bits long, a random value
 	// provides a sufficiently small probability of repeats.
 	var nonce [24]byte
-	if _, err := io.ReadFull(crypto_rand.Reader, nonce[:]); err != nil ***REMOVED***
+	if _, err := io.ReadFull(crypto_rand.Reader, nonce[:]); err != nil {
 		panic(err)
-	***REMOVED***
+	}
 
 	msg := []byte("Alas, poor Yorick! I knew him, Horatio")
 	// This encrypts msg and appends the result to the nonce.
@@ -39,23 +39,23 @@ func Example() ***REMOVED***
 	var decryptNonce [24]byte
 	copy(decryptNonce[:], encrypted[:24])
 	decrypted, ok := box.Open(nil, encrypted[24:], &decryptNonce, senderPublicKey, recipientPrivateKey)
-	if !ok ***REMOVED***
+	if !ok {
 		panic("decryption error")
-	***REMOVED***
+	}
 	fmt.Println(string(decrypted))
 	// Output: Alas, poor Yorick! I knew him, Horatio
-***REMOVED***
+}
 
-func Example_precompute() ***REMOVED***
+func Example_precompute() {
 	senderPublicKey, senderPrivateKey, err := box.GenerateKey(crypto_rand.Reader)
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 
 	recipientPublicKey, recipientPrivateKey, err := box.GenerateKey(crypto_rand.Reader)
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 
 	// The shared key can be used to speed up processing when using the same
 	// pair of keys repeatedly.
@@ -66,9 +66,9 @@ func Example_precompute() ***REMOVED***
 	// same key. Since the nonce here is 192 bits long, a random value
 	// provides a sufficiently small probability of repeats.
 	var nonce [24]byte
-	if _, err := io.ReadFull(crypto_rand.Reader, nonce[:]); err != nil ***REMOVED***
+	if _, err := io.ReadFull(crypto_rand.Reader, nonce[:]); err != nil {
 		panic(err)
-	***REMOVED***
+	}
 
 	msg := []byte("A fellow of infinite jest, of most excellent fancy")
 	// This encrypts msg and appends the result to the nonce.
@@ -87,9 +87,9 @@ func Example_precompute() ***REMOVED***
 	var decryptNonce [24]byte
 	copy(decryptNonce[:], encrypted[:24])
 	decrypted, ok := box.OpenAfterPrecomputation(nil, encrypted[24:], &decryptNonce, &sharedDecryptKey)
-	if !ok ***REMOVED***
+	if !ok {
 		panic("decryption error")
-	***REMOVED***
+	}
 	fmt.Println(string(decrypted))
 	// Output: A fellow of infinite jest, of most excellent fancy
-***REMOVED***
+}

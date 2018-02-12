@@ -8,10 +8,10 @@ import (
 // Link represents a link device from netlink. Shared link attributes
 // like name may be retrieved using the Attrs() method. Unique data
 // can be retrieved by casting the object to the proper type.
-type Link interface ***REMOVED***
+type Link interface {
 	Attrs() *LinkAttrs
 	Type() string
-***REMOVED***
+}
 
 type (
 	NsPid int
@@ -19,7 +19,7 @@ type (
 )
 
 // LinkAttrs represents data shared by most link types
-type LinkAttrs struct ***REMOVED***
+type LinkAttrs struct {
 	Index        int
 	MTU          int
 	TxQLen       int // Transmit Queue Length
@@ -29,7 +29,7 @@ type LinkAttrs struct ***REMOVED***
 	RawFlags     uint32
 	ParentIndex  int         // index of the parent link device
 	MasterIndex  int         // must be the index of a bridge
-	Namespace    interface***REMOVED******REMOVED*** // nil | NsPid | NsFd
+	Namespace    interface{} // nil | NsPid | NsFd
 	Alias        string
 	Statistics   *LinkStatistics
 	Promisc      int
@@ -38,7 +38,7 @@ type LinkAttrs struct ***REMOVED***
 	Protinfo     *Protinfo
 	OperState    LinkOperState
 	NetNsID      int
-***REMOVED***
+}
 
 // LinkOperState represents the values of the IFLA_OPERSTATE link
 // attribute, which contains the RFC2863 state of the interface.
@@ -54,8 +54,8 @@ const (
 	OperUp                    // Up, ready to send packets.
 )
 
-func (s LinkOperState) String() string ***REMOVED***
-	switch s ***REMOVED***
+func (s LinkOperState) String() string {
+	switch s {
 	case OperNotPresent:
 		return "not-present"
 	case OperDown:
@@ -70,22 +70,22 @@ func (s LinkOperState) String() string ***REMOVED***
 		return "up"
 	default:
 		return "unknown"
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // NewLinkAttrs returns LinkAttrs structure filled with default values
-func NewLinkAttrs() LinkAttrs ***REMOVED***
-	return LinkAttrs***REMOVED***
+func NewLinkAttrs() LinkAttrs {
+	return LinkAttrs{
 		TxQLen: -1,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 type LinkStatistics LinkStatistics64
 
 /*
-Ref: struct rtnl_link_stats ***REMOVED***...***REMOVED***
+Ref: struct rtnl_link_stats {...}
 */
-type LinkStatistics32 struct ***REMOVED***
+type LinkStatistics32 struct {
 	RxPackets         uint32
 	TxPackets         uint32
 	RxBytes           uint32
@@ -109,10 +109,10 @@ type LinkStatistics32 struct ***REMOVED***
 	TxWindowErrors    uint32
 	RxCompressed      uint32
 	TxCompressed      uint32
-***REMOVED***
+}
 
-func (s32 LinkStatistics32) to64() *LinkStatistics64 ***REMOVED***
-	return &LinkStatistics64***REMOVED***
+func (s32 LinkStatistics32) to64() *LinkStatistics64 {
+	return &LinkStatistics64{
 		RxPackets:         uint64(s32.RxPackets),
 		TxPackets:         uint64(s32.TxPackets),
 		RxBytes:           uint64(s32.RxBytes),
@@ -136,13 +136,13 @@ func (s32 LinkStatistics32) to64() *LinkStatistics64 ***REMOVED***
 		TxWindowErrors:    uint64(s32.TxWindowErrors),
 		RxCompressed:      uint64(s32.RxCompressed),
 		TxCompressed:      uint64(s32.TxCompressed),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 /*
-Ref: struct rtnl_link_stats64 ***REMOVED***...***REMOVED***
+Ref: struct rtnl_link_stats64 {...}
 */
-type LinkStatistics64 struct ***REMOVED***
+type LinkStatistics64 struct {
 	RxPackets         uint64
 	TxPackets         uint64
 	RxBytes           uint64
@@ -166,83 +166,83 @@ type LinkStatistics64 struct ***REMOVED***
 	TxWindowErrors    uint64
 	RxCompressed      uint64
 	TxCompressed      uint64
-***REMOVED***
+}
 
-type LinkXdp struct ***REMOVED***
+type LinkXdp struct {
 	Fd       int
 	Attached bool
 	Flags    uint32
 	ProgId   uint32
-***REMOVED***
+}
 
 // Device links cannot be created via netlink. These links
 // are links created by udev like 'lo' and 'etho0'
-type Device struct ***REMOVED***
+type Device struct {
 	LinkAttrs
-***REMOVED***
+}
 
-func (device *Device) Attrs() *LinkAttrs ***REMOVED***
+func (device *Device) Attrs() *LinkAttrs {
 	return &device.LinkAttrs
-***REMOVED***
+}
 
-func (device *Device) Type() string ***REMOVED***
+func (device *Device) Type() string {
 	return "device"
-***REMOVED***
+}
 
 // Dummy links are dummy ethernet devices
-type Dummy struct ***REMOVED***
+type Dummy struct {
 	LinkAttrs
-***REMOVED***
+}
 
-func (dummy *Dummy) Attrs() *LinkAttrs ***REMOVED***
+func (dummy *Dummy) Attrs() *LinkAttrs {
 	return &dummy.LinkAttrs
-***REMOVED***
+}
 
-func (dummy *Dummy) Type() string ***REMOVED***
+func (dummy *Dummy) Type() string {
 	return "dummy"
-***REMOVED***
+}
 
 // Ifb links are advanced dummy devices for packet filtering
-type Ifb struct ***REMOVED***
+type Ifb struct {
 	LinkAttrs
-***REMOVED***
+}
 
-func (ifb *Ifb) Attrs() *LinkAttrs ***REMOVED***
+func (ifb *Ifb) Attrs() *LinkAttrs {
 	return &ifb.LinkAttrs
-***REMOVED***
+}
 
-func (ifb *Ifb) Type() string ***REMOVED***
+func (ifb *Ifb) Type() string {
 	return "ifb"
-***REMOVED***
+}
 
 // Bridge links are simple linux bridges
-type Bridge struct ***REMOVED***
+type Bridge struct {
 	LinkAttrs
 	MulticastSnooping *bool
 	HelloTime         *uint32
-***REMOVED***
+}
 
-func (bridge *Bridge) Attrs() *LinkAttrs ***REMOVED***
+func (bridge *Bridge) Attrs() *LinkAttrs {
 	return &bridge.LinkAttrs
-***REMOVED***
+}
 
-func (bridge *Bridge) Type() string ***REMOVED***
+func (bridge *Bridge) Type() string {
 	return "bridge"
-***REMOVED***
+}
 
 // Vlan links have ParentIndex set in their Attrs()
-type Vlan struct ***REMOVED***
+type Vlan struct {
 	LinkAttrs
 	VlanId int
-***REMOVED***
+}
 
-func (vlan *Vlan) Attrs() *LinkAttrs ***REMOVED***
+func (vlan *Vlan) Attrs() *LinkAttrs {
 	return &vlan.LinkAttrs
-***REMOVED***
+}
 
-func (vlan *Vlan) Type() string ***REMOVED***
+func (vlan *Vlan) Type() string {
 	return "vlan"
-***REMOVED***
+}
 
 type MacvlanMode uint16
 
@@ -256,76 +256,76 @@ const (
 )
 
 // Macvlan links have ParentIndex set in their Attrs()
-type Macvlan struct ***REMOVED***
+type Macvlan struct {
 	LinkAttrs
 	Mode MacvlanMode
-***REMOVED***
+}
 
-func (macvlan *Macvlan) Attrs() *LinkAttrs ***REMOVED***
+func (macvlan *Macvlan) Attrs() *LinkAttrs {
 	return &macvlan.LinkAttrs
-***REMOVED***
+}
 
-func (macvlan *Macvlan) Type() string ***REMOVED***
+func (macvlan *Macvlan) Type() string {
 	return "macvlan"
-***REMOVED***
+}
 
 // Macvtap - macvtap is a virtual interfaces based on macvlan
-type Macvtap struct ***REMOVED***
+type Macvtap struct {
 	Macvlan
-***REMOVED***
+}
 
-func (macvtap Macvtap) Type() string ***REMOVED***
+func (macvtap Macvtap) Type() string {
 	return "macvtap"
-***REMOVED***
+}
 
 type TuntapMode uint16
 type TuntapFlag uint16
 
 // Tuntap links created via /dev/tun/tap, but can be destroyed via netlink
-type Tuntap struct ***REMOVED***
+type Tuntap struct {
 	LinkAttrs
 	Mode  TuntapMode
 	Flags TuntapFlag
-***REMOVED***
+}
 
-func (tuntap *Tuntap) Attrs() *LinkAttrs ***REMOVED***
+func (tuntap *Tuntap) Attrs() *LinkAttrs {
 	return &tuntap.LinkAttrs
-***REMOVED***
+}
 
-func (tuntap *Tuntap) Type() string ***REMOVED***
+func (tuntap *Tuntap) Type() string {
 	return "tuntap"
-***REMOVED***
+}
 
 // Veth devices must specify PeerName on create
-type Veth struct ***REMOVED***
+type Veth struct {
 	LinkAttrs
 	PeerName string // veth on create only
-***REMOVED***
+}
 
-func (veth *Veth) Attrs() *LinkAttrs ***REMOVED***
+func (veth *Veth) Attrs() *LinkAttrs {
 	return &veth.LinkAttrs
-***REMOVED***
+}
 
-func (veth *Veth) Type() string ***REMOVED***
+func (veth *Veth) Type() string {
 	return "veth"
-***REMOVED***
+}
 
 // GenericLink links represent types that are not currently understood
 // by this netlink library.
-type GenericLink struct ***REMOVED***
+type GenericLink struct {
 	LinkAttrs
 	LinkType string
-***REMOVED***
+}
 
-func (generic *GenericLink) Attrs() *LinkAttrs ***REMOVED***
+func (generic *GenericLink) Attrs() *LinkAttrs {
 	return &generic.LinkAttrs
-***REMOVED***
+}
 
-func (generic *GenericLink) Type() string ***REMOVED***
+func (generic *GenericLink) Type() string {
 	return generic.LinkType
-***REMOVED***
+}
 
-type Vxlan struct ***REMOVED***
+type Vxlan struct {
 	LinkAttrs
 	VxlanId      int
 	VtepDevIndex int
@@ -347,15 +347,15 @@ type Vxlan struct ***REMOVED***
 	Port         int
 	PortLow      int
 	PortHigh     int
-***REMOVED***
+}
 
-func (vxlan *Vxlan) Attrs() *LinkAttrs ***REMOVED***
+func (vxlan *Vxlan) Attrs() *LinkAttrs {
 	return &vxlan.LinkAttrs
-***REMOVED***
+}
 
-func (vxlan *Vxlan) Type() string ***REMOVED***
+func (vxlan *Vxlan) Type() string {
 	return "vxlan"
-***REMOVED***
+}
 
 type IPVlanMode uint16
 
@@ -366,38 +366,38 @@ const (
 	IPVLAN_MODE_MAX
 )
 
-type IPVlan struct ***REMOVED***
+type IPVlan struct {
 	LinkAttrs
 	Mode IPVlanMode
-***REMOVED***
+}
 
-func (ipvlan *IPVlan) Attrs() *LinkAttrs ***REMOVED***
+func (ipvlan *IPVlan) Attrs() *LinkAttrs {
 	return &ipvlan.LinkAttrs
-***REMOVED***
+}
 
-func (ipvlan *IPVlan) Type() string ***REMOVED***
+func (ipvlan *IPVlan) Type() string {
 	return "ipvlan"
-***REMOVED***
+}
 
 // BondMode type
 type BondMode int
 
-func (b BondMode) String() string ***REMOVED***
+func (b BondMode) String() string {
 	s, ok := bondModeToString[b]
-	if !ok ***REMOVED***
+	if !ok {
 		return fmt.Sprintf("BondMode(%d)", b)
-	***REMOVED***
+	}
 	return s
-***REMOVED***
+}
 
 // StringToBondMode returns bond mode, or uknonw is the s is invalid.
-func StringToBondMode(s string) BondMode ***REMOVED***
+func StringToBondMode(s string) BondMode {
 	mode, ok := StringToBondModeMap[s]
-	if !ok ***REMOVED***
+	if !ok {
 		return BOND_MODE_UNKNOWN
-	***REMOVED***
+	}
 	return mode
-***REMOVED***
+}
 
 // Possible BondMode
 const (
@@ -411,7 +411,7 @@ const (
 	BOND_MODE_UNKNOWN
 )
 
-var bondModeToString = map[BondMode]string***REMOVED***
+var bondModeToString = map[BondMode]string{
 	BOND_MODE_BALANCE_RR:    "balance-rr",
 	BOND_MODE_ACTIVE_BACKUP: "active-backup",
 	BOND_MODE_BALANCE_XOR:   "balance-xor",
@@ -419,8 +419,8 @@ var bondModeToString = map[BondMode]string***REMOVED***
 	BOND_MODE_802_3AD:       "802.3ad",
 	BOND_MODE_BALANCE_TLB:   "balance-tlb",
 	BOND_MODE_BALANCE_ALB:   "balance-alb",
-***REMOVED***
-var StringToBondModeMap = map[string]BondMode***REMOVED***
+}
+var StringToBondModeMap = map[string]BondMode{
 	"balance-rr":    BOND_MODE_BALANCE_RR,
 	"active-backup": BOND_MODE_ACTIVE_BACKUP,
 	"balance-xor":   BOND_MODE_BALANCE_XOR,
@@ -428,7 +428,7 @@ var StringToBondModeMap = map[string]BondMode***REMOVED***
 	"802.3ad":       BOND_MODE_802_3AD,
 	"balance-tlb":   BOND_MODE_BALANCE_TLB,
 	"balance-alb":   BOND_MODE_BALANCE_ALB,
-***REMOVED***
+}
 
 // BondArpValidate type
 type BondArpValidate int
@@ -473,22 +473,22 @@ const (
 // BondXmitHashPolicy type
 type BondXmitHashPolicy int
 
-func (b BondXmitHashPolicy) String() string ***REMOVED***
+func (b BondXmitHashPolicy) String() string {
 	s, ok := bondXmitHashPolicyToString[b]
-	if !ok ***REMOVED***
+	if !ok {
 		return fmt.Sprintf("XmitHashPolicy(%d)", b)
-	***REMOVED***
+	}
 	return s
-***REMOVED***
+}
 
 // StringToBondXmitHashPolicy returns bond lacp arte, or uknonw is the s is invalid.
-func StringToBondXmitHashPolicy(s string) BondXmitHashPolicy ***REMOVED***
+func StringToBondXmitHashPolicy(s string) BondXmitHashPolicy {
 	lacp, ok := StringToBondXmitHashPolicyMap[s]
-	if !ok ***REMOVED***
+	if !ok {
 		return BOND_XMIT_HASH_POLICY_UNKNOWN
-	***REMOVED***
+	}
 	return lacp
-***REMOVED***
+}
 
 // Possible BondXmitHashPolicy value
 const (
@@ -500,40 +500,40 @@ const (
 	BOND_XMIT_HASH_POLICY_UNKNOWN
 )
 
-var bondXmitHashPolicyToString = map[BondXmitHashPolicy]string***REMOVED***
+var bondXmitHashPolicyToString = map[BondXmitHashPolicy]string{
 	BOND_XMIT_HASH_POLICY_LAYER2:   "layer2",
 	BOND_XMIT_HASH_POLICY_LAYER3_4: "layer3+4",
 	BOND_XMIT_HASH_POLICY_LAYER2_3: "layer2+3",
 	BOND_XMIT_HASH_POLICY_ENCAP2_3: "encap2+3",
 	BOND_XMIT_HASH_POLICY_ENCAP3_4: "encap3+4",
-***REMOVED***
-var StringToBondXmitHashPolicyMap = map[string]BondXmitHashPolicy***REMOVED***
+}
+var StringToBondXmitHashPolicyMap = map[string]BondXmitHashPolicy{
 	"layer2":   BOND_XMIT_HASH_POLICY_LAYER2,
 	"layer3+4": BOND_XMIT_HASH_POLICY_LAYER3_4,
 	"layer2+3": BOND_XMIT_HASH_POLICY_LAYER2_3,
 	"encap2+3": BOND_XMIT_HASH_POLICY_ENCAP2_3,
 	"encap3+4": BOND_XMIT_HASH_POLICY_ENCAP3_4,
-***REMOVED***
+}
 
 // BondLacpRate type
 type BondLacpRate int
 
-func (b BondLacpRate) String() string ***REMOVED***
+func (b BondLacpRate) String() string {
 	s, ok := bondLacpRateToString[b]
-	if !ok ***REMOVED***
+	if !ok {
 		return fmt.Sprintf("LacpRate(%d)", b)
-	***REMOVED***
+	}
 	return s
-***REMOVED***
+}
 
 // StringToBondLacpRate returns bond lacp arte, or uknonw is the s is invalid.
-func StringToBondLacpRate(s string) BondLacpRate ***REMOVED***
+func StringToBondLacpRate(s string) BondLacpRate {
 	lacp, ok := StringToBondLacpRateMap[s]
-	if !ok ***REMOVED***
+	if !ok {
 		return BOND_LACP_RATE_UNKNOWN
-	***REMOVED***
+	}
 	return lacp
-***REMOVED***
+}
 
 // Possible BondLacpRate value
 const (
@@ -542,14 +542,14 @@ const (
 	BOND_LACP_RATE_UNKNOWN
 )
 
-var bondLacpRateToString = map[BondLacpRate]string***REMOVED***
+var bondLacpRateToString = map[BondLacpRate]string{
 	BOND_LACP_RATE_SLOW: "slow",
 	BOND_LACP_RATE_FAST: "fast",
-***REMOVED***
-var StringToBondLacpRateMap = map[string]BondLacpRate***REMOVED***
+}
+var StringToBondLacpRateMap = map[string]BondLacpRate{
 	"slow": BOND_LACP_RATE_SLOW,
 	"fast": BOND_LACP_RATE_FAST,
-***REMOVED***
+}
 
 // BondAdSelect type
 type BondAdSelect int
@@ -562,16 +562,16 @@ const (
 )
 
 // BondAdInfo represents ad info for bond
-type BondAdInfo struct ***REMOVED***
+type BondAdInfo struct {
 	AggregatorId int
 	NumPorts     int
 	ActorKey     int
 	PartnerKey   int
 	PartnerMac   net.HardwareAddr
-***REMOVED***
+}
 
 // Bond representation
-type Bond struct ***REMOVED***
+type Bond struct {
 	LinkAttrs
 	Mode            BondMode
 	ActiveSlave     int
@@ -601,10 +601,10 @@ type Bond struct ***REMOVED***
 	AdUserPortKey  int
 	AdActorSystem  net.HardwareAddr
 	TlbDynamicLb   int
-***REMOVED***
+}
 
-func NewLinkBond(atr LinkAttrs) *Bond ***REMOVED***
-	return &Bond***REMOVED***
+func NewLinkBond(atr LinkAttrs) *Bond {
+	return &Bond{
 		LinkAttrs:       atr,
 		Mode:            -1,
 		ActiveSlave:     -1,
@@ -632,8 +632,8 @@ func NewLinkBond(atr LinkAttrs) *Bond ***REMOVED***
 		AdUserPortKey:   -1,
 		AdActorSystem:   nil,
 		TlbDynamicLb:    -1,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Flag mask for bond options. Bond.Flagmask must be set to on for option to work.
 const (
@@ -661,17 +661,17 @@ const (
 )
 
 // Attrs implementation.
-func (bond *Bond) Attrs() *LinkAttrs ***REMOVED***
+func (bond *Bond) Attrs() *LinkAttrs {
 	return &bond.LinkAttrs
-***REMOVED***
+}
 
 // Type implementation fro Vxlan.
-func (bond *Bond) Type() string ***REMOVED***
+func (bond *Bond) Type() string {
 	return "bond"
-***REMOVED***
+}
 
 // Gretap devices must specify LocalIP and RemoteIP on create
-type Gretap struct ***REMOVED***
+type Gretap struct {
 	LinkAttrs
 	IKey       uint32
 	OKey       uint32
@@ -688,17 +688,17 @@ type Gretap struct ***REMOVED***
 	EncapFlags uint16
 	Link       uint32
 	FlowBased  bool
-***REMOVED***
+}
 
-func (gretap *Gretap) Attrs() *LinkAttrs ***REMOVED***
+func (gretap *Gretap) Attrs() *LinkAttrs {
 	return &gretap.LinkAttrs
-***REMOVED***
+}
 
-func (gretap *Gretap) Type() string ***REMOVED***
+func (gretap *Gretap) Type() string {
 	return "gretap"
-***REMOVED***
+}
 
-type Iptun struct ***REMOVED***
+type Iptun struct {
 	LinkAttrs
 	Ttl      uint8
 	Tos      uint8
@@ -706,34 +706,34 @@ type Iptun struct ***REMOVED***
 	Link     uint32
 	Local    net.IP
 	Remote   net.IP
-***REMOVED***
+}
 
-func (iptun *Iptun) Attrs() *LinkAttrs ***REMOVED***
+func (iptun *Iptun) Attrs() *LinkAttrs {
 	return &iptun.LinkAttrs
-***REMOVED***
+}
 
-func (iptun *Iptun) Type() string ***REMOVED***
+func (iptun *Iptun) Type() string {
 	return "ipip"
-***REMOVED***
+}
 
-type Vti struct ***REMOVED***
+type Vti struct {
 	LinkAttrs
 	IKey   uint32
 	OKey   uint32
 	Link   uint32
 	Local  net.IP
 	Remote net.IP
-***REMOVED***
+}
 
-func (vti *Vti) Attrs() *LinkAttrs ***REMOVED***
+func (vti *Vti) Attrs() *LinkAttrs {
 	return &vti.LinkAttrs
-***REMOVED***
+}
 
-func (iptun *Vti) Type() string ***REMOVED***
+func (iptun *Vti) Type() string {
 	return "vti"
-***REMOVED***
+}
 
-type Gretun struct ***REMOVED***
+type Gretun struct {
 	LinkAttrs
 	Link     uint32
 	IFlags   uint16
@@ -745,44 +745,44 @@ type Gretun struct ***REMOVED***
 	Ttl      uint8
 	Tos      uint8
 	PMtuDisc uint8
-***REMOVED***
+}
 
-func (gretun *Gretun) Attrs() *LinkAttrs ***REMOVED***
+func (gretun *Gretun) Attrs() *LinkAttrs {
 	return &gretun.LinkAttrs
-***REMOVED***
+}
 
-func (gretun *Gretun) Type() string ***REMOVED***
+func (gretun *Gretun) Type() string {
 	return "gre"
-***REMOVED***
+}
 
-type Vrf struct ***REMOVED***
+type Vrf struct {
 	LinkAttrs
 	Table uint32
-***REMOVED***
+}
 
-func (vrf *Vrf) Attrs() *LinkAttrs ***REMOVED***
+func (vrf *Vrf) Attrs() *LinkAttrs {
 	return &vrf.LinkAttrs
-***REMOVED***
+}
 
-func (vrf *Vrf) Type() string ***REMOVED***
+func (vrf *Vrf) Type() string {
 	return "vrf"
-***REMOVED***
+}
 
-type GTP struct ***REMOVED***
+type GTP struct {
 	LinkAttrs
 	FD0         int
 	FD1         int
 	Role        int
 	PDPHashsize int
-***REMOVED***
+}
 
-func (gtp *GTP) Attrs() *LinkAttrs ***REMOVED***
+func (gtp *GTP) Attrs() *LinkAttrs {
 	return &gtp.LinkAttrs
-***REMOVED***
+}
 
-func (gtp *GTP) Type() string ***REMOVED***
+func (gtp *GTP) Type() string {
 	return "gtp"
-***REMOVED***
+}
 
 // iproute2 supported devices;
 // vlan | veth | vcan | dummy | ifb | macvlan | macvtap |
@@ -794,6 +794,6 @@ func (gtp *GTP) Type() string ***REMOVED***
 // getting/reading links. This is intended for better error
 // handling by dependent code so that "not found error" can
 // be distinguished from other errors
-type LinkNotFoundError struct ***REMOVED***
+type LinkNotFoundError struct {
 	error
-***REMOVED***
+}

@@ -15,22 +15,22 @@ var (
 )
 
 // sha1Sum returns the SHA-1 hash of in.
-func sha1Sum(in []byte) []byte ***REMOVED***
+func sha1Sum(in []byte) []byte {
 	sum := sha1.Sum(in)
 	return sum[:]
-***REMOVED***
+}
 
 // fillWithRepeats returns v*ceiling(len(pattern) / v) bytes consisting of
 // repeats of pattern.
-func fillWithRepeats(pattern []byte, v int) []byte ***REMOVED***
-	if len(pattern) == 0 ***REMOVED***
+func fillWithRepeats(pattern []byte, v int) []byte {
+	if len(pattern) == 0 {
 		return nil
-	***REMOVED***
+	}
 	outputLen := v * ((len(pattern) + v - 1) / v)
 	return bytes.Repeat(pattern, (outputLen+len(pattern)-1)/len(pattern))[:outputLen]
-***REMOVED***
+}
 
-func pbkdf(hash func([]byte) []byte, u, v int, salt, password []byte, r int, ID byte, size int) (key []byte) ***REMOVED***
+func pbkdf(hash func([]byte) []byte, u, v int, salt, password []byte, r int, ID byte, size int) (key []byte) {
 	// implementation of https://tools.ietf.org/html/rfc7292#appendix-B.2 , RFC text verbatim in comments
 
 	//    Let H be a hash function built around a compression function f:
@@ -77,9 +77,9 @@ func pbkdf(hash func([]byte) []byte, u, v int, salt, password []byte, r int, ID 
 	//    1.  Construct a string, D (the "diversifier"), by concatenating v/8
 	//        copies of ID.
 	var D []byte
-	for i := 0; i < v; i++ ***REMOVED***
+	for i := 0; i < v; i++ {
 		D = append(D, ID)
-	***REMOVED***
+	}
 
 	//    2.  Concatenate copies of the salt together to create a string S of
 	//        length v(ceiling(s/v)) bits (the final copy of the salt may be
@@ -104,32 +104,32 @@ func pbkdf(hash func([]byte) []byte, u, v int, salt, password []byte, r int, ID 
 	//    6.  For i=1, 2, ..., c, do the following:
 	A := make([]byte, c*20)
 	var IjBuf []byte
-	for i := 0; i < c; i++ ***REMOVED***
+	for i := 0; i < c; i++ {
 		//        A.  Set A2=H^r(D||I). (i.e., the r-th hash of D||1,
 		//            H(H(H(... H(D||I))))
 		Ai := hash(append(D, I...))
-		for j := 1; j < r; j++ ***REMOVED***
+		for j := 1; j < r; j++ {
 			Ai = hash(Ai)
-		***REMOVED***
+		}
 		copy(A[i*20:], Ai[:])
 
-		if i < c-1 ***REMOVED*** // skip on last iteration
+		if i < c-1 { // skip on last iteration
 			// B.  Concatenate copies of Ai to create a string B of length v
 			//     bits (the final copy of Ai may be truncated to create B).
 			var B []byte
-			for len(B) < v ***REMOVED***
+			for len(B) < v {
 				B = append(B, Ai[:]...)
-			***REMOVED***
+			}
 			B = B[:v]
 
 			// C.  Treating I as a concatenation I_0, I_1, ..., I_(k-1) of v-bit
 			//     blocks, where k=ceiling(s/v)+ceiling(p/v), modify I by
 			//     setting I_j=(I_j+B+1) mod 2^v for each j.
-			***REMOVED***
+			{
 				Bbi := new(big.Int).SetBytes(B)
 				Ij := new(big.Int)
 
-				for j := 0; j < len(I)/v; j++ ***REMOVED***
+				for j := 0; j < len(I)/v; j++ {
 					Ij.SetBytes(I[j*v : (j+1)*v])
 					Ij.Add(Ij, Bbi)
 					Ij.Add(Ij, one)
@@ -137,25 +137,25 @@ func pbkdf(hash func([]byte) []byte, u, v int, salt, password []byte, r int, ID 
 					// We expect Ijb to be exactly v bytes,
 					// if it is longer or shorter we must
 					// adjust it accordingly.
-					if len(Ijb) > v ***REMOVED***
+					if len(Ijb) > v {
 						Ijb = Ijb[len(Ijb)-v:]
-					***REMOVED***
-					if len(Ijb) < v ***REMOVED***
-						if IjBuf == nil ***REMOVED***
+					}
+					if len(Ijb) < v {
+						if IjBuf == nil {
 							IjBuf = make([]byte, v)
-						***REMOVED***
+						}
 						bytesShort := v - len(Ijb)
-						for i := 0; i < bytesShort; i++ ***REMOVED***
+						for i := 0; i < bytesShort; i++ {
 							IjBuf[i] = 0
-						***REMOVED***
+						}
 						copy(IjBuf[bytesShort:], Ijb)
 						Ijb = IjBuf
-					***REMOVED***
+					}
 					copy(I[j*v:(j+1)*v], Ijb)
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+				}
+			}
+		}
+	}
 	//    7.  Concatenate A_1, A_2, ..., A_c together to form a pseudorandom
 	//        bit string, A.
 
@@ -167,4 +167,4 @@ func pbkdf(hash func([]byte) []byte, u, v int, salt, password []byte, r int, ID 
 	//    should be set after the 64 bits have been produced.  Similar concerns
 	//    hold for 2-key and 3-key triple-DES keys, for CDMF keys, and for any
 	//    similar keys with parity bits "built into them".
-***REMOVED***
+}

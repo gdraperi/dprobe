@@ -5,7 +5,7 @@ import (
 )
 
 // TagService provides access to information about tagged objects.
-type TagService interface ***REMOVED***
+type TagService interface {
 	// Get retrieves the descriptor identified by the tag. Some
 	// implementations may differentiate between "trusted" tags and
 	// "untrusted" tags. If a tag is "untrusted", the mapping will be returned
@@ -24,4 +24,4 @@ type TagService interface ***REMOVED***
 
 	// Lookup returns the set of tags referencing the given digest.
 	Lookup(ctx context.Context, digest Descriptor) ([]string, error)
-***REMOVED***
+}

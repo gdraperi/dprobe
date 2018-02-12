@@ -7,7 +7,7 @@ import (
 
 // Handshaker defines the interface for connection handshakes performed on the
 // server or client when first connecting.
-type Handshaker interface ***REMOVED***
+type Handshaker interface {
 	// Handshake should confirm or decorate a connection that may be incoming
 	// to a server or outgoing from a client.
 	//
@@ -20,15 +20,15 @@ type Handshaker interface ***REMOVED***
 	// While we currently only have implementations on the server-side, this
 	// interface should be sufficient to implement similar handshakes on the
 	// client-side.
-	Handshake(ctx context.Context, conn net.Conn) (net.Conn, interface***REMOVED******REMOVED***, error)
-***REMOVED***
+	Handshake(ctx context.Context, conn net.Conn) (net.Conn, interface{}, error)
+}
 
-type handshakerFunc func(ctx context.Context, conn net.Conn) (net.Conn, interface***REMOVED******REMOVED***, error)
+type handshakerFunc func(ctx context.Context, conn net.Conn) (net.Conn, interface{}, error)
 
-func (fn handshakerFunc) Handshake(ctx context.Context, conn net.Conn) (net.Conn, interface***REMOVED******REMOVED***, error) ***REMOVED***
+func (fn handshakerFunc) Handshake(ctx context.Context, conn net.Conn) (net.Conn, interface{}, error) {
 	return fn(ctx, conn)
-***REMOVED***
+}
 
-func noopHandshake(ctx context.Context, conn net.Conn) (net.Conn, interface***REMOVED******REMOVED***, error) ***REMOVED***
+func noopHandshake(ctx context.Context, conn net.Conn) (net.Conn, interface{}, error) {
 	return conn, nil, nil
-***REMOVED***
+}

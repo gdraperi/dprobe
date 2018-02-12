@@ -4,7 +4,7 @@
 
 package windows
 
-type WSAData struct ***REMOVED***
+type WSAData struct {
 	Version      uint16
 	HighVersion  uint16
 	MaxSockets   uint16
@@ -12,11 +12,11 @@ type WSAData struct ***REMOVED***
 	VendorInfo   *byte
 	Description  [WSADESCRIPTION_LEN + 1]byte
 	SystemStatus [WSASYS_STATUS_LEN + 1]byte
-***REMOVED***
+}
 
-type Servent struct ***REMOVED***
+type Servent struct {
 	Name    *byte
 	Aliases **byte
 	Proto   *byte
 	Port    uint16
-***REMOVED***
+}

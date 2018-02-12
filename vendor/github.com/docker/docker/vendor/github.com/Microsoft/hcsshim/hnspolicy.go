@@ -19,45 +19,45 @@ const (
 	Route                PolicyType = "ROUTE"
 )
 
-type NatPolicy struct ***REMOVED***
+type NatPolicy struct {
 	Type         PolicyType `json:"Type"`
 	Protocol     string
 	InternalPort uint16
 	ExternalPort uint16
-***REMOVED***
+}
 
-type QosPolicy struct ***REMOVED***
+type QosPolicy struct {
 	Type                            PolicyType `json:"Type"`
 	MaximumOutgoingBandwidthInBytes uint64
-***REMOVED***
+}
 
-type IsolationPolicy struct ***REMOVED***
+type IsolationPolicy struct {
 	Type               PolicyType `json:"Type"`
 	VLAN               uint
 	VSID               uint
 	InDefaultIsolation bool
-***REMOVED***
+}
 
-type VlanPolicy struct ***REMOVED***
+type VlanPolicy struct {
 	Type PolicyType `json:"Type"`
 	VLAN uint
-***REMOVED***
+}
 
-type VsidPolicy struct ***REMOVED***
+type VsidPolicy struct {
 	Type PolicyType `json:"Type"`
 	VSID uint
-***REMOVED***
+}
 
-type PaPolicy struct ***REMOVED***
+type PaPolicy struct {
 	Type PolicyType `json:"Type"`
 	PA   string     `json:"PA"`
-***REMOVED***
+}
 
-type OutboundNatPolicy struct ***REMOVED***
+type OutboundNatPolicy struct {
 	Policy
 	VIP        string   `json:"VIP,omitempty"`
 	Exceptions []string `json:"ExceptionList,omitempty"`
-***REMOVED***
+}
 
 type ActionType string
 type DirectionType string
@@ -74,7 +74,7 @@ const (
 	Switch RuleType = "Switch"
 )
 
-type ACLPolicy struct ***REMOVED***
+type ACLPolicy struct {
 	Type            PolicyType `json:"Type"`
 	Protocol        uint16
 	InternalPort    uint16
@@ -87,8 +87,8 @@ type ACLPolicy struct ***REMOVED***
 	RuleType        RuleType `json:"RuleType,omitempty"`
 	Priority        uint16
 	ServiceName     string
-***REMOVED***
+}
 
-type Policy struct ***REMOVED***
+type Policy struct {
 	Type PolicyType `json:"Type"`
-***REMOVED***
+}

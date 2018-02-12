@@ -7,7 +7,7 @@ import (
 
 // A Handlers provides a collection of request handlers for various
 // stages of handling requests.
-type Handlers struct ***REMOVED***
+type Handlers struct {
 	Validate         HandlerList
 	Build            HandlerList
 	Sign             HandlerList
@@ -19,11 +19,11 @@ type Handlers struct ***REMOVED***
 	Retry            HandlerList
 	AfterRetry       HandlerList
 	Complete         HandlerList
-***REMOVED***
+}
 
 // Copy returns of this handler's lists.
-func (h *Handlers) Copy() Handlers ***REMOVED***
-	return Handlers***REMOVED***
+func (h *Handlers) Copy() Handlers {
+	return Handlers{
 		Validate:         h.Validate.copy(),
 		Build:            h.Build.copy(),
 		Sign:             h.Sign.copy(),
@@ -35,11 +35,11 @@ func (h *Handlers) Copy() Handlers ***REMOVED***
 		Retry:            h.Retry.copy(),
 		AfterRetry:       h.AfterRetry.copy(),
 		Complete:         h.Complete.copy(),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Clear removes callback functions for all handlers
-func (h *Handlers) Clear() ***REMOVED***
+func (h *Handlers) Clear() {
 	h.Validate.Clear()
 	h.Build.Clear()
 	h.Send.Clear()
@@ -51,18 +51,18 @@ func (h *Handlers) Clear() ***REMOVED***
 	h.Retry.Clear()
 	h.AfterRetry.Clear()
 	h.Complete.Clear()
-***REMOVED***
+}
 
 // A HandlerListRunItem represents an entry in the HandlerList which
 // is being run.
-type HandlerListRunItem struct ***REMOVED***
+type HandlerListRunItem struct {
 	Index   int
 	Handler NamedHandler
 	Request *Request
-***REMOVED***
+}
 
 // A HandlerList manages zero or more handlers in a list.
-type HandlerList struct ***REMOVED***
+type HandlerList struct {
 	list []NamedHandler
 
 	// Called after each request handler in the list is called. If set
@@ -75,182 +75,182 @@ type HandlerList struct ***REMOVED***
 	// based on a condition such as error like, HandlerListStopOnError.
 	// Or for logging like HandlerListLogItem.
 	AfterEachFn func(item HandlerListRunItem) bool
-***REMOVED***
+}
 
 // A NamedHandler is a struct that contains a name and function callback.
-type NamedHandler struct ***REMOVED***
+type NamedHandler struct {
 	Name string
 	Fn   func(*Request)
-***REMOVED***
+}
 
 // copy creates a copy of the handler list.
-func (l *HandlerList) copy() HandlerList ***REMOVED***
-	n := HandlerList***REMOVED***
+func (l *HandlerList) copy() HandlerList {
+	n := HandlerList{
 		AfterEachFn: l.AfterEachFn,
-	***REMOVED***
-	if len(l.list) == 0 ***REMOVED***
+	}
+	if len(l.list) == 0 {
 		return n
-	***REMOVED***
+	}
 
 	n.list = append(make([]NamedHandler, 0, len(l.list)), l.list...)
 	return n
-***REMOVED***
+}
 
 // Clear clears the handler list.
-func (l *HandlerList) Clear() ***REMOVED***
+func (l *HandlerList) Clear() {
 	l.list = l.list[0:0]
-***REMOVED***
+}
 
 // Len returns the number of handlers in the list.
-func (l *HandlerList) Len() int ***REMOVED***
+func (l *HandlerList) Len() int {
 	return len(l.list)
-***REMOVED***
+}
 
 // PushBack pushes handler f to the back of the handler list.
-func (l *HandlerList) PushBack(f func(*Request)) ***REMOVED***
-	l.PushBackNamed(NamedHandler***REMOVED***"__anonymous", f***REMOVED***)
-***REMOVED***
+func (l *HandlerList) PushBack(f func(*Request)) {
+	l.PushBackNamed(NamedHandler{"__anonymous", f})
+}
 
 // PushBackNamed pushes named handler f to the back of the handler list.
-func (l *HandlerList) PushBackNamed(n NamedHandler) ***REMOVED***
-	if cap(l.list) == 0 ***REMOVED***
+func (l *HandlerList) PushBackNamed(n NamedHandler) {
+	if cap(l.list) == 0 {
 		l.list = make([]NamedHandler, 0, 5)
-	***REMOVED***
+	}
 	l.list = append(l.list, n)
-***REMOVED***
+}
 
 // PushFront pushes handler f to the front of the handler list.
-func (l *HandlerList) PushFront(f func(*Request)) ***REMOVED***
-	l.PushFrontNamed(NamedHandler***REMOVED***"__anonymous", f***REMOVED***)
-***REMOVED***
+func (l *HandlerList) PushFront(f func(*Request)) {
+	l.PushFrontNamed(NamedHandler{"__anonymous", f})
+}
 
 // PushFrontNamed pushes named handler f to the front of the handler list.
-func (l *HandlerList) PushFrontNamed(n NamedHandler) ***REMOVED***
-	if cap(l.list) == len(l.list) ***REMOVED***
+func (l *HandlerList) PushFrontNamed(n NamedHandler) {
+	if cap(l.list) == len(l.list) {
 		// Allocating new list required
-		l.list = append([]NamedHandler***REMOVED***n***REMOVED***, l.list...)
-	***REMOVED*** else ***REMOVED***
+		l.list = append([]NamedHandler{n}, l.list...)
+	} else {
 		// Enough room to prepend into list.
-		l.list = append(l.list, NamedHandler***REMOVED******REMOVED***)
+		l.list = append(l.list, NamedHandler{})
 		copy(l.list[1:], l.list)
 		l.list[0] = n
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Remove removes a NamedHandler n
-func (l *HandlerList) Remove(n NamedHandler) ***REMOVED***
+func (l *HandlerList) Remove(n NamedHandler) {
 	l.RemoveByName(n.Name)
-***REMOVED***
+}
 
 // RemoveByName removes a NamedHandler by name.
-func (l *HandlerList) RemoveByName(name string) ***REMOVED***
-	for i := 0; i < len(l.list); i++ ***REMOVED***
+func (l *HandlerList) RemoveByName(name string) {
+	for i := 0; i < len(l.list); i++ {
 		m := l.list[i]
-		if m.Name == name ***REMOVED***
+		if m.Name == name {
 			// Shift array preventing creating new arrays
 			copy(l.list[i:], l.list[i+1:])
-			l.list[len(l.list)-1] = NamedHandler***REMOVED******REMOVED***
+			l.list[len(l.list)-1] = NamedHandler{}
 			l.list = l.list[:len(l.list)-1]
 
 			// decrement list so next check to length is correct
 			i--
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // SwapNamed will swap out any existing handlers with the same name as the
 // passed in NamedHandler returning true if handlers were swapped. False is
 // returned otherwise.
-func (l *HandlerList) SwapNamed(n NamedHandler) (swapped bool) ***REMOVED***
-	for i := 0; i < len(l.list); i++ ***REMOVED***
-		if l.list[i].Name == n.Name ***REMOVED***
+func (l *HandlerList) SwapNamed(n NamedHandler) (swapped bool) {
+	for i := 0; i < len(l.list); i++ {
+		if l.list[i].Name == n.Name {
 			l.list[i].Fn = n.Fn
 			swapped = true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return swapped
-***REMOVED***
+}
 
 // SetBackNamed will replace the named handler if it exists in the handler list.
 // If the handler does not exist the handler will be added to the end of the list.
-func (l *HandlerList) SetBackNamed(n NamedHandler) ***REMOVED***
-	if !l.SwapNamed(n) ***REMOVED***
+func (l *HandlerList) SetBackNamed(n NamedHandler) {
+	if !l.SwapNamed(n) {
 		l.PushBackNamed(n)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // SetFrontNamed will replace the named handler if it exists in the handler list.
 // If the handler does not exist the handler will be added to the beginning of
 // the list.
-func (l *HandlerList) SetFrontNamed(n NamedHandler) ***REMOVED***
-	if !l.SwapNamed(n) ***REMOVED***
+func (l *HandlerList) SetFrontNamed(n NamedHandler) {
+	if !l.SwapNamed(n) {
 		l.PushFrontNamed(n)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Run executes all handlers in the list with a given request object.
-func (l *HandlerList) Run(r *Request) ***REMOVED***
-	for i, h := range l.list ***REMOVED***
+func (l *HandlerList) Run(r *Request) {
+	for i, h := range l.list {
 		h.Fn(r)
-		item := HandlerListRunItem***REMOVED***
+		item := HandlerListRunItem{
 			Index: i, Handler: h, Request: r,
-		***REMOVED***
-		if l.AfterEachFn != nil && !l.AfterEachFn(item) ***REMOVED***
+		}
+		if l.AfterEachFn != nil && !l.AfterEachFn(item) {
 			return
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // HandlerListLogItem logs the request handler and the state of the
 // request's Error value. Always returns true to continue iterating
 // request handlers in a HandlerList.
-func HandlerListLogItem(item HandlerListRunItem) bool ***REMOVED***
-	if item.Request.Config.Logger == nil ***REMOVED***
+func HandlerListLogItem(item HandlerListRunItem) bool {
+	if item.Request.Config.Logger == nil {
 		return true
-	***REMOVED***
+	}
 	item.Request.Config.Logger.Log("DEBUG: RequestHandler",
 		item.Index, item.Handler.Name, item.Request.Error)
 
 	return true
-***REMOVED***
+}
 
 // HandlerListStopOnError returns false to stop the HandlerList iterating
 // over request handlers if Request.Error is not nil. True otherwise
 // to continue iterating.
-func HandlerListStopOnError(item HandlerListRunItem) bool ***REMOVED***
+func HandlerListStopOnError(item HandlerListRunItem) bool {
 	return item.Request.Error == nil
-***REMOVED***
+}
 
 // WithAppendUserAgent will add a string to the user agent prefixed with a
 // single white space.
-func WithAppendUserAgent(s string) Option ***REMOVED***
-	return func(r *Request) ***REMOVED***
-		r.Handlers.Build.PushBack(func(r2 *Request) ***REMOVED***
+func WithAppendUserAgent(s string) Option {
+	return func(r *Request) {
+		r.Handlers.Build.PushBack(func(r2 *Request) {
 			AddToUserAgent(r, s)
-		***REMOVED***)
-	***REMOVED***
-***REMOVED***
+		})
+	}
+}
 
 // MakeAddToUserAgentHandler will add the name/version pair to the User-Agent request
 // header. If the extra parameters are provided they will be added as metadata to the
 // name/version pair resulting in the following format.
 // "name/version (extra0; extra1; ...)"
 // The user agent part will be concatenated with this current request's user agent string.
-func MakeAddToUserAgentHandler(name, version string, extra ...string) func(*Request) ***REMOVED***
+func MakeAddToUserAgentHandler(name, version string, extra ...string) func(*Request) {
 	ua := fmt.Sprintf("%s/%s", name, version)
-	if len(extra) > 0 ***REMOVED***
+	if len(extra) > 0 {
 		ua += fmt.Sprintf(" (%s)", strings.Join(extra, "; "))
-	***REMOVED***
-	return func(r *Request) ***REMOVED***
+	}
+	return func(r *Request) {
 		AddToUserAgent(r, ua)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // MakeAddToUserAgentFreeFormHandler adds the input to the User-Agent request header.
 // The input string will be concatenated with the current request's user agent string.
-func MakeAddToUserAgentFreeFormHandler(s string) func(*Request) ***REMOVED***
-	return func(r *Request) ***REMOVED***
+func MakeAddToUserAgentFreeFormHandler(s string) func(*Request) {
+	return func(r *Request) {
 		AddToUserAgent(r, s)
-	***REMOVED***
-***REMOVED***
+	}
+}

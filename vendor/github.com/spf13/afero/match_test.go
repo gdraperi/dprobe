@@ -22,162 +22,162 @@ import (
 )
 
 // contains returns true if vector contains the string s.
-func contains(vector []string, s string) bool ***REMOVED***
-	for _, elem := range vector ***REMOVED***
-		if elem == s ***REMOVED***
+func contains(vector []string, s string) bool {
+	for _, elem := range vector {
+		if elem == s {
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false
-***REMOVED***
+}
 
-func setupGlobDirRoot(t *testing.T, fs Fs) string ***REMOVED***
+func setupGlobDirRoot(t *testing.T, fs Fs) string {
 	path := testDir(fs)
 	setupGlobFiles(t, fs, path)
 	return path
-***REMOVED***
+}
 
-func setupGlobDirReusePath(t *testing.T, fs Fs, path string) string ***REMOVED***
+func setupGlobDirReusePath(t *testing.T, fs Fs, path string) string {
 	testRegistry[fs] = append(testRegistry[fs], path)
 	return setupGlobFiles(t, fs, path)
-***REMOVED***
+}
 
-func setupGlobFiles(t *testing.T, fs Fs, path string) string ***REMOVED***
+func setupGlobFiles(t *testing.T, fs Fs, path string) string {
 	testSubDir := filepath.Join(path, "globs", "bobs")
 	err := fs.MkdirAll(testSubDir, 0700)
-	if err != nil && !os.IsExist(err) ***REMOVED***
+	if err != nil && !os.IsExist(err) {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	f, err := fs.Create(filepath.Join(testSubDir, "/matcher"))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	f.WriteString("Testfile 1 content")
 	f.Close()
 
 	f, err = fs.Create(filepath.Join(testSubDir, "/../submatcher"))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	f.WriteString("Testfile 2 content")
 	f.Close()
 
 	f, err = fs.Create(filepath.Join(testSubDir, "/../../match"))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	f.WriteString("Testfile 3 content")
 	f.Close()
 
 	return testSubDir
-***REMOVED***
+}
 
-func TestGlob(t *testing.T) ***REMOVED***
+func TestGlob(t *testing.T) {
 	defer removeAllTestFiles(t)
 	var testDir string
-	for i, fs := range Fss ***REMOVED***
-		if i == 0 ***REMOVED***
+	for i, fs := range Fss {
+		if i == 0 {
 			testDir = setupGlobDirRoot(t, fs)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			setupGlobDirReusePath(t, fs, testDir)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	var globTests = []struct ***REMOVED***
+	var globTests = []struct {
 		pattern, result string
-	***REMOVED******REMOVED***
-		***REMOVED***testDir + "/globs/bobs/matcher", testDir + "/globs/bobs/matcher"***REMOVED***,
-		***REMOVED***testDir + "/globs/*/mat?her", testDir + "/globs/bobs/matcher"***REMOVED***,
-		***REMOVED***testDir + "/globs/bobs/../*", testDir + "/globs/submatcher"***REMOVED***,
-		***REMOVED***testDir + "/match", testDir + "/match"***REMOVED***,
-	***REMOVED***
+	}{
+		{testDir + "/globs/bobs/matcher", testDir + "/globs/bobs/matcher"},
+		{testDir + "/globs/*/mat?her", testDir + "/globs/bobs/matcher"},
+		{testDir + "/globs/bobs/../*", testDir + "/globs/submatcher"},
+		{testDir + "/match", testDir + "/match"},
+	}
 
-	for _, fs := range Fss ***REMOVED***
+	for _, fs := range Fss {
 
-		for _, tt := range globTests ***REMOVED***
+		for _, tt := range globTests {
 			pattern := tt.pattern
 			result := tt.result
-			if runtime.GOOS == "windows" ***REMOVED***
+			if runtime.GOOS == "windows" {
 				pattern = filepath.Clean(pattern)
 				result = filepath.Clean(result)
-			***REMOVED***
+			}
 			matches, err := Glob(fs, pattern)
-			if err != nil ***REMOVED***
+			if err != nil {
 				t.Errorf("Glob error for %q: %s", pattern, err)
 				continue
-			***REMOVED***
-			if !contains(matches, result) ***REMOVED***
+			}
+			if !contains(matches, result) {
 				t.Errorf("Glob(%#q) = %#v want %v", pattern, matches, result)
-			***REMOVED***
-		***REMOVED***
-		for _, pattern := range []string***REMOVED***"no_match", "../*/no_match"***REMOVED*** ***REMOVED***
+			}
+		}
+		for _, pattern := range []string{"no_match", "../*/no_match"} {
 			matches, err := Glob(fs, pattern)
-			if err != nil ***REMOVED***
+			if err != nil {
 				t.Errorf("Glob error for %q: %s", pattern, err)
 				continue
-			***REMOVED***
-			if len(matches) != 0 ***REMOVED***
+			}
+			if len(matches) != 0 {
 				t.Errorf("Glob(%#q) = %#v want []", pattern, matches)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestGlobSymlink(t *testing.T) ***REMOVED***
+func TestGlobSymlink(t *testing.T) {
 	defer removeAllTestFiles(t)
 
-	fs := &OsFs***REMOVED******REMOVED***
+	fs := &OsFs{}
 	testDir := setupGlobDirRoot(t, fs)
 
 	err := os.Symlink("target", filepath.Join(testDir, "symlink"))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Skipf("skipping on %s", runtime.GOOS)
-	***REMOVED***
+	}
 
-	var globSymlinkTests = []struct ***REMOVED***
+	var globSymlinkTests = []struct {
 		path, dest string
 		brokenLink bool
-	***REMOVED******REMOVED***
-		***REMOVED***"test1", "link1", false***REMOVED***,
-		***REMOVED***"test2", "link2", true***REMOVED***,
-	***REMOVED***
+	}{
+		{"test1", "link1", false},
+		{"test2", "link2", true},
+	}
 
-	for _, tt := range globSymlinkTests ***REMOVED***
+	for _, tt := range globSymlinkTests {
 		path := filepath.Join(testDir, tt.path)
 		dest := filepath.Join(testDir, tt.dest)
 		f, err := fs.Create(path)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
-		if err := f.Close(); err != nil ***REMOVED***
+		}
+		if err := f.Close(); err != nil {
 			t.Fatal(err)
-		***REMOVED***
+		}
 		err = os.Symlink(path, dest)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
-		if tt.brokenLink ***REMOVED***
+		}
+		if tt.brokenLink {
 			// Break the symlink.
 			fs.Remove(path)
-		***REMOVED***
+		}
 		matches, err := Glob(fs, dest)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Errorf("GlobSymlink error for %q: %s", dest, err)
-		***REMOVED***
-		if !contains(matches, dest) ***REMOVED***
+		}
+		if !contains(matches, dest) {
 			t.Errorf("Glob(%#q) = %#v want %v", dest, matches, dest)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 
-func TestGlobError(t *testing.T) ***REMOVED***
-	for _, fs := range Fss ***REMOVED***
+func TestGlobError(t *testing.T) {
+	for _, fs := range Fss {
 		_, err := Glob(fs, "[7]")
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Error("expected error for bad pattern; got none")
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

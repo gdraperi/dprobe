@@ -18,96 +18,96 @@ var (
 	validContainerNamePattern = names.RestrictedNamePattern
 )
 
-func (daemon *Daemon) registerName(container *container.Container) error ***REMOVED***
-	if daemon.Exists(container.ID) ***REMOVED***
+func (daemon *Daemon) registerName(container *container.Container) error {
+	if daemon.Exists(container.ID) {
 		return fmt.Errorf("Container is already loaded")
-	***REMOVED***
-	if err := validateID(container.ID); err != nil ***REMOVED***
+	}
+	if err := validateID(container.ID); err != nil {
 		return err
-	***REMOVED***
-	if container.Name == "" ***REMOVED***
+	}
+	if container.Name == "" {
 		name, err := daemon.generateNewName(container.ID)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		container.Name = name
-	***REMOVED***
+	}
 	return daemon.containersReplica.ReserveName(container.Name, container.ID)
-***REMOVED***
+}
 
-func (daemon *Daemon) generateIDAndName(name string) (string, string, error) ***REMOVED***
+func (daemon *Daemon) generateIDAndName(name string) (string, string, error) {
 	var (
 		err error
 		id  = stringid.GenerateNonCryptoID()
 	)
 
-	if name == "" ***REMOVED***
-		if name, err = daemon.generateNewName(id); err != nil ***REMOVED***
+	if name == "" {
+		if name, err = daemon.generateNewName(id); err != nil {
 			return "", "", err
-		***REMOVED***
+		}
 		return id, name, nil
-	***REMOVED***
+	}
 
-	if name, err = daemon.reserveName(id, name); err != nil ***REMOVED***
+	if name, err = daemon.reserveName(id, name); err != nil {
 		return "", "", err
-	***REMOVED***
+	}
 
 	return id, name, nil
-***REMOVED***
+}
 
-func (daemon *Daemon) reserveName(id, name string) (string, error) ***REMOVED***
-	if !validContainerNamePattern.MatchString(strings.TrimPrefix(name, "/")) ***REMOVED***
+func (daemon *Daemon) reserveName(id, name string) (string, error) {
+	if !validContainerNamePattern.MatchString(strings.TrimPrefix(name, "/")) {
 		return "", errdefs.InvalidParameter(errors.Errorf("Invalid container name (%s), only %s are allowed", name, validContainerNameChars))
-	***REMOVED***
-	if name[0] != '/' ***REMOVED***
+	}
+	if name[0] != '/' {
 		name = "/" + name
-	***REMOVED***
+	}
 
-	if err := daemon.containersReplica.ReserveName(name, id); err != nil ***REMOVED***
-		if err == container.ErrNameReserved ***REMOVED***
+	if err := daemon.containersReplica.ReserveName(name, id); err != nil {
+		if err == container.ErrNameReserved {
 			id, err := daemon.containersReplica.Snapshot().GetID(name)
-			if err != nil ***REMOVED***
+			if err != nil {
 				logrus.Errorf("got unexpected error while looking up reserved name: %v", err)
 				return "", err
-			***REMOVED***
-			return "", nameConflictError***REMOVED***id: id, name: name***REMOVED***
-		***REMOVED***
+			}
+			return "", nameConflictError{id: id, name: name}
+		}
 		return "", errors.Wrapf(err, "error reserving name: %q", name)
-	***REMOVED***
+	}
 	return name, nil
-***REMOVED***
+}
 
-func (daemon *Daemon) releaseName(name string) ***REMOVED***
+func (daemon *Daemon) releaseName(name string) {
 	daemon.containersReplica.ReleaseName(name)
-***REMOVED***
+}
 
-func (daemon *Daemon) generateNewName(id string) (string, error) ***REMOVED***
+func (daemon *Daemon) generateNewName(id string) (string, error) {
 	var name string
-	for i := 0; i < 6; i++ ***REMOVED***
+	for i := 0; i < 6; i++ {
 		name = namesgenerator.GetRandomName(i)
-		if name[0] != '/' ***REMOVED***
+		if name[0] != '/' {
 			name = "/" + name
-		***REMOVED***
+		}
 
-		if err := daemon.containersReplica.ReserveName(name, id); err != nil ***REMOVED***
-			if err == container.ErrNameReserved ***REMOVED***
+		if err := daemon.containersReplica.ReserveName(name, id); err != nil {
+			if err == container.ErrNameReserved {
 				continue
-			***REMOVED***
+			}
 			return "", err
-		***REMOVED***
+		}
 		return name, nil
-	***REMOVED***
+	}
 
 	name = "/" + stringid.TruncateID(id)
-	if err := daemon.containersReplica.ReserveName(name, id); err != nil ***REMOVED***
+	if err := daemon.containersReplica.ReserveName(name, id); err != nil {
 		return "", err
-	***REMOVED***
+	}
 	return name, nil
-***REMOVED***
+}
 
-func validateID(id string) error ***REMOVED***
-	if id == "" ***REMOVED***
+func validateID(id string) error {
+	if id == "" {
 		return fmt.Errorf("Invalid empty id")
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

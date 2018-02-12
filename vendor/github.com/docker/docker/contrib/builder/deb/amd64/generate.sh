@@ -12,15 +12,15 @@ set -e
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
 versions=( "$@" )
-if [ $***REMOVED***#versions[@]***REMOVED*** -eq 0 ]; then
+if [ ${#versions[@]} -eq 0 ]; then
 	versions=( */ )
 fi
-versions=( "$***REMOVED***versions[@]%/***REMOVED***" )
+versions=( "${versions[@]%/}" )
 
-for version in "$***REMOVED***versions[@]***REMOVED***"; do
-	distro="$***REMOVED***version%-****REMOVED***"
-	suite="$***REMOVED***version##*-***REMOVED***"
-	from="$***REMOVED***distro***REMOVED***:$***REMOVED***suite***REMOVED***"
+for version in "${versions[@]}"; do
+	distro="${version%-*}"
+	suite="${version##*-}"
+	from="${distro}:${suite}"
 
 	case "$from" in
 		debian:wheezy)
@@ -89,7 +89,7 @@ for version in "$***REMOVED***versions[@]***REMOVED***"; do
 	# debian jessie & ubuntu trusty have a libseccomp < 2.2.1 :(
 	case "$suite" in
 		wheezy|jessie|trusty)
-			packages=( "$***REMOVED***packages[@]/libseccomp-dev***REMOVED***" )
+			packages=( "${packages[@]/libseccomp-dev}" )
 			runcBuildTags="apparmor selinux"
 			;;
 		*)
@@ -102,18 +102,18 @@ for version in "$***REMOVED***versions[@]***REMOVED***"; do
 		# pull a couple packages from backports explicitly
 		# (build failures otherwise)
 		backportsPackages=( btrfs-tools )
-		for pkg in "$***REMOVED***backportsPackages[@]***REMOVED***"; do
-			packages=( "$***REMOVED***packages[@]/$pkg***REMOVED***" )
+		for pkg in "${backportsPackages[@]}"; do
+			packages=( "${packages[@]/$pkg}" )
 		done
-		echo "RUN apt-get update && apt-get install -y -t $suite-backports $***REMOVED***backportsPackages[*]***REMOVED*** --no-install-recommends && rm -rf /var/lib/apt/lists/*" >> "$version/Dockerfile"
+		echo "RUN apt-get update && apt-get install -y -t $suite-backports ${backportsPackages[*]} --no-install-recommends && rm -rf /var/lib/apt/lists/*" >> "$version/Dockerfile"
 	fi
 
-	echo "RUN apt-get update && apt-get install -y $***REMOVED***packages[*]***REMOVED*** --no-install-recommends && rm -rf /var/lib/apt/lists/*" >> "$version/Dockerfile"
+	echo "RUN apt-get update && apt-get install -y ${packages[*]} --no-install-recommends && rm -rf /var/lib/apt/lists/*" >> "$version/Dockerfile"
 
 	echo >> "$version/Dockerfile"
 
-	awk '$1 == "ENV" && $2 == "GO_VERSION" ***REMOVED*** print; exit ***REMOVED***' ../../../../Dockerfile >> "$version/Dockerfile"
-	echo 'RUN curl -fSL "https://golang.org/dl/go$***REMOVED***GO_VERSION***REMOVED***.linux-amd64.tar.gz" | tar xzC /usr/local' >> "$version/Dockerfile"
+	awk '$1 == "ENV" && $2 == "GO_VERSION" { print; exit }' ../../../../Dockerfile >> "$version/Dockerfile"
+	echo 'RUN curl -fSL "https://golang.org/dl/go${GO_VERSION}.linux-amd64.tar.gz" | tar xzC /usr/local' >> "$version/Dockerfile"
 	echo 'ENV PATH $PATH:/usr/local/go/bin' >> "$version/Dockerfile"
 
 	echo >> "$version/Dockerfile"

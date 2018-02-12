@@ -43,7 +43,7 @@ const (
 )
 
 // Internet Control Message Protocol version 6 (ICMPv6) Parameters, Updated: 2015-07-07
-var icmpTypes = map[ICMPType]string***REMOVED***
+var icmpTypes = map[ICMPType]string{
 	1:   "destination unreachable",
 	2:   "packet too big",
 	3:   "time exceeded",
@@ -79,4 +79,4 @@ var icmpTypes = map[ICMPType]string***REMOVED***
 	157: "duplicate address request",
 	158: "duplicate address confirmation",
 	159: "mpl control message",
-***REMOVED***
+}

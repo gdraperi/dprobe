@@ -1,6 +1,6 @@
-resource "aws_eip" "EIP1" ***REMOVED*** a ***REMOVED*** a ***REMOVED*** a ***REMOVED*** a ***REMOVED*** a ***REMOVED***
+resource "aws_eip" "EIP1" { a { a { a { a { a {
             count = "1"
 
-resource "aws_eip" "EIP2" ***REMOVED***
+resource "aws_eip" "EIP2" {
       count = "1"
-***REMOVED***
+}

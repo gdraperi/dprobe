@@ -9,29 +9,29 @@ package x509
 import "io/ioutil"
 
 // Possible certificate files; stop after finding one.
-var certFiles = []string***REMOVED***
+var certFiles = []string{
 	"/etc/ssl/certs/ca-certificates.crt",     // Debian/Ubuntu/Gentoo etc.
 	"/etc/pki/tls/certs/ca-bundle.crt",       // Fedora/RHEL
 	"/etc/ssl/ca-bundle.pem",                 // OpenSUSE
 	"/etc/ssl/cert.pem",                      // OpenBSD
 	"/usr/local/share/certs/ca-root-nss.crt", // FreeBSD/DragonFly
-***REMOVED***
+}
 
-func (c *Certificate) systemVerify(opts *VerifyOptions) (chains [][]*Certificate, err error) ***REMOVED***
+func (c *Certificate) systemVerify(opts *VerifyOptions) (chains [][]*Certificate, err error) {
 	return nil, nil
-***REMOVED***
+}
 
-func initSystemRoots() ***REMOVED***
+func initSystemRoots() {
 	roots := NewCertPool()
-	for _, file := range certFiles ***REMOVED***
+	for _, file := range certFiles {
 		data, err := ioutil.ReadFile(file)
-		if err == nil ***REMOVED***
+		if err == nil {
 			roots.AppendCertsFromPEM(data)
 			systemRoots = roots
 			return
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// All of the files failed to load. systemRoots will be nil which will
 	// trigger a specific error at verification time.
-***REMOVED***
+}

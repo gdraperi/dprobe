@@ -7,28 +7,28 @@ import (
 	"testing"
 )
 
-func TestNormalizeWorkdir(t *testing.T) ***REMOVED***
-	testCases := []struct***REMOVED*** current, requested, expected, expectedError string ***REMOVED******REMOVED***
-		***REMOVED***``, ``, ``, `cannot normalize nothing`***REMOVED***,
-		***REMOVED***``, `foo`, `/foo`, ``***REMOVED***,
-		***REMOVED***``, `/foo`, `/foo`, ``***REMOVED***,
-		***REMOVED***`/foo`, `bar`, `/foo/bar`, ``***REMOVED***,
-		***REMOVED***`/foo`, `/bar`, `/bar`, ``***REMOVED***,
-	***REMOVED***
+func TestNormalizeWorkdir(t *testing.T) {
+	testCases := []struct{ current, requested, expected, expectedError string }{
+		{``, ``, ``, `cannot normalize nothing`},
+		{``, `foo`, `/foo`, ``},
+		{``, `/foo`, `/foo`, ``},
+		{`/foo`, `bar`, `/foo/bar`, ``},
+		{`/foo`, `/bar`, `/bar`, ``},
+	}
 
-	for _, test := range testCases ***REMOVED***
+	for _, test := range testCases {
 		normalized, err := normalizeWorkdir(runtime.GOOS, test.current, test.requested)
 
-		if test.expectedError != "" && err == nil ***REMOVED***
+		if test.expectedError != "" && err == nil {
 			t.Fatalf("NormalizeWorkdir should return an error %s, got nil", test.expectedError)
-		***REMOVED***
+		}
 
-		if test.expectedError != "" && err.Error() != test.expectedError ***REMOVED***
+		if test.expectedError != "" && err.Error() != test.expectedError {
 			t.Fatalf("NormalizeWorkdir returned wrong error. Expected %s, got %s", test.expectedError, err.Error())
-		***REMOVED***
+		}
 
-		if normalized != test.expected ***REMOVED***
+		if normalized != test.expected {
 			t.Fatalf("NormalizeWorkdir error. Expected %s for current %s and requested %s, got %s", test.expected, test.current, test.requested, normalized)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

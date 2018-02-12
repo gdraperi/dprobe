@@ -17,7 +17,7 @@ import (
 	"golang.org/x/net/idna"
 )
 
-var isTokenTable = [127]bool***REMOVED***
+var isTokenTable = [127]bool{
 	'!':  true,
 	'#':  true,
 	'$':  true,
@@ -95,98 +95,98 @@ var isTokenTable = [127]bool***REMOVED***
 	'z':  true,
 	'|':  true,
 	'~':  true,
-***REMOVED***
+}
 
-func IsTokenRune(r rune) bool ***REMOVED***
+func IsTokenRune(r rune) bool {
 	i := int(r)
 	return i < len(isTokenTable) && isTokenTable[i]
-***REMOVED***
+}
 
-func isNotToken(r rune) bool ***REMOVED***
+func isNotToken(r rune) bool {
 	return !IsTokenRune(r)
-***REMOVED***
+}
 
 // HeaderValuesContainsToken reports whether any string in values
 // contains the provided token, ASCII case-insensitively.
-func HeaderValuesContainsToken(values []string, token string) bool ***REMOVED***
-	for _, v := range values ***REMOVED***
-		if headerValueContainsToken(v, token) ***REMOVED***
+func HeaderValuesContainsToken(values []string, token string) bool {
+	for _, v := range values {
+		if headerValueContainsToken(v, token) {
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false
-***REMOVED***
+}
 
 // isOWS reports whether b is an optional whitespace byte, as defined
 // by RFC 7230 section 3.2.3.
-func isOWS(b byte) bool ***REMOVED*** return b == ' ' || b == '\t' ***REMOVED***
+func isOWS(b byte) bool { return b == ' ' || b == '\t' }
 
 // trimOWS returns x with all optional whitespace removes from the
 // beginning and end.
-func trimOWS(x string) string ***REMOVED***
+func trimOWS(x string) string {
 	// TODO: consider using strings.Trim(x, " \t") instead,
 	// if and when it's fast enough. See issue 10292.
 	// But this ASCII-only code will probably always beat UTF-8
 	// aware code.
-	for len(x) > 0 && isOWS(x[0]) ***REMOVED***
+	for len(x) > 0 && isOWS(x[0]) {
 		x = x[1:]
-	***REMOVED***
-	for len(x) > 0 && isOWS(x[len(x)-1]) ***REMOVED***
+	}
+	for len(x) > 0 && isOWS(x[len(x)-1]) {
 		x = x[:len(x)-1]
-	***REMOVED***
+	}
 	return x
-***REMOVED***
+}
 
 // headerValueContainsToken reports whether v (assumed to be a
 // 0#element, in the ABNF extension described in RFC 7230 section 7)
 // contains token amongst its comma-separated tokens, ASCII
 // case-insensitively.
-func headerValueContainsToken(v string, token string) bool ***REMOVED***
+func headerValueContainsToken(v string, token string) bool {
 	v = trimOWS(v)
-	if comma := strings.IndexByte(v, ','); comma != -1 ***REMOVED***
+	if comma := strings.IndexByte(v, ','); comma != -1 {
 		return tokenEqual(trimOWS(v[:comma]), token) || headerValueContainsToken(v[comma+1:], token)
-	***REMOVED***
+	}
 	return tokenEqual(v, token)
-***REMOVED***
+}
 
 // lowerASCII returns the ASCII lowercase version of b.
-func lowerASCII(b byte) byte ***REMOVED***
-	if 'A' <= b && b <= 'Z' ***REMOVED***
+func lowerASCII(b byte) byte {
+	if 'A' <= b && b <= 'Z' {
 		return b + ('a' - 'A')
-	***REMOVED***
+	}
 	return b
-***REMOVED***
+}
 
 // tokenEqual reports whether t1 and t2 are equal, ASCII case-insensitively.
-func tokenEqual(t1, t2 string) bool ***REMOVED***
-	if len(t1) != len(t2) ***REMOVED***
+func tokenEqual(t1, t2 string) bool {
+	if len(t1) != len(t2) {
 		return false
-	***REMOVED***
-	for i, b := range t1 ***REMOVED***
-		if b >= utf8.RuneSelf ***REMOVED***
+	}
+	for i, b := range t1 {
+		if b >= utf8.RuneSelf {
 			// No UTF-8 or non-ASCII allowed in tokens.
 			return false
-		***REMOVED***
-		if lowerASCII(byte(b)) != lowerASCII(t2[i]) ***REMOVED***
+		}
+		if lowerASCII(byte(b)) != lowerASCII(t2[i]) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}
 
 // isLWS reports whether b is linear white space, according
 // to http://www.w3.org/Protocols/rfc2616/rfc2616-sec2.html#sec2.2
 //      LWS            = [CRLF] 1*( SP | HT )
-func isLWS(b byte) bool ***REMOVED*** return b == ' ' || b == '\t' ***REMOVED***
+func isLWS(b byte) bool { return b == ' ' || b == '\t' }
 
 // isCTL reports whether b is a control byte, according
 // to http://www.w3.org/Protocols/rfc2616/rfc2616-sec2.html#sec2.2
 //      CTL            = <any US-ASCII control character
 //                       (octets 0 - 31) and DEL (127)>
-func isCTL(b byte) bool ***REMOVED***
+func isCTL(b byte) bool {
 	const del = 0x7f // a CTL
 	return b < ' ' || b == del
-***REMOVED***
+}
 
 // ValidHeaderFieldName reports whether v is a valid HTTP/1.x header name.
 // HTTP/2 imposes the additional restriction that uppercase ASCII
@@ -198,20 +198,20 @@ func isCTL(b byte) bool ***REMOVED***
 //   token          = 1*tchar
 //   tchar = "!" / "#" / "$" / "%" / "&" / "'" / "*" / "+" / "-" / "." /
 //           "^" / "_" / "`" / "|" / "~" / DIGIT / ALPHA
-func ValidHeaderFieldName(v string) bool ***REMOVED***
-	if len(v) == 0 ***REMOVED***
+func ValidHeaderFieldName(v string) bool {
+	if len(v) == 0 {
 		return false
-	***REMOVED***
-	for _, r := range v ***REMOVED***
-		if !IsTokenRune(r) ***REMOVED***
+	}
+	for _, r := range v {
+		if !IsTokenRune(r) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}
 
 // ValidHostHeader reports whether h is a valid host header.
-func ValidHostHeader(h string) bool ***REMOVED***
+func ValidHostHeader(h string) bool {
 	// The latest spec is actually this:
 	//
 	// http://tools.ietf.org/html/rfc7230#section-5.4
@@ -223,16 +223,16 @@ func ValidHostHeader(h string) bool ***REMOVED***
 	// But we're going to be much more lenient for now and just
 	// search for any byte that's not a valid byte in any of those
 	// expressions.
-	for i := 0; i < len(h); i++ ***REMOVED***
-		if !validHostByte[h[i]] ***REMOVED***
+	for i := 0; i < len(h); i++ {
+		if !validHostByte[h[i]] {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}
 
 // See the validHostHeader comment.
-var validHostByte = [256]bool***REMOVED***
+var validHostByte = [256]bool{
 	'0': true, '1': true, '2': true, '3': true, '4': true, '5': true, '6': true, '7': true,
 	'8': true, '9': true,
 
@@ -265,7 +265,7 @@ var validHostByte = [256]bool***REMOVED***
 	']':  true,
 	'_':  true, // unreserved
 	'~':  true, // unreserved
-***REMOVED***
+}
 
 // ValidHeaderFieldValue reports whether v is a valid "field-value" according to
 // http://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.2 :
@@ -304,48 +304,48 @@ var validHostByte = [256]bool***REMOVED***
 //
 // This function does not (yet?) properly handle the rejection of
 // strings that begin or end with SP or HTAB.
-func ValidHeaderFieldValue(v string) bool ***REMOVED***
-	for i := 0; i < len(v); i++ ***REMOVED***
+func ValidHeaderFieldValue(v string) bool {
+	for i := 0; i < len(v); i++ {
 		b := v[i]
-		if isCTL(b) && !isLWS(b) ***REMOVED***
+		if isCTL(b) && !isLWS(b) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}
 
-func isASCII(s string) bool ***REMOVED***
-	for i := 0; i < len(s); i++ ***REMOVED***
-		if s[i] >= utf8.RuneSelf ***REMOVED***
+func isASCII(s string) bool {
+	for i := 0; i < len(s); i++ {
+		if s[i] >= utf8.RuneSelf {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}
 
 // PunycodeHostPort returns the IDNA Punycode version
 // of the provided "host" or "host:port" string.
-func PunycodeHostPort(v string) (string, error) ***REMOVED***
-	if isASCII(v) ***REMOVED***
+func PunycodeHostPort(v string) (string, error) {
+	if isASCII(v) {
 		return v, nil
-	***REMOVED***
+	}
 
 	host, port, err := net.SplitHostPort(v)
-	if err != nil ***REMOVED***
+	if err != nil {
 		// The input 'v' argument was just a "host" argument,
 		// without a port. This error should not be returned
 		// to the caller.
 		host = v
 		port = ""
-	***REMOVED***
+	}
 	host, err = idna.ToASCII(host)
-	if err != nil ***REMOVED***
+	if err != nil {
 		// Non-UTF-8? Not representable in Punycode, in any
 		// case.
 		return "", err
-	***REMOVED***
-	if port == "" ***REMOVED***
+	}
+	if port == "" {
 		return host, nil
-	***REMOVED***
+	}
 	return net.JoinHostPort(host, port), nil
-***REMOVED***
+}

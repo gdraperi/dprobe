@@ -5,52 +5,52 @@ import (
 	"testing"
 )
 
-func setUpCount(c *int) *FlagSet ***REMOVED***
+func setUpCount(c *int) *FlagSet {
 	f := NewFlagSet("test", ContinueOnError)
 	f.CountVarP(c, "verbose", "v", "a counter")
 	return f
-***REMOVED***
+}
 
-func TestCount(t *testing.T) ***REMOVED***
-	testCases := []struct ***REMOVED***
+func TestCount(t *testing.T) {
+	testCases := []struct {
 		input    []string
 		success  bool
 		expected int
-	***REMOVED******REMOVED***
-		***REMOVED***[]string***REMOVED******REMOVED***, true, 0***REMOVED***,
-		***REMOVED***[]string***REMOVED***"-v"***REMOVED***, true, 1***REMOVED***,
-		***REMOVED***[]string***REMOVED***"-vvv"***REMOVED***, true, 3***REMOVED***,
-		***REMOVED***[]string***REMOVED***"-v", "-v", "-v"***REMOVED***, true, 3***REMOVED***,
-		***REMOVED***[]string***REMOVED***"-v", "--verbose", "-v"***REMOVED***, true, 3***REMOVED***,
-		***REMOVED***[]string***REMOVED***"-v=3", "-v"***REMOVED***, true, 4***REMOVED***,
-		***REMOVED***[]string***REMOVED***"--verbose=0"***REMOVED***, true, 0***REMOVED***,
-		***REMOVED***[]string***REMOVED***"-v=0"***REMOVED***, true, 0***REMOVED***,
-		***REMOVED***[]string***REMOVED***"-v=a"***REMOVED***, false, 0***REMOVED***,
-	***REMOVED***
+	}{
+		{[]string{}, true, 0},
+		{[]string{"-v"}, true, 1},
+		{[]string{"-vvv"}, true, 3},
+		{[]string{"-v", "-v", "-v"}, true, 3},
+		{[]string{"-v", "--verbose", "-v"}, true, 3},
+		{[]string{"-v=3", "-v"}, true, 4},
+		{[]string{"--verbose=0"}, true, 0},
+		{[]string{"-v=0"}, true, 0},
+		{[]string{"-v=a"}, false, 0},
+	}
 
 	devnull, _ := os.Open(os.DevNull)
 	os.Stderr = devnull
-	for i := range testCases ***REMOVED***
+	for i := range testCases {
 		var count int
 		f := setUpCount(&count)
 
 		tc := &testCases[i]
 
 		err := f.Parse(tc.input)
-		if err != nil && tc.success == true ***REMOVED***
+		if err != nil && tc.success == true {
 			t.Errorf("expected success, got %q", err)
 			continue
-		***REMOVED*** else if err == nil && tc.success == false ***REMOVED***
+		} else if err == nil && tc.success == false {
 			t.Errorf("expected failure, got success")
 			continue
-		***REMOVED*** else if tc.success ***REMOVED***
+		} else if tc.success {
 			c, err := f.GetCount("verbose")
-			if err != nil ***REMOVED***
+			if err != nil {
 				t.Errorf("Got error trying to fetch the counter flag")
-			***REMOVED***
-			if c != tc.expected ***REMOVED***
+			}
+			if c != tc.expected {
 				t.Errorf("expected %d, got %d", tc.expected, c)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}

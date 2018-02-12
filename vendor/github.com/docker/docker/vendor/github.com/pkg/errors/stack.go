@@ -13,29 +13,29 @@ type Frame uintptr
 
 // pc returns the program counter for this frame;
 // multiple frames may have the same PC value.
-func (f Frame) pc() uintptr ***REMOVED*** return uintptr(f) - 1 ***REMOVED***
+func (f Frame) pc() uintptr { return uintptr(f) - 1 }
 
 // file returns the full path to the file that contains the
 // function for this Frame's pc.
-func (f Frame) file() string ***REMOVED***
+func (f Frame) file() string {
 	fn := runtime.FuncForPC(f.pc())
-	if fn == nil ***REMOVED***
+	if fn == nil {
 		return "unknown"
-	***REMOVED***
+	}
 	file, _ := fn.FileLine(f.pc())
 	return file
-***REMOVED***
+}
 
 // line returns the line number of source code of the
 // function for this Frame's pc.
-func (f Frame) line() int ***REMOVED***
+func (f Frame) line() int {
 	fn := runtime.FuncForPC(f.pc())
-	if fn == nil ***REMOVED***
+	if fn == nil {
 		return 0
-	***REMOVED***
+	}
 	_, line := fn.FileLine(f.pc())
 	return line
-***REMOVED***
+}
 
 // Format formats the frame according to the fmt.Formatter interface.
 //
@@ -48,22 +48,22 @@ func (f Frame) line() int ***REMOVED***
 //
 //    %+s   path of source file relative to the compile time GOPATH
 //    %+v   equivalent to %+s:%d
-func (f Frame) Format(s fmt.State, verb rune) ***REMOVED***
-	switch verb ***REMOVED***
+func (f Frame) Format(s fmt.State, verb rune) {
+	switch verb {
 	case 's':
-		switch ***REMOVED***
+		switch {
 		case s.Flag('+'):
 			pc := f.pc()
 			fn := runtime.FuncForPC(pc)
-			if fn == nil ***REMOVED***
+			if fn == nil {
 				io.WriteString(s, "unknown")
-			***REMOVED*** else ***REMOVED***
+			} else {
 				file, _ := fn.FileLine(pc)
 				fmt.Fprintf(s, "%s\n\t%s", fn.Name(), file)
-			***REMOVED***
+			}
 		default:
 			io.WriteString(s, path.Base(f.file()))
-		***REMOVED***
+		}
 	case 'd':
 		fmt.Fprintf(s, "%d", f.line())
 	case 'n':
@@ -73,71 +73,71 @@ func (f Frame) Format(s fmt.State, verb rune) ***REMOVED***
 		f.Format(s, 's')
 		io.WriteString(s, ":")
 		f.Format(s, 'd')
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // StackTrace is stack of Frames from innermost (newest) to outermost (oldest).
 type StackTrace []Frame
 
-func (st StackTrace) Format(s fmt.State, verb rune) ***REMOVED***
-	switch verb ***REMOVED***
+func (st StackTrace) Format(s fmt.State, verb rune) {
+	switch verb {
 	case 'v':
-		switch ***REMOVED***
+		switch {
 		case s.Flag('+'):
-			for _, f := range st ***REMOVED***
+			for _, f := range st {
 				fmt.Fprintf(s, "\n%+v", f)
-			***REMOVED***
+			}
 		case s.Flag('#'):
 			fmt.Fprintf(s, "%#v", []Frame(st))
 		default:
 			fmt.Fprintf(s, "%v", []Frame(st))
-		***REMOVED***
+		}
 	case 's':
 		fmt.Fprintf(s, "%s", []Frame(st))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // stack represents a stack of program counters.
 type stack []uintptr
 
-func (s *stack) Format(st fmt.State, verb rune) ***REMOVED***
-	switch verb ***REMOVED***
+func (s *stack) Format(st fmt.State, verb rune) {
+	switch verb {
 	case 'v':
-		switch ***REMOVED***
+		switch {
 		case st.Flag('+'):
-			for _, pc := range *s ***REMOVED***
+			for _, pc := range *s {
 				f := Frame(pc)
 				fmt.Fprintf(st, "\n%+v", f)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}
 
-func (s *stack) StackTrace() StackTrace ***REMOVED***
+func (s *stack) StackTrace() StackTrace {
 	f := make([]Frame, len(*s))
-	for i := 0; i < len(f); i++ ***REMOVED***
+	for i := 0; i < len(f); i++ {
 		f[i] = Frame((*s)[i])
-	***REMOVED***
+	}
 	return f
-***REMOVED***
+}
 
-func callers() *stack ***REMOVED***
+func callers() *stack {
 	const depth = 32
 	var pcs [depth]uintptr
 	n := runtime.Callers(3, pcs[:])
 	var st stack = pcs[0:n]
 	return &st
-***REMOVED***
+}
 
 // funcname removes the path prefix component of a function's name reported by func.Name().
-func funcname(name string) string ***REMOVED***
+func funcname(name string) string {
 	i := strings.LastIndex(name, "/")
 	name = name[i+1:]
 	i = strings.Index(name, ".")
 	return name[i+1:]
-***REMOVED***
+}
 
-func trimGOPATH(name, file string) string ***REMOVED***
+func trimGOPATH(name, file string) string {
 	// Here we want to get the source file path relative to the compile time
 	// GOPATH. As of Go 1.6.x there is no direct way to know the compiled
 	// GOPATH at runtime, but we can infer the number of path segments in the
@@ -163,16 +163,16 @@ func trimGOPATH(name, file string) string ***REMOVED***
 	const sep = "/"
 	goal := strings.Count(name, sep) + 2
 	i := len(file)
-	for n := 0; n < goal; n++ ***REMOVED***
+	for n := 0; n < goal; n++ {
 		i = strings.LastIndex(file[:i], sep)
-		if i == -1 ***REMOVED***
+		if i == -1 {
 			// not enough separators found, set i so that the slice expression
 			// below leaves file unmodified
 			i = -len(sep)
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	// get back to 0 or trim the leading separator
 	file = file[i+len(sep):]
 	return file
-***REMOVED***
+}

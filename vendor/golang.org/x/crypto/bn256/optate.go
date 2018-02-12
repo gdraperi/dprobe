@@ -4,7 +4,7 @@
 
 package bn256
 
-func lineFunctionAdd(r, p *twistPoint, q *curvePoint, r2 *gfP2, pool *bnPool) (a, b, c *gfP2, rOut *twistPoint) ***REMOVED***
+func lineFunctionAdd(r, p *twistPoint, q *curvePoint, r2 *gfP2, pool *bnPool) (a, b, c *gfP2, rOut *twistPoint) {
 	// See the mixed addition algorithm from "Faster Computation of the
 	// Tate Pairing", http://arxiv.org/pdf/0904.0854v3.pdf
 
@@ -80,9 +80,9 @@ func lineFunctionAdd(r, p *twistPoint, q *curvePoint, r2 *gfP2, pool *bnPool) (a
 	t2.Put(pool)
 
 	return
-***REMOVED***
+}
 
-func lineFunctionDouble(r *twistPoint, q *curvePoint, pool *bnPool) (a, b, c *gfP2, rOut *twistPoint) ***REMOVED***
+func lineFunctionDouble(r *twistPoint, q *curvePoint, pool *bnPool) (a, b, c *gfP2, rOut *twistPoint) {
 	// See the doubling algorithm for a=0 from "Faster Computation of the
 	// Tate Pairing", http://arxiv.org/pdf/0904.0854v3.pdf
 
@@ -149,9 +149,9 @@ func lineFunctionDouble(r *twistPoint, q *curvePoint, pool *bnPool) (a, b, c *gf
 	t.Put(pool)
 
 	return
-***REMOVED***
+}
 
-func mulLine(ret *gfP12, a, b, c *gfP2, pool *bnPool) ***REMOVED***
+func mulLine(ret *gfP12, a, b, c *gfP2, pool *bnPool) {
 	a2 := newGFp6(pool)
 	a2.x.SetZero()
 	a2.y.Set(a)
@@ -179,14 +179,14 @@ func mulLine(ret *gfP12, a, b, c *gfP2, pool *bnPool) ***REMOVED***
 	t3.Put(pool)
 	t2.Put(pool)
 	t.Put(pool)
-***REMOVED***
+}
 
 // sixuPlus2NAF is 6u+2 in non-adjacent form.
-var sixuPlus2NAF = []int8***REMOVED***0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, -1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, -1, 0, 1, 0, 0, 0, 1, 0, -1, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, -1, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0, 1***REMOVED***
+var sixuPlus2NAF = []int8{0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, -1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, -1, 0, 1, 0, 0, 0, 1, 0, -1, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, -1, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0, 1}
 
 // miller implements the Miller loop for calculating the Optimal Ate pairing.
 // See algorithm 1 from http://cryptojedi.org/papers/dclxvi-20100714.pdf
-func miller(q *twistPoint, p *curvePoint, pool *bnPool) *gfP12 ***REMOVED***
+func miller(q *twistPoint, p *curvePoint, pool *bnPool) *gfP12 {
 	ret := newGFp12(pool)
 	ret.SetOne()
 
@@ -207,11 +207,11 @@ func miller(q *twistPoint, p *curvePoint, pool *bnPool) *gfP12 ***REMOVED***
 	r2 := newGFp2(pool)
 	r2.Square(aAffine.y, pool)
 
-	for i := len(sixuPlus2NAF) - 1; i > 0; i-- ***REMOVED***
+	for i := len(sixuPlus2NAF) - 1; i > 0; i-- {
 		a, b, c, newR := lineFunctionDouble(r, bAffine, pool)
-		if i != len(sixuPlus2NAF)-1 ***REMOVED***
+		if i != len(sixuPlus2NAF)-1 {
 			ret.Square(ret, pool)
-		***REMOVED***
+		}
 
 		mulLine(ret, a, b, c, pool)
 		a.Put(pool)
@@ -220,14 +220,14 @@ func miller(q *twistPoint, p *curvePoint, pool *bnPool) *gfP12 ***REMOVED***
 		r.Put(pool)
 		r = newR
 
-		switch sixuPlus2NAF[i-1] ***REMOVED***
+		switch sixuPlus2NAF[i-1] {
 		case 1:
 			a, b, c, newR = lineFunctionAdd(r, aAffine, bAffine, r2, pool)
 		case -1:
 			a, b, c, newR = lineFunctionAdd(r, minusA, bAffine, r2, pool)
 		default:
 			continue
-		***REMOVED***
+		}
 
 		mulLine(ret, a, b, c, pool)
 		a.Put(pool)
@@ -235,7 +235,7 @@ func miller(q *twistPoint, p *curvePoint, pool *bnPool) *gfP12 ***REMOVED***
 		c.Put(pool)
 		r.Put(pool)
 		r = newR
-	***REMOVED***
+	}
 
 	// In order to calculate Q1 we have to convert q from the sextic twist
 	// to the full GF(p^12) group, apply the Frobenius there, and convert
@@ -297,12 +297,12 @@ func miller(q *twistPoint, p *curvePoint, pool *bnPool) *gfP12 ***REMOVED***
 	r2.Put(pool)
 
 	return ret
-***REMOVED***
+}
 
 // finalExponentiation computes the (p¹²-1)/Order-th power of an element of
 // GF(p¹²) to obtain an element of GT (steps 13-15 of algorithm 1 from
 // http://cryptojedi.org/papers/dclxvi-20100714.pdf)
-func finalExponentiation(in *gfP12, pool *bnPool) *gfP12 ***REMOVED***
+func finalExponentiation(in *gfP12, pool *bnPool) *gfP12 {
 	t1 := newGFp12(pool)
 
 	// This is the p^6-Frobenius
@@ -380,16 +380,16 @@ func finalExponentiation(in *gfP12, pool *bnPool) *gfP12 ***REMOVED***
 	y6.Put(pool)
 
 	return t0
-***REMOVED***
+}
 
-func optimalAte(a *twistPoint, b *curvePoint, pool *bnPool) *gfP12 ***REMOVED***
+func optimalAte(a *twistPoint, b *curvePoint, pool *bnPool) *gfP12 {
 	e := miller(a, b, pool)
 	ret := finalExponentiation(e, pool)
 	e.Put(pool)
 
-	if a.IsInfinity() || b.IsInfinity() ***REMOVED***
+	if a.IsInfinity() || b.IsInfinity() {
 		ret.SetOne()
-	***REMOVED***
+	}
 
 	return ret
-***REMOVED***
+}

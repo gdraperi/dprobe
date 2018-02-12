@@ -20,142 +20,142 @@ import (
 	"time"
 )
 
-func TestOCSPDecode(t *testing.T) ***REMOVED***
+func TestOCSPDecode(t *testing.T) {
 	responseBytes, _ := hex.DecodeString(ocspResponseHex)
 	resp, err := ParseResponse(responseBytes, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	responderCert, _ := hex.DecodeString(startComResponderCertHex)
 	responder, err := x509.ParseCertificate(responderCert)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	expected := Response***REMOVED***
+	expected := Response{
 		Status:           Good,
 		SerialNumber:     big.NewInt(0x1d0fa),
 		RevocationReason: Unspecified,
 		ThisUpdate:       time.Date(2010, 7, 7, 15, 1, 5, 0, time.UTC),
 		NextUpdate:       time.Date(2010, 7, 7, 18, 35, 17, 0, time.UTC),
 		RawResponderName: responder.RawSubject,
-	***REMOVED***
+	}
 
-	if !reflect.DeepEqual(resp.ThisUpdate, expected.ThisUpdate) ***REMOVED***
+	if !reflect.DeepEqual(resp.ThisUpdate, expected.ThisUpdate) {
 		t.Errorf("resp.ThisUpdate: got %v, want %v", resp.ThisUpdate, expected.ThisUpdate)
-	***REMOVED***
+	}
 
-	if !reflect.DeepEqual(resp.NextUpdate, expected.NextUpdate) ***REMOVED***
+	if !reflect.DeepEqual(resp.NextUpdate, expected.NextUpdate) {
 		t.Errorf("resp.NextUpdate: got %v, want %v", resp.NextUpdate, expected.NextUpdate)
-	***REMOVED***
+	}
 
-	if resp.Status != expected.Status ***REMOVED***
+	if resp.Status != expected.Status {
 		t.Errorf("resp.Status: got %d, want %d", resp.Status, expected.Status)
-	***REMOVED***
+	}
 
-	if resp.SerialNumber.Cmp(expected.SerialNumber) != 0 ***REMOVED***
+	if resp.SerialNumber.Cmp(expected.SerialNumber) != 0 {
 		t.Errorf("resp.SerialNumber: got %x, want %x", resp.SerialNumber, expected.SerialNumber)
-	***REMOVED***
+	}
 
-	if resp.RevocationReason != expected.RevocationReason ***REMOVED***
+	if resp.RevocationReason != expected.RevocationReason {
 		t.Errorf("resp.RevocationReason: got %d, want %d", resp.RevocationReason, expected.RevocationReason)
-	***REMOVED***
+	}
 
-	if !bytes.Equal(resp.RawResponderName, expected.RawResponderName) ***REMOVED***
+	if !bytes.Equal(resp.RawResponderName, expected.RawResponderName) {
 		t.Errorf("resp.RawResponderName: got %x, want %x", resp.RawResponderName, expected.RawResponderName)
-	***REMOVED***
+	}
 
-	if !bytes.Equal(resp.ResponderKeyHash, expected.ResponderKeyHash) ***REMOVED***
+	if !bytes.Equal(resp.ResponderKeyHash, expected.ResponderKeyHash) {
 		t.Errorf("resp.ResponderKeyHash: got %x, want %x", resp.ResponderKeyHash, expected.ResponderKeyHash)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestOCSPDecodeWithoutCert(t *testing.T) ***REMOVED***
+func TestOCSPDecodeWithoutCert(t *testing.T) {
 	responseBytes, _ := hex.DecodeString(ocspResponseWithoutCertHex)
 	_, err := ParseResponse(responseBytes, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Error(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestOCSPDecodeWithExtensions(t *testing.T) ***REMOVED***
+func TestOCSPDecodeWithExtensions(t *testing.T) {
 	responseBytes, _ := hex.DecodeString(ocspResponseWithCriticalExtensionHex)
 	_, err := ParseResponse(responseBytes, nil)
-	if err == nil ***REMOVED***
+	if err == nil {
 		t.Error(err)
-	***REMOVED***
+	}
 
 	responseBytes, _ = hex.DecodeString(ocspResponseWithExtensionHex)
 	response, err := ParseResponse(responseBytes, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if len(response.Extensions) != 1 ***REMOVED***
+	if len(response.Extensions) != 1 {
 		t.Errorf("len(response.Extensions): got %v, want %v", len(response.Extensions), 1)
-	***REMOVED***
+	}
 
 	extensionBytes := response.Extensions[0].Value
 	expectedBytes, _ := hex.DecodeString(ocspExtensionValueHex)
-	if !bytes.Equal(extensionBytes, expectedBytes) ***REMOVED***
+	if !bytes.Equal(extensionBytes, expectedBytes) {
 		t.Errorf("response.Extensions[0]: got %x, want %x", extensionBytes, expectedBytes)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestOCSPSignature(t *testing.T) ***REMOVED***
+func TestOCSPSignature(t *testing.T) {
 	issuerCert, _ := hex.DecodeString(startComHex)
 	issuer, err := x509.ParseCertificate(issuerCert)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	response, _ := hex.DecodeString(ocspResponseHex)
-	if _, err := ParseResponse(response, issuer); err != nil ***REMOVED***
+	if _, err := ParseResponse(response, issuer); err != nil {
 		t.Error(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestOCSPRequest(t *testing.T) ***REMOVED***
+func TestOCSPRequest(t *testing.T) {
 	leafCert, _ := hex.DecodeString(leafCertHex)
 	cert, err := x509.ParseCertificate(leafCert)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	issuerCert, _ := hex.DecodeString(issuerCertHex)
 	issuer, err := x509.ParseCertificate(issuerCert)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	request, err := CreateRequest(cert, issuer, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	expectedBytes, _ := hex.DecodeString(ocspRequestHex)
-	if !bytes.Equal(request, expectedBytes) ***REMOVED***
+	if !bytes.Equal(request, expectedBytes) {
 		t.Errorf("request: got %x, wanted %x", request, expectedBytes)
-	***REMOVED***
+	}
 
 	decodedRequest, err := ParseRequest(expectedBytes)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if decodedRequest.HashAlgorithm != crypto.SHA1 ***REMOVED***
+	if decodedRequest.HashAlgorithm != crypto.SHA1 {
 		t.Errorf("request.HashAlgorithm: got %v, want %v", decodedRequest.HashAlgorithm, crypto.SHA1)
-	***REMOVED***
+	}
 
-	var publicKeyInfo struct ***REMOVED***
+	var publicKeyInfo struct {
 		Algorithm pkix.AlgorithmIdentifier
 		PublicKey asn1.BitString
-	***REMOVED***
+	}
 	_, err = asn1.Unmarshal(issuer.RawSubjectPublicKeyInfo, &publicKeyInfo)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	h := sha1.New()
 	h.Write(publicKeyInfo.PublicKey.RightAlign())
@@ -165,69 +165,69 @@ func TestOCSPRequest(t *testing.T) ***REMOVED***
 	h.Write(issuer.RawSubject)
 	issuerNameHash := h.Sum(nil)
 
-	if got := decodedRequest.IssuerKeyHash; !bytes.Equal(got, issuerKeyHash) ***REMOVED***
+	if got := decodedRequest.IssuerKeyHash; !bytes.Equal(got, issuerKeyHash) {
 		t.Errorf("request.IssuerKeyHash: got %x, want %x", got, issuerKeyHash)
-	***REMOVED***
+	}
 
-	if got := decodedRequest.IssuerNameHash; !bytes.Equal(got, issuerNameHash) ***REMOVED***
+	if got := decodedRequest.IssuerNameHash; !bytes.Equal(got, issuerNameHash) {
 		t.Errorf("request.IssuerKeyHash: got %x, want %x", got, issuerNameHash)
-	***REMOVED***
+	}
 
-	if got := decodedRequest.SerialNumber; got.Cmp(cert.SerialNumber) != 0 ***REMOVED***
+	if got := decodedRequest.SerialNumber; got.Cmp(cert.SerialNumber) != 0 {
 		t.Errorf("request.SerialNumber: got %x, want %x", got, cert.SerialNumber)
-	***REMOVED***
+	}
 
 	marshaledRequest, err := decodedRequest.Marshal()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if bytes.Compare(expectedBytes, marshaledRequest) != 0 ***REMOVED***
+	if bytes.Compare(expectedBytes, marshaledRequest) != 0 {
 		t.Errorf(
 			"Marshaled request doesn't match expected: wanted %x, got %x",
 			expectedBytes,
 			marshaledRequest,
 		)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestOCSPResponse(t *testing.T) ***REMOVED***
+func TestOCSPResponse(t *testing.T) {
 	leafCert, _ := hex.DecodeString(leafCertHex)
 	leaf, err := x509.ParseCertificate(leafCert)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	issuerCert, _ := hex.DecodeString(issuerCertHex)
 	issuer, err := x509.ParseCertificate(issuerCert)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	responderCert, _ := hex.DecodeString(responderCertHex)
 	responder, err := x509.ParseCertificate(responderCert)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	responderPrivateKeyDER, _ := hex.DecodeString(responderPrivateKeyHex)
 	responderPrivateKey, err := x509.ParsePKCS1PrivateKey(responderPrivateKeyDER)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	extensionBytes, _ := hex.DecodeString(ocspExtensionValueHex)
-	extensions := []pkix.Extension***REMOVED***
-		***REMOVED***
+	extensions := []pkix.Extension{
+		{
 			Id:       ocspExtensionOID,
 			Critical: false,
 			Value:    extensionBytes,
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
 	thisUpdate := time.Date(2010, 7, 7, 15, 1, 5, 0, time.UTC)
 	nextUpdate := time.Date(2010, 7, 7, 18, 35, 17, 0, time.UTC)
-	template := Response***REMOVED***
+	template := Response{
 		Status:           Revoked,
 		SerialNumber:     leaf.SerialNumber,
 		ThisUpdate:       thisUpdate,
@@ -236,127 +236,127 @@ func TestOCSPResponse(t *testing.T) ***REMOVED***
 		RevocationReason: KeyCompromise,
 		Certificate:      responder,
 		ExtraExtensions:  extensions,
-	***REMOVED***
+	}
 
 	template.IssuerHash = crypto.MD5
 	_, err = CreateResponse(issuer, responder, template, responderPrivateKey)
-	if err == nil ***REMOVED***
+	if err == nil {
 		t.Fatal("CreateResponse didn't fail with non-valid template.IssuerHash value crypto.MD5")
-	***REMOVED***
+	}
 
-	testCases := []struct ***REMOVED***
+	testCases := []struct {
 		name       string
 		issuerHash crypto.Hash
-	***REMOVED******REMOVED***
-		***REMOVED***"Zero value", 0***REMOVED***,
-		***REMOVED***"crypto.SHA1", crypto.SHA1***REMOVED***,
-		***REMOVED***"crypto.SHA256", crypto.SHA256***REMOVED***,
-		***REMOVED***"crypto.SHA384", crypto.SHA384***REMOVED***,
-		***REMOVED***"crypto.SHA512", crypto.SHA512***REMOVED***,
-	***REMOVED***
-	for _, tc := range testCases ***REMOVED***
-		t.Run(tc.name, func(t *testing.T) ***REMOVED***
+	}{
+		{"Zero value", 0},
+		{"crypto.SHA1", crypto.SHA1},
+		{"crypto.SHA256", crypto.SHA256},
+		{"crypto.SHA384", crypto.SHA384},
+		{"crypto.SHA512", crypto.SHA512},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
 			template.IssuerHash = tc.issuerHash
 			responseBytes, err := CreateResponse(issuer, responder, template, responderPrivateKey)
-			if err != nil ***REMOVED***
+			if err != nil {
 				t.Fatalf("CreateResponse failed: %s", err)
-			***REMOVED***
+			}
 
 			resp, err := ParseResponse(responseBytes, nil)
-			if err != nil ***REMOVED***
+			if err != nil {
 				t.Fatalf("ParseResponse failed: %s", err)
-			***REMOVED***
+			}
 
-			if !reflect.DeepEqual(resp.ThisUpdate, template.ThisUpdate) ***REMOVED***
+			if !reflect.DeepEqual(resp.ThisUpdate, template.ThisUpdate) {
 				t.Errorf("resp.ThisUpdate: got %v, want %v", resp.ThisUpdate, template.ThisUpdate)
-			***REMOVED***
+			}
 
-			if !reflect.DeepEqual(resp.NextUpdate, template.NextUpdate) ***REMOVED***
+			if !reflect.DeepEqual(resp.NextUpdate, template.NextUpdate) {
 				t.Errorf("resp.NextUpdate: got %v, want %v", resp.NextUpdate, template.NextUpdate)
-			***REMOVED***
+			}
 
-			if !reflect.DeepEqual(resp.RevokedAt, template.RevokedAt) ***REMOVED***
+			if !reflect.DeepEqual(resp.RevokedAt, template.RevokedAt) {
 				t.Errorf("resp.RevokedAt: got %v, want %v", resp.RevokedAt, template.RevokedAt)
-			***REMOVED***
+			}
 
-			if !reflect.DeepEqual(resp.Extensions, template.ExtraExtensions) ***REMOVED***
+			if !reflect.DeepEqual(resp.Extensions, template.ExtraExtensions) {
 				t.Errorf("resp.Extensions: got %v, want %v", resp.Extensions, template.ExtraExtensions)
-			***REMOVED***
+			}
 
 			delay := time.Since(resp.ProducedAt)
-			if delay < -time.Hour || delay > time.Hour ***REMOVED***
+			if delay < -time.Hour || delay > time.Hour {
 				t.Errorf("resp.ProducedAt: got %s, want close to current time (%s)", resp.ProducedAt, time.Now())
-			***REMOVED***
+			}
 
-			if resp.Status != template.Status ***REMOVED***
+			if resp.Status != template.Status {
 				t.Errorf("resp.Status: got %d, want %d", resp.Status, template.Status)
-			***REMOVED***
+			}
 
-			if resp.SerialNumber.Cmp(template.SerialNumber) != 0 ***REMOVED***
+			if resp.SerialNumber.Cmp(template.SerialNumber) != 0 {
 				t.Errorf("resp.SerialNumber: got %x, want %x", resp.SerialNumber, template.SerialNumber)
-			***REMOVED***
+			}
 
-			if resp.RevocationReason != template.RevocationReason ***REMOVED***
+			if resp.RevocationReason != template.RevocationReason {
 				t.Errorf("resp.RevocationReason: got %d, want %d", resp.RevocationReason, template.RevocationReason)
-			***REMOVED***
+			}
 
 			expectedHash := tc.issuerHash
-			if tc.issuerHash == 0 ***REMOVED***
+			if tc.issuerHash == 0 {
 				expectedHash = crypto.SHA1
-			***REMOVED***
+			}
 
-			if resp.IssuerHash != expectedHash ***REMOVED***
+			if resp.IssuerHash != expectedHash {
 				t.Errorf("resp.IssuerHash: got %d, want %d", resp.IssuerHash, expectedHash)
-			***REMOVED***
-		***REMOVED***)
-	***REMOVED***
-***REMOVED***
+			}
+		})
+	}
+}
 
-func TestErrorResponse(t *testing.T) ***REMOVED***
+func TestErrorResponse(t *testing.T) {
 	responseBytes, _ := hex.DecodeString(errorResponseHex)
 	_, err := ParseResponse(responseBytes, nil)
 
 	respErr, ok := err.(ResponseError)
-	if !ok ***REMOVED***
+	if !ok {
 		t.Fatalf("expected ResponseError from ParseResponse but got %#v", err)
-	***REMOVED***
-	if respErr.Status != Malformed ***REMOVED***
+	}
+	if respErr.Status != Malformed {
 		t.Fatalf("expected Malformed status from ParseResponse but got %d", respErr.Status)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestOCSPDecodeMultiResponse(t *testing.T) ***REMOVED***
+func TestOCSPDecodeMultiResponse(t *testing.T) {
 	inclCert, _ := hex.DecodeString(ocspMultiResponseCertHex)
 	cert, err := x509.ParseCertificate(inclCert)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	responseBytes, _ := hex.DecodeString(ocspMultiResponseHex)
 	resp, err := ParseResponseForCert(responseBytes, cert, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if resp.SerialNumber.Cmp(cert.SerialNumber) != 0 ***REMOVED***
+	if resp.SerialNumber.Cmp(cert.SerialNumber) != 0 {
 		t.Errorf("resp.SerialNumber: got %x, want %x", resp.SerialNumber, cert.SerialNumber)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestOCSPDecodeMultiResponseWithoutMatchingCert(t *testing.T) ***REMOVED***
+func TestOCSPDecodeMultiResponseWithoutMatchingCert(t *testing.T) {
 	wrongCert, _ := hex.DecodeString(startComHex)
 	cert, err := x509.ParseCertificate(wrongCert)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	responseBytes, _ := hex.DecodeString(ocspMultiResponseHex)
 	_, err = ParseResponseForCert(responseBytes, cert, nil)
 	want := ParseError("no response matching the supplied certificate")
-	if err != want ***REMOVED***
+	if err != want {
 		t.Errorf("err: got %q, want %q", err, want)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // This OCSP response was taken from Thawte's public OCSP responder.
 // To recreate:
@@ -513,7 +513,7 @@ const ocspResponseWithoutCertHex = "308201d40a0100a08201cd308201c906092b06010505
 	"5a35fca2e054dfa8"
 
 // PKIX nonce extension
-var ocspExtensionOID = asn1.ObjectIdentifier***REMOVED***1, 3, 6, 1, 5, 5, 7, 48, 1, 2***REMOVED***
+var ocspExtensionOID = asn1.ObjectIdentifier{1, 3, 6, 1, 5, 5, 7, 48, 1, 2}
 var ocspExtensionValueHex = "0403000000"
 
 const ocspResponseWithCriticalExtensionHex = "308204fe0a0100a08204f7308204f306092b0601050507300101048204e4308204e03081" +

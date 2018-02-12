@@ -7,18 +7,18 @@ import (
 	"syscall"
 )
 
-func adviseRead(mem []byte) ***REMOVED***
+func adviseRead(mem []byte) {
 	syscall.Madvise(mem, syscall.MADV_SEQUENTIAL|syscall.MADV_WILLNEED)
-***REMOVED***
+}
 
-func adviseWrite(mem []byte) ***REMOVED***
+func adviseWrite(mem []byte) {
 	syscall.Madvise(mem, syscall.MADV_SEQUENTIAL)
-***REMOVED***
+}
 
-func fallocate(f *os.File, sz int64) error ***REMOVED***
+func fallocate(f *os.File, sz int64) error {
 	err := syscall.Fallocate(int(f.Fd()), 0, 0, sz)
-	if err == syscall.ENOTSUP ***REMOVED***
+	if err == syscall.ENOTSUP {
 		return f.Truncate(sz)
-	***REMOVED***
+	}
 	return err
-***REMOVED***
+}

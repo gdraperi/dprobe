@@ -16,28 +16,28 @@ import (
 	"unsafe"
 )
 
-func init() ***REMOVED***
-	AddFactory(CollatorFactory***REMOVED***"osx", newOSX16Collator,
-		"OS X/Darwin collator, using native strings."***REMOVED***)
-	AddFactory(CollatorFactory***REMOVED***"osx8", newOSX8Collator,
-		"OS X/Darwin collator for UTF-8."***REMOVED***)
-***REMOVED***
+func init() {
+	AddFactory(CollatorFactory{"osx", newOSX16Collator,
+		"OS X/Darwin collator, using native strings."})
+	AddFactory(CollatorFactory{"osx8", newOSX8Collator,
+		"OS X/Darwin collator for UTF-8."})
+}
 
-func osxUInt8P(s []byte) *C.UInt8 ***REMOVED***
+func osxUInt8P(s []byte) *C.UInt8 {
 	return (*C.UInt8)(unsafe.Pointer(&s[0]))
-***REMOVED***
+}
 
-func osxCharP(s []uint16) *C.UniChar ***REMOVED***
+func osxCharP(s []uint16) *C.UniChar {
 	return (*C.UniChar)(unsafe.Pointer(&s[0]))
-***REMOVED***
+}
 
 // osxCollator implements an Collator based on OS X's CoreFoundation.
-type osxCollator struct ***REMOVED***
+type osxCollator struct {
 	loc C.CFLocaleRef
 	opt C.CFStringCompareFlags
-***REMOVED***
+}
 
-func (c *osxCollator) init(locale string) ***REMOVED***
+func (c *osxCollator) init(locale string) {
 	l := C.CFStringCreateWithBytes(
 		C.kCFAllocatorDefault,
 		osxUInt8P([]byte(locale)),
@@ -46,33 +46,33 @@ func (c *osxCollator) init(locale string) ***REMOVED***
 		C.Boolean(0),
 	)
 	c.loc = C.CFLocaleCreate(C.kCFAllocatorDefault, l)
-***REMOVED***
+}
 
-func newOSX8Collator(locale string) (Collator, error) ***REMOVED***
-	c := &osx8Collator***REMOVED******REMOVED***
+func newOSX8Collator(locale string) (Collator, error) {
+	c := &osx8Collator{}
 	c.init(locale)
 	return c, nil
-***REMOVED***
+}
 
-func newOSX16Collator(locale string) (Collator, error) ***REMOVED***
-	c := &osx16Collator***REMOVED******REMOVED***
+func newOSX16Collator(locale string) (Collator, error) {
+	c := &osx16Collator{}
 	c.init(locale)
 	return c, nil
-***REMOVED***
+}
 
-func (c osxCollator) Key(s Input) []byte ***REMOVED***
+func (c osxCollator) Key(s Input) []byte {
 	return nil // sort keys not supported by OS X CoreFoundation
-***REMOVED***
+}
 
-type osx8Collator struct ***REMOVED***
+type osx8Collator struct {
 	osxCollator
-***REMOVED***
+}
 
-type osx16Collator struct ***REMOVED***
+type osx16Collator struct {
 	osxCollator
-***REMOVED***
+}
 
-func (c osx16Collator) Compare(a, b Input) int ***REMOVED***
+func (c osx16Collator) Compare(a, b Input) int {
 	sa := C.CFStringCreateWithCharactersNoCopy(
 		C.kCFAllocatorDefault,
 		osxCharP(a.UTF16),
@@ -87,9 +87,9 @@ func (c osx16Collator) Compare(a, b Input) int ***REMOVED***
 	)
 	_range := C.CFRangeMake(0, C.CFStringGetLength(sa))
 	return int(C.CFStringCompareWithOptionsAndLocale(sa, sb, _range, c.opt, c.loc))
-***REMOVED***
+}
 
-func (c osx8Collator) Compare(a, b Input) int ***REMOVED***
+func (c osx8Collator) Compare(a, b Input) int {
 	sa := C.CFStringCreateWithBytesNoCopy(
 		C.kCFAllocatorDefault,
 		osxUInt8P(a.UTF8),
@@ -108,4 +108,4 @@ func (c osx8Collator) Compare(a, b Input) int ***REMOVED***
 	)
 	_range := C.CFRangeMake(0, C.CFStringGetLength(sa))
 	return int(C.CFStringCompareWithOptionsAndLocale(sa, sb, _range, c.opt, c.loc))
-***REMOVED***
+}

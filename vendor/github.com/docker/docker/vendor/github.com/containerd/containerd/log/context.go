@@ -19,27 +19,27 @@ var (
 )
 
 type (
-	loggerKey struct***REMOVED******REMOVED***
-	moduleKey struct***REMOVED******REMOVED***
+	loggerKey struct{}
+	moduleKey struct{}
 )
 
 // WithLogger returns a new context with the provided logger. Use in
 // combination with logger.WithField(s) for great effect.
-func WithLogger(ctx context.Context, logger *logrus.Entry) context.Context ***REMOVED***
-	return context.WithValue(ctx, loggerKey***REMOVED******REMOVED***, logger)
-***REMOVED***
+func WithLogger(ctx context.Context, logger *logrus.Entry) context.Context {
+	return context.WithValue(ctx, loggerKey{}, logger)
+}
 
 // GetLogger retrieves the current logger from the context. If no logger is
 // available, the default logger is returned.
-func GetLogger(ctx context.Context) *logrus.Entry ***REMOVED***
-	logger := ctx.Value(loggerKey***REMOVED******REMOVED***)
+func GetLogger(ctx context.Context) *logrus.Entry {
+	logger := ctx.Value(loggerKey{})
 
-	if logger == nil ***REMOVED***
+	if logger == nil {
 		return L
-	***REMOVED***
+	}
 
 	return logger.(*logrus.Entry)
-***REMOVED***
+}
 
 // WithModule adds the module to the context, appending it with a slash if a
 // module already exists. A module is just an roughly correlated defined by the
@@ -53,29 +53,29 @@ func GetLogger(ctx context.Context) *logrus.Entry ***REMOVED***
 // same, a new module entry will not be created. If the new module and old
 // older module are the same but separated by other modules, the cycle will be
 // represented by the module path.
-func WithModule(ctx context.Context, module string) context.Context ***REMOVED***
+func WithModule(ctx context.Context, module string) context.Context {
 	parent := GetModulePath(ctx)
 
-	if parent != "" ***REMOVED***
+	if parent != "" {
 		// don't re-append module when module is the same.
-		if path.Base(parent) == module ***REMOVED***
+		if path.Base(parent) == module {
 			return ctx
-		***REMOVED***
+		}
 
 		module = path.Join(parent, module)
-	***REMOVED***
+	}
 
 	ctx = WithLogger(ctx, GetLogger(ctx).WithField("module", module))
-	return context.WithValue(ctx, moduleKey***REMOVED******REMOVED***, module)
-***REMOVED***
+	return context.WithValue(ctx, moduleKey{}, module)
+}
 
 // GetModulePath returns the module path for the provided context. If no module
 // is set, an empty string is returned.
-func GetModulePath(ctx context.Context) string ***REMOVED***
-	module := ctx.Value(moduleKey***REMOVED******REMOVED***)
-	if module == nil ***REMOVED***
+func GetModulePath(ctx context.Context) string {
+	module := ctx.Value(moduleKey{})
+	if module == nil {
 		return ""
-	***REMOVED***
+	}
 
 	return module.(string)
-***REMOVED***
+}

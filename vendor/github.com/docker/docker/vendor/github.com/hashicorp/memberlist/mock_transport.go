@@ -9,113 +9,113 @@ import (
 
 // MockNetwork is used as a factory that produces MockTransport instances which
 // are uniquely addressed and wired up to talk to each other.
-type MockNetwork struct ***REMOVED***
+type MockNetwork struct {
 	transports map[string]*MockTransport
 	port       int
-***REMOVED***
+}
 
 // NewTransport returns a new MockTransport with a unique address, wired up to
 // talk to the other transports in the MockNetwork.
-func (n *MockNetwork) NewTransport() *MockTransport ***REMOVED***
+func (n *MockNetwork) NewTransport() *MockTransport {
 	n.port += 1
 	addr := fmt.Sprintf("127.0.0.1:%d", n.port)
-	transport := &MockTransport***REMOVED***
+	transport := &MockTransport{
 		net:      n,
-		addr:     &MockAddress***REMOVED***addr***REMOVED***,
+		addr:     &MockAddress{addr},
 		packetCh: make(chan *Packet),
 		streamCh: make(chan net.Conn),
-	***REMOVED***
+	}
 
-	if n.transports == nil ***REMOVED***
+	if n.transports == nil {
 		n.transports = make(map[string]*MockTransport)
-	***REMOVED***
+	}
 	n.transports[addr] = transport
 	return transport
-***REMOVED***
+}
 
 // MockAddress is a wrapper which adds the net.Addr interface to our mock
 // address scheme.
-type MockAddress struct ***REMOVED***
+type MockAddress struct {
 	addr string
-***REMOVED***
+}
 
 // See net.Addr.
-func (a *MockAddress) Network() string ***REMOVED***
+func (a *MockAddress) Network() string {
 	return "mock"
-***REMOVED***
+}
 
 // See net.Addr.
-func (a *MockAddress) String() string ***REMOVED***
+func (a *MockAddress) String() string {
 	return a.addr
-***REMOVED***
+}
 
 // MockTransport directly plumbs messages to other transports its MockNetwork.
-type MockTransport struct ***REMOVED***
+type MockTransport struct {
 	net      *MockNetwork
 	addr     *MockAddress
 	packetCh chan *Packet
 	streamCh chan net.Conn
-***REMOVED***
+}
 
 // See Transport.
-func (t *MockTransport) FinalAdvertiseAddr(string, int) (net.IP, int, error) ***REMOVED***
+func (t *MockTransport) FinalAdvertiseAddr(string, int) (net.IP, int, error) {
 	host, portStr, err := net.SplitHostPort(t.addr.String())
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, 0, err
-	***REMOVED***
+	}
 
 	ip := net.ParseIP(host)
-	if ip == nil ***REMOVED***
+	if ip == nil {
 		return nil, 0, fmt.Errorf("Failed to parse IP %q", host)
-	***REMOVED***
+	}
 
 	port, err := strconv.ParseInt(portStr, 10, 16)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, 0, err
-	***REMOVED***
+	}
 
 	return ip, int(port), nil
-***REMOVED***
+}
 
 // See Transport.
-func (t *MockTransport) WriteTo(b []byte, addr string) (time.Time, error) ***REMOVED***
+func (t *MockTransport) WriteTo(b []byte, addr string) (time.Time, error) {
 	dest, ok := t.net.transports[addr]
-	if !ok ***REMOVED***
-		return time.Time***REMOVED******REMOVED***, fmt.Errorf("No route to %q", addr)
-	***REMOVED***
+	if !ok {
+		return time.Time{}, fmt.Errorf("No route to %q", addr)
+	}
 
 	now := time.Now()
-	dest.packetCh <- &Packet***REMOVED***
+	dest.packetCh <- &Packet{
 		Buf:       b,
 		From:      t.addr,
 		Timestamp: now,
-	***REMOVED***
+	}
 	return now, nil
-***REMOVED***
+}
 
 // See Transport.
-func (t *MockTransport) PacketCh() <-chan *Packet ***REMOVED***
+func (t *MockTransport) PacketCh() <-chan *Packet {
 	return t.packetCh
-***REMOVED***
+}
 
 // See Transport.
-func (t *MockTransport) DialTimeout(addr string, timeout time.Duration) (net.Conn, error) ***REMOVED***
+func (t *MockTransport) DialTimeout(addr string, timeout time.Duration) (net.Conn, error) {
 	dest, ok := t.net.transports[addr]
-	if !ok ***REMOVED***
+	if !ok {
 		return nil, fmt.Errorf("No route to %q", addr)
-	***REMOVED***
+	}
 
 	p1, p2 := net.Pipe()
 	dest.streamCh <- p1
 	return p2, nil
-***REMOVED***
+}
 
 // See Transport.
-func (t *MockTransport) StreamCh() <-chan net.Conn ***REMOVED***
+func (t *MockTransport) StreamCh() <-chan net.Conn {
 	return t.streamCh
-***REMOVED***
+}
 
 // See Transport.
-func (t *MockTransport) Shutdown() error ***REMOVED***
+func (t *MockTransport) Shutdown() error {
 	return nil
-***REMOVED***
+}

@@ -31,7 +31,7 @@ func mul(dest, a, b *[5]uint64)
 func square(out, in *[5]uint64)
 
 // mladder uses a Montgomery ladder to calculate (xr/zr) *= s.
-func mladder(xr, zr *[5]uint64, s *[32]byte) ***REMOVED***
+func mladder(xr, zr *[5]uint64, s *[32]byte) {
 	var work [5][5]uint64
 
 	work[0] = *xr
@@ -43,23 +43,23 @@ func mladder(xr, zr *[5]uint64, s *[32]byte) ***REMOVED***
 	j := uint(6)
 	var prevbit byte
 
-	for i := 31; i >= 0; i-- ***REMOVED***
-		for j < 8 ***REMOVED***
+	for i := 31; i >= 0; i-- {
+		for j < 8 {
 			bit := ((*s)[i] >> j) & 1
 			swap := bit ^ prevbit
 			prevbit = bit
 			cswap(&work[1], uint64(swap))
 			ladderstep(&work)
 			j--
-		***REMOVED***
+		}
 		j = 7
-	***REMOVED***
+	}
 
 	*xr = work[1]
 	*zr = work[2]
-***REMOVED***
+}
 
-func scalarMult(out, in, base *[32]byte) ***REMOVED***
+func scalarMult(out, in, base *[32]byte) {
 	var e [32]byte
 	copy(e[:], (*in)[:])
 	e[0] &= 248
@@ -72,19 +72,19 @@ func scalarMult(out, in, base *[32]byte) ***REMOVED***
 	invert(&z, &z)
 	mul(&t, &t, &z)
 	pack(out, &t)
-***REMOVED***
+}
 
-func setint(r *[5]uint64, v uint64) ***REMOVED***
+func setint(r *[5]uint64, v uint64) {
 	r[0] = v
 	r[1] = 0
 	r[2] = 0
 	r[3] = 0
 	r[4] = 0
-***REMOVED***
+}
 
 // unpack sets r = x where r consists of 5, 51-bit limbs in little-endian
 // order.
-func unpack(r *[5]uint64, x *[32]byte) ***REMOVED***
+func unpack(r *[5]uint64, x *[32]byte) {
 	r[0] = uint64(x[0]) |
 		uint64(x[1])<<8 |
 		uint64(x[2])<<16 |
@@ -125,11 +125,11 @@ func unpack(r *[5]uint64, x *[32]byte) ***REMOVED***
 		uint64(x[29])<<28 |
 		uint64(x[30])<<36 |
 		uint64(x[31]&127)<<44
-***REMOVED***
+}
 
 // pack sets out = x where out is the usual, little-endian form of the 5,
 // 51-bit limbs in x.
-func pack(out *[32]byte, x *[5]uint64) ***REMOVED***
+func pack(out *[32]byte, x *[5]uint64) {
 	t := *x
 	freeze(&t)
 
@@ -173,10 +173,10 @@ func pack(out *[32]byte, x *[5]uint64) ***REMOVED***
 	out[29] = byte(t[4] >> 28)
 	out[30] = byte(t[4] >> 36)
 	out[31] = byte(t[4] >> 44)
-***REMOVED***
+}
 
 // invert calculates r = x^-1 mod p using Fermat's little theorem.
-func invert(r *[5]uint64, x *[5]uint64) ***REMOVED***
+func invert(r *[5]uint64, x *[5]uint64) {
 	var z2, z9, z11, z2_5_0, z2_10_0, z2_20_0, z2_50_0, z2_100_0, t [5]uint64
 
 	square(&z2, x)        /* 2 */
@@ -188,45 +188,45 @@ func invert(r *[5]uint64, x *[5]uint64) ***REMOVED***
 	mul(&z2_5_0, &t, &z9) /* 2^5 - 2^0 = 31 */
 
 	square(&t, &z2_5_0)      /* 2^6 - 2^1 */
-	for i := 1; i < 5; i++ ***REMOVED*** /* 2^20 - 2^10 */
+	for i := 1; i < 5; i++ { /* 2^20 - 2^10 */
 		square(&t, &t)
-	***REMOVED***
+	}
 	mul(&z2_10_0, &t, &z2_5_0) /* 2^10 - 2^0 */
 
 	square(&t, &z2_10_0)      /* 2^11 - 2^1 */
-	for i := 1; i < 10; i++ ***REMOVED*** /* 2^20 - 2^10 */
+	for i := 1; i < 10; i++ { /* 2^20 - 2^10 */
 		square(&t, &t)
-	***REMOVED***
+	}
 	mul(&z2_20_0, &t, &z2_10_0) /* 2^20 - 2^0 */
 
 	square(&t, &z2_20_0)      /* 2^21 - 2^1 */
-	for i := 1; i < 20; i++ ***REMOVED*** /* 2^40 - 2^20 */
+	for i := 1; i < 20; i++ { /* 2^40 - 2^20 */
 		square(&t, &t)
-	***REMOVED***
+	}
 	mul(&t, &t, &z2_20_0) /* 2^40 - 2^0 */
 
 	square(&t, &t)            /* 2^41 - 2^1 */
-	for i := 1; i < 10; i++ ***REMOVED*** /* 2^50 - 2^10 */
+	for i := 1; i < 10; i++ { /* 2^50 - 2^10 */
 		square(&t, &t)
-	***REMOVED***
+	}
 	mul(&z2_50_0, &t, &z2_10_0) /* 2^50 - 2^0 */
 
 	square(&t, &z2_50_0)      /* 2^51 - 2^1 */
-	for i := 1; i < 50; i++ ***REMOVED*** /* 2^100 - 2^50 */
+	for i := 1; i < 50; i++ { /* 2^100 - 2^50 */
 		square(&t, &t)
-	***REMOVED***
+	}
 	mul(&z2_100_0, &t, &z2_50_0) /* 2^100 - 2^0 */
 
 	square(&t, &z2_100_0)      /* 2^101 - 2^1 */
-	for i := 1; i < 100; i++ ***REMOVED*** /* 2^200 - 2^100 */
+	for i := 1; i < 100; i++ { /* 2^200 - 2^100 */
 		square(&t, &t)
-	***REMOVED***
+	}
 	mul(&t, &t, &z2_100_0) /* 2^200 - 2^0 */
 
 	square(&t, &t)            /* 2^201 - 2^1 */
-	for i := 1; i < 50; i++ ***REMOVED*** /* 2^250 - 2^50 */
+	for i := 1; i < 50; i++ { /* 2^250 - 2^50 */
 		square(&t, &t)
-	***REMOVED***
+	}
 	mul(&t, &t, &z2_50_0) /* 2^250 - 2^0 */
 
 	square(&t, &t) /* 2^251 - 2^1 */
@@ -237,4 +237,4 @@ func invert(r *[5]uint64, x *[5]uint64) ***REMOVED***
 
 	square(&t, &t)   /* 2^255 - 2^5 */
 	mul(r, &t, &z11) /* 2^255 - 21 */
-***REMOVED***
+}

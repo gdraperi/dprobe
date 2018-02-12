@@ -138,23 +138,23 @@ Sample Dump Output
 See the Dump example for details on the setup of the types and variables being
 shown here.
 
-	(main.Foo) ***REMOVED***
-	 unexportedField: (*main.Bar)(0xf84002e210)(***REMOVED***
+	(main.Foo) {
+	 unexportedField: (*main.Bar)(0xf84002e210)({
 	  flag: (main.Flag) flagTwo,
 	  data: (uintptr) <nil>
-	 ***REMOVED***),
-	 ExportedField: (map[interface ***REMOVED******REMOVED***]interface ***REMOVED******REMOVED***) (len=1) ***REMOVED***
+	 }),
+	 ExportedField: (map[interface {}]interface {}) (len=1) {
 	  (string) (len=3) "one": (bool) true
-	 ***REMOVED***
-	***REMOVED***
+	 }
+	}
 
 Byte (and uint8) arrays and slices are displayed uniquely like the hexdump -C
 command as shown.
-	([]uint8) (len=32 cap=32) ***REMOVED***
+	([]uint8) (len=32 cap=32) {
 	 00000000  11 12 13 14 15 16 17 18  19 1a 1b 1c 1d 1e 1f 20  |............... |
 	 00000010  21 22 23 24 25 26 27 28  29 2a 2b 2c 2d 2e 2f 30  |!"#$%&'()*+,-./0|
 	 00000020  31 32                                             |12|
-	***REMOVED***
+	}
 
 Custom Formatter
 
@@ -193,10 +193,10 @@ Double pointer to a uint8:
 	%#+v: (**uint8)(0xf8400420d0->0xf8400420c8)5
 
 Pointer to circular struct with a uint8 field and a pointer to itself:
-	  %v: <*>***REMOVED***1 <*><shown>***REMOVED***
-	 %+v: <*>(0xf84003e260)***REMOVED***ui8:1 c:<*>(0xf84003e260)<shown>***REMOVED***
-	 %#v: (*main.circular)***REMOVED***ui8:(uint8)1 c:(*main.circular)<shown>***REMOVED***
-	%#+v: (*main.circular)(0xf84003e260)***REMOVED***ui8:(uint8)1 c:(*main.circular)(0xf84003e260)<shown>***REMOVED***
+	  %v: <*>{1 <*><shown>}
+	 %+v: <*>(0xf84003e260){ui8:1 c:<*>(0xf84003e260)<shown>}
+	 %#v: (*main.circular){ui8:(uint8)1 c:(*main.circular)<shown>}
+	%#+v: (*main.circular)(0xf84003e260){ui8:(uint8)1 c:(*main.circular)(0xf84003e260)<shown>}
 
 See the Printf example for details on the setup of variables being shown
 here.

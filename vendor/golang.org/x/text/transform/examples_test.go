@@ -12,7 +12,7 @@ import (
 	"golang.org/x/text/unicode/norm"
 )
 
-func ExampleRemoveFunc() ***REMOVED***
+func ExampleRemoveFunc() {
 	input := []byte(`tschüß; до свидания`)
 
 	b := make([]byte, len(input))
@@ -21,9 +21,9 @@ func ExampleRemoveFunc() ***REMOVED***
 	n, _, _ := t.Transform(b, input, true)
 	fmt.Println(string(b[:n]))
 
-	t = transform.RemoveFunc(func(r rune) bool ***REMOVED***
+	t = transform.RemoveFunc(func(r rune) bool {
 		return !unicode.Is(unicode.Latin, r)
-	***REMOVED***)
+	})
 	n, _, _ = t.Transform(b, input, true)
 	fmt.Println(string(b[:n]))
 
@@ -34,4 +34,4 @@ func ExampleRemoveFunc() ***REMOVED***
 	// tschüß;досвидания
 	// tschüß
 	// tschuß
-***REMOVED***
+}

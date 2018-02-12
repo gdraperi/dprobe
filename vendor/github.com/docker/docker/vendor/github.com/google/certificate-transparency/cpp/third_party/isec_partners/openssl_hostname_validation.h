@@ -34,13 +34,13 @@ SOFTWARE.
  *
  */
 
-typedef enum ***REMOVED***
+typedef enum {
   MatchFound,
   MatchNotFound,
   NoSANPresent,
   MalformedCertificate,
   Error
-***REMOVED*** HostnameValidationResult;
+} HostnameValidationResult;
 
 /**
 * Validates the server's identity by looking for the expected hostname in the

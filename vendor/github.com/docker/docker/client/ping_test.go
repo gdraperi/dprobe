@@ -15,20 +15,20 @@ import (
 // can still grab API details, when set.
 // Some of this is just excercising the code paths to make sure there are no
 // panics.
-func TestPingFail(t *testing.T) ***REMOVED***
+func TestPingFail(t *testing.T) {
 	var withHeader bool
-	client := &Client***REMOVED***
-		client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-			resp := &http.Response***REMOVED***StatusCode: http.StatusInternalServerError***REMOVED***
-			if withHeader ***REMOVED***
-				resp.Header = http.Header***REMOVED******REMOVED***
+	client := &Client{
+		client: newMockClient(func(req *http.Request) (*http.Response, error) {
+			resp := &http.Response{StatusCode: http.StatusInternalServerError}
+			if withHeader {
+				resp.Header = http.Header{}
 				resp.Header.Set("API-Version", "awesome")
 				resp.Header.Set("Docker-Experimental", "true")
-			***REMOVED***
+			}
 			resp.Body = ioutil.NopCloser(strings.NewReader("some error with the server"))
 			return resp, nil
-		***REMOVED***),
-	***REMOVED***
+		}),
+	}
 
 	ping, err := client.Ping(context.Background())
 	assert.Error(t, err)
@@ -40,43 +40,43 @@ func TestPingFail(t *testing.T) ***REMOVED***
 	assert.Error(t, err)
 	assert.Equal(t, true, ping2.Experimental)
 	assert.Equal(t, "awesome", ping2.APIVersion)
-***REMOVED***
+}
 
 // TestPingWithError tests the case where there is a protocol error in the ping.
 // This test is mostly just testing that there are no panics in this code path.
-func TestPingWithError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
-		client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-			resp := &http.Response***REMOVED***StatusCode: http.StatusInternalServerError***REMOVED***
-			resp.Header = http.Header***REMOVED******REMOVED***
+func TestPingWithError(t *testing.T) {
+	client := &Client{
+		client: newMockClient(func(req *http.Request) (*http.Response, error) {
+			resp := &http.Response{StatusCode: http.StatusInternalServerError}
+			resp.Header = http.Header{}
 			resp.Header.Set("API-Version", "awesome")
 			resp.Header.Set("Docker-Experimental", "true")
 			resp.Body = ioutil.NopCloser(strings.NewReader("some error with the server"))
 			return resp, errors.New("some error")
-		***REMOVED***),
-	***REMOVED***
+		}),
+	}
 
 	ping, err := client.Ping(context.Background())
 	assert.Error(t, err)
 	assert.Equal(t, false, ping.Experimental)
 	assert.Equal(t, "", ping.APIVersion)
-***REMOVED***
+}
 
 // TestPingSuccess tests that we are able to get the expected API headers/ping
 // details on success.
-func TestPingSuccess(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
-		client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-			resp := &http.Response***REMOVED***StatusCode: http.StatusInternalServerError***REMOVED***
-			resp.Header = http.Header***REMOVED******REMOVED***
+func TestPingSuccess(t *testing.T) {
+	client := &Client{
+		client: newMockClient(func(req *http.Request) (*http.Response, error) {
+			resp := &http.Response{StatusCode: http.StatusInternalServerError}
+			resp.Header = http.Header{}
 			resp.Header.Set("API-Version", "awesome")
 			resp.Header.Set("Docker-Experimental", "true")
 			resp.Body = ioutil.NopCloser(strings.NewReader("some error with the server"))
 			return resp, nil
-		***REMOVED***),
-	***REMOVED***
+		}),
+	}
 	ping, err := client.Ping(context.Background())
 	assert.Error(t, err)
 	assert.Equal(t, true, ping.Experimental)
 	assert.Equal(t, "awesome", ping.APIVersion)
-***REMOVED***
+}

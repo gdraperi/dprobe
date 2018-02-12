@@ -9,34 +9,34 @@ import (
 	specs "github.com/opencontainers/runtime-spec/specs-go"
 )
 
-func NewNetCls(root string) *netclsController ***REMOVED***
-	return &netclsController***REMOVED***
+func NewNetCls(root string) *netclsController {
+	return &netclsController{
 		root: filepath.Join(root, string(NetCLS)),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type netclsController struct ***REMOVED***
+type netclsController struct {
 	root string
-***REMOVED***
+}
 
-func (n *netclsController) Name() Name ***REMOVED***
+func (n *netclsController) Name() Name {
 	return NetCLS
-***REMOVED***
+}
 
-func (n *netclsController) Path(path string) string ***REMOVED***
+func (n *netclsController) Path(path string) string {
 	return filepath.Join(n.root, path)
-***REMOVED***
+}
 
-func (n *netclsController) Create(path string, resources *specs.LinuxResources) error ***REMOVED***
-	if err := os.MkdirAll(n.Path(path), defaultDirPerm); err != nil ***REMOVED***
+func (n *netclsController) Create(path string, resources *specs.LinuxResources) error {
+	if err := os.MkdirAll(n.Path(path), defaultDirPerm); err != nil {
 		return err
-	***REMOVED***
-	if resources.Network != nil && resources.Network.ClassID != nil && *resources.Network.ClassID > 0 ***REMOVED***
+	}
+	if resources.Network != nil && resources.Network.ClassID != nil && *resources.Network.ClassID > 0 {
 		return ioutil.WriteFile(
 			filepath.Join(n.Path(path), "net_cls.classid"),
 			[]byte(strconv.FormatUint(uint64(*resources.Network.ClassID), 10)),
 			defaultFilePerm,
 		)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

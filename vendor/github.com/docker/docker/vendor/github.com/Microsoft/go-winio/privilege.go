@@ -45,158 +45,158 @@ var (
 )
 
 // PrivilegeError represents an error enabling privileges.
-type PrivilegeError struct ***REMOVED***
+type PrivilegeError struct {
 	privileges []uint64
-***REMOVED***
+}
 
-func (e *PrivilegeError) Error() string ***REMOVED***
+func (e *PrivilegeError) Error() string {
 	s := ""
-	if len(e.privileges) > 1 ***REMOVED***
+	if len(e.privileges) > 1 {
 		s = "Could not enable privileges "
-	***REMOVED*** else ***REMOVED***
+	} else {
 		s = "Could not enable privilege "
-	***REMOVED***
-	for i, p := range e.privileges ***REMOVED***
-		if i != 0 ***REMOVED***
+	}
+	for i, p := range e.privileges {
+		if i != 0 {
 			s += ", "
-		***REMOVED***
+		}
 		s += `"`
 		s += getPrivilegeName(p)
 		s += `"`
-	***REMOVED***
+	}
 	return s
-***REMOVED***
+}
 
 // RunWithPrivilege enables a single privilege for a function call.
-func RunWithPrivilege(name string, fn func() error) error ***REMOVED***
-	return RunWithPrivileges([]string***REMOVED***name***REMOVED***, fn)
-***REMOVED***
+func RunWithPrivilege(name string, fn func() error) error {
+	return RunWithPrivileges([]string{name}, fn)
+}
 
 // RunWithPrivileges enables privileges for a function call.
-func RunWithPrivileges(names []string, fn func() error) error ***REMOVED***
+func RunWithPrivileges(names []string, fn func() error) error {
 	privileges, err := mapPrivileges(names)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()
 	token, err := newThreadToken()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer releaseThreadToken(token)
 	err = adjustPrivileges(token, privileges, SE_PRIVILEGE_ENABLED)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return fn()
-***REMOVED***
+}
 
-func mapPrivileges(names []string) ([]uint64, error) ***REMOVED***
+func mapPrivileges(names []string) ([]uint64, error) {
 	var privileges []uint64
 	privNameMutex.Lock()
 	defer privNameMutex.Unlock()
-	for _, name := range names ***REMOVED***
+	for _, name := range names {
 		p, ok := privNames[name]
-		if !ok ***REMOVED***
+		if !ok {
 			err := lookupPrivilegeValue("", name, &p)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			privNames[name] = p
-		***REMOVED***
+		}
 		privileges = append(privileges, p)
-	***REMOVED***
+	}
 	return privileges, nil
-***REMOVED***
+}
 
 // EnableProcessPrivileges enables privileges globally for the process.
-func EnableProcessPrivileges(names []string) error ***REMOVED***
+func EnableProcessPrivileges(names []string) error {
 	return enableDisableProcessPrivilege(names, SE_PRIVILEGE_ENABLED)
-***REMOVED***
+}
 
 // DisableProcessPrivileges disables privileges globally for the process.
-func DisableProcessPrivileges(names []string) error ***REMOVED***
+func DisableProcessPrivileges(names []string) error {
 	return enableDisableProcessPrivilege(names, 0)
-***REMOVED***
+}
 
-func enableDisableProcessPrivilege(names []string, action uint32) error ***REMOVED***
+func enableDisableProcessPrivilege(names []string, action uint32) error {
 	privileges, err := mapPrivileges(names)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	p, _ := windows.GetCurrentProcess()
 	var token windows.Token
 	err = windows.OpenProcessToken(p, windows.TOKEN_ADJUST_PRIVILEGES|windows.TOKEN_QUERY, &token)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	defer token.Close()
 	return adjustPrivileges(token, privileges, action)
-***REMOVED***
+}
 
-func adjustPrivileges(token windows.Token, privileges []uint64, action uint32) error ***REMOVED***
+func adjustPrivileges(token windows.Token, privileges []uint64, action uint32) error {
 	var b bytes.Buffer
 	binary.Write(&b, binary.LittleEndian, uint32(len(privileges)))
-	for _, p := range privileges ***REMOVED***
+	for _, p := range privileges {
 		binary.Write(&b, binary.LittleEndian, p)
 		binary.Write(&b, binary.LittleEndian, action)
-	***REMOVED***
+	}
 	prevState := make([]byte, b.Len())
 	reqSize := uint32(0)
 	success, err := adjustTokenPrivileges(token, false, &b.Bytes()[0], uint32(len(prevState)), &prevState[0], &reqSize)
-	if !success ***REMOVED***
+	if !success {
 		return err
-	***REMOVED***
-	if err == ERROR_NOT_ALL_ASSIGNED ***REMOVED***
-		return &PrivilegeError***REMOVED***privileges***REMOVED***
-	***REMOVED***
+	}
+	if err == ERROR_NOT_ALL_ASSIGNED {
+		return &PrivilegeError{privileges}
+	}
 	return nil
-***REMOVED***
+}
 
-func getPrivilegeName(luid uint64) string ***REMOVED***
+func getPrivilegeName(luid uint64) string {
 	var nameBuffer [256]uint16
 	bufSize := uint32(len(nameBuffer))
 	err := lookupPrivilegeName("", &luid, &nameBuffer[0], &bufSize)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Sprintf("<unknown privilege %d>", luid)
-	***REMOVED***
+	}
 
 	var displayNameBuffer [256]uint16
 	displayBufSize := uint32(len(displayNameBuffer))
 	var langID uint32
 	err = lookupPrivilegeDisplayName("", &nameBuffer[0], &displayNameBuffer[0], &displayBufSize, &langID)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Sprintf("<unknown privilege %s>", string(utf16.Decode(nameBuffer[:bufSize])))
-	***REMOVED***
+	}
 
 	return string(utf16.Decode(displayNameBuffer[:displayBufSize]))
-***REMOVED***
+}
 
-func newThreadToken() (windows.Token, error) ***REMOVED***
+func newThreadToken() (windows.Token, error) {
 	err := impersonateSelf(securityImpersonation)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 
 	var token windows.Token
 	err = openThreadToken(getCurrentThread(), syscall.TOKEN_ADJUST_PRIVILEGES|syscall.TOKEN_QUERY, false, &token)
-	if err != nil ***REMOVED***
+	if err != nil {
 		rerr := revertToSelf()
-		if rerr != nil ***REMOVED***
+		if rerr != nil {
 			panic(rerr)
-		***REMOVED***
+		}
 		return 0, err
-	***REMOVED***
+	}
 	return token, nil
-***REMOVED***
+}
 
-func releaseThreadToken(h windows.Token) ***REMOVED***
+func releaseThreadToken(h windows.Token) {
 	err := revertToSelf()
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 	h.Close()
-***REMOVED***
+}

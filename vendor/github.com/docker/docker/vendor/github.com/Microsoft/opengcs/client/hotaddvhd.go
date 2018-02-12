@@ -13,30 +13,30 @@ import (
 // service-VM per host scenario. In order to do a graphdriver `Diff`, we hot-add the
 // sandbox to /mnt/<id> so that we can run `exportSandbox` inside the utility VM to
 // get a tar-stream of the sandboxes contents back to the daemon.
-func (config *Config) HotAddVhd(hostPath string, containerPath string, readOnly bool, mount bool) error ***REMOVED***
+func (config *Config) HotAddVhd(hostPath string, containerPath string, readOnly bool, mount bool) error {
 	logrus.Debugf("opengcs: HotAddVhd: %s: %s", hostPath, containerPath)
 
-	if config.Uvm == nil ***REMOVED***
+	if config.Uvm == nil {
 		return fmt.Errorf("cannot hot-add VHD as no utility VM is in configuration")
-	***REMOVED***
+	}
 
 	defer config.DebugGCS()
 
-	modification := &hcsshim.ResourceModificationRequestResponse***REMOVED***
+	modification := &hcsshim.ResourceModificationRequestResponse{
 		Resource: "MappedVirtualDisk",
-		Data: hcsshim.MappedVirtualDisk***REMOVED***
+		Data: hcsshim.MappedVirtualDisk{
 			HostPath:          hostPath,
 			ContainerPath:     containerPath,
 			CreateInUtilityVM: true,
 			ReadOnly:          readOnly,
 			AttachOnly:        !mount,
-		***REMOVED***,
+		},
 		Request: "Add",
-	***REMOVED***
+	}
 
-	if err := config.Uvm.Modify(modification); err != nil ***REMOVED***
+	if err := config.Uvm.Modify(modification); err != nil {
 		return fmt.Errorf("failed to modify utility VM configuration for hot-add: %s", err)
-	***REMOVED***
+	}
 	logrus.Debugf("opengcs: HotAddVhd: %s added successfully", hostPath)
 	return nil
-***REMOVED***
+}

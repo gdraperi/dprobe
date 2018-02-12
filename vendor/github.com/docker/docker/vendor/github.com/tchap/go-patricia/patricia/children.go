@@ -11,7 +11,7 @@ import (
 	"sort"
 )
 
-type childList interface ***REMOVED***
+type childList interface {
 	length() int
 	head() *Trie
 	add(child *Trie) childList
@@ -21,199 +21,199 @@ type childList interface ***REMOVED***
 	walk(prefix *Prefix, visitor VisitorFunc) error
 	print(w io.Writer, indent int)
 	total() int
-***REMOVED***
+}
 
 type tries []*Trie
 
-func (t tries) Len() int ***REMOVED***
+func (t tries) Len() int {
 	return len(t)
-***REMOVED***
+}
 
-func (t tries) Less(i, j int) bool ***REMOVED***
-	strings := sort.StringSlice***REMOVED***string(t[i].prefix), string(t[j].prefix)***REMOVED***
+func (t tries) Less(i, j int) bool {
+	strings := sort.StringSlice{string(t[i].prefix), string(t[j].prefix)}
 	return strings.Less(0, 1)
-***REMOVED***
+}
 
-func (t tries) Swap(i, j int) ***REMOVED***
+func (t tries) Swap(i, j int) {
 	t[i], t[j] = t[j], t[i]
-***REMOVED***
+}
 
-type sparseChildList struct ***REMOVED***
+type sparseChildList struct {
 	children tries
-***REMOVED***
+}
 
-func newSparseChildList(maxChildrenPerSparseNode int) childList ***REMOVED***
-	return &sparseChildList***REMOVED***
+func newSparseChildList(maxChildrenPerSparseNode int) childList {
+	return &sparseChildList{
 		children: make(tries, 0, maxChildrenPerSparseNode),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (list *sparseChildList) length() int ***REMOVED***
+func (list *sparseChildList) length() int {
 	return len(list.children)
-***REMOVED***
+}
 
-func (list *sparseChildList) head() *Trie ***REMOVED***
+func (list *sparseChildList) head() *Trie {
 	return list.children[0]
-***REMOVED***
+}
 
-func (list *sparseChildList) add(child *Trie) childList ***REMOVED***
+func (list *sparseChildList) add(child *Trie) childList {
 	// Search for an empty spot and insert the child if possible.
-	if len(list.children) != cap(list.children) ***REMOVED***
+	if len(list.children) != cap(list.children) {
 		list.children = append(list.children, child)
 		return list
-	***REMOVED***
+	}
 
 	// Otherwise we have to transform to the dense list type.
 	return newDenseChildList(list, child)
-***REMOVED***
+}
 
-func (list *sparseChildList) remove(b byte) ***REMOVED***
-	for i, node := range list.children ***REMOVED***
-		if node.prefix[0] == b ***REMOVED***
+func (list *sparseChildList) remove(b byte) {
+	for i, node := range list.children {
+		if node.prefix[0] == b {
 			list.children[i] = list.children[len(list.children)-1]
 			list.children[len(list.children)-1] = nil
 			list.children = list.children[:len(list.children)-1]
 			return
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// This is not supposed to be reached.
 	panic("removing non-existent child")
-***REMOVED***
+}
 
-func (list *sparseChildList) replace(b byte, child *Trie) ***REMOVED***
+func (list *sparseChildList) replace(b byte, child *Trie) {
 	// Make a consistency check.
-	if p0 := child.prefix[0]; p0 != b ***REMOVED***
+	if p0 := child.prefix[0]; p0 != b {
 		panic(fmt.Errorf("child prefix mismatch: %v != %v", p0, b))
-	***REMOVED***
+	}
 
 	// Seek the child and replace it.
-	for i, node := range list.children ***REMOVED***
-		if node.prefix[0] == b ***REMOVED***
+	for i, node := range list.children {
+		if node.prefix[0] == b {
 			list.children[i] = child
 			return
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (list *sparseChildList) next(b byte) *Trie ***REMOVED***
-	for _, child := range list.children ***REMOVED***
-		if child.prefix[0] == b ***REMOVED***
+func (list *sparseChildList) next(b byte) *Trie {
+	for _, child := range list.children {
+		if child.prefix[0] == b {
 			return child
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func (list *sparseChildList) walk(prefix *Prefix, visitor VisitorFunc) error ***REMOVED***
+func (list *sparseChildList) walk(prefix *Prefix, visitor VisitorFunc) error {
 
 	sort.Sort(list.children)
 
-	for _, child := range list.children ***REMOVED***
+	for _, child := range list.children {
 		*prefix = append(*prefix, child.prefix...)
-		if child.item != nil ***REMOVED***
+		if child.item != nil {
 			err := visitor(*prefix, child.item)
-			if err != nil ***REMOVED***
-				if err == SkipSubtree ***REMOVED***
+			if err != nil {
+				if err == SkipSubtree {
 					*prefix = (*prefix)[:len(*prefix)-len(child.prefix)]
 					continue
-				***REMOVED***
+				}
 				*prefix = (*prefix)[:len(*prefix)-len(child.prefix)]
 				return err
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		err := child.children.walk(prefix, visitor)
 		*prefix = (*prefix)[:len(*prefix)-len(child.prefix)]
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (list *sparseChildList) total() int ***REMOVED***
+func (list *sparseChildList) total() int {
 	tot := 0
-	for _, child := range list.children ***REMOVED***
-		if child != nil ***REMOVED***
+	for _, child := range list.children {
+		if child != nil {
 			tot = tot + child.total()
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return tot
-***REMOVED***
+}
 
-func (list *sparseChildList) print(w io.Writer, indent int) ***REMOVED***
-	for _, child := range list.children ***REMOVED***
-		if child != nil ***REMOVED***
+func (list *sparseChildList) print(w io.Writer, indent int) {
+	for _, child := range list.children {
+		if child != nil {
 			child.print(w, indent)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-type denseChildList struct ***REMOVED***
+type denseChildList struct {
 	min         int
 	max         int
 	numChildren int
 	headIndex   int
 	children    []*Trie
-***REMOVED***
+}
 
-func newDenseChildList(list *sparseChildList, child *Trie) childList ***REMOVED***
+func newDenseChildList(list *sparseChildList, child *Trie) childList {
 	var (
 		min int = 255
 		max int = 0
 	)
-	for _, child := range list.children ***REMOVED***
+	for _, child := range list.children {
 		b := int(child.prefix[0])
-		if b < min ***REMOVED***
+		if b < min {
 			min = b
-		***REMOVED***
-		if b > max ***REMOVED***
+		}
+		if b > max {
 			max = b
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	b := int(child.prefix[0])
-	if b < min ***REMOVED***
+	if b < min {
 		min = b
-	***REMOVED***
-	if b > max ***REMOVED***
+	}
+	if b > max {
 		max = b
-	***REMOVED***
+	}
 
 	children := make([]*Trie, max-min+1)
-	for _, child := range list.children ***REMOVED***
+	for _, child := range list.children {
 		children[int(child.prefix[0])-min] = child
-	***REMOVED***
+	}
 	children[int(child.prefix[0])-min] = child
 
-	return &denseChildList***REMOVED***
+	return &denseChildList{
 		min:         min,
 		max:         max,
 		numChildren: list.length() + 1,
 		headIndex:   0,
 		children:    children,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (list *denseChildList) length() int ***REMOVED***
+func (list *denseChildList) length() int {
 	return list.numChildren
-***REMOVED***
+}
 
-func (list *denseChildList) head() *Trie ***REMOVED***
+func (list *denseChildList) head() *Trie {
 	return list.children[list.headIndex]
-***REMOVED***
+}
 
-func (list *denseChildList) add(child *Trie) childList ***REMOVED***
+func (list *denseChildList) add(child *Trie) childList {
 	b := int(child.prefix[0])
 	var i int
 
-	switch ***REMOVED***
+	switch {
 	case list.min <= b && b <= list.max:
-		if list.children[b-list.min] != nil ***REMOVED***
+		if list.children[b-list.min] != nil {
 			panic("dense child list collision detected")
-		***REMOVED***
+		}
 		i = b - list.min
 		list.children[i] = child
 
@@ -232,94 +232,94 @@ func (list *denseChildList) add(child *Trie) childList ***REMOVED***
 		copy(children, list.children)
 		list.children = children
 		list.max = b
-	***REMOVED***
+	}
 
 	list.numChildren++
-	if i < list.headIndex ***REMOVED***
+	if i < list.headIndex {
 		list.headIndex = i
-	***REMOVED***
+	}
 	return list
-***REMOVED***
+}
 
-func (list *denseChildList) remove(b byte) ***REMOVED***
+func (list *denseChildList) remove(b byte) {
 	i := int(b) - list.min
-	if list.children[i] == nil ***REMOVED***
+	if list.children[i] == nil {
 		// This is not supposed to be reached.
 		panic("removing non-existent child")
-	***REMOVED***
+	}
 	list.numChildren--
 	list.children[i] = nil
 
 	// Update head index.
-	if i == list.headIndex ***REMOVED***
-		for ; i < len(list.children); i++ ***REMOVED***
-			if list.children[i] != nil ***REMOVED***
+	if i == list.headIndex {
+		for ; i < len(list.children); i++ {
+			if list.children[i] != nil {
 				list.headIndex = i
 				return
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}
 
-func (list *denseChildList) replace(b byte, child *Trie) ***REMOVED***
+func (list *denseChildList) replace(b byte, child *Trie) {
 	// Make a consistency check.
-	if p0 := child.prefix[0]; p0 != b ***REMOVED***
+	if p0 := child.prefix[0]; p0 != b {
 		panic(fmt.Errorf("child prefix mismatch: %v != %v", p0, b))
-	***REMOVED***
+	}
 
 	// Replace the child.
 	list.children[int(b)-list.min] = child
-***REMOVED***
+}
 
-func (list *denseChildList) next(b byte) *Trie ***REMOVED***
+func (list *denseChildList) next(b byte) *Trie {
 	i := int(b)
-	if i < list.min || list.max < i ***REMOVED***
+	if i < list.min || list.max < i {
 		return nil
-	***REMOVED***
+	}
 	return list.children[i-list.min]
-***REMOVED***
+}
 
-func (list *denseChildList) walk(prefix *Prefix, visitor VisitorFunc) error ***REMOVED***
-	for _, child := range list.children ***REMOVED***
-		if child == nil ***REMOVED***
+func (list *denseChildList) walk(prefix *Prefix, visitor VisitorFunc) error {
+	for _, child := range list.children {
+		if child == nil {
 			continue
-		***REMOVED***
+		}
 		*prefix = append(*prefix, child.prefix...)
-		if child.item != nil ***REMOVED***
-			if err := visitor(*prefix, child.item); err != nil ***REMOVED***
-				if err == SkipSubtree ***REMOVED***
+		if child.item != nil {
+			if err := visitor(*prefix, child.item); err != nil {
+				if err == SkipSubtree {
 					*prefix = (*prefix)[:len(*prefix)-len(child.prefix)]
 					continue
-				***REMOVED***
+				}
 				*prefix = (*prefix)[:len(*prefix)-len(child.prefix)]
 				return err
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		err := child.children.walk(prefix, visitor)
 		*prefix = (*prefix)[:len(*prefix)-len(child.prefix)]
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (list *denseChildList) print(w io.Writer, indent int) ***REMOVED***
-	for _, child := range list.children ***REMOVED***
-		if child != nil ***REMOVED***
+func (list *denseChildList) print(w io.Writer, indent int) {
+	for _, child := range list.children {
+		if child != nil {
 			child.print(w, indent)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (list *denseChildList) total() int ***REMOVED***
+func (list *denseChildList) total() int {
 	tot := 0
-	for _, child := range list.children ***REMOVED***
-		if child != nil ***REMOVED***
+	for _, child := range list.children {
+		if child != nil {
 			tot = tot + child.total()
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return tot
-***REMOVED***
+}

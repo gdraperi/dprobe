@@ -1,3 +1,3 @@
 foo="bar"
-bar="$***REMOVED***file("bing/bong.txt")***REMOVED***"
+bar="${file("bing/bong.txt")}"
 foo-bar="baz"

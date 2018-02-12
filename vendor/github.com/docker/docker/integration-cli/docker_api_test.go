@@ -14,13 +14,13 @@ import (
 	"github.com/go-check/check"
 )
 
-func (s *DockerSuite) TestAPIOptionsRoute(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestAPIOptionsRoute(c *check.C) {
 	resp, _, err := request.Do("/", request.Method(http.MethodOptions))
 	c.Assert(err, checker.IsNil)
 	c.Assert(resp.StatusCode, checker.Equals, http.StatusOK)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestAPIGetEnabledCORS(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestAPIGetEnabledCORS(c *check.C) {
 	res, body, err := request.Get("/version")
 	c.Assert(err, checker.IsNil)
 	c.Assert(res.StatusCode, checker.Equals, http.StatusOK)
@@ -30,15 +30,15 @@ func (s *DockerSuite) TestAPIGetEnabledCORS(c *check.C) ***REMOVED***
 	//c.Log(res.Header)
 	//c.Assert(res.Header.Get("Access-Control-Allow-Origin"), check.Equals, "*")
 	//c.Assert(res.Header.Get("Access-Control-Allow-Headers"), check.Equals, "Origin, X-Requested-With, Content-Type, Accept, X-Registry-Auth")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestAPIClientVersionOldNotSupported(c *check.C) ***REMOVED***
-	if testEnv.OSType != runtime.GOOS ***REMOVED***
+func (s *DockerSuite) TestAPIClientVersionOldNotSupported(c *check.C) {
+	if testEnv.OSType != runtime.GOOS {
 		c.Skip("Daemon platform doesn't match test platform")
-	***REMOVED***
-	if api.MinVersion == api.DefaultVersion ***REMOVED***
+	}
+	if api.MinVersion == api.DefaultVersion {
 		c.Skip("API MinVersion==DefaultVersion")
-	***REMOVED***
+	}
 	v := strings.Split(api.MinVersion, ".")
 	vMinInt, err := strconv.Atoi(v[1])
 	c.Assert(err, checker.IsNil)
@@ -54,32 +54,32 @@ func (s *DockerSuite) TestAPIClientVersionOldNotSupported(c *check.C) ***REMOVED
 	content, err := ioutil.ReadAll(body)
 	c.Assert(err, checker.IsNil)
 	c.Assert(strings.TrimSpace(string(content)), checker.Contains, expected)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestAPIErrorJSON(c *check.C) ***REMOVED***
-	httpResp, body, err := request.Post("/containers/create", request.JSONBody(struct***REMOVED******REMOVED******REMOVED******REMOVED***))
+func (s *DockerSuite) TestAPIErrorJSON(c *check.C) {
+	httpResp, body, err := request.Post("/containers/create", request.JSONBody(struct{}{}))
 	c.Assert(err, checker.IsNil)
 	c.Assert(httpResp.StatusCode, checker.Equals, http.StatusBadRequest)
 	c.Assert(httpResp.Header.Get("Content-Type"), checker.Equals, "application/json")
 	b, err := request.ReadBody(body)
 	c.Assert(err, checker.IsNil)
 	c.Assert(getErrorMessage(c, b), checker.Equals, "Config cannot be empty in order to create a container")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestAPIErrorPlainText(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestAPIErrorPlainText(c *check.C) {
 	// Windows requires API 1.25 or later. This test is validating a behaviour which was present
 	// in v1.23, but changed in 1.24, hence not applicable on Windows. See apiVersionSupportsJSONErrors
 	testRequires(c, DaemonIsLinux)
-	httpResp, body, err := request.Post("/v1.23/containers/create", request.JSONBody(struct***REMOVED******REMOVED******REMOVED******REMOVED***))
+	httpResp, body, err := request.Post("/v1.23/containers/create", request.JSONBody(struct{}{}))
 	c.Assert(err, checker.IsNil)
 	c.Assert(httpResp.StatusCode, checker.Equals, http.StatusBadRequest)
 	c.Assert(httpResp.Header.Get("Content-Type"), checker.Contains, "text/plain")
 	b, err := request.ReadBody(body)
 	c.Assert(err, checker.IsNil)
 	c.Assert(strings.TrimSpace(string(b)), checker.Equals, "Config cannot be empty in order to create a container")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestAPIErrorNotFoundJSON(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestAPIErrorNotFoundJSON(c *check.C) {
 	// 404 is a different code path to normal errors, so test separately
 	httpResp, body, err := request.Get("/notfound", request.JSON)
 	c.Assert(err, checker.IsNil)
@@ -88,9 +88,9 @@ func (s *DockerSuite) TestAPIErrorNotFoundJSON(c *check.C) ***REMOVED***
 	b, err := request.ReadBody(body)
 	c.Assert(err, checker.IsNil)
 	c.Assert(getErrorMessage(c, b), checker.Equals, "page not found")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestAPIErrorNotFoundPlainText(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestAPIErrorNotFoundPlainText(c *check.C) {
 	httpResp, body, err := request.Get("/v1.23/notfound", request.JSON)
 	c.Assert(err, checker.IsNil)
 	c.Assert(httpResp.StatusCode, checker.Equals, http.StatusNotFound)
@@ -98,4 +98,4 @@ func (s *DockerSuite) TestAPIErrorNotFoundPlainText(c *check.C) ***REMOVED***
 	b, err := request.ReadBody(body)
 	c.Assert(err, checker.IsNil)
 	c.Assert(strings.TrimSpace(string(b)), checker.Equals, "page not found")
-***REMOVED***
+}

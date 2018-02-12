@@ -8,6 +8,6 @@ package pipeline
 
 import "testing"
 
-func init() ***REMOVED***
+func init() {
 	setHelper = (*testing.T).Helper
-***REMOVED***
+}

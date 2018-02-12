@@ -21,58 +21,58 @@ package atom // import "golang.org/x/net/html/atom"
 type Atom uint32
 
 // String returns the atom's name.
-func (a Atom) String() string ***REMOVED***
+func (a Atom) String() string {
 	start := uint32(a >> 8)
 	n := uint32(a & 0xff)
-	if start+n > uint32(len(atomText)) ***REMOVED***
+	if start+n > uint32(len(atomText)) {
 		return ""
-	***REMOVED***
+	}
 	return atomText[start : start+n]
-***REMOVED***
+}
 
-func (a Atom) string() string ***REMOVED***
+func (a Atom) string() string {
 	return atomText[a>>8 : a>>8+a&0xff]
-***REMOVED***
+}
 
 // fnv computes the FNV hash with an arbitrary starting value h.
-func fnv(h uint32, s []byte) uint32 ***REMOVED***
-	for i := range s ***REMOVED***
+func fnv(h uint32, s []byte) uint32 {
+	for i := range s {
 		h ^= uint32(s[i])
 		h *= 16777619
-	***REMOVED***
+	}
 	return h
-***REMOVED***
+}
 
-func match(s string, t []byte) bool ***REMOVED***
-	for i, c := range t ***REMOVED***
-		if s[i] != c ***REMOVED***
+func match(s string, t []byte) bool {
+	for i, c := range t {
+		if s[i] != c {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}
 
 // Lookup returns the atom whose name is s. It returns zero if there is no
 // such atom. The lookup is case sensitive.
-func Lookup(s []byte) Atom ***REMOVED***
-	if len(s) == 0 || len(s) > maxAtomLen ***REMOVED***
+func Lookup(s []byte) Atom {
+	if len(s) == 0 || len(s) > maxAtomLen {
 		return 0
-	***REMOVED***
+	}
 	h := fnv(hash0, s)
-	if a := table[h&uint32(len(table)-1)]; int(a&0xff) == len(s) && match(a.string(), s) ***REMOVED***
+	if a := table[h&uint32(len(table)-1)]; int(a&0xff) == len(s) && match(a.string(), s) {
 		return a
-	***REMOVED***
-	if a := table[(h>>16)&uint32(len(table)-1)]; int(a&0xff) == len(s) && match(a.string(), s) ***REMOVED***
+	}
+	if a := table[(h>>16)&uint32(len(table)-1)]; int(a&0xff) == len(s) && match(a.string(), s) {
 		return a
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
 // String returns a string whose contents are equal to s. In that sense, it is
 // equivalent to string(s) but may be more efficient.
-func String(s []byte) string ***REMOVED***
-	if a := Lookup(s); a != 0 ***REMOVED***
+func String(s []byte) string {
+	if a := Lookup(s); a != 0 {
 		return a.String()
-	***REMOVED***
+	}
 	return string(s)
-***REMOVED***
+}

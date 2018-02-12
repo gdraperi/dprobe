@@ -15,90 +15,90 @@ var (
 	nodesMetric metrics.LabeledGauge
 )
 
-func init() ***REMOVED***
+func init() {
 	nodesMetric = ns.NewLabeledGauge("nodes", "The number of nodes", "", "state")
-	for _, state := range api.NodeStatus_State_name ***REMOVED***
+	for _, state := range api.NodeStatus_State_name {
 		nodesMetric.WithValues(strings.ToLower(state)).Set(0)
-	***REMOVED***
+	}
 	metrics.Register(ns)
-***REMOVED***
+}
 
 // Collector collects swarmkit metrics
-type Collector struct ***REMOVED***
+type Collector struct {
 	store *store.MemoryStore
 
 	// stopChan signals to the state machine to stop running.
-	stopChan chan struct***REMOVED******REMOVED***
+	stopChan chan struct{}
 	// doneChan is closed when the state machine terminates.
-	doneChan chan struct***REMOVED******REMOVED***
-***REMOVED***
+	doneChan chan struct{}
+}
 
 // NewCollector creates a new metrics collector
-func NewCollector(store *store.MemoryStore) *Collector ***REMOVED***
-	return &Collector***REMOVED***
+func NewCollector(store *store.MemoryStore) *Collector {
+	return &Collector{
 		store:    store,
-		stopChan: make(chan struct***REMOVED******REMOVED***),
-		doneChan: make(chan struct***REMOVED******REMOVED***),
-	***REMOVED***
-***REMOVED***
+		stopChan: make(chan struct{}),
+		doneChan: make(chan struct{}),
+	}
+}
 
-func (c *Collector) updateNodeState(prevNode, newNode *api.Node) ***REMOVED***
+func (c *Collector) updateNodeState(prevNode, newNode *api.Node) {
 	// Skip updates if nothing changed.
-	if prevNode != nil && newNode != nil && prevNode.Status.State == newNode.Status.State ***REMOVED***
+	if prevNode != nil && newNode != nil && prevNode.Status.State == newNode.Status.State {
 		return
-	***REMOVED***
+	}
 
-	if prevNode != nil ***REMOVED***
+	if prevNode != nil {
 		nodesMetric.WithValues(strings.ToLower(prevNode.Status.State.String())).Dec(1)
-	***REMOVED***
-	if newNode != nil ***REMOVED***
+	}
+	if newNode != nil {
 		nodesMetric.WithValues(strings.ToLower(newNode.Status.State.String())).Inc(1)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Run contains the collector event loop
-func (c *Collector) Run(ctx context.Context) error ***REMOVED***
+func (c *Collector) Run(ctx context.Context) error {
 	defer close(c.doneChan)
 
-	watcher, cancel, err := store.ViewAndWatch(c.store, func(readTx store.ReadTx) error ***REMOVED***
+	watcher, cancel, err := store.ViewAndWatch(c.store, func(readTx store.ReadTx) error {
 		nodes, err := store.FindNodes(readTx, store.All)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-		for _, node := range nodes ***REMOVED***
+		}
+		for _, node := range nodes {
 			c.updateNodeState(nil, node)
-		***REMOVED***
+		}
 		return nil
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer cancel()
 
-	for ***REMOVED***
-		select ***REMOVED***
+	for {
+		select {
 		case event := <-watcher:
-			switch v := event.(type) ***REMOVED***
+			switch v := event.(type) {
 			case api.EventCreateNode:
 				c.updateNodeState(nil, v.Node)
 			case api.EventUpdateNode:
 				c.updateNodeState(v.OldNode, v.Node)
 			case api.EventDeleteNode:
 				c.updateNodeState(v.Node, nil)
-			***REMOVED***
+			}
 		case <-c.stopChan:
 			return nil
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // Stop stops the collector.
-func (c *Collector) Stop() ***REMOVED***
+func (c *Collector) Stop() {
 	close(c.stopChan)
 	<-c.doneChan
 
 	// Clean the metrics on exit.
-	for _, state := range api.NodeStatus_State_name ***REMOVED***
+	for _, state := range api.NodeStatus_State_name {
 		nodesMetric.WithValues(strings.ToLower(state)).Set(0)
-	***REMOVED***
-***REMOVED***
+	}
+}

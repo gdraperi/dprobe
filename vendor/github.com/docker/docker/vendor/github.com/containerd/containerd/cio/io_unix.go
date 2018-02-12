@@ -16,111 +16,111 @@ import (
 )
 
 // NewFIFOSetInDir returns a new FIFOSet with paths in a temporary directory under root
-func NewFIFOSetInDir(root, id string, terminal bool) (*FIFOSet, error) ***REMOVED***
-	if root != "" ***REMOVED***
-		if err := os.MkdirAll(root, 0700); err != nil ***REMOVED***
+func NewFIFOSetInDir(root, id string, terminal bool) (*FIFOSet, error) {
+	if root != "" {
+		if err := os.MkdirAll(root, 0700); err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	dir, err := ioutil.TempDir(root, "")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	closer := func() error ***REMOVED***
+	}
+	closer := func() error {
 		return os.RemoveAll(dir)
-	***REMOVED***
-	return NewFIFOSet(Config***REMOVED***
+	}
+	return NewFIFOSet(Config{
 		Stdin:    filepath.Join(dir, id+"-stdin"),
 		Stdout:   filepath.Join(dir, id+"-stdout"),
 		Stderr:   filepath.Join(dir, id+"-stderr"),
 		Terminal: terminal,
-	***REMOVED***, closer), nil
-***REMOVED***
+	}, closer), nil
+}
 
-func copyIO(fifos *FIFOSet, ioset *Streams) (*cio, error) ***REMOVED***
+func copyIO(fifos *FIFOSet, ioset *Streams) (*cio, error) {
 	var ctx, cancel = context.WithCancel(context.Background())
 	pipes, err := openFifos(ctx, fifos)
-	if err != nil ***REMOVED***
+	if err != nil {
 		cancel()
 		return nil, err
-	***REMOVED***
+	}
 
-	if fifos.Stdin != "" ***REMOVED***
-		go func() ***REMOVED***
+	if fifos.Stdin != "" {
+		go func() {
 			io.Copy(pipes.Stdin, ioset.Stdin)
 			pipes.Stdin.Close()
-		***REMOVED***()
-	***REMOVED***
+		}()
+	}
 
-	var wg = &sync.WaitGroup***REMOVED******REMOVED***
+	var wg = &sync.WaitGroup{}
 	wg.Add(1)
-	go func() ***REMOVED***
+	go func() {
 		io.Copy(ioset.Stdout, pipes.Stdout)
 		pipes.Stdout.Close()
 		wg.Done()
-	***REMOVED***()
+	}()
 
-	if !fifos.Terminal ***REMOVED***
+	if !fifos.Terminal {
 		wg.Add(1)
-		go func() ***REMOVED***
+		go func() {
 			io.Copy(ioset.Stderr, pipes.Stderr)
 			pipes.Stderr.Close()
 			wg.Done()
-		***REMOVED***()
-	***REMOVED***
-	return &cio***REMOVED***
+		}()
+	}
+	return &cio{
 		config:  fifos.Config,
 		wg:      wg,
 		closers: append(pipes.closers(), fifos),
 		cancel:  cancel,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-func openFifos(ctx context.Context, fifos *FIFOSet) (pipes, error) ***REMOVED***
+func openFifos(ctx context.Context, fifos *FIFOSet) (pipes, error) {
 	var err error
-	defer func() ***REMOVED***
-		if err != nil ***REMOVED***
+	defer func() {
+		if err != nil {
 			fifos.Close()
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
 	var f pipes
-	if fifos.Stdin != "" ***REMOVED***
-		if f.Stdin, err = fifo.OpenFifo(ctx, fifos.Stdin, syscall.O_WRONLY|syscall.O_CREAT|syscall.O_NONBLOCK, 0700); err != nil ***REMOVED***
+	if fifos.Stdin != "" {
+		if f.Stdin, err = fifo.OpenFifo(ctx, fifos.Stdin, syscall.O_WRONLY|syscall.O_CREAT|syscall.O_NONBLOCK, 0700); err != nil {
 			return f, errors.Wrapf(err, "failed to open stdin fifo")
-		***REMOVED***
-	***REMOVED***
-	if fifos.Stdout != "" ***REMOVED***
-		if f.Stdout, err = fifo.OpenFifo(ctx, fifos.Stdout, syscall.O_RDONLY|syscall.O_CREAT|syscall.O_NONBLOCK, 0700); err != nil ***REMOVED***
+		}
+	}
+	if fifos.Stdout != "" {
+		if f.Stdout, err = fifo.OpenFifo(ctx, fifos.Stdout, syscall.O_RDONLY|syscall.O_CREAT|syscall.O_NONBLOCK, 0700); err != nil {
 			f.Stdin.Close()
 			return f, errors.Wrapf(err, "failed to open stdout fifo")
-		***REMOVED***
-	***REMOVED***
-	if fifos.Stderr != "" ***REMOVED***
-		if f.Stderr, err = fifo.OpenFifo(ctx, fifos.Stderr, syscall.O_RDONLY|syscall.O_CREAT|syscall.O_NONBLOCK, 0700); err != nil ***REMOVED***
+		}
+	}
+	if fifos.Stderr != "" {
+		if f.Stderr, err = fifo.OpenFifo(ctx, fifos.Stderr, syscall.O_RDONLY|syscall.O_CREAT|syscall.O_NONBLOCK, 0700); err != nil {
 			f.Stdin.Close()
 			f.Stdout.Close()
 			return f, errors.Wrapf(err, "failed to open stderr fifo")
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return f, nil
-***REMOVED***
+}
 
 // NewDirectIO returns an IO implementation that exposes the IO streams as io.ReadCloser
 // and io.WriteCloser.
-func NewDirectIO(ctx context.Context, fifos *FIFOSet) (*DirectIO, error) ***REMOVED***
+func NewDirectIO(ctx context.Context, fifos *FIFOSet) (*DirectIO, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	pipes, err := openFifos(ctx, fifos)
-	return &DirectIO***REMOVED***
+	return &DirectIO{
 		pipes: pipes,
-		cio: cio***REMOVED***
+		cio: cio{
 			config:  fifos.Config,
 			closers: append(pipes.closers(), fifos),
 			cancel:  cancel,
-		***REMOVED***,
-	***REMOVED***, err
-***REMOVED***
+		},
+	}, err
+}
 
-func (p *pipes) closers() []io.Closer ***REMOVED***
-	return []io.Closer***REMOVED***p.Stdin, p.Stdout, p.Stderr***REMOVED***
-***REMOVED***
+func (p *pipes) closers() []io.Closer {
+	return []io.Closer{p.Stdin, p.Stdout, p.Stderr}
+}

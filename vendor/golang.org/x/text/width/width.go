@@ -71,80 +71,80 @@ var trie = newWidthTrie(0)
 
 // Lookup reports the Properties of the first rune in b and the number of bytes
 // of its UTF-8 encoding.
-func Lookup(b []byte) (p Properties, size int) ***REMOVED***
+func Lookup(b []byte) (p Properties, size int) {
 	v, sz := trie.lookup(b)
-	return Properties***REMOVED***elem(v), b[sz-1]***REMOVED***, sz
-***REMOVED***
+	return Properties{elem(v), b[sz-1]}, sz
+}
 
 // LookupString reports the Properties of the first rune in s and the number of
 // bytes of its UTF-8 encoding.
-func LookupString(s string) (p Properties, size int) ***REMOVED***
+func LookupString(s string) (p Properties, size int) {
 	v, sz := trie.lookupString(s)
-	return Properties***REMOVED***elem(v), s[sz-1]***REMOVED***, sz
-***REMOVED***
+	return Properties{elem(v), s[sz-1]}, sz
+}
 
 // LookupRune reports the Properties of rune r.
-func LookupRune(r rune) Properties ***REMOVED***
+func LookupRune(r rune) Properties {
 	var buf [4]byte
 	n := utf8.EncodeRune(buf[:], r)
 	v, _ := trie.lookup(buf[:n])
 	last := byte(r)
-	if r >= utf8.RuneSelf ***REMOVED***
+	if r >= utf8.RuneSelf {
 		last = 0x80 + byte(r&0x3f)
-	***REMOVED***
-	return Properties***REMOVED***elem(v), last***REMOVED***
-***REMOVED***
+	}
+	return Properties{elem(v), last}
+}
 
 // Properties provides access to width properties of a rune.
-type Properties struct ***REMOVED***
+type Properties struct {
 	elem elem
 	last byte
-***REMOVED***
+}
 
-func (e elem) kind() Kind ***REMOVED***
+func (e elem) kind() Kind {
 	return Kind(e >> typeShift)
-***REMOVED***
+}
 
 // Kind returns the Kind of a rune as defined in Unicode TR #11.
 // See http://unicode.org/reports/tr11/ for more details.
-func (p Properties) Kind() Kind ***REMOVED***
+func (p Properties) Kind() Kind {
 	return p.elem.kind()
-***REMOVED***
+}
 
 // Folded returns the folded variant of a rune or 0 if the rune is canonical.
-func (p Properties) Folded() rune ***REMOVED***
-	if p.elem&tagNeedsFold != 0 ***REMOVED***
+func (p Properties) Folded() rune {
+	if p.elem&tagNeedsFold != 0 {
 		buf := inverseData[byte(p.elem)]
 		buf[buf[0]] ^= p.last
 		r, _ := utf8.DecodeRune(buf[1 : 1+buf[0]])
 		return r
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
 // Narrow returns the narrow variant of a rune or 0 if the rune is already
 // narrow or doesn't have a narrow variant.
-func (p Properties) Narrow() rune ***REMOVED***
-	if k := p.elem.kind(); byte(p.elem) != 0 && (k == EastAsianFullwidth || k == EastAsianWide || k == EastAsianAmbiguous) ***REMOVED***
+func (p Properties) Narrow() rune {
+	if k := p.elem.kind(); byte(p.elem) != 0 && (k == EastAsianFullwidth || k == EastAsianWide || k == EastAsianAmbiguous) {
 		buf := inverseData[byte(p.elem)]
 		buf[buf[0]] ^= p.last
 		r, _ := utf8.DecodeRune(buf[1 : 1+buf[0]])
 		return r
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
 // Wide returns the wide variant of a rune or 0 if the rune is already
 // wide or doesn't have a wide variant.
-func (p Properties) Wide() rune ***REMOVED***
-	if k := p.elem.kind(); byte(p.elem) != 0 && (k == EastAsianHalfwidth || k == EastAsianNarrow) ***REMOVED***
+func (p Properties) Wide() rune {
+	if k := p.elem.kind(); byte(p.elem) != 0 && (k == EastAsianHalfwidth || k == EastAsianNarrow) {
 		buf := inverseData[byte(p.elem)]
 		buf[buf[0]] ^= p.last
 		r, _ := utf8.DecodeRune(buf[1 : 1+buf[0]])
 		return r
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
 // TODO for Properties:
 // - Add Fullwidth/Halfwidth or Inverted methods for computing variants
@@ -152,49 +152,49 @@ func (p Properties) Wide() rune ***REMOVED***
 // - Add width information (including information on non-spacing runes).
 
 // Transformer implements the transform.Transformer interface.
-type Transformer struct ***REMOVED***
+type Transformer struct {
 	t transform.SpanningTransformer
-***REMOVED***
+}
 
 // Reset implements the transform.Transformer interface.
-func (t Transformer) Reset() ***REMOVED*** t.t.Reset() ***REMOVED***
+func (t Transformer) Reset() { t.t.Reset() }
 
 // Transform implements the transform.Transformer interface.
-func (t Transformer) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) ***REMOVED***
+func (t Transformer) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) {
 	return t.t.Transform(dst, src, atEOF)
-***REMOVED***
+}
 
 // Span implements the transform.SpanningTransformer interface.
-func (t Transformer) Span(src []byte, atEOF bool) (n int, err error) ***REMOVED***
+func (t Transformer) Span(src []byte, atEOF bool) (n int, err error) {
 	return t.t.Span(src, atEOF)
-***REMOVED***
+}
 
 // Bytes returns a new byte slice with the result of applying t to b.
-func (t Transformer) Bytes(b []byte) []byte ***REMOVED***
+func (t Transformer) Bytes(b []byte) []byte {
 	b, _, _ = transform.Bytes(t, b)
 	return b
-***REMOVED***
+}
 
 // String returns a string with the result of applying t to s.
-func (t Transformer) String(s string) string ***REMOVED***
+func (t Transformer) String(s string) string {
 	s, _, _ = transform.String(t, s)
 	return s
-***REMOVED***
+}
 
 var (
 	// Fold is a transform that maps all runes to their canonical width.
 	//
 	// Note that the NFKC and NFKD transforms in golang.org/x/text/unicode/norm
 	// provide a more generic folding mechanism.
-	Fold Transformer = Transformer***REMOVED***foldTransform***REMOVED******REMOVED******REMOVED***
+	Fold Transformer = Transformer{foldTransform{}}
 
 	// Widen is a transform that maps runes to their wide variant, if
 	// available.
-	Widen Transformer = Transformer***REMOVED***wideTransform***REMOVED******REMOVED******REMOVED***
+	Widen Transformer = Transformer{wideTransform{}}
 
 	// Narrow is a transform that maps runes to their narrow variant, if
 	// available.
-	Narrow Transformer = Transformer***REMOVED***narrowTransform***REMOVED******REMOVED******REMOVED***
+	Narrow Transformer = Transformer{narrowTransform{}}
 )
 
 // TODO: Consider the following options:

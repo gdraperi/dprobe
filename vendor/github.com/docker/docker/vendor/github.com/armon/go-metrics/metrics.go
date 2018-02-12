@@ -5,111 +5,111 @@ import (
 	"time"
 )
 
-func (m *Metrics) SetGauge(key []string, val float32) ***REMOVED***
-	if m.HostName != "" && m.EnableHostname ***REMOVED***
+func (m *Metrics) SetGauge(key []string, val float32) {
+	if m.HostName != "" && m.EnableHostname {
 		key = insert(0, m.HostName, key)
-	***REMOVED***
-	if m.EnableTypePrefix ***REMOVED***
+	}
+	if m.EnableTypePrefix {
 		key = insert(0, "gauge", key)
-	***REMOVED***
-	if m.ServiceName != "" ***REMOVED***
+	}
+	if m.ServiceName != "" {
 		key = insert(0, m.ServiceName, key)
-	***REMOVED***
+	}
 	m.sink.SetGauge(key, val)
-***REMOVED***
+}
 
-func (m *Metrics) EmitKey(key []string, val float32) ***REMOVED***
-	if m.EnableTypePrefix ***REMOVED***
+func (m *Metrics) EmitKey(key []string, val float32) {
+	if m.EnableTypePrefix {
 		key = insert(0, "kv", key)
-	***REMOVED***
-	if m.ServiceName != "" ***REMOVED***
+	}
+	if m.ServiceName != "" {
 		key = insert(0, m.ServiceName, key)
-	***REMOVED***
+	}
 	m.sink.EmitKey(key, val)
-***REMOVED***
+}
 
-func (m *Metrics) IncrCounter(key []string, val float32) ***REMOVED***
-	if m.EnableTypePrefix ***REMOVED***
+func (m *Metrics) IncrCounter(key []string, val float32) {
+	if m.EnableTypePrefix {
 		key = insert(0, "counter", key)
-	***REMOVED***
-	if m.ServiceName != "" ***REMOVED***
+	}
+	if m.ServiceName != "" {
 		key = insert(0, m.ServiceName, key)
-	***REMOVED***
+	}
 	m.sink.IncrCounter(key, val)
-***REMOVED***
+}
 
-func (m *Metrics) AddSample(key []string, val float32) ***REMOVED***
-	if m.EnableTypePrefix ***REMOVED***
+func (m *Metrics) AddSample(key []string, val float32) {
+	if m.EnableTypePrefix {
 		key = insert(0, "sample", key)
-	***REMOVED***
-	if m.ServiceName != "" ***REMOVED***
+	}
+	if m.ServiceName != "" {
 		key = insert(0, m.ServiceName, key)
-	***REMOVED***
+	}
 	m.sink.AddSample(key, val)
-***REMOVED***
+}
 
-func (m *Metrics) MeasureSince(key []string, start time.Time) ***REMOVED***
-	if m.EnableTypePrefix ***REMOVED***
+func (m *Metrics) MeasureSince(key []string, start time.Time) {
+	if m.EnableTypePrefix {
 		key = insert(0, "timer", key)
-	***REMOVED***
-	if m.ServiceName != "" ***REMOVED***
+	}
+	if m.ServiceName != "" {
 		key = insert(0, m.ServiceName, key)
-	***REMOVED***
+	}
 	now := time.Now()
 	elapsed := now.Sub(start)
 	msec := float32(elapsed.Nanoseconds()) / float32(m.TimerGranularity)
 	m.sink.AddSample(key, msec)
-***REMOVED***
+}
 
 // Periodically collects runtime stats to publish
-func (m *Metrics) collectStats() ***REMOVED***
-	for ***REMOVED***
+func (m *Metrics) collectStats() {
+	for {
 		time.Sleep(m.ProfileInterval)
 		m.emitRuntimeStats()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Emits various runtime statsitics
-func (m *Metrics) emitRuntimeStats() ***REMOVED***
+func (m *Metrics) emitRuntimeStats() {
 	// Export number of Goroutines
 	numRoutines := runtime.NumGoroutine()
-	m.SetGauge([]string***REMOVED***"runtime", "num_goroutines"***REMOVED***, float32(numRoutines))
+	m.SetGauge([]string{"runtime", "num_goroutines"}, float32(numRoutines))
 
 	// Export memory stats
 	var stats runtime.MemStats
 	runtime.ReadMemStats(&stats)
-	m.SetGauge([]string***REMOVED***"runtime", "alloc_bytes"***REMOVED***, float32(stats.Alloc))
-	m.SetGauge([]string***REMOVED***"runtime", "sys_bytes"***REMOVED***, float32(stats.Sys))
-	m.SetGauge([]string***REMOVED***"runtime", "malloc_count"***REMOVED***, float32(stats.Mallocs))
-	m.SetGauge([]string***REMOVED***"runtime", "free_count"***REMOVED***, float32(stats.Frees))
-	m.SetGauge([]string***REMOVED***"runtime", "heap_objects"***REMOVED***, float32(stats.HeapObjects))
-	m.SetGauge([]string***REMOVED***"runtime", "total_gc_pause_ns"***REMOVED***, float32(stats.PauseTotalNs))
-	m.SetGauge([]string***REMOVED***"runtime", "total_gc_runs"***REMOVED***, float32(stats.NumGC))
+	m.SetGauge([]string{"runtime", "alloc_bytes"}, float32(stats.Alloc))
+	m.SetGauge([]string{"runtime", "sys_bytes"}, float32(stats.Sys))
+	m.SetGauge([]string{"runtime", "malloc_count"}, float32(stats.Mallocs))
+	m.SetGauge([]string{"runtime", "free_count"}, float32(stats.Frees))
+	m.SetGauge([]string{"runtime", "heap_objects"}, float32(stats.HeapObjects))
+	m.SetGauge([]string{"runtime", "total_gc_pause_ns"}, float32(stats.PauseTotalNs))
+	m.SetGauge([]string{"runtime", "total_gc_runs"}, float32(stats.NumGC))
 
 	// Export info about the last few GC runs
 	num := stats.NumGC
 
 	// Handle wrap around
-	if num < m.lastNumGC ***REMOVED***
+	if num < m.lastNumGC {
 		m.lastNumGC = 0
-	***REMOVED***
+	}
 
 	// Ensure we don't scan more than 256
-	if num-m.lastNumGC >= 256 ***REMOVED***
+	if num-m.lastNumGC >= 256 {
 		m.lastNumGC = num - 255
-	***REMOVED***
+	}
 
-	for i := m.lastNumGC; i < num; i++ ***REMOVED***
+	for i := m.lastNumGC; i < num; i++ {
 		pause := stats.PauseNs[i%256]
-		m.AddSample([]string***REMOVED***"runtime", "gc_pause_ns"***REMOVED***, float32(pause))
-	***REMOVED***
+		m.AddSample([]string{"runtime", "gc_pause_ns"}, float32(pause))
+	}
 	m.lastNumGC = num
-***REMOVED***
+}
 
 // Inserts a string value at an index into the slice
-func insert(i int, v string, s []string) []string ***REMOVED***
+func insert(i int, v string, s []string) []string {
 	s = append(s, "")
 	copy(s[i+1:], s[i:])
 	s[i] = v
 	return s
-***REMOVED***
+}

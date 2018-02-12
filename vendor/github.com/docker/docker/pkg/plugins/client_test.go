@@ -21,214 +21,214 @@ var (
 	server *httptest.Server
 )
 
-func setupRemotePluginServer() string ***REMOVED***
+func setupRemotePluginServer() string {
 	mux = http.NewServeMux()
 	server = httptest.NewServer(mux)
 	return server.URL
-***REMOVED***
+}
 
-func teardownRemotePluginServer() ***REMOVED***
-	if server != nil ***REMOVED***
+func teardownRemotePluginServer() {
+	if server != nil {
 		server.Close()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestFailedConnection(t *testing.T) ***REMOVED***
-	c, _ := NewClient("tcp://127.0.0.1:1", &tlsconfig.Options***REMOVED***InsecureSkipVerify: true***REMOVED***)
+func TestFailedConnection(t *testing.T) {
+	c, _ := NewClient("tcp://127.0.0.1:1", &tlsconfig.Options{InsecureSkipVerify: true})
 	_, err := c.callWithRetry("Service.Method", nil, false)
-	if err == nil ***REMOVED***
+	if err == nil {
 		t.Fatal("Unexpected successful connection")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestFailOnce(t *testing.T) ***REMOVED***
+func TestFailOnce(t *testing.T) {
 	addr := setupRemotePluginServer()
 	defer teardownRemotePluginServer()
 
 	failed := false
-	mux.HandleFunc("/Test.FailOnce", func(w http.ResponseWriter, r *http.Request) ***REMOVED***
-		if !failed ***REMOVED***
+	mux.HandleFunc("/Test.FailOnce", func(w http.ResponseWriter, r *http.Request) {
+		if !failed {
 			failed = true
 			panic("Plugin not ready")
-		***REMOVED***
-	***REMOVED***)
+		}
+	})
 
-	c, _ := NewClient(addr, &tlsconfig.Options***REMOVED***InsecureSkipVerify: true***REMOVED***)
+	c, _ := NewClient(addr, &tlsconfig.Options{InsecureSkipVerify: true})
 	b := strings.NewReader("body")
 	_, err := c.callWithRetry("Test.FailOnce", b, true)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestEchoInputOutput(t *testing.T) ***REMOVED***
+func TestEchoInputOutput(t *testing.T) {
 	addr := setupRemotePluginServer()
 	defer teardownRemotePluginServer()
 
-	m := Manifest***REMOVED***[]string***REMOVED***"VolumeDriver", "NetworkDriver"***REMOVED******REMOVED***
+	m := Manifest{[]string{"VolumeDriver", "NetworkDriver"}}
 
-	mux.HandleFunc("/Test.Echo", func(w http.ResponseWriter, r *http.Request) ***REMOVED***
-		if r.Method != "POST" ***REMOVED***
+	mux.HandleFunc("/Test.Echo", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
 			t.Fatalf("Expected POST, got %s\n", r.Method)
-		***REMOVED***
+		}
 
 		header := w.Header()
 		header.Set("Content-Type", transport.VersionMimetype)
 
 		io.Copy(w, r.Body)
-	***REMOVED***)
+	})
 
-	c, _ := NewClient(addr, &tlsconfig.Options***REMOVED***InsecureSkipVerify: true***REMOVED***)
+	c, _ := NewClient(addr, &tlsconfig.Options{InsecureSkipVerify: true})
 	var output Manifest
 	err := c.Call("Test.Echo", m, &output)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	assert.Equal(t, m, output)
 	err = c.Call("Test.Echo", nil, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestBackoff(t *testing.T) ***REMOVED***
-	cases := []struct ***REMOVED***
+func TestBackoff(t *testing.T) {
+	cases := []struct {
 		retries    int
 		expTimeOff time.Duration
-	***REMOVED******REMOVED***
-		***REMOVED***0, time.Duration(1)***REMOVED***,
-		***REMOVED***1, time.Duration(2)***REMOVED***,
-		***REMOVED***2, time.Duration(4)***REMOVED***,
-		***REMOVED***4, time.Duration(16)***REMOVED***,
-		***REMOVED***6, time.Duration(30)***REMOVED***,
-		***REMOVED***10, time.Duration(30)***REMOVED***,
-	***REMOVED***
+	}{
+		{0, time.Duration(1)},
+		{1, time.Duration(2)},
+		{2, time.Duration(4)},
+		{4, time.Duration(16)},
+		{6, time.Duration(30)},
+		{10, time.Duration(30)},
+	}
 
-	for _, c := range cases ***REMOVED***
+	for _, c := range cases {
 		s := c.expTimeOff * time.Second
-		if d := backoff(c.retries); d != s ***REMOVED***
+		if d := backoff(c.retries); d != s {
 			t.Fatalf("Retry %v, expected %v, was %v\n", c.retries, s, d)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestAbortRetry(t *testing.T) ***REMOVED***
-	cases := []struct ***REMOVED***
+func TestAbortRetry(t *testing.T) {
+	cases := []struct {
 		timeOff  time.Duration
 		expAbort bool
-	***REMOVED******REMOVED***
-		***REMOVED***time.Duration(1), false***REMOVED***,
-		***REMOVED***time.Duration(2), false***REMOVED***,
-		***REMOVED***time.Duration(10), false***REMOVED***,
-		***REMOVED***time.Duration(30), true***REMOVED***,
-		***REMOVED***time.Duration(40), true***REMOVED***,
-	***REMOVED***
+	}{
+		{time.Duration(1), false},
+		{time.Duration(2), false},
+		{time.Duration(10), false},
+		{time.Duration(30), true},
+		{time.Duration(40), true},
+	}
 
-	for _, c := range cases ***REMOVED***
+	for _, c := range cases {
 		s := c.timeOff * time.Second
-		if a := abort(time.Now(), s); a != c.expAbort ***REMOVED***
+		if a := abort(time.Now(), s); a != c.expAbort {
 			t.Fatalf("Duration %v, expected %v, was %v\n", c.timeOff, s, a)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestClientScheme(t *testing.T) ***REMOVED***
-	cases := map[string]string***REMOVED***
+func TestClientScheme(t *testing.T) {
+	cases := map[string]string{
 		"tcp://127.0.0.1:8080":          "http",
 		"unix:///usr/local/plugins/foo": "http",
 		"http://127.0.0.1:8080":         "http",
 		"https://127.0.0.1:8080":        "https",
-	***REMOVED***
+	}
 
-	for addr, scheme := range cases ***REMOVED***
+	for addr, scheme := range cases {
 		u, err := url.Parse(addr)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
+		}
 		s := httpScheme(u)
 
-		if s != scheme ***REMOVED***
+		if s != scheme {
 			t.Fatalf("URL scheme mismatch, expected %s, got %s", scheme, s)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestNewClientWithTimeout(t *testing.T) ***REMOVED***
+func TestNewClientWithTimeout(t *testing.T) {
 	addr := setupRemotePluginServer()
 	defer teardownRemotePluginServer()
 
-	m := Manifest***REMOVED***[]string***REMOVED***"VolumeDriver", "NetworkDriver"***REMOVED******REMOVED***
+	m := Manifest{[]string{"VolumeDriver", "NetworkDriver"}}
 
-	mux.HandleFunc("/Test.Echo", func(w http.ResponseWriter, r *http.Request) ***REMOVED***
+	mux.HandleFunc("/Test.Echo", func(w http.ResponseWriter, r *http.Request) {
 		time.Sleep(time.Duration(600) * time.Millisecond)
 		io.Copy(w, r.Body)
-	***REMOVED***)
+	})
 
 	// setting timeout of 500ms
 	timeout := time.Duration(500) * time.Millisecond
-	c, _ := NewClientWithTimeout(addr, &tlsconfig.Options***REMOVED***InsecureSkipVerify: true***REMOVED***, timeout)
+	c, _ := NewClientWithTimeout(addr, &tlsconfig.Options{InsecureSkipVerify: true}, timeout)
 	var output Manifest
 	err := c.Call("Test.Echo", m, &output)
-	if err == nil ***REMOVED***
+	if err == nil {
 		t.Fatal("Expected timeout error")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestClientStream(t *testing.T) ***REMOVED***
+func TestClientStream(t *testing.T) {
 	addr := setupRemotePluginServer()
 	defer teardownRemotePluginServer()
 
-	m := Manifest***REMOVED***[]string***REMOVED***"VolumeDriver", "NetworkDriver"***REMOVED******REMOVED***
+	m := Manifest{[]string{"VolumeDriver", "NetworkDriver"}}
 	var output Manifest
 
-	mux.HandleFunc("/Test.Echo", func(w http.ResponseWriter, r *http.Request) ***REMOVED***
-		if r.Method != "POST" ***REMOVED***
+	mux.HandleFunc("/Test.Echo", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
 			t.Fatalf("Expected POST, got %s", r.Method)
-		***REMOVED***
+		}
 
 		header := w.Header()
 		header.Set("Content-Type", transport.VersionMimetype)
 
 		io.Copy(w, r.Body)
-	***REMOVED***)
+	})
 
-	c, _ := NewClient(addr, &tlsconfig.Options***REMOVED***InsecureSkipVerify: true***REMOVED***)
+	c, _ := NewClient(addr, &tlsconfig.Options{InsecureSkipVerify: true})
 	body, err := c.Stream("Test.Echo", m)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	defer body.Close()
-	if err := json.NewDecoder(body).Decode(&output); err != nil ***REMOVED***
+	if err := json.NewDecoder(body).Decode(&output); err != nil {
 		t.Fatalf("Test.Echo: error reading plugin resp: %v", err)
-	***REMOVED***
+	}
 	assert.Equal(t, m, output)
-***REMOVED***
+}
 
-func TestClientSendFile(t *testing.T) ***REMOVED***
+func TestClientSendFile(t *testing.T) {
 	addr := setupRemotePluginServer()
 	defer teardownRemotePluginServer()
 
-	m := Manifest***REMOVED***[]string***REMOVED***"VolumeDriver", "NetworkDriver"***REMOVED******REMOVED***
+	m := Manifest{[]string{"VolumeDriver", "NetworkDriver"}}
 	var output Manifest
 	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(m); err != nil ***REMOVED***
+	if err := json.NewEncoder(&buf).Encode(m); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	mux.HandleFunc("/Test.Echo", func(w http.ResponseWriter, r *http.Request) ***REMOVED***
-		if r.Method != "POST" ***REMOVED***
+	}
+	mux.HandleFunc("/Test.Echo", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
 			t.Fatalf("Expected POST, got %s\n", r.Method)
-		***REMOVED***
+		}
 
 		header := w.Header()
 		header.Set("Content-Type", transport.VersionMimetype)
 
 		io.Copy(w, r.Body)
-	***REMOVED***)
+	})
 
-	c, _ := NewClient(addr, &tlsconfig.Options***REMOVED***InsecureSkipVerify: true***REMOVED***)
-	if err := c.SendFile("Test.Echo", &buf, &output); err != nil ***REMOVED***
+	c, _ := NewClient(addr, &tlsconfig.Options{InsecureSkipVerify: true})
+	if err := c.SendFile("Test.Echo", &buf, &output); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	assert.Equal(t, m, output)
-***REMOVED***
+}

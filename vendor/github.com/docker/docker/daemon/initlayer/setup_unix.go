@@ -17,11 +17,11 @@ import (
 //
 // This extra layer is used by all containers as the top-most ro layer. It protects
 // the container from unwanted side-effects on the rw layer.
-func Setup(initLayerFs containerfs.ContainerFS, rootIDs idtools.IDPair) error ***REMOVED***
+func Setup(initLayerFs containerfs.ContainerFS, rootIDs idtools.IDPair) error {
 	// Since all paths are local to the container, we can just extract initLayerFs.Path()
 	initLayer := initLayerFs.Path()
 
-	for pth, typ := range map[string]string***REMOVED***
+	for pth, typ := range map[string]string{
 		"/dev/pts":         "dir",
 		"/dev/shm":         "dir",
 		"/proc":            "dir",
@@ -32,42 +32,42 @@ func Setup(initLayerFs containerfs.ContainerFS, rootIDs idtools.IDPair) error **
 		"/etc/hostname":    "file",
 		"/dev/console":     "file",
 		"/etc/mtab":        "/proc/mounts",
-	***REMOVED*** ***REMOVED***
+	} {
 		parts := strings.Split(pth, "/")
 		prev := "/"
-		for _, p := range parts[1:] ***REMOVED***
+		for _, p := range parts[1:] {
 			prev = filepath.Join(prev, p)
 			unix.Unlink(filepath.Join(initLayer, prev))
-		***REMOVED***
+		}
 
-		if _, err := os.Stat(filepath.Join(initLayer, pth)); err != nil ***REMOVED***
-			if os.IsNotExist(err) ***REMOVED***
-				if err := idtools.MkdirAllAndChownNew(filepath.Join(initLayer, filepath.Dir(pth)), 0755, rootIDs); err != nil ***REMOVED***
+		if _, err := os.Stat(filepath.Join(initLayer, pth)); err != nil {
+			if os.IsNotExist(err) {
+				if err := idtools.MkdirAllAndChownNew(filepath.Join(initLayer, filepath.Dir(pth)), 0755, rootIDs); err != nil {
 					return err
-				***REMOVED***
-				switch typ ***REMOVED***
+				}
+				switch typ {
 				case "dir":
-					if err := idtools.MkdirAllAndChownNew(filepath.Join(initLayer, pth), 0755, rootIDs); err != nil ***REMOVED***
+					if err := idtools.MkdirAllAndChownNew(filepath.Join(initLayer, pth), 0755, rootIDs); err != nil {
 						return err
-					***REMOVED***
+					}
 				case "file":
 					f, err := os.OpenFile(filepath.Join(initLayer, pth), os.O_CREATE, 0755)
-					if err != nil ***REMOVED***
+					if err != nil {
 						return err
-					***REMOVED***
+					}
 					f.Chown(rootIDs.UID, rootIDs.GID)
 					f.Close()
 				default:
-					if err := os.Symlink(typ, filepath.Join(initLayer, pth)); err != nil ***REMOVED***
+					if err := os.Symlink(typ, filepath.Join(initLayer, pth)); err != nil {
 						return err
-					***REMOVED***
-				***REMOVED***
-			***REMOVED*** else ***REMOVED***
+					}
+				}
+			} else {
 				return err
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	// Layer is ready to use, if it wasn't before.
 	return nil
-***REMOVED***
+}

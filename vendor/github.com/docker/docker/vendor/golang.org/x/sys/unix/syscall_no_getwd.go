@@ -8,4 +8,4 @@ package unix
 
 const ImplementsGetwd = false
 
-func Getwd() (string, error) ***REMOVED*** return "", ENOTSUP ***REMOVED***
+func Getwd() (string, error) { return "", ENOTSUP }

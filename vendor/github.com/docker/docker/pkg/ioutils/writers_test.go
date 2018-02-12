@@ -6,42 +6,42 @@ import (
 	"testing"
 )
 
-func TestWriteCloserWrapperClose(t *testing.T) ***REMOVED***
+func TestWriteCloserWrapperClose(t *testing.T) {
 	called := false
-	writer := bytes.NewBuffer([]byte***REMOVED******REMOVED***)
-	wrapper := NewWriteCloserWrapper(writer, func() error ***REMOVED***
+	writer := bytes.NewBuffer([]byte{})
+	wrapper := NewWriteCloserWrapper(writer, func() error {
 		called = true
 		return nil
-	***REMOVED***)
-	if err := wrapper.Close(); err != nil ***REMOVED***
+	})
+	if err := wrapper.Close(); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if !called ***REMOVED***
+	}
+	if !called {
 		t.Fatalf("writeCloserWrapper should have call the anonymous function.")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestNopWriteCloser(t *testing.T) ***REMOVED***
-	writer := bytes.NewBuffer([]byte***REMOVED******REMOVED***)
+func TestNopWriteCloser(t *testing.T) {
+	writer := bytes.NewBuffer([]byte{})
 	wrapper := NopWriteCloser(writer)
-	if err := wrapper.Close(); err != nil ***REMOVED***
+	if err := wrapper.Close(); err != nil {
 		t.Fatal("NopWriteCloser always return nil on Close.")
-	***REMOVED***
+	}
 
-***REMOVED***
+}
 
-func TestNopWriter(t *testing.T) ***REMOVED***
-	nw := &NopWriter***REMOVED******REMOVED***
-	l, err := nw.Write([]byte***REMOVED***'c'***REMOVED***)
-	if err != nil ***REMOVED***
+func TestNopWriter(t *testing.T) {
+	nw := &NopWriter{}
+	l, err := nw.Write([]byte{'c'})
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if l != 1 ***REMOVED***
+	}
+	if l != 1 {
 		t.Fatalf("Expected 1 got %d", l)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestWriteCounter(t *testing.T) ***REMOVED***
+func TestWriteCounter(t *testing.T) {
 	dummy1 := "This is a dummy string."
 	dummy2 := "This is another dummy string."
 	totalLength := int64(len(dummy1) + len(dummy2))
@@ -55,11 +55,11 @@ func TestWriteCounter(t *testing.T) ***REMOVED***
 	reader1.WriteTo(wc)
 	reader2.WriteTo(wc)
 
-	if wc.Count != totalLength ***REMOVED***
+	if wc.Count != totalLength {
 		t.Errorf("Wrong count: %d vs. %d", wc.Count, totalLength)
-	***REMOVED***
+	}
 
-	if buffer.String() != dummy1+dummy2 ***REMOVED***
+	if buffer.String() != dummy1+dummy2 {
 		t.Error("Wrong message written")
-	***REMOVED***
-***REMOVED***
+	}
+}

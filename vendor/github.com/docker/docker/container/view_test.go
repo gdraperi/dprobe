@@ -14,101 +14,101 @@ import (
 
 var root string
 
-func TestMain(m *testing.M) ***REMOVED***
+func TestMain(m *testing.M) {
 	var err error
 	root, err = ioutil.TempDir("", "docker-container-test-")
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 	defer os.RemoveAll(root)
 
 	os.Exit(m.Run())
-***REMOVED***
+}
 
-func newContainer(t *testing.T) *Container ***REMOVED***
+func newContainer(t *testing.T) *Container {
 	var (
 		id    = uuid.New()
 		cRoot = filepath.Join(root, id)
 	)
-	if err := os.MkdirAll(cRoot, 0755); err != nil ***REMOVED***
+	if err := os.MkdirAll(cRoot, 0755); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	c := NewBaseContainer(id, cRoot)
-	c.HostConfig = &containertypes.HostConfig***REMOVED******REMOVED***
+	c.HostConfig = &containertypes.HostConfig{}
 	return c
-***REMOVED***
+}
 
-func TestViewSaveDelete(t *testing.T) ***REMOVED***
+func TestViewSaveDelete(t *testing.T) {
 	db, err := NewViewDB()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	c := newContainer(t)
-	if err := c.CheckpointTo(db); err != nil ***REMOVED***
+	if err := c.CheckpointTo(db); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if err := db.Delete(c); err != nil ***REMOVED***
+	}
+	if err := db.Delete(c); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestViewAll(t *testing.T) ***REMOVED***
+func TestViewAll(t *testing.T) {
 	var (
 		db, _ = NewViewDB()
 		one   = newContainer(t)
 		two   = newContainer(t)
 	)
 	one.Pid = 10
-	if err := one.CheckpointTo(db); err != nil ***REMOVED***
+	if err := one.CheckpointTo(db); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	two.Pid = 20
-	if err := two.CheckpointTo(db); err != nil ***REMOVED***
+	if err := two.CheckpointTo(db); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	all, err := db.Snapshot().All()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if l := len(all); l != 2 ***REMOVED***
+	}
+	if l := len(all); l != 2 {
 		t.Fatalf("expected 2 items, got %d", l)
-	***REMOVED***
+	}
 	byID := make(map[string]Snapshot)
-	for i := range all ***REMOVED***
+	for i := range all {
 		byID[all[i].ID] = all[i]
-	***REMOVED***
-	if s, ok := byID[one.ID]; !ok || s.Pid != 10 ***REMOVED***
+	}
+	if s, ok := byID[one.ID]; !ok || s.Pid != 10 {
 		t.Fatalf("expected something different with for id=%s: %v", one.ID, s)
-	***REMOVED***
-	if s, ok := byID[two.ID]; !ok || s.Pid != 20 ***REMOVED***
+	}
+	if s, ok := byID[two.ID]; !ok || s.Pid != 20 {
 		t.Fatalf("expected something different with for id=%s: %v", two.ID, s)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestViewGet(t *testing.T) ***REMOVED***
+func TestViewGet(t *testing.T) {
 	var (
 		db, _ = NewViewDB()
 		one   = newContainer(t)
 	)
 	one.ImageID = "some-image-123"
-	if err := one.CheckpointTo(db); err != nil ***REMOVED***
+	if err := one.CheckpointTo(db); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	s, err := db.Snapshot().Get(one.ID)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if s == nil || s.ImageID != "some-image-123" ***REMOVED***
+	}
+	if s == nil || s.ImageID != "some-image-123" {
 		t.Fatalf("expected ImageID=some-image-123. Got: %v", s)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestNames(t *testing.T) ***REMOVED***
+func TestNames(t *testing.T) {
 	db, err := NewViewDB()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	assert.NoError(t, db.ReserveName("name1", "containerid1"))
 	assert.NoError(t, db.ReserveName("name1", "containerid1")) // idempotent
 	assert.NoError(t, db.ReserveName("name2", "containerid2"))
@@ -144,42 +144,42 @@ func TestNames(t *testing.T) ***REMOVED***
 	assert.Equal(t, "containerid3", id)
 
 	// GetAllNames
-	assert.Equal(t, map[string][]string***REMOVED***"containerid1": ***REMOVED***"name1"***REMOVED***, "containerid3": ***REMOVED***"name2"***REMOVED******REMOVED***, view.GetAllNames())
+	assert.Equal(t, map[string][]string{"containerid1": {"name1"}, "containerid3": {"name2"}}, view.GetAllNames())
 
 	assert.NoError(t, db.ReserveName("name3", "containerid1"))
 	assert.NoError(t, db.ReserveName("name4", "containerid1"))
 
 	view = db.Snapshot()
-	assert.Equal(t, map[string][]string***REMOVED***"containerid1": ***REMOVED***"name1", "name3", "name4"***REMOVED***, "containerid4": ***REMOVED***"name2"***REMOVED******REMOVED***, view.GetAllNames())
+	assert.Equal(t, map[string][]string{"containerid1": {"name1", "name3", "name4"}, "containerid4": {"name2"}}, view.GetAllNames())
 
 	// Release containerid1's names with Delete even though no container exists
-	assert.NoError(t, db.Delete(&Container***REMOVED***ID: "containerid1"***REMOVED***))
+	assert.NoError(t, db.Delete(&Container{ID: "containerid1"}))
 
 	// Reusing one of those names should work
 	assert.NoError(t, db.ReserveName("name1", "containerid4"))
 	view = db.Snapshot()
-	assert.Equal(t, map[string][]string***REMOVED***"containerid4": ***REMOVED***"name1", "name2"***REMOVED******REMOVED***, view.GetAllNames())
-***REMOVED***
+	assert.Equal(t, map[string][]string{"containerid4": {"name1", "name2"}}, view.GetAllNames())
+}
 
 // Test case for GitHub issue 35920
-func TestViewWithHealthCheck(t *testing.T) ***REMOVED***
+func TestViewWithHealthCheck(t *testing.T) {
 	var (
 		db, _ = NewViewDB()
 		one   = newContainer(t)
 	)
-	one.Health = &Health***REMOVED***
-		Health: types.Health***REMOVED***
+	one.Health = &Health{
+		Health: types.Health{
 			Status: "starting",
-		***REMOVED***,
-	***REMOVED***
-	if err := one.CheckpointTo(db); err != nil ***REMOVED***
+		},
+	}
+	if err := one.CheckpointTo(db); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	s, err := db.Snapshot().Get(one.ID)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if s == nil || s.Health != "starting" ***REMOVED***
+	}
+	if s == nil || s.Health != "starting" {
 		t.Fatalf("expected Health=starting. Got: %+v", s)
-	***REMOVED***
-***REMOVED***
+	}
+}

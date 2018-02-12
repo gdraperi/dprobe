@@ -2,10 +2,10 @@
 
 package zfs
 
-func checkRootdirFs(rootdir string) error ***REMOVED***
+func checkRootdirFs(rootdir string) error {
 	return nil
-***REMOVED***
+}
 
-func getMountpoint(id string) string ***REMOVED***
+func getMountpoint(id string) string {
 	return id
-***REMOVED***
+}

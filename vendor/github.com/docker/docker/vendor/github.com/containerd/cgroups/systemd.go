@@ -16,55 +16,55 @@ const (
 	defaultSlice      = "system.slice"
 )
 
-func Systemd() ([]Subsystem, error) ***REMOVED***
+func Systemd() ([]Subsystem, error) {
 	root, err := v1MountPoint()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	defaultSubsystems, err := defaults(root)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	s, err := NewSystemd(root)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	// make sure the systemd controller is added first
-	return append([]Subsystem***REMOVED***s***REMOVED***, defaultSubsystems...), nil
-***REMOVED***
+	return append([]Subsystem{s}, defaultSubsystems...), nil
+}
 
-func Slice(slice, name string) Path ***REMOVED***
-	if slice == "" ***REMOVED***
+func Slice(slice, name string) Path {
+	if slice == "" {
 		slice = defaultSlice
-	***REMOVED***
-	return func(subsystem Name) (string, error) ***REMOVED***
+	}
+	return func(subsystem Name) (string, error) {
 		return filepath.Join(slice, unitName(name)), nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func NewSystemd(root string) (*SystemdController, error) ***REMOVED***
-	return &SystemdController***REMOVED***
+func NewSystemd(root string) (*SystemdController, error) {
+	return &SystemdController{
 		root: root,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-type SystemdController struct ***REMOVED***
+type SystemdController struct {
 	mu   sync.Mutex
 	root string
-***REMOVED***
+}
 
-func (s *SystemdController) Name() Name ***REMOVED***
+func (s *SystemdController) Name() Name {
 	return SystemdDbus
-***REMOVED***
+}
 
-func (s *SystemdController) Create(path string, resources *specs.LinuxResources) error ***REMOVED***
+func (s *SystemdController) Create(path string, resources *specs.LinuxResources) error {
 	conn, err := systemdDbus.New()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer conn.Close()
 	slice, name := splitName(path)
-	properties := []systemdDbus.Property***REMOVED***
+	properties := []systemdDbus.Property{
 		systemdDbus.PropDescription(fmt.Sprintf("cgroup %s", name)),
 		systemdDbus.PropWants(slice),
 		newProperty("DefaultDependencies", false),
@@ -72,44 +72,44 @@ func (s *SystemdController) Create(path string, resources *specs.LinuxResources)
 		newProperty("MemoryAccounting", true),
 		newProperty("CPUAccounting", true),
 		newProperty("BlockIOAccounting", true),
-	***REMOVED***
+	}
 	ch := make(chan string)
 	_, err = conn.StartTransientUnit(name, "replace", properties, ch)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	<-ch
 	return nil
-***REMOVED***
+}
 
-func (s *SystemdController) Delete(path string) error ***REMOVED***
+func (s *SystemdController) Delete(path string) error {
 	conn, err := systemdDbus.New()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer conn.Close()
 	_, name := splitName(path)
 	ch := make(chan string)
 	_, err = conn.StopUnit(name, "replace", ch)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	<-ch
 	return nil
-***REMOVED***
+}
 
-func newProperty(name string, units interface***REMOVED******REMOVED***) systemdDbus.Property ***REMOVED***
-	return systemdDbus.Property***REMOVED***
+func newProperty(name string, units interface{}) systemdDbus.Property {
+	return systemdDbus.Property{
 		Name:  name,
 		Value: dbus.MakeVariant(units),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func unitName(name string) string ***REMOVED***
+func unitName(name string) string {
 	return fmt.Sprintf("%s.slice", name)
-***REMOVED***
+}
 
-func splitName(path string) (slice string, unit string) ***REMOVED***
+func splitName(path string) (slice string, unit string) {
 	slice, unit = filepath.Split(path)
 	return strings.TrimSuffix(slice, "/"), unit
-***REMOVED***
+}

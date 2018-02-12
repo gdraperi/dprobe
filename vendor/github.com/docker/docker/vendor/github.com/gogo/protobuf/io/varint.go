@@ -41,94 +41,94 @@ var (
 	errLargeValue  = errors.New("Value is Larger than 64 bits")
 )
 
-func NewDelimitedWriter(w io.Writer) WriteCloser ***REMOVED***
-	return &varintWriter***REMOVED***w, make([]byte, 10), nil***REMOVED***
-***REMOVED***
+func NewDelimitedWriter(w io.Writer) WriteCloser {
+	return &varintWriter{w, make([]byte, 10), nil}
+}
 
-type varintWriter struct ***REMOVED***
+type varintWriter struct {
 	w      io.Writer
 	lenBuf []byte
 	buffer []byte
-***REMOVED***
+}
 
-func (this *varintWriter) WriteMsg(msg proto.Message) (err error) ***REMOVED***
+func (this *varintWriter) WriteMsg(msg proto.Message) (err error) {
 	var data []byte
-	if m, ok := msg.(marshaler); ok ***REMOVED***
+	if m, ok := msg.(marshaler); ok {
 		n, ok := getSize(m)
-		if !ok ***REMOVED***
+		if !ok {
 			data, err = proto.Marshal(msg)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-		***REMOVED***
-		if n >= len(this.buffer) ***REMOVED***
+			}
+		}
+		if n >= len(this.buffer) {
 			this.buffer = make([]byte, n)
-		***REMOVED***
+		}
 		_, err = m.MarshalTo(this.buffer)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		data = this.buffer[:n]
-	***REMOVED*** else ***REMOVED***
+	} else {
 		data, err = proto.Marshal(msg)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	length := uint64(len(data))
 	n := binary.PutUvarint(this.lenBuf, length)
 	_, err = this.w.Write(this.lenBuf[:n])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	_, err = this.w.Write(data)
 	return err
-***REMOVED***
+}
 
-func (this *varintWriter) Close() error ***REMOVED***
-	if closer, ok := this.w.(io.Closer); ok ***REMOVED***
+func (this *varintWriter) Close() error {
+	if closer, ok := this.w.(io.Closer); ok {
 		return closer.Close()
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func NewDelimitedReader(r io.Reader, maxSize int) ReadCloser ***REMOVED***
+func NewDelimitedReader(r io.Reader, maxSize int) ReadCloser {
 	var closer io.Closer
-	if c, ok := r.(io.Closer); ok ***REMOVED***
+	if c, ok := r.(io.Closer); ok {
 		closer = c
-	***REMOVED***
-	return &varintReader***REMOVED***bufio.NewReader(r), nil, maxSize, closer***REMOVED***
-***REMOVED***
+	}
+	return &varintReader{bufio.NewReader(r), nil, maxSize, closer}
+}
 
-type varintReader struct ***REMOVED***
+type varintReader struct {
 	r       *bufio.Reader
 	buf     []byte
 	maxSize int
 	closer  io.Closer
-***REMOVED***
+}
 
-func (this *varintReader) ReadMsg(msg proto.Message) error ***REMOVED***
+func (this *varintReader) ReadMsg(msg proto.Message) error {
 	length64, err := binary.ReadUvarint(this.r)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	length := int(length64)
-	if length < 0 || length > this.maxSize ***REMOVED***
+	if length < 0 || length > this.maxSize {
 		return io.ErrShortBuffer
-	***REMOVED***
-	if len(this.buf) < length ***REMOVED***
+	}
+	if len(this.buf) < length {
 		this.buf = make([]byte, length)
-	***REMOVED***
+	}
 	buf := this.buf[:length]
-	if _, err := io.ReadFull(this.r, buf); err != nil ***REMOVED***
+	if _, err := io.ReadFull(this.r, buf); err != nil {
 		return err
-	***REMOVED***
+	}
 	return proto.Unmarshal(buf, msg)
-***REMOVED***
+}
 
-func (this *varintReader) Close() error ***REMOVED***
-	if this.closer != nil ***REMOVED***
+func (this *varintReader) Close() error {
+	if this.closer != nil {
 		return this.closer.Close()
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

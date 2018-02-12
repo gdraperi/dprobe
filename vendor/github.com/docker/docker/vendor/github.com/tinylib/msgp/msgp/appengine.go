@@ -6,10 +6,10 @@ package msgp
 // uses 64-bit hardware...
 const smallint = false
 
-func UnsafeString(b []byte) string ***REMOVED***
+func UnsafeString(b []byte) string {
 	return string(b)
-***REMOVED***
+}
 
-func UnsafeBytes(s string) []byte ***REMOVED***
+func UnsafeBytes(s string) []byte {
 	return []byte(s)
-***REMOVED***
+}

@@ -5,8 +5,8 @@ package aws
 //
 //	Example:
 //
-//	values := aws.JSONValue***REMOVED***
+//	values := aws.JSONValue{
 //		"Foo": "Bar",
-//	***REMOVED***
+//	}
 //	values["Baz"] = "Qux"
-type JSONValue map[string]interface***REMOVED******REMOVED***
+type JSONValue map[string]interface{}

@@ -44,10 +44,10 @@ import (
 // contains a mutex and must not be copied.
 //
 // If cfg is nil, a new zero tls.Config is returned.
-func cloneTLSConfig(cfg *tls.Config) *tls.Config ***REMOVED***
-	if cfg == nil ***REMOVED***
-		return &tls.Config***REMOVED******REMOVED***
-	***REMOVED***
+func cloneTLSConfig(cfg *tls.Config) *tls.Config {
+	if cfg == nil {
+		return &tls.Config{}
+	}
 
 	return cfg.Clone()
-***REMOVED***
+}

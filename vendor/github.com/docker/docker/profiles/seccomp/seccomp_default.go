@@ -7,44 +7,44 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-func arches() []types.Architecture ***REMOVED***
-	return []types.Architecture***REMOVED***
-		***REMOVED***
+func arches() []types.Architecture {
+	return []types.Architecture{
+		{
 			Arch:      types.ArchX86_64,
-			SubArches: []types.Arch***REMOVED***types.ArchX86, types.ArchX32***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			SubArches: []types.Arch{types.ArchX86, types.ArchX32},
+		},
+		{
 			Arch:      types.ArchAARCH64,
-			SubArches: []types.Arch***REMOVED***types.ArchARM***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			SubArches: []types.Arch{types.ArchARM},
+		},
+		{
 			Arch:      types.ArchMIPS64,
-			SubArches: []types.Arch***REMOVED***types.ArchMIPS, types.ArchMIPS64N32***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			SubArches: []types.Arch{types.ArchMIPS, types.ArchMIPS64N32},
+		},
+		{
 			Arch:      types.ArchMIPS64N32,
-			SubArches: []types.Arch***REMOVED***types.ArchMIPS, types.ArchMIPS64***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			SubArches: []types.Arch{types.ArchMIPS, types.ArchMIPS64},
+		},
+		{
 			Arch:      types.ArchMIPSEL64,
-			SubArches: []types.Arch***REMOVED***types.ArchMIPSEL, types.ArchMIPSEL64N32***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			SubArches: []types.Arch{types.ArchMIPSEL, types.ArchMIPSEL64N32},
+		},
+		{
 			Arch:      types.ArchMIPSEL64N32,
-			SubArches: []types.Arch***REMOVED***types.ArchMIPSEL, types.ArchMIPSEL64***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			SubArches: []types.Arch{types.ArchMIPSEL, types.ArchMIPSEL64},
+		},
+		{
 			Arch:      types.ArchS390X,
-			SubArches: []types.Arch***REMOVED***types.ArchS390***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
-***REMOVED***
+			SubArches: []types.Arch{types.ArchS390},
+		},
+	}
+}
 
 // DefaultProfile defines the whitelist for the default seccomp profile.
-func DefaultProfile() *types.Seccomp ***REMOVED***
-	syscalls := []*types.Syscall***REMOVED***
-		***REMOVED***
-			Names: []string***REMOVED***
+func DefaultProfile() *types.Seccomp {
+	syscalls := []*types.Syscall{
+		{
+			Names: []string{
 				"accept",
 				"accept4",
 				"access",
@@ -352,134 +352,134 @@ func DefaultProfile() *types.Seccomp ***REMOVED***
 				"waitpid",
 				"write",
 				"writev",
-			***REMOVED***,
+			},
 			Action: types.ActAllow,
-			Args:   []*types.Arg***REMOVED******REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			Names:  []string***REMOVED***"personality"***REMOVED***,
+			Args:   []*types.Arg{},
+		},
+		{
+			Names:  []string{"personality"},
 			Action: types.ActAllow,
-			Args: []*types.Arg***REMOVED***
-				***REMOVED***
+			Args: []*types.Arg{
+				{
 					Index: 0,
 					Value: 0x0,
 					Op:    types.OpEqualTo,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			Names:  []string***REMOVED***"personality"***REMOVED***,
+				},
+			},
+		},
+		{
+			Names:  []string{"personality"},
 			Action: types.ActAllow,
-			Args: []*types.Arg***REMOVED***
-				***REMOVED***
+			Args: []*types.Arg{
+				{
 					Index: 0,
 					Value: 0x0008,
 					Op:    types.OpEqualTo,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			Names:  []string***REMOVED***"personality"***REMOVED***,
+				},
+			},
+		},
+		{
+			Names:  []string{"personality"},
 			Action: types.ActAllow,
-			Args: []*types.Arg***REMOVED***
-				***REMOVED***
+			Args: []*types.Arg{
+				{
 					Index: 0,
 					Value: 0x20000,
 					Op:    types.OpEqualTo,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			Names:  []string***REMOVED***"personality"***REMOVED***,
+				},
+			},
+		},
+		{
+			Names:  []string{"personality"},
 			Action: types.ActAllow,
-			Args: []*types.Arg***REMOVED***
-				***REMOVED***
+			Args: []*types.Arg{
+				{
 					Index: 0,
 					Value: 0x20008,
 					Op:    types.OpEqualTo,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			Names:  []string***REMOVED***"personality"***REMOVED***,
+				},
+			},
+		},
+		{
+			Names:  []string{"personality"},
 			Action: types.ActAllow,
-			Args: []*types.Arg***REMOVED***
-				***REMOVED***
+			Args: []*types.Arg{
+				{
 					Index: 0,
 					Value: 0xffffffff,
 					Op:    types.OpEqualTo,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			Names: []string***REMOVED***
+				},
+			},
+		},
+		{
+			Names: []string{
 				"sync_file_range2",
-			***REMOVED***,
+			},
 			Action: types.ActAllow,
-			Args:   []*types.Arg***REMOVED******REMOVED***,
-			Includes: types.Filter***REMOVED***
-				Arches: []string***REMOVED***"ppc64le"***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			Names: []string***REMOVED***
+			Args:   []*types.Arg{},
+			Includes: types.Filter{
+				Arches: []string{"ppc64le"},
+			},
+		},
+		{
+			Names: []string{
 				"arm_fadvise64_64",
 				"arm_sync_file_range",
 				"sync_file_range2",
 				"breakpoint",
 				"cacheflush",
 				"set_tls",
-			***REMOVED***,
+			},
 			Action: types.ActAllow,
-			Args:   []*types.Arg***REMOVED******REMOVED***,
-			Includes: types.Filter***REMOVED***
-				Arches: []string***REMOVED***"arm", "arm64"***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			Names: []string***REMOVED***
+			Args:   []*types.Arg{},
+			Includes: types.Filter{
+				Arches: []string{"arm", "arm64"},
+			},
+		},
+		{
+			Names: []string{
 				"arch_prctl",
-			***REMOVED***,
+			},
 			Action: types.ActAllow,
-			Args:   []*types.Arg***REMOVED******REMOVED***,
-			Includes: types.Filter***REMOVED***
-				Arches: []string***REMOVED***"amd64", "x32"***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			Names: []string***REMOVED***
+			Args:   []*types.Arg{},
+			Includes: types.Filter{
+				Arches: []string{"amd64", "x32"},
+			},
+		},
+		{
+			Names: []string{
 				"modify_ldt",
-			***REMOVED***,
+			},
 			Action: types.ActAllow,
-			Args:   []*types.Arg***REMOVED******REMOVED***,
-			Includes: types.Filter***REMOVED***
-				Arches: []string***REMOVED***"amd64", "x32", "x86"***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			Names: []string***REMOVED***
+			Args:   []*types.Arg{},
+			Includes: types.Filter{
+				Arches: []string{"amd64", "x32", "x86"},
+			},
+		},
+		{
+			Names: []string{
 				"s390_pci_mmio_read",
 				"s390_pci_mmio_write",
 				"s390_runtime_instr",
-			***REMOVED***,
+			},
 			Action: types.ActAllow,
-			Args:   []*types.Arg***REMOVED******REMOVED***,
-			Includes: types.Filter***REMOVED***
-				Arches: []string***REMOVED***"s390", "s390x"***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			Names: []string***REMOVED***
+			Args:   []*types.Arg{},
+			Includes: types.Filter{
+				Arches: []string{"s390", "s390x"},
+			},
+		},
+		{
+			Names: []string{
 				"open_by_handle_at",
-			***REMOVED***,
+			},
 			Action: types.ActAllow,
-			Args:   []*types.Arg***REMOVED******REMOVED***,
-			Includes: types.Filter***REMOVED***
-				Caps: []string***REMOVED***"CAP_DAC_READ_SEARCH"***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			Names: []string***REMOVED***
+			Args:   []*types.Arg{},
+			Includes: types.Filter{
+				Caps: []string{"CAP_DAC_READ_SEARCH"},
+			},
+		},
+		{
+			Names: []string{
 				"bpf",
 				"clone",
 				"fanotify_init",
@@ -494,146 +494,146 @@ func DefaultProfile() *types.Seccomp ***REMOVED***
 				"umount",
 				"umount2",
 				"unshare",
-			***REMOVED***,
+			},
 			Action: types.ActAllow,
-			Args:   []*types.Arg***REMOVED******REMOVED***,
-			Includes: types.Filter***REMOVED***
-				Caps: []string***REMOVED***"CAP_SYS_ADMIN"***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			Names: []string***REMOVED***
+			Args:   []*types.Arg{},
+			Includes: types.Filter{
+				Caps: []string{"CAP_SYS_ADMIN"},
+			},
+		},
+		{
+			Names: []string{
 				"clone",
-			***REMOVED***,
+			},
 			Action: types.ActAllow,
-			Args: []*types.Arg***REMOVED***
-				***REMOVED***
+			Args: []*types.Arg{
+				{
 					Index:    0,
 					Value:    unix.CLONE_NEWNS | unix.CLONE_NEWUTS | unix.CLONE_NEWIPC | unix.CLONE_NEWUSER | unix.CLONE_NEWPID | unix.CLONE_NEWNET,
 					ValueTwo: 0,
 					Op:       types.OpMaskedEqual,
-				***REMOVED***,
-			***REMOVED***,
-			Excludes: types.Filter***REMOVED***
-				Caps:   []string***REMOVED***"CAP_SYS_ADMIN"***REMOVED***,
-				Arches: []string***REMOVED***"s390", "s390x"***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			Names: []string***REMOVED***
+				},
+			},
+			Excludes: types.Filter{
+				Caps:   []string{"CAP_SYS_ADMIN"},
+				Arches: []string{"s390", "s390x"},
+			},
+		},
+		{
+			Names: []string{
 				"clone",
-			***REMOVED***,
+			},
 			Action: types.ActAllow,
-			Args: []*types.Arg***REMOVED***
-				***REMOVED***
+			Args: []*types.Arg{
+				{
 					Index:    1,
 					Value:    unix.CLONE_NEWNS | unix.CLONE_NEWUTS | unix.CLONE_NEWIPC | unix.CLONE_NEWUSER | unix.CLONE_NEWPID | unix.CLONE_NEWNET,
 					ValueTwo: 0,
 					Op:       types.OpMaskedEqual,
-				***REMOVED***,
-			***REMOVED***,
+				},
+			},
 			Comment: "s390 parameter ordering for clone is different",
-			Includes: types.Filter***REMOVED***
-				Arches: []string***REMOVED***"s390", "s390x"***REMOVED***,
-			***REMOVED***,
-			Excludes: types.Filter***REMOVED***
-				Caps: []string***REMOVED***"CAP_SYS_ADMIN"***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			Names: []string***REMOVED***
+			Includes: types.Filter{
+				Arches: []string{"s390", "s390x"},
+			},
+			Excludes: types.Filter{
+				Caps: []string{"CAP_SYS_ADMIN"},
+			},
+		},
+		{
+			Names: []string{
 				"reboot",
-			***REMOVED***,
+			},
 			Action: types.ActAllow,
-			Args:   []*types.Arg***REMOVED******REMOVED***,
-			Includes: types.Filter***REMOVED***
-				Caps: []string***REMOVED***"CAP_SYS_BOOT"***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			Names: []string***REMOVED***
+			Args:   []*types.Arg{},
+			Includes: types.Filter{
+				Caps: []string{"CAP_SYS_BOOT"},
+			},
+		},
+		{
+			Names: []string{
 				"chroot",
-			***REMOVED***,
+			},
 			Action: types.ActAllow,
-			Args:   []*types.Arg***REMOVED******REMOVED***,
-			Includes: types.Filter***REMOVED***
-				Caps: []string***REMOVED***"CAP_SYS_CHROOT"***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			Names: []string***REMOVED***
+			Args:   []*types.Arg{},
+			Includes: types.Filter{
+				Caps: []string{"CAP_SYS_CHROOT"},
+			},
+		},
+		{
+			Names: []string{
 				"delete_module",
 				"init_module",
 				"finit_module",
 				"query_module",
-			***REMOVED***,
+			},
 			Action: types.ActAllow,
-			Args:   []*types.Arg***REMOVED******REMOVED***,
-			Includes: types.Filter***REMOVED***
-				Caps: []string***REMOVED***"CAP_SYS_MODULE"***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			Names: []string***REMOVED***
+			Args:   []*types.Arg{},
+			Includes: types.Filter{
+				Caps: []string{"CAP_SYS_MODULE"},
+			},
+		},
+		{
+			Names: []string{
 				"acct",
-			***REMOVED***,
+			},
 			Action: types.ActAllow,
-			Args:   []*types.Arg***REMOVED******REMOVED***,
-			Includes: types.Filter***REMOVED***
-				Caps: []string***REMOVED***"CAP_SYS_PACCT"***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			Names: []string***REMOVED***
+			Args:   []*types.Arg{},
+			Includes: types.Filter{
+				Caps: []string{"CAP_SYS_PACCT"},
+			},
+		},
+		{
+			Names: []string{
 				"kcmp",
 				"process_vm_readv",
 				"process_vm_writev",
 				"ptrace",
-			***REMOVED***,
+			},
 			Action: types.ActAllow,
-			Args:   []*types.Arg***REMOVED******REMOVED***,
-			Includes: types.Filter***REMOVED***
-				Caps: []string***REMOVED***"CAP_SYS_PTRACE"***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			Names: []string***REMOVED***
+			Args:   []*types.Arg{},
+			Includes: types.Filter{
+				Caps: []string{"CAP_SYS_PTRACE"},
+			},
+		},
+		{
+			Names: []string{
 				"iopl",
 				"ioperm",
-			***REMOVED***,
+			},
 			Action: types.ActAllow,
-			Args:   []*types.Arg***REMOVED******REMOVED***,
-			Includes: types.Filter***REMOVED***
-				Caps: []string***REMOVED***"CAP_SYS_RAWIO"***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			Names: []string***REMOVED***
+			Args:   []*types.Arg{},
+			Includes: types.Filter{
+				Caps: []string{"CAP_SYS_RAWIO"},
+			},
+		},
+		{
+			Names: []string{
 				"settimeofday",
 				"stime",
 				"clock_settime",
-			***REMOVED***,
+			},
 			Action: types.ActAllow,
-			Args:   []*types.Arg***REMOVED******REMOVED***,
-			Includes: types.Filter***REMOVED***
-				Caps: []string***REMOVED***"CAP_SYS_TIME"***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			Names: []string***REMOVED***
+			Args:   []*types.Arg{},
+			Includes: types.Filter{
+				Caps: []string{"CAP_SYS_TIME"},
+			},
+		},
+		{
+			Names: []string{
 				"vhangup",
-			***REMOVED***,
+			},
 			Action: types.ActAllow,
-			Args:   []*types.Arg***REMOVED******REMOVED***,
-			Includes: types.Filter***REMOVED***
-				Caps: []string***REMOVED***"CAP_SYS_TTY_CONFIG"***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+			Args:   []*types.Arg{},
+			Includes: types.Filter{
+				Caps: []string{"CAP_SYS_TTY_CONFIG"},
+			},
+		},
+	}
 
-	return &types.Seccomp***REMOVED***
+	return &types.Seccomp{
 		DefaultAction: types.ActErrno,
 		ArchMap:       arches(),
 		Syscalls:      syscalls,
-	***REMOVED***
-***REMOVED***
+	}
+}

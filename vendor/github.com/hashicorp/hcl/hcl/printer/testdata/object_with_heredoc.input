@@ -1,6 +1,6 @@
-obj ***REMOVED***
+obj {
     foo = [<<EOF
         TEXT!
 EOF
     ]
-***REMOVED***
+}

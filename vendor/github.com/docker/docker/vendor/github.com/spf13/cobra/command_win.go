@@ -17,10 +17,10 @@ var MousetrapHelpText string = `This is a command line tool
 You need to open cmd.exe and run it from there.
 `
 
-func preExecHook(c *Command) ***REMOVED***
-	if mousetrap.StartedByExplorer() ***REMOVED***
+func preExecHook(c *Command) {
+	if mousetrap.StartedByExplorer() {
 		c.Print(MousetrapHelpText)
 		time.Sleep(5 * time.Second)
 		os.Exit(1)
-	***REMOVED***
-***REMOVED***
+	}
+}

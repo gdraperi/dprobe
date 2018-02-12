@@ -90,7 +90,7 @@ Other binaries are also included:
 Installing any of these binaries is easy.  Simply run:
 
     go get github.com/gogo/protobuf/proto
-    go get github.com/gogo/protobuf/***REMOVED***binary***REMOVED***
+    go get github.com/gogo/protobuf/{binary}
     go get github.com/gogo/protobuf/gogoproto
 
 These binaries allow you to using gogoprotobuf [extensions](https://github.com/gogo/protobuf/blob/master/extensions.md).

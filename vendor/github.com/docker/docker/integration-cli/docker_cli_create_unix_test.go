@@ -9,35 +9,35 @@ import (
 )
 
 // Test case for #30166 (target was not validated)
-func (s *DockerSuite) TestCreateTmpfsMountsTarget(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestCreateTmpfsMountsTarget(c *check.C) {
 	testRequires(c, DaemonIsLinux)
-	type testCase struct ***REMOVED***
+	type testCase struct {
 		target        string
 		expectedError string
-	***REMOVED***
-	cases := []testCase***REMOVED***
-		***REMOVED***
+	}
+	cases := []testCase{
+		{
 			target:        ".",
 			expectedError: "mount path must be absolute",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			target:        "foo",
 			expectedError: "mount path must be absolute",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			target:        "/",
 			expectedError: "destination can't be '/'",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			target:        "//",
 			expectedError: "destination can't be '/'",
-		***REMOVED***,
-	***REMOVED***
-	for _, x := range cases ***REMOVED***
+		},
+	}
+	for _, x := range cases {
 		out, _, _ := dockerCmdWithError("create", "--tmpfs", x.target, "busybox", "sh")
-		if x.expectedError != "" && !strings.Contains(out, x.expectedError) ***REMOVED***
+		if x.expectedError != "" && !strings.Contains(out, x.expectedError) {
 			c.Fatalf("mounting tmpfs over %q should fail with %q, but got %q",
 				x.target, x.expectedError, out)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

@@ -8,52 +8,52 @@ import (
 	"testing"
 )
 
-func checkOmit(t *testing.T, found, unexpected string) ***REMOVED***
-	if strings.Contains(found, unexpected) ***REMOVED***
+func checkOmit(t *testing.T, found, unexpected string) {
+	if strings.Contains(found, unexpected) {
 		t.Errorf("Got: %q\nBut should not have!\n", unexpected)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func check(t *testing.T, found, expected string) ***REMOVED***
-	if !strings.Contains(found, expected) ***REMOVED***
+func check(t *testing.T, found, expected string) {
+	if !strings.Contains(found, expected) {
 		t.Errorf("Expecting to contain: \n %q\nGot:\n %q\n", expected, found)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func runShellCheck(s string) error ***REMOVED***
-	excluded := []string***REMOVED***
+func runShellCheck(s string) error {
+	excluded := []string{
 		"SC2034", // PREFIX appears unused. Verify it or export it.
-	***REMOVED***
+	}
 	cmd := exec.Command("shellcheck", "-s", "bash", "-", "-e", strings.Join(excluded, ","))
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout
 
 	stdin, err := cmd.StdinPipe()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	go func() ***REMOVED***
+	}
+	go func() {
 		stdin.Write([]byte(s))
 		stdin.Close()
-	***REMOVED***()
+	}()
 
 	return cmd.Run()
-***REMOVED***
+}
 
 // World worst custom function, just keep telling you to enter hello!
-const bashCompletionFunc = `__custom_func() ***REMOVED***
+const bashCompletionFunc = `__custom_func() {
 	COMPREPLY=( "hello" )
-***REMOVED***
+}
 `
 
-func TestBashCompletions(t *testing.T) ***REMOVED***
-	rootCmd := &Command***REMOVED***
+func TestBashCompletions(t *testing.T) {
+	rootCmd := &Command{
 		Use:                    "root",
-		ArgAliases:             []string***REMOVED***"pods", "nodes", "services", "replicationcontrollers", "po", "no", "svc", "rc"***REMOVED***,
-		ValidArgs:              []string***REMOVED***"pod", "node", "service", "replicationcontroller"***REMOVED***,
+		ArgAliases:             []string{"pods", "nodes", "services", "replicationcontrollers", "po", "no", "svc", "rc"},
+		ValidArgs:              []string{"pod", "node", "service", "replicationcontroller"},
 		BashCompletionFunction: bashCompletionFunc,
 		Run: emptyRun,
-	***REMOVED***
+	}
 	rootCmd.Flags().IntP("introot", "i", -1, "help message for flag introot")
 	rootCmd.MarkFlagRequired("introot")
 
@@ -74,48 +74,48 @@ func TestBashCompletions(t *testing.T) ***REMOVED***
 
 	// Subdirectories in a given directory.
 	rootCmd.Flags().String("theme", "", "theme to use (located in /themes/THEMENAME/)")
-	rootCmd.Flags().SetAnnotation("theme", BashCompSubdirsInDir, []string***REMOVED***"themes"***REMOVED***)
+	rootCmd.Flags().SetAnnotation("theme", BashCompSubdirsInDir, []string{"themes"})
 
-	echoCmd := &Command***REMOVED***
+	echoCmd := &Command{
 		Use:     "echo [string to echo]",
-		Aliases: []string***REMOVED***"say"***REMOVED***,
+		Aliases: []string{"say"},
 		Short:   "Echo anything to the screen",
 		Long:    "an utterly useless command for testing.",
 		Example: "Just run cobra-test echo",
 		Run:     emptyRun,
-	***REMOVED***
+	}
 
-	printCmd := &Command***REMOVED***
+	printCmd := &Command{
 		Use:   "print [string to print]",
 		Args:  MinimumNArgs(1),
 		Short: "Print anything to the screen",
 		Long:  "an absolutely utterly useless command for testing.",
 		Run:   emptyRun,
-	***REMOVED***
+	}
 
-	deprecatedCmd := &Command***REMOVED***
+	deprecatedCmd := &Command{
 		Use:        "deprecated [can't do anything here]",
 		Args:       NoArgs,
 		Short:      "A command which is deprecated",
 		Long:       "an absolutely utterly useless command for testing deprecation!.",
 		Deprecated: "Please use echo instead",
 		Run:        emptyRun,
-	***REMOVED***
+	}
 
-	colonCmd := &Command***REMOVED***
+	colonCmd := &Command{
 		Use: "cmd:colon",
 		Run: emptyRun,
-	***REMOVED***
+	}
 
-	timesCmd := &Command***REMOVED***
+	timesCmd := &Command{
 		Use:        "times [# times] [string to echo]",
-		SuggestFor: []string***REMOVED***"counts"***REMOVED***,
+		SuggestFor: []string{"counts"},
 		Args:       OnlyValidArgs,
-		ValidArgs:  []string***REMOVED***"one", "two", "three", "four"***REMOVED***,
+		ValidArgs:  []string{"one", "two", "three", "four"},
 		Short:      "Echo anything to the screen more times",
 		Long:       "a slightly useless command for testing.",
 		Run:        emptyRun,
-	***REMOVED***
+	}
 
 	echoCmd.AddCommand(timesCmd)
 	rootCmd.AddCommand(echoCmd, printCmd, deprecatedCmd, colonCmd)
@@ -155,16 +155,16 @@ func TestBashCompletions(t *testing.T) ***REMOVED***
 	checkOmit(t, output, deprecatedCmd.Name())
 
 	// If available, run shellcheck against the script.
-	if err := exec.Command("which", "shellcheck").Run(); err != nil ***REMOVED***
+	if err := exec.Command("which", "shellcheck").Run(); err != nil {
 		return
-	***REMOVED***
-	if err := runShellCheck(output); err != nil ***REMOVED***
+	}
+	if err := runShellCheck(output); err != nil {
 		t.Fatalf("shellcheck failed: %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestBashCompletionHiddenFlag(t *testing.T) ***REMOVED***
-	c := &Command***REMOVED***Use: "c", Run: emptyRun***REMOVED***
+func TestBashCompletionHiddenFlag(t *testing.T) {
+	c := &Command{Use: "c", Run: emptyRun}
 
 	const flagName = "hiddenFlag"
 	c.Flags().Bool(flagName, false, "")
@@ -174,13 +174,13 @@ func TestBashCompletionHiddenFlag(t *testing.T) ***REMOVED***
 	c.GenBashCompletion(buf)
 	output := buf.String()
 
-	if strings.Contains(output, flagName) ***REMOVED***
+	if strings.Contains(output, flagName) {
 		t.Errorf("Expected completion to not include %q flag: Got %v", flagName, output)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestBashCompletionDeprecatedFlag(t *testing.T) ***REMOVED***
-	c := &Command***REMOVED***Use: "c", Run: emptyRun***REMOVED***
+func TestBashCompletionDeprecatedFlag(t *testing.T) {
+	c := &Command{Use: "c", Run: emptyRun}
 
 	const flagName = "deprecated-flag"
 	c.Flags().Bool(flagName, false, "")
@@ -190,7 +190,7 @@ func TestBashCompletionDeprecatedFlag(t *testing.T) ***REMOVED***
 	c.GenBashCompletion(buf)
 	output := buf.String()
 
-	if strings.Contains(output, flagName) ***REMOVED***
+	if strings.Contains(output, flagName) {
 		t.Errorf("expected completion to not include %q flag: Got %v", flagName, output)
-	***REMOVED***
-***REMOVED***
+	}
+}

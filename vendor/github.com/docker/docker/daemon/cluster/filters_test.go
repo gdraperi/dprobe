@@ -6,7 +6,7 @@ import (
 	"github.com/docker/docker/api/types/filters"
 )
 
-func TestNewListSecretsFilters(t *testing.T) ***REMOVED***
+func TestNewListSecretsFilters(t *testing.T) {
 	validNameFilter := filters.NewArgs()
 	validNameFilter.Add("name", "test_name")
 
@@ -28,35 +28,35 @@ func TestNewListSecretsFilters(t *testing.T) ***REMOVED***
 	validAllFilter.Add("label", "memory")
 	validAllFilter.Add("names", "test_name")
 
-	validFilters := []filters.Args***REMOVED***
+	validFilters := []filters.Args{
 		validNameFilter,
 		validIDFilter,
 		validLabelFilter,
 		validNamesFilter,
 		validAllFilter,
-	***REMOVED***
+	}
 
 	invalidTypeFilter := filters.NewArgs()
 	invalidTypeFilter.Add("nonexist", "aaaa")
 
-	invalidFilters := []filters.Args***REMOVED***
+	invalidFilters := []filters.Args{
 		invalidTypeFilter,
-	***REMOVED***
+	}
 
-	for _, filter := range validFilters ***REMOVED***
-		if _, err := newListSecretsFilters(filter); err != nil ***REMOVED***
+	for _, filter := range validFilters {
+		if _, err := newListSecretsFilters(filter); err != nil {
 			t.Fatalf("Should get no error, got %v", err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	for _, filter := range invalidFilters ***REMOVED***
-		if _, err := newListSecretsFilters(filter); err == nil ***REMOVED***
+	for _, filter := range invalidFilters {
+		if _, err := newListSecretsFilters(filter); err == nil {
 			t.Fatalf("Should get an error for filter %v, while got nil", filter)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestNewListConfigsFilters(t *testing.T) ***REMOVED***
+func TestNewListConfigsFilters(t *testing.T) {
 	validNameFilter := filters.NewArgs()
 	validNameFilter.Add("name", "test_name")
 
@@ -74,29 +74,29 @@ func TestNewListConfigsFilters(t *testing.T) ***REMOVED***
 	validAllFilter.Add("label", "type=test")
 	validAllFilter.Add("label", "memory")
 
-	validFilters := []filters.Args***REMOVED***
+	validFilters := []filters.Args{
 		validNameFilter,
 		validIDFilter,
 		validLabelFilter,
 		validAllFilter,
-	***REMOVED***
+	}
 
 	invalidTypeFilter := filters.NewArgs()
 	invalidTypeFilter.Add("nonexist", "aaaa")
 
-	invalidFilters := []filters.Args***REMOVED***
+	invalidFilters := []filters.Args{
 		invalidTypeFilter,
-	***REMOVED***
+	}
 
-	for _, filter := range validFilters ***REMOVED***
-		if _, err := newListConfigsFilters(filter); err != nil ***REMOVED***
+	for _, filter := range validFilters {
+		if _, err := newListConfigsFilters(filter); err != nil {
 			t.Fatalf("Should get no error, got %v", err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	for _, filter := range invalidFilters ***REMOVED***
-		if _, err := newListConfigsFilters(filter); err == nil ***REMOVED***
+	for _, filter := range invalidFilters {
+		if _, err := newListConfigsFilters(filter); err == nil {
 			t.Fatalf("Should get an error for filter %v, while got nil", filter)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

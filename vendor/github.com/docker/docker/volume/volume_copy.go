@@ -2,22 +2,22 @@ package volume
 
 import "strings"
 
-// ***REMOVED***<copy mode>=isEnabled***REMOVED***
-var copyModes = map[string]bool***REMOVED***
+// {<copy mode>=isEnabled}
+var copyModes = map[string]bool{
 	"nocopy": false,
-***REMOVED***
+}
 
-func copyModeExists(mode string) bool ***REMOVED***
+func copyModeExists(mode string) bool {
 	_, exists := copyModes[mode]
 	return exists
-***REMOVED***
+}
 
 // GetCopyMode gets the copy mode from the mode string for mounts
-func getCopyMode(mode string, def bool) (bool, bool) ***REMOVED***
-	for _, o := range strings.Split(mode, ",") ***REMOVED***
-		if isEnabled, exists := copyModes[o]; exists ***REMOVED***
+func getCopyMode(mode string, def bool) (bool, bool) {
+	for _, o := range strings.Split(mode, ",") {
+		if isEnabled, exists := copyModes[o]; exists {
 			return isEnabled, true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return def, false
-***REMOVED***
+}

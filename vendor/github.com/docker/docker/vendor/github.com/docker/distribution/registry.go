@@ -6,25 +6,25 @@ import (
 )
 
 // Scope defines the set of items that match a namespace.
-type Scope interface ***REMOVED***
+type Scope interface {
 	// Contains returns true if the name belongs to the namespace.
 	Contains(name string) bool
-***REMOVED***
+}
 
-type fullScope struct***REMOVED******REMOVED***
+type fullScope struct{}
 
-func (f fullScope) Contains(string) bool ***REMOVED***
+func (f fullScope) Contains(string) bool {
 	return true
-***REMOVED***
+}
 
 // GlobalScope represents the full namespace scope which contains
 // all other scopes.
-var GlobalScope = Scope(fullScope***REMOVED******REMOVED***)
+var GlobalScope = Scope(fullScope{})
 
 // Namespace represents a collection of repositories, addressable by name.
 // Generally, a namespace is backed by a set of one or more services,
 // providing facilities such as registry access, trust, and indexing.
-type Namespace interface ***REMOVED***
+type Namespace interface {
 	// Scope describes the names that can be used with this Namespace. The
 	// global namespace will have a scope that matches all names. The scope
 	// effectively provides an identity for the namespace.
@@ -46,34 +46,34 @@ type Namespace interface ***REMOVED***
 
 	// BlobStatter returns a BlobStatter to control
 	BlobStatter() BlobStatter
-***REMOVED***
+}
 
 // RepositoryEnumerator describes an operation to enumerate repositories
-type RepositoryEnumerator interface ***REMOVED***
+type RepositoryEnumerator interface {
 	Enumerate(ctx context.Context, ingester func(string) error) error
-***REMOVED***
+}
 
 // ManifestServiceOption is a function argument for Manifest Service methods
-type ManifestServiceOption interface ***REMOVED***
+type ManifestServiceOption interface {
 	Apply(ManifestService) error
-***REMOVED***
+}
 
 // WithTag allows a tag to be passed into Put
-func WithTag(tag string) ManifestServiceOption ***REMOVED***
-	return WithTagOption***REMOVED***tag***REMOVED***
-***REMOVED***
+func WithTag(tag string) ManifestServiceOption {
+	return WithTagOption{tag}
+}
 
 // WithTagOption holds a tag
-type WithTagOption struct***REMOVED*** Tag string ***REMOVED***
+type WithTagOption struct{ Tag string }
 
 // Apply conforms to the ManifestServiceOption interface
-func (o WithTagOption) Apply(m ManifestService) error ***REMOVED***
+func (o WithTagOption) Apply(m ManifestService) error {
 	// no implementation
 	return nil
-***REMOVED***
+}
 
 // Repository is a named collection of manifests and layers.
-type Repository interface ***REMOVED***
+type Repository interface {
 	// Named returns the name of the repository.
 	Named() reference.Named
 
@@ -90,7 +90,7 @@ type Repository interface ***REMOVED***
 
 	// Tags returns a reference to this repositories tag service
 	Tags(ctx context.Context) TagService
-***REMOVED***
+}
 
 // TODO(stevvooe): Must add close methods to all these. May want to change the
 // way instances are created to better reflect internal dependency

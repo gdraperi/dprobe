@@ -4,6 +4,6 @@ package cluster
 
 import "net"
 
-func (c *Cluster) resolveSystemAddr() (net.IP, error) ***REMOVED***
+func (c *Cluster) resolveSystemAddr() (net.IP, error) {
 	return c.resolveSystemAddrViaSubnetCheck()
-***REMOVED***
+}

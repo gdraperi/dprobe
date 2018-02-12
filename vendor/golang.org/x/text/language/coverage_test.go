@@ -10,145 +10,145 @@ import (
 	"testing"
 )
 
-func TestSupported(t *testing.T) ***REMOVED***
+func TestSupported(t *testing.T) {
 	// To prove the results are correct for a type, we test that the number of
 	// results is identical to the number of results on record, that all results
 	// are distinct and that all results are valid.
-	tests := map[string]int***REMOVED***
+	tests := map[string]int{
 		"BaseLanguages": numLanguages,
 		"Scripts":       numScripts,
 		"Regions":       numRegions,
 		"Tags":          0,
-	***REMOVED***
+	}
 	sup := reflect.ValueOf(Supported)
-	for name, num := range tests ***REMOVED***
+	for name, num := range tests {
 		v := sup.MethodByName(name).Call(nil)[0]
-		if n := v.Len(); n != num ***REMOVED***
+		if n := v.Len(); n != num {
 			t.Errorf("len(%s()) was %d; want %d", name, n, num)
-		***REMOVED***
+		}
 		dup := make(map[string]bool)
-		for i := 0; i < v.Len(); i++ ***REMOVED***
+		for i := 0; i < v.Len(); i++ {
 			x := v.Index(i).Interface()
 			// An invalid value will either cause a crash or result in a
 			// duplicate when passed to Sprint.
 			s := fmt.Sprint(x)
-			if dup[s] ***REMOVED***
+			if dup[s] {
 				t.Errorf("%s: duplicate entry %q", name, s)
-			***REMOVED***
+			}
 			dup[s] = true
-		***REMOVED***
-		if len(dup) != v.Len() ***REMOVED***
+		}
+		if len(dup) != v.Len() {
 			t.Errorf("%s: # unique entries was %d; want %d", name, len(dup), v.Len())
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestNewCoverage(t *testing.T) ***REMOVED***
-	bases := []Base***REMOVED***Base***REMOVED***0***REMOVED***, Base***REMOVED***3***REMOVED***, Base***REMOVED***7***REMOVED******REMOVED***
-	scripts := []Script***REMOVED***Script***REMOVED***11***REMOVED***, Script***REMOVED***17***REMOVED***, Script***REMOVED***23***REMOVED******REMOVED***
-	regions := []Region***REMOVED***Region***REMOVED***101***REMOVED***, Region***REMOVED***103***REMOVED***, Region***REMOVED***107***REMOVED******REMOVED***
-	tags := []Tag***REMOVED***Make("pt"), Make("en"), Make("en-GB"), Make("en-US"), Make("pt-PT")***REMOVED***
-	fbases := func() []Base ***REMOVED*** return bases ***REMOVED***
-	fscripts := func() []Script ***REMOVED*** return scripts ***REMOVED***
-	fregions := func() []Region ***REMOVED*** return regions ***REMOVED***
-	ftags := func() []Tag ***REMOVED*** return tags ***REMOVED***
+func TestNewCoverage(t *testing.T) {
+	bases := []Base{Base{0}, Base{3}, Base{7}}
+	scripts := []Script{Script{11}, Script{17}, Script{23}}
+	regions := []Region{Region{101}, Region{103}, Region{107}}
+	tags := []Tag{Make("pt"), Make("en"), Make("en-GB"), Make("en-US"), Make("pt-PT")}
+	fbases := func() []Base { return bases }
+	fscripts := func() []Script { return scripts }
+	fregions := func() []Region { return regions }
+	ftags := func() []Tag { return tags }
 
-	tests := []struct ***REMOVED***
+	tests := []struct {
 		desc    string
-		list    []interface***REMOVED******REMOVED***
+		list    []interface{}
 		bases   []Base
 		scripts []Script
 		regions []Region
 		tags    []Tag
-	***REMOVED******REMOVED***
-		***REMOVED***
+	}{
+		{
 			desc: "empty",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			desc:  "bases",
-			list:  []interface***REMOVED******REMOVED******REMOVED***bases***REMOVED***,
+			list:  []interface{}{bases},
 			bases: bases,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			desc:    "scripts",
-			list:    []interface***REMOVED******REMOVED******REMOVED***scripts***REMOVED***,
+			list:    []interface{}{scripts},
 			scripts: scripts,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			desc:    "regions",
-			list:    []interface***REMOVED******REMOVED******REMOVED***regions***REMOVED***,
+			list:    []interface{}{regions},
 			regions: regions,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			desc:  "bases derives from tags",
-			list:  []interface***REMOVED******REMOVED******REMOVED***tags***REMOVED***,
-			bases: []Base***REMOVED***Base***REMOVED***_en***REMOVED***, Base***REMOVED***_pt***REMOVED******REMOVED***,
+			list:  []interface{}{tags},
+			bases: []Base{Base{_en}, Base{_pt}},
 			tags:  tags,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			desc:  "tags and bases",
-			list:  []interface***REMOVED******REMOVED******REMOVED***tags, bases***REMOVED***,
+			list:  []interface{}{tags, bases},
 			bases: bases,
 			tags:  tags,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			desc:    "fully specified",
-			list:    []interface***REMOVED******REMOVED******REMOVED***tags, bases, scripts, regions***REMOVED***,
+			list:    []interface{}{tags, bases, scripts, regions},
 			bases:   bases,
 			scripts: scripts,
 			regions: regions,
 			tags:    tags,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			desc:  "bases func",
-			list:  []interface***REMOVED******REMOVED******REMOVED***fbases***REMOVED***,
+			list:  []interface{}{fbases},
 			bases: bases,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			desc:    "scripts func",
-			list:    []interface***REMOVED******REMOVED******REMOVED***fscripts***REMOVED***,
+			list:    []interface{}{fscripts},
 			scripts: scripts,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			desc:    "regions func",
-			list:    []interface***REMOVED******REMOVED******REMOVED***fregions***REMOVED***,
+			list:    []interface{}{fregions},
 			regions: regions,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			desc:  "tags func",
-			list:  []interface***REMOVED******REMOVED******REMOVED***ftags***REMOVED***,
-			bases: []Base***REMOVED***Base***REMOVED***_en***REMOVED***, Base***REMOVED***_pt***REMOVED******REMOVED***,
+			list:  []interface{}{ftags},
+			bases: []Base{Base{_en}, Base{_pt}},
 			tags:  tags,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			desc:  "tags and bases",
-			list:  []interface***REMOVED******REMOVED******REMOVED***ftags, fbases***REMOVED***,
+			list:  []interface{}{ftags, fbases},
 			bases: bases,
 			tags:  tags,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			desc:    "fully specified",
-			list:    []interface***REMOVED******REMOVED******REMOVED***ftags, fbases, fscripts, fregions***REMOVED***,
+			list:    []interface{}{ftags, fbases, fscripts, fregions},
 			bases:   bases,
 			scripts: scripts,
 			regions: regions,
 			tags:    tags,
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
-	for i, tt := range tests ***REMOVED***
+	for i, tt := range tests {
 		l := NewCoverage(tt.list...)
-		if a := l.BaseLanguages(); !reflect.DeepEqual(a, tt.bases) ***REMOVED***
+		if a := l.BaseLanguages(); !reflect.DeepEqual(a, tt.bases) {
 			t.Errorf("%d:%s: BaseLanguages was %v; want %v", i, tt.desc, a, tt.bases)
-		***REMOVED***
-		if a := l.Scripts(); !reflect.DeepEqual(a, tt.scripts) ***REMOVED***
+		}
+		if a := l.Scripts(); !reflect.DeepEqual(a, tt.scripts) {
 			t.Errorf("%d:%s: Scripts was %v; want %v", i, tt.desc, a, tt.scripts)
-		***REMOVED***
-		if a := l.Regions(); !reflect.DeepEqual(a, tt.regions) ***REMOVED***
+		}
+		if a := l.Regions(); !reflect.DeepEqual(a, tt.regions) {
 			t.Errorf("%d:%s: Regions was %v; want %v", i, tt.desc, a, tt.regions)
-		***REMOVED***
-		if a := l.Tags(); !reflect.DeepEqual(a, tt.tags) ***REMOVED***
+		}
+		if a := l.Tags(); !reflect.DeepEqual(a, tt.tags) {
 			t.Errorf("%d:%s: Tags was %v; want %v", i, tt.desc, a, tt.tags)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

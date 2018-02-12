@@ -5,17 +5,17 @@ import (
 	"os/exec"
 )
 
-func sessionBusPlatform() (*Conn, error) ***REMOVED***
+func sessionBusPlatform() (*Conn, error) {
 	cmd := exec.Command("launchctl", "getenv", "DBUS_LAUNCHD_SESSION_BUS_SOCKET")
 	b, err := cmd.CombinedOutput()
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	if len(b) == 0 ***REMOVED***
+	if len(b) == 0 {
 		return nil, errors.New("dbus: couldn't determine address of session bus")
-	***REMOVED***
+	}
 
 	return Dial("unix:path=" + string(b[:len(b)-1]))
-***REMOVED***
+}

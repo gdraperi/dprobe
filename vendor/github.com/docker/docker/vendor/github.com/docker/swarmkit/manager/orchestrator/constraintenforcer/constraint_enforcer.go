@@ -14,82 +14,82 @@ import (
 
 // ConstraintEnforcer watches for updates to nodes and shuts down tasks that no
 // longer satisfy scheduling constraints or resource limits.
-type ConstraintEnforcer struct ***REMOVED***
+type ConstraintEnforcer struct {
 	store    *store.MemoryStore
-	stopChan chan struct***REMOVED******REMOVED***
-	doneChan chan struct***REMOVED******REMOVED***
-***REMOVED***
+	stopChan chan struct{}
+	doneChan chan struct{}
+}
 
 // New creates a new ConstraintEnforcer.
-func New(store *store.MemoryStore) *ConstraintEnforcer ***REMOVED***
-	return &ConstraintEnforcer***REMOVED***
+func New(store *store.MemoryStore) *ConstraintEnforcer {
+	return &ConstraintEnforcer{
 		store:    store,
-		stopChan: make(chan struct***REMOVED******REMOVED***),
-		doneChan: make(chan struct***REMOVED******REMOVED***),
-	***REMOVED***
-***REMOVED***
+		stopChan: make(chan struct{}),
+		doneChan: make(chan struct{}),
+	}
+}
 
 // Run is the ConstraintEnforcer's main loop.
-func (ce *ConstraintEnforcer) Run() ***REMOVED***
+func (ce *ConstraintEnforcer) Run() {
 	defer close(ce.doneChan)
 
-	watcher, cancelWatch := state.Watch(ce.store.WatchQueue(), api.EventUpdateNode***REMOVED******REMOVED***)
+	watcher, cancelWatch := state.Watch(ce.store.WatchQueue(), api.EventUpdateNode{})
 	defer cancelWatch()
 
 	var (
 		nodes []*api.Node
 		err   error
 	)
-	ce.store.View(func(readTx store.ReadTx) ***REMOVED***
+	ce.store.View(func(readTx store.ReadTx) {
 		nodes, err = store.FindNodes(readTx, store.All)
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		log.L.WithError(err).Error("failed to check nodes for noncompliant tasks")
-	***REMOVED*** else ***REMOVED***
-		for _, node := range nodes ***REMOVED***
+	} else {
+		for _, node := range nodes {
 			ce.rejectNoncompliantTasks(node)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	for ***REMOVED***
-		select ***REMOVED***
+	for {
+		select {
 		case event := <-watcher:
 			node := event.(api.EventUpdateNode).Node
 			ce.rejectNoncompliantTasks(node)
 		case <-ce.stopChan:
 			return
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (ce *ConstraintEnforcer) rejectNoncompliantTasks(node *api.Node) ***REMOVED***
+func (ce *ConstraintEnforcer) rejectNoncompliantTasks(node *api.Node) {
 	// If the availability is "drain", the orchestrator will
 	// shut down all tasks.
 	// If the availability is "pause", we shouldn't touch
 	// the tasks on this node.
-	if node.Spec.Availability != api.NodeAvailabilityActive ***REMOVED***
+	if node.Spec.Availability != api.NodeAvailabilityActive {
 		return
-	***REMOVED***
+	}
 
 	var (
 		tasks []*api.Task
 		err   error
 	)
 
-	ce.store.View(func(tx store.ReadTx) ***REMOVED***
+	ce.store.View(func(tx store.ReadTx) {
 		tasks, err = store.FindTasks(tx, store.ByNodeID(node.ID))
-	***REMOVED***)
+	})
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.L.WithError(err).Errorf("failed to list tasks for node ID %s", node.ID)
-	***REMOVED***
+	}
 
-	available := &api.Resources***REMOVED******REMOVED***
+	available := &api.Resources{}
 	var fakeStore []*api.GenericResource
 
-	if node.Description != nil && node.Description.Resources != nil ***REMOVED***
+	if node.Description != nil && node.Description.Resources != nil {
 		available = node.Description.Resources.Copy()
-	***REMOVED***
+	}
 
 	removeTasks := make(map[string]*api.Task)
 
@@ -100,56 +100,56 @@ func (ce *ConstraintEnforcer) rejectNoncompliantTasks(node *api.Node) ***REMOVED
 	// resource, and sort by the size of the reservation
 	// to remove the most resource-intensive tasks.
 loop:
-	for _, t := range tasks ***REMOVED***
-		if t.DesiredState < api.TaskStateAssigned || t.DesiredState > api.TaskStateRunning ***REMOVED***
+	for _, t := range tasks {
+		if t.DesiredState < api.TaskStateAssigned || t.DesiredState > api.TaskStateRunning {
 			continue
-		***REMOVED***
+		}
 
 		// Ensure that the task still meets scheduling
 		// constraints.
-		if t.Spec.Placement != nil && len(t.Spec.Placement.Constraints) != 0 ***REMOVED***
+		if t.Spec.Placement != nil && len(t.Spec.Placement.Constraints) != 0 {
 			constraints, _ := constraint.Parse(t.Spec.Placement.Constraints)
-			if !constraint.NodeMatches(constraints, node) ***REMOVED***
+			if !constraint.NodeMatches(constraints, node) {
 				removeTasks[t.ID] = t
 				continue
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		// Ensure that the task assigned to the node
 		// still satisfies the resource limits.
-		if t.Spec.Resources != nil && t.Spec.Resources.Reservations != nil ***REMOVED***
-			if t.Spec.Resources.Reservations.MemoryBytes > available.MemoryBytes ***REMOVED***
+		if t.Spec.Resources != nil && t.Spec.Resources.Reservations != nil {
+			if t.Spec.Resources.Reservations.MemoryBytes > available.MemoryBytes {
 				removeTasks[t.ID] = t
 				continue
-			***REMOVED***
-			if t.Spec.Resources.Reservations.NanoCPUs > available.NanoCPUs ***REMOVED***
+			}
+			if t.Spec.Resources.Reservations.NanoCPUs > available.NanoCPUs {
 				removeTasks[t.ID] = t
 				continue
-			***REMOVED***
-			for _, ta := range t.AssignedGenericResources ***REMOVED***
+			}
+			for _, ta := range t.AssignedGenericResources {
 				// Type change or no longer available
-				if genericresource.HasResource(ta, available.Generic) ***REMOVED***
+				if genericresource.HasResource(ta, available.Generic) {
 					removeTasks[t.ID] = t
 					break loop
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 
 			available.MemoryBytes -= t.Spec.Resources.Reservations.MemoryBytes
 			available.NanoCPUs -= t.Spec.Resources.Reservations.NanoCPUs
 
 			genericresource.ClaimResources(&available.Generic,
 				&fakeStore, t.AssignedGenericResources)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if len(removeTasks) != 0 ***REMOVED***
-		err := ce.store.Batch(func(batch *store.Batch) error ***REMOVED***
-			for _, t := range removeTasks ***REMOVED***
-				err := batch.Update(func(tx store.Tx) error ***REMOVED***
+	if len(removeTasks) != 0 {
+		err := ce.store.Batch(func(batch *store.Batch) error {
+			for _, t := range removeTasks {
+				err := batch.Update(func(tx store.Tx) error {
 					t = store.GetTask(tx, t.ID)
-					if t == nil || t.DesiredState > api.TaskStateRunning ***REMOVED***
+					if t == nil || t.DesiredState > api.TaskStateRunning {
 						return nil
-					***REMOVED***
+					}
 
 					// We set the observed state to
 					// REJECTED, rather than the desired
@@ -163,22 +163,22 @@ loop:
 					t.Status.Err = "assigned node no longer meets constraints"
 					t.Status.Timestamp = ptypes.MustTimestampProto(time.Now())
 					return store.UpdateTask(tx, t)
-				***REMOVED***)
-				if err != nil ***REMOVED***
+				})
+				if err != nil {
 					log.L.WithError(err).Errorf("failed to shut down task %s", t.ID)
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return nil
-		***REMOVED***)
+		})
 
-		if err != nil ***REMOVED***
+		if err != nil {
 			log.L.WithError(err).Errorf("failed to shut down tasks")
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // Stop stops the ConstraintEnforcer and waits for the main loop to exit.
-func (ce *ConstraintEnforcer) Stop() ***REMOVED***
+func (ce *ConstraintEnforcer) Stop() {
 	close(ce.stopChan)
 	<-ce.doneChan
-***REMOVED***
+}

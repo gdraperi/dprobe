@@ -5,65 +5,65 @@ import (
 	"testing"
 )
 
-func TestTypeString(t *testing.T) ***REMOVED***
-	var tokens = []struct ***REMOVED***
+func TestTypeString(t *testing.T) {
+	var tokens = []struct {
 		tt  Type
 		str string
-	***REMOVED******REMOVED***
-		***REMOVED***ILLEGAL, "ILLEGAL"***REMOVED***,
-		***REMOVED***EOF, "EOF"***REMOVED***,
-		***REMOVED***COMMENT, "COMMENT"***REMOVED***,
-		***REMOVED***IDENT, "IDENT"***REMOVED***,
-		***REMOVED***NUMBER, "NUMBER"***REMOVED***,
-		***REMOVED***FLOAT, "FLOAT"***REMOVED***,
-		***REMOVED***BOOL, "BOOL"***REMOVED***,
-		***REMOVED***STRING, "STRING"***REMOVED***,
-		***REMOVED***HEREDOC, "HEREDOC"***REMOVED***,
-		***REMOVED***LBRACK, "LBRACK"***REMOVED***,
-		***REMOVED***LBRACE, "LBRACE"***REMOVED***,
-		***REMOVED***COMMA, "COMMA"***REMOVED***,
-		***REMOVED***PERIOD, "PERIOD"***REMOVED***,
-		***REMOVED***RBRACK, "RBRACK"***REMOVED***,
-		***REMOVED***RBRACE, "RBRACE"***REMOVED***,
-		***REMOVED***ASSIGN, "ASSIGN"***REMOVED***,
-		***REMOVED***ADD, "ADD"***REMOVED***,
-		***REMOVED***SUB, "SUB"***REMOVED***,
-	***REMOVED***
+	}{
+		{ILLEGAL, "ILLEGAL"},
+		{EOF, "EOF"},
+		{COMMENT, "COMMENT"},
+		{IDENT, "IDENT"},
+		{NUMBER, "NUMBER"},
+		{FLOAT, "FLOAT"},
+		{BOOL, "BOOL"},
+		{STRING, "STRING"},
+		{HEREDOC, "HEREDOC"},
+		{LBRACK, "LBRACK"},
+		{LBRACE, "LBRACE"},
+		{COMMA, "COMMA"},
+		{PERIOD, "PERIOD"},
+		{RBRACK, "RBRACK"},
+		{RBRACE, "RBRACE"},
+		{ASSIGN, "ASSIGN"},
+		{ADD, "ADD"},
+		{SUB, "SUB"},
+	}
 
-	for _, token := range tokens ***REMOVED***
-		if token.tt.String() != token.str ***REMOVED***
+	for _, token := range tokens {
+		if token.tt.String() != token.str {
 			t.Errorf("want: %q got:%q\n", token.str, token.tt)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-***REMOVED***
+}
 
-func TestTokenValue(t *testing.T) ***REMOVED***
-	var tokens = []struct ***REMOVED***
+func TestTokenValue(t *testing.T) {
+	var tokens = []struct {
 		tt Token
-		v  interface***REMOVED******REMOVED***
-	***REMOVED******REMOVED***
-		***REMOVED***Token***REMOVED***Type: BOOL, Text: `true`***REMOVED***, true***REMOVED***,
-		***REMOVED***Token***REMOVED***Type: BOOL, Text: `false`***REMOVED***, false***REMOVED***,
-		***REMOVED***Token***REMOVED***Type: FLOAT, Text: `3.14`***REMOVED***, float64(3.14)***REMOVED***,
-		***REMOVED***Token***REMOVED***Type: NUMBER, Text: `42`***REMOVED***, int64(42)***REMOVED***,
-		***REMOVED***Token***REMOVED***Type: IDENT, Text: `foo`***REMOVED***, "foo"***REMOVED***,
-		***REMOVED***Token***REMOVED***Type: STRING, Text: `"foo"`***REMOVED***, "foo"***REMOVED***,
-		***REMOVED***Token***REMOVED***Type: STRING, Text: `"foo\nbar"`***REMOVED***, "foo\nbar"***REMOVED***,
-		***REMOVED***Token***REMOVED***Type: STRING, Text: `"$***REMOVED***file("foo")***REMOVED***"`***REMOVED***, `$***REMOVED***file("foo")***REMOVED***`***REMOVED***,
-		***REMOVED***
-			Token***REMOVED***
+		v  interface{}
+	}{
+		{Token{Type: BOOL, Text: `true`}, true},
+		{Token{Type: BOOL, Text: `false`}, false},
+		{Token{Type: FLOAT, Text: `3.14`}, float64(3.14)},
+		{Token{Type: NUMBER, Text: `42`}, int64(42)},
+		{Token{Type: IDENT, Text: `foo`}, "foo"},
+		{Token{Type: STRING, Text: `"foo"`}, "foo"},
+		{Token{Type: STRING, Text: `"foo\nbar"`}, "foo\nbar"},
+		{Token{Type: STRING, Text: `"${file("foo")}"`}, `${file("foo")}`},
+		{
+			Token{
 				Type: STRING,
-				Text: `"$***REMOVED***replace("foo", ".", "\\.")***REMOVED***"`,
-			***REMOVED***,
-			`$***REMOVED***replace("foo", ".", "\\.")***REMOVED***`***REMOVED***,
-		***REMOVED***Token***REMOVED***Type: HEREDOC, Text: "<<EOF\nfoo\nbar\nEOF"***REMOVED***, "foo\nbar"***REMOVED***,
-	***REMOVED***
+				Text: `"${replace("foo", ".", "\\.")}"`,
+			},
+			`${replace("foo", ".", "\\.")}`},
+		{Token{Type: HEREDOC, Text: "<<EOF\nfoo\nbar\nEOF"}, "foo\nbar"},
+	}
 
-	for _, token := range tokens ***REMOVED***
-		if val := token.tt.Value(); !reflect.DeepEqual(val, token.v) ***REMOVED***
+	for _, token := range tokens {
+		if val := token.tt.Value(); !reflect.DeepEqual(val, token.v) {
 			t.Errorf("want: %v got:%v\n", token.v, val)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-***REMOVED***
+}

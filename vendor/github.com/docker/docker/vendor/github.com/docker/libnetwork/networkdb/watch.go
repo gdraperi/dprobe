@@ -14,20 +14,20 @@ const (
 	opDelete
 )
 
-type event struct ***REMOVED***
+type event struct {
 	Table     string
 	NetworkID string
 	Key       string
 	Value     []byte
-***REMOVED***
+}
 
 // NodeTable represents table event for node join and leave
 const NodeTable = "NodeTable"
 
 // NodeAddr represents the value carried for node event in NodeTable
-type NodeAddr struct ***REMOVED***
+type NodeAddr struct {
 	Addr net.IP
-***REMOVED***
+}
 
 // CreateEvent generates a table entry create event to the watchers
 type CreateEvent event
@@ -43,68 +43,68 @@ type DeleteEvent event
 // filter is an empty string it acts as a wildcard for that
 // field. Watch returns a channel of events, where the events will be
 // sent.
-func (nDB *NetworkDB) Watch(tname, nid, key string) (*events.Channel, func()) ***REMOVED***
+func (nDB *NetworkDB) Watch(tname, nid, key string) (*events.Channel, func()) {
 	var matcher events.Matcher
 
-	if tname != "" || nid != "" || key != "" ***REMOVED***
-		matcher = events.MatcherFunc(func(ev events.Event) bool ***REMOVED***
+	if tname != "" || nid != "" || key != "" {
+		matcher = events.MatcherFunc(func(ev events.Event) bool {
 			var evt event
-			switch ev := ev.(type) ***REMOVED***
+			switch ev := ev.(type) {
 			case CreateEvent:
 				evt = event(ev)
 			case UpdateEvent:
 				evt = event(ev)
 			case DeleteEvent:
 				evt = event(ev)
-			***REMOVED***
+			}
 
-			if tname != "" && evt.Table != tname ***REMOVED***
+			if tname != "" && evt.Table != tname {
 				return false
-			***REMOVED***
+			}
 
-			if nid != "" && evt.NetworkID != nid ***REMOVED***
+			if nid != "" && evt.NetworkID != nid {
 				return false
-			***REMOVED***
+			}
 
-			if key != "" && evt.Key != key ***REMOVED***
+			if key != "" && evt.Key != key {
 				return false
-			***REMOVED***
+			}
 
 			return true
-		***REMOVED***)
-	***REMOVED***
+		})
+	}
 
 	ch := events.NewChannel(0)
 	sink := events.Sink(events.NewQueue(ch))
 
-	if matcher != nil ***REMOVED***
+	if matcher != nil {
 		sink = events.NewFilter(sink, matcher)
-	***REMOVED***
+	}
 
 	nDB.broadcaster.Add(sink)
-	return ch, func() ***REMOVED***
+	return ch, func() {
 		nDB.broadcaster.Remove(sink)
 		ch.Close()
 		sink.Close()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func makeEvent(op opType, tname, nid, key string, value []byte) events.Event ***REMOVED***
-	ev := event***REMOVED***
+func makeEvent(op opType, tname, nid, key string, value []byte) events.Event {
+	ev := event{
 		Table:     tname,
 		NetworkID: nid,
 		Key:       key,
 		Value:     value,
-	***REMOVED***
+	}
 
-	switch op ***REMOVED***
+	switch op {
 	case opCreate:
 		return CreateEvent(ev)
 	case opUpdate:
 		return UpdateEvent(ev)
 	case opDelete:
 		return DeleteEvent(ev)
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}

@@ -14,21 +14,21 @@ package docker.swarmkit.v1;
 import "gogoproto/gogo.proto";
 import "github.com/docker/swarmkit/protobuf/plugin/plugin.proto";
 
-service Health ***REMOVED***
-	rpc Check(HealthCheckRequest) returns (HealthCheckResponse) ***REMOVED***
-		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED*** roles: "swarm-manager" ***REMOVED***;
-	***REMOVED***;
-***REMOVED***
+service Health {
+	rpc Check(HealthCheckRequest) returns (HealthCheckResponse) {
+		option (docker.protobuf.plugin.tls_authorization) = { roles: "swarm-manager" };
+	};
+}
 
-message HealthCheckRequest ***REMOVED***
+message HealthCheckRequest {
 	string service = 1;
-***REMOVED***
+}
 
-message HealthCheckResponse ***REMOVED***
-	enum ServingStatus ***REMOVED***
+message HealthCheckResponse {
+	enum ServingStatus {
 		UNKNOWN = 0;
 		SERVING = 1;
 		NOT_SERVING = 2;
-	***REMOVED***
+	}
 	ServingStatus status = 1;
-***REMOVED***
+}

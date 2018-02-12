@@ -12,347 +12,347 @@ import (
 	"github.com/docker/docker/registry"
 )
 
-type FakeService struct ***REMOVED***
+type FakeService struct {
 	registry.DefaultService
 
 	shouldReturnError bool
 
 	term    string
 	results []registrytypes.SearchResult
-***REMOVED***
+}
 
-func (s *FakeService) Search(ctx context.Context, term string, limit int, authConfig *types.AuthConfig, userAgent string, headers map[string][]string) (*registrytypes.SearchResults, error) ***REMOVED***
-	if s.shouldReturnError ***REMOVED***
+func (s *FakeService) Search(ctx context.Context, term string, limit int, authConfig *types.AuthConfig, userAgent string, headers map[string][]string) (*registrytypes.SearchResults, error) {
+	if s.shouldReturnError {
 		return nil, errors.New("Search unknown error")
-	***REMOVED***
-	return &registrytypes.SearchResults***REMOVED***
+	}
+	return &registrytypes.SearchResults{
 		Query:      s.term,
 		NumResults: len(s.results),
 		Results:    s.results,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-func TestSearchRegistryForImagesErrors(t *testing.T) ***REMOVED***
-	errorCases := []struct ***REMOVED***
+func TestSearchRegistryForImagesErrors(t *testing.T) {
+	errorCases := []struct {
 		filtersArgs       string
 		shouldReturnError bool
 		expectedError     string
-	***REMOVED******REMOVED***
-		***REMOVED***
+	}{
+		{
 			expectedError:     "Search unknown error",
 			shouldReturnError: true,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			filtersArgs:   "invalid json",
 			expectedError: "invalid character 'i' looking for beginning of value",
-		***REMOVED***,
-		***REMOVED***
-			filtersArgs:   `***REMOVED***"type":***REMOVED***"custom":true***REMOVED******REMOVED***`,
+		},
+		{
+			filtersArgs:   `{"type":{"custom":true}}`,
 			expectedError: "Invalid filter 'type'",
-		***REMOVED***,
-		***REMOVED***
-			filtersArgs:   `***REMOVED***"is-automated":***REMOVED***"invalid":true***REMOVED******REMOVED***`,
+		},
+		{
+			filtersArgs:   `{"is-automated":{"invalid":true}}`,
 			expectedError: "Invalid filter 'is-automated=[invalid]'",
-		***REMOVED***,
-		***REMOVED***
-			filtersArgs:   `***REMOVED***"is-automated":***REMOVED***"true":true,"false":true***REMOVED******REMOVED***`,
+		},
+		{
+			filtersArgs:   `{"is-automated":{"true":true,"false":true}}`,
 			expectedError: "Invalid filter 'is-automated",
-		***REMOVED***,
-		***REMOVED***
-			filtersArgs:   `***REMOVED***"is-official":***REMOVED***"invalid":true***REMOVED******REMOVED***`,
+		},
+		{
+			filtersArgs:   `{"is-official":{"invalid":true}}`,
 			expectedError: "Invalid filter 'is-official=[invalid]'",
-		***REMOVED***,
-		***REMOVED***
-			filtersArgs:   `***REMOVED***"is-official":***REMOVED***"true":true,"false":true***REMOVED******REMOVED***`,
+		},
+		{
+			filtersArgs:   `{"is-official":{"true":true,"false":true}}`,
 			expectedError: "Invalid filter 'is-official",
-		***REMOVED***,
-		***REMOVED***
-			filtersArgs:   `***REMOVED***"stars":***REMOVED***"invalid":true***REMOVED******REMOVED***`,
+		},
+		{
+			filtersArgs:   `{"stars":{"invalid":true}}`,
 			expectedError: "Invalid filter 'stars=invalid'",
-		***REMOVED***,
-		***REMOVED***
-			filtersArgs:   `***REMOVED***"stars":***REMOVED***"1":true,"invalid":true***REMOVED******REMOVED***`,
+		},
+		{
+			filtersArgs:   `{"stars":{"1":true,"invalid":true}}`,
 			expectedError: "Invalid filter 'stars=invalid'",
-		***REMOVED***,
-	***REMOVED***
-	for index, e := range errorCases ***REMOVED***
-		daemon := &Daemon***REMOVED***
-			RegistryService: &FakeService***REMOVED***
+		},
+	}
+	for index, e := range errorCases {
+		daemon := &Daemon{
+			RegistryService: &FakeService{
 				shouldReturnError: e.shouldReturnError,
-			***REMOVED***,
-		***REMOVED***
-		_, err := daemon.SearchRegistryForImages(context.Background(), e.filtersArgs, "term", 25, nil, map[string][]string***REMOVED******REMOVED***)
-		if err == nil ***REMOVED***
+			},
+		}
+		_, err := daemon.SearchRegistryForImages(context.Background(), e.filtersArgs, "term", 25, nil, map[string][]string{})
+		if err == nil {
 			t.Errorf("%d: expected an error, got nothing", index)
-		***REMOVED***
-		if !strings.Contains(err.Error(), e.expectedError) ***REMOVED***
+		}
+		if !strings.Contains(err.Error(), e.expectedError) {
 			t.Errorf("%d: expected error to contain %s, got %s", index, e.expectedError, err.Error())
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestSearchRegistryForImages(t *testing.T) ***REMOVED***
+func TestSearchRegistryForImages(t *testing.T) {
 	term := "term"
-	successCases := []struct ***REMOVED***
+	successCases := []struct {
 		filtersArgs     string
 		registryResults []registrytypes.SearchResult
 		expectedResults []registrytypes.SearchResult
-	***REMOVED******REMOVED***
-		***REMOVED***
+	}{
+		{
 			filtersArgs:     "",
-			registryResults: []registrytypes.SearchResult***REMOVED******REMOVED***,
-			expectedResults: []registrytypes.SearchResult***REMOVED******REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			registryResults: []registrytypes.SearchResult{},
+			expectedResults: []registrytypes.SearchResult{},
+		},
+		{
 			filtersArgs: "",
-			registryResults: []registrytypes.SearchResult***REMOVED***
-				***REMOVED***
+			registryResults: []registrytypes.SearchResult{
+				{
 					Name:        "name",
 					Description: "description",
-				***REMOVED***,
-			***REMOVED***,
-			expectedResults: []registrytypes.SearchResult***REMOVED***
-				***REMOVED***
+				},
+			},
+			expectedResults: []registrytypes.SearchResult{
+				{
 					Name:        "name",
 					Description: "description",
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			filtersArgs: `***REMOVED***"is-automated":***REMOVED***"true":true***REMOVED******REMOVED***`,
-			registryResults: []registrytypes.SearchResult***REMOVED***
-				***REMOVED***
+				},
+			},
+		},
+		{
+			filtersArgs: `{"is-automated":{"true":true}}`,
+			registryResults: []registrytypes.SearchResult{
+				{
 					Name:        "name",
 					Description: "description",
-				***REMOVED***,
-			***REMOVED***,
-			expectedResults: []registrytypes.SearchResult***REMOVED******REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			filtersArgs: `***REMOVED***"is-automated":***REMOVED***"true":true***REMOVED******REMOVED***`,
-			registryResults: []registrytypes.SearchResult***REMOVED***
-				***REMOVED***
-					Name:        "name",
-					Description: "description",
-					IsAutomated: true,
-				***REMOVED***,
-			***REMOVED***,
-			expectedResults: []registrytypes.SearchResult***REMOVED***
-				***REMOVED***
+				},
+			},
+			expectedResults: []registrytypes.SearchResult{},
+		},
+		{
+			filtersArgs: `{"is-automated":{"true":true}}`,
+			registryResults: []registrytypes.SearchResult{
+				{
 					Name:        "name",
 					Description: "description",
 					IsAutomated: true,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			filtersArgs: `***REMOVED***"is-automated":***REMOVED***"false":true***REMOVED******REMOVED***`,
-			registryResults: []registrytypes.SearchResult***REMOVED***
-				***REMOVED***
+				},
+			},
+			expectedResults: []registrytypes.SearchResult{
+				{
 					Name:        "name",
 					Description: "description",
 					IsAutomated: true,
-				***REMOVED***,
-			***REMOVED***,
-			expectedResults: []registrytypes.SearchResult***REMOVED******REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			filtersArgs: `***REMOVED***"is-automated":***REMOVED***"false":true***REMOVED******REMOVED***`,
-			registryResults: []registrytypes.SearchResult***REMOVED***
-				***REMOVED***
+				},
+			},
+		},
+		{
+			filtersArgs: `{"is-automated":{"false":true}}`,
+			registryResults: []registrytypes.SearchResult{
+				{
+					Name:        "name",
+					Description: "description",
+					IsAutomated: true,
+				},
+			},
+			expectedResults: []registrytypes.SearchResult{},
+		},
+		{
+			filtersArgs: `{"is-automated":{"false":true}}`,
+			registryResults: []registrytypes.SearchResult{
+				{
 					Name:        "name",
 					Description: "description",
 					IsAutomated: false,
-				***REMOVED***,
-			***REMOVED***,
-			expectedResults: []registrytypes.SearchResult***REMOVED***
-				***REMOVED***
+				},
+			},
+			expectedResults: []registrytypes.SearchResult{
+				{
 					Name:        "name",
 					Description: "description",
 					IsAutomated: false,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			filtersArgs: `***REMOVED***"is-official":***REMOVED***"true":true***REMOVED******REMOVED***`,
-			registryResults: []registrytypes.SearchResult***REMOVED***
-				***REMOVED***
+				},
+			},
+		},
+		{
+			filtersArgs: `{"is-official":{"true":true}}`,
+			registryResults: []registrytypes.SearchResult{
+				{
 					Name:        "name",
 					Description: "description",
-				***REMOVED***,
-			***REMOVED***,
-			expectedResults: []registrytypes.SearchResult***REMOVED******REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			filtersArgs: `***REMOVED***"is-official":***REMOVED***"true":true***REMOVED******REMOVED***`,
-			registryResults: []registrytypes.SearchResult***REMOVED***
-				***REMOVED***
-					Name:        "name",
-					Description: "description",
-					IsOfficial:  true,
-				***REMOVED***,
-			***REMOVED***,
-			expectedResults: []registrytypes.SearchResult***REMOVED***
-				***REMOVED***
+				},
+			},
+			expectedResults: []registrytypes.SearchResult{},
+		},
+		{
+			filtersArgs: `{"is-official":{"true":true}}`,
+			registryResults: []registrytypes.SearchResult{
+				{
 					Name:        "name",
 					Description: "description",
 					IsOfficial:  true,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			filtersArgs: `***REMOVED***"is-official":***REMOVED***"false":true***REMOVED******REMOVED***`,
-			registryResults: []registrytypes.SearchResult***REMOVED***
-				***REMOVED***
+				},
+			},
+			expectedResults: []registrytypes.SearchResult{
+				{
 					Name:        "name",
 					Description: "description",
 					IsOfficial:  true,
-				***REMOVED***,
-			***REMOVED***,
-			expectedResults: []registrytypes.SearchResult***REMOVED******REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			filtersArgs: `***REMOVED***"is-official":***REMOVED***"false":true***REMOVED******REMOVED***`,
-			registryResults: []registrytypes.SearchResult***REMOVED***
-				***REMOVED***
+				},
+			},
+		},
+		{
+			filtersArgs: `{"is-official":{"false":true}}`,
+			registryResults: []registrytypes.SearchResult{
+				{
+					Name:        "name",
+					Description: "description",
+					IsOfficial:  true,
+				},
+			},
+			expectedResults: []registrytypes.SearchResult{},
+		},
+		{
+			filtersArgs: `{"is-official":{"false":true}}`,
+			registryResults: []registrytypes.SearchResult{
+				{
 					Name:        "name",
 					Description: "description",
 					IsOfficial:  false,
-				***REMOVED***,
-			***REMOVED***,
-			expectedResults: []registrytypes.SearchResult***REMOVED***
-				***REMOVED***
+				},
+			},
+			expectedResults: []registrytypes.SearchResult{
+				{
 					Name:        "name",
 					Description: "description",
 					IsOfficial:  false,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			filtersArgs: `***REMOVED***"stars":***REMOVED***"0":true***REMOVED******REMOVED***`,
-			registryResults: []registrytypes.SearchResult***REMOVED***
-				***REMOVED***
+				},
+			},
+		},
+		{
+			filtersArgs: `{"stars":{"0":true}}`,
+			registryResults: []registrytypes.SearchResult{
+				{
 					Name:        "name",
 					Description: "description",
 					StarCount:   0,
-				***REMOVED***,
-			***REMOVED***,
-			expectedResults: []registrytypes.SearchResult***REMOVED***
-				***REMOVED***
+				},
+			},
+			expectedResults: []registrytypes.SearchResult{
+				{
 					Name:        "name",
 					Description: "description",
 					StarCount:   0,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			filtersArgs: `***REMOVED***"stars":***REMOVED***"1":true***REMOVED******REMOVED***`,
-			registryResults: []registrytypes.SearchResult***REMOVED***
-				***REMOVED***
+				},
+			},
+		},
+		{
+			filtersArgs: `{"stars":{"1":true}}`,
+			registryResults: []registrytypes.SearchResult{
+				{
 					Name:        "name",
 					Description: "description",
 					StarCount:   0,
-				***REMOVED***,
-			***REMOVED***,
-			expectedResults: []registrytypes.SearchResult***REMOVED******REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			filtersArgs: `***REMOVED***"stars":***REMOVED***"1":true***REMOVED******REMOVED***`,
-			registryResults: []registrytypes.SearchResult***REMOVED***
-				***REMOVED***
+				},
+			},
+			expectedResults: []registrytypes.SearchResult{},
+		},
+		{
+			filtersArgs: `{"stars":{"1":true}}`,
+			registryResults: []registrytypes.SearchResult{
+				{
 					Name:        "name0",
 					Description: "description0",
 					StarCount:   0,
-				***REMOVED***,
-				***REMOVED***
+				},
+				{
 					Name:        "name1",
 					Description: "description1",
 					StarCount:   1,
-				***REMOVED***,
-			***REMOVED***,
-			expectedResults: []registrytypes.SearchResult***REMOVED***
-				***REMOVED***
+				},
+			},
+			expectedResults: []registrytypes.SearchResult{
+				{
 					Name:        "name1",
 					Description: "description1",
 					StarCount:   1,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			filtersArgs: `***REMOVED***"stars":***REMOVED***"1":true***REMOVED***, "is-official":***REMOVED***"true":true***REMOVED***, "is-automated":***REMOVED***"true":true***REMOVED******REMOVED***`,
-			registryResults: []registrytypes.SearchResult***REMOVED***
-				***REMOVED***
+				},
+			},
+		},
+		{
+			filtersArgs: `{"stars":{"1":true}, "is-official":{"true":true}, "is-automated":{"true":true}}`,
+			registryResults: []registrytypes.SearchResult{
+				{
 					Name:        "name0",
 					Description: "description0",
 					StarCount:   0,
 					IsOfficial:  true,
 					IsAutomated: true,
-				***REMOVED***,
-				***REMOVED***
+				},
+				{
 					Name:        "name1",
 					Description: "description1",
 					StarCount:   1,
 					IsOfficial:  false,
 					IsAutomated: true,
-				***REMOVED***,
-				***REMOVED***
+				},
+				{
 					Name:        "name2",
 					Description: "description2",
 					StarCount:   1,
 					IsOfficial:  true,
 					IsAutomated: false,
-				***REMOVED***,
-				***REMOVED***
+				},
+				{
 					Name:        "name3",
 					Description: "description3",
 					StarCount:   2,
 					IsOfficial:  true,
 					IsAutomated: true,
-				***REMOVED***,
-			***REMOVED***,
-			expectedResults: []registrytypes.SearchResult***REMOVED***
-				***REMOVED***
+				},
+			},
+			expectedResults: []registrytypes.SearchResult{
+				{
 					Name:        "name3",
 					Description: "description3",
 					StarCount:   2,
 					IsOfficial:  true,
 					IsAutomated: true,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
-	for index, s := range successCases ***REMOVED***
-		daemon := &Daemon***REMOVED***
-			RegistryService: &FakeService***REMOVED***
+				},
+			},
+		},
+	}
+	for index, s := range successCases {
+		daemon := &Daemon{
+			RegistryService: &FakeService{
 				term:    term,
 				results: s.registryResults,
-			***REMOVED***,
-		***REMOVED***
-		results, err := daemon.SearchRegistryForImages(context.Background(), s.filtersArgs, term, 25, nil, map[string][]string***REMOVED******REMOVED***)
-		if err != nil ***REMOVED***
+			},
+		}
+		results, err := daemon.SearchRegistryForImages(context.Background(), s.filtersArgs, term, 25, nil, map[string][]string{})
+		if err != nil {
 			t.Errorf("%d: %v", index, err)
-		***REMOVED***
-		if results.Query != term ***REMOVED***
+		}
+		if results.Query != term {
 			t.Errorf("%d: expected Query to be %s, got %s", index, term, results.Query)
-		***REMOVED***
-		if results.NumResults != len(s.expectedResults) ***REMOVED***
+		}
+		if results.NumResults != len(s.expectedResults) {
 			t.Errorf("%d: expected NumResults to be %d, got %d", index, len(s.expectedResults), results.NumResults)
-		***REMOVED***
-		for _, result := range results.Results ***REMOVED***
+		}
+		for _, result := range results.Results {
 			found := false
-			for _, expectedResult := range s.expectedResults ***REMOVED***
+			for _, expectedResult := range s.expectedResults {
 				if expectedResult.Name == result.Name &&
 					expectedResult.Description == result.Description &&
 					expectedResult.IsAutomated == result.IsAutomated &&
 					expectedResult.IsOfficial == result.IsOfficial &&
-					expectedResult.StarCount == result.StarCount ***REMOVED***
+					expectedResult.StarCount == result.StarCount {
 					found = true
 					break
-				***REMOVED***
-			***REMOVED***
-			if !found ***REMOVED***
+				}
+			}
+			if !found {
 				t.Errorf("%d: expected results %v, got %v", index, s.expectedResults, results.Results)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}

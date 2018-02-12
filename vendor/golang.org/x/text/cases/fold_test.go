@@ -10,42 +10,42 @@ import (
 	"golang.org/x/text/internal/testtext"
 )
 
-var foldTestCases = []string***REMOVED***
+var foldTestCases = []string{
 	"βß\u13f8",        // "βssᏰ"
 	"ab\u13fc\uab7aꭰ", // abᏴᎪᎠ
 	"aﬃﬄaﬆ",           // affifflast
 	"Iİiı\u0345",      // ii̇iıι
 	"µµΜΜςσΣΣ",        // μμμμσσσσ
-***REMOVED***
+}
 
-func TestFold(t *testing.T) ***REMOVED***
-	for _, tc := range foldTestCases ***REMOVED***
-		testEntry := func(name string, c Caser, m func(r rune) string) ***REMOVED***
+func TestFold(t *testing.T) {
+	for _, tc := range foldTestCases {
+		testEntry := func(name string, c Caser, m func(r rune) string) {
 			want := ""
-			for _, r := range tc ***REMOVED***
+			for _, r := range tc {
 				want += m(r)
-			***REMOVED***
-			if got := c.String(tc); got != want ***REMOVED***
+			}
+			if got := c.String(tc); got != want {
 				t.Errorf("%s(%s) = %+q; want %+q", name, tc, got, want)
-			***REMOVED***
+			}
 			dst := make([]byte, 256) // big enough to hold any result
 			src := []byte(tc)
-			v := testtext.AllocsPerRun(20, func() ***REMOVED***
+			v := testtext.AllocsPerRun(20, func() {
 				c.Transform(dst, src, true)
-			***REMOVED***)
-			if v > 0 ***REMOVED***
+			})
+			if v > 0 {
 				t.Errorf("%s(%s): number of allocs was %f; want 0", name, tc, v)
-			***REMOVED***
-		***REMOVED***
-		testEntry("FullFold", Fold(), func(r rune) string ***REMOVED***
+			}
+		}
+		testEntry("FullFold", Fold(), func(r rune) string {
 			return runeFoldData(r).full
-		***REMOVED***)
+		})
 		// TODO:
-		// testEntry("SimpleFold", Fold(Compact), func(r rune) string ***REMOVED***
+		// testEntry("SimpleFold", Fold(Compact), func(r rune) string {
 		// 	return runeFoldData(r).simple
-		// ***REMOVED***)
-		// testEntry("SpecialFold", Fold(Turkic), func(r rune) string ***REMOVED***
+		// })
+		// testEntry("SpecialFold", Fold(Turkic), func(r rune) string {
 		// 	return runeFoldData(r).special
-		// ***REMOVED***)
-	***REMOVED***
-***REMOVED***
+		// })
+	}
+}

@@ -13,74 +13,74 @@ var (
 	parseResponseOnce sync.Once
 )
 
-func parseResponseHandler(rw http.ResponseWriter, r *http.Request) ***REMOVED***
+func parseResponseHandler(rw http.ResponseWriter, r *http.Request) {
 	rw.Header().Set("Content-Type", "application/json")
 	token := r.FormValue("token")
 	log.Println(token)
-	if token == "" ***REMOVED***
-		rw.Write([]byte(`***REMOVED***"ok":false,"error":"not_authed"***REMOVED***`))
+	if token == "" {
+		rw.Write([]byte(`{"ok":false,"error":"not_authed"}`))
 		return
-	***REMOVED***
-	if token != validToken ***REMOVED***
-		rw.Write([]byte(`***REMOVED***"ok":false,"error":"invalid_auth"***REMOVED***`))
+	}
+	if token != validToken {
+		rw.Write([]byte(`{"ok":false,"error":"invalid_auth"}`))
 		return
-	***REMOVED***
-	response := []byte(`***REMOVED***"ok": true***REMOVED***`)
+	}
+	response := []byte(`{"ok": true}`)
 	rw.Write(response)
-***REMOVED***
+}
 
-func setParseResponseHandler() ***REMOVED***
+func setParseResponseHandler() {
 	http.HandleFunc("/parseResponse", parseResponseHandler)
-***REMOVED***
+}
 
-func TestParseResponse(t *testing.T) ***REMOVED***
+func TestParseResponse(t *testing.T) {
 	parseResponseOnce.Do(setParseResponseHandler)
 	once.Do(startServer)
 	SLACK_API = "http://" + serverAddr + "/"
-	values := url.Values***REMOVED***
-		"token": ***REMOVED***validToken***REMOVED***,
-	***REMOVED***
-	responsePartial := &SlackResponse***REMOVED******REMOVED***
+	values := url.Values{
+		"token": {validToken},
+	}
+	responsePartial := &SlackResponse{}
 	err := post(context.Background(), http.DefaultClient, "parseResponse", values, responsePartial, false)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("Unexpected error: %s", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestParseResponseNoToken(t *testing.T) ***REMOVED***
+func TestParseResponseNoToken(t *testing.T) {
 	parseResponseOnce.Do(setParseResponseHandler)
 	once.Do(startServer)
 	SLACK_API = "http://" + serverAddr + "/"
-	values := url.Values***REMOVED******REMOVED***
-	responsePartial := &SlackResponse***REMOVED******REMOVED***
+	values := url.Values{}
+	responsePartial := &SlackResponse{}
 	err := post(context.Background(), http.DefaultClient, "parseResponse", values, responsePartial, false)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("Unexpected error: %s", err)
 		return
-	***REMOVED***
-	if responsePartial.Ok == true ***REMOVED***
+	}
+	if responsePartial.Ok == true {
 		t.Errorf("Unexpected error: %s", err)
-	***REMOVED*** else if responsePartial.Error != "not_authed" ***REMOVED***
+	} else if responsePartial.Error != "not_authed" {
 		t.Errorf("got %v; want %v", responsePartial.Error, "not_authed")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestParseResponseInvalidToken(t *testing.T) ***REMOVED***
+func TestParseResponseInvalidToken(t *testing.T) {
 	parseResponseOnce.Do(setParseResponseHandler)
 	once.Do(startServer)
 	SLACK_API = "http://" + serverAddr + "/"
-	values := url.Values***REMOVED***
-		"token": ***REMOVED***"whatever"***REMOVED***,
-	***REMOVED***
-	responsePartial := &SlackResponse***REMOVED******REMOVED***
+	values := url.Values{
+		"token": {"whatever"},
+	}
+	responsePartial := &SlackResponse{}
 	err := post(context.Background(), http.DefaultClient, "parseResponse", values, responsePartial, false)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("Unexpected error: %s", err)
 		return
-	***REMOVED***
-	if responsePartial.Ok == true ***REMOVED***
+	}
+	if responsePartial.Ok == true {
 		t.Errorf("Unexpected error: %s", err)
-	***REMOVED*** else if responsePartial.Error != "invalid_auth" ***REMOVED***
+	} else if responsePartial.Error != "invalid_auth" {
 		t.Errorf("got %v; want %v", responsePartial.Error, "invalid_auth")
-	***REMOVED***
-***REMOVED***
+	}
+}

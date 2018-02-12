@@ -58,7 +58,7 @@ var _ = time.Kitchen
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
-type Image struct ***REMOVED***
+type Image struct {
 	// Name provides a unique name for the image.
 	//
 	// Containerd treats this as the primary identifier.
@@ -75,45 +75,45 @@ type Image struct ***REMOVED***
 	CreatedAt time.Time `protobuf:"bytes,7,opt,name=created_at,json=createdAt,stdtime" json:"created_at"`
 	// UpdatedAt is the last time the image was mutated.
 	UpdatedAt time.Time `protobuf:"bytes,8,opt,name=updated_at,json=updatedAt,stdtime" json:"updated_at"`
-***REMOVED***
+}
 
-func (m *Image) Reset()                    ***REMOVED*** *m = Image***REMOVED******REMOVED*** ***REMOVED***
-func (*Image) ProtoMessage()               ***REMOVED******REMOVED***
-func (*Image) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorImages, []int***REMOVED***0***REMOVED*** ***REMOVED***
+func (m *Image) Reset()                    { *m = Image{} }
+func (*Image) ProtoMessage()               {}
+func (*Image) Descriptor() ([]byte, []int) { return fileDescriptorImages, []int{0} }
 
-type GetImageRequest struct ***REMOVED***
+type GetImageRequest struct {
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-***REMOVED***
+}
 
-func (m *GetImageRequest) Reset()                    ***REMOVED*** *m = GetImageRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*GetImageRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*GetImageRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorImages, []int***REMOVED***1***REMOVED*** ***REMOVED***
+func (m *GetImageRequest) Reset()                    { *m = GetImageRequest{} }
+func (*GetImageRequest) ProtoMessage()               {}
+func (*GetImageRequest) Descriptor() ([]byte, []int) { return fileDescriptorImages, []int{1} }
 
-type GetImageResponse struct ***REMOVED***
+type GetImageResponse struct {
 	Image *Image `protobuf:"bytes,1,opt,name=image" json:"image,omitempty"`
-***REMOVED***
+}
 
-func (m *GetImageResponse) Reset()                    ***REMOVED*** *m = GetImageResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*GetImageResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*GetImageResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorImages, []int***REMOVED***2***REMOVED*** ***REMOVED***
+func (m *GetImageResponse) Reset()                    { *m = GetImageResponse{} }
+func (*GetImageResponse) ProtoMessage()               {}
+func (*GetImageResponse) Descriptor() ([]byte, []int) { return fileDescriptorImages, []int{2} }
 
-type CreateImageRequest struct ***REMOVED***
+type CreateImageRequest struct {
 	Image Image `protobuf:"bytes,1,opt,name=image" json:"image"`
-***REMOVED***
+}
 
-func (m *CreateImageRequest) Reset()                    ***REMOVED*** *m = CreateImageRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*CreateImageRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*CreateImageRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorImages, []int***REMOVED***3***REMOVED*** ***REMOVED***
+func (m *CreateImageRequest) Reset()                    { *m = CreateImageRequest{} }
+func (*CreateImageRequest) ProtoMessage()               {}
+func (*CreateImageRequest) Descriptor() ([]byte, []int) { return fileDescriptorImages, []int{3} }
 
-type CreateImageResponse struct ***REMOVED***
+type CreateImageResponse struct {
 	Image Image `protobuf:"bytes,1,opt,name=image" json:"image"`
-***REMOVED***
+}
 
-func (m *CreateImageResponse) Reset()                    ***REMOVED*** *m = CreateImageResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*CreateImageResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*CreateImageResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorImages, []int***REMOVED***4***REMOVED*** ***REMOVED***
+func (m *CreateImageResponse) Reset()                    { *m = CreateImageResponse{} }
+func (*CreateImageResponse) ProtoMessage()               {}
+func (*CreateImageResponse) Descriptor() ([]byte, []int) { return fileDescriptorImages, []int{4} }
 
-type UpdateImageRequest struct ***REMOVED***
+type UpdateImageRequest struct {
 	// Image provides a full or partial image for update.
 	//
 	// The name field must be set or an error will be returned.
@@ -121,21 +121,21 @@ type UpdateImageRequest struct ***REMOVED***
 	// UpdateMask specifies which fields to perform the update on. If empty,
 	// the operation applies to all fields.
 	UpdateMask *google_protobuf2.FieldMask `protobuf:"bytes,2,opt,name=update_mask,json=updateMask" json:"update_mask,omitempty"`
-***REMOVED***
+}
 
-func (m *UpdateImageRequest) Reset()                    ***REMOVED*** *m = UpdateImageRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*UpdateImageRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*UpdateImageRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorImages, []int***REMOVED***5***REMOVED*** ***REMOVED***
+func (m *UpdateImageRequest) Reset()                    { *m = UpdateImageRequest{} }
+func (*UpdateImageRequest) ProtoMessage()               {}
+func (*UpdateImageRequest) Descriptor() ([]byte, []int) { return fileDescriptorImages, []int{5} }
 
-type UpdateImageResponse struct ***REMOVED***
+type UpdateImageResponse struct {
 	Image Image `protobuf:"bytes,1,opt,name=image" json:"image"`
-***REMOVED***
+}
 
-func (m *UpdateImageResponse) Reset()                    ***REMOVED*** *m = UpdateImageResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*UpdateImageResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*UpdateImageResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorImages, []int***REMOVED***6***REMOVED*** ***REMOVED***
+func (m *UpdateImageResponse) Reset()                    { *m = UpdateImageResponse{} }
+func (*UpdateImageResponse) ProtoMessage()               {}
+func (*UpdateImageResponse) Descriptor() ([]byte, []int) { return fileDescriptorImages, []int{6} }
 
-type ListImagesRequest struct ***REMOVED***
+type ListImagesRequest struct {
 	// Filters contains one or more filters using the syntax defined in the
 	// containerd filter package.
 	//
@@ -147,34 +147,34 @@ type ListImagesRequest struct ***REMOVED***
 	//
 	// If filters is zero-length or nil, all items will be returned.
 	Filters []string `protobuf:"bytes,1,rep,name=filters" json:"filters,omitempty"`
-***REMOVED***
+}
 
-func (m *ListImagesRequest) Reset()                    ***REMOVED*** *m = ListImagesRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*ListImagesRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*ListImagesRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorImages, []int***REMOVED***7***REMOVED*** ***REMOVED***
+func (m *ListImagesRequest) Reset()                    { *m = ListImagesRequest{} }
+func (*ListImagesRequest) ProtoMessage()               {}
+func (*ListImagesRequest) Descriptor() ([]byte, []int) { return fileDescriptorImages, []int{7} }
 
-type ListImagesResponse struct ***REMOVED***
+type ListImagesResponse struct {
 	Images []Image `protobuf:"bytes,1,rep,name=images" json:"images"`
-***REMOVED***
+}
 
-func (m *ListImagesResponse) Reset()                    ***REMOVED*** *m = ListImagesResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*ListImagesResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*ListImagesResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorImages, []int***REMOVED***8***REMOVED*** ***REMOVED***
+func (m *ListImagesResponse) Reset()                    { *m = ListImagesResponse{} }
+func (*ListImagesResponse) ProtoMessage()               {}
+func (*ListImagesResponse) Descriptor() ([]byte, []int) { return fileDescriptorImages, []int{8} }
 
-type DeleteImageRequest struct ***REMOVED***
+type DeleteImageRequest struct {
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Sync indicates that the delete and cleanup should be done
 	// synchronously before returning to the caller
 	//
 	// Default is false
 	Sync bool `protobuf:"varint,2,opt,name=sync,proto3" json:"sync,omitempty"`
-***REMOVED***
+}
 
-func (m *DeleteImageRequest) Reset()                    ***REMOVED*** *m = DeleteImageRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*DeleteImageRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*DeleteImageRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorImages, []int***REMOVED***9***REMOVED*** ***REMOVED***
+func (m *DeleteImageRequest) Reset()                    { *m = DeleteImageRequest{} }
+func (*DeleteImageRequest) ProtoMessage()               {}
+func (*DeleteImageRequest) Descriptor() ([]byte, []int) { return fileDescriptorImages, []int{9} }
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*Image)(nil), "containerd.services.images.v1.Image")
 	proto.RegisterType((*GetImageRequest)(nil), "containerd.services.images.v1.GetImageRequest")
 	proto.RegisterType((*GetImageResponse)(nil), "containerd.services.images.v1.GetImageResponse")
@@ -185,7 +185,7 @@ func init() ***REMOVED***
 	proto.RegisterType((*ListImagesRequest)(nil), "containerd.services.images.v1.ListImagesRequest")
 	proto.RegisterType((*ListImagesResponse)(nil), "containerd.services.images.v1.ListImagesResponse")
 	proto.RegisterType((*DeleteImageRequest)(nil), "containerd.services.images.v1.DeleteImageRequest")
-***REMOVED***
+}
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
@@ -197,7 +197,7 @@ const _ = grpc.SupportPackageIsVersion4
 
 // Client API for Images service
 
-type ImagesClient interface ***REMOVED***
+type ImagesClient interface {
 	// Get returns an image by name.
 	Get(ctx context.Context, in *GetImageRequest, opts ...grpc.CallOption) (*GetImageResponse, error)
 	// List returns a list of all images known to containerd.
@@ -211,64 +211,64 @@ type ImagesClient interface ***REMOVED***
 	Update(ctx context.Context, in *UpdateImageRequest, opts ...grpc.CallOption) (*UpdateImageResponse, error)
 	// Delete deletes the image by name.
 	Delete(ctx context.Context, in *DeleteImageRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error)
-***REMOVED***
+}
 
-type imagesClient struct ***REMOVED***
+type imagesClient struct {
 	cc *grpc.ClientConn
-***REMOVED***
+}
 
-func NewImagesClient(cc *grpc.ClientConn) ImagesClient ***REMOVED***
-	return &imagesClient***REMOVED***cc***REMOVED***
-***REMOVED***
+func NewImagesClient(cc *grpc.ClientConn) ImagesClient {
+	return &imagesClient{cc}
+}
 
-func (c *imagesClient) Get(ctx context.Context, in *GetImageRequest, opts ...grpc.CallOption) (*GetImageResponse, error) ***REMOVED***
+func (c *imagesClient) Get(ctx context.Context, in *GetImageRequest, opts ...grpc.CallOption) (*GetImageResponse, error) {
 	out := new(GetImageResponse)
 	err := grpc.Invoke(ctx, "/containerd.services.images.v1.Images/Get", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *imagesClient) List(ctx context.Context, in *ListImagesRequest, opts ...grpc.CallOption) (*ListImagesResponse, error) ***REMOVED***
+func (c *imagesClient) List(ctx context.Context, in *ListImagesRequest, opts ...grpc.CallOption) (*ListImagesResponse, error) {
 	out := new(ListImagesResponse)
 	err := grpc.Invoke(ctx, "/containerd.services.images.v1.Images/List", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *imagesClient) Create(ctx context.Context, in *CreateImageRequest, opts ...grpc.CallOption) (*CreateImageResponse, error) ***REMOVED***
+func (c *imagesClient) Create(ctx context.Context, in *CreateImageRequest, opts ...grpc.CallOption) (*CreateImageResponse, error) {
 	out := new(CreateImageResponse)
 	err := grpc.Invoke(ctx, "/containerd.services.images.v1.Images/Create", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *imagesClient) Update(ctx context.Context, in *UpdateImageRequest, opts ...grpc.CallOption) (*UpdateImageResponse, error) ***REMOVED***
+func (c *imagesClient) Update(ctx context.Context, in *UpdateImageRequest, opts ...grpc.CallOption) (*UpdateImageResponse, error) {
 	out := new(UpdateImageResponse)
 	err := grpc.Invoke(ctx, "/containerd.services.images.v1.Images/Update", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *imagesClient) Delete(ctx context.Context, in *DeleteImageRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error) ***REMOVED***
+func (c *imagesClient) Delete(ctx context.Context, in *DeleteImageRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error) {
 	out := new(google_protobuf1.Empty)
 	err := grpc.Invoke(ctx, "/containerd.services.images.v1.Images/Delete", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
 // Server API for Images service
 
-type ImagesServer interface ***REMOVED***
+type ImagesServer interface {
 	// Get returns an image by name.
 	Get(context.Context, *GetImageRequest) (*GetImageResponse, error)
 	// List returns a list of all images known to containerd.
@@ -282,154 +282,154 @@ type ImagesServer interface ***REMOVED***
 	Update(context.Context, *UpdateImageRequest) (*UpdateImageResponse, error)
 	// Delete deletes the image by name.
 	Delete(context.Context, *DeleteImageRequest) (*google_protobuf1.Empty, error)
-***REMOVED***
+}
 
-func RegisterImagesServer(s *grpc.Server, srv ImagesServer) ***REMOVED***
+func RegisterImagesServer(s *grpc.Server, srv ImagesServer) {
 	s.RegisterService(&_Images_serviceDesc, srv)
-***REMOVED***
+}
 
-func _Images_Get_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _Images_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetImageRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(ImagesServer).Get(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/containerd.services.images.v1.Images/Get",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ImagesServer).Get(ctx, req.(*GetImageRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _Images_List_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _Images_List_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListImagesRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(ImagesServer).List(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/containerd.services.images.v1.Images/List",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ImagesServer).List(ctx, req.(*ListImagesRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _Images_Create_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _Images_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateImageRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(ImagesServer).Create(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/containerd.services.images.v1.Images/Create",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ImagesServer).Create(ctx, req.(*CreateImageRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _Images_Update_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _Images_Update_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateImageRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(ImagesServer).Update(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/containerd.services.images.v1.Images/Update",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ImagesServer).Update(ctx, req.(*UpdateImageRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _Images_Delete_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _Images_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteImageRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(ImagesServer).Delete(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/containerd.services.images.v1.Images/Delete",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ImagesServer).Delete(ctx, req.(*DeleteImageRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-var _Images_serviceDesc = grpc.ServiceDesc***REMOVED***
+var _Images_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "containerd.services.images.v1.Images",
 	HandlerType: (*ImagesServer)(nil),
-	Methods: []grpc.MethodDesc***REMOVED***
-		***REMOVED***
+	Methods: []grpc.MethodDesc{
+		{
 			MethodName: "Get",
 			Handler:    _Images_Get_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "List",
 			Handler:    _Images_List_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "Create",
 			Handler:    _Images_Create_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "Update",
 			Handler:    _Images_Update_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "Delete",
 			Handler:    _Images_Delete_Handler,
-		***REMOVED***,
-	***REMOVED***,
-	Streams:  []grpc.StreamDesc***REMOVED******REMOVED***,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
 	Metadata: "github.com/containerd/containerd/api/services/images/v1/images.proto",
-***REMOVED***
+}
 
-func (m *Image) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *Image) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *Image) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *Image) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Name) > 0 ***REMOVED***
+	if len(m.Name) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintImages(dAtA, i, uint64(len(m.Name)))
 		i += copy(dAtA[i:], m.Name)
-	***REMOVED***
-	if len(m.Labels) > 0 ***REMOVED***
-		for k, _ := range m.Labels ***REMOVED***
+	}
+	if len(m.Labels) > 0 {
+		for k, _ := range m.Labels {
 			dAtA[i] = 0x12
 			i++
 			v := m.Labels[k]
@@ -443,98 +443,98 @@ func (m *Image) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
 			i++
 			i = encodeVarintImages(dAtA, i, uint64(len(v)))
 			i += copy(dAtA[i:], v)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	dAtA[i] = 0x1a
 	i++
 	i = encodeVarintImages(dAtA, i, uint64(m.Target.Size()))
 	n1, err := m.Target.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n1
 	dAtA[i] = 0x3a
 	i++
 	i = encodeVarintImages(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)))
 	n2, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n2
 	dAtA[i] = 0x42
 	i++
 	i = encodeVarintImages(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)))
 	n3, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.UpdatedAt, dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n3
 	return i, nil
-***REMOVED***
+}
 
-func (m *GetImageRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *GetImageRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *GetImageRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *GetImageRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Name) > 0 ***REMOVED***
+	if len(m.Name) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintImages(dAtA, i, uint64(len(m.Name)))
 		i += copy(dAtA[i:], m.Name)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *GetImageResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *GetImageResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *GetImageResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *GetImageResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.Image != nil ***REMOVED***
+	if m.Image != nil {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintImages(dAtA, i, uint64(m.Image.Size()))
 		n4, err := m.Image.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n4
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *CreateImageRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *CreateImageRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *CreateImageRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *CreateImageRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -543,24 +543,24 @@ func (m *CreateImageRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
 	i++
 	i = encodeVarintImages(dAtA, i, uint64(m.Image.Size()))
 	n5, err := m.Image.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n5
 	return i, nil
-***REMOVED***
+}
 
-func (m *CreateImageResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *CreateImageResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *CreateImageResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *CreateImageResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -569,24 +569,24 @@ func (m *CreateImageResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
 	i++
 	i = encodeVarintImages(dAtA, i, uint64(m.Image.Size()))
 	n6, err := m.Image.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n6
 	return i, nil
-***REMOVED***
+}
 
-func (m *UpdateImageRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *UpdateImageRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *UpdateImageRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *UpdateImageRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -595,34 +595,34 @@ func (m *UpdateImageRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
 	i++
 	i = encodeVarintImages(dAtA, i, uint64(m.Image.Size()))
 	n7, err := m.Image.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n7
-	if m.UpdateMask != nil ***REMOVED***
+	if m.UpdateMask != nil {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintImages(dAtA, i, uint64(m.UpdateMask.Size()))
 		n8, err := m.UpdateMask.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n8
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *UpdateImageResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *UpdateImageResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *UpdateImageResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *UpdateImageResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -631,134 +631,134 @@ func (m *UpdateImageResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
 	i++
 	i = encodeVarintImages(dAtA, i, uint64(m.Image.Size()))
 	n9, err := m.Image.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n9
 	return i, nil
-***REMOVED***
+}
 
-func (m *ListImagesRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *ListImagesRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *ListImagesRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *ListImagesRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Filters) > 0 ***REMOVED***
-		for _, s := range m.Filters ***REMOVED***
+	if len(m.Filters) > 0 {
+		for _, s := range m.Filters {
 			dAtA[i] = 0xa
 			i++
 			l = len(s)
-			for l >= 1<<7 ***REMOVED***
+			for l >= 1<<7 {
 				dAtA[i] = uint8(uint64(l)&0x7f | 0x80)
 				l >>= 7
 				i++
-			***REMOVED***
+			}
 			dAtA[i] = uint8(l)
 			i++
 			i += copy(dAtA[i:], s)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *ListImagesResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *ListImagesResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *ListImagesResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *ListImagesResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Images) > 0 ***REMOVED***
-		for _, msg := range m.Images ***REMOVED***
+	if len(m.Images) > 0 {
+		for _, msg := range m.Images {
 			dAtA[i] = 0xa
 			i++
 			i = encodeVarintImages(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			i += n
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *DeleteImageRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *DeleteImageRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *DeleteImageRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *DeleteImageRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Name) > 0 ***REMOVED***
+	if len(m.Name) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintImages(dAtA, i, uint64(len(m.Name)))
 		i += copy(dAtA[i:], m.Name)
-	***REMOVED***
-	if m.Sync ***REMOVED***
+	}
+	if m.Sync {
 		dAtA[i] = 0x10
 		i++
-		if m.Sync ***REMOVED***
+		if m.Sync {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func encodeVarintImages(dAtA []byte, offset int, v uint64) int ***REMOVED***
-	for v >= 1<<7 ***REMOVED***
+func encodeVarintImages(dAtA []byte, offset int, v uint64) int {
+	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
-	***REMOVED***
+	}
 	dAtA[offset] = uint8(v)
 	return offset + 1
-***REMOVED***
-func (m *Image) Size() (n int) ***REMOVED***
+}
+func (m *Image) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.Name)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovImages(uint64(l))
-	***REMOVED***
-	if len(m.Labels) > 0 ***REMOVED***
-		for k, v := range m.Labels ***REMOVED***
+	}
+	if len(m.Labels) > 0 {
+		for k, v := range m.Labels {
 			_ = k
 			_ = v
 			mapEntrySize := 1 + len(k) + sovImages(uint64(len(k))) + 1 + len(v) + sovImages(uint64(len(v)))
 			n += mapEntrySize + 1 + sovImages(uint64(mapEntrySize))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	l = m.Target.Size()
 	n += 1 + l + sovImages(uint64(l))
 	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)
@@ -766,1386 +766,1386 @@ func (m *Image) Size() (n int) ***REMOVED***
 	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.UpdatedAt)
 	n += 1 + l + sovImages(uint64(l))
 	return n
-***REMOVED***
+}
 
-func (m *GetImageRequest) Size() (n int) ***REMOVED***
+func (m *GetImageRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.Name)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovImages(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *GetImageResponse) Size() (n int) ***REMOVED***
+func (m *GetImageResponse) Size() (n int) {
 	var l int
 	_ = l
-	if m.Image != nil ***REMOVED***
+	if m.Image != nil {
 		l = m.Image.Size()
 		n += 1 + l + sovImages(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *CreateImageRequest) Size() (n int) ***REMOVED***
+func (m *CreateImageRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = m.Image.Size()
 	n += 1 + l + sovImages(uint64(l))
 	return n
-***REMOVED***
+}
 
-func (m *CreateImageResponse) Size() (n int) ***REMOVED***
+func (m *CreateImageResponse) Size() (n int) {
 	var l int
 	_ = l
 	l = m.Image.Size()
 	n += 1 + l + sovImages(uint64(l))
 	return n
-***REMOVED***
+}
 
-func (m *UpdateImageRequest) Size() (n int) ***REMOVED***
+func (m *UpdateImageRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = m.Image.Size()
 	n += 1 + l + sovImages(uint64(l))
-	if m.UpdateMask != nil ***REMOVED***
+	if m.UpdateMask != nil {
 		l = m.UpdateMask.Size()
 		n += 1 + l + sovImages(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *UpdateImageResponse) Size() (n int) ***REMOVED***
+func (m *UpdateImageResponse) Size() (n int) {
 	var l int
 	_ = l
 	l = m.Image.Size()
 	n += 1 + l + sovImages(uint64(l))
 	return n
-***REMOVED***
+}
 
-func (m *ListImagesRequest) Size() (n int) ***REMOVED***
+func (m *ListImagesRequest) Size() (n int) {
 	var l int
 	_ = l
-	if len(m.Filters) > 0 ***REMOVED***
-		for _, s := range m.Filters ***REMOVED***
+	if len(m.Filters) > 0 {
+		for _, s := range m.Filters {
 			l = len(s)
 			n += 1 + l + sovImages(uint64(l))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
+}
 
-func (m *ListImagesResponse) Size() (n int) ***REMOVED***
+func (m *ListImagesResponse) Size() (n int) {
 	var l int
 	_ = l
-	if len(m.Images) > 0 ***REMOVED***
-		for _, e := range m.Images ***REMOVED***
+	if len(m.Images) > 0 {
+		for _, e := range m.Images {
 			l = e.Size()
 			n += 1 + l + sovImages(uint64(l))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
+}
 
-func (m *DeleteImageRequest) Size() (n int) ***REMOVED***
+func (m *DeleteImageRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.Name)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovImages(uint64(l))
-	***REMOVED***
-	if m.Sync ***REMOVED***
+	}
+	if m.Sync {
 		n += 2
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func sovImages(x uint64) (n int) ***REMOVED***
-	for ***REMOVED***
+func sovImages(x uint64) (n int) {
+	for {
 		n++
 		x >>= 7
-		if x == 0 ***REMOVED***
+		if x == 0 {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
-func sozImages(x uint64) (n int) ***REMOVED***
+}
+func sozImages(x uint64) (n int) {
 	return sovImages(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-***REMOVED***
-func (this *Image) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Image) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	keysForLabels := make([]string, 0, len(this.Labels))
-	for k, _ := range this.Labels ***REMOVED***
+	for k, _ := range this.Labels {
 		keysForLabels = append(keysForLabels, k)
-	***REMOVED***
+	}
 	github_com_gogo_protobuf_sortkeys.Strings(keysForLabels)
-	mapStringForLabels := "map[string]string***REMOVED***"
-	for _, k := range keysForLabels ***REMOVED***
+	mapStringForLabels := "map[string]string{"
+	for _, k := range keysForLabels {
 		mapStringForLabels += fmt.Sprintf("%v: %v,", k, this.Labels[k])
-	***REMOVED***
-	mapStringForLabels += "***REMOVED***"
-	s := strings.Join([]string***REMOVED***`&Image***REMOVED***`,
+	}
+	mapStringForLabels += "}"
+	s := strings.Join([]string{`&Image{`,
 		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
 		`Labels:` + mapStringForLabels + `,`,
 		`Target:` + strings.Replace(strings.Replace(this.Target.String(), "Descriptor", "containerd_types.Descriptor", 1), `&`, ``, 1) + `,`,
 		`CreatedAt:` + strings.Replace(strings.Replace(this.CreatedAt.String(), "Timestamp", "google_protobuf3.Timestamp", 1), `&`, ``, 1) + `,`,
 		`UpdatedAt:` + strings.Replace(strings.Replace(this.UpdatedAt.String(), "Timestamp", "google_protobuf3.Timestamp", 1), `&`, ``, 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *GetImageRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *GetImageRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&GetImageRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&GetImageRequest{`,
 		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *GetImageResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *GetImageResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&GetImageResponse***REMOVED***`,
+	}
+	s := strings.Join([]string{`&GetImageResponse{`,
 		`Image:` + strings.Replace(fmt.Sprintf("%v", this.Image), "Image", "Image", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *CreateImageRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *CreateImageRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&CreateImageRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&CreateImageRequest{`,
 		`Image:` + strings.Replace(strings.Replace(this.Image.String(), "Image", "Image", 1), `&`, ``, 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *CreateImageResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *CreateImageResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&CreateImageResponse***REMOVED***`,
+	}
+	s := strings.Join([]string{`&CreateImageResponse{`,
 		`Image:` + strings.Replace(strings.Replace(this.Image.String(), "Image", "Image", 1), `&`, ``, 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *UpdateImageRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *UpdateImageRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&UpdateImageRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&UpdateImageRequest{`,
 		`Image:` + strings.Replace(strings.Replace(this.Image.String(), "Image", "Image", 1), `&`, ``, 1) + `,`,
 		`UpdateMask:` + strings.Replace(fmt.Sprintf("%v", this.UpdateMask), "FieldMask", "google_protobuf2.FieldMask", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *UpdateImageResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *UpdateImageResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&UpdateImageResponse***REMOVED***`,
+	}
+	s := strings.Join([]string{`&UpdateImageResponse{`,
 		`Image:` + strings.Replace(strings.Replace(this.Image.String(), "Image", "Image", 1), `&`, ``, 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *ListImagesRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *ListImagesRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&ListImagesRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&ListImagesRequest{`,
 		`Filters:` + fmt.Sprintf("%v", this.Filters) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *ListImagesResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *ListImagesResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&ListImagesResponse***REMOVED***`,
+	}
+	s := strings.Join([]string{`&ListImagesResponse{`,
 		`Images:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Images), "Image", "Image", 1), `&`, ``, 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *DeleteImageRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *DeleteImageRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&DeleteImageRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&DeleteImageRequest{`,
 		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
 		`Sync:` + fmt.Sprintf("%v", this.Sync) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func valueToStringImages(v interface***REMOVED******REMOVED***) string ***REMOVED***
+}
+func valueToStringImages(v interface{}) string {
 	rv := reflect.ValueOf(v)
-	if rv.IsNil() ***REMOVED***
+	if rv.IsNil() {
 		return "nil"
-	***REMOVED***
+	}
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
-***REMOVED***
-func (m *Image) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *Image) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowImages
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: Image: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: Image: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowImages
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthImages
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Name = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Labels", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowImages
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthImages
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Labels == nil ***REMOVED***
+			}
+			if m.Labels == nil {
 				m.Labels = make(map[string]string)
-			***REMOVED***
+			}
 			var mapkey string
 			var mapvalue string
-			for iNdEx < postIndex ***REMOVED***
+			for iNdEx < postIndex {
 				entryPreIndex := iNdEx
 				var wire uint64
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return ErrIntOverflowImages
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					wire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				fieldNum := int32(wire >> 3)
-				if fieldNum == 1 ***REMOVED***
+				if fieldNum == 1 {
 					var stringLenmapkey uint64
-					for shift := uint(0); ; shift += 7 ***REMOVED***
-						if shift >= 64 ***REMOVED***
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
 							return ErrIntOverflowImages
-						***REMOVED***
-						if iNdEx >= l ***REMOVED***
+						}
+						if iNdEx >= l {
 							return io.ErrUnexpectedEOF
-						***REMOVED***
+						}
 						b := dAtA[iNdEx]
 						iNdEx++
 						stringLenmapkey |= (uint64(b) & 0x7F) << shift
-						if b < 0x80 ***REMOVED***
+						if b < 0x80 {
 							break
-						***REMOVED***
-					***REMOVED***
+						}
+					}
 					intStringLenmapkey := int(stringLenmapkey)
-					if intStringLenmapkey < 0 ***REMOVED***
+					if intStringLenmapkey < 0 {
 						return ErrInvalidLengthImages
-					***REMOVED***
+					}
 					postStringIndexmapkey := iNdEx + intStringLenmapkey
-					if postStringIndexmapkey > l ***REMOVED***
+					if postStringIndexmapkey > l {
 						return io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
 					iNdEx = postStringIndexmapkey
-				***REMOVED*** else if fieldNum == 2 ***REMOVED***
+				} else if fieldNum == 2 {
 					var stringLenmapvalue uint64
-					for shift := uint(0); ; shift += 7 ***REMOVED***
-						if shift >= 64 ***REMOVED***
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
 							return ErrIntOverflowImages
-						***REMOVED***
-						if iNdEx >= l ***REMOVED***
+						}
+						if iNdEx >= l {
 							return io.ErrUnexpectedEOF
-						***REMOVED***
+						}
 						b := dAtA[iNdEx]
 						iNdEx++
 						stringLenmapvalue |= (uint64(b) & 0x7F) << shift
-						if b < 0x80 ***REMOVED***
+						if b < 0x80 {
 							break
-						***REMOVED***
-					***REMOVED***
+						}
+					}
 					intStringLenmapvalue := int(stringLenmapvalue)
-					if intStringLenmapvalue < 0 ***REMOVED***
+					if intStringLenmapvalue < 0 {
 						return ErrInvalidLengthImages
-					***REMOVED***
+					}
 					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
-					if postStringIndexmapvalue > l ***REMOVED***
+					if postStringIndexmapvalue > l {
 						return io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					mapvalue = string(dAtA[iNdEx:postStringIndexmapvalue])
 					iNdEx = postStringIndexmapvalue
-				***REMOVED*** else ***REMOVED***
+				} else {
 					iNdEx = entryPreIndex
 					skippy, err := skipImages(dAtA[iNdEx:])
-					if err != nil ***REMOVED***
+					if err != nil {
 						return err
-					***REMOVED***
-					if skippy < 0 ***REMOVED***
+					}
+					if skippy < 0 {
 						return ErrInvalidLengthImages
-					***REMOVED***
-					if (iNdEx + skippy) > postIndex ***REMOVED***
+					}
+					if (iNdEx + skippy) > postIndex {
 						return io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					iNdEx += skippy
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			m.Labels[mapkey] = mapvalue
 			iNdEx = postIndex
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Target", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowImages
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthImages
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Target.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Target.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 7:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CreatedAt", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowImages
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthImages
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.CreatedAt, dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.CreatedAt, dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 8:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field UpdatedAt", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowImages
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthImages
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.UpdatedAt, dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.UpdatedAt, dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipImages(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthImages
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *GetImageRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *GetImageRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowImages
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: GetImageRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: GetImageRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowImages
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthImages
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Name = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipImages(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthImages
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *GetImageResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *GetImageResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowImages
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: GetImageResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: GetImageResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Image", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowImages
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthImages
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Image == nil ***REMOVED***
-				m.Image = &Image***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.Image.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.Image == nil {
+				m.Image = &Image{}
+			}
+			if err := m.Image.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipImages(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthImages
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *CreateImageRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *CreateImageRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowImages
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: CreateImageRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: CreateImageRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Image", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowImages
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthImages
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Image.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Image.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipImages(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthImages
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *CreateImageResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *CreateImageResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowImages
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: CreateImageResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: CreateImageResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Image", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowImages
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthImages
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Image.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Image.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipImages(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthImages
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *UpdateImageRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *UpdateImageRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowImages
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: UpdateImageRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: UpdateImageRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Image", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowImages
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthImages
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Image.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Image.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field UpdateMask", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowImages
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthImages
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.UpdateMask == nil ***REMOVED***
-				m.UpdateMask = &google_protobuf2.FieldMask***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.UpdateMask.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.UpdateMask == nil {
+				m.UpdateMask = &google_protobuf2.FieldMask{}
+			}
+			if err := m.UpdateMask.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipImages(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthImages
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *UpdateImageResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *UpdateImageResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowImages
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: UpdateImageResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: UpdateImageResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Image", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowImages
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthImages
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Image.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Image.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipImages(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthImages
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *ListImagesRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *ListImagesRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowImages
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: ListImagesRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: ListImagesRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Filters", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowImages
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthImages
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Filters = append(m.Filters, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipImages(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthImages
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *ListImagesResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *ListImagesResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowImages
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: ListImagesResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: ListImagesResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Images", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowImages
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthImages
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.Images = append(m.Images, Image***REMOVED******REMOVED***)
-			if err := m.Images[len(m.Images)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			m.Images = append(m.Images, Image{})
+			if err := m.Images[len(m.Images)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipImages(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthImages
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *DeleteImageRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *DeleteImageRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowImages
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: DeleteImageRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: DeleteImageRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowImages
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthImages
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Name = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Sync", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowImages
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			m.Sync = bool(v != 0)
 		default:
 			iNdEx = preIndex
 			skippy, err := skipImages(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthImages
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func skipImages(dAtA []byte) (n int, err error) ***REMOVED***
+}
+func skipImages(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return 0, ErrIntOverflowImages
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return 0, io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		wireType := int(wire & 0x7)
-		switch wireType ***REMOVED***
+		switch wireType {
 		case 0:
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowImages
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				iNdEx++
-				if dAtA[iNdEx-1] < 0x80 ***REMOVED***
+				if dAtA[iNdEx-1] < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return iNdEx, nil
 		case 1:
 			iNdEx += 8
 			return iNdEx, nil
 		case 2:
 			var length int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowImages
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				length |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			iNdEx += length
-			if length < 0 ***REMOVED***
+			if length < 0 {
 				return 0, ErrInvalidLengthImages
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 3:
-			for ***REMOVED***
+			for {
 				var innerWire uint64
 				var start int = iNdEx
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return 0, ErrIntOverflowImages
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return 0, io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					innerWire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				innerWireType := int(innerWire & 0x7)
-				if innerWireType == 4 ***REMOVED***
+				if innerWireType == 4 {
 					break
-				***REMOVED***
+				}
 				next, err := skipImages(dAtA[start:])
-				if err != nil ***REMOVED***
+				if err != nil {
 					return 0, err
-				***REMOVED***
+				}
 				iNdEx = start + next
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 4:
 			return iNdEx, nil
@@ -2154,21 +2154,21 @@ func skipImages(dAtA []byte) (n int, err error) ***REMOVED***
 			return iNdEx, nil
 		default:
 			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	panic("unreachable")
-***REMOVED***
+}
 
 var (
 	ErrInvalidLengthImages = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowImages   = fmt.Errorf("proto: integer overflow")
 )
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterFile("github.com/containerd/containerd/api/services/images/v1/images.proto", fileDescriptorImages)
-***REMOVED***
+}
 
-var fileDescriptorImages = []byte***REMOVED***
+var fileDescriptorImages = []byte{
 	// 659 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x55, 0xcd, 0x6e, 0xd3, 0x40,
 	0x10, 0x8e, 0x93, 0xd4, 0x6d, 0x27, 0x07, 0xca, 0x52, 0x21, 0xcb, 0x40, 0x1a, 0x45, 0x20, 0xe5,
@@ -2212,4 +2212,4 @@ var fileDescriptorImages = []byte***REMOVED***
 	0xdf, 0x06, 0x45, 0xe3, 0xd7, 0xa0, 0x68, 0xbc, 0x7f, 0x7c, 0xc1, 0xf7, 0x78, 0x5b, 0x59, 0x47,
 	0x99, 0xba, 0x29, 0x63, 0xdd, 0xff, 0x13, 0x00, 0x00, 0xff, 0xff, 0x24, 0x4e, 0xca, 0x64, 0xda,
 	0x07, 0x00, 0x00,
-***REMOVED***
+}

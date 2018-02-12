@@ -7,7 +7,7 @@ package icmp
 import "encoding/binary"
 
 // An Extension represents an ICMP extension.
-type Extension interface ***REMOVED***
+type Extension interface {
 	// Len returns the length of ICMP extension.
 	// Proto must be either the ICMPv4 or ICMPv6 protocol number.
 	Len(proto int) int
@@ -15,21 +15,21 @@ type Extension interface ***REMOVED***
 	// Marshal returns the binary encoding of ICMP extension.
 	// Proto must be either the ICMPv4 or ICMPv6 protocol number.
 	Marshal(proto int) ([]byte, error)
-***REMOVED***
+}
 
 const extensionVersion = 2
 
-func validExtensionHeader(b []byte) bool ***REMOVED***
+func validExtensionHeader(b []byte) bool {
 	v := int(b[0]&0xf0) >> 4
 	s := binary.BigEndian.Uint16(b[2:4])
-	if s != 0 ***REMOVED***
+	if s != 0 {
 		s = checksum(b)
-	***REMOVED***
-	if v != extensionVersion || s != 0 ***REMOVED***
+	}
+	if v != extensionVersion || s != 0 {
 		return false
-	***REMOVED***
+	}
 	return true
-***REMOVED***
+}
 
 // parseExtensions parses b as a list of ICMP extensions.
 // The length attribute l must be the length attribute field in
@@ -38,7 +38,7 @@ func validExtensionHeader(b []byte) bool ***REMOVED***
 // It will return a list of ICMP extensions and an adjusted length
 // attribute that represents the length of the padded original
 // datagram field. Otherwise, it returns an error.
-func parseExtensions(b []byte, l int) ([]Extension, int, error) ***REMOVED***
+func parseExtensions(b []byte, l int) ([]Extension, int, error) {
 	// Still a lot of non-RFC 4884 compliant implementations are
 	// out there. Set the length attribute l to 128 when it looks
 	// inappropriate for backwards compatibility.
@@ -48,42 +48,42 @@ func parseExtensions(b []byte, l int) ([]Extension, int, error) ***REMOVED***
 	// header.
 	//
 	// See RFC 4884 for further information.
-	if 128 > l || l+8 > len(b) ***REMOVED***
+	if 128 > l || l+8 > len(b) {
 		l = 128
-	***REMOVED***
-	if l+8 > len(b) ***REMOVED***
+	}
+	if l+8 > len(b) {
 		return nil, -1, errNoExtension
-	***REMOVED***
-	if !validExtensionHeader(b[l:]) ***REMOVED***
-		if l == 128 ***REMOVED***
+	}
+	if !validExtensionHeader(b[l:]) {
+		if l == 128 {
 			return nil, -1, errNoExtension
-		***REMOVED***
+		}
 		l = 128
-		if !validExtensionHeader(b[l:]) ***REMOVED***
+		if !validExtensionHeader(b[l:]) {
 			return nil, -1, errNoExtension
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	var exts []Extension
-	for b = b[l+4:]; len(b) >= 4; ***REMOVED***
+	for b = b[l+4:]; len(b) >= 4; {
 		ol := int(binary.BigEndian.Uint16(b[:2]))
-		if 4 > ol || ol > len(b) ***REMOVED***
+		if 4 > ol || ol > len(b) {
 			break
-		***REMOVED***
-		switch b[2] ***REMOVED***
+		}
+		switch b[2] {
 		case classMPLSLabelStack:
 			ext, err := parseMPLSLabelStack(b[:ol])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, -1, err
-			***REMOVED***
+			}
 			exts = append(exts, ext)
 		case classInterfaceInfo:
 			ext, err := parseInterfaceInfo(b[:ol])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, -1, err
-			***REMOVED***
+			}
 			exts = append(exts, ext)
-		***REMOVED***
+		}
 		b = b[ol:]
-	***REMOVED***
+	}
 	return exts, l, nil
-***REMOVED***
+}

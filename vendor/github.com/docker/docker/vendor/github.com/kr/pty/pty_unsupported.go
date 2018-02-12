@@ -6,6 +6,6 @@ import (
 	"os"
 )
 
-func open() (pty, tty *os.File, err error) ***REMOVED***
+func open() (pty, tty *os.File, err error) {
 	return nil, nil, ErrUnsupported
-***REMOVED***
+}

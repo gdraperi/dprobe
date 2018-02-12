@@ -42,34 +42,34 @@ import (
 )
 
 // RPCStats contains stats information about RPCs.
-type RPCStats interface ***REMOVED***
+type RPCStats interface {
 	isRPCStats()
 	// IsClient returns true if this RPCStats is from client side.
 	IsClient() bool
-***REMOVED***
+}
 
 // Begin contains stats when an RPC begins.
 // FailFast are only valid if Client is true.
-type Begin struct ***REMOVED***
+type Begin struct {
 	// Client is true if this Begin is from client side.
 	Client bool
 	// BeginTime is the time when the RPC begins.
 	BeginTime time.Time
 	// FailFast indicates if this RPC is failfast.
 	FailFast bool
-***REMOVED***
+}
 
 // IsClient indicates if this is from client side.
-func (s *Begin) IsClient() bool ***REMOVED*** return s.Client ***REMOVED***
+func (s *Begin) IsClient() bool { return s.Client }
 
-func (s *Begin) isRPCStats() ***REMOVED******REMOVED***
+func (s *Begin) isRPCStats() {}
 
 // InPayload contains the information for an incoming payload.
-type InPayload struct ***REMOVED***
+type InPayload struct {
 	// Client is true if this InPayload is from client side.
 	Client bool
 	// Payload is the payload with original type.
-	Payload interface***REMOVED******REMOVED***
+	Payload interface{}
 	// Data is the serialized message payload.
 	Data []byte
 	// Length is the length of uncompressed data.
@@ -78,16 +78,16 @@ type InPayload struct ***REMOVED***
 	WireLength int
 	// RecvTime is the time when the payload is received.
 	RecvTime time.Time
-***REMOVED***
+}
 
 // IsClient indicates if this is from client side.
-func (s *InPayload) IsClient() bool ***REMOVED*** return s.Client ***REMOVED***
+func (s *InPayload) IsClient() bool { return s.Client }
 
-func (s *InPayload) isRPCStats() ***REMOVED******REMOVED***
+func (s *InPayload) isRPCStats() {}
 
 // InHeader contains stats when a header is received.
 // FullMethod, addresses and Compression are only valid if Client is false.
-type InHeader struct ***REMOVED***
+type InHeader struct {
 	// Client is true if this InHeader is from client side.
 	Client bool
 	// WireLength is the wire length of header.
@@ -101,32 +101,32 @@ type InHeader struct ***REMOVED***
 	LocalAddr net.Addr
 	// Compression is the compression algorithm used for the RPC.
 	Compression string
-***REMOVED***
+}
 
 // IsClient indicates if this is from client side.
-func (s *InHeader) IsClient() bool ***REMOVED*** return s.Client ***REMOVED***
+func (s *InHeader) IsClient() bool { return s.Client }
 
-func (s *InHeader) isRPCStats() ***REMOVED******REMOVED***
+func (s *InHeader) isRPCStats() {}
 
 // InTrailer contains stats when a trailer is received.
-type InTrailer struct ***REMOVED***
+type InTrailer struct {
 	// Client is true if this InTrailer is from client side.
 	Client bool
 	// WireLength is the wire length of trailer.
 	WireLength int
-***REMOVED***
+}
 
 // IsClient indicates if this is from client side.
-func (s *InTrailer) IsClient() bool ***REMOVED*** return s.Client ***REMOVED***
+func (s *InTrailer) IsClient() bool { return s.Client }
 
-func (s *InTrailer) isRPCStats() ***REMOVED******REMOVED***
+func (s *InTrailer) isRPCStats() {}
 
 // OutPayload contains the information for an outgoing payload.
-type OutPayload struct ***REMOVED***
+type OutPayload struct {
 	// Client is true if this OutPayload is from client side.
 	Client bool
 	// Payload is the payload with original type.
-	Payload interface***REMOVED******REMOVED***
+	Payload interface{}
 	// Data is the serialized message payload.
 	Data []byte
 	// Length is the length of uncompressed data.
@@ -135,16 +135,16 @@ type OutPayload struct ***REMOVED***
 	WireLength int
 	// SentTime is the time when the payload is sent.
 	SentTime time.Time
-***REMOVED***
+}
 
 // IsClient indicates if this is from client side.
-func (s *OutPayload) IsClient() bool ***REMOVED*** return s.Client ***REMOVED***
+func (s *OutPayload) IsClient() bool { return s.Client }
 
-func (s *OutPayload) isRPCStats() ***REMOVED******REMOVED***
+func (s *OutPayload) isRPCStats() {}
 
 // OutHeader contains stats when a header is sent.
 // FullMethod, addresses and Compression are only valid if Client is true.
-type OutHeader struct ***REMOVED***
+type OutHeader struct {
 	// Client is true if this OutHeader is from client side.
 	Client bool
 	// WireLength is the wire length of header.
@@ -158,66 +158,66 @@ type OutHeader struct ***REMOVED***
 	LocalAddr net.Addr
 	// Compression is the compression algorithm used for the RPC.
 	Compression string
-***REMOVED***
+}
 
 // IsClient indicates if this is from client side.
-func (s *OutHeader) IsClient() bool ***REMOVED*** return s.Client ***REMOVED***
+func (s *OutHeader) IsClient() bool { return s.Client }
 
-func (s *OutHeader) isRPCStats() ***REMOVED******REMOVED***
+func (s *OutHeader) isRPCStats() {}
 
 // OutTrailer contains stats when a trailer is sent.
-type OutTrailer struct ***REMOVED***
+type OutTrailer struct {
 	// Client is true if this OutTrailer is from client side.
 	Client bool
 	// WireLength is the wire length of trailer.
 	WireLength int
-***REMOVED***
+}
 
 // IsClient indicates if this is from client side.
-func (s *OutTrailer) IsClient() bool ***REMOVED*** return s.Client ***REMOVED***
+func (s *OutTrailer) IsClient() bool { return s.Client }
 
-func (s *OutTrailer) isRPCStats() ***REMOVED******REMOVED***
+func (s *OutTrailer) isRPCStats() {}
 
 // End contains stats when an RPC ends.
-type End struct ***REMOVED***
+type End struct {
 	// Client is true if this End is from client side.
 	Client bool
 	// EndTime is the time when the RPC ends.
 	EndTime time.Time
 	// Error is the error just happened.  It implements status.Status if non-nil.
 	Error error
-***REMOVED***
+}
 
 // IsClient indicates if this is from client side.
-func (s *End) IsClient() bool ***REMOVED*** return s.Client ***REMOVED***
+func (s *End) IsClient() bool { return s.Client }
 
-func (s *End) isRPCStats() ***REMOVED******REMOVED***
+func (s *End) isRPCStats() {}
 
 // ConnStats contains stats information about connections.
-type ConnStats interface ***REMOVED***
+type ConnStats interface {
 	isConnStats()
 	// IsClient returns true if this ConnStats is from client side.
 	IsClient() bool
-***REMOVED***
+}
 
 // ConnBegin contains the stats of a connection when it is established.
-type ConnBegin struct ***REMOVED***
+type ConnBegin struct {
 	// Client is true if this ConnBegin is from client side.
 	Client bool
-***REMOVED***
+}
 
 // IsClient indicates if this is from client side.
-func (s *ConnBegin) IsClient() bool ***REMOVED*** return s.Client ***REMOVED***
+func (s *ConnBegin) IsClient() bool { return s.Client }
 
-func (s *ConnBegin) isConnStats() ***REMOVED******REMOVED***
+func (s *ConnBegin) isConnStats() {}
 
 // ConnEnd contains the stats of a connection when it ends.
-type ConnEnd struct ***REMOVED***
+type ConnEnd struct {
 	// Client is true if this ConnEnd is from client side.
 	Client bool
-***REMOVED***
+}
 
 // IsClient indicates if this is from client side.
-func (s *ConnEnd) IsClient() bool ***REMOVED*** return s.Client ***REMOVED***
+func (s *ConnEnd) IsClient() bool { return s.Client }
 
-func (s *ConnEnd) isConnStats() ***REMOVED******REMOVED***
+func (s *ConnEnd) isConnStats() {}

@@ -2136,7 +2136,7 @@ const (
 )
 
 // Error table
-var errors = [...]string***REMOVED***
+var errors = [...]string{
 	1:   "operation not permitted",
 	2:   "no such file or directory",
 	3:   "no such process",
@@ -2268,10 +2268,10 @@ var errors = [...]string***REMOVED***
 	131: "state not recoverable",
 	132: "operation not possible due to RF-kill",
 	133: "memory page has hardware error",
-***REMOVED***
+}
 
 // Signal table
-var signals = [...]string***REMOVED***
+var signals = [...]string{
 	1:  "hangup",
 	2:  "interrupt",
 	3:  "quit",
@@ -2303,4 +2303,4 @@ var signals = [...]string***REMOVED***
 	29: "I/O possible",
 	30: "power failure",
 	31: "bad system call",
-***REMOVED***
+}

@@ -24,23 +24,23 @@ import (
 // Using BOMOverride is mostly intended for use cases where the first characters
 // of a fallback encoding are known to not be a BOM, for example, for valid HTML
 // and most encodings.
-func BOMOverride(fallback transform.Transformer) transform.Transformer ***REMOVED***
+func BOMOverride(fallback transform.Transformer) transform.Transformer {
 	// TODO: possibly allow a variadic argument of unicode encodings to allow
 	// specifying details of which fallbacks are supported as well as
 	// specifying the details of the implementations. This would also allow for
 	// support for UTF-32, which should not be supported by default.
-	return &bomOverride***REMOVED***fallback: fallback***REMOVED***
-***REMOVED***
+	return &bomOverride{fallback: fallback}
+}
 
-type bomOverride struct ***REMOVED***
+type bomOverride struct {
 	fallback transform.Transformer
 	current  transform.Transformer
-***REMOVED***
+}
 
-func (d *bomOverride) Reset() ***REMOVED***
+func (d *bomOverride) Reset() {
 	d.current = nil
 	d.fallback.Reset()
-***REMOVED***
+}
 
 var (
 	// TODO: we could use decode functions here, instead of allocating a new
@@ -51,32 +51,32 @@ var (
 
 const utf8BOM = "\ufeff"
 
-func (d *bomOverride) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) ***REMOVED***
-	if d.current != nil ***REMOVED***
+func (d *bomOverride) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) {
+	if d.current != nil {
 		return d.current.Transform(dst, src, atEOF)
-	***REMOVED***
-	if len(src) < 3 && !atEOF ***REMOVED***
+	}
+	if len(src) < 3 && !atEOF {
 		return 0, 0, transform.ErrShortSrc
-	***REMOVED***
+	}
 	d.current = d.fallback
 	bomSize := 0
-	if len(src) >= 2 ***REMOVED***
-		if src[0] == 0xFF && src[1] == 0xFE ***REMOVED***
+	if len(src) >= 2 {
+		if src[0] == 0xFF && src[1] == 0xFE {
 			d.current = utf16le.NewDecoder()
 			bomSize = 2
-		***REMOVED*** else if src[0] == 0xFE && src[1] == 0xFF ***REMOVED***
+		} else if src[0] == 0xFE && src[1] == 0xFF {
 			d.current = utf16be.NewDecoder()
 			bomSize = 2
-		***REMOVED*** else if len(src) >= 3 &&
+		} else if len(src) >= 3 &&
 			src[0] == utf8BOM[0] &&
 			src[1] == utf8BOM[1] &&
-			src[2] == utf8BOM[2] ***REMOVED***
+			src[2] == utf8BOM[2] {
 			d.current = transform.Nop
 			bomSize = 3
-		***REMOVED***
-	***REMOVED***
-	if bomSize < len(src) ***REMOVED***
+		}
+	}
+	if bomSize < len(src) {
 		nDst, nSrc, err = d.current.Transform(dst, src[bomSize:], atEOF)
-	***REMOVED***
+	}
 	return nDst, nSrc + bomSize, err
-***REMOVED***
+}

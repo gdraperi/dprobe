@@ -53,23 +53,23 @@ standard usage. Eg.
 
     ...
 
-    if err != nil ***REMOVED***
+    if err != nil {
 
         // This is a pretty serious error and the user should know about
         // it. It will be printed to the terminal as well as logged under the
         // default thresholds.
 
         jww.ERROR.Println(err)
-***REMOVED***
+    }
 
-    if err2 != nil ***REMOVED***
+    if err2 != nil {
         // This error isn’t going to materially change the behavior of the
         // application, but it’s something that may not be what the user
         // expects. Under the default thresholds, Warn will be logged, but
         // not printed to the terminal. 
 
         jww.WARN.Println(err2)
-***REMOVED***
+    }
 
     // Information that’s relevant to what’s happening, but not very
     // important for the user. Under the default thresholds this will be
@@ -116,10 +116,10 @@ verbosity.
         jww "github.com/spf13/jwalterweatherman"
     )
 
-    if Verbose ***REMOVED***
+    if Verbose {
         jww.SetLogThreshold(jww.LevelTrace)
         jww.SetStdoutThreshold(jww.LevelInfo)
-***REMOVED***
+    }
 ```
 
 Note that JWW's own internal output uses log levels as well, so set the log

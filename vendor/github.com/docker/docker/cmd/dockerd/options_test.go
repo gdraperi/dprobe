@@ -10,34 +10,34 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCommonOptionsInstallFlags(t *testing.T) ***REMOVED***
+func TestCommonOptionsInstallFlags(t *testing.T) {
 	flags := pflag.NewFlagSet("testing", pflag.ContinueOnError)
-	opts := newDaemonOptions(&config.Config***REMOVED******REMOVED***)
+	opts := newDaemonOptions(&config.Config{})
 	opts.InstallFlags(flags)
 
-	err := flags.Parse([]string***REMOVED***
+	err := flags.Parse([]string{
 		"--tlscacert=\"/foo/cafile\"",
 		"--tlscert=\"/foo/cert\"",
 		"--tlskey=\"/foo/key\"",
-	***REMOVED***)
+	})
 	assert.NoError(t, err)
 	assert.Equal(t, "/foo/cafile", opts.TLSOptions.CAFile)
 	assert.Equal(t, "/foo/cert", opts.TLSOptions.CertFile)
 	assert.Equal(t, opts.TLSOptions.KeyFile, "/foo/key")
-***REMOVED***
+}
 
-func defaultPath(filename string) string ***REMOVED***
+func defaultPath(filename string) string {
 	return filepath.Join(cliconfig.Dir(), filename)
-***REMOVED***
+}
 
-func TestCommonOptionsInstallFlagsWithDefaults(t *testing.T) ***REMOVED***
+func TestCommonOptionsInstallFlagsWithDefaults(t *testing.T) {
 	flags := pflag.NewFlagSet("testing", pflag.ContinueOnError)
-	opts := newDaemonOptions(&config.Config***REMOVED******REMOVED***)
+	opts := newDaemonOptions(&config.Config{})
 	opts.InstallFlags(flags)
 
-	err := flags.Parse([]string***REMOVED******REMOVED***)
+	err := flags.Parse([]string{})
 	assert.NoError(t, err)
 	assert.Equal(t, defaultPath("ca.pem"), opts.TLSOptions.CAFile)
 	assert.Equal(t, defaultPath("cert.pem"), opts.TLSOptions.CertFile)
 	assert.Equal(t, defaultPath("key.pem"), opts.TLSOptions.KeyFile)
-***REMOVED***
+}

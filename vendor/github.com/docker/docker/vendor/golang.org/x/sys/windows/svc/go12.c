@@ -19,6 +19,6 @@ void ·servicemain(void);
 
 void
 ·getServiceMain(uintptr *r)
-***REMOVED***
+{
 	*r = (uintptr)·servicemain;
-***REMOVED***
+}

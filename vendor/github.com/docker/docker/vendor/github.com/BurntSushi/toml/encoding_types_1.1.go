@@ -7,12 +7,12 @@ package toml
 
 // TextMarshaler is a synonym for encoding.TextMarshaler. It is defined here
 // so that Go 1.1 can be supported.
-type TextMarshaler interface ***REMOVED***
+type TextMarshaler interface {
 	MarshalText() (text []byte, err error)
-***REMOVED***
+}
 
 // TextUnmarshaler is a synonym for encoding.TextUnmarshaler. It is defined
 // here so that Go 1.1 can be supported.
-type TextUnmarshaler interface ***REMOVED***
+type TextUnmarshaler interface {
 	UnmarshalText(text []byte) error
-***REMOVED***
+}

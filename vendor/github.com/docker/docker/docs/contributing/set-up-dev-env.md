@@ -168,9 +168,9 @@ can take over 15 minutes to complete.
    ```none
    root@a8b2885ab900:/go/src/github.com/docker/docker# dockerd -D &
    ...output snipped...
-   DEBU[0001] Registering POST, /networks/***REMOVED***id:.****REMOVED***/connect
-   DEBU[0001] Registering POST, /networks/***REMOVED***id:.****REMOVED***/disconnect
-   DEBU[0001] Registering DELETE, /networks/***REMOVED***id:.****REMOVED***
+   DEBU[0001] Registering POST, /networks/{id:.*}/connect
+   DEBU[0001] Registering POST, /networks/{id:.*}/disconnect
+   DEBU[0001] Registering DELETE, /networks/{id:.*}
    INFO[0001] API listen on /var/run/docker.sock
    DEBU[0003] containerd connection state change: READY
    ```

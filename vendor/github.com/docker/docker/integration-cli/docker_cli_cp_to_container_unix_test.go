@@ -14,7 +14,7 @@ import (
 	"github.com/go-check/check"
 )
 
-func (s *DockerSuite) TestCpToContainerWithPermissions(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestCpToContainerWithPermissions(c *check.C) {
 	testRequires(c, SameHostDaemon, DaemonIsLinux)
 
 	tmpDir := getTestDir(c, "test-cp-to-host-with-permissions")
@@ -30,19 +30,19 @@ func (s *DockerSuite) TestCpToContainerWithPermissions(c *check.C) ***REMOVED***
 
 	srcPath := cpPath(tmpDir, "permdirtest")
 	dstPath := containerCpPath(containerName, "/")
-	c.Assert(runDockerCp(c, srcPath, dstPath, []string***REMOVED***"-a"***REMOVED***), checker.IsNil)
+	c.Assert(runDockerCp(c, srcPath, dstPath, []string{"-a"}), checker.IsNil)
 
 	out, err := startContainerGetOutput(c, containerName)
 	c.Assert(err, checker.IsNil, check.Commentf("output: %v", out))
 	c.Assert(strings.TrimSpace(out), checker.Equals, "2 2 700\n65534 65534 400", check.Commentf("output: %v", out))
-***REMOVED***
+}
 
 // Check ownership is root, both in non-userns and userns enabled modes
-func (s *DockerSuite) TestCpCheckDestOwnership(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestCpCheckDestOwnership(c *check.C) {
 	testRequires(c, DaemonIsLinux, SameHostDaemon)
 	tmpVolDir := getTestDir(c, "test-cp-tmpvol")
 	containerID := makeTestContainer(c,
-		testContainerOptions***REMOVED***volumes: []string***REMOVED***fmt.Sprintf("%s:/tmpvol", tmpVolDir)***REMOVED******REMOVED***)
+		testContainerOptions{volumes: []string{fmt.Sprintf("%s:/tmpvol", tmpVolDir)}})
 
 	tmpDir := getTestDir(c, "test-cp-to-check-ownership")
 	defer os.RemoveAll(tmpDir)
@@ -61,21 +61,21 @@ func (s *DockerSuite) TestCpCheckDestOwnership(c *check.C) ***REMOVED***
 	c.Assert(err, checker.IsNil)
 	c.Assert(stat.UID(), checker.Equals, uint32(uid), check.Commentf("Copied file not owned by container root UID"))
 	c.Assert(stat.GID(), checker.Equals, uint32(gid), check.Commentf("Copied file not owned by container root GID"))
-***REMOVED***
+}
 
-func getRootUIDGID() (int, int, error) ***REMOVED***
+func getRootUIDGID() (int, int, error) {
 	uidgid := strings.Split(filepath.Base(testEnv.DaemonInfo.DockerRootDir), ".")
-	if len(uidgid) == 1 ***REMOVED***
+	if len(uidgid) == 1 {
 		//user namespace remapping is not turned on; return 0
 		return 0, 0, nil
-	***REMOVED***
+	}
 	uid, err := strconv.Atoi(uidgid[0])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, 0, err
-	***REMOVED***
+	}
 	gid, err := strconv.Atoi(uidgid[1])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, 0, err
-	***REMOVED***
+	}
 	return uid, gid, nil
-***REMOVED***
+}

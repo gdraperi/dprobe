@@ -13,35 +13,35 @@ import (
 const roleReconcileInterval = 5 * time.Second
 
 // roleManager reconciles the raft member list with desired role changes.
-type roleManager struct ***REMOVED***
+type roleManager struct {
 	ctx    context.Context
 	cancel func()
 
 	store    *store.MemoryStore
 	raft     *raft.Node
-	doneChan chan struct***REMOVED******REMOVED***
+	doneChan chan struct{}
 
 	// pending contains changed nodes that have not yet been reconciled in
 	// the raft member list.
 	pending map[string]*api.Node
-***REMOVED***
+}
 
 // newRoleManager creates a new roleManager.
-func newRoleManager(store *store.MemoryStore, raftNode *raft.Node) *roleManager ***REMOVED***
+func newRoleManager(store *store.MemoryStore, raftNode *raft.Node) *roleManager {
 	ctx, cancel := context.WithCancel(context.Background())
-	return &roleManager***REMOVED***
+	return &roleManager{
 		ctx:      ctx,
 		cancel:   cancel,
 		store:    store,
 		raft:     raftNode,
-		doneChan: make(chan struct***REMOVED******REMOVED***),
+		doneChan: make(chan struct{}),
 		pending:  make(map[string]*api.Node),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Run is roleManager's main loop.
 // ctx is only used for logging.
-func (rm *roleManager) Run(ctx context.Context) ***REMOVED***
+func (rm *roleManager) Run(ctx context.Context) {
 	defer close(rm.doneChan)
 
 	var (
@@ -51,127 +51,127 @@ func (rm *roleManager) Run(ctx context.Context) ***REMOVED***
 	)
 
 	watcher, cancelWatch, err := store.ViewAndWatch(rm.store,
-		func(readTx store.ReadTx) error ***REMOVED***
+		func(readTx store.ReadTx) error {
 			var err error
 			nodes, err = store.FindNodes(readTx, store.All)
 			return err
-		***REMOVED***,
-		api.EventUpdateNode***REMOVED******REMOVED***)
+		},
+		api.EventUpdateNode{})
 	defer cancelWatch()
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.G(ctx).WithError(err).Error("failed to check nodes for role changes")
-	***REMOVED*** else ***REMOVED***
-		for _, node := range nodes ***REMOVED***
+	} else {
+		for _, node := range nodes {
 			rm.pending[node.ID] = node
 			rm.reconcileRole(ctx, node)
-		***REMOVED***
-		if len(rm.pending) != 0 ***REMOVED***
+		}
+		if len(rm.pending) != 0 {
 			ticker = time.NewTicker(roleReconcileInterval)
 			tickerCh = ticker.C
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	for ***REMOVED***
-		select ***REMOVED***
+	for {
+		select {
 		case event := <-watcher:
 			node := event.(api.EventUpdateNode).Node
 			rm.pending[node.ID] = node
 			rm.reconcileRole(ctx, node)
-			if len(rm.pending) != 0 && ticker == nil ***REMOVED***
+			if len(rm.pending) != 0 && ticker == nil {
 				ticker = time.NewTicker(roleReconcileInterval)
 				tickerCh = ticker.C
-			***REMOVED***
+			}
 		case <-tickerCh:
-			for _, node := range rm.pending ***REMOVED***
+			for _, node := range rm.pending {
 				rm.reconcileRole(ctx, node)
-			***REMOVED***
-			if len(rm.pending) == 0 ***REMOVED***
+			}
+			if len(rm.pending) == 0 {
 				ticker.Stop()
 				ticker = nil
 				tickerCh = nil
-			***REMOVED***
+			}
 		case <-rm.ctx.Done():
-			if ticker != nil ***REMOVED***
+			if ticker != nil {
 				ticker.Stop()
-			***REMOVED***
+			}
 			return
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (rm *roleManager) reconcileRole(ctx context.Context, node *api.Node) ***REMOVED***
-	if node.Role == node.Spec.DesiredRole ***REMOVED***
+func (rm *roleManager) reconcileRole(ctx context.Context, node *api.Node) {
+	if node.Role == node.Spec.DesiredRole {
 		// Nothing to do.
 		delete(rm.pending, node.ID)
 		return
-	***REMOVED***
+	}
 
 	// Promotion can proceed right away.
-	if node.Spec.DesiredRole == api.NodeRoleManager && node.Role == api.NodeRoleWorker ***REMOVED***
-		err := rm.store.Update(func(tx store.Tx) error ***REMOVED***
+	if node.Spec.DesiredRole == api.NodeRoleManager && node.Role == api.NodeRoleWorker {
+		err := rm.store.Update(func(tx store.Tx) error {
 			updatedNode := store.GetNode(tx, node.ID)
-			if updatedNode == nil || updatedNode.Spec.DesiredRole != node.Spec.DesiredRole || updatedNode.Role != node.Role ***REMOVED***
+			if updatedNode == nil || updatedNode.Spec.DesiredRole != node.Spec.DesiredRole || updatedNode.Role != node.Role {
 				return nil
-			***REMOVED***
+			}
 			updatedNode.Role = api.NodeRoleManager
 			return store.UpdateNode(tx, updatedNode)
-		***REMOVED***)
-		if err != nil ***REMOVED***
+		})
+		if err != nil {
 			log.G(ctx).WithError(err).Errorf("failed to promote node %s", node.ID)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			delete(rm.pending, node.ID)
-		***REMOVED***
-	***REMOVED*** else if node.Spec.DesiredRole == api.NodeRoleWorker && node.Role == api.NodeRoleManager ***REMOVED***
+		}
+	} else if node.Spec.DesiredRole == api.NodeRoleWorker && node.Role == api.NodeRoleManager {
 		// Check for node in memberlist
 		member := rm.raft.GetMemberByNodeID(node.ID)
-		if member != nil ***REMOVED***
+		if member != nil {
 			// Quorum safeguard
-			if !rm.raft.CanRemoveMember(member.RaftID) ***REMOVED***
+			if !rm.raft.CanRemoveMember(member.RaftID) {
 				// TODO(aaronl): Retry later
 				log.G(ctx).Debugf("can't demote node %s at this time: removing member from raft would result in a loss of quorum", node.ID)
 				return
-			***REMOVED***
+			}
 
 			rmCtx, rmCancel := context.WithTimeout(rm.ctx, 5*time.Second)
 			defer rmCancel()
 
-			if member.RaftID == rm.raft.Config.ID ***REMOVED***
+			if member.RaftID == rm.raft.Config.ID {
 				// Don't use rmCtx, because we expect to lose
 				// leadership, which will cancel this context.
 				log.G(ctx).Info("demoted; transferring leadership")
 				err := rm.raft.TransferLeadership(context.Background())
-				if err == nil ***REMOVED***
+				if err == nil {
 					return
-				***REMOVED***
+				}
 				log.G(ctx).WithError(err).Info("failed to transfer leadership")
-			***REMOVED***
-			if err := rm.raft.RemoveMember(rmCtx, member.RaftID); err != nil ***REMOVED***
+			}
+			if err := rm.raft.RemoveMember(rmCtx, member.RaftID); err != nil {
 				// TODO(aaronl): Retry later
 				log.G(ctx).WithError(err).Debugf("can't demote node %s at this time", node.ID)
-			***REMOVED***
+			}
 			return
-		***REMOVED***
+		}
 
-		err := rm.store.Update(func(tx store.Tx) error ***REMOVED***
+		err := rm.store.Update(func(tx store.Tx) error {
 			updatedNode := store.GetNode(tx, node.ID)
-			if updatedNode == nil || updatedNode.Spec.DesiredRole != node.Spec.DesiredRole || updatedNode.Role != node.Role ***REMOVED***
+			if updatedNode == nil || updatedNode.Spec.DesiredRole != node.Spec.DesiredRole || updatedNode.Role != node.Role {
 				return nil
-			***REMOVED***
+			}
 			updatedNode.Role = api.NodeRoleWorker
 
 			return store.UpdateNode(tx, updatedNode)
-		***REMOVED***)
-		if err != nil ***REMOVED***
+		})
+		if err != nil {
 			log.G(ctx).WithError(err).Errorf("failed to demote node %s", node.ID)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			delete(rm.pending, node.ID)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // Stop stops the roleManager and waits for the main loop to exit.
-func (rm *roleManager) Stop() ***REMOVED***
+func (rm *roleManager) Stop() {
 	rm.cancel()
 	<-rm.doneChan
-***REMOVED***
+}

@@ -7,8 +7,8 @@ const (
 	IFNAMSIZ    = 16
 )
 
-type ifReq struct ***REMOVED***
+type ifReq struct {
 	Name  [IFNAMSIZ]byte
 	Flags uint16
 	pad   [SizeOfIfReq - IFNAMSIZ - 2]byte
-***REMOVED***
+}

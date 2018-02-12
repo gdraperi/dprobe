@@ -26,7 +26,7 @@ const userHZ = 100
 
 // ProcStat provides status information about the process,
 // read from /proc/[pid]/stat.
-type ProcStat struct ***REMOVED***
+type ProcStat struct {
 	// The process ID.
 	PID int
 	// The filename of the executable.
@@ -87,35 +87,35 @@ type ProcStat struct ***REMOVED***
 	RSS int
 
 	fs FS
-***REMOVED***
+}
 
 // NewStat returns the current status information of the process.
-func (p Proc) NewStat() (ProcStat, error) ***REMOVED***
+func (p Proc) NewStat() (ProcStat, error) {
 	f, err := os.Open(p.path("stat"))
-	if err != nil ***REMOVED***
-		return ProcStat***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return ProcStat{}, err
+	}
 	defer f.Close()
 
 	data, err := ioutil.ReadAll(f)
-	if err != nil ***REMOVED***
-		return ProcStat***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return ProcStat{}, err
+	}
 
 	var (
 		ignore int
 
-		s = ProcStat***REMOVED***PID: p.PID, fs: p.fs***REMOVED***
+		s = ProcStat{PID: p.PID, fs: p.fs}
 		l = bytes.Index(data, []byte("("))
 		r = bytes.LastIndex(data, []byte(")"))
 	)
 
-	if l < 0 || r < 0 ***REMOVED***
-		return ProcStat***REMOVED******REMOVED***, fmt.Errorf(
+	if l < 0 || r < 0 {
+		return ProcStat{}, fmt.Errorf(
 			"unexpected format, couldn't extract comm: %s",
 			data,
 		)
-	***REMOVED***
+	}
 
 	s.Comm = string(data[l+1 : r])
 	_, err = fmt.Fscan(
@@ -143,33 +143,33 @@ func (p Proc) NewStat() (ProcStat, error) ***REMOVED***
 		&s.VSize,
 		&s.RSS,
 	)
-	if err != nil ***REMOVED***
-		return ProcStat***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return ProcStat{}, err
+	}
 
 	return s, nil
-***REMOVED***
+}
 
 // VirtualMemory returns the virtual memory size in bytes.
-func (s ProcStat) VirtualMemory() int ***REMOVED***
+func (s ProcStat) VirtualMemory() int {
 	return s.VSize
-***REMOVED***
+}
 
 // ResidentMemory returns the resident memory size in bytes.
-func (s ProcStat) ResidentMemory() int ***REMOVED***
+func (s ProcStat) ResidentMemory() int {
 	return s.RSS * os.Getpagesize()
-***REMOVED***
+}
 
 // StartTime returns the unix timestamp of the process in seconds.
-func (s ProcStat) StartTime() (float64, error) ***REMOVED***
+func (s ProcStat) StartTime() (float64, error) {
 	stat, err := s.fs.NewStat()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	return float64(stat.BootTime) + (float64(s.Starttime) / userHZ), nil
-***REMOVED***
+}
 
 // CPUTime returns the total CPU user and system time in seconds.
-func (s ProcStat) CPUTime() float64 ***REMOVED***
+func (s ProcStat) CPUTime() float64 {
 	return float64(s.UTime+s.STime) / userHZ
-***REMOVED***
+}

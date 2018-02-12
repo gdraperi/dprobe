@@ -49,7 +49,7 @@ const (
 	Neutral
 )
 
-type options struct***REMOVED******REMOVED***
+type options struct{}
 
 // An Option is an option for Bidi processing.
 type Option func(*options)
@@ -59,113 +59,113 @@ type Option func(*options)
 // The following option may be a way to expose this functionality in this API.
 // // LevelFunc sets a function that associates nesting levels with the given text.
 // // The levels function will be called with monotonically increasing values for p.
-// func LevelFunc(levels func(p int) int) Option ***REMOVED***
+// func LevelFunc(levels func(p int) int) Option {
 // 	panic("unimplemented")
-// ***REMOVED***
+// }
 
 // DefaultDirection sets the default direction for a Paragraph. The direction is
 // overridden if the text contains directional characters.
-func DefaultDirection(d Direction) Option ***REMOVED***
+func DefaultDirection(d Direction) Option {
 	panic("unimplemented")
-***REMOVED***
+}
 
 // A Paragraph holds a single Paragraph for Bidi processing.
-type Paragraph struct ***REMOVED***
+type Paragraph struct {
 	// buffers
-***REMOVED***
+}
 
 // SetBytes configures p for the given paragraph text. It replaces text
 // previously set by SetBytes or SetString. If b contains a paragraph separator
 // it will only process the first paragraph and report the number of bytes
 // consumed from b including this separator. Error may be non-nil if options are
 // given.
-func (p *Paragraph) SetBytes(b []byte, opts ...Option) (n int, err error) ***REMOVED***
+func (p *Paragraph) SetBytes(b []byte, opts ...Option) (n int, err error) {
 	panic("unimplemented")
-***REMOVED***
+}
 
 // SetString configures p for the given paragraph text. It replaces text
 // previously set by SetBytes or SetString. If b contains a paragraph separator
 // it will only process the first paragraph and report the number of bytes
 // consumed from b including this separator. Error may be non-nil if options are
 // given.
-func (p *Paragraph) SetString(s string, opts ...Option) (n int, err error) ***REMOVED***
+func (p *Paragraph) SetString(s string, opts ...Option) (n int, err error) {
 	panic("unimplemented")
-***REMOVED***
+}
 
 // IsLeftToRight reports whether the principle direction of rendering for this
 // paragraphs is left-to-right. If this returns false, the principle direction
 // of rendering is right-to-left.
-func (p *Paragraph) IsLeftToRight() bool ***REMOVED***
+func (p *Paragraph) IsLeftToRight() bool {
 	panic("unimplemented")
-***REMOVED***
+}
 
 // Direction returns the direction of the text of this paragraph.
 //
 // The direction may be LeftToRight, RightToLeft, Mixed, or Neutral.
-func (p *Paragraph) Direction() Direction ***REMOVED***
+func (p *Paragraph) Direction() Direction {
 	panic("unimplemented")
-***REMOVED***
+}
 
 // RunAt reports the Run at the given position of the input text.
 //
 // This method can be used for computing line breaks on paragraphs.
-func (p *Paragraph) RunAt(pos int) Run ***REMOVED***
+func (p *Paragraph) RunAt(pos int) Run {
 	panic("unimplemented")
-***REMOVED***
+}
 
 // Order computes the visual ordering of all the runs in a Paragraph.
-func (p *Paragraph) Order() (Ordering, error) ***REMOVED***
+func (p *Paragraph) Order() (Ordering, error) {
 	panic("unimplemented")
-***REMOVED***
+}
 
 // Line computes the visual ordering of runs for a single line starting and
 // ending at the given positions in the original text.
-func (p *Paragraph) Line(start, end int) (Ordering, error) ***REMOVED***
+func (p *Paragraph) Line(start, end int) (Ordering, error) {
 	panic("unimplemented")
-***REMOVED***
+}
 
 // An Ordering holds the computed visual order of runs of a Paragraph. Calling
 // SetBytes or SetString on the originating Paragraph invalidates an Ordering.
 // The methods of an Ordering should only be called by one goroutine at a time.
-type Ordering struct***REMOVED******REMOVED***
+type Ordering struct{}
 
 // Direction reports the directionality of the runs.
 //
 // The direction may be LeftToRight, RightToLeft, Mixed, or Neutral.
-func (o *Ordering) Direction() Direction ***REMOVED***
+func (o *Ordering) Direction() Direction {
 	panic("unimplemented")
-***REMOVED***
+}
 
 // NumRuns returns the number of runs.
-func (o *Ordering) NumRuns() int ***REMOVED***
+func (o *Ordering) NumRuns() int {
 	panic("unimplemented")
-***REMOVED***
+}
 
 // Run returns the ith run within the ordering.
-func (o *Ordering) Run(i int) Run ***REMOVED***
+func (o *Ordering) Run(i int) Run {
 	panic("unimplemented")
-***REMOVED***
+}
 
 // TODO: perhaps with options.
 // // Reorder creates a reader that reads the runes in visual order per character.
 // // Modifiers remain after the runes they modify.
-// func (l *Runs) Reorder() io.Reader ***REMOVED***
+// func (l *Runs) Reorder() io.Reader {
 // 	panic("unimplemented")
-// ***REMOVED***
+// }
 
 // A Run is a continuous sequence of characters of a single direction.
-type Run struct ***REMOVED***
-***REMOVED***
+type Run struct {
+}
 
 // String returns the text of the run in its original order.
-func (r *Run) String() string ***REMOVED***
+func (r *Run) String() string {
 	panic("unimplemented")
-***REMOVED***
+}
 
 // Bytes returns the text of the run in its original order.
-func (r *Run) Bytes() []byte ***REMOVED***
+func (r *Run) Bytes() []byte {
 	panic("unimplemented")
-***REMOVED***
+}
 
 // TODO: methods for
 // - Display order
@@ -173,26 +173,26 @@ func (r *Run) Bytes() []byte ***REMOVED***
 // - bracket replacement.
 
 // Direction reports the direction of the run.
-func (r *Run) Direction() Direction ***REMOVED***
+func (r *Run) Direction() Direction {
 	panic("unimplemented")
-***REMOVED***
+}
 
 // Position of the Run within the text passed to SetBytes or SetString of the
 // originating Paragraph value.
-func (r *Run) Pos() (start, end int) ***REMOVED***
+func (r *Run) Pos() (start, end int) {
 	panic("unimplemented")
-***REMOVED***
+}
 
 // AppendReverse reverses the order of characters of in, appends them to out,
 // and returns the result. Modifiers will still follow the runes they modify.
 // Brackets are replaced with their counterparts.
-func AppendReverse(out, in []byte) []byte ***REMOVED***
+func AppendReverse(out, in []byte) []byte {
 	panic("unimplemented")
-***REMOVED***
+}
 
 // ReverseString reverses the order of characters in s and returns a new string.
 // Modifiers will still follow the runes they modify. Brackets are replaced with
 // their counterparts.
-func ReverseString(s string) string ***REMOVED***
+func ReverseString(s string) string {
 	panic("unimplemented")
-***REMOVED***
+}

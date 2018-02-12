@@ -57,7 +57,7 @@ the code for a complete set.
     cast.ToString([]byte("one time")) // "one time"
     cast.ToString(nil)                // ""
 
-	var foo interface***REMOVED******REMOVED*** = "one more time"
+	var foo interface{} = "one more time"
     cast.ToString(foo)                // "one more time"
 
 
@@ -69,7 +69,7 @@ the code for a complete set.
     cast.ToInt(true)               // 1
     cast.ToInt(false)              // 0
 
-	var eight interface***REMOVED******REMOVED*** = 8
+	var eight interface{} = 8
     cast.ToInt(eight)              // 8
     cast.ToInt(nil)                // 0
 

@@ -18,10 +18,10 @@ import (
 var errNegativeNotAllowed = errors.New("unable to cast negative value")
 
 // ToTimeE casts an interface to a time.Time type.
-func ToTimeE(i interface***REMOVED******REMOVED***) (tim time.Time, err error) ***REMOVED***
+func ToTimeE(i interface{}) (tim time.Time, err error) {
 	i = indirect(i)
 
-	switch v := i.(type) ***REMOVED***
+	switch v := i.(type) {
 	case time.Time:
 		return v, nil
 	case string:
@@ -39,15 +39,15 @@ func ToTimeE(i interface***REMOVED******REMOVED***) (tim time.Time, err error) *
 	case uint32:
 		return time.Unix(int64(v), 0), nil
 	default:
-		return time.Time***REMOVED******REMOVED***, fmt.Errorf("unable to cast %#v of type %T to Time", i, i)
-	***REMOVED***
-***REMOVED***
+		return time.Time{}, fmt.Errorf("unable to cast %#v of type %T to Time", i, i)
+	}
+}
 
 // ToDurationE casts an interface to a time.Duration type.
-func ToDurationE(i interface***REMOVED******REMOVED***) (d time.Duration, err error) ***REMOVED***
+func ToDurationE(i interface{}) (d time.Duration, err error) {
 	i = indirect(i)
 
-	switch s := i.(type) ***REMOVED***
+	switch s := i.(type) {
 	case time.Duration:
 		return s, nil
 	case int, int64, int32, int16, int8, uint, uint64, uint32, uint16, uint8:
@@ -57,44 +57,44 @@ func ToDurationE(i interface***REMOVED******REMOVED***) (d time.Duration, err er
 		d = time.Duration(ToFloat64(s))
 		return
 	case string:
-		if strings.ContainsAny(s, "nsuµmh") ***REMOVED***
+		if strings.ContainsAny(s, "nsuµmh") {
 			d, err = time.ParseDuration(s)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			d, err = time.ParseDuration(s + "ns")
-		***REMOVED***
+		}
 		return
 	default:
 		err = fmt.Errorf("unable to cast %#v of type %T to Duration", i, i)
 		return
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // ToBoolE casts an interface to a bool type.
-func ToBoolE(i interface***REMOVED******REMOVED***) (bool, error) ***REMOVED***
+func ToBoolE(i interface{}) (bool, error) {
 	i = indirect(i)
 
-	switch b := i.(type) ***REMOVED***
+	switch b := i.(type) {
 	case bool:
 		return b, nil
 	case nil:
 		return false, nil
 	case int:
-		if i.(int) != 0 ***REMOVED***
+		if i.(int) != 0 {
 			return true, nil
-		***REMOVED***
+		}
 		return false, nil
 	case string:
 		return strconv.ParseBool(i.(string))
 	default:
 		return false, fmt.Errorf("unable to cast %#v of type %T to bool", i, i)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // ToFloat64E casts an interface to a float64 type.
-func ToFloat64E(i interface***REMOVED******REMOVED***) (float64, error) ***REMOVED***
+func ToFloat64E(i interface{}) (float64, error) {
 	i = indirect(i)
 
-	switch s := i.(type) ***REMOVED***
+	switch s := i.(type) {
 	case float64:
 		return s, nil
 	case float32:
@@ -121,25 +121,25 @@ func ToFloat64E(i interface***REMOVED******REMOVED***) (float64, error) ***REMOV
 		return float64(s), nil
 	case string:
 		v, err := strconv.ParseFloat(s, 64)
-		if err == nil ***REMOVED***
+		if err == nil {
 			return v, nil
-		***REMOVED***
+		}
 		return 0, fmt.Errorf("unable to cast %#v of type %T to float64", i, i)
 	case bool:
-		if s ***REMOVED***
+		if s {
 			return 1, nil
-		***REMOVED***
+		}
 		return 0, nil
 	default:
 		return 0, fmt.Errorf("unable to cast %#v of type %T to float64", i, i)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // ToFloat32E casts an interface to a float32 type.
-func ToFloat32E(i interface***REMOVED******REMOVED***) (float32, error) ***REMOVED***
+func ToFloat32E(i interface{}) (float32, error) {
 	i = indirect(i)
 
-	switch s := i.(type) ***REMOVED***
+	switch s := i.(type) {
 	case float64:
 		return float32(s), nil
 	case float32:
@@ -166,25 +166,25 @@ func ToFloat32E(i interface***REMOVED******REMOVED***) (float32, error) ***REMOV
 		return float32(s), nil
 	case string:
 		v, err := strconv.ParseFloat(s, 32)
-		if err == nil ***REMOVED***
+		if err == nil {
 			return float32(v), nil
-		***REMOVED***
+		}
 		return 0, fmt.Errorf("unable to cast %#v of type %T to float32", i, i)
 	case bool:
-		if s ***REMOVED***
+		if s {
 			return 1, nil
-		***REMOVED***
+		}
 		return 0, nil
 	default:
 		return 0, fmt.Errorf("unable to cast %#v of type %T to float32", i, i)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // ToInt64E casts an interface to an int64 type.
-func ToInt64E(i interface***REMOVED******REMOVED***) (int64, error) ***REMOVED***
+func ToInt64E(i interface{}) (int64, error) {
 	i = indirect(i)
 
-	switch s := i.(type) ***REMOVED***
+	switch s := i.(type) {
 	case int:
 		return int64(s), nil
 	case int64:
@@ -211,27 +211,27 @@ func ToInt64E(i interface***REMOVED******REMOVED***) (int64, error) ***REMOVED**
 		return int64(s), nil
 	case string:
 		v, err := strconv.ParseInt(s, 0, 0)
-		if err == nil ***REMOVED***
+		if err == nil {
 			return v, nil
-		***REMOVED***
+		}
 		return 0, fmt.Errorf("unable to cast %#v of type %T to int64", i, i)
 	case bool:
-		if s ***REMOVED***
+		if s {
 			return 1, nil
-		***REMOVED***
+		}
 		return 0, nil
 	case nil:
 		return 0, nil
 	default:
 		return 0, fmt.Errorf("unable to cast %#v of type %T to int64", i, i)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // ToInt32E casts an interface to an int32 type.
-func ToInt32E(i interface***REMOVED******REMOVED***) (int32, error) ***REMOVED***
+func ToInt32E(i interface{}) (int32, error) {
 	i = indirect(i)
 
-	switch s := i.(type) ***REMOVED***
+	switch s := i.(type) {
 	case int:
 		return int32(s), nil
 	case int64:
@@ -258,27 +258,27 @@ func ToInt32E(i interface***REMOVED******REMOVED***) (int32, error) ***REMOVED**
 		return int32(s), nil
 	case string:
 		v, err := strconv.ParseInt(s, 0, 0)
-		if err == nil ***REMOVED***
+		if err == nil {
 			return int32(v), nil
-		***REMOVED***
+		}
 		return 0, fmt.Errorf("unable to cast %#v of type %T to int32", i, i)
 	case bool:
-		if s ***REMOVED***
+		if s {
 			return 1, nil
-		***REMOVED***
+		}
 		return 0, nil
 	case nil:
 		return 0, nil
 	default:
 		return 0, fmt.Errorf("unable to cast %#v of type %T to int32", i, i)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // ToInt16E casts an interface to an int16 type.
-func ToInt16E(i interface***REMOVED******REMOVED***) (int16, error) ***REMOVED***
+func ToInt16E(i interface{}) (int16, error) {
 	i = indirect(i)
 
-	switch s := i.(type) ***REMOVED***
+	switch s := i.(type) {
 	case int:
 		return int16(s), nil
 	case int64:
@@ -305,27 +305,27 @@ func ToInt16E(i interface***REMOVED******REMOVED***) (int16, error) ***REMOVED**
 		return int16(s), nil
 	case string:
 		v, err := strconv.ParseInt(s, 0, 0)
-		if err == nil ***REMOVED***
+		if err == nil {
 			return int16(v), nil
-		***REMOVED***
+		}
 		return 0, fmt.Errorf("unable to cast %#v of type %T to int16", i, i)
 	case bool:
-		if s ***REMOVED***
+		if s {
 			return 1, nil
-		***REMOVED***
+		}
 		return 0, nil
 	case nil:
 		return 0, nil
 	default:
 		return 0, fmt.Errorf("unable to cast %#v of type %T to int16", i, i)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // ToInt8E casts an interface to an int8 type.
-func ToInt8E(i interface***REMOVED******REMOVED***) (int8, error) ***REMOVED***
+func ToInt8E(i interface{}) (int8, error) {
 	i = indirect(i)
 
-	switch s := i.(type) ***REMOVED***
+	switch s := i.(type) {
 	case int:
 		return int8(s), nil
 	case int64:
@@ -352,27 +352,27 @@ func ToInt8E(i interface***REMOVED******REMOVED***) (int8, error) ***REMOVED***
 		return int8(s), nil
 	case string:
 		v, err := strconv.ParseInt(s, 0, 0)
-		if err == nil ***REMOVED***
+		if err == nil {
 			return int8(v), nil
-		***REMOVED***
+		}
 		return 0, fmt.Errorf("unable to cast %#v of type %T to int8", i, i)
 	case bool:
-		if s ***REMOVED***
+		if s {
 			return 1, nil
-		***REMOVED***
+		}
 		return 0, nil
 	case nil:
 		return 0, nil
 	default:
 		return 0, fmt.Errorf("unable to cast %#v of type %T to int8", i, i)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // ToIntE casts an interface to an int type.
-func ToIntE(i interface***REMOVED******REMOVED***) (int, error) ***REMOVED***
+func ToIntE(i interface{}) (int, error) {
 	i = indirect(i)
 
-	switch s := i.(type) ***REMOVED***
+	switch s := i.(type) {
 	case int:
 		return s, nil
 	case int64:
@@ -399,57 +399,57 @@ func ToIntE(i interface***REMOVED******REMOVED***) (int, error) ***REMOVED***
 		return int(s), nil
 	case string:
 		v, err := strconv.ParseInt(s, 0, 0)
-		if err == nil ***REMOVED***
+		if err == nil {
 			return int(v), nil
-		***REMOVED***
+		}
 		return 0, fmt.Errorf("unable to cast %#v of type %T to int", i, i)
 	case bool:
-		if s ***REMOVED***
+		if s {
 			return 1, nil
-		***REMOVED***
+		}
 		return 0, nil
 	case nil:
 		return 0, nil
 	default:
 		return 0, fmt.Errorf("unable to cast %#v of type %T to int", i, i)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // ToUintE casts an interface to a uint type.
-func ToUintE(i interface***REMOVED******REMOVED***) (uint, error) ***REMOVED***
+func ToUintE(i interface{}) (uint, error) {
 	i = indirect(i)
 
-	switch s := i.(type) ***REMOVED***
+	switch s := i.(type) {
 	case string:
 		v, err := strconv.ParseUint(s, 0, 0)
-		if err == nil ***REMOVED***
+		if err == nil {
 			return uint(v), nil
-		***REMOVED***
+		}
 		return 0, fmt.Errorf("unable to cast %#v to uint: %s", i, err)
 	case int:
-		if s < 0 ***REMOVED***
+		if s < 0 {
 			return 0, errNegativeNotAllowed
-		***REMOVED***
+		}
 		return uint(s), nil
 	case int64:
-		if s < 0 ***REMOVED***
+		if s < 0 {
 			return 0, errNegativeNotAllowed
-		***REMOVED***
+		}
 		return uint(s), nil
 	case int32:
-		if s < 0 ***REMOVED***
+		if s < 0 {
 			return 0, errNegativeNotAllowed
-		***REMOVED***
+		}
 		return uint(s), nil
 	case int16:
-		if s < 0 ***REMOVED***
+		if s < 0 {
 			return 0, errNegativeNotAllowed
-		***REMOVED***
+		}
 		return uint(s), nil
 	case int8:
-		if s < 0 ***REMOVED***
+		if s < 0 {
 			return 0, errNegativeNotAllowed
-		***REMOVED***
+		}
 		return uint(s), nil
 	case uint:
 		return s, nil
@@ -462,62 +462,62 @@ func ToUintE(i interface***REMOVED******REMOVED***) (uint, error) ***REMOVED***
 	case uint8:
 		return uint(s), nil
 	case float64:
-		if s < 0 ***REMOVED***
+		if s < 0 {
 			return 0, errNegativeNotAllowed
-		***REMOVED***
+		}
 		return uint(s), nil
 	case float32:
-		if s < 0 ***REMOVED***
+		if s < 0 {
 			return 0, errNegativeNotAllowed
-		***REMOVED***
+		}
 		return uint(s), nil
 	case bool:
-		if s ***REMOVED***
+		if s {
 			return 1, nil
-		***REMOVED***
+		}
 		return 0, nil
 	case nil:
 		return 0, nil
 	default:
 		return 0, fmt.Errorf("unable to cast %#v of type %T to uint", i, i)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // ToUint64E casts an interface to a uint64 type.
-func ToUint64E(i interface***REMOVED******REMOVED***) (uint64, error) ***REMOVED***
+func ToUint64E(i interface{}) (uint64, error) {
 	i = indirect(i)
 
-	switch s := i.(type) ***REMOVED***
+	switch s := i.(type) {
 	case string:
 		v, err := strconv.ParseUint(s, 0, 64)
-		if err == nil ***REMOVED***
+		if err == nil {
 			return v, nil
-		***REMOVED***
+		}
 		return 0, fmt.Errorf("unable to cast %#v to uint64: %s", i, err)
 	case int:
-		if s < 0 ***REMOVED***
+		if s < 0 {
 			return 0, errNegativeNotAllowed
-		***REMOVED***
+		}
 		return uint64(s), nil
 	case int64:
-		if s < 0 ***REMOVED***
+		if s < 0 {
 			return 0, errNegativeNotAllowed
-		***REMOVED***
+		}
 		return uint64(s), nil
 	case int32:
-		if s < 0 ***REMOVED***
+		if s < 0 {
 			return 0, errNegativeNotAllowed
-		***REMOVED***
+		}
 		return uint64(s), nil
 	case int16:
-		if s < 0 ***REMOVED***
+		if s < 0 {
 			return 0, errNegativeNotAllowed
-		***REMOVED***
+		}
 		return uint64(s), nil
 	case int8:
-		if s < 0 ***REMOVED***
+		if s < 0 {
 			return 0, errNegativeNotAllowed
-		***REMOVED***
+		}
 		return uint64(s), nil
 	case uint:
 		return uint64(s), nil
@@ -530,62 +530,62 @@ func ToUint64E(i interface***REMOVED******REMOVED***) (uint64, error) ***REMOVED
 	case uint8:
 		return uint64(s), nil
 	case float32:
-		if s < 0 ***REMOVED***
+		if s < 0 {
 			return 0, errNegativeNotAllowed
-		***REMOVED***
+		}
 		return uint64(s), nil
 	case float64:
-		if s < 0 ***REMOVED***
+		if s < 0 {
 			return 0, errNegativeNotAllowed
-		***REMOVED***
+		}
 		return uint64(s), nil
 	case bool:
-		if s ***REMOVED***
+		if s {
 			return 1, nil
-		***REMOVED***
+		}
 		return 0, nil
 	case nil:
 		return 0, nil
 	default:
 		return 0, fmt.Errorf("unable to cast %#v of type %T to uint64", i, i)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // ToUint32E casts an interface to a uint32 type.
-func ToUint32E(i interface***REMOVED******REMOVED***) (uint32, error) ***REMOVED***
+func ToUint32E(i interface{}) (uint32, error) {
 	i = indirect(i)
 
-	switch s := i.(type) ***REMOVED***
+	switch s := i.(type) {
 	case string:
 		v, err := strconv.ParseUint(s, 0, 32)
-		if err == nil ***REMOVED***
+		if err == nil {
 			return uint32(v), nil
-		***REMOVED***
+		}
 		return 0, fmt.Errorf("unable to cast %#v to uint32: %s", i, err)
 	case int:
-		if s < 0 ***REMOVED***
+		if s < 0 {
 			return 0, errNegativeNotAllowed
-		***REMOVED***
+		}
 		return uint32(s), nil
 	case int64:
-		if s < 0 ***REMOVED***
+		if s < 0 {
 			return 0, errNegativeNotAllowed
-		***REMOVED***
+		}
 		return uint32(s), nil
 	case int32:
-		if s < 0 ***REMOVED***
+		if s < 0 {
 			return 0, errNegativeNotAllowed
-		***REMOVED***
+		}
 		return uint32(s), nil
 	case int16:
-		if s < 0 ***REMOVED***
+		if s < 0 {
 			return 0, errNegativeNotAllowed
-		***REMOVED***
+		}
 		return uint32(s), nil
 	case int8:
-		if s < 0 ***REMOVED***
+		if s < 0 {
 			return 0, errNegativeNotAllowed
-		***REMOVED***
+		}
 		return uint32(s), nil
 	case uint:
 		return uint32(s), nil
@@ -598,62 +598,62 @@ func ToUint32E(i interface***REMOVED******REMOVED***) (uint32, error) ***REMOVED
 	case uint8:
 		return uint32(s), nil
 	case float64:
-		if s < 0 ***REMOVED***
+		if s < 0 {
 			return 0, errNegativeNotAllowed
-		***REMOVED***
+		}
 		return uint32(s), nil
 	case float32:
-		if s < 0 ***REMOVED***
+		if s < 0 {
 			return 0, errNegativeNotAllowed
-		***REMOVED***
+		}
 		return uint32(s), nil
 	case bool:
-		if s ***REMOVED***
+		if s {
 			return 1, nil
-		***REMOVED***
+		}
 		return 0, nil
 	case nil:
 		return 0, nil
 	default:
 		return 0, fmt.Errorf("unable to cast %#v of type %T to uint32", i, i)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // ToUint16E casts an interface to a uint16 type.
-func ToUint16E(i interface***REMOVED******REMOVED***) (uint16, error) ***REMOVED***
+func ToUint16E(i interface{}) (uint16, error) {
 	i = indirect(i)
 
-	switch s := i.(type) ***REMOVED***
+	switch s := i.(type) {
 	case string:
 		v, err := strconv.ParseUint(s, 0, 16)
-		if err == nil ***REMOVED***
+		if err == nil {
 			return uint16(v), nil
-		***REMOVED***
+		}
 		return 0, fmt.Errorf("unable to cast %#v to uint16: %s", i, err)
 	case int:
-		if s < 0 ***REMOVED***
+		if s < 0 {
 			return 0, errNegativeNotAllowed
-		***REMOVED***
+		}
 		return uint16(s), nil
 	case int64:
-		if s < 0 ***REMOVED***
+		if s < 0 {
 			return 0, errNegativeNotAllowed
-		***REMOVED***
+		}
 		return uint16(s), nil
 	case int32:
-		if s < 0 ***REMOVED***
+		if s < 0 {
 			return 0, errNegativeNotAllowed
-		***REMOVED***
+		}
 		return uint16(s), nil
 	case int16:
-		if s < 0 ***REMOVED***
+		if s < 0 {
 			return 0, errNegativeNotAllowed
-		***REMOVED***
+		}
 		return uint16(s), nil
 	case int8:
-		if s < 0 ***REMOVED***
+		if s < 0 {
 			return 0, errNegativeNotAllowed
-		***REMOVED***
+		}
 		return uint16(s), nil
 	case uint:
 		return uint16(s), nil
@@ -666,62 +666,62 @@ func ToUint16E(i interface***REMOVED******REMOVED***) (uint16, error) ***REMOVED
 	case uint8:
 		return uint16(s), nil
 	case float64:
-		if s < 0 ***REMOVED***
+		if s < 0 {
 			return 0, errNegativeNotAllowed
-		***REMOVED***
+		}
 		return uint16(s), nil
 	case float32:
-		if s < 0 ***REMOVED***
+		if s < 0 {
 			return 0, errNegativeNotAllowed
-		***REMOVED***
+		}
 		return uint16(s), nil
 	case bool:
-		if s ***REMOVED***
+		if s {
 			return 1, nil
-		***REMOVED***
+		}
 		return 0, nil
 	case nil:
 		return 0, nil
 	default:
 		return 0, fmt.Errorf("unable to cast %#v of type %T to uint16", i, i)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // ToUint8E casts an interface to a uint type.
-func ToUint8E(i interface***REMOVED******REMOVED***) (uint8, error) ***REMOVED***
+func ToUint8E(i interface{}) (uint8, error) {
 	i = indirect(i)
 
-	switch s := i.(type) ***REMOVED***
+	switch s := i.(type) {
 	case string:
 		v, err := strconv.ParseUint(s, 0, 8)
-		if err == nil ***REMOVED***
+		if err == nil {
 			return uint8(v), nil
-		***REMOVED***
+		}
 		return 0, fmt.Errorf("unable to cast %#v to uint8: %s", i, err)
 	case int:
-		if s < 0 ***REMOVED***
+		if s < 0 {
 			return 0, errNegativeNotAllowed
-		***REMOVED***
+		}
 		return uint8(s), nil
 	case int64:
-		if s < 0 ***REMOVED***
+		if s < 0 {
 			return 0, errNegativeNotAllowed
-		***REMOVED***
+		}
 		return uint8(s), nil
 	case int32:
-		if s < 0 ***REMOVED***
+		if s < 0 {
 			return 0, errNegativeNotAllowed
-		***REMOVED***
+		}
 		return uint8(s), nil
 	case int16:
-		if s < 0 ***REMOVED***
+		if s < 0 {
 			return 0, errNegativeNotAllowed
-		***REMOVED***
+		}
 		return uint8(s), nil
 	case int8:
-		if s < 0 ***REMOVED***
+		if s < 0 {
 			return 0, errNegativeNotAllowed
-		***REMOVED***
+		}
 		return uint8(s), nil
 	case uint:
 		return uint8(s), nil
@@ -734,71 +734,71 @@ func ToUint8E(i interface***REMOVED******REMOVED***) (uint8, error) ***REMOVED**
 	case uint8:
 		return s, nil
 	case float64:
-		if s < 0 ***REMOVED***
+		if s < 0 {
 			return 0, errNegativeNotAllowed
-		***REMOVED***
+		}
 		return uint8(s), nil
 	case float32:
-		if s < 0 ***REMOVED***
+		if s < 0 {
 			return 0, errNegativeNotAllowed
-		***REMOVED***
+		}
 		return uint8(s), nil
 	case bool:
-		if s ***REMOVED***
+		if s {
 			return 1, nil
-		***REMOVED***
+		}
 		return 0, nil
 	case nil:
 		return 0, nil
 	default:
 		return 0, fmt.Errorf("unable to cast %#v of type %T to uint8", i, i)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // From html/template/content.go
 // Copyright 2011 The Go Authors. All rights reserved.
 // indirect returns the value, after dereferencing as many times
 // as necessary to reach the base type (or nil).
-func indirect(a interface***REMOVED******REMOVED***) interface***REMOVED******REMOVED*** ***REMOVED***
-	if a == nil ***REMOVED***
+func indirect(a interface{}) interface{} {
+	if a == nil {
 		return nil
-	***REMOVED***
-	if t := reflect.TypeOf(a); t.Kind() != reflect.Ptr ***REMOVED***
+	}
+	if t := reflect.TypeOf(a); t.Kind() != reflect.Ptr {
 		// Avoid creating a reflect.Value if it's not a pointer.
 		return a
-	***REMOVED***
+	}
 	v := reflect.ValueOf(a)
-	for v.Kind() == reflect.Ptr && !v.IsNil() ***REMOVED***
+	for v.Kind() == reflect.Ptr && !v.IsNil() {
 		v = v.Elem()
-	***REMOVED***
+	}
 	return v.Interface()
-***REMOVED***
+}
 
 // From html/template/content.go
 // Copyright 2011 The Go Authors. All rights reserved.
 // indirectToStringerOrError returns the value, after dereferencing as many times
 // as necessary to reach the base type (or nil) or an implementation of fmt.Stringer
 // or error,
-func indirectToStringerOrError(a interface***REMOVED******REMOVED***) interface***REMOVED******REMOVED*** ***REMOVED***
-	if a == nil ***REMOVED***
+func indirectToStringerOrError(a interface{}) interface{} {
+	if a == nil {
 		return nil
-	***REMOVED***
+	}
 
 	var errorType = reflect.TypeOf((*error)(nil)).Elem()
 	var fmtStringerType = reflect.TypeOf((*fmt.Stringer)(nil)).Elem()
 
 	v := reflect.ValueOf(a)
-	for !v.Type().Implements(fmtStringerType) && !v.Type().Implements(errorType) && v.Kind() == reflect.Ptr && !v.IsNil() ***REMOVED***
+	for !v.Type().Implements(fmtStringerType) && !v.Type().Implements(errorType) && v.Kind() == reflect.Ptr && !v.IsNil() {
 		v = v.Elem()
-	***REMOVED***
+	}
 	return v.Interface()
-***REMOVED***
+}
 
 // ToStringE casts an interface to a string type.
-func ToStringE(i interface***REMOVED******REMOVED***) (string, error) ***REMOVED***
+func ToStringE(i interface{}) (string, error) {
 	i = indirectToStringerOrError(i)
 
-	switch s := i.(type) ***REMOVED***
+	switch s := i.(type) {
 	case string:
 		return s, nil
 	case bool:
@@ -847,270 +847,270 @@ func ToStringE(i interface***REMOVED******REMOVED***) (string, error) ***REMOVED
 		return s.Error(), nil
 	default:
 		return "", fmt.Errorf("unable to cast %#v of type %T to string", i, i)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // ToStringMapStringE casts an interface to a map[string]string type.
-func ToStringMapStringE(i interface***REMOVED******REMOVED***) (map[string]string, error) ***REMOVED***
-	var m = map[string]string***REMOVED******REMOVED***
+func ToStringMapStringE(i interface{}) (map[string]string, error) {
+	var m = map[string]string{}
 
-	switch v := i.(type) ***REMOVED***
+	switch v := i.(type) {
 	case map[string]string:
 		return v, nil
-	case map[string]interface***REMOVED******REMOVED***:
-		for k, val := range v ***REMOVED***
+	case map[string]interface{}:
+		for k, val := range v {
 			m[ToString(k)] = ToString(val)
-		***REMOVED***
+		}
 		return m, nil
-	case map[interface***REMOVED******REMOVED***]string:
-		for k, val := range v ***REMOVED***
+	case map[interface{}]string:
+		for k, val := range v {
 			m[ToString(k)] = ToString(val)
-		***REMOVED***
+		}
 		return m, nil
-	case map[interface***REMOVED******REMOVED***]interface***REMOVED******REMOVED***:
-		for k, val := range v ***REMOVED***
+	case map[interface{}]interface{}:
+		for k, val := range v {
 			m[ToString(k)] = ToString(val)
-		***REMOVED***
+		}
 		return m, nil
 	default:
 		return m, fmt.Errorf("unable to cast %#v of type %T to map[string]string", i, i)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // ToStringMapStringSliceE casts an interface to a map[string][]string type.
-func ToStringMapStringSliceE(i interface***REMOVED******REMOVED***) (map[string][]string, error) ***REMOVED***
-	var m = map[string][]string***REMOVED******REMOVED***
+func ToStringMapStringSliceE(i interface{}) (map[string][]string, error) {
+	var m = map[string][]string{}
 
-	switch v := i.(type) ***REMOVED***
+	switch v := i.(type) {
 	case map[string][]string:
 		return v, nil
-	case map[string][]interface***REMOVED******REMOVED***:
-		for k, val := range v ***REMOVED***
+	case map[string][]interface{}:
+		for k, val := range v {
 			m[ToString(k)] = ToStringSlice(val)
-		***REMOVED***
+		}
 		return m, nil
 	case map[string]string:
-		for k, val := range v ***REMOVED***
-			m[ToString(k)] = []string***REMOVED***val***REMOVED***
-		***REMOVED***
-	case map[string]interface***REMOVED******REMOVED***:
-		for k, val := range v ***REMOVED***
-			switch vt := val.(type) ***REMOVED***
-			case []interface***REMOVED******REMOVED***:
+		for k, val := range v {
+			m[ToString(k)] = []string{val}
+		}
+	case map[string]interface{}:
+		for k, val := range v {
+			switch vt := val.(type) {
+			case []interface{}:
 				m[ToString(k)] = ToStringSlice(vt)
 			case []string:
 				m[ToString(k)] = vt
 			default:
-				m[ToString(k)] = []string***REMOVED***ToString(val)***REMOVED***
-			***REMOVED***
-		***REMOVED***
+				m[ToString(k)] = []string{ToString(val)}
+			}
+		}
 		return m, nil
-	case map[interface***REMOVED******REMOVED***][]string:
-		for k, val := range v ***REMOVED***
+	case map[interface{}][]string:
+		for k, val := range v {
 			m[ToString(k)] = ToStringSlice(val)
-		***REMOVED***
+		}
 		return m, nil
-	case map[interface***REMOVED******REMOVED***]string:
-		for k, val := range v ***REMOVED***
+	case map[interface{}]string:
+		for k, val := range v {
 			m[ToString(k)] = ToStringSlice(val)
-		***REMOVED***
+		}
 		return m, nil
-	case map[interface***REMOVED******REMOVED***][]interface***REMOVED******REMOVED***:
-		for k, val := range v ***REMOVED***
+	case map[interface{}][]interface{}:
+		for k, val := range v {
 			m[ToString(k)] = ToStringSlice(val)
-		***REMOVED***
+		}
 		return m, nil
-	case map[interface***REMOVED******REMOVED***]interface***REMOVED******REMOVED***:
-		for k, val := range v ***REMOVED***
+	case map[interface{}]interface{}:
+		for k, val := range v {
 			key, err := ToStringE(k)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return m, fmt.Errorf("unable to cast %#v of type %T to map[string][]string", i, i)
-			***REMOVED***
+			}
 			value, err := ToStringSliceE(val)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return m, fmt.Errorf("unable to cast %#v of type %T to map[string][]string", i, i)
-			***REMOVED***
+			}
 			m[key] = value
-		***REMOVED***
+		}
 	default:
 		return m, fmt.Errorf("unable to cast %#v of type %T to map[string][]string", i, i)
-	***REMOVED***
+	}
 	return m, nil
-***REMOVED***
+}
 
 // ToStringMapBoolE casts an interface to a map[string]bool type.
-func ToStringMapBoolE(i interface***REMOVED******REMOVED***) (map[string]bool, error) ***REMOVED***
-	var m = map[string]bool***REMOVED******REMOVED***
+func ToStringMapBoolE(i interface{}) (map[string]bool, error) {
+	var m = map[string]bool{}
 
-	switch v := i.(type) ***REMOVED***
-	case map[interface***REMOVED******REMOVED***]interface***REMOVED******REMOVED***:
-		for k, val := range v ***REMOVED***
+	switch v := i.(type) {
+	case map[interface{}]interface{}:
+		for k, val := range v {
 			m[ToString(k)] = ToBool(val)
-		***REMOVED***
+		}
 		return m, nil
-	case map[string]interface***REMOVED******REMOVED***:
-		for k, val := range v ***REMOVED***
+	case map[string]interface{}:
+		for k, val := range v {
 			m[ToString(k)] = ToBool(val)
-		***REMOVED***
+		}
 		return m, nil
 	case map[string]bool:
 		return v, nil
 	default:
 		return m, fmt.Errorf("unable to cast %#v of type %T to map[string]bool", i, i)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-// ToStringMapE casts an interface to a map[string]interface***REMOVED******REMOVED*** type.
-func ToStringMapE(i interface***REMOVED******REMOVED***) (map[string]interface***REMOVED******REMOVED***, error) ***REMOVED***
-	var m = map[string]interface***REMOVED******REMOVED******REMOVED******REMOVED***
+// ToStringMapE casts an interface to a map[string]interface{} type.
+func ToStringMapE(i interface{}) (map[string]interface{}, error) {
+	var m = map[string]interface{}{}
 
-	switch v := i.(type) ***REMOVED***
-	case map[interface***REMOVED******REMOVED***]interface***REMOVED******REMOVED***:
-		for k, val := range v ***REMOVED***
+	switch v := i.(type) {
+	case map[interface{}]interface{}:
+		for k, val := range v {
 			m[ToString(k)] = val
-		***REMOVED***
+		}
 		return m, nil
-	case map[string]interface***REMOVED******REMOVED***:
+	case map[string]interface{}:
 		return v, nil
 	default:
-		return m, fmt.Errorf("unable to cast %#v of type %T to map[string]interface***REMOVED******REMOVED***", i, i)
-	***REMOVED***
-***REMOVED***
+		return m, fmt.Errorf("unable to cast %#v of type %T to map[string]interface{}", i, i)
+	}
+}
 
-// ToSliceE casts an interface to a []interface***REMOVED******REMOVED*** type.
-func ToSliceE(i interface***REMOVED******REMOVED***) ([]interface***REMOVED******REMOVED***, error) ***REMOVED***
-	var s []interface***REMOVED******REMOVED***
+// ToSliceE casts an interface to a []interface{} type.
+func ToSliceE(i interface{}) ([]interface{}, error) {
+	var s []interface{}
 
-	switch v := i.(type) ***REMOVED***
-	case []interface***REMOVED******REMOVED***:
+	switch v := i.(type) {
+	case []interface{}:
 		return append(s, v...), nil
-	case []map[string]interface***REMOVED******REMOVED***:
-		for _, u := range v ***REMOVED***
+	case []map[string]interface{}:
+		for _, u := range v {
 			s = append(s, u)
-		***REMOVED***
+		}
 		return s, nil
 	default:
-		return s, fmt.Errorf("unable to cast %#v of type %T to []interface***REMOVED******REMOVED***", i, i)
-	***REMOVED***
-***REMOVED***
+		return s, fmt.Errorf("unable to cast %#v of type %T to []interface{}", i, i)
+	}
+}
 
 // ToBoolSliceE casts an interface to a []bool type.
-func ToBoolSliceE(i interface***REMOVED******REMOVED***) ([]bool, error) ***REMOVED***
-	if i == nil ***REMOVED***
-		return []bool***REMOVED******REMOVED***, fmt.Errorf("unable to cast %#v of type %T to []bool", i, i)
-	***REMOVED***
+func ToBoolSliceE(i interface{}) ([]bool, error) {
+	if i == nil {
+		return []bool{}, fmt.Errorf("unable to cast %#v of type %T to []bool", i, i)
+	}
 
-	switch v := i.(type) ***REMOVED***
+	switch v := i.(type) {
 	case []bool:
 		return v, nil
-	***REMOVED***
+	}
 
 	kind := reflect.TypeOf(i).Kind()
-	switch kind ***REMOVED***
+	switch kind {
 	case reflect.Slice, reflect.Array:
 		s := reflect.ValueOf(i)
 		a := make([]bool, s.Len())
-		for j := 0; j < s.Len(); j++ ***REMOVED***
+		for j := 0; j < s.Len(); j++ {
 			val, err := ToBoolE(s.Index(j).Interface())
-			if err != nil ***REMOVED***
-				return []bool***REMOVED******REMOVED***, fmt.Errorf("unable to cast %#v of type %T to []bool", i, i)
-			***REMOVED***
+			if err != nil {
+				return []bool{}, fmt.Errorf("unable to cast %#v of type %T to []bool", i, i)
+			}
 			a[j] = val
-		***REMOVED***
+		}
 		return a, nil
 	default:
-		return []bool***REMOVED******REMOVED***, fmt.Errorf("unable to cast %#v of type %T to []bool", i, i)
-	***REMOVED***
-***REMOVED***
+		return []bool{}, fmt.Errorf("unable to cast %#v of type %T to []bool", i, i)
+	}
+}
 
 // ToStringSliceE casts an interface to a []string type.
-func ToStringSliceE(i interface***REMOVED******REMOVED***) ([]string, error) ***REMOVED***
+func ToStringSliceE(i interface{}) ([]string, error) {
 	var a []string
 
-	switch v := i.(type) ***REMOVED***
-	case []interface***REMOVED******REMOVED***:
-		for _, u := range v ***REMOVED***
+	switch v := i.(type) {
+	case []interface{}:
+		for _, u := range v {
 			a = append(a, ToString(u))
-		***REMOVED***
+		}
 		return a, nil
 	case []string:
 		return v, nil
 	case string:
 		return strings.Fields(v), nil
-	case interface***REMOVED******REMOVED***:
+	case interface{}:
 		str, err := ToStringE(v)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return a, fmt.Errorf("unable to cast %#v of type %T to []string", i, i)
-		***REMOVED***
-		return []string***REMOVED***str***REMOVED***, nil
+		}
+		return []string{str}, nil
 	default:
 		return a, fmt.Errorf("unable to cast %#v of type %T to []string", i, i)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // ToIntSliceE casts an interface to a []int type.
-func ToIntSliceE(i interface***REMOVED******REMOVED***) ([]int, error) ***REMOVED***
-	if i == nil ***REMOVED***
-		return []int***REMOVED******REMOVED***, fmt.Errorf("unable to cast %#v of type %T to []int", i, i)
-	***REMOVED***
+func ToIntSliceE(i interface{}) ([]int, error) {
+	if i == nil {
+		return []int{}, fmt.Errorf("unable to cast %#v of type %T to []int", i, i)
+	}
 
-	switch v := i.(type) ***REMOVED***
+	switch v := i.(type) {
 	case []int:
 		return v, nil
-	***REMOVED***
+	}
 
 	kind := reflect.TypeOf(i).Kind()
-	switch kind ***REMOVED***
+	switch kind {
 	case reflect.Slice, reflect.Array:
 		s := reflect.ValueOf(i)
 		a := make([]int, s.Len())
-		for j := 0; j < s.Len(); j++ ***REMOVED***
+		for j := 0; j < s.Len(); j++ {
 			val, err := ToIntE(s.Index(j).Interface())
-			if err != nil ***REMOVED***
-				return []int***REMOVED******REMOVED***, fmt.Errorf("unable to cast %#v of type %T to []int", i, i)
-			***REMOVED***
+			if err != nil {
+				return []int{}, fmt.Errorf("unable to cast %#v of type %T to []int", i, i)
+			}
 			a[j] = val
-		***REMOVED***
+		}
 		return a, nil
 	default:
-		return []int***REMOVED******REMOVED***, fmt.Errorf("unable to cast %#v of type %T to []int", i, i)
-	***REMOVED***
-***REMOVED***
+		return []int{}, fmt.Errorf("unable to cast %#v of type %T to []int", i, i)
+	}
+}
 
 // ToDurationSliceE casts an interface to a []time.Duration type.
-func ToDurationSliceE(i interface***REMOVED******REMOVED***) ([]time.Duration, error) ***REMOVED***
-	if i == nil ***REMOVED***
-		return []time.Duration***REMOVED******REMOVED***, fmt.Errorf("unable to cast %#v of type %T to []time.Duration", i, i)
-	***REMOVED***
+func ToDurationSliceE(i interface{}) ([]time.Duration, error) {
+	if i == nil {
+		return []time.Duration{}, fmt.Errorf("unable to cast %#v of type %T to []time.Duration", i, i)
+	}
 
-	switch v := i.(type) ***REMOVED***
+	switch v := i.(type) {
 	case []time.Duration:
 		return v, nil
-	***REMOVED***
+	}
 
 	kind := reflect.TypeOf(i).Kind()
-	switch kind ***REMOVED***
+	switch kind {
 	case reflect.Slice, reflect.Array:
 		s := reflect.ValueOf(i)
 		a := make([]time.Duration, s.Len())
-		for j := 0; j < s.Len(); j++ ***REMOVED***
+		for j := 0; j < s.Len(); j++ {
 			val, err := ToDurationE(s.Index(j).Interface())
-			if err != nil ***REMOVED***
-				return []time.Duration***REMOVED******REMOVED***, fmt.Errorf("unable to cast %#v of type %T to []time.Duration", i, i)
-			***REMOVED***
+			if err != nil {
+				return []time.Duration{}, fmt.Errorf("unable to cast %#v of type %T to []time.Duration", i, i)
+			}
 			a[j] = val
-		***REMOVED***
+		}
 		return a, nil
 	default:
-		return []time.Duration***REMOVED******REMOVED***, fmt.Errorf("unable to cast %#v of type %T to []time.Duration", i, i)
-	***REMOVED***
-***REMOVED***
+		return []time.Duration{}, fmt.Errorf("unable to cast %#v of type %T to []time.Duration", i, i)
+	}
+}
 
 // StringToDate attempts to parse a string into a time.Time type using a
 // predefined list of formats.  If no suitable format is found, an error is
 // returned.
-func StringToDate(s string) (time.Time, error) ***REMOVED***
-	return parseDateWith(s, []string***REMOVED***
+func StringToDate(s string) (time.Time, error) {
+	return parseDateWith(s, []string{
 		time.RFC3339,
 		"2006-01-02T15:04:05", // iso8601 without timezone
 		time.RFC1123Z,
@@ -1133,14 +1133,14 @@ func StringToDate(s string) (time.Time, error) ***REMOVED***
 		time.StampMilli,
 		time.StampMicro,
 		time.StampNano,
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func parseDateWith(s string, dates []string) (d time.Time, e error) ***REMOVED***
-	for _, dateType := range dates ***REMOVED***
-		if d, e = time.Parse(dateType, s); e == nil ***REMOVED***
+func parseDateWith(s string, dates []string) (d time.Time, e error) {
+	for _, dateType := range dates {
+		if d, e = time.Parse(dateType, s); e == nil {
 			return
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return d, fmt.Errorf("unable to parse date: %s", s)
-***REMOVED***
+}

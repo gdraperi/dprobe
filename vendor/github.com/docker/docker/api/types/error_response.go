@@ -5,9 +5,9 @@ package types
 
 // ErrorResponse Represents an error.
 // swagger:model ErrorResponse
-type ErrorResponse struct ***REMOVED***
+type ErrorResponse struct {
 
 	// The error message.
 	// Required: true
 	Message string `json:"message"`
-***REMOVED***
+}

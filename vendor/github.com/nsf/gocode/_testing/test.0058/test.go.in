@@ -2,6 +2,6 @@ package main
 
 import myast "go/ast"
 
-func main() ***REMOVED***
+func main() {
 	myast.NewPack
-***REMOVED***
+}

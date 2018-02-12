@@ -11,82 +11,82 @@ import (
 )
 
 // ServiceUpdate updates a Service.
-func (cli *Client) ServiceUpdate(ctx context.Context, serviceID string, version swarm.Version, service swarm.ServiceSpec, options types.ServiceUpdateOptions) (types.ServiceUpdateResponse, error) ***REMOVED***
+func (cli *Client) ServiceUpdate(ctx context.Context, serviceID string, version swarm.Version, service swarm.ServiceSpec, options types.ServiceUpdateOptions) (types.ServiceUpdateResponse, error) {
 	var (
-		query   = url.Values***REMOVED******REMOVED***
+		query   = url.Values{}
 		distErr error
 	)
 
-	headers := map[string][]string***REMOVED***
-		"version": ***REMOVED***cli.version***REMOVED***,
-	***REMOVED***
+	headers := map[string][]string{
+		"version": {cli.version},
+	}
 
-	if options.EncodedRegistryAuth != "" ***REMOVED***
-		headers["X-Registry-Auth"] = []string***REMOVED***options.EncodedRegistryAuth***REMOVED***
-	***REMOVED***
+	if options.EncodedRegistryAuth != "" {
+		headers["X-Registry-Auth"] = []string{options.EncodedRegistryAuth}
+	}
 
-	if options.RegistryAuthFrom != "" ***REMOVED***
+	if options.RegistryAuthFrom != "" {
 		query.Set("registryAuthFrom", options.RegistryAuthFrom)
-	***REMOVED***
+	}
 
-	if options.Rollback != "" ***REMOVED***
+	if options.Rollback != "" {
 		query.Set("rollback", options.Rollback)
-	***REMOVED***
+	}
 
 	query.Set("version", strconv.FormatUint(version.Index, 10))
 
-	if err := validateServiceSpec(service); err != nil ***REMOVED***
-		return types.ServiceUpdateResponse***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err := validateServiceSpec(service); err != nil {
+		return types.ServiceUpdateResponse{}, err
+	}
 
 	var imgPlatforms []swarm.Platform
 	// ensure that the image is tagged
-	if service.TaskTemplate.ContainerSpec != nil ***REMOVED***
-		if taggedImg := imageWithTagString(service.TaskTemplate.ContainerSpec.Image); taggedImg != "" ***REMOVED***
+	if service.TaskTemplate.ContainerSpec != nil {
+		if taggedImg := imageWithTagString(service.TaskTemplate.ContainerSpec.Image); taggedImg != "" {
 			service.TaskTemplate.ContainerSpec.Image = taggedImg
-		***REMOVED***
-		if options.QueryRegistry ***REMOVED***
+		}
+		if options.QueryRegistry {
 			var img string
 			img, imgPlatforms, distErr = imageDigestAndPlatforms(ctx, cli, service.TaskTemplate.ContainerSpec.Image, options.EncodedRegistryAuth)
-			if img != "" ***REMOVED***
+			if img != "" {
 				service.TaskTemplate.ContainerSpec.Image = img
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	// ensure that the image is tagged
-	if service.TaskTemplate.PluginSpec != nil ***REMOVED***
-		if taggedImg := imageWithTagString(service.TaskTemplate.PluginSpec.Remote); taggedImg != "" ***REMOVED***
+	if service.TaskTemplate.PluginSpec != nil {
+		if taggedImg := imageWithTagString(service.TaskTemplate.PluginSpec.Remote); taggedImg != "" {
 			service.TaskTemplate.PluginSpec.Remote = taggedImg
-		***REMOVED***
-		if options.QueryRegistry ***REMOVED***
+		}
+		if options.QueryRegistry {
 			var img string
 			img, imgPlatforms, distErr = imageDigestAndPlatforms(ctx, cli, service.TaskTemplate.PluginSpec.Remote, options.EncodedRegistryAuth)
-			if img != "" ***REMOVED***
+			if img != "" {
 				service.TaskTemplate.PluginSpec.Remote = img
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
-	if service.TaskTemplate.Placement == nil && len(imgPlatforms) > 0 ***REMOVED***
-		service.TaskTemplate.Placement = &swarm.Placement***REMOVED******REMOVED***
-	***REMOVED***
-	if len(imgPlatforms) > 0 ***REMOVED***
+	if service.TaskTemplate.Placement == nil && len(imgPlatforms) > 0 {
+		service.TaskTemplate.Placement = &swarm.Placement{}
+	}
+	if len(imgPlatforms) > 0 {
 		service.TaskTemplate.Placement.Platforms = imgPlatforms
-	***REMOVED***
+	}
 
 	var response types.ServiceUpdateResponse
 	resp, err := cli.post(ctx, "/services/"+serviceID+"/update", query, service, headers)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return response, err
-	***REMOVED***
+	}
 
 	err = json.NewDecoder(resp.body).Decode(&response)
 
-	if distErr != nil ***REMOVED***
+	if distErr != nil {
 		response.Warnings = append(response.Warnings, digestWarning(service.TaskTemplate.ContainerSpec.Image))
-	***REMOVED***
+	}
 
 	ensureReaderClosed(resp)
 	return response, err
-***REMOVED***
+}

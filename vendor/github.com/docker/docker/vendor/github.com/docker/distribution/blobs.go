@@ -31,33 +31,33 @@ var (
 )
 
 // ErrBlobInvalidDigest returned when digest check fails.
-type ErrBlobInvalidDigest struct ***REMOVED***
+type ErrBlobInvalidDigest struct {
 	Digest digest.Digest
 	Reason error
-***REMOVED***
+}
 
-func (err ErrBlobInvalidDigest) Error() string ***REMOVED***
+func (err ErrBlobInvalidDigest) Error() string {
 	return fmt.Sprintf("invalid digest for referenced layer: %v, %v",
 		err.Digest, err.Reason)
-***REMOVED***
+}
 
 // ErrBlobMounted returned when a blob is mounted from another repository
 // instead of initiating an upload session.
-type ErrBlobMounted struct ***REMOVED***
+type ErrBlobMounted struct {
 	From       reference.Canonical
 	Descriptor Descriptor
-***REMOVED***
+}
 
-func (err ErrBlobMounted) Error() string ***REMOVED***
+func (err ErrBlobMounted) Error() string {
 	return fmt.Sprintf("blob mounted from: %v to: %v",
 		err.From, err.Descriptor)
-***REMOVED***
+}
 
 // Descriptor describes targeted content. Used in conjunction with a blob
 // store, a descriptor can be used to fetch, store and target any kind of
 // blob. The struct also describes the wire protocol format. Fields should
 // only be added but never changed.
-type Descriptor struct ***REMOVED***
+type Descriptor struct {
 	// MediaType describe the type of the content. All text based formats are
 	// encoded as utf-8.
 	MediaType string `json:"mediaType,omitempty"`
@@ -75,41 +75,41 @@ type Descriptor struct ***REMOVED***
 	// NOTE: Before adding a field here, please ensure that all
 	// other options have been exhausted. Much of the type relationships
 	// depend on the simplicity of this type.
-***REMOVED***
+}
 
 // Descriptor returns the descriptor, to make it satisfy the Describable
 // interface. Note that implementations of Describable are generally objects
 // which can be described, not simply descriptors; this exception is in place
 // to make it more convenient to pass actual descriptors to functions that
 // expect Describable objects.
-func (d Descriptor) Descriptor() Descriptor ***REMOVED***
+func (d Descriptor) Descriptor() Descriptor {
 	return d
-***REMOVED***
+}
 
 // BlobStatter makes blob descriptors available by digest. The service may
 // provide a descriptor of a different digest if the provided digest is not
 // canonical.
-type BlobStatter interface ***REMOVED***
+type BlobStatter interface {
 	// Stat provides metadata about a blob identified by the digest. If the
 	// blob is unknown to the describer, ErrBlobUnknown will be returned.
 	Stat(ctx context.Context, dgst digest.Digest) (Descriptor, error)
-***REMOVED***
+}
 
 // BlobDeleter enables deleting blobs from storage.
-type BlobDeleter interface ***REMOVED***
+type BlobDeleter interface {
 	Delete(ctx context.Context, dgst digest.Digest) error
-***REMOVED***
+}
 
 // BlobEnumerator enables iterating over blobs from storage
-type BlobEnumerator interface ***REMOVED***
+type BlobEnumerator interface {
 	Enumerate(ctx context.Context, ingester func(dgst digest.Digest) error) error
-***REMOVED***
+}
 
 // BlobDescriptorService manages metadata about a blob by digest. Most
 // implementations will not expose such an interface explicitly. Such mappings
 // should be maintained by interacting with the BlobIngester. Hence, this is
 // left off of BlobService and BlobStore.
-type BlobDescriptorService interface ***REMOVED***
+type BlobDescriptorService interface {
 	BlobStatter
 
 	// SetDescriptor assigns the descriptor to the digest. The provided digest and
@@ -125,22 +125,22 @@ type BlobDescriptorService interface ***REMOVED***
 
 	// Clear enables descriptors to be unlinked
 	Clear(ctx context.Context, dgst digest.Digest) error
-***REMOVED***
+}
 
 // BlobDescriptorServiceFactory creates middleware for BlobDescriptorService.
-type BlobDescriptorServiceFactory interface ***REMOVED***
+type BlobDescriptorServiceFactory interface {
 	BlobAccessController(svc BlobDescriptorService) BlobDescriptorService
-***REMOVED***
+}
 
 // ReadSeekCloser is the primary reader type for blob data, combining
 // io.ReadSeeker with io.Closer.
-type ReadSeekCloser interface ***REMOVED***
+type ReadSeekCloser interface {
 	io.ReadSeeker
 	io.Closer
-***REMOVED***
+}
 
 // BlobProvider describes operations for getting blob data.
-type BlobProvider interface ***REMOVED***
+type BlobProvider interface {
 	// Get returns the entire blob identified by digest along with the descriptor.
 	Get(ctx context.Context, dgst digest.Digest) ([]byte, error)
 
@@ -148,10 +148,10 @@ type BlobProvider interface ***REMOVED***
 	// descriptor. If the blob is not known to the service, an error will be
 	// returned.
 	Open(ctx context.Context, dgst digest.Digest) (ReadSeekCloser, error)
-***REMOVED***
+}
 
 // BlobServer can serve blobs via http.
-type BlobServer interface ***REMOVED***
+type BlobServer interface {
 	// ServeBlob attempts to serve the blob, identified by dgst, via http. The
 	// service may decide to redirect the client elsewhere or serve the data
 	// directly.
@@ -165,10 +165,10 @@ type BlobServer interface ***REMOVED***
 	// domain. The appropriate headers will be set for the blob, unless they
 	// have already been set by the caller.
 	ServeBlob(ctx context.Context, w http.ResponseWriter, r *http.Request, dgst digest.Digest) error
-***REMOVED***
+}
 
 // BlobIngester ingests blob data.
-type BlobIngester interface ***REMOVED***
+type BlobIngester interface {
 	// Put inserts the content p into the blob service, returning a descriptor
 	// or an error.
 	Put(ctx context.Context, mediaType string, p []byte) (Descriptor, error)
@@ -181,34 +181,34 @@ type BlobIngester interface ***REMOVED***
 
 	// Resume attempts to resume a write to a blob, identified by an id.
 	Resume(ctx context.Context, id string) (BlobWriter, error)
-***REMOVED***
+}
 
 // BlobCreateOption is a general extensible function argument for blob creation
 // methods. A BlobIngester may choose to honor any or none of the given
 // BlobCreateOptions, which can be specific to the implementation of the
 // BlobIngester receiving them.
 // TODO (brianbland): unify this with ManifestServiceOption in the future
-type BlobCreateOption interface ***REMOVED***
-	Apply(interface***REMOVED******REMOVED***) error
-***REMOVED***
+type BlobCreateOption interface {
+	Apply(interface{}) error
+}
 
 // CreateOptions is a collection of blob creation modifiers relevant to general
 // blob storage intended to be configured by the BlobCreateOption.Apply method.
-type CreateOptions struct ***REMOVED***
-	Mount struct ***REMOVED***
+type CreateOptions struct {
+	Mount struct {
 		ShouldMount bool
 		From        reference.Canonical
 		// Stat allows to pass precalculated descriptor to link and return.
 		// Blob access check will be skipped if set.
 		Stat *Descriptor
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // BlobWriter provides a handle for inserting data into a blob store.
 // Instances should be obtained from BlobWriteService.Writer and
 // BlobWriteService.Resume. If supported by the store, a writer can be
 // recovered with the id.
-type BlobWriter interface ***REMOVED***
+type BlobWriter interface {
 	io.WriteCloser
 	io.ReaderFrom
 
@@ -238,20 +238,20 @@ type BlobWriter interface ***REMOVED***
 	// result in a no-op. This allows use of Cancel in a defer statement,
 	// increasing the assurance that it is correctly called.
 	Cancel(ctx context.Context) error
-***REMOVED***
+}
 
 // BlobService combines the operations to access, read and write blobs. This
 // can be used to describe remote blob services.
-type BlobService interface ***REMOVED***
+type BlobService interface {
 	BlobStatter
 	BlobProvider
 	BlobIngester
-***REMOVED***
+}
 
 // BlobStore represent the entire suite of blob related operations. Such an
 // implementation can access, read, write, delete and serve blobs.
-type BlobStore interface ***REMOVED***
+type BlobStore interface {
 	BlobService
 	BlobServer
 	BlobDeleter
-***REMOVED***
+}

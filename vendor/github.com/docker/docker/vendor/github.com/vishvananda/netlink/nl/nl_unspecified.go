@@ -4,8 +4,8 @@ package nl
 
 import "encoding/binary"
 
-var SupportedNlFamilies = []int***REMOVED******REMOVED***
+var SupportedNlFamilies = []int{}
 
-func NativeEndian() binary.ByteOrder ***REMOVED***
+func NativeEndian() binary.ByteOrder {
 	return nil
-***REMOVED***
+}

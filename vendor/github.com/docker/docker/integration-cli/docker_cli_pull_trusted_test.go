@@ -11,7 +11,7 @@ import (
 	"github.com/gotestyourself/gotestyourself/icmd"
 )
 
-func (s *DockerTrustSuite) TestTrustedPull(c *check.C) ***REMOVED***
+func (s *DockerTrustSuite) TestTrustedPull(c *check.C) {
 	repoName := s.setupTrustedImage(c, "trusted-pull")
 
 	// Try pull
@@ -20,18 +20,18 @@ func (s *DockerTrustSuite) TestTrustedPull(c *check.C) ***REMOVED***
 	cli.DockerCmd(c, "rmi", repoName)
 	// Try untrusted pull to ensure we pushed the tag to the registry
 	cli.Docker(cli.Args("pull", "--disable-content-trust=true", repoName), trustedCmd).Assert(c, SuccessDownloaded)
-***REMOVED***
+}
 
-func (s *DockerTrustSuite) TestTrustedIsolatedPull(c *check.C) ***REMOVED***
+func (s *DockerTrustSuite) TestTrustedIsolatedPull(c *check.C) {
 	repoName := s.setupTrustedImage(c, "trusted-isolated-pull")
 
 	// Try pull (run from isolated directory without trust information)
 	cli.Docker(cli.Args("--config", "/tmp/docker-isolated", "pull", repoName), trustedCmd).Assert(c, SuccessTagging)
 
 	cli.DockerCmd(c, "rmi", repoName)
-***REMOVED***
+}
 
-func (s *DockerTrustSuite) TestUntrustedPull(c *check.C) ***REMOVED***
+func (s *DockerTrustSuite) TestUntrustedPull(c *check.C) {
 	repoName := fmt.Sprintf("%v/dockercliuntrusted/pulltest:latest", privateRegistryURL)
 	// tag the image and upload it to the private registry
 	cli.DockerCmd(c, "tag", "busybox", repoName)
@@ -39,18 +39,18 @@ func (s *DockerTrustSuite) TestUntrustedPull(c *check.C) ***REMOVED***
 	cli.DockerCmd(c, "rmi", repoName)
 
 	// Try trusted pull on untrusted tag
-	cli.Docker(cli.Args("pull", repoName), trustedCmd).Assert(c, icmd.Expected***REMOVED***
+	cli.Docker(cli.Args("pull", repoName), trustedCmd).Assert(c, icmd.Expected{
 		ExitCode: 1,
 		Err:      "Error: remote trust data does not exist",
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func (s *DockerTrustSuite) TestTrustedPullFromBadTrustServer(c *check.C) ***REMOVED***
+func (s *DockerTrustSuite) TestTrustedPullFromBadTrustServer(c *check.C) {
 	repoName := fmt.Sprintf("%v/dockerclievilpull/trusted:latest", privateRegistryURL)
 	evilLocalConfigDir, err := ioutil.TempDir("", "evil-local-config-dir")
-	if err != nil ***REMOVED***
+	if err != nil {
 		c.Fatalf("Failed to create local temp dir")
-	***REMOVED***
+	}
 
 	// tag the image and upload it to the private registry
 	cli.DockerCmd(c, "tag", "busybox", repoName)
@@ -76,28 +76,28 @@ func (s *DockerTrustSuite) TestTrustedPullFromBadTrustServer(c *check.C) ***REMO
 	cli.Docker(cli.Args("--config", evilLocalConfigDir, "push", repoName), trustedCmd).Assert(c, SuccessSigningAndPushing)
 
 	// Now, try pulling with the original client from this new trust server. This should fail because the new root is invalid.
-	cli.Docker(cli.Args("pull", repoName), trustedCmd).Assert(c, icmd.Expected***REMOVED***
+	cli.Docker(cli.Args("pull", repoName), trustedCmd).Assert(c, icmd.Expected{
 		ExitCode: 1,
 		Err:      "could not rotate trust to a new trusted root",
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func (s *DockerTrustSuite) TestTrustedOfflinePull(c *check.C) ***REMOVED***
+func (s *DockerTrustSuite) TestTrustedOfflinePull(c *check.C) {
 	repoName := s.setupTrustedImage(c, "trusted-offline-pull")
 
-	cli.Docker(cli.Args("pull", repoName), trustedCmdWithServer("https://invalidnotaryserver")).Assert(c, icmd.Expected***REMOVED***
+	cli.Docker(cli.Args("pull", repoName), trustedCmdWithServer("https://invalidnotaryserver")).Assert(c, icmd.Expected{
 		ExitCode: 1,
 		Err:      "error contacting notary server",
-	***REMOVED***)
+	})
 	// Do valid trusted pull to warm cache
 	cli.Docker(cli.Args("pull", repoName), trustedCmd).Assert(c, SuccessTagging)
 	cli.DockerCmd(c, "rmi", repoName)
 
 	// Try pull again with invalid notary server, should use cache
 	cli.Docker(cli.Args("pull", repoName), trustedCmdWithServer("https://invalidnotaryserver")).Assert(c, SuccessTagging)
-***REMOVED***
+}
 
-func (s *DockerTrustSuite) TestTrustedPullDelete(c *check.C) ***REMOVED***
+func (s *DockerTrustSuite) TestTrustedPullDelete(c *check.C) {
 	repoName := fmt.Sprintf("%v/dockercli/%s:latest", privateRegistryURL, "trusted-pull-delete")
 	// tag the image and upload it to the private registry
 	cli.BuildCmd(c, repoName, build.WithDockerfile(`
@@ -130,9 +130,9 @@ func (s *DockerTrustSuite) TestTrustedPullDelete(c *check.C) ***REMOVED***
 
 	_, err = inspectFieldWithError(imageID, "Id")
 	c.Assert(err, checker.NotNil, check.Commentf("image should have been deleted"))
-***REMOVED***
+}
 
-func (s *DockerTrustSuite) TestTrustedPullReadsFromReleasesRole(c *check.C) ***REMOVED***
+func (s *DockerTrustSuite) TestTrustedPullReadsFromReleasesRole(c *check.C) {
 	testRequires(c, NotaryHosting)
 	repoName := fmt.Sprintf("%v/dockerclireleasesdelegationpulling/trusted", privateRegistryURL)
 	targetName := fmt.Sprintf("%s:latest", repoName)
@@ -143,9 +143,9 @@ func (s *DockerTrustSuite) TestTrustedPullReadsFromReleasesRole(c *check.C) ***R
 	s.assertTargetInRoles(c, repoName, "latest", "targets")
 
 	// Try pull, check we retrieve from targets role
-	cli.Docker(cli.Args("-D", "pull", repoName), trustedCmd).Assert(c, icmd.Expected***REMOVED***
+	cli.Docker(cli.Args("-D", "pull", repoName), trustedCmd).Assert(c, icmd.Expected{
 		Err: "retrieving target for targets role",
-	***REMOVED***)
+	})
 
 	// Now we'll create the releases role, and try pushing and pulling
 	s.notaryCreateDelegation(c, repoName, "targets/releases", s.not.keys[0].Public)
@@ -154,9 +154,9 @@ func (s *DockerTrustSuite) TestTrustedPullReadsFromReleasesRole(c *check.C) ***R
 
 	// try a pull, check that we can still pull because we can still read the
 	// old tag in the targets role
-	cli.Docker(cli.Args("-D", "pull", repoName), trustedCmd).Assert(c, icmd.Expected***REMOVED***
+	cli.Docker(cli.Args("-D", "pull", repoName), trustedCmd).Assert(c, icmd.Expected{
 		Err: "retrieving target for targets role",
-	***REMOVED***)
+	})
 
 	// try a pull -a, check that it succeeds because we can still pull from the
 	// targets role
@@ -168,9 +168,9 @@ func (s *DockerTrustSuite) TestTrustedPullReadsFromReleasesRole(c *check.C) ***R
 	s.assertTargetInRoles(c, repoName, "latest", "targets", "targets/releases")
 
 	// Try pull, check we retrieve from targets/releases role
-	cli.Docker(cli.Args("-D", "pull", repoName), trustedCmd).Assert(c, icmd.Expected***REMOVED***
+	cli.Docker(cli.Args("-D", "pull", repoName), trustedCmd).Assert(c, icmd.Expected{
 		Err: "retrieving target for targets/releases role",
-	***REMOVED***)
+	})
 
 	// Create another delegation that we'll sign with
 	s.notaryCreateDelegation(c, repoName, "targets/other", s.not.keys[1].Public)
@@ -182,12 +182,12 @@ func (s *DockerTrustSuite) TestTrustedPullReadsFromReleasesRole(c *check.C) ***R
 	s.assertTargetInRoles(c, repoName, "latest", "targets", "targets/releases", "targets/other")
 
 	// Try pull, check we retrieve from targets/releases role
-	cli.Docker(cli.Args("-D", "pull", repoName), trustedCmd).Assert(c, icmd.Expected***REMOVED***
+	cli.Docker(cli.Args("-D", "pull", repoName), trustedCmd).Assert(c, icmd.Expected{
 		Err: "retrieving target for targets/releases role",
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func (s *DockerTrustSuite) TestTrustedPullIgnoresOtherDelegationRoles(c *check.C) ***REMOVED***
+func (s *DockerTrustSuite) TestTrustedPullIgnoresOtherDelegationRoles(c *check.C) {
 	testRequires(c, NotaryHosting)
 	repoName := fmt.Sprintf("%v/dockerclipullotherdelegation/trusted", privateRegistryURL)
 	targetName := fmt.Sprintf("%s:latest", repoName)
@@ -208,15 +208,15 @@ func (s *DockerTrustSuite) TestTrustedPullIgnoresOtherDelegationRoles(c *check.C
 	// Try pull - we should fail, since pull will only pull from the targets/releases
 	// role or the targets role
 	cli.DockerCmd(c, "tag", "busybox", targetName)
-	cli.Docker(cli.Args("-D", "pull", repoName), trustedCmd).Assert(c, icmd.Expected***REMOVED***
+	cli.Docker(cli.Args("-D", "pull", repoName), trustedCmd).Assert(c, icmd.Expected{
 		ExitCode: 1,
 		Err:      "No trust data for",
-	***REMOVED***)
+	})
 
 	// try a pull -a: we should fail since pull will only pull from the targets/releases
 	// role or the targets role
-	cli.Docker(cli.Args("-D", "pull", "-a", repoName), trustedCmd).Assert(c, icmd.Expected***REMOVED***
+	cli.Docker(cli.Args("-D", "pull", "-a", repoName), trustedCmd).Assert(c, icmd.Expected{
 		ExitCode: 1,
 		Err:      "No trusted tags for",
-	***REMOVED***)
-***REMOVED***
+	})
+}

@@ -1,18 +1,18 @@
 package ansiterm
 
-type csiParamState struct ***REMOVED***
+type csiParamState struct {
 	baseState
-***REMOVED***
+}
 
-func (csiState csiParamState) Handle(b byte) (s state, e error) ***REMOVED***
+func (csiState csiParamState) Handle(b byte) (s state, e error) {
 	csiState.parser.logf("CsiParam::Handle %#x", b)
 
 	nextState, err := csiState.baseState.Handle(b)
-	if nextState != nil || err != nil ***REMOVED***
+	if nextState != nil || err != nil {
 		return nextState, err
-	***REMOVED***
+	}
 
-	switch ***REMOVED***
+	switch {
 	case sliceContains(alphabetics, b):
 		return csiState.parser.ground, nil
 	case sliceContains(csiCollectables, b):
@@ -20,19 +20,19 @@ func (csiState csiParamState) Handle(b byte) (s state, e error) ***REMOVED***
 		return csiState, nil
 	case sliceContains(executors, b):
 		return csiState, csiState.parser.execute()
-	***REMOVED***
+	}
 
 	return csiState, nil
-***REMOVED***
+}
 
-func (csiState csiParamState) Transition(s state) error ***REMOVED***
+func (csiState csiParamState) Transition(s state) error {
 	csiState.parser.logf("CsiParam::Transition %s --> %s", csiState.Name(), s.Name())
 	csiState.baseState.Transition(s)
 
-	switch s ***REMOVED***
+	switch s {
 	case csiState.parser.ground:
 		return csiState.parser.csiDispatch()
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}

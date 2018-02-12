@@ -13,91 +13,91 @@ import (
 // is DoctypeNode, whose Data is the name, and which has attributes
 // named "system" and "public" for the two identifiers if they were present.
 // quirks is whether the document should be parsed in "quirks mode".
-func parseDoctype(s string) (n *Node, quirks bool) ***REMOVED***
-	n = &Node***REMOVED***Type: DoctypeNode***REMOVED***
+func parseDoctype(s string) (n *Node, quirks bool) {
+	n = &Node{Type: DoctypeNode}
 
 	// Find the name.
 	space := strings.IndexAny(s, whitespace)
-	if space == -1 ***REMOVED***
+	if space == -1 {
 		space = len(s)
-	***REMOVED***
+	}
 	n.Data = s[:space]
 	// The comparison to "html" is case-sensitive.
-	if n.Data != "html" ***REMOVED***
+	if n.Data != "html" {
 		quirks = true
-	***REMOVED***
+	}
 	n.Data = strings.ToLower(n.Data)
 	s = strings.TrimLeft(s[space:], whitespace)
 
-	if len(s) < 6 ***REMOVED***
+	if len(s) < 6 {
 		// It can't start with "PUBLIC" or "SYSTEM".
 		// Ignore the rest of the string.
 		return n, quirks || s != ""
-	***REMOVED***
+	}
 
 	key := strings.ToLower(s[:6])
 	s = s[6:]
-	for key == "public" || key == "system" ***REMOVED***
+	for key == "public" || key == "system" {
 		s = strings.TrimLeft(s, whitespace)
-		if s == "" ***REMOVED***
+		if s == "" {
 			break
-		***REMOVED***
+		}
 		quote := s[0]
-		if quote != '"' && quote != '\'' ***REMOVED***
+		if quote != '"' && quote != '\'' {
 			break
-		***REMOVED***
+		}
 		s = s[1:]
 		q := strings.IndexRune(s, rune(quote))
 		var id string
-		if q == -1 ***REMOVED***
+		if q == -1 {
 			id = s
 			s = ""
-		***REMOVED*** else ***REMOVED***
+		} else {
 			id = s[:q]
 			s = s[q+1:]
-		***REMOVED***
-		n.Attr = append(n.Attr, Attribute***REMOVED***Key: key, Val: id***REMOVED***)
-		if key == "public" ***REMOVED***
+		}
+		n.Attr = append(n.Attr, Attribute{Key: key, Val: id})
+		if key == "public" {
 			key = "system"
-		***REMOVED*** else ***REMOVED***
+		} else {
 			key = ""
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if key != "" || s != "" ***REMOVED***
+	if key != "" || s != "" {
 		quirks = true
-	***REMOVED*** else if len(n.Attr) > 0 ***REMOVED***
-		if n.Attr[0].Key == "public" ***REMOVED***
+	} else if len(n.Attr) > 0 {
+		if n.Attr[0].Key == "public" {
 			public := strings.ToLower(n.Attr[0].Val)
-			switch public ***REMOVED***
+			switch public {
 			case "-//w3o//dtd w3 html strict 3.0//en//", "-/w3d/dtd html 4.0 transitional/en", "html":
 				quirks = true
 			default:
-				for _, q := range quirkyIDs ***REMOVED***
-					if strings.HasPrefix(public, q) ***REMOVED***
+				for _, q := range quirkyIDs {
+					if strings.HasPrefix(public, q) {
 						quirks = true
 						break
-					***REMOVED***
-				***REMOVED***
-			***REMOVED***
+					}
+				}
+			}
 			// The following two public IDs only cause quirks mode if there is no system ID.
 			if len(n.Attr) == 1 && (strings.HasPrefix(public, "-//w3c//dtd html 4.01 frameset//") ||
-				strings.HasPrefix(public, "-//w3c//dtd html 4.01 transitional//")) ***REMOVED***
+				strings.HasPrefix(public, "-//w3c//dtd html 4.01 transitional//")) {
 				quirks = true
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		if lastAttr := n.Attr[len(n.Attr)-1]; lastAttr.Key == "system" &&
-			strings.ToLower(lastAttr.Val) == "http://www.ibm.com/data/dtd/v11/ibmxhtml1-transitional.dtd" ***REMOVED***
+			strings.ToLower(lastAttr.Val) == "http://www.ibm.com/data/dtd/v11/ibmxhtml1-transitional.dtd" {
 			quirks = true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return n, quirks
-***REMOVED***
+}
 
 // quirkyIDs is a list of public doctype identifiers that cause a document
 // to be interpreted in quirks mode. The identifiers should be in lower case.
-var quirkyIDs = []string***REMOVED***
+var quirkyIDs = []string{
 	"+//silmaril//dtd html pro v0r11 19970101//",
 	"-//advasoft ltd//dtd html 3.0 aswedit + extensions//",
 	"-//as//dtd html 3.0 aswedit + extensions//",
@@ -153,4 +153,4 @@ var quirkyIDs = []string***REMOVED***
 	"-//w3o//dtd w3 html 3.0//",
 	"-//webtechs//dtd mozilla html 2.0//",
 	"-//webtechs//dtd mozilla html//",
-***REMOVED***
+}

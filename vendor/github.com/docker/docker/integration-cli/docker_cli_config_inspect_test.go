@@ -10,16 +10,16 @@ import (
 	"github.com/go-check/check"
 )
 
-func (s *DockerSwarmSuite) TestConfigInspect(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestConfigInspect(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 
 	testName := "test_config"
-	id := d.CreateConfig(c, swarm.ConfigSpec***REMOVED***
-		Annotations: swarm.Annotations***REMOVED***
+	id := d.CreateConfig(c, swarm.ConfigSpec{
+		Annotations: swarm.Annotations{
 			Name: testName,
-		***REMOVED***,
+		},
 		Data: []byte("TESTINGDATA"),
-	***REMOVED***)
+	})
 	c.Assert(id, checker.Not(checker.Equals), "", check.Commentf("configs: %s", id))
 
 	config := d.GetConfig(c, id)
@@ -31,33 +31,33 @@ func (s *DockerSwarmSuite) TestConfigInspect(c *check.C) ***REMOVED***
 	var configs []swarm.Config
 	c.Assert(json.Unmarshal([]byte(out), &configs), checker.IsNil)
 	c.Assert(configs, checker.HasLen, 1)
-***REMOVED***
+}
 
-func (s *DockerSwarmSuite) TestConfigInspectMultiple(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestConfigInspectMultiple(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 
-	testNames := []string***REMOVED***
+	testNames := []string{
 		"test0",
 		"test1",
-	***REMOVED***
-	for _, n := range testNames ***REMOVED***
-		id := d.CreateConfig(c, swarm.ConfigSpec***REMOVED***
-			Annotations: swarm.Annotations***REMOVED***
+	}
+	for _, n := range testNames {
+		id := d.CreateConfig(c, swarm.ConfigSpec{
+			Annotations: swarm.Annotations{
 				Name: n,
-			***REMOVED***,
+			},
 			Data: []byte("TESTINGDATA"),
-		***REMOVED***)
+		})
 		c.Assert(id, checker.Not(checker.Equals), "", check.Commentf("configs: %s", id))
 
 		config := d.GetConfig(c, id)
 		c.Assert(config.Spec.Name, checker.Equals, n)
 
-	***REMOVED***
+	}
 
-	args := []string***REMOVED***
+	args := []string{
 		"config",
 		"inspect",
-	***REMOVED***
+	}
 	args = append(args, testNames...)
 	out, err := d.Cmd(args...)
 	c.Assert(err, checker.IsNil, check.Commentf(out))
@@ -65,4 +65,4 @@ func (s *DockerSwarmSuite) TestConfigInspectMultiple(c *check.C) ***REMOVED***
 	var configs []swarm.Config
 	c.Assert(json.Unmarshal([]byte(out), &configs), checker.IsNil)
 	c.Assert(configs, checker.HasLen, 2)
-***REMOVED***
+}

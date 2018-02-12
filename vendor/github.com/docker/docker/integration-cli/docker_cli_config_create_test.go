@@ -12,36 +12,36 @@ import (
 	"github.com/go-check/check"
 )
 
-func (s *DockerSwarmSuite) TestConfigCreate(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestConfigCreate(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 
 	testName := "test_config"
-	id := d.CreateConfig(c, swarm.ConfigSpec***REMOVED***
-		Annotations: swarm.Annotations***REMOVED***
+	id := d.CreateConfig(c, swarm.ConfigSpec{
+		Annotations: swarm.Annotations{
 			Name: testName,
-		***REMOVED***,
+		},
 		Data: []byte("TESTINGDATA"),
-	***REMOVED***)
+	})
 	c.Assert(id, checker.Not(checker.Equals), "", check.Commentf("configs: %s", id))
 
 	config := d.GetConfig(c, id)
 	c.Assert(config.Spec.Name, checker.Equals, testName)
-***REMOVED***
+}
 
-func (s *DockerSwarmSuite) TestConfigCreateWithLabels(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestConfigCreateWithLabels(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 
 	testName := "test_config"
-	id := d.CreateConfig(c, swarm.ConfigSpec***REMOVED***
-		Annotations: swarm.Annotations***REMOVED***
+	id := d.CreateConfig(c, swarm.ConfigSpec{
+		Annotations: swarm.Annotations{
 			Name: testName,
-			Labels: map[string]string***REMOVED***
+			Labels: map[string]string{
 				"key1": "value1",
 				"key2": "value2",
-			***REMOVED***,
-		***REMOVED***,
+			},
+		},
 		Data: []byte("TESTINGDATA"),
-	***REMOVED***)
+	})
 	c.Assert(id, checker.Not(checker.Equals), "", check.Commentf("configs: %s", id))
 
 	config := d.GetConfig(c, id)
@@ -49,27 +49,27 @@ func (s *DockerSwarmSuite) TestConfigCreateWithLabels(c *check.C) ***REMOVED***
 	c.Assert(len(config.Spec.Labels), checker.Equals, 2)
 	c.Assert(config.Spec.Labels["key1"], checker.Equals, "value1")
 	c.Assert(config.Spec.Labels["key2"], checker.Equals, "value2")
-***REMOVED***
+}
 
 // Test case for 28884
-func (s *DockerSwarmSuite) TestConfigCreateResolve(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestConfigCreateResolve(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 
 	name := "test_config"
-	id := d.CreateConfig(c, swarm.ConfigSpec***REMOVED***
-		Annotations: swarm.Annotations***REMOVED***
+	id := d.CreateConfig(c, swarm.ConfigSpec{
+		Annotations: swarm.Annotations{
 			Name: name,
-		***REMOVED***,
+		},
 		Data: []byte("foo"),
-	***REMOVED***)
+	})
 	c.Assert(id, checker.Not(checker.Equals), "", check.Commentf("configs: %s", id))
 
-	fake := d.CreateConfig(c, swarm.ConfigSpec***REMOVED***
-		Annotations: swarm.Annotations***REMOVED***
+	fake := d.CreateConfig(c, swarm.ConfigSpec{
+		Annotations: swarm.Annotations{
 			Name: id,
-		***REMOVED***,
+		},
 		Data: []byte("fake foo"),
-	***REMOVED***)
+	})
 	c.Assert(fake, checker.Not(checker.Equals), "", check.Commentf("configs: %s", fake))
 
 	out, err := d.Cmd("config", "ls")
@@ -107,9 +107,9 @@ func (s *DockerSwarmSuite) TestConfigCreateResolve(c *check.C) ***REMOVED***
 	c.Assert(out, checker.Not(checker.Contains), name)
 	c.Assert(out, checker.Not(checker.Contains), id)
 	c.Assert(out, checker.Not(checker.Contains), fake)
-***REMOVED***
+}
 
-func (s *DockerSwarmSuite) TestConfigCreateWithFile(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestConfigCreateWithFile(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 
 	testFile, err := ioutil.TempFile("", "configCreateTest")
@@ -128,4 +128,4 @@ func (s *DockerSwarmSuite) TestConfigCreateWithFile(c *check.C) ***REMOVED***
 	id := strings.TrimSpace(out)
 	config := d.GetConfig(c, id)
 	c.Assert(config.Spec.Name, checker.Equals, testName)
-***REMOVED***
+}

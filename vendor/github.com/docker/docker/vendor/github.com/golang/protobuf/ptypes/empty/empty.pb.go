@@ -31,29 +31,29 @@ const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 // empty messages in your APIs. A typical example is to use it as the request
 // or the response type of an API method. For instance:
 //
-//     service Foo ***REMOVED***
+//     service Foo {
 //       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-// ***REMOVED***
+//     }
 //
-// The JSON representation for `Empty` is empty JSON object `***REMOVED******REMOVED***`.
-type Empty struct ***REMOVED***
-***REMOVED***
+// The JSON representation for `Empty` is empty JSON object `{}`.
+type Empty struct {
+}
 
-func (m *Empty) Reset()                    ***REMOVED*** *m = Empty***REMOVED******REMOVED*** ***REMOVED***
-func (m *Empty) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*Empty) ProtoMessage()               ***REMOVED******REMOVED***
-func (*Empty) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***0***REMOVED*** ***REMOVED***
-func (*Empty) XXX_WellKnownType() string   ***REMOVED*** return "Empty" ***REMOVED***
+func (m *Empty) Reset()                    { *m = Empty{} }
+func (m *Empty) String() string            { return proto.CompactTextString(m) }
+func (*Empty) ProtoMessage()               {}
+func (*Empty) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
+func (*Empty) XXX_WellKnownType() string   { return "Empty" }
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*Empty)(nil), "google.protobuf.Empty")
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterFile("github.com/golang/protobuf/ptypes/empty/empty.proto", fileDescriptor0)
-***REMOVED***
+}
 
-var fileDescriptor0 = []byte***REMOVED***
+var fileDescriptor0 = []byte{
 	// 147 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x32, 0x4e, 0xcf, 0x2c, 0xc9,
 	0x28, 0x4d, 0xd2, 0x4b, 0xce, 0xcf, 0xd5, 0x4f, 0xcf, 0xcf, 0x49, 0xcc, 0x4b, 0xd7, 0x2f, 0x28,
@@ -65,4 +65,4 @@ var fileDescriptor0 = []byte***REMOVED***
 	0x0c, 0x80, 0xaa, 0xd3, 0x0b, 0x4f, 0xcd, 0xc9, 0xf1, 0xce, 0xcb, 0x2f, 0xcf, 0x0b, 0x01, 0xa9,
 	0x4f, 0x62, 0x03, 0x1b, 0x60, 0x0c, 0x08, 0x00, 0x00, 0xff, 0xff, 0x6e, 0x8e, 0x0a, 0x06, 0xcf,
 	0x00, 0x00, 0x00,
-***REMOVED***
+}

@@ -32,22 +32,22 @@ import (
 	"strings"
 )
 
-func (msg *DescriptorProto) GetMapFields() (*FieldDescriptorProto, *FieldDescriptorProto) ***REMOVED***
-	if !msg.GetOptions().GetMapEntry() ***REMOVED***
+func (msg *DescriptorProto) GetMapFields() (*FieldDescriptorProto, *FieldDescriptorProto) {
+	if !msg.GetOptions().GetMapEntry() {
 		return nil, nil
-	***REMOVED***
+	}
 	return msg.GetField()[0], msg.GetField()[1]
-***REMOVED***
+}
 
-func dotToUnderscore(r rune) rune ***REMOVED***
-	if r == '.' ***REMOVED***
+func dotToUnderscore(r rune) rune {
+	if r == '.' {
 		return '_'
-	***REMOVED***
+	}
 	return r
-***REMOVED***
+}
 
-func (field *FieldDescriptorProto) WireType() (wire int) ***REMOVED***
-	switch *field.Type ***REMOVED***
+func (field *FieldDescriptorProto) WireType() (wire int) {
+	switch *field.Type {
 	case FieldDescriptorProto_TYPE_DOUBLE:
 		return 1
 	case FieldDescriptorProto_TYPE_FLOAT:
@@ -84,307 +84,307 @@ func (field *FieldDescriptorProto) WireType() (wire int) ***REMOVED***
 		return 0
 	case FieldDescriptorProto_TYPE_SINT64:
 		return 0
-	***REMOVED***
+	}
 	panic("unreachable")
-***REMOVED***
+}
 
-func (field *FieldDescriptorProto) GetKeyUint64() (x uint64) ***REMOVED***
+func (field *FieldDescriptorProto) GetKeyUint64() (x uint64) {
 	packed := field.IsPacked()
 	wireType := field.WireType()
 	fieldNumber := field.GetNumber()
-	if packed ***REMOVED***
+	if packed {
 		wireType = 2
-	***REMOVED***
+	}
 	x = uint64(uint32(fieldNumber)<<3 | uint32(wireType))
 	return x
-***REMOVED***
+}
 
-func (field *FieldDescriptorProto) GetKey3Uint64() (x uint64) ***REMOVED***
+func (field *FieldDescriptorProto) GetKey3Uint64() (x uint64) {
 	packed := field.IsPacked3()
 	wireType := field.WireType()
 	fieldNumber := field.GetNumber()
-	if packed ***REMOVED***
+	if packed {
 		wireType = 2
-	***REMOVED***
+	}
 	x = uint64(uint32(fieldNumber)<<3 | uint32(wireType))
 	return x
-***REMOVED***
+}
 
-func (field *FieldDescriptorProto) GetKey() []byte ***REMOVED***
+func (field *FieldDescriptorProto) GetKey() []byte {
 	x := field.GetKeyUint64()
 	i := 0
 	keybuf := make([]byte, 0)
-	for i = 0; x > 127; i++ ***REMOVED***
+	for i = 0; x > 127; i++ {
 		keybuf = append(keybuf, 0x80|uint8(x&0x7F))
 		x >>= 7
-	***REMOVED***
+	}
 	keybuf = append(keybuf, uint8(x))
 	return keybuf
-***REMOVED***
+}
 
-func (field *FieldDescriptorProto) GetKey3() []byte ***REMOVED***
+func (field *FieldDescriptorProto) GetKey3() []byte {
 	x := field.GetKey3Uint64()
 	i := 0
 	keybuf := make([]byte, 0)
-	for i = 0; x > 127; i++ ***REMOVED***
+	for i = 0; x > 127; i++ {
 		keybuf = append(keybuf, 0x80|uint8(x&0x7F))
 		x >>= 7
-	***REMOVED***
+	}
 	keybuf = append(keybuf, uint8(x))
 	return keybuf
-***REMOVED***
+}
 
-func (desc *FileDescriptorSet) GetField(packageName, messageName, fieldName string) *FieldDescriptorProto ***REMOVED***
+func (desc *FileDescriptorSet) GetField(packageName, messageName, fieldName string) *FieldDescriptorProto {
 	msg := desc.GetMessage(packageName, messageName)
-	if msg == nil ***REMOVED***
+	if msg == nil {
 		return nil
-	***REMOVED***
-	for _, field := range msg.GetField() ***REMOVED***
-		if field.GetName() == fieldName ***REMOVED***
+	}
+	for _, field := range msg.GetField() {
+		if field.GetName() == fieldName {
 			return field
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func (file *FileDescriptorProto) GetMessage(typeName string) *DescriptorProto ***REMOVED***
-	for _, msg := range file.GetMessageType() ***REMOVED***
-		if msg.GetName() == typeName ***REMOVED***
+func (file *FileDescriptorProto) GetMessage(typeName string) *DescriptorProto {
+	for _, msg := range file.GetMessageType() {
+		if msg.GetName() == typeName {
 			return msg
-		***REMOVED***
+		}
 		nes := file.GetNestedMessage(msg, strings.TrimPrefix(typeName, msg.GetName()+"."))
-		if nes != nil ***REMOVED***
+		if nes != nil {
 			return nes
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func (file *FileDescriptorProto) GetNestedMessage(msg *DescriptorProto, typeName string) *DescriptorProto ***REMOVED***
-	for _, nes := range msg.GetNestedType() ***REMOVED***
-		if nes.GetName() == typeName ***REMOVED***
+func (file *FileDescriptorProto) GetNestedMessage(msg *DescriptorProto, typeName string) *DescriptorProto {
+	for _, nes := range msg.GetNestedType() {
+		if nes.GetName() == typeName {
 			return nes
-		***REMOVED***
+		}
 		res := file.GetNestedMessage(nes, strings.TrimPrefix(typeName, nes.GetName()+"."))
-		if res != nil ***REMOVED***
+		if res != nil {
 			return res
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func (desc *FileDescriptorSet) GetMessage(packageName string, typeName string) *DescriptorProto ***REMOVED***
-	for _, file := range desc.GetFile() ***REMOVED***
-		if strings.Map(dotToUnderscore, file.GetPackage()) != strings.Map(dotToUnderscore, packageName) ***REMOVED***
+func (desc *FileDescriptorSet) GetMessage(packageName string, typeName string) *DescriptorProto {
+	for _, file := range desc.GetFile() {
+		if strings.Map(dotToUnderscore, file.GetPackage()) != strings.Map(dotToUnderscore, packageName) {
 			continue
-		***REMOVED***
-		for _, msg := range file.GetMessageType() ***REMOVED***
-			if msg.GetName() == typeName ***REMOVED***
+		}
+		for _, msg := range file.GetMessageType() {
+			if msg.GetName() == typeName {
 				return msg
-			***REMOVED***
-		***REMOVED***
-		for _, msg := range file.GetMessageType() ***REMOVED***
-			for _, nes := range msg.GetNestedType() ***REMOVED***
-				if nes.GetName() == typeName ***REMOVED***
+			}
+		}
+		for _, msg := range file.GetMessageType() {
+			for _, nes := range msg.GetNestedType() {
+				if nes.GetName() == typeName {
 					return nes
-				***REMOVED***
-				if msg.GetName()+"."+nes.GetName() == typeName ***REMOVED***
+				}
+				if msg.GetName()+"."+nes.GetName() == typeName {
 					return nes
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+				}
+			}
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func (desc *FileDescriptorSet) IsProto3(packageName string, typeName string) bool ***REMOVED***
-	for _, file := range desc.GetFile() ***REMOVED***
-		if strings.Map(dotToUnderscore, file.GetPackage()) != strings.Map(dotToUnderscore, packageName) ***REMOVED***
+func (desc *FileDescriptorSet) IsProto3(packageName string, typeName string) bool {
+	for _, file := range desc.GetFile() {
+		if strings.Map(dotToUnderscore, file.GetPackage()) != strings.Map(dotToUnderscore, packageName) {
 			continue
-		***REMOVED***
-		for _, msg := range file.GetMessageType() ***REMOVED***
-			if msg.GetName() == typeName ***REMOVED***
+		}
+		for _, msg := range file.GetMessageType() {
+			if msg.GetName() == typeName {
 				return file.GetSyntax() == "proto3"
-			***REMOVED***
-		***REMOVED***
-		for _, msg := range file.GetMessageType() ***REMOVED***
-			for _, nes := range msg.GetNestedType() ***REMOVED***
-				if nes.GetName() == typeName ***REMOVED***
+			}
+		}
+		for _, msg := range file.GetMessageType() {
+			for _, nes := range msg.GetNestedType() {
+				if nes.GetName() == typeName {
 					return file.GetSyntax() == "proto3"
-				***REMOVED***
-				if msg.GetName()+"."+nes.GetName() == typeName ***REMOVED***
+				}
+				if msg.GetName()+"."+nes.GetName() == typeName {
 					return file.GetSyntax() == "proto3"
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+				}
+			}
+		}
+	}
 	return false
-***REMOVED***
+}
 
-func (msg *DescriptorProto) IsExtendable() bool ***REMOVED***
+func (msg *DescriptorProto) IsExtendable() bool {
 	return len(msg.GetExtensionRange()) > 0
-***REMOVED***
+}
 
-func (desc *FileDescriptorSet) FindExtension(packageName string, typeName string, fieldName string) (extPackageName string, field *FieldDescriptorProto) ***REMOVED***
+func (desc *FileDescriptorSet) FindExtension(packageName string, typeName string, fieldName string) (extPackageName string, field *FieldDescriptorProto) {
 	parent := desc.GetMessage(packageName, typeName)
-	if parent == nil ***REMOVED***
+	if parent == nil {
 		return "", nil
-	***REMOVED***
-	if !parent.IsExtendable() ***REMOVED***
+	}
+	if !parent.IsExtendable() {
 		return "", nil
-	***REMOVED***
+	}
 	extendee := "." + packageName + "." + typeName
-	for _, file := range desc.GetFile() ***REMOVED***
-		for _, ext := range file.GetExtension() ***REMOVED***
-			if strings.Map(dotToUnderscore, file.GetPackage()) == strings.Map(dotToUnderscore, packageName) ***REMOVED***
-				if !(ext.GetExtendee() == typeName || ext.GetExtendee() == extendee) ***REMOVED***
+	for _, file := range desc.GetFile() {
+		for _, ext := range file.GetExtension() {
+			if strings.Map(dotToUnderscore, file.GetPackage()) == strings.Map(dotToUnderscore, packageName) {
+				if !(ext.GetExtendee() == typeName || ext.GetExtendee() == extendee) {
 					continue
-				***REMOVED***
-			***REMOVED*** else ***REMOVED***
-				if ext.GetExtendee() != extendee ***REMOVED***
+				}
+			} else {
+				if ext.GetExtendee() != extendee {
 					continue
-				***REMOVED***
-			***REMOVED***
-			if ext.GetName() == fieldName ***REMOVED***
+				}
+			}
+			if ext.GetName() == fieldName {
 				return file.GetPackage(), ext
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return "", nil
-***REMOVED***
+}
 
-func (desc *FileDescriptorSet) FindExtensionByFieldNumber(packageName string, typeName string, fieldNum int32) (extPackageName string, field *FieldDescriptorProto) ***REMOVED***
+func (desc *FileDescriptorSet) FindExtensionByFieldNumber(packageName string, typeName string, fieldNum int32) (extPackageName string, field *FieldDescriptorProto) {
 	parent := desc.GetMessage(packageName, typeName)
-	if parent == nil ***REMOVED***
+	if parent == nil {
 		return "", nil
-	***REMOVED***
-	if !parent.IsExtendable() ***REMOVED***
+	}
+	if !parent.IsExtendable() {
 		return "", nil
-	***REMOVED***
+	}
 	extendee := "." + packageName + "." + typeName
-	for _, file := range desc.GetFile() ***REMOVED***
-		for _, ext := range file.GetExtension() ***REMOVED***
-			if strings.Map(dotToUnderscore, file.GetPackage()) == strings.Map(dotToUnderscore, packageName) ***REMOVED***
-				if !(ext.GetExtendee() == typeName || ext.GetExtendee() == extendee) ***REMOVED***
+	for _, file := range desc.GetFile() {
+		for _, ext := range file.GetExtension() {
+			if strings.Map(dotToUnderscore, file.GetPackage()) == strings.Map(dotToUnderscore, packageName) {
+				if !(ext.GetExtendee() == typeName || ext.GetExtendee() == extendee) {
 					continue
-				***REMOVED***
-			***REMOVED*** else ***REMOVED***
-				if ext.GetExtendee() != extendee ***REMOVED***
+				}
+			} else {
+				if ext.GetExtendee() != extendee {
 					continue
-				***REMOVED***
-			***REMOVED***
-			if ext.GetNumber() == fieldNum ***REMOVED***
+				}
+			}
+			if ext.GetNumber() == fieldNum {
 				return file.GetPackage(), ext
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return "", nil
-***REMOVED***
+}
 
-func (desc *FileDescriptorSet) FindMessage(packageName string, typeName string, fieldName string) (msgPackageName string, msgName string) ***REMOVED***
+func (desc *FileDescriptorSet) FindMessage(packageName string, typeName string, fieldName string) (msgPackageName string, msgName string) {
 	parent := desc.GetMessage(packageName, typeName)
-	if parent == nil ***REMOVED***
+	if parent == nil {
 		return "", ""
-	***REMOVED***
+	}
 	field := parent.GetFieldDescriptor(fieldName)
-	if field == nil ***REMOVED***
+	if field == nil {
 		var extPackageName string
 		extPackageName, field = desc.FindExtension(packageName, typeName, fieldName)
-		if field == nil ***REMOVED***
+		if field == nil {
 			return "", ""
-		***REMOVED***
+		}
 		packageName = extPackageName
-	***REMOVED***
+	}
 	typeNames := strings.Split(field.GetTypeName(), ".")
-	if len(typeNames) == 1 ***REMOVED***
+	if len(typeNames) == 1 {
 		msg := desc.GetMessage(packageName, typeName)
-		if msg == nil ***REMOVED***
+		if msg == nil {
 			return "", ""
-		***REMOVED***
+		}
 		return packageName, msg.GetName()
-	***REMOVED***
-	if len(typeNames) > 2 ***REMOVED***
-		for i := 1; i < len(typeNames)-1; i++ ***REMOVED***
+	}
+	if len(typeNames) > 2 {
+		for i := 1; i < len(typeNames)-1; i++ {
 			packageName = strings.Join(typeNames[1:len(typeNames)-i], ".")
 			typeName = strings.Join(typeNames[len(typeNames)-i:], ".")
 			msg := desc.GetMessage(packageName, typeName)
-			if msg != nil ***REMOVED***
+			if msg != nil {
 				typeNames := strings.Split(msg.GetName(), ".")
-				if len(typeNames) == 1 ***REMOVED***
+				if len(typeNames) == 1 {
 					return packageName, msg.GetName()
-				***REMOVED***
+				}
 				return strings.Join(typeNames[1:len(typeNames)-1], "."), typeNames[len(typeNames)-1]
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return "", ""
-***REMOVED***
+}
 
-func (msg *DescriptorProto) GetFieldDescriptor(fieldName string) *FieldDescriptorProto ***REMOVED***
-	for _, field := range msg.GetField() ***REMOVED***
-		if field.GetName() == fieldName ***REMOVED***
+func (msg *DescriptorProto) GetFieldDescriptor(fieldName string) *FieldDescriptorProto {
+	for _, field := range msg.GetField() {
+		if field.GetName() == fieldName {
 			return field
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func (desc *FileDescriptorSet) GetEnum(packageName string, typeName string) *EnumDescriptorProto ***REMOVED***
-	for _, file := range desc.GetFile() ***REMOVED***
-		if strings.Map(dotToUnderscore, file.GetPackage()) != strings.Map(dotToUnderscore, packageName) ***REMOVED***
+func (desc *FileDescriptorSet) GetEnum(packageName string, typeName string) *EnumDescriptorProto {
+	for _, file := range desc.GetFile() {
+		if strings.Map(dotToUnderscore, file.GetPackage()) != strings.Map(dotToUnderscore, packageName) {
 			continue
-		***REMOVED***
-		for _, enum := range file.GetEnumType() ***REMOVED***
-			if enum.GetName() == typeName ***REMOVED***
+		}
+		for _, enum := range file.GetEnumType() {
+			if enum.GetName() == typeName {
 				return enum
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func (f *FieldDescriptorProto) IsEnum() bool ***REMOVED***
+func (f *FieldDescriptorProto) IsEnum() bool {
 	return *f.Type == FieldDescriptorProto_TYPE_ENUM
-***REMOVED***
+}
 
-func (f *FieldDescriptorProto) IsMessage() bool ***REMOVED***
+func (f *FieldDescriptorProto) IsMessage() bool {
 	return *f.Type == FieldDescriptorProto_TYPE_MESSAGE
-***REMOVED***
+}
 
-func (f *FieldDescriptorProto) IsBytes() bool ***REMOVED***
+func (f *FieldDescriptorProto) IsBytes() bool {
 	return *f.Type == FieldDescriptorProto_TYPE_BYTES
-***REMOVED***
+}
 
-func (f *FieldDescriptorProto) IsRepeated() bool ***REMOVED***
+func (f *FieldDescriptorProto) IsRepeated() bool {
 	return f.Label != nil && *f.Label == FieldDescriptorProto_LABEL_REPEATED
-***REMOVED***
+}
 
-func (f *FieldDescriptorProto) IsString() bool ***REMOVED***
+func (f *FieldDescriptorProto) IsString() bool {
 	return *f.Type == FieldDescriptorProto_TYPE_STRING
-***REMOVED***
+}
 
-func (f *FieldDescriptorProto) IsBool() bool ***REMOVED***
+func (f *FieldDescriptorProto) IsBool() bool {
 	return *f.Type == FieldDescriptorProto_TYPE_BOOL
-***REMOVED***
+}
 
-func (f *FieldDescriptorProto) IsRequired() bool ***REMOVED***
+func (f *FieldDescriptorProto) IsRequired() bool {
 	return f.Label != nil && *f.Label == FieldDescriptorProto_LABEL_REQUIRED
-***REMOVED***
+}
 
-func (f *FieldDescriptorProto) IsPacked() bool ***REMOVED***
+func (f *FieldDescriptorProto) IsPacked() bool {
 	return f.Options != nil && f.GetOptions().GetPacked()
-***REMOVED***
+}
 
-func (f *FieldDescriptorProto) IsPacked3() bool ***REMOVED***
-	if f.IsRepeated() && f.IsScalar() ***REMOVED***
-		if f.Options == nil || f.GetOptions().Packed == nil ***REMOVED***
+func (f *FieldDescriptorProto) IsPacked3() bool {
+	if f.IsRepeated() && f.IsScalar() {
+		if f.Options == nil || f.GetOptions().Packed == nil {
 			return true
-		***REMOVED***
+		}
 		return f.Options != nil && f.GetOptions().GetPacked()
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
-func (m *DescriptorProto) HasExtension() bool ***REMOVED***
+func (m *DescriptorProto) HasExtension() bool {
 	return len(m.ExtensionRange) > 0
-***REMOVED***
+}

@@ -12,32 +12,32 @@ import (
 	"golang.org/x/text/message/catalog"
 )
 
-func TestMatchLanguage(t *testing.T) ***REMOVED***
+func TestMatchLanguage(t *testing.T) {
 	c := catalog.NewBuilder(catalog.Fallback(language.English))
 	c.SetString(language.Bengali, "", "")
 	c.SetString(language.English, "", "")
 	c.SetString(language.German, "", "")
 
-	testCases := []struct ***REMOVED***
+	testCases := []struct {
 		args string // '|'-separated list
 		want string
-	***REMOVED******REMOVED******REMOVED***
+	}{{
 		args: "de-CH",
 		want: "de",
-	***REMOVED***, ***REMOVED***
+	}, {
 		args: "bn-u-nu-latn|en-US,en;q=0.9,de;q=0.8,nl;q=0.7",
 		want: "bn-u-nu-latn",
-	***REMOVED***, ***REMOVED***
+	}, {
 		args: "gr",
 		want: "en",
-	***REMOVED******REMOVED***
-	for _, tc := range testCases ***REMOVED***
+	}}
+	for _, tc := range testCases {
 		DefaultCatalog = c
-		t.Run(tc.args, func(t *testing.T) ***REMOVED***
+		t.Run(tc.args, func(t *testing.T) {
 			got := MatchLanguage(strings.Split(tc.args, "|")...)
-			if got != language.Make(tc.want) ***REMOVED***
+			if got != language.Make(tc.want) {
 				t.Errorf("got %q; want %q", got, tc.want)
-			***REMOVED***
-		***REMOVED***)
-	***REMOVED***
-***REMOVED***
+			}
+		})
+	}
+}

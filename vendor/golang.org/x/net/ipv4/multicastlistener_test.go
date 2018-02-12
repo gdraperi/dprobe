@@ -13,75 +13,75 @@ import (
 	"golang.org/x/net/ipv4"
 )
 
-var udpMultipleGroupListenerTests = []net.Addr***REMOVED***
-	&net.UDPAddr***REMOVED***IP: net.IPv4(224, 0, 0, 249)***REMOVED***, // see RFC 4727
-	&net.UDPAddr***REMOVED***IP: net.IPv4(224, 0, 0, 250)***REMOVED***,
-	&net.UDPAddr***REMOVED***IP: net.IPv4(224, 0, 0, 254)***REMOVED***,
-***REMOVED***
+var udpMultipleGroupListenerTests = []net.Addr{
+	&net.UDPAddr{IP: net.IPv4(224, 0, 0, 249)}, // see RFC 4727
+	&net.UDPAddr{IP: net.IPv4(224, 0, 0, 250)},
+	&net.UDPAddr{IP: net.IPv4(224, 0, 0, 254)},
+}
 
-func TestUDPSinglePacketConnWithMultipleGroupListeners(t *testing.T) ***REMOVED***
-	switch runtime.GOOS ***REMOVED***
+func TestUDPSinglePacketConnWithMultipleGroupListeners(t *testing.T) {
+	switch runtime.GOOS {
 	case "nacl", "plan9", "windows":
 		t.Skipf("not supported on %s", runtime.GOOS)
-	***REMOVED***
-	if testing.Short() ***REMOVED***
+	}
+	if testing.Short() {
 		t.Skip("to avoid external network")
-	***REMOVED***
+	}
 
-	for _, gaddr := range udpMultipleGroupListenerTests ***REMOVED***
+	for _, gaddr := range udpMultipleGroupListenerTests {
 		c, err := net.ListenPacket("udp4", "0.0.0.0:0") // wildcard address with no reusable port
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
+		}
 		defer c.Close()
 
 		p := ipv4.NewPacketConn(c)
 		var mift []*net.Interface
 
 		ift, err := net.Interfaces()
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
-		for i, ifi := range ift ***REMOVED***
-			if _, ok := nettest.IsMulticastCapable("ip4", &ifi); !ok ***REMOVED***
+		}
+		for i, ifi := range ift {
+			if _, ok := nettest.IsMulticastCapable("ip4", &ifi); !ok {
 				continue
-			***REMOVED***
-			if err := p.JoinGroup(&ifi, gaddr); err != nil ***REMOVED***
+			}
+			if err := p.JoinGroup(&ifi, gaddr); err != nil {
 				t.Fatal(err)
-			***REMOVED***
+			}
 			mift = append(mift, &ift[i])
-		***REMOVED***
-		for _, ifi := range mift ***REMOVED***
-			if err := p.LeaveGroup(ifi, gaddr); err != nil ***REMOVED***
+		}
+		for _, ifi := range mift {
+			if err := p.LeaveGroup(ifi, gaddr); err != nil {
 				t.Fatal(err)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}
 
-func TestUDPMultiplePacketConnWithMultipleGroupListeners(t *testing.T) ***REMOVED***
-	switch runtime.GOOS ***REMOVED***
+func TestUDPMultiplePacketConnWithMultipleGroupListeners(t *testing.T) {
+	switch runtime.GOOS {
 	case "nacl", "plan9", "windows":
 		t.Skipf("not supported on %s", runtime.GOOS)
-	***REMOVED***
-	if testing.Short() ***REMOVED***
+	}
+	if testing.Short() {
 		t.Skip("to avoid external network")
-	***REMOVED***
+	}
 
-	for _, gaddr := range udpMultipleGroupListenerTests ***REMOVED***
+	for _, gaddr := range udpMultipleGroupListenerTests {
 		c1, err := net.ListenPacket("udp4", "224.0.0.0:0") // wildcard address with reusable port
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
+		}
 		defer c1.Close()
 		_, port, err := net.SplitHostPort(c1.LocalAddr().String())
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
+		}
 		c2, err := net.ListenPacket("udp4", net.JoinHostPort("224.0.0.0", port)) // wildcard address with reusable port
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
+		}
 		defer c2.Close()
 
 		var ps [2]*ipv4.PacketConn
@@ -90,58 +90,58 @@ func TestUDPMultiplePacketConnWithMultipleGroupListeners(t *testing.T) ***REMOVE
 		var mift []*net.Interface
 
 		ift, err := net.Interfaces()
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
-		for i, ifi := range ift ***REMOVED***
-			if _, ok := nettest.IsMulticastCapable("ip4", &ifi); !ok ***REMOVED***
+		}
+		for i, ifi := range ift {
+			if _, ok := nettest.IsMulticastCapable("ip4", &ifi); !ok {
 				continue
-			***REMOVED***
-			for _, p := range ps ***REMOVED***
-				if err := p.JoinGroup(&ifi, gaddr); err != nil ***REMOVED***
+			}
+			for _, p := range ps {
+				if err := p.JoinGroup(&ifi, gaddr); err != nil {
 					t.Fatal(err)
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			mift = append(mift, &ift[i])
-		***REMOVED***
-		for _, ifi := range mift ***REMOVED***
-			for _, p := range ps ***REMOVED***
-				if err := p.LeaveGroup(ifi, gaddr); err != nil ***REMOVED***
+		}
+		for _, ifi := range mift {
+			for _, p := range ps {
+				if err := p.LeaveGroup(ifi, gaddr); err != nil {
 					t.Fatal(err)
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+				}
+			}
+		}
+	}
+}
 
-func TestUDPPerInterfaceSinglePacketConnWithSingleGroupListener(t *testing.T) ***REMOVED***
-	switch runtime.GOOS ***REMOVED***
+func TestUDPPerInterfaceSinglePacketConnWithSingleGroupListener(t *testing.T) {
+	switch runtime.GOOS {
 	case "nacl", "plan9", "windows":
 		t.Skipf("not supported on %s", runtime.GOOS)
-	***REMOVED***
-	if testing.Short() ***REMOVED***
+	}
+	if testing.Short() {
 		t.Skip("to avoid external network")
-	***REMOVED***
+	}
 
-	gaddr := net.IPAddr***REMOVED***IP: net.IPv4(224, 0, 0, 254)***REMOVED*** // see RFC 4727
-	type ml struct ***REMOVED***
+	gaddr := net.IPAddr{IP: net.IPv4(224, 0, 0, 254)} // see RFC 4727
+	type ml struct {
 		c   *ipv4.PacketConn
 		ifi *net.Interface
-	***REMOVED***
+	}
 	var mlt []*ml
 
 	ift, err := net.Interfaces()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	port := "0"
-	for i, ifi := range ift ***REMOVED***
+	for i, ifi := range ift {
 		ip, ok := nettest.IsMulticastCapable("ip4", &ifi)
-		if !ok ***REMOVED***
+		if !ok {
 			continue
-		***REMOVED***
+		}
 		c, err := net.ListenPacket("udp4", net.JoinHostPort(ip.String(), port)) // unicast address with non-reusable port
-		if err != nil ***REMOVED***
+		if err != nil {
 			// The listen may fail when the serivce is
 			// already in use, but it's fine because the
 			// purpose of this is not to test the
@@ -149,117 +149,117 @@ func TestUDPPerInterfaceSinglePacketConnWithSingleGroupListener(t *testing.T) **
 			// kernel.
 			t.Log(err)
 			continue
-		***REMOVED***
+		}
 		defer c.Close()
-		if port == "0" ***REMOVED***
+		if port == "0" {
 			_, port, err = net.SplitHostPort(c.LocalAddr().String())
-			if err != nil ***REMOVED***
+			if err != nil {
 				t.Fatal(err)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		p := ipv4.NewPacketConn(c)
-		if err := p.JoinGroup(&ifi, &gaddr); err != nil ***REMOVED***
+		if err := p.JoinGroup(&ifi, &gaddr); err != nil {
 			t.Fatal(err)
-		***REMOVED***
-		mlt = append(mlt, &ml***REMOVED***p, &ift[i]***REMOVED***)
-	***REMOVED***
-	for _, m := range mlt ***REMOVED***
-		if err := m.c.LeaveGroup(m.ifi, &gaddr); err != nil ***REMOVED***
+		}
+		mlt = append(mlt, &ml{p, &ift[i]})
+	}
+	for _, m := range mlt {
+		if err := m.c.LeaveGroup(m.ifi, &gaddr); err != nil {
 			t.Fatal(err)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestIPSingleRawConnWithSingleGroupListener(t *testing.T) ***REMOVED***
-	switch runtime.GOOS ***REMOVED***
+func TestIPSingleRawConnWithSingleGroupListener(t *testing.T) {
+	switch runtime.GOOS {
 	case "nacl", "plan9", "windows":
 		t.Skipf("not supported on %s", runtime.GOOS)
-	***REMOVED***
-	if testing.Short() ***REMOVED***
+	}
+	if testing.Short() {
 		t.Skip("to avoid external network")
-	***REMOVED***
-	if m, ok := nettest.SupportsRawIPSocket(); !ok ***REMOVED***
+	}
+	if m, ok := nettest.SupportsRawIPSocket(); !ok {
 		t.Skip(m)
-	***REMOVED***
+	}
 
 	c, err := net.ListenPacket("ip4:icmp", "0.0.0.0") // wildcard address
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	defer c.Close()
 
 	r, err := ipv4.NewRawConn(c)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	gaddr := net.IPAddr***REMOVED***IP: net.IPv4(224, 0, 0, 254)***REMOVED*** // see RFC 4727
+	}
+	gaddr := net.IPAddr{IP: net.IPv4(224, 0, 0, 254)} // see RFC 4727
 	var mift []*net.Interface
 
 	ift, err := net.Interfaces()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	for i, ifi := range ift ***REMOVED***
-		if _, ok := nettest.IsMulticastCapable("ip4", &ifi); !ok ***REMOVED***
+	}
+	for i, ifi := range ift {
+		if _, ok := nettest.IsMulticastCapable("ip4", &ifi); !ok {
 			continue
-		***REMOVED***
-		if err := r.JoinGroup(&ifi, &gaddr); err != nil ***REMOVED***
+		}
+		if err := r.JoinGroup(&ifi, &gaddr); err != nil {
 			t.Fatal(err)
-		***REMOVED***
+		}
 		mift = append(mift, &ift[i])
-	***REMOVED***
-	for _, ifi := range mift ***REMOVED***
-		if err := r.LeaveGroup(ifi, &gaddr); err != nil ***REMOVED***
+	}
+	for _, ifi := range mift {
+		if err := r.LeaveGroup(ifi, &gaddr); err != nil {
 			t.Fatal(err)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestIPPerInterfaceSingleRawConnWithSingleGroupListener(t *testing.T) ***REMOVED***
-	switch runtime.GOOS ***REMOVED***
+func TestIPPerInterfaceSingleRawConnWithSingleGroupListener(t *testing.T) {
+	switch runtime.GOOS {
 	case "nacl", "plan9", "windows":
 		t.Skipf("not supported on %s", runtime.GOOS)
-	***REMOVED***
-	if testing.Short() ***REMOVED***
+	}
+	if testing.Short() {
 		t.Skip("to avoid external network")
-	***REMOVED***
-	if m, ok := nettest.SupportsRawIPSocket(); !ok ***REMOVED***
+	}
+	if m, ok := nettest.SupportsRawIPSocket(); !ok {
 		t.Skip(m)
-	***REMOVED***
+	}
 
-	gaddr := net.IPAddr***REMOVED***IP: net.IPv4(224, 0, 0, 254)***REMOVED*** // see RFC 4727
-	type ml struct ***REMOVED***
+	gaddr := net.IPAddr{IP: net.IPv4(224, 0, 0, 254)} // see RFC 4727
+	type ml struct {
 		c   *ipv4.RawConn
 		ifi *net.Interface
-	***REMOVED***
+	}
 	var mlt []*ml
 
 	ift, err := net.Interfaces()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	for i, ifi := range ift ***REMOVED***
+	}
+	for i, ifi := range ift {
 		ip, ok := nettest.IsMulticastCapable("ip4", &ifi)
-		if !ok ***REMOVED***
+		if !ok {
 			continue
-		***REMOVED***
+		}
 		c, err := net.ListenPacket("ip4:253", ip.String()) // unicast address
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
+		}
 		defer c.Close()
 		r, err := ipv4.NewRawConn(c)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
-		if err := r.JoinGroup(&ifi, &gaddr); err != nil ***REMOVED***
+		}
+		if err := r.JoinGroup(&ifi, &gaddr); err != nil {
 			t.Fatal(err)
-		***REMOVED***
-		mlt = append(mlt, &ml***REMOVED***r, &ift[i]***REMOVED***)
-	***REMOVED***
-	for _, m := range mlt ***REMOVED***
-		if err := m.c.LeaveGroup(m.ifi, &gaddr); err != nil ***REMOVED***
+		}
+		mlt = append(mlt, &ml{r, &ift[i]})
+	}
+	for _, m := range mlt {
+		if err := m.c.LeaveGroup(m.ifi, &gaddr); err != nil {
 			t.Fatal(err)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

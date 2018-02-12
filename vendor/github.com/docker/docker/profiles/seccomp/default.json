@@ -1,56 +1,56 @@
-***REMOVED***
+{
 	"defaultAction": "SCMP_ACT_ERRNO",
 	"archMap": [
-		***REMOVED***
+		{
 			"architecture": "SCMP_ARCH_X86_64",
 			"subArchitectures": [
 				"SCMP_ARCH_X86",
 				"SCMP_ARCH_X32"
 			]
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			"architecture": "SCMP_ARCH_AARCH64",
 			"subArchitectures": [
 				"SCMP_ARCH_ARM"
 			]
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			"architecture": "SCMP_ARCH_MIPS64",
 			"subArchitectures": [
 				"SCMP_ARCH_MIPS",
 				"SCMP_ARCH_MIPS64N32"
 			]
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			"architecture": "SCMP_ARCH_MIPS64N32",
 			"subArchitectures": [
 				"SCMP_ARCH_MIPS",
 				"SCMP_ARCH_MIPS64"
 			]
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			"architecture": "SCMP_ARCH_MIPSEL64",
 			"subArchitectures": [
 				"SCMP_ARCH_MIPSEL",
 				"SCMP_ARCH_MIPSEL64N32"
 			]
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			"architecture": "SCMP_ARCH_MIPSEL64N32",
 			"subArchitectures": [
 				"SCMP_ARCH_MIPSEL",
 				"SCMP_ARCH_MIPSEL64"
 			]
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			"architecture": "SCMP_ARCH_S390X",
 			"subArchitectures": [
 				"SCMP_ARCH_S390"
 			]
-		***REMOVED***
+		}
 	],
 	"syscalls": [
-		***REMOVED***
+		{
 			"names": [
 				"accept",
 				"accept4",
@@ -363,109 +363,109 @@
 			"action": "SCMP_ACT_ALLOW",
 			"args": [],
 			"comment": "",
-			"includes": ***REMOVED******REMOVED***,
-			"excludes": ***REMOVED******REMOVED***
-		***REMOVED***,
-		***REMOVED***
+			"includes": {},
+			"excludes": {}
+		},
+		{
 			"names": [
 				"personality"
 			],
 			"action": "SCMP_ACT_ALLOW",
 			"args": [
-				***REMOVED***
+				{
 					"index": 0,
 					"value": 0,
 					"valueTwo": 0,
 					"op": "SCMP_CMP_EQ"
-				***REMOVED***
+				}
 			],
 			"comment": "",
-			"includes": ***REMOVED******REMOVED***,
-			"excludes": ***REMOVED******REMOVED***
-		***REMOVED***,
-		***REMOVED***
+			"includes": {},
+			"excludes": {}
+		},
+		{
 			"names": [
 				"personality"
 			],
 			"action": "SCMP_ACT_ALLOW",
 			"args": [
-				***REMOVED***
+				{
 					"index": 0,
 					"value": 8,
 					"valueTwo": 0,
 					"op": "SCMP_CMP_EQ"
-				***REMOVED***
+				}
 			],
 			"comment": "",
-			"includes": ***REMOVED******REMOVED***,
-			"excludes": ***REMOVED******REMOVED***
-		***REMOVED***,
-		***REMOVED***
+			"includes": {},
+			"excludes": {}
+		},
+		{
 			"names": [
 				"personality"
 			],
 			"action": "SCMP_ACT_ALLOW",
 			"args": [
-				***REMOVED***
+				{
 					"index": 0,
 					"value": 131072,
 					"valueTwo": 0,
 					"op": "SCMP_CMP_EQ"
-				***REMOVED***
+				}
 			],
 			"comment": "",
-			"includes": ***REMOVED******REMOVED***,
-			"excludes": ***REMOVED******REMOVED***
-		***REMOVED***,
-		***REMOVED***
+			"includes": {},
+			"excludes": {}
+		},
+		{
 			"names": [
 				"personality"
 			],
 			"action": "SCMP_ACT_ALLOW",
 			"args": [
-				***REMOVED***
+				{
 					"index": 0,
 					"value": 131080,
 					"valueTwo": 0,
 					"op": "SCMP_CMP_EQ"
-				***REMOVED***
+				}
 			],
 			"comment": "",
-			"includes": ***REMOVED******REMOVED***,
-			"excludes": ***REMOVED******REMOVED***
-		***REMOVED***,
-		***REMOVED***
+			"includes": {},
+			"excludes": {}
+		},
+		{
 			"names": [
 				"personality"
 			],
 			"action": "SCMP_ACT_ALLOW",
 			"args": [
-				***REMOVED***
+				{
 					"index": 0,
 					"value": 4294967295,
 					"valueTwo": 0,
 					"op": "SCMP_CMP_EQ"
-				***REMOVED***
+				}
 			],
 			"comment": "",
-			"includes": ***REMOVED******REMOVED***,
-			"excludes": ***REMOVED******REMOVED***
-		***REMOVED***,
-		***REMOVED***
+			"includes": {},
+			"excludes": {}
+		},
+		{
 			"names": [
 				"sync_file_range2"
 			],
 			"action": "SCMP_ACT_ALLOW",
 			"args": [],
 			"comment": "",
-			"includes": ***REMOVED***
+			"includes": {
 				"arches": [
 					"ppc64le"
 				]
-			***REMOVED***,
-			"excludes": ***REMOVED******REMOVED***
-		***REMOVED***,
-		***REMOVED***
+			},
+			"excludes": {}
+		},
+		{
 			"names": [
 				"arm_fadvise64_64",
 				"arm_sync_file_range",
@@ -477,46 +477,46 @@
 			"action": "SCMP_ACT_ALLOW",
 			"args": [],
 			"comment": "",
-			"includes": ***REMOVED***
+			"includes": {
 				"arches": [
 					"arm",
 					"arm64"
 				]
-			***REMOVED***,
-			"excludes": ***REMOVED******REMOVED***
-		***REMOVED***,
-		***REMOVED***
+			},
+			"excludes": {}
+		},
+		{
 			"names": [
 				"arch_prctl"
 			],
 			"action": "SCMP_ACT_ALLOW",
 			"args": [],
 			"comment": "",
-			"includes": ***REMOVED***
+			"includes": {
 				"arches": [
 					"amd64",
 					"x32"
 				]
-			***REMOVED***,
-			"excludes": ***REMOVED******REMOVED***
-		***REMOVED***,
-		***REMOVED***
+			},
+			"excludes": {}
+		},
+		{
 			"names": [
 				"modify_ldt"
 			],
 			"action": "SCMP_ACT_ALLOW",
 			"args": [],
 			"comment": "",
-			"includes": ***REMOVED***
+			"includes": {
 				"arches": [
 					"amd64",
 					"x32",
 					"x86"
 				]
-			***REMOVED***,
-			"excludes": ***REMOVED******REMOVED***
-		***REMOVED***,
-		***REMOVED***
+			},
+			"excludes": {}
+		},
+		{
 			"names": [
 				"s390_pci_mmio_read",
 				"s390_pci_mmio_write",
@@ -525,29 +525,29 @@
 			"action": "SCMP_ACT_ALLOW",
 			"args": [],
 			"comment": "",
-			"includes": ***REMOVED***
+			"includes": {
 				"arches": [
 					"s390",
 					"s390x"
 				]
-			***REMOVED***,
-			"excludes": ***REMOVED******REMOVED***
-		***REMOVED***,
-		***REMOVED***
+			},
+			"excludes": {}
+		},
+		{
 			"names": [
 				"open_by_handle_at"
 			],
 			"action": "SCMP_ACT_ALLOW",
 			"args": [],
 			"comment": "",
-			"includes": ***REMOVED***
+			"includes": {
 				"caps": [
 					"CAP_DAC_READ_SEARCH"
 				]
-			***REMOVED***,
-			"excludes": ***REMOVED******REMOVED***
-		***REMOVED***,
-		***REMOVED***
+			},
+			"excludes": {}
+		},
+		{
 			"names": [
 				"bpf",
 				"clone",
@@ -567,29 +567,29 @@
 			"action": "SCMP_ACT_ALLOW",
 			"args": [],
 			"comment": "",
-			"includes": ***REMOVED***
+			"includes": {
 				"caps": [
 					"CAP_SYS_ADMIN"
 				]
-			***REMOVED***,
-			"excludes": ***REMOVED******REMOVED***
-		***REMOVED***,
-		***REMOVED***
+			},
+			"excludes": {}
+		},
+		{
 			"names": [
 				"clone"
 			],
 			"action": "SCMP_ACT_ALLOW",
 			"args": [
-				***REMOVED***
+				{
 					"index": 0,
 					"value": 2080505856,
 					"valueTwo": 0,
 					"op": "SCMP_CMP_MASKED_EQ"
-				***REMOVED***
+				}
 			],
 			"comment": "",
-			"includes": ***REMOVED******REMOVED***,
-			"excludes": ***REMOVED***
+			"includes": {},
+			"excludes": {
 				"caps": [
 					"CAP_SYS_ADMIN"
 				],
@@ -597,63 +597,63 @@
 					"s390",
 					"s390x"
 				]
-			***REMOVED***
-		***REMOVED***,
-		***REMOVED***
+			}
+		},
+		{
 			"names": [
 				"clone"
 			],
 			"action": "SCMP_ACT_ALLOW",
 			"args": [
-				***REMOVED***
+				{
 					"index": 1,
 					"value": 2080505856,
 					"valueTwo": 0,
 					"op": "SCMP_CMP_MASKED_EQ"
-				***REMOVED***
+				}
 			],
 			"comment": "s390 parameter ordering for clone is different",
-			"includes": ***REMOVED***
+			"includes": {
 				"arches": [
 					"s390",
 					"s390x"
 				]
-			***REMOVED***,
-			"excludes": ***REMOVED***
+			},
+			"excludes": {
 				"caps": [
 					"CAP_SYS_ADMIN"
 				]
-			***REMOVED***
-		***REMOVED***,
-		***REMOVED***
+			}
+		},
+		{
 			"names": [
 				"reboot"
 			],
 			"action": "SCMP_ACT_ALLOW",
 			"args": [],
 			"comment": "",
-			"includes": ***REMOVED***
+			"includes": {
 				"caps": [
 					"CAP_SYS_BOOT"
 				]
-			***REMOVED***,
-			"excludes": ***REMOVED******REMOVED***
-		***REMOVED***,
-		***REMOVED***
+			},
+			"excludes": {}
+		},
+		{
 			"names": [
 				"chroot"
 			],
 			"action": "SCMP_ACT_ALLOW",
 			"args": [],
 			"comment": "",
-			"includes": ***REMOVED***
+			"includes": {
 				"caps": [
 					"CAP_SYS_CHROOT"
 				]
-			***REMOVED***,
-			"excludes": ***REMOVED******REMOVED***
-		***REMOVED***,
-		***REMOVED***
+			},
+			"excludes": {}
+		},
+		{
 			"names": [
 				"delete_module",
 				"init_module",
@@ -663,28 +663,28 @@
 			"action": "SCMP_ACT_ALLOW",
 			"args": [],
 			"comment": "",
-			"includes": ***REMOVED***
+			"includes": {
 				"caps": [
 					"CAP_SYS_MODULE"
 				]
-			***REMOVED***,
-			"excludes": ***REMOVED******REMOVED***
-		***REMOVED***,
-		***REMOVED***
+			},
+			"excludes": {}
+		},
+		{
 			"names": [
 				"acct"
 			],
 			"action": "SCMP_ACT_ALLOW",
 			"args": [],
 			"comment": "",
-			"includes": ***REMOVED***
+			"includes": {
 				"caps": [
 					"CAP_SYS_PACCT"
 				]
-			***REMOVED***,
-			"excludes": ***REMOVED******REMOVED***
-		***REMOVED***,
-		***REMOVED***
+			},
+			"excludes": {}
+		},
+		{
 			"names": [
 				"kcmp",
 				"process_vm_readv",
@@ -694,14 +694,14 @@
 			"action": "SCMP_ACT_ALLOW",
 			"args": [],
 			"comment": "",
-			"includes": ***REMOVED***
+			"includes": {
 				"caps": [
 					"CAP_SYS_PTRACE"
 				]
-			***REMOVED***,
-			"excludes": ***REMOVED******REMOVED***
-		***REMOVED***,
-		***REMOVED***
+			},
+			"excludes": {}
+		},
+		{
 			"names": [
 				"iopl",
 				"ioperm"
@@ -709,14 +709,14 @@
 			"action": "SCMP_ACT_ALLOW",
 			"args": [],
 			"comment": "",
-			"includes": ***REMOVED***
+			"includes": {
 				"caps": [
 					"CAP_SYS_RAWIO"
 				]
-			***REMOVED***,
-			"excludes": ***REMOVED******REMOVED***
-		***REMOVED***,
-		***REMOVED***
+			},
+			"excludes": {}
+		},
+		{
 			"names": [
 				"settimeofday",
 				"stime",
@@ -725,26 +725,26 @@
 			"action": "SCMP_ACT_ALLOW",
 			"args": [],
 			"comment": "",
-			"includes": ***REMOVED***
+			"includes": {
 				"caps": [
 					"CAP_SYS_TIME"
 				]
-			***REMOVED***,
-			"excludes": ***REMOVED******REMOVED***
-		***REMOVED***,
-		***REMOVED***
+			},
+			"excludes": {}
+		},
+		{
 			"names": [
 				"vhangup"
 			],
 			"action": "SCMP_ACT_ALLOW",
 			"args": [],
 			"comment": "",
-			"includes": ***REMOVED***
+			"includes": {
 				"caps": [
 					"CAP_SYS_TTY_CONFIG"
 				]
-			***REMOVED***,
-			"excludes": ***REMOVED******REMOVED***
-		***REMOVED***
+			},
+			"excludes": {}
+		}
 	]
-***REMOVED***
+}

@@ -44,47 +44,47 @@ var (
 	errHashSize = errors.New("blake2b: invalid hash size")
 )
 
-var iv = [8]uint64***REMOVED***
+var iv = [8]uint64{
 	0x6a09e667f3bcc908, 0xbb67ae8584caa73b, 0x3c6ef372fe94f82b, 0xa54ff53a5f1d36f1,
 	0x510e527fade682d1, 0x9b05688c2b3e6c1f, 0x1f83d9abfb41bd6b, 0x5be0cd19137e2179,
-***REMOVED***
+}
 
 // Sum512 returns the BLAKE2b-512 checksum of the data.
-func Sum512(data []byte) [Size]byte ***REMOVED***
+func Sum512(data []byte) [Size]byte {
 	var sum [Size]byte
 	checkSum(&sum, Size, data)
 	return sum
-***REMOVED***
+}
 
 // Sum384 returns the BLAKE2b-384 checksum of the data.
-func Sum384(data []byte) [Size384]byte ***REMOVED***
+func Sum384(data []byte) [Size384]byte {
 	var sum [Size]byte
 	var sum384 [Size384]byte
 	checkSum(&sum, Size384, data)
 	copy(sum384[:], sum[:Size384])
 	return sum384
-***REMOVED***
+}
 
 // Sum256 returns the BLAKE2b-256 checksum of the data.
-func Sum256(data []byte) [Size256]byte ***REMOVED***
+func Sum256(data []byte) [Size256]byte {
 	var sum [Size]byte
 	var sum256 [Size256]byte
 	checkSum(&sum, Size256, data)
 	copy(sum256[:], sum[:Size256])
 	return sum256
-***REMOVED***
+}
 
 // New512 returns a new hash.Hash computing the BLAKE2b-512 checksum. A non-nil
 // key turns the hash into a MAC. The key must between zero and 64 bytes long.
-func New512(key []byte) (hash.Hash, error) ***REMOVED*** return newDigest(Size, key) ***REMOVED***
+func New512(key []byte) (hash.Hash, error) { return newDigest(Size, key) }
 
 // New384 returns a new hash.Hash computing the BLAKE2b-384 checksum. A non-nil
 // key turns the hash into a MAC. The key must between zero and 64 bytes long.
-func New384(key []byte) (hash.Hash, error) ***REMOVED*** return newDigest(Size384, key) ***REMOVED***
+func New384(key []byte) (hash.Hash, error) { return newDigest(Size384, key) }
 
 // New256 returns a new hash.Hash computing the BLAKE2b-256 checksum. A non-nil
 // key turns the hash into a MAC. The key must between zero and 64 bytes long.
-func New256(key []byte) (hash.Hash, error) ***REMOVED*** return newDigest(Size256, key) ***REMOVED***
+func New256(key []byte) (hash.Hash, error) { return newDigest(Size256, key) }
 
 // New returns a new hash.Hash computing the BLAKE2b checksum with a custom length.
 // A non-nil key turns the hash into a MAC. The key must between zero and 64 bytes long.
@@ -92,54 +92,54 @@ func New256(key []byte) (hash.Hash, error) ***REMOVED*** return newDigest(Size25
 // values equal or greater than:
 // - 32 if BLAKE2b is used as a hash function (The key is zero bytes long).
 // - 16 if BLAKE2b is used as a MAC function (The key is at least 16 bytes long).
-func New(size int, key []byte) (hash.Hash, error) ***REMOVED*** return newDigest(size, key) ***REMOVED***
+func New(size int, key []byte) (hash.Hash, error) { return newDigest(size, key) }
 
-func newDigest(hashSize int, key []byte) (*digest, error) ***REMOVED***
-	if hashSize < 1 || hashSize > Size ***REMOVED***
+func newDigest(hashSize int, key []byte) (*digest, error) {
+	if hashSize < 1 || hashSize > Size {
 		return nil, errHashSize
-	***REMOVED***
-	if len(key) > Size ***REMOVED***
+	}
+	if len(key) > Size {
 		return nil, errKeySize
-	***REMOVED***
-	d := &digest***REMOVED***
+	}
+	d := &digest{
 		size:   hashSize,
 		keyLen: len(key),
-	***REMOVED***
+	}
 	copy(d.key[:], key)
 	d.Reset()
 	return d, nil
-***REMOVED***
+}
 
-func checkSum(sum *[Size]byte, hashSize int, data []byte) ***REMOVED***
+func checkSum(sum *[Size]byte, hashSize int, data []byte) {
 	h := iv
 	h[0] ^= uint64(hashSize) | (1 << 16) | (1 << 24)
 	var c [2]uint64
 
-	if length := len(data); length > BlockSize ***REMOVED***
+	if length := len(data); length > BlockSize {
 		n := length &^ (BlockSize - 1)
-		if length == n ***REMOVED***
+		if length == n {
 			n -= BlockSize
-		***REMOVED***
+		}
 		hashBlocks(&h, &c, 0, data[:n])
 		data = data[n:]
-	***REMOVED***
+	}
 
 	var block [BlockSize]byte
 	offset := copy(block[:], data)
 	remaining := uint64(BlockSize - offset)
-	if c[0] < remaining ***REMOVED***
+	if c[0] < remaining {
 		c[1]--
-	***REMOVED***
+	}
 	c[0] -= remaining
 
 	hashBlocks(&h, &c, 0xFFFFFFFFFFFFFFFF, block[:])
 
-	for i, v := range h[:(hashSize+7)/8] ***REMOVED***
+	for i, v := range h[:(hashSize+7)/8] {
 		binary.LittleEndian.PutUint64(sum[8*i:], v)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type digest struct ***REMOVED***
+type digest struct {
 	h      [8]uint64
 	c      [2]uint64
 	size   int
@@ -148,74 +148,74 @@ type digest struct ***REMOVED***
 
 	key    [BlockSize]byte
 	keyLen int
-***REMOVED***
+}
 
-func (d *digest) BlockSize() int ***REMOVED*** return BlockSize ***REMOVED***
+func (d *digest) BlockSize() int { return BlockSize }
 
-func (d *digest) Size() int ***REMOVED*** return d.size ***REMOVED***
+func (d *digest) Size() int { return d.size }
 
-func (d *digest) Reset() ***REMOVED***
+func (d *digest) Reset() {
 	d.h = iv
 	d.h[0] ^= uint64(d.size) | (uint64(d.keyLen) << 8) | (1 << 16) | (1 << 24)
 	d.offset, d.c[0], d.c[1] = 0, 0, 0
-	if d.keyLen > 0 ***REMOVED***
+	if d.keyLen > 0 {
 		d.block = d.key
 		d.offset = BlockSize
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (d *digest) Write(p []byte) (n int, err error) ***REMOVED***
+func (d *digest) Write(p []byte) (n int, err error) {
 	n = len(p)
 
-	if d.offset > 0 ***REMOVED***
+	if d.offset > 0 {
 		remaining := BlockSize - d.offset
-		if n <= remaining ***REMOVED***
+		if n <= remaining {
 			d.offset += copy(d.block[d.offset:], p)
 			return
-		***REMOVED***
+		}
 		copy(d.block[d.offset:], p[:remaining])
 		hashBlocks(&d.h, &d.c, 0, d.block[:])
 		d.offset = 0
 		p = p[remaining:]
-	***REMOVED***
+	}
 
-	if length := len(p); length > BlockSize ***REMOVED***
+	if length := len(p); length > BlockSize {
 		nn := length &^ (BlockSize - 1)
-		if length == nn ***REMOVED***
+		if length == nn {
 			nn -= BlockSize
-		***REMOVED***
+		}
 		hashBlocks(&d.h, &d.c, 0, p[:nn])
 		p = p[nn:]
-	***REMOVED***
+	}
 
-	if len(p) > 0 ***REMOVED***
+	if len(p) > 0 {
 		d.offset += copy(d.block[:], p)
-	***REMOVED***
+	}
 
 	return
-***REMOVED***
+}
 
-func (d *digest) Sum(sum []byte) []byte ***REMOVED***
+func (d *digest) Sum(sum []byte) []byte {
 	var hash [Size]byte
 	d.finalize(&hash)
 	return append(sum, hash[:d.size]...)
-***REMOVED***
+}
 
-func (d *digest) finalize(hash *[Size]byte) ***REMOVED***
+func (d *digest) finalize(hash *[Size]byte) {
 	var block [BlockSize]byte
 	copy(block[:], d.block[:d.offset])
 	remaining := uint64(BlockSize - d.offset)
 
 	c := d.c
-	if c[0] < remaining ***REMOVED***
+	if c[0] < remaining {
 		c[1]--
-	***REMOVED***
+	}
 	c[0] -= remaining
 
 	h := d.h
 	hashBlocks(&h, &c, 0xFFFFFFFFFFFFFFFF, block[:])
 
-	for i, v := range h ***REMOVED***
+	for i, v := range h {
 		binary.LittleEndian.PutUint64(hash[8*i:], v)
-	***REMOVED***
-***REMOVED***
+	}
+}

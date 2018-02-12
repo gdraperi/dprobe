@@ -1,6 +1,6 @@
 package filters
 
-func ExampleArgs_MatchKVList() ***REMOVED***
+func ExampleArgs_MatchKVList() {
 	args := NewArgs(
 		Arg("label", "image=foo"),
 		Arg("label", "state=running"))
@@ -12,13 +12,13 @@ func ExampleArgs_MatchKVList() ***REMOVED***
 	args.MatchKVList("label", nil)
 
 	// returns true because all sources are matched
-	args.MatchKVList("label", map[string]string***REMOVED***
+	args.MatchKVList("label", map[string]string{
 		"image": "foo",
 		"state": "running",
-	***REMOVED***)
+	})
 
 	// returns false because the values do not match
-	args.MatchKVList("label", map[string]string***REMOVED***
+	args.MatchKVList("label", map[string]string{
 		"image": "other",
-	***REMOVED***)
-***REMOVED***
+	})
+}

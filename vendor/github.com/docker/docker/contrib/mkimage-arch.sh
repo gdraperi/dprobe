@@ -4,20 +4,20 @@
 # requires root
 set -e
 
-hash pacstrap &>/dev/null || ***REMOVED***
+hash pacstrap &>/dev/null || {
 	echo "Could not find pacstrap. Run pacman -S arch-install-scripts"
 	exit 1
-***REMOVED***
+}
 
-hash expect &>/dev/null || ***REMOVED***
+hash expect &>/dev/null || {
 	echo "Could not find expect. Run pacman -S expect"
 	exit 1
-***REMOVED***
+}
 
 
 export LANG="C.UTF-8"
 
-ROOTFS=$(mktemp -d $***REMOVED***TMPDIR:-/var/tmp***REMOVED***/rootfs-archlinux-XXXXXXXXXX)
+ROOTFS=$(mktemp -d ${TMPDIR:-/var/tmp}/rootfs-archlinux-XXXXXXXXXX)
 chmod 755 $ROOTFS
 
 # packages to ignore for space savings
@@ -45,7 +45,7 @@ PKGIGNORE=(
     xfsprogs
 )
 IFS=','
-PKGIGNORE="$***REMOVED***PKGIGNORE[*]***REMOVED***"
+PKGIGNORE="${PKGIGNORE[*]}"
 unset IFS
 
 arch="$(uname -m)"
@@ -58,14 +58,14 @@ case "$arch" in
 			echo "Could not find archlinuxarm-keyring. Please, install it and run pacman-key --populate archlinuxarm"
 			exit 1
 		fi
-		PACMAN_CONF=$(mktemp $***REMOVED***TMPDIR:-/var/tmp***REMOVED***/pacman-conf-archlinux-XXXXXXXXX)
+		PACMAN_CONF=$(mktemp ${TMPDIR:-/var/tmp}/pacman-conf-archlinux-XXXXXXXXX)
 		version="$(echo $arch | cut -c 5)"
-		sed "s/Architecture = armv/Architecture = armv$***REMOVED***version***REMOVED***h/g" './mkimage-archarm-pacman.conf' > "$***REMOVED***PACMAN_CONF***REMOVED***"
+		sed "s/Architecture = armv/Architecture = armv${version}h/g" './mkimage-archarm-pacman.conf' > "${PACMAN_CONF}"
 		PACMAN_MIRRORLIST='Server = http://mirror.archlinuxarm.org/$arch/$repo'
 		PACMAN_EXTRA_PKGS='archlinuxarm-keyring'
 		EXPECT_TIMEOUT=1800 # Most armv* based devices can be very slow (e.g. RPiv1)
 		ARCH_KEYRING=archlinuxarm
-		DOCKER_IMAGE_NAME="armv$***REMOVED***version***REMOVED***h/archlinux"
+		DOCKER_IMAGE_NAME="armv${version}h/archlinux"
 		;;
 	*)
 		PACMAN_CONF='./mkimage-arch-pacman.conf'
@@ -80,20 +80,20 @@ esac
 export PACMAN_MIRRORLIST
 
 expect <<EOF
-	set send_slow ***REMOVED***1 .1***REMOVED***
-	proc send ***REMOVED***ignore arg***REMOVED*** ***REMOVED***
+	set send_slow {1 .1}
+	proc send {ignore arg} {
 		sleep .1
 		exp_send -s -- \$arg
-	***REMOVED***
+	}
 	set timeout $EXPECT_TIMEOUT
 
 	spawn pacstrap -C $PACMAN_CONF -c -d -G -i $ROOTFS base haveged $PACMAN_EXTRA_PKGS --ignore $PKGIGNORE
-	expect ***REMOVED***
-		-exact "anyway? \[Y/n\] " ***REMOVED*** send -- "n\r"; exp_continue ***REMOVED***
-		-exact "(default=all): " ***REMOVED*** send -- "\r"; exp_continue ***REMOVED***
-		-exact "installation? \[Y/n\]" ***REMOVED*** send -- "y\r"; exp_continue ***REMOVED***
-		-exact "delete it? \[Y/n\]" ***REMOVED*** send -- "y\r"; exp_continue ***REMOVED***
-	***REMOVED***
+	expect {
+		-exact "anyway? \[Y/n\] " { send -- "n\r"; exp_continue }
+		-exact "(default=all): " { send -- "\r"; exp_continue }
+		-exact "installation? \[Y/n\]" { send -- "y\r"; exp_continue }
+		-exact "delete it? \[Y/n\]" { send -- "y\r"; exp_continue }
+	}
 EOF
 
 arch-chroot $ROOTFS /bin/sh -c 'rm -r /usr/share/man/*'

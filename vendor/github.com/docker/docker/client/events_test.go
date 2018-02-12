@@ -17,149 +17,149 @@ import (
 	"github.com/docker/docker/api/types/filters"
 )
 
-func TestEventsErrorInOptions(t *testing.T) ***REMOVED***
-	errorCases := []struct ***REMOVED***
+func TestEventsErrorInOptions(t *testing.T) {
+	errorCases := []struct {
 		options       types.EventsOptions
 		expectedError string
-	***REMOVED******REMOVED***
-		***REMOVED***
-			options: types.EventsOptions***REMOVED***
+	}{
+		{
+			options: types.EventsOptions{
 				Since: "2006-01-02TZ",
-			***REMOVED***,
+			},
 			expectedError: `parsing time "2006-01-02TZ"`,
-		***REMOVED***,
-		***REMOVED***
-			options: types.EventsOptions***REMOVED***
+		},
+		{
+			options: types.EventsOptions{
 				Until: "2006-01-02TZ",
-			***REMOVED***,
+			},
 			expectedError: `parsing time "2006-01-02TZ"`,
-		***REMOVED***,
-	***REMOVED***
-	for _, e := range errorCases ***REMOVED***
-		client := &Client***REMOVED***
+		},
+	}
+	for _, e := range errorCases {
+		client := &Client{
 			client: newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
-		***REMOVED***
+		}
 		_, errs := client.Events(context.Background(), e.options)
 		err := <-errs
-		if err == nil || !strings.Contains(err.Error(), e.expectedError) ***REMOVED***
+		if err == nil || !strings.Contains(err.Error(), e.expectedError) {
 			t.Fatalf("expected an error %q, got %v", e.expectedError, err)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestEventsErrorFromServer(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestEventsErrorFromServer(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
-	***REMOVED***
-	_, errs := client.Events(context.Background(), types.EventsOptions***REMOVED******REMOVED***)
+	}
+	_, errs := client.Events(context.Background(), types.EventsOptions{})
 	err := <-errs
-	if err == nil || err.Error() != "Error response from daemon: Server error" ***REMOVED***
+	if err == nil || err.Error() != "Error response from daemon: Server error" {
 		t.Fatalf("expected a Server Error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestEvents(t *testing.T) ***REMOVED***
+func TestEvents(t *testing.T) {
 
 	expectedURL := "/events"
 
 	filters := filters.NewArgs()
 	filters.Add("type", events.ContainerEventType)
-	expectedFiltersJSON := fmt.Sprintf(`***REMOVED***"type":***REMOVED***"%s":true***REMOVED******REMOVED***`, events.ContainerEventType)
+	expectedFiltersJSON := fmt.Sprintf(`{"type":{"%s":true}}`, events.ContainerEventType)
 
-	eventsCases := []struct ***REMOVED***
+	eventsCases := []struct {
 		options             types.EventsOptions
 		events              []events.Message
 		expectedEvents      map[string]bool
 		expectedQueryParams map[string]string
-	***REMOVED******REMOVED***
-		***REMOVED***
-			options: types.EventsOptions***REMOVED***
+	}{
+		{
+			options: types.EventsOptions{
 				Filters: filters,
-			***REMOVED***,
-			expectedQueryParams: map[string]string***REMOVED***
+			},
+			expectedQueryParams: map[string]string{
 				"filters": expectedFiltersJSON,
-			***REMOVED***,
-			events:         []events.Message***REMOVED******REMOVED***,
+			},
+			events:         []events.Message{},
 			expectedEvents: make(map[string]bool),
-		***REMOVED***,
-		***REMOVED***
-			options: types.EventsOptions***REMOVED***
+		},
+		{
+			options: types.EventsOptions{
 				Filters: filters,
-			***REMOVED***,
-			expectedQueryParams: map[string]string***REMOVED***
+			},
+			expectedQueryParams: map[string]string{
 				"filters": expectedFiltersJSON,
-			***REMOVED***,
-			events: []events.Message***REMOVED***
-				***REMOVED***
+			},
+			events: []events.Message{
+				{
 					Type:   "container",
 					ID:     "1",
 					Action: "create",
-				***REMOVED***,
-				***REMOVED***
+				},
+				{
 					Type:   "container",
 					ID:     "2",
 					Action: "die",
-				***REMOVED***,
-				***REMOVED***
+				},
+				{
 					Type:   "container",
 					ID:     "3",
 					Action: "create",
-				***REMOVED***,
-			***REMOVED***,
-			expectedEvents: map[string]bool***REMOVED***
+				},
+			},
+			expectedEvents: map[string]bool{
 				"1": true,
 				"2": true,
 				"3": true,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+			},
+		},
+	}
 
-	for _, eventsCase := range eventsCases ***REMOVED***
-		client := &Client***REMOVED***
-			client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-				if !strings.HasPrefix(req.URL.Path, expectedURL) ***REMOVED***
+	for _, eventsCase := range eventsCases {
+		client := &Client{
+			client: newMockClient(func(req *http.Request) (*http.Response, error) {
+				if !strings.HasPrefix(req.URL.Path, expectedURL) {
 					return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, req.URL)
-				***REMOVED***
+				}
 				query := req.URL.Query()
 
-				for key, expected := range eventsCase.expectedQueryParams ***REMOVED***
+				for key, expected := range eventsCase.expectedQueryParams {
 					actual := query.Get(key)
-					if actual != expected ***REMOVED***
+					if actual != expected {
 						return nil, fmt.Errorf("%s not set in URL query properly. Expected '%s', got %s", key, expected, actual)
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 
 				buffer := new(bytes.Buffer)
 
-				for _, e := range eventsCase.events ***REMOVED***
+				for _, e := range eventsCase.events {
 					b, _ := json.Marshal(e)
 					buffer.Write(b)
-				***REMOVED***
+				}
 
-				return &http.Response***REMOVED***
+				return &http.Response{
 					StatusCode: http.StatusOK,
 					Body:       ioutil.NopCloser(buffer),
-				***REMOVED***, nil
-			***REMOVED***),
-		***REMOVED***
+				}, nil
+			}),
+		}
 
 		messages, errs := client.Events(context.Background(), eventsCase.options)
 
 	loop:
-		for ***REMOVED***
-			select ***REMOVED***
+		for {
+			select {
 			case err := <-errs:
-				if err != nil && err != io.EOF ***REMOVED***
+				if err != nil && err != io.EOF {
 					t.Fatal(err)
-				***REMOVED***
+				}
 
 				break loop
 			case e := <-messages:
 				_, ok := eventsCase.expectedEvents[e.ID]
-				if !ok ***REMOVED***
+				if !ok {
 					t.Fatalf("event received not expected with action %s & id %s", e.Action, e.ID)
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+				}
+			}
+		}
+	}
+}

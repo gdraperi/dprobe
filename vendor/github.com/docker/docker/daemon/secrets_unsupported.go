@@ -2,6 +2,6 @@
 
 package daemon
 
-func secretsSupported() bool ***REMOVED***
+func secretsSupported() bool {
 	return false
-***REMOVED***
+}

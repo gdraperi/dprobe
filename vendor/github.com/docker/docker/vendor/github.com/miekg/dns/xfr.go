@@ -5,20 +5,20 @@ import (
 )
 
 // Envelope is used when doing a zone transfer with a remote server.
-type Envelope struct ***REMOVED***
+type Envelope struct {
 	RR    []RR  // The set of RRs in the answer section of the xfr reply message.
 	Error error // If something went wrong, this contains the error.
-***REMOVED***
+}
 
 // A Transfer defines parameters that are used during a zone transfer.
-type Transfer struct ***REMOVED***
+type Transfer struct {
 	*Conn
 	DialTimeout    time.Duration     // net.DialTimeout, defaults to 2 seconds
 	ReadTimeout    time.Duration     // net.Conn.SetReadTimeout value for connections, defaults to 2 seconds
 	WriteTimeout   time.Duration     // net.Conn.SetWriteTimeout value for connections, defaults to 2 seconds
 	TsigSecret     map[string]string // Secret(s) for Tsig map[<zonename>]<base64 secret>, zonename must be fully qualified
 	tsigTimersOnly bool
-***REMOVED***
+}
 
 // Think we need to away to stop the transfer
 
@@ -27,135 +27,135 @@ type Transfer struct ***REMOVED***
 // of a Dialer for a Transfer, you can do so by specifying the attributes
 // in the Transfer.Conn:
 //
-//	d := net.Dialer***REMOVED***LocalAddr: transfer_source***REMOVED***
+//	d := net.Dialer{LocalAddr: transfer_source}
 //	con, err := d.Dial("tcp", master)
-//	dnscon := &dns.Conn***REMOVED***Conn:con***REMOVED***
-//	transfer = &dns.Transfer***REMOVED***Conn: dnscon***REMOVED***
+//	dnscon := &dns.Conn{Conn:con}
+//	transfer = &dns.Transfer{Conn: dnscon}
 //	channel, err := transfer.In(message, master)
 //
-func (t *Transfer) In(q *Msg, a string) (env chan *Envelope, err error) ***REMOVED***
+func (t *Transfer) In(q *Msg, a string) (env chan *Envelope, err error) {
 	timeout := dnsTimeout
-	if t.DialTimeout != 0 ***REMOVED***
+	if t.DialTimeout != 0 {
 		timeout = t.DialTimeout
-	***REMOVED***
-	if t.Conn == nil ***REMOVED***
+	}
+	if t.Conn == nil {
 		t.Conn, err = DialTimeout("tcp", a, timeout)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
-	if err := t.WriteMsg(q); err != nil ***REMOVED***
+		}
+	}
+	if err := t.WriteMsg(q); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	env = make(chan *Envelope)
-	go func() ***REMOVED***
-		if q.Question[0].Qtype == TypeAXFR ***REMOVED***
+	go func() {
+		if q.Question[0].Qtype == TypeAXFR {
 			go t.inAxfr(q.Id, env)
 			return
-		***REMOVED***
-		if q.Question[0].Qtype == TypeIXFR ***REMOVED***
+		}
+		if q.Question[0].Qtype == TypeIXFR {
 			go t.inIxfr(q.Id, env)
 			return
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 	return env, nil
-***REMOVED***
+}
 
-func (t *Transfer) inAxfr(id uint16, c chan *Envelope) ***REMOVED***
+func (t *Transfer) inAxfr(id uint16, c chan *Envelope) {
 	first := true
 	defer t.Close()
 	defer close(c)
 	timeout := dnsTimeout
-	if t.ReadTimeout != 0 ***REMOVED***
+	if t.ReadTimeout != 0 {
 		timeout = t.ReadTimeout
-	***REMOVED***
-	for ***REMOVED***
+	}
+	for {
 		t.Conn.SetReadDeadline(time.Now().Add(timeout))
 		in, err := t.ReadMsg()
-		if err != nil ***REMOVED***
-			c <- &Envelope***REMOVED***nil, err***REMOVED***
+		if err != nil {
+			c <- &Envelope{nil, err}
 			return
-		***REMOVED***
-		if id != in.Id ***REMOVED***
-			c <- &Envelope***REMOVED***in.Answer, ErrId***REMOVED***
+		}
+		if id != in.Id {
+			c <- &Envelope{in.Answer, ErrId}
 			return
-		***REMOVED***
-		if first ***REMOVED***
-			if !isSOAFirst(in) ***REMOVED***
-				c <- &Envelope***REMOVED***in.Answer, ErrSoa***REMOVED***
+		}
+		if first {
+			if !isSOAFirst(in) {
+				c <- &Envelope{in.Answer, ErrSoa}
 				return
-			***REMOVED***
+			}
 			first = !first
 			// only one answer that is SOA, receive more
-			if len(in.Answer) == 1 ***REMOVED***
+			if len(in.Answer) == 1 {
 				t.tsigTimersOnly = true
-				c <- &Envelope***REMOVED***in.Answer, nil***REMOVED***
+				c <- &Envelope{in.Answer, nil}
 				continue
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
-		if !first ***REMOVED***
+		if !first {
 			t.tsigTimersOnly = true // Subsequent envelopes use this.
-			if isSOALast(in) ***REMOVED***
-				c <- &Envelope***REMOVED***in.Answer, nil***REMOVED***
+			if isSOALast(in) {
+				c <- &Envelope{in.Answer, nil}
 				return
-			***REMOVED***
-			c <- &Envelope***REMOVED***in.Answer, nil***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+			c <- &Envelope{in.Answer, nil}
+		}
+	}
+}
 
-func (t *Transfer) inIxfr(id uint16, c chan *Envelope) ***REMOVED***
+func (t *Transfer) inIxfr(id uint16, c chan *Envelope) {
 	serial := uint32(0) // The first serial seen is the current server serial
 	first := true
 	defer t.Close()
 	defer close(c)
 	timeout := dnsTimeout
-	if t.ReadTimeout != 0 ***REMOVED***
+	if t.ReadTimeout != 0 {
 		timeout = t.ReadTimeout
-	***REMOVED***
-	for ***REMOVED***
+	}
+	for {
 		t.SetReadDeadline(time.Now().Add(timeout))
 		in, err := t.ReadMsg()
-		if err != nil ***REMOVED***
-			c <- &Envelope***REMOVED***nil, err***REMOVED***
+		if err != nil {
+			c <- &Envelope{nil, err}
 			return
-		***REMOVED***
-		if id != in.Id ***REMOVED***
-			c <- &Envelope***REMOVED***in.Answer, ErrId***REMOVED***
+		}
+		if id != in.Id {
+			c <- &Envelope{in.Answer, ErrId}
 			return
-		***REMOVED***
-		if first ***REMOVED***
+		}
+		if first {
 			// A single SOA RR signals "no changes"
-			if len(in.Answer) == 1 && isSOAFirst(in) ***REMOVED***
-				c <- &Envelope***REMOVED***in.Answer, nil***REMOVED***
+			if len(in.Answer) == 1 && isSOAFirst(in) {
+				c <- &Envelope{in.Answer, nil}
 				return
-			***REMOVED***
+			}
 
 			// Check if the returned answer is ok
-			if !isSOAFirst(in) ***REMOVED***
-				c <- &Envelope***REMOVED***in.Answer, ErrSoa***REMOVED***
+			if !isSOAFirst(in) {
+				c <- &Envelope{in.Answer, ErrSoa}
 				return
-			***REMOVED***
+			}
 			// This serial is important
 			serial = in.Answer[0].(*SOA).Serial
 			first = !first
-		***REMOVED***
+		}
 
 		// Now we need to check each message for SOA records, to see what we need to do
-		if !first ***REMOVED***
+		if !first {
 			t.tsigTimersOnly = true
 			// If the last record in the IXFR contains the servers' SOA,  we should quit
-			if v, ok := in.Answer[len(in.Answer)-1].(*SOA); ok ***REMOVED***
-				if v.Serial == serial ***REMOVED***
-					c <- &Envelope***REMOVED***in.Answer, nil***REMOVED***
+			if v, ok := in.Answer[len(in.Answer)-1].(*SOA); ok {
+				if v.Serial == serial {
+					c <- &Envelope{in.Answer, nil}
 					return
-				***REMOVED***
-			***REMOVED***
-			c <- &Envelope***REMOVED***in.Answer, nil***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+				}
+			}
+			c <- &Envelope{in.Answer, nil}
+		}
+	}
+}
 
 // Out performs an outgoing transfer with the client connecting in w.
 // Basic use pattern:
@@ -163,82 +163,82 @@ func (t *Transfer) inIxfr(id uint16, c chan *Envelope) ***REMOVED***
 //	ch := make(chan *dns.Envelope)
 //	tr := new(dns.Transfer)
 //	tr.Out(w, r, ch)
-//	c <- &dns.Envelope***REMOVED***RR: []dns.RR***REMOVED***soa, rr1, rr2, rr3, soa***REMOVED******REMOVED***
+//	c <- &dns.Envelope{RR: []dns.RR{soa, rr1, rr2, rr3, soa}}
 //	close(ch)
 //	w.Hijack()
 //	// w.Close() // Client closes connection
 //
 // The server is responsible for sending the correct sequence of RRs through the
 // channel ch.
-func (t *Transfer) Out(w ResponseWriter, q *Msg, ch chan *Envelope) error ***REMOVED***
-	for x := range ch ***REMOVED***
+func (t *Transfer) Out(w ResponseWriter, q *Msg, ch chan *Envelope) error {
+	for x := range ch {
 		r := new(Msg)
 		// Compress?
 		r.SetReply(q)
 		r.Authoritative = true
 		// assume it fits TODO(miek): fix
 		r.Answer = append(r.Answer, x.RR...)
-		if err := w.WriteMsg(r); err != nil ***REMOVED***
+		if err := w.WriteMsg(r); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	w.TsigTimersOnly(true)
 	return nil
-***REMOVED***
+}
 
 // ReadMsg reads a message from the transfer connection t.
-func (t *Transfer) ReadMsg() (*Msg, error) ***REMOVED***
+func (t *Transfer) ReadMsg() (*Msg, error) {
 	m := new(Msg)
 	p := make([]byte, MaxMsgSize)
 	n, err := t.Read(p)
-	if err != nil && n == 0 ***REMOVED***
+	if err != nil && n == 0 {
 		return nil, err
-	***REMOVED***
+	}
 	p = p[:n]
-	if err := m.Unpack(p); err != nil ***REMOVED***
+	if err := m.Unpack(p); err != nil {
 		return nil, err
-	***REMOVED***
-	if ts := m.IsTsig(); ts != nil && t.TsigSecret != nil ***REMOVED***
-		if _, ok := t.TsigSecret[ts.Hdr.Name]; !ok ***REMOVED***
+	}
+	if ts := m.IsTsig(); ts != nil && t.TsigSecret != nil {
+		if _, ok := t.TsigSecret[ts.Hdr.Name]; !ok {
 			return m, ErrSecret
-		***REMOVED***
+		}
 		// Need to work on the original message p, as that was used to calculate the tsig.
 		err = TsigVerify(p, t.TsigSecret[ts.Hdr.Name], t.tsigRequestMAC, t.tsigTimersOnly)
 		t.tsigRequestMAC = ts.MAC
-	***REMOVED***
+	}
 	return m, err
-***REMOVED***
+}
 
 // WriteMsg writes a message through the transfer connection t.
-func (t *Transfer) WriteMsg(m *Msg) (err error) ***REMOVED***
+func (t *Transfer) WriteMsg(m *Msg) (err error) {
 	var out []byte
-	if ts := m.IsTsig(); ts != nil && t.TsigSecret != nil ***REMOVED***
-		if _, ok := t.TsigSecret[ts.Hdr.Name]; !ok ***REMOVED***
+	if ts := m.IsTsig(); ts != nil && t.TsigSecret != nil {
+		if _, ok := t.TsigSecret[ts.Hdr.Name]; !ok {
 			return ErrSecret
-		***REMOVED***
+		}
 		out, t.tsigRequestMAC, err = TsigGenerate(m, t.TsigSecret[ts.Hdr.Name], t.tsigRequestMAC, t.tsigTimersOnly)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		out, err = m.Pack()
-	***REMOVED***
-	if err != nil ***REMOVED***
+	}
+	if err != nil {
 		return err
-	***REMOVED***
-	if _, err = t.Write(out); err != nil ***REMOVED***
+	}
+	if _, err = t.Write(out); err != nil {
 		return err
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func isSOAFirst(in *Msg) bool ***REMOVED***
-	if len(in.Answer) > 0 ***REMOVED***
+func isSOAFirst(in *Msg) bool {
+	if len(in.Answer) > 0 {
 		return in.Answer[0].Header().Rrtype == TypeSOA
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
-func isSOALast(in *Msg) bool ***REMOVED***
-	if len(in.Answer) > 0 ***REMOVED***
+func isSOALast(in *Msg) bool {
+	if len(in.Answer) > 0 {
 		return in.Answer[len(in.Answer)-1].Header().Rrtype == TypeSOA
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}

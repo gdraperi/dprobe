@@ -4,13 +4,13 @@ import "golang.org/x/sys/unix"
 
 // Returns a []byte slice if the xattr is set and nil otherwise
 // Requires path and its attribute as arguments
-func Lgetxattr(path string, attr string) ([]byte, error) ***REMOVED***
+func Lgetxattr(path string, attr string) ([]byte, error) {
 	var sz int
 	// Start with a 128 length byte array
 	dest := make([]byte, 128)
 	sz, errno := unix.Lgetxattr(path, attr, dest)
 
-	switch ***REMOVED***
+	switch {
 	case errno == unix.ENODATA:
 		return nil, errno
 	case errno == unix.ENOTSUP:
@@ -19,17 +19,17 @@ func Lgetxattr(path string, attr string) ([]byte, error) ***REMOVED***
 		// 128 byte array might just not be good enough,
 		// A dummy buffer is used to get the real size
 		// of the xattrs on disk
-		sz, errno = unix.Lgetxattr(path, attr, []byte***REMOVED******REMOVED***)
-		if errno != nil ***REMOVED***
+		sz, errno = unix.Lgetxattr(path, attr, []byte{})
+		if errno != nil {
 			return nil, errno
-		***REMOVED***
+		}
 		dest = make([]byte, sz)
 		sz, errno = unix.Lgetxattr(path, attr, dest)
-		if errno != nil ***REMOVED***
+		if errno != nil {
 			return nil, errno
-		***REMOVED***
+		}
 	case errno != nil:
 		return nil, errno
-	***REMOVED***
+	}
 	return dest[:sz], nil
-***REMOVED***
+}

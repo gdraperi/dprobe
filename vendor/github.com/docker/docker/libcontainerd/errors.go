@@ -6,8 +6,8 @@ import (
 	"github.com/docker/docker/errdefs"
 )
 
-func newNotFoundError(err string) error ***REMOVED*** return errdefs.NotFound(errors.New(err)) ***REMOVED***
+func newNotFoundError(err string) error { return errdefs.NotFound(errors.New(err)) }
 
-func newInvalidParameterError(err string) error ***REMOVED*** return errdefs.InvalidParameter(errors.New(err)) ***REMOVED***
+func newInvalidParameterError(err string) error { return errdefs.InvalidParameter(errors.New(err)) }
 
-func newConflictError(err string) error ***REMOVED*** return errdefs.Conflict(errors.New(err)) ***REMOVED***
+func newConflictError(err string) error { return errdefs.Conflict(errors.New(err)) }

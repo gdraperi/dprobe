@@ -13,53 +13,53 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestNodeInspectError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestNodeInspectError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
-	***REMOVED***
+	}
 
 	_, _, err := client.NodeInspectWithRaw(context.Background(), "nothing")
-	if err == nil || err.Error() != "Error response from daemon: Server error" ***REMOVED***
+	if err == nil || err.Error() != "Error response from daemon: Server error" {
 		t.Fatalf("expected a Server Error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestNodeInspectNodeNotFound(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestNodeInspectNodeNotFound(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusNotFound, "Server error")),
-	***REMOVED***
+	}
 
 	_, _, err := client.NodeInspectWithRaw(context.Background(), "unknown")
-	if err == nil || !IsErrNotFound(err) ***REMOVED***
+	if err == nil || !IsErrNotFound(err) {
 		t.Fatalf("expected a nodeNotFoundError error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestNodeInspect(t *testing.T) ***REMOVED***
+func TestNodeInspect(t *testing.T) {
 	expectedURL := "/nodes/node_id"
-	client := &Client***REMOVED***
-		client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-			if !strings.HasPrefix(req.URL.Path, expectedURL) ***REMOVED***
+	client := &Client{
+		client: newMockClient(func(req *http.Request) (*http.Response, error) {
+			if !strings.HasPrefix(req.URL.Path, expectedURL) {
 				return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, req.URL)
-			***REMOVED***
-			content, err := json.Marshal(swarm.Node***REMOVED***
+			}
+			content, err := json.Marshal(swarm.Node{
 				ID: "node_id",
-			***REMOVED***)
-			if err != nil ***REMOVED***
+			})
+			if err != nil {
 				return nil, err
-			***REMOVED***
-			return &http.Response***REMOVED***
+			}
+			return &http.Response{
 				StatusCode: http.StatusOK,
 				Body:       ioutil.NopCloser(bytes.NewReader(content)),
-			***REMOVED***, nil
-		***REMOVED***),
-	***REMOVED***
+			}, nil
+		}),
+	}
 
 	nodeInspect, _, err := client.NodeInspectWithRaw(context.Background(), "node_id")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if nodeInspect.ID != "node_id" ***REMOVED***
+	}
+	if nodeInspect.ID != "node_id" {
 		t.Fatalf("expected `node_id`, got %s", nodeInspect.ID)
-	***REMOVED***
-***REMOVED***
+	}
+}

@@ -21,31 +21,31 @@ import (
 	"os"
 )
 
-type Logger interface ***REMOVED***
-	Debug(v ...interface***REMOVED******REMOVED***)
-	Debugf(format string, v ...interface***REMOVED******REMOVED***)
+type Logger interface {
+	Debug(v ...interface{})
+	Debugf(format string, v ...interface{})
 
-	Error(v ...interface***REMOVED******REMOVED***)
-	Errorf(format string, v ...interface***REMOVED******REMOVED***)
+	Error(v ...interface{})
+	Errorf(format string, v ...interface{})
 
-	Info(v ...interface***REMOVED******REMOVED***)
-	Infof(format string, v ...interface***REMOVED******REMOVED***)
+	Info(v ...interface{})
+	Infof(format string, v ...interface{})
 
-	Warning(v ...interface***REMOVED******REMOVED***)
-	Warningf(format string, v ...interface***REMOVED******REMOVED***)
+	Warning(v ...interface{})
+	Warningf(format string, v ...interface{})
 
-	Fatal(v ...interface***REMOVED******REMOVED***)
-	Fatalf(format string, v ...interface***REMOVED******REMOVED***)
+	Fatal(v ...interface{})
+	Fatalf(format string, v ...interface{})
 
-	Panic(v ...interface***REMOVED******REMOVED***)
-	Panicf(format string, v ...interface***REMOVED******REMOVED***)
-***REMOVED***
+	Panic(v ...interface{})
+	Panicf(format string, v ...interface{})
+}
 
-func SetLogger(l Logger) ***REMOVED*** raftLogger = l ***REMOVED***
+func SetLogger(l Logger) { raftLogger = l }
 
 var (
-	defaultLogger = &DefaultLogger***REMOVED***Logger: log.New(os.Stderr, "raft", log.LstdFlags)***REMOVED***
-	discardLogger = &DefaultLogger***REMOVED***Logger: log.New(ioutil.Discard, "", 0)***REMOVED***
+	defaultLogger = &DefaultLogger{Logger: log.New(os.Stderr, "raft", log.LstdFlags)}
+	discardLogger = &DefaultLogger{Logger: log.New(ioutil.Discard, "", 0)}
 	raftLogger    = Logger(defaultLogger)
 )
 
@@ -54,73 +54,73 @@ const (
 )
 
 // DefaultLogger is a default implementation of the Logger interface.
-type DefaultLogger struct ***REMOVED***
+type DefaultLogger struct {
 	*log.Logger
 	debug bool
-***REMOVED***
+}
 
-func (l *DefaultLogger) EnableTimestamps() ***REMOVED***
+func (l *DefaultLogger) EnableTimestamps() {
 	l.SetFlags(l.Flags() | log.Ldate | log.Ltime)
-***REMOVED***
+}
 
-func (l *DefaultLogger) EnableDebug() ***REMOVED***
+func (l *DefaultLogger) EnableDebug() {
 	l.debug = true
-***REMOVED***
+}
 
-func (l *DefaultLogger) Debug(v ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if l.debug ***REMOVED***
+func (l *DefaultLogger) Debug(v ...interface{}) {
+	if l.debug {
 		l.Output(calldepth, header("DEBUG", fmt.Sprint(v...)))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (l *DefaultLogger) Debugf(format string, v ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if l.debug ***REMOVED***
+func (l *DefaultLogger) Debugf(format string, v ...interface{}) {
+	if l.debug {
 		l.Output(calldepth, header("DEBUG", fmt.Sprintf(format, v...)))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (l *DefaultLogger) Info(v ...interface***REMOVED******REMOVED***) ***REMOVED***
+func (l *DefaultLogger) Info(v ...interface{}) {
 	l.Output(calldepth, header("INFO", fmt.Sprint(v...)))
-***REMOVED***
+}
 
-func (l *DefaultLogger) Infof(format string, v ...interface***REMOVED******REMOVED***) ***REMOVED***
+func (l *DefaultLogger) Infof(format string, v ...interface{}) {
 	l.Output(calldepth, header("INFO", fmt.Sprintf(format, v...)))
-***REMOVED***
+}
 
-func (l *DefaultLogger) Error(v ...interface***REMOVED******REMOVED***) ***REMOVED***
+func (l *DefaultLogger) Error(v ...interface{}) {
 	l.Output(calldepth, header("ERROR", fmt.Sprint(v...)))
-***REMOVED***
+}
 
-func (l *DefaultLogger) Errorf(format string, v ...interface***REMOVED******REMOVED***) ***REMOVED***
+func (l *DefaultLogger) Errorf(format string, v ...interface{}) {
 	l.Output(calldepth, header("ERROR", fmt.Sprintf(format, v...)))
-***REMOVED***
+}
 
-func (l *DefaultLogger) Warning(v ...interface***REMOVED******REMOVED***) ***REMOVED***
+func (l *DefaultLogger) Warning(v ...interface{}) {
 	l.Output(calldepth, header("WARN", fmt.Sprint(v...)))
-***REMOVED***
+}
 
-func (l *DefaultLogger) Warningf(format string, v ...interface***REMOVED******REMOVED***) ***REMOVED***
+func (l *DefaultLogger) Warningf(format string, v ...interface{}) {
 	l.Output(calldepth, header("WARN", fmt.Sprintf(format, v...)))
-***REMOVED***
+}
 
-func (l *DefaultLogger) Fatal(v ...interface***REMOVED******REMOVED***) ***REMOVED***
+func (l *DefaultLogger) Fatal(v ...interface{}) {
 	l.Output(calldepth, header("FATAL", fmt.Sprint(v...)))
 	os.Exit(1)
-***REMOVED***
+}
 
-func (l *DefaultLogger) Fatalf(format string, v ...interface***REMOVED******REMOVED***) ***REMOVED***
+func (l *DefaultLogger) Fatalf(format string, v ...interface{}) {
 	l.Output(calldepth, header("FATAL", fmt.Sprintf(format, v...)))
 	os.Exit(1)
-***REMOVED***
+}
 
-func (l *DefaultLogger) Panic(v ...interface***REMOVED******REMOVED***) ***REMOVED***
+func (l *DefaultLogger) Panic(v ...interface{}) {
 	l.Logger.Panic(v)
-***REMOVED***
+}
 
-func (l *DefaultLogger) Panicf(format string, v ...interface***REMOVED******REMOVED***) ***REMOVED***
+func (l *DefaultLogger) Panicf(format string, v ...interface{}) {
 	l.Logger.Panicf(format, v...)
-***REMOVED***
+}
 
-func header(lvl, msg string) string ***REMOVED***
+func header(lvl, msg string) string {
 	return fmt.Sprintf("%s: %s", lvl, msg)
-***REMOVED***
+}

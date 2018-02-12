@@ -17,17 +17,17 @@ var (
 	kernelAlign int
 )
 
-func init() ***REMOVED***
+func init() {
 	i := uint32(1)
 	b := (*[4]byte)(unsafe.Pointer(&i))
-	if b[0] == 1 ***REMOVED***
+	if b[0] == 1 {
 		NativeEndian = binary.LittleEndian
-	***REMOVED*** else ***REMOVED***
+	} else {
 		NativeEndian = binary.BigEndian
-	***REMOVED***
+	}
 	kernelAlign = probeProtocolStack()
-***REMOVED***
+}
 
-func roundup(l int) int ***REMOVED***
+func roundup(l int) int {
 	return (l + kernelAlign - 1) & ^(kernelAlign - 1)
-***REMOVED***
+}

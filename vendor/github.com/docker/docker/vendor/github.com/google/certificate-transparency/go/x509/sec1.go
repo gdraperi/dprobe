@@ -23,63 +23,63 @@ const ecPrivKeyVersion = 1
 //   SEC1 - http://www.secg.org/download/aid-780/sec1-v2.pdf
 // Per RFC5915 the NamedCurveOID is marked as ASN.1 OPTIONAL, however in
 // most cases it is not.
-type ecPrivateKey struct ***REMOVED***
+type ecPrivateKey struct {
 	Version       int
 	PrivateKey    []byte
 	NamedCurveOID asn1.ObjectIdentifier `asn1:"optional,explicit,tag:0"`
 	PublicKey     asn1.BitString        `asn1:"optional,explicit,tag:1"`
-***REMOVED***
+}
 
 // ParseECPrivateKey parses an ASN.1 Elliptic Curve Private Key Structure.
-func ParseECPrivateKey(der []byte) (key *ecdsa.PrivateKey, err error) ***REMOVED***
+func ParseECPrivateKey(der []byte) (key *ecdsa.PrivateKey, err error) {
 	return parseECPrivateKey(nil, der)
-***REMOVED***
+}
 
 // MarshalECPrivateKey marshals an EC private key into ASN.1, DER format.
-func MarshalECPrivateKey(key *ecdsa.PrivateKey) ([]byte, error) ***REMOVED***
+func MarshalECPrivateKey(key *ecdsa.PrivateKey) ([]byte, error) {
 	oid, ok := oidFromNamedCurve(key.Curve)
-	if !ok ***REMOVED***
+	if !ok {
 		return nil, errors.New("x509: unknown elliptic curve")
-	***REMOVED***
-	return asn1.Marshal(ecPrivateKey***REMOVED***
+	}
+	return asn1.Marshal(ecPrivateKey{
 		Version:       1,
 		PrivateKey:    key.D.Bytes(),
 		NamedCurveOID: oid,
-		PublicKey:     asn1.BitString***REMOVED***Bytes: elliptic.Marshal(key.Curve, key.X, key.Y)***REMOVED***,
-	***REMOVED***)
-***REMOVED***
+		PublicKey:     asn1.BitString{Bytes: elliptic.Marshal(key.Curve, key.X, key.Y)},
+	})
+}
 
 // parseECPrivateKey parses an ASN.1 Elliptic Curve Private Key Structure.
 // The OID for the named curve may be provided from another source (such as
 // the PKCS8 container) - if it is provided then use this instead of the OID
 // that may exist in the EC private key structure.
-func parseECPrivateKey(namedCurveOID *asn1.ObjectIdentifier, der []byte) (key *ecdsa.PrivateKey, err error) ***REMOVED***
+func parseECPrivateKey(namedCurveOID *asn1.ObjectIdentifier, der []byte) (key *ecdsa.PrivateKey, err error) {
 	var privKey ecPrivateKey
-	if _, err := asn1.Unmarshal(der, &privKey); err != nil ***REMOVED***
+	if _, err := asn1.Unmarshal(der, &privKey); err != nil {
 		return nil, errors.New("x509: failed to parse EC private key: " + err.Error())
-	***REMOVED***
-	if privKey.Version != ecPrivKeyVersion ***REMOVED***
+	}
+	if privKey.Version != ecPrivKeyVersion {
 		return nil, fmt.Errorf("x509: unknown EC private key version %d", privKey.Version)
-	***REMOVED***
+	}
 
 	var curve elliptic.Curve
-	if namedCurveOID != nil ***REMOVED***
+	if namedCurveOID != nil {
 		curve = namedCurveFromOID(*namedCurveOID)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		curve = namedCurveFromOID(privKey.NamedCurveOID)
-	***REMOVED***
-	if curve == nil ***REMOVED***
+	}
+	if curve == nil {
 		return nil, errors.New("x509: unknown elliptic curve")
-	***REMOVED***
+	}
 
 	k := new(big.Int).SetBytes(privKey.PrivateKey)
-	if k.Cmp(curve.Params().N) >= 0 ***REMOVED***
+	if k.Cmp(curve.Params().N) >= 0 {
 		return nil, errors.New("x509: invalid elliptic curve private key value")
-	***REMOVED***
+	}
 	priv := new(ecdsa.PrivateKey)
 	priv.Curve = curve
 	priv.D = k
 	priv.X, priv.Y = curve.ScalarBaseMult(privKey.PrivateKey)
 
 	return priv, nil
-***REMOVED***
+}

@@ -1,10 +1,10 @@
 package main
 
-type X struct ***REMOVED***
+type X struct {
 	a,b,c int
-***REMOVED***
+}
 
-func main() ***REMOVED***
+func main() {
 	var X *X
 	X.
-***REMOVED***
+}

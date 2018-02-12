@@ -10,16 +10,16 @@ import (
 	"testing"
 )
 
-type s struct***REMOVED******REMOVED***
+type s struct{}
 
-func (s) String() string ***REMOVED*** return "lazy string" ***REMOVED***
+func (s) String() string { return "lazy string" }
 
 // TestReset checks whether all the fields are zeroed after reset.
-func TestReset(t *testing.T) ***REMOVED***
+func TestReset(t *testing.T) {
 	tr := New("foo", "bar")
-	tr.LazyLog(s***REMOVED******REMOVED***, false)
+	tr.LazyLog(s{}, false)
 	tr.LazyPrintf("%d", 1)
-	tr.SetRecycler(func(_ interface***REMOVED******REMOVED***) ***REMOVED******REMOVED***)
+	tr.SetRecycler(func(_ interface{}) {})
 	tr.SetTraceInfo(3, 4)
 	tr.SetMaxEvents(100)
 	tr.SetError()
@@ -27,13 +27,13 @@ func TestReset(t *testing.T) ***REMOVED***
 
 	tr.(*trace).reset()
 
-	if !reflect.DeepEqual(tr, new(trace)) ***REMOVED***
+	if !reflect.DeepEqual(tr, new(trace)) {
 		t.Errorf("reset didn't clear all fields: %+v", tr)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // TestResetLog checks whether all the fields are zeroed after reset.
-func TestResetLog(t *testing.T) ***REMOVED***
+func TestResetLog(t *testing.T) {
 	el := NewEventLog("foo", "bar")
 	el.Printf("message")
 	el.Errorf("error")
@@ -41,138 +41,138 @@ func TestResetLog(t *testing.T) ***REMOVED***
 
 	el.(*eventLog).reset()
 
-	if !reflect.DeepEqual(el, new(eventLog)) ***REMOVED***
+	if !reflect.DeepEqual(el, new(eventLog)) {
 		t.Errorf("reset didn't clear all fields: %+v", el)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestAuthRequest(t *testing.T) ***REMOVED***
-	testCases := []struct ***REMOVED***
+func TestAuthRequest(t *testing.T) {
+	testCases := []struct {
 		host string
 		want bool
-	***REMOVED******REMOVED***
-		***REMOVED***host: "192.168.23.1", want: false***REMOVED***,
-		***REMOVED***host: "192.168.23.1:8080", want: false***REMOVED***,
-		***REMOVED***host: "malformed remote addr", want: false***REMOVED***,
-		***REMOVED***host: "localhost", want: true***REMOVED***,
-		***REMOVED***host: "localhost:8080", want: true***REMOVED***,
-		***REMOVED***host: "127.0.0.1", want: true***REMOVED***,
-		***REMOVED***host: "127.0.0.1:8080", want: true***REMOVED***,
-		***REMOVED***host: "::1", want: true***REMOVED***,
-		***REMOVED***host: "[::1]:8080", want: true***REMOVED***,
-	***REMOVED***
-	for _, tt := range testCases ***REMOVED***
-		req := &http.Request***REMOVED***RemoteAddr: tt.host***REMOVED***
+	}{
+		{host: "192.168.23.1", want: false},
+		{host: "192.168.23.1:8080", want: false},
+		{host: "malformed remote addr", want: false},
+		{host: "localhost", want: true},
+		{host: "localhost:8080", want: true},
+		{host: "127.0.0.1", want: true},
+		{host: "127.0.0.1:8080", want: true},
+		{host: "::1", want: true},
+		{host: "[::1]:8080", want: true},
+	}
+	for _, tt := range testCases {
+		req := &http.Request{RemoteAddr: tt.host}
 		any, sensitive := AuthRequest(req)
-		if any != tt.want || sensitive != tt.want ***REMOVED***
+		if any != tt.want || sensitive != tt.want {
 			t.Errorf("AuthRequest(%q) = %t, %t; want %t, %t", tt.host, any, sensitive, tt.want, tt.want)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // TestParseTemplate checks that all templates used by this package are valid
 // as they are parsed on first usage
-func TestParseTemplate(t *testing.T) ***REMOVED***
-	if tmpl := distTmpl(); tmpl == nil ***REMOVED***
+func TestParseTemplate(t *testing.T) {
+	if tmpl := distTmpl(); tmpl == nil {
 		t.Error("invalid template returned from distTmpl()")
-	***REMOVED***
-	if tmpl := pageTmpl(); tmpl == nil ***REMOVED***
+	}
+	if tmpl := pageTmpl(); tmpl == nil {
 		t.Error("invalid template returned from pageTmpl()")
-	***REMOVED***
-	if tmpl := eventsTmpl(); tmpl == nil ***REMOVED***
+	}
+	if tmpl := eventsTmpl(); tmpl == nil {
 		t.Error("invalid template returned from eventsTmpl()")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func benchmarkTrace(b *testing.B, maxEvents, numEvents int) ***REMOVED***
+func benchmarkTrace(b *testing.B, maxEvents, numEvents int) {
 	numSpans := (b.N + numEvents + 1) / numEvents
 
-	for i := 0; i < numSpans; i++ ***REMOVED***
+	for i := 0; i < numSpans; i++ {
 		tr := New("test", "test")
 		tr.SetMaxEvents(maxEvents)
-		for j := 0; j < numEvents; j++ ***REMOVED***
+		for j := 0; j < numEvents; j++ {
 			tr.LazyPrintf("%d", j)
-		***REMOVED***
+		}
 		tr.Finish()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func BenchmarkTrace_Default_2(b *testing.B) ***REMOVED***
+func BenchmarkTrace_Default_2(b *testing.B) {
 	benchmarkTrace(b, 0, 2)
-***REMOVED***
+}
 
-func BenchmarkTrace_Default_10(b *testing.B) ***REMOVED***
+func BenchmarkTrace_Default_10(b *testing.B) {
 	benchmarkTrace(b, 0, 10)
-***REMOVED***
+}
 
-func BenchmarkTrace_Default_100(b *testing.B) ***REMOVED***
+func BenchmarkTrace_Default_100(b *testing.B) {
 	benchmarkTrace(b, 0, 100)
-***REMOVED***
+}
 
-func BenchmarkTrace_Default_1000(b *testing.B) ***REMOVED***
+func BenchmarkTrace_Default_1000(b *testing.B) {
 	benchmarkTrace(b, 0, 1000)
-***REMOVED***
+}
 
-func BenchmarkTrace_Default_10000(b *testing.B) ***REMOVED***
+func BenchmarkTrace_Default_10000(b *testing.B) {
 	benchmarkTrace(b, 0, 10000)
-***REMOVED***
+}
 
-func BenchmarkTrace_10_2(b *testing.B) ***REMOVED***
+func BenchmarkTrace_10_2(b *testing.B) {
 	benchmarkTrace(b, 10, 2)
-***REMOVED***
+}
 
-func BenchmarkTrace_10_10(b *testing.B) ***REMOVED***
+func BenchmarkTrace_10_10(b *testing.B) {
 	benchmarkTrace(b, 10, 10)
-***REMOVED***
+}
 
-func BenchmarkTrace_10_100(b *testing.B) ***REMOVED***
+func BenchmarkTrace_10_100(b *testing.B) {
 	benchmarkTrace(b, 10, 100)
-***REMOVED***
+}
 
-func BenchmarkTrace_10_1000(b *testing.B) ***REMOVED***
+func BenchmarkTrace_10_1000(b *testing.B) {
 	benchmarkTrace(b, 10, 1000)
-***REMOVED***
+}
 
-func BenchmarkTrace_10_10000(b *testing.B) ***REMOVED***
+func BenchmarkTrace_10_10000(b *testing.B) {
 	benchmarkTrace(b, 10, 10000)
-***REMOVED***
+}
 
-func BenchmarkTrace_100_2(b *testing.B) ***REMOVED***
+func BenchmarkTrace_100_2(b *testing.B) {
 	benchmarkTrace(b, 100, 2)
-***REMOVED***
+}
 
-func BenchmarkTrace_100_10(b *testing.B) ***REMOVED***
+func BenchmarkTrace_100_10(b *testing.B) {
 	benchmarkTrace(b, 100, 10)
-***REMOVED***
+}
 
-func BenchmarkTrace_100_100(b *testing.B) ***REMOVED***
+func BenchmarkTrace_100_100(b *testing.B) {
 	benchmarkTrace(b, 100, 100)
-***REMOVED***
+}
 
-func BenchmarkTrace_100_1000(b *testing.B) ***REMOVED***
+func BenchmarkTrace_100_1000(b *testing.B) {
 	benchmarkTrace(b, 100, 1000)
-***REMOVED***
+}
 
-func BenchmarkTrace_100_10000(b *testing.B) ***REMOVED***
+func BenchmarkTrace_100_10000(b *testing.B) {
 	benchmarkTrace(b, 100, 10000)
-***REMOVED***
+}
 
-func BenchmarkTrace_1000_2(b *testing.B) ***REMOVED***
+func BenchmarkTrace_1000_2(b *testing.B) {
 	benchmarkTrace(b, 1000, 2)
-***REMOVED***
+}
 
-func BenchmarkTrace_1000_10(b *testing.B) ***REMOVED***
+func BenchmarkTrace_1000_10(b *testing.B) {
 	benchmarkTrace(b, 1000, 10)
-***REMOVED***
+}
 
-func BenchmarkTrace_1000_100(b *testing.B) ***REMOVED***
+func BenchmarkTrace_1000_100(b *testing.B) {
 	benchmarkTrace(b, 1000, 100)
-***REMOVED***
+}
 
-func BenchmarkTrace_1000_1000(b *testing.B) ***REMOVED***
+func BenchmarkTrace_1000_1000(b *testing.B) {
 	benchmarkTrace(b, 1000, 1000)
-***REMOVED***
+}
 
-func BenchmarkTrace_1000_10000(b *testing.B) ***REMOVED***
+func BenchmarkTrace_1000_10000(b *testing.B) {
 	benchmarkTrace(b, 1000, 10000)
-***REMOVED***
+}

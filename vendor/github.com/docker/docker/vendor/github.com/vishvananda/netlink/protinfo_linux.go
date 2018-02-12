@@ -7,11 +7,11 @@ import (
 	"github.com/vishvananda/netlink/nl"
 )
 
-func LinkGetProtinfo(link Link) (Protinfo, error) ***REMOVED***
+func LinkGetProtinfo(link Link) (Protinfo, error) {
 	return pkgHandle.LinkGetProtinfo(link)
-***REMOVED***
+}
 
-func (h *Handle) LinkGetProtinfo(link Link) (Protinfo, error) ***REMOVED***
+func (h *Handle) LinkGetProtinfo(link Link) (Protinfo, error) {
 	base := link.Attrs()
 	h.ensureIndex(base)
 	var pi Protinfo
@@ -19,39 +19,39 @@ func (h *Handle) LinkGetProtinfo(link Link) (Protinfo, error) ***REMOVED***
 	msg := nl.NewIfInfomsg(syscall.AF_BRIDGE)
 	req.AddData(msg)
 	msgs, err := req.Execute(syscall.NETLINK_ROUTE, 0)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return pi, err
-	***REMOVED***
+	}
 
-	for _, m := range msgs ***REMOVED***
+	for _, m := range msgs {
 		ans := nl.DeserializeIfInfomsg(m)
-		if int(ans.Index) != base.Index ***REMOVED***
+		if int(ans.Index) != base.Index {
 			continue
-		***REMOVED***
+		}
 		attrs, err := nl.ParseRouteAttr(m[ans.Len():])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return pi, err
-		***REMOVED***
-		for _, attr := range attrs ***REMOVED***
-			if attr.Attr.Type != syscall.IFLA_PROTINFO|syscall.NLA_F_NESTED ***REMOVED***
+		}
+		for _, attr := range attrs {
+			if attr.Attr.Type != syscall.IFLA_PROTINFO|syscall.NLA_F_NESTED {
 				continue
-			***REMOVED***
+			}
 			infos, err := nl.ParseRouteAttr(attr.Value)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return pi, err
-			***REMOVED***
+			}
 			pi = *parseProtinfo(infos)
 
 			return pi, nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return pi, fmt.Errorf("Device with index %d not found", base.Index)
-***REMOVED***
+}
 
-func parseProtinfo(infos []syscall.NetlinkRouteAttr) *Protinfo ***REMOVED***
+func parseProtinfo(infos []syscall.NetlinkRouteAttr) *Protinfo {
 	var pi Protinfo
-	for _, info := range infos ***REMOVED***
-		switch info.Attr.Type ***REMOVED***
+	for _, info := range infos {
+		switch info.Attr.Type {
 		case nl.IFLA_BRPORT_MODE:
 			pi.Hairpin = byteToBool(info.Value[0])
 		case nl.IFLA_BRPORT_GUARD:
@@ -68,7 +68,7 @@ func parseProtinfo(infos []syscall.NetlinkRouteAttr) *Protinfo ***REMOVED***
 			pi.ProxyArp = byteToBool(info.Value[0])
 		case nl.IFLA_BRPORT_PROXYARP_WIFI:
 			pi.ProxyArpWiFi = byteToBool(info.Value[0])
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return &pi
-***REMOVED***
+}

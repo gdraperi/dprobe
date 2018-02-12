@@ -9,27 +9,27 @@ import (
 
 // HumanDuration returns a human-readable approximation of a duration
 // (eg. "About a minute", "4 hours ago", etc.).
-func HumanDuration(d time.Duration) string ***REMOVED***
-	if seconds := int(d.Seconds()); seconds < 1 ***REMOVED***
+func HumanDuration(d time.Duration) string {
+	if seconds := int(d.Seconds()); seconds < 1 {
 		return "Less than a second"
-	***REMOVED*** else if seconds == 1 ***REMOVED***
+	} else if seconds == 1 {
 		return "1 second"
-	***REMOVED*** else if seconds < 60 ***REMOVED***
+	} else if seconds < 60 {
 		return fmt.Sprintf("%d seconds", seconds)
-	***REMOVED*** else if minutes := int(d.Minutes()); minutes == 1 ***REMOVED***
+	} else if minutes := int(d.Minutes()); minutes == 1 {
 		return "About a minute"
-	***REMOVED*** else if minutes < 46 ***REMOVED***
+	} else if minutes < 46 {
 		return fmt.Sprintf("%d minutes", minutes)
-	***REMOVED*** else if hours := int(d.Hours() + 0.5); hours == 1 ***REMOVED***
+	} else if hours := int(d.Hours() + 0.5); hours == 1 {
 		return "About an hour"
-	***REMOVED*** else if hours < 48 ***REMOVED***
+	} else if hours < 48 {
 		return fmt.Sprintf("%d hours", hours)
-	***REMOVED*** else if hours < 24*7*2 ***REMOVED***
+	} else if hours < 24*7*2 {
 		return fmt.Sprintf("%d days", hours/24)
-	***REMOVED*** else if hours < 24*30*2 ***REMOVED***
+	} else if hours < 24*30*2 {
 		return fmt.Sprintf("%d weeks", hours/24/7)
-	***REMOVED*** else if hours < 24*365*2 ***REMOVED***
+	} else if hours < 24*365*2 {
 		return fmt.Sprintf("%d months", hours/24/30)
-	***REMOVED***
+	}
 	return fmt.Sprintf("%d years", int(d.Hours())/24/365)
-***REMOVED***
+}

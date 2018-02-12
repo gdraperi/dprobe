@@ -37,7 +37,7 @@ const (
 )
 
 // A sockOpt represents a binding for sticky socket option.
-type sockOpt struct ***REMOVED***
+type sockOpt struct {
 	socket.Option
 	typ int // hint for option value type; optional
-***REMOVED***
+}

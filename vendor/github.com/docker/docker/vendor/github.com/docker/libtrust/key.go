@@ -13,7 +13,7 @@ import (
 )
 
 // PublicKey is a generic interface for a Public Key.
-type PublicKey interface ***REMOVED***
+type PublicKey interface {
 	// KeyType returns the key type for this key. For elliptic curve keys,
 	// this value should be "EC". For RSA keys, this value should be "RSA".
 	KeyType() string
@@ -40,12 +40,12 @@ type PublicKey interface ***REMOVED***
 	PEMBlock() (*pem.Block, error)
 	// The string representation of a key is its key type and ID.
 	String() string
-	AddExtendedField(string, interface***REMOVED******REMOVED***)
-	GetExtendedField(string) interface***REMOVED******REMOVED***
-***REMOVED***
+	AddExtendedField(string, interface{})
+	GetExtendedField(string) interface{}
+}
 
 // PrivateKey is a generic interface for a Private Key.
-type PrivateKey interface ***REMOVED***
+type PrivateKey interface {
 	// A PrivateKey contains all fields and methods of a PublicKey of the
 	// same type. The MarshalJSON method also outputs the private key as a
 	// JSON Web Key, and the PEMBlock method outputs the private key as a
@@ -63,129 +63,129 @@ type PrivateKey interface ***REMOVED***
 	// crypto.PublicKey for use with other standard library operations. The
 	// type is either *rsa.PublicKey or *ecdsa.PublicKey
 	CryptoPrivateKey() crypto.PrivateKey
-***REMOVED***
+}
 
 // FromCryptoPublicKey returns a libtrust PublicKey representation of the given
 // *ecdsa.PublicKey or *rsa.PublicKey. Returns a non-nil error when the given
 // key is of an unsupported type.
-func FromCryptoPublicKey(cryptoPublicKey crypto.PublicKey) (PublicKey, error) ***REMOVED***
-	switch cryptoPublicKey := cryptoPublicKey.(type) ***REMOVED***
+func FromCryptoPublicKey(cryptoPublicKey crypto.PublicKey) (PublicKey, error) {
+	switch cryptoPublicKey := cryptoPublicKey.(type) {
 	case *ecdsa.PublicKey:
 		return fromECPublicKey(cryptoPublicKey)
 	case *rsa.PublicKey:
 		return fromRSAPublicKey(cryptoPublicKey), nil
 	default:
 		return nil, fmt.Errorf("public key type %T is not supported", cryptoPublicKey)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // FromCryptoPrivateKey returns a libtrust PrivateKey representation of the given
 // *ecdsa.PrivateKey or *rsa.PrivateKey. Returns a non-nil error when the given
 // key is of an unsupported type.
-func FromCryptoPrivateKey(cryptoPrivateKey crypto.PrivateKey) (PrivateKey, error) ***REMOVED***
-	switch cryptoPrivateKey := cryptoPrivateKey.(type) ***REMOVED***
+func FromCryptoPrivateKey(cryptoPrivateKey crypto.PrivateKey) (PrivateKey, error) {
+	switch cryptoPrivateKey := cryptoPrivateKey.(type) {
 	case *ecdsa.PrivateKey:
 		return fromECPrivateKey(cryptoPrivateKey)
 	case *rsa.PrivateKey:
 		return fromRSAPrivateKey(cryptoPrivateKey), nil
 	default:
 		return nil, fmt.Errorf("private key type %T is not supported", cryptoPrivateKey)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // UnmarshalPublicKeyPEM parses the PEM encoded data and returns a libtrust
 // PublicKey or an error if there is a problem with the encoding.
-func UnmarshalPublicKeyPEM(data []byte) (PublicKey, error) ***REMOVED***
+func UnmarshalPublicKeyPEM(data []byte) (PublicKey, error) {
 	pemBlock, _ := pem.Decode(data)
-	if pemBlock == nil ***REMOVED***
+	if pemBlock == nil {
 		return nil, errors.New("unable to find PEM encoded data")
-	***REMOVED*** else if pemBlock.Type != "PUBLIC KEY" ***REMOVED***
+	} else if pemBlock.Type != "PUBLIC KEY" {
 		return nil, fmt.Errorf("unable to get PublicKey from PEM type: %s", pemBlock.Type)
-	***REMOVED***
+	}
 
 	return pubKeyFromPEMBlock(pemBlock)
-***REMOVED***
+}
 
 // UnmarshalPublicKeyPEMBundle parses the PEM encoded data as a bundle of
 // PEM blocks appended one after the other and returns a slice of PublicKey
 // objects that it finds.
-func UnmarshalPublicKeyPEMBundle(data []byte) ([]PublicKey, error) ***REMOVED***
-	pubKeys := []PublicKey***REMOVED******REMOVED***
+func UnmarshalPublicKeyPEMBundle(data []byte) ([]PublicKey, error) {
+	pubKeys := []PublicKey{}
 
-	for ***REMOVED***
+	for {
 		var pemBlock *pem.Block
 		pemBlock, data = pem.Decode(data)
-		if pemBlock == nil ***REMOVED***
+		if pemBlock == nil {
 			break
-		***REMOVED*** else if pemBlock.Type != "PUBLIC KEY" ***REMOVED***
+		} else if pemBlock.Type != "PUBLIC KEY" {
 			return nil, fmt.Errorf("unable to get PublicKey from PEM type: %s", pemBlock.Type)
-		***REMOVED***
+		}
 
 		pubKey, err := pubKeyFromPEMBlock(pemBlock)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 
 		pubKeys = append(pubKeys, pubKey)
-	***REMOVED***
+	}
 
 	return pubKeys, nil
-***REMOVED***
+}
 
 // UnmarshalPrivateKeyPEM parses the PEM encoded data and returns a libtrust
 // PrivateKey or an error if there is a problem with the encoding.
-func UnmarshalPrivateKeyPEM(data []byte) (PrivateKey, error) ***REMOVED***
+func UnmarshalPrivateKeyPEM(data []byte) (PrivateKey, error) {
 	pemBlock, _ := pem.Decode(data)
-	if pemBlock == nil ***REMOVED***
+	if pemBlock == nil {
 		return nil, errors.New("unable to find PEM encoded data")
-	***REMOVED***
+	}
 
 	var key PrivateKey
 
-	switch ***REMOVED***
+	switch {
 	case pemBlock.Type == "RSA PRIVATE KEY":
 		rsaPrivateKey, err := x509.ParsePKCS1PrivateKey(pemBlock.Bytes)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, fmt.Errorf("unable to decode RSA Private Key PEM data: %s", err)
-		***REMOVED***
+		}
 		key = fromRSAPrivateKey(rsaPrivateKey)
 	case pemBlock.Type == "EC PRIVATE KEY":
 		ecPrivateKey, err := x509.ParseECPrivateKey(pemBlock.Bytes)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, fmt.Errorf("unable to decode EC Private Key PEM data: %s", err)
-		***REMOVED***
+		}
 		key, err = fromECPrivateKey(ecPrivateKey)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 	default:
 		return nil, fmt.Errorf("unable to get PrivateKey from PEM type: %s", pemBlock.Type)
-	***REMOVED***
+	}
 
 	addPEMHeadersToKey(pemBlock, key.PublicKey())
 
 	return key, nil
-***REMOVED***
+}
 
 // UnmarshalPublicKeyJWK unmarshals the given JSON Web Key into a generic
 // Public Key to be used with libtrust.
-func UnmarshalPublicKeyJWK(data []byte) (PublicKey, error) ***REMOVED***
-	jwk := make(map[string]interface***REMOVED******REMOVED***)
+func UnmarshalPublicKeyJWK(data []byte) (PublicKey, error) {
+	jwk := make(map[string]interface{})
 
 	err := json.Unmarshal(data, &jwk)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf(
 			"decoding JWK Public Key JSON data: %s\n", err,
 		)
-	***REMOVED***
+	}
 
 	// Get the Key Type value.
 	kty, err := stringFromMap(jwk, "kty")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("JWK Public Key type: %s", err)
-	***REMOVED***
+	}
 
-	switch ***REMOVED***
+	switch {
 	case kty == "EC":
 		// Call out to unmarshal EC public key.
 		return ecPublicKeyFromMap(jwk)
@@ -196,49 +196,49 @@ func UnmarshalPublicKeyJWK(data []byte) (PublicKey, error) ***REMOVED***
 		return nil, fmt.Errorf(
 			"JWK Public Key type not supported: %q\n", kty,
 		)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // UnmarshalPublicKeyJWKSet parses the JSON encoded data as a JSON Web Key Set
 // and returns a slice of Public Key objects.
-func UnmarshalPublicKeyJWKSet(data []byte) ([]PublicKey, error) ***REMOVED***
+func UnmarshalPublicKeyJWKSet(data []byte) ([]PublicKey, error) {
 	rawKeys, err := loadJSONKeySetRaw(data)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	pubKeys := make([]PublicKey, 0, len(rawKeys))
 
-	for _, rawKey := range rawKeys ***REMOVED***
+	for _, rawKey := range rawKeys {
 		pubKey, err := UnmarshalPublicKeyJWK(rawKey)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		pubKeys = append(pubKeys, pubKey)
-	***REMOVED***
+	}
 
 	return pubKeys, nil
-***REMOVED***
+}
 
 // UnmarshalPrivateKeyJWK unmarshals the given JSON Web Key into a generic
 // Private Key to be used with libtrust.
-func UnmarshalPrivateKeyJWK(data []byte) (PrivateKey, error) ***REMOVED***
-	jwk := make(map[string]interface***REMOVED******REMOVED***)
+func UnmarshalPrivateKeyJWK(data []byte) (PrivateKey, error) {
+	jwk := make(map[string]interface{})
 
 	err := json.Unmarshal(data, &jwk)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf(
 			"decoding JWK Private Key JSON data: %s\n", err,
 		)
-	***REMOVED***
+	}
 
 	// Get the Key Type value.
 	kty, err := stringFromMap(jwk, "kty")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("JWK Private Key type: %s", err)
-	***REMOVED***
+	}
 
-	switch ***REMOVED***
+	switch {
 	case kty == "EC":
 		// Call out to unmarshal EC private key.
 		return ecPrivateKeyFromMap(jwk)
@@ -249,5 +249,5 @@ func UnmarshalPrivateKeyJWK(data []byte) (PrivateKey, error) ***REMOVED***
 		return nil, fmt.Errorf(
 			"JWK Private Key type not supported: %q\n", kty,
 		)
-	***REMOVED***
-***REMOVED***
+	}
+}

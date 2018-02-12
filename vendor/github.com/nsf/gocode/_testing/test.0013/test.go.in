@@ -1,6 +1,6 @@
 package main
 
-func main() ***REMOVED***
+func main() {
 	var a, b int
 	add := a + b
 	sub := a - b
@@ -25,4 +25,4 @@ func main() ***REMOVED***
 	logor := c || d
 	logand := c && d
 	
-***REMOVED***
+}

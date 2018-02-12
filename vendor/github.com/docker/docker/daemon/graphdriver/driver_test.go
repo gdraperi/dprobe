@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestIsEmptyDir(t *testing.T) ***REMOVED***
+func TestIsEmptyDir(t *testing.T) {
 	tmp, err := ioutil.TempDir("", "test-is-empty-dir")
 	require.NoError(t, err)
 	defer os.RemoveAll(tmp)
@@ -34,4 +34,4 @@ func TestIsEmptyDir(t *testing.T) ***REMOVED***
 	require.NoError(t, err)
 	empty = isEmptyDir(d)
 	assert.False(t, empty)
-***REMOVED***
+}

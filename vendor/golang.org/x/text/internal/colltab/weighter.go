@@ -5,7 +5,7 @@
 package colltab // import "golang.org/x/text/internal/colltab"
 
 // A Weighter can be used as a source for Collator and Searcher.
-type Weighter interface ***REMOVED***
+type Weighter interface {
 	// Start finds the start of the segment that includes position p.
 	Start(p int, b []byte) int
 
@@ -28,4 +28,4 @@ type Weighter interface ***REMOVED***
 
 	// Top returns the highest variable primary value.
 	Top() uint32
-***REMOVED***
+}

@@ -5,7 +5,7 @@ import (
 )
 
 // JSONLog is a log message, typically a single entry from a given log stream.
-type JSONLog struct ***REMOVED***
+type JSONLog struct {
 	// Log is the log message
 	Log string `json:"log,omitempty"`
 	// Stream is the log source
@@ -14,12 +14,12 @@ type JSONLog struct ***REMOVED***
 	Created time.Time `json:"time"`
 	// Attrs is the list of extra attributes provided by the user
 	Attrs map[string]string `json:"attrs,omitempty"`
-***REMOVED***
+}
 
 // Reset all fields to their zero value.
-func (jl *JSONLog) Reset() ***REMOVED***
+func (jl *JSONLog) Reset() {
 	jl.Log = ""
 	jl.Stream = ""
-	jl.Created = time.Time***REMOVED******REMOVED***
+	jl.Created = time.Time{}
 	jl.Attrs = make(map[string]string)
-***REMOVED***
+}

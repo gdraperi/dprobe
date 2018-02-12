@@ -7,7 +7,7 @@
 package route
 
 // An InterfaceMessage represents an interface message.
-type InterfaceMessage struct ***REMOVED***
+type InterfaceMessage struct {
 	Version int    // message version
 	Type    int    // message type
 	Flags   int    // interface flags
@@ -17,10 +17,10 @@ type InterfaceMessage struct ***REMOVED***
 
 	extOff int    // offset of header extension
 	raw    []byte // raw message
-***REMOVED***
+}
 
 // An InterfaceAddrMessage represents an interface address message.
-type InterfaceAddrMessage struct ***REMOVED***
+type InterfaceAddrMessage struct {
 	Version int    // message version
 	Type    int    // message type
 	Flags   int    // interface flags
@@ -28,14 +28,14 @@ type InterfaceAddrMessage struct ***REMOVED***
 	Addrs   []Addr // addresses
 
 	raw []byte // raw message
-***REMOVED***
+}
 
 // Sys implements the Sys method of Message interface.
-func (m *InterfaceAddrMessage) Sys() []Sys ***REMOVED*** return nil ***REMOVED***
+func (m *InterfaceAddrMessage) Sys() []Sys { return nil }
 
 // An InterfaceMulticastAddrMessage represents an interface multicast
 // address message.
-type InterfaceMulticastAddrMessage struct ***REMOVED***
+type InterfaceMulticastAddrMessage struct {
 	Version int    // message version
 	Type    int    // messsage type
 	Flags   int    // interface flags
@@ -43,14 +43,14 @@ type InterfaceMulticastAddrMessage struct ***REMOVED***
 	Addrs   []Addr // addresses
 
 	raw []byte // raw message
-***REMOVED***
+}
 
 // Sys implements the Sys method of Message interface.
-func (m *InterfaceMulticastAddrMessage) Sys() []Sys ***REMOVED*** return nil ***REMOVED***
+func (m *InterfaceMulticastAddrMessage) Sys() []Sys { return nil }
 
 // An InterfaceAnnounceMessage represents an interface announcement
 // message.
-type InterfaceAnnounceMessage struct ***REMOVED***
+type InterfaceAnnounceMessage struct {
 	Version int    // message version
 	Type    int    // message type
 	Index   int    // interface index
@@ -58,7 +58,7 @@ type InterfaceAnnounceMessage struct ***REMOVED***
 	What    int    // what type of announcement
 
 	raw []byte // raw message
-***REMOVED***
+}
 
 // Sys implements the Sys method of Message interface.
-func (m *InterfaceAnnounceMessage) Sys() []Sys ***REMOVED*** return nil ***REMOVED***
+func (m *InterfaceAnnounceMessage) Sys() []Sys { return nil }

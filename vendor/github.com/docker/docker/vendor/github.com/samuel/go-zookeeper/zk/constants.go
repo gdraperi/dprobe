@@ -43,14 +43,14 @@ const (
 )
 
 var (
-	eventNames = map[EventType]string***REMOVED***
+	eventNames = map[EventType]string{
 		EventNodeCreated:         "EventNodeCreated",
 		EventNodeDeleted:         "EventNodeDeleted",
 		EventNodeDataChanged:     "EventNodeDataChanged",
 		EventNodeChildrenChanged: "EventNodeChildrenChanged",
 		EventSession:             "EventSession",
 		EventNotWatching:         "EventNotWatching",
-	***REMOVED***
+	}
 )
 
 const (
@@ -74,7 +74,7 @@ const (
 )
 
 var (
-	stateNames = map[State]string***REMOVED***
+	stateNames = map[State]string{
 		StateUnknown:           "StateUnknown",
 		StateDisconnected:      "StateDisconnected",
 		StateSyncConnected:     "StateSyncConnected",
@@ -85,17 +85,17 @@ var (
 		StateConnecting:        "StateConnecting",
 		StateConnected:         "StateConnected",
 		StateHasSession:        "StateHasSession",
-	***REMOVED***
+	}
 )
 
 type State int32
 
-func (s State) String() string ***REMOVED***
-	if name := stateNames[s]; name != "" ***REMOVED***
+func (s State) String() string {
+	if name := stateNames[s]; name != "" {
 		return name
-	***REMOVED***
+	}
 	return "Unknown"
-***REMOVED***
+}
 
 type ErrCode int32
 
@@ -117,7 +117,7 @@ var (
 	ErrSessionMoved            = errors.New("zk: session moved to another server, so operation is ignored")
 
 	// ErrInvalidCallback         = errors.New("zk: invalid callback specified")
-	errCodeToError = map[ErrCode]error***REMOVED***
+	errCodeToError = map[ErrCode]error{
 		0:                          nil,
 		errAPIError:                ErrAPIError,
 		errNoNode:                  ErrNoNode,
@@ -133,15 +133,15 @@ var (
 		errClosing:      ErrClosing,
 		errNothing:      ErrNothing,
 		errSessionMoved: ErrSessionMoved,
-	***REMOVED***
+	}
 )
 
-func (e ErrCode) toError() error ***REMOVED***
-	if err, ok := errCodeToError[e]; ok ***REMOVED***
+func (e ErrCode) toError() error {
+	if err, ok := errCodeToError[e]; ok {
 		return err
-	***REMOVED***
+	}
 	return ErrUnknown
-***REMOVED***
+}
 
 const (
 	errOk = 0
@@ -183,8 +183,8 @@ const (
 )
 
 var (
-	emptyPassword = []byte***REMOVED***0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0***REMOVED***
-	opNames       = map[int32]string***REMOVED***
+	emptyPassword = []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+	opNames       = map[int32]string{
 		opNotify:       "notify",
 		opCreate:       "create",
 		opDelete:       "delete",
@@ -204,27 +204,27 @@ var (
 		opSetWatches:   "setWatches",
 
 		opWatcherEvent: "watcherEvent",
-	***REMOVED***
+	}
 )
 
 type EventType int32
 
-func (t EventType) String() string ***REMOVED***
-	if name := eventNames[t]; name != "" ***REMOVED***
+func (t EventType) String() string {
+	if name := eventNames[t]; name != "" {
 		return name
-	***REMOVED***
+	}
 	return "Unknown"
-***REMOVED***
+}
 
 // Mode is used to build custom server modes (leader|follower|standalone).
 type Mode uint8
 
-func (m Mode) String() string ***REMOVED***
-	if name := modeNames[m]; name != "" ***REMOVED***
+func (m Mode) String() string {
+	if name := modeNames[m]; name != "" {
 		return name
-	***REMOVED***
+	}
 	return "unknown"
-***REMOVED***
+}
 
 const (
 	ModeUnknown    Mode = iota
@@ -234,9 +234,9 @@ const (
 )
 
 var (
-	modeNames = map[Mode]string***REMOVED***
+	modeNames = map[Mode]string{
 		ModeLeader:     "leader",
 		ModeFollower:   "follower",
 		ModeStandalone: "standalone",
-	***REMOVED***
+	}
 )

@@ -17,30 +17,30 @@ import (
 // an array of runtime spec mounts, not container mounts. Then no need to
 // do multiple transitions.
 
-func (daemon *Daemon) setupMounts(c *container.Container) ([]container.Mount, error) ***REMOVED***
+func (daemon *Daemon) setupMounts(c *container.Container) ([]container.Mount, error) {
 	var mnts []container.Mount
-	for _, mount := range c.MountPoints ***REMOVED*** // type is volume.MountPoint
-		if err := daemon.lazyInitializeVolume(c.ID, mount); err != nil ***REMOVED***
+	for _, mount := range c.MountPoints { // type is volume.MountPoint
+		if err := daemon.lazyInitializeVolume(c.ID, mount); err != nil {
 			return nil, err
-		***REMOVED***
-		s, err := mount.Setup(c.MountLabel, idtools.IDPair***REMOVED***0, 0***REMOVED***, nil)
-		if err != nil ***REMOVED***
+		}
+		s, err := mount.Setup(c.MountLabel, idtools.IDPair{0, 0}, nil)
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 
-		mnts = append(mnts, container.Mount***REMOVED***
+		mnts = append(mnts, container.Mount{
 			Source:      s,
 			Destination: mount.Destination,
 			Writable:    mount.RW,
-		***REMOVED***)
-	***REMOVED***
+		})
+	}
 
 	sort.Sort(mounts(mnts))
 	return mnts, nil
-***REMOVED***
+}
 
 // setBindModeIfNull is platform specific processing which is a no-op on
 // Windows.
-func setBindModeIfNull(bind *volume.MountPoint) ***REMOVED***
+func setBindModeIfNull(bind *volume.MountPoint) {
 	return
-***REMOVED***
+}

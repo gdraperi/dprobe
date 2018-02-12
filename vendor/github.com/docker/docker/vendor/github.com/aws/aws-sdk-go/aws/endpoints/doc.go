@@ -20,17 +20,17 @@
 //     resolver := endpoints.DefaultResolver()
 //     partitions := resolver.(endpoints.EnumPartitions).Partitions()
 //
-//     for _, p := range partitions ***REMOVED***
+//     for _, p := range partitions {
 //         fmt.Println("Regions for", p.ID())
-//         for id, _ := range p.Regions() ***REMOVED***
+//         for id, _ := range p.Regions() {
 //             fmt.Println("*", id)
-//     ***REMOVED***
+//         }
 //
 //         fmt.Println("Services for", p.ID())
-//         for id, _ := range p.Services() ***REMOVED***
+//         for id, _ := range p.Services() {
 //             fmt.Println("*", id)
-//     ***REMOVED***
-// ***REMOVED***
+//         }
+//     }
 //
 // Using Custom Endpoints
 //
@@ -48,19 +48,19 @@
 // Resolver interface.
 //
 //
-//     myCustomResolver := func(service, region string, optFns ...func(*endpoints.Options)) (endpoints.ResolvedEndpoint, error) ***REMOVED***
-//         if service == endpoints.S3ServiceID ***REMOVED***
-//             return endpoints.ResolvedEndpoint***REMOVED***
+//     myCustomResolver := func(service, region string, optFns ...func(*endpoints.Options)) (endpoints.ResolvedEndpoint, error) {
+//         if service == endpoints.S3ServiceID {
+//             return endpoints.ResolvedEndpoint{
 //                 URL:           "s3.custom.endpoint.com",
 //                 SigningRegion: "custom-signing-region",
-//         ***REMOVED***, nil
-//     ***REMOVED***
+//             }, nil
+//         }
 //
 //         return endpoints.DefaultResolver().EndpointFor(service, region, optFns...)
-// ***REMOVED***
+//     }
 //
-//     sess := session.Must(session.NewSession(&aws.Config***REMOVED***
+//     sess := session.Must(session.NewSession(&aws.Config{
 //         Region:           aws.String("us-west-2"),
 //         EndpointResolver: endpoints.ResolverFunc(myCustomResolver),
-// ***REMOVED***))
+//     }))
 package endpoints

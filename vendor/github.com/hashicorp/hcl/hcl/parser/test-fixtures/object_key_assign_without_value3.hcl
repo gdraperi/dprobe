@@ -1,4 +1,4 @@
-foo ***REMOVED***
+foo {
   bar =
   baz = 7
-***REMOVED***
+}

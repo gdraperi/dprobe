@@ -45,25 +45,25 @@ const (
 )
 
 // NewReader returns a new *Reader that reads from 'r'
-func NewReader(r io.Reader) *Reader ***REMOVED***
+func NewReader(r io.Reader) *Reader {
 	return NewReaderSize(r, DefaultReaderSize)
-***REMOVED***
+}
 
 // NewReaderSize returns a new *Reader that
 // reads from 'r' and has a buffer size 'n'
-func NewReaderSize(r io.Reader, n int) *Reader ***REMOVED***
-	rd := &Reader***REMOVED***
+func NewReaderSize(r io.Reader, n int) *Reader {
+	rd := &Reader{
 		r:    r,
 		data: make([]byte, 0, max(minReaderSize, n)),
-	***REMOVED***
-	if s, ok := r.(io.Seeker); ok ***REMOVED***
+	}
+	if s, ok := r.(io.Seeker); ok {
 		rd.rs = s
-	***REMOVED***
+	}
 	return rd
-***REMOVED***
+}
 
 // Reader is a buffered look-ahead reader
-type Reader struct ***REMOVED***
+type Reader struct {
 	r io.Reader // underlying reader
 
 	// data[n:len(data)] is buffered data; data[len(data):cap(data)] is free buffer space
@@ -74,68 +74,68 @@ type Reader struct ***REMOVED***
 	// if the reader past to NewReader was
 	// also an io.Seeker, this is non-nil
 	rs io.Seeker
-***REMOVED***
+}
 
 // Reset resets the underlying reader
 // and the read buffer.
-func (r *Reader) Reset(rd io.Reader) ***REMOVED***
+func (r *Reader) Reset(rd io.Reader) {
 	r.r = rd
 	r.data = r.data[0:0]
 	r.n = 0
 	r.state = nil
-	if s, ok := rd.(io.Seeker); ok ***REMOVED***
+	if s, ok := rd.(io.Seeker); ok {
 		r.rs = s
-	***REMOVED*** else ***REMOVED***
+	} else {
 		r.rs = nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // more() does one read on the underlying reader
-func (r *Reader) more() ***REMOVED***
+func (r *Reader) more() {
 	// move data backwards so that
 	// the read offset is 0; this way
 	// we can supply the maximum number of
 	// bytes to the reader
-	if r.n != 0 ***REMOVED***
-		if r.n < len(r.data) ***REMOVED***
+	if r.n != 0 {
+		if r.n < len(r.data) {
 			r.data = r.data[:copy(r.data[0:], r.data[r.n:])]
-		***REMOVED*** else ***REMOVED***
+		} else {
 			r.data = r.data[:0]
-		***REMOVED***
+		}
 		r.n = 0
-	***REMOVED***
+	}
 	var a int
 	a, r.state = r.r.Read(r.data[len(r.data):cap(r.data)])
-	if a == 0 && r.state == nil ***REMOVED***
+	if a == 0 && r.state == nil {
 		r.state = io.ErrNoProgress
 		return
-	***REMOVED***
+	}
 	r.data = r.data[:len(r.data)+a]
-***REMOVED***
+}
 
 // pop error
-func (r *Reader) err() (e error) ***REMOVED***
+func (r *Reader) err() (e error) {
 	e, r.state = r.state, nil
 	return
-***REMOVED***
+}
 
 // pop error; EOF -> io.ErrUnexpectedEOF
-func (r *Reader) noEOF() (e error) ***REMOVED***
+func (r *Reader) noEOF() (e error) {
 	e, r.state = r.state, nil
-	if e == io.EOF ***REMOVED***
+	if e == io.EOF {
 		e = io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // buffered bytes
-func (r *Reader) buffered() int ***REMOVED*** return len(r.data) - r.n ***REMOVED***
+func (r *Reader) buffered() int { return len(r.data) - r.n }
 
 // Buffered returns the number of bytes currently in the buffer
-func (r *Reader) Buffered() int ***REMOVED*** return len(r.data) - r.n ***REMOVED***
+func (r *Reader) Buffered() int { return len(r.data) - r.n }
 
 // BufferSize returns the total size of the buffer
-func (r *Reader) BufferSize() int ***REMOVED*** return cap(r.data) ***REMOVED***
+func (r *Reader) BufferSize() int { return cap(r.data) }
 
 // Peek returns the next 'n' buffered bytes,
 // reading from the underlying reader if necessary.
@@ -143,32 +143,32 @@ func (r *Reader) BufferSize() int ***REMOVED*** return cap(r.data) ***REMOVED***
 // if it also returns an error. Peek does not advance
 // the reader. EOF errors are *not* returned as
 // io.ErrUnexpectedEOF.
-func (r *Reader) Peek(n int) ([]byte, error) ***REMOVED***
+func (r *Reader) Peek(n int) ([]byte, error) {
 	// in the degenerate case,
 	// we may need to realloc
 	// (the caller asked for more
 	// bytes than the size of the buffer)
-	if cap(r.data) < n ***REMOVED***
+	if cap(r.data) < n {
 		old := r.data[r.n:]
 		r.data = make([]byte, n+r.buffered())
 		r.data = r.data[:copy(r.data, old)]
 		r.n = 0
-	***REMOVED***
+	}
 
 	// keep filling until
 	// we hit an error or
 	// read enough bytes
-	for r.buffered() < n && r.state == nil ***REMOVED***
+	for r.buffered() < n && r.state == nil {
 		r.more()
-	***REMOVED***
+	}
 
 	// we must have hit an error
-	if r.buffered() < n ***REMOVED***
+	if r.buffered() < n {
 		return r.data[r.n:], r.err()
-	***REMOVED***
+	}
 
 	return r.data[r.n : r.n+n], nil
-***REMOVED***
+}
 
 // Skip moves the reader forward 'n' bytes.
 // Returns the number of bytes skipped and any
@@ -183,35 +183,35 @@ func (r *Reader) Peek(n int) ([]byte, error) ***REMOVED***
 // those rules apply instead. (Many implementations
 // will not return `io.EOF` until the next call
 // to Read.)
-func (r *Reader) Skip(n int) (int, error) ***REMOVED***
+func (r *Reader) Skip(n int) (int, error) {
 
 	// fast path
-	if r.buffered() >= n ***REMOVED***
+	if r.buffered() >= n {
 		r.n += n
 		return n, nil
-	***REMOVED***
+	}
 
 	// use seeker implementation
 	// if we can
-	if r.rs != nil ***REMOVED***
+	if r.rs != nil {
 		return r.skipSeek(n)
-	***REMOVED***
+	}
 
 	// loop on filling
 	// and then erasing
 	o := n
-	for r.buffered() < n && r.state == nil ***REMOVED***
+	for r.buffered() < n && r.state == nil {
 		r.more()
 		// we can skip forward
 		// up to r.buffered() bytes
 		step := min(r.buffered(), n)
 		r.n += step
 		n -= step
-	***REMOVED***
+	}
 	// at this point, n should be
 	// 0 if everything went smoothly
 	return o - n, r.noEOF()
-***REMOVED***
+}
 
 // Next returns the next 'n' bytes in the stream.
 // Unlike Peek, Next advances the reader position.
@@ -222,32 +222,32 @@ func (r *Reader) Skip(n int) (int, error) ***REMOVED***
 // If an the returned slice is less than the
 // length asked for, an error will be returned,
 // and the reader position will not be incremented.
-func (r *Reader) Next(n int) ([]byte, error) ***REMOVED***
+func (r *Reader) Next(n int) ([]byte, error) {
 
 	// in case the buffer is too small
-	if cap(r.data) < n ***REMOVED***
+	if cap(r.data) < n {
 		old := r.data[r.n:]
 		r.data = make([]byte, n+r.buffered())
 		r.data = r.data[:copy(r.data, old)]
 		r.n = 0
-	***REMOVED***
+	}
 
 	// fill at least 'n' bytes
-	for r.buffered() < n && r.state == nil ***REMOVED***
+	for r.buffered() < n && r.state == nil {
 		r.more()
-	***REMOVED***
+	}
 
-	if r.buffered() < n ***REMOVED***
+	if r.buffered() < n {
 		return r.data[r.n:], r.noEOF()
-	***REMOVED***
+	}
 	out := r.data[r.n : r.n+n]
 	r.n += n
 	return out, nil
-***REMOVED***
+}
 
 // skipSeek uses the io.Seeker to seek forward.
 // only call this function when n > r.buffered()
-func (r *Reader) skipSeek(n int) (int, error) ***REMOVED***
+func (r *Reader) skipSeek(n int) (int, error) {
 	o := r.buffered()
 	// first, clear buffer
 	n -= o
@@ -257,123 +257,123 @@ func (r *Reader) skipSeek(n int) (int, error) ***REMOVED***
 	// then seek forward remaning bytes
 	i, err := r.rs.Seek(int64(n), 1)
 	return int(i) + o, err
-***REMOVED***
+}
 
 // Read implements `io.Reader`
-func (r *Reader) Read(b []byte) (int, error) ***REMOVED***
+func (r *Reader) Read(b []byte) (int, error) {
 	// if we have data in the buffer, just
 	// return that.
-	if r.buffered() != 0 ***REMOVED***
+	if r.buffered() != 0 {
 		x := copy(b, r.data[r.n:])
 		r.n += x
 		return x, nil
-	***REMOVED***
+	}
 	var n int
 	// we have no buffered data; determine
 	// whether or not to buffer or call
 	// the underlying reader directly
-	if len(b) >= cap(r.data) ***REMOVED***
+	if len(b) >= cap(r.data) {
 		n, r.state = r.r.Read(b)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		r.more()
 		n = copy(b, r.data)
 		r.n = n
-	***REMOVED***
-	if n == 0 ***REMOVED***
+	}
+	if n == 0 {
 		return 0, r.err()
-	***REMOVED***
+	}
 	return n, nil
-***REMOVED***
+}
 
 // ReadFull attempts to read len(b) bytes into
 // 'b'. It returns the number of bytes read into
 // 'b', and an error if it does not return len(b).
 // EOF is considered an unexpected error.
-func (r *Reader) ReadFull(b []byte) (int, error) ***REMOVED***
+func (r *Reader) ReadFull(b []byte) (int, error) {
 	var n int  // read into b
 	var nn int // scratch
 	l := len(b)
 	// either read buffered data,
 	// or read directly for the underlying
 	// buffer, or fetch more buffered data.
-	for n < l && r.state == nil ***REMOVED***
-		if r.buffered() != 0 ***REMOVED***
+	for n < l && r.state == nil {
+		if r.buffered() != 0 {
 			nn = copy(b[n:], r.data[r.n:])
 			n += nn
 			r.n += nn
-		***REMOVED*** else if l-n > cap(r.data) ***REMOVED***
+		} else if l-n > cap(r.data) {
 			nn, r.state = r.r.Read(b[n:])
 			n += nn
-		***REMOVED*** else ***REMOVED***
+		} else {
 			r.more()
-		***REMOVED***
-	***REMOVED***
-	if n < l ***REMOVED***
+		}
+	}
+	if n < l {
 		return n, r.noEOF()
-	***REMOVED***
+	}
 	return n, nil
-***REMOVED***
+}
 
 // ReadByte implements `io.ByteReader`
-func (r *Reader) ReadByte() (byte, error) ***REMOVED***
-	for r.buffered() < 1 && r.state == nil ***REMOVED***
+func (r *Reader) ReadByte() (byte, error) {
+	for r.buffered() < 1 && r.state == nil {
 		r.more()
-	***REMOVED***
-	if r.buffered() < 1 ***REMOVED***
+	}
+	if r.buffered() < 1 {
 		return 0, r.err()
-	***REMOVED***
+	}
 	b := r.data[r.n]
 	r.n++
 	return b, nil
-***REMOVED***
+}
 
 // WriteTo implements `io.WriterTo`
-func (r *Reader) WriteTo(w io.Writer) (int64, error) ***REMOVED***
+func (r *Reader) WriteTo(w io.Writer) (int64, error) {
 	var (
 		i   int64
 		ii  int
 		err error
 	)
 	// first, clear buffer
-	if r.buffered() > 0 ***REMOVED***
+	if r.buffered() > 0 {
 		ii, err = w.Write(r.data[r.n:])
 		i += int64(ii)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return i, err
-		***REMOVED***
+		}
 		r.data = r.data[0:0]
 		r.n = 0
-	***REMOVED***
-	for r.state == nil ***REMOVED***
+	}
+	for r.state == nil {
 		// here we just do
 		// 1:1 reads and writes
 		r.more()
-		if r.buffered() > 0 ***REMOVED***
+		if r.buffered() > 0 {
 			ii, err = w.Write(r.data)
 			i += int64(ii)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return i, err
-			***REMOVED***
+			}
 			r.data = r.data[0:0]
 			r.n = 0
-		***REMOVED***
-	***REMOVED***
-	if r.state != io.EOF ***REMOVED***
+		}
+	}
+	if r.state != io.EOF {
 		return i, r.err()
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func min(a int, b int) int ***REMOVED***
-	if a < b ***REMOVED***
+func min(a int, b int) int {
+	if a < b {
 		return a
-	***REMOVED***
+	}
 	return b
-***REMOVED***
+}
 
-func max(a int, b int) int ***REMOVED***
-	if a < b ***REMOVED***
+func max(a int, b int) int {
+	if a < b {
 		return b
-	***REMOVED***
+	}
 	return a
-***REMOVED***
+}

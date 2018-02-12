@@ -6,9 +6,9 @@ import (
 )
 
 // NetworkDisconnect disconnects a container from an existent network in the docker host.
-func (cli *Client) NetworkDisconnect(ctx context.Context, networkID, containerID string, force bool) error ***REMOVED***
-	nd := types.NetworkDisconnect***REMOVED***Container: containerID, Force: force***REMOVED***
+func (cli *Client) NetworkDisconnect(ctx context.Context, networkID, containerID string, force bool) error {
+	nd := types.NetworkDisconnect{Container: containerID, Force: force}
 	resp, err := cli.post(ctx, "/networks/"+networkID+"/disconnect", nil, nd, nil)
 	ensureReaderClosed(resp)
 	return err
-***REMOVED***
+}

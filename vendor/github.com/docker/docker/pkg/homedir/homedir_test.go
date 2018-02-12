@@ -5,20 +5,20 @@ import (
 	"testing"
 )
 
-func TestGet(t *testing.T) ***REMOVED***
+func TestGet(t *testing.T) {
 	home := Get()
-	if home == "" ***REMOVED***
+	if home == "" {
 		t.Fatal("returned home directory is empty")
-	***REMOVED***
+	}
 
-	if !filepath.IsAbs(home) ***REMOVED***
+	if !filepath.IsAbs(home) {
 		t.Fatalf("returned path is not absolute: %s", home)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestGetShortcutString(t *testing.T) ***REMOVED***
+func TestGetShortcutString(t *testing.T) {
 	shortcut := GetShortcutString()
-	if shortcut == "" ***REMOVED***
+	if shortcut == "" {
 		t.Fatal("returned shortcut string is empty")
-	***REMOVED***
-***REMOVED***
+	}
+}

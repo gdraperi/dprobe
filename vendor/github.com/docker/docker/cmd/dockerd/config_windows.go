@@ -15,7 +15,7 @@ var (
 )
 
 // installConfigFlags adds flags to the pflag.FlagSet to configure the daemon
-func installConfigFlags(conf *config.Config, flags *pflag.FlagSet) ***REMOVED***
+func installConfigFlags(conf *config.Config, flags *pflag.FlagSet) {
 	// First handle install flags which are consistent cross-platform
 	installCommonConfigFlags(conf, flags)
 
@@ -23,4 +23,4 @@ func installConfigFlags(conf *config.Config, flags *pflag.FlagSet) ***REMOVED***
 	flags.StringVar(&conf.BridgeConfig.FixedCIDR, "fixed-cidr", "", "IPv4 subnet for fixed IPs")
 	flags.StringVarP(&conf.BridgeConfig.Iface, "bridge", "b", "", "Attach containers to a virtual switch")
 	flags.StringVarP(&conf.SocketGroup, "group", "G", "", "Users or groups that can access the named pipe")
-***REMOVED***
+}

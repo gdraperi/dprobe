@@ -20,153 +20,153 @@ type option func(tag language.Tag, f *number.Formatter)
 // func SpellOut() Option
 
 // NoSeparator causes a number to be displayed without grouping separators.
-func NoSeparator() Option ***REMOVED***
-	return func(t language.Tag, f *number.Formatter) ***REMOVED***
-		f.GroupingSize = [2]uint8***REMOVED******REMOVED***
-	***REMOVED***
-***REMOVED***
+func NoSeparator() Option {
+	return func(t language.Tag, f *number.Formatter) {
+		f.GroupingSize = [2]uint8{}
+	}
+}
 
 // MaxIntegerDigits limits the number of integer digits, eliminating the
 // most significant digits.
-func MaxIntegerDigits(max int) Option ***REMOVED***
-	return func(t language.Tag, f *number.Formatter) ***REMOVED***
-		if max >= 1<<8 ***REMOVED***
+func MaxIntegerDigits(max int) Option {
+	return func(t language.Tag, f *number.Formatter) {
+		if max >= 1<<8 {
 			max = (1 << 8) - 1
-		***REMOVED***
+		}
 		f.MaxIntegerDigits = uint8(max)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // MinIntegerDigits specifies the minimum number of integer digits, adding
 // leading zeros when needed.
-func MinIntegerDigits(min int) Option ***REMOVED***
-	return func(t language.Tag, f *number.Formatter) ***REMOVED***
-		if min >= 1<<8 ***REMOVED***
+func MinIntegerDigits(min int) Option {
+	return func(t language.Tag, f *number.Formatter) {
+		if min >= 1<<8 {
 			min = (1 << 8) - 1
-		***REMOVED***
+		}
 		f.MinIntegerDigits = uint8(min)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // MaxFractionDigits specifies the maximum number of fractional digits.
-func MaxFractionDigits(max int) Option ***REMOVED***
-	return func(t language.Tag, f *number.Formatter) ***REMOVED***
-		if max >= 1<<15 ***REMOVED***
+func MaxFractionDigits(max int) Option {
+	return func(t language.Tag, f *number.Formatter) {
+		if max >= 1<<15 {
 			max = (1 << 15) - 1
-		***REMOVED***
+		}
 		f.MaxFractionDigits = int16(max)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // MinFractionDigits specifies the minimum number of fractional digits.
-func MinFractionDigits(min int) Option ***REMOVED***
-	return func(t language.Tag, f *number.Formatter) ***REMOVED***
-		if min >= 1<<8 ***REMOVED***
+func MinFractionDigits(min int) Option {
+	return func(t language.Tag, f *number.Formatter) {
+		if min >= 1<<8 {
 			min = (1 << 8) - 1
-		***REMOVED***
+		}
 		f.MinFractionDigits = uint8(min)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Precision sets the maximum number of significant digits. A negative value
 // means exact.
-func Precision(prec int) Option ***REMOVED***
-	return func(t language.Tag, f *number.Formatter) ***REMOVED***
+func Precision(prec int) Option {
+	return func(t language.Tag, f *number.Formatter) {
 		f.SetPrecision(prec)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Scale simultaneously sets MinFractionDigits and MaxFractionDigits to the
 // given value.
-func Scale(decimals int) Option ***REMOVED***
-	return func(t language.Tag, f *number.Formatter) ***REMOVED***
+func Scale(decimals int) Option {
+	return func(t language.Tag, f *number.Formatter) {
 		f.SetScale(decimals)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // IncrementString sets the incremental value to which numbers should be
 // rounded. For instance: Increment("0.05") will cause 1.44 to round to 1.45.
 // IncrementString also sets scale to the scale of the increment.
-func IncrementString(decimal string) Option ***REMOVED***
+func IncrementString(decimal string) Option {
 	increment := 0
 	scale := 0
 	d := decimal
 	p := 0
-	for ; p < len(d) && '0' <= d[p] && d[p] <= '9'; p++ ***REMOVED***
+	for ; p < len(d) && '0' <= d[p] && d[p] <= '9'; p++ {
 		increment *= 10
 		increment += int(d[p]) - '0'
-	***REMOVED***
-	if p < len(d) && d[p] == '.' ***REMOVED***
-		for p++; p < len(d) && '0' <= d[p] && d[p] <= '9'; p++ ***REMOVED***
+	}
+	if p < len(d) && d[p] == '.' {
+		for p++; p < len(d) && '0' <= d[p] && d[p] <= '9'; p++ {
 			increment *= 10
 			increment += int(d[p]) - '0'
 			scale++
-		***REMOVED***
-	***REMOVED***
-	if p < len(d) ***REMOVED***
+		}
+	}
+	if p < len(d) {
 		increment = 0
 		scale = 0
-	***REMOVED***
-	return func(t language.Tag, f *number.Formatter) ***REMOVED***
+	}
+	return func(t language.Tag, f *number.Formatter) {
 		f.Increment = uint32(increment)
 		f.IncrementScale = uint8(scale)
 		f.SetScale(scale)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func noop(language.Tag, *number.Formatter) ***REMOVED******REMOVED***
+func noop(language.Tag, *number.Formatter) {}
 
 // PatternOverrides allows users to specify alternative patterns for specific
 // languages. The Pattern will be overridden for all languages in a subgroup as
 // well. The function will panic for invalid input. It is best to create this
 // option at startup time.
 // PatternOverrides must be the first Option passed to a formatter.
-func PatternOverrides(patterns map[string]string) Option ***REMOVED***
+func PatternOverrides(patterns map[string]string) Option {
 	// TODO: make it so that it does not have to be the first option.
 	// TODO: use -x-nochild to indicate it does not override child tags.
-	m := map[language.Tag]*number.Pattern***REMOVED******REMOVED***
-	for k, v := range patterns ***REMOVED***
+	m := map[language.Tag]*number.Pattern{}
+	for k, v := range patterns {
 		tag := language.MustParse(k)
 		p, err := number.ParsePattern(v)
-		if err != nil ***REMOVED***
+		if err != nil {
 			panic(fmt.Errorf("number: PatternOverrides: %v", err))
-		***REMOVED***
+		}
 		m[tag] = p
-	***REMOVED***
-	return func(t language.Tag, f *number.Formatter) ***REMOVED***
+	}
+	return func(t language.Tag, f *number.Formatter) {
 		// TODO: Use language grouping relation instead of parent relation.
 		// TODO: Should parent implement the grouping relation?
-		for lang := t; ; lang = t.Parent() ***REMOVED***
-			if p, ok := m[lang]; ok ***REMOVED***
+		for lang := t; ; lang = t.Parent() {
+			if p, ok := m[lang]; ok {
 				f.Pattern = *p
 				break
-			***REMOVED***
-			if lang == language.Und ***REMOVED***
+			}
+			if lang == language.Und {
 				break
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}
 
 // FormatWidth sets the total format width.
-func FormatWidth(n int) Option ***REMOVED***
-	if n <= 0 ***REMOVED***
+func FormatWidth(n int) Option {
+	if n <= 0 {
 		return noop
-	***REMOVED***
-	return func(t language.Tag, f *number.Formatter) ***REMOVED***
+	}
+	return func(t language.Tag, f *number.Formatter) {
 		f.FormatWidth = uint16(n)
-		if f.PadRune == 0 ***REMOVED***
+		if f.PadRune == 0 {
 			f.PadRune = ' '
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // Pad sets the rune to be used for filling up to the format width.
-func Pad(r rune) Option ***REMOVED***
-	return func(t language.Tag, f *number.Formatter) ***REMOVED***
+func Pad(r rune) Option {
+	return func(t language.Tag, f *number.Formatter) {
 		f.PadRune = r
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // TODO:
 // - FormatPosition (using type aliasing?)

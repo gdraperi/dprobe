@@ -29,10 +29,10 @@ var DeadlineExceeded = context.DeadlineExceeded
 //
 // Canceling this context releases resources associated with it, so code should
 // call cancel as soon as the operations running in this Context complete.
-func WithCancel(parent Context) (ctx Context, cancel CancelFunc) ***REMOVED***
+func WithCancel(parent Context) (ctx Context, cancel CancelFunc) {
 	ctx, f := context.WithCancel(parent)
 	return ctx, CancelFunc(f)
-***REMOVED***
+}
 
 // WithDeadline returns a copy of the parent context with the deadline adjusted
 // to be no later than d. If the parent's deadline is already earlier than d,
@@ -43,30 +43,30 @@ func WithCancel(parent Context) (ctx Context, cancel CancelFunc) ***REMOVED***
 //
 // Canceling this context releases resources associated with it, so code should
 // call cancel as soon as the operations running in this Context complete.
-func WithDeadline(parent Context, deadline time.Time) (Context, CancelFunc) ***REMOVED***
+func WithDeadline(parent Context, deadline time.Time) (Context, CancelFunc) {
 	ctx, f := context.WithDeadline(parent, deadline)
 	return ctx, CancelFunc(f)
-***REMOVED***
+}
 
 // WithTimeout returns WithDeadline(parent, time.Now().Add(timeout)).
 //
 // Canceling this context releases resources associated with it, so code should
 // call cancel as soon as the operations running in this Context complete:
 //
-// 	func slowOperationWithTimeout(ctx context.Context) (Result, error) ***REMOVED***
+// 	func slowOperationWithTimeout(ctx context.Context) (Result, error) {
 // 		ctx, cancel := context.WithTimeout(ctx, 100*time.Millisecond)
 // 		defer cancel()  // releases resources if slowOperation completes before timeout elapses
 // 		return slowOperation(ctx)
-// 	***REMOVED***
-func WithTimeout(parent Context, timeout time.Duration) (Context, CancelFunc) ***REMOVED***
+// 	}
+func WithTimeout(parent Context, timeout time.Duration) (Context, CancelFunc) {
 	return WithDeadline(parent, time.Now().Add(timeout))
-***REMOVED***
+}
 
 // WithValue returns a copy of parent in which the value associated with key is
 // val.
 //
 // Use context Values only for request-scoped data that transits processes and
 // APIs, not for passing optional parameters to functions.
-func WithValue(parent Context, key interface***REMOVED******REMOVED***, val interface***REMOVED******REMOVED***) Context ***REMOVED***
+func WithValue(parent Context, key interface{}, val interface{}) Context {
 	return context.WithValue(parent, key, val)
-***REMOVED***
+}

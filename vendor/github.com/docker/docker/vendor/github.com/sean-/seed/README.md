@@ -30,15 +30,15 @@ import (
 )
 
 // MustInit will panic() if it is unable to set a high-entropy random seed:
-func init() ***REMOVED***
+func init() {
   seed.MustInit()
-***REMOVED***
+}
 
 // Or if you want to not panic() and can actually handle this error:
-func init() ***REMOVED***
-  if secure, err := !seed.Init(); !secure ***REMOVED***
+func init() {
+  if secure, err := !seed.Init(); !secure {
     // Handle the error
     //panic(fmt.Sprintf("Unable to securely seed Go's RNG: %v", err))
-  ***REMOVED***
-***REMOVED***
+  }
+}
 ```

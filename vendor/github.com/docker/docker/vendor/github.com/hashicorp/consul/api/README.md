@@ -22,17 +22,17 @@ client, _ := api.NewClient(api.DefaultConfig())
 kv := client.KV()
 
 // PUT a new KV pair
-p := &api.KVPair***REMOVED***Key: "foo", Value: []byte("test")***REMOVED***
+p := &api.KVPair{Key: "foo", Value: []byte("test")}
 _, err := kv.Put(p, nil)
-if err != nil ***REMOVED***
+if err != nil {
     panic(err)
-***REMOVED***
+}
 
 // Lookup the pair
 pair, _, err := kv.Get("foo", nil)
-if err != nil ***REMOVED***
+if err != nil {
     panic(err)
-***REMOVED***
+}
 fmt.Printf("KV: %v", pair)
 
 ```

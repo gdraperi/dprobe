@@ -9,7 +9,7 @@ import (
 
 // Sandbox represents a network sandbox, identified by a specific key.  It
 // holds a list of Interfaces, routes etc, and more can be added dynamically.
-type Sandbox interface ***REMOVED***
+type Sandbox interface {
 	// The path where the network namespace is mounted.
 	Key() string
 
@@ -67,10 +67,10 @@ type Sandbox interface ***REMOVED***
 
 	// restore sandbox
 	Restore(ifsopt map[string][]IfaceOption, routes []*types.StaticRoute, gw net.IP, gw6 net.IP) error
-***REMOVED***
+}
 
 // NeighborOptionSetter interface defines the option setter methods for interface options
-type NeighborOptionSetter interface ***REMOVED***
+type NeighborOptionSetter interface {
 	// LinkName returns an option setter to set the srcName of the link that should
 	// be used in the neighbor entry
 	LinkName(string) NeighOption
@@ -78,10 +78,10 @@ type NeighborOptionSetter interface ***REMOVED***
 	// Family returns an option setter to set the address family for the neighbor
 	// entry. eg. AF_BRIDGE
 	Family(int) NeighOption
-***REMOVED***
+}
 
 // IfaceOptionSetter interface defines the option setter methods for interface options.
-type IfaceOptionSetter interface ***REMOVED***
+type IfaceOptionSetter interface {
 	// Bridge returns an option setter to set if the interface is a bridge.
 	Bridge(bool) IfaceOption
 
@@ -104,12 +104,12 @@ type IfaceOptionSetter interface ***REMOVED***
 
 	// Address returns an option setter to set interface routes.
 	Routes([]*net.IPNet) IfaceOption
-***REMOVED***
+}
 
 // Info represents all possible information that
 // the driver wants to place in the sandbox which includes
 // interfaces, routes and gateway
-type Info interface ***REMOVED***
+type Info interface {
 	// The collection of Interface previously added with the AddInterface
 	// method. Note that this doesn't include network interfaces added in any
 	// other way (such as the default loopback interface which is automatically
@@ -127,14 +127,14 @@ type Info interface ***REMOVED***
 	StaticRoutes() []*types.StaticRoute
 
 	// TODO: Add ip tables etc.
-***REMOVED***
+}
 
 // Interface represents the settings and identity of a network device. It is
 // used as a return type for Network.Link, and it is common practice for the
 // caller to use this information when moving interface SrcName from host
 // namespace to DstName in a different net namespace with the appropriate
 // network settings.
-type Interface interface ***REMOVED***
+type Interface interface {
 	// The name of the interface in the origin network namespace.
 	SrcName() string
 
@@ -168,4 +168,4 @@ type Interface interface ***REMOVED***
 
 	// Statistics returns the statistics for this interface
 	Statistics() (*types.InterfaceStatistics, error)
-***REMOVED***
+}

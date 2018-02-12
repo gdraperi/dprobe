@@ -11,21 +11,21 @@ import (
 	"syscall"
 )
 
-func protocolNotSupported(err error) bool ***REMOVED***
-	switch err := err.(type) ***REMOVED***
+func protocolNotSupported(err error) bool {
+	switch err := err.(type) {
 	case syscall.Errno:
-		switch err ***REMOVED***
+		switch err {
 		case syscall.EPROTONOSUPPORT, syscall.ENOPROTOOPT:
 			return true
-		***REMOVED***
+		}
 	case *os.SyscallError:
-		switch err := err.Err.(type) ***REMOVED***
+		switch err := err.Err.(type) {
 		case syscall.Errno:
-			switch err ***REMOVED***
+			switch err {
 			case syscall.EPROTONOSUPPORT, syscall.ENOPROTOOPT:
 				return true
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return false
-***REMOVED***
+}

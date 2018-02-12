@@ -15,43 +15,43 @@ import (
 	"github.com/pkg/errors"
 )
 
-type parseRequest struct ***REMOVED***
+type parseRequest struct {
 	command    string
 	args       []string
 	attributes map[string]bool
 	flags      *BFlags
 	original   string
-***REMOVED***
+}
 
-func nodeArgs(node *parser.Node) []string ***REMOVED***
-	result := []string***REMOVED******REMOVED***
-	for ; node.Next != nil; node = node.Next ***REMOVED***
+func nodeArgs(node *parser.Node) []string {
+	result := []string{}
+	for ; node.Next != nil; node = node.Next {
 		arg := node.Next
-		if len(arg.Children) == 0 ***REMOVED***
+		if len(arg.Children) == 0 {
 			result = append(result, arg.Value)
-		***REMOVED*** else if len(arg.Children) == 1 ***REMOVED***
+		} else if len(arg.Children) == 1 {
 			//sub command
 			result = append(result, arg.Children[0].Value)
 			result = append(result, nodeArgs(arg.Children[0])...)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return result
-***REMOVED***
+}
 
-func newParseRequestFromNode(node *parser.Node) parseRequest ***REMOVED***
-	return parseRequest***REMOVED***
+func newParseRequestFromNode(node *parser.Node) parseRequest {
+	return parseRequest{
 		command:    node.Value,
 		args:       nodeArgs(node),
 		attributes: node.Attributes,
 		original:   node.Original,
 		flags:      NewBFlagsWithArgs(node.Flags),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // ParseInstruction converts an AST to a typed instruction (either a command or a build stage beginning when encountering a `FROM` statement)
-func ParseInstruction(node *parser.Node) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func ParseInstruction(node *parser.Node) (interface{}, error) {
 	req := newParseRequestFromNode(node)
-	switch node.Value ***REMOVED***
+	switch node.Value {
 	case command.Env:
 		return parseEnv(req)
 	case command.Maintainer:
@@ -88,479 +88,479 @@ func ParseInstruction(node *parser.Node) (interface***REMOVED******REMOVED***, e
 		return parseArg(req)
 	case command.Shell:
 		return parseShell(req)
-	***REMOVED***
+	}
 
-	return nil, &UnknownInstruction***REMOVED***Instruction: node.Value, Line: node.StartLine***REMOVED***
-***REMOVED***
+	return nil, &UnknownInstruction{Instruction: node.Value, Line: node.StartLine}
+}
 
 // ParseCommand converts an AST to a typed Command
-func ParseCommand(node *parser.Node) (Command, error) ***REMOVED***
+func ParseCommand(node *parser.Node) (Command, error) {
 	s, err := ParseInstruction(node)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if c, ok := s.(Command); ok ***REMOVED***
+	}
+	if c, ok := s.(Command); ok {
 		return c, nil
-	***REMOVED***
+	}
 	return nil, errors.Errorf("%T is not a command type", s)
-***REMOVED***
+}
 
 // UnknownInstruction represents an error occurring when a command is unresolvable
-type UnknownInstruction struct ***REMOVED***
+type UnknownInstruction struct {
 	Line        int
 	Instruction string
-***REMOVED***
+}
 
-func (e *UnknownInstruction) Error() string ***REMOVED***
+func (e *UnknownInstruction) Error() string {
 	return fmt.Sprintf("unknown instruction: %s", strings.ToUpper(e.Instruction))
-***REMOVED***
+}
 
 // IsUnknownInstruction checks if the error is an UnknownInstruction or a parseError containing an UnknownInstruction
-func IsUnknownInstruction(err error) bool ***REMOVED***
+func IsUnknownInstruction(err error) bool {
 	_, ok := err.(*UnknownInstruction)
-	if !ok ***REMOVED***
+	if !ok {
 		var pe *parseError
-		if pe, ok = err.(*parseError); ok ***REMOVED***
+		if pe, ok = err.(*parseError); ok {
 			_, ok = pe.inner.(*UnknownInstruction)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return ok
-***REMOVED***
+}
 
-type parseError struct ***REMOVED***
+type parseError struct {
 	inner error
 	node  *parser.Node
-***REMOVED***
+}
 
-func (e *parseError) Error() string ***REMOVED***
+func (e *parseError) Error() string {
 	return fmt.Sprintf("Dockerfile parse error line %d: %v", e.node.StartLine, e.inner.Error())
-***REMOVED***
+}
 
 // Parse a docker file into a collection of buildable stages
-func Parse(ast *parser.Node) (stages []Stage, metaArgs []ArgCommand, err error) ***REMOVED***
-	for _, n := range ast.Children ***REMOVED***
+func Parse(ast *parser.Node) (stages []Stage, metaArgs []ArgCommand, err error) {
+	for _, n := range ast.Children {
 		cmd, err := ParseInstruction(n)
-		if err != nil ***REMOVED***
-			return nil, nil, &parseError***REMOVED***inner: err, node: n***REMOVED***
-		***REMOVED***
-		if len(stages) == 0 ***REMOVED***
+		if err != nil {
+			return nil, nil, &parseError{inner: err, node: n}
+		}
+		if len(stages) == 0 {
 			// meta arg case
-			if a, isArg := cmd.(*ArgCommand); isArg ***REMOVED***
+			if a, isArg := cmd.(*ArgCommand); isArg {
 				metaArgs = append(metaArgs, *a)
 				continue
-			***REMOVED***
-		***REMOVED***
-		switch c := cmd.(type) ***REMOVED***
+			}
+		}
+		switch c := cmd.(type) {
 		case *Stage:
 			stages = append(stages, *c)
 		case Command:
 			stage, err := CurrentStage(stages)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, nil, err
-			***REMOVED***
+			}
 			stage.AddCommand(c)
 		default:
 			return nil, nil, errors.Errorf("%T is not a command type", cmd)
-		***REMOVED***
+		}
 
-	***REMOVED***
+	}
 	return stages, metaArgs, nil
-***REMOVED***
+}
 
-func parseKvps(args []string, cmdName string) (KeyValuePairs, error) ***REMOVED***
-	if len(args) == 0 ***REMOVED***
+func parseKvps(args []string, cmdName string) (KeyValuePairs, error) {
+	if len(args) == 0 {
 		return nil, errAtLeastOneArgument(cmdName)
-	***REMOVED***
-	if len(args)%2 != 0 ***REMOVED***
+	}
+	if len(args)%2 != 0 {
 		// should never get here, but just in case
 		return nil, errTooManyArguments(cmdName)
-	***REMOVED***
+	}
 	var res KeyValuePairs
-	for j := 0; j < len(args); j += 2 ***REMOVED***
-		if len(args[j]) == 0 ***REMOVED***
+	for j := 0; j < len(args); j += 2 {
+		if len(args[j]) == 0 {
 			return nil, errBlankCommandNames(cmdName)
-		***REMOVED***
+		}
 		name := args[j]
 		value := args[j+1]
-		res = append(res, KeyValuePair***REMOVED***Key: name, Value: value***REMOVED***)
-	***REMOVED***
+		res = append(res, KeyValuePair{Key: name, Value: value})
+	}
 	return res, nil
-***REMOVED***
+}
 
-func parseEnv(req parseRequest) (*EnvCommand, error) ***REMOVED***
+func parseEnv(req parseRequest) (*EnvCommand, error) {
 
-	if err := req.flags.Parse(); err != nil ***REMOVED***
+	if err := req.flags.Parse(); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	envs, err := parseKvps(req.args, "ENV")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	return &EnvCommand***REMOVED***
+	}
+	return &EnvCommand{
 		Env:             envs,
 		withNameAndCode: newWithNameAndCode(req),
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-func parseMaintainer(req parseRequest) (*MaintainerCommand, error) ***REMOVED***
-	if len(req.args) != 1 ***REMOVED***
+func parseMaintainer(req parseRequest) (*MaintainerCommand, error) {
+	if len(req.args) != 1 {
 		return nil, errExactlyOneArgument("MAINTAINER")
-	***REMOVED***
+	}
 
-	if err := req.flags.Parse(); err != nil ***REMOVED***
+	if err := req.flags.Parse(); err != nil {
 		return nil, err
-	***REMOVED***
-	return &MaintainerCommand***REMOVED***
+	}
+	return &MaintainerCommand{
 		Maintainer:      req.args[0],
 		withNameAndCode: newWithNameAndCode(req),
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-func parseLabel(req parseRequest) (*LabelCommand, error) ***REMOVED***
+func parseLabel(req parseRequest) (*LabelCommand, error) {
 
-	if err := req.flags.Parse(); err != nil ***REMOVED***
+	if err := req.flags.Parse(); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	labels, err := parseKvps(req.args, "LABEL")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	return &LabelCommand***REMOVED***
+	return &LabelCommand{
 		Labels:          labels,
 		withNameAndCode: newWithNameAndCode(req),
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-func parseAdd(req parseRequest) (*AddCommand, error) ***REMOVED***
-	if len(req.args) < 2 ***REMOVED***
+func parseAdd(req parseRequest) (*AddCommand, error) {
+	if len(req.args) < 2 {
 		return nil, errNoDestinationArgument("ADD")
-	***REMOVED***
+	}
 	flChown := req.flags.AddString("chown", "")
-	if err := req.flags.Parse(); err != nil ***REMOVED***
+	if err := req.flags.Parse(); err != nil {
 		return nil, err
-	***REMOVED***
-	return &AddCommand***REMOVED***
+	}
+	return &AddCommand{
 		SourcesAndDest:  SourcesAndDest(req.args),
 		withNameAndCode: newWithNameAndCode(req),
 		Chown:           flChown.Value,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-func parseCopy(req parseRequest) (*CopyCommand, error) ***REMOVED***
-	if len(req.args) < 2 ***REMOVED***
+func parseCopy(req parseRequest) (*CopyCommand, error) {
+	if len(req.args) < 2 {
 		return nil, errNoDestinationArgument("COPY")
-	***REMOVED***
+	}
 	flChown := req.flags.AddString("chown", "")
 	flFrom := req.flags.AddString("from", "")
-	if err := req.flags.Parse(); err != nil ***REMOVED***
+	if err := req.flags.Parse(); err != nil {
 		return nil, err
-	***REMOVED***
-	return &CopyCommand***REMOVED***
+	}
+	return &CopyCommand{
 		SourcesAndDest:  SourcesAndDest(req.args),
 		From:            flFrom.Value,
 		withNameAndCode: newWithNameAndCode(req),
 		Chown:           flChown.Value,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-func parseFrom(req parseRequest) (*Stage, error) ***REMOVED***
+func parseFrom(req parseRequest) (*Stage, error) {
 	stageName, err := parseBuildStageName(req.args)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	if err := req.flags.Parse(); err != nil ***REMOVED***
+	if err := req.flags.Parse(); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	code := strings.TrimSpace(req.original)
 
-	return &Stage***REMOVED***
+	return &Stage{
 		BaseName:   req.args[0],
 		Name:       stageName,
 		SourceCode: code,
-		Commands:   []Command***REMOVED******REMOVED***,
-	***REMOVED***, nil
+		Commands:   []Command{},
+	}, nil
 
-***REMOVED***
+}
 
-func parseBuildStageName(args []string) (string, error) ***REMOVED***
+func parseBuildStageName(args []string) (string, error) {
 	stageName := ""
-	switch ***REMOVED***
+	switch {
 	case len(args) == 3 && strings.EqualFold(args[1], "as"):
 		stageName = strings.ToLower(args[2])
-		if ok, _ := regexp.MatchString("^[a-z][a-z0-9-_\\.]*$", stageName); !ok ***REMOVED***
+		if ok, _ := regexp.MatchString("^[a-z][a-z0-9-_\\.]*$", stageName); !ok {
 			return "", errors.Errorf("invalid name for build stage: %q, name can't start with a number or contain symbols", stageName)
-		***REMOVED***
+		}
 	case len(args) != 1:
 		return "", errors.New("FROM requires either one or three arguments")
-	***REMOVED***
+	}
 
 	return stageName, nil
-***REMOVED***
+}
 
-func parseOnBuild(req parseRequest) (*OnbuildCommand, error) ***REMOVED***
-	if len(req.args) == 0 ***REMOVED***
+func parseOnBuild(req parseRequest) (*OnbuildCommand, error) {
+	if len(req.args) == 0 {
 		return nil, errAtLeastOneArgument("ONBUILD")
-	***REMOVED***
-	if err := req.flags.Parse(); err != nil ***REMOVED***
+	}
+	if err := req.flags.Parse(); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	triggerInstruction := strings.ToUpper(strings.TrimSpace(req.args[0]))
-	switch strings.ToUpper(triggerInstruction) ***REMOVED***
+	switch strings.ToUpper(triggerInstruction) {
 	case "ONBUILD":
 		return nil, errors.New("Chaining ONBUILD via `ONBUILD ONBUILD` isn't allowed")
 	case "MAINTAINER", "FROM":
 		return nil, fmt.Errorf("%s isn't allowed as an ONBUILD trigger", triggerInstruction)
-	***REMOVED***
+	}
 
 	original := regexp.MustCompile(`(?i)^\s*ONBUILD\s*`).ReplaceAllString(req.original, "")
-	return &OnbuildCommand***REMOVED***
+	return &OnbuildCommand{
 		Expression:      original,
 		withNameAndCode: newWithNameAndCode(req),
-	***REMOVED***, nil
+	}, nil
 
-***REMOVED***
+}
 
-func parseWorkdir(req parseRequest) (*WorkdirCommand, error) ***REMOVED***
-	if len(req.args) != 1 ***REMOVED***
+func parseWorkdir(req parseRequest) (*WorkdirCommand, error) {
+	if len(req.args) != 1 {
 		return nil, errExactlyOneArgument("WORKDIR")
-	***REMOVED***
+	}
 
 	err := req.flags.Parse()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	return &WorkdirCommand***REMOVED***
+	}
+	return &WorkdirCommand{
 		Path:            req.args[0],
 		withNameAndCode: newWithNameAndCode(req),
-	***REMOVED***, nil
+	}, nil
 
-***REMOVED***
+}
 
-func parseShellDependentCommand(req parseRequest, emptyAsNil bool) ShellDependantCmdLine ***REMOVED***
+func parseShellDependentCommand(req parseRequest, emptyAsNil bool) ShellDependantCmdLine {
 	args := handleJSONArgs(req.args, req.attributes)
 	cmd := strslice.StrSlice(args)
-	if emptyAsNil && len(cmd) == 0 ***REMOVED***
+	if emptyAsNil && len(cmd) == 0 {
 		cmd = nil
-	***REMOVED***
-	return ShellDependantCmdLine***REMOVED***
+	}
+	return ShellDependantCmdLine{
 		CmdLine:      cmd,
 		PrependShell: !req.attributes["json"],
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func parseRun(req parseRequest) (*RunCommand, error) ***REMOVED***
+func parseRun(req parseRequest) (*RunCommand, error) {
 
-	if err := req.flags.Parse(); err != nil ***REMOVED***
+	if err := req.flags.Parse(); err != nil {
 		return nil, err
-	***REMOVED***
-	return &RunCommand***REMOVED***
+	}
+	return &RunCommand{
 		ShellDependantCmdLine: parseShellDependentCommand(req, false),
 		withNameAndCode:       newWithNameAndCode(req),
-	***REMOVED***, nil
+	}, nil
 
-***REMOVED***
+}
 
-func parseCmd(req parseRequest) (*CmdCommand, error) ***REMOVED***
-	if err := req.flags.Parse(); err != nil ***REMOVED***
+func parseCmd(req parseRequest) (*CmdCommand, error) {
+	if err := req.flags.Parse(); err != nil {
 		return nil, err
-	***REMOVED***
-	return &CmdCommand***REMOVED***
+	}
+	return &CmdCommand{
 		ShellDependantCmdLine: parseShellDependentCommand(req, false),
 		withNameAndCode:       newWithNameAndCode(req),
-	***REMOVED***, nil
+	}, nil
 
-***REMOVED***
+}
 
-func parseEntrypoint(req parseRequest) (*EntrypointCommand, error) ***REMOVED***
-	if err := req.flags.Parse(); err != nil ***REMOVED***
+func parseEntrypoint(req parseRequest) (*EntrypointCommand, error) {
+	if err := req.flags.Parse(); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	cmd := &EntrypointCommand***REMOVED***
+	cmd := &EntrypointCommand{
 		ShellDependantCmdLine: parseShellDependentCommand(req, true),
 		withNameAndCode:       newWithNameAndCode(req),
-	***REMOVED***
+	}
 
 	return cmd, nil
-***REMOVED***
+}
 
 // parseOptInterval(flag) is the duration of flag.Value, or 0 if
 // empty. An error is reported if the value is given and less than minimum duration.
-func parseOptInterval(f *Flag) (time.Duration, error) ***REMOVED***
+func parseOptInterval(f *Flag) (time.Duration, error) {
 	s := f.Value
-	if s == "" ***REMOVED***
+	if s == "" {
 		return 0, nil
-	***REMOVED***
+	}
 	d, err := time.ParseDuration(s)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
-	if d < container.MinimumDuration ***REMOVED***
+	}
+	if d < container.MinimumDuration {
 		return 0, fmt.Errorf("Interval %#v cannot be less than %s", f.name, container.MinimumDuration)
-	***REMOVED***
+	}
 	return d, nil
-***REMOVED***
-func parseHealthcheck(req parseRequest) (*HealthCheckCommand, error) ***REMOVED***
-	if len(req.args) == 0 ***REMOVED***
+}
+func parseHealthcheck(req parseRequest) (*HealthCheckCommand, error) {
+	if len(req.args) == 0 {
 		return nil, errAtLeastOneArgument("HEALTHCHECK")
-	***REMOVED***
-	cmd := &HealthCheckCommand***REMOVED***
+	}
+	cmd := &HealthCheckCommand{
 		withNameAndCode: newWithNameAndCode(req),
-	***REMOVED***
+	}
 
 	typ := strings.ToUpper(req.args[0])
 	args := req.args[1:]
-	if typ == "NONE" ***REMOVED***
-		if len(args) != 0 ***REMOVED***
+	if typ == "NONE" {
+		if len(args) != 0 {
 			return nil, errors.New("HEALTHCHECK NONE takes no arguments")
-		***REMOVED***
-		test := strslice.StrSlice***REMOVED***typ***REMOVED***
-		cmd.Health = &container.HealthConfig***REMOVED***
+		}
+		test := strslice.StrSlice{typ}
+		cmd.Health = &container.HealthConfig{
 			Test: test,
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
+		}
+	} else {
 
-		healthcheck := container.HealthConfig***REMOVED******REMOVED***
+		healthcheck := container.HealthConfig{}
 
 		flInterval := req.flags.AddString("interval", "")
 		flTimeout := req.flags.AddString("timeout", "")
 		flStartPeriod := req.flags.AddString("start-period", "")
 		flRetries := req.flags.AddString("retries", "")
 
-		if err := req.flags.Parse(); err != nil ***REMOVED***
+		if err := req.flags.Parse(); err != nil {
 			return nil, err
-		***REMOVED***
+		}
 
-		switch typ ***REMOVED***
+		switch typ {
 		case "CMD":
 			cmdSlice := handleJSONArgs(args, req.attributes)
-			if len(cmdSlice) == 0 ***REMOVED***
+			if len(cmdSlice) == 0 {
 				return nil, errors.New("Missing command after HEALTHCHECK CMD")
-			***REMOVED***
+			}
 
-			if !req.attributes["json"] ***REMOVED***
+			if !req.attributes["json"] {
 				typ = "CMD-SHELL"
-			***REMOVED***
+			}
 
-			healthcheck.Test = strslice.StrSlice(append([]string***REMOVED***typ***REMOVED***, cmdSlice...))
+			healthcheck.Test = strslice.StrSlice(append([]string{typ}, cmdSlice...))
 		default:
 			return nil, fmt.Errorf("Unknown type %#v in HEALTHCHECK (try CMD)", typ)
-		***REMOVED***
+		}
 
 		interval, err := parseOptInterval(flInterval)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		healthcheck.Interval = interval
 
 		timeout, err := parseOptInterval(flTimeout)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		healthcheck.Timeout = timeout
 
 		startPeriod, err := parseOptInterval(flStartPeriod)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		healthcheck.StartPeriod = startPeriod
 
-		if flRetries.Value != "" ***REMOVED***
+		if flRetries.Value != "" {
 			retries, err := strconv.ParseInt(flRetries.Value, 10, 32)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
-			if retries < 1 ***REMOVED***
+			}
+			if retries < 1 {
 				return nil, fmt.Errorf("--retries must be at least 1 (not %d)", retries)
-			***REMOVED***
+			}
 			healthcheck.Retries = int(retries)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			healthcheck.Retries = 0
-		***REMOVED***
+		}
 
 		cmd.Health = &healthcheck
-	***REMOVED***
+	}
 	return cmd, nil
-***REMOVED***
+}
 
-func parseExpose(req parseRequest) (*ExposeCommand, error) ***REMOVED***
+func parseExpose(req parseRequest) (*ExposeCommand, error) {
 	portsTab := req.args
 
-	if len(req.args) == 0 ***REMOVED***
+	if len(req.args) == 0 {
 		return nil, errAtLeastOneArgument("EXPOSE")
-	***REMOVED***
+	}
 
-	if err := req.flags.Parse(); err != nil ***REMOVED***
+	if err := req.flags.Parse(); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	sort.Strings(portsTab)
-	return &ExposeCommand***REMOVED***
+	return &ExposeCommand{
 		Ports:           portsTab,
 		withNameAndCode: newWithNameAndCode(req),
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-func parseUser(req parseRequest) (*UserCommand, error) ***REMOVED***
-	if len(req.args) != 1 ***REMOVED***
+func parseUser(req parseRequest) (*UserCommand, error) {
+	if len(req.args) != 1 {
 		return nil, errExactlyOneArgument("USER")
-	***REMOVED***
+	}
 
-	if err := req.flags.Parse(); err != nil ***REMOVED***
+	if err := req.flags.Parse(); err != nil {
 		return nil, err
-	***REMOVED***
-	return &UserCommand***REMOVED***
+	}
+	return &UserCommand{
 		User:            req.args[0],
 		withNameAndCode: newWithNameAndCode(req),
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-func parseVolume(req parseRequest) (*VolumeCommand, error) ***REMOVED***
-	if len(req.args) == 0 ***REMOVED***
+func parseVolume(req parseRequest) (*VolumeCommand, error) {
+	if len(req.args) == 0 {
 		return nil, errAtLeastOneArgument("VOLUME")
-	***REMOVED***
+	}
 
-	if err := req.flags.Parse(); err != nil ***REMOVED***
+	if err := req.flags.Parse(); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	cmd := &VolumeCommand***REMOVED***
+	cmd := &VolumeCommand{
 		withNameAndCode: newWithNameAndCode(req),
-	***REMOVED***
+	}
 
-	for _, v := range req.args ***REMOVED***
+	for _, v := range req.args {
 		v = strings.TrimSpace(v)
-		if v == "" ***REMOVED***
+		if v == "" {
 			return nil, errors.New("VOLUME specified can not be an empty string")
-		***REMOVED***
+		}
 		cmd.Volumes = append(cmd.Volumes, v)
-	***REMOVED***
+	}
 	return cmd, nil
 
-***REMOVED***
+}
 
-func parseStopSignal(req parseRequest) (*StopSignalCommand, error) ***REMOVED***
-	if len(req.args) != 1 ***REMOVED***
+func parseStopSignal(req parseRequest) (*StopSignalCommand, error) {
+	if len(req.args) != 1 {
 		return nil, errExactlyOneArgument("STOPSIGNAL")
-	***REMOVED***
+	}
 	sig := req.args[0]
 
-	cmd := &StopSignalCommand***REMOVED***
+	cmd := &StopSignalCommand{
 		Signal:          sig,
 		withNameAndCode: newWithNameAndCode(req),
-	***REMOVED***
+	}
 	return cmd, nil
 
-***REMOVED***
+}
 
-func parseArg(req parseRequest) (*ArgCommand, error) ***REMOVED***
-	if len(req.args) != 1 ***REMOVED***
+func parseArg(req parseRequest) (*ArgCommand, error) {
+	if len(req.args) != 1 {
 		return nil, errExactlyOneArgument("ARG")
-	***REMOVED***
+	}
 
 	var (
 		name     string
@@ -573,63 +573,63 @@ func parseArg(req parseRequest) (*ArgCommand, error) ***REMOVED***
 	// The reason for doing it differently for 'arg' is that we support just
 	// defining an arg and not assign it a value (while 'env' always expects a
 	// name-value pair). If possible, it will be good to harmonize the two.
-	if strings.Contains(arg, "=") ***REMOVED***
+	if strings.Contains(arg, "=") {
 		parts := strings.SplitN(arg, "=", 2)
-		if len(parts[0]) == 0 ***REMOVED***
+		if len(parts[0]) == 0 {
 			return nil, errBlankCommandNames("ARG")
-		***REMOVED***
+		}
 
 		name = parts[0]
 		newValue = &parts[1]
-	***REMOVED*** else ***REMOVED***
+	} else {
 		name = arg
-	***REMOVED***
+	}
 
-	return &ArgCommand***REMOVED***
+	return &ArgCommand{
 		Key:             name,
 		Value:           newValue,
 		withNameAndCode: newWithNameAndCode(req),
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-func parseShell(req parseRequest) (*ShellCommand, error) ***REMOVED***
-	if err := req.flags.Parse(); err != nil ***REMOVED***
+func parseShell(req parseRequest) (*ShellCommand, error) {
+	if err := req.flags.Parse(); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	shellSlice := handleJSONArgs(req.args, req.attributes)
-	switch ***REMOVED***
+	switch {
 	case len(shellSlice) == 0:
 		// SHELL []
 		return nil, errAtLeastOneArgument("SHELL")
 	case req.attributes["json"]:
 		// SHELL ["powershell", "-command"]
 
-		return &ShellCommand***REMOVED***
+		return &ShellCommand{
 			Shell:           strslice.StrSlice(shellSlice),
 			withNameAndCode: newWithNameAndCode(req),
-		***REMOVED***, nil
+		}, nil
 	default:
 		// SHELL powershell -command - not JSON
 		return nil, errNotJSON("SHELL", req.original)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func errAtLeastOneArgument(command string) error ***REMOVED***
+func errAtLeastOneArgument(command string) error {
 	return errors.Errorf("%s requires at least one argument", command)
-***REMOVED***
+}
 
-func errExactlyOneArgument(command string) error ***REMOVED***
+func errExactlyOneArgument(command string) error {
 	return errors.Errorf("%s requires exactly one argument", command)
-***REMOVED***
+}
 
-func errNoDestinationArgument(command string) error ***REMOVED***
+func errNoDestinationArgument(command string) error {
 	return errors.Errorf("%s requires at least two arguments, but only one was provided. Destination could not be determined.", command)
-***REMOVED***
+}
 
-func errBlankCommandNames(command string) error ***REMOVED***
+func errBlankCommandNames(command string) error {
 	return errors.Errorf("%s names can not be blank", command)
-***REMOVED***
+}
 
-func errTooManyArguments(command string) error ***REMOVED***
+func errTooManyArguments(command string) error {
 	return errors.Errorf("Bad input to %s, too many arguments", command)
-***REMOVED***
+}

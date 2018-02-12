@@ -24,57 +24,57 @@ const (
 )
 
 // regression test for deadlock in handlers
-func TestPluginAddHandler(t *testing.T) ***REMOVED***
+func TestPluginAddHandler(t *testing.T) {
 	// make a plugin which is pre-activated
-	p := &Plugin***REMOVED***activateWait: sync.NewCond(&sync.Mutex***REMOVED******REMOVED***)***REMOVED***
-	p.Manifest = &Manifest***REMOVED***Implements: []string***REMOVED***"bananas"***REMOVED******REMOVED***
+	p := &Plugin{activateWait: sync.NewCond(&sync.Mutex{})}
+	p.Manifest = &Manifest{Implements: []string{"bananas"}}
 	storage.plugins["qwerty"] = p
 
 	testActive(t, p)
-	Handle("bananas", func(_ string, _ *Client) ***REMOVED******REMOVED***)
+	Handle("bananas", func(_ string, _ *Client) {})
 	testActive(t, p)
-***REMOVED***
+}
 
-func TestPluginWaitBadPlugin(t *testing.T) ***REMOVED***
-	p := &Plugin***REMOVED***activateWait: sync.NewCond(&sync.Mutex***REMOVED******REMOVED***)***REMOVED***
+func TestPluginWaitBadPlugin(t *testing.T) {
+	p := &Plugin{activateWait: sync.NewCond(&sync.Mutex{})}
 	p.activateErr = errors.New("some junk happened")
 	testActive(t, p)
-***REMOVED***
+}
 
-func testActive(t *testing.T, p *Plugin) ***REMOVED***
-	done := make(chan struct***REMOVED******REMOVED***)
-	go func() ***REMOVED***
+func testActive(t *testing.T, p *Plugin) {
+	done := make(chan struct{})
+	go func() {
 		p.waitActive()
 		close(done)
-	***REMOVED***()
+	}()
 
-	select ***REMOVED***
+	select {
 	case <-time.After(100 * time.Millisecond):
 		_, f, l, _ := runtime.Caller(1)
 		t.Fatalf("%s:%d: deadlock in waitActive", filepath.Base(f), l)
 	case <-done:
-	***REMOVED***
+	}
 
-***REMOVED***
+}
 
-func TestGet(t *testing.T) ***REMOVED***
-	p := &Plugin***REMOVED***name: fruitPlugin, activateWait: sync.NewCond(&sync.Mutex***REMOVED******REMOVED***)***REMOVED***
-	p.Manifest = &Manifest***REMOVED***Implements: []string***REMOVED***fruitImplements***REMOVED******REMOVED***
+func TestGet(t *testing.T) {
+	p := &Plugin{name: fruitPlugin, activateWait: sync.NewCond(&sync.Mutex{})}
+	p.Manifest = &Manifest{Implements: []string{fruitImplements}}
 	storage.plugins[fruitPlugin] = p
 
 	plugin, err := Get(fruitPlugin, fruitImplements)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if p.Name() != plugin.Name() ***REMOVED***
+	}
+	if p.Name() != plugin.Name() {
 		t.Fatalf("No matching plugin with name %s found", plugin.Name())
-	***REMOVED***
-	if plugin.Client() != nil ***REMOVED***
+	}
+	if plugin.Client() != nil {
 		t.Fatal("expected nil Client but found one")
-	***REMOVED***
-	if !plugin.IsV1() ***REMOVED***
+	}
+	if !plugin.IsV1() {
 		t.Fatal("Expected true for V1 plugin")
-	***REMOVED***
+	}
 
 	// check negative case where plugin fruit doesn't implement banana
 	_, err = Get("fruit", "banana")
@@ -84,73 +84,73 @@ func TestGet(t *testing.T) ***REMOVED***
 	_, err = Get("vegetable", "potato")
 	assert.Equal(t, err, ErrNotFound)
 
-***REMOVED***
+}
 
-func TestPluginWithNoManifest(t *testing.T) ***REMOVED***
+func TestPluginWithNoManifest(t *testing.T) {
 	addr := setupRemotePluginServer()
 	defer teardownRemotePluginServer()
 
-	m := Manifest***REMOVED***[]string***REMOVED***fruitImplements***REMOVED******REMOVED***
+	m := Manifest{[]string{fruitImplements}}
 	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(m); err != nil ***REMOVED***
+	if err := json.NewEncoder(&buf).Encode(m); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	mux.HandleFunc("/Plugin.Activate", func(w http.ResponseWriter, r *http.Request) ***REMOVED***
-		if r.Method != "POST" ***REMOVED***
+	mux.HandleFunc("/Plugin.Activate", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
 			t.Fatalf("Expected POST, got %s\n", r.Method)
-		***REMOVED***
+		}
 
 		header := w.Header()
 		header.Set("Content-Type", transport.VersionMimetype)
 
 		io.Copy(w, &buf)
-	***REMOVED***)
+	})
 
-	p := &Plugin***REMOVED***
+	p := &Plugin{
 		name:         fruitPlugin,
-		activateWait: sync.NewCond(&sync.Mutex***REMOVED******REMOVED***),
+		activateWait: sync.NewCond(&sync.Mutex{}),
 		Addr:         addr,
-		TLSConfig:    &tlsconfig.Options***REMOVED***InsecureSkipVerify: true***REMOVED***,
-	***REMOVED***
+		TLSConfig:    &tlsconfig.Options{InsecureSkipVerify: true},
+	}
 	storage.plugins[fruitPlugin] = p
 
 	plugin, err := Get(fruitPlugin, fruitImplements)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if p.Name() != plugin.Name() ***REMOVED***
+	}
+	if p.Name() != plugin.Name() {
 		t.Fatalf("No matching plugin with name %s found", plugin.Name())
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestGetAll(t *testing.T) ***REMOVED***
+func TestGetAll(t *testing.T) {
 	tmpdir, unregister := Setup(t)
 	defer unregister()
 
 	p := filepath.Join(tmpdir, "example.json")
-	spec := `***REMOVED***
+	spec := `{
 	"Name": "example",
 	"Addr": "https://example.com/docker/plugin"
-***REMOVED***`
+}`
 
-	if err := ioutil.WriteFile(p, []byte(spec), 0644); err != nil ***REMOVED***
+	if err := ioutil.WriteFile(p, []byte(spec), 0644); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	r := newLocalRegistry()
 	plugin, err := r.Plugin("example")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	plugin.Manifest = &Manifest***REMOVED***Implements: []string***REMOVED***"apple"***REMOVED******REMOVED***
+	}
+	plugin.Manifest = &Manifest{Implements: []string{"apple"}}
 	storage.plugins["example"] = plugin
 
 	fetchedPlugins, err := GetAll("apple")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if fetchedPlugins[0].Name() != plugin.Name() ***REMOVED***
+	}
+	if fetchedPlugins[0].Name() != plugin.Name() {
 		t.Fatalf("Expected to get plugin with name %s", plugin.Name())
-	***REMOVED***
-***REMOVED***
+	}
+}

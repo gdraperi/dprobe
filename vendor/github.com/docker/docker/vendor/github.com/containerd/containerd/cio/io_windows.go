@@ -14,111 +14,111 @@ import (
 const pipeRoot = `\\.\pipe`
 
 // NewFIFOSetInDir returns a new set of fifos for the task
-func NewFIFOSetInDir(_, id string, terminal bool) (*FIFOSet, error) ***REMOVED***
-	return NewFIFOSet(Config***REMOVED***
+func NewFIFOSetInDir(_, id string, terminal bool) (*FIFOSet, error) {
+	return NewFIFOSet(Config{
 		Terminal: terminal,
 		Stdin:    fmt.Sprintf(`%s\ctr-%s-stdin`, pipeRoot, id),
 		Stdout:   fmt.Sprintf(`%s\ctr-%s-stdout`, pipeRoot, id),
 		Stderr:   fmt.Sprintf(`%s\ctr-%s-stderr`, pipeRoot, id),
-	***REMOVED***, nil), nil
-***REMOVED***
+	}, nil), nil
+}
 
-func copyIO(fifos *FIFOSet, ioset *Streams) (*cio, error) ***REMOVED***
+func copyIO(fifos *FIFOSet, ioset *Streams) (*cio, error) {
 	var (
 		wg  sync.WaitGroup
 		set []io.Closer
 	)
 
-	if fifos.Stdin != "" ***REMOVED***
+	if fifos.Stdin != "" {
 		l, err := winio.ListenPipe(fifos.Stdin, nil)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, errors.Wrapf(err, "failed to create stdin pipe %s", fifos.Stdin)
-		***REMOVED***
-		defer func(l net.Listener) ***REMOVED***
-			if err != nil ***REMOVED***
+		}
+		defer func(l net.Listener) {
+			if err != nil {
 				l.Close()
-			***REMOVED***
-		***REMOVED***(l)
+			}
+		}(l)
 		set = append(set, l)
 
-		go func() ***REMOVED***
+		go func() {
 			c, err := l.Accept()
-			if err != nil ***REMOVED***
+			if err != nil {
 				log.L.WithError(err).Errorf("failed to accept stdin connection on %s", fifos.Stdin)
 				return
-			***REMOVED***
+			}
 			io.Copy(c, ioset.Stdin)
 			c.Close()
 			l.Close()
-		***REMOVED***()
-	***REMOVED***
+		}()
+	}
 
-	if fifos.Stdout != "" ***REMOVED***
+	if fifos.Stdout != "" {
 		l, err := winio.ListenPipe(fifos.Stdout, nil)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, errors.Wrapf(err, "failed to create stdin pipe %s", fifos.Stdout)
-		***REMOVED***
-		defer func(l net.Listener) ***REMOVED***
-			if err != nil ***REMOVED***
+		}
+		defer func(l net.Listener) {
+			if err != nil {
 				l.Close()
-			***REMOVED***
-		***REMOVED***(l)
+			}
+		}(l)
 		set = append(set, l)
 
 		wg.Add(1)
-		go func() ***REMOVED***
+		go func() {
 			defer wg.Done()
 			c, err := l.Accept()
-			if err != nil ***REMOVED***
+			if err != nil {
 				log.L.WithError(err).Errorf("failed to accept stdout connection on %s", fifos.Stdout)
 				return
-			***REMOVED***
+			}
 			io.Copy(ioset.Stdout, c)
 			c.Close()
 			l.Close()
-		***REMOVED***()
-	***REMOVED***
+		}()
+	}
 
-	if !fifos.Terminal && fifos.Stderr != "" ***REMOVED***
+	if !fifos.Terminal && fifos.Stderr != "" {
 		l, err := winio.ListenPipe(fifos.Stderr, nil)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, errors.Wrapf(err, "failed to create stderr pipe %s", fifos.Stderr)
-		***REMOVED***
-		defer func(l net.Listener) ***REMOVED***
-			if err != nil ***REMOVED***
+		}
+		defer func(l net.Listener) {
+			if err != nil {
 				l.Close()
-			***REMOVED***
-		***REMOVED***(l)
+			}
+		}(l)
 		set = append(set, l)
 
 		wg.Add(1)
-		go func() ***REMOVED***
+		go func() {
 			defer wg.Done()
 			c, err := l.Accept()
-			if err != nil ***REMOVED***
+			if err != nil {
 				log.L.WithError(err).Errorf("failed to accept stderr connection on %s", fifos.Stderr)
 				return
-			***REMOVED***
+			}
 			io.Copy(ioset.Stderr, c)
 			c.Close()
 			l.Close()
-		***REMOVED***()
-	***REMOVED***
+		}()
+	}
 
-	return &cio***REMOVED***config: fifos.Config, closers: set***REMOVED***, nil
-***REMOVED***
+	return &cio{config: fifos.Config, closers: set}, nil
+}
 
 // NewDirectIO returns an IO implementation that exposes the IO streams as io.ReadCloser
 // and io.WriteCloser.
-func NewDirectIO(stdin io.WriteCloser, stdout, stderr io.ReadCloser, terminal bool) *DirectIO ***REMOVED***
-	return &DirectIO***REMOVED***
-		pipes: pipes***REMOVED***
+func NewDirectIO(stdin io.WriteCloser, stdout, stderr io.ReadCloser, terminal bool) *DirectIO {
+	return &DirectIO{
+		pipes: pipes{
 			Stdin:  stdin,
 			Stdout: stdout,
 			Stderr: stderr,
-		***REMOVED***,
-		cio: cio***REMOVED***
-			config: Config***REMOVED***Terminal: terminal***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
-***REMOVED***
+		},
+		cio: cio{
+			config: Config{Terminal: terminal},
+		},
+	}
+}

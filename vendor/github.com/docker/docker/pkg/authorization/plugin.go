@@ -9,7 +9,7 @@ import (
 
 // Plugin allows third party plugins to authorize requests and responses
 // in the context of docker API
-type Plugin interface ***REMOVED***
+type Plugin interface {
 	// Name returns the registered plugin name
 	Name() string
 
@@ -18,101 +18,101 @@ type Plugin interface ***REMOVED***
 
 	// AuthZResponse authorizes the response from the daemon to the client
 	AuthZResponse(*Request) (*Response, error)
-***REMOVED***
+}
 
 // newPlugins constructs and initializes the authorization plugins based on plugin names
-func newPlugins(names []string) []Plugin ***REMOVED***
-	plugins := []Plugin***REMOVED******REMOVED***
-	pluginsMap := make(map[string]struct***REMOVED******REMOVED***)
-	for _, name := range names ***REMOVED***
-		if _, ok := pluginsMap[name]; ok ***REMOVED***
+func newPlugins(names []string) []Plugin {
+	plugins := []Plugin{}
+	pluginsMap := make(map[string]struct{})
+	for _, name := range names {
+		if _, ok := pluginsMap[name]; ok {
 			continue
-		***REMOVED***
-		pluginsMap[name] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
+		}
+		pluginsMap[name] = struct{}{}
 		plugins = append(plugins, newAuthorizationPlugin(name))
-	***REMOVED***
+	}
 	return plugins
-***REMOVED***
+}
 
 var getter plugingetter.PluginGetter
 
 // SetPluginGetter sets the plugingetter
-func SetPluginGetter(pg plugingetter.PluginGetter) ***REMOVED***
+func SetPluginGetter(pg plugingetter.PluginGetter) {
 	getter = pg
-***REMOVED***
+}
 
 // GetPluginGetter gets the plugingetter
-func GetPluginGetter() plugingetter.PluginGetter ***REMOVED***
+func GetPluginGetter() plugingetter.PluginGetter {
 	return getter
-***REMOVED***
+}
 
 // authorizationPlugin is an internal adapter to docker plugin system
-type authorizationPlugin struct ***REMOVED***
+type authorizationPlugin struct {
 	initErr error
 	plugin  *plugins.Client
 	name    string
 	once    sync.Once
-***REMOVED***
+}
 
-func newAuthorizationPlugin(name string) Plugin ***REMOVED***
-	return &authorizationPlugin***REMOVED***name: name***REMOVED***
-***REMOVED***
+func newAuthorizationPlugin(name string) Plugin {
+	return &authorizationPlugin{name: name}
+}
 
-func (a *authorizationPlugin) Name() string ***REMOVED***
+func (a *authorizationPlugin) Name() string {
 	return a.name
-***REMOVED***
+}
 
 // Set the remote for an authz pluginv2
-func (a *authorizationPlugin) SetName(remote string) ***REMOVED***
+func (a *authorizationPlugin) SetName(remote string) {
 	a.name = remote
-***REMOVED***
+}
 
-func (a *authorizationPlugin) AuthZRequest(authReq *Request) (*Response, error) ***REMOVED***
-	if err := a.initPlugin(); err != nil ***REMOVED***
+func (a *authorizationPlugin) AuthZRequest(authReq *Request) (*Response, error) {
+	if err := a.initPlugin(); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	authRes := &Response***REMOVED******REMOVED***
-	if err := a.plugin.Call(AuthZApiRequest, authReq, authRes); err != nil ***REMOVED***
+	authRes := &Response{}
+	if err := a.plugin.Call(AuthZApiRequest, authReq, authRes); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	return authRes, nil
-***REMOVED***
+}
 
-func (a *authorizationPlugin) AuthZResponse(authReq *Request) (*Response, error) ***REMOVED***
-	if err := a.initPlugin(); err != nil ***REMOVED***
+func (a *authorizationPlugin) AuthZResponse(authReq *Request) (*Response, error) {
+	if err := a.initPlugin(); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	authRes := &Response***REMOVED******REMOVED***
-	if err := a.plugin.Call(AuthZApiResponse, authReq, authRes); err != nil ***REMOVED***
+	authRes := &Response{}
+	if err := a.plugin.Call(AuthZApiResponse, authReq, authRes); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	return authRes, nil
-***REMOVED***
+}
 
 // initPlugin initializes the authorization plugin if needed
-func (a *authorizationPlugin) initPlugin() error ***REMOVED***
+func (a *authorizationPlugin) initPlugin() error {
 	// Lazy loading of plugins
-	a.once.Do(func() ***REMOVED***
-		if a.plugin == nil ***REMOVED***
+	a.once.Do(func() {
+		if a.plugin == nil {
 			var plugin plugingetter.CompatPlugin
 			var e error
 
-			if pg := GetPluginGetter(); pg != nil ***REMOVED***
+			if pg := GetPluginGetter(); pg != nil {
 				plugin, e = pg.Get(a.name, AuthZApiImplements, plugingetter.Lookup)
 				a.SetName(plugin.Name())
-			***REMOVED*** else ***REMOVED***
+			} else {
 				plugin, e = plugins.Get(a.name, AuthZApiImplements)
-			***REMOVED***
-			if e != nil ***REMOVED***
+			}
+			if e != nil {
 				a.initErr = e
 				return
-			***REMOVED***
+			}
 			a.plugin = plugin.Client()
-		***REMOVED***
-	***REMOVED***)
+		}
+	})
 	return a.initErr
-***REMOVED***
+}

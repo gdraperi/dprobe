@@ -1,14 +1,14 @@
 package main
 
-func main() ***REMOVED***
+func main() {
 	var a int
-	for ***REMOVED***
+	for {
 		var b string
-		if a == len(b) ***REMOVED***
+		if a == len(b) {
 			var c bool
-		***REMOVED*** else ***REMOVED***
+		} else {
 			var d bool
 			
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

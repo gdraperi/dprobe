@@ -14,36 +14,36 @@ const (
 	RouteNameCatalog         = "catalog"
 )
 
-var allEndpoints = []string***REMOVED***
+var allEndpoints = []string{
 	RouteNameManifest,
 	RouteNameCatalog,
 	RouteNameTags,
 	RouteNameBlob,
 	RouteNameBlobUpload,
 	RouteNameBlobUploadChunk,
-***REMOVED***
+}
 
 // Router builds a gorilla router with named routes for the various API
 // methods. This can be used directly by both server implementations and
 // clients.
-func Router() *mux.Router ***REMOVED***
+func Router() *mux.Router {
 	return RouterWithPrefix("")
-***REMOVED***
+}
 
 // RouterWithPrefix builds a gorilla router with a configured prefix
 // on all routes.
-func RouterWithPrefix(prefix string) *mux.Router ***REMOVED***
+func RouterWithPrefix(prefix string) *mux.Router {
 	rootRouter := mux.NewRouter()
 	router := rootRouter
-	if prefix != "" ***REMOVED***
+	if prefix != "" {
 		router = router.PathPrefix(prefix).Subrouter()
-	***REMOVED***
+	}
 
 	router.StrictSlash(true)
 
-	for _, descriptor := range routeDescriptors ***REMOVED***
+	for _, descriptor := range routeDescriptors {
 		router.Path(descriptor.Path).Name(descriptor.Name)
-	***REMOVED***
+	}
 
 	return rootRouter
-***REMOVED***
+}

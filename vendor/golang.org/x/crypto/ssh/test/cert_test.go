@@ -15,63 +15,63 @@ import (
 )
 
 // Test both logging in with a cert, and also that the certificate presented by an OpenSSH host can be validated correctly
-func TestCertLogin(t *testing.T) ***REMOVED***
+func TestCertLogin(t *testing.T) {
 	s := newServer(t)
 	defer s.Shutdown()
 
 	// Use a key different from the default.
 	clientKey := testSigners["dsa"]
 	caAuthKey := testSigners["ecdsa"]
-	cert := &ssh.Certificate***REMOVED***
+	cert := &ssh.Certificate{
 		Key:             clientKey.PublicKey(),
-		ValidPrincipals: []string***REMOVED***username()***REMOVED***,
+		ValidPrincipals: []string{username()},
 		CertType:        ssh.UserCert,
 		ValidBefore:     ssh.CertTimeInfinity,
-	***REMOVED***
-	if err := cert.SignCert(rand.Reader, caAuthKey); err != nil ***REMOVED***
+	}
+	if err := cert.SignCert(rand.Reader, caAuthKey); err != nil {
 		t.Fatalf("SetSignature: %v", err)
-	***REMOVED***
+	}
 
 	certSigner, err := ssh.NewCertSigner(cert, clientKey)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("NewCertSigner: %v", err)
-	***REMOVED***
+	}
 
-	conf := &ssh.ClientConfig***REMOVED***
+	conf := &ssh.ClientConfig{
 		User: username(),
-		HostKeyCallback: (&ssh.CertChecker***REMOVED***
-			IsHostAuthority: func(pk ssh.PublicKey, addr string) bool ***REMOVED***
+		HostKeyCallback: (&ssh.CertChecker{
+			IsHostAuthority: func(pk ssh.PublicKey, addr string) bool {
 				return bytes.Equal(pk.Marshal(), testPublicKeys["ca"].Marshal())
-			***REMOVED***,
-		***REMOVED***).CheckHostKey,
-	***REMOVED***
+			},
+		}).CheckHostKey,
+	}
 	conf.Auth = append(conf.Auth, ssh.PublicKeys(certSigner))
 
-	for _, test := range []struct ***REMOVED***
+	for _, test := range []struct {
 		addr    string
 		succeed bool
-	***REMOVED******REMOVED***
-		***REMOVED***addr: "host.example.com:22", succeed: true***REMOVED***,
-		***REMOVED***addr: "host.example.com:10000", succeed: true***REMOVED***, // non-standard port must be OK
-		***REMOVED***addr: "host.example.com", succeed: false***REMOVED***,      // port must be specified
-		***REMOVED***addr: "host.ex4mple.com:22", succeed: false***REMOVED***,   // wrong host
-	***REMOVED*** ***REMOVED***
+	}{
+		{addr: "host.example.com:22", succeed: true},
+		{addr: "host.example.com:10000", succeed: true}, // non-standard port must be OK
+		{addr: "host.example.com", succeed: false},      // port must be specified
+		{addr: "host.ex4mple.com:22", succeed: false},   // wrong host
+	} {
 		client, err := s.TryDialWithAddr(conf, test.addr)
 
 		// Always close client if opened successfully
-		if err == nil ***REMOVED***
+		if err == nil {
 			client.Close()
-		***REMOVED***
+		}
 
 		// Now evaluate whether the test failed or passed
-		if test.succeed ***REMOVED***
-			if err != nil ***REMOVED***
+		if test.succeed {
+			if err != nil {
 				t.Fatalf("TryDialWithAddr: %v", err)
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
-			if err == nil ***REMOVED***
+			}
+		} else {
+			if err == nil {
 				t.Fatalf("TryDialWithAddr, unexpected success")
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}

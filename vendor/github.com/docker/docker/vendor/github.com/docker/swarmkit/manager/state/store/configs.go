@@ -9,114 +9,114 @@ import (
 
 const tableConfig = "config"
 
-func init() ***REMOVED***
-	register(ObjectStoreConfig***REMOVED***
-		Table: &memdb.TableSchema***REMOVED***
+func init() {
+	register(ObjectStoreConfig{
+		Table: &memdb.TableSchema{
 			Name: tableConfig,
-			Indexes: map[string]*memdb.IndexSchema***REMOVED***
-				indexID: ***REMOVED***
+			Indexes: map[string]*memdb.IndexSchema{
+				indexID: {
 					Name:    indexID,
 					Unique:  true,
-					Indexer: api.ConfigIndexerByID***REMOVED******REMOVED***,
-				***REMOVED***,
-				indexName: ***REMOVED***
+					Indexer: api.ConfigIndexerByID{},
+				},
+				indexName: {
 					Name:    indexName,
 					Unique:  true,
-					Indexer: api.ConfigIndexerByName***REMOVED******REMOVED***,
-				***REMOVED***,
-				indexCustom: ***REMOVED***
+					Indexer: api.ConfigIndexerByName{},
+				},
+				indexCustom: {
 					Name:         indexCustom,
-					Indexer:      api.ConfigCustomIndexer***REMOVED******REMOVED***,
+					Indexer:      api.ConfigCustomIndexer{},
 					AllowMissing: true,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		Save: func(tx ReadTx, snapshot *api.StoreSnapshot) error ***REMOVED***
+				},
+			},
+		},
+		Save: func(tx ReadTx, snapshot *api.StoreSnapshot) error {
 			var err error
 			snapshot.Configs, err = FindConfigs(tx, All)
 			return err
-		***REMOVED***,
-		Restore: func(tx Tx, snapshot *api.StoreSnapshot) error ***REMOVED***
+		},
+		Restore: func(tx Tx, snapshot *api.StoreSnapshot) error {
 			toStoreObj := make([]api.StoreObject, len(snapshot.Configs))
-			for i, x := range snapshot.Configs ***REMOVED***
+			for i, x := range snapshot.Configs {
 				toStoreObj[i] = x
-			***REMOVED***
+			}
 			return RestoreTable(tx, tableConfig, toStoreObj)
-		***REMOVED***,
-		ApplyStoreAction: func(tx Tx, sa api.StoreAction) error ***REMOVED***
-			switch v := sa.Target.(type) ***REMOVED***
+		},
+		ApplyStoreAction: func(tx Tx, sa api.StoreAction) error {
+			switch v := sa.Target.(type) {
 			case *api.StoreAction_Config:
 				obj := v.Config
-				switch sa.Action ***REMOVED***
+				switch sa.Action {
 				case api.StoreActionKindCreate:
 					return CreateConfig(tx, obj)
 				case api.StoreActionKindUpdate:
 					return UpdateConfig(tx, obj)
 				case api.StoreActionKindRemove:
 					return DeleteConfig(tx, obj.ID)
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return errUnknownStoreAction
-		***REMOVED***,
-	***REMOVED***)
-***REMOVED***
+		},
+	})
+}
 
 // CreateConfig adds a new config to the store.
 // Returns ErrExist if the ID is already taken.
-func CreateConfig(tx Tx, c *api.Config) error ***REMOVED***
+func CreateConfig(tx Tx, c *api.Config) error {
 	// Ensure the name is not already in use.
-	if tx.lookup(tableConfig, indexName, strings.ToLower(c.Spec.Annotations.Name)) != nil ***REMOVED***
+	if tx.lookup(tableConfig, indexName, strings.ToLower(c.Spec.Annotations.Name)) != nil {
 		return ErrNameConflict
-	***REMOVED***
+	}
 
 	return tx.create(tableConfig, c)
-***REMOVED***
+}
 
 // UpdateConfig updates an existing config in the store.
 // Returns ErrNotExist if the config doesn't exist.
-func UpdateConfig(tx Tx, c *api.Config) error ***REMOVED***
+func UpdateConfig(tx Tx, c *api.Config) error {
 	// Ensure the name is either not in use or already used by this same Config.
-	if existing := tx.lookup(tableConfig, indexName, strings.ToLower(c.Spec.Annotations.Name)); existing != nil ***REMOVED***
-		if existing.GetID() != c.ID ***REMOVED***
+	if existing := tx.lookup(tableConfig, indexName, strings.ToLower(c.Spec.Annotations.Name)); existing != nil {
+		if existing.GetID() != c.ID {
 			return ErrNameConflict
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return tx.update(tableConfig, c)
-***REMOVED***
+}
 
 // DeleteConfig removes a config from the store.
 // Returns ErrNotExist if the config doesn't exist.
-func DeleteConfig(tx Tx, id string) error ***REMOVED***
+func DeleteConfig(tx Tx, id string) error {
 	return tx.delete(tableConfig, id)
-***REMOVED***
+}
 
 // GetConfig looks up a config by ID.
 // Returns nil if the config doesn't exist.
-func GetConfig(tx ReadTx, id string) *api.Config ***REMOVED***
+func GetConfig(tx ReadTx, id string) *api.Config {
 	c := tx.get(tableConfig, id)
-	if c == nil ***REMOVED***
+	if c == nil {
 		return nil
-	***REMOVED***
+	}
 	return c.(*api.Config)
-***REMOVED***
+}
 
 // FindConfigs selects a set of configs and returns them.
-func FindConfigs(tx ReadTx, by By) ([]*api.Config, error) ***REMOVED***
-	checkType := func(by By) error ***REMOVED***
-		switch by.(type) ***REMOVED***
+func FindConfigs(tx ReadTx, by By) ([]*api.Config, error) {
+	checkType := func(by By) error {
+		switch by.(type) {
 		case byName, byNamePrefix, byIDPrefix, byCustom, byCustomPrefix:
 			return nil
 		default:
 			return ErrInvalidFindBy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	configList := []*api.Config***REMOVED******REMOVED***
-	appendResult := func(o api.StoreObject) ***REMOVED***
+	configList := []*api.Config{}
+	appendResult := func(o api.StoreObject) {
 		configList = append(configList, o.(*api.Config))
-	***REMOVED***
+	}
 
 	err := tx.find(tableConfig, by, checkType, appendResult)
 	return configList, err
-***REMOVED***
+}

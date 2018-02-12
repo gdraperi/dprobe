@@ -24,7 +24,7 @@ const reservedLabelPrefix = "__"
 // Labels represents a collection of label name -> value mappings. This type is
 // commonly used with the With(Labels) and GetMetricWith(Labels) methods of
 // metric vector Collectors, e.g.:
-//     myVec.With(Labels***REMOVED***"code": "404", "method": "GET"***REMOVED***).Add(42)
+//     myVec.With(Labels{"code": "404", "method": "GET"}).Add(42)
 //
 // The other use-case is the specification of constant label pairs in Opts or to
 // create a Desc.
@@ -46,7 +46,7 @@ type Labels map[string]string
 // values of their constLabels are considered equal.
 //
 // Use NewDesc to create new Desc instances.
-type Desc struct ***REMOVED***
+type Desc struct {
 	// fqName has been built from Namespace, Subsystem, and Name.
 	fqName string
 	// help provides some helpful information about this metric.
@@ -68,7 +68,7 @@ type Desc struct ***REMOVED***
 	// err is an error that occured during construction. It is reported on
 	// registration time.
 	err error
-***REMOVED***
+}
 
 // NewDesc allocates and initializes a new Desc. Errors are recorded in the Desc
 // and will be reported on registration time. variableLabels and constLabels can
@@ -80,60 +80,60 @@ type Desc struct ***REMOVED***
 // For constLabels, the label values are constant. Therefore, they are fully
 // specified in the Desc. See the Opts documentation for the implications of
 // constant labels.
-func NewDesc(fqName, help string, variableLabels []string, constLabels Labels) *Desc ***REMOVED***
-	d := &Desc***REMOVED***
+func NewDesc(fqName, help string, variableLabels []string, constLabels Labels) *Desc {
+	d := &Desc{
 		fqName:         fqName,
 		help:           help,
 		variableLabels: variableLabels,
-	***REMOVED***
-	if help == "" ***REMOVED***
+	}
+	if help == "" {
 		d.err = errors.New("empty help string")
 		return d
-	***REMOVED***
-	if !metricNameRE.MatchString(fqName) ***REMOVED***
+	}
+	if !metricNameRE.MatchString(fqName) {
 		d.err = fmt.Errorf("%q is not a valid metric name", fqName)
 		return d
-	***REMOVED***
+	}
 	// labelValues contains the label values of const labels (in order of
 	// their sorted label names) plus the fqName (at position 0).
 	labelValues := make([]string, 1, len(constLabels)+1)
 	labelValues[0] = fqName
 	labelNames := make([]string, 0, len(constLabels)+len(variableLabels))
-	labelNameSet := map[string]struct***REMOVED******REMOVED******REMOVED******REMOVED***
+	labelNameSet := map[string]struct{}{}
 	// First add only the const label names and sort them...
-	for labelName := range constLabels ***REMOVED***
-		if !checkLabelName(labelName) ***REMOVED***
+	for labelName := range constLabels {
+		if !checkLabelName(labelName) {
 			d.err = fmt.Errorf("%q is not a valid label name", labelName)
 			return d
-		***REMOVED***
+		}
 		labelNames = append(labelNames, labelName)
-		labelNameSet[labelName] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	***REMOVED***
+		labelNameSet[labelName] = struct{}{}
+	}
 	sort.Strings(labelNames)
 	// ... so that we can now add const label values in the order of their names.
-	for _, labelName := range labelNames ***REMOVED***
+	for _, labelName := range labelNames {
 		labelValues = append(labelValues, constLabels[labelName])
-	***REMOVED***
+	}
 	// Now add the variable label names, but prefix them with something that
 	// cannot be in a regular label name. That prevents matching the label
 	// dimension with a different mix between preset and variable labels.
-	for _, labelName := range variableLabels ***REMOVED***
-		if !checkLabelName(labelName) ***REMOVED***
+	for _, labelName := range variableLabels {
+		if !checkLabelName(labelName) {
 			d.err = fmt.Errorf("%q is not a valid label name", labelName)
 			return d
-		***REMOVED***
+		}
 		labelNames = append(labelNames, "$"+labelName)
-		labelNameSet[labelName] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	***REMOVED***
-	if len(labelNames) != len(labelNameSet) ***REMOVED***
+		labelNameSet[labelName] = struct{}{}
+	}
+	if len(labelNames) != len(labelNameSet) {
 		d.err = errors.New("duplicate label names")
 		return d
-	***REMOVED***
+	}
 	vh := hashNew()
-	for _, val := range labelValues ***REMOVED***
+	for _, val := range labelValues {
 		vh = hashAdd(vh, val)
 		vh = hashAddByte(vh, separatorByte)
-	***REMOVED***
+	}
 	d.id = vh
 	// Sort labelNames so that order doesn't matter for the hash.
 	sort.Strings(labelNames)
@@ -142,51 +142,51 @@ func NewDesc(fqName, help string, variableLabels []string, constLabels Labels) *
 	lh := hashNew()
 	lh = hashAdd(lh, help)
 	lh = hashAddByte(lh, separatorByte)
-	for _, labelName := range labelNames ***REMOVED***
+	for _, labelName := range labelNames {
 		lh = hashAdd(lh, labelName)
 		lh = hashAddByte(lh, separatorByte)
-	***REMOVED***
+	}
 	d.dimHash = lh
 
 	d.constLabelPairs = make([]*dto.LabelPair, 0, len(constLabels))
-	for n, v := range constLabels ***REMOVED***
-		d.constLabelPairs = append(d.constLabelPairs, &dto.LabelPair***REMOVED***
+	for n, v := range constLabels {
+		d.constLabelPairs = append(d.constLabelPairs, &dto.LabelPair{
 			Name:  proto.String(n),
 			Value: proto.String(v),
-		***REMOVED***)
-	***REMOVED***
+		})
+	}
 	sort.Sort(LabelPairSorter(d.constLabelPairs))
 	return d
-***REMOVED***
+}
 
 // NewInvalidDesc returns an invalid descriptor, i.e. a descriptor with the
 // provided error set. If a collector returning such a descriptor is registered,
 // registration will fail with the provided error. NewInvalidDesc can be used by
 // a Collector to signal inability to describe itself.
-func NewInvalidDesc(err error) *Desc ***REMOVED***
-	return &Desc***REMOVED***
+func NewInvalidDesc(err error) *Desc {
+	return &Desc{
 		err: err,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (d *Desc) String() string ***REMOVED***
+func (d *Desc) String() string {
 	lpStrings := make([]string, 0, len(d.constLabelPairs))
-	for _, lp := range d.constLabelPairs ***REMOVED***
+	for _, lp := range d.constLabelPairs {
 		lpStrings = append(
 			lpStrings,
 			fmt.Sprintf("%s=%q", lp.GetName(), lp.GetValue()),
 		)
-	***REMOVED***
+	}
 	return fmt.Sprintf(
-		"Desc***REMOVED***fqName: %q, help: %q, constLabels: ***REMOVED***%s***REMOVED***, variableLabels: %v***REMOVED***",
+		"Desc{fqName: %q, help: %q, constLabels: {%s}, variableLabels: %v}",
 		d.fqName,
 		d.help,
 		strings.Join(lpStrings, ","),
 		d.variableLabels,
 	)
-***REMOVED***
+}
 
-func checkLabelName(l string) bool ***REMOVED***
+func checkLabelName(l string) bool {
 	return labelNameRE.MatchString(l) &&
 		!strings.HasPrefix(l, reservedLabelPrefix)
-***REMOVED***
+}

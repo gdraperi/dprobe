@@ -33,38 +33,38 @@ import (
 	"io"
 )
 
-type Writer interface ***REMOVED***
+type Writer interface {
 	WriteMsg(proto.Message) error
-***REMOVED***
+}
 
-type WriteCloser interface ***REMOVED***
+type WriteCloser interface {
 	Writer
 	io.Closer
-***REMOVED***
+}
 
-type Reader interface ***REMOVED***
+type Reader interface {
 	ReadMsg(msg proto.Message) error
-***REMOVED***
+}
 
-type ReadCloser interface ***REMOVED***
+type ReadCloser interface {
 	Reader
 	io.Closer
-***REMOVED***
+}
 
-type marshaler interface ***REMOVED***
+type marshaler interface {
 	MarshalTo(data []byte) (n int, err error)
-***REMOVED***
+}
 
-func getSize(v interface***REMOVED******REMOVED***) (int, bool) ***REMOVED***
-	if sz, ok := v.(interface ***REMOVED***
+func getSize(v interface{}) (int, bool) {
+	if sz, ok := v.(interface {
 		Size() (n int)
-	***REMOVED***); ok ***REMOVED***
+	}); ok {
 		return sz.Size(), true
-	***REMOVED*** else if sz, ok := v.(interface ***REMOVED***
+	} else if sz, ok := v.(interface {
 		ProtoSize() (n int)
-	***REMOVED***); ok ***REMOVED***
+	}); ok {
 		return sz.ProtoSize(), true
-	***REMOVED*** else ***REMOVED***
+	} else {
 		return 0, false
-	***REMOVED***
-***REMOVED***
+	}
+}

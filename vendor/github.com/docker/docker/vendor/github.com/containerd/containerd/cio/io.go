@@ -9,7 +9,7 @@ import (
 )
 
 // Config holds the IO configurations.
-type Config struct ***REMOVED***
+type Config struct {
 	// Terminal is true if one has been allocated
 	Terminal bool
 	// Stdin path
@@ -18,10 +18,10 @@ type Config struct ***REMOVED***
 	Stdout string
 	// Stderr path
 	Stderr string
-***REMOVED***
+}
 
 // IO holds the io information for a task or process
-type IO interface ***REMOVED***
+type IO interface {
 	// Config returns the IO configuration.
 	Config() Config
 	// Cancel aborts all current io operations.
@@ -31,7 +31,7 @@ type IO interface ***REMOVED***
 	// Close cleans up all open io resources. Cancel() is always called before
 	// Close()
 	Close() error
-***REMOVED***
+}
 
 // Creator creates new IO sets for a task
 type Creator func(id string) (IO, error)
@@ -44,137 +44,137 @@ type Creator func(id string) (IO, error)
 type Attach func(*FIFOSet) (IO, error)
 
 // FIFOSet is a set of file paths to FIFOs for a task's standard IO streams
-type FIFOSet struct ***REMOVED***
+type FIFOSet struct {
 	Config
 	close func() error
-***REMOVED***
+}
 
 // Close the FIFOSet
-func (f *FIFOSet) Close() error ***REMOVED***
-	if f.close != nil ***REMOVED***
+func (f *FIFOSet) Close() error {
+	if f.close != nil {
 		return f.close()
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // NewFIFOSet returns a new FIFOSet from a Config and a close function
-func NewFIFOSet(config Config, close func() error) *FIFOSet ***REMOVED***
-	return &FIFOSet***REMOVED***Config: config, close: close***REMOVED***
-***REMOVED***
+func NewFIFOSet(config Config, close func() error) *FIFOSet {
+	return &FIFOSet{Config: config, close: close}
+}
 
 // Streams used to configure a Creator or Attach
-type Streams struct ***REMOVED***
+type Streams struct {
 	Stdin    io.Reader
 	Stdout   io.Writer
 	Stderr   io.Writer
 	Terminal bool
-***REMOVED***
+}
 
 // Opt customize options for creating a Creator or Attach
 type Opt func(*Streams)
 
 // WithStdio sets stream options to the standard input/output streams
-func WithStdio(opt *Streams) ***REMOVED***
+func WithStdio(opt *Streams) {
 	WithStreams(os.Stdin, os.Stdout, os.Stderr)(opt)
-***REMOVED***
+}
 
 // WithTerminal sets the terminal option
-func WithTerminal(opt *Streams) ***REMOVED***
+func WithTerminal(opt *Streams) {
 	opt.Terminal = true
-***REMOVED***
+}
 
 // WithStreams sets the stream options to the specified Reader and Writers
-func WithStreams(stdin io.Reader, stdout, stderr io.Writer) Opt ***REMOVED***
-	return func(opt *Streams) ***REMOVED***
+func WithStreams(stdin io.Reader, stdout, stderr io.Writer) Opt {
+	return func(opt *Streams) {
 		opt.Stdin = stdin
 		opt.Stdout = stdout
 		opt.Stderr = stderr
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // NewCreator returns an IO creator from the options
-func NewCreator(opts ...Opt) Creator ***REMOVED***
-	streams := &Streams***REMOVED******REMOVED***
-	for _, opt := range opts ***REMOVED***
+func NewCreator(opts ...Opt) Creator {
+	streams := &Streams{}
+	for _, opt := range opts {
 		opt(streams)
-	***REMOVED***
-	return func(id string) (IO, error) ***REMOVED***
+	}
+	return func(id string) (IO, error) {
 		// TODO: accept root as a param
 		root := "/run/containerd/fifo"
 		fifos, err := NewFIFOSetInDir(root, id, streams.Terminal)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		return copyIO(fifos, streams)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // NewAttach attaches the existing io for a task to the provided io.Reader/Writers
-func NewAttach(opts ...Opt) Attach ***REMOVED***
-	streams := &Streams***REMOVED******REMOVED***
-	for _, opt := range opts ***REMOVED***
+func NewAttach(opts ...Opt) Attach {
+	streams := &Streams{}
+	for _, opt := range opts {
 		opt(streams)
-	***REMOVED***
-	return func(fifos *FIFOSet) (IO, error) ***REMOVED***
-		if fifos == nil ***REMOVED***
+	}
+	return func(fifos *FIFOSet) (IO, error) {
+		if fifos == nil {
 			return nil, fmt.Errorf("cannot attach, missing fifos")
-		***REMOVED***
+		}
 		return copyIO(fifos, streams)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // NullIO redirects the container's IO into /dev/null
-func NullIO(_ string) (IO, error) ***REMOVED***
-	return &cio***REMOVED******REMOVED***, nil
-***REMOVED***
+func NullIO(_ string) (IO, error) {
+	return &cio{}, nil
+}
 
 // cio is a basic container IO implementation.
-type cio struct ***REMOVED***
+type cio struct {
 	config  Config
 	wg      *sync.WaitGroup
 	closers []io.Closer
 	cancel  context.CancelFunc
-***REMOVED***
+}
 
-func (c *cio) Config() Config ***REMOVED***
+func (c *cio) Config() Config {
 	return c.config
-***REMOVED***
+}
 
-func (c *cio) Wait() ***REMOVED***
-	if c.wg != nil ***REMOVED***
+func (c *cio) Wait() {
+	if c.wg != nil {
 		c.wg.Wait()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (c *cio) Close() error ***REMOVED***
+func (c *cio) Close() error {
 	var lastErr error
-	for _, closer := range c.closers ***REMOVED***
-		if closer == nil ***REMOVED***
+	for _, closer := range c.closers {
+		if closer == nil {
 			continue
-		***REMOVED***
-		if err := closer.Close(); err != nil ***REMOVED***
+		}
+		if err := closer.Close(); err != nil {
 			lastErr = err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return lastErr
-***REMOVED***
+}
 
-func (c *cio) Cancel() ***REMOVED***
-	if c.cancel != nil ***REMOVED***
+func (c *cio) Cancel() {
+	if c.cancel != nil {
 		c.cancel()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type pipes struct ***REMOVED***
+type pipes struct {
 	Stdin  io.WriteCloser
 	Stdout io.ReadCloser
 	Stderr io.ReadCloser
-***REMOVED***
+}
 
 // DirectIO allows task IO to be handled externally by the caller
-type DirectIO struct ***REMOVED***
+type DirectIO struct {
 	pipes
 	cio
-***REMOVED***
+}
 
-var _ IO = &DirectIO***REMOVED******REMOVED***
+var _ IO = &DirectIO{}

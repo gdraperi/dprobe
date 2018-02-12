@@ -13,7 +13,7 @@ import (
 
 // This is a heisen-test.  Because the created timestamp of images and the behavior of
 // sort is not predictable it doesn't always fail.
-func (s *DockerSuite) TestBuildHistory(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestBuildHistory(c *check.C) {
 	name := "testbuildhistory"
 	buildImageSuccessfully(c, name, build.WithDockerfile(`FROM `+minimalBaseImage()+`
 LABEL label.A="A"
@@ -45,26 +45,26 @@ LABEL label.Z="Z"`))
 
 	out, _ := dockerCmd(c, "history", name)
 	actualValues := strings.Split(out, "\n")[1:27]
-	expectedValues := [26]string***REMOVED***"Z", "Y", "X", "W", "V", "U", "T", "S", "R", "Q", "P", "O", "N", "M", "L", "K", "J", "I", "H", "G", "F", "E", "D", "C", "B", "A"***REMOVED***
+	expectedValues := [26]string{"Z", "Y", "X", "W", "V", "U", "T", "S", "R", "Q", "P", "O", "N", "M", "L", "K", "J", "I", "H", "G", "F", "E", "D", "C", "B", "A"}
 
-	for i := 0; i < 26; i++ ***REMOVED***
+	for i := 0; i < 26; i++ {
 		echoValue := fmt.Sprintf("LABEL label.%s=%s", expectedValues[i], expectedValues[i])
 		actualValue := actualValues[i]
 		c.Assert(actualValue, checker.Contains, echoValue)
-	***REMOVED***
+	}
 
-***REMOVED***
+}
 
-func (s *DockerSuite) TestHistoryExistentImage(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestHistoryExistentImage(c *check.C) {
 	dockerCmd(c, "history", "busybox")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestHistoryNonExistentImage(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestHistoryNonExistentImage(c *check.C) {
 	_, _, err := dockerCmdWithError("history", "testHistoryNonExistentImage")
 	c.Assert(err, checker.NotNil, check.Commentf("history on a non-existent image should fail."))
-***REMOVED***
+}
 
-func (s *DockerSuite) TestHistoryImageWithComment(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestHistoryImageWithComment(c *check.C) {
 	name := "testhistoryimagewithcomment"
 
 	// make an image through docker commit <container id> [ -m messages ]
@@ -81,27 +81,27 @@ func (s *DockerSuite) TestHistoryImageWithComment(c *check.C) ***REMOVED***
 	outputTabs := strings.Fields(strings.Split(out, "\n")[1])
 	actualValue := outputTabs[len(outputTabs)-1]
 	c.Assert(actualValue, checker.Contains, comment)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestHistoryHumanOptionFalse(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestHistoryHumanOptionFalse(c *check.C) {
 	out, _ := dockerCmd(c, "history", "--human=false", "busybox")
 	lines := strings.Split(out, "\n")
 	sizeColumnRegex, _ := regexp.Compile("SIZE +")
 	indices := sizeColumnRegex.FindStringIndex(lines[0])
 	startIndex := indices[0]
 	endIndex := indices[1]
-	for i := 1; i < len(lines)-1; i++ ***REMOVED***
-		if endIndex > len(lines[i]) ***REMOVED***
+	for i := 1; i < len(lines)-1; i++ {
+		if endIndex > len(lines[i]) {
 			endIndex = len(lines[i])
-		***REMOVED***
+		}
 		sizeString := lines[i][startIndex:endIndex]
 
 		_, err := strconv.Atoi(strings.TrimSpace(sizeString))
 		c.Assert(err, checker.IsNil, check.Commentf("The size '%s' was not an Integer", sizeString))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *DockerSuite) TestHistoryHumanOptionTrue(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestHistoryHumanOptionTrue(c *check.C) {
 	out, _ := dockerCmd(c, "history", "--human=true", "busybox")
 	lines := strings.Split(out, "\n")
 	sizeColumnRegex, _ := regexp.Compile("SIZE +")
@@ -109,11 +109,11 @@ func (s *DockerSuite) TestHistoryHumanOptionTrue(c *check.C) ***REMOVED***
 	indices := sizeColumnRegex.FindStringIndex(lines[0])
 	startIndex := indices[0]
 	endIndex := indices[1]
-	for i := 1; i < len(lines)-1; i++ ***REMOVED***
-		if endIndex > len(lines[i]) ***REMOVED***
+	for i := 1; i < len(lines)-1; i++ {
+		if endIndex > len(lines[i]) {
 			endIndex = len(lines[i])
-		***REMOVED***
+		}
 		sizeString := lines[i][startIndex:endIndex]
 		c.Assert(strings.TrimSpace(sizeString), checker.Matches, humanSizeRegexRaw, check.Commentf("The size '%s' was not in human format", sizeString))
-	***REMOVED***
-***REMOVED***
+	}
+}

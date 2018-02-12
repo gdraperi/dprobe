@@ -20,50 +20,50 @@ import (
 	"testing"
 )
 
-func TestWalk(t *testing.T) ***REMOVED***
+func TestWalk(t *testing.T) {
 	defer removeAllTestFiles(t)
 	var testDir string
-	for i, fs := range Fss ***REMOVED***
-		if i == 0 ***REMOVED***
+	for i, fs := range Fss {
+		if i == 0 {
 			testDir = setupTestDirRoot(t, fs)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			setupTestDirReusePath(t, fs, testDir)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	outputs := make([]string, len(Fss))
-	for i, fs := range Fss ***REMOVED***
-		walkFn := func(path string, info os.FileInfo, err error) error ***REMOVED***
-			if err != nil ***REMOVED***
+	for i, fs := range Fss {
+		walkFn := func(path string, info os.FileInfo, err error) error {
+			if err != nil {
 				t.Error("walkFn err:", err)
-			***REMOVED***
+			}
 			var size int64
-			if !info.IsDir() ***REMOVED***
+			if !info.IsDir() {
 				size = info.Size()
-			***REMOVED***
+			}
 			outputs[i] += fmt.Sprintln(path, info.Name(), size, info.IsDir(), err)
 			return nil
-		***REMOVED***
+		}
 		err := Walk(fs, testDir, walkFn)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Error(err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	fail := false
-	for i, o := range outputs ***REMOVED***
-		if i == 0 ***REMOVED***
+	for i, o := range outputs {
+		if i == 0 {
 			continue
-		***REMOVED***
-		if o != outputs[i-1] ***REMOVED***
+		}
+		if o != outputs[i-1] {
 			fail = true
 			break
-		***REMOVED***
-	***REMOVED***
-	if fail ***REMOVED***
+		}
+	}
+	if fail {
 		t.Log("Walk outputs not equal!")
-		for i, o := range outputs ***REMOVED***
+		for i, o := range outputs {
 			t.Log(Fss[i].Name() + "\n" + o)
-		***REMOVED***
+		}
 		t.Fail()
-	***REMOVED***
-***REMOVED***
+	}
+}

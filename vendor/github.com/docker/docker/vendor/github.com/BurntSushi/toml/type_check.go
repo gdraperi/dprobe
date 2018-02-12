@@ -4,31 +4,31 @@ package toml
 // While the first draft of the TOML spec has a simplistic type system that
 // probably doesn't need this level of sophistication, we seem to be militating
 // toward adding real composite types.
-type tomlType interface ***REMOVED***
+type tomlType interface {
 	typeString() string
-***REMOVED***
+}
 
 // typeEqual accepts any two types and returns true if they are equal.
-func typeEqual(t1, t2 tomlType) bool ***REMOVED***
-	if t1 == nil || t2 == nil ***REMOVED***
+func typeEqual(t1, t2 tomlType) bool {
+	if t1 == nil || t2 == nil {
 		return false
-	***REMOVED***
+	}
 	return t1.typeString() == t2.typeString()
-***REMOVED***
+}
 
-func typeIsHash(t tomlType) bool ***REMOVED***
+func typeIsHash(t tomlType) bool {
 	return typeEqual(t, tomlHash) || typeEqual(t, tomlArrayHash)
-***REMOVED***
+}
 
 type tomlBaseType string
 
-func (btype tomlBaseType) typeString() string ***REMOVED***
+func (btype tomlBaseType) typeString() string {
 	return string(btype)
-***REMOVED***
+}
 
-func (btype tomlBaseType) String() string ***REMOVED***
+func (btype tomlBaseType) String() string {
 	return btype.typeString()
-***REMOVED***
+}
 
 var (
 	tomlInteger   tomlBaseType = "Integer"
@@ -46,8 +46,8 @@ var (
 //
 // Passing a lexer item other than the following will cause a BUG message
 // to occur: itemString, itemBool, itemInteger, itemFloat, itemDatetime.
-func (p *parser) typeOfPrimitive(lexItem item) tomlType ***REMOVED***
-	switch lexItem.typ ***REMOVED***
+func (p *parser) typeOfPrimitive(lexItem item) tomlType {
+	switch lexItem.typ {
 	case itemInteger:
 		return tomlInteger
 	case itemFloat:
@@ -64,28 +64,28 @@ func (p *parser) typeOfPrimitive(lexItem item) tomlType ***REMOVED***
 		return tomlString
 	case itemBool:
 		return tomlBool
-	***REMOVED***
+	}
 	p.bug("Cannot infer primitive type of lex item '%s'.", lexItem)
 	panic("unreachable")
-***REMOVED***
+}
 
 // typeOfArray returns a tomlType for an array given a list of types of its
 // values.
 //
 // In the current spec, if an array is homogeneous, then its type is always
 // "Array". If the array is not homogeneous, an error is generated.
-func (p *parser) typeOfArray(types []tomlType) tomlType ***REMOVED***
+func (p *parser) typeOfArray(types []tomlType) tomlType {
 	// Empty arrays are cool.
-	if len(types) == 0 ***REMOVED***
+	if len(types) == 0 {
 		return tomlArray
-	***REMOVED***
+	}
 
 	theType := types[0]
-	for _, t := range types[1:] ***REMOVED***
-		if !typeEqual(theType, t) ***REMOVED***
+	for _, t := range types[1:] {
+		if !typeEqual(theType, t) {
 			p.panicf("Array contains values of type '%s' and '%s', but "+
 				"arrays must be homogeneous.", theType, t)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return tomlArray
-***REMOVED***
+}

@@ -10,19 +10,19 @@ import (
 	"golang.org/x/text/number"
 )
 
-func ExampleMaxIntegerDigits() ***REMOVED***
+func ExampleMaxIntegerDigits() {
 	const year = 1999
 	p := message.NewPrinter(language.English)
 	p.Println("Year:", number.Decimal(year, number.MaxIntegerDigits(2)))
 
 	// Output:
 	// Year: 99
-***REMOVED***
+}
 
-func ExampleIncrementString() ***REMOVED***
+func ExampleIncrementString() {
 	p := message.NewPrinter(language.English)
 
 	p.Println(number.Decimal(1.33, number.IncrementString("0.50")))
 
 	// Output: 1.50
-***REMOVED***
+}

@@ -16,42 +16,42 @@ var (
 
 // A StaticProvider is a set of credentials which are set programmatically,
 // and will never expire.
-type StaticProvider struct ***REMOVED***
+type StaticProvider struct {
 	Value
-***REMOVED***
+}
 
 // NewStaticCredentials returns a pointer to a new Credentials object
 // wrapping a static credentials value provider.
-func NewStaticCredentials(id, secret, token string) *Credentials ***REMOVED***
-	return NewCredentials(&StaticProvider***REMOVED***Value: Value***REMOVED***
+func NewStaticCredentials(id, secret, token string) *Credentials {
+	return NewCredentials(&StaticProvider{Value: Value{
 		AccessKeyID:     id,
 		SecretAccessKey: secret,
 		SessionToken:    token,
-	***REMOVED******REMOVED***)
-***REMOVED***
+	}})
+}
 
 // NewStaticCredentialsFromCreds returns a pointer to a new Credentials object
 // wrapping the static credentials value provide. Same as NewStaticCredentials
 // but takes the creds Value instead of individual fields
-func NewStaticCredentialsFromCreds(creds Value) *Credentials ***REMOVED***
-	return NewCredentials(&StaticProvider***REMOVED***Value: creds***REMOVED***)
-***REMOVED***
+func NewStaticCredentialsFromCreds(creds Value) *Credentials {
+	return NewCredentials(&StaticProvider{Value: creds})
+}
 
 // Retrieve returns the credentials or error if the credentials are invalid.
-func (s *StaticProvider) Retrieve() (Value, error) ***REMOVED***
-	if s.AccessKeyID == "" || s.SecretAccessKey == "" ***REMOVED***
-		return Value***REMOVED***ProviderName: StaticProviderName***REMOVED***, ErrStaticCredentialsEmpty
-	***REMOVED***
+func (s *StaticProvider) Retrieve() (Value, error) {
+	if s.AccessKeyID == "" || s.SecretAccessKey == "" {
+		return Value{ProviderName: StaticProviderName}, ErrStaticCredentialsEmpty
+	}
 
-	if len(s.Value.ProviderName) == 0 ***REMOVED***
+	if len(s.Value.ProviderName) == 0 {
 		s.Value.ProviderName = StaticProviderName
-	***REMOVED***
+	}
 	return s.Value, nil
-***REMOVED***
+}
 
 // IsExpired returns if the credentials are expired.
 //
 // For StaticProvider, the credentials never expired.
-func (s *StaticProvider) IsExpired() bool ***REMOVED***
+func (s *StaticProvider) IsExpired() bool {
 	return false
-***REMOVED***
+}

@@ -1,4 +1,4 @@
 package chrootarchive
 
-func init() ***REMOVED***
-***REMOVED***
+func init() {
+}

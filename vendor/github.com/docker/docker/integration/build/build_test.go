@@ -19,17 +19,17 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestBuildWithRemoveAndForceRemove(t *testing.T) ***REMOVED***
+func TestBuildWithRemoveAndForceRemove(t *testing.T) {
 	defer setupTest(t)()
 	t.Parallel()
-	cases := []struct ***REMOVED***
+	cases := []struct {
 		name                           string
 		dockerfile                     string
 		numberOfIntermediateContainers int
 		rm                             bool
 		forceRm                        bool
-	***REMOVED******REMOVED***
-		***REMOVED***
+	}{
+		{
 			name: "successful build with no removal",
 			dockerfile: `FROM busybox
 			RUN exit 0
@@ -37,8 +37,8 @@ func TestBuildWithRemoveAndForceRemove(t *testing.T) ***REMOVED***
 			numberOfIntermediateContainers: 2,
 			rm:      false,
 			forceRm: false,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			name: "successful build with remove",
 			dockerfile: `FROM busybox
 			RUN exit 0
@@ -46,8 +46,8 @@ func TestBuildWithRemoveAndForceRemove(t *testing.T) ***REMOVED***
 			numberOfIntermediateContainers: 0,
 			rm:      true,
 			forceRm: false,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			name: "successful build with remove and force remove",
 			dockerfile: `FROM busybox
 			RUN exit 0
@@ -55,8 +55,8 @@ func TestBuildWithRemoveAndForceRemove(t *testing.T) ***REMOVED***
 			numberOfIntermediateContainers: 0,
 			rm:      true,
 			forceRm: true,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			name: "failed build with no removal",
 			dockerfile: `FROM busybox
 			RUN exit 0
@@ -64,8 +64,8 @@ func TestBuildWithRemoveAndForceRemove(t *testing.T) ***REMOVED***
 			numberOfIntermediateContainers: 2,
 			rm:      false,
 			forceRm: false,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			name: "failed build with remove",
 			dockerfile: `FROM busybox
 			RUN exit 0
@@ -73,8 +73,8 @@ func TestBuildWithRemoveAndForceRemove(t *testing.T) ***REMOVED***
 			numberOfIntermediateContainers: 1,
 			rm:      true,
 			forceRm: false,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			name: "failed build with remove and force remove",
 			dockerfile: `FROM busybox
 			RUN exit 0
@@ -82,58 +82,58 @@ func TestBuildWithRemoveAndForceRemove(t *testing.T) ***REMOVED***
 			numberOfIntermediateContainers: 0,
 			rm:      true,
 			forceRm: true,
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
 	client := request.NewAPIClient(t)
 	ctx := context.Background()
-	for _, c := range cases ***REMOVED***
-		t.Run(c.name, func(t *testing.T) ***REMOVED***
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
 			t.Parallel()
 			dockerfile := []byte(c.dockerfile)
 
 			buff := bytes.NewBuffer(nil)
 			tw := tar.NewWriter(buff)
-			require.NoError(t, tw.WriteHeader(&tar.Header***REMOVED***
+			require.NoError(t, tw.WriteHeader(&tar.Header{
 				Name: "Dockerfile",
 				Size: int64(len(dockerfile)),
-			***REMOVED***))
+			}))
 			_, err := tw.Write(dockerfile)
 			require.NoError(t, err)
 			require.NoError(t, tw.Close())
-			resp, err := client.ImageBuild(ctx, buff, types.ImageBuildOptions***REMOVED***Remove: c.rm, ForceRemove: c.forceRm, NoCache: true***REMOVED***)
+			resp, err := client.ImageBuild(ctx, buff, types.ImageBuildOptions{Remove: c.rm, ForceRemove: c.forceRm, NoCache: true})
 			require.NoError(t, err)
 			defer resp.Body.Close()
 			filter, err := buildContainerIdsFilter(resp.Body)
 			require.NoError(t, err)
-			remainingContainers, err := client.ContainerList(ctx, types.ContainerListOptions***REMOVED***Filters: filter, All: true***REMOVED***)
+			remainingContainers, err := client.ContainerList(ctx, types.ContainerListOptions{Filters: filter, All: true})
 			require.NoError(t, err)
 			require.Equal(t, c.numberOfIntermediateContainers, len(remainingContainers), "Expected %v remaining intermediate containers, got %v", c.numberOfIntermediateContainers, len(remainingContainers))
-		***REMOVED***)
-	***REMOVED***
-***REMOVED***
+		})
+	}
+}
 
-func buildContainerIdsFilter(buildOutput io.Reader) (filters.Args, error) ***REMOVED***
+func buildContainerIdsFilter(buildOutput io.Reader) (filters.Args, error) {
 	const intermediateContainerPrefix = " ---> Running in "
 	filter := filters.NewArgs()
 
 	dec := json.NewDecoder(buildOutput)
-	for ***REMOVED***
-		m := jsonmessage.JSONMessage***REMOVED******REMOVED***
+	for {
+		m := jsonmessage.JSONMessage{}
 		err := dec.Decode(&m)
-		if err == io.EOF ***REMOVED***
+		if err == io.EOF {
 			return filter, nil
-		***REMOVED***
-		if err != nil ***REMOVED***
+		}
+		if err != nil {
 			return filter, err
-		***REMOVED***
-		if ix := strings.Index(m.Stream, intermediateContainerPrefix); ix != -1 ***REMOVED***
+		}
+		if ix := strings.Index(m.Stream, intermediateContainerPrefix); ix != -1 {
 			filter.Add("id", strings.TrimSpace(m.Stream[ix+len(intermediateContainerPrefix):]))
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestBuildMultiStageParentConfig(t *testing.T) ***REMOVED***
+func TestBuildMultiStageParentConfig(t *testing.T) {
 	dockerfile := `
 		FROM busybox AS stage0
 		ENV WHO=parent
@@ -153,11 +153,11 @@ func TestBuildMultiStageParentConfig(t *testing.T) ***REMOVED***
 	apiclient := testEnv.APIClient()
 	resp, err := apiclient.ImageBuild(ctx,
 		source.AsTarReader(t),
-		types.ImageBuildOptions***REMOVED***
+		types.ImageBuildOptions{
 			Remove:      true,
 			ForceRemove: true,
-			Tags:        []string***REMOVED***"build1"***REMOVED***,
-		***REMOVED***)
+			Tags:        []string{"build1"},
+		})
 	require.NoError(t, err)
 	_, err = io.Copy(ioutil.Discard, resp.Body)
 	resp.Body.Close()
@@ -168,9 +168,9 @@ func TestBuildMultiStageParentConfig(t *testing.T) ***REMOVED***
 
 	assert.Equal(t, "/foo/sub2", image.Config.WorkingDir)
 	assert.Contains(t, image.Config.Env, "WHO=parent")
-***REMOVED***
+}
 
-func TestBuildWithEmptyLayers(t *testing.T) ***REMOVED***
+func TestBuildWithEmptyLayers(t *testing.T) {
 	dockerfile := `
 		FROM    busybox
 		COPY    1/ /target/
@@ -188,20 +188,20 @@ func TestBuildWithEmptyLayers(t *testing.T) ***REMOVED***
 	apiclient := testEnv.APIClient()
 	resp, err := apiclient.ImageBuild(ctx,
 		source.AsTarReader(t),
-		types.ImageBuildOptions***REMOVED***
+		types.ImageBuildOptions{
 			Remove:      true,
 			ForceRemove: true,
-		***REMOVED***)
+		})
 	require.NoError(t, err)
 	_, err = io.Copy(ioutil.Discard, resp.Body)
 	resp.Body.Close()
 	require.NoError(t, err)
-***REMOVED***
+}
 
 // TestBuildMultiStageOnBuild checks that ONBUILD commands are applied to
 // multiple subsequent stages
 // #35652
-func TestBuildMultiStageOnBuild(t *testing.T) ***REMOVED***
+func TestBuildMultiStageOnBuild(t *testing.T) {
 	defer setupTest(t)()
 	// test both metadata and layer based commands as they may be implemented differently
 	dockerfile := `FROM busybox AS stage1
@@ -222,10 +222,10 @@ RUN cat somefile`
 	apiclient := testEnv.APIClient()
 	resp, err := apiclient.ImageBuild(ctx,
 		source.AsTarReader(t),
-		types.ImageBuildOptions***REMOVED***
+		types.ImageBuildOptions{
 			Remove:      true,
 			ForceRemove: true,
-		***REMOVED***)
+		})
 
 	out := bytes.NewBuffer(nil)
 	require.NoError(t, err)
@@ -242,28 +242,28 @@ RUN cat somefile`
 	image, _, err := apiclient.ImageInspectWithRaw(context.Background(), imageIDs[2])
 	require.NoError(t, err)
 	assert.Contains(t, image.Config.Env, "bar=baz")
-***REMOVED***
+}
 
-type buildLine struct ***REMOVED***
+type buildLine struct {
 	Stream string
-	Aux    struct ***REMOVED***
+	Aux    struct {
 		ID string
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func getImageIDsFromBuild(output []byte) ([]string, error) ***REMOVED***
-	ids := []string***REMOVED******REMOVED***
-	for _, line := range bytes.Split(output, []byte("\n")) ***REMOVED***
-		if len(line) == 0 ***REMOVED***
+func getImageIDsFromBuild(output []byte) ([]string, error) {
+	ids := []string{}
+	for _, line := range bytes.Split(output, []byte("\n")) {
+		if len(line) == 0 {
 			continue
-		***REMOVED***
-		entry := buildLine***REMOVED******REMOVED***
-		if err := json.Unmarshal(line, &entry); err != nil ***REMOVED***
+		}
+		entry := buildLine{}
+		if err := json.Unmarshal(line, &entry); err != nil {
 			return nil, err
-		***REMOVED***
-		if entry.Aux.ID != "" ***REMOVED***
+		}
+		if entry.Aux.ID != "" {
 			ids = append(ids, entry.Aux.ID)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return ids, nil
-***REMOVED***
+}

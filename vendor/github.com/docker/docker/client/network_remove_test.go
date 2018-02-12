@@ -11,37 +11,37 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestNetworkRemoveError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestNetworkRemoveError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
-	***REMOVED***
+	}
 
 	err := client.NetworkRemove(context.Background(), "network_id")
-	if err == nil || err.Error() != "Error response from daemon: Server error" ***REMOVED***
+	if err == nil || err.Error() != "Error response from daemon: Server error" {
 		t.Fatalf("expected a Server Error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestNetworkRemove(t *testing.T) ***REMOVED***
+func TestNetworkRemove(t *testing.T) {
 	expectedURL := "/networks/network_id"
 
-	client := &Client***REMOVED***
-		client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-			if !strings.HasPrefix(req.URL.Path, expectedURL) ***REMOVED***
+	client := &Client{
+		client: newMockClient(func(req *http.Request) (*http.Response, error) {
+			if !strings.HasPrefix(req.URL.Path, expectedURL) {
 				return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, req.URL)
-			***REMOVED***
-			if req.Method != "DELETE" ***REMOVED***
+			}
+			if req.Method != "DELETE" {
 				return nil, fmt.Errorf("expected DELETE method, got %s", req.Method)
-			***REMOVED***
-			return &http.Response***REMOVED***
+			}
+			return &http.Response{
 				StatusCode: http.StatusOK,
 				Body:       ioutil.NopCloser(bytes.NewReader([]byte("body"))),
-			***REMOVED***, nil
-		***REMOVED***),
-	***REMOVED***
+			}, nil
+		}),
+	}
 
 	err := client.NetworkRemove(context.Background(), "network_id")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}

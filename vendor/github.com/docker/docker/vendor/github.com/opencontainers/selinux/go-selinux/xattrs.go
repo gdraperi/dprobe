@@ -11,16 +11,16 @@ var _zero uintptr
 
 // Returns a []byte slice if the xattr is set and nil otherwise
 // Requires path and its attribute as arguments
-func lgetxattr(path string, attr string) ([]byte, error) ***REMOVED***
+func lgetxattr(path string, attr string) ([]byte, error) {
 	var sz int
 	pathBytes, err := syscall.BytePtrFromString(path)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	attrBytes, err := syscall.BytePtrFromString(attr)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// Start with a 128 length byte array
 	sz = 128
@@ -28,7 +28,7 @@ func lgetxattr(path string, attr string) ([]byte, error) ***REMOVED***
 	destBytes := unsafe.Pointer(&dest[0])
 	_sz, _, errno := syscall.Syscall6(syscall.SYS_LGETXATTR, uintptr(unsafe.Pointer(pathBytes)), uintptr(unsafe.Pointer(attrBytes)), uintptr(destBytes), uintptr(len(dest)), 0, 0)
 
-	switch ***REMOVED***
+	switch {
 	case errno == syscall.ENODATA:
 		return nil, errno
 	case errno == syscall.ENOTSUP:
@@ -39,40 +39,40 @@ func lgetxattr(path string, attr string) ([]byte, error) ***REMOVED***
 		// of the xattrs on disk
 		_sz, _, errno = syscall.Syscall6(syscall.SYS_LGETXATTR, uintptr(unsafe.Pointer(pathBytes)), uintptr(unsafe.Pointer(attrBytes)), uintptr(unsafe.Pointer(nil)), uintptr(0), 0, 0)
 		sz = int(_sz)
-		if sz < 0 ***REMOVED***
+		if sz < 0 {
 			return nil, errno
-		***REMOVED***
+		}
 		dest = make([]byte, sz)
 		destBytes := unsafe.Pointer(&dest[0])
 		_sz, _, errno = syscall.Syscall6(syscall.SYS_LGETXATTR, uintptr(unsafe.Pointer(pathBytes)), uintptr(unsafe.Pointer(attrBytes)), uintptr(destBytes), uintptr(len(dest)), 0, 0)
-		if errno != 0 ***REMOVED***
+		if errno != 0 {
 			return nil, errno
-		***REMOVED***
+		}
 	case errno != 0:
 		return nil, errno
-	***REMOVED***
+	}
 	sz = int(_sz)
 	return dest[:sz], nil
-***REMOVED***
+}
 
-func lsetxattr(path string, attr string, data []byte, flags int) error ***REMOVED***
+func lsetxattr(path string, attr string, data []byte, flags int) error {
 	pathBytes, err := syscall.BytePtrFromString(path)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	attrBytes, err := syscall.BytePtrFromString(attr)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	var dataBytes unsafe.Pointer
-	if len(data) > 0 ***REMOVED***
+	if len(data) > 0 {
 		dataBytes = unsafe.Pointer(&data[0])
-	***REMOVED*** else ***REMOVED***
+	} else {
 		dataBytes = unsafe.Pointer(&_zero)
-	***REMOVED***
+	}
 	_, _, errno := syscall.Syscall6(syscall.SYS_LSETXATTR, uintptr(unsafe.Pointer(pathBytes)), uintptr(unsafe.Pointer(attrBytes)), uintptr(dataBytes), uintptr(len(data)), uintptr(flags), 0)
-	if errno != 0 ***REMOVED***
+	if errno != 0 {
 		return errno
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

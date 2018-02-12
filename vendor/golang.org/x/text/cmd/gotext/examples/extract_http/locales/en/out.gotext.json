@@ -1,39 +1,39 @@
-***REMOVED***
+{
     "language": "en",
     "messages": [
-        ***REMOVED***
-            "id": "Hello ***REMOVED***From***REMOVED***!",
-            "message": "Hello ***REMOVED***From***REMOVED***!",
-            "translation": "Hello ***REMOVED***From***REMOVED***!",
+        {
+            "id": "Hello {From}!",
+            "message": "Hello {From}!",
+            "translation": "Hello {From}!",
             "translatorComment": "Copied from source.",
             "placeholders": [
-                ***REMOVED***
+                {
                     "id": "From",
                     "string": "%[1]s",
                     "type": "string",
                     "underlyingType": "string",
                     "argNum": 1,
                     "expr": "r.Header.Get(\"From\")"
-            ***REMOVED***
+                }
             ],
             "fuzzy": true
-    ***REMOVED***,
-        ***REMOVED***
-            "id": "Do you like your browser (***REMOVED***User_Agent***REMOVED***)?",
-            "message": "Do you like your browser (***REMOVED***User_Agent***REMOVED***)?",
-            "translation": "Do you like your browser (***REMOVED***User_Agent***REMOVED***)?",
+        },
+        {
+            "id": "Do you like your browser ({User_Agent})?",
+            "message": "Do you like your browser ({User_Agent})?",
+            "translation": "Do you like your browser ({User_Agent})?",
             "translatorComment": "Copied from source.",
             "placeholders": [
-                ***REMOVED***
+                {
                     "id": "User_Agent",
                     "string": "%[1]s",
                     "type": "string",
                     "underlyingType": "string",
                     "argNum": 1,
                     "expr": "r.Header.Get(\"User-Agent\")"
-            ***REMOVED***
+                }
             ],
             "fuzzy": true
-    ***REMOVED***
+        }
     ]
-***REMOVED***
+}

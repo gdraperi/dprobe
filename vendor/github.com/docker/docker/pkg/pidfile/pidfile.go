@@ -15,39 +15,39 @@ import (
 )
 
 // PIDFile is a file used to store the process ID of a running process.
-type PIDFile struct ***REMOVED***
+type PIDFile struct {
 	path string
-***REMOVED***
+}
 
-func checkPIDFileAlreadyExists(path string) error ***REMOVED***
-	if pidByte, err := ioutil.ReadFile(path); err == nil ***REMOVED***
+func checkPIDFileAlreadyExists(path string) error {
+	if pidByte, err := ioutil.ReadFile(path); err == nil {
 		pidString := strings.TrimSpace(string(pidByte))
-		if pid, err := strconv.Atoi(pidString); err == nil ***REMOVED***
-			if processExists(pid) ***REMOVED***
+		if pid, err := strconv.Atoi(pidString); err == nil {
+			if processExists(pid) {
 				return fmt.Errorf("pid file found, ensure docker is not running or delete %s", path)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return nil
-***REMOVED***
+}
 
 // New creates a PIDfile using the specified path.
-func New(path string) (*PIDFile, error) ***REMOVED***
-	if err := checkPIDFileAlreadyExists(path); err != nil ***REMOVED***
+func New(path string) (*PIDFile, error) {
+	if err := checkPIDFileAlreadyExists(path); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	// Note MkdirAll returns nil if a directory already exists
-	if err := system.MkdirAll(filepath.Dir(path), os.FileMode(0755), ""); err != nil ***REMOVED***
+	if err := system.MkdirAll(filepath.Dir(path), os.FileMode(0755), ""); err != nil {
 		return nil, err
-	***REMOVED***
-	if err := ioutil.WriteFile(path, []byte(fmt.Sprintf("%d", os.Getpid())), 0644); err != nil ***REMOVED***
+	}
+	if err := ioutil.WriteFile(path, []byte(fmt.Sprintf("%d", os.Getpid())), 0644); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	return &PIDFile***REMOVED***path: path***REMOVED***, nil
-***REMOVED***
+	return &PIDFile{path: path}, nil
+}
 
 // Remove removes the PIDFile.
-func (file PIDFile) Remove() error ***REMOVED***
+func (file PIDFile) Remove() error {
 	return os.Remove(file.path)
-***REMOVED***
+}

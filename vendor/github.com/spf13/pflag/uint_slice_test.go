@@ -7,155 +7,155 @@ import (
 	"testing"
 )
 
-func setUpUISFlagSet(uisp *[]uint) *FlagSet ***REMOVED***
+func setUpUISFlagSet(uisp *[]uint) *FlagSet {
 	f := NewFlagSet("test", ContinueOnError)
-	f.UintSliceVar(uisp, "uis", []uint***REMOVED******REMOVED***, "Command separated list!")
+	f.UintSliceVar(uisp, "uis", []uint{}, "Command separated list!")
 	return f
-***REMOVED***
+}
 
-func setUpUISFlagSetWithDefault(uisp *[]uint) *FlagSet ***REMOVED***
+func setUpUISFlagSetWithDefault(uisp *[]uint) *FlagSet {
 	f := NewFlagSet("test", ContinueOnError)
-	f.UintSliceVar(uisp, "uis", []uint***REMOVED***0, 1***REMOVED***, "Command separated list!")
+	f.UintSliceVar(uisp, "uis", []uint{0, 1}, "Command separated list!")
 	return f
-***REMOVED***
+}
 
-func TestEmptyUIS(t *testing.T) ***REMOVED***
+func TestEmptyUIS(t *testing.T) {
 	var uis []uint
 	f := setUpUISFlagSet(&uis)
-	err := f.Parse([]string***REMOVED******REMOVED***)
-	if err != nil ***REMOVED***
+	err := f.Parse([]string{})
+	if err != nil {
 		t.Fatal("expected no error; got", err)
-	***REMOVED***
+	}
 
 	getUIS, err := f.GetUintSlice("uis")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal("got an error from GetUintSlice():", err)
-	***REMOVED***
-	if len(getUIS) != 0 ***REMOVED***
+	}
+	if len(getUIS) != 0 {
 		t.Fatalf("got is %v with len=%d but expected length=0", getUIS, len(getUIS))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestUIS(t *testing.T) ***REMOVED***
+func TestUIS(t *testing.T) {
 	var uis []uint
 	f := setUpUISFlagSet(&uis)
 
-	vals := []string***REMOVED***"1", "2", "4", "3"***REMOVED***
+	vals := []string{"1", "2", "4", "3"}
 	arg := fmt.Sprintf("--uis=%s", strings.Join(vals, ","))
-	err := f.Parse([]string***REMOVED***arg***REMOVED***)
-	if err != nil ***REMOVED***
+	err := f.Parse([]string{arg})
+	if err != nil {
 		t.Fatal("expected no error; got", err)
-	***REMOVED***
-	for i, v := range uis ***REMOVED***
+	}
+	for i, v := range uis {
 		u, err := strconv.ParseUint(vals[i], 10, 0)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("got error: %v", err)
-		***REMOVED***
-		if uint(u) != v ***REMOVED***
+		}
+		if uint(u) != v {
 			t.Fatalf("expected uis[%d] to be %s but got %d", i, vals[i], v)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	getUIS, err := f.GetUintSlice("uis")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("got error: %v", err)
-	***REMOVED***
-	for i, v := range getUIS ***REMOVED***
+	}
+	for i, v := range getUIS {
 		u, err := strconv.ParseUint(vals[i], 10, 0)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("got error: %v", err)
-		***REMOVED***
-		if uint(u) != v ***REMOVED***
+		}
+		if uint(u) != v {
 			t.Fatalf("expected uis[%d] to be %s but got: %d from GetUintSlice", i, vals[i], v)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestUISDefault(t *testing.T) ***REMOVED***
+func TestUISDefault(t *testing.T) {
 	var uis []uint
 	f := setUpUISFlagSetWithDefault(&uis)
 
-	vals := []string***REMOVED***"0", "1"***REMOVED***
+	vals := []string{"0", "1"}
 
-	err := f.Parse([]string***REMOVED******REMOVED***)
-	if err != nil ***REMOVED***
+	err := f.Parse([]string{})
+	if err != nil {
 		t.Fatal("expected no error; got", err)
-	***REMOVED***
-	for i, v := range uis ***REMOVED***
+	}
+	for i, v := range uis {
 		u, err := strconv.ParseUint(vals[i], 10, 0)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("got error: %v", err)
-		***REMOVED***
-		if uint(u) != v ***REMOVED***
+		}
+		if uint(u) != v {
 			t.Fatalf("expect uis[%d] to be %d but got: %d", i, u, v)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	getUIS, err := f.GetUintSlice("uis")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal("got an error from GetUintSlice():", err)
-	***REMOVED***
-	for i, v := range getUIS ***REMOVED***
+	}
+	for i, v := range getUIS {
 		u, err := strconv.ParseUint(vals[i], 10, 0)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatal("got an error from GetIntSlice():", err)
-		***REMOVED***
-		if uint(u) != v ***REMOVED***
+		}
+		if uint(u) != v {
 			t.Fatalf("expected uis[%d] to be %d from GetUintSlice but got: %d", i, u, v)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestUISWithDefault(t *testing.T) ***REMOVED***
+func TestUISWithDefault(t *testing.T) {
 	var uis []uint
 	f := setUpUISFlagSetWithDefault(&uis)
 
-	vals := []string***REMOVED***"1", "2"***REMOVED***
+	vals := []string{"1", "2"}
 	arg := fmt.Sprintf("--uis=%s", strings.Join(vals, ","))
-	err := f.Parse([]string***REMOVED***arg***REMOVED***)
-	if err != nil ***REMOVED***
+	err := f.Parse([]string{arg})
+	if err != nil {
 		t.Fatal("expected no error; got", err)
-	***REMOVED***
-	for i, v := range uis ***REMOVED***
+	}
+	for i, v := range uis {
 		u, err := strconv.ParseUint(vals[i], 10, 0)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("got error: %v", err)
-		***REMOVED***
-		if uint(u) != v ***REMOVED***
+		}
+		if uint(u) != v {
 			t.Fatalf("expected uis[%d] to be %d from GetUintSlice but got: %d", i, u, v)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	getUIS, err := f.GetUintSlice("uis")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal("got an error from GetUintSlice():", err)
-	***REMOVED***
-	for i, v := range getUIS ***REMOVED***
+	}
+	for i, v := range getUIS {
 		u, err := strconv.ParseUint(vals[i], 10, 0)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("got error: %v", err)
-		***REMOVED***
-		if uint(u) != v ***REMOVED***
+		}
+		if uint(u) != v {
 			t.Fatalf("expected uis[%d] to be %d from GetUintSlice but got: %d", i, u, v)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestUISCalledTwice(t *testing.T) ***REMOVED***
+func TestUISCalledTwice(t *testing.T) {
 	var uis []uint
 	f := setUpUISFlagSet(&uis)
 
-	in := []string***REMOVED***"1,2", "3"***REMOVED***
-	expected := []int***REMOVED***1, 2, 3***REMOVED***
+	in := []string{"1,2", "3"}
+	expected := []int{1, 2, 3}
 	argfmt := "--uis=%s"
 	arg1 := fmt.Sprintf(argfmt, in[0])
 	arg2 := fmt.Sprintf(argfmt, in[1])
-	err := f.Parse([]string***REMOVED***arg1, arg2***REMOVED***)
-	if err != nil ***REMOVED***
+	err := f.Parse([]string{arg1, arg2})
+	if err != nil {
 		t.Fatal("expected no error; got", err)
-	***REMOVED***
-	for i, v := range uis ***REMOVED***
-		if uint(expected[i]) != v ***REMOVED***
+	}
+	for i, v := range uis {
+		if uint(expected[i]) != v {
 			t.Fatalf("expected uis[%d] to be %d but got: %d", i, expected[i], v)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

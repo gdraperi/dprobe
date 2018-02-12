@@ -22,12 +22,12 @@ const (
 	metricsBuildCanceled                = "build_canceled"
 )
 
-func init() ***REMOVED***
+func init() {
 	buildMetrics := metrics.NewNamespace("builder", "", nil)
 
 	buildsTriggered = buildMetrics.NewCounter("builds_triggered", "Number of triggered image builds")
 	buildsFailed = buildMetrics.NewLabeledCounter("builds_failed", "Number of failed image builds", "reason")
-	for _, r := range []string***REMOVED***
+	for _, r := range []string{
 		metricsDockerfileSyntaxError,
 		metricsDockerfileEmptyError,
 		metricsCommandNotSupportedError,
@@ -36,9 +36,9 @@ func init() ***REMOVED***
 		metricsMissingOnbuildArgumentsError,
 		metricsUnknownInstructionError,
 		metricsBuildCanceled,
-	***REMOVED*** ***REMOVED***
+	} {
 		buildsFailed.WithValues(r)
-	***REMOVED***
+	}
 
 	metrics.Register(buildMetrics)
-***REMOVED***
+}

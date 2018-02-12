@@ -6,19 +6,19 @@ import (
 	"net/url"
 )
 
-type OAuthResponseIncomingWebhook struct ***REMOVED***
+type OAuthResponseIncomingWebhook struct {
 	URL              string `json:"url"`
 	Channel          string `json:"channel"`
 	ChannelID        string `json:"channel_id,omitempty"`
 	ConfigurationURL string `json:"configuration_url"`
-***REMOVED***
+}
 
-type OAuthResponseBot struct ***REMOVED***
+type OAuthResponseBot struct {
 	BotUserID      string `json:"bot_user_id"`
 	BotAccessToken string `json:"bot_access_token"`
-***REMOVED***
+}
 
-type OAuthResponse struct ***REMOVED***
+type OAuthResponse struct {
 	AccessToken     string                       `json:"access_token"`
 	Scope           string                       `json:"scope"`
 	TeamName        string                       `json:"team_name"`
@@ -27,40 +27,40 @@ type OAuthResponse struct ***REMOVED***
 	Bot             OAuthResponseBot             `json:"bot"`
 	UserID          string                       `json:"user_id,omitempty"`
 	SlackResponse
-***REMOVED***
+}
 
 // GetOAuthToken retrieves an AccessToken
-func GetOAuthToken(clientID, clientSecret, code, redirectURI string, debug bool) (accessToken string, scope string, err error) ***REMOVED***
+func GetOAuthToken(clientID, clientSecret, code, redirectURI string, debug bool) (accessToken string, scope string, err error) {
 	return GetOAuthTokenContext(context.Background(), clientID, clientSecret, code, redirectURI, debug)
-***REMOVED***
+}
 
 // GetOAuthTokenContext retrieves an AccessToken with a custom context
-func GetOAuthTokenContext(ctx context.Context, clientID, clientSecret, code, redirectURI string, debug bool) (accessToken string, scope string, err error) ***REMOVED***
+func GetOAuthTokenContext(ctx context.Context, clientID, clientSecret, code, redirectURI string, debug bool) (accessToken string, scope string, err error) {
 	response, err := GetOAuthResponseContext(ctx, clientID, clientSecret, code, redirectURI, debug)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", "", err
-	***REMOVED***
+	}
 	return response.AccessToken, response.Scope, nil
-***REMOVED***
+}
 
-func GetOAuthResponse(clientID, clientSecret, code, redirectURI string, debug bool) (resp *OAuthResponse, err error) ***REMOVED***
+func GetOAuthResponse(clientID, clientSecret, code, redirectURI string, debug bool) (resp *OAuthResponse, err error) {
 	return GetOAuthResponseContext(context.Background(), clientID, clientSecret, code, redirectURI, debug)
-***REMOVED***
+}
 
-func GetOAuthResponseContext(ctx context.Context, clientID, clientSecret, code, redirectURI string, debug bool) (resp *OAuthResponse, err error) ***REMOVED***
-	values := url.Values***REMOVED***
-		"client_id":     ***REMOVED***clientID***REMOVED***,
-		"client_secret": ***REMOVED***clientSecret***REMOVED***,
-		"code":          ***REMOVED***code***REMOVED***,
-		"redirect_uri":  ***REMOVED***redirectURI***REMOVED***,
-	***REMOVED***
-	response := &OAuthResponse***REMOVED******REMOVED***
+func GetOAuthResponseContext(ctx context.Context, clientID, clientSecret, code, redirectURI string, debug bool) (resp *OAuthResponse, err error) {
+	values := url.Values{
+		"client_id":     {clientID},
+		"client_secret": {clientSecret},
+		"code":          {code},
+		"redirect_uri":  {redirectURI},
+	}
+	response := &OAuthResponse{}
 	err = post(ctx, customHTTPClient, "oauth.access", values, response, debug)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if !response.Ok ***REMOVED***
+	}
+	if !response.Ok {
 		return nil, errors.New(response.Error)
-	***REMOVED***
+	}
 	return response, nil
-***REMOVED***
+}

@@ -16,30 +16,30 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func usage() ***REMOVED***
+func usage() {
 	fmt.Fprintf(os.Stderr, "Usage: %s <flags>  [status] | [list] | [device id]  | [resize new-pool-size] | [snap new-id base-id] | [remove id] | [mount id mountpoint]\n", os.Args[0])
 	flag.PrintDefaults()
 	os.Exit(1)
-***REMOVED***
+}
 
-func byteSizeFromString(arg string) (int64, error) ***REMOVED***
+func byteSizeFromString(arg string) (int64, error) {
 	digits := ""
 	rest := ""
 	last := strings.LastIndexAny(arg, "0123456789")
-	if last >= 0 ***REMOVED***
+	if last >= 0 {
 		digits = arg[:last+1]
 		rest = arg[last+1:]
-	***REMOVED***
+	}
 
 	val, err := strconv.ParseInt(digits, 10, 64)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return val, err
-	***REMOVED***
+	}
 
 	rest = strings.ToLower(strings.TrimSpace(rest))
 
 	var multiplier int64 = 1
-	switch rest ***REMOVED***
+	switch rest {
 	case "":
 		multiplier = 1
 	case "k", "kb":
@@ -52,36 +52,36 @@ func byteSizeFromString(arg string) (int64, error) ***REMOVED***
 		multiplier = 1024 * 1024 * 1024 * 1024
 	default:
 		return 0, fmt.Errorf("Unknown size unit: %s", rest)
-	***REMOVED***
+	}
 
 	return val * multiplier, nil
-***REMOVED***
+}
 
-func main() ***REMOVED***
+func main() {
 	root := flag.String("r", "/var/lib/docker", "Docker root dir")
 	flDebug := flag.Bool("D", false, "Debug mode")
 
 	flag.Parse()
 
-	if *flDebug ***REMOVED***
+	if *flDebug {
 		os.Setenv("DEBUG", "1")
 		logrus.SetLevel(logrus.DebugLevel)
-	***REMOVED***
+	}
 
-	if flag.NArg() < 1 ***REMOVED***
+	if flag.NArg() < 1 {
 		usage()
-	***REMOVED***
+	}
 
 	args := flag.Args()
 
 	home := path.Join(*root, "devicemapper")
 	devices, err := devmapper.NewDeviceSet(home, false, nil, nil, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		fmt.Println("Can't initialize device mapper: ", err)
 		os.Exit(1)
-	***REMOVED***
+	}
 
-	switch args[0] ***REMOVED***
+	switch args[0] {
 	case "status":
 		status := devices.Status()
 		fmt.Printf("Pool name: %s\n", status.PoolName)
@@ -93,18 +93,18 @@ func main() ***REMOVED***
 	case "list":
 		ids := devices.List()
 		sort.Strings(ids)
-		for _, id := range ids ***REMOVED***
+		for _, id := range ids {
 			fmt.Println(id)
-		***REMOVED***
+		}
 	case "device":
-		if flag.NArg() < 2 ***REMOVED***
+		if flag.NArg() < 2 {
 			usage()
-		***REMOVED***
+		}
 		status, err := devices.GetDeviceStatus(args[1])
-		if err != nil ***REMOVED***
+		if err != nil {
 			fmt.Println("Can't get device info: ", err)
 			os.Exit(1)
-		***REMOVED***
+		}
 		fmt.Printf("Id: %d\n", status.DeviceID)
 		fmt.Printf("Size: %d\n", status.Size)
 		fmt.Printf("Transaction Id: %d\n", status.TransactionID)
@@ -112,56 +112,56 @@ func main() ***REMOVED***
 		fmt.Printf("Mapped Sectors: %d\n", status.MappedSectors)
 		fmt.Printf("Highest Mapped Sector: %d\n", status.HighestMappedSector)
 	case "resize":
-		if flag.NArg() < 2 ***REMOVED***
+		if flag.NArg() < 2 {
 			usage()
-		***REMOVED***
+		}
 
 		size, err := byteSizeFromString(args[1])
-		if err != nil ***REMOVED***
+		if err != nil {
 			fmt.Println("Invalid size: ", err)
 			os.Exit(1)
-		***REMOVED***
+		}
 
 		err = devices.ResizePool(size)
-		if err != nil ***REMOVED***
+		if err != nil {
 			fmt.Println("Error resizing pool: ", err)
 			os.Exit(1)
-		***REMOVED***
+		}
 
 	case "snap":
-		if flag.NArg() < 3 ***REMOVED***
+		if flag.NArg() < 3 {
 			usage()
-		***REMOVED***
+		}
 
 		err := devices.AddDevice(args[1], args[2], nil)
-		if err != nil ***REMOVED***
+		if err != nil {
 			fmt.Println("Can't create snap device: ", err)
 			os.Exit(1)
-		***REMOVED***
+		}
 	case "remove":
-		if flag.NArg() < 2 ***REMOVED***
+		if flag.NArg() < 2 {
 			usage()
-		***REMOVED***
+		}
 
 		err := devicemapper.RemoveDevice(args[1])
-		if err != nil ***REMOVED***
+		if err != nil {
 			fmt.Println("Can't remove device: ", err)
 			os.Exit(1)
-		***REMOVED***
+		}
 	case "mount":
-		if flag.NArg() < 3 ***REMOVED***
+		if flag.NArg() < 3 {
 			usage()
-		***REMOVED***
+		}
 
 		err := devices.MountDevice(args[1], args[2], "")
-		if err != nil ***REMOVED***
+		if err != nil {
 			fmt.Println("Can't mount device: ", err)
 			os.Exit(1)
-		***REMOVED***
+		}
 	default:
 		fmt.Printf("Unknown command %s\n", args[0])
 		usage()
 
 		os.Exit(1)
-	***REMOVED***
-***REMOVED***
+	}
+}

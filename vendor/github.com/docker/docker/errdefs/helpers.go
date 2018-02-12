@@ -2,239 +2,239 @@ package errdefs
 
 import "context"
 
-type errNotFound struct***REMOVED*** error ***REMOVED***
+type errNotFound struct{ error }
 
-func (errNotFound) NotFound() ***REMOVED******REMOVED***
+func (errNotFound) NotFound() {}
 
-func (e errNotFound) Cause() error ***REMOVED***
+func (e errNotFound) Cause() error {
 	return e.error
-***REMOVED***
+}
 
 // NotFound is a helper to create an error of the class with the same name from any error type
-func NotFound(err error) error ***REMOVED***
-	if err == nil ***REMOVED***
+func NotFound(err error) error {
+	if err == nil {
 		return nil
-	***REMOVED***
-	return errNotFound***REMOVED***err***REMOVED***
-***REMOVED***
+	}
+	return errNotFound{err}
+}
 
-type errInvalidParameter struct***REMOVED*** error ***REMOVED***
+type errInvalidParameter struct{ error }
 
-func (errInvalidParameter) InvalidParameter() ***REMOVED******REMOVED***
+func (errInvalidParameter) InvalidParameter() {}
 
-func (e errInvalidParameter) Cause() error ***REMOVED***
+func (e errInvalidParameter) Cause() error {
 	return e.error
-***REMOVED***
+}
 
 // InvalidParameter is a helper to create an error of the class with the same name from any error type
-func InvalidParameter(err error) error ***REMOVED***
-	if err == nil ***REMOVED***
+func InvalidParameter(err error) error {
+	if err == nil {
 		return nil
-	***REMOVED***
-	return errInvalidParameter***REMOVED***err***REMOVED***
-***REMOVED***
+	}
+	return errInvalidParameter{err}
+}
 
-type errConflict struct***REMOVED*** error ***REMOVED***
+type errConflict struct{ error }
 
-func (errConflict) Conflict() ***REMOVED******REMOVED***
+func (errConflict) Conflict() {}
 
-func (e errConflict) Cause() error ***REMOVED***
+func (e errConflict) Cause() error {
 	return e.error
-***REMOVED***
+}
 
 // Conflict is a helper to create an error of the class with the same name from any error type
-func Conflict(err error) error ***REMOVED***
-	if err == nil ***REMOVED***
+func Conflict(err error) error {
+	if err == nil {
 		return nil
-	***REMOVED***
-	return errConflict***REMOVED***err***REMOVED***
-***REMOVED***
+	}
+	return errConflict{err}
+}
 
-type errUnauthorized struct***REMOVED*** error ***REMOVED***
+type errUnauthorized struct{ error }
 
-func (errUnauthorized) Unauthorized() ***REMOVED******REMOVED***
+func (errUnauthorized) Unauthorized() {}
 
-func (e errUnauthorized) Cause() error ***REMOVED***
+func (e errUnauthorized) Cause() error {
 	return e.error
-***REMOVED***
+}
 
 // Unauthorized is a helper to create an error of the class with the same name from any error type
-func Unauthorized(err error) error ***REMOVED***
-	if err == nil ***REMOVED***
+func Unauthorized(err error) error {
+	if err == nil {
 		return nil
-	***REMOVED***
-	return errUnauthorized***REMOVED***err***REMOVED***
-***REMOVED***
+	}
+	return errUnauthorized{err}
+}
 
-type errUnavailable struct***REMOVED*** error ***REMOVED***
+type errUnavailable struct{ error }
 
-func (errUnavailable) Unavailable() ***REMOVED******REMOVED***
+func (errUnavailable) Unavailable() {}
 
-func (e errUnavailable) Cause() error ***REMOVED***
+func (e errUnavailable) Cause() error {
 	return e.error
-***REMOVED***
+}
 
 // Unavailable is a helper to create an error of the class with the same name from any error type
-func Unavailable(err error) error ***REMOVED***
-	return errUnavailable***REMOVED***err***REMOVED***
-***REMOVED***
+func Unavailable(err error) error {
+	return errUnavailable{err}
+}
 
-type errForbidden struct***REMOVED*** error ***REMOVED***
+type errForbidden struct{ error }
 
-func (errForbidden) Forbidden() ***REMOVED******REMOVED***
+func (errForbidden) Forbidden() {}
 
-func (e errForbidden) Cause() error ***REMOVED***
+func (e errForbidden) Cause() error {
 	return e.error
-***REMOVED***
+}
 
 // Forbidden is a helper to create an error of the class with the same name from any error type
-func Forbidden(err error) error ***REMOVED***
-	if err == nil ***REMOVED***
+func Forbidden(err error) error {
+	if err == nil {
 		return nil
-	***REMOVED***
-	return errForbidden***REMOVED***err***REMOVED***
-***REMOVED***
+	}
+	return errForbidden{err}
+}
 
-type errSystem struct***REMOVED*** error ***REMOVED***
+type errSystem struct{ error }
 
-func (errSystem) System() ***REMOVED******REMOVED***
+func (errSystem) System() {}
 
-func (e errSystem) Cause() error ***REMOVED***
+func (e errSystem) Cause() error {
 	return e.error
-***REMOVED***
+}
 
 // System is a helper to create an error of the class with the same name from any error type
-func System(err error) error ***REMOVED***
-	if err == nil ***REMOVED***
+func System(err error) error {
+	if err == nil {
 		return nil
-	***REMOVED***
-	return errSystem***REMOVED***err***REMOVED***
-***REMOVED***
+	}
+	return errSystem{err}
+}
 
-type errNotModified struct***REMOVED*** error ***REMOVED***
+type errNotModified struct{ error }
 
-func (errNotModified) NotModified() ***REMOVED******REMOVED***
+func (errNotModified) NotModified() {}
 
-func (e errNotModified) Cause() error ***REMOVED***
+func (e errNotModified) Cause() error {
 	return e.error
-***REMOVED***
+}
 
 // NotModified is a helper to create an error of the class with the same name from any error type
-func NotModified(err error) error ***REMOVED***
-	if err == nil ***REMOVED***
+func NotModified(err error) error {
+	if err == nil {
 		return nil
-	***REMOVED***
-	return errNotModified***REMOVED***err***REMOVED***
-***REMOVED***
+	}
+	return errNotModified{err}
+}
 
-type errAlreadyExists struct***REMOVED*** error ***REMOVED***
+type errAlreadyExists struct{ error }
 
-func (errAlreadyExists) AlreadyExists() ***REMOVED******REMOVED***
+func (errAlreadyExists) AlreadyExists() {}
 
-func (e errAlreadyExists) Cause() error ***REMOVED***
+func (e errAlreadyExists) Cause() error {
 	return e.error
-***REMOVED***
+}
 
 // AlreadyExists is a helper to create an error of the class with the same name from any error type
-func AlreadyExists(err error) error ***REMOVED***
-	if err == nil ***REMOVED***
+func AlreadyExists(err error) error {
+	if err == nil {
 		return nil
-	***REMOVED***
-	return errAlreadyExists***REMOVED***err***REMOVED***
-***REMOVED***
+	}
+	return errAlreadyExists{err}
+}
 
-type errNotImplemented struct***REMOVED*** error ***REMOVED***
+type errNotImplemented struct{ error }
 
-func (errNotImplemented) NotImplemented() ***REMOVED******REMOVED***
+func (errNotImplemented) NotImplemented() {}
 
-func (e errNotImplemented) Cause() error ***REMOVED***
+func (e errNotImplemented) Cause() error {
 	return e.error
-***REMOVED***
+}
 
 // NotImplemented is a helper to create an error of the class with the same name from any error type
-func NotImplemented(err error) error ***REMOVED***
-	if err == nil ***REMOVED***
+func NotImplemented(err error) error {
+	if err == nil {
 		return nil
-	***REMOVED***
-	return errNotImplemented***REMOVED***err***REMOVED***
-***REMOVED***
+	}
+	return errNotImplemented{err}
+}
 
-type errUnknown struct***REMOVED*** error ***REMOVED***
+type errUnknown struct{ error }
 
-func (errUnknown) Unknown() ***REMOVED******REMOVED***
+func (errUnknown) Unknown() {}
 
-func (e errUnknown) Cause() error ***REMOVED***
+func (e errUnknown) Cause() error {
 	return e.error
-***REMOVED***
+}
 
 // Unknown is a helper to create an error of the class with the same name from any error type
-func Unknown(err error) error ***REMOVED***
-	if err == nil ***REMOVED***
+func Unknown(err error) error {
+	if err == nil {
 		return nil
-	***REMOVED***
-	return errUnknown***REMOVED***err***REMOVED***
-***REMOVED***
+	}
+	return errUnknown{err}
+}
 
-type errCancelled struct***REMOVED*** error ***REMOVED***
+type errCancelled struct{ error }
 
-func (errCancelled) Cancelled() ***REMOVED******REMOVED***
+func (errCancelled) Cancelled() {}
 
-func (e errCancelled) Cause() error ***REMOVED***
+func (e errCancelled) Cause() error {
 	return e.error
-***REMOVED***
+}
 
 // Cancelled is a helper to create an error of the class with the same name from any error type
-func Cancelled(err error) error ***REMOVED***
-	if err == nil ***REMOVED***
+func Cancelled(err error) error {
+	if err == nil {
 		return nil
-	***REMOVED***
-	return errCancelled***REMOVED***err***REMOVED***
-***REMOVED***
+	}
+	return errCancelled{err}
+}
 
-type errDeadline struct***REMOVED*** error ***REMOVED***
+type errDeadline struct{ error }
 
-func (errDeadline) DeadlineExceeded() ***REMOVED******REMOVED***
+func (errDeadline) DeadlineExceeded() {}
 
-func (e errDeadline) Cause() error ***REMOVED***
+func (e errDeadline) Cause() error {
 	return e.error
-***REMOVED***
+}
 
 // Deadline is a helper to create an error of the class with the same name from any error type
-func Deadline(err error) error ***REMOVED***
-	if err == nil ***REMOVED***
+func Deadline(err error) error {
+	if err == nil {
 		return nil
-	***REMOVED***
-	return errDeadline***REMOVED***err***REMOVED***
-***REMOVED***
+	}
+	return errDeadline{err}
+}
 
-type errDataLoss struct***REMOVED*** error ***REMOVED***
+type errDataLoss struct{ error }
 
-func (errDataLoss) DataLoss() ***REMOVED******REMOVED***
+func (errDataLoss) DataLoss() {}
 
-func (e errDataLoss) Cause() error ***REMOVED***
+func (e errDataLoss) Cause() error {
 	return e.error
-***REMOVED***
+}
 
 // DataLoss is a helper to create an error of the class with the same name from any error type
-func DataLoss(err error) error ***REMOVED***
-	if err == nil ***REMOVED***
+func DataLoss(err error) error {
+	if err == nil {
 		return nil
-	***REMOVED***
-	return errDataLoss***REMOVED***err***REMOVED***
-***REMOVED***
+	}
+	return errDataLoss{err}
+}
 
 // FromContext returns the error class from the passed in context
-func FromContext(ctx context.Context) error ***REMOVED***
+func FromContext(ctx context.Context) error {
 	e := ctx.Err()
-	if e == nil ***REMOVED***
+	if e == nil {
 		return nil
-	***REMOVED***
+	}
 
-	if e == context.Canceled ***REMOVED***
+	if e == context.Canceled {
 		return Cancelled(e)
-	***REMOVED***
-	if e == context.DeadlineExceeded ***REMOVED***
+	}
+	if e == context.DeadlineExceeded {
 		return Deadline(e)
-	***REMOVED***
+	}
 	return Unknown(e)
-***REMOVED***
+}

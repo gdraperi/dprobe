@@ -13,55 +13,55 @@ import (
 	"golang.org/x/net/internal/socket"
 )
 
-func (c *payloadHandler) readFrom(b []byte) (int, *ControlMessage, net.Addr, error) ***REMOVED***
+func (c *payloadHandler) readFrom(b []byte) (int, *ControlMessage, net.Addr, error) {
 	c.rawOpt.RLock()
-	m := socket.Message***REMOVED***
+	m := socket.Message{
 		OOB: NewControlMessage(c.rawOpt.cflags),
-	***REMOVED***
+	}
 	c.rawOpt.RUnlock()
-	switch c.PacketConn.(type) ***REMOVED***
+	switch c.PacketConn.(type) {
 	case *net.UDPConn:
-		m.Buffers = [][]byte***REMOVED***b***REMOVED***
-		if err := c.RecvMsg(&m, 0); err != nil ***REMOVED***
-			return 0, nil, nil, &net.OpError***REMOVED***Op: "read", Net: c.PacketConn.LocalAddr().Network(), Source: c.PacketConn.LocalAddr(), Err: err***REMOVED***
-		***REMOVED***
+		m.Buffers = [][]byte{b}
+		if err := c.RecvMsg(&m, 0); err != nil {
+			return 0, nil, nil, &net.OpError{Op: "read", Net: c.PacketConn.LocalAddr().Network(), Source: c.PacketConn.LocalAddr(), Err: err}
+		}
 	case *net.IPConn:
 		h := make([]byte, HeaderLen)
-		m.Buffers = [][]byte***REMOVED***h, b***REMOVED***
-		if err := c.RecvMsg(&m, 0); err != nil ***REMOVED***
-			return 0, nil, nil, &net.OpError***REMOVED***Op: "read", Net: c.PacketConn.LocalAddr().Network(), Source: c.PacketConn.LocalAddr(), Err: err***REMOVED***
-		***REMOVED***
+		m.Buffers = [][]byte{h, b}
+		if err := c.RecvMsg(&m, 0); err != nil {
+			return 0, nil, nil, &net.OpError{Op: "read", Net: c.PacketConn.LocalAddr().Network(), Source: c.PacketConn.LocalAddr(), Err: err}
+		}
 		hdrlen := int(h[0]&0x0f) << 2
-		if hdrlen > len(h) ***REMOVED***
+		if hdrlen > len(h) {
 			d := hdrlen - len(h)
 			copy(b, b[d:])
 			m.N -= d
-		***REMOVED*** else ***REMOVED***
+		} else {
 			m.N -= hdrlen
-		***REMOVED***
+		}
 	default:
-		return 0, nil, nil, &net.OpError***REMOVED***Op: "read", Net: c.PacketConn.LocalAddr().Network(), Source: c.PacketConn.LocalAddr(), Err: errInvalidConnType***REMOVED***
-	***REMOVED***
+		return 0, nil, nil, &net.OpError{Op: "read", Net: c.PacketConn.LocalAddr().Network(), Source: c.PacketConn.LocalAddr(), Err: errInvalidConnType}
+	}
 	var cm *ControlMessage
-	if m.NN > 0 ***REMOVED***
+	if m.NN > 0 {
 		cm = new(ControlMessage)
-		if err := cm.Parse(m.OOB[:m.NN]); err != nil ***REMOVED***
-			return 0, nil, nil, &net.OpError***REMOVED***Op: "read", Net: c.PacketConn.LocalAddr().Network(), Source: c.PacketConn.LocalAddr(), Err: err***REMOVED***
-		***REMOVED***
+		if err := cm.Parse(m.OOB[:m.NN]); err != nil {
+			return 0, nil, nil, &net.OpError{Op: "read", Net: c.PacketConn.LocalAddr().Network(), Source: c.PacketConn.LocalAddr(), Err: err}
+		}
 		cm.Src = netAddrToIP4(m.Addr)
-	***REMOVED***
+	}
 	return m.N, cm, m.Addr, nil
-***REMOVED***
+}
 
-func (c *payloadHandler) writeTo(b []byte, cm *ControlMessage, dst net.Addr) (int, error) ***REMOVED***
-	m := socket.Message***REMOVED***
-		Buffers: [][]byte***REMOVED***b***REMOVED***,
+func (c *payloadHandler) writeTo(b []byte, cm *ControlMessage, dst net.Addr) (int, error) {
+	m := socket.Message{
+		Buffers: [][]byte{b},
 		OOB:     cm.Marshal(),
 		Addr:    dst,
-	***REMOVED***
+	}
 	err := c.SendMsg(&m, 0)
-	if err != nil ***REMOVED***
-		err = &net.OpError***REMOVED***Op: "write", Net: c.PacketConn.LocalAddr().Network(), Source: c.PacketConn.LocalAddr(), Addr: opAddr(dst), Err: err***REMOVED***
-	***REMOVED***
+	if err != nil {
+		err = &net.OpError{Op: "write", Net: c.PacketConn.LocalAddr().Network(), Source: c.PacketConn.LocalAddr(), Addr: opAddr(dst), Err: err}
+	}
 	return m.N, err
-***REMOVED***
+}

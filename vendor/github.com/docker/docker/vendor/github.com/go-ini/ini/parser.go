@@ -33,263 +33,263 @@ const (
 	_TOKEN_KEY
 )
 
-type parser struct ***REMOVED***
+type parser struct {
 	buf     *bufio.Reader
 	isEOF   bool
 	count   int
 	comment *bytes.Buffer
-***REMOVED***
+}
 
-func newParser(r io.Reader) *parser ***REMOVED***
-	return &parser***REMOVED***
+func newParser(r io.Reader) *parser {
+	return &parser{
 		buf:     bufio.NewReader(r),
 		count:   1,
-		comment: &bytes.Buffer***REMOVED******REMOVED***,
-	***REMOVED***
-***REMOVED***
+		comment: &bytes.Buffer{},
+	}
+}
 
 // BOM handles header of UTF-8, UTF-16 LE and UTF-16 BE's BOM format.
 // http://en.wikipedia.org/wiki/Byte_order_mark#Representations_of_byte_order_marks_by_encoding
-func (p *parser) BOM() error ***REMOVED***
+func (p *parser) BOM() error {
 	mask, err := p.buf.Peek(2)
-	if err != nil && err != io.EOF ***REMOVED***
+	if err != nil && err != io.EOF {
 		return err
-	***REMOVED*** else if len(mask) < 2 ***REMOVED***
+	} else if len(mask) < 2 {
 		return nil
-	***REMOVED***
+	}
 
-	switch ***REMOVED***
+	switch {
 	case mask[0] == 254 && mask[1] == 255:
 		fallthrough
 	case mask[0] == 255 && mask[1] == 254:
 		p.buf.Read(mask)
 	case mask[0] == 239 && mask[1] == 187:
 		mask, err := p.buf.Peek(3)
-		if err != nil && err != io.EOF ***REMOVED***
+		if err != nil && err != io.EOF {
 			return err
-		***REMOVED*** else if len(mask) < 3 ***REMOVED***
+		} else if len(mask) < 3 {
 			return nil
-		***REMOVED***
-		if mask[2] == 191 ***REMOVED***
+		}
+		if mask[2] == 191 {
 			p.buf.Read(mask)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func (p *parser) readUntil(delim byte) ([]byte, error) ***REMOVED***
+func (p *parser) readUntil(delim byte) ([]byte, error) {
 	data, err := p.buf.ReadBytes(delim)
-	if err != nil ***REMOVED***
-		if err == io.EOF ***REMOVED***
+	if err != nil {
+		if err == io.EOF {
 			p.isEOF = true
-		***REMOVED*** else ***REMOVED***
+		} else {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return data, nil
-***REMOVED***
+}
 
-func cleanComment(in []byte) ([]byte, bool) ***REMOVED***
+func cleanComment(in []byte) ([]byte, bool) {
 	i := bytes.IndexAny(in, "#;")
-	if i == -1 ***REMOVED***
+	if i == -1 {
 		return nil, false
-	***REMOVED***
+	}
 	return in[i:], true
-***REMOVED***
+}
 
-func readKeyName(in []byte) (string, int, error) ***REMOVED***
+func readKeyName(in []byte) (string, int, error) {
 	line := string(in)
 
 	// Check if key name surrounded by quotes.
 	var keyQuote string
-	if line[0] == '"' ***REMOVED***
-		if len(line) > 6 && string(line[0:3]) == `"""` ***REMOVED***
+	if line[0] == '"' {
+		if len(line) > 6 && string(line[0:3]) == `"""` {
 			keyQuote = `"""`
-		***REMOVED*** else ***REMOVED***
+		} else {
 			keyQuote = `"`
-		***REMOVED***
-	***REMOVED*** else if line[0] == '`' ***REMOVED***
+		}
+	} else if line[0] == '`' {
 		keyQuote = "`"
-	***REMOVED***
+	}
 
 	// Get out key name
 	endIdx := -1
-	if len(keyQuote) > 0 ***REMOVED***
+	if len(keyQuote) > 0 {
 		startIdx := len(keyQuote)
 		// FIXME: fail case -> """"""name"""=value
 		pos := strings.Index(line[startIdx:], keyQuote)
-		if pos == -1 ***REMOVED***
+		if pos == -1 {
 			return "", -1, fmt.Errorf("missing closing key quote: %s", line)
-		***REMOVED***
+		}
 		pos += startIdx
 
 		// Find key-value delimiter
 		i := strings.IndexAny(line[pos+startIdx:], "=:")
-		if i < 0 ***REMOVED***
-			return "", -1, ErrDelimiterNotFound***REMOVED***line***REMOVED***
-		***REMOVED***
+		if i < 0 {
+			return "", -1, ErrDelimiterNotFound{line}
+		}
 		endIdx = pos + i
 		return strings.TrimSpace(line[startIdx:pos]), endIdx + startIdx + 1, nil
-	***REMOVED***
+	}
 
 	endIdx = strings.IndexAny(line, "=:")
-	if endIdx < 0 ***REMOVED***
-		return "", -1, ErrDelimiterNotFound***REMOVED***line***REMOVED***
-	***REMOVED***
+	if endIdx < 0 {
+		return "", -1, ErrDelimiterNotFound{line}
+	}
 	return strings.TrimSpace(line[0:endIdx]), endIdx + 1, nil
-***REMOVED***
+}
 
-func (p *parser) readMultilines(line, val, valQuote string) (string, error) ***REMOVED***
-	for ***REMOVED***
+func (p *parser) readMultilines(line, val, valQuote string) (string, error) {
+	for {
 		data, err := p.readUntil('\n')
-		if err != nil ***REMOVED***
+		if err != nil {
 			return "", err
-		***REMOVED***
+		}
 		next := string(data)
 
 		pos := strings.LastIndex(next, valQuote)
-		if pos > -1 ***REMOVED***
+		if pos > -1 {
 			val += next[:pos]
 
 			comment, has := cleanComment([]byte(next[pos:]))
-			if has ***REMOVED***
+			if has {
 				p.comment.Write(bytes.TrimSpace(comment))
-			***REMOVED***
+			}
 			break
-		***REMOVED***
+		}
 		val += next
-		if p.isEOF ***REMOVED***
+		if p.isEOF {
 			return "", fmt.Errorf("missing closing key quote from '%s' to '%s'", line, next)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return val, nil
-***REMOVED***
+}
 
-func (p *parser) readContinuationLines(val string) (string, error) ***REMOVED***
-	for ***REMOVED***
+func (p *parser) readContinuationLines(val string) (string, error) {
+	for {
 		data, err := p.readUntil('\n')
-		if err != nil ***REMOVED***
+		if err != nil {
 			return "", err
-		***REMOVED***
+		}
 		next := strings.TrimSpace(string(data))
 
-		if len(next) == 0 ***REMOVED***
+		if len(next) == 0 {
 			break
-		***REMOVED***
+		}
 		val += next
-		if val[len(val)-1] != '\\' ***REMOVED***
+		if val[len(val)-1] != '\\' {
 			break
-		***REMOVED***
+		}
 		val = val[:len(val)-1]
-	***REMOVED***
+	}
 	return val, nil
-***REMOVED***
+}
 
 // hasSurroundedQuote check if and only if the first and last characters
 // are quotes \" or \'.
 // It returns false if any other parts also contain same kind of quotes.
-func hasSurroundedQuote(in string, quote byte) bool ***REMOVED***
+func hasSurroundedQuote(in string, quote byte) bool {
 	return len(in) > 2 && in[0] == quote && in[len(in)-1] == quote &&
 		strings.IndexByte(in[1:], quote) == len(in)-2
-***REMOVED***
+}
 
-func (p *parser) readValue(in []byte, ignoreContinuation bool) (string, error) ***REMOVED***
+func (p *parser) readValue(in []byte, ignoreContinuation bool) (string, error) {
 	line := strings.TrimLeftFunc(string(in), unicode.IsSpace)
-	if len(line) == 0 ***REMOVED***
+	if len(line) == 0 {
 		return "", nil
-	***REMOVED***
+	}
 
 	var valQuote string
-	if len(line) > 3 && string(line[0:3]) == `"""` ***REMOVED***
+	if len(line) > 3 && string(line[0:3]) == `"""` {
 		valQuote = `"""`
-	***REMOVED*** else if line[0] == '`' ***REMOVED***
+	} else if line[0] == '`' {
 		valQuote = "`"
-	***REMOVED***
+	}
 
-	if len(valQuote) > 0 ***REMOVED***
+	if len(valQuote) > 0 {
 		startIdx := len(valQuote)
 		pos := strings.LastIndex(line[startIdx:], valQuote)
 		// Check for multi-line value
-		if pos == -1 ***REMOVED***
+		if pos == -1 {
 			return p.readMultilines(line, line[startIdx:], valQuote)
-		***REMOVED***
+		}
 
 		return line[startIdx : pos+startIdx], nil
-	***REMOVED***
+	}
 
 	// Won't be able to reach here if value only contains whitespace.
 	line = strings.TrimSpace(line)
 
 	// Check continuation lines when desired.
-	if !ignoreContinuation && line[len(line)-1] == '\\' ***REMOVED***
+	if !ignoreContinuation && line[len(line)-1] == '\\' {
 		return p.readContinuationLines(line[:len(line)-1])
-	***REMOVED***
+	}
 
 	i := strings.IndexAny(line, "#;")
-	if i > -1 ***REMOVED***
+	if i > -1 {
 		p.comment.WriteString(line[i:])
 		line = strings.TrimSpace(line[:i])
-	***REMOVED***
+	}
 
 	// Trim single quotes
 	if hasSurroundedQuote(line, '\'') ||
-		hasSurroundedQuote(line, '"') ***REMOVED***
+		hasSurroundedQuote(line, '"') {
 		line = line[1 : len(line)-1]
-	***REMOVED***
+	}
 	return line, nil
-***REMOVED***
+}
 
 // parse parses data through an io.Reader.
-func (f *File) parse(reader io.Reader) (err error) ***REMOVED***
+func (f *File) parse(reader io.Reader) (err error) {
 	p := newParser(reader)
-	if err = p.BOM(); err != nil ***REMOVED***
+	if err = p.BOM(); err != nil {
 		return fmt.Errorf("BOM: %v", err)
-	***REMOVED***
+	}
 
 	// Ignore error because default section name is never empty string.
 	section, _ := f.NewSection(DEFAULT_SECTION)
 
 	var line []byte
 	var inUnparseableSection bool
-	for !p.isEOF ***REMOVED***
+	for !p.isEOF {
 		line, err = p.readUntil('\n')
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 
 		line = bytes.TrimLeftFunc(line, unicode.IsSpace)
-		if len(line) == 0 ***REMOVED***
+		if len(line) == 0 {
 			continue
-		***REMOVED***
+		}
 
 		// Comments
-		if line[0] == '#' || line[0] == ';' ***REMOVED***
+		if line[0] == '#' || line[0] == ';' {
 			// Note: we do not care ending line break,
 			// it is needed for adding second line,
 			// so just clean it once at the end when set to value.
 			p.comment.Write(line)
 			continue
-		***REMOVED***
+		}
 
 		// Section
-		if line[0] == '[' ***REMOVED***
+		if line[0] == '[' {
 			// Read to the next ']' (TODO: support quoted strings)
 			// TODO(unknwon): use LastIndexByte when stop supporting Go1.4
 			closeIdx := bytes.LastIndex(line, []byte("]"))
-			if closeIdx == -1 ***REMOVED***
+			if closeIdx == -1 {
 				return fmt.Errorf("unclosed section: %s", line)
-			***REMOVED***
+			}
 
 			name := string(line[1:closeIdx])
 			section, err = f.NewSection(name)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
+			}
 
 			comment, has := cleanComment(line[closeIdx+1:])
-			if has ***REMOVED***
+			if has {
 				p.comment.Write(comment)
-			***REMOVED***
+			}
 
 			section.Comment = strings.TrimSpace(p.comment.String())
 
@@ -298,61 +298,61 @@ func (f *File) parse(reader io.Reader) (err error) ***REMOVED***
 			p.count = 1
 
 			inUnparseableSection = false
-			for i := range f.options.UnparseableSections ***REMOVED***
+			for i := range f.options.UnparseableSections {
 				if f.options.UnparseableSections[i] == name ||
-					(f.options.Insensitive && strings.ToLower(f.options.UnparseableSections[i]) == strings.ToLower(name)) ***REMOVED***
+					(f.options.Insensitive && strings.ToLower(f.options.UnparseableSections[i]) == strings.ToLower(name)) {
 					inUnparseableSection = true
 					continue
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			continue
-		***REMOVED***
+		}
 
-		if inUnparseableSection ***REMOVED***
+		if inUnparseableSection {
 			section.isRawSection = true
 			section.rawBody += string(line)
 			continue
-		***REMOVED***
+		}
 
 		kname, offset, err := readKeyName(line)
-		if err != nil ***REMOVED***
+		if err != nil {
 			// Treat as boolean key when desired, and whole line is key name.
-			if IsErrDelimiterNotFound(err) && f.options.AllowBooleanKeys ***REMOVED***
+			if IsErrDelimiterNotFound(err) && f.options.AllowBooleanKeys {
 				kname, err := p.readValue(line, f.options.IgnoreContinuation)
-				if err != nil ***REMOVED***
+				if err != nil {
 					return err
-				***REMOVED***
+				}
 				key, err := section.NewBooleanKey(kname)
-				if err != nil ***REMOVED***
+				if err != nil {
 					return err
-				***REMOVED***
+				}
 				key.Comment = strings.TrimSpace(p.comment.String())
 				p.comment.Reset()
 				continue
-			***REMOVED***
+			}
 			return err
-		***REMOVED***
+		}
 
 		// Auto increment.
 		isAutoIncr := false
-		if kname == "-" ***REMOVED***
+		if kname == "-" {
 			isAutoIncr = true
 			kname = "#" + strconv.Itoa(p.count)
 			p.count++
-		***REMOVED***
+		}
 
 		value, err := p.readValue(line[offset:], f.options.IgnoreContinuation)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 
 		key, err := section.NewKey(kname, value)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		key.isAutoIncrement = isAutoIncr
 		key.Comment = strings.TrimSpace(p.comment.String())
 		p.comment.Reset()
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

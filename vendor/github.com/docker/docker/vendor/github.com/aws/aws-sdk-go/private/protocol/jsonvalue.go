@@ -23,33 +23,33 @@ const (
 // encodes the string before returning it.
 //
 // Will panic if the escape mode is unknown.
-func EncodeJSONValue(v aws.JSONValue, escape EscapeMode) (string, error) ***REMOVED***
+func EncodeJSONValue(v aws.JSONValue, escape EscapeMode) (string, error) {
 	b, err := json.Marshal(v)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 
-	switch escape ***REMOVED***
+	switch escape {
 	case NoEscape:
 		return string(b), nil
 	case Base64Escape:
 		return base64.StdEncoding.EncodeToString(b), nil
 	case QuotedEscape:
 		return strconv.Quote(string(b)), nil
-	***REMOVED***
+	}
 
 	panic(fmt.Sprintf("EncodeJSONValue called with unknown EscapeMode, %v", escape))
-***REMOVED***
+}
 
 // DecodeJSONValue will attempt to decode the string input as a JSONValue.
 // Optionally decoding base64 the value first before JSON unmarshaling.
 //
 // Will panic if the escape mode is unknown.
-func DecodeJSONValue(v string, escape EscapeMode) (aws.JSONValue, error) ***REMOVED***
+func DecodeJSONValue(v string, escape EscapeMode) (aws.JSONValue, error) {
 	var b []byte
 	var err error
 
-	switch escape ***REMOVED***
+	switch escape {
 	case NoEscape:
 		b = []byte(v)
 	case Base64Escape:
@@ -60,17 +60,17 @@ func DecodeJSONValue(v string, escape EscapeMode) (aws.JSONValue, error) ***REMO
 		b = []byte(u)
 	default:
 		panic(fmt.Sprintf("DecodeJSONValue called with unknown EscapeMode, %v", escape))
-	***REMOVED***
+	}
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	m := aws.JSONValue***REMOVED******REMOVED***
+	m := aws.JSONValue{}
 	err = json.Unmarshal(b, &m)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	return m, nil
-***REMOVED***
+}

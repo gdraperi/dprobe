@@ -2,10 +2,10 @@
 
 package mount
 
-func mount(device, target, mType string, flag uintptr, data string) error ***REMOVED***
+func mount(device, target, mType string, flag uintptr, data string) error {
 	panic("Not implemented")
-***REMOVED***
+}
 
-func unmount(target string, flag int) error ***REMOVED***
+func unmount(target string, flag int) error {
 	panic("Not implemented")
-***REMOVED***
+}

@@ -6,100 +6,100 @@ package norm
 
 import "unicode/utf8"
 
-type input struct ***REMOVED***
+type input struct {
 	str   string
 	bytes []byte
-***REMOVED***
+}
 
-func inputBytes(str []byte) input ***REMOVED***
-	return input***REMOVED***bytes: str***REMOVED***
-***REMOVED***
+func inputBytes(str []byte) input {
+	return input{bytes: str}
+}
 
-func inputString(str string) input ***REMOVED***
-	return input***REMOVED***str: str***REMOVED***
-***REMOVED***
+func inputString(str string) input {
+	return input{str: str}
+}
 
-func (in *input) setBytes(str []byte) ***REMOVED***
+func (in *input) setBytes(str []byte) {
 	in.str = ""
 	in.bytes = str
-***REMOVED***
+}
 
-func (in *input) setString(str string) ***REMOVED***
+func (in *input) setString(str string) {
 	in.str = str
 	in.bytes = nil
-***REMOVED***
+}
 
-func (in *input) _byte(p int) byte ***REMOVED***
-	if in.bytes == nil ***REMOVED***
+func (in *input) _byte(p int) byte {
+	if in.bytes == nil {
 		return in.str[p]
-	***REMOVED***
+	}
 	return in.bytes[p]
-***REMOVED***
+}
 
-func (in *input) skipASCII(p, max int) int ***REMOVED***
-	if in.bytes == nil ***REMOVED***
-		for ; p < max && in.str[p] < utf8.RuneSelf; p++ ***REMOVED***
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
-		for ; p < max && in.bytes[p] < utf8.RuneSelf; p++ ***REMOVED***
-		***REMOVED***
-	***REMOVED***
+func (in *input) skipASCII(p, max int) int {
+	if in.bytes == nil {
+		for ; p < max && in.str[p] < utf8.RuneSelf; p++ {
+		}
+	} else {
+		for ; p < max && in.bytes[p] < utf8.RuneSelf; p++ {
+		}
+	}
 	return p
-***REMOVED***
+}
 
-func (in *input) skipContinuationBytes(p int) int ***REMOVED***
-	if in.bytes == nil ***REMOVED***
-		for ; p < len(in.str) && !utf8.RuneStart(in.str[p]); p++ ***REMOVED***
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
-		for ; p < len(in.bytes) && !utf8.RuneStart(in.bytes[p]); p++ ***REMOVED***
-		***REMOVED***
-	***REMOVED***
+func (in *input) skipContinuationBytes(p int) int {
+	if in.bytes == nil {
+		for ; p < len(in.str) && !utf8.RuneStart(in.str[p]); p++ {
+		}
+	} else {
+		for ; p < len(in.bytes) && !utf8.RuneStart(in.bytes[p]); p++ {
+		}
+	}
 	return p
-***REMOVED***
+}
 
-func (in *input) appendSlice(buf []byte, b, e int) []byte ***REMOVED***
-	if in.bytes != nil ***REMOVED***
+func (in *input) appendSlice(buf []byte, b, e int) []byte {
+	if in.bytes != nil {
 		return append(buf, in.bytes[b:e]...)
-	***REMOVED***
-	for i := b; i < e; i++ ***REMOVED***
+	}
+	for i := b; i < e; i++ {
 		buf = append(buf, in.str[i])
-	***REMOVED***
+	}
 	return buf
-***REMOVED***
+}
 
-func (in *input) copySlice(buf []byte, b, e int) int ***REMOVED***
-	if in.bytes == nil ***REMOVED***
+func (in *input) copySlice(buf []byte, b, e int) int {
+	if in.bytes == nil {
 		return copy(buf, in.str[b:e])
-	***REMOVED***
+	}
 	return copy(buf, in.bytes[b:e])
-***REMOVED***
+}
 
-func (in *input) charinfoNFC(p int) (uint16, int) ***REMOVED***
-	if in.bytes == nil ***REMOVED***
+func (in *input) charinfoNFC(p int) (uint16, int) {
+	if in.bytes == nil {
 		return nfcData.lookupString(in.str[p:])
-	***REMOVED***
+	}
 	return nfcData.lookup(in.bytes[p:])
-***REMOVED***
+}
 
-func (in *input) charinfoNFKC(p int) (uint16, int) ***REMOVED***
-	if in.bytes == nil ***REMOVED***
+func (in *input) charinfoNFKC(p int) (uint16, int) {
+	if in.bytes == nil {
 		return nfkcData.lookupString(in.str[p:])
-	***REMOVED***
+	}
 	return nfkcData.lookup(in.bytes[p:])
-***REMOVED***
+}
 
-func (in *input) hangul(p int) (r rune) ***REMOVED***
-	if in.bytes == nil ***REMOVED***
-		if !isHangulString(in.str[p:]) ***REMOVED***
+func (in *input) hangul(p int) (r rune) {
+	if in.bytes == nil {
+		if !isHangulString(in.str[p:]) {
 			return 0
-		***REMOVED***
+		}
 		r, _ = utf8.DecodeRuneInString(in.str[p:])
-	***REMOVED*** else ***REMOVED***
-		if !isHangul(in.bytes[p:]) ***REMOVED***
+	} else {
+		if !isHangul(in.bytes[p:]) {
 			return 0
-		***REMOVED***
+		}
 		r, _ = utf8.DecodeRune(in.bytes[p:])
-	***REMOVED***
+	}
 	return r
-***REMOVED***
+}

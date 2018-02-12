@@ -6,52 +6,52 @@ import (
 
 // BridgeConfig stores all the bridge driver specific
 // configuration.
-type BridgeConfig struct ***REMOVED***
+type BridgeConfig struct {
 	commonBridgeConfig
-***REMOVED***
+}
 
 // Config defines the configuration of a docker daemon.
 // These are the configuration settings that you pass
 // to the docker daemon when you launch it with say: `dockerd -e windows`
-type Config struct ***REMOVED***
+type Config struct {
 	CommonConfig
 
 	// Fields below here are platform specific. (There are none presently
 	// for the Windows daemon.)
-***REMOVED***
+}
 
 // GetRuntime returns the runtime path and arguments for a given
 // runtime name
-func (conf *Config) GetRuntime(name string) *types.Runtime ***REMOVED***
+func (conf *Config) GetRuntime(name string) *types.Runtime {
 	return nil
-***REMOVED***
+}
 
 // GetInitPath returns the configure docker-init path
-func (conf *Config) GetInitPath() string ***REMOVED***
+func (conf *Config) GetInitPath() string {
 	return ""
-***REMOVED***
+}
 
 // GetDefaultRuntimeName returns the current default runtime
-func (conf *Config) GetDefaultRuntimeName() string ***REMOVED***
+func (conf *Config) GetDefaultRuntimeName() string {
 	return StockRuntimeName
-***REMOVED***
+}
 
 // GetAllRuntimes returns a copy of the runtimes map
-func (conf *Config) GetAllRuntimes() map[string]types.Runtime ***REMOVED***
-	return map[string]types.Runtime***REMOVED******REMOVED***
-***REMOVED***
+func (conf *Config) GetAllRuntimes() map[string]types.Runtime {
+	return map[string]types.Runtime{}
+}
 
 // GetExecRoot returns the user configured Exec-root
-func (conf *Config) GetExecRoot() string ***REMOVED***
+func (conf *Config) GetExecRoot() string {
 	return ""
-***REMOVED***
+}
 
 // IsSwarmCompatible defines if swarm mode can be enabled in this config
-func (conf *Config) IsSwarmCompatible() error ***REMOVED***
+func (conf *Config) IsSwarmCompatible() error {
 	return nil
-***REMOVED***
+}
 
 // ValidatePlatformConfig checks if any platform-specific configuration settings are invalid.
-func (conf *Config) ValidatePlatformConfig() error ***REMOVED***
+func (conf *Config) ValidatePlatformConfig() error {
 	return nil
-***REMOVED***
+}

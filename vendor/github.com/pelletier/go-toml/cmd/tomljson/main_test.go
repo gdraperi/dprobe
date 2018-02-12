@@ -8,16 +8,16 @@ import (
 	"testing"
 )
 
-func expectBufferEquality(t *testing.T, name string, buffer *bytes.Buffer, expected string) ***REMOVED***
+func expectBufferEquality(t *testing.T, name string, buffer *bytes.Buffer, expected string) {
 	output := buffer.String()
-	if output != expected ***REMOVED***
+	if output != expected {
 		t.Errorf("incorrect %s:\n%s\n\nexpected %s:\n%s", name, output, name, expected)
 		t.Log([]rune(output))
 		t.Log([]rune(expected))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func expectProcessMainResults(t *testing.T, input string, args []string, exitCode int, expectedOutput string, expectedError string) ***REMOVED***
+func expectProcessMainResults(t *testing.T, input string, args []string, exitCode int, expectedOutput string, expectedError string) {
 	inputReader := strings.NewReader(input)
 	outputBuffer := new(bytes.Buffer)
 	errorBuffer := new(bytes.Buffer)
@@ -27,56 +27,56 @@ func expectProcessMainResults(t *testing.T, input string, args []string, exitCod
 	expectBufferEquality(t, "output", outputBuffer, expectedOutput)
 	expectBufferEquality(t, "error", errorBuffer, expectedError)
 
-	if returnCode != exitCode ***REMOVED***
+	if returnCode != exitCode {
 		t.Error("incorrect return code:", returnCode, "expected", exitCode)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestProcessMainReadFromStdin(t *testing.T) ***REMOVED***
+func TestProcessMainReadFromStdin(t *testing.T) {
 	input := `
 		[mytoml]
 		a = 42`
-	expectedOutput := `***REMOVED***
-  "mytoml": ***REMOVED***
+	expectedOutput := `{
+  "mytoml": {
     "a": 42
-  ***REMOVED***
-***REMOVED***
+  }
+}
 `
 	expectedError := ``
 	expectedExitCode := 0
 
-	expectProcessMainResults(t, input, []string***REMOVED******REMOVED***, expectedExitCode, expectedOutput, expectedError)
-***REMOVED***
+	expectProcessMainResults(t, input, []string{}, expectedExitCode, expectedOutput, expectedError)
+}
 
-func TestProcessMainReadFromFile(t *testing.T) ***REMOVED***
+func TestProcessMainReadFromFile(t *testing.T) {
 	input := `
 		[mytoml]
 		a = 42`
 
 	tmpfile, err := ioutil.TempFile("", "example.toml")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if _, err := tmpfile.Write([]byte(input)); err != nil ***REMOVED***
+	}
+	if _, err := tmpfile.Write([]byte(input)); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	defer os.Remove(tmpfile.Name())
 
-	expectedOutput := `***REMOVED***
-  "mytoml": ***REMOVED***
+	expectedOutput := `{
+  "mytoml": {
     "a": 42
-  ***REMOVED***
-***REMOVED***
+  }
+}
 `
 	expectedError := ``
 	expectedExitCode := 0
 
-	expectProcessMainResults(t, ``, []string***REMOVED***tmpfile.Name()***REMOVED***, expectedExitCode, expectedOutput, expectedError)
-***REMOVED***
+	expectProcessMainResults(t, ``, []string{tmpfile.Name()}, expectedExitCode, expectedOutput, expectedError)
+}
 
-func TestProcessMainReadFromMissingFile(t *testing.T) ***REMOVED***
+func TestProcessMainReadFromMissingFile(t *testing.T) {
 	expectedError := `open /this/file/does/not/exist: no such file or directory
 `
-	expectProcessMainResults(t, ``, []string***REMOVED***"/this/file/does/not/exist"***REMOVED***, -1, ``, expectedError)
-***REMOVED***
+	expectProcessMainResults(t, ``, []string{"/this/file/does/not/exist"}, -1, ``, expectedError)
+}

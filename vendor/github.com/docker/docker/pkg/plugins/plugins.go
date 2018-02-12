@@ -17,9 +17,9 @@
 // plugin and the subsystem it implements.
 //
 //	plugin, err := plugins.Get("example", "VolumeDriver")
-//	if err != nil ***REMOVED***
+//	if err != nil {
 //		return fmt.Errorf("Error looking up volume plugin example: %v", err)
-//	***REMOVED***
+//	}
 package plugins
 
 import (
@@ -36,29 +36,29 @@ var (
 	ErrNotImplements = errors.New("Plugin does not implement the requested driver")
 )
 
-type plugins struct ***REMOVED***
+type plugins struct {
 	sync.Mutex
 	plugins map[string]*Plugin
-***REMOVED***
+}
 
-type extpointHandlers struct ***REMOVED***
+type extpointHandlers struct {
 	sync.RWMutex
 	extpointHandlers map[string][]func(string, *Client)
-***REMOVED***
+}
 
 var (
-	storage  = plugins***REMOVED***plugins: make(map[string]*Plugin)***REMOVED***
-	handlers = extpointHandlers***REMOVED***extpointHandlers: make(map[string][]func(string, *Client))***REMOVED***
+	storage  = plugins{plugins: make(map[string]*Plugin)}
+	handlers = extpointHandlers{extpointHandlers: make(map[string][]func(string, *Client))}
 )
 
 // Manifest lists what a plugin implements.
-type Manifest struct ***REMOVED***
+type Manifest struct {
 	// List of subsystem the plugin implements.
 	Implements []string
-***REMOVED***
+}
 
 // Plugin is the definition of a docker plugin.
-type Plugin struct ***REMOVED***
+type Plugin struct {
 	// Name of the plugin
 	name string
 	// Address of the plugin
@@ -76,42 +76,42 @@ type Plugin struct ***REMOVED***
 	activateErr error
 	// keeps track of callback handlers run against this plugin
 	handlersRun bool
-***REMOVED***
+}
 
 // Name returns the name of the plugin.
-func (p *Plugin) Name() string ***REMOVED***
+func (p *Plugin) Name() string {
 	return p.name
-***REMOVED***
+}
 
 // Client returns a ready-to-use plugin client that can be used to communicate with the plugin.
-func (p *Plugin) Client() *Client ***REMOVED***
+func (p *Plugin) Client() *Client {
 	return p.client
-***REMOVED***
+}
 
 // IsV1 returns true for V1 plugins and false otherwise.
-func (p *Plugin) IsV1() bool ***REMOVED***
+func (p *Plugin) IsV1() bool {
 	return true
-***REMOVED***
+}
 
 // NewLocalPlugin creates a new local plugin.
-func NewLocalPlugin(name, addr string) *Plugin ***REMOVED***
-	return &Plugin***REMOVED***
+func NewLocalPlugin(name, addr string) *Plugin {
+	return &Plugin{
 		name: name,
 		Addr: addr,
 		// TODO: change to nil
-		TLSConfig:    &tlsconfig.Options***REMOVED***InsecureSkipVerify: true***REMOVED***,
-		activateWait: sync.NewCond(&sync.Mutex***REMOVED******REMOVED***),
-	***REMOVED***
-***REMOVED***
+		TLSConfig:    &tlsconfig.Options{InsecureSkipVerify: true},
+		activateWait: sync.NewCond(&sync.Mutex{}),
+	}
+}
 
-func (p *Plugin) activate() error ***REMOVED***
+func (p *Plugin) activate() error {
 	p.activateWait.L.Lock()
 
-	if p.activated() ***REMOVED***
+	if p.activated() {
 		p.runHandlers()
 		p.activateWait.L.Unlock()
 		return p.activateErr
-	***REMOVED***
+	}
 
 	p.activateErr = p.activateWithLock()
 
@@ -119,211 +119,211 @@ func (p *Plugin) activate() error ***REMOVED***
 	p.activateWait.L.Unlock()
 	p.activateWait.Broadcast()
 	return p.activateErr
-***REMOVED***
+}
 
 // runHandlers runs the registered handlers for the implemented plugin types
 // This should only be run after activation, and while the activation lock is held.
-func (p *Plugin) runHandlers() ***REMOVED***
-	if !p.activated() ***REMOVED***
+func (p *Plugin) runHandlers() {
+	if !p.activated() {
 		return
-	***REMOVED***
+	}
 
 	handlers.RLock()
-	if !p.handlersRun ***REMOVED***
-		for _, iface := range p.Manifest.Implements ***REMOVED***
+	if !p.handlersRun {
+		for _, iface := range p.Manifest.Implements {
 			hdlrs, handled := handlers.extpointHandlers[iface]
-			if !handled ***REMOVED***
+			if !handled {
 				continue
-			***REMOVED***
-			for _, handler := range hdlrs ***REMOVED***
+			}
+			for _, handler := range hdlrs {
 				handler(p.name, p.client)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		p.handlersRun = true
-	***REMOVED***
+	}
 	handlers.RUnlock()
 
-***REMOVED***
+}
 
 // activated returns if the plugin has already been activated.
 // This should only be called with the activation lock held
-func (p *Plugin) activated() bool ***REMOVED***
+func (p *Plugin) activated() bool {
 	return p.Manifest != nil
-***REMOVED***
+}
 
-func (p *Plugin) activateWithLock() error ***REMOVED***
+func (p *Plugin) activateWithLock() error {
 	c, err := NewClient(p.Addr, p.TLSConfig)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	p.client = c
 
 	m := new(Manifest)
-	if err = p.client.Call("Plugin.Activate", nil, m); err != nil ***REMOVED***
+	if err = p.client.Call("Plugin.Activate", nil, m); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	p.Manifest = m
 	return nil
-***REMOVED***
+}
 
-func (p *Plugin) waitActive() error ***REMOVED***
+func (p *Plugin) waitActive() error {
 	p.activateWait.L.Lock()
-	for !p.activated() && p.activateErr == nil ***REMOVED***
+	for !p.activated() && p.activateErr == nil {
 		p.activateWait.Wait()
-	***REMOVED***
+	}
 	p.activateWait.L.Unlock()
 	return p.activateErr
-***REMOVED***
+}
 
-func (p *Plugin) implements(kind string) bool ***REMOVED***
-	if p.Manifest == nil ***REMOVED***
+func (p *Plugin) implements(kind string) bool {
+	if p.Manifest == nil {
 		return false
-	***REMOVED***
-	for _, driver := range p.Manifest.Implements ***REMOVED***
-		if driver == kind ***REMOVED***
+	}
+	for _, driver := range p.Manifest.Implements {
+		if driver == kind {
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false
-***REMOVED***
+}
 
-func load(name string) (*Plugin, error) ***REMOVED***
+func load(name string) (*Plugin, error) {
 	return loadWithRetry(name, true)
-***REMOVED***
+}
 
-func loadWithRetry(name string, retry bool) (*Plugin, error) ***REMOVED***
+func loadWithRetry(name string, retry bool) (*Plugin, error) {
 	registry := newLocalRegistry()
 	start := time.Now()
 
 	var retries int
-	for ***REMOVED***
+	for {
 		pl, err := registry.Plugin(name)
-		if err != nil ***REMOVED***
-			if !retry ***REMOVED***
+		if err != nil {
+			if !retry {
 				return nil, err
-			***REMOVED***
+			}
 
 			timeOff := backoff(retries)
-			if abort(start, timeOff) ***REMOVED***
+			if abort(start, timeOff) {
 				return nil, err
-			***REMOVED***
+			}
 			retries++
 			logrus.Warnf("Unable to locate plugin: %s, retrying in %v", name, timeOff)
 			time.Sleep(timeOff)
 			continue
-		***REMOVED***
+		}
 
 		storage.Lock()
-		if pl, exists := storage.plugins[name]; exists ***REMOVED***
+		if pl, exists := storage.plugins[name]; exists {
 			storage.Unlock()
 			return pl, pl.activate()
-		***REMOVED***
+		}
 		storage.plugins[name] = pl
 		storage.Unlock()
 
 		err = pl.activate()
 
-		if err != nil ***REMOVED***
+		if err != nil {
 			storage.Lock()
 			delete(storage.plugins, name)
 			storage.Unlock()
-		***REMOVED***
+		}
 
 		return pl, err
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func get(name string) (*Plugin, error) ***REMOVED***
+func get(name string) (*Plugin, error) {
 	storage.Lock()
 	pl, ok := storage.plugins[name]
 	storage.Unlock()
-	if ok ***REMOVED***
+	if ok {
 		return pl, pl.activate()
-	***REMOVED***
+	}
 	return load(name)
-***REMOVED***
+}
 
 // Get returns the plugin given the specified name and requested implementation.
-func Get(name, imp string) (*Plugin, error) ***REMOVED***
+func Get(name, imp string) (*Plugin, error) {
 	pl, err := get(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if err := pl.waitActive(); err == nil && pl.implements(imp) ***REMOVED***
+	}
+	if err := pl.waitActive(); err == nil && pl.implements(imp) {
 		logrus.Debugf("%s implements: %s", name, imp)
 		return pl, nil
-	***REMOVED***
+	}
 	return nil, ErrNotImplements
-***REMOVED***
+}
 
 // Handle adds the specified function to the extpointHandlers.
-func Handle(iface string, fn func(string, *Client)) ***REMOVED***
+func Handle(iface string, fn func(string, *Client)) {
 	handlers.Lock()
 	hdlrs, ok := handlers.extpointHandlers[iface]
-	if !ok ***REMOVED***
-		hdlrs = []func(string, *Client)***REMOVED******REMOVED***
-	***REMOVED***
+	if !ok {
+		hdlrs = []func(string, *Client){}
+	}
 
 	hdlrs = append(hdlrs, fn)
 	handlers.extpointHandlers[iface] = hdlrs
 
 	storage.Lock()
-	for _, p := range storage.plugins ***REMOVED***
+	for _, p := range storage.plugins {
 		p.activateWait.L.Lock()
-		if p.activated() && p.implements(iface) ***REMOVED***
+		if p.activated() && p.implements(iface) {
 			p.handlersRun = false
-		***REMOVED***
+		}
 		p.activateWait.L.Unlock()
-	***REMOVED***
+	}
 	storage.Unlock()
 
 	handlers.Unlock()
-***REMOVED***
+}
 
 // GetAll returns all the plugins for the specified implementation
-func GetAll(imp string) ([]*Plugin, error) ***REMOVED***
+func GetAll(imp string) ([]*Plugin, error) {
 	pluginNames, err := Scan()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	type plLoad struct ***REMOVED***
+	type plLoad struct {
 		pl  *Plugin
 		err error
-	***REMOVED***
+	}
 
 	chPl := make(chan *plLoad, len(pluginNames))
 	var wg sync.WaitGroup
-	for _, name := range pluginNames ***REMOVED***
+	for _, name := range pluginNames {
 		storage.Lock()
 		pl, ok := storage.plugins[name]
 		storage.Unlock()
-		if ok ***REMOVED***
-			chPl <- &plLoad***REMOVED***pl, nil***REMOVED***
+		if ok {
+			chPl <- &plLoad{pl, nil}
 			continue
-		***REMOVED***
+		}
 
 		wg.Add(1)
-		go func(name string) ***REMOVED***
+		go func(name string) {
 			defer wg.Done()
 			pl, err := loadWithRetry(name, false)
-			chPl <- &plLoad***REMOVED***pl, err***REMOVED***
-		***REMOVED***(name)
-	***REMOVED***
+			chPl <- &plLoad{pl, err}
+		}(name)
+	}
 
 	wg.Wait()
 	close(chPl)
 
 	var out []*Plugin
-	for pl := range chPl ***REMOVED***
-		if pl.err != nil ***REMOVED***
+	for pl := range chPl {
+		if pl.err != nil {
 			logrus.Error(pl.err)
 			continue
-		***REMOVED***
-		if err := pl.pl.waitActive(); err == nil && pl.pl.implements(imp) ***REMOVED***
+		}
+		if err := pl.pl.waitActive(); err == nil && pl.pl.implements(imp) {
 			out = append(out, pl.pl)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return out, nil
-***REMOVED***
+}

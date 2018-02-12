@@ -36,31 +36,31 @@ const (
 var (
 	// SchemaVersion provides a pre-initialized version structure for this
 	// packages version of the manifest.
-	SchemaVersion = manifest.Versioned***REMOVED***
+	SchemaVersion = manifest.Versioned{
 		SchemaVersion: 2,
 		MediaType:     MediaTypeManifest,
-	***REMOVED***
+	}
 )
 
-func init() ***REMOVED***
-	schema2Func := func(b []byte) (distribution.Manifest, distribution.Descriptor, error) ***REMOVED***
+func init() {
+	schema2Func := func(b []byte) (distribution.Manifest, distribution.Descriptor, error) {
 		m := new(DeserializedManifest)
 		err := m.UnmarshalJSON(b)
-		if err != nil ***REMOVED***
-			return nil, distribution.Descriptor***REMOVED******REMOVED***, err
-		***REMOVED***
+		if err != nil {
+			return nil, distribution.Descriptor{}, err
+		}
 
 		dgst := digest.FromBytes(b)
-		return m, distribution.Descriptor***REMOVED***Digest: dgst, Size: int64(len(b)), MediaType: MediaTypeManifest***REMOVED***, err
-	***REMOVED***
+		return m, distribution.Descriptor{Digest: dgst, Size: int64(len(b)), MediaType: MediaTypeManifest}, err
+	}
 	err := distribution.RegisterManifestSchema(MediaTypeManifest, schema2Func)
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(fmt.Sprintf("Unable to register manifest: %s", err))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Manifest defines a schema2 manifest.
-type Manifest struct ***REMOVED***
+type Manifest struct {
 	manifest.Versioned
 
 	// Config references the image configuration as a blob.
@@ -69,70 +69,70 @@ type Manifest struct ***REMOVED***
 	// Layers lists descriptors for the layers referenced by the
 	// configuration.
 	Layers []distribution.Descriptor `json:"layers"`
-***REMOVED***
+}
 
 // References returnes the descriptors of this manifests references.
-func (m Manifest) References() []distribution.Descriptor ***REMOVED***
+func (m Manifest) References() []distribution.Descriptor {
 	references := make([]distribution.Descriptor, 0, 1+len(m.Layers))
 	references = append(references, m.Config)
 	references = append(references, m.Layers...)
 	return references
-***REMOVED***
+}
 
 // Target returns the target of this signed manifest.
-func (m Manifest) Target() distribution.Descriptor ***REMOVED***
+func (m Manifest) Target() distribution.Descriptor {
 	return m.Config
-***REMOVED***
+}
 
 // DeserializedManifest wraps Manifest with a copy of the original JSON.
 // It satisfies the distribution.Manifest interface.
-type DeserializedManifest struct ***REMOVED***
+type DeserializedManifest struct {
 	Manifest
 
 	// canonical is the canonical byte representation of the Manifest.
 	canonical []byte
-***REMOVED***
+}
 
 // FromStruct takes a Manifest structure, marshals it to JSON, and returns a
 // DeserializedManifest which contains the manifest and its JSON representation.
-func FromStruct(m Manifest) (*DeserializedManifest, error) ***REMOVED***
+func FromStruct(m Manifest) (*DeserializedManifest, error) {
 	var deserialized DeserializedManifest
 	deserialized.Manifest = m
 
 	var err error
 	deserialized.canonical, err = json.MarshalIndent(&m, "", "   ")
 	return &deserialized, err
-***REMOVED***
+}
 
 // UnmarshalJSON populates a new Manifest struct from JSON data.
-func (m *DeserializedManifest) UnmarshalJSON(b []byte) error ***REMOVED***
+func (m *DeserializedManifest) UnmarshalJSON(b []byte) error {
 	m.canonical = make([]byte, len(b), len(b))
 	// store manifest in canonical
 	copy(m.canonical, b)
 
 	// Unmarshal canonical JSON into Manifest object
 	var manifest Manifest
-	if err := json.Unmarshal(m.canonical, &manifest); err != nil ***REMOVED***
+	if err := json.Unmarshal(m.canonical, &manifest); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	m.Manifest = manifest
 
 	return nil
-***REMOVED***
+}
 
 // MarshalJSON returns the contents of canonical. If canonical is empty,
 // marshals the inner contents.
-func (m *DeserializedManifest) MarshalJSON() ([]byte, error) ***REMOVED***
-	if len(m.canonical) > 0 ***REMOVED***
+func (m *DeserializedManifest) MarshalJSON() ([]byte, error) {
+	if len(m.canonical) > 0 {
 		return m.canonical, nil
-	***REMOVED***
+	}
 
 	return nil, errors.New("JSON representation not initialized in DeserializedManifest")
-***REMOVED***
+}
 
 // Payload returns the raw content of the manifest. The contents can be used to
 // calculate the content identifier.
-func (m DeserializedManifest) Payload() (string, []byte, error) ***REMOVED***
+func (m DeserializedManifest) Payload() (string, []byte, error) {
 	return m.MediaType, m.canonical, nil
-***REMOVED***
+}

@@ -8,6 +8,6 @@ package ipv6
 
 import "golang.org/x/net/internal/socket"
 
-func setControlMessage(c *socket.Conn, opt *rawOpt, cf ControlFlags, on bool) error ***REMOVED***
+func setControlMessage(c *socket.Conn, opt *rawOpt, cf ControlFlags, on bool) error {
 	return errOpNoSupport
-***REMOVED***
+}

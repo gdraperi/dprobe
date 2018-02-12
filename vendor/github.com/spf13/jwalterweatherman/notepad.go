@@ -13,9 +13,9 @@ import (
 
 type Threshold int
 
-func (t Threshold) String() string ***REMOVED***
+func (t Threshold) String() string {
 	return prefixes[t]
-***REMOVED***
+}
 
 const (
 	LevelTrace Threshold = iota
@@ -27,7 +27,7 @@ const (
 	LevelFatal
 )
 
-var prefixes map[Threshold]string = map[Threshold]string***REMOVED***
+var prefixes map[Threshold]string = map[Threshold]string{
 	LevelTrace:    "TRACE",
 	LevelDebug:    "DEBUG",
 	LevelInfo:     "INFO",
@@ -35,10 +35,10 @@ var prefixes map[Threshold]string = map[Threshold]string***REMOVED***
 	LevelError:    "ERROR",
 	LevelCritical: "CRITICAL",
 	LevelFatal:    "FATAL",
-***REMOVED***
+}
 
 // Notepad is where you leave a note!
-type Notepad struct ***REMOVED***
+type Notepad struct {
 	TRACE    *log.Logger
 	DEBUG    *log.Logger
 	INFO     *log.Logger
@@ -60,46 +60,46 @@ type Notepad struct ***REMOVED***
 
 	// One per Threshold
 	logCounters [7]*logCounter
-***REMOVED***
+}
 
 // NewNotepad create a new notepad.
-func NewNotepad(outThreshold Threshold, logThreshold Threshold, outHandle, logHandle io.Writer, prefix string, flags int) *Notepad ***REMOVED***
-	n := &Notepad***REMOVED******REMOVED***
+func NewNotepad(outThreshold Threshold, logThreshold Threshold, outHandle, logHandle io.Writer, prefix string, flags int) *Notepad {
+	n := &Notepad{}
 
-	n.loggers = [7]**log.Logger***REMOVED***&n.TRACE, &n.DEBUG, &n.INFO, &n.WARN, &n.ERROR, &n.CRITICAL, &n.FATAL***REMOVED***
+	n.loggers = [7]**log.Logger{&n.TRACE, &n.DEBUG, &n.INFO, &n.WARN, &n.ERROR, &n.CRITICAL, &n.FATAL}
 	n.outHandle = outHandle
 	n.logHandle = logHandle
 	n.stdoutThreshold = outThreshold
 	n.logThreshold = logThreshold
 
-	if len(prefix) != 0 ***REMOVED***
+	if len(prefix) != 0 {
 		n.prefix = "[" + prefix + "] "
-	***REMOVED*** else ***REMOVED***
+	} else {
 		n.prefix = ""
-	***REMOVED***
+	}
 
 	n.flags = flags
 
 	n.LOG = log.New(n.logHandle,
 		"LOG:   ",
 		n.flags)
-	n.FEEDBACK = &Feedback***REMOVED***out: log.New(outHandle, "", 0), log: n.LOG***REMOVED***
+	n.FEEDBACK = &Feedback{out: log.New(outHandle, "", 0), log: n.LOG}
 
 	n.init()
 	return n
-***REMOVED***
+}
 
 // init creates the loggers for each level depending on the notepad thresholds.
-func (n *Notepad) init() ***REMOVED***
+func (n *Notepad) init() {
 	logAndOut := io.MultiWriter(n.outHandle, n.logHandle)
 
-	for t, logger := range n.loggers ***REMOVED***
+	for t, logger := range n.loggers {
 		threshold := Threshold(t)
-		counter := &logCounter***REMOVED******REMOVED***
+		counter := &logCounter{}
 		n.logCounters[t] = counter
 		prefix := n.prefix + threshold.String() + " "
 
-		switch ***REMOVED***
+		switch {
 		case threshold >= n.logThreshold && threshold >= n.stdoutThreshold:
 			*logger = log.New(io.MultiWriter(counter, logAndOut), prefix, n.flags)
 
@@ -113,82 +113,82 @@ func (n *Notepad) init() ***REMOVED***
 			// counter doesn't care about prefix and flags, so don't use them
 			// for performance.
 			*logger = log.New(counter, "", 0)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // SetLogThreshold changes the threshold above which messages are written to the
 // log file.
-func (n *Notepad) SetLogThreshold(threshold Threshold) ***REMOVED***
+func (n *Notepad) SetLogThreshold(threshold Threshold) {
 	n.logThreshold = threshold
 	n.init()
-***REMOVED***
+}
 
 // SetLogOutput changes the file where log messages are written.
-func (n *Notepad) SetLogOutput(handle io.Writer) ***REMOVED***
+func (n *Notepad) SetLogOutput(handle io.Writer) {
 	n.logHandle = handle
 	n.init()
-***REMOVED***
+}
 
 // GetStdoutThreshold returns the defined Treshold for the log logger.
-func (n *Notepad) GetLogThreshold() Threshold ***REMOVED***
+func (n *Notepad) GetLogThreshold() Threshold {
 	return n.logThreshold
-***REMOVED***
+}
 
 // SetStdoutThreshold changes the threshold above which messages are written to the
 // standard output.
-func (n *Notepad) SetStdoutThreshold(threshold Threshold) ***REMOVED***
+func (n *Notepad) SetStdoutThreshold(threshold Threshold) {
 	n.stdoutThreshold = threshold
 	n.init()
-***REMOVED***
+}
 
 // GetStdoutThreshold returns the Treshold for the stdout logger.
-func (n *Notepad) GetStdoutThreshold() Threshold ***REMOVED***
+func (n *Notepad) GetStdoutThreshold() Threshold {
 	return n.stdoutThreshold
-***REMOVED***
+}
 
 // SetPrefix changes the prefix used by the notepad. Prefixes are displayed between
 // brackets at the beginning of the line. An empty prefix won't be displayed at all.
-func (n *Notepad) SetPrefix(prefix string) ***REMOVED***
-	if len(prefix) != 0 ***REMOVED***
+func (n *Notepad) SetPrefix(prefix string) {
+	if len(prefix) != 0 {
 		n.prefix = "[" + prefix + "] "
-	***REMOVED*** else ***REMOVED***
+	} else {
 		n.prefix = ""
-	***REMOVED***
+	}
 	n.init()
-***REMOVED***
+}
 
 // SetFlags choose which flags the logger will display (after prefix and message
 // level). See the package log for more informations on this.
-func (n *Notepad) SetFlags(flags int) ***REMOVED***
+func (n *Notepad) SetFlags(flags int) {
 	n.flags = flags
 	n.init()
-***REMOVED***
+}
 
 // Feedback writes plainly to the outHandle while
 // logging with the standard extra information (date, file, etc).
-type Feedback struct ***REMOVED***
+type Feedback struct {
 	out *log.Logger
 	log *log.Logger
-***REMOVED***
+}
 
-func (fb *Feedback) Println(v ...interface***REMOVED******REMOVED***) ***REMOVED***
+func (fb *Feedback) Println(v ...interface{}) {
 	fb.output(fmt.Sprintln(v...))
-***REMOVED***
+}
 
-func (fb *Feedback) Printf(format string, v ...interface***REMOVED******REMOVED***) ***REMOVED***
+func (fb *Feedback) Printf(format string, v ...interface{}) {
 	fb.output(fmt.Sprintf(format, v...))
-***REMOVED***
+}
 
-func (fb *Feedback) Print(v ...interface***REMOVED******REMOVED***) ***REMOVED***
+func (fb *Feedback) Print(v ...interface{}) {
 	fb.output(fmt.Sprint(v...))
-***REMOVED***
+}
 
-func (fb *Feedback) output(s string) ***REMOVED***
-	if fb.out != nil ***REMOVED***
+func (fb *Feedback) output(s string) {
+	if fb.out != nil {
 		fb.out.Output(2, s)
-	***REMOVED***
-	if fb.log != nil ***REMOVED***
+	}
+	if fb.log != nil {
 		fb.log.Output(2, s)
-	***REMOVED***
-***REMOVED***
+	}
+}

@@ -85,82 +85,82 @@ const (
 	TimeoutInfinite = 0xFFFFFFFF
 )
 
-type HcsError struct ***REMOVED***
+type HcsError struct {
 	title string
 	rest  string
 	Err   error
-***REMOVED***
+}
 
 type hcsSystem syscall.Handle
 type hcsProcess syscall.Handle
 type hcsCallback syscall.Handle
 
-type hcsProcessInformation struct ***REMOVED***
+type hcsProcessInformation struct {
 	ProcessId uint32
 	Reserved  uint32
 	StdInput  syscall.Handle
 	StdOutput syscall.Handle
 	StdError  syscall.Handle
-***REMOVED***
+}
 
-func makeError(err error, title, rest string) error ***REMOVED***
+func makeError(err error, title, rest string) error {
 	// Pass through DLL errors directly since they do not originate from HCS.
-	if _, ok := err.(*syscall.DLLError); ok ***REMOVED***
+	if _, ok := err.(*syscall.DLLError); ok {
 		return err
-	***REMOVED***
-	return &HcsError***REMOVED***title, rest, err***REMOVED***
-***REMOVED***
+	}
+	return &HcsError{title, rest, err}
+}
 
-func makeErrorf(err error, title, format string, a ...interface***REMOVED******REMOVED***) error ***REMOVED***
+func makeErrorf(err error, title, format string, a ...interface{}) error {
 	return makeError(err, title, fmt.Sprintf(format, a...))
-***REMOVED***
+}
 
-func win32FromError(err error) uint32 ***REMOVED***
-	if herr, ok := err.(*HcsError); ok ***REMOVED***
+func win32FromError(err error) uint32 {
+	if herr, ok := err.(*HcsError); ok {
 		return win32FromError(herr.Err)
-	***REMOVED***
-	if code, ok := err.(syscall.Errno); ok ***REMOVED***
+	}
+	if code, ok := err.(syscall.Errno); ok {
 		return uint32(code)
-	***REMOVED***
+	}
 	return uint32(ERROR_GEN_FAILURE)
-***REMOVED***
+}
 
-func win32FromHresult(hr uintptr) uintptr ***REMOVED***
-	if hr&0x1fff0000 == 0x00070000 ***REMOVED***
+func win32FromHresult(hr uintptr) uintptr {
+	if hr&0x1fff0000 == 0x00070000 {
 		return hr & 0xffff
-	***REMOVED***
+	}
 	return hr
-***REMOVED***
+}
 
-func (e *HcsError) Error() string ***REMOVED***
+func (e *HcsError) Error() string {
 	s := e.title
-	if len(s) > 0 && s[len(s)-1] != ' ' ***REMOVED***
+	if len(s) > 0 && s[len(s)-1] != ' ' {
 		s += " "
-	***REMOVED***
+	}
 	s += fmt.Sprintf("failed in Win32: %s (0x%x)", e.Err, win32FromError(e.Err))
-	if e.rest != "" ***REMOVED***
-		if e.rest[0] != ' ' ***REMOVED***
+	if e.rest != "" {
+		if e.rest[0] != ' ' {
 			s += " "
-		***REMOVED***
+		}
 		s += e.rest
-	***REMOVED***
+	}
 	return s
-***REMOVED***
+}
 
-func convertAndFreeCoTaskMemString(buffer *uint16) string ***REMOVED***
+func convertAndFreeCoTaskMemString(buffer *uint16) string {
 	str := syscall.UTF16ToString((*[1 << 30]uint16)(unsafe.Pointer(buffer))[:])
 	coTaskMemFree(unsafe.Pointer(buffer))
 	return str
-***REMOVED***
+}
 
-func convertAndFreeCoTaskMemBytes(buffer *uint16) []byte ***REMOVED***
+func convertAndFreeCoTaskMemBytes(buffer *uint16) []byte {
 	return []byte(convertAndFreeCoTaskMemString(buffer))
-***REMOVED***
+}
 
-func processHcsResult(err error, resultp *uint16) error ***REMOVED***
-	if resultp != nil ***REMOVED***
+func processHcsResult(err error, resultp *uint16) error {
+	if resultp != nil {
 		result := convertAndFreeCoTaskMemString(resultp)
 		logrus.Debugf("Result: %s", result)
-	***REMOVED***
+	}
 	return err
-***REMOVED***
+}

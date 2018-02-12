@@ -12,14 +12,14 @@
 // user input. The first step is to parse a specifier into a matcher:
 //
 //   m, err := Parse("linux")
-//   if err != nil ***REMOVED*** ... ***REMOVED***
+//   if err != nil { ... }
 //
 // Once you have a matcher, use it to match against the platform declared by a
 // component, typically from an image or runtime. Since extracting an images
 // platform is a little more involved, we'll use an example against the
 // platform default:
 //
-//   if ok := m.Match(Default()); !ok ***REMOVED*** /* doesn't match */ ***REMOVED***
+//   if ok := m.Match(Default()); !ok { /* doesn't match */ }
 //
 // This can be composed in loops for resolving runtimes or used as a filter for
 // fetch and select images.
@@ -33,11 +33,11 @@
 // images and runtimes that should make these declaring which platform they
 // support specifically. This looks roughly as follows:
 //
-//   type Platform struct ***REMOVED***
+//   type Platform struct {
 //	   Architecture string
 //	   OS           string
 //	   Variant      string
-//   ***REMOVED***
+//   }
 //
 // Most images and runtimes should at least set Architecture and OS, according
 // to their GOARCH and GOOS values, respectively (follow the OCI image
@@ -105,29 +105,29 @@ var (
 )
 
 // Matcher matches platforms specifications, provided by an image or runtime.
-type Matcher interface ***REMOVED***
+type Matcher interface {
 	Spec() specs.Platform
 	Match(platform specs.Platform) bool
-***REMOVED***
+}
 
-type matcher struct ***REMOVED***
+type matcher struct {
 	specs.Platform
-***REMOVED***
+}
 
-func (m *matcher) Spec() specs.Platform ***REMOVED***
+func (m *matcher) Spec() specs.Platform {
 	return m.Platform
-***REMOVED***
+}
 
-func (m *matcher) Match(platform specs.Platform) bool ***REMOVED***
+func (m *matcher) Match(platform specs.Platform) bool {
 	normalized := Normalize(platform)
 	return m.OS == normalized.OS &&
 		m.Architecture == normalized.Architecture &&
 		m.Variant == normalized.Variant
-***REMOVED***
+}
 
-func (m *matcher) String() string ***REMOVED***
+func (m *matcher) String() string {
 	return Format(m.Platform)
-***REMOVED***
+}
 
 // Parse parses the platform specifier syntax into a platform declaration.
 //
@@ -139,22 +139,22 @@ func (m *matcher) String() string ***REMOVED***
 // inferred based on the local environment.
 //
 // Applications should opt to use `Match` over directly parsing specifiers.
-func Parse(specifier string) (Matcher, error) ***REMOVED***
-	if strings.Contains(specifier, "*") ***REMOVED***
+func Parse(specifier string) (Matcher, error) {
+	if strings.Contains(specifier, "*") {
 		// TODO(stevvooe): need to work out exact wildcard handling
 		return nil, errors.Wrapf(errdefs.ErrInvalidArgument, "%q: wildcards not yet supported", specifier)
-	***REMOVED***
+	}
 
 	parts := strings.Split(specifier, "/")
 
-	for _, part := range parts ***REMOVED***
-		if !specifierRe.MatchString(part) ***REMOVED***
+	for _, part := range parts {
+		if !specifierRe.MatchString(part) {
 			return nil, errors.Wrapf(errdefs.ErrInvalidArgument, "%q is an invalid component of %q: platform specifier component must match %q", part, specifier, specifierRe.String())
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	var p specs.Platform
-	switch len(parts) ***REMOVED***
+	switch len(parts) {
 	case 1:
 		// in this case, we will test that the value might be an OS, then look
 		// it up. If it is not known, we'll treat it as an architecture. Since
@@ -162,22 +162,22 @@ func Parse(specifier string) (Matcher, error) ***REMOVED***
 		// going to be a little more strict if we don't know about the argument
 		// value.
 		p.OS = normalizeOS(parts[0])
-		if isKnownOS(p.OS) ***REMOVED***
+		if isKnownOS(p.OS) {
 			// picks a default architecture
 			p.Architecture = runtime.GOARCH
-			if p.Architecture == "arm" ***REMOVED***
+			if p.Architecture == "arm" {
 				// TODO(stevvooe): Resolve arm variant, if not v6 (default)
 				return nil, errors.Wrapf(errdefs.ErrNotImplemented, "arm support not fully implemented")
-			***REMOVED***
+			}
 
-			return &matcher***REMOVED***p***REMOVED***, nil
-		***REMOVED***
+			return &matcher{p}, nil
+		}
 
 		p.Architecture, p.Variant = normalizeArch(parts[0], "")
-		if isKnownArch(p.Architecture) ***REMOVED***
+		if isKnownArch(p.Architecture) {
 			p.OS = runtime.GOOS
-			return &matcher***REMOVED***p***REMOVED***, nil
-		***REMOVED***
+			return &matcher{p}, nil
+		}
 
 		return nil, errors.Wrapf(errdefs.ErrInvalidArgument, "%q: unknown operating system or architecture", specifier)
 	case 2:
@@ -186,45 +186,45 @@ func Parse(specifier string) (Matcher, error) ***REMOVED***
 		p.OS = normalizeOS(parts[0])
 		p.Architecture, p.Variant = normalizeArch(parts[1], "")
 
-		return &matcher***REMOVED***p***REMOVED***, nil
+		return &matcher{p}, nil
 	case 3:
 		// we have a fully specified variant, this is rare
 		p.OS = normalizeOS(parts[0])
 		p.Architecture, p.Variant = normalizeArch(parts[1], parts[2])
 
-		return &matcher***REMOVED***p***REMOVED***, nil
-	***REMOVED***
+		return &matcher{p}, nil
+	}
 
 	return nil, errors.Wrapf(errdefs.ErrInvalidArgument, "%q: cannot parse platform specifier", specifier)
-***REMOVED***
+}
 
 // Format returns a string specifier from the provided platform specification.
-func Format(platform specs.Platform) string ***REMOVED***
-	if platform.OS == "" ***REMOVED***
+func Format(platform specs.Platform) string {
+	if platform.OS == "" {
 		return "unknown"
-	***REMOVED***
+	}
 
 	return joinNotEmpty(platform.OS, platform.Architecture, platform.Variant)
-***REMOVED***
+}
 
-func joinNotEmpty(s ...string) string ***REMOVED***
+func joinNotEmpty(s ...string) string {
 	var ss []string
-	for _, s := range s ***REMOVED***
-		if s == "" ***REMOVED***
+	for _, s := range s {
+		if s == "" {
 			continue
-		***REMOVED***
+		}
 
 		ss = append(ss, s)
-	***REMOVED***
+	}
 
 	return strings.Join(ss, "/")
-***REMOVED***
+}
 
 // Normalize validates and translate the platform to the canonical value.
 //
 // For example, if "Aarch64" is encountered, we change it to "arm64" or if
 // "x86_64" is encountered, it becomes "amd64".
-func Normalize(platform specs.Platform) specs.Platform ***REMOVED***
+func Normalize(platform specs.Platform) specs.Platform {
 	platform.OS = normalizeOS(platform.OS)
 	platform.Architecture, platform.Variant = normalizeArch(platform.Architecture, platform.Variant)
 
@@ -233,4 +233,4 @@ func Normalize(platform specs.Platform) specs.Platform ***REMOVED***
 	platform.OSVersion = ""
 
 	return platform
-***REMOVED***
+}

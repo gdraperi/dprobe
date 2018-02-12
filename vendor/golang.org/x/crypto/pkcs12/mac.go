@@ -11,26 +11,26 @@ import (
 	"encoding/asn1"
 )
 
-type macData struct ***REMOVED***
+type macData struct {
 	Mac        digestInfo
 	MacSalt    []byte
 	Iterations int `asn1:"optional,default:1"`
-***REMOVED***
+}
 
 // from PKCS#7:
-type digestInfo struct ***REMOVED***
+type digestInfo struct {
 	Algorithm pkix.AlgorithmIdentifier
 	Digest    []byte
-***REMOVED***
+}
 
 var (
-	oidSHA1 = asn1.ObjectIdentifier([]int***REMOVED***1, 3, 14, 3, 2, 26***REMOVED***)
+	oidSHA1 = asn1.ObjectIdentifier([]int{1, 3, 14, 3, 2, 26})
 )
 
-func verifyMac(macData *macData, message, password []byte) error ***REMOVED***
-	if !macData.Mac.Algorithm.Algorithm.Equal(oidSHA1) ***REMOVED***
+func verifyMac(macData *macData, message, password []byte) error {
+	if !macData.Mac.Algorithm.Algorithm.Equal(oidSHA1) {
 		return NotImplementedError("unknown digest algorithm: " + macData.Mac.Algorithm.Algorithm.String())
-	***REMOVED***
+	}
 
 	key := pbkdf(sha1Sum, 20, 64, macData.MacSalt, password, macData.Iterations, 3, 20)
 
@@ -38,8 +38,8 @@ func verifyMac(macData *macData, message, password []byte) error ***REMOVED***
 	mac.Write(message)
 	expectedMAC := mac.Sum(nil)
 
-	if !hmac.Equal(macData.Mac.Digest, expectedMAC) ***REMOVED***
+	if !hmac.Equal(macData.Mac.Digest, expectedMAC) {
 		return ErrIncorrectPassword
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

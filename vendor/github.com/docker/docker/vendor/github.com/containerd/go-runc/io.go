@@ -9,205 +9,205 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-type IO interface ***REMOVED***
+type IO interface {
 	io.Closer
 	Stdin() io.WriteCloser
 	Stdout() io.ReadCloser
 	Stderr() io.ReadCloser
 	Set(*exec.Cmd)
-***REMOVED***
+}
 
-type StartCloser interface ***REMOVED***
+type StartCloser interface {
 	CloseAfterStart() error
-***REMOVED***
+}
 
 // NewPipeIO creates pipe pairs to be used with runc
-func NewPipeIO(uid, gid int) (i IO, err error) ***REMOVED***
+func NewPipeIO(uid, gid int) (i IO, err error) {
 	var pipes []*pipe
 	// cleanup in case of an error
-	defer func() ***REMOVED***
-		if err != nil ***REMOVED***
-			for _, p := range pipes ***REMOVED***
+	defer func() {
+		if err != nil {
+			for _, p := range pipes {
 				p.Close()
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***()
+			}
+		}
+	}()
 	stdin, err := newPipe()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	pipes = append(pipes, stdin)
-	if err = unix.Fchown(int(stdin.r.Fd()), uid, gid); err != nil ***REMOVED***
+	if err = unix.Fchown(int(stdin.r.Fd()), uid, gid); err != nil {
 		return nil, errors.Wrap(err, "failed to chown stdin")
-	***REMOVED***
+	}
 
 	stdout, err := newPipe()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	pipes = append(pipes, stdout)
-	if err = unix.Fchown(int(stdout.w.Fd()), uid, gid); err != nil ***REMOVED***
+	if err = unix.Fchown(int(stdout.w.Fd()), uid, gid); err != nil {
 		return nil, errors.Wrap(err, "failed to chown stdout")
-	***REMOVED***
+	}
 
 	stderr, err := newPipe()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	pipes = append(pipes, stderr)
-	if err = unix.Fchown(int(stderr.w.Fd()), uid, gid); err != nil ***REMOVED***
+	if err = unix.Fchown(int(stderr.w.Fd()), uid, gid); err != nil {
 		return nil, errors.Wrap(err, "failed to chown stderr")
-	***REMOVED***
+	}
 
-	return &pipeIO***REMOVED***
+	return &pipeIO{
 		in:  stdin,
 		out: stdout,
 		err: stderr,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-func newPipe() (*pipe, error) ***REMOVED***
+func newPipe() (*pipe, error) {
 	r, w, err := os.Pipe()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	return &pipe***REMOVED***
+	}
+	return &pipe{
 		r: r,
 		w: w,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-type pipe struct ***REMOVED***
+type pipe struct {
 	r *os.File
 	w *os.File
-***REMOVED***
+}
 
-func (p *pipe) Close() error ***REMOVED***
+func (p *pipe) Close() error {
 	err := p.r.Close()
-	if werr := p.w.Close(); err == nil ***REMOVED***
+	if werr := p.w.Close(); err == nil {
 		err = werr
-	***REMOVED***
+	}
 	return err
-***REMOVED***
+}
 
-type pipeIO struct ***REMOVED***
+type pipeIO struct {
 	in  *pipe
 	out *pipe
 	err *pipe
-***REMOVED***
+}
 
-func (i *pipeIO) Stdin() io.WriteCloser ***REMOVED***
+func (i *pipeIO) Stdin() io.WriteCloser {
 	return i.in.w
-***REMOVED***
+}
 
-func (i *pipeIO) Stdout() io.ReadCloser ***REMOVED***
+func (i *pipeIO) Stdout() io.ReadCloser {
 	return i.out.r
-***REMOVED***
+}
 
-func (i *pipeIO) Stderr() io.ReadCloser ***REMOVED***
+func (i *pipeIO) Stderr() io.ReadCloser {
 	return i.err.r
-***REMOVED***
+}
 
-func (i *pipeIO) Close() error ***REMOVED***
+func (i *pipeIO) Close() error {
 	var err error
-	for _, v := range []*pipe***REMOVED***
+	for _, v := range []*pipe{
 		i.in,
 		i.out,
 		i.err,
-	***REMOVED*** ***REMOVED***
-		if cerr := v.Close(); err == nil ***REMOVED***
+	} {
+		if cerr := v.Close(); err == nil {
 			err = cerr
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return err
-***REMOVED***
+}
 
-func (i *pipeIO) CloseAfterStart() error ***REMOVED***
-	for _, f := range []*os.File***REMOVED***
+func (i *pipeIO) CloseAfterStart() error {
+	for _, f := range []*os.File{
 		i.out.w,
 		i.err.w,
-	***REMOVED*** ***REMOVED***
+	} {
 		f.Close()
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // Set sets the io to the exec.Cmd
-func (i *pipeIO) Set(cmd *exec.Cmd) ***REMOVED***
+func (i *pipeIO) Set(cmd *exec.Cmd) {
 	cmd.Stdin = i.in.r
 	cmd.Stdout = i.out.w
 	cmd.Stderr = i.err.w
-***REMOVED***
+}
 
-func NewSTDIO() (IO, error) ***REMOVED***
-	return &stdio***REMOVED******REMOVED***, nil
-***REMOVED***
+func NewSTDIO() (IO, error) {
+	return &stdio{}, nil
+}
 
-type stdio struct ***REMOVED***
-***REMOVED***
+type stdio struct {
+}
 
-func (s *stdio) Close() error ***REMOVED***
+func (s *stdio) Close() error {
 	return nil
-***REMOVED***
+}
 
-func (s *stdio) Set(cmd *exec.Cmd) ***REMOVED***
+func (s *stdio) Set(cmd *exec.Cmd) {
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-***REMOVED***
+}
 
-func (s *stdio) Stdin() io.WriteCloser ***REMOVED***
+func (s *stdio) Stdin() io.WriteCloser {
 	return os.Stdin
-***REMOVED***
+}
 
-func (s *stdio) Stdout() io.ReadCloser ***REMOVED***
+func (s *stdio) Stdout() io.ReadCloser {
 	return os.Stdout
-***REMOVED***
+}
 
-func (s *stdio) Stderr() io.ReadCloser ***REMOVED***
+func (s *stdio) Stderr() io.ReadCloser {
 	return os.Stderr
-***REMOVED***
+}
 
 // NewNullIO returns IO setup for /dev/null use with runc
-func NewNullIO() (IO, error) ***REMOVED***
+func NewNullIO() (IO, error) {
 	f, err := os.Open(os.DevNull)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	return &nullIO***REMOVED***
+	}
+	return &nullIO{
 		devNull: f,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-type nullIO struct ***REMOVED***
+type nullIO struct {
 	devNull *os.File
-***REMOVED***
+}
 
-func (n *nullIO) Close() error ***REMOVED***
+func (n *nullIO) Close() error {
 	// this should be closed after start but if not
 	// make sure we close the file but don't return the error
 	n.devNull.Close()
 	return nil
-***REMOVED***
+}
 
-func (n *nullIO) Stdin() io.WriteCloser ***REMOVED***
+func (n *nullIO) Stdin() io.WriteCloser {
 	return nil
-***REMOVED***
+}
 
-func (n *nullIO) Stdout() io.ReadCloser ***REMOVED***
+func (n *nullIO) Stdout() io.ReadCloser {
 	return nil
-***REMOVED***
+}
 
-func (n *nullIO) Stderr() io.ReadCloser ***REMOVED***
+func (n *nullIO) Stderr() io.ReadCloser {
 	return nil
-***REMOVED***
+}
 
-func (n *nullIO) Set(c *exec.Cmd) ***REMOVED***
+func (n *nullIO) Set(c *exec.Cmd) {
 	// don't set STDIN here
 	c.Stdout = n.devNull
 	c.Stderr = n.devNull
-***REMOVED***
+}
 
-func (n *nullIO) CloseAfterStart() error ***REMOVED***
+func (n *nullIO) CloseAfterStart() error {
 	return n.devNull.Close()
-***REMOVED***
+}

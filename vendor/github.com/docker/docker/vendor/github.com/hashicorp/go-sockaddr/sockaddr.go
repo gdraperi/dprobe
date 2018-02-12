@@ -18,7 +18,7 @@ const (
 	TypeIP = 0x6
 )
 
-type SockAddr interface ***REMOVED***
+type SockAddr interface {
 	// CmpRFC returns 0 if SockAddr exactly matches one of the matched RFC
 	// networks, -1 if the receiver is contained within the RFC network, or
 	// 1 if the address is not contained within the RFC.
@@ -41,15 +41,15 @@ type SockAddr interface ***REMOVED***
 
 	// Type returns the SockAddrType
 	Type() SockAddrType
-***REMOVED***
+}
 
 // sockAddrAttrMap is a map of the SockAddr type-specific attributes.
 var sockAddrAttrMap map[AttrName]func(SockAddr) string
 var sockAddrAttrs []AttrName
 
-func init() ***REMOVED***
+func init() {
 	sockAddrInit()
-***REMOVED***
+}
 
 // New creates a new SockAddr from the string.  The order in which New()
 // attempts to construct a SockAddr is: IPv4Addr, IPv6Addr, SockAddrUnix.
@@ -64,83 +64,83 @@ func init() ***REMOVED***
 // of this heuristic and be assumed to be a valid UNIX socket path (which they
 // are, but it is probably not what you want and you won't realize it until you
 // stat(2) the file system to discover it doesn't exist).
-func NewSockAddr(s string) (SockAddr, error) ***REMOVED***
+func NewSockAddr(s string) (SockAddr, error) {
 	ipv4Addr, err := NewIPv4Addr(s)
-	if err == nil ***REMOVED***
+	if err == nil {
 		return ipv4Addr, nil
-	***REMOVED***
+	}
 
 	ipv6Addr, err := NewIPv6Addr(s)
-	if err == nil ***REMOVED***
+	if err == nil {
 		return ipv6Addr, nil
-	***REMOVED***
+	}
 
 	// Check to make sure the string begins with either a '.' or '/', or
 	// contains a '/'.
-	if len(s) > 1 && (strings.IndexAny(s[0:1], "./") != -1 || strings.IndexByte(s, '/') != -1) ***REMOVED***
+	if len(s) > 1 && (strings.IndexAny(s[0:1], "./") != -1 || strings.IndexByte(s, '/') != -1) {
 		unixSock, err := NewUnixSock(s)
-		if err == nil ***REMOVED***
+		if err == nil {
 			return unixSock, nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil, fmt.Errorf("Unable to convert %q to an IPv4 or IPv6 address, or a UNIX Socket", s)
-***REMOVED***
+}
 
 // ToIPAddr returns an IPAddr type or nil if the type conversion fails.
-func ToIPAddr(sa SockAddr) *IPAddr ***REMOVED***
+func ToIPAddr(sa SockAddr) *IPAddr {
 	ipa, ok := sa.(IPAddr)
-	if !ok ***REMOVED***
+	if !ok {
 		return nil
-	***REMOVED***
+	}
 	return &ipa
-***REMOVED***
+}
 
 // ToIPv4Addr returns an IPv4Addr type or nil if the type conversion fails.
-func ToIPv4Addr(sa SockAddr) *IPv4Addr ***REMOVED***
-	switch v := sa.(type) ***REMOVED***
+func ToIPv4Addr(sa SockAddr) *IPv4Addr {
+	switch v := sa.(type) {
 	case IPv4Addr:
 		return &v
 	default:
 		return nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // ToIPv6Addr returns an IPv6Addr type or nil if the type conversion fails.
-func ToIPv6Addr(sa SockAddr) *IPv6Addr ***REMOVED***
-	switch v := sa.(type) ***REMOVED***
+func ToIPv6Addr(sa SockAddr) *IPv6Addr {
+	switch v := sa.(type) {
 	case IPv6Addr:
 		return &v
 	default:
 		return nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // ToUnixSock returns a UnixSock type or nil if the type conversion fails.
-func ToUnixSock(sa SockAddr) *UnixSock ***REMOVED***
-	switch v := sa.(type) ***REMOVED***
+func ToUnixSock(sa SockAddr) *UnixSock {
+	switch v := sa.(type) {
 	case UnixSock:
 		return &v
 	default:
 		return nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // SockAddrAttr returns a string representation of an attribute for the given
 // SockAddr.
-func SockAddrAttr(sa SockAddr, selector AttrName) string ***REMOVED***
+func SockAddrAttr(sa SockAddr, selector AttrName) string {
 	fn, found := sockAddrAttrMap[selector]
-	if !found ***REMOVED***
+	if !found {
 		return ""
-	***REMOVED***
+	}
 
 	return fn(sa)
-***REMOVED***
+}
 
 // String() for SockAddrType returns a string representation of the
 // SockAddrType (e.g. "IPv4", "IPv6", "UNIX", "IP", or "unknown").
-func (sat SockAddrType) String() string ***REMOVED***
-	switch sat ***REMOVED***
+func (sat SockAddrType) String() string {
+	switch sat {
 	case TypeIPv4:
 		return "IPv4"
 	case TypeIPv6:
@@ -152,27 +152,27 @@ func (sat SockAddrType) String() string ***REMOVED***
 		return "UNIX"
 	default:
 		panic("unsupported type")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // sockAddrInit is called once at init()
-func sockAddrInit() ***REMOVED***
-	sockAddrAttrs = []AttrName***REMOVED***
+func sockAddrInit() {
+	sockAddrAttrs = []AttrName{
 		"type", // type should be first
 		"string",
-	***REMOVED***
+	}
 
-	sockAddrAttrMap = map[AttrName]func(sa SockAddr) string***REMOVED***
-		"string": func(sa SockAddr) string ***REMOVED***
+	sockAddrAttrMap = map[AttrName]func(sa SockAddr) string{
+		"string": func(sa SockAddr) string {
 			return sa.String()
-		***REMOVED***,
-		"type": func(sa SockAddr) string ***REMOVED***
+		},
+		"type": func(sa SockAddr) string {
 			return sa.Type().String()
-		***REMOVED***,
-	***REMOVED***
-***REMOVED***
+		},
+	}
+}
 
 // UnixSockAttrs returns a list of attributes supported by the UnixSock type
-func SockAddrAttrs() []AttrName ***REMOVED***
+func SockAddrAttrs() []AttrName {
 	return sockAddrAttrs
-***REMOVED***
+}

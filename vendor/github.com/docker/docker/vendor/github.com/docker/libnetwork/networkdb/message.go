@@ -12,87 +12,87 @@ const (
 	compoundOverhead = 4
 )
 
-func encodeRawMessage(t MessageType, raw []byte) ([]byte, error) ***REMOVED***
-	gMsg := GossipMessage***REMOVED***
+func encodeRawMessage(t MessageType, raw []byte) ([]byte, error) {
+	gMsg := GossipMessage{
 		Type: t,
 		Data: raw,
-	***REMOVED***
+	}
 
 	buf, err := proto.Marshal(&gMsg)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	return buf, nil
-***REMOVED***
+}
 
-func encodeMessage(t MessageType, msg interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func encodeMessage(t MessageType, msg interface{}) ([]byte, error) {
 	buf, err := proto.Marshal(msg.(proto.Message))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	buf, err = encodeRawMessage(t, buf)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	return buf, nil
-***REMOVED***
+}
 
-func decodeMessage(buf []byte) (MessageType, []byte, error) ***REMOVED***
+func decodeMessage(buf []byte) (MessageType, []byte, error) {
 	var gMsg GossipMessage
 
 	err := proto.Unmarshal(buf, &gMsg)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return MessageTypeInvalid, nil, err
-	***REMOVED***
+	}
 
 	return gMsg.Type, gMsg.Data, nil
-***REMOVED***
+}
 
 // makeCompoundMessage takes a list of messages and generates
 // a single compound message containing all of them
-func makeCompoundMessage(msgs [][]byte) []byte ***REMOVED***
-	cMsg := CompoundMessage***REMOVED******REMOVED***
+func makeCompoundMessage(msgs [][]byte) []byte {
+	cMsg := CompoundMessage{}
 
 	cMsg.Messages = make([]*CompoundMessage_SimpleMessage, 0, len(msgs))
-	for _, m := range msgs ***REMOVED***
-		cMsg.Messages = append(cMsg.Messages, &CompoundMessage_SimpleMessage***REMOVED***
+	for _, m := range msgs {
+		cMsg.Messages = append(cMsg.Messages, &CompoundMessage_SimpleMessage{
 			Payload: m,
-		***REMOVED***)
-	***REMOVED***
+		})
+	}
 
 	buf, err := proto.Marshal(&cMsg)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil
-	***REMOVED***
+	}
 
-	gMsg := GossipMessage***REMOVED***
+	gMsg := GossipMessage{
 		Type: MessageTypeCompound,
 		Data: buf,
-	***REMOVED***
+	}
 
 	buf, err = proto.Marshal(&gMsg)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil
-	***REMOVED***
+	}
 
 	return buf
-***REMOVED***
+}
 
 // decodeCompoundMessage splits a compound message and returns
 // the slices of individual messages. Returns any potential error.
-func decodeCompoundMessage(buf []byte) ([][]byte, error) ***REMOVED***
+func decodeCompoundMessage(buf []byte) ([][]byte, error) {
 	var cMsg CompoundMessage
-	if err := proto.Unmarshal(buf, &cMsg); err != nil ***REMOVED***
+	if err := proto.Unmarshal(buf, &cMsg); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	parts := make([][]byte, 0, len(cMsg.Messages))
-	for _, m := range cMsg.Messages ***REMOVED***
+	for _, m := range cMsg.Messages {
 		parts = append(parts, m.Payload)
-	***REMOVED***
+	}
 
 	return parts, nil
-***REMOVED***
+}

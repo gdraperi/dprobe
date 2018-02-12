@@ -12,18 +12,18 @@ import (
 
 // RegistryLogin authenticates the docker server with a given docker registry.
 // It returns unauthorizedError when the authentication fails.
-func (cli *Client) RegistryLogin(ctx context.Context, auth types.AuthConfig) (registry.AuthenticateOKBody, error) ***REMOVED***
-	resp, err := cli.post(ctx, "/auth", url.Values***REMOVED******REMOVED***, auth, nil)
+func (cli *Client) RegistryLogin(ctx context.Context, auth types.AuthConfig) (registry.AuthenticateOKBody, error) {
+	resp, err := cli.post(ctx, "/auth", url.Values{}, auth, nil)
 
-	if resp.statusCode == http.StatusUnauthorized ***REMOVED***
-		return registry.AuthenticateOKBody***REMOVED******REMOVED***, unauthorizedError***REMOVED***err***REMOVED***
-	***REMOVED***
-	if err != nil ***REMOVED***
-		return registry.AuthenticateOKBody***REMOVED******REMOVED***, err
-	***REMOVED***
+	if resp.statusCode == http.StatusUnauthorized {
+		return registry.AuthenticateOKBody{}, unauthorizedError{err}
+	}
+	if err != nil {
+		return registry.AuthenticateOKBody{}, err
+	}
 
 	var response registry.AuthenticateOKBody
 	err = json.NewDecoder(resp.body).Decode(&response)
 	ensureReaderClosed(resp)
 	return response, err
-***REMOVED***
+}

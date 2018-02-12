@@ -105,8 +105,8 @@ However, <code>append</code> did not provide a way to append a string to a <code
 which is another common case.
 </p>
 
-<pre><!--***REMOVED******REMOVED***code "/doc/progs/go1.go" `/greeting := ..byte/` `/append.*hello/`***REMOVED******REMOVED***
--->    greeting := []byte***REMOVED******REMOVED***
+<pre><!--{{code "/doc/progs/go1.go" `/greeting := ..byte/` `/append.*hello/`}}
+-->    greeting := []byte{}
     greeting = append(greeting, []byte(&#34;hello &#34;)...)</pre>
 
 <p>
@@ -116,7 +116,7 @@ slice, reducing the friction between strings and byte slices.
 The conversion is no longer necessary:
 </p>
 
-<pre><!--***REMOVED******REMOVED***code "/doc/progs/go1.go" `/append.*world/`***REMOVED******REMOVED***
+<pre><!--{{code "/doc/progs/go1.go" `/append.*world/`}}
 -->    greeting = append(greeting, &#34;world&#34;...)</pre>
 
 <p>
@@ -167,35 +167,35 @@ type specification for the elements' initializers if they are of pointer type.
 All four of the initializations in this example are legal; the last one was illegal before Go 1.
 </p>
 
-<pre><!--***REMOVED******REMOVED***code "/doc/progs/go1.go" `/type Date struct/` `/STOP/`***REMOVED******REMOVED***
--->    type Date struct ***REMOVED***
+<pre><!--{{code "/doc/progs/go1.go" `/type Date struct/` `/STOP/`}}
+-->    type Date struct {
         month string
         day   int
-***REMOVED***
+    }
     <span class="comment">// Struct values, fully qualified; always legal.</span>
-    holiday1 := []Date***REMOVED***
-        Date***REMOVED***&#34;Feb&#34;, 14***REMOVED***,
-        Date***REMOVED***&#34;Nov&#34;, 11***REMOVED***,
-        Date***REMOVED***&#34;Dec&#34;, 25***REMOVED***,
-***REMOVED***
+    holiday1 := []Date{
+        Date{&#34;Feb&#34;, 14},
+        Date{&#34;Nov&#34;, 11},
+        Date{&#34;Dec&#34;, 25},
+    }
     <span class="comment">// Struct values, type name elided; always legal.</span>
-    holiday2 := []Date***REMOVED***
-        ***REMOVED***&#34;Feb&#34;, 14***REMOVED***,
-        ***REMOVED***&#34;Nov&#34;, 11***REMOVED***,
-        ***REMOVED***&#34;Dec&#34;, 25***REMOVED***,
-***REMOVED***
+    holiday2 := []Date{
+        {&#34;Feb&#34;, 14},
+        {&#34;Nov&#34;, 11},
+        {&#34;Dec&#34;, 25},
+    }
     <span class="comment">// Pointers, fully qualified, always legal.</span>
-    holiday3 := []*Date***REMOVED***
-        &amp;Date***REMOVED***&#34;Feb&#34;, 14***REMOVED***,
-        &amp;Date***REMOVED***&#34;Nov&#34;, 11***REMOVED***,
-        &amp;Date***REMOVED***&#34;Dec&#34;, 25***REMOVED***,
-***REMOVED***
+    holiday3 := []*Date{
+        &amp;Date{&#34;Feb&#34;, 14},
+        &amp;Date{&#34;Nov&#34;, 11},
+        &amp;Date{&#34;Dec&#34;, 25},
+    }
     <span class="comment">// Pointers, type name elided; legal in Go 1.</span>
-    holiday4 := []*Date***REMOVED***
-        ***REMOVED***&#34;Feb&#34;, 14***REMOVED***,
-        ***REMOVED***&#34;Nov&#34;, 11***REMOVED***,
-        ***REMOVED***&#34;Dec&#34;, 25***REMOVED***,
-***REMOVED***</pre>
+    holiday4 := []*Date{
+        {&#34;Feb&#34;, 14},
+        {&#34;Nov&#34;, 11},
+        {&#34;Dec&#34;, 25},
+    }</pre>
 
 <p>
 <em>Updating</em>:
@@ -224,14 +224,14 @@ In Go 1, code that uses goroutines can be called from
 without introducing a deadlock.
 </p>
 
-<pre><!--***REMOVED******REMOVED***code "/doc/progs/go1.go" `/PackageGlobal/` `/^***REMOVED***/`***REMOVED******REMOVED***
+<pre><!--{{code "/doc/progs/go1.go" `/PackageGlobal/` `/^}/`}}
 -->var PackageGlobal int
 
-func init() ***REMOVED***
+func init() {
     c := make(chan int)
     go initializationFunction(c)
     PackageGlobal = &lt;-c
-***REMOVED***</pre>
+}</pre>
 
 <p>
 <em>Updating</em>:
@@ -272,14 +272,14 @@ when appropriate. For instance, the functions <code>unicode.ToLower</code> and
 relatives now take and return a <code>rune</code>.
 </p>
 
-<pre><!--***REMOVED******REMOVED***code "/doc/progs/go1.go" `/STARTRUNE/` `/ENDRUNE/`***REMOVED******REMOVED***
+<pre><!--{{code "/doc/progs/go1.go" `/STARTRUNE/` `/ENDRUNE/`}}
 -->    delta := &#39;δ&#39; <span class="comment">// delta has type rune.</span>
     var DELTA rune
     DELTA = unicode.ToUpper(delta)
     epsilon := unicode.ToLower(DELTA + 1)
-    if epsilon != &#39;δ&#39;+1 ***REMOVED***
+    if epsilon != &#39;δ&#39;+1 {
         log.Fatal(&#34;inconsistent casing for Greek&#34;)
-***REMOVED***</pre>
+    }</pre>
 
 <p>
 <em>Updating</em>:
@@ -296,9 +296,9 @@ Go 1 introduces a new built-in type, <code>error</code>, which has the following
 </p>
 
 <pre>
-    type error interface ***REMOVED***
+    type error interface {
         Error() string
-***REMOVED***
+    }
 </pre>
 
 <p>
@@ -328,7 +328,7 @@ In Go 1, that syntax has gone; instead there is a new built-in
 function, <code>delete</code>.  The call
 </p>
 
-<pre><!--***REMOVED******REMOVED***code "/doc/progs/go1.go" `/delete\(m, k\)/`***REMOVED******REMOVED***
+<pre><!--{{code "/doc/progs/go1.go" `/delete\(m, k\)/`}}
 -->    delete(m, k)</pre>
 
 <p>
@@ -368,12 +368,12 @@ This change means that code that depends on iteration order is very likely to br
 Just as important, it allows the map implementation to ensure better map balancing even when programs are using range loops to select an element from a map.
 </p>
 
-<pre><!--***REMOVED******REMOVED***code "/doc/progs/go1.go" `/Sunday/` `/^	***REMOVED***/`***REMOVED******REMOVED***
--->    m := map[string]int***REMOVED***&#34;Sunday&#34;: 0, &#34;Monday&#34;: 1***REMOVED***
-    for name, value := range m ***REMOVED***
+<pre><!--{{code "/doc/progs/go1.go" `/Sunday/` `/^	}/`}}
+-->    m := map[string]int{&#34;Sunday&#34;: 0, &#34;Monday&#34;: 1}
+    for name, value := range m {
         <span class="comment">// This loop should not assume Sunday will be visited first.</span>
         f(name, value)
-***REMOVED***</pre>
+    }</pre>
 
 <p>
 <em>Updating</em>:
@@ -408,16 +408,16 @@ proceed in left-to-right order.
 These examples illustrate the behavior.
 </p>
 
-<pre><!--***REMOVED******REMOVED***code "/doc/progs/go1.go" `/sa :=/` `/then sc.0. = 2/`***REMOVED******REMOVED***
--->    sa := []int***REMOVED***1, 2, 3***REMOVED***
+<pre><!--{{code "/doc/progs/go1.go" `/sa :=/` `/then sc.0. = 2/`}}
+-->    sa := []int{1, 2, 3}
     i := 0
     i, sa[i] = 1, 2 <span class="comment">// sets i = 1, sa[0] = 2</span>
 
-    sb := []int***REMOVED***1, 2, 3***REMOVED***
+    sb := []int{1, 2, 3}
     j := 0
     sb[j], j = 2, 1 <span class="comment">// sets sb[0] = 2, j = 1</span>
 
-    sc := []int***REMOVED***1, 2, 3***REMOVED***
+    sc := []int{1, 2, 3}
     sc[0], sc[0] = 1, 2 <span class="comment">// sets sc[0] = 1, then sc[0] = 2 (so sc[0] = 2 at end)</span></pre>
 
 <p>
@@ -446,17 +446,17 @@ This function implicitly returns a shadowed return value and will be rejected by
 </p>
 
 <pre>
-    func Bug() (i, j, k int) ***REMOVED***
-        for i = 0; i &lt; 5; i++ ***REMOVED***
-            for j := 0; j &lt; 5; j++ ***REMOVED*** // Redeclares j.
+    func Bug() (i, j, k int) {
+        for i = 0; i &lt; 5; i++ {
+            for j := 0; j &lt; 5; j++ { // Redeclares j.
                 k += i*j
-                if k > 100 ***REMOVED***
+                if k > 100 {
                     return // Rejected: j is shadowed here.
-            ***REMOVED***
-        ***REMOVED***
-    ***REMOVED***
+                }
+            }
+        }
         return // OK: j is not shadowed here.
-***REMOVED***
+    }
 </pre>
 
 <p>
@@ -486,16 +486,16 @@ As an example, if package <code>p</code> includes the definitions,
 </p>
 
 <pre>
-    type Struct struct ***REMOVED***
+    type Struct struct {
         Public int
         secret int
-***REMOVED***
-    func NewStruct(a int) Struct ***REMOVED***  // Note: not a pointer.
-        return Struct***REMOVED***a, f(a)***REMOVED***
-***REMOVED***
-    func (s Struct) String() string ***REMOVED***
-        return fmt.Sprintf("***REMOVED***%d (secret %d)***REMOVED***", s.Public, s.secret)
-***REMOVED***
+    }
+    func NewStruct(a int) Struct {  // Note: not a pointer.
+        return Struct{a, f(a)}
+    }
+    func (s Struct) String() string {
+        return fmt.Sprintf("{%d (secret %d)}", s.Public, s.secret)
+    }
 </pre>
 
 <p>
@@ -545,17 +545,17 @@ provided they are composed from elements for which equality is also defined,
 using element-wise comparison.
 </p>
 
-<pre><!--***REMOVED******REMOVED***code "/doc/progs/go1.go" `/type Day struct/` `/Printf/`***REMOVED******REMOVED***
--->    type Day struct ***REMOVED***
+<pre><!--{{code "/doc/progs/go1.go" `/type Day struct/` `/Printf/`}}
+-->    type Day struct {
         long  string
         short string
-***REMOVED***
-    Christmas := Day***REMOVED***&#34;Christmas&#34;, &#34;XMas&#34;***REMOVED***
-    Thanksgiving := Day***REMOVED***&#34;Thanksgiving&#34;, &#34;Turkey&#34;***REMOVED***
-    holiday := map[Day]bool***REMOVED***
+    }
+    Christmas := Day{&#34;Christmas&#34;, &#34;XMas&#34;}
+    Thanksgiving := Day{&#34;Thanksgiving&#34;, &#34;Turkey&#34;}
+    holiday := map[Day]bool{
         Christmas:    true,
         Thanksgiving: true,
-***REMOVED***
+    }
     fmt.Printf(&#34;Christmas is a holiday: %t\n&#34;, holiday[Christmas])</pre>
 
 <p>
@@ -862,9 +862,9 @@ the name <code>Error</code> for that method:
 </p>
 
 <pre>
-    type error interface ***REMOVED***
+    type error interface {
         Error() string
-***REMOVED***
+    }
 </pre>
 
 <p>
@@ -872,16 +872,16 @@ The <code>fmt</code> library automatically invokes <code>Error</code>, as it alr
 does for <code>String</code>, for easy printing of error values.
 </p>
 
-<pre><!--***REMOVED******REMOVED***code "/doc/progs/go1.go" `/START ERROR EXAMPLE/` `/END ERROR EXAMPLE/`***REMOVED******REMOVED***
--->type SyntaxError struct ***REMOVED***
+<pre><!--{{code "/doc/progs/go1.go" `/START ERROR EXAMPLE/` `/END ERROR EXAMPLE/`}}
+-->type SyntaxError struct {
     File    string
     Line    int
     Message string
-***REMOVED***
+}
 
-func (se *SyntaxError) Error() string ***REMOVED***
+func (se *SyntaxError) Error() string {
     return fmt.Sprintf(&#34;%s:%d: %s&#34;, se.File, se.Line, se.Message)
-***REMOVED***</pre>
+}</pre>
 
 <p>
 All standard packages have been updated to use the new interface; the old <code>os.Error</code> is gone.
@@ -899,7 +899,7 @@ func New(text string) error
 to turn a string into an error. It replaces the old <code>os.NewError</code>.
 </p>
 
-<pre><!--***REMOVED******REMOVED***code "/doc/progs/go1.go" `/ErrSyntax/`***REMOVED******REMOVED***
+<pre><!--{{code "/doc/progs/go1.go" `/ErrSyntax/`}}
 -->    var ErrSyntax = errors.New(&#34;syntax error&#34;)</pre>
 		
 <p>
@@ -990,17 +990,17 @@ returns a <code>time.Time</code> value rather than, in the old
 API, an integer nanosecond count since the Unix epoch.
 </p>
 
-<pre><!--***REMOVED******REMOVED***code "/doc/progs/go1.go" `/sleepUntil/` `/^***REMOVED***/`***REMOVED******REMOVED***
+<pre><!--{{code "/doc/progs/go1.go" `/sleepUntil/` `/^}/`}}
 --><span class="comment">// sleepUntil sleeps until the specified time. It returns immediately if it&#39;s too late.</span>
-func sleepUntil(wakeup time.Time) ***REMOVED***
+func sleepUntil(wakeup time.Time) {
     now := time.Now() <span class="comment">// A Time.</span>
-    if !wakeup.After(now) ***REMOVED***
+    if !wakeup.After(now) {
         return
-***REMOVED***
+    }
     delta := wakeup.Sub(now) <span class="comment">// A Duration.</span>
     fmt.Printf(&#34;Sleeping for %.3fs\n&#34;, delta.Seconds())
     time.Sleep(delta)
-***REMOVED***</pre>
+}</pre>
 
 <p>
 The new types, methods, and constants have been propagated through
@@ -1138,7 +1138,7 @@ In Go 1, the
 and
 <a href="/pkg/crypto/x509/#CreateCRL"><code>CreateCRL</code></a>
 functions in <code>crypto/x509</code> have been altered to take an
-<code>interface***REMOVED******REMOVED***</code> where they previously took a <code>*rsa.PublicKey</code>
+<code>interface{}</code> where they previously took a <code>*rsa.PublicKey</code>
 or <code>*rsa.PrivateKey</code>. This will allow other public key algorithms
 to be implemented in the future.
 </p>
@@ -1153,7 +1153,7 @@ No changes will be needed.
 <p>
 In Go 1, the <code>binary.TotalSize</code> function has been replaced by
 <a href="/pkg/encoding/binary/#Size"><code>Size</code></a>,
-which takes an <code>interface***REMOVED******REMOVED***</code> argument rather than
+which takes an <code>interface{}</code> argument rather than
 a <code>reflect.Value</code>.
 </p>
 
@@ -1237,7 +1237,7 @@ Values for such flags must be given units, just as <code>time.Duration</code>
 formats them: <code>10s</code>, <code>1h30m</code>, etc.
 </p>
 
-<pre><!--***REMOVED******REMOVED***code "/doc/progs/go1.go" `/timeout/`***REMOVED******REMOVED***
+<pre><!--{{code "/doc/progs/go1.go" `/timeout/`}}
 -->var timeout = flag.Duration(&#34;timeout&#34;, 30*time.Second, &#34;how long to wait for completion&#34;)</pre>
 
 <p>
@@ -1685,14 +1685,14 @@ changing it from a struct to an interface:
 </p>
 
 <pre>
-    type FileInfo interface ***REMOVED***
+    type FileInfo interface {
         Name() string       // base name of the file
         Size() int64        // length in bytes
         Mode() FileMode     // file mode bits
         ModTime() time.Time // modification time
         IsDir() bool        // abbreviation for Mode().IsDir()
-        Sys() interface***REMOVED******REMOVED***   // underlying data source (can return nil)
-***REMOVED***
+        Sys() interface{}   // underlying data source (can return nil)
+    }
 </pre>
 
 <p>
@@ -1715,14 +1715,14 @@ the <code>FileInfo</code> like this:
 
 <pre>
     fi, err := os.Stat("hello.go")
-    if err != nil ***REMOVED***
+    if err != nil {
         log.Fatal(err)
-***REMOVED***
+    }
     // Check that it's a Unix file.
     unixStat, ok := fi.Sys().(*syscall.Stat_t)
-    if !ok ***REMOVED***
+    if !ok {
         log.Fatal("hello.go: not a Unix file")
-***REMOVED***
+    }
     fmt.Printf("file i-number: %d\n", unixStat.Ino)
 </pre>
 
@@ -1751,11 +1751,11 @@ and
 <a href="/pkg/os/#IsPermission"><code>IsPermission</code></a>.
 </p>
 
-<pre><!--***REMOVED******REMOVED***code "/doc/progs/go1.go" `/os\.Open/` `/***REMOVED***/`***REMOVED******REMOVED***
+<pre><!--{{code "/doc/progs/go1.go" `/os\.Open/` `/}/`}}
 -->    f, err := os.OpenFile(name, os.O_RDWR|os.O_CREATE|os.O_EXCL, 0600)
-    if os.IsExist(err) ***REMOVED***
+    if os.IsExist(err) {
         log.Printf(&#34;%s already exists&#34;, name)
-***REMOVED***</pre>
+    }</pre>
 
 <p>
 <em>Updating</em>:
@@ -1821,21 +1821,21 @@ If a directory's contents are to be skipped,
 the function should return the value <a href="/pkg/path/filepath/#variables"><code>filepath.SkipDir</code></a>
 </p>
 
-<pre><!--***REMOVED******REMOVED***code "/doc/progs/go1.go" `/STARTWALK/` `/ENDWALK/`***REMOVED******REMOVED***
--->    markFn := func(path string, info os.FileInfo, err error) error ***REMOVED***
-        if path == &#34;pictures&#34; ***REMOVED*** <span class="comment">// Will skip walking of directory pictures and its contents.</span>
+<pre><!--{{code "/doc/progs/go1.go" `/STARTWALK/` `/ENDWALK/`}}
+-->    markFn := func(path string, info os.FileInfo, err error) error {
+        if path == &#34;pictures&#34; { <span class="comment">// Will skip walking of directory pictures and its contents.</span>
             return filepath.SkipDir
-    ***REMOVED***
-        if err != nil ***REMOVED***
+        }
+        if err != nil {
             return err
-    ***REMOVED***
+        }
         log.Println(path)
         return nil
-***REMOVED***
+    }
     err := filepath.Walk(&#34;.&#34;, markFn)
-    if err != nil ***REMOVED***
+    if err != nil {
         log.Fatal(err)
-***REMOVED***</pre>
+    }</pre>
 
 <p>
 <em>Updating</em>:
@@ -2033,20 +2033,20 @@ In Go 1, <code>B</code> has new methods, analogous to those of <code>T</code>, e
 logging and failure reporting.
 </p>
 
-<pre><!--***REMOVED******REMOVED***code "/doc/progs/go1.go" `/func.*Benchmark/` `/^***REMOVED***/`***REMOVED******REMOVED***
--->func BenchmarkSprintf(b *testing.B) ***REMOVED***
+<pre><!--{{code "/doc/progs/go1.go" `/func.*Benchmark/` `/^}/`}}
+-->func BenchmarkSprintf(b *testing.B) {
     <span class="comment">// Verify correctness before running benchmark.</span>
     b.StopTimer()
     got := fmt.Sprintf(&#34;%x&#34;, 23)
     const expect = &#34;17&#34;
-    if expect != got ***REMOVED***
+    if expect != got {
         b.Fatalf(&#34;expected %q; got %q&#34;, expect, got)
-***REMOVED***
+    }
     b.StartTimer()
-    for i := 0; i &lt; b.N; i++ ***REMOVED***
+    for i := 0; i &lt; b.N; i++ {
         fmt.Sprintf(&#34;%x&#34;, 23)
-***REMOVED***
-***REMOVED***</pre>
+    }
+}</pre>
 
 <p>
 <em>Updating</em>:
@@ -2134,11 +2134,11 @@ path for such URLs. In Go 1, the cited URL parses as:
 </p>
 
 <pre>
-    URL***REMOVED***
+    URL{
         Scheme: "mailto",
         Opaque: "dev@golang.org",
         RawQuery: "subject=Hi",
-***REMOVED***
+    }
 </pre>
 
 <p>
@@ -2219,19 +2219,19 @@ after a few more words <a href="/LINK">link text</a>.<br>
 </div>
 
 <script type="text/javascript">
-(function() ***REMOVED***
+(function() {
   var ga = document.createElement("script"); ga.type = "text/javascript"; ga.async = true;
   ga.src = ("https:" == document.location.protocol ? "https://ssl" : "http://www") + ".google-analytics.com/ga.js";
   var s = document.getElementsByTagName("script")[0]; s.parentNode.insertBefore(ga, s);
-***REMOVED***)();
+})();
 </script>
 </body>
 <script type="text/javascript">
-  (function() ***REMOVED***
+  (function() {
     var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
     po.src = 'https://apis.google.com/js/plusone.js';
     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
-  ***REMOVED***)();
+  })();
 </script>
 </html>
 

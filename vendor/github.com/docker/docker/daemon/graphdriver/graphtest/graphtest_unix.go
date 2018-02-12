@@ -28,72 +28,72 @@ var (
 // Driver conforms to graphdriver.Driver interface and
 // contains information such as root and reference count of the number of clients using it.
 // This helps in testing drivers added into the framework.
-type Driver struct ***REMOVED***
+type Driver struct {
 	graphdriver.Driver
 	root     string
 	refCount int
-***REMOVED***
+}
 
-func newDriver(t testing.TB, name string, options []string) *Driver ***REMOVED***
+func newDriver(t testing.TB, name string, options []string) *Driver {
 	root, err := ioutil.TempDir("", "docker-graphtest-")
 	require.NoError(t, err)
 
 	require.NoError(t, os.MkdirAll(root, 0755))
-	d, err := graphdriver.GetDriver(name, nil, graphdriver.Options***REMOVED***DriverOptions: options, Root: root***REMOVED***)
-	if err != nil ***REMOVED***
+	d, err := graphdriver.GetDriver(name, nil, graphdriver.Options{DriverOptions: options, Root: root})
+	if err != nil {
 		t.Logf("graphdriver: %v\n", err)
-		if graphdriver.IsDriverNotSupported(err) ***REMOVED***
+		if graphdriver.IsDriverNotSupported(err) {
 			t.Skipf("Driver %s not supported", name)
-		***REMOVED***
+		}
 		t.Fatal(err)
-	***REMOVED***
-	return &Driver***REMOVED***d, root, 1***REMOVED***
-***REMOVED***
+	}
+	return &Driver{d, root, 1}
+}
 
-func cleanup(t testing.TB, d *Driver) ***REMOVED***
-	if err := drv.Cleanup(); err != nil ***REMOVED***
+func cleanup(t testing.TB, d *Driver) {
+	if err := drv.Cleanup(); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	os.RemoveAll(d.root)
-***REMOVED***
+}
 
 // GetDriver create a new driver with given name or return an existing driver with the name updating the reference count.
-func GetDriver(t testing.TB, name string, options ...string) graphdriver.Driver ***REMOVED***
-	if drv == nil ***REMOVED***
+func GetDriver(t testing.TB, name string, options ...string) graphdriver.Driver {
+	if drv == nil {
 		drv = newDriver(t, name, options)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		drv.refCount++
-	***REMOVED***
+	}
 	return drv
-***REMOVED***
+}
 
 // PutDriver removes the driver if it is no longer used and updates the reference count.
-func PutDriver(t testing.TB) ***REMOVED***
-	if drv == nil ***REMOVED***
+func PutDriver(t testing.TB) {
+	if drv == nil {
 		t.Skip("No driver to put!")
-	***REMOVED***
+	}
 	drv.refCount--
-	if drv.refCount == 0 ***REMOVED***
+	if drv.refCount == 0 {
 		cleanup(t, drv)
 		drv = nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // DriverTestCreateEmpty creates a new image and verifies it is empty and the right metadata
-func DriverTestCreateEmpty(t testing.TB, drivername string, driverOptions ...string) ***REMOVED***
+func DriverTestCreateEmpty(t testing.TB, drivername string, driverOptions ...string) {
 	driver := GetDriver(t, drivername, driverOptions...)
 	defer PutDriver(t)
 
 	err := driver.Create("empty", "", nil)
 	require.NoError(t, err)
 
-	defer func() ***REMOVED***
+	defer func() {
 		require.NoError(t, driver.Remove("empty"))
-	***REMOVED***()
+	}()
 
-	if !driver.Exists("empty") ***REMOVED***
+	if !driver.Exists("empty") {
 		t.Fatal("Newly created image doesn't exist")
-	***REMOVED***
+	}
 
 	dir, err := driver.Get("empty", "")
 	require.NoError(t, err)
@@ -106,71 +106,71 @@ func DriverTestCreateEmpty(t testing.TB, drivername string, driverOptions ...str
 	assert.Len(t, fis, 0)
 
 	driver.Put("empty")
-***REMOVED***
+}
 
 // DriverTestCreateBase create a base driver and verify.
-func DriverTestCreateBase(t testing.TB, drivername string, driverOptions ...string) ***REMOVED***
+func DriverTestCreateBase(t testing.TB, drivername string, driverOptions ...string) {
 	driver := GetDriver(t, drivername, driverOptions...)
 	defer PutDriver(t)
 
 	createBase(t, driver, "Base")
-	defer func() ***REMOVED***
+	defer func() {
 		require.NoError(t, driver.Remove("Base"))
-	***REMOVED***()
+	}()
 	verifyBase(t, driver, "Base")
-***REMOVED***
+}
 
 // DriverTestCreateSnap Create a driver and snap and verify.
-func DriverTestCreateSnap(t testing.TB, drivername string, driverOptions ...string) ***REMOVED***
+func DriverTestCreateSnap(t testing.TB, drivername string, driverOptions ...string) {
 	driver := GetDriver(t, drivername, driverOptions...)
 	defer PutDriver(t)
 
 	createBase(t, driver, "Base")
-	defer func() ***REMOVED***
+	defer func() {
 		require.NoError(t, driver.Remove("Base"))
-	***REMOVED***()
+	}()
 
 	err := driver.Create("Snap", "Base", nil)
 	require.NoError(t, err)
-	defer func() ***REMOVED***
+	defer func() {
 		require.NoError(t, driver.Remove("Snap"))
-	***REMOVED***()
+	}()
 
 	verifyBase(t, driver, "Snap")
-***REMOVED***
+}
 
 // DriverTestDeepLayerRead reads a file from a lower layer under a given number of layers
-func DriverTestDeepLayerRead(t testing.TB, layerCount int, drivername string, driverOptions ...string) ***REMOVED***
+func DriverTestDeepLayerRead(t testing.TB, layerCount int, drivername string, driverOptions ...string) {
 	driver := GetDriver(t, drivername, driverOptions...)
 	defer PutDriver(t)
 
 	base := stringid.GenerateRandomID()
-	if err := driver.Create(base, "", nil); err != nil ***REMOVED***
+	if err := driver.Create(base, "", nil); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	content := []byte("test content")
-	if err := addFile(driver, base, "testfile.txt", content); err != nil ***REMOVED***
+	if err := addFile(driver, base, "testfile.txt", content); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	topLayer, err := addManyLayers(driver, base, layerCount)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	err = checkManyLayers(driver, topLayer, layerCount)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if err := checkFile(driver, topLayer, "testfile.txt", content); err != nil ***REMOVED***
+	if err := checkFile(driver, topLayer, "testfile.txt", content); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // DriverTestDiffApply tests diffing and applying produces the same layer
-func DriverTestDiffApply(t testing.TB, fileCount int, drivername string, driverOptions ...string) ***REMOVED***
+func DriverTestDiffApply(t testing.TB, fileCount int, drivername string, driverOptions ...string) {
 	driver := GetDriver(t, drivername, driverOptions...)
 	defer PutDriver(t)
 	base := stringid.GenerateRandomID()
@@ -179,127 +179,127 @@ func DriverTestDiffApply(t testing.TB, fileCount int, drivername string, driverO
 	deleteFileContent := []byte("This file should get removed in upper!")
 	deleteDir := "var/lib"
 
-	if err := driver.Create(base, "", nil); err != nil ***REMOVED***
+	if err := driver.Create(base, "", nil); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if err := addManyFiles(driver, base, fileCount, 3); err != nil ***REMOVED***
+	if err := addManyFiles(driver, base, fileCount, 3); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if err := addFile(driver, base, deleteFile, deleteFileContent); err != nil ***REMOVED***
+	if err := addFile(driver, base, deleteFile, deleteFileContent); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if err := addDirectory(driver, base, deleteDir); err != nil ***REMOVED***
+	if err := addDirectory(driver, base, deleteDir); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if err := driver.Create(upper, base, nil); err != nil ***REMOVED***
+	if err := driver.Create(upper, base, nil); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if err := addManyFiles(driver, upper, fileCount, 6); err != nil ***REMOVED***
+	if err := addManyFiles(driver, upper, fileCount, 6); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if err := removeAll(driver, upper, deleteFile, deleteDir); err != nil ***REMOVED***
+	if err := removeAll(driver, upper, deleteFile, deleteDir); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	diffSize, err := driver.DiffSize(upper, "")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	diff := stringid.GenerateRandomID()
-	if err := driver.Create(diff, base, nil); err != nil ***REMOVED***
+	if err := driver.Create(diff, base, nil); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if err := checkManyFiles(driver, diff, fileCount, 3); err != nil ***REMOVED***
+	if err := checkManyFiles(driver, diff, fileCount, 3); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if err := checkFile(driver, diff, deleteFile, deleteFileContent); err != nil ***REMOVED***
+	if err := checkFile(driver, diff, deleteFile, deleteFileContent); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	arch, err := driver.Diff(upper, base)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	buf := bytes.NewBuffer(nil)
-	if _, err := buf.ReadFrom(arch); err != nil ***REMOVED***
+	if _, err := buf.ReadFrom(arch); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if err := arch.Close(); err != nil ***REMOVED***
+	}
+	if err := arch.Close(); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	applyDiffSize, err := driver.ApplyDiff(diff, base, bytes.NewReader(buf.Bytes()))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if applyDiffSize != diffSize ***REMOVED***
+	if applyDiffSize != diffSize {
 		t.Fatalf("Apply diff size different, got %d, expected %d", applyDiffSize, diffSize)
-	***REMOVED***
+	}
 
-	if err := checkManyFiles(driver, diff, fileCount, 6); err != nil ***REMOVED***
+	if err := checkManyFiles(driver, diff, fileCount, 6); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if err := checkFileRemoved(driver, diff, deleteFile); err != nil ***REMOVED***
+	if err := checkFileRemoved(driver, diff, deleteFile); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if err := checkFileRemoved(driver, diff, deleteDir); err != nil ***REMOVED***
+	if err := checkFileRemoved(driver, diff, deleteDir); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // DriverTestChanges tests computed changes on a layer matches changes made
-func DriverTestChanges(t testing.TB, drivername string, driverOptions ...string) ***REMOVED***
+func DriverTestChanges(t testing.TB, drivername string, driverOptions ...string) {
 	driver := GetDriver(t, drivername, driverOptions...)
 	defer PutDriver(t)
 	base := stringid.GenerateRandomID()
 	upper := stringid.GenerateRandomID()
-	if err := driver.Create(base, "", nil); err != nil ***REMOVED***
+	if err := driver.Create(base, "", nil); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if err := addManyFiles(driver, base, 20, 3); err != nil ***REMOVED***
+	if err := addManyFiles(driver, base, 20, 3); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if err := driver.Create(upper, base, nil); err != nil ***REMOVED***
+	if err := driver.Create(upper, base, nil); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	expectedChanges, err := changeManyFiles(driver, upper, 20, 6)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	changes, err := driver.Changes(upper, base)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if err = checkChanges(expectedChanges, changes); err != nil ***REMOVED***
+	if err = checkChanges(expectedChanges, changes); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func writeRandomFile(path string, size uint64) error ***REMOVED***
+func writeRandomFile(path string, size uint64) error {
 	buf := make([]int64, size/8)
 
 	r := rand.NewSource(0)
-	for i := range buf ***REMOVED***
+	for i := range buf {
 		buf[i] = r.Int63()
-	***REMOVED***
+	}
 
 	// Cast to []byte
 	header := *(*reflect.SliceHeader)(unsafe.Pointer(&buf))
@@ -308,45 +308,45 @@ func writeRandomFile(path string, size uint64) error ***REMOVED***
 	data := *(*[]byte)(unsafe.Pointer(&header))
 
 	return ioutil.WriteFile(path, data, 0700)
-***REMOVED***
+}
 
 // DriverTestSetQuota Create a driver and test setting quota.
-func DriverTestSetQuota(t *testing.T, drivername string, required bool) ***REMOVED***
+func DriverTestSetQuota(t *testing.T, drivername string, required bool) {
 	driver := GetDriver(t, drivername)
 	defer PutDriver(t)
 
 	createBase(t, driver, "Base")
-	createOpts := &graphdriver.CreateOpts***REMOVED******REMOVED***
+	createOpts := &graphdriver.CreateOpts{}
 	createOpts.StorageOpt = make(map[string]string, 1)
 	createOpts.StorageOpt["size"] = "50M"
 	layerName := drivername + "Test"
-	if err := driver.CreateReadWrite(layerName, "Base", createOpts); err == quota.ErrQuotaNotSupported && !required ***REMOVED***
+	if err := driver.CreateReadWrite(layerName, "Base", createOpts); err == quota.ErrQuotaNotSupported && !required {
 		t.Skipf("Quota not supported on underlying filesystem: %v", err)
-	***REMOVED*** else if err != nil ***REMOVED***
+	} else if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	mountPath, err := driver.Get(layerName, "")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	quota := uint64(50 * units.MiB)
 
 	// Try to write a file smaller than quota, and ensure it works
 	err = writeRandomFile(path.Join(mountPath.Path(), "smallfile"), quota/2)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	defer os.Remove(path.Join(mountPath.Path(), "smallfile"))
 
 	// Try to write a file bigger than quota. We've already filled up half the quota, so hitting the limit should be easy
 	err = writeRandomFile(path.Join(mountPath.Path(), "bigfile"), quota)
-	if err == nil ***REMOVED***
+	if err == nil {
 		t.Fatalf("expected write to fail(), instead had success")
-	***REMOVED***
-	if pathError, ok := err.(*os.PathError); ok && pathError.Err != unix.EDQUOT && pathError.Err != unix.ENOSPC ***REMOVED***
+	}
+	if pathError, ok := err.(*os.PathError); ok && pathError.Err != unix.EDQUOT && pathError.Err != unix.ENOSPC {
 		os.Remove(path.Join(mountPath.Path(), "bigfile"))
 		t.Fatalf("expect write() to fail with %v or %v, got %v", unix.EDQUOT, unix.ENOSPC, pathError.Err)
-	***REMOVED***
-***REMOVED***
+	}
+}

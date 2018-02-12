@@ -14,26 +14,26 @@ import (
 	"golang.org/x/net/internal/socket"
 )
 
-func marshalPacketInfo(b []byte, cm *ControlMessage) []byte ***REMOVED***
+func marshalPacketInfo(b []byte, cm *ControlMessage) []byte {
 	m := socket.ControlMessage(b)
 	m.MarshalHeader(iana.ProtocolIP, sysIP_PKTINFO, sizeofInetPktinfo)
-	if cm != nil ***REMOVED***
+	if cm != nil {
 		pi := (*inetPktinfo)(unsafe.Pointer(&m.Data(sizeofInetPktinfo)[0]))
-		if ip := cm.Src.To4(); ip != nil ***REMOVED***
+		if ip := cm.Src.To4(); ip != nil {
 			copy(pi.Spec_dst[:], ip)
-		***REMOVED***
-		if cm.IfIndex > 0 ***REMOVED***
+		}
+		if cm.IfIndex > 0 {
 			pi.setIfindex(cm.IfIndex)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return m.Next(sizeofInetPktinfo)
-***REMOVED***
+}
 
-func parsePacketInfo(cm *ControlMessage, b []byte) ***REMOVED***
+func parsePacketInfo(cm *ControlMessage, b []byte) {
 	pi := (*inetPktinfo)(unsafe.Pointer(&b[0]))
 	cm.IfIndex = int(pi.Ifindex)
-	if len(cm.Dst) < net.IPv4len ***REMOVED***
+	if len(cm.Dst) < net.IPv4len {
 		cm.Dst = make(net.IP, net.IPv4len)
-	***REMOVED***
+	}
 	copy(cm.Dst, pi.Addr[:])
-***REMOVED***
+}

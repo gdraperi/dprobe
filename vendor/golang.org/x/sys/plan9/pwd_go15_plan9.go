@@ -8,14 +8,14 @@ package plan9
 
 import "syscall"
 
-func fixwd() ***REMOVED***
+func fixwd() {
 	syscall.Fixwd()
-***REMOVED***
+}
 
-func Getwd() (wd string, err error) ***REMOVED***
+func Getwd() (wd string, err error) {
 	return syscall.Getwd()
-***REMOVED***
+}
 
-func Chdir(path string) error ***REMOVED***
+func Chdir(path string) error {
 	return syscall.Chdir(path)
-***REMOVED***
+}

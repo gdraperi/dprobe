@@ -8,53 +8,53 @@ import (
 )
 
 // TestingT is the subset of testing.T used by WaitOn
-type TestingT interface ***REMOVED***
+type TestingT interface {
 	LogT
-	Fatalf(format string, args ...interface***REMOVED******REMOVED***)
-***REMOVED***
+	Fatalf(format string, args ...interface{})
+}
 
 // LogT is a logging interface that is passed to the WaitOn check function
-type LogT interface ***REMOVED***
-	Log(args ...interface***REMOVED******REMOVED***)
-	Logf(format string, args ...interface***REMOVED******REMOVED***)
-***REMOVED***
+type LogT interface {
+	Log(args ...interface{})
+	Logf(format string, args ...interface{})
+}
 
-type helperT interface ***REMOVED***
+type helperT interface {
 	Helper()
-***REMOVED***
+}
 
 // Settings are used to configure the behaviour of WaitOn
-type Settings struct ***REMOVED***
+type Settings struct {
 	// Timeout is the maximum time to wait for the condition. Defaults to 10s
 	Timeout time.Duration
 	// Delay is the time to sleep between checking the condition. Detaults to
 	// 1ms
 	Delay time.Duration
-***REMOVED***
+}
 
-func defaultConfig() *Settings ***REMOVED***
-	return &Settings***REMOVED***Timeout: 10 * time.Second, Delay: time.Millisecond***REMOVED***
-***REMOVED***
+func defaultConfig() *Settings {
+	return &Settings{Timeout: 10 * time.Second, Delay: time.Millisecond}
+}
 
 // SettingOp is a function which accepts and modifies Settings
 type SettingOp func(config *Settings)
 
 // WithDelay sets the delay to wait between polls
-func WithDelay(delay time.Duration) SettingOp ***REMOVED***
-	return func(config *Settings) ***REMOVED***
+func WithDelay(delay time.Duration) SettingOp {
+	return func(config *Settings) {
 		config.Delay = delay
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // WithTimeout sets the timeout
-func WithTimeout(timeout time.Duration) SettingOp ***REMOVED***
-	return func(config *Settings) ***REMOVED***
+func WithTimeout(timeout time.Duration) SettingOp {
+	return func(config *Settings) {
 		config.Timeout = timeout
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Result of a check performed by WaitOn
-type Result interface ***REMOVED***
+type Result interface {
 	// Error indicates that the check failed and polling should stop, and the
 	// the has failed
 	Error() error
@@ -62,79 +62,79 @@ type Result interface ***REMOVED***
 	Done() bool
 	// Message provides the most recent state when polling has not completed
 	Message() string
-***REMOVED***
+}
 
-type result struct ***REMOVED***
+type result struct {
 	done    bool
 	message string
 	err     error
-***REMOVED***
+}
 
-func (r result) Done() bool ***REMOVED***
+func (r result) Done() bool {
 	return r.done
-***REMOVED***
+}
 
-func (r result) Message() string ***REMOVED***
+func (r result) Message() string {
 	return r.message
-***REMOVED***
+}
 
-func (r result) Error() error ***REMOVED***
+func (r result) Error() error {
 	return r.err
-***REMOVED***
+}
 
 // Continue returns a Result that indicates to WaitOn that it should continue
 // polling. The message text will be used as the failure message if the timeout
 // is reached.
-func Continue(message string, args ...interface***REMOVED******REMOVED***) Result ***REMOVED***
-	return result***REMOVED***message: fmt.Sprintf(message, args...)***REMOVED***
-***REMOVED***
+func Continue(message string, args ...interface{}) Result {
+	return result{message: fmt.Sprintf(message, args...)}
+}
 
 // Success returns a Result where Done() returns true, which indicates to WaitOn
 // that it should stop polling and exit without an error.
-func Success() Result ***REMOVED***
-	return result***REMOVED***done: true***REMOVED***
-***REMOVED***
+func Success() Result {
+	return result{done: true}
+}
 
 // Error returns a Result that indicates to WaitOn that it should fail the test
 // and stop polling.
-func Error(err error) Result ***REMOVED***
-	return result***REMOVED***err: err***REMOVED***
-***REMOVED***
+func Error(err error) Result {
+	return result{err: err}
+}
 
 // WaitOn a condition or until a timeout. Poll by calling check and exit when
 // check returns a done Result. To fail a test and exit polling with an error
 // return a error result.
-func WaitOn(t TestingT, check func(t LogT) Result, pollOps ...SettingOp) ***REMOVED***
-	if ht, ok := t.(helperT); ok ***REMOVED***
+func WaitOn(t TestingT, check func(t LogT) Result, pollOps ...SettingOp) {
+	if ht, ok := t.(helperT); ok {
 		ht.Helper()
-	***REMOVED***
+	}
 	config := defaultConfig()
-	for _, pollOp := range pollOps ***REMOVED***
+	for _, pollOp := range pollOps {
 		pollOp(config)
-	***REMOVED***
+	}
 
 	var lastMessage string
 	after := time.After(config.Timeout)
 	chResult := make(chan Result)
-	for ***REMOVED***
-		go func() ***REMOVED***
+	for {
+		go func() {
 			chResult <- check(t)
-		***REMOVED***()
-		select ***REMOVED***
+		}()
+		select {
 		case <-after:
-			if lastMessage == "" ***REMOVED***
+			if lastMessage == "" {
 				lastMessage = "first check never completed"
-			***REMOVED***
+			}
 			t.Fatalf("timeout hit after %s: %s", config.Timeout, lastMessage)
 		case result := <-chResult:
-			switch ***REMOVED***
+			switch {
 			case result.Error() != nil:
 				t.Fatalf("polling check failed: %s", result.Error())
 			case result.Done():
 				return
-			***REMOVED***
+			}
 			time.Sleep(config.Delay)
 			lastMessage = result.Message()
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

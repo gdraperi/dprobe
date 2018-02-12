@@ -15,100 +15,100 @@ const shortForm = "2006-01-02"
 //
 //    c.Assert(myTime, IsBefore, theTime, check.Commentf("bouuuhhh"))
 //
-var IsBefore check.Checker = &isBeforeChecker***REMOVED***
-	&check.CheckerInfo***REMOVED***
+var IsBefore check.Checker = &isBeforeChecker{
+	&check.CheckerInfo{
 		Name:   "IsBefore",
-		Params: []string***REMOVED***"obtained", "expected"***REMOVED***,
-	***REMOVED***,
-***REMOVED***
+		Params: []string{"obtained", "expected"},
+	},
+}
 
-type isBeforeChecker struct ***REMOVED***
+type isBeforeChecker struct {
 	*check.CheckerInfo
-***REMOVED***
+}
 
-func (checker *isBeforeChecker) Check(params []interface***REMOVED******REMOVED***, names []string) (bool, string) ***REMOVED***
+func (checker *isBeforeChecker) Check(params []interface{}, names []string) (bool, string) {
 	return isBefore(params[0], params[1])
-***REMOVED***
+}
 
-func isBefore(value, t interface***REMOVED******REMOVED***) (bool, string) ***REMOVED***
+func isBefore(value, t interface{}) (bool, string) {
 	tTime, ok := parseTime(t)
-	if !ok ***REMOVED***
+	if !ok {
 		return false, "expected must be a Time struct, or parseable."
-	***REMOVED***
+	}
 	valueTime, valueIsTime := parseTime(value)
-	if valueIsTime ***REMOVED***
+	if valueIsTime {
 		return valueTime.Before(tTime), ""
-	***REMOVED***
+	}
 	return false, "obtained value is not a time.Time struct or parseable as a time."
-***REMOVED***
+}
 
 // IsAfter checker verifies the specified value is before the specified time.
 // It is exclusive.
 //
 //    c.Assert(myTime, IsAfter, theTime, check.Commentf("bouuuhhh"))
 //
-var IsAfter check.Checker = &isAfterChecker***REMOVED***
-	&check.CheckerInfo***REMOVED***
+var IsAfter check.Checker = &isAfterChecker{
+	&check.CheckerInfo{
 		Name:   "IsAfter",
-		Params: []string***REMOVED***"obtained", "expected"***REMOVED***,
-	***REMOVED***,
-***REMOVED***
+		Params: []string{"obtained", "expected"},
+	},
+}
 
-type isAfterChecker struct ***REMOVED***
+type isAfterChecker struct {
 	*check.CheckerInfo
-***REMOVED***
+}
 
-func (checker *isAfterChecker) Check(params []interface***REMOVED******REMOVED***, names []string) (bool, string) ***REMOVED***
+func (checker *isAfterChecker) Check(params []interface{}, names []string) (bool, string) {
 	return isAfter(params[0], params[1])
-***REMOVED***
+}
 
-func isAfter(value, t interface***REMOVED******REMOVED***) (bool, string) ***REMOVED***
+func isAfter(value, t interface{}) (bool, string) {
 	tTime, ok := parseTime(t)
-	if !ok ***REMOVED***
+	if !ok {
 		return false, "expected must be a Time struct, or parseable."
-	***REMOVED***
+	}
 	valueTime, valueIsTime := parseTime(value)
-	if valueIsTime ***REMOVED***
+	if valueIsTime {
 		return valueTime.After(tTime), ""
-	***REMOVED***
+	}
 	return false, "obtained value is not a time.Time struct or parseable as a time."
-***REMOVED***
+}
 
 // IsBetween checker verifies the specified time is between the specified start
 // and end. It's exclusive so if the specified time is at the tip of the interval.
 //
 //    c.Assert(myTime, IsBetween, startTime, endTime, check.Commentf("bouuuhhh"))
 //
-var IsBetween check.Checker = &isBetweenChecker***REMOVED***
-	&check.CheckerInfo***REMOVED***
+var IsBetween check.Checker = &isBetweenChecker{
+	&check.CheckerInfo{
 		Name:   "IsBetween",
-		Params: []string***REMOVED***"obtained", "start", "end"***REMOVED***,
-	***REMOVED***,
-***REMOVED***
+		Params: []string{"obtained", "start", "end"},
+	},
+}
 
-type isBetweenChecker struct ***REMOVED***
+type isBetweenChecker struct {
 	*check.CheckerInfo
-***REMOVED***
+}
 
-func (checker *isBetweenChecker) Check(params []interface***REMOVED******REMOVED***, names []string) (bool, string) ***REMOVED***
+func (checker *isBetweenChecker) Check(params []interface{}, names []string) (bool, string) {
 	return isBetween(params[0], params[1], params[2])
-***REMOVED***
+}
 
-func isBetween(value, start, end interface***REMOVED******REMOVED***) (bool, string) ***REMOVED***
+func isBetween(value, start, end interface{}) (bool, string) {
 	startTime, ok := parseTime(start)
-	if !ok ***REMOVED***
+	if !ok {
 		return false, "start must be a Time struct, or parseable."
-	***REMOVED***
+	}
 	endTime, ok := parseTime(end)
-	if !ok ***REMOVED***
+	if !ok {
 		return false, "end must be a Time struct, or parseable."
-	***REMOVED***
+	}
 	valueTime, valueIsTime := parseTime(value)
-	if valueIsTime ***REMOVED***
+	if valueIsTime {
 		return valueTime.After(startTime) && valueTime.Before(endTime), ""
-	***REMOVED***
+	}
 	return false, "obtained value is not a time.Time struct or parseable as a time."
-***REMOVED***
+}
 
 // TimeEquals checker verifies the specified time is the equal to the expected
 // time.
@@ -120,64 +120,64 @@ func isBetween(value, start, end interface***REMOVED******REMOVED***) (bool, str
 //
 //    c.Assert(myTime, TimeIgnore(TimeEquals, time.Hour), expected, check.Commentf("... bouh.."))
 //
-var TimeEquals check.Checker = &timeEqualsChecker***REMOVED***
-	&check.CheckerInfo***REMOVED***
+var TimeEquals check.Checker = &timeEqualsChecker{
+	&check.CheckerInfo{
 		Name:   "TimeEquals",
-		Params: []string***REMOVED***"obtained", "expected"***REMOVED***,
-	***REMOVED***,
-***REMOVED***
+		Params: []string{"obtained", "expected"},
+	},
+}
 
-type timeEqualsChecker struct ***REMOVED***
+type timeEqualsChecker struct {
 	*check.CheckerInfo
-***REMOVED***
+}
 
-func (checker *timeEqualsChecker) Check(params []interface***REMOVED******REMOVED***, names []string) (bool, string) ***REMOVED***
+func (checker *timeEqualsChecker) Check(params []interface{}, names []string) (bool, string) {
 	return timeEquals(params[0], params[1])
-***REMOVED***
+}
 
-func timeEquals(obtained, expected interface***REMOVED******REMOVED***) (bool, string) ***REMOVED***
+func timeEquals(obtained, expected interface{}) (bool, string) {
 	expectedTime, ok := parseTime(expected)
-	if !ok ***REMOVED***
+	if !ok {
 		return false, "expected must be a Time struct, or parseable."
-	***REMOVED***
+	}
 	valueTime, valueIsTime := parseTime(obtained)
-	if valueIsTime ***REMOVED***
+	if valueIsTime {
 		return valueTime.Equal(expectedTime), ""
-	***REMOVED***
+	}
 	return false, "obtained value is not a time.Time struct or parseable as a time."
-***REMOVED***
+}
 
 // TimeIgnore checker will ignore some part of the time on the encapsulated checker.
 //
 //    c.Assert(myTime, TimeIgnore(IsBetween, time.Second), start, end)
 //
-// FIXME use interface***REMOVED******REMOVED*** for ignore (to enable "Month", ..
-func TimeIgnore(checker check.Checker, ignore time.Duration) check.Checker ***REMOVED***
-	return &timeIgnoreChecker***REMOVED***
+// FIXME use interface{} for ignore (to enable "Month", ..
+func TimeIgnore(checker check.Checker, ignore time.Duration) check.Checker {
+	return &timeIgnoreChecker{
 		sub:    checker,
 		ignore: ignore,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type timeIgnoreChecker struct ***REMOVED***
+type timeIgnoreChecker struct {
 	sub    check.Checker
 	ignore time.Duration
-***REMOVED***
+}
 
-func (checker *timeIgnoreChecker) Info() *check.CheckerInfo ***REMOVED***
+func (checker *timeIgnoreChecker) Info() *check.CheckerInfo {
 	info := *checker.sub.Info()
 	info.Name = fmt.Sprintf("TimeIgnore(%s, %v)", info.Name, checker.ignore)
 	return &info
-***REMOVED***
+}
 
-func (checker *timeIgnoreChecker) Check(params []interface***REMOVED******REMOVED***, names []string) (bool, string) ***REMOVED***
+func (checker *timeIgnoreChecker) Check(params []interface{}, names []string) (bool, string) {
 	// Naive implementation : all params are supposed to be date
-	mParams := make([]interface***REMOVED******REMOVED***, len(params))
-	for index, param := range params ***REMOVED***
+	mParams := make([]interface{}, len(params))
+	for index, param := range params {
 		paramTime, ok := parseTime(param)
-		if !ok ***REMOVED***
+		if !ok {
 			return false, fmt.Sprintf("%s must be a Time struct, or parseable.", names[index])
-		***REMOVED***
+		}
 		year := paramTime.Year()
 		month := paramTime.Month()
 		day := paramTime.Day()
@@ -186,7 +186,7 @@ func (checker *timeIgnoreChecker) Check(params []interface***REMOVED******REMOVE
 		sec := paramTime.Second()
 		nsec := paramTime.Nanosecond()
 		location := paramTime.Location()
-		switch checker.ignore ***REMOVED***
+		switch checker.ignore {
 		case time.Hour:
 			hour = 0
 			fallthrough
@@ -202,33 +202,33 @@ func (checker *timeIgnoreChecker) Check(params []interface***REMOVED******REMOVE
 			fallthrough
 		case time.Nanosecond:
 			nsec = 0
-		***REMOVED***
+		}
 		mParams[index] = time.Date(year, month, day, hour, min, sec, nsec, location)
-	***REMOVED***
+	}
 	return checker.sub.Check(mParams, names)
-***REMOVED***
+}
 
-func parseTime(datetime interface***REMOVED******REMOVED***) (time.Time, bool) ***REMOVED***
-	switch datetime.(type) ***REMOVED***
+func parseTime(datetime interface{}) (time.Time, bool) {
+	switch datetime.(type) {
 	case time.Time:
 		return datetime.(time.Time), true
 	case string:
 		return parseTimeAsString(datetime.(string))
 	default:
-		if datetimeWithStr, ok := datetime.(fmt.Stringer); ok ***REMOVED***
+		if datetimeWithStr, ok := datetime.(fmt.Stringer); ok {
 			return parseTimeAsString(datetimeWithStr.String())
-		***REMOVED***
-		return time.Time***REMOVED******REMOVED***, false
-	***REMOVED***
-***REMOVED***
+		}
+		return time.Time{}, false
+	}
+}
 
-func parseTimeAsString(timeAsStr string) (time.Time, bool) ***REMOVED***
-	forms := []string***REMOVED***shortForm, time.RFC3339, time.RFC3339Nano, time.RFC822, time.RFC822Z***REMOVED***
-	for _, form := range forms ***REMOVED***
+func parseTimeAsString(timeAsStr string) (time.Time, bool) {
+	forms := []string{shortForm, time.RFC3339, time.RFC3339Nano, time.RFC822, time.RFC822Z}
+	for _, form := range forms {
 		datetime, err := time.Parse(form, timeAsStr)
-		if err == nil ***REMOVED***
+		if err == nil {
 			return datetime, true
-		***REMOVED***
-	***REMOVED***
-	return time.Time***REMOVED******REMOVED***, false
-***REMOVED***
+		}
+	}
+	return time.Time{}, false
+}

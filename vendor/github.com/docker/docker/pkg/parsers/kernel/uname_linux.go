@@ -7,11 +7,11 @@ import "golang.org/x/sys/unix"
 // other platforms where it is not available.
 type Utsname unix.Utsname
 
-func uname() (*unix.Utsname, error) ***REMOVED***
-	uts := &unix.Utsname***REMOVED******REMOVED***
+func uname() (*unix.Utsname, error) {
+	uts := &unix.Utsname{}
 
-	if err := unix.Uname(uts); err != nil ***REMOVED***
+	if err := unix.Uname(uts); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return uts, nil
-***REMOVED***
+}

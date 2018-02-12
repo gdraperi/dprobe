@@ -13,30 +13,30 @@ import (
 
 // EscapeCodes contains escape sequences that can be written to the terminal in
 // order to achieve different styles of text.
-type EscapeCodes struct ***REMOVED***
+type EscapeCodes struct {
 	// Foreground colors
 	Black, Red, Green, Yellow, Blue, Magenta, Cyan, White []byte
 
 	// Reset all attributes
 	Reset []byte
-***REMOVED***
+}
 
-var vt100EscapeCodes = EscapeCodes***REMOVED***
-	Black:   []byte***REMOVED***keyEscape, '[', '3', '0', 'm'***REMOVED***,
-	Red:     []byte***REMOVED***keyEscape, '[', '3', '1', 'm'***REMOVED***,
-	Green:   []byte***REMOVED***keyEscape, '[', '3', '2', 'm'***REMOVED***,
-	Yellow:  []byte***REMOVED***keyEscape, '[', '3', '3', 'm'***REMOVED***,
-	Blue:    []byte***REMOVED***keyEscape, '[', '3', '4', 'm'***REMOVED***,
-	Magenta: []byte***REMOVED***keyEscape, '[', '3', '5', 'm'***REMOVED***,
-	Cyan:    []byte***REMOVED***keyEscape, '[', '3', '6', 'm'***REMOVED***,
-	White:   []byte***REMOVED***keyEscape, '[', '3', '7', 'm'***REMOVED***,
+var vt100EscapeCodes = EscapeCodes{
+	Black:   []byte{keyEscape, '[', '3', '0', 'm'},
+	Red:     []byte{keyEscape, '[', '3', '1', 'm'},
+	Green:   []byte{keyEscape, '[', '3', '2', 'm'},
+	Yellow:  []byte{keyEscape, '[', '3', '3', 'm'},
+	Blue:    []byte{keyEscape, '[', '3', '4', 'm'},
+	Magenta: []byte{keyEscape, '[', '3', '5', 'm'},
+	Cyan:    []byte{keyEscape, '[', '3', '6', 'm'},
+	White:   []byte{keyEscape, '[', '3', '7', 'm'},
 
-	Reset: []byte***REMOVED***keyEscape, '[', '0', 'm'***REMOVED***,
-***REMOVED***
+	Reset: []byte{keyEscape, '[', '0', 'm'},
+}
 
 // Terminal contains the state for running a VT100 terminal that is capable of
 // reading lines of input.
-type Terminal struct ***REMOVED***
+type Terminal struct {
 	// AutoCompleteCallback, if non-null, is called for each keypress with
 	// the full input line and the current position of the cursor (in
 	// bytes, as an index into |line|). If it returns ok=false, the key
@@ -92,14 +92,14 @@ type Terminal struct ***REMOVED***
 	// the incomplete, initial line. That value is stored in
 	// historyPending.
 	historyPending string
-***REMOVED***
+}
 
 // NewTerminal runs a VT100 terminal on the given ReadWriter. If the ReadWriter is
 // a local terminal, that terminal must first have been put into raw mode.
 // prompt is a string that is written at the start of each input line (i.e.
 // "> ").
-func NewTerminal(c io.ReadWriter, prompt string) *Terminal ***REMOVED***
-	return &Terminal***REMOVED***
+func NewTerminal(c io.ReadWriter, prompt string) *Terminal {
+	return &Terminal{
 		Escape:       &vt100EscapeCodes,
 		c:            c,
 		prompt:       []rune(prompt),
@@ -107,8 +107,8 @@ func NewTerminal(c io.ReadWriter, prompt string) *Terminal ***REMOVED***
 		termHeight:   24,
 		echo:         true,
 		historyIndex: -1,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 const (
 	keyCtrlD     = 4
@@ -133,20 +133,20 @@ const (
 )
 
 var (
-	crlf       = []byte***REMOVED***'\r', '\n'***REMOVED***
-	pasteStart = []byte***REMOVED***keyEscape, '[', '2', '0', '0', '~'***REMOVED***
-	pasteEnd   = []byte***REMOVED***keyEscape, '[', '2', '0', '1', '~'***REMOVED***
+	crlf       = []byte{'\r', '\n'}
+	pasteStart = []byte{keyEscape, '[', '2', '0', '0', '~'}
+	pasteEnd   = []byte{keyEscape, '[', '2', '0', '1', '~'}
 )
 
 // bytesToKey tries to parse a key sequence from b. If successful, it returns
 // the key and the remainder of the input. Otherwise it returns utf8.RuneError.
-func bytesToKey(b []byte, pasteActive bool) (rune, []byte) ***REMOVED***
-	if len(b) == 0 ***REMOVED***
+func bytesToKey(b []byte, pasteActive bool) (rune, []byte) {
+	if len(b) == 0 {
 		return utf8.RuneError, nil
-	***REMOVED***
+	}
 
-	if !pasteActive ***REMOVED***
-		switch b[0] ***REMOVED***
+	if !pasteActive {
+		switch b[0] {
 		case 1: // ^A
 			return keyHome, b[1:]
 		case 5: // ^E
@@ -159,19 +159,19 @@ func bytesToKey(b []byte, pasteActive bool) (rune, []byte) ***REMOVED***
 			return keyClearScreen, b[1:]
 		case 23: // ^W
 			return keyDeleteWord, b[1:]
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if b[0] != keyEscape ***REMOVED***
-		if !utf8.FullRune(b) ***REMOVED***
+	if b[0] != keyEscape {
+		if !utf8.FullRune(b) {
 			return utf8.RuneError, b
-		***REMOVED***
+		}
 		r, l := utf8.DecodeRune(b)
 		return r, b[l:]
-	***REMOVED***
+	}
 
-	if !pasteActive && len(b) >= 3 && b[0] == keyEscape && b[1] == '[' ***REMOVED***
-		switch b[2] ***REMOVED***
+	if !pasteActive && len(b) >= 3 && b[0] == keyEscape && b[1] == '[' {
+		switch b[2] {
 		case 'A':
 			return keyUp, b[3:]
 		case 'B':
@@ -184,148 +184,148 @@ func bytesToKey(b []byte, pasteActive bool) (rune, []byte) ***REMOVED***
 			return keyHome, b[3:]
 		case 'F':
 			return keyEnd, b[3:]
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if !pasteActive && len(b) >= 6 && b[0] == keyEscape && b[1] == '[' && b[2] == '1' && b[3] == ';' && b[4] == '3' ***REMOVED***
-		switch b[5] ***REMOVED***
+	if !pasteActive && len(b) >= 6 && b[0] == keyEscape && b[1] == '[' && b[2] == '1' && b[3] == ';' && b[4] == '3' {
+		switch b[5] {
 		case 'C':
 			return keyAltRight, b[6:]
 		case 'D':
 			return keyAltLeft, b[6:]
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if !pasteActive && len(b) >= 6 && bytes.Equal(b[:6], pasteStart) ***REMOVED***
+	if !pasteActive && len(b) >= 6 && bytes.Equal(b[:6], pasteStart) {
 		return keyPasteStart, b[6:]
-	***REMOVED***
+	}
 
-	if pasteActive && len(b) >= 6 && bytes.Equal(b[:6], pasteEnd) ***REMOVED***
+	if pasteActive && len(b) >= 6 && bytes.Equal(b[:6], pasteEnd) {
 		return keyPasteEnd, b[6:]
-	***REMOVED***
+	}
 
 	// If we get here then we have a key that we don't recognise, or a
 	// partial sequence. It's not clear how one should find the end of a
 	// sequence without knowing them all, but it seems that [a-zA-Z~] only
 	// appears at the end of a sequence.
-	for i, c := range b[0:] ***REMOVED***
-		if c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c == '~' ***REMOVED***
+	for i, c := range b[0:] {
+		if c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c == '~' {
 			return keyUnknown, b[i+1:]
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return utf8.RuneError, b
-***REMOVED***
+}
 
 // queue appends data to the end of t.outBuf
-func (t *Terminal) queue(data []rune) ***REMOVED***
+func (t *Terminal) queue(data []rune) {
 	t.outBuf = append(t.outBuf, []byte(string(data))...)
-***REMOVED***
+}
 
-var eraseUnderCursor = []rune***REMOVED***' ', keyEscape, '[', 'D'***REMOVED***
-var space = []rune***REMOVED***' '***REMOVED***
+var eraseUnderCursor = []rune{' ', keyEscape, '[', 'D'}
+var space = []rune{' '}
 
-func isPrintable(key rune) bool ***REMOVED***
+func isPrintable(key rune) bool {
 	isInSurrogateArea := key >= 0xd800 && key <= 0xdbff
 	return key >= 32 && !isInSurrogateArea
-***REMOVED***
+}
 
 // moveCursorToPos appends data to t.outBuf which will move the cursor to the
 // given, logical position in the text.
-func (t *Terminal) moveCursorToPos(pos int) ***REMOVED***
-	if !t.echo ***REMOVED***
+func (t *Terminal) moveCursorToPos(pos int) {
+	if !t.echo {
 		return
-	***REMOVED***
+	}
 
 	x := visualLength(t.prompt) + pos
 	y := x / t.termWidth
 	x = x % t.termWidth
 
 	up := 0
-	if y < t.cursorY ***REMOVED***
+	if y < t.cursorY {
 		up = t.cursorY - y
-	***REMOVED***
+	}
 
 	down := 0
-	if y > t.cursorY ***REMOVED***
+	if y > t.cursorY {
 		down = y - t.cursorY
-	***REMOVED***
+	}
 
 	left := 0
-	if x < t.cursorX ***REMOVED***
+	if x < t.cursorX {
 		left = t.cursorX - x
-	***REMOVED***
+	}
 
 	right := 0
-	if x > t.cursorX ***REMOVED***
+	if x > t.cursorX {
 		right = x - t.cursorX
-	***REMOVED***
+	}
 
 	t.cursorX = x
 	t.cursorY = y
 	t.move(up, down, left, right)
-***REMOVED***
+}
 
-func (t *Terminal) move(up, down, left, right int) ***REMOVED***
+func (t *Terminal) move(up, down, left, right int) {
 	movement := make([]rune, 3*(up+down+left+right))
 	m := movement
-	for i := 0; i < up; i++ ***REMOVED***
+	for i := 0; i < up; i++ {
 		m[0] = keyEscape
 		m[1] = '['
 		m[2] = 'A'
 		m = m[3:]
-	***REMOVED***
-	for i := 0; i < down; i++ ***REMOVED***
+	}
+	for i := 0; i < down; i++ {
 		m[0] = keyEscape
 		m[1] = '['
 		m[2] = 'B'
 		m = m[3:]
-	***REMOVED***
-	for i := 0; i < left; i++ ***REMOVED***
+	}
+	for i := 0; i < left; i++ {
 		m[0] = keyEscape
 		m[1] = '['
 		m[2] = 'D'
 		m = m[3:]
-	***REMOVED***
-	for i := 0; i < right; i++ ***REMOVED***
+	}
+	for i := 0; i < right; i++ {
 		m[0] = keyEscape
 		m[1] = '['
 		m[2] = 'C'
 		m = m[3:]
-	***REMOVED***
+	}
 
 	t.queue(movement)
-***REMOVED***
+}
 
-func (t *Terminal) clearLineToRight() ***REMOVED***
-	op := []rune***REMOVED***keyEscape, '[', 'K'***REMOVED***
+func (t *Terminal) clearLineToRight() {
+	op := []rune{keyEscape, '[', 'K'}
 	t.queue(op)
-***REMOVED***
+}
 
 const maxLineLength = 4096
 
-func (t *Terminal) setLine(newLine []rune, newPos int) ***REMOVED***
-	if t.echo ***REMOVED***
+func (t *Terminal) setLine(newLine []rune, newPos int) {
+	if t.echo {
 		t.moveCursorToPos(0)
 		t.writeLine(newLine)
-		for i := len(newLine); i < len(t.line); i++ ***REMOVED***
+		for i := len(newLine); i < len(t.line); i++ {
 			t.writeLine(space)
-		***REMOVED***
+		}
 		t.moveCursorToPos(newPos)
-	***REMOVED***
+	}
 	t.line = newLine
 	t.pos = newPos
-***REMOVED***
+}
 
-func (t *Terminal) advanceCursor(places int) ***REMOVED***
+func (t *Terminal) advanceCursor(places int) {
 	t.cursorX += places
 	t.cursorY += t.cursorX / t.termWidth
-	if t.cursorY > t.maxLine ***REMOVED***
+	if t.cursorY > t.maxLine {
 		t.maxLine = t.cursorY
-	***REMOVED***
+	}
 	t.cursorX = t.cursorX % t.termWidth
 
-	if places > 0 && t.cursorX == 0 ***REMOVED***
+	if places > 0 && t.cursorX == 0 {
 		// Normally terminals will advance the current position
 		// when writing a character. But that doesn't happen
 		// for the last character in a line. However, when
@@ -337,110 +337,110 @@ func (t *Terminal) advanceCursor(places int) ***REMOVED***
 		// need to write a newline so that our cursor can be
 		// advanced to the next line.
 		t.outBuf = append(t.outBuf, '\r', '\n')
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (t *Terminal) eraseNPreviousChars(n int) ***REMOVED***
-	if n == 0 ***REMOVED***
+func (t *Terminal) eraseNPreviousChars(n int) {
+	if n == 0 {
 		return
-	***REMOVED***
+	}
 
-	if t.pos < n ***REMOVED***
+	if t.pos < n {
 		n = t.pos
-	***REMOVED***
+	}
 	t.pos -= n
 	t.moveCursorToPos(t.pos)
 
 	copy(t.line[t.pos:], t.line[n+t.pos:])
 	t.line = t.line[:len(t.line)-n]
-	if t.echo ***REMOVED***
+	if t.echo {
 		t.writeLine(t.line[t.pos:])
-		for i := 0; i < n; i++ ***REMOVED***
+		for i := 0; i < n; i++ {
 			t.queue(space)
-		***REMOVED***
+		}
 		t.advanceCursor(n)
 		t.moveCursorToPos(t.pos)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // countToLeftWord returns then number of characters from the cursor to the
 // start of the previous word.
-func (t *Terminal) countToLeftWord() int ***REMOVED***
-	if t.pos == 0 ***REMOVED***
+func (t *Terminal) countToLeftWord() int {
+	if t.pos == 0 {
 		return 0
-	***REMOVED***
+	}
 
 	pos := t.pos - 1
-	for pos > 0 ***REMOVED***
-		if t.line[pos] != ' ' ***REMOVED***
+	for pos > 0 {
+		if t.line[pos] != ' ' {
 			break
-		***REMOVED***
+		}
 		pos--
-	***REMOVED***
-	for pos > 0 ***REMOVED***
-		if t.line[pos] == ' ' ***REMOVED***
+	}
+	for pos > 0 {
+		if t.line[pos] == ' ' {
 			pos++
 			break
-		***REMOVED***
+		}
 		pos--
-	***REMOVED***
+	}
 
 	return t.pos - pos
-***REMOVED***
+}
 
 // countToRightWord returns then number of characters from the cursor to the
 // start of the next word.
-func (t *Terminal) countToRightWord() int ***REMOVED***
+func (t *Terminal) countToRightWord() int {
 	pos := t.pos
-	for pos < len(t.line) ***REMOVED***
-		if t.line[pos] == ' ' ***REMOVED***
+	for pos < len(t.line) {
+		if t.line[pos] == ' ' {
 			break
-		***REMOVED***
+		}
 		pos++
-	***REMOVED***
-	for pos < len(t.line) ***REMOVED***
-		if t.line[pos] != ' ' ***REMOVED***
+	}
+	for pos < len(t.line) {
+		if t.line[pos] != ' ' {
 			break
-		***REMOVED***
+		}
 		pos++
-	***REMOVED***
+	}
 	return pos - t.pos
-***REMOVED***
+}
 
 // visualLength returns the number of visible glyphs in s.
-func visualLength(runes []rune) int ***REMOVED***
+func visualLength(runes []rune) int {
 	inEscapeSeq := false
 	length := 0
 
-	for _, r := range runes ***REMOVED***
-		switch ***REMOVED***
+	for _, r := range runes {
+		switch {
 		case inEscapeSeq:
-			if (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') ***REMOVED***
+			if (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') {
 				inEscapeSeq = false
-			***REMOVED***
+			}
 		case r == '\x1b':
 			inEscapeSeq = true
 		default:
 			length++
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return length
-***REMOVED***
+}
 
 // handleKey processes the given key and, optionally, returns a line of text
 // that the user has entered.
-func (t *Terminal) handleKey(key rune) (line string, ok bool) ***REMOVED***
-	if t.pasteActive && key != keyEnter ***REMOVED***
+func (t *Terminal) handleKey(key rune) (line string, ok bool) {
+	if t.pasteActive && key != keyEnter {
 		t.addKeyToLine(key)
 		return
-	***REMOVED***
+	}
 
-	switch key ***REMOVED***
+	switch key {
 	case keyBackspace:
-		if t.pos == 0 ***REMOVED***
+		if t.pos == 0 {
 			return
-		***REMOVED***
+		}
 		t.eraseNPreviousChars(1)
 	case keyAltLeft:
 		// move left by a word.
@@ -451,42 +451,42 @@ func (t *Terminal) handleKey(key rune) (line string, ok bool) ***REMOVED***
 		t.pos += t.countToRightWord()
 		t.moveCursorToPos(t.pos)
 	case keyLeft:
-		if t.pos == 0 ***REMOVED***
+		if t.pos == 0 {
 			return
-		***REMOVED***
+		}
 		t.pos--
 		t.moveCursorToPos(t.pos)
 	case keyRight:
-		if t.pos == len(t.line) ***REMOVED***
+		if t.pos == len(t.line) {
 			return
-		***REMOVED***
+		}
 		t.pos++
 		t.moveCursorToPos(t.pos)
 	case keyHome:
-		if t.pos == 0 ***REMOVED***
+		if t.pos == 0 {
 			return
-		***REMOVED***
+		}
 		t.pos = 0
 		t.moveCursorToPos(t.pos)
 	case keyEnd:
-		if t.pos == len(t.line) ***REMOVED***
+		if t.pos == len(t.line) {
 			return
-		***REMOVED***
+		}
 		t.pos = len(t.line)
 		t.moveCursorToPos(t.pos)
 	case keyUp:
 		entry, ok := t.history.NthPreviousEntry(t.historyIndex + 1)
-		if !ok ***REMOVED***
+		if !ok {
 			return "", false
-		***REMOVED***
-		if t.historyIndex == -1 ***REMOVED***
+		}
+		if t.historyIndex == -1 {
 			t.historyPending = string(t.line)
-		***REMOVED***
+		}
 		t.historyIndex++
 		runes := []rune(entry)
 		t.setLine(runes, len(runes))
 	case keyDown:
-		switch t.historyIndex ***REMOVED***
+		switch t.historyIndex {
 		case -1:
 			return
 		case 0:
@@ -495,12 +495,12 @@ func (t *Terminal) handleKey(key rune) (line string, ok bool) ***REMOVED***
 			t.historyIndex--
 		default:
 			entry, ok := t.history.NthPreviousEntry(t.historyIndex - 1)
-			if ok ***REMOVED***
+			if ok {
 				t.historyIndex--
 				runes := []rune(entry)
 				t.setLine(runes, len(runes))
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 	case keyEnter:
 		t.moveCursorToPos(len(t.line))
 		t.queue([]rune("\r\n"))
@@ -517,20 +517,20 @@ func (t *Terminal) handleKey(key rune) (line string, ok bool) ***REMOVED***
 	case keyDeleteLine:
 		// Delete everything from the current cursor position to the
 		// end of line.
-		for i := t.pos; i < len(t.line); i++ ***REMOVED***
+		for i := t.pos; i < len(t.line); i++ {
 			t.queue(space)
 			t.advanceCursor(1)
-		***REMOVED***
+		}
 		t.line = t.line[:t.pos]
 		t.moveCursorToPos(t.pos)
 	case keyCtrlD:
 		// Erase the character under the current position.
 		// The EOF case when the line is empty is handled in
 		// readLine().
-		if t.pos < len(t.line) ***REMOVED***
+		if t.pos < len(t.line) {
 			t.pos++
 			t.eraseNPreviousChars(1)
-		***REMOVED***
+		}
 	case keyCtrlU:
 		t.eraseNPreviousChars(t.pos)
 	case keyClearScreen:
@@ -541,7 +541,7 @@ func (t *Terminal) handleKey(key rune) (line string, ok bool) ***REMOVED***
 		t.advanceCursor(visualLength(t.prompt))
 		t.setLine(t.line, t.pos)
 	default:
-		if t.AutoCompleteCallback != nil ***REMOVED***
+		if t.AutoCompleteCallback != nil {
 			prefix := string(t.line[:t.pos])
 			suffix := string(t.line[t.pos:])
 
@@ -549,91 +549,91 @@ func (t *Terminal) handleKey(key rune) (line string, ok bool) ***REMOVED***
 			newLine, newPos, completeOk := t.AutoCompleteCallback(prefix+suffix, len(prefix), key)
 			t.lock.Lock()
 
-			if completeOk ***REMOVED***
+			if completeOk {
 				t.setLine([]rune(newLine), utf8.RuneCount([]byte(newLine)[:newPos]))
 				return
-			***REMOVED***
-		***REMOVED***
-		if !isPrintable(key) ***REMOVED***
+			}
+		}
+		if !isPrintable(key) {
 			return
-		***REMOVED***
-		if len(t.line) == maxLineLength ***REMOVED***
+		}
+		if len(t.line) == maxLineLength {
 			return
-		***REMOVED***
+		}
 		t.addKeyToLine(key)
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // addKeyToLine inserts the given key at the current position in the current
 // line.
-func (t *Terminal) addKeyToLine(key rune) ***REMOVED***
-	if len(t.line) == cap(t.line) ***REMOVED***
+func (t *Terminal) addKeyToLine(key rune) {
+	if len(t.line) == cap(t.line) {
 		newLine := make([]rune, len(t.line), 2*(1+len(t.line)))
 		copy(newLine, t.line)
 		t.line = newLine
-	***REMOVED***
+	}
 	t.line = t.line[:len(t.line)+1]
 	copy(t.line[t.pos+1:], t.line[t.pos:])
 	t.line[t.pos] = key
-	if t.echo ***REMOVED***
+	if t.echo {
 		t.writeLine(t.line[t.pos:])
-	***REMOVED***
+	}
 	t.pos++
 	t.moveCursorToPos(t.pos)
-***REMOVED***
+}
 
-func (t *Terminal) writeLine(line []rune) ***REMOVED***
-	for len(line) != 0 ***REMOVED***
+func (t *Terminal) writeLine(line []rune) {
+	for len(line) != 0 {
 		remainingOnLine := t.termWidth - t.cursorX
 		todo := len(line)
-		if todo > remainingOnLine ***REMOVED***
+		if todo > remainingOnLine {
 			todo = remainingOnLine
-		***REMOVED***
+		}
 		t.queue(line[:todo])
 		t.advanceCursor(visualLength(line[:todo]))
 		line = line[todo:]
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // writeWithCRLF writes buf to w but replaces all occurrences of \n with \r\n.
-func writeWithCRLF(w io.Writer, buf []byte) (n int, err error) ***REMOVED***
-	for len(buf) > 0 ***REMOVED***
+func writeWithCRLF(w io.Writer, buf []byte) (n int, err error) {
+	for len(buf) > 0 {
 		i := bytes.IndexByte(buf, '\n')
 		todo := len(buf)
-		if i >= 0 ***REMOVED***
+		if i >= 0 {
 			todo = i
-		***REMOVED***
+		}
 
 		var nn int
 		nn, err = w.Write(buf[:todo])
 		n += nn
-		if err != nil ***REMOVED***
+		if err != nil {
 			return n, err
-		***REMOVED***
+		}
 		buf = buf[todo:]
 
-		if i >= 0 ***REMOVED***
-			if _, err = w.Write(crlf); err != nil ***REMOVED***
+		if i >= 0 {
+			if _, err = w.Write(crlf); err != nil {
 				return n, err
-			***REMOVED***
+			}
 			n++
 			buf = buf[1:]
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return n, nil
-***REMOVED***
+}
 
-func (t *Terminal) Write(buf []byte) (n int, err error) ***REMOVED***
+func (t *Terminal) Write(buf []byte) (n int, err error) {
 	t.lock.Lock()
 	defer t.lock.Unlock()
 
-	if t.cursorX == 0 && t.cursorY == 0 ***REMOVED***
+	if t.cursorX == 0 && t.cursorY == 0 {
 		// This is the easy case: there's nothing on the screen that we
 		// have to move out of the way.
 		return writeWithCRLF(t.c, buf)
-	***REMOVED***
+	}
 
 	// We have a prompt and possibly user input on the screen. We
 	// have to clear it first.
@@ -641,38 +641,38 @@ func (t *Terminal) Write(buf []byte) (n int, err error) ***REMOVED***
 	t.cursorX = 0
 	t.clearLineToRight()
 
-	for t.cursorY > 0 ***REMOVED***
+	for t.cursorY > 0 {
 		t.move(1 /* up */, 0, 0, 0)
 		t.cursorY--
 		t.clearLineToRight()
-	***REMOVED***
+	}
 
-	if _, err = t.c.Write(t.outBuf); err != nil ***REMOVED***
+	if _, err = t.c.Write(t.outBuf); err != nil {
 		return
-	***REMOVED***
+	}
 	t.outBuf = t.outBuf[:0]
 
-	if n, err = writeWithCRLF(t.c, buf); err != nil ***REMOVED***
+	if n, err = writeWithCRLF(t.c, buf); err != nil {
 		return
-	***REMOVED***
+	}
 
 	t.writeLine(t.prompt)
-	if t.echo ***REMOVED***
+	if t.echo {
 		t.writeLine(t.line)
-	***REMOVED***
+	}
 
 	t.moveCursorToPos(t.pos)
 
-	if _, err = t.c.Write(t.outBuf); err != nil ***REMOVED***
+	if _, err = t.c.Write(t.outBuf); err != nil {
 		return
-	***REMOVED***
+	}
 	t.outBuf = t.outBuf[:0]
 	return
-***REMOVED***
+}
 
 // ReadPassword temporarily changes the prompt and reads a password, without
 // echo, from the terminal.
-func (t *Terminal) ReadPassword(prompt string) (line string, err error) ***REMOVED***
+func (t *Terminal) ReadPassword(prompt string) (line string, err error) {
 	t.lock.Lock()
 	defer t.lock.Unlock()
 
@@ -686,76 +686,76 @@ func (t *Terminal) ReadPassword(prompt string) (line string, err error) ***REMOV
 	t.echo = true
 
 	return
-***REMOVED***
+}
 
 // ReadLine returns a line of input from the terminal.
-func (t *Terminal) ReadLine() (line string, err error) ***REMOVED***
+func (t *Terminal) ReadLine() (line string, err error) {
 	t.lock.Lock()
 	defer t.lock.Unlock()
 
 	return t.readLine()
-***REMOVED***
+}
 
-func (t *Terminal) readLine() (line string, err error) ***REMOVED***
+func (t *Terminal) readLine() (line string, err error) {
 	// t.lock must be held at this point
 
-	if t.cursorX == 0 && t.cursorY == 0 ***REMOVED***
+	if t.cursorX == 0 && t.cursorY == 0 {
 		t.writeLine(t.prompt)
 		t.c.Write(t.outBuf)
 		t.outBuf = t.outBuf[:0]
-	***REMOVED***
+	}
 
 	lineIsPasted := t.pasteActive
 
-	for ***REMOVED***
+	for {
 		rest := t.remainder
 		lineOk := false
-		for !lineOk ***REMOVED***
+		for !lineOk {
 			var key rune
 			key, rest = bytesToKey(rest, t.pasteActive)
-			if key == utf8.RuneError ***REMOVED***
+			if key == utf8.RuneError {
 				break
-			***REMOVED***
-			if !t.pasteActive ***REMOVED***
-				if key == keyCtrlD ***REMOVED***
-					if len(t.line) == 0 ***REMOVED***
+			}
+			if !t.pasteActive {
+				if key == keyCtrlD {
+					if len(t.line) == 0 {
 						return "", io.EOF
-					***REMOVED***
-				***REMOVED***
-				if key == keyPasteStart ***REMOVED***
+					}
+				}
+				if key == keyPasteStart {
 					t.pasteActive = true
-					if len(t.line) == 0 ***REMOVED***
+					if len(t.line) == 0 {
 						lineIsPasted = true
-					***REMOVED***
+					}
 					continue
-				***REMOVED***
-			***REMOVED*** else if key == keyPasteEnd ***REMOVED***
+				}
+			} else if key == keyPasteEnd {
 				t.pasteActive = false
 				continue
-			***REMOVED***
-			if !t.pasteActive ***REMOVED***
+			}
+			if !t.pasteActive {
 				lineIsPasted = false
-			***REMOVED***
+			}
 			line, lineOk = t.handleKey(key)
-		***REMOVED***
-		if len(rest) > 0 ***REMOVED***
+		}
+		if len(rest) > 0 {
 			n := copy(t.inBuf[:], rest)
 			t.remainder = t.inBuf[:n]
-		***REMOVED*** else ***REMOVED***
+		} else {
 			t.remainder = nil
-		***REMOVED***
+		}
 		t.c.Write(t.outBuf)
 		t.outBuf = t.outBuf[:0]
-		if lineOk ***REMOVED***
-			if t.echo ***REMOVED***
+		if lineOk {
+			if t.echo {
 				t.historyIndex = -1
 				t.history.Add(line)
-			***REMOVED***
-			if lineIsPasted ***REMOVED***
+			}
+			if lineIsPasted {
 				err = ErrPasteIndicator
-			***REMOVED***
+			}
 			return
-		***REMOVED***
+		}
 
 		// t.remainder is a slice at the beginning of t.inBuf
 		// containing a partial key sequence
@@ -766,33 +766,33 @@ func (t *Terminal) readLine() (line string, err error) ***REMOVED***
 		n, err = t.c.Read(readBuf)
 		t.lock.Lock()
 
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
+		}
 
 		t.remainder = t.inBuf[:n+len(t.remainder)]
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // SetPrompt sets the prompt to be used when reading subsequent lines.
-func (t *Terminal) SetPrompt(prompt string) ***REMOVED***
+func (t *Terminal) SetPrompt(prompt string) {
 	t.lock.Lock()
 	defer t.lock.Unlock()
 
 	t.prompt = []rune(prompt)
-***REMOVED***
+}
 
-func (t *Terminal) clearAndRepaintLinePlusNPrevious(numPrevLines int) ***REMOVED***
+func (t *Terminal) clearAndRepaintLinePlusNPrevious(numPrevLines int) {
 	// Move cursor to column zero at the start of the line.
 	t.move(t.cursorY, 0, t.cursorX, 0)
 	t.cursorX, t.cursorY = 0, 0
 	t.clearLineToRight()
-	for t.cursorY < numPrevLines ***REMOVED***
+	for t.cursorY < numPrevLines {
 		// Move down a line
 		t.move(0, 1, 0, 0)
 		t.cursorY++
 		t.clearLineToRight()
-	***REMOVED***
+	}
 	// Move back to beginning.
 	t.move(t.cursorY, 0, 0, 0)
 	t.cursorX, t.cursorY = 0, 0
@@ -801,20 +801,20 @@ func (t *Terminal) clearAndRepaintLinePlusNPrevious(numPrevLines int) ***REMOVED
 	t.advanceCursor(visualLength(t.prompt))
 	t.writeLine(t.line)
 	t.moveCursorToPos(t.pos)
-***REMOVED***
+}
 
-func (t *Terminal) SetSize(width, height int) error ***REMOVED***
+func (t *Terminal) SetSize(width, height int) error {
 	t.lock.Lock()
 	defer t.lock.Unlock()
 
-	if width == 0 ***REMOVED***
+	if width == 0 {
 		width = 1
-	***REMOVED***
+	}
 
 	oldWidth := t.termWidth
 	t.termWidth, t.termHeight = width, height
 
-	switch ***REMOVED***
+	switch {
 	case width == oldWidth:
 		// If the width didn't change then nothing else needs to be
 		// done.
@@ -835,9 +835,9 @@ func (t *Terminal) SetSize(width, height int) error ***REMOVED***
 		// wrapping and turning into two. This causes the prompt on
 		// xterms to move upwards, which isn't great, but it avoids a
 		// huge mess with gnome-terminal.
-		if t.cursorX >= t.termWidth ***REMOVED***
+		if t.cursorX >= t.termWidth {
 			t.cursorX = t.termWidth - 1
-		***REMOVED***
+		}
 		t.cursorY *= 2
 		t.clearAndRepaintLinePlusNPrevious(t.maxLine * 2)
 	case width > oldWidth:
@@ -849,40 +849,40 @@ func (t *Terminal) SetSize(width, height int) error ***REMOVED***
 		// But the position will actually be correct until we move, so
 		// we can move back to the beginning and repaint everything.
 		t.clearAndRepaintLinePlusNPrevious(t.maxLine)
-	***REMOVED***
+	}
 
 	_, err := t.c.Write(t.outBuf)
 	t.outBuf = t.outBuf[:0]
 	return err
-***REMOVED***
+}
 
-type pasteIndicatorError struct***REMOVED******REMOVED***
+type pasteIndicatorError struct{}
 
-func (pasteIndicatorError) Error() string ***REMOVED***
+func (pasteIndicatorError) Error() string {
 	return "terminal: ErrPasteIndicator not correctly handled"
-***REMOVED***
+}
 
 // ErrPasteIndicator may be returned from ReadLine as the error, in addition
 // to valid line data. It indicates that bracketed paste mode is enabled and
 // that the returned line consists only of pasted data. Programs may wish to
 // interpret pasted data more literally than typed data.
-var ErrPasteIndicator = pasteIndicatorError***REMOVED******REMOVED***
+var ErrPasteIndicator = pasteIndicatorError{}
 
 // SetBracketedPasteMode requests that the terminal bracket paste operations
 // with markers. Not all terminals support this but, if it is supported, then
 // enabling this mode will stop any autocomplete callback from running due to
 // pastes. Additionally, any lines that are completely pasted will be returned
 // from ReadLine with the error set to ErrPasteIndicator.
-func (t *Terminal) SetBracketedPasteMode(on bool) ***REMOVED***
-	if on ***REMOVED***
+func (t *Terminal) SetBracketedPasteMode(on bool) {
+	if on {
 		io.WriteString(t.c, "\x1b[?2004h")
-	***REMOVED*** else ***REMOVED***
+	} else {
 		io.WriteString(t.c, "\x1b[?2004l")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // stRingBuffer is a ring buffer of strings.
-type stRingBuffer struct ***REMOVED***
+type stRingBuffer struct {
 	// entries contains max elements.
 	entries []string
 	max     int
@@ -890,62 +890,62 @@ type stRingBuffer struct ***REMOVED***
 	head int
 	// size contains the number of elements in the ring.
 	size int
-***REMOVED***
+}
 
-func (s *stRingBuffer) Add(a string) ***REMOVED***
-	if s.entries == nil ***REMOVED***
+func (s *stRingBuffer) Add(a string) {
+	if s.entries == nil {
 		const defaultNumEntries = 100
 		s.entries = make([]string, defaultNumEntries)
 		s.max = defaultNumEntries
-	***REMOVED***
+	}
 
 	s.head = (s.head + 1) % s.max
 	s.entries[s.head] = a
-	if s.size < s.max ***REMOVED***
+	if s.size < s.max {
 		s.size++
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // NthPreviousEntry returns the value passed to the nth previous call to Add.
 // If n is zero then the immediately prior value is returned, if one, then the
 // next most recent, and so on. If such an element doesn't exist then ok is
 // false.
-func (s *stRingBuffer) NthPreviousEntry(n int) (value string, ok bool) ***REMOVED***
-	if n >= s.size ***REMOVED***
+func (s *stRingBuffer) NthPreviousEntry(n int) (value string, ok bool) {
+	if n >= s.size {
 		return "", false
-	***REMOVED***
+	}
 	index := s.head - n
-	if index < 0 ***REMOVED***
+	if index < 0 {
 		index += s.max
-	***REMOVED***
+	}
 	return s.entries[index], true
-***REMOVED***
+}
 
 // readPasswordLine reads from reader until it finds \n or io.EOF.
 // The slice returned does not include the \n.
 // readPasswordLine also ignores any \r it finds.
-func readPasswordLine(reader io.Reader) ([]byte, error) ***REMOVED***
+func readPasswordLine(reader io.Reader) ([]byte, error) {
 	var buf [1]byte
 	var ret []byte
 
-	for ***REMOVED***
+	for {
 		n, err := reader.Read(buf[:])
-		if n > 0 ***REMOVED***
-			switch buf[0] ***REMOVED***
+		if n > 0 {
+			switch buf[0] {
 			case '\n':
 				return ret, nil
 			case '\r':
 				// remove \r from passwords on Windows
 			default:
 				ret = append(ret, buf[0])
-			***REMOVED***
+			}
 			continue
-		***REMOVED***
-		if err != nil ***REMOVED***
-			if err == io.EOF && len(ret) > 0 ***REMOVED***
+		}
+		if err != nil {
+			if err == io.EOF && len(ret) > 0 {
 				return ret, nil
-			***REMOVED***
+			}
 			return ret, err
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

@@ -15,59 +15,59 @@ import (
 
 // OnePassSignature represents a one-pass signature packet. See RFC 4880,
 // section 5.4.
-type OnePassSignature struct ***REMOVED***
+type OnePassSignature struct {
 	SigType    SignatureType
 	Hash       crypto.Hash
 	PubKeyAlgo PublicKeyAlgorithm
 	KeyId      uint64
 	IsLast     bool
-***REMOVED***
+}
 
 const onePassSignatureVersion = 3
 
-func (ops *OnePassSignature) parse(r io.Reader) (err error) ***REMOVED***
+func (ops *OnePassSignature) parse(r io.Reader) (err error) {
 	var buf [13]byte
 
 	_, err = readFull(r, buf[:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
-	if buf[0] != onePassSignatureVersion ***REMOVED***
+	}
+	if buf[0] != onePassSignatureVersion {
 		err = errors.UnsupportedError("one-pass-signature packet version " + strconv.Itoa(int(buf[0])))
-	***REMOVED***
+	}
 
 	var ok bool
 	ops.Hash, ok = s2k.HashIdToHash(buf[2])
-	if !ok ***REMOVED***
+	if !ok {
 		return errors.UnsupportedError("hash function: " + strconv.Itoa(int(buf[2])))
-	***REMOVED***
+	}
 
 	ops.SigType = SignatureType(buf[1])
 	ops.PubKeyAlgo = PublicKeyAlgorithm(buf[3])
 	ops.KeyId = binary.BigEndian.Uint64(buf[4:12])
 	ops.IsLast = buf[12] != 0
 	return
-***REMOVED***
+}
 
 // Serialize marshals the given OnePassSignature to w.
-func (ops *OnePassSignature) Serialize(w io.Writer) error ***REMOVED***
+func (ops *OnePassSignature) Serialize(w io.Writer) error {
 	var buf [13]byte
 	buf[0] = onePassSignatureVersion
 	buf[1] = uint8(ops.SigType)
 	var ok bool
 	buf[2], ok = s2k.HashToHashId(ops.Hash)
-	if !ok ***REMOVED***
+	if !ok {
 		return errors.UnsupportedError("hash type: " + strconv.Itoa(int(ops.Hash)))
-	***REMOVED***
+	}
 	buf[3] = uint8(ops.PubKeyAlgo)
 	binary.BigEndian.PutUint64(buf[4:12], ops.KeyId)
-	if ops.IsLast ***REMOVED***
+	if ops.IsLast {
 		buf[12] = 1
-	***REMOVED***
+	}
 
-	if err := serializeHeader(w, packetTypeOnePassSignature, len(buf)); err != nil ***REMOVED***
+	if err := serializeHeader(w, packetTypeOnePassSignature, len(buf)); err != nil {
 		return err
-	***REMOVED***
+	}
 	_, err := w.Write(buf[:])
 	return err
-***REMOVED***
+}

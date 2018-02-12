@@ -20,10 +20,10 @@ var (
 	ErrCRCMismatch = errors.New("walpb: crc mismatch")
 )
 
-func (rec *Record) Validate(crc uint32) error ***REMOVED***
-	if rec.Crc == crc ***REMOVED***
+func (rec *Record) Validate(crc uint32) error {
+	if rec.Crc == crc {
 		return nil
-	***REMOVED***
+	}
 	rec.Reset()
 	return ErrCRCMismatch
-***REMOVED***
+}

@@ -6,7 +6,7 @@ import (
 	"sync"
 )
 
-type Keyring struct ***REMOVED***
+type Keyring struct {
 	// Keys stores the key data used during encryption and decryption. It is
 	// ordered in such a way where the first key (index 0) is the primary key,
 	// which is used for encrypting messages, and is the first key tried during
@@ -15,12 +15,12 @@ type Keyring struct ***REMOVED***
 
 	// The keyring lock is used while performing IO operations on the keyring.
 	l sync.Mutex
-***REMOVED***
+}
 
 // Init allocates substructures
-func (k *Keyring) init() ***REMOVED***
+func (k *Keyring) init() {
 	k.keys = make([][]byte, 0)
-***REMOVED***
+}
 
 // NewKeyring constructs a new container for a set of encryption keys. The
 // keyring contains all key data used internally by memberlist.
@@ -37,37 +37,37 @@ func (k *Keyring) init() ***REMOVED***
 //
 // A key should be either 16, 24, or 32 bytes to select AES-128,
 // AES-192, or AES-256.
-func NewKeyring(keys [][]byte, primaryKey []byte) (*Keyring, error) ***REMOVED***
-	keyring := &Keyring***REMOVED******REMOVED***
+func NewKeyring(keys [][]byte, primaryKey []byte) (*Keyring, error) {
+	keyring := &Keyring{}
 	keyring.init()
 
-	if len(keys) > 0 || len(primaryKey) > 0 ***REMOVED***
-		if len(primaryKey) == 0 ***REMOVED***
+	if len(keys) > 0 || len(primaryKey) > 0 {
+		if len(primaryKey) == 0 {
 			return nil, fmt.Errorf("Empty primary key not allowed")
-		***REMOVED***
-		if err := keyring.AddKey(primaryKey); err != nil ***REMOVED***
+		}
+		if err := keyring.AddKey(primaryKey); err != nil {
 			return nil, err
-		***REMOVED***
-		for _, key := range keys ***REMOVED***
-			if err := keyring.AddKey(key); err != nil ***REMOVED***
+		}
+		for _, key := range keys {
+			if err := keyring.AddKey(key); err != nil {
 				return nil, err
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	return keyring, nil
-***REMOVED***
+}
 
 // ValidateKey will check to see if the key is valid and returns an error if not.
 //
 // key should be either 16, 24, or 32 bytes to select AES-128,
 // AES-192, or AES-256.
-func ValidateKey(key []byte) error ***REMOVED***
-	if l := len(key); l != 16 && l != 24 && l != 32 ***REMOVED***
+func ValidateKey(key []byte) error {
+	if l := len(key); l != 16 && l != 24 && l != 32 {
 		return fmt.Errorf("key size must be 16, 24 or 32 bytes")
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // AddKey will install a new key on the ring. Adding a key to the ring will make
 // it available for use in decryption. If the key already exists on the ring,
@@ -75,86 +75,86 @@ func ValidateKey(key []byte) error ***REMOVED***
 //
 // key should be either 16, 24, or 32 bytes to select AES-128,
 // AES-192, or AES-256.
-func (k *Keyring) AddKey(key []byte) error ***REMOVED***
-	if err := ValidateKey(key); err != nil ***REMOVED***
+func (k *Keyring) AddKey(key []byte) error {
+	if err := ValidateKey(key); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	// No-op if key is already installed
-	for _, installedKey := range k.keys ***REMOVED***
-		if bytes.Equal(installedKey, key) ***REMOVED***
+	for _, installedKey := range k.keys {
+		if bytes.Equal(installedKey, key) {
 			return nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	keys := append(k.keys, key)
 	primaryKey := k.GetPrimaryKey()
-	if primaryKey == nil ***REMOVED***
+	if primaryKey == nil {
 		primaryKey = key
-	***REMOVED***
+	}
 	k.installKeys(keys, primaryKey)
 	return nil
-***REMOVED***
+}
 
 // UseKey changes the key used to encrypt messages. This is the only key used to
 // encrypt messages, so peers should know this key before this method is called.
-func (k *Keyring) UseKey(key []byte) error ***REMOVED***
-	for _, installedKey := range k.keys ***REMOVED***
-		if bytes.Equal(key, installedKey) ***REMOVED***
+func (k *Keyring) UseKey(key []byte) error {
+	for _, installedKey := range k.keys {
+		if bytes.Equal(key, installedKey) {
 			k.installKeys(k.keys, key)
 			return nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return fmt.Errorf("Requested key is not in the keyring")
-***REMOVED***
+}
 
 // RemoveKey drops a key from the keyring. This will return an error if the key
 // requested for removal is currently at position 0 (primary key).
-func (k *Keyring) RemoveKey(key []byte) error ***REMOVED***
-	if bytes.Equal(key, k.keys[0]) ***REMOVED***
+func (k *Keyring) RemoveKey(key []byte) error {
+	if bytes.Equal(key, k.keys[0]) {
 		return fmt.Errorf("Removing the primary key is not allowed")
-	***REMOVED***
-	for i, installedKey := range k.keys ***REMOVED***
-		if bytes.Equal(key, installedKey) ***REMOVED***
+	}
+	for i, installedKey := range k.keys {
+		if bytes.Equal(key, installedKey) {
 			keys := append(k.keys[:i], k.keys[i+1:]...)
 			k.installKeys(keys, k.keys[0])
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
 // installKeys will take out a lock on the keyring, and replace the keys with a
 // new set of keys. The key indicated by primaryKey will be installed as the new
 // primary key.
-func (k *Keyring) installKeys(keys [][]byte, primaryKey []byte) ***REMOVED***
+func (k *Keyring) installKeys(keys [][]byte, primaryKey []byte) {
 	k.l.Lock()
 	defer k.l.Unlock()
 
-	newKeys := [][]byte***REMOVED***primaryKey***REMOVED***
-	for _, key := range keys ***REMOVED***
-		if !bytes.Equal(key, primaryKey) ***REMOVED***
+	newKeys := [][]byte{primaryKey}
+	for _, key := range keys {
+		if !bytes.Equal(key, primaryKey) {
 			newKeys = append(newKeys, key)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	k.keys = newKeys
-***REMOVED***
+}
 
 // GetKeys returns the current set of keys on the ring.
-func (k *Keyring) GetKeys() [][]byte ***REMOVED***
+func (k *Keyring) GetKeys() [][]byte {
 	k.l.Lock()
 	defer k.l.Unlock()
 
 	return k.keys
-***REMOVED***
+}
 
 // GetPrimaryKey returns the key on the ring at position 0. This is the key used
 // for encrypting messages, and is the first key tried for decrypting messages.
-func (k *Keyring) GetPrimaryKey() (key []byte) ***REMOVED***
+func (k *Keyring) GetPrimaryKey() (key []byte) {
 	k.l.Lock()
 	defer k.l.Unlock()
 
-	if len(k.keys) > 0 ***REMOVED***
+	if len(k.keys) > 0 {
 		key = k.keys[0]
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}

@@ -30,7 +30,7 @@ const (
 )
 
 // Signature represents a signature. See RFC 4880, section 5.2.
-type Signature struct ***REMOVED***
+type Signature struct {
 	SigType    SignatureType
 	PubKeyAlgo PublicKeyAlgorithm
 	Hash       crypto.Hash
@@ -77,38 +77,38 @@ type Signature struct ***REMOVED***
 	EmbeddedSignature *Signature
 
 	outSubpackets []outputSubpacket
-***REMOVED***
+}
 
-func (sig *Signature) parse(r io.Reader) (err error) ***REMOVED***
+func (sig *Signature) parse(r io.Reader) (err error) {
 	// RFC 4880, section 5.2.3
 	var buf [5]byte
 	_, err = readFull(r, buf[:1])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
-	if buf[0] != 4 ***REMOVED***
+	}
+	if buf[0] != 4 {
 		err = errors.UnsupportedError("signature packet version " + strconv.Itoa(int(buf[0])))
 		return
-	***REMOVED***
+	}
 
 	_, err = readFull(r, buf[:5])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	sig.SigType = SignatureType(buf[0])
 	sig.PubKeyAlgo = PublicKeyAlgorithm(buf[1])
-	switch sig.PubKeyAlgo ***REMOVED***
+	switch sig.PubKeyAlgo {
 	case PubKeyAlgoRSA, PubKeyAlgoRSASignOnly, PubKeyAlgoDSA, PubKeyAlgoECDSA:
 	default:
 		err = errors.UnsupportedError("public key algorithm " + strconv.Itoa(int(sig.PubKeyAlgo)))
 		return
-	***REMOVED***
+	}
 
 	var ok bool
 	sig.Hash, ok = s2k.HashIdToHash(buf[2])
-	if !ok ***REMOVED***
+	if !ok {
 		return errors.UnsupportedError("hash function " + strconv.Itoa(int(buf[2])))
-	***REMOVED***
+	}
 
 	hashedSubpacketsLength := int(buf[3])<<8 | int(buf[4])
 	l := 6 + hashedSubpacketsLength
@@ -117,9 +117,9 @@ func (sig *Signature) parse(r io.Reader) (err error) ***REMOVED***
 	copy(sig.HashSuffix[1:], buf[:5])
 	hashedSubpackets := sig.HashSuffix[6:l]
 	_, err = readFull(r, hashedSubpackets)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	// See RFC 4880, section 5.2.4
 	trailer := sig.HashSuffix[l:]
 	trailer[0] = 4
@@ -130,65 +130,65 @@ func (sig *Signature) parse(r io.Reader) (err error) ***REMOVED***
 	trailer[5] = uint8(l)
 
 	err = parseSignatureSubpackets(sig, hashedSubpackets, true)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
 	_, err = readFull(r, buf[:2])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	unhashedSubpacketsLength := int(buf[0])<<8 | int(buf[1])
 	unhashedSubpackets := make([]byte, unhashedSubpacketsLength)
 	_, err = readFull(r, unhashedSubpackets)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	err = parseSignatureSubpackets(sig, unhashedSubpackets, false)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
 	_, err = readFull(r, sig.HashTag[:2])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
-	switch sig.PubKeyAlgo ***REMOVED***
+	switch sig.PubKeyAlgo {
 	case PubKeyAlgoRSA, PubKeyAlgoRSASignOnly:
 		sig.RSASignature.bytes, sig.RSASignature.bitLength, err = readMPI(r)
 	case PubKeyAlgoDSA:
 		sig.DSASigR.bytes, sig.DSASigR.bitLength, err = readMPI(r)
-		if err == nil ***REMOVED***
+		if err == nil {
 			sig.DSASigS.bytes, sig.DSASigS.bitLength, err = readMPI(r)
-		***REMOVED***
+		}
 	case PubKeyAlgoECDSA:
 		sig.ECDSASigR.bytes, sig.ECDSASigR.bitLength, err = readMPI(r)
-		if err == nil ***REMOVED***
+		if err == nil {
 			sig.ECDSASigS.bytes, sig.ECDSASigS.bitLength, err = readMPI(r)
-		***REMOVED***
+		}
 	default:
 		panic("unreachable")
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // parseSignatureSubpackets parses subpackets of the main signature packet. See
 // RFC 4880, section 5.2.3.1.
-func parseSignatureSubpackets(sig *Signature, subpackets []byte, isHashed bool) (err error) ***REMOVED***
-	for len(subpackets) > 0 ***REMOVED***
+func parseSignatureSubpackets(sig *Signature, subpackets []byte, isHashed bool) (err error) {
+	for len(subpackets) > 0 {
 		subpackets, err = parseSignatureSubpacket(sig, subpackets, isHashed)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if sig.CreationTime.IsZero() ***REMOVED***
+	if sig.CreationTime.IsZero() {
 		err = errors.StructuralError("no creation time in signature")
-	***REMOVED***
+	}
 
 	return
-***REMOVED***
+}
 
 type signatureSubpacketType uint8
 
@@ -208,153 +208,153 @@ const (
 )
 
 // parseSignatureSubpacket parses a single subpacket. len(subpacket) is >= 1.
-func parseSignatureSubpacket(sig *Signature, subpacket []byte, isHashed bool) (rest []byte, err error) ***REMOVED***
+func parseSignatureSubpacket(sig *Signature, subpacket []byte, isHashed bool) (rest []byte, err error) {
 	// RFC 4880, section 5.2.3.1
 	var (
 		length     uint32
 		packetType signatureSubpacketType
 		isCritical bool
 	)
-	switch ***REMOVED***
+	switch {
 	case subpacket[0] < 192:
 		length = uint32(subpacket[0])
 		subpacket = subpacket[1:]
 	case subpacket[0] < 255:
-		if len(subpacket) < 2 ***REMOVED***
+		if len(subpacket) < 2 {
 			goto Truncated
-		***REMOVED***
+		}
 		length = uint32(subpacket[0]-192)<<8 + uint32(subpacket[1]) + 192
 		subpacket = subpacket[2:]
 	default:
-		if len(subpacket) < 5 ***REMOVED***
+		if len(subpacket) < 5 {
 			goto Truncated
-		***REMOVED***
+		}
 		length = uint32(subpacket[1])<<24 |
 			uint32(subpacket[2])<<16 |
 			uint32(subpacket[3])<<8 |
 			uint32(subpacket[4])
 		subpacket = subpacket[5:]
-	***REMOVED***
-	if length > uint32(len(subpacket)) ***REMOVED***
+	}
+	if length > uint32(len(subpacket)) {
 		goto Truncated
-	***REMOVED***
+	}
 	rest = subpacket[length:]
 	subpacket = subpacket[:length]
-	if len(subpacket) == 0 ***REMOVED***
+	if len(subpacket) == 0 {
 		err = errors.StructuralError("zero length signature subpacket")
 		return
-	***REMOVED***
+	}
 	packetType = signatureSubpacketType(subpacket[0] & 0x7f)
 	isCritical = subpacket[0]&0x80 == 0x80
 	subpacket = subpacket[1:]
-	sig.rawSubpackets = append(sig.rawSubpackets, outputSubpacket***REMOVED***isHashed, packetType, isCritical, subpacket***REMOVED***)
-	switch packetType ***REMOVED***
+	sig.rawSubpackets = append(sig.rawSubpackets, outputSubpacket{isHashed, packetType, isCritical, subpacket})
+	switch packetType {
 	case creationTimeSubpacket:
-		if !isHashed ***REMOVED***
+		if !isHashed {
 			err = errors.StructuralError("signature creation time in non-hashed area")
 			return
-		***REMOVED***
-		if len(subpacket) != 4 ***REMOVED***
+		}
+		if len(subpacket) != 4 {
 			err = errors.StructuralError("signature creation time not four bytes")
 			return
-		***REMOVED***
+		}
 		t := binary.BigEndian.Uint32(subpacket)
 		sig.CreationTime = time.Unix(int64(t), 0)
 	case signatureExpirationSubpacket:
 		// Signature expiration time, section 5.2.3.10
-		if !isHashed ***REMOVED***
+		if !isHashed {
 			return
-		***REMOVED***
-		if len(subpacket) != 4 ***REMOVED***
+		}
+		if len(subpacket) != 4 {
 			err = errors.StructuralError("expiration subpacket with bad length")
 			return
-		***REMOVED***
+		}
 		sig.SigLifetimeSecs = new(uint32)
 		*sig.SigLifetimeSecs = binary.BigEndian.Uint32(subpacket)
 	case keyExpirationSubpacket:
 		// Key expiration time, section 5.2.3.6
-		if !isHashed ***REMOVED***
+		if !isHashed {
 			return
-		***REMOVED***
-		if len(subpacket) != 4 ***REMOVED***
+		}
+		if len(subpacket) != 4 {
 			err = errors.StructuralError("key expiration subpacket with bad length")
 			return
-		***REMOVED***
+		}
 		sig.KeyLifetimeSecs = new(uint32)
 		*sig.KeyLifetimeSecs = binary.BigEndian.Uint32(subpacket)
 	case prefSymmetricAlgosSubpacket:
 		// Preferred symmetric algorithms, section 5.2.3.7
-		if !isHashed ***REMOVED***
+		if !isHashed {
 			return
-		***REMOVED***
+		}
 		sig.PreferredSymmetric = make([]byte, len(subpacket))
 		copy(sig.PreferredSymmetric, subpacket)
 	case issuerSubpacket:
 		// Issuer, section 5.2.3.5
-		if len(subpacket) != 8 ***REMOVED***
+		if len(subpacket) != 8 {
 			err = errors.StructuralError("issuer subpacket with bad length")
 			return
-		***REMOVED***
+		}
 		sig.IssuerKeyId = new(uint64)
 		*sig.IssuerKeyId = binary.BigEndian.Uint64(subpacket)
 	case prefHashAlgosSubpacket:
 		// Preferred hash algorithms, section 5.2.3.8
-		if !isHashed ***REMOVED***
+		if !isHashed {
 			return
-		***REMOVED***
+		}
 		sig.PreferredHash = make([]byte, len(subpacket))
 		copy(sig.PreferredHash, subpacket)
 	case prefCompressionSubpacket:
 		// Preferred compression algorithms, section 5.2.3.9
-		if !isHashed ***REMOVED***
+		if !isHashed {
 			return
-		***REMOVED***
+		}
 		sig.PreferredCompression = make([]byte, len(subpacket))
 		copy(sig.PreferredCompression, subpacket)
 	case primaryUserIdSubpacket:
 		// Primary User ID, section 5.2.3.19
-		if !isHashed ***REMOVED***
+		if !isHashed {
 			return
-		***REMOVED***
-		if len(subpacket) != 1 ***REMOVED***
+		}
+		if len(subpacket) != 1 {
 			err = errors.StructuralError("primary user id subpacket with bad length")
 			return
-		***REMOVED***
+		}
 		sig.IsPrimaryId = new(bool)
-		if subpacket[0] > 0 ***REMOVED***
+		if subpacket[0] > 0 {
 			*sig.IsPrimaryId = true
-		***REMOVED***
+		}
 	case keyFlagsSubpacket:
 		// Key flags, section 5.2.3.21
-		if !isHashed ***REMOVED***
+		if !isHashed {
 			return
-		***REMOVED***
-		if len(subpacket) == 0 ***REMOVED***
+		}
+		if len(subpacket) == 0 {
 			err = errors.StructuralError("empty key flags subpacket")
 			return
-		***REMOVED***
+		}
 		sig.FlagsValid = true
-		if subpacket[0]&KeyFlagCertify != 0 ***REMOVED***
+		if subpacket[0]&KeyFlagCertify != 0 {
 			sig.FlagCertify = true
-		***REMOVED***
-		if subpacket[0]&KeyFlagSign != 0 ***REMOVED***
+		}
+		if subpacket[0]&KeyFlagSign != 0 {
 			sig.FlagSign = true
-		***REMOVED***
-		if subpacket[0]&KeyFlagEncryptCommunications != 0 ***REMOVED***
+		}
+		if subpacket[0]&KeyFlagEncryptCommunications != 0 {
 			sig.FlagEncryptCommunications = true
-		***REMOVED***
-		if subpacket[0]&KeyFlagEncryptStorage != 0 ***REMOVED***
+		}
+		if subpacket[0]&KeyFlagEncryptStorage != 0 {
 			sig.FlagEncryptStorage = true
-		***REMOVED***
+		}
 	case reasonForRevocationSubpacket:
 		// Reason For Revocation, section 5.2.3.23
-		if !isHashed ***REMOVED***
+		if !isHashed {
 			return
-		***REMOVED***
-		if len(subpacket) == 0 ***REMOVED***
+		}
+		if len(subpacket) == 0 {
 			err = errors.StructuralError("empty revocation reason subpacket")
 			return
-		***REMOVED***
+		}
 		sig.RevocationReason = new(uint8)
 		*sig.RevocationReason = subpacket[0]
 		sig.RevocationReasonText = string(subpacket[1:])
@@ -368,104 +368,104 @@ func parseSignatureSubpacket(sig *Signature, subpacket []byte, isHashed bool) (r
 		// Only usage is in signatures that cross-certify
 		// signing subkeys. section 5.2.3.26 describes the
 		// format, with its usage described in section 11.1
-		if sig.EmbeddedSignature != nil ***REMOVED***
+		if sig.EmbeddedSignature != nil {
 			err = errors.StructuralError("Cannot have multiple embedded signatures")
 			return
-		***REMOVED***
+		}
 		sig.EmbeddedSignature = new(Signature)
 		// Embedded signatures are required to be v4 signatures see
 		// section 12.1. However, we only parse v4 signatures in this
 		// file anyway.
-		if err := sig.EmbeddedSignature.parse(bytes.NewBuffer(subpacket)); err != nil ***REMOVED***
+		if err := sig.EmbeddedSignature.parse(bytes.NewBuffer(subpacket)); err != nil {
 			return nil, err
-		***REMOVED***
-		if sigType := sig.EmbeddedSignature.SigType; sigType != SigTypePrimaryKeyBinding ***REMOVED***
+		}
+		if sigType := sig.EmbeddedSignature.SigType; sigType != SigTypePrimaryKeyBinding {
 			return nil, errors.StructuralError("cross-signature has unexpected type " + strconv.Itoa(int(sigType)))
-		***REMOVED***
+		}
 	default:
-		if isCritical ***REMOVED***
+		if isCritical {
 			err = errors.UnsupportedError("unknown critical signature subpacket type " + strconv.Itoa(int(packetType)))
 			return
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
 
 Truncated:
 	err = errors.StructuralError("signature subpacket truncated")
 	return
-***REMOVED***
+}
 
 // subpacketLengthLength returns the length, in bytes, of an encoded length value.
-func subpacketLengthLength(length int) int ***REMOVED***
-	if length < 192 ***REMOVED***
+func subpacketLengthLength(length int) int {
+	if length < 192 {
 		return 1
-	***REMOVED***
-	if length < 16320 ***REMOVED***
+	}
+	if length < 16320 {
 		return 2
-	***REMOVED***
+	}
 	return 5
-***REMOVED***
+}
 
 // serializeSubpacketLength marshals the given length into to.
-func serializeSubpacketLength(to []byte, length int) int ***REMOVED***
+func serializeSubpacketLength(to []byte, length int) int {
 	// RFC 4880, Section 4.2.2.
-	if length < 192 ***REMOVED***
+	if length < 192 {
 		to[0] = byte(length)
 		return 1
-	***REMOVED***
-	if length < 16320 ***REMOVED***
+	}
+	if length < 16320 {
 		length -= 192
 		to[0] = byte((length >> 8) + 192)
 		to[1] = byte(length)
 		return 2
-	***REMOVED***
+	}
 	to[0] = 255
 	to[1] = byte(length >> 24)
 	to[2] = byte(length >> 16)
 	to[3] = byte(length >> 8)
 	to[4] = byte(length)
 	return 5
-***REMOVED***
+}
 
 // subpacketsLength returns the serialized length, in bytes, of the given
 // subpackets.
-func subpacketsLength(subpackets []outputSubpacket, hashed bool) (length int) ***REMOVED***
-	for _, subpacket := range subpackets ***REMOVED***
-		if subpacket.hashed == hashed ***REMOVED***
+func subpacketsLength(subpackets []outputSubpacket, hashed bool) (length int) {
+	for _, subpacket := range subpackets {
+		if subpacket.hashed == hashed {
 			length += subpacketLengthLength(len(subpacket.contents) + 1)
 			length += 1 // type byte
 			length += len(subpacket.contents)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}
 
 // serializeSubpackets marshals the given subpackets into to.
-func serializeSubpackets(to []byte, subpackets []outputSubpacket, hashed bool) ***REMOVED***
-	for _, subpacket := range subpackets ***REMOVED***
-		if subpacket.hashed == hashed ***REMOVED***
+func serializeSubpackets(to []byte, subpackets []outputSubpacket, hashed bool) {
+	for _, subpacket := range subpackets {
+		if subpacket.hashed == hashed {
 			n := serializeSubpacketLength(to, len(subpacket.contents)+1)
 			to[n] = byte(subpacket.subpacketType)
 			to = to[1+n:]
 			n = copy(to, subpacket.contents)
 			to = to[n:]
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}
 
 // KeyExpired returns whether sig is a self-signature of a key that has
 // expired.
-func (sig *Signature) KeyExpired(currentTime time.Time) bool ***REMOVED***
-	if sig.KeyLifetimeSecs == nil ***REMOVED***
+func (sig *Signature) KeyExpired(currentTime time.Time) bool {
+	if sig.KeyLifetimeSecs == nil {
 		return false
-	***REMOVED***
+	}
 	expiry := sig.CreationTime.Add(time.Duration(*sig.KeyLifetimeSecs) * time.Second)
 	return currentTime.After(expiry)
-***REMOVED***
+}
 
 // buildHashSuffix constructs the HashSuffix member of sig in preparation for signing.
-func (sig *Signature) buildHashSuffix() (err error) ***REMOVED***
+func (sig *Signature) buildHashSuffix() (err error) {
 	hashedSubpacketsLen := subpacketsLength(sig.outSubpackets, true)
 
 	var ok bool
@@ -475,10 +475,10 @@ func (sig *Signature) buildHashSuffix() (err error) ***REMOVED***
 	sig.HashSuffix[1] = uint8(sig.SigType)
 	sig.HashSuffix[2] = uint8(sig.PubKeyAlgo)
 	sig.HashSuffix[3], ok = s2k.HashToHashId(sig.Hash)
-	if !ok ***REMOVED***
+	if !ok {
 		sig.HashSuffix = nil
 		return errors.InvalidArgumentError("hash cannot be represented in OpenPGP: " + strconv.Itoa(int(sig.Hash)))
-	***REMOVED***
+	}
 	sig.HashSuffix[4] = byte(hashedSubpacketsLen >> 8)
 	sig.HashSuffix[5] = byte(hashedSubpacketsLen)
 	serializeSubpackets(sig.HashSuffix[6:l], sig.outSubpackets, true)
@@ -490,32 +490,32 @@ func (sig *Signature) buildHashSuffix() (err error) ***REMOVED***
 	trailer[4] = byte(l >> 8)
 	trailer[5] = byte(l)
 	return
-***REMOVED***
+}
 
-func (sig *Signature) signPrepareHash(h hash.Hash) (digest []byte, err error) ***REMOVED***
+func (sig *Signature) signPrepareHash(h hash.Hash) (digest []byte, err error) {
 	err = sig.buildHashSuffix()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
 	h.Write(sig.HashSuffix)
 	digest = h.Sum(nil)
 	copy(sig.HashTag[:], digest)
 	return
-***REMOVED***
+}
 
 // Sign signs a message with a private key. The hash, h, must contain
 // the hash of the message to be signed and will be mutated by this function.
 // On success, the signature is stored in sig. Call Serialize to write it out.
 // If config is nil, sensible defaults will be used.
-func (sig *Signature) Sign(h hash.Hash, priv *PrivateKey, config *Config) (err error) ***REMOVED***
+func (sig *Signature) Sign(h hash.Hash, priv *PrivateKey, config *Config) (err error) {
 	sig.outSubpackets = sig.buildSubpackets()
 	digest, err := sig.signPrepareHash(h)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
-	switch priv.PubKeyAlgo ***REMOVED***
+	switch priv.PubKeyAlgo {
 	case PubKeyAlgoRSA, PubKeyAlgoRSASignOnly:
 		// supports both *rsa.PrivateKey and crypto.Signer
 		sig.RSASignature.bytes, err = priv.PrivateKey.(crypto.Signer).Sign(config.Random(), digest, sig.Hash)
@@ -525,87 +525,87 @@ func (sig *Signature) Sign(h hash.Hash, priv *PrivateKey, config *Config) (err e
 
 		// Need to truncate hashBytes to match FIPS 186-3 section 4.6.
 		subgroupSize := (dsaPriv.Q.BitLen() + 7) / 8
-		if len(digest) > subgroupSize ***REMOVED***
+		if len(digest) > subgroupSize {
 			digest = digest[:subgroupSize]
-		***REMOVED***
+		}
 		r, s, err := dsa.Sign(config.Random(), dsaPriv, digest)
-		if err == nil ***REMOVED***
+		if err == nil {
 			sig.DSASigR.bytes = r.Bytes()
 			sig.DSASigR.bitLength = uint16(8 * len(sig.DSASigR.bytes))
 			sig.DSASigS.bytes = s.Bytes()
 			sig.DSASigS.bitLength = uint16(8 * len(sig.DSASigS.bytes))
-		***REMOVED***
+		}
 	case PubKeyAlgoECDSA:
 		var r, s *big.Int
-		if pk, ok := priv.PrivateKey.(*ecdsa.PrivateKey); ok ***REMOVED***
+		if pk, ok := priv.PrivateKey.(*ecdsa.PrivateKey); ok {
 			// direct support, avoid asn1 wrapping/unwrapping
 			r, s, err = ecdsa.Sign(config.Random(), pk, digest)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			var b []byte
 			b, err = priv.PrivateKey.(crypto.Signer).Sign(config.Random(), digest, nil)
-			if err == nil ***REMOVED***
+			if err == nil {
 				r, s, err = unwrapECDSASig(b)
-			***REMOVED***
-		***REMOVED***
-		if err == nil ***REMOVED***
+			}
+		}
+		if err == nil {
 			sig.ECDSASigR = fromBig(r)
 			sig.ECDSASigS = fromBig(s)
-		***REMOVED***
+		}
 	default:
 		err = errors.UnsupportedError("public key algorithm: " + strconv.Itoa(int(sig.PubKeyAlgo)))
-	***REMOVED***
+	}
 
 	return
-***REMOVED***
+}
 
 // unwrapECDSASig parses the two integer components of an ASN.1-encoded ECDSA
 // signature.
-func unwrapECDSASig(b []byte) (r, s *big.Int, err error) ***REMOVED***
-	var ecsdaSig struct ***REMOVED***
+func unwrapECDSASig(b []byte) (r, s *big.Int, err error) {
+	var ecsdaSig struct {
 		R, S *big.Int
-	***REMOVED***
+	}
 	_, err = asn1.Unmarshal(b, &ecsdaSig)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	return ecsdaSig.R, ecsdaSig.S, nil
-***REMOVED***
+}
 
 // SignUserId computes a signature from priv, asserting that pub is a valid
 // key for the identity id.  On success, the signature is stored in sig. Call
 // Serialize to write it out.
 // If config is nil, sensible defaults will be used.
-func (sig *Signature) SignUserId(id string, pub *PublicKey, priv *PrivateKey, config *Config) error ***REMOVED***
+func (sig *Signature) SignUserId(id string, pub *PublicKey, priv *PrivateKey, config *Config) error {
 	h, err := userIdSignatureHash(id, pub, sig.Hash)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return sig.Sign(h, priv, config)
-***REMOVED***
+}
 
 // SignKey computes a signature from priv, asserting that pub is a subkey. On
 // success, the signature is stored in sig. Call Serialize to write it out.
 // If config is nil, sensible defaults will be used.
-func (sig *Signature) SignKey(pub *PublicKey, priv *PrivateKey, config *Config) error ***REMOVED***
+func (sig *Signature) SignKey(pub *PublicKey, priv *PrivateKey, config *Config) error {
 	h, err := keySignatureHash(&priv.PublicKey, pub, sig.Hash)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return sig.Sign(h, priv, config)
-***REMOVED***
+}
 
 // Serialize marshals sig to w. Sign, SignUserId or SignKey must have been
 // called first.
-func (sig *Signature) Serialize(w io.Writer) (err error) ***REMOVED***
-	if len(sig.outSubpackets) == 0 ***REMOVED***
+func (sig *Signature) Serialize(w io.Writer) (err error) {
+	if len(sig.outSubpackets) == 0 {
 		sig.outSubpackets = sig.rawSubpackets
-	***REMOVED***
-	if sig.RSASignature.bytes == nil && sig.DSASigR.bytes == nil && sig.ECDSASigR.bytes == nil ***REMOVED***
+	}
+	if sig.RSASignature.bytes == nil && sig.DSASigR.bytes == nil && sig.ECDSASigR.bytes == nil {
 		return errors.InvalidArgumentError("Signature: need to call Sign, SignUserId or SignKey before Serialize")
-	***REMOVED***
+	}
 
 	sigLength := 0
-	switch sig.PubKeyAlgo ***REMOVED***
+	switch sig.PubKeyAlgo {
 	case PubKeyAlgoRSA, PubKeyAlgoRSASignOnly:
 		sigLength = 2 + len(sig.RSASignature.bytes)
 	case PubKeyAlgoDSA:
@@ -616,21 +616,21 @@ func (sig *Signature) Serialize(w io.Writer) (err error) ***REMOVED***
 		sigLength += 2 + len(sig.ECDSASigS.bytes)
 	default:
 		panic("impossible")
-	***REMOVED***
+	}
 
 	unhashedSubpacketsLen := subpacketsLength(sig.outSubpackets, false)
 	length := len(sig.HashSuffix) - 6 /* trailer not included */ +
 		2 /* length of unhashed subpackets */ + unhashedSubpacketsLen +
 		2 /* hash tag */ + sigLength
 	err = serializeHeader(w, packetTypeSignature, length)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
 	_, err = w.Write(sig.HashSuffix[:len(sig.HashSuffix)-6])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
 	unhashedSubpackets := make([]byte, 2+unhashedSubpacketsLen)
 	unhashedSubpackets[0] = byte(unhashedSubpacketsLen >> 8)
@@ -638,15 +638,15 @@ func (sig *Signature) Serialize(w io.Writer) (err error) ***REMOVED***
 	serializeSubpackets(unhashedSubpackets[2:], sig.outSubpackets, false)
 
 	_, err = w.Write(unhashedSubpackets)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	_, err = w.Write(sig.HashTag[:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
-	switch sig.PubKeyAlgo ***REMOVED***
+	switch sig.PubKeyAlgo {
 	case PubKeyAlgoRSA, PubKeyAlgoRSASignOnly:
 		err = writeMPIs(w, sig.RSASignature)
 	case PubKeyAlgoDSA:
@@ -655,77 +655,77 @@ func (sig *Signature) Serialize(w io.Writer) (err error) ***REMOVED***
 		err = writeMPIs(w, sig.ECDSASigR, sig.ECDSASigS)
 	default:
 		panic("impossible")
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // outputSubpacket represents a subpacket to be marshaled.
-type outputSubpacket struct ***REMOVED***
+type outputSubpacket struct {
 	hashed        bool // true if this subpacket is in the hashed area.
 	subpacketType signatureSubpacketType
 	isCritical    bool
 	contents      []byte
-***REMOVED***
+}
 
-func (sig *Signature) buildSubpackets() (subpackets []outputSubpacket) ***REMOVED***
+func (sig *Signature) buildSubpackets() (subpackets []outputSubpacket) {
 	creationTime := make([]byte, 4)
 	binary.BigEndian.PutUint32(creationTime, uint32(sig.CreationTime.Unix()))
-	subpackets = append(subpackets, outputSubpacket***REMOVED***true, creationTimeSubpacket, false, creationTime***REMOVED***)
+	subpackets = append(subpackets, outputSubpacket{true, creationTimeSubpacket, false, creationTime})
 
-	if sig.IssuerKeyId != nil ***REMOVED***
+	if sig.IssuerKeyId != nil {
 		keyId := make([]byte, 8)
 		binary.BigEndian.PutUint64(keyId, *sig.IssuerKeyId)
-		subpackets = append(subpackets, outputSubpacket***REMOVED***true, issuerSubpacket, false, keyId***REMOVED***)
-	***REMOVED***
+		subpackets = append(subpackets, outputSubpacket{true, issuerSubpacket, false, keyId})
+	}
 
-	if sig.SigLifetimeSecs != nil && *sig.SigLifetimeSecs != 0 ***REMOVED***
+	if sig.SigLifetimeSecs != nil && *sig.SigLifetimeSecs != 0 {
 		sigLifetime := make([]byte, 4)
 		binary.BigEndian.PutUint32(sigLifetime, *sig.SigLifetimeSecs)
-		subpackets = append(subpackets, outputSubpacket***REMOVED***true, signatureExpirationSubpacket, true, sigLifetime***REMOVED***)
-	***REMOVED***
+		subpackets = append(subpackets, outputSubpacket{true, signatureExpirationSubpacket, true, sigLifetime})
+	}
 
 	// Key flags may only appear in self-signatures or certification signatures.
 
-	if sig.FlagsValid ***REMOVED***
+	if sig.FlagsValid {
 		var flags byte
-		if sig.FlagCertify ***REMOVED***
+		if sig.FlagCertify {
 			flags |= KeyFlagCertify
-		***REMOVED***
-		if sig.FlagSign ***REMOVED***
+		}
+		if sig.FlagSign {
 			flags |= KeyFlagSign
-		***REMOVED***
-		if sig.FlagEncryptCommunications ***REMOVED***
+		}
+		if sig.FlagEncryptCommunications {
 			flags |= KeyFlagEncryptCommunications
-		***REMOVED***
-		if sig.FlagEncryptStorage ***REMOVED***
+		}
+		if sig.FlagEncryptStorage {
 			flags |= KeyFlagEncryptStorage
-		***REMOVED***
-		subpackets = append(subpackets, outputSubpacket***REMOVED***true, keyFlagsSubpacket, false, []byte***REMOVED***flags***REMOVED******REMOVED***)
-	***REMOVED***
+		}
+		subpackets = append(subpackets, outputSubpacket{true, keyFlagsSubpacket, false, []byte{flags}})
+	}
 
 	// The following subpackets may only appear in self-signatures
 
-	if sig.KeyLifetimeSecs != nil && *sig.KeyLifetimeSecs != 0 ***REMOVED***
+	if sig.KeyLifetimeSecs != nil && *sig.KeyLifetimeSecs != 0 {
 		keyLifetime := make([]byte, 4)
 		binary.BigEndian.PutUint32(keyLifetime, *sig.KeyLifetimeSecs)
-		subpackets = append(subpackets, outputSubpacket***REMOVED***true, keyExpirationSubpacket, true, keyLifetime***REMOVED***)
-	***REMOVED***
+		subpackets = append(subpackets, outputSubpacket{true, keyExpirationSubpacket, true, keyLifetime})
+	}
 
-	if sig.IsPrimaryId != nil && *sig.IsPrimaryId ***REMOVED***
-		subpackets = append(subpackets, outputSubpacket***REMOVED***true, primaryUserIdSubpacket, false, []byte***REMOVED***1***REMOVED******REMOVED***)
-	***REMOVED***
+	if sig.IsPrimaryId != nil && *sig.IsPrimaryId {
+		subpackets = append(subpackets, outputSubpacket{true, primaryUserIdSubpacket, false, []byte{1}})
+	}
 
-	if len(sig.PreferredSymmetric) > 0 ***REMOVED***
-		subpackets = append(subpackets, outputSubpacket***REMOVED***true, prefSymmetricAlgosSubpacket, false, sig.PreferredSymmetric***REMOVED***)
-	***REMOVED***
+	if len(sig.PreferredSymmetric) > 0 {
+		subpackets = append(subpackets, outputSubpacket{true, prefSymmetricAlgosSubpacket, false, sig.PreferredSymmetric})
+	}
 
-	if len(sig.PreferredHash) > 0 ***REMOVED***
-		subpackets = append(subpackets, outputSubpacket***REMOVED***true, prefHashAlgosSubpacket, false, sig.PreferredHash***REMOVED***)
-	***REMOVED***
+	if len(sig.PreferredHash) > 0 {
+		subpackets = append(subpackets, outputSubpacket{true, prefHashAlgosSubpacket, false, sig.PreferredHash})
+	}
 
-	if len(sig.PreferredCompression) > 0 ***REMOVED***
-		subpackets = append(subpackets, outputSubpacket***REMOVED***true, prefCompressionSubpacket, false, sig.PreferredCompression***REMOVED***)
-	***REMOVED***
+	if len(sig.PreferredCompression) > 0 {
+		subpackets = append(subpackets, outputSubpacket{true, prefCompressionSubpacket, false, sig.PreferredCompression})
+	}
 
 	return
-***REMOVED***
+}

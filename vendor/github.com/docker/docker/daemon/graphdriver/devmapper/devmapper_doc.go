@@ -2,7 +2,7 @@ package devmapper
 
 // Definition of struct dm_task and sub structures (from lvm2)
 //
-// struct dm_ioctl ***REMOVED***
+// struct dm_ioctl {
 // 	/*
 // 	 * The version number is made up of three parts:
 // 	 * major - no backward or forward compatibility,
@@ -46,23 +46,23 @@ package devmapper
 // 	char uuid[DM_UUID_LEN];	/* unique identifier for
 // 				 * the block device */
 // 	char data[7];		/* padding or data */
-// ***REMOVED***;
+// };
 
-// struct target ***REMOVED***
+// struct target {
 // 	uint64_t start;
 // 	uint64_t length;
 // 	char *type;
 // 	char *params;
 
 // 	struct target *next;
-// ***REMOVED***;
+// };
 
-// typedef enum ***REMOVED***
+// typedef enum {
 // 	DM_ADD_NODE_ON_RESUME, /* add /dev/mapper node with dmsetup resume */
 // 	DM_ADD_NODE_ON_CREATE  /* add /dev/mapper node with dmsetup create */
-// ***REMOVED*** dm_add_node_t;
+// } dm_add_node_t;
 
-// struct dm_task ***REMOVED***
+// struct dm_task {
 // 	int type;
 // 	char *dev_name;
 // 	char *mangled_dev_name;
@@ -79,9 +79,9 @@ package devmapper
 // 	mode_t mode;
 // 	uint32_t read_ahead;
 // 	uint32_t read_ahead_flags;
-// 	union ***REMOVED***
+// 	union {
 // 		struct dm_ioctl *v4;
-// 	***REMOVED*** dmi;
+// 	} dmi;
 // 	char *newname;
 // 	char *message;
 // 	char *geometry;
@@ -102,5 +102,5 @@ package devmapper
 
 // 	char *uuid;
 // 	char *mangled_uuid;
-// ***REMOVED***;
+// };
 //

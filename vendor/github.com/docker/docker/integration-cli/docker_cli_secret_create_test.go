@@ -12,36 +12,36 @@ import (
 	"github.com/go-check/check"
 )
 
-func (s *DockerSwarmSuite) TestSecretCreate(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestSecretCreate(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 
 	testName := "test_secret"
-	id := d.CreateSecret(c, swarm.SecretSpec***REMOVED***
-		Annotations: swarm.Annotations***REMOVED***
+	id := d.CreateSecret(c, swarm.SecretSpec{
+		Annotations: swarm.Annotations{
 			Name: testName,
-		***REMOVED***,
+		},
 		Data: []byte("TESTINGDATA"),
-	***REMOVED***)
+	})
 	c.Assert(id, checker.Not(checker.Equals), "", check.Commentf("secrets: %s", id))
 
 	secret := d.GetSecret(c, id)
 	c.Assert(secret.Spec.Name, checker.Equals, testName)
-***REMOVED***
+}
 
-func (s *DockerSwarmSuite) TestSecretCreateWithLabels(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestSecretCreateWithLabels(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 
 	testName := "test_secret"
-	id := d.CreateSecret(c, swarm.SecretSpec***REMOVED***
-		Annotations: swarm.Annotations***REMOVED***
+	id := d.CreateSecret(c, swarm.SecretSpec{
+		Annotations: swarm.Annotations{
 			Name: testName,
-			Labels: map[string]string***REMOVED***
+			Labels: map[string]string{
 				"key1": "value1",
 				"key2": "value2",
-			***REMOVED***,
-		***REMOVED***,
+			},
+		},
 		Data: []byte("TESTINGDATA"),
-	***REMOVED***)
+	})
 	c.Assert(id, checker.Not(checker.Equals), "", check.Commentf("secrets: %s", id))
 
 	secret := d.GetSecret(c, id)
@@ -49,27 +49,27 @@ func (s *DockerSwarmSuite) TestSecretCreateWithLabels(c *check.C) ***REMOVED***
 	c.Assert(len(secret.Spec.Labels), checker.Equals, 2)
 	c.Assert(secret.Spec.Labels["key1"], checker.Equals, "value1")
 	c.Assert(secret.Spec.Labels["key2"], checker.Equals, "value2")
-***REMOVED***
+}
 
 // Test case for 28884
-func (s *DockerSwarmSuite) TestSecretCreateResolve(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestSecretCreateResolve(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 
 	name := "test_secret"
-	id := d.CreateSecret(c, swarm.SecretSpec***REMOVED***
-		Annotations: swarm.Annotations***REMOVED***
+	id := d.CreateSecret(c, swarm.SecretSpec{
+		Annotations: swarm.Annotations{
 			Name: name,
-		***REMOVED***,
+		},
 		Data: []byte("foo"),
-	***REMOVED***)
+	})
 	c.Assert(id, checker.Not(checker.Equals), "", check.Commentf("secrets: %s", id))
 
-	fake := d.CreateSecret(c, swarm.SecretSpec***REMOVED***
-		Annotations: swarm.Annotations***REMOVED***
+	fake := d.CreateSecret(c, swarm.SecretSpec{
+		Annotations: swarm.Annotations{
 			Name: id,
-		***REMOVED***,
+		},
 		Data: []byte("fake foo"),
-	***REMOVED***)
+	})
 	c.Assert(fake, checker.Not(checker.Equals), "", check.Commentf("secrets: %s", fake))
 
 	out, err := d.Cmd("secret", "ls")
@@ -107,9 +107,9 @@ func (s *DockerSwarmSuite) TestSecretCreateResolve(c *check.C) ***REMOVED***
 	c.Assert(out, checker.Not(checker.Contains), name)
 	c.Assert(out, checker.Not(checker.Contains), id)
 	c.Assert(out, checker.Not(checker.Contains), fake)
-***REMOVED***
+}
 
-func (s *DockerSwarmSuite) TestSecretCreateWithFile(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestSecretCreateWithFile(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 
 	testFile, err := ioutil.TempFile("", "secretCreateTest")
@@ -128,4 +128,4 @@ func (s *DockerSwarmSuite) TestSecretCreateWithFile(c *check.C) ***REMOVED***
 	id := strings.TrimSpace(out)
 	secret := d.GetSecret(c, id)
 	c.Assert(secret.Spec.Name, checker.Equals, testName)
-***REMOVED***
+}

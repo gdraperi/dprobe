@@ -42,47 +42,47 @@ const (
 	HealthCheckResponse_NOT_SERVING HealthCheckResponse_ServingStatus = 2
 )
 
-var HealthCheckResponse_ServingStatus_name = map[int32]string***REMOVED***
+var HealthCheckResponse_ServingStatus_name = map[int32]string{
 	0: "UNKNOWN",
 	1: "SERVING",
 	2: "NOT_SERVING",
-***REMOVED***
-var HealthCheckResponse_ServingStatus_value = map[string]int32***REMOVED***
+}
+var HealthCheckResponse_ServingStatus_value = map[string]int32{
 	"UNKNOWN":     0,
 	"SERVING":     1,
 	"NOT_SERVING": 2,
-***REMOVED***
+}
 
-func (x HealthCheckResponse_ServingStatus) String() string ***REMOVED***
+func (x HealthCheckResponse_ServingStatus) String() string {
 	return proto.EnumName(HealthCheckResponse_ServingStatus_name, int32(x))
-***REMOVED***
-func (HealthCheckResponse_ServingStatus) EnumDescriptor() ([]byte, []int) ***REMOVED***
-	return fileDescriptor0, []int***REMOVED***1, 0***REMOVED***
-***REMOVED***
+}
+func (HealthCheckResponse_ServingStatus) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor0, []int{1, 0}
+}
 
-type HealthCheckRequest struct ***REMOVED***
+type HealthCheckRequest struct {
 	Service string `protobuf:"bytes,1,opt,name=service" json:"service,omitempty"`
-***REMOVED***
+}
 
-func (m *HealthCheckRequest) Reset()                    ***REMOVED*** *m = HealthCheckRequest***REMOVED******REMOVED*** ***REMOVED***
-func (m *HealthCheckRequest) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*HealthCheckRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*HealthCheckRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***0***REMOVED*** ***REMOVED***
+func (m *HealthCheckRequest) Reset()                    { *m = HealthCheckRequest{} }
+func (m *HealthCheckRequest) String() string            { return proto.CompactTextString(m) }
+func (*HealthCheckRequest) ProtoMessage()               {}
+func (*HealthCheckRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
-type HealthCheckResponse struct ***REMOVED***
+type HealthCheckResponse struct {
 	Status HealthCheckResponse_ServingStatus `protobuf:"varint,1,opt,name=status,enum=grpc.health.v1.HealthCheckResponse_ServingStatus" json:"status,omitempty"`
-***REMOVED***
+}
 
-func (m *HealthCheckResponse) Reset()                    ***REMOVED*** *m = HealthCheckResponse***REMOVED******REMOVED*** ***REMOVED***
-func (m *HealthCheckResponse) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*HealthCheckResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*HealthCheckResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***1***REMOVED*** ***REMOVED***
+func (m *HealthCheckResponse) Reset()                    { *m = HealthCheckResponse{} }
+func (m *HealthCheckResponse) String() string            { return proto.CompactTextString(m) }
+func (*HealthCheckResponse) ProtoMessage()               {}
+func (*HealthCheckResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*HealthCheckRequest)(nil), "grpc.health.v1.HealthCheckRequest")
 	proto.RegisterType((*HealthCheckResponse)(nil), "grpc.health.v1.HealthCheckResponse")
 	proto.RegisterEnum("grpc.health.v1.HealthCheckResponse_ServingStatus", HealthCheckResponse_ServingStatus_name, HealthCheckResponse_ServingStatus_value)
-***REMOVED***
+}
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
@@ -94,71 +94,71 @@ const _ = grpc.SupportPackageIsVersion4
 
 // Client API for Health service
 
-type HealthClient interface ***REMOVED***
+type HealthClient interface {
 	Check(ctx context.Context, in *HealthCheckRequest, opts ...grpc.CallOption) (*HealthCheckResponse, error)
-***REMOVED***
+}
 
-type healthClient struct ***REMOVED***
+type healthClient struct {
 	cc *grpc.ClientConn
-***REMOVED***
+}
 
-func NewHealthClient(cc *grpc.ClientConn) HealthClient ***REMOVED***
-	return &healthClient***REMOVED***cc***REMOVED***
-***REMOVED***
+func NewHealthClient(cc *grpc.ClientConn) HealthClient {
+	return &healthClient{cc}
+}
 
-func (c *healthClient) Check(ctx context.Context, in *HealthCheckRequest, opts ...grpc.CallOption) (*HealthCheckResponse, error) ***REMOVED***
+func (c *healthClient) Check(ctx context.Context, in *HealthCheckRequest, opts ...grpc.CallOption) (*HealthCheckResponse, error) {
 	out := new(HealthCheckResponse)
 	err := grpc.Invoke(ctx, "/grpc.health.v1.Health/Check", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
 // Server API for Health service
 
-type HealthServer interface ***REMOVED***
+type HealthServer interface {
 	Check(context.Context, *HealthCheckRequest) (*HealthCheckResponse, error)
-***REMOVED***
+}
 
-func RegisterHealthServer(s *grpc.Server, srv HealthServer) ***REMOVED***
+func RegisterHealthServer(s *grpc.Server, srv HealthServer) {
 	s.RegisterService(&_Health_serviceDesc, srv)
-***REMOVED***
+}
 
-func _Health_Check_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _Health_Check_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(HealthCheckRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(HealthServer).Check(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/grpc.health.v1.Health/Check",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(HealthServer).Check(ctx, req.(*HealthCheckRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-var _Health_serviceDesc = grpc.ServiceDesc***REMOVED***
+var _Health_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "grpc.health.v1.Health",
 	HandlerType: (*HealthServer)(nil),
-	Methods: []grpc.MethodDesc***REMOVED***
-		***REMOVED***
+	Methods: []grpc.MethodDesc{
+		{
 			MethodName: "Check",
 			Handler:    _Health_Check_Handler,
-		***REMOVED***,
-	***REMOVED***,
-	Streams:  []grpc.StreamDesc***REMOVED******REMOVED***,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
 	Metadata: "health.proto",
-***REMOVED***
+}
 
-func init() ***REMOVED*** proto.RegisterFile("health.proto", fileDescriptor0) ***REMOVED***
+func init() { proto.RegisterFile("health.proto", fileDescriptor0) }
 
-var fileDescriptor0 = []byte***REMOVED***
+var fileDescriptor0 = []byte{
 	// 204 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xe2, 0xe2, 0xc9, 0x48, 0x4d, 0xcc,
 	0x29, 0xc9, 0xd0, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0xe2, 0x4b, 0x2f, 0x2a, 0x48, 0xd6, 0x83,
@@ -173,4 +173,4 @@ var fileDescriptor0 = []byte***REMOVED***
 	0x60, 0x32, 0x8a, 0xe2, 0x62, 0x83, 0x58, 0x24, 0x14, 0xc0, 0xc5, 0x0a, 0xb6, 0x4c, 0x48, 0x09,
 	0xaf, 0x4b, 0xc0, 0xfe, 0x95, 0x52, 0x26, 0xc2, 0xb5, 0x49, 0x6c, 0xe0, 0x10, 0x34, 0x06, 0x04,
 	0x00, 0x00, 0xff, 0xff, 0xac, 0x56, 0x2a, 0xcb, 0x51, 0x01, 0x00, 0x00,
-***REMOVED***
+}

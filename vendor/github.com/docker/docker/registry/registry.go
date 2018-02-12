@@ -25,167 +25,167 @@ var (
 	ErrAlreadyExists = errors.New("Image already exists")
 )
 
-func newTLSConfig(hostname string, isSecure bool) (*tls.Config, error) ***REMOVED***
+func newTLSConfig(hostname string, isSecure bool) (*tls.Config, error) {
 	// PreferredServerCipherSuites should have no effect
 	tlsConfig := tlsconfig.ServerDefault()
 
 	tlsConfig.InsecureSkipVerify = !isSecure
 
-	if isSecure && CertsDir != "" ***REMOVED***
+	if isSecure && CertsDir != "" {
 		hostDir := filepath.Join(CertsDir, cleanPath(hostname))
 		logrus.Debugf("hostDir: %s", hostDir)
-		if err := ReadCertsDirectory(tlsConfig, hostDir); err != nil ***REMOVED***
+		if err := ReadCertsDirectory(tlsConfig, hostDir); err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return tlsConfig, nil
-***REMOVED***
+}
 
-func hasFile(files []os.FileInfo, name string) bool ***REMOVED***
-	for _, f := range files ***REMOVED***
-		if f.Name() == name ***REMOVED***
+func hasFile(files []os.FileInfo, name string) bool {
+	for _, f := range files {
+		if f.Name() == name {
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false
-***REMOVED***
+}
 
 // ReadCertsDirectory reads the directory for TLS certificates
 // including roots and certificate pairs and updates the
 // provided TLS configuration.
-func ReadCertsDirectory(tlsConfig *tls.Config, directory string) error ***REMOVED***
+func ReadCertsDirectory(tlsConfig *tls.Config, directory string) error {
 	fs, err := ioutil.ReadDir(directory)
-	if err != nil && !os.IsNotExist(err) ***REMOVED***
+	if err != nil && !os.IsNotExist(err) {
 		return err
-	***REMOVED***
+	}
 
-	for _, f := range fs ***REMOVED***
-		if strings.HasSuffix(f.Name(), ".crt") ***REMOVED***
-			if tlsConfig.RootCAs == nil ***REMOVED***
+	for _, f := range fs {
+		if strings.HasSuffix(f.Name(), ".crt") {
+			if tlsConfig.RootCAs == nil {
 				systemPool, err := tlsconfig.SystemCertPool()
-				if err != nil ***REMOVED***
+				if err != nil {
 					return fmt.Errorf("unable to get system cert pool: %v", err)
-				***REMOVED***
+				}
 				tlsConfig.RootCAs = systemPool
-			***REMOVED***
+			}
 			logrus.Debugf("crt: %s", filepath.Join(directory, f.Name()))
 			data, err := ioutil.ReadFile(filepath.Join(directory, f.Name()))
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
+			}
 			tlsConfig.RootCAs.AppendCertsFromPEM(data)
-		***REMOVED***
-		if strings.HasSuffix(f.Name(), ".cert") ***REMOVED***
+		}
+		if strings.HasSuffix(f.Name(), ".cert") {
 			certName := f.Name()
 			keyName := certName[:len(certName)-5] + ".key"
 			logrus.Debugf("cert: %s", filepath.Join(directory, f.Name()))
-			if !hasFile(fs, keyName) ***REMOVED***
+			if !hasFile(fs, keyName) {
 				return fmt.Errorf("missing key %s for client certificate %s. Note that CA certificates should use the extension .crt", keyName, certName)
-			***REMOVED***
+			}
 			cert, err := tls.LoadX509KeyPair(filepath.Join(directory, certName), filepath.Join(directory, keyName))
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
+			}
 			tlsConfig.Certificates = append(tlsConfig.Certificates, cert)
-		***REMOVED***
-		if strings.HasSuffix(f.Name(), ".key") ***REMOVED***
+		}
+		if strings.HasSuffix(f.Name(), ".key") {
 			keyName := f.Name()
 			certName := keyName[:len(keyName)-4] + ".cert"
 			logrus.Debugf("key: %s", filepath.Join(directory, f.Name()))
-			if !hasFile(fs, certName) ***REMOVED***
+			if !hasFile(fs, certName) {
 				return fmt.Errorf("Missing client certificate %s for key %s", certName, keyName)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
 // Headers returns request modifiers with a User-Agent and metaHeaders
-func Headers(userAgent string, metaHeaders http.Header) []transport.RequestModifier ***REMOVED***
-	modifiers := []transport.RequestModifier***REMOVED******REMOVED***
-	if userAgent != "" ***REMOVED***
-		modifiers = append(modifiers, transport.NewHeaderRequestModifier(http.Header***REMOVED***
-			"User-Agent": []string***REMOVED***userAgent***REMOVED***,
-		***REMOVED***))
-	***REMOVED***
-	if metaHeaders != nil ***REMOVED***
+func Headers(userAgent string, metaHeaders http.Header) []transport.RequestModifier {
+	modifiers := []transport.RequestModifier{}
+	if userAgent != "" {
+		modifiers = append(modifiers, transport.NewHeaderRequestModifier(http.Header{
+			"User-Agent": []string{userAgent},
+		}))
+	}
+	if metaHeaders != nil {
 		modifiers = append(modifiers, transport.NewHeaderRequestModifier(metaHeaders))
-	***REMOVED***
+	}
 	return modifiers
-***REMOVED***
+}
 
 // HTTPClient returns an HTTP client structure which uses the given transport
 // and contains the necessary headers for redirected requests
-func HTTPClient(transport http.RoundTripper) *http.Client ***REMOVED***
-	return &http.Client***REMOVED***
+func HTTPClient(transport http.RoundTripper) *http.Client {
+	return &http.Client{
 		Transport:     transport,
 		CheckRedirect: addRequiredHeadersToRedirectedRequests,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func trustedLocation(req *http.Request) bool ***REMOVED***
+func trustedLocation(req *http.Request) bool {
 	var (
-		trusteds = []string***REMOVED***"docker.com", "docker.io"***REMOVED***
+		trusteds = []string{"docker.com", "docker.io"}
 		hostname = strings.SplitN(req.Host, ":", 2)[0]
 	)
-	if req.URL.Scheme != "https" ***REMOVED***
+	if req.URL.Scheme != "https" {
 		return false
-	***REMOVED***
+	}
 
-	for _, trusted := range trusteds ***REMOVED***
-		if hostname == trusted || strings.HasSuffix(hostname, "."+trusted) ***REMOVED***
+	for _, trusted := range trusteds {
+		if hostname == trusted || strings.HasSuffix(hostname, "."+trusted) {
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false
-***REMOVED***
+}
 
 // addRequiredHeadersToRedirectedRequests adds the necessary redirection headers
 // for redirected requests
-func addRequiredHeadersToRedirectedRequests(req *http.Request, via []*http.Request) error ***REMOVED***
-	if via != nil && via[0] != nil ***REMOVED***
-		if trustedLocation(req) && trustedLocation(via[0]) ***REMOVED***
+func addRequiredHeadersToRedirectedRequests(req *http.Request, via []*http.Request) error {
+	if via != nil && via[0] != nil {
+		if trustedLocation(req) && trustedLocation(via[0]) {
 			req.Header = via[0].Header
 			return nil
-		***REMOVED***
-		for k, v := range via[0].Header ***REMOVED***
-			if k != "Authorization" ***REMOVED***
-				for _, vv := range v ***REMOVED***
+		}
+		for k, v := range via[0].Header {
+			if k != "Authorization" {
+				for _, vv := range v {
 					req.Header.Add(k, vv)
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+				}
+			}
+		}
+	}
 	return nil
-***REMOVED***
+}
 
 // NewTransport returns a new HTTP transport. If tlsConfig is nil, it uses the
 // default TLS configuration.
-func NewTransport(tlsConfig *tls.Config) *http.Transport ***REMOVED***
-	if tlsConfig == nil ***REMOVED***
+func NewTransport(tlsConfig *tls.Config) *http.Transport {
+	if tlsConfig == nil {
 		tlsConfig = tlsconfig.ServerDefault()
-	***REMOVED***
+	}
 
-	direct := &net.Dialer***REMOVED***
+	direct := &net.Dialer{
 		Timeout:   30 * time.Second,
 		KeepAlive: 30 * time.Second,
 		DualStack: true,
-	***REMOVED***
+	}
 
-	base := &http.Transport***REMOVED***
+	base := &http.Transport{
 		Proxy:               http.ProxyFromEnvironment,
 		Dial:                direct.Dial,
 		TLSHandshakeTimeout: 10 * time.Second,
 		TLSClientConfig:     tlsConfig,
 		// TODO(dmcgowan): Call close idle connections when complete and use keep alive
 		DisableKeepAlives: true,
-	***REMOVED***
+	}
 
 	proxyDialer, err := sockets.DialerFromEnvironment(direct)
-	if err == nil ***REMOVED***
+	if err == nil {
 		base.Dial = proxyDialer.Dial
-	***REMOVED***
+	}
 	return base
-***REMOVED***
+}

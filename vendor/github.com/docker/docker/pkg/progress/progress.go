@@ -5,7 +5,7 @@ import (
 )
 
 // Progress represents the progress of a transfer.
-type Progress struct ***REMOVED***
+type Progress struct {
 	ID string
 
 	// Progress contains a Message or...
@@ -23,67 +23,67 @@ type Progress struct ***REMOVED***
 
 	// Aux contains extra information not presented to the user, such as
 	// digests for push signing.
-	Aux interface***REMOVED******REMOVED***
+	Aux interface{}
 
 	LastUpdate bool
-***REMOVED***
+}
 
 // Output is an interface for writing progress information. It's
 // like a writer for progress, but we don't call it Writer because
 // that would be confusing next to ProgressReader (also, because it
 // doesn't implement the io.Writer interface).
-type Output interface ***REMOVED***
+type Output interface {
 	WriteProgress(Progress) error
-***REMOVED***
+}
 
 type chanOutput chan<- Progress
 
-func (out chanOutput) WriteProgress(p Progress) error ***REMOVED***
+func (out chanOutput) WriteProgress(p Progress) error {
 	out <- p
 	return nil
-***REMOVED***
+}
 
 // ChanOutput returns an Output that writes progress updates to the
 // supplied channel.
-func ChanOutput(progressChan chan<- Progress) Output ***REMOVED***
+func ChanOutput(progressChan chan<- Progress) Output {
 	return chanOutput(progressChan)
-***REMOVED***
+}
 
-type discardOutput struct***REMOVED******REMOVED***
+type discardOutput struct{}
 
-func (discardOutput) WriteProgress(Progress) error ***REMOVED***
+func (discardOutput) WriteProgress(Progress) error {
 	return nil
-***REMOVED***
+}
 
 // DiscardOutput returns an Output that discards progress
-func DiscardOutput() Output ***REMOVED***
-	return discardOutput***REMOVED******REMOVED***
-***REMOVED***
+func DiscardOutput() Output {
+	return discardOutput{}
+}
 
 // Update is a convenience function to write a progress update to the channel.
-func Update(out Output, id, action string) ***REMOVED***
-	out.WriteProgress(Progress***REMOVED***ID: id, Action: action***REMOVED***)
-***REMOVED***
+func Update(out Output, id, action string) {
+	out.WriteProgress(Progress{ID: id, Action: action})
+}
 
 // Updatef is a convenience function to write a printf-formatted progress update
 // to the channel.
-func Updatef(out Output, id, format string, a ...interface***REMOVED******REMOVED***) ***REMOVED***
+func Updatef(out Output, id, format string, a ...interface{}) {
 	Update(out, id, fmt.Sprintf(format, a...))
-***REMOVED***
+}
 
 // Message is a convenience function to write a progress message to the channel.
-func Message(out Output, id, message string) ***REMOVED***
-	out.WriteProgress(Progress***REMOVED***ID: id, Message: message***REMOVED***)
-***REMOVED***
+func Message(out Output, id, message string) {
+	out.WriteProgress(Progress{ID: id, Message: message})
+}
 
 // Messagef is a convenience function to write a printf-formatted progress
 // message to the channel.
-func Messagef(out Output, id, format string, a ...interface***REMOVED******REMOVED***) ***REMOVED***
+func Messagef(out Output, id, format string, a ...interface{}) {
 	Message(out, id, fmt.Sprintf(format, a...))
-***REMOVED***
+}
 
 // Aux sends auxiliary information over a progress interface, which will not be
 // formatted for the UI. This is used for things such as push signing.
-func Aux(out Output, a interface***REMOVED******REMOVED***) ***REMOVED***
-	out.WriteProgress(Progress***REMOVED***Aux: a***REMOVED***)
-***REMOVED***
+func Aux(out Output, a interface{}) {
+	out.WriteProgress(Progress{Aux: a})
+}

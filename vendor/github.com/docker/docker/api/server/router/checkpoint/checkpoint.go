@@ -6,31 +6,31 @@ import (
 )
 
 // checkpointRouter is a router to talk with the checkpoint controller
-type checkpointRouter struct ***REMOVED***
+type checkpointRouter struct {
 	backend Backend
 	decoder httputils.ContainerDecoder
 	routes  []router.Route
-***REMOVED***
+}
 
 // NewRouter initializes a new checkpoint router
-func NewRouter(b Backend, decoder httputils.ContainerDecoder) router.Router ***REMOVED***
-	r := &checkpointRouter***REMOVED***
+func NewRouter(b Backend, decoder httputils.ContainerDecoder) router.Router {
+	r := &checkpointRouter{
 		backend: b,
 		decoder: decoder,
-	***REMOVED***
+	}
 	r.initRoutes()
 	return r
-***REMOVED***
+}
 
 // Routes returns the available routers to the checkpoint controller
-func (r *checkpointRouter) Routes() []router.Route ***REMOVED***
+func (r *checkpointRouter) Routes() []router.Route {
 	return r.routes
-***REMOVED***
+}
 
-func (r *checkpointRouter) initRoutes() ***REMOVED***
-	r.routes = []router.Route***REMOVED***
-		router.NewGetRoute("/containers/***REMOVED***name:.****REMOVED***/checkpoints", r.getContainerCheckpoints, router.Experimental),
-		router.NewPostRoute("/containers/***REMOVED***name:.****REMOVED***/checkpoints", r.postContainerCheckpoint, router.Experimental),
-		router.NewDeleteRoute("/containers/***REMOVED***name***REMOVED***/checkpoints/***REMOVED***checkpoint***REMOVED***", r.deleteContainerCheckpoint, router.Experimental),
-	***REMOVED***
-***REMOVED***
+func (r *checkpointRouter) initRoutes() {
+	r.routes = []router.Route{
+		router.NewGetRoute("/containers/{name:.*}/checkpoints", r.getContainerCheckpoints, router.Experimental),
+		router.NewPostRoute("/containers/{name:.*}/checkpoints", r.postContainerCheckpoint, router.Experimental),
+		router.NewDeleteRoute("/containers/{name}/checkpoints/{checkpoint}", r.deleteContainerCheckpoint, router.Experimental),
+	}
+}

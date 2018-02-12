@@ -34,7 +34,7 @@ import (
 // Alternatively, you can use NewDefaultConfig to get a ConfigState instance
 // with default settings.  See the documentation of NewDefaultConfig for default
 // values.
-type ConfigState struct ***REMOVED***
+type ConfigState struct {
 	// Indent specifies the string to use for each indentation level.  The
 	// global config instance that all top-level functions use set this to a
 	// single space by default.  If you would like more indentation, you might
@@ -98,11 +98,11 @@ type ConfigState struct ***REMOVED***
 	// be spewed to strings and sorted by those strings.  This is only
 	// considered if SortKeys is true.
 	SpewKeys bool
-***REMOVED***
+}
 
 // Config is the active configuration of the top-level functions.
 // The configuration can be changed by modifying the contents of spew.Config.
-var Config = ConfigState***REMOVED***Indent: " "***REMOVED***
+var Config = ConfigState{Indent: " "}
 
 // Errorf is a wrapper for fmt.Errorf that treats each argument as if it were
 // passed with a Formatter interface returned by c.NewFormatter.  It returns
@@ -112,9 +112,9 @@ var Config = ConfigState***REMOVED***Indent: " "***REMOVED***
 // This function is shorthand for the following syntax:
 //
 //	fmt.Errorf(format, c.NewFormatter(a), c.NewFormatter(b))
-func (c *ConfigState) Errorf(format string, a ...interface***REMOVED******REMOVED***) (err error) ***REMOVED***
+func (c *ConfigState) Errorf(format string, a ...interface{}) (err error) {
 	return fmt.Errorf(format, c.convertArgs(a)...)
-***REMOVED***
+}
 
 // Fprint is a wrapper for fmt.Fprint that treats each argument as if it were
 // passed with a Formatter interface returned by c.NewFormatter.  It returns
@@ -124,9 +124,9 @@ func (c *ConfigState) Errorf(format string, a ...interface***REMOVED******REMOVE
 // This function is shorthand for the following syntax:
 //
 //	fmt.Fprint(w, c.NewFormatter(a), c.NewFormatter(b))
-func (c *ConfigState) Fprint(w io.Writer, a ...interface***REMOVED******REMOVED***) (n int, err error) ***REMOVED***
+func (c *ConfigState) Fprint(w io.Writer, a ...interface{}) (n int, err error) {
 	return fmt.Fprint(w, c.convertArgs(a)...)
-***REMOVED***
+}
 
 // Fprintf is a wrapper for fmt.Fprintf that treats each argument as if it were
 // passed with a Formatter interface returned by c.NewFormatter.  It returns
@@ -136,9 +136,9 @@ func (c *ConfigState) Fprint(w io.Writer, a ...interface***REMOVED******REMOVED*
 // This function is shorthand for the following syntax:
 //
 //	fmt.Fprintf(w, format, c.NewFormatter(a), c.NewFormatter(b))
-func (c *ConfigState) Fprintf(w io.Writer, format string, a ...interface***REMOVED******REMOVED***) (n int, err error) ***REMOVED***
+func (c *ConfigState) Fprintf(w io.Writer, format string, a ...interface{}) (n int, err error) {
 	return fmt.Fprintf(w, format, c.convertArgs(a)...)
-***REMOVED***
+}
 
 // Fprintln is a wrapper for fmt.Fprintln that treats each argument as if it
 // passed with a Formatter interface returned by c.NewFormatter.  See
@@ -147,9 +147,9 @@ func (c *ConfigState) Fprintf(w io.Writer, format string, a ...interface***REMOV
 // This function is shorthand for the following syntax:
 //
 //	fmt.Fprintln(w, c.NewFormatter(a), c.NewFormatter(b))
-func (c *ConfigState) Fprintln(w io.Writer, a ...interface***REMOVED******REMOVED***) (n int, err error) ***REMOVED***
+func (c *ConfigState) Fprintln(w io.Writer, a ...interface{}) (n int, err error) {
 	return fmt.Fprintln(w, c.convertArgs(a)...)
-***REMOVED***
+}
 
 // Print is a wrapper for fmt.Print that treats each argument as if it were
 // passed with a Formatter interface returned by c.NewFormatter.  It returns
@@ -159,9 +159,9 @@ func (c *ConfigState) Fprintln(w io.Writer, a ...interface***REMOVED******REMOVE
 // This function is shorthand for the following syntax:
 //
 //	fmt.Print(c.NewFormatter(a), c.NewFormatter(b))
-func (c *ConfigState) Print(a ...interface***REMOVED******REMOVED***) (n int, err error) ***REMOVED***
+func (c *ConfigState) Print(a ...interface{}) (n int, err error) {
 	return fmt.Print(c.convertArgs(a)...)
-***REMOVED***
+}
 
 // Printf is a wrapper for fmt.Printf that treats each argument as if it were
 // passed with a Formatter interface returned by c.NewFormatter.  It returns
@@ -171,9 +171,9 @@ func (c *ConfigState) Print(a ...interface***REMOVED******REMOVED***) (n int, er
 // This function is shorthand for the following syntax:
 //
 //	fmt.Printf(format, c.NewFormatter(a), c.NewFormatter(b))
-func (c *ConfigState) Printf(format string, a ...interface***REMOVED******REMOVED***) (n int, err error) ***REMOVED***
+func (c *ConfigState) Printf(format string, a ...interface{}) (n int, err error) {
 	return fmt.Printf(format, c.convertArgs(a)...)
-***REMOVED***
+}
 
 // Println is a wrapper for fmt.Println that treats each argument as if it were
 // passed with a Formatter interface returned by c.NewFormatter.  It returns
@@ -183,9 +183,9 @@ func (c *ConfigState) Printf(format string, a ...interface***REMOVED******REMOVE
 // This function is shorthand for the following syntax:
 //
 //	fmt.Println(c.NewFormatter(a), c.NewFormatter(b))
-func (c *ConfigState) Println(a ...interface***REMOVED******REMOVED***) (n int, err error) ***REMOVED***
+func (c *ConfigState) Println(a ...interface{}) (n int, err error) {
 	return fmt.Println(c.convertArgs(a)...)
-***REMOVED***
+}
 
 // Sprint is a wrapper for fmt.Sprint that treats each argument as if it were
 // passed with a Formatter interface returned by c.NewFormatter.  It returns
@@ -194,9 +194,9 @@ func (c *ConfigState) Println(a ...interface***REMOVED******REMOVED***) (n int, 
 // This function is shorthand for the following syntax:
 //
 //	fmt.Sprint(c.NewFormatter(a), c.NewFormatter(b))
-func (c *ConfigState) Sprint(a ...interface***REMOVED******REMOVED***) string ***REMOVED***
+func (c *ConfigState) Sprint(a ...interface{}) string {
 	return fmt.Sprint(c.convertArgs(a)...)
-***REMOVED***
+}
 
 // Sprintf is a wrapper for fmt.Sprintf that treats each argument as if it were
 // passed with a Formatter interface returned by c.NewFormatter.  It returns
@@ -205,9 +205,9 @@ func (c *ConfigState) Sprint(a ...interface***REMOVED******REMOVED***) string **
 // This function is shorthand for the following syntax:
 //
 //	fmt.Sprintf(format, c.NewFormatter(a), c.NewFormatter(b))
-func (c *ConfigState) Sprintf(format string, a ...interface***REMOVED******REMOVED***) string ***REMOVED***
+func (c *ConfigState) Sprintf(format string, a ...interface{}) string {
 	return fmt.Sprintf(format, c.convertArgs(a)...)
-***REMOVED***
+}
 
 // Sprintln is a wrapper for fmt.Sprintln that treats each argument as if it
 // were passed with a Formatter interface returned by c.NewFormatter.  It
@@ -216,9 +216,9 @@ func (c *ConfigState) Sprintf(format string, a ...interface***REMOVED******REMOV
 // This function is shorthand for the following syntax:
 //
 //	fmt.Sprintln(c.NewFormatter(a), c.NewFormatter(b))
-func (c *ConfigState) Sprintln(a ...interface***REMOVED******REMOVED***) string ***REMOVED***
+func (c *ConfigState) Sprintln(a ...interface{}) string {
 	return fmt.Sprintln(c.convertArgs(a)...)
-***REMOVED***
+}
 
 /*
 NewFormatter returns a custom formatter that satisfies the fmt.Formatter
@@ -237,15 +237,15 @@ Typically this function shouldn't be called directly.  It is much easier to make
 use of the custom formatter by calling one of the convenience functions such as
 c.Printf, c.Println, or c.Printf.
 */
-func (c *ConfigState) NewFormatter(v interface***REMOVED******REMOVED***) fmt.Formatter ***REMOVED***
+func (c *ConfigState) NewFormatter(v interface{}) fmt.Formatter {
 	return newFormatter(c, v)
-***REMOVED***
+}
 
 // Fdump formats and displays the passed arguments to io.Writer w.  It formats
 // exactly the same as Dump.
-func (c *ConfigState) Fdump(w io.Writer, a ...interface***REMOVED******REMOVED***) ***REMOVED***
+func (c *ConfigState) Fdump(w io.Writer, a ...interface{}) {
 	fdump(c, w, a...)
-***REMOVED***
+}
 
 /*
 Dump displays the passed parameters to standard out with newlines, customizable
@@ -270,28 +270,28 @@ of c.  See ConfigState for options documentation.
 See Fdump if you would prefer dumping to an arbitrary io.Writer or Sdump to
 get the formatted result as a string.
 */
-func (c *ConfigState) Dump(a ...interface***REMOVED******REMOVED***) ***REMOVED***
+func (c *ConfigState) Dump(a ...interface{}) {
 	fdump(c, os.Stdout, a...)
-***REMOVED***
+}
 
 // Sdump returns a string with the passed arguments formatted exactly the same
 // as Dump.
-func (c *ConfigState) Sdump(a ...interface***REMOVED******REMOVED***) string ***REMOVED***
+func (c *ConfigState) Sdump(a ...interface{}) string {
 	var buf bytes.Buffer
 	fdump(c, &buf, a...)
 	return buf.String()
-***REMOVED***
+}
 
 // convertArgs accepts a slice of arguments and returns a slice of the same
 // length with each argument converted to a spew Formatter interface using
 // the ConfigState associated with s.
-func (c *ConfigState) convertArgs(args []interface***REMOVED******REMOVED***) (formatters []interface***REMOVED******REMOVED***) ***REMOVED***
-	formatters = make([]interface***REMOVED******REMOVED***, len(args))
-	for index, arg := range args ***REMOVED***
+func (c *ConfigState) convertArgs(args []interface{}) (formatters []interface{}) {
+	formatters = make([]interface{}, len(args))
+	for index, arg := range args {
 		formatters[index] = newFormatter(c, arg)
-	***REMOVED***
+	}
 	return formatters
-***REMOVED***
+}
 
 // NewDefaultConfig returns a ConfigState with the following default settings.
 //
@@ -301,6 +301,6 @@ func (c *ConfigState) convertArgs(args []interface***REMOVED******REMOVED***) (f
 // 	DisablePointerMethods: false
 // 	ContinueOnMethod: false
 // 	SortKeys: false
-func NewDefaultConfig() *ConfigState ***REMOVED***
-	return &ConfigState***REMOVED***Indent: " "***REMOVED***
-***REMOVED***
+func NewDefaultConfig() *ConfigState {
+	return &ConfigState{Indent: " "}
+}

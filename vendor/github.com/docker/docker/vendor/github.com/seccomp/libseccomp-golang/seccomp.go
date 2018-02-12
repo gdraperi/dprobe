@@ -40,12 +40,12 @@ type ScmpAction uint
 type ScmpCompareOp uint
 
 // ScmpCondition represents a rule in a libseccomp filter context
-type ScmpCondition struct ***REMOVED***
+type ScmpCondition struct {
 	Argument uint          `json:"argument,omitempty"`
 	Op       ScmpCompareOp `json:"operator,omitempty"`
 	Operand1 uint64        `json:"operand_one,omitempty"`
 	Operand2 uint64        `json:"operand_two,omitempty"`
-***REMOVED***
+}
 
 // ScmpSyscall represents a Linux System Call
 type ScmpSyscall int32
@@ -150,8 +150,8 @@ const (
 
 // GetArchFromString returns an ScmpArch constant from a string representing an
 // architecture
-func GetArchFromString(arch string) (ScmpArch, error) ***REMOVED***
-	switch strings.ToLower(arch) ***REMOVED***
+func GetArchFromString(arch string) (ScmpArch, error) {
+	switch strings.ToLower(arch) {
 	case "x86":
 		return ArchX86, nil
 	case "amd64", "x86-64", "x86_64", "x64":
@@ -186,12 +186,12 @@ func GetArchFromString(arch string) (ScmpArch, error) ***REMOVED***
 		return ArchS390X, nil
 	default:
 		return ArchInvalid, fmt.Errorf("cannot convert unrecognized string %s", arch)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // String returns a string representation of an architecture constant
-func (a ScmpArch) String() string ***REMOVED***
-	switch a ***REMOVED***
+func (a ScmpArch) String() string {
+	switch a {
 	case ArchX86:
 		return "x86"
 	case ArchAMD64:
@@ -230,12 +230,12 @@ func (a ScmpArch) String() string ***REMOVED***
 		return "Invalid architecture"
 	default:
 		return "Unknown architecture"
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // String returns a string representation of a comparison operator constant
-func (a ScmpCompareOp) String() string ***REMOVED***
-	switch a ***REMOVED***
+func (a ScmpCompareOp) String() string {
+	switch a {
 	case CompareNotEqual:
 		return "Not equal"
 	case CompareLess:
@@ -254,12 +254,12 @@ func (a ScmpCompareOp) String() string ***REMOVED***
 		return "Invalid comparison operator"
 	default:
 		return "Unrecognized comparison operator"
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // String returns a string representation of a seccomp match action
-func (a ScmpAction) String() string ***REMOVED***
-	switch a & 0xFFFF ***REMOVED***
+func (a ScmpAction) String() string {
+	switch a & 0xFFFF {
 	case ActKill:
 		return "Action: Kill Process"
 	case ActTrap:
@@ -273,43 +273,43 @@ func (a ScmpAction) String() string ***REMOVED***
 		return "Action: Allow system call"
 	default:
 		return "Unrecognized Action"
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // SetReturnCode adds a return code to a supporting ScmpAction, clearing any
 // existing code Only valid on ActErrno and ActTrace. Takes no action otherwise.
 // Accepts 16-bit return code as argument.
 // Returns a valid ScmpAction of the original type with the new error code set.
-func (a ScmpAction) SetReturnCode(code int16) ScmpAction ***REMOVED***
+func (a ScmpAction) SetReturnCode(code int16) ScmpAction {
 	aTmp := a & 0x0000FFFF
-	if aTmp == ActErrno || aTmp == ActTrace ***REMOVED***
+	if aTmp == ActErrno || aTmp == ActTrace {
 		return (aTmp | (ScmpAction(code)&0xFFFF)<<16)
-	***REMOVED***
+	}
 	return a
-***REMOVED***
+}
 
 // GetReturnCode returns the return code of an ScmpAction
-func (a ScmpAction) GetReturnCode() int16 ***REMOVED***
+func (a ScmpAction) GetReturnCode() int16 {
 	return int16(a >> 16)
-***REMOVED***
+}
 
 // General utility functions
 
 // GetLibraryVersion returns the version of the library the bindings are built
 // against.
 // The version is formatted as follows: Major.Minor.Micro
-func GetLibraryVersion() (major, minor, micro int) ***REMOVED***
+func GetLibraryVersion() (major, minor, micro int) {
 	return verMajor, verMinor, verMicro
-***REMOVED***
+}
 
 // Syscall functions
 
 // GetName retrieves the name of a syscall from its number.
 // Acts on any syscall number.
 // Returns either a string containing the name of the syscall, or an error.
-func (s ScmpSyscall) GetName() (string, error) ***REMOVED***
+func (s ScmpSyscall) GetName() (string, error) {
 	return s.GetNameByArch(ArchNative)
-***REMOVED***
+}
 
 // GetNameByArch retrieves the name of a syscall from its number for a given
 // architecture.
@@ -317,58 +317,58 @@ func (s ScmpSyscall) GetName() (string, error) ***REMOVED***
 // Accepts a valid architecture constant.
 // Returns either a string containing the name of the syscall, or an error.
 // if the syscall is unrecognized or an issue occurred.
-func (s ScmpSyscall) GetNameByArch(arch ScmpArch) (string, error) ***REMOVED***
-	if err := sanitizeArch(arch); err != nil ***REMOVED***
+func (s ScmpSyscall) GetNameByArch(arch ScmpArch) (string, error) {
+	if err := sanitizeArch(arch); err != nil {
 		return "", err
-	***REMOVED***
+	}
 
 	cString := C.seccomp_syscall_resolve_num_arch(arch.toNative(), C.int(s))
-	if cString == nil ***REMOVED***
+	if cString == nil {
 		return "", fmt.Errorf("could not resolve syscall name")
-	***REMOVED***
+	}
 	defer C.free(unsafe.Pointer(cString))
 
 	finalStr := C.GoString(cString)
 	return finalStr, nil
-***REMOVED***
+}
 
 // GetSyscallFromName returns the number of a syscall by name on the kernel's
 // native architecture.
 // Accepts a string containing the name of a syscall.
 // Returns the number of the syscall, or an error if no syscall with that name
 // was found.
-func GetSyscallFromName(name string) (ScmpSyscall, error) ***REMOVED***
+func GetSyscallFromName(name string) (ScmpSyscall, error) {
 	cString := C.CString(name)
 	defer C.free(unsafe.Pointer(cString))
 
 	result := C.seccomp_syscall_resolve_name(cString)
-	if result == scmpError ***REMOVED***
+	if result == scmpError {
 		return 0, fmt.Errorf("could not resolve name to syscall")
-	***REMOVED***
+	}
 
 	return ScmpSyscall(result), nil
-***REMOVED***
+}
 
 // GetSyscallFromNameByArch returns the number of a syscall by name for a given
 // architecture's ABI.
 // Accepts the name of a syscall and an architecture constant.
 // Returns the number of the syscall, or an error if an invalid architecture is
 // passed or a syscall with that name was not found.
-func GetSyscallFromNameByArch(name string, arch ScmpArch) (ScmpSyscall, error) ***REMOVED***
-	if err := sanitizeArch(arch); err != nil ***REMOVED***
+func GetSyscallFromNameByArch(name string, arch ScmpArch) (ScmpSyscall, error) {
+	if err := sanitizeArch(arch); err != nil {
 		return 0, err
-	***REMOVED***
+	}
 
 	cString := C.CString(name)
 	defer C.free(unsafe.Pointer(cString))
 
 	result := C.seccomp_syscall_resolve_name_arch(arch.toNative(), cString)
-	if result == scmpError ***REMOVED***
+	if result == scmpError {
 		return 0, fmt.Errorf("could not resolve name to syscall")
-	***REMOVED***
+	}
 
 	return ScmpSyscall(result), nil
-***REMOVED***
+}
 
 // MakeCondition creates and returns a new condition to attach to a filter rule.
 // Associated rules will only match if this condition is true.
@@ -383,66 +383,66 @@ func GetSyscallFromNameByArch(name string, arch ScmpArch) (ScmpSyscall, error) *
 // 0 and the value provided was 1, the condition would match, as 0 is less
 // than or equal to 1.
 // Return either an error on bad argument or a valid ScmpCondition struct.
-func MakeCondition(arg uint, comparison ScmpCompareOp, values ...uint64) (ScmpCondition, error) ***REMOVED***
+func MakeCondition(arg uint, comparison ScmpCompareOp, values ...uint64) (ScmpCondition, error) {
 	var condStruct ScmpCondition
 
-	if comparison == CompareInvalid ***REMOVED***
+	if comparison == CompareInvalid {
 		return condStruct, fmt.Errorf("invalid comparison operator")
-	***REMOVED*** else if arg > 5 ***REMOVED***
+	} else if arg > 5 {
 		return condStruct, fmt.Errorf("syscalls only have up to 6 arguments")
-	***REMOVED*** else if len(values) > 2 ***REMOVED***
+	} else if len(values) > 2 {
 		return condStruct, fmt.Errorf("conditions can have at most 2 arguments")
-	***REMOVED*** else if len(values) == 0 ***REMOVED***
+	} else if len(values) == 0 {
 		return condStruct, fmt.Errorf("must provide at least one value to compare against")
-	***REMOVED***
+	}
 
 	condStruct.Argument = arg
 	condStruct.Op = comparison
 	condStruct.Operand1 = values[0]
-	if len(values) == 2 ***REMOVED***
+	if len(values) == 2 {
 		condStruct.Operand2 = values[1]
-	***REMOVED*** else ***REMOVED***
+	} else {
 		condStruct.Operand2 = 0 // Unused
-	***REMOVED***
+	}
 
 	return condStruct, nil
-***REMOVED***
+}
 
 // Utility Functions
 
 // GetNativeArch returns architecture token representing the native kernel
 // architecture
-func GetNativeArch() (ScmpArch, error) ***REMOVED***
+func GetNativeArch() (ScmpArch, error) {
 	arch := C.seccomp_arch_native()
 
 	return archFromNative(arch)
-***REMOVED***
+}
 
 // Public Filter API
 
 // ScmpFilter represents a filter context in libseccomp.
 // A filter context is initially empty. Rules can be added to it, and it can
 // then be loaded into the kernel.
-type ScmpFilter struct ***REMOVED***
+type ScmpFilter struct {
 	filterCtx C.scmp_filter_ctx
 	valid     bool
 	lock      sync.Mutex
-***REMOVED***
+}
 
 // NewFilter creates and returns a new filter context.
 // Accepts a default action to be taken for syscalls which match no rules in
 // the filter.
 // Returns a reference to a valid filter context, or nil and an error if the
 // filter context could not be created or an invalid default action was given.
-func NewFilter(defaultAction ScmpAction) (*ScmpFilter, error) ***REMOVED***
-	if err := sanitizeAction(defaultAction); err != nil ***REMOVED***
+func NewFilter(defaultAction ScmpAction) (*ScmpFilter, error) {
+	if err := sanitizeAction(defaultAction); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	fPtr := C.seccomp_init(defaultAction.toNative())
-	if fPtr == nil ***REMOVED***
+	if fPtr == nil {
 		return nil, fmt.Errorf("could not create filter")
-	***REMOVED***
+	}
 
 	filter := new(ScmpFilter)
 	filter.filterCtx = fPtr
@@ -450,38 +450,38 @@ func NewFilter(defaultAction ScmpAction) (*ScmpFilter, error) ***REMOVED***
 	runtime.SetFinalizer(filter, filterFinalizer)
 
 	return filter, nil
-***REMOVED***
+}
 
 // IsValid determines whether a filter context is valid to use.
 // Some operations (Release and Merge) render filter contexts invalid and
 // consequently prevent further use.
-func (f *ScmpFilter) IsValid() bool ***REMOVED***
+func (f *ScmpFilter) IsValid() bool {
 	f.lock.Lock()
 	defer f.lock.Unlock()
 
 	return f.valid
-***REMOVED***
+}
 
 // Reset resets a filter context, removing all its existing state.
 // Accepts a new default action to be taken for syscalls which do not match.
 // Returns an error if the filter or action provided are invalid.
-func (f *ScmpFilter) Reset(defaultAction ScmpAction) error ***REMOVED***
+func (f *ScmpFilter) Reset(defaultAction ScmpAction) error {
 	f.lock.Lock()
 	defer f.lock.Unlock()
 
-	if err := sanitizeAction(defaultAction); err != nil ***REMOVED***
+	if err := sanitizeAction(defaultAction); err != nil {
 		return err
-	***REMOVED*** else if !f.valid ***REMOVED***
+	} else if !f.valid {
 		return errBadFilter
-	***REMOVED***
+	}
 
 	retCode := C.seccomp_reset(f.filterCtx, defaultAction.toNative())
-	if retCode != 0 ***REMOVED***
+	if retCode != 0 {
 		return syscall.Errno(-1 * retCode)
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // Release releases a filter context, freeing its memory. Should be called after
 // loading into the kernel, when the filter is no longer needed.
@@ -489,17 +489,17 @@ func (f *ScmpFilter) Reset(defaultAction ScmpAction) error ***REMOVED***
 // be used.
 // Release() will be invoked automatically when a filter context is garbage
 // collected, but can also be called manually to free memory.
-func (f *ScmpFilter) Release() ***REMOVED***
+func (f *ScmpFilter) Release() {
 	f.lock.Lock()
 	defer f.lock.Unlock()
 
-	if !f.valid ***REMOVED***
+	if !f.valid {
 		return
-	***REMOVED***
+	}
 
 	f.valid = false
 	C.seccomp_release(f.filterCtx)
-***REMOVED***
+}
 
 // Merge merges two filter contexts.
 // The source filter src will be released as part of the process, and will no
@@ -511,29 +511,29 @@ func (f *ScmpFilter) Release() ***REMOVED***
 // The architectures of the src filter not present in the destination, and all
 // associated rules, will be added to the destination.
 // Returns an error if merging the filters failed.
-func (f *ScmpFilter) Merge(src *ScmpFilter) error ***REMOVED***
+func (f *ScmpFilter) Merge(src *ScmpFilter) error {
 	f.lock.Lock()
 	defer f.lock.Unlock()
 
 	src.lock.Lock()
 	defer src.lock.Unlock()
 
-	if !src.valid || !f.valid ***REMOVED***
+	if !src.valid || !f.valid {
 		return fmt.Errorf("one or more of the filter contexts is invalid or uninitialized")
-	***REMOVED***
+	}
 
 	// Merge the filters
 	retCode := C.seccomp_merge(f.filterCtx, src.filterCtx)
-	if syscall.Errno(-1*retCode) == syscall.EINVAL ***REMOVED***
+	if syscall.Errno(-1*retCode) == syscall.EINVAL {
 		return fmt.Errorf("filters could not be merged due to a mismatch in attributes or invalid filter")
-	***REMOVED*** else if retCode != 0 ***REMOVED***
+	} else if retCode != 0 {
 		return syscall.Errno(-1 * retCode)
-	***REMOVED***
+	}
 
 	src.valid = false
 
 	return nil
-***REMOVED***
+}
 
 // IsArchPresent checks if an architecture is present in a filter.
 // If a filter contains an architecture, it uses its default action for
@@ -546,117 +546,117 @@ func (f *ScmpFilter) Merge(src *ScmpFilter) error ***REMOVED***
 // Returns true if the architecture is present in the filter, false otherwise,
 // and an error on an invalid filter context, architecture constant, or an
 // issue with the call to libseccomp.
-func (f *ScmpFilter) IsArchPresent(arch ScmpArch) (bool, error) ***REMOVED***
+func (f *ScmpFilter) IsArchPresent(arch ScmpArch) (bool, error) {
 	f.lock.Lock()
 	defer f.lock.Unlock()
 
-	if err := sanitizeArch(arch); err != nil ***REMOVED***
+	if err := sanitizeArch(arch); err != nil {
 		return false, err
-	***REMOVED*** else if !f.valid ***REMOVED***
+	} else if !f.valid {
 		return false, errBadFilter
-	***REMOVED***
+	}
 
 	retCode := C.seccomp_arch_exist(f.filterCtx, arch.toNative())
-	if syscall.Errno(-1*retCode) == syscall.EEXIST ***REMOVED***
+	if syscall.Errno(-1*retCode) == syscall.EEXIST {
 		// -EEXIST is "arch not present"
 		return false, nil
-	***REMOVED*** else if retCode != 0 ***REMOVED***
+	} else if retCode != 0 {
 		return false, syscall.Errno(-1 * retCode)
-	***REMOVED***
+	}
 
 	return true, nil
-***REMOVED***
+}
 
 // AddArch adds an architecture to the filter.
 // Accepts an architecture constant.
 // Returns an error on invalid filter context or architecture token, or an
 // issue with the call to libseccomp.
-func (f *ScmpFilter) AddArch(arch ScmpArch) error ***REMOVED***
+func (f *ScmpFilter) AddArch(arch ScmpArch) error {
 	f.lock.Lock()
 	defer f.lock.Unlock()
 
-	if err := sanitizeArch(arch); err != nil ***REMOVED***
+	if err := sanitizeArch(arch); err != nil {
 		return err
-	***REMOVED*** else if !f.valid ***REMOVED***
+	} else if !f.valid {
 		return errBadFilter
-	***REMOVED***
+	}
 
 	// Libseccomp returns -EEXIST if the specified architecture is already
 	// present. Succeed silently in this case, as it's not fatal, and the
 	// architecture is present already.
 	retCode := C.seccomp_arch_add(f.filterCtx, arch.toNative())
-	if retCode != 0 && syscall.Errno(-1*retCode) != syscall.EEXIST ***REMOVED***
+	if retCode != 0 && syscall.Errno(-1*retCode) != syscall.EEXIST {
 		return syscall.Errno(-1 * retCode)
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // RemoveArch removes an architecture from the filter.
 // Accepts an architecture constant.
 // Returns an error on invalid filter context or architecture token, or an
 // issue with the call to libseccomp.
-func (f *ScmpFilter) RemoveArch(arch ScmpArch) error ***REMOVED***
+func (f *ScmpFilter) RemoveArch(arch ScmpArch) error {
 	f.lock.Lock()
 	defer f.lock.Unlock()
 
-	if err := sanitizeArch(arch); err != nil ***REMOVED***
+	if err := sanitizeArch(arch); err != nil {
 		return err
-	***REMOVED*** else if !f.valid ***REMOVED***
+	} else if !f.valid {
 		return errBadFilter
-	***REMOVED***
+	}
 
 	// Similar to AddArch, -EEXIST is returned if the arch is not present
 	// Succeed silently in that case, this is not fatal and the architecture
 	// is not present in the filter after RemoveArch
 	retCode := C.seccomp_arch_remove(f.filterCtx, arch.toNative())
-	if retCode != 0 && syscall.Errno(-1*retCode) != syscall.EEXIST ***REMOVED***
+	if retCode != 0 && syscall.Errno(-1*retCode) != syscall.EEXIST {
 		return syscall.Errno(-1 * retCode)
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // Load loads a filter context into the kernel.
 // Returns an error if the filter context is invalid or the syscall failed.
-func (f *ScmpFilter) Load() error ***REMOVED***
+func (f *ScmpFilter) Load() error {
 	f.lock.Lock()
 	defer f.lock.Unlock()
 
-	if !f.valid ***REMOVED***
+	if !f.valid {
 		return errBadFilter
-	***REMOVED***
+	}
 
-	if retCode := C.seccomp_load(f.filterCtx); retCode != 0 ***REMOVED***
+	if retCode := C.seccomp_load(f.filterCtx); retCode != 0 {
 		return syscall.Errno(-1 * retCode)
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // GetDefaultAction returns the default action taken on a syscall which does not
 // match a rule in the filter, or an error if an issue was encountered
 // retrieving the value.
-func (f *ScmpFilter) GetDefaultAction() (ScmpAction, error) ***REMOVED***
+func (f *ScmpFilter) GetDefaultAction() (ScmpAction, error) {
 	action, err := f.getFilterAttr(filterAttrActDefault)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0x0, err
-	***REMOVED***
+	}
 
 	return actionFromNative(action)
-***REMOVED***
+}
 
 // GetBadArchAction returns the default action taken on a syscall for an
 // architecture not in the filter, or an error if an issue was encountered
 // retrieving the value.
-func (f *ScmpFilter) GetBadArchAction() (ScmpAction, error) ***REMOVED***
+func (f *ScmpFilter) GetBadArchAction() (ScmpAction, error) {
 	action, err := f.getFilterAttr(filterAttrActBadArch)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0x0, err
-	***REMOVED***
+	}
 
 	return actionFromNative(action)
-***REMOVED***
+}
 
 // GetNoNewPrivsBit returns the current state the No New Privileges bit will be set
 // to on the filter being loaded, or an error if an issue was encountered
@@ -665,18 +665,18 @@ func (f *ScmpFilter) GetBadArchAction() (ScmpAction, error) ***REMOVED***
 // cannot gain more privileges than the process that ran exec().
 // For example, a process with No New Privileges set would be unable to exec
 // setuid/setgid executables.
-func (f *ScmpFilter) GetNoNewPrivsBit() (bool, error) ***REMOVED***
+func (f *ScmpFilter) GetNoNewPrivsBit() (bool, error) {
 	noNewPrivs, err := f.getFilterAttr(filterAttrNNP)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return false, err
-	***REMOVED***
+	}
 
-	if noNewPrivs == 0 ***REMOVED***
+	if noNewPrivs == 0 {
 		return false, nil
-	***REMOVED***
+	}
 
 	return true, nil
-***REMOVED***
+}
 
 // GetTsyncBit returns whether Thread Synchronization will be enabled on the
 // filter being loaded, or an error if an issue was encountered retrieving the
@@ -689,44 +689,44 @@ func (f *ScmpFilter) GetNoNewPrivsBit() (bool, error) ***REMOVED***
 // proceed as normal.
 // This function is unavailable before v2.2 of libseccomp and will return an
 // error.
-func (f *ScmpFilter) GetTsyncBit() (bool, error) ***REMOVED***
+func (f *ScmpFilter) GetTsyncBit() (bool, error) {
 	tSync, err := f.getFilterAttr(filterAttrTsync)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return false, err
-	***REMOVED***
+	}
 
-	if tSync == 0 ***REMOVED***
+	if tSync == 0 {
 		return false, nil
-	***REMOVED***
+	}
 
 	return true, nil
-***REMOVED***
+}
 
 // SetBadArchAction sets the default action taken on a syscall for an
 // architecture not in the filter, or an error if an issue was encountered
 // setting the value.
-func (f *ScmpFilter) SetBadArchAction(action ScmpAction) error ***REMOVED***
-	if err := sanitizeAction(action); err != nil ***REMOVED***
+func (f *ScmpFilter) SetBadArchAction(action ScmpAction) error {
+	if err := sanitizeAction(action); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	return f.setFilterAttr(filterAttrActBadArch, action.toNative())
-***REMOVED***
+}
 
 // SetNoNewPrivsBit sets the state of the No New Privileges bit, which will be
 // applied on filter load, or an error if an issue was encountered setting the
 // value.
 // Filters with No New Privileges set to 0 can only be loaded if the process
 // has the CAP_SYS_ADMIN capability.
-func (f *ScmpFilter) SetNoNewPrivsBit(state bool) error ***REMOVED***
+func (f *ScmpFilter) SetNoNewPrivsBit(state bool) error {
 	var toSet C.uint32_t = 0x0
 
-	if state ***REMOVED***
+	if state {
 		toSet = 0x1
-	***REMOVED***
+	}
 
 	return f.setFilterAttr(filterAttrNNP, toSet)
-***REMOVED***
+}
 
 // SetTsync sets whether Thread Synchronization will be enabled on the filter
 // being loaded. Returns an error if setting Tsync failed, or the filter is
@@ -739,44 +739,44 @@ func (f *ScmpFilter) SetNoNewPrivsBit(state bool) error ***REMOVED***
 // proceed as normal.
 // This function is unavailable before v2.2 of libseccomp and will return an
 // error.
-func (f *ScmpFilter) SetTsync(enable bool) error ***REMOVED***
+func (f *ScmpFilter) SetTsync(enable bool) error {
 	var toSet C.uint32_t = 0x0
 
-	if enable ***REMOVED***
+	if enable {
 		toSet = 0x1
-	***REMOVED***
+	}
 
 	return f.setFilterAttr(filterAttrTsync, toSet)
-***REMOVED***
+}
 
 // SetSyscallPriority sets a syscall's priority.
 // This provides a hint to the filter generator in libseccomp about the
 // importance of this syscall. High-priority syscalls are placed
 // first in the filter code, and incur less overhead (at the expense of
 // lower-priority syscalls).
-func (f *ScmpFilter) SetSyscallPriority(call ScmpSyscall, priority uint8) error ***REMOVED***
+func (f *ScmpFilter) SetSyscallPriority(call ScmpSyscall, priority uint8) error {
 	f.lock.Lock()
 	defer f.lock.Unlock()
 
-	if !f.valid ***REMOVED***
+	if !f.valid {
 		return errBadFilter
-	***REMOVED***
+	}
 
 	if retCode := C.seccomp_syscall_priority(f.filterCtx, C.int(call),
-		C.uint8_t(priority)); retCode != 0 ***REMOVED***
+		C.uint8_t(priority)); retCode != 0 {
 		return syscall.Errno(-1 * retCode)
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // AddRule adds a single rule for an unconditional action on a syscall.
 // Accepts the number of the syscall and the action to be taken on the call
 // being made.
 // Returns an error if an issue was encountered adding the rule.
-func (f *ScmpFilter) AddRule(call ScmpSyscall, action ScmpAction) error ***REMOVED***
+func (f *ScmpFilter) AddRule(call ScmpSyscall, action ScmpAction) error {
 	return f.addRuleGeneric(call, action, false, nil)
-***REMOVED***
+}
 
 // AddRuleExact adds a single rule for an unconditional action on a syscall.
 // Accepts the number of the syscall and the action to be taken on the call
@@ -786,9 +786,9 @@ func (f *ScmpFilter) AddRule(call ScmpSyscall, action ScmpAction) error ***REMOV
 // The rule will function exactly as described, but it may not function identically
 // (or be able to be applied to) all architectures.
 // Returns an error if an issue was encountered adding the rule.
-func (f *ScmpFilter) AddRuleExact(call ScmpSyscall, action ScmpAction) error ***REMOVED***
+func (f *ScmpFilter) AddRuleExact(call ScmpSyscall, action ScmpAction) error {
 	return f.addRuleGeneric(call, action, true, nil)
-***REMOVED***
+}
 
 // AddRuleConditional adds a single rule for a conditional action on a syscall.
 // Returns an error if an issue was encountered adding the rule.
@@ -796,9 +796,9 @@ func (f *ScmpFilter) AddRuleExact(call ScmpSyscall, action ScmpAction) error ***
 // There is a bug in library versions below v2.2.1 which can, in some cases,
 // cause conditions to be lost when more than one are used. Consequently,
 // AddRuleConditional is disabled on library versions lower than v2.2.1
-func (f *ScmpFilter) AddRuleConditional(call ScmpSyscall, action ScmpAction, conds []ScmpCondition) error ***REMOVED***
+func (f *ScmpFilter) AddRuleConditional(call ScmpSyscall, action ScmpAction, conds []ScmpCondition) error {
 	return f.addRuleGeneric(call, action, false, conds)
-***REMOVED***
+}
 
 // AddRuleConditionalExact adds a single rule for a conditional action on a
 // syscall.
@@ -810,48 +810,48 @@ func (f *ScmpFilter) AddRuleConditional(call ScmpSyscall, action ScmpAction, con
 // There is a bug in library versions below v2.2.1 which can, in some cases,
 // cause conditions to be lost when more than one are used. Consequently,
 // AddRuleConditionalExact is disabled on library versions lower than v2.2.1
-func (f *ScmpFilter) AddRuleConditionalExact(call ScmpSyscall, action ScmpAction, conds []ScmpCondition) error ***REMOVED***
+func (f *ScmpFilter) AddRuleConditionalExact(call ScmpSyscall, action ScmpAction, conds []ScmpCondition) error {
 	return f.addRuleGeneric(call, action, true, conds)
-***REMOVED***
+}
 
 // ExportPFC output PFC-formatted, human-readable dump of a filter context's
 // rules to a file.
 // Accepts file to write to (must be open for writing).
 // Returns an error if writing to the file fails.
-func (f *ScmpFilter) ExportPFC(file *os.File) error ***REMOVED***
+func (f *ScmpFilter) ExportPFC(file *os.File) error {
 	f.lock.Lock()
 	defer f.lock.Unlock()
 
 	fd := file.Fd()
 
-	if !f.valid ***REMOVED***
+	if !f.valid {
 		return errBadFilter
-	***REMOVED***
+	}
 
-	if retCode := C.seccomp_export_pfc(f.filterCtx, C.int(fd)); retCode != 0 ***REMOVED***
+	if retCode := C.seccomp_export_pfc(f.filterCtx, C.int(fd)); retCode != 0 {
 		return syscall.Errno(-1 * retCode)
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // ExportBPF outputs Berkeley Packet Filter-formatted, kernel-readable dump of a
 // filter context's rules to a file.
 // Accepts file to write to (must be open for writing).
 // Returns an error if writing to the file fails.
-func (f *ScmpFilter) ExportBPF(file *os.File) error ***REMOVED***
+func (f *ScmpFilter) ExportBPF(file *os.File) error {
 	f.lock.Lock()
 	defer f.lock.Unlock()
 
 	fd := file.Fd()
 
-	if !f.valid ***REMOVED***
+	if !f.valid {
 		return errBadFilter
-	***REMOVED***
+	}
 
-	if retCode := C.seccomp_export_bpf(f.filterCtx, C.int(fd)); retCode != 0 ***REMOVED***
+	if retCode := C.seccomp_export_bpf(f.filterCtx, C.int(fd)); retCode != 0 {
 		return syscall.Errno(-1 * retCode)
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}

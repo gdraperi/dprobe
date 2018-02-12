@@ -9,7 +9,7 @@ import (
 )
 
 // Mount to the provided target path
-func (m *Mount) Mount(target string) error ***REMOVED***
+func (m *Mount) Mount(target string) error {
 	flags, data := parseMountOptions(m.Options)
 
 	// propagation types.
@@ -19,123 +19,123 @@ func (m *Mount) Mount(target string) error ***REMOVED***
 	oflags := flags &^ ptypes
 
 	// In the case of remounting with changed data (data != ""), need to call mount (moby/moby#34077).
-	if flags&unix.MS_REMOUNT == 0 || data != "" ***REMOVED***
+	if flags&unix.MS_REMOUNT == 0 || data != "" {
 		// Initial call applying all non-propagation flags for mount
 		// or remount with changed data
-		if err := unix.Mount(m.Source, target, m.Type, uintptr(oflags), data); err != nil ***REMOVED***
+		if err := unix.Mount(m.Source, target, m.Type, uintptr(oflags), data); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if flags&ptypes != 0 ***REMOVED***
+	if flags&ptypes != 0 {
 		// Change the propagation type.
 		const pflags = ptypes | unix.MS_REC | unix.MS_SILENT
-		if err := unix.Mount("", target, "", uintptr(flags&pflags), ""); err != nil ***REMOVED***
+		if err := unix.Mount("", target, "", uintptr(flags&pflags), ""); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	const broflags = unix.MS_BIND | unix.MS_RDONLY
-	if oflags&broflags == broflags ***REMOVED***
+	if oflags&broflags == broflags {
 		// Remount the bind to apply read only.
 		return unix.Mount("", target, "", uintptr(oflags|unix.MS_REMOUNT), "")
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // Unmount the provided mount path with the flags
-func Unmount(target string, flags int) error ***REMOVED***
-	if err := unmount(target, flags); err != nil && err != unix.EINVAL ***REMOVED***
+func Unmount(target string, flags int) error {
+	if err := unmount(target, flags); err != nil && err != unix.EINVAL {
 		return err
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func unmount(target string, flags int) error ***REMOVED***
-	for i := 0; i < 50; i++ ***REMOVED***
-		if err := unix.Unmount(target, flags); err != nil ***REMOVED***
-			switch err ***REMOVED***
+func unmount(target string, flags int) error {
+	for i := 0; i < 50; i++ {
+		if err := unix.Unmount(target, flags); err != nil {
+			switch err {
 			case unix.EBUSY:
 				time.Sleep(50 * time.Millisecond)
 				continue
 			default:
 				return err
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		return nil
-	***REMOVED***
+	}
 	return errors.Wrapf(unix.EBUSY, "failed to unmount target %s", target)
-***REMOVED***
+}
 
 // UnmountAll repeatedly unmounts the given mount point until there
 // are no mounts remaining (EINVAL is returned by mount), which is
 // useful for undoing a stack of mounts on the same mount point.
-func UnmountAll(mount string, flags int) error ***REMOVED***
-	for ***REMOVED***
-		if err := unmount(mount, flags); err != nil ***REMOVED***
+func UnmountAll(mount string, flags int) error {
+	for {
+		if err := unmount(mount, flags); err != nil {
 			// EINVAL is returned if the target is not a
 			// mount point, indicating that we are
 			// done. It can also indicate a few other
 			// things (such as invalid flags) which we
 			// unfortunately end up squelching here too.
-			if err == unix.EINVAL ***REMOVED***
+			if err == unix.EINVAL {
 				return nil
-			***REMOVED***
+			}
 			return err
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // parseMountOptions takes fstab style mount options and parses them for
 // use with a standard mount() syscall
-func parseMountOptions(options []string) (int, string) ***REMOVED***
+func parseMountOptions(options []string) (int, string) {
 	var (
 		flag int
 		data []string
 	)
-	flags := map[string]struct ***REMOVED***
+	flags := map[string]struct {
 		clear bool
 		flag  int
-	***REMOVED******REMOVED***
-		"async":         ***REMOVED***true, unix.MS_SYNCHRONOUS***REMOVED***,
-		"atime":         ***REMOVED***true, unix.MS_NOATIME***REMOVED***,
-		"bind":          ***REMOVED***false, unix.MS_BIND***REMOVED***,
-		"defaults":      ***REMOVED***false, 0***REMOVED***,
-		"dev":           ***REMOVED***true, unix.MS_NODEV***REMOVED***,
-		"diratime":      ***REMOVED***true, unix.MS_NODIRATIME***REMOVED***,
-		"dirsync":       ***REMOVED***false, unix.MS_DIRSYNC***REMOVED***,
-		"exec":          ***REMOVED***true, unix.MS_NOEXEC***REMOVED***,
-		"mand":          ***REMOVED***false, unix.MS_MANDLOCK***REMOVED***,
-		"noatime":       ***REMOVED***false, unix.MS_NOATIME***REMOVED***,
-		"nodev":         ***REMOVED***false, unix.MS_NODEV***REMOVED***,
-		"nodiratime":    ***REMOVED***false, unix.MS_NODIRATIME***REMOVED***,
-		"noexec":        ***REMOVED***false, unix.MS_NOEXEC***REMOVED***,
-		"nomand":        ***REMOVED***true, unix.MS_MANDLOCK***REMOVED***,
-		"norelatime":    ***REMOVED***true, unix.MS_RELATIME***REMOVED***,
-		"nostrictatime": ***REMOVED***true, unix.MS_STRICTATIME***REMOVED***,
-		"nosuid":        ***REMOVED***false, unix.MS_NOSUID***REMOVED***,
-		"rbind":         ***REMOVED***false, unix.MS_BIND | unix.MS_REC***REMOVED***,
-		"relatime":      ***REMOVED***false, unix.MS_RELATIME***REMOVED***,
-		"remount":       ***REMOVED***false, unix.MS_REMOUNT***REMOVED***,
-		"ro":            ***REMOVED***false, unix.MS_RDONLY***REMOVED***,
-		"rw":            ***REMOVED***true, unix.MS_RDONLY***REMOVED***,
-		"strictatime":   ***REMOVED***false, unix.MS_STRICTATIME***REMOVED***,
-		"suid":          ***REMOVED***true, unix.MS_NOSUID***REMOVED***,
-		"sync":          ***REMOVED***false, unix.MS_SYNCHRONOUS***REMOVED***,
-	***REMOVED***
-	for _, o := range options ***REMOVED***
+	}{
+		"async":         {true, unix.MS_SYNCHRONOUS},
+		"atime":         {true, unix.MS_NOATIME},
+		"bind":          {false, unix.MS_BIND},
+		"defaults":      {false, 0},
+		"dev":           {true, unix.MS_NODEV},
+		"diratime":      {true, unix.MS_NODIRATIME},
+		"dirsync":       {false, unix.MS_DIRSYNC},
+		"exec":          {true, unix.MS_NOEXEC},
+		"mand":          {false, unix.MS_MANDLOCK},
+		"noatime":       {false, unix.MS_NOATIME},
+		"nodev":         {false, unix.MS_NODEV},
+		"nodiratime":    {false, unix.MS_NODIRATIME},
+		"noexec":        {false, unix.MS_NOEXEC},
+		"nomand":        {true, unix.MS_MANDLOCK},
+		"norelatime":    {true, unix.MS_RELATIME},
+		"nostrictatime": {true, unix.MS_STRICTATIME},
+		"nosuid":        {false, unix.MS_NOSUID},
+		"rbind":         {false, unix.MS_BIND | unix.MS_REC},
+		"relatime":      {false, unix.MS_RELATIME},
+		"remount":       {false, unix.MS_REMOUNT},
+		"ro":            {false, unix.MS_RDONLY},
+		"rw":            {true, unix.MS_RDONLY},
+		"strictatime":   {false, unix.MS_STRICTATIME},
+		"suid":          {true, unix.MS_NOSUID},
+		"sync":          {false, unix.MS_SYNCHRONOUS},
+	}
+	for _, o := range options {
 		// If the option does not exist in the flags table or the flag
 		// is not supported on the platform,
 		// then it is a data value for a specific fs type
-		if f, exists := flags[o]; exists && f.flag != 0 ***REMOVED***
-			if f.clear ***REMOVED***
+		if f, exists := flags[o]; exists && f.flag != 0 {
+			if f.clear {
 				flag &^= f.flag
-			***REMOVED*** else ***REMOVED***
+			} else {
 				flag |= f.flag
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
+			}
+		} else {
 			data = append(data, o)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return flag, strings.Join(data, ",")
-***REMOVED***
+}

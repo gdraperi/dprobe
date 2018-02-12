@@ -10,83 +10,83 @@ import (
 	"github.com/pkg/errors"
 )
 
-type parent struct ***REMOVED***
+type parent struct {
 	dir  string
 	last string
-***REMOVED***
+}
 
-type Validator struct ***REMOVED***
+type Validator struct {
 	parentDirs []parent
-***REMOVED***
+}
 
-func (v *Validator) HandleChange(kind ChangeKind, p string, fi os.FileInfo, err error) (retErr error) ***REMOVED***
-	if err != nil ***REMOVED***
+func (v *Validator) HandleChange(kind ChangeKind, p string, fi os.FileInfo, err error) (retErr error) {
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	// test that all paths are in order and all parent dirs were present
-	if v.parentDirs == nil ***REMOVED***
+	if v.parentDirs == nil {
 		v.parentDirs = make([]parent, 1, 10)
-	***REMOVED***
-	if runtime.GOOS == "windows" ***REMOVED***
+	}
+	if runtime.GOOS == "windows" {
 		p = strings.Replace(p, "\\", "", -1)
-	***REMOVED***
-	if p != path.Clean(p) ***REMOVED***
+	}
+	if p != path.Clean(p) {
 		return errors.Errorf("invalid unclean path %s", p)
-	***REMOVED***
-	if path.IsAbs(p) ***REMOVED***
+	}
+	if path.IsAbs(p) {
 		return errors.Errorf("abolute path %s not allowed", p)
-	***REMOVED***
+	}
 	dir := path.Dir(p)
 	base := path.Base(p)
-	if dir == "." ***REMOVED***
+	if dir == "." {
 		dir = ""
-	***REMOVED***
-	if dir == ".." || strings.HasPrefix(p, "../") ***REMOVED***
+	}
+	if dir == ".." || strings.HasPrefix(p, "../") {
 		return errors.Errorf("invalid path: %s", p)
-	***REMOVED***
+	}
 
 	// find a parent dir from saved records
-	i := sort.Search(len(v.parentDirs), func(i int) bool ***REMOVED***
+	i := sort.Search(len(v.parentDirs), func(i int) bool {
 		return ComparePath(v.parentDirs[len(v.parentDirs)-1-i].dir, dir) <= 0
-	***REMOVED***)
+	})
 	i = len(v.parentDirs) - 1 - i
-	if i != len(v.parentDirs)-1 ***REMOVED*** // skipping back to grandparent
+	if i != len(v.parentDirs)-1 { // skipping back to grandparent
 		v.parentDirs = v.parentDirs[:i+1]
-	***REMOVED***
+	}
 
-	if dir != v.parentDirs[len(v.parentDirs)-1].dir || v.parentDirs[i].last >= base ***REMOVED***
+	if dir != v.parentDirs[len(v.parentDirs)-1].dir || v.parentDirs[i].last >= base {
 		return errors.Errorf("changes out of order: %q %q", p, path.Join(v.parentDirs[i].dir, v.parentDirs[i].last))
-	***REMOVED***
+	}
 	v.parentDirs[i].last = base
-	if kind != ChangeKindDelete && fi.IsDir() ***REMOVED***
-		v.parentDirs = append(v.parentDirs, parent***REMOVED***
+	if kind != ChangeKindDelete && fi.IsDir() {
+		v.parentDirs = append(v.parentDirs, parent{
 			dir:  path.Join(dir, base),
 			last: "",
-		***REMOVED***)
-	***REMOVED***
+		})
+	}
 	// todo: validate invalid mode combinations
 	return err
-***REMOVED***
+}
 
-func ComparePath(p1, p2 string) int ***REMOVED***
+func ComparePath(p1, p2 string) int {
 	// byte-by-byte comparison to be compatible with str<>str
 	min := min(len(p1), len(p2))
-	for i := 0; i < min; i++ ***REMOVED***
-		switch ***REMOVED***
+	for i := 0; i < min; i++ {
+		switch {
 		case p1[i] == p2[i]:
 			continue
 		case p2[i] != '/' && p1[i] < p2[i] || p1[i] == '/':
 			return -1
 		default:
 			return 1
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return len(p1) - len(p2)
-***REMOVED***
+}
 
-func min(x, y int) int ***REMOVED***
-	if x < y ***REMOVED***
+func min(x, y int) int {
+	if x < y {
 		return x
-	***REMOVED***
+	}
 	return y
-***REMOVED***
+}

@@ -70,21 +70,21 @@ const (
 // lockedRand is a small wrapper around rand.Rand to provide
 // synchronization. Only the methods needed by the code are exposed
 // (e.g. Intn).
-type lockedRand struct ***REMOVED***
+type lockedRand struct {
 	mu   sync.Mutex
 	rand *rand.Rand
-***REMOVED***
+}
 
-func (r *lockedRand) Intn(n int) int ***REMOVED***
+func (r *lockedRand) Intn(n int) int {
 	r.mu.Lock()
 	v := r.rand.Intn(n)
 	r.mu.Unlock()
 	return v
-***REMOVED***
+}
 
-var globalRand = &lockedRand***REMOVED***
+var globalRand = &lockedRand{
 	rand: rand.New(rand.NewSource(time.Now().UnixNano())),
-***REMOVED***
+}
 
 // CampaignType represents the type of campaigning
 // the reason we use the type of string instead of uint64
@@ -94,19 +94,19 @@ type CampaignType string
 // StateType represents the role of a node in a cluster.
 type StateType uint64
 
-var stmap = [...]string***REMOVED***
+var stmap = [...]string{
 	"StateFollower",
 	"StateCandidate",
 	"StateLeader",
 	"StatePreCandidate",
-***REMOVED***
+}
 
-func (st StateType) String() string ***REMOVED***
+func (st StateType) String() string {
 	return stmap[uint64(st)]
-***REMOVED***
+}
 
 // Config contains the parameters to start a raft.
-type Config struct ***REMOVED***
+type Config struct {
 	// ID is the identity of the local raft. ID cannot be 0.
 	ID uint64
 
@@ -176,37 +176,37 @@ type Config struct ***REMOVED***
 	// Logger is the logger used for raft log. For multinode which can host
 	// multiple raft group, each raft group can have its own logger
 	Logger Logger
-***REMOVED***
+}
 
-func (c *Config) validate() error ***REMOVED***
-	if c.ID == None ***REMOVED***
+func (c *Config) validate() error {
+	if c.ID == None {
 		return errors.New("cannot use none as id")
-	***REMOVED***
+	}
 
-	if c.HeartbeatTick <= 0 ***REMOVED***
+	if c.HeartbeatTick <= 0 {
 		return errors.New("heartbeat tick must be greater than 0")
-	***REMOVED***
+	}
 
-	if c.ElectionTick <= c.HeartbeatTick ***REMOVED***
+	if c.ElectionTick <= c.HeartbeatTick {
 		return errors.New("election tick must be greater than heartbeat tick")
-	***REMOVED***
+	}
 
-	if c.Storage == nil ***REMOVED***
+	if c.Storage == nil {
 		return errors.New("storage cannot be nil")
-	***REMOVED***
+	}
 
-	if c.MaxInflightMsgs <= 0 ***REMOVED***
+	if c.MaxInflightMsgs <= 0 {
 		return errors.New("max inflight messages must be greater than 0")
-	***REMOVED***
+	}
 
-	if c.Logger == nil ***REMOVED***
+	if c.Logger == nil {
 		c.Logger = raftLogger
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-type raft struct ***REMOVED***
+type raft struct {
 	id uint64
 
 	Term uint64
@@ -261,28 +261,28 @@ type raft struct ***REMOVED***
 	step stepFunc
 
 	logger Logger
-***REMOVED***
+}
 
-func newRaft(c *Config) *raft ***REMOVED***
-	if err := c.validate(); err != nil ***REMOVED***
+func newRaft(c *Config) *raft {
+	if err := c.validate(); err != nil {
 		panic(err.Error())
-	***REMOVED***
+	}
 	raftlog := newLog(c.Storage, c.Logger)
 	hs, cs, err := c.Storage.InitialState()
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err) // TODO(bdarnell)
-	***REMOVED***
+	}
 	peers := c.peers
-	if len(cs.Nodes) > 0 ***REMOVED***
-		if len(peers) > 0 ***REMOVED***
+	if len(cs.Nodes) > 0 {
+		if len(peers) > 0 {
 			// TODO(bdarnell): the peers argument is always nil except in
 			// tests; the argument should be removed and these tests should be
 			// updated to specify their nodes through a snapshot.
 			panic("cannot specify both newRaft(peers) and ConfState.Nodes)")
-		***REMOVED***
+		}
 		peers = cs.Nodes
-	***REMOVED***
-	r := &raft***REMOVED***
+	}
+	r := &raft{
 		id:               c.ID,
 		lead:             None,
 		raftLog:          raftlog,
@@ -295,119 +295,119 @@ func newRaft(c *Config) *raft ***REMOVED***
 		checkQuorum:      c.CheckQuorum,
 		preVote:          c.PreVote,
 		readOnly:         newReadOnly(c.ReadOnlyOption),
-	***REMOVED***
-	for _, p := range peers ***REMOVED***
-		r.prs[p] = &Progress***REMOVED***Next: 1, ins: newInflights(r.maxInflight)***REMOVED***
-	***REMOVED***
-	if !isHardStateEqual(hs, emptyState) ***REMOVED***
+	}
+	for _, p := range peers {
+		r.prs[p] = &Progress{Next: 1, ins: newInflights(r.maxInflight)}
+	}
+	if !isHardStateEqual(hs, emptyState) {
 		r.loadState(hs)
-	***REMOVED***
-	if c.Applied > 0 ***REMOVED***
+	}
+	if c.Applied > 0 {
 		raftlog.appliedTo(c.Applied)
-	***REMOVED***
+	}
 	r.becomeFollower(r.Term, None)
 
 	var nodesStrs []string
-	for _, n := range r.nodes() ***REMOVED***
+	for _, n := range r.nodes() {
 		nodesStrs = append(nodesStrs, fmt.Sprintf("%x", n))
-	***REMOVED***
+	}
 
 	r.logger.Infof("newRaft %x [peers: [%s], term: %d, commit: %d, applied: %d, lastindex: %d, lastterm: %d]",
 		r.id, strings.Join(nodesStrs, ","), r.Term, r.raftLog.committed, r.raftLog.applied, r.raftLog.lastIndex(), r.raftLog.lastTerm())
 	return r
-***REMOVED***
+}
 
-func (r *raft) hasLeader() bool ***REMOVED*** return r.lead != None ***REMOVED***
+func (r *raft) hasLeader() bool { return r.lead != None }
 
-func (r *raft) softState() *SoftState ***REMOVED*** return &SoftState***REMOVED***Lead: r.lead, RaftState: r.state***REMOVED*** ***REMOVED***
+func (r *raft) softState() *SoftState { return &SoftState{Lead: r.lead, RaftState: r.state} }
 
-func (r *raft) hardState() pb.HardState ***REMOVED***
-	return pb.HardState***REMOVED***
+func (r *raft) hardState() pb.HardState {
+	return pb.HardState{
 		Term:   r.Term,
 		Vote:   r.Vote,
 		Commit: r.raftLog.committed,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (r *raft) quorum() int ***REMOVED*** return len(r.prs)/2 + 1 ***REMOVED***
+func (r *raft) quorum() int { return len(r.prs)/2 + 1 }
 
-func (r *raft) nodes() []uint64 ***REMOVED***
+func (r *raft) nodes() []uint64 {
 	nodes := make([]uint64, 0, len(r.prs))
-	for id := range r.prs ***REMOVED***
+	for id := range r.prs {
 		nodes = append(nodes, id)
-	***REMOVED***
+	}
 	sort.Sort(uint64Slice(nodes))
 	return nodes
-***REMOVED***
+}
 
 // send persists state to stable storage and then sends to its mailbox.
-func (r *raft) send(m pb.Message) ***REMOVED***
+func (r *raft) send(m pb.Message) {
 	m.From = r.id
-	if m.Type == pb.MsgVote || m.Type == pb.MsgPreVote ***REMOVED***
-		if m.Term == 0 ***REMOVED***
+	if m.Type == pb.MsgVote || m.Type == pb.MsgPreVote {
+		if m.Term == 0 {
 			// PreVote RPCs are sent at a term other than our actual term, so the code
 			// that sends these messages is responsible for setting the term.
 			panic(fmt.Sprintf("term should be set when sending %s", m.Type))
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
-		if m.Term != 0 ***REMOVED***
+		}
+	} else {
+		if m.Term != 0 {
 			panic(fmt.Sprintf("term should not be set when sending %s (was %d)", m.Type, m.Term))
-		***REMOVED***
+		}
 		// do not attach term to MsgProp, MsgReadIndex
 		// proposals are a way to forward to the leader and
 		// should be treated as local message.
 		// MsgReadIndex is also forwarded to leader.
-		if m.Type != pb.MsgProp && m.Type != pb.MsgReadIndex ***REMOVED***
+		if m.Type != pb.MsgProp && m.Type != pb.MsgReadIndex {
 			m.Term = r.Term
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	r.msgs = append(r.msgs, m)
-***REMOVED***
+}
 
 // sendAppend sends RPC, with entries to the given peer.
-func (r *raft) sendAppend(to uint64) ***REMOVED***
+func (r *raft) sendAppend(to uint64) {
 	pr := r.prs[to]
-	if pr.IsPaused() ***REMOVED***
+	if pr.IsPaused() {
 		return
-	***REMOVED***
-	m := pb.Message***REMOVED******REMOVED***
+	}
+	m := pb.Message{}
 	m.To = to
 
 	term, errt := r.raftLog.term(pr.Next - 1)
 	ents, erre := r.raftLog.entries(pr.Next, r.maxMsgSize)
 
-	if errt != nil || erre != nil ***REMOVED*** // send snapshot if we failed to get term or entries
-		if !pr.RecentActive ***REMOVED***
+	if errt != nil || erre != nil { // send snapshot if we failed to get term or entries
+		if !pr.RecentActive {
 			r.logger.Debugf("ignore sending snapshot to %x since it is not recently active", to)
 			return
-		***REMOVED***
+		}
 
 		m.Type = pb.MsgSnap
 		snapshot, err := r.raftLog.snapshot()
-		if err != nil ***REMOVED***
-			if err == ErrSnapshotTemporarilyUnavailable ***REMOVED***
+		if err != nil {
+			if err == ErrSnapshotTemporarilyUnavailable {
 				r.logger.Debugf("%x failed to send snapshot to %x because snapshot is temporarily unavailable", r.id, to)
 				return
-			***REMOVED***
+			}
 			panic(err) // TODO(bdarnell)
-		***REMOVED***
-		if IsEmptySnap(snapshot) ***REMOVED***
+		}
+		if IsEmptySnap(snapshot) {
 			panic("need non-empty snapshot")
-		***REMOVED***
+		}
 		m.Snapshot = snapshot
 		sindex, sterm := snapshot.Metadata.Index, snapshot.Metadata.Term
 		r.logger.Debugf("%x [firstindex: %d, commit: %d] sent snapshot[index: %d, term: %d] to %x [%s]",
 			r.id, r.raftLog.firstIndex(), r.raftLog.committed, sindex, sterm, to, pr)
 		pr.becomeSnapshot(sindex)
 		r.logger.Debugf("%x paused sending replication messages to %x [%s]", r.id, to, pr)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		m.Type = pb.MsgApp
 		m.Index = pr.Next - 1
 		m.LogTerm = term
 		m.Entries = ents
 		m.Commit = r.raftLog.committed
-		if n := len(m.Entries); n != 0 ***REMOVED***
-			switch pr.State ***REMOVED***
+		if n := len(m.Entries); n != 0 {
+			switch pr.State {
 			// optimistically increase the next when in ProgressStateReplicate
 			case ProgressStateReplicate:
 				last := m.Entries[n-1].Index
@@ -417,14 +417,14 @@ func (r *raft) sendAppend(to uint64) ***REMOVED***
 				pr.pause()
 			default:
 				r.logger.Panicf("%x is sending append in unhandled state %s", r.id, pr.State)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	r.send(m)
-***REMOVED***
+}
 
 // sendHeartbeat sends an empty MsgApp
-func (r *raft) sendHeartbeat(to uint64, ctx []byte) ***REMOVED***
+func (r *raft) sendHeartbeat(to uint64, ctx []byte) {
 	// Attach the commit as min(to.matched, r.committed).
 	// When the leader sends out heartbeat message,
 	// the receiver(follower) might not be matched with the leader
@@ -432,65 +432,65 @@ func (r *raft) sendHeartbeat(to uint64, ctx []byte) ***REMOVED***
 	// The leader MUST NOT forward the follower's commit to
 	// an unmatched index.
 	commit := min(r.prs[to].Match, r.raftLog.committed)
-	m := pb.Message***REMOVED***
+	m := pb.Message{
 		To:      to,
 		Type:    pb.MsgHeartbeat,
 		Commit:  commit,
 		Context: ctx,
-	***REMOVED***
+	}
 
 	r.send(m)
-***REMOVED***
+}
 
 // bcastAppend sends RPC, with entries to all peers that are not up-to-date
 // according to the progress recorded in r.prs.
-func (r *raft) bcastAppend() ***REMOVED***
-	for id := range r.prs ***REMOVED***
-		if id == r.id ***REMOVED***
+func (r *raft) bcastAppend() {
+	for id := range r.prs {
+		if id == r.id {
 			continue
-		***REMOVED***
+		}
 		r.sendAppend(id)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // bcastHeartbeat sends RPC, without entries to all the peers.
-func (r *raft) bcastHeartbeat() ***REMOVED***
+func (r *raft) bcastHeartbeat() {
 	lastCtx := r.readOnly.lastPendingRequestCtx()
-	if len(lastCtx) == 0 ***REMOVED***
+	if len(lastCtx) == 0 {
 		r.bcastHeartbeatWithCtx(nil)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		r.bcastHeartbeatWithCtx([]byte(lastCtx))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (r *raft) bcastHeartbeatWithCtx(ctx []byte) ***REMOVED***
-	for id := range r.prs ***REMOVED***
-		if id == r.id ***REMOVED***
+func (r *raft) bcastHeartbeatWithCtx(ctx []byte) {
+	for id := range r.prs {
+		if id == r.id {
 			continue
-		***REMOVED***
+		}
 		r.sendHeartbeat(id, ctx)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // maybeCommit attempts to advance the commit index. Returns true if
 // the commit index changed (in which case the caller should call
 // r.bcastAppend).
-func (r *raft) maybeCommit() bool ***REMOVED***
+func (r *raft) maybeCommit() bool {
 	// TODO(bmizerany): optimize.. Currently naive
 	mis := make(uint64Slice, 0, len(r.prs))
-	for id := range r.prs ***REMOVED***
+	for id := range r.prs {
 		mis = append(mis, r.prs[id].Match)
-	***REMOVED***
+	}
 	sort.Sort(sort.Reverse(mis))
 	mci := mis[r.quorum()-1]
 	return r.raftLog.maybeCommit(mci, r.Term)
-***REMOVED***
+}
 
-func (r *raft) reset(term uint64) ***REMOVED***
-	if r.Term != term ***REMOVED***
+func (r *raft) reset(term uint64) {
+	if r.Term != term {
 		r.Term = term
 		r.Vote = None
-	***REMOVED***
+	}
 	r.lead = None
 
 	r.electionElapsed = 0
@@ -500,91 +500,91 @@ func (r *raft) reset(term uint64) ***REMOVED***
 	r.abortLeaderTransfer()
 
 	r.votes = make(map[uint64]bool)
-	for id := range r.prs ***REMOVED***
-		r.prs[id] = &Progress***REMOVED***Next: r.raftLog.lastIndex() + 1, ins: newInflights(r.maxInflight)***REMOVED***
-		if id == r.id ***REMOVED***
+	for id := range r.prs {
+		r.prs[id] = &Progress{Next: r.raftLog.lastIndex() + 1, ins: newInflights(r.maxInflight)}
+		if id == r.id {
 			r.prs[id].Match = r.raftLog.lastIndex()
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	r.pendingConf = false
 	r.readOnly = newReadOnly(r.readOnly.option)
-***REMOVED***
+}
 
-func (r *raft) appendEntry(es ...pb.Entry) ***REMOVED***
+func (r *raft) appendEntry(es ...pb.Entry) {
 	li := r.raftLog.lastIndex()
-	for i := range es ***REMOVED***
+	for i := range es {
 		es[i].Term = r.Term
 		es[i].Index = li + 1 + uint64(i)
-	***REMOVED***
+	}
 	r.raftLog.append(es...)
 	r.prs[r.id].maybeUpdate(r.raftLog.lastIndex())
 	// Regardless of maybeCommit's return, our caller will call bcastAppend.
 	r.maybeCommit()
-***REMOVED***
+}
 
 // tickElection is run by followers and candidates after r.electionTimeout.
-func (r *raft) tickElection() ***REMOVED***
+func (r *raft) tickElection() {
 	r.electionElapsed++
 
-	if r.promotable() && r.pastElectionTimeout() ***REMOVED***
+	if r.promotable() && r.pastElectionTimeout() {
 		r.electionElapsed = 0
-		r.Step(pb.Message***REMOVED***From: r.id, Type: pb.MsgHup***REMOVED***)
-	***REMOVED***
-***REMOVED***
+		r.Step(pb.Message{From: r.id, Type: pb.MsgHup})
+	}
+}
 
 // tickHeartbeat is run by leaders to send a MsgBeat after r.heartbeatTimeout.
-func (r *raft) tickHeartbeat() ***REMOVED***
+func (r *raft) tickHeartbeat() {
 	r.heartbeatElapsed++
 	r.electionElapsed++
 
-	if r.electionElapsed >= r.electionTimeout ***REMOVED***
+	if r.electionElapsed >= r.electionTimeout {
 		r.electionElapsed = 0
-		if r.checkQuorum ***REMOVED***
-			r.Step(pb.Message***REMOVED***From: r.id, Type: pb.MsgCheckQuorum***REMOVED***)
-		***REMOVED***
+		if r.checkQuorum {
+			r.Step(pb.Message{From: r.id, Type: pb.MsgCheckQuorum})
+		}
 		// If current leader cannot transfer leadership in electionTimeout, it becomes leader again.
-		if r.state == StateLeader && r.leadTransferee != None ***REMOVED***
+		if r.state == StateLeader && r.leadTransferee != None {
 			r.abortLeaderTransfer()
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if r.state != StateLeader ***REMOVED***
+	if r.state != StateLeader {
 		return
-	***REMOVED***
+	}
 
-	if r.heartbeatElapsed >= r.heartbeatTimeout ***REMOVED***
+	if r.heartbeatElapsed >= r.heartbeatTimeout {
 		r.heartbeatElapsed = 0
-		r.Step(pb.Message***REMOVED***From: r.id, Type: pb.MsgBeat***REMOVED***)
-	***REMOVED***
-***REMOVED***
+		r.Step(pb.Message{From: r.id, Type: pb.MsgBeat})
+	}
+}
 
-func (r *raft) becomeFollower(term uint64, lead uint64) ***REMOVED***
+func (r *raft) becomeFollower(term uint64, lead uint64) {
 	r.step = stepFollower
 	r.reset(term)
 	r.tick = r.tickElection
 	r.lead = lead
 	r.state = StateFollower
 	r.logger.Infof("%x became follower at term %d", r.id, r.Term)
-***REMOVED***
+}
 
-func (r *raft) becomeCandidate() ***REMOVED***
+func (r *raft) becomeCandidate() {
 	// TODO(xiangli) remove the panic when the raft implementation is stable
-	if r.state == StateLeader ***REMOVED***
+	if r.state == StateLeader {
 		panic("invalid transition [leader -> candidate]")
-	***REMOVED***
+	}
 	r.step = stepCandidate
 	r.reset(r.Term + 1)
 	r.tick = r.tickElection
 	r.Vote = r.id
 	r.state = StateCandidate
 	r.logger.Infof("%x became candidate at term %d", r.id, r.Term)
-***REMOVED***
+}
 
-func (r *raft) becomePreCandidate() ***REMOVED***
+func (r *raft) becomePreCandidate() {
 	// TODO(xiangli) remove the panic when the raft implementation is stable
-	if r.state == StateLeader ***REMOVED***
+	if r.state == StateLeader {
 		panic("invalid transition [leader -> pre-candidate]")
-	***REMOVED***
+	}
 	// Becoming a pre-candidate changes our step functions and state,
 	// but doesn't change anything else. In particular it does not increase
 	// r.Term or change r.Vote.
@@ -592,110 +592,110 @@ func (r *raft) becomePreCandidate() ***REMOVED***
 	r.tick = r.tickElection
 	r.state = StatePreCandidate
 	r.logger.Infof("%x became pre-candidate at term %d", r.id, r.Term)
-***REMOVED***
+}
 
-func (r *raft) becomeLeader() ***REMOVED***
+func (r *raft) becomeLeader() {
 	// TODO(xiangli) remove the panic when the raft implementation is stable
-	if r.state == StateFollower ***REMOVED***
+	if r.state == StateFollower {
 		panic("invalid transition [follower -> leader]")
-	***REMOVED***
+	}
 	r.step = stepLeader
 	r.reset(r.Term)
 	r.tick = r.tickHeartbeat
 	r.lead = r.id
 	r.state = StateLeader
 	ents, err := r.raftLog.entries(r.raftLog.committed+1, noLimit)
-	if err != nil ***REMOVED***
+	if err != nil {
 		r.logger.Panicf("unexpected error getting uncommitted entries (%v)", err)
-	***REMOVED***
+	}
 
 	nconf := numOfPendingConf(ents)
-	if nconf > 1 ***REMOVED***
+	if nconf > 1 {
 		panic("unexpected multiple uncommitted config entry")
-	***REMOVED***
-	if nconf == 1 ***REMOVED***
+	}
+	if nconf == 1 {
 		r.pendingConf = true
-	***REMOVED***
+	}
 
-	r.appendEntry(pb.Entry***REMOVED***Data: nil***REMOVED***)
+	r.appendEntry(pb.Entry{Data: nil})
 	r.logger.Infof("%x became leader at term %d", r.id, r.Term)
-***REMOVED***
+}
 
-func (r *raft) campaign(t CampaignType) ***REMOVED***
+func (r *raft) campaign(t CampaignType) {
 	var term uint64
 	var voteMsg pb.MessageType
-	if t == campaignPreElection ***REMOVED***
+	if t == campaignPreElection {
 		r.becomePreCandidate()
 		voteMsg = pb.MsgPreVote
 		// PreVote RPCs are sent for the next term before we've incremented r.Term.
 		term = r.Term + 1
-	***REMOVED*** else ***REMOVED***
+	} else {
 		r.becomeCandidate()
 		voteMsg = pb.MsgVote
 		term = r.Term
-	***REMOVED***
-	if r.quorum() == r.poll(r.id, voteRespMsgType(voteMsg), true) ***REMOVED***
+	}
+	if r.quorum() == r.poll(r.id, voteRespMsgType(voteMsg), true) {
 		// We won the election after voting for ourselves (which must mean that
 		// this is a single-node cluster). Advance to the next state.
-		if t == campaignPreElection ***REMOVED***
+		if t == campaignPreElection {
 			r.campaign(campaignElection)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			r.becomeLeader()
-		***REMOVED***
+		}
 		return
-	***REMOVED***
-	for id := range r.prs ***REMOVED***
-		if id == r.id ***REMOVED***
+	}
+	for id := range r.prs {
+		if id == r.id {
 			continue
-		***REMOVED***
+		}
 		r.logger.Infof("%x [logterm: %d, index: %d] sent %s request to %x at term %d",
 			r.id, r.raftLog.lastTerm(), r.raftLog.lastIndex(), voteMsg, id, r.Term)
 
 		var ctx []byte
-		if t == campaignTransfer ***REMOVED***
+		if t == campaignTransfer {
 			ctx = []byte(t)
-		***REMOVED***
-		r.send(pb.Message***REMOVED***Term: term, To: id, Type: voteMsg, Index: r.raftLog.lastIndex(), LogTerm: r.raftLog.lastTerm(), Context: ctx***REMOVED***)
-	***REMOVED***
-***REMOVED***
+		}
+		r.send(pb.Message{Term: term, To: id, Type: voteMsg, Index: r.raftLog.lastIndex(), LogTerm: r.raftLog.lastTerm(), Context: ctx})
+	}
+}
 
-func (r *raft) poll(id uint64, t pb.MessageType, v bool) (granted int) ***REMOVED***
-	if v ***REMOVED***
+func (r *raft) poll(id uint64, t pb.MessageType, v bool) (granted int) {
+	if v {
 		r.logger.Infof("%x received %s from %x at term %d", r.id, t, id, r.Term)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		r.logger.Infof("%x received %s rejection from %x at term %d", r.id, t, id, r.Term)
-	***REMOVED***
-	if _, ok := r.votes[id]; !ok ***REMOVED***
+	}
+	if _, ok := r.votes[id]; !ok {
 		r.votes[id] = v
-	***REMOVED***
-	for _, vv := range r.votes ***REMOVED***
-		if vv ***REMOVED***
+	}
+	for _, vv := range r.votes {
+		if vv {
 			granted++
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return granted
-***REMOVED***
+}
 
-func (r *raft) Step(m pb.Message) error ***REMOVED***
+func (r *raft) Step(m pb.Message) error {
 	// Handle the message term, which may result in our stepping down to a follower.
-	switch ***REMOVED***
+	switch {
 	case m.Term == 0:
 		// local message
 	case m.Term > r.Term:
 		lead := m.From
-		if m.Type == pb.MsgVote || m.Type == pb.MsgPreVote ***REMOVED***
+		if m.Type == pb.MsgVote || m.Type == pb.MsgPreVote {
 			force := bytes.Equal(m.Context, []byte(campaignTransfer))
 			inLease := r.checkQuorum && r.lead != None && r.electionElapsed < r.electionTimeout
-			if !force && inLease ***REMOVED***
+			if !force && inLease {
 				// If a server receives a RequestVote request within the minimum election timeout
 				// of hearing from a current leader, it does not update its term or grant its vote
 				r.logger.Infof("%x [logterm: %d, index: %d, vote: %x] ignored %s from %x [logterm: %d, index: %d] at term %d: lease is not expired (remaining ticks: %d)",
 					r.id, r.raftLog.lastTerm(), r.raftLog.lastIndex(), r.Vote, m.Type, m.From, m.LogTerm, m.Index, r.Term, r.electionTimeout-r.electionElapsed)
 				return nil
-			***REMOVED***
+			}
 			lead = None
-		***REMOVED***
-		switch ***REMOVED***
+		}
+		switch {
 		case m.Type == pb.MsgPreVote:
 			// Never change our term in response to a PreVote
 		case m.Type == pb.MsgPreVoteResp && !m.Reject:
@@ -708,10 +708,10 @@ func (r *raft) Step(m pb.Message) error ***REMOVED***
 			r.logger.Infof("%x [term: %d] received a %s message with higher term from %x [term: %d]",
 				r.id, r.Term, m.Type, m.From, m.Term)
 			r.becomeFollower(m.Term, lead)
-		***REMOVED***
+		}
 
 	case m.Term < r.Term:
-		if r.checkQuorum && (m.Type == pb.MsgHeartbeat || m.Type == pb.MsgApp) ***REMOVED***
+		if r.checkQuorum && (m.Type == pb.MsgHeartbeat || m.Type == pb.MsgApp) {
 			// We have received messages from a leader at a lower term. It is possible
 			// that these messages were simply delayed in the network, but this could
 			// also mean that this node has advanced its term number during a network
@@ -725,158 +725,158 @@ func (r *raft) Step(m pb.Message) error ***REMOVED***
 			// removed node will send MsgVotes (or MsgPreVotes) which will be ignored,
 			// but it will not receive MsgApp or MsgHeartbeat, so it will not create
 			// disruptive term increases
-			r.send(pb.Message***REMOVED***To: m.From, Type: pb.MsgAppResp***REMOVED***)
-		***REMOVED*** else ***REMOVED***
+			r.send(pb.Message{To: m.From, Type: pb.MsgAppResp})
+		} else {
 			// ignore other cases
 			r.logger.Infof("%x [term: %d] ignored a %s message with lower term from %x [term: %d]",
 				r.id, r.Term, m.Type, m.From, m.Term)
-		***REMOVED***
+		}
 		return nil
-	***REMOVED***
+	}
 
-	switch m.Type ***REMOVED***
+	switch m.Type {
 	case pb.MsgHup:
-		if r.state != StateLeader ***REMOVED***
+		if r.state != StateLeader {
 			ents, err := r.raftLog.slice(r.raftLog.applied+1, r.raftLog.committed+1, noLimit)
-			if err != nil ***REMOVED***
+			if err != nil {
 				r.logger.Panicf("unexpected error getting unapplied entries (%v)", err)
-			***REMOVED***
-			if n := numOfPendingConf(ents); n != 0 && r.raftLog.committed > r.raftLog.applied ***REMOVED***
+			}
+			if n := numOfPendingConf(ents); n != 0 && r.raftLog.committed > r.raftLog.applied {
 				r.logger.Warningf("%x cannot campaign at term %d since there are still %d pending configuration changes to apply", r.id, r.Term, n)
 				return nil
-			***REMOVED***
+			}
 
 			r.logger.Infof("%x is starting a new election at term %d", r.id, r.Term)
-			if r.preVote ***REMOVED***
+			if r.preVote {
 				r.campaign(campaignPreElection)
-			***REMOVED*** else ***REMOVED***
+			} else {
 				r.campaign(campaignElection)
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
+			}
+		} else {
 			r.logger.Debugf("%x ignoring MsgHup because already leader", r.id)
-		***REMOVED***
+		}
 
 	case pb.MsgVote, pb.MsgPreVote:
 		// The m.Term > r.Term clause is for MsgPreVote. For MsgVote m.Term should
 		// always equal r.Term.
-		if (r.Vote == None || m.Term > r.Term || r.Vote == m.From) && r.raftLog.isUpToDate(m.Index, m.LogTerm) ***REMOVED***
+		if (r.Vote == None || m.Term > r.Term || r.Vote == m.From) && r.raftLog.isUpToDate(m.Index, m.LogTerm) {
 			r.logger.Infof("%x [logterm: %d, index: %d, vote: %x] cast %s for %x [logterm: %d, index: %d] at term %d",
 				r.id, r.raftLog.lastTerm(), r.raftLog.lastIndex(), r.Vote, m.Type, m.From, m.LogTerm, m.Index, r.Term)
-			r.send(pb.Message***REMOVED***To: m.From, Type: voteRespMsgType(m.Type)***REMOVED***)
-			if m.Type == pb.MsgVote ***REMOVED***
+			r.send(pb.Message{To: m.From, Type: voteRespMsgType(m.Type)})
+			if m.Type == pb.MsgVote {
 				// Only record real votes.
 				r.electionElapsed = 0
 				r.Vote = m.From
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
+			}
+		} else {
 			r.logger.Infof("%x [logterm: %d, index: %d, vote: %x] rejected %s from %x [logterm: %d, index: %d] at term %d",
 				r.id, r.raftLog.lastTerm(), r.raftLog.lastIndex(), r.Vote, m.Type, m.From, m.LogTerm, m.Index, r.Term)
-			r.send(pb.Message***REMOVED***To: m.From, Type: voteRespMsgType(m.Type), Reject: true***REMOVED***)
-		***REMOVED***
+			r.send(pb.Message{To: m.From, Type: voteRespMsgType(m.Type), Reject: true})
+		}
 
 	default:
 		r.step(r, m)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 type stepFunc func(r *raft, m pb.Message)
 
-func stepLeader(r *raft, m pb.Message) ***REMOVED***
+func stepLeader(r *raft, m pb.Message) {
 	// These message types do not require any progress for m.From.
-	switch m.Type ***REMOVED***
+	switch m.Type {
 	case pb.MsgBeat:
 		r.bcastHeartbeat()
 		return
 	case pb.MsgCheckQuorum:
-		if !r.checkQuorumActive() ***REMOVED***
+		if !r.checkQuorumActive() {
 			r.logger.Warningf("%x stepped down to follower since quorum is not active", r.id)
 			r.becomeFollower(r.Term, None)
-		***REMOVED***
+		}
 		return
 	case pb.MsgProp:
-		if len(m.Entries) == 0 ***REMOVED***
+		if len(m.Entries) == 0 {
 			r.logger.Panicf("%x stepped empty MsgProp", r.id)
-		***REMOVED***
-		if _, ok := r.prs[r.id]; !ok ***REMOVED***
+		}
+		if _, ok := r.prs[r.id]; !ok {
 			// If we are not currently a member of the range (i.e. this node
 			// was removed from the configuration while serving as leader),
 			// drop any new proposals.
 			return
-		***REMOVED***
-		if r.leadTransferee != None ***REMOVED***
+		}
+		if r.leadTransferee != None {
 			r.logger.Debugf("%x [term %d] transfer leadership to %x is in progress; dropping proposal", r.id, r.Term, r.leadTransferee)
 			return
-		***REMOVED***
+		}
 
-		for i, e := range m.Entries ***REMOVED***
-			if e.Type == pb.EntryConfChange ***REMOVED***
-				if r.pendingConf ***REMOVED***
+		for i, e := range m.Entries {
+			if e.Type == pb.EntryConfChange {
+				if r.pendingConf {
 					r.logger.Infof("propose conf %s ignored since pending unapplied configuration", e.String())
-					m.Entries[i] = pb.Entry***REMOVED***Type: pb.EntryNormal***REMOVED***
-				***REMOVED***
+					m.Entries[i] = pb.Entry{Type: pb.EntryNormal}
+				}
 				r.pendingConf = true
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		r.appendEntry(m.Entries...)
 		r.bcastAppend()
 		return
 	case pb.MsgReadIndex:
-		if r.quorum() > 1 ***REMOVED***
-			if r.raftLog.zeroTermOnErrCompacted(r.raftLog.term(r.raftLog.committed)) != r.Term ***REMOVED***
+		if r.quorum() > 1 {
+			if r.raftLog.zeroTermOnErrCompacted(r.raftLog.term(r.raftLog.committed)) != r.Term {
 				// Reject read only request when this leader has not committed any log entry at its term.
 				return
-			***REMOVED***
+			}
 
 			// thinking: use an interally defined context instead of the user given context.
 			// We can express this in terms of the term and index instead of a user-supplied value.
 			// This would allow multiple reads to piggyback on the same message.
-			switch r.readOnly.option ***REMOVED***
+			switch r.readOnly.option {
 			case ReadOnlySafe:
 				r.readOnly.addRequest(r.raftLog.committed, m)
 				r.bcastHeartbeatWithCtx(m.Entries[0].Data)
 			case ReadOnlyLeaseBased:
 				var ri uint64
-				if r.checkQuorum ***REMOVED***
+				if r.checkQuorum {
 					ri = r.raftLog.committed
-				***REMOVED***
-				if m.From == None || m.From == r.id ***REMOVED*** // from local member
-					r.readStates = append(r.readStates, ReadState***REMOVED***Index: r.raftLog.committed, RequestCtx: m.Entries[0].Data***REMOVED***)
-				***REMOVED*** else ***REMOVED***
-					r.send(pb.Message***REMOVED***To: m.From, Type: pb.MsgReadIndexResp, Index: ri, Entries: m.Entries***REMOVED***)
-				***REMOVED***
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
-			r.readStates = append(r.readStates, ReadState***REMOVED***Index: r.raftLog.committed, RequestCtx: m.Entries[0].Data***REMOVED***)
-		***REMOVED***
+				}
+				if m.From == None || m.From == r.id { // from local member
+					r.readStates = append(r.readStates, ReadState{Index: r.raftLog.committed, RequestCtx: m.Entries[0].Data})
+				} else {
+					r.send(pb.Message{To: m.From, Type: pb.MsgReadIndexResp, Index: ri, Entries: m.Entries})
+				}
+			}
+		} else {
+			r.readStates = append(r.readStates, ReadState{Index: r.raftLog.committed, RequestCtx: m.Entries[0].Data})
+		}
 
 		return
-	***REMOVED***
+	}
 
 	// All other message types require a progress for m.From (pr).
 	pr, prOk := r.prs[m.From]
-	if !prOk ***REMOVED***
+	if !prOk {
 		r.logger.Debugf("%x no progress available for %x", r.id, m.From)
 		return
-	***REMOVED***
-	switch m.Type ***REMOVED***
+	}
+	switch m.Type {
 	case pb.MsgAppResp:
 		pr.RecentActive = true
 
-		if m.Reject ***REMOVED***
+		if m.Reject {
 			r.logger.Debugf("%x received msgApp rejection(lastindex: %d) from %x for index %d",
 				r.id, m.RejectHint, m.From, m.Index)
-			if pr.maybeDecrTo(m.Index, m.RejectHint) ***REMOVED***
+			if pr.maybeDecrTo(m.Index, m.RejectHint) {
 				r.logger.Debugf("%x decreased progress of %x to [%s]", r.id, m.From, pr)
-				if pr.State == ProgressStateReplicate ***REMOVED***
+				if pr.State == ProgressStateReplicate {
 					pr.becomeProbe()
-				***REMOVED***
+				}
 				r.sendAppend(m.From)
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
+			}
+		} else {
 			oldPaused := pr.IsPaused()
-			if pr.maybeUpdate(m.Index) ***REMOVED***
-				switch ***REMOVED***
+			if pr.maybeUpdate(m.Index) {
+				switch {
 				case pr.State == ProgressStateProbe:
 					pr.becomeReplicate()
 				case pr.State == ProgressStateSnapshot && pr.needSnapshotAbort():
@@ -884,64 +884,64 @@ func stepLeader(r *raft, m pb.Message) ***REMOVED***
 					pr.becomeProbe()
 				case pr.State == ProgressStateReplicate:
 					pr.ins.freeTo(m.Index)
-				***REMOVED***
+				}
 
-				if r.maybeCommit() ***REMOVED***
+				if r.maybeCommit() {
 					r.bcastAppend()
-				***REMOVED*** else if oldPaused ***REMOVED***
+				} else if oldPaused {
 					// update() reset the wait state on this node. If we had delayed sending
 					// an update before, send it now.
 					r.sendAppend(m.From)
-				***REMOVED***
+				}
 				// Transfer leadership is in progress.
-				if m.From == r.leadTransferee && pr.Match == r.raftLog.lastIndex() ***REMOVED***
+				if m.From == r.leadTransferee && pr.Match == r.raftLog.lastIndex() {
 					r.logger.Infof("%x sent MsgTimeoutNow to %x after received MsgAppResp", r.id, m.From)
 					r.sendTimeoutNow(m.From)
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
+				}
+			}
+		}
 	case pb.MsgHeartbeatResp:
 		pr.RecentActive = true
 		pr.resume()
 
 		// free one slot for the full inflights window to allow progress.
-		if pr.State == ProgressStateReplicate && pr.ins.full() ***REMOVED***
+		if pr.State == ProgressStateReplicate && pr.ins.full() {
 			pr.ins.freeFirstOne()
-		***REMOVED***
-		if pr.Match < r.raftLog.lastIndex() ***REMOVED***
+		}
+		if pr.Match < r.raftLog.lastIndex() {
 			r.sendAppend(m.From)
-		***REMOVED***
+		}
 
-		if r.readOnly.option != ReadOnlySafe || len(m.Context) == 0 ***REMOVED***
+		if r.readOnly.option != ReadOnlySafe || len(m.Context) == 0 {
 			return
-		***REMOVED***
+		}
 
 		ackCount := r.readOnly.recvAck(m)
-		if ackCount < r.quorum() ***REMOVED***
+		if ackCount < r.quorum() {
 			return
-		***REMOVED***
+		}
 
 		rss := r.readOnly.advance(m)
-		for _, rs := range rss ***REMOVED***
+		for _, rs := range rss {
 			req := rs.req
-			if req.From == None || req.From == r.id ***REMOVED*** // from local member
-				r.readStates = append(r.readStates, ReadState***REMOVED***Index: rs.index, RequestCtx: req.Entries[0].Data***REMOVED***)
-			***REMOVED*** else ***REMOVED***
-				r.send(pb.Message***REMOVED***To: req.From, Type: pb.MsgReadIndexResp, Index: rs.index, Entries: req.Entries***REMOVED***)
-			***REMOVED***
-		***REMOVED***
+			if req.From == None || req.From == r.id { // from local member
+				r.readStates = append(r.readStates, ReadState{Index: rs.index, RequestCtx: req.Entries[0].Data})
+			} else {
+				r.send(pb.Message{To: req.From, Type: pb.MsgReadIndexResp, Index: rs.index, Entries: req.Entries})
+			}
+		}
 	case pb.MsgSnapStatus:
-		if pr.State != ProgressStateSnapshot ***REMOVED***
+		if pr.State != ProgressStateSnapshot {
 			return
-		***REMOVED***
-		if !m.Reject ***REMOVED***
+		}
+		if !m.Reject {
 			pr.becomeProbe()
 			r.logger.Debugf("%x snapshot succeeded, resumed sending replication messages to %x [%s]", r.id, m.From, pr)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			pr.snapshotFailure()
 			pr.becomeProbe()
 			r.logger.Debugf("%x snapshot failed, resumed sending replication messages to %x [%s]", r.id, m.From, pr)
-		***REMOVED***
+		}
 		// If snapshot finish, wait for the msgAppResp from the remote node before sending
 		// out the next msgApp.
 		// If snapshot failure, wait for a heartbeat interval before next try
@@ -949,53 +949,53 @@ func stepLeader(r *raft, m pb.Message) ***REMOVED***
 	case pb.MsgUnreachable:
 		// During optimistic replication, if the remote becomes unreachable,
 		// there is huge probability that a MsgApp is lost.
-		if pr.State == ProgressStateReplicate ***REMOVED***
+		if pr.State == ProgressStateReplicate {
 			pr.becomeProbe()
-		***REMOVED***
+		}
 		r.logger.Debugf("%x failed to send message to %x because it is unreachable [%s]", r.id, m.From, pr)
 	case pb.MsgTransferLeader:
 		leadTransferee := m.From
 		lastLeadTransferee := r.leadTransferee
-		if lastLeadTransferee != None ***REMOVED***
-			if lastLeadTransferee == leadTransferee ***REMOVED***
+		if lastLeadTransferee != None {
+			if lastLeadTransferee == leadTransferee {
 				r.logger.Infof("%x [term %d] transfer leadership to %x is in progress, ignores request to same node %x",
 					r.id, r.Term, leadTransferee, leadTransferee)
 				return
-			***REMOVED***
+			}
 			r.abortLeaderTransfer()
 			r.logger.Infof("%x [term %d] abort previous transferring leadership to %x", r.id, r.Term, lastLeadTransferee)
-		***REMOVED***
-		if leadTransferee == r.id ***REMOVED***
+		}
+		if leadTransferee == r.id {
 			r.logger.Debugf("%x is already leader. Ignored transferring leadership to self", r.id)
 			return
-		***REMOVED***
+		}
 		// Transfer leadership to third party.
 		r.logger.Infof("%x [term %d] starts to transfer leadership to %x", r.id, r.Term, leadTransferee)
 		// Transfer leadership should be finished in one electionTimeout, so reset r.electionElapsed.
 		r.electionElapsed = 0
 		r.leadTransferee = leadTransferee
-		if pr.Match == r.raftLog.lastIndex() ***REMOVED***
+		if pr.Match == r.raftLog.lastIndex() {
 			r.sendTimeoutNow(leadTransferee)
 			r.logger.Infof("%x sends MsgTimeoutNow to %x immediately as %x already has up-to-date log", r.id, leadTransferee, leadTransferee)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			r.sendAppend(leadTransferee)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // stepCandidate is shared by StateCandidate and StatePreCandidate; the difference is
 // whether they respond to MsgVoteResp or MsgPreVoteResp.
-func stepCandidate(r *raft, m pb.Message) ***REMOVED***
+func stepCandidate(r *raft, m pb.Message) {
 	// Only handle vote responses corresponding to our candidacy (while in
 	// StateCandidate, we may get stale MsgPreVoteResp messages in this term from
 	// our pre-candidate state).
 	var myVoteRespType pb.MessageType
-	if r.state == StatePreCandidate ***REMOVED***
+	if r.state == StatePreCandidate {
 		myVoteRespType = pb.MsgPreVoteResp
-	***REMOVED*** else ***REMOVED***
+	} else {
 		myVoteRespType = pb.MsgVoteResp
-	***REMOVED***
-	switch m.Type ***REMOVED***
+	}
+	switch m.Type {
 	case pb.MsgProp:
 		r.logger.Infof("%x no leader at term %d; dropping proposal", r.id, r.Term)
 		return
@@ -1011,29 +1011,29 @@ func stepCandidate(r *raft, m pb.Message) ***REMOVED***
 	case myVoteRespType:
 		gr := r.poll(m.From, m.Type, !m.Reject)
 		r.logger.Infof("%x [quorum:%d] has received %d %s votes and %d vote rejections", r.id, r.quorum(), gr, m.Type, len(r.votes)-gr)
-		switch r.quorum() ***REMOVED***
+		switch r.quorum() {
 		case gr:
-			if r.state == StatePreCandidate ***REMOVED***
+			if r.state == StatePreCandidate {
 				r.campaign(campaignElection)
-			***REMOVED*** else ***REMOVED***
+			} else {
 				r.becomeLeader()
 				r.bcastAppend()
-			***REMOVED***
+			}
 		case len(r.votes) - gr:
 			r.becomeFollower(r.Term, None)
-		***REMOVED***
+		}
 	case pb.MsgTimeoutNow:
 		r.logger.Debugf("%x [term %d state %v] ignored MsgTimeoutNow from %x", r.id, r.Term, r.state, m.From)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func stepFollower(r *raft, m pb.Message) ***REMOVED***
-	switch m.Type ***REMOVED***
+func stepFollower(r *raft, m pb.Message) {
+	switch m.Type {
 	case pb.MsgProp:
-		if r.lead == None ***REMOVED***
+		if r.lead == None {
 			r.logger.Infof("%x no leader at term %d; dropping proposal", r.id, r.Term)
 			return
-		***REMOVED***
+		}
 		m.To = r.lead
 		r.send(m)
 	case pb.MsgApp:
@@ -1049,209 +1049,209 @@ func stepFollower(r *raft, m pb.Message) ***REMOVED***
 		r.lead = m.From
 		r.handleSnapshot(m)
 	case pb.MsgTransferLeader:
-		if r.lead == None ***REMOVED***
+		if r.lead == None {
 			r.logger.Infof("%x no leader at term %d; dropping leader transfer msg", r.id, r.Term)
 			return
-		***REMOVED***
+		}
 		m.To = r.lead
 		r.send(m)
 	case pb.MsgTimeoutNow:
-		if r.promotable() ***REMOVED***
+		if r.promotable() {
 			r.logger.Infof("%x [term %d] received MsgTimeoutNow from %x and starts an election to get leadership.", r.id, r.Term, m.From)
 			// Leadership transfers never use pre-vote even if r.preVote is true; we
 			// know we are not recovering from a partition so there is no need for the
 			// extra round trip.
 			r.campaign(campaignTransfer)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			r.logger.Infof("%x received MsgTimeoutNow from %x but is not promotable", r.id, m.From)
-		***REMOVED***
+		}
 	case pb.MsgReadIndex:
-		if r.lead == None ***REMOVED***
+		if r.lead == None {
 			r.logger.Infof("%x no leader at term %d; dropping index reading msg", r.id, r.Term)
 			return
-		***REMOVED***
+		}
 		m.To = r.lead
 		r.send(m)
 	case pb.MsgReadIndexResp:
-		if len(m.Entries) != 1 ***REMOVED***
+		if len(m.Entries) != 1 {
 			r.logger.Errorf("%x invalid format of MsgReadIndexResp from %x, entries count: %d", r.id, m.From, len(m.Entries))
 			return
-		***REMOVED***
-		r.readStates = append(r.readStates, ReadState***REMOVED***Index: m.Index, RequestCtx: m.Entries[0].Data***REMOVED***)
-	***REMOVED***
-***REMOVED***
+		}
+		r.readStates = append(r.readStates, ReadState{Index: m.Index, RequestCtx: m.Entries[0].Data})
+	}
+}
 
-func (r *raft) handleAppendEntries(m pb.Message) ***REMOVED***
-	if m.Index < r.raftLog.committed ***REMOVED***
-		r.send(pb.Message***REMOVED***To: m.From, Type: pb.MsgAppResp, Index: r.raftLog.committed***REMOVED***)
+func (r *raft) handleAppendEntries(m pb.Message) {
+	if m.Index < r.raftLog.committed {
+		r.send(pb.Message{To: m.From, Type: pb.MsgAppResp, Index: r.raftLog.committed})
 		return
-	***REMOVED***
+	}
 
-	if mlastIndex, ok := r.raftLog.maybeAppend(m.Index, m.LogTerm, m.Commit, m.Entries...); ok ***REMOVED***
-		r.send(pb.Message***REMOVED***To: m.From, Type: pb.MsgAppResp, Index: mlastIndex***REMOVED***)
-	***REMOVED*** else ***REMOVED***
+	if mlastIndex, ok := r.raftLog.maybeAppend(m.Index, m.LogTerm, m.Commit, m.Entries...); ok {
+		r.send(pb.Message{To: m.From, Type: pb.MsgAppResp, Index: mlastIndex})
+	} else {
 		r.logger.Debugf("%x [logterm: %d, index: %d] rejected msgApp [logterm: %d, index: %d] from %x",
 			r.id, r.raftLog.zeroTermOnErrCompacted(r.raftLog.term(m.Index)), m.Index, m.LogTerm, m.Index, m.From)
-		r.send(pb.Message***REMOVED***To: m.From, Type: pb.MsgAppResp, Index: m.Index, Reject: true, RejectHint: r.raftLog.lastIndex()***REMOVED***)
-	***REMOVED***
-***REMOVED***
+		r.send(pb.Message{To: m.From, Type: pb.MsgAppResp, Index: m.Index, Reject: true, RejectHint: r.raftLog.lastIndex()})
+	}
+}
 
-func (r *raft) handleHeartbeat(m pb.Message) ***REMOVED***
+func (r *raft) handleHeartbeat(m pb.Message) {
 	r.raftLog.commitTo(m.Commit)
-	r.send(pb.Message***REMOVED***To: m.From, Type: pb.MsgHeartbeatResp, Context: m.Context***REMOVED***)
-***REMOVED***
+	r.send(pb.Message{To: m.From, Type: pb.MsgHeartbeatResp, Context: m.Context})
+}
 
-func (r *raft) handleSnapshot(m pb.Message) ***REMOVED***
+func (r *raft) handleSnapshot(m pb.Message) {
 	sindex, sterm := m.Snapshot.Metadata.Index, m.Snapshot.Metadata.Term
-	if r.restore(m.Snapshot) ***REMOVED***
+	if r.restore(m.Snapshot) {
 		r.logger.Infof("%x [commit: %d] restored snapshot [index: %d, term: %d]",
 			r.id, r.raftLog.committed, sindex, sterm)
-		r.send(pb.Message***REMOVED***To: m.From, Type: pb.MsgAppResp, Index: r.raftLog.lastIndex()***REMOVED***)
-	***REMOVED*** else ***REMOVED***
+		r.send(pb.Message{To: m.From, Type: pb.MsgAppResp, Index: r.raftLog.lastIndex()})
+	} else {
 		r.logger.Infof("%x [commit: %d] ignored snapshot [index: %d, term: %d]",
 			r.id, r.raftLog.committed, sindex, sterm)
-		r.send(pb.Message***REMOVED***To: m.From, Type: pb.MsgAppResp, Index: r.raftLog.committed***REMOVED***)
-	***REMOVED***
-***REMOVED***
+		r.send(pb.Message{To: m.From, Type: pb.MsgAppResp, Index: r.raftLog.committed})
+	}
+}
 
 // restore recovers the state machine from a snapshot. It restores the log and the
 // configuration of state machine.
-func (r *raft) restore(s pb.Snapshot) bool ***REMOVED***
-	if s.Metadata.Index <= r.raftLog.committed ***REMOVED***
+func (r *raft) restore(s pb.Snapshot) bool {
+	if s.Metadata.Index <= r.raftLog.committed {
 		return false
-	***REMOVED***
-	if r.raftLog.matchTerm(s.Metadata.Index, s.Metadata.Term) ***REMOVED***
+	}
+	if r.raftLog.matchTerm(s.Metadata.Index, s.Metadata.Term) {
 		r.logger.Infof("%x [commit: %d, lastindex: %d, lastterm: %d] fast-forwarded commit to snapshot [index: %d, term: %d]",
 			r.id, r.raftLog.committed, r.raftLog.lastIndex(), r.raftLog.lastTerm(), s.Metadata.Index, s.Metadata.Term)
 		r.raftLog.commitTo(s.Metadata.Index)
 		return false
-	***REMOVED***
+	}
 
 	r.logger.Infof("%x [commit: %d, lastindex: %d, lastterm: %d] starts to restore snapshot [index: %d, term: %d]",
 		r.id, r.raftLog.committed, r.raftLog.lastIndex(), r.raftLog.lastTerm(), s.Metadata.Index, s.Metadata.Term)
 
 	r.raftLog.restore(s)
 	r.prs = make(map[uint64]*Progress)
-	for _, n := range s.Metadata.ConfState.Nodes ***REMOVED***
+	for _, n := range s.Metadata.ConfState.Nodes {
 		match, next := uint64(0), r.raftLog.lastIndex()+1
-		if n == r.id ***REMOVED***
+		if n == r.id {
 			match = next - 1
-		***REMOVED***
+		}
 		r.setProgress(n, match, next)
 		r.logger.Infof("%x restored progress of %x [%s]", r.id, n, r.prs[n])
-	***REMOVED***
+	}
 	return true
-***REMOVED***
+}
 
 // promotable indicates whether state machine can be promoted to leader,
 // which is true when its own id is in progress list.
-func (r *raft) promotable() bool ***REMOVED***
+func (r *raft) promotable() bool {
 	_, ok := r.prs[r.id]
 	return ok
-***REMOVED***
+}
 
-func (r *raft) addNode(id uint64) ***REMOVED***
+func (r *raft) addNode(id uint64) {
 	r.pendingConf = false
-	if _, ok := r.prs[id]; ok ***REMOVED***
+	if _, ok := r.prs[id]; ok {
 		// Ignore any redundant addNode calls (which can happen because the
 		// initial bootstrapping entries are applied twice).
 		return
-	***REMOVED***
+	}
 
 	r.setProgress(id, 0, r.raftLog.lastIndex()+1)
 	// When a node is first added, we should mark it as recently active.
 	// Otherwise, CheckQuorum may cause us to step down if it is invoked
 	// before the added node has a chance to communicate with us.
 	r.prs[id].RecentActive = true
-***REMOVED***
+}
 
-func (r *raft) removeNode(id uint64) ***REMOVED***
+func (r *raft) removeNode(id uint64) {
 	r.delProgress(id)
 	r.pendingConf = false
 
 	// do not try to commit or abort transferring if there is no nodes in the cluster.
-	if len(r.prs) == 0 ***REMOVED***
+	if len(r.prs) == 0 {
 		return
-	***REMOVED***
+	}
 
 	// The quorum size is now smaller, so see if any pending entries can
 	// be committed.
-	if r.maybeCommit() ***REMOVED***
+	if r.maybeCommit() {
 		r.bcastAppend()
-	***REMOVED***
+	}
 	// If the removed node is the leadTransferee, then abort the leadership transferring.
-	if r.state == StateLeader && r.leadTransferee == id ***REMOVED***
+	if r.state == StateLeader && r.leadTransferee == id {
 		r.abortLeaderTransfer()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (r *raft) resetPendingConf() ***REMOVED*** r.pendingConf = false ***REMOVED***
+func (r *raft) resetPendingConf() { r.pendingConf = false }
 
-func (r *raft) setProgress(id, match, next uint64) ***REMOVED***
-	r.prs[id] = &Progress***REMOVED***Next: next, Match: match, ins: newInflights(r.maxInflight)***REMOVED***
-***REMOVED***
+func (r *raft) setProgress(id, match, next uint64) {
+	r.prs[id] = &Progress{Next: next, Match: match, ins: newInflights(r.maxInflight)}
+}
 
-func (r *raft) delProgress(id uint64) ***REMOVED***
+func (r *raft) delProgress(id uint64) {
 	delete(r.prs, id)
-***REMOVED***
+}
 
-func (r *raft) loadState(state pb.HardState) ***REMOVED***
-	if state.Commit < r.raftLog.committed || state.Commit > r.raftLog.lastIndex() ***REMOVED***
+func (r *raft) loadState(state pb.HardState) {
+	if state.Commit < r.raftLog.committed || state.Commit > r.raftLog.lastIndex() {
 		r.logger.Panicf("%x state.commit %d is out of range [%d, %d]", r.id, state.Commit, r.raftLog.committed, r.raftLog.lastIndex())
-	***REMOVED***
+	}
 	r.raftLog.committed = state.Commit
 	r.Term = state.Term
 	r.Vote = state.Vote
-***REMOVED***
+}
 
 // pastElectionTimeout returns true iff r.electionElapsed is greater
 // than or equal to the randomized election timeout in
 // [electiontimeout, 2 * electiontimeout - 1].
-func (r *raft) pastElectionTimeout() bool ***REMOVED***
+func (r *raft) pastElectionTimeout() bool {
 	return r.electionElapsed >= r.randomizedElectionTimeout
-***REMOVED***
+}
 
-func (r *raft) resetRandomizedElectionTimeout() ***REMOVED***
+func (r *raft) resetRandomizedElectionTimeout() {
 	r.randomizedElectionTimeout = r.electionTimeout + globalRand.Intn(r.electionTimeout)
-***REMOVED***
+}
 
 // checkQuorumActive returns true if the quorum is active from
 // the view of the local raft state machine. Otherwise, it returns
 // false.
 // checkQuorumActive also resets all RecentActive to false.
-func (r *raft) checkQuorumActive() bool ***REMOVED***
+func (r *raft) checkQuorumActive() bool {
 	var act int
 
-	for id := range r.prs ***REMOVED***
-		if id == r.id ***REMOVED*** // self is always active
+	for id := range r.prs {
+		if id == r.id { // self is always active
 			act++
 			continue
-		***REMOVED***
+		}
 
-		if r.prs[id].RecentActive ***REMOVED***
+		if r.prs[id].RecentActive {
 			act++
-		***REMOVED***
+		}
 
 		r.prs[id].RecentActive = false
-	***REMOVED***
+	}
 
 	return act >= r.quorum()
-***REMOVED***
+}
 
-func (r *raft) sendTimeoutNow(to uint64) ***REMOVED***
-	r.send(pb.Message***REMOVED***To: to, Type: pb.MsgTimeoutNow***REMOVED***)
-***REMOVED***
+func (r *raft) sendTimeoutNow(to uint64) {
+	r.send(pb.Message{To: to, Type: pb.MsgTimeoutNow})
+}
 
-func (r *raft) abortLeaderTransfer() ***REMOVED***
+func (r *raft) abortLeaderTransfer() {
 	r.leadTransferee = None
-***REMOVED***
+}
 
-func numOfPendingConf(ents []pb.Entry) int ***REMOVED***
+func numOfPendingConf(ents []pb.Entry) int {
 	n := 0
-	for i := range ents ***REMOVED***
-		if ents[i].Type == pb.EntryConfChange ***REMOVED***
+	for i := range ents {
+		if ents[i].Type == pb.EntryConfChange {
 			n++
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
+}

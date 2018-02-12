@@ -1,5 +1,5 @@
 name = "terraform-test-app"
 
-config_vars ***REMOVED***
+config_vars {
     FOO = "bar"
-***REMOVED***
+}

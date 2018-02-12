@@ -15,428 +15,428 @@ import (
 
 var marshalIntTest = 123
 
-var marshalTests = []struct ***REMOVED***
-	value interface***REMOVED******REMOVED***
+var marshalTests = []struct {
+	value interface{}
 	data  string
-***REMOVED******REMOVED***
-	***REMOVED***
+}{
+	{
 		nil,
 		"null\n",
-	***REMOVED***, ***REMOVED***
-		&struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-		"***REMOVED******REMOVED***\n",
-	***REMOVED***, ***REMOVED***
-		map[string]string***REMOVED***"v": "hi"***REMOVED***,
+	}, {
+		&struct{}{},
+		"{}\n",
+	}, {
+		map[string]string{"v": "hi"},
 		"v: hi\n",
-	***REMOVED***, ***REMOVED***
-		map[string]interface***REMOVED******REMOVED******REMOVED***"v": "hi"***REMOVED***,
+	}, {
+		map[string]interface{}{"v": "hi"},
 		"v: hi\n",
-	***REMOVED***, ***REMOVED***
-		map[string]string***REMOVED***"v": "true"***REMOVED***,
+	}, {
+		map[string]string{"v": "true"},
 		"v: \"true\"\n",
-	***REMOVED***, ***REMOVED***
-		map[string]string***REMOVED***"v": "false"***REMOVED***,
+	}, {
+		map[string]string{"v": "false"},
 		"v: \"false\"\n",
-	***REMOVED***, ***REMOVED***
-		map[string]interface***REMOVED******REMOVED******REMOVED***"v": true***REMOVED***,
+	}, {
+		map[string]interface{}{"v": true},
 		"v: true\n",
-	***REMOVED***, ***REMOVED***
-		map[string]interface***REMOVED******REMOVED******REMOVED***"v": false***REMOVED***,
+	}, {
+		map[string]interface{}{"v": false},
 		"v: false\n",
-	***REMOVED***, ***REMOVED***
-		map[string]interface***REMOVED******REMOVED******REMOVED***"v": 10***REMOVED***,
+	}, {
+		map[string]interface{}{"v": 10},
 		"v: 10\n",
-	***REMOVED***, ***REMOVED***
-		map[string]interface***REMOVED******REMOVED******REMOVED***"v": -10***REMOVED***,
+	}, {
+		map[string]interface{}{"v": -10},
 		"v: -10\n",
-	***REMOVED***, ***REMOVED***
-		map[string]uint***REMOVED***"v": 42***REMOVED***,
+	}, {
+		map[string]uint{"v": 42},
 		"v: 42\n",
-	***REMOVED***, ***REMOVED***
-		map[string]interface***REMOVED******REMOVED******REMOVED***"v": int64(4294967296)***REMOVED***,
+	}, {
+		map[string]interface{}{"v": int64(4294967296)},
 		"v: 4294967296\n",
-	***REMOVED***, ***REMOVED***
-		map[string]int64***REMOVED***"v": int64(4294967296)***REMOVED***,
+	}, {
+		map[string]int64{"v": int64(4294967296)},
 		"v: 4294967296\n",
-	***REMOVED***, ***REMOVED***
-		map[string]uint64***REMOVED***"v": 4294967296***REMOVED***,
+	}, {
+		map[string]uint64{"v": 4294967296},
 		"v: 4294967296\n",
-	***REMOVED***, ***REMOVED***
-		map[string]interface***REMOVED******REMOVED******REMOVED***"v": "10"***REMOVED***,
+	}, {
+		map[string]interface{}{"v": "10"},
 		"v: \"10\"\n",
-	***REMOVED***, ***REMOVED***
-		map[string]interface***REMOVED******REMOVED******REMOVED***"v": 0.1***REMOVED***,
+	}, {
+		map[string]interface{}{"v": 0.1},
 		"v: 0.1\n",
-	***REMOVED***, ***REMOVED***
-		map[string]interface***REMOVED******REMOVED******REMOVED***"v": float64(0.1)***REMOVED***,
+	}, {
+		map[string]interface{}{"v": float64(0.1)},
 		"v: 0.1\n",
-	***REMOVED***, ***REMOVED***
-		map[string]interface***REMOVED******REMOVED******REMOVED***"v": -0.1***REMOVED***,
+	}, {
+		map[string]interface{}{"v": -0.1},
 		"v: -0.1\n",
-	***REMOVED***, ***REMOVED***
-		map[string]interface***REMOVED******REMOVED******REMOVED***"v": math.Inf(+1)***REMOVED***,
+	}, {
+		map[string]interface{}{"v": math.Inf(+1)},
 		"v: .inf\n",
-	***REMOVED***, ***REMOVED***
-		map[string]interface***REMOVED******REMOVED******REMOVED***"v": math.Inf(-1)***REMOVED***,
+	}, {
+		map[string]interface{}{"v": math.Inf(-1)},
 		"v: -.inf\n",
-	***REMOVED***, ***REMOVED***
-		map[string]interface***REMOVED******REMOVED******REMOVED***"v": math.NaN()***REMOVED***,
+	}, {
+		map[string]interface{}{"v": math.NaN()},
 		"v: .nan\n",
-	***REMOVED***, ***REMOVED***
-		map[string]interface***REMOVED******REMOVED******REMOVED***"v": nil***REMOVED***,
+	}, {
+		map[string]interface{}{"v": nil},
 		"v: null\n",
-	***REMOVED***, ***REMOVED***
-		map[string]interface***REMOVED******REMOVED******REMOVED***"v": ""***REMOVED***,
+	}, {
+		map[string]interface{}{"v": ""},
 		"v: \"\"\n",
-	***REMOVED***, ***REMOVED***
-		map[string][]string***REMOVED***"v": []string***REMOVED***"A", "B"***REMOVED******REMOVED***,
+	}, {
+		map[string][]string{"v": []string{"A", "B"}},
 		"v:\n- A\n- B\n",
-	***REMOVED***, ***REMOVED***
-		map[string][]string***REMOVED***"v": []string***REMOVED***"A", "B\nC"***REMOVED******REMOVED***,
+	}, {
+		map[string][]string{"v": []string{"A", "B\nC"}},
 		"v:\n- A\n- |-\n  B\n  C\n",
-	***REMOVED***, ***REMOVED***
-		map[string][]interface***REMOVED******REMOVED******REMOVED***"v": []interface***REMOVED******REMOVED******REMOVED***"A", 1, map[string][]int***REMOVED***"B": []int***REMOVED***2, 3***REMOVED******REMOVED******REMOVED******REMOVED***,
+	}, {
+		map[string][]interface{}{"v": []interface{}{"A", 1, map[string][]int{"B": []int{2, 3}}}},
 		"v:\n- A\n- 1\n- B:\n  - 2\n  - 3\n",
-	***REMOVED***, ***REMOVED***
-		map[string]interface***REMOVED******REMOVED******REMOVED***"a": map[interface***REMOVED******REMOVED***]interface***REMOVED******REMOVED******REMOVED***"b": "c"***REMOVED******REMOVED***,
+	}, {
+		map[string]interface{}{"a": map[interface{}]interface{}{"b": "c"}},
 		"a:\n  b: c\n",
-	***REMOVED***, ***REMOVED***
-		map[string]interface***REMOVED******REMOVED******REMOVED***"a": "-"***REMOVED***,
+	}, {
+		map[string]interface{}{"a": "-"},
 		"a: '-'\n",
-	***REMOVED***,
+	},
 
 	// Simple values.
-	***REMOVED***
+	{
 		&marshalIntTest,
 		"123\n",
-	***REMOVED***,
+	},
 
 	// Structures
-	***REMOVED***
-		&struct***REMOVED*** Hello string ***REMOVED******REMOVED***"world"***REMOVED***,
+	{
+		&struct{ Hello string }{"world"},
 		"hello: world\n",
-	***REMOVED***, ***REMOVED***
-		&struct ***REMOVED***
-			A struct ***REMOVED***
+	}, {
+		&struct {
+			A struct {
 				B string
-			***REMOVED***
-		***REMOVED******REMOVED***struct***REMOVED*** B string ***REMOVED******REMOVED***"c"***REMOVED******REMOVED***,
+			}
+		}{struct{ B string }{"c"}},
 		"a:\n  b: c\n",
-	***REMOVED***, ***REMOVED***
-		&struct ***REMOVED***
-			A *struct ***REMOVED***
+	}, {
+		&struct {
+			A *struct {
 				B string
-			***REMOVED***
-		***REMOVED******REMOVED***&struct***REMOVED*** B string ***REMOVED******REMOVED***"c"***REMOVED******REMOVED***,
+			}
+		}{&struct{ B string }{"c"}},
 		"a:\n  b: c\n",
-	***REMOVED***, ***REMOVED***
-		&struct ***REMOVED***
-			A *struct ***REMOVED***
+	}, {
+		&struct {
+			A *struct {
 				B string
-			***REMOVED***
-		***REMOVED******REMOVED******REMOVED***,
+			}
+		}{},
 		"a: null\n",
-	***REMOVED***, ***REMOVED***
-		&struct***REMOVED*** A int ***REMOVED******REMOVED***1***REMOVED***,
+	}, {
+		&struct{ A int }{1},
 		"a: 1\n",
-	***REMOVED***, ***REMOVED***
-		&struct***REMOVED*** A []int ***REMOVED******REMOVED***[]int***REMOVED***1, 2***REMOVED******REMOVED***,
+	}, {
+		&struct{ A []int }{[]int{1, 2}},
 		"a:\n- 1\n- 2\n",
-	***REMOVED***, ***REMOVED***
-		&struct ***REMOVED***
+	}, {
+		&struct {
 			B int "a"
-		***REMOVED******REMOVED***1***REMOVED***,
+		}{1},
 		"a: 1\n",
-	***REMOVED***, ***REMOVED***
-		&struct***REMOVED*** A bool ***REMOVED******REMOVED***true***REMOVED***,
+	}, {
+		&struct{ A bool }{true},
 		"a: true\n",
-	***REMOVED***,
+	},
 
 	// Conditional flag
-	***REMOVED***
-		&struct ***REMOVED***
+	{
+		&struct {
 			A int "a,omitempty"
 			B int "b,omitempty"
-		***REMOVED******REMOVED***1, 0***REMOVED***,
+		}{1, 0},
 		"a: 1\n",
-	***REMOVED***, ***REMOVED***
-		&struct ***REMOVED***
+	}, {
+		&struct {
 			A int "a,omitempty"
 			B int "b,omitempty"
-		***REMOVED******REMOVED***0, 0***REMOVED***,
-		"***REMOVED******REMOVED***\n",
-	***REMOVED***, ***REMOVED***
-		&struct ***REMOVED***
-			A *struct***REMOVED*** X, y int ***REMOVED*** "a,omitempty,flow"
-		***REMOVED******REMOVED***&struct***REMOVED*** X, y int ***REMOVED******REMOVED***1, 2***REMOVED******REMOVED***,
-		"a: ***REMOVED***x: 1***REMOVED***\n",
-	***REMOVED***, ***REMOVED***
-		&struct ***REMOVED***
-			A *struct***REMOVED*** X, y int ***REMOVED*** "a,omitempty,flow"
-		***REMOVED******REMOVED***nil***REMOVED***,
-		"***REMOVED******REMOVED***\n",
-	***REMOVED***, ***REMOVED***
-		&struct ***REMOVED***
-			A *struct***REMOVED*** X, y int ***REMOVED*** "a,omitempty,flow"
-		***REMOVED******REMOVED***&struct***REMOVED*** X, y int ***REMOVED******REMOVED******REMOVED******REMOVED***,
-		"a: ***REMOVED***x: 0***REMOVED***\n",
-	***REMOVED***, ***REMOVED***
-		&struct ***REMOVED***
-			A struct***REMOVED*** X, y int ***REMOVED*** "a,omitempty,flow"
-		***REMOVED******REMOVED***struct***REMOVED*** X, y int ***REMOVED******REMOVED***1, 2***REMOVED******REMOVED***,
-		"a: ***REMOVED***x: 1***REMOVED***\n",
-	***REMOVED***, ***REMOVED***
-		&struct ***REMOVED***
-			A struct***REMOVED*** X, y int ***REMOVED*** "a,omitempty,flow"
-		***REMOVED******REMOVED***struct***REMOVED*** X, y int ***REMOVED******REMOVED***0, 1***REMOVED******REMOVED***,
-		"***REMOVED******REMOVED***\n",
-	***REMOVED***, ***REMOVED***
-		&struct ***REMOVED***
+		}{0, 0},
+		"{}\n",
+	}, {
+		&struct {
+			A *struct{ X, y int } "a,omitempty,flow"
+		}{&struct{ X, y int }{1, 2}},
+		"a: {x: 1}\n",
+	}, {
+		&struct {
+			A *struct{ X, y int } "a,omitempty,flow"
+		}{nil},
+		"{}\n",
+	}, {
+		&struct {
+			A *struct{ X, y int } "a,omitempty,flow"
+		}{&struct{ X, y int }{}},
+		"a: {x: 0}\n",
+	}, {
+		&struct {
+			A struct{ X, y int } "a,omitempty,flow"
+		}{struct{ X, y int }{1, 2}},
+		"a: {x: 1}\n",
+	}, {
+		&struct {
+			A struct{ X, y int } "a,omitempty,flow"
+		}{struct{ X, y int }{0, 1}},
+		"{}\n",
+	}, {
+		&struct {
 			A float64 "a,omitempty"
 			B float64 "b,omitempty"
-		***REMOVED******REMOVED***1, 0***REMOVED***,
+		}{1, 0},
 		"a: 1\n",
-	***REMOVED***,
+	},
 
 	// Flow flag
-	***REMOVED***
-		&struct ***REMOVED***
+	{
+		&struct {
 			A []int "a,flow"
-		***REMOVED******REMOVED***[]int***REMOVED***1, 2***REMOVED******REMOVED***,
+		}{[]int{1, 2}},
 		"a: [1, 2]\n",
-	***REMOVED***, ***REMOVED***
-		&struct ***REMOVED***
+	}, {
+		&struct {
 			A map[string]string "a,flow"
-		***REMOVED******REMOVED***map[string]string***REMOVED***"b": "c", "d": "e"***REMOVED******REMOVED***,
-		"a: ***REMOVED***b: c, d: e***REMOVED***\n",
-	***REMOVED***, ***REMOVED***
-		&struct ***REMOVED***
-			A struct ***REMOVED***
+		}{map[string]string{"b": "c", "d": "e"}},
+		"a: {b: c, d: e}\n",
+	}, {
+		&struct {
+			A struct {
 				B, D string
-			***REMOVED*** "a,flow"
-		***REMOVED******REMOVED***struct***REMOVED*** B, D string ***REMOVED******REMOVED***"c", "e"***REMOVED******REMOVED***,
-		"a: ***REMOVED***b: c, d: e***REMOVED***\n",
-	***REMOVED***,
+			} "a,flow"
+		}{struct{ B, D string }{"c", "e"}},
+		"a: {b: c, d: e}\n",
+	},
 
 	// Unexported field
-	***REMOVED***
-		&struct ***REMOVED***
+	{
+		&struct {
 			u int
 			A int
-		***REMOVED******REMOVED***0, 1***REMOVED***,
+		}{0, 1},
 		"a: 1\n",
-	***REMOVED***,
+	},
 
 	// Ignored field
-	***REMOVED***
-		&struct ***REMOVED***
+	{
+		&struct {
 			A int
 			B int "-"
-		***REMOVED******REMOVED***1, 2***REMOVED***,
+		}{1, 2},
 		"a: 1\n",
-	***REMOVED***,
+	},
 
 	// Struct inlining
-	***REMOVED***
-		&struct ***REMOVED***
+	{
+		&struct {
 			A int
 			C inlineB `yaml:",inline"`
-		***REMOVED******REMOVED***1, inlineB***REMOVED***2, inlineC***REMOVED***3***REMOVED******REMOVED******REMOVED***,
+		}{1, inlineB{2, inlineC{3}}},
 		"a: 1\nb: 2\nc: 3\n",
-	***REMOVED***,
+	},
 
 	// Map inlining
-	***REMOVED***
-		&struct ***REMOVED***
+	{
+		&struct {
 			A int
 			C map[string]int `yaml:",inline"`
-		***REMOVED******REMOVED***1, map[string]int***REMOVED***"b": 2, "c": 3***REMOVED******REMOVED***,
+		}{1, map[string]int{"b": 2, "c": 3}},
 		"a: 1\nb: 2\nc: 3\n",
-	***REMOVED***,
+	},
 
 	// Duration
-	***REMOVED***
-		map[string]time.Duration***REMOVED***"a": 3 * time.Second***REMOVED***,
+	{
+		map[string]time.Duration{"a": 3 * time.Second},
 		"a: 3s\n",
-	***REMOVED***,
+	},
 
 	// Issue #24: bug in map merging logic.
-	***REMOVED***
-		map[string]string***REMOVED***"a": "<foo>"***REMOVED***,
+	{
+		map[string]string{"a": "<foo>"},
 		"a: <foo>\n",
-	***REMOVED***,
+	},
 
 	// Issue #34: marshal unsupported base 60 floats quoted for compatibility
 	// with old YAML 1.1 parsers.
-	***REMOVED***
-		map[string]string***REMOVED***"a": "1:1"***REMOVED***,
+	{
+		map[string]string{"a": "1:1"},
 		"a: \"1:1\"\n",
-	***REMOVED***,
+	},
 
 	// Binary data.
-	***REMOVED***
-		map[string]string***REMOVED***"a": "\x00"***REMOVED***,
+	{
+		map[string]string{"a": "\x00"},
 		"a: \"\\0\"\n",
-	***REMOVED***, ***REMOVED***
-		map[string]string***REMOVED***"a": "\x80\x81\x82"***REMOVED***,
+	}, {
+		map[string]string{"a": "\x80\x81\x82"},
 		"a: !!binary gIGC\n",
-	***REMOVED***, ***REMOVED***
-		map[string]string***REMOVED***"a": strings.Repeat("\x90", 54)***REMOVED***,
+	}, {
+		map[string]string{"a": strings.Repeat("\x90", 54)},
 		"a: !!binary |\n  " + strings.Repeat("kJCQ", 17) + "kJ\n  CQ\n",
-	***REMOVED***,
+	},
 
 	// Ordered maps.
-	***REMOVED***
-		&yaml.MapSlice***REMOVED******REMOVED***"b", 2***REMOVED***, ***REMOVED***"a", 1***REMOVED***, ***REMOVED***"d", 4***REMOVED***, ***REMOVED***"c", 3***REMOVED***, ***REMOVED***"sub", yaml.MapSlice***REMOVED******REMOVED***"e", 5***REMOVED******REMOVED******REMOVED******REMOVED***,
+	{
+		&yaml.MapSlice{{"b", 2}, {"a", 1}, {"d", 4}, {"c", 3}, {"sub", yaml.MapSlice{{"e", 5}}}},
 		"b: 2\na: 1\nd: 4\nc: 3\nsub:\n  e: 5\n",
-	***REMOVED***,
+	},
 
 	// Encode unicode as utf-8 rather than in escaped form.
-	***REMOVED***
-		map[string]string***REMOVED***"a": "你好"***REMOVED***,
+	{
+		map[string]string{"a": "你好"},
 		"a: 你好\n",
-	***REMOVED***,
+	},
 
 	// Support encoding.TextMarshaler.
-	***REMOVED***
-		map[string]net.IP***REMOVED***"a": net.IPv4(1, 2, 3, 4)***REMOVED***,
+	{
+		map[string]net.IP{"a": net.IPv4(1, 2, 3, 4)},
 		"a: 1.2.3.4\n",
-	***REMOVED***,
-	***REMOVED***
-		map[string]time.Time***REMOVED***"a": time.Unix(1424801979, 0)***REMOVED***,
+	},
+	{
+		map[string]time.Time{"a": time.Unix(1424801979, 0)},
 		"a: 2015-02-24T18:19:39Z\n",
-	***REMOVED***,
+	},
 
 	// Ensure strings containing ": " are quoted (reported as PR #43, but not reproducible).
-	***REMOVED***
-		map[string]string***REMOVED***"a": "b: c"***REMOVED***,
+	{
+		map[string]string{"a": "b: c"},
 		"a: 'b: c'\n",
-	***REMOVED***,
+	},
 
 	// Containing hash mark ('#') in string should be quoted
-	***REMOVED***
-		map[string]string***REMOVED***"a": "Hello #comment"***REMOVED***,
+	{
+		map[string]string{"a": "Hello #comment"},
 		"a: 'Hello #comment'\n",
-	***REMOVED***,
-	***REMOVED***
-		map[string]string***REMOVED***"a": "你好 #comment"***REMOVED***,
+	},
+	{
+		map[string]string{"a": "你好 #comment"},
 		"a: '你好 #comment'\n",
-	***REMOVED***,
-***REMOVED***
+	},
+}
 
-func (s *S) TestMarshal(c *C) ***REMOVED***
+func (s *S) TestMarshal(c *C) {
 	defer os.Setenv("TZ", os.Getenv("TZ"))
 	os.Setenv("TZ", "UTC")
-	for _, item := range marshalTests ***REMOVED***
+	for _, item := range marshalTests {
 		data, err := yaml.Marshal(item.value)
 		c.Assert(err, IsNil)
 		c.Assert(string(data), Equals, item.data)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-var marshalErrorTests = []struct ***REMOVED***
-	value interface***REMOVED******REMOVED***
+var marshalErrorTests = []struct {
+	value interface{}
 	error string
 	panic string
-***REMOVED******REMOVED******REMOVED***
-	value: &struct ***REMOVED***
+}{{
+	value: &struct {
 		B       int
 		inlineB ",inline"
-	***REMOVED******REMOVED***1, inlineB***REMOVED***2, inlineC***REMOVED***3***REMOVED******REMOVED******REMOVED***,
-	panic: `Duplicated key 'b' in struct struct \***REMOVED*** B int; .*`,
-***REMOVED***, ***REMOVED***
-	value: &struct ***REMOVED***
+	}{1, inlineB{2, inlineC{3}}},
+	panic: `Duplicated key 'b' in struct struct \{ B int; .*`,
+}, {
+	value: &struct {
 		A int
 		B map[string]int ",inline"
-	***REMOVED******REMOVED***1, map[string]int***REMOVED***"a": 2***REMOVED******REMOVED***,
+	}{1, map[string]int{"a": 2}},
 	panic: `Can't have key "a" in inlined map; conflicts with struct field`,
-***REMOVED******REMOVED***
+}}
 
-func (s *S) TestMarshalErrors(c *C) ***REMOVED***
-	for _, item := range marshalErrorTests ***REMOVED***
-		if item.panic != "" ***REMOVED***
-			c.Assert(func() ***REMOVED*** yaml.Marshal(item.value) ***REMOVED***, PanicMatches, item.panic)
-		***REMOVED*** else ***REMOVED***
+func (s *S) TestMarshalErrors(c *C) {
+	for _, item := range marshalErrorTests {
+		if item.panic != "" {
+			c.Assert(func() { yaml.Marshal(item.value) }, PanicMatches, item.panic)
+		} else {
 			_, err := yaml.Marshal(item.value)
 			c.Assert(err, ErrorMatches, item.error)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (s *S) TestMarshalTypeCache(c *C) ***REMOVED***
+func (s *S) TestMarshalTypeCache(c *C) {
 	var data []byte
 	var err error
-	func() ***REMOVED***
-		type T struct***REMOVED*** A int ***REMOVED***
-		data, err = yaml.Marshal(&T***REMOVED******REMOVED***)
+	func() {
+		type T struct{ A int }
+		data, err = yaml.Marshal(&T{})
 		c.Assert(err, IsNil)
-	***REMOVED***()
-	func() ***REMOVED***
-		type T struct***REMOVED*** B int ***REMOVED***
-		data, err = yaml.Marshal(&T***REMOVED******REMOVED***)
+	}()
+	func() {
+		type T struct{ B int }
+		data, err = yaml.Marshal(&T{})
 		c.Assert(err, IsNil)
-	***REMOVED***()
+	}()
 	c.Assert(string(data), Equals, "b: 0\n")
-***REMOVED***
+}
 
-var marshalerTests = []struct ***REMOVED***
+var marshalerTests = []struct {
 	data  string
-	value interface***REMOVED******REMOVED***
-***REMOVED******REMOVED***
-	***REMOVED***"_:\n  hi: there\n", map[interface***REMOVED******REMOVED***]interface***REMOVED******REMOVED******REMOVED***"hi": "there"***REMOVED******REMOVED***,
-	***REMOVED***"_:\n- 1\n- A\n", []interface***REMOVED******REMOVED******REMOVED***1, "A"***REMOVED******REMOVED***,
-	***REMOVED***"_: 10\n", 10***REMOVED***,
-	***REMOVED***"_: null\n", nil***REMOVED***,
-	***REMOVED***"_: BAR!\n", "BAR!"***REMOVED***,
-***REMOVED***
+	value interface{}
+}{
+	{"_:\n  hi: there\n", map[interface{}]interface{}{"hi": "there"}},
+	{"_:\n- 1\n- A\n", []interface{}{1, "A"}},
+	{"_: 10\n", 10},
+	{"_: null\n", nil},
+	{"_: BAR!\n", "BAR!"},
+}
 
-type marshalerType struct ***REMOVED***
-	value interface***REMOVED******REMOVED***
-***REMOVED***
+type marshalerType struct {
+	value interface{}
+}
 
-func (o marshalerType) MarshalText() ([]byte, error) ***REMOVED***
+func (o marshalerType) MarshalText() ([]byte, error) {
 	panic("MarshalText called on type with MarshalYAML")
-***REMOVED***
+}
 
-func (o marshalerType) MarshalYAML() (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func (o marshalerType) MarshalYAML() (interface{}, error) {
 	return o.value, nil
-***REMOVED***
+}
 
-type marshalerValue struct ***REMOVED***
+type marshalerValue struct {
 	Field marshalerType "_"
-***REMOVED***
+}
 
-func (s *S) TestMarshaler(c *C) ***REMOVED***
-	for _, item := range marshalerTests ***REMOVED***
-		obj := &marshalerValue***REMOVED******REMOVED***
+func (s *S) TestMarshaler(c *C) {
+	for _, item := range marshalerTests {
+		obj := &marshalerValue{}
 		obj.Field.value = item.value
 		data, err := yaml.Marshal(obj)
 		c.Assert(err, IsNil)
 		c.Assert(string(data), Equals, string(item.data))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *S) TestMarshalerWholeDocument(c *C) ***REMOVED***
-	obj := &marshalerType***REMOVED******REMOVED***
-	obj.value = map[string]string***REMOVED***"hello": "world!"***REMOVED***
+func (s *S) TestMarshalerWholeDocument(c *C) {
+	obj := &marshalerType{}
+	obj.value = map[string]string{"hello": "world!"}
 	data, err := yaml.Marshal(obj)
 	c.Assert(err, IsNil)
 	c.Assert(string(data), Equals, "hello: world!\n")
-***REMOVED***
+}
 
-type failingMarshaler struct***REMOVED******REMOVED***
+type failingMarshaler struct{}
 
-func (ft *failingMarshaler) MarshalYAML() (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func (ft *failingMarshaler) MarshalYAML() (interface{}, error) {
 	return nil, failingErr
-***REMOVED***
+}
 
-func (s *S) TestMarshalerError(c *C) ***REMOVED***
-	_, err := yaml.Marshal(&failingMarshaler***REMOVED******REMOVED***)
+func (s *S) TestMarshalerError(c *C) {
+	_, err := yaml.Marshal(&failingMarshaler{})
 	c.Assert(err, Equals, failingErr)
-***REMOVED***
+}
 
-func (s *S) TestSortedOutput(c *C) ***REMOVED***
-	order := []interface***REMOVED******REMOVED******REMOVED***
+func (s *S) TestSortedOutput(c *C) {
+	order := []interface{}{
 		false,
 		true,
 		1,
@@ -473,29 +473,29 @@ func (s *S) TestSortedOutput(c *C) ***REMOVED***
 		"d1",
 		"d12",
 		"d12a",
-	***REMOVED***
-	m := make(map[interface***REMOVED******REMOVED***]int)
-	for _, k := range order ***REMOVED***
+	}
+	m := make(map[interface{}]int)
+	for _, k := range order {
 		m[k] = 1
-	***REMOVED***
+	}
 	data, err := yaml.Marshal(m)
 	c.Assert(err, IsNil)
 	out := "\n" + string(data)
 	last := 0
-	for i, k := range order ***REMOVED***
+	for i, k := range order {
 		repr := fmt.Sprint(k)
-		if s, ok := k.(string); ok ***REMOVED***
-			if _, err = strconv.ParseFloat(repr, 32); s == "" || err == nil ***REMOVED***
+		if s, ok := k.(string); ok {
+			if _, err = strconv.ParseFloat(repr, 32); s == "" || err == nil {
 				repr = `"` + repr + `"`
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		index := strings.Index(out, "\n"+repr+":")
-		if index == -1 ***REMOVED***
+		if index == -1 {
 			c.Fatalf("%#v is not in the output: %#v", k, out)
-		***REMOVED***
-		if index < last ***REMOVED***
+		}
+		if index < last {
 			c.Fatalf("%#v was generated before %#v: %q", k, order[i-1], out)
-		***REMOVED***
+		}
 		last = index
-	***REMOVED***
-***REMOVED***
+	}
+}

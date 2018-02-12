@@ -4,26 +4,26 @@ set -e
 # if we have our linux/amd64 version compiled, let's symlink it in
 if [ -x "$DEST/../binary-daemon/dockerd-$VERSION" ]; then
 	arch=$(go env GOHOSTARCH)
-	mkdir -p "$DEST/linux/$***REMOVED***arch***REMOVED***"
+	mkdir -p "$DEST/linux/${arch}"
 	(
-		cd "$DEST/linux/$***REMOVED***arch***REMOVED***"
+		cd "$DEST/linux/${arch}"
 		ln -sf ../../../binary-daemon/* ./
 	)
-	echo "Created symlinks:" "$DEST/linux/$***REMOVED***arch***REMOVED***/"*
+	echo "Created symlinks:" "$DEST/linux/${arch}/"*
 fi
 
-DOCKER_CROSSPLATFORMS=$***REMOVED***DOCKER_CROSSPLATFORMS:-"linux/amd64 windows/amd64"***REMOVED***
+DOCKER_CROSSPLATFORMS=${DOCKER_CROSSPLATFORMS:-"linux/amd64 windows/amd64"}
 
 for platform in $DOCKER_CROSSPLATFORMS; do
 	(
 		export KEEPDEST=1
 		export DEST="$DEST/$platform" # bundles/VERSION/cross/GOOS/GOARCH/docker-VERSION
-		export GOOS=$***REMOVED***platform%/****REMOVED***
-		export GOARCH=$***REMOVED***platform##*/***REMOVED***
+		export GOOS=${platform%/*}
+		export GOARCH=${platform##*/}
 
 		echo "Cross building: $DEST"
 		mkdir -p "$DEST"
 		ABS_DEST="$(cd "$DEST" && pwd -P)"
-		source "$***REMOVED***MAKEDIR***REMOVED***/binary-daemon"
+		source "${MAKEDIR}/binary-daemon"
 	)
 done

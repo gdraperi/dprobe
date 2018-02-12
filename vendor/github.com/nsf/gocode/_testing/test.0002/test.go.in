@@ -4,8 +4,8 @@ import "os"
 
 var test map[string]os.Error
 
-func main() ***REMOVED***
-	for key, value := range test ***REMOVED***
+func main() {
+	for key, value := range test {
 		
-	***REMOVED***
-***REMOVED***
+	}
+}

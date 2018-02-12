@@ -9,7 +9,7 @@ package image
 
 // HistoryResponseItem individual image layer information in response to ImageHistory operation
 // swagger:model HistoryResponseItem
-type HistoryResponseItem struct ***REMOVED***
+type HistoryResponseItem struct {
 
 	// comment
 	// Required: true
@@ -34,4 +34,4 @@ type HistoryResponseItem struct ***REMOVED***
 	// tags
 	// Required: true
 	Tags []string `json:"Tags"`
-***REMOVED***
+}

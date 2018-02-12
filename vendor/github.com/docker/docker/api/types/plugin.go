@@ -5,7 +5,7 @@ package types
 
 // Plugin A plugin for the Engine API
 // swagger:model Plugin
-type Plugin struct ***REMOVED***
+type Plugin struct {
 
 	// config
 	// Required: true
@@ -28,11 +28,11 @@ type Plugin struct ***REMOVED***
 	// settings
 	// Required: true
 	Settings PluginSettings `json:"Settings"`
-***REMOVED***
+}
 
 // PluginConfig The config of a plugin.
 // swagger:model PluginConfig
-type PluginConfig struct ***REMOVED***
+type PluginConfig struct {
 
 	// args
 	// Required: true
@@ -94,11 +94,11 @@ type PluginConfig struct ***REMOVED***
 
 	// rootfs
 	Rootfs *PluginConfigRootfs `json:"rootfs,omitempty"`
-***REMOVED***
+}
 
 // PluginConfigArgs plugin config args
 // swagger:model PluginConfigArgs
-type PluginConfigArgs struct ***REMOVED***
+type PluginConfigArgs struct {
 
 	// description
 	// Required: true
@@ -115,11 +115,11 @@ type PluginConfigArgs struct ***REMOVED***
 	// value
 	// Required: true
 	Value []string `json:"Value"`
-***REMOVED***
+}
 
 // PluginConfigInterface The interface between Docker and the plugin
 // swagger:model PluginConfigInterface
-type PluginConfigInterface struct ***REMOVED***
+type PluginConfigInterface struct {
 
 	// socket
 	// Required: true
@@ -128,11 +128,11 @@ type PluginConfigInterface struct ***REMOVED***
 	// types
 	// Required: true
 	Types []PluginInterfaceType `json:"Types"`
-***REMOVED***
+}
 
 // PluginConfigLinux plugin config linux
 // swagger:model PluginConfigLinux
-type PluginConfigLinux struct ***REMOVED***
+type PluginConfigLinux struct {
 
 	// allow all devices
 	// Required: true
@@ -145,42 +145,42 @@ type PluginConfigLinux struct ***REMOVED***
 	// devices
 	// Required: true
 	Devices []PluginDevice `json:"Devices"`
-***REMOVED***
+}
 
 // PluginConfigNetwork plugin config network
 // swagger:model PluginConfigNetwork
-type PluginConfigNetwork struct ***REMOVED***
+type PluginConfigNetwork struct {
 
 	// type
 	// Required: true
 	Type string `json:"Type"`
-***REMOVED***
+}
 
 // PluginConfigRootfs plugin config rootfs
 // swagger:model PluginConfigRootfs
-type PluginConfigRootfs struct ***REMOVED***
+type PluginConfigRootfs struct {
 
 	// diff ids
 	DiffIds []string `json:"diff_ids"`
 
 	// type
 	Type string `json:"type,omitempty"`
-***REMOVED***
+}
 
 // PluginConfigUser plugin config user
 // swagger:model PluginConfigUser
-type PluginConfigUser struct ***REMOVED***
+type PluginConfigUser struct {
 
 	// g ID
 	GID uint32 `json:"GID,omitempty"`
 
 	// UID
 	UID uint32 `json:"UID,omitempty"`
-***REMOVED***
+}
 
 // PluginSettings Settings that can be modified by users.
 // swagger:model PluginSettings
-type PluginSettings struct ***REMOVED***
+type PluginSettings struct {
 
 	// args
 	// Required: true
@@ -197,4 +197,4 @@ type PluginSettings struct ***REMOVED***
 	// mounts
 	// Required: true
 	Mounts []PluginMount `json:"Mounts"`
-***REMOVED***
+}

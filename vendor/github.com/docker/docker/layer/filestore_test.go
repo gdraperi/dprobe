@@ -13,92 +13,92 @@ import (
 	"github.com/opencontainers/go-digest"
 )
 
-func randomLayerID(seed int64) ChainID ***REMOVED***
+func randomLayerID(seed int64) ChainID {
 	r := rand.New(rand.NewSource(seed))
 
 	return ChainID(digest.FromBytes([]byte(fmt.Sprintf("%d", r.Int63()))))
-***REMOVED***
+}
 
-func newFileMetadataStore(t *testing.T) (*fileMetadataStore, string, func()) ***REMOVED***
+func newFileMetadataStore(t *testing.T) (*fileMetadataStore, string, func()) {
 	td, err := ioutil.TempDir("", "layers-")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	fms, err := NewFSMetadataStore(td)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	return fms.(*fileMetadataStore), td, func() ***REMOVED***
-		if err := os.RemoveAll(td); err != nil ***REMOVED***
+	return fms.(*fileMetadataStore), td, func() {
+		if err := os.RemoveAll(td); err != nil {
 			t.Logf("Failed to cleanup %q: %s", td, err)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func assertNotDirectoryError(t *testing.T, err error) ***REMOVED***
+func assertNotDirectoryError(t *testing.T, err error) {
 	perr, ok := err.(*os.PathError)
-	if !ok ***REMOVED***
+	if !ok {
 		t.Fatalf("Unexpected error %#v, expected path error", err)
-	***REMOVED***
+	}
 
-	if perr.Err != syscall.ENOTDIR ***REMOVED***
+	if perr.Err != syscall.ENOTDIR {
 		t.Fatalf("Unexpected error %s, expected %s", perr.Err, syscall.ENOTDIR)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestCommitFailure(t *testing.T) ***REMOVED***
+func TestCommitFailure(t *testing.T) {
 	fms, td, cleanup := newFileMetadataStore(t)
 	defer cleanup()
 
-	if err := ioutil.WriteFile(filepath.Join(td, "sha256"), []byte("was here first!"), 0644); err != nil ***REMOVED***
+	if err := ioutil.WriteFile(filepath.Join(td, "sha256"), []byte("was here first!"), 0644); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	tx, err := fms.StartTransaction()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if err := tx.SetSize(0); err != nil ***REMOVED***
+	if err := tx.SetSize(0); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	err = tx.Commit(randomLayerID(5))
-	if err == nil ***REMOVED***
+	if err == nil {
 		t.Fatalf("Expected error committing with invalid layer parent directory")
-	***REMOVED***
+	}
 	assertNotDirectoryError(t, err)
-***REMOVED***
+}
 
-func TestStartTransactionFailure(t *testing.T) ***REMOVED***
+func TestStartTransactionFailure(t *testing.T) {
 	fms, td, cleanup := newFileMetadataStore(t)
 	defer cleanup()
 
-	if err := ioutil.WriteFile(filepath.Join(td, "tmp"), []byte("was here first!"), 0644); err != nil ***REMOVED***
+	if err := ioutil.WriteFile(filepath.Join(td, "tmp"), []byte("was here first!"), 0644); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	_, err := fms.StartTransaction()
-	if err == nil ***REMOVED***
+	if err == nil {
 		t.Fatalf("Expected error starting transaction with invalid layer parent directory")
-	***REMOVED***
+	}
 	assertNotDirectoryError(t, err)
 
-	if err := os.Remove(filepath.Join(td, "tmp")); err != nil ***REMOVED***
+	if err := os.Remove(filepath.Join(td, "tmp")); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	tx, err := fms.StartTransaction()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if expected := filepath.Join(td, "tmp"); strings.HasPrefix(expected, tx.String()) ***REMOVED***
+	if expected := filepath.Join(td, "tmp"); strings.HasPrefix(expected, tx.String()) {
 		t.Fatalf("Unexpected transaction string %q, expected prefix %q", tx.String(), expected)
-	***REMOVED***
+	}
 
-	if err := tx.Cancel(); err != nil ***REMOVED***
+	if err := tx.Cancel(); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}

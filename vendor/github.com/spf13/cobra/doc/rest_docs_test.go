@@ -10,12 +10,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func TestGenRSTDoc(t *testing.T) ***REMOVED***
+func TestGenRSTDoc(t *testing.T) {
 	// We generate on a subcommand so we have both subcommands and parents
 	buf := new(bytes.Buffer)
-	if err := GenReST(echoCmd, buf); err != nil ***REMOVED***
+	if err := GenReST(echoCmd, buf); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	output := buf.String()
 
 	checkStringContains(t, output, echoCmd.Long)
@@ -25,52 +25,52 @@ func TestGenRSTDoc(t *testing.T) ***REMOVED***
 	checkStringContains(t, output, rootCmd.Short)
 	checkStringContains(t, output, echoSubCmd.Short)
 	checkStringOmits(t, output, deprecatedCmd.Short)
-***REMOVED***
+}
 
-func TestGenRSTNoTag(t *testing.T) ***REMOVED***
+func TestGenRSTNoTag(t *testing.T) {
 	rootCmd.DisableAutoGenTag = true
-	defer func() ***REMOVED*** rootCmd.DisableAutoGenTag = false ***REMOVED***()
+	defer func() { rootCmd.DisableAutoGenTag = false }()
 
 	buf := new(bytes.Buffer)
-	if err := GenReST(rootCmd, buf); err != nil ***REMOVED***
+	if err := GenReST(rootCmd, buf); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	output := buf.String()
 
 	unexpected := "Auto generated"
 	checkStringOmits(t, output, unexpected)
-***REMOVED***
+}
 
-func TestGenRSTTree(t *testing.T) ***REMOVED***
-	c := &cobra.Command***REMOVED***Use: "do [OPTIONS] arg1 arg2"***REMOVED***
+func TestGenRSTTree(t *testing.T) {
+	c := &cobra.Command{Use: "do [OPTIONS] arg1 arg2"}
 
 	tmpdir, err := ioutil.TempDir("", "test-gen-rst-tree")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("Failed to create tmpdir: %s", err.Error())
-	***REMOVED***
+	}
 	defer os.RemoveAll(tmpdir)
 
-	if err := GenReSTTree(c, tmpdir); err != nil ***REMOVED***
+	if err := GenReSTTree(c, tmpdir); err != nil {
 		t.Fatalf("GenReSTTree failed: %s", err.Error())
-	***REMOVED***
+	}
 
-	if _, err := os.Stat(filepath.Join(tmpdir, "do.rst")); err != nil ***REMOVED***
+	if _, err := os.Stat(filepath.Join(tmpdir, "do.rst")); err != nil {
 		t.Fatalf("Expected file 'do.rst' to exist")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func BenchmarkGenReSTToFile(b *testing.B) ***REMOVED***
+func BenchmarkGenReSTToFile(b *testing.B) {
 	file, err := ioutil.TempFile("", "")
-	if err != nil ***REMOVED***
+	if err != nil {
 		b.Fatal(err)
-	***REMOVED***
+	}
 	defer os.Remove(file.Name())
 	defer file.Close()
 
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ ***REMOVED***
-		if err := GenReST(rootCmd, file); err != nil ***REMOVED***
+	for i := 0; i < b.N; i++ {
+		if err := GenReST(rootCmd, file); err != nil {
 			b.Fatal(err)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

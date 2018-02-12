@@ -7,15 +7,15 @@ import (
 )
 
 // smallFields is a small size data set for benchmarking
-var smallFields = Fields***REMOVED***
+var smallFields = Fields{
 	"foo":   "bar",
 	"baz":   "qux",
 	"one":   "two",
 	"three": "four",
-***REMOVED***
+}
 
 // largeFields is a large size data set for benchmarking
-var largeFields = Fields***REMOVED***
+var largeFields = Fields{
 	"foo":       "bar",
 	"baz":       "qux",
 	"one":       "two",
@@ -44,58 +44,58 @@ var largeFields = Fields***REMOVED***
 	"this":      "will",
 	"make":      "thirty",
 	"entries":   "yeah",
-***REMOVED***
+}
 
-var errorFields = Fields***REMOVED***
+var errorFields = Fields{
 	"foo": fmt.Errorf("bar"),
 	"baz": fmt.Errorf("qux"),
-***REMOVED***
+}
 
-func BenchmarkErrorTextFormatter(b *testing.B) ***REMOVED***
-	doBenchmark(b, &TextFormatter***REMOVED***DisableColors: true***REMOVED***, errorFields)
-***REMOVED***
+func BenchmarkErrorTextFormatter(b *testing.B) {
+	doBenchmark(b, &TextFormatter{DisableColors: true}, errorFields)
+}
 
-func BenchmarkSmallTextFormatter(b *testing.B) ***REMOVED***
-	doBenchmark(b, &TextFormatter***REMOVED***DisableColors: true***REMOVED***, smallFields)
-***REMOVED***
+func BenchmarkSmallTextFormatter(b *testing.B) {
+	doBenchmark(b, &TextFormatter{DisableColors: true}, smallFields)
+}
 
-func BenchmarkLargeTextFormatter(b *testing.B) ***REMOVED***
-	doBenchmark(b, &TextFormatter***REMOVED***DisableColors: true***REMOVED***, largeFields)
-***REMOVED***
+func BenchmarkLargeTextFormatter(b *testing.B) {
+	doBenchmark(b, &TextFormatter{DisableColors: true}, largeFields)
+}
 
-func BenchmarkSmallColoredTextFormatter(b *testing.B) ***REMOVED***
-	doBenchmark(b, &TextFormatter***REMOVED***ForceColors: true***REMOVED***, smallFields)
-***REMOVED***
+func BenchmarkSmallColoredTextFormatter(b *testing.B) {
+	doBenchmark(b, &TextFormatter{ForceColors: true}, smallFields)
+}
 
-func BenchmarkLargeColoredTextFormatter(b *testing.B) ***REMOVED***
-	doBenchmark(b, &TextFormatter***REMOVED***ForceColors: true***REMOVED***, largeFields)
-***REMOVED***
+func BenchmarkLargeColoredTextFormatter(b *testing.B) {
+	doBenchmark(b, &TextFormatter{ForceColors: true}, largeFields)
+}
 
-func BenchmarkSmallJSONFormatter(b *testing.B) ***REMOVED***
-	doBenchmark(b, &JSONFormatter***REMOVED******REMOVED***, smallFields)
-***REMOVED***
+func BenchmarkSmallJSONFormatter(b *testing.B) {
+	doBenchmark(b, &JSONFormatter{}, smallFields)
+}
 
-func BenchmarkLargeJSONFormatter(b *testing.B) ***REMOVED***
-	doBenchmark(b, &JSONFormatter***REMOVED******REMOVED***, largeFields)
-***REMOVED***
+func BenchmarkLargeJSONFormatter(b *testing.B) {
+	doBenchmark(b, &JSONFormatter{}, largeFields)
+}
 
-func doBenchmark(b *testing.B, formatter Formatter, fields Fields) ***REMOVED***
+func doBenchmark(b *testing.B, formatter Formatter, fields Fields) {
 	logger := New()
 
-	entry := &Entry***REMOVED***
-		Time:    time.Time***REMOVED******REMOVED***,
+	entry := &Entry{
+		Time:    time.Time{},
 		Level:   InfoLevel,
 		Message: "message",
 		Data:    fields,
 		Logger:  logger,
-	***REMOVED***
+	}
 	var d []byte
 	var err error
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		d, err = formatter.Format(entry)
-		if err != nil ***REMOVED***
+		if err != nil {
 			b.Fatal(err)
-		***REMOVED***
+		}
 		b.SetBytes(int64(len(d)))
-	***REMOVED***
-***REMOVED***
+	}
+}

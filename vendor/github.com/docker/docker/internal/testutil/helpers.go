@@ -9,19 +9,19 @@ import (
 
 // ErrorContains checks that the error is not nil, and contains the expected
 // substring.
-func ErrorContains(t require.TestingT, err error, expectedError string, msgAndArgs ...interface***REMOVED******REMOVED***) ***REMOVED***
+func ErrorContains(t require.TestingT, err error, expectedError string, msgAndArgs ...interface{}) {
 	require.Error(t, err, msgAndArgs...)
 	assert.Contains(t, err.Error(), expectedError, msgAndArgs...)
-***REMOVED***
+}
 
 // DevZero acts like /dev/zero but in an OS-independent fashion.
-var DevZero io.Reader = devZero***REMOVED******REMOVED***
+var DevZero io.Reader = devZero{}
 
-type devZero struct***REMOVED******REMOVED***
+type devZero struct{}
 
-func (d devZero) Read(p []byte) (n int, err error) ***REMOVED***
-	for i := range p ***REMOVED***
+func (d devZero) Read(p []byte) (n int, err error) {
+	for i := range p {
 		p[i] = 0
-	***REMOVED***
+	}
 	return len(p), nil
-***REMOVED***
+}

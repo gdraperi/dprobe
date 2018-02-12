@@ -13,24 +13,24 @@ import (
 // ContainerRename changes the name of a container, using the oldName
 // to find the container. An error is returned if newName is already
 // reserved.
-func (daemon *Daemon) ContainerRename(oldName, newName string) error ***REMOVED***
+func (daemon *Daemon) ContainerRename(oldName, newName string) error {
 	var (
 		sid string
 		sb  libnetwork.Sandbox
 	)
 
-	if oldName == "" || newName == "" ***REMOVED***
+	if oldName == "" || newName == "" {
 		return errdefs.InvalidParameter(errors.New("Neither old nor new names may be empty"))
-	***REMOVED***
+	}
 
-	if newName[0] != '/' ***REMOVED***
+	if newName[0] != '/' {
 		newName = "/" + newName
-	***REMOVED***
+	}
 
 	container, err := daemon.GetContainer(oldName)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	container.Lock()
 	defer container.Unlock()
@@ -38,86 +38,86 @@ func (daemon *Daemon) ContainerRename(oldName, newName string) error ***REMOVED*
 	oldName = container.Name
 	oldIsAnonymousEndpoint := container.NetworkSettings.IsAnonymousEndpoint
 
-	if oldName == newName ***REMOVED***
+	if oldName == newName {
 		return errdefs.InvalidParameter(errors.New("Renaming a container with the same name as its current name"))
-	***REMOVED***
+	}
 
-	links := map[string]*dockercontainer.Container***REMOVED******REMOVED***
-	for k, v := range daemon.linkIndex.children(container) ***REMOVED***
-		if !strings.HasPrefix(k, oldName) ***REMOVED***
+	links := map[string]*dockercontainer.Container{}
+	for k, v := range daemon.linkIndex.children(container) {
+		if !strings.HasPrefix(k, oldName) {
 			return errdefs.InvalidParameter(errors.Errorf("Linked container %s does not match parent %s", k, oldName))
-		***REMOVED***
+		}
 		links[strings.TrimPrefix(k, oldName)] = v
-	***REMOVED***
+	}
 
-	if newName, err = daemon.reserveName(container.ID, newName); err != nil ***REMOVED***
+	if newName, err = daemon.reserveName(container.ID, newName); err != nil {
 		return errors.Wrap(err, "Error when allocating new name")
-	***REMOVED***
+	}
 
-	for k, v := range links ***REMOVED***
+	for k, v := range links {
 		daemon.containersReplica.ReserveName(newName+k, v.ID)
 		daemon.linkIndex.link(container, v, newName+k)
-	***REMOVED***
+	}
 
 	container.Name = newName
 	container.NetworkSettings.IsAnonymousEndpoint = false
 
-	defer func() ***REMOVED***
-		if err != nil ***REMOVED***
+	defer func() {
+		if err != nil {
 			container.Name = oldName
 			container.NetworkSettings.IsAnonymousEndpoint = oldIsAnonymousEndpoint
 			daemon.reserveName(container.ID, oldName)
-			for k, v := range links ***REMOVED***
+			for k, v := range links {
 				daemon.containersReplica.ReserveName(oldName+k, v.ID)
 				daemon.linkIndex.link(container, v, oldName+k)
 				daemon.linkIndex.unlink(newName+k, v, container)
 				daemon.containersReplica.ReleaseName(newName + k)
-			***REMOVED***
+			}
 			daemon.releaseName(newName)
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
-	for k, v := range links ***REMOVED***
+	for k, v := range links {
 		daemon.linkIndex.unlink(oldName+k, v, container)
 		daemon.containersReplica.ReleaseName(oldName + k)
-	***REMOVED***
+	}
 	daemon.releaseName(oldName)
-	if err = container.CheckpointTo(daemon.containersReplica); err != nil ***REMOVED***
+	if err = container.CheckpointTo(daemon.containersReplica); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	attributes := map[string]string***REMOVED***
+	attributes := map[string]string{
 		"oldName": oldName,
-	***REMOVED***
+	}
 
-	if !container.Running ***REMOVED***
+	if !container.Running {
 		daemon.LogContainerEventWithAttributes(container, "rename", attributes)
 		return nil
-	***REMOVED***
+	}
 
-	defer func() ***REMOVED***
-		if err != nil ***REMOVED***
+	defer func() {
+		if err != nil {
 			container.Name = oldName
 			container.NetworkSettings.IsAnonymousEndpoint = oldIsAnonymousEndpoint
-			if e := container.CheckpointTo(daemon.containersReplica); e != nil ***REMOVED***
+			if e := container.CheckpointTo(daemon.containersReplica); e != nil {
 				logrus.Errorf("%s: Failed in writing to Disk on rename failure: %v", container.ID, e)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***()
+			}
+		}
+	}()
 
 	sid = container.NetworkSettings.SandboxID
-	if sid != "" && daemon.netController != nil ***REMOVED***
+	if sid != "" && daemon.netController != nil {
 		sb, err = daemon.netController.SandboxByID(sid)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 
 		err = sb.Rename(strings.TrimPrefix(container.Name, "/"))
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	daemon.LogContainerEventWithAttributes(container, "rename", attributes)
 	return nil
-***REMOVED***
+}

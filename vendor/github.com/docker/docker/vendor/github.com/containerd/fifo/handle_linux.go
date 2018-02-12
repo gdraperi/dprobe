@@ -13,69 +13,69 @@ import (
 
 const O_PATH = 010000000
 
-type handle struct ***REMOVED***
+type handle struct {
 	f         *os.File
 	fd        uintptr
 	dev       uint64
 	ino       uint64
 	closeOnce sync.Once
 	name      string
-***REMOVED***
+}
 
-func getHandle(fn string) (*handle, error) ***REMOVED***
+func getHandle(fn string) (*handle, error) {
 	f, err := os.OpenFile(fn, O_PATH, 0)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, errors.Wrapf(err, "failed to open %v with O_PATH", fn)
-	***REMOVED***
+	}
 
 	var (
 		stat syscall.Stat_t
 		fd   = f.Fd()
 	)
-	if err := syscall.Fstat(int(fd), &stat); err != nil ***REMOVED***
+	if err := syscall.Fstat(int(fd), &stat); err != nil {
 		f.Close()
 		return nil, errors.Wrapf(err, "failed to stat handle %v", fd)
-	***REMOVED***
+	}
 
-	h := &handle***REMOVED***
+	h := &handle{
 		f:    f,
 		name: fn,
 		dev:  uint64(stat.Dev),
 		ino:  stat.Ino,
 		fd:   fd,
-	***REMOVED***
+	}
 
 	// check /proc just in case
-	if _, err := os.Stat(h.procPath()); err != nil ***REMOVED***
+	if _, err := os.Stat(h.procPath()); err != nil {
 		f.Close()
 		return nil, errors.Wrapf(err, "couldn't stat %v", h.procPath())
-	***REMOVED***
+	}
 
 	return h, nil
-***REMOVED***
+}
 
-func (h *handle) procPath() string ***REMOVED***
+func (h *handle) procPath() string {
 	return fmt.Sprintf("/proc/self/fd/%d", h.fd)
-***REMOVED***
+}
 
-func (h *handle) Name() string ***REMOVED***
+func (h *handle) Name() string {
 	return h.name
-***REMOVED***
+}
 
-func (h *handle) Path() (string, error) ***REMOVED***
+func (h *handle) Path() (string, error) {
 	var stat syscall.Stat_t
-	if err := syscall.Stat(h.procPath(), &stat); err != nil ***REMOVED***
+	if err := syscall.Stat(h.procPath(), &stat); err != nil {
 		return "", errors.Wrapf(err, "path %v could not be statted", h.procPath())
-	***REMOVED***
-	if uint64(stat.Dev) != h.dev || stat.Ino != h.ino ***REMOVED***
+	}
+	if uint64(stat.Dev) != h.dev || stat.Ino != h.ino {
 		return "", errors.Errorf("failed to verify handle %v/%v %v/%v", stat.Dev, h.dev, stat.Ino, h.ino)
-	***REMOVED***
+	}
 	return h.procPath(), nil
-***REMOVED***
+}
 
-func (h *handle) Close() error ***REMOVED***
-	h.closeOnce.Do(func() ***REMOVED***
+func (h *handle) Close() error {
+	h.closeOnce.Do(func() {
 		h.f.Close()
-	***REMOVED***)
+	})
 	return nil
-***REMOVED***
+}

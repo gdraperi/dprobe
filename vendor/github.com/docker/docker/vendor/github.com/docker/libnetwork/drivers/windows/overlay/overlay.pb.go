@@ -37,7 +37,7 @@ const _ = proto.GoGoProtoPackageIsVersion1
 
 // PeerRecord defines the information corresponding to a peer
 // container in the overlay network.
-type PeerRecord struct ***REMOVED***
+type PeerRecord struct {
 	// Endpoint IP is the IP of the container attachment on the
 	// given overlay network.
 	EndpointIP string `protobuf:"bytes,1,opt,name=endpoint_ip,json=endpointIp,proto3" json:"endpoint_ip,omitempty"`
@@ -48,89 +48,89 @@ type PeerRecord struct ***REMOVED***
 	// which this container is running and can be reached by
 	// building a tunnel to that host IP.
 	TunnelEndpointIP string `protobuf:"bytes,3,opt,name=tunnel_endpoint_ip,json=tunnelEndpointIp,proto3" json:"tunnel_endpoint_ip,omitempty"`
-***REMOVED***
+}
 
-func (m *PeerRecord) Reset()                    ***REMOVED*** *m = PeerRecord***REMOVED******REMOVED*** ***REMOVED***
-func (*PeerRecord) ProtoMessage()               ***REMOVED******REMOVED***
-func (*PeerRecord) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorOverlay, []int***REMOVED***0***REMOVED*** ***REMOVED***
+func (m *PeerRecord) Reset()                    { *m = PeerRecord{} }
+func (*PeerRecord) ProtoMessage()               {}
+func (*PeerRecord) Descriptor() ([]byte, []int) { return fileDescriptorOverlay, []int{0} }
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*PeerRecord)(nil), "overlay.PeerRecord")
-***REMOVED***
-func (this *PeerRecord) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *PeerRecord) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 7)
-	s = append(s, "&overlay.PeerRecord***REMOVED***")
+	s = append(s, "&overlay.PeerRecord{")
 	s = append(s, "EndpointIP: "+fmt.Sprintf("%#v", this.EndpointIP)+",\n")
 	s = append(s, "EndpointMAC: "+fmt.Sprintf("%#v", this.EndpointMAC)+",\n")
 	s = append(s, "TunnelEndpointIP: "+fmt.Sprintf("%#v", this.TunnelEndpointIP)+",\n")
-	s = append(s, "***REMOVED***")
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func valueToGoStringOverlay(v interface***REMOVED******REMOVED***, typ string) string ***REMOVED***
+}
+func valueToGoStringOverlay(v interface{}, typ string) string {
 	rv := reflect.ValueOf(v)
-	if rv.IsNil() ***REMOVED***
+	if rv.IsNil() {
 		return "nil"
-	***REMOVED***
+	}
 	pv := reflect.Indirect(rv).Interface()
-	return fmt.Sprintf("func(v %v) *%v ***REMOVED*** return &v ***REMOVED*** ( %#v )", typ, typ, pv)
-***REMOVED***
-func extensionToGoStringOverlay(e map[int32]github_com_gogo_protobuf_proto.Extension) string ***REMOVED***
-	if e == nil ***REMOVED***
+	return fmt.Sprintf("func(v %v) *%v { return &v } ( %#v )", typ, typ, pv)
+}
+func extensionToGoStringOverlay(e map[int32]github_com_gogo_protobuf_proto.Extension) string {
+	if e == nil {
 		return "nil"
-	***REMOVED***
-	s := "map[int32]proto.Extension***REMOVED***"
+	}
+	s := "map[int32]proto.Extension{"
 	keys := make([]int, 0, len(e))
-	for k := range e ***REMOVED***
+	for k := range e {
 		keys = append(keys, int(k))
-	***REMOVED***
+	}
 	sort.Ints(keys)
-	ss := []string***REMOVED******REMOVED***
-	for _, k := range keys ***REMOVED***
+	ss := []string{}
+	for _, k := range keys {
 		ss = append(ss, strconv.Itoa(k)+": "+e[int32(k)].GoString())
-	***REMOVED***
-	s += strings.Join(ss, ",") + "***REMOVED***"
+	}
+	s += strings.Join(ss, ",") + "}"
 	return s
-***REMOVED***
-func (m *PeerRecord) Marshal() (data []byte, err error) ***REMOVED***
+}
+func (m *PeerRecord) Marshal() (data []byte, err error) {
 	size := m.Size()
 	data = make([]byte, size)
 	n, err := m.MarshalTo(data)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return data[:n], nil
-***REMOVED***
+}
 
-func (m *PeerRecord) MarshalTo(data []byte) (int, error) ***REMOVED***
+func (m *PeerRecord) MarshalTo(data []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.EndpointIP) > 0 ***REMOVED***
+	if len(m.EndpointIP) > 0 {
 		data[i] = 0xa
 		i++
 		i = encodeVarintOverlay(data, i, uint64(len(m.EndpointIP)))
 		i += copy(data[i:], m.EndpointIP)
-	***REMOVED***
-	if len(m.EndpointMAC) > 0 ***REMOVED***
+	}
+	if len(m.EndpointMAC) > 0 {
 		data[i] = 0x12
 		i++
 		i = encodeVarintOverlay(data, i, uint64(len(m.EndpointMAC)))
 		i += copy(data[i:], m.EndpointMAC)
-	***REMOVED***
-	if len(m.TunnelEndpointIP) > 0 ***REMOVED***
+	}
+	if len(m.TunnelEndpointIP) > 0 {
 		data[i] = 0x1a
 		i++
 		i = encodeVarintOverlay(data, i, uint64(len(m.TunnelEndpointIP)))
 		i += copy(data[i:], m.TunnelEndpointIP)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func encodeFixed64Overlay(data []byte, offset int, v uint64) int ***REMOVED***
+func encodeFixed64Overlay(data []byte, offset int, v uint64) int {
 	data[offset] = uint8(v)
 	data[offset+1] = uint8(v >> 8)
 	data[offset+2] = uint8(v >> 16)
@@ -140,298 +140,298 @@ func encodeFixed64Overlay(data []byte, offset int, v uint64) int ***REMOVED***
 	data[offset+6] = uint8(v >> 48)
 	data[offset+7] = uint8(v >> 56)
 	return offset + 8
-***REMOVED***
-func encodeFixed32Overlay(data []byte, offset int, v uint32) int ***REMOVED***
+}
+func encodeFixed32Overlay(data []byte, offset int, v uint32) int {
 	data[offset] = uint8(v)
 	data[offset+1] = uint8(v >> 8)
 	data[offset+2] = uint8(v >> 16)
 	data[offset+3] = uint8(v >> 24)
 	return offset + 4
-***REMOVED***
-func encodeVarintOverlay(data []byte, offset int, v uint64) int ***REMOVED***
-	for v >= 1<<7 ***REMOVED***
+}
+func encodeVarintOverlay(data []byte, offset int, v uint64) int {
+	for v >= 1<<7 {
 		data[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
-	***REMOVED***
+	}
 	data[offset] = uint8(v)
 	return offset + 1
-***REMOVED***
-func (m *PeerRecord) Size() (n int) ***REMOVED***
+}
+func (m *PeerRecord) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.EndpointIP)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovOverlay(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.EndpointMAC)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovOverlay(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.TunnelEndpointIP)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovOverlay(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func sovOverlay(x uint64) (n int) ***REMOVED***
-	for ***REMOVED***
+func sovOverlay(x uint64) (n int) {
+	for {
 		n++
 		x >>= 7
-		if x == 0 ***REMOVED***
+		if x == 0 {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
-func sozOverlay(x uint64) (n int) ***REMOVED***
+}
+func sozOverlay(x uint64) (n int) {
 	return sovOverlay(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-***REMOVED***
-func (this *PeerRecord) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *PeerRecord) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&PeerRecord***REMOVED***`,
+	}
+	s := strings.Join([]string{`&PeerRecord{`,
 		`EndpointIP:` + fmt.Sprintf("%v", this.EndpointIP) + `,`,
 		`EndpointMAC:` + fmt.Sprintf("%v", this.EndpointMAC) + `,`,
 		`TunnelEndpointIP:` + fmt.Sprintf("%v", this.TunnelEndpointIP) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func valueToStringOverlay(v interface***REMOVED******REMOVED***) string ***REMOVED***
+}
+func valueToStringOverlay(v interface{}) string {
 	rv := reflect.ValueOf(v)
-	if rv.IsNil() ***REMOVED***
+	if rv.IsNil() {
 		return "nil"
-	***REMOVED***
+	}
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
-***REMOVED***
-func (m *PeerRecord) Unmarshal(data []byte) error ***REMOVED***
+}
+func (m *PeerRecord) Unmarshal(data []byte) error {
 	l := len(data)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowOverlay
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := data[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: PeerRecord: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: PeerRecord: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field EndpointIP", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowOverlay
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := data[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthOverlay
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.EndpointIP = string(data[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field EndpointMAC", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowOverlay
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := data[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthOverlay
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.EndpointMAC = string(data[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field TunnelEndpointIP", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowOverlay
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := data[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthOverlay
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.TunnelEndpointIP = string(data[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipOverlay(data[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthOverlay
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func skipOverlay(data []byte) (n int, err error) ***REMOVED***
+}
+func skipOverlay(data []byte) (n int, err error) {
 	l := len(data)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return 0, ErrIntOverflowOverlay
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return 0, io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := data[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		wireType := int(wire & 0x7)
-		switch wireType ***REMOVED***
+		switch wireType {
 		case 0:
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowOverlay
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				iNdEx++
-				if data[iNdEx-1] < 0x80 ***REMOVED***
+				if data[iNdEx-1] < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return iNdEx, nil
 		case 1:
 			iNdEx += 8
 			return iNdEx, nil
 		case 2:
 			var length int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowOverlay
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := data[iNdEx]
 				iNdEx++
 				length |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			iNdEx += length
-			if length < 0 ***REMOVED***
+			if length < 0 {
 				return 0, ErrInvalidLengthOverlay
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 3:
-			for ***REMOVED***
+			for {
 				var innerWire uint64
 				var start int = iNdEx
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return 0, ErrIntOverflowOverlay
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return 0, io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := data[iNdEx]
 					iNdEx++
 					innerWire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				innerWireType := int(innerWire & 0x7)
-				if innerWireType == 4 ***REMOVED***
+				if innerWireType == 4 {
 					break
-				***REMOVED***
+				}
 				next, err := skipOverlay(data[start:])
-				if err != nil ***REMOVED***
+				if err != nil {
 					return 0, err
-				***REMOVED***
+				}
 				iNdEx = start + next
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 4:
 			return iNdEx, nil
@@ -440,17 +440,17 @@ func skipOverlay(data []byte) (n int, err error) ***REMOVED***
 			return iNdEx, nil
 		default:
 			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	panic("unreachable")
-***REMOVED***
+}
 
 var (
 	ErrInvalidLengthOverlay = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowOverlay   = fmt.Errorf("proto: integer overflow")
 )
 
-var fileDescriptorOverlay = []byte***REMOVED***
+var fileDescriptorOverlay = []byte{
 	// 195 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xe2, 0xe2, 0xcd, 0x2f, 0x4b, 0x2d,
 	0xca, 0x49, 0xac, 0xd4, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x87, 0x72, 0xa5, 0x44, 0xd2,
@@ -465,4 +465,4 @@ var fileDescriptorOverlay = []byte***REMOVED***
 	0xc3, 0x43, 0x39, 0xc6, 0x86, 0x47, 0x72, 0x8c, 0x27, 0x80, 0xf8, 0x02, 0x10, 0x3f, 0x00, 0xe2,
 	0x24, 0x36, 0xb0, 0xc7, 0x8c, 0x01, 0x01, 0x00, 0x00, 0xff, 0xff, 0xbf, 0xd7, 0x7d, 0x7d, 0x08,
 	0x01, 0x00, 0x00,
-***REMOVED***
+}

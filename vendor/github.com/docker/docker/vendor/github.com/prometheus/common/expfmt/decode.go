@@ -27,147 +27,147 @@ import (
 )
 
 // Decoder types decode an input stream into metric families.
-type Decoder interface ***REMOVED***
+type Decoder interface {
 	Decode(*dto.MetricFamily) error
-***REMOVED***
+}
 
-type DecodeOptions struct ***REMOVED***
+type DecodeOptions struct {
 	// Timestamp is added to each value from the stream that has no explicit timestamp set.
 	Timestamp model.Time
-***REMOVED***
+}
 
 // ResponseFormat extracts the correct format from a HTTP response header.
 // If no matching format can be found FormatUnknown is returned.
-func ResponseFormat(h http.Header) Format ***REMOVED***
+func ResponseFormat(h http.Header) Format {
 	ct := h.Get(hdrContentType)
 
 	mediatype, params, err := mime.ParseMediaType(ct)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return FmtUnknown
-	***REMOVED***
+	}
 
 	const textType = "text/plain"
 
-	switch mediatype ***REMOVED***
+	switch mediatype {
 	case ProtoType:
-		if p, ok := params["proto"]; ok && p != ProtoProtocol ***REMOVED***
+		if p, ok := params["proto"]; ok && p != ProtoProtocol {
 			return FmtUnknown
-		***REMOVED***
-		if e, ok := params["encoding"]; ok && e != "delimited" ***REMOVED***
+		}
+		if e, ok := params["encoding"]; ok && e != "delimited" {
 			return FmtUnknown
-		***REMOVED***
+		}
 		return FmtProtoDelim
 
 	case textType:
-		if v, ok := params["version"]; ok && v != TextVersion ***REMOVED***
+		if v, ok := params["version"]; ok && v != TextVersion {
 			return FmtUnknown
-		***REMOVED***
+		}
 		return FmtText
-	***REMOVED***
+	}
 
 	return FmtUnknown
-***REMOVED***
+}
 
 // NewDecoder returns a new decoder based on the given input format.
 // If the input format does not imply otherwise, a text format decoder is returned.
-func NewDecoder(r io.Reader, format Format) Decoder ***REMOVED***
-	switch format ***REMOVED***
+func NewDecoder(r io.Reader, format Format) Decoder {
+	switch format {
 	case FmtProtoDelim:
-		return &protoDecoder***REMOVED***r: r***REMOVED***
-	***REMOVED***
-	return &textDecoder***REMOVED***r: r***REMOVED***
-***REMOVED***
+		return &protoDecoder{r: r}
+	}
+	return &textDecoder{r: r}
+}
 
 // protoDecoder implements the Decoder interface for protocol buffers.
-type protoDecoder struct ***REMOVED***
+type protoDecoder struct {
 	r io.Reader
-***REMOVED***
+}
 
 // Decode implements the Decoder interface.
-func (d *protoDecoder) Decode(v *dto.MetricFamily) error ***REMOVED***
+func (d *protoDecoder) Decode(v *dto.MetricFamily) error {
 	_, err := pbutil.ReadDelimited(d.r, v)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	if !model.IsValidMetricName(model.LabelValue(v.GetName())) ***REMOVED***
+	}
+	if !model.IsValidMetricName(model.LabelValue(v.GetName())) {
 		return fmt.Errorf("invalid metric name %q", v.GetName())
-	***REMOVED***
-	for _, m := range v.GetMetric() ***REMOVED***
-		if m == nil ***REMOVED***
+	}
+	for _, m := range v.GetMetric() {
+		if m == nil {
 			continue
-		***REMOVED***
-		for _, l := range m.GetLabel() ***REMOVED***
-			if l == nil ***REMOVED***
+		}
+		for _, l := range m.GetLabel() {
+			if l == nil {
 				continue
-			***REMOVED***
-			if !model.LabelValue(l.GetValue()).IsValid() ***REMOVED***
+			}
+			if !model.LabelValue(l.GetValue()).IsValid() {
 				return fmt.Errorf("invalid label value %q", l.GetValue())
-			***REMOVED***
-			if !model.LabelName(l.GetName()).IsValid() ***REMOVED***
+			}
+			if !model.LabelName(l.GetName()).IsValid() {
 				return fmt.Errorf("invalid label name %q", l.GetName())
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return nil
-***REMOVED***
+}
 
 // textDecoder implements the Decoder interface for the text protocol.
-type textDecoder struct ***REMOVED***
+type textDecoder struct {
 	r    io.Reader
 	p    TextParser
 	fams []*dto.MetricFamily
-***REMOVED***
+}
 
 // Decode implements the Decoder interface.
-func (d *textDecoder) Decode(v *dto.MetricFamily) error ***REMOVED***
+func (d *textDecoder) Decode(v *dto.MetricFamily) error {
 	// TODO(fabxc): Wrap this as a line reader to make streaming safer.
-	if len(d.fams) == 0 ***REMOVED***
+	if len(d.fams) == 0 {
 		// No cached metric families, read everything and parse metrics.
 		fams, err := d.p.TextToMetricFamilies(d.r)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-		if len(fams) == 0 ***REMOVED***
+		}
+		if len(fams) == 0 {
 			return io.EOF
-		***REMOVED***
+		}
 		d.fams = make([]*dto.MetricFamily, 0, len(fams))
-		for _, f := range fams ***REMOVED***
+		for _, f := range fams {
 			d.fams = append(d.fams, f)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	*v = *d.fams[0]
 	d.fams = d.fams[1:]
 
 	return nil
-***REMOVED***
+}
 
-type SampleDecoder struct ***REMOVED***
+type SampleDecoder struct {
 	Dec  Decoder
 	Opts *DecodeOptions
 
 	f dto.MetricFamily
-***REMOVED***
+}
 
-func (sd *SampleDecoder) Decode(s *model.Vector) error ***REMOVED***
-	if err := sd.Dec.Decode(&sd.f); err != nil ***REMOVED***
+func (sd *SampleDecoder) Decode(s *model.Vector) error {
+	if err := sd.Dec.Decode(&sd.f); err != nil {
 		return err
-	***REMOVED***
+	}
 	*s = extractSamples(&sd.f, sd.Opts)
 	return nil
-***REMOVED***
+}
 
 // Extract samples builds a slice of samples from the provided metric families.
-func ExtractSamples(o *DecodeOptions, fams ...*dto.MetricFamily) model.Vector ***REMOVED***
+func ExtractSamples(o *DecodeOptions, fams ...*dto.MetricFamily) model.Vector {
 	var all model.Vector
-	for _, f := range fams ***REMOVED***
+	for _, f := range fams {
 		all = append(all, extractSamples(f, o)...)
-	***REMOVED***
+	}
 	return all
-***REMOVED***
+}
 
-func extractSamples(f *dto.MetricFamily, o *DecodeOptions) model.Vector ***REMOVED***
-	switch f.GetType() ***REMOVED***
+func extractSamples(f *dto.MetricFamily, o *DecodeOptions) model.Vector {
+	switch f.GetType() {
 	case dto.MetricType_COUNTER:
 		return extractCounter(o, f)
 	case dto.MetricType_GAUGE:
@@ -178,235 +178,235 @@ func extractSamples(f *dto.MetricFamily, o *DecodeOptions) model.Vector ***REMOV
 		return extractUntyped(o, f)
 	case dto.MetricType_HISTOGRAM:
 		return extractHistogram(o, f)
-	***REMOVED***
+	}
 	panic("expfmt.extractSamples: unknown metric family type")
-***REMOVED***
+}
 
-func extractCounter(o *DecodeOptions, f *dto.MetricFamily) model.Vector ***REMOVED***
+func extractCounter(o *DecodeOptions, f *dto.MetricFamily) model.Vector {
 	samples := make(model.Vector, 0, len(f.Metric))
 
-	for _, m := range f.Metric ***REMOVED***
-		if m.Counter == nil ***REMOVED***
+	for _, m := range f.Metric {
+		if m.Counter == nil {
 			continue
-		***REMOVED***
+		}
 
 		lset := make(model.LabelSet, len(m.Label)+1)
-		for _, p := range m.Label ***REMOVED***
+		for _, p := range m.Label {
 			lset[model.LabelName(p.GetName())] = model.LabelValue(p.GetValue())
-		***REMOVED***
+		}
 		lset[model.MetricNameLabel] = model.LabelValue(f.GetName())
 
-		smpl := &model.Sample***REMOVED***
+		smpl := &model.Sample{
 			Metric: model.Metric(lset),
 			Value:  model.SampleValue(m.Counter.GetValue()),
-		***REMOVED***
+		}
 
-		if m.TimestampMs != nil ***REMOVED***
+		if m.TimestampMs != nil {
 			smpl.Timestamp = model.TimeFromUnixNano(*m.TimestampMs * 1000000)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			smpl.Timestamp = o.Timestamp
-		***REMOVED***
+		}
 
 		samples = append(samples, smpl)
-	***REMOVED***
+	}
 
 	return samples
-***REMOVED***
+}
 
-func extractGauge(o *DecodeOptions, f *dto.MetricFamily) model.Vector ***REMOVED***
+func extractGauge(o *DecodeOptions, f *dto.MetricFamily) model.Vector {
 	samples := make(model.Vector, 0, len(f.Metric))
 
-	for _, m := range f.Metric ***REMOVED***
-		if m.Gauge == nil ***REMOVED***
+	for _, m := range f.Metric {
+		if m.Gauge == nil {
 			continue
-		***REMOVED***
+		}
 
 		lset := make(model.LabelSet, len(m.Label)+1)
-		for _, p := range m.Label ***REMOVED***
+		for _, p := range m.Label {
 			lset[model.LabelName(p.GetName())] = model.LabelValue(p.GetValue())
-		***REMOVED***
+		}
 		lset[model.MetricNameLabel] = model.LabelValue(f.GetName())
 
-		smpl := &model.Sample***REMOVED***
+		smpl := &model.Sample{
 			Metric: model.Metric(lset),
 			Value:  model.SampleValue(m.Gauge.GetValue()),
-		***REMOVED***
+		}
 
-		if m.TimestampMs != nil ***REMOVED***
+		if m.TimestampMs != nil {
 			smpl.Timestamp = model.TimeFromUnixNano(*m.TimestampMs * 1000000)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			smpl.Timestamp = o.Timestamp
-		***REMOVED***
+		}
 
 		samples = append(samples, smpl)
-	***REMOVED***
+	}
 
 	return samples
-***REMOVED***
+}
 
-func extractUntyped(o *DecodeOptions, f *dto.MetricFamily) model.Vector ***REMOVED***
+func extractUntyped(o *DecodeOptions, f *dto.MetricFamily) model.Vector {
 	samples := make(model.Vector, 0, len(f.Metric))
 
-	for _, m := range f.Metric ***REMOVED***
-		if m.Untyped == nil ***REMOVED***
+	for _, m := range f.Metric {
+		if m.Untyped == nil {
 			continue
-		***REMOVED***
+		}
 
 		lset := make(model.LabelSet, len(m.Label)+1)
-		for _, p := range m.Label ***REMOVED***
+		for _, p := range m.Label {
 			lset[model.LabelName(p.GetName())] = model.LabelValue(p.GetValue())
-		***REMOVED***
+		}
 		lset[model.MetricNameLabel] = model.LabelValue(f.GetName())
 
-		smpl := &model.Sample***REMOVED***
+		smpl := &model.Sample{
 			Metric: model.Metric(lset),
 			Value:  model.SampleValue(m.Untyped.GetValue()),
-		***REMOVED***
+		}
 
-		if m.TimestampMs != nil ***REMOVED***
+		if m.TimestampMs != nil {
 			smpl.Timestamp = model.TimeFromUnixNano(*m.TimestampMs * 1000000)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			smpl.Timestamp = o.Timestamp
-		***REMOVED***
+		}
 
 		samples = append(samples, smpl)
-	***REMOVED***
+	}
 
 	return samples
-***REMOVED***
+}
 
-func extractSummary(o *DecodeOptions, f *dto.MetricFamily) model.Vector ***REMOVED***
+func extractSummary(o *DecodeOptions, f *dto.MetricFamily) model.Vector {
 	samples := make(model.Vector, 0, len(f.Metric))
 
-	for _, m := range f.Metric ***REMOVED***
-		if m.Summary == nil ***REMOVED***
+	for _, m := range f.Metric {
+		if m.Summary == nil {
 			continue
-		***REMOVED***
+		}
 
 		timestamp := o.Timestamp
-		if m.TimestampMs != nil ***REMOVED***
+		if m.TimestampMs != nil {
 			timestamp = model.TimeFromUnixNano(*m.TimestampMs * 1000000)
-		***REMOVED***
+		}
 
-		for _, q := range m.Summary.Quantile ***REMOVED***
+		for _, q := range m.Summary.Quantile {
 			lset := make(model.LabelSet, len(m.Label)+2)
-			for _, p := range m.Label ***REMOVED***
+			for _, p := range m.Label {
 				lset[model.LabelName(p.GetName())] = model.LabelValue(p.GetValue())
-			***REMOVED***
+			}
 			// BUG(matt): Update other names to "quantile".
 			lset[model.LabelName(model.QuantileLabel)] = model.LabelValue(fmt.Sprint(q.GetQuantile()))
 			lset[model.MetricNameLabel] = model.LabelValue(f.GetName())
 
-			samples = append(samples, &model.Sample***REMOVED***
+			samples = append(samples, &model.Sample{
 				Metric:    model.Metric(lset),
 				Value:     model.SampleValue(q.GetValue()),
 				Timestamp: timestamp,
-			***REMOVED***)
-		***REMOVED***
+			})
+		}
 
 		lset := make(model.LabelSet, len(m.Label)+1)
-		for _, p := range m.Label ***REMOVED***
+		for _, p := range m.Label {
 			lset[model.LabelName(p.GetName())] = model.LabelValue(p.GetValue())
-		***REMOVED***
+		}
 		lset[model.MetricNameLabel] = model.LabelValue(f.GetName() + "_sum")
 
-		samples = append(samples, &model.Sample***REMOVED***
+		samples = append(samples, &model.Sample{
 			Metric:    model.Metric(lset),
 			Value:     model.SampleValue(m.Summary.GetSampleSum()),
 			Timestamp: timestamp,
-		***REMOVED***)
+		})
 
 		lset = make(model.LabelSet, len(m.Label)+1)
-		for _, p := range m.Label ***REMOVED***
+		for _, p := range m.Label {
 			lset[model.LabelName(p.GetName())] = model.LabelValue(p.GetValue())
-		***REMOVED***
+		}
 		lset[model.MetricNameLabel] = model.LabelValue(f.GetName() + "_count")
 
-		samples = append(samples, &model.Sample***REMOVED***
+		samples = append(samples, &model.Sample{
 			Metric:    model.Metric(lset),
 			Value:     model.SampleValue(m.Summary.GetSampleCount()),
 			Timestamp: timestamp,
-		***REMOVED***)
-	***REMOVED***
+		})
+	}
 
 	return samples
-***REMOVED***
+}
 
-func extractHistogram(o *DecodeOptions, f *dto.MetricFamily) model.Vector ***REMOVED***
+func extractHistogram(o *DecodeOptions, f *dto.MetricFamily) model.Vector {
 	samples := make(model.Vector, 0, len(f.Metric))
 
-	for _, m := range f.Metric ***REMOVED***
-		if m.Histogram == nil ***REMOVED***
+	for _, m := range f.Metric {
+		if m.Histogram == nil {
 			continue
-		***REMOVED***
+		}
 
 		timestamp := o.Timestamp
-		if m.TimestampMs != nil ***REMOVED***
+		if m.TimestampMs != nil {
 			timestamp = model.TimeFromUnixNano(*m.TimestampMs * 1000000)
-		***REMOVED***
+		}
 
 		infSeen := false
 
-		for _, q := range m.Histogram.Bucket ***REMOVED***
+		for _, q := range m.Histogram.Bucket {
 			lset := make(model.LabelSet, len(m.Label)+2)
-			for _, p := range m.Label ***REMOVED***
+			for _, p := range m.Label {
 				lset[model.LabelName(p.GetName())] = model.LabelValue(p.GetValue())
-			***REMOVED***
+			}
 			lset[model.LabelName(model.BucketLabel)] = model.LabelValue(fmt.Sprint(q.GetUpperBound()))
 			lset[model.MetricNameLabel] = model.LabelValue(f.GetName() + "_bucket")
 
-			if math.IsInf(q.GetUpperBound(), +1) ***REMOVED***
+			if math.IsInf(q.GetUpperBound(), +1) {
 				infSeen = true
-			***REMOVED***
+			}
 
-			samples = append(samples, &model.Sample***REMOVED***
+			samples = append(samples, &model.Sample{
 				Metric:    model.Metric(lset),
 				Value:     model.SampleValue(q.GetCumulativeCount()),
 				Timestamp: timestamp,
-			***REMOVED***)
-		***REMOVED***
+			})
+		}
 
 		lset := make(model.LabelSet, len(m.Label)+1)
-		for _, p := range m.Label ***REMOVED***
+		for _, p := range m.Label {
 			lset[model.LabelName(p.GetName())] = model.LabelValue(p.GetValue())
-		***REMOVED***
+		}
 		lset[model.MetricNameLabel] = model.LabelValue(f.GetName() + "_sum")
 
-		samples = append(samples, &model.Sample***REMOVED***
+		samples = append(samples, &model.Sample{
 			Metric:    model.Metric(lset),
 			Value:     model.SampleValue(m.Histogram.GetSampleSum()),
 			Timestamp: timestamp,
-		***REMOVED***)
+		})
 
 		lset = make(model.LabelSet, len(m.Label)+1)
-		for _, p := range m.Label ***REMOVED***
+		for _, p := range m.Label {
 			lset[model.LabelName(p.GetName())] = model.LabelValue(p.GetValue())
-		***REMOVED***
+		}
 		lset[model.MetricNameLabel] = model.LabelValue(f.GetName() + "_count")
 
-		count := &model.Sample***REMOVED***
+		count := &model.Sample{
 			Metric:    model.Metric(lset),
 			Value:     model.SampleValue(m.Histogram.GetSampleCount()),
 			Timestamp: timestamp,
-		***REMOVED***
+		}
 		samples = append(samples, count)
 
-		if !infSeen ***REMOVED***
+		if !infSeen {
 			// Append an infinity bucket sample.
 			lset := make(model.LabelSet, len(m.Label)+2)
-			for _, p := range m.Label ***REMOVED***
+			for _, p := range m.Label {
 				lset[model.LabelName(p.GetName())] = model.LabelValue(p.GetValue())
-			***REMOVED***
+			}
 			lset[model.LabelName(model.BucketLabel)] = model.LabelValue("+Inf")
 			lset[model.MetricNameLabel] = model.LabelValue(f.GetName() + "_bucket")
 
-			samples = append(samples, &model.Sample***REMOVED***
+			samples = append(samples, &model.Sample{
 				Metric:    model.Metric(lset),
 				Value:     count.Value,
 				Timestamp: timestamp,
-			***REMOVED***)
-		***REMOVED***
-	***REMOVED***
+			})
+		}
+	}
 
 	return samples
-***REMOVED***
+}

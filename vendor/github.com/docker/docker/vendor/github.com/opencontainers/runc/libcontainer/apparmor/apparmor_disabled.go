@@ -8,13 +8,13 @@ import (
 
 var ErrApparmorNotEnabled = errors.New("apparmor: config provided but apparmor not supported")
 
-func IsEnabled() bool ***REMOVED***
+func IsEnabled() bool {
 	return false
-***REMOVED***
+}
 
-func ApplyProfile(name string) error ***REMOVED***
-	if name != "" ***REMOVED***
+func ApplyProfile(name string) error {
+	if name != "" {
 		return ErrApparmorNotEnabled
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

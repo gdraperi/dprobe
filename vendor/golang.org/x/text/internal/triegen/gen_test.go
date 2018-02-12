@@ -19,14 +19,14 @@ import (
 	"os/exec"
 )
 
-func init() ***REMOVED***
+func init() {
 	const tmpfile = "tmpout"
 	const dstfile = "data_test.go"
 
 	f, err := os.Create(tmpfile)
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatalf("Could not create output file: %v", err)
-	***REMOVED***
+	}
 	defer os.Remove(tmpfile)
 	defer f.Close()
 
@@ -40,14 +40,14 @@ func init() ***REMOVED***
 	Example_build()
 	ExampleGen_build()
 
-	if err := exec.Command("gofmt", "-w", tmpfile).Run(); err != nil ***REMOVED***
+	if err := exec.Command("gofmt", "-w", tmpfile).Run(); err != nil {
 		log.Fatal(err)
-	***REMOVED***
+	}
 	os.Remove(dstfile)
 	os.Rename(tmpfile, dstfile)
 
 	os.Exit(0)
-***REMOVED***
+}
 
 const header = `// This file is generated with "go test -tags generate". DO NOT EDIT!
 // +build !generate
@@ -59,10 +59,10 @@ package triegen_test
 // the generate flag is set. This will clearly make the tests fail, but that
 // is okay. It allows us to bootstrap.
 
-type trie struct***REMOVED******REMOVED***
+type trie struct{}
 
-func (t *trie) lookupString(string) (uint8, int) ***REMOVED*** return 0, 1 ***REMOVED***
-func (t *trie) lookupStringUnsafe(string) uint64 ***REMOVED*** return 0 ***REMOVED***
+func (t *trie) lookupString(string) (uint8, int) { return 0, 1 }
+func (t *trie) lookupStringUnsafe(string) uint64 { return 0 }
 
-func newRandTrie(i int) *trie  ***REMOVED*** return &trie***REMOVED******REMOVED*** ***REMOVED***
-func newMultiTrie(i int) *trie ***REMOVED*** return &trie***REMOVED******REMOVED*** ***REMOVED***
+func newRandTrie(i int) *trie  { return &trie{} }
+func newMultiTrie(i int) *trie { return &trie{} }

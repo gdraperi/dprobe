@@ -14,7 +14,7 @@ var (
 
 // https://msdn.microsoft.com/en-us/library/windows/desktop/aa366589(v=vs.85).aspx
 // https://msdn.microsoft.com/en-us/library/windows/desktop/aa366770(v=vs.85).aspx
-type memorystatusex struct ***REMOVED***
+type memorystatusex struct {
 	dwLength                uint32
 	dwMemoryLoad            uint32
 	ullTotalPhys            uint64
@@ -24,22 +24,22 @@ type memorystatusex struct ***REMOVED***
 	ullTotalVirtual         uint64
 	ullAvailVirtual         uint64
 	ullAvailExtendedVirtual uint64
-***REMOVED***
+}
 
 // ReadMemInfo retrieves memory statistics of the host system and returns a
 //  MemInfo type.
-func ReadMemInfo() (*MemInfo, error) ***REMOVED***
-	msi := &memorystatusex***REMOVED***
+func ReadMemInfo() (*MemInfo, error) {
+	msi := &memorystatusex{
 		dwLength: 64,
-	***REMOVED***
+	}
 	r1, _, _ := procGlobalMemoryStatusEx.Call(uintptr(unsafe.Pointer(msi)))
-	if r1 == 0 ***REMOVED***
-		return &MemInfo***REMOVED******REMOVED***, nil
-	***REMOVED***
-	return &MemInfo***REMOVED***
+	if r1 == 0 {
+		return &MemInfo{}, nil
+	}
+	return &MemInfo{
 		MemTotal:  int64(msi.ullTotalPhys),
 		MemFree:   int64(msi.ullAvailPhys),
 		SwapTotal: int64(msi.ullTotalPageFile),
 		SwapFree:  int64(msi.ullAvailPageFile),
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}

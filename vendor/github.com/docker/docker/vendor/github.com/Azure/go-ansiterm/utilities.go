@@ -4,18 +4,18 @@ import (
 	"strconv"
 )
 
-func sliceContains(bytes []byte, b byte) bool ***REMOVED***
-	for _, v := range bytes ***REMOVED***
-		if v == b ***REMOVED***
+func sliceContains(bytes []byte, b byte) bool {
+	for _, v := range bytes {
+		if v == b {
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return false
-***REMOVED***
+}
 
-func convertBytesToInteger(bytes []byte) int ***REMOVED***
+func convertBytesToInteger(bytes []byte) int {
 	s := string(bytes)
 	i, _ := strconv.Atoi(s)
 	return i
-***REMOVED***
+}

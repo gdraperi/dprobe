@@ -46,33 +46,33 @@ import (
 
 // Address represents a server the client connects to.
 // This is the EXPERIMENTAL API and may be changed or extended in the future.
-type Address struct ***REMOVED***
+type Address struct {
 	// Addr is the server address on which a connection will be established.
 	Addr string
 	// Metadata is the information associated with Addr, which may be used
 	// to make load balancing decision.
-	Metadata interface***REMOVED******REMOVED***
-***REMOVED***
+	Metadata interface{}
+}
 
 // BalancerConfig specifies the configurations for Balancer.
-type BalancerConfig struct ***REMOVED***
+type BalancerConfig struct {
 	// DialCreds is the transport credential the Balancer implementation can
 	// use to dial to a remote load balancer server. The Balancer implementations
 	// can ignore this if it does not need to talk to another party securely.
 	DialCreds credentials.TransportCredentials
-***REMOVED***
+}
 
 // BalancerGetOptions configures a Get call.
 // This is the EXPERIMENTAL API and may be changed or extended in the future.
-type BalancerGetOptions struct ***REMOVED***
+type BalancerGetOptions struct {
 	// BlockingWait specifies whether Get should block when there is no
 	// connected address.
 	BlockingWait bool
-***REMOVED***
+}
 
 // Balancer chooses network addresses for RPCs.
 // This is the EXPERIMENTAL API and may be changed or extended in the future.
-type Balancer interface ***REMOVED***
+type Balancer interface {
 	// Start does the initialization work to bootstrap a Balancer. For example,
 	// this function may start the name resolution and watch the updates. It will
 	// be called when dialing.
@@ -120,281 +120,281 @@ type Balancer interface ***REMOVED***
 	Notify() <-chan []Address
 	// Close shuts down the balancer.
 	Close() error
-***REMOVED***
+}
 
 // downErr implements net.Error. It is constructed by gRPC internals and passed to the down
 // call of Balancer.
-type downErr struct ***REMOVED***
+type downErr struct {
 	timeout   bool
 	temporary bool
 	desc      string
-***REMOVED***
+}
 
-func (e downErr) Error() string   ***REMOVED*** return e.desc ***REMOVED***
-func (e downErr) Timeout() bool   ***REMOVED*** return e.timeout ***REMOVED***
-func (e downErr) Temporary() bool ***REMOVED*** return e.temporary ***REMOVED***
+func (e downErr) Error() string   { return e.desc }
+func (e downErr) Timeout() bool   { return e.timeout }
+func (e downErr) Temporary() bool { return e.temporary }
 
-func downErrorf(timeout, temporary bool, format string, a ...interface***REMOVED******REMOVED***) downErr ***REMOVED***
-	return downErr***REMOVED***
+func downErrorf(timeout, temporary bool, format string, a ...interface{}) downErr {
+	return downErr{
 		timeout:   timeout,
 		temporary: temporary,
 		desc:      fmt.Sprintf(format, a...),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // RoundRobin returns a Balancer that selects addresses round-robin. It uses r to watch
 // the name resolution updates and updates the addresses available correspondingly.
-func RoundRobin(r naming.Resolver) Balancer ***REMOVED***
-	return &roundRobin***REMOVED***r: r***REMOVED***
-***REMOVED***
+func RoundRobin(r naming.Resolver) Balancer {
+	return &roundRobin{r: r}
+}
 
-type addrInfo struct ***REMOVED***
+type addrInfo struct {
 	addr      Address
 	connected bool
-***REMOVED***
+}
 
-type roundRobin struct ***REMOVED***
+type roundRobin struct {
 	r      naming.Resolver
 	w      naming.Watcher
 	addrs  []*addrInfo // all the addresses the client should potentially connect
 	mu     sync.Mutex
 	addrCh chan []Address // the channel to notify gRPC internals the list of addresses the client should connect to.
 	next   int            // index of the next address to return for Get()
-	waitCh chan struct***REMOVED******REMOVED***  // the channel to block when there is no connected address available
+	waitCh chan struct{}  // the channel to block when there is no connected address available
 	done   bool           // The Balancer is closed.
-***REMOVED***
+}
 
-func (rr *roundRobin) watchAddrUpdates() error ***REMOVED***
+func (rr *roundRobin) watchAddrUpdates() error {
 	updates, err := rr.w.Next()
-	if err != nil ***REMOVED***
+	if err != nil {
 		grpclog.Printf("grpc: the naming watcher stops working due to %v.\n", err)
 		return err
-	***REMOVED***
+	}
 	rr.mu.Lock()
 	defer rr.mu.Unlock()
-	for _, update := range updates ***REMOVED***
-		addr := Address***REMOVED***
+	for _, update := range updates {
+		addr := Address{
 			Addr:     update.Addr,
 			Metadata: update.Metadata,
-		***REMOVED***
-		switch update.Op ***REMOVED***
+		}
+		switch update.Op {
 		case naming.Add:
 			var exist bool
-			for _, v := range rr.addrs ***REMOVED***
-				if addr == v.addr ***REMOVED***
+			for _, v := range rr.addrs {
+				if addr == v.addr {
 					exist = true
 					grpclog.Println("grpc: The name resolver wanted to add an existing address: ", addr)
 					break
-				***REMOVED***
-			***REMOVED***
-			if exist ***REMOVED***
+				}
+			}
+			if exist {
 				continue
-			***REMOVED***
-			rr.addrs = append(rr.addrs, &addrInfo***REMOVED***addr: addr***REMOVED***)
+			}
+			rr.addrs = append(rr.addrs, &addrInfo{addr: addr})
 		case naming.Delete:
-			for i, v := range rr.addrs ***REMOVED***
-				if addr == v.addr ***REMOVED***
+			for i, v := range rr.addrs {
+				if addr == v.addr {
 					copy(rr.addrs[i:], rr.addrs[i+1:])
 					rr.addrs = rr.addrs[:len(rr.addrs)-1]
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		default:
 			grpclog.Println("Unknown update.Op ", update.Op)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	// Make a copy of rr.addrs and write it onto rr.addrCh so that gRPC internals gets notified.
 	open := make([]Address, len(rr.addrs))
-	for i, v := range rr.addrs ***REMOVED***
+	for i, v := range rr.addrs {
 		open[i] = v.addr
-	***REMOVED***
-	if rr.done ***REMOVED***
+	}
+	if rr.done {
 		return ErrClientConnClosing
-	***REMOVED***
+	}
 	rr.addrCh <- open
 	return nil
-***REMOVED***
+}
 
-func (rr *roundRobin) Start(target string, config BalancerConfig) error ***REMOVED***
+func (rr *roundRobin) Start(target string, config BalancerConfig) error {
 	rr.mu.Lock()
 	defer rr.mu.Unlock()
-	if rr.done ***REMOVED***
+	if rr.done {
 		return ErrClientConnClosing
-	***REMOVED***
-	if rr.r == nil ***REMOVED***
+	}
+	if rr.r == nil {
 		// If there is no name resolver installed, it is not needed to
 		// do name resolution. In this case, target is added into rr.addrs
 		// as the only address available and rr.addrCh stays nil.
-		rr.addrs = append(rr.addrs, &addrInfo***REMOVED***addr: Address***REMOVED***Addr: target***REMOVED******REMOVED***)
+		rr.addrs = append(rr.addrs, &addrInfo{addr: Address{Addr: target}})
 		return nil
-	***REMOVED***
+	}
 	w, err := rr.r.Resolve(target)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	rr.w = w
 	rr.addrCh = make(chan []Address)
-	go func() ***REMOVED***
-		for ***REMOVED***
-			if err := rr.watchAddrUpdates(); err != nil ***REMOVED***
+	go func() {
+		for {
+			if err := rr.watchAddrUpdates(); err != nil {
 				return
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***()
+			}
+		}
+	}()
 	return nil
-***REMOVED***
+}
 
 // Up sets the connected state of addr and sends notification if there are pending
 // Get() calls.
-func (rr *roundRobin) Up(addr Address) func(error) ***REMOVED***
+func (rr *roundRobin) Up(addr Address) func(error) {
 	rr.mu.Lock()
 	defer rr.mu.Unlock()
 	var cnt int
-	for _, a := range rr.addrs ***REMOVED***
-		if a.addr == addr ***REMOVED***
-			if a.connected ***REMOVED***
+	for _, a := range rr.addrs {
+		if a.addr == addr {
+			if a.connected {
 				return nil
-			***REMOVED***
+			}
 			a.connected = true
-		***REMOVED***
-		if a.connected ***REMOVED***
+		}
+		if a.connected {
 			cnt++
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	// addr is only one which is connected. Notify the Get() callers who are blocking.
-	if cnt == 1 && rr.waitCh != nil ***REMOVED***
+	if cnt == 1 && rr.waitCh != nil {
 		close(rr.waitCh)
 		rr.waitCh = nil
-	***REMOVED***
-	return func(err error) ***REMOVED***
+	}
+	return func(err error) {
 		rr.down(addr, err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // down unsets the connected state of addr.
-func (rr *roundRobin) down(addr Address, err error) ***REMOVED***
+func (rr *roundRobin) down(addr Address, err error) {
 	rr.mu.Lock()
 	defer rr.mu.Unlock()
-	for _, a := range rr.addrs ***REMOVED***
-		if addr == a.addr ***REMOVED***
+	for _, a := range rr.addrs {
+		if addr == a.addr {
 			a.connected = false
 			break
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // Get returns the next addr in the rotation.
-func (rr *roundRobin) Get(ctx context.Context, opts BalancerGetOptions) (addr Address, put func(), err error) ***REMOVED***
-	var ch chan struct***REMOVED******REMOVED***
+func (rr *roundRobin) Get(ctx context.Context, opts BalancerGetOptions) (addr Address, put func(), err error) {
+	var ch chan struct{}
 	rr.mu.Lock()
-	if rr.done ***REMOVED***
+	if rr.done {
 		rr.mu.Unlock()
 		err = ErrClientConnClosing
 		return
-	***REMOVED***
+	}
 
-	if len(rr.addrs) > 0 ***REMOVED***
-		if rr.next >= len(rr.addrs) ***REMOVED***
+	if len(rr.addrs) > 0 {
+		if rr.next >= len(rr.addrs) {
 			rr.next = 0
-		***REMOVED***
+		}
 		next := rr.next
-		for ***REMOVED***
+		for {
 			a := rr.addrs[next]
 			next = (next + 1) % len(rr.addrs)
-			if a.connected ***REMOVED***
+			if a.connected {
 				addr = a.addr
 				rr.next = next
 				rr.mu.Unlock()
 				return
-			***REMOVED***
-			if next == rr.next ***REMOVED***
+			}
+			if next == rr.next {
 				// Has iterated all the possible address but none is connected.
 				break
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-	if !opts.BlockingWait ***REMOVED***
-		if len(rr.addrs) == 0 ***REMOVED***
+			}
+		}
+	}
+	if !opts.BlockingWait {
+		if len(rr.addrs) == 0 {
 			rr.mu.Unlock()
 			err = Errorf(codes.Unavailable, "there is no address available")
 			return
-		***REMOVED***
+		}
 		// Returns the next addr on rr.addrs for failfast RPCs.
 		addr = rr.addrs[rr.next].addr
 		rr.next++
 		rr.mu.Unlock()
 		return
-	***REMOVED***
+	}
 	// Wait on rr.waitCh for non-failfast RPCs.
-	if rr.waitCh == nil ***REMOVED***
-		ch = make(chan struct***REMOVED******REMOVED***)
+	if rr.waitCh == nil {
+		ch = make(chan struct{})
 		rr.waitCh = ch
-	***REMOVED*** else ***REMOVED***
+	} else {
 		ch = rr.waitCh
-	***REMOVED***
+	}
 	rr.mu.Unlock()
-	for ***REMOVED***
-		select ***REMOVED***
+	for {
+		select {
 		case <-ctx.Done():
 			err = ctx.Err()
 			return
 		case <-ch:
 			rr.mu.Lock()
-			if rr.done ***REMOVED***
+			if rr.done {
 				rr.mu.Unlock()
 				err = ErrClientConnClosing
 				return
-			***REMOVED***
+			}
 
-			if len(rr.addrs) > 0 ***REMOVED***
-				if rr.next >= len(rr.addrs) ***REMOVED***
+			if len(rr.addrs) > 0 {
+				if rr.next >= len(rr.addrs) {
 					rr.next = 0
-				***REMOVED***
+				}
 				next := rr.next
-				for ***REMOVED***
+				for {
 					a := rr.addrs[next]
 					next = (next + 1) % len(rr.addrs)
-					if a.connected ***REMOVED***
+					if a.connected {
 						addr = a.addr
 						rr.next = next
 						rr.mu.Unlock()
 						return
-					***REMOVED***
-					if next == rr.next ***REMOVED***
+					}
+					if next == rr.next {
 						// Has iterated all the possible address but none is connected.
 						break
-					***REMOVED***
-				***REMOVED***
-			***REMOVED***
+					}
+				}
+			}
 			// The newly added addr got removed by Down() again.
-			if rr.waitCh == nil ***REMOVED***
-				ch = make(chan struct***REMOVED******REMOVED***)
+			if rr.waitCh == nil {
+				ch = make(chan struct{})
 				rr.waitCh = ch
-			***REMOVED*** else ***REMOVED***
+			} else {
 				ch = rr.waitCh
-			***REMOVED***
+			}
 			rr.mu.Unlock()
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (rr *roundRobin) Notify() <-chan []Address ***REMOVED***
+func (rr *roundRobin) Notify() <-chan []Address {
 	return rr.addrCh
-***REMOVED***
+}
 
-func (rr *roundRobin) Close() error ***REMOVED***
+func (rr *roundRobin) Close() error {
 	rr.mu.Lock()
 	defer rr.mu.Unlock()
 	rr.done = true
-	if rr.w != nil ***REMOVED***
+	if rr.w != nil {
 		rr.w.Close()
-	***REMOVED***
-	if rr.waitCh != nil ***REMOVED***
+	}
+	if rr.waitCh != nil {
 		close(rr.waitCh)
 		rr.waitCh = nil
-	***REMOVED***
-	if rr.addrCh != nil ***REMOVED***
+	}
+	if rr.addrCh != nil {
 		close(rr.addrCh)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

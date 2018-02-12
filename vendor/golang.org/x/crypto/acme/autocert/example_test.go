@@ -13,24 +13,24 @@ import (
 	"golang.org/x/crypto/acme/autocert"
 )
 
-func ExampleNewListener() ***REMOVED***
+func ExampleNewListener() {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) ***REMOVED***
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Hello, TLS user! Your config: %+v", r.TLS)
-	***REMOVED***)
+	})
 	log.Fatal(http.Serve(autocert.NewListener("example.com"), mux))
-***REMOVED***
+}
 
-func ExampleManager() ***REMOVED***
-	m := &autocert.Manager***REMOVED***
+func ExampleManager() {
+	m := &autocert.Manager{
 		Cache:      autocert.DirCache("secret-dir"),
 		Prompt:     autocert.AcceptTOS,
 		HostPolicy: autocert.HostWhitelist("example.org"),
-	***REMOVED***
+	}
 	go http.ListenAndServe(":http", m.HTTPHandler(nil))
-	s := &http.Server***REMOVED***
+	s := &http.Server{
 		Addr:      ":https",
-		TLSConfig: &tls.Config***REMOVED***GetCertificate: m.GetCertificate***REMOVED***,
-	***REMOVED***
+		TLSConfig: &tls.Config{GetCertificate: m.GetCertificate},
+	}
 	s.ListenAndServeTLS("", "")
-***REMOVED***
+}

@@ -10,89 +10,89 @@ type PositionalArgs func(cmd *Command, args []string) error
 // - root commands with no subcommands can take arbitrary arguments
 // - root commands with subcommands will do subcommand validity checking
 // - subcommands will always accept arbitrary arguments
-func legacyArgs(cmd *Command, args []string) error ***REMOVED***
+func legacyArgs(cmd *Command, args []string) error {
 	// no subcommand, always take args
-	if !cmd.HasSubCommands() ***REMOVED***
+	if !cmd.HasSubCommands() {
 		return nil
-	***REMOVED***
+	}
 
 	// root command with subcommands, do subcommand checking
-	if !cmd.HasParent() && len(args) > 0 ***REMOVED***
+	if !cmd.HasParent() && len(args) > 0 {
 		return fmt.Errorf("unknown command %q for %q%s", args[0], cmd.CommandPath(), cmd.findSuggestions(args[0]))
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // NoArgs returns an error if any args are included
-func NoArgs(cmd *Command, args []string) error ***REMOVED***
-	if len(args) > 0 ***REMOVED***
+func NoArgs(cmd *Command, args []string) error {
+	if len(args) > 0 {
 		return fmt.Errorf("unknown command %q for %q", args[0], cmd.CommandPath())
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // OnlyValidArgs returns an error if any args are not in the list of ValidArgs
-func OnlyValidArgs(cmd *Command, args []string) error ***REMOVED***
-	if len(cmd.ValidArgs) > 0 ***REMOVED***
-		for _, v := range args ***REMOVED***
-			if !stringInSlice(v, cmd.ValidArgs) ***REMOVED***
+func OnlyValidArgs(cmd *Command, args []string) error {
+	if len(cmd.ValidArgs) > 0 {
+		for _, v := range args {
+			if !stringInSlice(v, cmd.ValidArgs) {
 				return fmt.Errorf("invalid argument %q for %q%s", v, cmd.CommandPath(), cmd.findSuggestions(args[0]))
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func stringInSlice(a string, list []string) bool ***REMOVED***
-	for _, b := range list ***REMOVED***
-		if b == a ***REMOVED***
+func stringInSlice(a string, list []string) bool {
+	for _, b := range list {
+		if b == a {
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false
-***REMOVED***
+}
 
 // ArbitraryArgs never returns an error
-func ArbitraryArgs(cmd *Command, args []string) error ***REMOVED***
+func ArbitraryArgs(cmd *Command, args []string) error {
 	return nil
-***REMOVED***
+}
 
 // MinimumNArgs returns an error if there is not at least N args
-func MinimumNArgs(n int) PositionalArgs ***REMOVED***
-	return func(cmd *Command, args []string) error ***REMOVED***
-		if len(args) < n ***REMOVED***
+func MinimumNArgs(n int) PositionalArgs {
+	return func(cmd *Command, args []string) error {
+		if len(args) < n {
 			return fmt.Errorf("requires at least %d arg(s), only received %d", n, len(args))
-		***REMOVED***
+		}
 		return nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // MaximumNArgs returns an error if there are more than N args
-func MaximumNArgs(n int) PositionalArgs ***REMOVED***
-	return func(cmd *Command, args []string) error ***REMOVED***
-		if len(args) > n ***REMOVED***
+func MaximumNArgs(n int) PositionalArgs {
+	return func(cmd *Command, args []string) error {
+		if len(args) > n {
 			return fmt.Errorf("accepts at most %d arg(s), received %d", n, len(args))
-		***REMOVED***
+		}
 		return nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // ExactArgs returns an error if there are not exactly n args 
-func ExactArgs(n int) PositionalArgs ***REMOVED***
-	return func(cmd *Command, args []string) error ***REMOVED***
-		if len(args) != n ***REMOVED***
+func ExactArgs(n int) PositionalArgs {
+	return func(cmd *Command, args []string) error {
+		if len(args) != n {
 			return fmt.Errorf("accepts %d arg(s), received %d", n, len(args))
-		***REMOVED***
+		}
 		return nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // RangeArgs returns an error if the number of args is not within the expected range 
-func RangeArgs(min int, max int) PositionalArgs ***REMOVED***
-	return func(cmd *Command, args []string) error ***REMOVED***
-		if len(args) < min || len(args) > max ***REMOVED***
+func RangeArgs(min int, max int) PositionalArgs {
+	return func(cmd *Command, args []string) error {
+		if len(args) < min || len(args) > max {
 			return fmt.Errorf("accepts between %d and %d arg(s), received %d", min, max, len(args))
-		***REMOVED***
+		}
 		return nil
-	***REMOVED***
-***REMOVED***
+	}
+}

@@ -8,18 +8,18 @@ package ipv4
 
 const sizeofICMPFilter = 0x0
 
-type icmpFilter struct ***REMOVED***
-***REMOVED***
+type icmpFilter struct {
+}
 
-func (f *icmpFilter) accept(typ ICMPType) ***REMOVED***
-***REMOVED***
+func (f *icmpFilter) accept(typ ICMPType) {
+}
 
-func (f *icmpFilter) block(typ ICMPType) ***REMOVED***
-***REMOVED***
+func (f *icmpFilter) block(typ ICMPType) {
+}
 
-func (f *icmpFilter) setAll(block bool) ***REMOVED***
-***REMOVED***
+func (f *icmpFilter) setAll(block bool) {
+}
 
-func (f *icmpFilter) willBlock(typ ICMPType) bool ***REMOVED***
+func (f *icmpFilter) willBlock(typ ICMPType) bool {
 	return false
-***REMOVED***
+}

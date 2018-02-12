@@ -15,90 +15,90 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestNetworkInspectError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestNetworkInspectError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
-	***REMOVED***
+	}
 
-	_, err := client.NetworkInspect(context.Background(), "nothing", types.NetworkInspectOptions***REMOVED******REMOVED***)
+	_, err := client.NetworkInspect(context.Background(), "nothing", types.NetworkInspectOptions{})
 	assert.EqualError(t, err, "Error response from daemon: Server error")
-***REMOVED***
+}
 
-func TestNetworkInspectNotFoundError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestNetworkInspectNotFoundError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusNotFound, "missing")),
-	***REMOVED***
+	}
 
-	_, err := client.NetworkInspect(context.Background(), "unknown", types.NetworkInspectOptions***REMOVED******REMOVED***)
+	_, err := client.NetworkInspect(context.Background(), "unknown", types.NetworkInspectOptions{})
 	assert.EqualError(t, err, "Error: No such network: unknown")
 	assert.True(t, IsErrNotFound(err))
-***REMOVED***
+}
 
-func TestNetworkInspect(t *testing.T) ***REMOVED***
+func TestNetworkInspect(t *testing.T) {
 	expectedURL := "/networks/network_id"
-	client := &Client***REMOVED***
-		client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-			if !strings.HasPrefix(req.URL.Path, expectedURL) ***REMOVED***
+	client := &Client{
+		client: newMockClient(func(req *http.Request) (*http.Response, error) {
+			if !strings.HasPrefix(req.URL.Path, expectedURL) {
 				return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, req.URL)
-			***REMOVED***
-			if req.Method != "GET" ***REMOVED***
+			}
+			if req.Method != "GET" {
 				return nil, fmt.Errorf("expected GET method, got %s", req.Method)
-			***REMOVED***
+			}
 
 			var (
 				content []byte
 				err     error
 			)
-			if strings.Contains(req.URL.RawQuery, "scope=global") ***REMOVED***
-				return &http.Response***REMOVED***
+			if strings.Contains(req.URL.RawQuery, "scope=global") {
+				return &http.Response{
 					StatusCode: http.StatusNotFound,
 					Body:       ioutil.NopCloser(bytes.NewReader(content)),
-				***REMOVED***, nil
-			***REMOVED***
+				}, nil
+			}
 
-			if strings.Contains(req.URL.RawQuery, "verbose=true") ***REMOVED***
-				s := map[string]network.ServiceInfo***REMOVED***
-					"web": ***REMOVED******REMOVED***,
-				***REMOVED***
-				content, err = json.Marshal(types.NetworkResource***REMOVED***
+			if strings.Contains(req.URL.RawQuery, "verbose=true") {
+				s := map[string]network.ServiceInfo{
+					"web": {},
+				}
+				content, err = json.Marshal(types.NetworkResource{
 					Name:     "mynetwork",
 					Services: s,
-				***REMOVED***)
-			***REMOVED*** else ***REMOVED***
-				content, err = json.Marshal(types.NetworkResource***REMOVED***
+				})
+			} else {
+				content, err = json.Marshal(types.NetworkResource{
 					Name: "mynetwork",
-				***REMOVED***)
-			***REMOVED***
-			if err != nil ***REMOVED***
+				})
+			}
+			if err != nil {
 				return nil, err
-			***REMOVED***
-			return &http.Response***REMOVED***
+			}
+			return &http.Response{
 				StatusCode: http.StatusOK,
 				Body:       ioutil.NopCloser(bytes.NewReader(content)),
-			***REMOVED***, nil
-		***REMOVED***),
-	***REMOVED***
+			}, nil
+		}),
+	}
 
-	r, err := client.NetworkInspect(context.Background(), "network_id", types.NetworkInspectOptions***REMOVED******REMOVED***)
-	if err != nil ***REMOVED***
+	r, err := client.NetworkInspect(context.Background(), "network_id", types.NetworkInspectOptions{})
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if r.Name != "mynetwork" ***REMOVED***
+	}
+	if r.Name != "mynetwork" {
 		t.Fatalf("expected `mynetwork`, got %s", r.Name)
-	***REMOVED***
+	}
 
-	r, err = client.NetworkInspect(context.Background(), "network_id", types.NetworkInspectOptions***REMOVED***Verbose: true***REMOVED***)
-	if err != nil ***REMOVED***
+	r, err = client.NetworkInspect(context.Background(), "network_id", types.NetworkInspectOptions{Verbose: true})
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if r.Name != "mynetwork" ***REMOVED***
+	}
+	if r.Name != "mynetwork" {
 		t.Fatalf("expected `mynetwork`, got %s", r.Name)
-	***REMOVED***
+	}
 	_, ok := r.Services["web"]
-	if !ok ***REMOVED***
+	if !ok {
 		t.Fatalf("expected service `web` missing in the verbose output")
-	***REMOVED***
+	}
 
-	_, err = client.NetworkInspect(context.Background(), "network_id", types.NetworkInspectOptions***REMOVED***Scope: "global"***REMOVED***)
+	_, err = client.NetworkInspect(context.Background(), "network_id", types.NetworkInspectOptions{Scope: "global"})
 	assert.EqualError(t, err, "Error: No such network: network_id")
-***REMOVED***
+}

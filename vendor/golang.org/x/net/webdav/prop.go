@@ -20,17 +20,17 @@ import (
 
 // Proppatch describes a property update instruction as defined in RFC 4918.
 // See http://www.webdav.org/specs/rfc4918.html#METHOD_PROPPATCH
-type Proppatch struct ***REMOVED***
+type Proppatch struct {
 	// Remove specifies whether this patch removes properties. If it does not
 	// remove them, it sets them.
 	Remove bool
 	// Props contains the properties to be set or removed.
 	Props []Property
-***REMOVED***
+}
 
 // Propstat describes a XML propstat element as defined in RFC 4918.
 // See http://www.webdav.org/specs/rfc4918.html#ELEMENT_propstat
-type Propstat struct ***REMOVED***
+type Propstat struct {
 	// Props contains the properties for which Status applies.
 	Props []Property
 
@@ -49,26 +49,26 @@ type Propstat struct ***REMOVED***
 	// ResponseDescription contains the contents of the optional
 	// responsedescription field. If empty, the XML element is omitted.
 	ResponseDescription string
-***REMOVED***
+}
 
 // makePropstats returns a slice containing those of x and y whose Props slice
 // is non-empty. If both are empty, it returns a slice containing an otherwise
 // zero Propstat whose HTTP status code is 200 OK.
-func makePropstats(x, y Propstat) []Propstat ***REMOVED***
+func makePropstats(x, y Propstat) []Propstat {
 	pstats := make([]Propstat, 0, 2)
-	if len(x.Props) != 0 ***REMOVED***
+	if len(x.Props) != 0 {
 		pstats = append(pstats, x)
-	***REMOVED***
-	if len(y.Props) != 0 ***REMOVED***
+	}
+	if len(y.Props) != 0 {
 		pstats = append(pstats, y)
-	***REMOVED***
-	if len(pstats) == 0 ***REMOVED***
-		pstats = append(pstats, Propstat***REMOVED***
+	}
+	if len(pstats) == 0 {
+		pstats = append(pstats, Propstat{
 			Status: http.StatusOK,
-		***REMOVED***)
-	***REMOVED***
+		})
+	}
 	return pstats
-***REMOVED***
+}
 
 // DeadPropsHolder holds the dead properties of a resource.
 //
@@ -81,7 +81,7 @@ func makePropstats(x, y Propstat) []Propstat ***REMOVED***
 // There is a whitelist of the names of live properties. This package handles
 // all live properties, and will only pass non-whitelisted names to the Patch
 // method of DeadPropsHolder implementations.
-type DeadPropsHolder interface ***REMOVED***
+type DeadPropsHolder interface {
 	// DeadProps returns a copy of the dead properties held.
 	DeadProps() (map[xml.Name]Property, error)
 
@@ -97,29 +97,29 @@ type DeadPropsHolder interface ***REMOVED***
 	// For more details on when various HTTP status codes apply, see
 	// http://www.webdav.org/specs/rfc4918.html#PROPPATCH-status
 	Patch([]Proppatch) ([]Propstat, error)
-***REMOVED***
+}
 
 // liveProps contains all supported, protected DAV: properties.
-var liveProps = map[xml.Name]struct ***REMOVED***
+var liveProps = map[xml.Name]struct {
 	// findFn implements the propfind function of this property. If nil,
 	// it indicates a hidden property.
 	findFn func(context.Context, FileSystem, LockSystem, string, os.FileInfo) (string, error)
 	// dir is true if the property applies to directories.
 	dir bool
-***REMOVED******REMOVED***
-	***REMOVED***Space: "DAV:", Local: "resourcetype"***REMOVED***: ***REMOVED***
+}{
+	{Space: "DAV:", Local: "resourcetype"}: {
 		findFn: findResourceType,
 		dir:    true,
-	***REMOVED***,
-	***REMOVED***Space: "DAV:", Local: "displayname"***REMOVED***: ***REMOVED***
+	},
+	{Space: "DAV:", Local: "displayname"}: {
 		findFn: findDisplayName,
 		dir:    true,
-	***REMOVED***,
-	***REMOVED***Space: "DAV:", Local: "getcontentlength"***REMOVED***: ***REMOVED***
+	},
+	{Space: "DAV:", Local: "getcontentlength"}: {
 		findFn: findContentLength,
 		dir:    false,
-	***REMOVED***,
-	***REMOVED***Space: "DAV:", Local: "getlastmodified"***REMOVED***: ***REMOVED***
+	},
+	{Space: "DAV:", Local: "getlastmodified"}: {
 		findFn: findLastModified,
 		// http://webdav.org/specs/rfc4918.html#PROPERTY_getlastmodified
 		// suggests that getlastmodified should only apply to GETable
@@ -129,36 +129,36 @@ var liveProps = map[xml.Name]struct ***REMOVED***
 		// sortable by getlastmodified date, so this value is true, not false.
 		// See golang.org/issue/15334.
 		dir: true,
-	***REMOVED***,
-	***REMOVED***Space: "DAV:", Local: "creationdate"***REMOVED***: ***REMOVED***
+	},
+	{Space: "DAV:", Local: "creationdate"}: {
 		findFn: nil,
 		dir:    false,
-	***REMOVED***,
-	***REMOVED***Space: "DAV:", Local: "getcontentlanguage"***REMOVED***: ***REMOVED***
+	},
+	{Space: "DAV:", Local: "getcontentlanguage"}: {
 		findFn: nil,
 		dir:    false,
-	***REMOVED***,
-	***REMOVED***Space: "DAV:", Local: "getcontenttype"***REMOVED***: ***REMOVED***
+	},
+	{Space: "DAV:", Local: "getcontenttype"}: {
 		findFn: findContentType,
 		dir:    false,
-	***REMOVED***,
-	***REMOVED***Space: "DAV:", Local: "getetag"***REMOVED***: ***REMOVED***
+	},
+	{Space: "DAV:", Local: "getetag"}: {
 		findFn: findETag,
 		// findETag implements ETag as the concatenated hex values of a file's
 		// modification time and size. This is not a reliable synchronization
 		// mechanism for directories, so we do not advertise getetag for DAV
 		// collections.
 		dir: false,
-	***REMOVED***,
+	},
 
 	// TODO: The lockdiscovery property requires LockSystem to list the
 	// active locks on a resource.
-	***REMOVED***Space: "DAV:", Local: "lockdiscovery"***REMOVED***: ***REMOVED******REMOVED***,
-	***REMOVED***Space: "DAV:", Local: "supportedlock"***REMOVED***: ***REMOVED***
+	{Space: "DAV:", Local: "lockdiscovery"}: {},
+	{Space: "DAV:", Local: "supportedlock"}: {
 		findFn: findSupportedLock,
 		dir:    true,
-	***REMOVED***,
-***REMOVED***
+	},
+}
 
 // TODO(nigeltao) merge props and allprop?
 
@@ -166,85 +166,85 @@ var liveProps = map[xml.Name]struct ***REMOVED***
 //
 // Each Propstat has a unique status and each property name will only be part
 // of one Propstat element.
-func props(ctx context.Context, fs FileSystem, ls LockSystem, name string, pnames []xml.Name) ([]Propstat, error) ***REMOVED***
+func props(ctx context.Context, fs FileSystem, ls LockSystem, name string, pnames []xml.Name) ([]Propstat, error) {
 	f, err := fs.OpenFile(ctx, name, os.O_RDONLY, 0)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	defer f.Close()
 	fi, err := f.Stat()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	isDir := fi.IsDir()
 
 	var deadProps map[xml.Name]Property
-	if dph, ok := f.(DeadPropsHolder); ok ***REMOVED***
+	if dph, ok := f.(DeadPropsHolder); ok {
 		deadProps, err = dph.DeadProps()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	pstatOK := Propstat***REMOVED***Status: http.StatusOK***REMOVED***
-	pstatNotFound := Propstat***REMOVED***Status: http.StatusNotFound***REMOVED***
-	for _, pn := range pnames ***REMOVED***
+	pstatOK := Propstat{Status: http.StatusOK}
+	pstatNotFound := Propstat{Status: http.StatusNotFound}
+	for _, pn := range pnames {
 		// If this file has dead properties, check if they contain pn.
-		if dp, ok := deadProps[pn]; ok ***REMOVED***
+		if dp, ok := deadProps[pn]; ok {
 			pstatOK.Props = append(pstatOK.Props, dp)
 			continue
-		***REMOVED***
+		}
 		// Otherwise, it must either be a live property or we don't know it.
-		if prop := liveProps[pn]; prop.findFn != nil && (prop.dir || !isDir) ***REMOVED***
+		if prop := liveProps[pn]; prop.findFn != nil && (prop.dir || !isDir) {
 			innerXML, err := prop.findFn(ctx, fs, ls, name, fi)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
-			pstatOK.Props = append(pstatOK.Props, Property***REMOVED***
+			}
+			pstatOK.Props = append(pstatOK.Props, Property{
 				XMLName:  pn,
 				InnerXML: []byte(innerXML),
-			***REMOVED***)
-		***REMOVED*** else ***REMOVED***
-			pstatNotFound.Props = append(pstatNotFound.Props, Property***REMOVED***
+			})
+		} else {
+			pstatNotFound.Props = append(pstatNotFound.Props, Property{
 				XMLName: pn,
-			***REMOVED***)
-		***REMOVED***
-	***REMOVED***
+			})
+		}
+	}
 	return makePropstats(pstatOK, pstatNotFound), nil
-***REMOVED***
+}
 
 // Propnames returns the property names defined for resource name.
-func propnames(ctx context.Context, fs FileSystem, ls LockSystem, name string) ([]xml.Name, error) ***REMOVED***
+func propnames(ctx context.Context, fs FileSystem, ls LockSystem, name string) ([]xml.Name, error) {
 	f, err := fs.OpenFile(ctx, name, os.O_RDONLY, 0)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	defer f.Close()
 	fi, err := f.Stat()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	isDir := fi.IsDir()
 
 	var deadProps map[xml.Name]Property
-	if dph, ok := f.(DeadPropsHolder); ok ***REMOVED***
+	if dph, ok := f.(DeadPropsHolder); ok {
 		deadProps, err = dph.DeadProps()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	pnames := make([]xml.Name, 0, len(liveProps)+len(deadProps))
-	for pn, prop := range liveProps ***REMOVED***
-		if prop.findFn != nil && (prop.dir || !isDir) ***REMOVED***
+	for pn, prop := range liveProps {
+		if prop.findFn != nil && (prop.dir || !isDir) {
 			pnames = append(pnames, pn)
-		***REMOVED***
-	***REMOVED***
-	for pn := range deadProps ***REMOVED***
+		}
+	}
+	for pn := range deadProps {
 		pnames = append(pnames, pn)
-	***REMOVED***
+	}
 	return pnames, nil
-***REMOVED***
+}
 
 // Allprop returns the properties defined for resource name and the properties
 // named in include.
@@ -254,165 +254,165 @@ func propnames(ctx context.Context, fs FileSystem, ls LockSystem, name string) (
 // returned if they are named in 'include'.
 //
 // See http://www.webdav.org/specs/rfc4918.html#METHOD_PROPFIND
-func allprop(ctx context.Context, fs FileSystem, ls LockSystem, name string, include []xml.Name) ([]Propstat, error) ***REMOVED***
+func allprop(ctx context.Context, fs FileSystem, ls LockSystem, name string, include []xml.Name) ([]Propstat, error) {
 	pnames, err := propnames(ctx, fs, ls, name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	// Add names from include if they are not already covered in pnames.
 	nameset := make(map[xml.Name]bool)
-	for _, pn := range pnames ***REMOVED***
+	for _, pn := range pnames {
 		nameset[pn] = true
-	***REMOVED***
-	for _, pn := range include ***REMOVED***
-		if !nameset[pn] ***REMOVED***
+	}
+	for _, pn := range include {
+		if !nameset[pn] {
 			pnames = append(pnames, pn)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return props(ctx, fs, ls, name, pnames)
-***REMOVED***
+}
 
 // Patch patches the properties of resource name. The return values are
 // constrained in the same manner as DeadPropsHolder.Patch.
-func patch(ctx context.Context, fs FileSystem, ls LockSystem, name string, patches []Proppatch) ([]Propstat, error) ***REMOVED***
+func patch(ctx context.Context, fs FileSystem, ls LockSystem, name string, patches []Proppatch) ([]Propstat, error) {
 	conflict := false
 loop:
-	for _, patch := range patches ***REMOVED***
-		for _, p := range patch.Props ***REMOVED***
-			if _, ok := liveProps[p.XMLName]; ok ***REMOVED***
+	for _, patch := range patches {
+		for _, p := range patch.Props {
+			if _, ok := liveProps[p.XMLName]; ok {
 				conflict = true
 				break loop
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-	if conflict ***REMOVED***
-		pstatForbidden := Propstat***REMOVED***
+			}
+		}
+	}
+	if conflict {
+		pstatForbidden := Propstat{
 			Status:   http.StatusForbidden,
 			XMLError: `<D:cannot-modify-protected-property xmlns:D="DAV:"/>`,
-		***REMOVED***
-		pstatFailedDep := Propstat***REMOVED***
+		}
+		pstatFailedDep := Propstat{
 			Status: StatusFailedDependency,
-		***REMOVED***
-		for _, patch := range patches ***REMOVED***
-			for _, p := range patch.Props ***REMOVED***
-				if _, ok := liveProps[p.XMLName]; ok ***REMOVED***
-					pstatForbidden.Props = append(pstatForbidden.Props, Property***REMOVED***XMLName: p.XMLName***REMOVED***)
-				***REMOVED*** else ***REMOVED***
-					pstatFailedDep.Props = append(pstatFailedDep.Props, Property***REMOVED***XMLName: p.XMLName***REMOVED***)
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
+		}
+		for _, patch := range patches {
+			for _, p := range patch.Props {
+				if _, ok := liveProps[p.XMLName]; ok {
+					pstatForbidden.Props = append(pstatForbidden.Props, Property{XMLName: p.XMLName})
+				} else {
+					pstatFailedDep.Props = append(pstatFailedDep.Props, Property{XMLName: p.XMLName})
+				}
+			}
+		}
 		return makePropstats(pstatForbidden, pstatFailedDep), nil
-	***REMOVED***
+	}
 
 	f, err := fs.OpenFile(ctx, name, os.O_RDWR, 0)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	defer f.Close()
-	if dph, ok := f.(DeadPropsHolder); ok ***REMOVED***
+	if dph, ok := f.(DeadPropsHolder); ok {
 		ret, err := dph.Patch(patches)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		// http://www.webdav.org/specs/rfc4918.html#ELEMENT_propstat says that
 		// "The contents of the prop XML element must only list the names of
 		// properties to which the result in the status element applies."
-		for _, pstat := range ret ***REMOVED***
-			for i, p := range pstat.Props ***REMOVED***
-				pstat.Props[i] = Property***REMOVED***XMLName: p.XMLName***REMOVED***
-			***REMOVED***
-		***REMOVED***
+		for _, pstat := range ret {
+			for i, p := range pstat.Props {
+				pstat.Props[i] = Property{XMLName: p.XMLName}
+			}
+		}
 		return ret, nil
-	***REMOVED***
+	}
 	// The file doesn't implement the optional DeadPropsHolder interface, so
 	// all patches are forbidden.
-	pstat := Propstat***REMOVED***Status: http.StatusForbidden***REMOVED***
-	for _, patch := range patches ***REMOVED***
-		for _, p := range patch.Props ***REMOVED***
-			pstat.Props = append(pstat.Props, Property***REMOVED***XMLName: p.XMLName***REMOVED***)
-		***REMOVED***
-	***REMOVED***
-	return []Propstat***REMOVED***pstat***REMOVED***, nil
-***REMOVED***
+	pstat := Propstat{Status: http.StatusForbidden}
+	for _, patch := range patches {
+		for _, p := range patch.Props {
+			pstat.Props = append(pstat.Props, Property{XMLName: p.XMLName})
+		}
+	}
+	return []Propstat{pstat}, nil
+}
 
-func escapeXML(s string) string ***REMOVED***
-	for i := 0; i < len(s); i++ ***REMOVED***
+func escapeXML(s string) string {
+	for i := 0; i < len(s); i++ {
 		// As an optimization, if s contains only ASCII letters, digits or a
 		// few special characters, the escaped value is s itself and we don't
 		// need to allocate a buffer and convert between string and []byte.
-		switch c := s[i]; ***REMOVED***
+		switch c := s[i]; {
 		case c == ' ' || c == '_' ||
 			('+' <= c && c <= '9') || // Digits as well as + , - . and /
 			('A' <= c && c <= 'Z') ||
 			('a' <= c && c <= 'z'):
 			continue
-		***REMOVED***
+		}
 		// Otherwise, go through the full escaping process.
 		var buf bytes.Buffer
 		xml.EscapeText(&buf, []byte(s))
 		return buf.String()
-	***REMOVED***
+	}
 	return s
-***REMOVED***
+}
 
-func findResourceType(ctx context.Context, fs FileSystem, ls LockSystem, name string, fi os.FileInfo) (string, error) ***REMOVED***
-	if fi.IsDir() ***REMOVED***
+func findResourceType(ctx context.Context, fs FileSystem, ls LockSystem, name string, fi os.FileInfo) (string, error) {
+	if fi.IsDir() {
 		return `<D:collection xmlns:D="DAV:"/>`, nil
-	***REMOVED***
+	}
 	return "", nil
-***REMOVED***
+}
 
-func findDisplayName(ctx context.Context, fs FileSystem, ls LockSystem, name string, fi os.FileInfo) (string, error) ***REMOVED***
-	if slashClean(name) == "/" ***REMOVED***
+func findDisplayName(ctx context.Context, fs FileSystem, ls LockSystem, name string, fi os.FileInfo) (string, error) {
+	if slashClean(name) == "/" {
 		// Hide the real name of a possibly prefixed root directory.
 		return "", nil
-	***REMOVED***
+	}
 	return escapeXML(fi.Name()), nil
-***REMOVED***
+}
 
-func findContentLength(ctx context.Context, fs FileSystem, ls LockSystem, name string, fi os.FileInfo) (string, error) ***REMOVED***
+func findContentLength(ctx context.Context, fs FileSystem, ls LockSystem, name string, fi os.FileInfo) (string, error) {
 	return strconv.FormatInt(fi.Size(), 10), nil
-***REMOVED***
+}
 
-func findLastModified(ctx context.Context, fs FileSystem, ls LockSystem, name string, fi os.FileInfo) (string, error) ***REMOVED***
+func findLastModified(ctx context.Context, fs FileSystem, ls LockSystem, name string, fi os.FileInfo) (string, error) {
 	return fi.ModTime().Format(http.TimeFormat), nil
-***REMOVED***
+}
 
-func findContentType(ctx context.Context, fs FileSystem, ls LockSystem, name string, fi os.FileInfo) (string, error) ***REMOVED***
+func findContentType(ctx context.Context, fs FileSystem, ls LockSystem, name string, fi os.FileInfo) (string, error) {
 	f, err := fs.OpenFile(ctx, name, os.O_RDONLY, 0)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	defer f.Close()
 	// This implementation is based on serveContent's code in the standard net/http package.
 	ctype := mime.TypeByExtension(filepath.Ext(name))
-	if ctype != "" ***REMOVED***
+	if ctype != "" {
 		return ctype, nil
-	***REMOVED***
+	}
 	// Read a chunk to decide between utf-8 text and binary.
 	var buf [512]byte
 	n, err := io.ReadFull(f, buf[:])
-	if err != nil && err != io.EOF && err != io.ErrUnexpectedEOF ***REMOVED***
+	if err != nil && err != io.EOF && err != io.ErrUnexpectedEOF {
 		return "", err
-	***REMOVED***
+	}
 	ctype = http.DetectContentType(buf[:n])
 	// Rewind file.
 	_, err = f.Seek(0, os.SEEK_SET)
 	return ctype, err
-***REMOVED***
+}
 
-func findETag(ctx context.Context, fs FileSystem, ls LockSystem, name string, fi os.FileInfo) (string, error) ***REMOVED***
+func findETag(ctx context.Context, fs FileSystem, ls LockSystem, name string, fi os.FileInfo) (string, error) {
 	// The Apache http 2.4 web server by default concatenates the
 	// modification time and size of a file. We replicate the heuristic
 	// with nanosecond granularity.
 	return fmt.Sprintf(`"%x%x"`, fi.ModTime().UnixNano(), fi.Size()), nil
-***REMOVED***
+}
 
-func findSupportedLock(ctx context.Context, fs FileSystem, ls LockSystem, name string, fi os.FileInfo) (string, error) ***REMOVED***
+func findSupportedLock(ctx context.Context, fs FileSystem, ls LockSystem, name string, fi os.FileInfo) (string, error) {
 	return `` +
 		`<D:lockentry xmlns:D="DAV:">` +
 		`<D:lockscope><D:exclusive/></D:lockscope>` +
 		`<D:locktype><D:write/></D:locktype>` +
 		`</D:lockentry>`, nil
-***REMOVED***
+}

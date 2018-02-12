@@ -25,14 +25,14 @@ const (
 )
 
 // Callback provides a Callback interface for registering an IPAM instance into LibNetwork
-type Callback interface ***REMOVED***
+type Callback interface {
 	// GetPluginGetter returns the pluginv2 getter.
 	GetPluginGetter() plugingetter.PluginGetter
 	// RegisterIpamDriver provides a way for Remote drivers to dynamically register with libnetwork
 	RegisterIpamDriver(name string, driver Ipam) error
 	// RegisterIpamDriverWithCapabilities provides a way for Remote drivers to dynamically register with libnetwork and specify capabilities
 	RegisterIpamDriverWithCapabilities(name string, driver Ipam, capability *Capability) error
-***REMOVED***
+}
 
 /**************
  * IPAM Errors
@@ -62,7 +62,7 @@ var (
 
 // Ipam represents the interface the IPAM service plugins must implement
 // in order to allow injection/modification of IPAM database.
-type Ipam interface ***REMOVED***
+type Ipam interface {
 	discoverapi.Discover
 
 	// GetDefaultAddressSpaces returns the default local and global address spaces for this ipam
@@ -83,14 +83,14 @@ type Ipam interface ***REMOVED***
 
 	//IsBuiltIn returns true if it is a built-in driver.
 	IsBuiltIn() bool
-***REMOVED***
+}
 
 // Capability represents the requirements and capabilities of the IPAM driver
-type Capability struct ***REMOVED***
+type Capability struct {
 	// Whether on address request, libnetwork must
 	// specify the endpoint MAC address
 	RequiresMACAddress bool
 	// Whether of daemon start, libnetwork must replay the pool
 	// request and the address request for current local networks
 	RequiresRequestReplay bool
-***REMOVED***
+}

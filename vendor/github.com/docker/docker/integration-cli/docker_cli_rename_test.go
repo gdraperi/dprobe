@@ -9,7 +9,7 @@ import (
 	"github.com/gotestyourself/gotestyourself/icmd"
 )
 
-func (s *DockerSuite) TestRenameStoppedContainer(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRenameStoppedContainer(c *check.C) {
 	out, _ := dockerCmd(c, "run", "--name", "first_name", "-d", "busybox", "sh")
 
 	cleanedContainerID := strings.TrimSpace(out)
@@ -22,9 +22,9 @@ func (s *DockerSuite) TestRenameStoppedContainer(c *check.C) ***REMOVED***
 	name = inspectField(c, cleanedContainerID, "Name")
 	c.Assert(name, checker.Equals, "/"+newName, check.Commentf("Failed to rename container %s", name))
 
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRenameRunningContainer(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRenameRunningContainer(c *check.C) {
 	out, _ := dockerCmd(c, "run", "--name", "first_name", "-d", "busybox", "sh")
 
 	newName := "new_name" + stringid.GenerateNonCryptoID()
@@ -33,9 +33,9 @@ func (s *DockerSuite) TestRenameRunningContainer(c *check.C) ***REMOVED***
 
 	name := inspectField(c, cleanedContainerID, "Name")
 	c.Assert(name, checker.Equals, "/"+newName, check.Commentf("Failed to rename container %s", name))
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRenameRunningContainerAndReuse(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRenameRunningContainerAndReuse(c *check.C) {
 	out := runSleepingContainer(c, "--name", "first_name")
 	c.Assert(waitRun("first_name"), check.IsNil)
 
@@ -51,9 +51,9 @@ func (s *DockerSuite) TestRenameRunningContainerAndReuse(c *check.C) ***REMOVED*
 	newContainerID := strings.TrimSpace(out)
 	name = inspectField(c, newContainerID, "Name")
 	c.Assert(name, checker.Equals, "/first_name", check.Commentf("Failed to reuse container name"))
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRenameCheckNames(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRenameCheckNames(c *check.C) {
 	dockerCmd(c, "run", "--name", "first_name", "-d", "busybox", "sh")
 
 	newName := "new_name" + stringid.GenerateNonCryptoID()
@@ -62,15 +62,15 @@ func (s *DockerSuite) TestRenameCheckNames(c *check.C) ***REMOVED***
 	name := inspectField(c, newName, "Name")
 	c.Assert(name, checker.Equals, "/"+newName, check.Commentf("Failed to rename container %s", name))
 
-	result := dockerCmdWithResult("inspect", "-f=***REMOVED******REMOVED***.Name***REMOVED******REMOVED***", "--type=container", "first_name")
-	result.Assert(c, icmd.Expected***REMOVED***
+	result := dockerCmdWithResult("inspect", "-f={{.Name}}", "--type=container", "first_name")
+	result.Assert(c, icmd.Expected{
 		ExitCode: 1,
 		Err:      "No such container: first_name",
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
 // TODO: move to unit test
-func (s *DockerSuite) TestRenameInvalidName(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRenameInvalidName(c *check.C) {
 	runSleepingContainer(c, "--name", "myname")
 
 	out, _, err := dockerCmdWithError("rename", "myname", "new:invalid")
@@ -79,9 +79,9 @@ func (s *DockerSuite) TestRenameInvalidName(c *check.C) ***REMOVED***
 
 	out, _ = dockerCmd(c, "ps", "-a")
 	c.Assert(out, checker.Contains, "myname", check.Commentf("Output of docker ps should have included 'myname': %s", out))
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRenameAnonymousContainer(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRenameAnonymousContainer(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 
 	dockerCmd(c, "network", "create", "network1")
@@ -93,15 +93,15 @@ func (s *DockerSuite) TestRenameAnonymousContainer(c *check.C) ***REMOVED***
 	dockerCmd(c, "start", "container1")
 
 	count := "-c"
-	if testEnv.OSType == "windows" ***REMOVED***
+	if testEnv.OSType == "windows" {
 		count = "-n"
-	***REMOVED***
+	}
 
 	_, _, err := dockerCmdWithError("run", "--net", "network1", "busybox", "ping", count, "1", "container1")
 	c.Assert(err, check.IsNil, check.Commentf("Embedded DNS lookup fails after renaming anonymous container: %v", err))
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRenameContainerWithSameName(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRenameContainerWithSameName(c *check.C) {
 	out := runSleepingContainer(c, "--name", "old")
 	ContainerID := strings.TrimSpace(out)
 
@@ -112,16 +112,16 @@ func (s *DockerSuite) TestRenameContainerWithSameName(c *check.C) ***REMOVED***
 	out, _, err = dockerCmdWithError("rename", ContainerID, "old")
 	c.Assert(err, checker.NotNil, check.Commentf("Renaming a container with the same name should have failed"))
 	c.Assert(out, checker.Contains, "Renaming a container with the same name", check.Commentf("%v", err))
-***REMOVED***
+}
 
 // Test case for #23973
-func (s *DockerSuite) TestRenameContainerWithLinkedContainer(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRenameContainerWithLinkedContainer(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 
 	db1, _ := dockerCmd(c, "run", "--name", "db1", "-d", "busybox", "top")
 	dockerCmd(c, "run", "--name", "app1", "-d", "--link", "db1:/mysql", "busybox", "top")
 	dockerCmd(c, "rename", "app1", "app2")
-	out, _, err := dockerCmdWithError("inspect", "--format=***REMOVED******REMOVED*** .Id ***REMOVED******REMOVED***", "app2/mysql")
+	out, _, err := dockerCmdWithError("inspect", "--format={{ .Id }}", "app2/mysql")
 	c.Assert(err, checker.IsNil)
 	c.Assert(strings.TrimSpace(out), checker.Equals, strings.TrimSpace(db1))
-***REMOVED***
+}

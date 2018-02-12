@@ -22,57 +22,57 @@ import (
 	"time"
 )
 
-func PurgeFile(dirname string, suffix string, max uint, interval time.Duration, stop <-chan struct***REMOVED******REMOVED***) <-chan error ***REMOVED***
+func PurgeFile(dirname string, suffix string, max uint, interval time.Duration, stop <-chan struct{}) <-chan error {
 	return purgeFile(dirname, suffix, max, interval, stop, nil)
-***REMOVED***
+}
 
 // purgeFile is the internal implementation for PurgeFile which can post purged files to purgec if non-nil.
-func purgeFile(dirname string, suffix string, max uint, interval time.Duration, stop <-chan struct***REMOVED******REMOVED***, purgec chan<- string) <-chan error ***REMOVED***
+func purgeFile(dirname string, suffix string, max uint, interval time.Duration, stop <-chan struct{}, purgec chan<- string) <-chan error {
 	errC := make(chan error, 1)
-	go func() ***REMOVED***
-		for ***REMOVED***
+	go func() {
+		for {
 			fnames, err := ReadDir(dirname)
-			if err != nil ***REMOVED***
+			if err != nil {
 				errC <- err
 				return
-			***REMOVED***
+			}
 			newfnames := make([]string, 0)
-			for _, fname := range fnames ***REMOVED***
-				if strings.HasSuffix(fname, suffix) ***REMOVED***
+			for _, fname := range fnames {
+				if strings.HasSuffix(fname, suffix) {
 					newfnames = append(newfnames, fname)
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			sort.Strings(newfnames)
 			fnames = newfnames
-			for len(newfnames) > int(max) ***REMOVED***
+			for len(newfnames) > int(max) {
 				f := filepath.Join(dirname, newfnames[0])
 				l, err := TryLockFile(f, os.O_WRONLY, PrivateFileMode)
-				if err != nil ***REMOVED***
+				if err != nil {
 					break
-				***REMOVED***
-				if err = os.Remove(f); err != nil ***REMOVED***
+				}
+				if err = os.Remove(f); err != nil {
 					errC <- err
 					return
-				***REMOVED***
-				if err = l.Close(); err != nil ***REMOVED***
+				}
+				if err = l.Close(); err != nil {
 					plog.Errorf("error unlocking %s when purging file (%v)", l.Name(), err)
 					errC <- err
 					return
-				***REMOVED***
+				}
 				plog.Infof("purged file %s successfully", f)
 				newfnames = newfnames[1:]
-			***REMOVED***
-			if purgec != nil ***REMOVED***
-				for i := 0; i < len(fnames)-len(newfnames); i++ ***REMOVED***
+			}
+			if purgec != nil {
+				for i := 0; i < len(fnames)-len(newfnames); i++ {
 					purgec <- fnames[i]
-				***REMOVED***
-			***REMOVED***
-			select ***REMOVED***
+				}
+			}
+			select {
 			case <-time.After(interval):
 			case <-stop:
 				return
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***()
+			}
+		}
+	}()
 	return errC
-***REMOVED***
+}

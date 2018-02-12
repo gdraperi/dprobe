@@ -8,7 +8,7 @@ import (
 )
 
 // Backend abstracts a swarm manager.
-type Backend interface ***REMOVED***
+type Backend interface {
 	Init(req types.InitRequest) (string, error)
 	Join(req types.JoinRequest) error
 	Leave(force bool) error
@@ -44,4 +44,4 @@ type Backend interface ***REMOVED***
 	RemoveConfig(id string) error
 	GetConfig(id string) (types.Config, error)
 	UpdateConfig(idOrName string, version uint64, spec types.ConfigSpec) error
-***REMOVED***
+}

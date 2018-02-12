@@ -19,7 +19,7 @@ const testDir = "testfiles"
 const negativeTestDir = "testfiles-negative"
 const testFileLineInfo = "testfile-line/Dockerfile"
 
-func getDirs(t *testing.T, dir string) []string ***REMOVED***
+func getDirs(t *testing.T, dir string) []string {
 	f, err := os.Open(dir)
 	require.NoError(t, err)
 	defer f.Close()
@@ -27,10 +27,10 @@ func getDirs(t *testing.T, dir string) []string ***REMOVED***
 	dirs, err := f.Readdirnames(0)
 	require.NoError(t, err)
 	return dirs
-***REMOVED***
+}
 
-func TestParseErrorCases(t *testing.T) ***REMOVED***
-	for _, dir := range getDirs(t, negativeTestDir) ***REMOVED***
+func TestParseErrorCases(t *testing.T) {
+	for _, dir := range getDirs(t, negativeTestDir) {
 		dockerfile := filepath.Join(negativeTestDir, dir, "Dockerfile")
 
 		df, err := os.Open(dockerfile)
@@ -39,11 +39,11 @@ func TestParseErrorCases(t *testing.T) ***REMOVED***
 
 		_, err = Parse(df)
 		assert.Error(t, err, dockerfile)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestParseCases(t *testing.T) ***REMOVED***
-	for _, dir := range getDirs(t, testDir) ***REMOVED***
+func TestParseCases(t *testing.T) {
+	for _, dir := range getDirs(t, testDir) {
 		dockerfile := filepath.Join(testDir, dir, "Dockerfile")
 		resultfile := filepath.Join(testDir, dir, "result")
 
@@ -57,57 +57,57 @@ func TestParseCases(t *testing.T) ***REMOVED***
 		content, err := ioutil.ReadFile(resultfile)
 		require.NoError(t, err, resultfile)
 
-		if runtime.GOOS == "windows" ***REMOVED***
+		if runtime.GOOS == "windows" {
 			// CRLF --> CR to match Unix behavior
-			content = bytes.Replace(content, []byte***REMOVED***'\x0d', '\x0a'***REMOVED***, []byte***REMOVED***'\x0a'***REMOVED***, -1)
-		***REMOVED***
+			content = bytes.Replace(content, []byte{'\x0d', '\x0a'}, []byte{'\x0a'}, -1)
+		}
 		assert.Equal(t, result.AST.Dump()+"\n", string(content), "In "+dockerfile)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestParseWords(t *testing.T) ***REMOVED***
-	tests := []map[string][]string***REMOVED***
-		***REMOVED***
-			"input":  ***REMOVED***"foo"***REMOVED***,
-			"expect": ***REMOVED***"foo"***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			"input":  ***REMOVED***"foo bar"***REMOVED***,
-			"expect": ***REMOVED***"foo", "bar"***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			"input":  ***REMOVED***"foo\\ bar"***REMOVED***,
-			"expect": ***REMOVED***"foo\\ bar"***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			"input":  ***REMOVED***"foo=bar"***REMOVED***,
-			"expect": ***REMOVED***"foo=bar"***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			"input":  ***REMOVED***"foo bar 'abc xyz'"***REMOVED***,
-			"expect": ***REMOVED***"foo", "bar", "'abc xyz'"***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			"input":  ***REMOVED***`foo bar "abc xyz"`***REMOVED***,
-			"expect": ***REMOVED***"foo", "bar", `"abc xyz"`***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			"input":  ***REMOVED***"àöû"***REMOVED***,
-			"expect": ***REMOVED***"àöû"***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			"input":  ***REMOVED***`föo bàr "âbc xÿz"`***REMOVED***,
-			"expect": ***REMOVED***"föo", "bàr", `"âbc xÿz"`***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+func TestParseWords(t *testing.T) {
+	tests := []map[string][]string{
+		{
+			"input":  {"foo"},
+			"expect": {"foo"},
+		},
+		{
+			"input":  {"foo bar"},
+			"expect": {"foo", "bar"},
+		},
+		{
+			"input":  {"foo\\ bar"},
+			"expect": {"foo\\ bar"},
+		},
+		{
+			"input":  {"foo=bar"},
+			"expect": {"foo=bar"},
+		},
+		{
+			"input":  {"foo bar 'abc xyz'"},
+			"expect": {"foo", "bar", "'abc xyz'"},
+		},
+		{
+			"input":  {`foo bar "abc xyz"`},
+			"expect": {"foo", "bar", `"abc xyz"`},
+		},
+		{
+			"input":  {"àöû"},
+			"expect": {"àöû"},
+		},
+		{
+			"input":  {`föo bàr "âbc xÿz"`},
+			"expect": {"föo", "bàr", `"âbc xÿz"`},
+		},
+	}
 
-	for _, test := range tests ***REMOVED***
+	for _, test := range tests {
 		words := parseWords(test["input"][0], NewDefaultDirective())
 		assert.Equal(t, test["expect"], words)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestParseIncludesLineNumbers(t *testing.T) ***REMOVED***
+func TestParseIncludesLineNumbers(t *testing.T) {
 	df, err := os.Open(testFileLineInfo)
 	require.NoError(t, err)
 	defer df.Close()
@@ -119,18 +119,18 @@ func TestParseIncludesLineNumbers(t *testing.T) ***REMOVED***
 	assert.Equal(t, 5, ast.StartLine)
 	assert.Equal(t, 31, ast.endLine)
 	assert.Len(t, ast.Children, 3)
-	expected := [][]int***REMOVED***
-		***REMOVED***5, 5***REMOVED***,
-		***REMOVED***11, 12***REMOVED***,
-		***REMOVED***17, 31***REMOVED***,
-	***REMOVED***
-	for i, child := range ast.Children ***REMOVED***
+	expected := [][]int{
+		{5, 5},
+		{11, 12},
+		{17, 31},
+	}
+	for i, child := range ast.Children {
 		msg := fmt.Sprintf("Child %d", i)
-		assert.Equal(t, expected[i], []int***REMOVED***child.StartLine, child.endLine***REMOVED***, msg)
-	***REMOVED***
-***REMOVED***
+		assert.Equal(t, expected[i], []int{child.StartLine, child.endLine}, msg)
+	}
+}
 
-func TestParseWarnsOnEmptyContinutationLine(t *testing.T) ***REMOVED***
+func TestParseWarnsOnEmptyContinutationLine(t *testing.T) {
 	dockerfile := bytes.NewBufferString(`
 FROM alpine:3.6
 
@@ -160,9 +160,9 @@ RUN indented \
 	assert.Contains(t, warnings[0], "RUN something     following     more")
 	assert.Contains(t, warnings[1], "RUN another     thing")
 	assert.Contains(t, warnings[2], "will become errors in a future release")
-***REMOVED***
+}
 
-func TestParseReturnsScannerErrors(t *testing.T) ***REMOVED***
+func TestParseReturnsScannerErrors(t *testing.T) {
 	label := strings.Repeat("a", bufio.MaxScanTokenSize)
 
 	dockerfile := strings.NewReader(fmt.Sprintf(`
@@ -171,4 +171,4 @@ func TestParseReturnsScannerErrors(t *testing.T) ***REMOVED***
 `, label))
 	_, err := Parse(dockerfile)
 	assert.EqualError(t, err, "dockerfile line greater than max allowed size of 65535")
-***REMOVED***
+}

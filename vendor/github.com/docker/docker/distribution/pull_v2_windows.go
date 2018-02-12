@@ -17,93 +17,93 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var _ distribution.Describable = &v2LayerDescriptor***REMOVED******REMOVED***
+var _ distribution.Describable = &v2LayerDescriptor{}
 
-func (ld *v2LayerDescriptor) Descriptor() distribution.Descriptor ***REMOVED***
-	if ld.src.MediaType == schema2.MediaTypeForeignLayer && len(ld.src.URLs) > 0 ***REMOVED***
+func (ld *v2LayerDescriptor) Descriptor() distribution.Descriptor {
+	if ld.src.MediaType == schema2.MediaTypeForeignLayer && len(ld.src.URLs) > 0 {
 		return ld.src
-	***REMOVED***
-	return distribution.Descriptor***REMOVED******REMOVED***
-***REMOVED***
+	}
+	return distribution.Descriptor{}
+}
 
-func (ld *v2LayerDescriptor) open(ctx context.Context) (distribution.ReadSeekCloser, error) ***REMOVED***
+func (ld *v2LayerDescriptor) open(ctx context.Context) (distribution.ReadSeekCloser, error) {
 	blobs := ld.repo.Blobs(ctx)
 	rsc, err := blobs.Open(ctx, ld.digest)
 
-	if len(ld.src.URLs) == 0 ***REMOVED***
+	if len(ld.src.URLs) == 0 {
 		return rsc, err
-	***REMOVED***
+	}
 
 	// We're done if the registry has this blob.
-	if err == nil ***REMOVED***
+	if err == nil {
 		// Seek does an HTTP GET.  If it succeeds, the blob really is accessible.
-		if _, err = rsc.Seek(0, os.SEEK_SET); err == nil ***REMOVED***
+		if _, err = rsc.Seek(0, os.SEEK_SET); err == nil {
 			return rsc, nil
-		***REMOVED***
+		}
 		rsc.Close()
-	***REMOVED***
+	}
 
 	// Find the first URL that results in a 200 result code.
-	for _, url := range ld.src.URLs ***REMOVED***
+	for _, url := range ld.src.URLs {
 		logrus.Debugf("Pulling %v from foreign URL %v", ld.digest, url)
 		rsc = transport.NewHTTPReadSeeker(http.DefaultClient, url, nil)
 
 		// Seek does an HTTP GET.  If it succeeds, the blob really is accessible.
 		_, err = rsc.Seek(0, os.SEEK_SET)
-		if err == nil ***REMOVED***
+		if err == nil {
 			break
-		***REMOVED***
+		}
 		logrus.Debugf("Download for %v failed: %v", ld.digest, err)
 		rsc.Close()
 		rsc = nil
-	***REMOVED***
+	}
 	return rsc, err
-***REMOVED***
+}
 
-func filterManifests(manifests []manifestlist.ManifestDescriptor, os string) []manifestlist.ManifestDescriptor ***REMOVED***
+func filterManifests(manifests []manifestlist.ManifestDescriptor, os string) []manifestlist.ManifestDescriptor {
 	osVersion := ""
-	if os == "windows" ***REMOVED***
+	if os == "windows" {
 		// TODO: Add UBR (Update Build Release) component after build
 		version := system.GetOSVersion()
 		osVersion = fmt.Sprintf("%d.%d.%d", version.MajorVersion, version.MinorVersion, version.Build)
 		logrus.Debugf("will prefer entries with version %s", osVersion)
-	***REMOVED***
+	}
 
 	var matches []manifestlist.ManifestDescriptor
-	for _, manifestDescriptor := range manifests ***REMOVED***
+	for _, manifestDescriptor := range manifests {
 		// TODO: Consider filtering out greater versions, including only greater UBR
-		if manifestDescriptor.Platform.Architecture == runtime.GOARCH && manifestDescriptor.Platform.OS == os ***REMOVED***
+		if manifestDescriptor.Platform.Architecture == runtime.GOARCH && manifestDescriptor.Platform.OS == os {
 			matches = append(matches, manifestDescriptor)
 			logrus.Debugf("found match for %s/%s with media type %s, digest %s", os, runtime.GOARCH, manifestDescriptor.MediaType, manifestDescriptor.Digest.String())
-		***REMOVED***
-	***REMOVED***
-	if os == "windows" ***REMOVED***
-		sort.Stable(manifestsByVersion***REMOVED***osVersion, matches***REMOVED***)
-	***REMOVED***
+		}
+	}
+	if os == "windows" {
+		sort.Stable(manifestsByVersion{osVersion, matches})
+	}
 	return matches
-***REMOVED***
+}
 
-func versionMatch(actual, expected string) bool ***REMOVED***
+func versionMatch(actual, expected string) bool {
 	// Check whether the version matches up to the build, ignoring UBR
 	return strings.HasPrefix(actual, expected+".")
-***REMOVED***
+}
 
-type manifestsByVersion struct ***REMOVED***
+type manifestsByVersion struct {
 	version string
 	list    []manifestlist.ManifestDescriptor
-***REMOVED***
+}
 
-func (mbv manifestsByVersion) Less(i, j int) bool ***REMOVED***
+func (mbv manifestsByVersion) Less(i, j int) bool {
 	// TODO: Split version by parts and compare
 	// TODO: Prefer versions which have a greater version number
 	// Move compatible versions to the top, with no other ordering changes
 	return versionMatch(mbv.list[i].Platform.OSVersion, mbv.version) && !versionMatch(mbv.list[j].Platform.OSVersion, mbv.version)
-***REMOVED***
+}
 
-func (mbv manifestsByVersion) Len() int ***REMOVED***
+func (mbv manifestsByVersion) Len() int {
 	return len(mbv.list)
-***REMOVED***
+}
 
-func (mbv manifestsByVersion) Swap(i, j int) ***REMOVED***
+func (mbv manifestsByVersion) Swap(i, j int) {
 	mbv.list[i], mbv.list[j] = mbv.list[j], mbv.list[i]
-***REMOVED***
+}

@@ -11,23 +11,23 @@ var (
 	ErrIncorrectResponse = errors.New("Response is incorrect")
 )
 
-func getTeamInfo(rw http.ResponseWriter, r *http.Request) ***REMOVED***
+func getTeamInfo(rw http.ResponseWriter, r *http.Request) {
 	rw.Header().Set("Content-Type", "application/json")
-	response := []byte(`***REMOVED***"ok": true, "team": ***REMOVED***
+	response := []byte(`{"ok": true, "team": {
 			"id": "F0UWHUX",
 			"name": "notalar",
 			"domain": "notalar",
-			"icon": ***REMOVED***
+			"icon": {
               "image_34": "https://slack.global.ssl.fastly.net/66f9/img/avatars-teams/ava_0002-34.png",
               "image_44": "https://slack.global.ssl.fastly.net/66f9/img/avatars-teams/ava_0002-44.png",
               "image_55": "https://slack.global.ssl.fastly.net/66f9/img/avatars-teams/ava_0002-55.png",
               "image_default": true
-      ***REMOVED***
-		***REMOVED******REMOVED***`)
+          }
+		}}`)
 	rw.Write(response)
-***REMOVED***
+}
 
-func TestGetTeamInfo(t *testing.T) ***REMOVED***
+func TestGetTeamInfo(t *testing.T) {
 	http.HandleFunc("/team.info", getTeamInfo)
 
 	once.Do(startServer)
@@ -35,29 +35,29 @@ func TestGetTeamInfo(t *testing.T) ***REMOVED***
 	api := New("testing-token")
 
 	teamInfo, err := api.GetTeamInfo()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("Unexpected error: %s", err)
 		return
-	***REMOVED***
+	}
 
 	// t.Fatal refers to -> t.Errorf & return
-	if teamInfo.ID != "F0UWHUX" ***REMOVED***
+	if teamInfo.ID != "F0UWHUX" {
 		t.Fatal(ErrIncorrectResponse)
-	***REMOVED***
-	if teamInfo.Domain != "notalar" ***REMOVED***
+	}
+	if teamInfo.Domain != "notalar" {
 		t.Fatal(ErrIncorrectResponse)
-	***REMOVED***
-	if teamInfo.Name != "notalar" ***REMOVED***
+	}
+	if teamInfo.Name != "notalar" {
 		t.Fatal(ErrIncorrectResponse)
-	***REMOVED***
-	if teamInfo.Icon == nil ***REMOVED***
+	}
+	if teamInfo.Icon == nil {
 		t.Fatal(ErrIncorrectResponse)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func getTeamAccessLogs(rw http.ResponseWriter, r *http.Request) ***REMOVED***
+func getTeamAccessLogs(rw http.ResponseWriter, r *http.Request) {
 	rw.Header().Set("Content-Type", "application/json")
-	response := []byte(`***REMOVED***"ok": true, "logins": [***REMOVED***
+	response := []byte(`{"ok": true, "logins": [{
 			"user_id": "F0UWHUX",
 			"username": "notalar",
 			"date_first": 1475684477,
@@ -68,8 +68,8 @@ func getTeamAccessLogs(rw http.ResponseWriter, r *http.Request) ***REMOVED***
 			"isp": "AT&T U-verse",
                         "country": "US",
                         "region": "IN"
-                    ***REMOVED***,
-                        ***REMOVED***
+                        },
+                        {
                         "user_id": "XUHWU0F",
 			"username": "ralaton",
 			"date_first": 1447395893,
@@ -80,18 +80,18 @@ func getTeamAccessLogs(rw http.ResponseWriter, r *http.Request) ***REMOVED***
 			"isp": null,
                         "country": null,
                         "region": null
-                    ***REMOVED***],
-                        "paging": ***REMOVED***
+                        }],
+                        "paging": {
     			"count": 2,
     			"total": 2,
     			"page": 1,
     			"pages": 1
-    			***REMOVED***
-  ***REMOVED***`)
+    			}
+  }`)
 	rw.Write(response)
-***REMOVED***
+}
 
-func TestGetAccessLogs(t *testing.T) ***REMOVED***
+func TestGetAccessLogs(t *testing.T) {
 	http.HandleFunc("/team.accessLogs", getTeamAccessLogs)
 
 	once.Do(startServer)
@@ -99,73 +99,73 @@ func TestGetAccessLogs(t *testing.T) ***REMOVED***
 	api := New("testing-token")
 
 	logins, paging, err := api.GetAccessLogs(NewAccessLogParameters())
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("Unexpected error: %s", err)
 		return
-	***REMOVED***
+	}
 
-	if len(logins) != 2 ***REMOVED***
+	if len(logins) != 2 {
 		t.Fatal("Should have been 2 logins")
-	***REMOVED***
+	}
 
 	// test the first login
 	login1 := logins[0]
 	login2 := logins[1]
 
-	if (login1.UserID != "F0UWHUX") ***REMOVED***
+	if (login1.UserID != "F0UWHUX") {
 		t.Fatal(ErrIncorrectResponse)
-	***REMOVED***
-	if (login1.Username != "notalar") ***REMOVED***
+	}
+	if (login1.Username != "notalar") {
 		t.Fatal(ErrIncorrectResponse)
-	***REMOVED***
-	if (login1.DateFirst != 1475684477) ***REMOVED***
+	}
+	if (login1.DateFirst != 1475684477) {
 		t.Fatal(ErrIncorrectResponse)
-	***REMOVED***
-	if (login1.DateLast != 1475684645) ***REMOVED***
+	}
+	if (login1.DateLast != 1475684645) {
 		t.Fatal(ErrIncorrectResponse)
-	***REMOVED***
-	if (login1.Count != 8) ***REMOVED***
+	}
+	if (login1.Count != 8) {
 		t.Fatal(ErrIncorrectResponse)
-	***REMOVED***
-	if (login1.IP != "127.0.0.1") ***REMOVED***
+	}
+	if (login1.IP != "127.0.0.1") {
 		t.Fatal(ErrIncorrectResponse)
-	***REMOVED***
-	if (!strings.HasPrefix(login1.UserAgent, "SlackWeb")) ***REMOVED***
+	}
+	if (!strings.HasPrefix(login1.UserAgent, "SlackWeb")) {
 		t.Fatal(ErrIncorrectResponse)
-	***REMOVED***
-	if (login1.ISP != "AT&T U-verse") ***REMOVED***
+	}
+	if (login1.ISP != "AT&T U-verse") {
 		t.Fatal(ErrIncorrectResponse)
-	***REMOVED***
-	if (login1.Country != "US") ***REMOVED***
+	}
+	if (login1.Country != "US") {
 		t.Fatal(ErrIncorrectResponse)
-	***REMOVED***
-	if (login1.Region != "IN") ***REMOVED***
+	}
+	if (login1.Region != "IN") {
 		t.Fatal(ErrIncorrectResponse)
-	***REMOVED***
+	}
 
 	// test that the null values from login2 are coming across correctly
-	if (login2.ISP != "") ***REMOVED***
+	if (login2.ISP != "") {
 		t.Fatal(ErrIncorrectResponse)
-	***REMOVED***
-	if (login2.Country != "") ***REMOVED***
+	}
+	if (login2.Country != "") {
 		t.Fatal(ErrIncorrectResponse)
-	***REMOVED***
-	if (login2.Region != "") ***REMOVED***
+	}
+	if (login2.Region != "") {
 		t.Fatal(ErrIncorrectResponse)
-	***REMOVED***
+	}
 
 	// test the paging
-	if (paging.Count != 2) ***REMOVED***
+	if (paging.Count != 2) {
 		t.Fatal(ErrIncorrectResponse)
-	***REMOVED***
-	if (paging.Total != 2) ***REMOVED***
+	}
+	if (paging.Total != 2) {
 		t.Fatal(ErrIncorrectResponse)
-	***REMOVED***
-	if (paging.Page != 1) ***REMOVED***
+	}
+	if (paging.Page != 1) {
 		t.Fatal(ErrIncorrectResponse)
-	***REMOVED***
-	if (paging.Pages != 1) ***REMOVED***
+	}
+	if (paging.Pages != 1) {
 		t.Fatal(ErrIncorrectResponse)
-	***REMOVED***
-***REMOVED***
+	}
+}
 

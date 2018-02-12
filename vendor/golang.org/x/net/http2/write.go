@@ -16,14 +16,14 @@ import (
 )
 
 // writeFramer is implemented by any type that is used to write frames.
-type writeFramer interface ***REMOVED***
+type writeFramer interface {
 	writeFrame(writeContext) error
 
 	// staysWithinBuffer reports whether this writer promises that
 	// it will only write less than or equal to size bytes, and it
 	// won't Flush the write context.
 	staysWithinBuffer(size int) bool
-***REMOVED***
+}
 
 // writeContext is the interface needed by the various frame writer
 // types below. All the writeFrame methods below are scheduled via the
@@ -35,20 +35,20 @@ type writeFramer interface ***REMOVED***
 // end up using this yet, because it has a simpler design, not
 // currently implementing priorities), or b) delete this and
 // make the server code a bit more concrete.
-type writeContext interface ***REMOVED***
+type writeContext interface {
 	Framer() *Framer
 	Flush() error
 	CloseConn() error
 	// HeaderEncoder returns an HPACK encoder that writes to the
 	// returned buffer.
 	HeaderEncoder() (*hpack.Encoder, *bytes.Buffer)
-***REMOVED***
+}
 
 // writeEndsStream reports whether w writes a frame that will transition
 // the stream to a half-closed local state. This returns false for RST_STREAM,
 // which closes the entire stream (not just the local half).
-func writeEndsStream(w writeFramer) bool ***REMOVED***
-	switch v := w.(type) ***REMOVED***
+func writeEndsStream(w writeFramer) bool {
+	switch v := w.(type) {
 	case *writeData:
 		return v.endStream
 	case *writeResHeaders:
@@ -58,99 +58,99 @@ func writeEndsStream(w writeFramer) bool ***REMOVED***
 		// been intentionally nil'ed out to prevent use. Keep this
 		// here to catch future refactoring breaking it.
 		panic("writeEndsStream called on nil writeFramer")
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
-type flushFrameWriter struct***REMOVED******REMOVED***
+type flushFrameWriter struct{}
 
-func (flushFrameWriter) writeFrame(ctx writeContext) error ***REMOVED***
+func (flushFrameWriter) writeFrame(ctx writeContext) error {
 	return ctx.Flush()
-***REMOVED***
+}
 
-func (flushFrameWriter) staysWithinBuffer(max int) bool ***REMOVED*** return false ***REMOVED***
+func (flushFrameWriter) staysWithinBuffer(max int) bool { return false }
 
 type writeSettings []Setting
 
-func (s writeSettings) staysWithinBuffer(max int) bool ***REMOVED***
+func (s writeSettings) staysWithinBuffer(max int) bool {
 	const settingSize = 6 // uint16 + uint32
 	return frameHeaderLen+settingSize*len(s) <= max
 
-***REMOVED***
+}
 
-func (s writeSettings) writeFrame(ctx writeContext) error ***REMOVED***
+func (s writeSettings) writeFrame(ctx writeContext) error {
 	return ctx.Framer().WriteSettings([]Setting(s)...)
-***REMOVED***
+}
 
-type writeGoAway struct ***REMOVED***
+type writeGoAway struct {
 	maxStreamID uint32
 	code        ErrCode
-***REMOVED***
+}
 
-func (p *writeGoAway) writeFrame(ctx writeContext) error ***REMOVED***
+func (p *writeGoAway) writeFrame(ctx writeContext) error {
 	err := ctx.Framer().WriteGoAway(p.maxStreamID, p.code, nil)
 	ctx.Flush() // ignore error: we're hanging up on them anyway
 	return err
-***REMOVED***
+}
 
-func (*writeGoAway) staysWithinBuffer(max int) bool ***REMOVED*** return false ***REMOVED*** // flushes
+func (*writeGoAway) staysWithinBuffer(max int) bool { return false } // flushes
 
-type writeData struct ***REMOVED***
+type writeData struct {
 	streamID  uint32
 	p         []byte
 	endStream bool
-***REMOVED***
+}
 
-func (w *writeData) String() string ***REMOVED***
+func (w *writeData) String() string {
 	return fmt.Sprintf("writeData(stream=%d, p=%d, endStream=%v)", w.streamID, len(w.p), w.endStream)
-***REMOVED***
+}
 
-func (w *writeData) writeFrame(ctx writeContext) error ***REMOVED***
+func (w *writeData) writeFrame(ctx writeContext) error {
 	return ctx.Framer().WriteData(w.streamID, w.endStream, w.p)
-***REMOVED***
+}
 
-func (w *writeData) staysWithinBuffer(max int) bool ***REMOVED***
+func (w *writeData) staysWithinBuffer(max int) bool {
 	return frameHeaderLen+len(w.p) <= max
-***REMOVED***
+}
 
 // handlerPanicRST is the message sent from handler goroutines when
 // the handler panics.
-type handlerPanicRST struct ***REMOVED***
+type handlerPanicRST struct {
 	StreamID uint32
-***REMOVED***
+}
 
-func (hp handlerPanicRST) writeFrame(ctx writeContext) error ***REMOVED***
+func (hp handlerPanicRST) writeFrame(ctx writeContext) error {
 	return ctx.Framer().WriteRSTStream(hp.StreamID, ErrCodeInternal)
-***REMOVED***
+}
 
-func (hp handlerPanicRST) staysWithinBuffer(max int) bool ***REMOVED*** return frameHeaderLen+4 <= max ***REMOVED***
+func (hp handlerPanicRST) staysWithinBuffer(max int) bool { return frameHeaderLen+4 <= max }
 
-func (se StreamError) writeFrame(ctx writeContext) error ***REMOVED***
+func (se StreamError) writeFrame(ctx writeContext) error {
 	return ctx.Framer().WriteRSTStream(se.StreamID, se.Code)
-***REMOVED***
+}
 
-func (se StreamError) staysWithinBuffer(max int) bool ***REMOVED*** return frameHeaderLen+4 <= max ***REMOVED***
+func (se StreamError) staysWithinBuffer(max int) bool { return frameHeaderLen+4 <= max }
 
-type writePingAck struct***REMOVED*** pf *PingFrame ***REMOVED***
+type writePingAck struct{ pf *PingFrame }
 
-func (w writePingAck) writeFrame(ctx writeContext) error ***REMOVED***
+func (w writePingAck) writeFrame(ctx writeContext) error {
 	return ctx.Framer().WritePing(true, w.pf.Data)
-***REMOVED***
+}
 
-func (w writePingAck) staysWithinBuffer(max int) bool ***REMOVED*** return frameHeaderLen+len(w.pf.Data) <= max ***REMOVED***
+func (w writePingAck) staysWithinBuffer(max int) bool { return frameHeaderLen+len(w.pf.Data) <= max }
 
-type writeSettingsAck struct***REMOVED******REMOVED***
+type writeSettingsAck struct{}
 
-func (writeSettingsAck) writeFrame(ctx writeContext) error ***REMOVED***
+func (writeSettingsAck) writeFrame(ctx writeContext) error {
 	return ctx.Framer().WriteSettingsAck()
-***REMOVED***
+}
 
-func (writeSettingsAck) staysWithinBuffer(max int) bool ***REMOVED*** return frameHeaderLen <= max ***REMOVED***
+func (writeSettingsAck) staysWithinBuffer(max int) bool { return frameHeaderLen <= max }
 
 // splitHeaderBlock splits headerBlock into fragments so that each fragment fits
 // in a single frame, then calls fn for each fragment. firstFrag/lastFrag are true
 // for the first/last fragment, respectively.
-func splitHeaderBlock(ctx writeContext, headerBlock []byte, fn func(ctx writeContext, frag []byte, firstFrag, lastFrag bool) error) error ***REMOVED***
+func splitHeaderBlock(ctx writeContext, headerBlock []byte, fn func(ctx writeContext, frag []byte, firstFrag, lastFrag bool) error) error {
 	// For now we're lazy and just pick the minimum MAX_FRAME_SIZE
 	// that all peers must support (16KB). Later we could care
 	// more and send larger frames if the peer advertised it, but
@@ -160,23 +160,23 @@ func splitHeaderBlock(ctx writeContext, headerBlock []byte, fn func(ctx writeCon
 	const maxFrameSize = 16384
 
 	first := true
-	for len(headerBlock) > 0 ***REMOVED***
+	for len(headerBlock) > 0 {
 		frag := headerBlock
-		if len(frag) > maxFrameSize ***REMOVED***
+		if len(frag) > maxFrameSize {
 			frag = frag[:maxFrameSize]
-		***REMOVED***
+		}
 		headerBlock = headerBlock[len(frag):]
-		if err := fn(ctx, frag, first, len(headerBlock) == 0); err != nil ***REMOVED***
+		if err := fn(ctx, frag, first, len(headerBlock) == 0); err != nil {
 			return err
-		***REMOVED***
+		}
 		first = false
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // writeResHeaders is a request to write a HEADERS and 0+ CONTINUATION frames
 // for HTTP response headers or trailers from a server handler.
-type writeResHeaders struct ***REMOVED***
+type writeResHeaders struct {
 	streamID    uint32
 	httpResCode int         // 0 means no ":status" line
 	h           http.Header // may be nil
@@ -186,16 +186,16 @@ type writeResHeaders struct ***REMOVED***
 	date          string
 	contentType   string
 	contentLength string
-***REMOVED***
+}
 
-func encKV(enc *hpack.Encoder, k, v string) ***REMOVED***
-	if VerboseLogs ***REMOVED***
+func encKV(enc *hpack.Encoder, k, v string) {
+	if VerboseLogs {
 		log.Printf("http2: server encoding header %q = %q", k, v)
-	***REMOVED***
-	enc.WriteField(hpack.HeaderField***REMOVED***Name: k, Value: v***REMOVED***)
-***REMOVED***
+	}
+	enc.WriteField(hpack.HeaderField{Name: k, Value: v})
+}
 
-func (w *writeResHeaders) staysWithinBuffer(max int) bool ***REMOVED***
+func (w *writeResHeaders) staysWithinBuffer(max int) bool {
 	// TODO: this is a common one. It'd be nice to return true
 	// here and get into the fast path if we could be clever and
 	// calculate the size fast enough, or at least a conservative
@@ -204,51 +204,51 @@ func (w *writeResHeaders) staysWithinBuffer(max int) bool ***REMOVED***
 	// Otherwise I'm afraid that just calculating the length to
 	// answer this question would be slower than the ~2µs benefit.
 	return false
-***REMOVED***
+}
 
-func (w *writeResHeaders) writeFrame(ctx writeContext) error ***REMOVED***
+func (w *writeResHeaders) writeFrame(ctx writeContext) error {
 	enc, buf := ctx.HeaderEncoder()
 	buf.Reset()
 
-	if w.httpResCode != 0 ***REMOVED***
+	if w.httpResCode != 0 {
 		encKV(enc, ":status", httpCodeString(w.httpResCode))
-	***REMOVED***
+	}
 
 	encodeHeaders(enc, w.h, w.trailers)
 
-	if w.contentType != "" ***REMOVED***
+	if w.contentType != "" {
 		encKV(enc, "content-type", w.contentType)
-	***REMOVED***
-	if w.contentLength != "" ***REMOVED***
+	}
+	if w.contentLength != "" {
 		encKV(enc, "content-length", w.contentLength)
-	***REMOVED***
-	if w.date != "" ***REMOVED***
+	}
+	if w.date != "" {
 		encKV(enc, "date", w.date)
-	***REMOVED***
+	}
 
 	headerBlock := buf.Bytes()
-	if len(headerBlock) == 0 && w.trailers == nil ***REMOVED***
+	if len(headerBlock) == 0 && w.trailers == nil {
 		panic("unexpected empty hpack")
-	***REMOVED***
+	}
 
 	return splitHeaderBlock(ctx, headerBlock, w.writeHeaderBlock)
-***REMOVED***
+}
 
-func (w *writeResHeaders) writeHeaderBlock(ctx writeContext, frag []byte, firstFrag, lastFrag bool) error ***REMOVED***
-	if firstFrag ***REMOVED***
-		return ctx.Framer().WriteHeaders(HeadersFrameParam***REMOVED***
+func (w *writeResHeaders) writeHeaderBlock(ctx writeContext, frag []byte, firstFrag, lastFrag bool) error {
+	if firstFrag {
+		return ctx.Framer().WriteHeaders(HeadersFrameParam{
 			StreamID:      w.streamID,
 			BlockFragment: frag,
 			EndStream:     w.endStream,
 			EndHeaders:    lastFrag,
-		***REMOVED***)
-	***REMOVED*** else ***REMOVED***
+		})
+	} else {
 		return ctx.Framer().WriteContinuation(w.streamID, lastFrag, frag)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // writePushPromise is a request to write a PUSH_PROMISE and 0+ CONTINUATION frames.
-type writePushPromise struct ***REMOVED***
+type writePushPromise struct {
 	streamID uint32   // pusher stream
 	method   string   // for :method
 	url      *url.URL // for :scheme, :authority, :path
@@ -258,14 +258,14 @@ type writePushPromise struct ***REMOVED***
 	// the frame is written. The returned ID is copied to promisedID.
 	allocatePromisedID func() (uint32, error)
 	promisedID         uint32
-***REMOVED***
+}
 
-func (w *writePushPromise) staysWithinBuffer(max int) bool ***REMOVED***
+func (w *writePushPromise) staysWithinBuffer(max int) bool {
 	// TODO: see writeResHeaders.staysWithinBuffer
 	return false
-***REMOVED***
+}
 
-func (w *writePushPromise) writeFrame(ctx writeContext) error ***REMOVED***
+func (w *writePushPromise) writeFrame(ctx writeContext) error {
 	enc, buf := ctx.HeaderEncoder()
 	buf.Reset()
 
@@ -276,90 +276,90 @@ func (w *writePushPromise) writeFrame(ctx writeContext) error ***REMOVED***
 	encodeHeaders(enc, w.h, nil)
 
 	headerBlock := buf.Bytes()
-	if len(headerBlock) == 0 ***REMOVED***
+	if len(headerBlock) == 0 {
 		panic("unexpected empty hpack")
-	***REMOVED***
+	}
 
 	return splitHeaderBlock(ctx, headerBlock, w.writeHeaderBlock)
-***REMOVED***
+}
 
-func (w *writePushPromise) writeHeaderBlock(ctx writeContext, frag []byte, firstFrag, lastFrag bool) error ***REMOVED***
-	if firstFrag ***REMOVED***
-		return ctx.Framer().WritePushPromise(PushPromiseParam***REMOVED***
+func (w *writePushPromise) writeHeaderBlock(ctx writeContext, frag []byte, firstFrag, lastFrag bool) error {
+	if firstFrag {
+		return ctx.Framer().WritePushPromise(PushPromiseParam{
 			StreamID:      w.streamID,
 			PromiseID:     w.promisedID,
 			BlockFragment: frag,
 			EndHeaders:    lastFrag,
-		***REMOVED***)
-	***REMOVED*** else ***REMOVED***
+		})
+	} else {
 		return ctx.Framer().WriteContinuation(w.streamID, lastFrag, frag)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type write100ContinueHeadersFrame struct ***REMOVED***
+type write100ContinueHeadersFrame struct {
 	streamID uint32
-***REMOVED***
+}
 
-func (w write100ContinueHeadersFrame) writeFrame(ctx writeContext) error ***REMOVED***
+func (w write100ContinueHeadersFrame) writeFrame(ctx writeContext) error {
 	enc, buf := ctx.HeaderEncoder()
 	buf.Reset()
 	encKV(enc, ":status", "100")
-	return ctx.Framer().WriteHeaders(HeadersFrameParam***REMOVED***
+	return ctx.Framer().WriteHeaders(HeadersFrameParam{
 		StreamID:      w.streamID,
 		BlockFragment: buf.Bytes(),
 		EndStream:     false,
 		EndHeaders:    true,
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func (w write100ContinueHeadersFrame) staysWithinBuffer(max int) bool ***REMOVED***
+func (w write100ContinueHeadersFrame) staysWithinBuffer(max int) bool {
 	// Sloppy but conservative:
 	return 9+2*(len(":status")+len("100")) <= max
-***REMOVED***
+}
 
-type writeWindowUpdate struct ***REMOVED***
+type writeWindowUpdate struct {
 	streamID uint32 // or 0 for conn-level
 	n        uint32
-***REMOVED***
+}
 
-func (wu writeWindowUpdate) staysWithinBuffer(max int) bool ***REMOVED*** return frameHeaderLen+4 <= max ***REMOVED***
+func (wu writeWindowUpdate) staysWithinBuffer(max int) bool { return frameHeaderLen+4 <= max }
 
-func (wu writeWindowUpdate) writeFrame(ctx writeContext) error ***REMOVED***
+func (wu writeWindowUpdate) writeFrame(ctx writeContext) error {
 	return ctx.Framer().WriteWindowUpdate(wu.streamID, wu.n)
-***REMOVED***
+}
 
 // encodeHeaders encodes an http.Header. If keys is not nil, then (k, h[k])
 // is encoded only only if k is in keys.
-func encodeHeaders(enc *hpack.Encoder, h http.Header, keys []string) ***REMOVED***
-	if keys == nil ***REMOVED***
+func encodeHeaders(enc *hpack.Encoder, h http.Header, keys []string) {
+	if keys == nil {
 		sorter := sorterPool.Get().(*sorter)
 		// Using defer here, since the returned keys from the
 		// sorter.Keys method is only valid until the sorter
 		// is returned:
 		defer sorterPool.Put(sorter)
 		keys = sorter.Keys(h)
-	***REMOVED***
-	for _, k := range keys ***REMOVED***
+	}
+	for _, k := range keys {
 		vv := h[k]
 		k = lowerHeader(k)
-		if !validWireHeaderFieldName(k) ***REMOVED***
+		if !validWireHeaderFieldName(k) {
 			// Skip it as backup paranoia. Per
 			// golang.org/issue/14048, these should
 			// already be rejected at a higher level.
 			continue
-		***REMOVED***
+		}
 		isTE := k == "transfer-encoding"
-		for _, v := range vv ***REMOVED***
-			if !httplex.ValidHeaderFieldValue(v) ***REMOVED***
+		for _, v := range vv {
+			if !httplex.ValidHeaderFieldValue(v) {
 				// TODO: return an error? golang.org/issue/14048
 				// For now just omit it.
 				continue
-			***REMOVED***
+			}
 			// TODO: more of "8.1.2.2 Connection-Specific Header Fields"
-			if isTE && v != "trailers" ***REMOVED***
+			if isTE && v != "trailers" {
 				continue
-			***REMOVED***
+			}
 			encKV(enc, k, v)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

@@ -10,230 +10,230 @@ import (
 	"golang.org/x/text/transform"
 )
 
-type foldTransform struct ***REMOVED***
+type foldTransform struct {
 	transform.NopResetter
-***REMOVED***
+}
 
-func (foldTransform) Span(src []byte, atEOF bool) (n int, err error) ***REMOVED***
-	for n < len(src) ***REMOVED***
-		if src[n] < utf8.RuneSelf ***REMOVED***
+func (foldTransform) Span(src []byte, atEOF bool) (n int, err error) {
+	for n < len(src) {
+		if src[n] < utf8.RuneSelf {
 			// ASCII fast path.
-			for n++; n < len(src) && src[n] < utf8.RuneSelf; n++ ***REMOVED***
-			***REMOVED***
+			for n++; n < len(src) && src[n] < utf8.RuneSelf; n++ {
+			}
 			continue
-		***REMOVED***
+		}
 		v, size := trie.lookup(src[n:])
-		if size == 0 ***REMOVED*** // incomplete UTF-8 encoding
-			if !atEOF ***REMOVED***
+		if size == 0 { // incomplete UTF-8 encoding
+			if !atEOF {
 				err = transform.ErrShortSrc
-			***REMOVED*** else ***REMOVED***
+			} else {
 				n = len(src)
-			***REMOVED***
+			}
 			break
-		***REMOVED***
-		if elem(v)&tagNeedsFold != 0 ***REMOVED***
+		}
+		if elem(v)&tagNeedsFold != 0 {
 			err = transform.ErrEndOfSpan
 			break
-		***REMOVED***
+		}
 		n += size
-	***REMOVED***
+	}
 	return n, err
-***REMOVED***
+}
 
-func (foldTransform) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) ***REMOVED***
-	for nSrc < len(src) ***REMOVED***
-		if src[nSrc] < utf8.RuneSelf ***REMOVED***
+func (foldTransform) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) {
+	for nSrc < len(src) {
+		if src[nSrc] < utf8.RuneSelf {
 			// ASCII fast path.
 			start, end := nSrc, len(src)
-			if d := len(dst) - nDst; d < end-start ***REMOVED***
+			if d := len(dst) - nDst; d < end-start {
 				end = nSrc + d
-			***REMOVED***
-			for nSrc++; nSrc < end && src[nSrc] < utf8.RuneSelf; nSrc++ ***REMOVED***
-			***REMOVED***
+			}
+			for nSrc++; nSrc < end && src[nSrc] < utf8.RuneSelf; nSrc++ {
+			}
 			n := copy(dst[nDst:], src[start:nSrc])
-			if nDst += n; nDst == len(dst) ***REMOVED***
+			if nDst += n; nDst == len(dst) {
 				nSrc = start + n
-				if nSrc == len(src) ***REMOVED***
+				if nSrc == len(src) {
 					return nDst, nSrc, nil
-				***REMOVED***
-				if src[nSrc] < utf8.RuneSelf ***REMOVED***
+				}
+				if src[nSrc] < utf8.RuneSelf {
 					return nDst, nSrc, transform.ErrShortDst
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			continue
-		***REMOVED***
+		}
 		v, size := trie.lookup(src[nSrc:])
-		if size == 0 ***REMOVED*** // incomplete UTF-8 encoding
-			if !atEOF ***REMOVED***
+		if size == 0 { // incomplete UTF-8 encoding
+			if !atEOF {
 				return nDst, nSrc, transform.ErrShortSrc
-			***REMOVED***
+			}
 			size = 1 // gobble 1 byte
-		***REMOVED***
-		if elem(v)&tagNeedsFold == 0 ***REMOVED***
-			if size != copy(dst[nDst:], src[nSrc:nSrc+size]) ***REMOVED***
+		}
+		if elem(v)&tagNeedsFold == 0 {
+			if size != copy(dst[nDst:], src[nSrc:nSrc+size]) {
 				return nDst, nSrc, transform.ErrShortDst
-			***REMOVED***
+			}
 			nDst += size
-		***REMOVED*** else ***REMOVED***
+		} else {
 			data := inverseData[byte(v)]
-			if len(dst)-nDst < int(data[0]) ***REMOVED***
+			if len(dst)-nDst < int(data[0]) {
 				return nDst, nSrc, transform.ErrShortDst
-			***REMOVED***
+			}
 			i := 1
-			for end := int(data[0]); i < end; i++ ***REMOVED***
+			for end := int(data[0]); i < end; i++ {
 				dst[nDst] = data[i]
 				nDst++
-			***REMOVED***
+			}
 			dst[nDst] = data[i] ^ src[nSrc+size-1]
 			nDst++
-		***REMOVED***
+		}
 		nSrc += size
-	***REMOVED***
+	}
 	return nDst, nSrc, nil
-***REMOVED***
+}
 
-type narrowTransform struct ***REMOVED***
+type narrowTransform struct {
 	transform.NopResetter
-***REMOVED***
+}
 
-func (narrowTransform) Span(src []byte, atEOF bool) (n int, err error) ***REMOVED***
-	for n < len(src) ***REMOVED***
-		if src[n] < utf8.RuneSelf ***REMOVED***
+func (narrowTransform) Span(src []byte, atEOF bool) (n int, err error) {
+	for n < len(src) {
+		if src[n] < utf8.RuneSelf {
 			// ASCII fast path.
-			for n++; n < len(src) && src[n] < utf8.RuneSelf; n++ ***REMOVED***
-			***REMOVED***
+			for n++; n < len(src) && src[n] < utf8.RuneSelf; n++ {
+			}
 			continue
-		***REMOVED***
+		}
 		v, size := trie.lookup(src[n:])
-		if size == 0 ***REMOVED*** // incomplete UTF-8 encoding
-			if !atEOF ***REMOVED***
+		if size == 0 { // incomplete UTF-8 encoding
+			if !atEOF {
 				err = transform.ErrShortSrc
-			***REMOVED*** else ***REMOVED***
+			} else {
 				n = len(src)
-			***REMOVED***
+			}
 			break
-		***REMOVED***
-		if k := elem(v).kind(); byte(v) == 0 || k != EastAsianFullwidth && k != EastAsianWide && k != EastAsianAmbiguous ***REMOVED***
-		***REMOVED*** else ***REMOVED***
+		}
+		if k := elem(v).kind(); byte(v) == 0 || k != EastAsianFullwidth && k != EastAsianWide && k != EastAsianAmbiguous {
+		} else {
 			err = transform.ErrEndOfSpan
 			break
-		***REMOVED***
+		}
 		n += size
-	***REMOVED***
+	}
 	return n, err
-***REMOVED***
+}
 
-func (narrowTransform) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) ***REMOVED***
-	for nSrc < len(src) ***REMOVED***
-		if src[nSrc] < utf8.RuneSelf ***REMOVED***
+func (narrowTransform) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) {
+	for nSrc < len(src) {
+		if src[nSrc] < utf8.RuneSelf {
 			// ASCII fast path.
 			start, end := nSrc, len(src)
-			if d := len(dst) - nDst; d < end-start ***REMOVED***
+			if d := len(dst) - nDst; d < end-start {
 				end = nSrc + d
-			***REMOVED***
-			for nSrc++; nSrc < end && src[nSrc] < utf8.RuneSelf; nSrc++ ***REMOVED***
-			***REMOVED***
+			}
+			for nSrc++; nSrc < end && src[nSrc] < utf8.RuneSelf; nSrc++ {
+			}
 			n := copy(dst[nDst:], src[start:nSrc])
-			if nDst += n; nDst == len(dst) ***REMOVED***
+			if nDst += n; nDst == len(dst) {
 				nSrc = start + n
-				if nSrc == len(src) ***REMOVED***
+				if nSrc == len(src) {
 					return nDst, nSrc, nil
-				***REMOVED***
-				if src[nSrc] < utf8.RuneSelf ***REMOVED***
+				}
+				if src[nSrc] < utf8.RuneSelf {
 					return nDst, nSrc, transform.ErrShortDst
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			continue
-		***REMOVED***
+		}
 		v, size := trie.lookup(src[nSrc:])
-		if size == 0 ***REMOVED*** // incomplete UTF-8 encoding
-			if !atEOF ***REMOVED***
+		if size == 0 { // incomplete UTF-8 encoding
+			if !atEOF {
 				return nDst, nSrc, transform.ErrShortSrc
-			***REMOVED***
+			}
 			size = 1 // gobble 1 byte
-		***REMOVED***
-		if k := elem(v).kind(); byte(v) == 0 || k != EastAsianFullwidth && k != EastAsianWide && k != EastAsianAmbiguous ***REMOVED***
-			if size != copy(dst[nDst:], src[nSrc:nSrc+size]) ***REMOVED***
+		}
+		if k := elem(v).kind(); byte(v) == 0 || k != EastAsianFullwidth && k != EastAsianWide && k != EastAsianAmbiguous {
+			if size != copy(dst[nDst:], src[nSrc:nSrc+size]) {
 				return nDst, nSrc, transform.ErrShortDst
-			***REMOVED***
+			}
 			nDst += size
-		***REMOVED*** else ***REMOVED***
+		} else {
 			data := inverseData[byte(v)]
-			if len(dst)-nDst < int(data[0]) ***REMOVED***
+			if len(dst)-nDst < int(data[0]) {
 				return nDst, nSrc, transform.ErrShortDst
-			***REMOVED***
+			}
 			i := 1
-			for end := int(data[0]); i < end; i++ ***REMOVED***
+			for end := int(data[0]); i < end; i++ {
 				dst[nDst] = data[i]
 				nDst++
-			***REMOVED***
+			}
 			dst[nDst] = data[i] ^ src[nSrc+size-1]
 			nDst++
-		***REMOVED***
+		}
 		nSrc += size
-	***REMOVED***
+	}
 	return nDst, nSrc, nil
-***REMOVED***
+}
 
-type wideTransform struct ***REMOVED***
+type wideTransform struct {
 	transform.NopResetter
-***REMOVED***
+}
 
-func (wideTransform) Span(src []byte, atEOF bool) (n int, err error) ***REMOVED***
-	for n < len(src) ***REMOVED***
+func (wideTransform) Span(src []byte, atEOF bool) (n int, err error) {
+	for n < len(src) {
 		// TODO: Consider ASCII fast path. Special-casing ASCII handling can
 		// reduce the ns/op of BenchmarkWideASCII by about 30%. This is probably
 		// not enough to warrant the extra code and complexity.
 		v, size := trie.lookup(src[n:])
-		if size == 0 ***REMOVED*** // incomplete UTF-8 encoding
-			if !atEOF ***REMOVED***
+		if size == 0 { // incomplete UTF-8 encoding
+			if !atEOF {
 				err = transform.ErrShortSrc
-			***REMOVED*** else ***REMOVED***
+			} else {
 				n = len(src)
-			***REMOVED***
+			}
 			break
-		***REMOVED***
-		if k := elem(v).kind(); byte(v) == 0 || k != EastAsianHalfwidth && k != EastAsianNarrow ***REMOVED***
-		***REMOVED*** else ***REMOVED***
+		}
+		if k := elem(v).kind(); byte(v) == 0 || k != EastAsianHalfwidth && k != EastAsianNarrow {
+		} else {
 			err = transform.ErrEndOfSpan
 			break
-		***REMOVED***
+		}
 		n += size
-	***REMOVED***
+	}
 	return n, err
-***REMOVED***
+}
 
-func (wideTransform) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) ***REMOVED***
-	for nSrc < len(src) ***REMOVED***
+func (wideTransform) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) {
+	for nSrc < len(src) {
 		// TODO: Consider ASCII fast path. Special-casing ASCII handling can
 		// reduce the ns/op of BenchmarkWideASCII by about 30%. This is probably
 		// not enough to warrant the extra code and complexity.
 		v, size := trie.lookup(src[nSrc:])
-		if size == 0 ***REMOVED*** // incomplete UTF-8 encoding
-			if !atEOF ***REMOVED***
+		if size == 0 { // incomplete UTF-8 encoding
+			if !atEOF {
 				return nDst, nSrc, transform.ErrShortSrc
-			***REMOVED***
+			}
 			size = 1 // gobble 1 byte
-		***REMOVED***
-		if k := elem(v).kind(); byte(v) == 0 || k != EastAsianHalfwidth && k != EastAsianNarrow ***REMOVED***
-			if size != copy(dst[nDst:], src[nSrc:nSrc+size]) ***REMOVED***
+		}
+		if k := elem(v).kind(); byte(v) == 0 || k != EastAsianHalfwidth && k != EastAsianNarrow {
+			if size != copy(dst[nDst:], src[nSrc:nSrc+size]) {
 				return nDst, nSrc, transform.ErrShortDst
-			***REMOVED***
+			}
 			nDst += size
-		***REMOVED*** else ***REMOVED***
+		} else {
 			data := inverseData[byte(v)]
-			if len(dst)-nDst < int(data[0]) ***REMOVED***
+			if len(dst)-nDst < int(data[0]) {
 				return nDst, nSrc, transform.ErrShortDst
-			***REMOVED***
+			}
 			i := 1
-			for end := int(data[0]); i < end; i++ ***REMOVED***
+			for end := int(data[0]); i < end; i++ {
 				dst[nDst] = data[i]
 				nDst++
-			***REMOVED***
+			}
 			dst[nDst] = data[i] ^ src[nSrc+size-1]
 			nDst++
-		***REMOVED***
+		}
 		nSrc += size
-	***REMOVED***
+	}
 	return nDst, nSrc, nil
-***REMOVED***
+}

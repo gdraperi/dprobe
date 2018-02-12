@@ -23,127 +23,127 @@ import (
 // of calling caseOrbit on the remaining input bytes.
 type copyOrbit int
 
-func (t copyOrbit) Reset() ***REMOVED******REMOVED***
-func (t copyOrbit) Span(src []byte, atEOF bool) (n int, err error) ***REMOVED***
-	if int(t) == len(src) ***REMOVED***
+func (t copyOrbit) Reset() {}
+func (t copyOrbit) Span(src []byte, atEOF bool) (n int, err error) {
+	if int(t) == len(src) {
 		return int(t), nil
-	***REMOVED***
+	}
 	return int(t), transform.ErrEndOfSpan
-***REMOVED***
+}
 
 // Transform implements transform.Transformer specifically for testing the apply method.
 // See documentation of copyOrbit before using this method.
-func (t copyOrbit) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) ***REMOVED***
+func (t copyOrbit) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) {
 	n := copy(dst, src)
-	for i, c := range dst[:n] ***REMOVED***
+	for i, c := range dst[:n] {
 		dst[i] = orbitCase(c)
-	***REMOVED***
+	}
 	return n, n, nil
-***REMOVED***
+}
 
-func orbitCase(c byte) byte ***REMOVED***
-	if unicode.IsLower(rune(c)) ***REMOVED***
+func orbitCase(c byte) byte {
+	if unicode.IsLower(rune(c)) {
 		return byte(unicode.ToUpper(rune(c)))
-	***REMOVED*** else ***REMOVED***
+	} else {
 		return byte(unicode.ToLower(rune(c)))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestBuffers(t *testing.T) ***REMOVED***
+func TestBuffers(t *testing.T) {
 	want := "Those who cannot remember the past are condemned to compute it."
 
 	spans := rand.Perm(len(want) + 1)
 
 	// Compute the result of applying copyOrbit(span) transforms in reverse.
 	input := []byte(want)
-	for i := len(spans) - 1; i >= 0; i-- ***REMOVED***
-		for j := spans[i]; j < len(input); j++ ***REMOVED***
+	for i := len(spans) - 1; i >= 0; i-- {
+		for j := spans[i]; j < len(input); j++ {
 			input[j] = orbitCase(input[j])
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Apply the copyOrbit(span) transforms.
-	b := buffers***REMOVED***src: input***REMOVED***
-	for _, n := range spans ***REMOVED***
+	b := buffers{src: input}
+	for _, n := range spans {
 		b.apply(copyOrbit(n))
-		if n%11 == 0 ***REMOVED***
+		if n%11 == 0 {
 			b.apply(transform.Nop)
-		***REMOVED***
-	***REMOVED***
-	if got := string(b.src); got != want ***REMOVED***
+		}
+	}
+	if got := string(b.src); got != want {
 		t.Errorf("got %q; want %q", got, want)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type compareTestCase struct ***REMOVED***
+type compareTestCase struct {
 	a      string
 	b      string
 	result bool
-***REMOVED***
+}
 
-var compareTestCases = []struct ***REMOVED***
+var compareTestCases = []struct {
 	name  string
 	p     *Profile
 	cases []compareTestCase
-***REMOVED******REMOVED***
-	***REMOVED***"Nickname", Nickname, []compareTestCase***REMOVED***
-		***REMOVED***"a", "b", false***REMOVED***,
-		***REMOVED***"  Swan  of   Avon   ", "swan of avon", true***REMOVED***,
-		***REMOVED***"Foo", "foo", true***REMOVED***,
-		***REMOVED***"foo", "foo", true***REMOVED***,
-		***REMOVED***"Foo Bar", "foo bar", true***REMOVED***,
-		***REMOVED***"foo bar", "foo bar", true***REMOVED***,
-		***REMOVED***"\u03A3", "\u03C3", true***REMOVED***,
-		***REMOVED***"\u03A3", "\u03C2", false***REMOVED***,
-		***REMOVED***"\u03C3", "\u03C2", false***REMOVED***,
-		***REMOVED***"Richard \u2163", "richard iv", true***REMOVED***,
-		***REMOVED***"Å", "å", true***REMOVED***,
-		***REMOVED***"ﬀ", "ff", true***REMOVED***, // because of NFKC
-		***REMOVED***"ß", "sS", false***REMOVED***,
+}{
+	{"Nickname", Nickname, []compareTestCase{
+		{"a", "b", false},
+		{"  Swan  of   Avon   ", "swan of avon", true},
+		{"Foo", "foo", true},
+		{"foo", "foo", true},
+		{"Foo Bar", "foo bar", true},
+		{"foo bar", "foo bar", true},
+		{"\u03A3", "\u03C3", true},
+		{"\u03A3", "\u03C2", false},
+		{"\u03C3", "\u03C2", false},
+		{"Richard \u2163", "richard iv", true},
+		{"Å", "å", true},
+		{"ﬀ", "ff", true}, // because of NFKC
+		{"ß", "sS", false},
 
 		// After applying the Nickname profile, \u00a8  becomes \u0020\u0308,
 		// however because the nickname profile is not idempotent, applying it again
 		// to \u0020\u0308 results in \u0308.
-		***REMOVED***"\u00a8", "\u0020\u0308", true***REMOVED***,
-		***REMOVED***"\u00a8", "\u0308", true***REMOVED***,
-		***REMOVED***"\u0020\u0308", "\u0308", true***REMOVED***,
-	***REMOVED******REMOVED***,
-***REMOVED***
+		{"\u00a8", "\u0020\u0308", true},
+		{"\u00a8", "\u0308", true},
+		{"\u0020\u0308", "\u0308", true},
+	}},
+}
 
-func doCompareTests(t *testing.T, fn func(t *testing.T, p *Profile, tc compareTestCase)) ***REMOVED***
-	for _, g := range compareTestCases ***REMOVED***
-		for i, tc := range g.cases ***REMOVED***
+func doCompareTests(t *testing.T, fn func(t *testing.T, p *Profile, tc compareTestCase)) {
+	for _, g := range compareTestCases {
+		for i, tc := range g.cases {
 			name := fmt.Sprintf("%s:%d:%+q", g.name, i, tc.a)
-			testtext.Run(t, name, func(t *testing.T) ***REMOVED***
+			testtext.Run(t, name, func(t *testing.T) {
 				fn(t, g.p, tc)
-			***REMOVED***)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			})
+		}
+	}
+}
 
-func TestCompare(t *testing.T) ***REMOVED***
-	doCompareTests(t, func(t *testing.T, p *Profile, tc compareTestCase) ***REMOVED***
-		if result := p.Compare(tc.a, tc.b); result != tc.result ***REMOVED***
+func TestCompare(t *testing.T) {
+	doCompareTests(t, func(t *testing.T, p *Profile, tc compareTestCase) {
+		if result := p.Compare(tc.a, tc.b); result != tc.result {
 			t.Errorf("got %v; want %v", result, tc.result)
-		***REMOVED***
-	***REMOVED***)
-***REMOVED***
+		}
+	})
+}
 
-func TestCompareString(t *testing.T) ***REMOVED***
-	doCompareTests(t, func(t *testing.T, p *Profile, tc compareTestCase) ***REMOVED***
+func TestCompareString(t *testing.T) {
+	doCompareTests(t, func(t *testing.T, p *Profile, tc compareTestCase) {
 		a, err := p.CompareKey(tc.a)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Errorf("Unexpected error when creating key: %v", err)
 			return
-		***REMOVED***
+		}
 		b, err := p.CompareKey(tc.b)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Errorf("Unexpected error when creating key: %v", err)
 			return
-		***REMOVED***
+		}
 
-		if result := (a == b); result != tc.result ***REMOVED***
+		if result := (a == b); result != tc.result {
 			t.Errorf("got %v; want %v", result, tc.result)
-		***REMOVED***
-	***REMOVED***)
-***REMOVED***
+		}
+	})
+}

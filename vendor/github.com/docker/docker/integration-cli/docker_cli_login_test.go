@@ -8,7 +8,7 @@ import (
 	"github.com/go-check/check"
 )
 
-func (s *DockerSuite) TestLoginWithoutTTY(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestLoginWithoutTTY(c *check.C) {
 	cmd := exec.Command(dockerBinary, "login")
 
 	// Send to stdin so the process does not get the TTY
@@ -17,9 +17,9 @@ func (s *DockerSuite) TestLoginWithoutTTY(c *check.C) ***REMOVED***
 	// run the command and block until it's done
 	err := cmd.Run()
 	c.Assert(err, checker.NotNil) //"Expected non nil err when logging in & TTY not available"
-***REMOVED***
+}
 
-func (s *DockerRegistryAuthHtpasswdSuite) TestLoginToPrivateRegistry(c *check.C) ***REMOVED***
+func (s *DockerRegistryAuthHtpasswdSuite) TestLoginToPrivateRegistry(c *check.C) {
 	// wrong credentials
 	out, _, err := dockerCmdWithError("login", "-u", s.reg.Username(), "-p", "WRONGPASSWORD", privateRegistryURL)
 	c.Assert(err, checker.NotNil, check.Commentf(out))
@@ -27,4 +27,4 @@ func (s *DockerRegistryAuthHtpasswdSuite) TestLoginToPrivateRegistry(c *check.C)
 
 	// now it's fine
 	dockerCmd(c, "login", "-u", s.reg.Username(), "-p", s.reg.Password(), privateRegistryURL)
-***REMOVED***
+}

@@ -6,45 +6,45 @@ import (
 	"github.com/pkg/errors"
 )
 
-type templatedSecretGetter struct ***REMOVED***
+type templatedSecretGetter struct {
 	dependencies exec.DependencyGetter
 	t            *api.Task
 	node         *api.NodeDescription
-***REMOVED***
+}
 
 // NewTemplatedSecretGetter returns a SecretGetter that evaluates templates.
-func NewTemplatedSecretGetter(dependencies exec.DependencyGetter, t *api.Task, node *api.NodeDescription) exec.SecretGetter ***REMOVED***
-	return templatedSecretGetter***REMOVED***dependencies: dependencies, t: t, node: node***REMOVED***
-***REMOVED***
+func NewTemplatedSecretGetter(dependencies exec.DependencyGetter, t *api.Task, node *api.NodeDescription) exec.SecretGetter {
+	return templatedSecretGetter{dependencies: dependencies, t: t, node: node}
+}
 
-func (t templatedSecretGetter) Get(secretID string) (*api.Secret, error) ***REMOVED***
-	if t.dependencies == nil ***REMOVED***
+func (t templatedSecretGetter) Get(secretID string) (*api.Secret, error) {
+	if t.dependencies == nil {
 		return nil, errors.New("no secret provider available")
-	***REMOVED***
+	}
 
 	secrets := t.dependencies.Secrets()
-	if secrets == nil ***REMOVED***
+	if secrets == nil {
 		return nil, errors.New("no secret provider available")
-	***REMOVED***
+	}
 
 	secret, err := secrets.Get(secretID)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return secret, err
-	***REMOVED***
+	}
 
 	newSpec, err := ExpandSecretSpec(secret, t.node, t.t, t.dependencies)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return secret, errors.Wrapf(err, "failed to expand templated secret %s", secretID)
-	***REMOVED***
+	}
 
 	secretCopy := *secret
 	secretCopy.Spec = *newSpec
 	return &secretCopy, nil
-***REMOVED***
+}
 
 // TemplatedConfigGetter is a ConfigGetter with an additional method to expose
 // whether a config contains sensitive data.
-type TemplatedConfigGetter interface ***REMOVED***
+type TemplatedConfigGetter interface {
 	exec.ConfigGetter
 
 	// GetAndFlagSecretData returns the interpolated config, and also
@@ -52,66 +52,66 @@ type TemplatedConfigGetter interface ***REMOVED***
 	// secret. In this case, the config should be handled specially and
 	// should not be written to disk.
 	GetAndFlagSecretData(configID string) (*api.Config, bool, error)
-***REMOVED***
+}
 
-type templatedConfigGetter struct ***REMOVED***
+type templatedConfigGetter struct {
 	dependencies exec.DependencyGetter
 	t            *api.Task
 	node         *api.NodeDescription
-***REMOVED***
+}
 
 // NewTemplatedConfigGetter returns a ConfigGetter that evaluates templates.
-func NewTemplatedConfigGetter(dependencies exec.DependencyGetter, t *api.Task, node *api.NodeDescription) TemplatedConfigGetter ***REMOVED***
-	return templatedConfigGetter***REMOVED***dependencies: dependencies, t: t, node: node***REMOVED***
-***REMOVED***
+func NewTemplatedConfigGetter(dependencies exec.DependencyGetter, t *api.Task, node *api.NodeDescription) TemplatedConfigGetter {
+	return templatedConfigGetter{dependencies: dependencies, t: t, node: node}
+}
 
-func (t templatedConfigGetter) Get(configID string) (*api.Config, error) ***REMOVED***
+func (t templatedConfigGetter) Get(configID string) (*api.Config, error) {
 	config, _, err := t.GetAndFlagSecretData(configID)
 	return config, err
-***REMOVED***
+}
 
-func (t templatedConfigGetter) GetAndFlagSecretData(configID string) (*api.Config, bool, error) ***REMOVED***
-	if t.dependencies == nil ***REMOVED***
+func (t templatedConfigGetter) GetAndFlagSecretData(configID string) (*api.Config, bool, error) {
+	if t.dependencies == nil {
 		return nil, false, errors.New("no config provider available")
-	***REMOVED***
+	}
 
 	configs := t.dependencies.Configs()
-	if configs == nil ***REMOVED***
+	if configs == nil {
 		return nil, false, errors.New("no config provider available")
-	***REMOVED***
+	}
 
 	config, err := configs.Get(configID)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return config, false, err
-	***REMOVED***
+	}
 
 	newSpec, sensitive, err := ExpandConfigSpec(config, t.node, t.t, t.dependencies)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return config, false, errors.Wrapf(err, "failed to expand templated config %s", configID)
-	***REMOVED***
+	}
 
 	configCopy := *config
 	configCopy.Spec = *newSpec
 	return &configCopy, sensitive, nil
-***REMOVED***
+}
 
-type templatedDependencyGetter struct ***REMOVED***
+type templatedDependencyGetter struct {
 	secrets exec.SecretGetter
 	configs TemplatedConfigGetter
-***REMOVED***
+}
 
 // NewTemplatedDependencyGetter returns a DependencyGetter that evaluates templates.
-func NewTemplatedDependencyGetter(dependencies exec.DependencyGetter, t *api.Task, node *api.NodeDescription) exec.DependencyGetter ***REMOVED***
-	return templatedDependencyGetter***REMOVED***
+func NewTemplatedDependencyGetter(dependencies exec.DependencyGetter, t *api.Task, node *api.NodeDescription) exec.DependencyGetter {
+	return templatedDependencyGetter{
 		secrets: NewTemplatedSecretGetter(dependencies, t, node),
 		configs: NewTemplatedConfigGetter(dependencies, t, node),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (t templatedDependencyGetter) Secrets() exec.SecretGetter ***REMOVED***
+func (t templatedDependencyGetter) Secrets() exec.SecretGetter {
 	return t.secrets
-***REMOVED***
+}
 
-func (t templatedDependencyGetter) Configs() exec.ConfigGetter ***REMOVED***
+func (t templatedDependencyGetter) Configs() exec.ConfigGetter {
 	return t.configs
-***REMOVED***
+}

@@ -27,14 +27,14 @@ type (
 	// PathStep is a union-type for specific operations to traverse
 	// a value's tree structure. Users of this package never need to implement
 	// these types as values of this type will be returned by this package.
-	PathStep interface ***REMOVED***
+	PathStep interface {
 		String() string
 		Type() reflect.Type // Resulting type after performing the path step
 		isPathStep()
-	***REMOVED***
+	}
 
 	// SliceIndex is an index operation on a slice or array at some index Key.
-	SliceIndex interface ***REMOVED***
+	SliceIndex interface {
 		PathStep
 		Key() int // May return -1 if in a split state
 
@@ -50,99 +50,99 @@ type (
 		SplitKeys() (x int, y int)
 
 		isSliceIndex()
-	***REMOVED***
+	}
 	// MapIndex is an index operation on a map at some index Key.
-	MapIndex interface ***REMOVED***
+	MapIndex interface {
 		PathStep
 		Key() reflect.Value
 		isMapIndex()
-	***REMOVED***
+	}
 	// TypeAssertion represents a type assertion on an interface.
-	TypeAssertion interface ***REMOVED***
+	TypeAssertion interface {
 		PathStep
 		isTypeAssertion()
-	***REMOVED***
+	}
 	// StructField represents a struct field access on a field called Name.
-	StructField interface ***REMOVED***
+	StructField interface {
 		PathStep
 		Name() string
 		Index() int
 		isStructField()
-	***REMOVED***
+	}
 	// Indirect represents pointer indirection on the parent type.
-	Indirect interface ***REMOVED***
+	Indirect interface {
 		PathStep
 		isIndirect()
-	***REMOVED***
+	}
 	// Transform is a transformation from the parent type to the current type.
-	Transform interface ***REMOVED***
+	Transform interface {
 		PathStep
 		Name() string
 		Func() reflect.Value
 		isTransform()
-	***REMOVED***
+	}
 )
 
-func (pa *Path) push(s PathStep) ***REMOVED***
+func (pa *Path) push(s PathStep) {
 	*pa = append(*pa, s)
-***REMOVED***
+}
 
-func (pa *Path) pop() ***REMOVED***
+func (pa *Path) pop() {
 	*pa = (*pa)[:len(*pa)-1]
-***REMOVED***
+}
 
 // Last returns the last PathStep in the Path.
 // If the path is empty, this returns a non-nil PathStep that reports a nil Type.
-func (pa Path) Last() PathStep ***REMOVED***
-	if len(pa) > 0 ***REMOVED***
+func (pa Path) Last() PathStep {
+	if len(pa) > 0 {
 		return pa[len(pa)-1]
-	***REMOVED***
-	return pathStep***REMOVED******REMOVED***
-***REMOVED***
+	}
+	return pathStep{}
+}
 
 // String returns the simplified path to a node.
 // The simplified path only contains struct field accesses.
 //
 // For example:
 //	MyMap.MySlices.MyField
-func (pa Path) String() string ***REMOVED***
+func (pa Path) String() string {
 	var ss []string
-	for _, s := range pa ***REMOVED***
-		if _, ok := s.(*structField); ok ***REMOVED***
+	for _, s := range pa {
+		if _, ok := s.(*structField); ok {
 			ss = append(ss, s.String())
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return strings.TrimPrefix(strings.Join(ss, ""), ".")
-***REMOVED***
+}
 
 // GoString returns the path to a specific node using Go syntax.
 //
 // For example:
 //	(*root.MyMap["key"].(*mypkg.MyStruct).MySlices)[2][3].MyField
-func (pa Path) GoString() string ***REMOVED***
+func (pa Path) GoString() string {
 	var ssPre, ssPost []string
 	var numIndirect int
-	for i, s := range pa ***REMOVED***
+	for i, s := range pa {
 		var nextStep PathStep
-		if i+1 < len(pa) ***REMOVED***
+		if i+1 < len(pa) {
 			nextStep = pa[i+1]
-		***REMOVED***
-		switch s := s.(type) ***REMOVED***
+		}
+		switch s := s.(type) {
 		case *indirect:
 			numIndirect++
 			pPre, pPost := "(", ")"
-			switch nextStep.(type) ***REMOVED***
+			switch nextStep.(type) {
 			case *indirect:
 				continue // Next step is indirection, so let them batch up
 			case *structField:
 				numIndirect-- // Automatic indirection on struct fields
 			case nil:
 				pPre, pPost = "", "" // Last step; no need for parenthesis
-			***REMOVED***
-			if numIndirect > 0 ***REMOVED***
+			}
+			if numIndirect > 0 {
 				ssPre = append(ssPre, pPre+strings.Repeat("*", numIndirect))
 				ssPost = append(ssPost, pPost)
-			***REMOVED***
+			}
 			numIndirect = 0
 			continue
 		case *transform:
@@ -152,39 +152,39 @@ func (pa Path) GoString() string ***REMOVED***
 		case *typeAssertion:
 			// Elide type assertions immediately following a transform to
 			// prevent overly verbose path printouts.
-			// Some transforms return interface***REMOVED******REMOVED*** because of Go's lack of
+			// Some transforms return interface{} because of Go's lack of
 			// generics, but typically take in and return the exact same
 			// concrete type. Other times, the transform creates an anonymous
 			// struct, which will be very verbose to print.
-			if _, ok := nextStep.(*transform); ok ***REMOVED***
+			if _, ok := nextStep.(*transform); ok {
 				continue
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		ssPost = append(ssPost, s.String())
-	***REMOVED***
-	for i, j := 0, len(ssPre)-1; i < j; i, j = i+1, j-1 ***REMOVED***
+	}
+	for i, j := 0, len(ssPre)-1; i < j; i, j = i+1, j-1 {
 		ssPre[i], ssPre[j] = ssPre[j], ssPre[i]
-	***REMOVED***
+	}
 	return strings.Join(ssPre, "") + strings.Join(ssPost, "")
-***REMOVED***
+}
 
 type (
-	pathStep struct ***REMOVED***
+	pathStep struct {
 		typ reflect.Type
-	***REMOVED***
+	}
 
-	sliceIndex struct ***REMOVED***
+	sliceIndex struct {
 		pathStep
 		xkey, ykey int
-	***REMOVED***
-	mapIndex struct ***REMOVED***
+	}
+	mapIndex struct {
 		pathStep
 		key reflect.Value
-	***REMOVED***
-	typeAssertion struct ***REMOVED***
+	}
+	typeAssertion struct {
 		pathStep
-	***REMOVED***
-	structField struct ***REMOVED***
+	}
+	structField struct {
 		pathStep
 		name string
 		idx  int
@@ -195,30 +195,30 @@ type (
 		force      bool                // Forcibly allow visibility
 		pvx, pvy   reflect.Value       // Parent values
 		field      reflect.StructField // Field information
-	***REMOVED***
-	indirect struct ***REMOVED***
+	}
+	indirect struct {
 		pathStep
-	***REMOVED***
-	transform struct ***REMOVED***
+	}
+	transform struct {
 		pathStep
 		trans *transformer
-	***REMOVED***
+	}
 )
 
-func (ps pathStep) Type() reflect.Type ***REMOVED*** return ps.typ ***REMOVED***
-func (ps pathStep) String() string ***REMOVED***
-	if ps.typ == nil ***REMOVED***
+func (ps pathStep) Type() reflect.Type { return ps.typ }
+func (ps pathStep) String() string {
+	if ps.typ == nil {
 		return "<nil>"
-	***REMOVED***
+	}
 	s := ps.typ.String()
-	if s == "" || strings.ContainsAny(s, "***REMOVED******REMOVED***\n") ***REMOVED***
+	if s == "" || strings.ContainsAny(s, "{}\n") {
 		return "root" // Type too simple or complex to print
-	***REMOVED***
-	return fmt.Sprintf("***REMOVED***%s***REMOVED***", s)
-***REMOVED***
+	}
+	return fmt.Sprintf("{%s}", s)
+}
 
-func (si sliceIndex) String() string ***REMOVED***
-	switch ***REMOVED***
+func (si sliceIndex) String() string {
+	switch {
 	case si.xkey == si.ykey:
 		return fmt.Sprintf("[%d]", si.xkey)
 	case si.ykey == -1:
@@ -230,64 +230,64 @@ func (si sliceIndex) String() string ***REMOVED***
 	default:
 		// [5->3] means "X[5] moved to Y[3]"
 		return fmt.Sprintf("[%d->%d]", si.xkey, si.ykey)
-	***REMOVED***
-***REMOVED***
-func (mi mapIndex) String() string      ***REMOVED*** return fmt.Sprintf("[%#v]", mi.key) ***REMOVED***
-func (ta typeAssertion) String() string ***REMOVED*** return fmt.Sprintf(".(%v)", ta.typ) ***REMOVED***
-func (sf structField) String() string   ***REMOVED*** return fmt.Sprintf(".%s", sf.name) ***REMOVED***
-func (in indirect) String() string      ***REMOVED*** return "*" ***REMOVED***
-func (tf transform) String() string     ***REMOVED*** return fmt.Sprintf("%s()", tf.trans.name) ***REMOVED***
+	}
+}
+func (mi mapIndex) String() string      { return fmt.Sprintf("[%#v]", mi.key) }
+func (ta typeAssertion) String() string { return fmt.Sprintf(".(%v)", ta.typ) }
+func (sf structField) String() string   { return fmt.Sprintf(".%s", sf.name) }
+func (in indirect) String() string      { return "*" }
+func (tf transform) String() string     { return fmt.Sprintf("%s()", tf.trans.name) }
 
-func (si sliceIndex) Key() int ***REMOVED***
-	if si.xkey != si.ykey ***REMOVED***
+func (si sliceIndex) Key() int {
+	if si.xkey != si.ykey {
 		return -1
-	***REMOVED***
+	}
 	return si.xkey
-***REMOVED***
-func (si sliceIndex) SplitKeys() (x, y int) ***REMOVED*** return si.xkey, si.ykey ***REMOVED***
-func (mi mapIndex) Key() reflect.Value      ***REMOVED*** return mi.key ***REMOVED***
-func (sf structField) Name() string         ***REMOVED*** return sf.name ***REMOVED***
-func (sf structField) Index() int           ***REMOVED*** return sf.idx ***REMOVED***
-func (tf transform) Name() string           ***REMOVED*** return tf.trans.name ***REMOVED***
-func (tf transform) Func() reflect.Value    ***REMOVED*** return tf.trans.fnc ***REMOVED***
+}
+func (si sliceIndex) SplitKeys() (x, y int) { return si.xkey, si.ykey }
+func (mi mapIndex) Key() reflect.Value      { return mi.key }
+func (sf structField) Name() string         { return sf.name }
+func (sf structField) Index() int           { return sf.idx }
+func (tf transform) Name() string           { return tf.trans.name }
+func (tf transform) Func() reflect.Value    { return tf.trans.fnc }
 
-func (pathStep) isPathStep()           ***REMOVED******REMOVED***
-func (sliceIndex) isSliceIndex()       ***REMOVED******REMOVED***
-func (mapIndex) isMapIndex()           ***REMOVED******REMOVED***
-func (typeAssertion) isTypeAssertion() ***REMOVED******REMOVED***
-func (structField) isStructField()     ***REMOVED******REMOVED***
-func (indirect) isIndirect()           ***REMOVED******REMOVED***
-func (transform) isTransform()         ***REMOVED******REMOVED***
+func (pathStep) isPathStep()           {}
+func (sliceIndex) isSliceIndex()       {}
+func (mapIndex) isMapIndex()           {}
+func (typeAssertion) isTypeAssertion() {}
+func (structField) isStructField()     {}
+func (indirect) isIndirect()           {}
+func (transform) isTransform()         {}
 
 var (
-	_ SliceIndex    = sliceIndex***REMOVED******REMOVED***
-	_ MapIndex      = mapIndex***REMOVED******REMOVED***
-	_ TypeAssertion = typeAssertion***REMOVED******REMOVED***
-	_ StructField   = structField***REMOVED******REMOVED***
-	_ Indirect      = indirect***REMOVED******REMOVED***
-	_ Transform     = transform***REMOVED******REMOVED***
+	_ SliceIndex    = sliceIndex{}
+	_ MapIndex      = mapIndex{}
+	_ TypeAssertion = typeAssertion{}
+	_ StructField   = structField{}
+	_ Indirect      = indirect{}
+	_ Transform     = transform{}
 
-	_ PathStep = sliceIndex***REMOVED******REMOVED***
-	_ PathStep = mapIndex***REMOVED******REMOVED***
-	_ PathStep = typeAssertion***REMOVED******REMOVED***
-	_ PathStep = structField***REMOVED******REMOVED***
-	_ PathStep = indirect***REMOVED******REMOVED***
-	_ PathStep = transform***REMOVED******REMOVED***
+	_ PathStep = sliceIndex{}
+	_ PathStep = mapIndex{}
+	_ PathStep = typeAssertion{}
+	_ PathStep = structField{}
+	_ PathStep = indirect{}
+	_ PathStep = transform{}
 )
 
 // isExported reports whether the identifier is exported.
-func isExported(id string) bool ***REMOVED***
+func isExported(id string) bool {
 	r, _ := utf8.DecodeRuneInString(id)
 	return unicode.IsUpper(r)
-***REMOVED***
+}
 
 // isValid reports whether the identifier is valid.
 // Empty and underscore-only strings are not valid.
-func isValid(id string) bool ***REMOVED***
+func isValid(id string) bool {
 	ok := id != "" && id != "_"
-	for j, c := range id ***REMOVED***
+	for j, c := range id {
 		ok = ok && (j > 0 || !unicode.IsDigit(c))
 		ok = ok && (c == '_' || unicode.IsLetter(c) || unicode.IsDigit(c))
-	***REMOVED***
+	}
 	return ok
-***REMOVED***
+}

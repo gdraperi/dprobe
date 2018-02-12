@@ -12,5 +12,5 @@ cat $1 | \
     grep -v '^#' | \
     sed 's/^[^<]*<\([^>]*\)>/\1/' | \
     grep '<.*>' | sed -e 's/[<>]/ /g' | \
-    awk '***REMOVED***if ($3 != "") ***REMOVED*** print $3" "$1 ***REMOVED*** else ***REMOVED***print $2" "$1***REMOVED******REMOVED***' | \
+    awk '{if ($3 != "") { print $3" "$1 } else {print $2" "$1}}' | \
     sort | uniq

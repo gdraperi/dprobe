@@ -45,13 +45,13 @@ const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 //     duration.seconds = end.seconds - start.seconds;
 //     duration.nanos = end.nanos - start.nanos;
 //
-//     if (duration.seconds < 0 && duration.nanos > 0) ***REMOVED***
+//     if (duration.seconds < 0 && duration.nanos > 0) {
 //       duration.seconds += 1;
 //       duration.nanos -= 1000000000;
-// ***REMOVED*** else if (durations.seconds > 0 && duration.nanos < 0) ***REMOVED***
+//     } else if (durations.seconds > 0 && duration.nanos < 0) {
 //       duration.seconds -= 1;
 //       duration.nanos += 1000000000;
-// ***REMOVED***
+//     }
 //
 // Example 2: Compute Timestamp from Timestamp + Duration in pseudo code.
 //
@@ -62,13 +62,13 @@ const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 //     end.seconds = start.seconds + duration.seconds;
 //     end.nanos = start.nanos + duration.nanos;
 //
-//     if (end.nanos < 0) ***REMOVED***
+//     if (end.nanos < 0) {
 //       end.seconds -= 1;
 //       end.nanos += 1000000000;
-// ***REMOVED*** else if (end.nanos >= 1000000000) ***REMOVED***
+//     } else if (end.nanos >= 1000000000) {
 //       end.seconds += 1;
 //       end.nanos -= 1000000000;
-// ***REMOVED***
+//     }
 //
 // Example 3: Compute Duration from datetime.timedelta in Python.
 //
@@ -87,7 +87,7 @@ const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 // microsecond should be expressed in JSON format as "3.000001s".
 //
 //
-type Duration struct ***REMOVED***
+type Duration struct {
 	// Signed seconds of the span of time. Must be from -315,576,000,000
 	// to +315,576,000,000 inclusive. Note: these bounds are computed from:
 	// 60 sec/min * 60 min/hr * 24 hr/day * 365.25 days/year * 10000 years
@@ -99,37 +99,37 @@ type Duration struct ***REMOVED***
 	// of the same sign as the `seconds` field. Must be from -999,999,999
 	// to +999,999,999 inclusive.
 	Nanos int32 `protobuf:"varint,2,opt,name=nanos" json:"nanos,omitempty"`
-***REMOVED***
+}
 
-func (m *Duration) Reset()                    ***REMOVED*** *m = Duration***REMOVED******REMOVED*** ***REMOVED***
-func (m *Duration) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*Duration) ProtoMessage()               ***REMOVED******REMOVED***
-func (*Duration) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***0***REMOVED*** ***REMOVED***
-func (*Duration) XXX_WellKnownType() string   ***REMOVED*** return "Duration" ***REMOVED***
+func (m *Duration) Reset()                    { *m = Duration{} }
+func (m *Duration) String() string            { return proto.CompactTextString(m) }
+func (*Duration) ProtoMessage()               {}
+func (*Duration) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
+func (*Duration) XXX_WellKnownType() string   { return "Duration" }
 
-func (m *Duration) GetSeconds() int64 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Duration) GetSeconds() int64 {
+	if m != nil {
 		return m.Seconds
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *Duration) GetNanos() int32 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Duration) GetNanos() int32 {
+	if m != nil {
 		return m.Nanos
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*Duration)(nil), "google.protobuf.Duration")
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterFile("github.com/golang/protobuf/ptypes/duration/duration.proto", fileDescriptor0)
-***REMOVED***
+}
 
-var fileDescriptor0 = []byte***REMOVED***
+var fileDescriptor0 = []byte{
 	// 189 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xb2, 0x4c, 0xcf, 0x2c, 0xc9,
 	0x28, 0x4d, 0xd2, 0x4b, 0xce, 0xcf, 0xd5, 0x4f, 0xcf, 0xcf, 0x49, 0xcc, 0x4b, 0xd7, 0x2f, 0x28,
@@ -143,4 +143,4 @@ var fileDescriptor0 = []byte***REMOVED***
 	0xb3, 0x7b, 0x80, 0xd3, 0x2a, 0x26, 0x39, 0x77, 0x88, 0xb9, 0x01, 0x50, 0xa5, 0x7a, 0xe1, 0xa9,
 	0x39, 0x39, 0xde, 0x79, 0xf9, 0xe5, 0x79, 0x21, 0x20, 0x2d, 0x49, 0x6c, 0x60, 0x33, 0x8c, 0x01,
 	0x01, 0x00, 0x00, 0xff, 0xff, 0x45, 0x5a, 0x81, 0x3d, 0x0e, 0x01, 0x00, 0x00,
-***REMOVED***
+}

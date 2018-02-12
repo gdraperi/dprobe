@@ -33,111 +33,111 @@ import (
 const FilePathSeparator = string(filepath.Separator)
 
 // Takes a reader and a path and writes the content
-func (a Afero) WriteReader(path string, r io.Reader) (err error) ***REMOVED***
+func (a Afero) WriteReader(path string, r io.Reader) (err error) {
 	return WriteReader(a.Fs, path, r)
-***REMOVED***
+}
 
-func WriteReader(fs Fs, path string, r io.Reader) (err error) ***REMOVED***
+func WriteReader(fs Fs, path string, r io.Reader) (err error) {
 	dir, _ := filepath.Split(path)
 	ospath := filepath.FromSlash(dir)
 
-	if ospath != "" ***REMOVED***
+	if ospath != "" {
 		err = fs.MkdirAll(ospath, 0777) // rwx, rw, r
-		if err != nil ***REMOVED***
-			if err != os.ErrExist ***REMOVED***
+		if err != nil {
+			if err != os.ErrExist {
 				return err
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	file, err := fs.Create(path)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	defer file.Close()
 
 	_, err = io.Copy(file, r)
 	return
-***REMOVED***
+}
 
 // Same as WriteReader but checks to see if file/directory already exists.
-func (a Afero) SafeWriteReader(path string, r io.Reader) (err error) ***REMOVED***
+func (a Afero) SafeWriteReader(path string, r io.Reader) (err error) {
 	return SafeWriteReader(a.Fs, path, r)
-***REMOVED***
+}
 
-func SafeWriteReader(fs Fs, path string, r io.Reader) (err error) ***REMOVED***
+func SafeWriteReader(fs Fs, path string, r io.Reader) (err error) {
 	dir, _ := filepath.Split(path)
 	ospath := filepath.FromSlash(dir)
 
-	if ospath != "" ***REMOVED***
+	if ospath != "" {
 		err = fs.MkdirAll(ospath, 0777) // rwx, rw, r
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	exists, err := Exists(fs, path)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
-	if exists ***REMOVED***
+	}
+	if exists {
 		return fmt.Errorf("%v already exists", path)
-	***REMOVED***
+	}
 
 	file, err := fs.Create(path)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	defer file.Close()
 
 	_, err = io.Copy(file, r)
 	return
-***REMOVED***
+}
 
-func (a Afero) GetTempDir(subPath string) string ***REMOVED***
+func (a Afero) GetTempDir(subPath string) string {
 	return GetTempDir(a.Fs, subPath)
-***REMOVED***
+}
 
 // GetTempDir returns the default temp directory with trailing slash
 // if subPath is not empty then it will be created recursively with mode 777 rwx rwx rwx
-func GetTempDir(fs Fs, subPath string) string ***REMOVED***
-	addSlash := func(p string) string ***REMOVED***
-		if FilePathSeparator != p[len(p)-1:] ***REMOVED***
+func GetTempDir(fs Fs, subPath string) string {
+	addSlash := func(p string) string {
+		if FilePathSeparator != p[len(p)-1:] {
 			p = p + FilePathSeparator
-		***REMOVED***
+		}
 		return p
-	***REMOVED***
+	}
 	dir := addSlash(os.TempDir())
 
-	if subPath != "" ***REMOVED***
+	if subPath != "" {
 		// preserve windows backslash :-(
-		if FilePathSeparator == "\\" ***REMOVED***
+		if FilePathSeparator == "\\" {
 			subPath = strings.Replace(subPath, "\\", "____", -1)
-		***REMOVED***
+		}
 		dir = dir + UnicodeSanitize((subPath))
-		if FilePathSeparator == "\\" ***REMOVED***
+		if FilePathSeparator == "\\" {
 			dir = strings.Replace(dir, "____", "\\", -1)
-		***REMOVED***
+		}
 
-		if exists, _ := Exists(fs, dir); exists ***REMOVED***
+		if exists, _ := Exists(fs, dir); exists {
 			return addSlash(dir)
-		***REMOVED***
+		}
 
 		err := fs.MkdirAll(dir, 0777)
-		if err != nil ***REMOVED***
+		if err != nil {
 			panic(err)
-		***REMOVED***
+		}
 		dir = addSlash(dir)
-	***REMOVED***
+	}
 	return dir
-***REMOVED***
+}
 
 // Rewrite string to remove non-standard path characters
-func UnicodeSanitize(s string) string ***REMOVED***
+func UnicodeSanitize(s string) string {
 	source := []rune(s)
 	target := make([]rune, 0, len(source))
 
-	for _, r := range source ***REMOVED***
+	for _, r := range source {
 		if unicode.IsLetter(r) ||
 			unicode.IsDigit(r) ||
 			unicode.IsMark(r) ||
@@ -148,74 +148,74 @@ func UnicodeSanitize(s string) string ***REMOVED***
 			r == '-' ||
 			r == '%' ||
 			r == ' ' ||
-			r == '#' ***REMOVED***
+			r == '#' {
 			target = append(target, r)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return string(target)
-***REMOVED***
+}
 
 // Transform characters with accents into plain forms.
-func NeuterAccents(s string) string ***REMOVED***
+func NeuterAccents(s string) string {
 	t := transform.Chain(norm.NFD, transform.RemoveFunc(isMn), norm.NFC)
 	result, _, _ := transform.String(t, string(s))
 
 	return result
-***REMOVED***
+}
 
-func isMn(r rune) bool ***REMOVED***
+func isMn(r rune) bool {
 	return unicode.Is(unicode.Mn, r) // Mn: nonspacing marks
-***REMOVED***
+}
 
-func (a Afero) FileContainsBytes(filename string, subslice []byte) (bool, error) ***REMOVED***
+func (a Afero) FileContainsBytes(filename string, subslice []byte) (bool, error) {
 	return FileContainsBytes(a.Fs, filename, subslice)
-***REMOVED***
+}
 
 // Check if a file contains a specified byte slice.
-func FileContainsBytes(fs Fs, filename string, subslice []byte) (bool, error) ***REMOVED***
+func FileContainsBytes(fs Fs, filename string, subslice []byte) (bool, error) {
 	f, err := fs.Open(filename)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return false, err
-	***REMOVED***
+	}
 	defer f.Close()
 
 	return readerContainsAny(f, subslice), nil
-***REMOVED***
+}
 
-func (a Afero) FileContainsAnyBytes(filename string, subslices [][]byte) (bool, error) ***REMOVED***
+func (a Afero) FileContainsAnyBytes(filename string, subslices [][]byte) (bool, error) {
 	return FileContainsAnyBytes(a.Fs, filename, subslices)
-***REMOVED***
+}
 
 // Check if a file contains any of the specified byte slices.
-func FileContainsAnyBytes(fs Fs, filename string, subslices [][]byte) (bool, error) ***REMOVED***
+func FileContainsAnyBytes(fs Fs, filename string, subslices [][]byte) (bool, error) {
 	f, err := fs.Open(filename)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return false, err
-	***REMOVED***
+	}
 	defer f.Close()
 
 	return readerContainsAny(f, subslices...), nil
-***REMOVED***
+}
 
 // readerContains reports whether any of the subslices is within r.
-func readerContainsAny(r io.Reader, subslices ...[]byte) bool ***REMOVED***
+func readerContainsAny(r io.Reader, subslices ...[]byte) bool {
 
-	if r == nil || len(subslices) == 0 ***REMOVED***
+	if r == nil || len(subslices) == 0 {
 		return false
-	***REMOVED***
+	}
 
 	largestSlice := 0
 
-	for _, sl := range subslices ***REMOVED***
-		if len(sl) > largestSlice ***REMOVED***
+	for _, sl := range subslices {
+		if len(sl) > largestSlice {
 			largestSlice = len(sl)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if largestSlice == 0 ***REMOVED***
+	if largestSlice == 0 {
 		return false
-	***REMOVED***
+	}
 
 	bufflen := largestSlice * 4
 	halflen := bufflen / 2
@@ -223,108 +223,108 @@ func readerContainsAny(r io.Reader, subslices ...[]byte) bool ***REMOVED***
 	var err error
 	var n, i int
 
-	for ***REMOVED***
+	for {
 		i++
-		if i == 1 ***REMOVED***
+		if i == 1 {
 			n, err = io.ReadAtLeast(r, buff[:halflen], halflen)
-		***REMOVED*** else ***REMOVED***
-			if i != 2 ***REMOVED***
+		} else {
+			if i != 2 {
 				// shift left to catch overlapping matches
 				copy(buff[:], buff[halflen:])
-			***REMOVED***
+			}
 			n, err = io.ReadAtLeast(r, buff[halflen:], halflen)
-		***REMOVED***
+		}
 
-		if n > 0 ***REMOVED***
-			for _, sl := range subslices ***REMOVED***
-				if bytes.Contains(buff, sl) ***REMOVED***
+		if n > 0 {
+			for _, sl := range subslices {
+				if bytes.Contains(buff, sl) {
 					return true
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
+				}
+			}
+		}
 
-		if err != nil ***REMOVED***
+		if err != nil {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false
-***REMOVED***
+}
 
-func (a Afero) DirExists(path string) (bool, error) ***REMOVED***
+func (a Afero) DirExists(path string) (bool, error) {
 	return DirExists(a.Fs, path)
-***REMOVED***
+}
 
 // DirExists checks if a path exists and is a directory.
-func DirExists(fs Fs, path string) (bool, error) ***REMOVED***
+func DirExists(fs Fs, path string) (bool, error) {
 	fi, err := fs.Stat(path)
-	if err == nil && fi.IsDir() ***REMOVED***
+	if err == nil && fi.IsDir() {
 		return true, nil
-	***REMOVED***
-	if os.IsNotExist(err) ***REMOVED***
+	}
+	if os.IsNotExist(err) {
 		return false, nil
-	***REMOVED***
+	}
 	return false, err
-***REMOVED***
+}
 
-func (a Afero) IsDir(path string) (bool, error) ***REMOVED***
+func (a Afero) IsDir(path string) (bool, error) {
 	return IsDir(a.Fs, path)
-***REMOVED***
+}
 
 // IsDir checks if a given path is a directory.
-func IsDir(fs Fs, path string) (bool, error) ***REMOVED***
+func IsDir(fs Fs, path string) (bool, error) {
 	fi, err := fs.Stat(path)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return false, err
-	***REMOVED***
+	}
 	return fi.IsDir(), nil
-***REMOVED***
+}
 
-func (a Afero) IsEmpty(path string) (bool, error) ***REMOVED***
+func (a Afero) IsEmpty(path string) (bool, error) {
 	return IsEmpty(a.Fs, path)
-***REMOVED***
+}
 
 // IsEmpty checks if a given file or directory is empty.
-func IsEmpty(fs Fs, path string) (bool, error) ***REMOVED***
-	if b, _ := Exists(fs, path); !b ***REMOVED***
+func IsEmpty(fs Fs, path string) (bool, error) {
+	if b, _ := Exists(fs, path); !b {
 		return false, fmt.Errorf("%q path does not exist", path)
-	***REMOVED***
+	}
 	fi, err := fs.Stat(path)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return false, err
-	***REMOVED***
-	if fi.IsDir() ***REMOVED***
+	}
+	if fi.IsDir() {
 		f, err := fs.Open(path)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return false, err
-		***REMOVED***
+		}
 		defer f.Close()
 		list, err := f.Readdir(-1)
 		return len(list) == 0, nil
-	***REMOVED***
+	}
 	return fi.Size() == 0, nil
-***REMOVED***
+}
 
-func (a Afero) Exists(path string) (bool, error) ***REMOVED***
+func (a Afero) Exists(path string) (bool, error) {
 	return Exists(a.Fs, path)
-***REMOVED***
+}
 
 // Check if a file or directory exists.
-func Exists(fs Fs, path string) (bool, error) ***REMOVED***
+func Exists(fs Fs, path string) (bool, error) {
 	_, err := fs.Stat(path)
-	if err == nil ***REMOVED***
+	if err == nil {
 		return true, nil
-	***REMOVED***
-	if os.IsNotExist(err) ***REMOVED***
+	}
+	if os.IsNotExist(err) {
 		return false, nil
-	***REMOVED***
+	}
 	return false, err
-***REMOVED***
+}
 
-func FullBaseFsPath(basePathFs *BasePathFs, relativePath string) string ***REMOVED***
+func FullBaseFsPath(basePathFs *BasePathFs, relativePath string) string {
 	combinedPath := filepath.Join(basePathFs.path, relativePath)
-	if parent, ok := basePathFs.source.(*BasePathFs); ok ***REMOVED***
+	if parent, ok := basePathFs.source.(*BasePathFs); ok {
 		return FullBaseFsPath(parent, combinedPath)
-	***REMOVED***
+	}
 
 	return combinedPath
-***REMOVED***
+}

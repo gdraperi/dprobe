@@ -12,8 +12,8 @@ import (
 	"github.com/docker/docker/pkg/stringid"
 )
 
-type windowsParser struct ***REMOVED***
-***REMOVED***
+type windowsParser struct {
+}
 
 const (
 	// Spec should be in the format [source:]destination[:mode]
@@ -42,7 +42,7 @@ const (
 	rxReservedNames = `(con)|(prn)|(nul)|(aux)|(com[1-9])|(lpt[1-9])`
 
 	// rxPipe is a named path pipe (starts with `\\.\pipe\`, possibly with / instead of \)
-	rxPipe = `[/\\]***REMOVED***2***REMOVED***.[/\\]pipe[/\\][^:*?"<>|\r\n]+`
+	rxPipe = `[/\\]{2}.[/\\]pipe[/\\][^:*?"<>|\r\n]+`
 	// rxSource is the combined possibilities for a source
 	rxSource = `((?P<source>((` + rxHostDir + `)|(` + rxName + `)|(` + rxPipe + `))):)?`
 
@@ -78,247 +78,247 @@ const (
 
 type mountValidator func(mnt *mount.Mount) error
 
-func windowsSplitRawSpec(raw, destRegex string) ([]string, error) ***REMOVED***
+func windowsSplitRawSpec(raw, destRegex string) ([]string, error) {
 	specExp := regexp.MustCompile(`^` + rxSource + destRegex + rxMode + `$`)
 	match := specExp.FindStringSubmatch(strings.ToLower(raw))
 
 	// Must have something back
-	if len(match) == 0 ***REMOVED***
+	if len(match) == 0 {
 		return nil, errInvalidSpec(raw)
-	***REMOVED***
+	}
 
 	var split []string
 	matchgroups := make(map[string]string)
 	// Pull out the sub expressions from the named capture groups
-	for i, name := range specExp.SubexpNames() ***REMOVED***
+	for i, name := range specExp.SubexpNames() {
 		matchgroups[name] = strings.ToLower(match[i])
-	***REMOVED***
-	if source, exists := matchgroups["source"]; exists ***REMOVED***
-		if source != "" ***REMOVED***
+	}
+	if source, exists := matchgroups["source"]; exists {
+		if source != "" {
 			split = append(split, source)
-		***REMOVED***
-	***REMOVED***
-	if destination, exists := matchgroups["destination"]; exists ***REMOVED***
-		if destination != "" ***REMOVED***
+		}
+	}
+	if destination, exists := matchgroups["destination"]; exists {
+		if destination != "" {
 			split = append(split, destination)
-		***REMOVED***
-	***REMOVED***
-	if mode, exists := matchgroups["mode"]; exists ***REMOVED***
-		if mode != "" ***REMOVED***
+		}
+	}
+	if mode, exists := matchgroups["mode"]; exists {
+		if mode != "" {
 			split = append(split, mode)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	// Fix #26329. If the destination appears to be a file, and the source is null,
 	// it may be because we've fallen through the possible naming regex and hit a
 	// situation where the user intention was to map a file into a container through
 	// a local volume, but this is not supported by the platform.
-	if matchgroups["source"] == "" && matchgroups["destination"] != "" ***REMOVED***
+	if matchgroups["source"] == "" && matchgroups["destination"] != "" {
 		volExp := regexp.MustCompile(`^` + rxName + `$`)
 		reservedNameExp := regexp.MustCompile(`^` + rxReservedNames + `$`)
 
-		if volExp.MatchString(matchgroups["destination"]) ***REMOVED***
-			if reservedNameExp.MatchString(matchgroups["destination"]) ***REMOVED***
+		if volExp.MatchString(matchgroups["destination"]) {
+			if reservedNameExp.MatchString(matchgroups["destination"]) {
 				return nil, fmt.Errorf("volume name %q cannot be a reserved word for Windows filenames", matchgroups["destination"])
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
+			}
+		} else {
 
 			exists, isDir, _ := currentFileInfoProvider.fileInfo(matchgroups["destination"])
-			if exists && !isDir ***REMOVED***
+			if exists && !isDir {
 				return nil, fmt.Errorf("file '%s' cannot be mapped. Only directories can be mapped on this platform", matchgroups["destination"])
 
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return split, nil
-***REMOVED***
+}
 
-func windowsValidMountMode(mode string) bool ***REMOVED***
-	if mode == "" ***REMOVED***
+func windowsValidMountMode(mode string) bool {
+	if mode == "" {
 		return true
-	***REMOVED***
+	}
 	return rwModes[strings.ToLower(mode)]
-***REMOVED***
-func windowsValidateNotRoot(p string) error ***REMOVED***
+}
+func windowsValidateNotRoot(p string) error {
 	p = strings.ToLower(strings.Replace(p, `/`, `\`, -1))
-	if p == "c:" || p == `c:\` ***REMOVED***
+	if p == "c:" || p == `c:\` {
 		return fmt.Errorf("destination path cannot be `c:` or `c:\\`: %v", p)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-var windowsSpecificValidators mountValidator = func(mnt *mount.Mount) error ***REMOVED***
+var windowsSpecificValidators mountValidator = func(mnt *mount.Mount) error {
 	return windowsValidateNotRoot(mnt.Target)
-***REMOVED***
+}
 
-func windowsValidateRegex(p, r string) error ***REMOVED***
-	if regexp.MustCompile(`^` + r + `$`).MatchString(strings.ToLower(p)) ***REMOVED***
+func windowsValidateRegex(p, r string) error {
+	if regexp.MustCompile(`^` + r + `$`).MatchString(strings.ToLower(p)) {
 		return nil
-	***REMOVED***
+	}
 	return fmt.Errorf("invalid mount path: '%s'", p)
-***REMOVED***
-func windowsValidateAbsolute(p string) error ***REMOVED***
-	if err := windowsValidateRegex(p, rxDestination); err != nil ***REMOVED***
+}
+func windowsValidateAbsolute(p string) error {
+	if err := windowsValidateRegex(p, rxDestination); err != nil {
 		return fmt.Errorf("invalid mount path: '%s' mount path must be absolute", p)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func windowsDetectMountType(p string) mount.Type ***REMOVED***
-	if strings.HasPrefix(p, `\\.\pipe\`) ***REMOVED***
+func windowsDetectMountType(p string) mount.Type {
+	if strings.HasPrefix(p, `\\.\pipe\`) {
 		return mount.TypeNamedPipe
-	***REMOVED*** else if regexp.MustCompile(`^` + rxHostDir + `$`).MatchString(p) ***REMOVED***
+	} else if regexp.MustCompile(`^` + rxHostDir + `$`).MatchString(p) {
 		return mount.TypeBind
-	***REMOVED*** else ***REMOVED***
+	} else {
 		return mount.TypeVolume
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (p *windowsParser) ReadWrite(mode string) bool ***REMOVED***
+func (p *windowsParser) ReadWrite(mode string) bool {
 	return strings.ToLower(mode) != "ro"
-***REMOVED***
+}
 
 // IsVolumeNameValid checks a volume name in a platform specific manner.
-func (p *windowsParser) ValidateVolumeName(name string) error ***REMOVED***
+func (p *windowsParser) ValidateVolumeName(name string) error {
 	nameExp := regexp.MustCompile(`^` + rxName + `$`)
-	if !nameExp.MatchString(name) ***REMOVED***
+	if !nameExp.MatchString(name) {
 		return errors.New("invalid volume name")
-	***REMOVED***
+	}
 	nameExp = regexp.MustCompile(`^` + rxReservedNames + `$`)
-	if nameExp.MatchString(name) ***REMOVED***
+	if nameExp.MatchString(name) {
 		return fmt.Errorf("volume name %q cannot be a reserved word for Windows filenames", name)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (p *windowsParser) ValidateMountConfig(mnt *mount.Mount) error ***REMOVED***
+}
+func (p *windowsParser) ValidateMountConfig(mnt *mount.Mount) error {
 	return p.validateMountConfigReg(mnt, rxDestination, windowsSpecificValidators)
-***REMOVED***
+}
 
-type fileInfoProvider interface ***REMOVED***
+type fileInfoProvider interface {
 	fileInfo(path string) (exist, isDir bool, err error)
-***REMOVED***
+}
 
-type defaultFileInfoProvider struct ***REMOVED***
-***REMOVED***
+type defaultFileInfoProvider struct {
+}
 
-func (defaultFileInfoProvider) fileInfo(path string) (exist, isDir bool, err error) ***REMOVED***
+func (defaultFileInfoProvider) fileInfo(path string) (exist, isDir bool, err error) {
 	fi, err := os.Stat(path)
-	if err != nil ***REMOVED***
-		if !os.IsNotExist(err) ***REMOVED***
+	if err != nil {
+		if !os.IsNotExist(err) {
 			return false, false, err
-		***REMOVED***
+		}
 		return false, false, nil
-	***REMOVED***
+	}
 	return true, fi.IsDir(), nil
-***REMOVED***
+}
 
-var currentFileInfoProvider fileInfoProvider = defaultFileInfoProvider***REMOVED******REMOVED***
+var currentFileInfoProvider fileInfoProvider = defaultFileInfoProvider{}
 
-func (p *windowsParser) validateMountConfigReg(mnt *mount.Mount, destRegex string, additionalValidators ...mountValidator) error ***REMOVED***
+func (p *windowsParser) validateMountConfigReg(mnt *mount.Mount, destRegex string, additionalValidators ...mountValidator) error {
 
-	for _, v := range additionalValidators ***REMOVED***
-		if err := v(mnt); err != nil ***REMOVED***
-			return &errMountConfig***REMOVED***mnt, err***REMOVED***
-		***REMOVED***
-	***REMOVED***
-	if len(mnt.Target) == 0 ***REMOVED***
-		return &errMountConfig***REMOVED***mnt, errMissingField("Target")***REMOVED***
-	***REMOVED***
+	for _, v := range additionalValidators {
+		if err := v(mnt); err != nil {
+			return &errMountConfig{mnt, err}
+		}
+	}
+	if len(mnt.Target) == 0 {
+		return &errMountConfig{mnt, errMissingField("Target")}
+	}
 
-	if err := windowsValidateRegex(mnt.Target, destRegex); err != nil ***REMOVED***
-		return &errMountConfig***REMOVED***mnt, err***REMOVED***
-	***REMOVED***
+	if err := windowsValidateRegex(mnt.Target, destRegex); err != nil {
+		return &errMountConfig{mnt, err}
+	}
 
-	switch mnt.Type ***REMOVED***
+	switch mnt.Type {
 	case mount.TypeBind:
-		if len(mnt.Source) == 0 ***REMOVED***
-			return &errMountConfig***REMOVED***mnt, errMissingField("Source")***REMOVED***
-		***REMOVED***
+		if len(mnt.Source) == 0 {
+			return &errMountConfig{mnt, errMissingField("Source")}
+		}
 		// Don't error out just because the propagation mode is not supported on the platform
-		if opts := mnt.BindOptions; opts != nil ***REMOVED***
-			if len(opts.Propagation) > 0 ***REMOVED***
-				return &errMountConfig***REMOVED***mnt, fmt.Errorf("invalid propagation mode: %s", opts.Propagation)***REMOVED***
-			***REMOVED***
-		***REMOVED***
-		if mnt.VolumeOptions != nil ***REMOVED***
-			return &errMountConfig***REMOVED***mnt, errExtraField("VolumeOptions")***REMOVED***
-		***REMOVED***
+		if opts := mnt.BindOptions; opts != nil {
+			if len(opts.Propagation) > 0 {
+				return &errMountConfig{mnt, fmt.Errorf("invalid propagation mode: %s", opts.Propagation)}
+			}
+		}
+		if mnt.VolumeOptions != nil {
+			return &errMountConfig{mnt, errExtraField("VolumeOptions")}
+		}
 
-		if err := windowsValidateAbsolute(mnt.Source); err != nil ***REMOVED***
-			return &errMountConfig***REMOVED***mnt, err***REMOVED***
-		***REMOVED***
+		if err := windowsValidateAbsolute(mnt.Source); err != nil {
+			return &errMountConfig{mnt, err}
+		}
 
 		exists, isdir, err := currentFileInfoProvider.fileInfo(mnt.Source)
-		if err != nil ***REMOVED***
-			return &errMountConfig***REMOVED***mnt, err***REMOVED***
-		***REMOVED***
-		if !exists ***REMOVED***
-			return &errMountConfig***REMOVED***mnt, errBindNotExist***REMOVED***
-		***REMOVED***
-		if !isdir ***REMOVED***
-			return &errMountConfig***REMOVED***mnt, fmt.Errorf("source path must be a directory")***REMOVED***
-		***REMOVED***
+		if err != nil {
+			return &errMountConfig{mnt, err}
+		}
+		if !exists {
+			return &errMountConfig{mnt, errBindNotExist}
+		}
+		if !isdir {
+			return &errMountConfig{mnt, fmt.Errorf("source path must be a directory")}
+		}
 
 	case mount.TypeVolume:
-		if mnt.BindOptions != nil ***REMOVED***
-			return &errMountConfig***REMOVED***mnt, errExtraField("BindOptions")***REMOVED***
-		***REMOVED***
+		if mnt.BindOptions != nil {
+			return &errMountConfig{mnt, errExtraField("BindOptions")}
+		}
 
-		if len(mnt.Source) == 0 && mnt.ReadOnly ***REMOVED***
-			return &errMountConfig***REMOVED***mnt, fmt.Errorf("must not set ReadOnly mode when using anonymous volumes")***REMOVED***
-		***REMOVED***
+		if len(mnt.Source) == 0 && mnt.ReadOnly {
+			return &errMountConfig{mnt, fmt.Errorf("must not set ReadOnly mode when using anonymous volumes")}
+		}
 
-		if len(mnt.Source) != 0 ***REMOVED***
-			if err := p.ValidateVolumeName(mnt.Source); err != nil ***REMOVED***
-				return &errMountConfig***REMOVED***mnt, err***REMOVED***
-			***REMOVED***
-		***REMOVED***
+		if len(mnt.Source) != 0 {
+			if err := p.ValidateVolumeName(mnt.Source); err != nil {
+				return &errMountConfig{mnt, err}
+			}
+		}
 	case mount.TypeNamedPipe:
-		if len(mnt.Source) == 0 ***REMOVED***
-			return &errMountConfig***REMOVED***mnt, errMissingField("Source")***REMOVED***
-		***REMOVED***
+		if len(mnt.Source) == 0 {
+			return &errMountConfig{mnt, errMissingField("Source")}
+		}
 
-		if mnt.BindOptions != nil ***REMOVED***
-			return &errMountConfig***REMOVED***mnt, errExtraField("BindOptions")***REMOVED***
-		***REMOVED***
+		if mnt.BindOptions != nil {
+			return &errMountConfig{mnt, errExtraField("BindOptions")}
+		}
 
-		if mnt.ReadOnly ***REMOVED***
-			return &errMountConfig***REMOVED***mnt, errExtraField("ReadOnly")***REMOVED***
-		***REMOVED***
+		if mnt.ReadOnly {
+			return &errMountConfig{mnt, errExtraField("ReadOnly")}
+		}
 
-		if windowsDetectMountType(mnt.Source) != mount.TypeNamedPipe ***REMOVED***
-			return &errMountConfig***REMOVED***mnt, fmt.Errorf("'%s' is not a valid pipe path", mnt.Source)***REMOVED***
-		***REMOVED***
+		if windowsDetectMountType(mnt.Source) != mount.TypeNamedPipe {
+			return &errMountConfig{mnt, fmt.Errorf("'%s' is not a valid pipe path", mnt.Source)}
+		}
 
-		if windowsDetectMountType(mnt.Target) != mount.TypeNamedPipe ***REMOVED***
-			return &errMountConfig***REMOVED***mnt, fmt.Errorf("'%s' is not a valid pipe path", mnt.Target)***REMOVED***
-		***REMOVED***
+		if windowsDetectMountType(mnt.Target) != mount.TypeNamedPipe {
+			return &errMountConfig{mnt, fmt.Errorf("'%s' is not a valid pipe path", mnt.Target)}
+		}
 	default:
-		return &errMountConfig***REMOVED***mnt, errors.New("mount type unknown")***REMOVED***
-	***REMOVED***
+		return &errMountConfig{mnt, errors.New("mount type unknown")}
+	}
 	return nil
-***REMOVED***
-func (p *windowsParser) ParseMountRaw(raw, volumeDriver string) (*MountPoint, error) ***REMOVED***
+}
+func (p *windowsParser) ParseMountRaw(raw, volumeDriver string) (*MountPoint, error) {
 	return p.parseMountRaw(raw, volumeDriver, rxDestination, true, windowsSpecificValidators)
-***REMOVED***
+}
 
-func (p *windowsParser) parseMountRaw(raw, volumeDriver, destRegex string, convertTargetToBackslash bool, additionalValidators ...mountValidator) (*MountPoint, error) ***REMOVED***
+func (p *windowsParser) parseMountRaw(raw, volumeDriver, destRegex string, convertTargetToBackslash bool, additionalValidators ...mountValidator) (*MountPoint, error) {
 	arr, err := windowsSplitRawSpec(raw, destRegex)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	var spec mount.Mount
 	var mode string
-	switch len(arr) ***REMOVED***
+	switch len(arr) {
 	case 1:
 		// Just a destination path in the container
 		spec.Target = arr[0]
 	case 2:
-		if windowsValidMountMode(arr[1]) ***REMOVED***
+		if windowsValidMountMode(arr[1]) {
 			// Destination + Mode is not a valid volume - volumes
 			// cannot include a mode. e.g. /foo:rw
 			return nil, errInvalidSpec(raw)
-		***REMOVED***
+		}
 		// Host Source Path or Name + Destination
 		spec.Source = strings.Replace(arr[0], `/`, `\`, -1)
 		spec.Target = arr[1]
@@ -329,128 +329,128 @@ func (p *windowsParser) parseMountRaw(raw, volumeDriver, destRegex string, conve
 		mode = arr[2]
 	default:
 		return nil, errInvalidSpec(raw)
-	***REMOVED***
-	if convertTargetToBackslash ***REMOVED***
+	}
+	if convertTargetToBackslash {
 		spec.Target = strings.Replace(spec.Target, `/`, `\`, -1)
-	***REMOVED***
+	}
 
-	if !windowsValidMountMode(mode) ***REMOVED***
+	if !windowsValidMountMode(mode) {
 		return nil, errInvalidMode(mode)
-	***REMOVED***
+	}
 
 	spec.Type = windowsDetectMountType(spec.Source)
 	spec.ReadOnly = !p.ReadWrite(mode)
 
 	// cannot assume that if a volume driver is passed in that we should set it
-	if volumeDriver != "" && spec.Type == mount.TypeVolume ***REMOVED***
-		spec.VolumeOptions = &mount.VolumeOptions***REMOVED***
-			DriverConfig: &mount.Driver***REMOVED***Name: volumeDriver***REMOVED***,
-		***REMOVED***
-	***REMOVED***
+	if volumeDriver != "" && spec.Type == mount.TypeVolume {
+		spec.VolumeOptions = &mount.VolumeOptions{
+			DriverConfig: &mount.Driver{Name: volumeDriver},
+		}
+	}
 
-	if copyData, isSet := getCopyMode(mode, p.DefaultCopyMode()); isSet ***REMOVED***
-		if spec.VolumeOptions == nil ***REMOVED***
-			spec.VolumeOptions = &mount.VolumeOptions***REMOVED******REMOVED***
-		***REMOVED***
+	if copyData, isSet := getCopyMode(mode, p.DefaultCopyMode()); isSet {
+		if spec.VolumeOptions == nil {
+			spec.VolumeOptions = &mount.VolumeOptions{}
+		}
 		spec.VolumeOptions.NoCopy = !copyData
-	***REMOVED***
+	}
 
 	mp, err := p.parseMountSpec(spec, destRegex, convertTargetToBackslash, additionalValidators...)
-	if mp != nil ***REMOVED***
+	if mp != nil {
 		mp.Mode = mode
-	***REMOVED***
-	if err != nil ***REMOVED***
+	}
+	if err != nil {
 		err = fmt.Errorf("%v: %v", errInvalidSpec(raw), err)
-	***REMOVED***
+	}
 	return mp, err
-***REMOVED***
+}
 
-func (p *windowsParser) ParseMountSpec(cfg mount.Mount) (*MountPoint, error) ***REMOVED***
+func (p *windowsParser) ParseMountSpec(cfg mount.Mount) (*MountPoint, error) {
 	return p.parseMountSpec(cfg, rxDestination, true, windowsSpecificValidators)
-***REMOVED***
-func (p *windowsParser) parseMountSpec(cfg mount.Mount, destRegex string, convertTargetToBackslash bool, additionalValidators ...mountValidator) (*MountPoint, error) ***REMOVED***
-	if err := p.validateMountConfigReg(&cfg, destRegex, additionalValidators...); err != nil ***REMOVED***
+}
+func (p *windowsParser) parseMountSpec(cfg mount.Mount, destRegex string, convertTargetToBackslash bool, additionalValidators ...mountValidator) (*MountPoint, error) {
+	if err := p.validateMountConfigReg(&cfg, destRegex, additionalValidators...); err != nil {
 		return nil, err
-	***REMOVED***
-	mp := &MountPoint***REMOVED***
+	}
+	mp := &MountPoint{
 		RW:          !cfg.ReadOnly,
 		Destination: cfg.Target,
 		Type:        cfg.Type,
 		Spec:        cfg,
-	***REMOVED***
-	if convertTargetToBackslash ***REMOVED***
+	}
+	if convertTargetToBackslash {
 		mp.Destination = strings.Replace(cfg.Target, `/`, `\`, -1)
-	***REMOVED***
+	}
 
-	switch cfg.Type ***REMOVED***
+	switch cfg.Type {
 	case mount.TypeVolume:
-		if cfg.Source == "" ***REMOVED***
+		if cfg.Source == "" {
 			mp.Name = stringid.GenerateNonCryptoID()
-		***REMOVED*** else ***REMOVED***
+		} else {
 			mp.Name = cfg.Source
-		***REMOVED***
+		}
 		mp.CopyData = p.DefaultCopyMode()
 
-		if cfg.VolumeOptions != nil ***REMOVED***
-			if cfg.VolumeOptions.DriverConfig != nil ***REMOVED***
+		if cfg.VolumeOptions != nil {
+			if cfg.VolumeOptions.DriverConfig != nil {
 				mp.Driver = cfg.VolumeOptions.DriverConfig.Name
-			***REMOVED***
-			if cfg.VolumeOptions.NoCopy ***REMOVED***
+			}
+			if cfg.VolumeOptions.NoCopy {
 				mp.CopyData = false
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 	case mount.TypeBind:
 		mp.Source = strings.Replace(cfg.Source, `/`, `\`, -1)
 	case mount.TypeNamedPipe:
 		mp.Source = strings.Replace(cfg.Source, `/`, `\`, -1)
-	***REMOVED***
+	}
 	// cleanup trailing `\` except for paths like `c:\`
-	if len(mp.Source) > 3 && mp.Source[len(mp.Source)-1] == '\\' ***REMOVED***
+	if len(mp.Source) > 3 && mp.Source[len(mp.Source)-1] == '\\' {
 		mp.Source = mp.Source[:len(mp.Source)-1]
-	***REMOVED***
-	if len(mp.Destination) > 3 && mp.Destination[len(mp.Destination)-1] == '\\' ***REMOVED***
+	}
+	if len(mp.Destination) > 3 && mp.Destination[len(mp.Destination)-1] == '\\' {
 		mp.Destination = mp.Destination[:len(mp.Destination)-1]
-	***REMOVED***
+	}
 	return mp, nil
-***REMOVED***
+}
 
-func (p *windowsParser) ParseVolumesFrom(spec string) (string, string, error) ***REMOVED***
-	if len(spec) == 0 ***REMOVED***
+func (p *windowsParser) ParseVolumesFrom(spec string) (string, string, error) {
+	if len(spec) == 0 {
 		return "", "", fmt.Errorf("volumes-from specification cannot be an empty string")
-	***REMOVED***
+	}
 
 	specParts := strings.SplitN(spec, ":", 2)
 	id := specParts[0]
 	mode := "rw"
 
-	if len(specParts) == 2 ***REMOVED***
+	if len(specParts) == 2 {
 		mode = specParts[1]
-		if !windowsValidMountMode(mode) ***REMOVED***
+		if !windowsValidMountMode(mode) {
 			return "", "", errInvalidMode(mode)
-		***REMOVED***
+		}
 
 		// Do not allow copy modes on volumes-from
-		if _, isSet := getCopyMode(mode, p.DefaultCopyMode()); isSet ***REMOVED***
+		if _, isSet := getCopyMode(mode, p.DefaultCopyMode()); isSet {
 			return "", "", errInvalidMode(mode)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return id, mode, nil
-***REMOVED***
+}
 
-func (p *windowsParser) DefaultPropagationMode() mount.Propagation ***REMOVED***
+func (p *windowsParser) DefaultPropagationMode() mount.Propagation {
 	return mount.Propagation("")
-***REMOVED***
+}
 
-func (p *windowsParser) ConvertTmpfsOptions(opt *mount.TmpfsOptions, readOnly bool) (string, error) ***REMOVED***
+func (p *windowsParser) ConvertTmpfsOptions(opt *mount.TmpfsOptions, readOnly bool) (string, error) {
 	return "", fmt.Errorf("%s does not support tmpfs", runtime.GOOS)
-***REMOVED***
-func (p *windowsParser) DefaultCopyMode() bool ***REMOVED***
+}
+func (p *windowsParser) DefaultCopyMode() bool {
 	return false
-***REMOVED***
-func (p *windowsParser) IsBackwardCompatible(m *MountPoint) bool ***REMOVED***
+}
+func (p *windowsParser) IsBackwardCompatible(m *MountPoint) bool {
 	return false
-***REMOVED***
+}
 
-func (p *windowsParser) ValidateTmpfsMountDestination(dest string) error ***REMOVED***
+func (p *windowsParser) ValidateTmpfsMountDestination(dest string) error {
 	return errors.New("Platform does not support tmpfs")
-***REMOVED***
+}

@@ -7,37 +7,37 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func TestEnable(t *testing.T) ***REMOVED***
-	defer func() ***REMOVED***
+func TestEnable(t *testing.T) {
+	defer func() {
 		os.Setenv("DEBUG", "")
 		logrus.SetLevel(logrus.InfoLevel)
-	***REMOVED***()
+	}()
 	Enable()
-	if os.Getenv("DEBUG") != "1" ***REMOVED***
+	if os.Getenv("DEBUG") != "1" {
 		t.Fatalf("expected DEBUG=1, got %s\n", os.Getenv("DEBUG"))
-	***REMOVED***
-	if logrus.GetLevel() != logrus.DebugLevel ***REMOVED***
+	}
+	if logrus.GetLevel() != logrus.DebugLevel {
 		t.Fatalf("expected log level %v, got %v\n", logrus.DebugLevel, logrus.GetLevel())
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestDisable(t *testing.T) ***REMOVED***
+func TestDisable(t *testing.T) {
 	Disable()
-	if os.Getenv("DEBUG") != "" ***REMOVED***
+	if os.Getenv("DEBUG") != "" {
 		t.Fatalf("expected DEBUG=\"\", got %s\n", os.Getenv("DEBUG"))
-	***REMOVED***
-	if logrus.GetLevel() != logrus.InfoLevel ***REMOVED***
+	}
+	if logrus.GetLevel() != logrus.InfoLevel {
 		t.Fatalf("expected log level %v, got %v\n", logrus.InfoLevel, logrus.GetLevel())
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestEnabled(t *testing.T) ***REMOVED***
+func TestEnabled(t *testing.T) {
 	Enable()
-	if !IsEnabled() ***REMOVED***
+	if !IsEnabled() {
 		t.Fatal("expected debug enabled, got false")
-	***REMOVED***
+	}
 	Disable()
-	if IsEnabled() ***REMOVED***
+	if IsEnabled() {
 		t.Fatal("expected debug disabled, got true")
-	***REMOVED***
-***REMOVED***
+	}
+}

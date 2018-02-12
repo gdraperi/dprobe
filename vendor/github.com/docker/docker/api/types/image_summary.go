@@ -5,7 +5,7 @@ package types
 
 // ImageSummary image summary
 // swagger:model ImageSummary
-type ImageSummary struct ***REMOVED***
+type ImageSummary struct {
 
 	// containers
 	// Required: true
@@ -46,4 +46,4 @@ type ImageSummary struct ***REMOVED***
 	// virtual size
 	// Required: true
 	VirtualSize int64 `json:"VirtualSize"`
-***REMOVED***
+}

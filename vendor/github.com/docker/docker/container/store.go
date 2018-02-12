@@ -10,7 +10,7 @@ type StoreReducer func(*Container)
 
 // Store defines an interface that
 // any container store must implement.
-type Store interface ***REMOVED***
+type Store interface {
 	// Add appends a new container to the store.
 	Add(string, *Container)
 	// Get returns a container from the store by the identifier it was stored with.
@@ -25,4 +25,4 @@ type Store interface ***REMOVED***
 	First(StoreFilter) *Container
 	// ApplyAll calls the reducer function with every container in the store.
 	ApplyAll(StoreReducer)
-***REMOVED***
+}

@@ -8,23 +8,23 @@ import (
 )
 
 // Summary is not used on linux
-type Summary struct***REMOVED******REMOVED***
+type Summary struct{}
 
 // Stats holds metrics properties as returned by containerd
-type Stats struct ***REMOVED***
+type Stats struct {
 	Read    time.Time
 	Metrics *cgroups.Metrics
-***REMOVED***
+}
 
-func interfaceToStats(read time.Time, v interface***REMOVED******REMOVED***) *Stats ***REMOVED***
-	return &Stats***REMOVED***
+func interfaceToStats(read time.Time, v interface{}) *Stats {
+	return &Stats{
 		Metrics: v.(*cgroups.Metrics),
 		Read:    read,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Resources defines updatable container resource values. TODO: it must match containerd upcoming API
 type Resources specs.LinuxResources
 
 // Checkpoints contains the details of a checkpoint
-type Checkpoints struct***REMOVED******REMOVED***
+type Checkpoints struct{}

@@ -13,148 +13,148 @@ import (
 
 const rateLimitCount = 3
 
-type registeredNode struct ***REMOVED***
+type registeredNode struct {
 	SessionID  string
 	Heartbeat  *heartbeat.Heartbeat
 	Registered time.Time
 	Attempts   int
 	Node       *api.Node
-	Disconnect chan struct***REMOVED******REMOVED*** // signal to disconnect
+	Disconnect chan struct{} // signal to disconnect
 	mu         sync.Mutex
-***REMOVED***
+}
 
 // checkSessionID determines if the SessionID has changed and returns the
 // appropriate GRPC error code.
 //
 // This may not belong here in the future.
-func (rn *registeredNode) checkSessionID(sessionID string) error ***REMOVED***
+func (rn *registeredNode) checkSessionID(sessionID string) error {
 	rn.mu.Lock()
 	defer rn.mu.Unlock()
 
 	// Before each message send, we need to check the nodes sessionID hasn't
 	// changed. If it has, we will the stream and make the node
 	// re-register.
-	if sessionID == "" || rn.SessionID != sessionID ***REMOVED***
+	if sessionID == "" || rn.SessionID != sessionID {
 		return status.Errorf(codes.InvalidArgument, ErrSessionInvalid.Error())
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-type nodeStore struct ***REMOVED***
+type nodeStore struct {
 	periodChooser                *periodChooser
 	gracePeriodMultiplierNormal  time.Duration
 	gracePeriodMultiplierUnknown time.Duration
 	rateLimitPeriod              time.Duration
 	nodes                        map[string]*registeredNode
 	mu                           sync.RWMutex
-***REMOVED***
+}
 
-func newNodeStore(hbPeriod, hbEpsilon time.Duration, graceMultiplier int, rateLimitPeriod time.Duration) *nodeStore ***REMOVED***
-	return &nodeStore***REMOVED***
+func newNodeStore(hbPeriod, hbEpsilon time.Duration, graceMultiplier int, rateLimitPeriod time.Duration) *nodeStore {
+	return &nodeStore{
 		nodes:                        make(map[string]*registeredNode),
 		periodChooser:                newPeriodChooser(hbPeriod, hbEpsilon),
 		gracePeriodMultiplierNormal:  time.Duration(graceMultiplier),
 		gracePeriodMultiplierUnknown: time.Duration(graceMultiplier) * 2,
 		rateLimitPeriod:              rateLimitPeriod,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *nodeStore) updatePeriod(hbPeriod, hbEpsilon time.Duration, gracePeriodMultiplier int) ***REMOVED***
+func (s *nodeStore) updatePeriod(hbPeriod, hbEpsilon time.Duration, gracePeriodMultiplier int) {
 	s.mu.Lock()
 	s.periodChooser = newPeriodChooser(hbPeriod, hbEpsilon)
 	s.gracePeriodMultiplierNormal = time.Duration(gracePeriodMultiplier)
 	s.gracePeriodMultiplierUnknown = s.gracePeriodMultiplierNormal * 2
 	s.mu.Unlock()
-***REMOVED***
+}
 
-func (s *nodeStore) Len() int ***REMOVED***
+func (s *nodeStore) Len() int {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	return len(s.nodes)
-***REMOVED***
+}
 
-func (s *nodeStore) AddUnknown(n *api.Node, expireFunc func()) error ***REMOVED***
+func (s *nodeStore) AddUnknown(n *api.Node, expireFunc func()) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	rn := &registeredNode***REMOVED***
+	rn := &registeredNode{
 		Node: n,
-	***REMOVED***
+	}
 	s.nodes[n.ID] = rn
 	rn.Heartbeat = heartbeat.New(s.periodChooser.Choose()*s.gracePeriodMultiplierUnknown, expireFunc)
 	return nil
-***REMOVED***
+}
 
 // CheckRateLimit returns error if node with specified id is allowed to re-register
 // again.
-func (s *nodeStore) CheckRateLimit(id string) error ***REMOVED***
+func (s *nodeStore) CheckRateLimit(id string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if existRn, ok := s.nodes[id]; ok ***REMOVED***
-		if time.Since(existRn.Registered) > s.rateLimitPeriod ***REMOVED***
+	if existRn, ok := s.nodes[id]; ok {
+		if time.Since(existRn.Registered) > s.rateLimitPeriod {
 			existRn.Attempts = 0
-		***REMOVED***
+		}
 		existRn.Attempts++
-		if existRn.Attempts > rateLimitCount ***REMOVED***
+		if existRn.Attempts > rateLimitCount {
 			return status.Errorf(codes.Unavailable, "node %s exceeded rate limit count of registrations", id)
-		***REMOVED***
+		}
 		existRn.Registered = time.Now()
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // Add adds new node and returns it, it replaces existing without notification.
-func (s *nodeStore) Add(n *api.Node, expireFunc func()) *registeredNode ***REMOVED***
+func (s *nodeStore) Add(n *api.Node, expireFunc func()) *registeredNode {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	var attempts int
 	var registered time.Time
-	if existRn, ok := s.nodes[n.ID]; ok ***REMOVED***
+	if existRn, ok := s.nodes[n.ID]; ok {
 		attempts = existRn.Attempts
 		registered = existRn.Registered
 		existRn.Heartbeat.Stop()
 		delete(s.nodes, n.ID)
-	***REMOVED***
-	if registered.IsZero() ***REMOVED***
+	}
+	if registered.IsZero() {
 		registered = time.Now()
-	***REMOVED***
-	rn := &registeredNode***REMOVED***
+	}
+	rn := &registeredNode{
 		SessionID:  identity.NewID(), // session ID is local to the dispatcher.
 		Node:       n,
 		Registered: registered,
 		Attempts:   attempts,
-		Disconnect: make(chan struct***REMOVED******REMOVED***),
-	***REMOVED***
+		Disconnect: make(chan struct{}),
+	}
 	s.nodes[n.ID] = rn
 	rn.Heartbeat = heartbeat.New(s.periodChooser.Choose()*s.gracePeriodMultiplierNormal, expireFunc)
 	return rn
-***REMOVED***
+}
 
-func (s *nodeStore) Get(id string) (*registeredNode, error) ***REMOVED***
+func (s *nodeStore) Get(id string) (*registeredNode, error) {
 	s.mu.RLock()
 	rn, ok := s.nodes[id]
 	s.mu.RUnlock()
-	if !ok ***REMOVED***
+	if !ok {
 		return nil, status.Errorf(codes.NotFound, ErrNodeNotRegistered.Error())
-	***REMOVED***
+	}
 	return rn, nil
-***REMOVED***
+}
 
-func (s *nodeStore) GetWithSession(id, sid string) (*registeredNode, error) ***REMOVED***
+func (s *nodeStore) GetWithSession(id, sid string) (*registeredNode, error) {
 	s.mu.RLock()
 	rn, ok := s.nodes[id]
 	s.mu.RUnlock()
-	if !ok ***REMOVED***
+	if !ok {
 		return nil, status.Errorf(codes.NotFound, ErrNodeNotRegistered.Error())
-	***REMOVED***
+	}
 	return rn, rn.checkSessionID(sid)
-***REMOVED***
+}
 
-func (s *nodeStore) Heartbeat(id, sid string) (time.Duration, error) ***REMOVED***
+func (s *nodeStore) Heartbeat(id, sid string) (time.Duration, error) {
 	rn, err := s.GetWithSession(id, sid)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	period := s.periodChooser.Choose() // base period for node
 	grace := period * time.Duration(s.gracePeriodMultiplierNormal)
 	rn.mu.Lock()
@@ -162,36 +162,36 @@ func (s *nodeStore) Heartbeat(id, sid string) (time.Duration, error) ***REMOVED*
 	rn.Heartbeat.Beat()
 	rn.mu.Unlock()
 	return period, nil
-***REMOVED***
+}
 
-func (s *nodeStore) Delete(id string) *registeredNode ***REMOVED***
+func (s *nodeStore) Delete(id string) *registeredNode {
 	s.mu.Lock()
 	var node *registeredNode
-	if rn, ok := s.nodes[id]; ok ***REMOVED***
+	if rn, ok := s.nodes[id]; ok {
 		delete(s.nodes, id)
 		rn.Heartbeat.Stop()
 		node = rn
-	***REMOVED***
+	}
 	s.mu.Unlock()
 	return node
-***REMOVED***
+}
 
-func (s *nodeStore) Disconnect(id string) ***REMOVED***
+func (s *nodeStore) Disconnect(id string) {
 	s.mu.Lock()
-	if rn, ok := s.nodes[id]; ok ***REMOVED***
+	if rn, ok := s.nodes[id]; ok {
 		close(rn.Disconnect)
 		rn.Heartbeat.Stop()
-	***REMOVED***
+	}
 	s.mu.Unlock()
-***REMOVED***
+}
 
 // Clean removes all nodes and stops their heartbeats.
 // It's equivalent to invalidate all sessions.
-func (s *nodeStore) Clean() ***REMOVED***
+func (s *nodeStore) Clean() {
 	s.mu.Lock()
-	for _, rn := range s.nodes ***REMOVED***
+	for _, rn := range s.nodes {
 		rn.Heartbeat.Stop()
-	***REMOVED***
+	}
 	s.nodes = make(map[string]*registeredNode)
 	s.mu.Unlock()
-***REMOVED***
+}

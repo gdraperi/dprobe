@@ -1,5 +1,5 @@
 #!/bin/sh
-cd "$***REMOVED***0%/****REMOVED***"
+cd "${0%/*}"
 ROOTDIR=`pwd`
 mkdir -p "$HOME/.config/nvim/autoload"
 mkdir -p "$HOME/.config/nvim/ftplugin/go"

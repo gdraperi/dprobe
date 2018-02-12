@@ -14,48 +14,48 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestDaemonConfigurationNotFound(t *testing.T) ***REMOVED***
-	_, err := MergeDaemonConfigurations(&Config***REMOVED******REMOVED***, nil, "/tmp/foo-bar-baz-docker")
-	if err == nil || !os.IsNotExist(err) ***REMOVED***
+func TestDaemonConfigurationNotFound(t *testing.T) {
+	_, err := MergeDaemonConfigurations(&Config{}, nil, "/tmp/foo-bar-baz-docker")
+	if err == nil || !os.IsNotExist(err) {
 		t.Fatalf("expected does not exist error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestDaemonBrokenConfiguration(t *testing.T) ***REMOVED***
+func TestDaemonBrokenConfiguration(t *testing.T) {
 	f, err := ioutil.TempFile("", "docker-config-")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	configFile := f.Name()
-	f.Write([]byte(`***REMOVED***"Debug": tru`))
+	f.Write([]byte(`{"Debug": tru`))
 	f.Close()
 
-	_, err = MergeDaemonConfigurations(&Config***REMOVED******REMOVED***, nil, configFile)
-	if err == nil ***REMOVED***
+	_, err = MergeDaemonConfigurations(&Config{}, nil, configFile)
+	if err == nil {
 		t.Fatalf("expected error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestParseClusterAdvertiseSettings(t *testing.T) ***REMOVED***
+func TestParseClusterAdvertiseSettings(t *testing.T) {
 	_, err := ParseClusterAdvertiseSettings("something", "")
-	if err != discovery.ErrDiscoveryDisabled ***REMOVED***
+	if err != discovery.ErrDiscoveryDisabled {
 		t.Fatalf("expected discovery disabled error, got %v\n", err)
-	***REMOVED***
+	}
 
 	_, err = ParseClusterAdvertiseSettings("", "something")
-	if err == nil ***REMOVED***
+	if err == nil {
 		t.Fatalf("expected discovery store error, got %v\n", err)
-	***REMOVED***
+	}
 
 	_, err = ParseClusterAdvertiseSettings("etcd", "127.0.0.1:8080")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestFindConfigurationConflicts(t *testing.T) ***REMOVED***
-	config := map[string]interface***REMOVED******REMOVED******REMOVED***"authorization-plugins": "foobar"***REMOVED***
+func TestFindConfigurationConflicts(t *testing.T) {
+	config := map[string]interface{}{"authorization-plugins": "foobar"}
 	flags := pflag.NewFlagSet("test", pflag.ContinueOnError)
 
 	flags.String("authorization-plugins", "", "")
@@ -64,10 +64,10 @@ func TestFindConfigurationConflicts(t *testing.T) ***REMOVED***
 	testutil.ErrorContains(t,
 		findConfigurationConflicts(config, flags),
 		"authorization-plugins: (from flag: asdf, from file: foobar)")
-***REMOVED***
+}
 
-func TestFindConfigurationConflictsWithNamedOptions(t *testing.T) ***REMOVED***
-	config := map[string]interface***REMOVED******REMOVED******REMOVED***"hosts": []string***REMOVED***"qwer"***REMOVED******REMOVED***
+func TestFindConfigurationConflictsWithNamedOptions(t *testing.T) {
+	config := map[string]interface{}{"hosts": []string{"qwer"}}
 	flags := pflag.NewFlagSet("test", pflag.ContinueOnError)
 
 	var hosts []string
@@ -76,393 +76,393 @@ func TestFindConfigurationConflictsWithNamedOptions(t *testing.T) ***REMOVED***
 	assert.NoError(t, flags.Set("host", "unix:///var/run/docker.sock"))
 
 	testutil.ErrorContains(t, findConfigurationConflicts(config, flags), "hosts")
-***REMOVED***
+}
 
-func TestDaemonConfigurationMergeConflicts(t *testing.T) ***REMOVED***
+func TestDaemonConfigurationMergeConflicts(t *testing.T) {
 	f, err := ioutil.TempFile("", "docker-config-")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	configFile := f.Name()
-	f.Write([]byte(`***REMOVED***"debug": true***REMOVED***`))
+	f.Write([]byte(`{"debug": true}`))
 	f.Close()
 
 	flags := pflag.NewFlagSet("test", pflag.ContinueOnError)
 	flags.Bool("debug", false, "")
 	flags.Set("debug", "false")
 
-	_, err = MergeDaemonConfigurations(&Config***REMOVED******REMOVED***, flags, configFile)
-	if err == nil ***REMOVED***
+	_, err = MergeDaemonConfigurations(&Config{}, flags, configFile)
+	if err == nil {
 		t.Fatal("expected error, got nil")
-	***REMOVED***
-	if !strings.Contains(err.Error(), "debug") ***REMOVED***
+	}
+	if !strings.Contains(err.Error(), "debug") {
 		t.Fatalf("expected debug conflict, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestDaemonConfigurationMergeConcurrent(t *testing.T) ***REMOVED***
+func TestDaemonConfigurationMergeConcurrent(t *testing.T) {
 	f, err := ioutil.TempFile("", "docker-config-")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	configFile := f.Name()
-	f.Write([]byte(`***REMOVED***"max-concurrent-downloads": 1***REMOVED***`))
+	f.Write([]byte(`{"max-concurrent-downloads": 1}`))
 	f.Close()
 
-	_, err = MergeDaemonConfigurations(&Config***REMOVED******REMOVED***, nil, configFile)
-	if err != nil ***REMOVED***
+	_, err = MergeDaemonConfigurations(&Config{}, nil, configFile)
+	if err != nil {
 		t.Fatal("expected error, got nil")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestDaemonConfigurationMergeConcurrentError(t *testing.T) ***REMOVED***
+func TestDaemonConfigurationMergeConcurrentError(t *testing.T) {
 	f, err := ioutil.TempFile("", "docker-config-")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	configFile := f.Name()
-	f.Write([]byte(`***REMOVED***"max-concurrent-downloads": -1***REMOVED***`))
+	f.Write([]byte(`{"max-concurrent-downloads": -1}`))
 	f.Close()
 
-	_, err = MergeDaemonConfigurations(&Config***REMOVED******REMOVED***, nil, configFile)
-	if err == nil ***REMOVED***
+	_, err = MergeDaemonConfigurations(&Config{}, nil, configFile)
+	if err == nil {
 		t.Fatalf("expected no error, got error %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestDaemonConfigurationMergeConflictsWithInnerStructs(t *testing.T) ***REMOVED***
+func TestDaemonConfigurationMergeConflictsWithInnerStructs(t *testing.T) {
 	f, err := ioutil.TempFile("", "docker-config-")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	configFile := f.Name()
-	f.Write([]byte(`***REMOVED***"tlscacert": "/etc/certificates/ca.pem"***REMOVED***`))
+	f.Write([]byte(`{"tlscacert": "/etc/certificates/ca.pem"}`))
 	f.Close()
 
 	flags := pflag.NewFlagSet("test", pflag.ContinueOnError)
 	flags.String("tlscacert", "", "")
 	flags.Set("tlscacert", "~/.docker/ca.pem")
 
-	_, err = MergeDaemonConfigurations(&Config***REMOVED******REMOVED***, flags, configFile)
-	if err == nil ***REMOVED***
+	_, err = MergeDaemonConfigurations(&Config{}, flags, configFile)
+	if err == nil {
 		t.Fatal("expected error, got nil")
-	***REMOVED***
-	if !strings.Contains(err.Error(), "tlscacert") ***REMOVED***
+	}
+	if !strings.Contains(err.Error(), "tlscacert") {
 		t.Fatalf("expected tlscacert conflict, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestFindConfigurationConflictsWithUnknownKeys(t *testing.T) ***REMOVED***
-	config := map[string]interface***REMOVED******REMOVED******REMOVED***"tls-verify": "true"***REMOVED***
+func TestFindConfigurationConflictsWithUnknownKeys(t *testing.T) {
+	config := map[string]interface{}{"tls-verify": "true"}
 	flags := pflag.NewFlagSet("test", pflag.ContinueOnError)
 
 	flags.Bool("tlsverify", false, "")
 	err := findConfigurationConflicts(config, flags)
-	if err == nil ***REMOVED***
+	if err == nil {
 		t.Fatal("expected error, got nil")
-	***REMOVED***
-	if !strings.Contains(err.Error(), "the following directives don't match any configuration option: tls-verify") ***REMOVED***
+	}
+	if !strings.Contains(err.Error(), "the following directives don't match any configuration option: tls-verify") {
 		t.Fatalf("expected tls-verify conflict, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestFindConfigurationConflictsWithMergedValues(t *testing.T) ***REMOVED***
+func TestFindConfigurationConflictsWithMergedValues(t *testing.T) {
 	var hosts []string
-	config := map[string]interface***REMOVED******REMOVED******REMOVED***"hosts": "tcp://127.0.0.1:2345"***REMOVED***
+	config := map[string]interface{}{"hosts": "tcp://127.0.0.1:2345"}
 	flags := pflag.NewFlagSet("base", pflag.ContinueOnError)
 	flags.VarP(opts.NewNamedListOptsRef("hosts", &hosts, nil), "host", "H", "")
 
 	err := findConfigurationConflicts(config, flags)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	flags.Set("host", "unix:///var/run/docker.sock")
 	err = findConfigurationConflicts(config, flags)
-	if err == nil ***REMOVED***
+	if err == nil {
 		t.Fatal("expected error, got nil")
-	***REMOVED***
-	if !strings.Contains(err.Error(), "hosts: (from flag: [unix:///var/run/docker.sock], from file: tcp://127.0.0.1:2345)") ***REMOVED***
+	}
+	if !strings.Contains(err.Error(), "hosts: (from flag: [unix:///var/run/docker.sock], from file: tcp://127.0.0.1:2345)") {
 		t.Fatalf("expected hosts conflict, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestValidateConfigurationErrors(t *testing.T) ***REMOVED***
+func TestValidateConfigurationErrors(t *testing.T) {
 	minusNumber := -10
-	testCases := []struct ***REMOVED***
+	testCases := []struct {
 		config *Config
-	***REMOVED******REMOVED***
-		***REMOVED***
-			config: &Config***REMOVED***
-				CommonConfig: CommonConfig***REMOVED***
-					Labels: []string***REMOVED***"one"***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			config: &Config***REMOVED***
-				CommonConfig: CommonConfig***REMOVED***
-					Labels: []string***REMOVED***"foo=bar", "one"***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			config: &Config***REMOVED***
-				CommonConfig: CommonConfig***REMOVED***
-					DNS: []string***REMOVED***"1.1.1.1o"***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			config: &Config***REMOVED***
-				CommonConfig: CommonConfig***REMOVED***
-					DNS: []string***REMOVED***"2.2.2.2", "1.1.1.1o"***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			config: &Config***REMOVED***
-				CommonConfig: CommonConfig***REMOVED***
-					DNSSearch: []string***REMOVED***"123456"***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			config: &Config***REMOVED***
-				CommonConfig: CommonConfig***REMOVED***
-					DNSSearch: []string***REMOVED***"a.b.c", "123456"***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			config: &Config***REMOVED***
-				CommonConfig: CommonConfig***REMOVED***
+	}{
+		{
+			config: &Config{
+				CommonConfig: CommonConfig{
+					Labels: []string{"one"},
+				},
+			},
+		},
+		{
+			config: &Config{
+				CommonConfig: CommonConfig{
+					Labels: []string{"foo=bar", "one"},
+				},
+			},
+		},
+		{
+			config: &Config{
+				CommonConfig: CommonConfig{
+					DNS: []string{"1.1.1.1o"},
+				},
+			},
+		},
+		{
+			config: &Config{
+				CommonConfig: CommonConfig{
+					DNS: []string{"2.2.2.2", "1.1.1.1o"},
+				},
+			},
+		},
+		{
+			config: &Config{
+				CommonConfig: CommonConfig{
+					DNSSearch: []string{"123456"},
+				},
+			},
+		},
+		{
+			config: &Config{
+				CommonConfig: CommonConfig{
+					DNSSearch: []string{"a.b.c", "123456"},
+				},
+			},
+		},
+		{
+			config: &Config{
+				CommonConfig: CommonConfig{
 					MaxConcurrentDownloads: &minusNumber,
 					// This is weird...
-					ValuesSet: map[string]interface***REMOVED******REMOVED******REMOVED***
+					ValuesSet: map[string]interface{}{
 						"max-concurrent-downloads": -1,
-					***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			config: &Config***REMOVED***
-				CommonConfig: CommonConfig***REMOVED***
+					},
+				},
+			},
+		},
+		{
+			config: &Config{
+				CommonConfig: CommonConfig{
 					MaxConcurrentUploads: &minusNumber,
 					// This is weird...
-					ValuesSet: map[string]interface***REMOVED******REMOVED******REMOVED***
+					ValuesSet: map[string]interface{}{
 						"max-concurrent-uploads": -1,
-					***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			config: &Config***REMOVED***
-				CommonConfig: CommonConfig***REMOVED***
-					NodeGenericResources: []string***REMOVED***"foo"***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			config: &Config***REMOVED***
-				CommonConfig: CommonConfig***REMOVED***
-					NodeGenericResources: []string***REMOVED***"foo=bar", "foo=1"***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
-	for _, tc := range testCases ***REMOVED***
+					},
+				},
+			},
+		},
+		{
+			config: &Config{
+				CommonConfig: CommonConfig{
+					NodeGenericResources: []string{"foo"},
+				},
+			},
+		},
+		{
+			config: &Config{
+				CommonConfig: CommonConfig{
+					NodeGenericResources: []string{"foo=bar", "foo=1"},
+				},
+			},
+		},
+	}
+	for _, tc := range testCases {
 		err := Validate(tc.config)
-		if err == nil ***REMOVED***
+		if err == nil {
 			t.Fatalf("expected error, got nil for config %v", tc.config)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestValidateConfiguration(t *testing.T) ***REMOVED***
+func TestValidateConfiguration(t *testing.T) {
 	minusNumber := 4
-	testCases := []struct ***REMOVED***
+	testCases := []struct {
 		config *Config
-	***REMOVED******REMOVED***
-		***REMOVED***
-			config: &Config***REMOVED***
-				CommonConfig: CommonConfig***REMOVED***
-					Labels: []string***REMOVED***"one=two"***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			config: &Config***REMOVED***
-				CommonConfig: CommonConfig***REMOVED***
-					DNS: []string***REMOVED***"1.1.1.1"***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			config: &Config***REMOVED***
-				CommonConfig: CommonConfig***REMOVED***
-					DNSSearch: []string***REMOVED***"a.b.c"***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			config: &Config***REMOVED***
-				CommonConfig: CommonConfig***REMOVED***
+	}{
+		{
+			config: &Config{
+				CommonConfig: CommonConfig{
+					Labels: []string{"one=two"},
+				},
+			},
+		},
+		{
+			config: &Config{
+				CommonConfig: CommonConfig{
+					DNS: []string{"1.1.1.1"},
+				},
+			},
+		},
+		{
+			config: &Config{
+				CommonConfig: CommonConfig{
+					DNSSearch: []string{"a.b.c"},
+				},
+			},
+		},
+		{
+			config: &Config{
+				CommonConfig: CommonConfig{
 					MaxConcurrentDownloads: &minusNumber,
 					// This is weird...
-					ValuesSet: map[string]interface***REMOVED******REMOVED******REMOVED***
+					ValuesSet: map[string]interface{}{
 						"max-concurrent-downloads": -1,
-					***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			config: &Config***REMOVED***
-				CommonConfig: CommonConfig***REMOVED***
+					},
+				},
+			},
+		},
+		{
+			config: &Config{
+				CommonConfig: CommonConfig{
 					MaxConcurrentUploads: &minusNumber,
 					// This is weird...
-					ValuesSet: map[string]interface***REMOVED******REMOVED******REMOVED***
+					ValuesSet: map[string]interface{}{
 						"max-concurrent-uploads": -1,
-					***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			config: &Config***REMOVED***
-				CommonConfig: CommonConfig***REMOVED***
-					NodeGenericResources: []string***REMOVED***"foo=bar", "foo=baz"***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			config: &Config***REMOVED***
-				CommonConfig: CommonConfig***REMOVED***
-					NodeGenericResources: []string***REMOVED***"foo=1"***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
-	for _, tc := range testCases ***REMOVED***
+					},
+				},
+			},
+		},
+		{
+			config: &Config{
+				CommonConfig: CommonConfig{
+					NodeGenericResources: []string{"foo=bar", "foo=baz"},
+				},
+			},
+		},
+		{
+			config: &Config{
+				CommonConfig: CommonConfig{
+					NodeGenericResources: []string{"foo=1"},
+				},
+			},
+		},
+	}
+	for _, tc := range testCases {
 		err := Validate(tc.config)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("expected no error, got error %v", err)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestModifiedDiscoverySettings(t *testing.T) ***REMOVED***
-	cases := []struct ***REMOVED***
+func TestModifiedDiscoverySettings(t *testing.T) {
+	cases := []struct {
 		current  *Config
 		modified *Config
 		expected bool
-	***REMOVED******REMOVED***
-		***REMOVED***
-			current:  discoveryConfig("foo", "bar", map[string]string***REMOVED******REMOVED***),
-			modified: discoveryConfig("foo", "bar", map[string]string***REMOVED******REMOVED***),
+	}{
+		{
+			current:  discoveryConfig("foo", "bar", map[string]string{}),
+			modified: discoveryConfig("foo", "bar", map[string]string{}),
 			expected: false,
-		***REMOVED***,
-		***REMOVED***
-			current:  discoveryConfig("foo", "bar", map[string]string***REMOVED***"foo": "bar"***REMOVED***),
-			modified: discoveryConfig("foo", "bar", map[string]string***REMOVED***"foo": "bar"***REMOVED***),
+		},
+		{
+			current:  discoveryConfig("foo", "bar", map[string]string{"foo": "bar"}),
+			modified: discoveryConfig("foo", "bar", map[string]string{"foo": "bar"}),
 			expected: false,
-		***REMOVED***,
-		***REMOVED***
-			current:  discoveryConfig("foo", "bar", map[string]string***REMOVED******REMOVED***),
+		},
+		{
+			current:  discoveryConfig("foo", "bar", map[string]string{}),
 			modified: discoveryConfig("foo", "bar", nil),
 			expected: false,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			current:  discoveryConfig("foo", "bar", nil),
-			modified: discoveryConfig("foo", "bar", map[string]string***REMOVED******REMOVED***),
+			modified: discoveryConfig("foo", "bar", map[string]string{}),
 			expected: false,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			current:  discoveryConfig("foo", "bar", nil),
 			modified: discoveryConfig("baz", "bar", nil),
 			expected: true,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			current:  discoveryConfig("foo", "bar", nil),
 			modified: discoveryConfig("foo", "baz", nil),
 			expected: true,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			current:  discoveryConfig("foo", "bar", nil),
-			modified: discoveryConfig("foo", "bar", map[string]string***REMOVED***"foo": "bar"***REMOVED***),
+			modified: discoveryConfig("foo", "bar", map[string]string{"foo": "bar"}),
 			expected: true,
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
-	for _, c := range cases ***REMOVED***
+	for _, c := range cases {
 		got := ModifiedDiscoverySettings(c.current, c.modified.ClusterStore, c.modified.ClusterAdvertise, c.modified.ClusterOpts)
-		if c.expected != got ***REMOVED***
+		if c.expected != got {
 			t.Fatalf("expected %v, got %v: current config %v, new config %v", c.expected, got, c.current, c.modified)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func discoveryConfig(backendAddr, advertiseAddr string, opts map[string]string) *Config ***REMOVED***
-	return &Config***REMOVED***
-		CommonConfig: CommonConfig***REMOVED***
+func discoveryConfig(backendAddr, advertiseAddr string, opts map[string]string) *Config {
+	return &Config{
+		CommonConfig: CommonConfig{
 			ClusterStore:     backendAddr,
 			ClusterAdvertise: advertiseAddr,
 			ClusterOpts:      opts,
-		***REMOVED***,
-	***REMOVED***
-***REMOVED***
+		},
+	}
+}
 
 // TestReloadSetConfigFileNotExist tests that when `--config-file` is set
 // and it doesn't exist the `Reload` function returns an error.
-func TestReloadSetConfigFileNotExist(t *testing.T) ***REMOVED***
+func TestReloadSetConfigFileNotExist(t *testing.T) {
 	configFile := "/tmp/blabla/not/exists/config.json"
 	flags := pflag.NewFlagSet("test", pflag.ContinueOnError)
 	flags.String("config-file", "", "")
 	flags.Set("config-file", configFile)
 
-	err := Reload(configFile, flags, func(c *Config) ***REMOVED******REMOVED***)
+	err := Reload(configFile, flags, func(c *Config) {})
 	assert.Error(t, err)
 	testutil.ErrorContains(t, err, "unable to configure the Docker daemon with file")
-***REMOVED***
+}
 
 // TestReloadDefaultConfigNotExist tests that if the default configuration file
 // doesn't exist the daemon still will be reloaded.
-func TestReloadDefaultConfigNotExist(t *testing.T) ***REMOVED***
+func TestReloadDefaultConfigNotExist(t *testing.T) {
 	reloaded := false
 	configFile := "/etc/docker/daemon.json"
 	flags := pflag.NewFlagSet("test", pflag.ContinueOnError)
 	flags.String("config-file", configFile, "")
-	err := Reload(configFile, flags, func(c *Config) ***REMOVED***
+	err := Reload(configFile, flags, func(c *Config) {
 		reloaded = true
-	***REMOVED***)
+	})
 	assert.Nil(t, err)
 	assert.True(t, reloaded)
-***REMOVED***
+}
 
 // TestReloadBadDefaultConfig tests that when `--config-file` is not set
 // and the default configuration file exists and is bad return an error
-func TestReloadBadDefaultConfig(t *testing.T) ***REMOVED***
+func TestReloadBadDefaultConfig(t *testing.T) {
 	f, err := ioutil.TempFile("", "docker-config-")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	configFile := f.Name()
-	f.Write([]byte(`***REMOVED***wrong: "configuration"***REMOVED***`))
+	f.Write([]byte(`{wrong: "configuration"}`))
 	f.Close()
 
 	flags := pflag.NewFlagSet("test", pflag.ContinueOnError)
 	flags.String("config-file", configFile, "")
-	err = Reload(configFile, flags, func(c *Config) ***REMOVED******REMOVED***)
+	err = Reload(configFile, flags, func(c *Config) {})
 	assert.Error(t, err)
 	testutil.ErrorContains(t, err, "unable to configure the Docker daemon with file")
-***REMOVED***
+}
 
-func TestReloadWithConflictingLabels(t *testing.T) ***REMOVED***
-	tempFile := fs.NewFile(t, "config", fs.WithContent(`***REMOVED***"labels":["foo=bar","foo=baz"]***REMOVED***`))
+func TestReloadWithConflictingLabels(t *testing.T) {
+	tempFile := fs.NewFile(t, "config", fs.WithContent(`{"labels":["foo=bar","foo=baz"]}`))
 	defer tempFile.Remove()
 	configFile := tempFile.Path()
 
@@ -470,12 +470,12 @@ func TestReloadWithConflictingLabels(t *testing.T) ***REMOVED***
 	flags := pflag.NewFlagSet("test", pflag.ContinueOnError)
 	flags.String("config-file", configFile, "")
 	flags.StringSlice("labels", lbls, "")
-	err := Reload(configFile, flags, func(c *Config) ***REMOVED******REMOVED***)
+	err := Reload(configFile, flags, func(c *Config) {})
 	testutil.ErrorContains(t, err, "conflict labels for foo=baz and foo=bar")
-***REMOVED***
+}
 
-func TestReloadWithDuplicateLabels(t *testing.T) ***REMOVED***
-	tempFile := fs.NewFile(t, "config", fs.WithContent(`***REMOVED***"labels":["foo=the-same","foo=the-same"]***REMOVED***`))
+func TestReloadWithDuplicateLabels(t *testing.T) {
+	tempFile := fs.NewFile(t, "config", fs.WithContent(`{"labels":["foo=the-same","foo=the-same"]}`))
 	defer tempFile.Remove()
 	configFile := tempFile.Path()
 
@@ -483,6 +483,6 @@ func TestReloadWithDuplicateLabels(t *testing.T) ***REMOVED***
 	flags := pflag.NewFlagSet("test", pflag.ContinueOnError)
 	flags.String("config-file", configFile, "")
 	flags.StringSlice("labels", lbls, "")
-	err := Reload(configFile, flags, func(c *Config) ***REMOVED******REMOVED***)
+	err := Reload(configFile, flags, func(c *Config) {})
 	assert.NoError(t, err)
-***REMOVED***
+}

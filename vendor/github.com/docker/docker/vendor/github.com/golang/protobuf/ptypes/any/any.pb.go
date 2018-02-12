@@ -39,18 +39,18 @@ const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 //     Any any;
 //     any.PackFrom(foo);
 //     ...
-//     if (any.UnpackTo(&foo)) ***REMOVED***
+//     if (any.UnpackTo(&foo)) {
 //       ...
-// ***REMOVED***
+//     }
 //
 // Example 2: Pack and unpack a message in Java.
 //
 //     Foo foo = ...;
 //     Any any = Any.pack(foo);
 //     ...
-//     if (any.is(Foo.class)) ***REMOVED***
+//     if (any.is(Foo.class)) {
 //       foo = any.unpack(Foo.class);
-// ***REMOVED***
+//     }
 //
 //  Example 3: Pack and unpack a message in Python.
 //
@@ -76,28 +76,28 @@ const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 // additional field `@type` which contains the type URL. Example:
 //
 //     package google.profile;
-//     message Person ***REMOVED***
+//     message Person {
 //       string first_name = 1;
 //       string last_name = 2;
-// ***REMOVED***
+//     }
 //
-//     ***REMOVED***
+//     {
 //       "@type": "type.googleapis.com/google.profile.Person",
 //       "firstName": <string>,
 //       "lastName": <string>
-// ***REMOVED***
+//     }
 //
 // If the embedded message type is well-known and has a custom JSON
 // representation, that representation will be embedded adding a field
 // `value` which holds the custom JSON in addition to the `@type`
 // field. Example (for message [google.protobuf.Duration][]):
 //
-//     ***REMOVED***
+//     {
 //       "@type": "type.googleapis.com/google.protobuf.Duration",
 //       "value": "1.212s"
-// ***REMOVED***
+//     }
 //
-type Any struct ***REMOVED***
+type Any struct {
 	// A URL/resource name whose content describes the type of the
 	// serialized protocol buffer message.
 	//
@@ -123,35 +123,35 @@ type Any struct ***REMOVED***
 	TypeUrl string `protobuf:"bytes,1,opt,name=type_url,json=typeUrl" json:"type_url,omitempty"`
 	// Must be a valid serialized protocol buffer of the above specified type.
 	Value []byte `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
-***REMOVED***
+}
 
-func (m *Any) Reset()                    ***REMOVED*** *m = Any***REMOVED******REMOVED*** ***REMOVED***
-func (m *Any) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*Any) ProtoMessage()               ***REMOVED******REMOVED***
-func (*Any) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***0***REMOVED*** ***REMOVED***
-func (*Any) XXX_WellKnownType() string   ***REMOVED*** return "Any" ***REMOVED***
+func (m *Any) Reset()                    { *m = Any{} }
+func (m *Any) String() string            { return proto.CompactTextString(m) }
+func (*Any) ProtoMessage()               {}
+func (*Any) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
+func (*Any) XXX_WellKnownType() string   { return "Any" }
 
-func (m *Any) GetTypeUrl() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Any) GetTypeUrl() string {
+	if m != nil {
 		return m.TypeUrl
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *Any) GetValue() []byte ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Any) GetValue() []byte {
+	if m != nil {
 		return m.Value
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*Any)(nil), "google.protobuf.Any")
-***REMOVED***
+}
 
-func init() ***REMOVED*** proto.RegisterFile("github.com/golang/protobuf/ptypes/any/any.proto", fileDescriptor0) ***REMOVED***
+func init() { proto.RegisterFile("github.com/golang/protobuf/ptypes/any/any.proto", fileDescriptor0) }
 
-var fileDescriptor0 = []byte***REMOVED***
+var fileDescriptor0 = []byte{
 	// 184 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xd2, 0x4f, 0xcf, 0x2c, 0xc9,
 	0x28, 0x4d, 0xd2, 0x4b, 0xce, 0xcf, 0xd5, 0x4f, 0xcf, 0xcf, 0x49, 0xcc, 0x4b, 0xd7, 0x2f, 0x28,
@@ -165,4 +165,4 @@ var fileDescriptor0 = []byte***REMOVED***
 	0x98, 0xe4, 0xdc, 0x21, 0x46, 0x05, 0x40, 0x95, 0xe8, 0x85, 0xa7, 0xe6, 0xe4, 0x78, 0xe7, 0xe5,
 	0x97, 0xe7, 0x85, 0x80, 0x94, 0x26, 0xb1, 0x81, 0xf5, 0x1a, 0x03, 0x02, 0x00, 0x00, 0xff, 0xff,
 	0x45, 0x1f, 0x1a, 0xf2, 0xf3, 0x00, 0x00, 0x00,
-***REMOVED***
+}

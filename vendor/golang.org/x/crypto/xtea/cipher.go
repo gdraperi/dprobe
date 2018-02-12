@@ -15,68 +15,68 @@ const BlockSize = 8
 
 // A Cipher is an instance of an XTEA cipher using a particular key.
 // table contains a series of precalculated values that are used each round.
-type Cipher struct ***REMOVED***
+type Cipher struct {
 	table [64]uint32
-***REMOVED***
+}
 
 type KeySizeError int
 
-func (k KeySizeError) Error() string ***REMOVED***
+func (k KeySizeError) Error() string {
 	return "crypto/xtea: invalid key size " + strconv.Itoa(int(k))
-***REMOVED***
+}
 
 // NewCipher creates and returns a new Cipher.
 // The key argument should be the XTEA key.
 // XTEA only supports 128 bit (16 byte) keys.
-func NewCipher(key []byte) (*Cipher, error) ***REMOVED***
+func NewCipher(key []byte) (*Cipher, error) {
 	k := len(key)
-	switch k ***REMOVED***
+	switch k {
 	default:
 		return nil, KeySizeError(k)
 	case 16:
 		break
-	***REMOVED***
+	}
 
 	c := new(Cipher)
 	initCipher(c, key)
 
 	return c, nil
-***REMOVED***
+}
 
 // BlockSize returns the XTEA block size, 8 bytes.
 // It is necessary to satisfy the Block interface in the
 // package "crypto/cipher".
-func (c *Cipher) BlockSize() int ***REMOVED*** return BlockSize ***REMOVED***
+func (c *Cipher) BlockSize() int { return BlockSize }
 
 // Encrypt encrypts the 8 byte buffer src using the key and stores the result in dst.
 // Note that for amounts of data larger than a block,
 // it is not safe to just call Encrypt on successive blocks;
 // instead, use an encryption mode like CBC (see crypto/cipher/cbc.go).
-func (c *Cipher) Encrypt(dst, src []byte) ***REMOVED*** encryptBlock(c, dst, src) ***REMOVED***
+func (c *Cipher) Encrypt(dst, src []byte) { encryptBlock(c, dst, src) }
 
 // Decrypt decrypts the 8 byte buffer src using the key k and stores the result in dst.
-func (c *Cipher) Decrypt(dst, src []byte) ***REMOVED*** decryptBlock(c, dst, src) ***REMOVED***
+func (c *Cipher) Decrypt(dst, src []byte) { decryptBlock(c, dst, src) }
 
 // initCipher initializes the cipher context by creating a look up table
 // of precalculated values that are based on the key.
-func initCipher(c *Cipher, key []byte) ***REMOVED***
+func initCipher(c *Cipher, key []byte) {
 	// Load the key into four uint32s
 	var k [4]uint32
-	for i := 0; i < len(k); i++ ***REMOVED***
+	for i := 0; i < len(k); i++ {
 		j := i << 2 // Multiply by 4
 		k[i] = uint32(key[j+0])<<24 | uint32(key[j+1])<<16 | uint32(key[j+2])<<8 | uint32(key[j+3])
-	***REMOVED***
+	}
 
 	// Precalculate the table
 	const delta = 0x9E3779B9
 	var sum uint32
 
 	// Two rounds of XTEA applied per loop
-	for i := 0; i < numRounds; ***REMOVED***
+	for i := 0; i < numRounds; {
 		c.table[i] = sum + k[sum&3]
 		i++
 		sum += delta
 		c.table[i] = sum + k[(sum>>11)&3]
 		i++
-	***REMOVED***
-***REMOVED***
+	}
+}

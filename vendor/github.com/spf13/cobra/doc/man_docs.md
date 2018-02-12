@@ -12,20 +12,20 @@ import (
 	"github.com/spf13/cobra/doc"
 )
 
-func main() ***REMOVED***
-	cmd := &cobra.Command***REMOVED***
+func main() {
+	cmd := &cobra.Command{
 		Use:   "test",
 		Short: "my test program",
-	***REMOVED***
-	header := &doc.GenManHeader***REMOVED***
+	}
+	header := &doc.GenManHeader{
 		Title: "MINE",
 		Section: "3",
-	***REMOVED***
+	}
 	err := doc.GenManTree(cmd, header, "/tmp")
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 ```
 
 That will get you a man page `/tmp/test.3`

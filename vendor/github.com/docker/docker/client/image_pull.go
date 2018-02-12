@@ -20,46 +20,46 @@ import (
 // FIXME(vdemeester): there is currently used in a few way in docker/docker
 // - if not in trusted content, ref is used to pass the whole reference, and tag is empty
 // - if in trusted content, ref is used to pass the reference name, and tag for the digest
-func (cli *Client) ImagePull(ctx context.Context, refStr string, options types.ImagePullOptions) (io.ReadCloser, error) ***REMOVED***
+func (cli *Client) ImagePull(ctx context.Context, refStr string, options types.ImagePullOptions) (io.ReadCloser, error) {
 	ref, err := reference.ParseNormalizedNamed(refStr)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	query := url.Values***REMOVED******REMOVED***
+	query := url.Values{}
 	query.Set("fromImage", reference.FamiliarName(ref))
-	if !options.All ***REMOVED***
+	if !options.All {
 		query.Set("tag", getAPITagFromNamedRef(ref))
-	***REMOVED***
-	if options.Platform != "" ***REMOVED***
+	}
+	if options.Platform != "" {
 		query.Set("platform", strings.ToLower(options.Platform))
-	***REMOVED***
+	}
 
 	resp, err := cli.tryImageCreate(ctx, query, options.RegistryAuth)
-	if resp.statusCode == http.StatusUnauthorized && options.PrivilegeFunc != nil ***REMOVED***
+	if resp.statusCode == http.StatusUnauthorized && options.PrivilegeFunc != nil {
 		newAuthHeader, privilegeErr := options.PrivilegeFunc()
-		if privilegeErr != nil ***REMOVED***
+		if privilegeErr != nil {
 			return nil, privilegeErr
-		***REMOVED***
+		}
 		resp, err = cli.tryImageCreate(ctx, query, newAuthHeader)
-	***REMOVED***
-	if err != nil ***REMOVED***
+	}
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return resp.body, nil
-***REMOVED***
+}
 
 // getAPITagFromNamedRef returns a tag from the specified reference.
 // This function is necessary as long as the docker "server" api expects
 // digests to be sent as tags and makes a distinction between the name
 // and tag/digest part of a reference.
-func getAPITagFromNamedRef(ref reference.Named) string ***REMOVED***
-	if digested, ok := ref.(reference.Digested); ok ***REMOVED***
+func getAPITagFromNamedRef(ref reference.Named) string {
+	if digested, ok := ref.(reference.Digested); ok {
 		return digested.Digest().String()
-	***REMOVED***
+	}
 	ref = reference.TagNameOnly(ref)
-	if tagged, ok := ref.(reference.Tagged); ok ***REMOVED***
+	if tagged, ok := ref.(reference.Tagged); ok {
 		return tagged.Tag()
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}

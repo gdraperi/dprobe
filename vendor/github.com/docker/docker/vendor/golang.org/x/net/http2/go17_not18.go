@@ -9,8 +9,8 @@ package http2
 import "crypto/tls"
 
 // temporary copy of Go 1.7's private tls.Config.clone:
-func cloneTLSConfig(c *tls.Config) *tls.Config ***REMOVED***
-	return &tls.Config***REMOVED***
+func cloneTLSConfig(c *tls.Config) *tls.Config {
+	return &tls.Config{
 		Rand:                        c.Rand,
 		Time:                        c.Time,
 		Certificates:                c.Certificates,
@@ -32,5 +32,5 @@ func cloneTLSConfig(c *tls.Config) *tls.Config ***REMOVED***
 		CurvePreferences:            c.CurvePreferences,
 		DynamicRecordSizingDisabled: c.DynamicRecordSizingDisabled,
 		Renegotiation:               c.Renegotiation,
-	***REMOVED***
-***REMOVED***
+	}
+}

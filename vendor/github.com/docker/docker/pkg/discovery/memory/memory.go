@@ -9,35 +9,35 @@ import (
 
 // Discovery implements a discovery backend that keeps
 // data in memory.
-type Discovery struct ***REMOVED***
+type Discovery struct {
 	heartbeat time.Duration
 	values    []string
 	mu        sync.Mutex
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	Init()
-***REMOVED***
+}
 
 // Init registers the memory backend on demand.
-func Init() ***REMOVED***
-	discovery.Register("memory", &Discovery***REMOVED******REMOVED***)
-***REMOVED***
+func Init() {
+	discovery.Register("memory", &Discovery{})
+}
 
 // Initialize sets the heartbeat for the memory backend.
-func (s *Discovery) Initialize(_ string, heartbeat time.Duration, _ time.Duration, _ map[string]string) error ***REMOVED***
+func (s *Discovery) Initialize(_ string, heartbeat time.Duration, _ time.Duration, _ map[string]string) error {
 	s.heartbeat = heartbeat
 	s.values = make([]string, 0)
 	return nil
-***REMOVED***
+}
 
 // Watch sends periodic discovery updates to a channel.
-func (s *Discovery) Watch(stopCh <-chan struct***REMOVED******REMOVED***) (<-chan discovery.Entries, <-chan error) ***REMOVED***
+func (s *Discovery) Watch(stopCh <-chan struct{}) (<-chan discovery.Entries, <-chan error) {
 	ch := make(chan discovery.Entries)
 	errCh := make(chan error)
 	ticker := time.NewTicker(s.heartbeat)
 
-	go func() ***REMOVED***
+	go func() {
 		defer close(errCh)
 		defer close(ch)
 
@@ -46,48 +46,48 @@ func (s *Discovery) Watch(stopCh <-chan struct***REMOVED******REMOVED***) (<-cha
 		var err error
 
 		s.mu.Lock()
-		if len(s.values) > 0 ***REMOVED***
+		if len(s.values) > 0 {
 			currentEntries, err = discovery.CreateEntries(s.values)
-		***REMOVED***
+		}
 		s.mu.Unlock()
 
-		if err != nil ***REMOVED***
+		if err != nil {
 			errCh <- err
-		***REMOVED*** else if currentEntries != nil ***REMOVED***
+		} else if currentEntries != nil {
 			ch <- currentEntries
-		***REMOVED***
+		}
 
 		// Periodically send updates.
-		for ***REMOVED***
-			select ***REMOVED***
+		for {
+			select {
 			case <-ticker.C:
 				s.mu.Lock()
 				newEntries, err := discovery.CreateEntries(s.values)
 				s.mu.Unlock()
-				if err != nil ***REMOVED***
+				if err != nil {
 					errCh <- err
 					continue
-				***REMOVED***
+				}
 
 				// Check if the file has really changed.
-				if !newEntries.Equals(currentEntries) ***REMOVED***
+				if !newEntries.Equals(currentEntries) {
 					ch <- newEntries
-				***REMOVED***
+				}
 				currentEntries = newEntries
 			case <-stopCh:
 				ticker.Stop()
 				return
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***()
+			}
+		}
+	}()
 
 	return ch, errCh
-***REMOVED***
+}
 
 // Register adds a new address to the discovery.
-func (s *Discovery) Register(addr string) error ***REMOVED***
+func (s *Discovery) Register(addr string) error {
 	s.mu.Lock()
 	s.values = append(s.values, addr)
 	s.mu.Unlock()
 	return nil
-***REMOVED***
+}

@@ -15,511 +15,511 @@ import (
 
 // This is a direct translation of the program in
 // testdata/all_instructions.txt.
-var allInstructions = []Instruction***REMOVED***
-	LoadConstant***REMOVED***Dst: RegA, Val: 42***REMOVED***,
-	LoadConstant***REMOVED***Dst: RegX, Val: 42***REMOVED***,
+var allInstructions = []Instruction{
+	LoadConstant{Dst: RegA, Val: 42},
+	LoadConstant{Dst: RegX, Val: 42},
 
-	LoadScratch***REMOVED***Dst: RegA, N: 3***REMOVED***,
-	LoadScratch***REMOVED***Dst: RegX, N: 3***REMOVED***,
+	LoadScratch{Dst: RegA, N: 3},
+	LoadScratch{Dst: RegX, N: 3},
 
-	LoadAbsolute***REMOVED***Off: 42, Size: 1***REMOVED***,
-	LoadAbsolute***REMOVED***Off: 42, Size: 2***REMOVED***,
-	LoadAbsolute***REMOVED***Off: 42, Size: 4***REMOVED***,
+	LoadAbsolute{Off: 42, Size: 1},
+	LoadAbsolute{Off: 42, Size: 2},
+	LoadAbsolute{Off: 42, Size: 4},
 
-	LoadIndirect***REMOVED***Off: 42, Size: 1***REMOVED***,
-	LoadIndirect***REMOVED***Off: 42, Size: 2***REMOVED***,
-	LoadIndirect***REMOVED***Off: 42, Size: 4***REMOVED***,
+	LoadIndirect{Off: 42, Size: 1},
+	LoadIndirect{Off: 42, Size: 2},
+	LoadIndirect{Off: 42, Size: 4},
 
-	LoadMemShift***REMOVED***Off: 42***REMOVED***,
+	LoadMemShift{Off: 42},
 
-	LoadExtension***REMOVED***Num: ExtLen***REMOVED***,
-	LoadExtension***REMOVED***Num: ExtProto***REMOVED***,
-	LoadExtension***REMOVED***Num: ExtType***REMOVED***,
-	LoadExtension***REMOVED***Num: ExtRand***REMOVED***,
+	LoadExtension{Num: ExtLen},
+	LoadExtension{Num: ExtProto},
+	LoadExtension{Num: ExtType},
+	LoadExtension{Num: ExtRand},
 
-	StoreScratch***REMOVED***Src: RegA, N: 3***REMOVED***,
-	StoreScratch***REMOVED***Src: RegX, N: 3***REMOVED***,
+	StoreScratch{Src: RegA, N: 3},
+	StoreScratch{Src: RegX, N: 3},
 
-	ALUOpConstant***REMOVED***Op: ALUOpAdd, Val: 42***REMOVED***,
-	ALUOpConstant***REMOVED***Op: ALUOpSub, Val: 42***REMOVED***,
-	ALUOpConstant***REMOVED***Op: ALUOpMul, Val: 42***REMOVED***,
-	ALUOpConstant***REMOVED***Op: ALUOpDiv, Val: 42***REMOVED***,
-	ALUOpConstant***REMOVED***Op: ALUOpOr, Val: 42***REMOVED***,
-	ALUOpConstant***REMOVED***Op: ALUOpAnd, Val: 42***REMOVED***,
-	ALUOpConstant***REMOVED***Op: ALUOpShiftLeft, Val: 42***REMOVED***,
-	ALUOpConstant***REMOVED***Op: ALUOpShiftRight, Val: 42***REMOVED***,
-	ALUOpConstant***REMOVED***Op: ALUOpMod, Val: 42***REMOVED***,
-	ALUOpConstant***REMOVED***Op: ALUOpXor, Val: 42***REMOVED***,
+	ALUOpConstant{Op: ALUOpAdd, Val: 42},
+	ALUOpConstant{Op: ALUOpSub, Val: 42},
+	ALUOpConstant{Op: ALUOpMul, Val: 42},
+	ALUOpConstant{Op: ALUOpDiv, Val: 42},
+	ALUOpConstant{Op: ALUOpOr, Val: 42},
+	ALUOpConstant{Op: ALUOpAnd, Val: 42},
+	ALUOpConstant{Op: ALUOpShiftLeft, Val: 42},
+	ALUOpConstant{Op: ALUOpShiftRight, Val: 42},
+	ALUOpConstant{Op: ALUOpMod, Val: 42},
+	ALUOpConstant{Op: ALUOpXor, Val: 42},
 
-	ALUOpX***REMOVED***Op: ALUOpAdd***REMOVED***,
-	ALUOpX***REMOVED***Op: ALUOpSub***REMOVED***,
-	ALUOpX***REMOVED***Op: ALUOpMul***REMOVED***,
-	ALUOpX***REMOVED***Op: ALUOpDiv***REMOVED***,
-	ALUOpX***REMOVED***Op: ALUOpOr***REMOVED***,
-	ALUOpX***REMOVED***Op: ALUOpAnd***REMOVED***,
-	ALUOpX***REMOVED***Op: ALUOpShiftLeft***REMOVED***,
-	ALUOpX***REMOVED***Op: ALUOpShiftRight***REMOVED***,
-	ALUOpX***REMOVED***Op: ALUOpMod***REMOVED***,
-	ALUOpX***REMOVED***Op: ALUOpXor***REMOVED***,
+	ALUOpX{Op: ALUOpAdd},
+	ALUOpX{Op: ALUOpSub},
+	ALUOpX{Op: ALUOpMul},
+	ALUOpX{Op: ALUOpDiv},
+	ALUOpX{Op: ALUOpOr},
+	ALUOpX{Op: ALUOpAnd},
+	ALUOpX{Op: ALUOpShiftLeft},
+	ALUOpX{Op: ALUOpShiftRight},
+	ALUOpX{Op: ALUOpMod},
+	ALUOpX{Op: ALUOpXor},
 
-	NegateA***REMOVED******REMOVED***,
+	NegateA{},
 
-	Jump***REMOVED***Skip: 10***REMOVED***,
-	JumpIf***REMOVED***Cond: JumpEqual, Val: 42, SkipTrue: 8, SkipFalse: 9***REMOVED***,
-	JumpIf***REMOVED***Cond: JumpNotEqual, Val: 42, SkipTrue: 8***REMOVED***,
-	JumpIf***REMOVED***Cond: JumpLessThan, Val: 42, SkipTrue: 7***REMOVED***,
-	JumpIf***REMOVED***Cond: JumpLessOrEqual, Val: 42, SkipTrue: 6***REMOVED***,
-	JumpIf***REMOVED***Cond: JumpGreaterThan, Val: 42, SkipTrue: 4, SkipFalse: 5***REMOVED***,
-	JumpIf***REMOVED***Cond: JumpGreaterOrEqual, Val: 42, SkipTrue: 3, SkipFalse: 4***REMOVED***,
-	JumpIf***REMOVED***Cond: JumpBitsSet, Val: 42, SkipTrue: 2, SkipFalse: 3***REMOVED***,
+	Jump{Skip: 10},
+	JumpIf{Cond: JumpEqual, Val: 42, SkipTrue: 8, SkipFalse: 9},
+	JumpIf{Cond: JumpNotEqual, Val: 42, SkipTrue: 8},
+	JumpIf{Cond: JumpLessThan, Val: 42, SkipTrue: 7},
+	JumpIf{Cond: JumpLessOrEqual, Val: 42, SkipTrue: 6},
+	JumpIf{Cond: JumpGreaterThan, Val: 42, SkipTrue: 4, SkipFalse: 5},
+	JumpIf{Cond: JumpGreaterOrEqual, Val: 42, SkipTrue: 3, SkipFalse: 4},
+	JumpIf{Cond: JumpBitsSet, Val: 42, SkipTrue: 2, SkipFalse: 3},
 
-	TAX***REMOVED******REMOVED***,
-	TXA***REMOVED******REMOVED***,
+	TAX{},
+	TXA{},
 
-	RetA***REMOVED******REMOVED***,
-	RetConstant***REMOVED***Val: 42***REMOVED***,
-***REMOVED***
+	RetA{},
+	RetConstant{Val: 42},
+}
 var allInstructionsExpected = "testdata/all_instructions.bpf"
 
 // Check that we produce the same output as the canonical bpf_asm
 // linux kernel tool.
-func TestInterop(t *testing.T) ***REMOVED***
+func TestInterop(t *testing.T) {
 	out, err := Assemble(allInstructions)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("assembly of allInstructions program failed: %s", err)
-	***REMOVED***
+	}
 	t.Logf("Assembled program is %d instructions long", len(out))
 
 	bs, err := ioutil.ReadFile(allInstructionsExpected)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("reading %s: %s", allInstructionsExpected, err)
-	***REMOVED***
+	}
 	// First statement is the number of statements, last statement is
 	// empty. We just ignore both and rely on slice length.
 	stmts := strings.Split(string(bs), ",")
-	if len(stmts)-2 != len(out) ***REMOVED***
+	if len(stmts)-2 != len(out) {
 		t.Fatalf("test program lengths don't match: %s has %d, Go implementation has %d", allInstructionsExpected, len(stmts)-2, len(allInstructions))
-	***REMOVED***
+	}
 
-	for i, stmt := range stmts[1 : len(stmts)-2] ***REMOVED***
+	for i, stmt := range stmts[1 : len(stmts)-2] {
 		nums := strings.Split(stmt, " ")
-		if len(nums) != 4 ***REMOVED***
+		if len(nums) != 4 {
 			t.Fatalf("malformed instruction %d in %s: %s", i+1, allInstructionsExpected, stmt)
-		***REMOVED***
+		}
 
 		actual := out[i]
 
 		op, err := strconv.ParseUint(nums[0], 10, 16)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("malformed opcode %s in instruction %d of %s", nums[0], i+1, allInstructionsExpected)
-		***REMOVED***
-		if actual.Op != uint16(op) ***REMOVED***
+		}
+		if actual.Op != uint16(op) {
 			t.Errorf("opcode mismatch on instruction %d (%#v): got 0x%02x, want 0x%02x", i+1, allInstructions[i], actual.Op, op)
-		***REMOVED***
+		}
 
 		jt, err := strconv.ParseUint(nums[1], 10, 8)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("malformed jt offset %s in instruction %d of %s", nums[1], i+1, allInstructionsExpected)
-		***REMOVED***
-		if actual.Jt != uint8(jt) ***REMOVED***
+		}
+		if actual.Jt != uint8(jt) {
 			t.Errorf("jt mismatch on instruction %d (%#v): got %d, want %d", i+1, allInstructions[i], actual.Jt, jt)
-		***REMOVED***
+		}
 
 		jf, err := strconv.ParseUint(nums[2], 10, 8)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("malformed jf offset %s in instruction %d of %s", nums[2], i+1, allInstructionsExpected)
-		***REMOVED***
-		if actual.Jf != uint8(jf) ***REMOVED***
+		}
+		if actual.Jf != uint8(jf) {
 			t.Errorf("jf mismatch on instruction %d (%#v): got %d, want %d", i+1, allInstructions[i], actual.Jf, jf)
-		***REMOVED***
+		}
 
 		k, err := strconv.ParseUint(nums[3], 10, 32)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("malformed constant %s in instruction %d of %s", nums[3], i+1, allInstructionsExpected)
-		***REMOVED***
-		if actual.K != uint32(k) ***REMOVED***
+		}
+		if actual.K != uint32(k) {
 			t.Errorf("constant mismatch on instruction %d (%#v): got %d, want %d", i+1, allInstructions[i], actual.K, k)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // Check that assembly and disassembly match each other.
-func TestAsmDisasm(t *testing.T) ***REMOVED***
+func TestAsmDisasm(t *testing.T) {
 	prog1, err := Assemble(allInstructions)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("assembly of allInstructions program failed: %s", err)
-	***REMOVED***
+	}
 	t.Logf("Assembled program is %d instructions long", len(prog1))
 
 	got, allDecoded := Disassemble(prog1)
-	if !allDecoded ***REMOVED***
+	if !allDecoded {
 		t.Errorf("Disassemble(Assemble(allInstructions)) produced unrecognized instructions:")
-		for i, inst := range got ***REMOVED***
-			if r, ok := inst.(RawInstruction); ok ***REMOVED***
+		for i, inst := range got {
+			if r, ok := inst.(RawInstruction); ok {
 				t.Logf("  insn %d, %#v --> %#v", i+1, allInstructions[i], r)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
-	if len(allInstructions) != len(got) ***REMOVED***
+	if len(allInstructions) != len(got) {
 		t.Fatalf("disassembly changed program size: %d insns before, %d insns after", len(allInstructions), len(got))
-	***REMOVED***
-	if !reflect.DeepEqual(allInstructions, got) ***REMOVED***
+	}
+	if !reflect.DeepEqual(allInstructions, got) {
 		t.Errorf("program mutated by disassembly:")
-		for i := range got ***REMOVED***
-			if !reflect.DeepEqual(allInstructions[i], got[i]) ***REMOVED***
+		for i := range got {
+			if !reflect.DeepEqual(allInstructions[i], got[i]) {
 				t.Logf("  insn %d, s: %#v, p1: %#v, got: %#v", i+1, allInstructions[i], prog1[i], got[i])
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}
 
-type InvalidInstruction struct***REMOVED******REMOVED***
+type InvalidInstruction struct{}
 
-func (a InvalidInstruction) Assemble() (RawInstruction, error) ***REMOVED***
-	return RawInstruction***REMOVED******REMOVED***, fmt.Errorf("Invalid Instruction")
-***REMOVED***
+func (a InvalidInstruction) Assemble() (RawInstruction, error) {
+	return RawInstruction{}, fmt.Errorf("Invalid Instruction")
+}
 
-func (a InvalidInstruction) String() string ***REMOVED***
+func (a InvalidInstruction) String() string {
 	return fmt.Sprintf("unknown instruction: %#v", a)
-***REMOVED***
+}
 
-func TestString(t *testing.T) ***REMOVED***
-	testCases := []struct ***REMOVED***
+func TestString(t *testing.T) {
+	testCases := []struct {
 		instruction Instruction
 		assembler   string
-	***REMOVED******REMOVED***
-		***REMOVED***
-			instruction: LoadConstant***REMOVED***Dst: RegA, Val: 42***REMOVED***,
+	}{
+		{
+			instruction: LoadConstant{Dst: RegA, Val: 42},
 			assembler:   "ld #42",
-		***REMOVED***,
-		***REMOVED***
-			instruction: LoadConstant***REMOVED***Dst: RegX, Val: 42***REMOVED***,
+		},
+		{
+			instruction: LoadConstant{Dst: RegX, Val: 42},
 			assembler:   "ldx #42",
-		***REMOVED***,
-		***REMOVED***
-			instruction: LoadConstant***REMOVED***Dst: 0xffff, Val: 42***REMOVED***,
-			assembler:   "unknown instruction: bpf.LoadConstant***REMOVED***Dst:0xffff, Val:0x2a***REMOVED***",
-		***REMOVED***,
-		***REMOVED***
-			instruction: LoadScratch***REMOVED***Dst: RegA, N: 3***REMOVED***,
+		},
+		{
+			instruction: LoadConstant{Dst: 0xffff, Val: 42},
+			assembler:   "unknown instruction: bpf.LoadConstant{Dst:0xffff, Val:0x2a}",
+		},
+		{
+			instruction: LoadScratch{Dst: RegA, N: 3},
 			assembler:   "ld M[3]",
-		***REMOVED***,
-		***REMOVED***
-			instruction: LoadScratch***REMOVED***Dst: RegX, N: 3***REMOVED***,
+		},
+		{
+			instruction: LoadScratch{Dst: RegX, N: 3},
 			assembler:   "ldx M[3]",
-		***REMOVED***,
-		***REMOVED***
-			instruction: LoadScratch***REMOVED***Dst: 0xffff, N: 3***REMOVED***,
-			assembler:   "unknown instruction: bpf.LoadScratch***REMOVED***Dst:0xffff, N:3***REMOVED***",
-		***REMOVED***,
-		***REMOVED***
-			instruction: LoadAbsolute***REMOVED***Off: 42, Size: 1***REMOVED***,
+		},
+		{
+			instruction: LoadScratch{Dst: 0xffff, N: 3},
+			assembler:   "unknown instruction: bpf.LoadScratch{Dst:0xffff, N:3}",
+		},
+		{
+			instruction: LoadAbsolute{Off: 42, Size: 1},
 			assembler:   "ldb [42]",
-		***REMOVED***,
-		***REMOVED***
-			instruction: LoadAbsolute***REMOVED***Off: 42, Size: 2***REMOVED***,
+		},
+		{
+			instruction: LoadAbsolute{Off: 42, Size: 2},
 			assembler:   "ldh [42]",
-		***REMOVED***,
-		***REMOVED***
-			instruction: LoadAbsolute***REMOVED***Off: 42, Size: 4***REMOVED***,
+		},
+		{
+			instruction: LoadAbsolute{Off: 42, Size: 4},
 			assembler:   "ld [42]",
-		***REMOVED***,
-		***REMOVED***
-			instruction: LoadAbsolute***REMOVED***Off: 42, Size: -1***REMOVED***,
-			assembler:   "unknown instruction: bpf.LoadAbsolute***REMOVED***Off:0x2a, Size:-1***REMOVED***",
-		***REMOVED***,
-		***REMOVED***
-			instruction: LoadIndirect***REMOVED***Off: 42, Size: 1***REMOVED***,
+		},
+		{
+			instruction: LoadAbsolute{Off: 42, Size: -1},
+			assembler:   "unknown instruction: bpf.LoadAbsolute{Off:0x2a, Size:-1}",
+		},
+		{
+			instruction: LoadIndirect{Off: 42, Size: 1},
 			assembler:   "ldb [x + 42]",
-		***REMOVED***,
-		***REMOVED***
-			instruction: LoadIndirect***REMOVED***Off: 42, Size: 2***REMOVED***,
+		},
+		{
+			instruction: LoadIndirect{Off: 42, Size: 2},
 			assembler:   "ldh [x + 42]",
-		***REMOVED***,
-		***REMOVED***
-			instruction: LoadIndirect***REMOVED***Off: 42, Size: 4***REMOVED***,
+		},
+		{
+			instruction: LoadIndirect{Off: 42, Size: 4},
 			assembler:   "ld [x + 42]",
-		***REMOVED***,
-		***REMOVED***
-			instruction: LoadIndirect***REMOVED***Off: 42, Size: -1***REMOVED***,
-			assembler:   "unknown instruction: bpf.LoadIndirect***REMOVED***Off:0x2a, Size:-1***REMOVED***",
-		***REMOVED***,
-		***REMOVED***
-			instruction: LoadMemShift***REMOVED***Off: 42***REMOVED***,
+		},
+		{
+			instruction: LoadIndirect{Off: 42, Size: -1},
+			assembler:   "unknown instruction: bpf.LoadIndirect{Off:0x2a, Size:-1}",
+		},
+		{
+			instruction: LoadMemShift{Off: 42},
 			assembler:   "ldx 4*([42]&0xf)",
-		***REMOVED***,
-		***REMOVED***
-			instruction: LoadExtension***REMOVED***Num: ExtLen***REMOVED***,
+		},
+		{
+			instruction: LoadExtension{Num: ExtLen},
 			assembler:   "ld #len",
-		***REMOVED***,
-		***REMOVED***
-			instruction: LoadExtension***REMOVED***Num: ExtProto***REMOVED***,
+		},
+		{
+			instruction: LoadExtension{Num: ExtProto},
 			assembler:   "ld #proto",
-		***REMOVED***,
-		***REMOVED***
-			instruction: LoadExtension***REMOVED***Num: ExtType***REMOVED***,
+		},
+		{
+			instruction: LoadExtension{Num: ExtType},
 			assembler:   "ld #type",
-		***REMOVED***,
-		***REMOVED***
-			instruction: LoadExtension***REMOVED***Num: ExtPayloadOffset***REMOVED***,
+		},
+		{
+			instruction: LoadExtension{Num: ExtPayloadOffset},
 			assembler:   "ld #poff",
-		***REMOVED***,
-		***REMOVED***
-			instruction: LoadExtension***REMOVED***Num: ExtInterfaceIndex***REMOVED***,
+		},
+		{
+			instruction: LoadExtension{Num: ExtInterfaceIndex},
 			assembler:   "ld #ifidx",
-		***REMOVED***,
-		***REMOVED***
-			instruction: LoadExtension***REMOVED***Num: ExtNetlinkAttr***REMOVED***,
+		},
+		{
+			instruction: LoadExtension{Num: ExtNetlinkAttr},
 			assembler:   "ld #nla",
-		***REMOVED***,
-		***REMOVED***
-			instruction: LoadExtension***REMOVED***Num: ExtNetlinkAttrNested***REMOVED***,
+		},
+		{
+			instruction: LoadExtension{Num: ExtNetlinkAttrNested},
 			assembler:   "ld #nlan",
-		***REMOVED***,
-		***REMOVED***
-			instruction: LoadExtension***REMOVED***Num: ExtMark***REMOVED***,
+		},
+		{
+			instruction: LoadExtension{Num: ExtMark},
 			assembler:   "ld #mark",
-		***REMOVED***,
-		***REMOVED***
-			instruction: LoadExtension***REMOVED***Num: ExtQueue***REMOVED***,
+		},
+		{
+			instruction: LoadExtension{Num: ExtQueue},
 			assembler:   "ld #queue",
-		***REMOVED***,
-		***REMOVED***
-			instruction: LoadExtension***REMOVED***Num: ExtLinkLayerType***REMOVED***,
+		},
+		{
+			instruction: LoadExtension{Num: ExtLinkLayerType},
 			assembler:   "ld #hatype",
-		***REMOVED***,
-		***REMOVED***
-			instruction: LoadExtension***REMOVED***Num: ExtRXHash***REMOVED***,
+		},
+		{
+			instruction: LoadExtension{Num: ExtRXHash},
 			assembler:   "ld #rxhash",
-		***REMOVED***,
-		***REMOVED***
-			instruction: LoadExtension***REMOVED***Num: ExtCPUID***REMOVED***,
+		},
+		{
+			instruction: LoadExtension{Num: ExtCPUID},
 			assembler:   "ld #cpu",
-		***REMOVED***,
-		***REMOVED***
-			instruction: LoadExtension***REMOVED***Num: ExtVLANTag***REMOVED***,
+		},
+		{
+			instruction: LoadExtension{Num: ExtVLANTag},
 			assembler:   "ld #vlan_tci",
-		***REMOVED***,
-		***REMOVED***
-			instruction: LoadExtension***REMOVED***Num: ExtVLANTagPresent***REMOVED***,
+		},
+		{
+			instruction: LoadExtension{Num: ExtVLANTagPresent},
 			assembler:   "ld #vlan_avail",
-		***REMOVED***,
-		***REMOVED***
-			instruction: LoadExtension***REMOVED***Num: ExtVLANProto***REMOVED***,
+		},
+		{
+			instruction: LoadExtension{Num: ExtVLANProto},
 			assembler:   "ld #vlan_tpid",
-		***REMOVED***,
-		***REMOVED***
-			instruction: LoadExtension***REMOVED***Num: ExtRand***REMOVED***,
+		},
+		{
+			instruction: LoadExtension{Num: ExtRand},
 			assembler:   "ld #rand",
-		***REMOVED***,
-		***REMOVED***
-			instruction: LoadAbsolute***REMOVED***Off: 0xfffff038, Size: 4***REMOVED***,
+		},
+		{
+			instruction: LoadAbsolute{Off: 0xfffff038, Size: 4},
 			assembler:   "ld #rand",
-		***REMOVED***,
-		***REMOVED***
-			instruction: LoadExtension***REMOVED***Num: 0xfff***REMOVED***,
-			assembler:   "unknown instruction: bpf.LoadExtension***REMOVED***Num:4095***REMOVED***",
-		***REMOVED***,
-		***REMOVED***
-			instruction: StoreScratch***REMOVED***Src: RegA, N: 3***REMOVED***,
+		},
+		{
+			instruction: LoadExtension{Num: 0xfff},
+			assembler:   "unknown instruction: bpf.LoadExtension{Num:4095}",
+		},
+		{
+			instruction: StoreScratch{Src: RegA, N: 3},
 			assembler:   "st M[3]",
-		***REMOVED***,
-		***REMOVED***
-			instruction: StoreScratch***REMOVED***Src: RegX, N: 3***REMOVED***,
+		},
+		{
+			instruction: StoreScratch{Src: RegX, N: 3},
 			assembler:   "stx M[3]",
-		***REMOVED***,
-		***REMOVED***
-			instruction: StoreScratch***REMOVED***Src: 0xffff, N: 3***REMOVED***,
-			assembler:   "unknown instruction: bpf.StoreScratch***REMOVED***Src:0xffff, N:3***REMOVED***",
-		***REMOVED***,
-		***REMOVED***
-			instruction: ALUOpConstant***REMOVED***Op: ALUOpAdd, Val: 42***REMOVED***,
+		},
+		{
+			instruction: StoreScratch{Src: 0xffff, N: 3},
+			assembler:   "unknown instruction: bpf.StoreScratch{Src:0xffff, N:3}",
+		},
+		{
+			instruction: ALUOpConstant{Op: ALUOpAdd, Val: 42},
 			assembler:   "add #42",
-		***REMOVED***,
-		***REMOVED***
-			instruction: ALUOpConstant***REMOVED***Op: ALUOpSub, Val: 42***REMOVED***,
+		},
+		{
+			instruction: ALUOpConstant{Op: ALUOpSub, Val: 42},
 			assembler:   "sub #42",
-		***REMOVED***,
-		***REMOVED***
-			instruction: ALUOpConstant***REMOVED***Op: ALUOpMul, Val: 42***REMOVED***,
+		},
+		{
+			instruction: ALUOpConstant{Op: ALUOpMul, Val: 42},
 			assembler:   "mul #42",
-		***REMOVED***,
-		***REMOVED***
-			instruction: ALUOpConstant***REMOVED***Op: ALUOpDiv, Val: 42***REMOVED***,
+		},
+		{
+			instruction: ALUOpConstant{Op: ALUOpDiv, Val: 42},
 			assembler:   "div #42",
-		***REMOVED***,
-		***REMOVED***
-			instruction: ALUOpConstant***REMOVED***Op: ALUOpOr, Val: 42***REMOVED***,
+		},
+		{
+			instruction: ALUOpConstant{Op: ALUOpOr, Val: 42},
 			assembler:   "or #42",
-		***REMOVED***,
-		***REMOVED***
-			instruction: ALUOpConstant***REMOVED***Op: ALUOpAnd, Val: 42***REMOVED***,
+		},
+		{
+			instruction: ALUOpConstant{Op: ALUOpAnd, Val: 42},
 			assembler:   "and #42",
-		***REMOVED***,
-		***REMOVED***
-			instruction: ALUOpConstant***REMOVED***Op: ALUOpShiftLeft, Val: 42***REMOVED***,
+		},
+		{
+			instruction: ALUOpConstant{Op: ALUOpShiftLeft, Val: 42},
 			assembler:   "lsh #42",
-		***REMOVED***,
-		***REMOVED***
-			instruction: ALUOpConstant***REMOVED***Op: ALUOpShiftRight, Val: 42***REMOVED***,
+		},
+		{
+			instruction: ALUOpConstant{Op: ALUOpShiftRight, Val: 42},
 			assembler:   "rsh #42",
-		***REMOVED***,
-		***REMOVED***
-			instruction: ALUOpConstant***REMOVED***Op: ALUOpMod, Val: 42***REMOVED***,
+		},
+		{
+			instruction: ALUOpConstant{Op: ALUOpMod, Val: 42},
 			assembler:   "mod #42",
-		***REMOVED***,
-		***REMOVED***
-			instruction: ALUOpConstant***REMOVED***Op: ALUOpXor, Val: 42***REMOVED***,
+		},
+		{
+			instruction: ALUOpConstant{Op: ALUOpXor, Val: 42},
 			assembler:   "xor #42",
-		***REMOVED***,
-		***REMOVED***
-			instruction: ALUOpConstant***REMOVED***Op: 0xffff, Val: 42***REMOVED***,
-			assembler:   "unknown instruction: bpf.ALUOpConstant***REMOVED***Op:0xffff, Val:0x2a***REMOVED***",
-		***REMOVED***,
-		***REMOVED***
-			instruction: ALUOpX***REMOVED***Op: ALUOpAdd***REMOVED***,
+		},
+		{
+			instruction: ALUOpConstant{Op: 0xffff, Val: 42},
+			assembler:   "unknown instruction: bpf.ALUOpConstant{Op:0xffff, Val:0x2a}",
+		},
+		{
+			instruction: ALUOpX{Op: ALUOpAdd},
 			assembler:   "add x",
-		***REMOVED***,
-		***REMOVED***
-			instruction: ALUOpX***REMOVED***Op: ALUOpSub***REMOVED***,
+		},
+		{
+			instruction: ALUOpX{Op: ALUOpSub},
 			assembler:   "sub x",
-		***REMOVED***,
-		***REMOVED***
-			instruction: ALUOpX***REMOVED***Op: ALUOpMul***REMOVED***,
+		},
+		{
+			instruction: ALUOpX{Op: ALUOpMul},
 			assembler:   "mul x",
-		***REMOVED***,
-		***REMOVED***
-			instruction: ALUOpX***REMOVED***Op: ALUOpDiv***REMOVED***,
+		},
+		{
+			instruction: ALUOpX{Op: ALUOpDiv},
 			assembler:   "div x",
-		***REMOVED***,
-		***REMOVED***
-			instruction: ALUOpX***REMOVED***Op: ALUOpOr***REMOVED***,
+		},
+		{
+			instruction: ALUOpX{Op: ALUOpOr},
 			assembler:   "or x",
-		***REMOVED***,
-		***REMOVED***
-			instruction: ALUOpX***REMOVED***Op: ALUOpAnd***REMOVED***,
+		},
+		{
+			instruction: ALUOpX{Op: ALUOpAnd},
 			assembler:   "and x",
-		***REMOVED***,
-		***REMOVED***
-			instruction: ALUOpX***REMOVED***Op: ALUOpShiftLeft***REMOVED***,
+		},
+		{
+			instruction: ALUOpX{Op: ALUOpShiftLeft},
 			assembler:   "lsh x",
-		***REMOVED***,
-		***REMOVED***
-			instruction: ALUOpX***REMOVED***Op: ALUOpShiftRight***REMOVED***,
+		},
+		{
+			instruction: ALUOpX{Op: ALUOpShiftRight},
 			assembler:   "rsh x",
-		***REMOVED***,
-		***REMOVED***
-			instruction: ALUOpX***REMOVED***Op: ALUOpMod***REMOVED***,
+		},
+		{
+			instruction: ALUOpX{Op: ALUOpMod},
 			assembler:   "mod x",
-		***REMOVED***,
-		***REMOVED***
-			instruction: ALUOpX***REMOVED***Op: ALUOpXor***REMOVED***,
+		},
+		{
+			instruction: ALUOpX{Op: ALUOpXor},
 			assembler:   "xor x",
-		***REMOVED***,
-		***REMOVED***
-			instruction: ALUOpX***REMOVED***Op: 0xffff***REMOVED***,
-			assembler:   "unknown instruction: bpf.ALUOpX***REMOVED***Op:0xffff***REMOVED***",
-		***REMOVED***,
-		***REMOVED***
-			instruction: NegateA***REMOVED******REMOVED***,
+		},
+		{
+			instruction: ALUOpX{Op: 0xffff},
+			assembler:   "unknown instruction: bpf.ALUOpX{Op:0xffff}",
+		},
+		{
+			instruction: NegateA{},
 			assembler:   "neg",
-		***REMOVED***,
-		***REMOVED***
-			instruction: Jump***REMOVED***Skip: 10***REMOVED***,
+		},
+		{
+			instruction: Jump{Skip: 10},
 			assembler:   "ja 10",
-		***REMOVED***,
-		***REMOVED***
-			instruction: JumpIf***REMOVED***Cond: JumpEqual, Val: 42, SkipTrue: 8, SkipFalse: 9***REMOVED***,
+		},
+		{
+			instruction: JumpIf{Cond: JumpEqual, Val: 42, SkipTrue: 8, SkipFalse: 9},
 			assembler:   "jeq #42,8,9",
-		***REMOVED***,
-		***REMOVED***
-			instruction: JumpIf***REMOVED***Cond: JumpEqual, Val: 42, SkipTrue: 8***REMOVED***,
+		},
+		{
+			instruction: JumpIf{Cond: JumpEqual, Val: 42, SkipTrue: 8},
 			assembler:   "jeq #42,8",
-		***REMOVED***,
-		***REMOVED***
-			instruction: JumpIf***REMOVED***Cond: JumpEqual, Val: 42, SkipFalse: 8***REMOVED***,
+		},
+		{
+			instruction: JumpIf{Cond: JumpEqual, Val: 42, SkipFalse: 8},
 			assembler:   "jneq #42,8",
-		***REMOVED***,
-		***REMOVED***
-			instruction: JumpIf***REMOVED***Cond: JumpNotEqual, Val: 42, SkipTrue: 8***REMOVED***,
+		},
+		{
+			instruction: JumpIf{Cond: JumpNotEqual, Val: 42, SkipTrue: 8},
 			assembler:   "jneq #42,8",
-		***REMOVED***,
-		***REMOVED***
-			instruction: JumpIf***REMOVED***Cond: JumpLessThan, Val: 42, SkipTrue: 7***REMOVED***,
+		},
+		{
+			instruction: JumpIf{Cond: JumpLessThan, Val: 42, SkipTrue: 7},
 			assembler:   "jlt #42,7",
-		***REMOVED***,
-		***REMOVED***
-			instruction: JumpIf***REMOVED***Cond: JumpLessOrEqual, Val: 42, SkipTrue: 6***REMOVED***,
+		},
+		{
+			instruction: JumpIf{Cond: JumpLessOrEqual, Val: 42, SkipTrue: 6},
 			assembler:   "jle #42,6",
-		***REMOVED***,
-		***REMOVED***
-			instruction: JumpIf***REMOVED***Cond: JumpGreaterThan, Val: 42, SkipTrue: 4, SkipFalse: 5***REMOVED***,
+		},
+		{
+			instruction: JumpIf{Cond: JumpGreaterThan, Val: 42, SkipTrue: 4, SkipFalse: 5},
 			assembler:   "jgt #42,4,5",
-		***REMOVED***,
-		***REMOVED***
-			instruction: JumpIf***REMOVED***Cond: JumpGreaterThan, Val: 42, SkipTrue: 4***REMOVED***,
+		},
+		{
+			instruction: JumpIf{Cond: JumpGreaterThan, Val: 42, SkipTrue: 4},
 			assembler:   "jgt #42,4",
-		***REMOVED***,
-		***REMOVED***
-			instruction: JumpIf***REMOVED***Cond: JumpGreaterOrEqual, Val: 42, SkipTrue: 3, SkipFalse: 4***REMOVED***,
+		},
+		{
+			instruction: JumpIf{Cond: JumpGreaterOrEqual, Val: 42, SkipTrue: 3, SkipFalse: 4},
 			assembler:   "jge #42,3,4",
-		***REMOVED***,
-		***REMOVED***
-			instruction: JumpIf***REMOVED***Cond: JumpGreaterOrEqual, Val: 42, SkipTrue: 3***REMOVED***,
+		},
+		{
+			instruction: JumpIf{Cond: JumpGreaterOrEqual, Val: 42, SkipTrue: 3},
 			assembler:   "jge #42,3",
-		***REMOVED***,
-		***REMOVED***
-			instruction: JumpIf***REMOVED***Cond: JumpBitsSet, Val: 42, SkipTrue: 2, SkipFalse: 3***REMOVED***,
+		},
+		{
+			instruction: JumpIf{Cond: JumpBitsSet, Val: 42, SkipTrue: 2, SkipFalse: 3},
 			assembler:   "jset #42,2,3",
-		***REMOVED***,
-		***REMOVED***
-			instruction: JumpIf***REMOVED***Cond: JumpBitsSet, Val: 42, SkipTrue: 2***REMOVED***,
+		},
+		{
+			instruction: JumpIf{Cond: JumpBitsSet, Val: 42, SkipTrue: 2},
 			assembler:   "jset #42,2",
-		***REMOVED***,
-		***REMOVED***
-			instruction: JumpIf***REMOVED***Cond: JumpBitsNotSet, Val: 42, SkipTrue: 2, SkipFalse: 3***REMOVED***,
+		},
+		{
+			instruction: JumpIf{Cond: JumpBitsNotSet, Val: 42, SkipTrue: 2, SkipFalse: 3},
 			assembler:   "jset #42,3,2",
-		***REMOVED***,
-		***REMOVED***
-			instruction: JumpIf***REMOVED***Cond: JumpBitsNotSet, Val: 42, SkipTrue: 2***REMOVED***,
+		},
+		{
+			instruction: JumpIf{Cond: JumpBitsNotSet, Val: 42, SkipTrue: 2},
 			assembler:   "jset #42,0,2",
-		***REMOVED***,
-		***REMOVED***
-			instruction: JumpIf***REMOVED***Cond: 0xffff, Val: 42, SkipTrue: 1, SkipFalse: 2***REMOVED***,
-			assembler:   "unknown instruction: bpf.JumpIf***REMOVED***Cond:0xffff, Val:0x2a, SkipTrue:0x1, SkipFalse:0x2***REMOVED***",
-		***REMOVED***,
-		***REMOVED***
-			instruction: TAX***REMOVED******REMOVED***,
+		},
+		{
+			instruction: JumpIf{Cond: 0xffff, Val: 42, SkipTrue: 1, SkipFalse: 2},
+			assembler:   "unknown instruction: bpf.JumpIf{Cond:0xffff, Val:0x2a, SkipTrue:0x1, SkipFalse:0x2}",
+		},
+		{
+			instruction: TAX{},
 			assembler:   "tax",
-		***REMOVED***,
-		***REMOVED***
-			instruction: TXA***REMOVED******REMOVED***,
+		},
+		{
+			instruction: TXA{},
 			assembler:   "txa",
-		***REMOVED***,
-		***REMOVED***
-			instruction: RetA***REMOVED******REMOVED***,
+		},
+		{
+			instruction: RetA{},
 			assembler:   "ret a",
-		***REMOVED***,
-		***REMOVED***
-			instruction: RetConstant***REMOVED***Val: 42***REMOVED***,
+		},
+		{
+			instruction: RetConstant{Val: 42},
 			assembler:   "ret #42",
-		***REMOVED***,
+		},
 		// Invalid instruction
-		***REMOVED***
-			instruction: InvalidInstruction***REMOVED******REMOVED***,
-			assembler:   "unknown instruction: bpf.InvalidInstruction***REMOVED******REMOVED***",
-		***REMOVED***,
-	***REMOVED***
+		{
+			instruction: InvalidInstruction{},
+			assembler:   "unknown instruction: bpf.InvalidInstruction{}",
+		},
+	}
 
-	for _, testCase := range testCases ***REMOVED***
-		if input, ok := testCase.instruction.(fmt.Stringer); ok ***REMOVED***
+	for _, testCase := range testCases {
+		if input, ok := testCase.instruction.(fmt.Stringer); ok {
 			got := input.String()
-			if got != testCase.assembler ***REMOVED***
+			if got != testCase.assembler {
 				t.Errorf("String did not return expected assembler notation, expected: %s, got: %s", testCase.assembler, got)
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
+			}
+		} else {
 			t.Errorf("Instruction %#v is not a fmt.Stringer", testCase.instruction)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

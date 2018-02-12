@@ -42,27 +42,27 @@ const (
 	DefaultGatewayV6AuxKey = "DefaultGatewayIPv6"
 )
 
-type defaultBridgeNetworkConflict struct ***REMOVED***
+type defaultBridgeNetworkConflict struct {
 	ID string
-***REMOVED***
+}
 
-func (d defaultBridgeNetworkConflict) Error() string ***REMOVED***
+func (d defaultBridgeNetworkConflict) Error() string {
 	return fmt.Sprintf("Stale default bridge network %s", d.ID)
-***REMOVED***
+}
 
 type iptableCleanFunc func() error
 type iptablesCleanFuncs []iptableCleanFunc
 
 // configuration info for the "bridge" driver.
-type configuration struct ***REMOVED***
+type configuration struct {
 	EnableIPForwarding  bool
 	EnableIPTables      bool
 	EnableUserlandProxy bool
 	UserlandProxyPath   string
-***REMOVED***
+}
 
 // networkConfiguration for network specific configuration
-type networkConfiguration struct ***REMOVED***
+type networkConfiguration struct {
 	ID                   string
 	BridgeName           string
 	EnableIPv6           bool
@@ -82,7 +82,7 @@ type networkConfiguration struct ***REMOVED***
 	Internal           bool
 
 	BridgeIfaceCreator ifaceCreator
-***REMOVED***
+}
 
 // ifaceCreator represents how the bridge interface was created
 type ifaceCreator int8
@@ -94,23 +94,23 @@ const (
 )
 
 // endpointConfiguration represents the user specified configuration for the sandbox endpoint
-type endpointConfiguration struct ***REMOVED***
+type endpointConfiguration struct {
 	MacAddress net.HardwareAddr
-***REMOVED***
+}
 
 // containerConfiguration represents the user specified configuration for a container
-type containerConfiguration struct ***REMOVED***
+type containerConfiguration struct {
 	ParentEndpoints []string
 	ChildEndpoints  []string
-***REMOVED***
+}
 
 // cnnectivityConfiguration represents the user specified configuration regarding the external connectivity
-type connectivityConfiguration struct ***REMOVED***
+type connectivityConfiguration struct {
 	PortBindings []types.PortBinding
 	ExposedPorts []types.TransportPort
-***REMOVED***
+}
 
-type bridgeEndpoint struct ***REMOVED***
+type bridgeEndpoint struct {
 	id              string
 	nid             string
 	srcName         string
@@ -123,9 +123,9 @@ type bridgeEndpoint struct ***REMOVED***
 	portMapping     []types.PortBinding // Operation port bindings
 	dbIndex         uint64
 	dbExists        bool
-***REMOVED***
+}
 
-type bridgeNetwork struct ***REMOVED***
+type bridgeNetwork struct {
 	id            string
 	bridge        *bridgeInterface // The bridge's L3 interface
 	config        *networkConfiguration
@@ -134,9 +134,9 @@ type bridgeNetwork struct ***REMOVED***
 	driver        *driver // The network's driver
 	iptCleanFuncs iptablesCleanFuncs
 	sync.Mutex
-***REMOVED***
+}
 
-type driver struct ***REMOVED***
+type driver struct {
 	config         *configuration
 	network        *bridgeNetwork
 	natChain       *iptables.ChainInfo
@@ -147,191 +147,191 @@ type driver struct ***REMOVED***
 	nlh            *netlink.Handle
 	configNetwork  sync.Mutex
 	sync.Mutex
-***REMOVED***
+}
 
 // New constructs a new bridge driver
-func newDriver() *driver ***REMOVED***
-	return &driver***REMOVED***networks: map[string]*bridgeNetwork***REMOVED******REMOVED***, config: &configuration***REMOVED******REMOVED******REMOVED***
-***REMOVED***
+func newDriver() *driver {
+	return &driver{networks: map[string]*bridgeNetwork{}, config: &configuration{}}
+}
 
 // Init registers a new instance of bridge driver
-func Init(dc driverapi.DriverCallback, config map[string]interface***REMOVED******REMOVED***) error ***REMOVED***
+func Init(dc driverapi.DriverCallback, config map[string]interface{}) error {
 	d := newDriver()
-	if err := d.configure(config); err != nil ***REMOVED***
+	if err := d.configure(config); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	c := driverapi.Capability***REMOVED***
+	c := driverapi.Capability{
 		DataScope:         datastore.LocalScope,
 		ConnectivityScope: datastore.LocalScope,
-	***REMOVED***
+	}
 	return dc.RegisterDriver(networkType, d, c)
-***REMOVED***
+}
 
 // Validate performs a static validation on the network configuration parameters.
 // Whatever can be assessed a priori before attempting any programming.
-func (c *networkConfiguration) Validate() error ***REMOVED***
-	if c.Mtu < 0 ***REMOVED***
+func (c *networkConfiguration) Validate() error {
+	if c.Mtu < 0 {
 		return ErrInvalidMtu(c.Mtu)
-	***REMOVED***
+	}
 
 	// If bridge v4 subnet is specified
-	if c.AddressIPv4 != nil ***REMOVED***
+	if c.AddressIPv4 != nil {
 		// If default gw is specified, it must be part of bridge subnet
-		if c.DefaultGatewayIPv4 != nil ***REMOVED***
-			if !c.AddressIPv4.Contains(c.DefaultGatewayIPv4) ***REMOVED***
-				return &ErrInvalidGateway***REMOVED******REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+		if c.DefaultGatewayIPv4 != nil {
+			if !c.AddressIPv4.Contains(c.DefaultGatewayIPv4) {
+				return &ErrInvalidGateway{}
+			}
+		}
+	}
 
 	// If default v6 gw is specified, AddressIPv6 must be specified and gw must belong to AddressIPv6 subnet
-	if c.EnableIPv6 && c.DefaultGatewayIPv6 != nil ***REMOVED***
-		if c.AddressIPv6 == nil || !c.AddressIPv6.Contains(c.DefaultGatewayIPv6) ***REMOVED***
-			return &ErrInvalidGateway***REMOVED******REMOVED***
-		***REMOVED***
-	***REMOVED***
+	if c.EnableIPv6 && c.DefaultGatewayIPv6 != nil {
+		if c.AddressIPv6 == nil || !c.AddressIPv6.Contains(c.DefaultGatewayIPv6) {
+			return &ErrInvalidGateway{}
+		}
+	}
 	return nil
-***REMOVED***
+}
 
 // Conflicts check if two NetworkConfiguration objects overlap
-func (c *networkConfiguration) Conflicts(o *networkConfiguration) error ***REMOVED***
-	if o == nil ***REMOVED***
+func (c *networkConfiguration) Conflicts(o *networkConfiguration) error {
+	if o == nil {
 		return errors.New("same configuration")
-	***REMOVED***
+	}
 
 	// Also empty, because only one network with empty name is allowed
-	if c.BridgeName == o.BridgeName ***REMOVED***
+	if c.BridgeName == o.BridgeName {
 		return errors.New("networks have same bridge name")
-	***REMOVED***
+	}
 
 	// They must be in different subnets
 	if (c.AddressIPv4 != nil && o.AddressIPv4 != nil) &&
-		(c.AddressIPv4.Contains(o.AddressIPv4.IP) || o.AddressIPv4.Contains(c.AddressIPv4.IP)) ***REMOVED***
+		(c.AddressIPv4.Contains(o.AddressIPv4.IP) || o.AddressIPv4.Contains(c.AddressIPv4.IP)) {
 		return errors.New("networks have overlapping IPv4")
-	***REMOVED***
+	}
 
 	// They must be in different v6 subnets
 	if (c.AddressIPv6 != nil && o.AddressIPv6 != nil) &&
-		(c.AddressIPv6.Contains(o.AddressIPv6.IP) || o.AddressIPv6.Contains(c.AddressIPv6.IP)) ***REMOVED***
+		(c.AddressIPv6.Contains(o.AddressIPv6.IP) || o.AddressIPv6.Contains(c.AddressIPv6.IP)) {
 		return errors.New("networks have overlapping IPv6")
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (c *networkConfiguration) fromLabels(labels map[string]string) error ***REMOVED***
+func (c *networkConfiguration) fromLabels(labels map[string]string) error {
 	var err error
-	for label, value := range labels ***REMOVED***
-		switch label ***REMOVED***
+	for label, value := range labels {
+		switch label {
 		case BridgeName:
 			c.BridgeName = value
 		case netlabel.DriverMTU:
-			if c.Mtu, err = strconv.Atoi(value); err != nil ***REMOVED***
+			if c.Mtu, err = strconv.Atoi(value); err != nil {
 				return parseErr(label, value, err.Error())
-			***REMOVED***
+			}
 		case netlabel.EnableIPv6:
-			if c.EnableIPv6, err = strconv.ParseBool(value); err != nil ***REMOVED***
+			if c.EnableIPv6, err = strconv.ParseBool(value); err != nil {
 				return parseErr(label, value, err.Error())
-			***REMOVED***
+			}
 		case EnableIPMasquerade:
-			if c.EnableIPMasquerade, err = strconv.ParseBool(value); err != nil ***REMOVED***
+			if c.EnableIPMasquerade, err = strconv.ParseBool(value); err != nil {
 				return parseErr(label, value, err.Error())
-			***REMOVED***
+			}
 		case EnableICC:
-			if c.EnableICC, err = strconv.ParseBool(value); err != nil ***REMOVED***
+			if c.EnableICC, err = strconv.ParseBool(value); err != nil {
 				return parseErr(label, value, err.Error())
-			***REMOVED***
+			}
 		case DefaultBridge:
-			if c.DefaultBridge, err = strconv.ParseBool(value); err != nil ***REMOVED***
+			if c.DefaultBridge, err = strconv.ParseBool(value); err != nil {
 				return parseErr(label, value, err.Error())
-			***REMOVED***
+			}
 		case DefaultBindingIP:
-			if c.DefaultBindingIP = net.ParseIP(value); c.DefaultBindingIP == nil ***REMOVED***
+			if c.DefaultBindingIP = net.ParseIP(value); c.DefaultBindingIP == nil {
 				return parseErr(label, value, "nil ip")
-			***REMOVED***
+			}
 		case netlabel.ContainerIfacePrefix:
 			c.ContainerIfacePrefix = value
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
-func parseErr(label, value, errString string) error ***REMOVED***
+func parseErr(label, value, errString string) error {
 	return types.BadRequestErrorf("failed to parse %s value: %v (%s)", label, value, errString)
-***REMOVED***
+}
 
-func (n *bridgeNetwork) registerIptCleanFunc(clean iptableCleanFunc) ***REMOVED***
+func (n *bridgeNetwork) registerIptCleanFunc(clean iptableCleanFunc) {
 	n.iptCleanFuncs = append(n.iptCleanFuncs, clean)
-***REMOVED***
+}
 
-func (n *bridgeNetwork) getDriverChains() (*iptables.ChainInfo, *iptables.ChainInfo, *iptables.ChainInfo, error) ***REMOVED***
+func (n *bridgeNetwork) getDriverChains() (*iptables.ChainInfo, *iptables.ChainInfo, *iptables.ChainInfo, error) {
 	n.Lock()
 	defer n.Unlock()
 
-	if n.driver == nil ***REMOVED***
+	if n.driver == nil {
 		return nil, nil, nil, types.BadRequestErrorf("no driver found")
-	***REMOVED***
+	}
 
 	return n.driver.natChain, n.driver.filterChain, n.driver.isolationChain, nil
-***REMOVED***
+}
 
-func (n *bridgeNetwork) getNetworkBridgeName() string ***REMOVED***
+func (n *bridgeNetwork) getNetworkBridgeName() string {
 	n.Lock()
 	config := n.config
 	n.Unlock()
 
 	return config.BridgeName
-***REMOVED***
+}
 
-func (n *bridgeNetwork) getEndpoint(eid string) (*bridgeEndpoint, error) ***REMOVED***
+func (n *bridgeNetwork) getEndpoint(eid string) (*bridgeEndpoint, error) {
 	n.Lock()
 	defer n.Unlock()
 
-	if eid == "" ***REMOVED***
+	if eid == "" {
 		return nil, InvalidEndpointIDError(eid)
-	***REMOVED***
+	}
 
-	if ep, ok := n.endpoints[eid]; ok ***REMOVED***
+	if ep, ok := n.endpoints[eid]; ok {
 		return ep, nil
-	***REMOVED***
+	}
 
 	return nil, nil
-***REMOVED***
+}
 
 // Install/Removes the iptables rules needed to isolate this network
 // from each of the other networks
-func (n *bridgeNetwork) isolateNetwork(others []*bridgeNetwork, enable bool) error ***REMOVED***
+func (n *bridgeNetwork) isolateNetwork(others []*bridgeNetwork, enable bool) error {
 	n.Lock()
 	thisConfig := n.config
 	n.Unlock()
 
-	if thisConfig.Internal ***REMOVED***
+	if thisConfig.Internal {
 		return nil
-	***REMOVED***
+	}
 
 	// Install the rules to isolate this networks against each of the other networks
-	for _, o := range others ***REMOVED***
+	for _, o := range others {
 		o.Lock()
 		otherConfig := o.config
 		o.Unlock()
 
-		if otherConfig.Internal ***REMOVED***
+		if otherConfig.Internal {
 			continue
-		***REMOVED***
+		}
 
-		if thisConfig.BridgeName != otherConfig.BridgeName ***REMOVED***
-			if err := setINC(thisConfig.BridgeName, otherConfig.BridgeName, enable); err != nil ***REMOVED***
+		if thisConfig.BridgeName != otherConfig.BridgeName {
+			if err := setINC(thisConfig.BridgeName, otherConfig.BridgeName, enable); err != nil {
 				return err
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (d *driver) configure(option map[string]interface***REMOVED******REMOVED***) error ***REMOVED***
+func (d *driver) configure(option map[string]interface{}) error {
 	var (
 		config         *configuration
 		err            error
@@ -341,45 +341,45 @@ func (d *driver) configure(option map[string]interface***REMOVED******REMOVED***
 	)
 
 	genericData, ok := option[netlabel.GenericData]
-	if !ok || genericData == nil ***REMOVED***
+	if !ok || genericData == nil {
 		return nil
-	***REMOVED***
+	}
 
-	switch opt := genericData.(type) ***REMOVED***
+	switch opt := genericData.(type) {
 	case options.Generic:
-		opaqueConfig, err := options.GenerateFromModel(opt, &configuration***REMOVED******REMOVED***)
-		if err != nil ***REMOVED***
+		opaqueConfig, err := options.GenerateFromModel(opt, &configuration{})
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		config = opaqueConfig.(*configuration)
 	case *configuration:
 		config = opt
 	default:
-		return &ErrInvalidDriverConfig***REMOVED******REMOVED***
-	***REMOVED***
+		return &ErrInvalidDriverConfig{}
+	}
 
-	if config.EnableIPTables ***REMOVED***
-		if _, err := os.Stat("/proc/sys/net/bridge"); err != nil ***REMOVED***
-			if out, err := exec.Command("modprobe", "-va", "bridge", "br_netfilter").CombinedOutput(); err != nil ***REMOVED***
+	if config.EnableIPTables {
+		if _, err := os.Stat("/proc/sys/net/bridge"); err != nil {
+			if out, err := exec.Command("modprobe", "-va", "bridge", "br_netfilter").CombinedOutput(); err != nil {
 				logrus.Warnf("Running modprobe bridge br_netfilter failed with message: %s, error: %v", out, err)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		removeIPChains()
 		natChain, filterChain, isolationChain, err = setupIPChains(config)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		// Make sure on firewall reload, first thing being re-played is chains creation
-		iptables.OnReloaded(func() ***REMOVED*** logrus.Debugf("Recreating iptables chains on firewall reload"); setupIPChains(config) ***REMOVED***)
-	***REMOVED***
+		iptables.OnReloaded(func() { logrus.Debugf("Recreating iptables chains on firewall reload"); setupIPChains(config) })
+	}
 
-	if config.EnableIPForwarding ***REMOVED***
+	if config.EnableIPForwarding {
 		err = setupIPForwarding(config.EnableIPTables)
-		if err != nil ***REMOVED***
+		if err != nil {
 			logrus.Warn(err)
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	d.Lock()
 	d.natChain = natChain
@@ -389,196 +389,196 @@ func (d *driver) configure(option map[string]interface***REMOVED******REMOVED***
 	d.Unlock()
 
 	err = d.initStore(option)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (d *driver) getNetwork(id string) (*bridgeNetwork, error) ***REMOVED***
+func (d *driver) getNetwork(id string) (*bridgeNetwork, error) {
 	d.Lock()
 	defer d.Unlock()
 
-	if id == "" ***REMOVED***
+	if id == "" {
 		return nil, types.BadRequestErrorf("invalid network id: %s", id)
-	***REMOVED***
+	}
 
-	if nw, ok := d.networks[id]; ok ***REMOVED***
+	if nw, ok := d.networks[id]; ok {
 		return nw, nil
-	***REMOVED***
+	}
 
 	return nil, types.NotFoundErrorf("network not found: %s", id)
-***REMOVED***
+}
 
-func parseNetworkGenericOptions(data interface***REMOVED******REMOVED***) (*networkConfiguration, error) ***REMOVED***
+func parseNetworkGenericOptions(data interface{}) (*networkConfiguration, error) {
 	var (
 		err    error
 		config *networkConfiguration
 	)
 
-	switch opt := data.(type) ***REMOVED***
+	switch opt := data.(type) {
 	case *networkConfiguration:
 		config = opt
 	case map[string]string:
-		config = &networkConfiguration***REMOVED***
+		config = &networkConfiguration{
 			EnableICC:          true,
 			EnableIPMasquerade: true,
-		***REMOVED***
+		}
 		err = config.fromLabels(opt)
 	case options.Generic:
-		var opaqueConfig interface***REMOVED******REMOVED***
-		if opaqueConfig, err = options.GenerateFromModel(opt, config); err == nil ***REMOVED***
+		var opaqueConfig interface{}
+		if opaqueConfig, err = options.GenerateFromModel(opt, config); err == nil {
 			config = opaqueConfig.(*networkConfiguration)
-		***REMOVED***
+		}
 	default:
 		err = types.BadRequestErrorf("do not recognize network configuration format: %T", opt)
-	***REMOVED***
+	}
 
 	return config, err
-***REMOVED***
+}
 
-func (c *networkConfiguration) processIPAM(id string, ipamV4Data, ipamV6Data []driverapi.IPAMData) error ***REMOVED***
-	if len(ipamV4Data) > 1 || len(ipamV6Data) > 1 ***REMOVED***
+func (c *networkConfiguration) processIPAM(id string, ipamV4Data, ipamV6Data []driverapi.IPAMData) error {
+	if len(ipamV4Data) > 1 || len(ipamV6Data) > 1 {
 		return types.ForbiddenErrorf("bridge driver doesn't support multiple subnets")
-	***REMOVED***
+	}
 
-	if len(ipamV4Data) == 0 ***REMOVED***
+	if len(ipamV4Data) == 0 {
 		return types.BadRequestErrorf("bridge network %s requires ipv4 configuration", id)
-	***REMOVED***
+	}
 
-	if ipamV4Data[0].Gateway != nil ***REMOVED***
+	if ipamV4Data[0].Gateway != nil {
 		c.AddressIPv4 = types.GetIPNetCopy(ipamV4Data[0].Gateway)
-	***REMOVED***
+	}
 
-	if gw, ok := ipamV4Data[0].AuxAddresses[DefaultGatewayV4AuxKey]; ok ***REMOVED***
+	if gw, ok := ipamV4Data[0].AuxAddresses[DefaultGatewayV4AuxKey]; ok {
 		c.DefaultGatewayIPv4 = gw.IP
-	***REMOVED***
+	}
 
-	if len(ipamV6Data) > 0 ***REMOVED***
+	if len(ipamV6Data) > 0 {
 		c.AddressIPv6 = ipamV6Data[0].Pool
 
-		if ipamV6Data[0].Gateway != nil ***REMOVED***
+		if ipamV6Data[0].Gateway != nil {
 			c.AddressIPv6 = types.GetIPNetCopy(ipamV6Data[0].Gateway)
-		***REMOVED***
+		}
 
-		if gw, ok := ipamV6Data[0].AuxAddresses[DefaultGatewayV6AuxKey]; ok ***REMOVED***
+		if gw, ok := ipamV6Data[0].AuxAddresses[DefaultGatewayV6AuxKey]; ok {
 			c.DefaultGatewayIPv6 = gw.IP
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
-func parseNetworkOptions(id string, option options.Generic) (*networkConfiguration, error) ***REMOVED***
+func parseNetworkOptions(id string, option options.Generic) (*networkConfiguration, error) {
 	var (
 		err    error
-		config = &networkConfiguration***REMOVED******REMOVED***
+		config = &networkConfiguration{}
 	)
 
 	// Parse generic label first, config will be re-assigned
-	if genData, ok := option[netlabel.GenericData]; ok && genData != nil ***REMOVED***
-		if config, err = parseNetworkGenericOptions(genData); err != nil ***REMOVED***
+	if genData, ok := option[netlabel.GenericData]; ok && genData != nil {
+		if config, err = parseNetworkGenericOptions(genData); err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Process well-known labels next
-	if val, ok := option[netlabel.EnableIPv6]; ok ***REMOVED***
+	if val, ok := option[netlabel.EnableIPv6]; ok {
 		config.EnableIPv6 = val.(bool)
-	***REMOVED***
+	}
 
-	if val, ok := option[netlabel.Internal]; ok ***REMOVED***
-		if internal, ok := val.(bool); ok && internal ***REMOVED***
+	if val, ok := option[netlabel.Internal]; ok {
+		if internal, ok := val.(bool); ok && internal {
 			config.Internal = true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Finally validate the configuration
-	if err = config.Validate(); err != nil ***REMOVED***
+	if err = config.Validate(); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	if config.BridgeName == "" && config.DefaultBridge == false ***REMOVED***
+	if config.BridgeName == "" && config.DefaultBridge == false {
 		config.BridgeName = "br-" + id[:12]
-	***REMOVED***
+	}
 
 	exists, err := bridgeInterfaceExists(config.BridgeName)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	if !exists ***REMOVED***
+	if !exists {
 		config.BridgeIfaceCreator = ifaceCreatedByLibnetwork
-	***REMOVED*** else ***REMOVED***
+	} else {
 		config.BridgeIfaceCreator = ifaceCreatedByUser
-	***REMOVED***
+	}
 
 	config.ID = id
 	return config, nil
-***REMOVED***
+}
 
 // Returns the non link-local IPv6 subnet for the containers attached to this bridge if found, nil otherwise
-func getV6Network(config *networkConfiguration, i *bridgeInterface) *net.IPNet ***REMOVED***
-	if config.AddressIPv6 != nil ***REMOVED***
+func getV6Network(config *networkConfiguration, i *bridgeInterface) *net.IPNet {
+	if config.AddressIPv6 != nil {
 		return config.AddressIPv6
-	***REMOVED***
-	if i.bridgeIPv6 != nil && i.bridgeIPv6.IP != nil && !i.bridgeIPv6.IP.IsLinkLocalUnicast() ***REMOVED***
+	}
+	if i.bridgeIPv6 != nil && i.bridgeIPv6.IP != nil && !i.bridgeIPv6.IP.IsLinkLocalUnicast() {
 		return i.bridgeIPv6
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // Return a slice of networks over which caller can iterate safely
-func (d *driver) getNetworks() []*bridgeNetwork ***REMOVED***
+func (d *driver) getNetworks() []*bridgeNetwork {
 	d.Lock()
 	defer d.Unlock()
 
 	ls := make([]*bridgeNetwork, 0, len(d.networks))
-	for _, nw := range d.networks ***REMOVED***
+	for _, nw := range d.networks {
 		ls = append(ls, nw)
-	***REMOVED***
+	}
 	return ls
-***REMOVED***
+}
 
-func (d *driver) NetworkAllocate(id string, option map[string]string, ipV4Data, ipV6Data []driverapi.IPAMData) (map[string]string, error) ***REMOVED***
+func (d *driver) NetworkAllocate(id string, option map[string]string, ipV4Data, ipV6Data []driverapi.IPAMData) (map[string]string, error) {
 	return nil, types.NotImplementedErrorf("not implemented")
-***REMOVED***
+}
 
-func (d *driver) NetworkFree(id string) error ***REMOVED***
+func (d *driver) NetworkFree(id string) error {
 	return types.NotImplementedErrorf("not implemented")
-***REMOVED***
+}
 
-func (d *driver) EventNotify(etype driverapi.EventType, nid, tableName, key string, value []byte) ***REMOVED***
-***REMOVED***
+func (d *driver) EventNotify(etype driverapi.EventType, nid, tableName, key string, value []byte) {
+}
 
-func (d *driver) DecodeTableEntry(tablename string, key string, value []byte) (string, map[string]string) ***REMOVED***
+func (d *driver) DecodeTableEntry(tablename string, key string, value []byte) (string, map[string]string) {
 	return "", nil
-***REMOVED***
+}
 
 // Create a new network using bridge plugin
-func (d *driver) CreateNetwork(id string, option map[string]interface***REMOVED******REMOVED***, nInfo driverapi.NetworkInfo, ipV4Data, ipV6Data []driverapi.IPAMData) error ***REMOVED***
-	if len(ipV4Data) == 0 || ipV4Data[0].Pool.String() == "0.0.0.0/0" ***REMOVED***
+func (d *driver) CreateNetwork(id string, option map[string]interface{}, nInfo driverapi.NetworkInfo, ipV4Data, ipV6Data []driverapi.IPAMData) error {
+	if len(ipV4Data) == 0 || ipV4Data[0].Pool.String() == "0.0.0.0/0" {
 		return types.BadRequestErrorf("ipv4 pool is empty")
-	***REMOVED***
+	}
 	// Sanity checks
 	d.Lock()
-	if _, ok := d.networks[id]; ok ***REMOVED***
+	if _, ok := d.networks[id]; ok {
 		d.Unlock()
 		return types.ForbiddenErrorf("network %s exists", id)
-	***REMOVED***
+	}
 	d.Unlock()
 
 	// Parse and validate the config. It should not be conflict with existing networks' config
 	config, err := parseNetworkOptions(id, option)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if err = config.processIPAM(id, ipV4Data, ipV6Data); err != nil ***REMOVED***
+	if err = config.processIPAM(id, ipV4Data, ipV6Data); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	// start the critical section, from this point onward we are dealing with the list of networks
 	// so to be consistent we cannot allow that the list changes
@@ -586,48 +586,48 @@ func (d *driver) CreateNetwork(id string, option map[string]interface***REMOVED*
 	defer d.configNetwork.Unlock()
 
 	// check network conflicts
-	if err = d.checkConflict(config); err != nil ***REMOVED***
+	if err = d.checkConflict(config); err != nil {
 		nerr, ok := err.(defaultBridgeNetworkConflict)
-		if !ok ***REMOVED***
+		if !ok {
 			return err
-		***REMOVED***
+		}
 		// Got a conflict with a stale default network, clean that up and continue
 		logrus.Warn(nerr)
 		d.deleteNetwork(nerr.ID)
-	***REMOVED***
+	}
 
 	// there is no conflict, now create the network
-	if err = d.createNetwork(config); err != nil ***REMOVED***
+	if err = d.createNetwork(config); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	return d.storeUpdate(config)
-***REMOVED***
+}
 
-func (d *driver) checkConflict(config *networkConfiguration) error ***REMOVED***
+func (d *driver) checkConflict(config *networkConfiguration) error {
 	networkList := d.getNetworks()
-	for _, nw := range networkList ***REMOVED***
+	for _, nw := range networkList {
 		nw.Lock()
 		nwConfig := nw.config
 		nw.Unlock()
-		if err := nwConfig.Conflicts(config); err != nil ***REMOVED***
-			if config.DefaultBridge ***REMOVED***
+		if err := nwConfig.Conflicts(config); err != nil {
+			if config.DefaultBridge {
 				// We encountered and identified a stale default network
 				// We must delete it as libnetwork is the source of truth
 				// The default network being created must be the only one
 				// This can happen only from docker 1.12 on ward
 				logrus.Infof("Found stale default bridge network %s (%s)", nwConfig.ID, nwConfig.BridgeName)
-				return defaultBridgeNetworkConflict***REMOVED***nwConfig.ID***REMOVED***
-			***REMOVED***
+				return defaultBridgeNetworkConflict{nwConfig.ID}
+			}
 
 			return types.ForbiddenErrorf("cannot create network %s (%s): conflicts with network %s (%s): %s",
 				config.ID, config.BridgeName, nwConfig.ID, nwConfig.BridgeName, err.Error())
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func (d *driver) createNetwork(config *networkConfiguration) error ***REMOVED***
+func (d *driver) createNetwork(config *networkConfiguration) error {
 	var err error
 
 	defer osl.InitOSContext()()
@@ -636,55 +636,55 @@ func (d *driver) createNetwork(config *networkConfiguration) error ***REMOVED***
 
 	// Initialize handle when needed
 	d.Lock()
-	if d.nlh == nil ***REMOVED***
+	if d.nlh == nil {
 		d.nlh = ns.NlHandle()
-	***REMOVED***
+	}
 	d.Unlock()
 
 	// Create or retrieve the bridge L3 interface
 	bridgeIface, err := newInterface(d.nlh, config)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	// Create and set network handler in driver
-	network := &bridgeNetwork***REMOVED***
+	network := &bridgeNetwork{
 		id:         config.ID,
 		endpoints:  make(map[string]*bridgeEndpoint),
 		config:     config,
 		portMapper: portmapper.New(d.config.UserlandProxyPath),
 		bridge:     bridgeIface,
 		driver:     d,
-	***REMOVED***
+	}
 
 	d.Lock()
 	d.networks[config.ID] = network
 	d.Unlock()
 
 	// On failure make sure to reset driver network handler to nil
-	defer func() ***REMOVED***
-		if err != nil ***REMOVED***
+	defer func() {
+		if err != nil {
 			d.Lock()
 			delete(d.networks, config.ID)
 			d.Unlock()
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
 	// Add inter-network communication rules.
-	setupNetworkIsolationRules := func(config *networkConfiguration, i *bridgeInterface) error ***REMOVED***
-		if err := network.isolateNetwork(networkList, true); err != nil ***REMOVED***
-			if err = network.isolateNetwork(networkList, false); err != nil ***REMOVED***
+	setupNetworkIsolationRules := func(config *networkConfiguration, i *bridgeInterface) error {
+		if err := network.isolateNetwork(networkList, true); err != nil {
+			if err = network.isolateNetwork(networkList, false); err != nil {
 				logrus.Warnf("Failed on removing the inter-network iptables rules on cleanup: %v", err)
-			***REMOVED***
+			}
 			return err
-		***REMOVED***
+		}
 		// register the cleanup function
-		network.registerIptCleanFunc(func() error ***REMOVED***
+		network.registerIptCleanFunc(func() error {
 			nwList := d.getNetworks()
 			return network.isolateNetwork(nwList, false)
-		***REMOVED***)
+		})
 		return nil
-	***REMOVED***
+	}
 
 	// Prepare the bridge setup configuration
 	bridgeSetup := newBridgeSetup(config, bridgeIface)
@@ -692,9 +692,9 @@ func (d *driver) createNetwork(config *networkConfiguration) error ***REMOVED***
 	// If the bridge interface doesn't exist, we need to start the setup steps
 	// by creating a new device and assigning it an IPv4 address.
 	bridgeAlreadyExists := bridgeIface.exists()
-	if !bridgeAlreadyExists ***REMOVED***
+	if !bridgeAlreadyExists {
 		bridgeSetup.queueStep(setupDevice)
-	***REMOVED***
+	}
 
 	// Even if a bridge exists try to setup IPv4.
 	bridgeSetup.queueStep(setupBridgeIPv4)
@@ -702,64 +702,64 @@ func (d *driver) createNetwork(config *networkConfiguration) error ***REMOVED***
 	enableIPv6Forwarding := d.config.EnableIPForwarding && config.AddressIPv6 != nil
 
 	// Conditionally queue setup steps depending on configuration values.
-	for _, step := range []struct ***REMOVED***
+	for _, step := range []struct {
 		Condition bool
 		Fn        setupStep
-	***REMOVED******REMOVED***
+	}{
 		// Enable IPv6 on the bridge if required. We do this even for a
 		// previously  existing bridge, as it may be here from a previous
 		// installation where IPv6 wasn't supported yet and needs to be
 		// assigned an IPv6 link-local address.
-		***REMOVED***config.EnableIPv6, setupBridgeIPv6***REMOVED***,
+		{config.EnableIPv6, setupBridgeIPv6},
 
 		// We ensure that the bridge has the expectedIPv4 and IPv6 addresses in
 		// the case of a previously existing device.
-		***REMOVED***bridgeAlreadyExists, setupVerifyAndReconcile***REMOVED***,
+		{bridgeAlreadyExists, setupVerifyAndReconcile},
 
 		// Enable IPv6 Forwarding
-		***REMOVED***enableIPv6Forwarding, setupIPv6Forwarding***REMOVED***,
+		{enableIPv6Forwarding, setupIPv6Forwarding},
 
 		// Setup Loopback Adresses Routing
-		***REMOVED***!d.config.EnableUserlandProxy, setupLoopbackAdressesRouting***REMOVED***,
+		{!d.config.EnableUserlandProxy, setupLoopbackAdressesRouting},
 
 		// Setup IPTables.
-		***REMOVED***d.config.EnableIPTables, network.setupIPTables***REMOVED***,
+		{d.config.EnableIPTables, network.setupIPTables},
 
 		//We want to track firewalld configuration so that
 		//if it is started/reloaded, the rules can be applied correctly
-		***REMOVED***d.config.EnableIPTables, network.setupFirewalld***REMOVED***,
+		{d.config.EnableIPTables, network.setupFirewalld},
 
 		// Setup DefaultGatewayIPv4
-		***REMOVED***config.DefaultGatewayIPv4 != nil, setupGatewayIPv4***REMOVED***,
+		{config.DefaultGatewayIPv4 != nil, setupGatewayIPv4},
 
 		// Setup DefaultGatewayIPv6
-		***REMOVED***config.DefaultGatewayIPv6 != nil, setupGatewayIPv6***REMOVED***,
+		{config.DefaultGatewayIPv6 != nil, setupGatewayIPv6},
 
 		// Add inter-network communication rules.
-		***REMOVED***d.config.EnableIPTables, setupNetworkIsolationRules***REMOVED***,
+		{d.config.EnableIPTables, setupNetworkIsolationRules},
 
 		//Configure bridge networking filtering if ICC is off and IP tables are enabled
-		***REMOVED***!config.EnableICC && d.config.EnableIPTables, setupBridgeNetFiltering***REMOVED***,
-	***REMOVED*** ***REMOVED***
-		if step.Condition ***REMOVED***
+		{!config.EnableICC && d.config.EnableIPTables, setupBridgeNetFiltering},
+	} {
+		if step.Condition {
 			bridgeSetup.queueStep(step.Fn)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Apply the prepared list of steps, and abort at the first error.
 	bridgeSetup.queueStep(setupDeviceUp)
 	return bridgeSetup.apply()
-***REMOVED***
+}
 
-func (d *driver) DeleteNetwork(nid string) error ***REMOVED***
+func (d *driver) DeleteNetwork(nid string) error {
 
 	d.configNetwork.Lock()
 	defer d.configNetwork.Unlock()
 
 	return d.deleteNetwork(nid)
-***REMOVED***
+}
 
-func (d *driver) deleteNetwork(nid string) error ***REMOVED***
+func (d *driver) deleteNetwork(nid string) error {
 	var err error
 
 	defer osl.InitOSContext()()
@@ -768,27 +768,27 @@ func (d *driver) deleteNetwork(nid string) error ***REMOVED***
 	n, ok := d.networks[nid]
 	d.Unlock()
 
-	if !ok ***REMOVED***
+	if !ok {
 		return types.InternalMaskableErrorf("network %s does not exist", nid)
-	***REMOVED***
+	}
 
 	n.Lock()
 	config := n.config
 	n.Unlock()
 
 	// delele endpoints belong to this network
-	for _, ep := range n.endpoints ***REMOVED***
-		if err := n.releasePorts(ep); err != nil ***REMOVED***
+	for _, ep := range n.endpoints {
+		if err := n.releasePorts(ep); err != nil {
 			logrus.Warn(err)
-		***REMOVED***
-		if link, err := d.nlh.LinkByName(ep.srcName); err == nil ***REMOVED***
+		}
+		if link, err := d.nlh.LinkByName(ep.srcName); err == nil {
 			d.nlh.LinkDel(link)
-		***REMOVED***
+		}
 
-		if err := d.storeDelete(ep); err != nil ***REMOVED***
+		if err := d.storeDelete(ep); err != nil {
 			logrus.Warnf("Failed to remove bridge endpoint %s from store: %v", ep.id[0:7], err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	d.Lock()
 	delete(d.networks, nid)
@@ -796,98 +796,98 @@ func (d *driver) deleteNetwork(nid string) error ***REMOVED***
 
 	// On failure set network handler back in driver, but
 	// only if is not already taken over by some other thread
-	defer func() ***REMOVED***
-		if err != nil ***REMOVED***
+	defer func() {
+		if err != nil {
 			d.Lock()
-			if _, ok := d.networks[nid]; !ok ***REMOVED***
+			if _, ok := d.networks[nid]; !ok {
 				d.networks[nid] = n
-			***REMOVED***
+			}
 			d.Unlock()
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
-	switch config.BridgeIfaceCreator ***REMOVED***
+	switch config.BridgeIfaceCreator {
 	case ifaceCreatedByLibnetwork, ifaceCreatorUnknown:
 		// We only delete the bridge if it was created by the bridge driver and
 		// it is not the default one (to keep the backward compatible behavior.)
-		if !config.DefaultBridge ***REMOVED***
-			if err := d.nlh.LinkDel(n.bridge.Link); err != nil ***REMOVED***
+		if !config.DefaultBridge {
+			if err := d.nlh.LinkDel(n.bridge.Link); err != nil {
 				logrus.Warnf("Failed to remove bridge interface %s on network %s delete: %v", config.BridgeName, nid, err)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 	case ifaceCreatedByUser:
 		// Don't delete the bridge interface if it was not created by libnetwork.
-	***REMOVED***
+	}
 
 	// clean all relevant iptables rules
-	for _, cleanFunc := range n.iptCleanFuncs ***REMOVED***
-		if errClean := cleanFunc(); errClean != nil ***REMOVED***
+	for _, cleanFunc := range n.iptCleanFuncs {
+		if errClean := cleanFunc(); errClean != nil {
 			logrus.Warnf("Failed to clean iptables rules for bridge network: %v", errClean)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return d.storeDelete(config)
-***REMOVED***
+}
 
-func addToBridge(nlh *netlink.Handle, ifaceName, bridgeName string) error ***REMOVED***
+func addToBridge(nlh *netlink.Handle, ifaceName, bridgeName string) error {
 	link, err := nlh.LinkByName(ifaceName)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("could not find interface %s: %v", ifaceName, err)
-	***REMOVED***
+	}
 	if err = nlh.LinkSetMaster(link,
-		&netlink.Bridge***REMOVED***LinkAttrs: netlink.LinkAttrs***REMOVED***Name: bridgeName***REMOVED******REMOVED***); err != nil ***REMOVED***
+		&netlink.Bridge{LinkAttrs: netlink.LinkAttrs{Name: bridgeName}}); err != nil {
 		logrus.Debugf("Failed to add %s to bridge via netlink.Trying ioctl: %v", ifaceName, err)
 		iface, err := net.InterfaceByName(ifaceName)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return fmt.Errorf("could not find network interface %s: %v", ifaceName, err)
-		***REMOVED***
+		}
 
 		master, err := net.InterfaceByName(bridgeName)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return fmt.Errorf("could not find bridge %s: %v", bridgeName, err)
-		***REMOVED***
+		}
 
 		return ioctlAddToBridge(iface, master)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func setHairpinMode(nlh *netlink.Handle, link netlink.Link, enable bool) error ***REMOVED***
+func setHairpinMode(nlh *netlink.Handle, link netlink.Link, enable bool) error {
 	err := nlh.LinkSetHairpin(link, enable)
-	if err != nil && err != syscall.EINVAL ***REMOVED***
+	if err != nil && err != syscall.EINVAL {
 		// If error is not EINVAL something else went wrong, bail out right away
 		return fmt.Errorf("unable to set hairpin mode on %s via netlink: %v",
 			link.Attrs().Name, err)
-	***REMOVED***
+	}
 
 	// Hairpin mode successfully set up
-	if err == nil ***REMOVED***
+	if err == nil {
 		return nil
-	***REMOVED***
+	}
 
 	// The netlink method failed with EINVAL which is probably because of an older
 	// kernel. Try one more time via the sysfs method.
 	path := filepath.Join("/sys/class/net", link.Attrs().Name, "brport/hairpin_mode")
 
 	var val []byte
-	if enable ***REMOVED***
-		val = []byte***REMOVED***'1', '\n'***REMOVED***
-	***REMOVED*** else ***REMOVED***
-		val = []byte***REMOVED***'0', '\n'***REMOVED***
-	***REMOVED***
+	if enable {
+		val = []byte{'1', '\n'}
+	} else {
+		val = []byte{'0', '\n'}
+	}
 
-	if err := ioutil.WriteFile(path, val, 0644); err != nil ***REMOVED***
+	if err := ioutil.WriteFile(path, val, 0644); err != nil {
 		return fmt.Errorf("unable to set hairpin mode on %s via sysfs: %v", link.Attrs().Name, err)
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (d *driver) CreateEndpoint(nid, eid string, ifInfo driverapi.InterfaceInfo, epOptions map[string]interface***REMOVED******REMOVED***) error ***REMOVED***
+func (d *driver) CreateEndpoint(nid, eid string, ifInfo driverapi.InterfaceInfo, epOptions map[string]interface{}) error {
 	defer osl.InitOSContext()()
 
-	if ifInfo == nil ***REMOVED***
+	if ifInfo == nil {
 		return errors.New("invalid interface info passed")
-	***REMOVED***
+	}
 
 	// Get the network handler and make sure it exists
 	d.Lock()
@@ -895,122 +895,122 @@ func (d *driver) CreateEndpoint(nid, eid string, ifInfo driverapi.InterfaceInfo,
 	dconfig := d.config
 	d.Unlock()
 
-	if !ok ***REMOVED***
+	if !ok {
 		return types.NotFoundErrorf("network %s does not exist", nid)
-	***REMOVED***
-	if n == nil ***REMOVED***
+	}
+	if n == nil {
 		return driverapi.ErrNoNetwork(nid)
-	***REMOVED***
+	}
 
 	// Sanity check
 	n.Lock()
-	if n.id != nid ***REMOVED***
+	if n.id != nid {
 		n.Unlock()
 		return InvalidNetworkIDError(nid)
-	***REMOVED***
+	}
 	n.Unlock()
 
 	// Check if endpoint id is good and retrieve correspondent endpoint
 	ep, err := n.getEndpoint(eid)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	// Endpoint with that id exists either on desired or other sandbox
-	if ep != nil ***REMOVED***
+	if ep != nil {
 		return driverapi.ErrEndpointExists(eid)
-	***REMOVED***
+	}
 
 	// Try to convert the options to endpoint configuration
 	epConfig, err := parseEndpointOptions(epOptions)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	// Create and add the endpoint
 	n.Lock()
-	endpoint := &bridgeEndpoint***REMOVED***id: eid, nid: nid, config: epConfig***REMOVED***
+	endpoint := &bridgeEndpoint{id: eid, nid: nid, config: epConfig}
 	n.endpoints[eid] = endpoint
 	n.Unlock()
 
 	// On failure make sure to remove the endpoint
-	defer func() ***REMOVED***
-		if err != nil ***REMOVED***
+	defer func() {
+		if err != nil {
 			n.Lock()
 			delete(n.endpoints, eid)
 			n.Unlock()
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
 	// Generate a name for what will be the host side pipe interface
 	hostIfName, err := netutils.GenerateIfaceName(d.nlh, vethPrefix, vethLen)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	// Generate a name for what will be the sandbox side pipe interface
 	containerIfName, err := netutils.GenerateIfaceName(d.nlh, vethPrefix, vethLen)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	// Generate and add the interface pipe host <-> sandbox
-	veth := &netlink.Veth***REMOVED***
-		LinkAttrs: netlink.LinkAttrs***REMOVED***Name: hostIfName, TxQLen: 0***REMOVED***,
-		PeerName:  containerIfName***REMOVED***
-	if err = d.nlh.LinkAdd(veth); err != nil ***REMOVED***
+	veth := &netlink.Veth{
+		LinkAttrs: netlink.LinkAttrs{Name: hostIfName, TxQLen: 0},
+		PeerName:  containerIfName}
+	if err = d.nlh.LinkAdd(veth); err != nil {
 		return types.InternalErrorf("failed to add the host (%s) <=> sandbox (%s) pair interfaces: %v", hostIfName, containerIfName, err)
-	***REMOVED***
+	}
 
 	// Get the host side pipe interface handler
 	host, err := d.nlh.LinkByName(hostIfName)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return types.InternalErrorf("failed to find host side interface %s: %v", hostIfName, err)
-	***REMOVED***
-	defer func() ***REMOVED***
-		if err != nil ***REMOVED***
+	}
+	defer func() {
+		if err != nil {
 			d.nlh.LinkDel(host)
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
 	// Get the sandbox side pipe interface handler
 	sbox, err := d.nlh.LinkByName(containerIfName)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return types.InternalErrorf("failed to find sandbox side interface %s: %v", containerIfName, err)
-	***REMOVED***
-	defer func() ***REMOVED***
-		if err != nil ***REMOVED***
+	}
+	defer func() {
+		if err != nil {
 			d.nlh.LinkDel(sbox)
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
 	n.Lock()
 	config := n.config
 	n.Unlock()
 
 	// Add bridge inherited attributes to pipe interfaces
-	if config.Mtu != 0 ***REMOVED***
+	if config.Mtu != 0 {
 		err = d.nlh.LinkSetMTU(host, config.Mtu)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return types.InternalErrorf("failed to set MTU on host interface %s: %v", hostIfName, err)
-		***REMOVED***
+		}
 		err = d.nlh.LinkSetMTU(sbox, config.Mtu)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return types.InternalErrorf("failed to set MTU on sandbox interface %s: %v", containerIfName, err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Attach host side pipe interface into the bridge
-	if err = addToBridge(d.nlh, hostIfName, config.BridgeName); err != nil ***REMOVED***
+	if err = addToBridge(d.nlh, hostIfName, config.BridgeName); err != nil {
 		return fmt.Errorf("adding interface %s to bridge %s failed: %v", hostIfName, config.BridgeName, err)
-	***REMOVED***
+	}
 
-	if !dconfig.EnableUserlandProxy ***REMOVED***
+	if !dconfig.EnableUserlandProxy {
 		err = setHairpinMode(d.nlh, host, true)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Store the sandbox side pipe interface parameters
 	endpoint.srcName = containerIfName
@@ -1019,51 +1019,51 @@ func (d *driver) CreateEndpoint(nid, eid string, ifInfo driverapi.InterfaceInfo,
 	endpoint.addrv6 = ifInfo.AddressIPv6()
 
 	// Set the sbox's MAC if not provided. If specified, use the one configured by user, otherwise generate one based on IP.
-	if endpoint.macAddress == nil ***REMOVED***
+	if endpoint.macAddress == nil {
 		endpoint.macAddress = electMacAddress(epConfig, endpoint.addr.IP)
-		if err = ifInfo.SetMacAddress(endpoint.macAddress); err != nil ***REMOVED***
+		if err = ifInfo.SetMacAddress(endpoint.macAddress); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Up the host interface after finishing all netlink configuration
-	if err = d.nlh.LinkSetUp(host); err != nil ***REMOVED***
+	if err = d.nlh.LinkSetUp(host); err != nil {
 		return fmt.Errorf("could not set link up for host interface %s: %v", hostIfName, err)
-	***REMOVED***
+	}
 
-	if endpoint.addrv6 == nil && config.EnableIPv6 ***REMOVED***
+	if endpoint.addrv6 == nil && config.EnableIPv6 {
 		var ip6 net.IP
 		network := n.bridge.bridgeIPv6
-		if config.AddressIPv6 != nil ***REMOVED***
+		if config.AddressIPv6 != nil {
 			network = config.AddressIPv6
-		***REMOVED***
+		}
 
 		ones, _ := network.Mask.Size()
-		if ones > 80 ***REMOVED***
+		if ones > 80 {
 			err = types.ForbiddenErrorf("Cannot self generate an IPv6 address on network %v: At least 48 host bits are needed.", network)
 			return err
-		***REMOVED***
+		}
 
 		ip6 = make(net.IP, len(network.IP))
 		copy(ip6, network.IP)
-		for i, h := range endpoint.macAddress ***REMOVED***
+		for i, h := range endpoint.macAddress {
 			ip6[i+10] = h
-		***REMOVED***
+		}
 
-		endpoint.addrv6 = &net.IPNet***REMOVED***IP: ip6, Mask: network.Mask***REMOVED***
-		if err = ifInfo.SetIPAddress(endpoint.addrv6); err != nil ***REMOVED***
+		endpoint.addrv6 = &net.IPNet{IP: ip6, Mask: network.Mask}
+		if err = ifInfo.SetIPAddress(endpoint.addrv6); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if err = d.storeUpdate(endpoint); err != nil ***REMOVED***
+	if err = d.storeUpdate(endpoint); err != nil {
 		return fmt.Errorf("failed to save bridge endpoint %s to store: %v", endpoint.id[0:7], err)
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (d *driver) DeleteEndpoint(nid, eid string) error ***REMOVED***
+func (d *driver) DeleteEndpoint(nid, eid string) error {
 	var err error
 
 	defer osl.InitOSContext()()
@@ -1073,29 +1073,29 @@ func (d *driver) DeleteEndpoint(nid, eid string) error ***REMOVED***
 	n, ok := d.networks[nid]
 	d.Unlock()
 
-	if !ok ***REMOVED***
+	if !ok {
 		return types.InternalMaskableErrorf("network %s does not exist", nid)
-	***REMOVED***
-	if n == nil ***REMOVED***
+	}
+	if n == nil {
 		return driverapi.ErrNoNetwork(nid)
-	***REMOVED***
+	}
 
 	// Sanity Check
 	n.Lock()
-	if n.id != nid ***REMOVED***
+	if n.id != nid {
 		n.Unlock()
 		return InvalidNetworkIDError(nid)
-	***REMOVED***
+	}
 	n.Unlock()
 
 	// Check endpoint id and if an endpoint is actually there
 	ep, err := n.getEndpoint(eid)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	if ep == nil ***REMOVED***
+	}
+	if ep == nil {
 		return EndpointNotFoundError(eid)
-	***REMOVED***
+	}
 
 	// Remove it
 	n.Lock()
@@ -1104,228 +1104,228 @@ func (d *driver) DeleteEndpoint(nid, eid string) error ***REMOVED***
 
 	// On failure make sure to set back ep in n.endpoints, but only
 	// if it hasn't been taken over already by some other thread.
-	defer func() ***REMOVED***
-		if err != nil ***REMOVED***
+	defer func() {
+		if err != nil {
 			n.Lock()
-			if _, ok := n.endpoints[eid]; !ok ***REMOVED***
+			if _, ok := n.endpoints[eid]; !ok {
 				n.endpoints[eid] = ep
-			***REMOVED***
+			}
 			n.Unlock()
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
 	// Try removal of link. Discard error: it is a best effort.
 	// Also make sure defer does not see this error either.
-	if link, err := d.nlh.LinkByName(ep.srcName); err == nil ***REMOVED***
+	if link, err := d.nlh.LinkByName(ep.srcName); err == nil {
 		d.nlh.LinkDel(link)
-	***REMOVED***
+	}
 
-	if err := d.storeDelete(ep); err != nil ***REMOVED***
+	if err := d.storeDelete(ep); err != nil {
 		logrus.Warnf("Failed to remove bridge endpoint %s from store: %v", ep.id[0:7], err)
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (d *driver) EndpointOperInfo(nid, eid string) (map[string]interface***REMOVED******REMOVED***, error) ***REMOVED***
+func (d *driver) EndpointOperInfo(nid, eid string) (map[string]interface{}, error) {
 	// Get the network handler and make sure it exists
 	d.Lock()
 	n, ok := d.networks[nid]
 	d.Unlock()
-	if !ok ***REMOVED***
+	if !ok {
 		return nil, types.NotFoundErrorf("network %s does not exist", nid)
-	***REMOVED***
-	if n == nil ***REMOVED***
+	}
+	if n == nil {
 		return nil, driverapi.ErrNoNetwork(nid)
-	***REMOVED***
+	}
 
 	// Sanity check
 	n.Lock()
-	if n.id != nid ***REMOVED***
+	if n.id != nid {
 		n.Unlock()
 		return nil, InvalidNetworkIDError(nid)
-	***REMOVED***
+	}
 	n.Unlock()
 
 	// Check if endpoint id is good and retrieve correspondent endpoint
 	ep, err := n.getEndpoint(eid)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if ep == nil ***REMOVED***
+	}
+	if ep == nil {
 		return nil, driverapi.ErrNoEndpoint(eid)
-	***REMOVED***
+	}
 
-	m := make(map[string]interface***REMOVED******REMOVED***)
+	m := make(map[string]interface{})
 
-	if ep.extConnConfig != nil && ep.extConnConfig.ExposedPorts != nil ***REMOVED***
+	if ep.extConnConfig != nil && ep.extConnConfig.ExposedPorts != nil {
 		// Return a copy of the config data
 		epc := make([]types.TransportPort, 0, len(ep.extConnConfig.ExposedPorts))
-		for _, tp := range ep.extConnConfig.ExposedPorts ***REMOVED***
+		for _, tp := range ep.extConnConfig.ExposedPorts {
 			epc = append(epc, tp.GetCopy())
-		***REMOVED***
+		}
 		m[netlabel.ExposedPorts] = epc
-	***REMOVED***
+	}
 
-	if ep.portMapping != nil ***REMOVED***
+	if ep.portMapping != nil {
 		// Return a copy of the operational data
 		pmc := make([]types.PortBinding, 0, len(ep.portMapping))
-		for _, pm := range ep.portMapping ***REMOVED***
+		for _, pm := range ep.portMapping {
 			pmc = append(pmc, pm.GetCopy())
-		***REMOVED***
+		}
 		m[netlabel.PortMap] = pmc
-	***REMOVED***
+	}
 
-	if len(ep.macAddress) != 0 ***REMOVED***
+	if len(ep.macAddress) != 0 {
 		m[netlabel.MacAddress] = ep.macAddress
-	***REMOVED***
+	}
 
 	return m, nil
-***REMOVED***
+}
 
 // Join method is invoked when a Sandbox is attached to an endpoint.
-func (d *driver) Join(nid, eid string, sboxKey string, jinfo driverapi.JoinInfo, options map[string]interface***REMOVED******REMOVED***) error ***REMOVED***
+func (d *driver) Join(nid, eid string, sboxKey string, jinfo driverapi.JoinInfo, options map[string]interface{}) error {
 	defer osl.InitOSContext()()
 
 	network, err := d.getNetwork(nid)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	endpoint, err := network.getEndpoint(eid)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if endpoint == nil ***REMOVED***
+	if endpoint == nil {
 		return EndpointNotFoundError(eid)
-	***REMOVED***
+	}
 
 	endpoint.containerConfig, err = parseContainerOptions(options)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	iNames := jinfo.InterfaceName()
 	containerVethPrefix := defaultContainerVethPrefix
-	if network.config.ContainerIfacePrefix != "" ***REMOVED***
+	if network.config.ContainerIfacePrefix != "" {
 		containerVethPrefix = network.config.ContainerIfacePrefix
-	***REMOVED***
+	}
 	err = iNames.SetNames(endpoint.srcName, containerVethPrefix)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	err = jinfo.SetGateway(network.bridge.gatewayIPv4)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	err = jinfo.SetGatewayIPv6(network.bridge.gatewayIPv6)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // Leave method is invoked when a Sandbox detaches from an endpoint.
-func (d *driver) Leave(nid, eid string) error ***REMOVED***
+func (d *driver) Leave(nid, eid string) error {
 	defer osl.InitOSContext()()
 
 	network, err := d.getNetwork(nid)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return types.InternalMaskableErrorf("%s", err)
-	***REMOVED***
+	}
 
 	endpoint, err := network.getEndpoint(eid)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if endpoint == nil ***REMOVED***
+	if endpoint == nil {
 		return EndpointNotFoundError(eid)
-	***REMOVED***
+	}
 
-	if !network.config.EnableICC ***REMOVED***
-		if err = d.link(network, endpoint, false); err != nil ***REMOVED***
+	if !network.config.EnableICC {
+		if err = d.link(network, endpoint, false); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (d *driver) ProgramExternalConnectivity(nid, eid string, options map[string]interface***REMOVED******REMOVED***) error ***REMOVED***
+func (d *driver) ProgramExternalConnectivity(nid, eid string, options map[string]interface{}) error {
 	defer osl.InitOSContext()()
 
 	network, err := d.getNetwork(nid)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	endpoint, err := network.getEndpoint(eid)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if endpoint == nil ***REMOVED***
+	if endpoint == nil {
 		return EndpointNotFoundError(eid)
-	***REMOVED***
+	}
 
 	endpoint.extConnConfig, err = parseConnectivityOptions(options)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	// Program any required port mapping and store them in the endpoint
 	endpoint.portMapping, err = network.allocatePorts(endpoint, network.config.DefaultBindingIP, d.config.EnableUserlandProxy)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	defer func() ***REMOVED***
-		if err != nil ***REMOVED***
-			if e := network.releasePorts(endpoint); e != nil ***REMOVED***
+	defer func() {
+		if err != nil {
+			if e := network.releasePorts(endpoint); e != nil {
 				logrus.Errorf("Failed to release ports allocated for the bridge endpoint %s on failure %v because of %v",
 					eid, err, e)
-			***REMOVED***
+			}
 			endpoint.portMapping = nil
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
-	if err = d.storeUpdate(endpoint); err != nil ***REMOVED***
+	if err = d.storeUpdate(endpoint); err != nil {
 		return fmt.Errorf("failed to update bridge endpoint %s to store: %v", endpoint.id[0:7], err)
-	***REMOVED***
+	}
 
-	if !network.config.EnableICC ***REMOVED***
+	if !network.config.EnableICC {
 		return d.link(network, endpoint, true)
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (d *driver) RevokeExternalConnectivity(nid, eid string) error ***REMOVED***
+func (d *driver) RevokeExternalConnectivity(nid, eid string) error {
 	defer osl.InitOSContext()()
 
 	network, err := d.getNetwork(nid)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	endpoint, err := network.getEndpoint(eid)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if endpoint == nil ***REMOVED***
+	if endpoint == nil {
 		return EndpointNotFoundError(eid)
-	***REMOVED***
+	}
 
 	err = network.releasePorts(endpoint)
-	if err != nil ***REMOVED***
+	if err != nil {
 		logrus.Warn(err)
-	***REMOVED***
+	}
 
 	endpoint.portMapping = nil
 
@@ -1336,178 +1336,178 @@ func (d *driver) RevokeExternalConnectivity(nid, eid string) error ***REMOVED***
 	// Deeper details: https://github.com/docker/docker/issues/8795
 	clearEndpointConnections(d.nlh, endpoint)
 
-	if err = d.storeUpdate(endpoint); err != nil ***REMOVED***
+	if err = d.storeUpdate(endpoint); err != nil {
 		return fmt.Errorf("failed to update bridge endpoint %s to store: %v", endpoint.id[0:7], err)
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (d *driver) link(network *bridgeNetwork, endpoint *bridgeEndpoint, enable bool) error ***REMOVED***
+func (d *driver) link(network *bridgeNetwork, endpoint *bridgeEndpoint, enable bool) error {
 	var err error
 
 	cc := endpoint.containerConfig
-	if cc == nil ***REMOVED***
+	if cc == nil {
 		return nil
-	***REMOVED***
+	}
 	ec := endpoint.extConnConfig
-	if ec == nil ***REMOVED***
+	if ec == nil {
 		return nil
-	***REMOVED***
+	}
 
-	if ec.ExposedPorts != nil ***REMOVED***
-		for _, p := range cc.ParentEndpoints ***REMOVED***
+	if ec.ExposedPorts != nil {
+		for _, p := range cc.ParentEndpoints {
 			var parentEndpoint *bridgeEndpoint
 			parentEndpoint, err = network.getEndpoint(p)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if parentEndpoint == nil ***REMOVED***
+			}
+			if parentEndpoint == nil {
 				err = InvalidEndpointIDError(p)
 				return err
-			***REMOVED***
+			}
 
 			l := newLink(parentEndpoint.addr.IP.String(),
 				endpoint.addr.IP.String(),
 				ec.ExposedPorts, network.config.BridgeName)
-			if enable ***REMOVED***
+			if enable {
 				err = l.Enable()
-				if err != nil ***REMOVED***
+				if err != nil {
 					return err
-				***REMOVED***
-				defer func() ***REMOVED***
-					if err != nil ***REMOVED***
+				}
+				defer func() {
+					if err != nil {
 						l.Disable()
-					***REMOVED***
-				***REMOVED***()
-			***REMOVED*** else ***REMOVED***
+					}
+				}()
+			} else {
 				l.Disable()
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
-	for _, c := range cc.ChildEndpoints ***REMOVED***
+	for _, c := range cc.ChildEndpoints {
 		var childEndpoint *bridgeEndpoint
 		childEndpoint, err = network.getEndpoint(c)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-		if childEndpoint == nil ***REMOVED***
+		}
+		if childEndpoint == nil {
 			err = InvalidEndpointIDError(c)
 			return err
-		***REMOVED***
-		if childEndpoint.extConnConfig == nil || childEndpoint.extConnConfig.ExposedPorts == nil ***REMOVED***
+		}
+		if childEndpoint.extConnConfig == nil || childEndpoint.extConnConfig.ExposedPorts == nil {
 			continue
-		***REMOVED***
+		}
 
 		l := newLink(endpoint.addr.IP.String(),
 			childEndpoint.addr.IP.String(),
 			childEndpoint.extConnConfig.ExposedPorts, network.config.BridgeName)
-		if enable ***REMOVED***
+		if enable {
 			err = l.Enable()
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			defer func() ***REMOVED***
-				if err != nil ***REMOVED***
+			}
+			defer func() {
+				if err != nil {
 					l.Disable()
-				***REMOVED***
-			***REMOVED***()
-		***REMOVED*** else ***REMOVED***
+				}
+			}()
+		} else {
 			l.Disable()
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (d *driver) Type() string ***REMOVED***
+func (d *driver) Type() string {
 	return networkType
-***REMOVED***
+}
 
-func (d *driver) IsBuiltIn() bool ***REMOVED***
+func (d *driver) IsBuiltIn() bool {
 	return true
-***REMOVED***
+}
 
 // DiscoverNew is a notification for a new discovery event, such as a new node joining a cluster
-func (d *driver) DiscoverNew(dType discoverapi.DiscoveryType, data interface***REMOVED******REMOVED***) error ***REMOVED***
+func (d *driver) DiscoverNew(dType discoverapi.DiscoveryType, data interface{}) error {
 	return nil
-***REMOVED***
+}
 
 // DiscoverDelete is a notification for a discovery delete event, such as a node leaving a cluster
-func (d *driver) DiscoverDelete(dType discoverapi.DiscoveryType, data interface***REMOVED******REMOVED***) error ***REMOVED***
+func (d *driver) DiscoverDelete(dType discoverapi.DiscoveryType, data interface{}) error {
 	return nil
-***REMOVED***
+}
 
-func parseEndpointOptions(epOptions map[string]interface***REMOVED******REMOVED***) (*endpointConfiguration, error) ***REMOVED***
-	if epOptions == nil ***REMOVED***
+func parseEndpointOptions(epOptions map[string]interface{}) (*endpointConfiguration, error) {
+	if epOptions == nil {
 		return nil, nil
-	***REMOVED***
+	}
 
-	ec := &endpointConfiguration***REMOVED******REMOVED***
+	ec := &endpointConfiguration{}
 
-	if opt, ok := epOptions[netlabel.MacAddress]; ok ***REMOVED***
-		if mac, ok := opt.(net.HardwareAddr); ok ***REMOVED***
+	if opt, ok := epOptions[netlabel.MacAddress]; ok {
+		if mac, ok := opt.(net.HardwareAddr); ok {
 			ec.MacAddress = mac
-		***REMOVED*** else ***REMOVED***
-			return nil, &ErrInvalidEndpointConfig***REMOVED******REMOVED***
-		***REMOVED***
-	***REMOVED***
+		} else {
+			return nil, &ErrInvalidEndpointConfig{}
+		}
+	}
 
 	return ec, nil
-***REMOVED***
+}
 
-func parseContainerOptions(cOptions map[string]interface***REMOVED******REMOVED***) (*containerConfiguration, error) ***REMOVED***
-	if cOptions == nil ***REMOVED***
+func parseContainerOptions(cOptions map[string]interface{}) (*containerConfiguration, error) {
+	if cOptions == nil {
 		return nil, nil
-	***REMOVED***
+	}
 	genericData := cOptions[netlabel.GenericData]
-	if genericData == nil ***REMOVED***
+	if genericData == nil {
 		return nil, nil
-	***REMOVED***
-	switch opt := genericData.(type) ***REMOVED***
+	}
+	switch opt := genericData.(type) {
 	case options.Generic:
-		opaqueConfig, err := options.GenerateFromModel(opt, &containerConfiguration***REMOVED******REMOVED***)
-		if err != nil ***REMOVED***
+		opaqueConfig, err := options.GenerateFromModel(opt, &containerConfiguration{})
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		return opaqueConfig.(*containerConfiguration), nil
 	case *containerConfiguration:
 		return opt, nil
 	default:
 		return nil, nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func parseConnectivityOptions(cOptions map[string]interface***REMOVED******REMOVED***) (*connectivityConfiguration, error) ***REMOVED***
-	if cOptions == nil ***REMOVED***
+func parseConnectivityOptions(cOptions map[string]interface{}) (*connectivityConfiguration, error) {
+	if cOptions == nil {
 		return nil, nil
-	***REMOVED***
+	}
 
-	cc := &connectivityConfiguration***REMOVED******REMOVED***
+	cc := &connectivityConfiguration{}
 
-	if opt, ok := cOptions[netlabel.PortMap]; ok ***REMOVED***
-		if pb, ok := opt.([]types.PortBinding); ok ***REMOVED***
+	if opt, ok := cOptions[netlabel.PortMap]; ok {
+		if pb, ok := opt.([]types.PortBinding); ok {
 			cc.PortBindings = pb
-		***REMOVED*** else ***REMOVED***
+		} else {
 			return nil, types.BadRequestErrorf("Invalid port mapping data in connectivity configuration: %v", opt)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if opt, ok := cOptions[netlabel.ExposedPorts]; ok ***REMOVED***
-		if ports, ok := opt.([]types.TransportPort); ok ***REMOVED***
+	if opt, ok := cOptions[netlabel.ExposedPorts]; ok {
+		if ports, ok := opt.([]types.TransportPort); ok {
 			cc.ExposedPorts = ports
-		***REMOVED*** else ***REMOVED***
+		} else {
 			return nil, types.BadRequestErrorf("Invalid exposed ports data in connectivity configuration: %v", opt)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return cc, nil
-***REMOVED***
+}
 
-func electMacAddress(epConfig *endpointConfiguration, ip net.IP) net.HardwareAddr ***REMOVED***
-	if epConfig != nil && epConfig.MacAddress != nil ***REMOVED***
+func electMacAddress(epConfig *endpointConfiguration, ip net.IP) net.HardwareAddr {
+	if epConfig != nil && epConfig.MacAddress != nil {
 		return epConfig.MacAddress
-	***REMOVED***
+	}
 	return netutils.GenerateMACFromIP(ip)
-***REMOVED***
+}

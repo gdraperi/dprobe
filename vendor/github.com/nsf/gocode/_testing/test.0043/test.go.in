@@ -1,25 +1,25 @@
 package main
 
-type X struct ***REMOVED***
+type X struct {
 	Xa int
 	Xb int
 	Xy Y
-***REMOVED***
+}
 
-type Y struct ***REMOVED***
+type Y struct {
 	Ya int
 	Yb int
-***REMOVED***
+}
 
-func (x X) foo() ***REMOVED***
+func (x X) foo() {
 	return
-***REMOVED***
+}
 
-func main() ***REMOVED***
-	x := X***REMOVED***
+func main() {
+	x := X{
 		Xa: 1,
 		Xb: 2,
-	***REMOVED***
-	y := Y***REMOVED***
+	}
+	y := Y{
 		Ya: x.
-***REMOVED***
+}

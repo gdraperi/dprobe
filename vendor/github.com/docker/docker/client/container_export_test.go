@@ -11,40 +11,40 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestContainerExportError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestContainerExportError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
-	***REMOVED***
+	}
 	_, err := client.ContainerExport(context.Background(), "nothing")
-	if err == nil || err.Error() != "Error response from daemon: Server error" ***REMOVED***
+	if err == nil || err.Error() != "Error response from daemon: Server error" {
 		t.Fatalf("expected a Server Error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestContainerExport(t *testing.T) ***REMOVED***
+func TestContainerExport(t *testing.T) {
 	expectedURL := "/containers/container_id/export"
-	client := &Client***REMOVED***
-		client: newMockClient(func(r *http.Request) (*http.Response, error) ***REMOVED***
-			if !strings.HasPrefix(r.URL.Path, expectedURL) ***REMOVED***
+	client := &Client{
+		client: newMockClient(func(r *http.Request) (*http.Response, error) {
+			if !strings.HasPrefix(r.URL.Path, expectedURL) {
 				return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, r.URL)
-			***REMOVED***
+			}
 
-			return &http.Response***REMOVED***
+			return &http.Response{
 				StatusCode: http.StatusOK,
 				Body:       ioutil.NopCloser(bytes.NewReader([]byte("response"))),
-			***REMOVED***, nil
-		***REMOVED***),
-	***REMOVED***
+			}, nil
+		}),
+	}
 	body, err := client.ContainerExport(context.Background(), "container_id")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	defer body.Close()
 	content, err := ioutil.ReadAll(body)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if string(content) != "response" ***REMOVED***
+	}
+	if string(content) != "response" {
 		t.Fatalf("expected response to contain 'response', got %s", string(content))
-	***REMOVED***
-***REMOVED***
+	}
+}

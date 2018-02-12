@@ -6,9 +6,9 @@ import "github.com/docker/libnetwork/ipamapi"
 
 // Stub implementations for DNS related functions
 
-func (n *network) startResolver() ***REMOVED***
-***REMOVED***
+func (n *network) startResolver() {
+}
 
-func defaultIpamForNetworkType(networkType string) string ***REMOVED***
+func defaultIpamForNetworkType(networkType string) string {
 	return ipamapi.DefaultIPAM
-***REMOVED***
+}

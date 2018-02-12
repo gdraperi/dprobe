@@ -9,108 +9,108 @@ import (
 	ptypes "github.com/gogo/protobuf/types"
 )
 
-type remoteContainers struct ***REMOVED***
+type remoteContainers struct {
 	client containersapi.ContainersClient
-***REMOVED***
+}
 
-var _ containers.Store = &remoteContainers***REMOVED******REMOVED***
+var _ containers.Store = &remoteContainers{}
 
 // NewRemoteContainerStore returns the container Store connected with the provided client
-func NewRemoteContainerStore(client containersapi.ContainersClient) containers.Store ***REMOVED***
-	return &remoteContainers***REMOVED***
+func NewRemoteContainerStore(client containersapi.ContainersClient) containers.Store {
+	return &remoteContainers{
 		client: client,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (r *remoteContainers) Get(ctx context.Context, id string) (containers.Container, error) ***REMOVED***
-	resp, err := r.client.Get(ctx, &containersapi.GetContainerRequest***REMOVED***
+func (r *remoteContainers) Get(ctx context.Context, id string) (containers.Container, error) {
+	resp, err := r.client.Get(ctx, &containersapi.GetContainerRequest{
 		ID: id,
-	***REMOVED***)
-	if err != nil ***REMOVED***
-		return containers.Container***REMOVED******REMOVED***, errdefs.FromGRPC(err)
-	***REMOVED***
+	})
+	if err != nil {
+		return containers.Container{}, errdefs.FromGRPC(err)
+	}
 
 	return containerFromProto(&resp.Container), nil
-***REMOVED***
+}
 
-func (r *remoteContainers) List(ctx context.Context, filters ...string) ([]containers.Container, error) ***REMOVED***
-	resp, err := r.client.List(ctx, &containersapi.ListContainersRequest***REMOVED***
+func (r *remoteContainers) List(ctx context.Context, filters ...string) ([]containers.Container, error) {
+	resp, err := r.client.List(ctx, &containersapi.ListContainersRequest{
 		Filters: filters,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		return nil, errdefs.FromGRPC(err)
-	***REMOVED***
+	}
 
 	return containersFromProto(resp.Containers), nil
 
-***REMOVED***
+}
 
-func (r *remoteContainers) Create(ctx context.Context, container containers.Container) (containers.Container, error) ***REMOVED***
-	created, err := r.client.Create(ctx, &containersapi.CreateContainerRequest***REMOVED***
+func (r *remoteContainers) Create(ctx context.Context, container containers.Container) (containers.Container, error) {
+	created, err := r.client.Create(ctx, &containersapi.CreateContainerRequest{
 		Container: containerToProto(&container),
-	***REMOVED***)
-	if err != nil ***REMOVED***
-		return containers.Container***REMOVED******REMOVED***, errdefs.FromGRPC(err)
-	***REMOVED***
+	})
+	if err != nil {
+		return containers.Container{}, errdefs.FromGRPC(err)
+	}
 
 	return containerFromProto(&created.Container), nil
 
-***REMOVED***
+}
 
-func (r *remoteContainers) Update(ctx context.Context, container containers.Container, fieldpaths ...string) (containers.Container, error) ***REMOVED***
+func (r *remoteContainers) Update(ctx context.Context, container containers.Container, fieldpaths ...string) (containers.Container, error) {
 	var updateMask *ptypes.FieldMask
-	if len(fieldpaths) > 0 ***REMOVED***
-		updateMask = &ptypes.FieldMask***REMOVED***
+	if len(fieldpaths) > 0 {
+		updateMask = &ptypes.FieldMask{
 			Paths: fieldpaths,
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	updated, err := r.client.Update(ctx, &containersapi.UpdateContainerRequest***REMOVED***
+	updated, err := r.client.Update(ctx, &containersapi.UpdateContainerRequest{
 		Container:  containerToProto(&container),
 		UpdateMask: updateMask,
-	***REMOVED***)
-	if err != nil ***REMOVED***
-		return containers.Container***REMOVED******REMOVED***, errdefs.FromGRPC(err)
-	***REMOVED***
+	})
+	if err != nil {
+		return containers.Container{}, errdefs.FromGRPC(err)
+	}
 
 	return containerFromProto(&updated.Container), nil
 
-***REMOVED***
+}
 
-func (r *remoteContainers) Delete(ctx context.Context, id string) error ***REMOVED***
-	_, err := r.client.Delete(ctx, &containersapi.DeleteContainerRequest***REMOVED***
+func (r *remoteContainers) Delete(ctx context.Context, id string) error {
+	_, err := r.client.Delete(ctx, &containersapi.DeleteContainerRequest{
 		ID: id,
-	***REMOVED***)
+	})
 
 	return errdefs.FromGRPC(err)
 
-***REMOVED***
+}
 
-func containerToProto(container *containers.Container) containersapi.Container ***REMOVED***
-	return containersapi.Container***REMOVED***
+func containerToProto(container *containers.Container) containersapi.Container {
+	return containersapi.Container{
 		ID:     container.ID,
 		Labels: container.Labels,
 		Image:  container.Image,
-		Runtime: &containersapi.Container_Runtime***REMOVED***
+		Runtime: &containersapi.Container_Runtime{
 			Name:    container.Runtime.Name,
 			Options: container.Runtime.Options,
-		***REMOVED***,
+		},
 		Spec:        container.Spec,
 		Snapshotter: container.Snapshotter,
 		SnapshotKey: container.SnapshotKey,
 		Extensions:  container.Extensions,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func containerFromProto(containerpb *containersapi.Container) containers.Container ***REMOVED***
+func containerFromProto(containerpb *containersapi.Container) containers.Container {
 	var runtime containers.RuntimeInfo
-	if containerpb.Runtime != nil ***REMOVED***
-		runtime = containers.RuntimeInfo***REMOVED***
+	if containerpb.Runtime != nil {
+		runtime = containers.RuntimeInfo{
 			Name:    containerpb.Runtime.Name,
 			Options: containerpb.Runtime.Options,
-		***REMOVED***
-	***REMOVED***
-	return containers.Container***REMOVED***
+		}
+	}
+	return containers.Container{
 		ID:          containerpb.ID,
 		Labels:      containerpb.Labels,
 		Image:       containerpb.Image,
@@ -121,15 +121,15 @@ func containerFromProto(containerpb *containersapi.Container) containers.Contain
 		CreatedAt:   containerpb.CreatedAt,
 		UpdatedAt:   containerpb.UpdatedAt,
 		Extensions:  containerpb.Extensions,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func containersFromProto(containerspb []containersapi.Container) []containers.Container ***REMOVED***
+func containersFromProto(containerspb []containersapi.Container) []containers.Container {
 	var containers []containers.Container
 
-	for _, container := range containerspb ***REMOVED***
+	for _, container := range containerspb {
 		containers = append(containers, containerFromProto(&container))
-	***REMOVED***
+	}
 
 	return containers
-***REMOVED***
+}

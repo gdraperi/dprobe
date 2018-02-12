@@ -7,6 +7,6 @@ import "strings"
 // c:\ProgramData\Docker\Volumes\, the folders John and john would be synonymous.
 // Hence we can't allow the volume "John" and "john" to be created as separate
 // volumes.
-func normalizeVolumeName(name string) string ***REMOVED***
+func normalizeVolumeName(name string) string {
 	return strings.ToLower(name)
-***REMOVED***
+}

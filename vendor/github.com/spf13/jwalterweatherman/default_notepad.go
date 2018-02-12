@@ -27,7 +27,7 @@ var (
 	defaultNotepad *Notepad
 )
 
-func reloadDefaultNotepad() ***REMOVED***
+func reloadDefaultNotepad() {
 	TRACE = defaultNotepad.TRACE
 	DEBUG = defaultNotepad.DEBUG
 	INFO = defaultNotepad.INFO
@@ -38,76 +38,76 @@ func reloadDefaultNotepad() ***REMOVED***
 
 	LOG = defaultNotepad.LOG
 	FEEDBACK = defaultNotepad.FEEDBACK
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	defaultNotepad = NewNotepad(LevelError, LevelWarn, os.Stdout, ioutil.Discard, "", log.Ldate|log.Ltime)
 	reloadDefaultNotepad()
-***REMOVED***
+}
 
 // SetLogThreshold set the log threshold for the default notepad. Trace by default.
-func SetLogThreshold(threshold Threshold) ***REMOVED***
+func SetLogThreshold(threshold Threshold) {
 	defaultNotepad.SetLogThreshold(threshold)
 	reloadDefaultNotepad()
-***REMOVED***
+}
 
 // SetLogOutput set the log output for the default notepad. Discarded by default.
-func SetLogOutput(handle io.Writer) ***REMOVED***
+func SetLogOutput(handle io.Writer) {
 	defaultNotepad.SetLogOutput(handle)
 	reloadDefaultNotepad()
-***REMOVED***
+}
 
 // SetStdoutThreshold set the standard output threshold for the default notepad.
 // Info by default.
-func SetStdoutThreshold(threshold Threshold) ***REMOVED***
+func SetStdoutThreshold(threshold Threshold) {
 	defaultNotepad.SetStdoutThreshold(threshold)
 	reloadDefaultNotepad()
-***REMOVED***
+}
 
 // SetPrefix set the prefix for the default logger. Empty by default.
-func SetPrefix(prefix string) ***REMOVED***
+func SetPrefix(prefix string) {
 	defaultNotepad.SetPrefix(prefix)
 	reloadDefaultNotepad()
-***REMOVED***
+}
 
 // SetFlags set the flags for the default logger. "log.Ldate | log.Ltime" by default.
-func SetFlags(flags int) ***REMOVED***
+func SetFlags(flags int) {
 	defaultNotepad.SetFlags(flags)
 	reloadDefaultNotepad()
-***REMOVED***
+}
 
 // Level returns the current global log threshold.
-func LogThreshold() Threshold ***REMOVED***
+func LogThreshold() Threshold {
 	return defaultNotepad.logThreshold
-***REMOVED***
+}
 
 // Level returns the current global output threshold.
-func StdoutThreshold() Threshold ***REMOVED***
+func StdoutThreshold() Threshold {
 	return defaultNotepad.stdoutThreshold
-***REMOVED***
+}
 
 // GetStdoutThreshold returns the defined Treshold for the log logger.
-func GetLogThreshold() Threshold ***REMOVED***
+func GetLogThreshold() Threshold {
 	return defaultNotepad.GetLogThreshold()
-***REMOVED***
+}
 
 // GetStdoutThreshold returns the Treshold for the stdout logger.
-func GetStdoutThreshold() Threshold ***REMOVED***
+func GetStdoutThreshold() Threshold {
 	return defaultNotepad.GetStdoutThreshold()
-***REMOVED***
+}
 
 // LogCountForLevel returns the number of log invocations for a given threshold.
-func LogCountForLevel(l Threshold) uint64 ***REMOVED***
+func LogCountForLevel(l Threshold) uint64 {
 	return defaultNotepad.LogCountForLevel(l)
-***REMOVED***
+}
 
 // LogCountForLevelsGreaterThanorEqualTo returns the number of log invocations
 // greater than or equal to a given threshold.
-func LogCountForLevelsGreaterThanorEqualTo(threshold Threshold) uint64 ***REMOVED***
+func LogCountForLevelsGreaterThanorEqualTo(threshold Threshold) uint64 {
 	return defaultNotepad.LogCountForLevelsGreaterThanorEqualTo(threshold)
-***REMOVED***
+}
 
 // ResetLogCounters resets the invocation counters for all levels.
-func ResetLogCounters() ***REMOVED***
+func ResetLogCounters() {
 	defaultNotepad.ResetLogCounters()
-***REMOVED***
+}

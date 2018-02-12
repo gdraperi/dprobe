@@ -17,77 +17,77 @@ import (
 // instead of deriving path from daemon's exec-root. This is because
 // plugin socket files are created here and they cannot exceed max
 // path length of 108 bytes.
-func getPluginExecRoot(root string) string ***REMOVED***
+func getPluginExecRoot(root string) string {
 	return "/run/docker/plugins"
-***REMOVED***
+}
 
-func (daemon *Daemon) cleanupMountsByID(id string) error ***REMOVED***
+func (daemon *Daemon) cleanupMountsByID(id string) error {
 	logrus.Debugf("Cleaning up old mountid %s: start.", id)
 	f, err := os.Open("/proc/self/mountinfo")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer f.Close()
 
 	return daemon.cleanupMountsFromReaderByID(f, id, mount.Unmount)
-***REMOVED***
+}
 
-func (daemon *Daemon) cleanupMountsFromReaderByID(reader io.Reader, id string, unmount func(target string) error) error ***REMOVED***
-	if daemon.root == "" ***REMOVED***
+func (daemon *Daemon) cleanupMountsFromReaderByID(reader io.Reader, id string, unmount func(target string) error) error {
+	if daemon.root == "" {
 		return nil
-	***REMOVED***
+	}
 	var errors []string
 
 	regexps := getCleanPatterns(id)
 	sc := bufio.NewScanner(reader)
-	for sc.Scan() ***REMOVED***
-		if fields := strings.Fields(sc.Text()); len(fields) >= 4 ***REMOVED***
-			if mnt := fields[4]; strings.HasPrefix(mnt, daemon.root) ***REMOVED***
-				for _, p := range regexps ***REMOVED***
-					if p.MatchString(mnt) ***REMOVED***
-						if err := unmount(mnt); err != nil ***REMOVED***
+	for sc.Scan() {
+		if fields := strings.Fields(sc.Text()); len(fields) >= 4 {
+			if mnt := fields[4]; strings.HasPrefix(mnt, daemon.root) {
+				for _, p := range regexps {
+					if p.MatchString(mnt) {
+						if err := unmount(mnt); err != nil {
 							logrus.Error(err)
 							errors = append(errors, err.Error())
-						***REMOVED***
-					***REMOVED***
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+						}
+					}
+				}
+			}
+		}
+	}
 
-	if err := sc.Err(); err != nil ***REMOVED***
+	if err := sc.Err(); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if len(errors) > 0 ***REMOVED***
+	if len(errors) > 0 {
 		return fmt.Errorf("Error cleaning up mounts:\n%v", strings.Join(errors, "\n"))
-	***REMOVED***
+	}
 
 	logrus.Debugf("Cleaning up old mountid %v: done.", id)
 	return nil
-***REMOVED***
+}
 
 // cleanupMounts umounts shm/mqueue mounts for old containers
-func (daemon *Daemon) cleanupMounts() error ***REMOVED***
+func (daemon *Daemon) cleanupMounts() error {
 	return daemon.cleanupMountsByID("")
-***REMOVED***
+}
 
-func getCleanPatterns(id string) (regexps []*regexp.Regexp) ***REMOVED***
+func getCleanPatterns(id string) (regexps []*regexp.Regexp) {
 	var patterns []string
-	if id == "" ***REMOVED***
-		id = "[0-9a-f]***REMOVED***64***REMOVED***"
+	if id == "" {
+		id = "[0-9a-f]{64}"
 		patterns = append(patterns, "containers/"+id+"/shm")
-	***REMOVED***
+	}
 	patterns = append(patterns, "aufs/mnt/"+id+"$", "overlay/"+id+"/merged$", "zfs/graph/"+id+"$")
-	for _, p := range patterns ***REMOVED***
+	for _, p := range patterns {
 		r, err := regexp.Compile(p)
-		if err == nil ***REMOVED***
+		if err == nil {
 			regexps = append(regexps, r)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}
 
-func getRealPath(path string) (string, error) ***REMOVED***
+func getRealPath(path string) (string, error) {
 	return fileutils.ReadSymlinkedDirectory(path)
-***REMOVED***
+}

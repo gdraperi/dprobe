@@ -2,7 +2,7 @@ package main
 
 import "reflect"
 
-func main() ***REMOVED***
+func main() {
 	var test reflect.Value
 	test.
-***REMOVED***
+}

@@ -41,6 +41,6 @@ import (
 )
 
 // dialContext connects to the address on the named network.
-func dialContext(ctx context.Context, network, address string) (net.Conn, error) ***REMOVED***
-	return (&net.Dialer***REMOVED***Cancel: ctx.Done()***REMOVED***).Dial(network, address)
-***REMOVED***
+func dialContext(ctx context.Context, network, address string) (net.Conn, error) {
+	return (&net.Dialer{Cancel: ctx.Done()}).Dial(network, address)
+}

@@ -19,20 +19,20 @@ const (
 ///////////////////////////////////////////////////////////////////////////////
 
 // LogEntryType represents the LogEntryType enum from section 3.1 of the RFC:
-//   enum ***REMOVED*** x509_entry(0), precert_entry(1), (65535) ***REMOVED*** LogEntryType;
+//   enum { x509_entry(0), precert_entry(1), (65535) } LogEntryType;
 type LogEntryType uint16
 
-func (e LogEntryType) String() string ***REMOVED***
-	switch e ***REMOVED***
+func (e LogEntryType) String() string {
+	switch e {
 	case X509LogEntryType:
 		return "X509LogEntryType"
 	case PrecertLogEntryType:
 		return "PrecertLogEntryType"
 	case XJSONLogEntryType:
 		return "XJSONLogEntryType"
-	***REMOVED***
+	}
 	panic(fmt.Sprintf("No string defined for LogEntryType constant value %d", e))
-***REMOVED***
+}
 
 // LogEntryType constants, see section 3.1 of RFC6962.
 const (
@@ -42,17 +42,17 @@ const (
 )
 
 // MerkleLeafType represents the MerkleLeafType enum from section 3.4 of the
-// RFC: enum ***REMOVED*** timestamped_entry(0), (255) ***REMOVED*** MerkleLeafType;
+// RFC: enum { timestamped_entry(0), (255) } MerkleLeafType;
 type MerkleLeafType uint8
 
-func (m MerkleLeafType) String() string ***REMOVED***
-	switch m ***REMOVED***
+func (m MerkleLeafType) String() string {
+	switch m {
 	case TimestampedEntryLeafType:
 		return "TimestampedEntryLeafType"
 	default:
 		return fmt.Sprintf("UnknownLeafType(%d)", m)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // MerkleLeafType constants, see section 3.4 of the RFC.
 const (
@@ -60,17 +60,17 @@ const (
 )
 
 // Version represents the Version enum from section 3.2 of the RFC:
-// enum ***REMOVED*** v1(0), (255) ***REMOVED*** Version;
+// enum { v1(0), (255) } Version;
 type Version uint8
 
-func (v Version) String() string ***REMOVED***
-	switch v ***REMOVED***
+func (v Version) String() string {
+	switch v {
 	case V1:
 		return "V1"
 	default:
 		return fmt.Sprintf("UnknownVersion(%d)", v)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // CT Version constants, see section 3.2 of the RFC.
 const (
@@ -81,16 +81,16 @@ const (
 // section 3.2
 type SignatureType uint8
 
-func (st SignatureType) String() string ***REMOVED***
-	switch st ***REMOVED***
+func (st SignatureType) String() string {
+	switch st {
 	case CertificateTimestampSignatureType:
 		return "CertificateTimestamp"
 	case TreeHashSignatureType:
 		return "TreeHash"
 	default:
 		return fmt.Sprintf("UnknownSignatureType(%d)", st)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // SignatureType constants, see RFC section 3.2
 const (
@@ -103,10 +103,10 @@ const (
 type ASN1Cert []byte
 
 // PreCert represents a Precertificate (section 3.2)
-type PreCert struct ***REMOVED***
+type PreCert struct {
 	IssuerKeyHash  [issuerKeyHashLength]byte
 	TBSCertificate []byte
-***REMOVED***
+}
 
 // CTExtensions is a representation of the raw bytes of any CtExtension
 // structure (see section 3.2)
@@ -139,8 +139,8 @@ const (
 	SHA512 HashAlgorithm = 6
 )
 
-func (h HashAlgorithm) String() string ***REMOVED***
-	switch h ***REMOVED***
+func (h HashAlgorithm) String() string {
+	switch h {
 	case None:
 		return "None"
 	case MD5:
@@ -157,8 +157,8 @@ func (h HashAlgorithm) String() string ***REMOVED***
 		return "SHA512"
 	default:
 		return fmt.Sprintf("UNKNOWN(%d)", h)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // SignatureAlgorithm from the the DigitallySigned struct
 type SignatureAlgorithm byte
@@ -171,8 +171,8 @@ const (
 	ECDSA     SignatureAlgorithm = 3
 )
 
-func (s SignatureAlgorithm) String() string ***REMOVED***
-	switch s ***REMOVED***
+func (s SignatureAlgorithm) String() string {
+	switch s {
 	case Anonymous:
 		return "Anonymous"
 	case RSA:
@@ -183,155 +183,155 @@ func (s SignatureAlgorithm) String() string ***REMOVED***
 		return "ECDSA"
 	default:
 		return fmt.Sprintf("UNKNOWN(%d)", s)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // DigitallySigned represents an RFC5246 DigitallySigned structure
-type DigitallySigned struct ***REMOVED***
+type DigitallySigned struct {
 	HashAlgorithm      HashAlgorithm
 	SignatureAlgorithm SignatureAlgorithm
 	Signature          []byte
-***REMOVED***
+}
 
 // FromBase64String populates the DigitallySigned structure from the base64 data passed in.
 // Returns an error if the base64 data is invalid.
-func (d *DigitallySigned) FromBase64String(b64 string) error ***REMOVED***
+func (d *DigitallySigned) FromBase64String(b64 string) error {
 	raw, err := base64.StdEncoding.DecodeString(b64)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("failed to unbase64 DigitallySigned: %v", err)
-	***REMOVED***
+	}
 	ds, err := UnmarshalDigitallySigned(bytes.NewReader(raw))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("failed to unmarshal DigitallySigned: %v", err)
-	***REMOVED***
+	}
 	*d = *ds
 	return nil
-***REMOVED***
+}
 
 // Base64String returns the base64 representation of the DigitallySigned struct.
-func (d DigitallySigned) Base64String() (string, error) ***REMOVED***
+func (d DigitallySigned) Base64String() (string, error) {
 	b, err := MarshalDigitallySigned(d)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	return base64.StdEncoding.EncodeToString(b), nil
-***REMOVED***
+}
 
 // MarshalJSON implements the json.Marshaller interface.
-func (d DigitallySigned) MarshalJSON() ([]byte, error) ***REMOVED***
+func (d DigitallySigned) MarshalJSON() ([]byte, error) {
 	b64, err := d.Base64String()
-	if err != nil ***REMOVED***
-		return []byte***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return []byte{}, err
+	}
 	return []byte(`"` + b64 + `"`), nil
-***REMOVED***
+}
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
-func (d *DigitallySigned) UnmarshalJSON(b []byte) error ***REMOVED***
+func (d *DigitallySigned) UnmarshalJSON(b []byte) error {
 	var content string
-	if err := json.Unmarshal(b, &content); err != nil ***REMOVED***
+	if err := json.Unmarshal(b, &content); err != nil {
 		return fmt.Errorf("failed to unmarshal DigitallySigned: %v", err)
-	***REMOVED***
+	}
 	return d.FromBase64String(content)
-***REMOVED***
+}
 
 // LogEntry represents the contents of an entry in a CT log, see section 3.1.
-type LogEntry struct ***REMOVED***
+type LogEntry struct {
 	Index    int64
 	Leaf     MerkleTreeLeaf
 	X509Cert *x509.Certificate
 	Precert  *Precertificate
 	JSONData []byte
 	Chain    []ASN1Cert
-***REMOVED***
+}
 
 // SHA256Hash represents the output from the SHA256 hash function.
 type SHA256Hash [sha256.Size]byte
 
 // FromBase64String populates the SHA256 struct with the contents of the base64 data passed in.
-func (s *SHA256Hash) FromBase64String(b64 string) error ***REMOVED***
+func (s *SHA256Hash) FromBase64String(b64 string) error {
 	bs, err := base64.StdEncoding.DecodeString(b64)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("failed to unbase64 LogID: %v", err)
-	***REMOVED***
-	if len(bs) != sha256.Size ***REMOVED***
+	}
+	if len(bs) != sha256.Size {
 		return fmt.Errorf("invalid SHA256 length, expected 32 but got %d", len(bs))
-	***REMOVED***
+	}
 	copy(s[:], bs)
 	return nil
-***REMOVED***
+}
 
 // Base64String returns the base64 representation of this SHA256Hash.
-func (s SHA256Hash) Base64String() string ***REMOVED***
+func (s SHA256Hash) Base64String() string {
 	return base64.StdEncoding.EncodeToString(s[:])
-***REMOVED***
+}
 
 // MarshalJSON implements the json.Marshaller interface for SHA256Hash.
-func (s SHA256Hash) MarshalJSON() ([]byte, error) ***REMOVED***
+func (s SHA256Hash) MarshalJSON() ([]byte, error) {
 	return []byte(`"` + s.Base64String() + `"`), nil
-***REMOVED***
+}
 
 // UnmarshalJSON implements the json.Unmarshaller interface.
-func (s *SHA256Hash) UnmarshalJSON(b []byte) error ***REMOVED***
+func (s *SHA256Hash) UnmarshalJSON(b []byte) error {
 	var content string
-	if err := json.Unmarshal(b, &content); err != nil ***REMOVED***
+	if err := json.Unmarshal(b, &content); err != nil {
 		return fmt.Errorf("failed to unmarshal SHA256Hash: %v", err)
-	***REMOVED***
+	}
 	return s.FromBase64String(content)
-***REMOVED***
+}
 
 // SignedTreeHead represents the structure returned by the get-sth CT method
 // after base64 decoding. See sections 3.5 and 4.3 in the RFC)
-type SignedTreeHead struct ***REMOVED***
+type SignedTreeHead struct {
 	Version           Version         `json:"sth_version"`         // The version of the protocol to which the STH conforms
 	TreeSize          uint64          `json:"tree_size"`           // The number of entries in the new tree
 	Timestamp         uint64          `json:"timestamp"`           // The time at which the STH was created
 	SHA256RootHash    SHA256Hash      `json:"sha256_root_hash"`    // The root hash of the log's Merkle tree
 	TreeHeadSignature DigitallySigned `json:"tree_head_signature"` // The Log's signature for this STH (see RFC section 3.5)
 	LogID             SHA256Hash      `json:"log_id"`              // The SHA256 hash of the log's public key
-***REMOVED***
+}
 
 // SignedCertificateTimestamp represents the structure returned by the
 // add-chain and add-pre-chain methods after base64 decoding. (see RFC sections
 // 3.2 ,4.1 and 4.2)
-type SignedCertificateTimestamp struct ***REMOVED***
+type SignedCertificateTimestamp struct {
 	SCTVersion Version    // The version of the protocol to which the SCT conforms
 	LogID      SHA256Hash // the SHA-256 hash of the log's public key, calculated over
 	// the DER encoding of the key represented as SubjectPublicKeyInfo.
 	Timestamp  uint64          // Timestamp (in ms since unix epoc) at which the SCT was issued
 	Extensions CTExtensions    // For future extensions to the protocol
 	Signature  DigitallySigned // The Log's signature for this SCT
-***REMOVED***
+}
 
-func (s SignedCertificateTimestamp) String() string ***REMOVED***
-	return fmt.Sprintf("***REMOVED***Version:%d LogId:%s Timestamp:%d Extensions:'%s' Signature:%v***REMOVED***", s.SCTVersion,
+func (s SignedCertificateTimestamp) String() string {
+	return fmt.Sprintf("{Version:%d LogId:%s Timestamp:%d Extensions:'%s' Signature:%v}", s.SCTVersion,
 		base64.StdEncoding.EncodeToString(s.LogID[:]),
 		s.Timestamp,
 		s.Extensions,
 		s.Signature)
-***REMOVED***
+}
 
 // TimestampedEntry is part of the MerkleTreeLeaf structure.
 // See RFC section 3.4
-type TimestampedEntry struct ***REMOVED***
+type TimestampedEntry struct {
 	Timestamp    uint64
 	EntryType    LogEntryType
 	X509Entry    ASN1Cert
 	JSONData     []byte
 	PrecertEntry PreCert
 	Extensions   CTExtensions
-***REMOVED***
+}
 
 // MerkleTreeLeaf represents the deserialized sructure of the hash input for the
 // leaves of a log's Merkle tree. See RFC section 3.4
-type MerkleTreeLeaf struct ***REMOVED***
+type MerkleTreeLeaf struct {
 	Version          Version          // the version of the protocol to which the MerkleTreeLeaf corresponds
 	LeafType         MerkleLeafType   // The type of the leaf input, currently only TimestampedEntry can exist
 	TimestampedEntry TimestampedEntry // The entry data itself
-***REMOVED***
+}
 
 // Precertificate represents the parsed CT Precertificate structure.
-type Precertificate struct ***REMOVED***
+type Precertificate struct {
 	// Raw DER bytes of the precert
 	Raw []byte
 	// SHA256 hash of the issuing key
@@ -339,14 +339,14 @@ type Precertificate struct ***REMOVED***
 	// Parsed TBSCertificate structure (held in an x509.Certificate for ease of
 	// access.
 	TBSCertificate x509.Certificate
-***REMOVED***
+}
 
 // X509Certificate returns the X.509 Certificate contained within the
 // MerkleTreeLeaf.
 // Returns a pointer to an x509.Certificate or a non-nil error.
-func (m *MerkleTreeLeaf) X509Certificate() (*x509.Certificate, error) ***REMOVED***
+func (m *MerkleTreeLeaf) X509Certificate() (*x509.Certificate, error) {
 	return x509.ParseCertificate(m.TimestampedEntry.X509Entry)
-***REMOVED***
+}
 
 type sctError int
 
@@ -356,19 +356,19 @@ var (
 	ErrNotEnoughBuffer error = sctError(2)
 )
 
-func (e sctError) Error() string ***REMOVED***
-	switch e ***REMOVED***
+func (e sctError) Error() string {
+	switch e {
 	case ErrInvalidVersion:
 		return "invalid SCT version detected"
 	case ErrNotEnoughBuffer:
 		return "provided buffer was too small"
 	default:
 		return "unknown error"
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // AddJSONRequest represents the JSON request body sent ot the add-json CT
 // method.
-type AddJSONRequest struct ***REMOVED***
-	Data interface***REMOVED******REMOVED*** `json:"data"`
-***REMOVED***
+type AddJSONRequest struct {
+	Data interface{} `json:"data"`
+}

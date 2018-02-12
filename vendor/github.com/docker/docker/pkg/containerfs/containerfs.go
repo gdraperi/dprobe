@@ -10,7 +10,7 @@ import (
 )
 
 // ContainerFS is that represents a root file system
-type ContainerFS interface ***REMOVED***
+type ContainerFS interface {
 	// Path returns the path to the root. Note that this may not exist
 	// on the local system, so the continuity operations must be used
 	Path() string
@@ -23,11 +23,11 @@ type ContainerFS interface ***REMOVED***
 	ResolveScopedPath(path string, rawPath bool) (string, error)
 
 	Driver
-***REMOVED***
+}
 
 // Driver combines both continuity's Driver and PathDriver interfaces with a Platform
 // field to determine the OS.
-type Driver interface ***REMOVED***
+type Driver interface {
 	// OS returns the OS where the rootfs is located. Essentially,
 	// runtime.GOOS for everything aside from LCOW, which is "linux"
 	OS() string
@@ -39,49 +39,49 @@ type Driver interface ***REMOVED***
 	// Driver & PathDriver provide methods to manipulate files & paths
 	driver.Driver
 	pathdriver.PathDriver
-***REMOVED***
+}
 
 // NewLocalContainerFS is a helper function to implement daemon's Mount interface
 // when the graphdriver mount point is a local path on the machine.
-func NewLocalContainerFS(path string) ContainerFS ***REMOVED***
-	return &local***REMOVED***
+func NewLocalContainerFS(path string) ContainerFS {
+	return &local{
 		path:       path,
 		Driver:     driver.LocalDriver,
 		PathDriver: pathdriver.LocalPathDriver,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // NewLocalDriver provides file and path drivers for a local file system. They are
 // essentially a wrapper around the `os` and `filepath` functions.
-func NewLocalDriver() Driver ***REMOVED***
-	return &local***REMOVED***
+func NewLocalDriver() Driver {
+	return &local{
 		Driver:     driver.LocalDriver,
 		PathDriver: pathdriver.LocalPathDriver,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type local struct ***REMOVED***
+type local struct {
 	path string
 	driver.Driver
 	pathdriver.PathDriver
-***REMOVED***
+}
 
-func (l *local) Path() string ***REMOVED***
+func (l *local) Path() string {
 	return l.path
-***REMOVED***
+}
 
-func (l *local) ResolveScopedPath(path string, rawPath bool) (string, error) ***REMOVED***
+func (l *local) ResolveScopedPath(path string, rawPath bool) (string, error) {
 	cleanedPath := path
-	if !rawPath ***REMOVED***
+	if !rawPath {
 		cleanedPath = cleanScopedPath(path)
-	***REMOVED***
+	}
 	return symlink.FollowSymlinkInScope(filepath.Join(l.path, cleanedPath), l.path)
-***REMOVED***
+}
 
-func (l *local) OS() string ***REMOVED***
+func (l *local) OS() string {
 	return runtime.GOOS
-***REMOVED***
+}
 
-func (l *local) Architecture() string ***REMOVED***
+func (l *local) Architecture() string {
 	return runtime.GOARCH
-***REMOVED***
+}

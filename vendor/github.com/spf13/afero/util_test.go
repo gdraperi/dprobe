@@ -29,66 +29,66 @@ import (
 
 var testFS = new(MemMapFs)
 
-func TestDirExists(t *testing.T) ***REMOVED***
-	type test struct ***REMOVED***
+func TestDirExists(t *testing.T) {
+	type test struct {
 		input    string
 		expected bool
-	***REMOVED***
+	}
 
 	// First create a couple directories so there is something in the filesystem
 	//testFS := new(MemMapFs)
 	testFS.MkdirAll("/foo/bar", 0777)
 
-	data := []test***REMOVED***
-		***REMOVED***".", true***REMOVED***,
-		***REMOVED***"./", true***REMOVED***,
-		***REMOVED***"..", true***REMOVED***,
-		***REMOVED***"../", true***REMOVED***,
-		***REMOVED***"./..", true***REMOVED***,
-		***REMOVED***"./../", true***REMOVED***,
-		***REMOVED***"/foo/", true***REMOVED***,
-		***REMOVED***"/foo", true***REMOVED***,
-		***REMOVED***"/foo/bar", true***REMOVED***,
-		***REMOVED***"/foo/bar/", true***REMOVED***,
-		***REMOVED***"/", true***REMOVED***,
-		***REMOVED***"/some-really-random-directory-name", false***REMOVED***,
-		***REMOVED***"/some/really/random/directory/name", false***REMOVED***,
-		***REMOVED***"./some-really-random-local-directory-name", false***REMOVED***,
-		***REMOVED***"./some/really/random/local/directory/name", false***REMOVED***,
-	***REMOVED***
+	data := []test{
+		{".", true},
+		{"./", true},
+		{"..", true},
+		{"../", true},
+		{"./..", true},
+		{"./../", true},
+		{"/foo/", true},
+		{"/foo", true},
+		{"/foo/bar", true},
+		{"/foo/bar/", true},
+		{"/", true},
+		{"/some-really-random-directory-name", false},
+		{"/some/really/random/directory/name", false},
+		{"./some-really-random-local-directory-name", false},
+		{"./some/really/random/local/directory/name", false},
+	}
 
-	for i, d := range data ***REMOVED***
+	for i, d := range data {
 		exists, _ := DirExists(testFS, filepath.FromSlash(d.input))
-		if d.expected != exists ***REMOVED***
+		if d.expected != exists {
 			t.Errorf("Test %d %q failed. Expected %t got %t", i, d.input, d.expected, exists)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestIsDir(t *testing.T) ***REMOVED***
+func TestIsDir(t *testing.T) {
 	testFS = new(MemMapFs)
 
-	type test struct ***REMOVED***
+	type test struct {
 		input    string
 		expected bool
-	***REMOVED***
-	data := []test***REMOVED***
-		***REMOVED***"./", true***REMOVED***,
-		***REMOVED***"/", true***REMOVED***,
-		***REMOVED***"./this-directory-does-not-existi", false***REMOVED***,
-		***REMOVED***"/this-absolute-directory/does-not-exist", false***REMOVED***,
-	***REMOVED***
+	}
+	data := []test{
+		{"./", true},
+		{"/", true},
+		{"./this-directory-does-not-existi", false},
+		{"/this-absolute-directory/does-not-exist", false},
+	}
 
-	for i, d := range data ***REMOVED***
+	for i, d := range data {
 
 		exists, _ := IsDir(testFS, d.input)
-		if d.expected != exists ***REMOVED***
+		if d.expected != exists {
 			t.Errorf("Test %d failed. Expected %t got %t", i, d.expected, exists)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestIsEmpty(t *testing.T) ***REMOVED***
+func TestIsEmpty(t *testing.T) {
 	testFS = new(MemMapFs)
 
 	zeroSizedFile, _ := createZeroSizedFileInTempDir()
@@ -107,160 +107,160 @@ func TestIsEmpty(t *testing.T) ***REMOVED***
 	fileDoesNotExist := fmt.Errorf("%q path does not exist", nonExistentFile)
 	dirDoesNotExist := fmt.Errorf("%q path does not exist", nonExistentDir)
 
-	type test struct ***REMOVED***
+	type test struct {
 		input          string
 		expectedResult bool
 		expectedErr    error
-	***REMOVED***
+	}
 
-	data := []test***REMOVED***
-		***REMOVED***zeroSizedFile.Name(), true, nil***REMOVED***,
-		***REMOVED***nonZeroSizedFile.Name(), false, nil***REMOVED***,
-		***REMOVED***emptyDirectory, true, nil***REMOVED***,
-		***REMOVED***nonEmptyZeroLengthFilesDirectory, false, nil***REMOVED***,
-		***REMOVED***nonEmptyNonZeroLengthFilesDirectory, false, nil***REMOVED***,
-		***REMOVED***nonExistentFile, false, fileDoesNotExist***REMOVED***,
-		***REMOVED***nonExistentDir, false, dirDoesNotExist***REMOVED***,
-	***REMOVED***
-	for i, d := range data ***REMOVED***
+	data := []test{
+		{zeroSizedFile.Name(), true, nil},
+		{nonZeroSizedFile.Name(), false, nil},
+		{emptyDirectory, true, nil},
+		{nonEmptyZeroLengthFilesDirectory, false, nil},
+		{nonEmptyNonZeroLengthFilesDirectory, false, nil},
+		{nonExistentFile, false, fileDoesNotExist},
+		{nonExistentDir, false, dirDoesNotExist},
+	}
+	for i, d := range data {
 		exists, err := IsEmpty(testFS, d.input)
-		if d.expectedResult != exists ***REMOVED***
+		if d.expectedResult != exists {
 			t.Errorf("Test %d %q failed exists. Expected result %t got %t", i, d.input, d.expectedResult, exists)
-		***REMOVED***
-		if d.expectedErr != nil ***REMOVED***
-			if d.expectedErr.Error() != err.Error() ***REMOVED***
+		}
+		if d.expectedErr != nil {
+			if d.expectedErr.Error() != err.Error() {
 				t.Errorf("Test %d failed with err. Expected %q(%#v) got %q(%#v)", i, d.expectedErr, d.expectedErr, err, err)
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
-			if d.expectedErr != err ***REMOVED***
+			}
+		} else {
+			if d.expectedErr != err {
 				t.Errorf("Test %d failed. Expected error %q(%#v) got %q(%#v)", i, d.expectedErr, d.expectedErr, err, err)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}
 
-func TestReaderContains(t *testing.T) ***REMOVED***
-	for i, this := range []struct ***REMOVED***
+func TestReaderContains(t *testing.T) {
+	for i, this := range []struct {
 		v1     string
 		v2     [][]byte
 		expect bool
-	***REMOVED******REMOVED***
-		***REMOVED***"abc", [][]byte***REMOVED***[]byte("a")***REMOVED***, true***REMOVED***,
-		***REMOVED***"abc", [][]byte***REMOVED***[]byte("b")***REMOVED***, true***REMOVED***,
-		***REMOVED***"abcdefg", [][]byte***REMOVED***[]byte("efg")***REMOVED***, true***REMOVED***,
-		***REMOVED***"abc", [][]byte***REMOVED***[]byte("d")***REMOVED***, false***REMOVED***,
-		***REMOVED***"abc", [][]byte***REMOVED***[]byte("d"), []byte("e")***REMOVED***, false***REMOVED***,
-		***REMOVED***"abc", [][]byte***REMOVED***[]byte("d"), []byte("a")***REMOVED***, true***REMOVED***,
-		***REMOVED***"abc", [][]byte***REMOVED***[]byte("b"), []byte("e")***REMOVED***, true***REMOVED***,
-		***REMOVED***"", nil, false***REMOVED***,
-		***REMOVED***"", [][]byte***REMOVED***[]byte("a")***REMOVED***, false***REMOVED***,
-		***REMOVED***"a", [][]byte***REMOVED***[]byte("")***REMOVED***, false***REMOVED***,
-		***REMOVED***"", [][]byte***REMOVED***[]byte("")***REMOVED***, false***REMOVED******REMOVED*** ***REMOVED***
+	}{
+		{"abc", [][]byte{[]byte("a")}, true},
+		{"abc", [][]byte{[]byte("b")}, true},
+		{"abcdefg", [][]byte{[]byte("efg")}, true},
+		{"abc", [][]byte{[]byte("d")}, false},
+		{"abc", [][]byte{[]byte("d"), []byte("e")}, false},
+		{"abc", [][]byte{[]byte("d"), []byte("a")}, true},
+		{"abc", [][]byte{[]byte("b"), []byte("e")}, true},
+		{"", nil, false},
+		{"", [][]byte{[]byte("a")}, false},
+		{"a", [][]byte{[]byte("")}, false},
+		{"", [][]byte{[]byte("")}, false}} {
 		result := readerContainsAny(strings.NewReader(this.v1), this.v2...)
-		if result != this.expect ***REMOVED***
+		if result != this.expect {
 			t.Errorf("[%d] readerContains: got %t but expected %t", i, result, this.expect)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if readerContainsAny(nil, []byte("a")) ***REMOVED***
+	if readerContainsAny(nil, []byte("a")) {
 		t.Error("readerContains with nil reader")
-	***REMOVED***
+	}
 
-	if readerContainsAny(nil, nil) ***REMOVED***
+	if readerContainsAny(nil, nil) {
 		t.Error("readerContains with nil arguments")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func createZeroSizedFileInTempDir() (File, error) ***REMOVED***
+func createZeroSizedFileInTempDir() (File, error) {
 	filePrefix := "_path_test_"
 	f, e := TempFile(testFS, "", filePrefix) // dir is os.TempDir()
-	if e != nil ***REMOVED***
+	if e != nil {
 		// if there was an error no file was created.
 		// => no requirement to delete the file
 		return nil, e
-	***REMOVED***
+	}
 	return f, nil
-***REMOVED***
+}
 
-func createNonZeroSizedFileInTempDir() (File, error) ***REMOVED***
+func createNonZeroSizedFileInTempDir() (File, error) {
 	f, err := createZeroSizedFileInTempDir()
-	if err != nil ***REMOVED***
+	if err != nil {
 		// no file ??
-	***REMOVED***
+	}
 	byteString := []byte("byteString")
 	err = WriteFile(testFS, f.Name(), byteString, 0644)
-	if err != nil ***REMOVED***
+	if err != nil {
 		// delete the file
 		deleteFileInTempDir(f)
 		return nil, err
-	***REMOVED***
+	}
 	return f, nil
-***REMOVED***
+}
 
-func deleteFileInTempDir(f File) ***REMOVED***
+func deleteFileInTempDir(f File) {
 	err := testFS.Remove(f.Name())
-	if err != nil ***REMOVED***
+	if err != nil {
 		// now what?
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func createEmptyTempDir() (string, error) ***REMOVED***
+func createEmptyTempDir() (string, error) {
 	dirPrefix := "_dir_prefix_"
 	d, e := TempDir(testFS, "", dirPrefix) // will be in os.TempDir()
-	if e != nil ***REMOVED***
+	if e != nil {
 		// no directory to delete - it was never created
 		return "", e
-	***REMOVED***
+	}
 	return d, nil
-***REMOVED***
+}
 
-func createTempDirWithZeroLengthFiles() (string, error) ***REMOVED***
+func createTempDirWithZeroLengthFiles() (string, error) {
 	d, dirErr := createEmptyTempDir()
-	if dirErr != nil ***REMOVED***
+	if dirErr != nil {
 		//now what?
-	***REMOVED***
+	}
 	filePrefix := "_path_test_"
 	_, fileErr := TempFile(testFS, d, filePrefix) // dir is os.TempDir()
-	if fileErr != nil ***REMOVED***
+	if fileErr != nil {
 		// if there was an error no file was created.
 		// but we need to remove the directory to clean-up
 		deleteTempDir(d)
 		return "", fileErr
-	***REMOVED***
+	}
 	// the dir now has one, zero length file in it
 	return d, nil
 
-***REMOVED***
+}
 
-func createTempDirWithNonZeroLengthFiles() (string, error) ***REMOVED***
+func createTempDirWithNonZeroLengthFiles() (string, error) {
 	d, dirErr := createEmptyTempDir()
-	if dirErr != nil ***REMOVED***
+	if dirErr != nil {
 		//now what?
-	***REMOVED***
+	}
 	filePrefix := "_path_test_"
 	f, fileErr := TempFile(testFS, d, filePrefix) // dir is os.TempDir()
-	if fileErr != nil ***REMOVED***
+	if fileErr != nil {
 		// if there was an error no file was created.
 		// but we need to remove the directory to clean-up
 		deleteTempDir(d)
 		return "", fileErr
-	***REMOVED***
+	}
 	byteString := []byte("byteString")
 	fileErr = WriteFile(testFS, f.Name(), byteString, 0644)
-	if fileErr != nil ***REMOVED***
+	if fileErr != nil {
 		// delete the file
 		deleteFileInTempDir(f)
 		// also delete the directory
 		deleteTempDir(d)
 		return "", fileErr
-	***REMOVED***
+	}
 
 	// the dir now has one, zero length file in it
 	return d, nil
 
-***REMOVED***
+}
 
-func TestExists(t *testing.T) ***REMOVED***
+func TestExists(t *testing.T) {
 	zeroSizedFile, _ := createZeroSizedFileInTempDir()
 	defer deleteFileInTempDir(zeroSizedFile)
 	nonZeroSizedFile, _ := createNonZeroSizedFileInTempDir()
@@ -270,32 +270,32 @@ func TestExists(t *testing.T) ***REMOVED***
 	nonExistentFile := os.TempDir() + "/this-file-does-not-exist.txt"
 	nonExistentDir := os.TempDir() + "/this/direcotry/does/not/exist/"
 
-	type test struct ***REMOVED***
+	type test struct {
 		input          string
 		expectedResult bool
 		expectedErr    error
-	***REMOVED***
+	}
 
-	data := []test***REMOVED***
-		***REMOVED***zeroSizedFile.Name(), true, nil***REMOVED***,
-		***REMOVED***nonZeroSizedFile.Name(), true, nil***REMOVED***,
-		***REMOVED***emptyDirectory, true, nil***REMOVED***,
-		***REMOVED***nonExistentFile, false, nil***REMOVED***,
-		***REMOVED***nonExistentDir, false, nil***REMOVED***,
-	***REMOVED***
-	for i, d := range data ***REMOVED***
+	data := []test{
+		{zeroSizedFile.Name(), true, nil},
+		{nonZeroSizedFile.Name(), true, nil},
+		{emptyDirectory, true, nil},
+		{nonExistentFile, false, nil},
+		{nonExistentDir, false, nil},
+	}
+	for i, d := range data {
 		exists, err := Exists(testFS, d.input)
-		if d.expectedResult != exists ***REMOVED***
+		if d.expectedResult != exists {
 			t.Errorf("Test %d failed. Expected result %t got %t", i, d.expectedResult, exists)
-		***REMOVED***
-		if d.expectedErr != err ***REMOVED***
+		}
+		if d.expectedErr != err {
 			t.Errorf("Test %d failed. Expected %q got %q", i, d.expectedErr, err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-***REMOVED***
+}
 
-func TestSafeWriteToDisk(t *testing.T) ***REMOVED***
+func TestSafeWriteToDisk(t *testing.T) {
 	emptyFile, _ := createZeroSizedFileInTempDir()
 	defer deleteFileInTempDir(emptyFile)
 	tmpDir, _ := createEmptyTempDir()
@@ -306,38 +306,38 @@ func TestSafeWriteToDisk(t *testing.T) ***REMOVED***
 
 	fileExists := fmt.Errorf("%v already exists", emptyFile.Name())
 
-	type test struct ***REMOVED***
+	type test struct {
 		filename    string
 		expectedErr error
-	***REMOVED***
+	}
 
 	now := time.Now().Unix()
 	nowStr := strconv.FormatInt(now, 10)
-	data := []test***REMOVED***
-		***REMOVED***emptyFile.Name(), fileExists***REMOVED***,
-		***REMOVED***tmpDir + "/" + nowStr, nil***REMOVED***,
-	***REMOVED***
+	data := []test{
+		{emptyFile.Name(), fileExists},
+		{tmpDir + "/" + nowStr, nil},
+	}
 
-	for i, d := range data ***REMOVED***
+	for i, d := range data {
 		e := SafeWriteReader(testFS, d.filename, reader)
-		if d.expectedErr != nil ***REMOVED***
-			if d.expectedErr.Error() != e.Error() ***REMOVED***
+		if d.expectedErr != nil {
+			if d.expectedErr.Error() != e.Error() {
 				t.Errorf("Test %d failed. Expected error %q but got %q", i, d.expectedErr.Error(), e.Error())
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
-			if d.expectedErr != e ***REMOVED***
+			}
+		} else {
+			if d.expectedErr != e {
 				t.Errorf("Test %d failed. Expected %q but got %q", i, d.expectedErr, e)
-			***REMOVED***
+			}
 			contents, _ := ReadFile(testFS, d.filename)
-			if randomString != string(contents) ***REMOVED***
+			if randomString != string(contents) {
 				t.Errorf("Test %d failed. Expected contents %q but got %q", i, randomString, string(contents))
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		reader.Seek(0, 0)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestWriteToDisk(t *testing.T) ***REMOVED***
+func TestWriteToDisk(t *testing.T) {
 	emptyFile, _ := createZeroSizedFileInTempDir()
 	defer deleteFileInTempDir(emptyFile)
 	tmpDir, _ := createEmptyTempDir()
@@ -346,105 +346,105 @@ func TestWriteToDisk(t *testing.T) ***REMOVED***
 	randomString := "This is a random string!"
 	reader := strings.NewReader(randomString)
 
-	type test struct ***REMOVED***
+	type test struct {
 		filename    string
 		expectedErr error
-	***REMOVED***
+	}
 
 	now := time.Now().Unix()
 	nowStr := strconv.FormatInt(now, 10)
-	data := []test***REMOVED***
-		***REMOVED***emptyFile.Name(), nil***REMOVED***,
-		***REMOVED***tmpDir + "/" + nowStr, nil***REMOVED***,
-	***REMOVED***
+	data := []test{
+		{emptyFile.Name(), nil},
+		{tmpDir + "/" + nowStr, nil},
+	}
 
-	for i, d := range data ***REMOVED***
+	for i, d := range data {
 		e := WriteReader(testFS, d.filename, reader)
-		if d.expectedErr != e ***REMOVED***
+		if d.expectedErr != e {
 			t.Errorf("Test %d failed. WriteToDisk Error Expected %q but got %q", i, d.expectedErr, e)
-		***REMOVED***
+		}
 		contents, e := ReadFile(testFS, d.filename)
-		if e != nil ***REMOVED***
+		if e != nil {
 			t.Errorf("Test %d failed. Could not read file %s. Reason: %s\n", i, d.filename, e)
-		***REMOVED***
-		if randomString != string(contents) ***REMOVED***
+		}
+		if randomString != string(contents) {
 			t.Errorf("Test %d failed. Expected contents %q but got %q", i, randomString, string(contents))
-		***REMOVED***
+		}
 		reader.Seek(0, 0)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestGetTempDir(t *testing.T) ***REMOVED***
+func TestGetTempDir(t *testing.T) {
 	dir := os.TempDir()
-	if FilePathSeparator != dir[len(dir)-1:] ***REMOVED***
+	if FilePathSeparator != dir[len(dir)-1:] {
 		dir = dir + FilePathSeparator
-	***REMOVED***
+	}
 	testDir := "hugoTestFolder" + FilePathSeparator
-	tests := []struct ***REMOVED***
+	tests := []struct {
 		input    string
 		expected string
-	***REMOVED******REMOVED***
-		***REMOVED***"", dir***REMOVED***,
-		***REMOVED***testDir + "  Foo bar  ", dir + testDir + "  Foo bar  " + FilePathSeparator***REMOVED***,
-		***REMOVED***testDir + "Foo.Bar/foo_Bar-Foo", dir + testDir + "Foo.Bar/foo_Bar-Foo" + FilePathSeparator***REMOVED***,
-		***REMOVED***testDir + "fOO,bar:foo%bAR", dir + testDir + "fOObarfoo%bAR" + FilePathSeparator***REMOVED***,
-		***REMOVED***testDir + "FOo/BaR.html", dir + testDir + "FOo/BaR.html" + FilePathSeparator***REMOVED***,
-		***REMOVED***testDir + "трям/трям", dir + testDir + "трям/трям" + FilePathSeparator***REMOVED***,
-		***REMOVED***testDir + "은행", dir + testDir + "은행" + FilePathSeparator***REMOVED***,
-		***REMOVED***testDir + "Банковский кассир", dir + testDir + "Банковский кассир" + FilePathSeparator***REMOVED***,
-	***REMOVED***
+	}{
+		{"", dir},
+		{testDir + "  Foo bar  ", dir + testDir + "  Foo bar  " + FilePathSeparator},
+		{testDir + "Foo.Bar/foo_Bar-Foo", dir + testDir + "Foo.Bar/foo_Bar-Foo" + FilePathSeparator},
+		{testDir + "fOO,bar:foo%bAR", dir + testDir + "fOObarfoo%bAR" + FilePathSeparator},
+		{testDir + "FOo/BaR.html", dir + testDir + "FOo/BaR.html" + FilePathSeparator},
+		{testDir + "трям/трям", dir + testDir + "трям/трям" + FilePathSeparator},
+		{testDir + "은행", dir + testDir + "은행" + FilePathSeparator},
+		{testDir + "Банковский кассир", dir + testDir + "Банковский кассир" + FilePathSeparator},
+	}
 
-	for _, test := range tests ***REMOVED***
+	for _, test := range tests {
 		output := GetTempDir(new(MemMapFs), test.input)
-		if output != test.expected ***REMOVED***
+		if output != test.expected {
 			t.Errorf("Expected %#v, got %#v\n", test.expected, output)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // This function is very dangerous. Don't use it.
-func deleteTempDir(d string) ***REMOVED***
+func deleteTempDir(d string) {
 	err := os.RemoveAll(d)
-	if err != nil ***REMOVED***
+	if err != nil {
 		// now what?
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestFullBaseFsPath(t *testing.T) ***REMOVED***
-	type dirSpec struct ***REMOVED***
+func TestFullBaseFsPath(t *testing.T) {
+	type dirSpec struct {
 		Dir1, Dir2, Dir3 string
-	***REMOVED***
-	dirSpecs := []dirSpec***REMOVED***
-		dirSpec***REMOVED***Dir1: "/", Dir2: "/", Dir3: "/"***REMOVED***,
-		dirSpec***REMOVED***Dir1: "/", Dir2: "/path2", Dir3: "/"***REMOVED***,
-		dirSpec***REMOVED***Dir1: "/path1/dir", Dir2: "/path2/dir/", Dir3: "/path3/dir"***REMOVED***,
-		dirSpec***REMOVED***Dir1: "C:/path1", Dir2: "path2/dir", Dir3: "/path3/dir/"***REMOVED***,
-	***REMOVED***
+	}
+	dirSpecs := []dirSpec{
+		dirSpec{Dir1: "/", Dir2: "/", Dir3: "/"},
+		dirSpec{Dir1: "/", Dir2: "/path2", Dir3: "/"},
+		dirSpec{Dir1: "/path1/dir", Dir2: "/path2/dir/", Dir3: "/path3/dir"},
+		dirSpec{Dir1: "C:/path1", Dir2: "path2/dir", Dir3: "/path3/dir/"},
+	}
 
-	for _, ds := range dirSpecs ***REMOVED***
+	for _, ds := range dirSpecs {
 		memFs := NewMemMapFs()
 		level1Fs := NewBasePathFs(memFs, ds.Dir1)
 		level2Fs := NewBasePathFs(level1Fs, ds.Dir2)
 		level3Fs := NewBasePathFs(level2Fs, ds.Dir3)
 
-		type spec struct ***REMOVED***
+		type spec struct {
 			BaseFs       Fs
 			FileName     string
 			ExpectedPath string
-		***REMOVED***
-		specs := []spec***REMOVED***
-			spec***REMOVED***BaseFs: level3Fs, FileName: "f.txt", ExpectedPath: filepath.Join(ds.Dir1, ds.Dir2, ds.Dir3, "f.txt")***REMOVED***,
-			spec***REMOVED***BaseFs: level3Fs, FileName: "", ExpectedPath: filepath.Join(ds.Dir1, ds.Dir2, ds.Dir3, "")***REMOVED***,
-			spec***REMOVED***BaseFs: level2Fs, FileName: "f.txt", ExpectedPath: filepath.Join(ds.Dir1, ds.Dir2, "f.txt")***REMOVED***,
-			spec***REMOVED***BaseFs: level2Fs, FileName: "", ExpectedPath: filepath.Join(ds.Dir1, ds.Dir2, "")***REMOVED***,
-			spec***REMOVED***BaseFs: level1Fs, FileName: "f.txt", ExpectedPath: filepath.Join(ds.Dir1, "f.txt")***REMOVED***,
-			spec***REMOVED***BaseFs: level1Fs, FileName: "", ExpectedPath: filepath.Join(ds.Dir1, "")***REMOVED***,
-		***REMOVED***
+		}
+		specs := []spec{
+			spec{BaseFs: level3Fs, FileName: "f.txt", ExpectedPath: filepath.Join(ds.Dir1, ds.Dir2, ds.Dir3, "f.txt")},
+			spec{BaseFs: level3Fs, FileName: "", ExpectedPath: filepath.Join(ds.Dir1, ds.Dir2, ds.Dir3, "")},
+			spec{BaseFs: level2Fs, FileName: "f.txt", ExpectedPath: filepath.Join(ds.Dir1, ds.Dir2, "f.txt")},
+			spec{BaseFs: level2Fs, FileName: "", ExpectedPath: filepath.Join(ds.Dir1, ds.Dir2, "")},
+			spec{BaseFs: level1Fs, FileName: "f.txt", ExpectedPath: filepath.Join(ds.Dir1, "f.txt")},
+			spec{BaseFs: level1Fs, FileName: "", ExpectedPath: filepath.Join(ds.Dir1, "")},
+		}
 
-		for _, s := range specs ***REMOVED***
-			if actualPath := FullBaseFsPath(s.BaseFs.(*BasePathFs), s.FileName); actualPath != s.ExpectedPath ***REMOVED***
+		for _, s := range specs {
+			if actualPath := FullBaseFsPath(s.BaseFs.(*BasePathFs), s.FileName); actualPath != s.ExpectedPath {
 				t.Errorf("Expected \n%s got \n%s", s.ExpectedPath, actualPath)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}

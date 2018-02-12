@@ -11,15 +11,15 @@ import (
 	"syscall"
 )
 
-func init() ***REMOVED***
+func init() {
 	sysStat = statUnix
-***REMOVED***
+}
 
-func statUnix(fi os.FileInfo, h *Header) error ***REMOVED***
+func statUnix(fi os.FileInfo, h *Header) error {
 	sys, ok := fi.Sys().(*syscall.Stat_t)
-	if !ok ***REMOVED***
+	if !ok {
 		return nil
-	***REMOVED***
+	}
 	h.Uid = int(sys.Uid)
 	h.Gid = int(sys.Gid)
 	// TODO(bradfitz): populate username & group.  os/user
@@ -29,4 +29,4 @@ func statUnix(fi os.FileInfo, h *Header) error ***REMOVED***
 	h.ChangeTime = statCtime(sys)
 	// TODO(bradfitz): major/minor device numbers?
 	return nil
-***REMOVED***
+}

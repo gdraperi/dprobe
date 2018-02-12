@@ -18,14 +18,14 @@ import (
 // all protocol implementations prohibit using a combination of RFC
 // 2292 and RFC 3542 for some practical reasons.
 
-type rawOpt struct ***REMOVED***
+type rawOpt struct {
 	sync.RWMutex
 	cflags ControlFlags
-***REMOVED***
+}
 
-func (c *rawOpt) set(f ControlFlags)        ***REMOVED*** c.cflags |= f ***REMOVED***
-func (c *rawOpt) clear(f ControlFlags)      ***REMOVED*** c.cflags &^= f ***REMOVED***
-func (c *rawOpt) isset(f ControlFlags) bool ***REMOVED*** return c.cflags&f != 0 ***REMOVED***
+func (c *rawOpt) set(f ControlFlags)        { c.cflags |= f }
+func (c *rawOpt) clear(f ControlFlags)      { c.cflags &^= f }
+func (c *rawOpt) isset(f ControlFlags) bool { return c.cflags&f != 0 }
 
 // A ControlFlags represents per packet basis IP-level socket option
 // control flags.
@@ -44,7 +44,7 @@ const flagPacketInfo = FlagDst | FlagInterface
 
 // A ControlMessage represents per packet basis IP-level socket
 // options.
-type ControlMessage struct ***REMOVED***
+type ControlMessage struct {
 	// Receiving socket options: SetControlMessage allows to
 	// receive the options from the protocol stack using ReadFrom
 	// method of PacketConn.
@@ -60,76 +60,76 @@ type ControlMessage struct ***REMOVED***
 	IfIndex      int    // interface index, must be 1 <= value when specifying
 	NextHop      net.IP // next hop address, specifying only
 	MTU          int    // path MTU, receiving only
-***REMOVED***
+}
 
-func (cm *ControlMessage) String() string ***REMOVED***
-	if cm == nil ***REMOVED***
+func (cm *ControlMessage) String() string {
+	if cm == nil {
 		return "<nil>"
-	***REMOVED***
+	}
 	return fmt.Sprintf("tclass=%#x hoplim=%d src=%v dst=%v ifindex=%d nexthop=%v mtu=%d", cm.TrafficClass, cm.HopLimit, cm.Src, cm.Dst, cm.IfIndex, cm.NextHop, cm.MTU)
-***REMOVED***
+}
 
 // Marshal returns the binary encoding of cm.
-func (cm *ControlMessage) Marshal() []byte ***REMOVED***
-	if cm == nil ***REMOVED***
+func (cm *ControlMessage) Marshal() []byte {
+	if cm == nil {
 		return nil
-	***REMOVED***
+	}
 	var l int
 	tclass := false
-	if ctlOpts[ctlTrafficClass].name > 0 && cm.TrafficClass > 0 ***REMOVED***
+	if ctlOpts[ctlTrafficClass].name > 0 && cm.TrafficClass > 0 {
 		tclass = true
 		l += socket.ControlMessageSpace(ctlOpts[ctlTrafficClass].length)
-	***REMOVED***
+	}
 	hoplimit := false
-	if ctlOpts[ctlHopLimit].name > 0 && cm.HopLimit > 0 ***REMOVED***
+	if ctlOpts[ctlHopLimit].name > 0 && cm.HopLimit > 0 {
 		hoplimit = true
 		l += socket.ControlMessageSpace(ctlOpts[ctlHopLimit].length)
-	***REMOVED***
+	}
 	pktinfo := false
-	if ctlOpts[ctlPacketInfo].name > 0 && (cm.Src.To16() != nil && cm.Src.To4() == nil || cm.IfIndex > 0) ***REMOVED***
+	if ctlOpts[ctlPacketInfo].name > 0 && (cm.Src.To16() != nil && cm.Src.To4() == nil || cm.IfIndex > 0) {
 		pktinfo = true
 		l += socket.ControlMessageSpace(ctlOpts[ctlPacketInfo].length)
-	***REMOVED***
+	}
 	nexthop := false
-	if ctlOpts[ctlNextHop].name > 0 && cm.NextHop.To16() != nil && cm.NextHop.To4() == nil ***REMOVED***
+	if ctlOpts[ctlNextHop].name > 0 && cm.NextHop.To16() != nil && cm.NextHop.To4() == nil {
 		nexthop = true
 		l += socket.ControlMessageSpace(ctlOpts[ctlNextHop].length)
-	***REMOVED***
+	}
 	var b []byte
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		b = make([]byte, l)
 		bb := b
-		if tclass ***REMOVED***
+		if tclass {
 			bb = ctlOpts[ctlTrafficClass].marshal(bb, cm)
-		***REMOVED***
-		if hoplimit ***REMOVED***
+		}
+		if hoplimit {
 			bb = ctlOpts[ctlHopLimit].marshal(bb, cm)
-		***REMOVED***
-		if pktinfo ***REMOVED***
+		}
+		if pktinfo {
 			bb = ctlOpts[ctlPacketInfo].marshal(bb, cm)
-		***REMOVED***
-		if nexthop ***REMOVED***
+		}
+		if nexthop {
 			bb = ctlOpts[ctlNextHop].marshal(bb, cm)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return b
-***REMOVED***
+}
 
 // Parse parses b as a control message and stores the result in cm.
-func (cm *ControlMessage) Parse(b []byte) error ***REMOVED***
+func (cm *ControlMessage) Parse(b []byte) error {
 	ms, err := socket.ControlMessage(b).Parse()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	for _, m := range ms ***REMOVED***
+	}
+	for _, m := range ms {
 		lvl, typ, l, err := m.ParseHeader()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-		if lvl != iana.ProtocolIPv6 ***REMOVED***
+		}
+		if lvl != iana.ProtocolIPv6 {
 			continue
-		***REMOVED***
-		switch ***REMOVED***
+		}
+		switch {
 		case typ == ctlOpts[ctlTrafficClass].name && l >= ctlOpts[ctlTrafficClass].length:
 			ctlOpts[ctlTrafficClass].parse(cm, m.Data(l))
 		case typ == ctlOpts[ctlHopLimit].name && l >= ctlOpts[ctlHopLimit].length:
@@ -138,35 +138,35 @@ func (cm *ControlMessage) Parse(b []byte) error ***REMOVED***
 			ctlOpts[ctlPacketInfo].parse(cm, m.Data(l))
 		case typ == ctlOpts[ctlPathMTU].name && l >= ctlOpts[ctlPathMTU].length:
 			ctlOpts[ctlPathMTU].parse(cm, m.Data(l))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
 // NewControlMessage returns a new control message.
 //
 // The returned message is large enough for options specified by cf.
-func NewControlMessage(cf ControlFlags) []byte ***REMOVED***
-	opt := rawOpt***REMOVED***cflags: cf***REMOVED***
+func NewControlMessage(cf ControlFlags) []byte {
+	opt := rawOpt{cflags: cf}
 	var l int
-	if opt.isset(FlagTrafficClass) && ctlOpts[ctlTrafficClass].name > 0 ***REMOVED***
+	if opt.isset(FlagTrafficClass) && ctlOpts[ctlTrafficClass].name > 0 {
 		l += socket.ControlMessageSpace(ctlOpts[ctlTrafficClass].length)
-	***REMOVED***
-	if opt.isset(FlagHopLimit) && ctlOpts[ctlHopLimit].name > 0 ***REMOVED***
+	}
+	if opt.isset(FlagHopLimit) && ctlOpts[ctlHopLimit].name > 0 {
 		l += socket.ControlMessageSpace(ctlOpts[ctlHopLimit].length)
-	***REMOVED***
-	if opt.isset(flagPacketInfo) && ctlOpts[ctlPacketInfo].name > 0 ***REMOVED***
+	}
+	if opt.isset(flagPacketInfo) && ctlOpts[ctlPacketInfo].name > 0 {
 		l += socket.ControlMessageSpace(ctlOpts[ctlPacketInfo].length)
-	***REMOVED***
-	if opt.isset(FlagPathMTU) && ctlOpts[ctlPathMTU].name > 0 ***REMOVED***
+	}
+	if opt.isset(FlagPathMTU) && ctlOpts[ctlPathMTU].name > 0 {
 		l += socket.ControlMessageSpace(ctlOpts[ctlPathMTU].length)
-	***REMOVED***
+	}
 	var b []byte
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		b = make([]byte, l)
-	***REMOVED***
+	}
 	return b
-***REMOVED***
+}
 
 // Ancillary data socket options
 const (
@@ -179,9 +179,9 @@ const (
 )
 
 // A ctlOpt represents a binding for ancillary data socket option.
-type ctlOpt struct ***REMOVED***
+type ctlOpt struct {
 	name    int // option name, must be equal or greater than 1
 	length  int // option length
 	marshal func([]byte, *ControlMessage) []byte
 	parse   func(*ControlMessage, []byte)
-***REMOVED***
+}

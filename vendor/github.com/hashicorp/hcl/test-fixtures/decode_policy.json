@@ -1,19 +1,19 @@
-***REMOVED***
-    "key": ***REMOVED***
-        "": ***REMOVED***
+{
+    "key": {
+        "": {
             "policy": "read"
-    ***REMOVED***,
+        },
 
-        "foo/": ***REMOVED***
+        "foo/": {
             "policy": "write"
-    ***REMOVED***,
+        },
 
-        "foo/bar/": ***REMOVED***
+        "foo/bar/": {
             "policy": "read"
-    ***REMOVED***,
+        },
 
-        "foo/bar/baz": ***REMOVED***
+        "foo/bar/baz": {
             "policy": "deny"
-    ***REMOVED***
-***REMOVED***
-***REMOVED***
+        }
+    }
+}

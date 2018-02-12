@@ -15,79 +15,79 @@ const cpuSetSize = _CPU_SETSIZE / _NCPUBITS
 // CPUSet represents a CPU affinity mask.
 type CPUSet [cpuSetSize]cpuMask
 
-func schedAffinity(trap uintptr, pid int, set *CPUSet) error ***REMOVED***
+func schedAffinity(trap uintptr, pid int, set *CPUSet) error {
 	_, _, e := RawSyscall(trap, uintptr(pid), uintptr(unsafe.Sizeof(set)), uintptr(unsafe.Pointer(set)))
-	if e != 0 ***REMOVED***
+	if e != 0 {
 		return errnoErr(e)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SchedGetaffinity gets the CPU affinity mask of the thread specified by pid.
 // If pid is 0 the calling thread is used.
-func SchedGetaffinity(pid int, set *CPUSet) error ***REMOVED***
+func SchedGetaffinity(pid int, set *CPUSet) error {
 	return schedAffinity(SYS_SCHED_GETAFFINITY, pid, set)
-***REMOVED***
+}
 
 // SchedSetaffinity sets the CPU affinity mask of the thread specified by pid.
 // If pid is 0 the calling thread is used.
-func SchedSetaffinity(pid int, set *CPUSet) error ***REMOVED***
+func SchedSetaffinity(pid int, set *CPUSet) error {
 	return schedAffinity(SYS_SCHED_SETAFFINITY, pid, set)
-***REMOVED***
+}
 
 // Zero clears the set s, so that it contains no CPUs.
-func (s *CPUSet) Zero() ***REMOVED***
-	for i := range s ***REMOVED***
+func (s *CPUSet) Zero() {
+	for i := range s {
 		s[i] = 0
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func cpuBitsIndex(cpu int) int ***REMOVED***
+func cpuBitsIndex(cpu int) int {
 	return cpu / _NCPUBITS
-***REMOVED***
+}
 
-func cpuBitsMask(cpu int) cpuMask ***REMOVED***
+func cpuBitsMask(cpu int) cpuMask {
 	return cpuMask(1 << (uint(cpu) % _NCPUBITS))
-***REMOVED***
+}
 
 // Set adds cpu to the set s.
-func (s *CPUSet) Set(cpu int) ***REMOVED***
+func (s *CPUSet) Set(cpu int) {
 	i := cpuBitsIndex(cpu)
-	if i < len(s) ***REMOVED***
+	if i < len(s) {
 		s[i] |= cpuBitsMask(cpu)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Clear removes cpu from the set s.
-func (s *CPUSet) Clear(cpu int) ***REMOVED***
+func (s *CPUSet) Clear(cpu int) {
 	i := cpuBitsIndex(cpu)
-	if i < len(s) ***REMOVED***
+	if i < len(s) {
 		s[i] &^= cpuBitsMask(cpu)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // IsSet reports whether cpu is in the set s.
-func (s *CPUSet) IsSet(cpu int) bool ***REMOVED***
+func (s *CPUSet) IsSet(cpu int) bool {
 	i := cpuBitsIndex(cpu)
-	if i < len(s) ***REMOVED***
+	if i < len(s) {
 		return s[i]&cpuBitsMask(cpu) != 0
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
 // Count returns the number of CPUs in the set s.
-func (s *CPUSet) Count() int ***REMOVED***
+func (s *CPUSet) Count() int {
 	c := 0
-	for _, b := range s ***REMOVED***
+	for _, b := range s {
 		c += onesCount64(uint64(b))
-	***REMOVED***
+	}
 	return c
-***REMOVED***
+}
 
 // onesCount64 is a copy of Go 1.9's math/bits.OnesCount64.
 // Once this package can require Go 1.9, we can delete this
 // and update the caller to use bits.OnesCount64.
-func onesCount64(x uint64) int ***REMOVED***
+func onesCount64(x uint64) int {
 	const m0 = 0x5555555555555555 // 01010101 ...
 	const m1 = 0x3333333333333333 // 00110011 ...
 	const m2 = 0x0f0f0f0f0f0f0f0f // 00001111 ...
@@ -121,4 +121,4 @@ func onesCount64(x uint64) int ***REMOVED***
 	x += x >> 16
 	x += x >> 32
 	return int(x) & (1<<7 - 1)
-***REMOVED***
+}

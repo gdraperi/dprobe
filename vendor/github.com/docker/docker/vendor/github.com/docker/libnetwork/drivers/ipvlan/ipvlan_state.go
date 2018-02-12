@@ -8,108 +8,108 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func (d *driver) network(nid string) *network ***REMOVED***
+func (d *driver) network(nid string) *network {
 	d.Lock()
 	n, ok := d.networks[nid]
 	d.Unlock()
-	if !ok ***REMOVED***
+	if !ok {
 		logrus.Errorf("network id %s not found", nid)
-	***REMOVED***
+	}
 
 	return n
-***REMOVED***
+}
 
-func (d *driver) addNetwork(n *network) ***REMOVED***
+func (d *driver) addNetwork(n *network) {
 	d.Lock()
 	d.networks[n.id] = n
 	d.Unlock()
-***REMOVED***
+}
 
-func (d *driver) deleteNetwork(nid string) ***REMOVED***
+func (d *driver) deleteNetwork(nid string) {
 	d.Lock()
 	delete(d.networks, nid)
 	d.Unlock()
-***REMOVED***
+}
 
 // getNetworks Safely returns a slice of existng networks
-func (d *driver) getNetworks() []*network ***REMOVED***
+func (d *driver) getNetworks() []*network {
 	d.Lock()
 	defer d.Unlock()
 
 	ls := make([]*network, 0, len(d.networks))
-	for _, nw := range d.networks ***REMOVED***
+	for _, nw := range d.networks {
 		ls = append(ls, nw)
-	***REMOVED***
+	}
 
 	return ls
-***REMOVED***
+}
 
-func (n *network) endpoint(eid string) *endpoint ***REMOVED***
+func (n *network) endpoint(eid string) *endpoint {
 	n.Lock()
 	defer n.Unlock()
 
 	return n.endpoints[eid]
-***REMOVED***
+}
 
-func (n *network) addEndpoint(ep *endpoint) ***REMOVED***
+func (n *network) addEndpoint(ep *endpoint) {
 	n.Lock()
 	n.endpoints[ep.id] = ep
 	n.Unlock()
-***REMOVED***
+}
 
-func (n *network) deleteEndpoint(eid string) ***REMOVED***
+func (n *network) deleteEndpoint(eid string) {
 	n.Lock()
 	delete(n.endpoints, eid)
 	n.Unlock()
-***REMOVED***
+}
 
-func (n *network) getEndpoint(eid string) (*endpoint, error) ***REMOVED***
+func (n *network) getEndpoint(eid string) (*endpoint, error) {
 	n.Lock()
 	defer n.Unlock()
-	if eid == "" ***REMOVED***
+	if eid == "" {
 		return nil, fmt.Errorf("endpoint id %s not found", eid)
-	***REMOVED***
-	if ep, ok := n.endpoints[eid]; ok ***REMOVED***
+	}
+	if ep, ok := n.endpoints[eid]; ok {
 		return ep, nil
-	***REMOVED***
+	}
 
 	return nil, nil
-***REMOVED***
+}
 
-func validateID(nid, eid string) error ***REMOVED***
-	if nid == "" ***REMOVED***
+func validateID(nid, eid string) error {
+	if nid == "" {
 		return fmt.Errorf("invalid network id")
-	***REMOVED***
-	if eid == "" ***REMOVED***
+	}
+	if eid == "" {
 		return fmt.Errorf("invalid endpoint id")
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (n *network) sandbox() osl.Sandbox ***REMOVED***
+func (n *network) sandbox() osl.Sandbox {
 	n.Lock()
 	defer n.Unlock()
 
 	return n.sbox
-***REMOVED***
+}
 
-func (n *network) setSandbox(sbox osl.Sandbox) ***REMOVED***
+func (n *network) setSandbox(sbox osl.Sandbox) {
 	n.Lock()
 	n.sbox = sbox
 	n.Unlock()
-***REMOVED***
+}
 
-func (d *driver) getNetwork(id string) (*network, error) ***REMOVED***
+func (d *driver) getNetwork(id string) (*network, error) {
 	d.Lock()
 	defer d.Unlock()
-	if id == "" ***REMOVED***
+	if id == "" {
 		return nil, types.BadRequestErrorf("invalid network id: %s", id)
-	***REMOVED***
+	}
 
-	if nw, ok := d.networks[id]; ok ***REMOVED***
+	if nw, ok := d.networks[id]; ok {
 		return nw, nil
-	***REMOVED***
+	}
 
 	return nil, types.NotFoundErrorf("network not found: %s", id)
-***REMOVED***
+}

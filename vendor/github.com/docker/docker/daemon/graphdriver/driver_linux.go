@@ -51,7 +51,7 @@ var (
 	priority = "btrfs,zfs,overlay2,aufs,overlay,devicemapper,vfs"
 
 	// FsNames maps filesystem id to name of the filesystem.
-	FsNames = map[FsMagic]string***REMOVED***
+	FsNames = map[FsMagic]string{
 		FsMagicAufs:        "aufs",
 		FsMagicBtrfs:       "btrfs",
 		FsMagicCramfs:      "cramfs",
@@ -72,53 +72,53 @@ var (
 		FsMagicVxFS:        "vxfs",
 		FsMagicXfs:         "xfs",
 		FsMagicZfs:         "zfs",
-	***REMOVED***
+	}
 )
 
 // GetFSMagic returns the filesystem id given the path.
-func GetFSMagic(rootpath string) (FsMagic, error) ***REMOVED***
+func GetFSMagic(rootpath string) (FsMagic, error) {
 	var buf unix.Statfs_t
-	if err := unix.Statfs(rootpath, &buf); err != nil ***REMOVED***
+	if err := unix.Statfs(rootpath, &buf); err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	return FsMagic(buf.Type), nil
-***REMOVED***
+}
 
 // NewFsChecker returns a checker configured for the provided FsMagic
-func NewFsChecker(t FsMagic) Checker ***REMOVED***
-	return &fsChecker***REMOVED***
+func NewFsChecker(t FsMagic) Checker {
+	return &fsChecker{
 		t: t,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type fsChecker struct ***REMOVED***
+type fsChecker struct {
 	t FsMagic
-***REMOVED***
+}
 
-func (c *fsChecker) IsMounted(path string) bool ***REMOVED***
+func (c *fsChecker) IsMounted(path string) bool {
 	m, _ := Mounted(c.t, path)
 	return m
-***REMOVED***
+}
 
 // NewDefaultChecker returns a check that parses /proc/mountinfo to check
 // if the specified path is mounted.
-func NewDefaultChecker() Checker ***REMOVED***
-	return &defaultChecker***REMOVED******REMOVED***
-***REMOVED***
+func NewDefaultChecker() Checker {
+	return &defaultChecker{}
+}
 
-type defaultChecker struct ***REMOVED***
-***REMOVED***
+type defaultChecker struct {
+}
 
-func (c *defaultChecker) IsMounted(path string) bool ***REMOVED***
+func (c *defaultChecker) IsMounted(path string) bool {
 	m, _ := mount.Mounted(path)
 	return m
-***REMOVED***
+}
 
 // Mounted checks if the given path is mounted as the fs type
-func Mounted(fsType FsMagic, mountPath string) (bool, error) ***REMOVED***
+func Mounted(fsType FsMagic, mountPath string) (bool, error) {
 	var buf unix.Statfs_t
-	if err := unix.Statfs(mountPath, &buf); err != nil ***REMOVED***
+	if err := unix.Statfs(mountPath, &buf); err != nil {
 		return false, err
-	***REMOVED***
+	}
 	return FsMagic(buf.Type) == fsType, nil
-***REMOVED***
+}

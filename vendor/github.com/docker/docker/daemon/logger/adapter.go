@@ -15,7 +15,7 @@ import (
 
 // pluginAdapter takes a plugin and implements the Logger interface for logger
 // instances
-type pluginAdapter struct ***REMOVED***
+type pluginAdapter struct {
 	driverName   string
 	id           string
 	plugin       logPlugin
@@ -31,9 +31,9 @@ type pluginAdapter struct ***REMOVED***
 	// buf is shared for each `Log()` call to reduce allocations.
 	// buf must be protected by mutex
 	buf logdriver.LogEntry
-***REMOVED***
+}
 
-func (a *pluginAdapter) Log(msg *Message) error ***REMOVED***
+func (a *pluginAdapter) Log(msg *Message) error {
 	a.mu.Lock()
 
 	a.buf.Line = msg.Line
@@ -48,93 +48,93 @@ func (a *pluginAdapter) Log(msg *Message) error ***REMOVED***
 
 	PutMessage(msg)
 	return err
-***REMOVED***
+}
 
-func (a *pluginAdapter) Name() string ***REMOVED***
+func (a *pluginAdapter) Name() string {
 	return a.driverName
-***REMOVED***
+}
 
-func (a *pluginAdapter) Close() error ***REMOVED***
+func (a *pluginAdapter) Close() error {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 
-	if err := a.plugin.StopLogging(strings.TrimPrefix(a.fifoPath, a.basePath)); err != nil ***REMOVED***
+	if err := a.plugin.StopLogging(strings.TrimPrefix(a.fifoPath, a.basePath)); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if err := a.stream.Close(); err != nil ***REMOVED***
+	if err := a.stream.Close(); err != nil {
 		logrus.WithError(err).Error("error closing plugin fifo")
-	***REMOVED***
-	if err := os.Remove(a.fifoPath); err != nil && !os.IsNotExist(err) ***REMOVED***
+	}
+	if err := os.Remove(a.fifoPath); err != nil && !os.IsNotExist(err) {
 		logrus.WithError(err).Error("error cleaning up plugin fifo")
-	***REMOVED***
+	}
 
 	// may be nil, especially for unit tests
-	if pluginGetter != nil ***REMOVED***
+	if pluginGetter != nil {
 		pluginGetter.Get(a.Name(), extName, plugingetter.Release)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-type pluginAdapterWithRead struct ***REMOVED***
+type pluginAdapterWithRead struct {
 	*pluginAdapter
-***REMOVED***
+}
 
-func (a *pluginAdapterWithRead) ReadLogs(config ReadConfig) *LogWatcher ***REMOVED***
+func (a *pluginAdapterWithRead) ReadLogs(config ReadConfig) *LogWatcher {
 	watcher := NewLogWatcher()
 
-	go func() ***REMOVED***
+	go func() {
 		defer close(watcher.Msg)
 		stream, err := a.plugin.ReadLogs(a.logInfo, config)
-		if err != nil ***REMOVED***
+		if err != nil {
 			watcher.Err <- errors.Wrap(err, "error getting log reader")
 			return
-		***REMOVED***
+		}
 		defer stream.Close()
 
 		dec := logdriver.NewLogEntryDecoder(stream)
-		for ***REMOVED***
-			select ***REMOVED***
+		for {
+			select {
 			case <-watcher.WatchClose():
 				return
 			default:
-			***REMOVED***
+			}
 
 			var buf logdriver.LogEntry
-			if err := dec.Decode(&buf); err != nil ***REMOVED***
-				if err == io.EOF ***REMOVED***
+			if err := dec.Decode(&buf); err != nil {
+				if err == io.EOF {
 					return
-				***REMOVED***
-				select ***REMOVED***
+				}
+				select {
 				case watcher.Err <- errors.Wrap(err, "error decoding log message"):
 				case <-watcher.WatchClose():
-				***REMOVED***
+				}
 				return
-			***REMOVED***
+			}
 
-			msg := &Message***REMOVED***
+			msg := &Message{
 				Timestamp: time.Unix(0, buf.TimeNano),
 				Line:      buf.Line,
 				Source:    buf.Source,
-			***REMOVED***
+			}
 
 			// plugin should handle this, but check just in case
-			if !config.Since.IsZero() && msg.Timestamp.Before(config.Since) ***REMOVED***
+			if !config.Since.IsZero() && msg.Timestamp.Before(config.Since) {
 				continue
-			***REMOVED***
-			if !config.Until.IsZero() && msg.Timestamp.After(config.Until) ***REMOVED***
+			}
+			if !config.Until.IsZero() && msg.Timestamp.After(config.Until) {
 				return
-			***REMOVED***
+			}
 
-			select ***REMOVED***
+			select {
 			case watcher.Msg <- msg:
 			case <-watcher.WatchClose():
 				// make sure the message we consumed is sent
 				watcher.Msg <- msg
 				return
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***()
+			}
+		}
+	}()
 
 	return watcher
-***REMOVED***
+}

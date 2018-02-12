@@ -9,481 +9,481 @@ import (
 )
 
 // DecodeMsg implements msgp.Decodable
-func (z *Entry) DecodeMsg(dc *msgp.Reader) (err error) ***REMOVED***
+func (z *Entry) DecodeMsg(dc *msgp.Reader) (err error) {
 	var zxvk uint32
 	zxvk, err = dc.ReadArrayHeader()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
-	if zxvk != 2 ***REMOVED***
-		err = msgp.ArrayError***REMOVED***Wanted: 2, Got: zxvk***REMOVED***
+	}
+	if zxvk != 2 {
+		err = msgp.ArrayError{Wanted: 2, Got: zxvk}
 		return
-	***REMOVED***
+	}
 	z.Time, err = dc.ReadInt64()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	z.Record, err = dc.ReadIntf()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // EncodeMsg implements msgp.Encodable
-func (z Entry) EncodeMsg(en *msgp.Writer) (err error) ***REMOVED***
+func (z Entry) EncodeMsg(en *msgp.Writer) (err error) {
 	// array header, size 2
 	err = en.Append(0x92)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	err = en.WriteInt64(z.Time)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	err = en.WriteIntf(z.Record)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // MarshalMsg implements msgp.Marshaler
-func (z Entry) MarshalMsg(b []byte) (o []byte, err error) ***REMOVED***
+func (z Entry) MarshalMsg(b []byte) (o []byte, err error) {
 	o = msgp.Require(b, z.Msgsize())
 	// array header, size 2
 	o = append(o, 0x92)
 	o = msgp.AppendInt64(o, z.Time)
 	o, err = msgp.AppendIntf(o, z.Record)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // UnmarshalMsg implements msgp.Unmarshaler
-func (z *Entry) UnmarshalMsg(bts []byte) (o []byte, err error) ***REMOVED***
+func (z *Entry) UnmarshalMsg(bts []byte) (o []byte, err error) {
 	var zbzg uint32
 	zbzg, bts, err = msgp.ReadArrayHeaderBytes(bts)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
-	if zbzg != 2 ***REMOVED***
-		err = msgp.ArrayError***REMOVED***Wanted: 2, Got: zbzg***REMOVED***
+	}
+	if zbzg != 2 {
+		err = msgp.ArrayError{Wanted: 2, Got: zbzg}
 		return
-	***REMOVED***
+	}
 	z.Time, bts, err = msgp.ReadInt64Bytes(bts)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	z.Record, bts, err = msgp.ReadIntfBytes(bts)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	o = bts
 	return
-***REMOVED***
+}
 
 // Msgsize returns an upper bound estimate of the number of bytes occupied by the serialized message
-func (z Entry) Msgsize() (s int) ***REMOVED***
+func (z Entry) Msgsize() (s int) {
 	s = 1 + msgp.Int64Size + msgp.GuessSize(z.Record)
 	return
-***REMOVED***
+}
 
 // DecodeMsg implements msgp.Decodable
-func (z *Forward) DecodeMsg(dc *msgp.Reader) (err error) ***REMOVED***
+func (z *Forward) DecodeMsg(dc *msgp.Reader) (err error) {
 	var zcmr uint32
 	zcmr, err = dc.ReadArrayHeader()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
-	if zcmr != 3 ***REMOVED***
-		err = msgp.ArrayError***REMOVED***Wanted: 3, Got: zcmr***REMOVED***
+	}
+	if zcmr != 3 {
+		err = msgp.ArrayError{Wanted: 3, Got: zcmr}
 		return
-	***REMOVED***
+	}
 	z.Tag, err = dc.ReadString()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	var zajw uint32
 	zajw, err = dc.ReadArrayHeader()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
-	if cap(z.Entries) >= int(zajw) ***REMOVED***
+	}
+	if cap(z.Entries) >= int(zajw) {
 		z.Entries = (z.Entries)[:zajw]
-	***REMOVED*** else ***REMOVED***
+	} else {
 		z.Entries = make([]Entry, zajw)
-	***REMOVED***
-	for zbai := range z.Entries ***REMOVED***
+	}
+	for zbai := range z.Entries {
 		var zwht uint32
 		zwht, err = dc.ReadArrayHeader()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
-		if zwht != 2 ***REMOVED***
-			err = msgp.ArrayError***REMOVED***Wanted: 2, Got: zwht***REMOVED***
+		}
+		if zwht != 2 {
+			err = msgp.ArrayError{Wanted: 2, Got: zwht}
 			return
-		***REMOVED***
+		}
 		z.Entries[zbai].Time, err = dc.ReadInt64()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
+		}
 		z.Entries[zbai].Record, err = dc.ReadIntf()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	z.Option, err = dc.ReadIntf()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // EncodeMsg implements msgp.Encodable
-func (z *Forward) EncodeMsg(en *msgp.Writer) (err error) ***REMOVED***
+func (z *Forward) EncodeMsg(en *msgp.Writer) (err error) {
 	// array header, size 3
 	err = en.Append(0x93)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	err = en.WriteString(z.Tag)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	err = en.WriteArrayHeader(uint32(len(z.Entries)))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
-	for zbai := range z.Entries ***REMOVED***
+	}
+	for zbai := range z.Entries {
 		// array header, size 2
 		err = en.Append(0x92)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		err = en.WriteInt64(z.Entries[zbai].Time)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
+		}
 		err = en.WriteIntf(z.Entries[zbai].Record)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	err = en.WriteIntf(z.Option)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // MarshalMsg implements msgp.Marshaler
-func (z *Forward) MarshalMsg(b []byte) (o []byte, err error) ***REMOVED***
+func (z *Forward) MarshalMsg(b []byte) (o []byte, err error) {
 	o = msgp.Require(b, z.Msgsize())
 	// array header, size 3
 	o = append(o, 0x93)
 	o = msgp.AppendString(o, z.Tag)
 	o = msgp.AppendArrayHeader(o, uint32(len(z.Entries)))
-	for zbai := range z.Entries ***REMOVED***
+	for zbai := range z.Entries {
 		// array header, size 2
 		o = append(o, 0x92)
 		o = msgp.AppendInt64(o, z.Entries[zbai].Time)
 		o, err = msgp.AppendIntf(o, z.Entries[zbai].Record)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	o, err = msgp.AppendIntf(o, z.Option)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // UnmarshalMsg implements msgp.Unmarshaler
-func (z *Forward) UnmarshalMsg(bts []byte) (o []byte, err error) ***REMOVED***
+func (z *Forward) UnmarshalMsg(bts []byte) (o []byte, err error) {
 	var zhct uint32
 	zhct, bts, err = msgp.ReadArrayHeaderBytes(bts)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
-	if zhct != 3 ***REMOVED***
-		err = msgp.ArrayError***REMOVED***Wanted: 3, Got: zhct***REMOVED***
+	}
+	if zhct != 3 {
+		err = msgp.ArrayError{Wanted: 3, Got: zhct}
 		return
-	***REMOVED***
+	}
 	z.Tag, bts, err = msgp.ReadStringBytes(bts)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	var zcua uint32
 	zcua, bts, err = msgp.ReadArrayHeaderBytes(bts)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
-	if cap(z.Entries) >= int(zcua) ***REMOVED***
+	}
+	if cap(z.Entries) >= int(zcua) {
 		z.Entries = (z.Entries)[:zcua]
-	***REMOVED*** else ***REMOVED***
+	} else {
 		z.Entries = make([]Entry, zcua)
-	***REMOVED***
-	for zbai := range z.Entries ***REMOVED***
+	}
+	for zbai := range z.Entries {
 		var zxhx uint32
 		zxhx, bts, err = msgp.ReadArrayHeaderBytes(bts)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
-		if zxhx != 2 ***REMOVED***
-			err = msgp.ArrayError***REMOVED***Wanted: 2, Got: zxhx***REMOVED***
+		}
+		if zxhx != 2 {
+			err = msgp.ArrayError{Wanted: 2, Got: zxhx}
 			return
-		***REMOVED***
+		}
 		z.Entries[zbai].Time, bts, err = msgp.ReadInt64Bytes(bts)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
+		}
 		z.Entries[zbai].Record, bts, err = msgp.ReadIntfBytes(bts)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	z.Option, bts, err = msgp.ReadIntfBytes(bts)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	o = bts
 	return
-***REMOVED***
+}
 
 // Msgsize returns an upper bound estimate of the number of bytes occupied by the serialized message
-func (z *Forward) Msgsize() (s int) ***REMOVED***
+func (z *Forward) Msgsize() (s int) {
 	s = 1 + msgp.StringPrefixSize + len(z.Tag) + msgp.ArrayHeaderSize
-	for zbai := range z.Entries ***REMOVED***
+	for zbai := range z.Entries {
 		s += 1 + msgp.Int64Size + msgp.GuessSize(z.Entries[zbai].Record)
-	***REMOVED***
+	}
 	s += msgp.GuessSize(z.Option)
 	return
-***REMOVED***
+}
 
 // DecodeMsg implements msgp.Decodable
-func (z *Message) DecodeMsg(dc *msgp.Reader) (err error) ***REMOVED***
+func (z *Message) DecodeMsg(dc *msgp.Reader) (err error) {
 	var zlqf uint32
 	zlqf, err = dc.ReadArrayHeader()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
-	if zlqf != 4 ***REMOVED***
-		err = msgp.ArrayError***REMOVED***Wanted: 4, Got: zlqf***REMOVED***
+	}
+	if zlqf != 4 {
+		err = msgp.ArrayError{Wanted: 4, Got: zlqf}
 		return
-	***REMOVED***
+	}
 	z.Tag, err = dc.ReadString()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	z.Time, err = dc.ReadInt64()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	z.Record, err = dc.ReadIntf()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	z.Option, err = dc.ReadIntf()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // EncodeMsg implements msgp.Encodable
-func (z *Message) EncodeMsg(en *msgp.Writer) (err error) ***REMOVED***
+func (z *Message) EncodeMsg(en *msgp.Writer) (err error) {
 	// array header, size 4
 	err = en.Append(0x94)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	err = en.WriteString(z.Tag)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	err = en.WriteInt64(z.Time)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	err = en.WriteIntf(z.Record)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	err = en.WriteIntf(z.Option)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // MarshalMsg implements msgp.Marshaler
-func (z *Message) MarshalMsg(b []byte) (o []byte, err error) ***REMOVED***
+func (z *Message) MarshalMsg(b []byte) (o []byte, err error) {
 	o = msgp.Require(b, z.Msgsize())
 	// array header, size 4
 	o = append(o, 0x94)
 	o = msgp.AppendString(o, z.Tag)
 	o = msgp.AppendInt64(o, z.Time)
 	o, err = msgp.AppendIntf(o, z.Record)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	o, err = msgp.AppendIntf(o, z.Option)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // UnmarshalMsg implements msgp.Unmarshaler
-func (z *Message) UnmarshalMsg(bts []byte) (o []byte, err error) ***REMOVED***
+func (z *Message) UnmarshalMsg(bts []byte) (o []byte, err error) {
 	var zdaf uint32
 	zdaf, bts, err = msgp.ReadArrayHeaderBytes(bts)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
-	if zdaf != 4 ***REMOVED***
-		err = msgp.ArrayError***REMOVED***Wanted: 4, Got: zdaf***REMOVED***
+	}
+	if zdaf != 4 {
+		err = msgp.ArrayError{Wanted: 4, Got: zdaf}
 		return
-	***REMOVED***
+	}
 	z.Tag, bts, err = msgp.ReadStringBytes(bts)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	z.Time, bts, err = msgp.ReadInt64Bytes(bts)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	z.Record, bts, err = msgp.ReadIntfBytes(bts)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	z.Option, bts, err = msgp.ReadIntfBytes(bts)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	o = bts
 	return
-***REMOVED***
+}
 
 // Msgsize returns an upper bound estimate of the number of bytes occupied by the serialized message
-func (z *Message) Msgsize() (s int) ***REMOVED***
+func (z *Message) Msgsize() (s int) {
 	s = 1 + msgp.StringPrefixSize + len(z.Tag) + msgp.Int64Size + msgp.GuessSize(z.Record) + msgp.GuessSize(z.Option)
 	return
-***REMOVED***
+}
 
 // DecodeMsg implements msgp.Decodable
-func (z *MessageExt) DecodeMsg(dc *msgp.Reader) (err error) ***REMOVED***
+func (z *MessageExt) DecodeMsg(dc *msgp.Reader) (err error) {
 	var zpks uint32
 	zpks, err = dc.ReadArrayHeader()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
-	if zpks != 4 ***REMOVED***
-		err = msgp.ArrayError***REMOVED***Wanted: 4, Got: zpks***REMOVED***
+	}
+	if zpks != 4 {
+		err = msgp.ArrayError{Wanted: 4, Got: zpks}
 		return
-	***REMOVED***
+	}
 	z.Tag, err = dc.ReadString()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	err = dc.ReadExtension(&z.Time)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	z.Record, err = dc.ReadIntf()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	z.Option, err = dc.ReadIntf()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // EncodeMsg implements msgp.Encodable
-func (z *MessageExt) EncodeMsg(en *msgp.Writer) (err error) ***REMOVED***
+func (z *MessageExt) EncodeMsg(en *msgp.Writer) (err error) {
 	// array header, size 4
 	err = en.Append(0x94)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	err = en.WriteString(z.Tag)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	err = en.WriteExtension(&z.Time)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	err = en.WriteIntf(z.Record)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	err = en.WriteIntf(z.Option)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // MarshalMsg implements msgp.Marshaler
-func (z *MessageExt) MarshalMsg(b []byte) (o []byte, err error) ***REMOVED***
+func (z *MessageExt) MarshalMsg(b []byte) (o []byte, err error) {
 	o = msgp.Require(b, z.Msgsize())
 	// array header, size 4
 	o = append(o, 0x94)
 	o = msgp.AppendString(o, z.Tag)
 	o, err = msgp.AppendExtension(o, &z.Time)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	o, err = msgp.AppendIntf(o, z.Record)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	o, err = msgp.AppendIntf(o, z.Option)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // UnmarshalMsg implements msgp.Unmarshaler
-func (z *MessageExt) UnmarshalMsg(bts []byte) (o []byte, err error) ***REMOVED***
+func (z *MessageExt) UnmarshalMsg(bts []byte) (o []byte, err error) {
 	var zjfb uint32
 	zjfb, bts, err = msgp.ReadArrayHeaderBytes(bts)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
-	if zjfb != 4 ***REMOVED***
-		err = msgp.ArrayError***REMOVED***Wanted: 4, Got: zjfb***REMOVED***
+	}
+	if zjfb != 4 {
+		err = msgp.ArrayError{Wanted: 4, Got: zjfb}
 		return
-	***REMOVED***
+	}
 	z.Tag, bts, err = msgp.ReadStringBytes(bts)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	bts, err = msgp.ReadExtensionBytes(bts, &z.Time)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	z.Record, bts, err = msgp.ReadIntfBytes(bts)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	z.Option, bts, err = msgp.ReadIntfBytes(bts)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	o = bts
 	return
-***REMOVED***
+}
 
 // Msgsize returns an upper bound estimate of the number of bytes occupied by the serialized message
-func (z *MessageExt) Msgsize() (s int) ***REMOVED***
+func (z *MessageExt) Msgsize() (s int) {
 	s = 1 + msgp.StringPrefixSize + len(z.Tag) + msgp.ExtensionPrefixSize + z.Time.Len() + msgp.GuessSize(z.Record) + msgp.GuessSize(z.Option)
 	return
-***REMOVED***
+}

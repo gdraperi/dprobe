@@ -30,7 +30,7 @@ keywords: "API, Docker, rcli, REST, documentation"
   configuration is only used for Windows containers.
 * `GET /containers/(name)/logs` now supports an additional query parameter: `until`,
   which returns log lines that occurred before the specified timestamp.
-* `POST /containers/***REMOVED***id***REMOVED***/exec` now accepts a `WorkingDir` property to set the
+* `POST /containers/{id}/exec` now accepts a `WorkingDir` property to set the
   work-dir for the exec process, independent of the container's work-dir.
 * `Get /version` now returns a `Platform.Name` field, which can be used by products
   using Moby as a foundation to return information about the platform.
@@ -68,7 +68,7 @@ keywords: "API, Docker, rcli, REST, documentation"
 * `POST /containers/create` now accepts additional values for the
   `HostConfig.IpcMode` property. New values are `private`, `shareable`,
   and `none`.
-* `DELETE /networks/***REMOVED***id or name***REMOVED***` fixed issue where a `name` equal to another
+* `DELETE /networks/{id or name}` fixed issue where a `name` equal to another
   network's name was able to mask that `id`. If both a network with the given
   _name_ exists, and a network with the given _id_, the network with the given
   _id_ is now deleted. This change is not versioned, and affects all API versions
@@ -97,7 +97,7 @@ keywords: "API, Docker, rcli, REST, documentation"
 * `GET /images/(name)/get` now includes an `ImageMetadata` field which contains image metadata that is local to the engine and not part of the image config.
 * `POST /services/create` now accepts a `PluginSpec` when `TaskTemplate.Runtime` is set to `plugin`
 * `GET /events` now supports config events `create`, `update` and `remove` that are emitted when users create, update or remove a config
-* `GET /volumes/` and `GET /volumes/***REMOVED***name***REMOVED***` now return a `CreatedAt` field,
+* `GET /volumes/` and `GET /volumes/{name}` now return a `CreatedAt` field,
   containing the date/time the volume was created. This field is omitted if the
   creation date/time for the volume is unknown. For volumes with scope "global",
   this field represents the creation date/time of the local _instance_ of the
@@ -113,7 +113,7 @@ keywords: "API, Docker, rcli, REST, documentation"
 * `GET /info` and `GET /swarm` now returns the cluster-wide swarm CA info if the node is in a swarm: the cluster root CA certificate, and the cluster TLS
  leaf certificate issuer's subject and public key. It also displays the desired CA signing certificate, if any was provided as part of the spec.
 * `POST /build/` now (when not silent) produces an `Aux` message in the JSON output stream with payload `types.BuildResult` for each image produced. The final such message will reference the image resulting from the build.
-* `GET /nodes` and `GET /nodes/***REMOVED***id***REMOVED***` now returns additional information about swarm TLS info if the node is part of a swarm: the trusted root CA, and the
+* `GET /nodes` and `GET /nodes/{id}` now returns additional information about swarm TLS info if the node is part of a swarm: the trusted root CA, and the
  issuer's subject and public key.
 * `GET /distribution/(name)/json` is a new endpoint that returns a JSON output stream with payload `types.DistributionInspect` for an image name. It includes a descriptor with the digest, and supported platforms retrieved from directly contacting the registry.
 * `POST /swarm/update` now accepts 3 additional parameters as part of the swarm spec's CA configuration; the desired CA certificate for
@@ -149,7 +149,7 @@ keywords: "API, Docker, rcli, REST, documentation"
 * `GET /containers/create` now takes a `DeviceCgroupRules` field in `HostConfig` allowing to set custom device cgroup rules for the created container.
 * Optional query parameter `verbose` for `GET /networks/(id or name)` will now list all services with all the tasks, including the non-local tasks on the given network.
 * `GET /containers/(id or name)/attach/ws` now returns WebSocket in binary frame format for API version >= v1.28, and returns WebSocket in text frame format for API version< v1.28, for the purpose of backward-compatibility.
-* `GET /networks` is optimised only to return list of all networks and network specific information. List of all containers attached to a specific network is removed from this API and is only available using the network specific `GET /networks/***REMOVED***network-id***REMOVED***.
+* `GET /networks` is optimised only to return list of all networks and network specific information. List of all containers attached to a specific network is removed from this API and is only available using the network specific `GET /networks/{network-id}.
 * `GET /containers/json` now supports `publish` and `expose` filters to filter containers that expose or publish certain ports.
 * `POST /services/create` and `POST /services/(id or name)/update` now accept the `ReadOnly` parameter, which mounts the container's root filesystem as read only.
 * `POST /build` now accepts `extrahosts` parameter to specify a host to ip mapping to use during the build.
@@ -231,9 +231,9 @@ keywords: "API, Docker, rcli, REST, documentation"
 * `GET /images/json` now support a `reference` filter.
 * `GET /secrets` returns information on the secrets.
 * `POST /secrets/create` creates a secret.
-* `DELETE /secrets/***REMOVED***id***REMOVED***` removes the secret `id`.
-* `GET /secrets/***REMOVED***id***REMOVED***` returns information on the secret `id`.
-* `POST /secrets/***REMOVED***id***REMOVED***/update` updates the secret `id`.
+* `DELETE /secrets/{id}` removes the secret `id`.
+* `GET /secrets/{id}` returns information on the secret `id`.
+* `POST /secrets/{id}/update` updates the secret `id`.
 * `POST /services/(id or name)/update` now accepts service name or prefix of service id as a parameter.
 * `POST /containers/create` added 2 built-in log-opts that work on all logging drivers,
   `mode` (`blocking`|`non-blocking`), and `max-buffer-size` (e.g. `2m`) which enables a non-blocking log buffer.
@@ -262,7 +262,7 @@ keywords: "API, Docker, rcli, REST, documentation"
 * `POST /containers/(id or name)/start` no longer accepts a `HostConfig`.
 * `POST /images/(name)/tag` no longer has a `force` query parameter.
 * `GET /images/search` now supports maximum returned search results `limit`.
-* `POST /containers/***REMOVED***name:.****REMOVED***/copy` is now removed and errors out starting from this API version.
+* `POST /containers/{name:.*}/copy` is now removed and errors out starting from this API version.
 * API errors are now returned as JSON instead of plain text.
 * `POST /containers/create` and `POST /containers/(id)/start` allow you to configure kernel parameters (sysctls) for use in the container.
 * `POST /containers/<container ID>/exec` and `POST /exec/<exec ID>/start`
@@ -322,7 +322,7 @@ keywords: "API, Docker, rcli, REST, documentation"
 * `GET /containers/(id)/json` now returns the `NetworkID` of containers.
 * `POST /networks/create` Now supports an options field in the IPAM config that provides options
   for custom IPAM plugins.
-* `GET /networks/***REMOVED***network-id***REMOVED***` Now returns IPAM config options for custom IPAM plugins if any
+* `GET /networks/{network-id}` Now returns IPAM config options for custom IPAM plugins if any
   are available.
 * `GET /networks/<network-id>` now returns subnets info for user-defined networks.
 * `GET /info` can now return a `SystemStatus` field useful for returning additional information about applications

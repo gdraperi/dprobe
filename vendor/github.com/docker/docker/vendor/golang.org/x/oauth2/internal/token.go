@@ -27,7 +27,7 @@ import (
 // This type is a mirror of oauth2.Token and exists to break
 // an otherwise-circular dependency. Other internal packages
 // should convert this Token into an oauth2.Token before use.
-type Token struct ***REMOVED***
+type Token struct {
 	// AccessToken is the token that authorizes and authenticates
 	// the requests.
 	AccessToken string
@@ -50,46 +50,46 @@ type Token struct ***REMOVED***
 
 	// Raw optionally contains extra metadata from the server
 	// when updating a token.
-	Raw interface***REMOVED******REMOVED***
-***REMOVED***
+	Raw interface{}
+}
 
 // tokenJSON is the struct representing the HTTP response from OAuth2
 // providers returning a token in JSON form.
-type tokenJSON struct ***REMOVED***
+type tokenJSON struct {
 	AccessToken  string         `json:"access_token"`
 	TokenType    string         `json:"token_type"`
 	RefreshToken string         `json:"refresh_token"`
 	ExpiresIn    expirationTime `json:"expires_in"` // at least PayPal returns string, while most return number
 	Expires      expirationTime `json:"expires"`    // broken Facebook spelling of expires_in
-***REMOVED***
+}
 
-func (e *tokenJSON) expiry() (t time.Time) ***REMOVED***
-	if v := e.ExpiresIn; v != 0 ***REMOVED***
+func (e *tokenJSON) expiry() (t time.Time) {
+	if v := e.ExpiresIn; v != 0 {
 		return time.Now().Add(time.Duration(v) * time.Second)
-	***REMOVED***
-	if v := e.Expires; v != 0 ***REMOVED***
+	}
+	if v := e.Expires; v != 0 {
 		return time.Now().Add(time.Duration(v) * time.Second)
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 type expirationTime int32
 
-func (e *expirationTime) UnmarshalJSON(b []byte) error ***REMOVED***
+func (e *expirationTime) UnmarshalJSON(b []byte) error {
 	var n json.Number
 	err := json.Unmarshal(b, &n)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	i, err := n.Int64()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	*e = expirationTime(i)
 	return nil
-***REMOVED***
+}
 
-var brokenAuthHeaderProviders = []string***REMOVED***
+var brokenAuthHeaderProviders = []string{
 	"https://accounts.google.com/",
 	"https://api.dropbox.com/",
 	"https://api.dropboxapi.com/",
@@ -119,11 +119,11 @@ var brokenAuthHeaderProviders = []string***REMOVED***
 	"https://api.patreon.com/",
 	"https://sandbox.codeswholesale.com/oauth/token",
 	"https://api.codeswholesale.com/oauth/token",
-***REMOVED***
+}
 
-func RegisterBrokenAuthHeaderProvider(tokenURL string) ***REMOVED***
+func RegisterBrokenAuthHeaderProvider(tokenURL string) {
 	brokenAuthHeaderProviders = append(brokenAuthHeaderProviders, tokenURL)
-***REMOVED***
+}
 
 // providerAuthHeaderWorks reports whether the OAuth2 server identified by the tokenURL
 // implements the OAuth2 spec correctly
@@ -133,95 +133,95 @@ func RegisterBrokenAuthHeaderProvider(tokenURL string) ***REMOVED***
 // - Dropbox accepts either it in URL param or Auth header, but not both.
 // - Google only accepts URL param (not spec compliant?), not Auth header
 // - Stripe only accepts client secret in Auth header with Bearer method, not Basic
-func providerAuthHeaderWorks(tokenURL string) bool ***REMOVED***
-	for _, s := range brokenAuthHeaderProviders ***REMOVED***
-		if strings.HasPrefix(tokenURL, s) ***REMOVED***
+func providerAuthHeaderWorks(tokenURL string) bool {
+	for _, s := range brokenAuthHeaderProviders {
+		if strings.HasPrefix(tokenURL, s) {
 			// Some sites fail to implement the OAuth2 spec fully.
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Assume the provider implements the spec properly
 	// otherwise. We can add more exceptions as they're
 	// discovered. We will _not_ be adding configurable hooks
 	// to this package to let users select server bugs.
 	return true
-***REMOVED***
+}
 
-func RetrieveToken(ctx context.Context, clientID, clientSecret, tokenURL string, v url.Values) (*Token, error) ***REMOVED***
+func RetrieveToken(ctx context.Context, clientID, clientSecret, tokenURL string, v url.Values) (*Token, error) {
 	hc, err := ContextClient(ctx)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	v.Set("client_id", clientID)
 	bustedAuth := !providerAuthHeaderWorks(tokenURL)
-	if bustedAuth && clientSecret != "" ***REMOVED***
+	if bustedAuth && clientSecret != "" {
 		v.Set("client_secret", clientSecret)
-	***REMOVED***
+	}
 	req, err := http.NewRequest("POST", tokenURL, strings.NewReader(v.Encode()))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	if !bustedAuth ***REMOVED***
+	if !bustedAuth {
 		req.SetBasicAuth(clientID, clientSecret)
-	***REMOVED***
+	}
 	r, err := hc.Do(req)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	defer r.Body.Close()
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1<<20))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("oauth2: cannot fetch token: %v", err)
-	***REMOVED***
-	if code := r.StatusCode; code < 200 || code > 299 ***REMOVED***
+	}
+	if code := r.StatusCode; code < 200 || code > 299 {
 		return nil, fmt.Errorf("oauth2: cannot fetch token: %v\nResponse: %s", r.Status, body)
-	***REMOVED***
+	}
 
 	var token *Token
 	content, _, _ := mime.ParseMediaType(r.Header.Get("Content-Type"))
-	switch content ***REMOVED***
+	switch content {
 	case "application/x-www-form-urlencoded", "text/plain":
 		vals, err := url.ParseQuery(string(body))
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-		token = &Token***REMOVED***
+		}
+		token = &Token{
 			AccessToken:  vals.Get("access_token"),
 			TokenType:    vals.Get("token_type"),
 			RefreshToken: vals.Get("refresh_token"),
 			Raw:          vals,
-		***REMOVED***
+		}
 		e := vals.Get("expires_in")
-		if e == "" ***REMOVED***
+		if e == "" {
 			// TODO(jbd): Facebook's OAuth2 implementation is broken and
 			// returns expires_in field in expires. Remove the fallback to expires,
 			// when Facebook fixes their implementation.
 			e = vals.Get("expires")
-		***REMOVED***
+		}
 		expires, _ := strconv.Atoi(e)
-		if expires != 0 ***REMOVED***
+		if expires != 0 {
 			token.Expiry = time.Now().Add(time.Duration(expires) * time.Second)
-		***REMOVED***
+		}
 	default:
 		var tj tokenJSON
-		if err = json.Unmarshal(body, &tj); err != nil ***REMOVED***
+		if err = json.Unmarshal(body, &tj); err != nil {
 			return nil, err
-		***REMOVED***
-		token = &Token***REMOVED***
+		}
+		token = &Token{
 			AccessToken:  tj.AccessToken,
 			TokenType:    tj.TokenType,
 			RefreshToken: tj.RefreshToken,
 			Expiry:       tj.expiry(),
-			Raw:          make(map[string]interface***REMOVED******REMOVED***),
-		***REMOVED***
+			Raw:          make(map[string]interface{}),
+		}
 		json.Unmarshal(body, &token.Raw) // no error checks for optional fields
-	***REMOVED***
+	}
 	// Don't overwrite `RefreshToken` with an empty value
 	// if this was a token refreshing request.
-	if token.RefreshToken == "" ***REMOVED***
+	if token.RefreshToken == "" {
 		token.RefreshToken = v.Get("refresh_token")
-	***REMOVED***
+	}
 	return token, nil
-***REMOVED***
+}

@@ -18,64 +18,64 @@ import (
 )
 
 // A Decoder loads an archive of CLDR data.
-type Decoder struct ***REMOVED***
+type Decoder struct {
 	dirFilter     []string
 	sectionFilter []string
 	loader        Loader
 	cldr          *CLDR
 	curLocale     string
-***REMOVED***
+}
 
 // SetSectionFilter takes a list top-level LDML element names to which
 // evaluation of LDML should be limited.  It automatically calls SetDirFilter.
-func (d *Decoder) SetSectionFilter(filter ...string) ***REMOVED***
+func (d *Decoder) SetSectionFilter(filter ...string) {
 	d.sectionFilter = filter
 	// TODO: automatically set dir filter
-***REMOVED***
+}
 
 // SetDirFilter limits the loading of LDML XML files of the specied directories.
 // Note that sections may be split across directories differently for different CLDR versions.
 // For more robust code, use SetSectionFilter.
-func (d *Decoder) SetDirFilter(dir ...string) ***REMOVED***
+func (d *Decoder) SetDirFilter(dir ...string) {
 	d.dirFilter = dir
-***REMOVED***
+}
 
 // A Loader provides access to the files of a CLDR archive.
-type Loader interface ***REMOVED***
+type Loader interface {
 	Len() int
 	Path(i int) string
 	Reader(i int) (io.ReadCloser, error)
-***REMOVED***
+}
 
 var fileRe = regexp.MustCompile(`.*[/\\](.*)[/\\](.*)\.xml`)
 
 // Decode loads and decodes the files represented by l.
-func (d *Decoder) Decode(l Loader) (cldr *CLDR, err error) ***REMOVED***
+func (d *Decoder) Decode(l Loader) (cldr *CLDR, err error) {
 	d.cldr = makeCLDR()
-	for i := 0; i < l.Len(); i++ ***REMOVED***
+	for i := 0; i < l.Len(); i++ {
 		fname := l.Path(i)
-		if m := fileRe.FindStringSubmatch(fname); m != nil ***REMOVED***
-			if len(d.dirFilter) > 0 && !in(d.dirFilter, m[1]) ***REMOVED***
+		if m := fileRe.FindStringSubmatch(fname); m != nil {
+			if len(d.dirFilter) > 0 && !in(d.dirFilter, m[1]) {
 				continue
-			***REMOVED***
+			}
 			var r io.Reader
-			if r, err = l.Reader(i); err == nil ***REMOVED***
+			if r, err = l.Reader(i); err == nil {
 				err = d.decode(m[1], m[2], r)
-			***REMOVED***
-			if err != nil ***REMOVED***
+			}
+			if err != nil {
 				return nil, err
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	d.cldr.finalize(d.sectionFilter)
 	return d.cldr, nil
-***REMOVED***
+}
 
-func (d *Decoder) decode(dir, id string, r io.Reader) error ***REMOVED***
-	var v interface***REMOVED******REMOVED***
+func (d *Decoder) decode(dir, id string, r io.Reader) error {
+	var v interface{}
 	var l *LDML
 	cldr := d.cldr
-	switch ***REMOVED***
+	switch {
 	case dir == "supplemental":
 		v = cldr.supp
 	case dir == "transforms":
@@ -86,86 +86,86 @@ func (d *Decoder) decode(dir, id string, r io.Reader) error ***REMOVED***
 		return nil
 	default:
 		ok := false
-		if v, ok = cldr.locale[id]; !ok ***REMOVED***
-			l = &LDML***REMOVED******REMOVED***
+		if v, ok = cldr.locale[id]; !ok {
+			l = &LDML{}
 			v, cldr.locale[id] = l, l
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	x := xml.NewDecoder(r)
-	if err := x.Decode(v); err != nil ***REMOVED***
+	if err := x.Decode(v); err != nil {
 		log.Printf("%s/%s: %v", dir, id, err)
 		return err
-	***REMOVED***
-	if l != nil ***REMOVED***
-		if l.Identity == nil ***REMOVED***
+	}
+	if l != nil {
+		if l.Identity == nil {
 			return fmt.Errorf("%s/%s: missing identity element", dir, id)
-		***REMOVED***
+		}
 		// TODO: verify when CLDR bug http://unicode.org/cldr/trac/ticket/8970
 		// is resolved.
 		// path := strings.Split(id, "_")
-		// if lang := l.Identity.Language.Type; lang != path[0] ***REMOVED***
+		// if lang := l.Identity.Language.Type; lang != path[0] {
 		// 	return fmt.Errorf("%s/%s: language was %s; want %s", dir, id, lang, path[0])
-		// ***REMOVED***
-	***REMOVED***
+		// }
+	}
 	return nil
-***REMOVED***
+}
 
 type pathLoader []string
 
-func makePathLoader(path string) (pl pathLoader, err error) ***REMOVED***
-	err = filepath.Walk(path, func(path string, _ os.FileInfo, err error) error ***REMOVED***
+func makePathLoader(path string) (pl pathLoader, err error) {
+	err = filepath.Walk(path, func(path string, _ os.FileInfo, err error) error {
 		pl = append(pl, path)
 		return err
-	***REMOVED***)
+	})
 	return pl, err
-***REMOVED***
+}
 
-func (pl pathLoader) Len() int ***REMOVED***
+func (pl pathLoader) Len() int {
 	return len(pl)
-***REMOVED***
+}
 
-func (pl pathLoader) Path(i int) string ***REMOVED***
+func (pl pathLoader) Path(i int) string {
 	return pl[i]
-***REMOVED***
+}
 
-func (pl pathLoader) Reader(i int) (io.ReadCloser, error) ***REMOVED***
+func (pl pathLoader) Reader(i int) (io.ReadCloser, error) {
 	return os.Open(pl[i])
-***REMOVED***
+}
 
 // DecodePath loads CLDR data from the given path.
-func (d *Decoder) DecodePath(path string) (cldr *CLDR, err error) ***REMOVED***
+func (d *Decoder) DecodePath(path string) (cldr *CLDR, err error) {
 	loader, err := makePathLoader(path)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return d.Decode(loader)
-***REMOVED***
+}
 
-type zipLoader struct ***REMOVED***
+type zipLoader struct {
 	r *zip.Reader
-***REMOVED***
+}
 
-func (zl zipLoader) Len() int ***REMOVED***
+func (zl zipLoader) Len() int {
 	return len(zl.r.File)
-***REMOVED***
+}
 
-func (zl zipLoader) Path(i int) string ***REMOVED***
+func (zl zipLoader) Path(i int) string {
 	return zl.r.File[i].Name
-***REMOVED***
+}
 
-func (zl zipLoader) Reader(i int) (io.ReadCloser, error) ***REMOVED***
+func (zl zipLoader) Reader(i int) (io.ReadCloser, error) {
 	return zl.r.File[i].Open()
-***REMOVED***
+}
 
 // DecodeZip loads CLDR data from the zip archive for which r is the source.
-func (d *Decoder) DecodeZip(r io.Reader) (cldr *CLDR, err error) ***REMOVED***
+func (d *Decoder) DecodeZip(r io.Reader) (cldr *CLDR, err error) {
 	buffer, err := ioutil.ReadAll(r)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	archive, err := zip.NewReader(bytes.NewReader(buffer), int64(len(buffer)))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	return d.Decode(zipLoader***REMOVED***archive***REMOVED***)
-***REMOVED***
+	}
+	return d.Decode(zipLoader{archive})
+}

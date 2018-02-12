@@ -14,38 +14,38 @@ import (
 
 // ImageSearch makes the docker host to search by a term in a remote registry.
 // The list of results is not sorted in any fashion.
-func (cli *Client) ImageSearch(ctx context.Context, term string, options types.ImageSearchOptions) ([]registry.SearchResult, error) ***REMOVED***
+func (cli *Client) ImageSearch(ctx context.Context, term string, options types.ImageSearchOptions) ([]registry.SearchResult, error) {
 	var results []registry.SearchResult
-	query := url.Values***REMOVED******REMOVED***
+	query := url.Values{}
 	query.Set("term", term)
 	query.Set("limit", fmt.Sprintf("%d", options.Limit))
 
-	if options.Filters.Len() > 0 ***REMOVED***
+	if options.Filters.Len() > 0 {
 		filterJSON, err := filters.ToJSON(options.Filters)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return results, err
-		***REMOVED***
+		}
 		query.Set("filters", filterJSON)
-	***REMOVED***
+	}
 
 	resp, err := cli.tryImageSearch(ctx, query, options.RegistryAuth)
-	if resp.statusCode == http.StatusUnauthorized && options.PrivilegeFunc != nil ***REMOVED***
+	if resp.statusCode == http.StatusUnauthorized && options.PrivilegeFunc != nil {
 		newAuthHeader, privilegeErr := options.PrivilegeFunc()
-		if privilegeErr != nil ***REMOVED***
+		if privilegeErr != nil {
 			return results, privilegeErr
-		***REMOVED***
+		}
 		resp, err = cli.tryImageSearch(ctx, query, newAuthHeader)
-	***REMOVED***
-	if err != nil ***REMOVED***
+	}
+	if err != nil {
 		return results, err
-	***REMOVED***
+	}
 
 	err = json.NewDecoder(resp.body).Decode(&results)
 	ensureReaderClosed(resp)
 	return results, err
-***REMOVED***
+}
 
-func (cli *Client) tryImageSearch(ctx context.Context, query url.Values, registryAuth string) (serverResponse, error) ***REMOVED***
-	headers := map[string][]string***REMOVED***"X-Registry-Auth": ***REMOVED***registryAuth***REMOVED******REMOVED***
+func (cli *Client) tryImageSearch(ctx context.Context, query url.Values, registryAuth string) (serverResponse, error) {
+	headers := map[string][]string{"X-Registry-Auth": {registryAuth}}
 	return cli.get(ctx, "/images/search", query, headers)
-***REMOVED***
+}

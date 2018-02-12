@@ -12,7 +12,7 @@ import (
 )
 
 // unescapeBackslashSemicolonParens unescapes \;()
-func unescapeBackslashSemicolonParens(s string) string ***REMOVED***
+func unescapeBackslashSemicolonParens(s string) string {
 	re := regexp.MustCompile(`\\;`)
 	ret := re.ReplaceAll([]byte(s), []byte(";"))
 
@@ -26,9 +26,9 @@ func unescapeBackslashSemicolonParens(s string) string ***REMOVED***
 	ret = re.ReplaceAll([]byte(ret), []byte(`\`))
 
 	return string(ret)
-***REMOVED***
+}
 
-func regexpCheckUA(c *check.C, ua string) ***REMOVED***
+func regexpCheckUA(c *check.C, ua string) {
 	re := regexp.MustCompile("(?P<dockerUA>.+) UpstreamClient(?P<upstreamUA>.+)")
 	substrArr := re.FindStringSubmatch(ua)
 
@@ -47,30 +47,30 @@ func regexpCheckUA(c *check.C, ua string) ***REMOVED***
 	reUpstreamUA := regexp.MustCompile("^\\(Docker-Client/[0-9A-Za-z+]")
 	bMatchUpstreamUA := reUpstreamUA.MatchString(upstreamUA)
 	c.Assert(bMatchUpstreamUA, check.Equals, true, check.Commentf("(Upstream) Docker Client User-Agent malformed"))
-***REMOVED***
+}
 
 // registerUserAgentHandler registers a handler for the `/v2/*` endpoint.
 // Note that a 404 is returned to prevent the client to proceed.
 // We are only checking if the client sent a valid User Agent string along
 // with the request.
-func registerUserAgentHandler(reg *registry.Mock, result *string) ***REMOVED***
-	reg.RegisterHandler("/v2/", func(w http.ResponseWriter, r *http.Request) ***REMOVED***
+func registerUserAgentHandler(reg *registry.Mock, result *string) {
+	reg.RegisterHandler("/v2/", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(404)
-		w.Write([]byte(`***REMOVED***"errors":[***REMOVED***"code": "UNSUPPORTED","message": "this is a mock registry"***REMOVED***]***REMOVED***`))
+		w.Write([]byte(`{"errors":[{"code": "UNSUPPORTED","message": "this is a mock registry"}]}`))
 		var ua string
-		for k, v := range r.Header ***REMOVED***
-			if k == "User-Agent" ***REMOVED***
+		for k, v := range r.Header {
+			if k == "User-Agent" {
 				ua = v[0]
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		*result = ua
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
 // TestUserAgentPassThrough verifies that when an image is pulled from
 // a registry, the registry should see a User-Agent string of the form
 // [docker engine UA] UpstreamClientSTREAM-CLIENT([client UA])
-func (s *DockerRegistrySuite) TestUserAgentPassThrough(c *check.C) ***REMOVED***
+func (s *DockerRegistrySuite) TestUserAgentPassThrough(c *check.C) {
 	var ua string
 
 	reg, err := registry.NewMock(c)
@@ -100,4 +100,4 @@ func (s *DockerRegistrySuite) TestUserAgentPassThrough(c *check.C) ***REMOVED***
 	s.d.Cmd("tag", "busybox", repoName)
 	s.d.Cmd("push", repoName)
 	regexpCheckUA(c, ua)
-***REMOVED***
+}

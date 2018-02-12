@@ -15,11 +15,11 @@ const format = "Private-key-format: v1.3\n"
 // format as the private-key-file of BIND9 (Private-key-format: v1.3).
 // It needs some info from the key (the algorithm), so its a method of the DNSKEY
 // It supports rsa.PrivateKey, ecdsa.PrivateKey and dsa.PrivateKey
-func (r *DNSKEY) PrivateKeyString(p crypto.PrivateKey) string ***REMOVED***
+func (r *DNSKEY) PrivateKeyString(p crypto.PrivateKey) string {
 	algorithm := strconv.Itoa(int(r.Algorithm))
 	algorithm += " (" + AlgorithmToString[r.Algorithm] + ")"
 
-	switch p := p.(type) ***REMOVED***
+	switch p := p.(type) {
 	case *rsa.PrivateKey:
 		modulus := toBase64(p.PublicKey.N.Bytes())
 		e := big.NewInt(int64(p.PublicKey.E))
@@ -53,12 +53,12 @@ func (r *DNSKEY) PrivateKeyString(p crypto.PrivateKey) string ***REMOVED***
 
 	case *ecdsa.PrivateKey:
 		var intlen int
-		switch r.Algorithm ***REMOVED***
+		switch r.Algorithm {
 		case ECDSAP256SHA256:
 			intlen = 32
 		case ECDSAP384SHA384:
 			intlen = 48
-		***REMOVED***
+		}
 		private := toBase64(intToBytes(p.D, intlen))
 		return format +
 			"Algorithm: " + algorithm + "\n" +
@@ -81,5 +81,5 @@ func (r *DNSKEY) PrivateKeyString(p crypto.PrivateKey) string ***REMOVED***
 
 	default:
 		return ""
-	***REMOVED***
-***REMOVED***
+	}
+}

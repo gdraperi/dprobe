@@ -24,40 +24,40 @@ import (
 //    task manager does and use the private working set as the memory counter.
 //    We could return more info for those who really understand how memory
 //    management works in Windows if we introduced a "raw" stats (above).
-func (daemon *Daemon) ContainerTop(name string, psArgs string) (*containertypes.ContainerTopOKBody, error) ***REMOVED***
+func (daemon *Daemon) ContainerTop(name string, psArgs string) (*containertypes.ContainerTopOKBody, error) {
 	// It's not at all an equivalent to linux 'ps' on Windows
-	if psArgs != "" ***REMOVED***
+	if psArgs != "" {
 		return nil, errors.New("Windows does not support arguments to top")
-	***REMOVED***
+	}
 
 	container, err := daemon.GetContainer(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	if !container.IsRunning() ***REMOVED***
+	if !container.IsRunning() {
 		return nil, errNotRunning(container.ID)
-	***REMOVED***
+	}
 
-	if container.IsRestarting() ***REMOVED***
+	if container.IsRestarting() {
 		return nil, errContainerIsRestarting(container.ID)
-	***REMOVED***
+	}
 
 	s, err := daemon.containerd.Summary(context.Background(), container.ID)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	procList := &containertypes.ContainerTopOKBody***REMOVED******REMOVED***
-	procList.Titles = []string***REMOVED***"Name", "PID", "CPU", "Private Working Set"***REMOVED***
+	}
+	procList := &containertypes.ContainerTopOKBody{}
+	procList.Titles = []string{"Name", "PID", "CPU", "Private Working Set"}
 
-	for _, j := range s ***REMOVED***
+	for _, j := range s {
 		d := time.Duration((j.KernelTime100ns + j.UserTime100ns) * 100) // Combined time in nanoseconds
-		procList.Processes = append(procList.Processes, []string***REMOVED***
+		procList.Processes = append(procList.Processes, []string{
 			j.ImageName,
 			fmt.Sprint(j.ProcessId),
 			fmt.Sprintf("%02d:%02d:%02d.%03d", int(d.Hours()), int(d.Minutes())%60, int(d.Seconds())%60, int(d.Nanoseconds()/1000000)%1000),
-			units.HumanSize(float64(j.MemoryWorkingSetPrivateBytes))***REMOVED***)
-	***REMOVED***
+			units.HumanSize(float64(j.MemoryWorkingSetPrivateBytes))})
+	}
 
 	return procList, nil
-***REMOVED***
+}

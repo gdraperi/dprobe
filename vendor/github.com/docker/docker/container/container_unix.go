@@ -29,262 +29,262 @@ const (
 
 // TrySetNetworkMount attempts to set the network mounts given a provided destination and
 // the path to use for it; return true if the given destination was a network mount file
-func (container *Container) TrySetNetworkMount(destination string, path string) bool ***REMOVED***
-	if destination == "/etc/resolv.conf" ***REMOVED***
+func (container *Container) TrySetNetworkMount(destination string, path string) bool {
+	if destination == "/etc/resolv.conf" {
 		container.ResolvConfPath = path
 		return true
-	***REMOVED***
-	if destination == "/etc/hostname" ***REMOVED***
+	}
+	if destination == "/etc/hostname" {
 		container.HostnamePath = path
 		return true
-	***REMOVED***
-	if destination == "/etc/hosts" ***REMOVED***
+	}
+	if destination == "/etc/hosts" {
 		container.HostsPath = path
 		return true
-	***REMOVED***
+	}
 
 	return false
-***REMOVED***
+}
 
 // BuildHostnameFile writes the container's hostname file.
-func (container *Container) BuildHostnameFile() error ***REMOVED***
+func (container *Container) BuildHostnameFile() error {
 	hostnamePath, err := container.GetRootResourcePath("hostname")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	container.HostnamePath = hostnamePath
 	return ioutil.WriteFile(container.HostnamePath, []byte(container.Config.Hostname+"\n"), 0644)
-***REMOVED***
+}
 
 // NetworkMounts returns the list of network mounts.
-func (container *Container) NetworkMounts() []Mount ***REMOVED***
+func (container *Container) NetworkMounts() []Mount {
 	var mounts []Mount
 	shared := container.HostConfig.NetworkMode.IsContainer()
 	parser := volume.NewParser(container.OS)
-	if container.ResolvConfPath != "" ***REMOVED***
-		if _, err := os.Stat(container.ResolvConfPath); err != nil ***REMOVED***
+	if container.ResolvConfPath != "" {
+		if _, err := os.Stat(container.ResolvConfPath); err != nil {
 			logrus.Warnf("ResolvConfPath set to %q, but can't stat this filename (err = %v); skipping", container.ResolvConfPath, err)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			writable := !container.HostConfig.ReadonlyRootfs
-			if m, exists := container.MountPoints["/etc/resolv.conf"]; exists ***REMOVED***
+			if m, exists := container.MountPoints["/etc/resolv.conf"]; exists {
 				writable = m.RW
-			***REMOVED*** else ***REMOVED***
+			} else {
 				label.Relabel(container.ResolvConfPath, container.MountLabel, shared)
-			***REMOVED***
-			mounts = append(mounts, Mount***REMOVED***
+			}
+			mounts = append(mounts, Mount{
 				Source:      container.ResolvConfPath,
 				Destination: "/etc/resolv.conf",
 				Writable:    writable,
 				Propagation: string(parser.DefaultPropagationMode()),
-			***REMOVED***)
-		***REMOVED***
-	***REMOVED***
-	if container.HostnamePath != "" ***REMOVED***
-		if _, err := os.Stat(container.HostnamePath); err != nil ***REMOVED***
+			})
+		}
+	}
+	if container.HostnamePath != "" {
+		if _, err := os.Stat(container.HostnamePath); err != nil {
 			logrus.Warnf("HostnamePath set to %q, but can't stat this filename (err = %v); skipping", container.HostnamePath, err)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			writable := !container.HostConfig.ReadonlyRootfs
-			if m, exists := container.MountPoints["/etc/hostname"]; exists ***REMOVED***
+			if m, exists := container.MountPoints["/etc/hostname"]; exists {
 				writable = m.RW
-			***REMOVED*** else ***REMOVED***
+			} else {
 				label.Relabel(container.HostnamePath, container.MountLabel, shared)
-			***REMOVED***
-			mounts = append(mounts, Mount***REMOVED***
+			}
+			mounts = append(mounts, Mount{
 				Source:      container.HostnamePath,
 				Destination: "/etc/hostname",
 				Writable:    writable,
 				Propagation: string(parser.DefaultPropagationMode()),
-			***REMOVED***)
-		***REMOVED***
-	***REMOVED***
-	if container.HostsPath != "" ***REMOVED***
-		if _, err := os.Stat(container.HostsPath); err != nil ***REMOVED***
+			})
+		}
+	}
+	if container.HostsPath != "" {
+		if _, err := os.Stat(container.HostsPath); err != nil {
 			logrus.Warnf("HostsPath set to %q, but can't stat this filename (err = %v); skipping", container.HostsPath, err)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			writable := !container.HostConfig.ReadonlyRootfs
-			if m, exists := container.MountPoints["/etc/hosts"]; exists ***REMOVED***
+			if m, exists := container.MountPoints["/etc/hosts"]; exists {
 				writable = m.RW
-			***REMOVED*** else ***REMOVED***
+			} else {
 				label.Relabel(container.HostsPath, container.MountLabel, shared)
-			***REMOVED***
-			mounts = append(mounts, Mount***REMOVED***
+			}
+			mounts = append(mounts, Mount{
 				Source:      container.HostsPath,
 				Destination: "/etc/hosts",
 				Writable:    writable,
 				Propagation: string(parser.DefaultPropagationMode()),
-			***REMOVED***)
-		***REMOVED***
-	***REMOVED***
+			})
+		}
+	}
 	return mounts
-***REMOVED***
+}
 
 // CopyImagePathContent copies files in destination to the volume.
-func (container *Container) CopyImagePathContent(v volume.Volume, destination string) error ***REMOVED***
+func (container *Container) CopyImagePathContent(v volume.Volume, destination string) error {
 	rootfs, err := container.GetResourcePath(destination)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if _, err = ioutil.ReadDir(rootfs); err != nil ***REMOVED***
-		if os.IsNotExist(err) ***REMOVED***
+	if _, err = ioutil.ReadDir(rootfs); err != nil {
+		if os.IsNotExist(err) {
 			return nil
-		***REMOVED***
+		}
 		return err
-	***REMOVED***
+	}
 
 	id := stringid.GenerateNonCryptoID()
 	path, err := v.Mount(id)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	defer func() ***REMOVED***
-		if err := v.Unmount(id); err != nil ***REMOVED***
+	defer func() {
+		if err := v.Unmount(id); err != nil {
 			logrus.Warnf("error while unmounting volume %s: %v", v.Name(), err)
-		***REMOVED***
-	***REMOVED***()
-	if err := label.Relabel(path, container.MountLabel, true); err != nil && err != unix.ENOTSUP ***REMOVED***
+		}
+	}()
+	if err := label.Relabel(path, container.MountLabel, true); err != nil && err != unix.ENOTSUP {
 		return err
-	***REMOVED***
+	}
 	return copyExistingContents(rootfs, path)
-***REMOVED***
+}
 
 // ShmResourcePath returns path to shm
-func (container *Container) ShmResourcePath() (string, error) ***REMOVED***
+func (container *Container) ShmResourcePath() (string, error) {
 	return container.MountsResourcePath("shm")
-***REMOVED***
+}
 
 // HasMountFor checks if path is a mountpoint
-func (container *Container) HasMountFor(path string) bool ***REMOVED***
+func (container *Container) HasMountFor(path string) bool {
 	_, exists := container.MountPoints[path]
-	if exists ***REMOVED***
+	if exists {
 		return true
-	***REMOVED***
+	}
 
 	// Also search among the tmpfs mounts
-	for dest := range container.HostConfig.Tmpfs ***REMOVED***
-		if dest == path ***REMOVED***
+	for dest := range container.HostConfig.Tmpfs {
+		if dest == path {
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return false
-***REMOVED***
+}
 
 // UnmountIpcMount uses the provided unmount function to unmount shm if it was mounted
-func (container *Container) UnmountIpcMount(unmount func(pth string) error) error ***REMOVED***
-	if container.HasMountFor("/dev/shm") ***REMOVED***
+func (container *Container) UnmountIpcMount(unmount func(pth string) error) error {
+	if container.HasMountFor("/dev/shm") {
 		return nil
-	***REMOVED***
+	}
 
 	// container.ShmPath should not be used here as it may point
 	// to the host's or other container's /dev/shm
 	shmPath, err := container.ShmResourcePath()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	if shmPath == "" ***REMOVED***
+	}
+	if shmPath == "" {
 		return nil
-	***REMOVED***
-	if err = unmount(shmPath); err != nil && !os.IsNotExist(err) ***REMOVED***
-		if mounted, mErr := mount.Mounted(shmPath); mounted || mErr != nil ***REMOVED***
+	}
+	if err = unmount(shmPath); err != nil && !os.IsNotExist(err) {
+		if mounted, mErr := mount.Mounted(shmPath); mounted || mErr != nil {
 			return errors.Wrapf(err, "umount %s", shmPath)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
 // IpcMounts returns the list of IPC mounts
-func (container *Container) IpcMounts() []Mount ***REMOVED***
+func (container *Container) IpcMounts() []Mount {
 	var mounts []Mount
 	parser := volume.NewParser(container.OS)
 
-	if container.HasMountFor("/dev/shm") ***REMOVED***
+	if container.HasMountFor("/dev/shm") {
 		return mounts
-	***REMOVED***
-	if container.ShmPath == "" ***REMOVED***
+	}
+	if container.ShmPath == "" {
 		return mounts
-	***REMOVED***
+	}
 
 	label.SetFileLabel(container.ShmPath, container.MountLabel)
-	mounts = append(mounts, Mount***REMOVED***
+	mounts = append(mounts, Mount{
 		Source:      container.ShmPath,
 		Destination: "/dev/shm",
 		Writable:    true,
 		Propagation: string(parser.DefaultPropagationMode()),
-	***REMOVED***)
+	})
 
 	return mounts
-***REMOVED***
+}
 
 // SecretMounts returns the mounts for the secret path.
-func (container *Container) SecretMounts() ([]Mount, error) ***REMOVED***
+func (container *Container) SecretMounts() ([]Mount, error) {
 	var mounts []Mount
-	for _, r := range container.SecretReferences ***REMOVED***
-		if r.File == nil ***REMOVED***
+	for _, r := range container.SecretReferences {
+		if r.File == nil {
 			continue
-		***REMOVED***
+		}
 		src, err := container.SecretFilePath(*r)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-		mounts = append(mounts, Mount***REMOVED***
+		}
+		mounts = append(mounts, Mount{
 			Source:      src,
 			Destination: getSecretTargetPath(r),
 			Writable:    false,
-		***REMOVED***)
-	***REMOVED***
+		})
+	}
 
 	return mounts, nil
-***REMOVED***
+}
 
 // UnmountSecrets unmounts the local tmpfs for secrets
-func (container *Container) UnmountSecrets() error ***REMOVED***
+func (container *Container) UnmountSecrets() error {
 	p, err := container.SecretMountPath()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	if _, err := os.Stat(p); err != nil ***REMOVED***
-		if os.IsNotExist(err) ***REMOVED***
+	}
+	if _, err := os.Stat(p); err != nil {
+		if os.IsNotExist(err) {
 			return nil
-		***REMOVED***
+		}
 		return err
-	***REMOVED***
+	}
 
 	return mount.RecursiveUnmount(p)
-***REMOVED***
+}
 
 // ConfigMounts returns the mounts for configs.
-func (container *Container) ConfigMounts() ([]Mount, error) ***REMOVED***
+func (container *Container) ConfigMounts() ([]Mount, error) {
 	var mounts []Mount
-	for _, configRef := range container.ConfigReferences ***REMOVED***
-		if configRef.File == nil ***REMOVED***
+	for _, configRef := range container.ConfigReferences {
+		if configRef.File == nil {
 			continue
-		***REMOVED***
+		}
 		src, err := container.ConfigFilePath(*configRef)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-		mounts = append(mounts, Mount***REMOVED***
+		}
+		mounts = append(mounts, Mount{
 			Source:      src,
 			Destination: configRef.File.Name,
 			Writable:    false,
-		***REMOVED***)
-	***REMOVED***
+		})
+	}
 
 	return mounts, nil
-***REMOVED***
+}
 
 type conflictingUpdateOptions string
 
-func (e conflictingUpdateOptions) Error() string ***REMOVED***
+func (e conflictingUpdateOptions) Error() string {
 	return string(e)
-***REMOVED***
+}
 
-func (e conflictingUpdateOptions) Conflict() ***REMOVED******REMOVED***
+func (e conflictingUpdateOptions) Conflict() {}
 
 // UpdateContainer updates configuration of a container. Callers must hold a Lock on the Container.
-func (container *Container) UpdateContainer(hostConfig *containertypes.HostConfig) error ***REMOVED***
+func (container *Container) UpdateContainer(hostConfig *containertypes.HostConfig) error {
 	// update resources of container
 	resources := hostConfig.Resources
 	cResources := &container.HostConfig.Resources
@@ -293,197 +293,197 @@ func (container *Container) UpdateContainer(hostConfig *containertypes.HostConfi
 	// Because NanoCPU effectively updates CPUPeriod/CPUQuota,
 	// once NanoCPU is already set, updating CPUPeriod/CPUQuota will be blocked, and vice versa.
 	// In the following we make sure the intended update (resources) does not conflict with the existing (cResource).
-	if resources.NanoCPUs > 0 && cResources.CPUPeriod > 0 ***REMOVED***
+	if resources.NanoCPUs > 0 && cResources.CPUPeriod > 0 {
 		return conflictingUpdateOptions("Conflicting options: Nano CPUs cannot be updated as CPU Period has already been set")
-	***REMOVED***
-	if resources.NanoCPUs > 0 && cResources.CPUQuota > 0 ***REMOVED***
+	}
+	if resources.NanoCPUs > 0 && cResources.CPUQuota > 0 {
 		return conflictingUpdateOptions("Conflicting options: Nano CPUs cannot be updated as CPU Quota has already been set")
-	***REMOVED***
-	if resources.CPUPeriod > 0 && cResources.NanoCPUs > 0 ***REMOVED***
+	}
+	if resources.CPUPeriod > 0 && cResources.NanoCPUs > 0 {
 		return conflictingUpdateOptions("Conflicting options: CPU Period cannot be updated as NanoCPUs has already been set")
-	***REMOVED***
-	if resources.CPUQuota > 0 && cResources.NanoCPUs > 0 ***REMOVED***
+	}
+	if resources.CPUQuota > 0 && cResources.NanoCPUs > 0 {
 		return conflictingUpdateOptions("Conflicting options: CPU Quota cannot be updated as NanoCPUs has already been set")
-	***REMOVED***
+	}
 
-	if resources.BlkioWeight != 0 ***REMOVED***
+	if resources.BlkioWeight != 0 {
 		cResources.BlkioWeight = resources.BlkioWeight
-	***REMOVED***
-	if resources.CPUShares != 0 ***REMOVED***
+	}
+	if resources.CPUShares != 0 {
 		cResources.CPUShares = resources.CPUShares
-	***REMOVED***
-	if resources.NanoCPUs != 0 ***REMOVED***
+	}
+	if resources.NanoCPUs != 0 {
 		cResources.NanoCPUs = resources.NanoCPUs
-	***REMOVED***
-	if resources.CPUPeriod != 0 ***REMOVED***
+	}
+	if resources.CPUPeriod != 0 {
 		cResources.CPUPeriod = resources.CPUPeriod
-	***REMOVED***
-	if resources.CPUQuota != 0 ***REMOVED***
+	}
+	if resources.CPUQuota != 0 {
 		cResources.CPUQuota = resources.CPUQuota
-	***REMOVED***
-	if resources.CpusetCpus != "" ***REMOVED***
+	}
+	if resources.CpusetCpus != "" {
 		cResources.CpusetCpus = resources.CpusetCpus
-	***REMOVED***
-	if resources.CpusetMems != "" ***REMOVED***
+	}
+	if resources.CpusetMems != "" {
 		cResources.CpusetMems = resources.CpusetMems
-	***REMOVED***
-	if resources.Memory != 0 ***REMOVED***
+	}
+	if resources.Memory != 0 {
 		// if memory limit smaller than already set memoryswap limit and doesn't
 		// update the memoryswap limit, then error out.
-		if resources.Memory > cResources.MemorySwap && resources.MemorySwap == 0 ***REMOVED***
+		if resources.Memory > cResources.MemorySwap && resources.MemorySwap == 0 {
 			return conflictingUpdateOptions("Memory limit should be smaller than already set memoryswap limit, update the memoryswap at the same time")
-		***REMOVED***
+		}
 		cResources.Memory = resources.Memory
-	***REMOVED***
-	if resources.MemorySwap != 0 ***REMOVED***
+	}
+	if resources.MemorySwap != 0 {
 		cResources.MemorySwap = resources.MemorySwap
-	***REMOVED***
-	if resources.MemoryReservation != 0 ***REMOVED***
+	}
+	if resources.MemoryReservation != 0 {
 		cResources.MemoryReservation = resources.MemoryReservation
-	***REMOVED***
-	if resources.KernelMemory != 0 ***REMOVED***
+	}
+	if resources.KernelMemory != 0 {
 		cResources.KernelMemory = resources.KernelMemory
-	***REMOVED***
-	if resources.CPURealtimePeriod != 0 ***REMOVED***
+	}
+	if resources.CPURealtimePeriod != 0 {
 		cResources.CPURealtimePeriod = resources.CPURealtimePeriod
-	***REMOVED***
-	if resources.CPURealtimeRuntime != 0 ***REMOVED***
+	}
+	if resources.CPURealtimeRuntime != 0 {
 		cResources.CPURealtimeRuntime = resources.CPURealtimeRuntime
-	***REMOVED***
+	}
 
 	// update HostConfig of container
-	if hostConfig.RestartPolicy.Name != "" ***REMOVED***
-		if container.HostConfig.AutoRemove && !hostConfig.RestartPolicy.IsNone() ***REMOVED***
+	if hostConfig.RestartPolicy.Name != "" {
+		if container.HostConfig.AutoRemove && !hostConfig.RestartPolicy.IsNone() {
 			return conflictingUpdateOptions("Restart policy cannot be updated because AutoRemove is enabled for the container")
-		***REMOVED***
+		}
 		container.HostConfig.RestartPolicy = hostConfig.RestartPolicy
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // DetachAndUnmount uses a detached mount on all mount destinations, then
 // unmounts each volume normally.
 // This is used from daemon/archive for `docker cp`
-func (container *Container) DetachAndUnmount(volumeEventLog func(name, action string, attributes map[string]string)) error ***REMOVED***
+func (container *Container) DetachAndUnmount(volumeEventLog func(name, action string, attributes map[string]string)) error {
 	networkMounts := container.NetworkMounts()
 	mountPaths := make([]string, 0, len(container.MountPoints)+len(networkMounts))
 
-	for _, mntPoint := range container.MountPoints ***REMOVED***
+	for _, mntPoint := range container.MountPoints {
 		dest, err := container.GetResourcePath(mntPoint.Destination)
-		if err != nil ***REMOVED***
+		if err != nil {
 			logrus.Warnf("Failed to get volume destination path for container '%s' at '%s' while lazily unmounting: %v", container.ID, mntPoint.Destination, err)
 			continue
-		***REMOVED***
+		}
 		mountPaths = append(mountPaths, dest)
-	***REMOVED***
+	}
 
-	for _, m := range networkMounts ***REMOVED***
+	for _, m := range networkMounts {
 		dest, err := container.GetResourcePath(m.Destination)
-		if err != nil ***REMOVED***
+		if err != nil {
 			logrus.Warnf("Failed to get volume destination path for container '%s' at '%s' while lazily unmounting: %v", container.ID, m.Destination, err)
 			continue
-		***REMOVED***
+		}
 		mountPaths = append(mountPaths, dest)
-	***REMOVED***
+	}
 
-	for _, mountPath := range mountPaths ***REMOVED***
-		if err := detachMounted(mountPath); err != nil ***REMOVED***
+	for _, mountPath := range mountPaths {
+		if err := detachMounted(mountPath); err != nil {
 			logrus.Warnf("%s unmountVolumes: Failed to do lazy umount fo volume '%s': %v", container.ID, mountPath, err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return container.UnmountVolumes(volumeEventLog)
-***REMOVED***
+}
 
 // copyExistingContents copies from the source to the destination and
 // ensures the ownership is appropriately set.
-func copyExistingContents(source, destination string) error ***REMOVED***
+func copyExistingContents(source, destination string) error {
 	volList, err := ioutil.ReadDir(source)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	if len(volList) > 0 ***REMOVED***
+	}
+	if len(volList) > 0 {
 		srcList, err := ioutil.ReadDir(destination)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-		if len(srcList) == 0 ***REMOVED***
+		}
+		if len(srcList) == 0 {
 			// If the source volume is empty, copies files from the root into the volume
-			if err := chrootarchive.NewArchiver(nil).CopyWithTar(source, destination); err != nil ***REMOVED***
+			if err := chrootarchive.NewArchiver(nil).CopyWithTar(source, destination); err != nil {
 				return err
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return copyOwnership(source, destination)
-***REMOVED***
+}
 
 // copyOwnership copies the permissions and uid:gid of the source file
 // to the destination file
-func copyOwnership(source, destination string) error ***REMOVED***
+func copyOwnership(source, destination string) error {
 	stat, err := system.Stat(source)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	destStat, err := system.Stat(destination)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	// In some cases, even though UID/GID match and it would effectively be a no-op,
 	// this can return a permission denied error... for example if this is an NFS
 	// mount.
 	// Since it's not really an error that we can't chown to the same UID/GID, don't
 	// even bother trying in such cases.
-	if stat.UID() != destStat.UID() || stat.GID() != destStat.GID() ***REMOVED***
-		if err := os.Chown(destination, int(stat.UID()), int(stat.GID())); err != nil ***REMOVED***
+	if stat.UID() != destStat.UID() || stat.GID() != destStat.GID() {
+		if err := os.Chown(destination, int(stat.UID()), int(stat.GID())); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if stat.Mode() != destStat.Mode() ***REMOVED***
+	if stat.Mode() != destStat.Mode() {
 		return os.Chmod(destination, os.FileMode(stat.Mode()))
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // TmpfsMounts returns the list of tmpfs mounts
-func (container *Container) TmpfsMounts() ([]Mount, error) ***REMOVED***
+func (container *Container) TmpfsMounts() ([]Mount, error) {
 	parser := volume.NewParser(container.OS)
 	var mounts []Mount
-	for dest, data := range container.HostConfig.Tmpfs ***REMOVED***
-		mounts = append(mounts, Mount***REMOVED***
+	for dest, data := range container.HostConfig.Tmpfs {
+		mounts = append(mounts, Mount{
 			Source:      "tmpfs",
 			Destination: dest,
 			Data:        data,
-		***REMOVED***)
-	***REMOVED***
-	for dest, mnt := range container.MountPoints ***REMOVED***
-		if mnt.Type == mounttypes.TypeTmpfs ***REMOVED***
+		})
+	}
+	for dest, mnt := range container.MountPoints {
+		if mnt.Type == mounttypes.TypeTmpfs {
 			data, err := parser.ConvertTmpfsOptions(mnt.Spec.TmpfsOptions, mnt.Spec.ReadOnly)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
-			mounts = append(mounts, Mount***REMOVED***
+			}
+			mounts = append(mounts, Mount{
 				Source:      "tmpfs",
 				Destination: dest,
 				Data:        data,
-			***REMOVED***)
-		***REMOVED***
-	***REMOVED***
+			})
+		}
+	}
 	return mounts, nil
-***REMOVED***
+}
 
 // EnableServiceDiscoveryOnDefaultNetwork Enable service discovery on default network
-func (container *Container) EnableServiceDiscoveryOnDefaultNetwork() bool ***REMOVED***
+func (container *Container) EnableServiceDiscoveryOnDefaultNetwork() bool {
 	return false
-***REMOVED***
+}
 
 // GetMountPoints gives a platform specific transformation to types.MountPoint. Callers must hold a Container lock.
-func (container *Container) GetMountPoints() []types.MountPoint ***REMOVED***
+func (container *Container) GetMountPoints() []types.MountPoint {
 	mountPoints := make([]types.MountPoint, 0, len(container.MountPoints))
-	for _, m := range container.MountPoints ***REMOVED***
-		mountPoints = append(mountPoints, types.MountPoint***REMOVED***
+	for _, m := range container.MountPoints {
+		mountPoints = append(mountPoints, types.MountPoint{
 			Type:        m.Type,
 			Name:        m.Name,
 			Source:      m.Path(),
@@ -492,7 +492,7 @@ func (container *Container) GetMountPoints() []types.MountPoint ***REMOVED***
 			Mode:        m.Mode,
 			RW:          m.RW,
 			Propagation: m.Propagation,
-		***REMOVED***)
-	***REMOVED***
+		})
+	}
 	return mountPoints
-***REMOVED***
+}

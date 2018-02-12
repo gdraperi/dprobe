@@ -263,185 +263,185 @@ const (
 	SizeofVfTrust      = 0x08
 )
 
-// struct ifla_vf_mac ***REMOVED***
+// struct ifla_vf_mac {
 //   __u32 vf;
 //   __u8 mac[32]; /* MAX_ADDR_LEN */
-// ***REMOVED***;
+// };
 
-type VfMac struct ***REMOVED***
+type VfMac struct {
 	Vf  uint32
 	Mac [32]byte
-***REMOVED***
+}
 
-func (msg *VfMac) Len() int ***REMOVED***
+func (msg *VfMac) Len() int {
 	return SizeofVfMac
-***REMOVED***
+}
 
-func DeserializeVfMac(b []byte) *VfMac ***REMOVED***
+func DeserializeVfMac(b []byte) *VfMac {
 	return (*VfMac)(unsafe.Pointer(&b[0:SizeofVfMac][0]))
-***REMOVED***
+}
 
-func (msg *VfMac) Serialize() []byte ***REMOVED***
+func (msg *VfMac) Serialize() []byte {
 	return (*(*[SizeofVfMac]byte)(unsafe.Pointer(msg)))[:]
-***REMOVED***
+}
 
-// struct ifla_vf_vlan ***REMOVED***
+// struct ifla_vf_vlan {
 //   __u32 vf;
 //   __u32 vlan; /* 0 - 4095, 0 disables VLAN filter */
 //   __u32 qos;
-// ***REMOVED***;
+// };
 
-type VfVlan struct ***REMOVED***
+type VfVlan struct {
 	Vf   uint32
 	Vlan uint32
 	Qos  uint32
-***REMOVED***
+}
 
-func (msg *VfVlan) Len() int ***REMOVED***
+func (msg *VfVlan) Len() int {
 	return SizeofVfVlan
-***REMOVED***
+}
 
-func DeserializeVfVlan(b []byte) *VfVlan ***REMOVED***
+func DeserializeVfVlan(b []byte) *VfVlan {
 	return (*VfVlan)(unsafe.Pointer(&b[0:SizeofVfVlan][0]))
-***REMOVED***
+}
 
-func (msg *VfVlan) Serialize() []byte ***REMOVED***
+func (msg *VfVlan) Serialize() []byte {
 	return (*(*[SizeofVfVlan]byte)(unsafe.Pointer(msg)))[:]
-***REMOVED***
+}
 
-// struct ifla_vf_tx_rate ***REMOVED***
+// struct ifla_vf_tx_rate {
 //   __u32 vf;
 //   __u32 rate; /* Max TX bandwidth in Mbps, 0 disables throttling */
-// ***REMOVED***;
+// };
 
-type VfTxRate struct ***REMOVED***
+type VfTxRate struct {
 	Vf   uint32
 	Rate uint32
-***REMOVED***
+}
 
-func (msg *VfTxRate) Len() int ***REMOVED***
+func (msg *VfTxRate) Len() int {
 	return SizeofVfTxRate
-***REMOVED***
+}
 
-func DeserializeVfTxRate(b []byte) *VfTxRate ***REMOVED***
+func DeserializeVfTxRate(b []byte) *VfTxRate {
 	return (*VfTxRate)(unsafe.Pointer(&b[0:SizeofVfTxRate][0]))
-***REMOVED***
+}
 
-func (msg *VfTxRate) Serialize() []byte ***REMOVED***
+func (msg *VfTxRate) Serialize() []byte {
 	return (*(*[SizeofVfTxRate]byte)(unsafe.Pointer(msg)))[:]
-***REMOVED***
+}
 
-// struct ifla_vf_rate ***REMOVED***
+// struct ifla_vf_rate {
 //   __u32 vf;
 //   __u32 min_tx_rate; /* Min Bandwidth in Mbps */
 //   __u32 max_tx_rate; /* Max Bandwidth in Mbps */
-// ***REMOVED***;
+// };
 
-type VfRate struct ***REMOVED***
+type VfRate struct {
 	Vf        uint32
 	MinTxRate uint32
 	MaxTxRate uint32
-***REMOVED***
+}
 
-func (msg *VfRate) Len() int ***REMOVED***
+func (msg *VfRate) Len() int {
 	return SizeofVfRate
-***REMOVED***
+}
 
-func DeserializeVfRate(b []byte) *VfRate ***REMOVED***
+func DeserializeVfRate(b []byte) *VfRate {
 	return (*VfRate)(unsafe.Pointer(&b[0:SizeofVfRate][0]))
-***REMOVED***
+}
 
-func (msg *VfRate) Serialize() []byte ***REMOVED***
+func (msg *VfRate) Serialize() []byte {
 	return (*(*[SizeofVfRate]byte)(unsafe.Pointer(msg)))[:]
-***REMOVED***
+}
 
-// struct ifla_vf_spoofchk ***REMOVED***
+// struct ifla_vf_spoofchk {
 //   __u32 vf;
 //   __u32 setting;
-// ***REMOVED***;
+// };
 
-type VfSpoofchk struct ***REMOVED***
+type VfSpoofchk struct {
 	Vf      uint32
 	Setting uint32
-***REMOVED***
+}
 
-func (msg *VfSpoofchk) Len() int ***REMOVED***
+func (msg *VfSpoofchk) Len() int {
 	return SizeofVfSpoofchk
-***REMOVED***
+}
 
-func DeserializeVfSpoofchk(b []byte) *VfSpoofchk ***REMOVED***
+func DeserializeVfSpoofchk(b []byte) *VfSpoofchk {
 	return (*VfSpoofchk)(unsafe.Pointer(&b[0:SizeofVfSpoofchk][0]))
-***REMOVED***
+}
 
-func (msg *VfSpoofchk) Serialize() []byte ***REMOVED***
+func (msg *VfSpoofchk) Serialize() []byte {
 	return (*(*[SizeofVfSpoofchk]byte)(unsafe.Pointer(msg)))[:]
-***REMOVED***
+}
 
-// struct ifla_vf_link_state ***REMOVED***
+// struct ifla_vf_link_state {
 //   __u32 vf;
 //   __u32 link_state;
-// ***REMOVED***;
+// };
 
-type VfLinkState struct ***REMOVED***
+type VfLinkState struct {
 	Vf        uint32
 	LinkState uint32
-***REMOVED***
+}
 
-func (msg *VfLinkState) Len() int ***REMOVED***
+func (msg *VfLinkState) Len() int {
 	return SizeofVfLinkState
-***REMOVED***
+}
 
-func DeserializeVfLinkState(b []byte) *VfLinkState ***REMOVED***
+func DeserializeVfLinkState(b []byte) *VfLinkState {
 	return (*VfLinkState)(unsafe.Pointer(&b[0:SizeofVfLinkState][0]))
-***REMOVED***
+}
 
-func (msg *VfLinkState) Serialize() []byte ***REMOVED***
+func (msg *VfLinkState) Serialize() []byte {
 	return (*(*[SizeofVfLinkState]byte)(unsafe.Pointer(msg)))[:]
-***REMOVED***
+}
 
-// struct ifla_vf_rss_query_en ***REMOVED***
+// struct ifla_vf_rss_query_en {
 //   __u32 vf;
 //   __u32 setting;
-// ***REMOVED***;
+// };
 
-type VfRssQueryEn struct ***REMOVED***
+type VfRssQueryEn struct {
 	Vf      uint32
 	Setting uint32
-***REMOVED***
+}
 
-func (msg *VfRssQueryEn) Len() int ***REMOVED***
+func (msg *VfRssQueryEn) Len() int {
 	return SizeofVfRssQueryEn
-***REMOVED***
+}
 
-func DeserializeVfRssQueryEn(b []byte) *VfRssQueryEn ***REMOVED***
+func DeserializeVfRssQueryEn(b []byte) *VfRssQueryEn {
 	return (*VfRssQueryEn)(unsafe.Pointer(&b[0:SizeofVfRssQueryEn][0]))
-***REMOVED***
+}
 
-func (msg *VfRssQueryEn) Serialize() []byte ***REMOVED***
+func (msg *VfRssQueryEn) Serialize() []byte {
 	return (*(*[SizeofVfRssQueryEn]byte)(unsafe.Pointer(msg)))[:]
-***REMOVED***
+}
 
-// struct ifla_vf_trust ***REMOVED***
+// struct ifla_vf_trust {
 //   __u32 vf;
 //   __u32 setting;
-// ***REMOVED***;
+// };
 
-type VfTrust struct ***REMOVED***
+type VfTrust struct {
 	Vf      uint32
 	Setting uint32
-***REMOVED***
+}
 
-func (msg *VfTrust) Len() int ***REMOVED***
+func (msg *VfTrust) Len() int {
 	return SizeofVfTrust
-***REMOVED***
+}
 
-func DeserializeVfTrust(b []byte) *VfTrust ***REMOVED***
+func DeserializeVfTrust(b []byte) *VfTrust {
 	return (*VfTrust)(unsafe.Pointer(&b[0:SizeofVfTrust][0]))
-***REMOVED***
+}
 
-func (msg *VfTrust) Serialize() []byte ***REMOVED***
+func (msg *VfTrust) Serialize() []byte {
 	return (*(*[SizeofVfTrust]byte)(unsafe.Pointer(msg)))[:]
-***REMOVED***
+}
 
 const (
 	XDP_FLAGS_UPDATE_IF_NOEXIST = 1 << iota

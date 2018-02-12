@@ -74,25 +74,25 @@ const (
 	sizeofSockFprog = 0x8
 )
 
-type kernelSockaddrStorage struct ***REMOVED***
+type kernelSockaddrStorage struct {
 	Family  uint16
 	X__data [126]int8
-***REMOVED***
+}
 
-type sockaddrInet struct ***REMOVED***
+type sockaddrInet struct {
 	Family uint16
 	Port   uint16
 	Addr   [4]byte /* in_addr */
 	X__pad [8]uint8
-***REMOVED***
+}
 
-type inetPktinfo struct ***REMOVED***
+type inetPktinfo struct {
 	Ifindex  int32
 	Spec_dst [4]byte /* in_addr */
 	Addr     [4]byte /* in_addr */
-***REMOVED***
+}
 
-type sockExtendedErr struct ***REMOVED***
+type sockExtendedErr struct {
 	Errno  uint32
 	Origin uint8
 	Type   uint8
@@ -100,49 +100,49 @@ type sockExtendedErr struct ***REMOVED***
 	Pad    uint8
 	Info   uint32
 	Data   uint32
-***REMOVED***
+}
 
-type ipMreq struct ***REMOVED***
+type ipMreq struct {
 	Multiaddr [4]byte /* in_addr */
 	Interface [4]byte /* in_addr */
-***REMOVED***
+}
 
-type ipMreqn struct ***REMOVED***
+type ipMreqn struct {
 	Multiaddr [4]byte /* in_addr */
 	Address   [4]byte /* in_addr */
 	Ifindex   int32
-***REMOVED***
+}
 
-type ipMreqSource struct ***REMOVED***
+type ipMreqSource struct {
 	Multiaddr  uint32
 	Interface  uint32
 	Sourceaddr uint32
-***REMOVED***
+}
 
-type groupReq struct ***REMOVED***
+type groupReq struct {
 	Interface uint32
 	Group     kernelSockaddrStorage
-***REMOVED***
+}
 
-type groupSourceReq struct ***REMOVED***
+type groupSourceReq struct {
 	Interface uint32
 	Group     kernelSockaddrStorage
 	Source    kernelSockaddrStorage
-***REMOVED***
+}
 
-type icmpFilter struct ***REMOVED***
+type icmpFilter struct {
 	Data uint32
-***REMOVED***
+}
 
-type sockFProg struct ***REMOVED***
+type sockFProg struct {
 	Len       uint16
 	Pad_cgo_0 [2]byte
 	Filter    *sockFilter
-***REMOVED***
+}
 
-type sockFilter struct ***REMOVED***
+type sockFilter struct {
 	Code uint16
 	Jt   uint8
 	Jf   uint8
 	K    uint32
-***REMOVED***
+}

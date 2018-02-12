@@ -11,26 +11,26 @@ import (
 )
 
 // NodeList returns the list of nodes.
-func (cli *Client) NodeList(ctx context.Context, options types.NodeListOptions) ([]swarm.Node, error) ***REMOVED***
-	query := url.Values***REMOVED******REMOVED***
+func (cli *Client) NodeList(ctx context.Context, options types.NodeListOptions) ([]swarm.Node, error) {
+	query := url.Values{}
 
-	if options.Filters.Len() > 0 ***REMOVED***
+	if options.Filters.Len() > 0 {
 		filterJSON, err := filters.ToJSON(options.Filters)
 
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 
 		query.Set("filters", filterJSON)
-	***REMOVED***
+	}
 
 	resp, err := cli.get(ctx, "/nodes", query, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	var nodes []swarm.Node
 	err = json.NewDecoder(resp.body).Decode(&nodes)
 	ensureReaderClosed(resp)
 	return nodes, err
-***REMOVED***
+}

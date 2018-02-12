@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-var kindToType = [reflect.String + 1]reflect.Type***REMOVED***
+var kindToType = [reflect.String + 1]reflect.Type{
 	reflect.Bool:    reflect.TypeOf(true),
 	reflect.String:  reflect.TypeOf(""),
 	reflect.Float32: reflect.TypeOf(float64(1)),
@@ -21,20 +21,20 @@ var kindToType = [reflect.String + 1]reflect.Type***REMOVED***
 	reflect.Uint16:  reflect.TypeOf(uint64(1)),
 	reflect.Uint32:  reflect.TypeOf(uint64(1)),
 	reflect.Uint64:  reflect.TypeOf(uint64(1)),
-***REMOVED***
+}
 
 // typeFor returns a reflect.Type for a reflect.Kind, or nil if none is found.
 // supported values:
 // string, bool, int64, uint64, float64, time.Time, int, int8, int16, int32, uint, uint8, uint16, uint32, float32
-func typeFor(k reflect.Kind) reflect.Type ***REMOVED***
-	if k > 0 && int(k) < len(kindToType) ***REMOVED***
+func typeFor(k reflect.Kind) reflect.Type {
+	if k > 0 && int(k) < len(kindToType) {
 		return kindToType[k]
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func simpleValueCoercion(object interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
-	switch original := object.(type) ***REMOVED***
+func simpleValueCoercion(object interface{}) (interface{}, error) {
+	switch original := object.(type) {
 	case string, bool, int64, uint64, float64, time.Time:
 		return original, nil
 	case int:
@@ -59,10 +59,10 @@ func simpleValueCoercion(object interface***REMOVED******REMOVED***) (interface*
 		return original.String(), nil
 	default:
 		return nil, fmt.Errorf("cannot convert type %T to Tree", object)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func sliceToTree(object interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func sliceToTree(object interface{}) (interface{}, error) {
 	// arrays are a bit tricky, since they can represent either a
 	// collection of simple values, which is represented by one
 	// *tomlValue, or an array of tables, which is represented by an
@@ -72,71 +72,71 @@ func sliceToTree(object interface***REMOVED******REMOVED***) (interface***REMOVE
 	value := reflect.ValueOf(object)
 	insideType := value.Type().Elem()
 	length := value.Len()
-	if length > 0 ***REMOVED***
+	if length > 0 {
 		insideType = reflect.ValueOf(value.Index(0).Interface()).Type()
-	***REMOVED***
-	if insideType.Kind() == reflect.Map ***REMOVED***
+	}
+	if insideType.Kind() == reflect.Map {
 		// this is considered as an array of tables
 		tablesArray := make([]*Tree, 0, length)
-		for i := 0; i < length; i++ ***REMOVED***
+		for i := 0; i < length; i++ {
 			table := value.Index(i)
 			tree, err := toTree(table.Interface())
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			tablesArray = append(tablesArray, tree.(*Tree))
-		***REMOVED***
+		}
 		return tablesArray, nil
-	***REMOVED***
+	}
 
 	sliceType := typeFor(insideType.Kind())
-	if sliceType == nil ***REMOVED***
+	if sliceType == nil {
 		sliceType = insideType
-	***REMOVED***
+	}
 
 	arrayValue := reflect.MakeSlice(reflect.SliceOf(sliceType), 0, length)
 
-	for i := 0; i < length; i++ ***REMOVED***
+	for i := 0; i < length; i++ {
 		val := value.Index(i).Interface()
 		simpleValue, err := simpleValueCoercion(val)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		arrayValue = reflect.Append(arrayValue, reflect.ValueOf(simpleValue))
-	***REMOVED***
-	return &tomlValue***REMOVED***value: arrayValue.Interface(), position: Position***REMOVED******REMOVED******REMOVED***, nil
-***REMOVED***
+	}
+	return &tomlValue{value: arrayValue.Interface(), position: Position{}}, nil
+}
 
-func toTree(object interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func toTree(object interface{}) (interface{}, error) {
 	value := reflect.ValueOf(object)
 
-	if value.Kind() == reflect.Map ***REMOVED***
-		values := map[string]interface***REMOVED******REMOVED******REMOVED******REMOVED***
+	if value.Kind() == reflect.Map {
+		values := map[string]interface{}{}
 		keys := value.MapKeys()
-		for _, key := range keys ***REMOVED***
-			if key.Kind() != reflect.String ***REMOVED***
-				if _, ok := key.Interface().(string); !ok ***REMOVED***
+		for _, key := range keys {
+			if key.Kind() != reflect.String {
+				if _, ok := key.Interface().(string); !ok {
 					return nil, fmt.Errorf("map key needs to be a string, not %T (%v)", key.Interface(), key.Kind())
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 
 			v := value.MapIndex(key)
 			newValue, err := toTree(v.Interface())
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			values[key.String()] = newValue
-		***REMOVED***
-		return &Tree***REMOVED***values: values, position: Position***REMOVED******REMOVED******REMOVED***, nil
-	***REMOVED***
+		}
+		return &Tree{values: values, position: Position{}}, nil
+	}
 
-	if value.Kind() == reflect.Array || value.Kind() == reflect.Slice ***REMOVED***
+	if value.Kind() == reflect.Array || value.Kind() == reflect.Slice {
 		return sliceToTree(object)
-	***REMOVED***
+	}
 
 	simpleValue, err := simpleValueCoercion(object)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	return &tomlValue***REMOVED***value: simpleValue, position: Position***REMOVED******REMOVED******REMOVED***, nil
-***REMOVED***
+	}
+	return &tomlValue{value: simpleValue, position: Position{}}, nil
+}

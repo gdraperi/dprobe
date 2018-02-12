@@ -11,48 +11,48 @@ import (
 	"net/http"
 )
 
-func newServerConn(rwc io.ReadWriteCloser, buf *bufio.ReadWriter, req *http.Request, config *Config, handshake func(*Config, *http.Request) error) (conn *Conn, err error) ***REMOVED***
-	var hs serverHandshaker = &hybiServerHandshaker***REMOVED***Config: config***REMOVED***
+func newServerConn(rwc io.ReadWriteCloser, buf *bufio.ReadWriter, req *http.Request, config *Config, handshake func(*Config, *http.Request) error) (conn *Conn, err error) {
+	var hs serverHandshaker = &hybiServerHandshaker{Config: config}
 	code, err := hs.ReadHandshake(buf.Reader, req)
-	if err == ErrBadWebSocketVersion ***REMOVED***
+	if err == ErrBadWebSocketVersion {
 		fmt.Fprintf(buf, "HTTP/1.1 %03d %s\r\n", code, http.StatusText(code))
 		fmt.Fprintf(buf, "Sec-WebSocket-Version: %s\r\n", SupportedProtocolVersion)
 		buf.WriteString("\r\n")
 		buf.WriteString(err.Error())
 		buf.Flush()
 		return
-	***REMOVED***
-	if err != nil ***REMOVED***
+	}
+	if err != nil {
 		fmt.Fprintf(buf, "HTTP/1.1 %03d %s\r\n", code, http.StatusText(code))
 		buf.WriteString("\r\n")
 		buf.WriteString(err.Error())
 		buf.Flush()
 		return
-	***REMOVED***
-	if handshake != nil ***REMOVED***
+	}
+	if handshake != nil {
 		err = handshake(config, req)
-		if err != nil ***REMOVED***
+		if err != nil {
 			code = http.StatusForbidden
 			fmt.Fprintf(buf, "HTTP/1.1 %03d %s\r\n", code, http.StatusText(code))
 			buf.WriteString("\r\n")
 			buf.Flush()
 			return
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	err = hs.AcceptHandshake(buf.Writer)
-	if err != nil ***REMOVED***
+	if err != nil {
 		code = http.StatusBadRequest
 		fmt.Fprintf(buf, "HTTP/1.1 %03d %s\r\n", code, http.StatusText(code))
 		buf.WriteString("\r\n")
 		buf.Flush()
 		return
-	***REMOVED***
+	}
 	conn = hs.NewServerConn(buf, rwc, req)
 	return
-***REMOVED***
+}
 
 // Server represents a server of a WebSocket.
-type Server struct ***REMOVED***
+type Server struct {
 	// Config is a WebSocket configuration for new WebSocket connection.
 	Config
 
@@ -63,31 +63,31 @@ type Server struct ***REMOVED***
 
 	// Handler handles a WebSocket connection.
 	Handler
-***REMOVED***
+}
 
 // ServeHTTP implements the http.Handler interface for a WebSocket
-func (s Server) ServeHTTP(w http.ResponseWriter, req *http.Request) ***REMOVED***
+func (s Server) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	s.serveWebSocket(w, req)
-***REMOVED***
+}
 
-func (s Server) serveWebSocket(w http.ResponseWriter, req *http.Request) ***REMOVED***
+func (s Server) serveWebSocket(w http.ResponseWriter, req *http.Request) {
 	rwc, buf, err := w.(http.Hijacker).Hijack()
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic("Hijack failed: " + err.Error())
-	***REMOVED***
+	}
 	// The server should abort the WebSocket connection if it finds
 	// the client did not send a handshake that matches with protocol
 	// specification.
 	defer rwc.Close()
 	conn, err := newServerConn(rwc, buf, req, &s.Config, s.Handshake)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
-	if conn == nil ***REMOVED***
+	}
+	if conn == nil {
 		panic("unexpected nil conn")
-	***REMOVED***
+	}
 	s.Handler(conn)
-***REMOVED***
+}
 
 // Handler is a simple interface to a WebSocket browser client.
 // It checks if Origin header is valid URL by default.
@@ -98,16 +98,16 @@ func (s Server) serveWebSocket(w http.ResponseWriter, req *http.Request) ***REMO
 // Server.Handshake that does not check the origin.
 type Handler func(*Conn)
 
-func checkOrigin(config *Config, req *http.Request) (err error) ***REMOVED***
+func checkOrigin(config *Config, req *http.Request) (err error) {
 	config.Origin, err = Origin(config, req)
-	if err == nil && config.Origin == nil ***REMOVED***
+	if err == nil && config.Origin == nil {
 		return fmt.Errorf("null origin")
-	***REMOVED***
+	}
 	return err
-***REMOVED***
+}
 
 // ServeHTTP implements the http.Handler interface for a WebSocket
-func (h Handler) ServeHTTP(w http.ResponseWriter, req *http.Request) ***REMOVED***
-	s := Server***REMOVED***Handler: h, Handshake: checkOrigin***REMOVED***
+func (h Handler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	s := Server{Handler: h, Handshake: checkOrigin}
 	s.serveWebSocket(w, req)
-***REMOVED***
+}

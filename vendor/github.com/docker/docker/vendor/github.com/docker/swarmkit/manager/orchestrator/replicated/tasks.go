@@ -15,12 +15,12 @@ import (
 // service-level reconciliation, which observes changes to services and creates
 // and/or kills tasks to match the service definition.
 
-func (r *Orchestrator) initTasks(ctx context.Context, readTx store.ReadTx) error ***REMOVED***
+func (r *Orchestrator) initTasks(ctx context.Context, readTx store.ReadTx) error {
 	return taskinit.CheckTasks(ctx, r.store, readTx, r, r.restarts)
-***REMOVED***
+}
 
-func (r *Orchestrator) handleTaskEvent(ctx context.Context, event events.Event) ***REMOVED***
-	switch v := event.(type) ***REMOVED***
+func (r *Orchestrator) handleTaskEvent(ctx context.Context, event events.Event) {
+	switch v := event.(type) {
 	case api.EventDeleteNode:
 		r.restartTasksByNodeID(ctx, v.Node.ID)
 	case api.EventCreateNode:
@@ -28,153 +28,153 @@ func (r *Orchestrator) handleTaskEvent(ctx context.Context, event events.Event) 
 	case api.EventUpdateNode:
 		r.handleNodeChange(ctx, v.Node)
 	case api.EventDeleteTask:
-		if v.Task.DesiredState <= api.TaskStateRunning ***REMOVED***
+		if v.Task.DesiredState <= api.TaskStateRunning {
 			service := r.resolveService(ctx, v.Task)
-			if !orchestrator.IsReplicatedService(service) ***REMOVED***
+			if !orchestrator.IsReplicatedService(service) {
 				return
-			***REMOVED***
+			}
 			r.reconcileServices[service.ID] = service
-		***REMOVED***
+		}
 		r.restarts.Cancel(v.Task.ID)
 	case api.EventUpdateTask:
 		r.handleTaskChange(ctx, v.Task)
 	case api.EventCreateTask:
 		r.handleTaskChange(ctx, v.Task)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (r *Orchestrator) tickTasks(ctx context.Context) ***REMOVED***
-	if len(r.restartTasks) > 0 ***REMOVED***
-		err := r.store.Batch(func(batch *store.Batch) error ***REMOVED***
-			for taskID := range r.restartTasks ***REMOVED***
-				err := batch.Update(func(tx store.Tx) error ***REMOVED***
+func (r *Orchestrator) tickTasks(ctx context.Context) {
+	if len(r.restartTasks) > 0 {
+		err := r.store.Batch(func(batch *store.Batch) error {
+			for taskID := range r.restartTasks {
+				err := batch.Update(func(tx store.Tx) error {
 					// TODO(aaronl): optimistic update?
 					t := store.GetTask(tx, taskID)
-					if t != nil ***REMOVED***
-						if t.DesiredState > api.TaskStateRunning ***REMOVED***
+					if t != nil {
+						if t.DesiredState > api.TaskStateRunning {
 							return nil
-						***REMOVED***
+						}
 
 						service := store.GetService(tx, t.ServiceID)
-						if !orchestrator.IsReplicatedService(service) ***REMOVED***
+						if !orchestrator.IsReplicatedService(service) {
 							return nil
-						***REMOVED***
+						}
 
 						// Restart task if applicable
-						if err := r.restarts.Restart(ctx, tx, r.cluster, service, *t); err != nil ***REMOVED***
+						if err := r.restarts.Restart(ctx, tx, r.cluster, service, *t); err != nil {
 							return err
-						***REMOVED***
-					***REMOVED***
+						}
+					}
 					return nil
-				***REMOVED***)
-				if err != nil ***REMOVED***
+				})
+				if err != nil {
 					log.G(ctx).WithError(err).Errorf("Orchestrator task reaping transaction failed")
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return nil
-		***REMOVED***)
+		})
 
-		if err != nil ***REMOVED***
+		if err != nil {
 			log.G(ctx).WithError(err).Errorf("orchestrator task removal batch failed")
-		***REMOVED***
+		}
 
-		r.restartTasks = make(map[string]struct***REMOVED******REMOVED***)
-	***REMOVED***
-***REMOVED***
+		r.restartTasks = make(map[string]struct{})
+	}
+}
 
-func (r *Orchestrator) restartTasksByNodeID(ctx context.Context, nodeID string) ***REMOVED***
+func (r *Orchestrator) restartTasksByNodeID(ctx context.Context, nodeID string) {
 	var err error
-	r.store.View(func(tx store.ReadTx) ***REMOVED***
+	r.store.View(func(tx store.ReadTx) {
 		var tasks []*api.Task
 		tasks, err = store.FindTasks(tx, store.ByNodeID(nodeID))
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
+		}
 
-		for _, t := range tasks ***REMOVED***
-			if t.DesiredState > api.TaskStateRunning ***REMOVED***
+		for _, t := range tasks {
+			if t.DesiredState > api.TaskStateRunning {
 				continue
-			***REMOVED***
+			}
 			service := store.GetService(tx, t.ServiceID)
-			if orchestrator.IsReplicatedService(service) ***REMOVED***
-				r.restartTasks[t.ID] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***)
-	if err != nil ***REMOVED***
+			if orchestrator.IsReplicatedService(service) {
+				r.restartTasks[t.ID] = struct{}{}
+			}
+		}
+	})
+	if err != nil {
 		log.G(ctx).WithError(err).Errorf("failed to list tasks to remove")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (r *Orchestrator) handleNodeChange(ctx context.Context, n *api.Node) ***REMOVED***
-	if !orchestrator.InvalidNode(n) ***REMOVED***
+func (r *Orchestrator) handleNodeChange(ctx context.Context, n *api.Node) {
+	if !orchestrator.InvalidNode(n) {
 		return
-	***REMOVED***
+	}
 
 	r.restartTasksByNodeID(ctx, n.ID)
-***REMOVED***
+}
 
 // handleTaskChange defines what orchestrator does when a task is updated by agent.
-func (r *Orchestrator) handleTaskChange(ctx context.Context, t *api.Task) ***REMOVED***
+func (r *Orchestrator) handleTaskChange(ctx context.Context, t *api.Task) {
 	// If we already set the desired state past TaskStateRunning, there is no
 	// further action necessary.
-	if t.DesiredState > api.TaskStateRunning ***REMOVED***
+	if t.DesiredState > api.TaskStateRunning {
 		return
-	***REMOVED***
+	}
 
 	var (
 		n       *api.Node
 		service *api.Service
 	)
-	r.store.View(func(tx store.ReadTx) ***REMOVED***
-		if t.NodeID != "" ***REMOVED***
+	r.store.View(func(tx store.ReadTx) {
+		if t.NodeID != "" {
 			n = store.GetNode(tx, t.NodeID)
-		***REMOVED***
-		if t.ServiceID != "" ***REMOVED***
+		}
+		if t.ServiceID != "" {
 			service = store.GetService(tx, t.ServiceID)
-		***REMOVED***
-	***REMOVED***)
+		}
+	})
 
-	if !orchestrator.IsReplicatedService(service) ***REMOVED***
+	if !orchestrator.IsReplicatedService(service) {
 		return
-	***REMOVED***
+	}
 
 	if t.Status.State > api.TaskStateRunning ||
-		(t.NodeID != "" && orchestrator.InvalidNode(n)) ***REMOVED***
-		r.restartTasks[t.ID] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	***REMOVED***
-***REMOVED***
+		(t.NodeID != "" && orchestrator.InvalidNode(n)) {
+		r.restartTasks[t.ID] = struct{}{}
+	}
+}
 
 // FixTask validates a task with the current cluster settings, and takes
 // action to make it conformant. it's called at orchestrator initialization.
-func (r *Orchestrator) FixTask(ctx context.Context, batch *store.Batch, t *api.Task) ***REMOVED***
+func (r *Orchestrator) FixTask(ctx context.Context, batch *store.Batch, t *api.Task) {
 	// If we already set the desired state past TaskStateRunning, there is no
 	// further action necessary.
-	if t.DesiredState > api.TaskStateRunning ***REMOVED***
+	if t.DesiredState > api.TaskStateRunning {
 		return
-	***REMOVED***
+	}
 
 	var (
 		n       *api.Node
 		service *api.Service
 	)
-	batch.Update(func(tx store.Tx) error ***REMOVED***
-		if t.NodeID != "" ***REMOVED***
+	batch.Update(func(tx store.Tx) error {
+		if t.NodeID != "" {
 			n = store.GetNode(tx, t.NodeID)
-		***REMOVED***
-		if t.ServiceID != "" ***REMOVED***
+		}
+		if t.ServiceID != "" {
 			service = store.GetService(tx, t.ServiceID)
-		***REMOVED***
+		}
 		return nil
-	***REMOVED***)
+	})
 
-	if !orchestrator.IsReplicatedService(service) ***REMOVED***
+	if !orchestrator.IsReplicatedService(service) {
 		return
-	***REMOVED***
+	}
 
 	if t.Status.State > api.TaskStateRunning ||
-		(t.NodeID != "" && orchestrator.InvalidNode(n)) ***REMOVED***
-		r.restartTasks[t.ID] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
+		(t.NodeID != "" && orchestrator.InvalidNode(n)) {
+		r.restartTasks[t.ID] = struct{}{}
 		return
-	***REMOVED***
-***REMOVED***
+	}
+}

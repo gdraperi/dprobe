@@ -15,232 +15,232 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNewEnvClient(t *testing.T) ***REMOVED***
-	if runtime.GOOS == "windows" ***REMOVED***
+func TestNewEnvClient(t *testing.T) {
+	if runtime.GOOS == "windows" {
 		t.Skip("skipping unix only test for windows")
-	***REMOVED***
-	cases := []struct ***REMOVED***
+	}
+	cases := []struct {
 		envs            map[string]string
 		expectedError   string
 		expectedVersion string
-	***REMOVED******REMOVED***
-		***REMOVED***
-			envs:            map[string]string***REMOVED******REMOVED***,
+	}{
+		{
+			envs:            map[string]string{},
 			expectedVersion: api.DefaultVersion,
-		***REMOVED***,
-		***REMOVED***
-			envs: map[string]string***REMOVED***
+		},
+		{
+			envs: map[string]string{
 				"DOCKER_CERT_PATH": "invalid/path",
-			***REMOVED***,
+			},
 			expectedError: "Could not load X509 key pair: open invalid/path/cert.pem: no such file or directory",
-		***REMOVED***,
-		***REMOVED***
-			envs: map[string]string***REMOVED***
+		},
+		{
+			envs: map[string]string{
 				"DOCKER_CERT_PATH": "testdata/",
-			***REMOVED***,
+			},
 			expectedVersion: api.DefaultVersion,
-		***REMOVED***,
-		***REMOVED***
-			envs: map[string]string***REMOVED***
+		},
+		{
+			envs: map[string]string{
 				"DOCKER_CERT_PATH":  "testdata/",
 				"DOCKER_TLS_VERIFY": "1",
-			***REMOVED***,
+			},
 			expectedVersion: api.DefaultVersion,
-		***REMOVED***,
-		***REMOVED***
-			envs: map[string]string***REMOVED***
+		},
+		{
+			envs: map[string]string{
 				"DOCKER_CERT_PATH": "testdata/",
 				"DOCKER_HOST":      "https://notaunixsocket",
-			***REMOVED***,
+			},
 			expectedVersion: api.DefaultVersion,
-		***REMOVED***,
-		***REMOVED***
-			envs: map[string]string***REMOVED***
+		},
+		{
+			envs: map[string]string{
 				"DOCKER_HOST": "host",
-			***REMOVED***,
+			},
 			expectedError: "unable to parse docker host `host`",
-		***REMOVED***,
-		***REMOVED***
-			envs: map[string]string***REMOVED***
+		},
+		{
+			envs: map[string]string{
 				"DOCKER_HOST": "invalid://url",
-			***REMOVED***,
+			},
 			expectedVersion: api.DefaultVersion,
-		***REMOVED***,
-		***REMOVED***
-			envs: map[string]string***REMOVED***
+		},
+		{
+			envs: map[string]string{
 				"DOCKER_API_VERSION": "anything",
-			***REMOVED***,
+			},
 			expectedVersion: "anything",
-		***REMOVED***,
-		***REMOVED***
-			envs: map[string]string***REMOVED***
+		},
+		{
+			envs: map[string]string{
 				"DOCKER_API_VERSION": "1.22",
-			***REMOVED***,
+			},
 			expectedVersion: "1.22",
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
 	env := envToMap()
 	defer mapToEnv(env)
-	for _, c := range cases ***REMOVED***
+	for _, c := range cases {
 		mapToEnv(env)
 		mapToEnv(c.envs)
 		apiclient, err := NewEnvClient()
-		if c.expectedError != "" ***REMOVED***
+		if c.expectedError != "" {
 			assert.Error(t, err)
 			assert.Equal(t, c.expectedError, err.Error())
-		***REMOVED*** else ***REMOVED***
+		} else {
 			assert.NoError(t, err)
 			version := apiclient.ClientVersion()
 			assert.Equal(t, c.expectedVersion, version)
-		***REMOVED***
+		}
 
-		if c.envs["DOCKER_TLS_VERIFY"] != "" ***REMOVED***
+		if c.envs["DOCKER_TLS_VERIFY"] != "" {
 			// pedantic checking that this is handled correctly
 			tr := apiclient.client.Transport.(*http.Transport)
 			assert.NotNil(t, tr.TLSClientConfig)
 			assert.Equal(t, tr.TLSClientConfig.InsecureSkipVerify, false)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestGetAPIPath(t *testing.T) ***REMOVED***
-	testcases := []struct ***REMOVED***
+func TestGetAPIPath(t *testing.T) {
+	testcases := []struct {
 		version  string
 		path     string
 		query    url.Values
 		expected string
-	***REMOVED******REMOVED***
-		***REMOVED***"", "/containers/json", nil, "/containers/json"***REMOVED***,
-		***REMOVED***"", "/containers/json", url.Values***REMOVED******REMOVED***, "/containers/json"***REMOVED***,
-		***REMOVED***"", "/containers/json", url.Values***REMOVED***"s": []string***REMOVED***"c"***REMOVED******REMOVED***, "/containers/json?s=c"***REMOVED***,
-		***REMOVED***"1.22", "/containers/json", nil, "/v1.22/containers/json"***REMOVED***,
-		***REMOVED***"1.22", "/containers/json", url.Values***REMOVED******REMOVED***, "/v1.22/containers/json"***REMOVED***,
-		***REMOVED***"1.22", "/containers/json", url.Values***REMOVED***"s": []string***REMOVED***"c"***REMOVED******REMOVED***, "/v1.22/containers/json?s=c"***REMOVED***,
-		***REMOVED***"v1.22", "/containers/json", nil, "/v1.22/containers/json"***REMOVED***,
-		***REMOVED***"v1.22", "/containers/json", url.Values***REMOVED******REMOVED***, "/v1.22/containers/json"***REMOVED***,
-		***REMOVED***"v1.22", "/containers/json", url.Values***REMOVED***"s": []string***REMOVED***"c"***REMOVED******REMOVED***, "/v1.22/containers/json?s=c"***REMOVED***,
-		***REMOVED***"v1.22", "/networks/kiwl$%^", nil, "/v1.22/networks/kiwl$%25%5E"***REMOVED***,
-	***REMOVED***
+	}{
+		{"", "/containers/json", nil, "/containers/json"},
+		{"", "/containers/json", url.Values{}, "/containers/json"},
+		{"", "/containers/json", url.Values{"s": []string{"c"}}, "/containers/json?s=c"},
+		{"1.22", "/containers/json", nil, "/v1.22/containers/json"},
+		{"1.22", "/containers/json", url.Values{}, "/v1.22/containers/json"},
+		{"1.22", "/containers/json", url.Values{"s": []string{"c"}}, "/v1.22/containers/json?s=c"},
+		{"v1.22", "/containers/json", nil, "/v1.22/containers/json"},
+		{"v1.22", "/containers/json", url.Values{}, "/v1.22/containers/json"},
+		{"v1.22", "/containers/json", url.Values{"s": []string{"c"}}, "/v1.22/containers/json?s=c"},
+		{"v1.22", "/networks/kiwl$%^", nil, "/v1.22/networks/kiwl$%25%5E"},
+	}
 
-	for _, testcase := range testcases ***REMOVED***
-		c := Client***REMOVED***version: testcase.version, basePath: "/"***REMOVED***
+	for _, testcase := range testcases {
+		c := Client{version: testcase.version, basePath: "/"}
 		actual := c.getAPIPath(testcase.path, testcase.query)
 		assert.Equal(t, actual, testcase.expected)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestParseHost(t *testing.T) ***REMOVED***
-	cases := []struct ***REMOVED***
+func TestParseHost(t *testing.T) {
+	cases := []struct {
 		host  string
 		proto string
 		addr  string
 		base  string
 		err   bool
-	***REMOVED******REMOVED***
-		***REMOVED***"", "", "", "", true***REMOVED***,
-		***REMOVED***"foobar", "", "", "", true***REMOVED***,
-		***REMOVED***"foo://bar", "foo", "bar", "", false***REMOVED***,
-		***REMOVED***"tcp://localhost:2476", "tcp", "localhost:2476", "", false***REMOVED***,
-		***REMOVED***"tcp://localhost:2476/path", "tcp", "localhost:2476", "/path", false***REMOVED***,
-	***REMOVED***
+	}{
+		{"", "", "", "", true},
+		{"foobar", "", "", "", true},
+		{"foo://bar", "foo", "bar", "", false},
+		{"tcp://localhost:2476", "tcp", "localhost:2476", "", false},
+		{"tcp://localhost:2476/path", "tcp", "localhost:2476", "/path", false},
+	}
 
-	for _, cs := range cases ***REMOVED***
+	for _, cs := range cases {
 		p, a, b, e := ParseHost(cs.host)
-		if cs.err ***REMOVED***
+		if cs.err {
 			assert.Error(t, e)
-		***REMOVED***
+		}
 		assert.Equal(t, cs.proto, p)
 		assert.Equal(t, cs.addr, a)
 		assert.Equal(t, cs.base, b)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestParseHostURL(t *testing.T) ***REMOVED***
-	testcases := []struct ***REMOVED***
+func TestParseHostURL(t *testing.T) {
+	testcases := []struct {
 		host        string
 		expected    *url.URL
 		expectedErr string
-	***REMOVED******REMOVED***
-		***REMOVED***
+	}{
+		{
 			host:        "",
 			expectedErr: "unable to parse docker host",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			host:        "foobar",
 			expectedErr: "unable to parse docker host",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			host:     "foo://bar",
-			expected: &url.URL***REMOVED***Scheme: "foo", Host: "bar"***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			expected: &url.URL{Scheme: "foo", Host: "bar"},
+		},
+		{
 			host:     "tcp://localhost:2476",
-			expected: &url.URL***REMOVED***Scheme: "tcp", Host: "localhost:2476"***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			expected: &url.URL{Scheme: "tcp", Host: "localhost:2476"},
+		},
+		{
 			host:     "tcp://localhost:2476/path",
-			expected: &url.URL***REMOVED***Scheme: "tcp", Host: "localhost:2476", Path: "/path"***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+			expected: &url.URL{Scheme: "tcp", Host: "localhost:2476", Path: "/path"},
+		},
+	}
 
-	for _, testcase := range testcases ***REMOVED***
+	for _, testcase := range testcases {
 		actual, err := ParseHostURL(testcase.host)
-		if testcase.expectedErr != "" ***REMOVED***
+		if testcase.expectedErr != "" {
 			testutil.ErrorContains(t, err, testcase.expectedErr)
-		***REMOVED***
+		}
 		assert.Equal(t, testcase.expected, actual)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestNewEnvClientSetsDefaultVersion(t *testing.T) ***REMOVED***
+func TestNewEnvClientSetsDefaultVersion(t *testing.T) {
 	env := envToMap()
 	defer mapToEnv(env)
 
-	envMap := map[string]string***REMOVED***
+	envMap := map[string]string{
 		"DOCKER_HOST":        "",
 		"DOCKER_API_VERSION": "",
 		"DOCKER_TLS_VERIFY":  "",
 		"DOCKER_CERT_PATH":   "",
-	***REMOVED***
+	}
 	mapToEnv(envMap)
 
 	client, err := NewEnvClient()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	assert.Equal(t, client.version, api.DefaultVersion)
 
 	expected := "1.22"
 	os.Setenv("DOCKER_API_VERSION", expected)
 	client, err = NewEnvClient()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	assert.Equal(t, expected, client.version)
-***REMOVED***
+}
 
 // TestNegotiateAPIVersionEmpty asserts that client.Client can
 // negotiate a compatible APIVersion when omitted
-func TestNegotiateAPIVersionEmpty(t *testing.T) ***REMOVED***
+func TestNegotiateAPIVersionEmpty(t *testing.T) {
 	env := envToMap()
 	defer mapToEnv(env)
 
-	envMap := map[string]string***REMOVED***
+	envMap := map[string]string{
 		"DOCKER_API_VERSION": "",
-	***REMOVED***
+	}
 	mapToEnv(envMap)
 
 	client, err := NewEnvClient()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	ping := types.Ping***REMOVED***
+	ping := types.Ping{
 		APIVersion:   "",
 		OSType:       "linux",
 		Experimental: false,
-	***REMOVED***
+	}
 
 	// set our version to something new
 	client.version = "1.25"
@@ -252,23 +252,23 @@ func TestNegotiateAPIVersionEmpty(t *testing.T) ***REMOVED***
 	// test downgrade
 	client.NegotiateAPIVersionPing(ping)
 	assert.Equal(t, expected, client.version)
-***REMOVED***
+}
 
 // TestNegotiateAPIVersion asserts that client.Client can
 // negotiate a compatible APIVersion with the server
-func TestNegotiateAPIVersion(t *testing.T) ***REMOVED***
+func TestNegotiateAPIVersion(t *testing.T) {
 	client, err := NewEnvClient()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	expected := "1.21"
 
-	ping := types.Ping***REMOVED***
+	ping := types.Ping{
 		APIVersion:   expected,
 		OSType:       "linux",
 		Experimental: false,
-	***REMOVED***
+	}
 
 	// set our version to something new
 	client.version = "1.22"
@@ -284,100 +284,100 @@ func TestNegotiateAPIVersion(t *testing.T) ***REMOVED***
 	client.NegotiateAPIVersionPing(ping)
 	assert.Equal(t, expected, client.version)
 
-***REMOVED***
+}
 
 // TestNegotiateAPIVersionOverride asserts that we honor
 // the environment variable DOCKER_API_VERSION when negotianing versions
-func TestNegotiateAPVersionOverride(t *testing.T) ***REMOVED***
+func TestNegotiateAPVersionOverride(t *testing.T) {
 	env := envToMap()
 	defer mapToEnv(env)
 
-	envMap := map[string]string***REMOVED***
+	envMap := map[string]string{
 		"DOCKER_API_VERSION": "9.99",
-	***REMOVED***
+	}
 	mapToEnv(envMap)
 
 	client, err := NewEnvClient()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	ping := types.Ping***REMOVED***
+	ping := types.Ping{
 		APIVersion:   "1.24",
 		OSType:       "linux",
 		Experimental: false,
-	***REMOVED***
+	}
 
 	expected := envMap["DOCKER_API_VERSION"]
 
 	// test that we honored the env var
 	client.NegotiateAPIVersionPing(ping)
 	assert.Equal(t, expected, client.version)
-***REMOVED***
+}
 
 // mapToEnv takes a map of environment variables and sets them
-func mapToEnv(env map[string]string) ***REMOVED***
-	for k, v := range env ***REMOVED***
+func mapToEnv(env map[string]string) {
+	for k, v := range env {
 		os.Setenv(k, v)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // envToMap returns a map of environment variables
-func envToMap() map[string]string ***REMOVED***
+func envToMap() map[string]string {
 	env := make(map[string]string)
-	for _, e := range os.Environ() ***REMOVED***
+	for _, e := range os.Environ() {
 		kv := strings.SplitAfterN(e, "=", 2)
 		env[kv[0]] = kv[1]
-	***REMOVED***
+	}
 
 	return env
-***REMOVED***
+}
 
 type roundTripFunc func(*http.Request) (*http.Response, error)
 
-func (rtf roundTripFunc) RoundTrip(req *http.Request) (*http.Response, error) ***REMOVED***
+func (rtf roundTripFunc) RoundTrip(req *http.Request) (*http.Response, error) {
 	return rtf(req)
-***REMOVED***
+}
 
-type bytesBufferClose struct ***REMOVED***
+type bytesBufferClose struct {
 	*bytes.Buffer
-***REMOVED***
+}
 
-func (bbc bytesBufferClose) Close() error ***REMOVED***
+func (bbc bytesBufferClose) Close() error {
 	return nil
-***REMOVED***
+}
 
-func TestClientRedirect(t *testing.T) ***REMOVED***
-	client := &http.Client***REMOVED***
+func TestClientRedirect(t *testing.T) {
+	client := &http.Client{
 		CheckRedirect: CheckRedirect,
-		Transport: roundTripFunc(func(req *http.Request) (*http.Response, error) ***REMOVED***
-			if req.URL.String() == "/bla" ***REMOVED***
-				return &http.Response***REMOVED***StatusCode: 404***REMOVED***, nil
-			***REMOVED***
-			return &http.Response***REMOVED***
+		Transport: roundTripFunc(func(req *http.Request) (*http.Response, error) {
+			if req.URL.String() == "/bla" {
+				return &http.Response{StatusCode: 404}, nil
+			}
+			return &http.Response{
 				StatusCode: 301,
-				Header:     map[string][]string***REMOVED***"Location": ***REMOVED***"/bla"***REMOVED******REMOVED***,
-				Body:       bytesBufferClose***REMOVED***bytes.NewBuffer(nil)***REMOVED***,
-			***REMOVED***, nil
-		***REMOVED***),
-	***REMOVED***
+				Header:     map[string][]string{"Location": {"/bla"}},
+				Body:       bytesBufferClose{bytes.NewBuffer(nil)},
+			}, nil
+		}),
+	}
 
-	cases := []struct ***REMOVED***
+	cases := []struct {
 		httpMethod  string
 		expectedErr error
 		statusCode  int
-	***REMOVED******REMOVED***
-		***REMOVED***http.MethodGet, nil, 301***REMOVED***,
-		***REMOVED***http.MethodPost, &url.Error***REMOVED***Op: "Post", URL: "/bla", Err: ErrRedirect***REMOVED***, 301***REMOVED***,
-		***REMOVED***http.MethodPut, &url.Error***REMOVED***Op: "Put", URL: "/bla", Err: ErrRedirect***REMOVED***, 301***REMOVED***,
-		***REMOVED***http.MethodDelete, &url.Error***REMOVED***Op: "Delete", URL: "/bla", Err: ErrRedirect***REMOVED***, 301***REMOVED***,
-	***REMOVED***
+	}{
+		{http.MethodGet, nil, 301},
+		{http.MethodPost, &url.Error{Op: "Post", URL: "/bla", Err: ErrRedirect}, 301},
+		{http.MethodPut, &url.Error{Op: "Put", URL: "/bla", Err: ErrRedirect}, 301},
+		{http.MethodDelete, &url.Error{Op: "Delete", URL: "/bla", Err: ErrRedirect}, 301},
+	}
 
-	for _, tc := range cases ***REMOVED***
+	for _, tc := range cases {
 		req, err := http.NewRequest(tc.httpMethod, "/redirectme", nil)
 		assert.NoError(t, err)
 		resp, err := client.Do(req)
 		assert.Equal(t, tc.expectedErr, err)
 		assert.Equal(t, tc.statusCode, resp.StatusCode)
-	***REMOVED***
-***REMOVED***
+	}
+}

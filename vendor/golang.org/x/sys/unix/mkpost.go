@@ -21,30 +21,30 @@ import (
 	"regexp"
 )
 
-func main() ***REMOVED***
+func main() {
 	// Get the OS and architecture (using GOARCH_TARGET if it exists)
 	goos := os.Getenv("GOOS")
 	goarch := os.Getenv("GOARCH_TARGET")
-	if goarch == "" ***REMOVED***
+	if goarch == "" {
 		goarch = os.Getenv("GOARCH")
-	***REMOVED***
+	}
 	// Check that we are using the new build system if we should be.
-	if goos == "linux" && goarch != "sparc64" ***REMOVED***
-		if os.Getenv("GOLANG_SYS_BUILD") != "docker" ***REMOVED***
+	if goos == "linux" && goarch != "sparc64" {
+		if os.Getenv("GOLANG_SYS_BUILD") != "docker" {
 			os.Stderr.WriteString("In the new build system, mkpost should not be called directly.\n")
 			os.Stderr.WriteString("See README.md\n")
 			os.Exit(1)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	b, err := ioutil.ReadAll(os.Stdin)
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatal(err)
-	***REMOVED***
+	}
 
 	// If we have empty Ptrace structs, we should delete them. Only s390x emits
 	// nonempty Ptrace structs.
-	ptraceRexexp := regexp.MustCompile(`type Ptrace((Psw|Fpregs|Per) struct ***REMOVED***\s****REMOVED***)`)
+	ptraceRexexp := regexp.MustCompile(`type Ptrace((Psw|Fpregs|Per) struct {\s*})`)
 	b = ptraceRexexp.ReplaceAll(b, nil)
 
 	// Replace the control_regs union with a blank identifier for now.
@@ -70,11 +70,11 @@ func main() ***REMOVED***
 	b = removePaddingFieldsRegex.ReplaceAll(b, []byte("_"))
 
 	// We refuse to export private fields on s390x
-	if goarch == "s390x" && goos == "linux" ***REMOVED***
+	if goarch == "s390x" && goos == "linux" {
 		// Remove padding, hidden, or unused fields
 		removeFieldsRegex = regexp.MustCompile(`\bX_\S+`)
 		b = removeFieldsRegex.ReplaceAll(b, []byte("_"))
-	***REMOVED***
+	}
 
 	// Remove the first line of warning from cgo
 	b = b[bytes.IndexByte(b, '\n')+1:]
@@ -89,9 +89,9 @@ func main() ***REMOVED***
 
 	// gofmt
 	b, err = format.Source(b)
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatal(err)
-	***REMOVED***
+	}
 
 	os.Stdout.Write(b)
-***REMOVED***
+}

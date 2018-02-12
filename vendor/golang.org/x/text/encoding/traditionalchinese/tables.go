@@ -5,7 +5,7 @@ package traditionalchinese // import "golang.org/x/text/encoding/traditionalchin
 
 // decode is the decoding table from Big5 code to Unicode.
 // It is defined at http://encoding.spec.whatwg.org/index-big5.txt
-var decode = [...]uint32***REMOVED***
+var decode = [...]uint32{
 	942:   0x000043F0,
 	943:   0x00004C32,
 	944:   0x00004603,
@@ -18596,7 +18596,7 @@ var decode = [...]uint32***REMOVED***
 	19779: 0x000079C6,
 	19780: 0x0002910D,
 	19781: 0x000079D4,
-***REMOVED***
+}
 
 const numEncodeTables = 8
 
@@ -18613,7 +18613,7 @@ const numEncodeTables = 8
 
 const encode0Low, encode0High = 131105, 173738
 
-var encode0 = [...]uint16***REMOVED***
+var encode0 = [...]uint16{
 	131105 - 131105: 0x9C71,
 	131134 - 131105: 0x9375,
 	131142 - 131105: 0x9376,
@@ -20315,11 +20315,11 @@ var encode0 = [...]uint16***REMOVED***
 	173642 - 131105: 0x9FEC,
 	173659 - 131105: 0x8AE2,
 	173737 - 131105: 0x9E75,
-***REMOVED***
+}
 
 const encode1Low, encode1High = 11904, 40908
 
-var encode1 = [...]uint16***REMOVED***
+var encode1 = [...]uint16{
 	11904 - 11904: 0xC8D6,
 	11908 - 11904: 0xC8D7,
 	11910 - 11904: 0xC8D8,
@@ -36548,11 +36548,11 @@ var encode1 = [...]uint16***REMOVED***
 	40905 - 11904: 0x87D6,
 	40906 - 11904: 0x87DA,
 	40907 - 11904: 0x87DF,
-***REMOVED***
+}
 
 const encode2Low, encode2High = 7870, 10046
 
-var encode2 = [...]uint16***REMOVED***
+var encode2 = [...]uint16{
 	7870 - 7870:  0x8863,
 	7871 - 7870:  0x88A4,
 	7872 - 7870:  0x8865,
@@ -36768,11 +36768,11 @@ var encode2 = [...]uint16***REMOVED***
 	9792 - 7870:  0xA1F0,
 	9794 - 7870:  0xA1F1,
 	10045 - 7870: 0xC6E6,
-***REMOVED***
+}
 
 const encode3Low, encode3High = 167, 1106
 
-var encode3 = [...]uint16***REMOVED***
+var encode3 = [...]uint16{
 	167 - 167:  0xA1B1,
 	168 - 167:  0xC6D8,
 	175 - 167:  0xA1C2,
@@ -36953,11 +36953,11 @@ var encode3 = [...]uint16***REMOVED***
 	1102 - 167: 0xC874,
 	1103 - 167: 0xC875,
 	1105 - 167: 0xC85B,
-***REMOVED***
+}
 
 const encode4Low, encode4High = 65072, 65518
 
-var encode4 = [...]uint16***REMOVED***
+var encode4 = [...]uint16{
 	65072 - 65072: 0xA14A,
 	65073 - 65072: 0xA157,
 	65075 - 65072: 0xA159,
@@ -37109,11 +37109,11 @@ var encode4 = [...]uint16***REMOVED***
 	65508 - 65072: 0xC8CE,
 	65509 - 65072: 0xA244,
 	65517 - 65072: 0xF9FE,
-***REMOVED***
+}
 
 const encode5Low, encode5High = 194597, 195029
 
-var encode5 = [...]uint16***REMOVED***
+var encode5 = [...]uint16{
 	194597 - 194597: 0x9874,
 	194619 - 194597: 0x9AC8,
 	194624 - 194597: 0xA047,
@@ -37125,18 +37125,18 @@ var encode5 = [...]uint16***REMOVED***
 	194994 - 194597: 0x8FA8,
 	195004 - 194597: 0x957A,
 	195028 - 194597: 0x8FF0,
-***REMOVED***
+}
 
 const encode6Low, encode6High = 63751, 64014
 
-var encode6 = [...]uint16***REMOVED***
+var encode6 = [...]uint16{
 	63751 - 63751: 0x8BF8,
 	64012 - 63751: 0xC94A,
 	64013 - 63751: 0xDDFC,
-***REMOVED***
+}
 
 const encode7Low, encode7High = 175615, 175616
 
-var encode7 = [...]uint16***REMOVED***
+var encode7 = [...]uint16{
 	175615 - 175615: 0x87DC,
-***REMOVED***
+}

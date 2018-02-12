@@ -43,47 +43,47 @@ import (
 // Codec defines the interface gRPC uses to encode and decode messages.
 // Note that implementations of this interface must be thread safe;
 // a Codec's methods can be called from concurrent goroutines.
-type Codec interface ***REMOVED***
+type Codec interface {
 	// Marshal returns the wire format of v.
-	Marshal(v interface***REMOVED******REMOVED***) ([]byte, error)
+	Marshal(v interface{}) ([]byte, error)
 	// Unmarshal parses the wire format into v.
-	Unmarshal(data []byte, v interface***REMOVED******REMOVED***) error
+	Unmarshal(data []byte, v interface{}) error
 	// String returns the name of the Codec implementation. The returned
 	// string will be used as part of content type in transmission.
 	String() string
-***REMOVED***
+}
 
 // protoCodec is a Codec implementation with protobuf. It is the default codec for gRPC.
-type protoCodec struct ***REMOVED***
-***REMOVED***
+type protoCodec struct {
+}
 
-type cachedProtoBuffer struct ***REMOVED***
+type cachedProtoBuffer struct {
 	lastMarshaledSize uint32
 	proto.Buffer
-***REMOVED***
+}
 
-func capToMaxInt32(val int) uint32 ***REMOVED***
-	if val > math.MaxInt32 ***REMOVED***
+func capToMaxInt32(val int) uint32 {
+	if val > math.MaxInt32 {
 		return uint32(math.MaxInt32)
-	***REMOVED***
+	}
 	return uint32(val)
-***REMOVED***
+}
 
-func (p protoCodec) marshal(v interface***REMOVED******REMOVED***, cb *cachedProtoBuffer) ([]byte, error) ***REMOVED***
+func (p protoCodec) marshal(v interface{}, cb *cachedProtoBuffer) ([]byte, error) {
 	protoMsg := v.(proto.Message)
 	newSlice := make([]byte, 0, cb.lastMarshaledSize)
 
 	cb.SetBuf(newSlice)
 	cb.Reset()
-	if err := cb.Marshal(protoMsg); err != nil ***REMOVED***
+	if err := cb.Marshal(protoMsg); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	out := cb.Bytes()
 	cb.lastMarshaledSize = capToMaxInt32(len(out))
 	return out, nil
-***REMOVED***
+}
 
-func (p protoCodec) Marshal(v interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (p protoCodec) Marshal(v interface{}) ([]byte, error) {
 	cb := protoBufferPool.Get().(*cachedProtoBuffer)
 	out, err := p.marshal(v, cb)
 
@@ -91,28 +91,28 @@ func (p protoCodec) Marshal(v interface***REMOVED******REMOVED***) ([]byte, erro
 	cb.SetBuf(nil)
 	protoBufferPool.Put(cb)
 	return out, err
-***REMOVED***
+}
 
-func (p protoCodec) Unmarshal(data []byte, v interface***REMOVED******REMOVED***) error ***REMOVED***
+func (p protoCodec) Unmarshal(data []byte, v interface{}) error {
 	cb := protoBufferPool.Get().(*cachedProtoBuffer)
 	cb.SetBuf(data)
 	err := cb.Unmarshal(v.(proto.Message))
 	cb.SetBuf(nil)
 	protoBufferPool.Put(cb)
 	return err
-***REMOVED***
+}
 
-func (protoCodec) String() string ***REMOVED***
+func (protoCodec) String() string {
 	return "proto"
-***REMOVED***
+}
 
 var (
-	protoBufferPool = &sync.Pool***REMOVED***
-		New: func() interface***REMOVED******REMOVED*** ***REMOVED***
-			return &cachedProtoBuffer***REMOVED***
-				Buffer:            proto.Buffer***REMOVED******REMOVED***,
+	protoBufferPool = &sync.Pool{
+		New: func() interface{} {
+			return &cachedProtoBuffer{
+				Buffer:            proto.Buffer{},
 				lastMarshaledSize: 16,
-			***REMOVED***
-		***REMOVED***,
-	***REMOVED***
+			}
+		},
+	}
 )

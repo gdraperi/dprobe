@@ -3,6 +3,6 @@
 package system
 
 // LCOWSupported returns true if Linux containers on Windows are supported.
-func LCOWSupported() bool ***REMOVED***
+func LCOWSupported() bool {
 	return false
-***REMOVED***
+}

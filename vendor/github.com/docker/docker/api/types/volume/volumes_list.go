@@ -11,7 +11,7 @@ import "github.com/docker/docker/api/types"
 
 // VolumesListOKBody volumes list o k body
 // swagger:model VolumesListOKBody
-type VolumesListOKBody struct ***REMOVED***
+type VolumesListOKBody struct {
 
 	// List of volumes
 	// Required: true
@@ -20,4 +20,4 @@ type VolumesListOKBody struct ***REMOVED***
 	// Warnings that occurred when fetching the list of volumes
 	// Required: true
 	Warnings []string `json:"Warnings"`
-***REMOVED***
+}

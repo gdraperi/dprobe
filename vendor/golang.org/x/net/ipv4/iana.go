@@ -19,7 +19,7 @@ const (
 )
 
 // Internet Control Message Protocol (ICMP) Parameters, Updated: 2013-04-19
-var icmpTypes = map[ICMPType]string***REMOVED***
+var icmpTypes = map[ICMPType]string{
 	0:  "echo reply",
 	3:  "destination unreachable",
 	5:  "redirect",
@@ -31,4 +31,4 @@ var icmpTypes = map[ICMPType]string***REMOVED***
 	13: "timestamp",
 	14: "timestamp reply",
 	40: "photuris",
-***REMOVED***
+}

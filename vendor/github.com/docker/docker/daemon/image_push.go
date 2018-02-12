@@ -13,34 +13,34 @@ import (
 )
 
 // PushImage initiates a push operation on the repository named localName.
-func (daemon *Daemon) PushImage(ctx context.Context, image, tag string, metaHeaders map[string][]string, authConfig *types.AuthConfig, outStream io.Writer) error ***REMOVED***
+func (daemon *Daemon) PushImage(ctx context.Context, image, tag string, metaHeaders map[string][]string, authConfig *types.AuthConfig, outStream io.Writer) error {
 	ref, err := reference.ParseNormalizedNamed(image)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	if tag != "" ***REMOVED***
+	}
+	if tag != "" {
 		// Push by digest is not supported, so only tags are supported.
 		ref, err = reference.WithTag(ref, tag)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Include a buffer so that slow client connections don't affect
 	// transfer performance.
 	progressChan := make(chan progress.Progress, 100)
 
-	writesDone := make(chan struct***REMOVED******REMOVED***)
+	writesDone := make(chan struct{})
 
 	ctx, cancelFunc := context.WithCancel(ctx)
 
-	go func() ***REMOVED***
+	go func() {
 		progressutils.WriteDistributionProgress(cancelFunc, outStream, progressChan)
 		close(writesDone)
-	***REMOVED***()
+	}()
 
-	imagePushConfig := &distribution.ImagePushConfig***REMOVED***
-		Config: distribution.Config***REMOVED***
+	imagePushConfig := &distribution.ImagePushConfig{
+		Config: distribution.Config{
 			MetaHeaders:      metaHeaders,
 			AuthConfig:       authConfig,
 			ProgressOutput:   progress.ChanOutput(progressChan),
@@ -49,15 +49,15 @@ func (daemon *Daemon) PushImage(ctx context.Context, image, tag string, metaHead
 			MetadataStore:    daemon.distributionMetadataStore,
 			ImageStore:       distribution.NewImageConfigStoreFromStore(daemon.imageStore),
 			ReferenceStore:   daemon.referenceStore,
-		***REMOVED***,
+		},
 		ConfigMediaType: schema2.MediaTypeImageConfig,
 		LayerStores:     distribution.NewLayerProvidersFromStores(daemon.layerStores),
 		TrustKey:        daemon.trustKey,
 		UploadManager:   daemon.uploadManager,
-	***REMOVED***
+	}
 
 	err = distribution.Push(ctx, ref, imagePushConfig)
 	close(progressChan)
 	<-writesDone
 	return err
-***REMOVED***
+}

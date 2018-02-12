@@ -38,7 +38,7 @@ var (
 )
 
 // Transformer transforms bytes.
-type Transformer interface ***REMOVED***
+type Transformer interface {
 	// Transform writes to dst the transformed bytes read from src, and
 	// returns the number of dst bytes written and src bytes read. The
 	// atEOF argument tells whether src represents the last bytes of the
@@ -62,11 +62,11 @@ type Transformer interface ***REMOVED***
 
 	// Reset resets the state and allows a Transformer to be reused.
 	Reset()
-***REMOVED***
+}
 
 // SpanningTransformer extends the Transformer interface with a Span method
 // that determines how much of the input already conforms to the Transformer.
-type SpanningTransformer interface ***REMOVED***
+type SpanningTransformer interface {
 	Transformer
 
 	// Span returns a position in src such that transforming src[:n] results in
@@ -97,17 +97,17 @@ type SpanningTransformer interface ***REMOVED***
 	// copying and allocating buffers. Calls to Span and Transform may be
 	// interleaved.
 	Span(src []byte, atEOF bool) (n int, err error)
-***REMOVED***
+}
 
 // NopResetter can be embedded by implementations of Transformer to add a nop
 // Reset method.
-type NopResetter struct***REMOVED******REMOVED***
+type NopResetter struct{}
 
 // Reset implements the Reset method of the Transformer interface.
-func (NopResetter) Reset() ***REMOVED******REMOVED***
+func (NopResetter) Reset() {}
 
 // Reader wraps another io.Reader by transforming the bytes read.
-type Reader struct ***REMOVED***
+type Reader struct {
 	r   io.Reader
 	t   Transformer
 	err error
@@ -125,52 +125,52 @@ type Reader struct ***REMOVED***
 	// transformComplete is whether the transformation is complete,
 	// regardless of whether or not it was successful.
 	transformComplete bool
-***REMOVED***
+}
 
 const defaultBufSize = 4096
 
 // NewReader returns a new Reader that wraps r by transforming the bytes read
 // via t. It calls Reset on t.
-func NewReader(r io.Reader, t Transformer) *Reader ***REMOVED***
+func NewReader(r io.Reader, t Transformer) *Reader {
 	t.Reset()
-	return &Reader***REMOVED***
+	return &Reader{
 		r:   r,
 		t:   t,
 		dst: make([]byte, defaultBufSize),
 		src: make([]byte, defaultBufSize),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Read implements the io.Reader interface.
-func (r *Reader) Read(p []byte) (int, error) ***REMOVED***
+func (r *Reader) Read(p []byte) (int, error) {
 	n, err := 0, error(nil)
-	for ***REMOVED***
+	for {
 		// Copy out any transformed bytes and return the final error if we are done.
-		if r.dst0 != r.dst1 ***REMOVED***
+		if r.dst0 != r.dst1 {
 			n = copy(p, r.dst[r.dst0:r.dst1])
 			r.dst0 += n
-			if r.dst0 == r.dst1 && r.transformComplete ***REMOVED***
+			if r.dst0 == r.dst1 && r.transformComplete {
 				return n, r.err
-			***REMOVED***
+			}
 			return n, nil
-		***REMOVED*** else if r.transformComplete ***REMOVED***
+		} else if r.transformComplete {
 			return 0, r.err
-		***REMOVED***
+		}
 
 		// Try to transform some source bytes, or to flush the transformer if we
 		// are out of source bytes. We do this even if r.r.Read returned an error.
 		// As the io.Reader documentation says, "process the n > 0 bytes returned
 		// before considering the error".
-		if r.src0 != r.src1 || r.err != nil ***REMOVED***
+		if r.src0 != r.src1 || r.err != nil {
 			r.dst0 = 0
 			r.dst1, n, err = r.t.Transform(r.dst, r.src[r.src0:r.src1], r.err == io.EOF)
 			r.src0 += n
 
-			switch ***REMOVED***
+			switch {
 			case err == nil:
-				if r.src0 != r.src1 ***REMOVED***
+				if r.src0 != r.src1 {
 					r.err = errInconsistentByteCount
-				***REMOVED***
+				}
 				// The Transform call was successful; we are complete if we
 				// cannot read more bytes into src.
 				r.transformComplete = r.err != nil
@@ -184,29 +184,29 @@ func (r *Reader) Read(p []byte) (int, error) ***REMOVED***
 				r.transformComplete = true
 				// The reader error (r.err) takes precedence over the
 				// transformer error (err) unless r.err is nil or io.EOF.
-				if r.err == nil || r.err == io.EOF ***REMOVED***
+				if r.err == nil || r.err == io.EOF {
 					r.err = err
-				***REMOVED***
+				}
 				continue
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		// Move any untransformed source bytes to the start of the buffer
 		// and read more bytes.
-		if r.src0 != 0 ***REMOVED***
+		if r.src0 != 0 {
 			r.src0, r.src1 = 0, copy(r.src, r.src[r.src0:r.src1])
-		***REMOVED***
+		}
 		n, r.err = r.r.Read(r.src[r.src1:])
 		r.src1 += n
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // TODO: implement ReadByte (and ReadRune??).
 
 // Writer wraps another io.Writer by transforming the bytes read.
 // The user needs to call Close to flush unwritten bytes that may
 // be buffered.
-type Writer struct ***REMOVED***
+type Writer struct {
 	w   io.Writer
 	t   Transformer
 	dst []byte
@@ -214,67 +214,67 @@ type Writer struct ***REMOVED***
 	// src[:n] contains bytes that have not yet passed through t.
 	src []byte
 	n   int
-***REMOVED***
+}
 
 // NewWriter returns a new Writer that wraps w by transforming the bytes written
 // via t. It calls Reset on t.
-func NewWriter(w io.Writer, t Transformer) *Writer ***REMOVED***
+func NewWriter(w io.Writer, t Transformer) *Writer {
 	t.Reset()
-	return &Writer***REMOVED***
+	return &Writer{
 		w:   w,
 		t:   t,
 		dst: make([]byte, defaultBufSize),
 		src: make([]byte, defaultBufSize),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Write implements the io.Writer interface. If there are not enough
 // bytes available to complete a Transform, the bytes will be buffered
 // for the next write. Call Close to convert the remaining bytes.
-func (w *Writer) Write(data []byte) (n int, err error) ***REMOVED***
+func (w *Writer) Write(data []byte) (n int, err error) {
 	src := data
-	if w.n > 0 ***REMOVED***
+	if w.n > 0 {
 		// Append bytes from data to the last remainder.
 		// TODO: limit the amount copied on first try.
 		n = copy(w.src[w.n:], data)
 		w.n += n
 		src = w.src[:w.n]
-	***REMOVED***
-	for ***REMOVED***
+	}
+	for {
 		nDst, nSrc, err := w.t.Transform(w.dst, src, false)
-		if _, werr := w.w.Write(w.dst[:nDst]); werr != nil ***REMOVED***
+		if _, werr := w.w.Write(w.dst[:nDst]); werr != nil {
 			return n, werr
-		***REMOVED***
+		}
 		src = src[nSrc:]
-		if w.n == 0 ***REMOVED***
+		if w.n == 0 {
 			n += nSrc
-		***REMOVED*** else if len(src) <= n ***REMOVED***
+		} else if len(src) <= n {
 			// Enough bytes from w.src have been consumed. We make src point
 			// to data instead to reduce the copying.
 			w.n = 0
 			n -= len(src)
 			src = data[n:]
-			if n < len(data) && (err == nil || err == ErrShortSrc) ***REMOVED***
+			if n < len(data) && (err == nil || err == ErrShortSrc) {
 				continue
-			***REMOVED***
-		***REMOVED***
-		switch err ***REMOVED***
+			}
+		}
+		switch err {
 		case ErrShortDst:
 			// This error is okay as long as we are making progress.
-			if nDst > 0 || nSrc > 0 ***REMOVED***
+			if nDst > 0 || nSrc > 0 {
 				continue
-			***REMOVED***
+			}
 		case ErrShortSrc:
-			if len(src) < len(w.src) ***REMOVED***
+			if len(src) < len(w.src) {
 				m := copy(w.src, src)
 				// If w.n > 0, bytes from data were already copied to w.src and n
 				// was already set to the number of bytes consumed.
-				if w.n == 0 ***REMOVED***
+				if w.n == 0 {
 					n += m
-				***REMOVED***
+				}
 				w.n = m
 				err = nil
-			***REMOVED*** else if nDst > 0 || nSrc > 0 ***REMOVED***
+			} else if nDst > 0 || nSrc > 0 {
 				// Not enough buffer to store the remainder. Keep processing as
 				// long as there is progress. Without this case, transforms that
 				// require a lookahead larger than the buffer may result in an
@@ -282,58 +282,58 @@ func (w *Writer) Write(data []byte) (n int, err error) ***REMOVED***
 				// practice, but it may occur when buffers are set to small
 				// sizes during testing.
 				continue
-			***REMOVED***
+			}
 		case nil:
-			if w.n > 0 ***REMOVED***
+			if w.n > 0 {
 				err = errInconsistentByteCount
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		return n, err
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Close implements the io.Closer interface.
-func (w *Writer) Close() error ***REMOVED***
+func (w *Writer) Close() error {
 	src := w.src[:w.n]
-	for ***REMOVED***
+	for {
 		nDst, nSrc, err := w.t.Transform(w.dst, src, true)
-		if _, werr := w.w.Write(w.dst[:nDst]); werr != nil ***REMOVED***
+		if _, werr := w.w.Write(w.dst[:nDst]); werr != nil {
 			return werr
-		***REMOVED***
-		if err != ErrShortDst ***REMOVED***
+		}
+		if err != ErrShortDst {
 			return err
-		***REMOVED***
+		}
 		src = src[nSrc:]
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type nop struct***REMOVED*** NopResetter ***REMOVED***
+type nop struct{ NopResetter }
 
-func (nop) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) ***REMOVED***
+func (nop) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) {
 	n := copy(dst, src)
-	if n < len(src) ***REMOVED***
+	if n < len(src) {
 		err = ErrShortDst
-	***REMOVED***
+	}
 	return n, n, err
-***REMOVED***
+}
 
-func (nop) Span(src []byte, atEOF bool) (n int, err error) ***REMOVED***
+func (nop) Span(src []byte, atEOF bool) (n int, err error) {
 	return len(src), nil
-***REMOVED***
+}
 
-type discard struct***REMOVED*** NopResetter ***REMOVED***
+type discard struct{ NopResetter }
 
-func (discard) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) ***REMOVED***
+func (discard) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) {
 	return 0, len(src), nil
-***REMOVED***
+}
 
 var (
 	// Discard is a Transformer for which all Transform calls succeed
 	// by consuming all bytes and writing nothing.
-	Discard Transformer = discard***REMOVED******REMOVED***
+	Discard Transformer = discard{}
 
 	// Nop is a SpanningTransformer that copies src to dst.
-	Nop SpanningTransformer = nop***REMOVED******REMOVED***
+	Nop SpanningTransformer = nop{}
 )
 
 // chain is a sequence of links. A chain with N Transformers has N+1 links and
@@ -342,69 +342,69 @@ var (
 // buffers owned by the chain. The i'th link transforms bytes from the i'th
 // buffer chain.link[i].b at read offset chain.link[i].p to the i+1'th buffer
 // chain.link[i+1].b at write offset chain.link[i+1].n, for i in [0, N).
-type chain struct ***REMOVED***
+type chain struct {
 	link []link
 	err  error
 	// errStart is the index at which the error occurred plus 1. Processing
 	// errStart at this level at the next call to Transform. As long as
 	// errStart > 0, chain will not consume any more source bytes.
 	errStart int
-***REMOVED***
+}
 
-func (c *chain) fatalError(errIndex int, err error) ***REMOVED***
-	if i := errIndex + 1; i > c.errStart ***REMOVED***
+func (c *chain) fatalError(errIndex int, err error) {
+	if i := errIndex + 1; i > c.errStart {
 		c.errStart = i
 		c.err = err
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type link struct ***REMOVED***
+type link struct {
 	t Transformer
 	// b[p:n] holds the bytes to be transformed by t.
 	b []byte
 	p int
 	n int
-***REMOVED***
+}
 
-func (l *link) src() []byte ***REMOVED***
+func (l *link) src() []byte {
 	return l.b[l.p:l.n]
-***REMOVED***
+}
 
-func (l *link) dst() []byte ***REMOVED***
+func (l *link) dst() []byte {
 	return l.b[l.n:]
-***REMOVED***
+}
 
 // Chain returns a Transformer that applies t in sequence.
-func Chain(t ...Transformer) Transformer ***REMOVED***
-	if len(t) == 0 ***REMOVED***
-		return nop***REMOVED******REMOVED***
-	***REMOVED***
-	c := &chain***REMOVED***link: make([]link, len(t)+1)***REMOVED***
-	for i, tt := range t ***REMOVED***
+func Chain(t ...Transformer) Transformer {
+	if len(t) == 0 {
+		return nop{}
+	}
+	c := &chain{link: make([]link, len(t)+1)}
+	for i, tt := range t {
 		c.link[i].t = tt
-	***REMOVED***
+	}
 	// Allocate intermediate buffers.
 	b := make([][defaultBufSize]byte, len(t)-1)
-	for i := range b ***REMOVED***
+	for i := range b {
 		c.link[i+1].b = b[i][:]
-	***REMOVED***
+	}
 	return c
-***REMOVED***
+}
 
 // Reset resets the state of Chain. It calls Reset on all the Transformers.
-func (c *chain) Reset() ***REMOVED***
-	for i, l := range c.link ***REMOVED***
-		if l.t != nil ***REMOVED***
+func (c *chain) Reset() {
+	for i, l := range c.link {
+		if l.t != nil {
 			l.t.Reset()
-		***REMOVED***
+		}
 		c.link[i].p, c.link[i].n = 0, 0
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // TODO: make chain use Span (is going to be fun to implement!)
 
 // Transform applies the transformers of c in sequence.
-func (c *chain) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) ***REMOVED***
+func (c *chain) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) {
 	// Set up src and dst in the chain.
 	srcL := &c.link[0]
 	dstL := &c.link[len(c.link)-1]
@@ -417,23 +417,23 @@ func (c *chain) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err erro
 	// high is the highest index for which c.link[high] has a Transformer.
 	// The error returned by Transform determines whether to increase or
 	// decrease i. We try to completely fill a buffer before converting it.
-	for low, i, high := c.errStart, c.errStart, len(c.link)-2; low <= i && i <= high; ***REMOVED***
+	for low, i, high := c.errStart, c.errStart, len(c.link)-2; low <= i && i <= high; {
 		in, out := &c.link[i], &c.link[i+1]
 		nDst, nSrc, err0 := in.t.Transform(out.dst(), in.src(), atEOF && low == i)
 		out.n += nDst
 		in.p += nSrc
-		if i > 0 && in.p == in.n ***REMOVED***
+		if i > 0 && in.p == in.n {
 			in.p, in.n = 0, 0
-		***REMOVED***
+		}
 		needProgress, lastFull = lastFull, false
-		switch err0 ***REMOVED***
+		switch err0 {
 		case ErrShortDst:
 			// Process the destination buffer next. Return if we are already
 			// at the high index.
-			if i == high ***REMOVED***
+			if i == high {
 				return dstL.n, srcL.p, ErrShortDst
-			***REMOVED***
-			if out.n != 0 ***REMOVED***
+			}
+			if out.n != 0 {
 				i++
 				// If the Transformer at the next index is not able to process any
 				// source bytes there is nothing that can be done to make progress
@@ -441,26 +441,26 @@ func (c *chain) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err erro
 				// detect this and break out of the loop with a fatal error.
 				lastFull = true
 				continue
-			***REMOVED***
+			}
 			// The destination buffer was too small, but is completely empty.
 			// Return a fatal error as this transformation can never complete.
 			c.fatalError(i, errShortInternal)
 		case ErrShortSrc:
-			if i == 0 ***REMOVED***
+			if i == 0 {
 				// Save ErrShortSrc in err. All other errors take precedence.
 				err = ErrShortSrc
 				break
-			***REMOVED***
+			}
 			// Source bytes were depleted before filling up the destination buffer.
 			// Verify we made some progress, move the remaining bytes to the errStart
 			// and try to get more source bytes.
-			if needProgress && nSrc == 0 || in.n-in.p == len(in.b) ***REMOVED***
+			if needProgress && nSrc == 0 || in.n-in.p == len(in.b) {
 				// There were not enough source bytes to proceed while the source
 				// buffer cannot hold any more bytes. Return a fatal error as this
 				// transformation can never complete.
 				c.fatalError(i, errShortInternal)
 				break
-			***REMOVED***
+			}
 			// in.b is an internal buffer and we can make progress.
 			in.p, in.n = 0, copy(in.b, in.src())
 			fallthrough
@@ -468,116 +468,116 @@ func (c *chain) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err erro
 			// if i == low, we have depleted the bytes at index i or any lower levels.
 			// In that case we increase low and i. In all other cases we decrease i to
 			// fetch more bytes before proceeding to the next index.
-			if i > low ***REMOVED***
+			if i > low {
 				i--
 				continue
-			***REMOVED***
+			}
 		default:
 			c.fatalError(i, err0)
-		***REMOVED***
+		}
 		// Exhausted level low or fatal error: increase low and continue
 		// to process the bytes accepted so far.
 		i++
 		low = i
-	***REMOVED***
+	}
 
 	// If c.errStart > 0, this means we found a fatal error.  We will clear
 	// all upstream buffers. At this point, no more progress can be made
 	// downstream, as Transform would have bailed while handling ErrShortDst.
-	if c.errStart > 0 ***REMOVED***
-		for i := 1; i < c.errStart; i++ ***REMOVED***
+	if c.errStart > 0 {
+		for i := 1; i < c.errStart; i++ {
 			c.link[i].p, c.link[i].n = 0, 0
-		***REMOVED***
+		}
 		err, c.errStart, c.err = c.err, 0, nil
-	***REMOVED***
+	}
 	return dstL.n, srcL.p, err
-***REMOVED***
+}
 
 // Deprecated: use runes.Remove instead.
-func RemoveFunc(f func(r rune) bool) Transformer ***REMOVED***
+func RemoveFunc(f func(r rune) bool) Transformer {
 	return removeF(f)
-***REMOVED***
+}
 
 type removeF func(r rune) bool
 
-func (removeF) Reset() ***REMOVED******REMOVED***
+func (removeF) Reset() {}
 
 // Transform implements the Transformer interface.
-func (t removeF) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) ***REMOVED***
-	for r, sz := rune(0), 0; len(src) > 0; src = src[sz:] ***REMOVED***
+func (t removeF) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) {
+	for r, sz := rune(0), 0; len(src) > 0; src = src[sz:] {
 
-		if r = rune(src[0]); r < utf8.RuneSelf ***REMOVED***
+		if r = rune(src[0]); r < utf8.RuneSelf {
 			sz = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			r, sz = utf8.DecodeRune(src)
 
-			if sz == 1 ***REMOVED***
+			if sz == 1 {
 				// Invalid rune.
-				if !atEOF && !utf8.FullRune(src) ***REMOVED***
+				if !atEOF && !utf8.FullRune(src) {
 					err = ErrShortSrc
 					break
-				***REMOVED***
+				}
 				// We replace illegal bytes with RuneError. Not doing so might
 				// otherwise turn a sequence of invalid UTF-8 into valid UTF-8.
 				// The resulting byte sequence may subsequently contain runes
 				// for which t(r) is true that were passed unnoticed.
-				if !t(r) ***REMOVED***
-					if nDst+3 > len(dst) ***REMOVED***
+				if !t(r) {
+					if nDst+3 > len(dst) {
 						err = ErrShortDst
 						break
-					***REMOVED***
+					}
 					nDst += copy(dst[nDst:], "\uFFFD")
-				***REMOVED***
+				}
 				nSrc++
 				continue
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
-		if !t(r) ***REMOVED***
-			if nDst+sz > len(dst) ***REMOVED***
+		if !t(r) {
+			if nDst+sz > len(dst) {
 				err = ErrShortDst
 				break
-			***REMOVED***
+			}
 			nDst += copy(dst[nDst:], src[:sz])
-		***REMOVED***
+		}
 		nSrc += sz
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // grow returns a new []byte that is longer than b, and copies the first n bytes
 // of b to the start of the new slice.
-func grow(b []byte, n int) []byte ***REMOVED***
+func grow(b []byte, n int) []byte {
 	m := len(b)
-	if m <= 32 ***REMOVED***
+	if m <= 32 {
 		m = 64
-	***REMOVED*** else if m <= 256 ***REMOVED***
+	} else if m <= 256 {
 		m *= 2
-	***REMOVED*** else ***REMOVED***
+	} else {
 		m += m >> 1
-	***REMOVED***
+	}
 	buf := make([]byte, m)
 	copy(buf, b[:n])
 	return buf
-***REMOVED***
+}
 
 const initialBufSize = 128
 
 // String returns a string with the result of converting s[:n] using t, where
 // n <= len(s). If err == nil, n will be len(s). It calls Reset on t.
-func String(t Transformer, s string) (result string, n int, err error) ***REMOVED***
+func String(t Transformer, s string) (result string, n int, err error) {
 	t.Reset()
-	if s == "" ***REMOVED***
+	if s == "" {
 		// Fast path for the common case for empty input. Results in about a
 		// 86% reduction of running time for BenchmarkStringLowerEmpty.
-		if _, _, err := t.Transform(nil, nil, true); err == nil ***REMOVED***
+		if _, _, err := t.Transform(nil, nil, true); err == nil {
 			return "", 0, nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Allocate only once. Note that both dst and src escape when passed to
 	// Transform.
-	buf := [2 * initialBufSize]byte***REMOVED******REMOVED***
+	buf := [2 * initialBufSize]byte{}
 	dst := buf[:initialBufSize:initialBufSize]
 	src := buf[initialBufSize : 2*initialBufSize]
 
@@ -594,7 +594,7 @@ func String(t Transformer, s string) (result string, n int, err error) ***REMOVE
 	// being true returned nil error) then we don't need to allocate a new
 	// result string.
 	pPrefix := 0
-	for ***REMOVED***
+	for {
 		// Invariant: pDst == pPrefix && pSrc == pPrefix.
 
 		n := copy(src, s[pSrc:])
@@ -604,23 +604,23 @@ func String(t Transformer, s string) (result string, n int, err error) ***REMOVE
 
 		// TODO:  let transformers implement an optional Spanner interface, akin
 		// to norm's QuickSpan. This would even allow us to avoid any allocation.
-		if !bytes.Equal(dst[:nDst], src[:nSrc]) ***REMOVED***
+		if !bytes.Equal(dst[:nDst], src[:nSrc]) {
 			break
-		***REMOVED***
+		}
 		pPrefix = pSrc
-		if err == ErrShortDst ***REMOVED***
+		if err == ErrShortDst {
 			// A buffer can only be short if a transformer modifies its input.
 			break
-		***REMOVED*** else if err == ErrShortSrc ***REMOVED***
-			if nSrc == 0 ***REMOVED***
+		} else if err == ErrShortSrc {
+			if nSrc == 0 {
 				// No progress was made.
 				break
-			***REMOVED***
+			}
 			// Equal so far and !atEOF, so continue checking.
-		***REMOVED*** else if err != nil || pPrefix == len(s) ***REMOVED***
+		} else if err != nil || pPrefix == len(s) {
 			return string(s[:pPrefix]), pPrefix, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	// Post-condition: pDst == pPrefix + nDst && pSrc == pPrefix + nSrc.
 
 	// We have transformed the first pSrc bytes of the input s to become pDst
@@ -628,25 +628,25 @@ func String(t Transformer, s string) (result string, n int, err error) ***REMOVE
 	// pPrefix of them equal s[:pPrefix] and the last nDst of them equal
 	// dst[:nDst]. We copy them around, into a new dst buffer if necessary, so
 	// that they become one contiguous slice: dst[:pDst].
-	if pPrefix != 0 ***REMOVED***
+	if pPrefix != 0 {
 		newDst := dst
-		if pDst > len(newDst) ***REMOVED***
+		if pDst > len(newDst) {
 			newDst = make([]byte, len(s)+nDst-nSrc)
-		***REMOVED***
+		}
 		copy(newDst[pPrefix:pDst], dst[:nDst])
 		copy(newDst[:pPrefix], s[:pPrefix])
 		dst = newDst
-	***REMOVED***
+	}
 
 	// Prevent duplicate Transform calls with atEOF being true at the end of
 	// the input. Also return if we have an unrecoverable error.
 	if (err == nil && pSrc == len(s)) ||
-		(err != nil && err != ErrShortDst && err != ErrShortSrc) ***REMOVED***
+		(err != nil && err != ErrShortDst && err != ErrShortSrc) {
 		return string(dst[:pDst]), pSrc, err
-	***REMOVED***
+	}
 
 	// Transform the remaining input, growing dst and src buffers as necessary.
-	for ***REMOVED***
+	for {
 		n := copy(src, s[pSrc:])
 		nDst, nSrc, err := t.Transform(dst[pDst:], src[:n], pSrc+n == len(s))
 		pDst += nDst
@@ -654,52 +654,52 @@ func String(t Transformer, s string) (result string, n int, err error) ***REMOVE
 
 		// If we got ErrShortDst or ErrShortSrc, do not grow as long as we can
 		// make progress. This may avoid excessive allocations.
-		if err == ErrShortDst ***REMOVED***
-			if nDst == 0 ***REMOVED***
+		if err == ErrShortDst {
+			if nDst == 0 {
 				dst = grow(dst, pDst)
-			***REMOVED***
-		***REMOVED*** else if err == ErrShortSrc ***REMOVED***
-			if nSrc == 0 ***REMOVED***
+			}
+		} else if err == ErrShortSrc {
+			if nSrc == 0 {
 				src = grow(src, 0)
-			***REMOVED***
-		***REMOVED*** else if err != nil || pSrc == len(s) ***REMOVED***
+			}
+		} else if err != nil || pSrc == len(s) {
 			return string(dst[:pDst]), pSrc, err
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // Bytes returns a new byte slice with the result of converting b[:n] using t,
 // where n <= len(b). If err == nil, n will be len(b). It calls Reset on t.
-func Bytes(t Transformer, b []byte) (result []byte, n int, err error) ***REMOVED***
+func Bytes(t Transformer, b []byte) (result []byte, n int, err error) {
 	return doAppend(t, 0, make([]byte, len(b)), b)
-***REMOVED***
+}
 
 // Append appends the result of converting src[:n] using t to dst, where
 // n <= len(src), If err == nil, n will be len(src). It calls Reset on t.
-func Append(t Transformer, dst, src []byte) (result []byte, n int, err error) ***REMOVED***
-	if len(dst) == cap(dst) ***REMOVED***
+func Append(t Transformer, dst, src []byte) (result []byte, n int, err error) {
+	if len(dst) == cap(dst) {
 		n := len(src) + len(dst) // It is okay for this to be 0.
 		b := make([]byte, n)
 		dst = b[:copy(b, dst)]
-	***REMOVED***
+	}
 	return doAppend(t, len(dst), dst[:cap(dst)], src)
-***REMOVED***
+}
 
-func doAppend(t Transformer, pDst int, dst, src []byte) (result []byte, n int, err error) ***REMOVED***
+func doAppend(t Transformer, pDst int, dst, src []byte) (result []byte, n int, err error) {
 	t.Reset()
 	pSrc := 0
-	for ***REMOVED***
+	for {
 		nDst, nSrc, err := t.Transform(dst[pDst:], src[pSrc:], true)
 		pDst += nDst
 		pSrc += nSrc
-		if err != ErrShortDst ***REMOVED***
+		if err != ErrShortDst {
 			return dst[:pDst], pSrc, err
-		***REMOVED***
+		}
 
 		// Grow the destination buffer, but do not grow as long as we can make
 		// progress. This may avoid excessive allocations.
-		if nDst == 0 ***REMOVED***
+		if nDst == 0 {
 			dst = grow(dst, pDst)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

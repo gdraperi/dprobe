@@ -28,106 +28,106 @@ var (
 	defaultV2AuthPrefix = "/v2/auth"
 )
 
-type User struct ***REMOVED***
+type User struct {
 	User     string   `json:"user"`
 	Password string   `json:"password,omitempty"`
 	Roles    []string `json:"roles"`
 	Grant    []string `json:"grant,omitempty"`
 	Revoke   []string `json:"revoke,omitempty"`
-***REMOVED***
+}
 
 // userListEntry is the user representation given by the server for ListUsers
-type userListEntry struct ***REMOVED***
+type userListEntry struct {
 	User  string `json:"user"`
 	Roles []Role `json:"roles"`
-***REMOVED***
+}
 
-type UserRoles struct ***REMOVED***
+type UserRoles struct {
 	User  string `json:"user"`
 	Roles []Role `json:"roles"`
-***REMOVED***
+}
 
-func v2AuthURL(ep url.URL, action string, name string) *url.URL ***REMOVED***
-	if name != "" ***REMOVED***
+func v2AuthURL(ep url.URL, action string, name string) *url.URL {
+	if name != "" {
 		ep.Path = path.Join(ep.Path, defaultV2AuthPrefix, action, name)
 		return &ep
-	***REMOVED***
+	}
 	ep.Path = path.Join(ep.Path, defaultV2AuthPrefix, action)
 	return &ep
-***REMOVED***
+}
 
 // NewAuthAPI constructs a new AuthAPI that uses HTTP to
 // interact with etcd's general auth features.
-func NewAuthAPI(c Client) AuthAPI ***REMOVED***
-	return &httpAuthAPI***REMOVED***
+func NewAuthAPI(c Client) AuthAPI {
+	return &httpAuthAPI{
 		client: c,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type AuthAPI interface ***REMOVED***
+type AuthAPI interface {
 	// Enable auth.
 	Enable(ctx context.Context) error
 
 	// Disable auth.
 	Disable(ctx context.Context) error
-***REMOVED***
+}
 
-type httpAuthAPI struct ***REMOVED***
+type httpAuthAPI struct {
 	client httpClient
-***REMOVED***
+}
 
-func (s *httpAuthAPI) Enable(ctx context.Context) error ***REMOVED***
-	return s.enableDisable(ctx, &authAPIAction***REMOVED***"PUT"***REMOVED***)
-***REMOVED***
+func (s *httpAuthAPI) Enable(ctx context.Context) error {
+	return s.enableDisable(ctx, &authAPIAction{"PUT"})
+}
 
-func (s *httpAuthAPI) Disable(ctx context.Context) error ***REMOVED***
-	return s.enableDisable(ctx, &authAPIAction***REMOVED***"DELETE"***REMOVED***)
-***REMOVED***
+func (s *httpAuthAPI) Disable(ctx context.Context) error {
+	return s.enableDisable(ctx, &authAPIAction{"DELETE"})
+}
 
-func (s *httpAuthAPI) enableDisable(ctx context.Context, req httpAction) error ***REMOVED***
+func (s *httpAuthAPI) enableDisable(ctx context.Context, req httpAction) error {
 	resp, body, err := s.client.Do(ctx, req)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	if err = assertStatusCode(resp.StatusCode, http.StatusOK, http.StatusCreated); err != nil ***REMOVED***
+	}
+	if err = assertStatusCode(resp.StatusCode, http.StatusOK, http.StatusCreated); err != nil {
 		var sec authError
 		err = json.Unmarshal(body, &sec)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		return sec
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-type authAPIAction struct ***REMOVED***
+type authAPIAction struct {
 	verb string
-***REMOVED***
+}
 
-func (l *authAPIAction) HTTPRequest(ep url.URL) *http.Request ***REMOVED***
+func (l *authAPIAction) HTTPRequest(ep url.URL) *http.Request {
 	u := v2AuthURL(ep, "enable", "")
 	req, _ := http.NewRequest(l.verb, u.String(), nil)
 	return req
-***REMOVED***
+}
 
-type authError struct ***REMOVED***
+type authError struct {
 	Message string `json:"message"`
 	Code    int    `json:"-"`
-***REMOVED***
+}
 
-func (e authError) Error() string ***REMOVED***
+func (e authError) Error() string {
 	return e.Message
-***REMOVED***
+}
 
 // NewAuthUserAPI constructs a new AuthUserAPI that uses HTTP to
 // interact with etcd's user creation and modification features.
-func NewAuthUserAPI(c Client) AuthUserAPI ***REMOVED***
-	return &httpAuthUserAPI***REMOVED***
+func NewAuthUserAPI(c Client) AuthUserAPI {
+	return &httpAuthUserAPI{
 		client: c,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type AuthUserAPI interface ***REMOVED***
+type AuthUserAPI interface {
 	// AddUser adds a user.
 	AddUser(ctx context.Context, username string, password string) error
 
@@ -148,173 +148,173 @@ type AuthUserAPI interface ***REMOVED***
 
 	// ListUsers lists the users.
 	ListUsers(ctx context.Context) ([]string, error)
-***REMOVED***
+}
 
-type httpAuthUserAPI struct ***REMOVED***
+type httpAuthUserAPI struct {
 	client httpClient
-***REMOVED***
+}
 
-type authUserAPIAction struct ***REMOVED***
+type authUserAPIAction struct {
 	verb     string
 	username string
 	user     *User
-***REMOVED***
+}
 
-type authUserAPIList struct***REMOVED******REMOVED***
+type authUserAPIList struct{}
 
-func (list *authUserAPIList) HTTPRequest(ep url.URL) *http.Request ***REMOVED***
+func (list *authUserAPIList) HTTPRequest(ep url.URL) *http.Request {
 	u := v2AuthURL(ep, "users", "")
 	req, _ := http.NewRequest("GET", u.String(), nil)
 	req.Header.Set("Content-Type", "application/json")
 	return req
-***REMOVED***
+}
 
-func (l *authUserAPIAction) HTTPRequest(ep url.URL) *http.Request ***REMOVED***
+func (l *authUserAPIAction) HTTPRequest(ep url.URL) *http.Request {
 	u := v2AuthURL(ep, "users", l.username)
-	if l.user == nil ***REMOVED***
+	if l.user == nil {
 		req, _ := http.NewRequest(l.verb, u.String(), nil)
 		return req
-	***REMOVED***
+	}
 	b, err := json.Marshal(l.user)
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 	body := bytes.NewReader(b)
 	req, _ := http.NewRequest(l.verb, u.String(), body)
 	req.Header.Set("Content-Type", "application/json")
 	return req
-***REMOVED***
+}
 
-func (u *httpAuthUserAPI) ListUsers(ctx context.Context) ([]string, error) ***REMOVED***
-	resp, body, err := u.client.Do(ctx, &authUserAPIList***REMOVED******REMOVED***)
-	if err != nil ***REMOVED***
+func (u *httpAuthUserAPI) ListUsers(ctx context.Context) ([]string, error) {
+	resp, body, err := u.client.Do(ctx, &authUserAPIList{})
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if err = assertStatusCode(resp.StatusCode, http.StatusOK); err != nil ***REMOVED***
+	}
+	if err = assertStatusCode(resp.StatusCode, http.StatusOK); err != nil {
 		var sec authError
 		err = json.Unmarshal(body, &sec)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		return nil, sec
-	***REMOVED***
+	}
 
-	var userList struct ***REMOVED***
+	var userList struct {
 		Users []userListEntry `json:"users"`
-	***REMOVED***
+	}
 
-	if err = json.Unmarshal(body, &userList); err != nil ***REMOVED***
+	if err = json.Unmarshal(body, &userList); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	ret := make([]string, 0, len(userList.Users))
-	for _, u := range userList.Users ***REMOVED***
+	for _, u := range userList.Users {
 		ret = append(ret, u.User)
-	***REMOVED***
+	}
 	return ret, nil
-***REMOVED***
+}
 
-func (u *httpAuthUserAPI) AddUser(ctx context.Context, username string, password string) error ***REMOVED***
-	user := &User***REMOVED***
+func (u *httpAuthUserAPI) AddUser(ctx context.Context, username string, password string) error {
+	user := &User{
 		User:     username,
 		Password: password,
-	***REMOVED***
-	return u.addRemoveUser(ctx, &authUserAPIAction***REMOVED***
+	}
+	return u.addRemoveUser(ctx, &authUserAPIAction{
 		verb:     "PUT",
 		username: username,
 		user:     user,
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func (u *httpAuthUserAPI) RemoveUser(ctx context.Context, username string) error ***REMOVED***
-	return u.addRemoveUser(ctx, &authUserAPIAction***REMOVED***
+func (u *httpAuthUserAPI) RemoveUser(ctx context.Context, username string) error {
+	return u.addRemoveUser(ctx, &authUserAPIAction{
 		verb:     "DELETE",
 		username: username,
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func (u *httpAuthUserAPI) addRemoveUser(ctx context.Context, req *authUserAPIAction) error ***REMOVED***
+func (u *httpAuthUserAPI) addRemoveUser(ctx context.Context, req *authUserAPIAction) error {
 	resp, body, err := u.client.Do(ctx, req)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	if err = assertStatusCode(resp.StatusCode, http.StatusOK, http.StatusCreated); err != nil ***REMOVED***
+	}
+	if err = assertStatusCode(resp.StatusCode, http.StatusOK, http.StatusCreated); err != nil {
 		var sec authError
 		err = json.Unmarshal(body, &sec)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		return sec
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (u *httpAuthUserAPI) GetUser(ctx context.Context, username string) (*User, error) ***REMOVED***
-	return u.modUser(ctx, &authUserAPIAction***REMOVED***
+func (u *httpAuthUserAPI) GetUser(ctx context.Context, username string) (*User, error) {
+	return u.modUser(ctx, &authUserAPIAction{
 		verb:     "GET",
 		username: username,
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func (u *httpAuthUserAPI) GrantUser(ctx context.Context, username string, roles []string) (*User, error) ***REMOVED***
-	user := &User***REMOVED***
+func (u *httpAuthUserAPI) GrantUser(ctx context.Context, username string, roles []string) (*User, error) {
+	user := &User{
 		User:  username,
 		Grant: roles,
-	***REMOVED***
-	return u.modUser(ctx, &authUserAPIAction***REMOVED***
+	}
+	return u.modUser(ctx, &authUserAPIAction{
 		verb:     "PUT",
 		username: username,
 		user:     user,
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func (u *httpAuthUserAPI) RevokeUser(ctx context.Context, username string, roles []string) (*User, error) ***REMOVED***
-	user := &User***REMOVED***
+func (u *httpAuthUserAPI) RevokeUser(ctx context.Context, username string, roles []string) (*User, error) {
+	user := &User{
 		User:   username,
 		Revoke: roles,
-	***REMOVED***
-	return u.modUser(ctx, &authUserAPIAction***REMOVED***
+	}
+	return u.modUser(ctx, &authUserAPIAction{
 		verb:     "PUT",
 		username: username,
 		user:     user,
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func (u *httpAuthUserAPI) ChangePassword(ctx context.Context, username string, password string) (*User, error) ***REMOVED***
-	user := &User***REMOVED***
+func (u *httpAuthUserAPI) ChangePassword(ctx context.Context, username string, password string) (*User, error) {
+	user := &User{
 		User:     username,
 		Password: password,
-	***REMOVED***
-	return u.modUser(ctx, &authUserAPIAction***REMOVED***
+	}
+	return u.modUser(ctx, &authUserAPIAction{
 		verb:     "PUT",
 		username: username,
 		user:     user,
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func (u *httpAuthUserAPI) modUser(ctx context.Context, req *authUserAPIAction) (*User, error) ***REMOVED***
+func (u *httpAuthUserAPI) modUser(ctx context.Context, req *authUserAPIAction) (*User, error) {
 	resp, body, err := u.client.Do(ctx, req)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if err = assertStatusCode(resp.StatusCode, http.StatusOK); err != nil ***REMOVED***
+	}
+	if err = assertStatusCode(resp.StatusCode, http.StatusOK); err != nil {
 		var sec authError
 		err = json.Unmarshal(body, &sec)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		return nil, sec
-	***REMOVED***
+	}
 	var user User
-	if err = json.Unmarshal(body, &user); err != nil ***REMOVED***
+	if err = json.Unmarshal(body, &user); err != nil {
 		var userR UserRoles
-		if urerr := json.Unmarshal(body, &userR); urerr != nil ***REMOVED***
+		if urerr := json.Unmarshal(body, &userR); urerr != nil {
 			return nil, err
-		***REMOVED***
+		}
 		user.User = userR.User
-		for _, r := range userR.Roles ***REMOVED***
+		for _, r := range userR.Roles {
 			user.Roles = append(user.Roles, r.Role)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return &user, nil
-***REMOVED***
+}

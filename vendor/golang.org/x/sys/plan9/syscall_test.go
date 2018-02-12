@@ -12,22 +12,22 @@ import (
 	"golang.org/x/sys/plan9"
 )
 
-func testSetGetenv(t *testing.T, key, value string) ***REMOVED***
+func testSetGetenv(t *testing.T, key, value string) {
 	err := plan9.Setenv(key, value)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("Setenv failed to set %q: %v", value, err)
-	***REMOVED***
+	}
 	newvalue, found := plan9.Getenv(key)
-	if !found ***REMOVED***
+	if !found {
 		t.Fatalf("Getenv failed to find %v variable (want value %q)", key, value)
-	***REMOVED***
-	if newvalue != value ***REMOVED***
+	}
+	if newvalue != value {
 		t.Fatalf("Getenv(%v) = %q; want %q", key, newvalue, value)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestEnv(t *testing.T) ***REMOVED***
+func TestEnv(t *testing.T) {
 	testSetGetenv(t, "TESTENV", "AVALUE")
 	// make sure TESTENV gets set to "", not deleted
 	testSetGetenv(t, "TESTENV", "")
-***REMOVED***
+}

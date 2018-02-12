@@ -19,27 +19,27 @@ import (
 // Run executes service name by calling appropriate handler function.
 // The process is running on console, unlike real service. Use Ctrl+C to
 // send "Stop" command to your service.
-func Run(name string, handler svc.Handler) error ***REMOVED***
+func Run(name string, handler svc.Handler) error {
 	cmds := make(chan svc.ChangeRequest)
 	changes := make(chan svc.Status)
 
 	sig := make(chan os.Signal)
 	signal.Notify(sig)
 
-	go func() ***REMOVED***
-		status := svc.Status***REMOVED***State: svc.Stopped***REMOVED***
-		for ***REMOVED***
-			select ***REMOVED***
+	go func() {
+		status := svc.Status{State: svc.Stopped}
+		for {
+			select {
 			case <-sig:
-				cmds <- svc.ChangeRequest***REMOVED***svc.Stop, 0, 0, status***REMOVED***
+				cmds <- svc.ChangeRequest{svc.Stop, 0, 0, status}
 			case status = <-changes:
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***()
+			}
+		}
+	}()
 
-	_, errno := handler.Execute([]string***REMOVED***name***REMOVED***, cmds, changes)
-	if errno != 0 ***REMOVED***
+	_, errno := handler.Execute([]string{name}, cmds, changes)
+	if errno != 0 {
 		return syscall.Errno(errno)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

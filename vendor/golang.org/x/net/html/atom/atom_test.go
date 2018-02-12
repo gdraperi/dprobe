@@ -9,28 +9,28 @@ import (
 	"testing"
 )
 
-func TestKnown(t *testing.T) ***REMOVED***
-	for _, s := range testAtomList ***REMOVED***
-		if atom := Lookup([]byte(s)); atom.String() != s ***REMOVED***
+func TestKnown(t *testing.T) {
+	for _, s := range testAtomList {
+		if atom := Lookup([]byte(s)); atom.String() != s {
 			t.Errorf("Lookup(%q) = %#x (%q)", s, uint32(atom), atom.String())
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestHits(t *testing.T) ***REMOVED***
-	for _, a := range table ***REMOVED***
-		if a == 0 ***REMOVED***
+func TestHits(t *testing.T) {
+	for _, a := range table {
+		if a == 0 {
 			continue
-		***REMOVED***
+		}
 		got := Lookup([]byte(a.String()))
-		if got != a ***REMOVED***
+		if got != a {
 			t.Errorf("Lookup(%q) = %#x, want %#x", a.String(), uint32(got), uint32(a))
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestMisses(t *testing.T) ***REMOVED***
-	testCases := []string***REMOVED***
+func TestMisses(t *testing.T) {
+	testCases := []string{
 		"",
 		"\x00",
 		"\xff",
@@ -56,54 +56,54 @@ func TestMisses(t *testing.T) ***REMOVED***
 		"λ",
 		// The following string has the same hash (0xa1d7fab7) as "onmouseover".
 		"\x00\x00\x00\x00\x00\x50\x18\xae\x38\xd0\xb7",
-	***REMOVED***
-	for _, tc := range testCases ***REMOVED***
+	}
+	for _, tc := range testCases {
 		got := Lookup([]byte(tc))
-		if got != 0 ***REMOVED***
+		if got != 0 {
 			t.Errorf("Lookup(%q): got %d, want 0", tc, got)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestForeignObject(t *testing.T) ***REMOVED***
+func TestForeignObject(t *testing.T) {
 	const (
 		afo = Foreignobject
 		afO = ForeignObject
 		sfo = "foreignobject"
 		sfO = "foreignObject"
 	)
-	if got := Lookup([]byte(sfo)); got != afo ***REMOVED***
+	if got := Lookup([]byte(sfo)); got != afo {
 		t.Errorf("Lookup(%q): got %#v, want %#v", sfo, got, afo)
-	***REMOVED***
-	if got := Lookup([]byte(sfO)); got != afO ***REMOVED***
+	}
+	if got := Lookup([]byte(sfO)); got != afO {
 		t.Errorf("Lookup(%q): got %#v, want %#v", sfO, got, afO)
-	***REMOVED***
-	if got := afo.String(); got != sfo ***REMOVED***
+	}
+	if got := afo.String(); got != sfo {
 		t.Errorf("Atom(%#v).String(): got %q, want %q", afo, got, sfo)
-	***REMOVED***
-	if got := afO.String(); got != sfO ***REMOVED***
+	}
+	if got := afO.String(); got != sfO {
 		t.Errorf("Atom(%#v).String(): got %q, want %q", afO, got, sfO)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func BenchmarkLookup(b *testing.B) ***REMOVED***
+func BenchmarkLookup(b *testing.B) {
 	sortedTable := make([]string, 0, len(table))
-	for _, a := range table ***REMOVED***
-		if a != 0 ***REMOVED***
+	for _, a := range table {
+		if a != 0 {
 			sortedTable = append(sortedTable, a.String())
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	sort.Strings(sortedTable)
 
 	x := make([][]byte, 1000)
-	for i := range x ***REMOVED***
+	for i := range x {
 		x[i] = []byte(sortedTable[i%len(sortedTable)])
-	***REMOVED***
+	}
 
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ ***REMOVED***
-		for _, s := range x ***REMOVED***
+	for i := 0; i < b.N; i++ {
+		for _, s := range x {
 			Lookup(s)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

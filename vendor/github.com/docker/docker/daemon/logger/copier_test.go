@@ -12,45 +12,45 @@ import (
 	"time"
 )
 
-type TestLoggerJSON struct ***REMOVED***
+type TestLoggerJSON struct {
 	*json.Encoder
 	mu    sync.Mutex
 	delay time.Duration
-***REMOVED***
+}
 
-func (l *TestLoggerJSON) Log(m *Message) error ***REMOVED***
-	if l.delay > 0 ***REMOVED***
+func (l *TestLoggerJSON) Log(m *Message) error {
+	if l.delay > 0 {
 		time.Sleep(l.delay)
-	***REMOVED***
+	}
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	return l.Encode(m)
-***REMOVED***
+}
 
-func (l *TestLoggerJSON) Close() error ***REMOVED*** return nil ***REMOVED***
+func (l *TestLoggerJSON) Close() error { return nil }
 
-func (l *TestLoggerJSON) Name() string ***REMOVED*** return "json" ***REMOVED***
+func (l *TestLoggerJSON) Name() string { return "json" }
 
-type TestSizedLoggerJSON struct ***REMOVED***
+type TestSizedLoggerJSON struct {
 	*json.Encoder
 	mu sync.Mutex
-***REMOVED***
+}
 
-func (l *TestSizedLoggerJSON) Log(m *Message) error ***REMOVED***
+func (l *TestSizedLoggerJSON) Log(m *Message) error {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	return l.Encode(m)
-***REMOVED***
+}
 
-func (*TestSizedLoggerJSON) Close() error ***REMOVED*** return nil ***REMOVED***
+func (*TestSizedLoggerJSON) Close() error { return nil }
 
-func (*TestSizedLoggerJSON) Name() string ***REMOVED*** return "sized-json" ***REMOVED***
+func (*TestSizedLoggerJSON) Name() string { return "sized-json" }
 
-func (*TestSizedLoggerJSON) BufSize() int ***REMOVED***
+func (*TestSizedLoggerJSON) BufSize() int {
 	return 32 * 1024
-***REMOVED***
+}
 
-func TestCopier(t *testing.T) ***REMOVED***
+func TestCopier(t *testing.T) {
 	stdoutLine := "Line that thinks that it is log line from docker stdout"
 	stderrLine := "Line that thinks that it is log line from docker stderr"
 	stdoutTrailingLine := "stdout trailing line"
@@ -58,71 +58,71 @@ func TestCopier(t *testing.T) ***REMOVED***
 
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
-	for i := 0; i < 30; i++ ***REMOVED***
-		if _, err := stdout.WriteString(stdoutLine + "\n"); err != nil ***REMOVED***
+	for i := 0; i < 30; i++ {
+		if _, err := stdout.WriteString(stdoutLine + "\n"); err != nil {
 			t.Fatal(err)
-		***REMOVED***
-		if _, err := stderr.WriteString(stderrLine + "\n"); err != nil ***REMOVED***
+		}
+		if _, err := stderr.WriteString(stderrLine + "\n"); err != nil {
 			t.Fatal(err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Test remaining lines without line-endings
-	if _, err := stdout.WriteString(stdoutTrailingLine); err != nil ***REMOVED***
+	if _, err := stdout.WriteString(stdoutTrailingLine); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if _, err := stderr.WriteString(stderrTrailingLine); err != nil ***REMOVED***
+	}
+	if _, err := stderr.WriteString(stderrTrailingLine); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	var jsonBuf bytes.Buffer
 
-	jsonLog := &TestLoggerJSON***REMOVED***Encoder: json.NewEncoder(&jsonBuf)***REMOVED***
+	jsonLog := &TestLoggerJSON{Encoder: json.NewEncoder(&jsonBuf)}
 
 	c := NewCopier(
-		map[string]io.Reader***REMOVED***
+		map[string]io.Reader{
 			"stdout": &stdout,
 			"stderr": &stderr,
-		***REMOVED***,
+		},
 		jsonLog)
 	c.Run()
-	wait := make(chan struct***REMOVED******REMOVED***)
-	go func() ***REMOVED***
+	wait := make(chan struct{})
+	go func() {
 		c.Wait()
 		close(wait)
-	***REMOVED***()
-	select ***REMOVED***
+	}()
+	select {
 	case <-time.After(1 * time.Second):
 		t.Fatal("Copier failed to do its work in 1 second")
 	case <-wait:
-	***REMOVED***
+	}
 	dec := json.NewDecoder(&jsonBuf)
-	for ***REMOVED***
+	for {
 		var msg Message
-		if err := dec.Decode(&msg); err != nil ***REMOVED***
-			if err == io.EOF ***REMOVED***
+		if err := dec.Decode(&msg); err != nil {
+			if err == io.EOF {
 				break
-			***REMOVED***
+			}
 			t.Fatal(err)
-		***REMOVED***
-		if msg.Source != "stdout" && msg.Source != "stderr" ***REMOVED***
+		}
+		if msg.Source != "stdout" && msg.Source != "stderr" {
 			t.Fatalf("Wrong Source: %q, should be %q or %q", msg.Source, "stdout", "stderr")
-		***REMOVED***
-		if msg.Source == "stdout" ***REMOVED***
-			if string(msg.Line) != stdoutLine && string(msg.Line) != stdoutTrailingLine ***REMOVED***
+		}
+		if msg.Source == "stdout" {
+			if string(msg.Line) != stdoutLine && string(msg.Line) != stdoutTrailingLine {
 				t.Fatalf("Wrong Line: %q, expected %q or %q", msg.Line, stdoutLine, stdoutTrailingLine)
-			***REMOVED***
-		***REMOVED***
-		if msg.Source == "stderr" ***REMOVED***
-			if string(msg.Line) != stderrLine && string(msg.Line) != stderrTrailingLine ***REMOVED***
+			}
+		}
+		if msg.Source == "stderr" {
+			if string(msg.Line) != stderrLine && string(msg.Line) != stderrTrailingLine {
 				t.Fatalf("Wrong Line: %q, expected %q or %q", msg.Line, stderrLine, stderrTrailingLine)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}
 
 // TestCopierLongLines tests long lines without line breaks
-func TestCopierLongLines(t *testing.T) ***REMOVED***
+func TestCopierLongLines(t *testing.T) {
 	// Long lines (should be split at "defaultBufSize")
 	stdoutLongLine := strings.Repeat("a", defaultBufSize)
 	stderrLongLine := strings.Repeat("b", defaultBufSize)
@@ -132,103 +132,103 @@ func TestCopierLongLines(t *testing.T) ***REMOVED***
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
 
-	for i := 0; i < 3; i++ ***REMOVED***
-		if _, err := stdout.WriteString(stdoutLongLine); err != nil ***REMOVED***
+	for i := 0; i < 3; i++ {
+		if _, err := stdout.WriteString(stdoutLongLine); err != nil {
 			t.Fatal(err)
-		***REMOVED***
-		if _, err := stderr.WriteString(stderrLongLine); err != nil ***REMOVED***
+		}
+		if _, err := stderr.WriteString(stderrLongLine); err != nil {
 			t.Fatal(err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if _, err := stdout.WriteString(stdoutTrailingLine); err != nil ***REMOVED***
+	if _, err := stdout.WriteString(stdoutTrailingLine); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if _, err := stderr.WriteString(stderrTrailingLine); err != nil ***REMOVED***
+	}
+	if _, err := stderr.WriteString(stderrTrailingLine); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	var jsonBuf bytes.Buffer
 
-	jsonLog := &TestLoggerJSON***REMOVED***Encoder: json.NewEncoder(&jsonBuf)***REMOVED***
+	jsonLog := &TestLoggerJSON{Encoder: json.NewEncoder(&jsonBuf)}
 
 	c := NewCopier(
-		map[string]io.Reader***REMOVED***
+		map[string]io.Reader{
 			"stdout": &stdout,
 			"stderr": &stderr,
-		***REMOVED***,
+		},
 		jsonLog)
 	c.Run()
-	wait := make(chan struct***REMOVED******REMOVED***)
-	go func() ***REMOVED***
+	wait := make(chan struct{})
+	go func() {
 		c.Wait()
 		close(wait)
-	***REMOVED***()
-	select ***REMOVED***
+	}()
+	select {
 	case <-time.After(1 * time.Second):
 		t.Fatal("Copier failed to do its work in 1 second")
 	case <-wait:
-	***REMOVED***
+	}
 	dec := json.NewDecoder(&jsonBuf)
-	for ***REMOVED***
+	for {
 		var msg Message
-		if err := dec.Decode(&msg); err != nil ***REMOVED***
-			if err == io.EOF ***REMOVED***
+		if err := dec.Decode(&msg); err != nil {
+			if err == io.EOF {
 				break
-			***REMOVED***
+			}
 			t.Fatal(err)
-		***REMOVED***
-		if msg.Source != "stdout" && msg.Source != "stderr" ***REMOVED***
+		}
+		if msg.Source != "stdout" && msg.Source != "stderr" {
 			t.Fatalf("Wrong Source: %q, should be %q or %q", msg.Source, "stdout", "stderr")
-		***REMOVED***
-		if msg.Source == "stdout" ***REMOVED***
-			if string(msg.Line) != stdoutLongLine && string(msg.Line) != stdoutTrailingLine ***REMOVED***
+		}
+		if msg.Source == "stdout" {
+			if string(msg.Line) != stdoutLongLine && string(msg.Line) != stdoutTrailingLine {
 				t.Fatalf("Wrong Line: %q, expected 'stdoutLongLine' or 'stdoutTrailingLine'", msg.Line)
-			***REMOVED***
-		***REMOVED***
-		if msg.Source == "stderr" ***REMOVED***
-			if string(msg.Line) != stderrLongLine && string(msg.Line) != stderrTrailingLine ***REMOVED***
+			}
+		}
+		if msg.Source == "stderr" {
+			if string(msg.Line) != stderrLongLine && string(msg.Line) != stderrTrailingLine {
 				t.Fatalf("Wrong Line: %q, expected 'stderrLongLine' or 'stderrTrailingLine'", msg.Line)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}
 
-func TestCopierSlow(t *testing.T) ***REMOVED***
+func TestCopierSlow(t *testing.T) {
 	stdoutLine := "Line that thinks that it is log line from docker stdout"
 	var stdout bytes.Buffer
-	for i := 0; i < 30; i++ ***REMOVED***
-		if _, err := stdout.WriteString(stdoutLine + "\n"); err != nil ***REMOVED***
+	for i := 0; i < 30; i++ {
+		if _, err := stdout.WriteString(stdoutLine + "\n"); err != nil {
 			t.Fatal(err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	var jsonBuf bytes.Buffer
-	//encoder := &encodeCloser***REMOVED***Encoder: json.NewEncoder(&jsonBuf)***REMOVED***
-	jsonLog := &TestLoggerJSON***REMOVED***Encoder: json.NewEncoder(&jsonBuf), delay: 100 * time.Millisecond***REMOVED***
+	//encoder := &encodeCloser{Encoder: json.NewEncoder(&jsonBuf)}
+	jsonLog := &TestLoggerJSON{Encoder: json.NewEncoder(&jsonBuf), delay: 100 * time.Millisecond}
 
-	c := NewCopier(map[string]io.Reader***REMOVED***"stdout": &stdout***REMOVED***, jsonLog)
+	c := NewCopier(map[string]io.Reader{"stdout": &stdout}, jsonLog)
 	c.Run()
-	wait := make(chan struct***REMOVED******REMOVED***)
-	go func() ***REMOVED***
+	wait := make(chan struct{})
+	go func() {
 		c.Wait()
 		close(wait)
-	***REMOVED***()
+	}()
 	<-time.After(150 * time.Millisecond)
 	c.Close()
-	select ***REMOVED***
+	select {
 	case <-time.After(200 * time.Millisecond):
 		t.Fatal("failed to exit in time after the copier is closed")
 	case <-wait:
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestCopierWithSized(t *testing.T) ***REMOVED***
+func TestCopierWithSized(t *testing.T) {
 	var jsonBuf bytes.Buffer
 	expectedMsgs := 2
-	sizedLogger := &TestSizedLoggerJSON***REMOVED***Encoder: json.NewEncoder(&jsonBuf)***REMOVED***
+	sizedLogger := &TestSizedLoggerJSON{Encoder: json.NewEncoder(&jsonBuf)}
 	logbuf := bytes.NewBufferString(strings.Repeat(".", sizedLogger.BufSize()*expectedMsgs))
-	c := NewCopier(map[string]io.Reader***REMOVED***"stdout": logbuf***REMOVED***, sizedLogger)
+	c := NewCopier(map[string]io.Reader{"stdout": logbuf}, sizedLogger)
 
 	c.Run()
 	// Wait for Copier to finish writing to the buffered logger.
@@ -237,113 +237,113 @@ func TestCopierWithSized(t *testing.T) ***REMOVED***
 
 	recvdMsgs := 0
 	dec := json.NewDecoder(&jsonBuf)
-	for ***REMOVED***
+	for {
 		var msg Message
-		if err := dec.Decode(&msg); err != nil ***REMOVED***
-			if err == io.EOF ***REMOVED***
+		if err := dec.Decode(&msg); err != nil {
+			if err == io.EOF {
 				break
-			***REMOVED***
+			}
 			t.Fatal(err)
-		***REMOVED***
-		if msg.Source != "stdout" ***REMOVED***
+		}
+		if msg.Source != "stdout" {
 			t.Fatalf("Wrong Source: %q, should be %q", msg.Source, "stdout")
-		***REMOVED***
-		if len(msg.Line) != sizedLogger.BufSize() ***REMOVED***
+		}
+		if len(msg.Line) != sizedLogger.BufSize() {
 			t.Fatalf("Line was not of expected max length %d, was %d", sizedLogger.BufSize(), len(msg.Line))
-		***REMOVED***
+		}
 		recvdMsgs++
-	***REMOVED***
-	if recvdMsgs != expectedMsgs ***REMOVED***
+	}
+	if recvdMsgs != expectedMsgs {
 		t.Fatalf("expected to receive %d messages, actually received %d", expectedMsgs, recvdMsgs)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type BenchmarkLoggerDummy struct ***REMOVED***
-***REMOVED***
+type BenchmarkLoggerDummy struct {
+}
 
-func (l *BenchmarkLoggerDummy) Log(m *Message) error ***REMOVED*** PutMessage(m); return nil ***REMOVED***
+func (l *BenchmarkLoggerDummy) Log(m *Message) error { PutMessage(m); return nil }
 
-func (l *BenchmarkLoggerDummy) Close() error ***REMOVED*** return nil ***REMOVED***
+func (l *BenchmarkLoggerDummy) Close() error { return nil }
 
-func (l *BenchmarkLoggerDummy) Name() string ***REMOVED*** return "dummy" ***REMOVED***
+func (l *BenchmarkLoggerDummy) Name() string { return "dummy" }
 
-func BenchmarkCopier64(b *testing.B) ***REMOVED***
+func BenchmarkCopier64(b *testing.B) {
 	benchmarkCopier(b, 1<<6)
-***REMOVED***
-func BenchmarkCopier128(b *testing.B) ***REMOVED***
+}
+func BenchmarkCopier128(b *testing.B) {
 	benchmarkCopier(b, 1<<7)
-***REMOVED***
-func BenchmarkCopier256(b *testing.B) ***REMOVED***
+}
+func BenchmarkCopier256(b *testing.B) {
 	benchmarkCopier(b, 1<<8)
-***REMOVED***
-func BenchmarkCopier512(b *testing.B) ***REMOVED***
+}
+func BenchmarkCopier512(b *testing.B) {
 	benchmarkCopier(b, 1<<9)
-***REMOVED***
-func BenchmarkCopier1K(b *testing.B) ***REMOVED***
+}
+func BenchmarkCopier1K(b *testing.B) {
 	benchmarkCopier(b, 1<<10)
-***REMOVED***
-func BenchmarkCopier2K(b *testing.B) ***REMOVED***
+}
+func BenchmarkCopier2K(b *testing.B) {
 	benchmarkCopier(b, 1<<11)
-***REMOVED***
-func BenchmarkCopier4K(b *testing.B) ***REMOVED***
+}
+func BenchmarkCopier4K(b *testing.B) {
 	benchmarkCopier(b, 1<<12)
-***REMOVED***
-func BenchmarkCopier8K(b *testing.B) ***REMOVED***
+}
+func BenchmarkCopier8K(b *testing.B) {
 	benchmarkCopier(b, 1<<13)
-***REMOVED***
-func BenchmarkCopier16K(b *testing.B) ***REMOVED***
+}
+func BenchmarkCopier16K(b *testing.B) {
 	benchmarkCopier(b, 1<<14)
-***REMOVED***
-func BenchmarkCopier32K(b *testing.B) ***REMOVED***
+}
+func BenchmarkCopier32K(b *testing.B) {
 	benchmarkCopier(b, 1<<15)
-***REMOVED***
-func BenchmarkCopier64K(b *testing.B) ***REMOVED***
+}
+func BenchmarkCopier64K(b *testing.B) {
 	benchmarkCopier(b, 1<<16)
-***REMOVED***
-func BenchmarkCopier128K(b *testing.B) ***REMOVED***
+}
+func BenchmarkCopier128K(b *testing.B) {
 	benchmarkCopier(b, 1<<17)
-***REMOVED***
-func BenchmarkCopier256K(b *testing.B) ***REMOVED***
+}
+func BenchmarkCopier256K(b *testing.B) {
 	benchmarkCopier(b, 1<<18)
-***REMOVED***
+}
 
-func piped(b *testing.B, iterations int, delay time.Duration, buf []byte) io.Reader ***REMOVED***
+func piped(b *testing.B, iterations int, delay time.Duration, buf []byte) io.Reader {
 	r, w, err := os.Pipe()
-	if err != nil ***REMOVED***
+	if err != nil {
 		b.Fatal(err)
 		return nil
-	***REMOVED***
-	go func() ***REMOVED***
-		for i := 0; i < iterations; i++ ***REMOVED***
+	}
+	go func() {
+		for i := 0; i < iterations; i++ {
 			time.Sleep(delay)
-			if n, err := w.Write(buf); err != nil || n != len(buf) ***REMOVED***
-				if err != nil ***REMOVED***
+			if n, err := w.Write(buf); err != nil || n != len(buf) {
+				if err != nil {
 					b.Fatal(err)
-				***REMOVED***
+				}
 				b.Fatal(fmt.Errorf("short write"))
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		w.Close()
-	***REMOVED***()
+	}()
 	return r
-***REMOVED***
+}
 
-func benchmarkCopier(b *testing.B, length int) ***REMOVED***
+func benchmarkCopier(b *testing.B, length int) {
 	b.StopTimer()
-	buf := []byte***REMOVED***'A'***REMOVED***
-	for len(buf) < length ***REMOVED***
+	buf := []byte{'A'}
+	for len(buf) < length {
 		buf = append(buf, buf...)
-	***REMOVED***
-	buf = append(buf[:length-1], []byte***REMOVED***'\n'***REMOVED***...)
+	}
+	buf = append(buf[:length-1], []byte{'\n'}...)
 	b.StartTimer()
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		c := NewCopier(
-			map[string]io.Reader***REMOVED***
+			map[string]io.Reader{
 				"buffer": piped(b, 10, time.Nanosecond, buf),
-			***REMOVED***,
-			&BenchmarkLoggerDummy***REMOVED******REMOVED***)
+			},
+			&BenchmarkLoggerDummy{})
 		c.Run()
 		c.Wait()
 		c.Close()
-	***REMOVED***
-***REMOVED***
+	}
+}

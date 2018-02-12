@@ -7,9 +7,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func emptyRun(*cobra.Command, []string) ***REMOVED******REMOVED***
+func emptyRun(*cobra.Command, []string) {}
 
-func init() ***REMOVED***
+func init() {
 	rootCmd.PersistentFlags().StringP("rootflag", "r", "two", "")
 	rootCmd.PersistentFlags().StringP("strtwo", "t", "two", "help message for parent flag strtwo")
 
@@ -28,59 +28,59 @@ func init() ***REMOVED***
 
 	echoCmd.AddCommand(timesCmd, echoSubCmd, deprecatedCmd)
 	rootCmd.AddCommand(printCmd, echoCmd)
-***REMOVED***
+}
 
-var rootCmd = &cobra.Command***REMOVED***
+var rootCmd = &cobra.Command{
 	Use:   "root",
 	Short: "Root short description",
 	Long:  "Root long description",
 	Run:   emptyRun,
-***REMOVED***
+}
 
-var echoCmd = &cobra.Command***REMOVED***
+var echoCmd = &cobra.Command{
 	Use:     "echo [string to echo]",
-	Aliases: []string***REMOVED***"say"***REMOVED***,
+	Aliases: []string{"say"},
 	Short:   "Echo anything to the screen",
 	Long:    "an utterly useless command for testing",
 	Example: "Just run cobra-test echo",
-***REMOVED***
+}
 
-var echoSubCmd = &cobra.Command***REMOVED***
+var echoSubCmd = &cobra.Command{
 	Use:   "echosub [string to print]",
 	Short: "second sub command for echo",
 	Long:  "an absolutely utterly useless command for testing gendocs!.",
 	Run:   emptyRun,
-***REMOVED***
+}
 
-var timesCmd = &cobra.Command***REMOVED***
+var timesCmd = &cobra.Command{
 	Use:        "times [# times] [string to echo]",
-	SuggestFor: []string***REMOVED***"counts"***REMOVED***,
+	SuggestFor: []string{"counts"},
 	Short:      "Echo anything to the screen more times",
 	Long:       `a slightly useless command for testing.`,
 	Run:        emptyRun,
-***REMOVED***
+}
 
-var deprecatedCmd = &cobra.Command***REMOVED***
+var deprecatedCmd = &cobra.Command{
 	Use:        "deprecated [can't do anything here]",
 	Short:      "A command which is deprecated",
 	Long:       `an absolutely utterly useless command for testing deprecation!.`,
 	Deprecated: "Please use echo instead",
-***REMOVED***
+}
 
-var printCmd = &cobra.Command***REMOVED***
+var printCmd = &cobra.Command{
 	Use:   "print [string to print]",
 	Short: "Print anything to the screen",
 	Long:  `an absolutely utterly useless command for testing.`,
-***REMOVED***
+}
 
-func checkStringContains(t *testing.T, got, expected string) ***REMOVED***
-	if !strings.Contains(got, expected) ***REMOVED***
+func checkStringContains(t *testing.T, got, expected string) {
+	if !strings.Contains(got, expected) {
 		t.Errorf("Expected to contain: \n %v\nGot:\n %v\n", expected, got)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func checkStringOmits(t *testing.T, got, expected string) ***REMOVED***
-	if strings.Contains(got, expected) ***REMOVED***
+func checkStringOmits(t *testing.T, got, expected string) {
+	if strings.Contains(got, expected) {
 		t.Errorf("Expected to not contain: \n %v\nGot: %v", expected, got)
-	***REMOVED***
-***REMOVED***
+	}
+}

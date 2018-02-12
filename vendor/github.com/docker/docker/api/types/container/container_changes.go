@@ -9,7 +9,7 @@ package container
 
 // ContainerChangeResponseItem change item in response to ContainerChanges operation
 // swagger:model ContainerChangeResponseItem
-type ContainerChangeResponseItem struct ***REMOVED***
+type ContainerChangeResponseItem struct {
 
 	// Kind of change
 	// Required: true
@@ -18,4 +18,4 @@ type ContainerChangeResponseItem struct ***REMOVED***
 	// Path to file that has changed
 	// Required: true
 	Path string `json:"Path"`
-***REMOVED***
+}

@@ -11,42 +11,42 @@ type WalkFunc func(Node) (Node, bool)
 // node must not be nil. If fn returns true, Walk invokes fn recursively for
 // each of the non-nil children of node, followed by a call of fn(nil). The
 // returned node of fn can be used to rewrite the passed node to fn.
-func Walk(node Node, fn WalkFunc) Node ***REMOVED***
+func Walk(node Node, fn WalkFunc) Node {
 	rewritten, ok := fn(node)
-	if !ok ***REMOVED***
+	if !ok {
 		return rewritten
-	***REMOVED***
+	}
 
-	switch n := node.(type) ***REMOVED***
+	switch n := node.(type) {
 	case *File:
 		n.Node = Walk(n.Node, fn)
 	case *ObjectList:
-		for i, item := range n.Items ***REMOVED***
+		for i, item := range n.Items {
 			n.Items[i] = Walk(item, fn).(*ObjectItem)
-		***REMOVED***
+		}
 	case *ObjectKey:
 		// nothing to do
 	case *ObjectItem:
-		for i, k := range n.Keys ***REMOVED***
+		for i, k := range n.Keys {
 			n.Keys[i] = Walk(k, fn).(*ObjectKey)
-		***REMOVED***
+		}
 
-		if n.Val != nil ***REMOVED***
+		if n.Val != nil {
 			n.Val = Walk(n.Val, fn)
-		***REMOVED***
+		}
 	case *LiteralType:
 		// nothing to do
 	case *ListType:
-		for i, l := range n.List ***REMOVED***
+		for i, l := range n.List {
 			n.List[i] = Walk(l, fn)
-		***REMOVED***
+		}
 	case *ObjectType:
 		n.List = Walk(n.List, fn).(*ObjectList)
 	default:
 		// should we panic here?
 		fmt.Printf("unknown type: %T\n", n)
-	***REMOVED***
+	}
 
 	fn(nil)
 	return rewritten
-***REMOVED***
+}

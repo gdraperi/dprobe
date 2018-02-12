@@ -46,12 +46,12 @@ Rich Feature Set includes:
   - Standard field renaming via tags
   - Support for omitting empty fields during an encoding
   - Encoding from any value and decoding into pointer to any value
-    (struct, slice, map, primitives, pointers, interface***REMOVED******REMOVED***, etc)
+    (struct, slice, map, primitives, pointers, interface{}, etc)
   - Extensions to support efficient encoding/decoding of any named types
   - Support encoding.(Binary|Text)(M|Unm)arshaler interfaces
-  - Decoding without a schema (into a interface***REMOVED******REMOVED***).
+  - Decoding without a schema (into a interface{}).
     Includes Options to configure what specific map or slice type to use
-    when decoding an encoded list or map into a nil interface***REMOVED******REMOVED***
+    when decoding an encoded list or map into a nil interface{}
   - Encode a struct as an array, and decode struct from an array in the data stream
   - Comprehensive support for anonymous fields
   - Fast (no-reflection) encoding/decoding of common maps and slices
@@ -84,8 +84,8 @@ There are no restrictions on what the custom type can be. Some examples:
     type BisSet   []int
     type BitSet64 uint64
     type UUID     string
-    type MyStructWithUnexportedFields struct ***REMOVED*** a int; b bool; c []int; ***REMOVED***
-    type GifImage struct ***REMOVED*** ... ***REMOVED***
+    type MyStructWithUnexportedFields struct { a int; b bool; c []int; }
+    type GifImage struct { ... }
 
 As an illustration, MyStructWithUnexportedFields would normally be
 encoded as an empty map because it has no exported fields, while UUID
@@ -108,11 +108,11 @@ Typical usage model:
       ch codec.CborHandle
     )
 
-    mh.MapType = reflect.TypeOf(map[string]interface***REMOVED******REMOVED***(nil))
+    mh.MapType = reflect.TypeOf(map[string]interface{}(nil))
 
     // configure extensions
     // e.g. for msgpack, define functions and enable Time support for tag 1
-    // mh.SetExt(reflect.TypeOf(time.Time***REMOVED******REMOVED***), 1, myExt)
+    // mh.SetExt(reflect.TypeOf(time.Time{}), 1, myExt)
 
     // create and use decoder/encoder
     var (
@@ -131,14 +131,14 @@ Typical usage model:
     err = enc.Encode(v)
 
     //RPC Server
-    go func() ***REMOVED***
-        for ***REMOVED***
+    go func() {
+        for {
             conn, err := listener.Accept()
             rpcCodec := codec.GoRpc.ServerCodec(conn, h)
             //OR rpcCodec := codec.MsgpackSpecRpc.ServerCodec(conn, h)
             rpc.ServeCodec(rpcCodec)
-    ***REMOVED***
-***REMOVED***()
+        }
+    }()
 
     //RPC Communication (client side)
     conn, err = net.Dial("tcp", "localhost:5555")

@@ -169,7 +169,7 @@ and configures the S3 service client to use that role for API requests.
 
   // Create service client value configured for credentials
   // from assumed role.
-  svc := s3.New(sess, &aws.Config***REMOVED***Credentials: creds***REMOVED***)
+  svc := s3.New(sess, &aws.Config{Credentials: creds})
 ```
 
 See the [credentials][credentials_pkg] package documentation for more information on credential
@@ -182,9 +182,9 @@ or enabling the feature in code when creating a Session via the
 Option's SharedConfigState parameter.
 
 ```go
-  sess := session.Must(session.NewSessionWithOptions(session.Options***REMOVED***
+  sess := session.Must(session.NewSessionWithOptions(session.Options{
       SharedConfigState: session.SharedConfigEnable,
-  ***REMOVED***))
+  }))
 ```
 
 [credentials_pkg]: https://docs.aws.amazon.com/sdk-for-go/api/aws/credentials
@@ -214,9 +214,9 @@ use. This is helpful when you want to create multiple service clients, and
 all of the clients make API requests to the same region.
 
 ```go
-  sess := session.Must(session.NewSession(&aws.Config***REMOVED***
+  sess := session.Must(session.NewSession(&aws.Config{
       Region: aws.String(endpoints.UsWest2RegionID),
-  ***REMOVED***))
+  }))
 ```
 
 See the [endpoints][endpoints_pkg] package for the AWS Regions and Endpoints metadata.
@@ -227,9 +227,9 @@ Session. This is helpful when you want to create service clients in specific
 regions different from the Session's region.
 
 ```go
-  svc := s3.New(sess, &aws.Config***REMOVED***
+  svc := s3.New(sess, &aws.Config{
       Region: aws.String(endpoints.UsWest2RegionID),
-  ***REMOVED***)
+  })
 ```
 
 See the [Config][config_typ] type in the [aws][aws_pkg] package for more information and additional
@@ -290,18 +290,18 @@ documentation for the errors that could be returned.
 ```go
   ctx := context.Background()
 
-  result, err := svc.GetObjectWithContext(ctx, &s3.GetObjectInput***REMOVED***
+  result, err := svc.GetObjectWithContext(ctx, &s3.GetObjectInput{
       Bucket: aws.String("my-bucket"),
       Key: aws.String("my-key"),
-  ***REMOVED***)
-  if err != nil ***REMOVED***
+  })
+  if err != nil {
       // Cast err to awserr.Error to handle specific error codes.
       aerr, ok := err.(awserr.Error)
-      if ok && aerr.Code() == s3.ErrCodeNoSuchKey ***REMOVED***
+      if ok && aerr.Code() == s3.ErrCodeNoSuchKey {
           // Specific error code handling
-  ***REMOVED***
+      }
       return err
-  ***REMOVED***
+  }
 
   // Make sure to close the body when done with it for S3 GetObject APIs or
   // will leak connections.
@@ -317,18 +317,18 @@ functionality needed to round trip API page requests. Pagination methods
 take a callback function that will be called for each page of the API's response.
 
 ```go
-   objects := []string***REMOVED******REMOVED***
-   err := svc.ListObjectsPagesWithContext(ctx, &s3.ListObjectsInput***REMOVED***
+   objects := []string{}
+   err := svc.ListObjectsPagesWithContext(ctx, &s3.ListObjectsInput{
        Bucket: aws.String(myBucket),
-   ***REMOVED***, func(p *s3.ListObjectsOutput, lastPage bool) bool ***REMOVED***
-       for _, o := range p.Contents ***REMOVED***
+   }, func(p *s3.ListObjectsOutput, lastPage bool) bool {
+       for _, o := range p.Contents {
            objects = append(objects, aws.StringValue(o.Key))
-   ***REMOVED***
+       }
        return true // continue paging
-   ***REMOVED***)
-   if err != nil ***REMOVED***
+   })
+   if err != nil {
        panic(fmt.Sprintf("failed to list objects for bucket, %s, %v", myBucket, err))
-   ***REMOVED***
+   }
 
    fmt.Println("Objects in bucket:", objects)
 ```
@@ -341,16 +341,16 @@ or the waiter times out. If a resource times out the error code returned will
 be request.WaiterResourceNotReadyErrorCode.
 
 ```go
-  err := svc.WaitUntilBucketExistsWithContext(ctx, &s3.HeadBucketInput***REMOVED***
+  err := svc.WaitUntilBucketExistsWithContext(ctx, &s3.HeadBucketInput{
       Bucket: aws.String(myBucket),
-  ***REMOVED***)
-  if err != nil ***REMOVED***
+  })
+  if err != nil {
       aerr, ok := err.(awserr.Error)
-      if ok && aerr.Code() == request.WaiterResourceNotReadyErrorCode ***REMOVED***
+      if ok && aerr.Code() == request.WaiterResourceNotReadyErrorCode {
           fmt.Fprintf(os.Stderr, "timed out while waiting for bucket to exist")
-  ***REMOVED***
+      }
       panic(fmt.Errorf("failed to wait for bucket to exist, %v", err))
-  ***REMOVED***
+  }
   fmt.Println("Bucket", myBucket, "exists")
 ```
 
@@ -389,7 +389,7 @@ response.
   // Usage:
   //   # Upload myfile.txt to myBucket/myKey. Must complete within 10 minutes or will fail
   //   go run withContext.go -b mybucket -k myKey -d 10m < myfile.txt
-  func main() ***REMOVED***
+  func main() {
   	var bucket, key string
   	var timeout time.Duration
 
@@ -415,33 +415,33 @@ response.
   	// more than the passed in timeout.
   	ctx := context.Background()
   	var cancelFn func()
-  	if timeout > 0 ***REMOVED***
+  	if timeout > 0 {
   		ctx, cancelFn = context.WithTimeout(ctx, timeout)
-  	***REMOVED***
+  	}
   	// Ensure the context is canceled to prevent leaking.
   	// See context package for more information, https://golang.org/pkg/context/
   	defer cancelFn()
 
   	// Uploads the object to S3. The Context will interrupt the request if the
   	// timeout expires.
-  	_, err := svc.PutObjectWithContext(ctx, &s3.PutObjectInput***REMOVED***
+  	_, err := svc.PutObjectWithContext(ctx, &s3.PutObjectInput{
   		Bucket: aws.String(bucket),
   		Key:    aws.String(key),
   		Body:   os.Stdin,
-  	***REMOVED***)
-  	if err != nil ***REMOVED***
-  		if aerr, ok := err.(awserr.Error); ok && aerr.Code() == request.CanceledErrorCode ***REMOVED***
+  	})
+  	if err != nil {
+  		if aerr, ok := err.(awserr.Error); ok && aerr.Code() == request.CanceledErrorCode {
   			// If the SDK can determine the request or retry delay was canceled
   			// by a context the CanceledErrorCode error code will be returned.
   			fmt.Fprintf(os.Stderr, "upload canceled due to timeout, %v\n", err)
-  		***REMOVED*** else ***REMOVED***
+  		} else {
   			fmt.Fprintf(os.Stderr, "failed to upload object, %v\n", err)
-  		***REMOVED***
+  		}
   		os.Exit(1)
-  	***REMOVED***
+  	}
 
   	fmt.Printf("successfully uploaded file to %s/%s\n", bucket, key)
-  ***REMOVED***
+  }
 ```
 
 ## License

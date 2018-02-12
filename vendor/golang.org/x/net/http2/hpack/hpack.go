@@ -15,50 +15,50 @@ import (
 )
 
 // A DecodingError is something the spec defines as a decoding error.
-type DecodingError struct ***REMOVED***
+type DecodingError struct {
 	Err error
-***REMOVED***
+}
 
-func (de DecodingError) Error() string ***REMOVED***
+func (de DecodingError) Error() string {
 	return fmt.Sprintf("decoding error: %v", de.Err)
-***REMOVED***
+}
 
 // An InvalidIndexError is returned when an encoder references a table
 // entry before the static table or after the end of the dynamic table.
 type InvalidIndexError int
 
-func (e InvalidIndexError) Error() string ***REMOVED***
+func (e InvalidIndexError) Error() string {
 	return fmt.Sprintf("invalid indexed representation index %d", int(e))
-***REMOVED***
+}
 
 // A HeaderField is a name-value pair. Both the name and value are
 // treated as opaque sequences of octets.
-type HeaderField struct ***REMOVED***
+type HeaderField struct {
 	Name, Value string
 
 	// Sensitive means that this header field should never be
 	// indexed.
 	Sensitive bool
-***REMOVED***
+}
 
 // IsPseudo reports whether the header field is an http2 pseudo header.
 // That is, it reports whether it starts with a colon.
 // It is not otherwise guaranteed to be a valid pseudo header field,
 // though.
-func (hf HeaderField) IsPseudo() bool ***REMOVED***
+func (hf HeaderField) IsPseudo() bool {
 	return len(hf.Name) != 0 && hf.Name[0] == ':'
-***REMOVED***
+}
 
-func (hf HeaderField) String() string ***REMOVED***
+func (hf HeaderField) String() string {
 	var suffix string
-	if hf.Sensitive ***REMOVED***
+	if hf.Sensitive {
 		suffix = " (sensitive)"
-	***REMOVED***
+	}
 	return fmt.Sprintf("header field %q = %q%s", hf.Name, hf.Value, suffix)
-***REMOVED***
+}
 
 // Size returns the size of an entry per RFC 7541 section 4.1.
-func (hf HeaderField) Size() uint32 ***REMOVED***
+func (hf HeaderField) Size() uint32 {
 	// http://http2.github.io/http2-spec/compression.html#rfc.section.4.1
 	// "The size of the dynamic table is the sum of the size of
 	// its entries. The size of an entry is the sum of its name's
@@ -72,11 +72,11 @@ func (hf HeaderField) Size() uint32 ***REMOVED***
 	// won't happen on the wire because the encoding doesn't allow
 	// it.
 	return uint32(len(hf.Name) + len(hf.Value) + 32)
-***REMOVED***
+}
 
 // A Decoder is the decoding context for incremental processing of
 // header blocks.
-type Decoder struct ***REMOVED***
+type Decoder struct {
 	dynTab dynamicTable
 	emit   func(f HeaderField)
 
@@ -92,21 +92,21 @@ type Decoder struct ***REMOVED***
 	// saveBuf is previous data passed to Write which we weren't able
 	// to fully parse before. Unlike buf, we own this data.
 	saveBuf bytes.Buffer
-***REMOVED***
+}
 
 // NewDecoder returns a new decoder with the provided maximum dynamic
 // table size. The emitFunc will be called for each valid field
 // parsed, in the same goroutine as calls to Write, before Write returns.
-func NewDecoder(maxDynamicTableSize uint32, emitFunc func(f HeaderField)) *Decoder ***REMOVED***
-	d := &Decoder***REMOVED***
+func NewDecoder(maxDynamicTableSize uint32, emitFunc func(f HeaderField)) *Decoder {
+	d := &Decoder{
 		emit:        emitFunc,
 		emitEnabled: true,
-	***REMOVED***
+	}
 	d.dynTab.table.init()
 	d.dynTab.allowedMaxSize = maxDynamicTableSize
 	d.dynTab.setMaxSize(maxDynamicTableSize)
 	return d
-***REMOVED***
+}
 
 // ErrStringLength is returned by Decoder.Write when the max string length
 // (as configured by Decoder.SetMaxStringLength) would be violated.
@@ -116,16 +116,16 @@ var ErrStringLength = errors.New("hpack: string too long")
 // value string. If a string exceeds this length (even after any
 // decompression), Write will return ErrStringLength.
 // A value of 0 means unlimited and is the default from NewDecoder.
-func (d *Decoder) SetMaxStringLength(n int) ***REMOVED***
+func (d *Decoder) SetMaxStringLength(n int) {
 	d.maxStrLen = n
-***REMOVED***
+}
 
 // SetEmitFunc changes the callback used when new header fields
 // are decoded.
 // It must be non-nil. It does not affect EmitEnabled.
-func (d *Decoder) SetEmitFunc(emitFunc func(f HeaderField)) ***REMOVED***
+func (d *Decoder) SetEmitFunc(emitFunc func(f HeaderField)) {
 	d.emit = emitFunc
-***REMOVED***
+}
 
 // SetEmitEnabled controls whether the emitFunc provided to NewDecoder
 // should be called. The default is true.
@@ -134,144 +134,144 @@ func (d *Decoder) SetEmitFunc(emitFunc func(f HeaderField)) ***REMOVED***
 // while still decoding and keeping in-sync with decoder state, but
 // without doing unnecessary decompression or generating unnecessary
 // garbage for header fields past the limit.
-func (d *Decoder) SetEmitEnabled(v bool) ***REMOVED*** d.emitEnabled = v ***REMOVED***
+func (d *Decoder) SetEmitEnabled(v bool) { d.emitEnabled = v }
 
 // EmitEnabled reports whether calls to the emitFunc provided to NewDecoder
 // are currently enabled. The default is true.
-func (d *Decoder) EmitEnabled() bool ***REMOVED*** return d.emitEnabled ***REMOVED***
+func (d *Decoder) EmitEnabled() bool { return d.emitEnabled }
 
 // TODO: add method *Decoder.Reset(maxSize, emitFunc) to let callers re-use Decoders and their
 // underlying buffers for garbage reasons.
 
-func (d *Decoder) SetMaxDynamicTableSize(v uint32) ***REMOVED***
+func (d *Decoder) SetMaxDynamicTableSize(v uint32) {
 	d.dynTab.setMaxSize(v)
-***REMOVED***
+}
 
 // SetAllowedMaxDynamicTableSize sets the upper bound that the encoded
 // stream (via dynamic table size updates) may set the maximum size
 // to.
-func (d *Decoder) SetAllowedMaxDynamicTableSize(v uint32) ***REMOVED***
+func (d *Decoder) SetAllowedMaxDynamicTableSize(v uint32) {
 	d.dynTab.allowedMaxSize = v
-***REMOVED***
+}
 
-type dynamicTable struct ***REMOVED***
+type dynamicTable struct {
 	// http://http2.github.io/http2-spec/compression.html#rfc.section.2.3.2
 	table          headerFieldTable
 	size           uint32 // in bytes
 	maxSize        uint32 // current maxSize
 	allowedMaxSize uint32 // maxSize may go up to this, inclusive
-***REMOVED***
+}
 
-func (dt *dynamicTable) setMaxSize(v uint32) ***REMOVED***
+func (dt *dynamicTable) setMaxSize(v uint32) {
 	dt.maxSize = v
 	dt.evict()
-***REMOVED***
+}
 
-func (dt *dynamicTable) add(f HeaderField) ***REMOVED***
+func (dt *dynamicTable) add(f HeaderField) {
 	dt.table.addEntry(f)
 	dt.size += f.Size()
 	dt.evict()
-***REMOVED***
+}
 
 // If we're too big, evict old stuff.
-func (dt *dynamicTable) evict() ***REMOVED***
+func (dt *dynamicTable) evict() {
 	var n int
-	for dt.size > dt.maxSize && n < dt.table.len() ***REMOVED***
+	for dt.size > dt.maxSize && n < dt.table.len() {
 		dt.size -= dt.table.ents[n].Size()
 		n++
-	***REMOVED***
+	}
 	dt.table.evictOldest(n)
-***REMOVED***
+}
 
-func (d *Decoder) maxTableIndex() int ***REMOVED***
+func (d *Decoder) maxTableIndex() int {
 	// This should never overflow. RFC 7540 Section 6.5.2 limits the size of
 	// the dynamic table to 2^32 bytes, where each entry will occupy more than
 	// one byte. Further, the staticTable has a fixed, small length.
 	return d.dynTab.table.len() + staticTable.len()
-***REMOVED***
+}
 
-func (d *Decoder) at(i uint64) (hf HeaderField, ok bool) ***REMOVED***
+func (d *Decoder) at(i uint64) (hf HeaderField, ok bool) {
 	// See Section 2.3.3.
-	if i == 0 ***REMOVED***
+	if i == 0 {
 		return
-	***REMOVED***
-	if i <= uint64(staticTable.len()) ***REMOVED***
+	}
+	if i <= uint64(staticTable.len()) {
 		return staticTable.ents[i-1], true
-	***REMOVED***
-	if i > uint64(d.maxTableIndex()) ***REMOVED***
+	}
+	if i > uint64(d.maxTableIndex()) {
 		return
-	***REMOVED***
+	}
 	// In the dynamic table, newer entries have lower indices.
 	// However, dt.ents[0] is the oldest entry. Hence, dt.ents is
 	// the reversed dynamic table.
 	dt := d.dynTab.table
 	return dt.ents[dt.len()-(int(i)-staticTable.len())], true
-***REMOVED***
+}
 
 // Decode decodes an entire block.
 //
 // TODO: remove this method and make it incremental later? This is
 // easier for debugging now.
-func (d *Decoder) DecodeFull(p []byte) ([]HeaderField, error) ***REMOVED***
+func (d *Decoder) DecodeFull(p []byte) ([]HeaderField, error) {
 	var hf []HeaderField
 	saveFunc := d.emit
-	defer func() ***REMOVED*** d.emit = saveFunc ***REMOVED***()
-	d.emit = func(f HeaderField) ***REMOVED*** hf = append(hf, f) ***REMOVED***
-	if _, err := d.Write(p); err != nil ***REMOVED***
+	defer func() { d.emit = saveFunc }()
+	d.emit = func(f HeaderField) { hf = append(hf, f) }
+	if _, err := d.Write(p); err != nil {
 		return nil, err
-	***REMOVED***
-	if err := d.Close(); err != nil ***REMOVED***
+	}
+	if err := d.Close(); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return hf, nil
-***REMOVED***
+}
 
-func (d *Decoder) Close() error ***REMOVED***
-	if d.saveBuf.Len() > 0 ***REMOVED***
+func (d *Decoder) Close() error {
+	if d.saveBuf.Len() > 0 {
 		d.saveBuf.Reset()
-		return DecodingError***REMOVED***errors.New("truncated headers")***REMOVED***
-	***REMOVED***
+		return DecodingError{errors.New("truncated headers")}
+	}
 	return nil
-***REMOVED***
+}
 
-func (d *Decoder) Write(p []byte) (n int, err error) ***REMOVED***
-	if len(p) == 0 ***REMOVED***
+func (d *Decoder) Write(p []byte) (n int, err error) {
+	if len(p) == 0 {
 		// Prevent state machine CPU attacks (making us redo
 		// work up to the point of finding out we don't have
 		// enough data)
 		return
-	***REMOVED***
+	}
 	// Only copy the data if we have to. Optimistically assume
 	// that p will contain a complete header block.
-	if d.saveBuf.Len() == 0 ***REMOVED***
+	if d.saveBuf.Len() == 0 {
 		d.buf = p
-	***REMOVED*** else ***REMOVED***
+	} else {
 		d.saveBuf.Write(p)
 		d.buf = d.saveBuf.Bytes()
 		d.saveBuf.Reset()
-	***REMOVED***
+	}
 
-	for len(d.buf) > 0 ***REMOVED***
+	for len(d.buf) > 0 {
 		err = d.parseHeaderFieldRepr()
-		if err == errNeedMore ***REMOVED***
+		if err == errNeedMore {
 			// Extra paranoia, making sure saveBuf won't
 			// get too large. All the varint and string
 			// reading code earlier should already catch
 			// overlong things and return ErrStringLength,
 			// but keep this as a last resort.
 			const varIntOverhead = 8 // conservative
-			if d.maxStrLen != 0 && int64(len(d.buf)) > 2*(int64(d.maxStrLen)+varIntOverhead) ***REMOVED***
+			if d.maxStrLen != 0 && int64(len(d.buf)) > 2*(int64(d.maxStrLen)+varIntOverhead) {
 				return 0, ErrStringLength
-			***REMOVED***
+			}
 			d.saveBuf.Write(d.buf)
 			return len(p), nil
-		***REMOVED***
-		if err != nil ***REMOVED***
+		}
+		if err != nil {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return len(p), err
-***REMOVED***
+}
 
 // errNeedMore is an internal sentinel error value that means the
 // buffer is truncated and we need to read more data before we can
@@ -286,16 +286,16 @@ const (
 	indexedNever
 )
 
-func (v indexType) indexed() bool   ***REMOVED*** return v == indexedTrue ***REMOVED***
-func (v indexType) sensitive() bool ***REMOVED*** return v == indexedNever ***REMOVED***
+func (v indexType) indexed() bool   { return v == indexedTrue }
+func (v indexType) sensitive() bool { return v == indexedNever }
 
 // returns errNeedMore if there isn't enough data available.
 // any other error is fatal.
 // consumes d.buf iff it returns nil.
 // precondition: must be called with len(d.buf) > 0
-func (d *Decoder) parseHeaderFieldRepr() error ***REMOVED***
+func (d *Decoder) parseHeaderFieldRepr() error {
 	b := d.buf[0]
-	switch ***REMOVED***
+	switch {
 	case b&128 != 0:
 		// Indexed representation.
 		// High bit set?
@@ -321,88 +321,88 @@ func (d *Decoder) parseHeaderFieldRepr() error ***REMOVED***
 		// Top three bits are '001'.
 		// http://http2.github.io/http2-spec/compression.html#rfc.section.6.3
 		return d.parseDynamicTableSizeUpdate()
-	***REMOVED***
+	}
 
-	return DecodingError***REMOVED***errors.New("invalid encoding")***REMOVED***
-***REMOVED***
+	return DecodingError{errors.New("invalid encoding")}
+}
 
 // (same invariants and behavior as parseHeaderFieldRepr)
-func (d *Decoder) parseFieldIndexed() error ***REMOVED***
+func (d *Decoder) parseFieldIndexed() error {
 	buf := d.buf
 	idx, buf, err := readVarInt(7, buf)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	hf, ok := d.at(idx)
-	if !ok ***REMOVED***
-		return DecodingError***REMOVED***InvalidIndexError(idx)***REMOVED***
-	***REMOVED***
+	if !ok {
+		return DecodingError{InvalidIndexError(idx)}
+	}
 	d.buf = buf
-	return d.callEmit(HeaderField***REMOVED***Name: hf.Name, Value: hf.Value***REMOVED***)
-***REMOVED***
+	return d.callEmit(HeaderField{Name: hf.Name, Value: hf.Value})
+}
 
 // (same invariants and behavior as parseHeaderFieldRepr)
-func (d *Decoder) parseFieldLiteral(n uint8, it indexType) error ***REMOVED***
+func (d *Decoder) parseFieldLiteral(n uint8, it indexType) error {
 	buf := d.buf
 	nameIdx, buf, err := readVarInt(n, buf)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	var hf HeaderField
 	wantStr := d.emitEnabled || it.indexed()
-	if nameIdx > 0 ***REMOVED***
+	if nameIdx > 0 {
 		ihf, ok := d.at(nameIdx)
-		if !ok ***REMOVED***
-			return DecodingError***REMOVED***InvalidIndexError(nameIdx)***REMOVED***
-		***REMOVED***
+		if !ok {
+			return DecodingError{InvalidIndexError(nameIdx)}
+		}
 		hf.Name = ihf.Name
-	***REMOVED*** else ***REMOVED***
+	} else {
 		hf.Name, buf, err = d.readString(buf, wantStr)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	hf.Value, buf, err = d.readString(buf, wantStr)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	d.buf = buf
-	if it.indexed() ***REMOVED***
+	if it.indexed() {
 		d.dynTab.add(hf)
-	***REMOVED***
+	}
 	hf.Sensitive = it.sensitive()
 	return d.callEmit(hf)
-***REMOVED***
+}
 
-func (d *Decoder) callEmit(hf HeaderField) error ***REMOVED***
-	if d.maxStrLen != 0 ***REMOVED***
-		if len(hf.Name) > d.maxStrLen || len(hf.Value) > d.maxStrLen ***REMOVED***
+func (d *Decoder) callEmit(hf HeaderField) error {
+	if d.maxStrLen != 0 {
+		if len(hf.Name) > d.maxStrLen || len(hf.Value) > d.maxStrLen {
 			return ErrStringLength
-		***REMOVED***
-	***REMOVED***
-	if d.emitEnabled ***REMOVED***
+		}
+	}
+	if d.emitEnabled {
 		d.emit(hf)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // (same invariants and behavior as parseHeaderFieldRepr)
-func (d *Decoder) parseDynamicTableSizeUpdate() error ***REMOVED***
+func (d *Decoder) parseDynamicTableSizeUpdate() error {
 	buf := d.buf
 	size, buf, err := readVarInt(5, buf)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	if size > uint64(d.dynTab.allowedMaxSize) ***REMOVED***
-		return DecodingError***REMOVED***errors.New("dynamic table size update too large")***REMOVED***
-	***REMOVED***
+	}
+	if size > uint64(d.dynTab.allowedMaxSize) {
+		return DecodingError{errors.New("dynamic table size update too large")}
+	}
 	d.dynTab.setMaxSize(uint32(size))
 	d.buf = buf
 	return nil
-***REMOVED***
+}
 
-var errVarintOverflow = DecodingError***REMOVED***errors.New("varint integer overflow")***REMOVED***
+var errVarintOverflow = DecodingError{errors.New("varint integer overflow")}
 
 // readVarInt reads an unsigned variable length integer off the
 // beginning of p. n is the parameter as described in
@@ -412,38 +412,38 @@ var errVarintOverflow = DecodingError***REMOVED***errors.New("varint integer ove
 //
 // The returned remain buffer is either a smaller suffix of p, or err != nil.
 // The error is errNeedMore if p doesn't contain a complete integer.
-func readVarInt(n byte, p []byte) (i uint64, remain []byte, err error) ***REMOVED***
-	if n < 1 || n > 8 ***REMOVED***
+func readVarInt(n byte, p []byte) (i uint64, remain []byte, err error) {
+	if n < 1 || n > 8 {
 		panic("bad n")
-	***REMOVED***
-	if len(p) == 0 ***REMOVED***
+	}
+	if len(p) == 0 {
 		return 0, p, errNeedMore
-	***REMOVED***
+	}
 	i = uint64(p[0])
-	if n < 8 ***REMOVED***
+	if n < 8 {
 		i &= (1 << uint64(n)) - 1
-	***REMOVED***
-	if i < (1<<uint64(n))-1 ***REMOVED***
+	}
+	if i < (1<<uint64(n))-1 {
 		return i, p[1:], nil
-	***REMOVED***
+	}
 
 	origP := p
 	p = p[1:]
 	var m uint64
-	for len(p) > 0 ***REMOVED***
+	for len(p) > 0 {
 		b := p[0]
 		p = p[1:]
 		i += uint64(b&127) << m
-		if b&128 == 0 ***REMOVED***
+		if b&128 == 0 {
 			return i, p, nil
-		***REMOVED***
+		}
 		m += 7
-		if m >= 63 ***REMOVED*** // TODO: proper overflow check. making this up.
+		if m >= 63 { // TODO: proper overflow check. making this up.
 			return 0, origP, errVarintOverflow
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return 0, origP, errNeedMore
-***REMOVED***
+}
 
 // readString decodes an hpack string from p.
 //
@@ -453,38 +453,38 @@ func readVarInt(n byte, p []byte) (i uint64, remain []byte, err error) ***REMOVE
 // strings past the MAX_HEADER_LIST_SIZE are ignored, but the server
 // is returning an error anyway, and because they're not indexed, the error
 // won't affect the decoding state.
-func (d *Decoder) readString(p []byte, wantStr bool) (s string, remain []byte, err error) ***REMOVED***
-	if len(p) == 0 ***REMOVED***
+func (d *Decoder) readString(p []byte, wantStr bool) (s string, remain []byte, err error) {
+	if len(p) == 0 {
 		return "", p, errNeedMore
-	***REMOVED***
+	}
 	isHuff := p[0]&128 != 0
 	strLen, p, err := readVarInt(7, p)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", p, err
-	***REMOVED***
-	if d.maxStrLen != 0 && strLen > uint64(d.maxStrLen) ***REMOVED***
+	}
+	if d.maxStrLen != 0 && strLen > uint64(d.maxStrLen) {
 		return "", nil, ErrStringLength
-	***REMOVED***
-	if uint64(len(p)) < strLen ***REMOVED***
+	}
+	if uint64(len(p)) < strLen {
 		return "", p, errNeedMore
-	***REMOVED***
-	if !isHuff ***REMOVED***
-		if wantStr ***REMOVED***
+	}
+	if !isHuff {
+		if wantStr {
 			s = string(p[:strLen])
-		***REMOVED***
+		}
 		return s, p[strLen:], nil
-	***REMOVED***
+	}
 
-	if wantStr ***REMOVED***
+	if wantStr {
 		buf := bufPool.Get().(*bytes.Buffer)
 		buf.Reset() // don't trust others
 		defer bufPool.Put(buf)
-		if err := huffmanDecode(buf, d.maxStrLen, p[:strLen]); err != nil ***REMOVED***
+		if err := huffmanDecode(buf, d.maxStrLen, p[:strLen]); err != nil {
 			buf.Reset()
 			return "", nil, err
-		***REMOVED***
+		}
 		s = buf.String()
 		buf.Reset() // be nice to GC
-	***REMOVED***
+	}
 	return s, p[strLen:], nil
-***REMOVED***
+}

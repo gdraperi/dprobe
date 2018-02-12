@@ -34,37 +34,37 @@ import (
 	"github.com/pkg/errors"
 )
 
-func dispatch(d dispatchRequest, cmd instructions.Command) (err error) ***REMOVED***
-	if c, ok := cmd.(instructions.PlatformSpecific); ok ***REMOVED***
+func dispatch(d dispatchRequest, cmd instructions.Command) (err error) {
+	if c, ok := cmd.(instructions.PlatformSpecific); ok {
 		optionsOS := system.ParsePlatform(d.builder.options.Platform).OS
 		err := c.CheckPlatform(optionsOS)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return errdefs.InvalidParameter(err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	runConfigEnv := d.state.runConfig.Env
 	envs := append(runConfigEnv, d.state.buildArgs.FilterAllowed(runConfigEnv)...)
 
-	if ex, ok := cmd.(instructions.SupportsSingleWordExpansion); ok ***REMOVED***
-		err := ex.Expand(func(word string) (string, error) ***REMOVED***
+	if ex, ok := cmd.(instructions.SupportsSingleWordExpansion); ok {
+		err := ex.Expand(func(word string) (string, error) {
 			return d.shlex.ProcessWord(word, envs)
-		***REMOVED***)
-		if err != nil ***REMOVED***
+		})
+		if err != nil {
 			return errdefs.InvalidParameter(err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	defer func() ***REMOVED***
-		if d.builder.options.ForceRemove ***REMOVED***
+	defer func() {
+		if d.builder.options.ForceRemove {
 			d.builder.containerManager.RemoveAll(d.builder.Stdout)
 			return
-		***REMOVED***
-		if d.builder.options.Remove && err == nil ***REMOVED***
+		}
+		if d.builder.options.Remove && err == nil {
 			d.builder.containerManager.RemoveAll(d.builder.Stdout)
 			return
-		***REMOVED***
-	***REMOVED***()
-	switch c := cmd.(type) ***REMOVED***
+		}
+	}()
+	switch c := cmd.(type) {
 	case *instructions.EnvCommand:
 		return dispatchEnv(d, c)
 	case *instructions.MaintainerCommand:
@@ -99,12 +99,12 @@ func dispatch(d dispatchRequest, cmd instructions.Command) (err error) ***REMOVE
 		return dispatchArg(d, c)
 	case *instructions.ShellCommand:
 		return dispatchShell(d, c)
-	***REMOVED***
+	}
 	return errors.Errorf("unsupported command type: %v", reflect.TypeOf(cmd))
-***REMOVED***
+}
 
 // dispatchState is a data object which is modified by dispatchers
-type dispatchState struct ***REMOVED***
+type dispatchState struct {
 	runConfig       *container.Config
 	maintainer      string
 	cmdSet          bool
@@ -113,138 +113,138 @@ type dispatchState struct ***REMOVED***
 	stageName       string
 	buildArgs       *buildArgs
 	operatingSystem string
-***REMOVED***
+}
 
-func newDispatchState(baseArgs *buildArgs) *dispatchState ***REMOVED***
+func newDispatchState(baseArgs *buildArgs) *dispatchState {
 	args := baseArgs.Clone()
 	args.ResetAllowed()
-	return &dispatchState***REMOVED***runConfig: &container.Config***REMOVED******REMOVED***, buildArgs: args***REMOVED***
-***REMOVED***
+	return &dispatchState{runConfig: &container.Config{}, buildArgs: args}
+}
 
-type stagesBuildResults struct ***REMOVED***
+type stagesBuildResults struct {
 	flat    []*container.Config
 	indexed map[string]*container.Config
-***REMOVED***
+}
 
-func newStagesBuildResults() *stagesBuildResults ***REMOVED***
-	return &stagesBuildResults***REMOVED***
+func newStagesBuildResults() *stagesBuildResults {
+	return &stagesBuildResults{
 		indexed: make(map[string]*container.Config),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (r *stagesBuildResults) getByName(name string) (*container.Config, bool) ***REMOVED***
+func (r *stagesBuildResults) getByName(name string) (*container.Config, bool) {
 	c, ok := r.indexed[strings.ToLower(name)]
 	return c, ok
-***REMOVED***
+}
 
-func (r *stagesBuildResults) validateIndex(i int) error ***REMOVED***
-	if i == len(r.flat) ***REMOVED***
+func (r *stagesBuildResults) validateIndex(i int) error {
+	if i == len(r.flat) {
 		return errors.New("refers to current build stage")
-	***REMOVED***
-	if i < 0 || i > len(r.flat) ***REMOVED***
+	}
+	if i < 0 || i > len(r.flat) {
 		return errors.New("index out of bounds")
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (r *stagesBuildResults) get(nameOrIndex string) (*container.Config, error) ***REMOVED***
-	if c, ok := r.getByName(nameOrIndex); ok ***REMOVED***
+func (r *stagesBuildResults) get(nameOrIndex string) (*container.Config, error) {
+	if c, ok := r.getByName(nameOrIndex); ok {
 		return c, nil
-	***REMOVED***
+	}
 	ix, err := strconv.ParseInt(nameOrIndex, 10, 0)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, nil
-	***REMOVED***
-	if err := r.validateIndex(int(ix)); err != nil ***REMOVED***
+	}
+	if err := r.validateIndex(int(ix)); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return r.flat[ix], nil
-***REMOVED***
+}
 
-func (r *stagesBuildResults) checkStageNameAvailable(name string) error ***REMOVED***
-	if name != "" ***REMOVED***
-		if _, ok := r.getByName(name); ok ***REMOVED***
+func (r *stagesBuildResults) checkStageNameAvailable(name string) error {
+	if name != "" {
+		if _, ok := r.getByName(name); ok {
 			return errors.Errorf("%s stage name already used", name)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func (r *stagesBuildResults) commitStage(name string, config *container.Config) error ***REMOVED***
-	if name != "" ***REMOVED***
-		if _, ok := r.getByName(name); ok ***REMOVED***
+func (r *stagesBuildResults) commitStage(name string, config *container.Config) error {
+	if name != "" {
+		if _, ok := r.getByName(name); ok {
 			return errors.Errorf("%s stage name already used", name)
-		***REMOVED***
+		}
 		r.indexed[strings.ToLower(name)] = config
-	***REMOVED***
+	}
 	r.flat = append(r.flat, config)
 	return nil
-***REMOVED***
+}
 
-func commitStage(state *dispatchState, stages *stagesBuildResults) error ***REMOVED***
+func commitStage(state *dispatchState, stages *stagesBuildResults) error {
 	return stages.commitStage(state.stageName, state.runConfig)
-***REMOVED***
+}
 
-type dispatchRequest struct ***REMOVED***
+type dispatchRequest struct {
 	state   *dispatchState
 	shlex   *ShellLex
 	builder *Builder
 	source  builder.Source
 	stages  *stagesBuildResults
-***REMOVED***
+}
 
-func newDispatchRequest(builder *Builder, escapeToken rune, source builder.Source, buildArgs *buildArgs, stages *stagesBuildResults) dispatchRequest ***REMOVED***
-	return dispatchRequest***REMOVED***
+func newDispatchRequest(builder *Builder, escapeToken rune, source builder.Source, buildArgs *buildArgs, stages *stagesBuildResults) dispatchRequest {
+	return dispatchRequest{
 		state:   newDispatchState(buildArgs),
 		shlex:   NewShellLex(escapeToken),
 		builder: builder,
 		source:  source,
 		stages:  stages,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *dispatchState) updateRunConfig() ***REMOVED***
+func (s *dispatchState) updateRunConfig() {
 	s.runConfig.Image = s.imageID
-***REMOVED***
+}
 
 // hasFromImage returns true if the builder has processed a `FROM <image>` line
-func (s *dispatchState) hasFromImage() bool ***REMOVED***
+func (s *dispatchState) hasFromImage() bool {
 	return s.imageID != "" || (s.baseImage != nil && s.baseImage.ImageID() == "")
-***REMOVED***
+}
 
-func (s *dispatchState) beginStage(stageName string, image builder.Image) error ***REMOVED***
+func (s *dispatchState) beginStage(stageName string, image builder.Image) error {
 	s.stageName = stageName
 	s.imageID = image.ImageID()
 	s.operatingSystem = image.OperatingSystem()
-	if s.operatingSystem == "" ***REMOVED*** // In case it isn't set
+	if s.operatingSystem == "" { // In case it isn't set
 		s.operatingSystem = runtime.GOOS
-	***REMOVED***
-	if !system.IsOSSupported(s.operatingSystem) ***REMOVED***
+	}
+	if !system.IsOSSupported(s.operatingSystem) {
 		return system.ErrNotSupportedOperatingSystem
-	***REMOVED***
+	}
 
-	if image.RunConfig() != nil ***REMOVED***
+	if image.RunConfig() != nil {
 		// copy avoids referencing the same instance when 2 stages have the same base
 		s.runConfig = copyRunConfig(image.RunConfig())
-	***REMOVED*** else ***REMOVED***
-		s.runConfig = &container.Config***REMOVED******REMOVED***
-	***REMOVED***
+	} else {
+		s.runConfig = &container.Config{}
+	}
 	s.baseImage = image
 	s.setDefaultPath()
 	s.runConfig.OpenStdin = false
 	s.runConfig.StdinOnce = false
 	return nil
-***REMOVED***
+}
 
 // Add the default PATH to runConfig.ENV if one exists for the operating system and there
 // is no PATH set. Note that Windows containers on Windows won't have one as it's set by HCS
-func (s *dispatchState) setDefaultPath() ***REMOVED***
+func (s *dispatchState) setDefaultPath() {
 	defaultPath := system.DefaultPathEnv(s.operatingSystem)
-	if defaultPath == "" ***REMOVED***
+	if defaultPath == "" {
 		return
-	***REMOVED***
+	}
 	envMap := opts.ConvertKVStringsToMap(s.runConfig.Env)
-	if _, ok := envMap["PATH"]; !ok ***REMOVED***
+	if _, ok := envMap["PATH"]; !ok {
 		s.runConfig.Env = append(s.runConfig.Env, "PATH="+defaultPath)
-	***REMOVED***
-***REMOVED***
+	}
+}

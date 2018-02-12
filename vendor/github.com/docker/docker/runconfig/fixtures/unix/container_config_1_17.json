@@ -1,4 +1,4 @@
-***REMOVED***
+{
      "Hostname": "",
      "Domainname": "",
      "User": "",
@@ -18,21 +18,21 @@
      ],
      "Entrypoint": "bash",
      "Image": "ubuntu",
-     "Volumes": ***REMOVED***
-             "/tmp": ***REMOVED******REMOVED***
- ***REMOVED***,
+     "Volumes": {
+             "/tmp": {}
+     },
      "WorkingDir": "",
      "NetworkDisabled": false,
      "MacAddress": "12:34:56:78:9a:bc",
-     "ExposedPorts": ***REMOVED***
-             "22/tcp": ***REMOVED******REMOVED***
- ***REMOVED***,
+     "ExposedPorts": {
+             "22/tcp": {}
+     },
      "SecurityOpt": [""],
-     "HostConfig": ***REMOVED***
+     "HostConfig": {
        "Binds": ["/tmp:/tmp"],
        "Links": ["redis3:redis"],
-       "LxcConf": ***REMOVED***"lxc.utsname":"docker"***REMOVED***,
-       "PortBindings": ***REMOVED*** "22/tcp": [***REMOVED*** "HostPort": "11022" ***REMOVED***] ***REMOVED***,
+       "LxcConf": {"lxc.utsname":"docker"},
+       "PortBindings": { "22/tcp": [{ "HostPort": "11022" }] },
        "PublishAllPorts": false,
        "Privileged": false,
        "ReadonlyRootfs": false,
@@ -43,8 +43,8 @@
        "VolumesFrom": ["parent", "other:ro"],
        "CapAdd": ["NET_ADMIN"],
        "CapDrop": ["MKNOD"],
-       "RestartPolicy": ***REMOVED*** "Name": "", "MaximumRetryCount": 0 ***REMOVED***,
+       "RestartPolicy": { "Name": "", "MaximumRetryCount": 0 },
        "NetworkMode": "bridge",
        "Devices": []
-***REMOVED***
-***REMOVED***
+    }
+}

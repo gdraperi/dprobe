@@ -11,62 +11,62 @@ import (
 	"github.com/pelletier/go-toml"
 )
 
-func main() ***REMOVED***
+func main() {
 	bytes, err := ioutil.ReadAll(os.Stdin)
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatalf("Error during TOML read: %s", err)
 		os.Exit(2)
-	***REMOVED***
+	}
 	tree, err := toml.Load(string(bytes))
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatalf("Error during TOML load: %s", err)
 		os.Exit(1)
-	***REMOVED***
+	}
 
 	typedTree := translate(*tree)
 
-	if err := json.NewEncoder(os.Stdout).Encode(typedTree); err != nil ***REMOVED***
+	if err := json.NewEncoder(os.Stdout).Encode(typedTree); err != nil {
 		log.Fatalf("Error encoding JSON: %s", err)
 		os.Exit(3)
-	***REMOVED***
+	}
 
 	os.Exit(0)
-***REMOVED***
+}
 
-func translate(tomlData interface***REMOVED******REMOVED***) interface***REMOVED******REMOVED*** ***REMOVED***
-	switch orig := tomlData.(type) ***REMOVED***
-	case map[string]interface***REMOVED******REMOVED***:
-		typed := make(map[string]interface***REMOVED******REMOVED***, len(orig))
-		for k, v := range orig ***REMOVED***
+func translate(tomlData interface{}) interface{} {
+	switch orig := tomlData.(type) {
+	case map[string]interface{}:
+		typed := make(map[string]interface{}, len(orig))
+		for k, v := range orig {
 			typed[k] = translate(v)
-		***REMOVED***
+		}
 		return typed
 	case *toml.Tree:
 		return translate(*orig)
 	case toml.Tree:
 		keys := orig.Keys()
-		typed := make(map[string]interface***REMOVED******REMOVED***, len(keys))
-		for _, k := range keys ***REMOVED***
-			typed[k] = translate(orig.GetPath([]string***REMOVED***k***REMOVED***))
-		***REMOVED***
+		typed := make(map[string]interface{}, len(keys))
+		for _, k := range keys {
+			typed[k] = translate(orig.GetPath([]string{k}))
+		}
 		return typed
 	case []*toml.Tree:
-		typed := make([]map[string]interface***REMOVED******REMOVED***, len(orig))
-		for i, v := range orig ***REMOVED***
-			typed[i] = translate(v).(map[string]interface***REMOVED******REMOVED***)
-		***REMOVED***
+		typed := make([]map[string]interface{}, len(orig))
+		for i, v := range orig {
+			typed[i] = translate(v).(map[string]interface{})
+		}
 		return typed
-	case []map[string]interface***REMOVED******REMOVED***:
-		typed := make([]map[string]interface***REMOVED******REMOVED***, len(orig))
-		for i, v := range orig ***REMOVED***
-			typed[i] = translate(v).(map[string]interface***REMOVED******REMOVED***)
-		***REMOVED***
+	case []map[string]interface{}:
+		typed := make([]map[string]interface{}, len(orig))
+		for i, v := range orig {
+			typed[i] = translate(v).(map[string]interface{})
+		}
 		return typed
-	case []interface***REMOVED******REMOVED***:
-		typed := make([]interface***REMOVED******REMOVED***, len(orig))
-		for i, v := range orig ***REMOVED***
+	case []interface{}:
+		typed := make([]interface{}, len(orig))
+		for i, v := range orig {
 			typed[i] = translate(v)
-		***REMOVED***
+		}
 		return tag("array", typed)
 	case time.Time:
 		return tag("datetime", orig.Format("2006-01-02T15:04:05Z"))
@@ -78,14 +78,14 @@ func translate(tomlData interface***REMOVED******REMOVED***) interface***REMOVED
 		return tag("float", fmt.Sprintf("%v", orig))
 	case string:
 		return tag("string", orig)
-	***REMOVED***
+	}
 
 	panic(fmt.Sprintf("Unknown type: %T", tomlData))
-***REMOVED***
+}
 
-func tag(typeName string, data interface***REMOVED******REMOVED***) map[string]interface***REMOVED******REMOVED*** ***REMOVED***
-	return map[string]interface***REMOVED******REMOVED******REMOVED***
+func tag(typeName string, data interface{}) map[string]interface{} {
+	return map[string]interface{}{
 		"type":  typeName,
 		"value": data,
-	***REMOVED***
-***REMOVED***
+	}
+}

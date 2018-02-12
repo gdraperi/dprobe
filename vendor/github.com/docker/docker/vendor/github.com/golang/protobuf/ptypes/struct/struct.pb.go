@@ -40,18 +40,18 @@ const (
 	NullValue_NULL_VALUE NullValue = 0
 )
 
-var NullValue_name = map[int32]string***REMOVED***
+var NullValue_name = map[int32]string{
 	0: "NULL_VALUE",
-***REMOVED***
-var NullValue_value = map[string]int32***REMOVED***
+}
+var NullValue_value = map[string]int32{
 	"NULL_VALUE": 0,
-***REMOVED***
+}
 
-func (x NullValue) String() string ***REMOVED***
+func (x NullValue) String() string {
 	return proto.EnumName(NullValue_name, int32(x))
-***REMOVED***
-func (NullValue) EnumDescriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***0***REMOVED*** ***REMOVED***
-func (NullValue) XXX_WellKnownType() string       ***REMOVED*** return "NullValue" ***REMOVED***
+}
+func (NullValue) EnumDescriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
+func (NullValue) XXX_WellKnownType() string       { return "NullValue" }
 
 // `Struct` represents a structured data value, consisting of fields
 // which map to dynamically typed values. In some languages, `Struct`
@@ -61,23 +61,23 @@ func (NullValue) XXX_WellKnownType() string       ***REMOVED*** return "NullValu
 // with the proto support for the language.
 //
 // The JSON representation for `Struct` is JSON object.
-type Struct struct ***REMOVED***
+type Struct struct {
 	// Unordered map of dynamically typed values.
 	Fields map[string]*Value `protobuf:"bytes,1,rep,name=fields" json:"fields,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-***REMOVED***
+}
 
-func (m *Struct) Reset()                    ***REMOVED*** *m = Struct***REMOVED******REMOVED*** ***REMOVED***
-func (m *Struct) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*Struct) ProtoMessage()               ***REMOVED******REMOVED***
-func (*Struct) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***0***REMOVED*** ***REMOVED***
-func (*Struct) XXX_WellKnownType() string   ***REMOVED*** return "Struct" ***REMOVED***
+func (m *Struct) Reset()                    { *m = Struct{} }
+func (m *Struct) String() string            { return proto.CompactTextString(m) }
+func (*Struct) ProtoMessage()               {}
+func (*Struct) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
+func (*Struct) XXX_WellKnownType() string   { return "Struct" }
 
-func (m *Struct) GetFields() map[string]*Value ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Struct) GetFields() map[string]*Value {
+	if m != nil {
 		return m.Fields
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // `Value` represents a dynamically typed value which can be either
 // null, a number, a string, a boolean, a recursive struct value, or a
@@ -85,7 +85,7 @@ func (m *Struct) GetFields() map[string]*Value ***REMOVED***
 // variants, absence of any variant indicates an error.
 //
 // The JSON representation for `Value` is JSON value.
-type Value struct ***REMOVED***
+type Value struct {
 	// The kind of value.
 	//
 	// Types that are valid to be assigned to Kind:
@@ -96,109 +96,109 @@ type Value struct ***REMOVED***
 	//	*Value_StructValue
 	//	*Value_ListValue
 	Kind isValue_Kind `protobuf_oneof:"kind"`
-***REMOVED***
+}
 
-func (m *Value) Reset()                    ***REMOVED*** *m = Value***REMOVED******REMOVED*** ***REMOVED***
-func (m *Value) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*Value) ProtoMessage()               ***REMOVED******REMOVED***
-func (*Value) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***1***REMOVED*** ***REMOVED***
-func (*Value) XXX_WellKnownType() string   ***REMOVED*** return "Value" ***REMOVED***
+func (m *Value) Reset()                    { *m = Value{} }
+func (m *Value) String() string            { return proto.CompactTextString(m) }
+func (*Value) ProtoMessage()               {}
+func (*Value) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
+func (*Value) XXX_WellKnownType() string   { return "Value" }
 
-type isValue_Kind interface ***REMOVED***
+type isValue_Kind interface {
 	isValue_Kind()
-***REMOVED***
+}
 
-type Value_NullValue struct ***REMOVED***
+type Value_NullValue struct {
 	NullValue NullValue `protobuf:"varint,1,opt,name=null_value,json=nullValue,enum=google.protobuf.NullValue,oneof"`
-***REMOVED***
-type Value_NumberValue struct ***REMOVED***
+}
+type Value_NumberValue struct {
 	NumberValue float64 `protobuf:"fixed64,2,opt,name=number_value,json=numberValue,oneof"`
-***REMOVED***
-type Value_StringValue struct ***REMOVED***
+}
+type Value_StringValue struct {
 	StringValue string `protobuf:"bytes,3,opt,name=string_value,json=stringValue,oneof"`
-***REMOVED***
-type Value_BoolValue struct ***REMOVED***
+}
+type Value_BoolValue struct {
 	BoolValue bool `protobuf:"varint,4,opt,name=bool_value,json=boolValue,oneof"`
-***REMOVED***
-type Value_StructValue struct ***REMOVED***
+}
+type Value_StructValue struct {
 	StructValue *Struct `protobuf:"bytes,5,opt,name=struct_value,json=structValue,oneof"`
-***REMOVED***
-type Value_ListValue struct ***REMOVED***
+}
+type Value_ListValue struct {
 	ListValue *ListValue `protobuf:"bytes,6,opt,name=list_value,json=listValue,oneof"`
-***REMOVED***
+}
 
-func (*Value_NullValue) isValue_Kind()   ***REMOVED******REMOVED***
-func (*Value_NumberValue) isValue_Kind() ***REMOVED******REMOVED***
-func (*Value_StringValue) isValue_Kind() ***REMOVED******REMOVED***
-func (*Value_BoolValue) isValue_Kind()   ***REMOVED******REMOVED***
-func (*Value_StructValue) isValue_Kind() ***REMOVED******REMOVED***
-func (*Value_ListValue) isValue_Kind()   ***REMOVED******REMOVED***
+func (*Value_NullValue) isValue_Kind()   {}
+func (*Value_NumberValue) isValue_Kind() {}
+func (*Value_StringValue) isValue_Kind() {}
+func (*Value_BoolValue) isValue_Kind()   {}
+func (*Value_StructValue) isValue_Kind() {}
+func (*Value_ListValue) isValue_Kind()   {}
 
-func (m *Value) GetKind() isValue_Kind ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Value) GetKind() isValue_Kind {
+	if m != nil {
 		return m.Kind
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *Value) GetNullValue() NullValue ***REMOVED***
-	if x, ok := m.GetKind().(*Value_NullValue); ok ***REMOVED***
+func (m *Value) GetNullValue() NullValue {
+	if x, ok := m.GetKind().(*Value_NullValue); ok {
 		return x.NullValue
-	***REMOVED***
+	}
 	return NullValue_NULL_VALUE
-***REMOVED***
+}
 
-func (m *Value) GetNumberValue() float64 ***REMOVED***
-	if x, ok := m.GetKind().(*Value_NumberValue); ok ***REMOVED***
+func (m *Value) GetNumberValue() float64 {
+	if x, ok := m.GetKind().(*Value_NumberValue); ok {
 		return x.NumberValue
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *Value) GetStringValue() string ***REMOVED***
-	if x, ok := m.GetKind().(*Value_StringValue); ok ***REMOVED***
+func (m *Value) GetStringValue() string {
+	if x, ok := m.GetKind().(*Value_StringValue); ok {
 		return x.StringValue
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *Value) GetBoolValue() bool ***REMOVED***
-	if x, ok := m.GetKind().(*Value_BoolValue); ok ***REMOVED***
+func (m *Value) GetBoolValue() bool {
+	if x, ok := m.GetKind().(*Value_BoolValue); ok {
 		return x.BoolValue
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
-func (m *Value) GetStructValue() *Struct ***REMOVED***
-	if x, ok := m.GetKind().(*Value_StructValue); ok ***REMOVED***
+func (m *Value) GetStructValue() *Struct {
+	if x, ok := m.GetKind().(*Value_StructValue); ok {
 		return x.StructValue
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *Value) GetListValue() *ListValue ***REMOVED***
-	if x, ok := m.GetKind().(*Value_ListValue); ok ***REMOVED***
+func (m *Value) GetListValue() *ListValue {
+	if x, ok := m.GetKind().(*Value_ListValue); ok {
 		return x.ListValue
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // XXX_OneofFuncs is for the internal use of the proto package.
-func (*Value) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface***REMOVED******REMOVED***) ***REMOVED***
-	return _Value_OneofMarshaler, _Value_OneofUnmarshaler, _Value_OneofSizer, []interface***REMOVED******REMOVED******REMOVED***
+func (*Value) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
+	return _Value_OneofMarshaler, _Value_OneofUnmarshaler, _Value_OneofSizer, []interface{}{
 		(*Value_NullValue)(nil),
 		(*Value_NumberValue)(nil),
 		(*Value_StringValue)(nil),
 		(*Value_BoolValue)(nil),
 		(*Value_StructValue)(nil),
 		(*Value_ListValue)(nil),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func _Value_OneofMarshaler(msg proto.Message, b *proto.Buffer) error ***REMOVED***
+func _Value_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
 	m := msg.(*Value)
 	// kind
-	switch x := m.Kind.(type) ***REMOVED***
+	switch x := m.Kind.(type) {
 	case *Value_NullValue:
 		b.EncodeVarint(1<<3 | proto.WireVarint)
 		b.EncodeVarint(uint64(x.NullValue))
@@ -210,84 +210,84 @@ func _Value_OneofMarshaler(msg proto.Message, b *proto.Buffer) error ***REMOVED*
 		b.EncodeStringBytes(x.StringValue)
 	case *Value_BoolValue:
 		t := uint64(0)
-		if x.BoolValue ***REMOVED***
+		if x.BoolValue {
 			t = 1
-		***REMOVED***
+		}
 		b.EncodeVarint(4<<3 | proto.WireVarint)
 		b.EncodeVarint(t)
 	case *Value_StructValue:
 		b.EncodeVarint(5<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.StructValue); err != nil ***REMOVED***
+		if err := b.EncodeMessage(x.StructValue); err != nil {
 			return err
-		***REMOVED***
+		}
 	case *Value_ListValue:
 		b.EncodeVarint(6<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.ListValue); err != nil ***REMOVED***
+		if err := b.EncodeMessage(x.ListValue); err != nil {
 			return err
-		***REMOVED***
+		}
 	case nil:
 	default:
 		return fmt.Errorf("Value.Kind has unexpected type %T", x)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func _Value_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) ***REMOVED***
+func _Value_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
 	m := msg.(*Value)
-	switch tag ***REMOVED***
+	switch tag {
 	case 1: // kind.null_value
-		if wire != proto.WireVarint ***REMOVED***
+		if wire != proto.WireVarint {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		x, err := b.DecodeVarint()
-		m.Kind = &Value_NullValue***REMOVED***NullValue(x)***REMOVED***
+		m.Kind = &Value_NullValue{NullValue(x)}
 		return true, err
 	case 2: // kind.number_value
-		if wire != proto.WireFixed64 ***REMOVED***
+		if wire != proto.WireFixed64 {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		x, err := b.DecodeFixed64()
-		m.Kind = &Value_NumberValue***REMOVED***math.Float64frombits(x)***REMOVED***
+		m.Kind = &Value_NumberValue{math.Float64frombits(x)}
 		return true, err
 	case 3: // kind.string_value
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		x, err := b.DecodeStringBytes()
-		m.Kind = &Value_StringValue***REMOVED***x***REMOVED***
+		m.Kind = &Value_StringValue{x}
 		return true, err
 	case 4: // kind.bool_value
-		if wire != proto.WireVarint ***REMOVED***
+		if wire != proto.WireVarint {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		x, err := b.DecodeVarint()
-		m.Kind = &Value_BoolValue***REMOVED***x != 0***REMOVED***
+		m.Kind = &Value_BoolValue{x != 0}
 		return true, err
 	case 5: // kind.struct_value
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		msg := new(Struct)
 		err := b.DecodeMessage(msg)
-		m.Kind = &Value_StructValue***REMOVED***msg***REMOVED***
+		m.Kind = &Value_StructValue{msg}
 		return true, err
 	case 6: // kind.list_value
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		msg := new(ListValue)
 		err := b.DecodeMessage(msg)
-		m.Kind = &Value_ListValue***REMOVED***msg***REMOVED***
+		m.Kind = &Value_ListValue{msg}
 		return true, err
 	default:
 		return false, nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func _Value_OneofSizer(msg proto.Message) (n int) ***REMOVED***
+func _Value_OneofSizer(msg proto.Message) (n int) {
 	m := msg.(*Value)
 	// kind
-	switch x := m.Kind.(type) ***REMOVED***
+	switch x := m.Kind.(type) {
 	case *Value_NullValue:
 		n += proto.SizeVarint(1<<3 | proto.WireVarint)
 		n += proto.SizeVarint(uint64(x.NullValue))
@@ -314,43 +314,43 @@ func _Value_OneofSizer(msg proto.Message) (n int) ***REMOVED***
 	case nil:
 	default:
 		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
 // `ListValue` is a wrapper around a repeated field of values.
 //
 // The JSON representation for `ListValue` is JSON array.
-type ListValue struct ***REMOVED***
+type ListValue struct {
 	// Repeated field of dynamically typed values.
 	Values []*Value `protobuf:"bytes,1,rep,name=values" json:"values,omitempty"`
-***REMOVED***
+}
 
-func (m *ListValue) Reset()                    ***REMOVED*** *m = ListValue***REMOVED******REMOVED*** ***REMOVED***
-func (m *ListValue) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*ListValue) ProtoMessage()               ***REMOVED******REMOVED***
-func (*ListValue) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***2***REMOVED*** ***REMOVED***
-func (*ListValue) XXX_WellKnownType() string   ***REMOVED*** return "ListValue" ***REMOVED***
+func (m *ListValue) Reset()                    { *m = ListValue{} }
+func (m *ListValue) String() string            { return proto.CompactTextString(m) }
+func (*ListValue) ProtoMessage()               {}
+func (*ListValue) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
+func (*ListValue) XXX_WellKnownType() string   { return "ListValue" }
 
-func (m *ListValue) GetValues() []*Value ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ListValue) GetValues() []*Value {
+	if m != nil {
 		return m.Values
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*Struct)(nil), "google.protobuf.Struct")
 	proto.RegisterType((*Value)(nil), "google.protobuf.Value")
 	proto.RegisterType((*ListValue)(nil), "google.protobuf.ListValue")
 	proto.RegisterEnum("google.protobuf.NullValue", NullValue_name, NullValue_value)
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterFile("github.com/golang/protobuf/ptypes/struct/struct.proto", fileDescriptor0)
-***REMOVED***
+}
 
-var fileDescriptor0 = []byte***REMOVED***
+var fileDescriptor0 = []byte{
 	// 417 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x92, 0x41, 0x8b, 0xd3, 0x40,
 	0x14, 0x80, 0x3b, 0xc9, 0x36, 0x98, 0x17, 0x59, 0x97, 0x11, 0xb4, 0xac, 0xa0, 0xa1, 0x7b, 0x09,
@@ -379,4 +379,4 @@ var fileDescriptor0 = []byte***REMOVED***
 	0x68, 0x79, 0xd2, 0xf7, 0xf7, 0xb1, 0x20, 0xe4, 0x2d, 0x65, 0x5f, 0xe9, 0x07, 0x59, 0x99, 0x59,
 	0x4a, 0xf5, 0xec, 0x4f, 0x00, 0x00, 0x00, 0xff, 0xff, 0x9b, 0x6e, 0x5d, 0x3c, 0xfe, 0x02, 0x00,
 	0x00,
-***REMOVED***
+}

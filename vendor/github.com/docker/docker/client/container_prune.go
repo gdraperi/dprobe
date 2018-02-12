@@ -10,27 +10,27 @@ import (
 )
 
 // ContainersPrune requests the daemon to delete unused data
-func (cli *Client) ContainersPrune(ctx context.Context, pruneFilters filters.Args) (types.ContainersPruneReport, error) ***REMOVED***
+func (cli *Client) ContainersPrune(ctx context.Context, pruneFilters filters.Args) (types.ContainersPruneReport, error) {
 	var report types.ContainersPruneReport
 
-	if err := cli.NewVersionError("1.25", "container prune"); err != nil ***REMOVED***
+	if err := cli.NewVersionError("1.25", "container prune"); err != nil {
 		return report, err
-	***REMOVED***
+	}
 
 	query, err := getFiltersQuery(pruneFilters)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return report, err
-	***REMOVED***
+	}
 
 	serverResp, err := cli.post(ctx, "/containers/prune", query, nil, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return report, err
-	***REMOVED***
+	}
 	defer ensureReaderClosed(serverResp)
 
-	if err := json.NewDecoder(serverResp.body).Decode(&report); err != nil ***REMOVED***
+	if err := json.NewDecoder(serverResp.body).Decode(&report); err != nil {
 		return report, fmt.Errorf("Error retrieving disk usage: %v", err)
-	***REMOVED***
+	}
 
 	return report, nil
-***REMOVED***
+}

@@ -5,25 +5,25 @@ import (
 	"io"
 )
 
-type client interface ***REMOVED***
-	Call(string, interface***REMOVED******REMOVED***, interface***REMOVED******REMOVED***) error
-	Stream(string, interface***REMOVED******REMOVED***) (io.ReadCloser, error)
-***REMOVED***
+type client interface {
+	Call(string, interface{}, interface{}) error
+	Stream(string, interface{}) (io.ReadCloser, error)
+}
 
-type logPluginProxy struct ***REMOVED***
+type logPluginProxy struct {
 	client
-***REMOVED***
+}
 
-type logPluginProxyStartLoggingRequest struct ***REMOVED***
+type logPluginProxyStartLoggingRequest struct {
 	File string
 	Info Info
-***REMOVED***
+}
 
-type logPluginProxyStartLoggingResponse struct ***REMOVED***
+type logPluginProxyStartLoggingResponse struct {
 	Err string
-***REMOVED***
+}
 
-func (pp *logPluginProxy) StartLogging(file string, info Info) (err error) ***REMOVED***
+func (pp *logPluginProxy) StartLogging(file string, info Info) (err error) {
 	var (
 		req logPluginProxyStartLoggingRequest
 		ret logPluginProxyStartLoggingResponse
@@ -31,72 +31,72 @@ func (pp *logPluginProxy) StartLogging(file string, info Info) (err error) ***RE
 
 	req.File = file
 	req.Info = info
-	if err = pp.Call("LogDriver.StartLogging", req, &ret); err != nil ***REMOVED***
+	if err = pp.Call("LogDriver.StartLogging", req, &ret); err != nil {
 		return
-	***REMOVED***
+	}
 
-	if ret.Err != "" ***REMOVED***
+	if ret.Err != "" {
 		err = errors.New(ret.Err)
-	***REMOVED***
+	}
 
 	return
-***REMOVED***
+}
 
-type logPluginProxyStopLoggingRequest struct ***REMOVED***
+type logPluginProxyStopLoggingRequest struct {
 	File string
-***REMOVED***
+}
 
-type logPluginProxyStopLoggingResponse struct ***REMOVED***
+type logPluginProxyStopLoggingResponse struct {
 	Err string
-***REMOVED***
+}
 
-func (pp *logPluginProxy) StopLogging(file string) (err error) ***REMOVED***
+func (pp *logPluginProxy) StopLogging(file string) (err error) {
 	var (
 		req logPluginProxyStopLoggingRequest
 		ret logPluginProxyStopLoggingResponse
 	)
 
 	req.File = file
-	if err = pp.Call("LogDriver.StopLogging", req, &ret); err != nil ***REMOVED***
+	if err = pp.Call("LogDriver.StopLogging", req, &ret); err != nil {
 		return
-	***REMOVED***
+	}
 
-	if ret.Err != "" ***REMOVED***
+	if ret.Err != "" {
 		err = errors.New(ret.Err)
-	***REMOVED***
+	}
 
 	return
-***REMOVED***
+}
 
-type logPluginProxyCapabilitiesResponse struct ***REMOVED***
+type logPluginProxyCapabilitiesResponse struct {
 	Cap Capability
 	Err string
-***REMOVED***
+}
 
-func (pp *logPluginProxy) Capabilities() (cap Capability, err error) ***REMOVED***
+func (pp *logPluginProxy) Capabilities() (cap Capability, err error) {
 	var (
 		ret logPluginProxyCapabilitiesResponse
 	)
 
-	if err = pp.Call("LogDriver.Capabilities", nil, &ret); err != nil ***REMOVED***
+	if err = pp.Call("LogDriver.Capabilities", nil, &ret); err != nil {
 		return
-	***REMOVED***
+	}
 
 	cap = ret.Cap
 
-	if ret.Err != "" ***REMOVED***
+	if ret.Err != "" {
 		err = errors.New(ret.Err)
-	***REMOVED***
+	}
 
 	return
-***REMOVED***
+}
 
-type logPluginProxyReadLogsRequest struct ***REMOVED***
+type logPluginProxyReadLogsRequest struct {
 	Info   Info
 	Config ReadConfig
-***REMOVED***
+}
 
-func (pp *logPluginProxy) ReadLogs(info Info, config ReadConfig) (stream io.ReadCloser, err error) ***REMOVED***
+func (pp *logPluginProxy) ReadLogs(info Info, config ReadConfig) (stream io.ReadCloser, err error) {
 	var (
 		req logPluginProxyReadLogsRequest
 	)
@@ -104,4 +104,4 @@ func (pp *logPluginProxy) ReadLogs(info Info, config ReadConfig) (stream io.Read
 	req.Info = info
 	req.Config = config
 	return pp.Stream("LogDriver.ReadLogs", req)
-***REMOVED***
+}

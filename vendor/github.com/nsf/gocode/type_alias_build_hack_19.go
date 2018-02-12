@@ -6,14 +6,14 @@ import (
 	"go/ast"
 )
 
-func typeAliasSpec(name string, typ ast.Expr) *ast.TypeSpec ***REMOVED***
-	return &ast.TypeSpec***REMOVED***
+func typeAliasSpec(name string, typ ast.Expr) *ast.TypeSpec {
+	return &ast.TypeSpec{
 		Name:   ast.NewIdent(name),
 		Assign: 1,
 		Type:   typ,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func isAliasTypeSpec(t *ast.TypeSpec) bool ***REMOVED***
+func isAliasTypeSpec(t *ast.TypeSpec) bool {
 	return t.Assign != 0
-***REMOVED***
+}

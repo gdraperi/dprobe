@@ -33,16 +33,16 @@ import (
 )
 
 // Decode a reference to a struct pointer.
-func (o *Buffer) dec_ref_struct_message(p *Properties, base structPointer) (err error) ***REMOVED***
+func (o *Buffer) dec_ref_struct_message(p *Properties, base structPointer) (err error) {
 	raw, e := o.DecodeRawBytes(false)
-	if e != nil ***REMOVED***
+	if e != nil {
 		return e
-	***REMOVED***
+	}
 
 	// If the object can unmarshal itself, let it.
-	if p.isUnmarshaler ***REMOVED***
+	if p.isUnmarshaler {
 		panic("not supported, since this is a pointer receiver")
-	***REMOVED***
+	}
 
 	obuf := o.buf
 	oi := o.index
@@ -56,25 +56,25 @@ func (o *Buffer) dec_ref_struct_message(p *Properties, base structPointer) (err 
 	o.index = oi
 
 	return err
-***REMOVED***
+}
 
 // Decode a slice of references to struct pointers ([]struct).
-func (o *Buffer) dec_slice_ref_struct(p *Properties, is_group bool, base structPointer) error ***REMOVED***
+func (o *Buffer) dec_slice_ref_struct(p *Properties, is_group bool, base structPointer) error {
 	newBas := appendStructPointer(base, p.field, p.sstype)
 
-	if is_group ***REMOVED***
+	if is_group {
 		panic("not supported, maybe in future, if requested.")
-	***REMOVED***
+	}
 
 	raw, err := o.DecodeRawBytes(false)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	// If the object can unmarshal itself, let it.
-	if p.isUnmarshaler ***REMOVED***
+	if p.isUnmarshaler {
 		panic("not supported, since this is not a pointer receiver.")
-	***REMOVED***
+	}
 
 	obuf := o.buf
 	oi := o.index
@@ -87,28 +87,28 @@ func (o *Buffer) dec_slice_ref_struct(p *Properties, is_group bool, base structP
 	o.index = oi
 
 	return err
-***REMOVED***
+}
 
 // Decode a slice of references to struct pointers.
-func (o *Buffer) dec_slice_ref_struct_message(p *Properties, base structPointer) error ***REMOVED***
+func (o *Buffer) dec_slice_ref_struct_message(p *Properties, base structPointer) error {
 	return o.dec_slice_ref_struct(p, false, base)
-***REMOVED***
+}
 
-func setPtrCustomType(base structPointer, f field, v interface***REMOVED******REMOVED***) ***REMOVED***
-	if v == nil ***REMOVED***
+func setPtrCustomType(base structPointer, f field, v interface{}) {
+	if v == nil {
 		return
-	***REMOVED***
+	}
 	structPointer_SetStructPointer(base, f, toStructPointer(reflect.ValueOf(v)))
-***REMOVED***
+}
 
-func setCustomType(base structPointer, f field, value interface***REMOVED******REMOVED***) ***REMOVED***
-	if value == nil ***REMOVED***
+func setCustomType(base structPointer, f field, value interface{}) {
+	if value == nil {
 		return
-	***REMOVED***
+	}
 	v := reflect.ValueOf(value).Elem()
 	t := reflect.TypeOf(value).Elem()
 	kind := t.Kind()
-	switch kind ***REMOVED***
+	switch kind {
 	case reflect.Slice:
 		slice := reflect.MakeSlice(t, v.Len(), v.Cap())
 		reflect.Copy(slice, v)
@@ -119,54 +119,54 @@ func setCustomType(base structPointer, f field, value interface***REMOVED******R
 	default:
 		size := reflect.TypeOf(value).Elem().Size()
 		structPointer_Copy(toStructPointer(reflect.ValueOf(value)), structPointer_Add(base, f), int(size))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (o *Buffer) dec_custom_bytes(p *Properties, base structPointer) error ***REMOVED***
+func (o *Buffer) dec_custom_bytes(p *Properties, base structPointer) error {
 	b, err := o.DecodeRawBytes(true)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	i := reflect.New(p.ctype.Elem()).Interface()
 	custom := (i).(Unmarshaler)
-	if err := custom.Unmarshal(b); err != nil ***REMOVED***
+	if err := custom.Unmarshal(b); err != nil {
 		return err
-	***REMOVED***
+	}
 	setPtrCustomType(base, p.field, custom)
 	return nil
-***REMOVED***
+}
 
-func (o *Buffer) dec_custom_ref_bytes(p *Properties, base structPointer) error ***REMOVED***
+func (o *Buffer) dec_custom_ref_bytes(p *Properties, base structPointer) error {
 	b, err := o.DecodeRawBytes(true)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	i := reflect.New(p.ctype).Interface()
 	custom := (i).(Unmarshaler)
-	if err := custom.Unmarshal(b); err != nil ***REMOVED***
+	if err := custom.Unmarshal(b); err != nil {
 		return err
-	***REMOVED***
-	if custom != nil ***REMOVED***
+	}
+	if custom != nil {
 		setCustomType(base, p.field, custom)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // Decode a slice of bytes ([]byte) into a slice of custom types.
-func (o *Buffer) dec_custom_slice_bytes(p *Properties, base structPointer) error ***REMOVED***
+func (o *Buffer) dec_custom_slice_bytes(p *Properties, base structPointer) error {
 	b, err := o.DecodeRawBytes(true)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	i := reflect.New(p.ctype.Elem()).Interface()
 	custom := (i).(Unmarshaler)
-	if err := custom.Unmarshal(b); err != nil ***REMOVED***
+	if err := custom.Unmarshal(b); err != nil {
 		return err
-	***REMOVED***
+	}
 	newBas := appendStructPointer(base, p.field, p.ctype)
 
 	var zero field
 	setCustomType(newBas, zero, custom)
 
 	return nil
-***REMOVED***
+}

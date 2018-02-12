@@ -11,105 +11,105 @@ import (
 //
 // See openssh-portable/PROTOCOL, section 2.4. connection: Unix domain socket forwarding
 // https://github.com/openssh/openssh-portable/blob/master/PROTOCOL#L235
-type streamLocalChannelOpenDirectMsg struct ***REMOVED***
+type streamLocalChannelOpenDirectMsg struct {
 	socketPath string
 	reserved0  string
 	reserved1  uint32
-***REMOVED***
+}
 
 // forwardedStreamLocalPayload is a struct used for SSH_MSG_CHANNEL_OPEN message
 // with "forwarded-streamlocal@openssh.com" string.
-type forwardedStreamLocalPayload struct ***REMOVED***
+type forwardedStreamLocalPayload struct {
 	SocketPath string
 	Reserved0  string
-***REMOVED***
+}
 
 // streamLocalChannelForwardMsg is a struct used for SSH2_MSG_GLOBAL_REQUEST message
 // with "streamlocal-forward@openssh.com"/"cancel-streamlocal-forward@openssh.com" string.
-type streamLocalChannelForwardMsg struct ***REMOVED***
+type streamLocalChannelForwardMsg struct {
 	socketPath string
-***REMOVED***
+}
 
 // ListenUnix is similar to ListenTCP but uses a Unix domain socket.
-func (c *Client) ListenUnix(socketPath string) (net.Listener, error) ***REMOVED***
-	m := streamLocalChannelForwardMsg***REMOVED***
+func (c *Client) ListenUnix(socketPath string) (net.Listener, error) {
+	m := streamLocalChannelForwardMsg{
 		socketPath,
-	***REMOVED***
+	}
 	// send message
 	ok, _, err := c.SendRequest("streamlocal-forward@openssh.com", true, Marshal(&m))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if !ok ***REMOVED***
+	}
+	if !ok {
 		return nil, errors.New("ssh: streamlocal-forward@openssh.com request denied by peer")
-	***REMOVED***
-	ch := c.forwards.add(&net.UnixAddr***REMOVED***Name: socketPath, Net: "unix"***REMOVED***)
+	}
+	ch := c.forwards.add(&net.UnixAddr{Name: socketPath, Net: "unix"})
 
-	return &unixListener***REMOVED***socketPath, c, ch***REMOVED***, nil
-***REMOVED***
+	return &unixListener{socketPath, c, ch}, nil
+}
 
-func (c *Client) dialStreamLocal(socketPath string) (Channel, error) ***REMOVED***
-	msg := streamLocalChannelOpenDirectMsg***REMOVED***
+func (c *Client) dialStreamLocal(socketPath string) (Channel, error) {
+	msg := streamLocalChannelOpenDirectMsg{
 		socketPath: socketPath,
-	***REMOVED***
+	}
 	ch, in, err := c.OpenChannel("direct-streamlocal@openssh.com", Marshal(&msg))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	go DiscardRequests(in)
 	return ch, err
-***REMOVED***
+}
 
-type unixListener struct ***REMOVED***
+type unixListener struct {
 	socketPath string
 
 	conn *Client
 	in   <-chan forward
-***REMOVED***
+}
 
 // Accept waits for and returns the next connection to the listener.
-func (l *unixListener) Accept() (net.Conn, error) ***REMOVED***
+func (l *unixListener) Accept() (net.Conn, error) {
 	s, ok := <-l.in
-	if !ok ***REMOVED***
+	if !ok {
 		return nil, io.EOF
-	***REMOVED***
+	}
 	ch, incoming, err := s.newCh.Accept()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	go DiscardRequests(incoming)
 
-	return &chanConn***REMOVED***
+	return &chanConn{
 		Channel: ch,
-		laddr: &net.UnixAddr***REMOVED***
+		laddr: &net.UnixAddr{
 			Name: l.socketPath,
 			Net:  "unix",
-		***REMOVED***,
-		raddr: &net.UnixAddr***REMOVED***
+		},
+		raddr: &net.UnixAddr{
 			Name: "@",
 			Net:  "unix",
-		***REMOVED***,
-	***REMOVED***, nil
-***REMOVED***
+		},
+	}, nil
+}
 
 // Close closes the listener.
-func (l *unixListener) Close() error ***REMOVED***
+func (l *unixListener) Close() error {
 	// this also closes the listener.
-	l.conn.forwards.remove(&net.UnixAddr***REMOVED***Name: l.socketPath, Net: "unix"***REMOVED***)
-	m := streamLocalChannelForwardMsg***REMOVED***
+	l.conn.forwards.remove(&net.UnixAddr{Name: l.socketPath, Net: "unix"})
+	m := streamLocalChannelForwardMsg{
 		l.socketPath,
-	***REMOVED***
+	}
 	ok, _, err := l.conn.SendRequest("cancel-streamlocal-forward@openssh.com", true, Marshal(&m))
-	if err == nil && !ok ***REMOVED***
+	if err == nil && !ok {
 		err = errors.New("ssh: cancel-streamlocal-forward@openssh.com failed")
-	***REMOVED***
+	}
 	return err
-***REMOVED***
+}
 
 // Addr returns the listener's network address.
-func (l *unixListener) Addr() net.Addr ***REMOVED***
-	return &net.UnixAddr***REMOVED***
+func (l *unixListener) Addr() net.Addr {
+	return &net.UnixAddr{
 		Name: l.socketPath,
 		Net:  "unix",
-	***REMOVED***
-***REMOVED***
+	}
+}

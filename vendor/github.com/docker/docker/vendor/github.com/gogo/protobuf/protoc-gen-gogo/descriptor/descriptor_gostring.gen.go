@@ -46,670 +46,670 @@ var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
-func (this *FileDescriptorSet) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+func (this *FileDescriptorSet) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 5)
-	s = append(s, "&descriptor.FileDescriptorSet***REMOVED***")
-	if this.File != nil ***REMOVED***
+	s = append(s, "&descriptor.FileDescriptorSet{")
+	if this.File != nil {
 		s = append(s, "File: "+fmt.Sprintf("%#v", this.File)+",\n")
-	***REMOVED***
-	if this.XXX_unrecognized != nil ***REMOVED***
+	}
+	if this.XXX_unrecognized != nil {
 		s = append(s, "XXX_unrecognized:"+fmt.Sprintf("%#v", this.XXX_unrecognized)+",\n")
-	***REMOVED***
-	s = append(s, "***REMOVED***")
+	}
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func (this *FileDescriptorProto) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *FileDescriptorProto) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 16)
-	s = append(s, "&descriptor.FileDescriptorProto***REMOVED***")
-	if this.Name != nil ***REMOVED***
+	s = append(s, "&descriptor.FileDescriptorProto{")
+	if this.Name != nil {
 		s = append(s, "Name: "+valueToGoStringDescriptor(this.Name, "string")+",\n")
-	***REMOVED***
-	if this.Package != nil ***REMOVED***
+	}
+	if this.Package != nil {
 		s = append(s, "Package: "+valueToGoStringDescriptor(this.Package, "string")+",\n")
-	***REMOVED***
-	if this.Dependency != nil ***REMOVED***
+	}
+	if this.Dependency != nil {
 		s = append(s, "Dependency: "+fmt.Sprintf("%#v", this.Dependency)+",\n")
-	***REMOVED***
-	if this.PublicDependency != nil ***REMOVED***
+	}
+	if this.PublicDependency != nil {
 		s = append(s, "PublicDependency: "+fmt.Sprintf("%#v", this.PublicDependency)+",\n")
-	***REMOVED***
-	if this.WeakDependency != nil ***REMOVED***
+	}
+	if this.WeakDependency != nil {
 		s = append(s, "WeakDependency: "+fmt.Sprintf("%#v", this.WeakDependency)+",\n")
-	***REMOVED***
-	if this.MessageType != nil ***REMOVED***
+	}
+	if this.MessageType != nil {
 		s = append(s, "MessageType: "+fmt.Sprintf("%#v", this.MessageType)+",\n")
-	***REMOVED***
-	if this.EnumType != nil ***REMOVED***
+	}
+	if this.EnumType != nil {
 		s = append(s, "EnumType: "+fmt.Sprintf("%#v", this.EnumType)+",\n")
-	***REMOVED***
-	if this.Service != nil ***REMOVED***
+	}
+	if this.Service != nil {
 		s = append(s, "Service: "+fmt.Sprintf("%#v", this.Service)+",\n")
-	***REMOVED***
-	if this.Extension != nil ***REMOVED***
+	}
+	if this.Extension != nil {
 		s = append(s, "Extension: "+fmt.Sprintf("%#v", this.Extension)+",\n")
-	***REMOVED***
-	if this.Options != nil ***REMOVED***
+	}
+	if this.Options != nil {
 		s = append(s, "Options: "+fmt.Sprintf("%#v", this.Options)+",\n")
-	***REMOVED***
-	if this.SourceCodeInfo != nil ***REMOVED***
+	}
+	if this.SourceCodeInfo != nil {
 		s = append(s, "SourceCodeInfo: "+fmt.Sprintf("%#v", this.SourceCodeInfo)+",\n")
-	***REMOVED***
-	if this.Syntax != nil ***REMOVED***
+	}
+	if this.Syntax != nil {
 		s = append(s, "Syntax: "+valueToGoStringDescriptor(this.Syntax, "string")+",\n")
-	***REMOVED***
-	if this.XXX_unrecognized != nil ***REMOVED***
+	}
+	if this.XXX_unrecognized != nil {
 		s = append(s, "XXX_unrecognized:"+fmt.Sprintf("%#v", this.XXX_unrecognized)+",\n")
-	***REMOVED***
-	s = append(s, "***REMOVED***")
+	}
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func (this *DescriptorProto) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *DescriptorProto) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 14)
-	s = append(s, "&descriptor.DescriptorProto***REMOVED***")
-	if this.Name != nil ***REMOVED***
+	s = append(s, "&descriptor.DescriptorProto{")
+	if this.Name != nil {
 		s = append(s, "Name: "+valueToGoStringDescriptor(this.Name, "string")+",\n")
-	***REMOVED***
-	if this.Field != nil ***REMOVED***
+	}
+	if this.Field != nil {
 		s = append(s, "Field: "+fmt.Sprintf("%#v", this.Field)+",\n")
-	***REMOVED***
-	if this.Extension != nil ***REMOVED***
+	}
+	if this.Extension != nil {
 		s = append(s, "Extension: "+fmt.Sprintf("%#v", this.Extension)+",\n")
-	***REMOVED***
-	if this.NestedType != nil ***REMOVED***
+	}
+	if this.NestedType != nil {
 		s = append(s, "NestedType: "+fmt.Sprintf("%#v", this.NestedType)+",\n")
-	***REMOVED***
-	if this.EnumType != nil ***REMOVED***
+	}
+	if this.EnumType != nil {
 		s = append(s, "EnumType: "+fmt.Sprintf("%#v", this.EnumType)+",\n")
-	***REMOVED***
-	if this.ExtensionRange != nil ***REMOVED***
+	}
+	if this.ExtensionRange != nil {
 		s = append(s, "ExtensionRange: "+fmt.Sprintf("%#v", this.ExtensionRange)+",\n")
-	***REMOVED***
-	if this.OneofDecl != nil ***REMOVED***
+	}
+	if this.OneofDecl != nil {
 		s = append(s, "OneofDecl: "+fmt.Sprintf("%#v", this.OneofDecl)+",\n")
-	***REMOVED***
-	if this.Options != nil ***REMOVED***
+	}
+	if this.Options != nil {
 		s = append(s, "Options: "+fmt.Sprintf("%#v", this.Options)+",\n")
-	***REMOVED***
-	if this.ReservedRange != nil ***REMOVED***
+	}
+	if this.ReservedRange != nil {
 		s = append(s, "ReservedRange: "+fmt.Sprintf("%#v", this.ReservedRange)+",\n")
-	***REMOVED***
-	if this.ReservedName != nil ***REMOVED***
+	}
+	if this.ReservedName != nil {
 		s = append(s, "ReservedName: "+fmt.Sprintf("%#v", this.ReservedName)+",\n")
-	***REMOVED***
-	if this.XXX_unrecognized != nil ***REMOVED***
+	}
+	if this.XXX_unrecognized != nil {
 		s = append(s, "XXX_unrecognized:"+fmt.Sprintf("%#v", this.XXX_unrecognized)+",\n")
-	***REMOVED***
-	s = append(s, "***REMOVED***")
+	}
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func (this *DescriptorProto_ExtensionRange) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *DescriptorProto_ExtensionRange) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 6)
-	s = append(s, "&descriptor.DescriptorProto_ExtensionRange***REMOVED***")
-	if this.Start != nil ***REMOVED***
+	s = append(s, "&descriptor.DescriptorProto_ExtensionRange{")
+	if this.Start != nil {
 		s = append(s, "Start: "+valueToGoStringDescriptor(this.Start, "int32")+",\n")
-	***REMOVED***
-	if this.End != nil ***REMOVED***
+	}
+	if this.End != nil {
 		s = append(s, "End: "+valueToGoStringDescriptor(this.End, "int32")+",\n")
-	***REMOVED***
-	if this.XXX_unrecognized != nil ***REMOVED***
+	}
+	if this.XXX_unrecognized != nil {
 		s = append(s, "XXX_unrecognized:"+fmt.Sprintf("%#v", this.XXX_unrecognized)+",\n")
-	***REMOVED***
-	s = append(s, "***REMOVED***")
+	}
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func (this *DescriptorProto_ReservedRange) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *DescriptorProto_ReservedRange) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 6)
-	s = append(s, "&descriptor.DescriptorProto_ReservedRange***REMOVED***")
-	if this.Start != nil ***REMOVED***
+	s = append(s, "&descriptor.DescriptorProto_ReservedRange{")
+	if this.Start != nil {
 		s = append(s, "Start: "+valueToGoStringDescriptor(this.Start, "int32")+",\n")
-	***REMOVED***
-	if this.End != nil ***REMOVED***
+	}
+	if this.End != nil {
 		s = append(s, "End: "+valueToGoStringDescriptor(this.End, "int32")+",\n")
-	***REMOVED***
-	if this.XXX_unrecognized != nil ***REMOVED***
+	}
+	if this.XXX_unrecognized != nil {
 		s = append(s, "XXX_unrecognized:"+fmt.Sprintf("%#v", this.XXX_unrecognized)+",\n")
-	***REMOVED***
-	s = append(s, "***REMOVED***")
+	}
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func (this *FieldDescriptorProto) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *FieldDescriptorProto) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 14)
-	s = append(s, "&descriptor.FieldDescriptorProto***REMOVED***")
-	if this.Name != nil ***REMOVED***
+	s = append(s, "&descriptor.FieldDescriptorProto{")
+	if this.Name != nil {
 		s = append(s, "Name: "+valueToGoStringDescriptor(this.Name, "string")+",\n")
-	***REMOVED***
-	if this.Number != nil ***REMOVED***
+	}
+	if this.Number != nil {
 		s = append(s, "Number: "+valueToGoStringDescriptor(this.Number, "int32")+",\n")
-	***REMOVED***
-	if this.Label != nil ***REMOVED***
+	}
+	if this.Label != nil {
 		s = append(s, "Label: "+valueToGoStringDescriptor(this.Label, "descriptor.FieldDescriptorProto_Label")+",\n")
-	***REMOVED***
-	if this.Type != nil ***REMOVED***
+	}
+	if this.Type != nil {
 		s = append(s, "Type: "+valueToGoStringDescriptor(this.Type, "descriptor.FieldDescriptorProto_Type")+",\n")
-	***REMOVED***
-	if this.TypeName != nil ***REMOVED***
+	}
+	if this.TypeName != nil {
 		s = append(s, "TypeName: "+valueToGoStringDescriptor(this.TypeName, "string")+",\n")
-	***REMOVED***
-	if this.Extendee != nil ***REMOVED***
+	}
+	if this.Extendee != nil {
 		s = append(s, "Extendee: "+valueToGoStringDescriptor(this.Extendee, "string")+",\n")
-	***REMOVED***
-	if this.DefaultValue != nil ***REMOVED***
+	}
+	if this.DefaultValue != nil {
 		s = append(s, "DefaultValue: "+valueToGoStringDescriptor(this.DefaultValue, "string")+",\n")
-	***REMOVED***
-	if this.OneofIndex != nil ***REMOVED***
+	}
+	if this.OneofIndex != nil {
 		s = append(s, "OneofIndex: "+valueToGoStringDescriptor(this.OneofIndex, "int32")+",\n")
-	***REMOVED***
-	if this.JsonName != nil ***REMOVED***
+	}
+	if this.JsonName != nil {
 		s = append(s, "JsonName: "+valueToGoStringDescriptor(this.JsonName, "string")+",\n")
-	***REMOVED***
-	if this.Options != nil ***REMOVED***
+	}
+	if this.Options != nil {
 		s = append(s, "Options: "+fmt.Sprintf("%#v", this.Options)+",\n")
-	***REMOVED***
-	if this.XXX_unrecognized != nil ***REMOVED***
+	}
+	if this.XXX_unrecognized != nil {
 		s = append(s, "XXX_unrecognized:"+fmt.Sprintf("%#v", this.XXX_unrecognized)+",\n")
-	***REMOVED***
-	s = append(s, "***REMOVED***")
+	}
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func (this *OneofDescriptorProto) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *OneofDescriptorProto) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 6)
-	s = append(s, "&descriptor.OneofDescriptorProto***REMOVED***")
-	if this.Name != nil ***REMOVED***
+	s = append(s, "&descriptor.OneofDescriptorProto{")
+	if this.Name != nil {
 		s = append(s, "Name: "+valueToGoStringDescriptor(this.Name, "string")+",\n")
-	***REMOVED***
-	if this.Options != nil ***REMOVED***
+	}
+	if this.Options != nil {
 		s = append(s, "Options: "+fmt.Sprintf("%#v", this.Options)+",\n")
-	***REMOVED***
-	if this.XXX_unrecognized != nil ***REMOVED***
+	}
+	if this.XXX_unrecognized != nil {
 		s = append(s, "XXX_unrecognized:"+fmt.Sprintf("%#v", this.XXX_unrecognized)+",\n")
-	***REMOVED***
-	s = append(s, "***REMOVED***")
+	}
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func (this *EnumDescriptorProto) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *EnumDescriptorProto) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 7)
-	s = append(s, "&descriptor.EnumDescriptorProto***REMOVED***")
-	if this.Name != nil ***REMOVED***
+	s = append(s, "&descriptor.EnumDescriptorProto{")
+	if this.Name != nil {
 		s = append(s, "Name: "+valueToGoStringDescriptor(this.Name, "string")+",\n")
-	***REMOVED***
-	if this.Value != nil ***REMOVED***
+	}
+	if this.Value != nil {
 		s = append(s, "Value: "+fmt.Sprintf("%#v", this.Value)+",\n")
-	***REMOVED***
-	if this.Options != nil ***REMOVED***
+	}
+	if this.Options != nil {
 		s = append(s, "Options: "+fmt.Sprintf("%#v", this.Options)+",\n")
-	***REMOVED***
-	if this.XXX_unrecognized != nil ***REMOVED***
+	}
+	if this.XXX_unrecognized != nil {
 		s = append(s, "XXX_unrecognized:"+fmt.Sprintf("%#v", this.XXX_unrecognized)+",\n")
-	***REMOVED***
-	s = append(s, "***REMOVED***")
+	}
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func (this *EnumValueDescriptorProto) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *EnumValueDescriptorProto) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 7)
-	s = append(s, "&descriptor.EnumValueDescriptorProto***REMOVED***")
-	if this.Name != nil ***REMOVED***
+	s = append(s, "&descriptor.EnumValueDescriptorProto{")
+	if this.Name != nil {
 		s = append(s, "Name: "+valueToGoStringDescriptor(this.Name, "string")+",\n")
-	***REMOVED***
-	if this.Number != nil ***REMOVED***
+	}
+	if this.Number != nil {
 		s = append(s, "Number: "+valueToGoStringDescriptor(this.Number, "int32")+",\n")
-	***REMOVED***
-	if this.Options != nil ***REMOVED***
+	}
+	if this.Options != nil {
 		s = append(s, "Options: "+fmt.Sprintf("%#v", this.Options)+",\n")
-	***REMOVED***
-	if this.XXX_unrecognized != nil ***REMOVED***
+	}
+	if this.XXX_unrecognized != nil {
 		s = append(s, "XXX_unrecognized:"+fmt.Sprintf("%#v", this.XXX_unrecognized)+",\n")
-	***REMOVED***
-	s = append(s, "***REMOVED***")
+	}
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func (this *ServiceDescriptorProto) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *ServiceDescriptorProto) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 7)
-	s = append(s, "&descriptor.ServiceDescriptorProto***REMOVED***")
-	if this.Name != nil ***REMOVED***
+	s = append(s, "&descriptor.ServiceDescriptorProto{")
+	if this.Name != nil {
 		s = append(s, "Name: "+valueToGoStringDescriptor(this.Name, "string")+",\n")
-	***REMOVED***
-	if this.Method != nil ***REMOVED***
+	}
+	if this.Method != nil {
 		s = append(s, "Method: "+fmt.Sprintf("%#v", this.Method)+",\n")
-	***REMOVED***
-	if this.Options != nil ***REMOVED***
+	}
+	if this.Options != nil {
 		s = append(s, "Options: "+fmt.Sprintf("%#v", this.Options)+",\n")
-	***REMOVED***
-	if this.XXX_unrecognized != nil ***REMOVED***
+	}
+	if this.XXX_unrecognized != nil {
 		s = append(s, "XXX_unrecognized:"+fmt.Sprintf("%#v", this.XXX_unrecognized)+",\n")
-	***REMOVED***
-	s = append(s, "***REMOVED***")
+	}
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func (this *MethodDescriptorProto) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *MethodDescriptorProto) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 10)
-	s = append(s, "&descriptor.MethodDescriptorProto***REMOVED***")
-	if this.Name != nil ***REMOVED***
+	s = append(s, "&descriptor.MethodDescriptorProto{")
+	if this.Name != nil {
 		s = append(s, "Name: "+valueToGoStringDescriptor(this.Name, "string")+",\n")
-	***REMOVED***
-	if this.InputType != nil ***REMOVED***
+	}
+	if this.InputType != nil {
 		s = append(s, "InputType: "+valueToGoStringDescriptor(this.InputType, "string")+",\n")
-	***REMOVED***
-	if this.OutputType != nil ***REMOVED***
+	}
+	if this.OutputType != nil {
 		s = append(s, "OutputType: "+valueToGoStringDescriptor(this.OutputType, "string")+",\n")
-	***REMOVED***
-	if this.Options != nil ***REMOVED***
+	}
+	if this.Options != nil {
 		s = append(s, "Options: "+fmt.Sprintf("%#v", this.Options)+",\n")
-	***REMOVED***
-	if this.ClientStreaming != nil ***REMOVED***
+	}
+	if this.ClientStreaming != nil {
 		s = append(s, "ClientStreaming: "+valueToGoStringDescriptor(this.ClientStreaming, "bool")+",\n")
-	***REMOVED***
-	if this.ServerStreaming != nil ***REMOVED***
+	}
+	if this.ServerStreaming != nil {
 		s = append(s, "ServerStreaming: "+valueToGoStringDescriptor(this.ServerStreaming, "bool")+",\n")
-	***REMOVED***
-	if this.XXX_unrecognized != nil ***REMOVED***
+	}
+	if this.XXX_unrecognized != nil {
 		s = append(s, "XXX_unrecognized:"+fmt.Sprintf("%#v", this.XXX_unrecognized)+",\n")
-	***REMOVED***
-	s = append(s, "***REMOVED***")
+	}
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func (this *FileOptions) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *FileOptions) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 19)
-	s = append(s, "&descriptor.FileOptions***REMOVED***")
-	if this.JavaPackage != nil ***REMOVED***
+	s = append(s, "&descriptor.FileOptions{")
+	if this.JavaPackage != nil {
 		s = append(s, "JavaPackage: "+valueToGoStringDescriptor(this.JavaPackage, "string")+",\n")
-	***REMOVED***
-	if this.JavaOuterClassname != nil ***REMOVED***
+	}
+	if this.JavaOuterClassname != nil {
 		s = append(s, "JavaOuterClassname: "+valueToGoStringDescriptor(this.JavaOuterClassname, "string")+",\n")
-	***REMOVED***
-	if this.JavaMultipleFiles != nil ***REMOVED***
+	}
+	if this.JavaMultipleFiles != nil {
 		s = append(s, "JavaMultipleFiles: "+valueToGoStringDescriptor(this.JavaMultipleFiles, "bool")+",\n")
-	***REMOVED***
-	if this.JavaGenerateEqualsAndHash != nil ***REMOVED***
+	}
+	if this.JavaGenerateEqualsAndHash != nil {
 		s = append(s, "JavaGenerateEqualsAndHash: "+valueToGoStringDescriptor(this.JavaGenerateEqualsAndHash, "bool")+",\n")
-	***REMOVED***
-	if this.JavaStringCheckUtf8 != nil ***REMOVED***
+	}
+	if this.JavaStringCheckUtf8 != nil {
 		s = append(s, "JavaStringCheckUtf8: "+valueToGoStringDescriptor(this.JavaStringCheckUtf8, "bool")+",\n")
-	***REMOVED***
-	if this.OptimizeFor != nil ***REMOVED***
+	}
+	if this.OptimizeFor != nil {
 		s = append(s, "OptimizeFor: "+valueToGoStringDescriptor(this.OptimizeFor, "descriptor.FileOptions_OptimizeMode")+",\n")
-	***REMOVED***
-	if this.GoPackage != nil ***REMOVED***
+	}
+	if this.GoPackage != nil {
 		s = append(s, "GoPackage: "+valueToGoStringDescriptor(this.GoPackage, "string")+",\n")
-	***REMOVED***
-	if this.CcGenericServices != nil ***REMOVED***
+	}
+	if this.CcGenericServices != nil {
 		s = append(s, "CcGenericServices: "+valueToGoStringDescriptor(this.CcGenericServices, "bool")+",\n")
-	***REMOVED***
-	if this.JavaGenericServices != nil ***REMOVED***
+	}
+	if this.JavaGenericServices != nil {
 		s = append(s, "JavaGenericServices: "+valueToGoStringDescriptor(this.JavaGenericServices, "bool")+",\n")
-	***REMOVED***
-	if this.PyGenericServices != nil ***REMOVED***
+	}
+	if this.PyGenericServices != nil {
 		s = append(s, "PyGenericServices: "+valueToGoStringDescriptor(this.PyGenericServices, "bool")+",\n")
-	***REMOVED***
-	if this.Deprecated != nil ***REMOVED***
+	}
+	if this.Deprecated != nil {
 		s = append(s, "Deprecated: "+valueToGoStringDescriptor(this.Deprecated, "bool")+",\n")
-	***REMOVED***
-	if this.CcEnableArenas != nil ***REMOVED***
+	}
+	if this.CcEnableArenas != nil {
 		s = append(s, "CcEnableArenas: "+valueToGoStringDescriptor(this.CcEnableArenas, "bool")+",\n")
-	***REMOVED***
-	if this.ObjcClassPrefix != nil ***REMOVED***
+	}
+	if this.ObjcClassPrefix != nil {
 		s = append(s, "ObjcClassPrefix: "+valueToGoStringDescriptor(this.ObjcClassPrefix, "string")+",\n")
-	***REMOVED***
-	if this.CsharpNamespace != nil ***REMOVED***
+	}
+	if this.CsharpNamespace != nil {
 		s = append(s, "CsharpNamespace: "+valueToGoStringDescriptor(this.CsharpNamespace, "string")+",\n")
-	***REMOVED***
-	if this.UninterpretedOption != nil ***REMOVED***
+	}
+	if this.UninterpretedOption != nil {
 		s = append(s, "UninterpretedOption: "+fmt.Sprintf("%#v", this.UninterpretedOption)+",\n")
-	***REMOVED***
+	}
 	s = append(s, "XXX_InternalExtensions: "+extensionToGoStringDescriptor(this)+",\n")
-	if this.XXX_unrecognized != nil ***REMOVED***
+	if this.XXX_unrecognized != nil {
 		s = append(s, "XXX_unrecognized:"+fmt.Sprintf("%#v", this.XXX_unrecognized)+",\n")
-	***REMOVED***
-	s = append(s, "***REMOVED***")
+	}
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func (this *MessageOptions) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *MessageOptions) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 9)
-	s = append(s, "&descriptor.MessageOptions***REMOVED***")
-	if this.MessageSetWireFormat != nil ***REMOVED***
+	s = append(s, "&descriptor.MessageOptions{")
+	if this.MessageSetWireFormat != nil {
 		s = append(s, "MessageSetWireFormat: "+valueToGoStringDescriptor(this.MessageSetWireFormat, "bool")+",\n")
-	***REMOVED***
-	if this.NoStandardDescriptorAccessor != nil ***REMOVED***
+	}
+	if this.NoStandardDescriptorAccessor != nil {
 		s = append(s, "NoStandardDescriptorAccessor: "+valueToGoStringDescriptor(this.NoStandardDescriptorAccessor, "bool")+",\n")
-	***REMOVED***
-	if this.Deprecated != nil ***REMOVED***
+	}
+	if this.Deprecated != nil {
 		s = append(s, "Deprecated: "+valueToGoStringDescriptor(this.Deprecated, "bool")+",\n")
-	***REMOVED***
-	if this.MapEntry != nil ***REMOVED***
+	}
+	if this.MapEntry != nil {
 		s = append(s, "MapEntry: "+valueToGoStringDescriptor(this.MapEntry, "bool")+",\n")
-	***REMOVED***
-	if this.UninterpretedOption != nil ***REMOVED***
+	}
+	if this.UninterpretedOption != nil {
 		s = append(s, "UninterpretedOption: "+fmt.Sprintf("%#v", this.UninterpretedOption)+",\n")
-	***REMOVED***
+	}
 	s = append(s, "XXX_InternalExtensions: "+extensionToGoStringDescriptor(this)+",\n")
-	if this.XXX_unrecognized != nil ***REMOVED***
+	if this.XXX_unrecognized != nil {
 		s = append(s, "XXX_unrecognized:"+fmt.Sprintf("%#v", this.XXX_unrecognized)+",\n")
-	***REMOVED***
-	s = append(s, "***REMOVED***")
+	}
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func (this *FieldOptions) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *FieldOptions) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 11)
-	s = append(s, "&descriptor.FieldOptions***REMOVED***")
-	if this.Ctype != nil ***REMOVED***
+	s = append(s, "&descriptor.FieldOptions{")
+	if this.Ctype != nil {
 		s = append(s, "Ctype: "+valueToGoStringDescriptor(this.Ctype, "descriptor.FieldOptions_CType")+",\n")
-	***REMOVED***
-	if this.Packed != nil ***REMOVED***
+	}
+	if this.Packed != nil {
 		s = append(s, "Packed: "+valueToGoStringDescriptor(this.Packed, "bool")+",\n")
-	***REMOVED***
-	if this.Jstype != nil ***REMOVED***
+	}
+	if this.Jstype != nil {
 		s = append(s, "Jstype: "+valueToGoStringDescriptor(this.Jstype, "descriptor.FieldOptions_JSType")+",\n")
-	***REMOVED***
-	if this.Lazy != nil ***REMOVED***
+	}
+	if this.Lazy != nil {
 		s = append(s, "Lazy: "+valueToGoStringDescriptor(this.Lazy, "bool")+",\n")
-	***REMOVED***
-	if this.Deprecated != nil ***REMOVED***
+	}
+	if this.Deprecated != nil {
 		s = append(s, "Deprecated: "+valueToGoStringDescriptor(this.Deprecated, "bool")+",\n")
-	***REMOVED***
-	if this.Weak != nil ***REMOVED***
+	}
+	if this.Weak != nil {
 		s = append(s, "Weak: "+valueToGoStringDescriptor(this.Weak, "bool")+",\n")
-	***REMOVED***
-	if this.UninterpretedOption != nil ***REMOVED***
+	}
+	if this.UninterpretedOption != nil {
 		s = append(s, "UninterpretedOption: "+fmt.Sprintf("%#v", this.UninterpretedOption)+",\n")
-	***REMOVED***
+	}
 	s = append(s, "XXX_InternalExtensions: "+extensionToGoStringDescriptor(this)+",\n")
-	if this.XXX_unrecognized != nil ***REMOVED***
+	if this.XXX_unrecognized != nil {
 		s = append(s, "XXX_unrecognized:"+fmt.Sprintf("%#v", this.XXX_unrecognized)+",\n")
-	***REMOVED***
-	s = append(s, "***REMOVED***")
+	}
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func (this *OneofOptions) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *OneofOptions) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 5)
-	s = append(s, "&descriptor.OneofOptions***REMOVED***")
-	if this.UninterpretedOption != nil ***REMOVED***
+	s = append(s, "&descriptor.OneofOptions{")
+	if this.UninterpretedOption != nil {
 		s = append(s, "UninterpretedOption: "+fmt.Sprintf("%#v", this.UninterpretedOption)+",\n")
-	***REMOVED***
+	}
 	s = append(s, "XXX_InternalExtensions: "+extensionToGoStringDescriptor(this)+",\n")
-	if this.XXX_unrecognized != nil ***REMOVED***
+	if this.XXX_unrecognized != nil {
 		s = append(s, "XXX_unrecognized:"+fmt.Sprintf("%#v", this.XXX_unrecognized)+",\n")
-	***REMOVED***
-	s = append(s, "***REMOVED***")
+	}
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func (this *EnumOptions) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *EnumOptions) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 7)
-	s = append(s, "&descriptor.EnumOptions***REMOVED***")
-	if this.AllowAlias != nil ***REMOVED***
+	s = append(s, "&descriptor.EnumOptions{")
+	if this.AllowAlias != nil {
 		s = append(s, "AllowAlias: "+valueToGoStringDescriptor(this.AllowAlias, "bool")+",\n")
-	***REMOVED***
-	if this.Deprecated != nil ***REMOVED***
+	}
+	if this.Deprecated != nil {
 		s = append(s, "Deprecated: "+valueToGoStringDescriptor(this.Deprecated, "bool")+",\n")
-	***REMOVED***
-	if this.UninterpretedOption != nil ***REMOVED***
+	}
+	if this.UninterpretedOption != nil {
 		s = append(s, "UninterpretedOption: "+fmt.Sprintf("%#v", this.UninterpretedOption)+",\n")
-	***REMOVED***
+	}
 	s = append(s, "XXX_InternalExtensions: "+extensionToGoStringDescriptor(this)+",\n")
-	if this.XXX_unrecognized != nil ***REMOVED***
+	if this.XXX_unrecognized != nil {
 		s = append(s, "XXX_unrecognized:"+fmt.Sprintf("%#v", this.XXX_unrecognized)+",\n")
-	***REMOVED***
-	s = append(s, "***REMOVED***")
+	}
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func (this *EnumValueOptions) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *EnumValueOptions) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 6)
-	s = append(s, "&descriptor.EnumValueOptions***REMOVED***")
-	if this.Deprecated != nil ***REMOVED***
+	s = append(s, "&descriptor.EnumValueOptions{")
+	if this.Deprecated != nil {
 		s = append(s, "Deprecated: "+valueToGoStringDescriptor(this.Deprecated, "bool")+",\n")
-	***REMOVED***
-	if this.UninterpretedOption != nil ***REMOVED***
+	}
+	if this.UninterpretedOption != nil {
 		s = append(s, "UninterpretedOption: "+fmt.Sprintf("%#v", this.UninterpretedOption)+",\n")
-	***REMOVED***
+	}
 	s = append(s, "XXX_InternalExtensions: "+extensionToGoStringDescriptor(this)+",\n")
-	if this.XXX_unrecognized != nil ***REMOVED***
+	if this.XXX_unrecognized != nil {
 		s = append(s, "XXX_unrecognized:"+fmt.Sprintf("%#v", this.XXX_unrecognized)+",\n")
-	***REMOVED***
-	s = append(s, "***REMOVED***")
+	}
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func (this *ServiceOptions) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *ServiceOptions) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 6)
-	s = append(s, "&descriptor.ServiceOptions***REMOVED***")
-	if this.Deprecated != nil ***REMOVED***
+	s = append(s, "&descriptor.ServiceOptions{")
+	if this.Deprecated != nil {
 		s = append(s, "Deprecated: "+valueToGoStringDescriptor(this.Deprecated, "bool")+",\n")
-	***REMOVED***
-	if this.UninterpretedOption != nil ***REMOVED***
+	}
+	if this.UninterpretedOption != nil {
 		s = append(s, "UninterpretedOption: "+fmt.Sprintf("%#v", this.UninterpretedOption)+",\n")
-	***REMOVED***
+	}
 	s = append(s, "XXX_InternalExtensions: "+extensionToGoStringDescriptor(this)+",\n")
-	if this.XXX_unrecognized != nil ***REMOVED***
+	if this.XXX_unrecognized != nil {
 		s = append(s, "XXX_unrecognized:"+fmt.Sprintf("%#v", this.XXX_unrecognized)+",\n")
-	***REMOVED***
-	s = append(s, "***REMOVED***")
+	}
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func (this *MethodOptions) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *MethodOptions) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 6)
-	s = append(s, "&descriptor.MethodOptions***REMOVED***")
-	if this.Deprecated != nil ***REMOVED***
+	s = append(s, "&descriptor.MethodOptions{")
+	if this.Deprecated != nil {
 		s = append(s, "Deprecated: "+valueToGoStringDescriptor(this.Deprecated, "bool")+",\n")
-	***REMOVED***
-	if this.UninterpretedOption != nil ***REMOVED***
+	}
+	if this.UninterpretedOption != nil {
 		s = append(s, "UninterpretedOption: "+fmt.Sprintf("%#v", this.UninterpretedOption)+",\n")
-	***REMOVED***
+	}
 	s = append(s, "XXX_InternalExtensions: "+extensionToGoStringDescriptor(this)+",\n")
-	if this.XXX_unrecognized != nil ***REMOVED***
+	if this.XXX_unrecognized != nil {
 		s = append(s, "XXX_unrecognized:"+fmt.Sprintf("%#v", this.XXX_unrecognized)+",\n")
-	***REMOVED***
-	s = append(s, "***REMOVED***")
+	}
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func (this *UninterpretedOption) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *UninterpretedOption) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 11)
-	s = append(s, "&descriptor.UninterpretedOption***REMOVED***")
-	if this.Name != nil ***REMOVED***
+	s = append(s, "&descriptor.UninterpretedOption{")
+	if this.Name != nil {
 		s = append(s, "Name: "+fmt.Sprintf("%#v", this.Name)+",\n")
-	***REMOVED***
-	if this.IdentifierValue != nil ***REMOVED***
+	}
+	if this.IdentifierValue != nil {
 		s = append(s, "IdentifierValue: "+valueToGoStringDescriptor(this.IdentifierValue, "string")+",\n")
-	***REMOVED***
-	if this.PositiveIntValue != nil ***REMOVED***
+	}
+	if this.PositiveIntValue != nil {
 		s = append(s, "PositiveIntValue: "+valueToGoStringDescriptor(this.PositiveIntValue, "uint64")+",\n")
-	***REMOVED***
-	if this.NegativeIntValue != nil ***REMOVED***
+	}
+	if this.NegativeIntValue != nil {
 		s = append(s, "NegativeIntValue: "+valueToGoStringDescriptor(this.NegativeIntValue, "int64")+",\n")
-	***REMOVED***
-	if this.DoubleValue != nil ***REMOVED***
+	}
+	if this.DoubleValue != nil {
 		s = append(s, "DoubleValue: "+valueToGoStringDescriptor(this.DoubleValue, "float64")+",\n")
-	***REMOVED***
-	if this.StringValue != nil ***REMOVED***
+	}
+	if this.StringValue != nil {
 		s = append(s, "StringValue: "+valueToGoStringDescriptor(this.StringValue, "byte")+",\n")
-	***REMOVED***
-	if this.AggregateValue != nil ***REMOVED***
+	}
+	if this.AggregateValue != nil {
 		s = append(s, "AggregateValue: "+valueToGoStringDescriptor(this.AggregateValue, "string")+",\n")
-	***REMOVED***
-	if this.XXX_unrecognized != nil ***REMOVED***
+	}
+	if this.XXX_unrecognized != nil {
 		s = append(s, "XXX_unrecognized:"+fmt.Sprintf("%#v", this.XXX_unrecognized)+",\n")
-	***REMOVED***
-	s = append(s, "***REMOVED***")
+	}
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func (this *UninterpretedOption_NamePart) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *UninterpretedOption_NamePart) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 6)
-	s = append(s, "&descriptor.UninterpretedOption_NamePart***REMOVED***")
-	if this.NamePart != nil ***REMOVED***
+	s = append(s, "&descriptor.UninterpretedOption_NamePart{")
+	if this.NamePart != nil {
 		s = append(s, "NamePart: "+valueToGoStringDescriptor(this.NamePart, "string")+",\n")
-	***REMOVED***
-	if this.IsExtension != nil ***REMOVED***
+	}
+	if this.IsExtension != nil {
 		s = append(s, "IsExtension: "+valueToGoStringDescriptor(this.IsExtension, "bool")+",\n")
-	***REMOVED***
-	if this.XXX_unrecognized != nil ***REMOVED***
+	}
+	if this.XXX_unrecognized != nil {
 		s = append(s, "XXX_unrecognized:"+fmt.Sprintf("%#v", this.XXX_unrecognized)+",\n")
-	***REMOVED***
-	s = append(s, "***REMOVED***")
+	}
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func (this *SourceCodeInfo) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *SourceCodeInfo) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 5)
-	s = append(s, "&descriptor.SourceCodeInfo***REMOVED***")
-	if this.Location != nil ***REMOVED***
+	s = append(s, "&descriptor.SourceCodeInfo{")
+	if this.Location != nil {
 		s = append(s, "Location: "+fmt.Sprintf("%#v", this.Location)+",\n")
-	***REMOVED***
-	if this.XXX_unrecognized != nil ***REMOVED***
+	}
+	if this.XXX_unrecognized != nil {
 		s = append(s, "XXX_unrecognized:"+fmt.Sprintf("%#v", this.XXX_unrecognized)+",\n")
-	***REMOVED***
-	s = append(s, "***REMOVED***")
+	}
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func (this *SourceCodeInfo_Location) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *SourceCodeInfo_Location) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 9)
-	s = append(s, "&descriptor.SourceCodeInfo_Location***REMOVED***")
-	if this.Path != nil ***REMOVED***
+	s = append(s, "&descriptor.SourceCodeInfo_Location{")
+	if this.Path != nil {
 		s = append(s, "Path: "+fmt.Sprintf("%#v", this.Path)+",\n")
-	***REMOVED***
-	if this.Span != nil ***REMOVED***
+	}
+	if this.Span != nil {
 		s = append(s, "Span: "+fmt.Sprintf("%#v", this.Span)+",\n")
-	***REMOVED***
-	if this.LeadingComments != nil ***REMOVED***
+	}
+	if this.LeadingComments != nil {
 		s = append(s, "LeadingComments: "+valueToGoStringDescriptor(this.LeadingComments, "string")+",\n")
-	***REMOVED***
-	if this.TrailingComments != nil ***REMOVED***
+	}
+	if this.TrailingComments != nil {
 		s = append(s, "TrailingComments: "+valueToGoStringDescriptor(this.TrailingComments, "string")+",\n")
-	***REMOVED***
-	if this.LeadingDetachedComments != nil ***REMOVED***
+	}
+	if this.LeadingDetachedComments != nil {
 		s = append(s, "LeadingDetachedComments: "+fmt.Sprintf("%#v", this.LeadingDetachedComments)+",\n")
-	***REMOVED***
-	if this.XXX_unrecognized != nil ***REMOVED***
+	}
+	if this.XXX_unrecognized != nil {
 		s = append(s, "XXX_unrecognized:"+fmt.Sprintf("%#v", this.XXX_unrecognized)+",\n")
-	***REMOVED***
-	s = append(s, "***REMOVED***")
+	}
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func (this *GeneratedCodeInfo) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *GeneratedCodeInfo) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 5)
-	s = append(s, "&descriptor.GeneratedCodeInfo***REMOVED***")
-	if this.Annotation != nil ***REMOVED***
+	s = append(s, "&descriptor.GeneratedCodeInfo{")
+	if this.Annotation != nil {
 		s = append(s, "Annotation: "+fmt.Sprintf("%#v", this.Annotation)+",\n")
-	***REMOVED***
-	if this.XXX_unrecognized != nil ***REMOVED***
+	}
+	if this.XXX_unrecognized != nil {
 		s = append(s, "XXX_unrecognized:"+fmt.Sprintf("%#v", this.XXX_unrecognized)+",\n")
-	***REMOVED***
-	s = append(s, "***REMOVED***")
+	}
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func (this *GeneratedCodeInfo_Annotation) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *GeneratedCodeInfo_Annotation) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 8)
-	s = append(s, "&descriptor.GeneratedCodeInfo_Annotation***REMOVED***")
-	if this.Path != nil ***REMOVED***
+	s = append(s, "&descriptor.GeneratedCodeInfo_Annotation{")
+	if this.Path != nil {
 		s = append(s, "Path: "+fmt.Sprintf("%#v", this.Path)+",\n")
-	***REMOVED***
-	if this.SourceFile != nil ***REMOVED***
+	}
+	if this.SourceFile != nil {
 		s = append(s, "SourceFile: "+valueToGoStringDescriptor(this.SourceFile, "string")+",\n")
-	***REMOVED***
-	if this.Begin != nil ***REMOVED***
+	}
+	if this.Begin != nil {
 		s = append(s, "Begin: "+valueToGoStringDescriptor(this.Begin, "int32")+",\n")
-	***REMOVED***
-	if this.End != nil ***REMOVED***
+	}
+	if this.End != nil {
 		s = append(s, "End: "+valueToGoStringDescriptor(this.End, "int32")+",\n")
-	***REMOVED***
-	if this.XXX_unrecognized != nil ***REMOVED***
+	}
+	if this.XXX_unrecognized != nil {
 		s = append(s, "XXX_unrecognized:"+fmt.Sprintf("%#v", this.XXX_unrecognized)+",\n")
-	***REMOVED***
-	s = append(s, "***REMOVED***")
+	}
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func valueToGoStringDescriptor(v interface***REMOVED******REMOVED***, typ string) string ***REMOVED***
+}
+func valueToGoStringDescriptor(v interface{}, typ string) string {
 	rv := reflect.ValueOf(v)
-	if rv.IsNil() ***REMOVED***
+	if rv.IsNil() {
 		return "nil"
-	***REMOVED***
+	}
 	pv := reflect.Indirect(rv).Interface()
-	return fmt.Sprintf("func(v %v) *%v ***REMOVED*** return &v ***REMOVED*** ( %#v )", typ, typ, pv)
-***REMOVED***
-func extensionToGoStringDescriptor(m github_com_gogo_protobuf_proto.Message) string ***REMOVED***
+	return fmt.Sprintf("func(v %v) *%v { return &v } ( %#v )", typ, typ, pv)
+}
+func extensionToGoStringDescriptor(m github_com_gogo_protobuf_proto.Message) string {
 	e := github_com_gogo_protobuf_proto.GetUnsafeExtensionsMap(m)
-	if e == nil ***REMOVED***
+	if e == nil {
 		return "nil"
-	***REMOVED***
-	s := "proto.NewUnsafeXXX_InternalExtensions(map[int32]proto.Extension***REMOVED***"
+	}
+	s := "proto.NewUnsafeXXX_InternalExtensions(map[int32]proto.Extension{"
 	keys := make([]int, 0, len(e))
-	for k := range e ***REMOVED***
+	for k := range e {
 		keys = append(keys, int(k))
-	***REMOVED***
+	}
 	sort.Ints(keys)
-	ss := []string***REMOVED******REMOVED***
-	for _, k := range keys ***REMOVED***
+	ss := []string{}
+	for _, k := range keys {
 		ss = append(ss, strconv.Itoa(k)+": "+e[int32(k)].GoString())
-	***REMOVED***
-	s += strings.Join(ss, ",") + "***REMOVED***)"
+	}
+	s += strings.Join(ss, ",") + "})"
 	return s
-***REMOVED***
+}

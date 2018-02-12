@@ -18,22 +18,22 @@ import (
 	"log"
 )
 
-func initHijack() ***REMOVED***
+func initHijack() {
 	pkg := NewPackageLogger("log", "")
-	w := packageWriter***REMOVED***pkg***REMOVED***
+	w := packageWriter{pkg}
 	log.SetFlags(0)
 	log.SetPrefix("")
 	log.SetOutput(w)
-***REMOVED***
+}
 
-type packageWriter struct ***REMOVED***
+type packageWriter struct {
 	pl *PackageLogger
-***REMOVED***
+}
 
-func (p packageWriter) Write(b []byte) (int, error) ***REMOVED***
-	if p.pl.level < INFO ***REMOVED***
+func (p packageWriter) Write(b []byte) (int, error) {
+	if p.pl.level < INFO {
 		return 0, nil
-	***REMOVED***
+	}
 	p.pl.internalLog(calldepth+2, INFO, string(b))
 	return len(b), nil
-***REMOVED***
+}

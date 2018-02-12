@@ -7,16 +7,16 @@ import (
 )
 
 // ParseGenericResources parses and validates the specified string as a list of GenericResource
-func ParseGenericResources(value []string) ([]swarm.GenericResource, error) ***REMOVED***
-	if len(value) == 0 ***REMOVED***
+func ParseGenericResources(value []string) ([]swarm.GenericResource, error) {
+	if len(value) == 0 {
 		return nil, nil
-	***REMOVED***
+	}
 
 	resources, err := genericresource.Parse(value)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	obj := convert.GenericResourcesFromGRPC(resources)
 	return obj, nil
-***REMOVED***
+}

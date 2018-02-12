@@ -23,69 +23,69 @@ const (
 	secureOption = "encrypted"
 )
 
-type driver struct ***REMOVED***
-	config     map[string]interface***REMOVED******REMOVED***
+type driver struct {
+	config     map[string]interface{}
 	networks   networkTable
 	store      datastore.DataStore
 	localStore datastore.DataStore
 	once       sync.Once
 	joinOnce   sync.Once
 	sync.Mutex
-***REMOVED***
+}
 
 // Init registers a new instance of overlay driver
-func Init(dc driverapi.DriverCallback, config map[string]interface***REMOVED******REMOVED***) error ***REMOVED***
-	c := driverapi.Capability***REMOVED***
+func Init(dc driverapi.DriverCallback, config map[string]interface{}) error {
+	c := driverapi.Capability{
 		DataScope:         datastore.GlobalScope,
 		ConnectivityScope: datastore.GlobalScope,
-	***REMOVED***
+	}
 
-	d := &driver***REMOVED***
-		networks: networkTable***REMOVED******REMOVED***,
+	d := &driver{
+		networks: networkTable{},
 		config:   config,
-	***REMOVED***
+	}
 
-	if data, ok := config[netlabel.GlobalKVClient]; ok ***REMOVED***
+	if data, ok := config[netlabel.GlobalKVClient]; ok {
 		var err error
 		dsc, ok := data.(discoverapi.DatastoreConfigData)
-		if !ok ***REMOVED***
+		if !ok {
 			return types.InternalErrorf("incorrect data in datastore configuration: %v", data)
-		***REMOVED***
+		}
 		d.store, err = datastore.NewDataStoreFromConfig(dsc)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return types.InternalErrorf("failed to initialize data store: %v", err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if data, ok := config[netlabel.LocalKVClient]; ok ***REMOVED***
+	if data, ok := config[netlabel.LocalKVClient]; ok {
 		var err error
 		dsc, ok := data.(discoverapi.DatastoreConfigData)
-		if !ok ***REMOVED***
+		if !ok {
 			return types.InternalErrorf("incorrect data in datastore configuration: %v", data)
-		***REMOVED***
+		}
 		d.localStore, err = datastore.NewDataStoreFromConfig(dsc)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return types.InternalErrorf("failed to initialize local data store: %v", err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	d.restoreHNSNetworks()
 
 	return dc.RegisterDriver(networkType, d, c)
-***REMOVED***
+}
 
-func (d *driver) restoreHNSNetworks() error ***REMOVED***
+func (d *driver) restoreHNSNetworks() error {
 	logrus.Infof("Restoring existing overlay networks from HNS into docker")
 
 	hnsresponse, err := hcsshim.HNSListNetworkRequest("GET", "", "")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	for _, v := range hnsresponse ***REMOVED***
-		if v.Type != networkType ***REMOVED***
+	for _, v := range hnsresponse {
+		if v.Type != networkType {
 			continue
-		***REMOVED***
+		}
 
 		logrus.Infof("Restoring overlay network: %s", v.Name)
 		n := d.convertToOverlayNetwork(&v)
@@ -96,64 +96,64 @@ func (d *driver) restoreHNSNetworks() error ***REMOVED***
 		// and therefore don't restore hns endpoints for now
 		//
 		//n.restoreNetworkEndpoints()
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (d *driver) convertToOverlayNetwork(v *hcsshim.HNSNetwork) *network ***REMOVED***
-	n := &network***REMOVED***
+func (d *driver) convertToOverlayNetwork(v *hcsshim.HNSNetwork) *network {
+	n := &network{
 		id:              v.Name,
 		hnsID:           v.Id,
 		driver:          d,
-		endpoints:       endpointTable***REMOVED******REMOVED***,
-		subnets:         []*subnet***REMOVED******REMOVED***,
+		endpoints:       endpointTable{},
+		subnets:         []*subnet{},
 		providerAddress: v.ManagementIP,
-	***REMOVED***
+	}
 
-	for _, hnsSubnet := range v.Subnets ***REMOVED***
-		vsidPolicy := &hcsshim.VsidPolicy***REMOVED******REMOVED***
-		for _, policy := range hnsSubnet.Policies ***REMOVED***
-			if err := json.Unmarshal([]byte(policy), &vsidPolicy); err == nil && vsidPolicy.Type == "VSID" ***REMOVED***
+	for _, hnsSubnet := range v.Subnets {
+		vsidPolicy := &hcsshim.VsidPolicy{}
+		for _, policy := range hnsSubnet.Policies {
+			if err := json.Unmarshal([]byte(policy), &vsidPolicy); err == nil && vsidPolicy.Type == "VSID" {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		gwIP := net.ParseIP(hnsSubnet.GatewayAddress)
-		localsubnet := &subnet***REMOVED***
+		localsubnet := &subnet{
 			vni:  uint32(vsidPolicy.VSID),
 			gwIP: &gwIP,
-		***REMOVED***
+		}
 
 		_, subnetIP, err := net.ParseCIDR(hnsSubnet.AddressPrefix)
 
-		if err != nil ***REMOVED***
+		if err != nil {
 			logrus.Errorf("Error parsing subnet address %s ", hnsSubnet.AddressPrefix)
 			continue
-		***REMOVED***
+		}
 
 		localsubnet.subnetIP = subnetIP
 
 		n.subnets = append(n.subnets, localsubnet)
-	***REMOVED***
+	}
 
 	return n
-***REMOVED***
+}
 
-func (d *driver) Type() string ***REMOVED***
+func (d *driver) Type() string {
 	return networkType
-***REMOVED***
+}
 
-func (d *driver) IsBuiltIn() bool ***REMOVED***
+func (d *driver) IsBuiltIn() bool {
 	return true
-***REMOVED***
+}
 
 // DiscoverNew is a notification for a new discovery event, such as a new node joining a cluster
-func (d *driver) DiscoverNew(dType discoverapi.DiscoveryType, data interface***REMOVED******REMOVED***) error ***REMOVED***
+func (d *driver) DiscoverNew(dType discoverapi.DiscoveryType, data interface{}) error {
 	return types.NotImplementedErrorf("not implemented")
-***REMOVED***
+}
 
 // DiscoverDelete is a notification for a discovery delete event, such as a node leaving a cluster
-func (d *driver) DiscoverDelete(dType discoverapi.DiscoveryType, data interface***REMOVED******REMOVED***) error ***REMOVED***
+func (d *driver) DiscoverDelete(dType discoverapi.DiscoveryType, data interface{}) error {
 	return types.NotImplementedErrorf("not implemented")
-***REMOVED***
+}

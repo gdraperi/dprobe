@@ -10,90 +10,90 @@ import (
  */
 
 // ConnectedEvent is used for when we connect to Slack
-type ConnectedEvent struct ***REMOVED***
+type ConnectedEvent struct {
 	ConnectionCount int // 1 = first time, 2 = second time
 	Info            *Info
-***REMOVED***
+}
 
 // ConnectionErrorEvent contains information about a connection error
-type ConnectionErrorEvent struct ***REMOVED***
+type ConnectionErrorEvent struct {
 	Attempt  int
 	ErrorObj error
-***REMOVED***
+}
 
-func (c *ConnectionErrorEvent) Error() string ***REMOVED***
+func (c *ConnectionErrorEvent) Error() string {
 	return c.ErrorObj.Error()
-***REMOVED***
+}
 
 // ConnectingEvent contains information about our connection attempt
-type ConnectingEvent struct ***REMOVED***
+type ConnectingEvent struct {
 	Attempt         int // 1 = first attempt, 2 = second attempt
 	ConnectionCount int
-***REMOVED***
+}
 
 // DisconnectedEvent contains information about how we disconnected
-type DisconnectedEvent struct ***REMOVED***
+type DisconnectedEvent struct {
 	Intentional bool
-***REMOVED***
+}
 
 // LatencyReport contains information about connection latency
-type LatencyReport struct ***REMOVED***
+type LatencyReport struct {
 	Value time.Duration
-***REMOVED***
+}
 
 // InvalidAuthEvent is used in case we can't even authenticate with the API
-type InvalidAuthEvent struct***REMOVED******REMOVED***
+type InvalidAuthEvent struct{}
 
 // UnmarshallingErrorEvent is used when there are issues deconstructing a response
-type UnmarshallingErrorEvent struct ***REMOVED***
+type UnmarshallingErrorEvent struct {
 	ErrorObj error
-***REMOVED***
+}
 
-func (u UnmarshallingErrorEvent) Error() string ***REMOVED***
+func (u UnmarshallingErrorEvent) Error() string {
 	return u.ErrorObj.Error()
-***REMOVED***
+}
 
 // MessageTooLongEvent is used when sending a message that is too long
-type MessageTooLongEvent struct ***REMOVED***
+type MessageTooLongEvent struct {
 	Message   OutgoingMessage
 	MaxLength int
-***REMOVED***
+}
 
-func (m *MessageTooLongEvent) Error() string ***REMOVED***
+func (m *MessageTooLongEvent) Error() string {
 	return fmt.Sprintf("Message too long (max %d characters)", m.MaxLength)
-***REMOVED***
+}
 
 // RateLimitEvent is used when Slack warns that rate-limits are being hit.
-type RateLimitEvent struct***REMOVED******REMOVED***
+type RateLimitEvent struct{}
 
-func (e *RateLimitEvent) Error() string ***REMOVED***
+func (e *RateLimitEvent) Error() string {
 	return "Messages are being sent too fast."
-***REMOVED***
+}
 
 // OutgoingErrorEvent contains information in case there were errors sending messages
-type OutgoingErrorEvent struct ***REMOVED***
+type OutgoingErrorEvent struct {
 	Message  OutgoingMessage
 	ErrorObj error
-***REMOVED***
+}
 
-func (o OutgoingErrorEvent) Error() string ***REMOVED***
+func (o OutgoingErrorEvent) Error() string {
 	return o.ErrorObj.Error()
-***REMOVED***
+}
 
 // IncomingEventError contains information about an unexpected error receiving a websocket event
-type IncomingEventError struct ***REMOVED***
+type IncomingEventError struct {
 	ErrorObj error
-***REMOVED***
+}
 
-func (i *IncomingEventError) Error() string ***REMOVED***
+func (i *IncomingEventError) Error() string {
 	return i.ErrorObj.Error()
-***REMOVED***
+}
 
 // AckErrorEvent i
-type AckErrorEvent struct ***REMOVED***
+type AckErrorEvent struct {
 	ErrorObj error
-***REMOVED***
+}
 
-func (a *AckErrorEvent) Error() string ***REMOVED***
+func (a *AckErrorEvent) Error() string {
 	return a.ErrorObj.Error()
-***REMOVED***
+}

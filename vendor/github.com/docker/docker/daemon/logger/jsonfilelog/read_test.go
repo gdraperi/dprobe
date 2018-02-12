@@ -10,29 +10,29 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func BenchmarkJSONFileLoggerReadLogs(b *testing.B) ***REMOVED***
+func BenchmarkJSONFileLoggerReadLogs(b *testing.B) {
 	tmp := fs.NewDir(b, "bench-jsonfilelog")
 	defer tmp.Remove()
 
-	jsonlogger, err := New(logger.Info***REMOVED***
+	jsonlogger, err := New(logger.Info{
 		ContainerID: "a7317399f3f857173c6179d44823594f8294678dea9999662e5c625b5a1c7657",
 		LogPath:     tmp.Join("container.log"),
-		Config: map[string]string***REMOVED***
+		Config: map[string]string{
 			"labels": "first,second",
-		***REMOVED***,
-		ContainerLabels: map[string]string***REMOVED***
+		},
+		ContainerLabels: map[string]string{
 			"first":  "label_value",
 			"second": "label_foo",
-		***REMOVED***,
-	***REMOVED***)
+		},
+	})
 	require.NoError(b, err)
 	defer jsonlogger.Close()
 
-	msg := &logger.Message***REMOVED***
+	msg := &logger.Message{
 		Line:      []byte("Line that thinks that it is log line from docker\n"),
 		Source:    "stderr",
 		Timestamp: time.Now().UTC(),
-	***REMOVED***
+	}
 
 	buf := bytes.NewBuffer(nil)
 	require.NoError(b, marshalMessage(msg, nil, buf))
@@ -41,24 +41,24 @@ func BenchmarkJSONFileLoggerReadLogs(b *testing.B) ***REMOVED***
 	b.ResetTimer()
 
 	chError := make(chan error, b.N+1)
-	go func() ***REMOVED***
-		for i := 0; i < b.N; i++ ***REMOVED***
+	go func() {
+		for i := 0; i < b.N; i++ {
 			chError <- jsonlogger.Log(msg)
-		***REMOVED***
+		}
 		chError <- jsonlogger.Close()
-	***REMOVED***()
+	}()
 
-	lw := jsonlogger.(*JSONFileLogger).ReadLogs(logger.ReadConfig***REMOVED***Follow: true***REMOVED***)
+	lw := jsonlogger.(*JSONFileLogger).ReadLogs(logger.ReadConfig{Follow: true})
 	watchClose := lw.WatchClose()
-	for ***REMOVED***
-		select ***REMOVED***
+	for {
+		select {
 		case <-lw.Msg:
 		case <-watchClose:
 			return
 		case err := <-chError:
-			if err != nil ***REMOVED***
+			if err != nil {
 				b.Fatal(err)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}

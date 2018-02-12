@@ -6,7 +6,7 @@ import (
 )
 
 // CreateConfig hold task creation configuration
-type CreateConfig struct ***REMOVED***
+type CreateConfig struct {
 	ID               string
 	Bundle           string
 	Runtime          string
@@ -18,20 +18,20 @@ type CreateConfig struct ***REMOVED***
 	Checkpoint       string
 	ParentCheckpoint string
 	Options          *google_protobuf.Any
-***REMOVED***
+}
 
 // ExecConfig holds exec creation configuration
-type ExecConfig struct ***REMOVED***
+type ExecConfig struct {
 	ID       string
 	Terminal bool
 	Stdin    string
 	Stdout   string
 	Stderr   string
 	Spec     *google_protobuf.Any
-***REMOVED***
+}
 
 // CheckpointConfig holds task checkpoint configuration
-type CheckpointConfig struct ***REMOVED***
+type CheckpointConfig struct {
 	Path    string
 	Options *google_protobuf.Any
-***REMOVED***
+}

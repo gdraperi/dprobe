@@ -12,16 +12,16 @@
 // 	alpha-numeric                   := /[a-z0-9]+/
 //	separator                       := /[_.]|__|[-]*/
 //
-//	tag                             := /[\w][\w.-]***REMOVED***0,127***REMOVED***/
+//	tag                             := /[\w][\w.-]{0,127}/
 //
 //	digest                          := digest-algorithm ":" digest-hex
 //	digest-algorithm                := digest-algorithm-component [ digest-algorithm-separator digest-algorithm-component ]*
 //	digest-algorithm-separator      := /[+.-_]/
 //	digest-algorithm-component      := /[A-Za-z][A-Za-z0-9]*/
-//	digest-hex                      := /[0-9a-fA-F]***REMOVED***32,***REMOVED***/ ; At least 128 bit digest value
+//	digest-hex                      := /[0-9a-fA-F]{32,}/ ; At least 128 bit digest value
 //
-//	identifier                      := /[a-f0-9]***REMOVED***64***REMOVED***/
-//	short-identifier                := /[a-f0-9]***REMOVED***6,64***REMOVED***/
+//	identifier                      := /[a-f0-9]{64}/
+//	short-identifier                := /[a-f0-9]{6,64}/
 package reference
 
 import (
@@ -62,372 +62,372 @@ var (
 
 // Reference is an opaque object reference identifier that may include
 // modifiers such as a hostname, name, tag, and digest.
-type Reference interface ***REMOVED***
+type Reference interface {
 	// String returns the full reference
 	String() string
-***REMOVED***
+}
 
 // Field provides a wrapper type for resolving correct reference types when
 // working with encoding.
-type Field struct ***REMOVED***
+type Field struct {
 	reference Reference
-***REMOVED***
+}
 
 // AsField wraps a reference in a Field for encoding.
-func AsField(reference Reference) Field ***REMOVED***
-	return Field***REMOVED***reference***REMOVED***
-***REMOVED***
+func AsField(reference Reference) Field {
+	return Field{reference}
+}
 
 // Reference unwraps the reference type from the field to
 // return the Reference object. This object should be
 // of the appropriate type to further check for different
 // reference types.
-func (f Field) Reference() Reference ***REMOVED***
+func (f Field) Reference() Reference {
 	return f.reference
-***REMOVED***
+}
 
 // MarshalText serializes the field to byte text which
 // is the string of the reference.
-func (f Field) MarshalText() (p []byte, err error) ***REMOVED***
+func (f Field) MarshalText() (p []byte, err error) {
 	return []byte(f.reference.String()), nil
-***REMOVED***
+}
 
 // UnmarshalText parses text bytes by invoking the
 // reference parser to ensure the appropriately
 // typed reference object is wrapped by field.
-func (f *Field) UnmarshalText(p []byte) error ***REMOVED***
+func (f *Field) UnmarshalText(p []byte) error {
 	r, err := Parse(string(p))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	f.reference = r
 	return nil
-***REMOVED***
+}
 
 // Named is an object with a full name
-type Named interface ***REMOVED***
+type Named interface {
 	Reference
 	Name() string
-***REMOVED***
+}
 
 // Tagged is an object which has a tag
-type Tagged interface ***REMOVED***
+type Tagged interface {
 	Reference
 	Tag() string
-***REMOVED***
+}
 
 // NamedTagged is an object including a name and tag.
-type NamedTagged interface ***REMOVED***
+type NamedTagged interface {
 	Named
 	Tag() string
-***REMOVED***
+}
 
 // Digested is an object which has a digest
 // in which it can be referenced by
-type Digested interface ***REMOVED***
+type Digested interface {
 	Reference
 	Digest() digest.Digest
-***REMOVED***
+}
 
 // Canonical reference is an object with a fully unique
 // name including a name with domain and digest
-type Canonical interface ***REMOVED***
+type Canonical interface {
 	Named
 	Digest() digest.Digest
-***REMOVED***
+}
 
 // namedRepository is a reference to a repository with a name.
 // A namedRepository has both domain and path components.
-type namedRepository interface ***REMOVED***
+type namedRepository interface {
 	Named
 	Domain() string
 	Path() string
-***REMOVED***
+}
 
 // Domain returns the domain part of the Named reference
-func Domain(named Named) string ***REMOVED***
-	if r, ok := named.(namedRepository); ok ***REMOVED***
+func Domain(named Named) string {
+	if r, ok := named.(namedRepository); ok {
 		return r.Domain()
-	***REMOVED***
+	}
 	domain, _ := splitDomain(named.Name())
 	return domain
-***REMOVED***
+}
 
 // Path returns the name without the domain part of the Named reference
-func Path(named Named) (name string) ***REMOVED***
-	if r, ok := named.(namedRepository); ok ***REMOVED***
+func Path(named Named) (name string) {
+	if r, ok := named.(namedRepository); ok {
 		return r.Path()
-	***REMOVED***
+	}
 	_, path := splitDomain(named.Name())
 	return path
-***REMOVED***
+}
 
-func splitDomain(name string) (string, string) ***REMOVED***
+func splitDomain(name string) (string, string) {
 	match := anchoredNameRegexp.FindStringSubmatch(name)
-	if len(match) != 3 ***REMOVED***
+	if len(match) != 3 {
 		return "", name
-	***REMOVED***
+	}
 	return match[1], match[2]
-***REMOVED***
+}
 
 // SplitHostname splits a named reference into a
 // hostname and name string. If no valid hostname is
 // found, the hostname is empty and the full value
 // is returned as name
 // DEPRECATED: Use Domain or Path
-func SplitHostname(named Named) (string, string) ***REMOVED***
-	if r, ok := named.(namedRepository); ok ***REMOVED***
+func SplitHostname(named Named) (string, string) {
+	if r, ok := named.(namedRepository); ok {
 		return r.Domain(), r.Path()
-	***REMOVED***
+	}
 	return splitDomain(named.Name())
-***REMOVED***
+}
 
 // Parse parses s and returns a syntactically valid Reference.
 // If an error was encountered it is returned, along with a nil Reference.
 // NOTE: Parse will not handle short digests.
-func Parse(s string) (Reference, error) ***REMOVED***
+func Parse(s string) (Reference, error) {
 	matches := ReferenceRegexp.FindStringSubmatch(s)
-	if matches == nil ***REMOVED***
-		if s == "" ***REMOVED***
+	if matches == nil {
+		if s == "" {
 			return nil, ErrNameEmpty
-		***REMOVED***
-		if ReferenceRegexp.FindStringSubmatch(strings.ToLower(s)) != nil ***REMOVED***
+		}
+		if ReferenceRegexp.FindStringSubmatch(strings.ToLower(s)) != nil {
 			return nil, ErrNameContainsUppercase
-		***REMOVED***
+		}
 		return nil, ErrReferenceInvalidFormat
-	***REMOVED***
+	}
 
-	if len(matches[1]) > NameTotalLengthMax ***REMOVED***
+	if len(matches[1]) > NameTotalLengthMax {
 		return nil, ErrNameTooLong
-	***REMOVED***
+	}
 
 	var repo repository
 
 	nameMatch := anchoredNameRegexp.FindStringSubmatch(matches[1])
-	if nameMatch != nil && len(nameMatch) == 3 ***REMOVED***
+	if nameMatch != nil && len(nameMatch) == 3 {
 		repo.domain = nameMatch[1]
 		repo.path = nameMatch[2]
-	***REMOVED*** else ***REMOVED***
+	} else {
 		repo.domain = ""
 		repo.path = matches[1]
-	***REMOVED***
+	}
 
-	ref := reference***REMOVED***
+	ref := reference{
 		namedRepository: repo,
 		tag:             matches[2],
-	***REMOVED***
-	if matches[3] != "" ***REMOVED***
+	}
+	if matches[3] != "" {
 		var err error
 		ref.digest, err = digest.Parse(matches[3])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	r := getBestReferenceType(ref)
-	if r == nil ***REMOVED***
+	if r == nil {
 		return nil, ErrNameEmpty
-	***REMOVED***
+	}
 
 	return r, nil
-***REMOVED***
+}
 
 // ParseNamed parses s and returns a syntactically valid reference implementing
 // the Named interface. The reference must have a name and be in the canonical
 // form, otherwise an error is returned.
 // If an error was encountered it is returned, along with a nil Reference.
 // NOTE: ParseNamed will not handle short digests.
-func ParseNamed(s string) (Named, error) ***REMOVED***
+func ParseNamed(s string) (Named, error) {
 	named, err := ParseNormalizedNamed(s)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if named.String() != s ***REMOVED***
+	}
+	if named.String() != s {
 		return nil, ErrNameNotCanonical
-	***REMOVED***
+	}
 	return named, nil
-***REMOVED***
+}
 
 // WithName returns a named object representing the given string. If the input
 // is invalid ErrReferenceInvalidFormat will be returned.
-func WithName(name string) (Named, error) ***REMOVED***
-	if len(name) > NameTotalLengthMax ***REMOVED***
+func WithName(name string) (Named, error) {
+	if len(name) > NameTotalLengthMax {
 		return nil, ErrNameTooLong
-	***REMOVED***
+	}
 
 	match := anchoredNameRegexp.FindStringSubmatch(name)
-	if match == nil || len(match) != 3 ***REMOVED***
+	if match == nil || len(match) != 3 {
 		return nil, ErrReferenceInvalidFormat
-	***REMOVED***
-	return repository***REMOVED***
+	}
+	return repository{
 		domain: match[1],
 		path:   match[2],
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // WithTag combines the name from "name" and the tag from "tag" to form a
 // reference incorporating both the name and the tag.
-func WithTag(name Named, tag string) (NamedTagged, error) ***REMOVED***
-	if !anchoredTagRegexp.MatchString(tag) ***REMOVED***
+func WithTag(name Named, tag string) (NamedTagged, error) {
+	if !anchoredTagRegexp.MatchString(tag) {
 		return nil, ErrTagInvalidFormat
-	***REMOVED***
+	}
 	var repo repository
-	if r, ok := name.(namedRepository); ok ***REMOVED***
+	if r, ok := name.(namedRepository); ok {
 		repo.domain = r.Domain()
 		repo.path = r.Path()
-	***REMOVED*** else ***REMOVED***
+	} else {
 		repo.path = name.Name()
-	***REMOVED***
-	if canonical, ok := name.(Canonical); ok ***REMOVED***
-		return reference***REMOVED***
+	}
+	if canonical, ok := name.(Canonical); ok {
+		return reference{
 			namedRepository: repo,
 			tag:             tag,
 			digest:          canonical.Digest(),
-		***REMOVED***, nil
-	***REMOVED***
-	return taggedReference***REMOVED***
+		}, nil
+	}
+	return taggedReference{
 		namedRepository: repo,
 		tag:             tag,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // WithDigest combines the name from "name" and the digest from "digest" to form
 // a reference incorporating both the name and the digest.
-func WithDigest(name Named, digest digest.Digest) (Canonical, error) ***REMOVED***
-	if !anchoredDigestRegexp.MatchString(digest.String()) ***REMOVED***
+func WithDigest(name Named, digest digest.Digest) (Canonical, error) {
+	if !anchoredDigestRegexp.MatchString(digest.String()) {
 		return nil, ErrDigestInvalidFormat
-	***REMOVED***
+	}
 	var repo repository
-	if r, ok := name.(namedRepository); ok ***REMOVED***
+	if r, ok := name.(namedRepository); ok {
 		repo.domain = r.Domain()
 		repo.path = r.Path()
-	***REMOVED*** else ***REMOVED***
+	} else {
 		repo.path = name.Name()
-	***REMOVED***
-	if tagged, ok := name.(Tagged); ok ***REMOVED***
-		return reference***REMOVED***
+	}
+	if tagged, ok := name.(Tagged); ok {
+		return reference{
 			namedRepository: repo,
 			tag:             tagged.Tag(),
 			digest:          digest,
-		***REMOVED***, nil
-	***REMOVED***
-	return canonicalReference***REMOVED***
+		}, nil
+	}
+	return canonicalReference{
 		namedRepository: repo,
 		digest:          digest,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // TrimNamed removes any tag or digest from the named reference.
-func TrimNamed(ref Named) Named ***REMOVED***
+func TrimNamed(ref Named) Named {
 	domain, path := SplitHostname(ref)
-	return repository***REMOVED***
+	return repository{
 		domain: domain,
 		path:   path,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func getBestReferenceType(ref reference) Reference ***REMOVED***
-	if ref.Name() == "" ***REMOVED***
+func getBestReferenceType(ref reference) Reference {
+	if ref.Name() == "" {
 		// Allow digest only references
-		if ref.digest != "" ***REMOVED***
+		if ref.digest != "" {
 			return digestReference(ref.digest)
-		***REMOVED***
+		}
 		return nil
-	***REMOVED***
-	if ref.tag == "" ***REMOVED***
-		if ref.digest != "" ***REMOVED***
-			return canonicalReference***REMOVED***
+	}
+	if ref.tag == "" {
+		if ref.digest != "" {
+			return canonicalReference{
 				namedRepository: ref.namedRepository,
 				digest:          ref.digest,
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		return ref.namedRepository
-	***REMOVED***
-	if ref.digest == "" ***REMOVED***
-		return taggedReference***REMOVED***
+	}
+	if ref.digest == "" {
+		return taggedReference{
 			namedRepository: ref.namedRepository,
 			tag:             ref.tag,
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return ref
-***REMOVED***
+}
 
-type reference struct ***REMOVED***
+type reference struct {
 	namedRepository
 	tag    string
 	digest digest.Digest
-***REMOVED***
+}
 
-func (r reference) String() string ***REMOVED***
+func (r reference) String() string {
 	return r.Name() + ":" + r.tag + "@" + r.digest.String()
-***REMOVED***
+}
 
-func (r reference) Tag() string ***REMOVED***
+func (r reference) Tag() string {
 	return r.tag
-***REMOVED***
+}
 
-func (r reference) Digest() digest.Digest ***REMOVED***
+func (r reference) Digest() digest.Digest {
 	return r.digest
-***REMOVED***
+}
 
-type repository struct ***REMOVED***
+type repository struct {
 	domain string
 	path   string
-***REMOVED***
+}
 
-func (r repository) String() string ***REMOVED***
+func (r repository) String() string {
 	return r.Name()
-***REMOVED***
+}
 
-func (r repository) Name() string ***REMOVED***
-	if r.domain == "" ***REMOVED***
+func (r repository) Name() string {
+	if r.domain == "" {
 		return r.path
-	***REMOVED***
+	}
 	return r.domain + "/" + r.path
-***REMOVED***
+}
 
-func (r repository) Domain() string ***REMOVED***
+func (r repository) Domain() string {
 	return r.domain
-***REMOVED***
+}
 
-func (r repository) Path() string ***REMOVED***
+func (r repository) Path() string {
 	return r.path
-***REMOVED***
+}
 
 type digestReference digest.Digest
 
-func (d digestReference) String() string ***REMOVED***
+func (d digestReference) String() string {
 	return digest.Digest(d).String()
-***REMOVED***
+}
 
-func (d digestReference) Digest() digest.Digest ***REMOVED***
+func (d digestReference) Digest() digest.Digest {
 	return digest.Digest(d)
-***REMOVED***
+}
 
-type taggedReference struct ***REMOVED***
+type taggedReference struct {
 	namedRepository
 	tag string
-***REMOVED***
+}
 
-func (t taggedReference) String() string ***REMOVED***
+func (t taggedReference) String() string {
 	return t.Name() + ":" + t.tag
-***REMOVED***
+}
 
-func (t taggedReference) Tag() string ***REMOVED***
+func (t taggedReference) Tag() string {
 	return t.tag
-***REMOVED***
+}
 
-type canonicalReference struct ***REMOVED***
+type canonicalReference struct {
 	namedRepository
 	digest digest.Digest
-***REMOVED***
+}
 
-func (c canonicalReference) String() string ***REMOVED***
+func (c canonicalReference) String() string {
 	return c.Name() + "@" + c.digest.String()
-***REMOVED***
+}
 
-func (c canonicalReference) Digest() digest.Digest ***REMOVED***
+func (c canonicalReference) Digest() digest.Digest {
 	return c.digest
-***REMOVED***
+}

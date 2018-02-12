@@ -15,78 +15,78 @@ import (
 )
 
 // TestReader wraps a []byte and returns reads of a specific length.
-type testReader struct ***REMOVED***
+type testReader struct {
 	data   []byte
 	stride int
-***REMOVED***
+}
 
-func (t *testReader) Read(buf []byte) (n int, err error) ***REMOVED***
+func (t *testReader) Read(buf []byte) (n int, err error) {
 	n = t.stride
-	if n > len(t.data) ***REMOVED***
+	if n > len(t.data) {
 		n = len(t.data)
-	***REMOVED***
-	if n > len(buf) ***REMOVED***
+	}
+	if n > len(buf) {
 		n = len(buf)
-	***REMOVED***
+	}
 	copy(buf, t.data)
 	t.data = t.data[n:]
-	if len(t.data) == 0 ***REMOVED***
+	if len(t.data) == 0 {
 		err = io.EOF
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func testMDCReader(t *testing.T) ***REMOVED***
+func testMDCReader(t *testing.T) {
 	mdcPlaintext, _ := hex.DecodeString(mdcPlaintextHex)
 
-	for stride := 1; stride < len(mdcPlaintext)/2; stride++ ***REMOVED***
-		r := &testReader***REMOVED***data: mdcPlaintext, stride: stride***REMOVED***
-		mdcReader := &seMDCReader***REMOVED***in: r, h: sha1.New()***REMOVED***
+	for stride := 1; stride < len(mdcPlaintext)/2; stride++ {
+		r := &testReader{data: mdcPlaintext, stride: stride}
+		mdcReader := &seMDCReader{in: r, h: sha1.New()}
 		body, err := ioutil.ReadAll(mdcReader)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Errorf("stride: %d, error: %s", stride, err)
 			continue
-		***REMOVED***
-		if !bytes.Equal(body, mdcPlaintext[:len(mdcPlaintext)-22]) ***REMOVED***
+		}
+		if !bytes.Equal(body, mdcPlaintext[:len(mdcPlaintext)-22]) {
 			t.Errorf("stride: %d: bad contents %x", stride, body)
 			continue
-		***REMOVED***
+		}
 
 		err = mdcReader.Close()
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Errorf("stride: %d, error on Close: %s", stride, err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	mdcPlaintext[15] ^= 80
 
-	r := &testReader***REMOVED***data: mdcPlaintext, stride: 2***REMOVED***
-	mdcReader := &seMDCReader***REMOVED***in: r, h: sha1.New()***REMOVED***
+	r := &testReader{data: mdcPlaintext, stride: 2}
+	mdcReader := &seMDCReader{in: r, h: sha1.New()}
 	_, err := ioutil.ReadAll(mdcReader)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("corruption test, error: %s", err)
 		return
-	***REMOVED***
+	}
 	err = mdcReader.Close()
-	if err == nil ***REMOVED***
+	if err == nil {
 		t.Error("corruption: no error")
-	***REMOVED*** else if _, ok := err.(*errors.SignatureError); !ok ***REMOVED***
+	} else if _, ok := err.(*errors.SignatureError); !ok {
 		t.Errorf("corruption: expected SignatureError, got: %s", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 const mdcPlaintextHex = "a302789c3b2d93c4e0eb9aba22283539b3203335af44a134afb800c849cb4c4de10200aff40b45d31432c80cb384299a0655966d6939dfdeed1dddf980"
 
-func TestSerialize(t *testing.T) ***REMOVED***
+func TestSerialize(t *testing.T) {
 	buf := bytes.NewBuffer(nil)
 	c := CipherAES128
 	key := make([]byte, c.KeySize())
 
 	w, err := SerializeSymmetricallyEncrypted(buf, c, key, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("error from SerializeSymmetricallyEncrypted: %s", err)
 		return
-	***REMOVED***
+	}
 
 	contents := []byte("hello world\n")
 
@@ -94,30 +94,30 @@ func TestSerialize(t *testing.T) ***REMOVED***
 	w.Close()
 
 	p, err := Read(buf)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("error from Read: %s", err)
 		return
-	***REMOVED***
+	}
 
 	se, ok := p.(*SymmetricallyEncrypted)
-	if !ok ***REMOVED***
+	if !ok {
 		t.Errorf("didn't read a *SymmetricallyEncrypted")
 		return
-	***REMOVED***
+	}
 
 	r, err := se.Decrypt(c, key)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("error from Decrypt: %s", err)
 		return
-	***REMOVED***
+	}
 
 	contentsCopy := bytes.NewBuffer(nil)
 	_, err = io.Copy(contentsCopy, r)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("error from io.Copy: %s", err)
 		return
-	***REMOVED***
-	if !bytes.Equal(contentsCopy.Bytes(), contents) ***REMOVED***
+	}
+	if !bytes.Equal(contentsCopy.Bytes(), contents) {
 		t.Errorf("contents not equal got: %x want: %x", contentsCopy.Bytes(), contents)
-	***REMOVED***
-***REMOVED***
+	}
+}

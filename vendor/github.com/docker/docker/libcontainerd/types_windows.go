@@ -11,32 +11,32 @@ import (
 type Summary hcsshim.ProcessListItem
 
 // Stats contains statistics from HCS
-type Stats struct ***REMOVED***
+type Stats struct {
 	Read     time.Time
 	HCSStats *hcsshim.Statistics
-***REMOVED***
+}
 
-func interfaceToStats(read time.Time, v interface***REMOVED******REMOVED***) *Stats ***REMOVED***
-	return &Stats***REMOVED***
+func interfaceToStats(read time.Time, v interface{}) *Stats {
+	return &Stats{
 		HCSStats: v.(*hcsshim.Statistics),
 		Read:     read,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Resources defines updatable container resource values.
-type Resources struct***REMOVED******REMOVED***
+type Resources struct{}
 
 // LCOWOption is a CreateOption required for LCOW configuration
-type LCOWOption struct ***REMOVED***
+type LCOWOption struct {
 	Config *opengcs.Config
-***REMOVED***
+}
 
 // Checkpoint holds the details of a checkpoint (not supported in windows)
-type Checkpoint struct ***REMOVED***
+type Checkpoint struct {
 	Name string
-***REMOVED***
+}
 
 // Checkpoints contains the details of a checkpoint
-type Checkpoints struct ***REMOVED***
+type Checkpoints struct {
 	Checkpoints []*Checkpoint
-***REMOVED***
+}

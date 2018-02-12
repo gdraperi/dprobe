@@ -17,41 +17,41 @@ import (
 
 var addr = flag.String("addr", "localhost:8080", "http service address")
 
-var upgrader = websocket.Upgrader***REMOVED******REMOVED*** // use default options
+var upgrader = websocket.Upgrader{} // use default options
 
-func echo(w http.ResponseWriter, r *http.Request) ***REMOVED***
+func echo(w http.ResponseWriter, r *http.Request) {
 	c, err := upgrader.Upgrade(w, r, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Print("upgrade:", err)
 		return
-	***REMOVED***
+	}
 	defer c.Close()
-	for ***REMOVED***
+	for {
 		mt, message, err := c.ReadMessage()
-		if err != nil ***REMOVED***
+		if err != nil {
 			log.Println("read:", err)
 			break
-		***REMOVED***
+		}
 		log.Printf("recv: %s", message)
 		err = c.WriteMessage(mt, message)
-		if err != nil ***REMOVED***
+		if err != nil {
 			log.Println("write:", err)
 			break
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func home(w http.ResponseWriter, r *http.Request) ***REMOVED***
+func home(w http.ResponseWriter, r *http.Request) {
 	homeTemplate.Execute(w, "ws://"+r.Host+"/echo")
-***REMOVED***
+}
 
-func main() ***REMOVED***
+func main() {
 	flag.Parse()
 	log.SetFlags(0)
 	http.HandleFunc("/echo", echo)
 	http.HandleFunc("/", home)
 	log.Fatal(http.ListenAndServe(*addr, nil))
-***REMOVED***
+}
 
 var homeTemplate = template.Must(template.New("").Parse(`
 <!DOCTYPE html>
@@ -59,57 +59,57 @@ var homeTemplate = template.Must(template.New("").Parse(`
 <head>
 <meta charset="utf-8">
 <script>  
-window.addEventListener("load", function(evt) ***REMOVED***
+window.addEventListener("load", function(evt) {
 
     var output = document.getElementById("output");
     var input = document.getElementById("input");
     var ws;
 
-    var print = function(message) ***REMOVED***
+    var print = function(message) {
         var d = document.createElement("div");
         d.innerHTML = message;
         output.appendChild(d);
-***REMOVED***;
+    };
 
-    document.getElementById("open").onclick = function(evt) ***REMOVED***
-        if (ws) ***REMOVED***
+    document.getElementById("open").onclick = function(evt) {
+        if (ws) {
             return false;
-    ***REMOVED***
-        ws = new WebSocket("***REMOVED******REMOVED***.***REMOVED******REMOVED***");
-        ws.onopen = function(evt) ***REMOVED***
+        }
+        ws = new WebSocket("{{.}}");
+        ws.onopen = function(evt) {
             print("OPEN");
-    ***REMOVED***
-        ws.onclose = function(evt) ***REMOVED***
+        }
+        ws.onclose = function(evt) {
             print("CLOSE");
             ws = null;
-    ***REMOVED***
-        ws.onmessage = function(evt) ***REMOVED***
+        }
+        ws.onmessage = function(evt) {
             print("RESPONSE: " + evt.data);
-    ***REMOVED***
-        ws.onerror = function(evt) ***REMOVED***
+        }
+        ws.onerror = function(evt) {
             print("ERROR: " + evt.data);
-    ***REMOVED***
+        }
         return false;
-***REMOVED***;
+    };
 
-    document.getElementById("send").onclick = function(evt) ***REMOVED***
-        if (!ws) ***REMOVED***
+    document.getElementById("send").onclick = function(evt) {
+        if (!ws) {
             return false;
-    ***REMOVED***
+        }
         print("SEND: " + input.value);
         ws.send(input.value);
         return false;
-***REMOVED***;
+    };
 
-    document.getElementById("close").onclick = function(evt) ***REMOVED***
-        if (!ws) ***REMOVED***
+    document.getElementById("close").onclick = function(evt) {
+        if (!ws) {
             return false;
-    ***REMOVED***
+        }
         ws.close();
         return false;
-***REMOVED***;
+    };
 
-***REMOVED***);
+});
 </script>
 </head>
 <body>

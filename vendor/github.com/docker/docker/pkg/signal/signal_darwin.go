@@ -5,7 +5,7 @@ import (
 )
 
 // SignalMap is a map of Darwin signals.
-var SignalMap = map[string]syscall.Signal***REMOVED***
+var SignalMap = map[string]syscall.Signal{
 	"ABRT":   syscall.SIGABRT,
 	"ALRM":   syscall.SIGALRM,
 	"BUG":    syscall.SIGBUS,
@@ -38,4 +38,4 @@ var SignalMap = map[string]syscall.Signal***REMOVED***
 	"WINCH":  syscall.SIGWINCH,
 	"XCPU":   syscall.SIGXCPU,
 	"XFSZ":   syscall.SIGXFSZ,
-***REMOVED***
+}

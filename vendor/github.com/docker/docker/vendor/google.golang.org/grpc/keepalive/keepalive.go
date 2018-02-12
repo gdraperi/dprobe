@@ -43,7 +43,7 @@ import (
 // and to cause activity so intermediaries are aware the connection is still in use.
 // Make sure these parameters are set in coordination with the keepalive policy on the server,
 // as incompatible settings can result in closing of connection.
-type ClientParameters struct ***REMOVED***
+type ClientParameters struct {
 	// After a duration of this time if the client doesn't see any activity it pings the server to see if the transport is still alive.
 	Time time.Duration // The current default value is infinity.
 	// After having pinged for keepalive check, the client waits for a duration of Timeout and if no activity is seen even after that
@@ -51,10 +51,10 @@ type ClientParameters struct ***REMOVED***
 	Timeout time.Duration // The current default value is 20 seconds.
 	// If true, client runs keepalive checks even with no active RPCs.
 	PermitWithoutStream bool // false by default.
-***REMOVED***
+}
 
 // ServerParameters is used to set keepalive and max-age parameters on the server-side.
-type ServerParameters struct ***REMOVED***
+type ServerParameters struct {
 	// MaxConnectionIdle is a duration for the amount of time after which an idle connection would be closed by sending a GoAway.
 	// Idleness duration is defined since the most recent time the number of outstanding RPCs became zero or the connection establishment.
 	MaxConnectionIdle time.Duration // The current default value is infinity.
@@ -68,13 +68,13 @@ type ServerParameters struct ***REMOVED***
 	// After having pinged for keepalive check, the server waits for a duration of Timeout and if no activity is seen even after that
 	// the connection is closed.
 	Timeout time.Duration // The current default value is 20 seconds.
-***REMOVED***
+}
 
 // EnforcementPolicy is used to set keepalive enforcement policy on the server-side.
 // Server will close connection with a client that violates this policy.
-type EnforcementPolicy struct ***REMOVED***
+type EnforcementPolicy struct {
 	// MinTime is the minimum amount of time a client should wait before sending a keepalive ping.
 	MinTime time.Duration // The current default value is 5 minutes.
 	// If true, server expects keepalive pings even when there are no active streams(RPCs).
 	PermitWithoutStream bool // false by default.
-***REMOVED***
+}

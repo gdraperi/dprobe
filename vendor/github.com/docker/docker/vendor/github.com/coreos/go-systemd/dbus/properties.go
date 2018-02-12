@@ -34,204 +34,204 @@ import (
 // used for construction of the scope only and specifies the initial PIDs to
 // add to the scope object.
 
-type Property struct ***REMOVED***
+type Property struct {
 	Name  string
 	Value dbus.Variant
-***REMOVED***
+}
 
-type PropertyCollection struct ***REMOVED***
+type PropertyCollection struct {
 	Name       string
 	Properties []Property
-***REMOVED***
+}
 
-type execStart struct ***REMOVED***
+type execStart struct {
 	Path             string   // the binary path to execute
 	Args             []string // an array with all arguments to pass to the executed command, starting with argument 0
 	UncleanIsFailure bool     // a boolean whether it should be considered a failure if the process exits uncleanly
-***REMOVED***
+}
 
 // PropExecStart sets the ExecStart service property.  The first argument is a
 // slice with the binary path to execute followed by the arguments to pass to
 // the executed command. See
 // http://www.freedesktop.org/software/systemd/man/systemd.service.html#ExecStart=
-func PropExecStart(command []string, uncleanIsFailure bool) Property ***REMOVED***
-	execStarts := []execStart***REMOVED***
-		execStart***REMOVED***
+func PropExecStart(command []string, uncleanIsFailure bool) Property {
+	execStarts := []execStart{
+		execStart{
 			Path:             command[0],
 			Args:             command,
 			UncleanIsFailure: uncleanIsFailure,
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
-	return Property***REMOVED***
+	return Property{
 		Name:  "ExecStart",
 		Value: dbus.MakeVariant(execStarts),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // PropRemainAfterExit sets the RemainAfterExit service property. See
 // http://www.freedesktop.org/software/systemd/man/systemd.service.html#RemainAfterExit=
-func PropRemainAfterExit(b bool) Property ***REMOVED***
-	return Property***REMOVED***
+func PropRemainAfterExit(b bool) Property {
+	return Property{
 		Name:  "RemainAfterExit",
 		Value: dbus.MakeVariant(b),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // PropType sets the Type service property. See
 // http://www.freedesktop.org/software/systemd/man/systemd.service.html#Type=
-func PropType(t string) Property ***REMOVED***
-	return Property***REMOVED***
+func PropType(t string) Property {
+	return Property{
 		Name:  "Type",
 		Value: dbus.MakeVariant(t),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // PropDescription sets the Description unit property. See
 // http://www.freedesktop.org/software/systemd/man/systemd.unit#Description=
-func PropDescription(desc string) Property ***REMOVED***
-	return Property***REMOVED***
+func PropDescription(desc string) Property {
+	return Property{
 		Name:  "Description",
 		Value: dbus.MakeVariant(desc),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func propDependency(name string, units []string) Property ***REMOVED***
-	return Property***REMOVED***
+func propDependency(name string, units []string) Property {
+	return Property{
 		Name:  name,
 		Value: dbus.MakeVariant(units),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // PropRequires sets the Requires unit property.  See
 // http://www.freedesktop.org/software/systemd/man/systemd.unit.html#Requires=
-func PropRequires(units ...string) Property ***REMOVED***
+func PropRequires(units ...string) Property {
 	return propDependency("Requires", units)
-***REMOVED***
+}
 
 // PropRequiresOverridable sets the RequiresOverridable unit property.  See
 // http://www.freedesktop.org/software/systemd/man/systemd.unit.html#RequiresOverridable=
-func PropRequiresOverridable(units ...string) Property ***REMOVED***
+func PropRequiresOverridable(units ...string) Property {
 	return propDependency("RequiresOverridable", units)
-***REMOVED***
+}
 
 // PropRequisite sets the Requisite unit property.  See
 // http://www.freedesktop.org/software/systemd/man/systemd.unit.html#Requisite=
-func PropRequisite(units ...string) Property ***REMOVED***
+func PropRequisite(units ...string) Property {
 	return propDependency("Requisite", units)
-***REMOVED***
+}
 
 // PropRequisiteOverridable sets the RequisiteOverridable unit property.  See
 // http://www.freedesktop.org/software/systemd/man/systemd.unit.html#RequisiteOverridable=
-func PropRequisiteOverridable(units ...string) Property ***REMOVED***
+func PropRequisiteOverridable(units ...string) Property {
 	return propDependency("RequisiteOverridable", units)
-***REMOVED***
+}
 
 // PropWants sets the Wants unit property.  See
 // http://www.freedesktop.org/software/systemd/man/systemd.unit.html#Wants=
-func PropWants(units ...string) Property ***REMOVED***
+func PropWants(units ...string) Property {
 	return propDependency("Wants", units)
-***REMOVED***
+}
 
 // PropBindsTo sets the BindsTo unit property.  See
 // http://www.freedesktop.org/software/systemd/man/systemd.unit.html#BindsTo=
-func PropBindsTo(units ...string) Property ***REMOVED***
+func PropBindsTo(units ...string) Property {
 	return propDependency("BindsTo", units)
-***REMOVED***
+}
 
 // PropRequiredBy sets the RequiredBy unit property.  See
 // http://www.freedesktop.org/software/systemd/man/systemd.unit.html#RequiredBy=
-func PropRequiredBy(units ...string) Property ***REMOVED***
+func PropRequiredBy(units ...string) Property {
 	return propDependency("RequiredBy", units)
-***REMOVED***
+}
 
 // PropRequiredByOverridable sets the RequiredByOverridable unit property.  See
 // http://www.freedesktop.org/software/systemd/man/systemd.unit.html#RequiredByOverridable=
-func PropRequiredByOverridable(units ...string) Property ***REMOVED***
+func PropRequiredByOverridable(units ...string) Property {
 	return propDependency("RequiredByOverridable", units)
-***REMOVED***
+}
 
 // PropWantedBy sets the WantedBy unit property.  See
 // http://www.freedesktop.org/software/systemd/man/systemd.unit.html#WantedBy=
-func PropWantedBy(units ...string) Property ***REMOVED***
+func PropWantedBy(units ...string) Property {
 	return propDependency("WantedBy", units)
-***REMOVED***
+}
 
 // PropBoundBy sets the BoundBy unit property.  See
 // http://www.freedesktop.org/software/systemd/main/systemd.unit.html#BoundBy=
-func PropBoundBy(units ...string) Property ***REMOVED***
+func PropBoundBy(units ...string) Property {
 	return propDependency("BoundBy", units)
-***REMOVED***
+}
 
 // PropConflicts sets the Conflicts unit property.  See
 // http://www.freedesktop.org/software/systemd/man/systemd.unit.html#Conflicts=
-func PropConflicts(units ...string) Property ***REMOVED***
+func PropConflicts(units ...string) Property {
 	return propDependency("Conflicts", units)
-***REMOVED***
+}
 
 // PropConflictedBy sets the ConflictedBy unit property.  See
 // http://www.freedesktop.org/software/systemd/man/systemd.unit.html#ConflictedBy=
-func PropConflictedBy(units ...string) Property ***REMOVED***
+func PropConflictedBy(units ...string) Property {
 	return propDependency("ConflictedBy", units)
-***REMOVED***
+}
 
 // PropBefore sets the Before unit property.  See
 // http://www.freedesktop.org/software/systemd/man/systemd.unit.html#Before=
-func PropBefore(units ...string) Property ***REMOVED***
+func PropBefore(units ...string) Property {
 	return propDependency("Before", units)
-***REMOVED***
+}
 
 // PropAfter sets the After unit property.  See
 // http://www.freedesktop.org/software/systemd/man/systemd.unit.html#After=
-func PropAfter(units ...string) Property ***REMOVED***
+func PropAfter(units ...string) Property {
 	return propDependency("After", units)
-***REMOVED***
+}
 
 // PropOnFailure sets the OnFailure unit property.  See
 // http://www.freedesktop.org/software/systemd/man/systemd.unit.html#OnFailure=
-func PropOnFailure(units ...string) Property ***REMOVED***
+func PropOnFailure(units ...string) Property {
 	return propDependency("OnFailure", units)
-***REMOVED***
+}
 
 // PropTriggers sets the Triggers unit property.  See
 // http://www.freedesktop.org/software/systemd/man/systemd.unit.html#Triggers=
-func PropTriggers(units ...string) Property ***REMOVED***
+func PropTriggers(units ...string) Property {
 	return propDependency("Triggers", units)
-***REMOVED***
+}
 
 // PropTriggeredBy sets the TriggeredBy unit property.  See
 // http://www.freedesktop.org/software/systemd/man/systemd.unit.html#TriggeredBy=
-func PropTriggeredBy(units ...string) Property ***REMOVED***
+func PropTriggeredBy(units ...string) Property {
 	return propDependency("TriggeredBy", units)
-***REMOVED***
+}
 
 // PropPropagatesReloadTo sets the PropagatesReloadTo unit property.  See
 // http://www.freedesktop.org/software/systemd/man/systemd.unit.html#PropagatesReloadTo=
-func PropPropagatesReloadTo(units ...string) Property ***REMOVED***
+func PropPropagatesReloadTo(units ...string) Property {
 	return propDependency("PropagatesReloadTo", units)
-***REMOVED***
+}
 
 // PropRequiresMountsFor sets the RequiresMountsFor unit property.  See
 // http://www.freedesktop.org/software/systemd/man/systemd.unit.html#RequiresMountsFor=
-func PropRequiresMountsFor(units ...string) Property ***REMOVED***
+func PropRequiresMountsFor(units ...string) Property {
 	return propDependency("RequiresMountsFor", units)
-***REMOVED***
+}
 
 // PropSlice sets the Slice unit property.  See
 // http://www.freedesktop.org/software/systemd/man/systemd.resource-control.html#Slice=
-func PropSlice(slice string) Property ***REMOVED***
-	return Property***REMOVED***
+func PropSlice(slice string) Property {
+	return Property{
 		Name:  "Slice",
 		Value: dbus.MakeVariant(slice),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // PropPids sets the PIDs field of scope units used in the initial construction
 // of the scope only and specifies the initial PIDs to add to the scope object.
 // See https://www.freedesktop.org/wiki/Software/systemd/ControlGroupInterface/#properties
-func PropPids(pids ...uint32) Property ***REMOVED***
-	return Property***REMOVED***
+func PropPids(pids ...uint32) Property {
+	return Property{
 		Name:  "PIDs",
 		Value: dbus.MakeVariant(pids),
-	***REMOVED***
-***REMOVED***
+	}
+}

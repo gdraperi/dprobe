@@ -16,10 +16,10 @@ import (
 	"google.golang.org/appengine/urlfetch"
 )
 
-func init() ***REMOVED***
+func init() {
 	internal.RegisterContextClientFunc(contextClientAppEngine)
-***REMOVED***
+}
 
-func contextClientAppEngine(ctx context.Context) (*http.Client, error) ***REMOVED***
+func contextClientAppEngine(ctx context.Context) (*http.Client, error) {
 	return urlfetch.Client(ctx), nil
-***REMOVED***
+}

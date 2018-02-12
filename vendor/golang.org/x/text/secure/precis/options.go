@@ -15,7 +15,7 @@ import (
 // An Option is used to define the behavior and rules of a Profile.
 type Option func(*options)
 
-type options struct ***REMOVED***
+type options struct {
 	// Preparation options
 	foldWidth bool
 
@@ -32,19 +32,19 @@ type options struct ***REMOVED***
 
 	// Comparison options
 	ignorecase bool
-***REMOVED***
+}
 
-func getOpts(o ...Option) (res options) ***REMOVED***
-	for _, f := range o ***REMOVED***
+func getOpts(o ...Option) (res options) {
+	for _, f := range o {
 		f(&res)
-	***REMOVED***
+	}
 	// Using a SpanningTransformer, instead of norm.Form prevents an allocation
 	// down the road.
-	if res.norm == nil ***REMOVED***
+	if res.norm == nil {
 		res.norm = norm.NFC
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 var (
 	// The IgnoreCase option causes the profile to perform a case insensitive
@@ -67,30 +67,30 @@ var (
 )
 
 var (
-	ignoreCase = func(o *options) ***REMOVED***
+	ignoreCase = func(o *options) {
 		o.ignorecase = true
-	***REMOVED***
-	foldWidth = func(o *options) ***REMOVED***
+	}
+	foldWidth = func(o *options) {
 		o.foldWidth = true
-	***REMOVED***
-	disallowEmpty = func(o *options) ***REMOVED***
+	}
+	disallowEmpty = func(o *options) {
 		o.disallowEmpty = true
-	***REMOVED***
-	bidiRule = func(o *options) ***REMOVED***
+	}
+	bidiRule = func(o *options) {
 		o.bidiRule = true
-	***REMOVED***
-	repeat = func(o *options) ***REMOVED***
+	}
+	repeat = func(o *options) {
 		o.repeat = true
-	***REMOVED***
+	}
 )
 
 // TODO: move this logic to package transform
 
-type spanWrap struct***REMOVED*** transform.Transformer ***REMOVED***
+type spanWrap struct{ transform.Transformer }
 
-func (s spanWrap) Span(src []byte, atEOF bool) (n int, err error) ***REMOVED***
+func (s spanWrap) Span(src []byte, atEOF bool) (n int, err error) {
 	return 0, transform.ErrEndOfSpan
-***REMOVED***
+}
 
 // TODO: allow different types? For instance:
 //     func() transform.Transformer
@@ -101,57 +101,57 @@ func (s spanWrap) Span(src []byte, atEOF bool) (n int, err error) ***REMOVED***
 
 // The AdditionalMapping option defines the additional mapping rule for the
 // Profile by applying Transformer's in sequence.
-func AdditionalMapping(t ...func() transform.Transformer) Option ***REMOVED***
-	return func(o *options) ***REMOVED***
-		for _, f := range t ***REMOVED***
-			sf := func() transform.SpanningTransformer ***REMOVED***
+func AdditionalMapping(t ...func() transform.Transformer) Option {
+	return func(o *options) {
+		for _, f := range t {
+			sf := func() transform.SpanningTransformer {
 				return f().(transform.SpanningTransformer)
-			***REMOVED***
-			if _, ok := f().(transform.SpanningTransformer); !ok ***REMOVED***
-				sf = func() transform.SpanningTransformer ***REMOVED***
-					return spanWrap***REMOVED***f()***REMOVED***
-				***REMOVED***
-			***REMOVED***
+			}
+			if _, ok := f().(transform.SpanningTransformer); !ok {
+				sf = func() transform.SpanningTransformer {
+					return spanWrap{f()}
+				}
+			}
 			o.additional = append(o.additional, sf)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // The Norm option defines a Profile's normalization rule. Defaults to NFC.
-func Norm(f norm.Form) Option ***REMOVED***
-	return func(o *options) ***REMOVED***
+func Norm(f norm.Form) Option {
+	return func(o *options) {
 		o.norm = f
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // The FoldCase option defines a Profile's case mapping rule. Options can be
 // provided to determine the type of case folding used.
-func FoldCase(opts ...cases.Option) Option ***REMOVED***
-	return func(o *options) ***REMOVED***
+func FoldCase(opts ...cases.Option) Option {
+	return func(o *options) {
 		o.asciiLower = true
 		o.cases = cases.Fold(opts...)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // The LowerCase option defines a Profile's case mapping rule. Options can be
 // provided to determine the type of case folding used.
-func LowerCase(opts ...cases.Option) Option ***REMOVED***
-	return func(o *options) ***REMOVED***
+func LowerCase(opts ...cases.Option) Option {
+	return func(o *options) {
 		o.asciiLower = true
-		if len(opts) == 0 ***REMOVED***
+		if len(opts) == 0 {
 			o.cases = cases.Lower(language.Und, cases.HandleFinalSigma(false))
 			return
-		***REMOVED***
+		}
 
-		opts = append([]cases.Option***REMOVED***cases.HandleFinalSigma(false)***REMOVED***, opts...)
+		opts = append([]cases.Option{cases.HandleFinalSigma(false)}, opts...)
 		o.cases = cases.Lower(language.Und, opts...)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // The Disallow option further restricts a Profile's allowed characters beyond
 // what is disallowed by the underlying string class.
-func Disallow(set runes.Set) Option ***REMOVED***
-	return func(o *options) ***REMOVED***
+func Disallow(set runes.Set) Option {
+	return func(o *options) {
 		o.disallow = set
-	***REMOVED***
-***REMOVED***
+	}
+}

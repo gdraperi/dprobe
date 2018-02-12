@@ -1,14 +1,14 @@
 package store
 
-type orCombinator struct ***REMOVED***
+type orCombinator struct {
 	bys []By
-***REMOVED***
+}
 
-func (b orCombinator) isBy() ***REMOVED***
-***REMOVED***
+func (b orCombinator) isBy() {
+}
 
 // Or returns a combinator that applies OR logic on all the supplied By
 // arguments.
-func Or(bys ...By) By ***REMOVED***
-	return orCombinator***REMOVED***bys: bys***REMOVED***
-***REMOVED***
+func Or(bys ...By) By {
+	return orCombinator{bys: bys}
+}

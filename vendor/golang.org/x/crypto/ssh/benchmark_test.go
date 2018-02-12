@@ -11,72 +11,72 @@ import (
 	"testing"
 )
 
-type server struct ***REMOVED***
+type server struct {
 	*ServerConn
 	chans <-chan NewChannel
-***REMOVED***
+}
 
-func newServer(c net.Conn, conf *ServerConfig) (*server, error) ***REMOVED***
+func newServer(c net.Conn, conf *ServerConfig) (*server, error) {
 	sconn, chans, reqs, err := NewServerConn(c, conf)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	go DiscardRequests(reqs)
-	return &server***REMOVED***sconn, chans***REMOVED***, nil
-***REMOVED***
+	return &server{sconn, chans}, nil
+}
 
-func (s *server) Accept() (NewChannel, error) ***REMOVED***
+func (s *server) Accept() (NewChannel, error) {
 	n, ok := <-s.chans
-	if !ok ***REMOVED***
+	if !ok {
 		return nil, io.EOF
-	***REMOVED***
+	}
 	return n, nil
-***REMOVED***
+}
 
-func sshPipe() (Conn, *server, error) ***REMOVED***
+func sshPipe() (Conn, *server, error) {
 	c1, c2, err := netPipe()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 
-	clientConf := ClientConfig***REMOVED***
+	clientConf := ClientConfig{
 		User:            "user",
 		HostKeyCallback: InsecureIgnoreHostKey(),
-	***REMOVED***
-	serverConf := ServerConfig***REMOVED***
+	}
+	serverConf := ServerConfig{
 		NoClientAuth: true,
-	***REMOVED***
+	}
 	serverConf.AddHostKey(testSigners["ecdsa"])
 	done := make(chan *server, 1)
-	go func() ***REMOVED***
+	go func() {
 		server, err := newServer(c2, &serverConf)
-		if err != nil ***REMOVED***
+		if err != nil {
 			done <- nil
-		***REMOVED***
+		}
 		done <- server
-	***REMOVED***()
+	}()
 
 	client, _, reqs, err := NewClientConn(c1, "", &clientConf)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 
 	server := <-done
-	if server == nil ***REMOVED***
+	if server == nil {
 		return nil, nil, errors.New("server handshake failed.")
-	***REMOVED***
+	}
 	go DiscardRequests(reqs)
 
 	return client, server, nil
-***REMOVED***
+}
 
-func BenchmarkEndToEnd(b *testing.B) ***REMOVED***
+func BenchmarkEndToEnd(b *testing.B) {
 	b.StopTimer()
 
 	client, server, err := sshPipe()
-	if err != nil ***REMOVED***
+	if err != nil {
 		b.Fatalf("sshPipe: %v", err)
-	***REMOVED***
+	}
 
 	defer client.Close()
 	defer server.Close()
@@ -87,37 +87,37 @@ func BenchmarkEndToEnd(b *testing.B) ***REMOVED***
 	b.SetBytes(int64(size))
 	done := make(chan int, 1)
 
-	go func() ***REMOVED***
+	go func() {
 		newCh, err := server.Accept()
-		if err != nil ***REMOVED***
+		if err != nil {
 			b.Fatalf("Client: %v", err)
-		***REMOVED***
+		}
 		ch, incoming, err := newCh.Accept()
 		go DiscardRequests(incoming)
-		for i := 0; i < b.N; i++ ***REMOVED***
-			if _, err := io.ReadFull(ch, output); err != nil ***REMOVED***
+		for i := 0; i < b.N; i++ {
+			if _, err := io.ReadFull(ch, output); err != nil {
 				b.Fatalf("ReadFull: %v", err)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		ch.Close()
 		done <- 1
-	***REMOVED***()
+	}()
 
 	ch, in, err := client.OpenChannel("speed", nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		b.Fatalf("OpenChannel: %v", err)
-	***REMOVED***
+	}
 	go DiscardRequests(in)
 
 	b.ResetTimer()
 	b.StartTimer()
-	for i := 0; i < b.N; i++ ***REMOVED***
-		if _, err := ch.Write(input); err != nil ***REMOVED***
+	for i := 0; i < b.N; i++ {
+		if _, err := ch.Write(input); err != nil {
 			b.Fatalf("WriteFull: %v", err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	ch.Close()
 	b.StopTimer()
 
 	<-done
-***REMOVED***
+}

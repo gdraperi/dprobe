@@ -9,49 +9,49 @@ import (
 )
 
 // ReaderAt extends the standard io.ReaderAt interface with reporting of Size and io.Closer
-type ReaderAt interface ***REMOVED***
+type ReaderAt interface {
 	io.ReaderAt
 	io.Closer
 	Size() int64
-***REMOVED***
+}
 
 // Provider provides a reader interface for specific content
-type Provider interface ***REMOVED***
+type Provider interface {
 	ReaderAt(ctx context.Context, dgst digest.Digest) (ReaderAt, error)
-***REMOVED***
+}
 
 // Ingester writes content
-type Ingester interface ***REMOVED***
+type Ingester interface {
 	Writer(ctx context.Context, ref string, size int64, expected digest.Digest) (Writer, error)
-***REMOVED***
+}
 
 // Info holds content specific information
 //
 // TODO(stevvooe): Consider a very different name for this struct. Info is way
 // to general. It also reads very weird in certain context, like pluralization.
-type Info struct ***REMOVED***
+type Info struct {
 	Digest    digest.Digest
 	Size      int64
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	Labels    map[string]string
-***REMOVED***
+}
 
 // Status of a content operation
-type Status struct ***REMOVED***
+type Status struct {
 	Ref       string
 	Offset    int64
 	Total     int64
 	Expected  digest.Digest
 	StartedAt time.Time
 	UpdatedAt time.Time
-***REMOVED***
+}
 
 // WalkFunc defines the callback for a blob walk.
 type WalkFunc func(Info) error
 
 // Manager provides methods for inspecting, listing and removing content.
-type Manager interface ***REMOVED***
+type Manager interface {
 	// Info will return metadata about content available in the content store.
 	//
 	// If the content is not present, ErrNotFound will be returned.
@@ -71,10 +71,10 @@ type Manager interface ***REMOVED***
 
 	// Delete removes the content from the store.
 	Delete(ctx context.Context, dgst digest.Digest) error
-***REMOVED***
+}
 
 // IngestManager provides methods for managing ingests.
-type IngestManager interface ***REMOVED***
+type IngestManager interface {
 	// Status returns the status of the provided ref.
 	Status(ctx context.Context, ref string) (Status, error)
 
@@ -85,10 +85,10 @@ type IngestManager interface ***REMOVED***
 
 	// Abort completely cancels the ingest operation targeted by ref.
 	Abort(ctx context.Context, ref string) error
-***REMOVED***
+}
 
 // Writer handles the write of content into a content store
-type Writer interface ***REMOVED***
+type Writer interface {
 	// Close is expected to be called after Commit() when commission is needed.
 	// Closing a writer without commit allows resuming or aborting.
 	io.WriteCloser
@@ -105,24 +105,24 @@ type Writer interface ***REMOVED***
 
 	// Truncate updates the size of the target blob
 	Truncate(size int64) error
-***REMOVED***
+}
 
 // Store combines the methods of content-oriented interfaces into a set that
 // are commonly provided by complete implementations.
-type Store interface ***REMOVED***
+type Store interface {
 	Manager
 	Provider
 	IngestManager
 	Ingester
-***REMOVED***
+}
 
 // Opt is used to alter the mutable properties of content
 type Opt func(*Info) error
 
 // WithLabels allows labels to be set on content
-func WithLabels(labels map[string]string) Opt ***REMOVED***
-	return func(info *Info) error ***REMOVED***
+func WithLabels(labels map[string]string) Opt {
+	return func(info *Info) error {
 		info.Labels = labels
 		return nil
-	***REMOVED***
-***REMOVED***
+	}
+}

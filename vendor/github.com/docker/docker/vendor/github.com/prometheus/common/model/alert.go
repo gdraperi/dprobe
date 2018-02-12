@@ -26,7 +26,7 @@ const (
 )
 
 // Alert is a generic representation of an alert in the Prometheus eco-system.
-type Alert struct ***REMOVED***
+type Alert struct {
 	// Label value pairs for purpose of aggregation, matching, and disposition
 	// dispatching. This must minimally include an "alertname" label.
 	Labels LabelSet `json:"labels"`
@@ -38,99 +38,99 @@ type Alert struct ***REMOVED***
 	StartsAt     time.Time `json:"startsAt,omitempty"`
 	EndsAt       time.Time `json:"endsAt,omitempty"`
 	GeneratorURL string    `json:"generatorURL"`
-***REMOVED***
+}
 
 // Name returns the name of the alert. It is equivalent to the "alertname" label.
-func (a *Alert) Name() string ***REMOVED***
+func (a *Alert) Name() string {
 	return string(a.Labels[AlertNameLabel])
-***REMOVED***
+}
 
 // Fingerprint returns a unique hash for the alert. It is equivalent to
 // the fingerprint of the alert's label set.
-func (a *Alert) Fingerprint() Fingerprint ***REMOVED***
+func (a *Alert) Fingerprint() Fingerprint {
 	return a.Labels.Fingerprint()
-***REMOVED***
+}
 
-func (a *Alert) String() string ***REMOVED***
+func (a *Alert) String() string {
 	s := fmt.Sprintf("%s[%s]", a.Name(), a.Fingerprint().String()[:7])
-	if a.Resolved() ***REMOVED***
+	if a.Resolved() {
 		return s + "[resolved]"
-	***REMOVED***
+	}
 	return s + "[active]"
-***REMOVED***
+}
 
 // Resolved returns true iff the activity interval ended in the past.
-func (a *Alert) Resolved() bool ***REMOVED***
+func (a *Alert) Resolved() bool {
 	return a.ResolvedAt(time.Now())
-***REMOVED***
+}
 
 // ResolvedAt returns true off the activity interval ended before
 // the given timestamp.
-func (a *Alert) ResolvedAt(ts time.Time) bool ***REMOVED***
-	if a.EndsAt.IsZero() ***REMOVED***
+func (a *Alert) ResolvedAt(ts time.Time) bool {
+	if a.EndsAt.IsZero() {
 		return false
-	***REMOVED***
+	}
 	return !a.EndsAt.After(ts)
-***REMOVED***
+}
 
 // Status returns the status of the alert.
-func (a *Alert) Status() AlertStatus ***REMOVED***
-	if a.Resolved() ***REMOVED***
+func (a *Alert) Status() AlertStatus {
+	if a.Resolved() {
 		return AlertResolved
-	***REMOVED***
+	}
 	return AlertFiring
-***REMOVED***
+}
 
 // Validate checks whether the alert data is inconsistent.
-func (a *Alert) Validate() error ***REMOVED***
-	if a.StartsAt.IsZero() ***REMOVED***
+func (a *Alert) Validate() error {
+	if a.StartsAt.IsZero() {
 		return fmt.Errorf("start time missing")
-	***REMOVED***
-	if !a.EndsAt.IsZero() && a.EndsAt.Before(a.StartsAt) ***REMOVED***
+	}
+	if !a.EndsAt.IsZero() && a.EndsAt.Before(a.StartsAt) {
 		return fmt.Errorf("start time must be before end time")
-	***REMOVED***
-	if err := a.Labels.Validate(); err != nil ***REMOVED***
+	}
+	if err := a.Labels.Validate(); err != nil {
 		return fmt.Errorf("invalid label set: %s", err)
-	***REMOVED***
-	if len(a.Labels) == 0 ***REMOVED***
+	}
+	if len(a.Labels) == 0 {
 		return fmt.Errorf("at least one label pair required")
-	***REMOVED***
-	if err := a.Annotations.Validate(); err != nil ***REMOVED***
+	}
+	if err := a.Annotations.Validate(); err != nil {
 		return fmt.Errorf("invalid annotations: %s", err)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // Alert is a list of alerts that can be sorted in chronological order.
 type Alerts []*Alert
 
-func (as Alerts) Len() int      ***REMOVED*** return len(as) ***REMOVED***
-func (as Alerts) Swap(i, j int) ***REMOVED*** as[i], as[j] = as[j], as[i] ***REMOVED***
+func (as Alerts) Len() int      { return len(as) }
+func (as Alerts) Swap(i, j int) { as[i], as[j] = as[j], as[i] }
 
-func (as Alerts) Less(i, j int) bool ***REMOVED***
-	if as[i].StartsAt.Before(as[j].StartsAt) ***REMOVED***
+func (as Alerts) Less(i, j int) bool {
+	if as[i].StartsAt.Before(as[j].StartsAt) {
 		return true
-	***REMOVED***
-	if as[i].EndsAt.Before(as[j].EndsAt) ***REMOVED***
+	}
+	if as[i].EndsAt.Before(as[j].EndsAt) {
 		return true
-	***REMOVED***
+	}
 	return as[i].Fingerprint() < as[j].Fingerprint()
-***REMOVED***
+}
 
 // HasFiring returns true iff one of the alerts is not resolved.
-func (as Alerts) HasFiring() bool ***REMOVED***
-	for _, a := range as ***REMOVED***
-		if !a.Resolved() ***REMOVED***
+func (as Alerts) HasFiring() bool {
+	for _, a := range as {
+		if !a.Resolved() {
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false
-***REMOVED***
+}
 
 // Status returns StatusFiring iff at least one of the alerts is firing.
-func (as Alerts) Status() AlertStatus ***REMOVED***
-	if as.HasFiring() ***REMOVED***
+func (as Alerts) Status() AlertStatus {
+	if as.HasFiring() {
 		return AlertFiring
-	***REMOVED***
+	}
 	return AlertResolved
-***REMOVED***
+}

@@ -6,191 +6,191 @@ package triegen_test
 // lookup returns the trie value for the first UTF-8 encoding in s and
 // the width in bytes of this encoding. The size will be 0 if s does not
 // hold enough bytes to complete the encoding. len(s) must be greater than 0.
-func (t *randTrie) lookup(s []byte) (v uint8, sz int) ***REMOVED***
+func (t *randTrie) lookup(s []byte) (v uint8, sz int) {
 	c0 := s[0]
-	switch ***REMOVED***
+	switch {
 	case c0 < 0x80: // is ASCII
 		return randValues[c0], 1
 	case c0 < 0xC2:
 		return 0, 1 // Illegal UTF-8: not a starter, not ASCII.
 	case c0 < 0xE0: // 2-byte UTF-8
-		if len(s) < 2 ***REMOVED***
+		if len(s) < 2 {
 			return 0, 0
-		***REMOVED***
+		}
 		i := randIndex[c0]
 		c1 := s[1]
-		if c1 < 0x80 || 0xC0 <= c1 ***REMOVED***
+		if c1 < 0x80 || 0xC0 <= c1 {
 			return 0, 1 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		return t.lookupValue(uint32(i), c1), 2
 	case c0 < 0xF0: // 3-byte UTF-8
-		if len(s) < 3 ***REMOVED***
+		if len(s) < 3 {
 			return 0, 0
-		***REMOVED***
+		}
 		i := randIndex[c0]
 		c1 := s[1]
-		if c1 < 0x80 || 0xC0 <= c1 ***REMOVED***
+		if c1 < 0x80 || 0xC0 <= c1 {
 			return 0, 1 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		o := uint32(i)<<6 + uint32(c1)
 		i = randIndex[o]
 		c2 := s[2]
-		if c2 < 0x80 || 0xC0 <= c2 ***REMOVED***
+		if c2 < 0x80 || 0xC0 <= c2 {
 			return 0, 2 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		return t.lookupValue(uint32(i), c2), 3
 	case c0 < 0xF8: // 4-byte UTF-8
-		if len(s) < 4 ***REMOVED***
+		if len(s) < 4 {
 			return 0, 0
-		***REMOVED***
+		}
 		i := randIndex[c0]
 		c1 := s[1]
-		if c1 < 0x80 || 0xC0 <= c1 ***REMOVED***
+		if c1 < 0x80 || 0xC0 <= c1 {
 			return 0, 1 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		o := uint32(i)<<6 + uint32(c1)
 		i = randIndex[o]
 		c2 := s[2]
-		if c2 < 0x80 || 0xC0 <= c2 ***REMOVED***
+		if c2 < 0x80 || 0xC0 <= c2 {
 			return 0, 2 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		o = uint32(i)<<6 + uint32(c2)
 		i = randIndex[o]
 		c3 := s[3]
-		if c3 < 0x80 || 0xC0 <= c3 ***REMOVED***
+		if c3 < 0x80 || 0xC0 <= c3 {
 			return 0, 3 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		return t.lookupValue(uint32(i), c3), 4
-	***REMOVED***
+	}
 	// Illegal rune
 	return 0, 1
-***REMOVED***
+}
 
 // lookupUnsafe returns the trie value for the first UTF-8 encoding in s.
 // s must start with a full and valid UTF-8 encoded rune.
-func (t *randTrie) lookupUnsafe(s []byte) uint8 ***REMOVED***
+func (t *randTrie) lookupUnsafe(s []byte) uint8 {
 	c0 := s[0]
-	if c0 < 0x80 ***REMOVED*** // is ASCII
+	if c0 < 0x80 { // is ASCII
 		return randValues[c0]
-	***REMOVED***
+	}
 	i := randIndex[c0]
-	if c0 < 0xE0 ***REMOVED*** // 2-byte UTF-8
+	if c0 < 0xE0 { // 2-byte UTF-8
 		return t.lookupValue(uint32(i), s[1])
-	***REMOVED***
+	}
 	i = randIndex[uint32(i)<<6+uint32(s[1])]
-	if c0 < 0xF0 ***REMOVED*** // 3-byte UTF-8
+	if c0 < 0xF0 { // 3-byte UTF-8
 		return t.lookupValue(uint32(i), s[2])
-	***REMOVED***
+	}
 	i = randIndex[uint32(i)<<6+uint32(s[2])]
-	if c0 < 0xF8 ***REMOVED*** // 4-byte UTF-8
+	if c0 < 0xF8 { // 4-byte UTF-8
 		return t.lookupValue(uint32(i), s[3])
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
 // lookupString returns the trie value for the first UTF-8 encoding in s and
 // the width in bytes of this encoding. The size will be 0 if s does not
 // hold enough bytes to complete the encoding. len(s) must be greater than 0.
-func (t *randTrie) lookupString(s string) (v uint8, sz int) ***REMOVED***
+func (t *randTrie) lookupString(s string) (v uint8, sz int) {
 	c0 := s[0]
-	switch ***REMOVED***
+	switch {
 	case c0 < 0x80: // is ASCII
 		return randValues[c0], 1
 	case c0 < 0xC2:
 		return 0, 1 // Illegal UTF-8: not a starter, not ASCII.
 	case c0 < 0xE0: // 2-byte UTF-8
-		if len(s) < 2 ***REMOVED***
+		if len(s) < 2 {
 			return 0, 0
-		***REMOVED***
+		}
 		i := randIndex[c0]
 		c1 := s[1]
-		if c1 < 0x80 || 0xC0 <= c1 ***REMOVED***
+		if c1 < 0x80 || 0xC0 <= c1 {
 			return 0, 1 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		return t.lookupValue(uint32(i), c1), 2
 	case c0 < 0xF0: // 3-byte UTF-8
-		if len(s) < 3 ***REMOVED***
+		if len(s) < 3 {
 			return 0, 0
-		***REMOVED***
+		}
 		i := randIndex[c0]
 		c1 := s[1]
-		if c1 < 0x80 || 0xC0 <= c1 ***REMOVED***
+		if c1 < 0x80 || 0xC0 <= c1 {
 			return 0, 1 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		o := uint32(i)<<6 + uint32(c1)
 		i = randIndex[o]
 		c2 := s[2]
-		if c2 < 0x80 || 0xC0 <= c2 ***REMOVED***
+		if c2 < 0x80 || 0xC0 <= c2 {
 			return 0, 2 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		return t.lookupValue(uint32(i), c2), 3
 	case c0 < 0xF8: // 4-byte UTF-8
-		if len(s) < 4 ***REMOVED***
+		if len(s) < 4 {
 			return 0, 0
-		***REMOVED***
+		}
 		i := randIndex[c0]
 		c1 := s[1]
-		if c1 < 0x80 || 0xC0 <= c1 ***REMOVED***
+		if c1 < 0x80 || 0xC0 <= c1 {
 			return 0, 1 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		o := uint32(i)<<6 + uint32(c1)
 		i = randIndex[o]
 		c2 := s[2]
-		if c2 < 0x80 || 0xC0 <= c2 ***REMOVED***
+		if c2 < 0x80 || 0xC0 <= c2 {
 			return 0, 2 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		o = uint32(i)<<6 + uint32(c2)
 		i = randIndex[o]
 		c3 := s[3]
-		if c3 < 0x80 || 0xC0 <= c3 ***REMOVED***
+		if c3 < 0x80 || 0xC0 <= c3 {
 			return 0, 3 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		return t.lookupValue(uint32(i), c3), 4
-	***REMOVED***
+	}
 	// Illegal rune
 	return 0, 1
-***REMOVED***
+}
 
 // lookupStringUnsafe returns the trie value for the first UTF-8 encoding in s.
 // s must start with a full and valid UTF-8 encoded rune.
-func (t *randTrie) lookupStringUnsafe(s string) uint8 ***REMOVED***
+func (t *randTrie) lookupStringUnsafe(s string) uint8 {
 	c0 := s[0]
-	if c0 < 0x80 ***REMOVED*** // is ASCII
+	if c0 < 0x80 { // is ASCII
 		return randValues[c0]
-	***REMOVED***
+	}
 	i := randIndex[c0]
-	if c0 < 0xE0 ***REMOVED*** // 2-byte UTF-8
+	if c0 < 0xE0 { // 2-byte UTF-8
 		return t.lookupValue(uint32(i), s[1])
-	***REMOVED***
+	}
 	i = randIndex[uint32(i)<<6+uint32(s[1])]
-	if c0 < 0xF0 ***REMOVED*** // 3-byte UTF-8
+	if c0 < 0xF0 { // 3-byte UTF-8
 		return t.lookupValue(uint32(i), s[2])
-	***REMOVED***
+	}
 	i = randIndex[uint32(i)<<6+uint32(s[2])]
-	if c0 < 0xF8 ***REMOVED*** // 4-byte UTF-8
+	if c0 < 0xF8 { // 4-byte UTF-8
 		return t.lookupValue(uint32(i), s[3])
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
 // randTrie. Total size: 9280 bytes (9.06 KiB). Checksum: 6debd324a8debb8f.
-type randTrie struct***REMOVED******REMOVED***
+type randTrie struct{}
 
-func newRandTrie(i int) *randTrie ***REMOVED***
-	return &randTrie***REMOVED******REMOVED***
-***REMOVED***
+func newRandTrie(i int) *randTrie {
+	return &randTrie{}
+}
 
 // lookupValue determines the type of block n and looks up the value for b.
-func (t *randTrie) lookupValue(n uint32, b byte) uint8 ***REMOVED***
-	switch ***REMOVED***
+func (t *randTrie) lookupValue(n uint32, b byte) uint8 {
+	switch {
 	default:
 		return uint8(randValues[n<<6+uint32(b)])
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // randValues: 56 blocks, 3584 entries, 3584 bytes
 // The third block is the zero block.
-var randValues = [3584]uint8***REMOVED***
+var randValues = [3584]uint8{
 	// Block 0x0, offset 0x0
 	// Block 0x1, offset 0x40
 	// Block 0x2, offset 0x80
@@ -300,11 +300,11 @@ var randValues = [3584]uint8***REMOVED***
 	0xdb9: 0x0001,
 	// Block 0x37, offset 0xdc0
 	0xdda: 0x0001,
-***REMOVED***
+}
 
 // randIndex: 89 blocks, 5696 entries, 5696 bytes
 // Block 0 is the zero block.
-var randIndex = [5696]uint8***REMOVED***
+var randIndex = [5696]uint8{
 	// Block 0x0, offset 0x0
 	// Block 0x1, offset 0x40
 	// Block 0x2, offset 0x80
@@ -523,213 +523,213 @@ var randIndex = [5696]uint8***REMOVED***
 	// Block 0x58, offset 0x1600
 	0x1600: 0x50, 0x1603: 0x51,
 	0x1608: 0x52, 0x160a: 0x53, 0x160d: 0x54, 0x160e: 0x55,
-***REMOVED***
+}
 
 // lookup returns the trie value for the first UTF-8 encoding in s and
 // the width in bytes of this encoding. The size will be 0 if s does not
 // hold enough bytes to complete the encoding. len(s) must be greater than 0.
-func (t *multiTrie) lookup(s []byte) (v uint64, sz int) ***REMOVED***
+func (t *multiTrie) lookup(s []byte) (v uint64, sz int) {
 	c0 := s[0]
-	switch ***REMOVED***
+	switch {
 	case c0 < 0x80: // is ASCII
 		return t.ascii[c0], 1
 	case c0 < 0xC2:
 		return 0, 1 // Illegal UTF-8: not a starter, not ASCII.
 	case c0 < 0xE0: // 2-byte UTF-8
-		if len(s) < 2 ***REMOVED***
+		if len(s) < 2 {
 			return 0, 0
-		***REMOVED***
+		}
 		i := t.utf8Start[c0]
 		c1 := s[1]
-		if c1 < 0x80 || 0xC0 <= c1 ***REMOVED***
+		if c1 < 0x80 || 0xC0 <= c1 {
 			return 0, 1 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		return t.lookupValue(uint32(i), c1), 2
 	case c0 < 0xF0: // 3-byte UTF-8
-		if len(s) < 3 ***REMOVED***
+		if len(s) < 3 {
 			return 0, 0
-		***REMOVED***
+		}
 		i := t.utf8Start[c0]
 		c1 := s[1]
-		if c1 < 0x80 || 0xC0 <= c1 ***REMOVED***
+		if c1 < 0x80 || 0xC0 <= c1 {
 			return 0, 1 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		o := uint32(i)<<6 + uint32(c1)
 		i = multiIndex[o]
 		c2 := s[2]
-		if c2 < 0x80 || 0xC0 <= c2 ***REMOVED***
+		if c2 < 0x80 || 0xC0 <= c2 {
 			return 0, 2 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		return t.lookupValue(uint32(i), c2), 3
 	case c0 < 0xF8: // 4-byte UTF-8
-		if len(s) < 4 ***REMOVED***
+		if len(s) < 4 {
 			return 0, 0
-		***REMOVED***
+		}
 		i := t.utf8Start[c0]
 		c1 := s[1]
-		if c1 < 0x80 || 0xC0 <= c1 ***REMOVED***
+		if c1 < 0x80 || 0xC0 <= c1 {
 			return 0, 1 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		o := uint32(i)<<6 + uint32(c1)
 		i = multiIndex[o]
 		c2 := s[2]
-		if c2 < 0x80 || 0xC0 <= c2 ***REMOVED***
+		if c2 < 0x80 || 0xC0 <= c2 {
 			return 0, 2 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		o = uint32(i)<<6 + uint32(c2)
 		i = multiIndex[o]
 		c3 := s[3]
-		if c3 < 0x80 || 0xC0 <= c3 ***REMOVED***
+		if c3 < 0x80 || 0xC0 <= c3 {
 			return 0, 3 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		return t.lookupValue(uint32(i), c3), 4
-	***REMOVED***
+	}
 	// Illegal rune
 	return 0, 1
-***REMOVED***
+}
 
 // lookupUnsafe returns the trie value for the first UTF-8 encoding in s.
 // s must start with a full and valid UTF-8 encoded rune.
-func (t *multiTrie) lookupUnsafe(s []byte) uint64 ***REMOVED***
+func (t *multiTrie) lookupUnsafe(s []byte) uint64 {
 	c0 := s[0]
-	if c0 < 0x80 ***REMOVED*** // is ASCII
+	if c0 < 0x80 { // is ASCII
 		return t.ascii[c0]
-	***REMOVED***
+	}
 	i := t.utf8Start[c0]
-	if c0 < 0xE0 ***REMOVED*** // 2-byte UTF-8
+	if c0 < 0xE0 { // 2-byte UTF-8
 		return t.lookupValue(uint32(i), s[1])
-	***REMOVED***
+	}
 	i = multiIndex[uint32(i)<<6+uint32(s[1])]
-	if c0 < 0xF0 ***REMOVED*** // 3-byte UTF-8
+	if c0 < 0xF0 { // 3-byte UTF-8
 		return t.lookupValue(uint32(i), s[2])
-	***REMOVED***
+	}
 	i = multiIndex[uint32(i)<<6+uint32(s[2])]
-	if c0 < 0xF8 ***REMOVED*** // 4-byte UTF-8
+	if c0 < 0xF8 { // 4-byte UTF-8
 		return t.lookupValue(uint32(i), s[3])
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
 // lookupString returns the trie value for the first UTF-8 encoding in s and
 // the width in bytes of this encoding. The size will be 0 if s does not
 // hold enough bytes to complete the encoding. len(s) must be greater than 0.
-func (t *multiTrie) lookupString(s string) (v uint64, sz int) ***REMOVED***
+func (t *multiTrie) lookupString(s string) (v uint64, sz int) {
 	c0 := s[0]
-	switch ***REMOVED***
+	switch {
 	case c0 < 0x80: // is ASCII
 		return t.ascii[c0], 1
 	case c0 < 0xC2:
 		return 0, 1 // Illegal UTF-8: not a starter, not ASCII.
 	case c0 < 0xE0: // 2-byte UTF-8
-		if len(s) < 2 ***REMOVED***
+		if len(s) < 2 {
 			return 0, 0
-		***REMOVED***
+		}
 		i := t.utf8Start[c0]
 		c1 := s[1]
-		if c1 < 0x80 || 0xC0 <= c1 ***REMOVED***
+		if c1 < 0x80 || 0xC0 <= c1 {
 			return 0, 1 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		return t.lookupValue(uint32(i), c1), 2
 	case c0 < 0xF0: // 3-byte UTF-8
-		if len(s) < 3 ***REMOVED***
+		if len(s) < 3 {
 			return 0, 0
-		***REMOVED***
+		}
 		i := t.utf8Start[c0]
 		c1 := s[1]
-		if c1 < 0x80 || 0xC0 <= c1 ***REMOVED***
+		if c1 < 0x80 || 0xC0 <= c1 {
 			return 0, 1 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		o := uint32(i)<<6 + uint32(c1)
 		i = multiIndex[o]
 		c2 := s[2]
-		if c2 < 0x80 || 0xC0 <= c2 ***REMOVED***
+		if c2 < 0x80 || 0xC0 <= c2 {
 			return 0, 2 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		return t.lookupValue(uint32(i), c2), 3
 	case c0 < 0xF8: // 4-byte UTF-8
-		if len(s) < 4 ***REMOVED***
+		if len(s) < 4 {
 			return 0, 0
-		***REMOVED***
+		}
 		i := t.utf8Start[c0]
 		c1 := s[1]
-		if c1 < 0x80 || 0xC0 <= c1 ***REMOVED***
+		if c1 < 0x80 || 0xC0 <= c1 {
 			return 0, 1 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		o := uint32(i)<<6 + uint32(c1)
 		i = multiIndex[o]
 		c2 := s[2]
-		if c2 < 0x80 || 0xC0 <= c2 ***REMOVED***
+		if c2 < 0x80 || 0xC0 <= c2 {
 			return 0, 2 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		o = uint32(i)<<6 + uint32(c2)
 		i = multiIndex[o]
 		c3 := s[3]
-		if c3 < 0x80 || 0xC0 <= c3 ***REMOVED***
+		if c3 < 0x80 || 0xC0 <= c3 {
 			return 0, 3 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		return t.lookupValue(uint32(i), c3), 4
-	***REMOVED***
+	}
 	// Illegal rune
 	return 0, 1
-***REMOVED***
+}
 
 // lookupStringUnsafe returns the trie value for the first UTF-8 encoding in s.
 // s must start with a full and valid UTF-8 encoded rune.
-func (t *multiTrie) lookupStringUnsafe(s string) uint64 ***REMOVED***
+func (t *multiTrie) lookupStringUnsafe(s string) uint64 {
 	c0 := s[0]
-	if c0 < 0x80 ***REMOVED*** // is ASCII
+	if c0 < 0x80 { // is ASCII
 		return t.ascii[c0]
-	***REMOVED***
+	}
 	i := t.utf8Start[c0]
-	if c0 < 0xE0 ***REMOVED*** // 2-byte UTF-8
+	if c0 < 0xE0 { // 2-byte UTF-8
 		return t.lookupValue(uint32(i), s[1])
-	***REMOVED***
+	}
 	i = multiIndex[uint32(i)<<6+uint32(s[1])]
-	if c0 < 0xF0 ***REMOVED*** // 3-byte UTF-8
+	if c0 < 0xF0 { // 3-byte UTF-8
 		return t.lookupValue(uint32(i), s[2])
-	***REMOVED***
+	}
 	i = multiIndex[uint32(i)<<6+uint32(s[2])]
-	if c0 < 0xF8 ***REMOVED*** // 4-byte UTF-8
+	if c0 < 0xF8 { // 4-byte UTF-8
 		return t.lookupValue(uint32(i), s[3])
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
 // multiTrie. Total size: 18250 bytes (17.82 KiB). Checksum: a69a609d8696aa5e.
-type multiTrie struct ***REMOVED***
+type multiTrie struct {
 	ascii     []uint64 // index for ASCII bytes
 	utf8Start []uint8  // index for UTF-8 bytes >= 0xC0
-***REMOVED***
+}
 
-func newMultiTrie(i int) *multiTrie ***REMOVED***
+func newMultiTrie(i int) *multiTrie {
 	h := multiTrieHandles[i]
-	return &multiTrie***REMOVED***multiValues[uint32(h.ascii)<<6:], multiIndex[uint32(h.multi)<<6:]***REMOVED***
-***REMOVED***
+	return &multiTrie{multiValues[uint32(h.ascii)<<6:], multiIndex[uint32(h.multi)<<6:]}
+}
 
-type multiTrieHandle struct ***REMOVED***
+type multiTrieHandle struct {
 	ascii, multi uint8
-***REMOVED***
+}
 
 // multiTrieHandles: 5 handles, 10 bytes
-var multiTrieHandles = [5]multiTrieHandle***REMOVED***
-	***REMOVED***0, 0***REMOVED***,   // 8c1e77823143d35c: all
-	***REMOVED***0, 23***REMOVED***,  // 8fb58ff8243b45b0: ASCII only
-	***REMOVED***0, 23***REMOVED***,  // 8fb58ff8243b45b0: ASCII only 2
-	***REMOVED***0, 24***REMOVED***,  // 2ccc43994f11046f: BMP only
-	***REMOVED***30, 25***REMOVED***, // ce448591bdcb4733: No BMP
-***REMOVED***
+var multiTrieHandles = [5]multiTrieHandle{
+	{0, 0},   // 8c1e77823143d35c: all
+	{0, 23},  // 8fb58ff8243b45b0: ASCII only
+	{0, 23},  // 8fb58ff8243b45b0: ASCII only 2
+	{0, 24},  // 2ccc43994f11046f: BMP only
+	{30, 25}, // ce448591bdcb4733: No BMP
+}
 
 // lookupValue determines the type of block n and looks up the value for b.
-func (t *multiTrie) lookupValue(n uint32, b byte) uint64 ***REMOVED***
-	switch ***REMOVED***
+func (t *multiTrie) lookupValue(n uint32, b byte) uint64 {
+	switch {
 	default:
 		return uint64(multiValues[n<<6+uint32(b)])
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // multiValues: 32 blocks, 2048 entries, 16384 bytes
 // The third block is the zero block.
-var multiValues = [2048]uint64***REMOVED***
+var multiValues = [2048]uint64{
 	// Block 0x0, offset 0x0
 	0x03: 0x6e361699800b9fb8, 0x04: 0x52d3935a34f6f0b, 0x05: 0x2948319393e7ef10,
 	0x07: 0x20f03b006704f663, 0x08: 0x6c15c0732bb2495f, 0x09: 0xe54e2c59d953551,
@@ -796,11 +796,11 @@ var multiValues = [2048]uint64***REMOVED***
 	0x740: 0x4ca7f0c1623423d8, 0x741: 0x4f7156d996e2d0de,
 	// Block 0x1e, offset 0x780
 	// Block 0x1f, offset 0x7c0
-***REMOVED***
+}
 
 // multiIndex: 29 blocks, 1856 entries, 1856 bytes
 // Block 0 is the zero block.
-var multiIndex = [1856]uint8***REMOVED***
+var multiIndex = [1856]uint8{
 	// Block 0x0, offset 0x0
 	// Block 0x1, offset 0x40
 	// Block 0x2, offset 0x80
@@ -872,4 +872,4 @@ var multiIndex = [1856]uint8***REMOVED***
 	0x6e8: 0x08, 0x6ef: 0x09,
 	// Block 0x1c, offset 0x700
 	0x730: 0x0e, 0x731: 0x11, 0x732: 0x13, 0x733: 0x15, 0x734: 0x17,
-***REMOVED***
+}

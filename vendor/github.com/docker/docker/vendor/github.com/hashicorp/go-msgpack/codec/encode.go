@@ -38,7 +38,7 @@ const (
 )
 
 // encWriter abstracting writing to a byte array or to an io.Writer.
-type encWriter interface ***REMOVED***
+type encWriter interface {
 	writeUint16(uint16)
 	writeUint32(uint32)
 	writeUint64(uint64)
@@ -47,12 +47,12 @@ type encWriter interface ***REMOVED***
 	writen1(byte)
 	writen2(byte, byte)
 	atEndOfEncode()
-***REMOVED***
+}
 
 // encDriver abstracts the actual codec (binc vs msgpack, etc)
-type encDriver interface ***REMOVED***
+type encDriver interface {
 	isBuiltinType(rt uintptr) bool
-	encodeBuiltin(rt uintptr, v interface***REMOVED******REMOVED***)
+	encodeBuiltin(rt uintptr, v interface{})
 	encodeNil()
 	encodeInt(i int64)
 	encodeUint(i uint64)
@@ -68,19 +68,19 @@ type encDriver interface ***REMOVED***
 	//TODO
 	//encBignum(f *big.Int)
 	//encStringRunes(c charEncoding, v []rune)
-***REMOVED***
+}
 
-type ioEncWriterWriter interface ***REMOVED***
+type ioEncWriterWriter interface {
 	WriteByte(c byte) error
 	WriteString(s string) (n int, err error)
 	Write(p []byte) (n int, err error)
-***REMOVED***
+}
 
-type ioEncStringWriter interface ***REMOVED***
+type ioEncStringWriter interface {
 	WriteString(s string) (n int, err error)
-***REMOVED***
+}
 
-type EncodeOptions struct ***REMOVED***
+type EncodeOptions struct {
 	// Encode a struct as an array, and not as a map.
 	StructToArray bool
 
@@ -98,119 +98,119 @@ type EncodeOptions struct ***REMOVED***
 	//   AsSymbolMapStringKeys
 	//   AsSymbolMapStringKeysFlag | AsSymbolStructFieldNameFlag
 	AsSymbols AsSymbolFlag
-***REMOVED***
+}
 
 // ---------------------------------------------
 
-type simpleIoEncWriterWriter struct ***REMOVED***
+type simpleIoEncWriterWriter struct {
 	w  io.Writer
 	bw io.ByteWriter
 	sw ioEncStringWriter
-***REMOVED***
+}
 
-func (o *simpleIoEncWriterWriter) WriteByte(c byte) (err error) ***REMOVED***
-	if o.bw != nil ***REMOVED***
+func (o *simpleIoEncWriterWriter) WriteByte(c byte) (err error) {
+	if o.bw != nil {
 		return o.bw.WriteByte(c)
-	***REMOVED***
-	_, err = o.w.Write([]byte***REMOVED***c***REMOVED***)
+	}
+	_, err = o.w.Write([]byte{c})
 	return
-***REMOVED***
+}
 
-func (o *simpleIoEncWriterWriter) WriteString(s string) (n int, err error) ***REMOVED***
-	if o.sw != nil ***REMOVED***
+func (o *simpleIoEncWriterWriter) WriteString(s string) (n int, err error) {
+	if o.sw != nil {
 		return o.sw.WriteString(s)
-	***REMOVED***
+	}
 	return o.w.Write([]byte(s))
-***REMOVED***
+}
 
-func (o *simpleIoEncWriterWriter) Write(p []byte) (n int, err error) ***REMOVED***
+func (o *simpleIoEncWriterWriter) Write(p []byte) (n int, err error) {
 	return o.w.Write(p)
-***REMOVED***
+}
 
 // ----------------------------------------
 
 // ioEncWriter implements encWriter and can write to an io.Writer implementation
-type ioEncWriter struct ***REMOVED***
+type ioEncWriter struct {
 	w ioEncWriterWriter
 	x [8]byte // temp byte array re-used internally for efficiency
-***REMOVED***
+}
 
-func (z *ioEncWriter) writeUint16(v uint16) ***REMOVED***
+func (z *ioEncWriter) writeUint16(v uint16) {
 	bigen.PutUint16(z.x[:2], v)
 	z.writeb(z.x[:2])
-***REMOVED***
+}
 
-func (z *ioEncWriter) writeUint32(v uint32) ***REMOVED***
+func (z *ioEncWriter) writeUint32(v uint32) {
 	bigen.PutUint32(z.x[:4], v)
 	z.writeb(z.x[:4])
-***REMOVED***
+}
 
-func (z *ioEncWriter) writeUint64(v uint64) ***REMOVED***
+func (z *ioEncWriter) writeUint64(v uint64) {
 	bigen.PutUint64(z.x[:8], v)
 	z.writeb(z.x[:8])
-***REMOVED***
+}
 
-func (z *ioEncWriter) writeb(bs []byte) ***REMOVED***
-	if len(bs) == 0 ***REMOVED***
+func (z *ioEncWriter) writeb(bs []byte) {
+	if len(bs) == 0 {
 		return
-	***REMOVED***
+	}
 	n, err := z.w.Write(bs)
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
-	if n != len(bs) ***REMOVED***
+	}
+	if n != len(bs) {
 		encErr("write: Incorrect num bytes written. Expecting: %v, Wrote: %v", len(bs), n)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (z *ioEncWriter) writestr(s string) ***REMOVED***
+func (z *ioEncWriter) writestr(s string) {
 	n, err := z.w.WriteString(s)
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
-	if n != len(s) ***REMOVED***
+	}
+	if n != len(s) {
 		encErr("write: Incorrect num bytes written. Expecting: %v, Wrote: %v", len(s), n)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (z *ioEncWriter) writen1(b byte) ***REMOVED***
-	if err := z.w.WriteByte(b); err != nil ***REMOVED***
+func (z *ioEncWriter) writen1(b byte) {
+	if err := z.w.WriteByte(b); err != nil {
 		panic(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (z *ioEncWriter) writen2(b1 byte, b2 byte) ***REMOVED***
+func (z *ioEncWriter) writen2(b1 byte, b2 byte) {
 	z.writen1(b1)
 	z.writen1(b2)
-***REMOVED***
+}
 
-func (z *ioEncWriter) atEndOfEncode() ***REMOVED******REMOVED***
+func (z *ioEncWriter) atEndOfEncode() {}
 
 // ----------------------------------------
 
 // bytesEncWriter implements encWriter and can write to an byte slice.
 // It is used by Marshal function.
-type bytesEncWriter struct ***REMOVED***
+type bytesEncWriter struct {
 	b   []byte
 	c   int     // cursor
 	out *[]byte // write out on atEndOfEncode
-***REMOVED***
+}
 
-func (z *bytesEncWriter) writeUint16(v uint16) ***REMOVED***
+func (z *bytesEncWriter) writeUint16(v uint16) {
 	c := z.grow(2)
 	z.b[c] = byte(v >> 8)
 	z.b[c+1] = byte(v)
-***REMOVED***
+}
 
-func (z *bytesEncWriter) writeUint32(v uint32) ***REMOVED***
+func (z *bytesEncWriter) writeUint32(v uint32) {
 	c := z.grow(4)
 	z.b[c] = byte(v >> 24)
 	z.b[c+1] = byte(v >> 16)
 	z.b[c+2] = byte(v >> 8)
 	z.b[c+3] = byte(v)
-***REMOVED***
+}
 
-func (z *bytesEncWriter) writeUint64(v uint64) ***REMOVED***
+func (z *bytesEncWriter) writeUint64(v uint64) {
 	c := z.grow(8)
 	z.b[c] = byte(v >> 56)
 	z.b[c+1] = byte(v >> 48)
@@ -220,158 +220,158 @@ func (z *bytesEncWriter) writeUint64(v uint64) ***REMOVED***
 	z.b[c+5] = byte(v >> 16)
 	z.b[c+6] = byte(v >> 8)
 	z.b[c+7] = byte(v)
-***REMOVED***
+}
 
-func (z *bytesEncWriter) writeb(s []byte) ***REMOVED***
-	if len(s) == 0 ***REMOVED***
+func (z *bytesEncWriter) writeb(s []byte) {
+	if len(s) == 0 {
 		return
-	***REMOVED***
+	}
 	c := z.grow(len(s))
 	copy(z.b[c:], s)
-***REMOVED***
+}
 
-func (z *bytesEncWriter) writestr(s string) ***REMOVED***
+func (z *bytesEncWriter) writestr(s string) {
 	c := z.grow(len(s))
 	copy(z.b[c:], s)
-***REMOVED***
+}
 
-func (z *bytesEncWriter) writen1(b1 byte) ***REMOVED***
+func (z *bytesEncWriter) writen1(b1 byte) {
 	c := z.grow(1)
 	z.b[c] = b1
-***REMOVED***
+}
 
-func (z *bytesEncWriter) writen2(b1 byte, b2 byte) ***REMOVED***
+func (z *bytesEncWriter) writen2(b1 byte, b2 byte) {
 	c := z.grow(2)
 	z.b[c] = b1
 	z.b[c+1] = b2
-***REMOVED***
+}
 
-func (z *bytesEncWriter) atEndOfEncode() ***REMOVED***
+func (z *bytesEncWriter) atEndOfEncode() {
 	*(z.out) = z.b[:z.c]
-***REMOVED***
+}
 
-func (z *bytesEncWriter) grow(n int) (oldcursor int) ***REMOVED***
+func (z *bytesEncWriter) grow(n int) (oldcursor int) {
 	oldcursor = z.c
 	z.c = oldcursor + n
-	if z.c > cap(z.b) ***REMOVED***
+	if z.c > cap(z.b) {
 		// Tried using appendslice logic: (if cap < 1024, *2, else *1.25).
 		// However, it was too expensive, causing too many iterations of copy.
 		// Using bytes.Buffer model was much better (2*cap + n)
 		bs := make([]byte, 2*cap(z.b)+n)
 		copy(bs, z.b[:oldcursor])
 		z.b = bs
-	***REMOVED*** else if z.c > len(z.b) ***REMOVED***
+	} else if z.c > len(z.b) {
 		z.b = z.b[:cap(z.b)]
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // ---------------------------------------------
 
-type encFnInfo struct ***REMOVED***
+type encFnInfo struct {
 	ti    *typeInfo
 	e     *Encoder
 	ee    encDriver
 	xfFn  func(reflect.Value) ([]byte, error)
 	xfTag byte
-***REMOVED***
+}
 
-func (f *encFnInfo) builtin(rv reflect.Value) ***REMOVED***
+func (f *encFnInfo) builtin(rv reflect.Value) {
 	f.ee.encodeBuiltin(f.ti.rtid, rv.Interface())
-***REMOVED***
+}
 
-func (f *encFnInfo) rawExt(rv reflect.Value) ***REMOVED***
+func (f *encFnInfo) rawExt(rv reflect.Value) {
 	f.e.encRawExt(rv.Interface().(RawExt))
-***REMOVED***
+}
 
-func (f *encFnInfo) ext(rv reflect.Value) ***REMOVED***
+func (f *encFnInfo) ext(rv reflect.Value) {
 	bs, fnerr := f.xfFn(rv)
-	if fnerr != nil ***REMOVED***
+	if fnerr != nil {
 		panic(fnerr)
-	***REMOVED***
-	if bs == nil ***REMOVED***
+	}
+	if bs == nil {
 		f.ee.encodeNil()
 		return
-	***REMOVED***
-	if f.e.hh.writeExt() ***REMOVED***
+	}
+	if f.e.hh.writeExt() {
 		f.ee.encodeExtPreamble(f.xfTag, len(bs))
 		f.e.w.writeb(bs)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		f.ee.encodeStringBytes(c_RAW, bs)
-	***REMOVED***
+	}
 
-***REMOVED***
+}
 
-func (f *encFnInfo) binaryMarshal(rv reflect.Value) ***REMOVED***
+func (f *encFnInfo) binaryMarshal(rv reflect.Value) {
 	var bm binaryMarshaler
-	if f.ti.mIndir == 0 ***REMOVED***
+	if f.ti.mIndir == 0 {
 		bm = rv.Interface().(binaryMarshaler)
-	***REMOVED*** else if f.ti.mIndir == -1 ***REMOVED***
+	} else if f.ti.mIndir == -1 {
 		bm = rv.Addr().Interface().(binaryMarshaler)
-	***REMOVED*** else ***REMOVED***
-		for j, k := int8(0), f.ti.mIndir; j < k; j++ ***REMOVED***
-			if rv.IsNil() ***REMOVED***
+	} else {
+		for j, k := int8(0), f.ti.mIndir; j < k; j++ {
+			if rv.IsNil() {
 				f.ee.encodeNil()
 				return
-			***REMOVED***
+			}
 			rv = rv.Elem()
-		***REMOVED***
+		}
 		bm = rv.Interface().(binaryMarshaler)
-	***REMOVED***
+	}
 	// debugf(">>>> binaryMarshaler: %T", rv.Interface())
 	bs, fnerr := bm.MarshalBinary()
-	if fnerr != nil ***REMOVED***
+	if fnerr != nil {
 		panic(fnerr)
-	***REMOVED***
-	if bs == nil ***REMOVED***
+	}
+	if bs == nil {
 		f.ee.encodeNil()
-	***REMOVED*** else ***REMOVED***
+	} else {
 		f.ee.encodeStringBytes(c_RAW, bs)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (f *encFnInfo) kBool(rv reflect.Value) ***REMOVED***
+func (f *encFnInfo) kBool(rv reflect.Value) {
 	f.ee.encodeBool(rv.Bool())
-***REMOVED***
+}
 
-func (f *encFnInfo) kString(rv reflect.Value) ***REMOVED***
+func (f *encFnInfo) kString(rv reflect.Value) {
 	f.ee.encodeString(c_UTF8, rv.String())
-***REMOVED***
+}
 
-func (f *encFnInfo) kFloat64(rv reflect.Value) ***REMOVED***
+func (f *encFnInfo) kFloat64(rv reflect.Value) {
 	f.ee.encodeFloat64(rv.Float())
-***REMOVED***
+}
 
-func (f *encFnInfo) kFloat32(rv reflect.Value) ***REMOVED***
+func (f *encFnInfo) kFloat32(rv reflect.Value) {
 	f.ee.encodeFloat32(float32(rv.Float()))
-***REMOVED***
+}
 
-func (f *encFnInfo) kInt(rv reflect.Value) ***REMOVED***
+func (f *encFnInfo) kInt(rv reflect.Value) {
 	f.ee.encodeInt(rv.Int())
-***REMOVED***
+}
 
-func (f *encFnInfo) kUint(rv reflect.Value) ***REMOVED***
+func (f *encFnInfo) kUint(rv reflect.Value) {
 	f.ee.encodeUint(rv.Uint())
-***REMOVED***
+}
 
-func (f *encFnInfo) kInvalid(rv reflect.Value) ***REMOVED***
+func (f *encFnInfo) kInvalid(rv reflect.Value) {
 	f.ee.encodeNil()
-***REMOVED***
+}
 
-func (f *encFnInfo) kErr(rv reflect.Value) ***REMOVED***
+func (f *encFnInfo) kErr(rv reflect.Value) {
 	encErr("Unsupported kind: %s, for: %#v", rv.Kind(), rv)
-***REMOVED***
+}
 
-func (f *encFnInfo) kSlice(rv reflect.Value) ***REMOVED***
-	if rv.IsNil() ***REMOVED***
+func (f *encFnInfo) kSlice(rv reflect.Value) {
+	if rv.IsNil() {
 		f.ee.encodeNil()
 		return
-	***REMOVED***
+	}
 
-	if shortCircuitReflectToFastPath ***REMOVED***
-		switch f.ti.rtid ***REMOVED***
+	if shortCircuitReflectToFastPath {
+		switch f.ti.rtid {
 		case intfSliceTypId:
-			f.e.encSliceIntf(rv.Interface().([]interface***REMOVED******REMOVED***))
+			f.e.encSliceIntf(rv.Interface().([]interface{}))
 			return
 		case strSliceTypId:
 			f.e.encSliceStr(rv.Interface().([]string))
@@ -382,79 +382,79 @@ func (f *encFnInfo) kSlice(rv reflect.Value) ***REMOVED***
 		case int64SliceTypId:
 			f.e.encSliceInt64(rv.Interface().([]int64))
 			return
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// If in this method, then there was no extension function defined.
 	// So it's okay to treat as []byte.
-	if f.ti.rtid == uint8SliceTypId || f.ti.rt.Elem().Kind() == reflect.Uint8 ***REMOVED***
+	if f.ti.rtid == uint8SliceTypId || f.ti.rt.Elem().Kind() == reflect.Uint8 {
 		f.ee.encodeStringBytes(c_RAW, rv.Bytes())
 		return
-	***REMOVED***
+	}
 
 	l := rv.Len()
-	if f.ti.mbs ***REMOVED***
-		if l%2 == 1 ***REMOVED***
+	if f.ti.mbs {
+		if l%2 == 1 {
 			encErr("mapBySlice: invalid length (must be divisible by 2): %v", l)
-		***REMOVED***
+		}
 		f.ee.encodeMapPreamble(l / 2)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		f.ee.encodeArrayPreamble(l)
-	***REMOVED***
-	if l == 0 ***REMOVED***
+	}
+	if l == 0 {
 		return
-	***REMOVED***
-	for j := 0; j < l; j++ ***REMOVED***
+	}
+	for j := 0; j < l; j++ {
 		// TODO: Consider perf implication of encoding odd index values as symbols if type is string
 		f.e.encodeValue(rv.Index(j))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (f *encFnInfo) kArray(rv reflect.Value) ***REMOVED***
+func (f *encFnInfo) kArray(rv reflect.Value) {
 	// We cannot share kSlice method, because the array may be non-addressable.
-	// E.g. type struct S***REMOVED***B [2]byte***REMOVED***; Encode(S***REMOVED******REMOVED***) will bomb on "panic: slice of unaddressable array".
+	// E.g. type struct S{B [2]byte}; Encode(S{}) will bomb on "panic: slice of unaddressable array".
 	// So we have to duplicate the functionality here.
 	// f.e.encodeValue(rv.Slice(0, rv.Len()))
 	// f.kSlice(rv.Slice(0, rv.Len()))
 
 	l := rv.Len()
 	// Handle an array of bytes specially (in line with what is done for slices)
-	if f.ti.rt.Elem().Kind() == reflect.Uint8 ***REMOVED***
-		if l == 0 ***REMOVED***
+	if f.ti.rt.Elem().Kind() == reflect.Uint8 {
+		if l == 0 {
 			f.ee.encodeStringBytes(c_RAW, nil)
 			return
-		***REMOVED***
+		}
 		var bs []byte
-		if rv.CanAddr() ***REMOVED***
+		if rv.CanAddr() {
 			bs = rv.Slice(0, l).Bytes()
-		***REMOVED*** else ***REMOVED***
+		} else {
 			bs = make([]byte, l)
-			for i := 0; i < l; i++ ***REMOVED***
+			for i := 0; i < l; i++ {
 				bs[i] = byte(rv.Index(i).Uint())
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		f.ee.encodeStringBytes(c_RAW, bs)
 		return
-	***REMOVED***
+	}
 
-	if f.ti.mbs ***REMOVED***
-		if l%2 == 1 ***REMOVED***
+	if f.ti.mbs {
+		if l%2 == 1 {
 			encErr("mapBySlice: invalid length (must be divisible by 2): %v", l)
-		***REMOVED***
+		}
 		f.ee.encodeMapPreamble(l / 2)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		f.ee.encodeArrayPreamble(l)
-	***REMOVED***
-	if l == 0 ***REMOVED***
+	}
+	if l == 0 {
 		return
-	***REMOVED***
-	for j := 0; j < l; j++ ***REMOVED***
+	}
+	for j := 0; j < l; j++ {
 		// TODO: Consider perf implication of encoding odd index values as symbols if type is string
 		f.e.encodeValue(rv.Index(j))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (f *encFnInfo) kStruct(rv reflect.Value) ***REMOVED***
+func (f *encFnInfo) kStruct(rv reflect.Value) {
 	fti := f.ti
 	newlen := len(fti.sfi)
 	rvals := make([]reflect.Value, newlen)
@@ -463,122 +463,122 @@ func (f *encFnInfo) kStruct(rv reflect.Value) ***REMOVED***
 	tisfi := fti.sfip
 	toMap := !(fti.toArray || e.h.StructToArray)
 	// if toMap, use the sorted array. If toArray, use unsorted array (to match sequence in struct)
-	if toMap ***REMOVED***
+	if toMap {
 		tisfi = fti.sfi
 		encnames = make([]string, newlen)
-	***REMOVED***
+	}
 	newlen = 0
-	for _, si := range tisfi ***REMOVED***
-		if si.i != -1 ***REMOVED***
+	for _, si := range tisfi {
+		if si.i != -1 {
 			rvals[newlen] = rv.Field(int(si.i))
-		***REMOVED*** else ***REMOVED***
+		} else {
 			rvals[newlen] = rv.FieldByIndex(si.is)
-		***REMOVED***
-		if toMap ***REMOVED***
-			if si.omitEmpty && isEmptyValue(rvals[newlen]) ***REMOVED***
+		}
+		if toMap {
+			if si.omitEmpty && isEmptyValue(rvals[newlen]) {
 				continue
-			***REMOVED***
+			}
 			encnames[newlen] = si.encName
-		***REMOVED*** else ***REMOVED***
-			if si.omitEmpty && isEmptyValue(rvals[newlen]) ***REMOVED***
-				rvals[newlen] = reflect.Value***REMOVED******REMOVED*** //encode as nil
-			***REMOVED***
-		***REMOVED***
+		} else {
+			if si.omitEmpty && isEmptyValue(rvals[newlen]) {
+				rvals[newlen] = reflect.Value{} //encode as nil
+			}
+		}
 		newlen++
-	***REMOVED***
+	}
 
 	// debugf(">>>> kStruct: newlen: %v", newlen)
-	if toMap ***REMOVED***
+	if toMap {
 		ee := f.ee //don't dereference everytime
 		ee.encodeMapPreamble(newlen)
 		// asSymbols := e.h.AsSymbols&AsSymbolStructFieldNameFlag != 0
 		asSymbols := e.h.AsSymbols == AsSymbolDefault || e.h.AsSymbols&AsSymbolStructFieldNameFlag != 0
-		for j := 0; j < newlen; j++ ***REMOVED***
-			if asSymbols ***REMOVED***
+		for j := 0; j < newlen; j++ {
+			if asSymbols {
 				ee.encodeSymbol(encnames[j])
-			***REMOVED*** else ***REMOVED***
+			} else {
 				ee.encodeString(c_UTF8, encnames[j])
-			***REMOVED***
+			}
 			e.encodeValue(rvals[j])
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
+		}
+	} else {
 		f.ee.encodeArrayPreamble(newlen)
-		for j := 0; j < newlen; j++ ***REMOVED***
+		for j := 0; j < newlen; j++ {
 			e.encodeValue(rvals[j])
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-// func (f *encFnInfo) kPtr(rv reflect.Value) ***REMOVED***
+// func (f *encFnInfo) kPtr(rv reflect.Value) {
 // 	debugf(">>>>>>> ??? encode kPtr called - shouldn't get called")
-// 	if rv.IsNil() ***REMOVED***
+// 	if rv.IsNil() {
 // 		f.ee.encodeNil()
 // 		return
-// 	***REMOVED***
+// 	}
 // 	f.e.encodeValue(rv.Elem())
-// ***REMOVED***
+// }
 
-func (f *encFnInfo) kInterface(rv reflect.Value) ***REMOVED***
-	if rv.IsNil() ***REMOVED***
+func (f *encFnInfo) kInterface(rv reflect.Value) {
+	if rv.IsNil() {
 		f.ee.encodeNil()
 		return
-	***REMOVED***
+	}
 	f.e.encodeValue(rv.Elem())
-***REMOVED***
+}
 
-func (f *encFnInfo) kMap(rv reflect.Value) ***REMOVED***
-	if rv.IsNil() ***REMOVED***
+func (f *encFnInfo) kMap(rv reflect.Value) {
+	if rv.IsNil() {
 		f.ee.encodeNil()
 		return
-	***REMOVED***
+	}
 
-	if shortCircuitReflectToFastPath ***REMOVED***
-		switch f.ti.rtid ***REMOVED***
+	if shortCircuitReflectToFastPath {
+		switch f.ti.rtid {
 		case mapIntfIntfTypId:
-			f.e.encMapIntfIntf(rv.Interface().(map[interface***REMOVED******REMOVED***]interface***REMOVED******REMOVED***))
+			f.e.encMapIntfIntf(rv.Interface().(map[interface{}]interface{}))
 			return
 		case mapStrIntfTypId:
-			f.e.encMapStrIntf(rv.Interface().(map[string]interface***REMOVED******REMOVED***))
+			f.e.encMapStrIntf(rv.Interface().(map[string]interface{}))
 			return
 		case mapStrStrTypId:
 			f.e.encMapStrStr(rv.Interface().(map[string]string))
 			return
 		case mapInt64IntfTypId:
-			f.e.encMapInt64Intf(rv.Interface().(map[int64]interface***REMOVED******REMOVED***))
+			f.e.encMapInt64Intf(rv.Interface().(map[int64]interface{}))
 			return
 		case mapUint64IntfTypId:
-			f.e.encMapUint64Intf(rv.Interface().(map[uint64]interface***REMOVED******REMOVED***))
+			f.e.encMapUint64Intf(rv.Interface().(map[uint64]interface{}))
 			return
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	l := rv.Len()
 	f.ee.encodeMapPreamble(l)
-	if l == 0 ***REMOVED***
+	if l == 0 {
 		return
-	***REMOVED***
+	}
 	// keyTypeIsString := f.ti.rt.Key().Kind() == reflect.String
 	keyTypeIsString := f.ti.rt.Key() == stringTyp
 	var asSymbols bool
-	if keyTypeIsString ***REMOVED***
+	if keyTypeIsString {
 		asSymbols = f.e.h.AsSymbols&AsSymbolMapStringKeysFlag != 0
-	***REMOVED***
+	}
 	mks := rv.MapKeys()
-	// for j, lmks := 0, len(mks); j < lmks; j++ ***REMOVED***
-	for j := range mks ***REMOVED***
-		if keyTypeIsString ***REMOVED***
-			if asSymbols ***REMOVED***
+	// for j, lmks := 0, len(mks); j < lmks; j++ {
+	for j := range mks {
+		if keyTypeIsString {
+			if asSymbols {
 				f.ee.encodeSymbol(mks[j].String())
-			***REMOVED*** else ***REMOVED***
+			} else {
 				f.ee.encodeString(c_UTF8, mks[j].String())
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
+			}
+		} else {
 			f.e.encodeValue(mks[j])
-		***REMOVED***
+		}
 		f.e.encodeValue(rv.MapIndex(mks[j]))
-	***REMOVED***
+	}
 
-***REMOVED***
+}
 
 // --------------------------------------------------
 
@@ -586,15 +586,15 @@ func (f *encFnInfo) kMap(rv reflect.Value) ***REMOVED***
 // This way, we only do some calculations one times, and pass to the
 // code block that should be called (encapsulated in a function)
 // instead of executing the checks every time.
-type encFn struct ***REMOVED***
+type encFn struct {
 	i *encFnInfo
 	f func(*encFnInfo, reflect.Value)
-***REMOVED***
+}
 
 // --------------------------------------------------
 
 // An Encoder writes an object to an output stream in the codec format.
-type Encoder struct ***REMOVED***
+type Encoder struct {
 	w  encWriter
 	e  encDriver
 	h  *BasicHandle
@@ -602,43 +602,43 @@ type Encoder struct ***REMOVED***
 	f  map[uintptr]encFn
 	x  []uintptr
 	s  []encFn
-***REMOVED***
+}
 
 // NewEncoder returns an Encoder for encoding into an io.Writer.
 //
 // For efficiency, Users are encouraged to pass in a memory buffered writer
 // (eg bufio.Writer, bytes.Buffer).
-func NewEncoder(w io.Writer, h Handle) *Encoder ***REMOVED***
+func NewEncoder(w io.Writer, h Handle) *Encoder {
 	ww, ok := w.(ioEncWriterWriter)
-	if !ok ***REMOVED***
-		sww := simpleIoEncWriterWriter***REMOVED***w: w***REMOVED***
+	if !ok {
+		sww := simpleIoEncWriterWriter{w: w}
 		sww.bw, _ = w.(io.ByteWriter)
 		sww.sw, _ = w.(ioEncStringWriter)
 		ww = &sww
 		//ww = bufio.NewWriterSize(w, defEncByteBufSize)
-	***REMOVED***
-	z := ioEncWriter***REMOVED***
+	}
+	z := ioEncWriter{
 		w: ww,
-	***REMOVED***
-	return &Encoder***REMOVED***w: &z, hh: h, h: h.getBasicHandle(), e: h.newEncDriver(&z)***REMOVED***
-***REMOVED***
+	}
+	return &Encoder{w: &z, hh: h, h: h.getBasicHandle(), e: h.newEncDriver(&z)}
+}
 
 // NewEncoderBytes returns an encoder for encoding directly and efficiently
 // into a byte slice, using zero-copying to temporary slices.
 //
 // It will potentially replace the output byte slice pointed to.
 // After encoding, the out parameter contains the encoded contents.
-func NewEncoderBytes(out *[]byte, h Handle) *Encoder ***REMOVED***
+func NewEncoderBytes(out *[]byte, h Handle) *Encoder {
 	in := *out
-	if in == nil ***REMOVED***
+	if in == nil {
 		in = make([]byte, defEncByteBufSize)
-	***REMOVED***
-	z := bytesEncWriter***REMOVED***
+	}
+	z := bytesEncWriter{
 		b:   in,
 		out: out,
-	***REMOVED***
-	return &Encoder***REMOVED***w: &z, hh: h, h: h.getBasicHandle(), e: h.newEncDriver(&z)***REMOVED***
-***REMOVED***
+	}
+	return &Encoder{w: &z, hh: h, h: h.getBasicHandle(), e: h.newEncDriver(&z)}
+}
 
 // Encode writes an object into a stream in the codec format.
 //
@@ -671,19 +671,19 @@ func NewEncoderBytes(out *[]byte, h Handle) *Encoder ***REMOVED***
 //
 // Examples:
 //
-//      type MyStruct struct ***REMOVED***
+//      type MyStruct struct {
 //          _struct bool    `codec:",omitempty"`   //set omitempty for every field
 //          Field1 string   `codec:"-"`            //skip this field
 //          Field2 int      `codec:"myName"`       //Use key "myName" in encode stream
 //          Field3 int32    `codec:",omitempty"`   //use key "Field3". Omit if empty.
 //          Field4 bool     `codec:"f4,omitempty"` //use key "f4". Omit if empty.
 //          ...
-//  ***REMOVED***
+//      }
 //
-//      type MyStruct struct ***REMOVED***
+//      type MyStruct struct {
 //          _struct bool    `codec:",omitempty,toarray"`   //set omitempty for every field
 //                                                         //and encode struct as an array
-//  ***REMOVED***
+//      }
 //
 // The mode of encoding is based on the type of the value. When a value is seen:
 //   - If an extension is registered for it, call that extension function
@@ -693,15 +693,15 @@ func NewEncoderBytes(out *[]byte, h Handle) *Encoder ***REMOVED***
 // Note that struct field names and keys in map[string]XXX will be treated as symbols.
 // Some formats support symbols (e.g. binc) and will properly encode the string
 // only once in the stream, and use a tag to refer to it thereafter.
-func (e *Encoder) Encode(v interface***REMOVED******REMOVED***) (err error) ***REMOVED***
+func (e *Encoder) Encode(v interface{}) (err error) {
 	defer panicToErr(&err)
 	e.encode(v)
 	e.w.atEndOfEncode()
 	return
-***REMOVED***
+}
 
-func (e *Encoder) encode(iv interface***REMOVED******REMOVED***) ***REMOVED***
-	switch v := iv.(type) ***REMOVED***
+func (e *Encoder) encode(iv interface{}) {
+	switch v := iv.(type) {
 	case nil:
 		e.e.encodeNil()
 
@@ -737,7 +737,7 @@ func (e *Encoder) encode(iv interface***REMOVED******REMOVED***) ***REMOVED***
 	case float64:
 		e.e.encodeFloat64(v)
 
-	case []interface***REMOVED******REMOVED***:
+	case []interface{}:
 		e.encSliceIntf(v)
 	case []string:
 		e.encSliceStr(v)
@@ -748,15 +748,15 @@ func (e *Encoder) encode(iv interface***REMOVED******REMOVED***) ***REMOVED***
 	case []uint8:
 		e.e.encodeStringBytes(c_RAW, v)
 
-	case map[interface***REMOVED******REMOVED***]interface***REMOVED******REMOVED***:
+	case map[interface{}]interface{}:
 		e.encMapIntfIntf(v)
-	case map[string]interface***REMOVED******REMOVED***:
+	case map[string]interface{}:
 		e.encMapStrIntf(v)
 	case map[string]string:
 		e.encMapStrStr(v)
-	case map[int64]interface***REMOVED******REMOVED***:
+	case map[int64]interface{}:
 		e.encMapInt64Intf(v)
-	case map[uint64]interface***REMOVED******REMOVED***:
+	case map[uint64]interface{}:
 		e.encMapUint64Intf(v)
 
 	case *string:
@@ -788,7 +788,7 @@ func (e *Encoder) encode(iv interface***REMOVED******REMOVED***) ***REMOVED***
 	case *float64:
 		e.e.encodeFloat64(*v)
 
-	case *[]interface***REMOVED******REMOVED***:
+	case *[]interface{}:
 		e.encSliceIntf(*v)
 	case *[]string:
 		e.encSliceStr(*v)
@@ -799,62 +799,62 @@ func (e *Encoder) encode(iv interface***REMOVED******REMOVED***) ***REMOVED***
 	case *[]uint8:
 		e.e.encodeStringBytes(c_RAW, *v)
 
-	case *map[interface***REMOVED******REMOVED***]interface***REMOVED******REMOVED***:
+	case *map[interface{}]interface{}:
 		e.encMapIntfIntf(*v)
-	case *map[string]interface***REMOVED******REMOVED***:
+	case *map[string]interface{}:
 		e.encMapStrIntf(*v)
 	case *map[string]string:
 		e.encMapStrStr(*v)
-	case *map[int64]interface***REMOVED******REMOVED***:
+	case *map[int64]interface{}:
 		e.encMapInt64Intf(*v)
-	case *map[uint64]interface***REMOVED******REMOVED***:
+	case *map[uint64]interface{}:
 		e.encMapUint64Intf(*v)
 
 	default:
 		e.encodeValue(reflect.ValueOf(iv))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (e *Encoder) encodeValue(rv reflect.Value) ***REMOVED***
-	for rv.Kind() == reflect.Ptr ***REMOVED***
-		if rv.IsNil() ***REMOVED***
+func (e *Encoder) encodeValue(rv reflect.Value) {
+	for rv.Kind() == reflect.Ptr {
+		if rv.IsNil() {
 			e.e.encodeNil()
 			return
-		***REMOVED***
+		}
 		rv = rv.Elem()
-	***REMOVED***
+	}
 
 	rt := rv.Type()
 	rtid := reflect.ValueOf(rt).Pointer()
 
-	// if e.f == nil && e.s == nil ***REMOVED*** debugf("---->Creating new enc f map for type: %v\n", rt) ***REMOVED***
+	// if e.f == nil && e.s == nil { debugf("---->Creating new enc f map for type: %v\n", rt) }
 	var fn encFn
 	var ok bool
-	if useMapForCodecCache ***REMOVED***
+	if useMapForCodecCache {
 		fn, ok = e.f[rtid]
-	***REMOVED*** else ***REMOVED***
-		for i, v := range e.x ***REMOVED***
-			if v == rtid ***REMOVED***
+	} else {
+		for i, v := range e.x {
+			if v == rtid {
 				fn, ok = e.s[i], true
 				break
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-	if !ok ***REMOVED***
+			}
+		}
+	}
+	if !ok {
 		// debugf("\tCreating new enc fn for type: %v\n", rt)
-		fi := encFnInfo***REMOVED***ti: getTypeInfo(rtid, rt), e: e, ee: e.e***REMOVED***
+		fi := encFnInfo{ti: getTypeInfo(rtid, rt), e: e, ee: e.e}
 		fn.i = &fi
-		if rtid == rawExtTypId ***REMOVED***
+		if rtid == rawExtTypId {
 			fn.f = (*encFnInfo).rawExt
-		***REMOVED*** else if e.e.isBuiltinType(rtid) ***REMOVED***
+		} else if e.e.isBuiltinType(rtid) {
 			fn.f = (*encFnInfo).builtin
-		***REMOVED*** else if xfTag, xfFn := e.h.getEncodeExt(rtid); xfFn != nil ***REMOVED***
+		} else if xfTag, xfFn := e.h.getEncodeExt(rtid); xfFn != nil {
 			fi.xfTag, fi.xfFn = xfTag, xfFn
 			fn.f = (*encFnInfo).ext
-		***REMOVED*** else if supportBinaryMarshal && fi.ti.m ***REMOVED***
+		} else if supportBinaryMarshal && fi.ti.m {
 			fn.f = (*encFnInfo).binaryMarshal
-		***REMOVED*** else ***REMOVED***
-			switch rk := rt.Kind(); rk ***REMOVED***
+		} else {
+			switch rk := rt.Kind(); rk {
 			case reflect.Bool:
 				fn.f = (*encFnInfo).kBool
 			case reflect.String:
@@ -883,119 +883,119 @@ func (e *Encoder) encodeValue(rv reflect.Value) ***REMOVED***
 				fn.f = (*encFnInfo).kMap
 			default:
 				fn.f = (*encFnInfo).kErr
-			***REMOVED***
-		***REMOVED***
-		if useMapForCodecCache ***REMOVED***
-			if e.f == nil ***REMOVED***
+			}
+		}
+		if useMapForCodecCache {
+			if e.f == nil {
 				e.f = make(map[uintptr]encFn, 16)
-			***REMOVED***
+			}
 			e.f[rtid] = fn
-		***REMOVED*** else ***REMOVED***
+		} else {
 			e.s = append(e.s, fn)
 			e.x = append(e.x, rtid)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	fn.f(fn.i, rv)
 
-***REMOVED***
+}
 
-func (e *Encoder) encRawExt(re RawExt) ***REMOVED***
-	if re.Data == nil ***REMOVED***
+func (e *Encoder) encRawExt(re RawExt) {
+	if re.Data == nil {
 		e.e.encodeNil()
 		return
-	***REMOVED***
-	if e.hh.writeExt() ***REMOVED***
+	}
+	if e.hh.writeExt() {
 		e.e.encodeExtPreamble(re.Tag, len(re.Data))
 		e.w.writeb(re.Data)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		e.e.encodeStringBytes(c_RAW, re.Data)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // ---------------------------------------------
 // short circuit functions for common maps and slices
 
-func (e *Encoder) encSliceIntf(v []interface***REMOVED******REMOVED***) ***REMOVED***
+func (e *Encoder) encSliceIntf(v []interface{}) {
 	e.e.encodeArrayPreamble(len(v))
-	for _, v2 := range v ***REMOVED***
+	for _, v2 := range v {
 		e.encode(v2)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (e *Encoder) encSliceStr(v []string) ***REMOVED***
+func (e *Encoder) encSliceStr(v []string) {
 	e.e.encodeArrayPreamble(len(v))
-	for _, v2 := range v ***REMOVED***
+	for _, v2 := range v {
 		e.e.encodeString(c_UTF8, v2)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (e *Encoder) encSliceInt64(v []int64) ***REMOVED***
+func (e *Encoder) encSliceInt64(v []int64) {
 	e.e.encodeArrayPreamble(len(v))
-	for _, v2 := range v ***REMOVED***
+	for _, v2 := range v {
 		e.e.encodeInt(v2)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (e *Encoder) encSliceUint64(v []uint64) ***REMOVED***
+func (e *Encoder) encSliceUint64(v []uint64) {
 	e.e.encodeArrayPreamble(len(v))
-	for _, v2 := range v ***REMOVED***
+	for _, v2 := range v {
 		e.e.encodeUint(v2)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (e *Encoder) encMapStrStr(v map[string]string) ***REMOVED***
+func (e *Encoder) encMapStrStr(v map[string]string) {
 	e.e.encodeMapPreamble(len(v))
 	asSymbols := e.h.AsSymbols&AsSymbolMapStringKeysFlag != 0
-	for k2, v2 := range v ***REMOVED***
-		if asSymbols ***REMOVED***
+	for k2, v2 := range v {
+		if asSymbols {
 			e.e.encodeSymbol(k2)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			e.e.encodeString(c_UTF8, k2)
-		***REMOVED***
+		}
 		e.e.encodeString(c_UTF8, v2)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (e *Encoder) encMapStrIntf(v map[string]interface***REMOVED******REMOVED***) ***REMOVED***
+func (e *Encoder) encMapStrIntf(v map[string]interface{}) {
 	e.e.encodeMapPreamble(len(v))
 	asSymbols := e.h.AsSymbols&AsSymbolMapStringKeysFlag != 0
-	for k2, v2 := range v ***REMOVED***
-		if asSymbols ***REMOVED***
+	for k2, v2 := range v {
+		if asSymbols {
 			e.e.encodeSymbol(k2)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			e.e.encodeString(c_UTF8, k2)
-		***REMOVED***
+		}
 		e.encode(v2)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (e *Encoder) encMapInt64Intf(v map[int64]interface***REMOVED******REMOVED***) ***REMOVED***
+func (e *Encoder) encMapInt64Intf(v map[int64]interface{}) {
 	e.e.encodeMapPreamble(len(v))
-	for k2, v2 := range v ***REMOVED***
+	for k2, v2 := range v {
 		e.e.encodeInt(k2)
 		e.encode(v2)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (e *Encoder) encMapUint64Intf(v map[uint64]interface***REMOVED******REMOVED***) ***REMOVED***
+func (e *Encoder) encMapUint64Intf(v map[uint64]interface{}) {
 	e.e.encodeMapPreamble(len(v))
-	for k2, v2 := range v ***REMOVED***
+	for k2, v2 := range v {
 		e.e.encodeUint(uint64(k2))
 		e.encode(v2)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (e *Encoder) encMapIntfIntf(v map[interface***REMOVED******REMOVED***]interface***REMOVED******REMOVED***) ***REMOVED***
+func (e *Encoder) encMapIntfIntf(v map[interface{}]interface{}) {
 	e.e.encodeMapPreamble(len(v))
-	for k2, v2 := range v ***REMOVED***
+	for k2, v2 := range v {
 		e.encode(k2)
 		e.encode(v2)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // ----------------------------------------
 
-func encErr(format string, params ...interface***REMOVED******REMOVED***) ***REMOVED***
+func encErr(format string, params ...interface{}) {
 	doPanic(msgTagEnc, format, params...)
-***REMOVED***
+}

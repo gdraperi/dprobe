@@ -9,23 +9,23 @@ import (
 )
 
 // ContainerChanges returns a list of container fs changes
-func (daemon *Daemon) ContainerChanges(name string) ([]archive.Change, error) ***REMOVED***
+func (daemon *Daemon) ContainerChanges(name string) ([]archive.Change, error) {
 	start := time.Now()
 	container, err := daemon.GetContainer(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	if runtime.GOOS == "windows" && container.IsRunning() ***REMOVED***
+	if runtime.GOOS == "windows" && container.IsRunning() {
 		return nil, errors.New("Windows does not support diff of a running container")
-	***REMOVED***
+	}
 
 	container.Lock()
 	defer container.Unlock()
 	c, err := container.RWLayer.Changes()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	containerActions.WithValues("changes").UpdateSince(start)
 	return c, nil
-***REMOVED***
+}

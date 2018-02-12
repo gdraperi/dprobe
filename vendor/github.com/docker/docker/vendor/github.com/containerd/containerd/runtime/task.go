@@ -8,15 +8,15 @@ import (
 )
 
 // TaskInfo provides task specific information
-type TaskInfo struct ***REMOVED***
+type TaskInfo struct {
 	ID        string
 	Runtime   string
 	Spec      []byte
 	Namespace string
-***REMOVED***
+}
 
 // Process is a runtime object for an executing process inside a container
-type Process interface ***REMOVED***
+type Process interface {
 	ID() string
 	// State returns the process state
 	State(context.Context) (State, error)
@@ -30,10 +30,10 @@ type Process interface ***REMOVED***
 	Start(context.Context) error
 	// Wait for the process to exit
 	Wait(context.Context) (*Exit, error)
-***REMOVED***
+}
 
 // Task is the runtime object for an executing container
-type Task interface ***REMOVED***
+type Task interface {
 	Process
 
 	// Information of the container
@@ -55,20 +55,20 @@ type Task interface ***REMOVED***
 	// Process returns a process within the task for the provided id
 	Process(context.Context, string) (Process, error)
 	// Metrics returns runtime specific metrics for a task
-	Metrics(context.Context) (interface***REMOVED******REMOVED***, error)
-***REMOVED***
+	Metrics(context.Context) (interface{}, error)
+}
 
 // ExecOpts provides additional options for additional processes running in a task
-type ExecOpts struct ***REMOVED***
+type ExecOpts struct {
 	Spec *types.Any
 	IO   IO
-***REMOVED***
+}
 
 // ConsoleSize of a pty or windows terminal
-type ConsoleSize struct ***REMOVED***
+type ConsoleSize struct {
 	Width  uint32
 	Height uint32
-***REMOVED***
+}
 
 // Status is the runtime status of a task and/or process
 type Status int
@@ -89,7 +89,7 @@ const (
 )
 
 // State information for a process
-type State struct ***REMOVED***
+type State struct {
 	// Status is the current status of the container
 	Status Status
 	// Pid is the main process id for the container
@@ -104,13 +104,13 @@ type State struct ***REMOVED***
 	Stdout   string
 	Stderr   string
 	Terminal bool
-***REMOVED***
+}
 
 // ProcessInfo holds platform specific process information
-type ProcessInfo struct ***REMOVED***
+type ProcessInfo struct {
 	// Pid is the process ID
 	Pid uint32
 	// Info includes additional process information
 	// Info varies by platform
-	Info interface***REMOVED******REMOVED***
-***REMOVED***
+	Info interface{}
+}

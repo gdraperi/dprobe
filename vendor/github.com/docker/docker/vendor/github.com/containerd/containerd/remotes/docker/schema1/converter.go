@@ -29,13 +29,13 @@ import (
 
 const manifestSizeLimit = 8e6 // 8MB
 
-type blobState struct ***REMOVED***
+type blobState struct {
 	diffID digest.Digest
 	empty  bool
-***REMOVED***
+}
 
 // Converter converts schema1 manifests to schema2 on fetch
-type Converter struct ***REMOVED***
+type Converter struct {
 	contentStore content.Store
 	fetcher      remotes.Fetcher
 
@@ -44,166 +44,166 @@ type Converter struct ***REMOVED***
 	mu         sync.Mutex
 	blobMap    map[digest.Digest]blobState
 	layerBlobs map[digest.Digest]ocispec.Descriptor
-***REMOVED***
+}
 
 // NewConverter returns a new converter
-func NewConverter(contentStore content.Store, fetcher remotes.Fetcher) *Converter ***REMOVED***
-	return &Converter***REMOVED***
+func NewConverter(contentStore content.Store, fetcher remotes.Fetcher) *Converter {
+	return &Converter{
 		contentStore: contentStore,
 		fetcher:      fetcher,
-		blobMap:      map[digest.Digest]blobState***REMOVED******REMOVED***,
-		layerBlobs:   map[digest.Digest]ocispec.Descriptor***REMOVED******REMOVED***,
-	***REMOVED***
-***REMOVED***
+		blobMap:      map[digest.Digest]blobState{},
+		layerBlobs:   map[digest.Digest]ocispec.Descriptor{},
+	}
+}
 
 // Handle fetching descriptors for a docker media type
-func (c *Converter) Handle(ctx context.Context, desc ocispec.Descriptor) ([]ocispec.Descriptor, error) ***REMOVED***
-	switch desc.MediaType ***REMOVED***
+func (c *Converter) Handle(ctx context.Context, desc ocispec.Descriptor) ([]ocispec.Descriptor, error) {
+	switch desc.MediaType {
 	case images.MediaTypeDockerSchema1Manifest:
-		if err := c.fetchManifest(ctx, desc); err != nil ***REMOVED***
+		if err := c.fetchManifest(ctx, desc); err != nil {
 			return nil, err
-		***REMOVED***
+		}
 
 		m := c.pulledManifest
-		if len(m.FSLayers) != len(m.History) ***REMOVED***
+		if len(m.FSLayers) != len(m.History) {
 			return nil, errors.New("invalid schema 1 manifest, history and layer mismatch")
-		***REMOVED***
+		}
 		descs := make([]ocispec.Descriptor, 0, len(c.pulledManifest.FSLayers))
 
-		for i := range m.FSLayers ***REMOVED***
-			if _, ok := c.blobMap[c.pulledManifest.FSLayers[i].BlobSum]; !ok ***REMOVED***
+		for i := range m.FSLayers {
+			if _, ok := c.blobMap[c.pulledManifest.FSLayers[i].BlobSum]; !ok {
 				empty, err := isEmptyLayer([]byte(m.History[i].V1Compatibility))
-				if err != nil ***REMOVED***
+				if err != nil {
 					return nil, err
-				***REMOVED***
+				}
 
 				// Do no attempt to download a known empty blob
-				if !empty ***REMOVED***
-					descs = append([]ocispec.Descriptor***REMOVED***
-						***REMOVED***
+				if !empty {
+					descs = append([]ocispec.Descriptor{
+						{
 							MediaType: images.MediaTypeDockerSchema2LayerGzip,
 							Digest:    c.pulledManifest.FSLayers[i].BlobSum,
 							Size:      -1,
-						***REMOVED***,
-					***REMOVED***, descs...)
-				***REMOVED***
-				c.blobMap[c.pulledManifest.FSLayers[i].BlobSum] = blobState***REMOVED***
+						},
+					}, descs...)
+				}
+				c.blobMap[c.pulledManifest.FSLayers[i].BlobSum] = blobState{
 					empty: empty,
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
+				}
+			}
+		}
 		return descs, nil
 	case images.MediaTypeDockerSchema2LayerGzip:
-		if c.pulledManifest == nil ***REMOVED***
+		if c.pulledManifest == nil {
 			return nil, errors.New("manifest required for schema 1 blob pull")
-		***REMOVED***
+		}
 		return nil, c.fetchBlob(ctx, desc)
 	default:
 		return nil, fmt.Errorf("%v not support for schema 1 manifests", desc.MediaType)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Convert a docker manifest to an OCI descriptor
-func (c *Converter) Convert(ctx context.Context) (ocispec.Descriptor, error) ***REMOVED***
+func (c *Converter) Convert(ctx context.Context) (ocispec.Descriptor, error) {
 	history, diffIDs, err := c.schema1ManifestHistory()
-	if err != nil ***REMOVED***
-		return ocispec.Descriptor***REMOVED******REMOVED***, errors.Wrap(err, "schema 1 conversion failed")
-	***REMOVED***
+	if err != nil {
+		return ocispec.Descriptor{}, errors.Wrap(err, "schema 1 conversion failed")
+	}
 
 	var img ocispec.Image
-	if err := json.Unmarshal([]byte(c.pulledManifest.History[0].V1Compatibility), &img); err != nil ***REMOVED***
-		return ocispec.Descriptor***REMOVED******REMOVED***, errors.Wrap(err, "failed to unmarshal image from schema 1 history")
-	***REMOVED***
+	if err := json.Unmarshal([]byte(c.pulledManifest.History[0].V1Compatibility), &img); err != nil {
+		return ocispec.Descriptor{}, errors.Wrap(err, "failed to unmarshal image from schema 1 history")
+	}
 
 	img.History = history
-	img.RootFS = ocispec.RootFS***REMOVED***
+	img.RootFS = ocispec.RootFS{
 		Type:    "layers",
 		DiffIDs: diffIDs,
-	***REMOVED***
+	}
 
 	b, err := json.Marshal(img)
-	if err != nil ***REMOVED***
-		return ocispec.Descriptor***REMOVED******REMOVED***, errors.Wrap(err, "failed to marshal image")
-	***REMOVED***
+	if err != nil {
+		return ocispec.Descriptor{}, errors.Wrap(err, "failed to marshal image")
+	}
 
-	config := ocispec.Descriptor***REMOVED***
+	config := ocispec.Descriptor{
 		MediaType: ocispec.MediaTypeImageConfig,
 		Digest:    digest.Canonical.FromBytes(b),
 		Size:      int64(len(b)),
-	***REMOVED***
+	}
 
 	layers := make([]ocispec.Descriptor, len(diffIDs))
-	for i, diffID := range diffIDs ***REMOVED***
+	for i, diffID := range diffIDs {
 		layers[i] = c.layerBlobs[diffID]
-	***REMOVED***
+	}
 
-	manifest := ocispec.Manifest***REMOVED***
-		Versioned: specs.Versioned***REMOVED***
+	manifest := ocispec.Manifest{
+		Versioned: specs.Versioned{
 			SchemaVersion: 2,
-		***REMOVED***,
+		},
 		Config: config,
 		Layers: layers,
-	***REMOVED***
+	}
 
 	mb, err := json.Marshal(manifest)
-	if err != nil ***REMOVED***
-		return ocispec.Descriptor***REMOVED******REMOVED***, errors.Wrap(err, "failed to marshal image")
-	***REMOVED***
+	if err != nil {
+		return ocispec.Descriptor{}, errors.Wrap(err, "failed to marshal image")
+	}
 
-	desc := ocispec.Descriptor***REMOVED***
+	desc := ocispec.Descriptor{
 		MediaType: ocispec.MediaTypeImageManifest,
 		Digest:    digest.Canonical.FromBytes(mb),
 		Size:      int64(len(mb)),
-	***REMOVED***
+	}
 
-	labels := map[string]string***REMOVED******REMOVED***
+	labels := map[string]string{}
 	labels["containerd.io/gc.ref.content.0"] = manifest.Config.Digest.String()
-	for i, ch := range manifest.Layers ***REMOVED***
+	for i, ch := range manifest.Layers {
 		labels[fmt.Sprintf("containerd.io/gc.ref.content.%d", i+1)] = ch.Digest.String()
-	***REMOVED***
+	}
 
 	ref := remotes.MakeRefKey(ctx, desc)
-	if err := content.WriteBlob(ctx, c.contentStore, ref, bytes.NewReader(mb), desc.Size, desc.Digest, content.WithLabels(labels)); err != nil ***REMOVED***
-		return ocispec.Descriptor***REMOVED******REMOVED***, errors.Wrap(err, "failed to write config")
-	***REMOVED***
+	if err := content.WriteBlob(ctx, c.contentStore, ref, bytes.NewReader(mb), desc.Size, desc.Digest, content.WithLabels(labels)); err != nil {
+		return ocispec.Descriptor{}, errors.Wrap(err, "failed to write config")
+	}
 
 	ref = remotes.MakeRefKey(ctx, config)
-	if err := content.WriteBlob(ctx, c.contentStore, ref, bytes.NewReader(b), config.Size, config.Digest); err != nil ***REMOVED***
-		return ocispec.Descriptor***REMOVED******REMOVED***, errors.Wrap(err, "failed to write config")
-	***REMOVED***
+	if err := content.WriteBlob(ctx, c.contentStore, ref, bytes.NewReader(b), config.Size, config.Digest); err != nil {
+		return ocispec.Descriptor{}, errors.Wrap(err, "failed to write config")
+	}
 
 	return desc, nil
-***REMOVED***
+}
 
-func (c *Converter) fetchManifest(ctx context.Context, desc ocispec.Descriptor) error ***REMOVED***
+func (c *Converter) fetchManifest(ctx context.Context, desc ocispec.Descriptor) error {
 	log.G(ctx).Debug("fetch schema 1")
 
 	rc, err := c.fetcher.Fetch(ctx, desc)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	b, err := ioutil.ReadAll(io.LimitReader(rc, manifestSizeLimit)) // limit to 8MB
 	rc.Close()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	b, err = stripSignature(b)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	var m manifest
-	if err := json.Unmarshal(b, &m); err != nil ***REMOVED***
+	if err := json.Unmarshal(b, &m); err != nil {
 		return err
-	***REMOVED***
+	}
 	c.pulledManifest = &m
 
 	return nil
-***REMOVED***
+}
 
-func (c *Converter) fetchBlob(ctx context.Context, desc ocispec.Descriptor) error ***REMOVED***
+func (c *Converter) fetchBlob(ctx context.Context, desc ocispec.Descriptor) error {
 	log.G(ctx).Debug("fetch blob")
 
 	var (
@@ -214,88 +214,88 @@ func (c *Converter) fetchBlob(ctx context.Context, desc ocispec.Descriptor) erro
 	)
 
 	// size may be unknown, set to zero for content ingest
-	if size == -1 ***REMOVED***
+	if size == -1 {
 		size = 0
-	***REMOVED***
+	}
 
 tryit:
 	cw, err := c.contentStore.Writer(ctx, ref, size, desc.Digest)
-	if err != nil ***REMOVED***
-		if errdefs.IsUnavailable(err) ***REMOVED***
-			select ***REMOVED***
+	if err != nil {
+		if errdefs.IsUnavailable(err) {
+			select {
 			case <-time.After(time.Millisecond * time.Duration(rand.Intn(retry))):
-				if retry < 2048 ***REMOVED***
+				if retry < 2048 {
 					retry = retry << 1
-				***REMOVED***
+				}
 				goto tryit
 			case <-ctx.Done():
 				return err
-			***REMOVED***
-		***REMOVED*** else if !errdefs.IsAlreadyExists(err) ***REMOVED***
+			}
+		} else if !errdefs.IsAlreadyExists(err) {
 			return err
-		***REMOVED***
+		}
 
 		// TODO: Check if blob -> diff id mapping already exists
 		// TODO: Check if blob empty label exists
 
 		ra, err := c.contentStore.ReaderAt(ctx, desc.Digest)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		defer ra.Close()
 
 		gr, err := gzip.NewReader(content.NewReader(ra))
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		defer gr.Close()
 
 		_, err = io.Copy(calc, gr)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
+		}
+	} else {
 		defer cw.Close()
 
 		rc, err := c.fetcher.Fetch(ctx, desc)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		defer rc.Close()
 
 		eg, _ := errgroup.WithContext(ctx)
 		pr, pw := io.Pipe()
 
-		eg.Go(func() error ***REMOVED***
+		eg.Go(func() error {
 			gr, err := gzip.NewReader(pr)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
+			}
 			defer gr.Close()
 
 			_, err = io.Copy(calc, gr)
 			pr.CloseWithError(err)
 			return err
-		***REMOVED***)
+		})
 
-		eg.Go(func() error ***REMOVED***
+		eg.Go(func() error {
 			defer pw.Close()
 
 			return content.Copy(ctx, cw, io.TeeReader(rc, pw), size, desc.Digest)
-		***REMOVED***)
+		})
 
-		if err := eg.Wait(); err != nil ***REMOVED***
+		if err := eg.Wait(); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if desc.Size == -1 ***REMOVED***
+	if desc.Size == -1 {
 		info, err := c.contentStore.Info(ctx, desc.Digest)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return errors.Wrap(err, "failed to get blob info")
-		***REMOVED***
+		}
 		desc.Size = info.Size
-	***REMOVED***
+	}
 
 	state := calc.State()
 
@@ -305,111 +305,111 @@ tryit:
 	c.mu.Unlock()
 
 	return nil
-***REMOVED***
-func (c *Converter) schema1ManifestHistory() ([]ocispec.History, []digest.Digest, error) ***REMOVED***
-	if c.pulledManifest == nil ***REMOVED***
+}
+func (c *Converter) schema1ManifestHistory() ([]ocispec.History, []digest.Digest, error) {
+	if c.pulledManifest == nil {
 		return nil, nil, errors.New("missing schema 1 manifest for conversion")
-	***REMOVED***
+	}
 	m := *c.pulledManifest
 
-	if len(m.History) == 0 ***REMOVED***
+	if len(m.History) == 0 {
 		return nil, nil, errors.New("no history")
-	***REMOVED***
+	}
 
 	history := make([]ocispec.History, len(m.History))
-	diffIDs := []digest.Digest***REMOVED******REMOVED***
-	for i := range m.History ***REMOVED***
+	diffIDs := []digest.Digest{}
+	for i := range m.History {
 		var h v1History
-		if err := json.Unmarshal([]byte(m.History[i].V1Compatibility), &h); err != nil ***REMOVED***
+		if err := json.Unmarshal([]byte(m.History[i].V1Compatibility), &h); err != nil {
 			return nil, nil, errors.Wrap(err, "failed to unmarshal history")
-		***REMOVED***
+		}
 
 		blobSum := m.FSLayers[i].BlobSum
 
 		state := c.blobMap[blobSum]
 
-		history[len(history)-i-1] = ocispec.History***REMOVED***
+		history[len(history)-i-1] = ocispec.History{
 			Author:     h.Author,
 			Comment:    h.Comment,
 			Created:    &h.Created,
 			CreatedBy:  strings.Join(h.ContainerConfig.Cmd, " "),
 			EmptyLayer: state.empty,
-		***REMOVED***
+		}
 
-		if !state.empty ***REMOVED***
-			diffIDs = append([]digest.Digest***REMOVED***state.diffID***REMOVED***, diffIDs...)
+		if !state.empty {
+			diffIDs = append([]digest.Digest{state.diffID}, diffIDs...)
 
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return history, diffIDs, nil
-***REMOVED***
+}
 
-type fsLayer struct ***REMOVED***
+type fsLayer struct {
 	BlobSum digest.Digest `json:"blobSum"`
-***REMOVED***
+}
 
-type history struct ***REMOVED***
+type history struct {
 	V1Compatibility string `json:"v1Compatibility"`
-***REMOVED***
+}
 
-type manifest struct ***REMOVED***
+type manifest struct {
 	FSLayers []fsLayer `json:"fsLayers"`
 	History  []history `json:"history"`
-***REMOVED***
+}
 
-type v1History struct ***REMOVED***
+type v1History struct {
 	Author          string    `json:"author,omitempty"`
 	Created         time.Time `json:"created"`
 	Comment         string    `json:"comment,omitempty"`
 	ThrowAway       *bool     `json:"throwaway,omitempty"`
 	Size            *int      `json:"Size,omitempty"` // used before ThrowAway field
-	ContainerConfig struct ***REMOVED***
+	ContainerConfig struct {
 		Cmd []string `json:"Cmd,omitempty"`
-	***REMOVED*** `json:"container_config,omitempty"`
-***REMOVED***
+	} `json:"container_config,omitempty"`
+}
 
 // isEmptyLayer returns whether the v1 compatibility history describes an
 // empty layer. A return value of true indicates the layer is empty,
 // however false does not indicate non-empty.
-func isEmptyLayer(compatHistory []byte) (bool, error) ***REMOVED***
+func isEmptyLayer(compatHistory []byte) (bool, error) {
 	var h v1History
-	if err := json.Unmarshal(compatHistory, &h); err != nil ***REMOVED***
+	if err := json.Unmarshal(compatHistory, &h); err != nil {
 		return false, err
-	***REMOVED***
+	}
 
-	if h.ThrowAway != nil ***REMOVED***
+	if h.ThrowAway != nil {
 		return *h.ThrowAway, nil
-	***REMOVED***
-	if h.Size != nil ***REMOVED***
+	}
+	if h.Size != nil {
 		return *h.Size == 0, nil
-	***REMOVED***
+	}
 
 	// If no `Size` or `throwaway` field is given, then
 	// it cannot be determined whether the layer is empty
 	// from the history, return false
 	return false, nil
-***REMOVED***
+}
 
-type signature struct ***REMOVED***
+type signature struct {
 	Signatures []jsParsedSignature `json:"signatures"`
-***REMOVED***
+}
 
-type jsParsedSignature struct ***REMOVED***
+type jsParsedSignature struct {
 	Protected string `json:"protected"`
-***REMOVED***
+}
 
-type protectedBlock struct ***REMOVED***
+type protectedBlock struct {
 	Length int    `json:"formatLength"`
 	Tail   string `json:"formatTail"`
-***REMOVED***
+}
 
 // joseBase64UrlDecode decodes the given string using the standard base64 url
 // decoder but first adds the appropriate number of trailing '=' characters in
 // accordance with the jose specification.
 // http://tools.ietf.org/html/draft-ietf-jose-json-web-signature-31#section-2
-func joseBase64UrlDecode(s string) ([]byte, error) ***REMOVED***
-	switch len(s) % 4 ***REMOVED***
+func joseBase64UrlDecode(s string) ([]byte, error) {
+	switch len(s) % 4 {
 	case 0:
 	case 2:
 		s += "=="
@@ -417,67 +417,67 @@ func joseBase64UrlDecode(s string) ([]byte, error) ***REMOVED***
 		s += "="
 	default:
 		return nil, errors.New("illegal base64url string")
-	***REMOVED***
+	}
 	return base64.URLEncoding.DecodeString(s)
-***REMOVED***
+}
 
-func stripSignature(b []byte) ([]byte, error) ***REMOVED***
+func stripSignature(b []byte) ([]byte, error) {
 	var sig signature
-	if err := json.Unmarshal(b, &sig); err != nil ***REMOVED***
+	if err := json.Unmarshal(b, &sig); err != nil {
 		return nil, err
-	***REMOVED***
-	if len(sig.Signatures) == 0 ***REMOVED***
+	}
+	if len(sig.Signatures) == 0 {
 		return nil, errors.New("no signatures")
-	***REMOVED***
+	}
 	pb, err := joseBase64UrlDecode(sig.Signatures[0].Protected)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, errors.Wrapf(err, "could not decode %s", sig.Signatures[0].Protected)
-	***REMOVED***
+	}
 
 	var protected protectedBlock
-	if err := json.Unmarshal(pb, &protected); err != nil ***REMOVED***
+	if err := json.Unmarshal(pb, &protected); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	if protected.Length > len(b) ***REMOVED***
+	if protected.Length > len(b) {
 		return nil, errors.New("invalid protected length block")
-	***REMOVED***
+	}
 
 	tail, err := joseBase64UrlDecode(protected.Tail)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, errors.Wrap(err, "invalid tail base 64 value")
-	***REMOVED***
+	}
 
 	return append(b[:protected.Length], tail...), nil
-***REMOVED***
+}
 
-type blobStateCalculator struct ***REMOVED***
+type blobStateCalculator struct {
 	empty    bool
 	digester digest.Digester
-***REMOVED***
+}
 
-func newBlobStateCalculator() *blobStateCalculator ***REMOVED***
-	return &blobStateCalculator***REMOVED***
+func newBlobStateCalculator() *blobStateCalculator {
+	return &blobStateCalculator{
 		empty:    true,
 		digester: digest.Canonical.Digester(),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (c *blobStateCalculator) Write(p []byte) (int, error) ***REMOVED***
-	if c.empty ***REMOVED***
-		for _, b := range p ***REMOVED***
-			if b != 0x00 ***REMOVED***
+func (c *blobStateCalculator) Write(p []byte) (int, error) {
+	if c.empty {
+		for _, b := range p {
+			if b != 0x00 {
 				c.empty = false
 				break
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return c.digester.Hash().Write(p)
-***REMOVED***
+}
 
-func (c *blobStateCalculator) State() blobState ***REMOVED***
-	return blobState***REMOVED***
+func (c *blobStateCalculator) State() blobState {
+	return blobState{
 		empty:  c.empty,
 		diffID: c.digester.Digest(),
-	***REMOVED***
-***REMOVED***
+	}
+}

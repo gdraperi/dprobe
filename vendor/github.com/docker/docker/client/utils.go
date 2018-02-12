@@ -10,25 +10,25 @@ import (
 var headerRegexp = regexp.MustCompile(`\ADocker/.+\s\((.+)\)\z`)
 
 // getDockerOS returns the operating system based on the server header from the daemon.
-func getDockerOS(serverHeader string) string ***REMOVED***
+func getDockerOS(serverHeader string) string {
 	var osType string
 	matches := headerRegexp.FindStringSubmatch(serverHeader)
-	if len(matches) > 0 ***REMOVED***
+	if len(matches) > 0 {
 		osType = matches[1]
-	***REMOVED***
+	}
 	return osType
-***REMOVED***
+}
 
 // getFiltersQuery returns a url query with "filters" query term, based on the
 // filters provided.
-func getFiltersQuery(f filters.Args) (url.Values, error) ***REMOVED***
-	query := url.Values***REMOVED******REMOVED***
-	if f.Len() > 0 ***REMOVED***
+func getFiltersQuery(f filters.Args) (url.Values, error) {
+	query := url.Values{}
+	if f.Len() > 0 {
 		filterJSON, err := filters.ToJSON(f)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return query, err
-		***REMOVED***
+		}
 		query.Set("filters", filterJSON)
-	***REMOVED***
+	}
 	return query, nil
-***REMOVED***
+}

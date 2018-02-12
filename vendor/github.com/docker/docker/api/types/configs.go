@@ -10,24 +10,24 @@ import (
 // docker daemon).
 
 // ContainerCreateConfig is the parameter set to ContainerCreate()
-type ContainerCreateConfig struct ***REMOVED***
+type ContainerCreateConfig struct {
 	Name             string
 	Config           *container.Config
 	HostConfig       *container.HostConfig
 	NetworkingConfig *network.NetworkingConfig
 	AdjustCPUShares  bool
-***REMOVED***
+}
 
 // ContainerRmConfig holds arguments for the container remove
 // operation. This struct is used to tell the backend what operations
 // to perform.
-type ContainerRmConfig struct ***REMOVED***
+type ContainerRmConfig struct {
 	ForceRemove, RemoveVolume, RemoveLink bool
-***REMOVED***
+}
 
 // ContainerCommitConfig contains build configs for commit operation,
 // and is used when making a commit with the current state of the container.
-type ContainerCommitConfig struct ***REMOVED***
+type ContainerCommitConfig struct {
 	Pause   bool
 	Repo    string
 	Tag     string
@@ -36,11 +36,11 @@ type ContainerCommitConfig struct ***REMOVED***
 	// merge container config into commit config before commit
 	MergeConfigs bool
 	Config       *container.Config
-***REMOVED***
+}
 
 // ExecConfig is a small subset of the Config struct that holds the configuration
 // for the exec feature of docker.
-type ExecConfig struct ***REMOVED***
+type ExecConfig struct {
 	User         string   // User that will run the command
 	Privileged   bool     // Is the container in privileged mode
 	Tty          bool     // Attach standard streams to a tty.
@@ -52,19 +52,19 @@ type ExecConfig struct ***REMOVED***
 	Env          []string // Environment variables
 	WorkingDir   string   // Working directory
 	Cmd          []string // Execution commands and args
-***REMOVED***
+}
 
 // PluginRmConfig holds arguments for plugin remove.
-type PluginRmConfig struct ***REMOVED***
+type PluginRmConfig struct {
 	ForceRemove bool
-***REMOVED***
+}
 
 // PluginEnableConfig holds arguments for plugin enable
-type PluginEnableConfig struct ***REMOVED***
+type PluginEnableConfig struct {
 	Timeout int
-***REMOVED***
+}
 
 // PluginDisableConfig holds arguments for plugin disable.
-type PluginDisableConfig struct ***REMOVED***
+type PluginDisableConfig struct {
 	ForceDisable bool
-***REMOVED***
+}

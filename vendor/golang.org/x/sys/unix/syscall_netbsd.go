@@ -18,7 +18,7 @@ import (
 )
 
 // SockaddrDatalink implements the Sockaddr interface for AF_LINK type sockets.
-type SockaddrDatalink struct ***REMOVED***
+type SockaddrDatalink struct {
 	Len    uint8
 	Family uint8
 	Index  uint16
@@ -28,111 +28,111 @@ type SockaddrDatalink struct ***REMOVED***
 	Slen   uint8
 	Data   [12]int8
 	raw    RawSockaddrDatalink
-***REMOVED***
+}
 
 func Syscall9(trap, a1, a2, a3, a4, a5, a6, a7, a8, a9 uintptr) (r1, r2 uintptr, err syscall.Errno)
 
-func sysctlNodes(mib []_C_int) (nodes []Sysctlnode, err error) ***REMOVED***
+func sysctlNodes(mib []_C_int) (nodes []Sysctlnode, err error) {
 	var olen uintptr
 
 	// Get a list of all sysctl nodes below the given MIB by performing
 	// a sysctl for the given MIB with CTL_QUERY appended.
 	mib = append(mib, CTL_QUERY)
-	qnode := Sysctlnode***REMOVED***Flags: SYSCTL_VERS_1***REMOVED***
+	qnode := Sysctlnode{Flags: SYSCTL_VERS_1}
 	qp := (*byte)(unsafe.Pointer(&qnode))
 	sz := unsafe.Sizeof(qnode)
-	if err = sysctl(mib, nil, &olen, qp, sz); err != nil ***REMOVED***
+	if err = sysctl(mib, nil, &olen, qp, sz); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// Now that we know the size, get the actual nodes.
 	nodes = make([]Sysctlnode, olen/sz)
 	np := (*byte)(unsafe.Pointer(&nodes[0]))
-	if err = sysctl(mib, np, &olen, qp, sz); err != nil ***REMOVED***
+	if err = sysctl(mib, np, &olen, qp, sz); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	return nodes, nil
-***REMOVED***
+}
 
-func nametomib(name string) (mib []_C_int, err error) ***REMOVED***
+func nametomib(name string) (mib []_C_int, err error) {
 	// Split name into components.
 	var parts []string
 	last := 0
-	for i := 0; i < len(name); i++ ***REMOVED***
-		if name[i] == '.' ***REMOVED***
+	for i := 0; i < len(name); i++ {
+		if name[i] == '.' {
 			parts = append(parts, name[last:i])
 			last = i + 1
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	parts = append(parts, name[last:])
 
 	// Discover the nodes and construct the MIB OID.
-	for partno, part := range parts ***REMOVED***
+	for partno, part := range parts {
 		nodes, err := sysctlNodes(mib)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-		for _, node := range nodes ***REMOVED***
+		}
+		for _, node := range nodes {
 			n := make([]byte, 0)
-			for i := range node.Name ***REMOVED***
-				if node.Name[i] != 0 ***REMOVED***
+			for i := range node.Name {
+				if node.Name[i] != 0 {
 					n = append(n, byte(node.Name[i]))
-				***REMOVED***
-			***REMOVED***
-			if string(n) == part ***REMOVED***
+				}
+			}
+			if string(n) == part {
 				mib = append(mib, _C_int(node.Num))
 				break
-			***REMOVED***
-		***REMOVED***
-		if len(mib) != partno+1 ***REMOVED***
+			}
+		}
+		if len(mib) != partno+1 {
 			return nil, EINVAL
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return mib, nil
-***REMOVED***
+}
 
 //sysnb pipe() (fd1 int, fd2 int, err error)
-func Pipe(p []int) (err error) ***REMOVED***
-	if len(p) != 2 ***REMOVED***
+func Pipe(p []int) (err error) {
+	if len(p) != 2 {
 		return EINVAL
-	***REMOVED***
+	}
 	p[0], p[1], err = pipe()
 	return
-***REMOVED***
+}
 
 //sys getdents(fd int, buf []byte) (n int, err error)
-func Getdirentries(fd int, buf []byte, basep *uintptr) (n int, err error) ***REMOVED***
+func Getdirentries(fd int, buf []byte, basep *uintptr) (n int, err error) {
 	return getdents(fd, buf)
-***REMOVED***
+}
 
 const ImplementsGetwd = true
 
 //sys	Getcwd(buf []byte) (n int, err error) = SYS___GETCWD
 
-func Getwd() (string, error) ***REMOVED***
+func Getwd() (string, error) {
 	var buf [PathMax]byte
 	_, err := Getcwd(buf[0:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	n := clen(buf[:])
-	if n < 1 ***REMOVED***
+	if n < 1 {
 		return "", EINVAL
-	***REMOVED***
+	}
 	return string(buf[:n]), nil
-***REMOVED***
+}
 
 // TODO
-func sendfile(outfd int, infd int, offset *int64, count int) (written int, err error) ***REMOVED***
+func sendfile(outfd int, infd int, offset *int64, count int) (written int, err error) {
 	return -1, ENOSYS
-***REMOVED***
+}
 
-func setattrlistTimes(path string, times []Timespec, flags int) error ***REMOVED***
+func setattrlistTimes(path string, times []Timespec, flags int) error {
 	// used on Darwin for UtimesNano
 	return ENOSYS
-***REMOVED***
+}
 
 //sys	ioctl(fd int, req uint, arg uintptr) (err error)
 
@@ -141,83 +141,83 @@ func setattrlistTimes(path string, times []Timespec, flags int) error ***REMOVED
 
 // IoctlSetInt performs an ioctl operation which sets an integer value
 // on fd, using the specified request number.
-func IoctlSetInt(fd int, req uint, value int) error ***REMOVED***
+func IoctlSetInt(fd int, req uint, value int) error {
 	return ioctl(fd, req, uintptr(value))
-***REMOVED***
+}
 
-func IoctlSetWinsize(fd int, req uint, value *Winsize) error ***REMOVED***
+func IoctlSetWinsize(fd int, req uint, value *Winsize) error {
 	return ioctl(fd, req, uintptr(unsafe.Pointer(value)))
-***REMOVED***
+}
 
-func IoctlSetTermios(fd int, req uint, value *Termios) error ***REMOVED***
+func IoctlSetTermios(fd int, req uint, value *Termios) error {
 	return ioctl(fd, req, uintptr(unsafe.Pointer(value)))
-***REMOVED***
+}
 
 // IoctlGetInt performs an ioctl operation which gets an integer value
 // from fd, using the specified request number.
-func IoctlGetInt(fd int, req uint) (int, error) ***REMOVED***
+func IoctlGetInt(fd int, req uint) (int, error) {
 	var value int
 	err := ioctl(fd, req, uintptr(unsafe.Pointer(&value)))
 	return value, err
-***REMOVED***
+}
 
-func IoctlGetWinsize(fd int, req uint) (*Winsize, error) ***REMOVED***
+func IoctlGetWinsize(fd int, req uint) (*Winsize, error) {
 	var value Winsize
 	err := ioctl(fd, req, uintptr(unsafe.Pointer(&value)))
 	return &value, err
-***REMOVED***
+}
 
-func IoctlGetTermios(fd int, req uint) (*Termios, error) ***REMOVED***
+func IoctlGetTermios(fd int, req uint) (*Termios, error) {
 	var value Termios
 	err := ioctl(fd, req, uintptr(unsafe.Pointer(&value)))
 	return &value, err
-***REMOVED***
+}
 
-func Uname(uname *Utsname) error ***REMOVED***
-	mib := []_C_int***REMOVED***CTL_KERN, KERN_OSTYPE***REMOVED***
+func Uname(uname *Utsname) error {
+	mib := []_C_int{CTL_KERN, KERN_OSTYPE}
 	n := unsafe.Sizeof(uname.Sysname)
-	if err := sysctl(mib, &uname.Sysname[0], &n, nil, 0); err != nil ***REMOVED***
+	if err := sysctl(mib, &uname.Sysname[0], &n, nil, 0); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	mib = []_C_int***REMOVED***CTL_KERN, KERN_HOSTNAME***REMOVED***
+	mib = []_C_int{CTL_KERN, KERN_HOSTNAME}
 	n = unsafe.Sizeof(uname.Nodename)
-	if err := sysctl(mib, &uname.Nodename[0], &n, nil, 0); err != nil ***REMOVED***
+	if err := sysctl(mib, &uname.Nodename[0], &n, nil, 0); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	mib = []_C_int***REMOVED***CTL_KERN, KERN_OSRELEASE***REMOVED***
+	mib = []_C_int{CTL_KERN, KERN_OSRELEASE}
 	n = unsafe.Sizeof(uname.Release)
-	if err := sysctl(mib, &uname.Release[0], &n, nil, 0); err != nil ***REMOVED***
+	if err := sysctl(mib, &uname.Release[0], &n, nil, 0); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	mib = []_C_int***REMOVED***CTL_KERN, KERN_VERSION***REMOVED***
+	mib = []_C_int{CTL_KERN, KERN_VERSION}
 	n = unsafe.Sizeof(uname.Version)
-	if err := sysctl(mib, &uname.Version[0], &n, nil, 0); err != nil ***REMOVED***
+	if err := sysctl(mib, &uname.Version[0], &n, nil, 0); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	// The version might have newlines or tabs in it, convert them to
 	// spaces.
-	for i, b := range uname.Version ***REMOVED***
-		if b == '\n' || b == '\t' ***REMOVED***
-			if i == len(uname.Version)-1 ***REMOVED***
+	for i, b := range uname.Version {
+		if b == '\n' || b == '\t' {
+			if i == len(uname.Version)-1 {
 				uname.Version[i] = 0
-			***REMOVED*** else ***REMOVED***
+			} else {
 				uname.Version[i] = ' '
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
-	mib = []_C_int***REMOVED***CTL_HW, HW_MACHINE***REMOVED***
+	mib = []_C_int{CTL_HW, HW_MACHINE}
 	n = unsafe.Sizeof(uname.Machine)
-	if err := sysctl(mib, &uname.Machine[0], &n, nil, 0); err != nil ***REMOVED***
+	if err := sysctl(mib, &uname.Machine[0], &n, nil, 0); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 /*
  * Exposed directly

@@ -24,11 +24,11 @@ uses the v1 implementation of cgroups.
 
 ```go
 shares := uint64(100)
-control, err := cgroups.New(cgroups.V1, cgroups.StaticPath("/test"), &specs.LinuxResources***REMOVED***
-    CPU: &specs.CPU***REMOVED***
+control, err := cgroups.New(cgroups.V1, cgroups.StaticPath("/test"), &specs.LinuxResources{
+    CPU: &specs.CPU{
         Shares: &shares,
-***REMOVED***,
-***REMOVED***)
+    },
+})
 defer control.Delete()
 ```
 
@@ -36,11 +36,11 @@ defer control.Delete()
 
 
 ```go
-control, err := cgroups.New(cgroups.Systemd, cgroups.Slice("system.slice", "runc-test"), &specs.LinuxResources***REMOVED***
-    CPU: &specs.CPU***REMOVED***
+control, err := cgroups.New(cgroups.Systemd, cgroups.Slice("system.slice", "runc-test"), &specs.LinuxResources{
+    CPU: &specs.CPU{
         Shares: &shares,
-***REMOVED***,
-***REMOVED***)
+    },
+})
 
 ```
 
@@ -53,8 +53,8 @@ control, err = cgroups.Load(cgroups.V1, cgroups.StaticPath("/test"))
 ### Add a process to the cgroup
 
 ```go
-if err := control.Add(cgroups.Process***REMOVED***Pid:1234***REMOVED***); err != nil ***REMOVED***
-***REMOVED***
+if err := control.Add(cgroups.Process{Pid:1234}); err != nil {
+}
 ```
 
 ###  Update the cgroup 
@@ -63,21 +63,21 @@ To update the resources applied in the cgroup
 
 ```go
 shares = uint64(200)
-if err := control.Update(&specs.LinuxResources***REMOVED***
-    CPU: &specs.CPU***REMOVED***
+if err := control.Update(&specs.LinuxResources{
+    CPU: &specs.CPU{
         Shares: &shares,
-***REMOVED***,
-***REMOVED***); err != nil ***REMOVED***
-***REMOVED***
+    },
+}); err != nil {
+}
 ```
 
 ### Freeze and Thaw the cgroup
 
 ```go
-if err := control.Freeze(); err != nil ***REMOVED***
-***REMOVED***
-if err := control.Thaw(); err != nil ***REMOVED***
-***REMOVED***
+if err := control.Freeze(); err != nil {
+}
+if err := control.Thaw(); err != nil {
+}
 ```
 
 ### List all processes in the cgroup or recursively

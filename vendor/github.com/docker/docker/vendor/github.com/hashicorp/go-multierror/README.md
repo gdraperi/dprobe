@@ -34,12 +34,12 @@ the function behaves as you would expect.
 ```go
 var result error
 
-if err := step1(); err != nil ***REMOVED***
+if err := step1(); err != nil {
 	result = multierror.Append(result, err)
-***REMOVED***
-if err := step2(); err != nil ***REMOVED***
+}
+if err := step2(); err != nil {
 	result = multierror.Append(result, err)
-***REMOVED***
+}
 
 return result
 ```
@@ -54,11 +54,11 @@ var result *multierror.Error
 
 // ... accumulate errors here, maybe using Append
 
-if result != nil ***REMOVED***
-	result.ErrorFormat = func([]error) string ***REMOVED***
+if result != nil {
+	result.ErrorFormat = func([]error) string {
 		return "errors!"
-	***REMOVED***
-***REMOVED***
+	}
+}
 ```
 
 **Accessing the list of errors**
@@ -68,11 +68,11 @@ multierror, it will work just fine. But if you're aware a multierror might
 be returned, you can use type switches to access the list of errors:
 
 ```go
-if err := something(); err != nil ***REMOVED***
-	if merr, ok := err.(*multierror.Error); ok ***REMOVED***
+if err := something(); err != nil {
+	if merr, ok := err.(*multierror.Error); ok {
 		// Use merr.Errors
-	***REMOVED***
-***REMOVED***
+	}
+}
 ```
 
 **Returning a multierror only if there are errors**

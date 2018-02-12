@@ -20,109 +20,109 @@ import (
 
 var testEnv *environment.Execution
 
-type testingT interface ***REMOVED***
+type testingT interface {
 	require.TestingT
 	logT
-	Fatal(args ...interface***REMOVED******REMOVED***)
-	Fatalf(string, ...interface***REMOVED******REMOVED***)
-***REMOVED***
+	Fatal(args ...interface{})
+	Fatalf(string, ...interface{})
+}
 
-type logT interface ***REMOVED***
-	Logf(string, ...interface***REMOVED******REMOVED***)
-***REMOVED***
+type logT interface {
+	Logf(string, ...interface{})
+}
 
 // Fake is a static file server. It might be running locally or remotely
 // on test host.
-type Fake interface ***REMOVED***
+type Fake interface {
 	Close() error
 	URL() string
 	CtxDir() string
-***REMOVED***
+}
 
 // SetTestEnvironment sets a static test environment
 // TODO: decouple this package from environment
-func SetTestEnvironment(env *environment.Execution) ***REMOVED***
+func SetTestEnvironment(env *environment.Execution) {
 	testEnv = env
-***REMOVED***
+}
 
 // New returns a static file server that will be use as build context.
-func New(t testingT, dir string, modifiers ...func(*fakecontext.Fake) error) Fake ***REMOVED***
-	if testEnv == nil ***REMOVED***
+func New(t testingT, dir string, modifiers ...func(*fakecontext.Fake) error) Fake {
+	if testEnv == nil {
 		t.Fatal("fakstorage package requires SetTestEnvironment() to be called before use.")
-	***REMOVED***
+	}
 	ctx := fakecontext.New(t, dir, modifiers...)
-	if testEnv.IsLocalDaemon() ***REMOVED***
+	if testEnv.IsLocalDaemon() {
 		return newLocalFakeStorage(ctx)
-	***REMOVED***
+	}
 	return newRemoteFileServer(t, ctx)
-***REMOVED***
+}
 
 // localFileStorage is a file storage on the running machine
-type localFileStorage struct ***REMOVED***
+type localFileStorage struct {
 	*fakecontext.Fake
 	*httptest.Server
-***REMOVED***
+}
 
-func (s *localFileStorage) URL() string ***REMOVED***
+func (s *localFileStorage) URL() string {
 	return s.Server.URL
-***REMOVED***
+}
 
-func (s *localFileStorage) CtxDir() string ***REMOVED***
+func (s *localFileStorage) CtxDir() string {
 	return s.Fake.Dir
-***REMOVED***
+}
 
-func (s *localFileStorage) Close() error ***REMOVED***
+func (s *localFileStorage) Close() error {
 	defer s.Server.Close()
 	return s.Fake.Close()
-***REMOVED***
+}
 
-func newLocalFakeStorage(ctx *fakecontext.Fake) *localFileStorage ***REMOVED***
+func newLocalFakeStorage(ctx *fakecontext.Fake) *localFileStorage {
 	handler := http.FileServer(http.Dir(ctx.Dir))
 	server := httptest.NewServer(handler)
-	return &localFileStorage***REMOVED***
+	return &localFileStorage{
 		Fake:   ctx,
 		Server: server,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // remoteFileServer is a containerized static file server started on the remote
 // testing machine to be used in URL-accepting docker build functionality.
-type remoteFileServer struct ***REMOVED***
+type remoteFileServer struct {
 	host      string // hostname/port web server is listening to on docker host e.g. 0.0.0.0:43712
 	container string
 	image     string
 	ctx       *fakecontext.Fake
-***REMOVED***
+}
 
-func (f *remoteFileServer) URL() string ***REMOVED***
-	u := url.URL***REMOVED***
+func (f *remoteFileServer) URL() string {
+	u := url.URL{
 		Scheme: "http",
-		Host:   f.host***REMOVED***
+		Host:   f.host}
 	return u.String()
-***REMOVED***
+}
 
-func (f *remoteFileServer) CtxDir() string ***REMOVED***
+func (f *remoteFileServer) CtxDir() string {
 	return f.ctx.Dir
-***REMOVED***
+}
 
-func (f *remoteFileServer) Close() error ***REMOVED***
-	defer func() ***REMOVED***
-		if f.ctx != nil ***REMOVED***
+func (f *remoteFileServer) Close() error {
+	defer func() {
+		if f.ctx != nil {
 			f.ctx.Close()
-		***REMOVED***
-		if f.image != "" ***REMOVED***
-			if err := cli.Docker(cli.Args("rmi", "-f", f.image)).Error; err != nil ***REMOVED***
+		}
+		if f.image != "" {
+			if err := cli.Docker(cli.Args("rmi", "-f", f.image)).Error; err != nil {
 				fmt.Fprintf(os.Stderr, "Error closing remote file server : %v\n", err)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***()
-	if f.container == "" ***REMOVED***
+			}
+		}
+	}()
+	if f.container == "" {
 		return nil
-	***REMOVED***
+	}
 	return cli.Docker(cli.Args("rm", "-fv", f.container)).Error
-***REMOVED***
+}
 
-func newRemoteFileServer(t testingT, ctx *fakecontext.Fake) *remoteFileServer ***REMOVED***
+func newRemoteFileServer(t testingT, ctx *fakecontext.Fake) *remoteFileServer {
 	var (
 		image     = fmt.Sprintf("fileserver-img-%s", strings.ToLower(testutil.GenerateRandomAlphaOnlyString(10)))
 		container = fmt.Sprintf("fileserver-cnt-%s", strings.ToLower(testutil.GenerateRandomAlphaOnlyString(10)))
@@ -132,9 +132,9 @@ func newRemoteFileServer(t testingT, ctx *fakecontext.Fake) *remoteFileServer **
 
 	// Build the image
 	if err := ctx.Add("Dockerfile", `FROM httpserver
-COPY . /static`); err != nil ***REMOVED***
+COPY . /static`); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	cli.BuildCmd(t, image, build.WithoutCache, build.WithExternalBuildContext(ctx))
 
 	// Start the container
@@ -144,23 +144,23 @@ COPY . /static`); err != nil ***REMOVED***
 	out := cli.DockerCmd(t, "port", container, "80/tcp").Combined()
 	fileserverHostPort := strings.Trim(out, "\n")
 	_, port, err := net.SplitHostPort(fileserverHostPort)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("unable to parse file server host:port: %v", err)
-	***REMOVED***
+	}
 
 	dockerHostURL, err := url.Parse(request.DaemonHost())
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("unable to parse daemon host URL: %v", err)
-	***REMOVED***
+	}
 
 	host, _, err := net.SplitHostPort(dockerHostURL.Host)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("unable to parse docker daemon host:port: %v", err)
-	***REMOVED***
+	}
 
-	return &remoteFileServer***REMOVED***
+	return &remoteFileServer{
 		container: container,
 		image:     image,
 		host:      fmt.Sprintf("%s:%s", host, port),
-		ctx:       ctx***REMOVED***
-***REMOVED***
+		ctx:       ctx}
+}

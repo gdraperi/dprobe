@@ -1,10 +1,10 @@
 package main
 
-type Foo struct ***REMOVED******REMOVED***
+type Foo struct {}
 
-func (f *Foo) Bar() ***REMOVED******REMOVED***
+func (f *Foo) Bar() {}
 
-func create_foo() Foo ***REMOVED***
-	t := Foo***REMOVED******REMOVED***
+func create_foo() Foo {
+	t := Foo{}
 	
-***REMOVED***
+}

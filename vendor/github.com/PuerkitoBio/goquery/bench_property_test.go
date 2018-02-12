@@ -4,48 +4,48 @@ import (
 	"testing"
 )
 
-func BenchmarkAttr(b *testing.B) ***REMOVED***
+func BenchmarkAttr(b *testing.B) {
 	var s string
 
 	b.StopTimer()
 	sel := DocW().Find("h1")
 	b.StartTimer()
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		s, _ = sel.Attr("id")
-	***REMOVED***
-	if s != "firstHeading" ***REMOVED***
+	}
+	if s != "firstHeading" {
 		b.Fatalf("want firstHeading, got %q", s)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func BenchmarkText(b *testing.B) ***REMOVED***
+func BenchmarkText(b *testing.B) {
 	b.StopTimer()
 	sel := DocW().Find("h2")
 	b.StartTimer()
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		sel.Text()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func BenchmarkLength(b *testing.B) ***REMOVED***
+func BenchmarkLength(b *testing.B) {
 	var n int
 
 	b.StopTimer()
 	sel := DocW().Find("h2")
 	b.StartTimer()
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		n = sel.Length()
-	***REMOVED***
-	if n != 14 ***REMOVED***
+	}
+	if n != 14 {
 		b.Fatalf("want 14, got %d", n)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func BenchmarkHtml(b *testing.B) ***REMOVED***
+func BenchmarkHtml(b *testing.B) {
 	b.StopTimer()
 	sel := DocW().Find("h2")
 	b.StartTimer()
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		sel.Html()
-	***REMOVED***
-***REMOVED***
+	}
+}

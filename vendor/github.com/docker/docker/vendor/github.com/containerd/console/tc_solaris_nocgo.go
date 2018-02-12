@@ -22,10 +22,10 @@ const (
 	cmdTcSet = unix.TCSETS
 )
 
-func ptsname(f *os.File) (string, error) ***REMOVED***
+func ptsname(f *os.File) (string, error) {
 	panic("ptsname() support requires cgo.")
-***REMOVED***
+}
 
-func unlockpt(f *os.File) error ***REMOVED***
+func unlockpt(f *os.File) error {
 	panic("unlockpt() support requires cgo.")
-***REMOVED***
+}

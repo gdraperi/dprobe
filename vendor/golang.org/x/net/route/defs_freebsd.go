@@ -16,7 +16,7 @@ package route
 
 #include <netinet/in.h>
 
-struct if_data_freebsd7 ***REMOVED***
+struct if_data_freebsd7 {
 	u_char ifi_type;
 	u_char ifi_physical;
 	u_char ifi_addrlen;
@@ -42,9 +42,9 @@ struct if_data_freebsd7 ***REMOVED***
 	u_long ifi_hwassist;
 	time_t __ifi_epoch;
 	struct timeval __ifi_lastchange;
-***REMOVED***;
+};
 
-struct if_data_freebsd8 ***REMOVED***
+struct if_data_freebsd8 {
 	u_char ifi_type;
 	u_char ifi_physical;
 	u_char ifi_addrlen;
@@ -70,9 +70,9 @@ struct if_data_freebsd8 ***REMOVED***
 	u_long ifi_hwassist;
 	time_t __ifi_epoch;
 	struct timeval __ifi_lastchange;
-***REMOVED***;
+};
 
-struct if_data_freebsd9 ***REMOVED***
+struct if_data_freebsd9 {
 	u_char ifi_type;
 	u_char ifi_physical;
 	u_char ifi_addrlen;
@@ -98,9 +98,9 @@ struct if_data_freebsd9 ***REMOVED***
 	u_long ifi_hwassist;
 	time_t __ifi_epoch;
 	struct timeval __ifi_lastchange;
-***REMOVED***;
+};
 
-struct if_data_freebsd10 ***REMOVED***
+struct if_data_freebsd10 {
 	u_char ifi_type;
 	u_char ifi_physical;
 	u_char ifi_addrlen;
@@ -126,9 +126,9 @@ struct if_data_freebsd10 ***REMOVED***
 	uint64_t ifi_hwassist;
 	time_t __ifi_epoch;
 	struct timeval __ifi_lastchange;
-***REMOVED***;
+};
 
-struct if_data_freebsd11 ***REMOVED***
+struct if_data_freebsd11 {
 	uint8_t ifi_type;
 	uint8_t ifi_physical;
 	uint8_t ifi_addrlen;
@@ -152,20 +152,20 @@ struct if_data_freebsd11 ***REMOVED***
 	uint64_t ifi_oqdrops;
 	uint64_t ifi_noproto;
 	uint64_t ifi_hwassist;
-	union ***REMOVED***
+	union {
 		time_t tt;
 		uint64_t ph;
-	***REMOVED*** __ifi_epoch;
-	union ***REMOVED***
+	} __ifi_epoch;
+	union {
 		struct timeval tv;
-		struct ***REMOVED***
+		struct {
 			uint64_t ph1;
 			uint64_t ph2;
-		***REMOVED*** ph;
-	***REMOVED*** __ifi_lastchange;
-***REMOVED***;
+		} ph;
+	} __ifi_lastchange;
+};
 
-struct if_msghdr_freebsd7 ***REMOVED***
+struct if_msghdr_freebsd7 {
 	u_short ifm_msglen;
 	u_char ifm_version;
 	u_char ifm_type;
@@ -173,9 +173,9 @@ struct if_msghdr_freebsd7 ***REMOVED***
 	int ifm_flags;
 	u_short ifm_index;
 	struct if_data_freebsd7 ifm_data;
-***REMOVED***;
+};
 
-struct if_msghdr_freebsd8 ***REMOVED***
+struct if_msghdr_freebsd8 {
 	u_short ifm_msglen;
 	u_char ifm_version;
 	u_char ifm_type;
@@ -183,9 +183,9 @@ struct if_msghdr_freebsd8 ***REMOVED***
 	int ifm_flags;
 	u_short ifm_index;
 	struct if_data_freebsd8 ifm_data;
-***REMOVED***;
+};
 
-struct if_msghdr_freebsd9 ***REMOVED***
+struct if_msghdr_freebsd9 {
 	u_short ifm_msglen;
 	u_char ifm_version;
 	u_char ifm_type;
@@ -193,9 +193,9 @@ struct if_msghdr_freebsd9 ***REMOVED***
 	int ifm_flags;
 	u_short ifm_index;
 	struct if_data_freebsd9 ifm_data;
-***REMOVED***;
+};
 
-struct if_msghdr_freebsd10 ***REMOVED***
+struct if_msghdr_freebsd10 {
 	u_short ifm_msglen;
 	u_char ifm_version;
 	u_char ifm_type;
@@ -203,9 +203,9 @@ struct if_msghdr_freebsd10 ***REMOVED***
 	int ifm_flags;
 	u_short ifm_index;
 	struct if_data_freebsd10 ifm_data;
-***REMOVED***;
+};
 
-struct if_msghdr_freebsd11 ***REMOVED***
+struct if_msghdr_freebsd11 {
 	u_short ifm_msglen;
 	u_char ifm_version;
 	u_char ifm_type;
@@ -213,7 +213,7 @@ struct if_msghdr_freebsd11 ***REMOVED***
 	int ifm_flags;
 	u_short ifm_index;
 	struct if_data_freebsd11 ifm_data;
-***REMOVED***;
+};
 */
 import "C"
 

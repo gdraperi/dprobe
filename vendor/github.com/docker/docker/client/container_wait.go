@@ -25,60 +25,60 @@ import (
 // wait request or in getting the response. This allows the caller to
 // synchronize ContainerWait with other calls, such as specifying a
 // "next-exit" condition before issuing a ContainerStart request.
-func (cli *Client) ContainerWait(ctx context.Context, containerID string, condition container.WaitCondition) (<-chan container.ContainerWaitOKBody, <-chan error) ***REMOVED***
-	if versions.LessThan(cli.ClientVersion(), "1.30") ***REMOVED***
+func (cli *Client) ContainerWait(ctx context.Context, containerID string, condition container.WaitCondition) (<-chan container.ContainerWaitOKBody, <-chan error) {
+	if versions.LessThan(cli.ClientVersion(), "1.30") {
 		return cli.legacyContainerWait(ctx, containerID)
-	***REMOVED***
+	}
 
 	resultC := make(chan container.ContainerWaitOKBody)
 	errC := make(chan error, 1)
 
-	query := url.Values***REMOVED******REMOVED***
+	query := url.Values{}
 	query.Set("condition", string(condition))
 
 	resp, err := cli.post(ctx, "/containers/"+containerID+"/wait", query, nil, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		defer ensureReaderClosed(resp)
 		errC <- err
 		return resultC, errC
-	***REMOVED***
+	}
 
-	go func() ***REMOVED***
+	go func() {
 		defer ensureReaderClosed(resp)
 		var res container.ContainerWaitOKBody
-		if err := json.NewDecoder(resp.body).Decode(&res); err != nil ***REMOVED***
+		if err := json.NewDecoder(resp.body).Decode(&res); err != nil {
 			errC <- err
 			return
-		***REMOVED***
+		}
 
 		resultC <- res
-	***REMOVED***()
+	}()
 
 	return resultC, errC
-***REMOVED***
+}
 
 // legacyContainerWait returns immediately and doesn't have an option to wait
 // until the container is removed.
-func (cli *Client) legacyContainerWait(ctx context.Context, containerID string) (<-chan container.ContainerWaitOKBody, <-chan error) ***REMOVED***
+func (cli *Client) legacyContainerWait(ctx context.Context, containerID string) (<-chan container.ContainerWaitOKBody, <-chan error) {
 	resultC := make(chan container.ContainerWaitOKBody)
 	errC := make(chan error)
 
-	go func() ***REMOVED***
+	go func() {
 		resp, err := cli.post(ctx, "/containers/"+containerID+"/wait", nil, nil, nil)
-		if err != nil ***REMOVED***
+		if err != nil {
 			errC <- err
 			return
-		***REMOVED***
+		}
 		defer ensureReaderClosed(resp)
 
 		var res container.ContainerWaitOKBody
-		if err := json.NewDecoder(resp.body).Decode(&res); err != nil ***REMOVED***
+		if err := json.NewDecoder(resp.body).Decode(&res); err != nil {
 			errC <- err
 			return
-		***REMOVED***
+		}
 
 		resultC <- res
-	***REMOVED***()
+	}()
 
 	return resultC, errC
-***REMOVED***
+}

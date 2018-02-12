@@ -33,28 +33,28 @@ const opAssociateKmsKey = "AssociateKmsKey"
 //    req, resp := client.AssociateKmsKeyRequest(params)
 //
 //    err := req.Send()
-//    if err == nil ***REMOVED*** // resp is now filled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
-//***REMOVED***
+//    }
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/AssociateKmsKey
-func (c *CloudWatchLogs) AssociateKmsKeyRequest(input *AssociateKmsKeyInput) (req *request.Request, output *AssociateKmsKeyOutput) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (c *CloudWatchLogs) AssociateKmsKeyRequest(input *AssociateKmsKeyInput) (req *request.Request, output *AssociateKmsKeyOutput) {
+	op := &request.Operation{
 		Name:       opAssociateKmsKey,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
-	***REMOVED***
+	}
 
-	if input == nil ***REMOVED***
-		input = &AssociateKmsKeyInput***REMOVED******REMOVED***
-	***REMOVED***
+	if input == nil {
+		input = &AssociateKmsKeyInput{}
+	}
 
-	output = &AssociateKmsKeyOutput***REMOVED******REMOVED***
+	output = &AssociateKmsKeyOutput{}
 	req = c.newRequest(op, input, output)
 	req.Handlers.Unmarshal.Remove(jsonrpc.UnmarshalHandler)
 	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	return
-***REMOVED***
+}
 
 // AssociateKmsKey API operation for Amazon CloudWatch Logs.
 //
@@ -94,10 +94,10 @@ func (c *CloudWatchLogs) AssociateKmsKeyRequest(input *AssociateKmsKeyInput) (re
 //   The service cannot complete the request.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/AssociateKmsKey
-func (c *CloudWatchLogs) AssociateKmsKey(input *AssociateKmsKeyInput) (*AssociateKmsKeyOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) AssociateKmsKey(input *AssociateKmsKeyInput) (*AssociateKmsKeyOutput, error) {
 	req, out := c.AssociateKmsKeyRequest(input)
 	return out, req.Send()
-***REMOVED***
+}
 
 // AssociateKmsKeyWithContext is the same as AssociateKmsKey with the addition of
 // the ability to pass a context and additional request options.
@@ -108,12 +108,12 @@ func (c *CloudWatchLogs) AssociateKmsKey(input *AssociateKmsKeyInput) (*Associat
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *CloudWatchLogs) AssociateKmsKeyWithContext(ctx aws.Context, input *AssociateKmsKeyInput, opts ...request.Option) (*AssociateKmsKeyOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) AssociateKmsKeyWithContext(ctx aws.Context, input *AssociateKmsKeyInput, opts ...request.Option) (*AssociateKmsKeyOutput, error) {
 	req, out := c.AssociateKmsKeyRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
-***REMOVED***
+}
 
 const opCancelExportTask = "CancelExportTask"
 
@@ -136,28 +136,28 @@ const opCancelExportTask = "CancelExportTask"
 //    req, resp := client.CancelExportTaskRequest(params)
 //
 //    err := req.Send()
-//    if err == nil ***REMOVED*** // resp is now filled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
-//***REMOVED***
+//    }
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/CancelExportTask
-func (c *CloudWatchLogs) CancelExportTaskRequest(input *CancelExportTaskInput) (req *request.Request, output *CancelExportTaskOutput) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (c *CloudWatchLogs) CancelExportTaskRequest(input *CancelExportTaskInput) (req *request.Request, output *CancelExportTaskOutput) {
+	op := &request.Operation{
 		Name:       opCancelExportTask,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
-	***REMOVED***
+	}
 
-	if input == nil ***REMOVED***
-		input = &CancelExportTaskInput***REMOVED******REMOVED***
-	***REMOVED***
+	if input == nil {
+		input = &CancelExportTaskInput{}
+	}
 
-	output = &CancelExportTaskOutput***REMOVED******REMOVED***
+	output = &CancelExportTaskOutput{}
 	req = c.newRequest(op, input, output)
 	req.Handlers.Unmarshal.Remove(jsonrpc.UnmarshalHandler)
 	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	return
-***REMOVED***
+}
 
 // CancelExportTask API operation for Amazon CloudWatch Logs.
 //
@@ -186,10 +186,10 @@ func (c *CloudWatchLogs) CancelExportTaskRequest(input *CancelExportTaskInput) (
 //   The service cannot complete the request.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/CancelExportTask
-func (c *CloudWatchLogs) CancelExportTask(input *CancelExportTaskInput) (*CancelExportTaskOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) CancelExportTask(input *CancelExportTaskInput) (*CancelExportTaskOutput, error) {
 	req, out := c.CancelExportTaskRequest(input)
 	return out, req.Send()
-***REMOVED***
+}
 
 // CancelExportTaskWithContext is the same as CancelExportTask with the addition of
 // the ability to pass a context and additional request options.
@@ -200,12 +200,12 @@ func (c *CloudWatchLogs) CancelExportTask(input *CancelExportTaskInput) (*Cancel
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *CloudWatchLogs) CancelExportTaskWithContext(ctx aws.Context, input *CancelExportTaskInput, opts ...request.Option) (*CancelExportTaskOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) CancelExportTaskWithContext(ctx aws.Context, input *CancelExportTaskInput, opts ...request.Option) (*CancelExportTaskOutput, error) {
 	req, out := c.CancelExportTaskRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
-***REMOVED***
+}
 
 const opCreateExportTask = "CreateExportTask"
 
@@ -228,26 +228,26 @@ const opCreateExportTask = "CreateExportTask"
 //    req, resp := client.CreateExportTaskRequest(params)
 //
 //    err := req.Send()
-//    if err == nil ***REMOVED*** // resp is now filled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
-//***REMOVED***
+//    }
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/CreateExportTask
-func (c *CloudWatchLogs) CreateExportTaskRequest(input *CreateExportTaskInput) (req *request.Request, output *CreateExportTaskOutput) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (c *CloudWatchLogs) CreateExportTaskRequest(input *CreateExportTaskInput) (req *request.Request, output *CreateExportTaskOutput) {
+	op := &request.Operation{
 		Name:       opCreateExportTask,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
-	***REMOVED***
+	}
 
-	if input == nil ***REMOVED***
-		input = &CreateExportTaskInput***REMOVED******REMOVED***
-	***REMOVED***
+	if input == nil {
+		input = &CreateExportTaskInput{}
+	}
 
-	output = &CreateExportTaskOutput***REMOVED******REMOVED***
+	output = &CreateExportTaskOutput{}
 	req = c.newRequest(op, input, output)
 	return
-***REMOVED***
+}
 
 // CreateExportTask API operation for Amazon CloudWatch Logs.
 //
@@ -291,10 +291,10 @@ func (c *CloudWatchLogs) CreateExportTaskRequest(input *CreateExportTaskInput) (
 //   The specified resource already exists.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/CreateExportTask
-func (c *CloudWatchLogs) CreateExportTask(input *CreateExportTaskInput) (*CreateExportTaskOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) CreateExportTask(input *CreateExportTaskInput) (*CreateExportTaskOutput, error) {
 	req, out := c.CreateExportTaskRequest(input)
 	return out, req.Send()
-***REMOVED***
+}
 
 // CreateExportTaskWithContext is the same as CreateExportTask with the addition of
 // the ability to pass a context and additional request options.
@@ -305,12 +305,12 @@ func (c *CloudWatchLogs) CreateExportTask(input *CreateExportTaskInput) (*Create
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *CloudWatchLogs) CreateExportTaskWithContext(ctx aws.Context, input *CreateExportTaskInput, opts ...request.Option) (*CreateExportTaskOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) CreateExportTaskWithContext(ctx aws.Context, input *CreateExportTaskInput, opts ...request.Option) (*CreateExportTaskOutput, error) {
 	req, out := c.CreateExportTaskRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
-***REMOVED***
+}
 
 const opCreateLogGroup = "CreateLogGroup"
 
@@ -333,28 +333,28 @@ const opCreateLogGroup = "CreateLogGroup"
 //    req, resp := client.CreateLogGroupRequest(params)
 //
 //    err := req.Send()
-//    if err == nil ***REMOVED*** // resp is now filled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
-//***REMOVED***
+//    }
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/CreateLogGroup
-func (c *CloudWatchLogs) CreateLogGroupRequest(input *CreateLogGroupInput) (req *request.Request, output *CreateLogGroupOutput) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (c *CloudWatchLogs) CreateLogGroupRequest(input *CreateLogGroupInput) (req *request.Request, output *CreateLogGroupOutput) {
+	op := &request.Operation{
 		Name:       opCreateLogGroup,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
-	***REMOVED***
+	}
 
-	if input == nil ***REMOVED***
-		input = &CreateLogGroupInput***REMOVED******REMOVED***
-	***REMOVED***
+	if input == nil {
+		input = &CreateLogGroupInput{}
+	}
 
-	output = &CreateLogGroupOutput***REMOVED******REMOVED***
+	output = &CreateLogGroupOutput{}
 	req = c.newRequest(op, input, output)
 	req.Handlers.Unmarshal.Remove(jsonrpc.UnmarshalHandler)
 	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	return
-***REMOVED***
+}
 
 // CreateLogGroup API operation for Amazon CloudWatch Logs.
 //
@@ -405,10 +405,10 @@ func (c *CloudWatchLogs) CreateLogGroupRequest(input *CreateLogGroupInput) (req 
 //   The service cannot complete the request.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/CreateLogGroup
-func (c *CloudWatchLogs) CreateLogGroup(input *CreateLogGroupInput) (*CreateLogGroupOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) CreateLogGroup(input *CreateLogGroupInput) (*CreateLogGroupOutput, error) {
 	req, out := c.CreateLogGroupRequest(input)
 	return out, req.Send()
-***REMOVED***
+}
 
 // CreateLogGroupWithContext is the same as CreateLogGroup with the addition of
 // the ability to pass a context and additional request options.
@@ -419,12 +419,12 @@ func (c *CloudWatchLogs) CreateLogGroup(input *CreateLogGroupInput) (*CreateLogG
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *CloudWatchLogs) CreateLogGroupWithContext(ctx aws.Context, input *CreateLogGroupInput, opts ...request.Option) (*CreateLogGroupOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) CreateLogGroupWithContext(ctx aws.Context, input *CreateLogGroupInput, opts ...request.Option) (*CreateLogGroupOutput, error) {
 	req, out := c.CreateLogGroupRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
-***REMOVED***
+}
 
 const opCreateLogStream = "CreateLogStream"
 
@@ -447,28 +447,28 @@ const opCreateLogStream = "CreateLogStream"
 //    req, resp := client.CreateLogStreamRequest(params)
 //
 //    err := req.Send()
-//    if err == nil ***REMOVED*** // resp is now filled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
-//***REMOVED***
+//    }
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/CreateLogStream
-func (c *CloudWatchLogs) CreateLogStreamRequest(input *CreateLogStreamInput) (req *request.Request, output *CreateLogStreamOutput) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (c *CloudWatchLogs) CreateLogStreamRequest(input *CreateLogStreamInput) (req *request.Request, output *CreateLogStreamOutput) {
+	op := &request.Operation{
 		Name:       opCreateLogStream,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
-	***REMOVED***
+	}
 
-	if input == nil ***REMOVED***
-		input = &CreateLogStreamInput***REMOVED******REMOVED***
-	***REMOVED***
+	if input == nil {
+		input = &CreateLogStreamInput{}
+	}
 
-	output = &CreateLogStreamOutput***REMOVED******REMOVED***
+	output = &CreateLogStreamOutput{}
 	req = c.newRequest(op, input, output)
 	req.Handlers.Unmarshal.Remove(jsonrpc.UnmarshalHandler)
 	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	return
-***REMOVED***
+}
 
 // CreateLogStream API operation for Amazon CloudWatch Logs.
 //
@@ -506,10 +506,10 @@ func (c *CloudWatchLogs) CreateLogStreamRequest(input *CreateLogStreamInput) (re
 //   The service cannot complete the request.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/CreateLogStream
-func (c *CloudWatchLogs) CreateLogStream(input *CreateLogStreamInput) (*CreateLogStreamOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) CreateLogStream(input *CreateLogStreamInput) (*CreateLogStreamOutput, error) {
 	req, out := c.CreateLogStreamRequest(input)
 	return out, req.Send()
-***REMOVED***
+}
 
 // CreateLogStreamWithContext is the same as CreateLogStream with the addition of
 // the ability to pass a context and additional request options.
@@ -520,12 +520,12 @@ func (c *CloudWatchLogs) CreateLogStream(input *CreateLogStreamInput) (*CreateLo
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *CloudWatchLogs) CreateLogStreamWithContext(ctx aws.Context, input *CreateLogStreamInput, opts ...request.Option) (*CreateLogStreamOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) CreateLogStreamWithContext(ctx aws.Context, input *CreateLogStreamInput, opts ...request.Option) (*CreateLogStreamOutput, error) {
 	req, out := c.CreateLogStreamRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
-***REMOVED***
+}
 
 const opDeleteDestination = "DeleteDestination"
 
@@ -548,28 +548,28 @@ const opDeleteDestination = "DeleteDestination"
 //    req, resp := client.DeleteDestinationRequest(params)
 //
 //    err := req.Send()
-//    if err == nil ***REMOVED*** // resp is now filled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
-//***REMOVED***
+//    }
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DeleteDestination
-func (c *CloudWatchLogs) DeleteDestinationRequest(input *DeleteDestinationInput) (req *request.Request, output *DeleteDestinationOutput) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (c *CloudWatchLogs) DeleteDestinationRequest(input *DeleteDestinationInput) (req *request.Request, output *DeleteDestinationOutput) {
+	op := &request.Operation{
 		Name:       opDeleteDestination,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
-	***REMOVED***
+	}
 
-	if input == nil ***REMOVED***
-		input = &DeleteDestinationInput***REMOVED******REMOVED***
-	***REMOVED***
+	if input == nil {
+		input = &DeleteDestinationInput{}
+	}
 
-	output = &DeleteDestinationOutput***REMOVED******REMOVED***
+	output = &DeleteDestinationOutput{}
 	req = c.newRequest(op, input, output)
 	req.Handlers.Unmarshal.Remove(jsonrpc.UnmarshalHandler)
 	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	return
-***REMOVED***
+}
 
 // DeleteDestination API operation for Amazon CloudWatch Logs.
 //
@@ -598,10 +598,10 @@ func (c *CloudWatchLogs) DeleteDestinationRequest(input *DeleteDestinationInput)
 //   The service cannot complete the request.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DeleteDestination
-func (c *CloudWatchLogs) DeleteDestination(input *DeleteDestinationInput) (*DeleteDestinationOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) DeleteDestination(input *DeleteDestinationInput) (*DeleteDestinationOutput, error) {
 	req, out := c.DeleteDestinationRequest(input)
 	return out, req.Send()
-***REMOVED***
+}
 
 // DeleteDestinationWithContext is the same as DeleteDestination with the addition of
 // the ability to pass a context and additional request options.
@@ -612,12 +612,12 @@ func (c *CloudWatchLogs) DeleteDestination(input *DeleteDestinationInput) (*Dele
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *CloudWatchLogs) DeleteDestinationWithContext(ctx aws.Context, input *DeleteDestinationInput, opts ...request.Option) (*DeleteDestinationOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) DeleteDestinationWithContext(ctx aws.Context, input *DeleteDestinationInput, opts ...request.Option) (*DeleteDestinationOutput, error) {
 	req, out := c.DeleteDestinationRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
-***REMOVED***
+}
 
 const opDeleteLogGroup = "DeleteLogGroup"
 
@@ -640,28 +640,28 @@ const opDeleteLogGroup = "DeleteLogGroup"
 //    req, resp := client.DeleteLogGroupRequest(params)
 //
 //    err := req.Send()
-//    if err == nil ***REMOVED*** // resp is now filled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
-//***REMOVED***
+//    }
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DeleteLogGroup
-func (c *CloudWatchLogs) DeleteLogGroupRequest(input *DeleteLogGroupInput) (req *request.Request, output *DeleteLogGroupOutput) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (c *CloudWatchLogs) DeleteLogGroupRequest(input *DeleteLogGroupInput) (req *request.Request, output *DeleteLogGroupOutput) {
+	op := &request.Operation{
 		Name:       opDeleteLogGroup,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
-	***REMOVED***
+	}
 
-	if input == nil ***REMOVED***
-		input = &DeleteLogGroupInput***REMOVED******REMOVED***
-	***REMOVED***
+	if input == nil {
+		input = &DeleteLogGroupInput{}
+	}
 
-	output = &DeleteLogGroupOutput***REMOVED******REMOVED***
+	output = &DeleteLogGroupOutput{}
 	req = c.newRequest(op, input, output)
 	req.Handlers.Unmarshal.Remove(jsonrpc.UnmarshalHandler)
 	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	return
-***REMOVED***
+}
 
 // DeleteLogGroup API operation for Amazon CloudWatch Logs.
 //
@@ -689,10 +689,10 @@ func (c *CloudWatchLogs) DeleteLogGroupRequest(input *DeleteLogGroupInput) (req 
 //   The service cannot complete the request.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DeleteLogGroup
-func (c *CloudWatchLogs) DeleteLogGroup(input *DeleteLogGroupInput) (*DeleteLogGroupOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) DeleteLogGroup(input *DeleteLogGroupInput) (*DeleteLogGroupOutput, error) {
 	req, out := c.DeleteLogGroupRequest(input)
 	return out, req.Send()
-***REMOVED***
+}
 
 // DeleteLogGroupWithContext is the same as DeleteLogGroup with the addition of
 // the ability to pass a context and additional request options.
@@ -703,12 +703,12 @@ func (c *CloudWatchLogs) DeleteLogGroup(input *DeleteLogGroupInput) (*DeleteLogG
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *CloudWatchLogs) DeleteLogGroupWithContext(ctx aws.Context, input *DeleteLogGroupInput, opts ...request.Option) (*DeleteLogGroupOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) DeleteLogGroupWithContext(ctx aws.Context, input *DeleteLogGroupInput, opts ...request.Option) (*DeleteLogGroupOutput, error) {
 	req, out := c.DeleteLogGroupRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
-***REMOVED***
+}
 
 const opDeleteLogStream = "DeleteLogStream"
 
@@ -731,28 +731,28 @@ const opDeleteLogStream = "DeleteLogStream"
 //    req, resp := client.DeleteLogStreamRequest(params)
 //
 //    err := req.Send()
-//    if err == nil ***REMOVED*** // resp is now filled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
-//***REMOVED***
+//    }
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DeleteLogStream
-func (c *CloudWatchLogs) DeleteLogStreamRequest(input *DeleteLogStreamInput) (req *request.Request, output *DeleteLogStreamOutput) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (c *CloudWatchLogs) DeleteLogStreamRequest(input *DeleteLogStreamInput) (req *request.Request, output *DeleteLogStreamOutput) {
+	op := &request.Operation{
 		Name:       opDeleteLogStream,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
-	***REMOVED***
+	}
 
-	if input == nil ***REMOVED***
-		input = &DeleteLogStreamInput***REMOVED******REMOVED***
-	***REMOVED***
+	if input == nil {
+		input = &DeleteLogStreamInput{}
+	}
 
-	output = &DeleteLogStreamOutput***REMOVED******REMOVED***
+	output = &DeleteLogStreamOutput{}
 	req = c.newRequest(op, input, output)
 	req.Handlers.Unmarshal.Remove(jsonrpc.UnmarshalHandler)
 	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	return
-***REMOVED***
+}
 
 // DeleteLogStream API operation for Amazon CloudWatch Logs.
 //
@@ -780,10 +780,10 @@ func (c *CloudWatchLogs) DeleteLogStreamRequest(input *DeleteLogStreamInput) (re
 //   The service cannot complete the request.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DeleteLogStream
-func (c *CloudWatchLogs) DeleteLogStream(input *DeleteLogStreamInput) (*DeleteLogStreamOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) DeleteLogStream(input *DeleteLogStreamInput) (*DeleteLogStreamOutput, error) {
 	req, out := c.DeleteLogStreamRequest(input)
 	return out, req.Send()
-***REMOVED***
+}
 
 // DeleteLogStreamWithContext is the same as DeleteLogStream with the addition of
 // the ability to pass a context and additional request options.
@@ -794,12 +794,12 @@ func (c *CloudWatchLogs) DeleteLogStream(input *DeleteLogStreamInput) (*DeleteLo
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *CloudWatchLogs) DeleteLogStreamWithContext(ctx aws.Context, input *DeleteLogStreamInput, opts ...request.Option) (*DeleteLogStreamOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) DeleteLogStreamWithContext(ctx aws.Context, input *DeleteLogStreamInput, opts ...request.Option) (*DeleteLogStreamOutput, error) {
 	req, out := c.DeleteLogStreamRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
-***REMOVED***
+}
 
 const opDeleteMetricFilter = "DeleteMetricFilter"
 
@@ -822,28 +822,28 @@ const opDeleteMetricFilter = "DeleteMetricFilter"
 //    req, resp := client.DeleteMetricFilterRequest(params)
 //
 //    err := req.Send()
-//    if err == nil ***REMOVED*** // resp is now filled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
-//***REMOVED***
+//    }
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DeleteMetricFilter
-func (c *CloudWatchLogs) DeleteMetricFilterRequest(input *DeleteMetricFilterInput) (req *request.Request, output *DeleteMetricFilterOutput) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (c *CloudWatchLogs) DeleteMetricFilterRequest(input *DeleteMetricFilterInput) (req *request.Request, output *DeleteMetricFilterOutput) {
+	op := &request.Operation{
 		Name:       opDeleteMetricFilter,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
-	***REMOVED***
+	}
 
-	if input == nil ***REMOVED***
-		input = &DeleteMetricFilterInput***REMOVED******REMOVED***
-	***REMOVED***
+	if input == nil {
+		input = &DeleteMetricFilterInput{}
+	}
 
-	output = &DeleteMetricFilterOutput***REMOVED******REMOVED***
+	output = &DeleteMetricFilterOutput{}
 	req = c.newRequest(op, input, output)
 	req.Handlers.Unmarshal.Remove(jsonrpc.UnmarshalHandler)
 	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	return
-***REMOVED***
+}
 
 // DeleteMetricFilter API operation for Amazon CloudWatch Logs.
 //
@@ -870,10 +870,10 @@ func (c *CloudWatchLogs) DeleteMetricFilterRequest(input *DeleteMetricFilterInpu
 //   The service cannot complete the request.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DeleteMetricFilter
-func (c *CloudWatchLogs) DeleteMetricFilter(input *DeleteMetricFilterInput) (*DeleteMetricFilterOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) DeleteMetricFilter(input *DeleteMetricFilterInput) (*DeleteMetricFilterOutput, error) {
 	req, out := c.DeleteMetricFilterRequest(input)
 	return out, req.Send()
-***REMOVED***
+}
 
 // DeleteMetricFilterWithContext is the same as DeleteMetricFilter with the addition of
 // the ability to pass a context and additional request options.
@@ -884,12 +884,12 @@ func (c *CloudWatchLogs) DeleteMetricFilter(input *DeleteMetricFilterInput) (*De
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *CloudWatchLogs) DeleteMetricFilterWithContext(ctx aws.Context, input *DeleteMetricFilterInput, opts ...request.Option) (*DeleteMetricFilterOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) DeleteMetricFilterWithContext(ctx aws.Context, input *DeleteMetricFilterInput, opts ...request.Option) (*DeleteMetricFilterOutput, error) {
 	req, out := c.DeleteMetricFilterRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
-***REMOVED***
+}
 
 const opDeleteResourcePolicy = "DeleteResourcePolicy"
 
@@ -912,28 +912,28 @@ const opDeleteResourcePolicy = "DeleteResourcePolicy"
 //    req, resp := client.DeleteResourcePolicyRequest(params)
 //
 //    err := req.Send()
-//    if err == nil ***REMOVED*** // resp is now filled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
-//***REMOVED***
+//    }
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DeleteResourcePolicy
-func (c *CloudWatchLogs) DeleteResourcePolicyRequest(input *DeleteResourcePolicyInput) (req *request.Request, output *DeleteResourcePolicyOutput) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (c *CloudWatchLogs) DeleteResourcePolicyRequest(input *DeleteResourcePolicyInput) (req *request.Request, output *DeleteResourcePolicyOutput) {
+	op := &request.Operation{
 		Name:       opDeleteResourcePolicy,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
-	***REMOVED***
+	}
 
-	if input == nil ***REMOVED***
-		input = &DeleteResourcePolicyInput***REMOVED******REMOVED***
-	***REMOVED***
+	if input == nil {
+		input = &DeleteResourcePolicyInput{}
+	}
 
-	output = &DeleteResourcePolicyOutput***REMOVED******REMOVED***
+	output = &DeleteResourcePolicyOutput{}
 	req = c.newRequest(op, input, output)
 	req.Handlers.Unmarshal.Remove(jsonrpc.UnmarshalHandler)
 	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	return
-***REMOVED***
+}
 
 // DeleteResourcePolicy API operation for Amazon CloudWatch Logs.
 //
@@ -958,10 +958,10 @@ func (c *CloudWatchLogs) DeleteResourcePolicyRequest(input *DeleteResourcePolicy
 //   The service cannot complete the request.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DeleteResourcePolicy
-func (c *CloudWatchLogs) DeleteResourcePolicy(input *DeleteResourcePolicyInput) (*DeleteResourcePolicyOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) DeleteResourcePolicy(input *DeleteResourcePolicyInput) (*DeleteResourcePolicyOutput, error) {
 	req, out := c.DeleteResourcePolicyRequest(input)
 	return out, req.Send()
-***REMOVED***
+}
 
 // DeleteResourcePolicyWithContext is the same as DeleteResourcePolicy with the addition of
 // the ability to pass a context and additional request options.
@@ -972,12 +972,12 @@ func (c *CloudWatchLogs) DeleteResourcePolicy(input *DeleteResourcePolicyInput) 
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *CloudWatchLogs) DeleteResourcePolicyWithContext(ctx aws.Context, input *DeleteResourcePolicyInput, opts ...request.Option) (*DeleteResourcePolicyOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) DeleteResourcePolicyWithContext(ctx aws.Context, input *DeleteResourcePolicyInput, opts ...request.Option) (*DeleteResourcePolicyOutput, error) {
 	req, out := c.DeleteResourcePolicyRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
-***REMOVED***
+}
 
 const opDeleteRetentionPolicy = "DeleteRetentionPolicy"
 
@@ -1000,28 +1000,28 @@ const opDeleteRetentionPolicy = "DeleteRetentionPolicy"
 //    req, resp := client.DeleteRetentionPolicyRequest(params)
 //
 //    err := req.Send()
-//    if err == nil ***REMOVED*** // resp is now filled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
-//***REMOVED***
+//    }
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DeleteRetentionPolicy
-func (c *CloudWatchLogs) DeleteRetentionPolicyRequest(input *DeleteRetentionPolicyInput) (req *request.Request, output *DeleteRetentionPolicyOutput) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (c *CloudWatchLogs) DeleteRetentionPolicyRequest(input *DeleteRetentionPolicyInput) (req *request.Request, output *DeleteRetentionPolicyOutput) {
+	op := &request.Operation{
 		Name:       opDeleteRetentionPolicy,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
-	***REMOVED***
+	}
 
-	if input == nil ***REMOVED***
-		input = &DeleteRetentionPolicyInput***REMOVED******REMOVED***
-	***REMOVED***
+	if input == nil {
+		input = &DeleteRetentionPolicyInput{}
+	}
 
-	output = &DeleteRetentionPolicyOutput***REMOVED******REMOVED***
+	output = &DeleteRetentionPolicyOutput{}
 	req = c.newRequest(op, input, output)
 	req.Handlers.Unmarshal.Remove(jsonrpc.UnmarshalHandler)
 	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	return
-***REMOVED***
+}
 
 // DeleteRetentionPolicy API operation for Amazon CloudWatch Logs.
 //
@@ -1051,10 +1051,10 @@ func (c *CloudWatchLogs) DeleteRetentionPolicyRequest(input *DeleteRetentionPoli
 //   The service cannot complete the request.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DeleteRetentionPolicy
-func (c *CloudWatchLogs) DeleteRetentionPolicy(input *DeleteRetentionPolicyInput) (*DeleteRetentionPolicyOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) DeleteRetentionPolicy(input *DeleteRetentionPolicyInput) (*DeleteRetentionPolicyOutput, error) {
 	req, out := c.DeleteRetentionPolicyRequest(input)
 	return out, req.Send()
-***REMOVED***
+}
 
 // DeleteRetentionPolicyWithContext is the same as DeleteRetentionPolicy with the addition of
 // the ability to pass a context and additional request options.
@@ -1065,12 +1065,12 @@ func (c *CloudWatchLogs) DeleteRetentionPolicy(input *DeleteRetentionPolicyInput
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *CloudWatchLogs) DeleteRetentionPolicyWithContext(ctx aws.Context, input *DeleteRetentionPolicyInput, opts ...request.Option) (*DeleteRetentionPolicyOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) DeleteRetentionPolicyWithContext(ctx aws.Context, input *DeleteRetentionPolicyInput, opts ...request.Option) (*DeleteRetentionPolicyOutput, error) {
 	req, out := c.DeleteRetentionPolicyRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
-***REMOVED***
+}
 
 const opDeleteSubscriptionFilter = "DeleteSubscriptionFilter"
 
@@ -1093,28 +1093,28 @@ const opDeleteSubscriptionFilter = "DeleteSubscriptionFilter"
 //    req, resp := client.DeleteSubscriptionFilterRequest(params)
 //
 //    err := req.Send()
-//    if err == nil ***REMOVED*** // resp is now filled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
-//***REMOVED***
+//    }
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DeleteSubscriptionFilter
-func (c *CloudWatchLogs) DeleteSubscriptionFilterRequest(input *DeleteSubscriptionFilterInput) (req *request.Request, output *DeleteSubscriptionFilterOutput) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (c *CloudWatchLogs) DeleteSubscriptionFilterRequest(input *DeleteSubscriptionFilterInput) (req *request.Request, output *DeleteSubscriptionFilterOutput) {
+	op := &request.Operation{
 		Name:       opDeleteSubscriptionFilter,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
-	***REMOVED***
+	}
 
-	if input == nil ***REMOVED***
-		input = &DeleteSubscriptionFilterInput***REMOVED******REMOVED***
-	***REMOVED***
+	if input == nil {
+		input = &DeleteSubscriptionFilterInput{}
+	}
 
-	output = &DeleteSubscriptionFilterOutput***REMOVED******REMOVED***
+	output = &DeleteSubscriptionFilterOutput{}
 	req = c.newRequest(op, input, output)
 	req.Handlers.Unmarshal.Remove(jsonrpc.UnmarshalHandler)
 	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	return
-***REMOVED***
+}
 
 // DeleteSubscriptionFilter API operation for Amazon CloudWatch Logs.
 //
@@ -1141,10 +1141,10 @@ func (c *CloudWatchLogs) DeleteSubscriptionFilterRequest(input *DeleteSubscripti
 //   The service cannot complete the request.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DeleteSubscriptionFilter
-func (c *CloudWatchLogs) DeleteSubscriptionFilter(input *DeleteSubscriptionFilterInput) (*DeleteSubscriptionFilterOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) DeleteSubscriptionFilter(input *DeleteSubscriptionFilterInput) (*DeleteSubscriptionFilterOutput, error) {
 	req, out := c.DeleteSubscriptionFilterRequest(input)
 	return out, req.Send()
-***REMOVED***
+}
 
 // DeleteSubscriptionFilterWithContext is the same as DeleteSubscriptionFilter with the addition of
 // the ability to pass a context and additional request options.
@@ -1155,12 +1155,12 @@ func (c *CloudWatchLogs) DeleteSubscriptionFilter(input *DeleteSubscriptionFilte
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *CloudWatchLogs) DeleteSubscriptionFilterWithContext(ctx aws.Context, input *DeleteSubscriptionFilterInput, opts ...request.Option) (*DeleteSubscriptionFilterOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) DeleteSubscriptionFilterWithContext(ctx aws.Context, input *DeleteSubscriptionFilterInput, opts ...request.Option) (*DeleteSubscriptionFilterOutput, error) {
 	req, out := c.DeleteSubscriptionFilterRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
-***REMOVED***
+}
 
 const opDescribeDestinations = "DescribeDestinations"
 
@@ -1183,32 +1183,32 @@ const opDescribeDestinations = "DescribeDestinations"
 //    req, resp := client.DescribeDestinationsRequest(params)
 //
 //    err := req.Send()
-//    if err == nil ***REMOVED*** // resp is now filled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
-//***REMOVED***
+//    }
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DescribeDestinations
-func (c *CloudWatchLogs) DescribeDestinationsRequest(input *DescribeDestinationsInput) (req *request.Request, output *DescribeDestinationsOutput) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (c *CloudWatchLogs) DescribeDestinationsRequest(input *DescribeDestinationsInput) (req *request.Request, output *DescribeDestinationsOutput) {
+	op := &request.Operation{
 		Name:       opDescribeDestinations,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
-		Paginator: &request.Paginator***REMOVED***
-			InputTokens:     []string***REMOVED***"nextToken"***REMOVED***,
-			OutputTokens:    []string***REMOVED***"nextToken"***REMOVED***,
+		Paginator: &request.Paginator{
+			InputTokens:     []string{"nextToken"},
+			OutputTokens:    []string{"nextToken"},
 			LimitToken:      "limit",
 			TruncationToken: "",
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
-	if input == nil ***REMOVED***
-		input = &DescribeDestinationsInput***REMOVED******REMOVED***
-	***REMOVED***
+	if input == nil {
+		input = &DescribeDestinationsInput{}
+	}
 
-	output = &DescribeDestinationsOutput***REMOVED******REMOVED***
+	output = &DescribeDestinationsOutput{}
 	req = c.newRequest(op, input, output)
 	return
-***REMOVED***
+}
 
 // DescribeDestinations API operation for Amazon CloudWatch Logs.
 //
@@ -1230,10 +1230,10 @@ func (c *CloudWatchLogs) DescribeDestinationsRequest(input *DescribeDestinations
 //   The service cannot complete the request.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DescribeDestinations
-func (c *CloudWatchLogs) DescribeDestinations(input *DescribeDestinationsInput) (*DescribeDestinationsOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) DescribeDestinations(input *DescribeDestinationsInput) (*DescribeDestinationsOutput, error) {
 	req, out := c.DescribeDestinationsRequest(input)
 	return out, req.Send()
-***REMOVED***
+}
 
 // DescribeDestinationsWithContext is the same as DescribeDestinations with the addition of
 // the ability to pass a context and additional request options.
@@ -1244,12 +1244,12 @@ func (c *CloudWatchLogs) DescribeDestinations(input *DescribeDestinationsInput) 
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *CloudWatchLogs) DescribeDestinationsWithContext(ctx aws.Context, input *DescribeDestinationsInput, opts ...request.Option) (*DescribeDestinationsOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) DescribeDestinationsWithContext(ctx aws.Context, input *DescribeDestinationsInput, opts ...request.Option) (*DescribeDestinationsOutput, error) {
 	req, out := c.DescribeDestinationsRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
-***REMOVED***
+}
 
 // DescribeDestinationsPages iterates over the pages of a DescribeDestinations operation,
 // calling the "fn" function with the response data for each page. To stop
@@ -1262,15 +1262,15 @@ func (c *CloudWatchLogs) DescribeDestinationsWithContext(ctx aws.Context, input 
 //    // Example iterating over at most 3 pages of a DescribeDestinations operation.
 //    pageNum := 0
 //    err := client.DescribeDestinationsPages(params,
-//        func(page *DescribeDestinationsOutput, lastPage bool) bool ***REMOVED***
+//        func(page *DescribeDestinationsOutput, lastPage bool) bool {
 //            pageNum++
 //            fmt.Println(page)
 //            return pageNum <= 3
-//    ***REMOVED***)
+//        })
 //
-func (c *CloudWatchLogs) DescribeDestinationsPages(input *DescribeDestinationsInput, fn func(*DescribeDestinationsOutput, bool) bool) error ***REMOVED***
+func (c *CloudWatchLogs) DescribeDestinationsPages(input *DescribeDestinationsInput, fn func(*DescribeDestinationsOutput, bool) bool) error {
 	return c.DescribeDestinationsPagesWithContext(aws.BackgroundContext(), input, fn)
-***REMOVED***
+}
 
 // DescribeDestinationsPagesWithContext same as DescribeDestinationsPages except
 // it takes a Context and allows setting request options on the pages.
@@ -1279,27 +1279,27 @@ func (c *CloudWatchLogs) DescribeDestinationsPages(input *DescribeDestinationsIn
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *CloudWatchLogs) DescribeDestinationsPagesWithContext(ctx aws.Context, input *DescribeDestinationsInput, fn func(*DescribeDestinationsOutput, bool) bool, opts ...request.Option) error ***REMOVED***
-	p := request.Pagination***REMOVED***
-		NewRequest: func() (*request.Request, error) ***REMOVED***
+func (c *CloudWatchLogs) DescribeDestinationsPagesWithContext(ctx aws.Context, input *DescribeDestinationsInput, fn func(*DescribeDestinationsOutput, bool) bool, opts ...request.Option) error {
+	p := request.Pagination{
+		NewRequest: func() (*request.Request, error) {
 			var inCpy *DescribeDestinationsInput
-			if input != nil ***REMOVED***
+			if input != nil {
 				tmp := *input
 				inCpy = &tmp
-			***REMOVED***
+			}
 			req, _ := c.DescribeDestinationsRequest(inCpy)
 			req.SetContext(ctx)
 			req.ApplyOptions(opts...)
 			return req, nil
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
 	cont := true
-	for p.Next() && cont ***REMOVED***
+	for p.Next() && cont {
 		cont = fn(p.Page().(*DescribeDestinationsOutput), !p.HasNextPage())
-	***REMOVED***
+	}
 	return p.Err()
-***REMOVED***
+}
 
 const opDescribeExportTasks = "DescribeExportTasks"
 
@@ -1322,26 +1322,26 @@ const opDescribeExportTasks = "DescribeExportTasks"
 //    req, resp := client.DescribeExportTasksRequest(params)
 //
 //    err := req.Send()
-//    if err == nil ***REMOVED*** // resp is now filled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
-//***REMOVED***
+//    }
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DescribeExportTasks
-func (c *CloudWatchLogs) DescribeExportTasksRequest(input *DescribeExportTasksInput) (req *request.Request, output *DescribeExportTasksOutput) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (c *CloudWatchLogs) DescribeExportTasksRequest(input *DescribeExportTasksInput) (req *request.Request, output *DescribeExportTasksOutput) {
+	op := &request.Operation{
 		Name:       opDescribeExportTasks,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
-	***REMOVED***
+	}
 
-	if input == nil ***REMOVED***
-		input = &DescribeExportTasksInput***REMOVED******REMOVED***
-	***REMOVED***
+	if input == nil {
+		input = &DescribeExportTasksInput{}
+	}
 
-	output = &DescribeExportTasksOutput***REMOVED******REMOVED***
+	output = &DescribeExportTasksOutput{}
 	req = c.newRequest(op, input, output)
 	return
-***REMOVED***
+}
 
 // DescribeExportTasks API operation for Amazon CloudWatch Logs.
 //
@@ -1363,10 +1363,10 @@ func (c *CloudWatchLogs) DescribeExportTasksRequest(input *DescribeExportTasksIn
 //   The service cannot complete the request.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DescribeExportTasks
-func (c *CloudWatchLogs) DescribeExportTasks(input *DescribeExportTasksInput) (*DescribeExportTasksOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) DescribeExportTasks(input *DescribeExportTasksInput) (*DescribeExportTasksOutput, error) {
 	req, out := c.DescribeExportTasksRequest(input)
 	return out, req.Send()
-***REMOVED***
+}
 
 // DescribeExportTasksWithContext is the same as DescribeExportTasks with the addition of
 // the ability to pass a context and additional request options.
@@ -1377,12 +1377,12 @@ func (c *CloudWatchLogs) DescribeExportTasks(input *DescribeExportTasksInput) (*
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *CloudWatchLogs) DescribeExportTasksWithContext(ctx aws.Context, input *DescribeExportTasksInput, opts ...request.Option) (*DescribeExportTasksOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) DescribeExportTasksWithContext(ctx aws.Context, input *DescribeExportTasksInput, opts ...request.Option) (*DescribeExportTasksOutput, error) {
 	req, out := c.DescribeExportTasksRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
-***REMOVED***
+}
 
 const opDescribeLogGroups = "DescribeLogGroups"
 
@@ -1405,32 +1405,32 @@ const opDescribeLogGroups = "DescribeLogGroups"
 //    req, resp := client.DescribeLogGroupsRequest(params)
 //
 //    err := req.Send()
-//    if err == nil ***REMOVED*** // resp is now filled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
-//***REMOVED***
+//    }
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DescribeLogGroups
-func (c *CloudWatchLogs) DescribeLogGroupsRequest(input *DescribeLogGroupsInput) (req *request.Request, output *DescribeLogGroupsOutput) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (c *CloudWatchLogs) DescribeLogGroupsRequest(input *DescribeLogGroupsInput) (req *request.Request, output *DescribeLogGroupsOutput) {
+	op := &request.Operation{
 		Name:       opDescribeLogGroups,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
-		Paginator: &request.Paginator***REMOVED***
-			InputTokens:     []string***REMOVED***"nextToken"***REMOVED***,
-			OutputTokens:    []string***REMOVED***"nextToken"***REMOVED***,
+		Paginator: &request.Paginator{
+			InputTokens:     []string{"nextToken"},
+			OutputTokens:    []string{"nextToken"},
 			LimitToken:      "limit",
 			TruncationToken: "",
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
-	if input == nil ***REMOVED***
-		input = &DescribeLogGroupsInput***REMOVED******REMOVED***
-	***REMOVED***
+	if input == nil {
+		input = &DescribeLogGroupsInput{}
+	}
 
-	output = &DescribeLogGroupsOutput***REMOVED******REMOVED***
+	output = &DescribeLogGroupsOutput{}
 	req = c.newRequest(op, input, output)
 	return
-***REMOVED***
+}
 
 // DescribeLogGroups API operation for Amazon CloudWatch Logs.
 //
@@ -1452,10 +1452,10 @@ func (c *CloudWatchLogs) DescribeLogGroupsRequest(input *DescribeLogGroupsInput)
 //   The service cannot complete the request.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DescribeLogGroups
-func (c *CloudWatchLogs) DescribeLogGroups(input *DescribeLogGroupsInput) (*DescribeLogGroupsOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) DescribeLogGroups(input *DescribeLogGroupsInput) (*DescribeLogGroupsOutput, error) {
 	req, out := c.DescribeLogGroupsRequest(input)
 	return out, req.Send()
-***REMOVED***
+}
 
 // DescribeLogGroupsWithContext is the same as DescribeLogGroups with the addition of
 // the ability to pass a context and additional request options.
@@ -1466,12 +1466,12 @@ func (c *CloudWatchLogs) DescribeLogGroups(input *DescribeLogGroupsInput) (*Desc
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *CloudWatchLogs) DescribeLogGroupsWithContext(ctx aws.Context, input *DescribeLogGroupsInput, opts ...request.Option) (*DescribeLogGroupsOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) DescribeLogGroupsWithContext(ctx aws.Context, input *DescribeLogGroupsInput, opts ...request.Option) (*DescribeLogGroupsOutput, error) {
 	req, out := c.DescribeLogGroupsRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
-***REMOVED***
+}
 
 // DescribeLogGroupsPages iterates over the pages of a DescribeLogGroups operation,
 // calling the "fn" function with the response data for each page. To stop
@@ -1484,15 +1484,15 @@ func (c *CloudWatchLogs) DescribeLogGroupsWithContext(ctx aws.Context, input *De
 //    // Example iterating over at most 3 pages of a DescribeLogGroups operation.
 //    pageNum := 0
 //    err := client.DescribeLogGroupsPages(params,
-//        func(page *DescribeLogGroupsOutput, lastPage bool) bool ***REMOVED***
+//        func(page *DescribeLogGroupsOutput, lastPage bool) bool {
 //            pageNum++
 //            fmt.Println(page)
 //            return pageNum <= 3
-//    ***REMOVED***)
+//        })
 //
-func (c *CloudWatchLogs) DescribeLogGroupsPages(input *DescribeLogGroupsInput, fn func(*DescribeLogGroupsOutput, bool) bool) error ***REMOVED***
+func (c *CloudWatchLogs) DescribeLogGroupsPages(input *DescribeLogGroupsInput, fn func(*DescribeLogGroupsOutput, bool) bool) error {
 	return c.DescribeLogGroupsPagesWithContext(aws.BackgroundContext(), input, fn)
-***REMOVED***
+}
 
 // DescribeLogGroupsPagesWithContext same as DescribeLogGroupsPages except
 // it takes a Context and allows setting request options on the pages.
@@ -1501,27 +1501,27 @@ func (c *CloudWatchLogs) DescribeLogGroupsPages(input *DescribeLogGroupsInput, f
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *CloudWatchLogs) DescribeLogGroupsPagesWithContext(ctx aws.Context, input *DescribeLogGroupsInput, fn func(*DescribeLogGroupsOutput, bool) bool, opts ...request.Option) error ***REMOVED***
-	p := request.Pagination***REMOVED***
-		NewRequest: func() (*request.Request, error) ***REMOVED***
+func (c *CloudWatchLogs) DescribeLogGroupsPagesWithContext(ctx aws.Context, input *DescribeLogGroupsInput, fn func(*DescribeLogGroupsOutput, bool) bool, opts ...request.Option) error {
+	p := request.Pagination{
+		NewRequest: func() (*request.Request, error) {
 			var inCpy *DescribeLogGroupsInput
-			if input != nil ***REMOVED***
+			if input != nil {
 				tmp := *input
 				inCpy = &tmp
-			***REMOVED***
+			}
 			req, _ := c.DescribeLogGroupsRequest(inCpy)
 			req.SetContext(ctx)
 			req.ApplyOptions(opts...)
 			return req, nil
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
 	cont := true
-	for p.Next() && cont ***REMOVED***
+	for p.Next() && cont {
 		cont = fn(p.Page().(*DescribeLogGroupsOutput), !p.HasNextPage())
-	***REMOVED***
+	}
 	return p.Err()
-***REMOVED***
+}
 
 const opDescribeLogStreams = "DescribeLogStreams"
 
@@ -1544,32 +1544,32 @@ const opDescribeLogStreams = "DescribeLogStreams"
 //    req, resp := client.DescribeLogStreamsRequest(params)
 //
 //    err := req.Send()
-//    if err == nil ***REMOVED*** // resp is now filled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
-//***REMOVED***
+//    }
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DescribeLogStreams
-func (c *CloudWatchLogs) DescribeLogStreamsRequest(input *DescribeLogStreamsInput) (req *request.Request, output *DescribeLogStreamsOutput) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (c *CloudWatchLogs) DescribeLogStreamsRequest(input *DescribeLogStreamsInput) (req *request.Request, output *DescribeLogStreamsOutput) {
+	op := &request.Operation{
 		Name:       opDescribeLogStreams,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
-		Paginator: &request.Paginator***REMOVED***
-			InputTokens:     []string***REMOVED***"nextToken"***REMOVED***,
-			OutputTokens:    []string***REMOVED***"nextToken"***REMOVED***,
+		Paginator: &request.Paginator{
+			InputTokens:     []string{"nextToken"},
+			OutputTokens:    []string{"nextToken"},
 			LimitToken:      "limit",
 			TruncationToken: "",
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
-	if input == nil ***REMOVED***
-		input = &DescribeLogStreamsInput***REMOVED******REMOVED***
-	***REMOVED***
+	if input == nil {
+		input = &DescribeLogStreamsInput{}
+	}
 
-	output = &DescribeLogStreamsOutput***REMOVED******REMOVED***
+	output = &DescribeLogStreamsOutput{}
 	req = c.newRequest(op, input, output)
 	return
-***REMOVED***
+}
 
 // DescribeLogStreams API operation for Amazon CloudWatch Logs.
 //
@@ -1598,10 +1598,10 @@ func (c *CloudWatchLogs) DescribeLogStreamsRequest(input *DescribeLogStreamsInpu
 //   The service cannot complete the request.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DescribeLogStreams
-func (c *CloudWatchLogs) DescribeLogStreams(input *DescribeLogStreamsInput) (*DescribeLogStreamsOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) DescribeLogStreams(input *DescribeLogStreamsInput) (*DescribeLogStreamsOutput, error) {
 	req, out := c.DescribeLogStreamsRequest(input)
 	return out, req.Send()
-***REMOVED***
+}
 
 // DescribeLogStreamsWithContext is the same as DescribeLogStreams with the addition of
 // the ability to pass a context and additional request options.
@@ -1612,12 +1612,12 @@ func (c *CloudWatchLogs) DescribeLogStreams(input *DescribeLogStreamsInput) (*De
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *CloudWatchLogs) DescribeLogStreamsWithContext(ctx aws.Context, input *DescribeLogStreamsInput, opts ...request.Option) (*DescribeLogStreamsOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) DescribeLogStreamsWithContext(ctx aws.Context, input *DescribeLogStreamsInput, opts ...request.Option) (*DescribeLogStreamsOutput, error) {
 	req, out := c.DescribeLogStreamsRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
-***REMOVED***
+}
 
 // DescribeLogStreamsPages iterates over the pages of a DescribeLogStreams operation,
 // calling the "fn" function with the response data for each page. To stop
@@ -1630,15 +1630,15 @@ func (c *CloudWatchLogs) DescribeLogStreamsWithContext(ctx aws.Context, input *D
 //    // Example iterating over at most 3 pages of a DescribeLogStreams operation.
 //    pageNum := 0
 //    err := client.DescribeLogStreamsPages(params,
-//        func(page *DescribeLogStreamsOutput, lastPage bool) bool ***REMOVED***
+//        func(page *DescribeLogStreamsOutput, lastPage bool) bool {
 //            pageNum++
 //            fmt.Println(page)
 //            return pageNum <= 3
-//    ***REMOVED***)
+//        })
 //
-func (c *CloudWatchLogs) DescribeLogStreamsPages(input *DescribeLogStreamsInput, fn func(*DescribeLogStreamsOutput, bool) bool) error ***REMOVED***
+func (c *CloudWatchLogs) DescribeLogStreamsPages(input *DescribeLogStreamsInput, fn func(*DescribeLogStreamsOutput, bool) bool) error {
 	return c.DescribeLogStreamsPagesWithContext(aws.BackgroundContext(), input, fn)
-***REMOVED***
+}
 
 // DescribeLogStreamsPagesWithContext same as DescribeLogStreamsPages except
 // it takes a Context and allows setting request options on the pages.
@@ -1647,27 +1647,27 @@ func (c *CloudWatchLogs) DescribeLogStreamsPages(input *DescribeLogStreamsInput,
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *CloudWatchLogs) DescribeLogStreamsPagesWithContext(ctx aws.Context, input *DescribeLogStreamsInput, fn func(*DescribeLogStreamsOutput, bool) bool, opts ...request.Option) error ***REMOVED***
-	p := request.Pagination***REMOVED***
-		NewRequest: func() (*request.Request, error) ***REMOVED***
+func (c *CloudWatchLogs) DescribeLogStreamsPagesWithContext(ctx aws.Context, input *DescribeLogStreamsInput, fn func(*DescribeLogStreamsOutput, bool) bool, opts ...request.Option) error {
+	p := request.Pagination{
+		NewRequest: func() (*request.Request, error) {
 			var inCpy *DescribeLogStreamsInput
-			if input != nil ***REMOVED***
+			if input != nil {
 				tmp := *input
 				inCpy = &tmp
-			***REMOVED***
+			}
 			req, _ := c.DescribeLogStreamsRequest(inCpy)
 			req.SetContext(ctx)
 			req.ApplyOptions(opts...)
 			return req, nil
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
 	cont := true
-	for p.Next() && cont ***REMOVED***
+	for p.Next() && cont {
 		cont = fn(p.Page().(*DescribeLogStreamsOutput), !p.HasNextPage())
-	***REMOVED***
+	}
 	return p.Err()
-***REMOVED***
+}
 
 const opDescribeMetricFilters = "DescribeMetricFilters"
 
@@ -1690,32 +1690,32 @@ const opDescribeMetricFilters = "DescribeMetricFilters"
 //    req, resp := client.DescribeMetricFiltersRequest(params)
 //
 //    err := req.Send()
-//    if err == nil ***REMOVED*** // resp is now filled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
-//***REMOVED***
+//    }
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DescribeMetricFilters
-func (c *CloudWatchLogs) DescribeMetricFiltersRequest(input *DescribeMetricFiltersInput) (req *request.Request, output *DescribeMetricFiltersOutput) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (c *CloudWatchLogs) DescribeMetricFiltersRequest(input *DescribeMetricFiltersInput) (req *request.Request, output *DescribeMetricFiltersOutput) {
+	op := &request.Operation{
 		Name:       opDescribeMetricFilters,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
-		Paginator: &request.Paginator***REMOVED***
-			InputTokens:     []string***REMOVED***"nextToken"***REMOVED***,
-			OutputTokens:    []string***REMOVED***"nextToken"***REMOVED***,
+		Paginator: &request.Paginator{
+			InputTokens:     []string{"nextToken"},
+			OutputTokens:    []string{"nextToken"},
 			LimitToken:      "limit",
 			TruncationToken: "",
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
-	if input == nil ***REMOVED***
-		input = &DescribeMetricFiltersInput***REMOVED******REMOVED***
-	***REMOVED***
+	if input == nil {
+		input = &DescribeMetricFiltersInput{}
+	}
 
-	output = &DescribeMetricFiltersOutput***REMOVED******REMOVED***
+	output = &DescribeMetricFiltersOutput{}
 	req = c.newRequest(op, input, output)
 	return
-***REMOVED***
+}
 
 // DescribeMetricFilters API operation for Amazon CloudWatch Logs.
 //
@@ -1741,10 +1741,10 @@ func (c *CloudWatchLogs) DescribeMetricFiltersRequest(input *DescribeMetricFilte
 //   The service cannot complete the request.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DescribeMetricFilters
-func (c *CloudWatchLogs) DescribeMetricFilters(input *DescribeMetricFiltersInput) (*DescribeMetricFiltersOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) DescribeMetricFilters(input *DescribeMetricFiltersInput) (*DescribeMetricFiltersOutput, error) {
 	req, out := c.DescribeMetricFiltersRequest(input)
 	return out, req.Send()
-***REMOVED***
+}
 
 // DescribeMetricFiltersWithContext is the same as DescribeMetricFilters with the addition of
 // the ability to pass a context and additional request options.
@@ -1755,12 +1755,12 @@ func (c *CloudWatchLogs) DescribeMetricFilters(input *DescribeMetricFiltersInput
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *CloudWatchLogs) DescribeMetricFiltersWithContext(ctx aws.Context, input *DescribeMetricFiltersInput, opts ...request.Option) (*DescribeMetricFiltersOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) DescribeMetricFiltersWithContext(ctx aws.Context, input *DescribeMetricFiltersInput, opts ...request.Option) (*DescribeMetricFiltersOutput, error) {
 	req, out := c.DescribeMetricFiltersRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
-***REMOVED***
+}
 
 // DescribeMetricFiltersPages iterates over the pages of a DescribeMetricFilters operation,
 // calling the "fn" function with the response data for each page. To stop
@@ -1773,15 +1773,15 @@ func (c *CloudWatchLogs) DescribeMetricFiltersWithContext(ctx aws.Context, input
 //    // Example iterating over at most 3 pages of a DescribeMetricFilters operation.
 //    pageNum := 0
 //    err := client.DescribeMetricFiltersPages(params,
-//        func(page *DescribeMetricFiltersOutput, lastPage bool) bool ***REMOVED***
+//        func(page *DescribeMetricFiltersOutput, lastPage bool) bool {
 //            pageNum++
 //            fmt.Println(page)
 //            return pageNum <= 3
-//    ***REMOVED***)
+//        })
 //
-func (c *CloudWatchLogs) DescribeMetricFiltersPages(input *DescribeMetricFiltersInput, fn func(*DescribeMetricFiltersOutput, bool) bool) error ***REMOVED***
+func (c *CloudWatchLogs) DescribeMetricFiltersPages(input *DescribeMetricFiltersInput, fn func(*DescribeMetricFiltersOutput, bool) bool) error {
 	return c.DescribeMetricFiltersPagesWithContext(aws.BackgroundContext(), input, fn)
-***REMOVED***
+}
 
 // DescribeMetricFiltersPagesWithContext same as DescribeMetricFiltersPages except
 // it takes a Context and allows setting request options on the pages.
@@ -1790,27 +1790,27 @@ func (c *CloudWatchLogs) DescribeMetricFiltersPages(input *DescribeMetricFilters
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *CloudWatchLogs) DescribeMetricFiltersPagesWithContext(ctx aws.Context, input *DescribeMetricFiltersInput, fn func(*DescribeMetricFiltersOutput, bool) bool, opts ...request.Option) error ***REMOVED***
-	p := request.Pagination***REMOVED***
-		NewRequest: func() (*request.Request, error) ***REMOVED***
+func (c *CloudWatchLogs) DescribeMetricFiltersPagesWithContext(ctx aws.Context, input *DescribeMetricFiltersInput, fn func(*DescribeMetricFiltersOutput, bool) bool, opts ...request.Option) error {
+	p := request.Pagination{
+		NewRequest: func() (*request.Request, error) {
 			var inCpy *DescribeMetricFiltersInput
-			if input != nil ***REMOVED***
+			if input != nil {
 				tmp := *input
 				inCpy = &tmp
-			***REMOVED***
+			}
 			req, _ := c.DescribeMetricFiltersRequest(inCpy)
 			req.SetContext(ctx)
 			req.ApplyOptions(opts...)
 			return req, nil
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
 	cont := true
-	for p.Next() && cont ***REMOVED***
+	for p.Next() && cont {
 		cont = fn(p.Page().(*DescribeMetricFiltersOutput), !p.HasNextPage())
-	***REMOVED***
+	}
 	return p.Err()
-***REMOVED***
+}
 
 const opDescribeResourcePolicies = "DescribeResourcePolicies"
 
@@ -1833,26 +1833,26 @@ const opDescribeResourcePolicies = "DescribeResourcePolicies"
 //    req, resp := client.DescribeResourcePoliciesRequest(params)
 //
 //    err := req.Send()
-//    if err == nil ***REMOVED*** // resp is now filled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
-//***REMOVED***
+//    }
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DescribeResourcePolicies
-func (c *CloudWatchLogs) DescribeResourcePoliciesRequest(input *DescribeResourcePoliciesInput) (req *request.Request, output *DescribeResourcePoliciesOutput) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (c *CloudWatchLogs) DescribeResourcePoliciesRequest(input *DescribeResourcePoliciesInput) (req *request.Request, output *DescribeResourcePoliciesOutput) {
+	op := &request.Operation{
 		Name:       opDescribeResourcePolicies,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
-	***REMOVED***
+	}
 
-	if input == nil ***REMOVED***
-		input = &DescribeResourcePoliciesInput***REMOVED******REMOVED***
-	***REMOVED***
+	if input == nil {
+		input = &DescribeResourcePoliciesInput{}
+	}
 
-	output = &DescribeResourcePoliciesOutput***REMOVED******REMOVED***
+	output = &DescribeResourcePoliciesOutput{}
 	req = c.newRequest(op, input, output)
 	return
-***REMOVED***
+}
 
 // DescribeResourcePolicies API operation for Amazon CloudWatch Logs.
 //
@@ -1873,10 +1873,10 @@ func (c *CloudWatchLogs) DescribeResourcePoliciesRequest(input *DescribeResource
 //   The service cannot complete the request.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DescribeResourcePolicies
-func (c *CloudWatchLogs) DescribeResourcePolicies(input *DescribeResourcePoliciesInput) (*DescribeResourcePoliciesOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) DescribeResourcePolicies(input *DescribeResourcePoliciesInput) (*DescribeResourcePoliciesOutput, error) {
 	req, out := c.DescribeResourcePoliciesRequest(input)
 	return out, req.Send()
-***REMOVED***
+}
 
 // DescribeResourcePoliciesWithContext is the same as DescribeResourcePolicies with the addition of
 // the ability to pass a context and additional request options.
@@ -1887,12 +1887,12 @@ func (c *CloudWatchLogs) DescribeResourcePolicies(input *DescribeResourcePolicie
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *CloudWatchLogs) DescribeResourcePoliciesWithContext(ctx aws.Context, input *DescribeResourcePoliciesInput, opts ...request.Option) (*DescribeResourcePoliciesOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) DescribeResourcePoliciesWithContext(ctx aws.Context, input *DescribeResourcePoliciesInput, opts ...request.Option) (*DescribeResourcePoliciesOutput, error) {
 	req, out := c.DescribeResourcePoliciesRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
-***REMOVED***
+}
 
 const opDescribeSubscriptionFilters = "DescribeSubscriptionFilters"
 
@@ -1915,32 +1915,32 @@ const opDescribeSubscriptionFilters = "DescribeSubscriptionFilters"
 //    req, resp := client.DescribeSubscriptionFiltersRequest(params)
 //
 //    err := req.Send()
-//    if err == nil ***REMOVED*** // resp is now filled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
-//***REMOVED***
+//    }
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DescribeSubscriptionFilters
-func (c *CloudWatchLogs) DescribeSubscriptionFiltersRequest(input *DescribeSubscriptionFiltersInput) (req *request.Request, output *DescribeSubscriptionFiltersOutput) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (c *CloudWatchLogs) DescribeSubscriptionFiltersRequest(input *DescribeSubscriptionFiltersInput) (req *request.Request, output *DescribeSubscriptionFiltersOutput) {
+	op := &request.Operation{
 		Name:       opDescribeSubscriptionFilters,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
-		Paginator: &request.Paginator***REMOVED***
-			InputTokens:     []string***REMOVED***"nextToken"***REMOVED***,
-			OutputTokens:    []string***REMOVED***"nextToken"***REMOVED***,
+		Paginator: &request.Paginator{
+			InputTokens:     []string{"nextToken"},
+			OutputTokens:    []string{"nextToken"},
 			LimitToken:      "limit",
 			TruncationToken: "",
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
-	if input == nil ***REMOVED***
-		input = &DescribeSubscriptionFiltersInput***REMOVED******REMOVED***
-	***REMOVED***
+	if input == nil {
+		input = &DescribeSubscriptionFiltersInput{}
+	}
 
-	output = &DescribeSubscriptionFiltersOutput***REMOVED******REMOVED***
+	output = &DescribeSubscriptionFiltersOutput{}
 	req = c.newRequest(op, input, output)
 	return
-***REMOVED***
+}
 
 // DescribeSubscriptionFilters API operation for Amazon CloudWatch Logs.
 //
@@ -1966,10 +1966,10 @@ func (c *CloudWatchLogs) DescribeSubscriptionFiltersRequest(input *DescribeSubsc
 //   The service cannot complete the request.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DescribeSubscriptionFilters
-func (c *CloudWatchLogs) DescribeSubscriptionFilters(input *DescribeSubscriptionFiltersInput) (*DescribeSubscriptionFiltersOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) DescribeSubscriptionFilters(input *DescribeSubscriptionFiltersInput) (*DescribeSubscriptionFiltersOutput, error) {
 	req, out := c.DescribeSubscriptionFiltersRequest(input)
 	return out, req.Send()
-***REMOVED***
+}
 
 // DescribeSubscriptionFiltersWithContext is the same as DescribeSubscriptionFilters with the addition of
 // the ability to pass a context and additional request options.
@@ -1980,12 +1980,12 @@ func (c *CloudWatchLogs) DescribeSubscriptionFilters(input *DescribeSubscription
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *CloudWatchLogs) DescribeSubscriptionFiltersWithContext(ctx aws.Context, input *DescribeSubscriptionFiltersInput, opts ...request.Option) (*DescribeSubscriptionFiltersOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) DescribeSubscriptionFiltersWithContext(ctx aws.Context, input *DescribeSubscriptionFiltersInput, opts ...request.Option) (*DescribeSubscriptionFiltersOutput, error) {
 	req, out := c.DescribeSubscriptionFiltersRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
-***REMOVED***
+}
 
 // DescribeSubscriptionFiltersPages iterates over the pages of a DescribeSubscriptionFilters operation,
 // calling the "fn" function with the response data for each page. To stop
@@ -1998,15 +1998,15 @@ func (c *CloudWatchLogs) DescribeSubscriptionFiltersWithContext(ctx aws.Context,
 //    // Example iterating over at most 3 pages of a DescribeSubscriptionFilters operation.
 //    pageNum := 0
 //    err := client.DescribeSubscriptionFiltersPages(params,
-//        func(page *DescribeSubscriptionFiltersOutput, lastPage bool) bool ***REMOVED***
+//        func(page *DescribeSubscriptionFiltersOutput, lastPage bool) bool {
 //            pageNum++
 //            fmt.Println(page)
 //            return pageNum <= 3
-//    ***REMOVED***)
+//        })
 //
-func (c *CloudWatchLogs) DescribeSubscriptionFiltersPages(input *DescribeSubscriptionFiltersInput, fn func(*DescribeSubscriptionFiltersOutput, bool) bool) error ***REMOVED***
+func (c *CloudWatchLogs) DescribeSubscriptionFiltersPages(input *DescribeSubscriptionFiltersInput, fn func(*DescribeSubscriptionFiltersOutput, bool) bool) error {
 	return c.DescribeSubscriptionFiltersPagesWithContext(aws.BackgroundContext(), input, fn)
-***REMOVED***
+}
 
 // DescribeSubscriptionFiltersPagesWithContext same as DescribeSubscriptionFiltersPages except
 // it takes a Context and allows setting request options on the pages.
@@ -2015,27 +2015,27 @@ func (c *CloudWatchLogs) DescribeSubscriptionFiltersPages(input *DescribeSubscri
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *CloudWatchLogs) DescribeSubscriptionFiltersPagesWithContext(ctx aws.Context, input *DescribeSubscriptionFiltersInput, fn func(*DescribeSubscriptionFiltersOutput, bool) bool, opts ...request.Option) error ***REMOVED***
-	p := request.Pagination***REMOVED***
-		NewRequest: func() (*request.Request, error) ***REMOVED***
+func (c *CloudWatchLogs) DescribeSubscriptionFiltersPagesWithContext(ctx aws.Context, input *DescribeSubscriptionFiltersInput, fn func(*DescribeSubscriptionFiltersOutput, bool) bool, opts ...request.Option) error {
+	p := request.Pagination{
+		NewRequest: func() (*request.Request, error) {
 			var inCpy *DescribeSubscriptionFiltersInput
-			if input != nil ***REMOVED***
+			if input != nil {
 				tmp := *input
 				inCpy = &tmp
-			***REMOVED***
+			}
 			req, _ := c.DescribeSubscriptionFiltersRequest(inCpy)
 			req.SetContext(ctx)
 			req.ApplyOptions(opts...)
 			return req, nil
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
 	cont := true
-	for p.Next() && cont ***REMOVED***
+	for p.Next() && cont {
 		cont = fn(p.Page().(*DescribeSubscriptionFiltersOutput), !p.HasNextPage())
-	***REMOVED***
+	}
 	return p.Err()
-***REMOVED***
+}
 
 const opDisassociateKmsKey = "DisassociateKmsKey"
 
@@ -2058,28 +2058,28 @@ const opDisassociateKmsKey = "DisassociateKmsKey"
 //    req, resp := client.DisassociateKmsKeyRequest(params)
 //
 //    err := req.Send()
-//    if err == nil ***REMOVED*** // resp is now filled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
-//***REMOVED***
+//    }
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DisassociateKmsKey
-func (c *CloudWatchLogs) DisassociateKmsKeyRequest(input *DisassociateKmsKeyInput) (req *request.Request, output *DisassociateKmsKeyOutput) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (c *CloudWatchLogs) DisassociateKmsKeyRequest(input *DisassociateKmsKeyInput) (req *request.Request, output *DisassociateKmsKeyOutput) {
+	op := &request.Operation{
 		Name:       opDisassociateKmsKey,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
-	***REMOVED***
+	}
 
-	if input == nil ***REMOVED***
-		input = &DisassociateKmsKeyInput***REMOVED******REMOVED***
-	***REMOVED***
+	if input == nil {
+		input = &DisassociateKmsKeyInput{}
+	}
 
-	output = &DisassociateKmsKeyOutput***REMOVED******REMOVED***
+	output = &DisassociateKmsKeyOutput{}
 	req = c.newRequest(op, input, output)
 	req.Handlers.Unmarshal.Remove(jsonrpc.UnmarshalHandler)
 	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	return
-***REMOVED***
+}
 
 // DisassociateKmsKey API operation for Amazon CloudWatch Logs.
 //
@@ -2114,10 +2114,10 @@ func (c *CloudWatchLogs) DisassociateKmsKeyRequest(input *DisassociateKmsKeyInpu
 //   The service cannot complete the request.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DisassociateKmsKey
-func (c *CloudWatchLogs) DisassociateKmsKey(input *DisassociateKmsKeyInput) (*DisassociateKmsKeyOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) DisassociateKmsKey(input *DisassociateKmsKeyInput) (*DisassociateKmsKeyOutput, error) {
 	req, out := c.DisassociateKmsKeyRequest(input)
 	return out, req.Send()
-***REMOVED***
+}
 
 // DisassociateKmsKeyWithContext is the same as DisassociateKmsKey with the addition of
 // the ability to pass a context and additional request options.
@@ -2128,12 +2128,12 @@ func (c *CloudWatchLogs) DisassociateKmsKey(input *DisassociateKmsKeyInput) (*Di
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *CloudWatchLogs) DisassociateKmsKeyWithContext(ctx aws.Context, input *DisassociateKmsKeyInput, opts ...request.Option) (*DisassociateKmsKeyOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) DisassociateKmsKeyWithContext(ctx aws.Context, input *DisassociateKmsKeyInput, opts ...request.Option) (*DisassociateKmsKeyOutput, error) {
 	req, out := c.DisassociateKmsKeyRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
-***REMOVED***
+}
 
 const opFilterLogEvents = "FilterLogEvents"
 
@@ -2156,32 +2156,32 @@ const opFilterLogEvents = "FilterLogEvents"
 //    req, resp := client.FilterLogEventsRequest(params)
 //
 //    err := req.Send()
-//    if err == nil ***REMOVED*** // resp is now filled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
-//***REMOVED***
+//    }
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/FilterLogEvents
-func (c *CloudWatchLogs) FilterLogEventsRequest(input *FilterLogEventsInput) (req *request.Request, output *FilterLogEventsOutput) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (c *CloudWatchLogs) FilterLogEventsRequest(input *FilterLogEventsInput) (req *request.Request, output *FilterLogEventsOutput) {
+	op := &request.Operation{
 		Name:       opFilterLogEvents,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
-		Paginator: &request.Paginator***REMOVED***
-			InputTokens:     []string***REMOVED***"nextToken"***REMOVED***,
-			OutputTokens:    []string***REMOVED***"nextToken"***REMOVED***,
+		Paginator: &request.Paginator{
+			InputTokens:     []string{"nextToken"},
+			OutputTokens:    []string{"nextToken"},
 			LimitToken:      "limit",
 			TruncationToken: "",
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
-	if input == nil ***REMOVED***
-		input = &FilterLogEventsInput***REMOVED******REMOVED***
-	***REMOVED***
+	if input == nil {
+		input = &FilterLogEventsInput{}
+	}
 
-	output = &FilterLogEventsOutput***REMOVED******REMOVED***
+	output = &FilterLogEventsOutput{}
 	req = c.newRequest(op, input, output)
 	return
-***REMOVED***
+}
 
 // FilterLogEvents API operation for Amazon CloudWatch Logs.
 //
@@ -2213,10 +2213,10 @@ func (c *CloudWatchLogs) FilterLogEventsRequest(input *FilterLogEventsInput) (re
 //   The service cannot complete the request.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/FilterLogEvents
-func (c *CloudWatchLogs) FilterLogEvents(input *FilterLogEventsInput) (*FilterLogEventsOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) FilterLogEvents(input *FilterLogEventsInput) (*FilterLogEventsOutput, error) {
 	req, out := c.FilterLogEventsRequest(input)
 	return out, req.Send()
-***REMOVED***
+}
 
 // FilterLogEventsWithContext is the same as FilterLogEvents with the addition of
 // the ability to pass a context and additional request options.
@@ -2227,12 +2227,12 @@ func (c *CloudWatchLogs) FilterLogEvents(input *FilterLogEventsInput) (*FilterLo
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *CloudWatchLogs) FilterLogEventsWithContext(ctx aws.Context, input *FilterLogEventsInput, opts ...request.Option) (*FilterLogEventsOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) FilterLogEventsWithContext(ctx aws.Context, input *FilterLogEventsInput, opts ...request.Option) (*FilterLogEventsOutput, error) {
 	req, out := c.FilterLogEventsRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
-***REMOVED***
+}
 
 // FilterLogEventsPages iterates over the pages of a FilterLogEvents operation,
 // calling the "fn" function with the response data for each page. To stop
@@ -2245,15 +2245,15 @@ func (c *CloudWatchLogs) FilterLogEventsWithContext(ctx aws.Context, input *Filt
 //    // Example iterating over at most 3 pages of a FilterLogEvents operation.
 //    pageNum := 0
 //    err := client.FilterLogEventsPages(params,
-//        func(page *FilterLogEventsOutput, lastPage bool) bool ***REMOVED***
+//        func(page *FilterLogEventsOutput, lastPage bool) bool {
 //            pageNum++
 //            fmt.Println(page)
 //            return pageNum <= 3
-//    ***REMOVED***)
+//        })
 //
-func (c *CloudWatchLogs) FilterLogEventsPages(input *FilterLogEventsInput, fn func(*FilterLogEventsOutput, bool) bool) error ***REMOVED***
+func (c *CloudWatchLogs) FilterLogEventsPages(input *FilterLogEventsInput, fn func(*FilterLogEventsOutput, bool) bool) error {
 	return c.FilterLogEventsPagesWithContext(aws.BackgroundContext(), input, fn)
-***REMOVED***
+}
 
 // FilterLogEventsPagesWithContext same as FilterLogEventsPages except
 // it takes a Context and allows setting request options on the pages.
@@ -2262,27 +2262,27 @@ func (c *CloudWatchLogs) FilterLogEventsPages(input *FilterLogEventsInput, fn fu
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *CloudWatchLogs) FilterLogEventsPagesWithContext(ctx aws.Context, input *FilterLogEventsInput, fn func(*FilterLogEventsOutput, bool) bool, opts ...request.Option) error ***REMOVED***
-	p := request.Pagination***REMOVED***
-		NewRequest: func() (*request.Request, error) ***REMOVED***
+func (c *CloudWatchLogs) FilterLogEventsPagesWithContext(ctx aws.Context, input *FilterLogEventsInput, fn func(*FilterLogEventsOutput, bool) bool, opts ...request.Option) error {
+	p := request.Pagination{
+		NewRequest: func() (*request.Request, error) {
 			var inCpy *FilterLogEventsInput
-			if input != nil ***REMOVED***
+			if input != nil {
 				tmp := *input
 				inCpy = &tmp
-			***REMOVED***
+			}
 			req, _ := c.FilterLogEventsRequest(inCpy)
 			req.SetContext(ctx)
 			req.ApplyOptions(opts...)
 			return req, nil
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
 	cont := true
-	for p.Next() && cont ***REMOVED***
+	for p.Next() && cont {
 		cont = fn(p.Page().(*FilterLogEventsOutput), !p.HasNextPage())
-	***REMOVED***
+	}
 	return p.Err()
-***REMOVED***
+}
 
 const opGetLogEvents = "GetLogEvents"
 
@@ -2305,32 +2305,32 @@ const opGetLogEvents = "GetLogEvents"
 //    req, resp := client.GetLogEventsRequest(params)
 //
 //    err := req.Send()
-//    if err == nil ***REMOVED*** // resp is now filled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
-//***REMOVED***
+//    }
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/GetLogEvents
-func (c *CloudWatchLogs) GetLogEventsRequest(input *GetLogEventsInput) (req *request.Request, output *GetLogEventsOutput) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (c *CloudWatchLogs) GetLogEventsRequest(input *GetLogEventsInput) (req *request.Request, output *GetLogEventsOutput) {
+	op := &request.Operation{
 		Name:       opGetLogEvents,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
-		Paginator: &request.Paginator***REMOVED***
-			InputTokens:     []string***REMOVED***"nextToken"***REMOVED***,
-			OutputTokens:    []string***REMOVED***"nextForwardToken"***REMOVED***,
+		Paginator: &request.Paginator{
+			InputTokens:     []string{"nextToken"},
+			OutputTokens:    []string{"nextForwardToken"},
 			LimitToken:      "limit",
 			TruncationToken: "",
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
-	if input == nil ***REMOVED***
-		input = &GetLogEventsInput***REMOVED******REMOVED***
-	***REMOVED***
+	if input == nil {
+		input = &GetLogEventsInput{}
+	}
 
-	output = &GetLogEventsOutput***REMOVED******REMOVED***
+	output = &GetLogEventsOutput{}
 	req = c.newRequest(op, input, output)
 	return
-***REMOVED***
+}
 
 // GetLogEvents API operation for Amazon CloudWatch Logs.
 //
@@ -2359,10 +2359,10 @@ func (c *CloudWatchLogs) GetLogEventsRequest(input *GetLogEventsInput) (req *req
 //   The service cannot complete the request.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/GetLogEvents
-func (c *CloudWatchLogs) GetLogEvents(input *GetLogEventsInput) (*GetLogEventsOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) GetLogEvents(input *GetLogEventsInput) (*GetLogEventsOutput, error) {
 	req, out := c.GetLogEventsRequest(input)
 	return out, req.Send()
-***REMOVED***
+}
 
 // GetLogEventsWithContext is the same as GetLogEvents with the addition of
 // the ability to pass a context and additional request options.
@@ -2373,12 +2373,12 @@ func (c *CloudWatchLogs) GetLogEvents(input *GetLogEventsInput) (*GetLogEventsOu
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *CloudWatchLogs) GetLogEventsWithContext(ctx aws.Context, input *GetLogEventsInput, opts ...request.Option) (*GetLogEventsOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) GetLogEventsWithContext(ctx aws.Context, input *GetLogEventsInput, opts ...request.Option) (*GetLogEventsOutput, error) {
 	req, out := c.GetLogEventsRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
-***REMOVED***
+}
 
 // GetLogEventsPages iterates over the pages of a GetLogEvents operation,
 // calling the "fn" function with the response data for each page. To stop
@@ -2391,15 +2391,15 @@ func (c *CloudWatchLogs) GetLogEventsWithContext(ctx aws.Context, input *GetLogE
 //    // Example iterating over at most 3 pages of a GetLogEvents operation.
 //    pageNum := 0
 //    err := client.GetLogEventsPages(params,
-//        func(page *GetLogEventsOutput, lastPage bool) bool ***REMOVED***
+//        func(page *GetLogEventsOutput, lastPage bool) bool {
 //            pageNum++
 //            fmt.Println(page)
 //            return pageNum <= 3
-//    ***REMOVED***)
+//        })
 //
-func (c *CloudWatchLogs) GetLogEventsPages(input *GetLogEventsInput, fn func(*GetLogEventsOutput, bool) bool) error ***REMOVED***
+func (c *CloudWatchLogs) GetLogEventsPages(input *GetLogEventsInput, fn func(*GetLogEventsOutput, bool) bool) error {
 	return c.GetLogEventsPagesWithContext(aws.BackgroundContext(), input, fn)
-***REMOVED***
+}
 
 // GetLogEventsPagesWithContext same as GetLogEventsPages except
 // it takes a Context and allows setting request options on the pages.
@@ -2408,27 +2408,27 @@ func (c *CloudWatchLogs) GetLogEventsPages(input *GetLogEventsInput, fn func(*Ge
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *CloudWatchLogs) GetLogEventsPagesWithContext(ctx aws.Context, input *GetLogEventsInput, fn func(*GetLogEventsOutput, bool) bool, opts ...request.Option) error ***REMOVED***
-	p := request.Pagination***REMOVED***
-		NewRequest: func() (*request.Request, error) ***REMOVED***
+func (c *CloudWatchLogs) GetLogEventsPagesWithContext(ctx aws.Context, input *GetLogEventsInput, fn func(*GetLogEventsOutput, bool) bool, opts ...request.Option) error {
+	p := request.Pagination{
+		NewRequest: func() (*request.Request, error) {
 			var inCpy *GetLogEventsInput
-			if input != nil ***REMOVED***
+			if input != nil {
 				tmp := *input
 				inCpy = &tmp
-			***REMOVED***
+			}
 			req, _ := c.GetLogEventsRequest(inCpy)
 			req.SetContext(ctx)
 			req.ApplyOptions(opts...)
 			return req, nil
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
 	cont := true
-	for p.Next() && cont ***REMOVED***
+	for p.Next() && cont {
 		cont = fn(p.Page().(*GetLogEventsOutput), !p.HasNextPage())
-	***REMOVED***
+	}
 	return p.Err()
-***REMOVED***
+}
 
 const opListTagsLogGroup = "ListTagsLogGroup"
 
@@ -2451,26 +2451,26 @@ const opListTagsLogGroup = "ListTagsLogGroup"
 //    req, resp := client.ListTagsLogGroupRequest(params)
 //
 //    err := req.Send()
-//    if err == nil ***REMOVED*** // resp is now filled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
-//***REMOVED***
+//    }
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/ListTagsLogGroup
-func (c *CloudWatchLogs) ListTagsLogGroupRequest(input *ListTagsLogGroupInput) (req *request.Request, output *ListTagsLogGroupOutput) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (c *CloudWatchLogs) ListTagsLogGroupRequest(input *ListTagsLogGroupInput) (req *request.Request, output *ListTagsLogGroupOutput) {
+	op := &request.Operation{
 		Name:       opListTagsLogGroup,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
-	***REMOVED***
+	}
 
-	if input == nil ***REMOVED***
-		input = &ListTagsLogGroupInput***REMOVED******REMOVED***
-	***REMOVED***
+	if input == nil {
+		input = &ListTagsLogGroupInput{}
+	}
 
-	output = &ListTagsLogGroupOutput***REMOVED******REMOVED***
+	output = &ListTagsLogGroupOutput{}
 	req = c.newRequest(op, input, output)
 	return
-***REMOVED***
+}
 
 // ListTagsLogGroup API operation for Amazon CloudWatch Logs.
 //
@@ -2491,10 +2491,10 @@ func (c *CloudWatchLogs) ListTagsLogGroupRequest(input *ListTagsLogGroupInput) (
 //   The service cannot complete the request.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/ListTagsLogGroup
-func (c *CloudWatchLogs) ListTagsLogGroup(input *ListTagsLogGroupInput) (*ListTagsLogGroupOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) ListTagsLogGroup(input *ListTagsLogGroupInput) (*ListTagsLogGroupOutput, error) {
 	req, out := c.ListTagsLogGroupRequest(input)
 	return out, req.Send()
-***REMOVED***
+}
 
 // ListTagsLogGroupWithContext is the same as ListTagsLogGroup with the addition of
 // the ability to pass a context and additional request options.
@@ -2505,12 +2505,12 @@ func (c *CloudWatchLogs) ListTagsLogGroup(input *ListTagsLogGroupInput) (*ListTa
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *CloudWatchLogs) ListTagsLogGroupWithContext(ctx aws.Context, input *ListTagsLogGroupInput, opts ...request.Option) (*ListTagsLogGroupOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) ListTagsLogGroupWithContext(ctx aws.Context, input *ListTagsLogGroupInput, opts ...request.Option) (*ListTagsLogGroupOutput, error) {
 	req, out := c.ListTagsLogGroupRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
-***REMOVED***
+}
 
 const opPutDestination = "PutDestination"
 
@@ -2533,26 +2533,26 @@ const opPutDestination = "PutDestination"
 //    req, resp := client.PutDestinationRequest(params)
 //
 //    err := req.Send()
-//    if err == nil ***REMOVED*** // resp is now filled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
-//***REMOVED***
+//    }
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/PutDestination
-func (c *CloudWatchLogs) PutDestinationRequest(input *PutDestinationInput) (req *request.Request, output *PutDestinationOutput) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (c *CloudWatchLogs) PutDestinationRequest(input *PutDestinationInput) (req *request.Request, output *PutDestinationOutput) {
+	op := &request.Operation{
 		Name:       opPutDestination,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
-	***REMOVED***
+	}
 
-	if input == nil ***REMOVED***
-		input = &PutDestinationInput***REMOVED******REMOVED***
-	***REMOVED***
+	if input == nil {
+		input = &PutDestinationInput{}
+	}
 
-	output = &PutDestinationOutput***REMOVED******REMOVED***
+	output = &PutDestinationOutput{}
 	req = c.newRequest(op, input, output)
 	return
-***REMOVED***
+}
 
 // PutDestination API operation for Amazon CloudWatch Logs.
 //
@@ -2586,10 +2586,10 @@ func (c *CloudWatchLogs) PutDestinationRequest(input *PutDestinationInput) (req 
 //   The service cannot complete the request.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/PutDestination
-func (c *CloudWatchLogs) PutDestination(input *PutDestinationInput) (*PutDestinationOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) PutDestination(input *PutDestinationInput) (*PutDestinationOutput, error) {
 	req, out := c.PutDestinationRequest(input)
 	return out, req.Send()
-***REMOVED***
+}
 
 // PutDestinationWithContext is the same as PutDestination with the addition of
 // the ability to pass a context and additional request options.
@@ -2600,12 +2600,12 @@ func (c *CloudWatchLogs) PutDestination(input *PutDestinationInput) (*PutDestina
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *CloudWatchLogs) PutDestinationWithContext(ctx aws.Context, input *PutDestinationInput, opts ...request.Option) (*PutDestinationOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) PutDestinationWithContext(ctx aws.Context, input *PutDestinationInput, opts ...request.Option) (*PutDestinationOutput, error) {
 	req, out := c.PutDestinationRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
-***REMOVED***
+}
 
 const opPutDestinationPolicy = "PutDestinationPolicy"
 
@@ -2628,28 +2628,28 @@ const opPutDestinationPolicy = "PutDestinationPolicy"
 //    req, resp := client.PutDestinationPolicyRequest(params)
 //
 //    err := req.Send()
-//    if err == nil ***REMOVED*** // resp is now filled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
-//***REMOVED***
+//    }
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/PutDestinationPolicy
-func (c *CloudWatchLogs) PutDestinationPolicyRequest(input *PutDestinationPolicyInput) (req *request.Request, output *PutDestinationPolicyOutput) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (c *CloudWatchLogs) PutDestinationPolicyRequest(input *PutDestinationPolicyInput) (req *request.Request, output *PutDestinationPolicyOutput) {
+	op := &request.Operation{
 		Name:       opPutDestinationPolicy,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
-	***REMOVED***
+	}
 
-	if input == nil ***REMOVED***
-		input = &PutDestinationPolicyInput***REMOVED******REMOVED***
-	***REMOVED***
+	if input == nil {
+		input = &PutDestinationPolicyInput{}
+	}
 
-	output = &PutDestinationPolicyOutput***REMOVED******REMOVED***
+	output = &PutDestinationPolicyOutput{}
 	req = c.newRequest(op, input, output)
 	req.Handlers.Unmarshal.Remove(jsonrpc.UnmarshalHandler)
 	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	return
-***REMOVED***
+}
 
 // PutDestinationPolicy API operation for Amazon CloudWatch Logs.
 //
@@ -2676,10 +2676,10 @@ func (c *CloudWatchLogs) PutDestinationPolicyRequest(input *PutDestinationPolicy
 //   The service cannot complete the request.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/PutDestinationPolicy
-func (c *CloudWatchLogs) PutDestinationPolicy(input *PutDestinationPolicyInput) (*PutDestinationPolicyOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) PutDestinationPolicy(input *PutDestinationPolicyInput) (*PutDestinationPolicyOutput, error) {
 	req, out := c.PutDestinationPolicyRequest(input)
 	return out, req.Send()
-***REMOVED***
+}
 
 // PutDestinationPolicyWithContext is the same as PutDestinationPolicy with the addition of
 // the ability to pass a context and additional request options.
@@ -2690,12 +2690,12 @@ func (c *CloudWatchLogs) PutDestinationPolicy(input *PutDestinationPolicyInput) 
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *CloudWatchLogs) PutDestinationPolicyWithContext(ctx aws.Context, input *PutDestinationPolicyInput, opts ...request.Option) (*PutDestinationPolicyOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) PutDestinationPolicyWithContext(ctx aws.Context, input *PutDestinationPolicyInput, opts ...request.Option) (*PutDestinationPolicyOutput, error) {
 	req, out := c.PutDestinationPolicyRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
-***REMOVED***
+}
 
 const opPutLogEvents = "PutLogEvents"
 
@@ -2718,26 +2718,26 @@ const opPutLogEvents = "PutLogEvents"
 //    req, resp := client.PutLogEventsRequest(params)
 //
 //    err := req.Send()
-//    if err == nil ***REMOVED*** // resp is now filled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
-//***REMOVED***
+//    }
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/PutLogEvents
-func (c *CloudWatchLogs) PutLogEventsRequest(input *PutLogEventsInput) (req *request.Request, output *PutLogEventsOutput) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (c *CloudWatchLogs) PutLogEventsRequest(input *PutLogEventsInput) (req *request.Request, output *PutLogEventsOutput) {
+	op := &request.Operation{
 		Name:       opPutLogEvents,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
-	***REMOVED***
+	}
 
-	if input == nil ***REMOVED***
-		input = &PutLogEventsInput***REMOVED******REMOVED***
-	***REMOVED***
+	if input == nil {
+		input = &PutLogEventsInput{}
+	}
 
-	output = &PutLogEventsOutput***REMOVED******REMOVED***
+	output = &PutLogEventsOutput{}
 	req = c.newRequest(op, input, output)
 	return
-***REMOVED***
+}
 
 // PutLogEvents API operation for Amazon CloudWatch Logs.
 //
@@ -2794,10 +2794,10 @@ func (c *CloudWatchLogs) PutLogEventsRequest(input *PutLogEventsInput) (req *req
 //   The service cannot complete the request.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/PutLogEvents
-func (c *CloudWatchLogs) PutLogEvents(input *PutLogEventsInput) (*PutLogEventsOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) PutLogEvents(input *PutLogEventsInput) (*PutLogEventsOutput, error) {
 	req, out := c.PutLogEventsRequest(input)
 	return out, req.Send()
-***REMOVED***
+}
 
 // PutLogEventsWithContext is the same as PutLogEvents with the addition of
 // the ability to pass a context and additional request options.
@@ -2808,12 +2808,12 @@ func (c *CloudWatchLogs) PutLogEvents(input *PutLogEventsInput) (*PutLogEventsOu
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *CloudWatchLogs) PutLogEventsWithContext(ctx aws.Context, input *PutLogEventsInput, opts ...request.Option) (*PutLogEventsOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) PutLogEventsWithContext(ctx aws.Context, input *PutLogEventsInput, opts ...request.Option) (*PutLogEventsOutput, error) {
 	req, out := c.PutLogEventsRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
-***REMOVED***
+}
 
 const opPutMetricFilter = "PutMetricFilter"
 
@@ -2836,28 +2836,28 @@ const opPutMetricFilter = "PutMetricFilter"
 //    req, resp := client.PutMetricFilterRequest(params)
 //
 //    err := req.Send()
-//    if err == nil ***REMOVED*** // resp is now filled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
-//***REMOVED***
+//    }
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/PutMetricFilter
-func (c *CloudWatchLogs) PutMetricFilterRequest(input *PutMetricFilterInput) (req *request.Request, output *PutMetricFilterOutput) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (c *CloudWatchLogs) PutMetricFilterRequest(input *PutMetricFilterInput) (req *request.Request, output *PutMetricFilterOutput) {
+	op := &request.Operation{
 		Name:       opPutMetricFilter,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
-	***REMOVED***
+	}
 
-	if input == nil ***REMOVED***
-		input = &PutMetricFilterInput***REMOVED******REMOVED***
-	***REMOVED***
+	if input == nil {
+		input = &PutMetricFilterInput{}
+	}
 
-	output = &PutMetricFilterOutput***REMOVED******REMOVED***
+	output = &PutMetricFilterOutput{}
 	req = c.newRequest(op, input, output)
 	req.Handlers.Unmarshal.Remove(jsonrpc.UnmarshalHandler)
 	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	return
-***REMOVED***
+}
 
 // PutMetricFilter API operation for Amazon CloudWatch Logs.
 //
@@ -2892,10 +2892,10 @@ func (c *CloudWatchLogs) PutMetricFilterRequest(input *PutMetricFilterInput) (re
 //   The service cannot complete the request.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/PutMetricFilter
-func (c *CloudWatchLogs) PutMetricFilter(input *PutMetricFilterInput) (*PutMetricFilterOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) PutMetricFilter(input *PutMetricFilterInput) (*PutMetricFilterOutput, error) {
 	req, out := c.PutMetricFilterRequest(input)
 	return out, req.Send()
-***REMOVED***
+}
 
 // PutMetricFilterWithContext is the same as PutMetricFilter with the addition of
 // the ability to pass a context and additional request options.
@@ -2906,12 +2906,12 @@ func (c *CloudWatchLogs) PutMetricFilter(input *PutMetricFilterInput) (*PutMetri
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *CloudWatchLogs) PutMetricFilterWithContext(ctx aws.Context, input *PutMetricFilterInput, opts ...request.Option) (*PutMetricFilterOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) PutMetricFilterWithContext(ctx aws.Context, input *PutMetricFilterInput, opts ...request.Option) (*PutMetricFilterOutput, error) {
 	req, out := c.PutMetricFilterRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
-***REMOVED***
+}
 
 const opPutResourcePolicy = "PutResourcePolicy"
 
@@ -2934,26 +2934,26 @@ const opPutResourcePolicy = "PutResourcePolicy"
 //    req, resp := client.PutResourcePolicyRequest(params)
 //
 //    err := req.Send()
-//    if err == nil ***REMOVED*** // resp is now filled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
-//***REMOVED***
+//    }
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/PutResourcePolicy
-func (c *CloudWatchLogs) PutResourcePolicyRequest(input *PutResourcePolicyInput) (req *request.Request, output *PutResourcePolicyOutput) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (c *CloudWatchLogs) PutResourcePolicyRequest(input *PutResourcePolicyInput) (req *request.Request, output *PutResourcePolicyOutput) {
+	op := &request.Operation{
 		Name:       opPutResourcePolicy,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
-	***REMOVED***
+	}
 
-	if input == nil ***REMOVED***
-		input = &PutResourcePolicyInput***REMOVED******REMOVED***
-	***REMOVED***
+	if input == nil {
+		input = &PutResourcePolicyInput{}
+	}
 
-	output = &PutResourcePolicyOutput***REMOVED******REMOVED***
+	output = &PutResourcePolicyOutput{}
 	req = c.newRequest(op, input, output)
 	return
-***REMOVED***
+}
 
 // PutResourcePolicy API operation for Amazon CloudWatch Logs.
 //
@@ -2979,10 +2979,10 @@ func (c *CloudWatchLogs) PutResourcePolicyRequest(input *PutResourcePolicyInput)
 //   The service cannot complete the request.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/PutResourcePolicy
-func (c *CloudWatchLogs) PutResourcePolicy(input *PutResourcePolicyInput) (*PutResourcePolicyOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) PutResourcePolicy(input *PutResourcePolicyInput) (*PutResourcePolicyOutput, error) {
 	req, out := c.PutResourcePolicyRequest(input)
 	return out, req.Send()
-***REMOVED***
+}
 
 // PutResourcePolicyWithContext is the same as PutResourcePolicy with the addition of
 // the ability to pass a context and additional request options.
@@ -2993,12 +2993,12 @@ func (c *CloudWatchLogs) PutResourcePolicy(input *PutResourcePolicyInput) (*PutR
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *CloudWatchLogs) PutResourcePolicyWithContext(ctx aws.Context, input *PutResourcePolicyInput, opts ...request.Option) (*PutResourcePolicyOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) PutResourcePolicyWithContext(ctx aws.Context, input *PutResourcePolicyInput, opts ...request.Option) (*PutResourcePolicyOutput, error) {
 	req, out := c.PutResourcePolicyRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
-***REMOVED***
+}
 
 const opPutRetentionPolicy = "PutRetentionPolicy"
 
@@ -3021,28 +3021,28 @@ const opPutRetentionPolicy = "PutRetentionPolicy"
 //    req, resp := client.PutRetentionPolicyRequest(params)
 //
 //    err := req.Send()
-//    if err == nil ***REMOVED*** // resp is now filled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
-//***REMOVED***
+//    }
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/PutRetentionPolicy
-func (c *CloudWatchLogs) PutRetentionPolicyRequest(input *PutRetentionPolicyInput) (req *request.Request, output *PutRetentionPolicyOutput) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (c *CloudWatchLogs) PutRetentionPolicyRequest(input *PutRetentionPolicyInput) (req *request.Request, output *PutRetentionPolicyOutput) {
+	op := &request.Operation{
 		Name:       opPutRetentionPolicy,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
-	***REMOVED***
+	}
 
-	if input == nil ***REMOVED***
-		input = &PutRetentionPolicyInput***REMOVED******REMOVED***
-	***REMOVED***
+	if input == nil {
+		input = &PutRetentionPolicyInput{}
+	}
 
-	output = &PutRetentionPolicyOutput***REMOVED******REMOVED***
+	output = &PutRetentionPolicyOutput{}
 	req = c.newRequest(op, input, output)
 	req.Handlers.Unmarshal.Remove(jsonrpc.UnmarshalHandler)
 	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	return
-***REMOVED***
+}
 
 // PutRetentionPolicy API operation for Amazon CloudWatch Logs.
 //
@@ -3071,10 +3071,10 @@ func (c *CloudWatchLogs) PutRetentionPolicyRequest(input *PutRetentionPolicyInpu
 //   The service cannot complete the request.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/PutRetentionPolicy
-func (c *CloudWatchLogs) PutRetentionPolicy(input *PutRetentionPolicyInput) (*PutRetentionPolicyOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) PutRetentionPolicy(input *PutRetentionPolicyInput) (*PutRetentionPolicyOutput, error) {
 	req, out := c.PutRetentionPolicyRequest(input)
 	return out, req.Send()
-***REMOVED***
+}
 
 // PutRetentionPolicyWithContext is the same as PutRetentionPolicy with the addition of
 // the ability to pass a context and additional request options.
@@ -3085,12 +3085,12 @@ func (c *CloudWatchLogs) PutRetentionPolicy(input *PutRetentionPolicyInput) (*Pu
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *CloudWatchLogs) PutRetentionPolicyWithContext(ctx aws.Context, input *PutRetentionPolicyInput, opts ...request.Option) (*PutRetentionPolicyOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) PutRetentionPolicyWithContext(ctx aws.Context, input *PutRetentionPolicyInput, opts ...request.Option) (*PutRetentionPolicyOutput, error) {
 	req, out := c.PutRetentionPolicyRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
-***REMOVED***
+}
 
 const opPutSubscriptionFilter = "PutSubscriptionFilter"
 
@@ -3113,28 +3113,28 @@ const opPutSubscriptionFilter = "PutSubscriptionFilter"
 //    req, resp := client.PutSubscriptionFilterRequest(params)
 //
 //    err := req.Send()
-//    if err == nil ***REMOVED*** // resp is now filled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
-//***REMOVED***
+//    }
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/PutSubscriptionFilter
-func (c *CloudWatchLogs) PutSubscriptionFilterRequest(input *PutSubscriptionFilterInput) (req *request.Request, output *PutSubscriptionFilterOutput) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (c *CloudWatchLogs) PutSubscriptionFilterRequest(input *PutSubscriptionFilterInput) (req *request.Request, output *PutSubscriptionFilterOutput) {
+	op := &request.Operation{
 		Name:       opPutSubscriptionFilter,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
-	***REMOVED***
+	}
 
-	if input == nil ***REMOVED***
-		input = &PutSubscriptionFilterInput***REMOVED******REMOVED***
-	***REMOVED***
+	if input == nil {
+		input = &PutSubscriptionFilterInput{}
+	}
 
-	output = &PutSubscriptionFilterOutput***REMOVED******REMOVED***
+	output = &PutSubscriptionFilterOutput{}
 	req = c.newRequest(op, input, output)
 	req.Handlers.Unmarshal.Remove(jsonrpc.UnmarshalHandler)
 	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	return
-***REMOVED***
+}
 
 // PutSubscriptionFilter API operation for Amazon CloudWatch Logs.
 //
@@ -3184,10 +3184,10 @@ func (c *CloudWatchLogs) PutSubscriptionFilterRequest(input *PutSubscriptionFilt
 //   The service cannot complete the request.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/PutSubscriptionFilter
-func (c *CloudWatchLogs) PutSubscriptionFilter(input *PutSubscriptionFilterInput) (*PutSubscriptionFilterOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) PutSubscriptionFilter(input *PutSubscriptionFilterInput) (*PutSubscriptionFilterOutput, error) {
 	req, out := c.PutSubscriptionFilterRequest(input)
 	return out, req.Send()
-***REMOVED***
+}
 
 // PutSubscriptionFilterWithContext is the same as PutSubscriptionFilter with the addition of
 // the ability to pass a context and additional request options.
@@ -3198,12 +3198,12 @@ func (c *CloudWatchLogs) PutSubscriptionFilter(input *PutSubscriptionFilterInput
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *CloudWatchLogs) PutSubscriptionFilterWithContext(ctx aws.Context, input *PutSubscriptionFilterInput, opts ...request.Option) (*PutSubscriptionFilterOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) PutSubscriptionFilterWithContext(ctx aws.Context, input *PutSubscriptionFilterInput, opts ...request.Option) (*PutSubscriptionFilterOutput, error) {
 	req, out := c.PutSubscriptionFilterRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
-***REMOVED***
+}
 
 const opTagLogGroup = "TagLogGroup"
 
@@ -3226,28 +3226,28 @@ const opTagLogGroup = "TagLogGroup"
 //    req, resp := client.TagLogGroupRequest(params)
 //
 //    err := req.Send()
-//    if err == nil ***REMOVED*** // resp is now filled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
-//***REMOVED***
+//    }
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/TagLogGroup
-func (c *CloudWatchLogs) TagLogGroupRequest(input *TagLogGroupInput) (req *request.Request, output *TagLogGroupOutput) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (c *CloudWatchLogs) TagLogGroupRequest(input *TagLogGroupInput) (req *request.Request, output *TagLogGroupOutput) {
+	op := &request.Operation{
 		Name:       opTagLogGroup,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
-	***REMOVED***
+	}
 
-	if input == nil ***REMOVED***
-		input = &TagLogGroupInput***REMOVED******REMOVED***
-	***REMOVED***
+	if input == nil {
+		input = &TagLogGroupInput{}
+	}
 
-	output = &TagLogGroupOutput***REMOVED******REMOVED***
+	output = &TagLogGroupOutput{}
 	req = c.newRequest(op, input, output)
 	req.Handlers.Unmarshal.Remove(jsonrpc.UnmarshalHandler)
 	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	return
-***REMOVED***
+}
 
 // TagLogGroup API operation for Amazon CloudWatch Logs.
 //
@@ -3275,10 +3275,10 @@ func (c *CloudWatchLogs) TagLogGroupRequest(input *TagLogGroupInput) (req *reque
 //   A parameter is specified incorrectly.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/TagLogGroup
-func (c *CloudWatchLogs) TagLogGroup(input *TagLogGroupInput) (*TagLogGroupOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) TagLogGroup(input *TagLogGroupInput) (*TagLogGroupOutput, error) {
 	req, out := c.TagLogGroupRequest(input)
 	return out, req.Send()
-***REMOVED***
+}
 
 // TagLogGroupWithContext is the same as TagLogGroup with the addition of
 // the ability to pass a context and additional request options.
@@ -3289,12 +3289,12 @@ func (c *CloudWatchLogs) TagLogGroup(input *TagLogGroupInput) (*TagLogGroupOutpu
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *CloudWatchLogs) TagLogGroupWithContext(ctx aws.Context, input *TagLogGroupInput, opts ...request.Option) (*TagLogGroupOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) TagLogGroupWithContext(ctx aws.Context, input *TagLogGroupInput, opts ...request.Option) (*TagLogGroupOutput, error) {
 	req, out := c.TagLogGroupRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
-***REMOVED***
+}
 
 const opTestMetricFilter = "TestMetricFilter"
 
@@ -3317,26 +3317,26 @@ const opTestMetricFilter = "TestMetricFilter"
 //    req, resp := client.TestMetricFilterRequest(params)
 //
 //    err := req.Send()
-//    if err == nil ***REMOVED*** // resp is now filled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
-//***REMOVED***
+//    }
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/TestMetricFilter
-func (c *CloudWatchLogs) TestMetricFilterRequest(input *TestMetricFilterInput) (req *request.Request, output *TestMetricFilterOutput) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (c *CloudWatchLogs) TestMetricFilterRequest(input *TestMetricFilterInput) (req *request.Request, output *TestMetricFilterOutput) {
+	op := &request.Operation{
 		Name:       opTestMetricFilter,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
-	***REMOVED***
+	}
 
-	if input == nil ***REMOVED***
-		input = &TestMetricFilterInput***REMOVED******REMOVED***
-	***REMOVED***
+	if input == nil {
+		input = &TestMetricFilterInput{}
+	}
 
-	output = &TestMetricFilterOutput***REMOVED******REMOVED***
+	output = &TestMetricFilterOutput{}
 	req = c.newRequest(op, input, output)
 	return
-***REMOVED***
+}
 
 // TestMetricFilter API operation for Amazon CloudWatch Logs.
 //
@@ -3359,10 +3359,10 @@ func (c *CloudWatchLogs) TestMetricFilterRequest(input *TestMetricFilterInput) (
 //   The service cannot complete the request.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/TestMetricFilter
-func (c *CloudWatchLogs) TestMetricFilter(input *TestMetricFilterInput) (*TestMetricFilterOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) TestMetricFilter(input *TestMetricFilterInput) (*TestMetricFilterOutput, error) {
 	req, out := c.TestMetricFilterRequest(input)
 	return out, req.Send()
-***REMOVED***
+}
 
 // TestMetricFilterWithContext is the same as TestMetricFilter with the addition of
 // the ability to pass a context and additional request options.
@@ -3373,12 +3373,12 @@ func (c *CloudWatchLogs) TestMetricFilter(input *TestMetricFilterInput) (*TestMe
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *CloudWatchLogs) TestMetricFilterWithContext(ctx aws.Context, input *TestMetricFilterInput, opts ...request.Option) (*TestMetricFilterOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) TestMetricFilterWithContext(ctx aws.Context, input *TestMetricFilterInput, opts ...request.Option) (*TestMetricFilterOutput, error) {
 	req, out := c.TestMetricFilterRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
-***REMOVED***
+}
 
 const opUntagLogGroup = "UntagLogGroup"
 
@@ -3401,28 +3401,28 @@ const opUntagLogGroup = "UntagLogGroup"
 //    req, resp := client.UntagLogGroupRequest(params)
 //
 //    err := req.Send()
-//    if err == nil ***REMOVED*** // resp is now filled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
-//***REMOVED***
+//    }
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/UntagLogGroup
-func (c *CloudWatchLogs) UntagLogGroupRequest(input *UntagLogGroupInput) (req *request.Request, output *UntagLogGroupOutput) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (c *CloudWatchLogs) UntagLogGroupRequest(input *UntagLogGroupInput) (req *request.Request, output *UntagLogGroupOutput) {
+	op := &request.Operation{
 		Name:       opUntagLogGroup,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
-	***REMOVED***
+	}
 
-	if input == nil ***REMOVED***
-		input = &UntagLogGroupInput***REMOVED******REMOVED***
-	***REMOVED***
+	if input == nil {
+		input = &UntagLogGroupInput{}
+	}
 
-	output = &UntagLogGroupOutput***REMOVED******REMOVED***
+	output = &UntagLogGroupOutput{}
 	req = c.newRequest(op, input, output)
 	req.Handlers.Unmarshal.Remove(jsonrpc.UnmarshalHandler)
 	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
 	return
-***REMOVED***
+}
 
 // UntagLogGroup API operation for Amazon CloudWatch Logs.
 //
@@ -3443,10 +3443,10 @@ func (c *CloudWatchLogs) UntagLogGroupRequest(input *UntagLogGroupInput) (req *r
 //   The specified resource does not exist.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/UntagLogGroup
-func (c *CloudWatchLogs) UntagLogGroup(input *UntagLogGroupInput) (*UntagLogGroupOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) UntagLogGroup(input *UntagLogGroupInput) (*UntagLogGroupOutput, error) {
 	req, out := c.UntagLogGroupRequest(input)
 	return out, req.Send()
-***REMOVED***
+}
 
 // UntagLogGroupWithContext is the same as UntagLogGroup with the addition of
 // the ability to pass a context and additional request options.
@@ -3457,16 +3457,16 @@ func (c *CloudWatchLogs) UntagLogGroup(input *UntagLogGroupInput) (*UntagLogGrou
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *CloudWatchLogs) UntagLogGroupWithContext(ctx aws.Context, input *UntagLogGroupInput, opts ...request.Option) (*UntagLogGroupOutput, error) ***REMOVED***
+func (c *CloudWatchLogs) UntagLogGroupWithContext(ctx aws.Context, input *UntagLogGroupInput, opts ...request.Option) (*UntagLogGroupOutput, error) {
 	req, out := c.UntagLogGroupRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/AssociateKmsKeyRequest
-type AssociateKmsKeyInput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type AssociateKmsKeyInput struct {
+	_ struct{} `type:"structure"`
 
 	// The Amazon Resource Name (ARN) of the CMK to use when encrypting log data.
 	// For more information, see Amazon Resource Names - AWS Key Management Service
@@ -3479,124 +3479,124 @@ type AssociateKmsKeyInput struct ***REMOVED***
 	//
 	// LogGroupName is a required field
 	LogGroupName *string `locationName:"logGroupName" min:"1" type:"string" required:"true"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s AssociateKmsKeyInput) String() string ***REMOVED***
+func (s AssociateKmsKeyInput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s AssociateKmsKeyInput) GoString() string ***REMOVED***
+func (s AssociateKmsKeyInput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Validate inspects the fields of the type to determine if they are valid.
-func (s *AssociateKmsKeyInput) Validate() error ***REMOVED***
-	invalidParams := request.ErrInvalidParams***REMOVED***Context: "AssociateKmsKeyInput"***REMOVED***
-	if s.KmsKeyId == nil ***REMOVED***
+func (s *AssociateKmsKeyInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "AssociateKmsKeyInput"}
+	if s.KmsKeyId == nil {
 		invalidParams.Add(request.NewErrParamRequired("KmsKeyId"))
-	***REMOVED***
-	if s.LogGroupName == nil ***REMOVED***
+	}
+	if s.LogGroupName == nil {
 		invalidParams.Add(request.NewErrParamRequired("LogGroupName"))
-	***REMOVED***
-	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 ***REMOVED***
+	}
+	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("LogGroupName", 1))
-	***REMOVED***
+	}
 
-	if invalidParams.Len() > 0 ***REMOVED***
+	if invalidParams.Len() > 0 {
 		return invalidParams
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetKmsKeyId sets the KmsKeyId field's value.
-func (s *AssociateKmsKeyInput) SetKmsKeyId(v string) *AssociateKmsKeyInput ***REMOVED***
+func (s *AssociateKmsKeyInput) SetKmsKeyId(v string) *AssociateKmsKeyInput {
 	s.KmsKeyId = &v
 	return s
-***REMOVED***
+}
 
 // SetLogGroupName sets the LogGroupName field's value.
-func (s *AssociateKmsKeyInput) SetLogGroupName(v string) *AssociateKmsKeyInput ***REMOVED***
+func (s *AssociateKmsKeyInput) SetLogGroupName(v string) *AssociateKmsKeyInput {
 	s.LogGroupName = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/AssociateKmsKeyOutput
-type AssociateKmsKeyOutput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
-***REMOVED***
+type AssociateKmsKeyOutput struct {
+	_ struct{} `type:"structure"`
+}
 
 // String returns the string representation
-func (s AssociateKmsKeyOutput) String() string ***REMOVED***
+func (s AssociateKmsKeyOutput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s AssociateKmsKeyOutput) GoString() string ***REMOVED***
+func (s AssociateKmsKeyOutput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/CancelExportTaskRequest
-type CancelExportTaskInput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type CancelExportTaskInput struct {
+	_ struct{} `type:"structure"`
 
 	// The ID of the export task.
 	//
 	// TaskId is a required field
 	TaskId *string `locationName:"taskId" min:"1" type:"string" required:"true"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s CancelExportTaskInput) String() string ***REMOVED***
+func (s CancelExportTaskInput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s CancelExportTaskInput) GoString() string ***REMOVED***
+func (s CancelExportTaskInput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Validate inspects the fields of the type to determine if they are valid.
-func (s *CancelExportTaskInput) Validate() error ***REMOVED***
-	invalidParams := request.ErrInvalidParams***REMOVED***Context: "CancelExportTaskInput"***REMOVED***
-	if s.TaskId == nil ***REMOVED***
+func (s *CancelExportTaskInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CancelExportTaskInput"}
+	if s.TaskId == nil {
 		invalidParams.Add(request.NewErrParamRequired("TaskId"))
-	***REMOVED***
-	if s.TaskId != nil && len(*s.TaskId) < 1 ***REMOVED***
+	}
+	if s.TaskId != nil && len(*s.TaskId) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("TaskId", 1))
-	***REMOVED***
+	}
 
-	if invalidParams.Len() > 0 ***REMOVED***
+	if invalidParams.Len() > 0 {
 		return invalidParams
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetTaskId sets the TaskId field's value.
-func (s *CancelExportTaskInput) SetTaskId(v string) *CancelExportTaskInput ***REMOVED***
+func (s *CancelExportTaskInput) SetTaskId(v string) *CancelExportTaskInput {
 	s.TaskId = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/CancelExportTaskOutput
-type CancelExportTaskOutput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
-***REMOVED***
+type CancelExportTaskOutput struct {
+	_ struct{} `type:"structure"`
+}
 
 // String returns the string representation
-func (s CancelExportTaskOutput) String() string ***REMOVED***
+func (s CancelExportTaskOutput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s CancelExportTaskOutput) GoString() string ***REMOVED***
+func (s CancelExportTaskOutput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/CreateExportTaskRequest
-type CreateExportTaskInput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type CreateExportTaskInput struct {
+	_ struct{} `type:"structure"`
 
 	// The name of S3 bucket for the exported log data. The bucket must be in the
 	// same AWS region.
@@ -3633,121 +3633,121 @@ type CreateExportTaskInput struct ***REMOVED***
 	//
 	// To is a required field
 	To *int64 `locationName:"to" type:"long" required:"true"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s CreateExportTaskInput) String() string ***REMOVED***
+func (s CreateExportTaskInput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s CreateExportTaskInput) GoString() string ***REMOVED***
+func (s CreateExportTaskInput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Validate inspects the fields of the type to determine if they are valid.
-func (s *CreateExportTaskInput) Validate() error ***REMOVED***
-	invalidParams := request.ErrInvalidParams***REMOVED***Context: "CreateExportTaskInput"***REMOVED***
-	if s.Destination == nil ***REMOVED***
+func (s *CreateExportTaskInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CreateExportTaskInput"}
+	if s.Destination == nil {
 		invalidParams.Add(request.NewErrParamRequired("Destination"))
-	***REMOVED***
-	if s.Destination != nil && len(*s.Destination) < 1 ***REMOVED***
+	}
+	if s.Destination != nil && len(*s.Destination) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("Destination", 1))
-	***REMOVED***
-	if s.From == nil ***REMOVED***
+	}
+	if s.From == nil {
 		invalidParams.Add(request.NewErrParamRequired("From"))
-	***REMOVED***
-	if s.LogGroupName == nil ***REMOVED***
+	}
+	if s.LogGroupName == nil {
 		invalidParams.Add(request.NewErrParamRequired("LogGroupName"))
-	***REMOVED***
-	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 ***REMOVED***
+	}
+	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("LogGroupName", 1))
-	***REMOVED***
-	if s.LogStreamNamePrefix != nil && len(*s.LogStreamNamePrefix) < 1 ***REMOVED***
+	}
+	if s.LogStreamNamePrefix != nil && len(*s.LogStreamNamePrefix) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("LogStreamNamePrefix", 1))
-	***REMOVED***
-	if s.TaskName != nil && len(*s.TaskName) < 1 ***REMOVED***
+	}
+	if s.TaskName != nil && len(*s.TaskName) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("TaskName", 1))
-	***REMOVED***
-	if s.To == nil ***REMOVED***
+	}
+	if s.To == nil {
 		invalidParams.Add(request.NewErrParamRequired("To"))
-	***REMOVED***
+	}
 
-	if invalidParams.Len() > 0 ***REMOVED***
+	if invalidParams.Len() > 0 {
 		return invalidParams
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetDestination sets the Destination field's value.
-func (s *CreateExportTaskInput) SetDestination(v string) *CreateExportTaskInput ***REMOVED***
+func (s *CreateExportTaskInput) SetDestination(v string) *CreateExportTaskInput {
 	s.Destination = &v
 	return s
-***REMOVED***
+}
 
 // SetDestinationPrefix sets the DestinationPrefix field's value.
-func (s *CreateExportTaskInput) SetDestinationPrefix(v string) *CreateExportTaskInput ***REMOVED***
+func (s *CreateExportTaskInput) SetDestinationPrefix(v string) *CreateExportTaskInput {
 	s.DestinationPrefix = &v
 	return s
-***REMOVED***
+}
 
 // SetFrom sets the From field's value.
-func (s *CreateExportTaskInput) SetFrom(v int64) *CreateExportTaskInput ***REMOVED***
+func (s *CreateExportTaskInput) SetFrom(v int64) *CreateExportTaskInput {
 	s.From = &v
 	return s
-***REMOVED***
+}
 
 // SetLogGroupName sets the LogGroupName field's value.
-func (s *CreateExportTaskInput) SetLogGroupName(v string) *CreateExportTaskInput ***REMOVED***
+func (s *CreateExportTaskInput) SetLogGroupName(v string) *CreateExportTaskInput {
 	s.LogGroupName = &v
 	return s
-***REMOVED***
+}
 
 // SetLogStreamNamePrefix sets the LogStreamNamePrefix field's value.
-func (s *CreateExportTaskInput) SetLogStreamNamePrefix(v string) *CreateExportTaskInput ***REMOVED***
+func (s *CreateExportTaskInput) SetLogStreamNamePrefix(v string) *CreateExportTaskInput {
 	s.LogStreamNamePrefix = &v
 	return s
-***REMOVED***
+}
 
 // SetTaskName sets the TaskName field's value.
-func (s *CreateExportTaskInput) SetTaskName(v string) *CreateExportTaskInput ***REMOVED***
+func (s *CreateExportTaskInput) SetTaskName(v string) *CreateExportTaskInput {
 	s.TaskName = &v
 	return s
-***REMOVED***
+}
 
 // SetTo sets the To field's value.
-func (s *CreateExportTaskInput) SetTo(v int64) *CreateExportTaskInput ***REMOVED***
+func (s *CreateExportTaskInput) SetTo(v int64) *CreateExportTaskInput {
 	s.To = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/CreateExportTaskResponse
-type CreateExportTaskOutput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type CreateExportTaskOutput struct {
+	_ struct{} `type:"structure"`
 
 	// The ID of the export task.
 	TaskId *string `locationName:"taskId" min:"1" type:"string"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s CreateExportTaskOutput) String() string ***REMOVED***
+func (s CreateExportTaskOutput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s CreateExportTaskOutput) GoString() string ***REMOVED***
+func (s CreateExportTaskOutput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // SetTaskId sets the TaskId field's value.
-func (s *CreateExportTaskOutput) SetTaskId(v string) *CreateExportTaskOutput ***REMOVED***
+func (s *CreateExportTaskOutput) SetTaskId(v string) *CreateExportTaskOutput {
 	s.TaskId = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/CreateLogGroupRequest
-type CreateLogGroupInput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type CreateLogGroupInput struct {
+	_ struct{} `type:"structure"`
 
 	// The Amazon Resource Name (ARN) of the CMK to use when encrypting log data.
 	// For more information, see Amazon Resource Names - AWS Key Management Service
@@ -3761,73 +3761,73 @@ type CreateLogGroupInput struct ***REMOVED***
 
 	// The key-value pairs to use for the tags.
 	Tags map[string]*string `locationName:"tags" min:"1" type:"map"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s CreateLogGroupInput) String() string ***REMOVED***
+func (s CreateLogGroupInput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s CreateLogGroupInput) GoString() string ***REMOVED***
+func (s CreateLogGroupInput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Validate inspects the fields of the type to determine if they are valid.
-func (s *CreateLogGroupInput) Validate() error ***REMOVED***
-	invalidParams := request.ErrInvalidParams***REMOVED***Context: "CreateLogGroupInput"***REMOVED***
-	if s.LogGroupName == nil ***REMOVED***
+func (s *CreateLogGroupInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CreateLogGroupInput"}
+	if s.LogGroupName == nil {
 		invalidParams.Add(request.NewErrParamRequired("LogGroupName"))
-	***REMOVED***
-	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 ***REMOVED***
+	}
+	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("LogGroupName", 1))
-	***REMOVED***
-	if s.Tags != nil && len(s.Tags) < 1 ***REMOVED***
+	}
+	if s.Tags != nil && len(s.Tags) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("Tags", 1))
-	***REMOVED***
+	}
 
-	if invalidParams.Len() > 0 ***REMOVED***
+	if invalidParams.Len() > 0 {
 		return invalidParams
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetKmsKeyId sets the KmsKeyId field's value.
-func (s *CreateLogGroupInput) SetKmsKeyId(v string) *CreateLogGroupInput ***REMOVED***
+func (s *CreateLogGroupInput) SetKmsKeyId(v string) *CreateLogGroupInput {
 	s.KmsKeyId = &v
 	return s
-***REMOVED***
+}
 
 // SetLogGroupName sets the LogGroupName field's value.
-func (s *CreateLogGroupInput) SetLogGroupName(v string) *CreateLogGroupInput ***REMOVED***
+func (s *CreateLogGroupInput) SetLogGroupName(v string) *CreateLogGroupInput {
 	s.LogGroupName = &v
 	return s
-***REMOVED***
+}
 
 // SetTags sets the Tags field's value.
-func (s *CreateLogGroupInput) SetTags(v map[string]*string) *CreateLogGroupInput ***REMOVED***
+func (s *CreateLogGroupInput) SetTags(v map[string]*string) *CreateLogGroupInput {
 	s.Tags = v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/CreateLogGroupOutput
-type CreateLogGroupOutput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
-***REMOVED***
+type CreateLogGroupOutput struct {
+	_ struct{} `type:"structure"`
+}
 
 // String returns the string representation
-func (s CreateLogGroupOutput) String() string ***REMOVED***
+func (s CreateLogGroupOutput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s CreateLogGroupOutput) GoString() string ***REMOVED***
+func (s CreateLogGroupOutput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/CreateLogStreamRequest
-type CreateLogStreamInput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type CreateLogStreamInput struct {
+	_ struct{} `type:"structure"`
 
 	// The name of the log group.
 	//
@@ -3838,184 +3838,184 @@ type CreateLogStreamInput struct ***REMOVED***
 	//
 	// LogStreamName is a required field
 	LogStreamName *string `locationName:"logStreamName" min:"1" type:"string" required:"true"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s CreateLogStreamInput) String() string ***REMOVED***
+func (s CreateLogStreamInput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s CreateLogStreamInput) GoString() string ***REMOVED***
+func (s CreateLogStreamInput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Validate inspects the fields of the type to determine if they are valid.
-func (s *CreateLogStreamInput) Validate() error ***REMOVED***
-	invalidParams := request.ErrInvalidParams***REMOVED***Context: "CreateLogStreamInput"***REMOVED***
-	if s.LogGroupName == nil ***REMOVED***
+func (s *CreateLogStreamInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "CreateLogStreamInput"}
+	if s.LogGroupName == nil {
 		invalidParams.Add(request.NewErrParamRequired("LogGroupName"))
-	***REMOVED***
-	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 ***REMOVED***
+	}
+	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("LogGroupName", 1))
-	***REMOVED***
-	if s.LogStreamName == nil ***REMOVED***
+	}
+	if s.LogStreamName == nil {
 		invalidParams.Add(request.NewErrParamRequired("LogStreamName"))
-	***REMOVED***
-	if s.LogStreamName != nil && len(*s.LogStreamName) < 1 ***REMOVED***
+	}
+	if s.LogStreamName != nil && len(*s.LogStreamName) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("LogStreamName", 1))
-	***REMOVED***
+	}
 
-	if invalidParams.Len() > 0 ***REMOVED***
+	if invalidParams.Len() > 0 {
 		return invalidParams
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetLogGroupName sets the LogGroupName field's value.
-func (s *CreateLogStreamInput) SetLogGroupName(v string) *CreateLogStreamInput ***REMOVED***
+func (s *CreateLogStreamInput) SetLogGroupName(v string) *CreateLogStreamInput {
 	s.LogGroupName = &v
 	return s
-***REMOVED***
+}
 
 // SetLogStreamName sets the LogStreamName field's value.
-func (s *CreateLogStreamInput) SetLogStreamName(v string) *CreateLogStreamInput ***REMOVED***
+func (s *CreateLogStreamInput) SetLogStreamName(v string) *CreateLogStreamInput {
 	s.LogStreamName = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/CreateLogStreamOutput
-type CreateLogStreamOutput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
-***REMOVED***
+type CreateLogStreamOutput struct {
+	_ struct{} `type:"structure"`
+}
 
 // String returns the string representation
-func (s CreateLogStreamOutput) String() string ***REMOVED***
+func (s CreateLogStreamOutput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s CreateLogStreamOutput) GoString() string ***REMOVED***
+func (s CreateLogStreamOutput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DeleteDestinationRequest
-type DeleteDestinationInput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type DeleteDestinationInput struct {
+	_ struct{} `type:"structure"`
 
 	// The name of the destination.
 	//
 	// DestinationName is a required field
 	DestinationName *string `locationName:"destinationName" min:"1" type:"string" required:"true"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s DeleteDestinationInput) String() string ***REMOVED***
+func (s DeleteDestinationInput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s DeleteDestinationInput) GoString() string ***REMOVED***
+func (s DeleteDestinationInput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Validate inspects the fields of the type to determine if they are valid.
-func (s *DeleteDestinationInput) Validate() error ***REMOVED***
-	invalidParams := request.ErrInvalidParams***REMOVED***Context: "DeleteDestinationInput"***REMOVED***
-	if s.DestinationName == nil ***REMOVED***
+func (s *DeleteDestinationInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteDestinationInput"}
+	if s.DestinationName == nil {
 		invalidParams.Add(request.NewErrParamRequired("DestinationName"))
-	***REMOVED***
-	if s.DestinationName != nil && len(*s.DestinationName) < 1 ***REMOVED***
+	}
+	if s.DestinationName != nil && len(*s.DestinationName) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("DestinationName", 1))
-	***REMOVED***
+	}
 
-	if invalidParams.Len() > 0 ***REMOVED***
+	if invalidParams.Len() > 0 {
 		return invalidParams
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetDestinationName sets the DestinationName field's value.
-func (s *DeleteDestinationInput) SetDestinationName(v string) *DeleteDestinationInput ***REMOVED***
+func (s *DeleteDestinationInput) SetDestinationName(v string) *DeleteDestinationInput {
 	s.DestinationName = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DeleteDestinationOutput
-type DeleteDestinationOutput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
-***REMOVED***
+type DeleteDestinationOutput struct {
+	_ struct{} `type:"structure"`
+}
 
 // String returns the string representation
-func (s DeleteDestinationOutput) String() string ***REMOVED***
+func (s DeleteDestinationOutput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s DeleteDestinationOutput) GoString() string ***REMOVED***
+func (s DeleteDestinationOutput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DeleteLogGroupRequest
-type DeleteLogGroupInput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type DeleteLogGroupInput struct {
+	_ struct{} `type:"structure"`
 
 	// The name of the log group.
 	//
 	// LogGroupName is a required field
 	LogGroupName *string `locationName:"logGroupName" min:"1" type:"string" required:"true"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s DeleteLogGroupInput) String() string ***REMOVED***
+func (s DeleteLogGroupInput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s DeleteLogGroupInput) GoString() string ***REMOVED***
+func (s DeleteLogGroupInput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Validate inspects the fields of the type to determine if they are valid.
-func (s *DeleteLogGroupInput) Validate() error ***REMOVED***
-	invalidParams := request.ErrInvalidParams***REMOVED***Context: "DeleteLogGroupInput"***REMOVED***
-	if s.LogGroupName == nil ***REMOVED***
+func (s *DeleteLogGroupInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteLogGroupInput"}
+	if s.LogGroupName == nil {
 		invalidParams.Add(request.NewErrParamRequired("LogGroupName"))
-	***REMOVED***
-	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 ***REMOVED***
+	}
+	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("LogGroupName", 1))
-	***REMOVED***
+	}
 
-	if invalidParams.Len() > 0 ***REMOVED***
+	if invalidParams.Len() > 0 {
 		return invalidParams
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetLogGroupName sets the LogGroupName field's value.
-func (s *DeleteLogGroupInput) SetLogGroupName(v string) *DeleteLogGroupInput ***REMOVED***
+func (s *DeleteLogGroupInput) SetLogGroupName(v string) *DeleteLogGroupInput {
 	s.LogGroupName = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DeleteLogGroupOutput
-type DeleteLogGroupOutput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
-***REMOVED***
+type DeleteLogGroupOutput struct {
+	_ struct{} `type:"structure"`
+}
 
 // String returns the string representation
-func (s DeleteLogGroupOutput) String() string ***REMOVED***
+func (s DeleteLogGroupOutput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s DeleteLogGroupOutput) GoString() string ***REMOVED***
+func (s DeleteLogGroupOutput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DeleteLogStreamRequest
-type DeleteLogStreamInput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type DeleteLogStreamInput struct {
+	_ struct{} `type:"structure"`
 
 	// The name of the log group.
 	//
@@ -4026,70 +4026,70 @@ type DeleteLogStreamInput struct ***REMOVED***
 	//
 	// LogStreamName is a required field
 	LogStreamName *string `locationName:"logStreamName" min:"1" type:"string" required:"true"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s DeleteLogStreamInput) String() string ***REMOVED***
+func (s DeleteLogStreamInput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s DeleteLogStreamInput) GoString() string ***REMOVED***
+func (s DeleteLogStreamInput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Validate inspects the fields of the type to determine if they are valid.
-func (s *DeleteLogStreamInput) Validate() error ***REMOVED***
-	invalidParams := request.ErrInvalidParams***REMOVED***Context: "DeleteLogStreamInput"***REMOVED***
-	if s.LogGroupName == nil ***REMOVED***
+func (s *DeleteLogStreamInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteLogStreamInput"}
+	if s.LogGroupName == nil {
 		invalidParams.Add(request.NewErrParamRequired("LogGroupName"))
-	***REMOVED***
-	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 ***REMOVED***
+	}
+	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("LogGroupName", 1))
-	***REMOVED***
-	if s.LogStreamName == nil ***REMOVED***
+	}
+	if s.LogStreamName == nil {
 		invalidParams.Add(request.NewErrParamRequired("LogStreamName"))
-	***REMOVED***
-	if s.LogStreamName != nil && len(*s.LogStreamName) < 1 ***REMOVED***
+	}
+	if s.LogStreamName != nil && len(*s.LogStreamName) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("LogStreamName", 1))
-	***REMOVED***
+	}
 
-	if invalidParams.Len() > 0 ***REMOVED***
+	if invalidParams.Len() > 0 {
 		return invalidParams
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetLogGroupName sets the LogGroupName field's value.
-func (s *DeleteLogStreamInput) SetLogGroupName(v string) *DeleteLogStreamInput ***REMOVED***
+func (s *DeleteLogStreamInput) SetLogGroupName(v string) *DeleteLogStreamInput {
 	s.LogGroupName = &v
 	return s
-***REMOVED***
+}
 
 // SetLogStreamName sets the LogStreamName field's value.
-func (s *DeleteLogStreamInput) SetLogStreamName(v string) *DeleteLogStreamInput ***REMOVED***
+func (s *DeleteLogStreamInput) SetLogStreamName(v string) *DeleteLogStreamInput {
 	s.LogStreamName = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DeleteLogStreamOutput
-type DeleteLogStreamOutput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
-***REMOVED***
+type DeleteLogStreamOutput struct {
+	_ struct{} `type:"structure"`
+}
 
 // String returns the string representation
-func (s DeleteLogStreamOutput) String() string ***REMOVED***
+func (s DeleteLogStreamOutput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s DeleteLogStreamOutput) GoString() string ***REMOVED***
+func (s DeleteLogStreamOutput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DeleteMetricFilterRequest
-type DeleteMetricFilterInput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type DeleteMetricFilterInput struct {
+	_ struct{} `type:"structure"`
 
 	// The name of the metric filter.
 	//
@@ -4100,166 +4100,166 @@ type DeleteMetricFilterInput struct ***REMOVED***
 	//
 	// LogGroupName is a required field
 	LogGroupName *string `locationName:"logGroupName" min:"1" type:"string" required:"true"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s DeleteMetricFilterInput) String() string ***REMOVED***
+func (s DeleteMetricFilterInput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s DeleteMetricFilterInput) GoString() string ***REMOVED***
+func (s DeleteMetricFilterInput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Validate inspects the fields of the type to determine if they are valid.
-func (s *DeleteMetricFilterInput) Validate() error ***REMOVED***
-	invalidParams := request.ErrInvalidParams***REMOVED***Context: "DeleteMetricFilterInput"***REMOVED***
-	if s.FilterName == nil ***REMOVED***
+func (s *DeleteMetricFilterInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteMetricFilterInput"}
+	if s.FilterName == nil {
 		invalidParams.Add(request.NewErrParamRequired("FilterName"))
-	***REMOVED***
-	if s.FilterName != nil && len(*s.FilterName) < 1 ***REMOVED***
+	}
+	if s.FilterName != nil && len(*s.FilterName) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("FilterName", 1))
-	***REMOVED***
-	if s.LogGroupName == nil ***REMOVED***
+	}
+	if s.LogGroupName == nil {
 		invalidParams.Add(request.NewErrParamRequired("LogGroupName"))
-	***REMOVED***
-	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 ***REMOVED***
+	}
+	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("LogGroupName", 1))
-	***REMOVED***
+	}
 
-	if invalidParams.Len() > 0 ***REMOVED***
+	if invalidParams.Len() > 0 {
 		return invalidParams
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetFilterName sets the FilterName field's value.
-func (s *DeleteMetricFilterInput) SetFilterName(v string) *DeleteMetricFilterInput ***REMOVED***
+func (s *DeleteMetricFilterInput) SetFilterName(v string) *DeleteMetricFilterInput {
 	s.FilterName = &v
 	return s
-***REMOVED***
+}
 
 // SetLogGroupName sets the LogGroupName field's value.
-func (s *DeleteMetricFilterInput) SetLogGroupName(v string) *DeleteMetricFilterInput ***REMOVED***
+func (s *DeleteMetricFilterInput) SetLogGroupName(v string) *DeleteMetricFilterInput {
 	s.LogGroupName = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DeleteMetricFilterOutput
-type DeleteMetricFilterOutput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
-***REMOVED***
+type DeleteMetricFilterOutput struct {
+	_ struct{} `type:"structure"`
+}
 
 // String returns the string representation
-func (s DeleteMetricFilterOutput) String() string ***REMOVED***
+func (s DeleteMetricFilterOutput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s DeleteMetricFilterOutput) GoString() string ***REMOVED***
+func (s DeleteMetricFilterOutput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DeleteResourcePolicyRequest
-type DeleteResourcePolicyInput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type DeleteResourcePolicyInput struct {
+	_ struct{} `type:"structure"`
 
 	// The name of the policy to be revoked. This parameter is required.
 	PolicyName *string `locationName:"policyName" type:"string"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s DeleteResourcePolicyInput) String() string ***REMOVED***
+func (s DeleteResourcePolicyInput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s DeleteResourcePolicyInput) GoString() string ***REMOVED***
+func (s DeleteResourcePolicyInput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // SetPolicyName sets the PolicyName field's value.
-func (s *DeleteResourcePolicyInput) SetPolicyName(v string) *DeleteResourcePolicyInput ***REMOVED***
+func (s *DeleteResourcePolicyInput) SetPolicyName(v string) *DeleteResourcePolicyInput {
 	s.PolicyName = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DeleteResourcePolicyOutput
-type DeleteResourcePolicyOutput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
-***REMOVED***
+type DeleteResourcePolicyOutput struct {
+	_ struct{} `type:"structure"`
+}
 
 // String returns the string representation
-func (s DeleteResourcePolicyOutput) String() string ***REMOVED***
+func (s DeleteResourcePolicyOutput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s DeleteResourcePolicyOutput) GoString() string ***REMOVED***
+func (s DeleteResourcePolicyOutput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DeleteRetentionPolicyRequest
-type DeleteRetentionPolicyInput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type DeleteRetentionPolicyInput struct {
+	_ struct{} `type:"structure"`
 
 	// The name of the log group.
 	//
 	// LogGroupName is a required field
 	LogGroupName *string `locationName:"logGroupName" min:"1" type:"string" required:"true"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s DeleteRetentionPolicyInput) String() string ***REMOVED***
+func (s DeleteRetentionPolicyInput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s DeleteRetentionPolicyInput) GoString() string ***REMOVED***
+func (s DeleteRetentionPolicyInput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Validate inspects the fields of the type to determine if they are valid.
-func (s *DeleteRetentionPolicyInput) Validate() error ***REMOVED***
-	invalidParams := request.ErrInvalidParams***REMOVED***Context: "DeleteRetentionPolicyInput"***REMOVED***
-	if s.LogGroupName == nil ***REMOVED***
+func (s *DeleteRetentionPolicyInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteRetentionPolicyInput"}
+	if s.LogGroupName == nil {
 		invalidParams.Add(request.NewErrParamRequired("LogGroupName"))
-	***REMOVED***
-	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 ***REMOVED***
+	}
+	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("LogGroupName", 1))
-	***REMOVED***
+	}
 
-	if invalidParams.Len() > 0 ***REMOVED***
+	if invalidParams.Len() > 0 {
 		return invalidParams
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetLogGroupName sets the LogGroupName field's value.
-func (s *DeleteRetentionPolicyInput) SetLogGroupName(v string) *DeleteRetentionPolicyInput ***REMOVED***
+func (s *DeleteRetentionPolicyInput) SetLogGroupName(v string) *DeleteRetentionPolicyInput {
 	s.LogGroupName = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DeleteRetentionPolicyOutput
-type DeleteRetentionPolicyOutput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
-***REMOVED***
+type DeleteRetentionPolicyOutput struct {
+	_ struct{} `type:"structure"`
+}
 
 // String returns the string representation
-func (s DeleteRetentionPolicyOutput) String() string ***REMOVED***
+func (s DeleteRetentionPolicyOutput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s DeleteRetentionPolicyOutput) GoString() string ***REMOVED***
+func (s DeleteRetentionPolicyOutput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DeleteSubscriptionFilterRequest
-type DeleteSubscriptionFilterInput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type DeleteSubscriptionFilterInput struct {
+	_ struct{} `type:"structure"`
 
 	// The name of the subscription filter.
 	//
@@ -4270,70 +4270,70 @@ type DeleteSubscriptionFilterInput struct ***REMOVED***
 	//
 	// LogGroupName is a required field
 	LogGroupName *string `locationName:"logGroupName" min:"1" type:"string" required:"true"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s DeleteSubscriptionFilterInput) String() string ***REMOVED***
+func (s DeleteSubscriptionFilterInput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s DeleteSubscriptionFilterInput) GoString() string ***REMOVED***
+func (s DeleteSubscriptionFilterInput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Validate inspects the fields of the type to determine if they are valid.
-func (s *DeleteSubscriptionFilterInput) Validate() error ***REMOVED***
-	invalidParams := request.ErrInvalidParams***REMOVED***Context: "DeleteSubscriptionFilterInput"***REMOVED***
-	if s.FilterName == nil ***REMOVED***
+func (s *DeleteSubscriptionFilterInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DeleteSubscriptionFilterInput"}
+	if s.FilterName == nil {
 		invalidParams.Add(request.NewErrParamRequired("FilterName"))
-	***REMOVED***
-	if s.FilterName != nil && len(*s.FilterName) < 1 ***REMOVED***
+	}
+	if s.FilterName != nil && len(*s.FilterName) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("FilterName", 1))
-	***REMOVED***
-	if s.LogGroupName == nil ***REMOVED***
+	}
+	if s.LogGroupName == nil {
 		invalidParams.Add(request.NewErrParamRequired("LogGroupName"))
-	***REMOVED***
-	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 ***REMOVED***
+	}
+	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("LogGroupName", 1))
-	***REMOVED***
+	}
 
-	if invalidParams.Len() > 0 ***REMOVED***
+	if invalidParams.Len() > 0 {
 		return invalidParams
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetFilterName sets the FilterName field's value.
-func (s *DeleteSubscriptionFilterInput) SetFilterName(v string) *DeleteSubscriptionFilterInput ***REMOVED***
+func (s *DeleteSubscriptionFilterInput) SetFilterName(v string) *DeleteSubscriptionFilterInput {
 	s.FilterName = &v
 	return s
-***REMOVED***
+}
 
 // SetLogGroupName sets the LogGroupName field's value.
-func (s *DeleteSubscriptionFilterInput) SetLogGroupName(v string) *DeleteSubscriptionFilterInput ***REMOVED***
+func (s *DeleteSubscriptionFilterInput) SetLogGroupName(v string) *DeleteSubscriptionFilterInput {
 	s.LogGroupName = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DeleteSubscriptionFilterOutput
-type DeleteSubscriptionFilterOutput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
-***REMOVED***
+type DeleteSubscriptionFilterOutput struct {
+	_ struct{} `type:"structure"`
+}
 
 // String returns the string representation
-func (s DeleteSubscriptionFilterOutput) String() string ***REMOVED***
+func (s DeleteSubscriptionFilterOutput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s DeleteSubscriptionFilterOutput) GoString() string ***REMOVED***
+func (s DeleteSubscriptionFilterOutput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DescribeDestinationsRequest
-type DescribeDestinationsInput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type DescribeDestinationsInput struct {
+	_ struct{} `type:"structure"`
 
 	// The prefix to match. If you don't specify a value, no prefix filter is applied.
 	DestinationNamePrefix *string `min:"1" type:"string"`
@@ -4345,58 +4345,58 @@ type DescribeDestinationsInput struct ***REMOVED***
 	// The token for the next set of items to return. (You received this token from
 	// a previous call.)
 	NextToken *string `locationName:"nextToken" min:"1" type:"string"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s DescribeDestinationsInput) String() string ***REMOVED***
+func (s DescribeDestinationsInput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s DescribeDestinationsInput) GoString() string ***REMOVED***
+func (s DescribeDestinationsInput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Validate inspects the fields of the type to determine if they are valid.
-func (s *DescribeDestinationsInput) Validate() error ***REMOVED***
-	invalidParams := request.ErrInvalidParams***REMOVED***Context: "DescribeDestinationsInput"***REMOVED***
-	if s.DestinationNamePrefix != nil && len(*s.DestinationNamePrefix) < 1 ***REMOVED***
+func (s *DescribeDestinationsInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DescribeDestinationsInput"}
+	if s.DestinationNamePrefix != nil && len(*s.DestinationNamePrefix) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("DestinationNamePrefix", 1))
-	***REMOVED***
-	if s.Limit != nil && *s.Limit < 1 ***REMOVED***
+	}
+	if s.Limit != nil && *s.Limit < 1 {
 		invalidParams.Add(request.NewErrParamMinValue("Limit", 1))
-	***REMOVED***
-	if s.NextToken != nil && len(*s.NextToken) < 1 ***REMOVED***
+	}
+	if s.NextToken != nil && len(*s.NextToken) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("NextToken", 1))
-	***REMOVED***
+	}
 
-	if invalidParams.Len() > 0 ***REMOVED***
+	if invalidParams.Len() > 0 {
 		return invalidParams
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetDestinationNamePrefix sets the DestinationNamePrefix field's value.
-func (s *DescribeDestinationsInput) SetDestinationNamePrefix(v string) *DescribeDestinationsInput ***REMOVED***
+func (s *DescribeDestinationsInput) SetDestinationNamePrefix(v string) *DescribeDestinationsInput {
 	s.DestinationNamePrefix = &v
 	return s
-***REMOVED***
+}
 
 // SetLimit sets the Limit field's value.
-func (s *DescribeDestinationsInput) SetLimit(v int64) *DescribeDestinationsInput ***REMOVED***
+func (s *DescribeDestinationsInput) SetLimit(v int64) *DescribeDestinationsInput {
 	s.Limit = &v
 	return s
-***REMOVED***
+}
 
 // SetNextToken sets the NextToken field's value.
-func (s *DescribeDestinationsInput) SetNextToken(v string) *DescribeDestinationsInput ***REMOVED***
+func (s *DescribeDestinationsInput) SetNextToken(v string) *DescribeDestinationsInput {
 	s.NextToken = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DescribeDestinationsResponse
-type DescribeDestinationsOutput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type DescribeDestinationsOutput struct {
+	_ struct{} `type:"structure"`
 
 	// The destinations.
 	Destinations []*Destination `locationName:"destinations" type:"list"`
@@ -4404,33 +4404,33 @@ type DescribeDestinationsOutput struct ***REMOVED***
 	// The token for the next set of items to return. The token expires after 24
 	// hours.
 	NextToken *string `locationName:"nextToken" min:"1" type:"string"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s DescribeDestinationsOutput) String() string ***REMOVED***
+func (s DescribeDestinationsOutput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s DescribeDestinationsOutput) GoString() string ***REMOVED***
+func (s DescribeDestinationsOutput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // SetDestinations sets the Destinations field's value.
-func (s *DescribeDestinationsOutput) SetDestinations(v []*Destination) *DescribeDestinationsOutput ***REMOVED***
+func (s *DescribeDestinationsOutput) SetDestinations(v []*Destination) *DescribeDestinationsOutput {
 	s.Destinations = v
 	return s
-***REMOVED***
+}
 
 // SetNextToken sets the NextToken field's value.
-func (s *DescribeDestinationsOutput) SetNextToken(v string) *DescribeDestinationsOutput ***REMOVED***
+func (s *DescribeDestinationsOutput) SetNextToken(v string) *DescribeDestinationsOutput {
 	s.NextToken = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DescribeExportTasksRequest
-type DescribeExportTasksInput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type DescribeExportTasksInput struct {
+	_ struct{} `type:"structure"`
 
 	// The maximum number of items returned. If you don't specify a value, the default
 	// is up to 50 items.
@@ -4447,64 +4447,64 @@ type DescribeExportTasksInput struct ***REMOVED***
 	// The ID of the export task. Specifying a task ID filters the results to zero
 	// or one export tasks.
 	TaskId *string `locationName:"taskId" min:"1" type:"string"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s DescribeExportTasksInput) String() string ***REMOVED***
+func (s DescribeExportTasksInput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s DescribeExportTasksInput) GoString() string ***REMOVED***
+func (s DescribeExportTasksInput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Validate inspects the fields of the type to determine if they are valid.
-func (s *DescribeExportTasksInput) Validate() error ***REMOVED***
-	invalidParams := request.ErrInvalidParams***REMOVED***Context: "DescribeExportTasksInput"***REMOVED***
-	if s.Limit != nil && *s.Limit < 1 ***REMOVED***
+func (s *DescribeExportTasksInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DescribeExportTasksInput"}
+	if s.Limit != nil && *s.Limit < 1 {
 		invalidParams.Add(request.NewErrParamMinValue("Limit", 1))
-	***REMOVED***
-	if s.NextToken != nil && len(*s.NextToken) < 1 ***REMOVED***
+	}
+	if s.NextToken != nil && len(*s.NextToken) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("NextToken", 1))
-	***REMOVED***
-	if s.TaskId != nil && len(*s.TaskId) < 1 ***REMOVED***
+	}
+	if s.TaskId != nil && len(*s.TaskId) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("TaskId", 1))
-	***REMOVED***
+	}
 
-	if invalidParams.Len() > 0 ***REMOVED***
+	if invalidParams.Len() > 0 {
 		return invalidParams
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetLimit sets the Limit field's value.
-func (s *DescribeExportTasksInput) SetLimit(v int64) *DescribeExportTasksInput ***REMOVED***
+func (s *DescribeExportTasksInput) SetLimit(v int64) *DescribeExportTasksInput {
 	s.Limit = &v
 	return s
-***REMOVED***
+}
 
 // SetNextToken sets the NextToken field's value.
-func (s *DescribeExportTasksInput) SetNextToken(v string) *DescribeExportTasksInput ***REMOVED***
+func (s *DescribeExportTasksInput) SetNextToken(v string) *DescribeExportTasksInput {
 	s.NextToken = &v
 	return s
-***REMOVED***
+}
 
 // SetStatusCode sets the StatusCode field's value.
-func (s *DescribeExportTasksInput) SetStatusCode(v string) *DescribeExportTasksInput ***REMOVED***
+func (s *DescribeExportTasksInput) SetStatusCode(v string) *DescribeExportTasksInput {
 	s.StatusCode = &v
 	return s
-***REMOVED***
+}
 
 // SetTaskId sets the TaskId field's value.
-func (s *DescribeExportTasksInput) SetTaskId(v string) *DescribeExportTasksInput ***REMOVED***
+func (s *DescribeExportTasksInput) SetTaskId(v string) *DescribeExportTasksInput {
 	s.TaskId = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DescribeExportTasksResponse
-type DescribeExportTasksOutput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type DescribeExportTasksOutput struct {
+	_ struct{} `type:"structure"`
 
 	// The export tasks.
 	ExportTasks []*ExportTask `locationName:"exportTasks" type:"list"`
@@ -4512,33 +4512,33 @@ type DescribeExportTasksOutput struct ***REMOVED***
 	// The token for the next set of items to return. The token expires after 24
 	// hours.
 	NextToken *string `locationName:"nextToken" min:"1" type:"string"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s DescribeExportTasksOutput) String() string ***REMOVED***
+func (s DescribeExportTasksOutput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s DescribeExportTasksOutput) GoString() string ***REMOVED***
+func (s DescribeExportTasksOutput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // SetExportTasks sets the ExportTasks field's value.
-func (s *DescribeExportTasksOutput) SetExportTasks(v []*ExportTask) *DescribeExportTasksOutput ***REMOVED***
+func (s *DescribeExportTasksOutput) SetExportTasks(v []*ExportTask) *DescribeExportTasksOutput {
 	s.ExportTasks = v
 	return s
-***REMOVED***
+}
 
 // SetNextToken sets the NextToken field's value.
-func (s *DescribeExportTasksOutput) SetNextToken(v string) *DescribeExportTasksOutput ***REMOVED***
+func (s *DescribeExportTasksOutput) SetNextToken(v string) *DescribeExportTasksOutput {
 	s.NextToken = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DescribeLogGroupsRequest
-type DescribeLogGroupsInput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type DescribeLogGroupsInput struct {
+	_ struct{} `type:"structure"`
 
 	// The maximum number of items returned. If you don't specify a value, the default
 	// is up to 50 items.
@@ -4550,58 +4550,58 @@ type DescribeLogGroupsInput struct ***REMOVED***
 	// The token for the next set of items to return. (You received this token from
 	// a previous call.)
 	NextToken *string `locationName:"nextToken" min:"1" type:"string"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s DescribeLogGroupsInput) String() string ***REMOVED***
+func (s DescribeLogGroupsInput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s DescribeLogGroupsInput) GoString() string ***REMOVED***
+func (s DescribeLogGroupsInput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Validate inspects the fields of the type to determine if they are valid.
-func (s *DescribeLogGroupsInput) Validate() error ***REMOVED***
-	invalidParams := request.ErrInvalidParams***REMOVED***Context: "DescribeLogGroupsInput"***REMOVED***
-	if s.Limit != nil && *s.Limit < 1 ***REMOVED***
+func (s *DescribeLogGroupsInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DescribeLogGroupsInput"}
+	if s.Limit != nil && *s.Limit < 1 {
 		invalidParams.Add(request.NewErrParamMinValue("Limit", 1))
-	***REMOVED***
-	if s.LogGroupNamePrefix != nil && len(*s.LogGroupNamePrefix) < 1 ***REMOVED***
+	}
+	if s.LogGroupNamePrefix != nil && len(*s.LogGroupNamePrefix) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("LogGroupNamePrefix", 1))
-	***REMOVED***
-	if s.NextToken != nil && len(*s.NextToken) < 1 ***REMOVED***
+	}
+	if s.NextToken != nil && len(*s.NextToken) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("NextToken", 1))
-	***REMOVED***
+	}
 
-	if invalidParams.Len() > 0 ***REMOVED***
+	if invalidParams.Len() > 0 {
 		return invalidParams
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetLimit sets the Limit field's value.
-func (s *DescribeLogGroupsInput) SetLimit(v int64) *DescribeLogGroupsInput ***REMOVED***
+func (s *DescribeLogGroupsInput) SetLimit(v int64) *DescribeLogGroupsInput {
 	s.Limit = &v
 	return s
-***REMOVED***
+}
 
 // SetLogGroupNamePrefix sets the LogGroupNamePrefix field's value.
-func (s *DescribeLogGroupsInput) SetLogGroupNamePrefix(v string) *DescribeLogGroupsInput ***REMOVED***
+func (s *DescribeLogGroupsInput) SetLogGroupNamePrefix(v string) *DescribeLogGroupsInput {
 	s.LogGroupNamePrefix = &v
 	return s
-***REMOVED***
+}
 
 // SetNextToken sets the NextToken field's value.
-func (s *DescribeLogGroupsInput) SetNextToken(v string) *DescribeLogGroupsInput ***REMOVED***
+func (s *DescribeLogGroupsInput) SetNextToken(v string) *DescribeLogGroupsInput {
 	s.NextToken = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DescribeLogGroupsResponse
-type DescribeLogGroupsOutput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type DescribeLogGroupsOutput struct {
+	_ struct{} `type:"structure"`
 
 	// The log groups.
 	LogGroups []*LogGroup `locationName:"logGroups" type:"list"`
@@ -4609,33 +4609,33 @@ type DescribeLogGroupsOutput struct ***REMOVED***
 	// The token for the next set of items to return. The token expires after 24
 	// hours.
 	NextToken *string `locationName:"nextToken" min:"1" type:"string"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s DescribeLogGroupsOutput) String() string ***REMOVED***
+func (s DescribeLogGroupsOutput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s DescribeLogGroupsOutput) GoString() string ***REMOVED***
+func (s DescribeLogGroupsOutput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // SetLogGroups sets the LogGroups field's value.
-func (s *DescribeLogGroupsOutput) SetLogGroups(v []*LogGroup) *DescribeLogGroupsOutput ***REMOVED***
+func (s *DescribeLogGroupsOutput) SetLogGroups(v []*LogGroup) *DescribeLogGroupsOutput {
 	s.LogGroups = v
 	return s
-***REMOVED***
+}
 
 // SetNextToken sets the NextToken field's value.
-func (s *DescribeLogGroupsOutput) SetNextToken(v string) *DescribeLogGroupsOutput ***REMOVED***
+func (s *DescribeLogGroupsOutput) SetNextToken(v string) *DescribeLogGroupsOutput {
 	s.NextToken = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DescribeLogStreamsRequest
-type DescribeLogStreamsInput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type DescribeLogStreamsInput struct {
+	_ struct{} `type:"structure"`
 
 	// If the value is true, results are returned in descending order. If the value
 	// is to false, results are returned in ascending order. The default value is
@@ -4673,82 +4673,82 @@ type DescribeLogStreamsInput struct ***REMOVED***
 	// an eventual consistency basis. It typically updates in less than an hour
 	// from ingestion, but may take longer in some rare situations.
 	OrderBy *string `locationName:"orderBy" type:"string" enum:"OrderBy"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s DescribeLogStreamsInput) String() string ***REMOVED***
+func (s DescribeLogStreamsInput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s DescribeLogStreamsInput) GoString() string ***REMOVED***
+func (s DescribeLogStreamsInput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Validate inspects the fields of the type to determine if they are valid.
-func (s *DescribeLogStreamsInput) Validate() error ***REMOVED***
-	invalidParams := request.ErrInvalidParams***REMOVED***Context: "DescribeLogStreamsInput"***REMOVED***
-	if s.Limit != nil && *s.Limit < 1 ***REMOVED***
+func (s *DescribeLogStreamsInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DescribeLogStreamsInput"}
+	if s.Limit != nil && *s.Limit < 1 {
 		invalidParams.Add(request.NewErrParamMinValue("Limit", 1))
-	***REMOVED***
-	if s.LogGroupName == nil ***REMOVED***
+	}
+	if s.LogGroupName == nil {
 		invalidParams.Add(request.NewErrParamRequired("LogGroupName"))
-	***REMOVED***
-	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 ***REMOVED***
+	}
+	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("LogGroupName", 1))
-	***REMOVED***
-	if s.LogStreamNamePrefix != nil && len(*s.LogStreamNamePrefix) < 1 ***REMOVED***
+	}
+	if s.LogStreamNamePrefix != nil && len(*s.LogStreamNamePrefix) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("LogStreamNamePrefix", 1))
-	***REMOVED***
-	if s.NextToken != nil && len(*s.NextToken) < 1 ***REMOVED***
+	}
+	if s.NextToken != nil && len(*s.NextToken) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("NextToken", 1))
-	***REMOVED***
+	}
 
-	if invalidParams.Len() > 0 ***REMOVED***
+	if invalidParams.Len() > 0 {
 		return invalidParams
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetDescending sets the Descending field's value.
-func (s *DescribeLogStreamsInput) SetDescending(v bool) *DescribeLogStreamsInput ***REMOVED***
+func (s *DescribeLogStreamsInput) SetDescending(v bool) *DescribeLogStreamsInput {
 	s.Descending = &v
 	return s
-***REMOVED***
+}
 
 // SetLimit sets the Limit field's value.
-func (s *DescribeLogStreamsInput) SetLimit(v int64) *DescribeLogStreamsInput ***REMOVED***
+func (s *DescribeLogStreamsInput) SetLimit(v int64) *DescribeLogStreamsInput {
 	s.Limit = &v
 	return s
-***REMOVED***
+}
 
 // SetLogGroupName sets the LogGroupName field's value.
-func (s *DescribeLogStreamsInput) SetLogGroupName(v string) *DescribeLogStreamsInput ***REMOVED***
+func (s *DescribeLogStreamsInput) SetLogGroupName(v string) *DescribeLogStreamsInput {
 	s.LogGroupName = &v
 	return s
-***REMOVED***
+}
 
 // SetLogStreamNamePrefix sets the LogStreamNamePrefix field's value.
-func (s *DescribeLogStreamsInput) SetLogStreamNamePrefix(v string) *DescribeLogStreamsInput ***REMOVED***
+func (s *DescribeLogStreamsInput) SetLogStreamNamePrefix(v string) *DescribeLogStreamsInput {
 	s.LogStreamNamePrefix = &v
 	return s
-***REMOVED***
+}
 
 // SetNextToken sets the NextToken field's value.
-func (s *DescribeLogStreamsInput) SetNextToken(v string) *DescribeLogStreamsInput ***REMOVED***
+func (s *DescribeLogStreamsInput) SetNextToken(v string) *DescribeLogStreamsInput {
 	s.NextToken = &v
 	return s
-***REMOVED***
+}
 
 // SetOrderBy sets the OrderBy field's value.
-func (s *DescribeLogStreamsInput) SetOrderBy(v string) *DescribeLogStreamsInput ***REMOVED***
+func (s *DescribeLogStreamsInput) SetOrderBy(v string) *DescribeLogStreamsInput {
 	s.OrderBy = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DescribeLogStreamsResponse
-type DescribeLogStreamsOutput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type DescribeLogStreamsOutput struct {
+	_ struct{} `type:"structure"`
 
 	// The log streams.
 	LogStreams []*LogStream `locationName:"logStreams" type:"list"`
@@ -4756,33 +4756,33 @@ type DescribeLogStreamsOutput struct ***REMOVED***
 	// The token for the next set of items to return. The token expires after 24
 	// hours.
 	NextToken *string `locationName:"nextToken" min:"1" type:"string"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s DescribeLogStreamsOutput) String() string ***REMOVED***
+func (s DescribeLogStreamsOutput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s DescribeLogStreamsOutput) GoString() string ***REMOVED***
+func (s DescribeLogStreamsOutput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // SetLogStreams sets the LogStreams field's value.
-func (s *DescribeLogStreamsOutput) SetLogStreams(v []*LogStream) *DescribeLogStreamsOutput ***REMOVED***
+func (s *DescribeLogStreamsOutput) SetLogStreams(v []*LogStream) *DescribeLogStreamsOutput {
 	s.LogStreams = v
 	return s
-***REMOVED***
+}
 
 // SetNextToken sets the NextToken field's value.
-func (s *DescribeLogStreamsOutput) SetNextToken(v string) *DescribeLogStreamsOutput ***REMOVED***
+func (s *DescribeLogStreamsOutput) SetNextToken(v string) *DescribeLogStreamsOutput {
 	s.NextToken = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DescribeMetricFiltersRequest
-type DescribeMetricFiltersInput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type DescribeMetricFiltersInput struct {
+	_ struct{} `type:"structure"`
 
 	// The prefix to match.
 	FilterNamePrefix *string `locationName:"filterNamePrefix" min:"1" type:"string"`
@@ -4804,79 +4804,79 @@ type DescribeMetricFiltersInput struct ***REMOVED***
 	// The token for the next set of items to return. (You received this token from
 	// a previous call.)
 	NextToken *string `locationName:"nextToken" min:"1" type:"string"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s DescribeMetricFiltersInput) String() string ***REMOVED***
+func (s DescribeMetricFiltersInput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s DescribeMetricFiltersInput) GoString() string ***REMOVED***
+func (s DescribeMetricFiltersInput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Validate inspects the fields of the type to determine if they are valid.
-func (s *DescribeMetricFiltersInput) Validate() error ***REMOVED***
-	invalidParams := request.ErrInvalidParams***REMOVED***Context: "DescribeMetricFiltersInput"***REMOVED***
-	if s.FilterNamePrefix != nil && len(*s.FilterNamePrefix) < 1 ***REMOVED***
+func (s *DescribeMetricFiltersInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DescribeMetricFiltersInput"}
+	if s.FilterNamePrefix != nil && len(*s.FilterNamePrefix) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("FilterNamePrefix", 1))
-	***REMOVED***
-	if s.Limit != nil && *s.Limit < 1 ***REMOVED***
+	}
+	if s.Limit != nil && *s.Limit < 1 {
 		invalidParams.Add(request.NewErrParamMinValue("Limit", 1))
-	***REMOVED***
-	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 ***REMOVED***
+	}
+	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("LogGroupName", 1))
-	***REMOVED***
-	if s.NextToken != nil && len(*s.NextToken) < 1 ***REMOVED***
+	}
+	if s.NextToken != nil && len(*s.NextToken) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("NextToken", 1))
-	***REMOVED***
+	}
 
-	if invalidParams.Len() > 0 ***REMOVED***
+	if invalidParams.Len() > 0 {
 		return invalidParams
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetFilterNamePrefix sets the FilterNamePrefix field's value.
-func (s *DescribeMetricFiltersInput) SetFilterNamePrefix(v string) *DescribeMetricFiltersInput ***REMOVED***
+func (s *DescribeMetricFiltersInput) SetFilterNamePrefix(v string) *DescribeMetricFiltersInput {
 	s.FilterNamePrefix = &v
 	return s
-***REMOVED***
+}
 
 // SetLimit sets the Limit field's value.
-func (s *DescribeMetricFiltersInput) SetLimit(v int64) *DescribeMetricFiltersInput ***REMOVED***
+func (s *DescribeMetricFiltersInput) SetLimit(v int64) *DescribeMetricFiltersInput {
 	s.Limit = &v
 	return s
-***REMOVED***
+}
 
 // SetLogGroupName sets the LogGroupName field's value.
-func (s *DescribeMetricFiltersInput) SetLogGroupName(v string) *DescribeMetricFiltersInput ***REMOVED***
+func (s *DescribeMetricFiltersInput) SetLogGroupName(v string) *DescribeMetricFiltersInput {
 	s.LogGroupName = &v
 	return s
-***REMOVED***
+}
 
 // SetMetricName sets the MetricName field's value.
-func (s *DescribeMetricFiltersInput) SetMetricName(v string) *DescribeMetricFiltersInput ***REMOVED***
+func (s *DescribeMetricFiltersInput) SetMetricName(v string) *DescribeMetricFiltersInput {
 	s.MetricName = &v
 	return s
-***REMOVED***
+}
 
 // SetMetricNamespace sets the MetricNamespace field's value.
-func (s *DescribeMetricFiltersInput) SetMetricNamespace(v string) *DescribeMetricFiltersInput ***REMOVED***
+func (s *DescribeMetricFiltersInput) SetMetricNamespace(v string) *DescribeMetricFiltersInput {
 	s.MetricNamespace = &v
 	return s
-***REMOVED***
+}
 
 // SetNextToken sets the NextToken field's value.
-func (s *DescribeMetricFiltersInput) SetNextToken(v string) *DescribeMetricFiltersInput ***REMOVED***
+func (s *DescribeMetricFiltersInput) SetNextToken(v string) *DescribeMetricFiltersInput {
 	s.NextToken = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DescribeMetricFiltersResponse
-type DescribeMetricFiltersOutput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type DescribeMetricFiltersOutput struct {
+	_ struct{} `type:"structure"`
 
 	// The metric filters.
 	MetricFilters []*MetricFilter `locationName:"metricFilters" type:"list"`
@@ -4884,33 +4884,33 @@ type DescribeMetricFiltersOutput struct ***REMOVED***
 	// The token for the next set of items to return. The token expires after 24
 	// hours.
 	NextToken *string `locationName:"nextToken" min:"1" type:"string"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s DescribeMetricFiltersOutput) String() string ***REMOVED***
+func (s DescribeMetricFiltersOutput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s DescribeMetricFiltersOutput) GoString() string ***REMOVED***
+func (s DescribeMetricFiltersOutput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // SetMetricFilters sets the MetricFilters field's value.
-func (s *DescribeMetricFiltersOutput) SetMetricFilters(v []*MetricFilter) *DescribeMetricFiltersOutput ***REMOVED***
+func (s *DescribeMetricFiltersOutput) SetMetricFilters(v []*MetricFilter) *DescribeMetricFiltersOutput {
 	s.MetricFilters = v
 	return s
-***REMOVED***
+}
 
 // SetNextToken sets the NextToken field's value.
-func (s *DescribeMetricFiltersOutput) SetNextToken(v string) *DescribeMetricFiltersOutput ***REMOVED***
+func (s *DescribeMetricFiltersOutput) SetNextToken(v string) *DescribeMetricFiltersOutput {
 	s.NextToken = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DescribeResourcePoliciesRequest
-type DescribeResourcePoliciesInput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type DescribeResourcePoliciesInput struct {
+	_ struct{} `type:"structure"`
 
 	// The maximum number of resource policies to be displayed with one call of
 	// this API.
@@ -4919,49 +4919,49 @@ type DescribeResourcePoliciesInput struct ***REMOVED***
 	// The token for the next set of items to return. The token expires after 24
 	// hours.
 	NextToken *string `locationName:"nextToken" min:"1" type:"string"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s DescribeResourcePoliciesInput) String() string ***REMOVED***
+func (s DescribeResourcePoliciesInput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s DescribeResourcePoliciesInput) GoString() string ***REMOVED***
+func (s DescribeResourcePoliciesInput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Validate inspects the fields of the type to determine if they are valid.
-func (s *DescribeResourcePoliciesInput) Validate() error ***REMOVED***
-	invalidParams := request.ErrInvalidParams***REMOVED***Context: "DescribeResourcePoliciesInput"***REMOVED***
-	if s.Limit != nil && *s.Limit < 1 ***REMOVED***
+func (s *DescribeResourcePoliciesInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DescribeResourcePoliciesInput"}
+	if s.Limit != nil && *s.Limit < 1 {
 		invalidParams.Add(request.NewErrParamMinValue("Limit", 1))
-	***REMOVED***
-	if s.NextToken != nil && len(*s.NextToken) < 1 ***REMOVED***
+	}
+	if s.NextToken != nil && len(*s.NextToken) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("NextToken", 1))
-	***REMOVED***
+	}
 
-	if invalidParams.Len() > 0 ***REMOVED***
+	if invalidParams.Len() > 0 {
 		return invalidParams
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetLimit sets the Limit field's value.
-func (s *DescribeResourcePoliciesInput) SetLimit(v int64) *DescribeResourcePoliciesInput ***REMOVED***
+func (s *DescribeResourcePoliciesInput) SetLimit(v int64) *DescribeResourcePoliciesInput {
 	s.Limit = &v
 	return s
-***REMOVED***
+}
 
 // SetNextToken sets the NextToken field's value.
-func (s *DescribeResourcePoliciesInput) SetNextToken(v string) *DescribeResourcePoliciesInput ***REMOVED***
+func (s *DescribeResourcePoliciesInput) SetNextToken(v string) *DescribeResourcePoliciesInput {
 	s.NextToken = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DescribeResourcePoliciesResponse
-type DescribeResourcePoliciesOutput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type DescribeResourcePoliciesOutput struct {
+	_ struct{} `type:"structure"`
 
 	// The token for the next set of items to return. The token expires after 24
 	// hours.
@@ -4969,33 +4969,33 @@ type DescribeResourcePoliciesOutput struct ***REMOVED***
 
 	// The resource policies that exist in this account.
 	ResourcePolicies []*ResourcePolicy `locationName:"resourcePolicies" type:"list"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s DescribeResourcePoliciesOutput) String() string ***REMOVED***
+func (s DescribeResourcePoliciesOutput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s DescribeResourcePoliciesOutput) GoString() string ***REMOVED***
+func (s DescribeResourcePoliciesOutput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // SetNextToken sets the NextToken field's value.
-func (s *DescribeResourcePoliciesOutput) SetNextToken(v string) *DescribeResourcePoliciesOutput ***REMOVED***
+func (s *DescribeResourcePoliciesOutput) SetNextToken(v string) *DescribeResourcePoliciesOutput {
 	s.NextToken = &v
 	return s
-***REMOVED***
+}
 
 // SetResourcePolicies sets the ResourcePolicies field's value.
-func (s *DescribeResourcePoliciesOutput) SetResourcePolicies(v []*ResourcePolicy) *DescribeResourcePoliciesOutput ***REMOVED***
+func (s *DescribeResourcePoliciesOutput) SetResourcePolicies(v []*ResourcePolicy) *DescribeResourcePoliciesOutput {
 	s.ResourcePolicies = v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DescribeSubscriptionFiltersRequest
-type DescribeSubscriptionFiltersInput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type DescribeSubscriptionFiltersInput struct {
+	_ struct{} `type:"structure"`
 
 	// The prefix to match. If you don't specify a value, no prefix filter is applied.
 	FilterNamePrefix *string `locationName:"filterNamePrefix" min:"1" type:"string"`
@@ -5012,70 +5012,70 @@ type DescribeSubscriptionFiltersInput struct ***REMOVED***
 	// The token for the next set of items to return. (You received this token from
 	// a previous call.)
 	NextToken *string `locationName:"nextToken" min:"1" type:"string"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s DescribeSubscriptionFiltersInput) String() string ***REMOVED***
+func (s DescribeSubscriptionFiltersInput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s DescribeSubscriptionFiltersInput) GoString() string ***REMOVED***
+func (s DescribeSubscriptionFiltersInput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Validate inspects the fields of the type to determine if they are valid.
-func (s *DescribeSubscriptionFiltersInput) Validate() error ***REMOVED***
-	invalidParams := request.ErrInvalidParams***REMOVED***Context: "DescribeSubscriptionFiltersInput"***REMOVED***
-	if s.FilterNamePrefix != nil && len(*s.FilterNamePrefix) < 1 ***REMOVED***
+func (s *DescribeSubscriptionFiltersInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DescribeSubscriptionFiltersInput"}
+	if s.FilterNamePrefix != nil && len(*s.FilterNamePrefix) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("FilterNamePrefix", 1))
-	***REMOVED***
-	if s.Limit != nil && *s.Limit < 1 ***REMOVED***
+	}
+	if s.Limit != nil && *s.Limit < 1 {
 		invalidParams.Add(request.NewErrParamMinValue("Limit", 1))
-	***REMOVED***
-	if s.LogGroupName == nil ***REMOVED***
+	}
+	if s.LogGroupName == nil {
 		invalidParams.Add(request.NewErrParamRequired("LogGroupName"))
-	***REMOVED***
-	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 ***REMOVED***
+	}
+	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("LogGroupName", 1))
-	***REMOVED***
-	if s.NextToken != nil && len(*s.NextToken) < 1 ***REMOVED***
+	}
+	if s.NextToken != nil && len(*s.NextToken) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("NextToken", 1))
-	***REMOVED***
+	}
 
-	if invalidParams.Len() > 0 ***REMOVED***
+	if invalidParams.Len() > 0 {
 		return invalidParams
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetFilterNamePrefix sets the FilterNamePrefix field's value.
-func (s *DescribeSubscriptionFiltersInput) SetFilterNamePrefix(v string) *DescribeSubscriptionFiltersInput ***REMOVED***
+func (s *DescribeSubscriptionFiltersInput) SetFilterNamePrefix(v string) *DescribeSubscriptionFiltersInput {
 	s.FilterNamePrefix = &v
 	return s
-***REMOVED***
+}
 
 // SetLimit sets the Limit field's value.
-func (s *DescribeSubscriptionFiltersInput) SetLimit(v int64) *DescribeSubscriptionFiltersInput ***REMOVED***
+func (s *DescribeSubscriptionFiltersInput) SetLimit(v int64) *DescribeSubscriptionFiltersInput {
 	s.Limit = &v
 	return s
-***REMOVED***
+}
 
 // SetLogGroupName sets the LogGroupName field's value.
-func (s *DescribeSubscriptionFiltersInput) SetLogGroupName(v string) *DescribeSubscriptionFiltersInput ***REMOVED***
+func (s *DescribeSubscriptionFiltersInput) SetLogGroupName(v string) *DescribeSubscriptionFiltersInput {
 	s.LogGroupName = &v
 	return s
-***REMOVED***
+}
 
 // SetNextToken sets the NextToken field's value.
-func (s *DescribeSubscriptionFiltersInput) SetNextToken(v string) *DescribeSubscriptionFiltersInput ***REMOVED***
+func (s *DescribeSubscriptionFiltersInput) SetNextToken(v string) *DescribeSubscriptionFiltersInput {
 	s.NextToken = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DescribeSubscriptionFiltersResponse
-type DescribeSubscriptionFiltersOutput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type DescribeSubscriptionFiltersOutput struct {
+	_ struct{} `type:"structure"`
 
 	// The token for the next set of items to return. The token expires after 24
 	// hours.
@@ -5083,34 +5083,34 @@ type DescribeSubscriptionFiltersOutput struct ***REMOVED***
 
 	// The subscription filters.
 	SubscriptionFilters []*SubscriptionFilter `locationName:"subscriptionFilters" type:"list"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s DescribeSubscriptionFiltersOutput) String() string ***REMOVED***
+func (s DescribeSubscriptionFiltersOutput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s DescribeSubscriptionFiltersOutput) GoString() string ***REMOVED***
+func (s DescribeSubscriptionFiltersOutput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // SetNextToken sets the NextToken field's value.
-func (s *DescribeSubscriptionFiltersOutput) SetNextToken(v string) *DescribeSubscriptionFiltersOutput ***REMOVED***
+func (s *DescribeSubscriptionFiltersOutput) SetNextToken(v string) *DescribeSubscriptionFiltersOutput {
 	s.NextToken = &v
 	return s
-***REMOVED***
+}
 
 // SetSubscriptionFilters sets the SubscriptionFilters field's value.
-func (s *DescribeSubscriptionFiltersOutput) SetSubscriptionFilters(v []*SubscriptionFilter) *DescribeSubscriptionFiltersOutput ***REMOVED***
+func (s *DescribeSubscriptionFiltersOutput) SetSubscriptionFilters(v []*SubscriptionFilter) *DescribeSubscriptionFiltersOutput {
 	s.SubscriptionFilters = v
 	return s
-***REMOVED***
+}
 
 // Represents a cross-account destination that receives subscription log events.
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/Destination
-type Destination struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type Destination struct {
+	_ struct{} `type:"structure"`
 
 	// An IAM policy document that governs which AWS accounts can create subscription
 	// filters against this destination.
@@ -5132,115 +5132,115 @@ type Destination struct ***REMOVED***
 	// The Amazon Resource Name (ARN) of the physical target to where the log events
 	// are delivered (for example, a Kinesis stream).
 	TargetArn *string `locationName:"targetArn" min:"1" type:"string"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s Destination) String() string ***REMOVED***
+func (s Destination) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s Destination) GoString() string ***REMOVED***
+func (s Destination) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // SetAccessPolicy sets the AccessPolicy field's value.
-func (s *Destination) SetAccessPolicy(v string) *Destination ***REMOVED***
+func (s *Destination) SetAccessPolicy(v string) *Destination {
 	s.AccessPolicy = &v
 	return s
-***REMOVED***
+}
 
 // SetArn sets the Arn field's value.
-func (s *Destination) SetArn(v string) *Destination ***REMOVED***
+func (s *Destination) SetArn(v string) *Destination {
 	s.Arn = &v
 	return s
-***REMOVED***
+}
 
 // SetCreationTime sets the CreationTime field's value.
-func (s *Destination) SetCreationTime(v int64) *Destination ***REMOVED***
+func (s *Destination) SetCreationTime(v int64) *Destination {
 	s.CreationTime = &v
 	return s
-***REMOVED***
+}
 
 // SetDestinationName sets the DestinationName field's value.
-func (s *Destination) SetDestinationName(v string) *Destination ***REMOVED***
+func (s *Destination) SetDestinationName(v string) *Destination {
 	s.DestinationName = &v
 	return s
-***REMOVED***
+}
 
 // SetRoleArn sets the RoleArn field's value.
-func (s *Destination) SetRoleArn(v string) *Destination ***REMOVED***
+func (s *Destination) SetRoleArn(v string) *Destination {
 	s.RoleArn = &v
 	return s
-***REMOVED***
+}
 
 // SetTargetArn sets the TargetArn field's value.
-func (s *Destination) SetTargetArn(v string) *Destination ***REMOVED***
+func (s *Destination) SetTargetArn(v string) *Destination {
 	s.TargetArn = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DisassociateKmsKeyRequest
-type DisassociateKmsKeyInput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type DisassociateKmsKeyInput struct {
+	_ struct{} `type:"structure"`
 
 	// The name of the log group.
 	//
 	// LogGroupName is a required field
 	LogGroupName *string `locationName:"logGroupName" min:"1" type:"string" required:"true"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s DisassociateKmsKeyInput) String() string ***REMOVED***
+func (s DisassociateKmsKeyInput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s DisassociateKmsKeyInput) GoString() string ***REMOVED***
+func (s DisassociateKmsKeyInput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Validate inspects the fields of the type to determine if they are valid.
-func (s *DisassociateKmsKeyInput) Validate() error ***REMOVED***
-	invalidParams := request.ErrInvalidParams***REMOVED***Context: "DisassociateKmsKeyInput"***REMOVED***
-	if s.LogGroupName == nil ***REMOVED***
+func (s *DisassociateKmsKeyInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DisassociateKmsKeyInput"}
+	if s.LogGroupName == nil {
 		invalidParams.Add(request.NewErrParamRequired("LogGroupName"))
-	***REMOVED***
-	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 ***REMOVED***
+	}
+	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("LogGroupName", 1))
-	***REMOVED***
+	}
 
-	if invalidParams.Len() > 0 ***REMOVED***
+	if invalidParams.Len() > 0 {
 		return invalidParams
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetLogGroupName sets the LogGroupName field's value.
-func (s *DisassociateKmsKeyInput) SetLogGroupName(v string) *DisassociateKmsKeyInput ***REMOVED***
+func (s *DisassociateKmsKeyInput) SetLogGroupName(v string) *DisassociateKmsKeyInput {
 	s.LogGroupName = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/DisassociateKmsKeyOutput
-type DisassociateKmsKeyOutput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
-***REMOVED***
+type DisassociateKmsKeyOutput struct {
+	_ struct{} `type:"structure"`
+}
 
 // String returns the string representation
-func (s DisassociateKmsKeyOutput) String() string ***REMOVED***
+func (s DisassociateKmsKeyOutput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s DisassociateKmsKeyOutput) GoString() string ***REMOVED***
+func (s DisassociateKmsKeyOutput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Represents an export task.
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/ExportTask
-type ExportTask struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type ExportTask struct {
+	_ struct{} `type:"structure"`
 
 	// The name of Amazon S3 bucket to which the log data was exported.
 	Destination *string `locationName:"destination" min:"1" type:"string"`
@@ -5270,76 +5270,76 @@ type ExportTask struct ***REMOVED***
 	// The end time, expressed as the number of milliseconds after Jan 1, 1970 00:00:00
 	// UTC. Events with a time stamp later than this time are not exported.
 	To *int64 `locationName:"to" type:"long"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s ExportTask) String() string ***REMOVED***
+func (s ExportTask) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s ExportTask) GoString() string ***REMOVED***
+func (s ExportTask) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // SetDestination sets the Destination field's value.
-func (s *ExportTask) SetDestination(v string) *ExportTask ***REMOVED***
+func (s *ExportTask) SetDestination(v string) *ExportTask {
 	s.Destination = &v
 	return s
-***REMOVED***
+}
 
 // SetDestinationPrefix sets the DestinationPrefix field's value.
-func (s *ExportTask) SetDestinationPrefix(v string) *ExportTask ***REMOVED***
+func (s *ExportTask) SetDestinationPrefix(v string) *ExportTask {
 	s.DestinationPrefix = &v
 	return s
-***REMOVED***
+}
 
 // SetExecutionInfo sets the ExecutionInfo field's value.
-func (s *ExportTask) SetExecutionInfo(v *ExportTaskExecutionInfo) *ExportTask ***REMOVED***
+func (s *ExportTask) SetExecutionInfo(v *ExportTaskExecutionInfo) *ExportTask {
 	s.ExecutionInfo = v
 	return s
-***REMOVED***
+}
 
 // SetFrom sets the From field's value.
-func (s *ExportTask) SetFrom(v int64) *ExportTask ***REMOVED***
+func (s *ExportTask) SetFrom(v int64) *ExportTask {
 	s.From = &v
 	return s
-***REMOVED***
+}
 
 // SetLogGroupName sets the LogGroupName field's value.
-func (s *ExportTask) SetLogGroupName(v string) *ExportTask ***REMOVED***
+func (s *ExportTask) SetLogGroupName(v string) *ExportTask {
 	s.LogGroupName = &v
 	return s
-***REMOVED***
+}
 
 // SetStatus sets the Status field's value.
-func (s *ExportTask) SetStatus(v *ExportTaskStatus) *ExportTask ***REMOVED***
+func (s *ExportTask) SetStatus(v *ExportTaskStatus) *ExportTask {
 	s.Status = v
 	return s
-***REMOVED***
+}
 
 // SetTaskId sets the TaskId field's value.
-func (s *ExportTask) SetTaskId(v string) *ExportTask ***REMOVED***
+func (s *ExportTask) SetTaskId(v string) *ExportTask {
 	s.TaskId = &v
 	return s
-***REMOVED***
+}
 
 // SetTaskName sets the TaskName field's value.
-func (s *ExportTask) SetTaskName(v string) *ExportTask ***REMOVED***
+func (s *ExportTask) SetTaskName(v string) *ExportTask {
 	s.TaskName = &v
 	return s
-***REMOVED***
+}
 
 // SetTo sets the To field's value.
-func (s *ExportTask) SetTo(v int64) *ExportTask ***REMOVED***
+func (s *ExportTask) SetTo(v int64) *ExportTask {
 	s.To = &v
 	return s
-***REMOVED***
+}
 
 // Represents the status of an export task.
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/ExportTaskExecutionInfo
-type ExportTaskExecutionInfo struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type ExportTaskExecutionInfo struct {
+	_ struct{} `type:"structure"`
 
 	// The completion time of the export task, expressed as the number of milliseconds
 	// after Jan 1, 1970 00:00:00 UTC.
@@ -5348,67 +5348,67 @@ type ExportTaskExecutionInfo struct ***REMOVED***
 	// The creation time of the export task, expressed as the number of milliseconds
 	// after Jan 1, 1970 00:00:00 UTC.
 	CreationTime *int64 `locationName:"creationTime" type:"long"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s ExportTaskExecutionInfo) String() string ***REMOVED***
+func (s ExportTaskExecutionInfo) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s ExportTaskExecutionInfo) GoString() string ***REMOVED***
+func (s ExportTaskExecutionInfo) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // SetCompletionTime sets the CompletionTime field's value.
-func (s *ExportTaskExecutionInfo) SetCompletionTime(v int64) *ExportTaskExecutionInfo ***REMOVED***
+func (s *ExportTaskExecutionInfo) SetCompletionTime(v int64) *ExportTaskExecutionInfo {
 	s.CompletionTime = &v
 	return s
-***REMOVED***
+}
 
 // SetCreationTime sets the CreationTime field's value.
-func (s *ExportTaskExecutionInfo) SetCreationTime(v int64) *ExportTaskExecutionInfo ***REMOVED***
+func (s *ExportTaskExecutionInfo) SetCreationTime(v int64) *ExportTaskExecutionInfo {
 	s.CreationTime = &v
 	return s
-***REMOVED***
+}
 
 // Represents the status of an export task.
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/ExportTaskStatus
-type ExportTaskStatus struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type ExportTaskStatus struct {
+	_ struct{} `type:"structure"`
 
 	// The status code of the export task.
 	Code *string `locationName:"code" type:"string" enum:"ExportTaskStatusCode"`
 
 	// The status message related to the status code.
 	Message *string `locationName:"message" type:"string"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s ExportTaskStatus) String() string ***REMOVED***
+func (s ExportTaskStatus) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s ExportTaskStatus) GoString() string ***REMOVED***
+func (s ExportTaskStatus) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // SetCode sets the Code field's value.
-func (s *ExportTaskStatus) SetCode(v string) *ExportTaskStatus ***REMOVED***
+func (s *ExportTaskStatus) SetCode(v string) *ExportTaskStatus {
 	s.Code = &v
 	return s
-***REMOVED***
+}
 
 // SetMessage sets the Message field's value.
-func (s *ExportTaskStatus) SetMessage(v string) *ExportTaskStatus ***REMOVED***
+func (s *ExportTaskStatus) SetMessage(v string) *ExportTaskStatus {
 	s.Message = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/FilterLogEventsRequest
-type FilterLogEventsInput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type FilterLogEventsInput struct {
+	_ struct{} `type:"structure"`
 
 	// The end of the time range, expressed as the number of milliseconds after
 	// Jan 1, 1970 00:00:00 UTC. Events with a time stamp later than this time are
@@ -5444,94 +5444,94 @@ type FilterLogEventsInput struct ***REMOVED***
 	// Jan 1, 1970 00:00:00 UTC. Events with a time stamp before this time are not
 	// returned.
 	StartTime *int64 `locationName:"startTime" type:"long"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s FilterLogEventsInput) String() string ***REMOVED***
+func (s FilterLogEventsInput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s FilterLogEventsInput) GoString() string ***REMOVED***
+func (s FilterLogEventsInput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Validate inspects the fields of the type to determine if they are valid.
-func (s *FilterLogEventsInput) Validate() error ***REMOVED***
-	invalidParams := request.ErrInvalidParams***REMOVED***Context: "FilterLogEventsInput"***REMOVED***
-	if s.Limit != nil && *s.Limit < 1 ***REMOVED***
+func (s *FilterLogEventsInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "FilterLogEventsInput"}
+	if s.Limit != nil && *s.Limit < 1 {
 		invalidParams.Add(request.NewErrParamMinValue("Limit", 1))
-	***REMOVED***
-	if s.LogGroupName == nil ***REMOVED***
+	}
+	if s.LogGroupName == nil {
 		invalidParams.Add(request.NewErrParamRequired("LogGroupName"))
-	***REMOVED***
-	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 ***REMOVED***
+	}
+	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("LogGroupName", 1))
-	***REMOVED***
-	if s.LogStreamNames != nil && len(s.LogStreamNames) < 1 ***REMOVED***
+	}
+	if s.LogStreamNames != nil && len(s.LogStreamNames) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("LogStreamNames", 1))
-	***REMOVED***
-	if s.NextToken != nil && len(*s.NextToken) < 1 ***REMOVED***
+	}
+	if s.NextToken != nil && len(*s.NextToken) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("NextToken", 1))
-	***REMOVED***
+	}
 
-	if invalidParams.Len() > 0 ***REMOVED***
+	if invalidParams.Len() > 0 {
 		return invalidParams
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetEndTime sets the EndTime field's value.
-func (s *FilterLogEventsInput) SetEndTime(v int64) *FilterLogEventsInput ***REMOVED***
+func (s *FilterLogEventsInput) SetEndTime(v int64) *FilterLogEventsInput {
 	s.EndTime = &v
 	return s
-***REMOVED***
+}
 
 // SetFilterPattern sets the FilterPattern field's value.
-func (s *FilterLogEventsInput) SetFilterPattern(v string) *FilterLogEventsInput ***REMOVED***
+func (s *FilterLogEventsInput) SetFilterPattern(v string) *FilterLogEventsInput {
 	s.FilterPattern = &v
 	return s
-***REMOVED***
+}
 
 // SetInterleaved sets the Interleaved field's value.
-func (s *FilterLogEventsInput) SetInterleaved(v bool) *FilterLogEventsInput ***REMOVED***
+func (s *FilterLogEventsInput) SetInterleaved(v bool) *FilterLogEventsInput {
 	s.Interleaved = &v
 	return s
-***REMOVED***
+}
 
 // SetLimit sets the Limit field's value.
-func (s *FilterLogEventsInput) SetLimit(v int64) *FilterLogEventsInput ***REMOVED***
+func (s *FilterLogEventsInput) SetLimit(v int64) *FilterLogEventsInput {
 	s.Limit = &v
 	return s
-***REMOVED***
+}
 
 // SetLogGroupName sets the LogGroupName field's value.
-func (s *FilterLogEventsInput) SetLogGroupName(v string) *FilterLogEventsInput ***REMOVED***
+func (s *FilterLogEventsInput) SetLogGroupName(v string) *FilterLogEventsInput {
 	s.LogGroupName = &v
 	return s
-***REMOVED***
+}
 
 // SetLogStreamNames sets the LogStreamNames field's value.
-func (s *FilterLogEventsInput) SetLogStreamNames(v []*string) *FilterLogEventsInput ***REMOVED***
+func (s *FilterLogEventsInput) SetLogStreamNames(v []*string) *FilterLogEventsInput {
 	s.LogStreamNames = v
 	return s
-***REMOVED***
+}
 
 // SetNextToken sets the NextToken field's value.
-func (s *FilterLogEventsInput) SetNextToken(v string) *FilterLogEventsInput ***REMOVED***
+func (s *FilterLogEventsInput) SetNextToken(v string) *FilterLogEventsInput {
 	s.NextToken = &v
 	return s
-***REMOVED***
+}
 
 // SetStartTime sets the StartTime field's value.
-func (s *FilterLogEventsInput) SetStartTime(v int64) *FilterLogEventsInput ***REMOVED***
+func (s *FilterLogEventsInput) SetStartTime(v int64) *FilterLogEventsInput {
 	s.StartTime = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/FilterLogEventsResponse
-type FilterLogEventsOutput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type FilterLogEventsOutput struct {
+	_ struct{} `type:"structure"`
 
 	// The matched events.
 	Events []*FilteredLogEvent `locationName:"events" type:"list"`
@@ -5543,40 +5543,40 @@ type FilterLogEventsOutput struct ***REMOVED***
 	// Indicates which log streams have been searched and whether each has been
 	// searched completely.
 	SearchedLogStreams []*SearchedLogStream `locationName:"searchedLogStreams" type:"list"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s FilterLogEventsOutput) String() string ***REMOVED***
+func (s FilterLogEventsOutput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s FilterLogEventsOutput) GoString() string ***REMOVED***
+func (s FilterLogEventsOutput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // SetEvents sets the Events field's value.
-func (s *FilterLogEventsOutput) SetEvents(v []*FilteredLogEvent) *FilterLogEventsOutput ***REMOVED***
+func (s *FilterLogEventsOutput) SetEvents(v []*FilteredLogEvent) *FilterLogEventsOutput {
 	s.Events = v
 	return s
-***REMOVED***
+}
 
 // SetNextToken sets the NextToken field's value.
-func (s *FilterLogEventsOutput) SetNextToken(v string) *FilterLogEventsOutput ***REMOVED***
+func (s *FilterLogEventsOutput) SetNextToken(v string) *FilterLogEventsOutput {
 	s.NextToken = &v
 	return s
-***REMOVED***
+}
 
 // SetSearchedLogStreams sets the SearchedLogStreams field's value.
-func (s *FilterLogEventsOutput) SetSearchedLogStreams(v []*SearchedLogStream) *FilterLogEventsOutput ***REMOVED***
+func (s *FilterLogEventsOutput) SetSearchedLogStreams(v []*SearchedLogStream) *FilterLogEventsOutput {
 	s.SearchedLogStreams = v
 	return s
-***REMOVED***
+}
 
 // Represents a matched event.
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/FilteredLogEvent
-type FilteredLogEvent struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type FilteredLogEvent struct {
+	_ struct{} `type:"structure"`
 
 	// The ID of the event.
 	EventId *string `locationName:"eventId" type:"string"`
@@ -5594,51 +5594,51 @@ type FilteredLogEvent struct ***REMOVED***
 	// The time the event occurred, expressed as the number of milliseconds after
 	// Jan 1, 1970 00:00:00 UTC.
 	Timestamp *int64 `locationName:"timestamp" type:"long"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s FilteredLogEvent) String() string ***REMOVED***
+func (s FilteredLogEvent) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s FilteredLogEvent) GoString() string ***REMOVED***
+func (s FilteredLogEvent) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // SetEventId sets the EventId field's value.
-func (s *FilteredLogEvent) SetEventId(v string) *FilteredLogEvent ***REMOVED***
+func (s *FilteredLogEvent) SetEventId(v string) *FilteredLogEvent {
 	s.EventId = &v
 	return s
-***REMOVED***
+}
 
 // SetIngestionTime sets the IngestionTime field's value.
-func (s *FilteredLogEvent) SetIngestionTime(v int64) *FilteredLogEvent ***REMOVED***
+func (s *FilteredLogEvent) SetIngestionTime(v int64) *FilteredLogEvent {
 	s.IngestionTime = &v
 	return s
-***REMOVED***
+}
 
 // SetLogStreamName sets the LogStreamName field's value.
-func (s *FilteredLogEvent) SetLogStreamName(v string) *FilteredLogEvent ***REMOVED***
+func (s *FilteredLogEvent) SetLogStreamName(v string) *FilteredLogEvent {
 	s.LogStreamName = &v
 	return s
-***REMOVED***
+}
 
 // SetMessage sets the Message field's value.
-func (s *FilteredLogEvent) SetMessage(v string) *FilteredLogEvent ***REMOVED***
+func (s *FilteredLogEvent) SetMessage(v string) *FilteredLogEvent {
 	s.Message = &v
 	return s
-***REMOVED***
+}
 
 // SetTimestamp sets the Timestamp field's value.
-func (s *FilteredLogEvent) SetTimestamp(v int64) *FilteredLogEvent ***REMOVED***
+func (s *FilteredLogEvent) SetTimestamp(v int64) *FilteredLogEvent {
 	s.Timestamp = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/GetLogEventsRequest
-type GetLogEventsInput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type GetLogEventsInput struct {
+	_ struct{} `type:"structure"`
 
 	// The end of the time range, expressed as the number of milliseconds after
 	// Jan 1, 1970 00:00:00 UTC. Events with a time stamp later than this time are
@@ -5673,91 +5673,91 @@ type GetLogEventsInput struct ***REMOVED***
 	// Jan 1, 1970 00:00:00 UTC. Events with a time stamp earlier than this time
 	// are not included.
 	StartTime *int64 `locationName:"startTime" type:"long"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s GetLogEventsInput) String() string ***REMOVED***
+func (s GetLogEventsInput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s GetLogEventsInput) GoString() string ***REMOVED***
+func (s GetLogEventsInput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Validate inspects the fields of the type to determine if they are valid.
-func (s *GetLogEventsInput) Validate() error ***REMOVED***
-	invalidParams := request.ErrInvalidParams***REMOVED***Context: "GetLogEventsInput"***REMOVED***
-	if s.Limit != nil && *s.Limit < 1 ***REMOVED***
+func (s *GetLogEventsInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "GetLogEventsInput"}
+	if s.Limit != nil && *s.Limit < 1 {
 		invalidParams.Add(request.NewErrParamMinValue("Limit", 1))
-	***REMOVED***
-	if s.LogGroupName == nil ***REMOVED***
+	}
+	if s.LogGroupName == nil {
 		invalidParams.Add(request.NewErrParamRequired("LogGroupName"))
-	***REMOVED***
-	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 ***REMOVED***
+	}
+	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("LogGroupName", 1))
-	***REMOVED***
-	if s.LogStreamName == nil ***REMOVED***
+	}
+	if s.LogStreamName == nil {
 		invalidParams.Add(request.NewErrParamRequired("LogStreamName"))
-	***REMOVED***
-	if s.LogStreamName != nil && len(*s.LogStreamName) < 1 ***REMOVED***
+	}
+	if s.LogStreamName != nil && len(*s.LogStreamName) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("LogStreamName", 1))
-	***REMOVED***
-	if s.NextToken != nil && len(*s.NextToken) < 1 ***REMOVED***
+	}
+	if s.NextToken != nil && len(*s.NextToken) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("NextToken", 1))
-	***REMOVED***
+	}
 
-	if invalidParams.Len() > 0 ***REMOVED***
+	if invalidParams.Len() > 0 {
 		return invalidParams
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetEndTime sets the EndTime field's value.
-func (s *GetLogEventsInput) SetEndTime(v int64) *GetLogEventsInput ***REMOVED***
+func (s *GetLogEventsInput) SetEndTime(v int64) *GetLogEventsInput {
 	s.EndTime = &v
 	return s
-***REMOVED***
+}
 
 // SetLimit sets the Limit field's value.
-func (s *GetLogEventsInput) SetLimit(v int64) *GetLogEventsInput ***REMOVED***
+func (s *GetLogEventsInput) SetLimit(v int64) *GetLogEventsInput {
 	s.Limit = &v
 	return s
-***REMOVED***
+}
 
 // SetLogGroupName sets the LogGroupName field's value.
-func (s *GetLogEventsInput) SetLogGroupName(v string) *GetLogEventsInput ***REMOVED***
+func (s *GetLogEventsInput) SetLogGroupName(v string) *GetLogEventsInput {
 	s.LogGroupName = &v
 	return s
-***REMOVED***
+}
 
 // SetLogStreamName sets the LogStreamName field's value.
-func (s *GetLogEventsInput) SetLogStreamName(v string) *GetLogEventsInput ***REMOVED***
+func (s *GetLogEventsInput) SetLogStreamName(v string) *GetLogEventsInput {
 	s.LogStreamName = &v
 	return s
-***REMOVED***
+}
 
 // SetNextToken sets the NextToken field's value.
-func (s *GetLogEventsInput) SetNextToken(v string) *GetLogEventsInput ***REMOVED***
+func (s *GetLogEventsInput) SetNextToken(v string) *GetLogEventsInput {
 	s.NextToken = &v
 	return s
-***REMOVED***
+}
 
 // SetStartFromHead sets the StartFromHead field's value.
-func (s *GetLogEventsInput) SetStartFromHead(v bool) *GetLogEventsInput ***REMOVED***
+func (s *GetLogEventsInput) SetStartFromHead(v bool) *GetLogEventsInput {
 	s.StartFromHead = &v
 	return s
-***REMOVED***
+}
 
 // SetStartTime sets the StartTime field's value.
-func (s *GetLogEventsInput) SetStartTime(v int64) *GetLogEventsInput ***REMOVED***
+func (s *GetLogEventsInput) SetStartTime(v int64) *GetLogEventsInput {
 	s.StartTime = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/GetLogEventsResponse
-type GetLogEventsOutput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type GetLogEventsOutput struct {
+	_ struct{} `type:"structure"`
 
 	// The events.
 	Events []*OutputLogEvent `locationName:"events" type:"list"`
@@ -5769,41 +5769,41 @@ type GetLogEventsOutput struct ***REMOVED***
 	// The token for the next set of items in the forward direction. The token expires
 	// after 24 hours.
 	NextForwardToken *string `locationName:"nextForwardToken" min:"1" type:"string"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s GetLogEventsOutput) String() string ***REMOVED***
+func (s GetLogEventsOutput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s GetLogEventsOutput) GoString() string ***REMOVED***
+func (s GetLogEventsOutput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // SetEvents sets the Events field's value.
-func (s *GetLogEventsOutput) SetEvents(v []*OutputLogEvent) *GetLogEventsOutput ***REMOVED***
+func (s *GetLogEventsOutput) SetEvents(v []*OutputLogEvent) *GetLogEventsOutput {
 	s.Events = v
 	return s
-***REMOVED***
+}
 
 // SetNextBackwardToken sets the NextBackwardToken field's value.
-func (s *GetLogEventsOutput) SetNextBackwardToken(v string) *GetLogEventsOutput ***REMOVED***
+func (s *GetLogEventsOutput) SetNextBackwardToken(v string) *GetLogEventsOutput {
 	s.NextBackwardToken = &v
 	return s
-***REMOVED***
+}
 
 // SetNextForwardToken sets the NextForwardToken field's value.
-func (s *GetLogEventsOutput) SetNextForwardToken(v string) *GetLogEventsOutput ***REMOVED***
+func (s *GetLogEventsOutput) SetNextForwardToken(v string) *GetLogEventsOutput {
 	s.NextForwardToken = &v
 	return s
-***REMOVED***
+}
 
 // Represents a log event, which is a record of activity that was recorded by
 // the application or resource being monitored.
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/InputLogEvent
-type InputLogEvent struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type InputLogEvent struct {
+	_ struct{} `type:"structure"`
 
 	// The raw event message.
 	//
@@ -5815,119 +5815,119 @@ type InputLogEvent struct ***REMOVED***
 	//
 	// Timestamp is a required field
 	Timestamp *int64 `locationName:"timestamp" type:"long" required:"true"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s InputLogEvent) String() string ***REMOVED***
+func (s InputLogEvent) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s InputLogEvent) GoString() string ***REMOVED***
+func (s InputLogEvent) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Validate inspects the fields of the type to determine if they are valid.
-func (s *InputLogEvent) Validate() error ***REMOVED***
-	invalidParams := request.ErrInvalidParams***REMOVED***Context: "InputLogEvent"***REMOVED***
-	if s.Message == nil ***REMOVED***
+func (s *InputLogEvent) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "InputLogEvent"}
+	if s.Message == nil {
 		invalidParams.Add(request.NewErrParamRequired("Message"))
-	***REMOVED***
-	if s.Message != nil && len(*s.Message) < 1 ***REMOVED***
+	}
+	if s.Message != nil && len(*s.Message) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("Message", 1))
-	***REMOVED***
-	if s.Timestamp == nil ***REMOVED***
+	}
+	if s.Timestamp == nil {
 		invalidParams.Add(request.NewErrParamRequired("Timestamp"))
-	***REMOVED***
+	}
 
-	if invalidParams.Len() > 0 ***REMOVED***
+	if invalidParams.Len() > 0 {
 		return invalidParams
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetMessage sets the Message field's value.
-func (s *InputLogEvent) SetMessage(v string) *InputLogEvent ***REMOVED***
+func (s *InputLogEvent) SetMessage(v string) *InputLogEvent {
 	s.Message = &v
 	return s
-***REMOVED***
+}
 
 // SetTimestamp sets the Timestamp field's value.
-func (s *InputLogEvent) SetTimestamp(v int64) *InputLogEvent ***REMOVED***
+func (s *InputLogEvent) SetTimestamp(v int64) *InputLogEvent {
 	s.Timestamp = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/ListTagsLogGroupRequest
-type ListTagsLogGroupInput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type ListTagsLogGroupInput struct {
+	_ struct{} `type:"structure"`
 
 	// The name of the log group.
 	//
 	// LogGroupName is a required field
 	LogGroupName *string `locationName:"logGroupName" min:"1" type:"string" required:"true"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s ListTagsLogGroupInput) String() string ***REMOVED***
+func (s ListTagsLogGroupInput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s ListTagsLogGroupInput) GoString() string ***REMOVED***
+func (s ListTagsLogGroupInput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Validate inspects the fields of the type to determine if they are valid.
-func (s *ListTagsLogGroupInput) Validate() error ***REMOVED***
-	invalidParams := request.ErrInvalidParams***REMOVED***Context: "ListTagsLogGroupInput"***REMOVED***
-	if s.LogGroupName == nil ***REMOVED***
+func (s *ListTagsLogGroupInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ListTagsLogGroupInput"}
+	if s.LogGroupName == nil {
 		invalidParams.Add(request.NewErrParamRequired("LogGroupName"))
-	***REMOVED***
-	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 ***REMOVED***
+	}
+	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("LogGroupName", 1))
-	***REMOVED***
+	}
 
-	if invalidParams.Len() > 0 ***REMOVED***
+	if invalidParams.Len() > 0 {
 		return invalidParams
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetLogGroupName sets the LogGroupName field's value.
-func (s *ListTagsLogGroupInput) SetLogGroupName(v string) *ListTagsLogGroupInput ***REMOVED***
+func (s *ListTagsLogGroupInput) SetLogGroupName(v string) *ListTagsLogGroupInput {
 	s.LogGroupName = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/ListTagsLogGroupResponse
-type ListTagsLogGroupOutput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type ListTagsLogGroupOutput struct {
+	_ struct{} `type:"structure"`
 
 	// The tags for the log group.
 	Tags map[string]*string `locationName:"tags" min:"1" type:"map"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s ListTagsLogGroupOutput) String() string ***REMOVED***
+func (s ListTagsLogGroupOutput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s ListTagsLogGroupOutput) GoString() string ***REMOVED***
+func (s ListTagsLogGroupOutput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // SetTags sets the Tags field's value.
-func (s *ListTagsLogGroupOutput) SetTags(v map[string]*string) *ListTagsLogGroupOutput ***REMOVED***
+func (s *ListTagsLogGroupOutput) SetTags(v map[string]*string) *ListTagsLogGroupOutput {
 	s.Tags = v
 	return s
-***REMOVED***
+}
 
 // Represents a log group.
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/LogGroup
-type LogGroup struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type LogGroup struct {
+	_ struct{} `type:"structure"`
 
 	// The Amazon Resource Name (ARN) of the log group.
 	Arn *string `locationName:"arn" type:"string"`
@@ -5952,65 +5952,65 @@ type LogGroup struct ***REMOVED***
 
 	// The number of bytes stored.
 	StoredBytes *int64 `locationName:"storedBytes" type:"long"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s LogGroup) String() string ***REMOVED***
+func (s LogGroup) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s LogGroup) GoString() string ***REMOVED***
+func (s LogGroup) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // SetArn sets the Arn field's value.
-func (s *LogGroup) SetArn(v string) *LogGroup ***REMOVED***
+func (s *LogGroup) SetArn(v string) *LogGroup {
 	s.Arn = &v
 	return s
-***REMOVED***
+}
 
 // SetCreationTime sets the CreationTime field's value.
-func (s *LogGroup) SetCreationTime(v int64) *LogGroup ***REMOVED***
+func (s *LogGroup) SetCreationTime(v int64) *LogGroup {
 	s.CreationTime = &v
 	return s
-***REMOVED***
+}
 
 // SetKmsKeyId sets the KmsKeyId field's value.
-func (s *LogGroup) SetKmsKeyId(v string) *LogGroup ***REMOVED***
+func (s *LogGroup) SetKmsKeyId(v string) *LogGroup {
 	s.KmsKeyId = &v
 	return s
-***REMOVED***
+}
 
 // SetLogGroupName sets the LogGroupName field's value.
-func (s *LogGroup) SetLogGroupName(v string) *LogGroup ***REMOVED***
+func (s *LogGroup) SetLogGroupName(v string) *LogGroup {
 	s.LogGroupName = &v
 	return s
-***REMOVED***
+}
 
 // SetMetricFilterCount sets the MetricFilterCount field's value.
-func (s *LogGroup) SetMetricFilterCount(v int64) *LogGroup ***REMOVED***
+func (s *LogGroup) SetMetricFilterCount(v int64) *LogGroup {
 	s.MetricFilterCount = &v
 	return s
-***REMOVED***
+}
 
 // SetRetentionInDays sets the RetentionInDays field's value.
-func (s *LogGroup) SetRetentionInDays(v int64) *LogGroup ***REMOVED***
+func (s *LogGroup) SetRetentionInDays(v int64) *LogGroup {
 	s.RetentionInDays = &v
 	return s
-***REMOVED***
+}
 
 // SetStoredBytes sets the StoredBytes field's value.
-func (s *LogGroup) SetStoredBytes(v int64) *LogGroup ***REMOVED***
+func (s *LogGroup) SetStoredBytes(v int64) *LogGroup {
 	s.StoredBytes = &v
 	return s
-***REMOVED***
+}
 
 // Represents a log stream, which is a sequence of log events from a single
 // emitter of logs.
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/LogStream
-type LogStream struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type LogStream struct {
+	_ struct{} `type:"structure"`
 
 	// The Amazon Resource Name (ARN) of the log stream.
 	Arn *string `locationName:"arn" type:"string"`
@@ -6042,72 +6042,72 @@ type LogStream struct ***REMOVED***
 
 	// The sequence token.
 	UploadSequenceToken *string `locationName:"uploadSequenceToken" min:"1" type:"string"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s LogStream) String() string ***REMOVED***
+func (s LogStream) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s LogStream) GoString() string ***REMOVED***
+func (s LogStream) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // SetArn sets the Arn field's value.
-func (s *LogStream) SetArn(v string) *LogStream ***REMOVED***
+func (s *LogStream) SetArn(v string) *LogStream {
 	s.Arn = &v
 	return s
-***REMOVED***
+}
 
 // SetCreationTime sets the CreationTime field's value.
-func (s *LogStream) SetCreationTime(v int64) *LogStream ***REMOVED***
+func (s *LogStream) SetCreationTime(v int64) *LogStream {
 	s.CreationTime = &v
 	return s
-***REMOVED***
+}
 
 // SetFirstEventTimestamp sets the FirstEventTimestamp field's value.
-func (s *LogStream) SetFirstEventTimestamp(v int64) *LogStream ***REMOVED***
+func (s *LogStream) SetFirstEventTimestamp(v int64) *LogStream {
 	s.FirstEventTimestamp = &v
 	return s
-***REMOVED***
+}
 
 // SetLastEventTimestamp sets the LastEventTimestamp field's value.
-func (s *LogStream) SetLastEventTimestamp(v int64) *LogStream ***REMOVED***
+func (s *LogStream) SetLastEventTimestamp(v int64) *LogStream {
 	s.LastEventTimestamp = &v
 	return s
-***REMOVED***
+}
 
 // SetLastIngestionTime sets the LastIngestionTime field's value.
-func (s *LogStream) SetLastIngestionTime(v int64) *LogStream ***REMOVED***
+func (s *LogStream) SetLastIngestionTime(v int64) *LogStream {
 	s.LastIngestionTime = &v
 	return s
-***REMOVED***
+}
 
 // SetLogStreamName sets the LogStreamName field's value.
-func (s *LogStream) SetLogStreamName(v string) *LogStream ***REMOVED***
+func (s *LogStream) SetLogStreamName(v string) *LogStream {
 	s.LogStreamName = &v
 	return s
-***REMOVED***
+}
 
 // SetStoredBytes sets the StoredBytes field's value.
-func (s *LogStream) SetStoredBytes(v int64) *LogStream ***REMOVED***
+func (s *LogStream) SetStoredBytes(v int64) *LogStream {
 	s.StoredBytes = &v
 	return s
-***REMOVED***
+}
 
 // SetUploadSequenceToken sets the UploadSequenceToken field's value.
-func (s *LogStream) SetUploadSequenceToken(v string) *LogStream ***REMOVED***
+func (s *LogStream) SetUploadSequenceToken(v string) *LogStream {
 	s.UploadSequenceToken = &v
 	return s
-***REMOVED***
+}
 
 // Metric filters express how CloudWatch Logs would extract metric observations
 // from ingested log events and transform them into metric data in a CloudWatch
 // metric.
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/MetricFilter
-type MetricFilter struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type MetricFilter struct {
+	_ struct{} `type:"structure"`
 
 	// The creation time of the metric filter, expressed as the number of milliseconds
 	// after Jan 1, 1970 00:00:00 UTC.
@@ -6127,52 +6127,52 @@ type MetricFilter struct ***REMOVED***
 
 	// The metric transformations.
 	MetricTransformations []*MetricTransformation `locationName:"metricTransformations" min:"1" type:"list"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s MetricFilter) String() string ***REMOVED***
+func (s MetricFilter) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s MetricFilter) GoString() string ***REMOVED***
+func (s MetricFilter) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // SetCreationTime sets the CreationTime field's value.
-func (s *MetricFilter) SetCreationTime(v int64) *MetricFilter ***REMOVED***
+func (s *MetricFilter) SetCreationTime(v int64) *MetricFilter {
 	s.CreationTime = &v
 	return s
-***REMOVED***
+}
 
 // SetFilterName sets the FilterName field's value.
-func (s *MetricFilter) SetFilterName(v string) *MetricFilter ***REMOVED***
+func (s *MetricFilter) SetFilterName(v string) *MetricFilter {
 	s.FilterName = &v
 	return s
-***REMOVED***
+}
 
 // SetFilterPattern sets the FilterPattern field's value.
-func (s *MetricFilter) SetFilterPattern(v string) *MetricFilter ***REMOVED***
+func (s *MetricFilter) SetFilterPattern(v string) *MetricFilter {
 	s.FilterPattern = &v
 	return s
-***REMOVED***
+}
 
 // SetLogGroupName sets the LogGroupName field's value.
-func (s *MetricFilter) SetLogGroupName(v string) *MetricFilter ***REMOVED***
+func (s *MetricFilter) SetLogGroupName(v string) *MetricFilter {
 	s.LogGroupName = &v
 	return s
-***REMOVED***
+}
 
 // SetMetricTransformations sets the MetricTransformations field's value.
-func (s *MetricFilter) SetMetricTransformations(v []*MetricTransformation) *MetricFilter ***REMOVED***
+func (s *MetricFilter) SetMetricTransformations(v []*MetricTransformation) *MetricFilter {
 	s.MetricTransformations = v
 	return s
-***REMOVED***
+}
 
 // Represents a matched event.
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/MetricFilterMatchRecord
-type MetricFilterMatchRecord struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type MetricFilterMatchRecord struct {
+	_ struct{} `type:"structure"`
 
 	// The raw event data.
 	EventMessage *string `locationName:"eventMessage" min:"1" type:"string"`
@@ -6182,41 +6182,41 @@ type MetricFilterMatchRecord struct ***REMOVED***
 
 	// The values extracted from the event data by the filter.
 	ExtractedValues map[string]*string `locationName:"extractedValues" type:"map"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s MetricFilterMatchRecord) String() string ***REMOVED***
+func (s MetricFilterMatchRecord) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s MetricFilterMatchRecord) GoString() string ***REMOVED***
+func (s MetricFilterMatchRecord) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // SetEventMessage sets the EventMessage field's value.
-func (s *MetricFilterMatchRecord) SetEventMessage(v string) *MetricFilterMatchRecord ***REMOVED***
+func (s *MetricFilterMatchRecord) SetEventMessage(v string) *MetricFilterMatchRecord {
 	s.EventMessage = &v
 	return s
-***REMOVED***
+}
 
 // SetEventNumber sets the EventNumber field's value.
-func (s *MetricFilterMatchRecord) SetEventNumber(v int64) *MetricFilterMatchRecord ***REMOVED***
+func (s *MetricFilterMatchRecord) SetEventNumber(v int64) *MetricFilterMatchRecord {
 	s.EventNumber = &v
 	return s
-***REMOVED***
+}
 
 // SetExtractedValues sets the ExtractedValues field's value.
-func (s *MetricFilterMatchRecord) SetExtractedValues(v map[string]*string) *MetricFilterMatchRecord ***REMOVED***
+func (s *MetricFilterMatchRecord) SetExtractedValues(v map[string]*string) *MetricFilterMatchRecord {
 	s.ExtractedValues = v
 	return s
-***REMOVED***
+}
 
 // Indicates how to transform ingested log events in to metric data in a CloudWatch
 // metric.
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/MetricTransformation
-type MetricTransformation struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type MetricTransformation struct {
+	_ struct{} `type:"structure"`
 
 	// (Optional) The value to emit when a filter pattern does not match a log event.
 	// This value can be null.
@@ -6237,65 +6237,65 @@ type MetricTransformation struct ***REMOVED***
 	//
 	// MetricValue is a required field
 	MetricValue *string `locationName:"metricValue" type:"string" required:"true"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s MetricTransformation) String() string ***REMOVED***
+func (s MetricTransformation) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s MetricTransformation) GoString() string ***REMOVED***
+func (s MetricTransformation) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Validate inspects the fields of the type to determine if they are valid.
-func (s *MetricTransformation) Validate() error ***REMOVED***
-	invalidParams := request.ErrInvalidParams***REMOVED***Context: "MetricTransformation"***REMOVED***
-	if s.MetricName == nil ***REMOVED***
+func (s *MetricTransformation) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "MetricTransformation"}
+	if s.MetricName == nil {
 		invalidParams.Add(request.NewErrParamRequired("MetricName"))
-	***REMOVED***
-	if s.MetricNamespace == nil ***REMOVED***
+	}
+	if s.MetricNamespace == nil {
 		invalidParams.Add(request.NewErrParamRequired("MetricNamespace"))
-	***REMOVED***
-	if s.MetricValue == nil ***REMOVED***
+	}
+	if s.MetricValue == nil {
 		invalidParams.Add(request.NewErrParamRequired("MetricValue"))
-	***REMOVED***
+	}
 
-	if invalidParams.Len() > 0 ***REMOVED***
+	if invalidParams.Len() > 0 {
 		return invalidParams
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetDefaultValue sets the DefaultValue field's value.
-func (s *MetricTransformation) SetDefaultValue(v float64) *MetricTransformation ***REMOVED***
+func (s *MetricTransformation) SetDefaultValue(v float64) *MetricTransformation {
 	s.DefaultValue = &v
 	return s
-***REMOVED***
+}
 
 // SetMetricName sets the MetricName field's value.
-func (s *MetricTransformation) SetMetricName(v string) *MetricTransformation ***REMOVED***
+func (s *MetricTransformation) SetMetricName(v string) *MetricTransformation {
 	s.MetricName = &v
 	return s
-***REMOVED***
+}
 
 // SetMetricNamespace sets the MetricNamespace field's value.
-func (s *MetricTransformation) SetMetricNamespace(v string) *MetricTransformation ***REMOVED***
+func (s *MetricTransformation) SetMetricNamespace(v string) *MetricTransformation {
 	s.MetricNamespace = &v
 	return s
-***REMOVED***
+}
 
 // SetMetricValue sets the MetricValue field's value.
-func (s *MetricTransformation) SetMetricValue(v string) *MetricTransformation ***REMOVED***
+func (s *MetricTransformation) SetMetricValue(v string) *MetricTransformation {
 	s.MetricValue = &v
 	return s
-***REMOVED***
+}
 
 // Represents a log event.
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/OutputLogEvent
-type OutputLogEvent struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type OutputLogEvent struct {
+	_ struct{} `type:"structure"`
 
 	// The time the event was ingested, expressed as the number of milliseconds
 	// after Jan 1, 1970 00:00:00 UTC.
@@ -6307,39 +6307,39 @@ type OutputLogEvent struct ***REMOVED***
 	// The time the event occurred, expressed as the number of milliseconds after
 	// Jan 1, 1970 00:00:00 UTC.
 	Timestamp *int64 `locationName:"timestamp" type:"long"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s OutputLogEvent) String() string ***REMOVED***
+func (s OutputLogEvent) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s OutputLogEvent) GoString() string ***REMOVED***
+func (s OutputLogEvent) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // SetIngestionTime sets the IngestionTime field's value.
-func (s *OutputLogEvent) SetIngestionTime(v int64) *OutputLogEvent ***REMOVED***
+func (s *OutputLogEvent) SetIngestionTime(v int64) *OutputLogEvent {
 	s.IngestionTime = &v
 	return s
-***REMOVED***
+}
 
 // SetMessage sets the Message field's value.
-func (s *OutputLogEvent) SetMessage(v string) *OutputLogEvent ***REMOVED***
+func (s *OutputLogEvent) SetMessage(v string) *OutputLogEvent {
 	s.Message = &v
 	return s
-***REMOVED***
+}
 
 // SetTimestamp sets the Timestamp field's value.
-func (s *OutputLogEvent) SetTimestamp(v int64) *OutputLogEvent ***REMOVED***
+func (s *OutputLogEvent) SetTimestamp(v int64) *OutputLogEvent {
 	s.Timestamp = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/PutDestinationRequest
-type PutDestinationInput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type PutDestinationInput struct {
+	_ struct{} `type:"structure"`
 
 	// A name for the destination.
 	//
@@ -6356,91 +6356,91 @@ type PutDestinationInput struct ***REMOVED***
 	//
 	// TargetArn is a required field
 	TargetArn *string `locationName:"targetArn" min:"1" type:"string" required:"true"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s PutDestinationInput) String() string ***REMOVED***
+func (s PutDestinationInput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s PutDestinationInput) GoString() string ***REMOVED***
+func (s PutDestinationInput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Validate inspects the fields of the type to determine if they are valid.
-func (s *PutDestinationInput) Validate() error ***REMOVED***
-	invalidParams := request.ErrInvalidParams***REMOVED***Context: "PutDestinationInput"***REMOVED***
-	if s.DestinationName == nil ***REMOVED***
+func (s *PutDestinationInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "PutDestinationInput"}
+	if s.DestinationName == nil {
 		invalidParams.Add(request.NewErrParamRequired("DestinationName"))
-	***REMOVED***
-	if s.DestinationName != nil && len(*s.DestinationName) < 1 ***REMOVED***
+	}
+	if s.DestinationName != nil && len(*s.DestinationName) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("DestinationName", 1))
-	***REMOVED***
-	if s.RoleArn == nil ***REMOVED***
+	}
+	if s.RoleArn == nil {
 		invalidParams.Add(request.NewErrParamRequired("RoleArn"))
-	***REMOVED***
-	if s.RoleArn != nil && len(*s.RoleArn) < 1 ***REMOVED***
+	}
+	if s.RoleArn != nil && len(*s.RoleArn) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("RoleArn", 1))
-	***REMOVED***
-	if s.TargetArn == nil ***REMOVED***
+	}
+	if s.TargetArn == nil {
 		invalidParams.Add(request.NewErrParamRequired("TargetArn"))
-	***REMOVED***
-	if s.TargetArn != nil && len(*s.TargetArn) < 1 ***REMOVED***
+	}
+	if s.TargetArn != nil && len(*s.TargetArn) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("TargetArn", 1))
-	***REMOVED***
+	}
 
-	if invalidParams.Len() > 0 ***REMOVED***
+	if invalidParams.Len() > 0 {
 		return invalidParams
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetDestinationName sets the DestinationName field's value.
-func (s *PutDestinationInput) SetDestinationName(v string) *PutDestinationInput ***REMOVED***
+func (s *PutDestinationInput) SetDestinationName(v string) *PutDestinationInput {
 	s.DestinationName = &v
 	return s
-***REMOVED***
+}
 
 // SetRoleArn sets the RoleArn field's value.
-func (s *PutDestinationInput) SetRoleArn(v string) *PutDestinationInput ***REMOVED***
+func (s *PutDestinationInput) SetRoleArn(v string) *PutDestinationInput {
 	s.RoleArn = &v
 	return s
-***REMOVED***
+}
 
 // SetTargetArn sets the TargetArn field's value.
-func (s *PutDestinationInput) SetTargetArn(v string) *PutDestinationInput ***REMOVED***
+func (s *PutDestinationInput) SetTargetArn(v string) *PutDestinationInput {
 	s.TargetArn = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/PutDestinationResponse
-type PutDestinationOutput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type PutDestinationOutput struct {
+	_ struct{} `type:"structure"`
 
 	// The destination.
 	Destination *Destination `locationName:"destination" type:"structure"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s PutDestinationOutput) String() string ***REMOVED***
+func (s PutDestinationOutput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s PutDestinationOutput) GoString() string ***REMOVED***
+func (s PutDestinationOutput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // SetDestination sets the Destination field's value.
-func (s *PutDestinationOutput) SetDestination(v *Destination) *PutDestinationOutput ***REMOVED***
+func (s *PutDestinationOutput) SetDestination(v *Destination) *PutDestinationOutput {
 	s.Destination = v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/PutDestinationPolicyRequest
-type PutDestinationPolicyInput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type PutDestinationPolicyInput struct {
+	_ struct{} `type:"structure"`
 
 	// An IAM policy document that authorizes cross-account users to deliver their
 	// log events to the associated destination.
@@ -6452,70 +6452,70 @@ type PutDestinationPolicyInput struct ***REMOVED***
 	//
 	// DestinationName is a required field
 	DestinationName *string `locationName:"destinationName" min:"1" type:"string" required:"true"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s PutDestinationPolicyInput) String() string ***REMOVED***
+func (s PutDestinationPolicyInput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s PutDestinationPolicyInput) GoString() string ***REMOVED***
+func (s PutDestinationPolicyInput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Validate inspects the fields of the type to determine if they are valid.
-func (s *PutDestinationPolicyInput) Validate() error ***REMOVED***
-	invalidParams := request.ErrInvalidParams***REMOVED***Context: "PutDestinationPolicyInput"***REMOVED***
-	if s.AccessPolicy == nil ***REMOVED***
+func (s *PutDestinationPolicyInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "PutDestinationPolicyInput"}
+	if s.AccessPolicy == nil {
 		invalidParams.Add(request.NewErrParamRequired("AccessPolicy"))
-	***REMOVED***
-	if s.AccessPolicy != nil && len(*s.AccessPolicy) < 1 ***REMOVED***
+	}
+	if s.AccessPolicy != nil && len(*s.AccessPolicy) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("AccessPolicy", 1))
-	***REMOVED***
-	if s.DestinationName == nil ***REMOVED***
+	}
+	if s.DestinationName == nil {
 		invalidParams.Add(request.NewErrParamRequired("DestinationName"))
-	***REMOVED***
-	if s.DestinationName != nil && len(*s.DestinationName) < 1 ***REMOVED***
+	}
+	if s.DestinationName != nil && len(*s.DestinationName) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("DestinationName", 1))
-	***REMOVED***
+	}
 
-	if invalidParams.Len() > 0 ***REMOVED***
+	if invalidParams.Len() > 0 {
 		return invalidParams
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetAccessPolicy sets the AccessPolicy field's value.
-func (s *PutDestinationPolicyInput) SetAccessPolicy(v string) *PutDestinationPolicyInput ***REMOVED***
+func (s *PutDestinationPolicyInput) SetAccessPolicy(v string) *PutDestinationPolicyInput {
 	s.AccessPolicy = &v
 	return s
-***REMOVED***
+}
 
 // SetDestinationName sets the DestinationName field's value.
-func (s *PutDestinationPolicyInput) SetDestinationName(v string) *PutDestinationPolicyInput ***REMOVED***
+func (s *PutDestinationPolicyInput) SetDestinationName(v string) *PutDestinationPolicyInput {
 	s.DestinationName = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/PutDestinationPolicyOutput
-type PutDestinationPolicyOutput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
-***REMOVED***
+type PutDestinationPolicyOutput struct {
+	_ struct{} `type:"structure"`
+}
 
 // String returns the string representation
-func (s PutDestinationPolicyOutput) String() string ***REMOVED***
+func (s PutDestinationPolicyOutput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s PutDestinationPolicyOutput) GoString() string ***REMOVED***
+func (s PutDestinationPolicyOutput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/PutLogEventsRequest
-type PutLogEventsInput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type PutLogEventsInput struct {
+	_ struct{} `type:"structure"`
 
 	// The log events.
 	//
@@ -6538,119 +6538,119 @@ type PutLogEventsInput struct ***REMOVED***
 	// call PutLogEvents twice within a narrow time period using the same value
 	// for sequenceToken, both calls may be successful, or one may be rejected.
 	SequenceToken *string `locationName:"sequenceToken" min:"1" type:"string"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s PutLogEventsInput) String() string ***REMOVED***
+func (s PutLogEventsInput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s PutLogEventsInput) GoString() string ***REMOVED***
+func (s PutLogEventsInput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Validate inspects the fields of the type to determine if they are valid.
-func (s *PutLogEventsInput) Validate() error ***REMOVED***
-	invalidParams := request.ErrInvalidParams***REMOVED***Context: "PutLogEventsInput"***REMOVED***
-	if s.LogEvents == nil ***REMOVED***
+func (s *PutLogEventsInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "PutLogEventsInput"}
+	if s.LogEvents == nil {
 		invalidParams.Add(request.NewErrParamRequired("LogEvents"))
-	***REMOVED***
-	if s.LogEvents != nil && len(s.LogEvents) < 1 ***REMOVED***
+	}
+	if s.LogEvents != nil && len(s.LogEvents) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("LogEvents", 1))
-	***REMOVED***
-	if s.LogGroupName == nil ***REMOVED***
+	}
+	if s.LogGroupName == nil {
 		invalidParams.Add(request.NewErrParamRequired("LogGroupName"))
-	***REMOVED***
-	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 ***REMOVED***
+	}
+	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("LogGroupName", 1))
-	***REMOVED***
-	if s.LogStreamName == nil ***REMOVED***
+	}
+	if s.LogStreamName == nil {
 		invalidParams.Add(request.NewErrParamRequired("LogStreamName"))
-	***REMOVED***
-	if s.LogStreamName != nil && len(*s.LogStreamName) < 1 ***REMOVED***
+	}
+	if s.LogStreamName != nil && len(*s.LogStreamName) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("LogStreamName", 1))
-	***REMOVED***
-	if s.SequenceToken != nil && len(*s.SequenceToken) < 1 ***REMOVED***
+	}
+	if s.SequenceToken != nil && len(*s.SequenceToken) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("SequenceToken", 1))
-	***REMOVED***
-	if s.LogEvents != nil ***REMOVED***
-		for i, v := range s.LogEvents ***REMOVED***
-			if v == nil ***REMOVED***
+	}
+	if s.LogEvents != nil {
+		for i, v := range s.LogEvents {
+			if v == nil {
 				continue
-			***REMOVED***
-			if err := v.Validate(); err != nil ***REMOVED***
+			}
+			if err := v.Validate(); err != nil {
 				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "LogEvents", i), err.(request.ErrInvalidParams))
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
-	if invalidParams.Len() > 0 ***REMOVED***
+	if invalidParams.Len() > 0 {
 		return invalidParams
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetLogEvents sets the LogEvents field's value.
-func (s *PutLogEventsInput) SetLogEvents(v []*InputLogEvent) *PutLogEventsInput ***REMOVED***
+func (s *PutLogEventsInput) SetLogEvents(v []*InputLogEvent) *PutLogEventsInput {
 	s.LogEvents = v
 	return s
-***REMOVED***
+}
 
 // SetLogGroupName sets the LogGroupName field's value.
-func (s *PutLogEventsInput) SetLogGroupName(v string) *PutLogEventsInput ***REMOVED***
+func (s *PutLogEventsInput) SetLogGroupName(v string) *PutLogEventsInput {
 	s.LogGroupName = &v
 	return s
-***REMOVED***
+}
 
 // SetLogStreamName sets the LogStreamName field's value.
-func (s *PutLogEventsInput) SetLogStreamName(v string) *PutLogEventsInput ***REMOVED***
+func (s *PutLogEventsInput) SetLogStreamName(v string) *PutLogEventsInput {
 	s.LogStreamName = &v
 	return s
-***REMOVED***
+}
 
 // SetSequenceToken sets the SequenceToken field's value.
-func (s *PutLogEventsInput) SetSequenceToken(v string) *PutLogEventsInput ***REMOVED***
+func (s *PutLogEventsInput) SetSequenceToken(v string) *PutLogEventsInput {
 	s.SequenceToken = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/PutLogEventsResponse
-type PutLogEventsOutput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type PutLogEventsOutput struct {
+	_ struct{} `type:"structure"`
 
 	// The next sequence token.
 	NextSequenceToken *string `locationName:"nextSequenceToken" min:"1" type:"string"`
 
 	// The rejected events.
 	RejectedLogEventsInfo *RejectedLogEventsInfo `locationName:"rejectedLogEventsInfo" type:"structure"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s PutLogEventsOutput) String() string ***REMOVED***
+func (s PutLogEventsOutput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s PutLogEventsOutput) GoString() string ***REMOVED***
+func (s PutLogEventsOutput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // SetNextSequenceToken sets the NextSequenceToken field's value.
-func (s *PutLogEventsOutput) SetNextSequenceToken(v string) *PutLogEventsOutput ***REMOVED***
+func (s *PutLogEventsOutput) SetNextSequenceToken(v string) *PutLogEventsOutput {
 	s.NextSequenceToken = &v
 	return s
-***REMOVED***
+}
 
 // SetRejectedLogEventsInfo sets the RejectedLogEventsInfo field's value.
-func (s *PutLogEventsOutput) SetRejectedLogEventsInfo(v *RejectedLogEventsInfo) *PutLogEventsOutput ***REMOVED***
+func (s *PutLogEventsOutput) SetRejectedLogEventsInfo(v *RejectedLogEventsInfo) *PutLogEventsOutput {
 	s.RejectedLogEventsInfo = v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/PutMetricFilterRequest
-type PutMetricFilterInput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type PutMetricFilterInput struct {
+	_ struct{} `type:"structure"`
 
 	// A name for the metric filter.
 	//
@@ -6671,101 +6671,101 @@ type PutMetricFilterInput struct ***REMOVED***
 	//
 	// MetricTransformations is a required field
 	MetricTransformations []*MetricTransformation `locationName:"metricTransformations" min:"1" type:"list" required:"true"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s PutMetricFilterInput) String() string ***REMOVED***
+func (s PutMetricFilterInput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s PutMetricFilterInput) GoString() string ***REMOVED***
+func (s PutMetricFilterInput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Validate inspects the fields of the type to determine if they are valid.
-func (s *PutMetricFilterInput) Validate() error ***REMOVED***
-	invalidParams := request.ErrInvalidParams***REMOVED***Context: "PutMetricFilterInput"***REMOVED***
-	if s.FilterName == nil ***REMOVED***
+func (s *PutMetricFilterInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "PutMetricFilterInput"}
+	if s.FilterName == nil {
 		invalidParams.Add(request.NewErrParamRequired("FilterName"))
-	***REMOVED***
-	if s.FilterName != nil && len(*s.FilterName) < 1 ***REMOVED***
+	}
+	if s.FilterName != nil && len(*s.FilterName) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("FilterName", 1))
-	***REMOVED***
-	if s.FilterPattern == nil ***REMOVED***
+	}
+	if s.FilterPattern == nil {
 		invalidParams.Add(request.NewErrParamRequired("FilterPattern"))
-	***REMOVED***
-	if s.LogGroupName == nil ***REMOVED***
+	}
+	if s.LogGroupName == nil {
 		invalidParams.Add(request.NewErrParamRequired("LogGroupName"))
-	***REMOVED***
-	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 ***REMOVED***
+	}
+	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("LogGroupName", 1))
-	***REMOVED***
-	if s.MetricTransformations == nil ***REMOVED***
+	}
+	if s.MetricTransformations == nil {
 		invalidParams.Add(request.NewErrParamRequired("MetricTransformations"))
-	***REMOVED***
-	if s.MetricTransformations != nil && len(s.MetricTransformations) < 1 ***REMOVED***
+	}
+	if s.MetricTransformations != nil && len(s.MetricTransformations) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("MetricTransformations", 1))
-	***REMOVED***
-	if s.MetricTransformations != nil ***REMOVED***
-		for i, v := range s.MetricTransformations ***REMOVED***
-			if v == nil ***REMOVED***
+	}
+	if s.MetricTransformations != nil {
+		for i, v := range s.MetricTransformations {
+			if v == nil {
 				continue
-			***REMOVED***
-			if err := v.Validate(); err != nil ***REMOVED***
+			}
+			if err := v.Validate(); err != nil {
 				invalidParams.AddNested(fmt.Sprintf("%s[%v]", "MetricTransformations", i), err.(request.ErrInvalidParams))
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
-	if invalidParams.Len() > 0 ***REMOVED***
+	if invalidParams.Len() > 0 {
 		return invalidParams
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetFilterName sets the FilterName field's value.
-func (s *PutMetricFilterInput) SetFilterName(v string) *PutMetricFilterInput ***REMOVED***
+func (s *PutMetricFilterInput) SetFilterName(v string) *PutMetricFilterInput {
 	s.FilterName = &v
 	return s
-***REMOVED***
+}
 
 // SetFilterPattern sets the FilterPattern field's value.
-func (s *PutMetricFilterInput) SetFilterPattern(v string) *PutMetricFilterInput ***REMOVED***
+func (s *PutMetricFilterInput) SetFilterPattern(v string) *PutMetricFilterInput {
 	s.FilterPattern = &v
 	return s
-***REMOVED***
+}
 
 // SetLogGroupName sets the LogGroupName field's value.
-func (s *PutMetricFilterInput) SetLogGroupName(v string) *PutMetricFilterInput ***REMOVED***
+func (s *PutMetricFilterInput) SetLogGroupName(v string) *PutMetricFilterInput {
 	s.LogGroupName = &v
 	return s
-***REMOVED***
+}
 
 // SetMetricTransformations sets the MetricTransformations field's value.
-func (s *PutMetricFilterInput) SetMetricTransformations(v []*MetricTransformation) *PutMetricFilterInput ***REMOVED***
+func (s *PutMetricFilterInput) SetMetricTransformations(v []*MetricTransformation) *PutMetricFilterInput {
 	s.MetricTransformations = v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/PutMetricFilterOutput
-type PutMetricFilterOutput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
-***REMOVED***
+type PutMetricFilterOutput struct {
+	_ struct{} `type:"structure"`
+}
 
 // String returns the string representation
-func (s PutMetricFilterOutput) String() string ***REMOVED***
+func (s PutMetricFilterOutput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s PutMetricFilterOutput) GoString() string ***REMOVED***
+func (s PutMetricFilterOutput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/PutResourcePolicyRequest
-type PutResourcePolicyInput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type PutResourcePolicyInput struct {
+	_ struct{} `type:"structure"`
 
 	// Details of the new policy, including the identity of the principal that is
 	// enabled to put logs to this account. This is formatted as a JSON string.
@@ -6774,77 +6774,77 @@ type PutResourcePolicyInput struct ***REMOVED***
 	// to put DNS query logs in to the specified log group. Replace "logArn" with
 	// the ARN of your CloudWatch Logs resource, such as a log group or log stream.
 	//
-	// ***REMOVED*** "Version": "2012-10-17" "Statement": [ ***REMOVED*** "Sid": "Route53LogsToCloudWatchLogs",
-	// "Effect": "Allow", "Principal": ***REMOVED*** "Service": [ "route53.amazonaws.com" ]
-	// ***REMOVED***, "Action":"logs:PutLogEvents", "Resource": logArn ***REMOVED*** ] ***REMOVED***
+	// { "Version": "2012-10-17" "Statement": [ { "Sid": "Route53LogsToCloudWatchLogs",
+	// "Effect": "Allow", "Principal": { "Service": [ "route53.amazonaws.com" ]
+	// }, "Action":"logs:PutLogEvents", "Resource": logArn } ] }
 	PolicyDocument *string `locationName:"policyDocument" min:"1" type:"string"`
 
 	// Name of the new policy. This parameter is required.
 	PolicyName *string `locationName:"policyName" type:"string"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s PutResourcePolicyInput) String() string ***REMOVED***
+func (s PutResourcePolicyInput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s PutResourcePolicyInput) GoString() string ***REMOVED***
+func (s PutResourcePolicyInput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Validate inspects the fields of the type to determine if they are valid.
-func (s *PutResourcePolicyInput) Validate() error ***REMOVED***
-	invalidParams := request.ErrInvalidParams***REMOVED***Context: "PutResourcePolicyInput"***REMOVED***
-	if s.PolicyDocument != nil && len(*s.PolicyDocument) < 1 ***REMOVED***
+func (s *PutResourcePolicyInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "PutResourcePolicyInput"}
+	if s.PolicyDocument != nil && len(*s.PolicyDocument) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("PolicyDocument", 1))
-	***REMOVED***
+	}
 
-	if invalidParams.Len() > 0 ***REMOVED***
+	if invalidParams.Len() > 0 {
 		return invalidParams
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetPolicyDocument sets the PolicyDocument field's value.
-func (s *PutResourcePolicyInput) SetPolicyDocument(v string) *PutResourcePolicyInput ***REMOVED***
+func (s *PutResourcePolicyInput) SetPolicyDocument(v string) *PutResourcePolicyInput {
 	s.PolicyDocument = &v
 	return s
-***REMOVED***
+}
 
 // SetPolicyName sets the PolicyName field's value.
-func (s *PutResourcePolicyInput) SetPolicyName(v string) *PutResourcePolicyInput ***REMOVED***
+func (s *PutResourcePolicyInput) SetPolicyName(v string) *PutResourcePolicyInput {
 	s.PolicyName = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/PutResourcePolicyResponse
-type PutResourcePolicyOutput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type PutResourcePolicyOutput struct {
+	_ struct{} `type:"structure"`
 
 	// The new policy.
 	ResourcePolicy *ResourcePolicy `locationName:"resourcePolicy" type:"structure"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s PutResourcePolicyOutput) String() string ***REMOVED***
+func (s PutResourcePolicyOutput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s PutResourcePolicyOutput) GoString() string ***REMOVED***
+func (s PutResourcePolicyOutput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // SetResourcePolicy sets the ResourcePolicy field's value.
-func (s *PutResourcePolicyOutput) SetResourcePolicy(v *ResourcePolicy) *PutResourcePolicyOutput ***REMOVED***
+func (s *PutResourcePolicyOutput) SetResourcePolicy(v *ResourcePolicy) *PutResourcePolicyOutput {
 	s.ResourcePolicy = v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/PutRetentionPolicyRequest
-type PutRetentionPolicyInput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type PutRetentionPolicyInput struct {
+	_ struct{} `type:"structure"`
 
 	// The name of the log group.
 	//
@@ -6857,67 +6857,67 @@ type PutRetentionPolicyInput struct ***REMOVED***
 	//
 	// RetentionInDays is a required field
 	RetentionInDays *int64 `locationName:"retentionInDays" type:"integer" required:"true"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s PutRetentionPolicyInput) String() string ***REMOVED***
+func (s PutRetentionPolicyInput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s PutRetentionPolicyInput) GoString() string ***REMOVED***
+func (s PutRetentionPolicyInput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Validate inspects the fields of the type to determine if they are valid.
-func (s *PutRetentionPolicyInput) Validate() error ***REMOVED***
-	invalidParams := request.ErrInvalidParams***REMOVED***Context: "PutRetentionPolicyInput"***REMOVED***
-	if s.LogGroupName == nil ***REMOVED***
+func (s *PutRetentionPolicyInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "PutRetentionPolicyInput"}
+	if s.LogGroupName == nil {
 		invalidParams.Add(request.NewErrParamRequired("LogGroupName"))
-	***REMOVED***
-	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 ***REMOVED***
+	}
+	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("LogGroupName", 1))
-	***REMOVED***
-	if s.RetentionInDays == nil ***REMOVED***
+	}
+	if s.RetentionInDays == nil {
 		invalidParams.Add(request.NewErrParamRequired("RetentionInDays"))
-	***REMOVED***
+	}
 
-	if invalidParams.Len() > 0 ***REMOVED***
+	if invalidParams.Len() > 0 {
 		return invalidParams
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetLogGroupName sets the LogGroupName field's value.
-func (s *PutRetentionPolicyInput) SetLogGroupName(v string) *PutRetentionPolicyInput ***REMOVED***
+func (s *PutRetentionPolicyInput) SetLogGroupName(v string) *PutRetentionPolicyInput {
 	s.LogGroupName = &v
 	return s
-***REMOVED***
+}
 
 // SetRetentionInDays sets the RetentionInDays field's value.
-func (s *PutRetentionPolicyInput) SetRetentionInDays(v int64) *PutRetentionPolicyInput ***REMOVED***
+func (s *PutRetentionPolicyInput) SetRetentionInDays(v int64) *PutRetentionPolicyInput {
 	s.RetentionInDays = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/PutRetentionPolicyOutput
-type PutRetentionPolicyOutput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
-***REMOVED***
+type PutRetentionPolicyOutput struct {
+	_ struct{} `type:"structure"`
+}
 
 // String returns the string representation
-func (s PutRetentionPolicyOutput) String() string ***REMOVED***
+func (s PutRetentionPolicyOutput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s PutRetentionPolicyOutput) GoString() string ***REMOVED***
+func (s PutRetentionPolicyOutput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/PutSubscriptionFilterRequest
-type PutSubscriptionFilterInput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type PutSubscriptionFilterInput struct {
+	_ struct{} `type:"structure"`
 
 	// The ARN of the destination to deliver matching log events to. Currently,
 	// the supported destinations are:
@@ -6966,107 +6966,107 @@ type PutSubscriptionFilterInput struct ***REMOVED***
 	// the ARN when you are working with a logical destination for cross-account
 	// delivery.
 	RoleArn *string `locationName:"roleArn" min:"1" type:"string"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s PutSubscriptionFilterInput) String() string ***REMOVED***
+func (s PutSubscriptionFilterInput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s PutSubscriptionFilterInput) GoString() string ***REMOVED***
+func (s PutSubscriptionFilterInput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Validate inspects the fields of the type to determine if they are valid.
-func (s *PutSubscriptionFilterInput) Validate() error ***REMOVED***
-	invalidParams := request.ErrInvalidParams***REMOVED***Context: "PutSubscriptionFilterInput"***REMOVED***
-	if s.DestinationArn == nil ***REMOVED***
+func (s *PutSubscriptionFilterInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "PutSubscriptionFilterInput"}
+	if s.DestinationArn == nil {
 		invalidParams.Add(request.NewErrParamRequired("DestinationArn"))
-	***REMOVED***
-	if s.DestinationArn != nil && len(*s.DestinationArn) < 1 ***REMOVED***
+	}
+	if s.DestinationArn != nil && len(*s.DestinationArn) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("DestinationArn", 1))
-	***REMOVED***
-	if s.FilterName == nil ***REMOVED***
+	}
+	if s.FilterName == nil {
 		invalidParams.Add(request.NewErrParamRequired("FilterName"))
-	***REMOVED***
-	if s.FilterName != nil && len(*s.FilterName) < 1 ***REMOVED***
+	}
+	if s.FilterName != nil && len(*s.FilterName) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("FilterName", 1))
-	***REMOVED***
-	if s.FilterPattern == nil ***REMOVED***
+	}
+	if s.FilterPattern == nil {
 		invalidParams.Add(request.NewErrParamRequired("FilterPattern"))
-	***REMOVED***
-	if s.LogGroupName == nil ***REMOVED***
+	}
+	if s.LogGroupName == nil {
 		invalidParams.Add(request.NewErrParamRequired("LogGroupName"))
-	***REMOVED***
-	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 ***REMOVED***
+	}
+	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("LogGroupName", 1))
-	***REMOVED***
-	if s.RoleArn != nil && len(*s.RoleArn) < 1 ***REMOVED***
+	}
+	if s.RoleArn != nil && len(*s.RoleArn) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("RoleArn", 1))
-	***REMOVED***
+	}
 
-	if invalidParams.Len() > 0 ***REMOVED***
+	if invalidParams.Len() > 0 {
 		return invalidParams
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetDestinationArn sets the DestinationArn field's value.
-func (s *PutSubscriptionFilterInput) SetDestinationArn(v string) *PutSubscriptionFilterInput ***REMOVED***
+func (s *PutSubscriptionFilterInput) SetDestinationArn(v string) *PutSubscriptionFilterInput {
 	s.DestinationArn = &v
 	return s
-***REMOVED***
+}
 
 // SetDistribution sets the Distribution field's value.
-func (s *PutSubscriptionFilterInput) SetDistribution(v string) *PutSubscriptionFilterInput ***REMOVED***
+func (s *PutSubscriptionFilterInput) SetDistribution(v string) *PutSubscriptionFilterInput {
 	s.Distribution = &v
 	return s
-***REMOVED***
+}
 
 // SetFilterName sets the FilterName field's value.
-func (s *PutSubscriptionFilterInput) SetFilterName(v string) *PutSubscriptionFilterInput ***REMOVED***
+func (s *PutSubscriptionFilterInput) SetFilterName(v string) *PutSubscriptionFilterInput {
 	s.FilterName = &v
 	return s
-***REMOVED***
+}
 
 // SetFilterPattern sets the FilterPattern field's value.
-func (s *PutSubscriptionFilterInput) SetFilterPattern(v string) *PutSubscriptionFilterInput ***REMOVED***
+func (s *PutSubscriptionFilterInput) SetFilterPattern(v string) *PutSubscriptionFilterInput {
 	s.FilterPattern = &v
 	return s
-***REMOVED***
+}
 
 // SetLogGroupName sets the LogGroupName field's value.
-func (s *PutSubscriptionFilterInput) SetLogGroupName(v string) *PutSubscriptionFilterInput ***REMOVED***
+func (s *PutSubscriptionFilterInput) SetLogGroupName(v string) *PutSubscriptionFilterInput {
 	s.LogGroupName = &v
 	return s
-***REMOVED***
+}
 
 // SetRoleArn sets the RoleArn field's value.
-func (s *PutSubscriptionFilterInput) SetRoleArn(v string) *PutSubscriptionFilterInput ***REMOVED***
+func (s *PutSubscriptionFilterInput) SetRoleArn(v string) *PutSubscriptionFilterInput {
 	s.RoleArn = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/PutSubscriptionFilterOutput
-type PutSubscriptionFilterOutput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
-***REMOVED***
+type PutSubscriptionFilterOutput struct {
+	_ struct{} `type:"structure"`
+}
 
 // String returns the string representation
-func (s PutSubscriptionFilterOutput) String() string ***REMOVED***
+func (s PutSubscriptionFilterOutput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s PutSubscriptionFilterOutput) GoString() string ***REMOVED***
+func (s PutSubscriptionFilterOutput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Represents the rejected events.
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/RejectedLogEventsInfo
-type RejectedLogEventsInfo struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type RejectedLogEventsInfo struct {
+	_ struct{} `type:"structure"`
 
 	// The expired log events.
 	ExpiredLogEventEndIndex *int64 `locationName:"expiredLogEventEndIndex" type:"integer"`
@@ -7076,41 +7076,41 @@ type RejectedLogEventsInfo struct ***REMOVED***
 
 	// The log events that are too old.
 	TooOldLogEventEndIndex *int64 `locationName:"tooOldLogEventEndIndex" type:"integer"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s RejectedLogEventsInfo) String() string ***REMOVED***
+func (s RejectedLogEventsInfo) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s RejectedLogEventsInfo) GoString() string ***REMOVED***
+func (s RejectedLogEventsInfo) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // SetExpiredLogEventEndIndex sets the ExpiredLogEventEndIndex field's value.
-func (s *RejectedLogEventsInfo) SetExpiredLogEventEndIndex(v int64) *RejectedLogEventsInfo ***REMOVED***
+func (s *RejectedLogEventsInfo) SetExpiredLogEventEndIndex(v int64) *RejectedLogEventsInfo {
 	s.ExpiredLogEventEndIndex = &v
 	return s
-***REMOVED***
+}
 
 // SetTooNewLogEventStartIndex sets the TooNewLogEventStartIndex field's value.
-func (s *RejectedLogEventsInfo) SetTooNewLogEventStartIndex(v int64) *RejectedLogEventsInfo ***REMOVED***
+func (s *RejectedLogEventsInfo) SetTooNewLogEventStartIndex(v int64) *RejectedLogEventsInfo {
 	s.TooNewLogEventStartIndex = &v
 	return s
-***REMOVED***
+}
 
 // SetTooOldLogEventEndIndex sets the TooOldLogEventEndIndex field's value.
-func (s *RejectedLogEventsInfo) SetTooOldLogEventEndIndex(v int64) *RejectedLogEventsInfo ***REMOVED***
+func (s *RejectedLogEventsInfo) SetTooOldLogEventEndIndex(v int64) *RejectedLogEventsInfo {
 	s.TooOldLogEventEndIndex = &v
 	return s
-***REMOVED***
+}
 
 // A policy enabling one or more entities to put logs to a log group in this
 // account.
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/ResourcePolicy
-type ResourcePolicy struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type ResourcePolicy struct {
+	_ struct{} `type:"structure"`
 
 	// Time stamp showing when this policy was last updated, expressed as the number
 	// of milliseconds after Jan 1, 1970 00:00:00 UTC.
@@ -7121,74 +7121,74 @@ type ResourcePolicy struct ***REMOVED***
 
 	// The name of the resource policy.
 	PolicyName *string `locationName:"policyName" type:"string"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s ResourcePolicy) String() string ***REMOVED***
+func (s ResourcePolicy) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s ResourcePolicy) GoString() string ***REMOVED***
+func (s ResourcePolicy) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // SetLastUpdatedTime sets the LastUpdatedTime field's value.
-func (s *ResourcePolicy) SetLastUpdatedTime(v int64) *ResourcePolicy ***REMOVED***
+func (s *ResourcePolicy) SetLastUpdatedTime(v int64) *ResourcePolicy {
 	s.LastUpdatedTime = &v
 	return s
-***REMOVED***
+}
 
 // SetPolicyDocument sets the PolicyDocument field's value.
-func (s *ResourcePolicy) SetPolicyDocument(v string) *ResourcePolicy ***REMOVED***
+func (s *ResourcePolicy) SetPolicyDocument(v string) *ResourcePolicy {
 	s.PolicyDocument = &v
 	return s
-***REMOVED***
+}
 
 // SetPolicyName sets the PolicyName field's value.
-func (s *ResourcePolicy) SetPolicyName(v string) *ResourcePolicy ***REMOVED***
+func (s *ResourcePolicy) SetPolicyName(v string) *ResourcePolicy {
 	s.PolicyName = &v
 	return s
-***REMOVED***
+}
 
 // Represents the search status of a log stream.
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/SearchedLogStream
-type SearchedLogStream struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type SearchedLogStream struct {
+	_ struct{} `type:"structure"`
 
 	// The name of the log stream.
 	LogStreamName *string `locationName:"logStreamName" min:"1" type:"string"`
 
 	// Indicates whether all the events in this log stream were searched.
 	SearchedCompletely *bool `locationName:"searchedCompletely" type:"boolean"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s SearchedLogStream) String() string ***REMOVED***
+func (s SearchedLogStream) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s SearchedLogStream) GoString() string ***REMOVED***
+func (s SearchedLogStream) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // SetLogStreamName sets the LogStreamName field's value.
-func (s *SearchedLogStream) SetLogStreamName(v string) *SearchedLogStream ***REMOVED***
+func (s *SearchedLogStream) SetLogStreamName(v string) *SearchedLogStream {
 	s.LogStreamName = &v
 	return s
-***REMOVED***
+}
 
 // SetSearchedCompletely sets the SearchedCompletely field's value.
-func (s *SearchedLogStream) SetSearchedCompletely(v bool) *SearchedLogStream ***REMOVED***
+func (s *SearchedLogStream) SetSearchedCompletely(v bool) *SearchedLogStream {
 	s.SearchedCompletely = &v
 	return s
-***REMOVED***
+}
 
 // Represents a subscription filter.
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/SubscriptionFilter
-type SubscriptionFilter struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type SubscriptionFilter struct {
+	_ struct{} `type:"structure"`
 
 	// The creation time of the subscription filter, expressed as the number of
 	// milliseconds after Jan 1, 1970 00:00:00 UTC.
@@ -7214,63 +7214,63 @@ type SubscriptionFilter struct ***REMOVED***
 	LogGroupName *string `locationName:"logGroupName" min:"1" type:"string"`
 
 	RoleArn *string `locationName:"roleArn" min:"1" type:"string"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s SubscriptionFilter) String() string ***REMOVED***
+func (s SubscriptionFilter) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s SubscriptionFilter) GoString() string ***REMOVED***
+func (s SubscriptionFilter) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // SetCreationTime sets the CreationTime field's value.
-func (s *SubscriptionFilter) SetCreationTime(v int64) *SubscriptionFilter ***REMOVED***
+func (s *SubscriptionFilter) SetCreationTime(v int64) *SubscriptionFilter {
 	s.CreationTime = &v
 	return s
-***REMOVED***
+}
 
 // SetDestinationArn sets the DestinationArn field's value.
-func (s *SubscriptionFilter) SetDestinationArn(v string) *SubscriptionFilter ***REMOVED***
+func (s *SubscriptionFilter) SetDestinationArn(v string) *SubscriptionFilter {
 	s.DestinationArn = &v
 	return s
-***REMOVED***
+}
 
 // SetDistribution sets the Distribution field's value.
-func (s *SubscriptionFilter) SetDistribution(v string) *SubscriptionFilter ***REMOVED***
+func (s *SubscriptionFilter) SetDistribution(v string) *SubscriptionFilter {
 	s.Distribution = &v
 	return s
-***REMOVED***
+}
 
 // SetFilterName sets the FilterName field's value.
-func (s *SubscriptionFilter) SetFilterName(v string) *SubscriptionFilter ***REMOVED***
+func (s *SubscriptionFilter) SetFilterName(v string) *SubscriptionFilter {
 	s.FilterName = &v
 	return s
-***REMOVED***
+}
 
 // SetFilterPattern sets the FilterPattern field's value.
-func (s *SubscriptionFilter) SetFilterPattern(v string) *SubscriptionFilter ***REMOVED***
+func (s *SubscriptionFilter) SetFilterPattern(v string) *SubscriptionFilter {
 	s.FilterPattern = &v
 	return s
-***REMOVED***
+}
 
 // SetLogGroupName sets the LogGroupName field's value.
-func (s *SubscriptionFilter) SetLogGroupName(v string) *SubscriptionFilter ***REMOVED***
+func (s *SubscriptionFilter) SetLogGroupName(v string) *SubscriptionFilter {
 	s.LogGroupName = &v
 	return s
-***REMOVED***
+}
 
 // SetRoleArn sets the RoleArn field's value.
-func (s *SubscriptionFilter) SetRoleArn(v string) *SubscriptionFilter ***REMOVED***
+func (s *SubscriptionFilter) SetRoleArn(v string) *SubscriptionFilter {
 	s.RoleArn = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/TagLogGroupRequest
-type TagLogGroupInput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type TagLogGroupInput struct {
+	_ struct{} `type:"structure"`
 
 	// The name of the log group.
 	//
@@ -7281,70 +7281,70 @@ type TagLogGroupInput struct ***REMOVED***
 	//
 	// Tags is a required field
 	Tags map[string]*string `locationName:"tags" min:"1" type:"map" required:"true"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s TagLogGroupInput) String() string ***REMOVED***
+func (s TagLogGroupInput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s TagLogGroupInput) GoString() string ***REMOVED***
+func (s TagLogGroupInput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Validate inspects the fields of the type to determine if they are valid.
-func (s *TagLogGroupInput) Validate() error ***REMOVED***
-	invalidParams := request.ErrInvalidParams***REMOVED***Context: "TagLogGroupInput"***REMOVED***
-	if s.LogGroupName == nil ***REMOVED***
+func (s *TagLogGroupInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "TagLogGroupInput"}
+	if s.LogGroupName == nil {
 		invalidParams.Add(request.NewErrParamRequired("LogGroupName"))
-	***REMOVED***
-	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 ***REMOVED***
+	}
+	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("LogGroupName", 1))
-	***REMOVED***
-	if s.Tags == nil ***REMOVED***
+	}
+	if s.Tags == nil {
 		invalidParams.Add(request.NewErrParamRequired("Tags"))
-	***REMOVED***
-	if s.Tags != nil && len(s.Tags) < 1 ***REMOVED***
+	}
+	if s.Tags != nil && len(s.Tags) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("Tags", 1))
-	***REMOVED***
+	}
 
-	if invalidParams.Len() > 0 ***REMOVED***
+	if invalidParams.Len() > 0 {
 		return invalidParams
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetLogGroupName sets the LogGroupName field's value.
-func (s *TagLogGroupInput) SetLogGroupName(v string) *TagLogGroupInput ***REMOVED***
+func (s *TagLogGroupInput) SetLogGroupName(v string) *TagLogGroupInput {
 	s.LogGroupName = &v
 	return s
-***REMOVED***
+}
 
 // SetTags sets the Tags field's value.
-func (s *TagLogGroupInput) SetTags(v map[string]*string) *TagLogGroupInput ***REMOVED***
+func (s *TagLogGroupInput) SetTags(v map[string]*string) *TagLogGroupInput {
 	s.Tags = v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/TagLogGroupOutput
-type TagLogGroupOutput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
-***REMOVED***
+type TagLogGroupOutput struct {
+	_ struct{} `type:"structure"`
+}
 
 // String returns the string representation
-func (s TagLogGroupOutput) String() string ***REMOVED***
+func (s TagLogGroupOutput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s TagLogGroupOutput) GoString() string ***REMOVED***
+func (s TagLogGroupOutput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/TestMetricFilterRequest
-type TestMetricFilterInput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type TestMetricFilterInput struct {
+	_ struct{} `type:"structure"`
 
 	// A symbolic description of how CloudWatch Logs should interpret the data in
 	// each log event. For example, a log event may contain time stamps, IP addresses,
@@ -7358,76 +7358,76 @@ type TestMetricFilterInput struct ***REMOVED***
 	//
 	// LogEventMessages is a required field
 	LogEventMessages []*string `locationName:"logEventMessages" min:"1" type:"list" required:"true"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s TestMetricFilterInput) String() string ***REMOVED***
+func (s TestMetricFilterInput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s TestMetricFilterInput) GoString() string ***REMOVED***
+func (s TestMetricFilterInput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Validate inspects the fields of the type to determine if they are valid.
-func (s *TestMetricFilterInput) Validate() error ***REMOVED***
-	invalidParams := request.ErrInvalidParams***REMOVED***Context: "TestMetricFilterInput"***REMOVED***
-	if s.FilterPattern == nil ***REMOVED***
+func (s *TestMetricFilterInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "TestMetricFilterInput"}
+	if s.FilterPattern == nil {
 		invalidParams.Add(request.NewErrParamRequired("FilterPattern"))
-	***REMOVED***
-	if s.LogEventMessages == nil ***REMOVED***
+	}
+	if s.LogEventMessages == nil {
 		invalidParams.Add(request.NewErrParamRequired("LogEventMessages"))
-	***REMOVED***
-	if s.LogEventMessages != nil && len(s.LogEventMessages) < 1 ***REMOVED***
+	}
+	if s.LogEventMessages != nil && len(s.LogEventMessages) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("LogEventMessages", 1))
-	***REMOVED***
+	}
 
-	if invalidParams.Len() > 0 ***REMOVED***
+	if invalidParams.Len() > 0 {
 		return invalidParams
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetFilterPattern sets the FilterPattern field's value.
-func (s *TestMetricFilterInput) SetFilterPattern(v string) *TestMetricFilterInput ***REMOVED***
+func (s *TestMetricFilterInput) SetFilterPattern(v string) *TestMetricFilterInput {
 	s.FilterPattern = &v
 	return s
-***REMOVED***
+}
 
 // SetLogEventMessages sets the LogEventMessages field's value.
-func (s *TestMetricFilterInput) SetLogEventMessages(v []*string) *TestMetricFilterInput ***REMOVED***
+func (s *TestMetricFilterInput) SetLogEventMessages(v []*string) *TestMetricFilterInput {
 	s.LogEventMessages = v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/TestMetricFilterResponse
-type TestMetricFilterOutput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type TestMetricFilterOutput struct {
+	_ struct{} `type:"structure"`
 
 	// The matched events.
 	Matches []*MetricFilterMatchRecord `locationName:"matches" type:"list"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s TestMetricFilterOutput) String() string ***REMOVED***
+func (s TestMetricFilterOutput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s TestMetricFilterOutput) GoString() string ***REMOVED***
+func (s TestMetricFilterOutput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // SetMatches sets the Matches field's value.
-func (s *TestMetricFilterOutput) SetMatches(v []*MetricFilterMatchRecord) *TestMetricFilterOutput ***REMOVED***
+func (s *TestMetricFilterOutput) SetMatches(v []*MetricFilterMatchRecord) *TestMetricFilterOutput {
 	s.Matches = v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/UntagLogGroupRequest
-type UntagLogGroupInput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type UntagLogGroupInput struct {
+	_ struct{} `type:"structure"`
 
 	// The name of the log group.
 	//
@@ -7438,66 +7438,66 @@ type UntagLogGroupInput struct ***REMOVED***
 	//
 	// Tags is a required field
 	Tags []*string `locationName:"tags" min:"1" type:"list" required:"true"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s UntagLogGroupInput) String() string ***REMOVED***
+func (s UntagLogGroupInput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s UntagLogGroupInput) GoString() string ***REMOVED***
+func (s UntagLogGroupInput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Validate inspects the fields of the type to determine if they are valid.
-func (s *UntagLogGroupInput) Validate() error ***REMOVED***
-	invalidParams := request.ErrInvalidParams***REMOVED***Context: "UntagLogGroupInput"***REMOVED***
-	if s.LogGroupName == nil ***REMOVED***
+func (s *UntagLogGroupInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "UntagLogGroupInput"}
+	if s.LogGroupName == nil {
 		invalidParams.Add(request.NewErrParamRequired("LogGroupName"))
-	***REMOVED***
-	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 ***REMOVED***
+	}
+	if s.LogGroupName != nil && len(*s.LogGroupName) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("LogGroupName", 1))
-	***REMOVED***
-	if s.Tags == nil ***REMOVED***
+	}
+	if s.Tags == nil {
 		invalidParams.Add(request.NewErrParamRequired("Tags"))
-	***REMOVED***
-	if s.Tags != nil && len(s.Tags) < 1 ***REMOVED***
+	}
+	if s.Tags != nil && len(s.Tags) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("Tags", 1))
-	***REMOVED***
+	}
 
-	if invalidParams.Len() > 0 ***REMOVED***
+	if invalidParams.Len() > 0 {
 		return invalidParams
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetLogGroupName sets the LogGroupName field's value.
-func (s *UntagLogGroupInput) SetLogGroupName(v string) *UntagLogGroupInput ***REMOVED***
+func (s *UntagLogGroupInput) SetLogGroupName(v string) *UntagLogGroupInput {
 	s.LogGroupName = &v
 	return s
-***REMOVED***
+}
 
 // SetTags sets the Tags field's value.
-func (s *UntagLogGroupInput) SetTags(v []*string) *UntagLogGroupInput ***REMOVED***
+func (s *UntagLogGroupInput) SetTags(v []*string) *UntagLogGroupInput {
 	s.Tags = v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/logs-2014-03-28/UntagLogGroupOutput
-type UntagLogGroupOutput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
-***REMOVED***
+type UntagLogGroupOutput struct {
+	_ struct{} `type:"structure"`
+}
 
 // String returns the string representation
-func (s UntagLogGroupOutput) String() string ***REMOVED***
+func (s UntagLogGroupOutput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s UntagLogGroupOutput) GoString() string ***REMOVED***
+func (s UntagLogGroupOutput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // The method used to distribute log data to the destination, which can be either
 // random or grouped by log stream.

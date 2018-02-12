@@ -16,69 +16,69 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestVolumeInspectError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestVolumeInspectError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
-	***REMOVED***
+	}
 
 	_, err := client.VolumeInspect(context.Background(), "nothing")
 	testutil.ErrorContains(t, err, "Error response from daemon: Server error")
-***REMOVED***
+}
 
-func TestVolumeInspectNotFound(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestVolumeInspectNotFound(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusNotFound, "Server error")),
-	***REMOVED***
+	}
 
 	_, err := client.VolumeInspect(context.Background(), "unknown")
 	assert.True(t, IsErrNotFound(err))
-***REMOVED***
+}
 
-func TestVolumeInspectWithEmptyID(t *testing.T) ***REMOVED***
+func TestVolumeInspectWithEmptyID(t *testing.T) {
 	expectedURL := "/volumes/"
 
-	client := &Client***REMOVED***
-		client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
+	client := &Client{
+		client: newMockClient(func(req *http.Request) (*http.Response, error) {
 			assert.Equal(t, req.URL.Path, expectedURL)
-			return &http.Response***REMOVED***
+			return &http.Response{
 				StatusCode: http.StatusNotFound,
 				Body:       ioutil.NopCloser(bytes.NewReader(nil)),
-			***REMOVED***, nil
-		***REMOVED***),
-	***REMOVED***
+			}, nil
+		}),
+	}
 	_, err := client.VolumeInspect(context.Background(), "")
 	testutil.ErrorContains(t, err, "No such volume: ")
 
-***REMOVED***
+}
 
-func TestVolumeInspect(t *testing.T) ***REMOVED***
+func TestVolumeInspect(t *testing.T) {
 	expectedURL := "/volumes/volume_id"
-	expected := types.Volume***REMOVED***
+	expected := types.Volume{
 		Name:       "name",
 		Driver:     "driver",
 		Mountpoint: "mountpoint",
-	***REMOVED***
+	}
 
-	client := &Client***REMOVED***
-		client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-			if !strings.HasPrefix(req.URL.Path, expectedURL) ***REMOVED***
+	client := &Client{
+		client: newMockClient(func(req *http.Request) (*http.Response, error) {
+			if !strings.HasPrefix(req.URL.Path, expectedURL) {
 				return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, req.URL)
-			***REMOVED***
-			if req.Method != "GET" ***REMOVED***
+			}
+			if req.Method != "GET" {
 				return nil, fmt.Errorf("expected GET method, got %s", req.Method)
-			***REMOVED***
+			}
 			content, err := json.Marshal(expected)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
-			return &http.Response***REMOVED***
+			}
+			return &http.Response{
 				StatusCode: http.StatusOK,
 				Body:       ioutil.NopCloser(bytes.NewReader(content)),
-			***REMOVED***, nil
-		***REMOVED***),
-	***REMOVED***
+			}, nil
+		}),
+	}
 
 	volume, err := client.VolumeInspect(context.Background(), "volume_id")
 	require.NoError(t, err)
 	assert.Equal(t, expected, volume)
-***REMOVED***
+}

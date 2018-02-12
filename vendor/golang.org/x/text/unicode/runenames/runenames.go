@@ -15,28 +15,28 @@ import (
 )
 
 // Name returns the name for r.
-func Name(r rune) string ***REMOVED***
-	i := sort.Search(len(table0), func(j int) bool ***REMOVED***
+func Name(r rune) string {
+	i := sort.Search(len(table0), func(j int) bool {
 		e := table0[j]
 		rOffset := rune(e >> shiftRuneOffset)
 		return r < rOffset
-	***REMOVED***)
-	if i == 0 ***REMOVED***
+	})
+	if i == 0 {
 		return ""
-	***REMOVED***
+	}
 
 	e := table0[i-1]
 	rOffset := rune(e >> shiftRuneOffset)
 	rLength := rune(e>>shiftRuneLength) & maskRuneLength
-	if r >= rOffset+rLength ***REMOVED***
+	if r >= rOffset+rLength {
 		return ""
-	***REMOVED***
+	}
 
-	if (e>>shiftDirect)&maskDirect != 0 ***REMOVED***
+	if (e>>shiftDirect)&maskDirect != 0 {
 		o := int(e>>shiftDataOffset) & maskDataOffset
 		n := int(e>>shiftDataLength) & maskDataLength
 		return data[o : o+n]
-	***REMOVED***
+	}
 
 	base := uint32(e>>shiftDataBase) & maskDataBase
 	base <<= dataBaseUnit
@@ -45,4 +45,4 @@ func Name(r rune) string ***REMOVED***
 	d0 := base + uint32(table1[j-1]) // dataOffset
 	d1 := base + uint32(table1[j-0]) // dataOffset + dataLength
 	return data[d0:d1]
-***REMOVED***
+}

@@ -20,23 +20,23 @@ import (
 
 const ImplementsGetwd = true
 
-func Getwd() (string, error) ***REMOVED***
+func Getwd() (string, error) {
 	buf := make([]byte, 2048)
-	attrs, err := getAttrList(".", attrList***REMOVED***CommonAttr: attrCmnFullpath***REMOVED***, buf, 0)
-	if err == nil && len(attrs) == 1 && len(attrs[0]) >= 2 ***REMOVED***
+	attrs, err := getAttrList(".", attrList{CommonAttr: attrCmnFullpath}, buf, 0)
+	if err == nil && len(attrs) == 1 && len(attrs[0]) >= 2 {
 		wd := string(attrs[0])
 		// Sanity check that it's an absolute path and ends
 		// in a null byte, which we then strip.
-		if wd[0] == '/' && wd[len(wd)-1] == 0 ***REMOVED***
+		if wd[0] == '/' && wd[len(wd)-1] == 0 {
 			return wd[:len(wd)-1], nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	// If pkg/os/getwd.go gets ENOTSUP, it will fall back to the
 	// slow algorithm.
 	return "", ENOTSUP
-***REMOVED***
+}
 
-type SockaddrDatalink struct ***REMOVED***
+type SockaddrDatalink struct {
 	Len    uint8
 	Family uint8
 	Index  uint16
@@ -46,10 +46,10 @@ type SockaddrDatalink struct ***REMOVED***
 	Slen   uint8
 	Data   [12]int8
 	raw    RawSockaddrDatalink
-***REMOVED***
+}
 
-// Translate "kern.hostname" to []_C_int***REMOVED***0,1,2,3***REMOVED***.
-func nametomib(name string) (mib []_C_int, err error) ***REMOVED***
+// Translate "kern.hostname" to []_C_int{0,1,2,3}.
+func nametomib(name string) (mib []_C_int, err error) {
 	const siz = unsafe.Sizeof(mib[0])
 
 	// NOTE(rsc): It seems strange to set the buffer to have
@@ -64,40 +64,40 @@ func nametomib(name string) (mib []_C_int, err error) ***REMOVED***
 
 	p := (*byte)(unsafe.Pointer(&buf[0]))
 	bytes, err := ByteSliceFromString(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// Magic sysctl: "setting" 0.3 to a string name
 	// lets you read back the array of integers form.
-	if err = sysctl([]_C_int***REMOVED***0, 3***REMOVED***, p, &n, &bytes[0], uintptr(len(name))); err != nil ***REMOVED***
+	if err = sysctl([]_C_int{0, 3}, p, &n, &bytes[0], uintptr(len(name))); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return buf[0 : n/siz], nil
-***REMOVED***
+}
 
-func direntIno(buf []byte) (uint64, bool) ***REMOVED***
-	return readInt(buf, unsafe.Offsetof(Dirent***REMOVED******REMOVED***.Ino), unsafe.Sizeof(Dirent***REMOVED******REMOVED***.Ino))
-***REMOVED***
+func direntIno(buf []byte) (uint64, bool) {
+	return readInt(buf, unsafe.Offsetof(Dirent{}.Ino), unsafe.Sizeof(Dirent{}.Ino))
+}
 
-func direntReclen(buf []byte) (uint64, bool) ***REMOVED***
-	return readInt(buf, unsafe.Offsetof(Dirent***REMOVED******REMOVED***.Reclen), unsafe.Sizeof(Dirent***REMOVED******REMOVED***.Reclen))
-***REMOVED***
+func direntReclen(buf []byte) (uint64, bool) {
+	return readInt(buf, unsafe.Offsetof(Dirent{}.Reclen), unsafe.Sizeof(Dirent{}.Reclen))
+}
 
-func direntNamlen(buf []byte) (uint64, bool) ***REMOVED***
-	return readInt(buf, unsafe.Offsetof(Dirent***REMOVED******REMOVED***.Namlen), unsafe.Sizeof(Dirent***REMOVED******REMOVED***.Namlen))
-***REMOVED***
+func direntNamlen(buf []byte) (uint64, bool) {
+	return readInt(buf, unsafe.Offsetof(Dirent{}.Namlen), unsafe.Sizeof(Dirent{}.Namlen))
+}
 
 //sys   ptrace(request int, pid int, addr uintptr, data uintptr) (err error)
-func PtraceAttach(pid int) (err error) ***REMOVED*** return ptrace(PT_ATTACH, pid, 0, 0) ***REMOVED***
-func PtraceDetach(pid int) (err error) ***REMOVED*** return ptrace(PT_DETACH, pid, 0, 0) ***REMOVED***
+func PtraceAttach(pid int) (err error) { return ptrace(PT_ATTACH, pid, 0, 0) }
+func PtraceDetach(pid int) (err error) { return ptrace(PT_DETACH, pid, 0, 0) }
 
 const (
 	attrBitMapCount = 5
 	attrCmnFullpath = 0x08000000
 )
 
-type attrList struct ***REMOVED***
+type attrList struct {
 	bitmapCount uint16
 	_           uint16
 	CommonAttr  uint32
@@ -105,19 +105,19 @@ type attrList struct ***REMOVED***
 	DirAttr     uint32
 	FileAttr    uint32
 	Forkattr    uint32
-***REMOVED***
+}
 
-func getAttrList(path string, attrList attrList, attrBuf []byte, options uint) (attrs [][]byte, err error) ***REMOVED***
-	if len(attrBuf) < 4 ***REMOVED***
+func getAttrList(path string, attrList attrList, attrBuf []byte, options uint) (attrs [][]byte, err error) {
+	if len(attrBuf) < 4 {
 		return nil, errorspkg.New("attrBuf too small")
-	***REMOVED***
+	}
 	attrList.bitmapCount = attrBitMapCount
 
 	var _p0 *byte
 	_p0, err = BytePtrFromString(path)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	_, _, e1 := Syscall6(
 		SYS_GETATTRLIST,
@@ -128,69 +128,69 @@ func getAttrList(path string, attrList attrList, attrBuf []byte, options uint) (
 		uintptr(options),
 		0,
 	)
-	if e1 != 0 ***REMOVED***
+	if e1 != 0 {
 		return nil, e1
-	***REMOVED***
+	}
 	size := *(*uint32)(unsafe.Pointer(&attrBuf[0]))
 
 	// dat is the section of attrBuf that contains valid data,
 	// without the 4 byte length header. All attribute offsets
 	// are relative to dat.
 	dat := attrBuf
-	if int(size) < len(attrBuf) ***REMOVED***
+	if int(size) < len(attrBuf) {
 		dat = dat[:size]
-	***REMOVED***
+	}
 	dat = dat[4:] // remove length prefix
 
-	for i := uint32(0); int(i) < len(dat); ***REMOVED***
+	for i := uint32(0); int(i) < len(dat); {
 		header := dat[i:]
-		if len(header) < 8 ***REMOVED***
+		if len(header) < 8 {
 			return attrs, errorspkg.New("truncated attribute header")
-		***REMOVED***
+		}
 		datOff := *(*int32)(unsafe.Pointer(&header[0]))
 		attrLen := *(*uint32)(unsafe.Pointer(&header[4]))
-		if datOff < 0 || uint32(datOff)+attrLen > uint32(len(dat)) ***REMOVED***
+		if datOff < 0 || uint32(datOff)+attrLen > uint32(len(dat)) {
 			return attrs, errorspkg.New("truncated results; attrBuf too small")
-		***REMOVED***
+		}
 		end := uint32(datOff) + attrLen
 		attrs = append(attrs, dat[datOff:end])
 		i = end
-		if r := i % 4; r != 0 ***REMOVED***
+		if r := i % 4; r != 0 {
 			i += (4 - r)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}
 
 //sysnb pipe() (r int, w int, err error)
 
-func Pipe(p []int) (err error) ***REMOVED***
-	if len(p) != 2 ***REMOVED***
+func Pipe(p []int) (err error) {
+	if len(p) != 2 {
 		return EINVAL
-	***REMOVED***
+	}
 	p[0], p[1], err = pipe()
 	return
-***REMOVED***
+}
 
-func Getfsstat(buf []Statfs_t, flags int) (n int, err error) ***REMOVED***
+func Getfsstat(buf []Statfs_t, flags int) (n int, err error) {
 	var _p0 unsafe.Pointer
 	var bufsize uintptr
-	if len(buf) > 0 ***REMOVED***
+	if len(buf) > 0 {
 		_p0 = unsafe.Pointer(&buf[0])
-		bufsize = unsafe.Sizeof(Statfs_t***REMOVED******REMOVED***) * uintptr(len(buf))
-	***REMOVED***
+		bufsize = unsafe.Sizeof(Statfs_t{}) * uintptr(len(buf))
+	}
 	r0, _, e1 := Syscall(SYS_GETFSSTAT64, uintptr(_p0), bufsize, uintptr(flags))
 	n = int(r0)
-	if e1 != 0 ***REMOVED***
+	if e1 != 0 {
 		err = e1
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func utimensat(dirfd int, path string, times *[2]Timespec, flags int) error ***REMOVED***
+func utimensat(dirfd int, path string, times *[2]Timespec, flags int) error {
 	// Darwin doesn't support SYS_UTIMENSAT
 	return ENOSYS
-***REMOVED***
+}
 
 /*
  * Wrapped
@@ -198,7 +198,7 @@ func utimensat(dirfd int, path string, times *[2]Timespec, flags int) error ***R
 
 //sys	kill(pid int, signum int, posix int) (err error)
 
-func Kill(pid int, signum syscall.Signal) (err error) ***REMOVED*** return kill(pid, int(signum), 1) ***REMOVED***
+func Kill(pid int, signum syscall.Signal) (err error) { return kill(pid, int(signum), 1) }
 
 //sys	ioctl(fd int, req uint, arg uintptr) (err error)
 
@@ -207,37 +207,37 @@ func Kill(pid int, signum syscall.Signal) (err error) ***REMOVED*** return kill(
 
 // IoctlSetInt performs an ioctl operation which sets an integer value
 // on fd, using the specified request number.
-func IoctlSetInt(fd int, req uint, value int) error ***REMOVED***
+func IoctlSetInt(fd int, req uint, value int) error {
 	return ioctl(fd, req, uintptr(value))
-***REMOVED***
+}
 
-func IoctlSetWinsize(fd int, req uint, value *Winsize) error ***REMOVED***
+func IoctlSetWinsize(fd int, req uint, value *Winsize) error {
 	return ioctl(fd, req, uintptr(unsafe.Pointer(value)))
-***REMOVED***
+}
 
-func IoctlSetTermios(fd int, req uint, value *Termios) error ***REMOVED***
+func IoctlSetTermios(fd int, req uint, value *Termios) error {
 	return ioctl(fd, req, uintptr(unsafe.Pointer(value)))
-***REMOVED***
+}
 
 // IoctlGetInt performs an ioctl operation which gets an integer value
 // from fd, using the specified request number.
-func IoctlGetInt(fd int, req uint) (int, error) ***REMOVED***
+func IoctlGetInt(fd int, req uint) (int, error) {
 	var value int
 	err := ioctl(fd, req, uintptr(unsafe.Pointer(&value)))
 	return value, err
-***REMOVED***
+}
 
-func IoctlGetWinsize(fd int, req uint) (*Winsize, error) ***REMOVED***
+func IoctlGetWinsize(fd int, req uint) (*Winsize, error) {
 	var value Winsize
 	err := ioctl(fd, req, uintptr(unsafe.Pointer(&value)))
 	return &value, err
-***REMOVED***
+}
 
-func IoctlGetTermios(fd int, req uint) (*Termios, error) ***REMOVED***
+func IoctlGetTermios(fd int, req uint) (*Termios, error) {
 	var value Termios
 	err := ioctl(fd, req, uintptr(unsafe.Pointer(&value)))
 	return &value, err
-***REMOVED***
+}
 
 /*
  * Exposed directly

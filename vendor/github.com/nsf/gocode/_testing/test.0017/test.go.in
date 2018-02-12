@@ -1,14 +1,14 @@
 package main
 
-func a(a, b, c int) int ***REMOVED***
+func a(a, b, c int) int {
 	return 123
-***REMOVED***
+}
 
-func main() ***REMOVED***
+func main() {
 	
-***REMOVED***
+}
 
-func b(a, b, c string) string ***REMOVED***
+func b(a, b, c string) string {
 	return "abc"
-***REMOVED***
+}
 

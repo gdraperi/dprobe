@@ -6,24 +6,24 @@ import (
 	localos "os"
 )
 
-func A() localos.Error ***REMOVED***
+func A() localos.Error {
 	return nil
-***REMOVED***
+}
 
 // B() is defined in file 'b.go'
 var test = B()
 
-type Tester struct ***REMOVED***
+type Tester struct {
 	a, b, c, d int
-***REMOVED***
+}
 
-func (t *Tester) SetA() ***REMOVED***
+func (t *Tester) SetA() {
 	t.a = 31337
-***REMOVED***
+}
 
-func (t *Tester) SetB() ***REMOVED***
+func (t *Tester) SetB() {
 	t.b = 31337
-***REMOVED***
+}
 
 Tester.
 

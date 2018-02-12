@@ -33,10 +33,10 @@ import (
 	"strconv"
 )
 
-func MarshalJSONEnum(m map[int32]string, value int32) ([]byte, error) ***REMOVED***
+func MarshalJSONEnum(m map[int32]string, value int32) ([]byte, error) {
 	s, ok := m[value]
-	if !ok ***REMOVED***
+	if !ok {
 		s = strconv.Itoa(int(value))
-	***REMOVED***
+	}
 	return json.Marshal(s)
-***REMOVED***
+}

@@ -14,98 +14,98 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func (s *DockerSuite) TestInspectAPIContainerResponse(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestInspectAPIContainerResponse(c *check.C) {
 	out, _ := dockerCmd(c, "run", "-d", "busybox", "true")
 
 	cleanedContainerID := strings.TrimSpace(out)
-	keysBase := []string***REMOVED***"Id", "State", "Created", "Path", "Args", "Config", "Image", "NetworkSettings",
-		"ResolvConfPath", "HostnamePath", "HostsPath", "LogPath", "Name", "Driver", "MountLabel", "ProcessLabel", "GraphDriver"***REMOVED***
+	keysBase := []string{"Id", "State", "Created", "Path", "Args", "Config", "Image", "NetworkSettings",
+		"ResolvConfPath", "HostnamePath", "HostsPath", "LogPath", "Name", "Driver", "MountLabel", "ProcessLabel", "GraphDriver"}
 
-	type acase struct ***REMOVED***
+	type acase struct {
 		version string
 		keys    []string
-	***REMOVED***
+	}
 
 	var cases []acase
 
-	if testEnv.OSType == "windows" ***REMOVED***
-		cases = []acase***REMOVED***
-			***REMOVED***"v1.25", append(keysBase, "Mounts")***REMOVED***,
-		***REMOVED***
+	if testEnv.OSType == "windows" {
+		cases = []acase{
+			{"v1.25", append(keysBase, "Mounts")},
+		}
 
-	***REMOVED*** else ***REMOVED***
-		cases = []acase***REMOVED***
-			***REMOVED***"v1.20", append(keysBase, "Mounts")***REMOVED***,
-			***REMOVED***"v1.19", append(keysBase, "Volumes", "VolumesRW")***REMOVED***,
-		***REMOVED***
-	***REMOVED***
+	} else {
+		cases = []acase{
+			{"v1.20", append(keysBase, "Mounts")},
+			{"v1.19", append(keysBase, "Volumes", "VolumesRW")},
+		}
+	}
 
-	for _, cs := range cases ***REMOVED***
+	for _, cs := range cases {
 		body := getInspectBody(c, cs.version, cleanedContainerID)
 
-		var inspectJSON map[string]interface***REMOVED******REMOVED***
+		var inspectJSON map[string]interface{}
 		err := json.Unmarshal(body, &inspectJSON)
 		c.Assert(err, checker.IsNil, check.Commentf("Unable to unmarshal body for version %s", cs.version))
 
-		for _, key := range cs.keys ***REMOVED***
+		for _, key := range cs.keys {
 			_, ok := inspectJSON[key]
 			c.Check(ok, checker.True, check.Commentf("%s does not exist in response for version %s", key, cs.version))
-		***REMOVED***
+		}
 
 		//Issue #6830: type not properly converted to JSON/back
 		_, ok := inspectJSON["Path"].(bool)
 		c.Assert(ok, checker.False, check.Commentf("Path of `true` should not be converted to boolean `true` via JSON marshalling"))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *DockerSuite) TestInspectAPIContainerVolumeDriverLegacy(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestInspectAPIContainerVolumeDriverLegacy(c *check.C) {
 	// No legacy implications for Windows
 	testRequires(c, DaemonIsLinux)
 	out, _ := dockerCmd(c, "run", "-d", "busybox", "true")
 
 	cleanedContainerID := strings.TrimSpace(out)
 
-	cases := []string***REMOVED***"v1.19", "v1.20"***REMOVED***
-	for _, version := range cases ***REMOVED***
+	cases := []string{"v1.19", "v1.20"}
+	for _, version := range cases {
 		body := getInspectBody(c, version, cleanedContainerID)
 
-		var inspectJSON map[string]interface***REMOVED******REMOVED***
+		var inspectJSON map[string]interface{}
 		err := json.Unmarshal(body, &inspectJSON)
 		c.Assert(err, checker.IsNil, check.Commentf("Unable to unmarshal body for version %s", version))
 
 		config, ok := inspectJSON["Config"]
 		c.Assert(ok, checker.True, check.Commentf("Unable to find 'Config'"))
-		cfg := config.(map[string]interface***REMOVED******REMOVED***)
+		cfg := config.(map[string]interface{})
 		_, ok = cfg["VolumeDriver"]
 		c.Assert(ok, checker.True, check.Commentf("API version %s expected to include VolumeDriver in 'Config'", version))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *DockerSuite) TestInspectAPIContainerVolumeDriver(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestInspectAPIContainerVolumeDriver(c *check.C) {
 	out, _ := dockerCmd(c, "run", "-d", "--volume-driver", "local", "busybox", "true")
 
 	cleanedContainerID := strings.TrimSpace(out)
 
 	body := getInspectBody(c, "v1.25", cleanedContainerID)
 
-	var inspectJSON map[string]interface***REMOVED******REMOVED***
+	var inspectJSON map[string]interface{}
 	err := json.Unmarshal(body, &inspectJSON)
 	c.Assert(err, checker.IsNil, check.Commentf("Unable to unmarshal body for version 1.25"))
 
 	config, ok := inspectJSON["Config"]
 	c.Assert(ok, checker.True, check.Commentf("Unable to find 'Config'"))
-	cfg := config.(map[string]interface***REMOVED******REMOVED***)
+	cfg := config.(map[string]interface{})
 	_, ok = cfg["VolumeDriver"]
 	c.Assert(ok, checker.False, check.Commentf("API version 1.25 expected to not include VolumeDriver in 'Config'"))
 
 	config, ok = inspectJSON["HostConfig"]
 	c.Assert(ok, checker.True, check.Commentf("Unable to find 'HostConfig'"))
-	cfg = config.(map[string]interface***REMOVED******REMOVED***)
+	cfg = config.(map[string]interface{})
 	_, ok = cfg["VolumeDriver"]
 	c.Assert(ok, checker.True, check.Commentf("API version 1.25 expected to include VolumeDriver in 'HostConfig'"))
-***REMOVED***
+}
 
-func (s *DockerSuite) TestInspectAPIImageResponse(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestInspectAPIImageResponse(c *check.C) {
 	dockerCmd(c, "tag", "busybox:latest", "busybox:mytag")
 	cli, err := client.NewEnvClient()
 	c.Assert(err, checker.IsNil)
@@ -117,34 +117,34 @@ func (s *DockerSuite) TestInspectAPIImageResponse(c *check.C) ***REMOVED***
 	c.Assert(imageJSON.RepoTags, checker.HasLen, 2)
 	assert.Contains(c, imageJSON.RepoTags, "busybox:latest")
 	assert.Contains(c, imageJSON.RepoTags, "busybox:mytag")
-***REMOVED***
+}
 
 // #17131, #17139, #17173
-func (s *DockerSuite) TestInspectAPIEmptyFieldsInConfigPre121(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestInspectAPIEmptyFieldsInConfigPre121(c *check.C) {
 	// Not relevant on Windows
 	testRequires(c, DaemonIsLinux)
 	out, _ := dockerCmd(c, "run", "-d", "busybox", "true")
 
 	cleanedContainerID := strings.TrimSpace(out)
 
-	cases := []string***REMOVED***"v1.19", "v1.20"***REMOVED***
-	for _, version := range cases ***REMOVED***
+	cases := []string{"v1.19", "v1.20"}
+	for _, version := range cases {
 		body := getInspectBody(c, version, cleanedContainerID)
 
-		var inspectJSON map[string]interface***REMOVED******REMOVED***
+		var inspectJSON map[string]interface{}
 		err := json.Unmarshal(body, &inspectJSON)
 		c.Assert(err, checker.IsNil, check.Commentf("Unable to unmarshal body for version %s", version))
 		config, ok := inspectJSON["Config"]
 		c.Assert(ok, checker.True, check.Commentf("Unable to find 'Config'"))
-		cfg := config.(map[string]interface***REMOVED******REMOVED***)
-		for _, f := range []string***REMOVED***"MacAddress", "NetworkDisabled", "ExposedPorts"***REMOVED*** ***REMOVED***
+		cfg := config.(map[string]interface{})
+		for _, f := range []string{"MacAddress", "NetworkDisabled", "ExposedPorts"} {
 			_, ok := cfg[f]
 			c.Check(ok, checker.True, check.Commentf("API version %s expected to include %s in 'Config'", version, f))
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (s *DockerSuite) TestInspectAPIBridgeNetworkSettings120(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestInspectAPIBridgeNetworkSettings120(c *check.C) {
 	// Not relevant on Windows, and besides it doesn't have any bridge network settings
 	testRequires(c, DaemonIsLinux)
 	out, _ := dockerCmd(c, "run", "-d", "busybox", "top")
@@ -159,9 +159,9 @@ func (s *DockerSuite) TestInspectAPIBridgeNetworkSettings120(c *check.C) ***REMO
 
 	settings := inspectJSON.NetworkSettings
 	c.Assert(settings.IPAddress, checker.Not(checker.HasLen), 0)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestInspectAPIBridgeNetworkSettings121(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestInspectAPIBridgeNetworkSettings121(c *check.C) {
 	// Windows doesn't have any bridge network settings
 	testRequires(c, DaemonIsLinux)
 	out, _ := dockerCmd(c, "run", "-d", "busybox", "top")
@@ -178,4 +178,4 @@ func (s *DockerSuite) TestInspectAPIBridgeNetworkSettings121(c *check.C) ***REMO
 	c.Assert(settings.IPAddress, checker.Not(checker.HasLen), 0)
 	c.Assert(settings.Networks["bridge"], checker.Not(checker.IsNil))
 	c.Assert(settings.IPAddress, checker.Equals, settings.Networks["bridge"].IPAddress)
-***REMOVED***
+}

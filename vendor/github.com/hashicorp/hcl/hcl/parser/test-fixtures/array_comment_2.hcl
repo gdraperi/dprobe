@@ -1,6 +1,6 @@
-provisioner "remote-exec" ***REMOVED***
+provisioner "remote-exec" {
   scripts = [
-    "$***REMOVED***path.module***REMOVED***/scripts/install-consul.sh" // missing comma
-    "$***REMOVED***path.module***REMOVED***/scripts/install-haproxy.sh"
+    "${path.module}/scripts/install-consul.sh" // missing comma
+    "${path.module}/scripts/install-haproxy.sh"
   ] 
-***REMOVED***
+}

@@ -8,56 +8,56 @@ import (
 
 // ImageProber exposes an Image cache to the Builder. It supports resetting a
 // cache.
-type ImageProber interface ***REMOVED***
+type ImageProber interface {
 	Reset()
 	Probe(parentID string, runConfig *container.Config) (string, error)
-***REMOVED***
+}
 
-type imageProber struct ***REMOVED***
+type imageProber struct {
 	cache       builder.ImageCache
 	reset       func() builder.ImageCache
 	cacheBusted bool
-***REMOVED***
+}
 
-func newImageProber(cacheBuilder builder.ImageCacheBuilder, cacheFrom []string, noCache bool) ImageProber ***REMOVED***
-	if noCache ***REMOVED***
-		return &nopProber***REMOVED******REMOVED***
-	***REMOVED***
+func newImageProber(cacheBuilder builder.ImageCacheBuilder, cacheFrom []string, noCache bool) ImageProber {
+	if noCache {
+		return &nopProber{}
+	}
 
-	reset := func() builder.ImageCache ***REMOVED***
+	reset := func() builder.ImageCache {
 		return cacheBuilder.MakeImageCache(cacheFrom)
-	***REMOVED***
-	return &imageProber***REMOVED***cache: reset(), reset: reset***REMOVED***
-***REMOVED***
+	}
+	return &imageProber{cache: reset(), reset: reset}
+}
 
-func (c *imageProber) Reset() ***REMOVED***
+func (c *imageProber) Reset() {
 	c.cache = c.reset()
 	c.cacheBusted = false
-***REMOVED***
+}
 
 // Probe checks if cache match can be found for current build instruction.
 // It returns the cachedID if there is a hit, and the empty string on miss
-func (c *imageProber) Probe(parentID string, runConfig *container.Config) (string, error) ***REMOVED***
-	if c.cacheBusted ***REMOVED***
+func (c *imageProber) Probe(parentID string, runConfig *container.Config) (string, error) {
+	if c.cacheBusted {
 		return "", nil
-	***REMOVED***
+	}
 	cacheID, err := c.cache.GetCache(parentID, runConfig)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
-	if len(cacheID) == 0 ***REMOVED***
+	}
+	if len(cacheID) == 0 {
 		logrus.Debugf("[BUILDER] Cache miss: %s", runConfig.Cmd)
 		c.cacheBusted = true
 		return "", nil
-	***REMOVED***
+	}
 	logrus.Debugf("[BUILDER] Use cached version: %s", runConfig.Cmd)
 	return cacheID, nil
-***REMOVED***
+}
 
-type nopProber struct***REMOVED******REMOVED***
+type nopProber struct{}
 
-func (c *nopProber) Reset() ***REMOVED******REMOVED***
+func (c *nopProber) Reset() {}
 
-func (c *nopProber) Probe(_ string, _ *container.Config) (string, error) ***REMOVED***
+func (c *nopProber) Probe(_ string, _ *container.Config) (string, error) {
 	return "", nil
-***REMOVED***
+}

@@ -2,16 +2,16 @@
 # Copyright 1999-2013 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
-command="$***REMOVED***DOCKERD_BINARY:-/usr/bin/dockerd***REMOVED***"
-pidfile="$***REMOVED***DOCKER_PIDFILE:-/run/$***REMOVED***RC_SVCNAME***REMOVED***.pid***REMOVED***"
-command_args="-p \"$***REMOVED***pidfile***REMOVED***\" $***REMOVED***DOCKER_OPTS***REMOVED***"
-DOCKER_LOGFILE="$***REMOVED***DOCKER_LOGFILE:-/var/log/$***REMOVED***RC_SVCNAME***REMOVED***.log***REMOVED***"
-DOCKER_ERRFILE="$***REMOVED***DOCKER_ERRFILE:-$***REMOVED***DOCKER_LOGFILE***REMOVED******REMOVED***"
-DOCKER_OUTFILE="$***REMOVED***DOCKER_OUTFILE:-$***REMOVED***DOCKER_LOGFILE***REMOVED******REMOVED***"
+command="${DOCKERD_BINARY:-/usr/bin/dockerd}"
+pidfile="${DOCKER_PIDFILE:-/run/${RC_SVCNAME}.pid}"
+command_args="-p \"${pidfile}\" ${DOCKER_OPTS}"
+DOCKER_LOGFILE="${DOCKER_LOGFILE:-/var/log/${RC_SVCNAME}.log}"
+DOCKER_ERRFILE="${DOCKER_ERRFILE:-${DOCKER_LOGFILE}}"
+DOCKER_OUTFILE="${DOCKER_OUTFILE:-${DOCKER_LOGFILE}}"
 start_stop_daemon_args="--background \
-	--stderr \"$***REMOVED***DOCKER_ERRFILE***REMOVED***\" --stdout \"$***REMOVED***DOCKER_OUTFILE***REMOVED***\""
+	--stderr \"${DOCKER_ERRFILE}\" --stdout \"${DOCKER_OUTFILE}\""
 
-start_pre() ***REMOVED***
+start_pre() {
 	checkpath -f -m 0644 -o root:docker "$DOCKER_LOGFILE"
 
 	ulimit -n 1048576
@@ -21,4 +21,4 @@ start_pre() ***REMOVED***
 	ulimit -u unlimited
 
 	return 0
-***REMOVED***
+}

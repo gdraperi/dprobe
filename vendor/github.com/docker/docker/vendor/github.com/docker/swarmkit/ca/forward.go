@@ -16,62 +16,62 @@ const (
 
 // forwardedTLSInfoFromContext obtains forwarded TLS CN/OU from the grpc.MD
 // object in ctx.
-func forwardedTLSInfoFromContext(ctx context.Context) (remoteAddr string, cn string, org string, ous []string) ***REMOVED***
+func forwardedTLSInfoFromContext(ctx context.Context) (remoteAddr string, cn string, org string, ous []string) {
 	md, _ := metadata.FromContext(ctx)
-	if len(md[remoteAddrKey]) != 0 ***REMOVED***
+	if len(md[remoteAddrKey]) != 0 {
 		remoteAddr = md[remoteAddrKey][0]
-	***REMOVED***
-	if len(md[certCNKey]) != 0 ***REMOVED***
+	}
+	if len(md[certCNKey]) != 0 {
 		cn = md[certCNKey][0]
-	***REMOVED***
-	if len(md[certOrgKey]) != 0 ***REMOVED***
+	}
+	if len(md[certOrgKey]) != 0 {
 		org = md[certOrgKey][0]
-	***REMOVED***
+	}
 	ous = md[certOUKey]
 	return
-***REMOVED***
+}
 
-func isForwardedRequest(ctx context.Context) bool ***REMOVED***
+func isForwardedRequest(ctx context.Context) bool {
 	md, _ := metadata.FromContext(ctx)
-	if len(md[certForwardedKey]) != 1 ***REMOVED***
+	if len(md[certForwardedKey]) != 1 {
 		return false
-	***REMOVED***
+	}
 	return md[certForwardedKey][0] == "true"
-***REMOVED***
+}
 
 // WithMetadataForwardTLSInfo reads certificate from context and returns context where
 // ForwardCert is set based on original certificate.
-func WithMetadataForwardTLSInfo(ctx context.Context) (context.Context, error) ***REMOVED***
+func WithMetadataForwardTLSInfo(ctx context.Context) (context.Context, error) {
 	md, ok := metadata.FromContext(ctx)
-	if !ok ***REMOVED***
-		md = metadata.MD***REMOVED******REMOVED***
-	***REMOVED***
+	if !ok {
+		md = metadata.MD{}
+	}
 
-	ous := []string***REMOVED******REMOVED***
+	ous := []string{}
 	org := ""
 	cn := ""
 
 	certSubj, err := certSubjectFromContext(ctx)
-	if err == nil ***REMOVED***
+	if err == nil {
 		cn = certSubj.CommonName
 		ous = certSubj.OrganizationalUnit
-		if len(certSubj.Organization) > 0 ***REMOVED***
+		if len(certSubj.Organization) > 0 {
 			org = certSubj.Organization[0]
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// If there's no TLS cert, forward with blank TLS metadata.
 	// Note that the presence of this blank metadata is extremely
 	// important. Without it, it would look like manager is making
 	// the request directly.
-	md[certForwardedKey] = []string***REMOVED***"true"***REMOVED***
-	md[certCNKey] = []string***REMOVED***cn***REMOVED***
-	md[certOrgKey] = []string***REMOVED***org***REMOVED***
+	md[certForwardedKey] = []string{"true"}
+	md[certCNKey] = []string{cn}
+	md[certOrgKey] = []string{org}
 	md[certOUKey] = ous
 	peer, ok := peer.FromContext(ctx)
-	if ok ***REMOVED***
-		md[remoteAddrKey] = []string***REMOVED***peer.Addr.String()***REMOVED***
-	***REMOVED***
+	if ok {
+		md[remoteAddrKey] = []string{peer.Addr.String()}
+	}
 
 	return metadata.NewContext(ctx, md), nil
-***REMOVED***
+}

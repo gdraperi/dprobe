@@ -11,7 +11,7 @@ import (
 // ProcLimits represents the soft limits for each of the process's resource
 // limits. For more information see getrlimit(2):
 // http://man7.org/linux/man-pages/man2/getrlimit.2.html.
-type ProcLimits struct ***REMOVED***
+type ProcLimits struct {
 	// CPU time limit in seconds.
 	CPUTime int
 	// Maximum size of files that the process may create.
@@ -53,7 +53,7 @@ type ProcLimits struct ***REMOVED***
 	// scheduled under a real-time scheduling policy may consume without making
 	// a blocking system call.
 	RealtimeTimeout int
-***REMOVED***
+}
 
 const (
 	limitsFields    = 3
@@ -65,25 +65,25 @@ var (
 )
 
 // NewLimits returns the current soft limits of the process.
-func (p Proc) NewLimits() (ProcLimits, error) ***REMOVED***
+func (p Proc) NewLimits() (ProcLimits, error) {
 	f, err := os.Open(p.path("limits"))
-	if err != nil ***REMOVED***
-		return ProcLimits***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return ProcLimits{}, err
+	}
 	defer f.Close()
 
 	var (
-		l = ProcLimits***REMOVED******REMOVED***
+		l = ProcLimits{}
 		s = bufio.NewScanner(f)
 	)
-	for s.Scan() ***REMOVED***
+	for s.Scan() {
 		fields := limitsDelimiter.Split(s.Text(), limitsFields)
-		if len(fields) != limitsFields ***REMOVED***
-			return ProcLimits***REMOVED******REMOVED***, fmt.Errorf(
+		if len(fields) != limitsFields {
+			return ProcLimits{}, fmt.Errorf(
 				"couldn't parse %s line %s", f.Name(), s.Text())
-		***REMOVED***
+		}
 
-		switch fields[0] ***REMOVED***
+		switch fields[0] {
 		case "Max cpu time":
 			l.CPUTime, err = parseInt(fields[1])
 		case "Max file size":
@@ -116,22 +116,22 @@ func (p Proc) NewLimits() (ProcLimits, error) ***REMOVED***
 			l.RealtimePriority, err = parseInt(fields[1])
 		case "Max realtime timeout":
 			l.RealtimeTimeout, err = parseInt(fields[1])
-		***REMOVED***
-		if err != nil ***REMOVED***
-			return ProcLimits***REMOVED******REMOVED***, err
-		***REMOVED***
-	***REMOVED***
+		}
+		if err != nil {
+			return ProcLimits{}, err
+		}
+	}
 
 	return l, s.Err()
-***REMOVED***
+}
 
-func parseInt(s string) (int, error) ***REMOVED***
-	if s == limitsUnlimited ***REMOVED***
+func parseInt(s string) (int, error) {
+	if s == limitsUnlimited {
 		return -1, nil
-	***REMOVED***
+	}
 	i, err := strconv.ParseInt(s, 10, 32)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, fmt.Errorf("couldn't parse value %s: %s", s, err)
-	***REMOVED***
+	}
 	return int(i), nil
-***REMOVED***
+}

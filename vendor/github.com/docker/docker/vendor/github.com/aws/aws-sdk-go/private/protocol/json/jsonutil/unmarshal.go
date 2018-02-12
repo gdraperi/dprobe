@@ -14,57 +14,57 @@ import (
 )
 
 // UnmarshalJSON reads a stream and unmarshals the results in object v.
-func UnmarshalJSON(v interface***REMOVED******REMOVED***, stream io.Reader) error ***REMOVED***
-	var out interface***REMOVED******REMOVED***
+func UnmarshalJSON(v interface{}, stream io.Reader) error {
+	var out interface{}
 
 	b, err := ioutil.ReadAll(stream)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if len(b) == 0 ***REMOVED***
+	if len(b) == 0 {
 		return nil
-	***REMOVED***
+	}
 
-	if err := json.Unmarshal(b, &out); err != nil ***REMOVED***
+	if err := json.Unmarshal(b, &out); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	return unmarshalAny(reflect.ValueOf(v), out, "")
-***REMOVED***
+}
 
-func unmarshalAny(value reflect.Value, data interface***REMOVED******REMOVED***, tag reflect.StructTag) error ***REMOVED***
+func unmarshalAny(value reflect.Value, data interface{}, tag reflect.StructTag) error {
 	vtype := value.Type()
-	if vtype.Kind() == reflect.Ptr ***REMOVED***
+	if vtype.Kind() == reflect.Ptr {
 		vtype = vtype.Elem() // check kind of actual element type
-	***REMOVED***
+	}
 
 	t := tag.Get("type")
-	if t == "" ***REMOVED***
-		switch vtype.Kind() ***REMOVED***
+	if t == "" {
+		switch vtype.Kind() {
 		case reflect.Struct:
 			// also it can't be a time object
-			if _, ok := value.Interface().(*time.Time); !ok ***REMOVED***
+			if _, ok := value.Interface().(*time.Time); !ok {
 				t = "structure"
-			***REMOVED***
+			}
 		case reflect.Slice:
 			// also it can't be a byte slice
-			if _, ok := value.Interface().([]byte); !ok ***REMOVED***
+			if _, ok := value.Interface().([]byte); !ok {
 				t = "list"
-			***REMOVED***
+			}
 		case reflect.Map:
 			// cannot be a JSONValue map
-			if _, ok := value.Interface().(aws.JSONValue); !ok ***REMOVED***
+			if _, ok := value.Interface().(aws.JSONValue); !ok {
 				t = "map"
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
-	switch t ***REMOVED***
+	switch t {
 	case "structure":
-		if field, ok := vtype.FieldByName("_"); ok ***REMOVED***
+		if field, ok := vtype.FieldByName("_"); ok {
 			tag = field.Tag
-		***REMOVED***
+		}
 		return unmarshalStruct(value, data, tag)
 	case "list":
 		return unmarshalList(value, data, tag)
@@ -72,135 +72,135 @@ func unmarshalAny(value reflect.Value, data interface***REMOVED******REMOVED***,
 		return unmarshalMap(value, data, tag)
 	default:
 		return unmarshalScalar(value, data, tag)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func unmarshalStruct(value reflect.Value, data interface***REMOVED******REMOVED***, tag reflect.StructTag) error ***REMOVED***
-	if data == nil ***REMOVED***
+func unmarshalStruct(value reflect.Value, data interface{}, tag reflect.StructTag) error {
+	if data == nil {
 		return nil
-	***REMOVED***
-	mapData, ok := data.(map[string]interface***REMOVED******REMOVED***)
-	if !ok ***REMOVED***
+	}
+	mapData, ok := data.(map[string]interface{})
+	if !ok {
 		return fmt.Errorf("JSON value is not a structure (%#v)", data)
-	***REMOVED***
+	}
 
 	t := value.Type()
-	if value.Kind() == reflect.Ptr ***REMOVED***
-		if value.IsNil() ***REMOVED*** // create the structure if it's nil
+	if value.Kind() == reflect.Ptr {
+		if value.IsNil() { // create the structure if it's nil
 			s := reflect.New(value.Type().Elem())
 			value.Set(s)
 			value = s
-		***REMOVED***
+		}
 
 		value = value.Elem()
 		t = t.Elem()
-	***REMOVED***
+	}
 
 	// unwrap any payloads
-	if payload := tag.Get("payload"); payload != "" ***REMOVED***
+	if payload := tag.Get("payload"); payload != "" {
 		field, _ := t.FieldByName(payload)
 		return unmarshalAny(value.FieldByName(payload), data, field.Tag)
-	***REMOVED***
+	}
 
-	for i := 0; i < t.NumField(); i++ ***REMOVED***
+	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
-		if field.PkgPath != "" ***REMOVED***
+		if field.PkgPath != "" {
 			continue // ignore unexported fields
-		***REMOVED***
+		}
 
 		// figure out what this field is called
 		name := field.Name
-		if locName := field.Tag.Get("locationName"); locName != "" ***REMOVED***
+		if locName := field.Tag.Get("locationName"); locName != "" {
 			name = locName
-		***REMOVED***
+		}
 
 		member := value.FieldByIndex(field.Index)
 		err := unmarshalAny(member, mapData[name], field.Tag)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func unmarshalList(value reflect.Value, data interface***REMOVED******REMOVED***, tag reflect.StructTag) error ***REMOVED***
-	if data == nil ***REMOVED***
+func unmarshalList(value reflect.Value, data interface{}, tag reflect.StructTag) error {
+	if data == nil {
 		return nil
-	***REMOVED***
-	listData, ok := data.([]interface***REMOVED******REMOVED***)
-	if !ok ***REMOVED***
+	}
+	listData, ok := data.([]interface{})
+	if !ok {
 		return fmt.Errorf("JSON value is not a list (%#v)", data)
-	***REMOVED***
+	}
 
-	if value.IsNil() ***REMOVED***
+	if value.IsNil() {
 		l := len(listData)
 		value.Set(reflect.MakeSlice(value.Type(), l, l))
-	***REMOVED***
+	}
 
-	for i, c := range listData ***REMOVED***
+	for i, c := range listData {
 		err := unmarshalAny(value.Index(i), c, "")
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
-func unmarshalMap(value reflect.Value, data interface***REMOVED******REMOVED***, tag reflect.StructTag) error ***REMOVED***
-	if data == nil ***REMOVED***
+func unmarshalMap(value reflect.Value, data interface{}, tag reflect.StructTag) error {
+	if data == nil {
 		return nil
-	***REMOVED***
-	mapData, ok := data.(map[string]interface***REMOVED******REMOVED***)
-	if !ok ***REMOVED***
+	}
+	mapData, ok := data.(map[string]interface{})
+	if !ok {
 		return fmt.Errorf("JSON value is not a map (%#v)", data)
-	***REMOVED***
+	}
 
-	if value.IsNil() ***REMOVED***
+	if value.IsNil() {
 		value.Set(reflect.MakeMap(value.Type()))
-	***REMOVED***
+	}
 
-	for k, v := range mapData ***REMOVED***
+	for k, v := range mapData {
 		kvalue := reflect.ValueOf(k)
 		vvalue := reflect.New(value.Type().Elem()).Elem()
 
 		unmarshalAny(vvalue, v, "")
 		value.SetMapIndex(kvalue, vvalue)
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func unmarshalScalar(value reflect.Value, data interface***REMOVED******REMOVED***, tag reflect.StructTag) error ***REMOVED***
-	errf := func() error ***REMOVED***
+func unmarshalScalar(value reflect.Value, data interface{}, tag reflect.StructTag) error {
+	errf := func() error {
 		return fmt.Errorf("unsupported value: %v (%s)", value.Interface(), value.Type())
-	***REMOVED***
+	}
 
-	switch d := data.(type) ***REMOVED***
+	switch d := data.(type) {
 	case nil:
 		return nil // nothing to do here
 	case string:
-		switch value.Interface().(type) ***REMOVED***
+		switch value.Interface().(type) {
 		case *string:
 			value.Set(reflect.ValueOf(&d))
 		case []byte:
 			b, err := base64.StdEncoding.DecodeString(d)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
+			}
 			value.Set(reflect.ValueOf(b))
 		case aws.JSONValue:
 			// No need to use escaping as the value is a non-quoted string.
 			v, err := protocol.DecodeJSONValue(d, protocol.NoEscape)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
+			}
 			value.Set(reflect.ValueOf(v))
 		default:
 			return errf()
-		***REMOVED***
+		}
 	case float64:
-		switch value.Interface().(type) ***REMOVED***
+		switch value.Interface().(type) {
 		case *int64:
 			di := int64(d)
 			value.Set(reflect.ValueOf(&di))
@@ -211,16 +211,16 @@ func unmarshalScalar(value reflect.Value, data interface***REMOVED******REMOVED*
 			value.Set(reflect.ValueOf(&t))
 		default:
 			return errf()
-		***REMOVED***
+		}
 	case bool:
-		switch value.Interface().(type) ***REMOVED***
+		switch value.Interface().(type) {
 		case *bool:
 			value.Set(reflect.ValueOf(&d))
 		default:
 			return errf()
-		***REMOVED***
+		}
 	default:
 		return fmt.Errorf("unsupported JSON value (%v)", data)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

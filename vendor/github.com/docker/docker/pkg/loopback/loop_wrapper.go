@@ -16,7 +16,7 @@ package loopback
 */
 import "C"
 
-type loopInfo64 struct ***REMOVED***
+type loopInfo64 struct {
 	loDevice         uint64 /* ioctl r/o */
 	loInode          uint64 /* ioctl r/o */
 	loRdevice        uint64 /* ioctl r/o */
@@ -30,7 +30,7 @@ type loopInfo64 struct ***REMOVED***
 	loCryptName      [LoNameSize]uint8
 	loEncryptKey     [LoKeySize]uint8 /* ioctl w/o */
 	loInit           [2]uint64
-***REMOVED***
+}
 
 // IOCTL consts
 const (

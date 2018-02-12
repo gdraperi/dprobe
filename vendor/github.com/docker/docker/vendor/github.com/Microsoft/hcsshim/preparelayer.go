@@ -13,34 +13,34 @@ var prepareLayerLock sync.Mutex
 // parent layers, and is necessary in order to view or interact with the layer
 // as an actual filesystem (reading and writing files, creating directories, etc).
 // Disabling the filter must be done via UnprepareLayer.
-func PrepareLayer(info DriverInfo, layerId string, parentLayerPaths []string) error ***REMOVED***
+func PrepareLayer(info DriverInfo, layerId string, parentLayerPaths []string) error {
 	title := "hcsshim::PrepareLayer "
 	logrus.Debugf(title+"flavour %d layerId %s", info.Flavour, layerId)
 
 	// Generate layer descriptors
 	layers, err := layerPathsToDescriptors(parentLayerPaths)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	// Convert info to API calling convention
 	infop, err := convertDriverInfo(info)
-	if err != nil ***REMOVED***
+	if err != nil {
 		logrus.Error(err)
 		return err
-	***REMOVED***
+	}
 
 	// This lock is a temporary workaround for a Windows bug. Only allowing one
 	// call to prepareLayer at a time vastly reduces the chance of a timeout.
 	prepareLayerLock.Lock()
 	defer prepareLayerLock.Unlock()
 	err = prepareLayer(&infop, layerId, layers)
-	if err != nil ***REMOVED***
+	if err != nil {
 		err = makeErrorf(err, title, "layerId=%s flavour=%d", layerId, info.Flavour)
 		logrus.Error(err)
 		return err
-	***REMOVED***
+	}
 
 	logrus.Debugf(title+"succeeded flavour=%d layerId=%s", info.Flavour, layerId)
 	return nil
-***REMOVED***
+}

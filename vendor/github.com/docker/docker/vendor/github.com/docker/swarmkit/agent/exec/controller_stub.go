@@ -9,7 +9,7 @@ import (
 
 // StubController implements the Controller interface,
 // but allows you to specify behaviors for each of its methods.
-type StubController struct ***REMOVED***
+type StubController struct {
 	Controller
 	UpdateFn    func(ctx context.Context, t *api.Task) error
 	PrepareFn   func(ctx context.Context) error
@@ -21,55 +21,55 @@ type StubController struct ***REMOVED***
 	CloseFn     func() error
 	calls       map[string]int
 	cstatus     *api.ContainerStatus
-***REMOVED***
+}
 
 // NewStubController returns an initialized StubController
-func NewStubController() *StubController ***REMOVED***
-	return &StubController***REMOVED***
+func NewStubController() *StubController {
+	return &StubController{
 		calls: make(map[string]int),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // If function A calls updateCountsForSelf,
 // The callCount[A] value will be incremented
-func (sc *StubController) called() ***REMOVED***
+func (sc *StubController) called() {
 	pc, _, _, ok := runtime.Caller(1)
-	if !ok ***REMOVED***
+	if !ok {
 		panic("Failed to find caller of function")
-	***REMOVED***
+	}
 	// longName looks like 'github.com/docker/swarmkit/agent/exec.(*StubController).Prepare:1'
 	longName := runtime.FuncForPC(pc).Name()
 	parts := strings.Split(longName, ".")
 	tail := strings.Split(parts[len(parts)-1], ":")
 	sc.calls[tail[0]]++
-***REMOVED***
+}
 
 // Update is part of the Controller interface
-func (sc *StubController) Update(ctx context.Context, t *api.Task) error ***REMOVED***
+func (sc *StubController) Update(ctx context.Context, t *api.Task) error {
 	sc.called()
 	return sc.UpdateFn(ctx, t)
-***REMOVED***
+}
 
 // Prepare is part of the Controller interface
-func (sc *StubController) Prepare(ctx context.Context) error ***REMOVED*** sc.called(); return sc.PrepareFn(ctx) ***REMOVED***
+func (sc *StubController) Prepare(ctx context.Context) error { sc.called(); return sc.PrepareFn(ctx) }
 
 // Start is part of the Controller interface
-func (sc *StubController) Start(ctx context.Context) error ***REMOVED*** sc.called(); return sc.StartFn(ctx) ***REMOVED***
+func (sc *StubController) Start(ctx context.Context) error { sc.called(); return sc.StartFn(ctx) }
 
 // Wait is part of the Controller interface
-func (sc *StubController) Wait(ctx context.Context) error ***REMOVED*** sc.called(); return sc.WaitFn(ctx) ***REMOVED***
+func (sc *StubController) Wait(ctx context.Context) error { sc.called(); return sc.WaitFn(ctx) }
 
 // Shutdown is part of the Controller interface
-func (sc *StubController) Shutdown(ctx context.Context) error ***REMOVED*** sc.called(); return sc.ShutdownFn(ctx) ***REMOVED***
+func (sc *StubController) Shutdown(ctx context.Context) error { sc.called(); return sc.ShutdownFn(ctx) }
 
 // Terminate is part of the Controller interface
-func (sc *StubController) Terminate(ctx context.Context) error ***REMOVED***
+func (sc *StubController) Terminate(ctx context.Context) error {
 	sc.called()
 	return sc.TerminateFn(ctx)
-***REMOVED***
+}
 
 // Remove is part of the Controller interface
-func (sc *StubController) Remove(ctx context.Context) error ***REMOVED*** sc.called(); return sc.RemoveFn(ctx) ***REMOVED***
+func (sc *StubController) Remove(ctx context.Context) error { sc.called(); return sc.RemoveFn(ctx) }
 
 // Close is part of the Controller interface
-func (sc *StubController) Close() error ***REMOVED*** sc.called(); return sc.CloseFn() ***REMOVED***
+func (sc *StubController) Close() error { sc.called(); return sc.CloseFn() }

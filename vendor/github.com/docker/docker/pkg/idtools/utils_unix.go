@@ -9,24 +9,24 @@ import (
 	"strings"
 )
 
-func resolveBinary(binname string) (string, error) ***REMOVED***
+func resolveBinary(binname string) (string, error) {
 	binaryPath, err := exec.LookPath(binname)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	resolvedPath, err := filepath.EvalSymlinks(binaryPath)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	//only return no error if the final resolved binary basename
 	//matches what was searched for
-	if filepath.Base(resolvedPath) == binname ***REMOVED***
+	if filepath.Base(resolvedPath) == binname {
 		return resolvedPath, nil
-	***REMOVED***
+	}
 	return "", fmt.Errorf("Binary %q does not resolve to a binary of that name in $PATH (%q)", binname, resolvedPath)
-***REMOVED***
+}
 
-func execCmd(cmd, args string) ([]byte, error) ***REMOVED***
+func execCmd(cmd, args string) ([]byte, error) {
 	execCmd := exec.Command(cmd, strings.Split(args, " ")...)
 	return execCmd.CombinedOutput()
-***REMOVED***
+}

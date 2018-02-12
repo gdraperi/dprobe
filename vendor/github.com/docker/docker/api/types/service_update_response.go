@@ -5,8 +5,8 @@ package types
 
 // ServiceUpdateResponse service update response
 // swagger:model ServiceUpdateResponse
-type ServiceUpdateResponse struct ***REMOVED***
+type ServiceUpdateResponse struct {
 
 	// Optional warning messages
 	Warnings []string `json:"Warnings"`
-***REMOVED***
+}

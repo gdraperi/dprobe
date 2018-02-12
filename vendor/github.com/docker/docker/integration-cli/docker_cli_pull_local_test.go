@@ -24,47 +24,47 @@ import (
 // tags for the same image) are not also pulled down.
 //
 // Ref: docker/docker#8141
-func testPullImageWithAliases(c *check.C) ***REMOVED***
+func testPullImageWithAliases(c *check.C) {
 	repoName := fmt.Sprintf("%v/dockercli/busybox", privateRegistryURL)
 
-	repos := []string***REMOVED******REMOVED***
-	for _, tag := range []string***REMOVED***"recent", "fresh"***REMOVED*** ***REMOVED***
+	repos := []string{}
+	for _, tag := range []string{"recent", "fresh"} {
 		repos = append(repos, fmt.Sprintf("%v:%v", repoName, tag))
-	***REMOVED***
+	}
 
 	// Tag and push the same image multiple times.
-	for _, repo := range repos ***REMOVED***
+	for _, repo := range repos {
 		dockerCmd(c, "tag", "busybox", repo)
 		dockerCmd(c, "push", repo)
-	***REMOVED***
+	}
 
 	// Clear local images store.
-	args := append([]string***REMOVED***"rmi"***REMOVED***, repos...)
+	args := append([]string{"rmi"}, repos...)
 	dockerCmd(c, args...)
 
 	// Pull a single tag and verify it doesn't bring down all aliases.
 	dockerCmd(c, "pull", repos[0])
 	dockerCmd(c, "inspect", repos[0])
-	for _, repo := range repos[1:] ***REMOVED***
+	for _, repo := range repos[1:] {
 		_, _, err := dockerCmdWithError("inspect", repo)
 		c.Assert(err, checker.NotNil, check.Commentf("Image %v shouldn't have been pulled down", repo))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *DockerRegistrySuite) TestPullImageWithAliases(c *check.C) ***REMOVED***
+func (s *DockerRegistrySuite) TestPullImageWithAliases(c *check.C) {
 	testPullImageWithAliases(c)
-***REMOVED***
+}
 
-func (s *DockerSchema1RegistrySuite) TestPullImageWithAliases(c *check.C) ***REMOVED***
+func (s *DockerSchema1RegistrySuite) TestPullImageWithAliases(c *check.C) {
 	testPullImageWithAliases(c)
-***REMOVED***
+}
 
 // testConcurrentPullWholeRepo pulls the same repo concurrently.
-func testConcurrentPullWholeRepo(c *check.C) ***REMOVED***
+func testConcurrentPullWholeRepo(c *check.C) {
 	repoName := fmt.Sprintf("%v/dockercli/busybox", privateRegistryURL)
 
-	repos := []string***REMOVED******REMOVED***
-	for _, tag := range []string***REMOVED***"recent", "fresh", "todays"***REMOVED*** ***REMOVED***
+	repos := []string{}
+	for _, tag := range []string{"recent", "fresh", "todays"} {
 		repo := fmt.Sprintf("%v:%v", repoName, tag)
 		buildImageSuccessfully(c, repo, build.WithDockerfile(fmt.Sprintf(`
 		    FROM busybox
@@ -75,84 +75,84 @@ func testConcurrentPullWholeRepo(c *check.C) ***REMOVED***
 		`, repo)))
 		dockerCmd(c, "push", repo)
 		repos = append(repos, repo)
-	***REMOVED***
+	}
 
 	// Clear local images store.
-	args := append([]string***REMOVED***"rmi"***REMOVED***, repos...)
+	args := append([]string{"rmi"}, repos...)
 	dockerCmd(c, args...)
 
 	// Run multiple re-pulls concurrently
 	results := make(chan error)
 	numPulls := 3
 
-	for i := 0; i != numPulls; i++ ***REMOVED***
-		go func() ***REMOVED***
+	for i := 0; i != numPulls; i++ {
+		go func() {
 			result := icmd.RunCommand(dockerBinary, "pull", "-a", repoName)
 			results <- result.Error
-		***REMOVED***()
-	***REMOVED***
+		}()
+	}
 
 	// These checks are separate from the loop above because the check
 	// package is not goroutine-safe.
-	for i := 0; i != numPulls; i++ ***REMOVED***
+	for i := 0; i != numPulls; i++ {
 		err := <-results
 		c.Assert(err, checker.IsNil, check.Commentf("concurrent pull failed with error: %v", err))
-	***REMOVED***
+	}
 
 	// Ensure all tags were pulled successfully
-	for _, repo := range repos ***REMOVED***
+	for _, repo := range repos {
 		dockerCmd(c, "inspect", repo)
 		out, _ := dockerCmd(c, "run", "--rm", repo)
 		c.Assert(strings.TrimSpace(out), checker.Equals, "/bin/sh -c echo "+repo)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *DockerRegistrySuite) testConcurrentPullWholeRepo(c *check.C) ***REMOVED***
+func (s *DockerRegistrySuite) testConcurrentPullWholeRepo(c *check.C) {
 	testConcurrentPullWholeRepo(c)
-***REMOVED***
+}
 
-func (s *DockerSchema1RegistrySuite) testConcurrentPullWholeRepo(c *check.C) ***REMOVED***
+func (s *DockerSchema1RegistrySuite) testConcurrentPullWholeRepo(c *check.C) {
 	testConcurrentPullWholeRepo(c)
-***REMOVED***
+}
 
 // testConcurrentFailingPull tries a concurrent pull that doesn't succeed.
-func testConcurrentFailingPull(c *check.C) ***REMOVED***
+func testConcurrentFailingPull(c *check.C) {
 	repoName := fmt.Sprintf("%v/dockercli/busybox", privateRegistryURL)
 
 	// Run multiple pulls concurrently
 	results := make(chan error)
 	numPulls := 3
 
-	for i := 0; i != numPulls; i++ ***REMOVED***
-		go func() ***REMOVED***
+	for i := 0; i != numPulls; i++ {
+		go func() {
 			result := icmd.RunCommand(dockerBinary, "pull", repoName+":asdfasdf")
 			results <- result.Error
-		***REMOVED***()
-	***REMOVED***
+		}()
+	}
 
 	// These checks are separate from the loop above because the check
 	// package is not goroutine-safe.
-	for i := 0; i != numPulls; i++ ***REMOVED***
+	for i := 0; i != numPulls; i++ {
 		err := <-results
 		c.Assert(err, checker.NotNil, check.Commentf("expected pull to fail"))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *DockerRegistrySuite) testConcurrentFailingPull(c *check.C) ***REMOVED***
+func (s *DockerRegistrySuite) testConcurrentFailingPull(c *check.C) {
 	testConcurrentFailingPull(c)
-***REMOVED***
+}
 
-func (s *DockerSchema1RegistrySuite) testConcurrentFailingPull(c *check.C) ***REMOVED***
+func (s *DockerSchema1RegistrySuite) testConcurrentFailingPull(c *check.C) {
 	testConcurrentFailingPull(c)
-***REMOVED***
+}
 
 // testConcurrentPullMultipleTags pulls multiple tags from the same repo
 // concurrently.
-func testConcurrentPullMultipleTags(c *check.C) ***REMOVED***
+func testConcurrentPullMultipleTags(c *check.C) {
 	repoName := fmt.Sprintf("%v/dockercli/busybox", privateRegistryURL)
 
-	repos := []string***REMOVED******REMOVED***
-	for _, tag := range []string***REMOVED***"recent", "fresh", "todays"***REMOVED*** ***REMOVED***
+	repos := []string{}
+	for _, tag := range []string{"recent", "fresh", "todays"} {
 		repo := fmt.Sprintf("%v:%v", repoName, tag)
 		buildImageSuccessfully(c, repo, build.WithDockerfile(fmt.Sprintf(`
 		    FROM busybox
@@ -163,48 +163,48 @@ func testConcurrentPullMultipleTags(c *check.C) ***REMOVED***
 		`, repo)))
 		dockerCmd(c, "push", repo)
 		repos = append(repos, repo)
-	***REMOVED***
+	}
 
 	// Clear local images store.
-	args := append([]string***REMOVED***"rmi"***REMOVED***, repos...)
+	args := append([]string{"rmi"}, repos...)
 	dockerCmd(c, args...)
 
 	// Re-pull individual tags, in parallel
 	results := make(chan error)
 
-	for _, repo := range repos ***REMOVED***
-		go func(repo string) ***REMOVED***
+	for _, repo := range repos {
+		go func(repo string) {
 			result := icmd.RunCommand(dockerBinary, "pull", repo)
 			results <- result.Error
-		***REMOVED***(repo)
-	***REMOVED***
+		}(repo)
+	}
 
 	// These checks are separate from the loop above because the check
 	// package is not goroutine-safe.
-	for range repos ***REMOVED***
+	for range repos {
 		err := <-results
 		c.Assert(err, checker.IsNil, check.Commentf("concurrent pull failed with error: %v", err))
-	***REMOVED***
+	}
 
 	// Ensure all tags were pulled successfully
-	for _, repo := range repos ***REMOVED***
+	for _, repo := range repos {
 		dockerCmd(c, "inspect", repo)
 		out, _ := dockerCmd(c, "run", "--rm", repo)
 		c.Assert(strings.TrimSpace(out), checker.Equals, "/bin/sh -c echo "+repo)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *DockerRegistrySuite) TestConcurrentPullMultipleTags(c *check.C) ***REMOVED***
+func (s *DockerRegistrySuite) TestConcurrentPullMultipleTags(c *check.C) {
 	testConcurrentPullMultipleTags(c)
-***REMOVED***
+}
 
-func (s *DockerSchema1RegistrySuite) TestConcurrentPullMultipleTags(c *check.C) ***REMOVED***
+func (s *DockerSchema1RegistrySuite) TestConcurrentPullMultipleTags(c *check.C) {
 	testConcurrentPullMultipleTags(c)
-***REMOVED***
+}
 
 // testPullIDStability verifies that pushing an image and pulling it back
 // preserves the image ID.
-func testPullIDStability(c *check.C) ***REMOVED***
+func testPullIDStability(c *check.C) {
 	derivedImage := privateRegistryURL + "/dockercli/id-stability"
 	baseImage := "busybox"
 
@@ -221,21 +221,21 @@ func testPullIDStability(c *check.C) ***REMOVED***
 
 	// Pull
 	out, _ := dockerCmd(c, "pull", derivedImage)
-	if strings.Contains(out, "Pull complete") ***REMOVED***
+	if strings.Contains(out, "Pull complete") {
 		c.Fatalf("repull redownloaded a layer: %s", out)
-	***REMOVED***
+	}
 
 	derivedIDAfterPull := getIDByName(c, derivedImage)
 
-	if derivedIDAfterPull != originalID ***REMOVED***
+	if derivedIDAfterPull != originalID {
 		c.Fatal("image's ID unexpectedly changed after a repush/repull")
-	***REMOVED***
+	}
 
 	// Make sure the image runs correctly
 	out, _ = dockerCmd(c, "run", "--rm", derivedImage)
-	if strings.TrimSpace(out) != derivedImage ***REMOVED***
+	if strings.TrimSpace(out) != derivedImage {
 		c.Fatalf("expected %s; got %s", derivedImage, out)
-	***REMOVED***
+	}
 
 	// Confirm that repushing and repulling does not change the computed ID
 	dockerCmd(c, "push", derivedImage)
@@ -244,27 +244,27 @@ func testPullIDStability(c *check.C) ***REMOVED***
 
 	derivedIDAfterPull = getIDByName(c, derivedImage)
 
-	if derivedIDAfterPull != originalID ***REMOVED***
+	if derivedIDAfterPull != originalID {
 		c.Fatal("image's ID unexpectedly changed after a repush/repull")
-	***REMOVED***
+	}
 
 	// Make sure the image still runs
 	out, _ = dockerCmd(c, "run", "--rm", derivedImage)
-	if strings.TrimSpace(out) != derivedImage ***REMOVED***
+	if strings.TrimSpace(out) != derivedImage {
 		c.Fatalf("expected %s; got %s", derivedImage, out)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *DockerRegistrySuite) TestPullIDStability(c *check.C) ***REMOVED***
+func (s *DockerRegistrySuite) TestPullIDStability(c *check.C) {
 	testPullIDStability(c)
-***REMOVED***
+}
 
-func (s *DockerSchema1RegistrySuite) TestPullIDStability(c *check.C) ***REMOVED***
+func (s *DockerSchema1RegistrySuite) TestPullIDStability(c *check.C) {
 	testPullIDStability(c)
-***REMOVED***
+}
 
 // #21213
-func testPullNoLayers(c *check.C) ***REMOVED***
+func testPullNoLayers(c *check.C) {
 	repoName := fmt.Sprintf("%v/dockercli/scratch", privateRegistryURL)
 
 	buildImageSuccessfully(c, repoName, build.WithDockerfile(`
@@ -273,52 +273,52 @@ func testPullNoLayers(c *check.C) ***REMOVED***
 	dockerCmd(c, "push", repoName)
 	dockerCmd(c, "rmi", repoName)
 	dockerCmd(c, "pull", repoName)
-***REMOVED***
+}
 
-func (s *DockerRegistrySuite) TestPullNoLayers(c *check.C) ***REMOVED***
+func (s *DockerRegistrySuite) TestPullNoLayers(c *check.C) {
 	testPullNoLayers(c)
-***REMOVED***
+}
 
-func (s *DockerSchema1RegistrySuite) TestPullNoLayers(c *check.C) ***REMOVED***
+func (s *DockerSchema1RegistrySuite) TestPullNoLayers(c *check.C) {
 	testPullNoLayers(c)
-***REMOVED***
+}
 
-func (s *DockerRegistrySuite) TestPullManifestList(c *check.C) ***REMOVED***
+func (s *DockerRegistrySuite) TestPullManifestList(c *check.C) {
 	testRequires(c, NotArm)
 	pushDigest, err := setupImage(c)
 	c.Assert(err, checker.IsNil, check.Commentf("error setting up image"))
 
 	// Inject a manifest list into the registry
-	manifestList := &manifestlist.ManifestList***REMOVED***
-		Versioned: manifest.Versioned***REMOVED***
+	manifestList := &manifestlist.ManifestList{
+		Versioned: manifest.Versioned{
 			SchemaVersion: 2,
 			MediaType:     manifestlist.MediaTypeManifestList,
-		***REMOVED***,
-		Manifests: []manifestlist.ManifestDescriptor***REMOVED***
-			***REMOVED***
-				Descriptor: distribution.Descriptor***REMOVED***
+		},
+		Manifests: []manifestlist.ManifestDescriptor{
+			{
+				Descriptor: distribution.Descriptor{
 					Digest:    "sha256:1a9ec845ee94c202b2d5da74a24f0ed2058318bfa9879fa541efaecba272e86b",
 					Size:      3253,
 					MediaType: schema2.MediaTypeManifest,
-				***REMOVED***,
-				Platform: manifestlist.PlatformSpec***REMOVED***
+				},
+				Platform: manifestlist.PlatformSpec{
 					Architecture: "bogus_arch",
 					OS:           "bogus_os",
-				***REMOVED***,
-			***REMOVED***,
-			***REMOVED***
-				Descriptor: distribution.Descriptor***REMOVED***
+				},
+			},
+			{
+				Descriptor: distribution.Descriptor{
 					Digest:    pushDigest,
 					Size:      3253,
 					MediaType: schema2.MediaTypeManifest,
-				***REMOVED***,
-				Platform: manifestlist.PlatformSpec***REMOVED***
+				},
+				Platform: manifestlist.PlatformSpec{
 					Architecture: runtime.GOARCH,
 					OS:           runtime.GOOS,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+				},
+			},
+		},
+	}
 
 	manifestListJSON, err := json.MarshalIndent(manifestList, "", "   ")
 	c.Assert(err, checker.IsNil, check.Commentf("error marshalling manifest list"))
@@ -364,10 +364,10 @@ func (s *DockerRegistrySuite) TestPullManifestList(c *check.C) ***REMOVED***
 	dockerCmd(c, "inspect", repoName)
 
 	dockerCmd(c, "rmi", repoName)
-***REMOVED***
+}
 
 // #23100
-func (s *DockerRegistryAuthHtpasswdSuite) TestPullWithExternalAuthLoginWithScheme(c *check.C) ***REMOVED***
+func (s *DockerRegistryAuthHtpasswdSuite) TestPullWithExternalAuthLoginWithScheme(c *check.C) {
 	osPath := os.Getenv("PATH")
 	defer os.Setenv("PATH", osPath)
 
@@ -384,7 +384,7 @@ func (s *DockerRegistryAuthHtpasswdSuite) TestPullWithExternalAuthLoginWithSchem
 	tmp, err := ioutil.TempDir("", "integration-cli-")
 	c.Assert(err, checker.IsNil)
 
-	externalAuthConfig := `***REMOVED*** "credsStore": "shell-test" ***REMOVED***`
+	externalAuthConfig := `{ "credsStore": "shell-test" }`
 
 	configPath := filepath.Join(tmp, "config.json")
 	err = ioutil.WriteFile(configPath, []byte(externalAuthConfig), 0644)
@@ -410,9 +410,9 @@ func (s *DockerRegistryAuthHtpasswdSuite) TestPullWithExternalAuthLoginWithSchem
 
 	// logout should work w scheme also because it will be stripped
 	dockerCmd(c, "--config", tmp, "logout", "https://"+privateRegistryURL)
-***REMOVED***
+}
 
-func (s *DockerRegistryAuthHtpasswdSuite) TestPullWithExternalAuth(c *check.C) ***REMOVED***
+func (s *DockerRegistryAuthHtpasswdSuite) TestPullWithExternalAuth(c *check.C) {
 	osPath := os.Getenv("PATH")
 	defer os.Setenv("PATH", osPath)
 
@@ -429,7 +429,7 @@ func (s *DockerRegistryAuthHtpasswdSuite) TestPullWithExternalAuth(c *check.C) *
 	tmp, err := ioutil.TempDir("", "integration-cli-")
 	c.Assert(err, checker.IsNil)
 
-	externalAuthConfig := `***REMOVED*** "credsStore": "shell-test" ***REMOVED***`
+	externalAuthConfig := `{ "credsStore": "shell-test" }`
 
 	configPath := filepath.Join(tmp, "config.json")
 	err = ioutil.WriteFile(configPath, []byte(externalAuthConfig), 0644)
@@ -445,10 +445,10 @@ func (s *DockerRegistryAuthHtpasswdSuite) TestPullWithExternalAuth(c *check.C) *
 	dockerCmd(c, "--config", tmp, "push", repoName)
 
 	dockerCmd(c, "--config", tmp, "pull", repoName)
-***REMOVED***
+}
 
 // TestRunImplicitPullWithNoTag should pull implicitly only the default tag (latest)
-func (s *DockerRegistrySuite) TestRunImplicitPullWithNoTag(c *check.C) ***REMOVED***
+func (s *DockerRegistrySuite) TestRunImplicitPullWithNoTag(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	repo := fmt.Sprintf("%v/dockercli/busybox", privateRegistryURL)
 	repoTag1 := fmt.Sprintf("%v:latest", repo)
@@ -467,4 +467,4 @@ func (s *DockerRegistrySuite) TestRunImplicitPullWithNoTag(c *check.C) ***REMOVE
 	outImageCmd, _ := dockerCmd(c, "images", repo)
 	splitOutImageCmd := strings.Split(strings.TrimSpace(outImageCmd), "\n")
 	c.Assert(splitOutImageCmd, checker.HasLen, 2)
-***REMOVED***
+}

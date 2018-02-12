@@ -1,7 +1,7 @@
-***REMOVED***
-  "module": ***REMOVED***
-    "app": ***REMOVED***
+{
+  "module": {
+    "app": {
       "foo": null
-***REMOVED***
-  ***REMOVED***
-***REMOVED***
+    }
+  }
+}

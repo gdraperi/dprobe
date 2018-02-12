@@ -8,10 +8,10 @@ import "syscall"
 
 //sys createVirtualDisk(virtualStorageType *virtualStorageType, path string, virtualDiskAccessMask uint32, securityDescriptor *uintptr, flags uint32, providerSpecificFlags uint32, parameters *createVirtualDiskParameters, o *syscall.Overlapped, handle *syscall.Handle) (err error) [failretval != 0] = VirtDisk.CreateVirtualDisk
 
-type virtualStorageType struct ***REMOVED***
+type virtualStorageType struct {
 	DeviceID uint32
 	VendorID [16]byte
-***REMOVED***
+}
 
 const virtualDiskAccessNONE uint32 = 0
 const virtualDiskAccessATTACHRO uint32 = 65536
@@ -29,7 +29,7 @@ const createVirtualDiskFlagFullPhysicalAllocation uint32 = 1
 const createVirtualDiskFlagPreventWritesToSourceDisk uint32 = 2
 const createVirtualDiskFlagDoNotCopyMetadataFromParent uint32 = 4
 
-type version2 struct ***REMOVED***
+type version2 struct {
 	UniqueID                 [16]byte // GUID
 	MaximumSize              uint64
 	BlockSizeInBytes         uint32
@@ -40,24 +40,24 @@ type version2 struct ***REMOVED***
 	ParentVirtualStorageType virtualStorageType
 	SourceVirtualStorageType virtualStorageType
 	ResiliencyGUID           [16]byte // GUID
-***REMOVED***
+}
 
-type createVirtualDiskParameters struct ***REMOVED***
+type createVirtualDiskParameters struct {
 	Version  uint32 // Must always be set to 2
 	Version2 version2
-***REMOVED***
+}
 
 // CreateVhdx will create a simple vhdx file at the given path using default values.
-func CreateVhdx(path string, maxSizeInGb, blockSizeInMb uint32) error ***REMOVED***
+func CreateVhdx(path string, maxSizeInGb, blockSizeInMb uint32) error {
 	var defaultType virtualStorageType
 
-	parameters := createVirtualDiskParameters***REMOVED***
+	parameters := createVirtualDiskParameters{
 		Version: 2,
-		Version2: version2***REMOVED***
+		Version2: version2{
 			MaximumSize:      uint64(maxSizeInGb) * 1024 * 1024 * 1024,
 			BlockSizeInBytes: blockSizeInMb * 1024 * 1024,
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
 	var handle syscall.Handle
 
@@ -70,13 +70,13 @@ func CreateVhdx(path string, maxSizeInGb, blockSizeInMb uint32) error ***REMOVED
 		0,
 		&parameters,
 		nil,
-		&handle); err != nil ***REMOVED***
+		&handle); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if err := syscall.CloseHandle(handle); err != nil ***REMOVED***
+	if err := syscall.CloseHandle(handle); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}

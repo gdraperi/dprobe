@@ -32,177 +32,177 @@ value     := quoted | [^\s,]+
 quoted    := <go string syntax>
 
 */
-func Parse(s string) (Filter, error) ***REMOVED***
+func Parse(s string) (Filter, error) {
 	// special case empty to match all
-	if s == "" ***REMOVED***
+	if s == "" {
 		return Always, nil
-	***REMOVED***
+	}
 
-	p := parser***REMOVED***input: s***REMOVED***
+	p := parser{input: s}
 	return p.parse()
-***REMOVED***
+}
 
 // ParseAll parses each filter in ss and returns a filter that will return true
 // if any filter matches the expression.
 //
 // If no filters are provided, the filter will match anything.
-func ParseAll(ss ...string) (Filter, error) ***REMOVED***
-	if len(ss) == 0 ***REMOVED***
+func ParseAll(ss ...string) (Filter, error) {
+	if len(ss) == 0 {
 		return Always, nil
-	***REMOVED***
+	}
 
 	var fs []Filter
-	for _, s := range ss ***REMOVED***
+	for _, s := range ss {
 		f, err := Parse(s)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, errors.Wrapf(errdefs.ErrInvalidArgument, err.Error())
-		***REMOVED***
+		}
 
 		fs = append(fs, f)
-	***REMOVED***
+	}
 
 	return Any(fs), nil
-***REMOVED***
+}
 
-type parser struct ***REMOVED***
+type parser struct {
 	input   string
 	scanner scanner
-***REMOVED***
+}
 
-func (p *parser) parse() (Filter, error) ***REMOVED***
+func (p *parser) parse() (Filter, error) {
 	p.scanner.init(p.input)
 
 	ss, err := p.selectors()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, errors.Wrap(err, "filters")
-	***REMOVED***
+	}
 
 	return ss, nil
-***REMOVED***
+}
 
-func (p *parser) selectors() (Filter, error) ***REMOVED***
+func (p *parser) selectors() (Filter, error) {
 	s, err := p.selector()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	ss := All***REMOVED***s***REMOVED***
+	ss := All{s}
 
 loop:
-	for ***REMOVED***
+	for {
 		tok := p.scanner.peek()
-		switch tok ***REMOVED***
+		switch tok {
 		case ',':
 			pos, tok, _ := p.scanner.scan()
-			if tok != tokenSeparator ***REMOVED***
+			if tok != tokenSeparator {
 				return nil, p.mkerr(pos, "expected a separator")
-			***REMOVED***
+			}
 
 			s, err := p.selector()
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 
 			ss = append(ss, s)
 		case tokenEOF:
 			break loop
 		default:
 			return nil, p.mkerr(p.scanner.ppos, "unexpected input: %v", string(tok))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return ss, nil
-***REMOVED***
+}
 
-func (p *parser) selector() (selector, error) ***REMOVED***
+func (p *parser) selector() (selector, error) {
 	fieldpath, err := p.fieldpath()
-	if err != nil ***REMOVED***
-		return selector***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return selector{}, err
+	}
 
-	switch p.scanner.peek() ***REMOVED***
+	switch p.scanner.peek() {
 	case ',', tokenSeparator, tokenEOF:
-		return selector***REMOVED***
+		return selector{
 			fieldpath: fieldpath,
 			operator:  operatorPresent,
-		***REMOVED***, nil
-	***REMOVED***
+		}, nil
+	}
 
 	op, err := p.operator()
-	if err != nil ***REMOVED***
-		return selector***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return selector{}, err
+	}
 
 	var allowAltQuotes bool
-	if op == operatorMatches ***REMOVED***
+	if op == operatorMatches {
 		allowAltQuotes = true
-	***REMOVED***
+	}
 
 	value, err := p.value(allowAltQuotes)
-	if err != nil ***REMOVED***
-		if err == io.EOF ***REMOVED***
-			return selector***REMOVED******REMOVED***, io.ErrUnexpectedEOF
-		***REMOVED***
-		return selector***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		if err == io.EOF {
+			return selector{}, io.ErrUnexpectedEOF
+		}
+		return selector{}, err
+	}
 
-	return selector***REMOVED***
+	return selector{
 		fieldpath: fieldpath,
 		value:     value,
 		operator:  op,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-func (p *parser) fieldpath() ([]string, error) ***REMOVED***
+func (p *parser) fieldpath() ([]string, error) {
 	f, err := p.field()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	fs := []string***REMOVED***f***REMOVED***
+	fs := []string{f}
 loop:
-	for ***REMOVED***
+	for {
 		tok := p.scanner.peek() // lookahead to consume field separator
 
-		switch tok ***REMOVED***
+		switch tok {
 		case '.':
 			pos, tok, _ := p.scanner.scan() // consume separator
-			if tok != tokenSeparator ***REMOVED***
+			if tok != tokenSeparator {
 				return nil, p.mkerr(pos, "expected a field separator (`.`)")
-			***REMOVED***
+			}
 
 			f, err := p.field()
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 
 			fs = append(fs, f)
 		default:
 			// let the layer above handle the other bad cases.
 			break loop
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return fs, nil
-***REMOVED***
+}
 
-func (p *parser) field() (string, error) ***REMOVED***
+func (p *parser) field() (string, error) {
 	pos, tok, s := p.scanner.scan()
-	switch tok ***REMOVED***
+	switch tok {
 	case tokenField:
 		return s, nil
 	case tokenQuoted:
 		return p.unquote(pos, s, false)
-	***REMOVED***
+	}
 
 	return "", p.mkerr(pos, "expected field or quoted")
-***REMOVED***
+}
 
-func (p *parser) operator() (operator, error) ***REMOVED***
+func (p *parser) operator() (operator, error) {
 	pos, tok, s := p.scanner.scan()
-	switch tok ***REMOVED***
+	switch tok {
 	case tokenOperator:
-		switch s ***REMOVED***
+		switch s {
 		case "==":
 			return operatorEqual, nil
 		case "!=":
@@ -211,60 +211,60 @@ func (p *parser) operator() (operator, error) ***REMOVED***
 			return operatorMatches, nil
 		default:
 			return 0, p.mkerr(pos, "unsupported operator %q", s)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return 0, p.mkerr(pos, `expected an operator ("=="|"!="|"~=")`)
-***REMOVED***
+}
 
-func (p *parser) value(allowAltQuotes bool) (string, error) ***REMOVED***
+func (p *parser) value(allowAltQuotes bool) (string, error) {
 	pos, tok, s := p.scanner.scan()
 
-	switch tok ***REMOVED***
+	switch tok {
 	case tokenValue, tokenField:
 		return s, nil
 	case tokenQuoted:
 		return p.unquote(pos, s, allowAltQuotes)
-	***REMOVED***
+	}
 
 	return "", p.mkerr(pos, "expected value or quoted")
-***REMOVED***
+}
 
-func (p *parser) unquote(pos int, s string, allowAlts bool) (string, error) ***REMOVED***
-	if !allowAlts && s[0] != '\'' && s[0] != '"' ***REMOVED***
+func (p *parser) unquote(pos int, s string, allowAlts bool) (string, error) {
+	if !allowAlts && s[0] != '\'' && s[0] != '"' {
 		return "", p.mkerr(pos, "invalid quote encountered")
-	***REMOVED***
+	}
 
 	uq, err := unquote(s)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", p.mkerr(pos, "unquoting failed: %v", err)
-	***REMOVED***
+	}
 
 	return uq, nil
-***REMOVED***
+}
 
-type parseError struct ***REMOVED***
+type parseError struct {
 	input string
 	pos   int
 	msg   string
-***REMOVED***
+}
 
-func (pe parseError) Error() string ***REMOVED***
-	if pe.pos < len(pe.input) ***REMOVED***
+func (pe parseError) Error() string {
+	if pe.pos < len(pe.input) {
 		before := pe.input[:pe.pos]
 		location := pe.input[pe.pos : pe.pos+1] // need to handle end
 		after := pe.input[pe.pos+1:]
 
 		return fmt.Sprintf("[%s >|%s|< %s]: %v", before, location, after, pe.msg)
-	***REMOVED***
+	}
 
 	return fmt.Sprintf("[%s]: %v", pe.input, pe.msg)
-***REMOVED***
+}
 
-func (p *parser) mkerr(pos int, format string, args ...interface***REMOVED******REMOVED***) error ***REMOVED***
-	return errors.Wrap(parseError***REMOVED***
+func (p *parser) mkerr(pos int, format string, args ...interface{}) error {
+	return errors.Wrap(parseError{
 		input: p.input,
 		pos:   pos,
 		msg:   fmt.Sprintf(format, args...),
-	***REMOVED***, "parse error")
-***REMOVED***
+	}, "parse error")
+}

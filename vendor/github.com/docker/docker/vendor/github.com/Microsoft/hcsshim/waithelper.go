@@ -6,58 +6,58 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func processAsyncHcsResult(err error, resultp *uint16, callbackNumber uintptr, expectedNotification hcsNotification, timeout *time.Duration) error ***REMOVED***
+func processAsyncHcsResult(err error, resultp *uint16, callbackNumber uintptr, expectedNotification hcsNotification, timeout *time.Duration) error {
 	err = processHcsResult(err, resultp)
-	if IsPending(err) ***REMOVED***
+	if IsPending(err) {
 		return waitForNotification(callbackNumber, expectedNotification, timeout)
-	***REMOVED***
+	}
 
 	return err
-***REMOVED***
+}
 
-func waitForNotification(callbackNumber uintptr, expectedNotification hcsNotification, timeout *time.Duration) error ***REMOVED***
+func waitForNotification(callbackNumber uintptr, expectedNotification hcsNotification, timeout *time.Duration) error {
 	callbackMapLock.RLock()
 	channels := callbackMap[callbackNumber].channels
 	callbackMapLock.RUnlock()
 
 	expectedChannel := channels[expectedNotification]
-	if expectedChannel == nil ***REMOVED***
+	if expectedChannel == nil {
 		logrus.Errorf("unknown notification type in waitForNotification %x", expectedNotification)
 		return ErrInvalidNotificationType
-	***REMOVED***
+	}
 
 	var c <-chan time.Time
-	if timeout != nil ***REMOVED***
+	if timeout != nil {
 		timer := time.NewTimer(*timeout)
 		c = timer.C
 		defer timer.Stop()
-	***REMOVED***
+	}
 
-	select ***REMOVED***
+	select {
 	case err, ok := <-expectedChannel:
-		if !ok ***REMOVED***
+		if !ok {
 			return ErrHandleClose
-		***REMOVED***
+		}
 		return err
 	case err, ok := <-channels[hcsNotificationSystemExited]:
-		if !ok ***REMOVED***
+		if !ok {
 			return ErrHandleClose
-		***REMOVED***
+		}
 		// If the expected notification is hcsNotificationSystemExited which of the two selects
 		// chosen is random. Return the raw error if hcsNotificationSystemExited is expected
-		if channels[hcsNotificationSystemExited] == expectedChannel ***REMOVED***
+		if channels[hcsNotificationSystemExited] == expectedChannel {
 			return err
-		***REMOVED***
+		}
 		return ErrUnexpectedContainerExit
 	case _, ok := <-channels[hcsNotificationServiceDisconnect]:
-		if !ok ***REMOVED***
+		if !ok {
 			return ErrHandleClose
-		***REMOVED***
+		}
 		// hcsNotificationServiceDisconnect should never be an expected notification
 		// it does not need the same handling as hcsNotificationSystemExited
 		return ErrUnexpectedProcessAbort
 	case <-c:
 		return ErrTimeout
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

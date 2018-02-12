@@ -4,19 +4,19 @@
 
 package ipv6
 
-func (f *icmpv6Filter) accept(typ ICMPType) ***REMOVED***
+func (f *icmpv6Filter) accept(typ ICMPType) {
 	// TODO(mikio): implement this
-***REMOVED***
+}
 
-func (f *icmpv6Filter) block(typ ICMPType) ***REMOVED***
+func (f *icmpv6Filter) block(typ ICMPType) {
 	// TODO(mikio): implement this
-***REMOVED***
+}
 
-func (f *icmpv6Filter) setAll(block bool) ***REMOVED***
+func (f *icmpv6Filter) setAll(block bool) {
 	// TODO(mikio): implement this
-***REMOVED***
+}
 
-func (f *icmpv6Filter) willBlock(typ ICMPType) bool ***REMOVED***
+func (f *icmpv6Filter) willBlock(typ ICMPType) bool {
 	// TODO(mikio): implement this
 	return false
-***REMOVED***
+}

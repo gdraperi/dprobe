@@ -83,49 +83,49 @@ const (
 	sizeofICMPv6Filter = 0x20
 )
 
-type sockaddrStorage struct ***REMOVED***
+type sockaddrStorage struct {
 	Len         uint8
 	Family      uint8
 	X__ss_pad1  [6]int8
 	X__ss_align int64
 	X__ss_pad2  [112]int8
-***REMOVED***
+}
 
-type sockaddrInet6 struct ***REMOVED***
+type sockaddrInet6 struct {
 	Len      uint8
 	Family   uint8
 	Port     uint16
 	Flowinfo uint32
 	Addr     [16]byte /* in6_addr */
 	Scope_id uint32
-***REMOVED***
+}
 
-type inet6Pktinfo struct ***REMOVED***
+type inet6Pktinfo struct {
 	Addr    [16]byte /* in6_addr */
 	Ifindex uint32
-***REMOVED***
+}
 
-type ipv6Mtuinfo struct ***REMOVED***
+type ipv6Mtuinfo struct {
 	Addr sockaddrInet6
 	Mtu  uint32
-***REMOVED***
+}
 
-type ipv6Mreq struct ***REMOVED***
+type ipv6Mreq struct {
 	Multiaddr [16]byte /* in6_addr */
 	Interface uint32
-***REMOVED***
+}
 
-type icmpv6Filter struct ***REMOVED***
+type icmpv6Filter struct {
 	Filt [8]uint32
-***REMOVED***
+}
 
-type groupReq struct ***REMOVED***
+type groupReq struct {
 	Interface uint32
 	Pad_cgo_0 [128]byte
-***REMOVED***
+}
 
-type groupSourceReq struct ***REMOVED***
+type groupSourceReq struct {
 	Interface uint32
 	Pad_cgo_0 [128]byte
 	Pad_cgo_1 [128]byte
-***REMOVED***
+}

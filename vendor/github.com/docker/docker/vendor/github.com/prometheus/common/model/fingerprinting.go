@@ -23,83 +23,83 @@ import (
 type Fingerprint uint64
 
 // FingerprintFromString transforms a string representation into a Fingerprint.
-func FingerprintFromString(s string) (Fingerprint, error) ***REMOVED***
+func FingerprintFromString(s string) (Fingerprint, error) {
 	num, err := strconv.ParseUint(s, 16, 64)
 	return Fingerprint(num), err
-***REMOVED***
+}
 
 // ParseFingerprint parses the input string into a fingerprint.
-func ParseFingerprint(s string) (Fingerprint, error) ***REMOVED***
+func ParseFingerprint(s string) (Fingerprint, error) {
 	num, err := strconv.ParseUint(s, 16, 64)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	return Fingerprint(num), nil
-***REMOVED***
+}
 
-func (f Fingerprint) String() string ***REMOVED***
+func (f Fingerprint) String() string {
 	return fmt.Sprintf("%016x", uint64(f))
-***REMOVED***
+}
 
 // Fingerprints represents a collection of Fingerprint subject to a given
 // natural sorting scheme. It implements sort.Interface.
 type Fingerprints []Fingerprint
 
 // Len implements sort.Interface.
-func (f Fingerprints) Len() int ***REMOVED***
+func (f Fingerprints) Len() int {
 	return len(f)
-***REMOVED***
+}
 
 // Less implements sort.Interface.
-func (f Fingerprints) Less(i, j int) bool ***REMOVED***
+func (f Fingerprints) Less(i, j int) bool {
 	return f[i] < f[j]
-***REMOVED***
+}
 
 // Swap implements sort.Interface.
-func (f Fingerprints) Swap(i, j int) ***REMOVED***
+func (f Fingerprints) Swap(i, j int) {
 	f[i], f[j] = f[j], f[i]
-***REMOVED***
+}
 
 // FingerprintSet is a set of Fingerprints.
-type FingerprintSet map[Fingerprint]struct***REMOVED******REMOVED***
+type FingerprintSet map[Fingerprint]struct{}
 
 // Equal returns true if both sets contain the same elements (and not more).
-func (s FingerprintSet) Equal(o FingerprintSet) bool ***REMOVED***
-	if len(s) != len(o) ***REMOVED***
+func (s FingerprintSet) Equal(o FingerprintSet) bool {
+	if len(s) != len(o) {
 		return false
-	***REMOVED***
+	}
 
-	for k := range s ***REMOVED***
-		if _, ok := o[k]; !ok ***REMOVED***
+	for k := range s {
+		if _, ok := o[k]; !ok {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return true
-***REMOVED***
+}
 
 // Intersection returns the elements contained in both sets.
-func (s FingerprintSet) Intersection(o FingerprintSet) FingerprintSet ***REMOVED***
+func (s FingerprintSet) Intersection(o FingerprintSet) FingerprintSet {
 	myLength, otherLength := len(s), len(o)
-	if myLength == 0 || otherLength == 0 ***REMOVED***
-		return FingerprintSet***REMOVED******REMOVED***
-	***REMOVED***
+	if myLength == 0 || otherLength == 0 {
+		return FingerprintSet{}
+	}
 
 	subSet := s
 	superSet := o
 
-	if otherLength < myLength ***REMOVED***
+	if otherLength < myLength {
 		subSet = o
 		superSet = s
-	***REMOVED***
+	}
 
-	out := FingerprintSet***REMOVED******REMOVED***
+	out := FingerprintSet{}
 
-	for k := range subSet ***REMOVED***
-		if _, ok := superSet[k]; ok ***REMOVED***
-			out[k] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-		***REMOVED***
-	***REMOVED***
+	for k := range subSet {
+		if _, ok := superSet[k]; ok {
+			out[k] = struct{}{}
+		}
+	}
 
 	return out
-***REMOVED***
+}

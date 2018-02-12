@@ -1,8 +1,8 @@
 package main
 
-func main() ***REMOVED***
-	if y := 20; y == 0 ***REMOVED***
-	***REMOVED***
-	if x := 10; x == 0 ***REMOVED***
-	***REMOVED*** else if 
-***REMOVED***
+func main() {
+	if y := 20; y == 0 {
+	}
+	if x := 10; x == 0 {
+	} else if 
+}

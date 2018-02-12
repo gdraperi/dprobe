@@ -21,7 +21,7 @@ option go_package = "github.com/containerd/containerd/api/services/images/v1;ima
 // required by consuming services.
 //
 // As such, this can really be considered a "metadata service".
-service Images ***REMOVED***
+service Images {
 	// Get returns an image by name.
 	rpc Get(GetImageRequest) returns (GetImageResponse);
 
@@ -39,9 +39,9 @@ service Images ***REMOVED***
 
 	// Delete deletes the image by name.
 	rpc Delete(DeleteImageRequest) returns (google.protobuf.Empty);
-***REMOVED***
+}
 
-message Image ***REMOVED***
+message Image {
 	// Name provides a unique name for the image.
 	//
 	// Containerd treats this as the primary identifier.
@@ -62,25 +62,25 @@ message Image ***REMOVED***
 
 	// UpdatedAt is the last time the image was mutated.
 	google.protobuf.Timestamp updated_at = 8 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
-***REMOVED***
+}
 
-message GetImageRequest ***REMOVED***
+message GetImageRequest {
 	string name = 1;
-***REMOVED***
+}
 
-message GetImageResponse ***REMOVED***
+message GetImageResponse {
 	Image image = 1;
-***REMOVED***
+}
 
-message CreateImageRequest ***REMOVED***
+message CreateImageRequest {
 	Image image = 1 [(gogoproto.nullable) = false];
-***REMOVED***
+}
 
-message CreateImageResponse ***REMOVED***
+message CreateImageResponse {
 	Image image = 1 [(gogoproto.nullable) = false];
-***REMOVED***
+}
 
-message UpdateImageRequest ***REMOVED***
+message UpdateImageRequest {
 	// Image provides a full or partial image for update.
 	//
 	// The name field must be set or an error will be returned.
@@ -89,13 +89,13 @@ message UpdateImageRequest ***REMOVED***
 	// UpdateMask specifies which fields to perform the update on. If empty,
 	// the operation applies to all fields.
 	google.protobuf.FieldMask update_mask = 2;
-***REMOVED***
+}
 
-message UpdateImageResponse ***REMOVED***
+message UpdateImageResponse {
 	Image image = 1 [(gogoproto.nullable) = false];
-***REMOVED***
+}
 
-message ListImagesRequest ***REMOVED***
+message ListImagesRequest {
 	// Filters contains one or more filters using the syntax defined in the
 	// containerd filter package.
 	//
@@ -107,13 +107,13 @@ message ListImagesRequest ***REMOVED***
 	//
 	// If filters is zero-length or nil, all items will be returned.
 	repeated string filters = 1;
-***REMOVED***
+}
 
-message ListImagesResponse ***REMOVED***
+message ListImagesResponse {
 	repeated Image images = 1 [(gogoproto.nullable) = false];
-***REMOVED***
+}
 
-message DeleteImageRequest ***REMOVED***
+message DeleteImageRequest {
 	string name = 1;
 
 	// Sync indicates that the delete and cleanup should be done
@@ -121,4 +121,4 @@ message DeleteImageRequest ***REMOVED***
 	//
 	// Default is false
 	bool sync = 2;
-***REMOVED***
+}

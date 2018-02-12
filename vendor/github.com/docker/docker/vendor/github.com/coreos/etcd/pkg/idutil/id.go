@@ -46,33 +46,33 @@ const (
 // It helps to extend the event window to 2^56. This doesn't break that
 // id generated after restart is unique because etcd throughput is <<
 // 256req/ms(250k reqs/second).
-type Generator struct ***REMOVED***
+type Generator struct {
 	mu sync.Mutex
 	// high order 2 bytes
 	prefix uint64
 	// low order 6 bytes
 	suffix uint64
-***REMOVED***
+}
 
-func NewGenerator(memberID uint16, now time.Time) *Generator ***REMOVED***
+func NewGenerator(memberID uint16, now time.Time) *Generator {
 	prefix := uint64(memberID) << suffixLen
 	unixMilli := uint64(now.UnixNano()) / uint64(time.Millisecond/time.Nanosecond)
 	suffix := lowbit(unixMilli, tsLen) << cntLen
-	return &Generator***REMOVED***
+	return &Generator{
 		prefix: prefix,
 		suffix: suffix,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Next generates a id that is unique.
-func (g *Generator) Next() uint64 ***REMOVED***
+func (g *Generator) Next() uint64 {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 	g.suffix++
 	id := g.prefix | lowbit(g.suffix, suffixLen)
 	return id
-***REMOVED***
+}
 
-func lowbit(x uint64, n uint) uint64 ***REMOVED***
+func lowbit(x uint64, n uint) uint64 {
 	return x & (math.MaxUint64 >> (64 - n))
-***REMOVED***
+}

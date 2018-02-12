@@ -15,28 +15,28 @@ import (
 	"github.com/go-check/check"
 )
 
-func (s *DockerSwarmSuite) TestServiceCreateMountVolume(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestServiceCreateMountVolume(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 	out, err := d.Cmd("service", "create", "--no-resolve-image", "--detach=true", "--mount", "type=volume,source=foo,target=/foo,volume-nocopy", "busybox", "top")
 	c.Assert(err, checker.IsNil, check.Commentf(out))
 	id := strings.TrimSpace(out)
 
 	var tasks []swarm.Task
-	waitAndAssert(c, defaultReconciliationTimeout, func(c *check.C) (interface***REMOVED******REMOVED***, check.CommentInterface) ***REMOVED***
+	waitAndAssert(c, defaultReconciliationTimeout, func(c *check.C) (interface{}, check.CommentInterface) {
 		tasks = d.GetServiceTasks(c, id)
 		return len(tasks) > 0, nil
-	***REMOVED***, checker.Equals, true)
+	}, checker.Equals, true)
 
 	task := tasks[0]
-	waitAndAssert(c, defaultReconciliationTimeout, func(c *check.C) (interface***REMOVED******REMOVED***, check.CommentInterface) ***REMOVED***
-		if task.NodeID == "" || task.Status.ContainerStatus.ContainerID == "" ***REMOVED***
+	waitAndAssert(c, defaultReconciliationTimeout, func(c *check.C) (interface{}, check.CommentInterface) {
+		if task.NodeID == "" || task.Status.ContainerStatus.ContainerID == "" {
 			task = d.GetTask(c, task.ID)
-		***REMOVED***
+		}
 		return task.NodeID != "" && task.Status.ContainerStatus.ContainerID != "", nil
-	***REMOVED***, checker.Equals, true)
+	}, checker.Equals, true)
 
 	// check container mount config
-	out, err = s.nodeCmd(c, task.NodeID, "inspect", "--format", "***REMOVED******REMOVED***json .HostConfig.Mounts***REMOVED******REMOVED***", task.Status.ContainerStatus.ContainerID)
+	out, err = s.nodeCmd(c, task.NodeID, "inspect", "--format", "{{json .HostConfig.Mounts}}", task.Status.ContainerStatus.ContainerID)
 	c.Assert(err, checker.IsNil, check.Commentf(out))
 
 	var mountConfig []mount.Mount
@@ -50,7 +50,7 @@ func (s *DockerSwarmSuite) TestServiceCreateMountVolume(c *check.C) ***REMOVED**
 	c.Assert(mountConfig[0].VolumeOptions.NoCopy, checker.True)
 
 	// check container mounts actual
-	out, err = s.nodeCmd(c, task.NodeID, "inspect", "--format", "***REMOVED******REMOVED***json .Mounts***REMOVED******REMOVED***", task.Status.ContainerStatus.ContainerID)
+	out, err = s.nodeCmd(c, task.NodeID, "inspect", "--format", "{{json .Mounts}}", task.Status.ContainerStatus.ContainerID)
 	c.Assert(err, checker.IsNil, check.Commentf(out))
 
 	var mounts []types.MountPoint
@@ -61,25 +61,25 @@ func (s *DockerSwarmSuite) TestServiceCreateMountVolume(c *check.C) ***REMOVED**
 	c.Assert(mounts[0].Name, checker.Equals, "foo")
 	c.Assert(mounts[0].Destination, checker.Equals, "/foo")
 	c.Assert(mounts[0].RW, checker.Equals, true)
-***REMOVED***
+}
 
-func (s *DockerSwarmSuite) TestServiceCreateWithSecretSimple(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestServiceCreateWithSecretSimple(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 
 	serviceName := "test-service-secret"
 	testName := "test_secret"
-	id := d.CreateSecret(c, swarm.SecretSpec***REMOVED***
-		Annotations: swarm.Annotations***REMOVED***
+	id := d.CreateSecret(c, swarm.SecretSpec{
+		Annotations: swarm.Annotations{
 			Name: testName,
-		***REMOVED***,
+		},
 		Data: []byte("TESTINGDATA"),
-	***REMOVED***)
+	})
 	c.Assert(id, checker.Not(checker.Equals), "", check.Commentf("secrets: %s", id))
 
 	out, err := d.Cmd("service", "create", "--detach", "--no-resolve-image", "--name", serviceName, "--secret", testName, "busybox", "top")
 	c.Assert(err, checker.IsNil, check.Commentf(out))
 
-	out, err = d.Cmd("service", "inspect", "--format", "***REMOVED******REMOVED*** json .Spec.TaskTemplate.ContainerSpec.Secrets ***REMOVED******REMOVED***", serviceName)
+	out, err = d.Cmd("service", "inspect", "--format", "{{ json .Spec.TaskTemplate.ContainerSpec.Secrets }}", serviceName)
 	c.Assert(err, checker.IsNil)
 
 	var refs []swarm.SecretReference
@@ -95,40 +95,40 @@ func (s *DockerSwarmSuite) TestServiceCreateWithSecretSimple(c *check.C) ***REMO
 	out, err = d.Cmd("service", "rm", serviceName)
 	c.Assert(err, checker.IsNil, check.Commentf(out))
 	d.DeleteSecret(c, testName)
-***REMOVED***
+}
 
-func (s *DockerSwarmSuite) TestServiceCreateWithSecretSourceTargetPaths(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestServiceCreateWithSecretSourceTargetPaths(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 
-	testPaths := map[string]string***REMOVED***
+	testPaths := map[string]string{
 		"app":                  "/etc/secret",
 		"test_secret":          "test_secret",
 		"relative_secret":      "relative/secret",
 		"escapes_in_container": "../secret",
-	***REMOVED***
+	}
 
 	var secretFlags []string
 
-	for testName, testTarget := range testPaths ***REMOVED***
-		id := d.CreateSecret(c, swarm.SecretSpec***REMOVED***
-			Annotations: swarm.Annotations***REMOVED***
+	for testName, testTarget := range testPaths {
+		id := d.CreateSecret(c, swarm.SecretSpec{
+			Annotations: swarm.Annotations{
 				Name: testName,
-			***REMOVED***,
+			},
 			Data: []byte("TESTINGDATA " + testName + " " + testTarget),
-		***REMOVED***)
+		})
 		c.Assert(id, checker.Not(checker.Equals), "", check.Commentf("secrets: %s", id))
 
 		secretFlags = append(secretFlags, "--secret", fmt.Sprintf("source=%s,target=%s", testName, testTarget))
-	***REMOVED***
+	}
 
 	serviceName := "svc"
-	serviceCmd := []string***REMOVED***"service", "create", "--detach", "--no-resolve-image", "--name", serviceName***REMOVED***
+	serviceCmd := []string{"service", "create", "--detach", "--no-resolve-image", "--name", serviceName}
 	serviceCmd = append(serviceCmd, secretFlags...)
 	serviceCmd = append(serviceCmd, "busybox", "top")
 	out, err := d.Cmd(serviceCmd...)
 	c.Assert(err, checker.IsNil, check.Commentf(out))
 
-	out, err = d.Cmd("service", "inspect", "--format", "***REMOVED******REMOVED*** json .Spec.TaskTemplate.ContainerSpec.Secrets ***REMOVED******REMOVED***", serviceName)
+	out, err = d.Cmd("service", "inspect", "--format", "{{ json .Spec.TaskTemplate.ContainerSpec.Secrets }}", serviceName)
 	c.Assert(err, checker.IsNil)
 
 	var refs []swarm.SecretReference
@@ -136,49 +136,49 @@ func (s *DockerSwarmSuite) TestServiceCreateWithSecretSourceTargetPaths(c *check
 	c.Assert(refs, checker.HasLen, len(testPaths))
 
 	var tasks []swarm.Task
-	waitAndAssert(c, defaultReconciliationTimeout, func(c *check.C) (interface***REMOVED******REMOVED***, check.CommentInterface) ***REMOVED***
+	waitAndAssert(c, defaultReconciliationTimeout, func(c *check.C) (interface{}, check.CommentInterface) {
 		tasks = d.GetServiceTasks(c, serviceName)
 		return len(tasks) > 0, nil
-	***REMOVED***, checker.Equals, true)
+	}, checker.Equals, true)
 
 	task := tasks[0]
-	waitAndAssert(c, defaultReconciliationTimeout, func(c *check.C) (interface***REMOVED******REMOVED***, check.CommentInterface) ***REMOVED***
-		if task.NodeID == "" || task.Status.ContainerStatus.ContainerID == "" ***REMOVED***
+	waitAndAssert(c, defaultReconciliationTimeout, func(c *check.C) (interface{}, check.CommentInterface) {
+		if task.NodeID == "" || task.Status.ContainerStatus.ContainerID == "" {
 			task = d.GetTask(c, task.ID)
-		***REMOVED***
+		}
 		return task.NodeID != "" && task.Status.ContainerStatus.ContainerID != "", nil
-	***REMOVED***, checker.Equals, true)
+	}, checker.Equals, true)
 
-	for testName, testTarget := range testPaths ***REMOVED***
+	for testName, testTarget := range testPaths {
 		path := testTarget
-		if !filepath.IsAbs(path) ***REMOVED***
+		if !filepath.IsAbs(path) {
 			path = filepath.Join("/run/secrets", path)
-		***REMOVED***
+		}
 		out, err := d.Cmd("exec", task.Status.ContainerStatus.ContainerID, "cat", path)
 		c.Assert(err, checker.IsNil)
 		c.Assert(out, checker.Equals, "TESTINGDATA "+testName+" "+testTarget)
-	***REMOVED***
+	}
 
 	out, err = d.Cmd("service", "rm", serviceName)
 	c.Assert(err, checker.IsNil, check.Commentf(out))
-***REMOVED***
+}
 
-func (s *DockerSwarmSuite) TestServiceCreateWithSecretReferencedTwice(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestServiceCreateWithSecretReferencedTwice(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 
-	id := d.CreateSecret(c, swarm.SecretSpec***REMOVED***
-		Annotations: swarm.Annotations***REMOVED***
+	id := d.CreateSecret(c, swarm.SecretSpec{
+		Annotations: swarm.Annotations{
 			Name: "mysecret",
-		***REMOVED***,
+		},
 		Data: []byte("TESTINGDATA"),
-	***REMOVED***)
+	})
 	c.Assert(id, checker.Not(checker.Equals), "", check.Commentf("secrets: %s", id))
 
 	serviceName := "svc"
 	out, err := d.Cmd("service", "create", "--detach", "--no-resolve-image", "--name", serviceName, "--secret", "source=mysecret,target=target1", "--secret", "source=mysecret,target=target2", "busybox", "top")
 	c.Assert(err, checker.IsNil, check.Commentf(out))
 
-	out, err = d.Cmd("service", "inspect", "--format", "***REMOVED******REMOVED*** json .Spec.TaskTemplate.ContainerSpec.Secrets ***REMOVED******REMOVED***", serviceName)
+	out, err = d.Cmd("service", "inspect", "--format", "{{ json .Spec.TaskTemplate.ContainerSpec.Secrets }}", serviceName)
 	c.Assert(err, checker.IsNil)
 
 	var refs []swarm.SecretReference
@@ -186,48 +186,48 @@ func (s *DockerSwarmSuite) TestServiceCreateWithSecretReferencedTwice(c *check.C
 	c.Assert(refs, checker.HasLen, 2)
 
 	var tasks []swarm.Task
-	waitAndAssert(c, defaultReconciliationTimeout, func(c *check.C) (interface***REMOVED******REMOVED***, check.CommentInterface) ***REMOVED***
+	waitAndAssert(c, defaultReconciliationTimeout, func(c *check.C) (interface{}, check.CommentInterface) {
 		tasks = d.GetServiceTasks(c, serviceName)
 		return len(tasks) > 0, nil
-	***REMOVED***, checker.Equals, true)
+	}, checker.Equals, true)
 
 	task := tasks[0]
-	waitAndAssert(c, defaultReconciliationTimeout, func(c *check.C) (interface***REMOVED******REMOVED***, check.CommentInterface) ***REMOVED***
-		if task.NodeID == "" || task.Status.ContainerStatus.ContainerID == "" ***REMOVED***
+	waitAndAssert(c, defaultReconciliationTimeout, func(c *check.C) (interface{}, check.CommentInterface) {
+		if task.NodeID == "" || task.Status.ContainerStatus.ContainerID == "" {
 			task = d.GetTask(c, task.ID)
-		***REMOVED***
+		}
 		return task.NodeID != "" && task.Status.ContainerStatus.ContainerID != "", nil
-	***REMOVED***, checker.Equals, true)
+	}, checker.Equals, true)
 
-	for _, target := range []string***REMOVED***"target1", "target2"***REMOVED*** ***REMOVED***
+	for _, target := range []string{"target1", "target2"} {
 		c.Assert(err, checker.IsNil, check.Commentf(out))
 		path := filepath.Join("/run/secrets", target)
 		out, err := d.Cmd("exec", task.Status.ContainerStatus.ContainerID, "cat", path)
 		c.Assert(err, checker.IsNil)
 		c.Assert(out, checker.Equals, "TESTINGDATA")
-	***REMOVED***
+	}
 
 	out, err = d.Cmd("service", "rm", serviceName)
 	c.Assert(err, checker.IsNil, check.Commentf(out))
-***REMOVED***
+}
 
-func (s *DockerSwarmSuite) TestServiceCreateWithConfigSimple(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestServiceCreateWithConfigSimple(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 
 	serviceName := "test-service-config"
 	testName := "test_config"
-	id := d.CreateConfig(c, swarm.ConfigSpec***REMOVED***
-		Annotations: swarm.Annotations***REMOVED***
+	id := d.CreateConfig(c, swarm.ConfigSpec{
+		Annotations: swarm.Annotations{
 			Name: testName,
-		***REMOVED***,
+		},
 		Data: []byte("TESTINGDATA"),
-	***REMOVED***)
+	})
 	c.Assert(id, checker.Not(checker.Equals), "", check.Commentf("configs: %s", id))
 
 	out, err := d.Cmd("service", "create", "--detach", "--no-resolve-image", "--name", serviceName, "--config", testName, "busybox", "top")
 	c.Assert(err, checker.IsNil, check.Commentf(out))
 
-	out, err = d.Cmd("service", "inspect", "--format", "***REMOVED******REMOVED*** json .Spec.TaskTemplate.ContainerSpec.Configs ***REMOVED******REMOVED***", serviceName)
+	out, err = d.Cmd("service", "inspect", "--format", "{{ json .Spec.TaskTemplate.ContainerSpec.Configs }}", serviceName)
 	c.Assert(err, checker.IsNil)
 
 	var refs []swarm.ConfigReference
@@ -243,39 +243,39 @@ func (s *DockerSwarmSuite) TestServiceCreateWithConfigSimple(c *check.C) ***REMO
 	out, err = d.Cmd("service", "rm", serviceName)
 	c.Assert(err, checker.IsNil, check.Commentf(out))
 	d.DeleteConfig(c, testName)
-***REMOVED***
+}
 
-func (s *DockerSwarmSuite) TestServiceCreateWithConfigSourceTargetPaths(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestServiceCreateWithConfigSourceTargetPaths(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 
-	testPaths := map[string]string***REMOVED***
+	testPaths := map[string]string{
 		"app":             "/etc/config",
 		"test_config":     "test_config",
 		"relative_config": "relative/config",
-	***REMOVED***
+	}
 
 	var configFlags []string
 
-	for testName, testTarget := range testPaths ***REMOVED***
-		id := d.CreateConfig(c, swarm.ConfigSpec***REMOVED***
-			Annotations: swarm.Annotations***REMOVED***
+	for testName, testTarget := range testPaths {
+		id := d.CreateConfig(c, swarm.ConfigSpec{
+			Annotations: swarm.Annotations{
 				Name: testName,
-			***REMOVED***,
+			},
 			Data: []byte("TESTINGDATA " + testName + " " + testTarget),
-		***REMOVED***)
+		})
 		c.Assert(id, checker.Not(checker.Equals), "", check.Commentf("configs: %s", id))
 
 		configFlags = append(configFlags, "--config", fmt.Sprintf("source=%s,target=%s", testName, testTarget))
-	***REMOVED***
+	}
 
 	serviceName := "svc"
-	serviceCmd := []string***REMOVED***"service", "create", "--detach", "--no-resolve-image", "--name", serviceName***REMOVED***
+	serviceCmd := []string{"service", "create", "--detach", "--no-resolve-image", "--name", serviceName}
 	serviceCmd = append(serviceCmd, configFlags...)
 	serviceCmd = append(serviceCmd, "busybox", "top")
 	out, err := d.Cmd(serviceCmd...)
 	c.Assert(err, checker.IsNil, check.Commentf(out))
 
-	out, err = d.Cmd("service", "inspect", "--format", "***REMOVED******REMOVED*** json .Spec.TaskTemplate.ContainerSpec.Configs ***REMOVED******REMOVED***", serviceName)
+	out, err = d.Cmd("service", "inspect", "--format", "{{ json .Spec.TaskTemplate.ContainerSpec.Configs }}", serviceName)
 	c.Assert(err, checker.IsNil)
 
 	var refs []swarm.ConfigReference
@@ -283,49 +283,49 @@ func (s *DockerSwarmSuite) TestServiceCreateWithConfigSourceTargetPaths(c *check
 	c.Assert(refs, checker.HasLen, len(testPaths))
 
 	var tasks []swarm.Task
-	waitAndAssert(c, defaultReconciliationTimeout, func(c *check.C) (interface***REMOVED******REMOVED***, check.CommentInterface) ***REMOVED***
+	waitAndAssert(c, defaultReconciliationTimeout, func(c *check.C) (interface{}, check.CommentInterface) {
 		tasks = d.GetServiceTasks(c, serviceName)
 		return len(tasks) > 0, nil
-	***REMOVED***, checker.Equals, true)
+	}, checker.Equals, true)
 
 	task := tasks[0]
-	waitAndAssert(c, defaultReconciliationTimeout, func(c *check.C) (interface***REMOVED******REMOVED***, check.CommentInterface) ***REMOVED***
-		if task.NodeID == "" || task.Status.ContainerStatus.ContainerID == "" ***REMOVED***
+	waitAndAssert(c, defaultReconciliationTimeout, func(c *check.C) (interface{}, check.CommentInterface) {
+		if task.NodeID == "" || task.Status.ContainerStatus.ContainerID == "" {
 			task = d.GetTask(c, task.ID)
-		***REMOVED***
+		}
 		return task.NodeID != "" && task.Status.ContainerStatus.ContainerID != "", nil
-	***REMOVED***, checker.Equals, true)
+	}, checker.Equals, true)
 
-	for testName, testTarget := range testPaths ***REMOVED***
+	for testName, testTarget := range testPaths {
 		path := testTarget
-		if !filepath.IsAbs(path) ***REMOVED***
+		if !filepath.IsAbs(path) {
 			path = filepath.Join("/", path)
-		***REMOVED***
+		}
 		out, err := d.Cmd("exec", task.Status.ContainerStatus.ContainerID, "cat", path)
 		c.Assert(err, checker.IsNil)
 		c.Assert(out, checker.Equals, "TESTINGDATA "+testName+" "+testTarget)
-	***REMOVED***
+	}
 
 	out, err = d.Cmd("service", "rm", serviceName)
 	c.Assert(err, checker.IsNil, check.Commentf(out))
-***REMOVED***
+}
 
-func (s *DockerSwarmSuite) TestServiceCreateWithConfigReferencedTwice(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestServiceCreateWithConfigReferencedTwice(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 
-	id := d.CreateConfig(c, swarm.ConfigSpec***REMOVED***
-		Annotations: swarm.Annotations***REMOVED***
+	id := d.CreateConfig(c, swarm.ConfigSpec{
+		Annotations: swarm.Annotations{
 			Name: "myconfig",
-		***REMOVED***,
+		},
 		Data: []byte("TESTINGDATA"),
-	***REMOVED***)
+	})
 	c.Assert(id, checker.Not(checker.Equals), "", check.Commentf("configs: %s", id))
 
 	serviceName := "svc"
 	out, err := d.Cmd("service", "create", "--detach", "--no-resolve-image", "--name", serviceName, "--config", "source=myconfig,target=target1", "--config", "source=myconfig,target=target2", "busybox", "top")
 	c.Assert(err, checker.IsNil, check.Commentf(out))
 
-	out, err = d.Cmd("service", "inspect", "--format", "***REMOVED******REMOVED*** json .Spec.TaskTemplate.ContainerSpec.Configs ***REMOVED******REMOVED***", serviceName)
+	out, err = d.Cmd("service", "inspect", "--format", "{{ json .Spec.TaskTemplate.ContainerSpec.Configs }}", serviceName)
 	c.Assert(err, checker.IsNil)
 
 	var refs []swarm.ConfigReference
@@ -333,53 +333,53 @@ func (s *DockerSwarmSuite) TestServiceCreateWithConfigReferencedTwice(c *check.C
 	c.Assert(refs, checker.HasLen, 2)
 
 	var tasks []swarm.Task
-	waitAndAssert(c, defaultReconciliationTimeout, func(c *check.C) (interface***REMOVED******REMOVED***, check.CommentInterface) ***REMOVED***
+	waitAndAssert(c, defaultReconciliationTimeout, func(c *check.C) (interface{}, check.CommentInterface) {
 		tasks = d.GetServiceTasks(c, serviceName)
 		return len(tasks) > 0, nil
-	***REMOVED***, checker.Equals, true)
+	}, checker.Equals, true)
 
 	task := tasks[0]
-	waitAndAssert(c, defaultReconciliationTimeout, func(c *check.C) (interface***REMOVED******REMOVED***, check.CommentInterface) ***REMOVED***
-		if task.NodeID == "" || task.Status.ContainerStatus.ContainerID == "" ***REMOVED***
+	waitAndAssert(c, defaultReconciliationTimeout, func(c *check.C) (interface{}, check.CommentInterface) {
+		if task.NodeID == "" || task.Status.ContainerStatus.ContainerID == "" {
 			task = d.GetTask(c, task.ID)
-		***REMOVED***
+		}
 		return task.NodeID != "" && task.Status.ContainerStatus.ContainerID != "", nil
-	***REMOVED***, checker.Equals, true)
+	}, checker.Equals, true)
 
-	for _, target := range []string***REMOVED***"target1", "target2"***REMOVED*** ***REMOVED***
+	for _, target := range []string{"target1", "target2"} {
 		c.Assert(err, checker.IsNil, check.Commentf(out))
 		path := filepath.Join("/", target)
 		out, err := d.Cmd("exec", task.Status.ContainerStatus.ContainerID, "cat", path)
 		c.Assert(err, checker.IsNil)
 		c.Assert(out, checker.Equals, "TESTINGDATA")
-	***REMOVED***
+	}
 
 	out, err = d.Cmd("service", "rm", serviceName)
 	c.Assert(err, checker.IsNil, check.Commentf(out))
-***REMOVED***
+}
 
-func (s *DockerSwarmSuite) TestServiceCreateMountTmpfs(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestServiceCreateMountTmpfs(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 	out, err := d.Cmd("service", "create", "--no-resolve-image", "--detach=true", "--mount", "type=tmpfs,target=/foo,tmpfs-size=1MB", "busybox", "sh", "-c", "mount | grep foo; tail -f /dev/null")
 	c.Assert(err, checker.IsNil, check.Commentf(out))
 	id := strings.TrimSpace(out)
 
 	var tasks []swarm.Task
-	waitAndAssert(c, defaultReconciliationTimeout, func(c *check.C) (interface***REMOVED******REMOVED***, check.CommentInterface) ***REMOVED***
+	waitAndAssert(c, defaultReconciliationTimeout, func(c *check.C) (interface{}, check.CommentInterface) {
 		tasks = d.GetServiceTasks(c, id)
 		return len(tasks) > 0, nil
-	***REMOVED***, checker.Equals, true)
+	}, checker.Equals, true)
 
 	task := tasks[0]
-	waitAndAssert(c, defaultReconciliationTimeout, func(c *check.C) (interface***REMOVED******REMOVED***, check.CommentInterface) ***REMOVED***
-		if task.NodeID == "" || task.Status.ContainerStatus.ContainerID == "" ***REMOVED***
+	waitAndAssert(c, defaultReconciliationTimeout, func(c *check.C) (interface{}, check.CommentInterface) {
+		if task.NodeID == "" || task.Status.ContainerStatus.ContainerID == "" {
 			task = d.GetTask(c, task.ID)
-		***REMOVED***
+		}
 		return task.NodeID != "" && task.Status.ContainerStatus.ContainerID != "", nil
-	***REMOVED***, checker.Equals, true)
+	}, checker.Equals, true)
 
 	// check container mount config
-	out, err = s.nodeCmd(c, task.NodeID, "inspect", "--format", "***REMOVED******REMOVED***json .HostConfig.Mounts***REMOVED******REMOVED***", task.Status.ContainerStatus.ContainerID)
+	out, err = s.nodeCmd(c, task.NodeID, "inspect", "--format", "{{json .HostConfig.Mounts}}", task.Status.ContainerStatus.ContainerID)
 	c.Assert(err, checker.IsNil, check.Commentf(out))
 
 	var mountConfig []mount.Mount
@@ -393,7 +393,7 @@ func (s *DockerSwarmSuite) TestServiceCreateMountTmpfs(c *check.C) ***REMOVED***
 	c.Assert(mountConfig[0].TmpfsOptions.SizeBytes, checker.Equals, int64(1048576))
 
 	// check container mounts actual
-	out, err = s.nodeCmd(c, task.NodeID, "inspect", "--format", "***REMOVED******REMOVED***json .Mounts***REMOVED******REMOVED***", task.Status.ContainerStatus.ContainerID)
+	out, err = s.nodeCmd(c, task.NodeID, "inspect", "--format", "{{json .Mounts}}", task.Status.ContainerStatus.ContainerID)
 	c.Assert(err, checker.IsNil, check.Commentf(out))
 
 	var mounts []types.MountPoint
@@ -409,9 +409,9 @@ func (s *DockerSwarmSuite) TestServiceCreateMountTmpfs(c *check.C) ***REMOVED***
 	c.Assert(err, checker.IsNil, check.Commentf(out))
 	c.Assert(strings.TrimSpace(out), checker.HasPrefix, "tmpfs on /foo type tmpfs")
 	c.Assert(strings.TrimSpace(out), checker.Contains, "size=1024k")
-***REMOVED***
+}
 
-func (s *DockerSwarmSuite) TestServiceCreateWithNetworkAlias(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestServiceCreateWithNetworkAlias(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 	out, err := d.Cmd("network", "create", "--scope=swarm", "test_swarm_br")
 	c.Assert(err, checker.IsNil, check.Commentf(out))
@@ -421,21 +421,21 @@ func (s *DockerSwarmSuite) TestServiceCreateWithNetworkAlias(c *check.C) ***REMO
 	id := strings.TrimSpace(out)
 
 	var tasks []swarm.Task
-	waitAndAssert(c, defaultReconciliationTimeout, func(c *check.C) (interface***REMOVED******REMOVED***, check.CommentInterface) ***REMOVED***
+	waitAndAssert(c, defaultReconciliationTimeout, func(c *check.C) (interface{}, check.CommentInterface) {
 		tasks = d.GetServiceTasks(c, id)
 		return len(tasks) > 0, nil
-	***REMOVED***, checker.Equals, true)
+	}, checker.Equals, true)
 
 	task := tasks[0]
-	waitAndAssert(c, defaultReconciliationTimeout, func(c *check.C) (interface***REMOVED******REMOVED***, check.CommentInterface) ***REMOVED***
-		if task.NodeID == "" || task.Status.ContainerStatus.ContainerID == "" ***REMOVED***
+	waitAndAssert(c, defaultReconciliationTimeout, func(c *check.C) (interface{}, check.CommentInterface) {
+		if task.NodeID == "" || task.Status.ContainerStatus.ContainerID == "" {
 			task = d.GetTask(c, task.ID)
-		***REMOVED***
+		}
 		return task.NodeID != "" && task.Status.ContainerStatus.ContainerID != "", nil
-	***REMOVED***, checker.Equals, true)
+	}, checker.Equals, true)
 
 	// check container alias config
-	out, err = s.nodeCmd(c, task.NodeID, "inspect", "--format", "***REMOVED******REMOVED***json .NetworkSettings.Networks.test_swarm_br.Aliases***REMOVED******REMOVED***", task.Status.ContainerStatus.ContainerID)
+	out, err = s.nodeCmd(c, task.NodeID, "inspect", "--format", "{{json .NetworkSettings.Networks.test_swarm_br.Aliases}}", task.Status.ContainerStatus.ContainerID)
 	c.Assert(err, checker.IsNil, check.Commentf(out))
 
 	// Make sure the only alias seen is the container-id
@@ -444,4 +444,4 @@ func (s *DockerSwarmSuite) TestServiceCreateWithNetworkAlias(c *check.C) ***REMO
 	c.Assert(aliases, checker.HasLen, 1)
 
 	c.Assert(task.Status.ContainerStatus.ContainerID, checker.Contains, aliases[0])
-***REMOVED***
+}

@@ -10,57 +10,57 @@ import (
 	"github.com/hashicorp/hcl/hcl/parser"
 )
 
-var DefaultConfig = Config***REMOVED***
+var DefaultConfig = Config{
 	SpacesWidth: 2,
-***REMOVED***
+}
 
 // A Config node controls the output of Fprint.
-type Config struct ***REMOVED***
+type Config struct {
 	SpacesWidth int // if set, it will use spaces instead of tabs for alignment
-***REMOVED***
+}
 
-func (c *Config) Fprint(output io.Writer, node ast.Node) error ***REMOVED***
-	p := &printer***REMOVED***
+func (c *Config) Fprint(output io.Writer, node ast.Node) error {
+	p := &printer{
 		cfg:                *c,
 		comments:           make([]*ast.CommentGroup, 0),
 		standaloneComments: make([]*ast.CommentGroup, 0),
 		// enableTrace:        true,
-	***REMOVED***
+	}
 
 	p.collectComments(node)
 
-	if _, err := output.Write(p.unindent(p.output(node))); err != nil ***REMOVED***
+	if _, err := output.Write(p.unindent(p.output(node))); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	// flush tabwriter, if any
 	var err error
-	if tw, _ := output.(*tabwriter.Writer); tw != nil ***REMOVED***
+	if tw, _ := output.(*tabwriter.Writer); tw != nil {
 		err = tw.Flush()
-	***REMOVED***
+	}
 
 	return err
-***REMOVED***
+}
 
 // Fprint "pretty-prints" an HCL node to output
 // It calls Config.Fprint with default settings.
-func Fprint(output io.Writer, node ast.Node) error ***REMOVED***
+func Fprint(output io.Writer, node ast.Node) error {
 	return DefaultConfig.Fprint(output, node)
-***REMOVED***
+}
 
 // Format formats src HCL and returns the result.
-func Format(src []byte) ([]byte, error) ***REMOVED***
+func Format(src []byte) ([]byte, error) {
 	node, err := parser.Parse(src)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	var buf bytes.Buffer
-	if err := DefaultConfig.Fprint(&buf, node); err != nil ***REMOVED***
+	if err := DefaultConfig.Fprint(&buf, node); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// Add trailing newline to result
 	buf.WriteString("\n")
 	return buf.Bytes(), nil
-***REMOVED***
+}

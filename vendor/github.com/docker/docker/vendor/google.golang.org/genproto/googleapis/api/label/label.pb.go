@@ -40,66 +40,66 @@ const (
 	LabelDescriptor_INT64 LabelDescriptor_ValueType = 2
 )
 
-var LabelDescriptor_ValueType_name = map[int32]string***REMOVED***
+var LabelDescriptor_ValueType_name = map[int32]string{
 	0: "STRING",
 	1: "BOOL",
 	2: "INT64",
-***REMOVED***
-var LabelDescriptor_ValueType_value = map[string]int32***REMOVED***
+}
+var LabelDescriptor_ValueType_value = map[string]int32{
 	"STRING": 0,
 	"BOOL":   1,
 	"INT64":  2,
-***REMOVED***
+}
 
-func (x LabelDescriptor_ValueType) String() string ***REMOVED***
+func (x LabelDescriptor_ValueType) String() string {
 	return proto.EnumName(LabelDescriptor_ValueType_name, int32(x))
-***REMOVED***
-func (LabelDescriptor_ValueType) EnumDescriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***0, 0***REMOVED*** ***REMOVED***
+}
+func (LabelDescriptor_ValueType) EnumDescriptor() ([]byte, []int) { return fileDescriptor0, []int{0, 0} }
 
 // A description of a label.
-type LabelDescriptor struct ***REMOVED***
+type LabelDescriptor struct {
 	// The label key.
 	Key string `protobuf:"bytes,1,opt,name=key" json:"key,omitempty"`
 	// The type of data that can be assigned to the label.
 	ValueType LabelDescriptor_ValueType `protobuf:"varint,2,opt,name=value_type,json=valueType,enum=google.api.LabelDescriptor_ValueType" json:"value_type,omitempty"`
 	// A human-readable description for the label.
 	Description string `protobuf:"bytes,3,opt,name=description" json:"description,omitempty"`
-***REMOVED***
+}
 
-func (m *LabelDescriptor) Reset()                    ***REMOVED*** *m = LabelDescriptor***REMOVED******REMOVED*** ***REMOVED***
-func (m *LabelDescriptor) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*LabelDescriptor) ProtoMessage()               ***REMOVED******REMOVED***
-func (*LabelDescriptor) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***0***REMOVED*** ***REMOVED***
+func (m *LabelDescriptor) Reset()                    { *m = LabelDescriptor{} }
+func (m *LabelDescriptor) String() string            { return proto.CompactTextString(m) }
+func (*LabelDescriptor) ProtoMessage()               {}
+func (*LabelDescriptor) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
-func (m *LabelDescriptor) GetKey() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *LabelDescriptor) GetKey() string {
+	if m != nil {
 		return m.Key
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *LabelDescriptor) GetValueType() LabelDescriptor_ValueType ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *LabelDescriptor) GetValueType() LabelDescriptor_ValueType {
+	if m != nil {
 		return m.ValueType
-	***REMOVED***
+	}
 	return LabelDescriptor_STRING
-***REMOVED***
+}
 
-func (m *LabelDescriptor) GetDescription() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *LabelDescriptor) GetDescription() string {
+	if m != nil {
 		return m.Description
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*LabelDescriptor)(nil), "google.api.LabelDescriptor")
 	proto.RegisterEnum("google.api.LabelDescriptor_ValueType", LabelDescriptor_ValueType_name, LabelDescriptor_ValueType_value)
-***REMOVED***
+}
 
-func init() ***REMOVED*** proto.RegisterFile("google/api/label.proto", fileDescriptor0) ***REMOVED***
+func init() { proto.RegisterFile("google/api/label.proto", fileDescriptor0) }
 
-var fileDescriptor0 = []byte***REMOVED***
+var fileDescriptor0 = []byte{
 	// 252 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0x4b, 0xcf, 0xcf, 0x4f,
 	0xcf, 0x49, 0xd5, 0x4f, 0x2c, 0xc8, 0xd4, 0xcf, 0x49, 0x4c, 0x4a, 0xcd, 0xd1, 0x2b, 0x28, 0xca,
@@ -117,4 +117,4 @@ var fileDescriptor0 = []byte***REMOVED***
 	0x79, 0xe0, 0x30, 0xd0, 0x87, 0x48, 0x25, 0x16, 0x64, 0x16, 0x23, 0x82, 0xc7, 0x1a, 0x4c, 0xfe,
 	0x60, 0x64, 0x5c, 0xc4, 0xc4, 0xe2, 0xee, 0x18, 0xe0, 0x99, 0xc4, 0x06, 0x56, 0x6b, 0x0c, 0x08,
 	0x00, 0x00, 0xff, 0xff, 0x57, 0x04, 0xaa, 0x1f, 0x49, 0x01, 0x00, 0x00,
-***REMOVED***
+}

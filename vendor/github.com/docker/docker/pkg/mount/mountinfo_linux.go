@@ -28,66 +28,66 @@ const (
 
 // Parse /proc/self/mountinfo because comparing Dev and ino does not work from
 // bind mounts
-func parseMountTable() ([]*Info, error) ***REMOVED***
+func parseMountTable() ([]*Info, error) {
 	f, err := os.Open("/proc/self/mountinfo")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	defer f.Close()
 
 	return parseInfoFile(f)
-***REMOVED***
+}
 
-func parseInfoFile(r io.Reader) ([]*Info, error) ***REMOVED***
+func parseInfoFile(r io.Reader) ([]*Info, error) {
 	var (
 		s   = bufio.NewScanner(r)
-		out = []*Info***REMOVED******REMOVED***
+		out = []*Info{}
 	)
 
-	for s.Scan() ***REMOVED***
-		if err := s.Err(); err != nil ***REMOVED***
+	for s.Scan() {
+		if err := s.Err(); err != nil {
 			return nil, err
-		***REMOVED***
+		}
 
 		var (
-			p              = &Info***REMOVED******REMOVED***
+			p              = &Info{}
 			text           = s.Text()
 			optionalFields string
 		)
 
 		if _, err := fmt.Sscanf(text, mountinfoFormat,
 			&p.ID, &p.Parent, &p.Major, &p.Minor,
-			&p.Root, &p.Mountpoint, &p.Opts, &optionalFields); err != nil ***REMOVED***
+			&p.Root, &p.Mountpoint, &p.Opts, &optionalFields); err != nil {
 			return nil, fmt.Errorf("Scanning '%s' failed: %s", text, err)
-		***REMOVED***
+		}
 		// Safe as mountinfo encodes mountpoints with spaces as \040.
 		index := strings.Index(text, " - ")
 		postSeparatorFields := strings.Fields(text[index+3:])
-		if len(postSeparatorFields) < 3 ***REMOVED***
+		if len(postSeparatorFields) < 3 {
 			return nil, fmt.Errorf("Error found less than 3 fields post '-' in %q", text)
-		***REMOVED***
+		}
 
-		if optionalFields != "-" ***REMOVED***
+		if optionalFields != "-" {
 			p.Optional = optionalFields
-		***REMOVED***
+		}
 
 		p.Fstype = postSeparatorFields[0]
 		p.Source = postSeparatorFields[1]
 		p.VfsOpts = strings.Join(postSeparatorFields[2:], " ")
 		out = append(out, p)
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
 // PidMountInfo collects the mounts for a specific process ID. If the process
 // ID is unknown, it is better to use `GetMounts` which will inspect
 // "/proc/self/mountinfo" instead.
-func PidMountInfo(pid int) ([]*Info, error) ***REMOVED***
+func PidMountInfo(pid int) ([]*Info, error) {
 	f, err := os.Open(fmt.Sprintf("/proc/%d/mountinfo", pid))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	defer f.Close()
 
 	return parseInfoFile(f)
-***REMOVED***
+}

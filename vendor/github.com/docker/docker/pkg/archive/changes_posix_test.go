@@ -11,117 +11,117 @@ import (
 	"testing"
 )
 
-func TestHardLinkOrder(t *testing.T) ***REMOVED***
-	names := []string***REMOVED***"file1.txt", "file2.txt", "file3.txt"***REMOVED***
+func TestHardLinkOrder(t *testing.T) {
+	names := []string{"file1.txt", "file2.txt", "file3.txt"}
 	msg := []byte("Hey y'all")
 
 	// Create dir
 	src, err := ioutil.TempDir("", "docker-hardlink-test-src-")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	defer os.RemoveAll(src)
-	for _, name := range names ***REMOVED***
-		func() ***REMOVED***
+	for _, name := range names {
+		func() {
 			fh, err := os.Create(path.Join(src, name))
-			if err != nil ***REMOVED***
+			if err != nil {
 				t.Fatal(err)
-			***REMOVED***
+			}
 			defer fh.Close()
-			if _, err = fh.Write(msg); err != nil ***REMOVED***
+			if _, err = fh.Write(msg); err != nil {
 				t.Fatal(err)
-			***REMOVED***
-		***REMOVED***()
-	***REMOVED***
+			}
+		}()
+	}
 	// Create dest, with changes that includes hardlinks
 	dest, err := ioutil.TempDir("", "docker-hardlink-test-dest-")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	os.RemoveAll(dest) // we just want the name, at first
-	if err := copyDir(src, dest); err != nil ***REMOVED***
+	if err := copyDir(src, dest); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	defer os.RemoveAll(dest)
-	for _, name := range names ***REMOVED***
-		for i := 0; i < 5; i++ ***REMOVED***
-			if err := os.Link(path.Join(dest, name), path.Join(dest, fmt.Sprintf("%s.link%d", name, i))); err != nil ***REMOVED***
+	for _, name := range names {
+		for i := 0; i < 5; i++ {
+			if err := os.Link(path.Join(dest, name), path.Join(dest, fmt.Sprintf("%s.link%d", name, i))); err != nil {
 				t.Fatal(err)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	// get changes
 	changes, err := ChangesDirs(dest, src)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	// sort
 	sort.Sort(changesByPath(changes))
 
 	// ExportChanges
 	ar, err := ExportChanges(dest, changes, nil, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	hdrs, err := walkHeaders(ar)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	// reverse sort
 	sort.Sort(sort.Reverse(changesByPath(changes)))
 	// ExportChanges
 	arRev, err := ExportChanges(dest, changes, nil, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	hdrsRev, err := walkHeaders(arRev)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	// line up the two sets
 	sort.Sort(tarHeaders(hdrs))
 	sort.Sort(tarHeaders(hdrsRev))
 
 	// compare Size and LinkName
-	for i := range hdrs ***REMOVED***
-		if hdrs[i].Name != hdrsRev[i].Name ***REMOVED***
+	for i := range hdrs {
+		if hdrs[i].Name != hdrsRev[i].Name {
 			t.Errorf("headers - expected name %q; but got %q", hdrs[i].Name, hdrsRev[i].Name)
-		***REMOVED***
-		if hdrs[i].Size != hdrsRev[i].Size ***REMOVED***
+		}
+		if hdrs[i].Size != hdrsRev[i].Size {
 			t.Errorf("headers - %q expected size %d; but got %d", hdrs[i].Name, hdrs[i].Size, hdrsRev[i].Size)
-		***REMOVED***
-		if hdrs[i].Typeflag != hdrsRev[i].Typeflag ***REMOVED***
+		}
+		if hdrs[i].Typeflag != hdrsRev[i].Typeflag {
 			t.Errorf("headers - %q expected type %d; but got %d", hdrs[i].Name, hdrs[i].Typeflag, hdrsRev[i].Typeflag)
-		***REMOVED***
-		if hdrs[i].Linkname != hdrsRev[i].Linkname ***REMOVED***
+		}
+		if hdrs[i].Linkname != hdrsRev[i].Linkname {
 			t.Errorf("headers - %q expected linkname %q; but got %q", hdrs[i].Name, hdrs[i].Linkname, hdrsRev[i].Linkname)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-***REMOVED***
+}
 
 type tarHeaders []tar.Header
 
-func (th tarHeaders) Len() int           ***REMOVED*** return len(th) ***REMOVED***
-func (th tarHeaders) Swap(i, j int)      ***REMOVED*** th[j], th[i] = th[i], th[j] ***REMOVED***
-func (th tarHeaders) Less(i, j int) bool ***REMOVED*** return th[i].Name < th[j].Name ***REMOVED***
+func (th tarHeaders) Len() int           { return len(th) }
+func (th tarHeaders) Swap(i, j int)      { th[j], th[i] = th[i], th[j] }
+func (th tarHeaders) Less(i, j int) bool { return th[i].Name < th[j].Name }
 
-func walkHeaders(r io.Reader) ([]tar.Header, error) ***REMOVED***
+func walkHeaders(r io.Reader) ([]tar.Header, error) {
 	t := tar.NewReader(r)
-	headers := []tar.Header***REMOVED******REMOVED***
-	for ***REMOVED***
+	headers := []tar.Header{}
+	for {
 		hdr, err := t.Next()
-		if err != nil ***REMOVED***
-			if err == io.EOF ***REMOVED***
+		if err != nil {
+			if err == io.EOF {
 				break
-			***REMOVED***
+			}
 			return headers, err
-		***REMOVED***
+		}
 		headers = append(headers, *hdr)
-	***REMOVED***
+	}
 	return headers, nil
-***REMOVED***
+}

@@ -4,16 +4,16 @@ import "encoding/json"
 
 // AttachmentField contains information for an attachment field
 // An Attachment can contain multiple of these
-type AttachmentField struct ***REMOVED***
+type AttachmentField struct {
 	Title string `json:"title"`
 	Value string `json:"value"`
 	Short bool   `json:"short"`
-***REMOVED***
+}
 
 // AttachmentAction is a button or menu to be included in the attachment. Required when
 // using message buttons or menus and otherwise not useful. A maximum of 5 actions may be
 // provided per attachment.
-type AttachmentAction struct ***REMOVED***
+type AttachmentAction struct {
 	Name            string                        `json:"name"`                       // Required.
 	Text            string                        `json:"text"`                       // Required.
 	Style           string                        `json:"style,omitempty"`            // Optional. Allowed values: "default", "primary", "danger".
@@ -26,23 +26,23 @@ type AttachmentAction struct ***REMOVED***
 	OptionGroups    []AttachmentActionOptionGroup `json:"option_groups,omitempty"`    // Optional.
 	Confirm         *ConfirmationField            `json:"confirm,omitempty"`          // Optional.
 	URL             string                        `json:"url,omitempty"`              // Optional.
-***REMOVED***
+}
 
 // AttachmentActionOption the individual option to appear in action menu.
-type AttachmentActionOption struct ***REMOVED***
+type AttachmentActionOption struct {
 	Text        string `json:"text"`                  // Required.
 	Value       string `json:"value"`                 // Required.
 	Description string `json:"description,omitempty"` // Optional. Up to 30 characters.
-***REMOVED***
+}
 
 // AttachmentActionOptionGroup is a semi-hierarchal way to list available options to appear in action menu.
-type AttachmentActionOptionGroup struct ***REMOVED***
+type AttachmentActionOptionGroup struct {
 	Text    string                   `json:"text"`    // Required.
 	Options []AttachmentActionOption `json:"options"` // Required.
-***REMOVED***
+}
 
 // AttachmentActionCallback is sent from Slack when a user clicks a button in an interactive message (aka AttachmentAction)
-type AttachmentActionCallback struct ***REMOVED***
+type AttachmentActionCallback struct {
 	Actions    []AttachmentAction `json:"actions"`
 	CallbackID string             `json:"callback_id"`
 	Team       Team               `json:"team"`
@@ -60,18 +60,18 @@ type AttachmentActionCallback struct ***REMOVED***
 	Token        string `json:"token"`
 	ResponseURL  string `json:"response_url"`
 	TriggerID    string `json:"trigger_id"`
-***REMOVED***
+}
 
 // ConfirmationField are used to ask users to confirm actions
-type ConfirmationField struct ***REMOVED***
+type ConfirmationField struct {
 	Title       string `json:"title,omitempty"`        // Optional.
 	Text        string `json:"text"`                   // Required.
 	OkText      string `json:"ok_text,omitempty"`      // Optional. Defaults to "Okay"
 	DismissText string `json:"dismiss_text,omitempty"` // Optional. Defaults to "Cancel"
-***REMOVED***
+}
 
 // Attachment contains all the information for an attachment
-type Attachment struct ***REMOVED***
+type Attachment struct {
 	Color    string `json:"color,omitempty"`
 	Fallback string `json:"fallback"`
 
@@ -99,4 +99,4 @@ type Attachment struct ***REMOVED***
 	FooterIcon string `json:"footer_icon,omitempty"`
 
 	Ts json.Number `json:"ts,omitempty"`
-***REMOVED***
+}

@@ -12,16 +12,16 @@ import (
 	"github.com/spf13/cobra/doc"
 )
 
-func main() ***REMOVED***
-	cmd := &cobra.Command***REMOVED***
+func main() {
+	cmd := &cobra.Command{
 		Use:   "test",
 		Short: "my test program",
-	***REMOVED***
+	}
 	err := doc.GenYamlTree(cmd, "/tmp")
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 ```
 
 That will get you a Yaml document `/tmp/test.yaml`
@@ -44,13 +44,13 @@ import (
 	"github.com/spf13/cobra/doc"
 )
 
-func main() ***REMOVED***
+func main() {
 	kubectl := cmd.NewKubectlCommand(cmdutil.NewFactory(nil), os.Stdin, ioutil.Discard, ioutil.Discard)
 	err := doc.GenYamlTree(kubectl, "./")
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 ```
 
 This will generate a whole series of files, one for each command in the tree, in the directory specified (in this case "./")
@@ -71,15 +71,15 @@ This will write the yaml doc for ONLY "cmd" into the out, buffer.
 Both `GenYaml` and `GenYamlTree` have alternate versions with callbacks to get some control of the output:
 
 ```go
-func GenYamlTreeCustom(cmd *Command, dir string, filePrepender, linkHandler func(string) string) error ***REMOVED***
+func GenYamlTreeCustom(cmd *Command, dir string, filePrepender, linkHandler func(string) string) error {
 	//...
-***REMOVED***
+}
 ```
 
 ```go
-func GenYamlCustom(cmd *Command, out *bytes.Buffer, linkHandler func(string) string) error ***REMOVED***
+func GenYamlCustom(cmd *Command, out *bytes.Buffer, linkHandler func(string) string) error {
 	//...
-***REMOVED***
+}
 ```
 
 The `filePrepender` will prepend the return value given the full filepath to the rendered Yaml file. A common use case is to add front matter to use the generated documentation with [Hugo](http://gohugo.io/):
@@ -93,20 +93,20 @@ url: %s
 ---
 `
 
-filePrepender := func(filename string) string ***REMOVED***
+filePrepender := func(filename string) string {
 	now := time.Now().Format(time.RFC3339)
 	name := filepath.Base(filename)
 	base := strings.TrimSuffix(name, path.Ext(name))
 	url := "/commands/" + strings.ToLower(base) + "/"
 	return fmt.Sprintf(fmTemplate, now, strings.Replace(base, "_", " ", -1), base, url)
-***REMOVED***
+}
 ```
 
 The `linkHandler` can be used to customize the rendered internal links to the commands, given a filename:
 
 ```go
-linkHandler := func(name string) string ***REMOVED***
+linkHandler := func(name string) string {
 	base := strings.TrimSuffix(name, path.Ext(name))
 	return "/commands/" + strings.ToLower(base) + "/"
-***REMOVED***
+}
 ```

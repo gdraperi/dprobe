@@ -15,10 +15,10 @@
 
 package cmd
 
-func initGpl2() ***REMOVED***
-	Licenses["gpl2"] = License***REMOVED***
+func initGpl2() {
+	Licenses["gpl2"] = License{
 		Name:            "GNU General Public License 2.0",
-		PossibleMatches: []string***REMOVED***"gpl2", "gnu gpl2", "gplv2"***REMOVED***,
+		PossibleMatches: []string{"gpl2", "gnu gpl2", "gplv2"},
 		Header: `
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -372,5 +372,5 @@ consider it more useful to permit linking proprietary applications with the
 library.  If this is what you want to do, use the GNU Lesser General
 Public License instead of this License.
 `,
-	***REMOVED***
-***REMOVED***
+	}
+}

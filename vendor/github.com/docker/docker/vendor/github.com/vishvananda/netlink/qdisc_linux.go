@@ -11,7 +11,7 @@ import (
 )
 
 // NOTE function is here because it uses other linux functions
-func NewNetem(attrs QdiscAttrs, nattrs NetemQdiscAttrs) *Netem ***REMOVED***
+func NewNetem(attrs QdiscAttrs, nattrs NetemQdiscAttrs) *Netem {
 	var limit uint32 = 1000
 	var lossCorr, delayCorr, duplicateCorr uint32
 	var reorderProb, reorderCorr uint32
@@ -24,40 +24,40 @@ func NewNetem(attrs QdiscAttrs, nattrs NetemQdiscAttrs) *Netem ***REMOVED***
 	jitter := nattrs.Jitter
 
 	// Correlation
-	if latency > 0 && jitter > 0 ***REMOVED***
+	if latency > 0 && jitter > 0 {
 		delayCorr = Percentage2u32(nattrs.DelayCorr)
-	***REMOVED***
-	if loss > 0 ***REMOVED***
+	}
+	if loss > 0 {
 		lossCorr = Percentage2u32(nattrs.LossCorr)
-	***REMOVED***
-	if duplicate > 0 ***REMOVED***
+	}
+	if duplicate > 0 {
 		duplicateCorr = Percentage2u32(nattrs.DuplicateCorr)
-	***REMOVED***
+	}
 	// FIXME should validate values(like loss/duplicate are percentages...)
 	latency = time2Tick(latency)
 
-	if nattrs.Limit != 0 ***REMOVED***
+	if nattrs.Limit != 0 {
 		limit = nattrs.Limit
-	***REMOVED***
+	}
 	// Jitter is only value if latency is > 0
-	if latency > 0 ***REMOVED***
+	if latency > 0 {
 		jitter = time2Tick(jitter)
-	***REMOVED***
+	}
 
 	reorderProb = Percentage2u32(nattrs.ReorderProb)
 	reorderCorr = Percentage2u32(nattrs.ReorderCorr)
 
-	if reorderProb > 0 ***REMOVED***
+	if reorderProb > 0 {
 		// ERROR if lantency == 0
-		if gap == 0 ***REMOVED***
+		if gap == 0 {
 			gap = 1
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	corruptProb = Percentage2u32(nattrs.CorruptProb)
 	corruptCorr = Percentage2u32(nattrs.CorruptCorr)
 
-	return &Netem***REMOVED***
+	return &Netem{
 		QdiscAttrs:    attrs,
 		Latency:       latency,
 		DelayCorr:     delayCorr,
@@ -72,120 +72,120 @@ func NewNetem(attrs QdiscAttrs, nattrs NetemQdiscAttrs) *Netem ***REMOVED***
 		ReorderCorr:   reorderCorr,
 		CorruptProb:   corruptProb,
 		CorruptCorr:   corruptCorr,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // QdiscDel will delete a qdisc from the system.
 // Equivalent to: `tc qdisc del $qdisc`
-func QdiscDel(qdisc Qdisc) error ***REMOVED***
+func QdiscDel(qdisc Qdisc) error {
 	return pkgHandle.QdiscDel(qdisc)
-***REMOVED***
+}
 
 // QdiscDel will delete a qdisc from the system.
 // Equivalent to: `tc qdisc del $qdisc`
-func (h *Handle) QdiscDel(qdisc Qdisc) error ***REMOVED***
+func (h *Handle) QdiscDel(qdisc Qdisc) error {
 	return h.qdiscModify(syscall.RTM_DELQDISC, 0, qdisc)
-***REMOVED***
+}
 
 // QdiscChange will change a qdisc in place
 // Equivalent to: `tc qdisc change $qdisc`
 // The parent and handle MUST NOT be changed.
-func QdiscChange(qdisc Qdisc) error ***REMOVED***
+func QdiscChange(qdisc Qdisc) error {
 	return pkgHandle.QdiscChange(qdisc)
-***REMOVED***
+}
 
 // QdiscChange will change a qdisc in place
 // Equivalent to: `tc qdisc change $qdisc`
 // The parent and handle MUST NOT be changed.
-func (h *Handle) QdiscChange(qdisc Qdisc) error ***REMOVED***
+func (h *Handle) QdiscChange(qdisc Qdisc) error {
 	return h.qdiscModify(syscall.RTM_NEWQDISC, 0, qdisc)
-***REMOVED***
+}
 
 // QdiscReplace will replace a qdisc to the system.
 // Equivalent to: `tc qdisc replace $qdisc`
 // The handle MUST change.
-func QdiscReplace(qdisc Qdisc) error ***REMOVED***
+func QdiscReplace(qdisc Qdisc) error {
 	return pkgHandle.QdiscReplace(qdisc)
-***REMOVED***
+}
 
 // QdiscReplace will replace a qdisc to the system.
 // Equivalent to: `tc qdisc replace $qdisc`
 // The handle MUST change.
-func (h *Handle) QdiscReplace(qdisc Qdisc) error ***REMOVED***
+func (h *Handle) QdiscReplace(qdisc Qdisc) error {
 	return h.qdiscModify(
 		syscall.RTM_NEWQDISC,
 		syscall.NLM_F_CREATE|syscall.NLM_F_REPLACE,
 		qdisc)
-***REMOVED***
+}
 
 // QdiscAdd will add a qdisc to the system.
 // Equivalent to: `tc qdisc add $qdisc`
-func QdiscAdd(qdisc Qdisc) error ***REMOVED***
+func QdiscAdd(qdisc Qdisc) error {
 	return pkgHandle.QdiscAdd(qdisc)
-***REMOVED***
+}
 
 // QdiscAdd will add a qdisc to the system.
 // Equivalent to: `tc qdisc add $qdisc`
-func (h *Handle) QdiscAdd(qdisc Qdisc) error ***REMOVED***
+func (h *Handle) QdiscAdd(qdisc Qdisc) error {
 	return h.qdiscModify(
 		syscall.RTM_NEWQDISC,
 		syscall.NLM_F_CREATE|syscall.NLM_F_EXCL,
 		qdisc)
-***REMOVED***
+}
 
-func (h *Handle) qdiscModify(cmd, flags int, qdisc Qdisc) error ***REMOVED***
+func (h *Handle) qdiscModify(cmd, flags int, qdisc Qdisc) error {
 	req := h.newNetlinkRequest(cmd, flags|syscall.NLM_F_ACK)
 	base := qdisc.Attrs()
-	msg := &nl.TcMsg***REMOVED***
+	msg := &nl.TcMsg{
 		Family:  nl.FAMILY_ALL,
 		Ifindex: int32(base.LinkIndex),
 		Handle:  base.Handle,
 		Parent:  base.Parent,
-	***REMOVED***
+	}
 	req.AddData(msg)
 
 	// When deleting don't bother building the rest of the netlink payload
-	if cmd != syscall.RTM_DELQDISC ***REMOVED***
-		if err := qdiscPayload(req, qdisc); err != nil ***REMOVED***
+	if cmd != syscall.RTM_DELQDISC {
+		if err := qdiscPayload(req, qdisc); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	_, err := req.Execute(syscall.NETLINK_ROUTE, 0)
 	return err
-***REMOVED***
+}
 
-func qdiscPayload(req *nl.NetlinkRequest, qdisc Qdisc) error ***REMOVED***
+func qdiscPayload(req *nl.NetlinkRequest, qdisc Qdisc) error {
 
 	req.AddData(nl.NewRtAttr(nl.TCA_KIND, nl.ZeroTerminated(qdisc.Type())))
 
 	options := nl.NewRtAttr(nl.TCA_OPTIONS, nil)
 
-	switch qdisc := qdisc.(type) ***REMOVED***
+	switch qdisc := qdisc.(type) {
 	case *Prio:
-		tcmap := nl.TcPrioMap***REMOVED***
+		tcmap := nl.TcPrioMap{
 			Bands:   int32(qdisc.Bands),
 			Priomap: qdisc.PriorityMap,
-		***REMOVED***
+		}
 		options = nl.NewRtAttr(nl.TCA_OPTIONS, tcmap.Serialize())
 	case *Tbf:
-		opt := nl.TcTbfQopt***REMOVED******REMOVED***
+		opt := nl.TcTbfQopt{}
 		opt.Rate.Rate = uint32(qdisc.Rate)
 		opt.Peakrate.Rate = uint32(qdisc.Peakrate)
 		opt.Limit = qdisc.Limit
 		opt.Buffer = qdisc.Buffer
 		nl.NewRtAttrChild(options, nl.TCA_TBF_PARMS, opt.Serialize())
-		if qdisc.Rate >= uint64(1<<32) ***REMOVED***
+		if qdisc.Rate >= uint64(1<<32) {
 			nl.NewRtAttrChild(options, nl.TCA_TBF_RATE64, nl.Uint64Attr(qdisc.Rate))
-		***REMOVED***
-		if qdisc.Peakrate >= uint64(1<<32) ***REMOVED***
+		}
+		if qdisc.Peakrate >= uint64(1<<32) {
 			nl.NewRtAttrChild(options, nl.TCA_TBF_PRATE64, nl.Uint64Attr(qdisc.Peakrate))
-		***REMOVED***
-		if qdisc.Peakrate > 0 ***REMOVED***
+		}
+		if qdisc.Peakrate > 0 {
 			nl.NewRtAttrChild(options, nl.TCA_TBF_PBURST, nl.Uint32Attr(qdisc.Minburst))
-		***REMOVED***
+		}
 	case *Htb:
-		opt := nl.TcHtbGlob***REMOVED******REMOVED***
+		opt := nl.TcHtbGlob{}
 		opt.Version = qdisc.Version
 		opt.Rate2Quantum = qdisc.Rate2Quantum
 		opt.Defcls = qdisc.Defcls
@@ -195,7 +195,7 @@ func qdiscPayload(req *nl.NetlinkRequest, qdisc Qdisc) error ***REMOVED***
 		nl.NewRtAttrChild(options, nl.TCA_HTB_INIT, opt.Serialize())
 		// nl.NewRtAttrChild(options, nl.TCA_HTB_DIRECT_QLEN, opt.Serialize())
 	case *Netem:
-		opt := nl.TcNetemQopt***REMOVED******REMOVED***
+		opt := nl.TcNetemQopt{}
 		opt.Latency = qdisc.Latency
 		opt.Limit = qdisc.Limit
 		opt.Loss = qdisc.Loss
@@ -204,175 +204,175 @@ func qdiscPayload(req *nl.NetlinkRequest, qdisc Qdisc) error ***REMOVED***
 		opt.Jitter = qdisc.Jitter
 		options = nl.NewRtAttr(nl.TCA_OPTIONS, opt.Serialize())
 		// Correlation
-		corr := nl.TcNetemCorr***REMOVED******REMOVED***
+		corr := nl.TcNetemCorr{}
 		corr.DelayCorr = qdisc.DelayCorr
 		corr.LossCorr = qdisc.LossCorr
 		corr.DupCorr = qdisc.DuplicateCorr
 
-		if corr.DelayCorr > 0 || corr.LossCorr > 0 || corr.DupCorr > 0 ***REMOVED***
+		if corr.DelayCorr > 0 || corr.LossCorr > 0 || corr.DupCorr > 0 {
 			nl.NewRtAttrChild(options, nl.TCA_NETEM_CORR, corr.Serialize())
-		***REMOVED***
+		}
 		// Corruption
-		corruption := nl.TcNetemCorrupt***REMOVED******REMOVED***
+		corruption := nl.TcNetemCorrupt{}
 		corruption.Probability = qdisc.CorruptProb
 		corruption.Correlation = qdisc.CorruptCorr
-		if corruption.Probability > 0 ***REMOVED***
+		if corruption.Probability > 0 {
 			nl.NewRtAttrChild(options, nl.TCA_NETEM_CORRUPT, corruption.Serialize())
-		***REMOVED***
+		}
 		// Reorder
-		reorder := nl.TcNetemReorder***REMOVED******REMOVED***
+		reorder := nl.TcNetemReorder{}
 		reorder.Probability = qdisc.ReorderProb
 		reorder.Correlation = qdisc.ReorderCorr
-		if reorder.Probability > 0 ***REMOVED***
+		if reorder.Probability > 0 {
 			nl.NewRtAttrChild(options, nl.TCA_NETEM_REORDER, reorder.Serialize())
-		***REMOVED***
+		}
 	case *Ingress:
 		// ingress filters must use the proper handle
-		if qdisc.Attrs().Parent != HANDLE_INGRESS ***REMOVED***
+		if qdisc.Attrs().Parent != HANDLE_INGRESS {
 			return fmt.Errorf("Ingress filters must set Parent to HANDLE_INGRESS")
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	req.AddData(options)
 	return nil
-***REMOVED***
+}
 
 // QdiscList gets a list of qdiscs in the system.
 // Equivalent to: `tc qdisc show`.
 // The list can be filtered by link.
-func QdiscList(link Link) ([]Qdisc, error) ***REMOVED***
+func QdiscList(link Link) ([]Qdisc, error) {
 	return pkgHandle.QdiscList(link)
-***REMOVED***
+}
 
 // QdiscList gets a list of qdiscs in the system.
 // Equivalent to: `tc qdisc show`.
 // The list can be filtered by link.
-func (h *Handle) QdiscList(link Link) ([]Qdisc, error) ***REMOVED***
+func (h *Handle) QdiscList(link Link) ([]Qdisc, error) {
 	req := h.newNetlinkRequest(syscall.RTM_GETQDISC, syscall.NLM_F_DUMP)
 	index := int32(0)
-	if link != nil ***REMOVED***
+	if link != nil {
 		base := link.Attrs()
 		h.ensureIndex(base)
 		index = int32(base.Index)
-	***REMOVED***
-	msg := &nl.TcMsg***REMOVED***
+	}
+	msg := &nl.TcMsg{
 		Family:  nl.FAMILY_ALL,
 		Ifindex: index,
-	***REMOVED***
+	}
 	req.AddData(msg)
 
 	msgs, err := req.Execute(syscall.NETLINK_ROUTE, syscall.RTM_NEWQDISC)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	var res []Qdisc
-	for _, m := range msgs ***REMOVED***
+	for _, m := range msgs {
 		msg := nl.DeserializeTcMsg(m)
 
 		attrs, err := nl.ParseRouteAttr(m[msg.Len():])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 
 		// skip qdiscs from other interfaces
-		if link != nil && msg.Ifindex != index ***REMOVED***
+		if link != nil && msg.Ifindex != index {
 			continue
-		***REMOVED***
+		}
 
-		base := QdiscAttrs***REMOVED***
+		base := QdiscAttrs{
 			LinkIndex: int(msg.Ifindex),
 			Handle:    msg.Handle,
 			Parent:    msg.Parent,
 			Refcnt:    msg.Info,
-		***REMOVED***
+		}
 		var qdisc Qdisc
 		qdiscType := ""
-		for _, attr := range attrs ***REMOVED***
-			switch attr.Attr.Type ***REMOVED***
+		for _, attr := range attrs {
+			switch attr.Attr.Type {
 			case nl.TCA_KIND:
 				qdiscType = string(attr.Value[:len(attr.Value)-1])
-				switch qdiscType ***REMOVED***
+				switch qdiscType {
 				case "pfifo_fast":
-					qdisc = &PfifoFast***REMOVED******REMOVED***
+					qdisc = &PfifoFast{}
 				case "prio":
-					qdisc = &Prio***REMOVED******REMOVED***
+					qdisc = &Prio{}
 				case "tbf":
-					qdisc = &Tbf***REMOVED******REMOVED***
+					qdisc = &Tbf{}
 				case "ingress":
-					qdisc = &Ingress***REMOVED******REMOVED***
+					qdisc = &Ingress{}
 				case "htb":
-					qdisc = &Htb***REMOVED******REMOVED***
+					qdisc = &Htb{}
 				case "netem":
-					qdisc = &Netem***REMOVED******REMOVED***
+					qdisc = &Netem{}
 				default:
-					qdisc = &GenericQdisc***REMOVED***QdiscType: qdiscType***REMOVED***
-				***REMOVED***
+					qdisc = &GenericQdisc{QdiscType: qdiscType}
+				}
 			case nl.TCA_OPTIONS:
-				switch qdiscType ***REMOVED***
+				switch qdiscType {
 				case "pfifo_fast":
 					// pfifo returns TcPrioMap directly without wrapping it in rtattr
-					if err := parsePfifoFastData(qdisc, attr.Value); err != nil ***REMOVED***
+					if err := parsePfifoFastData(qdisc, attr.Value); err != nil {
 						return nil, err
-					***REMOVED***
+					}
 				case "prio":
 					// prio returns TcPrioMap directly without wrapping it in rtattr
-					if err := parsePrioData(qdisc, attr.Value); err != nil ***REMOVED***
+					if err := parsePrioData(qdisc, attr.Value); err != nil {
 						return nil, err
-					***REMOVED***
+					}
 				case "tbf":
 					data, err := nl.ParseRouteAttr(attr.Value)
-					if err != nil ***REMOVED***
+					if err != nil {
 						return nil, err
-					***REMOVED***
-					if err := parseTbfData(qdisc, data); err != nil ***REMOVED***
+					}
+					if err := parseTbfData(qdisc, data); err != nil {
 						return nil, err
-					***REMOVED***
+					}
 				case "htb":
 					data, err := nl.ParseRouteAttr(attr.Value)
-					if err != nil ***REMOVED***
+					if err != nil {
 						return nil, err
-					***REMOVED***
-					if err := parseHtbData(qdisc, data); err != nil ***REMOVED***
+					}
+					if err := parseHtbData(qdisc, data); err != nil {
 						return nil, err
-					***REMOVED***
+					}
 				case "netem":
-					if err := parseNetemData(qdisc, attr.Value); err != nil ***REMOVED***
+					if err := parseNetemData(qdisc, attr.Value); err != nil {
 						return nil, err
-					***REMOVED***
+					}
 
 					// no options for ingress
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
+				}
+			}
+		}
 		*qdisc.Attrs() = base
 		res = append(res, qdisc)
-	***REMOVED***
+	}
 
 	return res, nil
-***REMOVED***
+}
 
-func parsePfifoFastData(qdisc Qdisc, value []byte) error ***REMOVED***
+func parsePfifoFastData(qdisc Qdisc, value []byte) error {
 	pfifo := qdisc.(*PfifoFast)
 	tcmap := nl.DeserializeTcPrioMap(value)
 	pfifo.PriorityMap = tcmap.Priomap
 	pfifo.Bands = uint8(tcmap.Bands)
 	return nil
-***REMOVED***
+}
 
-func parsePrioData(qdisc Qdisc, value []byte) error ***REMOVED***
+func parsePrioData(qdisc Qdisc, value []byte) error {
 	prio := qdisc.(*Prio)
 	tcmap := nl.DeserializeTcPrioMap(value)
 	prio.PriorityMap = tcmap.Priomap
 	prio.Bands = uint8(tcmap.Bands)
 	return nil
-***REMOVED***
+}
 
-func parseHtbData(qdisc Qdisc, data []syscall.NetlinkRouteAttr) error ***REMOVED***
+func parseHtbData(qdisc Qdisc, data []syscall.NetlinkRouteAttr) error {
 	native = nl.NativeEndian()
 	htb := qdisc.(*Htb)
-	for _, datum := range data ***REMOVED***
-		switch datum.Attr.Type ***REMOVED***
+	for _, datum := range data {
+		switch datum.Attr.Type {
 		case nl.TCA_HTB_INIT:
 			opt := nl.DeserializeTcHtbGlob(datum.Value)
 			htb.Version = opt.Version
@@ -383,12 +383,12 @@ func parseHtbData(qdisc Qdisc, data []syscall.NetlinkRouteAttr) error ***REMOVED
 		case nl.TCA_HTB_DIRECT_QLEN:
 			// TODO
 			//htb.DirectQlen = native.uint32(datum.Value)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func parseNetemData(qdisc Qdisc, value []byte) error ***REMOVED***
+func parseNetemData(qdisc Qdisc, value []byte) error {
 	netem := qdisc.(*Netem)
 	opt := nl.DeserializeTcNetemQopt(value)
 	netem.Latency = opt.Latency
@@ -398,11 +398,11 @@ func parseNetemData(qdisc Qdisc, value []byte) error ***REMOVED***
 	netem.Duplicate = opt.Duplicate
 	netem.Jitter = opt.Jitter
 	data, err := nl.ParseRouteAttr(value[nl.SizeofTcNetemQopt:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	for _, datum := range data ***REMOVED***
-		switch datum.Attr.Type ***REMOVED***
+	}
+	for _, datum := range data {
+		switch datum.Attr.Type {
 		case nl.TCA_NETEM_CORR:
 			opt := nl.DeserializeTcNetemCorr(datum.Value)
 			netem.DelayCorr = opt.DelayCorr
@@ -416,16 +416,16 @@ func parseNetemData(qdisc Qdisc, value []byte) error ***REMOVED***
 			opt := nl.DeserializeTcNetemReorder(datum.Value)
 			netem.ReorderProb = opt.Probability
 			netem.ReorderCorr = opt.Correlation
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func parseTbfData(qdisc Qdisc, data []syscall.NetlinkRouteAttr) error ***REMOVED***
+func parseTbfData(qdisc Qdisc, data []syscall.NetlinkRouteAttr) error {
 	native = nl.NativeEndian()
 	tbf := qdisc.(*Tbf)
-	for _, datum := range data ***REMOVED***
-		switch datum.Attr.Type ***REMOVED***
+	for _, datum := range data {
+		switch datum.Attr.Type {
 		case nl.TCA_TBF_PARMS:
 			opt := nl.DeserializeTcTbfQopt(datum.Value)
 			tbf.Rate = uint64(opt.Rate.Rate)
@@ -438,10 +438,10 @@ func parseTbfData(qdisc Qdisc, data []syscall.NetlinkRouteAttr) error ***REMOVED
 			tbf.Peakrate = native.Uint64(datum.Value[0:8])
 		case nl.TCA_TBF_PBURST:
 			tbf.Minburst = native.Uint32(datum.Value[0:4])
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
 const (
 	TIME_UNITS_PER_SEC = 1000000
@@ -453,77 +453,77 @@ var (
 	hz          float64
 )
 
-func initClock() ***REMOVED***
+func initClock() {
 	data, err := ioutil.ReadFile("/proc/net/psched")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	parts := strings.Split(strings.TrimSpace(string(data)), " ")
-	if len(parts) < 3 ***REMOVED***
+	if len(parts) < 3 {
 		return
-	***REMOVED***
+	}
 	var vals [3]uint64
-	for i := range vals ***REMOVED***
+	for i := range vals {
 		val, err := strconv.ParseUint(parts[i], 16, 32)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
+		}
 		vals[i] = val
-	***REMOVED***
+	}
 	// compatibility
-	if vals[2] == 1000000000 ***REMOVED***
+	if vals[2] == 1000000000 {
 		vals[0] = vals[1]
-	***REMOVED***
+	}
 	clockFactor = float64(vals[2]) / TIME_UNITS_PER_SEC
 	tickInUsec = float64(vals[0]) / float64(vals[1]) * clockFactor
 	hz = float64(vals[0])
-***REMOVED***
+}
 
-func TickInUsec() float64 ***REMOVED***
-	if tickInUsec == 0.0 ***REMOVED***
+func TickInUsec() float64 {
+	if tickInUsec == 0.0 {
 		initClock()
-	***REMOVED***
+	}
 	return tickInUsec
-***REMOVED***
+}
 
-func ClockFactor() float64 ***REMOVED***
-	if clockFactor == 0.0 ***REMOVED***
+func ClockFactor() float64 {
+	if clockFactor == 0.0 {
 		initClock()
-	***REMOVED***
+	}
 	return clockFactor
-***REMOVED***
+}
 
-func Hz() float64 ***REMOVED***
-	if hz == 0.0 ***REMOVED***
+func Hz() float64 {
+	if hz == 0.0 {
 		initClock()
-	***REMOVED***
+	}
 	return hz
-***REMOVED***
+}
 
-func time2Tick(time uint32) uint32 ***REMOVED***
+func time2Tick(time uint32) uint32 {
 	return uint32(float64(time) * TickInUsec())
-***REMOVED***
+}
 
-func tick2Time(tick uint32) uint32 ***REMOVED***
+func tick2Time(tick uint32) uint32 {
 	return uint32(float64(tick) / TickInUsec())
-***REMOVED***
+}
 
-func time2Ktime(time uint32) uint32 ***REMOVED***
+func time2Ktime(time uint32) uint32 {
 	return uint32(float64(time) * ClockFactor())
-***REMOVED***
+}
 
-func ktime2Time(ktime uint32) uint32 ***REMOVED***
+func ktime2Time(ktime uint32) uint32 {
 	return uint32(float64(ktime) / ClockFactor())
-***REMOVED***
+}
 
-func burst(rate uint64, buffer uint32) uint32 ***REMOVED***
+func burst(rate uint64, buffer uint32) uint32 {
 	return uint32(float64(rate) * float64(tick2Time(buffer)) / TIME_UNITS_PER_SEC)
-***REMOVED***
+}
 
-func latency(rate uint64, limit, buffer uint32) float64 ***REMOVED***
+func latency(rate uint64, limit, buffer uint32) float64 {
 	return TIME_UNITS_PER_SEC*(float64(limit)/float64(rate)) - float64(tick2Time(buffer))
-***REMOVED***
+}
 
-func Xmittime(rate uint64, size uint32) float64 ***REMOVED***
+func Xmittime(rate uint64, size uint32) float64 {
 	return TickInUsec() * TIME_UNITS_PER_SEC * (float64(size) / float64(rate))
-***REMOVED***
+}

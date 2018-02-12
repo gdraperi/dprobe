@@ -11,75 +11,75 @@ import (
 	"github.com/docker/distribution/registry/client"
 )
 
-var alwaysContinue = []error***REMOVED***
-	&client.UnexpectedHTTPResponseError***REMOVED******REMOVED***,
+var alwaysContinue = []error{
+	&client.UnexpectedHTTPResponseError{},
 
 	// Some errcode.Errors that don't disprove the existence of a V1 image
-	errcode.Error***REMOVED***Code: errcode.ErrorCodeUnauthorized***REMOVED***,
-	errcode.Error***REMOVED***Code: v2.ErrorCodeManifestUnknown***REMOVED***,
-	errcode.Error***REMOVED***Code: v2.ErrorCodeNameUnknown***REMOVED***,
+	errcode.Error{Code: errcode.ErrorCodeUnauthorized},
+	errcode.Error{Code: v2.ErrorCodeManifestUnknown},
+	errcode.Error{Code: v2.ErrorCodeNameUnknown},
 
 	errors.New("some totally unexpected error"),
-***REMOVED***
+}
 
-var continueFromMirrorEndpoint = []error***REMOVED***
-	ImageConfigPullError***REMOVED******REMOVED***,
+var continueFromMirrorEndpoint = []error{
+	ImageConfigPullError{},
 
 	// Some other errcode.Error that doesn't indicate we should search for a V1 image.
-	errcode.Error***REMOVED***Code: errcode.ErrorCodeTooManyRequests***REMOVED***,
-***REMOVED***
+	errcode.Error{Code: errcode.ErrorCodeTooManyRequests},
+}
 
-var neverContinue = []error***REMOVED***
+var neverContinue = []error{
 	errors.New(strings.ToLower(syscall.ESRCH.Error())), // No such process
-***REMOVED***
+}
 
-func TestContinueOnError_NonMirrorEndpoint(t *testing.T) ***REMOVED***
-	for _, err := range alwaysContinue ***REMOVED***
-		if !continueOnError(err, false) ***REMOVED***
+func TestContinueOnError_NonMirrorEndpoint(t *testing.T) {
+	for _, err := range alwaysContinue {
+		if !continueOnError(err, false) {
 			t.Errorf("Should continue from non-mirror endpoint: %T: '%s'", err, err.Error())
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	for _, err := range continueFromMirrorEndpoint ***REMOVED***
-		if continueOnError(err, false) ***REMOVED***
+	for _, err := range continueFromMirrorEndpoint {
+		if continueOnError(err, false) {
 			t.Errorf("Should only continue from mirror endpoint: %T: '%s'", err, err.Error())
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestContinueOnError_MirrorEndpoint(t *testing.T) ***REMOVED***
-	errs := []error***REMOVED******REMOVED***
+func TestContinueOnError_MirrorEndpoint(t *testing.T) {
+	errs := []error{}
 	errs = append(errs, alwaysContinue...)
 	errs = append(errs, continueFromMirrorEndpoint...)
-	for _, err := range errs ***REMOVED***
-		if !continueOnError(err, true) ***REMOVED***
+	for _, err := range errs {
+		if !continueOnError(err, true) {
 			t.Errorf("Should continue from mirror endpoint: %T: '%s'", err, err.Error())
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestContinueOnError_NeverContinue(t *testing.T) ***REMOVED***
-	for _, isMirrorEndpoint := range []bool***REMOVED***true, false***REMOVED*** ***REMOVED***
-		for _, err := range neverContinue ***REMOVED***
-			if continueOnError(err, isMirrorEndpoint) ***REMOVED***
+func TestContinueOnError_NeverContinue(t *testing.T) {
+	for _, isMirrorEndpoint := range []bool{true, false} {
+		for _, err := range neverContinue {
+			if continueOnError(err, isMirrorEndpoint) {
 				t.Errorf("Should never continue: %T: '%s'", err, err.Error())
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}
 
-func TestContinueOnError_UnnestsErrors(t *testing.T) ***REMOVED***
+func TestContinueOnError_UnnestsErrors(t *testing.T) {
 	// ContinueOnError should evaluate nested errcode.Errors.
 
 	// Assumes that v2.ErrorCodeNameUnknown is a continueable error code.
-	err := errcode.Errors***REMOVED***errcode.Error***REMOVED***Code: v2.ErrorCodeNameUnknown***REMOVED******REMOVED***
-	if !continueOnError(err, false) ***REMOVED***
+	err := errcode.Errors{errcode.Error{Code: v2.ErrorCodeNameUnknown}}
+	if !continueOnError(err, false) {
 		t.Fatal("ContinueOnError should unnest, base return value on errcode.Errors")
-	***REMOVED***
+	}
 
 	// Assumes that errcode.ErrorCodeTooManyRequests is not a V1-fallback indication
-	err = errcode.Errors***REMOVED***errcode.Error***REMOVED***Code: errcode.ErrorCodeTooManyRequests***REMOVED******REMOVED***
-	if continueOnError(err, false) ***REMOVED***
+	err = errcode.Errors{errcode.Error{Code: errcode.ErrorCodeTooManyRequests}}
+	if continueOnError(err, false) {
 		t.Fatal("ContinueOnError should unnest, base return value on errcode.Errors")
-	***REMOVED***
-***REMOVED***
+	}
+}

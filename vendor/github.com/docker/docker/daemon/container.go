@@ -33,87 +33,87 @@ import (
 //  - A partial container ID prefix (e.g. short ID) of any length that is
 //    unique enough to only return a single container object
 //  If none of these searches succeed, an error is returned
-func (daemon *Daemon) GetContainer(prefixOrName string) (*container.Container, error) ***REMOVED***
-	if len(prefixOrName) == 0 ***REMOVED***
+func (daemon *Daemon) GetContainer(prefixOrName string) (*container.Container, error) {
+	if len(prefixOrName) == 0 {
 		return nil, errors.WithStack(invalidIdentifier(prefixOrName))
-	***REMOVED***
+	}
 
-	if containerByID := daemon.containers.Get(prefixOrName); containerByID != nil ***REMOVED***
+	if containerByID := daemon.containers.Get(prefixOrName); containerByID != nil {
 		// prefix is an exact match to a full container ID
 		return containerByID, nil
-	***REMOVED***
+	}
 
 	// GetByName will match only an exact name provided; we ignore errors
-	if containerByName, _ := daemon.GetByName(prefixOrName); containerByName != nil ***REMOVED***
+	if containerByName, _ := daemon.GetByName(prefixOrName); containerByName != nil {
 		// prefix is an exact match to a full container Name
 		return containerByName, nil
-	***REMOVED***
+	}
 
 	containerID, indexError := daemon.idIndex.Get(prefixOrName)
-	if indexError != nil ***REMOVED***
+	if indexError != nil {
 		// When truncindex defines an error type, use that instead
-		if indexError == truncindex.ErrNotExist ***REMOVED***
+		if indexError == truncindex.ErrNotExist {
 			return nil, containerNotFound(prefixOrName)
-		***REMOVED***
+		}
 		return nil, errdefs.System(indexError)
-	***REMOVED***
+	}
 	return daemon.containers.Get(containerID), nil
-***REMOVED***
+}
 
 // checkContainer make sure the specified container validates the specified conditions
-func (daemon *Daemon) checkContainer(container *container.Container, conditions ...func(*container.Container) error) error ***REMOVED***
-	for _, condition := range conditions ***REMOVED***
-		if err := condition(container); err != nil ***REMOVED***
+func (daemon *Daemon) checkContainer(container *container.Container, conditions ...func(*container.Container) error) error {
+	for _, condition := range conditions {
+		if err := condition(container); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
 // Exists returns a true if a container of the specified ID or name exists,
 // false otherwise.
-func (daemon *Daemon) Exists(id string) bool ***REMOVED***
+func (daemon *Daemon) Exists(id string) bool {
 	c, _ := daemon.GetContainer(id)
 	return c != nil
-***REMOVED***
+}
 
 // IsPaused returns a bool indicating if the specified container is paused.
-func (daemon *Daemon) IsPaused(id string) bool ***REMOVED***
+func (daemon *Daemon) IsPaused(id string) bool {
 	c, _ := daemon.GetContainer(id)
 	return c.State.IsPaused()
-***REMOVED***
+}
 
-func (daemon *Daemon) containerRoot(id string) string ***REMOVED***
+func (daemon *Daemon) containerRoot(id string) string {
 	return filepath.Join(daemon.repository, id)
-***REMOVED***
+}
 
 // Load reads the contents of a container from disk
 // This is typically done at startup.
-func (daemon *Daemon) load(id string) (*container.Container, error) ***REMOVED***
+func (daemon *Daemon) load(id string) (*container.Container, error) {
 	container := daemon.newBaseContainer(id)
 
-	if err := container.FromDisk(); err != nil ***REMOVED***
+	if err := container.FromDisk(); err != nil {
 		return nil, err
-	***REMOVED***
-	if err := label.ReserveLabel(container.ProcessLabel); err != nil ***REMOVED***
+	}
+	if err := label.ReserveLabel(container.ProcessLabel); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	if container.ID != id ***REMOVED***
+	if container.ID != id {
 		return container, fmt.Errorf("Container %s is stored at %s", container.ID, id)
-	***REMOVED***
+	}
 
 	return container, nil
-***REMOVED***
+}
 
 // Register makes a container object usable by the daemon as <container.ID>
-func (daemon *Daemon) Register(c *container.Container) error ***REMOVED***
+func (daemon *Daemon) Register(c *container.Container) error {
 	// Attach to stdout and stderr
-	if c.Config.OpenStdin ***REMOVED***
+	if c.Config.OpenStdin {
 		c.StreamConfig.NewInputPipes()
-	***REMOVED*** else ***REMOVED***
+	} else {
 		c.StreamConfig.NewNopInputPipe()
-	***REMOVED***
+	}
 
 	// once in the memory store it is visible to other goroutines
 	// grab a Lock until it has been checkpointed to avoid races
@@ -123,29 +123,29 @@ func (daemon *Daemon) Register(c *container.Container) error ***REMOVED***
 	daemon.containers.Add(c.ID, c)
 	daemon.idIndex.Add(c.ID)
 	return c.CheckpointTo(daemon.containersReplica)
-***REMOVED***
+}
 
-func (daemon *Daemon) newContainer(name string, operatingSystem string, config *containertypes.Config, hostConfig *containertypes.HostConfig, imgID image.ID, managed bool) (*container.Container, error) ***REMOVED***
+func (daemon *Daemon) newContainer(name string, operatingSystem string, config *containertypes.Config, hostConfig *containertypes.HostConfig, imgID image.ID, managed bool) (*container.Container, error) {
 	var (
 		id             string
 		err            error
 		noExplicitName = name == ""
 	)
 	id, name, err = daemon.generateIDAndName(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	if hostConfig.NetworkMode.IsHost() ***REMOVED***
-		if config.Hostname == "" ***REMOVED***
+	if hostConfig.NetworkMode.IsHost() {
+		if config.Hostname == "" {
 			config.Hostname, err = os.Hostname()
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, errdefs.System(err)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
+			}
+		}
+	} else {
 		daemon.generateHostname(id, config)
-	***REMOVED***
+	}
 	entrypoint, args := daemon.getEntrypointAndArgs(config.Entrypoint, config.Cmd)
 
 	base := daemon.newBaseContainer(id)
@@ -154,195 +154,195 @@ func (daemon *Daemon) newContainer(name string, operatingSystem string, config *
 	base.Path = entrypoint
 	base.Args = args //FIXME: de-duplicate from config
 	base.Config = config
-	base.HostConfig = &containertypes.HostConfig***REMOVED******REMOVED***
+	base.HostConfig = &containertypes.HostConfig{}
 	base.ImageID = imgID
-	base.NetworkSettings = &network.Settings***REMOVED***IsAnonymousEndpoint: noExplicitName***REMOVED***
+	base.NetworkSettings = &network.Settings{IsAnonymousEndpoint: noExplicitName}
 	base.Name = name
 	base.Driver = daemon.GraphDriverName(operatingSystem)
 	base.OS = operatingSystem
 	return base, err
-***REMOVED***
+}
 
 // GetByName returns a container given a name.
-func (daemon *Daemon) GetByName(name string) (*container.Container, error) ***REMOVED***
-	if len(name) == 0 ***REMOVED***
+func (daemon *Daemon) GetByName(name string) (*container.Container, error) {
+	if len(name) == 0 {
 		return nil, fmt.Errorf("No container name supplied")
-	***REMOVED***
+	}
 	fullName := name
-	if name[0] != '/' ***REMOVED***
+	if name[0] != '/' {
 		fullName = "/" + name
-	***REMOVED***
+	}
 	id, err := daemon.containersReplica.Snapshot().GetID(fullName)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("Could not find entity for %s", name)
-	***REMOVED***
+	}
 	e := daemon.containers.Get(id)
-	if e == nil ***REMOVED***
+	if e == nil {
 		return nil, fmt.Errorf("Could not find container for entity id %s", id)
-	***REMOVED***
+	}
 	return e, nil
-***REMOVED***
+}
 
 // newBaseContainer creates a new container with its initial
 // configuration based on the root storage from the daemon.
-func (daemon *Daemon) newBaseContainer(id string) *container.Container ***REMOVED***
+func (daemon *Daemon) newBaseContainer(id string) *container.Container {
 	return container.NewBaseContainer(id, daemon.containerRoot(id))
-***REMOVED***
+}
 
-func (daemon *Daemon) getEntrypointAndArgs(configEntrypoint strslice.StrSlice, configCmd strslice.StrSlice) (string, []string) ***REMOVED***
-	if len(configEntrypoint) != 0 ***REMOVED***
+func (daemon *Daemon) getEntrypointAndArgs(configEntrypoint strslice.StrSlice, configCmd strslice.StrSlice) (string, []string) {
+	if len(configEntrypoint) != 0 {
 		return configEntrypoint[0], append(configEntrypoint[1:], configCmd...)
-	***REMOVED***
+	}
 	return configCmd[0], configCmd[1:]
-***REMOVED***
+}
 
-func (daemon *Daemon) generateHostname(id string, config *containertypes.Config) ***REMOVED***
+func (daemon *Daemon) generateHostname(id string, config *containertypes.Config) {
 	// Generate default hostname
-	if config.Hostname == "" ***REMOVED***
+	if config.Hostname == "" {
 		config.Hostname = id[:12]
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (daemon *Daemon) setSecurityOptions(container *container.Container, hostConfig *containertypes.HostConfig) error ***REMOVED***
+func (daemon *Daemon) setSecurityOptions(container *container.Container, hostConfig *containertypes.HostConfig) error {
 	container.Lock()
 	defer container.Unlock()
 	return daemon.parseSecurityOpt(container, hostConfig)
-***REMOVED***
+}
 
-func (daemon *Daemon) setHostConfig(container *container.Container, hostConfig *containertypes.HostConfig) error ***REMOVED***
+func (daemon *Daemon) setHostConfig(container *container.Container, hostConfig *containertypes.HostConfig) error {
 	// Do not lock while creating volumes since this could be calling out to external plugins
 	// Don't want to block other actions, like `docker ps` because we're waiting on an external plugin
-	if err := daemon.registerMountPoints(container, hostConfig); err != nil ***REMOVED***
+	if err := daemon.registerMountPoints(container, hostConfig); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	container.Lock()
 	defer container.Unlock()
 
 	// Register any links from the host config before starting the container
-	if err := daemon.registerLinks(container, hostConfig); err != nil ***REMOVED***
+	if err := daemon.registerLinks(container, hostConfig); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	runconfig.SetDefaultNetModeIfBlank(hostConfig)
 	container.HostConfig = hostConfig
 	return container.CheckpointTo(daemon.containersReplica)
-***REMOVED***
+}
 
 // verifyContainerSettings performs validation of the hostconfig and config
 // structures.
-func (daemon *Daemon) verifyContainerSettings(platform string, hostConfig *containertypes.HostConfig, config *containertypes.Config, update bool) ([]string, error) ***REMOVED***
+func (daemon *Daemon) verifyContainerSettings(platform string, hostConfig *containertypes.HostConfig, config *containertypes.Config, update bool) ([]string, error) {
 	// First perform verification of settings common across all platforms.
-	if config != nil ***REMOVED***
-		if config.WorkingDir != "" ***REMOVED***
+	if config != nil {
+		if config.WorkingDir != "" {
 			wdInvalid := false
-			if runtime.GOOS == platform ***REMOVED***
+			if runtime.GOOS == platform {
 				config.WorkingDir = filepath.FromSlash(config.WorkingDir) // Ensure in platform semantics
-				if !system.IsAbs(config.WorkingDir) ***REMOVED***
+				if !system.IsAbs(config.WorkingDir) {
 					wdInvalid = true
-				***REMOVED***
-			***REMOVED*** else ***REMOVED***
+				}
+			} else {
 				// LCOW. Force Unix semantics
 				config.WorkingDir = strings.Replace(config.WorkingDir, string(os.PathSeparator), "/", -1)
-				if !path.IsAbs(config.WorkingDir) ***REMOVED***
+				if !path.IsAbs(config.WorkingDir) {
 					wdInvalid = true
-				***REMOVED***
-			***REMOVED***
-			if wdInvalid ***REMOVED***
+				}
+			}
+			if wdInvalid {
 				return nil, fmt.Errorf("the working directory '%s' is invalid, it needs to be an absolute path", config.WorkingDir)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
-		if len(config.StopSignal) > 0 ***REMOVED***
+		if len(config.StopSignal) > 0 {
 			_, err := signal.ParseSignal(config.StopSignal)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		// Validate if Env contains empty variable or not (e.g., ``, `=foo`)
-		for _, env := range config.Env ***REMOVED***
-			if _, err := opts.ValidateEnv(env); err != nil ***REMOVED***
+		for _, env := range config.Env {
+			if _, err := opts.ValidateEnv(env); err != nil {
 				return nil, err
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		// Validate the healthcheck params of Config
-		if config.Healthcheck != nil ***REMOVED***
-			if config.Healthcheck.Interval != 0 && config.Healthcheck.Interval < containertypes.MinimumDuration ***REMOVED***
+		if config.Healthcheck != nil {
+			if config.Healthcheck.Interval != 0 && config.Healthcheck.Interval < containertypes.MinimumDuration {
 				return nil, errors.Errorf("Interval in Healthcheck cannot be less than %s", containertypes.MinimumDuration)
-			***REMOVED***
+			}
 
-			if config.Healthcheck.Timeout != 0 && config.Healthcheck.Timeout < containertypes.MinimumDuration ***REMOVED***
+			if config.Healthcheck.Timeout != 0 && config.Healthcheck.Timeout < containertypes.MinimumDuration {
 				return nil, errors.Errorf("Timeout in Healthcheck cannot be less than %s", containertypes.MinimumDuration)
-			***REMOVED***
+			}
 
-			if config.Healthcheck.Retries < 0 ***REMOVED***
+			if config.Healthcheck.Retries < 0 {
 				return nil, errors.Errorf("Retries in Healthcheck cannot be negative")
-			***REMOVED***
+			}
 
-			if config.Healthcheck.StartPeriod != 0 && config.Healthcheck.StartPeriod < containertypes.MinimumDuration ***REMOVED***
+			if config.Healthcheck.StartPeriod != 0 && config.Healthcheck.StartPeriod < containertypes.MinimumDuration {
 				return nil, errors.Errorf("StartPeriod in Healthcheck cannot be less than %s", containertypes.MinimumDuration)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
-	if hostConfig == nil ***REMOVED***
+	if hostConfig == nil {
 		return nil, nil
-	***REMOVED***
+	}
 
-	if hostConfig.AutoRemove && !hostConfig.RestartPolicy.IsNone() ***REMOVED***
+	if hostConfig.AutoRemove && !hostConfig.RestartPolicy.IsNone() {
 		return nil, errors.Errorf("can't create 'AutoRemove' container with restart policy")
-	***REMOVED***
+	}
 
 	// Validate mounts; check if host directories still exist
 	parser := volume.NewParser(platform)
-	for _, cfg := range hostConfig.Mounts ***REMOVED***
-		if err := parser.ValidateMountConfig(&cfg); err != nil ***REMOVED***
+	for _, cfg := range hostConfig.Mounts {
+		if err := parser.ValidateMountConfig(&cfg); err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	for _, extraHost := range hostConfig.ExtraHosts ***REMOVED***
-		if _, err := opts.ValidateExtraHost(extraHost); err != nil ***REMOVED***
+	for _, extraHost := range hostConfig.ExtraHosts {
+		if _, err := opts.ValidateExtraHost(extraHost); err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	for port := range hostConfig.PortBindings ***REMOVED***
+	for port := range hostConfig.PortBindings {
 		_, portStr := nat.SplitProtoPort(string(port))
-		if _, err := nat.ParsePort(portStr); err != nil ***REMOVED***
+		if _, err := nat.ParsePort(portStr); err != nil {
 			return nil, errors.Errorf("invalid port specification: %q", portStr)
-		***REMOVED***
-		for _, pb := range hostConfig.PortBindings[port] ***REMOVED***
+		}
+		for _, pb := range hostConfig.PortBindings[port] {
 			_, err := nat.NewPort(nat.SplitProtoPort(pb.HostPort))
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, errors.Errorf("invalid port specification: %q", pb.HostPort)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	p := hostConfig.RestartPolicy
 
-	switch p.Name ***REMOVED***
+	switch p.Name {
 	case "always", "unless-stopped", "no":
-		if p.MaximumRetryCount != 0 ***REMOVED***
+		if p.MaximumRetryCount != 0 {
 			return nil, errors.Errorf("maximum retry count cannot be used with restart policy '%s'", p.Name)
-		***REMOVED***
+		}
 	case "on-failure":
-		if p.MaximumRetryCount < 0 ***REMOVED***
+		if p.MaximumRetryCount < 0 {
 			return nil, errors.Errorf("maximum retry count cannot be negative")
-		***REMOVED***
+		}
 	case "":
 		// do nothing
 	default:
 		return nil, errors.Errorf("invalid restart policy '%s'", p.Name)
-	***REMOVED***
+	}
 
-	if !hostConfig.Isolation.IsValid() ***REMOVED***
+	if !hostConfig.Isolation.IsValid() {
 		return nil, errors.Errorf("invalid isolation '%s' on %s", hostConfig.Isolation, runtime.GOOS)
-	***REMOVED***
+	}
 
 	// Now do platform-specific verification
 	return verifyPlatformContainerSettings(daemon, hostConfig, config, update)
-***REMOVED***
+}

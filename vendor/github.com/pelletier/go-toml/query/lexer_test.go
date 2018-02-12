@@ -5,11 +5,11 @@ import (
 	"testing"
 )
 
-func testQLFlow(t *testing.T, input string, expectedFlow []token) ***REMOVED***
+func testQLFlow(t *testing.T, input string, expectedFlow []token) {
 	ch := lexQuery(input)
-	for idx, expected := range expectedFlow ***REMOVED***
+	for idx, expected := range expectedFlow {
 		token := <-ch
-		if token != expected ***REMOVED***
+		if token != expected {
 			t.Log("While testing #", idx, ":", input)
 			t.Log("compared (got)", token, "to (expected)", expected)
 			t.Log("\tvalue:", token.val, "<->", expected.val)
@@ -19,161 +19,161 @@ func testQLFlow(t *testing.T, input string, expectedFlow []token) ***REMOVED***
 			t.Log("\tcolumn:", token.Col, "<->", expected.Col)
 			t.Log("compared", token, "to", expected)
 			t.FailNow()
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	tok, ok := <-ch
-	if ok ***REMOVED***
+	if ok {
 		t.Log("channel is not closed!")
 		t.Log(len(ch)+1, "tokens remaining:")
 
 		t.Log("token ->", tok)
-		for token := range ch ***REMOVED***
+		for token := range ch {
 			t.Log("token ->", token)
-		***REMOVED***
+		}
 		t.FailNow()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestLexSpecialChars(t *testing.T) ***REMOVED***
-	testQLFlow(t, " .$[]..()?*", []token***REMOVED***
-		***REMOVED***toml.Position***REMOVED***1, 2***REMOVED***, tokenDot, "."***REMOVED***,
-		***REMOVED***toml.Position***REMOVED***1, 3***REMOVED***, tokenDollar, "$"***REMOVED***,
-		***REMOVED***toml.Position***REMOVED***1, 4***REMOVED***, tokenLeftBracket, "["***REMOVED***,
-		***REMOVED***toml.Position***REMOVED***1, 5***REMOVED***, tokenRightBracket, "]"***REMOVED***,
-		***REMOVED***toml.Position***REMOVED***1, 6***REMOVED***, tokenDotDot, ".."***REMOVED***,
-		***REMOVED***toml.Position***REMOVED***1, 8***REMOVED***, tokenLeftParen, "("***REMOVED***,
-		***REMOVED***toml.Position***REMOVED***1, 9***REMOVED***, tokenRightParen, ")"***REMOVED***,
-		***REMOVED***toml.Position***REMOVED***1, 10***REMOVED***, tokenQuestion, "?"***REMOVED***,
-		***REMOVED***toml.Position***REMOVED***1, 11***REMOVED***, tokenStar, "*"***REMOVED***,
-		***REMOVED***toml.Position***REMOVED***1, 12***REMOVED***, tokenEOF, ""***REMOVED***,
-	***REMOVED***)
-***REMOVED***
+func TestLexSpecialChars(t *testing.T) {
+	testQLFlow(t, " .$[]..()?*", []token{
+		{toml.Position{1, 2}, tokenDot, "."},
+		{toml.Position{1, 3}, tokenDollar, "$"},
+		{toml.Position{1, 4}, tokenLeftBracket, "["},
+		{toml.Position{1, 5}, tokenRightBracket, "]"},
+		{toml.Position{1, 6}, tokenDotDot, ".."},
+		{toml.Position{1, 8}, tokenLeftParen, "("},
+		{toml.Position{1, 9}, tokenRightParen, ")"},
+		{toml.Position{1, 10}, tokenQuestion, "?"},
+		{toml.Position{1, 11}, tokenStar, "*"},
+		{toml.Position{1, 12}, tokenEOF, ""},
+	})
+}
 
-func TestLexString(t *testing.T) ***REMOVED***
-	testQLFlow(t, "'foo\n'", []token***REMOVED***
-		***REMOVED***toml.Position***REMOVED***1, 2***REMOVED***, tokenString, "foo\n"***REMOVED***,
-		***REMOVED***toml.Position***REMOVED***2, 2***REMOVED***, tokenEOF, ""***REMOVED***,
-	***REMOVED***)
-***REMOVED***
+func TestLexString(t *testing.T) {
+	testQLFlow(t, "'foo\n'", []token{
+		{toml.Position{1, 2}, tokenString, "foo\n"},
+		{toml.Position{2, 2}, tokenEOF, ""},
+	})
+}
 
-func TestLexDoubleString(t *testing.T) ***REMOVED***
-	testQLFlow(t, `"bar"`, []token***REMOVED***
-		***REMOVED***toml.Position***REMOVED***1, 2***REMOVED***, tokenString, "bar"***REMOVED***,
-		***REMOVED***toml.Position***REMOVED***1, 6***REMOVED***, tokenEOF, ""***REMOVED***,
-	***REMOVED***)
-***REMOVED***
+func TestLexDoubleString(t *testing.T) {
+	testQLFlow(t, `"bar"`, []token{
+		{toml.Position{1, 2}, tokenString, "bar"},
+		{toml.Position{1, 6}, tokenEOF, ""},
+	})
+}
 
-func TestLexStringEscapes(t *testing.T) ***REMOVED***
-	testQLFlow(t, `"foo \" \' \b \f \/ \t \r \\ \u03A9 \U00012345 \n bar"`, []token***REMOVED***
-		***REMOVED***toml.Position***REMOVED***1, 2***REMOVED***, tokenString, "foo \" ' \b \f / \t \r \\ \u03A9 \U00012345 \n bar"***REMOVED***,
-		***REMOVED***toml.Position***REMOVED***1, 55***REMOVED***, tokenEOF, ""***REMOVED***,
-	***REMOVED***)
-***REMOVED***
+func TestLexStringEscapes(t *testing.T) {
+	testQLFlow(t, `"foo \" \' \b \f \/ \t \r \\ \u03A9 \U00012345 \n bar"`, []token{
+		{toml.Position{1, 2}, tokenString, "foo \" ' \b \f / \t \r \\ \u03A9 \U00012345 \n bar"},
+		{toml.Position{1, 55}, tokenEOF, ""},
+	})
+}
 
-func TestLexStringUnfinishedUnicode4(t *testing.T) ***REMOVED***
-	testQLFlow(t, `"\u000"`, []token***REMOVED***
-		***REMOVED***toml.Position***REMOVED***1, 2***REMOVED***, tokenError, "unfinished unicode escape"***REMOVED***,
-	***REMOVED***)
-***REMOVED***
+func TestLexStringUnfinishedUnicode4(t *testing.T) {
+	testQLFlow(t, `"\u000"`, []token{
+		{toml.Position{1, 2}, tokenError, "unfinished unicode escape"},
+	})
+}
 
-func TestLexStringUnfinishedUnicode8(t *testing.T) ***REMOVED***
-	testQLFlow(t, `"\U0000"`, []token***REMOVED***
-		***REMOVED***toml.Position***REMOVED***1, 2***REMOVED***, tokenError, "unfinished unicode escape"***REMOVED***,
-	***REMOVED***)
-***REMOVED***
+func TestLexStringUnfinishedUnicode8(t *testing.T) {
+	testQLFlow(t, `"\U0000"`, []token{
+		{toml.Position{1, 2}, tokenError, "unfinished unicode escape"},
+	})
+}
 
-func TestLexStringInvalidEscape(t *testing.T) ***REMOVED***
-	testQLFlow(t, `"\x"`, []token***REMOVED***
-		***REMOVED***toml.Position***REMOVED***1, 2***REMOVED***, tokenError, "invalid escape sequence: \\x"***REMOVED***,
-	***REMOVED***)
-***REMOVED***
+func TestLexStringInvalidEscape(t *testing.T) {
+	testQLFlow(t, `"\x"`, []token{
+		{toml.Position{1, 2}, tokenError, "invalid escape sequence: \\x"},
+	})
+}
 
-func TestLexStringUnfinished(t *testing.T) ***REMOVED***
-	testQLFlow(t, `"bar`, []token***REMOVED***
-		***REMOVED***toml.Position***REMOVED***1, 2***REMOVED***, tokenError, "unclosed string"***REMOVED***,
-	***REMOVED***)
-***REMOVED***
+func TestLexStringUnfinished(t *testing.T) {
+	testQLFlow(t, `"bar`, []token{
+		{toml.Position{1, 2}, tokenError, "unclosed string"},
+	})
+}
 
-func TestLexKey(t *testing.T) ***REMOVED***
-	testQLFlow(t, "foo", []token***REMOVED***
-		***REMOVED***toml.Position***REMOVED***1, 1***REMOVED***, tokenKey, "foo"***REMOVED***,
-		***REMOVED***toml.Position***REMOVED***1, 4***REMOVED***, tokenEOF, ""***REMOVED***,
-	***REMOVED***)
-***REMOVED***
+func TestLexKey(t *testing.T) {
+	testQLFlow(t, "foo", []token{
+		{toml.Position{1, 1}, tokenKey, "foo"},
+		{toml.Position{1, 4}, tokenEOF, ""},
+	})
+}
 
-func TestLexRecurse(t *testing.T) ***REMOVED***
-	testQLFlow(t, "$..*", []token***REMOVED***
-		***REMOVED***toml.Position***REMOVED***1, 1***REMOVED***, tokenDollar, "$"***REMOVED***,
-		***REMOVED***toml.Position***REMOVED***1, 2***REMOVED***, tokenDotDot, ".."***REMOVED***,
-		***REMOVED***toml.Position***REMOVED***1, 4***REMOVED***, tokenStar, "*"***REMOVED***,
-		***REMOVED***toml.Position***REMOVED***1, 5***REMOVED***, tokenEOF, ""***REMOVED***,
-	***REMOVED***)
-***REMOVED***
+func TestLexRecurse(t *testing.T) {
+	testQLFlow(t, "$..*", []token{
+		{toml.Position{1, 1}, tokenDollar, "$"},
+		{toml.Position{1, 2}, tokenDotDot, ".."},
+		{toml.Position{1, 4}, tokenStar, "*"},
+		{toml.Position{1, 5}, tokenEOF, ""},
+	})
+}
 
-func TestLexBracketKey(t *testing.T) ***REMOVED***
-	testQLFlow(t, "$[foo]", []token***REMOVED***
-		***REMOVED***toml.Position***REMOVED***1, 1***REMOVED***, tokenDollar, "$"***REMOVED***,
-		***REMOVED***toml.Position***REMOVED***1, 2***REMOVED***, tokenLeftBracket, "["***REMOVED***,
-		***REMOVED***toml.Position***REMOVED***1, 3***REMOVED***, tokenKey, "foo"***REMOVED***,
-		***REMOVED***toml.Position***REMOVED***1, 6***REMOVED***, tokenRightBracket, "]"***REMOVED***,
-		***REMOVED***toml.Position***REMOVED***1, 7***REMOVED***, tokenEOF, ""***REMOVED***,
-	***REMOVED***)
-***REMOVED***
+func TestLexBracketKey(t *testing.T) {
+	testQLFlow(t, "$[foo]", []token{
+		{toml.Position{1, 1}, tokenDollar, "$"},
+		{toml.Position{1, 2}, tokenLeftBracket, "["},
+		{toml.Position{1, 3}, tokenKey, "foo"},
+		{toml.Position{1, 6}, tokenRightBracket, "]"},
+		{toml.Position{1, 7}, tokenEOF, ""},
+	})
+}
 
-func TestLexSpace(t *testing.T) ***REMOVED***
-	testQLFlow(t, "foo bar baz", []token***REMOVED***
-		***REMOVED***toml.Position***REMOVED***1, 1***REMOVED***, tokenKey, "foo"***REMOVED***,
-		***REMOVED***toml.Position***REMOVED***1, 5***REMOVED***, tokenKey, "bar"***REMOVED***,
-		***REMOVED***toml.Position***REMOVED***1, 9***REMOVED***, tokenKey, "baz"***REMOVED***,
-		***REMOVED***toml.Position***REMOVED***1, 12***REMOVED***, tokenEOF, ""***REMOVED***,
-	***REMOVED***)
-***REMOVED***
+func TestLexSpace(t *testing.T) {
+	testQLFlow(t, "foo bar baz", []token{
+		{toml.Position{1, 1}, tokenKey, "foo"},
+		{toml.Position{1, 5}, tokenKey, "bar"},
+		{toml.Position{1, 9}, tokenKey, "baz"},
+		{toml.Position{1, 12}, tokenEOF, ""},
+	})
+}
 
-func TestLexInteger(t *testing.T) ***REMOVED***
-	testQLFlow(t, "100 +200 -300", []token***REMOVED***
-		***REMOVED***toml.Position***REMOVED***1, 1***REMOVED***, tokenInteger, "100"***REMOVED***,
-		***REMOVED***toml.Position***REMOVED***1, 5***REMOVED***, tokenInteger, "+200"***REMOVED***,
-		***REMOVED***toml.Position***REMOVED***1, 10***REMOVED***, tokenInteger, "-300"***REMOVED***,
-		***REMOVED***toml.Position***REMOVED***1, 14***REMOVED***, tokenEOF, ""***REMOVED***,
-	***REMOVED***)
-***REMOVED***
+func TestLexInteger(t *testing.T) {
+	testQLFlow(t, "100 +200 -300", []token{
+		{toml.Position{1, 1}, tokenInteger, "100"},
+		{toml.Position{1, 5}, tokenInteger, "+200"},
+		{toml.Position{1, 10}, tokenInteger, "-300"},
+		{toml.Position{1, 14}, tokenEOF, ""},
+	})
+}
 
-func TestLexFloat(t *testing.T) ***REMOVED***
-	testQLFlow(t, "100.0 +200.0 -300.0", []token***REMOVED***
-		***REMOVED***toml.Position***REMOVED***1, 1***REMOVED***, tokenFloat, "100.0"***REMOVED***,
-		***REMOVED***toml.Position***REMOVED***1, 7***REMOVED***, tokenFloat, "+200.0"***REMOVED***,
-		***REMOVED***toml.Position***REMOVED***1, 14***REMOVED***, tokenFloat, "-300.0"***REMOVED***,
-		***REMOVED***toml.Position***REMOVED***1, 20***REMOVED***, tokenEOF, ""***REMOVED***,
-	***REMOVED***)
-***REMOVED***
+func TestLexFloat(t *testing.T) {
+	testQLFlow(t, "100.0 +200.0 -300.0", []token{
+		{toml.Position{1, 1}, tokenFloat, "100.0"},
+		{toml.Position{1, 7}, tokenFloat, "+200.0"},
+		{toml.Position{1, 14}, tokenFloat, "-300.0"},
+		{toml.Position{1, 20}, tokenEOF, ""},
+	})
+}
 
-func TestLexFloatWithMultipleDots(t *testing.T) ***REMOVED***
-	testQLFlow(t, "4.2.", []token***REMOVED***
-		***REMOVED***toml.Position***REMOVED***1, 1***REMOVED***, tokenError, "cannot have two dots in one float"***REMOVED***,
-	***REMOVED***)
-***REMOVED***
+func TestLexFloatWithMultipleDots(t *testing.T) {
+	testQLFlow(t, "4.2.", []token{
+		{toml.Position{1, 1}, tokenError, "cannot have two dots in one float"},
+	})
+}
 
-func TestLexFloatLeadingDot(t *testing.T) ***REMOVED***
-	testQLFlow(t, "+.1", []token***REMOVED***
-		***REMOVED***toml.Position***REMOVED***1, 1***REMOVED***, tokenError, "cannot start float with a dot"***REMOVED***,
-	***REMOVED***)
-***REMOVED***
+func TestLexFloatLeadingDot(t *testing.T) {
+	testQLFlow(t, "+.1", []token{
+		{toml.Position{1, 1}, tokenError, "cannot start float with a dot"},
+	})
+}
 
-func TestLexFloatWithTrailingDot(t *testing.T) ***REMOVED***
-	testQLFlow(t, "42.", []token***REMOVED***
-		***REMOVED***toml.Position***REMOVED***1, 1***REMOVED***, tokenError, "float cannot end with a dot"***REMOVED***,
-	***REMOVED***)
-***REMOVED***
+func TestLexFloatWithTrailingDot(t *testing.T) {
+	testQLFlow(t, "42.", []token{
+		{toml.Position{1, 1}, tokenError, "float cannot end with a dot"},
+	})
+}
 
-func TestLexNumberWithoutDigit(t *testing.T) ***REMOVED***
-	testQLFlow(t, "+", []token***REMOVED***
-		***REMOVED***toml.Position***REMOVED***1, 1***REMOVED***, tokenError, "no digit in that number"***REMOVED***,
-	***REMOVED***)
-***REMOVED***
+func TestLexNumberWithoutDigit(t *testing.T) {
+	testQLFlow(t, "+", []token{
+		{toml.Position{1, 1}, tokenError, "no digit in that number"},
+	})
+}
 
-func TestLexUnknown(t *testing.T) ***REMOVED***
-	testQLFlow(t, "^", []token***REMOVED***
-		***REMOVED***toml.Position***REMOVED***1, 1***REMOVED***, tokenError, "unexpected char: '94'"***REMOVED***,
-	***REMOVED***)
-***REMOVED***
+func TestLexUnknown(t *testing.T) {
+	testQLFlow(t, "^", []token{
+		{toml.Position{1, 1}, tokenError, "unexpected char: '94'"},
+	})
+}

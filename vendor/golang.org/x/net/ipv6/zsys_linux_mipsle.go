@@ -102,30 +102,30 @@ const (
 	sizeofSockFprog = 0x8
 )
 
-type kernelSockaddrStorage struct ***REMOVED***
+type kernelSockaddrStorage struct {
 	Family  uint16
 	X__data [126]int8
-***REMOVED***
+}
 
-type sockaddrInet6 struct ***REMOVED***
+type sockaddrInet6 struct {
 	Family   uint16
 	Port     uint16
 	Flowinfo uint32
 	Addr     [16]byte /* in6_addr */
 	Scope_id uint32
-***REMOVED***
+}
 
-type inet6Pktinfo struct ***REMOVED***
+type inet6Pktinfo struct {
 	Addr    [16]byte /* in6_addr */
 	Ifindex int32
-***REMOVED***
+}
 
-type ipv6Mtuinfo struct ***REMOVED***
+type ipv6Mtuinfo struct {
 	Addr sockaddrInet6
 	Mtu  uint32
-***REMOVED***
+}
 
-type ipv6FlowlabelReq struct ***REMOVED***
+type ipv6FlowlabelReq struct {
 	Dst        [16]byte /* in6_addr */
 	Label      uint32
 	Action     uint8
@@ -134,37 +134,37 @@ type ipv6FlowlabelReq struct ***REMOVED***
 	Expires    uint16
 	Linger     uint16
 	X__flr_pad uint32
-***REMOVED***
+}
 
-type ipv6Mreq struct ***REMOVED***
+type ipv6Mreq struct {
 	Multiaddr [16]byte /* in6_addr */
 	Ifindex   int32
-***REMOVED***
+}
 
-type groupReq struct ***REMOVED***
+type groupReq struct {
 	Interface uint32
 	Group     kernelSockaddrStorage
-***REMOVED***
+}
 
-type groupSourceReq struct ***REMOVED***
+type groupSourceReq struct {
 	Interface uint32
 	Group     kernelSockaddrStorage
 	Source    kernelSockaddrStorage
-***REMOVED***
+}
 
-type icmpv6Filter struct ***REMOVED***
+type icmpv6Filter struct {
 	Data [8]uint32
-***REMOVED***
+}
 
-type sockFProg struct ***REMOVED***
+type sockFProg struct {
 	Len       uint16
 	Pad_cgo_0 [2]byte
 	Filter    *sockFilter
-***REMOVED***
+}
 
-type sockFilter struct ***REMOVED***
+type sockFilter struct {
 	Code uint16
 	Jt   uint8
 	Jf   uint8
 	K    uint32
-***REMOVED***
+}

@@ -47,42 +47,42 @@ const (
 	eventExtraOffset = 10 // Add this to any event to get a string that supports extended data
 )
 
-func installServiceFlags(flags *pflag.FlagSet) ***REMOVED***
+func installServiceFlags(flags *pflag.FlagSet) {
 	flServiceName = flags.String("service-name", "docker", "Set the Windows service name")
 	flRegisterService = flags.Bool("register-service", false, "Register the service and exit")
 	flUnregisterService = flags.Bool("unregister-service", false, "Unregister the service and exit")
 	flRunService = flags.Bool("run-service", false, "")
 	flags.MarkHidden("run-service")
-***REMOVED***
+}
 
-type handler struct ***REMOVED***
+type handler struct {
 	tosvc     chan bool
 	fromsvc   chan error
 	daemonCli *DaemonCli
-***REMOVED***
+}
 
-type etwHook struct ***REMOVED***
+type etwHook struct {
 	log *eventlog.Log
-***REMOVED***
+}
 
-func (h *etwHook) Levels() []logrus.Level ***REMOVED***
-	return []logrus.Level***REMOVED***
+func (h *etwHook) Levels() []logrus.Level {
+	return []logrus.Level{
 		logrus.PanicLevel,
 		logrus.FatalLevel,
 		logrus.ErrorLevel,
 		logrus.WarnLevel,
 		logrus.InfoLevel,
 		logrus.DebugLevel,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (h *etwHook) Fire(e *logrus.Entry) error ***REMOVED***
+func (h *etwHook) Fire(e *logrus.Entry) error {
 	var (
 		etype uint16
 		eid   uint32
 	)
 
-	switch e.Level ***REMOVED***
+	switch e.Level {
 	case logrus.PanicLevel:
 		etype = windows.EVENTLOG_ERROR_TYPE
 		eid = eventPanic
@@ -103,27 +103,27 @@ func (h *etwHook) Fire(e *logrus.Entry) error ***REMOVED***
 		eid = eventDebug
 	default:
 		return errors.New("unknown level")
-	***REMOVED***
+	}
 
 	// If there is additional data, include it as a second string.
 	exts := ""
-	if len(e.Data) > 0 ***REMOVED***
-		fs := bytes.Buffer***REMOVED******REMOVED***
-		for k, v := range e.Data ***REMOVED***
+	if len(e.Data) > 0 {
+		fs := bytes.Buffer{}
+		for k, v := range e.Data {
 			fs.WriteString(k)
 			fs.WriteByte('=')
 			fmt.Fprint(&fs, v)
 			fs.WriteByte(' ')
-		***REMOVED***
+		}
 
 		exts = fs.String()[:fs.Len()-1]
 		eid += eventExtraOffset
-	***REMOVED***
+	}
 
-	if h.log == nil ***REMOVED***
+	if h.log == nil {
 		fmt.Fprintf(os.Stderr, "%s [%s]\n", e.Message, exts)
 		return nil
-	***REMOVED***
+	}
 
 	var (
 		ss  [2]*uint16
@@ -131,70 +131,70 @@ func (h *etwHook) Fire(e *logrus.Entry) error ***REMOVED***
 	)
 
 	ss[0], err = windows.UTF16PtrFromString(e.Message)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	count := uint16(1)
-	if exts != "" ***REMOVED***
+	if exts != "" {
 		ss[1], err = windows.UTF16PtrFromString(exts)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 
 		count++
-	***REMOVED***
+	}
 
 	return windows.ReportEvent(h.log.Handle, etype, 0, eid, 0, count, 0, &ss[0], nil)
-***REMOVED***
+}
 
-func getServicePath() (string, error) ***REMOVED***
+func getServicePath() (string, error) {
 	p, err := exec.LookPath(os.Args[0])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	return filepath.Abs(p)
-***REMOVED***
+}
 
-func registerService() error ***REMOVED***
+func registerService() error {
 	p, err := getServicePath()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	m, err := mgr.Connect()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer m.Disconnect()
 
-	depends := []string***REMOVED******REMOVED***
+	depends := []string{}
 
 	// This dependency is required on build 14393 (RS1)
 	// it is added to the platform in newer builds
-	if system.GetOSVersion().Build == 14393 ***REMOVED***
+	if system.GetOSVersion().Build == 14393 {
 		depends = append(depends, "ConDrv")
-	***REMOVED***
+	}
 
-	c := mgr.Config***REMOVED***
+	c := mgr.Config{
 		ServiceType:  windows.SERVICE_WIN32_OWN_PROCESS,
 		StartType:    mgr.StartAutomatic,
 		ErrorControl: mgr.ErrorNormal,
 		Dependencies: depends,
 		DisplayName:  "Docker Engine",
-	***REMOVED***
+	}
 
 	// Configure the service to launch with the arguments that were just passed.
-	args := []string***REMOVED***"--run-service"***REMOVED***
-	for _, a := range os.Args[1:] ***REMOVED***
-		if a != "--register-service" && a != "--unregister-service" ***REMOVED***
+	args := []string{"--run-service"}
+	for _, a := range os.Args[1:] {
+		if a != "--register-service" && a != "--unregister-service" {
 			args = append(args, a)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	s, err := m.CreateService(*flServiceName, p, c, args...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer s.Close()
 
 	// See http://stackoverflow.com/questions/35151052/how-do-i-configure-failure-actions-of-a-windows-service-written-in-go
@@ -207,207 +207,207 @@ func registerService() error ***REMOVED***
 		serviceConfigFailureActions = 2
 	)
 
-	type serviceFailureActions struct ***REMOVED***
+	type serviceFailureActions struct {
 		ResetPeriod  uint32
 		RebootMsg    *uint16
 		Command      *uint16
 		ActionsCount uint32
 		Actions      uintptr
-	***REMOVED***
+	}
 
-	type scAction struct ***REMOVED***
+	type scAction struct {
 		Type  uint32
 		Delay uint32
-	***REMOVED***
-	t := []scAction***REMOVED***
-		***REMOVED***Type: scActionRestart, Delay: uint32(60 * time.Second / time.Millisecond)***REMOVED***,
-		***REMOVED***Type: scActionRestart, Delay: uint32(60 * time.Second / time.Millisecond)***REMOVED***,
-		***REMOVED***Type: scActionNone***REMOVED***,
-	***REMOVED***
-	lpInfo := serviceFailureActions***REMOVED***ResetPeriod: uint32(24 * time.Hour / time.Second), ActionsCount: uint32(3), Actions: uintptr(unsafe.Pointer(&t[0]))***REMOVED***
+	}
+	t := []scAction{
+		{Type: scActionRestart, Delay: uint32(60 * time.Second / time.Millisecond)},
+		{Type: scActionRestart, Delay: uint32(60 * time.Second / time.Millisecond)},
+		{Type: scActionNone},
+	}
+	lpInfo := serviceFailureActions{ResetPeriod: uint32(24 * time.Hour / time.Second), ActionsCount: uint32(3), Actions: uintptr(unsafe.Pointer(&t[0]))}
 	err = windows.ChangeServiceConfig2(s.Handle, serviceConfigFailureActions, (*byte)(unsafe.Pointer(&lpInfo)))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	return eventlog.Install(*flServiceName, p, false, eventlog.Info|eventlog.Warning|eventlog.Error)
-***REMOVED***
+}
 
-func unregisterService() error ***REMOVED***
+func unregisterService() error {
 	m, err := mgr.Connect()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer m.Disconnect()
 
 	s, err := m.OpenService(*flServiceName)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer s.Close()
 
 	eventlog.Remove(*flServiceName)
 	err = s.Delete()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // initService is the entry point for running the daemon as a Windows
 // service. It returns an indication to stop (if registering/un-registering);
 // an indication of whether it is running as a service; and an error.
-func initService(daemonCli *DaemonCli) (bool, bool, error) ***REMOVED***
-	if *flUnregisterService ***REMOVED***
-		if *flRegisterService ***REMOVED***
+func initService(daemonCli *DaemonCli) (bool, bool, error) {
+	if *flUnregisterService {
+		if *flRegisterService {
 			return true, false, errors.New("--register-service and --unregister-service cannot be used together")
-		***REMOVED***
+		}
 		return true, false, unregisterService()
-	***REMOVED***
+	}
 
-	if *flRegisterService ***REMOVED***
+	if *flRegisterService {
 		return true, false, registerService()
-	***REMOVED***
+	}
 
-	if !*flRunService ***REMOVED***
+	if !*flRunService {
 		return false, false, nil
-	***REMOVED***
+	}
 
 	interactive, err := svc.IsAnInteractiveSession()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return false, false, err
-	***REMOVED***
+	}
 
-	h := &handler***REMOVED***
+	h := &handler{
 		tosvc:     make(chan bool),
 		fromsvc:   make(chan error),
 		daemonCli: daemonCli,
-	***REMOVED***
+	}
 
 	var log *eventlog.Log
-	if !interactive ***REMOVED***
+	if !interactive {
 		log, err = eventlog.Open(*flServiceName)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return false, false, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	logrus.AddHook(&etwHook***REMOVED***log***REMOVED***)
+	logrus.AddHook(&etwHook{log})
 	logrus.SetOutput(ioutil.Discard)
 
 	service = h
-	go func() ***REMOVED***
-		if interactive ***REMOVED***
+	go func() {
+		if interactive {
 			err = debug.Run(*flServiceName, h)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			err = svc.Run(*flServiceName, h)
-		***REMOVED***
+		}
 
 		h.fromsvc <- err
-	***REMOVED***()
+	}()
 
 	// Wait for the first signal from the service handler.
 	err = <-h.fromsvc
-	if err != nil ***REMOVED***
+	if err != nil {
 		return false, false, err
-	***REMOVED***
+	}
 	return false, true, nil
-***REMOVED***
+}
 
-func (h *handler) started() error ***REMOVED***
+func (h *handler) started() error {
 	// This must be delayed until daemonCli initializes Config.Root
 	err := initPanicFile(filepath.Join(h.daemonCli.Config.Root, "panic.log"))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	h.tosvc <- false
 	return nil
-***REMOVED***
+}
 
-func (h *handler) stopped(err error) ***REMOVED***
+func (h *handler) stopped(err error) {
 	logrus.Debugf("Stopping service: %v", err)
 	h.tosvc <- err != nil
 	<-h.fromsvc
-***REMOVED***
+}
 
-func (h *handler) Execute(_ []string, r <-chan svc.ChangeRequest, s chan<- svc.Status) (bool, uint32) ***REMOVED***
-	s <- svc.Status***REMOVED***State: svc.StartPending, Accepts: 0***REMOVED***
+func (h *handler) Execute(_ []string, r <-chan svc.ChangeRequest, s chan<- svc.Status) (bool, uint32) {
+	s <- svc.Status{State: svc.StartPending, Accepts: 0}
 	// Unblock initService()
 	h.fromsvc <- nil
 
 	// Wait for initialization to complete.
 	failed := <-h.tosvc
-	if failed ***REMOVED***
+	if failed {
 		logrus.Debug("Aborting service start due to failure during initialization")
 		return true, 1
-	***REMOVED***
+	}
 
-	s <- svc.Status***REMOVED***State: svc.Running, Accepts: svc.AcceptStop | svc.AcceptShutdown | svc.Accepted(windows.SERVICE_ACCEPT_PARAMCHANGE)***REMOVED***
+	s <- svc.Status{State: svc.Running, Accepts: svc.AcceptStop | svc.AcceptShutdown | svc.Accepted(windows.SERVICE_ACCEPT_PARAMCHANGE)}
 	logrus.Debug("Service running")
 Loop:
-	for ***REMOVED***
-		select ***REMOVED***
+	for {
+		select {
 		case failed = <-h.tosvc:
 			break Loop
 		case c := <-r:
-			switch c.Cmd ***REMOVED***
+			switch c.Cmd {
 			case svc.Cmd(windows.SERVICE_CONTROL_PARAMCHANGE):
 				h.daemonCli.reloadConfig()
 			case svc.Interrogate:
 				s <- c.CurrentStatus
 			case svc.Stop, svc.Shutdown:
-				s <- svc.Status***REMOVED***State: svc.StopPending, Accepts: 0***REMOVED***
+				s <- svc.Status{State: svc.StopPending, Accepts: 0}
 				h.daemonCli.stop()
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	removePanicFile()
-	if failed ***REMOVED***
+	if failed {
 		return true, 1
-	***REMOVED***
+	}
 	return false, 0
-***REMOVED***
+}
 
-func initPanicFile(path string) error ***REMOVED***
+func initPanicFile(path string) error {
 	var err error
 	panicFile, err = os.OpenFile(path, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	st, err := panicFile.Stat()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	// If there are contents in the file already, move the file out of the way
 	// and replace it.
-	if st.Size() > 0 ***REMOVED***
+	if st.Size() > 0 {
 		panicFile.Close()
 		os.Rename(path, path+".old")
 		panicFile, err = os.Create(path)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Update STD_ERROR_HANDLE to point to the panic file so that Go writes to
 	// it when it panics. Remember the old stderr to restore it before removing
 	// the panic file.
 	sh := windows.STD_ERROR_HANDLE
 	h, err := windows.GetStdHandle(uint32(sh))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	oldStderr = h
 
 	r, _, err := setStdHandle.Call(uintptr(sh), uintptr(panicFile.Fd()))
-	if r == 0 && err != nil ***REMOVED***
+	if r == 0 && err != nil {
 		return err
-	***REMOVED***
+	}
 
 	// Reset os.Stderr to the panic file (so fmt.Fprintf(os.Stderr,...) actually gets redirected)
 	os.Stderr = os.NewFile(uintptr(panicFile.Fd()), "/dev/stderr")
@@ -416,15 +416,15 @@ func initPanicFile(path string) error ***REMOVED***
 	log.SetOutput(os.Stderr)
 
 	return nil
-***REMOVED***
+}
 
-func removePanicFile() ***REMOVED***
-	if st, err := panicFile.Stat(); err == nil ***REMOVED***
-		if st.Size() == 0 ***REMOVED***
+func removePanicFile() {
+	if st, err := panicFile.Stat(); err == nil {
+		if st.Size() == 0 {
 			sh := windows.STD_ERROR_HANDLE
 			setStdHandle.Call(uintptr(sh), uintptr(oldStderr))
 			panicFile.Close()
 			os.Remove(panicFile.Name())
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

@@ -20,12 +20,12 @@ import (
 
 // slashClean is equivalent to but slightly more efficient than
 // path.Clean("/" + name).
-func slashClean(name string) string ***REMOVED***
-	if name == "" || name[0] != '/' ***REMOVED***
+func slashClean(name string) string {
+	if name == "" || name[0] != '/' {
 		name = "/" + name
-	***REMOVED***
+	}
 	return path.Clean(name)
-***REMOVED***
+}
 
 // A FileSystem implements access to a collection of named files. The elements
 // in a file path are separated by slash ('/', U+002F) characters, regardless
@@ -37,23 +37,23 @@ func slashClean(name string) string ***REMOVED***
 // Note that the os.Rename documentation says that "OS-specific restrictions
 // might apply". In particular, whether or not renaming a file or directory
 // overwriting another existing file or directory is an error is OS-dependent.
-type FileSystem interface ***REMOVED***
+type FileSystem interface {
 	Mkdir(ctx context.Context, name string, perm os.FileMode) error
 	OpenFile(ctx context.Context, name string, flag int, perm os.FileMode) (File, error)
 	RemoveAll(ctx context.Context, name string) error
 	Rename(ctx context.Context, oldName, newName string) error
 	Stat(ctx context.Context, name string) (os.FileInfo, error)
-***REMOVED***
+}
 
 // A File is returned by a FileSystem's OpenFile method and can be served by a
 // Handler.
 //
 // A File may optionally implement the DeadPropsHolder interface, if it can
 // load and save dead properties.
-type File interface ***REMOVED***
+type File interface {
 	http.File
 	io.Writer
-***REMOVED***
+}
 
 // A Dir implements FileSystem using the native file system restricted to a
 // specific directory tree.
@@ -65,79 +65,79 @@ type File interface ***REMOVED***
 // An empty Dir is treated as ".".
 type Dir string
 
-func (d Dir) resolve(name string) string ***REMOVED***
+func (d Dir) resolve(name string) string {
 	// This implementation is based on Dir.Open's code in the standard net/http package.
 	if filepath.Separator != '/' && strings.IndexRune(name, filepath.Separator) >= 0 ||
-		strings.Contains(name, "\x00") ***REMOVED***
+		strings.Contains(name, "\x00") {
 		return ""
-	***REMOVED***
+	}
 	dir := string(d)
-	if dir == "" ***REMOVED***
+	if dir == "" {
 		dir = "."
-	***REMOVED***
+	}
 	return filepath.Join(dir, filepath.FromSlash(slashClean(name)))
-***REMOVED***
+}
 
-func (d Dir) Mkdir(ctx context.Context, name string, perm os.FileMode) error ***REMOVED***
-	if name = d.resolve(name); name == "" ***REMOVED***
+func (d Dir) Mkdir(ctx context.Context, name string, perm os.FileMode) error {
+	if name = d.resolve(name); name == "" {
 		return os.ErrNotExist
-	***REMOVED***
+	}
 	return os.Mkdir(name, perm)
-***REMOVED***
+}
 
-func (d Dir) OpenFile(ctx context.Context, name string, flag int, perm os.FileMode) (File, error) ***REMOVED***
-	if name = d.resolve(name); name == "" ***REMOVED***
+func (d Dir) OpenFile(ctx context.Context, name string, flag int, perm os.FileMode) (File, error) {
+	if name = d.resolve(name); name == "" {
 		return nil, os.ErrNotExist
-	***REMOVED***
+	}
 	f, err := os.OpenFile(name, flag, perm)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return f, nil
-***REMOVED***
+}
 
-func (d Dir) RemoveAll(ctx context.Context, name string) error ***REMOVED***
-	if name = d.resolve(name); name == "" ***REMOVED***
+func (d Dir) RemoveAll(ctx context.Context, name string) error {
+	if name = d.resolve(name); name == "" {
 		return os.ErrNotExist
-	***REMOVED***
-	if name == filepath.Clean(string(d)) ***REMOVED***
+	}
+	if name == filepath.Clean(string(d)) {
 		// Prohibit removing the virtual root directory.
 		return os.ErrInvalid
-	***REMOVED***
+	}
 	return os.RemoveAll(name)
-***REMOVED***
+}
 
-func (d Dir) Rename(ctx context.Context, oldName, newName string) error ***REMOVED***
-	if oldName = d.resolve(oldName); oldName == "" ***REMOVED***
+func (d Dir) Rename(ctx context.Context, oldName, newName string) error {
+	if oldName = d.resolve(oldName); oldName == "" {
 		return os.ErrNotExist
-	***REMOVED***
-	if newName = d.resolve(newName); newName == "" ***REMOVED***
+	}
+	if newName = d.resolve(newName); newName == "" {
 		return os.ErrNotExist
-	***REMOVED***
-	if root := filepath.Clean(string(d)); root == oldName || root == newName ***REMOVED***
+	}
+	if root := filepath.Clean(string(d)); root == oldName || root == newName {
 		// Prohibit renaming from or to the virtual root directory.
 		return os.ErrInvalid
-	***REMOVED***
+	}
 	return os.Rename(oldName, newName)
-***REMOVED***
+}
 
-func (d Dir) Stat(ctx context.Context, name string) (os.FileInfo, error) ***REMOVED***
-	if name = d.resolve(name); name == "" ***REMOVED***
+func (d Dir) Stat(ctx context.Context, name string) (os.FileInfo, error) {
+	if name = d.resolve(name); name == "" {
 		return nil, os.ErrNotExist
-	***REMOVED***
+	}
 	return os.Stat(name)
-***REMOVED***
+}
 
 // NewMemFS returns a new in-memory FileSystem implementation.
-func NewMemFS() FileSystem ***REMOVED***
-	return &memFS***REMOVED***
-		root: memFSNode***REMOVED***
+func NewMemFS() FileSystem {
+	return &memFS{
+		root: memFSNode{
 			children: make(map[string]*memFSNode),
 			mode:     0660 | os.ModeDir,
 			modTime:  time.Now(),
-		***REMOVED***,
-	***REMOVED***
-***REMOVED***
+		},
+	}
+}
 
 // A memFS implements FileSystem, storing all metadata and actual file data
 // in-memory. No limits on filesystem size are used, so it is not recommended
@@ -147,10 +147,10 @@ func NewMemFS() FileSystem ***REMOVED***
 // and each node's contents and metadata are protected by a per-node mutex.
 //
 // TODO: Enforce file permissions.
-type memFS struct ***REMOVED***
+type memFS struct {
 	mu   sync.Mutex
 	root memFSNode
-***REMOVED***
+}
 
 // TODO: clean up and rationalize the walk/find code.
 
@@ -165,56 +165,56 @@ type memFS struct ***REMOVED***
 //   - "/foo/bar/", "x", true
 // The frag argument will be empty only if dir is the root node and the walk
 // ends at that root node.
-func (fs *memFS) walk(op, fullname string, f func(dir *memFSNode, frag string, final bool) error) error ***REMOVED***
+func (fs *memFS) walk(op, fullname string, f func(dir *memFSNode, frag string, final bool) error) error {
 	original := fullname
 	fullname = slashClean(fullname)
 
 	// Strip any leading "/"s to make fullname a relative path, as the walk
 	// starts at fs.root.
-	if fullname[0] == '/' ***REMOVED***
+	if fullname[0] == '/' {
 		fullname = fullname[1:]
-	***REMOVED***
+	}
 	dir := &fs.root
 
-	for ***REMOVED***
+	for {
 		frag, remaining := fullname, ""
 		i := strings.IndexRune(fullname, '/')
 		final := i < 0
-		if !final ***REMOVED***
+		if !final {
 			frag, remaining = fullname[:i], fullname[i+1:]
-		***REMOVED***
-		if frag == "" && dir != &fs.root ***REMOVED***
+		}
+		if frag == "" && dir != &fs.root {
 			panic("webdav: empty path fragment for a clean path")
-		***REMOVED***
-		if err := f(dir, frag, final); err != nil ***REMOVED***
-			return &os.PathError***REMOVED***
+		}
+		if err := f(dir, frag, final); err != nil {
+			return &os.PathError{
 				Op:   op,
 				Path: original,
 				Err:  err,
-			***REMOVED***
-		***REMOVED***
-		if final ***REMOVED***
+			}
+		}
+		if final {
 			break
-		***REMOVED***
+		}
 		child := dir.children[frag]
-		if child == nil ***REMOVED***
-			return &os.PathError***REMOVED***
+		if child == nil {
+			return &os.PathError{
 				Op:   op,
 				Path: original,
 				Err:  os.ErrNotExist,
-			***REMOVED***
-		***REMOVED***
-		if !child.mode.IsDir() ***REMOVED***
-			return &os.PathError***REMOVED***
+			}
+		}
+		if !child.mode.IsDir() {
+			return &os.PathError{
 				Op:   op,
 				Path: original,
 				Err:  os.ErrInvalid,
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		dir, fullname = child, remaining
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // find returns the parent of the named node and the relative name fragment
 // from the parent to the child. For example, if finding "/foo/bar/baz" then
@@ -226,184 +226,184 @@ func (fs *memFS) walk(op, fullname string, f func(dir *memFSNode, frag string, f
 // isn't a directory, but it will not return an error per se if the child does
 // not already exist. The error returned is either nil or an *os.PathError
 // whose Op is op.
-func (fs *memFS) find(op, fullname string) (parent *memFSNode, frag string, err error) ***REMOVED***
-	err = fs.walk(op, fullname, func(parent0 *memFSNode, frag0 string, final bool) error ***REMOVED***
-		if !final ***REMOVED***
+func (fs *memFS) find(op, fullname string) (parent *memFSNode, frag string, err error) {
+	err = fs.walk(op, fullname, func(parent0 *memFSNode, frag0 string, final bool) error {
+		if !final {
 			return nil
-		***REMOVED***
-		if frag0 != "" ***REMOVED***
+		}
+		if frag0 != "" {
 			parent, frag = parent0, frag0
-		***REMOVED***
+		}
 		return nil
-	***REMOVED***)
+	})
 	return parent, frag, err
-***REMOVED***
+}
 
-func (fs *memFS) Mkdir(ctx context.Context, name string, perm os.FileMode) error ***REMOVED***
+func (fs *memFS) Mkdir(ctx context.Context, name string, perm os.FileMode) error {
 	fs.mu.Lock()
 	defer fs.mu.Unlock()
 
 	dir, frag, err := fs.find("mkdir", name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	if dir == nil ***REMOVED***
+	}
+	if dir == nil {
 		// We can't create the root.
 		return os.ErrInvalid
-	***REMOVED***
-	if _, ok := dir.children[frag]; ok ***REMOVED***
+	}
+	if _, ok := dir.children[frag]; ok {
 		return os.ErrExist
-	***REMOVED***
-	dir.children[frag] = &memFSNode***REMOVED***
+	}
+	dir.children[frag] = &memFSNode{
 		children: make(map[string]*memFSNode),
 		mode:     perm.Perm() | os.ModeDir,
 		modTime:  time.Now(),
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (fs *memFS) OpenFile(ctx context.Context, name string, flag int, perm os.FileMode) (File, error) ***REMOVED***
+func (fs *memFS) OpenFile(ctx context.Context, name string, flag int, perm os.FileMode) (File, error) {
 	fs.mu.Lock()
 	defer fs.mu.Unlock()
 
 	dir, frag, err := fs.find("open", name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	var n *memFSNode
-	if dir == nil ***REMOVED***
+	if dir == nil {
 		// We're opening the root.
-		if flag&(os.O_WRONLY|os.O_RDWR) != 0 ***REMOVED***
+		if flag&(os.O_WRONLY|os.O_RDWR) != 0 {
 			return nil, os.ErrPermission
-		***REMOVED***
+		}
 		n, frag = &fs.root, "/"
 
-	***REMOVED*** else ***REMOVED***
+	} else {
 		n = dir.children[frag]
-		if flag&(os.O_SYNC|os.O_APPEND) != 0 ***REMOVED***
+		if flag&(os.O_SYNC|os.O_APPEND) != 0 {
 			// memFile doesn't support these flags yet.
 			return nil, os.ErrInvalid
-		***REMOVED***
-		if flag&os.O_CREATE != 0 ***REMOVED***
-			if flag&os.O_EXCL != 0 && n != nil ***REMOVED***
+		}
+		if flag&os.O_CREATE != 0 {
+			if flag&os.O_EXCL != 0 && n != nil {
 				return nil, os.ErrExist
-			***REMOVED***
-			if n == nil ***REMOVED***
-				n = &memFSNode***REMOVED***
+			}
+			if n == nil {
+				n = &memFSNode{
 					mode: perm.Perm(),
-				***REMOVED***
+				}
 				dir.children[frag] = n
-			***REMOVED***
-		***REMOVED***
-		if n == nil ***REMOVED***
+			}
+		}
+		if n == nil {
 			return nil, os.ErrNotExist
-		***REMOVED***
-		if flag&(os.O_WRONLY|os.O_RDWR) != 0 && flag&os.O_TRUNC != 0 ***REMOVED***
+		}
+		if flag&(os.O_WRONLY|os.O_RDWR) != 0 && flag&os.O_TRUNC != 0 {
 			n.mu.Lock()
 			n.data = nil
 			n.mu.Unlock()
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	children := make([]os.FileInfo, 0, len(n.children))
-	for cName, c := range n.children ***REMOVED***
+	for cName, c := range n.children {
 		children = append(children, c.stat(cName))
-	***REMOVED***
-	return &memFile***REMOVED***
+	}
+	return &memFile{
 		n:                n,
 		nameSnapshot:     frag,
 		childrenSnapshot: children,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-func (fs *memFS) RemoveAll(ctx context.Context, name string) error ***REMOVED***
+func (fs *memFS) RemoveAll(ctx context.Context, name string) error {
 	fs.mu.Lock()
 	defer fs.mu.Unlock()
 
 	dir, frag, err := fs.find("remove", name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	if dir == nil ***REMOVED***
+	}
+	if dir == nil {
 		// We can't remove the root.
 		return os.ErrInvalid
-	***REMOVED***
+	}
 	delete(dir.children, frag)
 	return nil
-***REMOVED***
+}
 
-func (fs *memFS) Rename(ctx context.Context, oldName, newName string) error ***REMOVED***
+func (fs *memFS) Rename(ctx context.Context, oldName, newName string) error {
 	fs.mu.Lock()
 	defer fs.mu.Unlock()
 
 	oldName = slashClean(oldName)
 	newName = slashClean(newName)
-	if oldName == newName ***REMOVED***
+	if oldName == newName {
 		return nil
-	***REMOVED***
-	if strings.HasPrefix(newName, oldName+"/") ***REMOVED***
+	}
+	if strings.HasPrefix(newName, oldName+"/") {
 		// We can't rename oldName to be a sub-directory of itself.
 		return os.ErrInvalid
-	***REMOVED***
+	}
 
 	oDir, oFrag, err := fs.find("rename", oldName)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	if oDir == nil ***REMOVED***
+	}
+	if oDir == nil {
 		// We can't rename from the root.
 		return os.ErrInvalid
-	***REMOVED***
+	}
 
 	nDir, nFrag, err := fs.find("rename", newName)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	if nDir == nil ***REMOVED***
+	}
+	if nDir == nil {
 		// We can't rename to the root.
 		return os.ErrInvalid
-	***REMOVED***
+	}
 
 	oNode, ok := oDir.children[oFrag]
-	if !ok ***REMOVED***
+	if !ok {
 		return os.ErrNotExist
-	***REMOVED***
-	if oNode.children != nil ***REMOVED***
-		if nNode, ok := nDir.children[nFrag]; ok ***REMOVED***
-			if nNode.children == nil ***REMOVED***
+	}
+	if oNode.children != nil {
+		if nNode, ok := nDir.children[nFrag]; ok {
+			if nNode.children == nil {
 				return errNotADirectory
-			***REMOVED***
-			if len(nNode.children) != 0 ***REMOVED***
+			}
+			if len(nNode.children) != 0 {
 				return errDirectoryNotEmpty
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	delete(oDir.children, oFrag)
 	nDir.children[nFrag] = oNode
 	return nil
-***REMOVED***
+}
 
-func (fs *memFS) Stat(ctx context.Context, name string) (os.FileInfo, error) ***REMOVED***
+func (fs *memFS) Stat(ctx context.Context, name string) (os.FileInfo, error) {
 	fs.mu.Lock()
 	defer fs.mu.Unlock()
 
 	dir, frag, err := fs.find("stat", name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if dir == nil ***REMOVED***
+	}
+	if dir == nil {
 		// We're stat'ting the root.
 		return fs.root.stat("/"), nil
-	***REMOVED***
-	if n, ok := dir.children[frag]; ok ***REMOVED***
+	}
+	if n, ok := dir.children[frag]; ok {
 		return n.stat(path.Base(name)), nil
-	***REMOVED***
+	}
 	return nil, os.ErrNotExist
-***REMOVED***
+}
 
 // A memFSNode represents a single entry in the in-memory filesystem and also
 // implements os.FileInfo.
-type memFSNode struct ***REMOVED***
+type memFSNode struct {
 	// children is protected by memFS.mu.
 	children map[string]*memFSNode
 
@@ -412,134 +412,134 @@ type memFSNode struct ***REMOVED***
 	mode      os.FileMode
 	modTime   time.Time
 	deadProps map[xml.Name]Property
-***REMOVED***
+}
 
-func (n *memFSNode) stat(name string) *memFileInfo ***REMOVED***
+func (n *memFSNode) stat(name string) *memFileInfo {
 	n.mu.Lock()
 	defer n.mu.Unlock()
-	return &memFileInfo***REMOVED***
+	return &memFileInfo{
 		name:    name,
 		size:    int64(len(n.data)),
 		mode:    n.mode,
 		modTime: n.modTime,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (n *memFSNode) DeadProps() (map[xml.Name]Property, error) ***REMOVED***
+func (n *memFSNode) DeadProps() (map[xml.Name]Property, error) {
 	n.mu.Lock()
 	defer n.mu.Unlock()
-	if len(n.deadProps) == 0 ***REMOVED***
+	if len(n.deadProps) == 0 {
 		return nil, nil
-	***REMOVED***
+	}
 	ret := make(map[xml.Name]Property, len(n.deadProps))
-	for k, v := range n.deadProps ***REMOVED***
+	for k, v := range n.deadProps {
 		ret[k] = v
-	***REMOVED***
+	}
 	return ret, nil
-***REMOVED***
+}
 
-func (n *memFSNode) Patch(patches []Proppatch) ([]Propstat, error) ***REMOVED***
+func (n *memFSNode) Patch(patches []Proppatch) ([]Propstat, error) {
 	n.mu.Lock()
 	defer n.mu.Unlock()
-	pstat := Propstat***REMOVED***Status: http.StatusOK***REMOVED***
-	for _, patch := range patches ***REMOVED***
-		for _, p := range patch.Props ***REMOVED***
-			pstat.Props = append(pstat.Props, Property***REMOVED***XMLName: p.XMLName***REMOVED***)
-			if patch.Remove ***REMOVED***
+	pstat := Propstat{Status: http.StatusOK}
+	for _, patch := range patches {
+		for _, p := range patch.Props {
+			pstat.Props = append(pstat.Props, Property{XMLName: p.XMLName})
+			if patch.Remove {
 				delete(n.deadProps, p.XMLName)
 				continue
-			***REMOVED***
-			if n.deadProps == nil ***REMOVED***
-				n.deadProps = map[xml.Name]Property***REMOVED******REMOVED***
-			***REMOVED***
+			}
+			if n.deadProps == nil {
+				n.deadProps = map[xml.Name]Property{}
+			}
 			n.deadProps[p.XMLName] = p
-		***REMOVED***
-	***REMOVED***
-	return []Propstat***REMOVED***pstat***REMOVED***, nil
-***REMOVED***
+		}
+	}
+	return []Propstat{pstat}, nil
+}
 
-type memFileInfo struct ***REMOVED***
+type memFileInfo struct {
 	name    string
 	size    int64
 	mode    os.FileMode
 	modTime time.Time
-***REMOVED***
+}
 
-func (f *memFileInfo) Name() string       ***REMOVED*** return f.name ***REMOVED***
-func (f *memFileInfo) Size() int64        ***REMOVED*** return f.size ***REMOVED***
-func (f *memFileInfo) Mode() os.FileMode  ***REMOVED*** return f.mode ***REMOVED***
-func (f *memFileInfo) ModTime() time.Time ***REMOVED*** return f.modTime ***REMOVED***
-func (f *memFileInfo) IsDir() bool        ***REMOVED*** return f.mode.IsDir() ***REMOVED***
-func (f *memFileInfo) Sys() interface***REMOVED******REMOVED***   ***REMOVED*** return nil ***REMOVED***
+func (f *memFileInfo) Name() string       { return f.name }
+func (f *memFileInfo) Size() int64        { return f.size }
+func (f *memFileInfo) Mode() os.FileMode  { return f.mode }
+func (f *memFileInfo) ModTime() time.Time { return f.modTime }
+func (f *memFileInfo) IsDir() bool        { return f.mode.IsDir() }
+func (f *memFileInfo) Sys() interface{}   { return nil }
 
 // A memFile is a File implementation for a memFSNode. It is a per-file (not
 // per-node) read/write position, and a snapshot of the memFS' tree structure
 // (a node's name and children) for that node.
-type memFile struct ***REMOVED***
+type memFile struct {
 	n                *memFSNode
 	nameSnapshot     string
 	childrenSnapshot []os.FileInfo
 	// pos is protected by n.mu.
 	pos int
-***REMOVED***
+}
 
 // A *memFile implements the optional DeadPropsHolder interface.
 var _ DeadPropsHolder = (*memFile)(nil)
 
-func (f *memFile) DeadProps() (map[xml.Name]Property, error)     ***REMOVED*** return f.n.DeadProps() ***REMOVED***
-func (f *memFile) Patch(patches []Proppatch) ([]Propstat, error) ***REMOVED*** return f.n.Patch(patches) ***REMOVED***
+func (f *memFile) DeadProps() (map[xml.Name]Property, error)     { return f.n.DeadProps() }
+func (f *memFile) Patch(patches []Proppatch) ([]Propstat, error) { return f.n.Patch(patches) }
 
-func (f *memFile) Close() error ***REMOVED***
+func (f *memFile) Close() error {
 	return nil
-***REMOVED***
+}
 
-func (f *memFile) Read(p []byte) (int, error) ***REMOVED***
+func (f *memFile) Read(p []byte) (int, error) {
 	f.n.mu.Lock()
 	defer f.n.mu.Unlock()
-	if f.n.mode.IsDir() ***REMOVED***
+	if f.n.mode.IsDir() {
 		return 0, os.ErrInvalid
-	***REMOVED***
-	if f.pos >= len(f.n.data) ***REMOVED***
+	}
+	if f.pos >= len(f.n.data) {
 		return 0, io.EOF
-	***REMOVED***
+	}
 	n := copy(p, f.n.data[f.pos:])
 	f.pos += n
 	return n, nil
-***REMOVED***
+}
 
-func (f *memFile) Readdir(count int) ([]os.FileInfo, error) ***REMOVED***
+func (f *memFile) Readdir(count int) ([]os.FileInfo, error) {
 	f.n.mu.Lock()
 	defer f.n.mu.Unlock()
-	if !f.n.mode.IsDir() ***REMOVED***
+	if !f.n.mode.IsDir() {
 		return nil, os.ErrInvalid
-	***REMOVED***
+	}
 	old := f.pos
-	if old >= len(f.childrenSnapshot) ***REMOVED***
+	if old >= len(f.childrenSnapshot) {
 		// The os.File Readdir docs say that at the end of a directory,
 		// the error is io.EOF if count > 0 and nil if count <= 0.
-		if count > 0 ***REMOVED***
+		if count > 0 {
 			return nil, io.EOF
-		***REMOVED***
+		}
 		return nil, nil
-	***REMOVED***
-	if count > 0 ***REMOVED***
+	}
+	if count > 0 {
 		f.pos += count
-		if f.pos > len(f.childrenSnapshot) ***REMOVED***
+		if f.pos > len(f.childrenSnapshot) {
 			f.pos = len(f.childrenSnapshot)
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
+		}
+	} else {
 		f.pos = len(f.childrenSnapshot)
 		old = 0
-	***REMOVED***
+	}
 	return f.childrenSnapshot[old:f.pos], nil
-***REMOVED***
+}
 
-func (f *memFile) Seek(offset int64, whence int) (int64, error) ***REMOVED***
+func (f *memFile) Seek(offset int64, whence int) (int64, error) {
 	f.n.mu.Lock()
 	defer f.n.mu.Unlock()
 	npos := f.pos
 	// TODO: How to handle offsets greater than the size of system int?
-	switch whence ***REMOVED***
+	switch whence {
 	case os.SEEK_SET:
 		npos = int(offset)
 	case os.SEEK_CUR:
@@ -548,249 +548,249 @@ func (f *memFile) Seek(offset int64, whence int) (int64, error) ***REMOVED***
 		npos = len(f.n.data) + int(offset)
 	default:
 		npos = -1
-	***REMOVED***
-	if npos < 0 ***REMOVED***
+	}
+	if npos < 0 {
 		return 0, os.ErrInvalid
-	***REMOVED***
+	}
 	f.pos = npos
 	return int64(f.pos), nil
-***REMOVED***
+}
 
-func (f *memFile) Stat() (os.FileInfo, error) ***REMOVED***
+func (f *memFile) Stat() (os.FileInfo, error) {
 	return f.n.stat(f.nameSnapshot), nil
-***REMOVED***
+}
 
-func (f *memFile) Write(p []byte) (int, error) ***REMOVED***
+func (f *memFile) Write(p []byte) (int, error) {
 	lenp := len(p)
 	f.n.mu.Lock()
 	defer f.n.mu.Unlock()
 
-	if f.n.mode.IsDir() ***REMOVED***
+	if f.n.mode.IsDir() {
 		return 0, os.ErrInvalid
-	***REMOVED***
-	if f.pos < len(f.n.data) ***REMOVED***
+	}
+	if f.pos < len(f.n.data) {
 		n := copy(f.n.data[f.pos:], p)
 		f.pos += n
 		p = p[n:]
-	***REMOVED*** else if f.pos > len(f.n.data) ***REMOVED***
+	} else if f.pos > len(f.n.data) {
 		// Write permits the creation of holes, if we've seek'ed past the
 		// existing end of file.
-		if f.pos <= cap(f.n.data) ***REMOVED***
+		if f.pos <= cap(f.n.data) {
 			oldLen := len(f.n.data)
 			f.n.data = f.n.data[:f.pos]
 			hole := f.n.data[oldLen:]
-			for i := range hole ***REMOVED***
+			for i := range hole {
 				hole[i] = 0
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
+			}
+		} else {
 			d := make([]byte, f.pos, f.pos+len(p))
 			copy(d, f.n.data)
 			f.n.data = d
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if len(p) > 0 ***REMOVED***
+	if len(p) > 0 {
 		// We should only get here if f.pos == len(f.n.data).
 		f.n.data = append(f.n.data, p...)
 		f.pos = len(f.n.data)
-	***REMOVED***
+	}
 	f.n.modTime = time.Now()
 	return lenp, nil
-***REMOVED***
+}
 
 // moveFiles moves files and/or directories from src to dst.
 //
 // See section 9.9.4 for when various HTTP status codes apply.
-func moveFiles(ctx context.Context, fs FileSystem, src, dst string, overwrite bool) (status int, err error) ***REMOVED***
+func moveFiles(ctx context.Context, fs FileSystem, src, dst string, overwrite bool) (status int, err error) {
 	created := false
-	if _, err := fs.Stat(ctx, dst); err != nil ***REMOVED***
-		if !os.IsNotExist(err) ***REMOVED***
+	if _, err := fs.Stat(ctx, dst); err != nil {
+		if !os.IsNotExist(err) {
 			return http.StatusForbidden, err
-		***REMOVED***
+		}
 		created = true
-	***REMOVED*** else if overwrite ***REMOVED***
+	} else if overwrite {
 		// Section 9.9.3 says that "If a resource exists at the destination
 		// and the Overwrite header is "T", then prior to performing the move,
 		// the server must perform a DELETE with "Depth: infinity" on the
 		// destination resource.
-		if err := fs.RemoveAll(ctx, dst); err != nil ***REMOVED***
+		if err := fs.RemoveAll(ctx, dst); err != nil {
 			return http.StatusForbidden, err
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
+		}
+	} else {
 		return http.StatusPreconditionFailed, os.ErrExist
-	***REMOVED***
-	if err := fs.Rename(ctx, src, dst); err != nil ***REMOVED***
+	}
+	if err := fs.Rename(ctx, src, dst); err != nil {
 		return http.StatusForbidden, err
-	***REMOVED***
-	if created ***REMOVED***
+	}
+	if created {
 		return http.StatusCreated, nil
-	***REMOVED***
+	}
 	return http.StatusNoContent, nil
-***REMOVED***
+}
 
-func copyProps(dst, src File) error ***REMOVED***
+func copyProps(dst, src File) error {
 	d, ok := dst.(DeadPropsHolder)
-	if !ok ***REMOVED***
+	if !ok {
 		return nil
-	***REMOVED***
+	}
 	s, ok := src.(DeadPropsHolder)
-	if !ok ***REMOVED***
+	if !ok {
 		return nil
-	***REMOVED***
+	}
 	m, err := s.DeadProps()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	props := make([]Property, 0, len(m))
-	for _, prop := range m ***REMOVED***
+	for _, prop := range m {
 		props = append(props, prop)
-	***REMOVED***
-	_, err = d.Patch([]Proppatch***REMOVED******REMOVED***Props: props***REMOVED******REMOVED***)
+	}
+	_, err = d.Patch([]Proppatch{{Props: props}})
 	return err
-***REMOVED***
+}
 
 // copyFiles copies files and/or directories from src to dst.
 //
 // See section 9.8.5 for when various HTTP status codes apply.
-func copyFiles(ctx context.Context, fs FileSystem, src, dst string, overwrite bool, depth int, recursion int) (status int, err error) ***REMOVED***
-	if recursion == 1000 ***REMOVED***
+func copyFiles(ctx context.Context, fs FileSystem, src, dst string, overwrite bool, depth int, recursion int) (status int, err error) {
+	if recursion == 1000 {
 		return http.StatusInternalServerError, errRecursionTooDeep
-	***REMOVED***
+	}
 	recursion++
 
 	// TODO: section 9.8.3 says that "Note that an infinite-depth COPY of /A/
 	// into /A/B/ could lead to infinite recursion if not handled correctly."
 
 	srcFile, err := fs.OpenFile(ctx, src, os.O_RDONLY, 0)
-	if err != nil ***REMOVED***
-		if os.IsNotExist(err) ***REMOVED***
+	if err != nil {
+		if os.IsNotExist(err) {
 			return http.StatusNotFound, err
-		***REMOVED***
+		}
 		return http.StatusInternalServerError, err
-	***REMOVED***
+	}
 	defer srcFile.Close()
 	srcStat, err := srcFile.Stat()
-	if err != nil ***REMOVED***
-		if os.IsNotExist(err) ***REMOVED***
+	if err != nil {
+		if os.IsNotExist(err) {
 			return http.StatusNotFound, err
-		***REMOVED***
+		}
 		return http.StatusInternalServerError, err
-	***REMOVED***
+	}
 	srcPerm := srcStat.Mode() & os.ModePerm
 
 	created := false
-	if _, err := fs.Stat(ctx, dst); err != nil ***REMOVED***
-		if os.IsNotExist(err) ***REMOVED***
+	if _, err := fs.Stat(ctx, dst); err != nil {
+		if os.IsNotExist(err) {
 			created = true
-		***REMOVED*** else ***REMOVED***
+		} else {
 			return http.StatusForbidden, err
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
-		if !overwrite ***REMOVED***
+		}
+	} else {
+		if !overwrite {
 			return http.StatusPreconditionFailed, os.ErrExist
-		***REMOVED***
-		if err := fs.RemoveAll(ctx, dst); err != nil && !os.IsNotExist(err) ***REMOVED***
+		}
+		if err := fs.RemoveAll(ctx, dst); err != nil && !os.IsNotExist(err) {
 			return http.StatusForbidden, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if srcStat.IsDir() ***REMOVED***
-		if err := fs.Mkdir(ctx, dst, srcPerm); err != nil ***REMOVED***
+	if srcStat.IsDir() {
+		if err := fs.Mkdir(ctx, dst, srcPerm); err != nil {
 			return http.StatusForbidden, err
-		***REMOVED***
-		if depth == infiniteDepth ***REMOVED***
+		}
+		if depth == infiniteDepth {
 			children, err := srcFile.Readdir(-1)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return http.StatusForbidden, err
-			***REMOVED***
-			for _, c := range children ***REMOVED***
+			}
+			for _, c := range children {
 				name := c.Name()
 				s := path.Join(src, name)
 				d := path.Join(dst, name)
 				cStatus, cErr := copyFiles(ctx, fs, s, d, overwrite, depth, recursion)
-				if cErr != nil ***REMOVED***
+				if cErr != nil {
 					// TODO: MultiStatus.
 					return cStatus, cErr
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
+				}
+			}
+		}
 
-	***REMOVED*** else ***REMOVED***
+	} else {
 		dstFile, err := fs.OpenFile(ctx, dst, os.O_RDWR|os.O_CREATE|os.O_TRUNC, srcPerm)
-		if err != nil ***REMOVED***
-			if os.IsNotExist(err) ***REMOVED***
+		if err != nil {
+			if os.IsNotExist(err) {
 				return http.StatusConflict, err
-			***REMOVED***
+			}
 			return http.StatusForbidden, err
 
-		***REMOVED***
+		}
 		_, copyErr := io.Copy(dstFile, srcFile)
 		propsErr := copyProps(dstFile, srcFile)
 		closeErr := dstFile.Close()
-		if copyErr != nil ***REMOVED***
+		if copyErr != nil {
 			return http.StatusInternalServerError, copyErr
-		***REMOVED***
-		if propsErr != nil ***REMOVED***
+		}
+		if propsErr != nil {
 			return http.StatusInternalServerError, propsErr
-		***REMOVED***
-		if closeErr != nil ***REMOVED***
+		}
+		if closeErr != nil {
 			return http.StatusInternalServerError, closeErr
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if created ***REMOVED***
+	if created {
 		return http.StatusCreated, nil
-	***REMOVED***
+	}
 	return http.StatusNoContent, nil
-***REMOVED***
+}
 
 // walkFS traverses filesystem fs starting at name up to depth levels.
 //
 // Allowed values for depth are 0, 1 or infiniteDepth. For each visited node,
 // walkFS calls walkFn. If a visited file system node is a directory and
 // walkFn returns filepath.SkipDir, walkFS will skip traversal of this node.
-func walkFS(ctx context.Context, fs FileSystem, depth int, name string, info os.FileInfo, walkFn filepath.WalkFunc) error ***REMOVED***
+func walkFS(ctx context.Context, fs FileSystem, depth int, name string, info os.FileInfo, walkFn filepath.WalkFunc) error {
 	// This implementation is based on Walk's code in the standard path/filepath package.
 	err := walkFn(name, info, nil)
-	if err != nil ***REMOVED***
-		if info.IsDir() && err == filepath.SkipDir ***REMOVED***
+	if err != nil {
+		if info.IsDir() && err == filepath.SkipDir {
 			return nil
-		***REMOVED***
+		}
 		return err
-	***REMOVED***
-	if !info.IsDir() || depth == 0 ***REMOVED***
+	}
+	if !info.IsDir() || depth == 0 {
 		return nil
-	***REMOVED***
-	if depth == 1 ***REMOVED***
+	}
+	if depth == 1 {
 		depth = 0
-	***REMOVED***
+	}
 
 	// Read directory names.
 	f, err := fs.OpenFile(ctx, name, os.O_RDONLY, 0)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return walkFn(name, info, err)
-	***REMOVED***
+	}
 	fileInfos, err := f.Readdir(0)
 	f.Close()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return walkFn(name, info, err)
-	***REMOVED***
+	}
 
-	for _, fileInfo := range fileInfos ***REMOVED***
+	for _, fileInfo := range fileInfos {
 		filename := path.Join(name, fileInfo.Name())
 		fileInfo, err := fs.Stat(ctx, filename)
-		if err != nil ***REMOVED***
-			if err := walkFn(filename, fileInfo, err); err != nil && err != filepath.SkipDir ***REMOVED***
+		if err != nil {
+			if err := walkFn(filename, fileInfo, err); err != nil && err != filepath.SkipDir {
 				return err
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
+			}
+		} else {
 			err = walkFS(ctx, fs, depth, filename, fileInfo, walkFn)
-			if err != nil ***REMOVED***
-				if !fileInfo.IsDir() || err != filepath.SkipDir ***REMOVED***
+			if err != nil {
+				if !fileInfo.IsDir() || err != filepath.SkipDir {
 					return err
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+				}
+			}
+		}
+	}
 	return nil
-***REMOVED***
+}

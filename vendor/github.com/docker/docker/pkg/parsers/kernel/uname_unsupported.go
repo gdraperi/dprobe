@@ -9,10 +9,10 @@ import (
 // Utsname represents the system name structure.
 // It is defined here to make it portable as it is available on linux but not
 // on windows.
-type Utsname struct ***REMOVED***
+type Utsname struct {
 	Release [65]byte
-***REMOVED***
+}
 
-func uname() (*Utsname, error) ***REMOVED***
+func uname() (*Utsname, error) {
 	return nil, errors.New("Kernel version detection is available only on linux")
-***REMOVED***
+}

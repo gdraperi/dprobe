@@ -17,26 +17,26 @@ var (
 
 type portConfigs []*PortConfig
 
-func (p portConfigs) String() string ***REMOVED***
-	if len(p) == 0 ***REMOVED***
+func (p portConfigs) String() string {
+	if len(p) == 0 {
 		return ""
-	***REMOVED***
+	}
 
 	pc := p[0]
 	str := fmt.Sprintf("%d:%d/%s", pc.PublishedPort, pc.TargetPort, PortConfig_Protocol_name[int32(pc.Protocol)])
-	for _, pc := range p[1:] ***REMOVED***
+	for _, pc := range p[1:] {
 		str = str + fmt.Sprintf(",%d:%d/%s", pc.PublishedPort, pc.TargetPort, PortConfig_Protocol_name[int32(pc.Protocol)])
-	***REMOVED***
+	}
 
 	return str
-***REMOVED***
+}
 
-type serviceKey struct ***REMOVED***
+type serviceKey struct {
 	id    string
 	ports string
-***REMOVED***
+}
 
-type service struct ***REMOVED***
+type service struct {
 	name string // Service Name
 	id   string // Service ID
 
@@ -59,27 +59,27 @@ type service struct ***REMOVED***
 	deleted bool
 
 	sync.Mutex
-***REMOVED***
+}
 
 // assignIPToEndpoint inserts the mapping between the IP and the endpoint identifier
 // returns true if the mapping was not present, false otherwise
 // returns also the number of endpoints associated to the IP
-func (s *service) assignIPToEndpoint(ip, eID string) (bool, int) ***REMOVED***
+func (s *service) assignIPToEndpoint(ip, eID string) (bool, int) {
 	return s.ipToEndpoint.Insert(ip, eID)
-***REMOVED***
+}
 
 // removeIPToEndpoint removes the mapping between the IP and the endpoint identifier
 // returns true if the mapping was deleted, false otherwise
 // returns also the number of endpoints associated to the IP
-func (s *service) removeIPToEndpoint(ip, eID string) (bool, int) ***REMOVED***
+func (s *service) removeIPToEndpoint(ip, eID string) (bool, int) {
 	return s.ipToEndpoint.Remove(ip, eID)
-***REMOVED***
+}
 
-func (s *service) printIPToEndpoint(ip string) (string, bool) ***REMOVED***
+func (s *service) printIPToEndpoint(ip string) (string, bool) {
 	return s.ipToEndpoint.String(ip)
-***REMOVED***
+}
 
-type loadBalancer struct ***REMOVED***
+type loadBalancer struct {
 	vip    net.IP
 	fwMark uint32
 
@@ -90,4 +90,4 @@ type loadBalancer struct ***REMOVED***
 	// Back pointer to service to which the loadbalancer belongs.
 	service *service
 	sync.Mutex
-***REMOVED***
+}

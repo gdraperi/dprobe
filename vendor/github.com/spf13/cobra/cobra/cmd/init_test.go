@@ -14,7 +14,7 @@ import (
 // in GOPATH and compares the content of files in initialized project with
 // appropriate golden files ("testdata/*.golden").
 // Use -update to update existing golden files.
-func TestGoldenInitCmd(t *testing.T) ***REMOVED***
+func TestGoldenInitCmd(t *testing.T) {
 	projectName := "github.com/spf13/testproject"
 	project := NewProject(projectName)
 	defer os.RemoveAll(project.AbsPath())
@@ -26,58 +26,58 @@ func TestGoldenInitCmd(t *testing.T) ***REMOVED***
 	defer viper.Set("license", nil)
 	defer viper.Set("year", nil)
 
-	os.Args = []string***REMOVED***"cobra", "init", projectName***REMOVED***
-	if err := rootCmd.Execute(); err != nil ***REMOVED***
+	os.Args = []string{"cobra", "init", projectName}
+	if err := rootCmd.Execute(); err != nil {
 		t.Fatal("Error by execution:", err)
-	***REMOVED***
+	}
 
-	expectedFiles := []string***REMOVED***".", "cmd", "LICENSE", "main.go", "cmd/root.go"***REMOVED***
-	gotFiles := []string***REMOVED******REMOVED***
+	expectedFiles := []string{".", "cmd", "LICENSE", "main.go", "cmd/root.go"}
+	gotFiles := []string{}
 
 	// Check project file hierarchy and compare the content of every single file
 	// with appropriate golden file.
-	err := filepath.Walk(project.AbsPath(), func(path string, info os.FileInfo, err error) error ***REMOVED***
-		if err != nil ***REMOVED***
+	err := filepath.Walk(project.AbsPath(), func(path string, info os.FileInfo, err error) error {
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 
 		// Make path relative to project.AbsPath().
 		// E.g. path = "/home/user/go/src/github.com/spf13/testproject/cmd/root.go"
 		// then it returns just "cmd/root.go".
 		relPath, err := filepath.Rel(project.AbsPath(), path)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		relPath = filepath.ToSlash(relPath)
 		gotFiles = append(gotFiles, relPath)
 		goldenPath := filepath.Join("testdata", filepath.Base(path)+".golden")
 
-		switch relPath ***REMOVED***
+		switch relPath {
 		// Known directories.
 		case ".", "cmd":
 			return nil
 		// Known files.
 		case "LICENSE", "main.go", "cmd/root.go":
-			if *update ***REMOVED***
+			if *update {
 				got, err := ioutil.ReadFile(path)
-				if err != nil ***REMOVED***
+				if err != nil {
 					return err
-				***REMOVED***
-				if err := ioutil.WriteFile(goldenPath, got, 0644); err != nil ***REMOVED***
+				}
+				if err := ioutil.WriteFile(goldenPath, got, 0644); err != nil {
 					t.Fatal("Error while updating file:", err)
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return compareFiles(path, goldenPath)
-		***REMOVED***
+		}
 		// Unknown file.
 		return errors.New("unknown file: " + path)
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	// Check if some files lack.
-	if err := checkLackFiles(expectedFiles, gotFiles); err != nil ***REMOVED***
+	if err := checkLackFiles(expectedFiles, gotFiles); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}

@@ -4,15 +4,15 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-ROOT=$(dirname "$***REMOVED***BASH_SOURCE***REMOVED***")/..
+ROOT=$(dirname "${BASH_SOURCE}")/..
 
-pushd "$***REMOVED***ROOT***REMOVED***" > /dev/null
+pushd "${ROOT}" > /dev/null
 
-GOFMT=$***REMOVED***GOFMT:-"gofmt"***REMOVED***
+GOFMT=${GOFMT:-"gofmt"}
 bad_files=$(find . -name '*.go' | xargs $GOFMT -s -l)
-if [[ -n "$***REMOVED***bad_files***REMOVED***" ]]; then
+if [[ -n "${bad_files}" ]]; then
   echo "!!! '$GOFMT' needs to be run on the following files: "
-  echo "$***REMOVED***bad_files***REMOVED***"
+  echo "${bad_files}"
   exit 1
 fi
 

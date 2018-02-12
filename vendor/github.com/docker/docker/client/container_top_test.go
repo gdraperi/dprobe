@@ -14,61 +14,61 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestContainerTopError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestContainerTopError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
-	***REMOVED***
-	_, err := client.ContainerTop(context.Background(), "nothing", []string***REMOVED******REMOVED***)
-	if err == nil || err.Error() != "Error response from daemon: Server error" ***REMOVED***
+	}
+	_, err := client.ContainerTop(context.Background(), "nothing", []string{})
+	if err == nil || err.Error() != "Error response from daemon: Server error" {
 		t.Fatalf("expected a Server Error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestContainerTop(t *testing.T) ***REMOVED***
+func TestContainerTop(t *testing.T) {
 	expectedURL := "/containers/container_id/top"
-	expectedProcesses := [][]string***REMOVED***
-		***REMOVED***"p1", "p2"***REMOVED***,
-		***REMOVED***"p3"***REMOVED***,
-	***REMOVED***
-	expectedTitles := []string***REMOVED***"title1", "title2"***REMOVED***
+	expectedProcesses := [][]string{
+		{"p1", "p2"},
+		{"p3"},
+	}
+	expectedTitles := []string{"title1", "title2"}
 
-	client := &Client***REMOVED***
-		client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-			if !strings.HasPrefix(req.URL.Path, expectedURL) ***REMOVED***
+	client := &Client{
+		client: newMockClient(func(req *http.Request) (*http.Response, error) {
+			if !strings.HasPrefix(req.URL.Path, expectedURL) {
 				return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, req.URL)
-			***REMOVED***
+			}
 			query := req.URL.Query()
 			args := query.Get("ps_args")
-			if args != "arg1 arg2" ***REMOVED***
+			if args != "arg1 arg2" {
 				return nil, fmt.Errorf("args not set in URL query properly. Expected 'arg1 arg2', got %v", args)
-			***REMOVED***
+			}
 
-			b, err := json.Marshal(container.ContainerTopOKBody***REMOVED***
-				Processes: [][]string***REMOVED***
-					***REMOVED***"p1", "p2"***REMOVED***,
-					***REMOVED***"p3"***REMOVED***,
-				***REMOVED***,
-				Titles: []string***REMOVED***"title1", "title2"***REMOVED***,
-			***REMOVED***)
-			if err != nil ***REMOVED***
+			b, err := json.Marshal(container.ContainerTopOKBody{
+				Processes: [][]string{
+					{"p1", "p2"},
+					{"p3"},
+				},
+				Titles: []string{"title1", "title2"},
+			})
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 
-			return &http.Response***REMOVED***
+			return &http.Response{
 				StatusCode: http.StatusOK,
 				Body:       ioutil.NopCloser(bytes.NewReader(b)),
-			***REMOVED***, nil
-		***REMOVED***),
-	***REMOVED***
+			}, nil
+		}),
+	}
 
-	processList, err := client.ContainerTop(context.Background(), "container_id", []string***REMOVED***"arg1", "arg2"***REMOVED***)
-	if err != nil ***REMOVED***
+	processList, err := client.ContainerTop(context.Background(), "container_id", []string{"arg1", "arg2"})
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if !reflect.DeepEqual(expectedProcesses, processList.Processes) ***REMOVED***
+	}
+	if !reflect.DeepEqual(expectedProcesses, processList.Processes) {
 		t.Fatalf("Processes: expected %v, got %v", expectedProcesses, processList.Processes)
-	***REMOVED***
-	if !reflect.DeepEqual(expectedTitles, processList.Titles) ***REMOVED***
+	}
+	if !reflect.DeepEqual(expectedTitles, processList.Titles) {
 		t.Fatalf("Titles: expected %v, got %v", expectedTitles, processList.Titles)
-	***REMOVED***
-***REMOVED***
+	}
+}

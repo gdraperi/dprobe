@@ -3,14 +3,14 @@
       pull_request: [ opened ]
   operations:
       - type:       label
-        filters: ***REMOVED***
+        filters: {
             ~labels: [ "status/0-triage", "status/1-design-review", "status/2-code-review", "status/3-docs-review", "status/4-merge" ],
-    ***REMOVED***
-        settings: ***REMOVED***
-            patterns: ***REMOVED***
+        }
+        settings: {
+            patterns: {
                 status/0-triage:     [ ".*" ],
-        ***REMOVED***
-    ***REMOVED***
+            }
+        }
 
 # For every newly created or modified issue, assign label based on matching regexp using the `label`
 # operation, as well as an Engine-specific version label using `version-label`.
@@ -18,8 +18,8 @@
       issues:       [ edited, opened, reopened ]
   operations:
       - type:       label
-        settings: ***REMOVED***
-            patterns: ***REMOVED***
+        settings: {
+            patterns: {
                 area/builder:        [ "dockerfile", "docker build" ],
                 area/distribution:   [ "docker login", "docker logout", "docker pull", "docker push", "docker search" ],
                 area/plugins:        [ "docker plugin" ],
@@ -31,8 +31,8 @@
                 platform/freebsd:    [ "freebsd" ],
                 platform/windows:    [ "nanoserver", "windowsservercore", "windows server" ],
                 platform/arm:        [ "raspberry", "raspbian", "rpi", "beaglebone", "pine64" ],
-        ***REMOVED***
-    ***REMOVED***
+            }
+        }
       - type:       version-label
 
 # Labeling a PR with `rebuild/<configuration>` triggers a rebuild job for the associated
@@ -43,67 +43,67 @@
       pull_request: [ labeled ]
   operations:
       - type:       rebuild
-        settings: ***REMOVED***
+        settings: {
             # When configurations are empty, the `rebuild` operation rebuilds all the currently
             # known statuses for that pull request.
             configurations: [],
             label:          "rebuild/*",
-    ***REMOVED***
+        }
       - type:       rebuild
-        settings: ***REMOVED***
+        settings: {
             configurations: [ arm ],
             label:          "rebuild/arm",
-    ***REMOVED***
+        }
       - type:       rebuild
-        settings: ***REMOVED***
+        settings: {
             configurations: [ experimental ],
             label:          "rebuild/experimental",
-    ***REMOVED***
+        }
       - type:       rebuild
-        settings: ***REMOVED***
+        settings: {
             configurations: [ janky ],
             label:          "rebuild/janky",
-    ***REMOVED***
+        }
       - type:       rebuild
-        settings: ***REMOVED***
+        settings: {
             configurations: [ powerpc ],
             label:          "rebuild/powerpc",
-    ***REMOVED***
+        }
       - type:       rebuild
-        settings: ***REMOVED***
+        settings: {
             configurations: [ userns ],
             label:          "rebuild/userns",
-    ***REMOVED***
+        }
       - type:       rebuild
-        settings: ***REMOVED***
+        settings: {
             configurations: [ vendor ],
             label:          "rebuild/vendor",
-    ***REMOVED***
+        }
       - type:       rebuild
-        settings: ***REMOVED***
+        settings: {
             configurations: [ win2lin ],
             label:          "rebuild/win2lin",
-    ***REMOVED***
+        }
       - type:       rebuild
-        settings: ***REMOVED***
+        settings: {
             configurations: [ windowsRS1 ],
             label:          "rebuild/windowsRS1",
-    ***REMOVED***
+        }
       - type:       rebuild
-        settings: ***REMOVED***
+        settings: {
             configurations: [ z ],
             label:          "rebuild/z",
-    ***REMOVED***
+        }
 
 # Once a day, randomly assign pull requests older than 2 weeks.
 - schedule:         "@daily"
   operations:
       - type:       random-assign
-        filters: ***REMOVED***
+        filters: {
             age:    "2w",
             is:     "pr",
-    ***REMOVED***
-        settings: ***REMOVED***
+        }
+        settings: {
             users: [
                 "aaronlehmann",
                 "akihirosuda",
@@ -128,4 +128,4 @@
                 "vieux",
                 "yongtang",
             ]
-    ***REMOVED***
+        }

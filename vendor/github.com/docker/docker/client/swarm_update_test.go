@@ -13,37 +13,37 @@ import (
 	"github.com/docker/docker/api/types/swarm"
 )
 
-func TestSwarmUpdateError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestSwarmUpdateError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
-	***REMOVED***
+	}
 
-	err := client.SwarmUpdate(context.Background(), swarm.Version***REMOVED******REMOVED***, swarm.Spec***REMOVED******REMOVED***, swarm.UpdateFlags***REMOVED******REMOVED***)
-	if err == nil || err.Error() != "Error response from daemon: Server error" ***REMOVED***
+	err := client.SwarmUpdate(context.Background(), swarm.Version{}, swarm.Spec{}, swarm.UpdateFlags{})
+	if err == nil || err.Error() != "Error response from daemon: Server error" {
 		t.Fatalf("expected a Server Error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestSwarmUpdate(t *testing.T) ***REMOVED***
+func TestSwarmUpdate(t *testing.T) {
 	expectedURL := "/swarm/update"
 
-	client := &Client***REMOVED***
-		client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-			if !strings.HasPrefix(req.URL.Path, expectedURL) ***REMOVED***
+	client := &Client{
+		client: newMockClient(func(req *http.Request) (*http.Response, error) {
+			if !strings.HasPrefix(req.URL.Path, expectedURL) {
 				return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, req.URL)
-			***REMOVED***
-			if req.Method != "POST" ***REMOVED***
+			}
+			if req.Method != "POST" {
 				return nil, fmt.Errorf("expected POST method, got %s", req.Method)
-			***REMOVED***
-			return &http.Response***REMOVED***
+			}
+			return &http.Response{
 				StatusCode: http.StatusOK,
 				Body:       ioutil.NopCloser(bytes.NewReader([]byte(""))),
-			***REMOVED***, nil
-		***REMOVED***),
-	***REMOVED***
+			}, nil
+		}),
+	}
 
-	err := client.SwarmUpdate(context.Background(), swarm.Version***REMOVED******REMOVED***, swarm.Spec***REMOVED******REMOVED***, swarm.UpdateFlags***REMOVED******REMOVED***)
-	if err != nil ***REMOVED***
+	err := client.SwarmUpdate(context.Background(), swarm.Version{}, swarm.Spec{}, swarm.UpdateFlags{})
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}

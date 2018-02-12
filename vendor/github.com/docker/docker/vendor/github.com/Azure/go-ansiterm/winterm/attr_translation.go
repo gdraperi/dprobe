@@ -11,8 +11,8 @@ const (
 
 // collectAnsiIntoWindowsAttributes modifies the passed Windows text mode flags to reflect the
 // request represented by the passed ANSI mode.
-func collectAnsiIntoWindowsAttributes(windowsMode uint16, inverted bool, baseMode uint16, ansiMode int16) (uint16, bool) ***REMOVED***
-	switch ansiMode ***REMOVED***
+func collectAnsiIntoWindowsAttributes(windowsMode uint16, inverted bool, baseMode uint16, ansiMode int16) (uint16, bool) {
+	switch ansiMode {
 
 	// Mode styles
 	case ansiterm.ANSI_SGR_BOLD:
@@ -89,12 +89,12 @@ func collectAnsiIntoWindowsAttributes(windowsMode uint16, inverted bool, baseMod
 
 	case ansiterm.ANSI_SGR_BACKGROUND_WHITE:
 		windowsMode = (windowsMode &^ BACKGROUND_COLOR_MASK) | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE
-	***REMOVED***
+	}
 
 	return windowsMode, inverted
-***REMOVED***
+}
 
 // invertAttributes inverts the foreground and background colors of a Windows attributes value
-func invertAttributes(windowsMode uint16) uint16 ***REMOVED***
+func invertAttributes(windowsMode uint16) uint16 {
 	return (COMMON_LVB_MASK & windowsMode) | ((FOREGROUND_MASK & windowsMode) << 4) | ((BACKGROUND_MASK & windowsMode) >> 4)
-***REMOVED***
+}

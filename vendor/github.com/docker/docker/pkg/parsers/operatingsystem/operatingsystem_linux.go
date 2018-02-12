@@ -25,53 +25,53 @@ var (
 )
 
 // GetOperatingSystem gets the name of the current operating system.
-func GetOperatingSystem() (string, error) ***REMOVED***
+func GetOperatingSystem() (string, error) {
 	osReleaseFile, err := os.Open(etcOsRelease)
-	if err != nil ***REMOVED***
-		if !os.IsNotExist(err) ***REMOVED***
+	if err != nil {
+		if !os.IsNotExist(err) {
 			return "", fmt.Errorf("Error opening %s: %v", etcOsRelease, err)
-		***REMOVED***
+		}
 		osReleaseFile, err = os.Open(altOsRelease)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return "", fmt.Errorf("Error opening %s: %v", altOsRelease, err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	defer osReleaseFile.Close()
 
 	var prettyName string
 	scanner := bufio.NewScanner(osReleaseFile)
-	for scanner.Scan() ***REMOVED***
+	for scanner.Scan() {
 		line := scanner.Text()
-		if strings.HasPrefix(line, "PRETTY_NAME=") ***REMOVED***
+		if strings.HasPrefix(line, "PRETTY_NAME=") {
 			data := strings.SplitN(line, "=", 2)
 			prettyNames, err := shellwords.Parse(data[1])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return "", fmt.Errorf("PRETTY_NAME is invalid: %s", err.Error())
-			***REMOVED***
-			if len(prettyNames) != 1 ***REMOVED***
+			}
+			if len(prettyNames) != 1 {
 				return "", fmt.Errorf("PRETTY_NAME needs to be enclosed by quotes if they have spaces: %s", data[1])
-			***REMOVED***
+			}
 			prettyName = prettyNames[0]
-		***REMOVED***
-	***REMOVED***
-	if prettyName != "" ***REMOVED***
+		}
+	}
+	if prettyName != "" {
 		return prettyName, nil
-	***REMOVED***
+	}
 	// If not set, defaults to PRETTY_NAME="Linux"
 	// c.f. http://www.freedesktop.org/software/systemd/man/os-release.html
 	return "Linux", nil
-***REMOVED***
+}
 
 // IsContainerized returns true if we are running inside a container.
-func IsContainerized() (bool, error) ***REMOVED***
+func IsContainerized() (bool, error) {
 	b, err := ioutil.ReadFile(proc1Cgroup)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return false, err
-	***REMOVED***
-	for _, line := range bytes.Split(b, []byte***REMOVED***'\n'***REMOVED***) ***REMOVED***
-		if len(line) > 0 && !bytes.HasSuffix(line, []byte***REMOVED***'/'***REMOVED***) && !bytes.HasSuffix(line, []byte("init.scope")) ***REMOVED***
+	}
+	for _, line := range bytes.Split(b, []byte{'\n'}) {
+		if len(line) > 0 && !bytes.HasSuffix(line, []byte{'/'}) && !bytes.HasSuffix(line, []byte("init.scope")) {
 			return true, nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false, nil
-***REMOVED***
+}

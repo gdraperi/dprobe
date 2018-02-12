@@ -14,44 +14,44 @@ import (
 )
 
 // InitDockerDefault registers the built-in ipam service with libnetwork
-func InitDockerDefault(ic ipamapi.Callback, l, g interface***REMOVED******REMOVED***) error ***REMOVED***
+func InitDockerDefault(ic ipamapi.Callback, l, g interface{}) error {
 	var (
 		ok                bool
 		localDs, globalDs datastore.DataStore
 	)
 
-	if l != nil ***REMOVED***
-		if localDs, ok = l.(datastore.DataStore); !ok ***REMOVED***
+	if l != nil {
+		if localDs, ok = l.(datastore.DataStore); !ok {
 			return errors.New("incorrect local datastore passed to built-in ipam init")
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if g != nil ***REMOVED***
-		if globalDs, ok = g.(datastore.DataStore); !ok ***REMOVED***
+	if g != nil {
+		if globalDs, ok = g.(datastore.DataStore); !ok {
 			return errors.New("incorrect global datastore passed to built-in ipam init")
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	ipamutils.InitNetworks()
 
 	a, err := ipam.NewAllocator(localDs, globalDs)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	cps := &ipamapi.Capability***REMOVED***RequiresRequestReplay: true***REMOVED***
+	cps := &ipamapi.Capability{RequiresRequestReplay: true}
 
 	return ic.RegisterIpamDriverWithCapabilities(ipamapi.DefaultIPAM, a, cps)
-***REMOVED***
+}
 
 // Init registers the built-in ipam service with libnetwork
-func Init(ic ipamapi.Callback, l, g interface***REMOVED******REMOVED***) error ***REMOVED***
+func Init(ic ipamapi.Callback, l, g interface{}) error {
 	initFunc := windowsipam.GetInit(windowsipam.DefaultIPAM)
 
 	err := InitDockerDefault(ic, l, g)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	return initFunc(ic, l, g)
-***REMOVED***
+}

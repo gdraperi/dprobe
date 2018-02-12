@@ -9,7 +9,7 @@ import (
 	"unsafe"
 )
 
-func probeProtocolStack() int ***REMOVED*** return 4 ***REMOVED***
+func probeProtocolStack() int { return 4 }
 
 const (
 	sysSETSOCKOPT = 0xe
@@ -23,33 +23,33 @@ const (
 func socketcall(call, a0, a1, a2, a3, a4, a5 uintptr) (uintptr, syscall.Errno)
 func rawsocketcall(call, a0, a1, a2, a3, a4, a5 uintptr) (uintptr, syscall.Errno)
 
-func getsockopt(s uintptr, level, name int, b []byte) (int, error) ***REMOVED***
+func getsockopt(s uintptr, level, name int, b []byte) (int, error) {
 	l := uint32(len(b))
 	_, errno := socketcall(sysGETSOCKOPT, s, uintptr(level), uintptr(name), uintptr(unsafe.Pointer(&b[0])), uintptr(unsafe.Pointer(&l)), 0)
 	return int(l), errnoErr(errno)
-***REMOVED***
+}
 
-func setsockopt(s uintptr, level, name int, b []byte) error ***REMOVED***
+func setsockopt(s uintptr, level, name int, b []byte) error {
 	_, errno := socketcall(sysSETSOCKOPT, s, uintptr(level), uintptr(name), uintptr(unsafe.Pointer(&b[0])), uintptr(len(b)), 0)
 	return errnoErr(errno)
-***REMOVED***
+}
 
-func recvmsg(s uintptr, h *msghdr, flags int) (int, error) ***REMOVED***
+func recvmsg(s uintptr, h *msghdr, flags int) (int, error) {
 	n, errno := socketcall(sysRECVMSG, s, uintptr(unsafe.Pointer(h)), uintptr(flags), 0, 0, 0)
 	return int(n), errnoErr(errno)
-***REMOVED***
+}
 
-func sendmsg(s uintptr, h *msghdr, flags int) (int, error) ***REMOVED***
+func sendmsg(s uintptr, h *msghdr, flags int) (int, error) {
 	n, errno := socketcall(sysSENDMSG, s, uintptr(unsafe.Pointer(h)), uintptr(flags), 0, 0, 0)
 	return int(n), errnoErr(errno)
-***REMOVED***
+}
 
-func recvmmsg(s uintptr, hs []mmsghdr, flags int) (int, error) ***REMOVED***
+func recvmmsg(s uintptr, hs []mmsghdr, flags int) (int, error) {
 	n, errno := socketcall(sysRECVMMSG, s, uintptr(unsafe.Pointer(&hs[0])), uintptr(len(hs)), uintptr(flags), 0, 0)
 	return int(n), errnoErr(errno)
-***REMOVED***
+}
 
-func sendmmsg(s uintptr, hs []mmsghdr, flags int) (int, error) ***REMOVED***
+func sendmmsg(s uintptr, hs []mmsghdr, flags int) (int, error) {
 	n, errno := socketcall(sysSENDMMSG, s, uintptr(unsafe.Pointer(&hs[0])), uintptr(len(hs)), uintptr(flags), 0, 0)
 	return int(n), errnoErr(errno)
-***REMOVED***
+}

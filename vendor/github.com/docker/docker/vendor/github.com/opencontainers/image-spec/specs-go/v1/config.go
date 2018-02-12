@@ -21,12 +21,12 @@ import (
 )
 
 // ImageConfig defines the execution parameters which should be used as a base when running a container using an image.
-type ImageConfig struct ***REMOVED***
+type ImageConfig struct {
 	// User defines the username or UID which the process in the container should run as.
 	User string `json:"User,omitempty"`
 
 	// ExposedPorts a set of ports to expose from a container running this image.
-	ExposedPorts map[string]struct***REMOVED******REMOVED*** `json:"ExposedPorts,omitempty"`
+	ExposedPorts map[string]struct{} `json:"ExposedPorts,omitempty"`
 
 	// Env is a list of environment variables to be used in a container.
 	Env []string `json:"Env,omitempty"`
@@ -38,7 +38,7 @@ type ImageConfig struct ***REMOVED***
 	Cmd []string `json:"Cmd,omitempty"`
 
 	// Volumes is a set of directories describing where the process is likely write data specific to a container instance.
-	Volumes map[string]struct***REMOVED******REMOVED*** `json:"Volumes,omitempty"`
+	Volumes map[string]struct{} `json:"Volumes,omitempty"`
 
 	// WorkingDir sets the current working directory of the entrypoint process in the container.
 	WorkingDir string `json:"WorkingDir,omitempty"`
@@ -48,19 +48,19 @@ type ImageConfig struct ***REMOVED***
 
 	// StopSignal contains the system call signal that will be sent to the container to exit.
 	StopSignal string `json:"StopSignal,omitempty"`
-***REMOVED***
+}
 
 // RootFS describes a layer content addresses
-type RootFS struct ***REMOVED***
+type RootFS struct {
 	// Type is the type of the rootfs.
 	Type string `json:"type"`
 
 	// DiffIDs is an array of layer content hashes (DiffIDs), in order from bottom-most to top-most.
 	DiffIDs []digest.Digest `json:"diff_ids"`
-***REMOVED***
+}
 
 // History describes the history of a layer.
-type History struct ***REMOVED***
+type History struct {
 	// Created is the combined date and time at which the layer was created, formatted as defined by RFC 3339, section 5.6.
 	Created *time.Time `json:"created,omitempty"`
 
@@ -75,11 +75,11 @@ type History struct ***REMOVED***
 
 	// EmptyLayer is used to mark if the history item created a filesystem diff.
 	EmptyLayer bool `json:"empty_layer,omitempty"`
-***REMOVED***
+}
 
 // Image is the JSON structure which describes some basic information about the image.
 // This provides the `application/vnd.oci.image.config.v1+json` mediatype when marshalled to JSON.
-type Image struct ***REMOVED***
+type Image struct {
 	// Created is the combined date and time at which the image was created, formatted as defined by RFC 3339, section 5.6.
 	Created *time.Time `json:"created,omitempty"`
 
@@ -100,4 +100,4 @@ type Image struct ***REMOVED***
 
 	// History describes the history of each layer.
 	History []History `json:"history,omitempty"`
-***REMOVED***
+}

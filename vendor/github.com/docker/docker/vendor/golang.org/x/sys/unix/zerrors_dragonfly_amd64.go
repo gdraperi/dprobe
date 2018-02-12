@@ -1427,7 +1427,7 @@ const (
 )
 
 // Error table
-var errors = [...]string***REMOVED***
+var errors = [...]string{
 	1:  "operation not permitted",
 	2:  "no such file or directory",
 	3:  "no such process",
@@ -1527,10 +1527,10 @@ var errors = [...]string***REMOVED***
 	97: "unknown error: 97",
 	98: "unknown error: 98",
 	99: "unknown error: 99",
-***REMOVED***
+}
 
 // Signal table
-var signals = [...]string***REMOVED***
+var signals = [...]string{
 	1:  "hangup",
 	2:  "interrupt",
 	3:  "quit",
@@ -1565,4 +1565,4 @@ var signals = [...]string***REMOVED***
 	32: "thread Scheduler",
 	33: "checkPoint",
 	34: "checkPointExit",
-***REMOVED***
+}

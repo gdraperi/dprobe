@@ -45,12 +45,12 @@ Rich Feature Set includes:
   - Standard field renaming via tags
   - Support for omitting empty fields during an encoding
   - Encoding from any value and decoding into pointer to any value
-    (struct, slice, map, primitives, pointers, interface***REMOVED******REMOVED***, etc)
+    (struct, slice, map, primitives, pointers, interface{}, etc)
   - Extensions to support efficient encoding/decoding of any named types
   - Support encoding.(Binary|Text)(M|Unm)arshaler interfaces
-  - Decoding without a schema (into a interface***REMOVED******REMOVED***).
+  - Decoding without a schema (into a interface{}).
     Includes Options to configure what specific map or slice type to use
-    when decoding an encoded list or map into a nil interface***REMOVED******REMOVED***
+    when decoding an encoded list or map into a nil interface{}
   - Encode a struct as an array, and decode struct from an array in the data stream
   - Comprehensive support for anonymous fields
   - Fast (no-reflection) encoding/decoding of common maps and slices
@@ -83,8 +83,8 @@ There are no restrictions on what the custom type can be. Some examples:
     type BisSet   []int
     type BitSet64 uint64
     type UUID     string
-    type MyStructWithUnexportedFields struct ***REMOVED*** a int; b bool; c []int; ***REMOVED***
-    type GifImage struct ***REMOVED*** ... ***REMOVED***
+    type MyStructWithUnexportedFields struct { a int; b bool; c []int; }
+    type GifImage struct { ... }
 
 As an illustration, MyStructWithUnexportedFields would normally be
 encoded as an empty map because it has no exported fields, while UUID
@@ -121,11 +121,11 @@ Sample usage model:
       ch codec.CborHandle
     )
 
-    mh.MapType = reflect.TypeOf(map[string]interface***REMOVED******REMOVED***(nil))
+    mh.MapType = reflect.TypeOf(map[string]interface{}(nil))
 
     // configure extensions
     // e.g. for msgpack, define functions and enable Time support for tag 1
-    // mh.SetExt(reflect.TypeOf(time.Time***REMOVED******REMOVED***), 1, myExt)
+    // mh.SetExt(reflect.TypeOf(time.Time{}), 1, myExt)
 
     // create and use decoder/encoder
     var (
@@ -144,14 +144,14 @@ Sample usage model:
     err = enc.Encode(v)
 
     //RPC Server
-    go func() ***REMOVED***
-        for ***REMOVED***
+    go func() {
+        for {
             conn, err := listener.Accept()
             rpcCodec := codec.GoRpc.ServerCodec(conn, h)
             //OR rpcCodec := codec.MsgpackSpecRpc.ServerCodec(conn, h)
             rpc.ServeCodec(rpcCodec)
-    ***REMOVED***
-***REMOVED***()
+        }
+    }()
 
     //RPC Communication (client side)
     conn, err = net.Dial("tcp", "localhost:5555")
@@ -166,7 +166,7 @@ package codec
 //
 //    - encoding/json always reads whole file into memory first.
 //      This makes it unsuitable for parsing very large files.
-//    - encoding/xml cannot parse into a map[string]interface***REMOVED******REMOVED***
+//    - encoding/xml cannot parse into a map[string]interface{}
 //      I found this out on reading https://github.com/clbanning/mxj
 
 // TODO:
@@ -179,13 +179,13 @@ package codec
 //     This is because there's no fast way to use a channel without it
 //     having to switch goroutines constantly.
 //     Callback pattern is still the best. Maybe cnsider supporting something like:
-//        type X struct ***REMOVED***
+//        type X struct {
 //             Name string
 //             Ys []Y
 //             Ys chan <- Y
-//             Ys func(interface***REMOVED******REMOVED***) -> call this interface for each entry in there.
-//    ***REMOVED***
-//    - Consider adding a isZeroer interface ***REMOVED*** isZero() bool ***REMOVED***
+//             Ys func(interface{}) -> call this interface for each entry in there.
+//        }
+//    - Consider adding a isZeroer interface { isZero() bool }
 //      It is used within isEmpty, for omitEmpty support.
 //    - Consider making Handle used AS-IS within the encoding/decoding session.
 //      This means that we don't cache Handle information within the (En|De)coder,

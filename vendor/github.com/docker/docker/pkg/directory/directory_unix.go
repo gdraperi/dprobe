@@ -9,40 +9,40 @@ import (
 )
 
 // Size walks a directory tree and returns its total size in bytes.
-func Size(dir string) (size int64, err error) ***REMOVED***
-	data := make(map[uint64]struct***REMOVED******REMOVED***)
-	err = filepath.Walk(dir, func(d string, fileInfo os.FileInfo, err error) error ***REMOVED***
-		if err != nil ***REMOVED***
+func Size(dir string) (size int64, err error) {
+	data := make(map[uint64]struct{})
+	err = filepath.Walk(dir, func(d string, fileInfo os.FileInfo, err error) error {
+		if err != nil {
 			// if dir does not exist, Size() returns the error.
 			// if dir/x disappeared while walking, Size() ignores dir/x.
-			if os.IsNotExist(err) && d != dir ***REMOVED***
+			if os.IsNotExist(err) && d != dir {
 				return nil
-			***REMOVED***
+			}
 			return err
-		***REMOVED***
+		}
 
 		// Ignore directory sizes
-		if fileInfo == nil ***REMOVED***
+		if fileInfo == nil {
 			return nil
-		***REMOVED***
+		}
 
 		s := fileInfo.Size()
-		if fileInfo.IsDir() || s == 0 ***REMOVED***
+		if fileInfo.IsDir() || s == 0 {
 			return nil
-		***REMOVED***
+		}
 
 		// Check inode to handle hard links correctly
 		inode := fileInfo.Sys().(*syscall.Stat_t).Ino
 		// inode is not a uint64 on all platforms. Cast it to avoid issues.
-		if _, exists := data[inode]; exists ***REMOVED***
+		if _, exists := data[inode]; exists {
 			return nil
-		***REMOVED***
+		}
 		// inode is not a uint64 on all platforms. Cast it to avoid issues.
-		data[inode] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
+		data[inode] = struct{}{}
 
 		size += s
 
 		return nil
-	***REMOVED***)
+	})
 	return
-***REMOVED***
+}

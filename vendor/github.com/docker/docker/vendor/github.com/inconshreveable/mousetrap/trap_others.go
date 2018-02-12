@@ -10,6 +10,6 @@ package mousetrap
 // whether it was launched from explorer.exe
 //
 // On non-Windows platforms, it always returns false.
-func StartedByExplorer() bool ***REMOVED***
+func StartedByExplorer() bool {
 	return false
-***REMOVED***
+}

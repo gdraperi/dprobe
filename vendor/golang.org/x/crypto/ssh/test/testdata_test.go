@@ -17,48 +17,48 @@ import (
 )
 
 var (
-	testPrivateKeys map[string]interface***REMOVED******REMOVED***
+	testPrivateKeys map[string]interface{}
 	testSigners     map[string]ssh.Signer
 	testPublicKeys  map[string]ssh.PublicKey
 )
 
-func init() ***REMOVED***
+func init() {
 	var err error
 
 	n := len(testdata.PEMBytes)
-	testPrivateKeys = make(map[string]interface***REMOVED******REMOVED***, n)
+	testPrivateKeys = make(map[string]interface{}, n)
 	testSigners = make(map[string]ssh.Signer, n)
 	testPublicKeys = make(map[string]ssh.PublicKey, n)
-	for t, k := range testdata.PEMBytes ***REMOVED***
+	for t, k := range testdata.PEMBytes {
 		testPrivateKeys[t], err = ssh.ParseRawPrivateKey(k)
-		if err != nil ***REMOVED***
+		if err != nil {
 			panic(fmt.Sprintf("Unable to parse test key %s: %v", t, err))
-		***REMOVED***
+		}
 		testSigners[t], err = ssh.NewSignerFromKey(testPrivateKeys[t])
-		if err != nil ***REMOVED***
+		if err != nil {
 			panic(fmt.Sprintf("Unable to create signer for test key %s: %v", t, err))
-		***REMOVED***
+		}
 		testPublicKeys[t] = testSigners[t].PublicKey()
-	***REMOVED***
+	}
 
 	// Create a cert and sign it for use in tests.
-	testCert := &ssh.Certificate***REMOVED***
-		Nonce:           []byte***REMOVED******REMOVED***,                       // To pass reflect.DeepEqual after marshal & parse, this must be non-nil
-		ValidPrincipals: []string***REMOVED***"gopher1", "gopher2"***REMOVED***, // increases test coverage
+	testCert := &ssh.Certificate{
+		Nonce:           []byte{},                       // To pass reflect.DeepEqual after marshal & parse, this must be non-nil
+		ValidPrincipals: []string{"gopher1", "gopher2"}, // increases test coverage
 		ValidAfter:      0,                              // unix epoch
 		ValidBefore:     ssh.CertTimeInfinity,           // The end of currently representable time.
-		Reserved:        []byte***REMOVED******REMOVED***,                       // To pass reflect.DeepEqual after marshal & parse, this must be non-nil
+		Reserved:        []byte{},                       // To pass reflect.DeepEqual after marshal & parse, this must be non-nil
 		Key:             testPublicKeys["ecdsa"],
 		SignatureKey:    testPublicKeys["rsa"],
-		Permissions: ssh.Permissions***REMOVED***
-			CriticalOptions: map[string]string***REMOVED******REMOVED***,
-			Extensions:      map[string]string***REMOVED******REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+		Permissions: ssh.Permissions{
+			CriticalOptions: map[string]string{},
+			Extensions:      map[string]string{},
+		},
+	}
 	testCert.SignCert(rand.Reader, testSigners["rsa"])
 	testPrivateKeys["cert"] = testPrivateKeys["ecdsa"]
 	testSigners["cert"], err = ssh.NewCertSigner(testCert, testSigners["ecdsa"])
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(fmt.Sprintf("Unable to create certificate signer: %v", err))
-	***REMOVED***
-***REMOVED***
+	}
+}

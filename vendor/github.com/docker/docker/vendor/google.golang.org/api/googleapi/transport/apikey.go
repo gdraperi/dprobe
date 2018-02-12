@@ -13,26 +13,26 @@ import (
 
 // APIKey is an HTTP Transport which wraps an underlying transport and
 // appends an API Key "key" parameter to the URL of outgoing requests.
-type APIKey struct ***REMOVED***
+type APIKey struct {
 	// Key is the API Key to set on requests.
 	Key string
 
 	// Transport is the underlying HTTP transport.
 	// If nil, http.DefaultTransport is used.
 	Transport http.RoundTripper
-***REMOVED***
+}
 
-func (t *APIKey) RoundTrip(req *http.Request) (*http.Response, error) ***REMOVED***
+func (t *APIKey) RoundTrip(req *http.Request) (*http.Response, error) {
 	rt := t.Transport
-	if rt == nil ***REMOVED***
+	if rt == nil {
 		rt = http.DefaultTransport
-		if rt == nil ***REMOVED***
+		if rt == nil {
 			return nil, errors.New("googleapi/transport: no Transport specified or available")
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	newReq := *req
 	args := newReq.URL.Query()
 	args.Set("key", t.Key)
 	newReq.URL.RawQuery = args.Encode()
 	return rt.RoundTrip(&newReq)
-***REMOVED***
+}

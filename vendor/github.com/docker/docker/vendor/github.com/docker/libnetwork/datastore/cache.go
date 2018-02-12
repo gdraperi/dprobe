@@ -10,17 +10,17 @@ import (
 
 type kvMap map[string]KVObject
 
-type cache struct ***REMOVED***
+type cache struct {
 	sync.Mutex
 	kmm map[string]kvMap
 	ds  *datastore
-***REMOVED***
+}
 
-func newCache(ds *datastore) *cache ***REMOVED***
-	return &cache***REMOVED***kmm: make(map[string]kvMap), ds: ds***REMOVED***
-***REMOVED***
+func newCache(ds *datastore) *cache {
+	return &cache{kmm: make(map[string]kvMap), ds: ds}
+}
 
-func (c *cache) kmap(kvObject KVObject) (kvMap, error) ***REMOVED***
+func (c *cache) kmap(kvObject KVObject) (kvMap, error) {
 	var err error
 
 	c.Lock()
@@ -28,47 +28,47 @@ func (c *cache) kmap(kvObject KVObject) (kvMap, error) ***REMOVED***
 	kmap, ok := c.kmm[keyPrefix]
 	c.Unlock()
 
-	if ok ***REMOVED***
+	if ok {
 		return kmap, nil
-	***REMOVED***
+	}
 
-	kmap = kvMap***REMOVED******REMOVED***
+	kmap = kvMap{}
 
 	// Bail out right away if the kvObject does not implement KVConstructor
 	ctor, ok := kvObject.(KVConstructor)
-	if !ok ***REMOVED***
+	if !ok {
 		return nil, errors.New("error while populating kmap, object does not implement KVConstructor interface")
-	***REMOVED***
+	}
 
 	kvList, err := c.ds.store.List(keyPrefix)
-	if err != nil ***REMOVED***
-		if err == store.ErrKeyNotFound ***REMOVED***
+	if err != nil {
+		if err == store.ErrKeyNotFound {
 			// If the store doesn't have anything then there is nothing to
 			// populate in the cache. Just bail out.
 			goto out
-		***REMOVED***
+		}
 
 		return nil, fmt.Errorf("error while populating kmap: %v", err)
-	***REMOVED***
+	}
 
-	for _, kvPair := range kvList ***REMOVED***
+	for _, kvPair := range kvList {
 		// Ignore empty kvPair values
-		if len(kvPair.Value) == 0 ***REMOVED***
+		if len(kvPair.Value) == 0 {
 			continue
-		***REMOVED***
+		}
 
 		dstO := ctor.New()
 		err = dstO.SetValue(kvPair.Value)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 
 		// Make sure the object has a correct view of the DB index in
 		// case we need to modify it and update the DB.
 		dstO.SetIndex(kvPair.LastIndex)
 
 		kmap[Key(dstO.Key()...)] = dstO
-	***REMOVED***
+	}
 
 out:
 	// There may multiple go routines racing to fill the
@@ -76,103 +76,103 @@ out:
 	// wins. The others should just use what the first populated.
 	c.Lock()
 	kmapNew, ok := c.kmm[keyPrefix]
-	if ok ***REMOVED***
+	if ok {
 		c.Unlock()
 		return kmapNew, nil
-	***REMOVED***
+	}
 
 	c.kmm[keyPrefix] = kmap
 	c.Unlock()
 
 	return kmap, nil
-***REMOVED***
+}
 
-func (c *cache) add(kvObject KVObject, atomic bool) error ***REMOVED***
+func (c *cache) add(kvObject KVObject, atomic bool) error {
 	kmap, err := c.kmap(kvObject)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	c.Lock()
 	// If atomic is true, cache needs to maintain its own index
 	// for atomicity and the add needs to be atomic.
-	if atomic ***REMOVED***
-		if prev, ok := kmap[Key(kvObject.Key()...)]; ok ***REMOVED***
-			if prev.Index() != kvObject.Index() ***REMOVED***
+	if atomic {
+		if prev, ok := kmap[Key(kvObject.Key()...)]; ok {
+			if prev.Index() != kvObject.Index() {
 				c.Unlock()
 				return ErrKeyModified
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		// Increment index
 		index := kvObject.Index()
 		index++
 		kvObject.SetIndex(index)
-	***REMOVED***
+	}
 
 	kmap[Key(kvObject.Key()...)] = kvObject
 	c.Unlock()
 	return nil
-***REMOVED***
+}
 
-func (c *cache) del(kvObject KVObject, atomic bool) error ***REMOVED***
+func (c *cache) del(kvObject KVObject, atomic bool) error {
 	kmap, err := c.kmap(kvObject)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	c.Lock()
 	// If atomic is true, cache needs to maintain its own index
 	// for atomicity and del needs to be atomic.
-	if atomic ***REMOVED***
-		if prev, ok := kmap[Key(kvObject.Key()...)]; ok ***REMOVED***
-			if prev.Index() != kvObject.Index() ***REMOVED***
+	if atomic {
+		if prev, ok := kmap[Key(kvObject.Key()...)]; ok {
+			if prev.Index() != kvObject.Index() {
 				c.Unlock()
 				return ErrKeyModified
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	delete(kmap, Key(kvObject.Key()...))
 	c.Unlock()
 	return nil
-***REMOVED***
+}
 
-func (c *cache) get(key string, kvObject KVObject) error ***REMOVED***
+func (c *cache) get(key string, kvObject KVObject) error {
 	kmap, err := c.kmap(kvObject)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	c.Lock()
 	defer c.Unlock()
 
 	o, ok := kmap[Key(kvObject.Key()...)]
-	if !ok ***REMOVED***
+	if !ok {
 		return ErrKeyNotFound
-	***REMOVED***
+	}
 
 	ctor, ok := o.(KVConstructor)
-	if !ok ***REMOVED***
+	if !ok {
 		return errors.New("kvobject does not implement KVConstructor interface. could not get object")
-	***REMOVED***
+	}
 
 	return ctor.CopyTo(kvObject)
-***REMOVED***
+}
 
-func (c *cache) list(kvObject KVObject) ([]KVObject, error) ***REMOVED***
+func (c *cache) list(kvObject KVObject) ([]KVObject, error) {
 	kmap, err := c.kmap(kvObject)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	c.Lock()
 	defer c.Unlock()
 
 	var kvol []KVObject
-	for _, v := range kmap ***REMOVED***
+	for _, v := range kmap {
 		kvol = append(kvol, v)
-	***REMOVED***
+	}
 
 	return kvol, nil
-***REMOVED***
+}

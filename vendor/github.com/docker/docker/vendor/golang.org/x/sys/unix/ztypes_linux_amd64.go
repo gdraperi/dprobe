@@ -21,17 +21,17 @@ type (
 	_C_long_long int64
 )
 
-type Timespec struct ***REMOVED***
+type Timespec struct {
 	Sec  int64
 	Nsec int64
-***REMOVED***
+}
 
-type Timeval struct ***REMOVED***
+type Timeval struct {
 	Sec  int64
 	Usec int64
-***REMOVED***
+}
 
-type Timex struct ***REMOVED***
+type Timex struct {
 	Modes     uint32
 	Pad_cgo_0 [4]byte
 	Offset    int64
@@ -56,23 +56,23 @@ type Timex struct ***REMOVED***
 	Stbcnt    int64
 	Tai       int32
 	Pad_cgo_3 [44]byte
-***REMOVED***
+}
 
 type Time_t int64
 
-type Tms struct ***REMOVED***
+type Tms struct {
 	Utime  int64
 	Stime  int64
 	Cutime int64
 	Cstime int64
-***REMOVED***
+}
 
-type Utimbuf struct ***REMOVED***
+type Utimbuf struct {
 	Actime  int64
 	Modtime int64
-***REMOVED***
+}
 
-type Rusage struct ***REMOVED***
+type Rusage struct {
 	Utime    Timeval
 	Stime    Timeval
 	Maxrss   int64
@@ -89,16 +89,16 @@ type Rusage struct ***REMOVED***
 	Nsignals int64
 	Nvcsw    int64
 	Nivcsw   int64
-***REMOVED***
+}
 
-type Rlimit struct ***REMOVED***
+type Rlimit struct {
 	Cur uint64
 	Max uint64
-***REMOVED***
+}
 
 type _Gid_t uint32
 
-type Stat_t struct ***REMOVED***
+type Stat_t struct {
 	Dev     uint64
 	Ino     uint64
 	Nlink   uint64
@@ -114,9 +114,9 @@ type Stat_t struct ***REMOVED***
 	Mtim    Timespec
 	Ctim    Timespec
 	_       [3]int64
-***REMOVED***
+}
 
-type Statfs_t struct ***REMOVED***
+type Statfs_t struct {
 	Type    int64
 	Bsize   int64
 	Blocks  uint64
@@ -129,22 +129,22 @@ type Statfs_t struct ***REMOVED***
 	Frsize  int64
 	Flags   int64
 	Spare   [4]int64
-***REMOVED***
+}
 
-type Dirent struct ***REMOVED***
+type Dirent struct {
 	Ino       uint64
 	Off       int64
 	Reclen    uint16
 	Type      uint8
 	Name      [256]int8
 	Pad_cgo_0 [5]byte
-***REMOVED***
+}
 
-type Fsid struct ***REMOVED***
+type Fsid struct {
 	X__val [2]int32
-***REMOVED***
+}
 
-type Flock_t struct ***REMOVED***
+type Flock_t struct {
 	Type      int16
 	Whence    int16
 	Pad_cgo_0 [4]byte
@@ -152,27 +152,27 @@ type Flock_t struct ***REMOVED***
 	Len       int64
 	Pid       int32
 	Pad_cgo_1 [4]byte
-***REMOVED***
+}
 
-type FscryptPolicy struct ***REMOVED***
+type FscryptPolicy struct {
 	Version                   uint8
 	Contents_encryption_mode  uint8
 	Filenames_encryption_mode uint8
 	Flags                     uint8
 	Master_key_descriptor     [8]uint8
-***REMOVED***
+}
 
-type FscryptKey struct ***REMOVED***
+type FscryptKey struct {
 	Mode uint32
 	Raw  [64]uint8
 	Size uint32
-***REMOVED***
+}
 
-type KeyctlDHParams struct ***REMOVED***
+type KeyctlDHParams struct {
 	Private int32
 	Prime   int32
 	Base    int32
-***REMOVED***
+}
 
 const (
 	FADV_NORMAL     = 0x0
@@ -183,27 +183,27 @@ const (
 	FADV_NOREUSE    = 0x5
 )
 
-type RawSockaddrInet4 struct ***REMOVED***
+type RawSockaddrInet4 struct {
 	Family uint16
 	Port   uint16
 	Addr   [4]byte /* in_addr */
 	Zero   [8]uint8
-***REMOVED***
+}
 
-type RawSockaddrInet6 struct ***REMOVED***
+type RawSockaddrInet6 struct {
 	Family   uint16
 	Port     uint16
 	Flowinfo uint32
 	Addr     [16]byte /* in6_addr */
 	Scope_id uint32
-***REMOVED***
+}
 
-type RawSockaddrUnix struct ***REMOVED***
+type RawSockaddrUnix struct {
 	Family uint16
 	Path   [108]int8
-***REMOVED***
+}
 
-type RawSockaddrLinklayer struct ***REMOVED***
+type RawSockaddrLinklayer struct {
 	Family   uint16
 	Protocol uint16
 	Ifindex  int32
@@ -211,90 +211,90 @@ type RawSockaddrLinklayer struct ***REMOVED***
 	Pkttype  uint8
 	Halen    uint8
 	Addr     [8]uint8
-***REMOVED***
+}
 
-type RawSockaddrNetlink struct ***REMOVED***
+type RawSockaddrNetlink struct {
 	Family uint16
 	Pad    uint16
 	Pid    uint32
 	Groups uint32
-***REMOVED***
+}
 
-type RawSockaddrHCI struct ***REMOVED***
+type RawSockaddrHCI struct {
 	Family  uint16
 	Dev     uint16
 	Channel uint16
-***REMOVED***
+}
 
-type RawSockaddrCAN struct ***REMOVED***
+type RawSockaddrCAN struct {
 	Family    uint16
 	Pad_cgo_0 [2]byte
 	Ifindex   int32
 	Addr      [8]byte
-***REMOVED***
+}
 
-type RawSockaddrALG struct ***REMOVED***
+type RawSockaddrALG struct {
 	Family uint16
 	Type   [14]uint8
 	Feat   uint32
 	Mask   uint32
 	Name   [64]uint8
-***REMOVED***
+}
 
-type RawSockaddrVM struct ***REMOVED***
+type RawSockaddrVM struct {
 	Family    uint16
 	Reserved1 uint16
 	Port      uint32
 	Cid       uint32
 	Zero      [4]uint8
-***REMOVED***
+}
 
-type RawSockaddr struct ***REMOVED***
+type RawSockaddr struct {
 	Family uint16
 	Data   [14]int8
-***REMOVED***
+}
 
-type RawSockaddrAny struct ***REMOVED***
+type RawSockaddrAny struct {
 	Addr RawSockaddr
 	Pad  [96]int8
-***REMOVED***
+}
 
 type _Socklen uint32
 
-type Linger struct ***REMOVED***
+type Linger struct {
 	Onoff  int32
 	Linger int32
-***REMOVED***
+}
 
-type Iovec struct ***REMOVED***
+type Iovec struct {
 	Base *byte
 	Len  uint64
-***REMOVED***
+}
 
-type IPMreq struct ***REMOVED***
+type IPMreq struct {
 	Multiaddr [4]byte /* in_addr */
 	Interface [4]byte /* in_addr */
-***REMOVED***
+}
 
-type IPMreqn struct ***REMOVED***
+type IPMreqn struct {
 	Multiaddr [4]byte /* in_addr */
 	Address   [4]byte /* in_addr */
 	Ifindex   int32
-***REMOVED***
+}
 
-type IPv6Mreq struct ***REMOVED***
+type IPv6Mreq struct {
 	Multiaddr [16]byte /* in6_addr */
 	Interface uint32
-***REMOVED***
+}
 
-type PacketMreq struct ***REMOVED***
+type PacketMreq struct {
 	Ifindex int32
 	Type    uint16
 	Alen    uint16
 	Address [8]uint8
-***REMOVED***
+}
 
-type Msghdr struct ***REMOVED***
+type Msghdr struct {
 	Name       *byte
 	Namelen    uint32
 	Pad_cgo_0  [4]byte
@@ -304,41 +304,41 @@ type Msghdr struct ***REMOVED***
 	Controllen uint64
 	Flags      int32
 	Pad_cgo_1  [4]byte
-***REMOVED***
+}
 
-type Cmsghdr struct ***REMOVED***
+type Cmsghdr struct {
 	Len   uint64
 	Level int32
 	Type  int32
-***REMOVED***
+}
 
-type Inet4Pktinfo struct ***REMOVED***
+type Inet4Pktinfo struct {
 	Ifindex  int32
 	Spec_dst [4]byte /* in_addr */
 	Addr     [4]byte /* in_addr */
-***REMOVED***
+}
 
-type Inet6Pktinfo struct ***REMOVED***
+type Inet6Pktinfo struct {
 	Addr    [16]byte /* in6_addr */
 	Ifindex uint32
-***REMOVED***
+}
 
-type IPv6MTUInfo struct ***REMOVED***
+type IPv6MTUInfo struct {
 	Addr RawSockaddrInet6
 	Mtu  uint32
-***REMOVED***
+}
 
-type ICMPv6Filter struct ***REMOVED***
+type ICMPv6Filter struct {
 	Data [8]uint32
-***REMOVED***
+}
 
-type Ucred struct ***REMOVED***
+type Ucred struct {
 	Pid int32
 	Uid uint32
 	Gid uint32
-***REMOVED***
+}
 
-type TCPInfo struct ***REMOVED***
+type TCPInfo struct {
 	State          uint8
 	Ca_state       uint8
 	Retransmits    uint8
@@ -370,7 +370,7 @@ type TCPInfo struct ***REMOVED***
 	Rcv_rtt        uint32
 	Rcv_space      uint32
 	Total_retrans  uint32
-***REMOVED***
+}
 
 const (
 	SizeofSockaddrInet4     = 0x10
@@ -493,51 +493,51 @@ const (
 	SizeofRtNexthop     = 0x8
 )
 
-type NlMsghdr struct ***REMOVED***
+type NlMsghdr struct {
 	Len   uint32
 	Type  uint16
 	Flags uint16
 	Seq   uint32
 	Pid   uint32
-***REMOVED***
+}
 
-type NlMsgerr struct ***REMOVED***
+type NlMsgerr struct {
 	Error int32
 	Msg   NlMsghdr
-***REMOVED***
+}
 
-type RtGenmsg struct ***REMOVED***
+type RtGenmsg struct {
 	Family uint8
-***REMOVED***
+}
 
-type NlAttr struct ***REMOVED***
+type NlAttr struct {
 	Len  uint16
 	Type uint16
-***REMOVED***
+}
 
-type RtAttr struct ***REMOVED***
+type RtAttr struct {
 	Len  uint16
 	Type uint16
-***REMOVED***
+}
 
-type IfInfomsg struct ***REMOVED***
+type IfInfomsg struct {
 	Family     uint8
 	X__ifi_pad uint8
 	Type       uint16
 	Index      int32
 	Flags      uint32
 	Change     uint32
-***REMOVED***
+}
 
-type IfAddrmsg struct ***REMOVED***
+type IfAddrmsg struct {
 	Family    uint8
 	Prefixlen uint8
 	Flags     uint8
 	Scope     uint8
 	Index     uint32
-***REMOVED***
+}
 
-type RtMsg struct ***REMOVED***
+type RtMsg struct {
 	Family   uint8
 	Dst_len  uint8
 	Src_len  uint8
@@ -547,43 +547,43 @@ type RtMsg struct ***REMOVED***
 	Scope    uint8
 	Type     uint8
 	Flags    uint32
-***REMOVED***
+}
 
-type RtNexthop struct ***REMOVED***
+type RtNexthop struct {
 	Len     uint16
 	Flags   uint8
 	Hops    uint8
 	Ifindex int32
-***REMOVED***
+}
 
 const (
 	SizeofSockFilter = 0x8
 	SizeofSockFprog  = 0x10
 )
 
-type SockFilter struct ***REMOVED***
+type SockFilter struct {
 	Code uint16
 	Jt   uint8
 	Jf   uint8
 	K    uint32
-***REMOVED***
+}
 
-type SockFprog struct ***REMOVED***
+type SockFprog struct {
 	Len       uint16
 	Pad_cgo_0 [6]byte
 	Filter    *SockFilter
-***REMOVED***
+}
 
-type InotifyEvent struct ***REMOVED***
+type InotifyEvent struct {
 	Wd     int32
 	Mask   uint32
 	Cookie uint32
 	Len    uint32
-***REMOVED***
+}
 
 const SizeofInotifyEvent = 0x10
 
-type PtraceRegs struct ***REMOVED***
+type PtraceRegs struct {
 	R15      uint64
 	R14      uint64
 	R13      uint64
@@ -611,13 +611,13 @@ type PtraceRegs struct ***REMOVED***
 	Es       uint64
 	Fs       uint64
 	Gs       uint64
-***REMOVED***
+}
 
-type FdSet struct ***REMOVED***
+type FdSet struct {
 	Bits [16]int64
-***REMOVED***
+}
 
-type Sysinfo_t struct ***REMOVED***
+type Sysinfo_t struct {
 	Uptime    int64
 	Loads     [3]uint64
 	Totalram  uint64
@@ -634,31 +634,31 @@ type Sysinfo_t struct ***REMOVED***
 	Unit      uint32
 	X_f       [0]int8
 	Pad_cgo_1 [4]byte
-***REMOVED***
+}
 
-type Utsname struct ***REMOVED***
+type Utsname struct {
 	Sysname    [65]byte
 	Nodename   [65]byte
 	Release    [65]byte
 	Version    [65]byte
 	Machine    [65]byte
 	Domainname [65]byte
-***REMOVED***
+}
 
-type Ustat_t struct ***REMOVED***
+type Ustat_t struct {
 	Tfree     int32
 	Pad_cgo_0 [4]byte
 	Tinode    uint64
 	Fname     [6]int8
 	Fpack     [6]int8
 	Pad_cgo_1 [4]byte
-***REMOVED***
+}
 
-type EpollEvent struct ***REMOVED***
+type EpollEvent struct {
 	Events uint32
 	Fd     int32
 	Pad    int32
-***REMOVED***
+}
 
 const (
 	AT_FDCWD            = -0x64
@@ -667,11 +667,11 @@ const (
 	AT_SYMLINK_NOFOLLOW = 0x100
 )
 
-type PollFd struct ***REMOVED***
+type PollFd struct {
 	Fd      int32
 	Events  int16
 	Revents int16
-***REMOVED***
+}
 
 const (
 	POLLIN    = 0x1
@@ -683,15 +683,15 @@ const (
 	POLLNVAL  = 0x20
 )
 
-type Sigset_t struct ***REMOVED***
+type Sigset_t struct {
 	X__val [16]uint64
-***REMOVED***
+}
 
 const RNDGETENTCNT = 0x80045200
 
 const PERF_IOC_FLAG_GROUP = 0x1
 
-type Termios struct ***REMOVED***
+type Termios struct {
 	Iflag  uint32
 	Oflag  uint32
 	Cflag  uint32
@@ -700,16 +700,16 @@ type Termios struct ***REMOVED***
 	Cc     [19]uint8
 	Ispeed uint32
 	Ospeed uint32
-***REMOVED***
+}
 
-type Winsize struct ***REMOVED***
+type Winsize struct {
 	Row    uint16
 	Col    uint16
 	Xpixel uint16
 	Ypixel uint16
-***REMOVED***
+}
 
-type Taskstats struct ***REMOVED***
+type Taskstats struct {
 	Version                   uint16
 	Pad_cgo_0                 [2]byte
 	Ac_exitcode               uint32
@@ -757,7 +757,7 @@ type Taskstats struct ***REMOVED***
 	Cpu_scaled_run_real_total uint64
 	Freepages_count           uint64
 	Freepages_delay_total     uint64
-***REMOVED***
+}
 
 const (
 	TASKSTATS_CMD_UNSPEC                  = 0x0
@@ -777,11 +777,11 @@ const (
 	TASKSTATS_CMD_ATTR_DEREGISTER_CPUMASK = 0x4
 )
 
-type Genlmsghdr struct ***REMOVED***
+type Genlmsghdr struct {
 	Cmd      uint8
 	Version  uint8
 	Reserved uint16
-***REMOVED***
+}
 
 const (
 	CTRL_CMD_UNSPEC            = 0x0

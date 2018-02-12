@@ -15,80 +15,80 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestNodeListError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestNodeListError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
-	***REMOVED***
+	}
 
-	_, err := client.NodeList(context.Background(), types.NodeListOptions***REMOVED******REMOVED***)
-	if err == nil || err.Error() != "Error response from daemon: Server error" ***REMOVED***
+	_, err := client.NodeList(context.Background(), types.NodeListOptions{})
+	if err == nil || err.Error() != "Error response from daemon: Server error" {
 		t.Fatalf("expected a Server Error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestNodeList(t *testing.T) ***REMOVED***
+func TestNodeList(t *testing.T) {
 	expectedURL := "/nodes"
 
 	filters := filters.NewArgs()
 	filters.Add("label", "label1")
 	filters.Add("label", "label2")
 
-	listCases := []struct ***REMOVED***
+	listCases := []struct {
 		options             types.NodeListOptions
 		expectedQueryParams map[string]string
-	***REMOVED******REMOVED***
-		***REMOVED***
-			options: types.NodeListOptions***REMOVED******REMOVED***,
-			expectedQueryParams: map[string]string***REMOVED***
+	}{
+		{
+			options: types.NodeListOptions{},
+			expectedQueryParams: map[string]string{
 				"filters": "",
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			options: types.NodeListOptions***REMOVED***
+			},
+		},
+		{
+			options: types.NodeListOptions{
 				Filters: filters,
-			***REMOVED***,
-			expectedQueryParams: map[string]string***REMOVED***
-				"filters": `***REMOVED***"label":***REMOVED***"label1":true,"label2":true***REMOVED******REMOVED***`,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
-	for _, listCase := range listCases ***REMOVED***
-		client := &Client***REMOVED***
-			client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-				if !strings.HasPrefix(req.URL.Path, expectedURL) ***REMOVED***
+			},
+			expectedQueryParams: map[string]string{
+				"filters": `{"label":{"label1":true,"label2":true}}`,
+			},
+		},
+	}
+	for _, listCase := range listCases {
+		client := &Client{
+			client: newMockClient(func(req *http.Request) (*http.Response, error) {
+				if !strings.HasPrefix(req.URL.Path, expectedURL) {
 					return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, req.URL)
-				***REMOVED***
+				}
 				query := req.URL.Query()
-				for key, expected := range listCase.expectedQueryParams ***REMOVED***
+				for key, expected := range listCase.expectedQueryParams {
 					actual := query.Get(key)
-					if actual != expected ***REMOVED***
+					if actual != expected {
 						return nil, fmt.Errorf("%s not set in URL query properly. Expected '%s', got %s", key, expected, actual)
-					***REMOVED***
-				***REMOVED***
-				content, err := json.Marshal([]swarm.Node***REMOVED***
-					***REMOVED***
+					}
+				}
+				content, err := json.Marshal([]swarm.Node{
+					{
 						ID: "node_id1",
-					***REMOVED***,
-					***REMOVED***
+					},
+					{
 						ID: "node_id2",
-					***REMOVED***,
-				***REMOVED***)
-				if err != nil ***REMOVED***
+					},
+				})
+				if err != nil {
 					return nil, err
-				***REMOVED***
-				return &http.Response***REMOVED***
+				}
+				return &http.Response{
 					StatusCode: http.StatusOK,
 					Body:       ioutil.NopCloser(bytes.NewReader(content)),
-				***REMOVED***, nil
-			***REMOVED***),
-		***REMOVED***
+				}, nil
+			}),
+		}
 
 		nodes, err := client.NodeList(context.Background(), listCase.options)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
-		if len(nodes) != 2 ***REMOVED***
+		}
+		if len(nodes) != 2 {
 			t.Fatalf("expected 2 nodes, got %v", nodes)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

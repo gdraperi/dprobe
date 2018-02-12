@@ -5,17 +5,17 @@ import (
 )
 
 // Endpoint represents an endpoint.
-type Endpoint struct ***REMOVED***
+type Endpoint struct {
 	Spec       EndpointSpec        `json:",omitempty"`
 	Ports      []PortConfig        `json:",omitempty"`
 	VirtualIPs []EndpointVirtualIP `json:",omitempty"`
-***REMOVED***
+}
 
 // EndpointSpec represents the spec of an endpoint.
-type EndpointSpec struct ***REMOVED***
+type EndpointSpec struct {
 	Mode  ResolutionMode `json:",omitempty"`
 	Ports []PortConfig   `json:",omitempty"`
-***REMOVED***
+}
 
 // ResolutionMode represents a resolution mode.
 type ResolutionMode string
@@ -28,7 +28,7 @@ const (
 )
 
 // PortConfig represents the config of a port.
-type PortConfig struct ***REMOVED***
+type PortConfig struct {
 	Name     string             `json:",omitempty"`
 	Protocol PortConfigProtocol `json:",omitempty"`
 	// TargetPort is the port inside the container
@@ -37,7 +37,7 @@ type PortConfig struct ***REMOVED***
 	PublishedPort uint32 `json:",omitempty"`
 	// PublishMode is the mode in which port is published
 	PublishMode PortConfigPublishMode `json:",omitempty"`
-***REMOVED***
+}
 
 // PortConfigPublishMode represents the mode in which the port is to
 // be published.
@@ -65,22 +65,22 @@ const (
 )
 
 // EndpointVirtualIP represents the virtual ip of a port.
-type EndpointVirtualIP struct ***REMOVED***
+type EndpointVirtualIP struct {
 	NetworkID string `json:",omitempty"`
 	Addr      string `json:",omitempty"`
-***REMOVED***
+}
 
 // Network represents a network.
-type Network struct ***REMOVED***
+type Network struct {
 	ID string
 	Meta
 	Spec        NetworkSpec  `json:",omitempty"`
 	DriverState Driver       `json:",omitempty"`
 	IPAMOptions *IPAMOptions `json:",omitempty"`
-***REMOVED***
+}
 
 // NetworkSpec represents the spec of a network.
-type NetworkSpec struct ***REMOVED***
+type NetworkSpec struct {
 	Annotations
 	DriverConfiguration *Driver                  `json:",omitempty"`
 	IPv6Enabled         bool                     `json:",omitempty"`
@@ -90,30 +90,30 @@ type NetworkSpec struct ***REMOVED***
 	IPAMOptions         *IPAMOptions             `json:",omitempty"`
 	ConfigFrom          *network.ConfigReference `json:",omitempty"`
 	Scope               string                   `json:",omitempty"`
-***REMOVED***
+}
 
 // NetworkAttachmentConfig represents the configuration of a network attachment.
-type NetworkAttachmentConfig struct ***REMOVED***
+type NetworkAttachmentConfig struct {
 	Target     string            `json:",omitempty"`
 	Aliases    []string          `json:",omitempty"`
 	DriverOpts map[string]string `json:",omitempty"`
-***REMOVED***
+}
 
 // NetworkAttachment represents a network attachment.
-type NetworkAttachment struct ***REMOVED***
+type NetworkAttachment struct {
 	Network   Network  `json:",omitempty"`
 	Addresses []string `json:",omitempty"`
-***REMOVED***
+}
 
 // IPAMOptions represents ipam options.
-type IPAMOptions struct ***REMOVED***
+type IPAMOptions struct {
 	Driver  Driver       `json:",omitempty"`
 	Configs []IPAMConfig `json:",omitempty"`
-***REMOVED***
+}
 
 // IPAMConfig represents ipam configuration.
-type IPAMConfig struct ***REMOVED***
+type IPAMConfig struct {
 	Subnet  string `json:",omitempty"`
 	Range   string `json:",omitempty"`
 	Gateway string `json:",omitempty"`
-***REMOVED***
+}

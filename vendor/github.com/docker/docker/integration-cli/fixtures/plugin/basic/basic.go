@@ -8,27 +8,27 @@ import (
 	"path/filepath"
 )
 
-func main() ***REMOVED***
+func main() {
 	p, err := filepath.Abs(filepath.Join("run", "docker", "plugins"))
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
-	if err := os.MkdirAll(p, 0755); err != nil ***REMOVED***
+	}
+	if err := os.MkdirAll(p, 0755); err != nil {
 		panic(err)
-	***REMOVED***
+	}
 	l, err := net.Listen("unix", filepath.Join(p, "basic.sock"))
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 
 	mux := http.NewServeMux()
-	server := http.Server***REMOVED***
+	server := http.Server{
 		Addr:    l.Addr().String(),
 		Handler: http.NewServeMux(),
-	***REMOVED***
-	mux.HandleFunc("/Plugin.Activate", func(w http.ResponseWriter, r *http.Request) ***REMOVED***
+	}
+	mux.HandleFunc("/Plugin.Activate", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/vnd.docker.plugins.v1.1+json")
-		fmt.Println(w, `***REMOVED***"Implements": ["dummy"]***REMOVED***`)
-	***REMOVED***)
+		fmt.Println(w, `{"Implements": ["dummy"]}`)
+	})
 	server.Serve(l)
-***REMOVED***
+}

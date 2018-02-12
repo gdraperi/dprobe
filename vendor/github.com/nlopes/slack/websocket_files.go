@@ -1,13 +1,13 @@
 package slack
 
 // FileActionEvent represents the File action event
-type fileActionEvent struct ***REMOVED***
+type fileActionEvent struct {
 	Type           string `json:"type"`
 	EventTimestamp string `json:"event_ts"`
 	File           File   `json:"file"`
 	// FileID is used for FileDeletedEvent
 	FileID string `json:"file_id,omitempty"`
-***REMOVED***
+}
 
 // FileCreatedEvent represents the File created event
 type FileCreatedEvent fileActionEvent
@@ -31,19 +31,19 @@ type FileDeletedEvent fileActionEvent
 type FilePrivateEvent fileActionEvent
 
 // FileCommentAddedEvent represents the File comment added event
-type FileCommentAddedEvent struct ***REMOVED***
+type FileCommentAddedEvent struct {
 	fileActionEvent
 	Comment Comment `json:"comment"`
-***REMOVED***
+}
 
 // FileCommentEditedEvent represents the File comment edited event
-type FileCommentEditedEvent struct ***REMOVED***
+type FileCommentEditedEvent struct {
 	fileActionEvent
 	Comment Comment `json:"comment"`
-***REMOVED***
+}
 
 // FileCommentDeletedEvent represents the File comment deleted event
-type FileCommentDeletedEvent struct ***REMOVED***
+type FileCommentDeletedEvent struct {
 	fileActionEvent
 	Comment string `json:"comment"`
-***REMOVED***
+}

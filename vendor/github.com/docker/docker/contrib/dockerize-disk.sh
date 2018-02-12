@@ -6,13 +6,13 @@ if ! command -v qemu-nbd &> /dev/null; then
   exit 1
 fi
 
-usage() ***REMOVED***
+usage() {
   echo "Convert disk image to docker image"
   echo ""
   echo "usage: $0 image-name disk-image-file [ base-image ]"
   echo "   ie: $0 cirros:0.3.3 cirros-0.3.3-x86_64-disk.img"
   echo "       $0 ubuntu:cloud ubuntu-14.04-server-cloudimg-amd64-disk1.img ubuntu:14.04"
-***REMOVED***
+}
 
 if [ "$#" -lt 2 ]; then
   usage
@@ -21,8 +21,8 @@ fi
 
 CURDIR=$(pwd)
 
-image_name="$***REMOVED***1%:****REMOVED***"
-image_tag="$***REMOVED***1#*:***REMOVED***"
+image_name="${1%:*}"
+image_tag="${1#*:}"
 if [ "$image_tag" == "$1" ]; then
   image_tag="latest"
 fi
@@ -34,19 +34,19 @@ block_device=/dev/nbd0
 
 builddir=$(mktemp -d)
 
-cleanup() ***REMOVED***
+cleanup() {
   umount "$builddir/disk_image" || true
   umount "$builddir/workdir" || true
   qemu-nbd -d $block_device &> /dev/null || true
   rm -rf $builddir
-***REMOVED***
+}
 trap cleanup EXIT
 
 # Mount disk image
 modprobe nbd max_part=63
-qemu-nbd -rc $***REMOVED***block_device***REMOVED*** -P 1 "$disk_image_file"
+qemu-nbd -rc ${block_device} -P 1 "$disk_image_file"
 mkdir "$builddir/disk_image"
-mount -o ro $***REMOVED***block_device***REMOVED*** "$builddir/disk_image"
+mount -o ro ${block_device} "$builddir/disk_image"
 
 mkdir "$builddir/workdir"
 mkdir "$builddir/diff"
@@ -59,18 +59,18 @@ if [ -n "$docker_base_image" ]; then
   docker pull "$docker_base_image"
   docker save "$docker_base_image" | tar -xC "$builddir/base"
 
-  image_id=$(docker inspect -f "***REMOVED******REMOVED***.Id***REMOVED******REMOVED***" "$docker_base_image")
+  image_id=$(docker inspect -f "{{.Id}}" "$docker_base_image")
   while [ -n "$image_id" ]; do
     mkdir -p "$builddir/base/$image_id/layer"
     tar -xf "$builddir/base/$image_id/layer.tar" -C "$builddir/base/$image_id/layer"
 
-    base_image_mounts="$***REMOVED***base_image_mounts***REMOVED***:$builddir/base/$image_id/layer=ro+wh"
-    image_id=$(docker inspect -f "***REMOVED******REMOVED***.Parent***REMOVED******REMOVED***" "$image_id")
+    base_image_mounts="${base_image_mounts}:$builddir/base/$image_id/layer=ro+wh"
+    image_id=$(docker inspect -f "{{.Parent}}" "$image_id")
   done
 fi
 
 # Mount work directory
-mount -t aufs -o "br=$builddir/diff=rw$***REMOVED***base_image_mounts***REMOVED***,dio,xino=/dev/shm/aufs.xino" none "$builddir/workdir"
+mount -t aufs -o "br=$builddir/diff=rw${base_image_mounts},dio,xino=/dev/shm/aufs.xino" none "$builddir/workdir"
 
 # Update files
 cd $builddir
@@ -97,19 +97,19 @@ cd diff
 tar -cf $builddir/result/$new_image_id/layer.tar *
 echo "1.0" > $builddir/result/$new_image_id/VERSION
 cat > $builddir/result/$new_image_id/json <<-EOS
-***REMOVED*** "docker_version": "1.4.1"
+{ "docker_version": "1.4.1"
 , "id": "$new_image_id"
 , "created": "$(date -u +%Y-%m-%dT%H:%M:%S.%NZ)"
 EOS
 
 if [ -n "$docker_base_image" ]; then
-  image_id=$(docker inspect -f "***REMOVED******REMOVED***.Id***REMOVED******REMOVED***" "$docker_base_image")
+  image_id=$(docker inspect -f "{{.Id}}" "$docker_base_image")
   echo ", \"parent\": \"$image_id\"" >> $builddir/result/$new_image_id/json
 fi
 
-echo "***REMOVED***" >> $builddir/result/$new_image_id/json
+echo "}" >> $builddir/result/$new_image_id/json
 
-echo "***REMOVED***\"$image_name\":***REMOVED***\"$image_tag\":\"$new_image_id\"***REMOVED******REMOVED***" > $builddir/result/repositories
+echo "{\"$image_name\":{\"$image_tag\":\"$new_image_id\"}}" > $builddir/result/repositories
 
 cd $builddir/result
 

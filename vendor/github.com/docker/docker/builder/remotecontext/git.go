@@ -10,26 +10,26 @@ import (
 )
 
 // MakeGitContext returns a Context from gitURL that is cloned in a temporary directory.
-func MakeGitContext(gitURL string) (builder.Source, error) ***REMOVED***
+func MakeGitContext(gitURL string) (builder.Source, error) {
 	root, err := git.Clone(gitURL)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	c, err := archive.Tar(root, archive.Uncompressed)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	defer func() ***REMOVED***
+	defer func() {
 		err := c.Close()
-		if err != nil ***REMOVED***
+		if err != nil {
 			logrus.WithField("action", "MakeGitContext").WithField("module", "builder").WithField("url", gitURL).WithError(err).Error("error while closing git context")
-		***REMOVED***
+		}
 		err = os.RemoveAll(root)
-		if err != nil ***REMOVED***
+		if err != nil {
 			logrus.WithField("action", "MakeGitContext").WithField("module", "builder").WithField("url", gitURL).WithError(err).Error("error while removing path and children of root")
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 	return FromArchive(c)
-***REMOVED***
+}

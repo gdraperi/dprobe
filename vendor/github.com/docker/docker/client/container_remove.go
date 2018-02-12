@@ -8,20 +8,20 @@ import (
 )
 
 // ContainerRemove kills and removes a container from the docker host.
-func (cli *Client) ContainerRemove(ctx context.Context, containerID string, options types.ContainerRemoveOptions) error ***REMOVED***
-	query := url.Values***REMOVED******REMOVED***
-	if options.RemoveVolumes ***REMOVED***
+func (cli *Client) ContainerRemove(ctx context.Context, containerID string, options types.ContainerRemoveOptions) error {
+	query := url.Values{}
+	if options.RemoveVolumes {
 		query.Set("v", "1")
-	***REMOVED***
-	if options.RemoveLinks ***REMOVED***
+	}
+	if options.RemoveLinks {
 		query.Set("link", "1")
-	***REMOVED***
+	}
 
-	if options.Force ***REMOVED***
+	if options.Force {
 		query.Set("force", "1")
-	***REMOVED***
+	}
 
 	resp, err := cli.delete(ctx, "/containers/"+containerID, query, nil)
 	ensureReaderClosed(resp)
 	return wrapResponseError(err, resp, "container", containerID)
-***REMOVED***
+}

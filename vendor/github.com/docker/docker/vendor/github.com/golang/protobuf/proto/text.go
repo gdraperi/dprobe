@@ -51,134 +51,134 @@ var (
 	newline         = []byte("\n")
 	spaces          = []byte("                                        ")
 	gtNewline       = []byte(">\n")
-	endBraceNewline = []byte("***REMOVED***\n")
-	backslashN      = []byte***REMOVED***'\\', 'n'***REMOVED***
-	backslashR      = []byte***REMOVED***'\\', 'r'***REMOVED***
-	backslashT      = []byte***REMOVED***'\\', 't'***REMOVED***
-	backslashDQ     = []byte***REMOVED***'\\', '"'***REMOVED***
-	backslashBS     = []byte***REMOVED***'\\', '\\'***REMOVED***
+	endBraceNewline = []byte("}\n")
+	backslashN      = []byte{'\\', 'n'}
+	backslashR      = []byte{'\\', 'r'}
+	backslashT      = []byte{'\\', 't'}
+	backslashDQ     = []byte{'\\', '"'}
+	backslashBS     = []byte{'\\', '\\'}
 	posInf          = []byte("inf")
 	negInf          = []byte("-inf")
 	nan             = []byte("nan")
 )
 
-type writer interface ***REMOVED***
+type writer interface {
 	io.Writer
 	WriteByte(byte) error
-***REMOVED***
+}
 
 // textWriter is an io.Writer that tracks its indentation level.
-type textWriter struct ***REMOVED***
+type textWriter struct {
 	ind      int
 	complete bool // if the current position is a complete line
 	compact  bool // whether to write out as a one-liner
 	w        writer
-***REMOVED***
+}
 
-func (w *textWriter) WriteString(s string) (n int, err error) ***REMOVED***
-	if !strings.Contains(s, "\n") ***REMOVED***
-		if !w.compact && w.complete ***REMOVED***
+func (w *textWriter) WriteString(s string) (n int, err error) {
+	if !strings.Contains(s, "\n") {
+		if !w.compact && w.complete {
 			w.writeIndent()
-		***REMOVED***
+		}
 		w.complete = false
 		return io.WriteString(w.w, s)
-	***REMOVED***
+	}
 	// WriteString is typically called without newlines, so this
 	// codepath and its copy are rare.  We copy to avoid
 	// duplicating all of Write's logic here.
 	return w.Write([]byte(s))
-***REMOVED***
+}
 
-func (w *textWriter) Write(p []byte) (n int, err error) ***REMOVED***
+func (w *textWriter) Write(p []byte) (n int, err error) {
 	newlines := bytes.Count(p, newline)
-	if newlines == 0 ***REMOVED***
-		if !w.compact && w.complete ***REMOVED***
+	if newlines == 0 {
+		if !w.compact && w.complete {
 			w.writeIndent()
-		***REMOVED***
+		}
 		n, err = w.w.Write(p)
 		w.complete = false
 		return n, err
-	***REMOVED***
+	}
 
 	frags := bytes.SplitN(p, newline, newlines+1)
-	if w.compact ***REMOVED***
-		for i, frag := range frags ***REMOVED***
-			if i > 0 ***REMOVED***
-				if err := w.w.WriteByte(' '); err != nil ***REMOVED***
+	if w.compact {
+		for i, frag := range frags {
+			if i > 0 {
+				if err := w.w.WriteByte(' '); err != nil {
 					return n, err
-				***REMOVED***
+				}
 				n++
-			***REMOVED***
+			}
 			nn, err := w.w.Write(frag)
 			n += nn
-			if err != nil ***REMOVED***
+			if err != nil {
 				return n, err
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		return n, nil
-	***REMOVED***
+	}
 
-	for i, frag := range frags ***REMOVED***
-		if w.complete ***REMOVED***
+	for i, frag := range frags {
+		if w.complete {
 			w.writeIndent()
-		***REMOVED***
+		}
 		nn, err := w.w.Write(frag)
 		n += nn
-		if err != nil ***REMOVED***
+		if err != nil {
 			return n, err
-		***REMOVED***
-		if i+1 < len(frags) ***REMOVED***
-			if err := w.w.WriteByte('\n'); err != nil ***REMOVED***
+		}
+		if i+1 < len(frags) {
+			if err := w.w.WriteByte('\n'); err != nil {
 				return n, err
-			***REMOVED***
+			}
 			n++
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	w.complete = len(frags[len(frags)-1]) == 0
 	return n, nil
-***REMOVED***
+}
 
-func (w *textWriter) WriteByte(c byte) error ***REMOVED***
-	if w.compact && c == '\n' ***REMOVED***
+func (w *textWriter) WriteByte(c byte) error {
+	if w.compact && c == '\n' {
 		c = ' '
-	***REMOVED***
-	if !w.compact && w.complete ***REMOVED***
+	}
+	if !w.compact && w.complete {
 		w.writeIndent()
-	***REMOVED***
+	}
 	err := w.w.WriteByte(c)
 	w.complete = c == '\n'
 	return err
-***REMOVED***
+}
 
-func (w *textWriter) indent() ***REMOVED*** w.ind++ ***REMOVED***
+func (w *textWriter) indent() { w.ind++ }
 
-func (w *textWriter) unindent() ***REMOVED***
-	if w.ind == 0 ***REMOVED***
+func (w *textWriter) unindent() {
+	if w.ind == 0 {
 		log.Print("proto: textWriter unindented too far")
 		return
-	***REMOVED***
+	}
 	w.ind--
-***REMOVED***
+}
 
-func writeName(w *textWriter, props *Properties) error ***REMOVED***
-	if _, err := w.WriteString(props.OrigName); err != nil ***REMOVED***
+func writeName(w *textWriter, props *Properties) error {
+	if _, err := w.WriteString(props.OrigName); err != nil {
 		return err
-	***REMOVED***
-	if props.Wire != "group" ***REMOVED***
+	}
+	if props.Wire != "group" {
 		return w.WriteByte(':')
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // raw is the interface satisfied by RawMessage.
-type raw interface ***REMOVED***
+type raw interface {
 	Bytes() []byte
-***REMOVED***
+}
 
-func requiresQuotes(u string) bool ***REMOVED***
+func requiresQuotes(u string) bool {
 	// When type URL contains any characters except [0-9A-Za-z./\-]*, it must be quoted.
-	for _, ch := range u ***REMOVED***
-		switch ***REMOVED***
+	for _, ch := range u {
+		switch {
 		case ch == '.' || ch == '/' || ch == '_':
 			continue
 		case '0' <= ch && ch <= '9':
@@ -189,19 +189,19 @@ func requiresQuotes(u string) bool ***REMOVED***
 			continue
 		default:
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false
-***REMOVED***
+}
 
 // isAny reports whether sv is a google.protobuf.Any message
-func isAny(sv reflect.Value) bool ***REMOVED***
-	type wkt interface ***REMOVED***
+func isAny(sv reflect.Value) bool {
+	type wkt interface {
 		XXX_WellKnownType() string
-	***REMOVED***
+	}
 	t, ok := sv.Addr().Interface().(wkt)
 	return ok && t.XXX_WellKnownType() == "Any"
-***REMOVED***
+}
 
 // writeProto3Any writes an expanded google.protobuf.Any message.
 //
@@ -210,206 +210,206 @@ func isAny(sv reflect.Value) bool ***REMOVED***
 //
 // It returns (true, error) when sv was written in expanded format or an error
 // was encountered.
-func (tm *TextMarshaler) writeProto3Any(w *textWriter, sv reflect.Value) (bool, error) ***REMOVED***
+func (tm *TextMarshaler) writeProto3Any(w *textWriter, sv reflect.Value) (bool, error) {
 	turl := sv.FieldByName("TypeUrl")
 	val := sv.FieldByName("Value")
-	if !turl.IsValid() || !val.IsValid() ***REMOVED***
+	if !turl.IsValid() || !val.IsValid() {
 		return true, errors.New("proto: invalid google.protobuf.Any message")
-	***REMOVED***
+	}
 
 	b, ok := val.Interface().([]byte)
-	if !ok ***REMOVED***
+	if !ok {
 		return true, errors.New("proto: invalid google.protobuf.Any message")
-	***REMOVED***
+	}
 
 	parts := strings.Split(turl.String(), "/")
 	mt := MessageType(parts[len(parts)-1])
-	if mt == nil ***REMOVED***
+	if mt == nil {
 		return false, nil
-	***REMOVED***
+	}
 	m := reflect.New(mt.Elem())
-	if err := Unmarshal(b, m.Interface().(Message)); err != nil ***REMOVED***
+	if err := Unmarshal(b, m.Interface().(Message)); err != nil {
 		return false, nil
-	***REMOVED***
+	}
 	w.Write([]byte("["))
 	u := turl.String()
-	if requiresQuotes(u) ***REMOVED***
+	if requiresQuotes(u) {
 		writeString(w, u)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		w.Write([]byte(u))
-	***REMOVED***
-	if w.compact ***REMOVED***
+	}
+	if w.compact {
 		w.Write([]byte("]:<"))
-	***REMOVED*** else ***REMOVED***
+	} else {
 		w.Write([]byte("]: <\n"))
 		w.ind++
-	***REMOVED***
-	if err := tm.writeStruct(w, m.Elem()); err != nil ***REMOVED***
+	}
+	if err := tm.writeStruct(w, m.Elem()); err != nil {
 		return true, err
-	***REMOVED***
-	if w.compact ***REMOVED***
+	}
+	if w.compact {
 		w.Write([]byte("> "))
-	***REMOVED*** else ***REMOVED***
+	} else {
 		w.ind--
 		w.Write([]byte(">\n"))
-	***REMOVED***
+	}
 	return true, nil
-***REMOVED***
+}
 
-func (tm *TextMarshaler) writeStruct(w *textWriter, sv reflect.Value) error ***REMOVED***
-	if tm.ExpandAny && isAny(sv) ***REMOVED***
-		if canExpand, err := tm.writeProto3Any(w, sv); canExpand ***REMOVED***
+func (tm *TextMarshaler) writeStruct(w *textWriter, sv reflect.Value) error {
+	if tm.ExpandAny && isAny(sv) {
+		if canExpand, err := tm.writeProto3Any(w, sv); canExpand {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	st := sv.Type()
 	sprops := GetProperties(st)
-	for i := 0; i < sv.NumField(); i++ ***REMOVED***
+	for i := 0; i < sv.NumField(); i++ {
 		fv := sv.Field(i)
 		props := sprops.Prop[i]
 		name := st.Field(i).Name
 
-		if strings.HasPrefix(name, "XXX_") ***REMOVED***
+		if strings.HasPrefix(name, "XXX_") {
 			// There are two XXX_ fields:
 			//   XXX_unrecognized []byte
 			//   XXX_extensions   map[int32]proto.Extension
 			// The first is handled here;
 			// the second is handled at the bottom of this function.
-			if name == "XXX_unrecognized" && !fv.IsNil() ***REMOVED***
-				if err := writeUnknownStruct(w, fv.Interface().([]byte)); err != nil ***REMOVED***
+			if name == "XXX_unrecognized" && !fv.IsNil() {
+				if err := writeUnknownStruct(w, fv.Interface().([]byte)); err != nil {
 					return err
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			continue
-		***REMOVED***
-		if fv.Kind() == reflect.Ptr && fv.IsNil() ***REMOVED***
+		}
+		if fv.Kind() == reflect.Ptr && fv.IsNil() {
 			// Field not filled in. This could be an optional field or
 			// a required field that wasn't filled in. Either way, there
 			// isn't anything we can show for it.
 			continue
-		***REMOVED***
-		if fv.Kind() == reflect.Slice && fv.IsNil() ***REMOVED***
+		}
+		if fv.Kind() == reflect.Slice && fv.IsNil() {
 			// Repeated field that is empty, or a bytes field that is unused.
 			continue
-		***REMOVED***
+		}
 
-		if props.Repeated && fv.Kind() == reflect.Slice ***REMOVED***
+		if props.Repeated && fv.Kind() == reflect.Slice {
 			// Repeated field.
-			for j := 0; j < fv.Len(); j++ ***REMOVED***
-				if err := writeName(w, props); err != nil ***REMOVED***
+			for j := 0; j < fv.Len(); j++ {
+				if err := writeName(w, props); err != nil {
 					return err
-				***REMOVED***
-				if !w.compact ***REMOVED***
-					if err := w.WriteByte(' '); err != nil ***REMOVED***
+				}
+				if !w.compact {
+					if err := w.WriteByte(' '); err != nil {
 						return err
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				v := fv.Index(j)
-				if v.Kind() == reflect.Ptr && v.IsNil() ***REMOVED***
+				if v.Kind() == reflect.Ptr && v.IsNil() {
 					// A nil message in a repeated field is not valid,
 					// but we can handle that more gracefully than panicking.
-					if _, err := w.Write([]byte("<nil>\n")); err != nil ***REMOVED***
+					if _, err := w.Write([]byte("<nil>\n")); err != nil {
 						return err
-					***REMOVED***
+					}
 					continue
-				***REMOVED***
-				if err := tm.writeAny(w, v, props); err != nil ***REMOVED***
+				}
+				if err := tm.writeAny(w, v, props); err != nil {
 					return err
-				***REMOVED***
-				if err := w.WriteByte('\n'); err != nil ***REMOVED***
+				}
+				if err := w.WriteByte('\n'); err != nil {
 					return err
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			continue
-		***REMOVED***
-		if fv.Kind() == reflect.Map ***REMOVED***
+		}
+		if fv.Kind() == reflect.Map {
 			// Map fields are rendered as a repeated struct with key/value fields.
 			keys := fv.MapKeys()
 			sort.Sort(mapKeys(keys))
-			for _, key := range keys ***REMOVED***
+			for _, key := range keys {
 				val := fv.MapIndex(key)
-				if err := writeName(w, props); err != nil ***REMOVED***
+				if err := writeName(w, props); err != nil {
 					return err
-				***REMOVED***
-				if !w.compact ***REMOVED***
-					if err := w.WriteByte(' '); err != nil ***REMOVED***
+				}
+				if !w.compact {
+					if err := w.WriteByte(' '); err != nil {
 						return err
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				// open struct
-				if err := w.WriteByte('<'); err != nil ***REMOVED***
+				if err := w.WriteByte('<'); err != nil {
 					return err
-				***REMOVED***
-				if !w.compact ***REMOVED***
-					if err := w.WriteByte('\n'); err != nil ***REMOVED***
+				}
+				if !w.compact {
+					if err := w.WriteByte('\n'); err != nil {
 						return err
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				w.indent()
 				// key
-				if _, err := w.WriteString("key:"); err != nil ***REMOVED***
+				if _, err := w.WriteString("key:"); err != nil {
 					return err
-				***REMOVED***
-				if !w.compact ***REMOVED***
-					if err := w.WriteByte(' '); err != nil ***REMOVED***
+				}
+				if !w.compact {
+					if err := w.WriteByte(' '); err != nil {
 						return err
-					***REMOVED***
-				***REMOVED***
-				if err := tm.writeAny(w, key, props.mkeyprop); err != nil ***REMOVED***
+					}
+				}
+				if err := tm.writeAny(w, key, props.mkeyprop); err != nil {
 					return err
-				***REMOVED***
-				if err := w.WriteByte('\n'); err != nil ***REMOVED***
+				}
+				if err := w.WriteByte('\n'); err != nil {
 					return err
-				***REMOVED***
+				}
 				// nil values aren't legal, but we can avoid panicking because of them.
-				if val.Kind() != reflect.Ptr || !val.IsNil() ***REMOVED***
+				if val.Kind() != reflect.Ptr || !val.IsNil() {
 					// value
-					if _, err := w.WriteString("value:"); err != nil ***REMOVED***
+					if _, err := w.WriteString("value:"); err != nil {
 						return err
-					***REMOVED***
-					if !w.compact ***REMOVED***
-						if err := w.WriteByte(' '); err != nil ***REMOVED***
+					}
+					if !w.compact {
+						if err := w.WriteByte(' '); err != nil {
 							return err
-						***REMOVED***
-					***REMOVED***
-					if err := tm.writeAny(w, val, props.mvalprop); err != nil ***REMOVED***
+						}
+					}
+					if err := tm.writeAny(w, val, props.mvalprop); err != nil {
 						return err
-					***REMOVED***
-					if err := w.WriteByte('\n'); err != nil ***REMOVED***
+					}
+					if err := w.WriteByte('\n'); err != nil {
 						return err
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				// close struct
 				w.unindent()
-				if err := w.WriteByte('>'); err != nil ***REMOVED***
+				if err := w.WriteByte('>'); err != nil {
 					return err
-				***REMOVED***
-				if err := w.WriteByte('\n'); err != nil ***REMOVED***
+				}
+				if err := w.WriteByte('\n'); err != nil {
 					return err
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			continue
-		***REMOVED***
-		if props.proto3 && fv.Kind() == reflect.Slice && fv.Len() == 0 ***REMOVED***
+		}
+		if props.proto3 && fv.Kind() == reflect.Slice && fv.Len() == 0 {
 			// empty bytes field
 			continue
-		***REMOVED***
-		if fv.Kind() != reflect.Ptr && fv.Kind() != reflect.Slice ***REMOVED***
+		}
+		if fv.Kind() != reflect.Ptr && fv.Kind() != reflect.Slice {
 			// proto3 non-repeated scalar field; skip if zero value
-			if isProto3Zero(fv) ***REMOVED***
+			if isProto3Zero(fv) {
 				continue
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
-		if fv.Kind() == reflect.Interface ***REMOVED***
+		if fv.Kind() == reflect.Interface {
 			// Check if it is a oneof.
-			if st.Field(i).Tag.Get("protobuf_oneof") != "" ***REMOVED***
+			if st.Field(i).Tag.Get("protobuf_oneof") != "" {
 				// fv is nil, or holds a pointer to generated struct.
 				// That generated struct has exactly one field,
 				// which has a protobuf struct tag.
-				if fv.IsNil() ***REMOVED***
+				if fv.IsNil() {
 					continue
-				***REMOVED***
+				}
 				inner := fv.Elem().Elem() // interface -> *T -> T
 				tag := inner.Type().Field(0).Tag.Get("protobuf")
 				props = new(Properties) // Overwrite the outer props var, but not its pointee.
@@ -420,165 +420,165 @@ func (tm *TextMarshaler) writeStruct(w *textWriter, sv reflect.Value) error ***R
 				// Special case to cope with malformed messages gracefully:
 				// If the value in the oneof is a nil pointer, don't panic
 				// in writeAny.
-				if fv.Kind() == reflect.Ptr && fv.IsNil() ***REMOVED***
+				if fv.Kind() == reflect.Ptr && fv.IsNil() {
 					// Use errors.New so writeAny won't render quotes.
 					msg := errors.New("/* nil */")
 					fv = reflect.ValueOf(&msg).Elem()
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
+				}
+			}
+		}
 
-		if err := writeName(w, props); err != nil ***REMOVED***
+		if err := writeName(w, props); err != nil {
 			return err
-		***REMOVED***
-		if !w.compact ***REMOVED***
-			if err := w.WriteByte(' '); err != nil ***REMOVED***
+		}
+		if !w.compact {
+			if err := w.WriteByte(' '); err != nil {
 				return err
-			***REMOVED***
-		***REMOVED***
-		if b, ok := fv.Interface().(raw); ok ***REMOVED***
-			if err := writeRaw(w, b.Bytes()); err != nil ***REMOVED***
+			}
+		}
+		if b, ok := fv.Interface().(raw); ok {
+			if err := writeRaw(w, b.Bytes()); err != nil {
 				return err
-			***REMOVED***
+			}
 			continue
-		***REMOVED***
+		}
 
 		// Enums have a String method, so writeAny will work fine.
-		if err := tm.writeAny(w, fv, props); err != nil ***REMOVED***
+		if err := tm.writeAny(w, fv, props); err != nil {
 			return err
-		***REMOVED***
+		}
 
-		if err := w.WriteByte('\n'); err != nil ***REMOVED***
+		if err := w.WriteByte('\n'); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Extensions (the XXX_extensions field).
 	pv := sv.Addr()
-	if _, ok := extendable(pv.Interface()); ok ***REMOVED***
-		if err := tm.writeExtensions(w, pv); err != nil ***REMOVED***
+	if _, ok := extendable(pv.Interface()); ok {
+		if err := tm.writeExtensions(w, pv); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
 // writeRaw writes an uninterpreted raw message.
-func writeRaw(w *textWriter, b []byte) error ***REMOVED***
-	if err := w.WriteByte('<'); err != nil ***REMOVED***
+func writeRaw(w *textWriter, b []byte) error {
+	if err := w.WriteByte('<'); err != nil {
 		return err
-	***REMOVED***
-	if !w.compact ***REMOVED***
-		if err := w.WriteByte('\n'); err != nil ***REMOVED***
+	}
+	if !w.compact {
+		if err := w.WriteByte('\n'); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	w.indent()
-	if err := writeUnknownStruct(w, b); err != nil ***REMOVED***
+	if err := writeUnknownStruct(w, b); err != nil {
 		return err
-	***REMOVED***
+	}
 	w.unindent()
-	if err := w.WriteByte('>'); err != nil ***REMOVED***
+	if err := w.WriteByte('>'); err != nil {
 		return err
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // writeAny writes an arbitrary field.
-func (tm *TextMarshaler) writeAny(w *textWriter, v reflect.Value, props *Properties) error ***REMOVED***
+func (tm *TextMarshaler) writeAny(w *textWriter, v reflect.Value, props *Properties) error {
 	v = reflect.Indirect(v)
 
 	// Floats have special cases.
-	if v.Kind() == reflect.Float32 || v.Kind() == reflect.Float64 ***REMOVED***
+	if v.Kind() == reflect.Float32 || v.Kind() == reflect.Float64 {
 		x := v.Float()
 		var b []byte
-		switch ***REMOVED***
+		switch {
 		case math.IsInf(x, 1):
 			b = posInf
 		case math.IsInf(x, -1):
 			b = negInf
 		case math.IsNaN(x):
 			b = nan
-		***REMOVED***
-		if b != nil ***REMOVED***
+		}
+		if b != nil {
 			_, err := w.Write(b)
 			return err
-		***REMOVED***
+		}
 		// Other values are handled below.
-	***REMOVED***
+	}
 
 	// We don't attempt to serialise every possible value type; only those
 	// that can occur in protocol buffers.
-	switch v.Kind() ***REMOVED***
+	switch v.Kind() {
 	case reflect.Slice:
 		// Should only be a []byte; repeated fields are handled in writeStruct.
-		if err := writeString(w, string(v.Bytes())); err != nil ***REMOVED***
+		if err := writeString(w, string(v.Bytes())); err != nil {
 			return err
-		***REMOVED***
+		}
 	case reflect.String:
-		if err := writeString(w, v.String()); err != nil ***REMOVED***
+		if err := writeString(w, v.String()); err != nil {
 			return err
-		***REMOVED***
+		}
 	case reflect.Struct:
 		// Required/optional group/message.
 		var bra, ket byte = '<', '>'
-		if props != nil && props.Wire == "group" ***REMOVED***
-			bra, ket = '***REMOVED***', '***REMOVED***'
-		***REMOVED***
-		if err := w.WriteByte(bra); err != nil ***REMOVED***
+		if props != nil && props.Wire == "group" {
+			bra, ket = '{', '}'
+		}
+		if err := w.WriteByte(bra); err != nil {
 			return err
-		***REMOVED***
-		if !w.compact ***REMOVED***
-			if err := w.WriteByte('\n'); err != nil ***REMOVED***
+		}
+		if !w.compact {
+			if err := w.WriteByte('\n'); err != nil {
 				return err
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		w.indent()
-		if etm, ok := v.Interface().(encoding.TextMarshaler); ok ***REMOVED***
+		if etm, ok := v.Interface().(encoding.TextMarshaler); ok {
 			text, err := etm.MarshalText()
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if _, err = w.Write(text); err != nil ***REMOVED***
+			}
+			if _, err = w.Write(text); err != nil {
 				return err
-			***REMOVED***
-		***REMOVED*** else if err := tm.writeStruct(w, v); err != nil ***REMOVED***
+			}
+		} else if err := tm.writeStruct(w, v); err != nil {
 			return err
-		***REMOVED***
+		}
 		w.unindent()
-		if err := w.WriteByte(ket); err != nil ***REMOVED***
+		if err := w.WriteByte(ket); err != nil {
 			return err
-		***REMOVED***
+		}
 	default:
 		_, err := fmt.Fprint(w, v.Interface())
 		return err
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // equivalent to C's isprint.
-func isprint(c byte) bool ***REMOVED***
+func isprint(c byte) bool {
 	return c >= 0x20 && c < 0x7f
-***REMOVED***
+}
 
 // writeString writes a string in the protocol buffer text format.
 // It is similar to strconv.Quote except we don't use Go escape sequences,
 // we treat the string as a byte sequence, and we use octal escapes.
 // These differences are to maintain interoperability with the other
 // languages' implementations of the text format.
-func writeString(w *textWriter, s string) error ***REMOVED***
+func writeString(w *textWriter, s string) error {
 	// use WriteByte here to get any needed indent
-	if err := w.WriteByte('"'); err != nil ***REMOVED***
+	if err := w.WriteByte('"'); err != nil {
 		return err
-	***REMOVED***
+	}
 	// Loop over the bytes, not the runes.
-	for i := 0; i < len(s); i++ ***REMOVED***
+	for i := 0; i < len(s); i++ {
 		var err error
 		// Divergence from C++: we don't escape apostrophes.
 		// There's no need to escape them, and the C++ parser
 		// copes with a naked apostrophe.
-		switch c := s[i]; c ***REMOVED***
+		switch c := s[i]; c {
 		case '\n':
 			_, err = w.w.Write(backslashN)
 		case '\r':
@@ -590,61 +590,61 @@ func writeString(w *textWriter, s string) error ***REMOVED***
 		case '\\':
 			_, err = w.w.Write(backslashBS)
 		default:
-			if isprint(c) ***REMOVED***
+			if isprint(c) {
 				err = w.w.WriteByte(c)
-			***REMOVED*** else ***REMOVED***
+			} else {
 				_, err = fmt.Fprintf(w.w, "\\%03o", c)
-			***REMOVED***
-		***REMOVED***
-		if err != nil ***REMOVED***
+			}
+		}
+		if err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return w.WriteByte('"')
-***REMOVED***
+}
 
-func writeUnknownStruct(w *textWriter, data []byte) (err error) ***REMOVED***
-	if !w.compact ***REMOVED***
-		if _, err := fmt.Fprintf(w, "/* %d unknown bytes */\n", len(data)); err != nil ***REMOVED***
+func writeUnknownStruct(w *textWriter, data []byte) (err error) {
+	if !w.compact {
+		if _, err := fmt.Fprintf(w, "/* %d unknown bytes */\n", len(data)); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	b := NewBuffer(data)
-	for b.index < len(b.buf) ***REMOVED***
+	for b.index < len(b.buf) {
 		x, err := b.DecodeVarint()
-		if err != nil ***REMOVED***
+		if err != nil {
 			_, err := fmt.Fprintf(w, "/* %v */\n", err)
 			return err
-		***REMOVED***
+		}
 		wire, tag := x&7, x>>3
-		if wire == WireEndGroup ***REMOVED***
+		if wire == WireEndGroup {
 			w.unindent()
-			if _, err := w.Write(endBraceNewline); err != nil ***REMOVED***
+			if _, err := w.Write(endBraceNewline); err != nil {
 				return err
-			***REMOVED***
+			}
 			continue
-		***REMOVED***
-		if _, err := fmt.Fprint(w, tag); err != nil ***REMOVED***
+		}
+		if _, err := fmt.Fprint(w, tag); err != nil {
 			return err
-		***REMOVED***
-		if wire != WireStartGroup ***REMOVED***
-			if err := w.WriteByte(':'); err != nil ***REMOVED***
+		}
+		if wire != WireStartGroup {
+			if err := w.WriteByte(':'); err != nil {
 				return err
-			***REMOVED***
-		***REMOVED***
-		if !w.compact || wire == WireStartGroup ***REMOVED***
-			if err := w.WriteByte(' '); err != nil ***REMOVED***
+			}
+		}
+		if !w.compact || wire == WireStartGroup {
+			if err := w.WriteByte(' '); err != nil {
 				return err
-			***REMOVED***
-		***REMOVED***
-		switch wire ***REMOVED***
+			}
+		}
+		switch wire {
 		case WireBytes:
 			buf, e := b.DecodeRawBytes(false)
-			if e == nil ***REMOVED***
+			if e == nil {
 				_, err = fmt.Fprintf(w, "%q", buf)
-			***REMOVED*** else ***REMOVED***
+			} else {
 				_, err = fmt.Fprintf(w, "/* %v */", e)
-			***REMOVED***
+			}
 		case WireFixed32:
 			x, err = b.DecodeFixed32()
 			err = writeUnknownInt(w, x, err)
@@ -652,42 +652,42 @@ func writeUnknownStruct(w *textWriter, data []byte) (err error) ***REMOVED***
 			x, err = b.DecodeFixed64()
 			err = writeUnknownInt(w, x, err)
 		case WireStartGroup:
-			err = w.WriteByte('***REMOVED***')
+			err = w.WriteByte('{')
 			w.indent()
 		case WireVarint:
 			x, err = b.DecodeVarint()
 			err = writeUnknownInt(w, x, err)
 		default:
 			_, err = fmt.Fprintf(w, "/* unknown wire type %d */", wire)
-		***REMOVED***
-		if err != nil ***REMOVED***
+		}
+		if err != nil {
 			return err
-		***REMOVED***
-		if err = w.WriteByte('\n'); err != nil ***REMOVED***
+		}
+		if err = w.WriteByte('\n'); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func writeUnknownInt(w *textWriter, x uint64, err error) error ***REMOVED***
-	if err == nil ***REMOVED***
+func writeUnknownInt(w *textWriter, x uint64, err error) error {
+	if err == nil {
 		_, err = fmt.Fprint(w, x)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		_, err = fmt.Fprintf(w, "/* %v */", err)
-	***REMOVED***
+	}
 	return err
-***REMOVED***
+}
 
 type int32Slice []int32
 
-func (s int32Slice) Len() int           ***REMOVED*** return len(s) ***REMOVED***
-func (s int32Slice) Less(i, j int) bool ***REMOVED*** return s[i] < s[j] ***REMOVED***
-func (s int32Slice) Swap(i, j int)      ***REMOVED*** s[i], s[j] = s[j], s[i] ***REMOVED***
+func (s int32Slice) Len() int           { return len(s) }
+func (s int32Slice) Less(i, j int) bool { return s[i] < s[j] }
+func (s int32Slice) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
 
 // writeExtensions writes all the extensions in pv.
 // pv is assumed to be a pointer to a protocol message struct that is extendable.
-func (tm *TextMarshaler) writeExtensions(w *textWriter, pv reflect.Value) error ***REMOVED***
+func (tm *TextMarshaler) writeExtensions(w *textWriter, pv reflect.Value) error {
 	emap := extensionMaps[pv.Type().Elem()]
 	ep, _ := extendable(pv.Interface())
 
@@ -695,160 +695,160 @@ func (tm *TextMarshaler) writeExtensions(w *textWriter, pv reflect.Value) error 
 	// This isn't strictly necessary, but it will give us
 	// canonical output, which will also make testing easier.
 	m, mu := ep.extensionsRead()
-	if m == nil ***REMOVED***
+	if m == nil {
 		return nil
-	***REMOVED***
+	}
 	mu.Lock()
 	ids := make([]int32, 0, len(m))
-	for id := range m ***REMOVED***
+	for id := range m {
 		ids = append(ids, id)
-	***REMOVED***
+	}
 	sort.Sort(int32Slice(ids))
 	mu.Unlock()
 
-	for _, extNum := range ids ***REMOVED***
+	for _, extNum := range ids {
 		ext := m[extNum]
 		var desc *ExtensionDesc
-		if emap != nil ***REMOVED***
+		if emap != nil {
 			desc = emap[extNum]
-		***REMOVED***
-		if desc == nil ***REMOVED***
+		}
+		if desc == nil {
 			// Unknown extension.
-			if err := writeUnknownStruct(w, ext.enc); err != nil ***REMOVED***
+			if err := writeUnknownStruct(w, ext.enc); err != nil {
 				return err
-			***REMOVED***
+			}
 			continue
-		***REMOVED***
+		}
 
 		pb, err := GetExtension(ep, desc)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return fmt.Errorf("failed getting extension: %v", err)
-		***REMOVED***
+		}
 
 		// Repeated extensions will appear as a slice.
-		if !desc.repeated() ***REMOVED***
-			if err := tm.writeExtension(w, desc.Name, pb); err != nil ***REMOVED***
+		if !desc.repeated() {
+			if err := tm.writeExtension(w, desc.Name, pb); err != nil {
 				return err
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
+			}
+		} else {
 			v := reflect.ValueOf(pb)
-			for i := 0; i < v.Len(); i++ ***REMOVED***
-				if err := tm.writeExtension(w, desc.Name, v.Index(i).Interface()); err != nil ***REMOVED***
+			for i := 0; i < v.Len(); i++ {
+				if err := tm.writeExtension(w, desc.Name, v.Index(i).Interface()); err != nil {
 					return err
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+				}
+			}
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func (tm *TextMarshaler) writeExtension(w *textWriter, name string, pb interface***REMOVED******REMOVED***) error ***REMOVED***
-	if _, err := fmt.Fprintf(w, "[%s]:", name); err != nil ***REMOVED***
+func (tm *TextMarshaler) writeExtension(w *textWriter, name string, pb interface{}) error {
+	if _, err := fmt.Fprintf(w, "[%s]:", name); err != nil {
 		return err
-	***REMOVED***
-	if !w.compact ***REMOVED***
-		if err := w.WriteByte(' '); err != nil ***REMOVED***
+	}
+	if !w.compact {
+		if err := w.WriteByte(' '); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
-	if err := tm.writeAny(w, reflect.ValueOf(pb), nil); err != nil ***REMOVED***
+		}
+	}
+	if err := tm.writeAny(w, reflect.ValueOf(pb), nil); err != nil {
 		return err
-	***REMOVED***
-	if err := w.WriteByte('\n'); err != nil ***REMOVED***
+	}
+	if err := w.WriteByte('\n'); err != nil {
 		return err
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (w *textWriter) writeIndent() ***REMOVED***
-	if !w.complete ***REMOVED***
+func (w *textWriter) writeIndent() {
+	if !w.complete {
 		return
-	***REMOVED***
+	}
 	remain := w.ind * 2
-	for remain > 0 ***REMOVED***
+	for remain > 0 {
 		n := remain
-		if n > len(spaces) ***REMOVED***
+		if n > len(spaces) {
 			n = len(spaces)
-		***REMOVED***
+		}
 		w.w.Write(spaces[:n])
 		remain -= n
-	***REMOVED***
+	}
 	w.complete = false
-***REMOVED***
+}
 
 // TextMarshaler is a configurable text format marshaler.
-type TextMarshaler struct ***REMOVED***
+type TextMarshaler struct {
 	Compact   bool // use compact text format (one line).
 	ExpandAny bool // expand google.protobuf.Any messages of known types
-***REMOVED***
+}
 
 // Marshal writes a given protocol buffer in text format.
 // The only errors returned are from w.
-func (tm *TextMarshaler) Marshal(w io.Writer, pb Message) error ***REMOVED***
+func (tm *TextMarshaler) Marshal(w io.Writer, pb Message) error {
 	val := reflect.ValueOf(pb)
-	if pb == nil || val.IsNil() ***REMOVED***
+	if pb == nil || val.IsNil() {
 		w.Write([]byte("<nil>"))
 		return nil
-	***REMOVED***
+	}
 	var bw *bufio.Writer
 	ww, ok := w.(writer)
-	if !ok ***REMOVED***
+	if !ok {
 		bw = bufio.NewWriter(w)
 		ww = bw
-	***REMOVED***
-	aw := &textWriter***REMOVED***
+	}
+	aw := &textWriter{
 		w:        ww,
 		complete: true,
 		compact:  tm.Compact,
-	***REMOVED***
+	}
 
-	if etm, ok := pb.(encoding.TextMarshaler); ok ***REMOVED***
+	if etm, ok := pb.(encoding.TextMarshaler); ok {
 		text, err := etm.MarshalText()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-		if _, err = aw.Write(text); err != nil ***REMOVED***
+		}
+		if _, err = aw.Write(text); err != nil {
 			return err
-		***REMOVED***
-		if bw != nil ***REMOVED***
+		}
+		if bw != nil {
 			return bw.Flush()
-		***REMOVED***
+		}
 		return nil
-	***REMOVED***
+	}
 	// Dereference the received pointer so we don't have outer < and >.
 	v := reflect.Indirect(val)
-	if err := tm.writeStruct(aw, v); err != nil ***REMOVED***
+	if err := tm.writeStruct(aw, v); err != nil {
 		return err
-	***REMOVED***
-	if bw != nil ***REMOVED***
+	}
+	if bw != nil {
 		return bw.Flush()
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // Text is the same as Marshal, but returns the string directly.
-func (tm *TextMarshaler) Text(pb Message) string ***REMOVED***
+func (tm *TextMarshaler) Text(pb Message) string {
 	var buf bytes.Buffer
 	tm.Marshal(&buf, pb)
 	return buf.String()
-***REMOVED***
+}
 
 var (
-	defaultTextMarshaler = TextMarshaler***REMOVED******REMOVED***
-	compactTextMarshaler = TextMarshaler***REMOVED***Compact: true***REMOVED***
+	defaultTextMarshaler = TextMarshaler{}
+	compactTextMarshaler = TextMarshaler{Compact: true}
 )
 
 // TODO: consider removing some of the Marshal functions below.
 
 // MarshalText writes a given protocol buffer in text format.
 // The only errors returned are from w.
-func MarshalText(w io.Writer, pb Message) error ***REMOVED*** return defaultTextMarshaler.Marshal(w, pb) ***REMOVED***
+func MarshalText(w io.Writer, pb Message) error { return defaultTextMarshaler.Marshal(w, pb) }
 
 // MarshalTextString is the same as MarshalText, but returns the string directly.
-func MarshalTextString(pb Message) string ***REMOVED*** return defaultTextMarshaler.Text(pb) ***REMOVED***
+func MarshalTextString(pb Message) string { return defaultTextMarshaler.Text(pb) }
 
 // CompactText writes a given protocol buffer in compact text format (one line).
-func CompactText(w io.Writer, pb Message) error ***REMOVED*** return compactTextMarshaler.Marshal(w, pb) ***REMOVED***
+func CompactText(w io.Writer, pb Message) error { return compactTextMarshaler.Marshal(w, pb) }
 
 // CompactTextString is the same as CompactText, but returns the string directly.
-func CompactTextString(pb Message) string ***REMOVED*** return compactTextMarshaler.Text(pb) ***REMOVED***
+func CompactTextString(pb Message) string { return compactTextMarshaler.Text(pb) }

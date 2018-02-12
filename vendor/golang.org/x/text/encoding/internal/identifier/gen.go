@@ -17,121 +17,121 @@ import (
 	"golang.org/x/text/internal/gen"
 )
 
-type registry struct ***REMOVED***
+type registry struct {
 	XMLName  xml.Name `xml:"registry"`
 	Updated  string   `xml:"updated"`
-	Registry []struct ***REMOVED***
+	Registry []struct {
 		ID     string `xml:"id,attr"`
-		Record []struct ***REMOVED***
+		Record []struct {
 			Name string `xml:"name"`
-			Xref []struct ***REMOVED***
+			Xref []struct {
 				Type string `xml:"type,attr"`
 				Data string `xml:"data,attr"`
-			***REMOVED*** `xml:"xref"`
-			Desc struct ***REMOVED***
+			} `xml:"xref"`
+			Desc struct {
 				Data string `xml:",innerxml"`
-				// Any []struct ***REMOVED***
+				// Any []struct {
 				// 	Data string `xml:",chardata"`
-				// ***REMOVED*** `xml:",any"`
+				// } `xml:",any"`
 				// Data string `xml:",chardata"`
-			***REMOVED*** `xml:"description,"`
+			} `xml:"description,"`
 			MIB   string   `xml:"value"`
 			Alias []string `xml:"alias"`
 			MIME  string   `xml:"preferred_alias"`
-		***REMOVED*** `xml:"record"`
-	***REMOVED*** `xml:"registry"`
-***REMOVED***
+		} `xml:"record"`
+	} `xml:"registry"`
+}
 
-func main() ***REMOVED***
+func main() {
 	r := gen.OpenIANAFile("assignments/character-sets/character-sets.xml")
-	reg := &registry***REMOVED******REMOVED***
-	if err := xml.NewDecoder(r).Decode(&reg); err != nil && err != io.EOF ***REMOVED***
+	reg := &registry{}
+	if err := xml.NewDecoder(r).Decode(&reg); err != nil && err != io.EOF {
 		log.Fatalf("Error decoding charset registry: %v", err)
-	***REMOVED***
-	if len(reg.Registry) == 0 || reg.Registry[0].ID != "character-sets-1" ***REMOVED***
+	}
+	if len(reg.Registry) == 0 || reg.Registry[0].ID != "character-sets-1" {
 		log.Fatalf("Unexpected ID %s", reg.Registry[0].ID)
-	***REMOVED***
+	}
 
-	w := &bytes.Buffer***REMOVED******REMOVED***
+	w := &bytes.Buffer{}
 	fmt.Fprintf(w, "const (\n")
-	for _, rec := range reg.Registry[0].Record ***REMOVED***
+	for _, rec := range reg.Registry[0].Record {
 		constName := ""
-		for _, a := range rec.Alias ***REMOVED***
-			if strings.HasPrefix(a, "cs") && strings.IndexByte(a, '-') == -1 ***REMOVED***
+		for _, a := range rec.Alias {
+			if strings.HasPrefix(a, "cs") && strings.IndexByte(a, '-') == -1 {
 				// Some of the constant definitions have comments in them. Strip those.
 				constName = strings.Title(strings.SplitN(a[2:], "\n", 2)[0])
-			***REMOVED***
-		***REMOVED***
-		if constName == "" ***REMOVED***
-			switch rec.MIB ***REMOVED***
+			}
+		}
+		if constName == "" {
+			switch rec.MIB {
 			case "2085":
 				constName = "HZGB2312" // Not listed as alias for some reason.
 			default:
 				log.Fatalf("No cs alias defined for %s.", rec.MIB)
-			***REMOVED***
-		***REMOVED***
-		if rec.MIME != "" ***REMOVED***
+			}
+		}
+		if rec.MIME != "" {
 			rec.MIME = fmt.Sprintf(" (MIME: %s)", rec.MIME)
-		***REMOVED***
+		}
 		fmt.Fprintf(w, "// %s is the MIB identifier with IANA name %s%s.\n//\n", constName, rec.Name, rec.MIME)
-		if len(rec.Desc.Data) > 0 ***REMOVED***
+		if len(rec.Desc.Data) > 0 {
 			fmt.Fprint(w, "// ")
 			d := xml.NewDecoder(strings.NewReader(rec.Desc.Data))
 			inElem := true
 			attr := ""
-			for ***REMOVED***
+			for {
 				t, err := d.Token()
-				if err != nil ***REMOVED***
-					if err != io.EOF ***REMOVED***
+				if err != nil {
+					if err != io.EOF {
 						log.Fatal(err)
-					***REMOVED***
+					}
 					break
-				***REMOVED***
-				switch x := t.(type) ***REMOVED***
+				}
+				switch x := t.(type) {
 				case xml.CharData:
 					attr = "" // Don't need attribute info.
 					a := bytes.Split([]byte(x), []byte("\n"))
-					for i, b := range a ***REMOVED***
-						if b = bytes.TrimSpace(b); len(b) != 0 ***REMOVED***
-							if !inElem && i > 0 ***REMOVED***
+					for i, b := range a {
+						if b = bytes.TrimSpace(b); len(b) != 0 {
+							if !inElem && i > 0 {
 								fmt.Fprint(w, "\n// ")
-							***REMOVED***
+							}
 							inElem = false
 							fmt.Fprintf(w, "%s ", string(b))
-						***REMOVED***
-					***REMOVED***
+						}
+					}
 				case xml.StartElement:
-					if x.Name.Local == "xref" ***REMOVED***
+					if x.Name.Local == "xref" {
 						inElem = true
 						use := false
-						for _, a := range x.Attr ***REMOVED***
-							if a.Name.Local == "type" ***REMOVED***
+						for _, a := range x.Attr {
+							if a.Name.Local == "type" {
 								use = use || a.Value != "person"
-							***REMOVED***
-							if a.Name.Local == "data" && use ***REMOVED***
+							}
+							if a.Name.Local == "data" && use {
 								attr = a.Value + " "
-							***REMOVED***
-						***REMOVED***
-					***REMOVED***
+							}
+						}
+					}
 				case xml.EndElement:
 					inElem = false
 					fmt.Fprint(w, attr)
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			fmt.Fprint(w, "\n")
-		***REMOVED***
-		for _, x := range rec.Xref ***REMOVED***
-			switch x.Type ***REMOVED***
+		}
+		for _, x := range rec.Xref {
+			switch x.Type {
 			case "rfc":
 				fmt.Fprintf(w, "// Reference: %s\n", strings.ToUpper(x.Data))
 			case "uri":
 				fmt.Fprintf(w, "// Reference: %s\n", x.Data)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fmt.Fprintf(w, "%s MIB = %s\n", constName, rec.MIB)
 		fmt.Fprintln(w)
-	***REMOVED***
+	}
 	fmt.Fprintln(w, ")")
 
 	gen.WriteGoFile("mib.go", "identifier", w.Bytes())
-***REMOVED***
+}

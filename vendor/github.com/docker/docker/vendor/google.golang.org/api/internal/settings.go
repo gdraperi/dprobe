@@ -10,7 +10,7 @@ import (
 
 // DialSettings holds information needed to establish a connection with a
 // Google API service.
-type DialSettings struct ***REMOVED***
+type DialSettings struct {
 	Endpoint                   string
 	Scopes                     []string
 	ServiceAccountJSONFilename string // if set, TokenSource is ignored.
@@ -20,4 +20,4 @@ type DialSettings struct ***REMOVED***
 	HTTPClient                 *http.Client
 	GRPCDialOpts               []grpc.DialOption
 	GRPCConn                   *grpc.ClientConn
-***REMOVED***
+}

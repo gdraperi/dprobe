@@ -8,67 +8,67 @@ import (
 	"strings"
 )
 
-func adjustAttributeNames(aa []Attribute, nameMap map[string]string) ***REMOVED***
-	for i := range aa ***REMOVED***
-		if newName, ok := nameMap[aa[i].Key]; ok ***REMOVED***
+func adjustAttributeNames(aa []Attribute, nameMap map[string]string) {
+	for i := range aa {
+		if newName, ok := nameMap[aa[i].Key]; ok {
 			aa[i].Key = newName
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func adjustForeignAttributes(aa []Attribute) ***REMOVED***
-	for i, a := range aa ***REMOVED***
-		if a.Key == "" || a.Key[0] != 'x' ***REMOVED***
+func adjustForeignAttributes(aa []Attribute) {
+	for i, a := range aa {
+		if a.Key == "" || a.Key[0] != 'x' {
 			continue
-		***REMOVED***
-		switch a.Key ***REMOVED***
+		}
+		switch a.Key {
 		case "xlink:actuate", "xlink:arcrole", "xlink:href", "xlink:role", "xlink:show",
 			"xlink:title", "xlink:type", "xml:base", "xml:lang", "xml:space", "xmlns:xlink":
 			j := strings.Index(a.Key, ":")
 			aa[i].Namespace = a.Key[:j]
 			aa[i].Key = a.Key[j+1:]
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func htmlIntegrationPoint(n *Node) bool ***REMOVED***
-	if n.Type != ElementNode ***REMOVED***
+func htmlIntegrationPoint(n *Node) bool {
+	if n.Type != ElementNode {
 		return false
-	***REMOVED***
-	switch n.Namespace ***REMOVED***
+	}
+	switch n.Namespace {
 	case "math":
-		if n.Data == "annotation-xml" ***REMOVED***
-			for _, a := range n.Attr ***REMOVED***
-				if a.Key == "encoding" ***REMOVED***
+		if n.Data == "annotation-xml" {
+			for _, a := range n.Attr {
+				if a.Key == "encoding" {
 					val := strings.ToLower(a.Val)
-					if val == "text/html" || val == "application/xhtml+xml" ***REMOVED***
+					if val == "text/html" || val == "application/xhtml+xml" {
 						return true
-					***REMOVED***
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
+					}
+				}
+			}
+		}
 	case "svg":
-		switch n.Data ***REMOVED***
+		switch n.Data {
 		case "desc", "foreignObject", "title":
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false
-***REMOVED***
+}
 
-func mathMLTextIntegrationPoint(n *Node) bool ***REMOVED***
-	if n.Namespace != "math" ***REMOVED***
+func mathMLTextIntegrationPoint(n *Node) bool {
+	if n.Namespace != "math" {
 		return false
-	***REMOVED***
-	switch n.Data ***REMOVED***
+	}
+	switch n.Data {
 	case "mi", "mo", "mn", "ms", "mtext":
 		return true
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
 // Section 12.2.5.5.
-var breakout = map[string]bool***REMOVED***
+var breakout = map[string]bool{
 	"b":          true,
 	"big":        true,
 	"blockquote": true,
@@ -113,10 +113,10 @@ var breakout = map[string]bool***REMOVED***
 	"u":          true,
 	"ul":         true,
 	"var":        true,
-***REMOVED***
+}
 
 // Section 12.2.5.5.
-var svgTagNameAdjustments = map[string]string***REMOVED***
+var svgTagNameAdjustments = map[string]string{
 	"altglyph":            "altGlyph",
 	"altglyphdef":         "altGlyphDef",
 	"altglyphitem":        "altGlyphItem",
@@ -153,14 +153,14 @@ var svgTagNameAdjustments = map[string]string***REMOVED***
 	"lineargradient":      "linearGradient",
 	"radialgradient":      "radialGradient",
 	"textpath":            "textPath",
-***REMOVED***
+}
 
 // Section 12.2.5.1
-var mathMLAttributeAdjustments = map[string]string***REMOVED***
+var mathMLAttributeAdjustments = map[string]string{
 	"definitionurl": "definitionURL",
-***REMOVED***
+}
 
-var svgAttributeAdjustments = map[string]string***REMOVED***
+var svgAttributeAdjustments = map[string]string{
 	"attributename":             "attributeName",
 	"attributetype":             "attributeType",
 	"basefrequency":             "baseFrequency",
@@ -223,4 +223,4 @@ var svgAttributeAdjustments = map[string]string***REMOVED***
 	"xchannelselector":          "xChannelSelector",
 	"ychannelselector":          "yChannelSelector",
 	"zoomandpan":                "zoomAndPan",
-***REMOVED***
+}

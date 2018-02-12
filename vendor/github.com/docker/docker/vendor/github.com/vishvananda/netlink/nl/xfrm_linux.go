@@ -13,9 +13,9 @@ const (
 
 type XfrmMsgType uint8
 
-type XfrmMsg interface ***REMOVED***
+type XfrmMsg interface {
 	Type() XfrmMsgType
-***REMOVED***
+}
 
 // Message Types
 const (
@@ -101,55 +101,55 @@ const (
 	__XFRMNLGRP_MAX   = 0x9
 )
 
-// typedef union ***REMOVED***
+// typedef union {
 //   __be32    a4;
 //   __be32    a6[4];
-// ***REMOVED*** xfrm_address_t;
+// } xfrm_address_t;
 
 type XfrmAddress [SizeofXfrmAddress]byte
 
-func (x *XfrmAddress) ToIP() net.IP ***REMOVED***
-	var empty = [12]byte***REMOVED******REMOVED***
+func (x *XfrmAddress) ToIP() net.IP {
+	var empty = [12]byte{}
 	ip := make(net.IP, net.IPv6len)
-	if bytes.Equal(x[4:16], empty[:]) ***REMOVED***
+	if bytes.Equal(x[4:16], empty[:]) {
 		ip[10] = 0xff
 		ip[11] = 0xff
 		copy(ip[12:16], x[0:4])
-	***REMOVED*** else ***REMOVED***
+	} else {
 		copy(ip[:], x[:])
-	***REMOVED***
+	}
 	return ip
-***REMOVED***
+}
 
-func (x *XfrmAddress) ToIPNet(prefixlen uint8) *net.IPNet ***REMOVED***
+func (x *XfrmAddress) ToIPNet(prefixlen uint8) *net.IPNet {
 	ip := x.ToIP()
-	if GetIPFamily(ip) == FAMILY_V4 ***REMOVED***
-		return &net.IPNet***REMOVED***IP: ip, Mask: net.CIDRMask(int(prefixlen), 32)***REMOVED***
-	***REMOVED***
-	return &net.IPNet***REMOVED***IP: ip, Mask: net.CIDRMask(int(prefixlen), 128)***REMOVED***
-***REMOVED***
+	if GetIPFamily(ip) == FAMILY_V4 {
+		return &net.IPNet{IP: ip, Mask: net.CIDRMask(int(prefixlen), 32)}
+	}
+	return &net.IPNet{IP: ip, Mask: net.CIDRMask(int(prefixlen), 128)}
+}
 
-func (x *XfrmAddress) FromIP(ip net.IP) ***REMOVED***
-	var empty = [16]byte***REMOVED******REMOVED***
-	if len(ip) < net.IPv4len ***REMOVED***
+func (x *XfrmAddress) FromIP(ip net.IP) {
+	var empty = [16]byte{}
+	if len(ip) < net.IPv4len {
 		copy(x[4:16], empty[:])
-	***REMOVED*** else if GetIPFamily(ip) == FAMILY_V4 ***REMOVED***
+	} else if GetIPFamily(ip) == FAMILY_V4 {
 		copy(x[0:4], ip.To4()[0:4])
 		copy(x[4:16], empty[:12])
-	***REMOVED*** else ***REMOVED***
+	} else {
 		copy(x[0:16], ip.To16()[0:16])
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func DeserializeXfrmAddress(b []byte) *XfrmAddress ***REMOVED***
+func DeserializeXfrmAddress(b []byte) *XfrmAddress {
 	return (*XfrmAddress)(unsafe.Pointer(&b[0:SizeofXfrmAddress][0]))
-***REMOVED***
+}
 
-func (x *XfrmAddress) Serialize() []byte ***REMOVED***
+func (x *XfrmAddress) Serialize() []byte {
 	return (*(*[SizeofXfrmAddress]byte)(unsafe.Pointer(x)))[:]
-***REMOVED***
+}
 
-// struct xfrm_selector ***REMOVED***
+// struct xfrm_selector {
 //   xfrm_address_t  daddr;
 //   xfrm_address_t  saddr;
 //   __be16  dport;
@@ -162,9 +162,9 @@ func (x *XfrmAddress) Serialize() []byte ***REMOVED***
 //   __u8  proto;
 //   int ifindex;
 //   __kernel_uid32_t  user;
-// ***REMOVED***;
+// };
 
-type XfrmSelector struct ***REMOVED***
+type XfrmSelector struct {
 	Daddr      XfrmAddress
 	Saddr      XfrmAddress
 	Dport      uint16 // big endian
@@ -178,21 +178,21 @@ type XfrmSelector struct ***REMOVED***
 	Pad        [3]byte
 	Ifindex    int32
 	User       uint32
-***REMOVED***
+}
 
-func (msg *XfrmSelector) Len() int ***REMOVED***
+func (msg *XfrmSelector) Len() int {
 	return SizeofXfrmSelector
-***REMOVED***
+}
 
-func DeserializeXfrmSelector(b []byte) *XfrmSelector ***REMOVED***
+func DeserializeXfrmSelector(b []byte) *XfrmSelector {
 	return (*XfrmSelector)(unsafe.Pointer(&b[0:SizeofXfrmSelector][0]))
-***REMOVED***
+}
 
-func (msg *XfrmSelector) Serialize() []byte ***REMOVED***
+func (msg *XfrmSelector) Serialize() []byte {
 	return (*(*[SizeofXfrmSelector]byte)(unsafe.Pointer(msg)))[:]
-***REMOVED***
+}
 
-// struct xfrm_lifetime_cfg ***REMOVED***
+// struct xfrm_lifetime_cfg {
 //   __u64 soft_byte_limit;
 //   __u64 hard_byte_limit;
 //   __u64 soft_packet_limit;
@@ -201,10 +201,10 @@ func (msg *XfrmSelector) Serialize() []byte ***REMOVED***
 //   __u64 hard_add_expires_seconds;
 //   __u64 soft_use_expires_seconds;
 //   __u64 hard_use_expires_seconds;
-// ***REMOVED***;
+// };
 //
 
-type XfrmLifetimeCfg struct ***REMOVED***
+type XfrmLifetimeCfg struct {
 	SoftByteLimit         uint64
 	HardByteLimit         uint64
 	SoftPacketLimit       uint64
@@ -213,84 +213,84 @@ type XfrmLifetimeCfg struct ***REMOVED***
 	HardAddExpiresSeconds uint64
 	SoftUseExpiresSeconds uint64
 	HardUseExpiresSeconds uint64
-***REMOVED***
+}
 
-func (msg *XfrmLifetimeCfg) Len() int ***REMOVED***
+func (msg *XfrmLifetimeCfg) Len() int {
 	return SizeofXfrmLifetimeCfg
-***REMOVED***
+}
 
-func DeserializeXfrmLifetimeCfg(b []byte) *XfrmLifetimeCfg ***REMOVED***
+func DeserializeXfrmLifetimeCfg(b []byte) *XfrmLifetimeCfg {
 	return (*XfrmLifetimeCfg)(unsafe.Pointer(&b[0:SizeofXfrmLifetimeCfg][0]))
-***REMOVED***
+}
 
-func (msg *XfrmLifetimeCfg) Serialize() []byte ***REMOVED***
+func (msg *XfrmLifetimeCfg) Serialize() []byte {
 	return (*(*[SizeofXfrmLifetimeCfg]byte)(unsafe.Pointer(msg)))[:]
-***REMOVED***
+}
 
-// struct xfrm_lifetime_cur ***REMOVED***
+// struct xfrm_lifetime_cur {
 //   __u64 bytes;
 //   __u64 packets;
 //   __u64 add_time;
 //   __u64 use_time;
-// ***REMOVED***;
+// };
 
-type XfrmLifetimeCur struct ***REMOVED***
+type XfrmLifetimeCur struct {
 	Bytes   uint64
 	Packets uint64
 	AddTime uint64
 	UseTime uint64
-***REMOVED***
+}
 
-func (msg *XfrmLifetimeCur) Len() int ***REMOVED***
+func (msg *XfrmLifetimeCur) Len() int {
 	return SizeofXfrmLifetimeCur
-***REMOVED***
+}
 
-func DeserializeXfrmLifetimeCur(b []byte) *XfrmLifetimeCur ***REMOVED***
+func DeserializeXfrmLifetimeCur(b []byte) *XfrmLifetimeCur {
 	return (*XfrmLifetimeCur)(unsafe.Pointer(&b[0:SizeofXfrmLifetimeCur][0]))
-***REMOVED***
+}
 
-func (msg *XfrmLifetimeCur) Serialize() []byte ***REMOVED***
+func (msg *XfrmLifetimeCur) Serialize() []byte {
 	return (*(*[SizeofXfrmLifetimeCur]byte)(unsafe.Pointer(msg)))[:]
-***REMOVED***
+}
 
-// struct xfrm_id ***REMOVED***
+// struct xfrm_id {
 //   xfrm_address_t  daddr;
 //   __be32    spi;
 //   __u8    proto;
-// ***REMOVED***;
+// };
 
-type XfrmId struct ***REMOVED***
+type XfrmId struct {
 	Daddr XfrmAddress
 	Spi   uint32 // big endian
 	Proto uint8
 	Pad   [3]byte
-***REMOVED***
+}
 
-func (msg *XfrmId) Len() int ***REMOVED***
+func (msg *XfrmId) Len() int {
 	return SizeofXfrmId
-***REMOVED***
+}
 
-func DeserializeXfrmId(b []byte) *XfrmId ***REMOVED***
+func DeserializeXfrmId(b []byte) *XfrmId {
 	return (*XfrmId)(unsafe.Pointer(&b[0:SizeofXfrmId][0]))
-***REMOVED***
+}
 
-func (msg *XfrmId) Serialize() []byte ***REMOVED***
+func (msg *XfrmId) Serialize() []byte {
 	return (*(*[SizeofXfrmId]byte)(unsafe.Pointer(msg)))[:]
-***REMOVED***
+}
 
-type XfrmMark struct ***REMOVED***
+type XfrmMark struct {
 	Value uint32
 	Mask  uint32
-***REMOVED***
+}
 
-func (msg *XfrmMark) Len() int ***REMOVED***
+func (msg *XfrmMark) Len() int {
 	return SizeofXfrmMark
-***REMOVED***
+}
 
-func DeserializeXfrmMark(b []byte) *XfrmMark ***REMOVED***
+func DeserializeXfrmMark(b []byte) *XfrmMark {
 	return (*XfrmMark)(unsafe.Pointer(&b[0:SizeofXfrmMark][0]))
-***REMOVED***
+}
 
-func (msg *XfrmMark) Serialize() []byte ***REMOVED***
+func (msg *XfrmMark) Serialize() []byte {
 	return (*(*[SizeofXfrmMark]byte)(unsafe.Pointer(msg)))[:]
-***REMOVED***
+}

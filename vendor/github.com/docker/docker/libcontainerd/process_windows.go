@@ -8,37 +8,37 @@ import (
 	"github.com/docker/docker/pkg/ioutils"
 )
 
-type autoClosingReader struct ***REMOVED***
+type autoClosingReader struct {
 	io.ReadCloser
 	sync.Once
-***REMOVED***
+}
 
-func (r *autoClosingReader) Read(b []byte) (n int, err error) ***REMOVED***
+func (r *autoClosingReader) Read(b []byte) (n int, err error) {
 	n, err = r.ReadCloser.Read(b)
-	if err != nil ***REMOVED***
-		r.Once.Do(func() ***REMOVED*** r.ReadCloser.Close() ***REMOVED***)
-	***REMOVED***
+	if err != nil {
+		r.Once.Do(func() { r.ReadCloser.Close() })
+	}
 	return
-***REMOVED***
+}
 
-func createStdInCloser(pipe io.WriteCloser, process hcsshim.Process) io.WriteCloser ***REMOVED***
-	return ioutils.NewWriteCloserWrapper(pipe, func() error ***REMOVED***
-		if err := pipe.Close(); err != nil ***REMOVED***
+func createStdInCloser(pipe io.WriteCloser, process hcsshim.Process) io.WriteCloser {
+	return ioutils.NewWriteCloserWrapper(pipe, func() error {
+		if err := pipe.Close(); err != nil {
 			return err
-		***REMOVED***
+		}
 
 		err := process.CloseStdin()
-		if err != nil && !hcsshim.IsNotExist(err) && !hcsshim.IsAlreadyClosed(err) ***REMOVED***
+		if err != nil && !hcsshim.IsNotExist(err) && !hcsshim.IsAlreadyClosed(err) {
 			// This error will occur if the compute system is currently shutting down
-			if perr, ok := err.(*hcsshim.ProcessError); ok && perr.Err != hcsshim.ErrVmcomputeOperationInvalidState ***REMOVED***
+			if perr, ok := err.(*hcsshim.ProcessError); ok && perr.Err != hcsshim.ErrVmcomputeOperationInvalidState {
 				return err
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		return nil
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func (p *process) Cleanup() error ***REMOVED***
+func (p *process) Cleanup() error {
 	return nil
-***REMOVED***
+}

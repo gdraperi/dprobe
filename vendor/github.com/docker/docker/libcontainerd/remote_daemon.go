@@ -33,18 +33,18 @@ const (
 	pidFile                 = "docker-containerd.pid"
 )
 
-type pluginConfigs struct ***REMOVED***
-	Plugins map[string]interface***REMOVED******REMOVED*** `toml:"plugins"`
-***REMOVED***
+type pluginConfigs struct {
+	Plugins map[string]interface{} `toml:"plugins"`
+}
 
-type remote struct ***REMOVED***
+type remote struct {
 	sync.RWMutex
 	server.Config
 
 	daemonPid int
 	logger    *logrus.Entry
 
-	daemonWaitCh    chan struct***REMOVED******REMOVED***
+	daemonWaitCh    chan struct{}
 	clients         []*client
 	shutdownContext context.Context
 	shutdownCancel  context.CancelFunc
@@ -56,81 +56,81 @@ type remote struct ***REMOVED***
 	stateDir    string
 	snapshotter string
 	pluginConfs pluginConfigs
-***REMOVED***
+}
 
 // New creates a fresh instance of libcontainerd remote.
-func New(rootDir, stateDir string, options ...RemoteOption) (rem Remote, err error) ***REMOVED***
-	defer func() ***REMOVED***
-		if err != nil ***REMOVED***
+func New(rootDir, stateDir string, options ...RemoteOption) (rem Remote, err error) {
+	defer func() {
+		if err != nil {
 			err = errors.Wrap(err, "Failed to connect to containerd")
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
-	r := &remote***REMOVED***
+	r := &remote{
 		rootDir:  rootDir,
 		stateDir: stateDir,
-		Config: server.Config***REMOVED***
+		Config: server.Config{
 			Root:  filepath.Join(rootDir, "daemon"),
 			State: filepath.Join(stateDir, "daemon"),
-		***REMOVED***,
-		pluginConfs: pluginConfigs***REMOVED***make(map[string]interface***REMOVED******REMOVED***)***REMOVED***,
+		},
+		pluginConfs: pluginConfigs{make(map[string]interface{})},
 		daemonPid:   -1,
 		logger:      logrus.WithField("module", "libcontainerd"),
-	***REMOVED***
+	}
 	r.shutdownContext, r.shutdownCancel = context.WithCancel(context.Background())
 
 	rem = r
-	for _, option := range options ***REMOVED***
-		if err = option.Apply(r); err != nil ***REMOVED***
+	for _, option := range options {
+		if err = option.Apply(r); err != nil {
 			return
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	r.setDefaults()
 
-	if err = system.MkdirAll(stateDir, 0700, ""); err != nil ***REMOVED***
+	if err = system.MkdirAll(stateDir, 0700, ""); err != nil {
 		return
-	***REMOVED***
+	}
 
-	if r.startDaemon ***REMOVED***
+	if r.startDaemon {
 		os.Remove(r.GRPC.Address)
-		if err = r.startContainerd(); err != nil ***REMOVED***
+		if err = r.startContainerd(); err != nil {
 			return
-		***REMOVED***
-		defer func() ***REMOVED***
-			if err != nil ***REMOVED***
+		}
+		defer func() {
+			if err != nil {
 				r.Cleanup()
-			***REMOVED***
-		***REMOVED***()
-	***REMOVED***
+			}
+		}()
+	}
 
 	// This connection is just used to monitor the connection
 	client, err := containerd.New(r.GRPC.Address)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
-	if _, err := client.Version(context.Background()); err != nil ***REMOVED***
+	}
+	if _, err := client.Version(context.Background()); err != nil {
 		system.KillProcess(r.daemonPid)
 		return nil, errors.Wrapf(err, "unable to get containerd version")
-	***REMOVED***
+	}
 
 	go r.monitorConnection(client)
 
 	return r, nil
-***REMOVED***
+}
 
-func (r *remote) NewClient(ns string, b Backend) (Client, error) ***REMOVED***
-	c := &client***REMOVED***
+func (r *remote) NewClient(ns string, b Backend) (Client, error) {
+	c := &client{
 		stateDir:   r.stateDir,
 		logger:     r.logger.WithField("namespace", ns),
 		namespace:  ns,
 		backend:    b,
 		containers: make(map[string]*container),
-	***REMOVED***
+	}
 
 	rclient, err := containerd.New(r.GRPC.Address, containerd.WithDefaultNamespace(ns))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	c.remote = rclient
 
 	go c.processEventStream(r.shutdownContext)
@@ -139,88 +139,88 @@ func (r *remote) NewClient(ns string, b Backend) (Client, error) ***REMOVED***
 	r.clients = append(r.clients, c)
 	r.Unlock()
 	return c, nil
-***REMOVED***
+}
 
-func (r *remote) Cleanup() ***REMOVED***
-	if r.daemonPid != -1 ***REMOVED***
+func (r *remote) Cleanup() {
+	if r.daemonPid != -1 {
 		r.shutdownCancel()
 		r.stopDaemon()
-	***REMOVED***
+	}
 
 	// cleanup some files
 	os.Remove(filepath.Join(r.stateDir, pidFile))
 
 	r.platformCleanup()
-***REMOVED***
+}
 
-func (r *remote) getContainerdPid() (int, error) ***REMOVED***
+func (r *remote) getContainerdPid() (int, error) {
 	pidFile := filepath.Join(r.stateDir, pidFile)
 	f, err := os.OpenFile(pidFile, os.O_RDWR, 0600)
-	if err != nil ***REMOVED***
-		if os.IsNotExist(err) ***REMOVED***
+	if err != nil {
+		if os.IsNotExist(err) {
 			return -1, nil
-		***REMOVED***
+		}
 		return -1, err
-	***REMOVED***
+	}
 	defer f.Close()
 
 	b := make([]byte, 8)
 	n, err := f.Read(b)
-	if err != nil && err != io.EOF ***REMOVED***
+	if err != nil && err != io.EOF {
 		return -1, err
-	***REMOVED***
+	}
 
-	if n > 0 ***REMOVED***
+	if n > 0 {
 		pid, err := strconv.ParseUint(string(b[:n]), 10, 64)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return -1, err
-		***REMOVED***
-		if system.IsProcessAlive(int(pid)) ***REMOVED***
+		}
+		if system.IsProcessAlive(int(pid)) {
 			return int(pid), nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return -1, nil
-***REMOVED***
+}
 
-func (r *remote) getContainerdConfig() (string, error) ***REMOVED***
+func (r *remote) getContainerdConfig() (string, error) {
 	path := filepath.Join(r.stateDir, configFile)
 	f, err := os.OpenFile(path, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0600)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", errors.Wrapf(err, "failed to open containerd config file at %s", path)
-	***REMOVED***
+	}
 	defer f.Close()
 
 	enc := toml.NewEncoder(f)
-	if err = enc.Encode(r.Config); err != nil ***REMOVED***
+	if err = enc.Encode(r.Config); err != nil {
 		return "", errors.Wrapf(err, "failed to encode general config")
-	***REMOVED***
-	if err = enc.Encode(r.pluginConfs); err != nil ***REMOVED***
+	}
+	if err = enc.Encode(r.pluginConfs); err != nil {
 		return "", errors.Wrapf(err, "failed to encode plugin configs")
-	***REMOVED***
+	}
 
 	return path, nil
-***REMOVED***
+}
 
-func (r *remote) startContainerd() error ***REMOVED***
+func (r *remote) startContainerd() error {
 	pid, err := r.getContainerdPid()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if pid != -1 ***REMOVED***
+	if pid != -1 {
 		r.daemonPid = pid
 		logrus.WithField("pid", pid).
 			Infof("libcontainerd: %s is still running", binaryName)
 		return nil
-	***REMOVED***
+	}
 
 	configFile, err := r.getContainerdConfig()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	args := []string***REMOVED***"--config", configFile***REMOVED***
+	args := []string{"--config", configFile}
 	cmd := exec.Command(binaryName, args...)
 	// redirect containerd logs to docker logs
 	cmd.Stdout = os.Stdout
@@ -228,90 +228,90 @@ func (r *remote) startContainerd() error ***REMOVED***
 	cmd.SysProcAttr = containerdSysProcAttr()
 	// clear the NOTIFY_SOCKET from the env when starting containerd
 	cmd.Env = nil
-	for _, e := range os.Environ() ***REMOVED***
-		if !strings.HasPrefix(e, "NOTIFY_SOCKET") ***REMOVED***
+	for _, e := range os.Environ() {
+		if !strings.HasPrefix(e, "NOTIFY_SOCKET") {
 			cmd.Env = append(cmd.Env, e)
-		***REMOVED***
-	***REMOVED***
-	if err := cmd.Start(); err != nil ***REMOVED***
+		}
+	}
+	if err := cmd.Start(); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	r.daemonWaitCh = make(chan struct***REMOVED******REMOVED***)
-	go func() ***REMOVED***
+	r.daemonWaitCh = make(chan struct{})
+	go func() {
 		// Reap our child when needed
-		if err := cmd.Wait(); err != nil ***REMOVED***
+		if err := cmd.Wait(); err != nil {
 			r.logger.WithError(err).Errorf("containerd did not exit successfully")
-		***REMOVED***
+		}
 		close(r.daemonWaitCh)
-	***REMOVED***()
+	}()
 
 	r.daemonPid = cmd.Process.Pid
 
 	err = ioutil.WriteFile(filepath.Join(r.stateDir, pidFile), []byte(fmt.Sprintf("%d", r.daemonPid)), 0660)
-	if err != nil ***REMOVED***
+	if err != nil {
 		system.KillProcess(r.daemonPid)
 		return errors.Wrap(err, "libcontainerd: failed to save daemon pid to disk")
-	***REMOVED***
+	}
 
 	logrus.WithField("pid", r.daemonPid).
 		Infof("libcontainerd: started new %s process", binaryName)
 
 	return nil
-***REMOVED***
+}
 
-func (r *remote) monitorConnection(client *containerd.Client) ***REMOVED***
+func (r *remote) monitorConnection(client *containerd.Client) {
 	var transientFailureCount = 0
 
 	ticker := time.NewTicker(500 * time.Millisecond)
 	defer ticker.Stop()
 
-	for ***REMOVED***
+	for {
 		<-ticker.C
 		ctx, cancel := context.WithTimeout(r.shutdownContext, healthCheckTimeout)
 		_, err := client.IsServing(ctx)
 		cancel()
-		if err == nil ***REMOVED***
+		if err == nil {
 			transientFailureCount = 0
 			continue
-		***REMOVED***
+		}
 
-		select ***REMOVED***
+		select {
 		case <-r.shutdownContext.Done():
 			r.logger.Info("stopping healthcheck following graceful shutdown")
 			client.Close()
 			return
 		default:
-		***REMOVED***
+		}
 
 		r.logger.WithError(err).WithField("binary", binaryName).Debug("daemon is not responding")
 
-		if r.daemonPid != -1 ***REMOVED***
+		if r.daemonPid != -1 {
 			transientFailureCount++
-			if transientFailureCount >= maxConnectionRetryCount || !system.IsProcessAlive(r.daemonPid) ***REMOVED***
+			if transientFailureCount >= maxConnectionRetryCount || !system.IsProcessAlive(r.daemonPid) {
 				transientFailureCount = 0
-				if system.IsProcessAlive(r.daemonPid) ***REMOVED***
+				if system.IsProcessAlive(r.daemonPid) {
 					r.logger.WithField("pid", r.daemonPid).Info("killing and restarting containerd")
 					// Try to get a stack trace
 					syscall.Kill(r.daemonPid, syscall.SIGUSR1)
 					<-time.After(100 * time.Millisecond)
 					system.KillProcess(r.daemonPid)
-				***REMOVED***
+				}
 				<-r.daemonWaitCh
 				var err error
 				client.Close()
 				os.Remove(r.GRPC.Address)
-				if err = r.startContainerd(); err != nil ***REMOVED***
+				if err = r.startContainerd(); err != nil {
 					r.logger.WithError(err).Error("failed restarting containerd")
-				***REMOVED*** else ***REMOVED***
+				} else {
 					newClient, err := containerd.New(r.GRPC.Address)
-					if err != nil ***REMOVED***
+					if err != nil {
 						r.logger.WithError(err).Error("failed connect to containerd")
-					***REMOVED*** else ***REMOVED***
+					} else {
 						client = newClient
-					***REMOVED***
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+					}
+				}
+			}
+		}
+	}
+}

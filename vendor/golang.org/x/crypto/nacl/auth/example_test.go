@@ -11,15 +11,15 @@ import (
 	"golang.org/x/crypto/nacl/auth"
 )
 
-func Example() ***REMOVED***
+func Example() {
 	// Load your secret key from a safe place and reuse it across multiple
 	// Sum calls. (Obviously don't use this example key for anything
 	// real.) If you want to convert a passphrase to a key, use a suitable
 	// package like bcrypt or scrypt.
 	secretKeyBytes, err := hex.DecodeString("6368616e676520746869732070617373776f726420746f206120736563726574")
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 
 	var secretKey [32]byte
 	copy(secretKey[:], secretKeyBytes)
@@ -33,4 +33,4 @@ func Example() ***REMOVED***
 	// Output: eca5a521f3d77b63f567fb0cb6f5f2d200641bc8dada42f60c5f881260c30317
 	// true
 	// false
-***REMOVED***
+}

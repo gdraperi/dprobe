@@ -10,72 +10,72 @@ import (
 )
 
 // A VM is an emulated BPF virtual machine.
-type VM struct ***REMOVED***
+type VM struct {
 	filter []Instruction
-***REMOVED***
+}
 
 // NewVM returns a new VM using the input BPF program.
-func NewVM(filter []Instruction) (*VM, error) ***REMOVED***
-	if len(filter) == 0 ***REMOVED***
+func NewVM(filter []Instruction) (*VM, error) {
+	if len(filter) == 0 {
 		return nil, errors.New("one or more Instructions must be specified")
-	***REMOVED***
+	}
 
-	for i, ins := range filter ***REMOVED***
+	for i, ins := range filter {
 		check := len(filter) - (i + 1)
-		switch ins := ins.(type) ***REMOVED***
+		switch ins := ins.(type) {
 		// Check for out-of-bounds jumps in instructions
 		case Jump:
-			if check <= int(ins.Skip) ***REMOVED***
+			if check <= int(ins.Skip) {
 				return nil, fmt.Errorf("cannot jump %d instructions; jumping past program bounds", ins.Skip)
-			***REMOVED***
+			}
 		case JumpIf:
-			if check <= int(ins.SkipTrue) ***REMOVED***
+			if check <= int(ins.SkipTrue) {
 				return nil, fmt.Errorf("cannot jump %d instructions in true case; jumping past program bounds", ins.SkipTrue)
-			***REMOVED***
-			if check <= int(ins.SkipFalse) ***REMOVED***
+			}
+			if check <= int(ins.SkipFalse) {
 				return nil, fmt.Errorf("cannot jump %d instructions in false case; jumping past program bounds", ins.SkipFalse)
-			***REMOVED***
+			}
 		// Check for division or modulus by zero
 		case ALUOpConstant:
-			if ins.Val != 0 ***REMOVED***
+			if ins.Val != 0 {
 				break
-			***REMOVED***
+			}
 
-			switch ins.Op ***REMOVED***
+			switch ins.Op {
 			case ALUOpDiv, ALUOpMod:
 				return nil, errors.New("cannot divide by zero using ALUOpConstant")
-			***REMOVED***
+			}
 		// Check for unknown extensions
 		case LoadExtension:
-			switch ins.Num ***REMOVED***
+			switch ins.Num {
 			case ExtLen:
 			default:
 				return nil, fmt.Errorf("extension %d not implemented", ins.Num)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	// Make sure last instruction is a return instruction
-	switch filter[len(filter)-1].(type) ***REMOVED***
+	switch filter[len(filter)-1].(type) {
 	case RetA, RetConstant:
 	default:
 		return nil, errors.New("BPF program must end with RetA or RetConstant")
-	***REMOVED***
+	}
 
 	// Though our VM works using disassembled instructions, we
 	// attempt to assemble the input filter anyway to ensure it is compatible
 	// with an operating system VM.
 	_, err := Assemble(filter)
 
-	return &VM***REMOVED***
+	return &VM{
 		filter: filter,
-	***REMOVED***, err
-***REMOVED***
+	}, err
+}
 
 // Run runs the VM's BPF program against the input bytes.
 // Run returns the number of bytes accepted by the BPF program, and any errors
 // which occurred while processing the program.
-func (v *VM) Run(in []byte) (int, error) ***REMOVED***
+func (v *VM) Run(in []byte) (int, error) {
 	var (
 		// Registers of the virtual machine
 		regA       uint32
@@ -96,10 +96,10 @@ func (v *VM) Run(in []byte) (int, error) ***REMOVED***
 	// operations against kernel implementation, and make sure Go
 	// implementation matches behavior
 
-	for i := 0; i < len(v.filter) && ok; i++ ***REMOVED***
+	for i := 0; i < len(v.filter) && ok; i++ {
 		ins := v.filter[i]
 
-		switch ins := ins.(type) ***REMOVED***
+		switch ins := ins.(type) {
 		case ALUOpConstant:
 			regA = aluOpConstant(ins, regA)
 		case ALUOpX:
@@ -133,8 +133,8 @@ func (v *VM) Run(in []byte) (int, error) ***REMOVED***
 			regA = regX
 		default:
 			return 0, fmt.Errorf("unknown Instruction at index %d: %T", i, ins)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return 0, nil
-***REMOVED***
+}

@@ -14,88 +14,88 @@ import (
 // difference here is the addition of the Type method that returns a string
 // name of the type.  As this is generally unknown, we approximate that with
 // reflection.
-type flagValueWrapper struct ***REMOVED***
+type flagValueWrapper struct {
 	inner    goflag.Value
 	flagType string
-***REMOVED***
+}
 
 // We are just copying the boolFlag interface out of goflag as that is what
 // they use to decide if a flag should get "true" when no arg is given.
-type goBoolFlag interface ***REMOVED***
+type goBoolFlag interface {
 	goflag.Value
 	IsBoolFlag() bool
-***REMOVED***
+}
 
-func wrapFlagValue(v goflag.Value) Value ***REMOVED***
+func wrapFlagValue(v goflag.Value) Value {
 	// If the flag.Value happens to also be a pflag.Value, just use it directly.
-	if pv, ok := v.(Value); ok ***REMOVED***
+	if pv, ok := v.(Value); ok {
 		return pv
-	***REMOVED***
+	}
 
-	pv := &flagValueWrapper***REMOVED***
+	pv := &flagValueWrapper{
 		inner: v,
-	***REMOVED***
+	}
 
 	t := reflect.TypeOf(v)
-	if t.Kind() == reflect.Interface || t.Kind() == reflect.Ptr ***REMOVED***
+	if t.Kind() == reflect.Interface || t.Kind() == reflect.Ptr {
 		t = t.Elem()
-	***REMOVED***
+	}
 
 	pv.flagType = strings.TrimSuffix(t.Name(), "Value")
 	return pv
-***REMOVED***
+}
 
-func (v *flagValueWrapper) String() string ***REMOVED***
+func (v *flagValueWrapper) String() string {
 	return v.inner.String()
-***REMOVED***
+}
 
-func (v *flagValueWrapper) Set(s string) error ***REMOVED***
+func (v *flagValueWrapper) Set(s string) error {
 	return v.inner.Set(s)
-***REMOVED***
+}
 
-func (v *flagValueWrapper) Type() string ***REMOVED***
+func (v *flagValueWrapper) Type() string {
 	return v.flagType
-***REMOVED***
+}
 
 // PFlagFromGoFlag will return a *pflag.Flag given a *flag.Flag
 // If the *flag.Flag.Name was a single character (ex: `v`) it will be accessiblei
 // with both `-v` and `--v` in flags. If the golang flag was more than a single
 // character (ex: `verbose`) it will only be accessible via `--verbose`
-func PFlagFromGoFlag(goflag *goflag.Flag) *Flag ***REMOVED***
+func PFlagFromGoFlag(goflag *goflag.Flag) *Flag {
 	// Remember the default value as a string; it won't change.
-	flag := &Flag***REMOVED***
+	flag := &Flag{
 		Name:  goflag.Name,
 		Usage: goflag.Usage,
 		Value: wrapFlagValue(goflag.Value),
 		// Looks like golang flags don't set DefValue correctly  :-(
 		//DefValue: goflag.DefValue,
 		DefValue: goflag.Value.String(),
-	***REMOVED***
+	}
 	// Ex: if the golang flag was -v, allow both -v and --v to work
-	if len(flag.Name) == 1 ***REMOVED***
+	if len(flag.Name) == 1 {
 		flag.Shorthand = flag.Name
-	***REMOVED***
-	if fv, ok := goflag.Value.(goBoolFlag); ok && fv.IsBoolFlag() ***REMOVED***
+	}
+	if fv, ok := goflag.Value.(goBoolFlag); ok && fv.IsBoolFlag() {
 		flag.NoOptDefVal = "true"
-	***REMOVED***
+	}
 	return flag
-***REMOVED***
+}
 
 // AddGoFlag will add the given *flag.Flag to the pflag.FlagSet
-func (f *FlagSet) AddGoFlag(goflag *goflag.Flag) ***REMOVED***
-	if f.Lookup(goflag.Name) != nil ***REMOVED***
+func (f *FlagSet) AddGoFlag(goflag *goflag.Flag) {
+	if f.Lookup(goflag.Name) != nil {
 		return
-	***REMOVED***
+	}
 	newflag := PFlagFromGoFlag(goflag)
 	f.AddFlag(newflag)
-***REMOVED***
+}
 
 // AddGoFlagSet will add the given *flag.FlagSet to the pflag.FlagSet
-func (f *FlagSet) AddGoFlagSet(newSet *goflag.FlagSet) ***REMOVED***
-	if newSet == nil ***REMOVED***
+func (f *FlagSet) AddGoFlagSet(newSet *goflag.FlagSet) {
+	if newSet == nil {
 		return
-	***REMOVED***
-	newSet.VisitAll(func(goflag *goflag.Flag) ***REMOVED***
+	}
+	newSet.VisitAll(func(goflag *goflag.Flag) {
 		f.AddGoFlag(goflag)
-	***REMOVED***)
-***REMOVED***
+	})
+}

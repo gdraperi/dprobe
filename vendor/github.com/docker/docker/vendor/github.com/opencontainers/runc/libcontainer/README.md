@@ -28,17 +28,17 @@ import (
 	_ "github.com/opencontainers/runc/libcontainer/nsenter"
 )
 
-func init() ***REMOVED***
-	if len(os.Args) > 1 && os.Args[1] == "init" ***REMOVED***
+func init() {
+	if len(os.Args) > 1 && os.Args[1] == "init" {
 		runtime.GOMAXPROCS(1)
 		runtime.LockOSThread()
 		factory, _ := libcontainer.New("")
-		if err := factory.StartInitialization(); err != nil ***REMOVED***
+		if err := factory.StartInitialization(); err != nil {
 			logrus.Fatal(err)
-		***REMOVED***
+		}
 		panic("--this line should have never been executed, congratulations--")
-	***REMOVED***
-***REMOVED***
+	}
+}
 ```
 
 Then to create a container you first have to initialize an instance of a factory
@@ -46,10 +46,10 @@ that will handle the creation and initialization for a container.
 
 ```go
 factory, err := libcontainer.New("/var/lib/container", libcontainer.Cgroupfs, libcontainer.InitArgs(os.Args[0], "init"))
-if err != nil ***REMOVED***
+if err != nil {
 	logrus.Fatal(err)
 	return
-***REMOVED***
+}
 ```
 
 Once you have an instance of the factory created we can create a configuration
@@ -57,10 +57,10 @@ struct describing how the container is to be created. A sample would look simila
 
 ```go
 defaultMountFlags := unix.MS_NOEXEC | unix.MS_NOSUID | unix.MS_NODEV
-config := &configs.Config***REMOVED***
+config := &configs.Config{
 	Rootfs: "/your/path/to/rootfs",
-	Capabilities: &configs.Capabilities***REMOVED***
-                Bounding: []string***REMOVED***
+	Capabilities: &configs.Capabilities{
+                Bounding: []string{
                         "CAP_CHOWN",
                         "CAP_DAC_OVERRIDE",
                         "CAP_FSETID",
@@ -75,8 +75,8 @@ config := &configs.Config***REMOVED***
                         "CAP_SYS_CHROOT",
                         "CAP_KILL",
                         "CAP_AUDIT_WRITE",
-            ***REMOVED***,
-                Effective: []string***REMOVED***
+                },
+                Effective: []string{
                         "CAP_CHOWN",
                         "CAP_DAC_OVERRIDE",
                         "CAP_FSETID",
@@ -91,8 +91,8 @@ config := &configs.Config***REMOVED***
                         "CAP_SYS_CHROOT",
                         "CAP_KILL",
                         "CAP_AUDIT_WRITE",
-            ***REMOVED***,
-                Inheritable: []string***REMOVED***
+                },
+                Inheritable: []string{
                         "CAP_CHOWN",
                         "CAP_DAC_OVERRIDE",
                         "CAP_FSETID",
@@ -107,8 +107,8 @@ config := &configs.Config***REMOVED***
                         "CAP_SYS_CHROOT",
                         "CAP_KILL",
                         "CAP_AUDIT_WRITE",
-            ***REMOVED***,
-                Permitted: []string***REMOVED***
+                },
+                Permitted: []string{
                         "CAP_CHOWN",
                         "CAP_DAC_OVERRIDE",
                         "CAP_FSETID",
@@ -123,8 +123,8 @@ config := &configs.Config***REMOVED***
                         "CAP_SYS_CHROOT",
                         "CAP_KILL",
                         "CAP_AUDIT_WRITE",
-            ***REMOVED***,
-                Ambient: []string***REMOVED***
+                },
+                Ambient: []string{
                         "CAP_CHOWN",
                         "CAP_DAC_OVERRIDE",
                         "CAP_FSETID",
@@ -139,141 +139,141 @@ config := &configs.Config***REMOVED***
                         "CAP_SYS_CHROOT",
                         "CAP_KILL",
                         "CAP_AUDIT_WRITE",
-            ***REMOVED***,
-    ***REMOVED***,
-	Namespaces: configs.Namespaces([]configs.Namespace***REMOVED***
-		***REMOVED***Type: configs.NEWNS***REMOVED***,
-		***REMOVED***Type: configs.NEWUTS***REMOVED***,
-		***REMOVED***Type: configs.NEWIPC***REMOVED***,
-		***REMOVED***Type: configs.NEWPID***REMOVED***,
-		***REMOVED***Type: configs.NEWUSER***REMOVED***,
-		***REMOVED***Type: configs.NEWNET***REMOVED***,
-	***REMOVED***),
-	Cgroups: &configs.Cgroup***REMOVED***
+                },
+        },
+	Namespaces: configs.Namespaces([]configs.Namespace{
+		{Type: configs.NEWNS},
+		{Type: configs.NEWUTS},
+		{Type: configs.NEWIPC},
+		{Type: configs.NEWPID},
+		{Type: configs.NEWUSER},
+		{Type: configs.NEWNET},
+	}),
+	Cgroups: &configs.Cgroup{
 		Name:   "test-container",
 		Parent: "system",
-		Resources: &configs.Resources***REMOVED***
+		Resources: &configs.Resources{
 			MemorySwappiness: nil,
 			AllowAllDevices:  nil,
 			AllowedDevices:   configs.DefaultAllowedDevices,
-		***REMOVED***,
-	***REMOVED***,
-	MaskPaths: []string***REMOVED***
+		},
+	},
+	MaskPaths: []string{
 		"/proc/kcore",
 		"/sys/firmware",
-	***REMOVED***,
-	ReadonlyPaths: []string***REMOVED***
+	},
+	ReadonlyPaths: []string{
 		"/proc/sys", "/proc/sysrq-trigger", "/proc/irq", "/proc/bus",
-	***REMOVED***,
+	},
 	Devices:  configs.DefaultAutoCreatedDevices,
 	Hostname: "testing",
-	Mounts: []*configs.Mount***REMOVED***
-		***REMOVED***
+	Mounts: []*configs.Mount{
+		{
 			Source:      "proc",
 			Destination: "/proc",
 			Device:      "proc",
 			Flags:       defaultMountFlags,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			Source:      "tmpfs",
 			Destination: "/dev",
 			Device:      "tmpfs",
 			Flags:       unix.MS_NOSUID | unix.MS_STRICTATIME,
 			Data:        "mode=755",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			Source:      "devpts",
 			Destination: "/dev/pts",
 			Device:      "devpts",
 			Flags:       unix.MS_NOSUID | unix.MS_NOEXEC,
 			Data:        "newinstance,ptmxmode=0666,mode=0620,gid=5",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			Device:      "tmpfs",
 			Source:      "shm",
 			Destination: "/dev/shm",
 			Data:        "mode=1777,size=65536k",
 			Flags:       defaultMountFlags,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			Source:      "mqueue",
 			Destination: "/dev/mqueue",
 			Device:      "mqueue",
 			Flags:       defaultMountFlags,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			Source:      "sysfs",
 			Destination: "/sys",
 			Device:      "sysfs",
 			Flags:       defaultMountFlags | unix.MS_RDONLY,
-		***REMOVED***,
-	***REMOVED***,
-	UidMappings: []configs.IDMap***REMOVED***
-		***REMOVED***
+		},
+	},
+	UidMappings: []configs.IDMap{
+		{
 			ContainerID: 0,
 			HostID: 1000,
 			Size: 65536,
-		***REMOVED***,
-	***REMOVED***,
-	GidMappings: []configs.IDMap***REMOVED***
-		***REMOVED***
+		},
+	},
+	GidMappings: []configs.IDMap{
+		{
 			ContainerID: 0,
 			HostID: 1000,
 			Size: 65536,
-		***REMOVED***,
-	***REMOVED***,
-	Networks: []*configs.Network***REMOVED***
-		***REMOVED***
+		},
+	},
+	Networks: []*configs.Network{
+		{
 			Type:    "loopback",
 			Address: "127.0.0.1/0",
 			Gateway: "localhost",
-		***REMOVED***,
-	***REMOVED***,
-	Rlimits: []configs.Rlimit***REMOVED***
-		***REMOVED***
+		},
+	},
+	Rlimits: []configs.Rlimit{
+		{
 			Type: unix.RLIMIT_NOFILE,
 			Hard: uint64(1025),
 			Soft: uint64(1025),
-		***REMOVED***,
-	***REMOVED***,
-***REMOVED***
+		},
+	},
+}
 ```
 
 Once you have the configuration populated you can create a container:
 
 ```go
 container, err := factory.Create("container-id", config)
-if err != nil ***REMOVED***
+if err != nil {
 	logrus.Fatal(err)
 	return
-***REMOVED***
+}
 ```
 
 To spawn bash as the initial process inside the container and have the
 processes pid returned in order to wait, signal, or kill the process:
 
 ```go
-process := &libcontainer.Process***REMOVED***
-	Args:   []string***REMOVED***"/bin/bash"***REMOVED***,
-	Env:    []string***REMOVED***"PATH=/bin"***REMOVED***,
+process := &libcontainer.Process{
+	Args:   []string{"/bin/bash"},
+	Env:    []string{"PATH=/bin"},
 	User:   "daemon",
 	Stdin:  os.Stdin,
 	Stdout: os.Stdout,
 	Stderr: os.Stderr,
-***REMOVED***
+}
 
 err := container.Run(process)
-if err != nil ***REMOVED***
+if err != nil {
 	container.Destroy()
 	logrus.Fatal(err)
 	return
-***REMOVED***
+}
 
 // wait for the process to finish.
 _, err := process.Wait()
-if err != nil ***REMOVED***
+if err != nil {
 	logrus.Fatal(err)
-***REMOVED***
+}
 
 // destroy the container.
 container.Destroy()

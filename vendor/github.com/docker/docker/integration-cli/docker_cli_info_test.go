@@ -12,11 +12,11 @@ import (
 )
 
 // ensure docker info succeeds
-func (s *DockerSuite) TestInfoEnsureSucceeds(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestInfoEnsureSucceeds(c *check.C) {
 	out, _ := dockerCmd(c, "info")
 
 	// always shown fields
-	stringsToCheck := []string***REMOVED***
+	stringsToCheck := []string{
 		"ID:",
 		"Containers:",
 		" Running:",
@@ -34,46 +34,46 @@ func (s *DockerSuite) TestInfoEnsureSucceeds(c *check.C) ***REMOVED***
 		"Volume:",
 		"Network:",
 		"Live Restore Enabled:",
-	***REMOVED***
+	}
 
-	if testEnv.OSType == "linux" ***REMOVED***
+	if testEnv.OSType == "linux" {
 		stringsToCheck = append(stringsToCheck, "Init Binary:", "Security Options:", "containerd version:", "runc version:", "init version:")
-	***REMOVED***
+	}
 
-	if DaemonIsLinux() ***REMOVED***
+	if DaemonIsLinux() {
 		stringsToCheck = append(stringsToCheck, "Runtimes:", "Default Runtime: runc")
-	***REMOVED***
+	}
 
-	if testEnv.DaemonInfo.ExperimentalBuild ***REMOVED***
+	if testEnv.DaemonInfo.ExperimentalBuild {
 		stringsToCheck = append(stringsToCheck, "Experimental: true")
-	***REMOVED*** else ***REMOVED***
+	} else {
 		stringsToCheck = append(stringsToCheck, "Experimental: false")
-	***REMOVED***
+	}
 
-	for _, linePrefix := range stringsToCheck ***REMOVED***
+	for _, linePrefix := range stringsToCheck {
 		c.Assert(out, checker.Contains, linePrefix, check.Commentf("couldn't find string %v in output", linePrefix))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // TestInfoFormat tests `docker info --format`
-func (s *DockerSuite) TestInfoFormat(c *check.C) ***REMOVED***
-	out, status := dockerCmd(c, "info", "--format", "***REMOVED******REMOVED***json .***REMOVED******REMOVED***")
+func (s *DockerSuite) TestInfoFormat(c *check.C) {
+	out, status := dockerCmd(c, "info", "--format", "{{json .}}")
 	c.Assert(status, checker.Equals, 0)
-	var m map[string]interface***REMOVED******REMOVED***
+	var m map[string]interface{}
 	err := json.Unmarshal([]byte(out), &m)
 	c.Assert(err, checker.IsNil)
-	_, _, err = dockerCmdWithError("info", "--format", "***REMOVED******REMOVED***.badString***REMOVED******REMOVED***")
+	_, _, err = dockerCmdWithError("info", "--format", "{{.badString}}")
 	c.Assert(err, checker.NotNil)
-***REMOVED***
+}
 
 // TestInfoDiscoveryBackend verifies that a daemon run with `--cluster-advertise` and
 // `--cluster-store` properly show the backend's endpoint in info output.
-func (s *DockerSuite) TestInfoDiscoveryBackend(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestInfoDiscoveryBackend(c *check.C) {
 	testRequires(c, SameHostDaemon, DaemonIsLinux)
 
-	d := daemon.New(c, dockerBinary, dockerdBinary, daemon.Config***REMOVED***
+	d := daemon.New(c, dockerBinary, dockerdBinary, daemon.Config{
 		Experimental: testEnv.DaemonInfo.ExperimentalBuild,
-	***REMOVED***)
+	})
 	discoveryBackend := "consul://consuladdr:consulport/some/path"
 	discoveryAdvertise := "1.1.1.1:2375"
 	d.Start(c, fmt.Sprintf("--cluster-store=%s", discoveryBackend), fmt.Sprintf("--cluster-advertise=%s", discoveryAdvertise))
@@ -83,16 +83,16 @@ func (s *DockerSuite) TestInfoDiscoveryBackend(c *check.C) ***REMOVED***
 	c.Assert(err, checker.IsNil)
 	c.Assert(out, checker.Contains, fmt.Sprintf("Cluster Store: %s\n", discoveryBackend))
 	c.Assert(out, checker.Contains, fmt.Sprintf("Cluster Advertise: %s\n", discoveryAdvertise))
-***REMOVED***
+}
 
 // TestInfoDiscoveryInvalidAdvertise verifies that a daemon run with
 // an invalid `--cluster-advertise` configuration
-func (s *DockerSuite) TestInfoDiscoveryInvalidAdvertise(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestInfoDiscoveryInvalidAdvertise(c *check.C) {
 	testRequires(c, SameHostDaemon, DaemonIsLinux)
 
-	d := daemon.New(c, dockerBinary, dockerdBinary, daemon.Config***REMOVED***
+	d := daemon.New(c, dockerBinary, dockerdBinary, daemon.Config{
 		Experimental: testEnv.DaemonInfo.ExperimentalBuild,
-	***REMOVED***)
+	})
 	discoveryBackend := "consul://consuladdr:consulport/some/path"
 
 	// --cluster-advertise with an invalid string is an error
@@ -102,16 +102,16 @@ func (s *DockerSuite) TestInfoDiscoveryInvalidAdvertise(c *check.C) ***REMOVED**
 	// --cluster-advertise without --cluster-store is also an error
 	err = d.StartWithError("--cluster-advertise=1.1.1.1:2375")
 	c.Assert(err, checker.NotNil)
-***REMOVED***
+}
 
 // TestInfoDiscoveryAdvertiseInterfaceName verifies that a daemon run with `--cluster-advertise`
 // configured with interface name properly show the advertise ip-address in info output.
-func (s *DockerSuite) TestInfoDiscoveryAdvertiseInterfaceName(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestInfoDiscoveryAdvertiseInterfaceName(c *check.C) {
 	testRequires(c, SameHostDaemon, Network, DaemonIsLinux)
 
-	d := daemon.New(c, dockerBinary, dockerdBinary, daemon.Config***REMOVED***
+	d := daemon.New(c, dockerBinary, dockerdBinary, daemon.Config{
 		Experimental: testEnv.DaemonInfo.ExperimentalBuild,
-	***REMOVED***)
+	})
 	discoveryBackend := "consul://consuladdr:consulport/some/path"
 	discoveryAdvertise := "eth0"
 
@@ -130,9 +130,9 @@ func (s *DockerSuite) TestInfoDiscoveryAdvertiseInterfaceName(c *check.C) ***REM
 	c.Assert(err, checker.IsNil)
 	c.Assert(out, checker.Contains, fmt.Sprintf("Cluster Store: %s\n", discoveryBackend))
 	c.Assert(out, checker.Contains, fmt.Sprintf("Cluster Advertise: %s:2375\n", ip.String()))
-***REMOVED***
+}
 
-func (s *DockerSuite) TestInfoDisplaysRunningContainers(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestInfoDisplaysRunningContainers(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 
 	existing := existingContainerStates(c)
@@ -143,9 +143,9 @@ func (s *DockerSuite) TestInfoDisplaysRunningContainers(c *check.C) ***REMOVED**
 	c.Assert(out, checker.Contains, fmt.Sprintf(" Running: %d\n", existing["ContainersRunning"]+1))
 	c.Assert(out, checker.Contains, fmt.Sprintf(" Paused: %d\n", existing["ContainersPaused"]))
 	c.Assert(out, checker.Contains, fmt.Sprintf(" Stopped: %d\n", existing["ContainersStopped"]))
-***REMOVED***
+}
 
-func (s *DockerSuite) TestInfoDisplaysPausedContainers(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestInfoDisplaysPausedContainers(c *check.C) {
 	testRequires(c, IsPausable)
 
 	existing := existingContainerStates(c)
@@ -160,9 +160,9 @@ func (s *DockerSuite) TestInfoDisplaysPausedContainers(c *check.C) ***REMOVED***
 	c.Assert(out, checker.Contains, fmt.Sprintf(" Running: %d\n", existing["ContainersRunning"]))
 	c.Assert(out, checker.Contains, fmt.Sprintf(" Paused: %d\n", existing["ContainersPaused"]+1))
 	c.Assert(out, checker.Contains, fmt.Sprintf(" Stopped: %d\n", existing["ContainersStopped"]))
-***REMOVED***
+}
 
-func (s *DockerSuite) TestInfoDisplaysStoppedContainers(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestInfoDisplaysStoppedContainers(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 
 	existing := existingContainerStates(c)
@@ -177,14 +177,14 @@ func (s *DockerSuite) TestInfoDisplaysStoppedContainers(c *check.C) ***REMOVED**
 	c.Assert(out, checker.Contains, fmt.Sprintf(" Running: %d\n", existing["ContainersRunning"]))
 	c.Assert(out, checker.Contains, fmt.Sprintf(" Paused: %d\n", existing["ContainersPaused"]))
 	c.Assert(out, checker.Contains, fmt.Sprintf(" Stopped: %d\n", existing["ContainersStopped"]+1))
-***REMOVED***
+}
 
-func (s *DockerSuite) TestInfoDebug(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestInfoDebug(c *check.C) {
 	testRequires(c, SameHostDaemon, DaemonIsLinux)
 
-	d := daemon.New(c, dockerBinary, dockerdBinary, daemon.Config***REMOVED***
+	d := daemon.New(c, dockerBinary, dockerdBinary, daemon.Config{
 		Experimental: testEnv.DaemonInfo.ExperimentalBuild,
-	***REMOVED***)
+	})
 	d.Start(c, "--debug")
 	defer d.Stop(c)
 
@@ -197,17 +197,17 @@ func (s *DockerSuite) TestInfoDebug(c *check.C) ***REMOVED***
 	c.Assert(out, checker.Contains, "System Time")
 	c.Assert(out, checker.Contains, "EventsListeners")
 	c.Assert(out, checker.Contains, "Docker Root Dir")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestInsecureRegistries(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestInsecureRegistries(c *check.C) {
 	testRequires(c, SameHostDaemon, DaemonIsLinux)
 
 	registryCIDR := "192.168.1.0/24"
 	registryHost := "insecurehost.com:5000"
 
-	d := daemon.New(c, dockerBinary, dockerdBinary, daemon.Config***REMOVED***
+	d := daemon.New(c, dockerBinary, dockerdBinary, daemon.Config{
 		Experimental: testEnv.DaemonInfo.ExperimentalBuild,
-	***REMOVED***)
+	})
 	d.Start(c, "--insecure-registry="+registryCIDR, "--insecure-registry="+registryHost)
 	defer d.Stop(c)
 
@@ -216,9 +216,9 @@ func (s *DockerSuite) TestInsecureRegistries(c *check.C) ***REMOVED***
 	c.Assert(out, checker.Contains, "Insecure Registries:\n")
 	c.Assert(out, checker.Contains, fmt.Sprintf(" %s\n", registryHost))
 	c.Assert(out, checker.Contains, fmt.Sprintf(" %s\n", registryCIDR))
-***REMOVED***
+}
 
-func (s *DockerDaemonSuite) TestRegistryMirrors(c *check.C) ***REMOVED***
+func (s *DockerDaemonSuite) TestRegistryMirrors(c *check.C) {
 	testRequires(c, SameHostDaemon, DaemonIsLinux)
 
 	registryMirror1 := "https://192.168.1.2"
@@ -231,17 +231,17 @@ func (s *DockerDaemonSuite) TestRegistryMirrors(c *check.C) ***REMOVED***
 	c.Assert(out, checker.Contains, "Registry Mirrors:\n")
 	c.Assert(out, checker.Contains, fmt.Sprintf(" %s", registryMirror1))
 	c.Assert(out, checker.Contains, fmt.Sprintf(" %s", registryMirror2))
-***REMOVED***
+}
 
-func existingContainerStates(c *check.C) map[string]int ***REMOVED***
-	out, _ := dockerCmd(c, "info", "--format", "***REMOVED******REMOVED***json .***REMOVED******REMOVED***")
-	var m map[string]interface***REMOVED******REMOVED***
+func existingContainerStates(c *check.C) map[string]int {
+	out, _ := dockerCmd(c, "info", "--format", "{{json .}}")
+	var m map[string]interface{}
 	err := json.Unmarshal([]byte(out), &m)
 	c.Assert(err, checker.IsNil)
-	res := map[string]int***REMOVED******REMOVED***
+	res := map[string]int{}
 	res["Containers"] = int(m["Containers"].(float64))
 	res["ContainersRunning"] = int(m["ContainersRunning"].(float64))
 	res["ContainersPaused"] = int(m["ContainersPaused"].(float64))
 	res["ContainersStopped"] = int(m["ContainersStopped"].(float64))
 	return res
-***REMOVED***
+}

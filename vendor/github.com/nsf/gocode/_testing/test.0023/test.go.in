@@ -4,6 +4,6 @@ package main
 
 import ъ "fmt"
 
-func main() ***REMOVED***
+func main() {
 	ъ.
-***REMOVED***
+}

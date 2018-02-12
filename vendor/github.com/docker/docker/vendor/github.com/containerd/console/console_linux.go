@@ -30,123 +30,123 @@ const (
 //		wg sync.WaitGroup
 //	)
 //	wg.Add(1)
-//	go func() ***REMOVED***
+//	go func() {
 //		io.Copy(&b, epollConsole)
 //		wg.Done()
-//	***REMOVED***()
+//	}()
 //	// perform I/O on the console
 //	epollConsole.Shutdown(epoller.CloseConsole)
 //	wg.Wait()
 //	epollConsole.Close()
-type Epoller struct ***REMOVED***
+type Epoller struct {
 	efd       int
 	mu        sync.Mutex
 	fdMapping map[int]*EpollConsole
-***REMOVED***
+}
 
 // NewEpoller returns an instance of epoller with a valid epoll fd.
-func NewEpoller() (*Epoller, error) ***REMOVED***
+func NewEpoller() (*Epoller, error) {
 	efd, err := unix.EpollCreate1(unix.EPOLL_CLOEXEC)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	return &Epoller***REMOVED***
+	}
+	return &Epoller{
 		efd:       efd,
 		fdMapping: make(map[int]*EpollConsole),
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // Add creates a epoll console based on the provided console. The console will
 // be registered with EPOLLET (i.e. using edge-triggered notification) and its
 // file descriptor will be set to non-blocking mode. After this, user should use
 // the return console to perform I/O.
-func (e *Epoller) Add(console Console) (*EpollConsole, error) ***REMOVED***
+func (e *Epoller) Add(console Console) (*EpollConsole, error) {
 	sysfd := int(console.Fd())
 	// Set sysfd to non-blocking mode
-	if err := unix.SetNonblock(sysfd, true); err != nil ***REMOVED***
+	if err := unix.SetNonblock(sysfd, true); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	ev := unix.EpollEvent***REMOVED***
+	ev := unix.EpollEvent{
 		Events: unix.EPOLLIN | unix.EPOLLOUT | unix.EPOLLRDHUP | unix.EPOLLET,
 		Fd:     int32(sysfd),
-	***REMOVED***
-	if err := unix.EpollCtl(e.efd, unix.EPOLL_CTL_ADD, sysfd, &ev); err != nil ***REMOVED***
+	}
+	if err := unix.EpollCtl(e.efd, unix.EPOLL_CTL_ADD, sysfd, &ev); err != nil {
 		return nil, err
-	***REMOVED***
-	ef := &EpollConsole***REMOVED***
+	}
+	ef := &EpollConsole{
 		Console: console,
 		sysfd:   sysfd,
-		readc:   sync.NewCond(&sync.Mutex***REMOVED******REMOVED***),
-		writec:  sync.NewCond(&sync.Mutex***REMOVED******REMOVED***),
-	***REMOVED***
+		readc:   sync.NewCond(&sync.Mutex{}),
+		writec:  sync.NewCond(&sync.Mutex{}),
+	}
 	e.mu.Lock()
 	e.fdMapping[sysfd] = ef
 	e.mu.Unlock()
 	return ef, nil
-***REMOVED***
+}
 
 // Wait starts the loop to wait for its consoles' notifications and signal
 // appropriate console that it can perform I/O.
-func (e *Epoller) Wait() error ***REMOVED***
+func (e *Epoller) Wait() error {
 	events := make([]unix.EpollEvent, maxEvents)
-	for ***REMOVED***
+	for {
 		n, err := unix.EpollWait(e.efd, events, -1)
-		if err != nil ***REMOVED***
+		if err != nil {
 			// EINTR: The call was interrupted by a signal handler before either
 			// any of the requested events occurred or the timeout expired
-			if err == unix.EINTR ***REMOVED***
+			if err == unix.EINTR {
 				continue
-			***REMOVED***
+			}
 			return err
-		***REMOVED***
-		for i := 0; i < n; i++ ***REMOVED***
+		}
+		for i := 0; i < n; i++ {
 			ev := &events[i]
 			// the console is ready to be read from
-			if ev.Events&(unix.EPOLLIN|unix.EPOLLHUP|unix.EPOLLERR) != 0 ***REMOVED***
-				if epfile := e.getConsole(int(ev.Fd)); epfile != nil ***REMOVED***
+			if ev.Events&(unix.EPOLLIN|unix.EPOLLHUP|unix.EPOLLERR) != 0 {
+				if epfile := e.getConsole(int(ev.Fd)); epfile != nil {
 					epfile.signalRead()
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			// the console is ready to be written to
-			if ev.Events&(unix.EPOLLOUT|unix.EPOLLHUP|unix.EPOLLERR) != 0 ***REMOVED***
-				if epfile := e.getConsole(int(ev.Fd)); epfile != nil ***REMOVED***
+			if ev.Events&(unix.EPOLLOUT|unix.EPOLLHUP|unix.EPOLLERR) != 0 {
+				if epfile := e.getConsole(int(ev.Fd)); epfile != nil {
 					epfile.signalWrite()
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+				}
+			}
+		}
+	}
+}
 
 // Close unregister the console's file descriptor from epoll interface
-func (e *Epoller) CloseConsole(fd int) error ***REMOVED***
+func (e *Epoller) CloseConsole(fd int) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 	delete(e.fdMapping, fd)
-	return unix.EpollCtl(e.efd, unix.EPOLL_CTL_DEL, fd, &unix.EpollEvent***REMOVED******REMOVED***)
-***REMOVED***
+	return unix.EpollCtl(e.efd, unix.EPOLL_CTL_DEL, fd, &unix.EpollEvent{})
+}
 
-func (e *Epoller) getConsole(sysfd int) *EpollConsole ***REMOVED***
+func (e *Epoller) getConsole(sysfd int) *EpollConsole {
 	e.mu.Lock()
 	f := e.fdMapping[sysfd]
 	e.mu.Unlock()
 	return f
-***REMOVED***
+}
 
 // Close the epoll fd
-func (e *Epoller) Close() error ***REMOVED***
+func (e *Epoller) Close() error {
 	return unix.Close(e.efd)
-***REMOVED***
+}
 
 // EpollConsole acts like a console but register its file descriptor with a
 // epoll fd and uses epoll API to perform I/O.
-type EpollConsole struct ***REMOVED***
+type EpollConsole struct {
 	Console
 	readc  *sync.Cond
 	writec *sync.Cond
 	sysfd  int
 	closed bool
-***REMOVED***
+}
 
 // Read reads up to len(p) bytes into p. It returns the number of bytes read
 // (0 <= n <= len(p)) and any error encountered.
@@ -154,38 +154,38 @@ type EpollConsole struct ***REMOVED***
 // If the console's read returns EAGAIN or EIO, we assumes that its a
 // temporary error because the other side went away and wait for the signal
 // generated by epoll event to continue.
-func (ec *EpollConsole) Read(p []byte) (n int, err error) ***REMOVED***
+func (ec *EpollConsole) Read(p []byte) (n int, err error) {
 	var read int
 	ec.readc.L.Lock()
 	defer ec.readc.L.Unlock()
-	for ***REMOVED***
+	for {
 		read, err = ec.Console.Read(p[n:])
 		n += read
-		if err != nil ***REMOVED***
+		if err != nil {
 			var hangup bool
-			if perr, ok := err.(*os.PathError); ok ***REMOVED***
+			if perr, ok := err.(*os.PathError); ok {
 				hangup = (perr.Err == unix.EAGAIN || perr.Err == unix.EIO)
-			***REMOVED*** else ***REMOVED***
+			} else {
 				hangup = (err == unix.EAGAIN || err == unix.EIO)
-			***REMOVED***
+			}
 			// if the other end disappear, assume this is temporary and wait for the
 			// signal to continue again. Unless we didnt read anything and the
 			// console is already marked as closed then we should exit
-			if hangup && !(n == 0 && len(p) > 0 && ec.closed) ***REMOVED***
+			if hangup && !(n == 0 && len(p) > 0 && ec.closed) {
 				ec.readc.Wait()
 				continue
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		break
-	***REMOVED***
+	}
 	// if we didnt read anything then return io.EOF to end gracefully
-	if n == 0 && len(p) > 0 && err == nil ***REMOVED***
+	if n == 0 && len(p) > 0 && err == nil {
 		err = io.EOF
-	***REMOVED***
+	}
 	// signal for others that we finished the read
 	ec.readc.Signal()
 	return n, err
-***REMOVED***
+}
 
 // Writes len(p) bytes from p to the console. It returns the number of bytes
 // written from p (0 <= n <= len(p)) and any error encountered that caused
@@ -194,37 +194,37 @@ func (ec *EpollConsole) Read(p []byte) (n int, err error) ***REMOVED***
 // If writes to the console returns EAGAIN or EIO, we assumes that its a
 // temporary error because the other side went away and wait for the signal
 // generated by epoll event to continue.
-func (ec *EpollConsole) Write(p []byte) (n int, err error) ***REMOVED***
+func (ec *EpollConsole) Write(p []byte) (n int, err error) {
 	var written int
 	ec.writec.L.Lock()
 	defer ec.writec.L.Unlock()
-	for ***REMOVED***
+	for {
 		written, err = ec.Console.Write(p[n:])
 		n += written
-		if err != nil ***REMOVED***
+		if err != nil {
 			var hangup bool
-			if perr, ok := err.(*os.PathError); ok ***REMOVED***
+			if perr, ok := err.(*os.PathError); ok {
 				hangup = (perr.Err == unix.EAGAIN || perr.Err == unix.EIO)
-			***REMOVED*** else ***REMOVED***
+			} else {
 				hangup = (err == unix.EAGAIN || err == unix.EIO)
-			***REMOVED***
+			}
 			// if the other end disappear, assume this is temporary and wait for the
 			// signal to continue again.
-			if hangup ***REMOVED***
+			if hangup {
 				ec.writec.Wait()
 				continue
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		// unrecoverable error, break the loop and return the error
 		break
-	***REMOVED***
-	if n < len(p) && err == nil ***REMOVED***
+	}
+	if n < len(p) && err == nil {
 		err = io.ErrShortWrite
-	***REMOVED***
+	}
 	// signal for others that we finished the write
 	ec.writec.Signal()
 	return n, err
-***REMOVED***
+}
 
 // Close closed the file descriptor and signal call waiters for this fd.
 // It accepts a callback which will be called with the console's fd. The
@@ -232,7 +232,7 @@ func (ec *EpollConsole) Write(p []byte) (n int, err error) ***REMOVED***
 // console's fd from the epoll interface.
 // User should call Shutdown and wait for all I/O operation to be finished
 // before closing the console.
-func (ec *EpollConsole) Shutdown(close func(int) error) error ***REMOVED***
+func (ec *EpollConsole) Shutdown(close func(int) error) error {
 	ec.readc.L.Lock()
 	defer ec.readc.L.Unlock()
 	ec.writec.L.Lock()
@@ -242,14 +242,14 @@ func (ec *EpollConsole) Shutdown(close func(int) error) error ***REMOVED***
 	ec.writec.Broadcast()
 	ec.closed = true
 	return close(ec.sysfd)
-***REMOVED***
+}
 
 // signalRead signals that the console is readable.
-func (ec *EpollConsole) signalRead() ***REMOVED***
+func (ec *EpollConsole) signalRead() {
 	ec.readc.Signal()
-***REMOVED***
+}
 
 // signalWrite signals that the console is writable.
-func (ec *EpollConsole) signalWrite() ***REMOVED***
+func (ec *EpollConsole) signalWrite() {
 	ec.writec.Signal()
-***REMOVED***
+}

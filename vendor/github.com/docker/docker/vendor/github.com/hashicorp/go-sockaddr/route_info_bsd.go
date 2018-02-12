@@ -4,33 +4,33 @@ package sockaddr
 
 import "os/exec"
 
-var cmds map[string][]string = map[string][]string***REMOVED***
-	"route": ***REMOVED***"/sbin/route", "-n", "get", "default"***REMOVED***,
-***REMOVED***
+var cmds map[string][]string = map[string][]string{
+	"route": {"/sbin/route", "-n", "get", "default"},
+}
 
-type routeInfo struct ***REMOVED***
+type routeInfo struct {
 	cmds map[string][]string
-***REMOVED***
+}
 
 // NewRouteInfo returns a BSD-specific implementation of the RouteInfo
 // interface.
-func NewRouteInfo() (routeInfo, error) ***REMOVED***
-	return routeInfo***REMOVED***
+func NewRouteInfo() (routeInfo, error) {
+	return routeInfo{
 		cmds: cmds,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // GetDefaultInterfaceName returns the interface name attached to the default
 // route on the default interface.
-func (ri routeInfo) GetDefaultInterfaceName() (string, error) ***REMOVED***
+func (ri routeInfo) GetDefaultInterfaceName() (string, error) {
 	out, err := exec.Command(cmds["route"][0], cmds["route"][1:]...).Output()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 
 	var ifName string
-	if ifName, err = parseDefaultIfNameFromRoute(string(out)); err != nil ***REMOVED***
+	if ifName, err = parseDefaultIfNameFromRoute(string(out)); err != nil {
 		return "", err
-	***REMOVED***
+	}
 	return ifName, nil
-***REMOVED***
+}

@@ -16,7 +16,7 @@ const (
 
 // IPAddr is a generic IP address interface for IPv4 and IPv6 addresses,
 // networks, and socket endpoints.
-type IPAddr interface ***REMOVED***
+type IPAddr interface {
 	SockAddr
 	AddressBinString() string
 	AddressHexString() string
@@ -33,7 +33,7 @@ type IPAddr interface ***REMOVED***
 	NetIPNet() *net.IPNet
 	Network() IPAddr
 	Octets() []int
-***REMOVED***
+}
 
 // IPPort is the type for an IP port number for the TCP and UDP IP transports.
 type IPPort uint16
@@ -46,56 +46,56 @@ type IPPrefixLen byte
 var ipAddrAttrMap map[AttrName]func(IPAddr) string
 var ipAddrAttrs []AttrName
 
-func init() ***REMOVED***
+func init() {
 	ipAddrInit()
-***REMOVED***
+}
 
 // NewIPAddr creates a new IPAddr from a string.  Returns nil if the string is
 // not an IPv4 or an IPv6 address.
-func NewIPAddr(addr string) (IPAddr, error) ***REMOVED***
+func NewIPAddr(addr string) (IPAddr, error) {
 	ipv4Addr, err := NewIPv4Addr(addr)
-	if err == nil ***REMOVED***
+	if err == nil {
 		return ipv4Addr, nil
-	***REMOVED***
+	}
 
 	ipv6Addr, err := NewIPv6Addr(addr)
-	if err == nil ***REMOVED***
+	if err == nil {
 		return ipv6Addr, nil
-	***REMOVED***
+	}
 
 	return nil, fmt.Errorf("invalid IPAddr %v", addr)
-***REMOVED***
+}
 
 // IPAddrAttr returns a string representation of an attribute for the given
 // IPAddr.
-func IPAddrAttr(ip IPAddr, selector AttrName) string ***REMOVED***
+func IPAddrAttr(ip IPAddr, selector AttrName) string {
 	fn, found := ipAddrAttrMap[selector]
-	if !found ***REMOVED***
+	if !found {
 		return ""
-	***REMOVED***
+	}
 
 	return fn(ip)
-***REMOVED***
+}
 
 // IPAttrs returns a list of attributes supported by the IPAddr type
-func IPAttrs() []AttrName ***REMOVED***
+func IPAttrs() []AttrName {
 	return ipAddrAttrs
-***REMOVED***
+}
 
 // MustIPAddr is a helper method that must return an IPAddr or panic on invalid
 // input.
-func MustIPAddr(addr string) IPAddr ***REMOVED***
+func MustIPAddr(addr string) IPAddr {
 	ip, err := NewIPAddr(addr)
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(fmt.Sprintf("Unable to create an IPAddr from %+q: %v", addr, err))
-	***REMOVED***
+	}
 	return ip
-***REMOVED***
+}
 
 // ipAddrInit is called once at init()
-func ipAddrInit() ***REMOVED***
+func ipAddrInit() {
 	// Sorted for human readability
-	ipAddrAttrs = []AttrName***REMOVED***
+	ipAddrAttrs = []AttrName{
 		"host",
 		"address",
 		"port",
@@ -107,63 +107,63 @@ func ipAddrInit() ***REMOVED***
 		"first_usable",
 		"last_usable",
 		"octets",
-	***REMOVED***
+	}
 
-	ipAddrAttrMap = map[AttrName]func(ip IPAddr) string***REMOVED***
-		"address": func(ip IPAddr) string ***REMOVED***
+	ipAddrAttrMap = map[AttrName]func(ip IPAddr) string{
+		"address": func(ip IPAddr) string {
 			return ip.NetIP().String()
-		***REMOVED***,
-		"binary": func(ip IPAddr) string ***REMOVED***
+		},
+		"binary": func(ip IPAddr) string {
 			return ip.AddressBinString()
-		***REMOVED***,
-		"first_usable": func(ip IPAddr) string ***REMOVED***
+		},
+		"first_usable": func(ip IPAddr) string {
 			return ip.FirstUsable().String()
-		***REMOVED***,
-		"hex": func(ip IPAddr) string ***REMOVED***
+		},
+		"hex": func(ip IPAddr) string {
 			return ip.AddressHexString()
-		***REMOVED***,
-		"host": func(ip IPAddr) string ***REMOVED***
+		},
+		"host": func(ip IPAddr) string {
 			return ip.Host().String()
-		***REMOVED***,
-		"last_usable": func(ip IPAddr) string ***REMOVED***
+		},
+		"last_usable": func(ip IPAddr) string {
 			return ip.LastUsable().String()
-		***REMOVED***,
-		"mask_bits": func(ip IPAddr) string ***REMOVED***
+		},
+		"mask_bits": func(ip IPAddr) string {
 			return fmt.Sprintf("%d", ip.Maskbits())
-		***REMOVED***,
-		"netmask": func(ip IPAddr) string ***REMOVED***
-			switch v := ip.(type) ***REMOVED***
+		},
+		"netmask": func(ip IPAddr) string {
+			switch v := ip.(type) {
 			case IPv4Addr:
-				ipv4Mask := IPv4Addr***REMOVED***
+				ipv4Mask := IPv4Addr{
 					Address: IPv4Address(v.Mask),
 					Mask:    IPv4HostMask,
-				***REMOVED***
+				}
 				return ipv4Mask.String()
 			case IPv6Addr:
 				ipv6Mask := new(big.Int)
 				ipv6Mask.Set(v.Mask)
-				ipv6MaskAddr := IPv6Addr***REMOVED***
+				ipv6MaskAddr := IPv6Addr{
 					Address: IPv6Address(ipv6Mask),
 					Mask:    ipv6HostMask,
-				***REMOVED***
+				}
 				return ipv6MaskAddr.String()
 			default:
 				return fmt.Sprintf("<unsupported type: %T>", ip)
-			***REMOVED***
-		***REMOVED***,
-		"network": func(ip IPAddr) string ***REMOVED***
+			}
+		},
+		"network": func(ip IPAddr) string {
 			return ip.Network().NetIP().String()
-		***REMOVED***,
-		"octets": func(ip IPAddr) string ***REMOVED***
+		},
+		"octets": func(ip IPAddr) string {
 			octets := ip.Octets()
 			octetStrs := make([]string, 0, len(octets))
-			for _, octet := range octets ***REMOVED***
+			for _, octet := range octets {
 				octetStrs = append(octetStrs, fmt.Sprintf("%d", octet))
-			***REMOVED***
+			}
 			return strings.Join(octetStrs, " ")
-		***REMOVED***,
-		"port": func(ip IPAddr) string ***REMOVED***
+		},
+		"port": func(ip IPAddr) string {
 			return fmt.Sprintf("%d", ip.IPPort())
-		***REMOVED***,
-	***REMOVED***
-***REMOVED***
+		},
+	}
+}

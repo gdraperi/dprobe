@@ -9,7 +9,7 @@ import (
 )
 
 // Resolver provides remotes based on a locator.
-type Resolver interface ***REMOVED***
+type Resolver interface {
 	// Resolve attempts to resolve the reference into a name and descriptor.
 	//
 	// The argument `ref` should be a scheme-less URI representing the remote.
@@ -30,35 +30,35 @@ type Resolver interface ***REMOVED***
 
 	// Pusher returns a new pusher for the provided reference
 	Pusher(ctx context.Context, ref string) (Pusher, error)
-***REMOVED***
+}
 
 // Fetcher fetches content
-type Fetcher interface ***REMOVED***
+type Fetcher interface {
 	// Fetch the resource identified by the descriptor.
 	Fetch(ctx context.Context, desc ocispec.Descriptor) (io.ReadCloser, error)
-***REMOVED***
+}
 
 // Pusher pushes content
-type Pusher interface ***REMOVED***
+type Pusher interface {
 	// Push returns a content writer for the given resource identified
 	// by the descriptor.
 	Push(ctx context.Context, d ocispec.Descriptor) (content.Writer, error)
-***REMOVED***
+}
 
 // FetcherFunc allows package users to implement a Fetcher with just a
 // function.
 type FetcherFunc func(ctx context.Context, desc ocispec.Descriptor) (io.ReadCloser, error)
 
 // Fetch content
-func (fn FetcherFunc) Fetch(ctx context.Context, desc ocispec.Descriptor) (io.ReadCloser, error) ***REMOVED***
+func (fn FetcherFunc) Fetch(ctx context.Context, desc ocispec.Descriptor) (io.ReadCloser, error) {
 	return fn(ctx, desc)
-***REMOVED***
+}
 
 // PusherFunc allows package users to implement a Pusher with just a
 // function.
 type PusherFunc func(ctx context.Context, desc ocispec.Descriptor, r io.Reader) error
 
 // Push content
-func (fn PusherFunc) Push(ctx context.Context, desc ocispec.Descriptor, r io.Reader) error ***REMOVED***
+func (fn PusherFunc) Push(ctx context.Context, desc ocispec.Descriptor, r io.Reader) error {
 	return fn(ctx, desc, r)
-***REMOVED***
+}

@@ -50,70 +50,70 @@ var EnableTracing = true
 
 // methodFamily returns the trace family for the given method.
 // It turns "/pkg.Service/GetFoo" into "pkg.Service".
-func methodFamily(m string) string ***REMOVED***
+func methodFamily(m string) string {
 	m = strings.TrimPrefix(m, "/") // remove leading slash
-	if i := strings.Index(m, "/"); i >= 0 ***REMOVED***
+	if i := strings.Index(m, "/"); i >= 0 {
 		m = m[:i] // remove everything from second slash
-	***REMOVED***
-	if i := strings.LastIndex(m, "."); i >= 0 ***REMOVED***
+	}
+	if i := strings.LastIndex(m, "."); i >= 0 {
 		m = m[i+1:] // cut down to last dotted component
-	***REMOVED***
+	}
 	return m
-***REMOVED***
+}
 
 // traceInfo contains tracing information for an RPC.
-type traceInfo struct ***REMOVED***
+type traceInfo struct {
 	tr        trace.Trace
 	firstLine firstLine
-***REMOVED***
+}
 
 // firstLine is the first line of an RPC trace.
-type firstLine struct ***REMOVED***
+type firstLine struct {
 	client     bool // whether this is a client (outgoing) RPC
 	remoteAddr net.Addr
 	deadline   time.Duration // may be zero
-***REMOVED***
+}
 
-func (f *firstLine) String() string ***REMOVED***
+func (f *firstLine) String() string {
 	var line bytes.Buffer
 	io.WriteString(&line, "RPC: ")
-	if f.client ***REMOVED***
+	if f.client {
 		io.WriteString(&line, "to")
-	***REMOVED*** else ***REMOVED***
+	} else {
 		io.WriteString(&line, "from")
-	***REMOVED***
+	}
 	fmt.Fprintf(&line, " %v deadline:", f.remoteAddr)
-	if f.deadline != 0 ***REMOVED***
+	if f.deadline != 0 {
 		fmt.Fprint(&line, f.deadline)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		io.WriteString(&line, "none")
-	***REMOVED***
+	}
 	return line.String()
-***REMOVED***
+}
 
 // payload represents an RPC request or response payload.
-type payload struct ***REMOVED***
+type payload struct {
 	sent bool        // whether this is an outgoing payload
-	msg  interface***REMOVED******REMOVED*** // e.g. a proto.Message
+	msg  interface{} // e.g. a proto.Message
 	// TODO(dsymonds): add stringifying info to codec, and limit how much we hold here?
-***REMOVED***
+}
 
-func (p payload) String() string ***REMOVED***
-	if p.sent ***REMOVED***
+func (p payload) String() string {
+	if p.sent {
 		return fmt.Sprintf("sent: %v", p.msg)
-	***REMOVED***
+	}
 	return fmt.Sprintf("recv: %v", p.msg)
-***REMOVED***
+}
 
-type fmtStringer struct ***REMOVED***
+type fmtStringer struct {
 	format string
-	a      []interface***REMOVED******REMOVED***
-***REMOVED***
+	a      []interface{}
+}
 
-func (f *fmtStringer) String() string ***REMOVED***
+func (f *fmtStringer) String() string {
 	return fmt.Sprintf(f.format, f.a...)
-***REMOVED***
+}
 
 type stringer string
 
-func (s stringer) String() string ***REMOVED*** return string(s) ***REMOVED***
+func (s stringer) String() string { return string(s) }

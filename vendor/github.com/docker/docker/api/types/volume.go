@@ -5,7 +5,7 @@ package types
 
 // Volume volume
 // swagger:model Volume
-type Volume struct ***REMOVED***
+type Volume struct {
 
 	// Date/Time the volume was created.
 	CreatedAt string `json:"CreatedAt,omitempty"`
@@ -36,22 +36,22 @@ type Volume struct ***REMOVED***
 
 	// Low-level details about the volume, provided by the volume driver.
 	// Details are returned as a map with key/value pairs:
-	// `***REMOVED***"key":"value","key2":"value2"***REMOVED***`.
+	// `{"key":"value","key2":"value2"}`.
 	//
 	// The `Status` field is optional, and is omitted if the volume driver
 	// does not support this feature.
 	//
-	Status map[string]interface***REMOVED******REMOVED*** `json:"Status,omitempty"`
+	Status map[string]interface{} `json:"Status,omitempty"`
 
 	// usage data
 	UsageData *VolumeUsageData `json:"UsageData,omitempty"`
-***REMOVED***
+}
 
 // VolumeUsageData Usage details about the volume. This information is used by the
 // `GET /system/df` endpoint, and omitted in other endpoints.
 //
 // swagger:model VolumeUsageData
-type VolumeUsageData struct ***REMOVED***
+type VolumeUsageData struct {
 
 	// The number of containers referencing this volume. This field
 	// is set to `-1` if the reference-count is not available.
@@ -66,4 +66,4 @@ type VolumeUsageData struct ***REMOVED***
 	//
 	// Required: true
 	Size int64 `json:"Size"`
-***REMOVED***
+}

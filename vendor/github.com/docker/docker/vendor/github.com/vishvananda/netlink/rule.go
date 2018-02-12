@@ -6,7 +6,7 @@ import (
 )
 
 // Rule represents a netlink rule.
-type Rule struct ***REMOVED***
+type Rule struct {
 	Priority          int
 	Family            int
 	Table             int
@@ -21,15 +21,15 @@ type Rule struct ***REMOVED***
 	OifName           string
 	SuppressIfgroup   int
 	SuppressPrefixlen int
-***REMOVED***
+}
 
-func (r Rule) String() string ***REMOVED***
+func (r Rule) String() string {
 	return fmt.Sprintf("ip rule %d: from %s table %d", r.Priority, r.Src, r.Table)
-***REMOVED***
+}
 
 // NewRule return empty rules.
-func NewRule() *Rule ***REMOVED***
-	return &Rule***REMOVED***
+func NewRule() *Rule {
+	return &Rule{
 		SuppressIfgroup:   -1,
 		SuppressPrefixlen: -1,
 		Priority:          -1,
@@ -37,5 +37,5 @@ func NewRule() *Rule ***REMOVED***
 		Mask:              -1,
 		Goto:              -1,
 		Flow:              -1,
-	***REMOVED***
-***REMOVED***
+	}
+}

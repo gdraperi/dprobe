@@ -28,28 +28,28 @@ import "time"
 
 const FilePathSeparator = string(filepath.Separator)
 
-type File struct ***REMOVED***
+type File struct {
 	// atomic requires 64-bit alignment for struct field access
 	at           int64
 	readDirCount int64
 	closed       bool
 	readOnly     bool
 	fileData     *FileData
-***REMOVED***
+}
 
-func NewFileHandle(data *FileData) *File ***REMOVED***
-	return &File***REMOVED***fileData: data***REMOVED***
-***REMOVED***
+func NewFileHandle(data *FileData) *File {
+	return &File{fileData: data}
+}
 
-func NewReadOnlyFileHandle(data *FileData) *File ***REMOVED***
-	return &File***REMOVED***fileData: data, readOnly: true***REMOVED***
-***REMOVED***
+func NewReadOnlyFileHandle(data *FileData) *File {
+	return &File{fileData: data, readOnly: true}
+}
 
-func (f File) Data() *FileData ***REMOVED***
+func (f File) Data() *FileData {
 	return f.fileData
-***REMOVED***
+}
 
-type FileData struct ***REMOVED***
+type FileData struct {
 	sync.Mutex
 	name    string
 	data    []byte
@@ -57,252 +57,252 @@ type FileData struct ***REMOVED***
 	dir     bool
 	mode    os.FileMode
 	modtime time.Time
-***REMOVED***
+}
 
-func (d *FileData) Name() string ***REMOVED***
+func (d *FileData) Name() string {
 	d.Lock()
 	defer d.Unlock()
 	return d.name
-***REMOVED***
+}
 
-func CreateFile(name string) *FileData ***REMOVED***
-	return &FileData***REMOVED***name: name, mode: os.ModeTemporary, modtime: time.Now()***REMOVED***
-***REMOVED***
+func CreateFile(name string) *FileData {
+	return &FileData{name: name, mode: os.ModeTemporary, modtime: time.Now()}
+}
 
-func CreateDir(name string) *FileData ***REMOVED***
-	return &FileData***REMOVED***name: name, memDir: &DirMap***REMOVED******REMOVED***, dir: true***REMOVED***
-***REMOVED***
+func CreateDir(name string) *FileData {
+	return &FileData{name: name, memDir: &DirMap{}, dir: true}
+}
 
-func ChangeFileName(f *FileData, newname string) ***REMOVED***
+func ChangeFileName(f *FileData, newname string) {
 	f.Lock()
 	f.name = newname
 	f.Unlock()
-***REMOVED***
+}
 
-func SetMode(f *FileData, mode os.FileMode) ***REMOVED***
+func SetMode(f *FileData, mode os.FileMode) {
 	f.Lock()
 	f.mode = mode
 	f.Unlock()
-***REMOVED***
+}
 
-func SetModTime(f *FileData, mtime time.Time) ***REMOVED***
+func SetModTime(f *FileData, mtime time.Time) {
 	f.Lock()
 	setModTime(f, mtime)
 	f.Unlock()
-***REMOVED***
+}
 
-func setModTime(f *FileData, mtime time.Time) ***REMOVED***
+func setModTime(f *FileData, mtime time.Time) {
 	f.modtime = mtime
-***REMOVED***
+}
 
-func GetFileInfo(f *FileData) *FileInfo ***REMOVED***
-	return &FileInfo***REMOVED***f***REMOVED***
-***REMOVED***
+func GetFileInfo(f *FileData) *FileInfo {
+	return &FileInfo{f}
+}
 
-func (f *File) Open() error ***REMOVED***
+func (f *File) Open() error {
 	atomic.StoreInt64(&f.at, 0)
 	atomic.StoreInt64(&f.readDirCount, 0)
 	f.fileData.Lock()
 	f.closed = false
 	f.fileData.Unlock()
 	return nil
-***REMOVED***
+}
 
-func (f *File) Close() error ***REMOVED***
+func (f *File) Close() error {
 	f.fileData.Lock()
 	f.closed = true
-	if !f.readOnly ***REMOVED***
+	if !f.readOnly {
 		setModTime(f.fileData, time.Now())
-	***REMOVED***
+	}
 	f.fileData.Unlock()
 	return nil
-***REMOVED***
+}
 
-func (f *File) Name() string ***REMOVED***
+func (f *File) Name() string {
 	return f.fileData.Name()
-***REMOVED***
+}
 
-func (f *File) Stat() (os.FileInfo, error) ***REMOVED***
-	return &FileInfo***REMOVED***f.fileData***REMOVED***, nil
-***REMOVED***
+func (f *File) Stat() (os.FileInfo, error) {
+	return &FileInfo{f.fileData}, nil
+}
 
-func (f *File) Sync() error ***REMOVED***
+func (f *File) Sync() error {
 	return nil
-***REMOVED***
+}
 
-func (f *File) Readdir(count int) (res []os.FileInfo, err error) ***REMOVED***
+func (f *File) Readdir(count int) (res []os.FileInfo, err error) {
 	var outLength int64
 
 	f.fileData.Lock()
 	files := f.fileData.memDir.Files()[f.readDirCount:]
-	if count > 0 ***REMOVED***
-		if len(files) < count ***REMOVED***
+	if count > 0 {
+		if len(files) < count {
 			outLength = int64(len(files))
-		***REMOVED*** else ***REMOVED***
+		} else {
 			outLength = int64(count)
-		***REMOVED***
-		if len(files) == 0 ***REMOVED***
+		}
+		if len(files) == 0 {
 			err = io.EOF
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
+		}
+	} else {
 		outLength = int64(len(files))
-	***REMOVED***
+	}
 	f.readDirCount += outLength
 	f.fileData.Unlock()
 
 	res = make([]os.FileInfo, outLength)
-	for i := range res ***REMOVED***
-		res[i] = &FileInfo***REMOVED***files[i]***REMOVED***
-	***REMOVED***
+	for i := range res {
+		res[i] = &FileInfo{files[i]}
+	}
 
 	return res, err
-***REMOVED***
+}
 
-func (f *File) Readdirnames(n int) (names []string, err error) ***REMOVED***
+func (f *File) Readdirnames(n int) (names []string, err error) {
 	fi, err := f.Readdir(n)
 	names = make([]string, len(fi))
-	for i, f := range fi ***REMOVED***
+	for i, f := range fi {
 		_, names[i] = filepath.Split(f.Name())
-	***REMOVED***
+	}
 	return names, err
-***REMOVED***
+}
 
-func (f *File) Read(b []byte) (n int, err error) ***REMOVED***
+func (f *File) Read(b []byte) (n int, err error) {
 	f.fileData.Lock()
 	defer f.fileData.Unlock()
-	if f.closed == true ***REMOVED***
+	if f.closed == true {
 		return 0, ErrFileClosed
-	***REMOVED***
-	if len(b) > 0 && int(f.at) == len(f.fileData.data) ***REMOVED***
+	}
+	if len(b) > 0 && int(f.at) == len(f.fileData.data) {
 		return 0, io.EOF
-	***REMOVED***
-	if int(f.at) > len(f.fileData.data) ***REMOVED***
+	}
+	if int(f.at) > len(f.fileData.data) {
 		return 0, io.ErrUnexpectedEOF
-	***REMOVED***
-	if len(f.fileData.data)-int(f.at) >= len(b) ***REMOVED***
+	}
+	if len(f.fileData.data)-int(f.at) >= len(b) {
 		n = len(b)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		n = len(f.fileData.data) - int(f.at)
-	***REMOVED***
+	}
 	copy(b, f.fileData.data[f.at:f.at+int64(n)])
 	atomic.AddInt64(&f.at, int64(n))
 	return
-***REMOVED***
+}
 
-func (f *File) ReadAt(b []byte, off int64) (n int, err error) ***REMOVED***
+func (f *File) ReadAt(b []byte, off int64) (n int, err error) {
 	atomic.StoreInt64(&f.at, off)
 	return f.Read(b)
-***REMOVED***
+}
 
-func (f *File) Truncate(size int64) error ***REMOVED***
-	if f.closed == true ***REMOVED***
+func (f *File) Truncate(size int64) error {
+	if f.closed == true {
 		return ErrFileClosed
-	***REMOVED***
-	if f.readOnly ***REMOVED***
-		return &os.PathError***REMOVED***Op: "truncate", Path: f.fileData.name, Err: errors.New("file handle is read only")***REMOVED***
-	***REMOVED***
-	if size < 0 ***REMOVED***
+	}
+	if f.readOnly {
+		return &os.PathError{Op: "truncate", Path: f.fileData.name, Err: errors.New("file handle is read only")}
+	}
+	if size < 0 {
 		return ErrOutOfRange
-	***REMOVED***
-	if size > int64(len(f.fileData.data)) ***REMOVED***
+	}
+	if size > int64(len(f.fileData.data)) {
 		diff := size - int64(len(f.fileData.data))
-		f.fileData.data = append(f.fileData.data, bytes.Repeat([]byte***REMOVED***00***REMOVED***, int(diff))...)
-	***REMOVED*** else ***REMOVED***
+		f.fileData.data = append(f.fileData.data, bytes.Repeat([]byte{00}, int(diff))...)
+	} else {
 		f.fileData.data = f.fileData.data[0:size]
-	***REMOVED***
+	}
 	setModTime(f.fileData, time.Now())
 	return nil
-***REMOVED***
+}
 
-func (f *File) Seek(offset int64, whence int) (int64, error) ***REMOVED***
-	if f.closed == true ***REMOVED***
+func (f *File) Seek(offset int64, whence int) (int64, error) {
+	if f.closed == true {
 		return 0, ErrFileClosed
-	***REMOVED***
-	switch whence ***REMOVED***
+	}
+	switch whence {
 	case 0:
 		atomic.StoreInt64(&f.at, offset)
 	case 1:
 		atomic.AddInt64(&f.at, int64(offset))
 	case 2:
 		atomic.StoreInt64(&f.at, int64(len(f.fileData.data))+offset)
-	***REMOVED***
+	}
 	return f.at, nil
-***REMOVED***
+}
 
-func (f *File) Write(b []byte) (n int, err error) ***REMOVED***
-	if f.readOnly ***REMOVED***
-		return 0, &os.PathError***REMOVED***Op: "write", Path: f.fileData.name, Err: errors.New("file handle is read only")***REMOVED***
-	***REMOVED***
+func (f *File) Write(b []byte) (n int, err error) {
+	if f.readOnly {
+		return 0, &os.PathError{Op: "write", Path: f.fileData.name, Err: errors.New("file handle is read only")}
+	}
 	n = len(b)
 	cur := atomic.LoadInt64(&f.at)
 	f.fileData.Lock()
 	defer f.fileData.Unlock()
 	diff := cur - int64(len(f.fileData.data))
 	var tail []byte
-	if n+int(cur) < len(f.fileData.data) ***REMOVED***
+	if n+int(cur) < len(f.fileData.data) {
 		tail = f.fileData.data[n+int(cur):]
-	***REMOVED***
-	if diff > 0 ***REMOVED***
-		f.fileData.data = append(bytes.Repeat([]byte***REMOVED***00***REMOVED***, int(diff)), b...)
+	}
+	if diff > 0 {
+		f.fileData.data = append(bytes.Repeat([]byte{00}, int(diff)), b...)
 		f.fileData.data = append(f.fileData.data, tail...)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		f.fileData.data = append(f.fileData.data[:cur], b...)
 		f.fileData.data = append(f.fileData.data, tail...)
-	***REMOVED***
+	}
 	setModTime(f.fileData, time.Now())
 
 	atomic.StoreInt64(&f.at, int64(len(f.fileData.data)))
 	return
-***REMOVED***
+}
 
-func (f *File) WriteAt(b []byte, off int64) (n int, err error) ***REMOVED***
+func (f *File) WriteAt(b []byte, off int64) (n int, err error) {
 	atomic.StoreInt64(&f.at, off)
 	return f.Write(b)
-***REMOVED***
+}
 
-func (f *File) WriteString(s string) (ret int, err error) ***REMOVED***
+func (f *File) WriteString(s string) (ret int, err error) {
 	return f.Write([]byte(s))
-***REMOVED***
+}
 
-func (f *File) Info() *FileInfo ***REMOVED***
-	return &FileInfo***REMOVED***f.fileData***REMOVED***
-***REMOVED***
+func (f *File) Info() *FileInfo {
+	return &FileInfo{f.fileData}
+}
 
-type FileInfo struct ***REMOVED***
+type FileInfo struct {
 	*FileData
-***REMOVED***
+}
 
 // Implements os.FileInfo
-func (s *FileInfo) Name() string ***REMOVED***
+func (s *FileInfo) Name() string {
 	s.Lock()
 	_, name := filepath.Split(s.name)
 	s.Unlock()
 	return name
-***REMOVED***
-func (s *FileInfo) Mode() os.FileMode ***REMOVED***
+}
+func (s *FileInfo) Mode() os.FileMode {
 	s.Lock()
 	defer s.Unlock()
 	return s.mode
-***REMOVED***
-func (s *FileInfo) ModTime() time.Time ***REMOVED***
+}
+func (s *FileInfo) ModTime() time.Time {
 	s.Lock()
 	defer s.Unlock()
 	return s.modtime
-***REMOVED***
-func (s *FileInfo) IsDir() bool ***REMOVED***
+}
+func (s *FileInfo) IsDir() bool {
 	s.Lock()
 	defer s.Unlock()
 	return s.dir
-***REMOVED***
-func (s *FileInfo) Sys() interface***REMOVED******REMOVED*** ***REMOVED*** return nil ***REMOVED***
-func (s *FileInfo) Size() int64 ***REMOVED***
-	if s.IsDir() ***REMOVED***
+}
+func (s *FileInfo) Sys() interface{} { return nil }
+func (s *FileInfo) Size() int64 {
+	if s.IsDir() {
 		return int64(42)
-	***REMOVED***
+	}
 	s.Lock()
 	defer s.Unlock()
 	return int64(len(s.data))
-***REMOVED***
+}
 
 var (
 	ErrFileClosed        = errors.New("File is closed")

@@ -25,17 +25,17 @@ Examples
 
 Here is an example of using the package:
 
-    func SlowMethod() ***REMOVED***
+    func SlowMethod() {
         // Profiling the runtime of a method
-        defer metrics.MeasureSince([]string***REMOVED***"SlowMethod"***REMOVED***, time.Now())
-***REMOVED***
+        defer metrics.MeasureSince([]string{"SlowMethod"}, time.Now())
+    }
 
     // Configure a statsite sink as the global metrics sink
     sink, _ := metrics.NewStatsiteSink("statsite:8125")
     metrics.NewGlobal(metrics.DefaultConfig("service-name"), sink)
 
     // Emit a Key/Value pair
-    metrics.EmitKey([]string***REMOVED***"questions", "meaning of life"***REMOVED***, 42)
+    metrics.EmitKey([]string{"questions", "meaning of life"}, 42)
 
 
 Here is an example of setting up an signal handler:
@@ -46,16 +46,16 @@ Here is an example of setting up an signal handler:
     metrics.NewGlobal(metrics.DefaultConfig("service-name"), inm)
 
     // Run some code
-    inm.SetGauge([]string***REMOVED***"foo"***REMOVED***, 42)
-	inm.EmitKey([]string***REMOVED***"bar"***REMOVED***, 30)
+    inm.SetGauge([]string{"foo"}, 42)
+	inm.EmitKey([]string{"bar"}, 30)
 
-	inm.IncrCounter([]string***REMOVED***"baz"***REMOVED***, 42)
-	inm.IncrCounter([]string***REMOVED***"baz"***REMOVED***, 1)
-	inm.IncrCounter([]string***REMOVED***"baz"***REMOVED***, 80)
+	inm.IncrCounter([]string{"baz"}, 42)
+	inm.IncrCounter([]string{"baz"}, 1)
+	inm.IncrCounter([]string{"baz"}, 80)
 
-	inm.AddSample([]string***REMOVED***"method", "wow"***REMOVED***, 42)
-	inm.AddSample([]string***REMOVED***"method", "wow"***REMOVED***, 100)
-	inm.AddSample([]string***REMOVED***"method", "wow"***REMOVED***, 22)
+	inm.AddSample([]string{"method", "wow"}, 42)
+	inm.AddSample([]string{"method", "wow"}, 100)
+	inm.AddSample([]string{"method", "wow"}, 22)
 
     ....
 

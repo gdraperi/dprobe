@@ -12,38 +12,38 @@ import (
 
 // ReadMemInfo retrieves memory statistics of the host system and returns a
 // MemInfo type.
-func ReadMemInfo() (*MemInfo, error) ***REMOVED***
+func ReadMemInfo() (*MemInfo, error) {
 	file, err := os.Open("/proc/meminfo")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	defer file.Close()
 	return parseMemInfo(file)
-***REMOVED***
+}
 
 // parseMemInfo parses the /proc/meminfo file into
 // a MemInfo object given an io.Reader to the file.
 // Throws error if there are problems reading from the file
-func parseMemInfo(reader io.Reader) (*MemInfo, error) ***REMOVED***
-	meminfo := &MemInfo***REMOVED******REMOVED***
+func parseMemInfo(reader io.Reader) (*MemInfo, error) {
+	meminfo := &MemInfo{}
 	scanner := bufio.NewScanner(reader)
-	for scanner.Scan() ***REMOVED***
+	for scanner.Scan() {
 		// Expected format: ["MemTotal:", "1234", "kB"]
 		parts := strings.Fields(scanner.Text())
 
 		// Sanity checks: Skip malformed entries.
-		if len(parts) < 3 || parts[2] != "kB" ***REMOVED***
+		if len(parts) < 3 || parts[2] != "kB" {
 			continue
-		***REMOVED***
+		}
 
 		// Convert to bytes.
 		size, err := strconv.Atoi(parts[1])
-		if err != nil ***REMOVED***
+		if err != nil {
 			continue
-		***REMOVED***
+		}
 		bytes := int64(size) * units.KiB
 
-		switch parts[0] ***REMOVED***
+		switch parts[0] {
 		case "MemTotal:":
 			meminfo.MemTotal = bytes
 		case "MemFree:":
@@ -52,14 +52,14 @@ func parseMemInfo(reader io.Reader) (*MemInfo, error) ***REMOVED***
 			meminfo.SwapTotal = bytes
 		case "SwapFree:":
 			meminfo.SwapFree = bytes
-		***REMOVED***
+		}
 
-	***REMOVED***
+	}
 
 	// Handle errors that may have occurred during the reading of the file.
-	if err := scanner.Err(); err != nil ***REMOVED***
+	if err := scanner.Err(); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	return meminfo, nil
-***REMOVED***
+}

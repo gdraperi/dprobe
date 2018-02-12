@@ -12,15 +12,15 @@ set -e
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
 versions=( "$@" )
-if [ $***REMOVED***#versions[@]***REMOVED*** -eq 0 ]; then
+if [ ${#versions[@]} -eq 0 ]; then
 	versions=( */ )
 fi
-versions=( "$***REMOVED***versions[@]%/***REMOVED***" )
+versions=( "${versions[@]%/}" )
 
-for version in "$***REMOVED***versions[@]***REMOVED***"; do
-	distro="$***REMOVED***version%-****REMOVED***"
-	suite="$***REMOVED***version##*-***REMOVED***"
-	from="$***REMOVED***distro***REMOVED***:$***REMOVED***suite***REMOVED***"
+for version in "${versions[@]}"; do
+	distro="${version%-*}"
+	suite="${version##*-}"
+	from="${distro}:${suite}"
 	installer=yum
 
 	if [[ "$distro" == "fedora" ]]; then
@@ -54,7 +54,7 @@ for version in "$***REMOVED***versions[@]***REMOVED***"; do
 			echo >> "$version/Dockerfile"
 			;;
 		fedora:*)
-			echo "RUN $***REMOVED***installer***REMOVED*** -y upgrade" >> "$version/Dockerfile"
+			echo "RUN ${installer} -y upgrade" >> "$version/Dockerfile"
 			;;
 		*) ;;
 	esac
@@ -78,10 +78,10 @@ for version in "$***REMOVED***versions[@]***REMOVED***"; do
 			echo 'RUN zypper --non-interactive install ca-certificates* curl gzip rpm-build' >> "$version/Dockerfile"
 			;;
 		photon:*)
-			echo "RUN $***REMOVED***installer***REMOVED*** install -y wget curl ca-certificates gzip make rpm-build sed gcc linux-api-headers glibc-devel binutils libseccomp elfutils" >> "$version/Dockerfile"
+			echo "RUN ${installer} install -y wget curl ca-certificates gzip make rpm-build sed gcc linux-api-headers glibc-devel binutils libseccomp elfutils" >> "$version/Dockerfile"
 			;;
 		*)
-			echo "RUN $***REMOVED***installer***REMOVED*** install -y @development-tools fedora-packager" >> "$version/Dockerfile"
+			echo "RUN ${installer} install -y @development-tools fedora-packager" >> "$version/Dockerfile"
 			;;
 	esac
 
@@ -104,21 +104,21 @@ for version in "$***REMOVED***versions[@]***REMOVED***"; do
 	case "$from" in
 		oraclelinux:7)
 			# Enable the optional repository
-			packages=( --enablerepo=ol7_optional_latest "$***REMOVED***packages[*]***REMOVED***" )
+			packages=( --enablerepo=ol7_optional_latest "${packages[*]}" )
 			;;
 	esac
 
 	case "$from" in
 		oraclelinux:6|amazonlinux:latest)
 			# doesn't use systemd, doesn't have a devel package for it
-			packages=( "$***REMOVED***packages[@]/systemd-devel***REMOVED***" )
+			packages=( "${packages[@]/systemd-devel}" )
 			;;
 	esac
 
 	# opensuse & oraclelinx:6 do not have the right libseccomp libs
 	case "$from" in
 		opensuse:*|oraclelinux:6)
-			packages=( "$***REMOVED***packages[@]/libseccomp-devel***REMOVED***" )
+			packages=( "${packages[@]/libseccomp-devel}" )
 			runcBuildTags="selinux"
 			;;
 		*)
@@ -129,30 +129,30 @@ for version in "$***REMOVED***versions[@]***REMOVED***"; do
 
 	case "$from" in
 		opensuse:*)
-			packages=( "$***REMOVED***packages[@]/btrfs-progs-devel/libbtrfs-devel***REMOVED***" )
-			packages=( "$***REMOVED***packages[@]/pkgconfig/pkg-config***REMOVED***" )
-			packages=( "$***REMOVED***packages[@]/vim-common/vim***REMOVED***" )
+			packages=( "${packages[@]/btrfs-progs-devel/libbtrfs-devel}" )
+			packages=( "${packages[@]/pkgconfig/pkg-config}" )
+			packages=( "${packages[@]/vim-common/vim}" )
 			if [[ "$from" == "opensuse:13."* ]]; then
 				packages+=( systemd-rpm-macros )
 			fi
 
 			# use zypper
-			echo "RUN zypper --non-interactive install $***REMOVED***packages[*]***REMOVED***" >> "$version/Dockerfile"
+			echo "RUN zypper --non-interactive install ${packages[*]}" >> "$version/Dockerfile"
 			;;
 		photon:*)
-			packages=( "$***REMOVED***packages[@]/pkgconfig/pkg-config***REMOVED***" )
-			echo "RUN $***REMOVED***installer***REMOVED*** install -y $***REMOVED***packages[*]***REMOVED***" >> "$version/Dockerfile"
+			packages=( "${packages[@]/pkgconfig/pkg-config}" )
+			echo "RUN ${installer} install -y ${packages[*]}" >> "$version/Dockerfile"
 			;;
 		*)
-			echo "RUN $***REMOVED***installer***REMOVED*** install -y $***REMOVED***packages[*]***REMOVED***" >> "$version/Dockerfile"
+			echo "RUN ${installer} install -y ${packages[*]}" >> "$version/Dockerfile"
 			;;
 	esac
 
 	echo >> "$version/Dockerfile"
 
 
-	awk '$1 == "ENV" && $2 == "GO_VERSION" ***REMOVED*** print; exit ***REMOVED***' ../../../../Dockerfile >> "$version/Dockerfile"
-	echo 'RUN curl -fSL "https://golang.org/dl/go$***REMOVED***GO_VERSION***REMOVED***.linux-amd64.tar.gz" | tar xzC /usr/local' >> "$version/Dockerfile"
+	awk '$1 == "ENV" && $2 == "GO_VERSION" { print; exit }' ../../../../Dockerfile >> "$version/Dockerfile"
+	echo 'RUN curl -fSL "https://golang.org/dl/go${GO_VERSION}.linux-amd64.tar.gz" | tar xzC /usr/local' >> "$version/Dockerfile"
 	echo 'ENV PATH $PATH:/usr/local/go/bin' >> "$version/Dockerfile"
 
 	echo >> "$version/Dockerfile"

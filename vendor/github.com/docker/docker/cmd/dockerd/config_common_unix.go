@@ -17,7 +17,7 @@ var (
 
 // installUnixConfigFlags adds command-line options to the top-level flag parser for
 // the current process that are common across Unix platforms.
-func installUnixConfigFlags(conf *config.Config, flags *pflag.FlagSet) ***REMOVED***
+func installUnixConfigFlags(conf *config.Config, flags *pflag.FlagSet) {
 	conf.Runtimes = make(map[string]types.Runtime)
 
 	flags.StringVarP(&conf.SocketGroup, "group", "G", "docker", "Group for the unix socket")
@@ -31,4 +31,4 @@ func installUnixConfigFlags(conf *config.Config, flags *pflag.FlagSet) ***REMOVE
 	flags.Var(opts.NewNamedRuntimeOpt("runtimes", &conf.Runtimes, config.StockRuntimeName), "add-runtime", "Register an additional OCI compatible runtime")
 	flags.StringVar(&conf.DefaultRuntime, "default-runtime", config.StockRuntimeName, "Default OCI runtime for containers")
 
-***REMOVED***
+}

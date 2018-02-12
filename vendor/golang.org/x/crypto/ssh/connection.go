@@ -11,17 +11,17 @@ import (
 
 // OpenChannelError is returned if the other side rejects an
 // OpenChannel request.
-type OpenChannelError struct ***REMOVED***
+type OpenChannelError struct {
 	Reason  RejectionReason
 	Message string
-***REMOVED***
+}
 
-func (e *OpenChannelError) Error() string ***REMOVED***
+func (e *OpenChannelError) Error() string {
 	return fmt.Sprintf("ssh: rejected: %s (%s)", e.Reason, e.Message)
-***REMOVED***
+}
 
 // ConnMetadata holds metadata for the connection.
-type ConnMetadata interface ***REMOVED***
+type ConnMetadata interface {
 	// User returns the user ID for this connection.
 	User() string
 
@@ -41,13 +41,13 @@ type ConnMetadata interface ***REMOVED***
 
 	// LocalAddr returns the local address for this connection.
 	LocalAddr() net.Addr
-***REMOVED***
+}
 
 // Conn represents an SSH connection for both server and client roles.
 // Conn is the basis for implementing an application layer, such
 // as ClientConn, which implements the traditional shell access for
 // clients.
-type Conn interface ***REMOVED***
+type Conn interface {
 	ConnMetadata
 
 	// SendRequest sends a global request, and returns the
@@ -72,72 +72,72 @@ type Conn interface ***REMOVED***
 	// TODO(hanwen): consider exposing:
 	//   RequestKeyChange
 	//   Disconnect
-***REMOVED***
+}
 
 // DiscardRequests consumes and rejects all requests from the
 // passed-in channel.
-func DiscardRequests(in <-chan *Request) ***REMOVED***
-	for req := range in ***REMOVED***
-		if req.WantReply ***REMOVED***
+func DiscardRequests(in <-chan *Request) {
+	for req := range in {
+		if req.WantReply {
 			req.Reply(false, nil)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // A connection represents an incoming connection.
-type connection struct ***REMOVED***
+type connection struct {
 	transport *handshakeTransport
 	sshConn
 
 	// The connection protocol.
 	*mux
-***REMOVED***
+}
 
-func (c *connection) Close() error ***REMOVED***
+func (c *connection) Close() error {
 	return c.sshConn.conn.Close()
-***REMOVED***
+}
 
 // sshconn provides net.Conn metadata, but disallows direct reads and
 // writes.
-type sshConn struct ***REMOVED***
+type sshConn struct {
 	conn net.Conn
 
 	user          string
 	sessionID     []byte
 	clientVersion []byte
 	serverVersion []byte
-***REMOVED***
+}
 
-func dup(src []byte) []byte ***REMOVED***
+func dup(src []byte) []byte {
 	dst := make([]byte, len(src))
 	copy(dst, src)
 	return dst
-***REMOVED***
+}
 
-func (c *sshConn) User() string ***REMOVED***
+func (c *sshConn) User() string {
 	return c.user
-***REMOVED***
+}
 
-func (c *sshConn) RemoteAddr() net.Addr ***REMOVED***
+func (c *sshConn) RemoteAddr() net.Addr {
 	return c.conn.RemoteAddr()
-***REMOVED***
+}
 
-func (c *sshConn) Close() error ***REMOVED***
+func (c *sshConn) Close() error {
 	return c.conn.Close()
-***REMOVED***
+}
 
-func (c *sshConn) LocalAddr() net.Addr ***REMOVED***
+func (c *sshConn) LocalAddr() net.Addr {
 	return c.conn.LocalAddr()
-***REMOVED***
+}
 
-func (c *sshConn) SessionID() []byte ***REMOVED***
+func (c *sshConn) SessionID() []byte {
 	return dup(c.sessionID)
-***REMOVED***
+}
 
-func (c *sshConn) ClientVersion() []byte ***REMOVED***
+func (c *sshConn) ClientVersion() []byte {
 	return dup(c.clientVersion)
-***REMOVED***
+}
 
-func (c *sshConn) ServerVersion() []byte ***REMOVED***
+func (c *sshConn) ServerVersion() []byte {
 	return dup(c.serverVersion)
-***REMOVED***
+}

@@ -25,21 +25,21 @@ var (
 	// Used for flags.
 	cfgFile, userLicense string
 
-	rootCmd = &cobra.Command***REMOVED***
+	rootCmd = &cobra.Command{
 		Use:   "cobra",
 		Short: "A generator for Cobra based Applications",
 		Long: `Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-	***REMOVED***
+	}
 )
 
 // Execute executes the root command.
-func Execute() ***REMOVED***
+func Execute() {
 	rootCmd.Execute()
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	cobra.OnInitialize(initConfig)
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cobra.yaml)")
@@ -53,27 +53,27 @@ func init() ***REMOVED***
 
 	rootCmd.AddCommand(addCmd)
 	rootCmd.AddCommand(initCmd)
-***REMOVED***
+}
 
-func initConfig() ***REMOVED***
-	if cfgFile != "" ***REMOVED***
+func initConfig() {
+	if cfgFile != "" {
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		// Find home directory.
 		home, err := homedir.Dir()
-		if err != nil ***REMOVED***
+		if err != nil {
 			er(err)
-		***REMOVED***
+		}
 
 		// Search config in home directory with name ".cobra" (without extension).
 		viper.AddConfigPath(home)
 		viper.SetConfigName(".cobra")
-	***REMOVED***
+	}
 
 	viper.AutomaticEnv()
 
-	if err := viper.ReadInConfig(); err == nil ***REMOVED***
+	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
-	***REMOVED***
-***REMOVED***
+	}
+}

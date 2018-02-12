@@ -12,66 +12,66 @@ import (
 	"syscall"
 )
 
-func (c *Conn) recvMsg(m *Message, flags int) error ***REMOVED***
+func (c *Conn) recvMsg(m *Message, flags int) error {
 	var h msghdr
 	vs := make([]iovec, len(m.Buffers))
 	var sa []byte
-	if c.network != "tcp" ***REMOVED***
+	if c.network != "tcp" {
 		sa = make([]byte, sizeofSockaddrInet6)
-	***REMOVED***
+	}
 	h.pack(vs, m.Buffers, m.OOB, sa)
 	var operr error
 	var n int
-	fn := func(s uintptr) bool ***REMOVED***
+	fn := func(s uintptr) bool {
 		n, operr = recvmsg(s, &h, flags)
-		if operr == syscall.EAGAIN ***REMOVED***
+		if operr == syscall.EAGAIN {
 			return false
-		***REMOVED***
+		}
 		return true
-	***REMOVED***
-	if err := c.c.Read(fn); err != nil ***REMOVED***
+	}
+	if err := c.c.Read(fn); err != nil {
 		return err
-	***REMOVED***
-	if operr != nil ***REMOVED***
+	}
+	if operr != nil {
 		return os.NewSyscallError("recvmsg", operr)
-	***REMOVED***
-	if c.network != "tcp" ***REMOVED***
+	}
+	if c.network != "tcp" {
 		var err error
 		m.Addr, err = parseInetAddr(sa[:], c.network)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	m.N = n
 	m.NN = h.controllen()
 	m.Flags = h.flags()
 	return nil
-***REMOVED***
+}
 
-func (c *Conn) sendMsg(m *Message, flags int) error ***REMOVED***
+func (c *Conn) sendMsg(m *Message, flags int) error {
 	var h msghdr
 	vs := make([]iovec, len(m.Buffers))
 	var sa []byte
-	if m.Addr != nil ***REMOVED***
+	if m.Addr != nil {
 		sa = marshalInetAddr(m.Addr)
-	***REMOVED***
+	}
 	h.pack(vs, m.Buffers, m.OOB, sa)
 	var operr error
 	var n int
-	fn := func(s uintptr) bool ***REMOVED***
+	fn := func(s uintptr) bool {
 		n, operr = sendmsg(s, &h, flags)
-		if operr == syscall.EAGAIN ***REMOVED***
+		if operr == syscall.EAGAIN {
 			return false
-		***REMOVED***
+		}
 		return true
-	***REMOVED***
-	if err := c.c.Write(fn); err != nil ***REMOVED***
+	}
+	if err := c.c.Write(fn); err != nil {
 		return err
-	***REMOVED***
-	if operr != nil ***REMOVED***
+	}
+	if operr != nil {
 		return os.NewSyscallError("sendmsg", operr)
-	***REMOVED***
+	}
 	m.N = n
 	m.NN = len(m.OOB)
 	return nil
-***REMOVED***
+}

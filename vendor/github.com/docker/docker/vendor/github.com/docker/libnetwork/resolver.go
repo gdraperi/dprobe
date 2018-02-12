@@ -15,7 +15,7 @@ import (
 
 // Resolver represents the embedded DNS server in Docker. It operates
 // by listening on container's loopback interface for DNS queries.
-type Resolver interface ***REMOVED***
+type Resolver interface {
 	// Start starts the name server for the container
 	Start() error
 	// Stop stops the name server for the container. Stopped resolver
@@ -32,12 +32,12 @@ type Resolver interface ***REMOVED***
 	SetExtServers([]extDNSEntry)
 	// ResolverOptions returns resolv.conf options that should be set
 	ResolverOptions() []string
-***REMOVED***
+}
 
 // DNSBackend represents a backend DNS resolver used for DNS name
 // resolution. All the queries to the resolver are forwared to the
 // backend resolver.
-type DNSBackend interface ***REMOVED***
+type DNSBackend interface {
 	// ResolveName resolves a service name to an IPv4 or IPv6 address by searching
 	// the networks the sandbox is connected to. For IPv6 queries, second return
 	// value will be true if the name exists in docker domain but doesn't have an
@@ -57,7 +57,7 @@ type DNSBackend interface ***REMOVED***
 	// HandleQueryResp passes the name & IP from a response to the backend. backend
 	// can use it to maintain any required state about the resolution
 	HandleQueryResp(name string, ip net.IP)
-***REMOVED***
+}
 
 const (
 	dnsPort         = "53"
@@ -71,13 +71,13 @@ const (
 	logInterval     = 2 * time.Second
 )
 
-type extDNSEntry struct ***REMOVED***
+type extDNSEntry struct {
 	IPStr        string
 	HostLoopback bool
-***REMOVED***
+}
 
 // resolver implements the Resolver interface
-type resolver struct ***REMOVED***
+type resolver struct {
 	backend       DNSBackend
 	extDNSList    [maxExtDNS]extDNSEntry
 	server        *dns.Server
@@ -91,146 +91,146 @@ type resolver struct ***REMOVED***
 	listenAddress string
 	proxyDNS      bool
 	resolverKey   string
-	startCh       chan struct***REMOVED******REMOVED***
-***REMOVED***
+	startCh       chan struct{}
+}
 
-func init() ***REMOVED***
+func init() {
 	rand.Seed(time.Now().Unix())
-***REMOVED***
+}
 
 // NewResolver creates a new instance of the Resolver
-func NewResolver(address string, proxyDNS bool, resolverKey string, backend DNSBackend) Resolver ***REMOVED***
-	return &resolver***REMOVED***
+func NewResolver(address string, proxyDNS bool, resolverKey string, backend DNSBackend) Resolver {
+	return &resolver{
 		backend:       backend,
 		proxyDNS:      proxyDNS,
 		listenAddress: address,
 		resolverKey:   resolverKey,
 		err:           fmt.Errorf("setup not done yet"),
-		startCh:       make(chan struct***REMOVED******REMOVED***, 1),
-	***REMOVED***
-***REMOVED***
+		startCh:       make(chan struct{}, 1),
+	}
+}
 
-func (r *resolver) SetupFunc(port int) func() ***REMOVED***
-	return (func() ***REMOVED***
+func (r *resolver) SetupFunc(port int) func() {
+	return (func() {
 		var err error
 
 		// DNS operates primarily on UDP
-		addr := &net.UDPAddr***REMOVED***
+		addr := &net.UDPAddr{
 			IP:   net.ParseIP(r.listenAddress),
 			Port: port,
-		***REMOVED***
+		}
 
 		r.conn, err = net.ListenUDP("udp", addr)
-		if err != nil ***REMOVED***
+		if err != nil {
 			r.err = fmt.Errorf("error in opening name server socket %v", err)
 			return
-		***REMOVED***
+		}
 
 		// Listen on a TCP as well
-		tcpaddr := &net.TCPAddr***REMOVED***
+		tcpaddr := &net.TCPAddr{
 			IP:   net.ParseIP(r.listenAddress),
 			Port: port,
-		***REMOVED***
+		}
 
 		r.tcpListen, err = net.ListenTCP("tcp", tcpaddr)
-		if err != nil ***REMOVED***
+		if err != nil {
 			r.err = fmt.Errorf("error in opening name TCP server socket %v", err)
 			return
-		***REMOVED***
+		}
 		r.err = nil
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func (r *resolver) Start() error ***REMOVED***
-	r.startCh <- struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	defer func() ***REMOVED*** <-r.startCh ***REMOVED***()
+func (r *resolver) Start() error {
+	r.startCh <- struct{}{}
+	defer func() { <-r.startCh }()
 
 	// make sure the resolver has been setup before starting
-	if r.err != nil ***REMOVED***
+	if r.err != nil {
 		return r.err
-	***REMOVED***
+	}
 
-	if err := r.setupIPTable(); err != nil ***REMOVED***
+	if err := r.setupIPTable(); err != nil {
 		return fmt.Errorf("setting up IP table rules failed: %v", err)
-	***REMOVED***
+	}
 
-	s := &dns.Server***REMOVED***Handler: r, PacketConn: r.conn***REMOVED***
+	s := &dns.Server{Handler: r, PacketConn: r.conn}
 	r.server = s
-	go func() ***REMOVED***
+	go func() {
 		s.ActivateAndServe()
-	***REMOVED***()
+	}()
 
-	tcpServer := &dns.Server***REMOVED***Handler: r, Listener: r.tcpListen***REMOVED***
+	tcpServer := &dns.Server{Handler: r, Listener: r.tcpListen}
 	r.tcpServer = tcpServer
-	go func() ***REMOVED***
+	go func() {
 		tcpServer.ActivateAndServe()
-	***REMOVED***()
+	}()
 	return nil
-***REMOVED***
+}
 
-func (r *resolver) Stop() ***REMOVED***
-	r.startCh <- struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	defer func() ***REMOVED*** <-r.startCh ***REMOVED***()
+func (r *resolver) Stop() {
+	r.startCh <- struct{}{}
+	defer func() { <-r.startCh }()
 
-	if r.server != nil ***REMOVED***
+	if r.server != nil {
 		r.server.Shutdown()
-	***REMOVED***
-	if r.tcpServer != nil ***REMOVED***
+	}
+	if r.tcpServer != nil {
 		r.tcpServer.Shutdown()
-	***REMOVED***
+	}
 	r.conn = nil
 	r.tcpServer = nil
 	r.err = fmt.Errorf("setup not done yet")
-	r.tStamp = time.Time***REMOVED******REMOVED***
+	r.tStamp = time.Time{}
 	r.count = 0
-	r.queryLock = sync.Mutex***REMOVED******REMOVED***
-***REMOVED***
+	r.queryLock = sync.Mutex{}
+}
 
-func (r *resolver) SetExtServers(extDNS []extDNSEntry) ***REMOVED***
+func (r *resolver) SetExtServers(extDNS []extDNSEntry) {
 	l := len(extDNS)
-	if l > maxExtDNS ***REMOVED***
+	if l > maxExtDNS {
 		l = maxExtDNS
-	***REMOVED***
-	for i := 0; i < l; i++ ***REMOVED***
+	}
+	for i := 0; i < l; i++ {
 		r.extDNSList[i] = extDNS[i]
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (r *resolver) NameServer() string ***REMOVED***
+func (r *resolver) NameServer() string {
 	return r.listenAddress
-***REMOVED***
+}
 
-func (r *resolver) ResolverOptions() []string ***REMOVED***
-	return []string***REMOVED***"ndots:0"***REMOVED***
-***REMOVED***
+func (r *resolver) ResolverOptions() []string {
+	return []string{"ndots:0"}
+}
 
-func setCommonFlags(msg *dns.Msg) ***REMOVED***
+func setCommonFlags(msg *dns.Msg) {
 	msg.RecursionAvailable = true
-***REMOVED***
+}
 
-func shuffleAddr(addr []net.IP) []net.IP ***REMOVED***
-	for i := len(addr) - 1; i > 0; i-- ***REMOVED***
+func shuffleAddr(addr []net.IP) []net.IP {
+	for i := len(addr) - 1; i > 0; i-- {
 		r := rand.Intn(i + 1)
 		addr[i], addr[r] = addr[r], addr[i]
-	***REMOVED***
+	}
 	return addr
-***REMOVED***
+}
 
-func createRespMsg(query *dns.Msg) *dns.Msg ***REMOVED***
+func createRespMsg(query *dns.Msg) *dns.Msg {
 	resp := new(dns.Msg)
 	resp.SetReply(query)
 	setCommonFlags(resp)
 
 	return resp
-***REMOVED***
+}
 
-func (r *resolver) handleMXQuery(name string, query *dns.Msg) (*dns.Msg, error) ***REMOVED***
+func (r *resolver) handleMXQuery(name string, query *dns.Msg) (*dns.Msg, error) {
 	addrv4, _ := r.backend.ResolveName(name, types.IPv4)
 	addrv6, _ := r.backend.ResolveName(name, types.IPv6)
 
-	if addrv4 == nil && addrv6 == nil ***REMOVED***
+	if addrv4 == nil && addrv6 == nil {
 		return nil, nil
-	***REMOVED***
+	}
 
 	// We were able to resolve the name. Respond with an empty list with
 	// RcodeSuccess/NOERROR so that email clients can treat it as "implicit MX"
@@ -238,63 +238,63 @@ func (r *resolver) handleMXQuery(name string, query *dns.Msg) (*dns.Msg, error) 
 
 	resp := createRespMsg(query)
 	return resp, nil
-***REMOVED***
+}
 
-func (r *resolver) handleIPQuery(name string, query *dns.Msg, ipType int) (*dns.Msg, error) ***REMOVED***
+func (r *resolver) handleIPQuery(name string, query *dns.Msg, ipType int) (*dns.Msg, error) {
 	var addr []net.IP
 	var ipv6Miss bool
 	addr, ipv6Miss = r.backend.ResolveName(name, ipType)
 
-	if addr == nil && ipv6Miss ***REMOVED***
+	if addr == nil && ipv6Miss {
 		// Send a reply without any Answer sections
 		logrus.Debugf("[resolver] lookup name %s present without IPv6 address", name)
 		resp := createRespMsg(query)
 		return resp, nil
-	***REMOVED***
-	if addr == nil ***REMOVED***
+	}
+	if addr == nil {
 		return nil, nil
-	***REMOVED***
+	}
 
 	logrus.Debugf("[resolver] lookup for %s: IP %v", name, addr)
 
 	resp := createRespMsg(query)
-	if len(addr) > 1 ***REMOVED***
+	if len(addr) > 1 {
 		addr = shuffleAddr(addr)
-	***REMOVED***
-	if ipType == types.IPv4 ***REMOVED***
-		for _, ip := range addr ***REMOVED***
+	}
+	if ipType == types.IPv4 {
+		for _, ip := range addr {
 			rr := new(dns.A)
-			rr.Hdr = dns.RR_Header***REMOVED***Name: name, Rrtype: dns.TypeA, Class: dns.ClassINET, Ttl: respTTL***REMOVED***
+			rr.Hdr = dns.RR_Header{Name: name, Rrtype: dns.TypeA, Class: dns.ClassINET, Ttl: respTTL}
 			rr.A = ip
 			resp.Answer = append(resp.Answer, rr)
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
-		for _, ip := range addr ***REMOVED***
+		}
+	} else {
+		for _, ip := range addr {
 			rr := new(dns.AAAA)
-			rr.Hdr = dns.RR_Header***REMOVED***Name: name, Rrtype: dns.TypeAAAA, Class: dns.ClassINET, Ttl: respTTL***REMOVED***
+			rr.Hdr = dns.RR_Header{Name: name, Rrtype: dns.TypeAAAA, Class: dns.ClassINET, Ttl: respTTL}
 			rr.AAAA = ip
 			resp.Answer = append(resp.Answer, rr)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return resp, nil
-***REMOVED***
+}
 
-func (r *resolver) handlePTRQuery(ptr string, query *dns.Msg) (*dns.Msg, error) ***REMOVED***
-	parts := []string***REMOVED******REMOVED***
+func (r *resolver) handlePTRQuery(ptr string, query *dns.Msg) (*dns.Msg, error) {
+	parts := []string{}
 
-	if strings.HasSuffix(ptr, ptrIPv4domain) ***REMOVED***
+	if strings.HasSuffix(ptr, ptrIPv4domain) {
 		parts = strings.Split(ptr, ptrIPv4domain)
-	***REMOVED*** else if strings.HasSuffix(ptr, ptrIPv6domain) ***REMOVED***
+	} else if strings.HasSuffix(ptr, ptrIPv6domain) {
 		parts = strings.Split(ptr, ptrIPv6domain)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		return nil, fmt.Errorf("invalid PTR query, %v", ptr)
-	***REMOVED***
+	}
 
 	host := r.backend.ResolveIP(parts[0])
 
-	if len(host) == 0 ***REMOVED***
+	if len(host) == 0 {
 		return nil, nil
-	***REMOVED***
+	}
 
 	logrus.Debugf("[resolver] lookup for IP %s: name %s", parts[0], host)
 	fqdn := dns.Fqdn(host)
@@ -304,71 +304,71 @@ func (r *resolver) handlePTRQuery(ptr string, query *dns.Msg) (*dns.Msg, error) 
 	setCommonFlags(resp)
 
 	rr := new(dns.PTR)
-	rr.Hdr = dns.RR_Header***REMOVED***Name: ptr, Rrtype: dns.TypePTR, Class: dns.ClassINET, Ttl: respTTL***REMOVED***
+	rr.Hdr = dns.RR_Header{Name: ptr, Rrtype: dns.TypePTR, Class: dns.ClassINET, Ttl: respTTL}
 	rr.Ptr = fqdn
 	resp.Answer = append(resp.Answer, rr)
 	return resp, nil
-***REMOVED***
+}
 
-func (r *resolver) handleSRVQuery(svc string, query *dns.Msg) (*dns.Msg, error) ***REMOVED***
+func (r *resolver) handleSRVQuery(svc string, query *dns.Msg) (*dns.Msg, error) {
 
 	srv, ip := r.backend.ResolveService(svc)
 
-	if len(srv) == 0 ***REMOVED***
+	if len(srv) == 0 {
 		return nil, nil
-	***REMOVED***
-	if len(srv) != len(ip) ***REMOVED***
+	}
+	if len(srv) != len(ip) {
 		return nil, fmt.Errorf("invalid reply for SRV query %s", svc)
-	***REMOVED***
+	}
 
 	resp := createRespMsg(query)
 
-	for i, r := range srv ***REMOVED***
+	for i, r := range srv {
 		rr := new(dns.SRV)
-		rr.Hdr = dns.RR_Header***REMOVED***Name: svc, Rrtype: dns.TypePTR, Class: dns.ClassINET, Ttl: respTTL***REMOVED***
+		rr.Hdr = dns.RR_Header{Name: svc, Rrtype: dns.TypePTR, Class: dns.ClassINET, Ttl: respTTL}
 		rr.Port = r.Port
 		rr.Target = r.Target
 		resp.Answer = append(resp.Answer, rr)
 
 		rr1 := new(dns.A)
-		rr1.Hdr = dns.RR_Header***REMOVED***Name: r.Target, Rrtype: dns.TypeA, Class: dns.ClassINET, Ttl: respTTL***REMOVED***
+		rr1.Hdr = dns.RR_Header{Name: r.Target, Rrtype: dns.TypeA, Class: dns.ClassINET, Ttl: respTTL}
 		rr1.A = ip[i]
 		resp.Extra = append(resp.Extra, rr1)
-	***REMOVED***
+	}
 	return resp, nil
 
-***REMOVED***
+}
 
-func truncateResp(resp *dns.Msg, maxSize int, isTCP bool) ***REMOVED***
-	if !isTCP ***REMOVED***
+func truncateResp(resp *dns.Msg, maxSize int, isTCP bool) {
+	if !isTCP {
 		resp.Truncated = true
-	***REMOVED***
+	}
 
 	srv := resp.Question[0].Qtype == dns.TypeSRV
 	// trim the Answer RRs one by one till the whole message fits
 	// within the reply size
-	for resp.Len() > maxSize ***REMOVED***
+	for resp.Len() > maxSize {
 		resp.Answer = resp.Answer[:len(resp.Answer)-1]
 
-		if srv && len(resp.Extra) > 0 ***REMOVED***
+		if srv && len(resp.Extra) > 0 {
 			resp.Extra = resp.Extra[:len(resp.Extra)-1]
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (r *resolver) ServeDNS(w dns.ResponseWriter, query *dns.Msg) ***REMOVED***
+func (r *resolver) ServeDNS(w dns.ResponseWriter, query *dns.Msg) {
 	var (
 		extConn net.Conn
 		resp    *dns.Msg
 		err     error
 	)
 
-	if query == nil || len(query.Question) == 0 ***REMOVED***
+	if query == nil || len(query.Question) == 0 {
 		return
-	***REMOVED***
+	}
 	name := query.Question[0].Name
 
-	switch query.Question[0].Qtype ***REMOVED***
+	switch query.Question[0].Qtype {
 	case dns.TypeA:
 		resp, err = r.handleIPQuery(name, query, types.IPv4)
 	case dns.TypeAAAA:
@@ -379,79 +379,79 @@ func (r *resolver) ServeDNS(w dns.ResponseWriter, query *dns.Msg) ***REMOVED***
 		resp, err = r.handlePTRQuery(name, query)
 	case dns.TypeSRV:
 		resp, err = r.handleSRVQuery(name, query)
-	***REMOVED***
+	}
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		logrus.Error(err)
 		return
-	***REMOVED***
+	}
 
-	if resp == nil ***REMOVED***
+	if resp == nil {
 		// If the backend doesn't support proxying dns request
 		// fail the response
-		if !r.proxyDNS ***REMOVED***
+		if !r.proxyDNS {
 			resp = new(dns.Msg)
 			resp.SetRcode(query, dns.RcodeServerFailure)
 			w.WriteMsg(resp)
 			return
-		***REMOVED***
+		}
 
 		// If the user sets ndots > 0 explicitly and the query is
 		// in the root domain don't forward it out. We will return
 		// failure and let the client retry with the search domain
 		// attached
-		switch query.Question[0].Qtype ***REMOVED***
+		switch query.Question[0].Qtype {
 		case dns.TypeA:
 			fallthrough
 		case dns.TypeAAAA:
-			if r.backend.NdotsSet() && !strings.Contains(strings.TrimSuffix(name, "."), ".") ***REMOVED***
+			if r.backend.NdotsSet() && !strings.Contains(strings.TrimSuffix(name, "."), ".") {
 				resp = createRespMsg(query)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	proto := w.LocalAddr().Network()
 	maxSize := 0
-	if proto == "tcp" ***REMOVED***
+	if proto == "tcp" {
 		maxSize = dns.MaxMsgSize - 1
-	***REMOVED*** else if proto == "udp" ***REMOVED***
+	} else if proto == "udp" {
 		optRR := query.IsEdns0()
-		if optRR != nil ***REMOVED***
+		if optRR != nil {
 			maxSize = int(optRR.UDPSize())
-		***REMOVED***
-		if maxSize < defaultRespSize ***REMOVED***
+		}
+		if maxSize < defaultRespSize {
 			maxSize = defaultRespSize
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if resp != nil ***REMOVED***
-		if resp.Len() > maxSize ***REMOVED***
+	if resp != nil {
+		if resp.Len() > maxSize {
 			truncateResp(resp, maxSize, proto == "tcp")
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
-		for i := 0; i < maxExtDNS; i++ ***REMOVED***
+		}
+	} else {
+		for i := 0; i < maxExtDNS; i++ {
 			extDNS := &r.extDNSList[i]
-			if extDNS.IPStr == "" ***REMOVED***
+			if extDNS.IPStr == "" {
 				break
-			***REMOVED***
-			extConnect := func() ***REMOVED***
+			}
+			extConnect := func() {
 				addr := fmt.Sprintf("%s:%d", extDNS.IPStr, 53)
 				extConn, err = net.DialTimeout(proto, addr, extIOTimeout)
-			***REMOVED***
+			}
 
-			if extDNS.HostLoopback ***REMOVED***
+			if extDNS.HostLoopback {
 				extConnect()
-			***REMOVED*** else ***REMOVED***
+			} else {
 				execErr := r.backend.ExecFunc(extConnect)
-				if execErr != nil ***REMOVED***
+				if execErr != nil {
 					logrus.Warn(execErr)
 					continue
-				***REMOVED***
-			***REMOVED***
-			if err != nil ***REMOVED***
+				}
+			}
+			if err != nil {
 				logrus.Warnf("[resolver] connect failed: %s", err)
 				continue
-			***REMOVED***
+			}
 
 			queryType := dns.TypeToString[query.Question[0].Qtype]
 			logrus.Debugf("[resolver] query %s (%s) from %s, forwarding to %s:%s", name, queryType,
@@ -459,43 +459,43 @@ func (r *resolver) ServeDNS(w dns.ResponseWriter, query *dns.Msg) ***REMOVED***
 
 			// Timeout has to be set for every IO operation.
 			extConn.SetDeadline(time.Now().Add(extIOTimeout))
-			co := &dns.Conn***REMOVED***
+			co := &dns.Conn{
 				Conn:    extConn,
 				UDPSize: uint16(maxSize),
-			***REMOVED***
+			}
 			defer co.Close()
 
 			// limits the number of outstanding concurrent queries.
-			if !r.forwardQueryStart() ***REMOVED***
+			if !r.forwardQueryStart() {
 				old := r.tStamp
 				r.tStamp = time.Now()
-				if r.tStamp.Sub(old) > logInterval ***REMOVED***
+				if r.tStamp.Sub(old) > logInterval {
 					logrus.Errorf("[resolver] more than %v concurrent queries from %s", maxConcurrent, extConn.LocalAddr().String())
-				***REMOVED***
+				}
 				continue
-			***REMOVED***
+			}
 
 			err = co.WriteMsg(query)
-			if err != nil ***REMOVED***
+			if err != nil {
 				r.forwardQueryEnd()
 				logrus.Debugf("[resolver] send to DNS server failed, %s", err)
 				continue
-			***REMOVED***
+			}
 
 			resp, err = co.ReadMsg()
 			// Truncated DNS replies should be sent to the client so that the
 			// client can retry over TCP
-			if err != nil && err != dns.ErrTruncated ***REMOVED***
+			if err != nil && err != dns.ErrTruncated {
 				r.forwardQueryEnd()
 				logrus.Debugf("[resolver] read from DNS server failed, %s", err)
 				continue
-			***REMOVED***
+			}
 			r.forwardQueryEnd()
-			if resp != nil ***REMOVED***
+			if resp != nil {
 				answers := 0
-				for _, rr := range resp.Answer ***REMOVED***
+				for _, rr := range resp.Answer {
 					h := rr.Header()
-					switch h.Rrtype ***REMOVED***
+					switch h.Rrtype {
 					case dns.TypeA:
 						answers++
 						ip := rr.(*dns.A).A
@@ -506,46 +506,46 @@ func (r *resolver) ServeDNS(w dns.ResponseWriter, query *dns.Msg) ***REMOVED***
 						ip := rr.(*dns.AAAA).AAAA
 						logrus.Debugf("[resolver] received AAAA record %q for %q from %s:%s", ip, h.Name, proto, extDNS.IPStr)
 						r.backend.HandleQueryResp(h.Name, ip)
-					***REMOVED***
-				***REMOVED***
-				if resp.Answer == nil || answers == 0 ***REMOVED***
+					}
+				}
+				if resp.Answer == nil || answers == 0 {
 					logrus.Debugf("[resolver] external DNS %s:%s did not return any %s records for %q", proto, extDNS.IPStr, queryType, name)
-				***REMOVED***
-			***REMOVED*** else ***REMOVED***
+				}
+			} else {
 				logrus.Debugf("[resolver] external DNS %s:%s returned empty response for %q", proto, extDNS.IPStr, name)
-			***REMOVED***
+			}
 			resp.Compress = true
 			break
-		***REMOVED***
-		if resp == nil ***REMOVED***
+		}
+		if resp == nil {
 			return
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if err = w.WriteMsg(resp); err != nil ***REMOVED***
+	if err = w.WriteMsg(resp); err != nil {
 		logrus.Errorf("[resolver] error writing resolver resp, %s", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (r *resolver) forwardQueryStart() bool ***REMOVED***
+func (r *resolver) forwardQueryStart() bool {
 	r.queryLock.Lock()
 	defer r.queryLock.Unlock()
 
-	if r.count == maxConcurrent ***REMOVED***
+	if r.count == maxConcurrent {
 		return false
-	***REMOVED***
+	}
 	r.count++
 
 	return true
-***REMOVED***
+}
 
-func (r *resolver) forwardQueryEnd() ***REMOVED***
+func (r *resolver) forwardQueryEnd() {
 	r.queryLock.Lock()
 	defer r.queryLock.Unlock()
 
-	if r.count == 0 ***REMOVED***
+	if r.count == 0 {
 		logrus.Error("[resolver] invalid concurrent query count")
-	***REMOVED*** else ***REMOVED***
+	} else {
 		r.count--
-	***REMOVED***
-***REMOVED***
+	}
+}

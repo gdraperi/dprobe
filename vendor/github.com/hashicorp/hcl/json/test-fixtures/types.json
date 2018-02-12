@@ -1,4 +1,4 @@
-***REMOVED***
+{
 	"foo": "bar",
 	"bar": 7,
 	"baz": [1,2,3],
@@ -7,4 +7,4 @@
     "foo": true,
     "bar": false,
     "foo": null
-***REMOVED***
+}

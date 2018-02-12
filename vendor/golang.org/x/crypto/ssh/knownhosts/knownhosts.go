@@ -27,406 +27,406 @@ import (
 // (http://man.openbsd.org/sshd#SSH_KNOWN_HOSTS_FILE_FORMAT) for
 // background.
 
-type addr struct***REMOVED*** host, port string ***REMOVED***
+type addr struct{ host, port string }
 
-func (a *addr) String() string ***REMOVED***
+func (a *addr) String() string {
 	h := a.host
-	if strings.Contains(h, ":") ***REMOVED***
+	if strings.Contains(h, ":") {
 		h = "[" + h + "]"
-	***REMOVED***
+	}
 	return h + ":" + a.port
-***REMOVED***
+}
 
-type matcher interface ***REMOVED***
+type matcher interface {
 	match([]addr) bool
-***REMOVED***
+}
 
-type hostPattern struct ***REMOVED***
+type hostPattern struct {
 	negate bool
 	addr   addr
-***REMOVED***
+}
 
-func (p *hostPattern) String() string ***REMOVED***
+func (p *hostPattern) String() string {
 	n := ""
-	if p.negate ***REMOVED***
+	if p.negate {
 		n = "!"
-	***REMOVED***
+	}
 
 	return n + p.addr.String()
-***REMOVED***
+}
 
 type hostPatterns []hostPattern
 
-func (ps hostPatterns) match(addrs []addr) bool ***REMOVED***
+func (ps hostPatterns) match(addrs []addr) bool {
 	matched := false
-	for _, p := range ps ***REMOVED***
-		for _, a := range addrs ***REMOVED***
+	for _, p := range ps {
+		for _, a := range addrs {
 			m := p.match(a)
-			if !m ***REMOVED***
+			if !m {
 				continue
-			***REMOVED***
-			if p.negate ***REMOVED***
+			}
+			if p.negate {
 				return false
-			***REMOVED***
+			}
 			matched = true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return matched
-***REMOVED***
+}
 
 // See
 // https://android.googlesource.com/platform/external/openssh/+/ab28f5495c85297e7a597c1ba62e996416da7c7e/addrmatch.c
 // The matching of * has no regard for separators, unlike filesystem globs
-func wildcardMatch(pat []byte, str []byte) bool ***REMOVED***
-	for ***REMOVED***
-		if len(pat) == 0 ***REMOVED***
+func wildcardMatch(pat []byte, str []byte) bool {
+	for {
+		if len(pat) == 0 {
 			return len(str) == 0
-		***REMOVED***
-		if len(str) == 0 ***REMOVED***
+		}
+		if len(str) == 0 {
 			return false
-		***REMOVED***
+		}
 
-		if pat[0] == '*' ***REMOVED***
-			if len(pat) == 1 ***REMOVED***
+		if pat[0] == '*' {
+			if len(pat) == 1 {
 				return true
-			***REMOVED***
+			}
 
-			for j := range str ***REMOVED***
-				if wildcardMatch(pat[1:], str[j:]) ***REMOVED***
+			for j := range str {
+				if wildcardMatch(pat[1:], str[j:]) {
 					return true
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return false
-		***REMOVED***
+		}
 
-		if pat[0] == '?' || pat[0] == str[0] ***REMOVED***
+		if pat[0] == '?' || pat[0] == str[0] {
 			pat = pat[1:]
 			str = str[1:]
-		***REMOVED*** else ***REMOVED***
+		} else {
 			return false
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (p *hostPattern) match(a addr) bool ***REMOVED***
+func (p *hostPattern) match(a addr) bool {
 	return wildcardMatch([]byte(p.addr.host), []byte(a.host)) && p.addr.port == a.port
-***REMOVED***
+}
 
-type keyDBLine struct ***REMOVED***
+type keyDBLine struct {
 	cert     bool
 	matcher  matcher
 	knownKey KnownKey
-***REMOVED***
+}
 
-func serialize(k ssh.PublicKey) string ***REMOVED***
+func serialize(k ssh.PublicKey) string {
 	return k.Type() + " " + base64.StdEncoding.EncodeToString(k.Marshal())
-***REMOVED***
+}
 
-func (l *keyDBLine) match(addrs []addr) bool ***REMOVED***
+func (l *keyDBLine) match(addrs []addr) bool {
 	return l.matcher.match(addrs)
-***REMOVED***
+}
 
-type hostKeyDB struct ***REMOVED***
+type hostKeyDB struct {
 	// Serialized version of revoked keys
 	revoked map[string]*KnownKey
 	lines   []keyDBLine
-***REMOVED***
+}
 
-func newHostKeyDB() *hostKeyDB ***REMOVED***
-	db := &hostKeyDB***REMOVED***
+func newHostKeyDB() *hostKeyDB {
+	db := &hostKeyDB{
 		revoked: make(map[string]*KnownKey),
-	***REMOVED***
+	}
 
 	return db
-***REMOVED***
+}
 
-func keyEq(a, b ssh.PublicKey) bool ***REMOVED***
+func keyEq(a, b ssh.PublicKey) bool {
 	return bytes.Equal(a.Marshal(), b.Marshal())
-***REMOVED***
+}
 
 // IsAuthorityForHost can be used as a callback in ssh.CertChecker
-func (db *hostKeyDB) IsHostAuthority(remote ssh.PublicKey, address string) bool ***REMOVED***
+func (db *hostKeyDB) IsHostAuthority(remote ssh.PublicKey, address string) bool {
 	h, p, err := net.SplitHostPort(address)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return false
-	***REMOVED***
-	a := addr***REMOVED***host: h, port: p***REMOVED***
+	}
+	a := addr{host: h, port: p}
 
-	for _, l := range db.lines ***REMOVED***
-		if l.cert && keyEq(l.knownKey.Key, remote) && l.match([]addr***REMOVED***a***REMOVED***) ***REMOVED***
+	for _, l := range db.lines {
+		if l.cert && keyEq(l.knownKey.Key, remote) && l.match([]addr{a}) {
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false
-***REMOVED***
+}
 
 // IsRevoked can be used as a callback in ssh.CertChecker
-func (db *hostKeyDB) IsRevoked(key *ssh.Certificate) bool ***REMOVED***
+func (db *hostKeyDB) IsRevoked(key *ssh.Certificate) bool {
 	_, ok := db.revoked[string(key.Marshal())]
 	return ok
-***REMOVED***
+}
 
 const markerCert = "@cert-authority"
 const markerRevoked = "@revoked"
 
-func nextWord(line []byte) (string, []byte) ***REMOVED***
+func nextWord(line []byte) (string, []byte) {
 	i := bytes.IndexAny(line, "\t ")
-	if i == -1 ***REMOVED***
+	if i == -1 {
 		return string(line), nil
-	***REMOVED***
+	}
 
 	return string(line[:i]), bytes.TrimSpace(line[i:])
-***REMOVED***
+}
 
-func parseLine(line []byte) (marker, host string, key ssh.PublicKey, err error) ***REMOVED***
-	if w, next := nextWord(line); w == markerCert || w == markerRevoked ***REMOVED***
+func parseLine(line []byte) (marker, host string, key ssh.PublicKey, err error) {
+	if w, next := nextWord(line); w == markerCert || w == markerRevoked {
 		marker = w
 		line = next
-	***REMOVED***
+	}
 
 	host, line = nextWord(line)
-	if len(line) == 0 ***REMOVED***
+	if len(line) == 0 {
 		return "", "", nil, errors.New("knownhosts: missing host pattern")
-	***REMOVED***
+	}
 
 	// ignore the keytype as it's in the key blob anyway.
 	_, line = nextWord(line)
-	if len(line) == 0 ***REMOVED***
+	if len(line) == 0 {
 		return "", "", nil, errors.New("knownhosts: missing key type pattern")
-	***REMOVED***
+	}
 
 	keyBlob, _ := nextWord(line)
 
 	keyBytes, err := base64.StdEncoding.DecodeString(keyBlob)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", "", nil, err
-	***REMOVED***
+	}
 	key, err = ssh.ParsePublicKey(keyBytes)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", "", nil, err
-	***REMOVED***
+	}
 
 	return marker, host, key, nil
-***REMOVED***
+}
 
-func (db *hostKeyDB) parseLine(line []byte, filename string, linenum int) error ***REMOVED***
+func (db *hostKeyDB) parseLine(line []byte, filename string, linenum int) error {
 	marker, pattern, key, err := parseLine(line)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if marker == markerRevoked ***REMOVED***
-		db.revoked[string(key.Marshal())] = &KnownKey***REMOVED***
+	if marker == markerRevoked {
+		db.revoked[string(key.Marshal())] = &KnownKey{
 			Key:      key,
 			Filename: filename,
 			Line:     linenum,
-		***REMOVED***
+		}
 
 		return nil
-	***REMOVED***
+	}
 
-	entry := keyDBLine***REMOVED***
+	entry := keyDBLine{
 		cert: marker == markerCert,
-		knownKey: KnownKey***REMOVED***
+		knownKey: KnownKey{
 			Filename: filename,
 			Line:     linenum,
 			Key:      key,
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
-	if pattern[0] == '|' ***REMOVED***
+	if pattern[0] == '|' {
 		entry.matcher, err = newHashedHost(pattern)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		entry.matcher, err = newHostnameMatcher(pattern)
-	***REMOVED***
+	}
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	db.lines = append(db.lines, entry)
 	return nil
-***REMOVED***
+}
 
-func newHostnameMatcher(pattern string) (matcher, error) ***REMOVED***
+func newHostnameMatcher(pattern string) (matcher, error) {
 	var hps hostPatterns
-	for _, p := range strings.Split(pattern, ",") ***REMOVED***
-		if len(p) == 0 ***REMOVED***
+	for _, p := range strings.Split(pattern, ",") {
+		if len(p) == 0 {
 			continue
-		***REMOVED***
+		}
 
 		var a addr
 		var negate bool
-		if p[0] == '!' ***REMOVED***
+		if p[0] == '!' {
 			negate = true
 			p = p[1:]
-		***REMOVED***
+		}
 
-		if len(p) == 0 ***REMOVED***
+		if len(p) == 0 {
 			return nil, errors.New("knownhosts: negation without following hostname")
-		***REMOVED***
+		}
 
 		var err error
-		if p[0] == '[' ***REMOVED***
+		if p[0] == '[' {
 			a.host, a.port, err = net.SplitHostPort(p)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
+			}
+		} else {
 			a.host, a.port, err = net.SplitHostPort(p)
-			if err != nil ***REMOVED***
+			if err != nil {
 				a.host = p
 				a.port = "22"
-			***REMOVED***
-		***REMOVED***
-		hps = append(hps, hostPattern***REMOVED***
+			}
+		}
+		hps = append(hps, hostPattern{
 			negate: negate,
 			addr:   a,
-		***REMOVED***)
-	***REMOVED***
+		})
+	}
 	return hps, nil
-***REMOVED***
+}
 
 // KnownKey represents a key declared in a known_hosts file.
-type KnownKey struct ***REMOVED***
+type KnownKey struct {
 	Key      ssh.PublicKey
 	Filename string
 	Line     int
-***REMOVED***
+}
 
-func (k *KnownKey) String() string ***REMOVED***
+func (k *KnownKey) String() string {
 	return fmt.Sprintf("%s:%d: %s", k.Filename, k.Line, serialize(k.Key))
-***REMOVED***
+}
 
 // KeyError is returned if we did not find the key in the host key
 // database, or there was a mismatch.  Typically, in batch
 // applications, this should be interpreted as failure. Interactive
 // applications can offer an interactive prompt to the user.
-type KeyError struct ***REMOVED***
+type KeyError struct {
 	// Want holds the accepted host keys. For each key algorithm,
 	// there can be one hostkey.  If Want is empty, the host is
 	// unknown. If Want is non-empty, there was a mismatch, which
 	// can signify a MITM attack.
 	Want []KnownKey
-***REMOVED***
+}
 
-func (u *KeyError) Error() string ***REMOVED***
-	if len(u.Want) == 0 ***REMOVED***
+func (u *KeyError) Error() string {
+	if len(u.Want) == 0 {
 		return "knownhosts: key is unknown"
-	***REMOVED***
+	}
 	return "knownhosts: key mismatch"
-***REMOVED***
+}
 
 // RevokedError is returned if we found a key that was revoked.
-type RevokedError struct ***REMOVED***
+type RevokedError struct {
 	Revoked KnownKey
-***REMOVED***
+}
 
-func (r *RevokedError) Error() string ***REMOVED***
+func (r *RevokedError) Error() string {
 	return "knownhosts: key is revoked"
-***REMOVED***
+}
 
 // check checks a key against the host database. This should not be
 // used for verifying certificates.
-func (db *hostKeyDB) check(address string, remote net.Addr, remoteKey ssh.PublicKey) error ***REMOVED***
-	if revoked := db.revoked[string(remoteKey.Marshal())]; revoked != nil ***REMOVED***
-		return &RevokedError***REMOVED***Revoked: *revoked***REMOVED***
-	***REMOVED***
+func (db *hostKeyDB) check(address string, remote net.Addr, remoteKey ssh.PublicKey) error {
+	if revoked := db.revoked[string(remoteKey.Marshal())]; revoked != nil {
+		return &RevokedError{Revoked: *revoked}
+	}
 
 	host, port, err := net.SplitHostPort(remote.String())
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("knownhosts: SplitHostPort(%s): %v", remote, err)
-	***REMOVED***
+	}
 
-	addrs := []addr***REMOVED***
-		***REMOVED***host, port***REMOVED***,
-	***REMOVED***
+	addrs := []addr{
+		{host, port},
+	}
 
-	if address != "" ***REMOVED***
+	if address != "" {
 		host, port, err := net.SplitHostPort(address)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return fmt.Errorf("knownhosts: SplitHostPort(%s): %v", address, err)
-		***REMOVED***
+		}
 
-		addrs = append(addrs, addr***REMOVED***host, port***REMOVED***)
-	***REMOVED***
+		addrs = append(addrs, addr{host, port})
+	}
 
 	return db.checkAddrs(addrs, remoteKey)
-***REMOVED***
+}
 
 // checkAddrs checks if we can find the given public key for any of
 // the given addresses.  If we only find an entry for the IP address,
 // or only the hostname, then this still succeeds.
-func (db *hostKeyDB) checkAddrs(addrs []addr, remoteKey ssh.PublicKey) error ***REMOVED***
+func (db *hostKeyDB) checkAddrs(addrs []addr, remoteKey ssh.PublicKey) error {
 	// TODO(hanwen): are these the right semantics? What if there
 	// is just a key for the IP address, but not for the
 	// hostname?
 
 	// Algorithm => key.
-	knownKeys := map[string]KnownKey***REMOVED******REMOVED***
-	for _, l := range db.lines ***REMOVED***
-		if l.match(addrs) ***REMOVED***
+	knownKeys := map[string]KnownKey{}
+	for _, l := range db.lines {
+		if l.match(addrs) {
 			typ := l.knownKey.Key.Type()
-			if _, ok := knownKeys[typ]; !ok ***REMOVED***
+			if _, ok := knownKeys[typ]; !ok {
 				knownKeys[typ] = l.knownKey
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
-	keyErr := &KeyError***REMOVED******REMOVED***
-	for _, v := range knownKeys ***REMOVED***
+	keyErr := &KeyError{}
+	for _, v := range knownKeys {
 		keyErr.Want = append(keyErr.Want, v)
-	***REMOVED***
+	}
 
 	// Unknown remote host.
-	if len(knownKeys) == 0 ***REMOVED***
+	if len(knownKeys) == 0 {
 		return keyErr
-	***REMOVED***
+	}
 
 	// If the remote host starts using a different, unknown key type, we
 	// also interpret that as a mismatch.
-	if known, ok := knownKeys[remoteKey.Type()]; !ok || !keyEq(known.Key, remoteKey) ***REMOVED***
+	if known, ok := knownKeys[remoteKey.Type()]; !ok || !keyEq(known.Key, remoteKey) {
 		return keyErr
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // The Read function parses file contents.
-func (db *hostKeyDB) Read(r io.Reader, filename string) error ***REMOVED***
+func (db *hostKeyDB) Read(r io.Reader, filename string) error {
 	scanner := bufio.NewScanner(r)
 
 	lineNum := 0
-	for scanner.Scan() ***REMOVED***
+	for scanner.Scan() {
 		lineNum++
 		line := scanner.Bytes()
 		line = bytes.TrimSpace(line)
-		if len(line) == 0 || line[0] == '#' ***REMOVED***
+		if len(line) == 0 || line[0] == '#' {
 			continue
-		***REMOVED***
+		}
 
-		if err := db.parseLine(line, filename, lineNum); err != nil ***REMOVED***
+		if err := db.parseLine(line, filename, lineNum); err != nil {
 			return fmt.Errorf("knownhosts: %s:%d: %v", filename, lineNum, err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return scanner.Err()
-***REMOVED***
+}
 
 // New creates a host key callback from the given OpenSSH host key
 // files. The returned callback is for use in
 // ssh.ClientConfig.HostKeyCallback.
-func New(files ...string) (ssh.HostKeyCallback, error) ***REMOVED***
+func New(files ...string) (ssh.HostKeyCallback, error) {
 	db := newHostKeyDB()
-	for _, fn := range files ***REMOVED***
+	for _, fn := range files {
 		f, err := os.Open(fn)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		defer f.Close()
-		if err := db.Read(f, fn); err != nil ***REMOVED***
+		if err := db.Read(f, fn); err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	var certChecker ssh.CertChecker
 	certChecker.IsHostAuthority = db.IsHostAuthority
@@ -434,113 +434,113 @@ func New(files ...string) (ssh.HostKeyCallback, error) ***REMOVED***
 	certChecker.HostKeyFallback = db.check
 
 	return certChecker.CheckHostKey, nil
-***REMOVED***
+}
 
 // Normalize normalizes an address into the form used in known_hosts
-func Normalize(address string) string ***REMOVED***
+func Normalize(address string) string {
 	host, port, err := net.SplitHostPort(address)
-	if err != nil ***REMOVED***
+	if err != nil {
 		host = address
 		port = "22"
-	***REMOVED***
+	}
 	entry := host
-	if port != "22" ***REMOVED***
+	if port != "22" {
 		entry = "[" + entry + "]:" + port
-	***REMOVED*** else if strings.Contains(host, ":") && !strings.HasPrefix(host, "[") ***REMOVED***
+	} else if strings.Contains(host, ":") && !strings.HasPrefix(host, "[") {
 		entry = "[" + entry + "]"
-	***REMOVED***
+	}
 	return entry
-***REMOVED***
+}
 
 // Line returns a line to add append to the known_hosts files.
-func Line(addresses []string, key ssh.PublicKey) string ***REMOVED***
+func Line(addresses []string, key ssh.PublicKey) string {
 	var trimmed []string
-	for _, a := range addresses ***REMOVED***
+	for _, a := range addresses {
 		trimmed = append(trimmed, Normalize(a))
-	***REMOVED***
+	}
 
 	return strings.Join(trimmed, ",") + " " + serialize(key)
-***REMOVED***
+}
 
 // HashHostname hashes the given hostname. The hostname is not
 // normalized before hashing.
-func HashHostname(hostname string) string ***REMOVED***
+func HashHostname(hostname string) string {
 	// TODO(hanwen): check if we can safely normalize this always.
 	salt := make([]byte, sha1.Size)
 
 	_, err := rand.Read(salt)
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(fmt.Sprintf("crypto/rand failure %v", err))
-	***REMOVED***
+	}
 
 	hash := hashHost(hostname, salt)
 	return encodeHash(sha1HashType, salt, hash)
-***REMOVED***
+}
 
-func decodeHash(encoded string) (hashType string, salt, hash []byte, err error) ***REMOVED***
-	if len(encoded) == 0 || encoded[0] != '|' ***REMOVED***
+func decodeHash(encoded string) (hashType string, salt, hash []byte, err error) {
+	if len(encoded) == 0 || encoded[0] != '|' {
 		err = errors.New("knownhosts: hashed host must start with '|'")
 		return
-	***REMOVED***
+	}
 	components := strings.Split(encoded, "|")
-	if len(components) != 4 ***REMOVED***
+	if len(components) != 4 {
 		err = fmt.Errorf("knownhosts: got %d components, want 3", len(components))
 		return
-	***REMOVED***
+	}
 
 	hashType = components[1]
-	if salt, err = base64.StdEncoding.DecodeString(components[2]); err != nil ***REMOVED***
+	if salt, err = base64.StdEncoding.DecodeString(components[2]); err != nil {
 		return
-	***REMOVED***
-	if hash, err = base64.StdEncoding.DecodeString(components[3]); err != nil ***REMOVED***
+	}
+	if hash, err = base64.StdEncoding.DecodeString(components[3]); err != nil {
 		return
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func encodeHash(typ string, salt []byte, hash []byte) string ***REMOVED***
-	return strings.Join([]string***REMOVED***"",
+func encodeHash(typ string, salt []byte, hash []byte) string {
+	return strings.Join([]string{"",
 		typ,
 		base64.StdEncoding.EncodeToString(salt),
 		base64.StdEncoding.EncodeToString(hash),
-	***REMOVED***, "|")
-***REMOVED***
+	}, "|")
+}
 
 // See https://android.googlesource.com/platform/external/openssh/+/ab28f5495c85297e7a597c1ba62e996416da7c7e/hostfile.c#120
-func hashHost(hostname string, salt []byte) []byte ***REMOVED***
+func hashHost(hostname string, salt []byte) []byte {
 	mac := hmac.New(sha1.New, salt)
 	mac.Write([]byte(hostname))
 	return mac.Sum(nil)
-***REMOVED***
+}
 
-type hashedHost struct ***REMOVED***
+type hashedHost struct {
 	salt []byte
 	hash []byte
-***REMOVED***
+}
 
 const sha1HashType = "1"
 
-func newHashedHost(encoded string) (*hashedHost, error) ***REMOVED***
+func newHashedHost(encoded string) (*hashedHost, error) {
 	typ, salt, hash, err := decodeHash(encoded)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// The type field seems for future algorithm agility, but it's
 	// actually hardcoded in openssh currently, see
 	// https://android.googlesource.com/platform/external/openssh/+/ab28f5495c85297e7a597c1ba62e996416da7c7e/hostfile.c#120
-	if typ != sha1HashType ***REMOVED***
+	if typ != sha1HashType {
 		return nil, fmt.Errorf("knownhosts: got hash type %s, must be '1'", typ)
-	***REMOVED***
+	}
 
-	return &hashedHost***REMOVED***salt: salt, hash: hash***REMOVED***, nil
-***REMOVED***
+	return &hashedHost{salt: salt, hash: hash}, nil
+}
 
-func (h *hashedHost) match(addrs []addr) bool ***REMOVED***
-	for _, a := range addrs ***REMOVED***
-		if bytes.Equal(hashHost(Normalize(a.String()), h.salt), h.hash) ***REMOVED***
+func (h *hashedHost) match(addrs []addr) bool {
+	for _, a := range addrs {
+		if bytes.Equal(hashHost(Normalize(a.String()), h.salt), h.hash) {
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false
-***REMOVED***
+}

@@ -11,17 +11,17 @@ const (
 	msInvalidate             // invalidate cached data
 )
 
-func msync(db *DB) error ***REMOVED***
+func msync(db *DB) error {
 	_, _, errno := syscall.Syscall(syscall.SYS_MSYNC, uintptr(unsafe.Pointer(db.data)), uintptr(db.datasz), msInvalidate)
-	if errno != 0 ***REMOVED***
+	if errno != 0 {
 		return errno
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func fdatasync(db *DB) error ***REMOVED***
-	if db.data != nil ***REMOVED***
+func fdatasync(db *DB) error {
+	if db.data != nil {
 		return msync(db)
-	***REMOVED***
+	}
 	return db.file.Sync()
-***REMOVED***
+}

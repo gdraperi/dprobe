@@ -22,82 +22,82 @@ var testLevels = flag.Bool("levels", false, "enable testing of levels")
 
 // TestBidiCore performs the tests in BidiTest.txt.
 // See http://www.unicode.org/Public/UCD/latest/ucd/BidiTest.txt.
-func TestBidiCore(t *testing.T) ***REMOVED***
+func TestBidiCore(t *testing.T) {
 	testtext.SkipIfNotLong(t)
 
 	r := gen.OpenUCDFile("BidiTest.txt")
 	defer r.Close()
 
 	var wantLevels, wantOrder []string
-	p := ucd.New(r, ucd.Part(func(p *ucd.Parser) ***REMOVED***
+	p := ucd.New(r, ucd.Part(func(p *ucd.Parser) {
 		s := strings.Split(p.String(0), ":")
-		switch s[0] ***REMOVED***
+		switch s[0] {
 		case "Levels":
 			wantLevels = strings.Fields(s[1])
 		case "Reorder":
 			wantOrder = strings.Fields(s[1])
 		default:
 			log.Fatalf("Unknown part %q.", s[0])
-		***REMOVED***
-	***REMOVED***))
+		}
+	}))
 
-	for p.Next() ***REMOVED***
-		types := []Class***REMOVED******REMOVED***
-		for _, s := range p.Strings(0) ***REMOVED***
+	for p.Next() {
+		types := []Class{}
+		for _, s := range p.Strings(0) {
 			types = append(types, bidiClass[s])
-		***REMOVED***
+		}
 		// We ignore the bracketing part of the algorithm.
 		pairTypes := make([]bracketType, len(types))
 		pairValues := make([]rune, len(types))
 
-		for i := uint(0); i < 3; i++ ***REMOVED***
-			if p.Uint(1)&(1<<i) == 0 ***REMOVED***
+		for i := uint(0); i < 3; i++ {
+			if p.Uint(1)&(1<<i) == 0 {
 				continue
-			***REMOVED***
+			}
 			lev := level(int(i) - 1)
 			par := newParagraph(types, pairTypes, pairValues, lev)
 
-			if *testLevels ***REMOVED***
-				levels := par.getLevels([]int***REMOVED***len(types)***REMOVED***)
-				for i, s := range wantLevels ***REMOVED***
-					if s == "x" ***REMOVED***
+			if *testLevels {
+				levels := par.getLevels([]int{len(types)})
+				for i, s := range wantLevels {
+					if s == "x" {
 						continue
-					***REMOVED***
+					}
 					l, _ := strconv.ParseUint(s, 10, 8)
-					if level(l)&1 != levels[i]&1 ***REMOVED***
+					if level(l)&1 != levels[i]&1 {
 						t.Errorf("%s:%d:levels: got %v; want %v", p.String(0), lev, levels, wantLevels)
 						break
-					***REMOVED***
-				***REMOVED***
-			***REMOVED***
+					}
+				}
+			}
 
-			order := par.getReordering([]int***REMOVED***len(types)***REMOVED***)
+			order := par.getReordering([]int{len(types)})
 			gotOrder := filterOrder(types, order)
-			if got, want := fmt.Sprint(gotOrder), fmt.Sprint(wantOrder); got != want ***REMOVED***
+			if got, want := fmt.Sprint(gotOrder), fmt.Sprint(wantOrder); got != want {
 				t.Errorf("%s:%d:order: got %v; want %v\noriginal %v", p.String(0), lev, got, want, order)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-	if err := p.Err(); err != nil ***REMOVED***
+			}
+		}
+	}
+	if err := p.Err(); err != nil {
 		log.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-var removeClasses = map[Class]bool***REMOVED***
+var removeClasses = map[Class]bool{
 	LRO: true,
 	RLO: true,
 	RLE: true,
 	LRE: true,
 	PDF: true,
 	BN:  true,
-***REMOVED***
+}
 
 // TestBidiCharacters performs the tests in BidiCharacterTest.txt.
 // See http://www.unicode.org/Public/UCD/latest/ucd/BidiCharacterTest.txt
-func TestBidiCharacters(t *testing.T) ***REMOVED***
+func TestBidiCharacters(t *testing.T) {
 	testtext.SkipIfNotLong(t)
 
-	ucd.Parse(gen.OpenUCDFile("BidiCharacterTest.txt"), func(p *ucd.Parser) ***REMOVED***
+	ucd.Parse(gen.OpenUCDFile("BidiCharacterTest.txt"), func(p *ucd.Parser) {
 		var (
 			types      []Class
 			pairTypes  []bracketType
@@ -109,28 +109,28 @@ func TestBidiCharacters(t *testing.T) ***REMOVED***
 			wantVisualOrder = p.Strings(4)
 		)
 
-		switch l := p.Int(1); l ***REMOVED***
+		switch l := p.Int(1); l {
 		case 0, 1:
 			parLevel = level(l)
 		case 2:
 			parLevel = implicitLevel
 		default:
 			// Spec says to ignore unknown parts.
-		***REMOVED***
+		}
 
 		runes := p.Runes(0)
 
-		for _, r := range runes ***REMOVED***
+		for _, r := range runes {
 			// Assign the bracket type.
-			if d := norm.NFKD.PropertiesString(string(r)).Decomposition(); d != nil ***REMOVED***
+			if d := norm.NFKD.PropertiesString(string(r)).Decomposition(); d != nil {
 				r = []rune(string(d))[0]
-			***REMOVED***
+			}
 			p, _ := LookupRune(r)
 
 			// Assign the class for this rune.
 			types = append(types, p.Class())
 
-			switch ***REMOVED***
+			switch {
 			case !p.IsBracket():
 				pairTypes = append(pairTypes, bpNone)
 				pairValues = append(pairValues, 0)
@@ -140,63 +140,63 @@ func TestBidiCharacters(t *testing.T) ***REMOVED***
 			default:
 				pairTypes = append(pairTypes, bpClose)
 				pairValues = append(pairValues, p.reverseBracket(r))
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		par := newParagraph(types, pairTypes, pairValues, parLevel)
 
 		// Test results:
-		if got := par.embeddingLevel; got != wantLevel ***REMOVED***
+		if got := par.embeddingLevel; got != wantLevel {
 			t.Errorf("%v:level: got %d; want %d", string(runes), got, wantLevel)
-		***REMOVED***
+		}
 
-		if *testLevels ***REMOVED***
-			gotLevels := getLevelStrings(types, par.getLevels([]int***REMOVED***len(types)***REMOVED***))
-			if got, want := fmt.Sprint(gotLevels), fmt.Sprint(wantLevels); got != want ***REMOVED***
+		if *testLevels {
+			gotLevels := getLevelStrings(types, par.getLevels([]int{len(types)}))
+			if got, want := fmt.Sprint(gotLevels), fmt.Sprint(wantLevels); got != want {
 				t.Errorf("%04X %q:%d: got %v; want %v\nval: %x\npair: %v", runes, string(runes), parLevel, got, want, pairValues, pairTypes)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
-		order := par.getReordering([]int***REMOVED***len(types)***REMOVED***)
+		order := par.getReordering([]int{len(types)})
 		order = filterOrder(types, order)
-		if got, want := fmt.Sprint(order), fmt.Sprint(wantVisualOrder); got != want ***REMOVED***
+		if got, want := fmt.Sprint(order), fmt.Sprint(wantVisualOrder); got != want {
 			t.Errorf("%04X %q:%d: got %v; want %v\ngot order: %s", runes, string(runes), parLevel, got, want, reorder(runes, order))
-		***REMOVED***
-	***REMOVED***)
-***REMOVED***
+		}
+	})
+}
 
-func getLevelStrings(cl []Class, levels []level) []string ***REMOVED***
+func getLevelStrings(cl []Class, levels []level) []string {
 	var results []string
-	for i, l := range levels ***REMOVED***
-		if !removeClasses[cl[i]] ***REMOVED***
+	for i, l := range levels {
+		if !removeClasses[cl[i]] {
 			results = append(results, fmt.Sprint(l))
-		***REMOVED*** else ***REMOVED***
+		} else {
 			results = append(results, "x")
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return results
-***REMOVED***
+}
 
-func filterOrder(cl []Class, order []int) []int ***REMOVED***
-	no := []int***REMOVED******REMOVED***
-	for _, o := range order ***REMOVED***
-		if !removeClasses[cl[o]] ***REMOVED***
+func filterOrder(cl []Class, order []int) []int {
+	no := []int{}
+	for _, o := range order {
+		if !removeClasses[cl[o]] {
 			no = append(no, o)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return no
-***REMOVED***
+}
 
-func reorder(r []rune, order []int) string ***REMOVED***
+func reorder(r []rune, order []int) string {
 	nr := make([]rune, len(order))
-	for i, o := range order ***REMOVED***
+	for i, o := range order {
 		nr[i] = r[o]
-	***REMOVED***
+	}
 	return string(nr)
-***REMOVED***
+}
 
 // bidiClass names and codes taken from class "bc" in
 // http://www.unicode.org/Public/8.0.0/ucd/PropertyValueAliases.txt
-var bidiClass = map[string]Class***REMOVED***
+var bidiClass = map[string]Class{
 	"AL":  AL,  // classArabicLetter,
 	"AN":  AN,  // classArabicNumber,
 	"B":   B,   // classParagraphSeparator,
@@ -221,4 +221,4 @@ var bidiClass = map[string]Class***REMOVED***
 	"RLI": RLI, // classRightToLeftIsolate,
 	"FSI": FSI, // classFirstStrongIsolate,
 	"PDI": PDI, // classPopDirectionalIsolate,
-***REMOVED***
+}

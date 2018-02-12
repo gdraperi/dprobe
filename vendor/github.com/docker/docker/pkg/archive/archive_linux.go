@@ -10,40 +10,40 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-func getWhiteoutConverter(format WhiteoutFormat) tarWhiteoutConverter ***REMOVED***
-	if format == OverlayWhiteoutFormat ***REMOVED***
-		return overlayWhiteoutConverter***REMOVED******REMOVED***
-	***REMOVED***
+func getWhiteoutConverter(format WhiteoutFormat) tarWhiteoutConverter {
+	if format == OverlayWhiteoutFormat {
+		return overlayWhiteoutConverter{}
+	}
 	return nil
-***REMOVED***
+}
 
-type overlayWhiteoutConverter struct***REMOVED******REMOVED***
+type overlayWhiteoutConverter struct{}
 
-func (overlayWhiteoutConverter) ConvertWrite(hdr *tar.Header, path string, fi os.FileInfo) (wo *tar.Header, err error) ***REMOVED***
+func (overlayWhiteoutConverter) ConvertWrite(hdr *tar.Header, path string, fi os.FileInfo) (wo *tar.Header, err error) {
 	// convert whiteouts to AUFS format
-	if fi.Mode()&os.ModeCharDevice != 0 && hdr.Devmajor == 0 && hdr.Devminor == 0 ***REMOVED***
+	if fi.Mode()&os.ModeCharDevice != 0 && hdr.Devmajor == 0 && hdr.Devminor == 0 {
 		// we just rename the file and make it normal
 		dir, filename := filepath.Split(hdr.Name)
 		hdr.Name = filepath.Join(dir, WhiteoutPrefix+filename)
 		hdr.Mode = 0600
 		hdr.Typeflag = tar.TypeReg
 		hdr.Size = 0
-	***REMOVED***
+	}
 
-	if fi.Mode()&os.ModeDir != 0 ***REMOVED***
+	if fi.Mode()&os.ModeDir != 0 {
 		// convert opaque dirs to AUFS format by writing an empty file with the prefix
 		opaque, err := system.Lgetxattr(path, "trusted.overlay.opaque")
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-		if len(opaque) == 1 && opaque[0] == 'y' ***REMOVED***
-			if hdr.Xattrs != nil ***REMOVED***
+		}
+		if len(opaque) == 1 && opaque[0] == 'y' {
+			if hdr.Xattrs != nil {
 				delete(hdr.Xattrs, "trusted.overlay.opaque")
-			***REMOVED***
+			}
 
 			// create a header for the whiteout file
 			// it should inherit some properties from the parent, but be a regular file
-			wo = &tar.Header***REMOVED***
+			wo = &tar.Header{
 				Typeflag:   tar.TypeReg,
 				Mode:       hdr.Mode & int64(os.ModePerm),
 				Name:       filepath.Join(hdr.Name, WhiteoutOpaqueDir),
@@ -54,39 +54,39 @@ func (overlayWhiteoutConverter) ConvertWrite(hdr *tar.Header, path string, fi os
 				Gname:      hdr.Gname,
 				AccessTime: hdr.AccessTime,
 				ChangeTime: hdr.ChangeTime,
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	return
-***REMOVED***
+}
 
-func (overlayWhiteoutConverter) ConvertRead(hdr *tar.Header, path string) (bool, error) ***REMOVED***
+func (overlayWhiteoutConverter) ConvertRead(hdr *tar.Header, path string) (bool, error) {
 	base := filepath.Base(path)
 	dir := filepath.Dir(path)
 
 	// if a directory is marked as opaque by the AUFS special file, we need to translate that to overlay
-	if base == WhiteoutOpaqueDir ***REMOVED***
-		err := unix.Setxattr(dir, "trusted.overlay.opaque", []byte***REMOVED***'y'***REMOVED***, 0)
+	if base == WhiteoutOpaqueDir {
+		err := unix.Setxattr(dir, "trusted.overlay.opaque", []byte{'y'}, 0)
 		// don't write the file itself
 		return false, err
-	***REMOVED***
+	}
 
 	// if a file was deleted and we are using overlay, we need to create a character device
-	if strings.HasPrefix(base, WhiteoutPrefix) ***REMOVED***
+	if strings.HasPrefix(base, WhiteoutPrefix) {
 		originalBase := base[len(WhiteoutPrefix):]
 		originalPath := filepath.Join(dir, originalBase)
 
-		if err := unix.Mknod(originalPath, unix.S_IFCHR, 0); err != nil ***REMOVED***
+		if err := unix.Mknod(originalPath, unix.S_IFCHR, 0); err != nil {
 			return false, err
-		***REMOVED***
-		if err := os.Chown(originalPath, hdr.Uid, hdr.Gid); err != nil ***REMOVED***
+		}
+		if err := os.Chown(originalPath, hdr.Uid, hdr.Gid); err != nil {
 			return false, err
-		***REMOVED***
+		}
 
 		// don't write the file itself
 		return false, nil
-	***REMOVED***
+	}
 
 	return true, nil
-***REMOVED***
+}

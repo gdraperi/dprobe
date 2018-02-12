@@ -1576,7 +1576,7 @@ const (
 )
 
 // Error table
-var errors = [...]string***REMOVED***
+var errors = [...]string{
 	1:  "operation not permitted",
 	2:  "no such file or directory",
 	3:  "no such process",
@@ -1673,10 +1673,10 @@ var errors = [...]string***REMOVED***
 	94: "multihop attempted",
 	95: "link has been severed",
 	96: "protocol error",
-***REMOVED***
+}
 
 // Signal table
-var signals = [...]string***REMOVED***
+var signals = [...]string{
 	1:  "hangup",
 	2:  "interrupt",
 	3:  "quit",
@@ -1709,4 +1709,4 @@ var signals = [...]string***REMOVED***
 	30: "user defined signal 1",
 	31: "user defined signal 2",
 	32: "power fail/restart",
-***REMOVED***
+}

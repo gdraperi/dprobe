@@ -56,9 +56,9 @@ If you like, you can bind the flag to a variable using the Var() functions.
 
 ``` go
 var flagvar int
-func init() ***REMOVED***
+func init() {
     flag.IntVar(&flagvar, "flagname", 1234, "help message for flagname")
-***REMOVED***
+}
 ```
 
 Or you can create custom flags that satisfy the Value interface (with
@@ -107,9 +107,9 @@ that give one-letter shorthands for flags. You can use these by appending
 ``` go
 var ip = flag.IntP("flagname", "f", 1234, "help message")
 var flagvar bool
-func init() ***REMOVED***
+func init() {
 	flag.BoolVarP(&flagvar, "boolname", "b", true, "help message")
-***REMOVED***
+}
 flag.VarP(&flagVal, "varname", "v", "help message")
 ```
 
@@ -191,14 +191,14 @@ It is possible to set a custom flag name 'normalization function.' It allows fla
 **Example #1**: You want -, _, and . in flags to compare the same. aka --my-flag == --my_flag == --my.flag
 
 ``` go
-func wordSepNormalizeFunc(f *pflag.FlagSet, name string) pflag.NormalizedName ***REMOVED***
-	from := []string***REMOVED***"-", "_"***REMOVED***
+func wordSepNormalizeFunc(f *pflag.FlagSet, name string) pflag.NormalizedName {
+	from := []string{"-", "_"}
 	to := "."
-	for _, sep := range from ***REMOVED***
+	for _, sep := range from {
 		name = strings.Replace(name, sep, to, -1)
-	***REMOVED***
+	}
 	return pflag.NormalizedName(name)
-***REMOVED***
+}
 
 myFlagSet.SetNormalizeFunc(wordSepNormalizeFunc)
 ```
@@ -206,14 +206,14 @@ myFlagSet.SetNormalizeFunc(wordSepNormalizeFunc)
 **Example #2**: You want to alias two flags. aka --old-flag-name == --new-flag-name
 
 ``` go
-func aliasNormalizeFunc(f *pflag.FlagSet, name string) pflag.NormalizedName ***REMOVED***
-	switch name ***REMOVED***
+func aliasNormalizeFunc(f *pflag.FlagSet, name string) pflag.NormalizedName {
+	switch name {
 	case "old-flag-name":
 		name = "new-flag-name"
 		break
-	***REMOVED***
+	}
 	return pflag.NormalizedName(name)
-***REMOVED***
+}
 
 myFlagSet.SetNormalizeFunc(aliasNormalizeFunc)
 ```
@@ -259,10 +259,10 @@ import (
 
 var ip *int = flag.Int("flagname", 1234, "help message for flagname")
 
-func main() ***REMOVED***
+func main() {
 	flag.CommandLine.AddGoFlagSet(goflag.CommandLine)
 	flag.Parse()
-***REMOVED***
+}
 ```
 
 ## More info

@@ -34,132 +34,132 @@ var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
-type AttachNetworkRequest struct ***REMOVED***
+type AttachNetworkRequest struct {
 	Config      *NetworkAttachmentConfig `protobuf:"bytes,1,opt,name=config" json:"config,omitempty"`
 	ContainerID string                   `protobuf:"bytes,2,opt,name=container_id,json=containerId,proto3" json:"container_id,omitempty"`
-***REMOVED***
+}
 
-func (m *AttachNetworkRequest) Reset()                    ***REMOVED*** *m = AttachNetworkRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*AttachNetworkRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*AttachNetworkRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorResource, []int***REMOVED***0***REMOVED*** ***REMOVED***
+func (m *AttachNetworkRequest) Reset()                    { *m = AttachNetworkRequest{} }
+func (*AttachNetworkRequest) ProtoMessage()               {}
+func (*AttachNetworkRequest) Descriptor() ([]byte, []int) { return fileDescriptorResource, []int{0} }
 
-type AttachNetworkResponse struct ***REMOVED***
+type AttachNetworkResponse struct {
 	AttachmentID string `protobuf:"bytes,1,opt,name=attachment_id,json=attachmentId,proto3" json:"attachment_id,omitempty"`
-***REMOVED***
+}
 
-func (m *AttachNetworkResponse) Reset()                    ***REMOVED*** *m = AttachNetworkResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*AttachNetworkResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*AttachNetworkResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorResource, []int***REMOVED***1***REMOVED*** ***REMOVED***
+func (m *AttachNetworkResponse) Reset()                    { *m = AttachNetworkResponse{} }
+func (*AttachNetworkResponse) ProtoMessage()               {}
+func (*AttachNetworkResponse) Descriptor() ([]byte, []int) { return fileDescriptorResource, []int{1} }
 
-type DetachNetworkRequest struct ***REMOVED***
+type DetachNetworkRequest struct {
 	AttachmentID string `protobuf:"bytes,1,opt,name=attachment_id,json=attachmentId,proto3" json:"attachment_id,omitempty"`
-***REMOVED***
+}
 
-func (m *DetachNetworkRequest) Reset()                    ***REMOVED*** *m = DetachNetworkRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*DetachNetworkRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*DetachNetworkRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorResource, []int***REMOVED***2***REMOVED*** ***REMOVED***
+func (m *DetachNetworkRequest) Reset()                    { *m = DetachNetworkRequest{} }
+func (*DetachNetworkRequest) ProtoMessage()               {}
+func (*DetachNetworkRequest) Descriptor() ([]byte, []int) { return fileDescriptorResource, []int{2} }
 
-type DetachNetworkResponse struct ***REMOVED***
-***REMOVED***
+type DetachNetworkResponse struct {
+}
 
-func (m *DetachNetworkResponse) Reset()                    ***REMOVED*** *m = DetachNetworkResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*DetachNetworkResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*DetachNetworkResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorResource, []int***REMOVED***3***REMOVED*** ***REMOVED***
+func (m *DetachNetworkResponse) Reset()                    { *m = DetachNetworkResponse{} }
+func (*DetachNetworkResponse) ProtoMessage()               {}
+func (*DetachNetworkResponse) Descriptor() ([]byte, []int) { return fileDescriptorResource, []int{3} }
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*AttachNetworkRequest)(nil), "docker.swarmkit.v1.AttachNetworkRequest")
 	proto.RegisterType((*AttachNetworkResponse)(nil), "docker.swarmkit.v1.AttachNetworkResponse")
 	proto.RegisterType((*DetachNetworkRequest)(nil), "docker.swarmkit.v1.DetachNetworkRequest")
 	proto.RegisterType((*DetachNetworkResponse)(nil), "docker.swarmkit.v1.DetachNetworkResponse")
-***REMOVED***
+}
 
-type authenticatedWrapperResourceAllocatorServer struct ***REMOVED***
+type authenticatedWrapperResourceAllocatorServer struct {
 	local     ResourceAllocatorServer
 	authorize func(context.Context, []string) error
-***REMOVED***
+}
 
-func NewAuthenticatedWrapperResourceAllocatorServer(local ResourceAllocatorServer, authorize func(context.Context, []string) error) ResourceAllocatorServer ***REMOVED***
-	return &authenticatedWrapperResourceAllocatorServer***REMOVED***
+func NewAuthenticatedWrapperResourceAllocatorServer(local ResourceAllocatorServer, authorize func(context.Context, []string) error) ResourceAllocatorServer {
+	return &authenticatedWrapperResourceAllocatorServer{
 		local:     local,
 		authorize: authorize,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (p *authenticatedWrapperResourceAllocatorServer) AttachNetwork(ctx context.Context, r *AttachNetworkRequest) (*AttachNetworkResponse, error) ***REMOVED***
+func (p *authenticatedWrapperResourceAllocatorServer) AttachNetwork(ctx context.Context, r *AttachNetworkRequest) (*AttachNetworkResponse, error) {
 
-	if err := p.authorize(ctx, []string***REMOVED***"swarm-worker", "swarm-manager"***REMOVED***); err != nil ***REMOVED***
+	if err := p.authorize(ctx, []string{"swarm-worker", "swarm-manager"}); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return p.local.AttachNetwork(ctx, r)
-***REMOVED***
+}
 
-func (p *authenticatedWrapperResourceAllocatorServer) DetachNetwork(ctx context.Context, r *DetachNetworkRequest) (*DetachNetworkResponse, error) ***REMOVED***
+func (p *authenticatedWrapperResourceAllocatorServer) DetachNetwork(ctx context.Context, r *DetachNetworkRequest) (*DetachNetworkResponse, error) {
 
-	if err := p.authorize(ctx, []string***REMOVED***"swarm-worker", "swarm-manager"***REMOVED***); err != nil ***REMOVED***
+	if err := p.authorize(ctx, []string{"swarm-worker", "swarm-manager"}); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return p.local.DetachNetwork(ctx, r)
-***REMOVED***
+}
 
-func (m *AttachNetworkRequest) Copy() *AttachNetworkRequest ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *AttachNetworkRequest) Copy() *AttachNetworkRequest {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &AttachNetworkRequest***REMOVED******REMOVED***
+	}
+	o := &AttachNetworkRequest{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *AttachNetworkRequest) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *AttachNetworkRequest) CopyFrom(src interface{}) {
 
 	o := src.(*AttachNetworkRequest)
 	*m = *o
-	if o.Config != nil ***REMOVED***
-		m.Config = &NetworkAttachmentConfig***REMOVED******REMOVED***
+	if o.Config != nil {
+		m.Config = &NetworkAttachmentConfig{}
 		github_com_docker_swarmkit_api_deepcopy.Copy(m.Config, o.Config)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (m *AttachNetworkResponse) Copy() *AttachNetworkResponse ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *AttachNetworkResponse) Copy() *AttachNetworkResponse {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &AttachNetworkResponse***REMOVED******REMOVED***
+	}
+	o := &AttachNetworkResponse{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *AttachNetworkResponse) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *AttachNetworkResponse) CopyFrom(src interface{}) {
 
 	o := src.(*AttachNetworkResponse)
 	*m = *o
-***REMOVED***
+}
 
-func (m *DetachNetworkRequest) Copy() *DetachNetworkRequest ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *DetachNetworkRequest) Copy() *DetachNetworkRequest {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &DetachNetworkRequest***REMOVED******REMOVED***
+	}
+	o := &DetachNetworkRequest{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *DetachNetworkRequest) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *DetachNetworkRequest) CopyFrom(src interface{}) {
 
 	o := src.(*DetachNetworkRequest)
 	*m = *o
-***REMOVED***
+}
 
-func (m *DetachNetworkResponse) Copy() *DetachNetworkResponse ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *DetachNetworkResponse) Copy() *DetachNetworkResponse {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &DetachNetworkResponse***REMOVED******REMOVED***
+	}
+	o := &DetachNetworkResponse{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *DetachNetworkResponse) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED******REMOVED***
+func (m *DetachNetworkResponse) CopyFrom(src interface{}) {}
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
@@ -171,202 +171,202 @@ const _ = grpc.SupportPackageIsVersion4
 
 // Client API for ResourceAllocator service
 
-type ResourceAllocatorClient interface ***REMOVED***
+type ResourceAllocatorClient interface {
 	AttachNetwork(ctx context.Context, in *AttachNetworkRequest, opts ...grpc.CallOption) (*AttachNetworkResponse, error)
 	DetachNetwork(ctx context.Context, in *DetachNetworkRequest, opts ...grpc.CallOption) (*DetachNetworkResponse, error)
-***REMOVED***
+}
 
-type resourceAllocatorClient struct ***REMOVED***
+type resourceAllocatorClient struct {
 	cc *grpc.ClientConn
-***REMOVED***
+}
 
-func NewResourceAllocatorClient(cc *grpc.ClientConn) ResourceAllocatorClient ***REMOVED***
-	return &resourceAllocatorClient***REMOVED***cc***REMOVED***
-***REMOVED***
+func NewResourceAllocatorClient(cc *grpc.ClientConn) ResourceAllocatorClient {
+	return &resourceAllocatorClient{cc}
+}
 
-func (c *resourceAllocatorClient) AttachNetwork(ctx context.Context, in *AttachNetworkRequest, opts ...grpc.CallOption) (*AttachNetworkResponse, error) ***REMOVED***
+func (c *resourceAllocatorClient) AttachNetwork(ctx context.Context, in *AttachNetworkRequest, opts ...grpc.CallOption) (*AttachNetworkResponse, error) {
 	out := new(AttachNetworkResponse)
 	err := grpc.Invoke(ctx, "/docker.swarmkit.v1.ResourceAllocator/AttachNetwork", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *resourceAllocatorClient) DetachNetwork(ctx context.Context, in *DetachNetworkRequest, opts ...grpc.CallOption) (*DetachNetworkResponse, error) ***REMOVED***
+func (c *resourceAllocatorClient) DetachNetwork(ctx context.Context, in *DetachNetworkRequest, opts ...grpc.CallOption) (*DetachNetworkResponse, error) {
 	out := new(DetachNetworkResponse)
 	err := grpc.Invoke(ctx, "/docker.swarmkit.v1.ResourceAllocator/DetachNetwork", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
 // Server API for ResourceAllocator service
 
-type ResourceAllocatorServer interface ***REMOVED***
+type ResourceAllocatorServer interface {
 	AttachNetwork(context.Context, *AttachNetworkRequest) (*AttachNetworkResponse, error)
 	DetachNetwork(context.Context, *DetachNetworkRequest) (*DetachNetworkResponse, error)
-***REMOVED***
+}
 
-func RegisterResourceAllocatorServer(s *grpc.Server, srv ResourceAllocatorServer) ***REMOVED***
+func RegisterResourceAllocatorServer(s *grpc.Server, srv ResourceAllocatorServer) {
 	s.RegisterService(&_ResourceAllocator_serviceDesc, srv)
-***REMOVED***
+}
 
-func _ResourceAllocator_AttachNetwork_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _ResourceAllocator_AttachNetwork_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AttachNetworkRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(ResourceAllocatorServer).AttachNetwork(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/docker.swarmkit.v1.ResourceAllocator/AttachNetwork",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ResourceAllocatorServer).AttachNetwork(ctx, req.(*AttachNetworkRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _ResourceAllocator_DetachNetwork_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _ResourceAllocator_DetachNetwork_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DetachNetworkRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(ResourceAllocatorServer).DetachNetwork(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/docker.swarmkit.v1.ResourceAllocator/DetachNetwork",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ResourceAllocatorServer).DetachNetwork(ctx, req.(*DetachNetworkRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-var _ResourceAllocator_serviceDesc = grpc.ServiceDesc***REMOVED***
+var _ResourceAllocator_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "docker.swarmkit.v1.ResourceAllocator",
 	HandlerType: (*ResourceAllocatorServer)(nil),
-	Methods: []grpc.MethodDesc***REMOVED***
-		***REMOVED***
+	Methods: []grpc.MethodDesc{
+		{
 			MethodName: "AttachNetwork",
 			Handler:    _ResourceAllocator_AttachNetwork_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "DetachNetwork",
 			Handler:    _ResourceAllocator_DetachNetwork_Handler,
-		***REMOVED***,
-	***REMOVED***,
-	Streams:  []grpc.StreamDesc***REMOVED******REMOVED***,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
 	Metadata: "github.com/docker/swarmkit/api/resource.proto",
-***REMOVED***
+}
 
-func (m *AttachNetworkRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *AttachNetworkRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *AttachNetworkRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *AttachNetworkRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.Config != nil ***REMOVED***
+	if m.Config != nil {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintResource(dAtA, i, uint64(m.Config.Size()))
 		n1, err := m.Config.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n1
-	***REMOVED***
-	if len(m.ContainerID) > 0 ***REMOVED***
+	}
+	if len(m.ContainerID) > 0 {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintResource(dAtA, i, uint64(len(m.ContainerID)))
 		i += copy(dAtA[i:], m.ContainerID)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *AttachNetworkResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *AttachNetworkResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *AttachNetworkResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *AttachNetworkResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.AttachmentID) > 0 ***REMOVED***
+	if len(m.AttachmentID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintResource(dAtA, i, uint64(len(m.AttachmentID)))
 		i += copy(dAtA[i:], m.AttachmentID)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *DetachNetworkRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *DetachNetworkRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *DetachNetworkRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *DetachNetworkRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.AttachmentID) > 0 ***REMOVED***
+	if len(m.AttachmentID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintResource(dAtA, i, uint64(len(m.AttachmentID)))
 		i += copy(dAtA[i:], m.AttachmentID)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *DetachNetworkResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *DetachNetworkResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *DetachNetworkResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *DetachNetworkResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
 	return i, nil
-***REMOVED***
+}
 
-func encodeFixed64Resource(dAtA []byte, offset int, v uint64) int ***REMOVED***
+func encodeFixed64Resource(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
 	dAtA[offset+2] = uint8(v >> 16)
@@ -376,674 +376,674 @@ func encodeFixed64Resource(dAtA []byte, offset int, v uint64) int ***REMOVED***
 	dAtA[offset+6] = uint8(v >> 48)
 	dAtA[offset+7] = uint8(v >> 56)
 	return offset + 8
-***REMOVED***
-func encodeFixed32Resource(dAtA []byte, offset int, v uint32) int ***REMOVED***
+}
+func encodeFixed32Resource(dAtA []byte, offset int, v uint32) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
 	dAtA[offset+2] = uint8(v >> 16)
 	dAtA[offset+3] = uint8(v >> 24)
 	return offset + 4
-***REMOVED***
-func encodeVarintResource(dAtA []byte, offset int, v uint64) int ***REMOVED***
-	for v >= 1<<7 ***REMOVED***
+}
+func encodeVarintResource(dAtA []byte, offset int, v uint64) int {
+	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
-	***REMOVED***
+	}
 	dAtA[offset] = uint8(v)
 	return offset + 1
-***REMOVED***
+}
 
-type raftProxyResourceAllocatorServer struct ***REMOVED***
+type raftProxyResourceAllocatorServer struct {
 	local                       ResourceAllocatorServer
 	connSelector                raftselector.ConnProvider
 	localCtxMods, remoteCtxMods []func(context.Context) (context.Context, error)
-***REMOVED***
+}
 
-func NewRaftProxyResourceAllocatorServer(local ResourceAllocatorServer, connSelector raftselector.ConnProvider, localCtxMod, remoteCtxMod func(context.Context) (context.Context, error)) ResourceAllocatorServer ***REMOVED***
-	redirectChecker := func(ctx context.Context) (context.Context, error) ***REMOVED***
+func NewRaftProxyResourceAllocatorServer(local ResourceAllocatorServer, connSelector raftselector.ConnProvider, localCtxMod, remoteCtxMod func(context.Context) (context.Context, error)) ResourceAllocatorServer {
+	redirectChecker := func(ctx context.Context) (context.Context, error) {
 		s, ok := transport.StreamFromContext(ctx)
-		if !ok ***REMOVED***
+		if !ok {
 			return ctx, status.Errorf(codes.InvalidArgument, "remote addr is not found in context")
-		***REMOVED***
+		}
 		addr := s.ServerTransport().RemoteAddr().String()
 		md, ok := metadata.FromContext(ctx)
-		if ok && len(md["redirect"]) != 0 ***REMOVED***
+		if ok && len(md["redirect"]) != 0 {
 			return ctx, status.Errorf(codes.ResourceExhausted, "more than one redirect to leader from: %s", md["redirect"])
-		***REMOVED***
-		if !ok ***REMOVED***
-			md = metadata.New(map[string]string***REMOVED******REMOVED***)
-		***REMOVED***
+		}
+		if !ok {
+			md = metadata.New(map[string]string{})
+		}
 		md["redirect"] = append(md["redirect"], addr)
 		return metadata.NewContext(ctx, md), nil
-	***REMOVED***
-	remoteMods := []func(context.Context) (context.Context, error)***REMOVED***redirectChecker***REMOVED***
+	}
+	remoteMods := []func(context.Context) (context.Context, error){redirectChecker}
 	remoteMods = append(remoteMods, remoteCtxMod)
 
 	var localMods []func(context.Context) (context.Context, error)
-	if localCtxMod != nil ***REMOVED***
-		localMods = []func(context.Context) (context.Context, error)***REMOVED***localCtxMod***REMOVED***
-	***REMOVED***
+	if localCtxMod != nil {
+		localMods = []func(context.Context) (context.Context, error){localCtxMod}
+	}
 
-	return &raftProxyResourceAllocatorServer***REMOVED***
+	return &raftProxyResourceAllocatorServer{
 		local:         local,
 		connSelector:  connSelector,
 		localCtxMods:  localMods,
 		remoteCtxMods: remoteMods,
-	***REMOVED***
-***REMOVED***
-func (p *raftProxyResourceAllocatorServer) runCtxMods(ctx context.Context, ctxMods []func(context.Context) (context.Context, error)) (context.Context, error) ***REMOVED***
+	}
+}
+func (p *raftProxyResourceAllocatorServer) runCtxMods(ctx context.Context, ctxMods []func(context.Context) (context.Context, error)) (context.Context, error) {
 	var err error
-	for _, mod := range ctxMods ***REMOVED***
+	for _, mod := range ctxMods {
 		ctx, err = mod(ctx)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return ctx, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return ctx, nil
-***REMOVED***
-func (p *raftProxyResourceAllocatorServer) pollNewLeaderConn(ctx context.Context) (*grpc.ClientConn, error) ***REMOVED***
+}
+func (p *raftProxyResourceAllocatorServer) pollNewLeaderConn(ctx context.Context) (*grpc.ClientConn, error) {
 	ticker := rafttime.NewTicker(500 * rafttime.Millisecond)
 	defer ticker.Stop()
-	for ***REMOVED***
-		select ***REMOVED***
+	for {
+		select {
 		case <-ticker.C:
 			conn, err := p.connSelector.LeaderConn(ctx)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 
 			client := NewHealthClient(conn)
 
-			resp, err := client.Check(ctx, &HealthCheckRequest***REMOVED***Service: "Raft"***REMOVED***)
-			if err != nil || resp.Status != HealthCheckResponse_SERVING ***REMOVED***
+			resp, err := client.Check(ctx, &HealthCheckRequest{Service: "Raft"})
+			if err != nil || resp.Status != HealthCheckResponse_SERVING {
 				continue
-			***REMOVED***
+			}
 			return conn, nil
 		case <-ctx.Done():
 			return nil, ctx.Err()
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (p *raftProxyResourceAllocatorServer) AttachNetwork(ctx context.Context, r *AttachNetworkRequest) (*AttachNetworkResponse, error) ***REMOVED***
+func (p *raftProxyResourceAllocatorServer) AttachNetwork(ctx context.Context, r *AttachNetworkRequest) (*AttachNetworkResponse, error) {
 
 	conn, err := p.connSelector.LeaderConn(ctx)
-	if err != nil ***REMOVED***
-		if err == raftselector.ErrIsLeader ***REMOVED***
+	if err != nil {
+		if err == raftselector.ErrIsLeader {
 			ctx, err = p.runCtxMods(ctx, p.localCtxMods)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			return p.local.AttachNetwork(ctx, r)
-		***REMOVED***
+		}
 		return nil, err
-	***REMOVED***
+	}
 	modCtx, err := p.runCtxMods(ctx, p.remoteCtxMods)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	resp, err := NewResourceAllocatorClient(conn).AttachNetwork(modCtx, r)
-	if err != nil ***REMOVED***
-		if !strings.Contains(err.Error(), "is closing") && !strings.Contains(err.Error(), "the connection is unavailable") && !strings.Contains(err.Error(), "connection error") ***REMOVED***
+	if err != nil {
+		if !strings.Contains(err.Error(), "is closing") && !strings.Contains(err.Error(), "the connection is unavailable") && !strings.Contains(err.Error(), "connection error") {
 			return resp, err
-		***REMOVED***
+		}
 		conn, err := p.pollNewLeaderConn(ctx)
-		if err != nil ***REMOVED***
-			if err == raftselector.ErrIsLeader ***REMOVED***
+		if err != nil {
+			if err == raftselector.ErrIsLeader {
 				return p.local.AttachNetwork(ctx, r)
-			***REMOVED***
+			}
 			return nil, err
-		***REMOVED***
+		}
 		return NewResourceAllocatorClient(conn).AttachNetwork(modCtx, r)
-	***REMOVED***
+	}
 	return resp, err
-***REMOVED***
+}
 
-func (p *raftProxyResourceAllocatorServer) DetachNetwork(ctx context.Context, r *DetachNetworkRequest) (*DetachNetworkResponse, error) ***REMOVED***
+func (p *raftProxyResourceAllocatorServer) DetachNetwork(ctx context.Context, r *DetachNetworkRequest) (*DetachNetworkResponse, error) {
 
 	conn, err := p.connSelector.LeaderConn(ctx)
-	if err != nil ***REMOVED***
-		if err == raftselector.ErrIsLeader ***REMOVED***
+	if err != nil {
+		if err == raftselector.ErrIsLeader {
 			ctx, err = p.runCtxMods(ctx, p.localCtxMods)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			return p.local.DetachNetwork(ctx, r)
-		***REMOVED***
+		}
 		return nil, err
-	***REMOVED***
+	}
 	modCtx, err := p.runCtxMods(ctx, p.remoteCtxMods)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	resp, err := NewResourceAllocatorClient(conn).DetachNetwork(modCtx, r)
-	if err != nil ***REMOVED***
-		if !strings.Contains(err.Error(), "is closing") && !strings.Contains(err.Error(), "the connection is unavailable") && !strings.Contains(err.Error(), "connection error") ***REMOVED***
+	if err != nil {
+		if !strings.Contains(err.Error(), "is closing") && !strings.Contains(err.Error(), "the connection is unavailable") && !strings.Contains(err.Error(), "connection error") {
 			return resp, err
-		***REMOVED***
+		}
 		conn, err := p.pollNewLeaderConn(ctx)
-		if err != nil ***REMOVED***
-			if err == raftselector.ErrIsLeader ***REMOVED***
+		if err != nil {
+			if err == raftselector.ErrIsLeader {
 				return p.local.DetachNetwork(ctx, r)
-			***REMOVED***
+			}
 			return nil, err
-		***REMOVED***
+		}
 		return NewResourceAllocatorClient(conn).DetachNetwork(modCtx, r)
-	***REMOVED***
+	}
 	return resp, err
-***REMOVED***
+}
 
-func (m *AttachNetworkRequest) Size() (n int) ***REMOVED***
+func (m *AttachNetworkRequest) Size() (n int) {
 	var l int
 	_ = l
-	if m.Config != nil ***REMOVED***
+	if m.Config != nil {
 		l = m.Config.Size()
 		n += 1 + l + sovResource(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.ContainerID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovResource(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *AttachNetworkResponse) Size() (n int) ***REMOVED***
+func (m *AttachNetworkResponse) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.AttachmentID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovResource(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *DetachNetworkRequest) Size() (n int) ***REMOVED***
+func (m *DetachNetworkRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.AttachmentID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovResource(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *DetachNetworkResponse) Size() (n int) ***REMOVED***
+func (m *DetachNetworkResponse) Size() (n int) {
 	var l int
 	_ = l
 	return n
-***REMOVED***
+}
 
-func sovResource(x uint64) (n int) ***REMOVED***
-	for ***REMOVED***
+func sovResource(x uint64) (n int) {
+	for {
 		n++
 		x >>= 7
-		if x == 0 ***REMOVED***
+		if x == 0 {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
-func sozResource(x uint64) (n int) ***REMOVED***
+}
+func sozResource(x uint64) (n int) {
 	return sovResource(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-***REMOVED***
-func (this *AttachNetworkRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *AttachNetworkRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&AttachNetworkRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&AttachNetworkRequest{`,
 		`Config:` + strings.Replace(fmt.Sprintf("%v", this.Config), "NetworkAttachmentConfig", "NetworkAttachmentConfig", 1) + `,`,
 		`ContainerID:` + fmt.Sprintf("%v", this.ContainerID) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *AttachNetworkResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *AttachNetworkResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&AttachNetworkResponse***REMOVED***`,
+	}
+	s := strings.Join([]string{`&AttachNetworkResponse{`,
 		`AttachmentID:` + fmt.Sprintf("%v", this.AttachmentID) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *DetachNetworkRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *DetachNetworkRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&DetachNetworkRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&DetachNetworkRequest{`,
 		`AttachmentID:` + fmt.Sprintf("%v", this.AttachmentID) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *DetachNetworkResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *DetachNetworkResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&DetachNetworkResponse***REMOVED***`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+	}
+	s := strings.Join([]string{`&DetachNetworkResponse{`,
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func valueToStringResource(v interface***REMOVED******REMOVED***) string ***REMOVED***
+}
+func valueToStringResource(v interface{}) string {
 	rv := reflect.ValueOf(v)
-	if rv.IsNil() ***REMOVED***
+	if rv.IsNil() {
 		return "nil"
-	***REMOVED***
+	}
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
-***REMOVED***
-func (m *AttachNetworkRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *AttachNetworkRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowResource
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: AttachNetworkRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: AttachNetworkRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Config", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowResource
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthResource
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Config == nil ***REMOVED***
-				m.Config = &NetworkAttachmentConfig***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.Config.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.Config == nil {
+				m.Config = &NetworkAttachmentConfig{}
+			}
+			if err := m.Config.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ContainerID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowResource
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthResource
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ContainerID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipResource(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthResource
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *AttachNetworkResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *AttachNetworkResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowResource
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: AttachNetworkResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: AttachNetworkResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field AttachmentID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowResource
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthResource
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.AttachmentID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipResource(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthResource
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *DetachNetworkRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *DetachNetworkRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowResource
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: DetachNetworkRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: DetachNetworkRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field AttachmentID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowResource
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthResource
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.AttachmentID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipResource(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthResource
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *DetachNetworkResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *DetachNetworkResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowResource
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: DetachNetworkResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: DetachNetworkResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		default:
 			iNdEx = preIndex
 			skippy, err := skipResource(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthResource
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func skipResource(dAtA []byte) (n int, err error) ***REMOVED***
+}
+func skipResource(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return 0, ErrIntOverflowResource
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return 0, io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		wireType := int(wire & 0x7)
-		switch wireType ***REMOVED***
+		switch wireType {
 		case 0:
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowResource
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				iNdEx++
-				if dAtA[iNdEx-1] < 0x80 ***REMOVED***
+				if dAtA[iNdEx-1] < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return iNdEx, nil
 		case 1:
 			iNdEx += 8
 			return iNdEx, nil
 		case 2:
 			var length int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowResource
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				length |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			iNdEx += length
-			if length < 0 ***REMOVED***
+			if length < 0 {
 				return 0, ErrInvalidLengthResource
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 3:
-			for ***REMOVED***
+			for {
 				var innerWire uint64
 				var start int = iNdEx
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return 0, ErrIntOverflowResource
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return 0, io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					innerWire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				innerWireType := int(innerWire & 0x7)
-				if innerWireType == 4 ***REMOVED***
+				if innerWireType == 4 {
 					break
-				***REMOVED***
+				}
 				next, err := skipResource(dAtA[start:])
-				if err != nil ***REMOVED***
+				if err != nil {
 					return 0, err
-				***REMOVED***
+				}
 				iNdEx = start + next
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 4:
 			return iNdEx, nil
@@ -1052,21 +1052,21 @@ func skipResource(dAtA []byte) (n int, err error) ***REMOVED***
 			return iNdEx, nil
 		default:
 			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	panic("unreachable")
-***REMOVED***
+}
 
 var (
 	ErrInvalidLengthResource = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowResource   = fmt.Errorf("proto: integer overflow")
 )
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterFile("github.com/docker/swarmkit/api/resource.proto", fileDescriptorResource)
-***REMOVED***
+}
 
-var fileDescriptorResource = []byte***REMOVED***
+var fileDescriptorResource = []byte{
 	// 397 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x92, 0xcf, 0x4e, 0xf2, 0x40,
 	0x14, 0xc5, 0x19, 0x16, 0x24, 0xdf, 0x50, 0xf2, 0x69, 0x03, 0x91, 0x90, 0x58, 0x48, 0xdd, 0xa0,
@@ -1093,4 +1093,4 @@ var fileDescriptorResource = []byte***REMOVED***
 	0x22, 0x1c, 0xc4, 0x4e, 0x2c, 0xed, 0xf2, 0x74, 0xae, 0x64, 0xde, 0xe7, 0x4a, 0xe6, 0x3e, 0x56,
 	0xc0, 0x34, 0x56, 0xc0, 0x5b, 0xac, 0x80, 0x8f, 0x58, 0x01, 0xfd, 0x5c, 0xf2, 0x63, 0x9e, 0x7f,
 	0x05, 0x00, 0x00, 0xff, 0xff, 0xc1, 0x7a, 0x29, 0xfc, 0x58, 0x03, 0x00, 0x00,
-***REMOVED***
+}

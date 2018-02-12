@@ -23,7 +23,7 @@ import (
 )
 
 // Task on a linux based system
-type Task struct ***REMOVED***
+type Task struct {
 	mu        sync.Mutex
 	id        string
 	pid       int
@@ -33,20 +33,20 @@ type Task struct ***REMOVED***
 	monitor   runtime.TaskMonitor
 	events    *exchange.Exchange
 	runtime   *runc.Runc
-***REMOVED***
+}
 
-func newTask(id, namespace string, pid int, shim *client.Client, monitor runtime.TaskMonitor, events *exchange.Exchange, runtime *runc.Runc) (*Task, error) ***REMOVED***
+func newTask(id, namespace string, pid int, shim *client.Client, monitor runtime.TaskMonitor, events *exchange.Exchange, runtime *runc.Runc) (*Task, error) {
 	var (
 		err error
 		cg  cgroups.Cgroup
 	)
-	if pid > 0 ***REMOVED***
+	if pid > 0 {
 		cg, err = cgroups.Load(cgroups.V1, cgroups.PidPath(pid))
-		if err != nil && err != cgroups.ErrCgroupDeleted ***REMOVED***
+		if err != nil && err != cgroups.ErrCgroupDeleted {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
-	return &Task***REMOVED***
+		}
+	}
+	return &Task{
 		id:        id,
 		pid:       pid,
 		shim:      shim,
@@ -55,67 +55,67 @@ func newTask(id, namespace string, pid int, shim *client.Client, monitor runtime
 		monitor:   monitor,
 		events:    events,
 		runtime:   runtime,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // ID of the task
-func (t *Task) ID() string ***REMOVED***
+func (t *Task) ID() string {
 	return t.id
-***REMOVED***
+}
 
 // Info returns task information about the runtime and namespace
-func (t *Task) Info() runtime.TaskInfo ***REMOVED***
-	return runtime.TaskInfo***REMOVED***
+func (t *Task) Info() runtime.TaskInfo {
+	return runtime.TaskInfo{
 		ID:        t.id,
 		Runtime:   pluginID,
 		Namespace: t.namespace,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Start the task
-func (t *Task) Start(ctx context.Context) error ***REMOVED***
+func (t *Task) Start(ctx context.Context) error {
 	t.mu.Lock()
 	hasCgroup := t.cg != nil
 	t.mu.Unlock()
-	r, err := t.shim.Start(ctx, &shim.StartRequest***REMOVED***
+	r, err := t.shim.Start(ctx, &shim.StartRequest{
 		ID: t.id,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		return errdefs.FromGRPC(err)
-	***REMOVED***
+	}
 	t.pid = int(r.Pid)
-	if !hasCgroup ***REMOVED***
+	if !hasCgroup {
 		cg, err := cgroups.Load(cgroups.V1, cgroups.PidPath(t.pid))
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		t.mu.Lock()
 		t.cg = cg
 		t.mu.Unlock()
-		if err := t.monitor.Monitor(t); err != nil ***REMOVED***
+		if err := t.monitor.Monitor(t); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
-	t.events.Publish(ctx, runtime.TaskStartEventTopic, &eventstypes.TaskStart***REMOVED***
+		}
+	}
+	t.events.Publish(ctx, runtime.TaskStartEventTopic, &eventstypes.TaskStart{
 		ContainerID: t.id,
 		Pid:         uint32(t.pid),
-	***REMOVED***)
+	})
 	return nil
-***REMOVED***
+}
 
 // State returns runtime information for the task
-func (t *Task) State(ctx context.Context) (runtime.State, error) ***REMOVED***
-	response, err := t.shim.State(ctx, &shim.StateRequest***REMOVED***
+func (t *Task) State(ctx context.Context) (runtime.State, error) {
+	response, err := t.shim.State(ctx, &shim.StateRequest{
 		ID: t.id,
-	***REMOVED***)
-	if err != nil ***REMOVED***
-		if err != grpc.ErrServerStopped ***REMOVED***
-			return runtime.State***REMOVED******REMOVED***, errdefs.FromGRPC(err)
-		***REMOVED***
-		return runtime.State***REMOVED******REMOVED***, errdefs.ErrNotFound
-	***REMOVED***
+	})
+	if err != nil {
+		if err != grpc.ErrServerStopped {
+			return runtime.State{}, errdefs.FromGRPC(err)
+		}
+		return runtime.State{}, errdefs.ErrNotFound
+	}
 	var status runtime.Status
-	switch response.Status ***REMOVED***
+	switch response.Status {
 	case task.StatusCreated:
 		status = runtime.CreatedStatus
 	case task.StatusRunning:
@@ -126,8 +126,8 @@ func (t *Task) State(ctx context.Context) (runtime.State, error) ***REMOVED***
 		status = runtime.PausedStatus
 	case task.StatusPausing:
 		status = runtime.PausingStatus
-	***REMOVED***
-	return runtime.State***REMOVED***
+	}
+	return runtime.State{
 		Pid:        response.Pid,
 		Status:     status,
 		Stdin:      response.Stdin,
@@ -136,196 +136,196 @@ func (t *Task) State(ctx context.Context) (runtime.State, error) ***REMOVED***
 		Terminal:   response.Terminal,
 		ExitStatus: response.ExitStatus,
 		ExitedAt:   response.ExitedAt,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // Pause the task and all processes
-func (t *Task) Pause(ctx context.Context) error ***REMOVED***
-	if _, err := t.shim.Pause(ctx, empty); err != nil ***REMOVED***
+func (t *Task) Pause(ctx context.Context) error {
+	if _, err := t.shim.Pause(ctx, empty); err != nil {
 		return errdefs.FromGRPC(err)
-	***REMOVED***
-	t.events.Publish(ctx, runtime.TaskPausedEventTopic, &eventstypes.TaskPaused***REMOVED***
+	}
+	t.events.Publish(ctx, runtime.TaskPausedEventTopic, &eventstypes.TaskPaused{
 		ContainerID: t.id,
-	***REMOVED***)
+	})
 	return nil
-***REMOVED***
+}
 
 // Resume the task and all processes
-func (t *Task) Resume(ctx context.Context) error ***REMOVED***
-	if _, err := t.shim.Resume(ctx, empty); err != nil ***REMOVED***
+func (t *Task) Resume(ctx context.Context) error {
+	if _, err := t.shim.Resume(ctx, empty); err != nil {
 		return errdefs.FromGRPC(err)
-	***REMOVED***
-	t.events.Publish(ctx, runtime.TaskResumedEventTopic, &eventstypes.TaskResumed***REMOVED***
+	}
+	t.events.Publish(ctx, runtime.TaskResumedEventTopic, &eventstypes.TaskResumed{
 		ContainerID: t.id,
-	***REMOVED***)
+	})
 	return nil
-***REMOVED***
+}
 
 // Kill the task using the provided signal
 //
 // Optionally send the signal to all processes that are a child of the task
-func (t *Task) Kill(ctx context.Context, signal uint32, all bool) error ***REMOVED***
-	if _, err := t.shim.Kill(ctx, &shim.KillRequest***REMOVED***
+func (t *Task) Kill(ctx context.Context, signal uint32, all bool) error {
+	if _, err := t.shim.Kill(ctx, &shim.KillRequest{
 		ID:     t.id,
 		Signal: signal,
 		All:    all,
-	***REMOVED***); err != nil ***REMOVED***
+	}); err != nil {
 		return errdefs.FromGRPC(err)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // Exec creates a new process inside the task
-func (t *Task) Exec(ctx context.Context, id string, opts runtime.ExecOpts) (runtime.Process, error) ***REMOVED***
-	if err := identifiers.Validate(id); err != nil ***REMOVED***
+func (t *Task) Exec(ctx context.Context, id string, opts runtime.ExecOpts) (runtime.Process, error) {
+	if err := identifiers.Validate(id); err != nil {
 		return nil, errors.Wrapf(err, "invalid exec id")
-	***REMOVED***
-	request := &shim.ExecProcessRequest***REMOVED***
+	}
+	request := &shim.ExecProcessRequest{
 		ID:       id,
 		Stdin:    opts.IO.Stdin,
 		Stdout:   opts.IO.Stdout,
 		Stderr:   opts.IO.Stderr,
 		Terminal: opts.IO.Terminal,
 		Spec:     opts.Spec,
-	***REMOVED***
-	if _, err := t.shim.Exec(ctx, request); err != nil ***REMOVED***
+	}
+	if _, err := t.shim.Exec(ctx, request); err != nil {
 		return nil, errdefs.FromGRPC(err)
-	***REMOVED***
-	return &Process***REMOVED***
+	}
+	return &Process{
 		id: id,
 		t:  t,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // Pids returns all system level process ids running inside the task
-func (t *Task) Pids(ctx context.Context) ([]runtime.ProcessInfo, error) ***REMOVED***
-	resp, err := t.shim.ListPids(ctx, &shim.ListPidsRequest***REMOVED***
+func (t *Task) Pids(ctx context.Context) ([]runtime.ProcessInfo, error) {
+	resp, err := t.shim.ListPids(ctx, &shim.ListPidsRequest{
 		ID: t.id,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		return nil, errdefs.FromGRPC(err)
-	***REMOVED***
+	}
 	var processList []runtime.ProcessInfo
-	for _, p := range resp.Processes ***REMOVED***
-		processList = append(processList, runtime.ProcessInfo***REMOVED***
+	for _, p := range resp.Processes {
+		processList = append(processList, runtime.ProcessInfo{
 			Pid:  p.Pid,
 			Info: p.Info,
-		***REMOVED***)
-	***REMOVED***
+		})
+	}
 	return processList, nil
-***REMOVED***
+}
 
 // ResizePty changes the side of the task's PTY to the provided width and height
-func (t *Task) ResizePty(ctx context.Context, size runtime.ConsoleSize) error ***REMOVED***
-	_, err := t.shim.ResizePty(ctx, &shim.ResizePtyRequest***REMOVED***
+func (t *Task) ResizePty(ctx context.Context, size runtime.ConsoleSize) error {
+	_, err := t.shim.ResizePty(ctx, &shim.ResizePtyRequest{
 		ID:     t.id,
 		Width:  size.Width,
 		Height: size.Height,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		err = errdefs.FromGRPC(err)
-	***REMOVED***
+	}
 	return err
-***REMOVED***
+}
 
 // CloseIO closes the provided IO on the task
-func (t *Task) CloseIO(ctx context.Context) error ***REMOVED***
-	_, err := t.shim.CloseIO(ctx, &shim.CloseIORequest***REMOVED***
+func (t *Task) CloseIO(ctx context.Context) error {
+	_, err := t.shim.CloseIO(ctx, &shim.CloseIORequest{
 		ID:    t.id,
 		Stdin: true,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		err = errdefs.FromGRPC(err)
-	***REMOVED***
+	}
 	return err
-***REMOVED***
+}
 
 // Checkpoint creates a system level dump of the task and process information that can be later restored
-func (t *Task) Checkpoint(ctx context.Context, path string, options *types.Any) error ***REMOVED***
-	r := &shim.CheckpointTaskRequest***REMOVED***
+func (t *Task) Checkpoint(ctx context.Context, path string, options *types.Any) error {
+	r := &shim.CheckpointTaskRequest{
 		Path:    path,
 		Options: options,
-	***REMOVED***
-	if _, err := t.shim.Checkpoint(ctx, r); err != nil ***REMOVED***
+	}
+	if _, err := t.shim.Checkpoint(ctx, r); err != nil {
 		return errdefs.FromGRPC(err)
-	***REMOVED***
-	t.events.Publish(ctx, runtime.TaskCheckpointedEventTopic, &eventstypes.TaskCheckpointed***REMOVED***
+	}
+	t.events.Publish(ctx, runtime.TaskCheckpointedEventTopic, &eventstypes.TaskCheckpointed{
 		ContainerID: t.id,
-	***REMOVED***)
+	})
 	return nil
-***REMOVED***
+}
 
 // DeleteProcess removes the provided process from the task and deletes all on disk state
-func (t *Task) DeleteProcess(ctx context.Context, id string) (*runtime.Exit, error) ***REMOVED***
-	r, err := t.shim.DeleteProcess(ctx, &shim.DeleteProcessRequest***REMOVED***
+func (t *Task) DeleteProcess(ctx context.Context, id string) (*runtime.Exit, error) {
+	r, err := t.shim.DeleteProcess(ctx, &shim.DeleteProcessRequest{
 		ID: id,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		return nil, errdefs.FromGRPC(err)
-	***REMOVED***
-	return &runtime.Exit***REMOVED***
+	}
+	return &runtime.Exit{
 		Status:    r.ExitStatus,
 		Timestamp: r.ExitedAt,
 		Pid:       r.Pid,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // Update changes runtime information of a running task
-func (t *Task) Update(ctx context.Context, resources *types.Any) error ***REMOVED***
-	if _, err := t.shim.Update(ctx, &shim.UpdateTaskRequest***REMOVED***
+func (t *Task) Update(ctx context.Context, resources *types.Any) error {
+	if _, err := t.shim.Update(ctx, &shim.UpdateTaskRequest{
 		Resources: resources,
-	***REMOVED***); err != nil ***REMOVED***
+	}); err != nil {
 		return errdefs.FromGRPC(err)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // Process returns a specific process inside the task by the process id
-func (t *Task) Process(ctx context.Context, id string) (runtime.Process, error) ***REMOVED***
-	p := &Process***REMOVED***
+func (t *Task) Process(ctx context.Context, id string) (runtime.Process, error) {
+	p := &Process{
 		id: id,
 		t:  t,
-	***REMOVED***
-	if _, err := p.State(ctx); err != nil ***REMOVED***
+	}
+	if _, err := p.State(ctx); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return p, nil
-***REMOVED***
+}
 
 // Metrics returns runtime specific system level metric information for the task
-func (t *Task) Metrics(ctx context.Context) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func (t *Task) Metrics(ctx context.Context) (interface{}, error) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
-	if t.cg == nil ***REMOVED***
+	if t.cg == nil {
 		return nil, errors.Wrap(errdefs.ErrNotFound, "cgroup does not exist")
-	***REMOVED***
+	}
 	stats, err := t.cg.Stat(cgroups.IgnoreNotExist)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return stats, nil
-***REMOVED***
+}
 
 // Cgroup returns the underlying cgroup for a linux task
-func (t *Task) Cgroup() (cgroups.Cgroup, error) ***REMOVED***
+func (t *Task) Cgroup() (cgroups.Cgroup, error) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
-	if t.cg == nil ***REMOVED***
+	if t.cg == nil {
 		return nil, errors.Wrap(errdefs.ErrNotFound, "cgroup does not exist")
-	***REMOVED***
+	}
 	return t.cg, nil
-***REMOVED***
+}
 
 // Wait for the task to exit returning the status and timestamp
-func (t *Task) Wait(ctx context.Context) (*runtime.Exit, error) ***REMOVED***
-	r, err := t.shim.Wait(ctx, &shim.WaitRequest***REMOVED***
+func (t *Task) Wait(ctx context.Context) (*runtime.Exit, error) {
+	r, err := t.shim.Wait(ctx, &shim.WaitRequest{
 		ID: t.id,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	return &runtime.Exit***REMOVED***
+	}
+	return &runtime.Exit{
 		Timestamp: r.ExitedAt,
 		Status:    r.ExitStatus,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}

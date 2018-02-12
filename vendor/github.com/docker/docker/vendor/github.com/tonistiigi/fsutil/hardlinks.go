@@ -8,39 +8,39 @@ import (
 
 // Hardlinks validates that all targets for links were part of the changes
 
-type Hardlinks struct ***REMOVED***
-	seenFiles map[string]struct***REMOVED******REMOVED***
-***REMOVED***
+type Hardlinks struct {
+	seenFiles map[string]struct{}
+}
 
-func (v *Hardlinks) HandleChange(kind ChangeKind, p string, fi os.FileInfo, err error) error ***REMOVED***
-	if err != nil ***REMOVED***
+func (v *Hardlinks) HandleChange(kind ChangeKind, p string, fi os.FileInfo, err error) error {
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if v.seenFiles == nil ***REMOVED***
-		v.seenFiles = make(map[string]struct***REMOVED******REMOVED***)
-	***REMOVED***
+	if v.seenFiles == nil {
+		v.seenFiles = make(map[string]struct{})
+	}
 
-	if kind == ChangeKindDelete ***REMOVED***
+	if kind == ChangeKindDelete {
 		return nil
-	***REMOVED***
+	}
 
 	stat, ok := fi.Sys().(*Stat)
-	if !ok ***REMOVED***
+	if !ok {
 		return errors.Errorf("invalid change without stat info: %s", p)
-	***REMOVED***
+	}
 
-	if fi.IsDir() || fi.Mode()&os.ModeSymlink != 0 ***REMOVED***
+	if fi.IsDir() || fi.Mode()&os.ModeSymlink != 0 {
 		return nil
-	***REMOVED***
+	}
 
-	if len(stat.Linkname) > 0 ***REMOVED***
-		if _, ok := v.seenFiles[stat.Linkname]; !ok ***REMOVED***
+	if len(stat.Linkname) > 0 {
+		if _, ok := v.seenFiles[stat.Linkname]; !ok {
 			return errors.Errorf("invalid link %s to unknown path: %q", p, stat.Linkname)
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
-		v.seenFiles[p] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	***REMOVED***
+		}
+	} else {
+		v.seenFiles[p] = struct{}{}
+	}
 
 	return nil
-***REMOVED***
+}

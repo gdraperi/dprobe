@@ -31,25 +31,25 @@ import (
 
 type invalidIsolationError string
 
-func (e invalidIsolationError) Error() string ***REMOVED***
+func (e invalidIsolationError) Error() string {
 	return fmt.Sprintf("Unsupported isolation: %q", string(e))
-***REMOVED***
+}
 
-func (e invalidIsolationError) InvalidParameter() ***REMOVED******REMOVED***
+func (e invalidIsolationError) InvalidParameter() {}
 
-func newImageBuildOptions(ctx context.Context, r *http.Request) (*types.ImageBuildOptions, error) ***REMOVED***
+func newImageBuildOptions(ctx context.Context, r *http.Request) (*types.ImageBuildOptions, error) {
 	version := httputils.VersionFromContext(ctx)
-	options := &types.ImageBuildOptions***REMOVED******REMOVED***
-	if httputils.BoolValue(r, "forcerm") && versions.GreaterThanOrEqualTo(version, "1.12") ***REMOVED***
+	options := &types.ImageBuildOptions{}
+	if httputils.BoolValue(r, "forcerm") && versions.GreaterThanOrEqualTo(version, "1.12") {
 		options.Remove = true
-	***REMOVED*** else if r.FormValue("rm") == "" && versions.GreaterThanOrEqualTo(version, "1.12") ***REMOVED***
+	} else if r.FormValue("rm") == "" && versions.GreaterThanOrEqualTo(version, "1.12") {
 		options.Remove = true
-	***REMOVED*** else ***REMOVED***
+	} else {
 		options.Remove = httputils.BoolValue(r, "rm")
-	***REMOVED***
-	if httputils.BoolValue(r, "pull") && versions.GreaterThanOrEqualTo(version, "1.16") ***REMOVED***
+	}
+	if httputils.BoolValue(r, "pull") && versions.GreaterThanOrEqualTo(version, "1.16") {
 		options.PullParent = true
-	***REMOVED***
+	}
 
 	options.Dockerfile = r.FormValue("dockerfile")
 	options.SuppressOutput = httputils.BoolValue(r, "q")
@@ -70,7 +70,7 @@ func newImageBuildOptions(ctx context.Context, r *http.Request) (*types.ImageBui
 	options.Squash = httputils.BoolValue(r, "squash")
 	options.Target = r.FormValue("target")
 	options.RemoteContext = r.FormValue("remote")
-	if versions.GreaterThanOrEqualTo(version, "1.32") ***REMOVED***
+	if versions.GreaterThanOrEqualTo(version, "1.32") {
 		// TODO @jhowardmsft. The following environment variable is an interim
 		// measure to allow the daemon to have a default platform if omitted by
 		// the client. This allows LCOW and WCOW to work with a down-level CLI
@@ -79,43 +79,43 @@ func newImageBuildOptions(ctx context.Context, r *http.Request) (*types.ImageBui
 		// updated, this can be removed. PR for CLI is currently in
 		// https://github.com/docker/cli/pull/474.
 		apiPlatform := r.FormValue("platform")
-		if system.LCOWSupported() && apiPlatform == "" ***REMOVED***
+		if system.LCOWSupported() && apiPlatform == "" {
 			apiPlatform = os.Getenv("LCOW_API_PLATFORM_IF_OMITTED")
-		***REMOVED***
+		}
 		p := system.ParsePlatform(apiPlatform)
-		if err := system.ValidatePlatform(p); err != nil ***REMOVED***
+		if err := system.ValidatePlatform(p); err != nil {
 			return nil, errdefs.InvalidParameter(errors.Errorf("invalid platform: %s", err))
-		***REMOVED***
+		}
 		options.Platform = p.OS
-	***REMOVED***
+	}
 
-	if r.Form.Get("shmsize") != "" ***REMOVED***
+	if r.Form.Get("shmsize") != "" {
 		shmSize, err := strconv.ParseInt(r.Form.Get("shmsize"), 10, 64)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		options.ShmSize = shmSize
-	***REMOVED***
+	}
 
-	if i := container.Isolation(r.FormValue("isolation")); i != "" ***REMOVED***
-		if !container.Isolation.IsValid(i) ***REMOVED***
+	if i := container.Isolation(r.FormValue("isolation")); i != "" {
+		if !container.Isolation.IsValid(i) {
 			return nil, invalidIsolationError(i)
-		***REMOVED***
+		}
 		options.Isolation = i
-	***REMOVED***
+	}
 
-	if runtime.GOOS != "windows" && options.SecurityOpt != nil ***REMOVED***
+	if runtime.GOOS != "windows" && options.SecurityOpt != nil {
 		return nil, errdefs.InvalidParameter(errors.New("The daemon on this platform does not support setting security options on build"))
-	***REMOVED***
+	}
 
-	var buildUlimits = []*units.Ulimit***REMOVED******REMOVED***
+	var buildUlimits = []*units.Ulimit{}
 	ulimitsJSON := r.FormValue("ulimits")
-	if ulimitsJSON != "" ***REMOVED***
-		if err := json.Unmarshal([]byte(ulimitsJSON), &buildUlimits); err != nil ***REMOVED***
+	if ulimitsJSON != "" {
+		if err := json.Unmarshal([]byte(ulimitsJSON), &buildUlimits); err != nil {
 			return nil, errors.Wrap(errdefs.InvalidParameter(err), "error reading ulimit settings")
-		***REMOVED***
+		}
 		options.Ulimits = buildUlimits
-	***REMOVED***
+	}
 
 	// Note that there are two ways a --build-arg might appear in the
 	// json of the query param:
@@ -130,45 +130,45 @@ func newImageBuildOptions(ctx context.Context, r *http.Request) (*types.ImageBui
 	// so that it can print a warning about "foo" being unused if there is
 	// no "ARG foo" in the Dockerfile.
 	buildArgsJSON := r.FormValue("buildargs")
-	if buildArgsJSON != "" ***REMOVED***
-		var buildArgs = map[string]*string***REMOVED******REMOVED***
-		if err := json.Unmarshal([]byte(buildArgsJSON), &buildArgs); err != nil ***REMOVED***
+	if buildArgsJSON != "" {
+		var buildArgs = map[string]*string{}
+		if err := json.Unmarshal([]byte(buildArgsJSON), &buildArgs); err != nil {
 			return nil, errors.Wrap(errdefs.InvalidParameter(err), "error reading build args")
-		***REMOVED***
+		}
 		options.BuildArgs = buildArgs
-	***REMOVED***
+	}
 
 	labelsJSON := r.FormValue("labels")
-	if labelsJSON != "" ***REMOVED***
-		var labels = map[string]string***REMOVED******REMOVED***
-		if err := json.Unmarshal([]byte(labelsJSON), &labels); err != nil ***REMOVED***
+	if labelsJSON != "" {
+		var labels = map[string]string{}
+		if err := json.Unmarshal([]byte(labelsJSON), &labels); err != nil {
 			return nil, errors.Wrap(errdefs.InvalidParameter(err), "error reading labels")
-		***REMOVED***
+		}
 		options.Labels = labels
-	***REMOVED***
+	}
 
 	cacheFromJSON := r.FormValue("cachefrom")
-	if cacheFromJSON != "" ***REMOVED***
-		var cacheFrom = []string***REMOVED******REMOVED***
-		if err := json.Unmarshal([]byte(cacheFromJSON), &cacheFrom); err != nil ***REMOVED***
+	if cacheFromJSON != "" {
+		var cacheFrom = []string{}
+		if err := json.Unmarshal([]byte(cacheFromJSON), &cacheFrom); err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		options.CacheFrom = cacheFrom
-	***REMOVED***
+	}
 	options.SessionID = r.FormValue("session")
 
 	return options, nil
-***REMOVED***
+}
 
-func (br *buildRouter) postPrune(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error ***REMOVED***
+func (br *buildRouter) postPrune(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error {
 	report, err := br.backend.PruneCache(ctx)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return httputils.WriteJSON(w, http.StatusOK, report)
-***REMOVED***
+}
 
-func (br *buildRouter) postBuild(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error ***REMOVED***
+func (br *buildRouter) postBuild(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error {
 	var (
 		notVerboseBuffer = bytes.NewBuffer(nil)
 		version          = httputils.VersionFromContext(ctx)
@@ -178,103 +178,103 @@ func (br *buildRouter) postBuild(ctx context.Context, w http.ResponseWriter, r *
 
 	output := ioutils.NewWriteFlusher(w)
 	defer output.Close()
-	errf := func(err error) error ***REMOVED***
-		if httputils.BoolValue(r, "q") && notVerboseBuffer.Len() > 0 ***REMOVED***
+	errf := func(err error) error {
+		if httputils.BoolValue(r, "q") && notVerboseBuffer.Len() > 0 {
 			output.Write(notVerboseBuffer.Bytes())
-		***REMOVED***
+		}
 		// Do not write the error in the http output if it's still empty.
 		// This prevents from writing a 200(OK) when there is an internal error.
-		if !output.Flushed() ***REMOVED***
+		if !output.Flushed() {
 			return err
-		***REMOVED***
+		}
 		_, err = w.Write(streamformatter.FormatError(err))
-		if err != nil ***REMOVED***
+		if err != nil {
 			logrus.Warnf("could not write error response: %v", err)
-		***REMOVED***
+		}
 		return nil
-	***REMOVED***
+	}
 
 	buildOptions, err := newImageBuildOptions(ctx, r)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return errf(err)
-	***REMOVED***
+	}
 	buildOptions.AuthConfigs = getAuthConfigs(r.Header)
 
-	if buildOptions.Squash && !br.daemon.HasExperimental() ***REMOVED***
+	if buildOptions.Squash && !br.daemon.HasExperimental() {
 		return errdefs.InvalidParameter(errors.New("squash is only supported with experimental mode"))
-	***REMOVED***
+	}
 
 	out := io.Writer(output)
-	if buildOptions.SuppressOutput ***REMOVED***
+	if buildOptions.SuppressOutput {
 		out = notVerboseBuffer
-	***REMOVED***
+	}
 
 	// Currently, only used if context is from a remote url.
 	// Look at code in DetectContextFromRemoteURL for more information.
-	createProgressReader := func(in io.ReadCloser) io.ReadCloser ***REMOVED***
+	createProgressReader := func(in io.ReadCloser) io.ReadCloser {
 		progressOutput := streamformatter.NewJSONProgressOutput(out, true)
 		return progress.NewProgressReader(in, progressOutput, r.ContentLength, "Downloading context", buildOptions.RemoteContext)
-	***REMOVED***
+	}
 
 	wantAux := versions.GreaterThanOrEqualTo(version, "1.30")
 
-	imgID, err := br.backend.Build(ctx, backend.BuildConfig***REMOVED***
+	imgID, err := br.backend.Build(ctx, backend.BuildConfig{
 		Source:         r.Body,
 		Options:        buildOptions,
 		ProgressWriter: buildProgressWriter(out, wantAux, createProgressReader),
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		return errf(err)
-	***REMOVED***
+	}
 
 	// Everything worked so if -q was provided the output from the daemon
 	// should be just the image ID and we'll print that to stdout.
-	if buildOptions.SuppressOutput ***REMOVED***
+	if buildOptions.SuppressOutput {
 		fmt.Fprintln(streamformatter.NewStdoutWriter(output), imgID)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func getAuthConfigs(header http.Header) map[string]types.AuthConfig ***REMOVED***
-	authConfigs := map[string]types.AuthConfig***REMOVED******REMOVED***
+func getAuthConfigs(header http.Header) map[string]types.AuthConfig {
+	authConfigs := map[string]types.AuthConfig{}
 	authConfigsEncoded := header.Get("X-Registry-Config")
 
-	if authConfigsEncoded == "" ***REMOVED***
+	if authConfigsEncoded == "" {
 		return authConfigs
-	***REMOVED***
+	}
 
 	authConfigsJSON := base64.NewDecoder(base64.URLEncoding, strings.NewReader(authConfigsEncoded))
 	// Pulling an image does not error when no auth is provided so to remain
 	// consistent with the existing api decode errors are ignored
 	json.NewDecoder(authConfigsJSON).Decode(&authConfigs)
 	return authConfigs
-***REMOVED***
+}
 
-type syncWriter struct ***REMOVED***
+type syncWriter struct {
 	w  io.Writer
 	mu sync.Mutex
-***REMOVED***
+}
 
-func (s *syncWriter) Write(b []byte) (count int, err error) ***REMOVED***
+func (s *syncWriter) Write(b []byte) (count int, err error) {
 	s.mu.Lock()
 	count, err = s.w.Write(b)
 	s.mu.Unlock()
 	return
-***REMOVED***
+}
 
-func buildProgressWriter(out io.Writer, wantAux bool, createProgressReader func(io.ReadCloser) io.ReadCloser) backend.ProgressWriter ***REMOVED***
-	out = &syncWriter***REMOVED***w: out***REMOVED***
+func buildProgressWriter(out io.Writer, wantAux bool, createProgressReader func(io.ReadCloser) io.ReadCloser) backend.ProgressWriter {
+	out = &syncWriter{w: out}
 
 	var aux *streamformatter.AuxFormatter
-	if wantAux ***REMOVED***
-		aux = &streamformatter.AuxFormatter***REMOVED***Writer: out***REMOVED***
-	***REMOVED***
+	if wantAux {
+		aux = &streamformatter.AuxFormatter{Writer: out}
+	}
 
-	return backend.ProgressWriter***REMOVED***
+	return backend.ProgressWriter{
 		Output:             out,
 		StdoutFormatter:    streamformatter.NewStdoutWriter(out),
 		StderrFormatter:    streamformatter.NewStderrWriter(out),
 		AuxFormatter:       aux,
 		ProgressReaderFunc: createProgressReader,
-	***REMOVED***
-***REMOVED***
+	}
+}

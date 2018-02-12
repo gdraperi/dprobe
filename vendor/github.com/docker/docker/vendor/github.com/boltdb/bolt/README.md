@@ -82,17 +82,17 @@ import (
 	"github.com/boltdb/bolt"
 )
 
-func main() ***REMOVED***
+func main() {
 	// Open the my.db data file in your current directory.
 	// It will be created if it doesn't exist.
 	db, err := bolt.Open("my.db", 0600, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatal(err)
-	***REMOVED***
+	}
 	defer db.Close()
 
 	...
-***REMOVED***
+}
 ```
 
 Please note that Bolt obtains a file lock on the data file so multiple processes
@@ -101,7 +101,7 @@ database will cause it to hang until the other process closes it. To prevent
 an indefinite wait you can pass a timeout option to the `Open()` function:
 
 ```go
-db, err := bolt.Open("my.db", 0600, &bolt.Options***REMOVED***Timeout: 1 * time.Second***REMOVED***)
+db, err := bolt.Open("my.db", 0600, &bolt.Options{Timeout: 1 * time.Second})
 ```
 
 
@@ -127,10 +127,10 @@ re-map the data file but it cannot do so while a read-only transaction is open.
 To start a read-write transaction, you can use the `DB.Update()` function:
 
 ```go
-err := db.Update(func(tx *bolt.Tx) error ***REMOVED***
+err := db.Update(func(tx *bolt.Tx) error {
 	...
 	return nil
-***REMOVED***)
+})
 ```
 
 Inside the closure, you have a consistent view of the database. You commit the
@@ -148,10 +148,10 @@ it will be passed through.
 To start a read-only transaction, you can use the `DB.View()` function:
 
 ```go
-err := db.View(func(tx *bolt.Tx) error ***REMOVED***
+err := db.View(func(tx *bolt.Tx) error {
 	...
 	return nil
-***REMOVED***)
+})
 ```
 
 You also get a consistent view of the database within this closure, however,
@@ -167,10 +167,10 @@ can be minimized by combining multiple updates with the `DB.Batch()`
 function:
 
 ```go
-err := db.Batch(func(tx *bolt.Tx) error ***REMOVED***
+err := db.Batch(func(tx *bolt.Tx) error {
 	...
 	return nil
-***REMOVED***)
+})
 ```
 
 Concurrent Batch calls are opportunistically combined into larger
@@ -187,16 +187,16 @@ set variables in the enclosing scope:
 
 ```go
 var id uint64
-err := db.Batch(func(tx *bolt.Tx) error ***REMOVED***
+err := db.Batch(func(tx *bolt.Tx) error {
 	// Find last key in bucket, decode as bigendian uint64, increment
 	// by one, encode back to []byte, and add new key.
 	...
 	id = newValue
 	return nil
-***REMOVED***)
-if err != nil ***REMOVED***
+})
+if err != nil {
 	return ...
-***REMOVED***
+}
 fmt.Println("Allocated ID %d", id)
 ```
 
@@ -215,21 +215,21 @@ the transaction.
 ```go
 // Start a writable transaction.
 tx, err := db.Begin(true)
-if err != nil ***REMOVED***
+if err != nil {
     return err
-***REMOVED***
+}
 defer tx.Rollback()
 
 // Use the transaction...
 _, err := tx.CreateBucket([]byte("MyBucket"))
-if err != nil ***REMOVED***
+if err != nil {
     return err
-***REMOVED***
+}
 
 // Commit the transaction and check for error.
-if err := tx.Commit(); err != nil ***REMOVED***
+if err := tx.Commit(); err != nil {
     return err
-***REMOVED***
+}
 ```
 
 The first argument to `DB.Begin()` is a boolean stating if the transaction
@@ -243,13 +243,13 @@ bucket must be unique. You can create a bucket using the `DB.CreateBucket()`
 function:
 
 ```go
-db.Update(func(tx *bolt.Tx) error ***REMOVED***
+db.Update(func(tx *bolt.Tx) error {
 	b, err := tx.CreateBucket([]byte("MyBucket"))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("create bucket: %s", err)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***)
+})
 ```
 
 You can also create a bucket only if it doesn't exist by using the
@@ -265,23 +265,23 @@ To delete a bucket, simply call the `Tx.DeleteBucket()` function.
 To save a key/value pair to a bucket, use the `Bucket.Put()` function:
 
 ```go
-db.Update(func(tx *bolt.Tx) error ***REMOVED***
+db.Update(func(tx *bolt.Tx) error {
 	b := tx.Bucket([]byte("MyBucket"))
 	err := b.Put([]byte("answer"), []byte("42"))
 	return err
-***REMOVED***)
+})
 ```
 
 This will set the value of the `"answer"` key to `"42"` in the `MyBucket`
 bucket. To retrieve this value, we can use the `Bucket.Get()` function:
 
 ```go
-db.View(func(tx *bolt.Tx) error ***REMOVED***
+db.View(func(tx *bolt.Tx) error {
 	b := tx.Bucket([]byte("MyBucket"))
 	v := b.Get([]byte("answer"))
 	fmt.Printf("The answer is: %s\n", v)
 	return nil
-***REMOVED***)
+})
 ```
 
 The `Get()` function does not return an error because its operation is
@@ -304,8 +304,8 @@ example below.
 
 ```go
 // CreateUser saves u to the store. The new user ID is set on u once the data is persisted.
-func (s *Store) CreateUser(u *User) error ***REMOVED***
-    return s.db.Update(func(tx *bolt.Tx) error ***REMOVED***
+func (s *Store) CreateUser(u *User) error {
+    return s.db.Update(func(tx *bolt.Tx) error {
         // Retrieve the users bucket.
         // This should be created when the DB is first opened.
         b := tx.Bucket([]byte("users"))
@@ -318,26 +318,26 @@ func (s *Store) CreateUser(u *User) error ***REMOVED***
 
         // Marshal user data into bytes.
         buf, err := json.Marshal(u)
-        if err != nil ***REMOVED***
+        if err != nil {
             return err
-    ***REMOVED***
+        }
 
         // Persist bytes to users bucket.
         return b.Put(itob(u.ID), buf)
-***REMOVED***)
-***REMOVED***
+    })
+}
 
 // itob returns an 8-byte big endian representation of v.
-func itob(v int) []byte ***REMOVED***
+func itob(v int) []byte {
     b := make([]byte, 8)
     binary.BigEndian.PutUint64(b, uint64(v))
     return b
-***REMOVED***
+}
 
-type User struct ***REMOVED***
+type User struct {
     ID int
     ...
-***REMOVED***
+}
 ```
 
 ### Iterating over keys
@@ -347,18 +347,18 @@ iteration over these keys extremely fast. To iterate over keys we'll use a
 `Cursor`:
 
 ```go
-db.View(func(tx *bolt.Tx) error ***REMOVED***
+db.View(func(tx *bolt.Tx) error {
 	// Assume bucket exists and has keys
 	b := tx.Bucket([]byte("MyBucket"))
 
 	c := b.Cursor()
 
-	for k, v := c.First(); k != nil; k, v = c.Next() ***REMOVED***
+	for k, v := c.First(); k != nil; k, v = c.Next() {
 		fmt.Printf("key=%s, value=%s\n", k, v)
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***)
+})
 ```
 
 The cursor allows you to move to a specific point in the list of keys and move
@@ -390,17 +390,17 @@ access the sub-bucket.
 To iterate over a key prefix, you can combine `Seek()` and `bytes.HasPrefix()`:
 
 ```go
-db.View(func(tx *bolt.Tx) error ***REMOVED***
+db.View(func(tx *bolt.Tx) error {
 	// Assume bucket exists and has keys
 	c := tx.Bucket([]byte("MyBucket")).Cursor()
 
 	prefix := []byte("1234")
-	for k, v := c.Seek(prefix); bytes.HasPrefix(k, prefix); k, v = c.Next() ***REMOVED***
+	for k, v := c.Seek(prefix); bytes.HasPrefix(k, prefix); k, v = c.Next() {
 		fmt.Printf("key=%s, value=%s\n", k, v)
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***)
+})
 ```
 
 #### Range scans
@@ -410,7 +410,7 @@ use a sortable time encoding such as RFC3339 then you can query a specific
 date range like this:
 
 ```go
-db.View(func(tx *bolt.Tx) error ***REMOVED***
+db.View(func(tx *bolt.Tx) error {
 	// Assume our events bucket exists and has RFC3339 encoded time keys.
 	c := tx.Bucket([]byte("Events")).Cursor()
 
@@ -419,12 +419,12 @@ db.View(func(tx *bolt.Tx) error ***REMOVED***
 	max := []byte("2000-01-01T00:00:00Z")
 
 	// Iterate over the 90's.
-	for k, v := c.Seek(min); k != nil && bytes.Compare(k, max) <= 0; k, v = c.Next() ***REMOVED***
+	for k, v := c.Seek(min); k != nil && bytes.Compare(k, max) <= 0; k, v = c.Next() {
 		fmt.Printf("%s: %s\n", k, v)
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***)
+})
 ```
 
 Note that, while RFC3339 is sortable, the Golang implementation of RFC3339Nano does not use a fixed number of digits after the decimal point and is therefore not sortable.
@@ -436,16 +436,16 @@ You can also use the function `ForEach()` if you know you'll be iterating over
 all the keys in a bucket:
 
 ```go
-db.View(func(tx *bolt.Tx) error ***REMOVED***
+db.View(func(tx *bolt.Tx) error {
 	// Assume bucket exists and has keys
 	b := tx.Bucket([]byte("MyBucket"))
 
-	b.ForEach(func(k, v []byte) error ***REMOVED***
+	b.ForEach(func(k, v []byte) error {
 		fmt.Printf("key=%s, value=%s\n", k, v)
 		return nil
-	***REMOVED***)
+	})
 	return nil
-***REMOVED***)
+})
 ```
 
 Please note that keys and values in `ForEach()` are only valid while
@@ -480,18 +480,18 @@ One common use case is to backup over HTTP so you can use tools like `cURL` to
 do database backups:
 
 ```go
-func BackupHandleFunc(w http.ResponseWriter, req *http.Request) ***REMOVED***
-	err := db.View(func(tx *bolt.Tx) error ***REMOVED***
+func BackupHandleFunc(w http.ResponseWriter, req *http.Request) {
+	err := db.View(func(tx *bolt.Tx) error {
 		w.Header().Set("Content-Type", "application/octet-stream")
 		w.Header().Set("Content-Disposition", `attachment; filename="my.db"`)
 		w.Header().Set("Content-Length", strconv.Itoa(int(tx.Size())))
 		_, err := tx.WriteTo(w)
 		return err
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	***REMOVED***
-***REMOVED***
+	}
+}
 ```
 
 Then you can backup using this command:
@@ -517,11 +517,11 @@ in that time range.
 For example, we could start a goroutine to log stats every 10 seconds:
 
 ```go
-go func() ***REMOVED***
+go func() {
 	// Grab the initial stats.
 	prev := db.Stats()
 
-	for ***REMOVED***
+	for {
 		// Wait for 10s.
 		time.Sleep(10 * time.Second)
 
@@ -534,8 +534,8 @@ go func() ***REMOVED***
 
 		// Save stats for the next loop.
 		prev = stats
-	***REMOVED***
-***REMOVED***()
+	}
+}()
 ```
 
 It's also useful to pipe these stats to a service such as statsd for monitoring
@@ -550,10 +550,10 @@ uses a shared lock to allow multiple processes to read from the database but
 it will block any processes from opening the database in read-write mode.
 
 ```go
-db, err := bolt.Open("my.db", 0666, &bolt.Options***REMOVED***ReadOnly: true***REMOVED***)
-if err != nil ***REMOVED***
+db, err := bolt.Open("my.db", 0666, &bolt.Options{ReadOnly: true})
+if err != nil {
 	log.Fatal(err)
-***REMOVED***
+}
 ```
 
 ### Mobile Use (iOS/Android)
@@ -565,27 +565,27 @@ constructor that takes in a filepath where the database file will be stored.
 Neither Android nor iOS require extra permissions or cleanup from using this method.
 
 ```go
-func NewBoltDB(filepath string) *BoltDB ***REMOVED***
+func NewBoltDB(filepath string) *BoltDB {
 	db, err := bolt.Open(filepath+"/demo.db", 0600, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatal(err)
-	***REMOVED***
+	}
 
-	return &BoltDB***REMOVED***db***REMOVED***
-***REMOVED***
+	return &BoltDB{db}
+}
 
-type BoltDB struct ***REMOVED***
+type BoltDB struct {
 	db *bolt.DB
 	...
-***REMOVED***
+}
 
-func (b *BoltDB) Path() string ***REMOVED***
+func (b *BoltDB) Path() string {
 	return b.db.Path()
-***REMOVED***
+}
 
-func (b *BoltDB) Close() ***REMOVED***
+func (b *BoltDB) Close() {
 	b.db.Close()
-***REMOVED***
+}
 ```
 
 Database logic should be defined as methods on this wrapper struct.
@@ -598,18 +598,18 @@ database file):
 
 ```java
 String path;
-if (android.os.Build.VERSION.SDK_INT >=android.os.Build.VERSION_CODES.LOLLIPOP)***REMOVED***
+if (android.os.Build.VERSION.SDK_INT >=android.os.Build.VERSION_CODES.LOLLIPOP){
     path = getNoBackupFilesDir().getAbsolutePath();
-***REMOVED*** else***REMOVED***
+} else{
     path = getFilesDir().getAbsolutePath();
-***REMOVED***
+}
 Boltmobiledemo.BoltDB boltDB = Boltmobiledemo.NewBoltDB(path)
 ```
 
 #### iOS
 
 ```objc
-- (void)demo ***REMOVED***
+- (void)demo {
     NSString* path = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory,
                                                           NSUserDomainMask,
                                                           YES) objectAtIndex:0];
@@ -617,21 +617,21 @@ Boltmobiledemo.BoltDB boltDB = Boltmobiledemo.NewBoltDB(path)
 	[self addSkipBackupAttributeToItemAtPath:demo.path];
 	//Some DB Logic would go here
 	[demo close];
-***REMOVED***
+}
 
 - (BOOL)addSkipBackupAttributeToItemAtPath:(NSString *) filePathString
-***REMOVED***
+{
     NSURL* URL= [NSURL fileURLWithPath: filePathString];
     assert([[NSFileManager defaultManager] fileExistsAtPath: [URL path]]);
 
     NSError *error = nil;
     BOOL success = [URL setResourceValue: [NSNumber numberWithBool: YES]
                                   forKey: NSURLIsExcludedFromBackupKey error: &error];
-    if(!success)***REMOVED***
+    if(!success){
         NSLog(@"Error excluding %@ from backup %@", [URL lastPathComponent], error);
-***REMOVED***
+    }
     return success;
-***REMOVED***
+}
 
 ```
 

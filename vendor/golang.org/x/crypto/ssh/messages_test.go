@@ -13,27 +13,27 @@ import (
 	"testing/quick"
 )
 
-var intLengthTests = []struct ***REMOVED***
+var intLengthTests = []struct {
 	val, length int
-***REMOVED******REMOVED***
-	***REMOVED***0, 4 + 0***REMOVED***,
-	***REMOVED***1, 4 + 1***REMOVED***,
-	***REMOVED***127, 4 + 1***REMOVED***,
-	***REMOVED***128, 4 + 2***REMOVED***,
-	***REMOVED***-1, 4 + 1***REMOVED***,
-***REMOVED***
+}{
+	{0, 4 + 0},
+	{1, 4 + 1},
+	{127, 4 + 1},
+	{128, 4 + 2},
+	{-1, 4 + 1},
+}
 
-func TestIntLength(t *testing.T) ***REMOVED***
-	for _, test := range intLengthTests ***REMOVED***
+func TestIntLength(t *testing.T) {
+	for _, test := range intLengthTests {
 		v := new(big.Int).SetInt64(int64(test.val))
 		length := intLength(v)
-		if length != test.length ***REMOVED***
+		if length != test.length {
 			t.Errorf("For %d, got length %d but expected %d", test.val, length, test.length)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-type msgAllTypes struct ***REMOVED***
+type msgAllTypes struct {
 	Bool    bool `sshtype:"21"`
 	Array   [16]byte
 	Uint64  uint64
@@ -44,10 +44,10 @@ type msgAllTypes struct ***REMOVED***
 	Bytes   []byte
 	Int     *big.Int
 	Rest    []byte `ssh:"rest"`
-***REMOVED***
+}
 
-func (t *msgAllTypes) Generate(rand *rand.Rand, size int) reflect.Value ***REMOVED***
-	m := &msgAllTypes***REMOVED******REMOVED***
+func (t *msgAllTypes) Generate(rand *rand.Rand, size int) reflect.Value {
+	m := &msgAllTypes{}
 	m.Bool = rand.Intn(2) == 1
 	randomBytes(m.Array[:], rand)
 	m.Uint64 = uint64(rand.Int63n(1<<63 - 1))
@@ -59,177 +59,177 @@ func (t *msgAllTypes) Generate(rand *rand.Rand, size int) reflect.Value ***REMOV
 	m.Int = randomInt(rand)
 	m.Rest = m.Array[:]
 	return reflect.ValueOf(m)
-***REMOVED***
+}
 
-func TestMarshalUnmarshal(t *testing.T) ***REMOVED***
+func TestMarshalUnmarshal(t *testing.T) {
 	rand := rand.New(rand.NewSource(0))
-	iface := &msgAllTypes***REMOVED******REMOVED***
+	iface := &msgAllTypes{}
 	ty := reflect.ValueOf(iface).Type()
 
 	n := 100
-	if testing.Short() ***REMOVED***
+	if testing.Short() {
 		n = 5
-	***REMOVED***
-	for j := 0; j < n; j++ ***REMOVED***
+	}
+	for j := 0; j < n; j++ {
 		v, ok := quick.Value(ty, rand)
-		if !ok ***REMOVED***
+		if !ok {
 			t.Errorf("failed to create value")
 			break
-		***REMOVED***
+		}
 
 		m1 := v.Elem().Interface()
 		m2 := iface
 
 		marshaled := Marshal(m1)
-		if err := Unmarshal(marshaled, m2); err != nil ***REMOVED***
+		if err := Unmarshal(marshaled, m2); err != nil {
 			t.Errorf("Unmarshal %#v: %s", m1, err)
 			break
-		***REMOVED***
+		}
 
-		if !reflect.DeepEqual(v.Interface(), m2) ***REMOVED***
+		if !reflect.DeepEqual(v.Interface(), m2) {
 			t.Errorf("got: %#v\nwant:%#v\n%x", m2, m1, marshaled)
 			break
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestUnmarshalEmptyPacket(t *testing.T) ***REMOVED***
+func TestUnmarshalEmptyPacket(t *testing.T) {
 	var b []byte
 	var m channelRequestSuccessMsg
-	if err := Unmarshal(b, &m); err == nil ***REMOVED***
+	if err := Unmarshal(b, &m); err == nil {
 		t.Fatalf("unmarshal of empty slice succeeded")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestUnmarshalUnexpectedPacket(t *testing.T) ***REMOVED***
-	type S struct ***REMOVED***
+func TestUnmarshalUnexpectedPacket(t *testing.T) {
+	type S struct {
 		I uint32 `sshtype:"43"`
 		S string
 		B bool
-	***REMOVED***
+	}
 
-	s := S***REMOVED***11, "hello", true***REMOVED***
+	s := S{11, "hello", true}
 	packet := Marshal(s)
 	packet[0] = 42
-	roundtrip := S***REMOVED******REMOVED***
+	roundtrip := S{}
 	err := Unmarshal(packet, &roundtrip)
-	if err == nil ***REMOVED***
+	if err == nil {
 		t.Fatal("expected error, not nil")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestMarshalPtr(t *testing.T) ***REMOVED***
-	s := struct ***REMOVED***
+func TestMarshalPtr(t *testing.T) {
+	s := struct {
 		S string
-	***REMOVED******REMOVED***"hello"***REMOVED***
+	}{"hello"}
 
 	m1 := Marshal(s)
 	m2 := Marshal(&s)
-	if !bytes.Equal(m1, m2) ***REMOVED***
+	if !bytes.Equal(m1, m2) {
 		t.Errorf("got %q, want %q for marshaled pointer", m2, m1)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestBareMarshalUnmarshal(t *testing.T) ***REMOVED***
-	type S struct ***REMOVED***
+func TestBareMarshalUnmarshal(t *testing.T) {
+	type S struct {
 		I uint32
 		S string
 		B bool
-	***REMOVED***
+	}
 
-	s := S***REMOVED***42, "hello", true***REMOVED***
+	s := S{42, "hello", true}
 	packet := Marshal(s)
-	roundtrip := S***REMOVED******REMOVED***
+	roundtrip := S{}
 	Unmarshal(packet, &roundtrip)
 
-	if !reflect.DeepEqual(s, roundtrip) ***REMOVED***
+	if !reflect.DeepEqual(s, roundtrip) {
 		t.Errorf("got %#v, want %#v", roundtrip, s)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestBareMarshal(t *testing.T) ***REMOVED***
-	type S2 struct ***REMOVED***
+func TestBareMarshal(t *testing.T) {
+	type S2 struct {
 		I uint32
-	***REMOVED***
-	s := S2***REMOVED***42***REMOVED***
+	}
+	s := S2{42}
 	packet := Marshal(s)
 	i, rest, ok := parseUint32(packet)
-	if len(rest) > 0 || !ok ***REMOVED***
+	if len(rest) > 0 || !ok {
 		t.Errorf("parseInt(%q): parse error", packet)
-	***REMOVED***
-	if i != s.I ***REMOVED***
+	}
+	if i != s.I {
 		t.Errorf("got %d, want %d", i, s.I)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestUnmarshalShortKexInitPacket(t *testing.T) ***REMOVED***
+func TestUnmarshalShortKexInitPacket(t *testing.T) {
 	// This used to panic.
 	// Issue 11348
-	packet := []byte***REMOVED***0x14, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0xff, 0xff, 0xff, 0xff***REMOVED***
-	kim := &kexInitMsg***REMOVED******REMOVED***
-	if err := Unmarshal(packet, kim); err == nil ***REMOVED***
+	packet := []byte{0x14, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0xff, 0xff, 0xff, 0xff}
+	kim := &kexInitMsg{}
+	if err := Unmarshal(packet, kim); err == nil {
 		t.Error("truncated packet unmarshaled without error")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestMarshalMultiTag(t *testing.T) ***REMOVED***
-	var res struct ***REMOVED***
+func TestMarshalMultiTag(t *testing.T) {
+	var res struct {
 		A uint32 `sshtype:"1|2"`
-	***REMOVED***
+	}
 
-	good1 := struct ***REMOVED***
+	good1 := struct {
 		A uint32 `sshtype:"1"`
-	***REMOVED******REMOVED***
+	}{
 		1,
-	***REMOVED***
-	good2 := struct ***REMOVED***
+	}
+	good2 := struct {
 		A uint32 `sshtype:"2"`
-	***REMOVED******REMOVED***
+	}{
 		1,
-	***REMOVED***
+	}
 
-	if e := Unmarshal(Marshal(good1), &res); e != nil ***REMOVED***
+	if e := Unmarshal(Marshal(good1), &res); e != nil {
 		t.Errorf("error unmarshaling multipart tag: %v", e)
-	***REMOVED***
+	}
 
-	if e := Unmarshal(Marshal(good2), &res); e != nil ***REMOVED***
+	if e := Unmarshal(Marshal(good2), &res); e != nil {
 		t.Errorf("error unmarshaling multipart tag: %v", e)
-	***REMOVED***
+	}
 
-	bad1 := struct ***REMOVED***
+	bad1 := struct {
 		A uint32 `sshtype:"3"`
-	***REMOVED******REMOVED***
+	}{
 		1,
-	***REMOVED***
-	if e := Unmarshal(Marshal(bad1), &res); e == nil ***REMOVED***
+	}
+	if e := Unmarshal(Marshal(bad1), &res); e == nil {
 		t.Errorf("bad struct unmarshaled without error")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func randomBytes(out []byte, rand *rand.Rand) ***REMOVED***
-	for i := 0; i < len(out); i++ ***REMOVED***
+func randomBytes(out []byte, rand *rand.Rand) {
+	for i := 0; i < len(out); i++ {
 		out[i] = byte(rand.Int31())
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func randomNameList(rand *rand.Rand) []string ***REMOVED***
+func randomNameList(rand *rand.Rand) []string {
 	ret := make([]string, rand.Int31()&15)
-	for i := range ret ***REMOVED***
+	for i := range ret {
 		s := make([]byte, 1+(rand.Int31()&15))
-		for j := range s ***REMOVED***
+		for j := range s {
 			s[j] = 'a' + uint8(rand.Int31()&15)
-		***REMOVED***
+		}
 		ret[i] = string(s)
-	***REMOVED***
+	}
 	return ret
-***REMOVED***
+}
 
-func randomInt(rand *rand.Rand) *big.Int ***REMOVED***
+func randomInt(rand *rand.Rand) *big.Int {
 	return new(big.Int).SetInt64(int64(int32(rand.Uint32())))
-***REMOVED***
+}
 
-func (*kexInitMsg) Generate(rand *rand.Rand, size int) reflect.Value ***REMOVED***
-	ki := &kexInitMsg***REMOVED******REMOVED***
+func (*kexInitMsg) Generate(rand *rand.Rand, size int) reflect.Value {
+	ki := &kexInitMsg{}
 	randomBytes(ki.Cookie[:], rand)
 	ki.KexAlgos = randomNameList(rand)
 	ki.ServerHostKeyAlgos = randomNameList(rand)
@@ -241,17 +241,17 @@ func (*kexInitMsg) Generate(rand *rand.Rand, size int) reflect.Value ***REMOVED*
 	ki.CompressionServerClient = randomNameList(rand)
 	ki.LanguagesClientServer = randomNameList(rand)
 	ki.LanguagesServerClient = randomNameList(rand)
-	if rand.Int31()&1 == 1 ***REMOVED***
+	if rand.Int31()&1 == 1 {
 		ki.FirstKexFollows = true
-	***REMOVED***
+	}
 	return reflect.ValueOf(ki)
-***REMOVED***
+}
 
-func (*kexDHInitMsg) Generate(rand *rand.Rand, size int) reflect.Value ***REMOVED***
-	dhi := &kexDHInitMsg***REMOVED******REMOVED***
+func (*kexDHInitMsg) Generate(rand *rand.Rand, size int) reflect.Value {
+	dhi := &kexDHInitMsg{}
 	dhi.X = randomInt(rand)
 	return reflect.ValueOf(dhi)
-***REMOVED***
+}
 
 var (
 	_kexInitMsg   = new(kexInitMsg).Generate(rand.New(rand.NewSource(0)), 10).Elem().Interface()
@@ -261,28 +261,28 @@ var (
 	_kexDHInit = Marshal(_kexDHInitMsg)
 )
 
-func BenchmarkMarshalKexInitMsg(b *testing.B) ***REMOVED***
-	for i := 0; i < b.N; i++ ***REMOVED***
+func BenchmarkMarshalKexInitMsg(b *testing.B) {
+	for i := 0; i < b.N; i++ {
 		Marshal(_kexInitMsg)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func BenchmarkUnmarshalKexInitMsg(b *testing.B) ***REMOVED***
+func BenchmarkUnmarshalKexInitMsg(b *testing.B) {
 	m := new(kexInitMsg)
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		Unmarshal(_kexInit, m)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func BenchmarkMarshalKexDHInitMsg(b *testing.B) ***REMOVED***
-	for i := 0; i < b.N; i++ ***REMOVED***
+func BenchmarkMarshalKexDHInitMsg(b *testing.B) {
+	for i := 0; i < b.N; i++ {
 		Marshal(_kexDHInitMsg)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func BenchmarkUnmarshalKexDHInitMsg(b *testing.B) ***REMOVED***
+func BenchmarkUnmarshalKexDHInitMsg(b *testing.B) {
 	m := new(kexDHInitMsg)
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		Unmarshal(_kexDHInit, m)
-	***REMOVED***
-***REMOVED***
+	}
+}

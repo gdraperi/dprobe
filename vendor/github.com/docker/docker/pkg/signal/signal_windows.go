@@ -20,7 +20,7 @@ const (
 //
 // We have these so that docker kill can be used to gracefully (TERM) and
 // forcibly (KILL) terminate a container on Windows.
-var SignalMap = map[string]syscall.Signal***REMOVED***
+var SignalMap = map[string]syscall.Signal{
 	"KILL": syscall.SIGKILL,
 	"TERM": syscall.SIGTERM,
-***REMOVED***
+}

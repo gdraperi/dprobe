@@ -8,14 +8,14 @@ import (
 )
 
 // NoArgs validates args and returns an error if there are any args
-func NoArgs(cmd *cobra.Command, args []string) error ***REMOVED***
-	if len(args) == 0 ***REMOVED***
+func NoArgs(cmd *cobra.Command, args []string) error {
+	if len(args) == 0 {
 		return nil
-	***REMOVED***
+	}
 
-	if cmd.HasSubCommands() ***REMOVED***
+	if cmd.HasSubCommands() {
 		return errors.Errorf("\n" + strings.TrimRight(cmd.UsageString(), "\n"))
-	***REMOVED***
+	}
 
 	return errors.Errorf(
 		"\"%s\" accepts no argument(s).\nSee '%s --help'.\n\nUsage:  %s\n\n%s",
@@ -24,4 +24,4 @@ func NoArgs(cmd *cobra.Command, args []string) error ***REMOVED***
 		cmd.UseLine(),
 		cmd.Short,
 	)
-***REMOVED***
+}

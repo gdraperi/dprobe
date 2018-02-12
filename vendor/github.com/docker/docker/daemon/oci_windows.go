@@ -23,18 +23,18 @@ const (
 	credentialSpecFileLocation     = "CredentialSpecs"
 )
 
-func (daemon *Daemon) createSpec(c *container.Container) (*specs.Spec, error) ***REMOVED***
+func (daemon *Daemon) createSpec(c *container.Container) (*specs.Spec, error) {
 	img, err := daemon.GetImage(string(c.ImageID))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	s := oci.DefaultOSSpec(img.OS)
 
 	linkedEnv, err := daemon.setupLinkedContainers(c)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// Note, unlike Unix, we do NOT call into SetupWorkingDirectory as
 	// this is done in VMCompute. Further, we couldn't do it for Hyper-V
@@ -43,32 +43,32 @@ func (daemon *Daemon) createSpec(c *container.Container) (*specs.Spec, error) **
 	// In base spec
 	s.Hostname = c.FullHostname()
 
-	if err := daemon.setupSecretDir(c); err != nil ***REMOVED***
+	if err := daemon.setupSecretDir(c); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	if err := daemon.setupConfigDir(c); err != nil ***REMOVED***
+	if err := daemon.setupConfigDir(c); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// In s.Mounts
 	mounts, err := daemon.setupMounts(c)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	var isHyperV bool
-	if c.HostConfig.Isolation.IsDefault() ***REMOVED***
+	if c.HostConfig.Isolation.IsDefault() {
 		// Container using default isolation, so take the default from the daemon configuration
 		isHyperV = daemon.defaultIsolation.IsHyperV()
-	***REMOVED*** else ***REMOVED***
+	} else {
 		// Container may be requesting an explicit isolation mode.
 		isHyperV = c.HostConfig.Isolation.IsHyperV()
-	***REMOVED***
+	}
 
-	if isHyperV ***REMOVED***
-		s.Windows.HyperV = &specs.WindowsHyperV***REMOVED******REMOVED***
-	***REMOVED***
+	if isHyperV {
+		s.Windows.HyperV = &specs.WindowsHyperV{}
+	}
 
 	// If the container has not been started, and has configs or secrets
 	// secrets, create symlinks to each config and secret. If it has been
@@ -76,90 +76,90 @@ func (daemon *Daemon) createSpec(c *container.Container) (*specs.Spec, error) **
 	// is important to not mount a Hyper-V  container that has been started
 	// before, to protect the host from the container; for example, from
 	// malicious mutation of NTFS data structures.
-	if !c.HasBeenStartedBefore && (len(c.SecretReferences) > 0 || len(c.ConfigReferences) > 0) ***REMOVED***
+	if !c.HasBeenStartedBefore && (len(c.SecretReferences) > 0 || len(c.ConfigReferences) > 0) {
 		// The container file system is mounted before this function is called,
 		// except for Hyper-V containers, so mount it here in that case.
-		if isHyperV ***REMOVED***
-			if err := daemon.Mount(c); err != nil ***REMOVED***
+		if isHyperV {
+			if err := daemon.Mount(c); err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			defer daemon.Unmount(c)
-		***REMOVED***
-		if err := c.CreateSecretSymlinks(); err != nil ***REMOVED***
+		}
+		if err := c.CreateSecretSymlinks(); err != nil {
 			return nil, err
-		***REMOVED***
-		if err := c.CreateConfigSymlinks(); err != nil ***REMOVED***
+		}
+		if err := c.CreateConfigSymlinks(); err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	secretMounts, err := c.SecretMounts()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if secretMounts != nil ***REMOVED***
+	}
+	if secretMounts != nil {
 		mounts = append(mounts, secretMounts...)
-	***REMOVED***
+	}
 
 	configMounts, err := c.ConfigMounts()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if configMounts != nil ***REMOVED***
+	}
+	if configMounts != nil {
 		mounts = append(mounts, configMounts...)
-	***REMOVED***
+	}
 
-	for _, mount := range mounts ***REMOVED***
-		m := specs.Mount***REMOVED***
+	for _, mount := range mounts {
+		m := specs.Mount{
 			Source:      mount.Source,
 			Destination: mount.Destination,
-		***REMOVED***
-		if !mount.Writable ***REMOVED***
+		}
+		if !mount.Writable {
 			m.Options = append(m.Options, "ro")
-		***REMOVED***
-		if img.OS != runtime.GOOS ***REMOVED***
+		}
+		if img.OS != runtime.GOOS {
 			m.Type = "bind"
 			m.Options = append(m.Options, "rbind")
 			m.Options = append(m.Options, fmt.Sprintf("uvmpath=/tmp/gcs/%s/binds", c.ID))
-		***REMOVED***
+		}
 		s.Mounts = append(s.Mounts, m)
-	***REMOVED***
+	}
 
 	// In s.Process
-	s.Process.Args = append([]string***REMOVED***c.Path***REMOVED***, c.Args...)
-	if !c.Config.ArgsEscaped && img.OS == "windows" ***REMOVED***
+	s.Process.Args = append([]string{c.Path}, c.Args...)
+	if !c.Config.ArgsEscaped && img.OS == "windows" {
 		s.Process.Args = escapeArgs(s.Process.Args)
-	***REMOVED***
+	}
 
 	s.Process.Cwd = c.Config.WorkingDir
 	s.Process.Env = c.CreateDaemonEnvironment(c.Config.Tty, linkedEnv)
-	if c.Config.Tty ***REMOVED***
+	if c.Config.Tty {
 		s.Process.Terminal = c.Config.Tty
-		s.Process.ConsoleSize = &specs.Box***REMOVED***
+		s.Process.ConsoleSize = &specs.Box{
 			Height: c.HostConfig.ConsoleSize[0],
 			Width:  c.HostConfig.ConsoleSize[1],
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	s.Process.User.Username = c.Config.User
 
 	// Get the layer path for each layer.
 	max := len(img.RootFS.DiffIDs)
-	for i := 1; i <= max; i++ ***REMOVED***
+	for i := 1; i <= max; i++ {
 		img.RootFS.DiffIDs = img.RootFS.DiffIDs[:i]
-		if !system.IsOSSupported(img.OperatingSystem()) ***REMOVED***
+		if !system.IsOSSupported(img.OperatingSystem()) {
 			return nil, fmt.Errorf("cannot get layerpath for ImageID %s: %s ", img.RootFS.ChainID(), system.ErrNotSupportedOperatingSystem)
-		***REMOVED***
+		}
 		layerPath, err := layer.GetLayerPath(daemon.layerStores[img.OperatingSystem()], img.RootFS.ChainID())
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, fmt.Errorf("failed to get layer path from graphdriver %s for ImageID %s - %s", daemon.layerStores[img.OperatingSystem()], img.RootFS.ChainID(), err)
-		***REMOVED***
+		}
 		// Reverse order, expecting parent most first
-		s.Windows.LayerFolders = append([]string***REMOVED***layerPath***REMOVED***, s.Windows.LayerFolders...)
-	***REMOVED***
+		s.Windows.LayerFolders = append([]string{layerPath}, s.Windows.LayerFolders...)
+	}
 	m, err := c.RWLayer.Metadata()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("failed to get layer metadata - %s", err)
-	***REMOVED***
+	}
 	s.Windows.LayerFolders = append(s.Windows.LayerFolders, m["dir"])
 
 	dnsSearch := daemon.getDNSSearchSettings(c)
@@ -168,79 +168,79 @@ func (daemon *Daemon) createSpec(c *container.Container) (*specs.Spec, error) **
 	var epList []string
 	AllowUnqualifiedDNSQuery := false
 	gwHNSID := ""
-	if c.NetworkSettings != nil ***REMOVED***
-		for n := range c.NetworkSettings.Networks ***REMOVED***
+	if c.NetworkSettings != nil {
+		for n := range c.NetworkSettings.Networks {
 			sn, err := daemon.FindNetwork(n)
-			if err != nil ***REMOVED***
+			if err != nil {
 				continue
-			***REMOVED***
+			}
 
 			ep, err := c.GetEndpointInNetwork(sn)
-			if err != nil ***REMOVED***
+			if err != nil {
 				continue
-			***REMOVED***
+			}
 
 			data, err := ep.DriverInfo()
-			if err != nil ***REMOVED***
+			if err != nil {
 				continue
-			***REMOVED***
+			}
 
-			if data["GW_INFO"] != nil ***REMOVED***
-				gwInfo := data["GW_INFO"].(map[string]interface***REMOVED******REMOVED***)
-				if gwInfo["hnsid"] != nil ***REMOVED***
+			if data["GW_INFO"] != nil {
+				gwInfo := data["GW_INFO"].(map[string]interface{})
+				if gwInfo["hnsid"] != nil {
 					gwHNSID = gwInfo["hnsid"].(string)
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 
-			if data["hnsid"] != nil ***REMOVED***
+			if data["hnsid"] != nil {
 				epList = append(epList, data["hnsid"].(string))
-			***REMOVED***
+			}
 
-			if data["AllowUnqualifiedDNSQuery"] != nil ***REMOVED***
+			if data["AllowUnqualifiedDNSQuery"] != nil {
 				AllowUnqualifiedDNSQuery = true
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	var networkSharedContainerID string
-	if c.HostConfig.NetworkMode.IsContainer() ***REMOVED***
+	if c.HostConfig.NetworkMode.IsContainer() {
 		networkSharedContainerID = c.NetworkSharedContainerID
-		for _, ep := range c.SharedEndpointList ***REMOVED***
+		for _, ep := range c.SharedEndpointList {
 			epList = append(epList, ep)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if gwHNSID != "" ***REMOVED***
+	if gwHNSID != "" {
 		epList = append(epList, gwHNSID)
-	***REMOVED***
+	}
 
-	s.Windows.Network = &specs.WindowsNetwork***REMOVED***
+	s.Windows.Network = &specs.WindowsNetwork{
 		AllowUnqualifiedDNSQuery:   AllowUnqualifiedDNSQuery,
 		DNSSearchList:              dnsSearch,
 		EndpointList:               epList,
 		NetworkSharedContainerName: networkSharedContainerID,
-	***REMOVED***
+	}
 
-	switch img.OS ***REMOVED***
+	switch img.OS {
 	case "windows":
-		if err := daemon.createSpecWindowsFields(c, &s, isHyperV); err != nil ***REMOVED***
+		if err := daemon.createSpecWindowsFields(c, &s, isHyperV); err != nil {
 			return nil, err
-		***REMOVED***
+		}
 	case "linux":
-		if !system.LCOWSupported() ***REMOVED***
+		if !system.LCOWSupported() {
 			return nil, fmt.Errorf("Linux containers on Windows are not supported")
-		***REMOVED***
+		}
 		daemon.createSpecLinuxFields(c, &s)
 	default:
 		return nil, fmt.Errorf("Unsupported platform %q", img.OS)
-	***REMOVED***
+	}
 
 	return (*specs.Spec)(&s), nil
-***REMOVED***
+}
 
 // Sets the Windows-specific fields of the OCI spec
-func (daemon *Daemon) createSpecWindowsFields(c *container.Container, s *specs.Spec, isHyperV bool) error ***REMOVED***
-	if len(s.Process.Cwd) == 0 ***REMOVED***
+func (daemon *Daemon) createSpecWindowsFields(c *container.Container, s *specs.Spec, isHyperV bool) error {
+	if len(s.Process.Cwd) == 0 {
 		// We default to C:\ to workaround the oddity of the case that the
 		// default directory for cmd running as LocalSystem (or
 		// ContainerAdministrator) is c:\windows\system32. Hence docker run
@@ -249,15 +249,15 @@ func (daemon *Daemon) createSpecWindowsFields(c *container.Container, s *specs.S
 		// which has no WORKDIR and has a COPY file ., . will be interpreted
 		// as c:\. Hence, setting it to default of c:\ makes for consistency.
 		s.Process.Cwd = `C:\`
-	***REMOVED***
+	}
 
 	s.Root.Readonly = false // Windows does not support a read-only root filesystem
-	if !isHyperV ***REMOVED***
+	if !isHyperV {
 		s.Root.Path = c.BaseFS.Path() // This is not set for Hyper-V containers
-		if !strings.HasSuffix(s.Root.Path, `\`) ***REMOVED***
-			s.Root.Path = s.Root.Path + `\` // Ensure a correctly formatted volume GUID path \\?\Volume***REMOVED***GUID***REMOVED***\
-		***REMOVED***
-	***REMOVED***
+		if !strings.HasSuffix(s.Root.Path, `\`) {
+			s.Root.Path = s.Root.Path + `\` // Ensure a correctly formatted volume GUID path \\?\Volume{GUID}\
+		}
+	}
 
 	// First boot optimization
 	s.Windows.IgnoreFlushesDuringBoot = !c.HasBeenStartedBefore
@@ -266,161 +266,161 @@ func (daemon *Daemon) createSpecWindowsFields(c *container.Container, s *specs.S
 	cpuShares := uint16(c.HostConfig.CPUShares)
 	cpuMaximum := uint16(c.HostConfig.CPUPercent) * 100
 	cpuCount := uint64(c.HostConfig.CPUCount)
-	if c.HostConfig.NanoCPUs > 0 ***REMOVED***
-		if isHyperV ***REMOVED***
+	if c.HostConfig.NanoCPUs > 0 {
+		if isHyperV {
 			cpuCount = uint64(c.HostConfig.NanoCPUs / 1e9)
 			leftoverNanoCPUs := c.HostConfig.NanoCPUs % 1e9
-			if leftoverNanoCPUs != 0 ***REMOVED***
+			if leftoverNanoCPUs != 0 {
 				cpuCount++
 				cpuMaximum = uint16(c.HostConfig.NanoCPUs / int64(cpuCount) / (1e9 / 10000))
-				if cpuMaximum < 1 ***REMOVED***
+				if cpuMaximum < 1 {
 					// The requested NanoCPUs is so small that we rounded to 0, use 1 instead
 					cpuMaximum = 1
-				***REMOVED***
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
+				}
+			}
+		} else {
 			cpuMaximum = uint16(c.HostConfig.NanoCPUs / int64(sysinfo.NumCPU()) / (1e9 / 10000))
-			if cpuMaximum < 1 ***REMOVED***
+			if cpuMaximum < 1 {
 				// The requested NanoCPUs is so small that we rounded to 0, use 1 instead
 				cpuMaximum = 1
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	memoryLimit := uint64(c.HostConfig.Memory)
-	s.Windows.Resources = &specs.WindowsResources***REMOVED***
-		CPU: &specs.WindowsCPUResources***REMOVED***
+	s.Windows.Resources = &specs.WindowsResources{
+		CPU: &specs.WindowsCPUResources{
 			Maximum: &cpuMaximum,
 			Shares:  &cpuShares,
 			Count:   &cpuCount,
-		***REMOVED***,
-		Memory: &specs.WindowsMemoryResources***REMOVED***
+		},
+		Memory: &specs.WindowsMemoryResources{
 			Limit: &memoryLimit,
-		***REMOVED***,
-		Storage: &specs.WindowsStorageResources***REMOVED***
+		},
+		Storage: &specs.WindowsStorageResources{
 			Bps:  &c.HostConfig.IOMaximumBandwidth,
 			Iops: &c.HostConfig.IOMaximumIOps,
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
 	// Read and add credentials from the security options if a credential spec has been provided.
-	if c.HostConfig.SecurityOpt != nil ***REMOVED***
+	if c.HostConfig.SecurityOpt != nil {
 		cs := ""
-		for _, sOpt := range c.HostConfig.SecurityOpt ***REMOVED***
+		for _, sOpt := range c.HostConfig.SecurityOpt {
 			sOpt = strings.ToLower(sOpt)
-			if !strings.Contains(sOpt, "=") ***REMOVED***
+			if !strings.Contains(sOpt, "=") {
 				return fmt.Errorf("invalid security option: no equals sign in supplied value %s", sOpt)
-			***REMOVED***
+			}
 			var splitsOpt []string
 			splitsOpt = strings.SplitN(sOpt, "=", 2)
-			if len(splitsOpt) != 2 ***REMOVED***
+			if len(splitsOpt) != 2 {
 				return fmt.Errorf("invalid security option: %s", sOpt)
-			***REMOVED***
-			if splitsOpt[0] != "credentialspec" ***REMOVED***
+			}
+			if splitsOpt[0] != "credentialspec" {
 				return fmt.Errorf("security option not supported: %s", splitsOpt[0])
-			***REMOVED***
+			}
 
 			var (
 				match   bool
 				csValue string
 				err     error
 			)
-			if match, csValue = getCredentialSpec("file://", splitsOpt[1]); match ***REMOVED***
-				if csValue == "" ***REMOVED***
+			if match, csValue = getCredentialSpec("file://", splitsOpt[1]); match {
+				if csValue == "" {
 					return fmt.Errorf("no value supplied for file:// credential spec security option")
-				***REMOVED***
-				if cs, err = readCredentialSpecFile(c.ID, daemon.root, filepath.Clean(csValue)); err != nil ***REMOVED***
+				}
+				if cs, err = readCredentialSpecFile(c.ID, daemon.root, filepath.Clean(csValue)); err != nil {
 					return err
-				***REMOVED***
-			***REMOVED*** else if match, csValue = getCredentialSpec("registry://", splitsOpt[1]); match ***REMOVED***
-				if csValue == "" ***REMOVED***
+				}
+			} else if match, csValue = getCredentialSpec("registry://", splitsOpt[1]); match {
+				if csValue == "" {
 					return fmt.Errorf("no value supplied for registry:// credential spec security option")
-				***REMOVED***
-				if cs, err = readCredentialSpecRegistry(c.ID, csValue); err != nil ***REMOVED***
+				}
+				if cs, err = readCredentialSpecRegistry(c.ID, csValue); err != nil {
 					return err
-				***REMOVED***
-			***REMOVED*** else ***REMOVED***
+				}
+			} else {
 				return fmt.Errorf("invalid credential spec security option - value must be prefixed file:// or registry:// followed by a value")
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		s.Windows.CredentialSpec = cs
-	***REMOVED***
+	}
 
 	// Assume we are not starting a container for a servicing operation
 	s.Windows.Servicing = false
 
 	return nil
-***REMOVED***
+}
 
 // Sets the Linux-specific fields of the OCI spec
 // TODO: @jhowardmsft LCOW Support. We need to do a lot more pulling in what can
 // be pulled in from oci_linux.go.
-func (daemon *Daemon) createSpecLinuxFields(c *container.Container, s *specs.Spec) ***REMOVED***
-	if len(s.Process.Cwd) == 0 ***REMOVED***
+func (daemon *Daemon) createSpecLinuxFields(c *container.Container, s *specs.Spec) {
+	if len(s.Process.Cwd) == 0 {
 		s.Process.Cwd = `/`
-	***REMOVED***
+	}
 	s.Root.Path = "rootfs"
 	s.Root.Readonly = c.HostConfig.ReadonlyRootfs
-***REMOVED***
+}
 
-func escapeArgs(args []string) []string ***REMOVED***
+func escapeArgs(args []string) []string {
 	escapedArgs := make([]string, len(args))
-	for i, a := range args ***REMOVED***
+	for i, a := range args {
 		escapedArgs[i] = windows.EscapeArg(a)
-	***REMOVED***
+	}
 	return escapedArgs
-***REMOVED***
+}
 
 // mergeUlimits merge the Ulimits from HostConfig with daemon defaults, and update HostConfig
 // It will do nothing on non-Linux platform
-func (daemon *Daemon) mergeUlimits(c *containertypes.HostConfig) ***REMOVED***
+func (daemon *Daemon) mergeUlimits(c *containertypes.HostConfig) {
 	return
-***REMOVED***
+}
 
 // getCredentialSpec is a helper function to get the value of a credential spec supplied
 // on the CLI, stripping the prefix
-func getCredentialSpec(prefix, value string) (bool, string) ***REMOVED***
-	if strings.HasPrefix(value, prefix) ***REMOVED***
+func getCredentialSpec(prefix, value string) (bool, string) {
+	if strings.HasPrefix(value, prefix) {
 		return true, strings.TrimPrefix(value, prefix)
-	***REMOVED***
+	}
 	return false, ""
-***REMOVED***
+}
 
 // readCredentialSpecRegistry is a helper function to read a credential spec from
 // the registry. If not found, we return an empty string and warn in the log.
 // This allows for staging on machines which do not have the necessary components.
-func readCredentialSpecRegistry(id, name string) (string, error) ***REMOVED***
+func readCredentialSpecRegistry(id, name string) (string, error) {
 	var (
 		k   registry.Key
 		err error
 		val string
 	)
-	if k, err = registry.OpenKey(registry.LOCAL_MACHINE, credentialSpecRegistryLocation, registry.QUERY_VALUE); err != nil ***REMOVED***
+	if k, err = registry.OpenKey(registry.LOCAL_MACHINE, credentialSpecRegistryLocation, registry.QUERY_VALUE); err != nil {
 		return "", fmt.Errorf("failed handling spec %q for container %s - %s could not be opened", name, id, credentialSpecRegistryLocation)
-	***REMOVED***
-	if val, _, err = k.GetStringValue(name); err != nil ***REMOVED***
-		if err == registry.ErrNotExist ***REMOVED***
+	}
+	if val, _, err = k.GetStringValue(name); err != nil {
+		if err == registry.ErrNotExist {
 			return "", fmt.Errorf("credential spec %q for container %s as it was not found", name, id)
-		***REMOVED***
+		}
 		return "", fmt.Errorf("error %v reading credential spec %q from registry for container %s", err, name, id)
-	***REMOVED***
+	}
 	return val, nil
-***REMOVED***
+}
 
 // readCredentialSpecFile is a helper function to read a credential spec from
 // a file. If not found, we return an empty string and warn in the log.
 // This allows for staging on machines which do not have the necessary components.
-func readCredentialSpecFile(id, root, location string) (string, error) ***REMOVED***
-	if filepath.IsAbs(location) ***REMOVED***
+func readCredentialSpecFile(id, root, location string) (string, error) {
+	if filepath.IsAbs(location) {
 		return "", fmt.Errorf("invalid credential spec - file:// path cannot be absolute")
-	***REMOVED***
+	}
 	base := filepath.Join(root, credentialSpecFileLocation)
 	full := filepath.Join(base, location)
-	if !strings.HasPrefix(full, base) ***REMOVED***
+	if !strings.HasPrefix(full, base) {
 		return "", fmt.Errorf("invalid credential spec - file:// path must be under %s", base)
-	***REMOVED***
+	}
 	bcontents, err := ioutil.ReadFile(full)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", fmt.Errorf("credential spec '%s' for container %s as the file could not be read: %q", full, id, err)
-	***REMOVED***
+	}
 	return string(bcontents[:]), nil
-***REMOVED***
+}

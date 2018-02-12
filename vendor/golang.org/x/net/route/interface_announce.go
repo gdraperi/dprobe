@@ -6,27 +6,27 @@
 
 package route
 
-func (w *wireFormat) parseInterfaceAnnounceMessage(_ RIBType, b []byte) (Message, error) ***REMOVED***
-	if len(b) < w.bodyOff ***REMOVED***
+func (w *wireFormat) parseInterfaceAnnounceMessage(_ RIBType, b []byte) (Message, error) {
+	if len(b) < w.bodyOff {
 		return nil, errMessageTooShort
-	***REMOVED***
+	}
 	l := int(nativeEndian.Uint16(b[:2]))
-	if len(b) < l ***REMOVED***
+	if len(b) < l {
 		return nil, errInvalidMessage
-	***REMOVED***
-	m := &InterfaceAnnounceMessage***REMOVED***
+	}
+	m := &InterfaceAnnounceMessage{
 		Version: int(b[2]),
 		Type:    int(b[3]),
 		Index:   int(nativeEndian.Uint16(b[4:6])),
 		What:    int(nativeEndian.Uint16(b[22:24])),
 		raw:     b[:l],
-	***REMOVED***
-	for i := 0; i < 16; i++ ***REMOVED***
-		if b[6+i] != 0 ***REMOVED***
+	}
+	for i := 0; i < 16; i++ {
+		if b[6+i] != 0 {
 			continue
-		***REMOVED***
+		}
 		m.Name = string(b[6 : 6+i])
 		break
-	***REMOVED***
+	}
 	return m, nil
-***REMOVED***
+}

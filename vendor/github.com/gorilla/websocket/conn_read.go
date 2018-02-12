@@ -8,11 +8,11 @@ package websocket
 
 import "io"
 
-func (c *Conn) read(n int) ([]byte, error) ***REMOVED***
+func (c *Conn) read(n int) ([]byte, error) {
 	p, err := c.br.Peek(n)
-	if err == io.EOF ***REMOVED***
+	if err == io.EOF {
 		err = errUnexpectedEOF
-	***REMOVED***
+	}
 	c.br.Discard(len(p))
 	return p, err
-***REMOVED***
+}

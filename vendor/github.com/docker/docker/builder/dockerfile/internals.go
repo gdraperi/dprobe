@@ -30,143 +30,143 @@ import (
 
 // Archiver defines an interface for copying files from one destination to
 // another using Tar/Untar.
-type Archiver interface ***REMOVED***
+type Archiver interface {
 	TarUntar(src, dst string) error
 	UntarPath(src, dst string) error
 	CopyWithTar(src, dst string) error
 	CopyFileWithTar(src, dst string) error
 	IDMappings() *idtools.IDMappings
-***REMOVED***
+}
 
 // The builder will use the following interfaces if the container fs implements
 // these for optimized copies to and from the container.
-type extractor interface ***REMOVED***
+type extractor interface {
 	ExtractArchive(src io.Reader, dst string, opts *archive.TarOptions) error
-***REMOVED***
+}
 
-type archiver interface ***REMOVED***
+type archiver interface {
 	ArchivePath(src string, opts *archive.TarOptions) (io.ReadCloser, error)
-***REMOVED***
+}
 
 // helper functions to get tar/untar func
-func untarFunc(i interface***REMOVED******REMOVED***) containerfs.UntarFunc ***REMOVED***
-	if ea, ok := i.(extractor); ok ***REMOVED***
+func untarFunc(i interface{}) containerfs.UntarFunc {
+	if ea, ok := i.(extractor); ok {
 		return ea.ExtractArchive
-	***REMOVED***
+	}
 	return chrootarchive.Untar
-***REMOVED***
+}
 
-func tarFunc(i interface***REMOVED******REMOVED***) containerfs.TarFunc ***REMOVED***
-	if ap, ok := i.(archiver); ok ***REMOVED***
+func tarFunc(i interface{}) containerfs.TarFunc {
+	if ap, ok := i.(archiver); ok {
 		return ap.ArchivePath
-	***REMOVED***
+	}
 	return archive.TarWithOptions
-***REMOVED***
+}
 
-func (b *Builder) getArchiver(src, dst containerfs.Driver) Archiver ***REMOVED***
+func (b *Builder) getArchiver(src, dst containerfs.Driver) Archiver {
 	t, u := tarFunc(src), untarFunc(dst)
-	return &containerfs.Archiver***REMOVED***
+	return &containerfs.Archiver{
 		SrcDriver:     src,
 		DstDriver:     dst,
 		Tar:           t,
 		Untar:         u,
 		IDMappingsVar: b.idMappings,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (b *Builder) commit(dispatchState *dispatchState, comment string) error ***REMOVED***
-	if b.disableCommit ***REMOVED***
+func (b *Builder) commit(dispatchState *dispatchState, comment string) error {
+	if b.disableCommit {
 		return nil
-	***REMOVED***
-	if !dispatchState.hasFromImage() ***REMOVED***
+	}
+	if !dispatchState.hasFromImage() {
 		return errors.New("Please provide a source image with `from` prior to commit")
-	***REMOVED***
+	}
 
 	optionsPlatform := system.ParsePlatform(b.options.Platform)
 	runConfigWithCommentCmd := copyRunConfig(dispatchState.runConfig, withCmdComment(comment, optionsPlatform.OS))
 	hit, err := b.probeCache(dispatchState, runConfigWithCommentCmd)
-	if err != nil || hit ***REMOVED***
+	if err != nil || hit {
 		return err
-	***REMOVED***
+	}
 	id, err := b.create(runConfigWithCommentCmd)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	return b.commitContainer(dispatchState, id, runConfigWithCommentCmd)
-***REMOVED***
+}
 
-func (b *Builder) commitContainer(dispatchState *dispatchState, id string, containerConfig *container.Config) error ***REMOVED***
-	if b.disableCommit ***REMOVED***
+func (b *Builder) commitContainer(dispatchState *dispatchState, id string, containerConfig *container.Config) error {
+	if b.disableCommit {
 		return nil
-	***REMOVED***
+	}
 
-	commitCfg := &backend.ContainerCommitConfig***REMOVED***
-		ContainerCommitConfig: types.ContainerCommitConfig***REMOVED***
+	commitCfg := &backend.ContainerCommitConfig{
+		ContainerCommitConfig: types.ContainerCommitConfig{
 			Author: dispatchState.maintainer,
 			Pause:  true,
 			// TODO: this should be done by Commit()
 			Config: copyRunConfig(dispatchState.runConfig),
-		***REMOVED***,
+		},
 		ContainerConfig: containerConfig,
-	***REMOVED***
+	}
 
 	// Commit the container
 	imageID, err := b.docker.Commit(id, commitCfg)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	dispatchState.imageID = imageID
 	return nil
-***REMOVED***
+}
 
-func (b *Builder) exportImage(state *dispatchState, imageMount *imageMount, runConfig *container.Config) error ***REMOVED***
+func (b *Builder) exportImage(state *dispatchState, imageMount *imageMount, runConfig *container.Config) error {
 	newLayer, err := imageMount.Layer().Commit()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	// add an image mount without an image so the layer is properly unmounted
 	// if there is an error before we can add the full mount with image
 	b.imageSources.Add(newImageMount(nil, newLayer))
 
 	parentImage, ok := imageMount.Image().(*image.Image)
-	if !ok ***REMOVED***
+	if !ok {
 		return errors.Errorf("unexpected image type")
-	***REMOVED***
+	}
 
-	newImage := image.NewChildImage(parentImage, image.ChildConfig***REMOVED***
+	newImage := image.NewChildImage(parentImage, image.ChildConfig{
 		Author:          state.maintainer,
 		ContainerConfig: runConfig,
 		DiffID:          newLayer.DiffID(),
 		Config:          copyRunConfig(state.runConfig),
-	***REMOVED***, parentImage.OS)
+	}, parentImage.OS)
 
 	// TODO: it seems strange to marshal this here instead of just passing in the
 	// image struct
 	config, err := newImage.MarshalJSON()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return errors.Wrap(err, "failed to encode image config")
-	***REMOVED***
+	}
 
 	exportedImage, err := b.docker.CreateImage(config, state.imageID)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return errors.Wrapf(err, "failed to export image")
-	***REMOVED***
+	}
 
 	state.imageID = exportedImage.ImageID()
 	b.imageSources.Add(newImageMount(exportedImage, newLayer))
 	return nil
-***REMOVED***
+}
 
-func (b *Builder) performCopy(state *dispatchState, inst copyInstruction) error ***REMOVED***
+func (b *Builder) performCopy(state *dispatchState, inst copyInstruction) error {
 	srcHash := getSourceHashFromInfos(inst.infos)
 
 	var chownComment string
-	if inst.chownStr != "" ***REMOVED***
+	if inst.chownStr != "" {
 		chownComment = fmt.Sprintf("--chown=%s", inst.chownStr)
-	***REMOVED***
+	}
 	commentStr := fmt.Sprintf("%s %s%s in %s ", inst.cmdName, chownComment, srcHash, inst.dest)
 
 	// TODO: should this have been using origPaths instead of srcHash in the comment?
@@ -175,76 +175,76 @@ func (b *Builder) performCopy(state *dispatchState, inst copyInstruction) error 
 		state.runConfig,
 		withCmdCommentString(commentStr, optionsPlatform.OS))
 	hit, err := b.probeCache(state, runConfigWithCommentCmd)
-	if err != nil || hit ***REMOVED***
+	if err != nil || hit {
 		return err
-	***REMOVED***
+	}
 
 	imageMount, err := b.imageSources.Get(state.imageID, true)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return errors.Wrapf(err, "failed to get destination image %q", state.imageID)
-	***REMOVED***
+	}
 
 	destInfo, err := createDestInfo(state.runConfig.WorkingDir, inst, imageMount, b.options.Platform)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	chownPair := b.idMappings.RootPair()
 	// if a chown was requested, perform the steps to get the uid, gid
 	// translated (if necessary because of user namespaces), and replace
 	// the root pair with the chown pair for copy operations
-	if inst.chownStr != "" ***REMOVED***
+	if inst.chownStr != "" {
 		chownPair, err = parseChownFlag(inst.chownStr, destInfo.root.Path(), b.idMappings)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return errors.Wrapf(err, "unable to convert uid/gid chown string to host mapping")
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	for _, info := range inst.infos ***REMOVED***
-		opts := copyFileOptions***REMOVED***
+	for _, info := range inst.infos {
+		opts := copyFileOptions{
 			decompress: inst.allowLocalDecompression,
 			archiver:   b.getArchiver(info.root, destInfo.root),
 			chownPair:  chownPair,
-		***REMOVED***
-		if err := performCopyForInfo(destInfo, info, opts); err != nil ***REMOVED***
+		}
+		if err := performCopyForInfo(destInfo, info, opts); err != nil {
 			return errors.Wrapf(err, "failed to copy files")
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return b.exportImage(state, imageMount, runConfigWithCommentCmd)
-***REMOVED***
+}
 
-func createDestInfo(workingDir string, inst copyInstruction, imageMount *imageMount, platform string) (copyInfo, error) ***REMOVED***
+func createDestInfo(workingDir string, inst copyInstruction, imageMount *imageMount, platform string) (copyInfo, error) {
 	// Twiddle the destination when it's a relative path - meaning, make it
 	// relative to the WORKINGDIR
 	dest, err := normalizeDest(workingDir, inst.dest, platform)
-	if err != nil ***REMOVED***
-		return copyInfo***REMOVED******REMOVED***, errors.Wrapf(err, "invalid %s", inst.cmdName)
-	***REMOVED***
+	if err != nil {
+		return copyInfo{}, errors.Wrapf(err, "invalid %s", inst.cmdName)
+	}
 
 	destMount, err := imageMount.Source()
-	if err != nil ***REMOVED***
-		return copyInfo***REMOVED******REMOVED***, errors.Wrapf(err, "failed to mount copy source")
-	***REMOVED***
+	if err != nil {
+		return copyInfo{}, errors.Wrapf(err, "failed to mount copy source")
+	}
 
 	return newCopyInfoFromSource(destMount, dest, ""), nil
-***REMOVED***
+}
 
 // normalizeDest normalises the destination of a COPY/ADD command in a
 // platform semantically consistent way.
-func normalizeDest(workingDir, requested string, platform string) (string, error) ***REMOVED***
+func normalizeDest(workingDir, requested string, platform string) (string, error) {
 	dest := fromSlash(requested, platform)
 	endsInSlash := strings.HasSuffix(dest, string(separator(platform)))
 
-	if platform != "windows" ***REMOVED***
-		if !path.IsAbs(requested) ***REMOVED***
+	if platform != "windows" {
+		if !path.IsAbs(requested) {
 			dest = path.Join("/", filepath.ToSlash(workingDir), dest)
 			// Make sure we preserve any trailing slash
-			if endsInSlash ***REMOVED***
+			if endsInSlash {
 				dest += "/"
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		return dest, nil
-	***REMOVED***
+	}
 
 	// We are guaranteed that the working directory is already consistent,
 	// However, Windows also has, for now, the limitation that ADD/COPY can
@@ -260,99 +260,99 @@ func normalizeDest(workingDir, requested string, platform string) (string, error
 
 	// Not a typo - filepath.IsAbs, not system.IsAbs on this next check as
 	// we only want to validate where the DriveColon part has been supplied.
-	if filepath.IsAbs(dest) ***REMOVED***
-		if strings.ToUpper(string(dest[0])) != "C" ***REMOVED***
+	if filepath.IsAbs(dest) {
+		if strings.ToUpper(string(dest[0])) != "C" {
 			return "", fmt.Errorf("Windows does not support destinations not on the system drive (C:)")
-		***REMOVED***
+		}
 		dest = dest[2:] // Strip the drive letter
-	***REMOVED***
+	}
 
 	// Cannot handle relative where WorkingDir is not the system drive.
-	if len(workingDir) > 0 ***REMOVED***
-		if ((len(workingDir) > 1) && !system.IsAbs(workingDir[2:])) || (len(workingDir) == 1) ***REMOVED***
+	if len(workingDir) > 0 {
+		if ((len(workingDir) > 1) && !system.IsAbs(workingDir[2:])) || (len(workingDir) == 1) {
 			return "", fmt.Errorf("Current WorkingDir %s is not platform consistent", workingDir)
-		***REMOVED***
-		if !system.IsAbs(dest) ***REMOVED***
-			if string(workingDir[0]) != "C" ***REMOVED***
+		}
+		if !system.IsAbs(dest) {
+			if string(workingDir[0]) != "C" {
 				return "", fmt.Errorf("Windows does not support relative paths when WORKDIR is not the system drive")
-			***REMOVED***
+			}
 			dest = filepath.Join(string(os.PathSeparator), workingDir[2:], dest)
 			// Make sure we preserve any trailing slash
-			if endsInSlash ***REMOVED***
+			if endsInSlash {
 				dest += string(os.PathSeparator)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return dest, nil
-***REMOVED***
+}
 
 // For backwards compat, if there's just one info then use it as the
 // cache look-up string, otherwise hash 'em all into one
-func getSourceHashFromInfos(infos []copyInfo) string ***REMOVED***
-	if len(infos) == 1 ***REMOVED***
+func getSourceHashFromInfos(infos []copyInfo) string {
+	if len(infos) == 1 {
 		return infos[0].hash
-	***REMOVED***
+	}
 	var hashs []string
-	for _, info := range infos ***REMOVED***
+	for _, info := range infos {
 		hashs = append(hashs, info.hash)
-	***REMOVED***
+	}
 	return hashStringSlice("multi", hashs)
-***REMOVED***
+}
 
-func hashStringSlice(prefix string, slice []string) string ***REMOVED***
+func hashStringSlice(prefix string, slice []string) string {
 	hasher := sha256.New()
 	hasher.Write([]byte(strings.Join(slice, ",")))
 	return prefix + ":" + hex.EncodeToString(hasher.Sum(nil))
-***REMOVED***
+}
 
 type runConfigModifier func(*container.Config)
 
-func withCmd(cmd []string) runConfigModifier ***REMOVED***
-	return func(runConfig *container.Config) ***REMOVED***
+func withCmd(cmd []string) runConfigModifier {
+	return func(runConfig *container.Config) {
 		runConfig.Cmd = cmd
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // withCmdComment sets Cmd to a nop comment string. See withCmdCommentString for
 // why there are two almost identical versions of this.
-func withCmdComment(comment string, platform string) runConfigModifier ***REMOVED***
-	return func(runConfig *container.Config) ***REMOVED***
+func withCmdComment(comment string, platform string) runConfigModifier {
+	return func(runConfig *container.Config) {
 		runConfig.Cmd = append(getShell(runConfig, platform), "#(nop) ", comment)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // withCmdCommentString exists to maintain compatibility with older versions.
 // A few instructions (workdir, copy, add) used a nop comment that is a single arg
 // where as all the other instructions used a two arg comment string. This
 // function implements the single arg version.
-func withCmdCommentString(comment string, platform string) runConfigModifier ***REMOVED***
-	return func(runConfig *container.Config) ***REMOVED***
+func withCmdCommentString(comment string, platform string) runConfigModifier {
+	return func(runConfig *container.Config) {
 		runConfig.Cmd = append(getShell(runConfig, platform), "#(nop) "+comment)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func withEnv(env []string) runConfigModifier ***REMOVED***
-	return func(runConfig *container.Config) ***REMOVED***
+func withEnv(env []string) runConfigModifier {
+	return func(runConfig *container.Config) {
 		runConfig.Env = env
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // withEntrypointOverride sets an entrypoint on runConfig if the command is
 // not empty. The entrypoint is left unmodified if command is empty.
 //
 // The dockerfile RUN instruction expect to run without an entrypoint
 // so the runConfig entrypoint needs to be modified accordingly. ContainerCreate
-// will change a []string***REMOVED***""***REMOVED*** entrypoint to nil, so we probe the cache with the
+// will change a []string{""} entrypoint to nil, so we probe the cache with the
 // nil entrypoint.
-func withEntrypointOverride(cmd []string, entrypoint []string) runConfigModifier ***REMOVED***
-	return func(runConfig *container.Config) ***REMOVED***
-		if len(cmd) > 0 ***REMOVED***
+func withEntrypointOverride(cmd []string, entrypoint []string) runConfigModifier {
+	return func(runConfig *container.Config) {
+		if len(cmd) > 0 {
 			runConfig.Entrypoint = entrypoint
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func copyRunConfig(runConfig *container.Config, modifiers ...runConfigModifier) *container.Config ***REMOVED***
+func copyRunConfig(runConfig *container.Config, modifiers ...runConfigModifier) *container.Config {
 	copy := *runConfig
 	copy.Cmd = copyStringSlice(runConfig.Cmd)
 	copy.Env = copyStringSlice(runConfig.Env)
@@ -360,88 +360,88 @@ func copyRunConfig(runConfig *container.Config, modifiers ...runConfigModifier) 
 	copy.OnBuild = copyStringSlice(runConfig.OnBuild)
 	copy.Shell = copyStringSlice(runConfig.Shell)
 
-	if copy.Volumes != nil ***REMOVED***
-		copy.Volumes = make(map[string]struct***REMOVED******REMOVED***, len(runConfig.Volumes))
-		for k, v := range runConfig.Volumes ***REMOVED***
+	if copy.Volumes != nil {
+		copy.Volumes = make(map[string]struct{}, len(runConfig.Volumes))
+		for k, v := range runConfig.Volumes {
 			copy.Volumes[k] = v
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if copy.ExposedPorts != nil ***REMOVED***
+	if copy.ExposedPorts != nil {
 		copy.ExposedPorts = make(nat.PortSet, len(runConfig.ExposedPorts))
-		for k, v := range runConfig.ExposedPorts ***REMOVED***
+		for k, v := range runConfig.ExposedPorts {
 			copy.ExposedPorts[k] = v
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if copy.Labels != nil ***REMOVED***
+	if copy.Labels != nil {
 		copy.Labels = make(map[string]string, len(runConfig.Labels))
-		for k, v := range runConfig.Labels ***REMOVED***
+		for k, v := range runConfig.Labels {
 			copy.Labels[k] = v
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	for _, modifier := range modifiers ***REMOVED***
+	for _, modifier := range modifiers {
 		modifier(&copy)
-	***REMOVED***
+	}
 	return &copy
-***REMOVED***
+}
 
-func copyStringSlice(orig []string) []string ***REMOVED***
-	if orig == nil ***REMOVED***
+func copyStringSlice(orig []string) []string {
+	if orig == nil {
 		return nil
-	***REMOVED***
-	return append([]string***REMOVED******REMOVED***, orig...)
-***REMOVED***
+	}
+	return append([]string{}, orig...)
+}
 
 // getShell is a helper function which gets the right shell for prefixing the
 // shell-form of RUN, ENTRYPOINT and CMD instructions
-func getShell(c *container.Config, os string) []string ***REMOVED***
-	if 0 == len(c.Shell) ***REMOVED***
-		return append([]string***REMOVED******REMOVED***, defaultShellForOS(os)[:]...)
-	***REMOVED***
-	return append([]string***REMOVED******REMOVED***, c.Shell[:]...)
-***REMOVED***
+func getShell(c *container.Config, os string) []string {
+	if 0 == len(c.Shell) {
+		return append([]string{}, defaultShellForOS(os)[:]...)
+	}
+	return append([]string{}, c.Shell[:]...)
+}
 
-func (b *Builder) probeCache(dispatchState *dispatchState, runConfig *container.Config) (bool, error) ***REMOVED***
+func (b *Builder) probeCache(dispatchState *dispatchState, runConfig *container.Config) (bool, error) {
 	cachedID, err := b.imageProber.Probe(dispatchState.imageID, runConfig)
-	if cachedID == "" || err != nil ***REMOVED***
+	if cachedID == "" || err != nil {
 		return false, err
-	***REMOVED***
+	}
 	fmt.Fprint(b.Stdout, " ---> Using cache\n")
 
 	dispatchState.imageID = cachedID
 	return true, nil
-***REMOVED***
+}
 
-var defaultLogConfig = container.LogConfig***REMOVED***Type: "none"***REMOVED***
+var defaultLogConfig = container.LogConfig{Type: "none"}
 
-func (b *Builder) probeAndCreate(dispatchState *dispatchState, runConfig *container.Config) (string, error) ***REMOVED***
-	if hit, err := b.probeCache(dispatchState, runConfig); err != nil || hit ***REMOVED***
+func (b *Builder) probeAndCreate(dispatchState *dispatchState, runConfig *container.Config) (string, error) {
+	if hit, err := b.probeCache(dispatchState, runConfig); err != nil || hit {
 		return "", err
-	***REMOVED***
+	}
 	// Set a log config to override any default value set on the daemon
-	hostConfig := &container.HostConfig***REMOVED***LogConfig: defaultLogConfig***REMOVED***
+	hostConfig := &container.HostConfig{LogConfig: defaultLogConfig}
 	container, err := b.containerManager.Create(runConfig, hostConfig)
 	return container.ID, err
-***REMOVED***
+}
 
-func (b *Builder) create(runConfig *container.Config) (string, error) ***REMOVED***
+func (b *Builder) create(runConfig *container.Config) (string, error) {
 	hostConfig := hostConfigFromOptions(b.options)
 	container, err := b.containerManager.Create(runConfig, hostConfig)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	// TODO: could this be moved into containerManager.Create() ?
-	for _, warning := range container.Warnings ***REMOVED***
+	for _, warning := range container.Warnings {
 		fmt.Fprintf(b.Stdout, " ---> [Warning] %s\n", warning)
-	***REMOVED***
+	}
 	fmt.Fprintf(b.Stdout, " ---> Running in %s\n", stringid.TruncateID(container.ID))
 	return container.ID, nil
-***REMOVED***
+}
 
-func hostConfigFromOptions(options *types.ImageBuildOptions) *container.HostConfig ***REMOVED***
-	resources := container.Resources***REMOVED***
+func hostConfigFromOptions(options *types.ImageBuildOptions) *container.HostConfig {
+	resources := container.Resources{
 		CgroupParent: options.CgroupParent,
 		CPUShares:    options.CPUShares,
 		CPUPeriod:    options.CPUPeriod,
@@ -451,9 +451,9 @@ func hostConfigFromOptions(options *types.ImageBuildOptions) *container.HostConf
 		Memory:       options.Memory,
 		MemorySwap:   options.MemorySwap,
 		Ulimits:      options.Ulimits,
-	***REMOVED***
+	}
 
-	hc := &container.HostConfig***REMOVED***
+	hc := &container.HostConfig{
 		SecurityOpt: options.SecurityOpt,
 		Isolation:   options.Isolation,
 		ShmSize:     options.ShmSize,
@@ -462,32 +462,32 @@ func hostConfigFromOptions(options *types.ImageBuildOptions) *container.HostConf
 		// Set a log config to override any default value set on the daemon
 		LogConfig:  defaultLogConfig,
 		ExtraHosts: options.ExtraHosts,
-	***REMOVED***
+	}
 
 	// For WCOW, the default of 20GB hard-coded in the platform
 	// is too small for builder scenarios where many users are
 	// using RUN statements to install large amounts of data.
 	// Use 127GB as that's the default size of a VHD in Hyper-V.
-	if runtime.GOOS == "windows" && options.Platform == "windows" ***REMOVED***
+	if runtime.GOOS == "windows" && options.Platform == "windows" {
 		hc.StorageOpt = make(map[string]string)
 		hc.StorageOpt["size"] = "127GB"
-	***REMOVED***
+	}
 
 	return hc
-***REMOVED***
+}
 
 // fromSlash works like filepath.FromSlash but with a given OS platform field
-func fromSlash(path, platform string) string ***REMOVED***
-	if platform == "windows" ***REMOVED***
+func fromSlash(path, platform string) string {
+	if platform == "windows" {
 		return strings.Replace(path, "/", "\\", -1)
-	***REMOVED***
+	}
 	return path
-***REMOVED***
+}
 
 // separator returns a OS path separator for the given OS platform
-func separator(platform string) byte ***REMOVED***
-	if platform == "windows" ***REMOVED***
+func separator(platform string) byte {
+	if platform == "windows" {
 		return '\\'
-	***REMOVED***
+	}
 	return '/'
-***REMOVED***
+}

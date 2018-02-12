@@ -11,53 +11,53 @@ import (
 	"testing"
 )
 
-func (ll *Link) String() string ***REMOVED***
+func (ll *Link) String() string {
 	return fmt.Sprintf("name=%s index=%d type=%d flags=%#x mtu=%d addr=%v", ll.Name, ll.Index, ll.Type, ll.Flags, ll.MTU, llAddr(ll.Addr))
-***REMOVED***
+}
 
-type linkPack struct ***REMOVED***
+type linkPack struct {
 	af  int
 	lls []Link
-***REMOVED***
+}
 
-func linkPacks() ([]linkPack, error) ***REMOVED***
+func linkPacks() ([]linkPack, error) {
 	var lastErr error
 	var lps []linkPack
-	for _, af := range [...]int***REMOVED***sysAF_UNSPEC, sysAF_INET, sysAF_INET6***REMOVED*** ***REMOVED***
+	for _, af := range [...]int{sysAF_UNSPEC, sysAF_INET, sysAF_INET6} {
 		lls, err := Links(af, "")
-		if err != nil ***REMOVED***
+		if err != nil {
 			lastErr = err
 			continue
-		***REMOVED***
-		lps = append(lps, linkPack***REMOVED***af: af, lls: lls***REMOVED***)
-	***REMOVED***
+		}
+		lps = append(lps, linkPack{af: af, lls: lls})
+	}
 	return lps, lastErr
-***REMOVED***
+}
 
-func TestLinks(t *testing.T) ***REMOVED***
+func TestLinks(t *testing.T) {
 	lps, err := linkPacks()
-	if len(lps) == 0 && err != nil ***REMOVED***
+	if len(lps) == 0 && err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	for _, lp := range lps ***REMOVED***
+	}
+	for _, lp := range lps {
 		n := 0
-		for _, sll := range lp.lls ***REMOVED***
+		for _, sll := range lp.lls {
 			lls, err := Links(lp.af, sll.Name)
-			if err != nil ***REMOVED***
+			if err != nil {
 				t.Fatal(lp.af, sll.Name, err)
-			***REMOVED***
-			for _, ll := range lls ***REMOVED***
-				if ll.Name != sll.Name || ll.Index != sll.Index ***REMOVED***
+			}
+			for _, ll := range lls {
+				if ll.Name != sll.Name || ll.Index != sll.Index {
 					t.Errorf("af=%s got %v; want %v", addrFamily(lp.af), &ll, &sll)
 					continue
-				***REMOVED***
+				}
 				t.Logf("af=%s name=%s %v", addrFamily(lp.af), sll.Name, &ll)
 				n++
-			***REMOVED***
-		***REMOVED***
-		if n != len(lp.lls) ***REMOVED***
+			}
+		}
+		if n != len(lp.lls) {
 			t.Errorf("af=%s got %d; want %d", addrFamily(lp.af), n, len(lp.lls))
 			continue
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

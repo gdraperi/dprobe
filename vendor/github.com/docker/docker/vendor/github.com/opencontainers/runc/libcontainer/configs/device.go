@@ -11,7 +11,7 @@ const (
 
 // TODO Windows: This can be factored out in the future
 
-type Device struct ***REMOVED***
+type Device struct {
 	// Device type, block, char, etc.
 	Type rune `json:"type"`
 
@@ -38,20 +38,20 @@ type Device struct ***REMOVED***
 
 	// Write the file to the allowed list
 	Allow bool `json:"allow"`
-***REMOVED***
+}
 
-func (d *Device) CgroupString() string ***REMOVED***
+func (d *Device) CgroupString() string {
 	return fmt.Sprintf("%c %s:%s %s", d.Type, deviceNumberString(d.Major), deviceNumberString(d.Minor), d.Permissions)
-***REMOVED***
+}
 
-func (d *Device) Mkdev() int ***REMOVED***
+func (d *Device) Mkdev() int {
 	return int((d.Major << 8) | (d.Minor & 0xff) | ((d.Minor & 0xfff00) << 12))
-***REMOVED***
+}
 
 // deviceNumberString converts the device number to a string return result.
-func deviceNumberString(number int64) string ***REMOVED***
-	if number == Wildcard ***REMOVED***
+func deviceNumberString(number int64) string {
+	if number == Wildcard {
 		return "*"
-	***REMOVED***
+	}
 	return fmt.Sprint(number)
-***REMOVED***
+}

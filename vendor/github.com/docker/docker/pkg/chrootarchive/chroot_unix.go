@@ -4,9 +4,9 @@ package chrootarchive
 
 import "golang.org/x/sys/unix"
 
-func chroot(path string) error ***REMOVED***
-	if err := unix.Chroot(path); err != nil ***REMOVED***
+func chroot(path string) error {
+	if err := unix.Chroot(path); err != nil {
 		return err
-	***REMOVED***
+	}
 	return unix.Chdir("/")
-***REMOVED***
+}

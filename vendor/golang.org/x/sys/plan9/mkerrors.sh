@@ -11,7 +11,7 @@ unset LANG
 export LC_ALL=C
 export LC_CTYPE=C
 
-CC=$***REMOVED***CC:-gcc***REMOVED***
+CC=${CC:-gcc}
 
 uname=$(uname)
 
@@ -39,7 +39,7 @@ ccflags="$@"
 	echo
 	echo '/*'
 	indirect="includes_$(uname)"
-	echo "$***REMOVED***!indirect***REMOVED*** $includes"
+	echo "${!indirect} $includes"
 	echo '*/'
 	echo 'import "C"'
 	echo
@@ -47,14 +47,14 @@ ccflags="$@"
 
 	# The gcc command line prints all the #defines
 	# it encounters while processing the input
-	echo "$***REMOVED***!indirect***REMOVED*** $includes" | $CC -x c - -E -dM $ccflags |
+	echo "${!indirect} $includes" | $CC -x c - -E -dM $ccflags |
 	awk '
-		$1 != "#define" || $2 ~ /\(/ || $3 == "" ***REMOVED***next***REMOVED***
+		$1 != "#define" || $2 ~ /\(/ || $3 == "" {next}
 
-		$2 ~ /^E([ABCD]X|[BIS]P|[SD]I|S|FL)$/ ***REMOVED***next***REMOVED***  # 386 registers
-		$2 ~ /^(SIGEV_|SIGSTKSZ|SIGRT(MIN|MAX))/ ***REMOVED***next***REMOVED***
-		$2 ~ /^(SCM_SRCRT)$/ ***REMOVED***next***REMOVED***
-		$2 ~ /^(MAP_FAILED)$/ ***REMOVED***next***REMOVED***
+		$2 ~ /^E([ABCD]X|[BIS]P|[SD]I|S|FL)$/ {next}  # 386 registers
+		$2 ~ /^(SIGEV_|SIGSTKSZ|SIGRT(MIN|MAX))/ {next}
+		$2 ~ /^(SCM_SRCRT)$/ {next}
+		$2 ~ /^(MAP_FAILED)$/ {next}
 
 		$2 !~ /^ETH_/ &&
 		$2 !~ /^EPROC_/ &&
@@ -105,11 +105,11 @@ ccflags="$@"
 		$2 !~ /^(BPF_TIMEVAL)$/ &&
 		$2 ~ /^(BPF|DLT)_/ ||
 		$2 !~ "WMESGLEN" &&
-		$2 ~ /^W[A-Z0-9]+$/ ***REMOVED***printf("\t%s = C.%s\n", $2, $2)***REMOVED***
-		$2 ~ /^__WCOREFLAG$/ ***REMOVED***next***REMOVED***
-		$2 ~ /^__W[A-Z0-9]+$/ ***REMOVED***printf("\t%s = C.%s\n", substr($2,3), $2)***REMOVED***
+		$2 ~ /^W[A-Z0-9]+$/ {printf("\t%s = C.%s\n", $2, $2)}
+		$2 ~ /^__WCOREFLAG$/ {next}
+		$2 ~ /^__W[A-Z0-9]+$/ {printf("\t%s = C.%s\n", substr($2,3), $2)}
 
-		***REMOVED***next***REMOVED***
+		{next}
 	' | sort
 
 	echo ')'
@@ -118,24 +118,24 @@ ccflags="$@"
 # Pull out the error names for later.
 errors=$(
 	echo '#include <errno.h>' | $CC -x c - -E -dM $ccflags |
-	awk '$1=="#define" && $2 ~ /^E[A-Z0-9_]+$/ ***REMOVED*** print $2 ***REMOVED***' |
+	awk '$1=="#define" && $2 ~ /^E[A-Z0-9_]+$/ { print $2 }' |
 	sort
 )
 
 # Pull out the signal names for later.
 signals=$(
 	echo '#include <signal.h>' | $CC -x c - -E -dM $ccflags |
-	awk '$1=="#define" && $2 ~ /^SIG[A-Z0-9]+$/ ***REMOVED*** print $2 ***REMOVED***' |
+	awk '$1=="#define" && $2 ~ /^SIG[A-Z0-9]+$/ { print $2 }' |
 	egrep -v '(SIGSTKSIZE|SIGSTKSZ|SIGRT)' |
 	sort
 )
 
 # Again, writing regexps to a file.
 echo '#include <errno.h>' | $CC -x c - -E -dM $ccflags |
-	awk '$1=="#define" && $2 ~ /^E[A-Z0-9_]+$/ ***REMOVED*** print "^\t" $2 "[ \t]*=" ***REMOVED***' |
+	awk '$1=="#define" && $2 ~ /^E[A-Z0-9_]+$/ { print "^\t" $2 "[ \t]*=" }' |
 	sort >_error.grep
 echo '#include <signal.h>' | $CC -x c - -E -dM $ccflags |
-	awk '$1=="#define" && $2 ~ /^SIG[A-Z0-9]+$/ ***REMOVED*** print "^\t" $2 "[ \t]*=" ***REMOVED***' |
+	awk '$1=="#define" && $2 ~ /^SIG[A-Z0-9]+$/ { print "^\t" $2 "[ \t]*=" }' |
 	egrep -v '(SIGSTKSIZE|SIGSTKSZ|SIGRT)' |
 	sort >_signal.grep
 
@@ -168,9 +168,9 @@ echo ')'
 
 #define nelem(x) (sizeof(x)/sizeof((x)[0]))
 
-enum ***REMOVED*** A = 'A', Z = 'Z', a = 'a', z = 'z' ***REMOVED***; // avoid need for single quotes below
+enum { A = 'A', Z = 'Z', a = 'a', z = 'z' }; // avoid need for single quotes below
 
-int errors[] = ***REMOVED***
+int errors[] = {
 "
 	for i in $errors
 	do
@@ -178,9 +178,9 @@ int errors[] = ***REMOVED***
 	done
 
 	echo -E "
-***REMOVED***;
+};
 
-int signals[] = ***REMOVED***
+int signals[] = {
 "
 	for i in $signals
 	do
@@ -189,24 +189,24 @@ int signals[] = ***REMOVED***
 
 	# Use -E because on some systems bash builtin interprets \n itself.
 	echo -E '
-***REMOVED***;
+};
 
 static int
 intcmp(const void *a, const void *b)
-***REMOVED***
+{
 	return *(int*)a - *(int*)b;
-***REMOVED***
+}
 
 int
 main(void)
-***REMOVED***
+{
 	int i, j, e;
 	char buf[1024], *p;
 
 	printf("\n\n// Error table\n");
-	printf("var errors = [...]string ***REMOVED***\n");
+	printf("var errors = [...]string {\n");
 	qsort(errors, nelem(errors), sizeof errors[0], intcmp);
-	for(i=0; i<nelem(errors); i++) ***REMOVED***
+	for(i=0; i<nelem(errors); i++) {
 		e = errors[i];
 		if(i > 0 && errors[i-1] == e)
 			continue;
@@ -215,13 +215,13 @@ main(void)
 		if(A <= buf[0] && buf[0] <= Z && a <= buf[1] && buf[1] <= z)
 			buf[0] += a - A;
 		printf("\t%d: \"%s\",\n", e, buf);
-	***REMOVED***
-	printf("***REMOVED***\n\n");
+	}
+	printf("}\n\n");
 	
 	printf("\n\n// Signal table\n");
-	printf("var signals = [...]string ***REMOVED***\n");
+	printf("var signals = [...]string {\n");
 	qsort(signals, nelem(signals), sizeof signals[0], intcmp);
-	for(i=0; i<nelem(signals); i++) ***REMOVED***
+	for(i=0; i<nelem(signals); i++) {
 		e = signals[i];
 		if(i > 0 && signals[i-1] == e)
 			continue;
@@ -234,11 +234,11 @@ main(void)
 		if(p)
 			*p = '\0';
 		printf("\t%d: \"%s\",\n", e, buf);
-	***REMOVED***
-	printf("***REMOVED***\n\n");
+	}
+	printf("}\n\n");
 
 	return 0;
-***REMOVED***
+}
 
 '
 ) >_errors.c

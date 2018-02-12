@@ -12,11 +12,11 @@ import "crypto/tls"
 // SessionTicketsDisabled and SessionTicketKey. This avoids copying the
 // sync.Mutex in the sync.Once and makes it safe to call cloneTLSConfig on a
 // config in active use.
-func cloneTLSConfig(cfg *tls.Config) *tls.Config ***REMOVED***
-	if cfg == nil ***REMOVED***
-		return &tls.Config***REMOVED******REMOVED***
-	***REMOVED***
-	return &tls.Config***REMOVED***
+func cloneTLSConfig(cfg *tls.Config) *tls.Config {
+	if cfg == nil {
+		return &tls.Config{}
+	}
+	return &tls.Config{
 		Rand:                     cfg.Rand,
 		Time:                     cfg.Time,
 		Certificates:             cfg.Certificates,
@@ -34,5 +34,5 @@ func cloneTLSConfig(cfg *tls.Config) *tls.Config ***REMOVED***
 		MinVersion:               cfg.MinVersion,
 		MaxVersion:               cfg.MaxVersion,
 		CurvePreferences:         cfg.CurvePreferences,
-	***REMOVED***
-***REMOVED***
+	}
+}

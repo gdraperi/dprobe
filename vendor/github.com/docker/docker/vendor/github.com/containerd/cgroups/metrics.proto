@@ -4,47 +4,47 @@ package io.containerd.cgroups.v1;
 
 import "gogoproto/gogo.proto";
 
-message Metrics ***REMOVED***
+message Metrics {
 	repeated HugetlbStat hugetlb = 1;
 	PidsStat pids = 2;
 	CPUStat cpu = 3 [(gogoproto.customname) = "CPU"];
 	MemoryStat memory = 4;
 	BlkIOStat blkio = 5;
-***REMOVED***
+}
 
-message HugetlbStat ***REMOVED***
+message HugetlbStat {
 	uint64 usage = 1;
 	uint64 max = 2;
 	uint64 failcnt = 3;
 	string pagesize = 4;
-***REMOVED***
+}
 
-message PidsStat ***REMOVED***
+message PidsStat {
 	uint64 current = 1;
 	uint64 limit = 2;
-***REMOVED***
+}
 
-message CPUStat ***REMOVED***
+message CPUStat {
 	CPUUsage usage = 1;
 	Throttle throttling = 2;
-***REMOVED***
+}
 
-message CPUUsage ***REMOVED***
+message CPUUsage {
 	// values in nanoseconds
 	uint64 total = 1;
 	uint64 kernel = 2;
 	uint64 user = 3;
 	repeated uint64 per_cpu = 4 [(gogoproto.customname) = "PerCPU"];
 
-***REMOVED***
+}
 
-message Throttle ***REMOVED***
+message Throttle {
 	uint64 periods = 1;
 	uint64 throttled_periods = 2;
 	uint64 throttled_time = 3;
-***REMOVED***
+}
 
-message MemoryStat ***REMOVED***
+message MemoryStat {
 	uint64 cache = 1;
 	uint64 rss = 2 [(gogoproto.customname) = "RSS"];
 	uint64 rss_huge = 3 [(gogoproto.customname) = "RSSHuge"];
@@ -82,16 +82,16 @@ message MemoryStat ***REMOVED***
 	MemoryEntry kernel = 35;
 	MemoryEntry kernel_tcp = 36 [(gogoproto.customname) = "KernelTCP"];
 
-***REMOVED***
+}
 
-message MemoryEntry ***REMOVED***
+message MemoryEntry {
 	uint64 limit = 1;
 	uint64 usage = 2;
 	uint64 max = 3;
 	uint64 failcnt = 4;
-***REMOVED***
+}
 
-message BlkIOStat ***REMOVED***
+message BlkIOStat {
 	repeated BlkIOEntry io_service_bytes_recursive = 1;
 	repeated BlkIOEntry io_serviced_recursive = 2;
 	repeated BlkIOEntry io_queued_recursive = 3;
@@ -100,12 +100,12 @@ message BlkIOStat ***REMOVED***
 	repeated BlkIOEntry io_merged_recursive = 6;
 	repeated BlkIOEntry io_time_recursive = 7;
 	repeated BlkIOEntry sectors_recursive = 8;
-***REMOVED***
+}
 
-message BlkIOEntry ***REMOVED***
+message BlkIOEntry {
 	string op = 1;
 	string device = 2;
 	uint64 major = 3;
 	uint64 minor = 4;
 	uint64 value = 5;
-***REMOVED***
+}

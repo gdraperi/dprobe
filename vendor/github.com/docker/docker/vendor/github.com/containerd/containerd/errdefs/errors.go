@@ -30,33 +30,33 @@ var (
 )
 
 // IsInvalidArgument returns true if the error is due to an invalid argument
-func IsInvalidArgument(err error) bool ***REMOVED***
+func IsInvalidArgument(err error) bool {
 	return errors.Cause(err) == ErrInvalidArgument
-***REMOVED***
+}
 
 // IsNotFound returns true if the error is due to a missing object
-func IsNotFound(err error) bool ***REMOVED***
+func IsNotFound(err error) bool {
 	return errors.Cause(err) == ErrNotFound
-***REMOVED***
+}
 
 // IsAlreadyExists returns true if the error is due to an already existing
 // metadata item
-func IsAlreadyExists(err error) bool ***REMOVED***
+func IsAlreadyExists(err error) bool {
 	return errors.Cause(err) == ErrAlreadyExists
-***REMOVED***
+}
 
 // IsFailedPrecondition returns true if an operation could not proceed to the
 // lack of a particular condition
-func IsFailedPrecondition(err error) bool ***REMOVED***
+func IsFailedPrecondition(err error) bool {
 	return errors.Cause(err) == ErrFailedPrecondition
-***REMOVED***
+}
 
 // IsUnavailable returns true if the error is due to a resource being unavailable
-func IsUnavailable(err error) bool ***REMOVED***
+func IsUnavailable(err error) bool {
 	return errors.Cause(err) == ErrUnavailable
-***REMOVED***
+}
 
 // IsNotImplemented returns true if the error is due to not being implemented
-func IsNotImplemented(err error) bool ***REMOVED***
+func IsNotImplemented(err error) bool {
 	return errors.Cause(err) == ErrNotImplemented
-***REMOVED***
+}

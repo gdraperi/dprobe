@@ -10,20 +10,20 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-type ReceiveOpt struct ***REMOVED***
+type ReceiveOpt struct {
 	NotifyHashed  ChangeFunc
 	ContentHasher ContentHasher
 	ProgressCb    func(int, bool)
 	Merge         bool
 	Filter        FilterFunc
-***REMOVED***
+}
 
-func Receive(ctx context.Context, conn Stream, dest string, opt ReceiveOpt) error ***REMOVED***
+func Receive(ctx context.Context, conn Stream, dest string, opt ReceiveOpt) error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	r := &receiver***REMOVED***
-		conn:          &syncStream***REMOVED***Stream: conn***REMOVED***,
+	r := &receiver{
+		conn:          &syncStream{Stream: conn},
 		dest:          dest,
 		files:         make(map[string]uint32),
 		pipes:         make(map[uint32]io.WriteCloser),
@@ -32,11 +32,11 @@ func Receive(ctx context.Context, conn Stream, dest string, opt ReceiveOpt) erro
 		progressCb:    opt.ProgressCb,
 		merge:         opt.Merge,
 		filter:        opt.Filter,
-	***REMOVED***
+	}
 	return r.run(ctx)
-***REMOVED***
+}
 
-type receiver struct ***REMOVED***
+type receiver struct {
 	dest       string
 	conn       Stream
 	files      map[string]uint32
@@ -51,152 +51,152 @@ type receiver struct ***REMOVED***
 	contentHasher  ContentHasher
 	orderValidator Validator
 	hlValidator    Hardlinks
-***REMOVED***
+}
 
-type dynamicWalker struct ***REMOVED***
+type dynamicWalker struct {
 	walkChan chan *currentPath
 	closed   bool
-***REMOVED***
+}
 
-func newDynamicWalker() *dynamicWalker ***REMOVED***
-	return &dynamicWalker***REMOVED***
+func newDynamicWalker() *dynamicWalker {
+	return &dynamicWalker{
 		walkChan: make(chan *currentPath, 128),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (w *dynamicWalker) update(p *currentPath) error ***REMOVED***
-	if w.closed ***REMOVED***
+func (w *dynamicWalker) update(p *currentPath) error {
+	if w.closed {
 		return errors.New("walker is closed")
-	***REMOVED***
-	if p == nil ***REMOVED***
+	}
+	if p == nil {
 		close(w.walkChan)
 		return nil
-	***REMOVED***
+	}
 	w.walkChan <- p
 	return nil
-***REMOVED***
+}
 
-func (w *dynamicWalker) fill(ctx context.Context, pathC chan<- *currentPath) error ***REMOVED***
-	for ***REMOVED***
-		select ***REMOVED***
+func (w *dynamicWalker) fill(ctx context.Context, pathC chan<- *currentPath) error {
+	for {
+		select {
 		case p, ok := <-w.walkChan:
-			if !ok ***REMOVED***
+			if !ok {
 				return nil
-			***REMOVED***
+			}
 			pathC <- p
 		case <-ctx.Done():
 			return ctx.Err()
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func (r *receiver) run(ctx context.Context) error ***REMOVED***
+func (r *receiver) run(ctx context.Context) error {
 	g, ctx := errgroup.WithContext(ctx)
 
-	dw, err := NewDiskWriter(ctx, r.dest, DiskWriterOpt***REMOVED***
+	dw, err := NewDiskWriter(ctx, r.dest, DiskWriterOpt{
 		AsyncDataCb:   r.asyncDataFunc,
 		NotifyCb:      r.notifyHashed,
 		ContentHasher: r.contentHasher,
 		Filter:        r.filter,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	w := newDynamicWalker()
 
-	g.Go(func() error ***REMOVED***
+	g.Go(func() error {
 		destWalker := emptyWalker
-		if !r.merge ***REMOVED***
+		if !r.merge {
 			destWalker = GetWalkerFn(r.dest)
-		***REMOVED***
+		}
 		err := doubleWalkDiff(ctx, dw.HandleChange, destWalker, w.fill)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-		if err := dw.Wait(ctx); err != nil ***REMOVED***
+		}
+		if err := dw.Wait(ctx); err != nil {
 			return err
-		***REMOVED***
-		r.conn.SendMsg(&Packet***REMOVED***Type: PACKET_FIN***REMOVED***)
+		}
+		r.conn.SendMsg(&Packet{Type: PACKET_FIN})
 		return nil
-	***REMOVED***)
+	})
 
-	g.Go(func() error ***REMOVED***
+	g.Go(func() error {
 		var i uint32 = 0
 
 		size := 0
-		if r.progressCb != nil ***REMOVED***
-			defer func() ***REMOVED***
+		if r.progressCb != nil {
+			defer func() {
 				r.progressCb(size, true)
-			***REMOVED***()
-		***REMOVED***
+			}()
+		}
 		var p Packet
-		for ***REMOVED***
-			p = Packet***REMOVED***Data: p.Data[:0]***REMOVED***
-			if err := r.conn.RecvMsg(&p); err != nil ***REMOVED***
+		for {
+			p = Packet{Data: p.Data[:0]}
+			if err := r.conn.RecvMsg(&p); err != nil {
 				return err
-			***REMOVED***
-			if r.progressCb != nil ***REMOVED***
+			}
+			if r.progressCb != nil {
 				size += p.Size()
 				r.progressCb(size, false)
-			***REMOVED***
+			}
 
-			switch p.Type ***REMOVED***
+			switch p.Type {
 			case PACKET_STAT:
-				if p.Stat == nil ***REMOVED***
-					if err := w.update(nil); err != nil ***REMOVED***
+				if p.Stat == nil {
+					if err := w.update(nil); err != nil {
 						return err
-					***REMOVED***
+					}
 					break
-				***REMOVED***
-				if fileCanRequestData(os.FileMode(p.Stat.Mode)) ***REMOVED***
+				}
+				if fileCanRequestData(os.FileMode(p.Stat.Mode)) {
 					r.mu.Lock()
 					r.files[p.Stat.Path] = i
 					r.mu.Unlock()
-				***REMOVED***
+				}
 				i++
-				cp := &currentPath***REMOVED***path: p.Stat.Path, f: &StatInfo***REMOVED***p.Stat***REMOVED******REMOVED***
-				if err := r.orderValidator.HandleChange(ChangeKindAdd, cp.path, cp.f, nil); err != nil ***REMOVED***
+				cp := &currentPath{path: p.Stat.Path, f: &StatInfo{p.Stat}}
+				if err := r.orderValidator.HandleChange(ChangeKindAdd, cp.path, cp.f, nil); err != nil {
 					return err
-				***REMOVED***
-				if err := r.hlValidator.HandleChange(ChangeKindAdd, cp.path, cp.f, nil); err != nil ***REMOVED***
+				}
+				if err := r.hlValidator.HandleChange(ChangeKindAdd, cp.path, cp.f, nil); err != nil {
 					return err
-				***REMOVED***
-				if err := w.update(cp); err != nil ***REMOVED***
+				}
+				if err := w.update(cp); err != nil {
 					return err
-				***REMOVED***
+				}
 			case PACKET_DATA:
 				r.muPipes.Lock()
 				pw, ok := r.pipes[p.ID]
 				r.muPipes.Unlock()
-				if !ok ***REMOVED***
+				if !ok {
 					return errors.Errorf("invalid file request %s", p.ID)
-				***REMOVED***
-				if len(p.Data) == 0 ***REMOVED***
-					if err := pw.Close(); err != nil ***REMOVED***
+				}
+				if len(p.Data) == 0 {
+					if err := pw.Close(); err != nil {
 						return err
-					***REMOVED***
-				***REMOVED*** else ***REMOVED***
-					if _, err := pw.Write(p.Data); err != nil ***REMOVED***
+					}
+				} else {
+					if _, err := pw.Write(p.Data); err != nil {
 						return err
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 			case PACKET_FIN:
 				return nil
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***)
+			}
+		}
+	})
 	return g.Wait()
-***REMOVED***
+}
 
-func (r *receiver) asyncDataFunc(ctx context.Context, p string, wc io.WriteCloser) error ***REMOVED***
+func (r *receiver) asyncDataFunc(ctx context.Context, p string, wc io.WriteCloser) error {
 	r.mu.Lock()
 	id, ok := r.files[p]
-	if !ok ***REMOVED***
+	if !ok {
 		r.mu.Unlock()
 		return errors.Errorf("invalid file request %s", p)
-	***REMOVED***
+	}
 	delete(r.files, p)
 	r.mu.Unlock()
 
@@ -204,38 +204,38 @@ func (r *receiver) asyncDataFunc(ctx context.Context, p string, wc io.WriteClose
 	r.muPipes.Lock()
 	r.pipes[id] = wwc
 	r.muPipes.Unlock()
-	if err := r.conn.SendMsg(&Packet***REMOVED***Type: PACKET_REQ, ID: id***REMOVED***); err != nil ***REMOVED***
+	if err := r.conn.SendMsg(&Packet{Type: PACKET_REQ, ID: id}); err != nil {
 		return err
-	***REMOVED***
+	}
 	err := wwc.Wait(ctx)
 	r.muPipes.Lock()
 	delete(r.pipes, id)
 	r.muPipes.Unlock()
 	return err
-***REMOVED***
+}
 
-type wrappedWriteCloser struct ***REMOVED***
+type wrappedWriteCloser struct {
 	io.WriteCloser
 	err  error
 	once sync.Once
-	done chan struct***REMOVED******REMOVED***
-***REMOVED***
+	done chan struct{}
+}
 
-func newWrappedWriteCloser(wc io.WriteCloser) *wrappedWriteCloser ***REMOVED***
-	return &wrappedWriteCloser***REMOVED***WriteCloser: wc, done: make(chan struct***REMOVED******REMOVED***)***REMOVED***
-***REMOVED***
+func newWrappedWriteCloser(wc io.WriteCloser) *wrappedWriteCloser {
+	return &wrappedWriteCloser{WriteCloser: wc, done: make(chan struct{})}
+}
 
-func (w *wrappedWriteCloser) Close() error ***REMOVED***
+func (w *wrappedWriteCloser) Close() error {
 	w.err = w.WriteCloser.Close()
-	w.once.Do(func() ***REMOVED*** close(w.done) ***REMOVED***)
+	w.once.Do(func() { close(w.done) })
 	return w.err
-***REMOVED***
+}
 
-func (w *wrappedWriteCloser) Wait(ctx context.Context) error ***REMOVED***
-	select ***REMOVED***
+func (w *wrappedWriteCloser) Wait(ctx context.Context) error {
+	select {
 	case <-ctx.Done():
 		return ctx.Err()
 	case <-w.done:
 		return w.err
-	***REMOVED***
-***REMOVED***
+	}
+}

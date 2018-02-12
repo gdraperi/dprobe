@@ -18,19 +18,19 @@ import (
 	"os/exec"
 )
 
-func main() ***REMOVED***
+func main() {
 	c := exec.Command("grep", "--color=auto", "bar")
 	f, err := pty.Start(c)
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 
-	go func() ***REMOVED***
+	go func() {
 		f.Write([]byte("foo\n"))
 		f.Write([]byte("bar\n"))
 		f.Write([]byte("baz\n"))
-		f.Write([]byte***REMOVED***4***REMOVED***) // EOT
-	***REMOVED***()
+		f.Write([]byte{4}) // EOT
+	}()
 	io.Copy(os.Stdout, f)
-***REMOVED***
+}
 ```

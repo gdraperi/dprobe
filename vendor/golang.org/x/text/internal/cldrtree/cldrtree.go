@@ -82,7 +82,7 @@ import (
 // - allow two Trees to share the same set of buckets.
 
 // A Builder allows storing CLDR data in compact form.
-type Builder struct ***REMOVED***
+type Builder struct {
 	table []string
 
 	rootMeta    *metaData
@@ -96,258 +96,258 @@ type Builder struct ***REMOVED***
 	size        int
 	sizeAll     int
 	bucketWaste int
-***REMOVED***
+}
 
 const (
 	maxBucketSize = 8 * 1024 // 8K
 	maxStrlen     = 254      // allow 0xFF sentinel
 )
 
-func (b *Builder) setError(err error) ***REMOVED***
-	if b.err == nil ***REMOVED***
+func (b *Builder) setError(err error) {
+	if b.err == nil {
 		b.err = err
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (b *Builder) addString(data string) stringInfo ***REMOVED***
+func (b *Builder) addString(data string) stringInfo {
 	data = b.makeString(data)
 	info, ok := b.strToBucket[data]
-	if !ok ***REMOVED***
+	if !ok {
 		b.size += len(data)
 		x := len(b.buckets) - 1
 		bucket := b.buckets[x]
-		if len(bucket)+len(data) < maxBucketSize ***REMOVED***
+		if len(bucket)+len(data) < maxBucketSize {
 			info.bucket = uint16(x)
 			info.bucketPos = uint16(len(bucket))
 			b.buckets[x] = append(bucket, data...)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			info.bucket = uint16(len(b.buckets))
 			info.bucketPos = 0
 			b.buckets = append(b.buckets, []byte(data))
-		***REMOVED***
+		}
 		b.strToBucket[data] = info
-	***REMOVED***
+	}
 	return info
-***REMOVED***
+}
 
-func (b *Builder) addStringToBucket(data string, bucket uint16) stringInfo ***REMOVED***
+func (b *Builder) addStringToBucket(data string, bucket uint16) stringInfo {
 	data = b.makeString(data)
 	info, ok := b.strToBucket[data]
-	if !ok || info.bucket != bucket ***REMOVED***
-		if ok ***REMOVED***
+	if !ok || info.bucket != bucket {
+		if ok {
 			b.bucketWaste += len(data)
-		***REMOVED***
+		}
 		b.size += len(data)
 		bk := b.buckets[bucket]
 		info.bucket = bucket
 		info.bucketPos = uint16(len(bk))
 		b.buckets[bucket] = append(bk, data...)
 		b.strToBucket[data] = info
-	***REMOVED***
+	}
 	return info
-***REMOVED***
+}
 
-func (b *Builder) makeString(data string) string ***REMOVED***
-	if len(data) > maxStrlen ***REMOVED***
+func (b *Builder) makeString(data string) string {
+	if len(data) > maxStrlen {
 		b.setError(fmt.Errorf("string %q exceeds maximum length of %d", data, maxStrlen))
 		data = data[:maxStrlen]
-		for i := len(data) - 1; i > len(data)-4; i-- ***REMOVED***
-			if utf8.RuneStart(data[i]) ***REMOVED***
+		for i := len(data) - 1; i > len(data)-4; i-- {
+			if utf8.RuneStart(data[i]) {
 				data = data[:i]
 				break
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-	data = string([]byte***REMOVED***byte(len(data))***REMOVED***) + data
+			}
+		}
+	}
+	data = string([]byte{byte(len(data))}) + data
 	b.sizeAll += len(data)
 	return data
-***REMOVED***
+}
 
-type stringInfo struct ***REMOVED***
+type stringInfo struct {
 	bufferPos uint32
 	bucket    uint16
 	bucketPos uint16
-***REMOVED***
+}
 
 // New creates a new Builder.
-func New(tableName string) *Builder ***REMOVED***
-	b := &Builder***REMOVED***
-		strToBucket: map[string]stringInfo***REMOVED******REMOVED***,
-		buckets:     [][]byte***REMOVED***nil***REMOVED***, // initialize with first bucket.
-	***REMOVED***
-	b.rootMeta = &metaData***REMOVED***
+func New(tableName string) *Builder {
+	b := &Builder{
+		strToBucket: map[string]stringInfo{},
+		buckets:     [][]byte{nil}, // initialize with first bucket.
+	}
+	b.rootMeta = &metaData{
 		b:        b,
-		typeInfo: &typeInfo***REMOVED******REMOVED***,
-	***REMOVED***
+		typeInfo: &typeInfo{},
+	}
 	return b
-***REMOVED***
+}
 
 // Gen writes all the tables and types for the collected data.
-func (b *Builder) Gen(w *gen.CodeWriter) error ***REMOVED***
+func (b *Builder) Gen(w *gen.CodeWriter) error {
 	t, err := build(b)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return generate(b, t, w)
-***REMOVED***
+}
 
 // GenTestData generates tables useful for testing data generated with Gen.
-func (b *Builder) GenTestData(w *gen.CodeWriter) error ***REMOVED***
+func (b *Builder) GenTestData(w *gen.CodeWriter) error {
 	return generateTestData(b, w)
-***REMOVED***
+}
 
-type locale struct ***REMOVED***
+type locale struct {
 	tag  language.Tag
 	root *Index
-***REMOVED***
+}
 
 // Locale creates an index for the given locale.
-func (b *Builder) Locale(t language.Tag) *Index ***REMOVED***
-	index := &Index***REMOVED***
+func (b *Builder) Locale(t language.Tag) *Index {
+	index := &Index{
 		meta: b.rootMeta,
-	***REMOVED***
-	b.locales = append(b.locales, locale***REMOVED***tag: t, root: index***REMOVED***)
+	}
+	b.locales = append(b.locales, locale{tag: t, root: index})
 	return index
-***REMOVED***
+}
 
 // An Index holds a map of either leaf values or other indices.
-type Index struct ***REMOVED***
+type Index struct {
 	meta *metaData
 
 	subIndex []*Index
 	values   []keyValue
-***REMOVED***
+}
 
-func (i *Index) setError(err error) ***REMOVED*** i.meta.b.setError(err) ***REMOVED***
+func (i *Index) setError(err error) { i.meta.b.setError(err) }
 
-type keyValue struct ***REMOVED***
+type keyValue struct {
 	key   enumIndex
 	value stringInfo
-***REMOVED***
+}
 
 // Element is a CLDR XML element.
-type Element interface ***REMOVED***
+type Element interface {
 	GetCommon() *cldr.Common
-***REMOVED***
+}
 
 // Index creates a subindex where the type and enum values are not shared
 // with siblings by default. The name is derived from the elem. If elem is
 // an alias reference, the alias will be resolved and linked. If elem is nil
 // Index returns nil.
-func (i *Index) Index(elem Element, opt ...Option) *Index ***REMOVED***
-	if elem == nil || reflect.ValueOf(elem).IsNil() ***REMOVED***
+func (i *Index) Index(elem Element, opt ...Option) *Index {
+	if elem == nil || reflect.ValueOf(elem).IsNil() {
 		return nil
-	***REMOVED***
+	}
 	c := elem.GetCommon()
-	o := &options***REMOVED***
+	o := &options{
 		parent: i,
 		name:   c.GetCommon().Element(),
-	***REMOVED***
+	}
 	o.fill(opt)
 	o.setAlias(elem)
 	return i.subIndexForKey(o)
-***REMOVED***
+}
 
 // IndexWithName is like Section but derives the name from the given name.
-func (i *Index) IndexWithName(name string, opt ...Option) *Index ***REMOVED***
-	o := &options***REMOVED***parent: i, name: name***REMOVED***
+func (i *Index) IndexWithName(name string, opt ...Option) *Index {
+	o := &options{parent: i, name: name}
 	o.fill(opt)
 	return i.subIndexForKey(o)
-***REMOVED***
+}
 
 // IndexFromType creates a subindex the value of tye type attribute as key. It
 // will also configure the Index to share the enumeration values with all
 // sibling values. If elem is an alias, it will be resolved and linked.
-func (i *Index) IndexFromType(elem Element, opts ...Option) *Index ***REMOVED***
-	o := &options***REMOVED***
+func (i *Index) IndexFromType(elem Element, opts ...Option) *Index {
+	o := &options{
 		parent: i,
 		name:   elem.GetCommon().Type,
-	***REMOVED***
+	}
 	o.fill(opts)
 	o.setAlias(elem)
 	useSharedType()(o)
 	return i.subIndexForKey(o)
-***REMOVED***
+}
 
 // IndexFromAlt creates a subindex the value of tye alt attribute as key. It
 // will also configure the Index to share the enumeration values with all
 // sibling values. If elem is an alias, it will be resolved and linked.
-func (i *Index) IndexFromAlt(elem Element, opts ...Option) *Index ***REMOVED***
-	o := &options***REMOVED***
+func (i *Index) IndexFromAlt(elem Element, opts ...Option) *Index {
+	o := &options{
 		parent: i,
 		name:   elem.GetCommon().Alt,
-	***REMOVED***
+	}
 	o.fill(opts)
 	o.setAlias(elem)
 	useSharedType()(o)
 	return i.subIndexForKey(o)
-***REMOVED***
+}
 
-func (i *Index) subIndexForKey(opts *options) *Index ***REMOVED***
+func (i *Index) subIndexForKey(opts *options) *Index {
 	key := opts.name
-	if len(i.values) > 0 ***REMOVED***
+	if len(i.values) > 0 {
 		panic(fmt.Errorf("cldrtree: adding Index for %q when value already exists", key))
-	***REMOVED***
+	}
 	meta := i.meta.sub(key, opts)
-	for _, x := range i.subIndex ***REMOVED***
-		if x.meta == meta ***REMOVED***
+	for _, x := range i.subIndex {
+		if x.meta == meta {
 			return x
-		***REMOVED***
-	***REMOVED***
-	if alias := opts.alias; alias != nil ***REMOVED***
-		if a := alias.GetCommon().Alias; a != nil ***REMOVED***
-			if a.Source != "locale" ***REMOVED***
+		}
+	}
+	if alias := opts.alias; alias != nil {
+		if a := alias.GetCommon().Alias; a != nil {
+			if a.Source != "locale" {
 				i.setError(fmt.Errorf("cldrtree: non-locale alias not supported %v", a.Path))
-			***REMOVED***
-			if meta.inheritOffset < 0 ***REMOVED***
+			}
+			if meta.inheritOffset < 0 {
 				i.setError(fmt.Errorf("cldrtree: alias was already set %v", a.Path))
-			***REMOVED***
+			}
 			path := a.Path
-			for ; strings.HasPrefix(path, "../"); path = path[len("../"):] ***REMOVED***
+			for ; strings.HasPrefix(path, "../"); path = path[len("../"):] {
 				meta.inheritOffset--
-			***REMOVED***
+			}
 			m := aliasRe.FindStringSubmatch(path)
-			if m == nil ***REMOVED***
+			if m == nil {
 				i.setError(fmt.Errorf("cldrtree: could not parse alias %q", a.Path))
-			***REMOVED*** else ***REMOVED***
+			} else {
 				key := m[4]
-				if key == "" ***REMOVED***
+				if key == "" {
 					key = m[1]
-				***REMOVED***
+				}
 				meta.inheritIndex = key
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-	x := &Index***REMOVED***meta: meta***REMOVED***
+			}
+		}
+	}
+	x := &Index{meta: meta}
 	i.subIndex = append(i.subIndex, x)
 	return x
-***REMOVED***
+}
 
 var aliasRe = regexp.MustCompile(`^([a-zA-Z]+)(\[@([a-zA-Z-]+)='([a-zA-Z-]+)'\])?`)
 
 // SetValue sets the value, the data from a CLDR XML element, for the given key.
-func (i *Index) SetValue(key string, value Element, opt ...Option) ***REMOVED***
-	if len(i.subIndex) > 0 ***REMOVED***
+func (i *Index) SetValue(key string, value Element, opt ...Option) {
+	if len(i.subIndex) > 0 {
 		panic(fmt.Errorf("adding value for key %q when index already exists", key))
-	***REMOVED***
-	o := &options***REMOVED***parent: i***REMOVED***
+	}
+	o := &options{parent: i}
 	o.fill(opt)
 	c := value.GetCommon()
-	if c.Alias != nil ***REMOVED***
+	if c.Alias != nil {
 		i.setError(fmt.Errorf("cldrtree: alias not supported for SetValue %v", c.Alias.Path))
-	***REMOVED***
+	}
 	i.setValue(key, c.Data(), o)
-***REMOVED***
+}
 
-func (i *Index) setValue(key, data string, o *options) ***REMOVED***
+func (i *Index) setValue(key, data string, o *options) {
 	index, _ := i.meta.typeInfo.lookupSubtype(key, o)
-	kv := keyValue***REMOVED***key: index***REMOVED***
-	if len(i.values) > 0 ***REMOVED***
+	kv := keyValue{key: index}
+	if len(i.values) > 0 {
 		// Add string to the same bucket as the other values.
 		bucket := i.values[0].value.bucket
 		kv.value = i.meta.b.addStringToBucket(data, bucket)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		kv.value = i.meta.b.addString(data)
-	***REMOVED***
+	}
 	i.values = append(i.values, kv)
-***REMOVED***
+}

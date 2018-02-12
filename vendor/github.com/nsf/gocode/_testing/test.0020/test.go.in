@@ -2,21 +2,21 @@ package main
 
 import "sync"
 
-type Dummy struct ***REMOVED***
+type Dummy struct {
 	sync.Mutex
-***REMOVED***
+}
 
-type Bar struct ***REMOVED***
+type Bar struct {
 	Dummy
-***REMOVED***
+}
 
-func (b *Bar) Lock() ***REMOVED***
-***REMOVED***
+func (b *Bar) Lock() {
+}
 
-func (b *Bar) Unlock() ***REMOVED***
-***REMOVED***
+func (b *Bar) Unlock() {
+}
 
-func main() ***REMOVED***
+func main() {
 	var b Bar
 	b.
-***REMOVED***
+}

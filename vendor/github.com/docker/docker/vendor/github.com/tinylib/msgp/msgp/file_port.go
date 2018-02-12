@@ -10,38 +10,38 @@ import (
 // MarshalSizer is the combination
 // of the Marshaler and Sizer
 // interfaces.
-type MarshalSizer interface ***REMOVED***
+type MarshalSizer interface {
 	Marshaler
 	Sizer
-***REMOVED***
+}
 
-func ReadFile(dst Unmarshaler, file *os.File) error ***REMOVED***
-	if u, ok := dst.(Decodable); ok ***REMOVED***
+func ReadFile(dst Unmarshaler, file *os.File) error {
+	if u, ok := dst.(Decodable); ok {
 		return u.DecodeMsg(NewReader(file))
-	***REMOVED***
+	}
 
 	data, err := ioutil.ReadAll(file)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	_, err = dst.UnmarshalMsg(data)
 	return err
-***REMOVED***
+}
 
-func WriteFile(src MarshalSizer, file *os.File) error ***REMOVED***
-	if e, ok := src.(Encodable); ok ***REMOVED***
+func WriteFile(src MarshalSizer, file *os.File) error {
+	if e, ok := src.(Encodable); ok {
 		w := NewWriter(file)
 		err := e.EncodeMsg(w)
-		if err == nil ***REMOVED***
+		if err == nil {
 			err = w.Flush()
-		***REMOVED***
+		}
 		return err
-	***REMOVED***
+	}
 
 	raw, err := src.MarshalMsg(nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	_, err = file.Write(raw)
 	return err
-***REMOVED***
+}

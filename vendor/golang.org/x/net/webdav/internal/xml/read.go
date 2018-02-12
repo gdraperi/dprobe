@@ -111,32 +111,32 @@ import (
 // Unmarshal maps an XML element to a pointer by setting the pointer
 // to a freshly allocated value and then mapping the element to that value.
 //
-func Unmarshal(data []byte, v interface***REMOVED******REMOVED***) error ***REMOVED***
+func Unmarshal(data []byte, v interface{}) error {
 	return NewDecoder(bytes.NewReader(data)).Decode(v)
-***REMOVED***
+}
 
 // Decode works like xml.Unmarshal, except it reads the decoder
 // stream to find the start element.
-func (d *Decoder) Decode(v interface***REMOVED******REMOVED***) error ***REMOVED***
+func (d *Decoder) Decode(v interface{}) error {
 	return d.DecodeElement(v, nil)
-***REMOVED***
+}
 
 // DecodeElement works like xml.Unmarshal except that it takes
 // a pointer to the start XML element to decode into v.
 // It is useful when a client reads some raw XML tokens itself
 // but also wants to defer to Unmarshal for some elements.
-func (d *Decoder) DecodeElement(v interface***REMOVED******REMOVED***, start *StartElement) error ***REMOVED***
+func (d *Decoder) DecodeElement(v interface{}, start *StartElement) error {
 	val := reflect.ValueOf(v)
-	if val.Kind() != reflect.Ptr ***REMOVED***
+	if val.Kind() != reflect.Ptr {
 		return errors.New("non-pointer passed to Unmarshal")
-	***REMOVED***
+	}
 	return d.unmarshal(val.Elem(), start)
-***REMOVED***
+}
 
 // An UnmarshalError represents an error in the unmarshalling process.
 type UnmarshalError string
 
-func (e UnmarshalError) Error() string ***REMOVED*** return string(e) ***REMOVED***
+func (e UnmarshalError) Error() string { return string(e) }
 
 // Unmarshaler is the interface implemented by objects that can unmarshal
 // an XML element description of themselves.
@@ -153,9 +153,9 @@ func (e UnmarshalError) Error() string ***REMOVED*** return string(e) ***REMOVED
 // Another common strategy is to use d.Token to process the
 // XML object one token at a time.
 // UnmarshalXML may not use d.RawToken.
-type Unmarshaler interface ***REMOVED***
+type Unmarshaler interface {
 	UnmarshalXML(d *Decoder, start StartElement) error
-***REMOVED***
+}
 
 // UnmarshalerAttr is the interface implemented by objects that can unmarshal
 // an XML attribute description of themselves.
@@ -165,102 +165,102 @@ type Unmarshaler interface ***REMOVED***
 // returns that error.
 // UnmarshalXMLAttr is used only for struct fields with the
 // "attr" option in the field tag.
-type UnmarshalerAttr interface ***REMOVED***
+type UnmarshalerAttr interface {
 	UnmarshalXMLAttr(attr Attr) error
-***REMOVED***
+}
 
 // receiverType returns the receiver type to use in an expression like "%s.MethodName".
-func receiverType(val interface***REMOVED******REMOVED***) string ***REMOVED***
+func receiverType(val interface{}) string {
 	t := reflect.TypeOf(val)
-	if t.Name() != "" ***REMOVED***
+	if t.Name() != "" {
 		return t.String()
-	***REMOVED***
+	}
 	return "(" + t.String() + ")"
-***REMOVED***
+}
 
 // unmarshalInterface unmarshals a single XML element into val.
 // start is the opening tag of the element.
-func (p *Decoder) unmarshalInterface(val Unmarshaler, start *StartElement) error ***REMOVED***
+func (p *Decoder) unmarshalInterface(val Unmarshaler, start *StartElement) error {
 	// Record that decoder must stop at end tag corresponding to start.
 	p.pushEOF()
 
 	p.unmarshalDepth++
 	err := val.UnmarshalXML(p, *start)
 	p.unmarshalDepth--
-	if err != nil ***REMOVED***
+	if err != nil {
 		p.popEOF()
 		return err
-	***REMOVED***
+	}
 
-	if !p.popEOF() ***REMOVED***
+	if !p.popEOF() {
 		return fmt.Errorf("xml: %s.UnmarshalXML did not consume entire <%s> element", receiverType(val), start.Name.Local)
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // unmarshalTextInterface unmarshals a single XML element into val.
 // The chardata contained in the element (but not its children)
 // is passed to the text unmarshaler.
-func (p *Decoder) unmarshalTextInterface(val encoding.TextUnmarshaler, start *StartElement) error ***REMOVED***
+func (p *Decoder) unmarshalTextInterface(val encoding.TextUnmarshaler, start *StartElement) error {
 	var buf []byte
 	depth := 1
-	for depth > 0 ***REMOVED***
+	for depth > 0 {
 		t, err := p.Token()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-		switch t := t.(type) ***REMOVED***
+		}
+		switch t := t.(type) {
 		case CharData:
-			if depth == 1 ***REMOVED***
+			if depth == 1 {
 				buf = append(buf, t...)
-			***REMOVED***
+			}
 		case StartElement:
 			depth++
 		case EndElement:
 			depth--
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return val.UnmarshalText(buf)
-***REMOVED***
+}
 
 // unmarshalAttr unmarshals a single XML attribute into val.
-func (p *Decoder) unmarshalAttr(val reflect.Value, attr Attr) error ***REMOVED***
-	if val.Kind() == reflect.Ptr ***REMOVED***
-		if val.IsNil() ***REMOVED***
+func (p *Decoder) unmarshalAttr(val reflect.Value, attr Attr) error {
+	if val.Kind() == reflect.Ptr {
+		if val.IsNil() {
 			val.Set(reflect.New(val.Type().Elem()))
-		***REMOVED***
+		}
 		val = val.Elem()
-	***REMOVED***
+	}
 
-	if val.CanInterface() && val.Type().Implements(unmarshalerAttrType) ***REMOVED***
+	if val.CanInterface() && val.Type().Implements(unmarshalerAttrType) {
 		// This is an unmarshaler with a non-pointer receiver,
 		// so it's likely to be incorrect, but we do what we're told.
 		return val.Interface().(UnmarshalerAttr).UnmarshalXMLAttr(attr)
-	***REMOVED***
-	if val.CanAddr() ***REMOVED***
+	}
+	if val.CanAddr() {
 		pv := val.Addr()
-		if pv.CanInterface() && pv.Type().Implements(unmarshalerAttrType) ***REMOVED***
+		if pv.CanInterface() && pv.Type().Implements(unmarshalerAttrType) {
 			return pv.Interface().(UnmarshalerAttr).UnmarshalXMLAttr(attr)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Not an UnmarshalerAttr; try encoding.TextUnmarshaler.
-	if val.CanInterface() && val.Type().Implements(textUnmarshalerType) ***REMOVED***
+	if val.CanInterface() && val.Type().Implements(textUnmarshalerType) {
 		// This is an unmarshaler with a non-pointer receiver,
 		// so it's likely to be incorrect, but we do what we're told.
 		return val.Interface().(encoding.TextUnmarshaler).UnmarshalText([]byte(attr.Value))
-	***REMOVED***
-	if val.CanAddr() ***REMOVED***
+	}
+	if val.CanAddr() {
 		pv := val.Addr()
-		if pv.CanInterface() && pv.Type().Implements(textUnmarshalerType) ***REMOVED***
+		if pv.CanInterface() && pv.Type().Implements(textUnmarshalerType) {
 			return pv.Interface().(encoding.TextUnmarshaler).UnmarshalText([]byte(attr.Value))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	copyValue(val, []byte(attr.Value))
 	return nil
-***REMOVED***
+}
 
 var (
 	unmarshalerType     = reflect.TypeOf((*Unmarshaler)(nil)).Elem()
@@ -269,60 +269,60 @@ var (
 )
 
 // Unmarshal a single XML element into val.
-func (p *Decoder) unmarshal(val reflect.Value, start *StartElement) error ***REMOVED***
+func (p *Decoder) unmarshal(val reflect.Value, start *StartElement) error {
 	// Find start element if we need it.
-	if start == nil ***REMOVED***
-		for ***REMOVED***
+	if start == nil {
+		for {
 			tok, err := p.Token()
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if t, ok := tok.(StartElement); ok ***REMOVED***
+			}
+			if t, ok := tok.(StartElement); ok {
 				start = &t
 				break
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	// Load value from interface, but only if the result will be
 	// usefully addressable.
-	if val.Kind() == reflect.Interface && !val.IsNil() ***REMOVED***
+	if val.Kind() == reflect.Interface && !val.IsNil() {
 		e := val.Elem()
-		if e.Kind() == reflect.Ptr && !e.IsNil() ***REMOVED***
+		if e.Kind() == reflect.Ptr && !e.IsNil() {
 			val = e
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if val.Kind() == reflect.Ptr ***REMOVED***
-		if val.IsNil() ***REMOVED***
+	if val.Kind() == reflect.Ptr {
+		if val.IsNil() {
 			val.Set(reflect.New(val.Type().Elem()))
-		***REMOVED***
+		}
 		val = val.Elem()
-	***REMOVED***
+	}
 
-	if val.CanInterface() && val.Type().Implements(unmarshalerType) ***REMOVED***
+	if val.CanInterface() && val.Type().Implements(unmarshalerType) {
 		// This is an unmarshaler with a non-pointer receiver,
 		// so it's likely to be incorrect, but we do what we're told.
 		return p.unmarshalInterface(val.Interface().(Unmarshaler), start)
-	***REMOVED***
+	}
 
-	if val.CanAddr() ***REMOVED***
+	if val.CanAddr() {
 		pv := val.Addr()
-		if pv.CanInterface() && pv.Type().Implements(unmarshalerType) ***REMOVED***
+		if pv.CanInterface() && pv.Type().Implements(unmarshalerType) {
 			return p.unmarshalInterface(pv.Interface().(Unmarshaler), start)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if val.CanInterface() && val.Type().Implements(textUnmarshalerType) ***REMOVED***
+	if val.CanInterface() && val.Type().Implements(textUnmarshalerType) {
 		return p.unmarshalTextInterface(val.Interface().(encoding.TextUnmarshaler), start)
-	***REMOVED***
+	}
 
-	if val.CanAddr() ***REMOVED***
+	if val.CanAddr() {
 		pv := val.Addr()
-		if pv.CanInterface() && pv.Type().Implements(textUnmarshalerType) ***REMOVED***
+		if pv.CanInterface() && pv.Type().Implements(textUnmarshalerType) {
 			return p.unmarshalTextInterface(pv.Interface().(encoding.TextUnmarshaler), start)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	var (
 		data         []byte
@@ -338,7 +338,7 @@ func (p *Decoder) unmarshal(val reflect.Value, start *StartElement) error ***REM
 		err          error
 	)
 
-	switch v := val; v.Kind() ***REMOVED***
+	switch v := val; v.Kind() {
 	default:
 		return errors.New("unknown type " + v.Type().String())
 
@@ -350,31 +350,31 @@ func (p *Decoder) unmarshal(val reflect.Value, start *StartElement) error ***REM
 
 	case reflect.Slice:
 		typ := v.Type()
-		if typ.Elem().Kind() == reflect.Uint8 ***REMOVED***
+		if typ.Elem().Kind() == reflect.Uint8 {
 			// []byte
 			saveData = v
 			break
-		***REMOVED***
+		}
 
 		// Slice of element values.
 		// Grow slice.
 		n := v.Len()
-		if n >= v.Cap() ***REMOVED***
+		if n >= v.Cap() {
 			ncap := 2 * n
-			if ncap < 4 ***REMOVED***
+			if ncap < 4 {
 				ncap = 4
-			***REMOVED***
+			}
 			new := reflect.MakeSlice(typ, n, ncap)
 			reflect.Copy(new, v)
 			v.Set(new)
-		***REMOVED***
+		}
 		v.SetLen(n + 1)
 
 		// Recur to read element into slice.
-		if err := p.unmarshal(v.Index(n), start); err != nil ***REMOVED***
+		if err := p.unmarshal(v.Index(n), start); err != nil {
 			v.SetLen(n)
 			return err
-		***REMOVED***
+		}
 		return nil
 
 	case reflect.Bool, reflect.Float32, reflect.Float64, reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr, reflect.String:
@@ -382,251 +382,251 @@ func (p *Decoder) unmarshal(val reflect.Value, start *StartElement) error ***REM
 
 	case reflect.Struct:
 		typ := v.Type()
-		if typ == nameType ***REMOVED***
+		if typ == nameType {
 			v.Set(reflect.ValueOf(start.Name))
 			break
-		***REMOVED***
+		}
 
 		sv = v
 		tinfo, err = getTypeInfo(typ)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 
 		// Validate and assign element name.
-		if tinfo.xmlname != nil ***REMOVED***
+		if tinfo.xmlname != nil {
 			finfo := tinfo.xmlname
-			if finfo.name != "" && finfo.name != start.Name.Local ***REMOVED***
+			if finfo.name != "" && finfo.name != start.Name.Local {
 				return UnmarshalError("expected element type <" + finfo.name + "> but have <" + start.Name.Local + ">")
-			***REMOVED***
-			if finfo.xmlns != "" && finfo.xmlns != start.Name.Space ***REMOVED***
+			}
+			if finfo.xmlns != "" && finfo.xmlns != start.Name.Space {
 				e := "expected element <" + finfo.name + "> in name space " + finfo.xmlns + " but have "
-				if start.Name.Space == "" ***REMOVED***
+				if start.Name.Space == "" {
 					e += "no name space"
-				***REMOVED*** else ***REMOVED***
+				} else {
 					e += start.Name.Space
-				***REMOVED***
+				}
 				return UnmarshalError(e)
-			***REMOVED***
+			}
 			fv := finfo.value(sv)
-			if _, ok := fv.Interface().(Name); ok ***REMOVED***
+			if _, ok := fv.Interface().(Name); ok {
 				fv.Set(reflect.ValueOf(start.Name))
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		// Assign attributes.
 		// Also, determine whether we need to save character data or comments.
-		for i := range tinfo.fields ***REMOVED***
+		for i := range tinfo.fields {
 			finfo := &tinfo.fields[i]
-			switch finfo.flags & fMode ***REMOVED***
+			switch finfo.flags & fMode {
 			case fAttr:
 				strv := finfo.value(sv)
 				// Look for attribute.
-				for _, a := range start.Attr ***REMOVED***
-					if a.Name.Local == finfo.name && (finfo.xmlns == "" || finfo.xmlns == a.Name.Space) ***REMOVED***
-						if err := p.unmarshalAttr(strv, a); err != nil ***REMOVED***
+				for _, a := range start.Attr {
+					if a.Name.Local == finfo.name && (finfo.xmlns == "" || finfo.xmlns == a.Name.Space) {
+						if err := p.unmarshalAttr(strv, a); err != nil {
 							return err
-						***REMOVED***
+						}
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 
 			case fCharData:
-				if !saveData.IsValid() ***REMOVED***
+				if !saveData.IsValid() {
 					saveData = finfo.value(sv)
-				***REMOVED***
+				}
 
 			case fComment:
-				if !saveComment.IsValid() ***REMOVED***
+				if !saveComment.IsValid() {
 					saveComment = finfo.value(sv)
-				***REMOVED***
+				}
 
 			case fAny, fAny | fElement:
-				if !saveAny.IsValid() ***REMOVED***
+				if !saveAny.IsValid() {
 					saveAny = finfo.value(sv)
-				***REMOVED***
+				}
 
 			case fInnerXml:
-				if !saveXML.IsValid() ***REMOVED***
+				if !saveXML.IsValid() {
 					saveXML = finfo.value(sv)
-					if p.saved == nil ***REMOVED***
+					if p.saved == nil {
 						saveXMLIndex = 0
 						p.saved = new(bytes.Buffer)
-					***REMOVED*** else ***REMOVED***
+					} else {
 						saveXMLIndex = p.savedOffset()
-					***REMOVED***
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+					}
+				}
+			}
+		}
+	}
 
 	// Find end element.
 	// Process sub-elements along the way.
 Loop:
-	for ***REMOVED***
+	for {
 		var savedOffset int
-		if saveXML.IsValid() ***REMOVED***
+		if saveXML.IsValid() {
 			savedOffset = p.savedOffset()
-		***REMOVED***
+		}
 		tok, err := p.Token()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-		switch t := tok.(type) ***REMOVED***
+		}
+		switch t := tok.(type) {
 		case StartElement:
 			consumed := false
-			if sv.IsValid() ***REMOVED***
+			if sv.IsValid() {
 				consumed, err = p.unmarshalPath(tinfo, sv, nil, &t)
-				if err != nil ***REMOVED***
+				if err != nil {
 					return err
-				***REMOVED***
-				if !consumed && saveAny.IsValid() ***REMOVED***
+				}
+				if !consumed && saveAny.IsValid() {
 					consumed = true
-					if err := p.unmarshal(saveAny, &t); err != nil ***REMOVED***
+					if err := p.unmarshal(saveAny, &t); err != nil {
 						return err
-					***REMOVED***
-				***REMOVED***
-			***REMOVED***
-			if !consumed ***REMOVED***
-				if err := p.Skip(); err != nil ***REMOVED***
+					}
+				}
+			}
+			if !consumed {
+				if err := p.Skip(); err != nil {
 					return err
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 
 		case EndElement:
-			if saveXML.IsValid() ***REMOVED***
+			if saveXML.IsValid() {
 				saveXMLData = p.saved.Bytes()[saveXMLIndex:savedOffset]
-				if saveXMLIndex == 0 ***REMOVED***
+				if saveXMLIndex == 0 {
 					p.saved = nil
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			break Loop
 
 		case CharData:
-			if saveData.IsValid() ***REMOVED***
+			if saveData.IsValid() {
 				data = append(data, t...)
-			***REMOVED***
+			}
 
 		case Comment:
-			if saveComment.IsValid() ***REMOVED***
+			if saveComment.IsValid() {
 				comment = append(comment, t...)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
-	if saveData.IsValid() && saveData.CanInterface() && saveData.Type().Implements(textUnmarshalerType) ***REMOVED***
-		if err := saveData.Interface().(encoding.TextUnmarshaler).UnmarshalText(data); err != nil ***REMOVED***
+	if saveData.IsValid() && saveData.CanInterface() && saveData.Type().Implements(textUnmarshalerType) {
+		if err := saveData.Interface().(encoding.TextUnmarshaler).UnmarshalText(data); err != nil {
 			return err
-		***REMOVED***
-		saveData = reflect.Value***REMOVED******REMOVED***
-	***REMOVED***
+		}
+		saveData = reflect.Value{}
+	}
 
-	if saveData.IsValid() && saveData.CanAddr() ***REMOVED***
+	if saveData.IsValid() && saveData.CanAddr() {
 		pv := saveData.Addr()
-		if pv.CanInterface() && pv.Type().Implements(textUnmarshalerType) ***REMOVED***
-			if err := pv.Interface().(encoding.TextUnmarshaler).UnmarshalText(data); err != nil ***REMOVED***
+		if pv.CanInterface() && pv.Type().Implements(textUnmarshalerType) {
+			if err := pv.Interface().(encoding.TextUnmarshaler).UnmarshalText(data); err != nil {
 				return err
-			***REMOVED***
-			saveData = reflect.Value***REMOVED******REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+			saveData = reflect.Value{}
+		}
+	}
 
-	if err := copyValue(saveData, data); err != nil ***REMOVED***
+	if err := copyValue(saveData, data); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	switch t := saveComment; t.Kind() ***REMOVED***
+	switch t := saveComment; t.Kind() {
 	case reflect.String:
 		t.SetString(string(comment))
 	case reflect.Slice:
 		t.Set(reflect.ValueOf(comment))
-	***REMOVED***
+	}
 
-	switch t := saveXML; t.Kind() ***REMOVED***
+	switch t := saveXML; t.Kind() {
 	case reflect.String:
 		t.SetString(string(saveXMLData))
 	case reflect.Slice:
 		t.Set(reflect.ValueOf(saveXMLData))
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func copyValue(dst reflect.Value, src []byte) (err error) ***REMOVED***
+func copyValue(dst reflect.Value, src []byte) (err error) {
 	dst0 := dst
 
-	if dst.Kind() == reflect.Ptr ***REMOVED***
-		if dst.IsNil() ***REMOVED***
+	if dst.Kind() == reflect.Ptr {
+		if dst.IsNil() {
 			dst.Set(reflect.New(dst.Type().Elem()))
-		***REMOVED***
+		}
 		dst = dst.Elem()
-	***REMOVED***
+	}
 
 	// Save accumulated data.
-	switch dst.Kind() ***REMOVED***
+	switch dst.Kind() {
 	case reflect.Invalid:
 		// Probably a comment.
 	default:
 		return errors.New("cannot unmarshal into " + dst0.Type().String())
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		itmp, err := strconv.ParseInt(string(src), 10, dst.Type().Bits())
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		dst.SetInt(itmp)
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 		utmp, err := strconv.ParseUint(string(src), 10, dst.Type().Bits())
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		dst.SetUint(utmp)
 	case reflect.Float32, reflect.Float64:
 		ftmp, err := strconv.ParseFloat(string(src), dst.Type().Bits())
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		dst.SetFloat(ftmp)
 	case reflect.Bool:
 		value, err := strconv.ParseBool(strings.TrimSpace(string(src)))
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		dst.SetBool(value)
 	case reflect.String:
 		dst.SetString(string(src))
 	case reflect.Slice:
-		if len(src) == 0 ***REMOVED***
+		if len(src) == 0 {
 			// non-nil to flag presence
-			src = []byte***REMOVED******REMOVED***
-		***REMOVED***
+			src = []byte{}
+		}
 		dst.SetBytes(src)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // unmarshalPath walks down an XML structure looking for wanted
 // paths, and calls unmarshal on them.
 // The consumed result tells whether XML elements have been consumed
 // from the Decoder until start's matching end element, or if it's
 // still untouched because start is uninteresting for sv's fields.
-func (p *Decoder) unmarshalPath(tinfo *typeInfo, sv reflect.Value, parents []string, start *StartElement) (consumed bool, err error) ***REMOVED***
+func (p *Decoder) unmarshalPath(tinfo *typeInfo, sv reflect.Value, parents []string, start *StartElement) (consumed bool, err error) {
 	recurse := false
 Loop:
-	for i := range tinfo.fields ***REMOVED***
+	for i := range tinfo.fields {
 		finfo := &tinfo.fields[i]
-		if finfo.flags&fElement == 0 || len(finfo.parents) < len(parents) || finfo.xmlns != "" && finfo.xmlns != start.Name.Space ***REMOVED***
+		if finfo.flags&fElement == 0 || len(finfo.parents) < len(parents) || finfo.xmlns != "" && finfo.xmlns != start.Name.Space {
 			continue
-		***REMOVED***
-		for j := range parents ***REMOVED***
-			if parents[j] != finfo.parents[j] ***REMOVED***
+		}
+		for j := range parents {
+			if parents[j] != finfo.parents[j] {
 				continue Loop
-			***REMOVED***
-		***REMOVED***
-		if len(finfo.parents) == len(parents) && finfo.name == start.Name.Local ***REMOVED***
+			}
+		}
+		if len(finfo.parents) == len(parents) && finfo.name == start.Name.Local {
 			// It's a perfect match, unmarshal the field.
 			return true, p.unmarshal(finfo.value(sv), start)
-		***REMOVED***
-		if len(finfo.parents) > len(parents) && finfo.parents[len(parents)] == start.Name.Local ***REMOVED***
+		}
+		if len(finfo.parents) > len(parents) && finfo.parents[len(parents)] == start.Name.Local {
 			// It's a prefix for the field. Break and recurse
 			// since it's not ok for one field path to be itself
 			// the prefix for another field path.
@@ -636,37 +636,37 @@ Loop:
 			// don't try to append to it.
 			parents = finfo.parents[:len(parents)+1]
 			break
-		***REMOVED***
-	***REMOVED***
-	if !recurse ***REMOVED***
+		}
+	}
+	if !recurse {
 		// We have no business with this element.
 		return false, nil
-	***REMOVED***
+	}
 	// The element is not a perfect match for any field, but one
 	// or more fields have the path to this element as a parent
 	// prefix. Recurse and attempt to match these.
-	for ***REMOVED***
+	for {
 		var tok Token
 		tok, err = p.Token()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return true, err
-		***REMOVED***
-		switch t := tok.(type) ***REMOVED***
+		}
+		switch t := tok.(type) {
 		case StartElement:
 			consumed2, err := p.unmarshalPath(tinfo, sv, parents, &t)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return true, err
-			***REMOVED***
-			if !consumed2 ***REMOVED***
-				if err := p.Skip(); err != nil ***REMOVED***
+			}
+			if !consumed2 {
+				if err := p.Skip(); err != nil {
 					return true, err
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case EndElement:
 			return true, nil
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // Skip reads tokens until it has consumed the end element
 // matching the most recent start element already consumed.
@@ -674,19 +674,19 @@ Loop:
 // skip nested structures.
 // It returns nil if it finds an end element matching the start
 // element; otherwise it returns an error describing the problem.
-func (d *Decoder) Skip() error ***REMOVED***
-	for ***REMOVED***
+func (d *Decoder) Skip() error {
+	for {
 		tok, err := d.Token()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-		switch tok.(type) ***REMOVED***
+		}
+		switch tok.(type) {
 		case StartElement:
-			if err := d.Skip(); err != nil ***REMOVED***
+			if err := d.Skip(); err != nil {
 				return err
-			***REMOVED***
+			}
 		case EndElement:
 			return nil
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

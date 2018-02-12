@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-var sigToType = map[byte]reflect.Type***REMOVED***
+var sigToType = map[byte]reflect.Type{
 	'y': byteType,
 	'b': boolType,
 	'n': int16Type,
@@ -21,34 +21,34 @@ var sigToType = map[byte]reflect.Type***REMOVED***
 	'o': objectPathType,
 	'v': variantType,
 	'h': unixFDIndexType,
-***REMOVED***
+}
 
 // Signature represents a correct type signature as specified by the D-Bus
 // specification. The zero value represents the empty signature, "".
-type Signature struct ***REMOVED***
+type Signature struct {
 	str string
-***REMOVED***
+}
 
 // SignatureOf returns the concatenation of all the signatures of the given
 // values. It panics if one of them is not representable in D-Bus.
-func SignatureOf(vs ...interface***REMOVED******REMOVED***) Signature ***REMOVED***
+func SignatureOf(vs ...interface{}) Signature {
 	var s string
-	for _, v := range vs ***REMOVED***
+	for _, v := range vs {
 		s += getSignature(reflect.TypeOf(v))
-	***REMOVED***
-	return Signature***REMOVED***s***REMOVED***
-***REMOVED***
+	}
+	return Signature{s}
+}
 
 // SignatureOfType returns the signature of the given type. It panics if the
 // type is not representable in D-Bus.
-func SignatureOfType(t reflect.Type) Signature ***REMOVED***
-	return Signature***REMOVED***getSignature(t)***REMOVED***
-***REMOVED***
+func SignatureOfType(t reflect.Type) Signature {
+	return Signature{getSignature(t)}
+}
 
 // getSignature returns the signature of the given type and panics on unknown types.
-func getSignature(t reflect.Type) string ***REMOVED***
+func getSignature(t reflect.Type) string {
 	// handle simple types first
-	switch t.Kind() ***REMOVED***
+	switch t.Kind() {
 	case reflect.Uint8:
 		return "y"
 	case reflect.Bool:
@@ -58,14 +58,14 @@ func getSignature(t reflect.Type) string ***REMOVED***
 	case reflect.Uint16:
 		return "q"
 	case reflect.Int32:
-		if t == unixFDType ***REMOVED***
+		if t == unixFDType {
 			return "h"
-		***REMOVED***
+		}
 		return "i"
 	case reflect.Uint32:
-		if t == unixFDIndexType ***REMOVED***
+		if t == unixFDIndexType {
 			return "h"
-		***REMOVED***
+		}
 		return "u"
 	case reflect.Int64:
 		return "x"
@@ -76,182 +76,182 @@ func getSignature(t reflect.Type) string ***REMOVED***
 	case reflect.Ptr:
 		return getSignature(t.Elem())
 	case reflect.String:
-		if t == objectPathType ***REMOVED***
+		if t == objectPathType {
 			return "o"
-		***REMOVED***
+		}
 		return "s"
 	case reflect.Struct:
-		if t == variantType ***REMOVED***
+		if t == variantType {
 			return "v"
-		***REMOVED*** else if t == signatureType ***REMOVED***
+		} else if t == signatureType {
 			return "g"
-		***REMOVED***
+		}
 		var s string
-		for i := 0; i < t.NumField(); i++ ***REMOVED***
+		for i := 0; i < t.NumField(); i++ {
 			field := t.Field(i)
-			if field.PkgPath == "" && field.Tag.Get("dbus") != "-" ***REMOVED***
+			if field.PkgPath == "" && field.Tag.Get("dbus") != "-" {
 				s += getSignature(t.Field(i).Type)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		return "(" + s + ")"
 	case reflect.Array, reflect.Slice:
 		return "a" + getSignature(t.Elem())
 	case reflect.Map:
-		if !isKeyType(t.Key()) ***REMOVED***
-			panic(InvalidTypeError***REMOVED***t***REMOVED***)
-		***REMOVED***
-		return "a***REMOVED***" + getSignature(t.Key()) + getSignature(t.Elem()) + "***REMOVED***"
-	***REMOVED***
-	panic(InvalidTypeError***REMOVED***t***REMOVED***)
-***REMOVED***
+		if !isKeyType(t.Key()) {
+			panic(InvalidTypeError{t})
+		}
+		return "a{" + getSignature(t.Key()) + getSignature(t.Elem()) + "}"
+	}
+	panic(InvalidTypeError{t})
+}
 
 // ParseSignature returns the signature represented by this string, or a
 // SignatureError if the string is not a valid signature.
-func ParseSignature(s string) (sig Signature, err error) ***REMOVED***
-	if len(s) == 0 ***REMOVED***
+func ParseSignature(s string) (sig Signature, err error) {
+	if len(s) == 0 {
 		return
-	***REMOVED***
-	if len(s) > 255 ***REMOVED***
-		return Signature***REMOVED***""***REMOVED***, SignatureError***REMOVED***s, "too long"***REMOVED***
-	***REMOVED***
+	}
+	if len(s) > 255 {
+		return Signature{""}, SignatureError{s, "too long"}
+	}
 	sig.str = s
-	for err == nil && len(s) != 0 ***REMOVED***
+	for err == nil && len(s) != 0 {
 		err, s = validSingle(s, 0)
-	***REMOVED***
-	if err != nil ***REMOVED***
-		sig = Signature***REMOVED***""***REMOVED***
-	***REMOVED***
+	}
+	if err != nil {
+		sig = Signature{""}
+	}
 
 	return
-***REMOVED***
+}
 
 // ParseSignatureMust behaves like ParseSignature, except that it panics if s
 // is not valid.
-func ParseSignatureMust(s string) Signature ***REMOVED***
+func ParseSignatureMust(s string) Signature {
 	sig, err := ParseSignature(s)
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 	return sig
-***REMOVED***
+}
 
 // Empty retruns whether the signature is the empty signature.
-func (s Signature) Empty() bool ***REMOVED***
+func (s Signature) Empty() bool {
 	return s.str == ""
-***REMOVED***
+}
 
 // Single returns whether the signature represents a single, complete type.
-func (s Signature) Single() bool ***REMOVED***
+func (s Signature) Single() bool {
 	err, r := validSingle(s.str, 0)
 	return err != nil && r == ""
-***REMOVED***
+}
 
 // String returns the signature's string representation.
-func (s Signature) String() string ***REMOVED***
+func (s Signature) String() string {
 	return s.str
-***REMOVED***
+}
 
 // A SignatureError indicates that a signature passed to a function or received
 // on a connection is not a valid signature.
-type SignatureError struct ***REMOVED***
+type SignatureError struct {
 	Sig    string
 	Reason string
-***REMOVED***
+}
 
-func (e SignatureError) Error() string ***REMOVED***
+func (e SignatureError) Error() string {
 	return fmt.Sprintf("dbus: invalid signature: %q (%s)", e.Sig, e.Reason)
-***REMOVED***
+}
 
 // Try to read a single type from this string. If it was successfull, err is nil
 // and rem is the remaining unparsed part. Otherwise, err is a non-nil
 // SignatureError and rem is "". depth is the current recursion depth which may
 // not be greater than 64 and should be given as 0 on the first call.
-func validSingle(s string, depth int) (err error, rem string) ***REMOVED***
-	if s == "" ***REMOVED***
-		return SignatureError***REMOVED***Sig: s, Reason: "empty signature"***REMOVED***, ""
-	***REMOVED***
-	if depth > 64 ***REMOVED***
-		return SignatureError***REMOVED***Sig: s, Reason: "container nesting too deep"***REMOVED***, ""
-	***REMOVED***
-	switch s[0] ***REMOVED***
+func validSingle(s string, depth int) (err error, rem string) {
+	if s == "" {
+		return SignatureError{Sig: s, Reason: "empty signature"}, ""
+	}
+	if depth > 64 {
+		return SignatureError{Sig: s, Reason: "container nesting too deep"}, ""
+	}
+	switch s[0] {
 	case 'y', 'b', 'n', 'q', 'i', 'u', 'x', 't', 'd', 's', 'g', 'o', 'v', 'h':
 		return nil, s[1:]
 	case 'a':
-		if len(s) > 1 && s[1] == '***REMOVED***' ***REMOVED***
-			i := findMatching(s[1:], '***REMOVED***', '***REMOVED***')
-			if i == -1 ***REMOVED***
-				return SignatureError***REMOVED***Sig: s, Reason: "unmatched '***REMOVED***'"***REMOVED***, ""
-			***REMOVED***
+		if len(s) > 1 && s[1] == '{' {
+			i := findMatching(s[1:], '{', '}')
+			if i == -1 {
+				return SignatureError{Sig: s, Reason: "unmatched '{'"}, ""
+			}
 			i++
 			rem = s[i+1:]
 			s = s[2:i]
-			if err, _ = validSingle(s[:1], depth+1); err != nil ***REMOVED***
+			if err, _ = validSingle(s[:1], depth+1); err != nil {
 				return err, ""
-			***REMOVED***
+			}
 			err, nr := validSingle(s[1:], depth+1)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err, ""
-			***REMOVED***
-			if nr != "" ***REMOVED***
-				return SignatureError***REMOVED***Sig: s, Reason: "too many types in dict"***REMOVED***, ""
-			***REMOVED***
+			}
+			if nr != "" {
+				return SignatureError{Sig: s, Reason: "too many types in dict"}, ""
+			}
 			return nil, rem
-		***REMOVED***
+		}
 		return validSingle(s[1:], depth+1)
 	case '(':
 		i := findMatching(s, '(', ')')
-		if i == -1 ***REMOVED***
-			return SignatureError***REMOVED***Sig: s, Reason: "unmatched ')'"***REMOVED***, ""
-		***REMOVED***
+		if i == -1 {
+			return SignatureError{Sig: s, Reason: "unmatched ')'"}, ""
+		}
 		rem = s[i+1:]
 		s = s[1:i]
-		for err == nil && s != "" ***REMOVED***
+		for err == nil && s != "" {
 			err, s = validSingle(s, depth+1)
-		***REMOVED***
-		if err != nil ***REMOVED***
+		}
+		if err != nil {
 			rem = ""
-		***REMOVED***
+		}
 		return
-	***REMOVED***
-	return SignatureError***REMOVED***Sig: s, Reason: "invalid type character"***REMOVED***, ""
-***REMOVED***
+	}
+	return SignatureError{Sig: s, Reason: "invalid type character"}, ""
+}
 
-func findMatching(s string, left, right rune) int ***REMOVED***
+func findMatching(s string, left, right rune) int {
 	n := 0
-	for i, v := range s ***REMOVED***
-		if v == left ***REMOVED***
+	for i, v := range s {
+		if v == left {
 			n++
-		***REMOVED*** else if v == right ***REMOVED***
+		} else if v == right {
 			n--
-		***REMOVED***
-		if n == 0 ***REMOVED***
+		}
+		if n == 0 {
 			return i
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return -1
-***REMOVED***
+}
 
 // typeFor returns the type of the given signature. It ignores any left over
 // characters and panics if s doesn't start with a valid type signature.
-func typeFor(s string) (t reflect.Type) ***REMOVED***
+func typeFor(s string) (t reflect.Type) {
 	err, _ := validSingle(s, 0)
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 
-	if t, ok := sigToType[s[0]]; ok ***REMOVED***
+	if t, ok := sigToType[s[0]]; ok {
 		return t
-	***REMOVED***
-	switch s[0] ***REMOVED***
+	}
+	switch s[0] {
 	case 'a':
-		if s[1] == '***REMOVED***' ***REMOVED***
-			i := strings.LastIndex(s, "***REMOVED***")
+		if s[1] == '{' {
+			i := strings.LastIndex(s, "}")
 			t = reflect.MapOf(sigToType[s[2]], typeFor(s[3:i]))
-		***REMOVED*** else ***REMOVED***
+		} else {
 			t = reflect.SliceOf(typeFor(s[1:]))
-		***REMOVED***
+		}
 	case '(':
 		t = interfacesType
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}

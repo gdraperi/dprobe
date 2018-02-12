@@ -1,6 +1,6 @@
-path ***REMOVED***
+path {
 	policy = "write"
-	permissions = ***REMOVED***
+	permissions = {
         "bool" = [false]
-	***REMOVED***
-***REMOVED***
+	}
+}

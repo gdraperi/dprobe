@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestEscapeProxyRead(t *testing.T) ***REMOVED***
+func TestEscapeProxyRead(t *testing.T) {
 	escapeKeys, _ := ToBytes("DEL")
 	keys, _ := ToBytes("a,b,c,+")
 	reader := NewEscapeProxy(bytes.NewReader(keys), escapeKeys)
@@ -25,7 +25,7 @@ func TestEscapeProxyRead(t *testing.T) ***REMOVED***
 	nr, err = reader.Read(buf)
 	require.Error(t, err, "Should throw error when no keys are to read")
 	require.EqualValues(t, nr, 0, "nr should be zero")
-	require.Condition(t, func() (success bool) ***REMOVED*** return len(keys) == 0 && len(buf) == 0 ***REMOVED***, "keys & the read buffer size should be zero")
+	require.Condition(t, func() (success bool) { return len(keys) == 0 && len(buf) == 0 }, "keys & the read buffer size should be zero")
 
 	escapeKeys, _ = ToBytes("ctrl-x,ctrl-@")
 	keys, _ = ToBytes("DEL")
@@ -41,9 +41,9 @@ func TestEscapeProxyRead(t *testing.T) ***REMOVED***
 	reader = NewEscapeProxy(bytes.NewReader(keys), escapeKeys)
 	buf = make([]byte, len(keys))
 	nr, err = reader.Read(buf)
-	require.Condition(t, func() (success bool) ***REMOVED***
+	require.Condition(t, func() (success bool) {
 		return reflect.TypeOf(err).Name() == "EscapeError"
-	***REMOVED***, err)
+	}, err)
 	require.EqualValues(t, nr, 0, "nr should be equal to 0")
 	require.Equal(t, keys, buf, "keys & the read buffer should be equal")
 
@@ -56,9 +56,9 @@ func TestEscapeProxyRead(t *testing.T) ***REMOVED***
 	require.EqualValues(t, nr, 0, "nr should be equal to 0")
 	require.Equal(t, keys[0:1], buf, "keys & the read buffer should be equal")
 	nr, err = reader.Read(buf)
-	require.Condition(t, func() (success bool) ***REMOVED***
+	require.Condition(t, func() (success bool) {
 		return reflect.TypeOf(err).Name() == "EscapeError"
-	***REMOVED***, err)
+	}, err)
 	require.EqualValues(t, nr, 0, "nr should be equal to 0")
 	require.Equal(t, keys[1:], buf, "keys & the read buffer should be equal")
 
@@ -89,4 +89,4 @@ func TestEscapeProxyRead(t *testing.T) ***REMOVED***
 	require.NoError(t, err)
 	require.EqualValues(t, nr, len(keys), fmt.Sprintf("nr should be equal to %d", len(keys)))
 	require.Equal(t, keys, buf, "keys & the read buffer should be equal")
-***REMOVED***
+}

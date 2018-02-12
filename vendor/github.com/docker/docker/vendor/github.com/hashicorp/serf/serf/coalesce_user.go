@@ -1,52 +1,52 @@
 package serf
 
-type latestUserEvents struct ***REMOVED***
+type latestUserEvents struct {
 	LTime  LamportTime
 	Events []Event
-***REMOVED***
+}
 
-type userEventCoalescer struct ***REMOVED***
+type userEventCoalescer struct {
 	// Maps an event name into the latest versions
 	events map[string]*latestUserEvents
-***REMOVED***
+}
 
-func (c *userEventCoalescer) Handle(e Event) bool ***REMOVED***
+func (c *userEventCoalescer) Handle(e Event) bool {
 	// Only handle EventUser messages
-	if e.EventType() != EventUser ***REMOVED***
+	if e.EventType() != EventUser {
 		return false
-	***REMOVED***
+	}
 
 	// Check if coalescing is enabled
 	user := e.(UserEvent)
 	return user.Coalesce
-***REMOVED***
+}
 
-func (c *userEventCoalescer) Coalesce(e Event) ***REMOVED***
+func (c *userEventCoalescer) Coalesce(e Event) {
 	user := e.(UserEvent)
 	latest, ok := c.events[user.Name]
 
 	// Create a new entry if there are none, or
 	// if this message has the newest LTime
-	if !ok || latest.LTime < user.LTime ***REMOVED***
-		latest = &latestUserEvents***REMOVED***
+	if !ok || latest.LTime < user.LTime {
+		latest = &latestUserEvents{
 			LTime:  user.LTime,
-			Events: []Event***REMOVED***e***REMOVED***,
-		***REMOVED***
+			Events: []Event{e},
+		}
 		c.events[user.Name] = latest
 		return
-	***REMOVED***
+	}
 
 	// If the the same age, save it
-	if latest.LTime == user.LTime ***REMOVED***
+	if latest.LTime == user.LTime {
 		latest.Events = append(latest.Events, e)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (c *userEventCoalescer) Flush(outChan chan<- Event) ***REMOVED***
-	for _, latest := range c.events ***REMOVED***
-		for _, e := range latest.Events ***REMOVED***
+func (c *userEventCoalescer) Flush(outChan chan<- Event) {
+	for _, latest := range c.events {
+		for _, e := range latest.Events {
 			outChan <- e
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	c.events = make(map[string]*latestUserEvents)
-***REMOVED***
+}

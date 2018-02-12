@@ -11,29 +11,29 @@ import (
 	"golang.org/x/text/internal/testtext"
 )
 
-func TestLinking(t *testing.T) ***REMOVED***
+func TestLinking(t *testing.T) {
 	base := getSize(t, `display.Tags(language.English).Name(language.English)`)
 	compact := getSize(t, `display.English.Languages().Name(language.English)`)
 
-	if d := base - compact; d < 1.5*1024*1024 ***REMOVED***
+	if d := base - compact; d < 1.5*1024*1024 {
 		t.Errorf("size(base) - size(compact) = %d - %d = was %d; want > 1.5MB", base, compact, d)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func getSize(t *testing.T, main string) int ***REMOVED***
+func getSize(t *testing.T, main string) int {
 	size, err := testtext.CodeSize(fmt.Sprintf(body, main))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Skipf("skipping link size test; binary size could not be determined: %v", err)
-	***REMOVED***
+	}
 	return size
-***REMOVED***
+}
 
 const body = `package main
 import (
 	"golang.org/x/text/language"
 	"golang.org/x/text/language/display"
 )
-func main() ***REMOVED***
+func main() {
 	%s
-***REMOVED***
+}
 `

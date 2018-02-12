@@ -7,17 +7,17 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func strPtr(source string) *string ***REMOVED***
+func strPtr(source string) *string {
 	return &source
-***REMOVED***
+}
 
-func TestGetAllAllowed(t *testing.T) ***REMOVED***
-	buildArgs := newBuildArgs(map[string]*string***REMOVED***
+func TestGetAllAllowed(t *testing.T) {
+	buildArgs := newBuildArgs(map[string]*string{
 		"ArgNotUsedInDockerfile":              strPtr("fromopt1"),
 		"ArgOverriddenByOptions":              strPtr("fromopt2"),
 		"ArgNoDefaultInDockerfileFromOptions": strPtr("fromopt3"),
 		"HTTP_PROXY":                          strPtr("theproxy"),
-	***REMOVED***)
+	})
 
 	buildArgs.AddMetaArg("ArgFromMeta", strPtr("frommeta1"))
 	buildArgs.AddMetaArg("ArgFromMetaOverridden", strPtr("frommeta2"))
@@ -31,46 +31,46 @@ func TestGetAllAllowed(t *testing.T) ***REMOVED***
 	buildArgs.AddArg("ArgFromMetaOverridden", strPtr("fromdockerfile3"))
 
 	all := buildArgs.GetAllAllowed()
-	expected := map[string]string***REMOVED***
+	expected := map[string]string{
 		"HTTP_PROXY":                          "theproxy",
 		"ArgOverriddenByOptions":              "fromopt2",
 		"ArgWithDefaultInDockerfile":          "fromdockerfile1",
 		"ArgNoDefaultInDockerfileFromOptions": "fromopt3",
 		"ArgFromMeta":                         "frommeta1",
 		"ArgFromMetaOverridden":               "fromdockerfile3",
-	***REMOVED***
+	}
 	assert.Equal(t, expected, all)
-***REMOVED***
+}
 
-func TestGetAllMeta(t *testing.T) ***REMOVED***
-	buildArgs := newBuildArgs(map[string]*string***REMOVED***
+func TestGetAllMeta(t *testing.T) {
+	buildArgs := newBuildArgs(map[string]*string{
 		"ArgNotUsedInDockerfile":        strPtr("fromopt1"),
 		"ArgOverriddenByOptions":        strPtr("fromopt2"),
 		"ArgNoDefaultInMetaFromOptions": strPtr("fromopt3"),
 		"HTTP_PROXY":                    strPtr("theproxy"),
-	***REMOVED***)
+	})
 
 	buildArgs.AddMetaArg("ArgFromMeta", strPtr("frommeta1"))
 	buildArgs.AddMetaArg("ArgOverriddenByOptions", strPtr("frommeta2"))
 	buildArgs.AddMetaArg("ArgNoDefaultInMetaFromOptions", nil)
 
 	all := buildArgs.GetAllMeta()
-	expected := map[string]string***REMOVED***
+	expected := map[string]string{
 		"HTTP_PROXY":                    "theproxy",
 		"ArgFromMeta":                   "frommeta1",
 		"ArgOverriddenByOptions":        "fromopt2",
 		"ArgNoDefaultInMetaFromOptions": "fromopt3",
-	***REMOVED***
+	}
 	assert.Equal(t, expected, all)
-***REMOVED***
+}
 
-func TestWarnOnUnusedBuildArgs(t *testing.T) ***REMOVED***
-	buildArgs := newBuildArgs(map[string]*string***REMOVED***
+func TestWarnOnUnusedBuildArgs(t *testing.T) {
+	buildArgs := newBuildArgs(map[string]*string{
 		"ThisArgIsUsed":    strPtr("fromopt1"),
 		"ThisArgIsNotUsed": strPtr("fromopt2"),
 		"HTTPS_PROXY":      strPtr("referenced builtin"),
 		"HTTP_PROXY":       strPtr("unreferenced builtin"),
-	***REMOVED***)
+	})
 	buildArgs.AddArg("ThisArgIsUsed", nil)
 	buildArgs.AddArg("HTTPS_PROXY", nil)
 
@@ -81,15 +81,15 @@ func TestWarnOnUnusedBuildArgs(t *testing.T) ***REMOVED***
 	assert.NotContains(t, out, "HTTPS_PROXY")
 	assert.NotContains(t, out, "HTTP_PROXY")
 	assert.Contains(t, out, "ThisArgIsNotUsed")
-***REMOVED***
+}
 
-func TestIsUnreferencedBuiltin(t *testing.T) ***REMOVED***
-	buildArgs := newBuildArgs(map[string]*string***REMOVED***
+func TestIsUnreferencedBuiltin(t *testing.T) {
+	buildArgs := newBuildArgs(map[string]*string{
 		"ThisArgIsUsed":    strPtr("fromopt1"),
 		"ThisArgIsNotUsed": strPtr("fromopt2"),
 		"HTTPS_PROXY":      strPtr("referenced builtin"),
 		"HTTP_PROXY":       strPtr("unreferenced builtin"),
-	***REMOVED***)
+	})
 	buildArgs.AddArg("ThisArgIsUsed", nil)
 	buildArgs.AddArg("HTTPS_PROXY", nil)
 
@@ -97,4 +97,4 @@ func TestIsUnreferencedBuiltin(t *testing.T) ***REMOVED***
 	assert.True(t, buildArgs.IsReferencedOrNotBuiltin("ThisArgIsNotUsed"))
 	assert.True(t, buildArgs.IsReferencedOrNotBuiltin("HTTPS_PROXY"))
 	assert.False(t, buildArgs.IsReferencedOrNotBuiltin("HTTP_PROXY"))
-***REMOVED***
+}

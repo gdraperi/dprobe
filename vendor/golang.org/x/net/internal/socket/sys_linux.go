@@ -11,17 +11,17 @@ import (
 	"unsafe"
 )
 
-func probeProtocolStack() int ***REMOVED***
+func probeProtocolStack() int {
 	var p uintptr
 	return int(unsafe.Sizeof(p))
-***REMOVED***
+}
 
-func recvmmsg(s uintptr, hs []mmsghdr, flags int) (int, error) ***REMOVED***
+func recvmmsg(s uintptr, hs []mmsghdr, flags int) (int, error) {
 	n, _, errno := syscall.Syscall6(sysRECVMMSG, s, uintptr(unsafe.Pointer(&hs[0])), uintptr(len(hs)), uintptr(flags), 0, 0)
 	return int(n), errnoErr(errno)
-***REMOVED***
+}
 
-func sendmmsg(s uintptr, hs []mmsghdr, flags int) (int, error) ***REMOVED***
+func sendmmsg(s uintptr, hs []mmsghdr, flags int) (int, error) {
 	n, _, errno := syscall.Syscall6(sysSENDMMSG, s, uintptr(unsafe.Pointer(&hs[0])), uintptr(len(hs)), uintptr(flags), 0, 0)
 	return int(n), errnoErr(errno)
-***REMOVED***
+}

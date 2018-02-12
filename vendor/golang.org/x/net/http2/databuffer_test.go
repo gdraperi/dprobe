@@ -13,63 +13,63 @@ import (
 	"testing"
 )
 
-func fmtDataChunk(chunk []byte) string ***REMOVED***
+func fmtDataChunk(chunk []byte) string {
 	out := ""
 	var last byte
 	var count int
-	for _, c := range chunk ***REMOVED***
-		if c != last ***REMOVED***
-			if count > 0 ***REMOVED***
+	for _, c := range chunk {
+		if c != last {
+			if count > 0 {
 				out += fmt.Sprintf(" x %d ", count)
 				count = 0
-			***REMOVED***
-			out += string([]byte***REMOVED***c***REMOVED***)
+			}
+			out += string([]byte{c})
 			last = c
-		***REMOVED***
+		}
 		count++
-	***REMOVED***
-	if count > 0 ***REMOVED***
+	}
+	if count > 0 {
 		out += fmt.Sprintf(" x %d", count)
-	***REMOVED***
+	}
 	return out
-***REMOVED***
+}
 
-func fmtDataChunks(chunks [][]byte) string ***REMOVED***
+func fmtDataChunks(chunks [][]byte) string {
 	var out string
-	for _, chunk := range chunks ***REMOVED***
-		out += fmt.Sprintf("***REMOVED***%q***REMOVED***", fmtDataChunk(chunk))
-	***REMOVED***
+	for _, chunk := range chunks {
+		out += fmt.Sprintf("{%q}", fmtDataChunk(chunk))
+	}
 	return out
-***REMOVED***
+}
 
-func testDataBuffer(t *testing.T, wantBytes []byte, setup func(t *testing.T) *dataBuffer) ***REMOVED***
+func testDataBuffer(t *testing.T, wantBytes []byte, setup func(t *testing.T) *dataBuffer) {
 	// Run setup, then read the remaining bytes from the dataBuffer and check
 	// that they match wantBytes. We use different read sizes to check corner
 	// cases in Read.
-	for _, readSize := range []int***REMOVED***1, 2, 1 * 1024, 32 * 1024***REMOVED*** ***REMOVED***
-		t.Run(fmt.Sprintf("ReadSize=%d", readSize), func(t *testing.T) ***REMOVED***
+	for _, readSize := range []int{1, 2, 1 * 1024, 32 * 1024} {
+		t.Run(fmt.Sprintf("ReadSize=%d", readSize), func(t *testing.T) {
 			b := setup(t)
 			buf := make([]byte, readSize)
 			var gotRead bytes.Buffer
-			for ***REMOVED***
+			for {
 				n, err := b.Read(buf)
 				gotRead.Write(buf[:n])
-				if err == errReadEmpty ***REMOVED***
+				if err == errReadEmpty {
 					break
-				***REMOVED***
-				if err != nil ***REMOVED***
+				}
+				if err != nil {
 					t.Fatalf("error after %v bytes: %v", gotRead.Len(), err)
-				***REMOVED***
-			***REMOVED***
-			if got, want := gotRead.Bytes(), wantBytes; !bytes.Equal(got, want) ***REMOVED***
+				}
+			}
+			if got, want := gotRead.Bytes(), wantBytes; !bytes.Equal(got, want) {
 				t.Errorf("FinalRead=%q, want %q", fmtDataChunk(got), fmtDataChunk(want))
-			***REMOVED***
-		***REMOVED***)
-	***REMOVED***
-***REMOVED***
+			}
+		})
+	}
+}
 
-func TestDataBufferAllocation(t *testing.T) ***REMOVED***
-	writes := [][]byte***REMOVED***
+func TestDataBufferAllocation(t *testing.T) {
+	writes := [][]byte{
 		bytes.Repeat([]byte("a"), 1*1024-1),
 		[]byte("a"),
 		bytes.Repeat([]byte("b"), 4*1024-1),
@@ -79,79 +79,79 @@ func TestDataBufferAllocation(t *testing.T) ***REMOVED***
 		bytes.Repeat([]byte("d"), 16*1024-1),
 		[]byte("d"),
 		bytes.Repeat([]byte("e"), 32*1024),
-	***REMOVED***
+	}
 	var wantRead bytes.Buffer
-	for _, p := range writes ***REMOVED***
+	for _, p := range writes {
 		wantRead.Write(p)
-	***REMOVED***
+	}
 
-	testDataBuffer(t, wantRead.Bytes(), func(t *testing.T) *dataBuffer ***REMOVED***
-		b := &dataBuffer***REMOVED******REMOVED***
-		for _, p := range writes ***REMOVED***
-			if n, err := b.Write(p); n != len(p) || err != nil ***REMOVED***
+	testDataBuffer(t, wantRead.Bytes(), func(t *testing.T) *dataBuffer {
+		b := &dataBuffer{}
+		for _, p := range writes {
+			if n, err := b.Write(p); n != len(p) || err != nil {
 				t.Fatalf("Write(%q x %d)=%v,%v want %v,nil", p[:1], len(p), n, err, len(p))
-			***REMOVED***
-		***REMOVED***
-		want := [][]byte***REMOVED***
+			}
+		}
+		want := [][]byte{
 			bytes.Repeat([]byte("a"), 1*1024),
 			bytes.Repeat([]byte("b"), 4*1024),
 			bytes.Repeat([]byte("c"), 8*1024),
 			bytes.Repeat([]byte("d"), 16*1024),
 			bytes.Repeat([]byte("e"), 16*1024),
 			bytes.Repeat([]byte("e"), 16*1024),
-		***REMOVED***
-		if !reflect.DeepEqual(b.chunks, want) ***REMOVED***
+		}
+		if !reflect.DeepEqual(b.chunks, want) {
 			t.Errorf("dataBuffer.chunks\ngot:  %s\nwant: %s", fmtDataChunks(b.chunks), fmtDataChunks(want))
-		***REMOVED***
+		}
 		return b
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func TestDataBufferAllocationWithExpected(t *testing.T) ***REMOVED***
-	writes := [][]byte***REMOVED***
+func TestDataBufferAllocationWithExpected(t *testing.T) {
+	writes := [][]byte{
 		bytes.Repeat([]byte("a"), 1*1024), // allocates 16KB
 		bytes.Repeat([]byte("b"), 14*1024),
 		bytes.Repeat([]byte("c"), 15*1024), // allocates 16KB more
 		bytes.Repeat([]byte("d"), 2*1024),
 		bytes.Repeat([]byte("e"), 1*1024), // overflows 32KB expectation, allocates just 1KB
-	***REMOVED***
+	}
 	var wantRead bytes.Buffer
-	for _, p := range writes ***REMOVED***
+	for _, p := range writes {
 		wantRead.Write(p)
-	***REMOVED***
+	}
 
-	testDataBuffer(t, wantRead.Bytes(), func(t *testing.T) *dataBuffer ***REMOVED***
-		b := &dataBuffer***REMOVED***expected: 32 * 1024***REMOVED***
-		for _, p := range writes ***REMOVED***
-			if n, err := b.Write(p); n != len(p) || err != nil ***REMOVED***
+	testDataBuffer(t, wantRead.Bytes(), func(t *testing.T) *dataBuffer {
+		b := &dataBuffer{expected: 32 * 1024}
+		for _, p := range writes {
+			if n, err := b.Write(p); n != len(p) || err != nil {
 				t.Fatalf("Write(%q x %d)=%v,%v want %v,nil", p[:1], len(p), n, err, len(p))
-			***REMOVED***
-		***REMOVED***
-		want := [][]byte***REMOVED***
+			}
+		}
+		want := [][]byte{
 			append(bytes.Repeat([]byte("a"), 1*1024), append(bytes.Repeat([]byte("b"), 14*1024), bytes.Repeat([]byte("c"), 1*1024)...)...),
 			append(bytes.Repeat([]byte("c"), 14*1024), bytes.Repeat([]byte("d"), 2*1024)...),
 			bytes.Repeat([]byte("e"), 1*1024),
-		***REMOVED***
-		if !reflect.DeepEqual(b.chunks, want) ***REMOVED***
+		}
+		if !reflect.DeepEqual(b.chunks, want) {
 			t.Errorf("dataBuffer.chunks\ngot:  %s\nwant: %s", fmtDataChunks(b.chunks), fmtDataChunks(want))
-		***REMOVED***
+		}
 		return b
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func TestDataBufferWriteAfterPartialRead(t *testing.T) ***REMOVED***
-	testDataBuffer(t, []byte("cdxyz"), func(t *testing.T) *dataBuffer ***REMOVED***
-		b := &dataBuffer***REMOVED******REMOVED***
-		if n, err := b.Write([]byte("abcd")); n != 4 || err != nil ***REMOVED***
+func TestDataBufferWriteAfterPartialRead(t *testing.T) {
+	testDataBuffer(t, []byte("cdxyz"), func(t *testing.T) *dataBuffer {
+		b := &dataBuffer{}
+		if n, err := b.Write([]byte("abcd")); n != 4 || err != nil {
 			t.Fatalf("Write(\"abcd\")=%v,%v want 4,nil", n, err)
-		***REMOVED***
+		}
 		p := make([]byte, 2)
-		if n, err := b.Read(p); n != 2 || err != nil || !bytes.Equal(p, []byte("ab")) ***REMOVED***
+		if n, err := b.Read(p); n != 2 || err != nil || !bytes.Equal(p, []byte("ab")) {
 			t.Fatalf("Read()=%q,%v,%v want \"ab\",2,nil", p, n, err)
-		***REMOVED***
-		if n, err := b.Write([]byte("xyz")); n != 3 || err != nil ***REMOVED***
+		}
+		if n, err := b.Write([]byte("xyz")); n != 3 || err != nil {
 			t.Fatalf("Write(\"xyz\")=%v,%v want 3,nil", n, err)
-		***REMOVED***
+		}
 		return b
-	***REMOVED***)
-***REMOVED***
+	})
+}

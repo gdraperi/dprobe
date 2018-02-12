@@ -35,63 +35,63 @@ const (
 )
 
 var (
-	wrlck = syscall.Flock_t***REMOVED***
+	wrlck = syscall.Flock_t{
 		Type:   syscall.F_WRLCK,
 		Whence: int16(io.SeekStart),
 		Start:  0,
 		Len:    0,
-	***REMOVED***
+	}
 
 	linuxTryLockFile = flockTryLockFile
 	linuxLockFile    = flockLockFile
 )
 
-func init() ***REMOVED***
+func init() {
 	// use open file descriptor locks if the system supports it
-	getlk := syscall.Flock_t***REMOVED***Type: syscall.F_RDLCK***REMOVED***
-	if err := syscall.FcntlFlock(0, F_OFD_GETLK, &getlk); err == nil ***REMOVED***
+	getlk := syscall.Flock_t{Type: syscall.F_RDLCK}
+	if err := syscall.FcntlFlock(0, F_OFD_GETLK, &getlk); err == nil {
 		linuxTryLockFile = ofdTryLockFile
 		linuxLockFile = ofdLockFile
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TryLockFile(path string, flag int, perm os.FileMode) (*LockedFile, error) ***REMOVED***
+func TryLockFile(path string, flag int, perm os.FileMode) (*LockedFile, error) {
 	return linuxTryLockFile(path, flag, perm)
-***REMOVED***
+}
 
-func ofdTryLockFile(path string, flag int, perm os.FileMode) (*LockedFile, error) ***REMOVED***
+func ofdTryLockFile(path string, flag int, perm os.FileMode) (*LockedFile, error) {
 	f, err := os.OpenFile(path, flag, perm)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	flock := wrlck
-	if err = syscall.FcntlFlock(f.Fd(), F_OFD_SETLK, &flock); err != nil ***REMOVED***
+	if err = syscall.FcntlFlock(f.Fd(), F_OFD_SETLK, &flock); err != nil {
 		f.Close()
-		if err == syscall.EWOULDBLOCK ***REMOVED***
+		if err == syscall.EWOULDBLOCK {
 			err = ErrLocked
-		***REMOVED***
+		}
 		return nil, err
-	***REMOVED***
-	return &LockedFile***REMOVED***f***REMOVED***, nil
-***REMOVED***
+	}
+	return &LockedFile{f}, nil
+}
 
-func LockFile(path string, flag int, perm os.FileMode) (*LockedFile, error) ***REMOVED***
+func LockFile(path string, flag int, perm os.FileMode) (*LockedFile, error) {
 	return linuxLockFile(path, flag, perm)
-***REMOVED***
+}
 
-func ofdLockFile(path string, flag int, perm os.FileMode) (*LockedFile, error) ***REMOVED***
+func ofdLockFile(path string, flag int, perm os.FileMode) (*LockedFile, error) {
 	f, err := os.OpenFile(path, flag, perm)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	flock := wrlck
 	err = syscall.FcntlFlock(f.Fd(), F_OFD_SETLKW, &flock)
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		f.Close()
 		return nil, err
-	***REMOVED***
-	return &LockedFile***REMOVED***f***REMOVED***, err
-***REMOVED***
+	}
+	return &LockedFile{f}, err
+}

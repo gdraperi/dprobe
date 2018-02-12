@@ -43,7 +43,7 @@ var ErrSnapshotTemporarilyUnavailable = errors.New("snapshot is temporarily unav
 // If any Storage method returns an error, the raft instance will
 // become inoperable and refuse to participate in elections; the
 // application is responsible for cleanup and recovery in this case.
-type Storage interface ***REMOVED***
+type Storage interface {
 	// InitialState returns the saved HardState and ConfState information.
 	InitialState() (pb.HardState, pb.ConfState, error)
 	// Entries returns a slice of log entries in the range [lo,hi).
@@ -67,11 +67,11 @@ type Storage interface ***REMOVED***
 	// so raft state machine could know that Storage needs some time to prepare
 	// snapshot and call Snapshot later.
 	Snapshot() (pb.Snapshot, error)
-***REMOVED***
+}
 
 // MemoryStorage implements the Storage interface backed by an
 // in-memory array.
-type MemoryStorage struct ***REMOVED***
+type MemoryStorage struct {
 	// Protects access to all fields. Most methods of MemoryStorage are
 	// run on the raft goroutine, but Append() is run on an application
 	// goroutine.
@@ -81,148 +81,148 @@ type MemoryStorage struct ***REMOVED***
 	snapshot  pb.Snapshot
 	// ents[i] has raft log position i+snapshot.Metadata.Index
 	ents []pb.Entry
-***REMOVED***
+}
 
 // NewMemoryStorage creates an empty MemoryStorage.
-func NewMemoryStorage() *MemoryStorage ***REMOVED***
-	return &MemoryStorage***REMOVED***
+func NewMemoryStorage() *MemoryStorage {
+	return &MemoryStorage{
 		// When starting from scratch populate the list with a dummy entry at term zero.
 		ents: make([]pb.Entry, 1),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // InitialState implements the Storage interface.
-func (ms *MemoryStorage) InitialState() (pb.HardState, pb.ConfState, error) ***REMOVED***
+func (ms *MemoryStorage) InitialState() (pb.HardState, pb.ConfState, error) {
 	return ms.hardState, ms.snapshot.Metadata.ConfState, nil
-***REMOVED***
+}
 
 // SetHardState saves the current HardState.
-func (ms *MemoryStorage) SetHardState(st pb.HardState) error ***REMOVED***
+func (ms *MemoryStorage) SetHardState(st pb.HardState) error {
 	ms.Lock()
 	defer ms.Unlock()
 	ms.hardState = st
 	return nil
-***REMOVED***
+}
 
 // Entries implements the Storage interface.
-func (ms *MemoryStorage) Entries(lo, hi, maxSize uint64) ([]pb.Entry, error) ***REMOVED***
+func (ms *MemoryStorage) Entries(lo, hi, maxSize uint64) ([]pb.Entry, error) {
 	ms.Lock()
 	defer ms.Unlock()
 	offset := ms.ents[0].Index
-	if lo <= offset ***REMOVED***
+	if lo <= offset {
 		return nil, ErrCompacted
-	***REMOVED***
-	if hi > ms.lastIndex()+1 ***REMOVED***
+	}
+	if hi > ms.lastIndex()+1 {
 		raftLogger.Panicf("entries' hi(%d) is out of bound lastindex(%d)", hi, ms.lastIndex())
-	***REMOVED***
+	}
 	// only contains dummy entries.
-	if len(ms.ents) == 1 ***REMOVED***
+	if len(ms.ents) == 1 {
 		return nil, ErrUnavailable
-	***REMOVED***
+	}
 
 	ents := ms.ents[lo-offset : hi-offset]
 	return limitSize(ents, maxSize), nil
-***REMOVED***
+}
 
 // Term implements the Storage interface.
-func (ms *MemoryStorage) Term(i uint64) (uint64, error) ***REMOVED***
+func (ms *MemoryStorage) Term(i uint64) (uint64, error) {
 	ms.Lock()
 	defer ms.Unlock()
 	offset := ms.ents[0].Index
-	if i < offset ***REMOVED***
+	if i < offset {
 		return 0, ErrCompacted
-	***REMOVED***
-	if int(i-offset) >= len(ms.ents) ***REMOVED***
+	}
+	if int(i-offset) >= len(ms.ents) {
 		return 0, ErrUnavailable
-	***REMOVED***
+	}
 	return ms.ents[i-offset].Term, nil
-***REMOVED***
+}
 
 // LastIndex implements the Storage interface.
-func (ms *MemoryStorage) LastIndex() (uint64, error) ***REMOVED***
+func (ms *MemoryStorage) LastIndex() (uint64, error) {
 	ms.Lock()
 	defer ms.Unlock()
 	return ms.lastIndex(), nil
-***REMOVED***
+}
 
-func (ms *MemoryStorage) lastIndex() uint64 ***REMOVED***
+func (ms *MemoryStorage) lastIndex() uint64 {
 	return ms.ents[0].Index + uint64(len(ms.ents)) - 1
-***REMOVED***
+}
 
 // FirstIndex implements the Storage interface.
-func (ms *MemoryStorage) FirstIndex() (uint64, error) ***REMOVED***
+func (ms *MemoryStorage) FirstIndex() (uint64, error) {
 	ms.Lock()
 	defer ms.Unlock()
 	return ms.firstIndex(), nil
-***REMOVED***
+}
 
-func (ms *MemoryStorage) firstIndex() uint64 ***REMOVED***
+func (ms *MemoryStorage) firstIndex() uint64 {
 	return ms.ents[0].Index + 1
-***REMOVED***
+}
 
 // Snapshot implements the Storage interface.
-func (ms *MemoryStorage) Snapshot() (pb.Snapshot, error) ***REMOVED***
+func (ms *MemoryStorage) Snapshot() (pb.Snapshot, error) {
 	ms.Lock()
 	defer ms.Unlock()
 	return ms.snapshot, nil
-***REMOVED***
+}
 
 // ApplySnapshot overwrites the contents of this Storage object with
 // those of the given snapshot.
-func (ms *MemoryStorage) ApplySnapshot(snap pb.Snapshot) error ***REMOVED***
+func (ms *MemoryStorage) ApplySnapshot(snap pb.Snapshot) error {
 	ms.Lock()
 	defer ms.Unlock()
 
 	//handle check for old snapshot being applied
 	msIndex := ms.snapshot.Metadata.Index
 	snapIndex := snap.Metadata.Index
-	if msIndex >= snapIndex ***REMOVED***
+	if msIndex >= snapIndex {
 		return ErrSnapOutOfDate
-	***REMOVED***
+	}
 
 	ms.snapshot = snap
-	ms.ents = []pb.Entry***REMOVED******REMOVED***Term: snap.Metadata.Term, Index: snap.Metadata.Index***REMOVED******REMOVED***
+	ms.ents = []pb.Entry{{Term: snap.Metadata.Term, Index: snap.Metadata.Index}}
 	return nil
-***REMOVED***
+}
 
 // CreateSnapshot makes a snapshot which can be retrieved with Snapshot() and
 // can be used to reconstruct the state at that point.
 // If any configuration changes have been made since the last compaction,
 // the result of the last ApplyConfChange must be passed in.
-func (ms *MemoryStorage) CreateSnapshot(i uint64, cs *pb.ConfState, data []byte) (pb.Snapshot, error) ***REMOVED***
+func (ms *MemoryStorage) CreateSnapshot(i uint64, cs *pb.ConfState, data []byte) (pb.Snapshot, error) {
 	ms.Lock()
 	defer ms.Unlock()
-	if i <= ms.snapshot.Metadata.Index ***REMOVED***
-		return pb.Snapshot***REMOVED******REMOVED***, ErrSnapOutOfDate
-	***REMOVED***
+	if i <= ms.snapshot.Metadata.Index {
+		return pb.Snapshot{}, ErrSnapOutOfDate
+	}
 
 	offset := ms.ents[0].Index
-	if i > ms.lastIndex() ***REMOVED***
+	if i > ms.lastIndex() {
 		raftLogger.Panicf("snapshot %d is out of bound lastindex(%d)", i, ms.lastIndex())
-	***REMOVED***
+	}
 
 	ms.snapshot.Metadata.Index = i
 	ms.snapshot.Metadata.Term = ms.ents[i-offset].Term
-	if cs != nil ***REMOVED***
+	if cs != nil {
 		ms.snapshot.Metadata.ConfState = *cs
-	***REMOVED***
+	}
 	ms.snapshot.Data = data
 	return ms.snapshot, nil
-***REMOVED***
+}
 
 // Compact discards all log entries prior to compactIndex.
 // It is the application's responsibility to not attempt to compact an index
 // greater than raftLog.applied.
-func (ms *MemoryStorage) Compact(compactIndex uint64) error ***REMOVED***
+func (ms *MemoryStorage) Compact(compactIndex uint64) error {
 	ms.Lock()
 	defer ms.Unlock()
 	offset := ms.ents[0].Index
-	if compactIndex <= offset ***REMOVED***
+	if compactIndex <= offset {
 		return ErrCompacted
-	***REMOVED***
-	if compactIndex > ms.lastIndex() ***REMOVED***
+	}
+	if compactIndex > ms.lastIndex() {
 		raftLogger.Panicf("compact %d is out of bound lastindex(%d)", compactIndex, ms.lastIndex())
-	***REMOVED***
+	}
 
 	i := compactIndex - offset
 	ents := make([]pb.Entry, 1, 1+uint64(len(ms.ents))-i)
@@ -231,15 +231,15 @@ func (ms *MemoryStorage) Compact(compactIndex uint64) error ***REMOVED***
 	ents = append(ents, ms.ents[i+1:]...)
 	ms.ents = ents
 	return nil
-***REMOVED***
+}
 
 // Append the new entries to storage.
 // TODO (xiangli): ensure the entries are continuous and
 // entries[0].Index > ms.entries[0].Index
-func (ms *MemoryStorage) Append(entries []pb.Entry) error ***REMOVED***
-	if len(entries) == 0 ***REMOVED***
+func (ms *MemoryStorage) Append(entries []pb.Entry) error {
+	if len(entries) == 0 {
 		return nil
-	***REMOVED***
+	}
 
 	ms.Lock()
 	defer ms.Unlock()
@@ -248,24 +248,24 @@ func (ms *MemoryStorage) Append(entries []pb.Entry) error ***REMOVED***
 	last := entries[0].Index + uint64(len(entries)) - 1
 
 	// shortcut if there is no new entry.
-	if last < first ***REMOVED***
+	if last < first {
 		return nil
-	***REMOVED***
+	}
 	// truncate compacted entries
-	if first > entries[0].Index ***REMOVED***
+	if first > entries[0].Index {
 		entries = entries[first-entries[0].Index:]
-	***REMOVED***
+	}
 
 	offset := entries[0].Index - ms.ents[0].Index
-	switch ***REMOVED***
+	switch {
 	case uint64(len(ms.ents)) > offset:
-		ms.ents = append([]pb.Entry***REMOVED******REMOVED***, ms.ents[:offset]...)
+		ms.ents = append([]pb.Entry{}, ms.ents[:offset]...)
 		ms.ents = append(ms.ents, entries...)
 	case uint64(len(ms.ents)) == offset:
 		ms.ents = append(ms.ents, entries...)
 	default:
 		raftLogger.Panicf("missing log entry [last: %d, append at: %d]",
 			ms.lastIndex(), entries[0].Index)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

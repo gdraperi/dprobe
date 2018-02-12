@@ -6,11 +6,11 @@ import (
 	"testing"
 )
 
-func TestTailFile(t *testing.T) ***REMOVED***
+func TestTailFile(t *testing.T) {
 	f, err := ioutil.TempFile("", "tail-test")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	defer f.Close()
 	defer os.RemoveAll(f.Name())
 	testFile := []byte(`first line
@@ -39,110 +39,110 @@ last third line
 last fourth line
 last fifth line
 truncated line`)
-	if _, err := f.Write(testFile); err != nil ***REMOVED***
+	if _, err := f.Write(testFile); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if _, err := f.Seek(0, os.SEEK_SET); err != nil ***REMOVED***
+	}
+	if _, err := f.Seek(0, os.SEEK_SET); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	expected := []string***REMOVED***"last fourth line", "last fifth line"***REMOVED***
+	}
+	expected := []string{"last fourth line", "last fifth line"}
 	res, err := TailFile(f, 2)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	for i, l := range res ***REMOVED***
+	}
+	for i, l := range res {
 		t.Logf("%s", l)
-		if expected[i] != string(l) ***REMOVED***
+		if expected[i] != string(l) {
 			t.Fatalf("Expected line %s, got %s", expected[i], l)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestTailFileManyLines(t *testing.T) ***REMOVED***
+func TestTailFileManyLines(t *testing.T) {
 	f, err := ioutil.TempFile("", "tail-test")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	defer f.Close()
 	defer os.RemoveAll(f.Name())
 	testFile := []byte(`first line
 second line
 truncated line`)
-	if _, err := f.Write(testFile); err != nil ***REMOVED***
+	if _, err := f.Write(testFile); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if _, err := f.Seek(0, os.SEEK_SET); err != nil ***REMOVED***
+	}
+	if _, err := f.Seek(0, os.SEEK_SET); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	expected := []string***REMOVED***"first line", "second line"***REMOVED***
+	}
+	expected := []string{"first line", "second line"}
 	res, err := TailFile(f, 10000)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	for i, l := range res ***REMOVED***
+	}
+	for i, l := range res {
 		t.Logf("%s", l)
-		if expected[i] != string(l) ***REMOVED***
+		if expected[i] != string(l) {
 			t.Fatalf("Expected line %s, got %s", expected[i], l)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestTailEmptyFile(t *testing.T) ***REMOVED***
+func TestTailEmptyFile(t *testing.T) {
 	f, err := ioutil.TempFile("", "tail-test")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	defer f.Close()
 	defer os.RemoveAll(f.Name())
 	res, err := TailFile(f, 10000)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if len(res) != 0 ***REMOVED***
+	}
+	if len(res) != 0 {
 		t.Fatal("Must be empty slice from empty file")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestTailNegativeN(t *testing.T) ***REMOVED***
+func TestTailNegativeN(t *testing.T) {
 	f, err := ioutil.TempFile("", "tail-test")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	defer f.Close()
 	defer os.RemoveAll(f.Name())
 	testFile := []byte(`first line
 second line
 truncated line`)
-	if _, err := f.Write(testFile); err != nil ***REMOVED***
+	if _, err := f.Write(testFile); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if _, err := f.Seek(0, os.SEEK_SET); err != nil ***REMOVED***
+	}
+	if _, err := f.Seek(0, os.SEEK_SET); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if _, err := TailFile(f, -1); err != ErrNonPositiveLinesNumber ***REMOVED***
+	}
+	if _, err := TailFile(f, -1); err != ErrNonPositiveLinesNumber {
 		t.Fatalf("Expected ErrNonPositiveLinesNumber, got %s", err)
-	***REMOVED***
-	if _, err := TailFile(f, 0); err != ErrNonPositiveLinesNumber ***REMOVED***
+	}
+	if _, err := TailFile(f, 0); err != ErrNonPositiveLinesNumber {
 		t.Fatalf("Expected ErrNonPositiveLinesNumber, got %s", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func BenchmarkTail(b *testing.B) ***REMOVED***
+func BenchmarkTail(b *testing.B) {
 	f, err := ioutil.TempFile("", "tail-test")
-	if err != nil ***REMOVED***
+	if err != nil {
 		b.Fatal(err)
-	***REMOVED***
+	}
 	defer f.Close()
 	defer os.RemoveAll(f.Name())
-	for i := 0; i < 10000; i++ ***REMOVED***
-		if _, err := f.Write([]byte("tailfile pretty interesting line\n")); err != nil ***REMOVED***
+	for i := 0; i < 10000; i++ {
+		if _, err := f.Write([]byte("tailfile pretty interesting line\n")); err != nil {
 			b.Fatal(err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ ***REMOVED***
-		if _, err := TailFile(f, 1000); err != nil ***REMOVED***
+	for i := 0; i < b.N; i++ {
+		if _, err := TailFile(f, 1000); err != nil {
 			b.Fatal(err)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

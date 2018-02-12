@@ -15,17 +15,17 @@ import (
 )
 
 // Hook up gocheck into the "go test" runner.
-func Test(t *testing.T) ***REMOVED*** check.TestingT(t) ***REMOVED***
+func Test(t *testing.T) { check.TestingT(t) }
 
-type DiscoverySuite struct***REMOVED******REMOVED***
+type DiscoverySuite struct{}
 
-var _ = check.Suite(&DiscoverySuite***REMOVED******REMOVED***)
+var _ = check.Suite(&DiscoverySuite{})
 
-func (ds *DiscoverySuite) TestInitialize(c *check.C) ***REMOVED***
-	storeMock := &FakeStore***REMOVED***
-		Endpoints: []string***REMOVED***"127.0.0.1"***REMOVED***,
-	***REMOVED***
-	d := &Discovery***REMOVED***backend: store.CONSUL***REMOVED***
+func (ds *DiscoverySuite) TestInitialize(c *check.C) {
+	storeMock := &FakeStore{
+		Endpoints: []string{"127.0.0.1"},
+	}
+	d := &Discovery{backend: store.CONSUL}
 	d.Initialize("127.0.0.1", 0, 0, nil)
 	d.store = storeMock
 
@@ -34,10 +34,10 @@ func (ds *DiscoverySuite) TestInitialize(c *check.C) ***REMOVED***
 	c.Assert(s.Endpoints[0], check.Equals, "127.0.0.1")
 	c.Assert(d.path, check.Equals, defaultDiscoveryPath)
 
-	storeMock = &FakeStore***REMOVED***
-		Endpoints: []string***REMOVED***"127.0.0.1:1234"***REMOVED***,
-	***REMOVED***
-	d = &Discovery***REMOVED***backend: store.CONSUL***REMOVED***
+	storeMock = &FakeStore{
+		Endpoints: []string{"127.0.0.1:1234"},
+	}
+	d = &Discovery{backend: store.CONSUL}
 	d.Initialize("127.0.0.1:1234/path", 0, 0, nil)
 	d.store = storeMock
 
@@ -46,10 +46,10 @@ func (ds *DiscoverySuite) TestInitialize(c *check.C) ***REMOVED***
 	c.Assert(s.Endpoints[0], check.Equals, "127.0.0.1:1234")
 	c.Assert(d.path, check.Equals, "path/"+defaultDiscoveryPath)
 
-	storeMock = &FakeStore***REMOVED***
-		Endpoints: []string***REMOVED***"127.0.0.1:1234", "127.0.0.2:1234", "127.0.0.3:1234"***REMOVED***,
-	***REMOVED***
-	d = &Discovery***REMOVED***backend: store.CONSUL***REMOVED***
+	storeMock = &FakeStore{
+		Endpoints: []string{"127.0.0.1:1234", "127.0.0.2:1234", "127.0.0.3:1234"},
+	}
+	d = &Discovery{backend: store.CONSUL}
 	d.Initialize("127.0.0.1:1234,127.0.0.2:1234,127.0.0.3:1234/path", 0, 0, nil)
 	d.store = storeMock
 
@@ -60,78 +60,78 @@ func (ds *DiscoverySuite) TestInitialize(c *check.C) ***REMOVED***
 	c.Assert(s.Endpoints[2], check.Equals, "127.0.0.3:1234")
 
 	c.Assert(d.path, check.Equals, "path/"+defaultDiscoveryPath)
-***REMOVED***
+}
 
 // Extremely limited mock store so we can test initialization
-type Mock struct ***REMOVED***
+type Mock struct {
 	// Endpoints passed to InitializeMock
 	Endpoints []string
 
 	// Options passed to InitializeMock
 	Options *store.Config
-***REMOVED***
+}
 
-func NewMock(endpoints []string, options *store.Config) (store.Store, error) ***REMOVED***
-	s := &Mock***REMOVED******REMOVED***
+func NewMock(endpoints []string, options *store.Config) (store.Store, error) {
+	s := &Mock{}
 	s.Endpoints = endpoints
 	s.Options = options
 	return s, nil
-***REMOVED***
-func (s *Mock) Put(key string, value []byte, opts *store.WriteOptions) error ***REMOVED***
+}
+func (s *Mock) Put(key string, value []byte, opts *store.WriteOptions) error {
 	return errors.New("Put not supported")
-***REMOVED***
-func (s *Mock) Get(key string) (*store.KVPair, error) ***REMOVED***
+}
+func (s *Mock) Get(key string) (*store.KVPair, error) {
 	return nil, errors.New("Get not supported")
-***REMOVED***
-func (s *Mock) Delete(key string) error ***REMOVED***
+}
+func (s *Mock) Delete(key string) error {
 	return errors.New("Delete not supported")
-***REMOVED***
+}
 
 // Exists mock
-func (s *Mock) Exists(key string) (bool, error) ***REMOVED***
+func (s *Mock) Exists(key string) (bool, error) {
 	return false, errors.New("Exists not supported")
-***REMOVED***
+}
 
 // Watch mock
-func (s *Mock) Watch(key string, stopCh <-chan struct***REMOVED******REMOVED***) (<-chan *store.KVPair, error) ***REMOVED***
+func (s *Mock) Watch(key string, stopCh <-chan struct{}) (<-chan *store.KVPair, error) {
 	return nil, errors.New("Watch not supported")
-***REMOVED***
+}
 
 // WatchTree mock
-func (s *Mock) WatchTree(prefix string, stopCh <-chan struct***REMOVED******REMOVED***) (<-chan []*store.KVPair, error) ***REMOVED***
+func (s *Mock) WatchTree(prefix string, stopCh <-chan struct{}) (<-chan []*store.KVPair, error) {
 	return nil, errors.New("WatchTree not supported")
-***REMOVED***
+}
 
 // NewLock mock
-func (s *Mock) NewLock(key string, options *store.LockOptions) (store.Locker, error) ***REMOVED***
+func (s *Mock) NewLock(key string, options *store.LockOptions) (store.Locker, error) {
 	return nil, errors.New("NewLock not supported")
-***REMOVED***
+}
 
 // List mock
-func (s *Mock) List(prefix string) ([]*store.KVPair, error) ***REMOVED***
+func (s *Mock) List(prefix string) ([]*store.KVPair, error) {
 	return nil, errors.New("List not supported")
-***REMOVED***
+}
 
 // DeleteTree mock
-func (s *Mock) DeleteTree(prefix string) error ***REMOVED***
+func (s *Mock) DeleteTree(prefix string) error {
 	return errors.New("DeleteTree not supported")
-***REMOVED***
+}
 
 // AtomicPut mock
-func (s *Mock) AtomicPut(key string, value []byte, previous *store.KVPair, opts *store.WriteOptions) (bool, *store.KVPair, error) ***REMOVED***
+func (s *Mock) AtomicPut(key string, value []byte, previous *store.KVPair, opts *store.WriteOptions) (bool, *store.KVPair, error) {
 	return false, nil, errors.New("AtomicPut not supported")
-***REMOVED***
+}
 
 // AtomicDelete mock
-func (s *Mock) AtomicDelete(key string, previous *store.KVPair) (bool, error) ***REMOVED***
+func (s *Mock) AtomicDelete(key string, previous *store.KVPair) (bool, error) {
 	return false, errors.New("AtomicDelete not supported")
-***REMOVED***
+}
 
 // Close mock
-func (s *Mock) Close() ***REMOVED***
-***REMOVED***
+func (s *Mock) Close() {
+}
 
-func (ds *DiscoverySuite) TestInitializeWithCerts(c *check.C) ***REMOVED***
+func (ds *DiscoverySuite) TestInitializeWithCerts(c *check.C) {
 	cert := `-----BEGIN CERTIFICATE-----
 MIIDCDCCAfKgAwIBAgIICifG7YeiQOEwCwYJKoZIhvcNAQELMBIxEDAOBgNVBAMT
 B1Rlc3QgQ0EwHhcNMTUxMDAxMjMwMDAwWhcNMjAwOTI5MjMwMDAwWjASMRAwDgYD
@@ -192,58 +192,58 @@ BFrwkQE4HQtQBV60hYQUzzlSk44VFDz+jxIEtacRHaomDRh2FtOTz+I=
 	keyFile.Close()
 
 	libkv.AddStore("mock", NewMock)
-	d := &Discovery***REMOVED***backend: "mock"***REMOVED***
-	err = d.Initialize("127.0.0.3:1234", 0, 0, map[string]string***REMOVED***
+	d := &Discovery{backend: "mock"}
+	err = d.Initialize("127.0.0.3:1234", 0, 0, map[string]string{
 		"kv.cacertfile": certFile.Name(),
 		"kv.certfile":   certFile.Name(),
 		"kv.keyfile":    keyFile.Name(),
-	***REMOVED***)
+	})
 	c.Assert(err, check.IsNil)
 	s := d.store.(*Mock)
 	c.Assert(s.Options.TLS, check.NotNil)
 	c.Assert(s.Options.TLS.RootCAs, check.NotNil)
 	c.Assert(s.Options.TLS.Certificates, check.HasLen, 1)
-***REMOVED***
+}
 
-func (ds *DiscoverySuite) TestWatch(c *check.C) ***REMOVED***
+func (ds *DiscoverySuite) TestWatch(c *check.C) {
 	mockCh := make(chan []*store.KVPair)
 
-	storeMock := &FakeStore***REMOVED***
-		Endpoints:  []string***REMOVED***"127.0.0.1:1234"***REMOVED***,
+	storeMock := &FakeStore{
+		Endpoints:  []string{"127.0.0.1:1234"},
 		mockKVChan: mockCh,
-	***REMOVED***
+	}
 
-	d := &Discovery***REMOVED***backend: store.CONSUL***REMOVED***
+	d := &Discovery{backend: store.CONSUL}
 	d.Initialize("127.0.0.1:1234/path", 0, 0, nil)
 	d.store = storeMock
 
-	expected := discovery.Entries***REMOVED***
-		&discovery.Entry***REMOVED***Host: "1.1.1.1", Port: "1111"***REMOVED***,
-		&discovery.Entry***REMOVED***Host: "2.2.2.2", Port: "2222"***REMOVED***,
-	***REMOVED***
-	kvs := []*store.KVPair***REMOVED***
-		***REMOVED***Key: path.Join("path", defaultDiscoveryPath, "1.1.1.1"), Value: []byte("1.1.1.1:1111")***REMOVED***,
-		***REMOVED***Key: path.Join("path", defaultDiscoveryPath, "2.2.2.2"), Value: []byte("2.2.2.2:2222")***REMOVED***,
-	***REMOVED***
+	expected := discovery.Entries{
+		&discovery.Entry{Host: "1.1.1.1", Port: "1111"},
+		&discovery.Entry{Host: "2.2.2.2", Port: "2222"},
+	}
+	kvs := []*store.KVPair{
+		{Key: path.Join("path", defaultDiscoveryPath, "1.1.1.1"), Value: []byte("1.1.1.1:1111")},
+		{Key: path.Join("path", defaultDiscoveryPath, "2.2.2.2"), Value: []byte("2.2.2.2:2222")},
+	}
 
-	stopCh := make(chan struct***REMOVED******REMOVED***)
+	stopCh := make(chan struct{})
 	ch, errCh := d.Watch(stopCh)
 
 	// It should fire an error since the first WatchTree call failed.
 	c.Assert(<-errCh, check.ErrorMatches, "test error")
 	// We have to drain the error channel otherwise Watch will get stuck.
-	go func() ***REMOVED***
-		for range errCh ***REMOVED***
-		***REMOVED***
-	***REMOVED***()
+	go func() {
+		for range errCh {
+		}
+	}()
 
 	// Push the entries into the store channel and make sure discovery emits.
 	mockCh <- kvs
 	c.Assert(<-ch, check.DeepEquals, expected)
 
 	// Add a new entry.
-	expected = append(expected, &discovery.Entry***REMOVED***Host: "3.3.3.3", Port: "3333"***REMOVED***)
-	kvs = append(kvs, &store.KVPair***REMOVED***Key: path.Join("path", defaultDiscoveryPath, "3.3.3.3"), Value: []byte("3.3.3.3:3333")***REMOVED***)
+	expected = append(expected, &discovery.Entry{Host: "3.3.3.3", Port: "3333"})
+	kvs = append(kvs, &store.KVPair{Key: path.Join("path", defaultDiscoveryPath, "3.3.3.3"), Value: []byte("3.3.3.3:3333")})
 	mockCh <- kvs
 	c.Assert(<-ch, check.DeepEquals, expected)
 
@@ -255,68 +255,68 @@ func (ds *DiscoverySuite) TestWatch(c *check.C) ***REMOVED***
 	close(stopCh)
 	c.Assert(<-ch, check.IsNil)
 	c.Assert(<-errCh, check.IsNil)
-***REMOVED***
+}
 
 // FakeStore implements store.Store methods. It mocks all store
 // function in a simple, naive way.
-type FakeStore struct ***REMOVED***
+type FakeStore struct {
 	Endpoints  []string
 	Options    *store.Config
 	mockKVChan <-chan []*store.KVPair
 
 	watchTreeCallCount int
-***REMOVED***
+}
 
-func (s *FakeStore) Put(key string, value []byte, options *store.WriteOptions) error ***REMOVED***
+func (s *FakeStore) Put(key string, value []byte, options *store.WriteOptions) error {
 	return nil
-***REMOVED***
+}
 
-func (s *FakeStore) Get(key string) (*store.KVPair, error) ***REMOVED***
+func (s *FakeStore) Get(key string) (*store.KVPair, error) {
 	return nil, nil
-***REMOVED***
+}
 
-func (s *FakeStore) Delete(key string) error ***REMOVED***
+func (s *FakeStore) Delete(key string) error {
 	return nil
-***REMOVED***
+}
 
-func (s *FakeStore) Exists(key string) (bool, error) ***REMOVED***
+func (s *FakeStore) Exists(key string) (bool, error) {
 	return true, nil
-***REMOVED***
+}
 
-func (s *FakeStore) Watch(key string, stopCh <-chan struct***REMOVED******REMOVED***) (<-chan *store.KVPair, error) ***REMOVED***
+func (s *FakeStore) Watch(key string, stopCh <-chan struct{}) (<-chan *store.KVPair, error) {
 	return nil, nil
-***REMOVED***
+}
 
 // WatchTree will fail the first time, and return the mockKVchan afterwards.
 // This is the behavior we need for testing.. If we need 'moar', should update this.
-func (s *FakeStore) WatchTree(directory string, stopCh <-chan struct***REMOVED******REMOVED***) (<-chan []*store.KVPair, error) ***REMOVED***
-	if s.watchTreeCallCount == 0 ***REMOVED***
+func (s *FakeStore) WatchTree(directory string, stopCh <-chan struct{}) (<-chan []*store.KVPair, error) {
+	if s.watchTreeCallCount == 0 {
 		s.watchTreeCallCount = 1
 		return nil, errors.New("test error")
-	***REMOVED***
+	}
 	// First calls error
 	return s.mockKVChan, nil
-***REMOVED***
+}
 
-func (s *FakeStore) NewLock(key string, options *store.LockOptions) (store.Locker, error) ***REMOVED***
+func (s *FakeStore) NewLock(key string, options *store.LockOptions) (store.Locker, error) {
 	return nil, nil
-***REMOVED***
+}
 
-func (s *FakeStore) List(directory string) ([]*store.KVPair, error) ***REMOVED***
-	return []*store.KVPair***REMOVED******REMOVED***, nil
-***REMOVED***
+func (s *FakeStore) List(directory string) ([]*store.KVPair, error) {
+	return []*store.KVPair{}, nil
+}
 
-func (s *FakeStore) DeleteTree(directory string) error ***REMOVED***
+func (s *FakeStore) DeleteTree(directory string) error {
 	return nil
-***REMOVED***
+}
 
-func (s *FakeStore) AtomicPut(key string, value []byte, previous *store.KVPair, options *store.WriteOptions) (bool, *store.KVPair, error) ***REMOVED***
+func (s *FakeStore) AtomicPut(key string, value []byte, previous *store.KVPair, options *store.WriteOptions) (bool, *store.KVPair, error) {
 	return true, nil, nil
-***REMOVED***
+}
 
-func (s *FakeStore) AtomicDelete(key string, previous *store.KVPair) (bool, error) ***REMOVED***
+func (s *FakeStore) AtomicDelete(key string, previous *store.KVPair) (bool, error) {
 	return true, nil
-***REMOVED***
+}
 
-func (s *FakeStore) Close() ***REMOVED***
-***REMOVED***
+func (s *FakeStore) Close() {
+}

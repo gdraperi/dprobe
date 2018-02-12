@@ -27,38 +27,38 @@ import (
 
 var pid = os.Getpid()
 
-type GlogFormatter struct ***REMOVED***
+type GlogFormatter struct {
 	StringFormatter
-***REMOVED***
+}
 
-func NewGlogFormatter(w io.Writer) *GlogFormatter ***REMOVED***
-	g := &GlogFormatter***REMOVED******REMOVED***
+func NewGlogFormatter(w io.Writer) *GlogFormatter {
+	g := &GlogFormatter{}
 	g.w = bufio.NewWriter(w)
 	return g
-***REMOVED***
+}
 
-func (g GlogFormatter) Format(pkg string, level LogLevel, depth int, entries ...interface***REMOVED******REMOVED***) ***REMOVED***
+func (g GlogFormatter) Format(pkg string, level LogLevel, depth int, entries ...interface{}) {
 	g.w.Write(GlogHeader(level, depth+1))
 	g.StringFormatter.Format(pkg, level, depth+1, entries...)
-***REMOVED***
+}
 
-func GlogHeader(level LogLevel, depth int) []byte ***REMOVED***
+func GlogHeader(level LogLevel, depth int) []byte {
 	// Lmmdd hh:mm:ss.uuuuuu threadid file:line]
 	now := time.Now().UTC()
 	_, file, line, ok := runtime.Caller(depth) // It's always the same number of frames to the user's call.
-	if !ok ***REMOVED***
+	if !ok {
 		file = "???"
 		line = 1
-	***REMOVED*** else ***REMOVED***
+	} else {
 		slash := strings.LastIndex(file, "/")
-		if slash >= 0 ***REMOVED***
+		if slash >= 0 {
 			file = file[slash+1:]
-		***REMOVED***
-	***REMOVED***
-	if line < 0 ***REMOVED***
+		}
+	}
+	if line < 0 {
 		line = 0 // not a real line number
-	***REMOVED***
-	buf := &bytes.Buffer***REMOVED******REMOVED***
+	}
+	buf := &bytes.Buffer{}
 	buf.Grow(30)
 	_, month, day := now.Date()
 	hour, minute, second := now.Clock()
@@ -83,14 +83,14 @@ func GlogHeader(level LogLevel, depth int) []byte ***REMOVED***
 	buf.WriteByte(']')
 	buf.WriteByte(' ')
 	return buf.Bytes()
-***REMOVED***
+}
 
 const digits = "0123456789"
 
-func twoDigits(b *bytes.Buffer, d int) ***REMOVED***
+func twoDigits(b *bytes.Buffer, d int) {
 	c2 := digits[d%10]
 	d /= 10
 	c1 := digits[d%10]
 	b.WriteByte(c1)
 	b.WriteByte(c2)
-***REMOVED***
+}

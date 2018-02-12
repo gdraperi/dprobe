@@ -14,20 +14,20 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestNetworkListError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestNetworkListError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
-	***REMOVED***
+	}
 
-	_, err := client.NetworkList(context.Background(), types.NetworkListOptions***REMOVED***
+	_, err := client.NetworkList(context.Background(), types.NetworkListOptions{
 		Filters: filters.NewArgs(),
-	***REMOVED***)
-	if err == nil || err.Error() != "Error response from daemon: Server error" ***REMOVED***
+	})
+	if err == nil || err.Error() != "Error response from daemon: Server error" {
 		t.Fatalf("expected a Server Error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestNetworkList(t *testing.T) ***REMOVED***
+func TestNetworkList(t *testing.T) {
 	expectedURL := "/networks"
 
 	noDanglingFilters := filters.NewArgs()
@@ -40,69 +40,69 @@ func TestNetworkList(t *testing.T) ***REMOVED***
 	labelFilters.Add("label", "label1")
 	labelFilters.Add("label", "label2")
 
-	listCases := []struct ***REMOVED***
+	listCases := []struct {
 		options         types.NetworkListOptions
 		expectedFilters string
-	***REMOVED******REMOVED***
-		***REMOVED***
-			options: types.NetworkListOptions***REMOVED***
+	}{
+		{
+			options: types.NetworkListOptions{
 				Filters: filters.NewArgs(),
-			***REMOVED***,
+			},
 			expectedFilters: "",
-		***REMOVED***, ***REMOVED***
-			options: types.NetworkListOptions***REMOVED***
+		}, {
+			options: types.NetworkListOptions{
 				Filters: noDanglingFilters,
-			***REMOVED***,
-			expectedFilters: `***REMOVED***"dangling":***REMOVED***"false":true***REMOVED******REMOVED***`,
-		***REMOVED***, ***REMOVED***
-			options: types.NetworkListOptions***REMOVED***
+			},
+			expectedFilters: `{"dangling":{"false":true}}`,
+		}, {
+			options: types.NetworkListOptions{
 				Filters: danglingFilters,
-			***REMOVED***,
-			expectedFilters: `***REMOVED***"dangling":***REMOVED***"true":true***REMOVED******REMOVED***`,
-		***REMOVED***, ***REMOVED***
-			options: types.NetworkListOptions***REMOVED***
+			},
+			expectedFilters: `{"dangling":{"true":true}}`,
+		}, {
+			options: types.NetworkListOptions{
 				Filters: labelFilters,
-			***REMOVED***,
-			expectedFilters: `***REMOVED***"label":***REMOVED***"label1":true,"label2":true***REMOVED******REMOVED***`,
-		***REMOVED***,
-	***REMOVED***
+			},
+			expectedFilters: `{"label":{"label1":true,"label2":true}}`,
+		},
+	}
 
-	for _, listCase := range listCases ***REMOVED***
-		client := &Client***REMOVED***
-			client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-				if !strings.HasPrefix(req.URL.Path, expectedURL) ***REMOVED***
+	for _, listCase := range listCases {
+		client := &Client{
+			client: newMockClient(func(req *http.Request) (*http.Response, error) {
+				if !strings.HasPrefix(req.URL.Path, expectedURL) {
 					return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, req.URL)
-				***REMOVED***
-				if req.Method != "GET" ***REMOVED***
+				}
+				if req.Method != "GET" {
 					return nil, fmt.Errorf("expected GET method, got %s", req.Method)
-				***REMOVED***
+				}
 				query := req.URL.Query()
 				actualFilters := query.Get("filters")
-				if actualFilters != listCase.expectedFilters ***REMOVED***
+				if actualFilters != listCase.expectedFilters {
 					return nil, fmt.Errorf("filters not set in URL query properly. Expected '%s', got %s", listCase.expectedFilters, actualFilters)
-				***REMOVED***
-				content, err := json.Marshal([]types.NetworkResource***REMOVED***
-					***REMOVED***
+				}
+				content, err := json.Marshal([]types.NetworkResource{
+					{
 						Name:   "network",
 						Driver: "bridge",
-					***REMOVED***,
-				***REMOVED***)
-				if err != nil ***REMOVED***
+					},
+				})
+				if err != nil {
 					return nil, err
-				***REMOVED***
-				return &http.Response***REMOVED***
+				}
+				return &http.Response{
 					StatusCode: http.StatusOK,
 					Body:       ioutil.NopCloser(bytes.NewReader(content)),
-				***REMOVED***, nil
-			***REMOVED***),
-		***REMOVED***
+				}, nil
+			}),
+		}
 
 		networkResources, err := client.NetworkList(context.Background(), listCase.options)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
-		if len(networkResources) != 1 ***REMOVED***
+		}
+		if len(networkResources) != 1 {
 			t.Fatalf("expected 1 network resource, got %v", networkResources)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

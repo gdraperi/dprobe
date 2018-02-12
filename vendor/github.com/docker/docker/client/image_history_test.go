@@ -13,48 +13,48 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestImageHistoryError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestImageHistoryError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
-	***REMOVED***
+	}
 	_, err := client.ImageHistory(context.Background(), "nothing")
-	if err == nil || err.Error() != "Error response from daemon: Server error" ***REMOVED***
+	if err == nil || err.Error() != "Error response from daemon: Server error" {
 		t.Fatalf("expected a Server error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestImageHistory(t *testing.T) ***REMOVED***
+func TestImageHistory(t *testing.T) {
 	expectedURL := "/images/image_id/history"
-	client := &Client***REMOVED***
-		client: newMockClient(func(r *http.Request) (*http.Response, error) ***REMOVED***
-			if !strings.HasPrefix(r.URL.Path, expectedURL) ***REMOVED***
+	client := &Client{
+		client: newMockClient(func(r *http.Request) (*http.Response, error) {
+			if !strings.HasPrefix(r.URL.Path, expectedURL) {
 				return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, r.URL)
-			***REMOVED***
-			b, err := json.Marshal([]image.HistoryResponseItem***REMOVED***
-				***REMOVED***
+			}
+			b, err := json.Marshal([]image.HistoryResponseItem{
+				{
 					ID:   "image_id1",
-					Tags: []string***REMOVED***"tag1", "tag2"***REMOVED***,
-				***REMOVED***,
-				***REMOVED***
+					Tags: []string{"tag1", "tag2"},
+				},
+				{
 					ID:   "image_id2",
-					Tags: []string***REMOVED***"tag1", "tag2"***REMOVED***,
-				***REMOVED***,
-			***REMOVED***)
-			if err != nil ***REMOVED***
+					Tags: []string{"tag1", "tag2"},
+				},
+			})
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 
-			return &http.Response***REMOVED***
+			return &http.Response{
 				StatusCode: http.StatusOK,
 				Body:       ioutil.NopCloser(bytes.NewReader(b)),
-			***REMOVED***, nil
-		***REMOVED***),
-	***REMOVED***
+			}, nil
+		}),
+	}
 	imageHistories, err := client.ImageHistory(context.Background(), "image_id")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if len(imageHistories) != 2 ***REMOVED***
+	}
+	if len(imageHistories) != 2 {
 		t.Fatalf("expected 2 containers, got %v", imageHistories)
-	***REMOVED***
-***REMOVED***
+	}
+}

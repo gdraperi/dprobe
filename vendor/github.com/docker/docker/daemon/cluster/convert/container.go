@@ -13,11 +13,11 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func containerSpecFromGRPC(c *swarmapi.ContainerSpec) *types.ContainerSpec ***REMOVED***
-	if c == nil ***REMOVED***
+func containerSpecFromGRPC(c *swarmapi.ContainerSpec) *types.ContainerSpec {
+	if c == nil {
 		return nil
-	***REMOVED***
-	containerSpec := &types.ContainerSpec***REMOVED***
+	}
+	containerSpec := &types.ContainerSpec{
 		Image:      c.Image,
 		Labels:     c.Labels,
 		Command:    c.Command,
@@ -35,188 +35,188 @@ func containerSpecFromGRPC(c *swarmapi.ContainerSpec) *types.ContainerSpec ***RE
 		Secrets:    secretReferencesFromGRPC(c.Secrets),
 		Configs:    configReferencesFromGRPC(c.Configs),
 		Isolation:  IsolationFromGRPC(c.Isolation),
-	***REMOVED***
+	}
 
-	if c.DNSConfig != nil ***REMOVED***
-		containerSpec.DNSConfig = &types.DNSConfig***REMOVED***
+	if c.DNSConfig != nil {
+		containerSpec.DNSConfig = &types.DNSConfig{
 			Nameservers: c.DNSConfig.Nameservers,
 			Search:      c.DNSConfig.Search,
 			Options:     c.DNSConfig.Options,
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Privileges
-	if c.Privileges != nil ***REMOVED***
-		containerSpec.Privileges = &types.Privileges***REMOVED******REMOVED***
+	if c.Privileges != nil {
+		containerSpec.Privileges = &types.Privileges{}
 
-		if c.Privileges.CredentialSpec != nil ***REMOVED***
-			containerSpec.Privileges.CredentialSpec = &types.CredentialSpec***REMOVED******REMOVED***
-			switch c.Privileges.CredentialSpec.Source.(type) ***REMOVED***
+		if c.Privileges.CredentialSpec != nil {
+			containerSpec.Privileges.CredentialSpec = &types.CredentialSpec{}
+			switch c.Privileges.CredentialSpec.Source.(type) {
 			case *swarmapi.Privileges_CredentialSpec_File:
 				containerSpec.Privileges.CredentialSpec.File = c.Privileges.CredentialSpec.GetFile()
 			case *swarmapi.Privileges_CredentialSpec_Registry:
 				containerSpec.Privileges.CredentialSpec.Registry = c.Privileges.CredentialSpec.GetRegistry()
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
-		if c.Privileges.SELinuxContext != nil ***REMOVED***
-			containerSpec.Privileges.SELinuxContext = &types.SELinuxContext***REMOVED***
+		if c.Privileges.SELinuxContext != nil {
+			containerSpec.Privileges.SELinuxContext = &types.SELinuxContext{
 				Disable: c.Privileges.SELinuxContext.Disable,
 				User:    c.Privileges.SELinuxContext.User,
 				Type:    c.Privileges.SELinuxContext.Type,
 				Role:    c.Privileges.SELinuxContext.Role,
 				Level:   c.Privileges.SELinuxContext.Level,
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	// Mounts
-	for _, m := range c.Mounts ***REMOVED***
-		mount := mounttypes.Mount***REMOVED***
+	for _, m := range c.Mounts {
+		mount := mounttypes.Mount{
 			Target:   m.Target,
 			Source:   m.Source,
 			Type:     mounttypes.Type(strings.ToLower(swarmapi.Mount_MountType_name[int32(m.Type)])),
 			ReadOnly: m.ReadOnly,
-		***REMOVED***
+		}
 
-		if m.BindOptions != nil ***REMOVED***
-			mount.BindOptions = &mounttypes.BindOptions***REMOVED***
+		if m.BindOptions != nil {
+			mount.BindOptions = &mounttypes.BindOptions{
 				Propagation: mounttypes.Propagation(strings.ToLower(swarmapi.Mount_BindOptions_MountPropagation_name[int32(m.BindOptions.Propagation)])),
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
-		if m.VolumeOptions != nil ***REMOVED***
-			mount.VolumeOptions = &mounttypes.VolumeOptions***REMOVED***
+		if m.VolumeOptions != nil {
+			mount.VolumeOptions = &mounttypes.VolumeOptions{
 				NoCopy: m.VolumeOptions.NoCopy,
 				Labels: m.VolumeOptions.Labels,
-			***REMOVED***
-			if m.VolumeOptions.DriverConfig != nil ***REMOVED***
-				mount.VolumeOptions.DriverConfig = &mounttypes.Driver***REMOVED***
+			}
+			if m.VolumeOptions.DriverConfig != nil {
+				mount.VolumeOptions.DriverConfig = &mounttypes.Driver{
 					Name:    m.VolumeOptions.DriverConfig.Name,
 					Options: m.VolumeOptions.DriverConfig.Options,
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
+				}
+			}
+		}
 
-		if m.TmpfsOptions != nil ***REMOVED***
-			mount.TmpfsOptions = &mounttypes.TmpfsOptions***REMOVED***
+		if m.TmpfsOptions != nil {
+			mount.TmpfsOptions = &mounttypes.TmpfsOptions{
 				SizeBytes: m.TmpfsOptions.SizeBytes,
 				Mode:      m.TmpfsOptions.Mode,
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		containerSpec.Mounts = append(containerSpec.Mounts, mount)
-	***REMOVED***
+	}
 
-	if c.StopGracePeriod != nil ***REMOVED***
+	if c.StopGracePeriod != nil {
 		grace, _ := gogotypes.DurationFromProto(c.StopGracePeriod)
 		containerSpec.StopGracePeriod = &grace
-	***REMOVED***
+	}
 
-	if c.Healthcheck != nil ***REMOVED***
+	if c.Healthcheck != nil {
 		containerSpec.Healthcheck = healthConfigFromGRPC(c.Healthcheck)
-	***REMOVED***
+	}
 
 	return containerSpec
-***REMOVED***
+}
 
-func secretReferencesToGRPC(sr []*types.SecretReference) []*swarmapi.SecretReference ***REMOVED***
+func secretReferencesToGRPC(sr []*types.SecretReference) []*swarmapi.SecretReference {
 	refs := make([]*swarmapi.SecretReference, 0, len(sr))
-	for _, s := range sr ***REMOVED***
-		ref := &swarmapi.SecretReference***REMOVED***
+	for _, s := range sr {
+		ref := &swarmapi.SecretReference{
 			SecretID:   s.SecretID,
 			SecretName: s.SecretName,
-		***REMOVED***
-		if s.File != nil ***REMOVED***
-			ref.Target = &swarmapi.SecretReference_File***REMOVED***
-				File: &swarmapi.FileTarget***REMOVED***
+		}
+		if s.File != nil {
+			ref.Target = &swarmapi.SecretReference_File{
+				File: &swarmapi.FileTarget{
 					Name: s.File.Name,
 					UID:  s.File.UID,
 					GID:  s.File.GID,
 					Mode: s.File.Mode,
-				***REMOVED***,
-			***REMOVED***
-		***REMOVED***
+				},
+			}
+		}
 
 		refs = append(refs, ref)
-	***REMOVED***
+	}
 
 	return refs
-***REMOVED***
+}
 
-func secretReferencesFromGRPC(sr []*swarmapi.SecretReference) []*types.SecretReference ***REMOVED***
+func secretReferencesFromGRPC(sr []*swarmapi.SecretReference) []*types.SecretReference {
 	refs := make([]*types.SecretReference, 0, len(sr))
-	for _, s := range sr ***REMOVED***
+	for _, s := range sr {
 		target := s.GetFile()
-		if target == nil ***REMOVED***
+		if target == nil {
 			// not a file target
 			logrus.Warnf("secret target not a file: secret=%s", s.SecretID)
 			continue
-		***REMOVED***
-		refs = append(refs, &types.SecretReference***REMOVED***
-			File: &types.SecretReferenceFileTarget***REMOVED***
+		}
+		refs = append(refs, &types.SecretReference{
+			File: &types.SecretReferenceFileTarget{
 				Name: target.Name,
 				UID:  target.UID,
 				GID:  target.GID,
 				Mode: target.Mode,
-			***REMOVED***,
+			},
 			SecretID:   s.SecretID,
 			SecretName: s.SecretName,
-		***REMOVED***)
-	***REMOVED***
+		})
+	}
 
 	return refs
-***REMOVED***
+}
 
-func configReferencesToGRPC(sr []*types.ConfigReference) []*swarmapi.ConfigReference ***REMOVED***
+func configReferencesToGRPC(sr []*types.ConfigReference) []*swarmapi.ConfigReference {
 	refs := make([]*swarmapi.ConfigReference, 0, len(sr))
-	for _, s := range sr ***REMOVED***
-		ref := &swarmapi.ConfigReference***REMOVED***
+	for _, s := range sr {
+		ref := &swarmapi.ConfigReference{
 			ConfigID:   s.ConfigID,
 			ConfigName: s.ConfigName,
-		***REMOVED***
-		if s.File != nil ***REMOVED***
-			ref.Target = &swarmapi.ConfigReference_File***REMOVED***
-				File: &swarmapi.FileTarget***REMOVED***
+		}
+		if s.File != nil {
+			ref.Target = &swarmapi.ConfigReference_File{
+				File: &swarmapi.FileTarget{
 					Name: s.File.Name,
 					UID:  s.File.UID,
 					GID:  s.File.GID,
 					Mode: s.File.Mode,
-				***REMOVED***,
-			***REMOVED***
-		***REMOVED***
+				},
+			}
+		}
 
 		refs = append(refs, ref)
-	***REMOVED***
+	}
 
 	return refs
-***REMOVED***
+}
 
-func configReferencesFromGRPC(sr []*swarmapi.ConfigReference) []*types.ConfigReference ***REMOVED***
+func configReferencesFromGRPC(sr []*swarmapi.ConfigReference) []*types.ConfigReference {
 	refs := make([]*types.ConfigReference, 0, len(sr))
-	for _, s := range sr ***REMOVED***
+	for _, s := range sr {
 		target := s.GetFile()
-		if target == nil ***REMOVED***
+		if target == nil {
 			// not a file target
 			logrus.Warnf("config target not a file: config=%s", s.ConfigID)
 			continue
-		***REMOVED***
-		refs = append(refs, &types.ConfigReference***REMOVED***
-			File: &types.ConfigReferenceFileTarget***REMOVED***
+		}
+		refs = append(refs, &types.ConfigReference{
+			File: &types.ConfigReferenceFileTarget{
 				Name: target.Name,
 				UID:  target.UID,
 				GID:  target.GID,
 				Mode: target.Mode,
-			***REMOVED***,
+			},
 			ConfigID:   s.ConfigID,
 			ConfigName: s.ConfigName,
-		***REMOVED***)
-	***REMOVED***
+		})
+	}
 
 	return refs
-***REMOVED***
+}
 
-func containerToGRPC(c *types.ContainerSpec) (*swarmapi.ContainerSpec, error) ***REMOVED***
-	containerSpec := &swarmapi.ContainerSpec***REMOVED***
+func containerToGRPC(c *types.ContainerSpec) (*swarmapi.ContainerSpec, error) {
+	containerSpec := &swarmapi.ContainerSpec{
 		Image:      c.Image,
 		Labels:     c.Labels,
 		Command:    c.Command,
@@ -234,148 +234,148 @@ func containerToGRPC(c *types.ContainerSpec) (*swarmapi.ContainerSpec, error) **
 		Secrets:    secretReferencesToGRPC(c.Secrets),
 		Configs:    configReferencesToGRPC(c.Configs),
 		Isolation:  isolationToGRPC(c.Isolation),
-	***REMOVED***
+	}
 
-	if c.DNSConfig != nil ***REMOVED***
-		containerSpec.DNSConfig = &swarmapi.ContainerSpec_DNSConfig***REMOVED***
+	if c.DNSConfig != nil {
+		containerSpec.DNSConfig = &swarmapi.ContainerSpec_DNSConfig{
 			Nameservers: c.DNSConfig.Nameservers,
 			Search:      c.DNSConfig.Search,
 			Options:     c.DNSConfig.Options,
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if c.StopGracePeriod != nil ***REMOVED***
+	if c.StopGracePeriod != nil {
 		containerSpec.StopGracePeriod = gogotypes.DurationProto(*c.StopGracePeriod)
-	***REMOVED***
+	}
 
 	// Privileges
-	if c.Privileges != nil ***REMOVED***
-		containerSpec.Privileges = &swarmapi.Privileges***REMOVED******REMOVED***
+	if c.Privileges != nil {
+		containerSpec.Privileges = &swarmapi.Privileges{}
 
-		if c.Privileges.CredentialSpec != nil ***REMOVED***
-			containerSpec.Privileges.CredentialSpec = &swarmapi.Privileges_CredentialSpec***REMOVED******REMOVED***
+		if c.Privileges.CredentialSpec != nil {
+			containerSpec.Privileges.CredentialSpec = &swarmapi.Privileges_CredentialSpec{}
 
-			if c.Privileges.CredentialSpec.File != "" && c.Privileges.CredentialSpec.Registry != "" ***REMOVED***
+			if c.Privileges.CredentialSpec.File != "" && c.Privileges.CredentialSpec.Registry != "" {
 				return nil, errors.New("cannot specify both \"file\" and \"registry\" credential specs")
-			***REMOVED***
-			if c.Privileges.CredentialSpec.File != "" ***REMOVED***
-				containerSpec.Privileges.CredentialSpec.Source = &swarmapi.Privileges_CredentialSpec_File***REMOVED***
+			}
+			if c.Privileges.CredentialSpec.File != "" {
+				containerSpec.Privileges.CredentialSpec.Source = &swarmapi.Privileges_CredentialSpec_File{
 					File: c.Privileges.CredentialSpec.File,
-				***REMOVED***
-			***REMOVED*** else if c.Privileges.CredentialSpec.Registry != "" ***REMOVED***
-				containerSpec.Privileges.CredentialSpec.Source = &swarmapi.Privileges_CredentialSpec_Registry***REMOVED***
+				}
+			} else if c.Privileges.CredentialSpec.Registry != "" {
+				containerSpec.Privileges.CredentialSpec.Source = &swarmapi.Privileges_CredentialSpec_Registry{
 					Registry: c.Privileges.CredentialSpec.Registry,
-				***REMOVED***
-			***REMOVED*** else ***REMOVED***
+				}
+			} else {
 				return nil, errors.New("must either provide \"file\" or \"registry\" for credential spec")
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
-		if c.Privileges.SELinuxContext != nil ***REMOVED***
-			containerSpec.Privileges.SELinuxContext = &swarmapi.Privileges_SELinuxContext***REMOVED***
+		if c.Privileges.SELinuxContext != nil {
+			containerSpec.Privileges.SELinuxContext = &swarmapi.Privileges_SELinuxContext{
 				Disable: c.Privileges.SELinuxContext.Disable,
 				User:    c.Privileges.SELinuxContext.User,
 				Type:    c.Privileges.SELinuxContext.Type,
 				Role:    c.Privileges.SELinuxContext.Role,
 				Level:   c.Privileges.SELinuxContext.Level,
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	// Mounts
-	for _, m := range c.Mounts ***REMOVED***
-		mount := swarmapi.Mount***REMOVED***
+	for _, m := range c.Mounts {
+		mount := swarmapi.Mount{
 			Target:   m.Target,
 			Source:   m.Source,
 			ReadOnly: m.ReadOnly,
-		***REMOVED***
+		}
 
-		if mountType, ok := swarmapi.Mount_MountType_value[strings.ToUpper(string(m.Type))]; ok ***REMOVED***
+		if mountType, ok := swarmapi.Mount_MountType_value[strings.ToUpper(string(m.Type))]; ok {
 			mount.Type = swarmapi.Mount_MountType(mountType)
-		***REMOVED*** else if string(m.Type) != "" ***REMOVED***
+		} else if string(m.Type) != "" {
 			return nil, fmt.Errorf("invalid MountType: %q", m.Type)
-		***REMOVED***
+		}
 
-		if m.BindOptions != nil ***REMOVED***
-			if mountPropagation, ok := swarmapi.Mount_BindOptions_MountPropagation_value[strings.ToUpper(string(m.BindOptions.Propagation))]; ok ***REMOVED***
-				mount.BindOptions = &swarmapi.Mount_BindOptions***REMOVED***Propagation: swarmapi.Mount_BindOptions_MountPropagation(mountPropagation)***REMOVED***
-			***REMOVED*** else if string(m.BindOptions.Propagation) != "" ***REMOVED***
+		if m.BindOptions != nil {
+			if mountPropagation, ok := swarmapi.Mount_BindOptions_MountPropagation_value[strings.ToUpper(string(m.BindOptions.Propagation))]; ok {
+				mount.BindOptions = &swarmapi.Mount_BindOptions{Propagation: swarmapi.Mount_BindOptions_MountPropagation(mountPropagation)}
+			} else if string(m.BindOptions.Propagation) != "" {
 				return nil, fmt.Errorf("invalid MountPropagation: %q", m.BindOptions.Propagation)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
-		if m.VolumeOptions != nil ***REMOVED***
-			mount.VolumeOptions = &swarmapi.Mount_VolumeOptions***REMOVED***
+		if m.VolumeOptions != nil {
+			mount.VolumeOptions = &swarmapi.Mount_VolumeOptions{
 				NoCopy: m.VolumeOptions.NoCopy,
 				Labels: m.VolumeOptions.Labels,
-			***REMOVED***
-			if m.VolumeOptions.DriverConfig != nil ***REMOVED***
-				mount.VolumeOptions.DriverConfig = &swarmapi.Driver***REMOVED***
+			}
+			if m.VolumeOptions.DriverConfig != nil {
+				mount.VolumeOptions.DriverConfig = &swarmapi.Driver{
 					Name:    m.VolumeOptions.DriverConfig.Name,
 					Options: m.VolumeOptions.DriverConfig.Options,
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
+				}
+			}
+		}
 
-		if m.TmpfsOptions != nil ***REMOVED***
-			mount.TmpfsOptions = &swarmapi.Mount_TmpfsOptions***REMOVED***
+		if m.TmpfsOptions != nil {
+			mount.TmpfsOptions = &swarmapi.Mount_TmpfsOptions{
 				SizeBytes: m.TmpfsOptions.SizeBytes,
 				Mode:      m.TmpfsOptions.Mode,
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		containerSpec.Mounts = append(containerSpec.Mounts, mount)
-	***REMOVED***
+	}
 
-	if c.Healthcheck != nil ***REMOVED***
+	if c.Healthcheck != nil {
 		containerSpec.Healthcheck = healthConfigToGRPC(c.Healthcheck)
-	***REMOVED***
+	}
 
 	return containerSpec, nil
-***REMOVED***
+}
 
-func healthConfigFromGRPC(h *swarmapi.HealthConfig) *container.HealthConfig ***REMOVED***
+func healthConfigFromGRPC(h *swarmapi.HealthConfig) *container.HealthConfig {
 	interval, _ := gogotypes.DurationFromProto(h.Interval)
 	timeout, _ := gogotypes.DurationFromProto(h.Timeout)
 	startPeriod, _ := gogotypes.DurationFromProto(h.StartPeriod)
-	return &container.HealthConfig***REMOVED***
+	return &container.HealthConfig{
 		Test:        h.Test,
 		Interval:    interval,
 		Timeout:     timeout,
 		Retries:     int(h.Retries),
 		StartPeriod: startPeriod,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func healthConfigToGRPC(h *container.HealthConfig) *swarmapi.HealthConfig ***REMOVED***
-	return &swarmapi.HealthConfig***REMOVED***
+func healthConfigToGRPC(h *container.HealthConfig) *swarmapi.HealthConfig {
+	return &swarmapi.HealthConfig{
 		Test:        h.Test,
 		Interval:    gogotypes.DurationProto(h.Interval),
 		Timeout:     gogotypes.DurationProto(h.Timeout),
 		Retries:     int32(h.Retries),
 		StartPeriod: gogotypes.DurationProto(h.StartPeriod),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // IsolationFromGRPC converts a swarm api container isolation to a moby isolation representation
-func IsolationFromGRPC(i swarmapi.ContainerSpec_Isolation) container.Isolation ***REMOVED***
-	switch i ***REMOVED***
+func IsolationFromGRPC(i swarmapi.ContainerSpec_Isolation) container.Isolation {
+	switch i {
 	case swarmapi.ContainerIsolationHyperV:
 		return container.IsolationHyperV
 	case swarmapi.ContainerIsolationProcess:
 		return container.IsolationProcess
 	case swarmapi.ContainerIsolationDefault:
 		return container.IsolationDefault
-	***REMOVED***
+	}
 	return container.IsolationEmpty
-***REMOVED***
+}
 
-func isolationToGRPC(i container.Isolation) swarmapi.ContainerSpec_Isolation ***REMOVED***
-	if i.IsHyperV() ***REMOVED***
+func isolationToGRPC(i container.Isolation) swarmapi.ContainerSpec_Isolation {
+	if i.IsHyperV() {
 		return swarmapi.ContainerIsolationHyperV
-	***REMOVED***
-	if i.IsProcess() ***REMOVED***
+	}
+	if i.IsProcess() {
 		return swarmapi.ContainerIsolationProcess
-	***REMOVED***
+	}
 	return swarmapi.ContainerIsolationDefault
-***REMOVED***
+}

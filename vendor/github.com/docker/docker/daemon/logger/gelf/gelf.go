@@ -20,44 +20,44 @@ import (
 
 const name = "gelf"
 
-type gelfLogger struct ***REMOVED***
+type gelfLogger struct {
 	writer   gelf.Writer
 	info     logger.Info
 	hostname string
 	rawExtra json.RawMessage
-***REMOVED***
+}
 
-func init() ***REMOVED***
-	if err := logger.RegisterLogDriver(name, New); err != nil ***REMOVED***
+func init() {
+	if err := logger.RegisterLogDriver(name, New); err != nil {
 		logrus.Fatal(err)
-	***REMOVED***
-	if err := logger.RegisterLogOptValidator(name, ValidateLogOpt); err != nil ***REMOVED***
+	}
+	if err := logger.RegisterLogOptValidator(name, ValidateLogOpt); err != nil {
 		logrus.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // New creates a gelf logger using the configuration passed in on the
 // context. The supported context configuration variable is gelf-address.
-func New(info logger.Info) (logger.Logger, error) ***REMOVED***
+func New(info logger.Info) (logger.Logger, error) {
 	// parse gelf address
 	address, err := parseAddress(info.Config["gelf-address"])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// collect extra data for GELF message
 	hostname, err := info.Hostname()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("gelf: cannot access hostname to set source field")
-	***REMOVED***
+	}
 
 	// parse log tag
 	tag, err := loggerutils.ParseLogTag(info, loggerutils.DefaultTemplate)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	extra := map[string]interface***REMOVED******REMOVED******REMOVED***
+	extra := map[string]interface{}{
 		"_container_id":   info.ContainerID,
 		"_container_name": info.Name(),
 		"_image_id":       info.ContainerImageID,
@@ -65,84 +65,84 @@ func New(info logger.Info) (logger.Logger, error) ***REMOVED***
 		"_command":        info.Command(),
 		"_tag":            tag,
 		"_created":        info.ContainerCreated,
-	***REMOVED***
+	}
 
-	extraAttrs, err := info.ExtraAttributes(func(key string) string ***REMOVED***
-		if key[0] == '_' ***REMOVED***
+	extraAttrs, err := info.ExtraAttributes(func(key string) string {
+		if key[0] == '_' {
 			return key
-		***REMOVED***
+		}
 		return "_" + key
-	***REMOVED***)
+	})
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	for k, v := range extraAttrs ***REMOVED***
+	for k, v := range extraAttrs {
 		extra[k] = v
-	***REMOVED***
+	}
 
 	rawExtra, err := json.Marshal(extra)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	var gelfWriter gelf.Writer
-	if address.Scheme == "udp" ***REMOVED***
+	if address.Scheme == "udp" {
 		gelfWriter, err = newGELFUDPWriter(address.Host, info)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED*** else if address.Scheme == "tcp" ***REMOVED***
+		}
+	} else if address.Scheme == "tcp" {
 		gelfWriter, err = newGELFTCPWriter(address.Host, info)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	return &gelfLogger***REMOVED***
+	return &gelfLogger{
 		writer:   gelfWriter,
 		info:     info,
 		hostname: hostname,
 		rawExtra: rawExtra,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // create new TCP gelfWriter
-func newGELFTCPWriter(address string, info logger.Info) (gelf.Writer, error) ***REMOVED***
+func newGELFTCPWriter(address string, info logger.Info) (gelf.Writer, error) {
 	gelfWriter, err := gelf.NewTCPWriter(address)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("gelf: cannot connect to GELF endpoint: %s %v", address, err)
-	***REMOVED***
+	}
 
-	if v, ok := info.Config["gelf-tcp-max-reconnect"]; ok ***REMOVED***
+	if v, ok := info.Config["gelf-tcp-max-reconnect"]; ok {
 		i, err := strconv.Atoi(v)
-		if err != nil || i < 0 ***REMOVED***
+		if err != nil || i < 0 {
 			return nil, fmt.Errorf("gelf-tcp-max-reconnect must be a positive integer")
-		***REMOVED***
+		}
 		gelfWriter.MaxReconnect = i
-	***REMOVED***
+	}
 
-	if v, ok := info.Config["gelf-tcp-reconnect-delay"]; ok ***REMOVED***
+	if v, ok := info.Config["gelf-tcp-reconnect-delay"]; ok {
 		i, err := strconv.Atoi(v)
-		if err != nil || i < 0 ***REMOVED***
+		if err != nil || i < 0 {
 			return nil, fmt.Errorf("gelf-tcp-reconnect-delay must be a positive integer")
-		***REMOVED***
+		}
 		gelfWriter.ReconnectDelay = time.Duration(i)
-	***REMOVED***
+	}
 
 	return gelfWriter, nil
-***REMOVED***
+}
 
 // create new UDP gelfWriter
-func newGELFUDPWriter(address string, info logger.Info) (gelf.Writer, error) ***REMOVED***
+func newGELFUDPWriter(address string, info logger.Info) (gelf.Writer, error) {
 	gelfWriter, err := gelf.NewUDPWriter(address)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("gelf: cannot connect to GELF endpoint: %s %v", address, err)
-	***REMOVED***
+	}
 
-	if v, ok := info.Config["gelf-compression-type"]; ok ***REMOVED***
-		switch v ***REMOVED***
+	if v, ok := info.Config["gelf-compression-type"]; ok {
+		switch v {
 		case "gzip":
 			gelfWriter.CompressionType = gelf.CompressGzip
 		case "zlib":
@@ -151,118 +151,118 @@ func newGELFUDPWriter(address string, info logger.Info) (gelf.Writer, error) ***
 			gelfWriter.CompressionType = gelf.CompressNone
 		default:
 			return nil, fmt.Errorf("gelf: invalid compression type %q", v)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if v, ok := info.Config["gelf-compression-level"]; ok ***REMOVED***
+	if v, ok := info.Config["gelf-compression-level"]; ok {
 		val, err := strconv.Atoi(v)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, fmt.Errorf("gelf: invalid compression level %s, err %v", v, err)
-		***REMOVED***
+		}
 		gelfWriter.CompressionLevel = val
-	***REMOVED***
+	}
 
 	return gelfWriter, nil
-***REMOVED***
+}
 
-func (s *gelfLogger) Log(msg *logger.Message) error ***REMOVED***
+func (s *gelfLogger) Log(msg *logger.Message) error {
 	level := gelf.LOG_INFO
-	if msg.Source == "stderr" ***REMOVED***
+	if msg.Source == "stderr" {
 		level = gelf.LOG_ERR
-	***REMOVED***
+	}
 
-	m := gelf.Message***REMOVED***
+	m := gelf.Message{
 		Version:  "1.1",
 		Host:     s.hostname,
 		Short:    string(msg.Line),
 		TimeUnix: float64(msg.Timestamp.UnixNano()/int64(time.Millisecond)) / 1000.0,
 		Level:    int32(level),
 		RawExtra: s.rawExtra,
-	***REMOVED***
+	}
 	logger.PutMessage(msg)
 
-	if err := s.writer.WriteMessage(&m); err != nil ***REMOVED***
+	if err := s.writer.WriteMessage(&m); err != nil {
 		return fmt.Errorf("gelf: cannot send GELF message: %v", err)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (s *gelfLogger) Close() error ***REMOVED***
+func (s *gelfLogger) Close() error {
 	return s.writer.Close()
-***REMOVED***
+}
 
-func (s *gelfLogger) Name() string ***REMOVED***
+func (s *gelfLogger) Name() string {
 	return name
-***REMOVED***
+}
 
 // ValidateLogOpt looks for gelf specific log option gelf-address.
-func ValidateLogOpt(cfg map[string]string) error ***REMOVED***
+func ValidateLogOpt(cfg map[string]string) error {
 	address, err := parseAddress(cfg["gelf-address"])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	for key, val := range cfg ***REMOVED***
-		switch key ***REMOVED***
+	for key, val := range cfg {
+		switch key {
 		case "gelf-address":
 		case "tag":
 		case "labels":
 		case "env":
 		case "env-regex":
 		case "gelf-compression-level":
-			if address.Scheme != "udp" ***REMOVED***
+			if address.Scheme != "udp" {
 				return fmt.Errorf("compression is only supported on UDP")
-			***REMOVED***
+			}
 			i, err := strconv.Atoi(val)
-			if err != nil || i < flate.DefaultCompression || i > flate.BestCompression ***REMOVED***
+			if err != nil || i < flate.DefaultCompression || i > flate.BestCompression {
 				return fmt.Errorf("unknown value %q for log opt %q for gelf log driver", val, key)
-			***REMOVED***
+			}
 		case "gelf-compression-type":
-			if address.Scheme != "udp" ***REMOVED***
+			if address.Scheme != "udp" {
 				return fmt.Errorf("compression is only supported on UDP")
-			***REMOVED***
-			switch val ***REMOVED***
+			}
+			switch val {
 			case "gzip", "zlib", "none":
 			default:
 				return fmt.Errorf("unknown value %q for log opt %q for gelf log driver", val, key)
-			***REMOVED***
+			}
 		case "gelf-tcp-max-reconnect", "gelf-tcp-reconnect-delay":
-			if address.Scheme != "tcp" ***REMOVED***
+			if address.Scheme != "tcp" {
 				return fmt.Errorf("%q is only valid for TCP", key)
-			***REMOVED***
+			}
 			i, err := strconv.Atoi(val)
-			if err != nil || i < 0 ***REMOVED***
+			if err != nil || i < 0 {
 				return fmt.Errorf("%q must be a positive integer", key)
-			***REMOVED***
+			}
 		default:
 			return fmt.Errorf("unknown log opt %q for gelf log driver", key)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
-func parseAddress(address string) (*url.URL, error) ***REMOVED***
-	if address == "" ***REMOVED***
+func parseAddress(address string) (*url.URL, error) {
+	if address == "" {
 		return nil, fmt.Errorf("gelf-address is a required parameter")
-	***REMOVED***
-	if !urlutil.IsTransportURL(address) ***REMOVED***
+	}
+	if !urlutil.IsTransportURL(address) {
 		return nil, fmt.Errorf("gelf-address should be in form proto://address, got %v", address)
-	***REMOVED***
+	}
 	url, err := url.Parse(address)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// we support only udp
-	if url.Scheme != "udp" && url.Scheme != "tcp" ***REMOVED***
+	if url.Scheme != "udp" && url.Scheme != "tcp" {
 		return nil, fmt.Errorf("gelf: endpoint needs to be TCP or UDP")
-	***REMOVED***
+	}
 
 	// get host and port
-	if _, _, err = net.SplitHostPort(url.Host); err != nil ***REMOVED***
+	if _, _, err = net.SplitHostPort(url.Host); err != nil {
 		return nil, fmt.Errorf("gelf: please provide gelf-address as proto://host:port")
-	***REMOVED***
+	}
 
 	return url, nil
-***REMOVED***
+}

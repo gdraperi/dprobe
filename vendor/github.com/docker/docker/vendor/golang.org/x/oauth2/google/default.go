@@ -21,31 +21,31 @@ import (
 // DefaultCredentials holds "Application Default Credentials".
 // For more details, see:
 // https://developers.google.com/accounts/docs/application-default-credentials
-type DefaultCredentials struct ***REMOVED***
+type DefaultCredentials struct {
 	ProjectID   string // may be empty
 	TokenSource oauth2.TokenSource
-***REMOVED***
+}
 
 // DefaultClient returns an HTTP Client that uses the
 // DefaultTokenSource to obtain authentication credentials.
-func DefaultClient(ctx context.Context, scope ...string) (*http.Client, error) ***REMOVED***
+func DefaultClient(ctx context.Context, scope ...string) (*http.Client, error) {
 	ts, err := DefaultTokenSource(ctx, scope...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return oauth2.NewClient(ctx, ts), nil
-***REMOVED***
+}
 
 // DefaultTokenSource returns the token source for
 // "Application Default Credentials".
 // It is a shortcut for FindDefaultCredentials(ctx, scope).TokenSource.
-func DefaultTokenSource(ctx context.Context, scope ...string) (oauth2.TokenSource, error) ***REMOVED***
+func DefaultTokenSource(ctx context.Context, scope ...string) (oauth2.TokenSource, error) {
 	creds, err := FindDefaultCredentials(ctx, scope...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return creds.TokenSource, nil
-***REMOVED***
+}
 
 // FindDefaultCredentials searches for "Application Default Credentials".
 //
@@ -61,70 +61,70 @@ func DefaultTokenSource(ctx context.Context, scope ...string) (oauth2.TokenSourc
 //   4. On Google Compute Engine and Google App Engine Managed VMs, it fetches
 //      credentials from the metadata server.
 //      (In this final case any provided scopes are ignored.)
-func FindDefaultCredentials(ctx context.Context, scope ...string) (*DefaultCredentials, error) ***REMOVED***
+func FindDefaultCredentials(ctx context.Context, scope ...string) (*DefaultCredentials, error) {
 	// First, try the environment variable.
 	const envVar = "GOOGLE_APPLICATION_CREDENTIALS"
-	if filename := os.Getenv(envVar); filename != "" ***REMOVED***
+	if filename := os.Getenv(envVar); filename != "" {
 		creds, err := readCredentialsFile(ctx, filename, scope)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, fmt.Errorf("google: error getting credentials using %v environment variable: %v", envVar, err)
-		***REMOVED***
+		}
 		return creds, nil
-	***REMOVED***
+	}
 
 	// Second, try a well-known file.
 	filename := wellKnownFile()
-	if creds, err := readCredentialsFile(ctx, filename, scope); err == nil ***REMOVED***
+	if creds, err := readCredentialsFile(ctx, filename, scope); err == nil {
 		return creds, nil
-	***REMOVED*** else if !os.IsNotExist(err) ***REMOVED***
+	} else if !os.IsNotExist(err) {
 		return nil, fmt.Errorf("google: error getting credentials using well-known file (%v): %v", filename, err)
-	***REMOVED***
+	}
 
 	// Third, if we're on Google App Engine use those credentials.
-	if appengineTokenFunc != nil && !appengineVM ***REMOVED***
-		return &DefaultCredentials***REMOVED***
+	if appengineTokenFunc != nil && !appengineVM {
+		return &DefaultCredentials{
 			ProjectID:   appengineAppIDFunc(ctx),
 			TokenSource: AppEngineTokenSource(ctx, scope...),
-		***REMOVED***, nil
-	***REMOVED***
+		}, nil
+	}
 
 	// Fourth, if we're on Google Compute Engine use the metadata server.
-	if metadata.OnGCE() ***REMOVED***
+	if metadata.OnGCE() {
 		id, _ := metadata.ProjectID()
-		return &DefaultCredentials***REMOVED***
+		return &DefaultCredentials{
 			ProjectID:   id,
 			TokenSource: ComputeTokenSource(""),
-		***REMOVED***, nil
-	***REMOVED***
+		}, nil
+	}
 
 	// None are found; return helpful error.
 	const url = "https://developers.google.com/accounts/docs/application-default-credentials"
 	return nil, fmt.Errorf("google: could not find default credentials. See %v for more information.", url)
-***REMOVED***
+}
 
-func wellKnownFile() string ***REMOVED***
+func wellKnownFile() string {
 	const f = "application_default_credentials.json"
-	if runtime.GOOS == "windows" ***REMOVED***
+	if runtime.GOOS == "windows" {
 		return filepath.Join(os.Getenv("APPDATA"), "gcloud", f)
-	***REMOVED***
+	}
 	return filepath.Join(guessUnixHomeDir(), ".config", "gcloud", f)
-***REMOVED***
+}
 
-func readCredentialsFile(ctx context.Context, filename string, scopes []string) (*DefaultCredentials, error) ***REMOVED***
+func readCredentialsFile(ctx context.Context, filename string, scopes []string) (*DefaultCredentials, error) {
 	b, err := ioutil.ReadFile(filename)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	var f credentialsFile
-	if err := json.Unmarshal(b, &f); err != nil ***REMOVED***
+	if err := json.Unmarshal(b, &f); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	ts, err := f.tokenSource(ctx, append([]string(nil), scopes...))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	return &DefaultCredentials***REMOVED***
+	}
+	return &DefaultCredentials{
 		ProjectID:   f.ProjectID,
 		TokenSource: ts,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}

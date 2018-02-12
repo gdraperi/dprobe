@@ -81,7 +81,7 @@ const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 //
 // - Logging. If some API errors are stored in logs, the message `Status` could
 //     be used directly after any stripping needed for security/privacy reasons.
-type Status struct ***REMOVED***
+type Status struct {
 	// The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
 	Code int32 `protobuf:"varint,1,opt,name=code" json:"code,omitempty"`
 	// A developer-facing error message, which should be in English. Any
@@ -91,41 +91,41 @@ type Status struct ***REMOVED***
 	// A list of messages that carry the error details.  There will be a
 	// common set of message types for APIs to use.
 	Details []*google_protobuf.Any `protobuf:"bytes,3,rep,name=details" json:"details,omitempty"`
-***REMOVED***
+}
 
-func (m *Status) Reset()                    ***REMOVED*** *m = Status***REMOVED******REMOVED*** ***REMOVED***
-func (m *Status) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*Status) ProtoMessage()               ***REMOVED******REMOVED***
-func (*Status) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***0***REMOVED*** ***REMOVED***
+func (m *Status) Reset()                    { *m = Status{} }
+func (m *Status) String() string            { return proto.CompactTextString(m) }
+func (*Status) ProtoMessage()               {}
+func (*Status) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
-func (m *Status) GetCode() int32 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Status) GetCode() int32 {
+	if m != nil {
 		return m.Code
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *Status) GetMessage() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Status) GetMessage() string {
+	if m != nil {
 		return m.Message
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *Status) GetDetails() []*google_protobuf.Any ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Status) GetDetails() []*google_protobuf.Any {
+	if m != nil {
 		return m.Details
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*Status)(nil), "google.rpc.Status")
-***REMOVED***
+}
 
-func init() ***REMOVED*** proto.RegisterFile("google/rpc/status.proto", fileDescriptor0) ***REMOVED***
+func init() { proto.RegisterFile("google/rpc/status.proto", fileDescriptor0) }
 
-var fileDescriptor0 = []byte***REMOVED***
+var fileDescriptor0 = []byte{
 	// 209 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0x4f, 0xcf, 0xcf, 0x4f,
 	0xcf, 0x49, 0xd5, 0x2f, 0x2a, 0x48, 0xd6, 0x2f, 0x2e, 0x49, 0x2c, 0x29, 0x2d, 0xd6, 0x2b, 0x28,
@@ -141,4 +141,4 @@ var fileDescriptor0 = []byte***REMOVED***
 	0x0b, 0x32, 0x8b, 0x91, 0xfc, 0x69, 0x0d, 0xa1, 0x16, 0x31, 0x31, 0x07, 0x05, 0x38, 0x27, 0xb1,
 	0x81, 0x55, 0x1a, 0x03, 0x02, 0x00, 0x00, 0xff, 0xff, 0xa4, 0x53, 0xf0, 0x7c, 0x10, 0x01, 0x00,
 	0x00,
-***REMOVED***
+}

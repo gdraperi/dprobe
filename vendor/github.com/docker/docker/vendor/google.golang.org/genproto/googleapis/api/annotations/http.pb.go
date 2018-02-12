@@ -16,24 +16,24 @@ var _ = math.Inf
 // Defines the HTTP configuration for a service. It contains a list of
 // [HttpRule][google.api.HttpRule], each specifying the mapping of an RPC method
 // to one or more HTTP REST API methods.
-type Http struct ***REMOVED***
+type Http struct {
 	// A list of HTTP configuration rules that apply to individual API methods.
 	//
 	// **NOTE:** All service configuration rules follow "last one wins" order.
 	Rules []*HttpRule `protobuf:"bytes,1,rep,name=rules" json:"rules,omitempty"`
-***REMOVED***
+}
 
-func (m *Http) Reset()                    ***REMOVED*** *m = Http***REMOVED******REMOVED*** ***REMOVED***
-func (m *Http) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*Http) ProtoMessage()               ***REMOVED******REMOVED***
-func (*Http) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor1, []int***REMOVED***0***REMOVED*** ***REMOVED***
+func (m *Http) Reset()                    { *m = Http{} }
+func (m *Http) String() string            { return proto.CompactTextString(m) }
+func (*Http) ProtoMessage()               {}
+func (*Http) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{0} }
 
-func (m *Http) GetRules() []*HttpRule ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Http) GetRules() []*HttpRule {
+	if m != nil {
 		return m.Rules
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // `HttpRule` defines the mapping of an RPC method to one or more HTTP
 // REST APIs.  The mapping determines what portions of the request
@@ -48,21 +48,21 @@ func (m *Http) GetRules() []*HttpRule ***REMOVED***
 // operation on a resource collection of messages:
 //
 //
-//     service Messaging ***REMOVED***
-//       rpc GetMessage(GetMessageRequest) returns (Message) ***REMOVED***
-//         option (google.api.http).get = "/v1/messages/***REMOVED***message_id***REMOVED***/***REMOVED***sub.subfield***REMOVED***";
-//   ***REMOVED***
-// ***REMOVED***
-//     message GetMessageRequest ***REMOVED***
-//       message SubMessage ***REMOVED***
+//     service Messaging {
+//       rpc GetMessage(GetMessageRequest) returns (Message) {
+//         option (google.api.http).get = "/v1/messages/{message_id}/{sub.subfield}";
+//       }
+//     }
+//     message GetMessageRequest {
+//       message SubMessage {
 //         string subfield = 1;
-//   ***REMOVED***
+//       }
 //       string message_id = 1; // mapped to the URL
 //       SubMessage sub = 2;    // `sub.subfield` is url-mapped
-// ***REMOVED***
-//     message Message ***REMOVED***
+//     }
+//     message Message {
 //       string text = 1; // content of the resource
-// ***REMOVED***
+//     }
 //
 // The same http annotation can alternatively be expressed inside the
 // `GRPC API Configuration` YAML file.
@@ -70,7 +70,7 @@ func (m *Http) GetRules() []*HttpRule ***REMOVED***
 //     http:
 //       rules:
 //         - selector: <proto_package_name>.Messaging.GetMessage
-//           get: /v1/messages/***REMOVED***message_id***REMOVED***/***REMOVED***sub.subfield***REMOVED***
+//           get: /v1/messages/{message_id}/{sub.subfield}
 //
 // This definition enables an automatic, bidrectional mapping of HTTP
 // JSON to RPC. Example:
@@ -88,14 +88,14 @@ func (m *Http) GetRules() []*HttpRule ***REMOVED***
 // parameters. Assume the following definition of the request message:
 //
 //
-//     message GetMessageRequest ***REMOVED***
-//       message SubMessage ***REMOVED***
+//     message GetMessageRequest {
+//       message SubMessage {
 //         string subfield = 1;
-//   ***REMOVED***
+//       }
 //       string message_id = 1; // mapped to the URL
 //       int64 revision = 2;    // becomes a parameter
 //       SubMessage sub = 3;    // `sub.subfield` becomes a parameter
-// ***REMOVED***
+//     }
 //
 //
 // This enables a HTTP JSON to RPC mapping as below:
@@ -114,18 +114,18 @@ func (m *Http) GetRules() []*HttpRule ***REMOVED***
 // message resource collection:
 //
 //
-//     service Messaging ***REMOVED***
-//       rpc UpdateMessage(UpdateMessageRequest) returns (Message) ***REMOVED***
-//         option (google.api.http) = ***REMOVED***
-//           put: "/v1/messages/***REMOVED***message_id***REMOVED***"
+//     service Messaging {
+//       rpc UpdateMessage(UpdateMessageRequest) returns (Message) {
+//         option (google.api.http) = {
+//           put: "/v1/messages/{message_id}"
 //           body: "message"
-//     ***REMOVED***;
-//   ***REMOVED***
-// ***REMOVED***
-//     message UpdateMessageRequest ***REMOVED***
+//         };
+//       }
+//     }
+//     message UpdateMessageRequest {
 //       string message_id = 1; // mapped to the URL
 //       Message message = 2;   // mapped to the body
-// ***REMOVED***
+//     }
 //
 //
 // The following HTTP JSON to RPC mapping is enabled, where the
@@ -134,32 +134,32 @@ func (m *Http) GetRules() []*HttpRule ***REMOVED***
 //
 // HTTP | RPC
 // -----|-----
-// `PUT /v1/messages/123456 ***REMOVED*** "text": "Hi!" ***REMOVED***` | `UpdateMessage(message_id: "123456" message ***REMOVED*** text: "Hi!" ***REMOVED***)`
+// `PUT /v1/messages/123456 { "text": "Hi!" }` | `UpdateMessage(message_id: "123456" message { text: "Hi!" })`
 //
 // The special name `*` can be used in the body mapping to define that
 // every field not bound by the path template should be mapped to the
 // request body.  This enables the following alternative definition of
 // the update method:
 //
-//     service Messaging ***REMOVED***
-//       rpc UpdateMessage(Message) returns (Message) ***REMOVED***
-//         option (google.api.http) = ***REMOVED***
-//           put: "/v1/messages/***REMOVED***message_id***REMOVED***"
+//     service Messaging {
+//       rpc UpdateMessage(Message) returns (Message) {
+//         option (google.api.http) = {
+//           put: "/v1/messages/{message_id}"
 //           body: "*"
-//     ***REMOVED***;
-//   ***REMOVED***
-// ***REMOVED***
-//     message Message ***REMOVED***
+//         };
+//       }
+//     }
+//     message Message {
 //       string message_id = 1;
 //       string text = 2;
-// ***REMOVED***
+//     }
 //
 //
 // The following HTTP JSON to RPC mapping is enabled:
 //
 // HTTP | RPC
 // -----|-----
-// `PUT /v1/messages/123456 ***REMOVED*** "text": "Hi!" ***REMOVED***` | `UpdateMessage(message_id: "123456" text: "Hi!")`
+// `PUT /v1/messages/123456 { "text": "Hi!" }` | `UpdateMessage(message_id: "123456" text: "Hi!")`
 //
 // Note that when using `*` in the body mapping, it is not possible to
 // have HTTP parameters, as all fields not bound by the path end in
@@ -170,20 +170,20 @@ func (m *Http) GetRules() []*HttpRule ***REMOVED***
 // It is possible to define multiple HTTP methods for one RPC by using
 // the `additional_bindings` option. Example:
 //
-//     service Messaging ***REMOVED***
-//       rpc GetMessage(GetMessageRequest) returns (Message) ***REMOVED***
-//         option (google.api.http) = ***REMOVED***
-//           get: "/v1/messages/***REMOVED***message_id***REMOVED***"
-//           additional_bindings ***REMOVED***
-//             get: "/v1/users/***REMOVED***user_id***REMOVED***/messages/***REMOVED***message_id***REMOVED***"
-//       ***REMOVED***
-//     ***REMOVED***;
-//   ***REMOVED***
-// ***REMOVED***
-//     message GetMessageRequest ***REMOVED***
+//     service Messaging {
+//       rpc GetMessage(GetMessageRequest) returns (Message) {
+//         option (google.api.http) = {
+//           get: "/v1/messages/{message_id}"
+//           additional_bindings {
+//             get: "/v1/users/{user_id}/messages/{message_id}"
+//           }
+//         };
+//       }
+//     }
+//     message GetMessageRequest {
 //       string message_id = 1;
 //       string user_id = 2;
-// ***REMOVED***
+//     }
 //
 //
 // This enables the following two alternative HTTP JSON to RPC
@@ -213,10 +213,10 @@ func (m *Http) GetRules() []*HttpRule ***REMOVED***
 // The syntax of the path template is as follows:
 //
 //     Template = "/" Segments [ Verb ] ;
-//     Segments = Segment ***REMOVED*** "/" Segment ***REMOVED*** ;
+//     Segments = Segment { "/" Segment } ;
 //     Segment  = "*" | "**" | LITERAL | Variable ;
-//     Variable = "***REMOVED***" FieldPath [ "=" Segments ] "***REMOVED***" ;
-//     FieldPath = IDENT ***REMOVED*** "." IDENT ***REMOVED*** ;
+//     Variable = "{" FieldPath [ "=" Segments ] "}" ;
+//     FieldPath = IDENT { "." IDENT } ;
 //     Verb     = ":" LITERAL ;
 //
 // The syntax `*` matches a single path segment. It follows the semantics of
@@ -231,8 +231,8 @@ func (m *Http) GetRules() []*HttpRule ***REMOVED***
 //
 // The syntax `Variable` matches the entire path as specified by its template;
 // this nested template must not contain further variables. If a variable
-// matches a single path segment, its template may be omitted, e.g. `***REMOVED***var***REMOVED***`
-// is equivalent to `***REMOVED***var=****REMOVED***`.
+// matches a single path segment, its template may be omitted, e.g. `{var}`
+// is equivalent to `{var=*}`.
 //
 // NOTE: the field paths in variables and in the `body` must not refer to
 // repeated fields or map fields.
@@ -241,13 +241,13 @@ func (m *Http) GetRules() []*HttpRule ***REMOVED***
 // `pattern` field, such as HEAD, or "*" to leave the HTTP method unspecified for
 // a given URL path rule. The wild-card rule is useful for services that provide
 // content to Web (HTML) clients.
-type HttpRule struct ***REMOVED***
+type HttpRule struct {
 	// Selects methods to which this rule applies.
 	//
 	// Refer to [selector][google.api.DocumentationRule.selector] for syntax details.
 	Selector string `protobuf:"bytes,1,opt,name=selector" json:"selector,omitempty"`
 	// Determines the URL pattern is matched by this rules. This pattern can be
-	// used with any of the ***REMOVED***get|put|post|delete|patch***REMOVED*** methods. A custom method
+	// used with any of the {get|put|post|delete|patch} methods. A custom method
 	// can be defined using the 'custom' field.
 	//
 	// Types that are valid to be assigned to Pattern:
@@ -267,129 +267,129 @@ type HttpRule struct ***REMOVED***
 	// not contain an `additional_bindings` field themselves (that is,
 	// the nesting may only be one level deep).
 	AdditionalBindings []*HttpRule `protobuf:"bytes,11,rep,name=additional_bindings,json=additionalBindings" json:"additional_bindings,omitempty"`
-***REMOVED***
+}
 
-func (m *HttpRule) Reset()                    ***REMOVED*** *m = HttpRule***REMOVED******REMOVED*** ***REMOVED***
-func (m *HttpRule) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*HttpRule) ProtoMessage()               ***REMOVED******REMOVED***
-func (*HttpRule) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor1, []int***REMOVED***1***REMOVED*** ***REMOVED***
+func (m *HttpRule) Reset()                    { *m = HttpRule{} }
+func (m *HttpRule) String() string            { return proto.CompactTextString(m) }
+func (*HttpRule) ProtoMessage()               {}
+func (*HttpRule) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{1} }
 
-type isHttpRule_Pattern interface ***REMOVED***
+type isHttpRule_Pattern interface {
 	isHttpRule_Pattern()
-***REMOVED***
+}
 
-type HttpRule_Get struct ***REMOVED***
+type HttpRule_Get struct {
 	Get string `protobuf:"bytes,2,opt,name=get,oneof"`
-***REMOVED***
-type HttpRule_Put struct ***REMOVED***
+}
+type HttpRule_Put struct {
 	Put string `protobuf:"bytes,3,opt,name=put,oneof"`
-***REMOVED***
-type HttpRule_Post struct ***REMOVED***
+}
+type HttpRule_Post struct {
 	Post string `protobuf:"bytes,4,opt,name=post,oneof"`
-***REMOVED***
-type HttpRule_Delete struct ***REMOVED***
+}
+type HttpRule_Delete struct {
 	Delete string `protobuf:"bytes,5,opt,name=delete,oneof"`
-***REMOVED***
-type HttpRule_Patch struct ***REMOVED***
+}
+type HttpRule_Patch struct {
 	Patch string `protobuf:"bytes,6,opt,name=patch,oneof"`
-***REMOVED***
-type HttpRule_Custom struct ***REMOVED***
+}
+type HttpRule_Custom struct {
 	Custom *CustomHttpPattern `protobuf:"bytes,8,opt,name=custom,oneof"`
-***REMOVED***
+}
 
-func (*HttpRule_Get) isHttpRule_Pattern()    ***REMOVED******REMOVED***
-func (*HttpRule_Put) isHttpRule_Pattern()    ***REMOVED******REMOVED***
-func (*HttpRule_Post) isHttpRule_Pattern()   ***REMOVED******REMOVED***
-func (*HttpRule_Delete) isHttpRule_Pattern() ***REMOVED******REMOVED***
-func (*HttpRule_Patch) isHttpRule_Pattern()  ***REMOVED******REMOVED***
-func (*HttpRule_Custom) isHttpRule_Pattern() ***REMOVED******REMOVED***
+func (*HttpRule_Get) isHttpRule_Pattern()    {}
+func (*HttpRule_Put) isHttpRule_Pattern()    {}
+func (*HttpRule_Post) isHttpRule_Pattern()   {}
+func (*HttpRule_Delete) isHttpRule_Pattern() {}
+func (*HttpRule_Patch) isHttpRule_Pattern()  {}
+func (*HttpRule_Custom) isHttpRule_Pattern() {}
 
-func (m *HttpRule) GetPattern() isHttpRule_Pattern ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *HttpRule) GetPattern() isHttpRule_Pattern {
+	if m != nil {
 		return m.Pattern
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *HttpRule) GetSelector() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *HttpRule) GetSelector() string {
+	if m != nil {
 		return m.Selector
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *HttpRule) GetGet() string ***REMOVED***
-	if x, ok := m.GetPattern().(*HttpRule_Get); ok ***REMOVED***
+func (m *HttpRule) GetGet() string {
+	if x, ok := m.GetPattern().(*HttpRule_Get); ok {
 		return x.Get
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *HttpRule) GetPut() string ***REMOVED***
-	if x, ok := m.GetPattern().(*HttpRule_Put); ok ***REMOVED***
+func (m *HttpRule) GetPut() string {
+	if x, ok := m.GetPattern().(*HttpRule_Put); ok {
 		return x.Put
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *HttpRule) GetPost() string ***REMOVED***
-	if x, ok := m.GetPattern().(*HttpRule_Post); ok ***REMOVED***
+func (m *HttpRule) GetPost() string {
+	if x, ok := m.GetPattern().(*HttpRule_Post); ok {
 		return x.Post
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *HttpRule) GetDelete() string ***REMOVED***
-	if x, ok := m.GetPattern().(*HttpRule_Delete); ok ***REMOVED***
+func (m *HttpRule) GetDelete() string {
+	if x, ok := m.GetPattern().(*HttpRule_Delete); ok {
 		return x.Delete
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *HttpRule) GetPatch() string ***REMOVED***
-	if x, ok := m.GetPattern().(*HttpRule_Patch); ok ***REMOVED***
+func (m *HttpRule) GetPatch() string {
+	if x, ok := m.GetPattern().(*HttpRule_Patch); ok {
 		return x.Patch
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *HttpRule) GetCustom() *CustomHttpPattern ***REMOVED***
-	if x, ok := m.GetPattern().(*HttpRule_Custom); ok ***REMOVED***
+func (m *HttpRule) GetCustom() *CustomHttpPattern {
+	if x, ok := m.GetPattern().(*HttpRule_Custom); ok {
 		return x.Custom
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *HttpRule) GetBody() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *HttpRule) GetBody() string {
+	if m != nil {
 		return m.Body
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *HttpRule) GetAdditionalBindings() []*HttpRule ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *HttpRule) GetAdditionalBindings() []*HttpRule {
+	if m != nil {
 		return m.AdditionalBindings
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // XXX_OneofFuncs is for the internal use of the proto package.
-func (*HttpRule) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface***REMOVED******REMOVED***) ***REMOVED***
-	return _HttpRule_OneofMarshaler, _HttpRule_OneofUnmarshaler, _HttpRule_OneofSizer, []interface***REMOVED******REMOVED******REMOVED***
+func (*HttpRule) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
+	return _HttpRule_OneofMarshaler, _HttpRule_OneofUnmarshaler, _HttpRule_OneofSizer, []interface{}{
 		(*HttpRule_Get)(nil),
 		(*HttpRule_Put)(nil),
 		(*HttpRule_Post)(nil),
 		(*HttpRule_Delete)(nil),
 		(*HttpRule_Patch)(nil),
 		(*HttpRule_Custom)(nil),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func _HttpRule_OneofMarshaler(msg proto.Message, b *proto.Buffer) error ***REMOVED***
+func _HttpRule_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
 	m := msg.(*HttpRule)
 	// pattern
-	switch x := m.Pattern.(type) ***REMOVED***
+	switch x := m.Pattern.(type) {
 	case *HttpRule_Get:
 		b.EncodeVarint(2<<3 | proto.WireBytes)
 		b.EncodeStringBytes(x.Get)
@@ -407,71 +407,71 @@ func _HttpRule_OneofMarshaler(msg proto.Message, b *proto.Buffer) error ***REMOV
 		b.EncodeStringBytes(x.Patch)
 	case *HttpRule_Custom:
 		b.EncodeVarint(8<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Custom); err != nil ***REMOVED***
+		if err := b.EncodeMessage(x.Custom); err != nil {
 			return err
-		***REMOVED***
+		}
 	case nil:
 	default:
 		return fmt.Errorf("HttpRule.Pattern has unexpected type %T", x)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func _HttpRule_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) ***REMOVED***
+func _HttpRule_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
 	m := msg.(*HttpRule)
-	switch tag ***REMOVED***
+	switch tag {
 	case 2: // pattern.get
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		x, err := b.DecodeStringBytes()
-		m.Pattern = &HttpRule_Get***REMOVED***x***REMOVED***
+		m.Pattern = &HttpRule_Get{x}
 		return true, err
 	case 3: // pattern.put
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		x, err := b.DecodeStringBytes()
-		m.Pattern = &HttpRule_Put***REMOVED***x***REMOVED***
+		m.Pattern = &HttpRule_Put{x}
 		return true, err
 	case 4: // pattern.post
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		x, err := b.DecodeStringBytes()
-		m.Pattern = &HttpRule_Post***REMOVED***x***REMOVED***
+		m.Pattern = &HttpRule_Post{x}
 		return true, err
 	case 5: // pattern.delete
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		x, err := b.DecodeStringBytes()
-		m.Pattern = &HttpRule_Delete***REMOVED***x***REMOVED***
+		m.Pattern = &HttpRule_Delete{x}
 		return true, err
 	case 6: // pattern.patch
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		x, err := b.DecodeStringBytes()
-		m.Pattern = &HttpRule_Patch***REMOVED***x***REMOVED***
+		m.Pattern = &HttpRule_Patch{x}
 		return true, err
 	case 8: // pattern.custom
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		msg := new(CustomHttpPattern)
 		err := b.DecodeMessage(msg)
-		m.Pattern = &HttpRule_Custom***REMOVED***msg***REMOVED***
+		m.Pattern = &HttpRule_Custom{msg}
 		return true, err
 	default:
 		return false, nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func _HttpRule_OneofSizer(msg proto.Message) (n int) ***REMOVED***
+func _HttpRule_OneofSizer(msg proto.Message) (n int) {
 	m := msg.(*HttpRule)
 	// pattern
-	switch x := m.Pattern.(type) ***REMOVED***
+	switch x := m.Pattern.(type) {
 	case *HttpRule_Get:
 		n += proto.SizeVarint(2<<3 | proto.WireBytes)
 		n += proto.SizeVarint(uint64(len(x.Get)))
@@ -500,46 +500,46 @@ func _HttpRule_OneofSizer(msg proto.Message) (n int) ***REMOVED***
 	case nil:
 	default:
 		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
 // A custom pattern is used for defining custom HTTP verb.
-type CustomHttpPattern struct ***REMOVED***
+type CustomHttpPattern struct {
 	// The name of this custom HTTP verb.
 	Kind string `protobuf:"bytes,1,opt,name=kind" json:"kind,omitempty"`
 	// The path matched by this custom verb.
 	Path string `protobuf:"bytes,2,opt,name=path" json:"path,omitempty"`
-***REMOVED***
+}
 
-func (m *CustomHttpPattern) Reset()                    ***REMOVED*** *m = CustomHttpPattern***REMOVED******REMOVED*** ***REMOVED***
-func (m *CustomHttpPattern) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*CustomHttpPattern) ProtoMessage()               ***REMOVED******REMOVED***
-func (*CustomHttpPattern) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor1, []int***REMOVED***2***REMOVED*** ***REMOVED***
+func (m *CustomHttpPattern) Reset()                    { *m = CustomHttpPattern{} }
+func (m *CustomHttpPattern) String() string            { return proto.CompactTextString(m) }
+func (*CustomHttpPattern) ProtoMessage()               {}
+func (*CustomHttpPattern) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{2} }
 
-func (m *CustomHttpPattern) GetKind() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *CustomHttpPattern) GetKind() string {
+	if m != nil {
 		return m.Kind
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *CustomHttpPattern) GetPath() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *CustomHttpPattern) GetPath() string {
+	if m != nil {
 		return m.Path
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*Http)(nil), "google.api.Http")
 	proto.RegisterType((*HttpRule)(nil), "google.api.HttpRule")
 	proto.RegisterType((*CustomHttpPattern)(nil), "google.api.CustomHttpPattern")
-***REMOVED***
+}
 
-func init() ***REMOVED*** proto.RegisterFile("google/api/http.proto", fileDescriptor1) ***REMOVED***
+func init() { proto.RegisterFile("google/api/http.proto", fileDescriptor1) }
 
-var fileDescriptor1 = []byte***REMOVED***
+var fileDescriptor1 = []byte{
 	// 359 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x7c, 0x92, 0xcf, 0x6a, 0xe3, 0x30,
 	0x10, 0xc6, 0xd7, 0x89, 0xe3, 0x24, 0x13, 0x58, 0x58, 0x6d, 0x76, 0x11, 0x85, 0x42, 0xc8, 0x29,
@@ -564,4 +564,4 @@ var fileDescriptor1 = []byte***REMOVED***
 	0xeb, 0x7e, 0x02, 0x53, 0x4a, 0x23, 0xb3, 0x6d, 0xb6, 0xab, 0xb3, 0xf8, 0x23, 0x8a, 0xde, 0x7a,
 	0xf1, 0xfd, 0x7a, 0xfb, 0xb0, 0x4b, 0xdc, 0xb9, 0xeb, 0xcf, 0x00, 0x00, 0x00, 0xff, 0xff, 0x68,
 	0x15, 0x60, 0x5b, 0x40, 0x02, 0x00, 0x00,
-***REMOVED***
+}

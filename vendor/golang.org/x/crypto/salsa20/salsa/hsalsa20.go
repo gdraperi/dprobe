@@ -6,12 +6,12 @@
 package salsa // import "golang.org/x/crypto/salsa20/salsa"
 
 // Sigma is the Salsa20 constant for 256-bit keys.
-var Sigma = [16]byte***REMOVED***'e', 'x', 'p', 'a', 'n', 'd', ' ', '3', '2', '-', 'b', 'y', 't', 'e', ' ', 'k'***REMOVED***
+var Sigma = [16]byte{'e', 'x', 'p', 'a', 'n', 'd', ' ', '3', '2', '-', 'b', 'y', 't', 'e', ' ', 'k'}
 
 // HSalsa20 applies the HSalsa20 core function to a 16-byte input in, 32-byte
 // key k, and 16-byte constant c, and puts the result into the 32-byte array
 // out.
-func HSalsa20(out *[32]byte, in *[16]byte, k *[32]byte, c *[16]byte) ***REMOVED***
+func HSalsa20(out *[32]byte, in *[16]byte, k *[32]byte, c *[16]byte) {
 	x0 := uint32(c[0]) | uint32(c[1])<<8 | uint32(c[2])<<16 | uint32(c[3])<<24
 	x1 := uint32(k[0]) | uint32(k[1])<<8 | uint32(k[2])<<16 | uint32(k[3])<<24
 	x2 := uint32(k[4]) | uint32(k[5])<<8 | uint32(k[6])<<16 | uint32(k[7])<<24
@@ -29,7 +29,7 @@ func HSalsa20(out *[32]byte, in *[16]byte, k *[32]byte, c *[16]byte) ***REMOVED*
 	x14 := uint32(k[28]) | uint32(k[29])<<8 | uint32(k[30])<<16 | uint32(k[31])<<24
 	x15 := uint32(c[12]) | uint32(c[13])<<8 | uint32(c[14])<<16 | uint32(c[15])<<24
 
-	for i := 0; i < 20; i += 2 ***REMOVED***
+	for i := 0; i < 20; i += 2 {
 		u := x0 + x12
 		x4 ^= u<<7 | u>>(32-7)
 		u = x4 + x0
@@ -101,7 +101,7 @@ func HSalsa20(out *[32]byte, in *[16]byte, k *[32]byte, c *[16]byte) ***REMOVED*
 		x14 ^= u<<13 | u>>(32-13)
 		u = x14 + x13
 		x15 ^= u<<18 | u>>(32-18)
-	***REMOVED***
+	}
 	out[0] = byte(x0)
 	out[1] = byte(x0 >> 8)
 	out[2] = byte(x0 >> 16)
@@ -141,4 +141,4 @@ func HSalsa20(out *[32]byte, in *[16]byte, k *[32]byte, c *[16]byte) ***REMOVED*
 	out[29] = byte(x9 >> 8)
 	out[30] = byte(x9 >> 16)
 	out[31] = byte(x9 >> 24)
-***REMOVED***
+}

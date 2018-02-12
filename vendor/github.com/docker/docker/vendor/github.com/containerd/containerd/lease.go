@@ -11,82 +11,82 @@ import (
 // Lease is used to hold a reference to active resources which have not been
 // referenced by a root resource. This is useful for preventing garbage
 // collection of resources while they are actively being updated.
-type Lease struct ***REMOVED***
+type Lease struct {
 	id        string
 	createdAt time.Time
 
 	client *Client
-***REMOVED***
+}
 
 // CreateLease creates a new lease
-func (c *Client) CreateLease(ctx context.Context) (Lease, error) ***REMOVED***
+func (c *Client) CreateLease(ctx context.Context) (Lease, error) {
 	lapi := leasesapi.NewLeasesClient(c.conn)
-	resp, err := lapi.Create(ctx, &leasesapi.CreateRequest***REMOVED******REMOVED***)
-	if err != nil ***REMOVED***
-		return Lease***REMOVED******REMOVED***, err
-	***REMOVED***
+	resp, err := lapi.Create(ctx, &leasesapi.CreateRequest{})
+	if err != nil {
+		return Lease{}, err
+	}
 
-	return Lease***REMOVED***
+	return Lease{
 		id:     resp.Lease.ID,
 		client: c,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // ListLeases lists active leases
-func (c *Client) ListLeases(ctx context.Context) ([]Lease, error) ***REMOVED***
+func (c *Client) ListLeases(ctx context.Context) ([]Lease, error) {
 	lapi := leasesapi.NewLeasesClient(c.conn)
-	resp, err := lapi.List(ctx, &leasesapi.ListRequest***REMOVED******REMOVED***)
-	if err != nil ***REMOVED***
+	resp, err := lapi.List(ctx, &leasesapi.ListRequest{})
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	leases := make([]Lease, len(resp.Leases))
-	for i := range resp.Leases ***REMOVED***
-		leases[i] = Lease***REMOVED***
+	for i := range resp.Leases {
+		leases[i] = Lease{
 			id:        resp.Leases[i].ID,
 			createdAt: resp.Leases[i].CreatedAt,
 			client:    c,
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return leases, nil
-***REMOVED***
+}
 
 // WithLease attaches a lease on the context
-func (c *Client) WithLease(ctx context.Context) (context.Context, func() error, error) ***REMOVED***
+func (c *Client) WithLease(ctx context.Context) (context.Context, func() error, error) {
 	_, ok := leases.Lease(ctx)
-	if ok ***REMOVED***
-		return ctx, func() error ***REMOVED***
+	if ok {
+		return ctx, func() error {
 			return nil
-		***REMOVED***, nil
-	***REMOVED***
+		}, nil
+	}
 
 	l, err := c.CreateLease(ctx)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 
 	ctx = leases.WithLease(ctx, l.ID())
-	return ctx, func() error ***REMOVED***
+	return ctx, func() error {
 		return l.Delete(ctx)
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // ID returns the lease ID
-func (l Lease) ID() string ***REMOVED***
+func (l Lease) ID() string {
 	return l.id
-***REMOVED***
+}
 
 // CreatedAt returns the time at which the lease was created
-func (l Lease) CreatedAt() time.Time ***REMOVED***
+func (l Lease) CreatedAt() time.Time {
 	return l.createdAt
-***REMOVED***
+}
 
 // Delete deletes the lease, removing the reference to all resources created
 // during the lease.
-func (l Lease) Delete(ctx context.Context) error ***REMOVED***
+func (l Lease) Delete(ctx context.Context) error {
 	lapi := leasesapi.NewLeasesClient(l.client.conn)
-	_, err := lapi.Delete(ctx, &leasesapi.DeleteRequest***REMOVED***
+	_, err := lapi.Delete(ctx, &leasesapi.DeleteRequest{
 		ID: l.id,
-	***REMOVED***)
+	})
 	return err
-***REMOVED***
+}

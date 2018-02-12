@@ -1,5 +1,5 @@
-***REMOVED***
-    "array": ***REMOVED***
+{
+    "array": {
         "key1": [
             1,
             2,
@@ -41,124 +41,124 @@
             1,
             2
         ]
-***REMOVED***,
-    "boolean": ***REMOVED***
+    },
+    "boolean": {
         "False": false,
         "True": true
-***REMOVED***,
-    "datetime": ***REMOVED***
+    },
+    "datetime": {
         "key1": "1979-05-27T07:32:00Z",
         "key2": "1979-05-27T00:32:00-07:00",
         "key3": "1979-05-27T00:32:00.999999-07:00"
-***REMOVED***,
-    "float": ***REMOVED***
-        "both": ***REMOVED***
+    },
+    "float": {
+        "both": {
             "key": 6.626e-34
-    ***REMOVED***,
-        "exponent": ***REMOVED***
+        },
+        "exponent": {
             "key1": 5e+22,
             "key2": 1000000,
             "key3": -0.02
-    ***REMOVED***,
-        "fractional": ***REMOVED***
+        },
+        "fractional": {
             "key1": 1,
             "key2": 3.1415,
             "key3": -0.01
-    ***REMOVED***,
-        "underscores": ***REMOVED***
+        },
+        "underscores": {
             "key1": 9224617.445991227,
             "key2": 1e+100
-    ***REMOVED***
-***REMOVED***,
-    "fruit": [***REMOVED***
+        }
+    },
+    "fruit": [{
             "name": "apple",
-            "physical": ***REMOVED***
+            "physical": {
                 "color": "red",
                 "shape": "round"
-        ***REMOVED***,
-            "variety": [***REMOVED***
+            },
+            "variety": [{
                     "name": "red delicious"
-            ***REMOVED***,
-                ***REMOVED***
+                },
+                {
                     "name": "granny smith"
-            ***REMOVED***
+                }
             ]
-    ***REMOVED***,
-        ***REMOVED***
+        },
+        {
             "name": "banana",
-            "variety": [***REMOVED***
+            "variety": [{
                 "name": "plantain"
-        ***REMOVED***]
-    ***REMOVED***
+            }]
+        }
     ],
-    "integer": ***REMOVED***
+    "integer": {
         "key1": 99,
         "key2": 42,
         "key3": 0,
         "key4": -17,
-        "underscores": ***REMOVED***
+        "underscores": {
             "key1": 1000,
             "key2": 5349221,
             "key3": 12345
-    ***REMOVED***
-***REMOVED***,
-    "products": [***REMOVED***
+        }
+    },
+    "products": [{
             "name": "Hammer",
             "sku": 738594937
-    ***REMOVED***,
-        ***REMOVED******REMOVED***,
-        ***REMOVED***
+        },
+        {},
+        {
             "color": "gray",
             "name": "Nail",
             "sku": 284758393
-    ***REMOVED***
+        }
     ],
-    "string": ***REMOVED***
-        "basic": ***REMOVED***
+    "string": {
+        "basic": {
             "basic": "I'm a string. \"You can quote me\". Name\tJosé\nLocation\tSF."
-    ***REMOVED***,
-        "literal": ***REMOVED***
-            "multiline": ***REMOVED***
+        },
+        "literal": {
+            "multiline": {
                 "lines": "The first newline is\ntrimmed in raw strings.\n   All other whitespace\n   is preserved.\n",
-                "regex2": "I [dw]on't need \\d***REMOVED***2***REMOVED*** apples"
-        ***REMOVED***,
+                "regex2": "I [dw]on't need \\d{2} apples"
+            },
             "quoted": "Tom \"Dubs\" Preston-Werner",
             "regex": "\u003c\\i\\c*\\s*\u003e",
             "winpath": "C:\\Users\\nodejs\\templates",
             "winpath2": "\\\\ServerX\\admin$\\system32\\"
-    ***REMOVED***,
-        "multiline": ***REMOVED***
-            "continued": ***REMOVED***
+        },
+        "multiline": {
+            "continued": {
                 "key1": "The quick brown fox jumps over the lazy dog.",
                 "key2": "The quick brown fox jumps over the lazy dog.",
                 "key3": "The quick brown fox jumps over the lazy dog."
-        ***REMOVED***,
+            },
             "key1": "One\nTwo",
             "key2": "One\nTwo",
             "key3": "One\nTwo"
-    ***REMOVED***
-***REMOVED***,
-    "table": ***REMOVED***
-        "inline": ***REMOVED***
-            "name": ***REMOVED***
+        }
+    },
+    "table": {
+        "inline": {
+            "name": {
                 "first": "Tom",
                 "last": "Preston-Werner"
-        ***REMOVED***,
-            "point": ***REMOVED***
+            },
+            "point": {
                 "x": 1,
                 "y": 2
-        ***REMOVED***
-    ***REMOVED***,
+            }
+        },
         "key": "value",
-        "subtable": ***REMOVED***
+        "subtable": {
             "key": "another value"
-    ***REMOVED***
-***REMOVED***,
-    "x": ***REMOVED***
-        "y": ***REMOVED***
-            "z": ***REMOVED***
-                "w": ***REMOVED******REMOVED***
-        ***REMOVED***
-    ***REMOVED***
-***REMOVED***
-***REMOVED***
+        }
+    },
+    "x": {
+        "y": {
+            "z": {
+                "w": {}
+            }
+        }
+    }
+}

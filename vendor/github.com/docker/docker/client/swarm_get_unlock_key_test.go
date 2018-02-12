@@ -16,45 +16,45 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestSwarmGetUnlockKeyError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestSwarmGetUnlockKeyError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
-	***REMOVED***
+	}
 
 	_, err := client.SwarmGetUnlockKey(context.Background())
 	testutil.ErrorContains(t, err, "Error response from daemon: Server error")
-***REMOVED***
+}
 
-func TestSwarmGetUnlockKey(t *testing.T) ***REMOVED***
+func TestSwarmGetUnlockKey(t *testing.T) {
 	expectedURL := "/swarm/unlockkey"
 	unlockKey := "SWMKEY-1-y6guTZNTwpQeTL5RhUfOsdBdXoQjiB2GADHSRJvbXeE"
 
-	client := &Client***REMOVED***
-		client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-			if !strings.HasPrefix(req.URL.Path, expectedURL) ***REMOVED***
+	client := &Client{
+		client: newMockClient(func(req *http.Request) (*http.Response, error) {
+			if !strings.HasPrefix(req.URL.Path, expectedURL) {
 				return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, req.URL)
-			***REMOVED***
-			if req.Method != "GET" ***REMOVED***
+			}
+			if req.Method != "GET" {
 				return nil, fmt.Errorf("expected GET method, got %s", req.Method)
-			***REMOVED***
+			}
 
-			key := types.SwarmUnlockKeyResponse***REMOVED***
+			key := types.SwarmUnlockKeyResponse{
 				UnlockKey: unlockKey,
-			***REMOVED***
+			}
 
 			b, err := json.Marshal(key)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 
-			return &http.Response***REMOVED***
+			return &http.Response{
 				StatusCode: http.StatusOK,
 				Body:       ioutil.NopCloser(bytes.NewReader(b)),
-			***REMOVED***, nil
-		***REMOVED***),
-	***REMOVED***
+			}, nil
+		}),
+	}
 
 	resp, err := client.SwarmGetUnlockKey(context.Background())
 	require.NoError(t, err)
 	assert.Equal(t, unlockKey, resp.UnlockKey)
-***REMOVED***
+}

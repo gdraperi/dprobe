@@ -29,37 +29,37 @@ package prometheus
 // Note that all previously pushed metrics with the same job and instance will
 // be replaced with the metrics pushed by this call. (It uses HTTP method 'PUT'
 // to push to the Pushgateway.)
-func Push(job, instance, url string) error ***REMOVED***
+func Push(job, instance, url string) error {
 	return defRegistry.Push(job, instance, url, "PUT")
-***REMOVED***
+}
 
 // PushAdd works like Push, but only previously pushed metrics with the same
 // name (and the same job and instance) will be replaced. (It uses HTTP method
 // 'POST' to push to the Pushgateway.)
-func PushAdd(job, instance, url string) error ***REMOVED***
+func PushAdd(job, instance, url string) error {
 	return defRegistry.Push(job, instance, url, "POST")
-***REMOVED***
+}
 
 // PushCollectors works like Push, but it does not collect from the default
 // registry. Instead, it collects from the provided collectors. It is a
 // convenient way to push only a few metrics.
-func PushCollectors(job, instance, url string, collectors ...Collector) error ***REMOVED***
+func PushCollectors(job, instance, url string, collectors ...Collector) error {
 	return pushCollectors(job, instance, url, "PUT", collectors...)
-***REMOVED***
+}
 
 // PushAddCollectors works like PushAdd, but it does not collect from the
 // default registry. Instead, it collects from the provided collectors. It is a
 // convenient way to push only a few metrics.
-func PushAddCollectors(job, instance, url string, collectors ...Collector) error ***REMOVED***
+func PushAddCollectors(job, instance, url string, collectors ...Collector) error {
 	return pushCollectors(job, instance, url, "POST", collectors...)
-***REMOVED***
+}
 
-func pushCollectors(job, instance, url, method string, collectors ...Collector) error ***REMOVED***
+func pushCollectors(job, instance, url, method string, collectors ...Collector) error {
 	r := newRegistry()
-	for _, collector := range collectors ***REMOVED***
-		if _, err := r.Register(collector); err != nil ***REMOVED***
+	for _, collector := range collectors {
+		if _, err := r.Register(collector); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return r.Push(job, instance, url, method)
-***REMOVED***
+}

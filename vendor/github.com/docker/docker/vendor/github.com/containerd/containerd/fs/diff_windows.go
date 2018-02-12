@@ -6,27 +6,27 @@ import (
 	"golang.org/x/sys/windows"
 )
 
-func detectDirDiff(upper, lower string) *diffDirOptions ***REMOVED***
+func detectDirDiff(upper, lower string) *diffDirOptions {
 	return nil
-***REMOVED***
+}
 
-func compareSysStat(s1, s2 interface***REMOVED******REMOVED***) (bool, error) ***REMOVED***
+func compareSysStat(s1, s2 interface{}) (bool, error) {
 	f1, ok := s1.(windows.Win32FileAttributeData)
-	if !ok ***REMOVED***
+	if !ok {
 		return false, nil
-	***REMOVED***
+	}
 	f2, ok := s2.(windows.Win32FileAttributeData)
-	if !ok ***REMOVED***
+	if !ok {
 		return false, nil
-	***REMOVED***
+	}
 	return f1.FileAttributes == f2.FileAttributes, nil
-***REMOVED***
+}
 
-func compareCapabilities(p1, p2 string) (bool, error) ***REMOVED***
+func compareCapabilities(p1, p2 string) (bool, error) {
 	// TODO: Use windows equivalent
 	return true, nil
-***REMOVED***
+}
 
-func isLinked(os.FileInfo) bool ***REMOVED***
+func isLinked(os.FileInfo) bool {
 	return false
-***REMOVED***
+}

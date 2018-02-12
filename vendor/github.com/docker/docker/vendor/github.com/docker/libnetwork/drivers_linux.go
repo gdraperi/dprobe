@@ -9,18 +9,18 @@ import (
 	"github.com/docker/libnetwork/drivers/remote"
 )
 
-func getInitializers(experimental bool) []initializer ***REMOVED***
-	in := []initializer***REMOVED***
-		***REMOVED***bridge.Init, "bridge"***REMOVED***,
-		***REMOVED***host.Init, "host"***REMOVED***,
-		***REMOVED***macvlan.Init, "macvlan"***REMOVED***,
-		***REMOVED***null.Init, "null"***REMOVED***,
-		***REMOVED***remote.Init, "remote"***REMOVED***,
-		***REMOVED***overlay.Init, "overlay"***REMOVED***,
-	***REMOVED***
+func getInitializers(experimental bool) []initializer {
+	in := []initializer{
+		{bridge.Init, "bridge"},
+		{host.Init, "host"},
+		{macvlan.Init, "macvlan"},
+		{null.Init, "null"},
+		{remote.Init, "remote"},
+		{overlay.Init, "overlay"},
+	}
 
-	if experimental ***REMOVED***
+	if experimental {
 		in = append(in, additionalDrivers()...)
-	***REMOVED***
+	}
 	return in
-***REMOVED***
+}

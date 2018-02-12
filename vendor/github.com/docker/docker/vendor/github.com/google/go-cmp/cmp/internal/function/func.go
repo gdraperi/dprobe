@@ -26,24 +26,24 @@ const (
 var boolType = reflect.TypeOf(true)
 
 // IsType reports whether the reflect.Type is of the specified function type.
-func IsType(t reflect.Type, ft funcType) bool ***REMOVED***
-	if t == nil || t.Kind() != reflect.Func || t.IsVariadic() ***REMOVED***
+func IsType(t reflect.Type, ft funcType) bool {
+	if t == nil || t.Kind() != reflect.Func || t.IsVariadic() {
 		return false
-	***REMOVED***
+	}
 	ni, no := t.NumIn(), t.NumOut()
-	switch ft ***REMOVED***
+	switch ft {
 	case ttbFunc: // func(T, T) bool
-		if ni == 2 && no == 1 && t.In(0) == t.In(1) && t.Out(0) == boolType ***REMOVED***
+		if ni == 2 && no == 1 && t.In(0) == t.In(1) && t.Out(0) == boolType {
 			return true
-		***REMOVED***
+		}
 	case tibFunc: // func(T, I) bool
-		if ni == 2 && no == 1 && t.In(0).AssignableTo(t.In(1)) && t.Out(0) == boolType ***REMOVED***
+		if ni == 2 && no == 1 && t.In(0).AssignableTo(t.In(1)) && t.Out(0) == boolType {
 			return true
-		***REMOVED***
+		}
 	case trFunc: // func(T) R
-		if ni == 1 && no == 1 ***REMOVED***
+		if ni == 1 && no == 1 {
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false
-***REMOVED***
+}

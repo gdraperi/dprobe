@@ -11,61 +11,61 @@ import (
 )
 
 // NewTask creates a new task.
-func NewTask(cluster *api.Cluster, service *api.Service, slot uint64, nodeID string) *api.Task ***REMOVED***
+func NewTask(cluster *api.Cluster, service *api.Service, slot uint64, nodeID string) *api.Task {
 	var logDriver *api.Driver
-	if service.Spec.Task.LogDriver != nil ***REMOVED***
+	if service.Spec.Task.LogDriver != nil {
 		// use the log driver specific to the task, if we have it.
 		logDriver = service.Spec.Task.LogDriver
-	***REMOVED*** else if cluster != nil ***REMOVED***
+	} else if cluster != nil {
 		// pick up the cluster default, if available.
 		logDriver = cluster.Spec.TaskDefaults.LogDriver // nil is okay here.
-	***REMOVED***
+	}
 
 	taskID := identity.NewID()
-	task := api.Task***REMOVED***
+	task := api.Task{
 		ID:                 taskID,
 		ServiceAnnotations: service.Spec.Annotations,
 		Spec:               service.Spec.Task,
 		SpecVersion:        service.SpecVersion,
 		ServiceID:          service.ID,
 		Slot:               slot,
-		Status: api.TaskStatus***REMOVED***
+		Status: api.TaskStatus{
 			State:     api.TaskStateNew,
 			Timestamp: ptypes.MustTimestampProto(time.Now()),
 			Message:   "created",
-		***REMOVED***,
-		Endpoint: &api.Endpoint***REMOVED***
+		},
+		Endpoint: &api.Endpoint{
 			Spec: service.Spec.Endpoint.Copy(),
-		***REMOVED***,
+		},
 		DesiredState: api.TaskStateRunning,
 		LogDriver:    logDriver,
-	***REMOVED***
+	}
 
 	// In global mode we also set the NodeID
-	if nodeID != "" ***REMOVED***
+	if nodeID != "" {
 		task.NodeID = nodeID
-	***REMOVED***
+	}
 
 	return &task
-***REMOVED***
+}
 
 // RestartCondition returns the restart condition to apply to this task.
-func RestartCondition(task *api.Task) api.RestartPolicy_RestartCondition ***REMOVED***
+func RestartCondition(task *api.Task) api.RestartPolicy_RestartCondition {
 	restartCondition := defaults.Service.Task.Restart.Condition
-	if task.Spec.Restart != nil ***REMOVED***
+	if task.Spec.Restart != nil {
 		restartCondition = task.Spec.Restart.Condition
-	***REMOVED***
+	}
 	return restartCondition
-***REMOVED***
+}
 
 // IsTaskDirty determines whether a task matches the given service's spec.
-func IsTaskDirty(s *api.Service, t *api.Task) bool ***REMOVED***
+func IsTaskDirty(s *api.Service, t *api.Task) bool {
 	// If the spec version matches, we know the task is not dirty. However,
 	// if it does not match, that doesn't mean the task is dirty, since
 	// only a portion of the spec is included in the comparison.
-	if t.SpecVersion != nil && s.SpecVersion != nil && *s.SpecVersion == *t.SpecVersion ***REMOVED***
+	if t.SpecVersion != nil && s.SpecVersion != nil && *s.SpecVersion == *t.SpecVersion {
 		return false
-	***REMOVED***
+	}
 
 	// Make a deep copy of the service and task spec for the comparison.
 	serviceTaskSpec := *s.Spec.Task.Copy()
@@ -84,59 +84,59 @@ func IsTaskDirty(s *api.Service, t *api.Task) bool ***REMOVED***
 	// which case we know that the task either successfully pulled its
 	// container image or didn't need to.
 	ignorePullOpts := t.DesiredState <= api.TaskStateRunning && currentState >= api.TaskStateReady && currentState <= api.TaskStateRunning
-	if ignorePullOpts && serviceTaskSpec.GetContainer() != nil && t.Spec.GetContainer() != nil ***REMOVED***
+	if ignorePullOpts && serviceTaskSpec.GetContainer() != nil && t.Spec.GetContainer() != nil {
 		// Modify the service's container spec.
 		serviceTaskSpec.GetContainer().PullOptions = t.Spec.GetContainer().PullOptions
-	***REMOVED***
+	}
 
 	return !reflect.DeepEqual(serviceTaskSpec, t.Spec) ||
 		(t.Endpoint != nil && !reflect.DeepEqual(s.Spec.Endpoint, t.Endpoint.Spec))
-***REMOVED***
+}
 
 // InvalidNode is true if the node is nil, down, or drained
-func InvalidNode(n *api.Node) bool ***REMOVED***
+func InvalidNode(n *api.Node) bool {
 	return n == nil ||
 		n.Status.State == api.NodeStatus_DOWN ||
 		n.Spec.Availability == api.NodeAvailabilityDrain
-***REMOVED***
+}
 
 // TasksByTimestamp sorts tasks by applied timestamp if available, otherwise
 // status timestamp.
 type TasksByTimestamp []*api.Task
 
 // Len implements the Len method for sorting.
-func (t TasksByTimestamp) Len() int ***REMOVED***
+func (t TasksByTimestamp) Len() int {
 	return len(t)
-***REMOVED***
+}
 
 // Swap implements the Swap method for sorting.
-func (t TasksByTimestamp) Swap(i, j int) ***REMOVED***
+func (t TasksByTimestamp) Swap(i, j int) {
 	t[i], t[j] = t[j], t[i]
-***REMOVED***
+}
 
 // Less implements the Less method for sorting.
-func (t TasksByTimestamp) Less(i, j int) bool ***REMOVED***
+func (t TasksByTimestamp) Less(i, j int) bool {
 	iTimestamp := t[i].Status.Timestamp
-	if t[i].Status.AppliedAt != nil ***REMOVED***
+	if t[i].Status.AppliedAt != nil {
 		iTimestamp = t[i].Status.AppliedAt
-	***REMOVED***
+	}
 
 	jTimestamp := t[j].Status.Timestamp
-	if t[j].Status.AppliedAt != nil ***REMOVED***
+	if t[j].Status.AppliedAt != nil {
 		iTimestamp = t[j].Status.AppliedAt
-	***REMOVED***
+	}
 
-	if iTimestamp == nil ***REMOVED***
+	if iTimestamp == nil {
 		return true
-	***REMOVED***
-	if jTimestamp == nil ***REMOVED***
+	}
+	if jTimestamp == nil {
 		return false
-	***REMOVED***
-	if iTimestamp.Seconds < jTimestamp.Seconds ***REMOVED***
+	}
+	if iTimestamp.Seconds < jTimestamp.Seconds {
 		return true
-	***REMOVED***
-	if iTimestamp.Seconds > jTimestamp.Seconds ***REMOVED***
+	}
+	if iTimestamp.Seconds > jTimestamp.Seconds {
 		return false
-	***REMOVED***
+	}
 	return iTimestamp.Nanos < jTimestamp.Nanos
-***REMOVED***
+}

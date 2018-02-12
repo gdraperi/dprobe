@@ -22,40 +22,40 @@ const (
 
 type notAllowedError string
 
-func (e notAllowedError) Error() string ***REMOVED***
+func (e notAllowedError) Error() string {
 	return string(e)
-***REMOVED***
+}
 
-func (e notAllowedError) Forbidden() ***REMOVED******REMOVED***
+func (e notAllowedError) Forbidden() {}
 
 type notAvailableError string
 
-func (e notAvailableError) Error() string ***REMOVED***
+func (e notAvailableError) Error() string {
 	return string(e)
-***REMOVED***
+}
 
-func (e notAvailableError) Unavailable() ***REMOVED******REMOVED***
+func (e notAvailableError) Unavailable() {}
 
 type configError string
 
-func (e configError) Error() string ***REMOVED***
+func (e configError) Error() string {
 	return string(e)
-***REMOVED***
+}
 
-func (e configError) InvalidParameter() ***REMOVED******REMOVED***
+func (e configError) InvalidParameter() {}
 
-type invalidUnlockKey struct***REMOVED******REMOVED***
+type invalidUnlockKey struct{}
 
-func (invalidUnlockKey) Error() string ***REMOVED***
+func (invalidUnlockKey) Error() string {
 	return "swarm could not be unlocked: invalid key provided"
-***REMOVED***
+}
 
-func (invalidUnlockKey) Unauthorized() ***REMOVED******REMOVED***
+func (invalidUnlockKey) Unauthorized() {}
 
-type notLockedError struct***REMOVED******REMOVED***
+type notLockedError struct{}
 
-func (notLockedError) Error() string ***REMOVED***
+func (notLockedError) Error() string {
 	return "swarm is not locked"
-***REMOVED***
+}
 
-func (notLockedError) Conflict() ***REMOVED******REMOVED***
+func (notLockedError) Conflict() {}

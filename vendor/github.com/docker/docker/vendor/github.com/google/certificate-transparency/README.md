@@ -246,7 +246,7 @@ in the gclient [build process](#build-quick-start), modify the top-level
 `.gclient` to add:
 
 ```python
-      "custom_vars": ***REMOVED*** "ssl_impl": "boringssl" ***REMOVED*** ***REMOVED***,
+      "custom_vars": { "ssl_impl": "boringssl" } },
 ```
 
 Then continue the [build process](#build-quick-start) with the `gclient sync` step.

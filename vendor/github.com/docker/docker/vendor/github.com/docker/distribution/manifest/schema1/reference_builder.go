@@ -14,37 +14,37 @@ import (
 
 // referenceManifestBuilder is a type for constructing manifests from schema1
 // dependencies.
-type referenceManifestBuilder struct ***REMOVED***
+type referenceManifestBuilder struct {
 	Manifest
 	pk libtrust.PrivateKey
-***REMOVED***
+}
 
 // NewReferenceManifestBuilder is used to build new manifests for the current
 // schema version using schema1 dependencies.
-func NewReferenceManifestBuilder(pk libtrust.PrivateKey, ref reference.Named, architecture string) distribution.ManifestBuilder ***REMOVED***
+func NewReferenceManifestBuilder(pk libtrust.PrivateKey, ref reference.Named, architecture string) distribution.ManifestBuilder {
 	tag := ""
-	if tagged, isTagged := ref.(reference.Tagged); isTagged ***REMOVED***
+	if tagged, isTagged := ref.(reference.Tagged); isTagged {
 		tag = tagged.Tag()
-	***REMOVED***
+	}
 
-	return &referenceManifestBuilder***REMOVED***
-		Manifest: Manifest***REMOVED***
-			Versioned: manifest.Versioned***REMOVED***
+	return &referenceManifestBuilder{
+		Manifest: Manifest{
+			Versioned: manifest.Versioned{
 				SchemaVersion: 1,
-			***REMOVED***,
+			},
 			Name:         ref.Name(),
 			Tag:          tag,
 			Architecture: architecture,
-		***REMOVED***,
+		},
 		pk: pk,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (mb *referenceManifestBuilder) Build(ctx context.Context) (distribution.Manifest, error) ***REMOVED***
+func (mb *referenceManifestBuilder) Build(ctx context.Context) (distribution.Manifest, error) {
 	m := mb.Manifest
-	if len(m.FSLayers) == 0 ***REMOVED***
+	if len(m.FSLayers) == 0 {
 		return nil, errors.New("cannot build manifest with zero layers or history")
-	***REMOVED***
+	}
 
 	m.FSLayers = make([]FSLayer, len(mb.Manifest.FSLayers))
 	m.History = make([]History, len(mb.Manifest.History))
@@ -52,47 +52,47 @@ func (mb *referenceManifestBuilder) Build(ctx context.Context) (distribution.Man
 	copy(m.History, mb.Manifest.History)
 
 	return Sign(&m, mb.pk)
-***REMOVED***
+}
 
 // AppendReference adds a reference to the current ManifestBuilder
-func (mb *referenceManifestBuilder) AppendReference(d distribution.Describable) error ***REMOVED***
+func (mb *referenceManifestBuilder) AppendReference(d distribution.Describable) error {
 	r, ok := d.(Reference)
-	if !ok ***REMOVED***
+	if !ok {
 		return fmt.Errorf("Unable to add non-reference type to v1 builder")
-	***REMOVED***
+	}
 
 	// Entries need to be prepended
-	mb.Manifest.FSLayers = append([]FSLayer***REMOVED******REMOVED***BlobSum: r.Digest***REMOVED******REMOVED***, mb.Manifest.FSLayers...)
-	mb.Manifest.History = append([]History***REMOVED***r.History***REMOVED***, mb.Manifest.History...)
+	mb.Manifest.FSLayers = append([]FSLayer{{BlobSum: r.Digest}}, mb.Manifest.FSLayers...)
+	mb.Manifest.History = append([]History{r.History}, mb.Manifest.History...)
 	return nil
 
-***REMOVED***
+}
 
 // References returns the current references added to this builder
-func (mb *referenceManifestBuilder) References() []distribution.Descriptor ***REMOVED***
+func (mb *referenceManifestBuilder) References() []distribution.Descriptor {
 	refs := make([]distribution.Descriptor, len(mb.Manifest.FSLayers))
-	for i := range mb.Manifest.FSLayers ***REMOVED***
+	for i := range mb.Manifest.FSLayers {
 		layerDigest := mb.Manifest.FSLayers[i].BlobSum
 		history := mb.Manifest.History[i]
-		ref := Reference***REMOVED***layerDigest, 0, history***REMOVED***
+		ref := Reference{layerDigest, 0, history}
 		refs[i] = ref.Descriptor()
-	***REMOVED***
+	}
 	return refs
-***REMOVED***
+}
 
 // Reference describes a manifest v2, schema version 1 dependency.
 // An FSLayer associated with a history entry.
-type Reference struct ***REMOVED***
+type Reference struct {
 	Digest  digest.Digest
 	Size    int64 // if we know it, set it for the descriptor.
 	History History
-***REMOVED***
+}
 
 // Descriptor describes a reference
-func (r Reference) Descriptor() distribution.Descriptor ***REMOVED***
-	return distribution.Descriptor***REMOVED***
+func (r Reference) Descriptor() distribution.Descriptor {
+	return distribution.Descriptor{
 		MediaType: MediaTypeManifestLayer,
 		Digest:    r.Digest,
 		Size:      r.Size,
-	***REMOVED***
-***REMOVED***
+	}
+}

@@ -1,15 +1,15 @@
 package main
 
-const dockerProfileTemplate = `@***REMOVED***DOCKER_GRAPH_PATH***REMOVED***=/var/lib/docker
+const dockerProfileTemplate = `@{DOCKER_GRAPH_PATH}=/var/lib/docker
 
-profile /usr/bin/docker (attach_disconnected, complain) ***REMOVED***
+profile /usr/bin/docker (attach_disconnected, complain) {
   # Prevent following links to these files during container setup.
   deny /etc/** mkl,
   deny /dev/** kl,
   deny /sys/** mkl,
   deny /proc/** mkl,
 
-  mount -> @***REMOVED***DOCKER_GRAPH_PATH***REMOVED***/**,
+  mount -> @{DOCKER_GRAPH_PATH}/**,
   mount -> /,
   mount -> /proc/**,
   mount -> /sys/**,
@@ -20,19 +20,19 @@ profile /usr/bin/docker (attach_disconnected, complain) ***REMOVED***
 
   umount,
   pivot_root,
-***REMOVED******REMOVED***if ge .Version 209000***REMOVED******REMOVED***
-  signal (receive) peer=@***REMOVED***profile_name***REMOVED***,
+{{if ge .Version 209000}}
+  signal (receive) peer=@{profile_name},
   signal (receive) peer=unconfined,
   signal (send),
-***REMOVED******REMOVED***end***REMOVED******REMOVED***
+{{end}}
   network,
   capability,
   owner /** rw,
-  @***REMOVED***DOCKER_GRAPH_PATH***REMOVED***/** rwl,
-  @***REMOVED***DOCKER_GRAPH_PATH***REMOVED***/linkgraph.db k,
-  @***REMOVED***DOCKER_GRAPH_PATH***REMOVED***/network/files/boltdb.db k,
-  @***REMOVED***DOCKER_GRAPH_PATH***REMOVED***/network/files/local-kv.db k,
-  @***REMOVED***DOCKER_GRAPH_PATH***REMOVED***/[0-9]*.[0-9]*/linkgraph.db k,
+  @{DOCKER_GRAPH_PATH}/** rwl,
+  @{DOCKER_GRAPH_PATH}/linkgraph.db k,
+  @{DOCKER_GRAPH_PATH}/network/files/boltdb.db k,
+  @{DOCKER_GRAPH_PATH}/network/files/local-kv.db k,
+  @{DOCKER_GRAPH_PATH}/[0-9]*.[0-9]*/linkgraph.db k,
 
   # For non-root client use:
   /dev/urandom r,
@@ -46,12 +46,12 @@ profile /usr/bin/docker (attach_disconnected, complain) ***REMOVED***
   /etc/ld.so.cache r,
   /etc/passwd r,
 
-***REMOVED******REMOVED***if ge .Version 209000***REMOVED******REMOVED***
-  ptrace peer=@***REMOVED***profile_name***REMOVED***,
+{{if ge .Version 209000}}
+  ptrace peer=@{profile_name},
   ptrace (read) peer=docker-default,
   deny ptrace (trace) peer=docker-default,
   deny ptrace peer=/usr/bin/docker///bin/ps,
-***REMOVED******REMOVED***end***REMOVED******REMOVED***
+{{end}}
 
   /usr/lib/** rm,
   /lib/** rm,
@@ -72,13 +72,13 @@ profile /usr/bin/docker (attach_disconnected, complain) ***REMOVED***
   /sbin/zfs rCx,
   /sbin/apparmor_parser rCx,
 
-***REMOVED******REMOVED***if ge .Version 209000***REMOVED******REMOVED***
+{{if ge .Version 209000}}
   # Transitions
   change_profile -> docker-*,
   change_profile -> unconfined,
-***REMOVED******REMOVED***end***REMOVED******REMOVED***
+{{end}}
 
-  profile /bin/cat (complain) ***REMOVED***
+  profile /bin/cat (complain) {
     /etc/ld.so.cache r,
     /lib/** rm,
     /dev/null rw,
@@ -87,8 +87,8 @@ profile /usr/bin/docker (attach_disconnected, complain) ***REMOVED***
 
     # For reading in 'docker stats':
     /proc/[0-9]*/net/dev r,
-  ***REMOVED***
-  profile /bin/ps (complain) ***REMOVED***
+  }
+  profile /bin/ps (complain) {
     /etc/ld.so.cache r,
     /etc/localtime r,
     /etc/passwd r,
@@ -98,10 +98,10 @@ profile /usr/bin/docker (attach_disconnected, complain) ***REMOVED***
     /dev/null rw,
     /bin/ps mr,
 
-***REMOVED******REMOVED***if ge .Version 209000***REMOVED******REMOVED***
+{{if ge .Version 209000}}
     # We don't need ptrace so we'll deny and ignore the error.
     deny ptrace (read, trace),
-***REMOVED******REMOVED***end***REMOVED******REMOVED***
+{{end}}
 
     # Quiet dac_override denials
     deny capability dac_override,
@@ -117,24 +117,24 @@ profile /usr/bin/docker (attach_disconnected, complain) ***REMOVED***
     /proc/sys/kernel/pid_max r,
     /proc/ r,
     /proc/tty/drivers r,
-  ***REMOVED***
-  profile /sbin/iptables (complain) ***REMOVED***
-***REMOVED******REMOVED***if ge .Version 209000***REMOVED******REMOVED***
+  }
+  profile /sbin/iptables (complain) {
+{{if ge .Version 209000}}
     signal (receive) peer=/usr/bin/docker,
-***REMOVED******REMOVED***end***REMOVED******REMOVED***
+{{end}}
     capability net_admin,
-  ***REMOVED***
-  profile /sbin/auplink flags=(attach_disconnected, complain) ***REMOVED***
-***REMOVED******REMOVED***if ge .Version 209000***REMOVED******REMOVED***
+  }
+  profile /sbin/auplink flags=(attach_disconnected, complain) {
+{{if ge .Version 209000}}
     signal (receive) peer=/usr/bin/docker,
-***REMOVED******REMOVED***end***REMOVED******REMOVED***
+{{end}}
     capability sys_admin,
     capability dac_override,
 
-    @***REMOVED***DOCKER_GRAPH_PATH***REMOVED***/aufs/** rw,
-    @***REMOVED***DOCKER_GRAPH_PATH***REMOVED***/tmp/** rw,
+    @{DOCKER_GRAPH_PATH}/aufs/** rw,
+    @{DOCKER_GRAPH_PATH}/tmp/** rw,
     # For user namespaces:
-    @***REMOVED***DOCKER_GRAPH_PATH***REMOVED***/[0-9]*.[0-9]*/** rw,
+    @{DOCKER_GRAPH_PATH}/[0-9]*.[0-9]*/** rw,
 
     /sys/fs/aufs/** r,
     /lib/** rm,
@@ -144,11 +144,11 @@ profile /usr/bin/docker (attach_disconnected, complain) ***REMOVED***
     /sbin/auplink rm,
     /proc/fs/aufs/** rw,
     /proc/[0-9]*/mounts rw,
-  ***REMOVED***
-  profile /sbin/modprobe /bin/kmod (complain) ***REMOVED***
-***REMOVED******REMOVED***if ge .Version 209000***REMOVED******REMOVED***
+  }
+  profile /sbin/modprobe /bin/kmod (complain) {
+{{if ge .Version 209000}}
     signal (receive) peer=/usr/bin/docker,
-***REMOVED******REMOVED***end***REMOVED******REMOVED***
+{{end}}
     capability sys_module,
     /etc/ld.so.cache r,
     /lib/** rm,
@@ -158,20 +158,20 @@ profile /usr/bin/docker (attach_disconnected, complain) ***REMOVED***
     /bin/kmod rm,
     /proc/cmdline r,
     /sys/module/** r,
-    /etc/modprobe.d***REMOVED***/,/*****REMOVED*** r,
-  ***REMOVED***
+    /etc/modprobe.d{/,/**} r,
+  }
   # xz works via pipes, so we do not need access to the filesystem.
-  profile /usr/bin/xz (complain) ***REMOVED***
-***REMOVED******REMOVED***if ge .Version 209000***REMOVED******REMOVED***
+  profile /usr/bin/xz (complain) {
+{{if ge .Version 209000}}
     signal (receive) peer=/usr/bin/docker,
-***REMOVED******REMOVED***end***REMOVED******REMOVED***
+{{end}}
     /etc/ld.so.cache r,
     /lib/** rm,
     /usr/bin/xz rm,
     deny /proc/** rw,
     deny /sys/** rw,
-  ***REMOVED***
-  profile /sbin/xtables-multi (attach_disconnected, complain) ***REMOVED***
+  }
+  profile /sbin/xtables-multi (attach_disconnected, complain) {
     /etc/ld.so.cache r,
     /lib/** rm,
     /sbin/xtables-multi rm,
@@ -183,12 +183,12 @@ profile /usr/bin/docker (attach_disconnected, complain) ***REMOVED***
     capability net_raw,
     capability net_admin,
     network raw,
-  ***REMOVED***
-  profile /sbin/zfs (attach_disconnected, complain) ***REMOVED***
+  }
+  profile /sbin/zfs (attach_disconnected, complain) {
     file,
     capability,
-  ***REMOVED***
-  profile /sbin/mke2fs (complain) ***REMOVED***
+  }
+  profile /sbin/mke2fs (complain) {
     /sbin/mke2fs rm,
 
     /lib/** rm,
@@ -205,8 +205,8 @@ profile /usr/bin/docker (attach_disconnected, complain) ***REMOVED***
 
     /proc/swaps r,
     /proc/[0-9]*/mounts r,
-  ***REMOVED***
-  profile /sbin/tune2fs (complain) ***REMOVED***
+  }
+  profile /sbin/tune2fs (complain) {
     /sbin/tune2fs rm,
 
     /lib/** rm,
@@ -223,8 +223,8 @@ profile /usr/bin/docker (attach_disconnected, complain) ***REMOVED***
 
     /proc/swaps r,
     /proc/[0-9]*/mounts r,
-  ***REMOVED***
-  profile /sbin/blkid (complain) ***REMOVED***
+  }
+  profile /sbin/blkid (complain) {
     /sbin/blkid rm,
 
     /lib/** rm,
@@ -242,9 +242,9 @@ profile /usr/bin/docker (attach_disconnected, complain) ***REMOVED***
 
     capability mknod,
 
-    mount -> @***REMOVED***DOCKER_GRAPH_PATH***REMOVED***/**,
-  ***REMOVED***
-  profile /sbin/apparmor_parser (complain) ***REMOVED***
+    mount -> @{DOCKER_GRAPH_PATH}/**,
+  }
+  profile /sbin/apparmor_parser (complain) {
     /sbin/apparmor_parser rm,
 
     /lib/** rm,
@@ -264,5 +264,5 @@ profile /usr/bin/docker (attach_disconnected, complain) ***REMOVED***
     /proc r,
 
     capability mac_admin,
-  ***REMOVED***
-***REMOVED***`
+  }
+}`

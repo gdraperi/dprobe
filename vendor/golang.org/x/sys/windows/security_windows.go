@@ -37,26 +37,26 @@ const (
 
 // TranslateAccountName converts a directory service
 // object name from one format to another.
-func TranslateAccountName(username string, from, to uint32, initSize int) (string, error) ***REMOVED***
+func TranslateAccountName(username string, from, to uint32, initSize int) (string, error) {
 	u, e := UTF16PtrFromString(username)
-	if e != nil ***REMOVED***
+	if e != nil {
 		return "", e
-	***REMOVED***
+	}
 	n := uint32(50)
-	for ***REMOVED***
+	for {
 		b := make([]uint16, n)
 		e = TranslateName(u, from, to, &b[0], &n)
-		if e == nil ***REMOVED***
+		if e == nil {
 			return UTF16ToString(b[:n]), nil
-		***REMOVED***
-		if e != ERROR_INSUFFICIENT_BUFFER ***REMOVED***
+		}
+		if e != ERROR_INSUFFICIENT_BUFFER {
 			return "", e
-		***REMOVED***
-		if n <= uint32(len(b)) ***REMOVED***
+		}
+		if n <= uint32(len(b)) {
 			return "", e
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 const (
 	// do not reorder
@@ -66,12 +66,12 @@ const (
 	NetSetupDomainName
 )
 
-type UserInfo10 struct ***REMOVED***
+type UserInfo10 struct {
 	Name       *uint16
 	Comment    *uint16
 	UsrComment *uint16
 	FullName   *uint16
-***REMOVED***
+}
 
 //sys	NetUserGetInfo(serverName *uint16, userName *uint16, level uint32, buf **byte) (neterr error) = netapi32.NetUserGetInfo
 //sys	NetGetJoinInformation(server *uint16, name **uint16, bufType *uint32) (neterr error) = netapi32.NetGetJoinInformation
@@ -91,18 +91,18 @@ const (
 	SidTypeLabel
 )
 
-type SidIdentifierAuthority struct ***REMOVED***
+type SidIdentifierAuthority struct {
 	Value [6]byte
-***REMOVED***
+}
 
 var (
-	SECURITY_NULL_SID_AUTHORITY        = SidIdentifierAuthority***REMOVED***[6]byte***REMOVED***0, 0, 0, 0, 0, 0***REMOVED******REMOVED***
-	SECURITY_WORLD_SID_AUTHORITY       = SidIdentifierAuthority***REMOVED***[6]byte***REMOVED***0, 0, 0, 0, 0, 1***REMOVED******REMOVED***
-	SECURITY_LOCAL_SID_AUTHORITY       = SidIdentifierAuthority***REMOVED***[6]byte***REMOVED***0, 0, 0, 0, 0, 2***REMOVED******REMOVED***
-	SECURITY_CREATOR_SID_AUTHORITY     = SidIdentifierAuthority***REMOVED***[6]byte***REMOVED***0, 0, 0, 0, 0, 3***REMOVED******REMOVED***
-	SECURITY_NON_UNIQUE_AUTHORITY      = SidIdentifierAuthority***REMOVED***[6]byte***REMOVED***0, 0, 0, 0, 0, 4***REMOVED******REMOVED***
-	SECURITY_NT_AUTHORITY              = SidIdentifierAuthority***REMOVED***[6]byte***REMOVED***0, 0, 0, 0, 0, 5***REMOVED******REMOVED***
-	SECURITY_MANDATORY_LABEL_AUTHORITY = SidIdentifierAuthority***REMOVED***[6]byte***REMOVED***0, 0, 0, 0, 0, 16***REMOVED******REMOVED***
+	SECURITY_NULL_SID_AUTHORITY        = SidIdentifierAuthority{[6]byte{0, 0, 0, 0, 0, 0}}
+	SECURITY_WORLD_SID_AUTHORITY       = SidIdentifierAuthority{[6]byte{0, 0, 0, 0, 0, 1}}
+	SECURITY_LOCAL_SID_AUTHORITY       = SidIdentifierAuthority{[6]byte{0, 0, 0, 0, 0, 2}}
+	SECURITY_CREATOR_SID_AUTHORITY     = SidIdentifierAuthority{[6]byte{0, 0, 0, 0, 0, 3}}
+	SECURITY_NON_UNIQUE_AUTHORITY      = SidIdentifierAuthority{[6]byte{0, 0, 0, 0, 0, 4}}
+	SECURITY_NT_AUTHORITY              = SidIdentifierAuthority{[6]byte{0, 0, 0, 0, 0, 5}}
+	SECURITY_MANDATORY_LABEL_AUTHORITY = SidIdentifierAuthority{[6]byte{0, 0, 0, 0, 0, 16}}
 )
 
 const (
@@ -174,117 +174,117 @@ const (
 
 // The security identifier (SID) structure is a variable-length
 // structure used to uniquely identify users or groups.
-type SID struct***REMOVED******REMOVED***
+type SID struct{}
 
 // StringToSid converts a string-format security identifier
 // sid into a valid, functional sid.
-func StringToSid(s string) (*SID, error) ***REMOVED***
+func StringToSid(s string) (*SID, error) {
 	var sid *SID
 	p, e := UTF16PtrFromString(s)
-	if e != nil ***REMOVED***
+	if e != nil {
 		return nil, e
-	***REMOVED***
+	}
 	e = ConvertStringSidToSid(p, &sid)
-	if e != nil ***REMOVED***
+	if e != nil {
 		return nil, e
-	***REMOVED***
+	}
 	defer LocalFree((Handle)(unsafe.Pointer(sid)))
 	return sid.Copy()
-***REMOVED***
+}
 
 // LookupSID retrieves a security identifier sid for the account
 // and the name of the domain on which the account was found.
 // System specify target computer to search.
-func LookupSID(system, account string) (sid *SID, domain string, accType uint32, err error) ***REMOVED***
-	if len(account) == 0 ***REMOVED***
+func LookupSID(system, account string) (sid *SID, domain string, accType uint32, err error) {
+	if len(account) == 0 {
 		return nil, "", 0, syscall.EINVAL
-	***REMOVED***
+	}
 	acc, e := UTF16PtrFromString(account)
-	if e != nil ***REMOVED***
+	if e != nil {
 		return nil, "", 0, e
-	***REMOVED***
+	}
 	var sys *uint16
-	if len(system) > 0 ***REMOVED***
+	if len(system) > 0 {
 		sys, e = UTF16PtrFromString(system)
-		if e != nil ***REMOVED***
+		if e != nil {
 			return nil, "", 0, e
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	n := uint32(50)
 	dn := uint32(50)
-	for ***REMOVED***
+	for {
 		b := make([]byte, n)
 		db := make([]uint16, dn)
 		sid = (*SID)(unsafe.Pointer(&b[0]))
 		e = LookupAccountName(sys, acc, sid, &n, &db[0], &dn, &accType)
-		if e == nil ***REMOVED***
+		if e == nil {
 			return sid, UTF16ToString(db), accType, nil
-		***REMOVED***
-		if e != ERROR_INSUFFICIENT_BUFFER ***REMOVED***
+		}
+		if e != ERROR_INSUFFICIENT_BUFFER {
 			return nil, "", 0, e
-		***REMOVED***
-		if n <= uint32(len(b)) ***REMOVED***
+		}
+		if n <= uint32(len(b)) {
 			return nil, "", 0, e
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // String converts sid to a string format
 // suitable for display, storage, or transmission.
-func (sid *SID) String() (string, error) ***REMOVED***
+func (sid *SID) String() (string, error) {
 	var s *uint16
 	e := ConvertSidToStringSid(sid, &s)
-	if e != nil ***REMOVED***
+	if e != nil {
 		return "", e
-	***REMOVED***
+	}
 	defer LocalFree((Handle)(unsafe.Pointer(s)))
 	return UTF16ToString((*[256]uint16)(unsafe.Pointer(s))[:]), nil
-***REMOVED***
+}
 
 // Len returns the length, in bytes, of a valid security identifier sid.
-func (sid *SID) Len() int ***REMOVED***
+func (sid *SID) Len() int {
 	return int(GetLengthSid(sid))
-***REMOVED***
+}
 
 // Copy creates a duplicate of security identifier sid.
-func (sid *SID) Copy() (*SID, error) ***REMOVED***
+func (sid *SID) Copy() (*SID, error) {
 	b := make([]byte, sid.Len())
 	sid2 := (*SID)(unsafe.Pointer(&b[0]))
 	e := CopySid(uint32(len(b)), sid2, sid)
-	if e != nil ***REMOVED***
+	if e != nil {
 		return nil, e
-	***REMOVED***
+	}
 	return sid2, nil
-***REMOVED***
+}
 
 // LookupAccount retrieves the name of the account for this sid
 // and the name of the first domain on which this sid is found.
 // System specify target computer to search for.
-func (sid *SID) LookupAccount(system string) (account, domain string, accType uint32, err error) ***REMOVED***
+func (sid *SID) LookupAccount(system string) (account, domain string, accType uint32, err error) {
 	var sys *uint16
-	if len(system) > 0 ***REMOVED***
+	if len(system) > 0 {
 		sys, err = UTF16PtrFromString(system)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return "", "", 0, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	n := uint32(50)
 	dn := uint32(50)
-	for ***REMOVED***
+	for {
 		b := make([]uint16, n)
 		db := make([]uint16, dn)
 		e := LookupAccountSid(sys, sid, &b[0], &n, &db[0], &dn, &accType)
-		if e == nil ***REMOVED***
+		if e == nil {
 			return UTF16ToString(b), UTF16ToString(db), accType, nil
-		***REMOVED***
-		if e != ERROR_INSUFFICIENT_BUFFER ***REMOVED***
+		}
+		if e != ERROR_INSUFFICIENT_BUFFER {
 			return "", "", 0, e
-		***REMOVED***
-		if n <= uint32(len(b)) ***REMOVED***
+		}
+		if n <= uint32(len(b)) {
 			return "", "", 0, e
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 const (
 	// do not reorder
@@ -347,23 +347,23 @@ const (
 	MaxTokenInfoClass
 )
 
-type SIDAndAttributes struct ***REMOVED***
+type SIDAndAttributes struct {
 	Sid        *SID
 	Attributes uint32
-***REMOVED***
+}
 
-type Tokenuser struct ***REMOVED***
+type Tokenuser struct {
 	User SIDAndAttributes
-***REMOVED***
+}
 
-type Tokenprimarygroup struct ***REMOVED***
+type Tokenprimarygroup struct {
 	PrimaryGroup *SID
-***REMOVED***
+}
 
-type Tokengroups struct ***REMOVED***
+type Tokengroups struct {
 	GroupCount uint32
 	Groups     [1]SIDAndAttributes
-***REMOVED***
+}
 
 // Authorization Functions
 //sys checkTokenMembership(tokenHandle Token, sidToCheck *SID, isMember *int32) (err error) = advapi32.CheckTokenMembership
@@ -382,95 +382,95 @@ type Token Handle
 
 // OpenCurrentProcessToken opens the access token
 // associated with current process.
-func OpenCurrentProcessToken() (Token, error) ***REMOVED***
+func OpenCurrentProcessToken() (Token, error) {
 	p, e := GetCurrentProcess()
-	if e != nil ***REMOVED***
+	if e != nil {
 		return 0, e
-	***REMOVED***
+	}
 	var t Token
 	e = OpenProcessToken(p, TOKEN_QUERY, &t)
-	if e != nil ***REMOVED***
+	if e != nil {
 		return 0, e
-	***REMOVED***
+	}
 	return t, nil
-***REMOVED***
+}
 
 // Close releases access to access token.
-func (t Token) Close() error ***REMOVED***
+func (t Token) Close() error {
 	return CloseHandle(Handle(t))
-***REMOVED***
+}
 
 // getInfo retrieves a specified type of information about an access token.
-func (t Token) getInfo(class uint32, initSize int) (unsafe.Pointer, error) ***REMOVED***
+func (t Token) getInfo(class uint32, initSize int) (unsafe.Pointer, error) {
 	n := uint32(initSize)
-	for ***REMOVED***
+	for {
 		b := make([]byte, n)
 		e := GetTokenInformation(t, class, &b[0], uint32(len(b)), &n)
-		if e == nil ***REMOVED***
+		if e == nil {
 			return unsafe.Pointer(&b[0]), nil
-		***REMOVED***
-		if e != ERROR_INSUFFICIENT_BUFFER ***REMOVED***
+		}
+		if e != ERROR_INSUFFICIENT_BUFFER {
 			return nil, e
-		***REMOVED***
-		if n <= uint32(len(b)) ***REMOVED***
+		}
+		if n <= uint32(len(b)) {
 			return nil, e
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // GetTokenUser retrieves access token t user account information.
-func (t Token) GetTokenUser() (*Tokenuser, error) ***REMOVED***
+func (t Token) GetTokenUser() (*Tokenuser, error) {
 	i, e := t.getInfo(TokenUser, 50)
-	if e != nil ***REMOVED***
+	if e != nil {
 		return nil, e
-	***REMOVED***
+	}
 	return (*Tokenuser)(i), nil
-***REMOVED***
+}
 
 // GetTokenGroups retrieves group accounts associated with access token t.
-func (t Token) GetTokenGroups() (*Tokengroups, error) ***REMOVED***
+func (t Token) GetTokenGroups() (*Tokengroups, error) {
 	i, e := t.getInfo(TokenGroups, 50)
-	if e != nil ***REMOVED***
+	if e != nil {
 		return nil, e
-	***REMOVED***
+	}
 	return (*Tokengroups)(i), nil
-***REMOVED***
+}
 
 // GetTokenPrimaryGroup retrieves access token t primary group information.
 // A pointer to a SID structure representing a group that will become
 // the primary group of any objects created by a process using this access token.
-func (t Token) GetTokenPrimaryGroup() (*Tokenprimarygroup, error) ***REMOVED***
+func (t Token) GetTokenPrimaryGroup() (*Tokenprimarygroup, error) {
 	i, e := t.getInfo(TokenPrimaryGroup, 50)
-	if e != nil ***REMOVED***
+	if e != nil {
 		return nil, e
-	***REMOVED***
+	}
 	return (*Tokenprimarygroup)(i), nil
-***REMOVED***
+}
 
 // GetUserProfileDirectory retrieves path to the
 // root directory of the access token t user's profile.
-func (t Token) GetUserProfileDirectory() (string, error) ***REMOVED***
+func (t Token) GetUserProfileDirectory() (string, error) {
 	n := uint32(100)
-	for ***REMOVED***
+	for {
 		b := make([]uint16, n)
 		e := GetUserProfileDirectory(t, &b[0], &n)
-		if e == nil ***REMOVED***
+		if e == nil {
 			return UTF16ToString(b), nil
-		***REMOVED***
-		if e != ERROR_INSUFFICIENT_BUFFER ***REMOVED***
+		}
+		if e != ERROR_INSUFFICIENT_BUFFER {
 			return "", e
-		***REMOVED***
-		if n <= uint32(len(b)) ***REMOVED***
+		}
+		if n <= uint32(len(b)) {
 			return "", e
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // IsMember reports whether the access token t is a member of the provided SID.
-func (t Token) IsMember(sid *SID) (bool, error) ***REMOVED***
+func (t Token) IsMember(sid *SID) (bool, error) {
 	var b int32
-	if e := checkTokenMembership(t, sid, &b); e != nil ***REMOVED***
+	if e := checkTokenMembership(t, sid, &b); e != nil {
 		return false, e
-	***REMOVED***
+	}
 	return b != 0, nil
-***REMOVED***
+}

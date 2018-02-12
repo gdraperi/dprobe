@@ -13,23 +13,23 @@ var (
 	getProcessAffinityMask = kernel32.NewProc("GetProcessAffinityMask")
 )
 
-func numCPU() int ***REMOVED***
+func numCPU() int {
 	// Gets the affinity mask for a process
 	var mask, sysmask uintptr
 	currentProcess, _, _ := getCurrentProcess.Call()
 	ret, _, _ := getProcessAffinityMask.Call(currentProcess, uintptr(unsafe.Pointer(&mask)), uintptr(unsafe.Pointer(&sysmask)))
-	if ret == 0 ***REMOVED***
+	if ret == 0 {
 		return 0
-	***REMOVED***
+	}
 	// For every available thread a bit is set in the mask.
 	ncpu := int(popcnt(uint64(mask)))
 	return ncpu
-***REMOVED***
+}
 
 // NumCPU returns the number of CPUs which are currently online
-func NumCPU() int ***REMOVED***
-	if ncpu := numCPU(); ncpu > 0 ***REMOVED***
+func NumCPU() int {
+	if ncpu := numCPU(); ncpu > 0 {
 		return ncpu
-	***REMOVED***
+	}
 	return runtime.NumCPU()
-***REMOVED***
+}

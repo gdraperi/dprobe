@@ -21,7 +21,7 @@ import (
 // │   └── f1 # empty file, 0660
 // └── d3     # 0700
 //     └── f1 # whiteout, 0644
-func setupOverlayTestDir(t *testing.T, src string) ***REMOVED***
+func setupOverlayTestDir(t *testing.T, src string) {
 	// Create opaque directory containing single file and permission 0700
 	err := os.Mkdir(filepath.Join(src, "d1"), 0700)
 	require.NoError(t, err)
@@ -29,7 +29,7 @@ func setupOverlayTestDir(t *testing.T, src string) ***REMOVED***
 	err = system.Lsetxattr(filepath.Join(src, "d1"), "trusted.overlay.opaque", []byte("y"), 0)
 	require.NoError(t, err)
 
-	err = ioutil.WriteFile(filepath.Join(src, "d1", "f1"), []byte***REMOVED******REMOVED***, 0600)
+	err = ioutil.WriteFile(filepath.Join(src, "d1", "f1"), []byte{}, 0600)
 	require.NoError(t, err)
 
 	// Create another opaque directory containing single file but with permission 0750
@@ -39,7 +39,7 @@ func setupOverlayTestDir(t *testing.T, src string) ***REMOVED***
 	err = system.Lsetxattr(filepath.Join(src, "d2"), "trusted.overlay.opaque", []byte("y"), 0)
 	require.NoError(t, err)
 
-	err = ioutil.WriteFile(filepath.Join(src, "d2", "f1"), []byte***REMOVED******REMOVED***, 0660)
+	err = ioutil.WriteFile(filepath.Join(src, "d2", "f1"), []byte{}, 0660)
 	require.NoError(t, err)
 
 	// Create regular directory with deleted file
@@ -48,41 +48,41 @@ func setupOverlayTestDir(t *testing.T, src string) ***REMOVED***
 
 	err = system.Mknod(filepath.Join(src, "d3", "f1"), unix.S_IFCHR, 0)
 	require.NoError(t, err)
-***REMOVED***
+}
 
-func checkOpaqueness(t *testing.T, path string, opaque string) ***REMOVED***
+func checkOpaqueness(t *testing.T, path string, opaque string) {
 	xattrOpaque, err := system.Lgetxattr(path, "trusted.overlay.opaque")
 	require.NoError(t, err)
 
-	if string(xattrOpaque) != opaque ***REMOVED***
+	if string(xattrOpaque) != opaque {
 		t.Fatalf("Unexpected opaque value: %q, expected %q", string(xattrOpaque), opaque)
-	***REMOVED***
+	}
 
-***REMOVED***
+}
 
-func checkOverlayWhiteout(t *testing.T, path string) ***REMOVED***
+func checkOverlayWhiteout(t *testing.T, path string) {
 	stat, err := os.Stat(path)
 	require.NoError(t, err)
 
 	statT, ok := stat.Sys().(*syscall.Stat_t)
-	if !ok ***REMOVED***
+	if !ok {
 		t.Fatalf("Unexpected type: %t, expected *syscall.Stat_t", stat.Sys())
-	***REMOVED***
-	if statT.Rdev != 0 ***REMOVED***
+	}
+	if statT.Rdev != 0 {
 		t.Fatalf("Non-zero device number for whiteout")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func checkFileMode(t *testing.T, path string, perm os.FileMode) ***REMOVED***
+func checkFileMode(t *testing.T, path string, perm os.FileMode) {
 	stat, err := os.Stat(path)
 	require.NoError(t, err)
 
-	if stat.Mode() != perm ***REMOVED***
+	if stat.Mode() != perm {
 		t.Fatalf("Unexpected file mode for %s: %o, expected %o", path, stat.Mode(), perm)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestOverlayTarUntar(t *testing.T) ***REMOVED***
+func TestOverlayTarUntar(t *testing.T) {
 	oldmask, err := system.Umask(0)
 	require.NoError(t, err)
 	defer system.Umask(oldmask)
@@ -97,10 +97,10 @@ func TestOverlayTarUntar(t *testing.T) ***REMOVED***
 	require.NoError(t, err)
 	defer os.RemoveAll(dst)
 
-	options := &TarOptions***REMOVED***
+	options := &TarOptions{
 		Compression:    Uncompressed,
 		WhiteoutFormat: OverlayWhiteoutFormat,
-	***REMOVED***
+	}
 	archive, err := TarWithOptions(src, options)
 	require.NoError(t, err)
 	defer archive.Close()
@@ -119,9 +119,9 @@ func TestOverlayTarUntar(t *testing.T) ***REMOVED***
 	checkOpaqueness(t, filepath.Join(dst, "d2"), "y")
 	checkOpaqueness(t, filepath.Join(dst, "d3"), "")
 	checkOverlayWhiteout(t, filepath.Join(dst, "d3", "f1"))
-***REMOVED***
+}
 
-func TestOverlayTarAUFSUntar(t *testing.T) ***REMOVED***
+func TestOverlayTarAUFSUntar(t *testing.T) {
 	oldmask, err := system.Umask(0)
 	require.NoError(t, err)
 	defer system.Umask(oldmask)
@@ -136,17 +136,17 @@ func TestOverlayTarAUFSUntar(t *testing.T) ***REMOVED***
 	require.NoError(t, err)
 	defer os.RemoveAll(dst)
 
-	archive, err := TarWithOptions(src, &TarOptions***REMOVED***
+	archive, err := TarWithOptions(src, &TarOptions{
 		Compression:    Uncompressed,
 		WhiteoutFormat: OverlayWhiteoutFormat,
-	***REMOVED***)
+	})
 	require.NoError(t, err)
 	defer archive.Close()
 
-	err = Untar(archive, dst, &TarOptions***REMOVED***
+	err = Untar(archive, dst, &TarOptions{
 		Compression:    Uncompressed,
 		WhiteoutFormat: AUFSWhiteoutFormat,
-	***REMOVED***)
+	})
 	require.NoError(t, err)
 
 	checkFileMode(t, filepath.Join(dst, "d1"), 0700|os.ModeDir)
@@ -157,4 +157,4 @@ func TestOverlayTarAUFSUntar(t *testing.T) ***REMOVED***
 	checkFileMode(t, filepath.Join(dst, "d1", "f1"), 0600)
 	checkFileMode(t, filepath.Join(dst, "d2", "f1"), 0660)
 	checkFileMode(t, filepath.Join(dst, "d3", WhiteoutPrefix+"f1"), 0600)
-***REMOVED***
+}

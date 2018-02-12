@@ -9,7 +9,7 @@ package container
 
 // ContainerTopOKBody OK response to ContainerTop operation
 // swagger:model ContainerTopOKBody
-type ContainerTopOKBody struct ***REMOVED***
+type ContainerTopOKBody struct {
 
 	// Each process running in the container, where each is process is an array of values corresponding to the titles
 	// Required: true
@@ -18,4 +18,4 @@ type ContainerTopOKBody struct ***REMOVED***
 	// The ps column titles
 	// Required: true
 	Titles []string `json:"Titles"`
-***REMOVED***
+}

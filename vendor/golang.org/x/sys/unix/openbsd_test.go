@@ -22,14 +22,14 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-type testProc struct ***REMOVED***
+type testProc struct {
 	fn      func()       // should always exit instead of returning
 	cleanup func() error // for instance, delete coredumps from testing pledge
 	success bool         // whether zero-exit means success or failure
-***REMOVED***
+}
 
 var (
-	testProcs = map[string]testProc***REMOVED******REMOVED***
+	testProcs = map[string]testProc{}
 	procName  = ""
 )
 
@@ -37,77 +37,77 @@ const (
 	optName = "sys-unix-internal-procname"
 )
 
-func init() ***REMOVED***
+func init() {
 	flag.StringVar(&procName, optName, "", "internal use only")
-***REMOVED***
+}
 
 // testCmd generates a proper command that, when executed, runs the test
 // corresponding to the given key.
-func testCmd(procName string) (*exec.Cmd, error) ***REMOVED***
+func testCmd(procName string) (*exec.Cmd, error) {
 	exe, err := filepath.Abs(os.Args[0])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	cmd := exec.Command(exe, "-"+optName+"="+procName)
 	cmd.Stdout, cmd.Stderr = os.Stdout, os.Stderr
 	return cmd, nil
-***REMOVED***
+}
 
 // ExitsCorrectly is a comprehensive, one-line-of-use wrapper for testing
 // a testProc with a key.
-func ExitsCorrectly(procName string, t *testing.T) ***REMOVED***
+func ExitsCorrectly(procName string, t *testing.T) {
 	s := testProcs[procName]
 	c, err := testCmd(procName)
-	defer func() ***REMOVED***
-		if s.cleanup() != nil ***REMOVED***
+	defer func() {
+		if s.cleanup() != nil {
 			t.Fatalf("Failed to run cleanup for %s", procName)
-		***REMOVED***
-	***REMOVED***()
-	if err != nil ***REMOVED***
+		}
+	}()
+	if err != nil {
 		t.Fatalf("Failed to construct command for %s", procName)
-	***REMOVED***
-	if (c.Run() == nil) != s.success ***REMOVED***
+	}
+	if (c.Run() == nil) != s.success {
 		result := "succeed"
-		if !s.success ***REMOVED***
+		if !s.success {
 			result = "fail"
-		***REMOVED***
+		}
 		t.Fatalf("Process did not %s when it was supposed to", result)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestMain(m *testing.M) ***REMOVED***
+func TestMain(m *testing.M) {
 	flag.Parse()
-	if procName != "" ***REMOVED***
+	if procName != "" {
 		testProcs[procName].fn()
-	***REMOVED***
+	}
 	os.Exit(m.Run())
-***REMOVED***
+}
 
 // For example, add a test for pledge.
-func init() ***REMOVED***
-	testProcs["pledge"] = testProc***REMOVED***
-		func() ***REMOVED***
+func init() {
+	testProcs["pledge"] = testProc{
+		func() {
 			fmt.Println(unix.Pledge("", nil))
 			os.Exit(0)
-		***REMOVED***,
-		func() error ***REMOVED***
+		},
+		func() error {
 			files, err := ioutil.ReadDir(".")
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			for _, file := range files ***REMOVED***
-				if filepath.Ext(file.Name()) == ".core" ***REMOVED***
-					if err := os.Remove(file.Name()); err != nil ***REMOVED***
+			}
+			for _, file := range files {
+				if filepath.Ext(file.Name()) == ".core" {
+					if err := os.Remove(file.Name()); err != nil {
 						return err
-					***REMOVED***
-				***REMOVED***
-			***REMOVED***
+					}
+				}
+			}
 			return nil
-		***REMOVED***,
+		},
 		false,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestPledge(t *testing.T) ***REMOVED***
+func TestPledge(t *testing.T) {
 	ExitsCorrectly("pledge", t)
-***REMOVED***
+}

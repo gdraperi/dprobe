@@ -12,74 +12,74 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func (daemon *Daemon) setupLinkedContainers(container *container.Container) ([]string, error) ***REMOVED***
+func (daemon *Daemon) setupLinkedContainers(container *container.Container) ([]string, error) {
 	return nil, nil
-***REMOVED***
+}
 
-func (daemon *Daemon) setupConfigDir(c *container.Container) (setupErr error) ***REMOVED***
-	if len(c.ConfigReferences) == 0 ***REMOVED***
+func (daemon *Daemon) setupConfigDir(c *container.Container) (setupErr error) {
+	if len(c.ConfigReferences) == 0 {
 		return nil
-	***REMOVED***
+	}
 
 	localPath, err := c.ConfigsDirPath()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	logrus.Debugf("configs: setting up config dir: %s", localPath)
 
 	// create local config root
-	if err := system.MkdirAllWithACL(localPath, 0, system.SddlAdministratorsLocalSystem); err != nil ***REMOVED***
+	if err := system.MkdirAllWithACL(localPath, 0, system.SddlAdministratorsLocalSystem); err != nil {
 		return errors.Wrap(err, "error creating config dir")
-	***REMOVED***
+	}
 
-	defer func() ***REMOVED***
-		if setupErr != nil ***REMOVED***
-			if err := os.RemoveAll(localPath); err != nil ***REMOVED***
+	defer func() {
+		if setupErr != nil {
+			if err := os.RemoveAll(localPath); err != nil {
 				logrus.Errorf("error cleaning up config dir: %s", err)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***()
+			}
+		}
+	}()
 
-	if c.DependencyStore == nil ***REMOVED***
+	if c.DependencyStore == nil {
 		return fmt.Errorf("config store is not initialized")
-	***REMOVED***
+	}
 
-	for _, configRef := range c.ConfigReferences ***REMOVED***
+	for _, configRef := range c.ConfigReferences {
 		// TODO (ehazlett): use type switch when more are supported
-		if configRef.File == nil ***REMOVED***
+		if configRef.File == nil {
 			logrus.Error("config target type is not a file target")
 			continue
-		***REMOVED***
+		}
 
 		fPath, err := c.ConfigFilePath(*configRef)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 
-		log := logrus.WithFields(logrus.Fields***REMOVED***"name": configRef.File.Name, "path": fPath***REMOVED***)
+		log := logrus.WithFields(logrus.Fields{"name": configRef.File.Name, "path": fPath})
 
 		log.Debug("injecting config")
 		config, err := c.DependencyStore.Configs().Get(configRef.ConfigID)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return errors.Wrap(err, "unable to get config from config store")
-		***REMOVED***
-		if err := ioutil.WriteFile(fPath, config.Spec.Data, configRef.File.Mode); err != nil ***REMOVED***
+		}
+		if err := ioutil.WriteFile(fPath, config.Spec.Data, configRef.File.Mode); err != nil {
 			return errors.Wrap(err, "error injecting config")
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
 // getSize returns real size & virtual size
-func (daemon *Daemon) getSize(containerID string) (int64, int64) ***REMOVED***
+func (daemon *Daemon) getSize(containerID string) (int64, int64) {
 	// TODO Windows
 	return 0, 0
-***REMOVED***
+}
 
-func (daemon *Daemon) setupIpcDirs(container *container.Container) error ***REMOVED***
+func (daemon *Daemon) setupIpcDirs(container *container.Container) error {
 	return nil
-***REMOVED***
+}
 
 // TODO Windows: Fix Post-TP5. This is a hack to allow docker cp to work
 // against containers which have volumes. You will still be able to cp
@@ -87,128 +87,128 @@ func (daemon *Daemon) setupIpcDirs(container *container.Container) error ***REMO
 // inside the container. Without this fix, docker cp is broken to any
 // container which has a volume, regardless of where the file is inside the
 // container.
-func (daemon *Daemon) mountVolumes(container *container.Container) error ***REMOVED***
+func (daemon *Daemon) mountVolumes(container *container.Container) error {
 	return nil
-***REMOVED***
+}
 
-func detachMounted(path string) error ***REMOVED***
+func detachMounted(path string) error {
 	return nil
-***REMOVED***
+}
 
-func (daemon *Daemon) setupSecretDir(c *container.Container) (setupErr error) ***REMOVED***
-	if len(c.SecretReferences) == 0 ***REMOVED***
+func (daemon *Daemon) setupSecretDir(c *container.Container) (setupErr error) {
+	if len(c.SecretReferences) == 0 {
 		return nil
-	***REMOVED***
+	}
 
 	localMountPath, err := c.SecretMountPath()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	logrus.Debugf("secrets: setting up secret dir: %s", localMountPath)
 
 	// create local secret root
-	if err := system.MkdirAllWithACL(localMountPath, 0, system.SddlAdministratorsLocalSystem); err != nil ***REMOVED***
+	if err := system.MkdirAllWithACL(localMountPath, 0, system.SddlAdministratorsLocalSystem); err != nil {
 		return errors.Wrap(err, "error creating secret local directory")
-	***REMOVED***
+	}
 
-	defer func() ***REMOVED***
-		if setupErr != nil ***REMOVED***
-			if err := os.RemoveAll(localMountPath); err != nil ***REMOVED***
+	defer func() {
+		if setupErr != nil {
+			if err := os.RemoveAll(localMountPath); err != nil {
 				logrus.Errorf("error cleaning up secret mount: %s", err)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***()
+			}
+		}
+	}()
 
-	if c.DependencyStore == nil ***REMOVED***
+	if c.DependencyStore == nil {
 		return fmt.Errorf("secret store is not initialized")
-	***REMOVED***
+	}
 
-	for _, s := range c.SecretReferences ***REMOVED***
+	for _, s := range c.SecretReferences {
 		// TODO (ehazlett): use type switch when more are supported
-		if s.File == nil ***REMOVED***
+		if s.File == nil {
 			logrus.Error("secret target type is not a file target")
 			continue
-		***REMOVED***
+		}
 
 		// secrets are created in the SecretMountPath on the host, at a
 		// single level
 		fPath, err := c.SecretFilePath(*s)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-		logrus.WithFields(logrus.Fields***REMOVED***
+		}
+		logrus.WithFields(logrus.Fields{
 			"name": s.File.Name,
 			"path": fPath,
-		***REMOVED***).Debug("injecting secret")
+		}).Debug("injecting secret")
 		secret, err := c.DependencyStore.Secrets().Get(s.SecretID)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return errors.Wrap(err, "unable to get secret from secret store")
-		***REMOVED***
-		if err := ioutil.WriteFile(fPath, secret.Spec.Data, s.File.Mode); err != nil ***REMOVED***
+		}
+		if err := ioutil.WriteFile(fPath, secret.Spec.Data, s.File.Mode); err != nil {
 			return errors.Wrap(err, "error injecting secret")
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
-func killProcessDirectly(container *container.Container) error ***REMOVED***
+func killProcessDirectly(container *container.Container) error {
 	return nil
-***REMOVED***
+}
 
-func isLinkable(child *container.Container) bool ***REMOVED***
+func isLinkable(child *container.Container) bool {
 	return false
-***REMOVED***
+}
 
-func enableIPOnPredefinedNetwork() bool ***REMOVED***
+func enableIPOnPredefinedNetwork() bool {
 	return true
-***REMOVED***
+}
 
-func (daemon *Daemon) isNetworkHotPluggable() bool ***REMOVED***
+func (daemon *Daemon) isNetworkHotPluggable() bool {
 	return false
-***REMOVED***
+}
 
-func setupPathsAndSandboxOptions(container *container.Container, sboxOptions *[]libnetwork.SandboxOption) error ***REMOVED***
+func setupPathsAndSandboxOptions(container *container.Container, sboxOptions *[]libnetwork.SandboxOption) error {
 	return nil
-***REMOVED***
+}
 
-func (daemon *Daemon) initializeNetworkingPaths(container *container.Container, nc *container.Container) error ***REMOVED***
+func (daemon *Daemon) initializeNetworkingPaths(container *container.Container, nc *container.Container) error {
 
-	if nc.HostConfig.Isolation.IsHyperV() ***REMOVED***
+	if nc.HostConfig.Isolation.IsHyperV() {
 		return fmt.Errorf("sharing of hyperv containers network is not supported")
-	***REMOVED***
+	}
 
 	container.NetworkSharedContainerID = nc.ID
 
-	if nc.NetworkSettings != nil ***REMOVED***
-		for n := range nc.NetworkSettings.Networks ***REMOVED***
+	if nc.NetworkSettings != nil {
+		for n := range nc.NetworkSettings.Networks {
 			sn, err := daemon.FindNetwork(n)
-			if err != nil ***REMOVED***
+			if err != nil {
 				continue
-			***REMOVED***
+			}
 
 			ep, err := nc.GetEndpointInNetwork(sn)
-			if err != nil ***REMOVED***
+			if err != nil {
 				continue
-			***REMOVED***
+			}
 
 			data, err := ep.DriverInfo()
-			if err != nil ***REMOVED***
+			if err != nil {
 				continue
-			***REMOVED***
+			}
 
-			if data["GW_INFO"] != nil ***REMOVED***
-				gwInfo := data["GW_INFO"].(map[string]interface***REMOVED******REMOVED***)
-				if gwInfo["hnsid"] != nil ***REMOVED***
+			if data["GW_INFO"] != nil {
+				gwInfo := data["GW_INFO"].(map[string]interface{})
+				if gwInfo["hnsid"] != nil {
 					container.SharedEndpointList = append(container.SharedEndpointList, gwInfo["hnsid"].(string))
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 
-			if data["hnsid"] != nil ***REMOVED***
+			if data["hnsid"] != nil {
 				container.SharedEndpointList = append(container.SharedEndpointList, data["hnsid"].(string))
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	return nil
-***REMOVED***
+}

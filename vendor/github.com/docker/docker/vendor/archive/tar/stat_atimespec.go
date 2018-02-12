@@ -11,10 +11,10 @@ import (
 	"time"
 )
 
-func statAtime(st *syscall.Stat_t) time.Time ***REMOVED***
+func statAtime(st *syscall.Stat_t) time.Time {
 	return time.Unix(st.Atimespec.Unix())
-***REMOVED***
+}
 
-func statCtime(st *syscall.Stat_t) time.Time ***REMOVED***
+func statCtime(st *syscall.Stat_t) time.Time {
 	return time.Unix(st.Ctimespec.Unix())
-***REMOVED***
+}

@@ -10,32 +10,32 @@ const (
 	GRPCHeader = "containerd-lease"
 )
 
-func withGRPCLeaseHeader(ctx context.Context, lid string) context.Context ***REMOVED***
+func withGRPCLeaseHeader(ctx context.Context, lid string) context.Context {
 	// also store on the grpc headers so it gets picked up by any clients
 	// that are using this.
 	txheader := metadata.Pairs(GRPCHeader, lid)
 	md, ok := metadata.FromOutgoingContext(ctx) // merge with outgoing context.
-	if !ok ***REMOVED***
+	if !ok {
 		md = txheader
-	***REMOVED*** else ***REMOVED***
+	} else {
 		// order ensures the latest is first in this list.
 		md = metadata.Join(txheader, md)
-	***REMOVED***
+	}
 
 	return metadata.NewOutgoingContext(ctx, md)
-***REMOVED***
+}
 
-func fromGRPCHeader(ctx context.Context) (string, bool) ***REMOVED***
+func fromGRPCHeader(ctx context.Context) (string, bool) {
 	// try to extract for use in grpc servers.
 	md, ok := metadata.FromIncomingContext(ctx)
-	if !ok ***REMOVED***
+	if !ok {
 		return "", false
-	***REMOVED***
+	}
 
 	values := md[GRPCHeader]
-	if len(values) == 0 ***REMOVED***
+	if len(values) == 0 {
 		return "", false
-	***REMOVED***
+	}
 
 	return values[0], true
-***REMOVED***
+}

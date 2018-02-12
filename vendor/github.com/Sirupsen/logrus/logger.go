@@ -7,7 +7,7 @@ import (
 	"sync/atomic"
 )
 
-type Logger struct ***REMOVED***
+type Logger struct {
 	// The logs are `io.Copy`'d to this in a mutex. It's common to set this to a
 	// file, or leave it default which is `os.Stderr`. You can also set this to
 	// something more adventorous, such as logging to Kafka.
@@ -31,293 +31,293 @@ type Logger struct ***REMOVED***
 	mu MutexWrap
 	// Reusable empty entry
 	entryPool sync.Pool
-***REMOVED***
+}
 
-type MutexWrap struct ***REMOVED***
+type MutexWrap struct {
 	lock     sync.Mutex
 	disabled bool
-***REMOVED***
+}
 
-func (mw *MutexWrap) Lock() ***REMOVED***
-	if !mw.disabled ***REMOVED***
+func (mw *MutexWrap) Lock() {
+	if !mw.disabled {
 		mw.lock.Lock()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (mw *MutexWrap) Unlock() ***REMOVED***
-	if !mw.disabled ***REMOVED***
+func (mw *MutexWrap) Unlock() {
+	if !mw.disabled {
 		mw.lock.Unlock()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (mw *MutexWrap) Disable() ***REMOVED***
+func (mw *MutexWrap) Disable() {
 	mw.disabled = true
-***REMOVED***
+}
 
 // Creates a new logger. Configuration should be set by changing `Formatter`,
 // `Out` and `Hooks` directly on the default logger instance. You can also just
 // instantiate your own:
 //
-//    var log = &Logger***REMOVED***
+//    var log = &Logger{
 //      Out: os.Stderr,
 //      Formatter: new(JSONFormatter),
 //      Hooks: make(LevelHooks),
 //      Level: logrus.DebugLevel,
-//***REMOVED***
+//    }
 //
 // It's recommended to make this a global instance called `log`.
-func New() *Logger ***REMOVED***
-	return &Logger***REMOVED***
+func New() *Logger {
+	return &Logger{
 		Out:       os.Stderr,
 		Formatter: new(TextFormatter),
 		Hooks:     make(LevelHooks),
 		Level:     InfoLevel,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (logger *Logger) newEntry() *Entry ***REMOVED***
+func (logger *Logger) newEntry() *Entry {
 	entry, ok := logger.entryPool.Get().(*Entry)
-	if ok ***REMOVED***
+	if ok {
 		return entry
-	***REMOVED***
+	}
 	return NewEntry(logger)
-***REMOVED***
+}
 
-func (logger *Logger) releaseEntry(entry *Entry) ***REMOVED***
+func (logger *Logger) releaseEntry(entry *Entry) {
 	logger.entryPool.Put(entry)
-***REMOVED***
+}
 
 // Adds a field to the log entry, note that it doesn't log until you call
 // Debug, Print, Info, Warn, Fatal or Panic. It only creates a log entry.
 // If you want multiple fields, use `WithFields`.
-func (logger *Logger) WithField(key string, value interface***REMOVED******REMOVED***) *Entry ***REMOVED***
+func (logger *Logger) WithField(key string, value interface{}) *Entry {
 	entry := logger.newEntry()
 	defer logger.releaseEntry(entry)
 	return entry.WithField(key, value)
-***REMOVED***
+}
 
 // Adds a struct of fields to the log entry. All it does is call `WithField` for
 // each `Field`.
-func (logger *Logger) WithFields(fields Fields) *Entry ***REMOVED***
+func (logger *Logger) WithFields(fields Fields) *Entry {
 	entry := logger.newEntry()
 	defer logger.releaseEntry(entry)
 	return entry.WithFields(fields)
-***REMOVED***
+}
 
 // Add an error as single field to the log entry.  All it does is call
 // `WithError` for the given `error`.
-func (logger *Logger) WithError(err error) *Entry ***REMOVED***
+func (logger *Logger) WithError(err error) *Entry {
 	entry := logger.newEntry()
 	defer logger.releaseEntry(entry)
 	return entry.WithError(err)
-***REMOVED***
+}
 
-func (logger *Logger) Debugf(format string, args ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if logger.level() >= DebugLevel ***REMOVED***
+func (logger *Logger) Debugf(format string, args ...interface{}) {
+	if logger.level() >= DebugLevel {
 		entry := logger.newEntry()
 		entry.Debugf(format, args...)
 		logger.releaseEntry(entry)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (logger *Logger) Infof(format string, args ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if logger.level() >= InfoLevel ***REMOVED***
+func (logger *Logger) Infof(format string, args ...interface{}) {
+	if logger.level() >= InfoLevel {
 		entry := logger.newEntry()
 		entry.Infof(format, args...)
 		logger.releaseEntry(entry)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (logger *Logger) Printf(format string, args ...interface***REMOVED******REMOVED***) ***REMOVED***
+func (logger *Logger) Printf(format string, args ...interface{}) {
 	entry := logger.newEntry()
 	entry.Printf(format, args...)
 	logger.releaseEntry(entry)
-***REMOVED***
+}
 
-func (logger *Logger) Warnf(format string, args ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if logger.level() >= WarnLevel ***REMOVED***
+func (logger *Logger) Warnf(format string, args ...interface{}) {
+	if logger.level() >= WarnLevel {
 		entry := logger.newEntry()
 		entry.Warnf(format, args...)
 		logger.releaseEntry(entry)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (logger *Logger) Warningf(format string, args ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if logger.level() >= WarnLevel ***REMOVED***
+func (logger *Logger) Warningf(format string, args ...interface{}) {
+	if logger.level() >= WarnLevel {
 		entry := logger.newEntry()
 		entry.Warnf(format, args...)
 		logger.releaseEntry(entry)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (logger *Logger) Errorf(format string, args ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if logger.level() >= ErrorLevel ***REMOVED***
+func (logger *Logger) Errorf(format string, args ...interface{}) {
+	if logger.level() >= ErrorLevel {
 		entry := logger.newEntry()
 		entry.Errorf(format, args...)
 		logger.releaseEntry(entry)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (logger *Logger) Fatalf(format string, args ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if logger.level() >= FatalLevel ***REMOVED***
+func (logger *Logger) Fatalf(format string, args ...interface{}) {
+	if logger.level() >= FatalLevel {
 		entry := logger.newEntry()
 		entry.Fatalf(format, args...)
 		logger.releaseEntry(entry)
-	***REMOVED***
+	}
 	Exit(1)
-***REMOVED***
+}
 
-func (logger *Logger) Panicf(format string, args ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if logger.level() >= PanicLevel ***REMOVED***
+func (logger *Logger) Panicf(format string, args ...interface{}) {
+	if logger.level() >= PanicLevel {
 		entry := logger.newEntry()
 		entry.Panicf(format, args...)
 		logger.releaseEntry(entry)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (logger *Logger) Debug(args ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if logger.level() >= DebugLevel ***REMOVED***
+func (logger *Logger) Debug(args ...interface{}) {
+	if logger.level() >= DebugLevel {
 		entry := logger.newEntry()
 		entry.Debug(args...)
 		logger.releaseEntry(entry)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (logger *Logger) Info(args ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if logger.level() >= InfoLevel ***REMOVED***
+func (logger *Logger) Info(args ...interface{}) {
+	if logger.level() >= InfoLevel {
 		entry := logger.newEntry()
 		entry.Info(args...)
 		logger.releaseEntry(entry)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (logger *Logger) Print(args ...interface***REMOVED******REMOVED***) ***REMOVED***
+func (logger *Logger) Print(args ...interface{}) {
 	entry := logger.newEntry()
 	entry.Info(args...)
 	logger.releaseEntry(entry)
-***REMOVED***
+}
 
-func (logger *Logger) Warn(args ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if logger.level() >= WarnLevel ***REMOVED***
+func (logger *Logger) Warn(args ...interface{}) {
+	if logger.level() >= WarnLevel {
 		entry := logger.newEntry()
 		entry.Warn(args...)
 		logger.releaseEntry(entry)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (logger *Logger) Warning(args ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if logger.level() >= WarnLevel ***REMOVED***
+func (logger *Logger) Warning(args ...interface{}) {
+	if logger.level() >= WarnLevel {
 		entry := logger.newEntry()
 		entry.Warn(args...)
 		logger.releaseEntry(entry)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (logger *Logger) Error(args ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if logger.level() >= ErrorLevel ***REMOVED***
+func (logger *Logger) Error(args ...interface{}) {
+	if logger.level() >= ErrorLevel {
 		entry := logger.newEntry()
 		entry.Error(args...)
 		logger.releaseEntry(entry)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (logger *Logger) Fatal(args ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if logger.level() >= FatalLevel ***REMOVED***
+func (logger *Logger) Fatal(args ...interface{}) {
+	if logger.level() >= FatalLevel {
 		entry := logger.newEntry()
 		entry.Fatal(args...)
 		logger.releaseEntry(entry)
-	***REMOVED***
+	}
 	Exit(1)
-***REMOVED***
+}
 
-func (logger *Logger) Panic(args ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if logger.level() >= PanicLevel ***REMOVED***
+func (logger *Logger) Panic(args ...interface{}) {
+	if logger.level() >= PanicLevel {
 		entry := logger.newEntry()
 		entry.Panic(args...)
 		logger.releaseEntry(entry)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (logger *Logger) Debugln(args ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if logger.level() >= DebugLevel ***REMOVED***
+func (logger *Logger) Debugln(args ...interface{}) {
+	if logger.level() >= DebugLevel {
 		entry := logger.newEntry()
 		entry.Debugln(args...)
 		logger.releaseEntry(entry)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (logger *Logger) Infoln(args ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if logger.level() >= InfoLevel ***REMOVED***
+func (logger *Logger) Infoln(args ...interface{}) {
+	if logger.level() >= InfoLevel {
 		entry := logger.newEntry()
 		entry.Infoln(args...)
 		logger.releaseEntry(entry)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (logger *Logger) Println(args ...interface***REMOVED******REMOVED***) ***REMOVED***
+func (logger *Logger) Println(args ...interface{}) {
 	entry := logger.newEntry()
 	entry.Println(args...)
 	logger.releaseEntry(entry)
-***REMOVED***
+}
 
-func (logger *Logger) Warnln(args ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if logger.level() >= WarnLevel ***REMOVED***
+func (logger *Logger) Warnln(args ...interface{}) {
+	if logger.level() >= WarnLevel {
 		entry := logger.newEntry()
 		entry.Warnln(args...)
 		logger.releaseEntry(entry)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (logger *Logger) Warningln(args ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if logger.level() >= WarnLevel ***REMOVED***
+func (logger *Logger) Warningln(args ...interface{}) {
+	if logger.level() >= WarnLevel {
 		entry := logger.newEntry()
 		entry.Warnln(args...)
 		logger.releaseEntry(entry)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (logger *Logger) Errorln(args ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if logger.level() >= ErrorLevel ***REMOVED***
+func (logger *Logger) Errorln(args ...interface{}) {
+	if logger.level() >= ErrorLevel {
 		entry := logger.newEntry()
 		entry.Errorln(args...)
 		logger.releaseEntry(entry)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (logger *Logger) Fatalln(args ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if logger.level() >= FatalLevel ***REMOVED***
+func (logger *Logger) Fatalln(args ...interface{}) {
+	if logger.level() >= FatalLevel {
 		entry := logger.newEntry()
 		entry.Fatalln(args...)
 		logger.releaseEntry(entry)
-	***REMOVED***
+	}
 	Exit(1)
-***REMOVED***
+}
 
-func (logger *Logger) Panicln(args ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if logger.level() >= PanicLevel ***REMOVED***
+func (logger *Logger) Panicln(args ...interface{}) {
+	if logger.level() >= PanicLevel {
 		entry := logger.newEntry()
 		entry.Panicln(args...)
 		logger.releaseEntry(entry)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 //When file is opened with appending mode, it's safe to
 //write concurrently to a file (within 4k message on Linux).
 //In these cases user can choose to disable the lock.
-func (logger *Logger) SetNoLock() ***REMOVED***
+func (logger *Logger) SetNoLock() {
 	logger.mu.Disable()
-***REMOVED***
+}
 
-func (logger *Logger) level() Level ***REMOVED***
+func (logger *Logger) level() Level {
 	return Level(atomic.LoadUint32((*uint32)(&logger.Level)))
-***REMOVED***
+}
 
-func (logger *Logger) SetLevel(level Level) ***REMOVED***
+func (logger *Logger) SetLevel(level Level) {
 	atomic.StoreUint32((*uint32)(&logger.Level), uint32(level))
-***REMOVED***
+}
 
-func (logger *Logger) AddHook(hook Hook) ***REMOVED***
+func (logger *Logger) AddHook(hook Hook) {
 	logger.mu.Lock()
 	defer logger.mu.Unlock()
 	logger.Hooks.Add(hook)
-***REMOVED***
+}

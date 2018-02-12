@@ -44,7 +44,7 @@ const (
 
 // A Header represents a single header in a tar archive.
 // Some fields may not be populated.
-type Header struct ***REMOVED***
+type Header struct {
 	Name       string    // name of header file entry
 	Mode       int64     // permission and mode bits
 	Uid        int       // user id of owner
@@ -60,80 +60,80 @@ type Header struct ***REMOVED***
 	AccessTime time.Time // access time
 	ChangeTime time.Time // status change time
 	Xattrs     map[string]string
-***REMOVED***
+}
 
 // FileInfo returns an os.FileInfo for the Header.
-func (h *Header) FileInfo() os.FileInfo ***REMOVED***
-	return headerFileInfo***REMOVED***h***REMOVED***
-***REMOVED***
+func (h *Header) FileInfo() os.FileInfo {
+	return headerFileInfo{h}
+}
 
 // headerFileInfo implements os.FileInfo.
-type headerFileInfo struct ***REMOVED***
+type headerFileInfo struct {
 	h *Header
-***REMOVED***
+}
 
-func (fi headerFileInfo) Size() int64        ***REMOVED*** return fi.h.Size ***REMOVED***
-func (fi headerFileInfo) IsDir() bool        ***REMOVED*** return fi.Mode().IsDir() ***REMOVED***
-func (fi headerFileInfo) ModTime() time.Time ***REMOVED*** return fi.h.ModTime ***REMOVED***
-func (fi headerFileInfo) Sys() interface***REMOVED******REMOVED***   ***REMOVED*** return fi.h ***REMOVED***
+func (fi headerFileInfo) Size() int64        { return fi.h.Size }
+func (fi headerFileInfo) IsDir() bool        { return fi.Mode().IsDir() }
+func (fi headerFileInfo) ModTime() time.Time { return fi.h.ModTime }
+func (fi headerFileInfo) Sys() interface{}   { return fi.h }
 
 // Name returns the base name of the file.
-func (fi headerFileInfo) Name() string ***REMOVED***
-	if fi.IsDir() ***REMOVED***
+func (fi headerFileInfo) Name() string {
+	if fi.IsDir() {
 		return path.Base(path.Clean(fi.h.Name))
-	***REMOVED***
+	}
 	return path.Base(fi.h.Name)
-***REMOVED***
+}
 
 // Mode returns the permission and mode bits for the headerFileInfo.
-func (fi headerFileInfo) Mode() (mode os.FileMode) ***REMOVED***
+func (fi headerFileInfo) Mode() (mode os.FileMode) {
 	// Set file permission bits.
 	mode = os.FileMode(fi.h.Mode).Perm()
 
 	// Set setuid, setgid and sticky bits.
-	if fi.h.Mode&c_ISUID != 0 ***REMOVED***
+	if fi.h.Mode&c_ISUID != 0 {
 		// setuid
 		mode |= os.ModeSetuid
-	***REMOVED***
-	if fi.h.Mode&c_ISGID != 0 ***REMOVED***
+	}
+	if fi.h.Mode&c_ISGID != 0 {
 		// setgid
 		mode |= os.ModeSetgid
-	***REMOVED***
-	if fi.h.Mode&c_ISVTX != 0 ***REMOVED***
+	}
+	if fi.h.Mode&c_ISVTX != 0 {
 		// sticky
 		mode |= os.ModeSticky
-	***REMOVED***
+	}
 
 	// Set file mode bits.
 	// clear perm, setuid, setgid and sticky bits.
 	m := os.FileMode(fi.h.Mode) &^ 07777
-	if m == c_ISDIR ***REMOVED***
+	if m == c_ISDIR {
 		// directory
 		mode |= os.ModeDir
-	***REMOVED***
-	if m == c_ISFIFO ***REMOVED***
+	}
+	if m == c_ISFIFO {
 		// named pipe (FIFO)
 		mode |= os.ModeNamedPipe
-	***REMOVED***
-	if m == c_ISLNK ***REMOVED***
+	}
+	if m == c_ISLNK {
 		// symbolic link
 		mode |= os.ModeSymlink
-	***REMOVED***
-	if m == c_ISBLK ***REMOVED***
+	}
+	if m == c_ISBLK {
 		// device file
 		mode |= os.ModeDevice
-	***REMOVED***
-	if m == c_ISCHR ***REMOVED***
+	}
+	if m == c_ISCHR {
 		// Unix character device
 		mode |= os.ModeDevice
 		mode |= os.ModeCharDevice
-	***REMOVED***
-	if m == c_ISSOCK ***REMOVED***
+	}
+	if m == c_ISSOCK {
 		// Unix domain socket
 		mode |= os.ModeSocket
-	***REMOVED***
+	}
 
-	switch fi.h.Typeflag ***REMOVED***
+	switch fi.h.Typeflag {
 	case TypeSymlink:
 		// symbolic link
 		mode |= os.ModeSymlink
@@ -150,10 +150,10 @@ func (fi headerFileInfo) Mode() (mode os.FileMode) ***REMOVED***
 	case TypeFifo:
 		// fifo node
 		mode |= os.ModeNamedPipe
-	***REMOVED***
+	}
 
 	return mode
-***REMOVED***
+}
 
 // sysStat, if non-nil, populates h from system-dependent fields of fi.
 var sysStat func(fi os.FileInfo, h *Header) error
@@ -200,17 +200,17 @@ const (
 // Because os.FileInfo's Name method returns only the base name of
 // the file it describes, it may be necessary to modify the Name field
 // of the returned header to provide the full path name of the file.
-func FileInfoHeader(fi os.FileInfo, link string) (*Header, error) ***REMOVED***
-	if fi == nil ***REMOVED***
+func FileInfoHeader(fi os.FileInfo, link string) (*Header, error) {
+	if fi == nil {
 		return nil, errors.New("tar: FileInfo is nil")
-	***REMOVED***
+	}
 	fm := fi.Mode()
-	h := &Header***REMOVED***
+	h := &Header{
 		Name:    fi.Name(),
 		ModTime: fi.ModTime(),
 		Mode:    int64(fm.Perm()), // or'd with c_IS* constants later
-	***REMOVED***
-	switch ***REMOVED***
+	}
+	switch {
 	case fm.IsRegular():
 		h.Typeflag = TypeReg
 		h.Size = fi.Size()
@@ -221,30 +221,30 @@ func FileInfoHeader(fi os.FileInfo, link string) (*Header, error) ***REMOVED***
 		h.Typeflag = TypeSymlink
 		h.Linkname = link
 	case fm&os.ModeDevice != 0:
-		if fm&os.ModeCharDevice != 0 ***REMOVED***
+		if fm&os.ModeCharDevice != 0 {
 			h.Typeflag = TypeChar
-		***REMOVED*** else ***REMOVED***
+		} else {
 			h.Typeflag = TypeBlock
-		***REMOVED***
+		}
 	case fm&os.ModeNamedPipe != 0:
 		h.Typeflag = TypeFifo
 	case fm&os.ModeSocket != 0:
 		return nil, fmt.Errorf("archive/tar: sockets not supported")
 	default:
 		return nil, fmt.Errorf("archive/tar: unknown file mode %v", fm)
-	***REMOVED***
-	if fm&os.ModeSetuid != 0 ***REMOVED***
+	}
+	if fm&os.ModeSetuid != 0 {
 		h.Mode |= c_ISUID
-	***REMOVED***
-	if fm&os.ModeSetgid != 0 ***REMOVED***
+	}
+	if fm&os.ModeSetgid != 0 {
 		h.Mode |= c_ISGID
-	***REMOVED***
-	if fm&os.ModeSticky != 0 ***REMOVED***
+	}
+	if fm&os.ModeSticky != 0 {
 		h.Mode |= c_ISVTX
-	***REMOVED***
+	}
 	// If possible, populate additional fields from OS-specific
 	// FileInfo fields.
-	if sys, ok := fi.Sys().(*Header); ok ***REMOVED***
+	if sys, ok := fi.Sys().(*Header); ok {
 		// This FileInfo came from a Header (not the OS). Use the
 		// original Header to populate all remaining fields.
 		h.Uid = sys.Uid
@@ -253,32 +253,32 @@ func FileInfoHeader(fi os.FileInfo, link string) (*Header, error) ***REMOVED***
 		h.Gname = sys.Gname
 		h.AccessTime = sys.AccessTime
 		h.ChangeTime = sys.ChangeTime
-		if sys.Xattrs != nil ***REMOVED***
+		if sys.Xattrs != nil {
 			h.Xattrs = make(map[string]string)
-			for k, v := range sys.Xattrs ***REMOVED***
+			for k, v := range sys.Xattrs {
 				h.Xattrs[k] = v
-			***REMOVED***
-		***REMOVED***
-		if sys.Typeflag == TypeLink ***REMOVED***
+			}
+		}
+		if sys.Typeflag == TypeLink {
 			// hard link
 			h.Typeflag = TypeLink
 			h.Size = 0
 			h.Linkname = sys.Linkname
-		***REMOVED***
-	***REMOVED***
-	if sysStat != nil ***REMOVED***
+		}
+	}
+	if sysStat != nil {
 		return h, sysStat(fi, h)
-	***REMOVED***
+	}
 	return h, nil
-***REMOVED***
+}
 
 // isHeaderOnlyType checks if the given type flag is of the type that has no
 // data section even if a size is specified.
-func isHeaderOnlyType(flag byte) bool ***REMOVED***
-	switch flag ***REMOVED***
+func isHeaderOnlyType(flag byte) bool {
+	switch flag {
 	case TypeLink, TypeSymlink, TypeChar, TypeBlock, TypeDir, TypeFifo:
 		return true
 	default:
 		return false
-	***REMOVED***
-***REMOVED***
+	}
+}

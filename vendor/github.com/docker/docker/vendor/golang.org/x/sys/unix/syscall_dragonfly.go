@@ -14,7 +14,7 @@ package unix
 
 import "unsafe"
 
-type SockaddrDatalink struct ***REMOVED***
+type SockaddrDatalink struct {
 	Len    uint8
 	Family uint8
 	Index  uint16
@@ -26,10 +26,10 @@ type SockaddrDatalink struct ***REMOVED***
 	Rcf    uint16
 	Route  [16]uint16
 	raw    RawSockaddrDatalink
-***REMOVED***
+}
 
-// Translate "kern.hostname" to []_C_int***REMOVED***0,1,2,3***REMOVED***.
-func nametomib(name string) (mib []_C_int, err error) ***REMOVED***
+// Translate "kern.hostname" to []_C_int{0,1,2,3}.
+func nametomib(name string) (mib []_C_int, err error) {
 	const siz = unsafe.Sizeof(mib[0])
 
 	// NOTE(rsc): It seems strange to set the buffer to have
@@ -44,86 +44,86 @@ func nametomib(name string) (mib []_C_int, err error) ***REMOVED***
 
 	p := (*byte)(unsafe.Pointer(&buf[0]))
 	bytes, err := ByteSliceFromString(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// Magic sysctl: "setting" 0.3 to a string name
 	// lets you read back the array of integers form.
-	if err = sysctl([]_C_int***REMOVED***0, 3***REMOVED***, p, &n, &bytes[0], uintptr(len(name))); err != nil ***REMOVED***
+	if err = sysctl([]_C_int{0, 3}, p, &n, &bytes[0], uintptr(len(name))); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return buf[0 : n/siz], nil
-***REMOVED***
+}
 
-func direntIno(buf []byte) (uint64, bool) ***REMOVED***
-	return readInt(buf, unsafe.Offsetof(Dirent***REMOVED******REMOVED***.Fileno), unsafe.Sizeof(Dirent***REMOVED******REMOVED***.Fileno))
-***REMOVED***
+func direntIno(buf []byte) (uint64, bool) {
+	return readInt(buf, unsafe.Offsetof(Dirent{}.Fileno), unsafe.Sizeof(Dirent{}.Fileno))
+}
 
-func direntReclen(buf []byte) (uint64, bool) ***REMOVED***
+func direntReclen(buf []byte) (uint64, bool) {
 	namlen, ok := direntNamlen(buf)
-	if !ok ***REMOVED***
+	if !ok {
 		return 0, false
-	***REMOVED***
+	}
 	return (16 + namlen + 1 + 7) &^ 7, true
-***REMOVED***
+}
 
-func direntNamlen(buf []byte) (uint64, bool) ***REMOVED***
-	return readInt(buf, unsafe.Offsetof(Dirent***REMOVED******REMOVED***.Namlen), unsafe.Sizeof(Dirent***REMOVED******REMOVED***.Namlen))
-***REMOVED***
+func direntNamlen(buf []byte) (uint64, bool) {
+	return readInt(buf, unsafe.Offsetof(Dirent{}.Namlen), unsafe.Sizeof(Dirent{}.Namlen))
+}
 
 //sysnb pipe() (r int, w int, err error)
 
-func Pipe(p []int) (err error) ***REMOVED***
-	if len(p) != 2 ***REMOVED***
+func Pipe(p []int) (err error) {
+	if len(p) != 2 {
 		return EINVAL
-	***REMOVED***
+	}
 	p[0], p[1], err = pipe()
 	return
-***REMOVED***
+}
 
 //sys	extpread(fd int, p []byte, flags int, offset int64) (n int, err error)
-func Pread(fd int, p []byte, offset int64) (n int, err error) ***REMOVED***
+func Pread(fd int, p []byte, offset int64) (n int, err error) {
 	return extpread(fd, p, 0, offset)
-***REMOVED***
+}
 
 //sys	extpwrite(fd int, p []byte, flags int, offset int64) (n int, err error)
-func Pwrite(fd int, p []byte, offset int64) (n int, err error) ***REMOVED***
+func Pwrite(fd int, p []byte, offset int64) (n int, err error) {
 	return extpwrite(fd, p, 0, offset)
-***REMOVED***
+}
 
-func Accept4(fd, flags int) (nfd int, sa Sockaddr, err error) ***REMOVED***
+func Accept4(fd, flags int) (nfd int, sa Sockaddr, err error) {
 	var rsa RawSockaddrAny
 	var len _Socklen = SizeofSockaddrAny
 	nfd, err = accept4(fd, &rsa, &len, flags)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
-	if len > SizeofSockaddrAny ***REMOVED***
+	}
+	if len > SizeofSockaddrAny {
 		panic("RawSockaddrAny too small")
-	***REMOVED***
+	}
 	sa, err = anyToSockaddr(&rsa)
-	if err != nil ***REMOVED***
+	if err != nil {
 		Close(nfd)
 		nfd = 0
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func Getfsstat(buf []Statfs_t, flags int) (n int, err error) ***REMOVED***
+func Getfsstat(buf []Statfs_t, flags int) (n int, err error) {
 	var _p0 unsafe.Pointer
 	var bufsize uintptr
-	if len(buf) > 0 ***REMOVED***
+	if len(buf) > 0 {
 		_p0 = unsafe.Pointer(&buf[0])
-		bufsize = unsafe.Sizeof(Statfs_t***REMOVED******REMOVED***) * uintptr(len(buf))
-	***REMOVED***
+		bufsize = unsafe.Sizeof(Statfs_t{}) * uintptr(len(buf))
+	}
 	r0, _, e1 := Syscall(SYS_GETFSSTAT, uintptr(_p0), bufsize, uintptr(flags))
 	n = int(r0)
-	if e1 != 0 ***REMOVED***
+	if e1 != 0 {
 		err = e1
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 /*
  * Exposed directly

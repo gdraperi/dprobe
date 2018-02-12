@@ -8,24 +8,24 @@ import (
 )
 
 // DefaultTemplate defines the defaults template logger should use.
-const DefaultTemplate = "***REMOVED******REMOVED***.ID***REMOVED******REMOVED***"
+const DefaultTemplate = "{{.ID}}"
 
 // ParseLogTag generates a context aware tag for consistency across different
 // log drivers based on the context of the running container.
-func ParseLogTag(info logger.Info, defaultTemplate string) (string, error) ***REMOVED***
+func ParseLogTag(info logger.Info, defaultTemplate string) (string, error) {
 	tagTemplate := info.Config["tag"]
-	if tagTemplate == "" ***REMOVED***
+	if tagTemplate == "" {
 		tagTemplate = defaultTemplate
-	***REMOVED***
+	}
 
 	tmpl, err := templates.NewParse("log-tag", tagTemplate)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	buf := new(bytes.Buffer)
-	if err := tmpl.Execute(buf, &info); err != nil ***REMOVED***
+	if err := tmpl.Execute(buf, &info); err != nil {
 		return "", err
-	***REMOVED***
+	}
 
 	return buf.String(), nil
-***REMOVED***
+}

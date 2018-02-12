@@ -9,16 +9,16 @@ import (
 )
 
 // IsProcessAlive returns true if process with a given pid is running.
-func IsProcessAlive(pid int) bool ***REMOVED***
+func IsProcessAlive(pid int) bool {
 	err := unix.Kill(pid, syscall.Signal(0))
-	if err == nil || err == unix.EPERM ***REMOVED***
+	if err == nil || err == unix.EPERM {
 		return true
-	***REMOVED***
+	}
 
 	return false
-***REMOVED***
+}
 
 // KillProcess force-stops a process.
-func KillProcess(pid int) ***REMOVED***
+func KillProcess(pid int) {
 	unix.Kill(pid, unix.SIGKILL)
-***REMOVED***
+}

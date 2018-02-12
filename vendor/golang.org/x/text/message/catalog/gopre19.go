@@ -10,14 +10,14 @@ import "golang.org/x/text/internal/catmsg"
 
 // A Message holds a collection of translations for the same phrase that may
 // vary based on the values of substitution arguments.
-type Message interface ***REMOVED***
+type Message interface {
 	catmsg.Message
-***REMOVED***
+}
 
-func firstInSequence(m []Message) catmsg.Message ***REMOVED***
-	a := []catmsg.Message***REMOVED******REMOVED***
-	for _, m := range m ***REMOVED***
+func firstInSequence(m []Message) catmsg.Message {
+	a := []catmsg.Message{}
+	for _, m := range m {
 		a = append(a, m)
-	***REMOVED***
+	}
 	return catmsg.FirstOf(a)
-***REMOVED***
+}

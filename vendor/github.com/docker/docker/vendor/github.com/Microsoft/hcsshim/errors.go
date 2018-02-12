@@ -72,190 +72,190 @@ var (
 	ErrPlatformNotSupported = errors.New("unsupported platform request")
 )
 
-type EndpointNotFoundError struct ***REMOVED***
+type EndpointNotFoundError struct {
 	EndpointName string
-***REMOVED***
+}
 
-func (e EndpointNotFoundError) Error() string ***REMOVED***
+func (e EndpointNotFoundError) Error() string {
 	return fmt.Sprintf("Endpoint %s not found", e.EndpointName)
-***REMOVED***
+}
 
-type NetworkNotFoundError struct ***REMOVED***
+type NetworkNotFoundError struct {
 	NetworkName string
-***REMOVED***
+}
 
-func (e NetworkNotFoundError) Error() string ***REMOVED***
+func (e NetworkNotFoundError) Error() string {
 	return fmt.Sprintf("Network %s not found", e.NetworkName)
-***REMOVED***
+}
 
 // ProcessError is an error encountered in HCS during an operation on a Process object
-type ProcessError struct ***REMOVED***
+type ProcessError struct {
 	Process   *process
 	Operation string
 	ExtraInfo string
 	Err       error
-***REMOVED***
+}
 
 // ContainerError is an error encountered in HCS during an operation on a Container object
-type ContainerError struct ***REMOVED***
+type ContainerError struct {
 	Container *container
 	Operation string
 	ExtraInfo string
 	Err       error
-***REMOVED***
+}
 
-func (e *ContainerError) Error() string ***REMOVED***
-	if e == nil ***REMOVED***
+func (e *ContainerError) Error() string {
+	if e == nil {
 		return "<nil>"
-	***REMOVED***
+	}
 
-	if e.Container == nil ***REMOVED***
+	if e.Container == nil {
 		return "unexpected nil container for error: " + e.Err.Error()
-	***REMOVED***
+	}
 
 	s := "container " + e.Container.id
 
-	if e.Operation != "" ***REMOVED***
+	if e.Operation != "" {
 		s += " encountered an error during " + e.Operation
-	***REMOVED***
+	}
 
-	switch e.Err.(type) ***REMOVED***
+	switch e.Err.(type) {
 	case nil:
 		break
 	case syscall.Errno:
 		s += fmt.Sprintf(": failure in a Windows system call: %s (0x%x)", e.Err, win32FromError(e.Err))
 	default:
 		s += fmt.Sprintf(": %s", e.Err.Error())
-	***REMOVED***
+	}
 
-	if e.ExtraInfo != "" ***REMOVED***
+	if e.ExtraInfo != "" {
 		s += " extra info: " + e.ExtraInfo
-	***REMOVED***
+	}
 
 	return s
-***REMOVED***
+}
 
-func makeContainerError(container *container, operation string, extraInfo string, err error) error ***REMOVED***
+func makeContainerError(container *container, operation string, extraInfo string, err error) error {
 	// Don't double wrap errors
-	if _, ok := err.(*ContainerError); ok ***REMOVED***
+	if _, ok := err.(*ContainerError); ok {
 		return err
-	***REMOVED***
-	containerError := &ContainerError***REMOVED***Container: container, Operation: operation, ExtraInfo: extraInfo, Err: err***REMOVED***
+	}
+	containerError := &ContainerError{Container: container, Operation: operation, ExtraInfo: extraInfo, Err: err}
 	return containerError
-***REMOVED***
+}
 
-func (e *ProcessError) Error() string ***REMOVED***
-	if e == nil ***REMOVED***
+func (e *ProcessError) Error() string {
+	if e == nil {
 		return "<nil>"
-	***REMOVED***
+	}
 
-	if e.Process == nil ***REMOVED***
+	if e.Process == nil {
 		return "Unexpected nil process for error: " + e.Err.Error()
-	***REMOVED***
+	}
 
 	s := fmt.Sprintf("process %d", e.Process.processID)
 
-	if e.Process.container != nil ***REMOVED***
+	if e.Process.container != nil {
 		s += " in container " + e.Process.container.id
-	***REMOVED***
+	}
 
-	if e.Operation != "" ***REMOVED***
+	if e.Operation != "" {
 		s += " encountered an error during " + e.Operation
-	***REMOVED***
+	}
 
-	switch e.Err.(type) ***REMOVED***
+	switch e.Err.(type) {
 	case nil:
 		break
 	case syscall.Errno:
 		s += fmt.Sprintf(": failure in a Windows system call: %s (0x%x)", e.Err, win32FromError(e.Err))
 	default:
 		s += fmt.Sprintf(": %s", e.Err.Error())
-	***REMOVED***
+	}
 
 	return s
-***REMOVED***
+}
 
-func makeProcessError(process *process, operation string, extraInfo string, err error) error ***REMOVED***
+func makeProcessError(process *process, operation string, extraInfo string, err error) error {
 	// Don't double wrap errors
-	if _, ok := err.(*ProcessError); ok ***REMOVED***
+	if _, ok := err.(*ProcessError); ok {
 		return err
-	***REMOVED***
-	processError := &ProcessError***REMOVED***Process: process, Operation: operation, ExtraInfo: extraInfo, Err: err***REMOVED***
+	}
+	processError := &ProcessError{Process: process, Operation: operation, ExtraInfo: extraInfo, Err: err}
 	return processError
-***REMOVED***
+}
 
 // IsNotExist checks if an error is caused by the Container or Process not existing.
 // Note: Currently, ErrElementNotFound can mean that a Process has either
 // already exited, or does not exist. Both IsAlreadyStopped and IsNotExist
 // will currently return true when the error is ErrElementNotFound or ErrProcNotFound.
-func IsNotExist(err error) bool ***REMOVED***
+func IsNotExist(err error) bool {
 	err = getInnerError(err)
-	if _, ok := err.(EndpointNotFoundError); ok ***REMOVED***
+	if _, ok := err.(EndpointNotFoundError); ok {
 		return true
-	***REMOVED***
-	if _, ok := err.(NetworkNotFoundError); ok ***REMOVED***
+	}
+	if _, ok := err.(NetworkNotFoundError); ok {
 		return true
-	***REMOVED***
+	}
 	return err == ErrComputeSystemDoesNotExist ||
 		err == ErrElementNotFound ||
 		err == ErrProcNotFound
-***REMOVED***
+}
 
 // IsAlreadyClosed checks if an error is caused by the Container or Process having been
 // already closed by a call to the Close() method.
-func IsAlreadyClosed(err error) bool ***REMOVED***
+func IsAlreadyClosed(err error) bool {
 	err = getInnerError(err)
 	return err == ErrAlreadyClosed
-***REMOVED***
+}
 
 // IsPending returns a boolean indicating whether the error is that
 // the requested operation is being completed in the background.
-func IsPending(err error) bool ***REMOVED***
+func IsPending(err error) bool {
 	err = getInnerError(err)
 	return err == ErrVmcomputeOperationPending
-***REMOVED***
+}
 
 // IsTimeout returns a boolean indicating whether the error is caused by
 // a timeout waiting for the operation to complete.
-func IsTimeout(err error) bool ***REMOVED***
+func IsTimeout(err error) bool {
 	err = getInnerError(err)
 	return err == ErrTimeout
-***REMOVED***
+}
 
 // IsAlreadyStopped returns a boolean indicating whether the error is caused by
 // a Container or Process being already stopped.
 // Note: Currently, ErrElementNotFound can mean that a Process has either
 // already exited, or does not exist. Both IsAlreadyStopped and IsNotExist
 // will currently return true when the error is ErrElementNotFound or ErrProcNotFound.
-func IsAlreadyStopped(err error) bool ***REMOVED***
+func IsAlreadyStopped(err error) bool {
 	err = getInnerError(err)
 	return err == ErrVmcomputeAlreadyStopped ||
 		err == ErrElementNotFound ||
 		err == ErrProcNotFound
-***REMOVED***
+}
 
 // IsNotSupported returns a boolean indicating whether the error is caused by
 // unsupported platform requests
 // Note: Currently Unsupported platform requests can be mean either
 // ErrVmcomputeInvalidJSON, ErrInvalidData, ErrNotSupported or ErrVmcomputeUnknownMessage
 // is thrown from the Platform
-func IsNotSupported(err error) bool ***REMOVED***
+func IsNotSupported(err error) bool {
 	err = getInnerError(err)
 	// If Platform doesn't recognize or support the request sent, below errors are seen
 	return err == ErrVmcomputeInvalidJSON ||
 		err == ErrInvalidData ||
 		err == ErrNotSupported ||
 		err == ErrVmcomputeUnknownMessage
-***REMOVED***
+}
 
-func getInnerError(err error) error ***REMOVED***
-	switch pe := err.(type) ***REMOVED***
+func getInnerError(err error) error {
+	switch pe := err.(type) {
 	case nil:
 		return nil
 	case *ContainerError:
 		err = pe.Err
 	case *ProcessError:
 		err = pe.Err
-	***REMOVED***
+	}
 	return err
-***REMOVED***
+}

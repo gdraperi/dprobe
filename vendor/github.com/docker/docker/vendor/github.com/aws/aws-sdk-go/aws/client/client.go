@@ -9,46 +9,46 @@ import (
 )
 
 // A Config provides configuration to a service client instance.
-type Config struct ***REMOVED***
+type Config struct {
 	Config        *aws.Config
 	Handlers      request.Handlers
 	Endpoint      string
 	SigningRegion string
 	SigningName   string
-***REMOVED***
+}
 
 // ConfigProvider provides a generic way for a service client to receive
 // the ClientConfig without circular dependencies.
-type ConfigProvider interface ***REMOVED***
+type ConfigProvider interface {
 	ClientConfig(serviceName string, cfgs ...*aws.Config) Config
-***REMOVED***
+}
 
 // ConfigNoResolveEndpointProvider same as ConfigProvider except it will not
 // resolve the endpoint automatically. The service client's endpoint must be
 // provided via the aws.Config.Endpoint field.
-type ConfigNoResolveEndpointProvider interface ***REMOVED***
+type ConfigNoResolveEndpointProvider interface {
 	ClientConfigNoResolveEndpoint(cfgs ...*aws.Config) Config
-***REMOVED***
+}
 
 // A Client implements the base client request and response handling
 // used by all service clients.
-type Client struct ***REMOVED***
+type Client struct {
 	request.Retryer
 	metadata.ClientInfo
 
 	Config   aws.Config
 	Handlers request.Handlers
-***REMOVED***
+}
 
 // New will return a pointer to a new initialized service client.
-func New(cfg aws.Config, info metadata.ClientInfo, handlers request.Handlers, options ...func(*Client)) *Client ***REMOVED***
-	svc := &Client***REMOVED***
+func New(cfg aws.Config, info metadata.ClientInfo, handlers request.Handlers, options ...func(*Client)) *Client {
+	svc := &Client{
 		Config:     cfg,
 		ClientInfo: info,
 		Handlers:   handlers.Copy(),
-	***REMOVED***
+	}
 
-	switch retryer, ok := cfg.Retryer.(request.Retryer); ***REMOVED***
+	switch retryer, ok := cfg.Retryer.(request.Retryer); {
 	case ok:
 		svc.Retryer = retryer
 	case cfg.Retryer != nil && cfg.Logger != nil:
@@ -57,34 +57,34 @@ func New(cfg aws.Config, info metadata.ClientInfo, handlers request.Handlers, op
 		fallthrough
 	default:
 		maxRetries := aws.IntValue(cfg.MaxRetries)
-		if cfg.MaxRetries == nil || maxRetries == aws.UseServiceDefaultRetries ***REMOVED***
+		if cfg.MaxRetries == nil || maxRetries == aws.UseServiceDefaultRetries {
 			maxRetries = 3
-		***REMOVED***
-		svc.Retryer = DefaultRetryer***REMOVED***NumMaxRetries: maxRetries***REMOVED***
-	***REMOVED***
+		}
+		svc.Retryer = DefaultRetryer{NumMaxRetries: maxRetries}
+	}
 
 	svc.AddDebugHandlers()
 
-	for _, option := range options ***REMOVED***
+	for _, option := range options {
 		option(svc)
-	***REMOVED***
+	}
 
 	return svc
-***REMOVED***
+}
 
 // NewRequest returns a new Request pointer for the service API
 // operation and parameters.
-func (c *Client) NewRequest(operation *request.Operation, params interface***REMOVED******REMOVED***, data interface***REMOVED******REMOVED***) *request.Request ***REMOVED***
+func (c *Client) NewRequest(operation *request.Operation, params interface{}, data interface{}) *request.Request {
 	return request.New(c.Config, c.ClientInfo, c.Handlers, c.Retryer, operation, params, data)
-***REMOVED***
+}
 
 // AddDebugHandlers injects debug logging handlers into the service to log request
 // debug information.
-func (c *Client) AddDebugHandlers() ***REMOVED***
-	if !c.Config.LogLevel.AtLeast(aws.LogDebug) ***REMOVED***
+func (c *Client) AddDebugHandlers() {
+	if !c.Config.LogLevel.AtLeast(aws.LogDebug) {
 		return
-	***REMOVED***
+	}
 
-	c.Handlers.Send.PushFrontNamed(request.NamedHandler***REMOVED***Name: "awssdk.client.LogRequest", Fn: logRequest***REMOVED***)
-	c.Handlers.Send.PushBackNamed(request.NamedHandler***REMOVED***Name: "awssdk.client.LogResponse", Fn: logResponse***REMOVED***)
-***REMOVED***
+	c.Handlers.Send.PushFrontNamed(request.NamedHandler{Name: "awssdk.client.LogRequest", Fn: logRequest})
+	c.Handlers.Send.PushBackNamed(request.NamedHandler{Name: "awssdk.client.LogResponse", Fn: logResponse})
+}

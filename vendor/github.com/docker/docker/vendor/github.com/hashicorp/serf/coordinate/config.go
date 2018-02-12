@@ -13,7 +13,7 @@ package coordinate
 // [3] Lee, Sanghwan, et al. "On suitability of Euclidean embedding for
 //     host-based network coordinate systems." Networking, IEEE/ACM Transactions
 //     on 18.1 (2010): 27-40.
-type Config struct ***REMOVED***
+type Config struct {
 	// The dimensionality of the coordinate system. As discussed in [2], more
 	// dimensions improves the accuracy of the estimates up to a point. Per [2]
 	// we chose 4 dimensions plus a non-Euclidean height.
@@ -52,12 +52,12 @@ type Config struct ***REMOVED***
 	// GravityRho is a tuning factor that sets how much gravity has an effect
 	// to try to re-center coordinates. See [2] for more details.
 	GravityRho float64
-***REMOVED***
+}
 
 // DefaultConfig returns a Config that has some default values suitable for
 // basic testing of the algorithm, but not tuned to any particular type of cluster.
-func DefaultConfig() *Config ***REMOVED***
-	return &Config***REMOVED***
+func DefaultConfig() *Config {
+	return &Config{
 		Dimensionality:       8,
 		VivaldiErrorMax:      1.5,
 		VivaldiCE:            0.25,
@@ -66,5 +66,5 @@ func DefaultConfig() *Config ***REMOVED***
 		HeightMin:            10.0e-6,
 		LatencyFilterSize:    3,
 		GravityRho:           150.0,
-	***REMOVED***
-***REMOVED***
+	}
+}

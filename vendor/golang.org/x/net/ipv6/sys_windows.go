@@ -29,47 +29,47 @@ const (
 	sizeofICMPv6Filter = 0
 )
 
-type sockaddrInet6 struct ***REMOVED***
+type sockaddrInet6 struct {
 	Family   uint16
 	Port     uint16
 	Flowinfo uint32
 	Addr     [16]byte /* in6_addr */
 	Scope_id uint32
-***REMOVED***
+}
 
-type ipv6Mreq struct ***REMOVED***
+type ipv6Mreq struct {
 	Multiaddr [16]byte /* in6_addr */
 	Interface uint32
-***REMOVED***
+}
 
-type ipv6Mtuinfo struct ***REMOVED***
+type ipv6Mtuinfo struct {
 	Addr sockaddrInet6
 	Mtu  uint32
-***REMOVED***
+}
 
-type icmpv6Filter struct ***REMOVED***
+type icmpv6Filter struct {
 	// TODO(mikio): implement this
-***REMOVED***
+}
 
 var (
-	ctlOpts = [ctlMax]ctlOpt***REMOVED******REMOVED***
+	ctlOpts = [ctlMax]ctlOpt{}
 
-	sockOpts = map[int]*sockOpt***REMOVED***
-		ssoHopLimit:           ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIPv6, Name: sysIPV6_UNICAST_HOPS, Len: 4***REMOVED******REMOVED***,
-		ssoMulticastInterface: ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIPv6, Name: sysIPV6_MULTICAST_IF, Len: 4***REMOVED******REMOVED***,
-		ssoMulticastHopLimit:  ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIPv6, Name: sysIPV6_MULTICAST_HOPS, Len: 4***REMOVED******REMOVED***,
-		ssoMulticastLoopback:  ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIPv6, Name: sysIPV6_MULTICAST_LOOP, Len: 4***REMOVED******REMOVED***,
-		ssoJoinGroup:          ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIPv6, Name: sysIPV6_JOIN_GROUP, Len: sizeofIPv6Mreq***REMOVED***, typ: ssoTypeIPMreq***REMOVED***,
-		ssoLeaveGroup:         ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIPv6, Name: sysIPV6_LEAVE_GROUP, Len: sizeofIPv6Mreq***REMOVED***, typ: ssoTypeIPMreq***REMOVED***,
-	***REMOVED***
+	sockOpts = map[int]*sockOpt{
+		ssoHopLimit:           {Option: socket.Option{Level: iana.ProtocolIPv6, Name: sysIPV6_UNICAST_HOPS, Len: 4}},
+		ssoMulticastInterface: {Option: socket.Option{Level: iana.ProtocolIPv6, Name: sysIPV6_MULTICAST_IF, Len: 4}},
+		ssoMulticastHopLimit:  {Option: socket.Option{Level: iana.ProtocolIPv6, Name: sysIPV6_MULTICAST_HOPS, Len: 4}},
+		ssoMulticastLoopback:  {Option: socket.Option{Level: iana.ProtocolIPv6, Name: sysIPV6_MULTICAST_LOOP, Len: 4}},
+		ssoJoinGroup:          {Option: socket.Option{Level: iana.ProtocolIPv6, Name: sysIPV6_JOIN_GROUP, Len: sizeofIPv6Mreq}, typ: ssoTypeIPMreq},
+		ssoLeaveGroup:         {Option: socket.Option{Level: iana.ProtocolIPv6, Name: sysIPV6_LEAVE_GROUP, Len: sizeofIPv6Mreq}, typ: ssoTypeIPMreq},
+	}
 )
 
-func (sa *sockaddrInet6) setSockaddr(ip net.IP, i int) ***REMOVED***
+func (sa *sockaddrInet6) setSockaddr(ip net.IP, i int) {
 	sa.Family = syscall.AF_INET6
 	copy(sa.Addr[:], ip)
 	sa.Scope_id = uint32(i)
-***REMOVED***
+}
 
-func (mreq *ipv6Mreq) setIfindex(i int) ***REMOVED***
+func (mreq *ipv6Mreq) setIfindex(i int) {
 	mreq.Interface = uint32(i)
-***REMOVED***
+}

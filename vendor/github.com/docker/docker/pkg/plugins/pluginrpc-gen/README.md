@@ -9,13 +9,13 @@ API and the subsystem being extended.
 Given an interface definition:
 
 ```go
-type volumeDriver interface ***REMOVED***
+type volumeDriver interface {
 	Create(name string, opts opts) (err error)
 	Remove(name string) (err error)
 	Path(name string) (mountpoint string, err error)
 	Mount(name string) (mountpoint string, err error)
 	Unmount(name string) (err error)
-***REMOVED***
+}
 ```
 
 **Note**: All function options and return values must be named in the definition.

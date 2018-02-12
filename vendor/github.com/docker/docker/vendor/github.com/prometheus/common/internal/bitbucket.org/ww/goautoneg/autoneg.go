@@ -47,49 +47,49 @@ import (
 )
 
 // Structure to represent a clause in an HTTP Accept Header
-type Accept struct ***REMOVED***
+type Accept struct {
 	Type, SubType string
 	Q             float64
 	Params        map[string]string
-***REMOVED***
+}
 
 // For internal use, so that we can use the sort interface
 type accept_slice []Accept
 
-func (accept accept_slice) Len() int ***REMOVED***
+func (accept accept_slice) Len() int {
 	slice := []Accept(accept)
 	return len(slice)
-***REMOVED***
+}
 
-func (accept accept_slice) Less(i, j int) bool ***REMOVED***
+func (accept accept_slice) Less(i, j int) bool {
 	slice := []Accept(accept)
 	ai, aj := slice[i], slice[j]
-	if ai.Q > aj.Q ***REMOVED***
+	if ai.Q > aj.Q {
 		return true
-	***REMOVED***
-	if ai.Type != "*" && aj.Type == "*" ***REMOVED***
+	}
+	if ai.Type != "*" && aj.Type == "*" {
 		return true
-	***REMOVED***
-	if ai.SubType != "*" && aj.SubType == "*" ***REMOVED***
+	}
+	if ai.SubType != "*" && aj.SubType == "*" {
 		return true
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
-func (accept accept_slice) Swap(i, j int) ***REMOVED***
+func (accept accept_slice) Swap(i, j int) {
 	slice := []Accept(accept)
 	slice[i], slice[j] = slice[j], slice[i]
-***REMOVED***
+}
 
 // Parse an Accept Header string returning a sorted list
 // of clauses
-func ParseAccept(header string) (accept []Accept) ***REMOVED***
+func ParseAccept(header string) (accept []Accept) {
 	parts := strings.Split(header, ",")
 	accept = make([]Accept, 0, len(parts))
-	for _, part := range parts ***REMOVED***
+	for _, part := range parts {
 		part := strings.Trim(part, " ")
 
-		a := Accept***REMOVED******REMOVED***
+		a := Accept{}
 		a.Params = make(map[string]string)
 		a.Q = 1.0
 
@@ -99,64 +99,64 @@ func ParseAccept(header string) (accept []Accept) ***REMOVED***
 		sp := strings.Split(media_range, "/")
 		a.Type = strings.Trim(sp[0], " ")
 
-		switch ***REMOVED***
+		switch {
 		case len(sp) == 1 && a.Type == "*":
 			a.SubType = "*"
 		case len(sp) == 2:
 			a.SubType = strings.Trim(sp[1], " ")
 		default:
 			continue
-		***REMOVED***
+		}
 
-		if len(mrp) == 1 ***REMOVED***
+		if len(mrp) == 1 {
 			accept = append(accept, a)
 			continue
-		***REMOVED***
+		}
 
-		for _, param := range mrp[1:] ***REMOVED***
+		for _, param := range mrp[1:] {
 			sp := strings.SplitN(param, "=", 2)
-			if len(sp) != 2 ***REMOVED***
+			if len(sp) != 2 {
 				continue
-			***REMOVED***
+			}
 			token := strings.Trim(sp[0], " ")
-			if token == "q" ***REMOVED***
+			if token == "q" {
 				a.Q, _ = strconv.ParseFloat(sp[1], 32)
-			***REMOVED*** else ***REMOVED***
+			} else {
 				a.Params[token] = strings.Trim(sp[1], " ")
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		accept = append(accept, a)
-	***REMOVED***
+	}
 
 	slice := accept_slice(accept)
 	sort.Sort(slice)
 
 	return
-***REMOVED***
+}
 
 // Negotiate the most appropriate content_type given the accept header
 // and a list of alternatives.
-func Negotiate(header string, alternatives []string) (content_type string) ***REMOVED***
+func Negotiate(header string, alternatives []string) (content_type string) {
 	asp := make([][]string, 0, len(alternatives))
-	for _, ctype := range alternatives ***REMOVED***
+	for _, ctype := range alternatives {
 		asp = append(asp, strings.SplitN(ctype, "/", 2))
-	***REMOVED***
-	for _, clause := range ParseAccept(header) ***REMOVED***
-		for i, ctsp := range asp ***REMOVED***
-			if clause.Type == ctsp[0] && clause.SubType == ctsp[1] ***REMOVED***
+	}
+	for _, clause := range ParseAccept(header) {
+		for i, ctsp := range asp {
+			if clause.Type == ctsp[0] && clause.SubType == ctsp[1] {
 				content_type = alternatives[i]
 				return
-			***REMOVED***
-			if clause.Type == ctsp[0] && clause.SubType == "*" ***REMOVED***
+			}
+			if clause.Type == ctsp[0] && clause.SubType == "*" {
 				content_type = alternatives[i]
 				return
-			***REMOVED***
-			if clause.Type == "*" && clause.SubType == "*" ***REMOVED***
+			}
+			if clause.Type == "*" && clause.SubType == "*" {
 				content_type = alternatives[i]
 				return
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return
-***REMOVED***
+}

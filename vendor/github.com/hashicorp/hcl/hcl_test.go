@@ -9,11 +9,11 @@ import (
 // This is the directory where our test fixtures are.
 const fixtureDir = "./test-fixtures"
 
-func testReadFile(t *testing.T, n string) string ***REMOVED***
+func testReadFile(t *testing.T, n string) string {
 	d, err := ioutil.ReadFile(filepath.Join(fixtureDir, n))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("err: %s", err)
-	***REMOVED***
+	}
 
 	return string(d)
-***REMOVED***
+}

@@ -27,10 +27,10 @@ import (
 // TODO: remove Currency type from package language.
 
 // Kind determines the rounding and rendering properties of a currency value.
-type Kind struct ***REMOVED***
+type Kind struct {
 	rounding rounding
 	// TODO: formatting type: standard, accounting. See CLDR.
-***REMOVED***
+}
 
 type rounding byte
 
@@ -41,47 +41,47 @@ const (
 
 var (
 	// Standard defines standard rounding and formatting for currencies.
-	Standard Kind = Kind***REMOVED***rounding: standard***REMOVED***
+	Standard Kind = Kind{rounding: standard}
 
 	// Cash defines rounding and formatting standards for cash transactions.
-	Cash Kind = Kind***REMOVED***rounding: cash***REMOVED***
+	Cash Kind = Kind{rounding: cash}
 
 	// Accounting defines rounding and formatting standards for accounting.
-	Accounting Kind = Kind***REMOVED***rounding: standard***REMOVED***
+	Accounting Kind = Kind{rounding: standard}
 )
 
 // Rounding reports the rounding characteristics for the given currency, where
 // scale is the number of fractional decimals and increment is the number of
 // units in terms of 10^(-scale) to which to round to.
-func (k Kind) Rounding(cur Unit) (scale, increment int) ***REMOVED***
+func (k Kind) Rounding(cur Unit) (scale, increment int) {
 	info := currency.Elem(int(cur.index))[3]
-	switch k.rounding ***REMOVED***
+	switch k.rounding {
 	case standard:
 		info &= roundMask
 	case cash:
 		info >>= cashShift
-	***REMOVED***
+	}
 	return int(roundings[info].scale), int(roundings[info].increment)
-***REMOVED***
+}
 
 // Unit is an ISO 4217 currency designator.
-type Unit struct ***REMOVED***
+type Unit struct {
 	index uint16
-***REMOVED***
+}
 
 // String returns the ISO code of u.
-func (u Unit) String() string ***REMOVED***
-	if u.index == 0 ***REMOVED***
+func (u Unit) String() string {
+	if u.index == 0 {
 		return "XXX"
-	***REMOVED***
+	}
 	return currency.Elem(int(u.index))[:3]
-***REMOVED***
+}
 
 // Amount creates an Amount for the given currency unit and amount.
-func (u Unit) Amount(amount interface***REMOVED******REMOVED***) Amount ***REMOVED***
+func (u Unit) Amount(amount interface{}) Amount {
 	// TODO: verify amount is a supported number type
-	return Amount***REMOVED***amount: amount, currency: u***REMOVED***
-***REMOVED***
+	return Amount{amount: amount, currency: u}
+}
 
 var (
 	errSyntax = errors.New("currency: tag is not well-formed")
@@ -90,96 +90,96 @@ var (
 
 // ParseISO parses a 3-letter ISO 4217 currency code. It returns an error if s
 // is not well-formed or not a recognized currency code.
-func ParseISO(s string) (Unit, error) ***REMOVED***
+func ParseISO(s string) (Unit, error) {
 	var buf [4]byte // Take one byte more to detect oversize keys.
 	key := buf[:copy(buf[:], s)]
-	if !tag.FixCase("XXX", key) ***REMOVED***
-		return Unit***REMOVED******REMOVED***, errSyntax
-	***REMOVED***
-	if i := currency.Index(key); i >= 0 ***REMOVED***
-		if i == xxx ***REMOVED***
-			return Unit***REMOVED******REMOVED***, nil
-		***REMOVED***
-		return Unit***REMOVED***uint16(i)***REMOVED***, nil
-	***REMOVED***
-	return Unit***REMOVED******REMOVED***, errValue
-***REMOVED***
+	if !tag.FixCase("XXX", key) {
+		return Unit{}, errSyntax
+	}
+	if i := currency.Index(key); i >= 0 {
+		if i == xxx {
+			return Unit{}, nil
+		}
+		return Unit{uint16(i)}, nil
+	}
+	return Unit{}, errValue
+}
 
 // MustParseISO is like ParseISO, but panics if the given currency unit
 // cannot be parsed. It simplifies safe initialization of Unit values.
-func MustParseISO(s string) Unit ***REMOVED***
+func MustParseISO(s string) Unit {
 	c, err := ParseISO(s)
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 	return c
-***REMOVED***
+}
 
 // FromRegion reports the currency unit that is currently legal tender in the
 // given region according to CLDR. It will return false if region currently does
 // not have a legal tender.
-func FromRegion(r language.Region) (currency Unit, ok bool) ***REMOVED***
+func FromRegion(r language.Region) (currency Unit, ok bool) {
 	x := regionToCode(r)
-	i := sort.Search(len(regionToCurrency), func(i int) bool ***REMOVED***
+	i := sort.Search(len(regionToCurrency), func(i int) bool {
 		return regionToCurrency[i].region >= x
-	***REMOVED***)
-	if i < len(regionToCurrency) && regionToCurrency[i].region == x ***REMOVED***
-		return Unit***REMOVED***regionToCurrency[i].code***REMOVED***, true
-	***REMOVED***
-	return Unit***REMOVED******REMOVED***, false
-***REMOVED***
+	})
+	if i < len(regionToCurrency) && regionToCurrency[i].region == x {
+		return Unit{regionToCurrency[i].code}, true
+	}
+	return Unit{}, false
+}
 
 // FromTag reports the most likely currency for the given tag. It considers the
 // currency defined in the -u extension and infers the region if necessary.
-func FromTag(t language.Tag) (Unit, language.Confidence) ***REMOVED***
-	if cur := t.TypeForKey("cu"); len(cur) == 3 ***REMOVED***
+func FromTag(t language.Tag) (Unit, language.Confidence) {
+	if cur := t.TypeForKey("cu"); len(cur) == 3 {
 		c, _ := ParseISO(cur)
 		return c, language.Exact
-	***REMOVED***
+	}
 	r, conf := t.Region()
-	if cur, ok := FromRegion(r); ok ***REMOVED***
+	if cur, ok := FromRegion(r); ok {
 		return cur, conf
-	***REMOVED***
-	return Unit***REMOVED******REMOVED***, language.No
-***REMOVED***
+	}
+	return Unit{}, language.No
+}
 
 var (
 	// Undefined and testing.
-	XXX Unit = Unit***REMOVED******REMOVED***
-	XTS Unit = Unit***REMOVED***xts***REMOVED***
+	XXX Unit = Unit{}
+	XTS Unit = Unit{xts}
 
 	// G10 currencies https://en.wikipedia.org/wiki/G10_currencies.
-	USD Unit = Unit***REMOVED***usd***REMOVED***
-	EUR Unit = Unit***REMOVED***eur***REMOVED***
-	JPY Unit = Unit***REMOVED***jpy***REMOVED***
-	GBP Unit = Unit***REMOVED***gbp***REMOVED***
-	CHF Unit = Unit***REMOVED***chf***REMOVED***
-	AUD Unit = Unit***REMOVED***aud***REMOVED***
-	NZD Unit = Unit***REMOVED***nzd***REMOVED***
-	CAD Unit = Unit***REMOVED***cad***REMOVED***
-	SEK Unit = Unit***REMOVED***sek***REMOVED***
-	NOK Unit = Unit***REMOVED***nok***REMOVED***
+	USD Unit = Unit{usd}
+	EUR Unit = Unit{eur}
+	JPY Unit = Unit{jpy}
+	GBP Unit = Unit{gbp}
+	CHF Unit = Unit{chf}
+	AUD Unit = Unit{aud}
+	NZD Unit = Unit{nzd}
+	CAD Unit = Unit{cad}
+	SEK Unit = Unit{sek}
+	NOK Unit = Unit{nok}
 
 	// Additional common currencies as defined by CLDR.
-	BRL Unit = Unit***REMOVED***brl***REMOVED***
-	CNY Unit = Unit***REMOVED***cny***REMOVED***
-	DKK Unit = Unit***REMOVED***dkk***REMOVED***
-	INR Unit = Unit***REMOVED***inr***REMOVED***
-	RUB Unit = Unit***REMOVED***rub***REMOVED***
-	HKD Unit = Unit***REMOVED***hkd***REMOVED***
-	IDR Unit = Unit***REMOVED***idr***REMOVED***
-	KRW Unit = Unit***REMOVED***krw***REMOVED***
-	MXN Unit = Unit***REMOVED***mxn***REMOVED***
-	PLN Unit = Unit***REMOVED***pln***REMOVED***
-	SAR Unit = Unit***REMOVED***sar***REMOVED***
-	THB Unit = Unit***REMOVED***thb***REMOVED***
-	TRY Unit = Unit***REMOVED***try***REMOVED***
-	TWD Unit = Unit***REMOVED***twd***REMOVED***
-	ZAR Unit = Unit***REMOVED***zar***REMOVED***
+	BRL Unit = Unit{brl}
+	CNY Unit = Unit{cny}
+	DKK Unit = Unit{dkk}
+	INR Unit = Unit{inr}
+	RUB Unit = Unit{rub}
+	HKD Unit = Unit{hkd}
+	IDR Unit = Unit{idr}
+	KRW Unit = Unit{krw}
+	MXN Unit = Unit{mxn}
+	PLN Unit = Unit{pln}
+	SAR Unit = Unit{sar}
+	THB Unit = Unit{thb}
+	TRY Unit = Unit{try}
+	TWD Unit = Unit{twd}
+	ZAR Unit = Unit{zar}
 
 	// Precious metals.
-	XAG Unit = Unit***REMOVED***xag***REMOVED***
-	XAU Unit = Unit***REMOVED***xau***REMOVED***
-	XPT Unit = Unit***REMOVED***xpt***REMOVED***
-	XPD Unit = Unit***REMOVED***xpd***REMOVED***
+	XAG Unit = Unit{xag}
+	XAU Unit = Unit{xau}
+	XPT Unit = Unit{xpt}
+	XPD Unit = Unit{xpd}
 )

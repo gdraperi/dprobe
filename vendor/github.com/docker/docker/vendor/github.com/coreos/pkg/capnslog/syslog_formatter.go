@@ -21,26 +21,26 @@ import (
 	"log/syslog"
 )
 
-func NewSyslogFormatter(w *syslog.Writer) Formatter ***REMOVED***
-	return &syslogFormatter***REMOVED***w***REMOVED***
-***REMOVED***
+func NewSyslogFormatter(w *syslog.Writer) Formatter {
+	return &syslogFormatter{w}
+}
 
-func NewDefaultSyslogFormatter(tag string) (Formatter, error) ***REMOVED***
+func NewDefaultSyslogFormatter(tag string) (Formatter, error) {
 	w, err := syslog.New(syslog.LOG_DEBUG, tag)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return NewSyslogFormatter(w), nil
-***REMOVED***
+}
 
-type syslogFormatter struct ***REMOVED***
+type syslogFormatter struct {
 	w *syslog.Writer
-***REMOVED***
+}
 
-func (s *syslogFormatter) Format(pkg string, l LogLevel, _ int, entries ...interface***REMOVED******REMOVED***) ***REMOVED***
-	for _, entry := range entries ***REMOVED***
+func (s *syslogFormatter) Format(pkg string, l LogLevel, _ int, entries ...interface{}) {
+	for _, entry := range entries {
 		str := fmt.Sprint(entry)
-		switch l ***REMOVED***
+		switch l {
 		case CRITICAL:
 			s.w.Crit(str)
 		case ERROR:
@@ -57,9 +57,9 @@ func (s *syslogFormatter) Format(pkg string, l LogLevel, _ int, entries ...inter
 			s.w.Debug(str)
 		default:
 			panic("Unhandled loglevel")
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (s *syslogFormatter) Flush() ***REMOVED***
-***REMOVED***
+func (s *syslogFormatter) Flush() {
+}

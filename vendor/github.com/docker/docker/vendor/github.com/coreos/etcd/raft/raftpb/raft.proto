@@ -9,30 +9,30 @@ option (gogoproto.unmarshaler_all) = true;
 option (gogoproto.goproto_getters_all) = false;
 option (gogoproto.goproto_enum_prefix_all) = false;
 
-enum EntryType ***REMOVED***
+enum EntryType {
 	EntryNormal     = 0;
 	EntryConfChange = 1;
-***REMOVED***
+}
 
-message Entry ***REMOVED***
+message Entry {
 	optional uint64     Term  = 2 [(gogoproto.nullable) = false]; // must be 64-bit aligned for atomic operations
 	optional uint64     Index = 3 [(gogoproto.nullable) = false]; // must be 64-bit aligned for atomic operations
 	optional EntryType  Type  = 1 [(gogoproto.nullable) = false];
 	optional bytes      Data  = 4;
-***REMOVED***
+}
 
-message SnapshotMetadata ***REMOVED***
+message SnapshotMetadata {
 	optional ConfState conf_state = 1 [(gogoproto.nullable) = false];
 	optional uint64    index      = 2 [(gogoproto.nullable) = false];
 	optional uint64    term       = 3 [(gogoproto.nullable) = false];
-***REMOVED***
+}
 
-message Snapshot ***REMOVED***
+message Snapshot {
 	optional bytes            data     = 1;
 	optional SnapshotMetadata metadata = 2 [(gogoproto.nullable) = false];
-***REMOVED***
+}
 
-enum MessageType ***REMOVED***
+enum MessageType {
 	MsgHup             = 0;
 	MsgBeat            = 1;
 	MsgProp            = 2;
@@ -52,9 +52,9 @@ enum MessageType ***REMOVED***
 	MsgReadIndexResp   = 16;
 	MsgPreVote         = 17;
 	MsgPreVoteResp     = 18;
-***REMOVED***
+}
 
-message Message ***REMOVED***
+message Message {
 	optional MessageType type        = 1  [(gogoproto.nullable) = false];
 	optional uint64      to          = 2  [(gogoproto.nullable) = false];
 	optional uint64      from        = 3  [(gogoproto.nullable) = false];
@@ -67,27 +67,27 @@ message Message ***REMOVED***
 	optional bool        reject      = 10 [(gogoproto.nullable) = false];
 	optional uint64      rejectHint  = 11 [(gogoproto.nullable) = false];
 	optional bytes       context     = 12;
-***REMOVED***
+}
 
-message HardState ***REMOVED***
+message HardState {
 	optional uint64 term   = 1 [(gogoproto.nullable) = false];
 	optional uint64 vote   = 2 [(gogoproto.nullable) = false];
 	optional uint64 commit = 3 [(gogoproto.nullable) = false];
-***REMOVED***
+}
 
-message ConfState ***REMOVED***
+message ConfState {
 	repeated uint64 nodes = 1;
-***REMOVED***
+}
 
-enum ConfChangeType ***REMOVED***
+enum ConfChangeType {
 	ConfChangeAddNode    = 0;
 	ConfChangeRemoveNode = 1;
 	ConfChangeUpdateNode = 2;
-***REMOVED***
+}
 
-message ConfChange ***REMOVED***
+message ConfChange {
 	optional uint64          ID      = 1 [(gogoproto.nullable) = false];
 	optional ConfChangeType  Type    = 2 [(gogoproto.nullable) = false];
 	optional uint64          NodeID  = 3 [(gogoproto.nullable) = false];
 	optional bytes           Context = 4;
-***REMOVED***
+}

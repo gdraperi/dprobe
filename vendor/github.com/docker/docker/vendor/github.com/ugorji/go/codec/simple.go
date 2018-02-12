@@ -28,127 +28,127 @@ const (
 	simpleVdExt       = 248
 )
 
-type simpleEncDriver struct ***REMOVED***
+type simpleEncDriver struct {
 	noBuiltInTypes
 	encNoSeparator
 	e *Encoder
 	h *SimpleHandle
 	w encWriter
 	b [8]byte
-***REMOVED***
+}
 
-func (e *simpleEncDriver) EncodeNil() ***REMOVED***
+func (e *simpleEncDriver) EncodeNil() {
 	e.w.writen1(simpleVdNil)
-***REMOVED***
+}
 
-func (e *simpleEncDriver) EncodeBool(b bool) ***REMOVED***
-	if b ***REMOVED***
+func (e *simpleEncDriver) EncodeBool(b bool) {
+	if b {
 		e.w.writen1(simpleVdTrue)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		e.w.writen1(simpleVdFalse)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (e *simpleEncDriver) EncodeFloat32(f float32) ***REMOVED***
+func (e *simpleEncDriver) EncodeFloat32(f float32) {
 	e.w.writen1(simpleVdFloat32)
-	bigenHelper***REMOVED***e.b[:4], e.w***REMOVED***.writeUint32(math.Float32bits(f))
-***REMOVED***
+	bigenHelper{e.b[:4], e.w}.writeUint32(math.Float32bits(f))
+}
 
-func (e *simpleEncDriver) EncodeFloat64(f float64) ***REMOVED***
+func (e *simpleEncDriver) EncodeFloat64(f float64) {
 	e.w.writen1(simpleVdFloat64)
-	bigenHelper***REMOVED***e.b[:8], e.w***REMOVED***.writeUint64(math.Float64bits(f))
-***REMOVED***
+	bigenHelper{e.b[:8], e.w}.writeUint64(math.Float64bits(f))
+}
 
-func (e *simpleEncDriver) EncodeInt(v int64) ***REMOVED***
-	if v < 0 ***REMOVED***
+func (e *simpleEncDriver) EncodeInt(v int64) {
+	if v < 0 {
 		e.encUint(uint64(-v), simpleVdNegInt)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		e.encUint(uint64(v), simpleVdPosInt)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (e *simpleEncDriver) EncodeUint(v uint64) ***REMOVED***
+func (e *simpleEncDriver) EncodeUint(v uint64) {
 	e.encUint(v, simpleVdPosInt)
-***REMOVED***
+}
 
-func (e *simpleEncDriver) encUint(v uint64, bd uint8) ***REMOVED***
-	if v <= math.MaxUint8 ***REMOVED***
+func (e *simpleEncDriver) encUint(v uint64, bd uint8) {
+	if v <= math.MaxUint8 {
 		e.w.writen2(bd, uint8(v))
-	***REMOVED*** else if v <= math.MaxUint16 ***REMOVED***
+	} else if v <= math.MaxUint16 {
 		e.w.writen1(bd + 1)
-		bigenHelper***REMOVED***e.b[:2], e.w***REMOVED***.writeUint16(uint16(v))
-	***REMOVED*** else if v <= math.MaxUint32 ***REMOVED***
+		bigenHelper{e.b[:2], e.w}.writeUint16(uint16(v))
+	} else if v <= math.MaxUint32 {
 		e.w.writen1(bd + 2)
-		bigenHelper***REMOVED***e.b[:4], e.w***REMOVED***.writeUint32(uint32(v))
-	***REMOVED*** else ***REMOVED*** // if v <= math.MaxUint64 ***REMOVED***
+		bigenHelper{e.b[:4], e.w}.writeUint32(uint32(v))
+	} else { // if v <= math.MaxUint64 {
 		e.w.writen1(bd + 3)
-		bigenHelper***REMOVED***e.b[:8], e.w***REMOVED***.writeUint64(v)
-	***REMOVED***
-***REMOVED***
+		bigenHelper{e.b[:8], e.w}.writeUint64(v)
+	}
+}
 
-func (e *simpleEncDriver) encLen(bd byte, length int) ***REMOVED***
-	if length == 0 ***REMOVED***
+func (e *simpleEncDriver) encLen(bd byte, length int) {
+	if length == 0 {
 		e.w.writen1(bd)
-	***REMOVED*** else if length <= math.MaxUint8 ***REMOVED***
+	} else if length <= math.MaxUint8 {
 		e.w.writen1(bd + 1)
 		e.w.writen1(uint8(length))
-	***REMOVED*** else if length <= math.MaxUint16 ***REMOVED***
+	} else if length <= math.MaxUint16 {
 		e.w.writen1(bd + 2)
-		bigenHelper***REMOVED***e.b[:2], e.w***REMOVED***.writeUint16(uint16(length))
-	***REMOVED*** else if int64(length) <= math.MaxUint32 ***REMOVED***
+		bigenHelper{e.b[:2], e.w}.writeUint16(uint16(length))
+	} else if int64(length) <= math.MaxUint32 {
 		e.w.writen1(bd + 3)
-		bigenHelper***REMOVED***e.b[:4], e.w***REMOVED***.writeUint32(uint32(length))
-	***REMOVED*** else ***REMOVED***
+		bigenHelper{e.b[:4], e.w}.writeUint32(uint32(length))
+	} else {
 		e.w.writen1(bd + 4)
-		bigenHelper***REMOVED***e.b[:8], e.w***REMOVED***.writeUint64(uint64(length))
-	***REMOVED***
-***REMOVED***
+		bigenHelper{e.b[:8], e.w}.writeUint64(uint64(length))
+	}
+}
 
-func (e *simpleEncDriver) EncodeExt(rv interface***REMOVED******REMOVED***, xtag uint64, ext Ext, _ *Encoder) ***REMOVED***
+func (e *simpleEncDriver) EncodeExt(rv interface{}, xtag uint64, ext Ext, _ *Encoder) {
 	bs := ext.WriteExt(rv)
-	if bs == nil ***REMOVED***
+	if bs == nil {
 		e.EncodeNil()
 		return
-	***REMOVED***
+	}
 	e.encodeExtPreamble(uint8(xtag), len(bs))
 	e.w.writeb(bs)
-***REMOVED***
+}
 
-func (e *simpleEncDriver) EncodeRawExt(re *RawExt, _ *Encoder) ***REMOVED***
+func (e *simpleEncDriver) EncodeRawExt(re *RawExt, _ *Encoder) {
 	e.encodeExtPreamble(uint8(re.Tag), len(re.Data))
 	e.w.writeb(re.Data)
-***REMOVED***
+}
 
-func (e *simpleEncDriver) encodeExtPreamble(xtag byte, length int) ***REMOVED***
+func (e *simpleEncDriver) encodeExtPreamble(xtag byte, length int) {
 	e.encLen(simpleVdExt, length)
 	e.w.writen1(xtag)
-***REMOVED***
+}
 
-func (e *simpleEncDriver) EncodeArrayStart(length int) ***REMOVED***
+func (e *simpleEncDriver) EncodeArrayStart(length int) {
 	e.encLen(simpleVdArray, length)
-***REMOVED***
+}
 
-func (e *simpleEncDriver) EncodeMapStart(length int) ***REMOVED***
+func (e *simpleEncDriver) EncodeMapStart(length int) {
 	e.encLen(simpleVdMap, length)
-***REMOVED***
+}
 
-func (e *simpleEncDriver) EncodeString(c charEncoding, v string) ***REMOVED***
+func (e *simpleEncDriver) EncodeString(c charEncoding, v string) {
 	e.encLen(simpleVdString, len(v))
 	e.w.writestr(v)
-***REMOVED***
+}
 
-func (e *simpleEncDriver) EncodeSymbol(v string) ***REMOVED***
+func (e *simpleEncDriver) EncodeSymbol(v string) {
 	e.EncodeString(c_UTF8, v)
-***REMOVED***
+}
 
-func (e *simpleEncDriver) EncodeStringBytes(c charEncoding, v []byte) ***REMOVED***
+func (e *simpleEncDriver) EncodeStringBytes(c charEncoding, v []byte) {
 	e.encLen(simpleVdByteArray, len(v))
 	e.w.writeb(v)
-***REMOVED***
+}
 
 //------------------------------------
 
-type simpleDecDriver struct ***REMOVED***
+type simpleDecDriver struct {
 	d      *Decoder
 	h      *SimpleHandle
 	r      decReader
@@ -159,50 +159,50 @@ type simpleDecDriver struct ***REMOVED***
 	noStreamingCodec
 	decNoSeparator
 	b [scratchByteArrayLen]byte
-***REMOVED***
+}
 
-func (d *simpleDecDriver) readNextBd() ***REMOVED***
+func (d *simpleDecDriver) readNextBd() {
 	d.bd = d.r.readn1()
 	d.bdRead = true
-***REMOVED***
+}
 
-func (d *simpleDecDriver) ContainerType() (vt valueType) ***REMOVED***
-	if d.bd == simpleVdNil ***REMOVED***
+func (d *simpleDecDriver) ContainerType() (vt valueType) {
+	if d.bd == simpleVdNil {
 		return valueTypeNil
-	***REMOVED*** else if d.bd == simpleVdByteArray || d.bd == simpleVdByteArray+1 ||
-		d.bd == simpleVdByteArray+2 || d.bd == simpleVdByteArray+3 || d.bd == simpleVdByteArray+4 ***REMOVED***
+	} else if d.bd == simpleVdByteArray || d.bd == simpleVdByteArray+1 ||
+		d.bd == simpleVdByteArray+2 || d.bd == simpleVdByteArray+3 || d.bd == simpleVdByteArray+4 {
 		return valueTypeBytes
-	***REMOVED*** else if d.bd == simpleVdString || d.bd == simpleVdString+1 ||
-		d.bd == simpleVdString+2 || d.bd == simpleVdString+3 || d.bd == simpleVdString+4 ***REMOVED***
+	} else if d.bd == simpleVdString || d.bd == simpleVdString+1 ||
+		d.bd == simpleVdString+2 || d.bd == simpleVdString+3 || d.bd == simpleVdString+4 {
 		return valueTypeString
-	***REMOVED*** else if d.bd == simpleVdArray || d.bd == simpleVdArray+1 ||
-		d.bd == simpleVdArray+2 || d.bd == simpleVdArray+3 || d.bd == simpleVdArray+4 ***REMOVED***
+	} else if d.bd == simpleVdArray || d.bd == simpleVdArray+1 ||
+		d.bd == simpleVdArray+2 || d.bd == simpleVdArray+3 || d.bd == simpleVdArray+4 {
 		return valueTypeArray
-	***REMOVED*** else if d.bd == simpleVdMap || d.bd == simpleVdMap+1 ||
-		d.bd == simpleVdMap+2 || d.bd == simpleVdMap+3 || d.bd == simpleVdMap+4 ***REMOVED***
+	} else if d.bd == simpleVdMap || d.bd == simpleVdMap+1 ||
+		d.bd == simpleVdMap+2 || d.bd == simpleVdMap+3 || d.bd == simpleVdMap+4 {
 		return valueTypeMap
-	***REMOVED*** else ***REMOVED***
+	} else {
 		// d.d.errorf("isContainerType: unsupported parameter: %v", vt)
-	***REMOVED***
+	}
 	return valueTypeUnset
-***REMOVED***
+}
 
-func (d *simpleDecDriver) TryDecodeAsNil() bool ***REMOVED***
-	if !d.bdRead ***REMOVED***
+func (d *simpleDecDriver) TryDecodeAsNil() bool {
+	if !d.bdRead {
 		d.readNextBd()
-	***REMOVED***
-	if d.bd == simpleVdNil ***REMOVED***
+	}
+	if d.bd == simpleVdNil {
 		d.bdRead = false
 		return true
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
-func (d *simpleDecDriver) decCheckInteger() (ui uint64, neg bool) ***REMOVED***
-	if !d.bdRead ***REMOVED***
+func (d *simpleDecDriver) decCheckInteger() (ui uint64, neg bool) {
+	if !d.bdRead {
 		d.readNextBd()
-	***REMOVED***
-	switch d.bd ***REMOVED***
+	}
+	switch d.bd {
 	case simpleVdPosInt:
 		ui = uint64(d.r.readn1())
 	case simpleVdPosInt + 1:
@@ -226,99 +226,99 @@ func (d *simpleDecDriver) decCheckInteger() (ui uint64, neg bool) ***REMOVED***
 	default:
 		d.d.errorf("decIntAny: Integer only valid from pos/neg integer1..8. Invalid descriptor: %v", d.bd)
 		return
-	***REMOVED***
+	}
 	// don't do this check, because callers may only want the unsigned value.
-	// if ui > math.MaxInt64 ***REMOVED***
+	// if ui > math.MaxInt64 {
 	// 	d.d.errorf("decIntAny: Integer out of range for signed int64: %v", ui)
 	//		return
-	// ***REMOVED***
+	// }
 	return
-***REMOVED***
+}
 
-func (d *simpleDecDriver) DecodeInt(bitsize uint8) (i int64) ***REMOVED***
+func (d *simpleDecDriver) DecodeInt(bitsize uint8) (i int64) {
 	ui, neg := d.decCheckInteger()
 	i, overflow := chkOvf.SignedInt(ui)
-	if overflow ***REMOVED***
+	if overflow {
 		d.d.errorf("simple: overflow converting %v to signed integer", ui)
 		return
-	***REMOVED***
-	if neg ***REMOVED***
+	}
+	if neg {
 		i = -i
-	***REMOVED***
-	if chkOvf.Int(i, bitsize) ***REMOVED***
+	}
+	if chkOvf.Int(i, bitsize) {
 		d.d.errorf("simple: overflow integer: %v", i)
 		return
-	***REMOVED***
+	}
 	d.bdRead = false
 	return
-***REMOVED***
+}
 
-func (d *simpleDecDriver) DecodeUint(bitsize uint8) (ui uint64) ***REMOVED***
+func (d *simpleDecDriver) DecodeUint(bitsize uint8) (ui uint64) {
 	ui, neg := d.decCheckInteger()
-	if neg ***REMOVED***
+	if neg {
 		d.d.errorf("Assigning negative signed value to unsigned type")
 		return
-	***REMOVED***
-	if chkOvf.Uint(ui, bitsize) ***REMOVED***
+	}
+	if chkOvf.Uint(ui, bitsize) {
 		d.d.errorf("simple: overflow integer: %v", ui)
 		return
-	***REMOVED***
+	}
 	d.bdRead = false
 	return
-***REMOVED***
+}
 
-func (d *simpleDecDriver) DecodeFloat(chkOverflow32 bool) (f float64) ***REMOVED***
-	if !d.bdRead ***REMOVED***
+func (d *simpleDecDriver) DecodeFloat(chkOverflow32 bool) (f float64) {
+	if !d.bdRead {
 		d.readNextBd()
-	***REMOVED***
-	if d.bd == simpleVdFloat32 ***REMOVED***
+	}
+	if d.bd == simpleVdFloat32 {
 		f = float64(math.Float32frombits(bigen.Uint32(d.r.readx(4))))
-	***REMOVED*** else if d.bd == simpleVdFloat64 ***REMOVED***
+	} else if d.bd == simpleVdFloat64 {
 		f = math.Float64frombits(bigen.Uint64(d.r.readx(8)))
-	***REMOVED*** else ***REMOVED***
-		if d.bd >= simpleVdPosInt && d.bd <= simpleVdNegInt+3 ***REMOVED***
+	} else {
+		if d.bd >= simpleVdPosInt && d.bd <= simpleVdNegInt+3 {
 			f = float64(d.DecodeInt(64))
-		***REMOVED*** else ***REMOVED***
+		} else {
 			d.d.errorf("Float only valid from float32/64: Invalid descriptor: %v", d.bd)
 			return
-		***REMOVED***
-	***REMOVED***
-	if chkOverflow32 && chkOvf.Float32(f) ***REMOVED***
+		}
+	}
+	if chkOverflow32 && chkOvf.Float32(f) {
 		d.d.errorf("msgpack: float32 overflow: %v", f)
 		return
-	***REMOVED***
+	}
 	d.bdRead = false
 	return
-***REMOVED***
+}
 
 // bool can be decoded from bool only (single byte).
-func (d *simpleDecDriver) DecodeBool() (b bool) ***REMOVED***
-	if !d.bdRead ***REMOVED***
+func (d *simpleDecDriver) DecodeBool() (b bool) {
+	if !d.bdRead {
 		d.readNextBd()
-	***REMOVED***
-	if d.bd == simpleVdTrue ***REMOVED***
+	}
+	if d.bd == simpleVdTrue {
 		b = true
-	***REMOVED*** else if d.bd == simpleVdFalse ***REMOVED***
-	***REMOVED*** else ***REMOVED***
+	} else if d.bd == simpleVdFalse {
+	} else {
 		d.d.errorf("Invalid single-byte value for bool: %s: %x", msgBadDesc, d.bd)
 		return
-	***REMOVED***
+	}
 	d.bdRead = false
 	return
-***REMOVED***
+}
 
-func (d *simpleDecDriver) ReadMapStart() (length int) ***REMOVED***
+func (d *simpleDecDriver) ReadMapStart() (length int) {
 	d.bdRead = false
 	return d.decLen()
-***REMOVED***
+}
 
-func (d *simpleDecDriver) ReadArrayStart() (length int) ***REMOVED***
+func (d *simpleDecDriver) ReadArrayStart() (length int) {
 	d.bdRead = false
 	return d.decLen()
-***REMOVED***
+}
 
-func (d *simpleDecDriver) decLen() int ***REMOVED***
-	switch d.bd % 8 ***REMOVED***
+func (d *simpleDecDriver) decLen() int {
+	switch d.bd % 8 {
 	case 0:
 		return 0
 	case 1:
@@ -327,96 +327,96 @@ func (d *simpleDecDriver) decLen() int ***REMOVED***
 		return int(bigen.Uint16(d.r.readx(2)))
 	case 3:
 		ui := uint64(bigen.Uint32(d.r.readx(4)))
-		if chkOvf.Uint(ui, intBitsize) ***REMOVED***
+		if chkOvf.Uint(ui, intBitsize) {
 			d.d.errorf("simple: overflow integer: %v", ui)
 			return 0
-		***REMOVED***
+		}
 		return int(ui)
 	case 4:
 		ui := bigen.Uint64(d.r.readx(8))
-		if chkOvf.Uint(ui, intBitsize) ***REMOVED***
+		if chkOvf.Uint(ui, intBitsize) {
 			d.d.errorf("simple: overflow integer: %v", ui)
 			return 0
-		***REMOVED***
+		}
 		return int(ui)
-	***REMOVED***
+	}
 	d.d.errorf("decLen: Cannot read length: bd%8 must be in range 0..4. Got: %d", d.bd%8)
 	return -1
-***REMOVED***
+}
 
-func (d *simpleDecDriver) DecodeString() (s string) ***REMOVED***
+func (d *simpleDecDriver) DecodeString() (s string) {
 	return string(d.DecodeBytes(d.b[:], true, true))
-***REMOVED***
+}
 
-func (d *simpleDecDriver) DecodeBytes(bs []byte, isstring, zerocopy bool) (bsOut []byte) ***REMOVED***
-	if !d.bdRead ***REMOVED***
+func (d *simpleDecDriver) DecodeBytes(bs []byte, isstring, zerocopy bool) (bsOut []byte) {
+	if !d.bdRead {
 		d.readNextBd()
-	***REMOVED***
-	if d.bd == simpleVdNil ***REMOVED***
+	}
+	if d.bd == simpleVdNil {
 		d.bdRead = false
 		return
-	***REMOVED***
+	}
 	clen := d.decLen()
 	d.bdRead = false
-	if zerocopy ***REMOVED***
-		if d.br ***REMOVED***
+	if zerocopy {
+		if d.br {
 			return d.r.readx(clen)
-		***REMOVED*** else if len(bs) == 0 ***REMOVED***
+		} else if len(bs) == 0 {
 			bs = d.b[:]
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return decByteSlice(d.r, clen, bs)
-***REMOVED***
+}
 
-func (d *simpleDecDriver) DecodeExt(rv interface***REMOVED******REMOVED***, xtag uint64, ext Ext) (realxtag uint64) ***REMOVED***
-	if xtag > 0xff ***REMOVED***
+func (d *simpleDecDriver) DecodeExt(rv interface{}, xtag uint64, ext Ext) (realxtag uint64) {
+	if xtag > 0xff {
 		d.d.errorf("decodeExt: tag must be <= 0xff; got: %v", xtag)
 		return
-	***REMOVED***
+	}
 	realxtag1, xbs := d.decodeExtV(ext != nil, uint8(xtag))
 	realxtag = uint64(realxtag1)
-	if ext == nil ***REMOVED***
+	if ext == nil {
 		re := rv.(*RawExt)
 		re.Tag = realxtag
 		re.Data = detachZeroCopyBytes(d.br, re.Data, xbs)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		ext.ReadExt(rv, xbs)
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func (d *simpleDecDriver) decodeExtV(verifyTag bool, tag byte) (xtag byte, xbs []byte) ***REMOVED***
-	if !d.bdRead ***REMOVED***
+func (d *simpleDecDriver) decodeExtV(verifyTag bool, tag byte) (xtag byte, xbs []byte) {
+	if !d.bdRead {
 		d.readNextBd()
-	***REMOVED***
-	switch d.bd ***REMOVED***
+	}
+	switch d.bd {
 	case simpleVdExt, simpleVdExt + 1, simpleVdExt + 2, simpleVdExt + 3, simpleVdExt + 4:
 		l := d.decLen()
 		xtag = d.r.readn1()
-		if verifyTag && xtag != tag ***REMOVED***
+		if verifyTag && xtag != tag {
 			d.d.errorf("Wrong extension tag. Got %b. Expecting: %v", xtag, tag)
 			return
-		***REMOVED***
+		}
 		xbs = d.r.readx(l)
 	case simpleVdByteArray, simpleVdByteArray + 1, simpleVdByteArray + 2, simpleVdByteArray + 3, simpleVdByteArray + 4:
 		xbs = d.DecodeBytes(nil, false, true)
 	default:
 		d.d.errorf("Invalid d.bd for extensions (Expecting extensions or byte array). Got: 0x%x", d.bd)
 		return
-	***REMOVED***
+	}
 	d.bdRead = false
 	return
-***REMOVED***
+}
 
-func (d *simpleDecDriver) DecodeNaked() ***REMOVED***
-	if !d.bdRead ***REMOVED***
+func (d *simpleDecDriver) DecodeNaked() {
+	if !d.bdRead {
 		d.readNextBd()
-	***REMOVED***
+	}
 
 	n := &d.d.n
 	var decodeFurther bool
 
-	switch d.bd ***REMOVED***
+	switch d.bd {
 	case simpleVdNil:
 		n.v = valueTypeNil
 	case simpleVdFalse:
@@ -426,13 +426,13 @@ func (d *simpleDecDriver) DecodeNaked() ***REMOVED***
 		n.v = valueTypeBool
 		n.b = true
 	case simpleVdPosInt, simpleVdPosInt + 1, simpleVdPosInt + 2, simpleVdPosInt + 3:
-		if d.h.SignedInteger ***REMOVED***
+		if d.h.SignedInteger {
 			n.v = valueTypeInt
 			n.i = d.DecodeInt(64)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			n.v = valueTypeUint
 			n.u = d.DecodeUint(64)
-		***REMOVED***
+		}
 	case simpleVdNegInt, simpleVdNegInt + 1, simpleVdNegInt + 2, simpleVdNegInt + 3:
 		n.v = valueTypeInt
 		n.i = d.DecodeInt(64)
@@ -461,13 +461,13 @@ func (d *simpleDecDriver) DecodeNaked() ***REMOVED***
 		decodeFurther = true
 	default:
 		d.d.errorf("decodeNaked: Unrecognized d.bd: 0x%x", d.bd)
-	***REMOVED***
+	}
 
-	if !decodeFurther ***REMOVED***
+	if !decodeFurther {
 		d.bdRead = false
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 //------------------------------------
 
@@ -489,30 +489,30 @@ func (d *simpleDecDriver) DecodeNaked() ***REMOVED***
 //   - strings/bytearrays are encoded as [bd] [length] [byte]...
 //
 // The full spec will be published soon.
-type SimpleHandle struct ***REMOVED***
+type SimpleHandle struct {
 	BasicHandle
 	binaryEncodingType
-***REMOVED***
+}
 
-func (h *SimpleHandle) SetBytesExt(rt reflect.Type, tag uint64, ext BytesExt) (err error) ***REMOVED***
-	return h.SetExt(rt, tag, &setExtWrapper***REMOVED***b: ext***REMOVED***)
-***REMOVED***
+func (h *SimpleHandle) SetBytesExt(rt reflect.Type, tag uint64, ext BytesExt) (err error) {
+	return h.SetExt(rt, tag, &setExtWrapper{b: ext})
+}
 
-func (h *SimpleHandle) newEncDriver(e *Encoder) encDriver ***REMOVED***
-	return &simpleEncDriver***REMOVED***e: e, w: e.w, h: h***REMOVED***
-***REMOVED***
+func (h *SimpleHandle) newEncDriver(e *Encoder) encDriver {
+	return &simpleEncDriver{e: e, w: e.w, h: h}
+}
 
-func (h *SimpleHandle) newDecDriver(d *Decoder) decDriver ***REMOVED***
-	return &simpleDecDriver***REMOVED***d: d, r: d.r, h: h, br: d.bytes***REMOVED***
-***REMOVED***
+func (h *SimpleHandle) newDecDriver(d *Decoder) decDriver {
+	return &simpleDecDriver{d: d, r: d.r, h: h, br: d.bytes}
+}
 
-func (e *simpleEncDriver) reset() ***REMOVED***
+func (e *simpleEncDriver) reset() {
 	e.w = e.e.w
-***REMOVED***
+}
 
-func (d *simpleDecDriver) reset() ***REMOVED***
+func (d *simpleDecDriver) reset() {
 	d.r = d.d.r
-***REMOVED***
+}
 
 var _ decDriver = (*simpleDecDriver)(nil)
 var _ encDriver = (*simpleEncDriver)(nil)

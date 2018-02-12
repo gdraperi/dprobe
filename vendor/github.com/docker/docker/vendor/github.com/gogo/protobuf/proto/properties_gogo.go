@@ -34,69 +34,69 @@ import (
 	"reflect"
 )
 
-func (p *Properties) setCustomEncAndDec(typ reflect.Type) ***REMOVED***
+func (p *Properties) setCustomEncAndDec(typ reflect.Type) {
 	p.ctype = typ
-	if p.Repeated ***REMOVED***
+	if p.Repeated {
 		p.enc = (*Buffer).enc_custom_slice_bytes
 		p.dec = (*Buffer).dec_custom_slice_bytes
 		p.size = size_custom_slice_bytes
-	***REMOVED*** else if typ.Kind() == reflect.Ptr ***REMOVED***
+	} else if typ.Kind() == reflect.Ptr {
 		p.enc = (*Buffer).enc_custom_bytes
 		p.dec = (*Buffer).dec_custom_bytes
 		p.size = size_custom_bytes
-	***REMOVED*** else ***REMOVED***
+	} else {
 		p.enc = (*Buffer).enc_custom_ref_bytes
 		p.dec = (*Buffer).dec_custom_ref_bytes
 		p.size = size_custom_ref_bytes
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (p *Properties) setDurationEncAndDec(typ reflect.Type) ***REMOVED***
-	if p.Repeated ***REMOVED***
-		if typ.Elem().Kind() == reflect.Ptr ***REMOVED***
+func (p *Properties) setDurationEncAndDec(typ reflect.Type) {
+	if p.Repeated {
+		if typ.Elem().Kind() == reflect.Ptr {
 			p.enc = (*Buffer).enc_slice_duration
 			p.dec = (*Buffer).dec_slice_duration
 			p.size = size_slice_duration
-		***REMOVED*** else ***REMOVED***
+		} else {
 			p.enc = (*Buffer).enc_slice_ref_duration
 			p.dec = (*Buffer).dec_slice_ref_duration
 			p.size = size_slice_ref_duration
-		***REMOVED***
-	***REMOVED*** else if typ.Kind() == reflect.Ptr ***REMOVED***
+		}
+	} else if typ.Kind() == reflect.Ptr {
 		p.enc = (*Buffer).enc_duration
 		p.dec = (*Buffer).dec_duration
 		p.size = size_duration
-	***REMOVED*** else ***REMOVED***
+	} else {
 		p.enc = (*Buffer).enc_ref_duration
 		p.dec = (*Buffer).dec_ref_duration
 		p.size = size_ref_duration
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (p *Properties) setTimeEncAndDec(typ reflect.Type) ***REMOVED***
-	if p.Repeated ***REMOVED***
-		if typ.Elem().Kind() == reflect.Ptr ***REMOVED***
+func (p *Properties) setTimeEncAndDec(typ reflect.Type) {
+	if p.Repeated {
+		if typ.Elem().Kind() == reflect.Ptr {
 			p.enc = (*Buffer).enc_slice_time
 			p.dec = (*Buffer).dec_slice_time
 			p.size = size_slice_time
-		***REMOVED*** else ***REMOVED***
+		} else {
 			p.enc = (*Buffer).enc_slice_ref_time
 			p.dec = (*Buffer).dec_slice_ref_time
 			p.size = size_slice_ref_time
-		***REMOVED***
-	***REMOVED*** else if typ.Kind() == reflect.Ptr ***REMOVED***
+		}
+	} else if typ.Kind() == reflect.Ptr {
 		p.enc = (*Buffer).enc_time
 		p.dec = (*Buffer).dec_time
 		p.size = size_time
-	***REMOVED*** else ***REMOVED***
+	} else {
 		p.enc = (*Buffer).enc_ref_time
 		p.dec = (*Buffer).dec_ref_time
 		p.size = size_ref_time
-	***REMOVED***
+	}
 
-***REMOVED***
+}
 
-func (p *Properties) setSliceOfNonPointerStructs(typ reflect.Type) ***REMOVED***
+func (p *Properties) setSliceOfNonPointerStructs(typ reflect.Type) {
 	t2 := typ.Elem()
 	p.sstype = typ
 	p.stype = t2
@@ -105,7 +105,7 @@ func (p *Properties) setSliceOfNonPointerStructs(typ reflect.Type) ***REMOVED***
 	p.enc = (*Buffer).enc_slice_ref_struct_message
 	p.dec = (*Buffer).dec_slice_ref_struct_message
 	p.size = size_slice_ref_struct_message
-	if p.Wire != "bytes" ***REMOVED***
+	if p.Wire != "bytes" {
 		fmt.Fprintf(os.Stderr, "proto: no ptr oenc for %T -> %T \n", typ, t2)
-	***REMOVED***
-***REMOVED***
+	}
+}

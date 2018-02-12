@@ -16,21 +16,21 @@ const (
 
 // challenge carries information from a WWW-Authenticate response header.
 // See RFC 2617.
-type challenge struct ***REMOVED***
+type challenge struct {
 	// scheme is the auth-scheme according to RFC 2617
 	scheme authenticationScheme
 
 	// parameters are the auth-params according to RFC 2617
 	parameters map[string]string
-***REMOVED***
+}
 
 type byScheme []challenge
 
-func (bs byScheme) Len() int      ***REMOVED*** return len(bs) ***REMOVED***
-func (bs byScheme) Swap(i, j int) ***REMOVED*** bs[i], bs[j] = bs[j], bs[i] ***REMOVED***
+func (bs byScheme) Len() int      { return len(bs) }
+func (bs byScheme) Swap(i, j int) { bs[i], bs[j] = bs[j], bs[i] }
 
 // Sort in priority order: token > digest > basic
-func (bs byScheme) Less(i, j int) bool ***REMOVED*** return bs[i].scheme > bs[j].scheme ***REMOVED***
+func (bs byScheme) Less(i, j int) bool { return bs[i].scheme > bs[j].scheme }
 
 // Octet types from RFC 2616.
 type octetType byte
@@ -42,7 +42,7 @@ const (
 	isSpace
 )
 
-func init() ***REMOVED***
+func init() {
 	// OCTET      = <any 8-bit sequence of data>
 	// CHAR       = <any US-ASCII character (octets 0 - 127)>
 	// CTL        = <any US-ASCII control character (octets 0 - 31) and DEL (127)>
@@ -55,31 +55,31 @@ func init() ***REMOVED***
 	// LWS        = [CRLF] 1*( SP | HT )
 	// TEXT       = <any OCTET except CTLs, but including LWS>
 	// separators = "(" | ")" | "<" | ">" | "@" | "," | ";" | ":" | "\" | <">
-	//              | "/" | "[" | "]" | "?" | "=" | "***REMOVED***" | "***REMOVED***" | SP | HT
+	//              | "/" | "[" | "]" | "?" | "=" | "{" | "}" | SP | HT
 	// token      = 1*<any CHAR except CTLs or separators>
 	// qdtext     = <any TEXT except <">>
 
-	for c := 0; c < 256; c++ ***REMOVED***
+	for c := 0; c < 256; c++ {
 		var t octetType
 		isCtl := c <= 31 || c == 127
 		isChar := 0 <= c && c <= 127
-		isSeparator := strings.IndexRune(" \t\"(),/:;<=>?@[]\\***REMOVED******REMOVED***", rune(c)) >= 0
-		if strings.IndexRune(" \t\r\n", rune(c)) >= 0 ***REMOVED***
+		isSeparator := strings.IndexRune(" \t\"(),/:;<=>?@[]\\{}", rune(c)) >= 0
+		if strings.IndexRune(" \t\r\n", rune(c)) >= 0 {
 			t |= isSpace
-		***REMOVED***
-		if isChar && !isCtl && !isSeparator ***REMOVED***
+		}
+		if isChar && !isCtl && !isSeparator {
 			t |= isToken
-		***REMOVED***
+		}
 		octetTypes[c] = t
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func parseAuthHeader(header http.Header) []challenge ***REMOVED***
-	challenges := []challenge***REMOVED******REMOVED***
-	for _, h := range header[http.CanonicalHeaderKey("WWW-Authenticate")] ***REMOVED***
+func parseAuthHeader(header http.Header) []challenge {
+	challenges := []challenge{}
+	for _, h := range header[http.CanonicalHeaderKey("WWW-Authenticate")] {
 		v, p := parseValueAndParams(h)
 		var s authenticationScheme
-		switch v ***REMOVED***
+		switch v {
 		case "basic":
 			s = basicAuth
 		case "digest":
@@ -88,80 +88,80 @@ func parseAuthHeader(header http.Header) []challenge ***REMOVED***
 			s = bearerAuth
 		default:
 			continue
-		***REMOVED***
-		challenges = append(challenges, challenge***REMOVED***scheme: s, parameters: p***REMOVED***)
-	***REMOVED***
+		}
+		challenges = append(challenges, challenge{scheme: s, parameters: p})
+	}
 	sort.Stable(byScheme(challenges))
 	return challenges
-***REMOVED***
+}
 
-func parseValueAndParams(header string) (value string, params map[string]string) ***REMOVED***
+func parseValueAndParams(header string) (value string, params map[string]string) {
 	params = make(map[string]string)
 	value, s := expectToken(header)
-	if value == "" ***REMOVED***
+	if value == "" {
 		return
-	***REMOVED***
+	}
 	value = strings.ToLower(value)
-	for ***REMOVED***
+	for {
 		var pkey string
 		pkey, s = expectToken(skipSpace(s))
-		if pkey == "" ***REMOVED***
+		if pkey == "" {
 			return
-		***REMOVED***
-		if !strings.HasPrefix(s, "=") ***REMOVED***
+		}
+		if !strings.HasPrefix(s, "=") {
 			return
-		***REMOVED***
+		}
 		var pvalue string
 		pvalue, s = expectTokenOrQuoted(s[1:])
-		if pvalue == "" ***REMOVED***
+		if pvalue == "" {
 			return
-		***REMOVED***
+		}
 		pkey = strings.ToLower(pkey)
 		params[pkey] = pvalue
 		s = skipSpace(s)
-		if !strings.HasPrefix(s, ",") ***REMOVED***
+		if !strings.HasPrefix(s, ",") {
 			return
-		***REMOVED***
+		}
 		s = s[1:]
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func skipSpace(s string) (rest string) ***REMOVED***
+func skipSpace(s string) (rest string) {
 	i := 0
-	for ; i < len(s); i++ ***REMOVED***
-		if octetTypes[s[i]]&isSpace == 0 ***REMOVED***
+	for ; i < len(s); i++ {
+		if octetTypes[s[i]]&isSpace == 0 {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return s[i:]
-***REMOVED***
+}
 
-func expectToken(s string) (token, rest string) ***REMOVED***
+func expectToken(s string) (token, rest string) {
 	i := 0
-	for ; i < len(s); i++ ***REMOVED***
-		if octetTypes[s[i]]&isToken == 0 ***REMOVED***
+	for ; i < len(s); i++ {
+		if octetTypes[s[i]]&isToken == 0 {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return s[:i], s[i:]
-***REMOVED***
+}
 
-func expectTokenOrQuoted(s string) (value string, rest string) ***REMOVED***
-	if !strings.HasPrefix(s, "\"") ***REMOVED***
+func expectTokenOrQuoted(s string) (value string, rest string) {
+	if !strings.HasPrefix(s, "\"") {
 		return expectToken(s)
-	***REMOVED***
+	}
 	s = s[1:]
-	for i := 0; i < len(s); i++ ***REMOVED***
-		switch s[i] ***REMOVED***
+	for i := 0; i < len(s); i++ {
+		switch s[i] {
 		case '"':
 			return s[:i], s[i+1:]
 		case '\\':
 			p := make([]byte, len(s)-1)
 			j := copy(p, s[:i])
 			escape := true
-			for i = i + 1; i < len(s); i++ ***REMOVED***
+			for i = i + 1; i < len(s); i++ {
 				b := s[i]
-				switch ***REMOVED***
+				switch {
 				case escape:
 					escape = false
 					p[j] = b
@@ -173,10 +173,10 @@ func expectTokenOrQuoted(s string) (value string, rest string) ***REMOVED***
 				default:
 					p[j] = b
 					j++
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return "", ""
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return "", ""
-***REMOVED***
+}

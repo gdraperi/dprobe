@@ -12,14 +12,14 @@ if ! command -v curl &> /dev/null; then
 	exit 1
 fi
 
-usage() ***REMOVED***
+usage() {
 	echo "usage: $0 dir image[:tag][@image-id] ..."
 	echo "   ie: $0 /tmp/hello-world hello-world"
 	echo "       $0 /tmp/debian-jessie debian:jessie"
 	echo "       $0 /tmp/old-hello-world hello-world@ef872312fe1bbc5e05aae626791a47ee9b032efa8f3bda39cc0be7b56bfe59b9"
 	echo "       $0 /tmp/old-debian debian:latest@f6fab3b798be3174f45aa1eb731f8182705555f89c9026d8c1ef230cbf8301dd"
 	[ -z "$1" ] || exit "$1"
-***REMOVED***
+}
 
 dir="$1" # dir for building tar in
 shift || usage 1 >&2
@@ -35,42 +35,42 @@ rm -f "$dir"/tags-*.tmp
 while [ $# -gt 0 ]; do
 	imageTag="$1"
 	shift
-	image="$***REMOVED***imageTag%%[:@]****REMOVED***"
-	tag="$***REMOVED***imageTag#*:***REMOVED***"
-	imageId="$***REMOVED***tag##*@***REMOVED***"
+	image="${imageTag%%[:@]*}"
+	tag="${imageTag#*:}"
+	imageId="${tag##*@}"
 	[ "$imageId" != "$tag" ] || imageId=
 	[ "$tag" != "$imageTag" ] || tag='latest'
-	tag="$***REMOVED***tag%@****REMOVED***"
+	tag="${tag%@*}"
 
-	imageFile="$***REMOVED***image//\//_***REMOVED***" # "/" can't be in filenames :)
+	imageFile="${image//\//_}" # "/" can't be in filenames :)
 
-	token="$(curl -sSL -o /dev/null -D- -H 'X-Docker-Token: true' "https://index.docker.io/v1/repositories/$image/images" | tr -d '\r' | awk -F ': *' '$1 == "X-Docker-Token" ***REMOVED*** print $2 ***REMOVED***')"
+	token="$(curl -sSL -o /dev/null -D- -H 'X-Docker-Token: true' "https://index.docker.io/v1/repositories/$image/images" | tr -d '\r' | awk -F ': *' '$1 == "X-Docker-Token" { print $2 }')"
 
 	if [ -z "$imageId" ]; then
 		imageId="$(curl -sSL -H "Authorization: Token $token" "https://registry-1.docker.io/v1/repositories/$image/tags/$tag")"
-		imageId="$***REMOVED***imageId//\"/***REMOVED***"
+		imageId="${imageId//\"/}"
 	fi
 
 	ancestryJson="$(curl -sSL -H "Authorization: Token $token" "https://registry-1.docker.io/v1/images/$imageId/ancestry")"
-	if [ "$***REMOVED***ancestryJson:0:1***REMOVED***" != '[' ]; then
+	if [ "${ancestryJson:0:1}" != '[' ]; then
 		echo >&2 "error: /v1/images/$imageId/ancestry returned something unexpected:"
 		echo >&2 "  $ancestryJson"
 		exit 1
 	fi
 
 	IFS=','
-	ancestry=( $***REMOVED***ancestryJson//[\[\] \"]/***REMOVED*** )
+	ancestry=( ${ancestryJson//[\[\] \"]/} )
 	unset IFS
 
 	if [ -s "$dir/tags-$imageFile.tmp" ]; then
 		echo -n ', ' >> "$dir/tags-$imageFile.tmp"
 	else
-		images=( "$***REMOVED***images[@]***REMOVED***" "$image" )
+		images=( "${images[@]}" "$image" )
 	fi
 	echo -n '"'"$tag"'": "'"$imageId"'"' >> "$dir/tags-$imageFile.tmp"
 
-	echo "Downloading '$imageTag' ($***REMOVED***#ancestry[@]***REMOVED*** layers)..."
-	for imageId in "$***REMOVED***ancestry[@]***REMOVED***"; do
+	echo "Downloading '$imageTag' (${#ancestry[@]} layers)..."
+	for imageId in "${ancestry[@]}"; do
 		mkdir -p "$dir/$imageId"
 		echo '1.0' > "$dir/$imageId/VERSION"
 
@@ -81,7 +81,7 @@ while [ $# -gt 0 ]; do
 		# "HTTP/1.1 416 Requested Range Not Satisfiable"
 		if [ -f "$dir/$imageId/layer.tar" ]; then
 			# TODO hackpatch for no -C support :'(
-			echo "skipping existing $***REMOVED***imageId:0:12***REMOVED***"
+			echo "skipping existing ${imageId:0:12}"
 			continue
 		fi
 		curl -SL --progress -H "Authorization: Token $token" "https://registry-1.docker.io/v1/images/$imageId/layer" -o "$dir/$imageId/layer.tar" # -C -
@@ -89,17 +89,17 @@ while [ $# -gt 0 ]; do
 	echo
 done
 
-echo -n '***REMOVED***' > "$dir/repositories"
+echo -n '{' > "$dir/repositories"
 firstImage=1
-for image in "$***REMOVED***images[@]***REMOVED***"; do
-	imageFile="$***REMOVED***image//\//_***REMOVED***" # "/" can't be in filenames :)
+for image in "${images[@]}"; do
+	imageFile="${image//\//_}" # "/" can't be in filenames :)
 
 	[ "$firstImage" ] || echo -n ',' >> "$dir/repositories"
 	firstImage=
 	echo -n $'\n\t' >> "$dir/repositories"
-	echo -n '"'"$image"'": ***REMOVED*** '"$(cat "$dir/tags-$imageFile.tmp")"' ***REMOVED***' >> "$dir/repositories"
+	echo -n '"'"$image"'": { '"$(cat "$dir/tags-$imageFile.tmp")"' }' >> "$dir/repositories"
 done
-echo -n $'\n***REMOVED***\n' >> "$dir/repositories"
+echo -n $'\n}\n' >> "$dir/repositories"
 
 rm -f "$dir"/tags-*.tmp
 

@@ -1,5 +1,5 @@
 package p
 
-type T struct***REMOVED*** X ***REMOVED***
+type T struct{ X }
 
 var _ = T.x.

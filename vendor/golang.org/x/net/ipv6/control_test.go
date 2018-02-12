@@ -10,12 +10,12 @@ import (
 	"golang.org/x/net/ipv6"
 )
 
-func TestControlMessageParseWithFuzz(t *testing.T) ***REMOVED***
+func TestControlMessageParseWithFuzz(t *testing.T) {
 	var cm ipv6.ControlMessage
-	for _, fuzz := range []string***REMOVED***
+	for _, fuzz := range []string{
 		"\f\x00\x00\x00)\x00\x00\x00.\x00\x00\x00",
 		"\f\x00\x00\x00)\x00\x00\x00,\x00\x00\x00",
-	***REMOVED*** ***REMOVED***
+	} {
 		cm.Parse([]byte(fuzz))
-	***REMOVED***
-***REMOVED***
+	}
+}

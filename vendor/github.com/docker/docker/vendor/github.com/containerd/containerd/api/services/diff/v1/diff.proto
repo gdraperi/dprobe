@@ -9,7 +9,7 @@ import "github.com/containerd/containerd/api/types/descriptor.proto";
 option go_package = "github.com/containerd/containerd/api/services/diff/v1;diff";
 
 // Diff service creates and applies diffs
-service Diff ***REMOVED***
+service Diff {
 	// Apply applies the content associated with the provided digests onto
 	// the provided mounts. Archive content will be extracted and
 	// decompressed if necessary.
@@ -18,23 +18,23 @@ service Diff ***REMOVED***
 	// Diff creates a diff between the given mounts and uploads the result
 	// to the content store.
 	rpc Diff(DiffRequest) returns (DiffResponse);
-***REMOVED***
+}
 
-message ApplyRequest ***REMOVED***
+message ApplyRequest {
 	// Diff is the descriptor of the diff to be extracted
 	containerd.types.Descriptor diff = 1;
 
 	repeated containerd.types.Mount mounts = 2;
-***REMOVED***
+}
 
-message ApplyResponse ***REMOVED***
+message ApplyResponse {
 	// Applied is the descriptor for the object which was applied.
 	// If the input was a compressed blob then the result will be
 	// the descriptor for the uncompressed blob.
 	containerd.types.Descriptor applied = 1;
-***REMOVED***
+}
 
-message DiffRequest ***REMOVED***
+message DiffRequest {
 	// Left are the mounts which represent the older copy
 	// in which is the base of the computed changes.
 	repeated containerd.types.Mount left = 1;
@@ -54,9 +54,9 @@ message DiffRequest ***REMOVED***
 	// Labels are the labels to apply to the generated content
 	// on content store commit.
 	map<string, string> labels = 5;
-***REMOVED***
+}
 
-message DiffResponse ***REMOVED***
+message DiffResponse {
 	// Diff is the descriptor of the diff which can be applied
 	containerd.types.Descriptor diff = 3;
-***REMOVED***
+}

@@ -2,24 +2,24 @@
 
 package netlink
 
-type GenlOp struct***REMOVED******REMOVED***
+type GenlOp struct{}
 
-type GenlMulticastGroup struct***REMOVED******REMOVED***
+type GenlMulticastGroup struct{}
 
-type GenlFamily struct***REMOVED******REMOVED***
+type GenlFamily struct{}
 
-func (h *Handle) GenlFamilyList() ([]*GenlFamily, error) ***REMOVED***
+func (h *Handle) GenlFamilyList() ([]*GenlFamily, error) {
 	return nil, ErrNotImplemented
-***REMOVED***
+}
 
-func GenlFamilyList() ([]*GenlFamily, error) ***REMOVED***
+func GenlFamilyList() ([]*GenlFamily, error) {
 	return nil, ErrNotImplemented
-***REMOVED***
+}
 
-func (h *Handle) GenlFamilyGet(name string) (*GenlFamily, error) ***REMOVED***
+func (h *Handle) GenlFamilyGet(name string) (*GenlFamily, error) {
 	return nil, ErrNotImplemented
-***REMOVED***
+}
 
-func GenlFamilyGet(name string) (*GenlFamily, error) ***REMOVED***
+func GenlFamilyGet(name string) (*GenlFamily, error) {
 	return nil, ErrNotImplemented
-***REMOVED***
+}

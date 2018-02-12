@@ -13,69 +13,69 @@ import (
 	"github.com/gotestyourself/gotestyourself/internal/source"
 )
 
-type skipT interface ***REMOVED***
-	Skip(args ...interface***REMOVED******REMOVED***)
-	Log(args ...interface***REMOVED******REMOVED***)
-***REMOVED***
+type skipT interface {
+	Skip(args ...interface{})
+	Log(args ...interface{})
+}
 
-type helperT interface ***REMOVED***
+type helperT interface {
 	Helper()
-***REMOVED***
+}
 
 // BoolOrCheckFunc can be a bool or func() bool, other types will panic
-type BoolOrCheckFunc interface***REMOVED******REMOVED***
+type BoolOrCheckFunc interface{}
 
 // If skips the test if the check function returns true. The skip message will
 // contain the name of the check function. Extra message text can be passed as a
 // format string with args
-func If(t skipT, condition BoolOrCheckFunc, msgAndArgs ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if ht, ok := t.(helperT); ok ***REMOVED***
+func If(t skipT, condition BoolOrCheckFunc, msgAndArgs ...interface{}) {
+	if ht, ok := t.(helperT); ok {
 		ht.Helper()
-	***REMOVED***
-	switch check := condition.(type) ***REMOVED***
+	}
+	switch check := condition.(type) {
 	case bool:
 		ifCondition(t, check, msgAndArgs...)
 	case func() bool:
-		if check() ***REMOVED***
+		if check() {
 			t.Skip(format.WithCustomMessage(getFunctionName(check), msgAndArgs...))
-		***REMOVED***
+		}
 	default:
 		panic(fmt.Sprintf("invalid type for condition arg: %T", check))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func getFunctionName(function func() bool) string ***REMOVED***
+func getFunctionName(function func() bool) string {
 	funcPath := runtime.FuncForPC(reflect.ValueOf(function).Pointer()).Name()
 	return strings.SplitN(path.Base(funcPath), ".", 2)[1]
-***REMOVED***
+}
 
 // IfCondition skips the test if the condition is true. The skip message will
 // contain the source of the expression passed as the condition. Extra message
 // text can be passed as a format string with args.
 //
 // Deprecated: Use If() which now accepts bool arguments
-func IfCondition(t skipT, condition bool, msgAndArgs ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if ht, ok := t.(helperT); ok ***REMOVED***
+func IfCondition(t skipT, condition bool, msgAndArgs ...interface{}) {
+	if ht, ok := t.(helperT); ok {
 		ht.Helper()
-	***REMOVED***
+	}
 	ifCondition(t, condition, msgAndArgs...)
-***REMOVED***
+}
 
-func ifCondition(t skipT, condition bool, msgAndArgs ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if ht, ok := t.(helperT); ok ***REMOVED***
+func ifCondition(t skipT, condition bool, msgAndArgs ...interface{}) {
+	if ht, ok := t.(helperT); ok {
 		ht.Helper()
-	***REMOVED***
-	if !condition ***REMOVED***
+	}
+	if !condition {
 		return
-	***REMOVED***
+	}
 	const (
 		stackIndex = 2
 		argPos     = 1
 	)
 	source, err := source.GetCondition(stackIndex, argPos)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Log(err.Error())
 		t.Skip(format.Message(msgAndArgs...))
-	***REMOVED***
+	}
 	t.Skip(format.WithCustomMessage(source, msgAndArgs...))
-***REMOVED***
+}

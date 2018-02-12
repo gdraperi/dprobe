@@ -1,6 +1,6 @@
-resource = [***REMOVED***
-	"foo": ***REMOVED***
-		"bar": ***REMOVED******REMOVED***,
+resource = [{
+	"foo": {
+		"bar": {},
 		"baz": [1, 2, "foo"],
-	***REMOVED***
-***REMOVED***]
+	}
+}]

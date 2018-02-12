@@ -5,10 +5,10 @@ package btrfs
 // TODO(vbatts) remove this work-around once supported linux distros are on
 // btrfs utilities of >= 3.16.1
 
-func btrfsBuildVersion() string ***REMOVED***
+func btrfsBuildVersion() string {
 	return "-"
-***REMOVED***
+}
 
-func btrfsLibVersion() int ***REMOVED***
+func btrfsLibVersion() int {
 	return -1
-***REMOVED***
+}

@@ -21,43 +21,43 @@ import (
 )
 
 // PublicKey represents an ElGamal public key.
-type PublicKey struct ***REMOVED***
+type PublicKey struct {
 	G, P, Y *big.Int
-***REMOVED***
+}
 
 // PrivateKey represents an ElGamal private key.
-type PrivateKey struct ***REMOVED***
+type PrivateKey struct {
 	PublicKey
 	X *big.Int
-***REMOVED***
+}
 
 // Encrypt encrypts the given message to the given public key. The result is a
 // pair of integers. Errors can result from reading random, or because msg is
 // too large to be encrypted to the public key.
-func Encrypt(random io.Reader, pub *PublicKey, msg []byte) (c1, c2 *big.Int, err error) ***REMOVED***
+func Encrypt(random io.Reader, pub *PublicKey, msg []byte) (c1, c2 *big.Int, err error) {
 	pLen := (pub.P.BitLen() + 7) / 8
-	if len(msg) > pLen-11 ***REMOVED***
+	if len(msg) > pLen-11 {
 		err = errors.New("elgamal: message too long")
 		return
-	***REMOVED***
+	}
 
 	// EM = 0x02 || PS || 0x00 || M
 	em := make([]byte, pLen-1)
 	em[0] = 2
 	ps, mm := em[1:len(em)-len(msg)-1], em[len(em)-len(msg):]
 	err = nonZeroRandomBytes(ps, random)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	em[len(em)-len(msg)-1] = 0
 	copy(mm, msg)
 
 	m := new(big.Int).SetBytes(em)
 
 	k, err := rand.Int(random, pub.P)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
 	c1 = new(big.Int).Exp(pub.G, k, pub.P)
 	s := new(big.Int).Exp(pub.Y, k, pub.P)
@@ -65,7 +65,7 @@ func Encrypt(random io.Reader, pub *PublicKey, msg []byte) (c1, c2 *big.Int, err
 	c2.Mod(c2, pub.P)
 
 	return
-***REMOVED***
+}
 
 // Decrypt takes two integers, resulting from an ElGamal encryption, and
 // returns the plaintext of the message. An error can result only if the
@@ -74,7 +74,7 @@ func Encrypt(random io.Reader, pub *PublicKey, msg []byte) (c1, c2 *big.Int, err
 // be used to break the cryptosystem.  See ``Chosen Ciphertext Attacks
 // Against Protocols Based on the RSA Encryption Standard PKCS #1'', Daniel
 // Bleichenbacher, Advances in Cryptology (Crypto '98),
-func Decrypt(priv *PrivateKey, c1, c2 *big.Int) (msg []byte, err error) ***REMOVED***
+func Decrypt(priv *PrivateKey, c1, c2 *big.Int) (msg []byte, err error) {
 	s := new(big.Int).Exp(c1, priv.X, priv.P)
 	s.ModInverse(s, priv.P)
 	s.Mul(s, c2)
@@ -90,33 +90,33 @@ func Decrypt(priv *PrivateKey, c1, c2 *big.Int) (msg []byte, err error) ***REMOV
 	var lookingForIndex, index int
 	lookingForIndex = 1
 
-	for i := 1; i < len(em); i++ ***REMOVED***
+	for i := 1; i < len(em); i++ {
 		equals0 := subtle.ConstantTimeByteEq(em[i], 0)
 		index = subtle.ConstantTimeSelect(lookingForIndex&equals0, i, index)
 		lookingForIndex = subtle.ConstantTimeSelect(equals0, 0, lookingForIndex)
-	***REMOVED***
+	}
 
-	if firstByteIsTwo != 1 || lookingForIndex != 0 || index < 9 ***REMOVED***
+	if firstByteIsTwo != 1 || lookingForIndex != 0 || index < 9 {
 		return nil, errors.New("elgamal: decryption error")
-	***REMOVED***
+	}
 	return em[index+1:], nil
-***REMOVED***
+}
 
 // nonZeroRandomBytes fills the given slice with non-zero random octets.
-func nonZeroRandomBytes(s []byte, rand io.Reader) (err error) ***REMOVED***
+func nonZeroRandomBytes(s []byte, rand io.Reader) (err error) {
 	_, err = io.ReadFull(rand, s)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
-	for i := 0; i < len(s); i++ ***REMOVED***
-		for s[i] == 0 ***REMOVED***
+	for i := 0; i < len(s); i++ {
+		for s[i] == 0 {
 			_, err = io.ReadFull(rand, s[i:i+1])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	return
-***REMOVED***
+}

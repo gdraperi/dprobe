@@ -11,23 +11,23 @@ import (
 	"unsafe"
 )
 
-func getsockopt(s uintptr, level, name int, b []byte) (int, error) ***REMOVED***
+func getsockopt(s uintptr, level, name int, b []byte) (int, error) {
 	l := uint32(len(b))
 	_, _, errno := syscall.Syscall6(syscall.SYS_GETSOCKOPT, s, uintptr(level), uintptr(name), uintptr(unsafe.Pointer(&b[0])), uintptr(unsafe.Pointer(&l)), 0)
 	return int(l), errnoErr(errno)
-***REMOVED***
+}
 
-func setsockopt(s uintptr, level, name int, b []byte) error ***REMOVED***
+func setsockopt(s uintptr, level, name int, b []byte) error {
 	_, _, errno := syscall.Syscall6(syscall.SYS_SETSOCKOPT, s, uintptr(level), uintptr(name), uintptr(unsafe.Pointer(&b[0])), uintptr(len(b)), 0)
 	return errnoErr(errno)
-***REMOVED***
+}
 
-func recvmsg(s uintptr, h *msghdr, flags int) (int, error) ***REMOVED***
+func recvmsg(s uintptr, h *msghdr, flags int) (int, error) {
 	n, _, errno := syscall.Syscall(syscall.SYS_RECVMSG, s, uintptr(unsafe.Pointer(h)), uintptr(flags))
 	return int(n), errnoErr(errno)
-***REMOVED***
+}
 
-func sendmsg(s uintptr, h *msghdr, flags int) (int, error) ***REMOVED***
+func sendmsg(s uintptr, h *msghdr, flags int) (int, error) {
 	n, _, errno := syscall.Syscall(syscall.SYS_SENDMSG, s, uintptr(unsafe.Pointer(h)), uintptr(flags))
 	return int(n), errnoErr(errno)
-***REMOVED***
+}

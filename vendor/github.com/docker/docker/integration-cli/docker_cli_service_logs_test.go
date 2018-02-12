@@ -16,59 +16,59 @@ import (
 	"github.com/gotestyourself/gotestyourself/icmd"
 )
 
-type logMessage struct ***REMOVED***
+type logMessage struct {
 	err  error
 	data []byte
-***REMOVED***
+}
 
-func (s *DockerSwarmSuite) TestServiceLogs(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestServiceLogs(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 
 	// we have multiple services here for detecting the goroutine issue #28915
-	services := map[string]string***REMOVED***
+	services := map[string]string{
 		"TestServiceLogs1": "hello1",
 		"TestServiceLogs2": "hello2",
-	***REMOVED***
+	}
 
-	for name, message := range services ***REMOVED***
+	for name, message := range services {
 		out, err := d.Cmd("service", "create", "--detach", "--no-resolve-image", "--name", name, "busybox",
 			"sh", "-c", fmt.Sprintf("echo %s; tail -f /dev/null", message))
 		c.Assert(err, checker.IsNil)
 		c.Assert(strings.TrimSpace(out), checker.Not(checker.Equals), "")
-	***REMOVED***
+	}
 
 	// make sure task has been deployed.
 	waitAndAssert(c, defaultReconciliationTimeout,
 		d.CheckRunningTaskImages, checker.DeepEquals,
-		map[string]int***REMOVED***"busybox:latest": len(services)***REMOVED***)
+		map[string]int{"busybox:latest": len(services)})
 
-	for name, message := range services ***REMOVED***
+	for name, message := range services {
 		out, err := d.Cmd("service", "logs", name)
 		c.Assert(err, checker.IsNil)
 		c.Logf("log for %q: %q", name, out)
 		c.Assert(out, checker.Contains, message)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // countLogLines returns a closure that can be used with waitAndAssert to
 // verify that a minimum number of expected container log messages have been
 // output.
-func countLogLines(d *daemon.Swarm, name string) func(*check.C) (interface***REMOVED******REMOVED***, check.CommentInterface) ***REMOVED***
-	return func(c *check.C) (interface***REMOVED******REMOVED***, check.CommentInterface) ***REMOVED***
+func countLogLines(d *daemon.Swarm, name string) func(*check.C) (interface{}, check.CommentInterface) {
+	return func(c *check.C) (interface{}, check.CommentInterface) {
 		result := icmd.RunCmd(d.Command("service", "logs", "-t", "--raw", name))
-		result.Assert(c, icmd.Expected***REMOVED******REMOVED***)
+		result.Assert(c, icmd.Expected{})
 		// if this returns an emptystring, trying to split it later will return
 		// an array containing emptystring. a valid log line will NEVER be
 		// emptystring because we ask for the timestamp.
-		if result.Stdout() == "" ***REMOVED***
+		if result.Stdout() == "" {
 			return 0, check.Commentf("Empty stdout")
-		***REMOVED***
+		}
 		lines := strings.Split(strings.TrimSpace(result.Stdout()), "\n")
 		return len(lines), check.Commentf("output, %q", string(result.Stdout()))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *DockerSwarmSuite) TestServiceLogsCompleteness(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestServiceLogsCompleteness(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 
 	name := "TestServiceLogsCompleteness"
@@ -90,12 +90,12 @@ func (s *DockerSwarmSuite) TestServiceLogsCompleteness(c *check.C) ***REMOVED***
 	// i have heard anecdotal reports that logs may come back from the engine
 	// mis-ordered. if this tests fails, consider the possibility that that
 	// might be occurring
-	for i, line := range lines ***REMOVED***
+	for i, line := range lines {
 		c.Assert(line, checker.Contains, fmt.Sprintf("log test %v", i))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *DockerSwarmSuite) TestServiceLogsTail(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestServiceLogsTail(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 
 	name := "TestServiceLogsTail"
@@ -113,13 +113,13 @@ func (s *DockerSwarmSuite) TestServiceLogsTail(c *check.C) ***REMOVED***
 	c.Assert(err, checker.IsNil)
 	lines := strings.Split(strings.TrimSpace(out), "\n")
 
-	for i, line := range lines ***REMOVED***
+	for i, line := range lines {
 		// doing i+5 is hacky but not too fragile, it's good enough. if it flakes something else is wrong
 		c.Assert(line, checker.Contains, fmt.Sprintf("log test %v", i+5))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *DockerSwarmSuite) TestServiceLogsSince(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestServiceLogsSince(c *check.C) {
 	// See DockerSuite.TestLogsSince, which is where this comes from
 	d := s.AddDaemon(c, true, true)
 
@@ -144,17 +144,17 @@ func (s *DockerSwarmSuite) TestServiceLogsSince(c *check.C) ***REMOVED***
 	out, err = d.Cmd("service", "logs", "-t", fmt.Sprintf("--since=%v", since), name)
 	c.Assert(err, checker.IsNil)
 
-	unexpected := []string***REMOVED***"log1", "log2"***REMOVED***
-	expected := []string***REMOVED***"log3"***REMOVED***
-	for _, v := range unexpected ***REMOVED***
+	unexpected := []string{"log1", "log2"}
+	expected := []string{"log3"}
+	for _, v := range unexpected {
 		c.Assert(out, checker.Not(checker.Contains), v, check.Commentf("unexpected log message returned, since=%v", u))
-	***REMOVED***
-	for _, v := range expected ***REMOVED***
+	}
+	for _, v := range expected {
 		c.Assert(out, checker.Contains, v, check.Commentf("expected log message %v, was not present, since=%v", u))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *DockerSwarmSuite) TestServiceLogsFollow(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestServiceLogsFollow(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 
 	name := "TestServiceLogsFollow"
@@ -166,7 +166,7 @@ func (s *DockerSwarmSuite) TestServiceLogsFollow(c *check.C) ***REMOVED***
 	// make sure task has been deployed.
 	waitAndAssert(c, defaultReconciliationTimeout, d.CheckActiveContainerCount, checker.Equals, 1)
 
-	args := []string***REMOVED***"service", "logs", "-f", name***REMOVED***
+	args := []string{"service", "logs", "-f", name}
 	cmd := exec.Command(dockerBinary, d.PrependHostArg(args)...)
 	r, w := io.Pipe()
 	cmd.Stdout = w
@@ -176,31 +176,31 @@ func (s *DockerSwarmSuite) TestServiceLogsFollow(c *check.C) ***REMOVED***
 
 	// Make sure pipe is written to
 	ch := make(chan *logMessage)
-	done := make(chan struct***REMOVED******REMOVED***)
-	go func() ***REMOVED***
+	done := make(chan struct{})
+	go func() {
 		reader := bufio.NewReader(r)
-		for ***REMOVED***
-			msg := &logMessage***REMOVED******REMOVED***
+		for {
+			msg := &logMessage{}
 			msg.data, _, msg.err = reader.ReadLine()
-			select ***REMOVED***
+			select {
 			case ch <- msg:
 			case <-done:
 				return
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***()
+			}
+		}
+	}()
 
-	for i := 0; i < 3; i++ ***REMOVED***
+	for i := 0; i < 3; i++ {
 		msg := <-ch
 		c.Assert(msg.err, checker.IsNil)
 		c.Assert(string(msg.data), checker.Contains, "log test")
-	***REMOVED***
+	}
 	close(done)
 
 	c.Assert(cmd.Process.Kill(), checker.IsNil)
-***REMOVED***
+}
 
-func (s *DockerSwarmSuite) TestServiceLogsTaskLogs(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestServiceLogsTaskLogs(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 
 	name := "TestServicelogsTaskLogs"
@@ -212,19 +212,19 @@ func (s *DockerSwarmSuite) TestServiceLogsTaskLogs(c *check.C) ***REMOVED***
 		// which has some number of replicas
 		fmt.Sprintf("--replicas=%v", replicas),
 		// which has this the task id as an environment variable templated in
-		"--env", "TASK=***REMOVED******REMOVED***.Task.ID***REMOVED******REMOVED***",
+		"--env", "TASK={{.Task.ID}}",
 		// and runs this command to print exactly 6 logs lines
 		"busybox", "sh", "-c", "for line in $(seq 0 5); do echo $TASK log test $line; done; sleep 100000",
 	))
-	result.Assert(c, icmd.Expected***REMOVED******REMOVED***)
+	result.Assert(c, icmd.Expected{})
 	// ^^ verify that we get no error
 	// then verify that we have an id in stdout
 	id := strings.TrimSpace(result.Stdout())
 	c.Assert(id, checker.Not(checker.Equals), "")
 	// so, right here, we're basically inspecting by id and returning only
 	// the ID. if they don't match, the service doesn't exist.
-	result = icmd.RunCmd(d.Command("service", "inspect", "--format=\"***REMOVED******REMOVED***.ID***REMOVED******REMOVED***\"", id))
-	result.Assert(c, icmd.Expected***REMOVED***Out: id***REMOVED***)
+	result = icmd.RunCmd(d.Command("service", "inspect", "--format=\"{{.ID}}\"", id))
+	result.Assert(c, icmd.Expected{Out: id})
 
 	// make sure task has been deployed.
 	waitAndAssert(c, defaultReconciliationTimeout, d.CheckActiveContainerCount, checker.Equals, replicas)
@@ -232,28 +232,28 @@ func (s *DockerSwarmSuite) TestServiceLogsTaskLogs(c *check.C) ***REMOVED***
 
 	// get the task ids
 	result = icmd.RunCmd(d.Command("service", "ps", "-q", name))
-	result.Assert(c, icmd.Expected***REMOVED******REMOVED***)
+	result.Assert(c, icmd.Expected{})
 	// make sure we have two tasks
 	taskIDs := strings.Split(strings.TrimSpace(result.Stdout()), "\n")
 	c.Assert(taskIDs, checker.HasLen, replicas)
 
-	for _, taskID := range taskIDs ***REMOVED***
+	for _, taskID := range taskIDs {
 		c.Logf("checking task %v", taskID)
 		result := icmd.RunCmd(d.Command("service", "logs", taskID))
-		result.Assert(c, icmd.Expected***REMOVED******REMOVED***)
+		result.Assert(c, icmd.Expected{})
 		lines := strings.Split(strings.TrimSpace(result.Stdout()), "\n")
 
 		c.Logf("checking messages for %v", taskID)
-		for i, line := range lines ***REMOVED***
+		for i, line := range lines {
 			// make sure the message is in order
 			c.Assert(line, checker.Contains, fmt.Sprintf("log test %v", i))
 			// make sure it contains the task id
 			c.Assert(line, checker.Contains, taskID)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (s *DockerSwarmSuite) TestServiceLogsTTY(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestServiceLogsTTY(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 
 	name := "TestServiceLogsTTY"
@@ -271,13 +271,13 @@ func (s *DockerSwarmSuite) TestServiceLogsTTY(c *check.C) ***REMOVED***
 		"echo out; (echo err 1>&2); sleep 10000",
 	))
 
-	result.Assert(c, icmd.Expected***REMOVED******REMOVED***)
+	result.Assert(c, icmd.Expected{})
 	id := strings.TrimSpace(result.Stdout())
 	c.Assert(id, checker.Not(checker.Equals), "")
 	// so, right here, we're basically inspecting by id and returning only
 	// the ID. if they don't match, the service doesn't exist.
-	result = icmd.RunCmd(d.Command("service", "inspect", "--format=\"***REMOVED******REMOVED***.ID***REMOVED******REMOVED***\"", id))
-	result.Assert(c, icmd.Expected***REMOVED***Out: id***REMOVED***)
+	result = icmd.RunCmd(d.Command("service", "inspect", "--format=\"{{.ID}}\"", id))
+	result.Assert(c, icmd.Expected{Out: id})
 
 	// make sure task has been deployed.
 	waitAndAssert(c, defaultReconciliationTimeout, d.CheckActiveContainerCount, checker.Equals, 1)
@@ -288,10 +288,10 @@ func (s *DockerSwarmSuite) TestServiceLogsTTY(c *check.C) ***REMOVED***
 	result = icmd.RunCmd(cmd)
 	// for some reason there is carriage return in the output. i think this is
 	// just expected.
-	result.Assert(c, icmd.Expected***REMOVED***Out: "out\r\nerr\r\n"***REMOVED***)
-***REMOVED***
+	result.Assert(c, icmd.Expected{Out: "out\r\nerr\r\n"})
+}
 
-func (s *DockerSwarmSuite) TestServiceLogsNoHangDeletedContainer(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestServiceLogsNoHangDeletedContainer(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 
 	name := "TestServiceLogsNoHangDeletedContainer"
@@ -308,7 +308,7 @@ func (s *DockerSwarmSuite) TestServiceLogsNoHangDeletedContainer(c *check.C) ***
 	))
 
 	// confirm that the command succeeded
-	result.Assert(c, icmd.Expected***REMOVED******REMOVED***)
+	result.Assert(c, icmd.Expected{})
 	// get the service id
 	id := strings.TrimSpace(result.Stdout())
 	c.Assert(id, checker.Not(checker.Equals), "")
@@ -323,9 +323,9 @@ func (s *DockerSwarmSuite) TestServiceLogsNoHangDeletedContainer(c *check.C) ***
 	containerID := strings.TrimSpace(result.Stdout())
 	c.Assert(containerID, checker.Not(checker.Equals), "")
 	result = icmd.RunCmd(d.Command("stop", containerID))
-	result.Assert(c, icmd.Expected***REMOVED***Out: containerID***REMOVED***)
+	result.Assert(c, icmd.Expected{Out: containerID})
 	result = icmd.RunCmd(d.Command("rm", containerID))
-	result.Assert(c, icmd.Expected***REMOVED***Out: containerID***REMOVED***)
+	result.Assert(c, icmd.Expected{Out: containerID})
 
 	// run logs. use tail 2 to make sure we don't try to get a bunch of logs
 	// somehow and slow down execution time
@@ -337,10 +337,10 @@ func (s *DockerSwarmSuite) TestServiceLogsNoHangDeletedContainer(c *check.C) ***
 	// then, assert that the result matches expected. if the command timed out,
 	// if the command is timed out, result.Timeout will be true, but the
 	// Expected defaults to false
-	result.Assert(c, icmd.Expected***REMOVED******REMOVED***)
-***REMOVED***
+	result.Assert(c, icmd.Expected{})
+}
 
-func (s *DockerSwarmSuite) TestServiceLogsDetails(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestServiceLogsDetails(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 
 	name := "TestServiceLogsDetails"
@@ -362,7 +362,7 @@ func (s *DockerSwarmSuite) TestServiceLogsDetails(c *check.C) ***REMOVED***
 		"echo LogLine; while true; do sleep 1; done;",
 	))
 
-	result.Assert(c, icmd.Expected***REMOVED******REMOVED***)
+	result.Assert(c, icmd.Expected{})
 	id := strings.TrimSpace(result.Stdout())
 	c.Assert(id, checker.Not(checker.Equals), "")
 
@@ -377,12 +377,12 @@ func (s *DockerSwarmSuite) TestServiceLogsDetails(c *check.C) ***REMOVED***
 	// in this case, we should get details and we should get log message, but
 	// there will also be context as details (which will fall after the detail
 	// we inserted in alphabetical order
-	result.Assert(c, icmd.Expected***REMOVED***Out: "asdf=test1"***REMOVED***)
-	result.Assert(c, icmd.Expected***REMOVED***Out: "LogLine"***REMOVED***)
+	result.Assert(c, icmd.Expected{Out: "asdf=test1"})
+	result.Assert(c, icmd.Expected{Out: "LogLine"})
 
 	// call service logs with details. this time, don't pass raw
 	result = icmd.RunCmd(d.Command("service", "logs", "--details", id))
 	// in this case, we should get details space logmessage as well. the context
 	// is part of the pretty part of the logline
-	result.Assert(c, icmd.Expected***REMOVED***Out: "asdf=test1 LogLine"***REMOVED***)
-***REMOVED***
+	result.Assert(c, icmd.Expected{Out: "asdf=test1 LogLine"})
+}

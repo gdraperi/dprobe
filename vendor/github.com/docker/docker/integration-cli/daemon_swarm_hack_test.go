@@ -5,19 +5,19 @@ import (
 	"github.com/go-check/check"
 )
 
-func (s *DockerSwarmSuite) getDaemon(c *check.C, nodeID string) *daemon.Swarm ***REMOVED***
+func (s *DockerSwarmSuite) getDaemon(c *check.C, nodeID string) *daemon.Swarm {
 	s.daemonsLock.Lock()
 	defer s.daemonsLock.Unlock()
-	for _, d := range s.daemons ***REMOVED***
-		if d.NodeID == nodeID ***REMOVED***
+	for _, d := range s.daemons {
+		if d.NodeID == nodeID {
 			return d
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	c.Fatalf("could not find node with id: %s", nodeID)
 	return nil
-***REMOVED***
+}
 
 // nodeCmd executes a command on a given node via the normal docker socket
-func (s *DockerSwarmSuite) nodeCmd(c *check.C, id string, args ...string) (string, error) ***REMOVED***
+func (s *DockerSwarmSuite) nodeCmd(c *check.C, id string, args ...string) (string, error) {
 	return s.getDaemon(c, id).Cmd(args...)
-***REMOVED***
+}

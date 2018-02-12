@@ -362,7 +362,7 @@ interface(`docker_admin',`
 		type docker_config_t;
 	')
 
-	allow $1 docker_t:process ***REMOVED*** ptrace signal_perms ***REMOVED***;
+	allow $1 docker_t:process { ptrace signal_perms };
 	ps_process_pattern($1, docker_t)
 
 	admin_pattern($1, docker_config_t)

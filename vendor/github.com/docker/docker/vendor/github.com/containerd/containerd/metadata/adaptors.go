@@ -9,105 +9,105 @@ import (
 	"github.com/containerd/containerd/images"
 )
 
-func adaptImage(o interface***REMOVED******REMOVED***) filters.Adaptor ***REMOVED***
+func adaptImage(o interface{}) filters.Adaptor {
 	obj := o.(images.Image)
-	return filters.AdapterFunc(func(fieldpath []string) (string, bool) ***REMOVED***
-		if len(fieldpath) == 0 ***REMOVED***
+	return filters.AdapterFunc(func(fieldpath []string) (string, bool) {
+		if len(fieldpath) == 0 {
 			return "", false
-		***REMOVED***
+		}
 
-		switch fieldpath[0] ***REMOVED***
+		switch fieldpath[0] {
 		case "name":
 			return obj.Name, len(obj.Name) > 0
 		case "target":
-			if len(fieldpath) < 2 ***REMOVED***
+			if len(fieldpath) < 2 {
 				return "", false
-			***REMOVED***
+			}
 
-			switch fieldpath[1] ***REMOVED***
+			switch fieldpath[1] {
 			case "digest":
 				return obj.Target.Digest.String(), len(obj.Target.Digest) > 0
 			case "mediatype":
 				return obj.Target.MediaType, len(obj.Target.MediaType) > 0
-			***REMOVED***
+			}
 		case "labels":
 			return checkMap(fieldpath[1:], obj.Labels)
 			// TODO(stevvooe): Greater/Less than filters would be awesome for
 			// size. Let's do it!
-		***REMOVED***
+		}
 
 		return "", false
-	***REMOVED***)
-***REMOVED***
-func adaptContainer(o interface***REMOVED******REMOVED***) filters.Adaptor ***REMOVED***
+	})
+}
+func adaptContainer(o interface{}) filters.Adaptor {
 	obj := o.(containers.Container)
-	return filters.AdapterFunc(func(fieldpath []string) (string, bool) ***REMOVED***
-		if len(fieldpath) == 0 ***REMOVED***
+	return filters.AdapterFunc(func(fieldpath []string) (string, bool) {
+		if len(fieldpath) == 0 {
 			return "", false
-		***REMOVED***
+		}
 
-		switch fieldpath[0] ***REMOVED***
+		switch fieldpath[0] {
 		case "id":
 			return obj.ID, len(obj.ID) > 0
 		case "runtime":
-			if len(fieldpath) <= 1 ***REMOVED***
+			if len(fieldpath) <= 1 {
 				return "", false
-			***REMOVED***
+			}
 
-			switch fieldpath[1] ***REMOVED***
+			switch fieldpath[1] {
 			case "name":
 				return obj.Runtime.Name, len(obj.Runtime.Name) > 0
 			default:
 				return "", false
-			***REMOVED***
+			}
 		case "image":
 			return obj.Image, len(obj.Image) > 0
 		case "labels":
 			return checkMap(fieldpath[1:], obj.Labels)
-		***REMOVED***
+		}
 
 		return "", false
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func adaptContentInfo(info content.Info) filters.Adaptor ***REMOVED***
-	return filters.AdapterFunc(func(fieldpath []string) (string, bool) ***REMOVED***
-		if len(fieldpath) == 0 ***REMOVED***
+func adaptContentInfo(info content.Info) filters.Adaptor {
+	return filters.AdapterFunc(func(fieldpath []string) (string, bool) {
+		if len(fieldpath) == 0 {
 			return "", false
-		***REMOVED***
+		}
 
-		switch fieldpath[0] ***REMOVED***
+		switch fieldpath[0] {
 		case "digest":
 			return info.Digest.String(), true
 		case "size":
 			// TODO: support size based filtering
 		case "labels":
 			return checkMap(fieldpath[1:], info.Labels)
-		***REMOVED***
+		}
 
 		return "", false
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func adaptContentStatus(status content.Status) filters.Adaptor ***REMOVED***
-	return filters.AdapterFunc(func(fieldpath []string) (string, bool) ***REMOVED***
-		if len(fieldpath) == 0 ***REMOVED***
+func adaptContentStatus(status content.Status) filters.Adaptor {
+	return filters.AdapterFunc(func(fieldpath []string) (string, bool) {
+		if len(fieldpath) == 0 {
 			return "", false
-		***REMOVED***
-		switch fieldpath[0] ***REMOVED***
+		}
+		switch fieldpath[0] {
 		case "ref":
 			return status.Ref, true
-		***REMOVED***
+		}
 
 		return "", false
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func checkMap(fieldpath []string, m map[string]string) (string, bool) ***REMOVED***
-	if len(m) == 0 ***REMOVED***
+func checkMap(fieldpath []string, m map[string]string) (string, bool) {
+	if len(m) == 0 {
 		return "", false
-	***REMOVED***
+	}
 
 	value, ok := m[strings.Join(fieldpath, ".")]
 	return value, ok
-***REMOVED***
+}

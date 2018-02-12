@@ -20,7 +20,7 @@ const (
 type ConfigEventType uint8
 
 // Provider provides clustering config details
-type Provider interface ***REMOVED***
+type Provider interface {
 	IsManager() bool
 	IsAgent() bool
 	GetLocalAddress() string
@@ -33,4 +33,4 @@ type Provider interface ***REMOVED***
 	DetachNetwork(string, string) error
 	UpdateAttachment(string, string, *network.NetworkingConfig) error
 	WaitForDetachment(context.Context, string, string, string, string) error
-***REMOVED***
+}

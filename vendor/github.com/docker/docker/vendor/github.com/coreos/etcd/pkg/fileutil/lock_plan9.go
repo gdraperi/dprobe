@@ -20,26 +20,26 @@ import (
 	"time"
 )
 
-func TryLockFile(path string, flag int, perm os.FileMode) (*LockedFile, error) ***REMOVED***
-	if err := os.Chmod(path, syscall.DMEXCL|PrivateFileMode); err != nil ***REMOVED***
+func TryLockFile(path string, flag int, perm os.FileMode) (*LockedFile, error) {
+	if err := os.Chmod(path, syscall.DMEXCL|PrivateFileMode); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	f, err := os.Open(path, flag, perm)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, ErrLocked
-	***REMOVED***
-	return &LockedFile***REMOVED***f***REMOVED***, nil
-***REMOVED***
+	}
+	return &LockedFile{f}, nil
+}
 
-func LockFile(path string, flag int, perm os.FileMode) (*LockedFile, error) ***REMOVED***
-	if err := os.Chmod(path, syscall.DMEXCL|PrivateFileMode); err != nil ***REMOVED***
+func LockFile(path string, flag int, perm os.FileMode) (*LockedFile, error) {
+	if err := os.Chmod(path, syscall.DMEXCL|PrivateFileMode); err != nil {
 		return nil, err
-	***REMOVED***
-	for ***REMOVED***
+	}
+	for {
 		f, err := os.OpenFile(path, flag, perm)
-		if err == nil ***REMOVED***
-			return &LockedFile***REMOVED***f***REMOVED***, nil
-		***REMOVED***
+		if err == nil {
+			return &LockedFile{f}, nil
+		}
 		time.Sleep(10 * time.Millisecond)
-	***REMOVED***
-***REMOVED***
+	}
+}

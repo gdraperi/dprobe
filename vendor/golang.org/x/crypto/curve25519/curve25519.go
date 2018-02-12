@@ -21,62 +21,62 @@ import (
 // context.
 type fieldElement [10]int32
 
-func feZero(fe *fieldElement) ***REMOVED***
-	for i := range fe ***REMOVED***
+func feZero(fe *fieldElement) {
+	for i := range fe {
 		fe[i] = 0
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func feOne(fe *fieldElement) ***REMOVED***
+func feOne(fe *fieldElement) {
 	feZero(fe)
 	fe[0] = 1
-***REMOVED***
+}
 
-func feAdd(dst, a, b *fieldElement) ***REMOVED***
-	for i := range dst ***REMOVED***
+func feAdd(dst, a, b *fieldElement) {
+	for i := range dst {
 		dst[i] = a[i] + b[i]
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func feSub(dst, a, b *fieldElement) ***REMOVED***
-	for i := range dst ***REMOVED***
+func feSub(dst, a, b *fieldElement) {
+	for i := range dst {
 		dst[i] = a[i] - b[i]
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func feCopy(dst, src *fieldElement) ***REMOVED***
-	for i := range dst ***REMOVED***
+func feCopy(dst, src *fieldElement) {
+	for i := range dst {
 		dst[i] = src[i]
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // feCSwap replaces (f,g) with (g,f) if b == 1; replaces (f,g) with (f,g) if b == 0.
 //
-// Preconditions: b in ***REMOVED***0,1***REMOVED***.
-func feCSwap(f, g *fieldElement, b int32) ***REMOVED***
+// Preconditions: b in {0,1}.
+func feCSwap(f, g *fieldElement, b int32) {
 	b = -b
-	for i := range f ***REMOVED***
+	for i := range f {
 		t := b & (f[i] ^ g[i])
 		f[i] ^= t
 		g[i] ^= t
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // load3 reads a 24-bit, little-endian value from in.
-func load3(in []byte) int64 ***REMOVED***
+func load3(in []byte) int64 {
 	var r int64
 	r = int64(in[0])
 	r |= int64(in[1]) << 8
 	r |= int64(in[2]) << 16
 	return r
-***REMOVED***
+}
 
 // load4 reads a 32-bit, little-endian value from in.
-func load4(in []byte) int64 ***REMOVED***
+func load4(in []byte) int64 {
 	return int64(binary.LittleEndian.Uint32(in))
-***REMOVED***
+}
 
-func feFromBytes(dst *fieldElement, src *[32]byte) ***REMOVED***
+func feFromBytes(dst *fieldElement, src *[32]byte) {
 	h0 := load4(src[:])
 	h1 := load3(src[4:]) << 6
 	h2 := load3(src[7:]) << 5
@@ -131,7 +131,7 @@ func feFromBytes(dst *fieldElement, src *[32]byte) ***REMOVED***
 	dst[7] = int32(h7)
 	dst[8] = int32(h8)
 	dst[9] = int32(h9)
-***REMOVED***
+}
 
 // feToBytes marshals h to s.
 // Preconditions:
@@ -156,7 +156,7 @@ func feFromBytes(dst *fieldElement, src *[32]byte) ***REMOVED***
 //
 //   Have q+2^(-255)x = 2^(-255)(h + 19 2^(-25) h9 + 2^(-1))
 //   so floor(2^(-255)(h + 19 2^(-25) h9 + 2^(-1))) = q.
-func feToBytes(s *[32]byte, h *fieldElement) ***REMOVED***
+func feToBytes(s *[32]byte, h *fieldElement) {
 	var carry [10]int32
 
 	q := (19*h[9] + (1 << 24)) >> 25
@@ -243,7 +243,7 @@ func feToBytes(s *[32]byte, h *fieldElement) ***REMOVED***
 	s[29] = byte(h[9] >> 2)
 	s[30] = byte(h[9] >> 10)
 	s[31] = byte(h[9] >> 18)
-***REMOVED***
+}
 
 // feMul calculates h = f * g
 // Can overlap h with f or g.
@@ -272,7 +272,7 @@ func feToBytes(s *[32]byte, h *fieldElement) ***REMOVED***
 // Can get away with 11 carries, but then data flow is much deeper.
 //
 // With tighter constraints on inputs can squeeze carries into int32.
-func feMul(h, f, g *fieldElement) ***REMOVED***
+func feMul(h, f, g *fieldElement) {
 	f0 := f[0]
 	f1 := f[1]
 	f2 := f[2]
@@ -501,7 +501,7 @@ func feMul(h, f, g *fieldElement) ***REMOVED***
 	h[7] = int32(h7)
 	h[8] = int32(h8)
 	h[9] = int32(h9)
-***REMOVED***
+}
 
 // feSquare calculates h = f*f. Can overlap h with f.
 //
@@ -510,7 +510,7 @@ func feMul(h, f, g *fieldElement) ***REMOVED***
 //
 // Postconditions:
 //    |h| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
-func feSquare(h, f *fieldElement) ***REMOVED***
+func feSquare(h, f *fieldElement) {
 	f0 := f[0]
 	f1 := f[1]
 	f2 := f[2]
@@ -654,7 +654,7 @@ func feSquare(h, f *fieldElement) ***REMOVED***
 	h[7] = int32(h7)
 	h[8] = int32(h8)
 	h[9] = int32(h9)
-***REMOVED***
+}
 
 // feMul121666 calculates h = f * 121666. Can overlap h with f.
 //
@@ -663,7 +663,7 @@ func feSquare(h, f *fieldElement) ***REMOVED***
 //
 // Postconditions:
 //    |h| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
-func feMul121666(h, f *fieldElement) ***REMOVED***
+func feMul121666(h, f *fieldElement) {
 	h0 := int64(f[0]) * 121666
 	h1 := int64(f[1]) * 121666
 	h2 := int64(f[2]) * 121666
@@ -718,71 +718,71 @@ func feMul121666(h, f *fieldElement) ***REMOVED***
 	h[7] = int32(h7)
 	h[8] = int32(h8)
 	h[9] = int32(h9)
-***REMOVED***
+}
 
 // feInvert sets out = z^-1.
-func feInvert(out, z *fieldElement) ***REMOVED***
+func feInvert(out, z *fieldElement) {
 	var t0, t1, t2, t3 fieldElement
 	var i int
 
 	feSquare(&t0, z)
-	for i = 1; i < 1; i++ ***REMOVED***
+	for i = 1; i < 1; i++ {
 		feSquare(&t0, &t0)
-	***REMOVED***
+	}
 	feSquare(&t1, &t0)
-	for i = 1; i < 2; i++ ***REMOVED***
+	for i = 1; i < 2; i++ {
 		feSquare(&t1, &t1)
-	***REMOVED***
+	}
 	feMul(&t1, z, &t1)
 	feMul(&t0, &t0, &t1)
 	feSquare(&t2, &t0)
-	for i = 1; i < 1; i++ ***REMOVED***
+	for i = 1; i < 1; i++ {
 		feSquare(&t2, &t2)
-	***REMOVED***
+	}
 	feMul(&t1, &t1, &t2)
 	feSquare(&t2, &t1)
-	for i = 1; i < 5; i++ ***REMOVED***
+	for i = 1; i < 5; i++ {
 		feSquare(&t2, &t2)
-	***REMOVED***
+	}
 	feMul(&t1, &t2, &t1)
 	feSquare(&t2, &t1)
-	for i = 1; i < 10; i++ ***REMOVED***
+	for i = 1; i < 10; i++ {
 		feSquare(&t2, &t2)
-	***REMOVED***
+	}
 	feMul(&t2, &t2, &t1)
 	feSquare(&t3, &t2)
-	for i = 1; i < 20; i++ ***REMOVED***
+	for i = 1; i < 20; i++ {
 		feSquare(&t3, &t3)
-	***REMOVED***
+	}
 	feMul(&t2, &t3, &t2)
 	feSquare(&t2, &t2)
-	for i = 1; i < 10; i++ ***REMOVED***
+	for i = 1; i < 10; i++ {
 		feSquare(&t2, &t2)
-	***REMOVED***
+	}
 	feMul(&t1, &t2, &t1)
 	feSquare(&t2, &t1)
-	for i = 1; i < 50; i++ ***REMOVED***
+	for i = 1; i < 50; i++ {
 		feSquare(&t2, &t2)
-	***REMOVED***
+	}
 	feMul(&t2, &t2, &t1)
 	feSquare(&t3, &t2)
-	for i = 1; i < 100; i++ ***REMOVED***
+	for i = 1; i < 100; i++ {
 		feSquare(&t3, &t3)
-	***REMOVED***
+	}
 	feMul(&t2, &t3, &t2)
 	feSquare(&t2, &t2)
-	for i = 1; i < 50; i++ ***REMOVED***
+	for i = 1; i < 50; i++ {
 		feSquare(&t2, &t2)
-	***REMOVED***
+	}
 	feMul(&t1, &t2, &t1)
 	feSquare(&t1, &t1)
-	for i = 1; i < 5; i++ ***REMOVED***
+	for i = 1; i < 5; i++ {
 		feSquare(&t1, &t1)
-	***REMOVED***
+	}
 	feMul(out, &t1, &t0)
-***REMOVED***
+}
 
-func scalarMult(out, in, base *[32]byte) ***REMOVED***
+func scalarMult(out, in, base *[32]byte) {
 	var e [32]byte
 
 	copy(e[:], in[:])
@@ -797,7 +797,7 @@ func scalarMult(out, in, base *[32]byte) ***REMOVED***
 	feOne(&z3)
 
 	swap := int32(0)
-	for pos := 254; pos >= 0; pos-- ***REMOVED***
+	for pos := 254; pos >= 0; pos-- {
 		b := e[pos/8] >> uint(pos&7)
 		b &= 1
 		swap ^= int32(b)
@@ -823,7 +823,7 @@ func scalarMult(out, in, base *[32]byte) ***REMOVED***
 		feAdd(&tmp0, &tmp0, &z3)
 		feMul(&z3, &x1, &z2)
 		feMul(&z2, &tmp1, &tmp0)
-	***REMOVED***
+	}
 
 	feCSwap(&x2, &x3, swap)
 	feCSwap(&z2, &z3, swap)
@@ -831,4 +831,4 @@ func scalarMult(out, in, base *[32]byte) ***REMOVED***
 	feInvert(&z2, &z2)
 	feMul(&x2, &x2, &z2)
 	feToBytes(out, &x2)
-***REMOVED***
+}

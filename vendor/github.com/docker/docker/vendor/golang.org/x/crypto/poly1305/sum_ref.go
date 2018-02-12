@@ -11,7 +11,7 @@ import "encoding/binary"
 // Sum generates an authenticator for msg using a one-time key and puts the
 // 16-byte result into out. Authenticating two different messages with the same
 // key allows an attacker to forge messages at will.
-func Sum(out *[TagSize]byte, msg []byte, key *[32]byte) ***REMOVED***
+func Sum(out *[TagSize]byte, msg []byte, key *[32]byte) {
 	var (
 		h0, h1, h2, h3, h4 uint32 // the hash accumulators
 		r0, r1, r2, r3, r4 uint64 // the r part of the key
@@ -25,7 +25,7 @@ func Sum(out *[TagSize]byte, msg []byte, key *[32]byte) ***REMOVED***
 
 	R1, R2, R3, R4 := r1*5, r2*5, r3*5, r4*5
 
-	for len(msg) >= TagSize ***REMOVED***
+	for len(msg) >= TagSize {
 		// h += msg
 		h0 += binary.LittleEndian.Uint32(msg[0:]) & 0x3ffffff
 		h1 += (binary.LittleEndian.Uint32(msg[3:]) >> 2) & 0x3ffffff
@@ -52,9 +52,9 @@ func Sum(out *[TagSize]byte, msg []byte, key *[32]byte) ***REMOVED***
 		h0 = h0 & 0x3ffffff
 
 		msg = msg[TagSize:]
-	***REMOVED***
+	}
 
-	if len(msg) > 0 ***REMOVED***
+	if len(msg) > 0 {
 		var block [TagSize]byte
 		off := copy(block[:], msg)
 		block[off] = 0x01
@@ -83,7 +83,7 @@ func Sum(out *[TagSize]byte, msg []byte, key *[32]byte) ***REMOVED***
 		h0 += uint32(d4>>26) * 5
 		h1 += h0 >> 26
 		h0 = h0 & 0x3ffffff
-	***REMOVED***
+	}
 
 	// h %= p reduction
 	h2 += h1 >> 26
@@ -138,4 +138,4 @@ func Sum(out *[TagSize]byte, msg []byte, key *[32]byte) ***REMOVED***
 	binary.LittleEndian.PutUint32(out[4:], h1)
 	binary.LittleEndian.PutUint32(out[8:], h2)
 	binary.LittleEndian.PutUint32(out[12:], h3)
-***REMOVED***
+}

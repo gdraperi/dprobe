@@ -26,7 +26,7 @@ const (
 
 // NetworkDB instance drives the networkdb cluster and acts the broker
 // for cluster-scoped and network-scoped gossip and watches.
-type NetworkDB struct ***REMOVED***
+type NetworkDB struct {
 	// The clocks MUST be the first things
 	// in this struct due to Golang issue #599.
 
@@ -69,7 +69,7 @@ type NetworkDB struct ***REMOVED***
 
 	// A table of ack channels for every node from which we are
 	// waiting for an ack.
-	bulkSyncAckTbl map[string]chan struct***REMOVED******REMOVED***
+	bulkSyncAckTbl map[string]chan struct{}
 
 	// Broadcast queue for network event gossip.
 	networkBroadcasts *memberlist.TransmitLimitedQueue
@@ -79,7 +79,7 @@ type NetworkDB struct ***REMOVED***
 
 	// A central stop channel to stop all go routines running on
 	// behalf of the NetworkDB instance.
-	stopCh chan struct***REMOVED******REMOVED***
+	stopCh chan struct{}
 
 	// A central broadcaster for all local watchers watching table
 	// events.
@@ -101,28 +101,28 @@ type NetworkDB struct ***REMOVED***
 
 	// lastHealthTimestamp is the last timestamp when the health score got printed
 	lastHealthTimestamp time.Time
-***REMOVED***
+}
 
 // PeerInfo represents the peer (gossip cluster) nodes of a network
-type PeerInfo struct ***REMOVED***
+type PeerInfo struct {
 	Name string
 	IP   string
-***REMOVED***
+}
 
 // PeerClusterInfo represents the peer (gossip cluster) nodes
-type PeerClusterInfo struct ***REMOVED***
+type PeerClusterInfo struct {
 	PeerInfo
-***REMOVED***
+}
 
-type node struct ***REMOVED***
+type node struct {
 	memberlist.Node
 	ltime serf.LamportTime
 	// Number of hours left before the reaper removes the node
 	reapTime time.Duration
-***REMOVED***
+}
 
 // network describes the node/network attachment.
-type network struct ***REMOVED***
+type network struct {
 	// Network ID
 	id string
 
@@ -147,11 +147,11 @@ type network struct ***REMOVED***
 	// Its use is for statistics purposes. It keep tracks of database size and is printed per network every StatsPrintPeriod
 	// interval
 	entriesNumber int
-***REMOVED***
+}
 
 // Config represents the configuration of the networdb instance and
 // can be passed by the caller.
-type Config struct ***REMOVED***
+type Config struct {
 	// NodeID is the node unique identifier of the node when is part of the cluster
 	NodeID string
 
@@ -195,10 +195,10 @@ type Config struct ***REMOVED***
 	// HealthPrintPeriod the period to use to print the health score
 	// Default is 1min
 	HealthPrintPeriod time.Duration
-***REMOVED***
+}
 
 // entry defines a table entry
-type entry struct ***REMOVED***
+type entry struct {
 	// node from which this entry was learned.
 	node string
 
@@ -215,12 +215,12 @@ type entry struct ***REMOVED***
 	// Number of seconds still left before a deleted table entry gets
 	// removed from networkDB
 	reapTime time.Duration
-***REMOVED***
+}
 
 // DefaultConfig returns a NetworkDB config with default values
-func DefaultConfig() *Config ***REMOVED***
+func DefaultConfig() *Config {
 	hostname, _ := os.Hostname()
-	return &Config***REMOVED***
+	return &Config{
 		NodeID:            stringid.TruncateID(stringid.GenerateRandomID()),
 		Hostname:          hostname,
 		BindAddr:          "0.0.0.0",
@@ -228,18 +228,18 @@ func DefaultConfig() *Config ***REMOVED***
 		StatsPrintPeriod:  5 * time.Minute,
 		HealthPrintPeriod: 1 * time.Minute,
 		reapEntryInterval: 30 * time.Minute,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // New creates a new instance of NetworkDB using the Config passed by
 // the caller.
-func New(c *Config) (*NetworkDB, error) ***REMOVED***
+func New(c *Config) (*NetworkDB, error) {
 	// The garbage collection logic for entries leverage the presence of the network.
 	// For this reason the expiration time of the network is put slightly higher than the entry expiration so that
 	// there is at least 5 extra cycle to make sure that all the entries are properly deleted before deleting the network.
 	c.reapNetworkInterval = c.reapEntryInterval + 5*reapPeriod
 
-	nDB := &NetworkDB***REMOVED***
+	nDB := &NetworkDB{
 		config:         c,
 		indexes:        make(map[int]*radix.Tree),
 		networks:       make(map[string]map[string]*network),
@@ -247,226 +247,226 @@ func New(c *Config) (*NetworkDB, error) ***REMOVED***
 		failedNodes:    make(map[string]*node),
 		leftNodes:      make(map[string]*node),
 		networkNodes:   make(map[string][]string),
-		bulkSyncAckTbl: make(map[string]chan struct***REMOVED******REMOVED***),
+		bulkSyncAckTbl: make(map[string]chan struct{}),
 		broadcaster:    events.NewBroadcaster(),
-	***REMOVED***
+	}
 
 	nDB.indexes[byTable] = radix.New()
 	nDB.indexes[byNetwork] = radix.New()
 
 	logrus.Infof("New memberlist node - Node:%v will use memberlist nodeID:%v with config:%+v", c.Hostname, c.NodeID, c)
-	if err := nDB.clusterInit(); err != nil ***REMOVED***
+	if err := nDB.clusterInit(); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	return nDB, nil
-***REMOVED***
+}
 
 // Join joins this NetworkDB instance with a list of peer NetworkDB
 // instances passed by the caller in the form of addr:port
-func (nDB *NetworkDB) Join(members []string) error ***REMOVED***
+func (nDB *NetworkDB) Join(members []string) error {
 	nDB.Lock()
 	nDB.bootStrapIP = make([]net.IP, 0, len(members))
-	for _, m := range members ***REMOVED***
+	for _, m := range members {
 		nDB.bootStrapIP = append(nDB.bootStrapIP, net.ParseIP(m))
-	***REMOVED***
+	}
 	nDB.Unlock()
 	return nDB.clusterJoin(members)
-***REMOVED***
+}
 
 // Close destroys this NetworkDB instance by leave the cluster,
 // stopping timers, canceling goroutines etc.
-func (nDB *NetworkDB) Close() ***REMOVED***
-	if err := nDB.clusterLeave(); err != nil ***REMOVED***
+func (nDB *NetworkDB) Close() {
+	if err := nDB.clusterLeave(); err != nil {
 		logrus.Errorf("%v(%v) Could not close DB: %v", nDB.config.Hostname, nDB.config.NodeID, err)
-	***REMOVED***
+	}
 
 	//Avoid (*Broadcaster).run goroutine leak
 	nDB.broadcaster.Close()
-***REMOVED***
+}
 
 // ClusterPeers returns all the gossip cluster peers.
-func (nDB *NetworkDB) ClusterPeers() []PeerInfo ***REMOVED***
+func (nDB *NetworkDB) ClusterPeers() []PeerInfo {
 	nDB.RLock()
 	defer nDB.RUnlock()
 	peers := make([]PeerInfo, 0, len(nDB.nodes))
-	for _, node := range nDB.nodes ***REMOVED***
-		peers = append(peers, PeerInfo***REMOVED***
+	for _, node := range nDB.nodes {
+		peers = append(peers, PeerInfo{
 			Name: node.Name,
 			IP:   node.Node.Addr.String(),
-		***REMOVED***)
-	***REMOVED***
+		})
+	}
 	return peers
-***REMOVED***
+}
 
 // Peers returns the gossip peers for a given network.
-func (nDB *NetworkDB) Peers(nid string) []PeerInfo ***REMOVED***
+func (nDB *NetworkDB) Peers(nid string) []PeerInfo {
 	nDB.RLock()
 	defer nDB.RUnlock()
 	peers := make([]PeerInfo, 0, len(nDB.networkNodes[nid]))
-	for _, nodeName := range nDB.networkNodes[nid] ***REMOVED***
-		if node, ok := nDB.nodes[nodeName]; ok ***REMOVED***
-			peers = append(peers, PeerInfo***REMOVED***
+	for _, nodeName := range nDB.networkNodes[nid] {
+		if node, ok := nDB.nodes[nodeName]; ok {
+			peers = append(peers, PeerInfo{
 				Name: node.Name,
 				IP:   node.Addr.String(),
-			***REMOVED***)
-		***REMOVED*** else ***REMOVED***
+			})
+		} else {
 			// Added for testing purposes, this condition should never happen else mean that the network list
 			// is out of sync with the node list
-			peers = append(peers, PeerInfo***REMOVED******REMOVED***)
-		***REMOVED***
-	***REMOVED***
+			peers = append(peers, PeerInfo{})
+		}
+	}
 	return peers
-***REMOVED***
+}
 
 // GetEntry retrieves the value of a table entry in a given (network,
 // table, key) tuple
-func (nDB *NetworkDB) GetEntry(tname, nid, key string) ([]byte, error) ***REMOVED***
+func (nDB *NetworkDB) GetEntry(tname, nid, key string) ([]byte, error) {
 	entry, err := nDB.getEntry(tname, nid, key)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	return entry.value, nil
-***REMOVED***
+}
 
-func (nDB *NetworkDB) getEntry(tname, nid, key string) (*entry, error) ***REMOVED***
+func (nDB *NetworkDB) getEntry(tname, nid, key string) (*entry, error) {
 	nDB.RLock()
 	defer nDB.RUnlock()
 
 	e, ok := nDB.indexes[byTable].Get(fmt.Sprintf("/%s/%s/%s", tname, nid, key))
-	if !ok ***REMOVED***
+	if !ok {
 		return nil, types.NotFoundErrorf("could not get entry in table %s with network id %s and key %s", tname, nid, key)
-	***REMOVED***
+	}
 
 	return e.(*entry), nil
-***REMOVED***
+}
 
 // CreateEntry creates a table entry in NetworkDB for given (network,
 // table, key) tuple and if the NetworkDB is part of the cluster
 // propagates this event to the cluster. It is an error to create an
 // entry for the same tuple for which there is already an existing
 // entry unless the current entry is deleting state.
-func (nDB *NetworkDB) CreateEntry(tname, nid, key string, value []byte) error ***REMOVED***
+func (nDB *NetworkDB) CreateEntry(tname, nid, key string, value []byte) error {
 	oldEntry, err := nDB.getEntry(tname, nid, key)
-	if err != nil ***REMOVED***
-		if _, ok := err.(types.NotFoundError); !ok ***REMOVED***
+	if err != nil {
+		if _, ok := err.(types.NotFoundError); !ok {
 			return fmt.Errorf("cannot create entry in table %s with network id %s and key %s: %v", tname, nid, key, err)
-		***REMOVED***
-	***REMOVED***
-	if oldEntry != nil && !oldEntry.deleting ***REMOVED***
+		}
+	}
+	if oldEntry != nil && !oldEntry.deleting {
 		return fmt.Errorf("cannot create entry in table %s with network id %s and key %s, already exists", tname, nid, key)
-	***REMOVED***
+	}
 
-	entry := &entry***REMOVED***
+	entry := &entry{
 		ltime: nDB.tableClock.Increment(),
 		node:  nDB.config.NodeID,
 		value: value,
-	***REMOVED***
+	}
 
-	if err := nDB.sendTableEvent(TableEventTypeCreate, nid, tname, key, entry); err != nil ***REMOVED***
+	if err := nDB.sendTableEvent(TableEventTypeCreate, nid, tname, key, entry); err != nil {
 		return fmt.Errorf("cannot send create event for table %s, %v", tname, err)
-	***REMOVED***
+	}
 
 	nDB.Lock()
 	nDB.createOrUpdateEntry(nid, tname, key, entry)
 	nDB.Unlock()
 
 	return nil
-***REMOVED***
+}
 
 // UpdateEntry updates a table entry in NetworkDB for given (network,
 // table, key) tuple and if the NetworkDB is part of the cluster
 // propagates this event to the cluster. It is an error to update a
 // non-existent entry.
-func (nDB *NetworkDB) UpdateEntry(tname, nid, key string, value []byte) error ***REMOVED***
-	if _, err := nDB.GetEntry(tname, nid, key); err != nil ***REMOVED***
+func (nDB *NetworkDB) UpdateEntry(tname, nid, key string, value []byte) error {
+	if _, err := nDB.GetEntry(tname, nid, key); err != nil {
 		return fmt.Errorf("cannot update entry as the entry in table %s with network id %s and key %s does not exist", tname, nid, key)
-	***REMOVED***
+	}
 
-	entry := &entry***REMOVED***
+	entry := &entry{
 		ltime: nDB.tableClock.Increment(),
 		node:  nDB.config.NodeID,
 		value: value,
-	***REMOVED***
+	}
 
-	if err := nDB.sendTableEvent(TableEventTypeUpdate, nid, tname, key, entry); err != nil ***REMOVED***
+	if err := nDB.sendTableEvent(TableEventTypeUpdate, nid, tname, key, entry); err != nil {
 		return fmt.Errorf("cannot send table update event: %v", err)
-	***REMOVED***
+	}
 
 	nDB.Lock()
 	nDB.createOrUpdateEntry(nid, tname, key, entry)
 	nDB.Unlock()
 
 	return nil
-***REMOVED***
+}
 
 // TableElem elem
-type TableElem struct ***REMOVED***
+type TableElem struct {
 	Value []byte
 	owner string
-***REMOVED***
+}
 
 // GetTableByNetwork walks the networkdb by the give table and network id and
 // returns a map of keys and values
-func (nDB *NetworkDB) GetTableByNetwork(tname, nid string) map[string]*TableElem ***REMOVED***
+func (nDB *NetworkDB) GetTableByNetwork(tname, nid string) map[string]*TableElem {
 	entries := make(map[string]*TableElem)
-	nDB.indexes[byTable].WalkPrefix(fmt.Sprintf("/%s/%s", tname, nid), func(k string, v interface***REMOVED******REMOVED***) bool ***REMOVED***
+	nDB.indexes[byTable].WalkPrefix(fmt.Sprintf("/%s/%s", tname, nid), func(k string, v interface{}) bool {
 		entry := v.(*entry)
-		if entry.deleting ***REMOVED***
+		if entry.deleting {
 			return false
-		***REMOVED***
+		}
 		key := k[strings.LastIndex(k, "/")+1:]
-		entries[key] = &TableElem***REMOVED***Value: entry.value, owner: entry.node***REMOVED***
+		entries[key] = &TableElem{Value: entry.value, owner: entry.node}
 		return false
-	***REMOVED***)
+	})
 	return entries
-***REMOVED***
+}
 
 // DeleteEntry deletes a table entry in NetworkDB for given (network,
 // table, key) tuple and if the NetworkDB is part of the cluster
 // propagates this event to the cluster.
-func (nDB *NetworkDB) DeleteEntry(tname, nid, key string) error ***REMOVED***
+func (nDB *NetworkDB) DeleteEntry(tname, nid, key string) error {
 	value, err := nDB.GetEntry(tname, nid, key)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("cannot delete entry as the entry in table %s with network id %s and key %s does not exist", tname, nid, key)
-	***REMOVED***
+	}
 
-	entry := &entry***REMOVED***
+	entry := &entry{
 		ltime:    nDB.tableClock.Increment(),
 		node:     nDB.config.NodeID,
 		value:    value,
 		deleting: true,
 		reapTime: nDB.config.reapEntryInterval,
-	***REMOVED***
+	}
 
-	if err := nDB.sendTableEvent(TableEventTypeDelete, nid, tname, key, entry); err != nil ***REMOVED***
+	if err := nDB.sendTableEvent(TableEventTypeDelete, nid, tname, key, entry); err != nil {
 		return fmt.Errorf("cannot send table delete event: %v", err)
-	***REMOVED***
+	}
 
 	nDB.Lock()
 	nDB.createOrUpdateEntry(nid, tname, key, entry)
 	nDB.Unlock()
 
 	return nil
-***REMOVED***
+}
 
-func (nDB *NetworkDB) deleteNodeFromNetworks(deletedNode string) ***REMOVED***
-	for nid, nodes := range nDB.networkNodes ***REMOVED***
+func (nDB *NetworkDB) deleteNodeFromNetworks(deletedNode string) {
+	for nid, nodes := range nDB.networkNodes {
 		updatedNodes := make([]string, 0, len(nodes))
-		for _, node := range nodes ***REMOVED***
-			if node == deletedNode ***REMOVED***
+		for _, node := range nodes {
+			if node == deletedNode {
 				continue
-			***REMOVED***
+			}
 
 			updatedNodes = append(updatedNodes, node)
-		***REMOVED***
+		}
 
 		nDB.networkNodes[nid] = updatedNodes
-	***REMOVED***
+	}
 
 	delete(nDB.networks, deletedNode)
-***REMOVED***
+}
 
 // deleteNodeNetworkEntries is called in 2 conditions with 2 different outcomes:
 // 1) when a notification is coming of a node leaving the network
@@ -481,12 +481,12 @@ func (nDB *NetworkDB) deleteNodeFromNetworks(deletedNode string) ***REMOVED***
 //			B) if the entry is owned by a remote node, then we can safely delete it. This
 //			ensures that if we join back this network as we receive the CREATE event for
 //		  entries owned by remote nodes, we will accept them and we notify the application
-func (nDB *NetworkDB) deleteNodeNetworkEntries(nid, node string) ***REMOVED***
+func (nDB *NetworkDB) deleteNodeNetworkEntries(nid, node string) {
 	// Indicates if the delete is triggered for the local node
 	isNodeLocal := node == nDB.config.NodeID
 
 	nDB.indexes[byNetwork].WalkPrefix(fmt.Sprintf("/%s", nid),
-		func(path string, v interface***REMOVED******REMOVED***) bool ***REMOVED***
+		func(path string, v interface{}) bool {
 			oldEntry := v.(*entry)
 			params := strings.Split(path[1:], "/")
 			nid := params[0]
@@ -494,57 +494,57 @@ func (nDB *NetworkDB) deleteNodeNetworkEntries(nid, node string) ***REMOVED***
 			key := params[2]
 
 			// If the entry is owned by a remote node and this node is not leaving the network
-			if oldEntry.node != node && !isNodeLocal ***REMOVED***
+			if oldEntry.node != node && !isNodeLocal {
 				// Don't do anything because the event is triggered for a node that does not own this entry
 				return false
-			***REMOVED***
+			}
 
 			// If this entry is already marked for deletion and this node is not leaving the network
-			if oldEntry.deleting && !isNodeLocal ***REMOVED***
+			if oldEntry.deleting && !isNodeLocal {
 				// Don't do anything this entry will be already garbage collected using the old reapTime
 				return false
-			***REMOVED***
+			}
 
-			entry := &entry***REMOVED***
+			entry := &entry{
 				ltime:    oldEntry.ltime,
 				node:     oldEntry.node,
 				value:    oldEntry.value,
 				deleting: true,
 				reapTime: nDB.config.reapEntryInterval,
-			***REMOVED***
+			}
 
 			// we arrived at this point in 2 cases:
 			// 1) this entry is owned by the node that is leaving the network
 			// 2) the local node is leaving the network
-			if oldEntry.node == node ***REMOVED***
-				if isNodeLocal ***REMOVED***
+			if oldEntry.node == node {
+				if isNodeLocal {
 					// TODO fcrisciani: this can be removed if there is no way to leave the network
 					// without doing a delete of all the objects
 					entry.ltime++
-				***REMOVED***
+				}
 
-				if !oldEntry.deleting ***REMOVED***
+				if !oldEntry.deleting {
 					nDB.createOrUpdateEntry(nid, tname, key, entry)
-				***REMOVED***
-			***REMOVED*** else ***REMOVED***
+				}
+			} else {
 				// the local node is leaving the network, all the entries of remote nodes can be safely removed
 				nDB.deleteEntry(nid, tname, key)
-			***REMOVED***
+			}
 
 			// Notify to the upper layer only entries not already marked for deletion
-			if !oldEntry.deleting ***REMOVED***
+			if !oldEntry.deleting {
 				nDB.broadcaster.Write(makeEvent(opDelete, tname, nid, key, entry.value))
-			***REMOVED***
+			}
 			return false
-		***REMOVED***)
-***REMOVED***
+		})
+}
 
-func (nDB *NetworkDB) deleteNodeTableEntries(node string) ***REMOVED***
-	nDB.indexes[byTable].Walk(func(path string, v interface***REMOVED******REMOVED***) bool ***REMOVED***
+func (nDB *NetworkDB) deleteNodeTableEntries(node string) {
+	nDB.indexes[byTable].Walk(func(path string, v interface{}) bool {
 		oldEntry := v.(*entry)
-		if oldEntry.node != node ***REMOVED***
+		if oldEntry.node != node {
 			return false
-		***REMOVED***
+		}
 
 		params := strings.Split(path[1:], "/")
 		tname := params[0]
@@ -553,82 +553,82 @@ func (nDB *NetworkDB) deleteNodeTableEntries(node string) ***REMOVED***
 
 		nDB.deleteEntry(nid, tname, key)
 
-		if !oldEntry.deleting ***REMOVED***
+		if !oldEntry.deleting {
 			nDB.broadcaster.Write(makeEvent(opDelete, tname, nid, key, oldEntry.value))
-		***REMOVED***
+		}
 		return false
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
 // WalkTable walks a single table in NetworkDB and invokes the passed
 // function for each entry in the table passing the network, key,
 // value. The walk stops if the passed function returns a true.
-func (nDB *NetworkDB) WalkTable(tname string, fn func(string, string, []byte, bool) bool) error ***REMOVED***
+func (nDB *NetworkDB) WalkTable(tname string, fn func(string, string, []byte, bool) bool) error {
 	nDB.RLock()
-	values := make(map[string]interface***REMOVED******REMOVED***)
-	nDB.indexes[byTable].WalkPrefix(fmt.Sprintf("/%s", tname), func(path string, v interface***REMOVED******REMOVED***) bool ***REMOVED***
+	values := make(map[string]interface{})
+	nDB.indexes[byTable].WalkPrefix(fmt.Sprintf("/%s", tname), func(path string, v interface{}) bool {
 		values[path] = v
 		return false
-	***REMOVED***)
+	})
 	nDB.RUnlock()
 
-	for k, v := range values ***REMOVED***
+	for k, v := range values {
 		params := strings.Split(k[1:], "/")
 		nid := params[1]
 		key := params[2]
-		if fn(nid, key, v.(*entry).value, v.(*entry).deleting) ***REMOVED***
+		if fn(nid, key, v.(*entry).value, v.(*entry).deleting) {
 			return nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
 // JoinNetwork joins this node to a given network and propagates this
 // event across the cluster. This triggers this node joining the
 // sub-cluster of this network and participates in the network-scoped
 // gossip and bulk sync for this network.
-func (nDB *NetworkDB) JoinNetwork(nid string) error ***REMOVED***
+func (nDB *NetworkDB) JoinNetwork(nid string) error {
 	ltime := nDB.networkClock.Increment()
 
 	nDB.Lock()
 	nodeNetworks, ok := nDB.networks[nDB.config.NodeID]
-	if !ok ***REMOVED***
+	if !ok {
 		nodeNetworks = make(map[string]*network)
 		nDB.networks[nDB.config.NodeID] = nodeNetworks
-	***REMOVED***
+	}
 	n, ok := nodeNetworks[nid]
 	var entries int
-	if ok ***REMOVED***
+	if ok {
 		entries = n.entriesNumber
-	***REMOVED***
-	nodeNetworks[nid] = &network***REMOVED***id: nid, ltime: ltime, entriesNumber: entries***REMOVED***
-	nodeNetworks[nid].tableBroadcasts = &memberlist.TransmitLimitedQueue***REMOVED***
-		NumNodes: func() int ***REMOVED***
+	}
+	nodeNetworks[nid] = &network{id: nid, ltime: ltime, entriesNumber: entries}
+	nodeNetworks[nid].tableBroadcasts = &memberlist.TransmitLimitedQueue{
+		NumNodes: func() int {
 			//TODO fcrisciani this can be optimized maybe avoiding the lock?
 			// this call is done each GetBroadcasts call to evaluate the number of
 			// replicas for the message
 			nDB.RLock()
 			defer nDB.RUnlock()
 			return len(nDB.networkNodes[nid])
-		***REMOVED***,
+		},
 		RetransmitMult: 4,
-	***REMOVED***
+	}
 	nDB.addNetworkNode(nid, nDB.config.NodeID)
 	networkNodes := nDB.networkNodes[nid]
 	nDB.Unlock()
 
-	if err := nDB.sendNetworkEvent(nid, NetworkEventTypeJoin, ltime); err != nil ***REMOVED***
+	if err := nDB.sendNetworkEvent(nid, NetworkEventTypeJoin, ltime); err != nil {
 		return fmt.Errorf("failed to send leave network event for %s: %v", nid, err)
-	***REMOVED***
+	}
 
 	logrus.Debugf("%v(%v): joined network %s", nDB.config.Hostname, nDB.config.NodeID, nid)
-	if _, err := nDB.bulkSync(networkNodes, true); err != nil ***REMOVED***
+	if _, err := nDB.bulkSync(networkNodes, true); err != nil {
 		logrus.Errorf("Error bulk syncing while joining network %s: %v", nid, err)
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // LeaveNetwork leaves this node from a given network and propagates
 // this event across the cluster. This triggers this node leaving the
@@ -636,11 +636,11 @@ func (nDB *NetworkDB) JoinNetwork(nid string) error ***REMOVED***
 // participate in the network-scoped gossip and bulk sync for this
 // network. Also remove all the table entries for this network from
 // networkdb
-func (nDB *NetworkDB) LeaveNetwork(nid string) error ***REMOVED***
+func (nDB *NetworkDB) LeaveNetwork(nid string) error {
 	ltime := nDB.networkClock.Increment()
-	if err := nDB.sendNetworkEvent(nid, NetworkEventTypeLeave, ltime); err != nil ***REMOVED***
+	if err := nDB.sendNetworkEvent(nid, NetworkEventTypeLeave, ltime); err != nil {
 		return fmt.Errorf("failed to send leave network event for %s: %v", nid, err)
-	***REMOVED***
+	}
 
 	nDB.Lock()
 	defer nDB.Unlock()
@@ -652,108 +652,108 @@ func (nDB *NetworkDB) LeaveNetwork(nid string) error ***REMOVED***
 	nDB.deleteNodeNetworkEntries(nid, nDB.config.NodeID)
 
 	nodeNetworks, ok := nDB.networks[nDB.config.NodeID]
-	if !ok ***REMOVED***
+	if !ok {
 		return fmt.Errorf("could not find self node for network %s while trying to leave", nid)
-	***REMOVED***
+	}
 
 	n, ok := nodeNetworks[nid]
-	if !ok ***REMOVED***
+	if !ok {
 		return fmt.Errorf("could not find network %s while trying to leave", nid)
-	***REMOVED***
+	}
 
 	logrus.Debugf("%v(%v): leaving network %s", nDB.config.Hostname, nDB.config.NodeID, nid)
 	n.ltime = ltime
 	n.reapTime = nDB.config.reapNetworkInterval
 	n.leaving = true
 	return nil
-***REMOVED***
+}
 
 // addNetworkNode adds the node to the list of nodes which participate
 // in the passed network only if it is not already present. Caller
 // should hold the NetworkDB lock while calling this
-func (nDB *NetworkDB) addNetworkNode(nid string, nodeName string) ***REMOVED***
+func (nDB *NetworkDB) addNetworkNode(nid string, nodeName string) {
 	nodes := nDB.networkNodes[nid]
-	for _, node := range nodes ***REMOVED***
-		if node == nodeName ***REMOVED***
+	for _, node := range nodes {
+		if node == nodeName {
 			return
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	nDB.networkNodes[nid] = append(nDB.networkNodes[nid], nodeName)
-***REMOVED***
+}
 
 // Deletes the node from the list of nodes which participate in the
 // passed network. Caller should hold the NetworkDB lock while calling
 // this
-func (nDB *NetworkDB) deleteNetworkNode(nid string, nodeName string) ***REMOVED***
+func (nDB *NetworkDB) deleteNetworkNode(nid string, nodeName string) {
 	nodes, ok := nDB.networkNodes[nid]
-	if !ok || len(nodes) == 0 ***REMOVED***
+	if !ok || len(nodes) == 0 {
 		return
-	***REMOVED***
+	}
 	newNodes := make([]string, 0, len(nodes)-1)
-	for _, name := range nodes ***REMOVED***
-		if name == nodeName ***REMOVED***
+	for _, name := range nodes {
+		if name == nodeName {
 			continue
-		***REMOVED***
+		}
 		newNodes = append(newNodes, name)
-	***REMOVED***
+	}
 	nDB.networkNodes[nid] = newNodes
-***REMOVED***
+}
 
 // findCommonnetworks find the networks that both this node and the
 // passed node have joined.
-func (nDB *NetworkDB) findCommonNetworks(nodeName string) []string ***REMOVED***
+func (nDB *NetworkDB) findCommonNetworks(nodeName string) []string {
 	nDB.RLock()
 	defer nDB.RUnlock()
 
 	var networks []string
-	for nid := range nDB.networks[nDB.config.NodeID] ***REMOVED***
-		if n, ok := nDB.networks[nodeName][nid]; ok ***REMOVED***
-			if !n.leaving ***REMOVED***
+	for nid := range nDB.networks[nDB.config.NodeID] {
+		if n, ok := nDB.networks[nodeName][nid]; ok {
+			if !n.leaving {
 				networks = append(networks, nid)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	return networks
-***REMOVED***
+}
 
-func (nDB *NetworkDB) updateLocalNetworkTime() ***REMOVED***
+func (nDB *NetworkDB) updateLocalNetworkTime() {
 	nDB.Lock()
 	defer nDB.Unlock()
 
 	ltime := nDB.networkClock.Increment()
-	for _, n := range nDB.networks[nDB.config.NodeID] ***REMOVED***
+	for _, n := range nDB.networks[nDB.config.NodeID] {
 		n.ltime = ltime
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // createOrUpdateEntry this function handles the creation or update of entries into the local
 // tree store. It is also used to keep in sync the entries number of the network (all tables are aggregated)
-func (nDB *NetworkDB) createOrUpdateEntry(nid, tname, key string, entry interface***REMOVED******REMOVED***) (bool, bool) ***REMOVED***
+func (nDB *NetworkDB) createOrUpdateEntry(nid, tname, key string, entry interface{}) (bool, bool) {
 	_, okTable := nDB.indexes[byTable].Insert(fmt.Sprintf("/%s/%s/%s", tname, nid, key), entry)
 	_, okNetwork := nDB.indexes[byNetwork].Insert(fmt.Sprintf("/%s/%s/%s", nid, tname, key), entry)
-	if !okNetwork ***REMOVED***
+	if !okNetwork {
 		// Add only if it is an insert not an update
 		n, ok := nDB.networks[nDB.config.NodeID][nid]
-		if ok ***REMOVED***
+		if ok {
 			n.entriesNumber++
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return okTable, okNetwork
-***REMOVED***
+}
 
 // deleteEntry this function handles the deletion of entries into the local tree store.
 // It is also used to keep in sync the entries number of the network (all tables are aggregated)
-func (nDB *NetworkDB) deleteEntry(nid, tname, key string) (bool, bool) ***REMOVED***
+func (nDB *NetworkDB) deleteEntry(nid, tname, key string) (bool, bool) {
 	_, okTable := nDB.indexes[byTable].Delete(fmt.Sprintf("/%s/%s/%s", tname, nid, key))
 	_, okNetwork := nDB.indexes[byNetwork].Delete(fmt.Sprintf("/%s/%s/%s", nid, tname, key))
-	if okNetwork ***REMOVED***
+	if okNetwork {
 		// Remove only if the delete is successful
 		n, ok := nDB.networks[nDB.config.NodeID][nid]
-		if ok ***REMOVED***
+		if ok {
 			n.entriesNumber--
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return okTable, okNetwork
-***REMOVED***
+}

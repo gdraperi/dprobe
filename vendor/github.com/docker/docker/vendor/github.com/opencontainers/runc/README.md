@@ -131,12 +131,12 @@ Your process field in the `config.json` should look like this below with `"termi
 
 
 ```json
-        "process": ***REMOVED***
+        "process": {
                 "terminal": false,
-                "user": ***REMOVED***
+                "user": {
                         "uid": 0,
                         "gid": 0
-            ***REMOVED***,
+                },
                 "args": [
                         "sleep", "5"
                 ],
@@ -145,7 +145,7 @@ Your process field in the `config.json` should look like this below with `"termi
                         "TERM=xterm"
                 ],
                 "cwd": "/",
-                "capabilities": ***REMOVED***
+                "capabilities": {
                         "bounding": [
                                 "CAP_AUDIT_WRITE",
                                 "CAP_KILL",
@@ -171,16 +171,16 @@ Your process field in the `config.json` should look like this below with `"termi
                                 "CAP_KILL",
                                 "CAP_NET_BIND_SERVICE"
                         ]
-            ***REMOVED***,
+                },
                 "rlimits": [
-                        ***REMOVED***
+                        {
                                 "type": "RLIMIT_NOFILE",
                                 "hard": 1024,
                                 "soft": 1024
-                    ***REMOVED***
+                        }
                 ],
                 "noNewPrivileges": true
-    ***REMOVED***,
+        },
 ```
 
 Now we can go through the lifecycle operations in your shell.

@@ -8,7 +8,7 @@ package google
 
 import "google.golang.org/appengine"
 
-func init() ***REMOVED***
+func init() {
 	appengineTokenFunc = appengine.AccessToken
 	appengineAppIDFunc = appengine.AppID
-***REMOVED***
+}

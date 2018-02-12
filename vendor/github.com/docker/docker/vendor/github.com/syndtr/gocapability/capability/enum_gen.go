@@ -2,8 +2,8 @@
 
 package capability
 
-func (c Cap) String() string ***REMOVED***
-	switch c ***REMOVED***
+func (c Cap) String() string {
+	switch c {
 	case CAP_CHOWN:
 		return "chown"
 	case CAP_DAC_OVERRIDE:
@@ -80,13 +80,13 @@ func (c Cap) String() string ***REMOVED***
 		return "block_suspend"
 	case CAP_AUDIT_READ:
 		return "audit_read"
-	***REMOVED***
+	}
 	return "unknown"
-***REMOVED***
+}
 
 // List returns list of all supported capabilities
-func List() []Cap ***REMOVED***
-	return []Cap***REMOVED***
+func List() []Cap {
+	return []Cap{
 		CAP_CHOWN,
 		CAP_DAC_OVERRIDE,
 		CAP_DAC_READ_SEARCH,
@@ -125,5 +125,5 @@ func List() []Cap ***REMOVED***
 		CAP_WAKE_ALARM,
 		CAP_BLOCK_SUSPEND,
 		CAP_AUDIT_READ,
-	***REMOVED***
-***REMOVED***
+	}
+}

@@ -29,18 +29,18 @@ var appengineAppIDFunc func(c context.Context) string
 // that involves user accounts, see oauth2.Config instead.
 //
 // The provided context must have come from appengine.NewContext.
-func AppEngineTokenSource(ctx context.Context, scope ...string) oauth2.TokenSource ***REMOVED***
-	if appengineTokenFunc == nil ***REMOVED***
+func AppEngineTokenSource(ctx context.Context, scope ...string) oauth2.TokenSource {
+	if appengineTokenFunc == nil {
 		panic("google: AppEngineTokenSource can only be used on App Engine.")
-	***REMOVED***
-	scopes := append([]string***REMOVED******REMOVED***, scope...)
+	}
+	scopes := append([]string{}, scope...)
 	sort.Strings(scopes)
-	return &appEngineTokenSource***REMOVED***
+	return &appEngineTokenSource{
 		ctx:    ctx,
 		scopes: scopes,
 		key:    strings.Join(scopes, " "),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // aeTokens helps the fetched tokens to be reused until their expiration.
 var (
@@ -48,42 +48,42 @@ var (
 	aeTokens   = make(map[string]*tokenLock) // key is space-separated scopes
 )
 
-type tokenLock struct ***REMOVED***
+type tokenLock struct {
 	mu sync.Mutex // guards t; held while fetching or updating t
 	t  *oauth2.Token
-***REMOVED***
+}
 
-type appEngineTokenSource struct ***REMOVED***
+type appEngineTokenSource struct {
 	ctx    context.Context
 	scopes []string
 	key    string // to aeTokens map; space-separated scopes
-***REMOVED***
+}
 
-func (ts *appEngineTokenSource) Token() (*oauth2.Token, error) ***REMOVED***
-	if appengineTokenFunc == nil ***REMOVED***
+func (ts *appEngineTokenSource) Token() (*oauth2.Token, error) {
+	if appengineTokenFunc == nil {
 		panic("google: AppEngineTokenSource can only be used on App Engine.")
-	***REMOVED***
+	}
 
 	aeTokensMu.Lock()
 	tok, ok := aeTokens[ts.key]
-	if !ok ***REMOVED***
-		tok = &tokenLock***REMOVED******REMOVED***
+	if !ok {
+		tok = &tokenLock{}
 		aeTokens[ts.key] = tok
-	***REMOVED***
+	}
 	aeTokensMu.Unlock()
 
 	tok.mu.Lock()
 	defer tok.mu.Unlock()
-	if tok.t.Valid() ***REMOVED***
+	if tok.t.Valid() {
 		return tok.t, nil
-	***REMOVED***
+	}
 	access, exp, err := appengineTokenFunc(ts.ctx, ts.scopes...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	tok.t = &oauth2.Token***REMOVED***
+	}
+	tok.t = &oauth2.Token{
 		AccessToken: access,
 		Expiry:      exp,
-	***REMOVED***
+	}
 	return tok.t, nil
-***REMOVED***
+}

@@ -8,12 +8,12 @@ import (
 // DefaultBackoffConfig uses values specified for backoff in
 // https://github.com/grpc/grpc/blob/master/doc/connection-backoff.md.
 var (
-	DefaultBackoffConfig = BackoffConfig***REMOVED***
+	DefaultBackoffConfig = BackoffConfig{
 		MaxDelay:  120 * time.Second,
 		baseDelay: 1.0 * time.Second,
 		factor:    1.6,
 		jitter:    0.2,
-	***REMOVED***
+	}
 )
 
 // backoffStrategy defines the methodology for backing off after a grpc
@@ -22,14 +22,14 @@ var (
 // This is unexported until the gRPC project decides whether or not to allow
 // alternative backoff strategies. Once a decision is made, this type and its
 // method may be exported.
-type backoffStrategy interface ***REMOVED***
+type backoffStrategy interface {
 	// backoff returns the amount of time to wait before the next retry given
 	// the number of consecutive failures.
 	backoff(retries int) time.Duration
-***REMOVED***
+}
 
 // BackoffConfig defines the parameters for the default gRPC backoff strategy.
-type BackoffConfig struct ***REMOVED***
+type BackoffConfig struct {
 	// MaxDelay is the upper bound of backoff delay.
 	MaxDelay time.Duration
 
@@ -47,34 +47,34 @@ type BackoffConfig struct ***REMOVED***
 
 	// jitter provides a range to randomize backoff delays.
 	jitter float64
-***REMOVED***
+}
 
-func setDefaults(bc *BackoffConfig) ***REMOVED***
+func setDefaults(bc *BackoffConfig) {
 	md := bc.MaxDelay
 	*bc = DefaultBackoffConfig
 
-	if md > 0 ***REMOVED***
+	if md > 0 {
 		bc.MaxDelay = md
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (bc BackoffConfig) backoff(retries int) time.Duration ***REMOVED***
-	if retries == 0 ***REMOVED***
+func (bc BackoffConfig) backoff(retries int) time.Duration {
+	if retries == 0 {
 		return bc.baseDelay
-	***REMOVED***
+	}
 	backoff, max := float64(bc.baseDelay), float64(bc.MaxDelay)
-	for backoff < max && retries > 0 ***REMOVED***
+	for backoff < max && retries > 0 {
 		backoff *= bc.factor
 		retries--
-	***REMOVED***
-	if backoff > max ***REMOVED***
+	}
+	if backoff > max {
 		backoff = max
-	***REMOVED***
+	}
 	// Randomize backoff delays so that if a cluster of requests start at
 	// the same time, they won't operate in lockstep.
 	backoff *= 1 + bc.jitter*(rand.Float64()*2-1)
-	if backoff < 0 ***REMOVED***
+	if backoff < 0 {
 		return 0
-	***REMOVED***
+	}
 	return time.Duration(backoff)
-***REMOVED***
+}

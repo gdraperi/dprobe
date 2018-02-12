@@ -16,31 +16,31 @@ import (
 	"golang.org/x/net/internal/socket"
 )
 
-func TestSocket(t *testing.T) ***REMOVED***
-	t.Run("Option", func(t *testing.T) ***REMOVED***
-		testSocketOption(t, &socket.Option***REMOVED***Level: syscall.SOL_SOCKET, Name: syscall.SO_RCVBUF, Len: 4***REMOVED***)
-	***REMOVED***)
-***REMOVED***
+func TestSocket(t *testing.T) {
+	t.Run("Option", func(t *testing.T) {
+		testSocketOption(t, &socket.Option{Level: syscall.SOL_SOCKET, Name: syscall.SO_RCVBUF, Len: 4})
+	})
+}
 
-func testSocketOption(t *testing.T, so *socket.Option) ***REMOVED***
+func testSocketOption(t *testing.T, so *socket.Option) {
 	c, err := nettest.NewLocalPacketListener("udp")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Skipf("not supported on %s/%s: %v", runtime.GOOS, runtime.GOARCH, err)
-	***REMOVED***
+	}
 	defer c.Close()
 	cc, err := socket.NewConn(c.(net.Conn))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	const N = 2048
-	if err := so.SetInt(cc, N); err != nil ***REMOVED***
+	if err := so.SetInt(cc, N); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	n, err := so.GetInt(cc)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if n < N ***REMOVED***
+	}
+	if n < N {
 		t.Fatalf("got %d; want greater than or equal to %d", n, N)
-	***REMOVED***
-***REMOVED***
+	}
+}

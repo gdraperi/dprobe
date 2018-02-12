@@ -78,7 +78,7 @@ var _ = time.Kitchen
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
-type CreateTaskRequest struct ***REMOVED***
+type CreateTaskRequest struct {
 	ContainerID string `protobuf:"bytes,1,opt,name=container_id,json=containerId,proto3" json:"container_id,omitempty"`
 	// RootFS provides the pre-chroot mounts to perform in the shim before
 	// executing the container task.
@@ -93,111 +93,111 @@ type CreateTaskRequest struct ***REMOVED***
 	Terminal   bool                          `protobuf:"varint,7,opt,name=terminal,proto3" json:"terminal,omitempty"`
 	Checkpoint *containerd_types2.Descriptor `protobuf:"bytes,8,opt,name=checkpoint" json:"checkpoint,omitempty"`
 	Options    *google_protobuf1.Any         `protobuf:"bytes,9,opt,name=options" json:"options,omitempty"`
-***REMOVED***
+}
 
-func (m *CreateTaskRequest) Reset()                    ***REMOVED*** *m = CreateTaskRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*CreateTaskRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*CreateTaskRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorTasks, []int***REMOVED***0***REMOVED*** ***REMOVED***
+func (m *CreateTaskRequest) Reset()                    { *m = CreateTaskRequest{} }
+func (*CreateTaskRequest) ProtoMessage()               {}
+func (*CreateTaskRequest) Descriptor() ([]byte, []int) { return fileDescriptorTasks, []int{0} }
 
-type CreateTaskResponse struct ***REMOVED***
+type CreateTaskResponse struct {
 	ContainerID string `protobuf:"bytes,1,opt,name=container_id,json=containerId,proto3" json:"container_id,omitempty"`
 	Pid         uint32 `protobuf:"varint,2,opt,name=pid,proto3" json:"pid,omitempty"`
-***REMOVED***
+}
 
-func (m *CreateTaskResponse) Reset()                    ***REMOVED*** *m = CreateTaskResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*CreateTaskResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*CreateTaskResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorTasks, []int***REMOVED***1***REMOVED*** ***REMOVED***
+func (m *CreateTaskResponse) Reset()                    { *m = CreateTaskResponse{} }
+func (*CreateTaskResponse) ProtoMessage()               {}
+func (*CreateTaskResponse) Descriptor() ([]byte, []int) { return fileDescriptorTasks, []int{1} }
 
-type StartRequest struct ***REMOVED***
+type StartRequest struct {
 	ContainerID string `protobuf:"bytes,1,opt,name=container_id,json=containerId,proto3" json:"container_id,omitempty"`
 	ExecID      string `protobuf:"bytes,2,opt,name=exec_id,json=execId,proto3" json:"exec_id,omitempty"`
-***REMOVED***
+}
 
-func (m *StartRequest) Reset()                    ***REMOVED*** *m = StartRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*StartRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*StartRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorTasks, []int***REMOVED***2***REMOVED*** ***REMOVED***
+func (m *StartRequest) Reset()                    { *m = StartRequest{} }
+func (*StartRequest) ProtoMessage()               {}
+func (*StartRequest) Descriptor() ([]byte, []int) { return fileDescriptorTasks, []int{2} }
 
-type StartResponse struct ***REMOVED***
+type StartResponse struct {
 	Pid uint32 `protobuf:"varint,1,opt,name=pid,proto3" json:"pid,omitempty"`
-***REMOVED***
+}
 
-func (m *StartResponse) Reset()                    ***REMOVED*** *m = StartResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*StartResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*StartResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorTasks, []int***REMOVED***3***REMOVED*** ***REMOVED***
+func (m *StartResponse) Reset()                    { *m = StartResponse{} }
+func (*StartResponse) ProtoMessage()               {}
+func (*StartResponse) Descriptor() ([]byte, []int) { return fileDescriptorTasks, []int{3} }
 
-type DeleteTaskRequest struct ***REMOVED***
+type DeleteTaskRequest struct {
 	ContainerID string `protobuf:"bytes,1,opt,name=container_id,json=containerId,proto3" json:"container_id,omitempty"`
-***REMOVED***
+}
 
-func (m *DeleteTaskRequest) Reset()                    ***REMOVED*** *m = DeleteTaskRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*DeleteTaskRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*DeleteTaskRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorTasks, []int***REMOVED***4***REMOVED*** ***REMOVED***
+func (m *DeleteTaskRequest) Reset()                    { *m = DeleteTaskRequest{} }
+func (*DeleteTaskRequest) ProtoMessage()               {}
+func (*DeleteTaskRequest) Descriptor() ([]byte, []int) { return fileDescriptorTasks, []int{4} }
 
-type DeleteResponse struct ***REMOVED***
+type DeleteResponse struct {
 	ID         string    `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Pid        uint32    `protobuf:"varint,2,opt,name=pid,proto3" json:"pid,omitempty"`
 	ExitStatus uint32    `protobuf:"varint,3,opt,name=exit_status,json=exitStatus,proto3" json:"exit_status,omitempty"`
 	ExitedAt   time.Time `protobuf:"bytes,4,opt,name=exited_at,json=exitedAt,stdtime" json:"exited_at"`
-***REMOVED***
+}
 
-func (m *DeleteResponse) Reset()                    ***REMOVED*** *m = DeleteResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*DeleteResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*DeleteResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorTasks, []int***REMOVED***5***REMOVED*** ***REMOVED***
+func (m *DeleteResponse) Reset()                    { *m = DeleteResponse{} }
+func (*DeleteResponse) ProtoMessage()               {}
+func (*DeleteResponse) Descriptor() ([]byte, []int) { return fileDescriptorTasks, []int{5} }
 
-type DeleteProcessRequest struct ***REMOVED***
+type DeleteProcessRequest struct {
 	ContainerID string `protobuf:"bytes,1,opt,name=container_id,json=containerId,proto3" json:"container_id,omitempty"`
 	ExecID      string `protobuf:"bytes,2,opt,name=exec_id,json=execId,proto3" json:"exec_id,omitempty"`
-***REMOVED***
+}
 
-func (m *DeleteProcessRequest) Reset()                    ***REMOVED*** *m = DeleteProcessRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*DeleteProcessRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*DeleteProcessRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorTasks, []int***REMOVED***6***REMOVED*** ***REMOVED***
+func (m *DeleteProcessRequest) Reset()                    { *m = DeleteProcessRequest{} }
+func (*DeleteProcessRequest) ProtoMessage()               {}
+func (*DeleteProcessRequest) Descriptor() ([]byte, []int) { return fileDescriptorTasks, []int{6} }
 
-type GetRequest struct ***REMOVED***
+type GetRequest struct {
 	ContainerID string `protobuf:"bytes,1,opt,name=container_id,json=containerId,proto3" json:"container_id,omitempty"`
 	ExecID      string `protobuf:"bytes,2,opt,name=exec_id,json=execId,proto3" json:"exec_id,omitempty"`
-***REMOVED***
+}
 
-func (m *GetRequest) Reset()                    ***REMOVED*** *m = GetRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*GetRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*GetRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorTasks, []int***REMOVED***7***REMOVED*** ***REMOVED***
+func (m *GetRequest) Reset()                    { *m = GetRequest{} }
+func (*GetRequest) ProtoMessage()               {}
+func (*GetRequest) Descriptor() ([]byte, []int) { return fileDescriptorTasks, []int{7} }
 
-type GetResponse struct ***REMOVED***
+type GetResponse struct {
 	Process *containerd_v1_types.Process `protobuf:"bytes,1,opt,name=process" json:"process,omitempty"`
-***REMOVED***
+}
 
-func (m *GetResponse) Reset()                    ***REMOVED*** *m = GetResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*GetResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*GetResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorTasks, []int***REMOVED***8***REMOVED*** ***REMOVED***
+func (m *GetResponse) Reset()                    { *m = GetResponse{} }
+func (*GetResponse) ProtoMessage()               {}
+func (*GetResponse) Descriptor() ([]byte, []int) { return fileDescriptorTasks, []int{8} }
 
-type ListTasksRequest struct ***REMOVED***
+type ListTasksRequest struct {
 	Filter string `protobuf:"bytes,1,opt,name=filter,proto3" json:"filter,omitempty"`
-***REMOVED***
+}
 
-func (m *ListTasksRequest) Reset()                    ***REMOVED*** *m = ListTasksRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*ListTasksRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*ListTasksRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorTasks, []int***REMOVED***9***REMOVED*** ***REMOVED***
+func (m *ListTasksRequest) Reset()                    { *m = ListTasksRequest{} }
+func (*ListTasksRequest) ProtoMessage()               {}
+func (*ListTasksRequest) Descriptor() ([]byte, []int) { return fileDescriptorTasks, []int{9} }
 
-type ListTasksResponse struct ***REMOVED***
+type ListTasksResponse struct {
 	Tasks []*containerd_v1_types.Process `protobuf:"bytes,1,rep,name=tasks" json:"tasks,omitempty"`
-***REMOVED***
+}
 
-func (m *ListTasksResponse) Reset()                    ***REMOVED*** *m = ListTasksResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*ListTasksResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*ListTasksResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorTasks, []int***REMOVED***10***REMOVED*** ***REMOVED***
+func (m *ListTasksResponse) Reset()                    { *m = ListTasksResponse{} }
+func (*ListTasksResponse) ProtoMessage()               {}
+func (*ListTasksResponse) Descriptor() ([]byte, []int) { return fileDescriptorTasks, []int{10} }
 
-type KillRequest struct ***REMOVED***
+type KillRequest struct {
 	ContainerID string `protobuf:"bytes,1,opt,name=container_id,json=containerId,proto3" json:"container_id,omitempty"`
 	ExecID      string `protobuf:"bytes,2,opt,name=exec_id,json=execId,proto3" json:"exec_id,omitempty"`
 	Signal      uint32 `protobuf:"varint,3,opt,name=signal,proto3" json:"signal,omitempty"`
 	All         bool   `protobuf:"varint,4,opt,name=all,proto3" json:"all,omitempty"`
-***REMOVED***
+}
 
-func (m *KillRequest) Reset()                    ***REMOVED*** *m = KillRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*KillRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*KillRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorTasks, []int***REMOVED***11***REMOVED*** ***REMOVED***
+func (m *KillRequest) Reset()                    { *m = KillRequest{} }
+func (*KillRequest) ProtoMessage()               {}
+func (*KillRequest) Descriptor() ([]byte, []int) { return fileDescriptorTasks, []int{11} }
 
-type ExecProcessRequest struct ***REMOVED***
+type ExecProcessRequest struct {
 	ContainerID string `protobuf:"bytes,1,opt,name=container_id,json=containerId,proto3" json:"container_id,omitempty"`
 	Stdin       string `protobuf:"bytes,2,opt,name=stdin,proto3" json:"stdin,omitempty"`
 	Stdout      string `protobuf:"bytes,3,opt,name=stdout,proto3" json:"stdout,omitempty"`
@@ -209,135 +209,135 @@ type ExecProcessRequest struct ***REMOVED***
 	Spec *google_protobuf1.Any `protobuf:"bytes,6,opt,name=spec" json:"spec,omitempty"`
 	// id of the exec process
 	ExecID string `protobuf:"bytes,7,opt,name=exec_id,json=execId,proto3" json:"exec_id,omitempty"`
-***REMOVED***
+}
 
-func (m *ExecProcessRequest) Reset()                    ***REMOVED*** *m = ExecProcessRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*ExecProcessRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*ExecProcessRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorTasks, []int***REMOVED***12***REMOVED*** ***REMOVED***
+func (m *ExecProcessRequest) Reset()                    { *m = ExecProcessRequest{} }
+func (*ExecProcessRequest) ProtoMessage()               {}
+func (*ExecProcessRequest) Descriptor() ([]byte, []int) { return fileDescriptorTasks, []int{12} }
 
-type ExecProcessResponse struct ***REMOVED***
-***REMOVED***
+type ExecProcessResponse struct {
+}
 
-func (m *ExecProcessResponse) Reset()                    ***REMOVED*** *m = ExecProcessResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*ExecProcessResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*ExecProcessResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorTasks, []int***REMOVED***13***REMOVED*** ***REMOVED***
+func (m *ExecProcessResponse) Reset()                    { *m = ExecProcessResponse{} }
+func (*ExecProcessResponse) ProtoMessage()               {}
+func (*ExecProcessResponse) Descriptor() ([]byte, []int) { return fileDescriptorTasks, []int{13} }
 
-type ResizePtyRequest struct ***REMOVED***
+type ResizePtyRequest struct {
 	ContainerID string `protobuf:"bytes,1,opt,name=container_id,json=containerId,proto3" json:"container_id,omitempty"`
 	ExecID      string `protobuf:"bytes,2,opt,name=exec_id,json=execId,proto3" json:"exec_id,omitempty"`
 	Width       uint32 `protobuf:"varint,3,opt,name=width,proto3" json:"width,omitempty"`
 	Height      uint32 `protobuf:"varint,4,opt,name=height,proto3" json:"height,omitempty"`
-***REMOVED***
+}
 
-func (m *ResizePtyRequest) Reset()                    ***REMOVED*** *m = ResizePtyRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*ResizePtyRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*ResizePtyRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorTasks, []int***REMOVED***14***REMOVED*** ***REMOVED***
+func (m *ResizePtyRequest) Reset()                    { *m = ResizePtyRequest{} }
+func (*ResizePtyRequest) ProtoMessage()               {}
+func (*ResizePtyRequest) Descriptor() ([]byte, []int) { return fileDescriptorTasks, []int{14} }
 
-type CloseIORequest struct ***REMOVED***
+type CloseIORequest struct {
 	ContainerID string `protobuf:"bytes,1,opt,name=container_id,json=containerId,proto3" json:"container_id,omitempty"`
 	ExecID      string `protobuf:"bytes,2,opt,name=exec_id,json=execId,proto3" json:"exec_id,omitempty"`
 	Stdin       bool   `protobuf:"varint,3,opt,name=stdin,proto3" json:"stdin,omitempty"`
-***REMOVED***
+}
 
-func (m *CloseIORequest) Reset()                    ***REMOVED*** *m = CloseIORequest***REMOVED******REMOVED*** ***REMOVED***
-func (*CloseIORequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*CloseIORequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorTasks, []int***REMOVED***15***REMOVED*** ***REMOVED***
+func (m *CloseIORequest) Reset()                    { *m = CloseIORequest{} }
+func (*CloseIORequest) ProtoMessage()               {}
+func (*CloseIORequest) Descriptor() ([]byte, []int) { return fileDescriptorTasks, []int{15} }
 
-type PauseTaskRequest struct ***REMOVED***
+type PauseTaskRequest struct {
 	ContainerID string `protobuf:"bytes,1,opt,name=container_id,json=containerId,proto3" json:"container_id,omitempty"`
-***REMOVED***
+}
 
-func (m *PauseTaskRequest) Reset()                    ***REMOVED*** *m = PauseTaskRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*PauseTaskRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*PauseTaskRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorTasks, []int***REMOVED***16***REMOVED*** ***REMOVED***
+func (m *PauseTaskRequest) Reset()                    { *m = PauseTaskRequest{} }
+func (*PauseTaskRequest) ProtoMessage()               {}
+func (*PauseTaskRequest) Descriptor() ([]byte, []int) { return fileDescriptorTasks, []int{16} }
 
-type ResumeTaskRequest struct ***REMOVED***
+type ResumeTaskRequest struct {
 	ContainerID string `protobuf:"bytes,1,opt,name=container_id,json=containerId,proto3" json:"container_id,omitempty"`
-***REMOVED***
+}
 
-func (m *ResumeTaskRequest) Reset()                    ***REMOVED*** *m = ResumeTaskRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*ResumeTaskRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*ResumeTaskRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorTasks, []int***REMOVED***17***REMOVED*** ***REMOVED***
+func (m *ResumeTaskRequest) Reset()                    { *m = ResumeTaskRequest{} }
+func (*ResumeTaskRequest) ProtoMessage()               {}
+func (*ResumeTaskRequest) Descriptor() ([]byte, []int) { return fileDescriptorTasks, []int{17} }
 
-type ListPidsRequest struct ***REMOVED***
+type ListPidsRequest struct {
 	ContainerID string `protobuf:"bytes,1,opt,name=container_id,json=containerId,proto3" json:"container_id,omitempty"`
-***REMOVED***
+}
 
-func (m *ListPidsRequest) Reset()                    ***REMOVED*** *m = ListPidsRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*ListPidsRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*ListPidsRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorTasks, []int***REMOVED***18***REMOVED*** ***REMOVED***
+func (m *ListPidsRequest) Reset()                    { *m = ListPidsRequest{} }
+func (*ListPidsRequest) ProtoMessage()               {}
+func (*ListPidsRequest) Descriptor() ([]byte, []int) { return fileDescriptorTasks, []int{18} }
 
-type ListPidsResponse struct ***REMOVED***
+type ListPidsResponse struct {
 	// Processes includes the process ID and additional process information
 	Processes []*containerd_v1_types.ProcessInfo `protobuf:"bytes,1,rep,name=processes" json:"processes,omitempty"`
-***REMOVED***
+}
 
-func (m *ListPidsResponse) Reset()                    ***REMOVED*** *m = ListPidsResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*ListPidsResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*ListPidsResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorTasks, []int***REMOVED***19***REMOVED*** ***REMOVED***
+func (m *ListPidsResponse) Reset()                    { *m = ListPidsResponse{} }
+func (*ListPidsResponse) ProtoMessage()               {}
+func (*ListPidsResponse) Descriptor() ([]byte, []int) { return fileDescriptorTasks, []int{19} }
 
-type CheckpointTaskRequest struct ***REMOVED***
+type CheckpointTaskRequest struct {
 	ContainerID      string                                     `protobuf:"bytes,1,opt,name=container_id,json=containerId,proto3" json:"container_id,omitempty"`
 	ParentCheckpoint github_com_opencontainers_go_digest.Digest `protobuf:"bytes,2,opt,name=parent_checkpoint,json=parentCheckpoint,proto3,customtype=github.com/opencontainers/go-digest.Digest" json:"parent_checkpoint"`
 	Options          *google_protobuf1.Any                      `protobuf:"bytes,3,opt,name=options" json:"options,omitempty"`
-***REMOVED***
+}
 
-func (m *CheckpointTaskRequest) Reset()                    ***REMOVED*** *m = CheckpointTaskRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*CheckpointTaskRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*CheckpointTaskRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorTasks, []int***REMOVED***20***REMOVED*** ***REMOVED***
+func (m *CheckpointTaskRequest) Reset()                    { *m = CheckpointTaskRequest{} }
+func (*CheckpointTaskRequest) ProtoMessage()               {}
+func (*CheckpointTaskRequest) Descriptor() ([]byte, []int) { return fileDescriptorTasks, []int{20} }
 
-type CheckpointTaskResponse struct ***REMOVED***
+type CheckpointTaskResponse struct {
 	Descriptors []*containerd_types2.Descriptor `protobuf:"bytes,1,rep,name=descriptors" json:"descriptors,omitempty"`
-***REMOVED***
+}
 
-func (m *CheckpointTaskResponse) Reset()                    ***REMOVED*** *m = CheckpointTaskResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*CheckpointTaskResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*CheckpointTaskResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorTasks, []int***REMOVED***21***REMOVED*** ***REMOVED***
+func (m *CheckpointTaskResponse) Reset()                    { *m = CheckpointTaskResponse{} }
+func (*CheckpointTaskResponse) ProtoMessage()               {}
+func (*CheckpointTaskResponse) Descriptor() ([]byte, []int) { return fileDescriptorTasks, []int{21} }
 
-type UpdateTaskRequest struct ***REMOVED***
+type UpdateTaskRequest struct {
 	ContainerID string                `protobuf:"bytes,1,opt,name=container_id,json=containerId,proto3" json:"container_id,omitempty"`
 	Resources   *google_protobuf1.Any `protobuf:"bytes,2,opt,name=resources" json:"resources,omitempty"`
-***REMOVED***
+}
 
-func (m *UpdateTaskRequest) Reset()                    ***REMOVED*** *m = UpdateTaskRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*UpdateTaskRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*UpdateTaskRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorTasks, []int***REMOVED***22***REMOVED*** ***REMOVED***
+func (m *UpdateTaskRequest) Reset()                    { *m = UpdateTaskRequest{} }
+func (*UpdateTaskRequest) ProtoMessage()               {}
+func (*UpdateTaskRequest) Descriptor() ([]byte, []int) { return fileDescriptorTasks, []int{22} }
 
-type MetricsRequest struct ***REMOVED***
+type MetricsRequest struct {
 	Filters []string `protobuf:"bytes,1,rep,name=filters" json:"filters,omitempty"`
-***REMOVED***
+}
 
-func (m *MetricsRequest) Reset()                    ***REMOVED*** *m = MetricsRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*MetricsRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*MetricsRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorTasks, []int***REMOVED***23***REMOVED*** ***REMOVED***
+func (m *MetricsRequest) Reset()                    { *m = MetricsRequest{} }
+func (*MetricsRequest) ProtoMessage()               {}
+func (*MetricsRequest) Descriptor() ([]byte, []int) { return fileDescriptorTasks, []int{23} }
 
-type MetricsResponse struct ***REMOVED***
+type MetricsResponse struct {
 	Metrics []*containerd_types1.Metric `protobuf:"bytes,1,rep,name=metrics" json:"metrics,omitempty"`
-***REMOVED***
+}
 
-func (m *MetricsResponse) Reset()                    ***REMOVED*** *m = MetricsResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*MetricsResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*MetricsResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorTasks, []int***REMOVED***24***REMOVED*** ***REMOVED***
+func (m *MetricsResponse) Reset()                    { *m = MetricsResponse{} }
+func (*MetricsResponse) ProtoMessage()               {}
+func (*MetricsResponse) Descriptor() ([]byte, []int) { return fileDescriptorTasks, []int{24} }
 
-type WaitRequest struct ***REMOVED***
+type WaitRequest struct {
 	ContainerID string `protobuf:"bytes,1,opt,name=container_id,json=containerId,proto3" json:"container_id,omitempty"`
 	ExecID      string `protobuf:"bytes,2,opt,name=exec_id,json=execId,proto3" json:"exec_id,omitempty"`
-***REMOVED***
+}
 
-func (m *WaitRequest) Reset()                    ***REMOVED*** *m = WaitRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*WaitRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*WaitRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorTasks, []int***REMOVED***25***REMOVED*** ***REMOVED***
+func (m *WaitRequest) Reset()                    { *m = WaitRequest{} }
+func (*WaitRequest) ProtoMessage()               {}
+func (*WaitRequest) Descriptor() ([]byte, []int) { return fileDescriptorTasks, []int{25} }
 
-type WaitResponse struct ***REMOVED***
+type WaitResponse struct {
 	ExitStatus uint32    `protobuf:"varint,1,opt,name=exit_status,json=exitStatus,proto3" json:"exit_status,omitempty"`
 	ExitedAt   time.Time `protobuf:"bytes,2,opt,name=exited_at,json=exitedAt,stdtime" json:"exited_at"`
-***REMOVED***
+}
 
-func (m *WaitResponse) Reset()                    ***REMOVED*** *m = WaitResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*WaitResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*WaitResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorTasks, []int***REMOVED***26***REMOVED*** ***REMOVED***
+func (m *WaitResponse) Reset()                    { *m = WaitResponse{} }
+func (*WaitResponse) ProtoMessage()               {}
+func (*WaitResponse) Descriptor() ([]byte, []int) { return fileDescriptorTasks, []int{26} }
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*CreateTaskRequest)(nil), "containerd.services.tasks.v1.CreateTaskRequest")
 	proto.RegisterType((*CreateTaskResponse)(nil), "containerd.services.tasks.v1.CreateTaskResponse")
 	proto.RegisterType((*StartRequest)(nil), "containerd.services.tasks.v1.StartRequest")
@@ -365,7 +365,7 @@ func init() ***REMOVED***
 	proto.RegisterType((*MetricsResponse)(nil), "containerd.services.tasks.v1.MetricsResponse")
 	proto.RegisterType((*WaitRequest)(nil), "containerd.services.tasks.v1.WaitRequest")
 	proto.RegisterType((*WaitResponse)(nil), "containerd.services.tasks.v1.WaitResponse")
-***REMOVED***
+}
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
@@ -377,7 +377,7 @@ const _ = grpc.SupportPackageIsVersion4
 
 // Client API for Tasks service
 
-type TasksClient interface ***REMOVED***
+type TasksClient interface {
 	// Create a task.
 	Create(ctx context.Context, in *CreateTaskRequest, opts ...grpc.CallOption) (*CreateTaskResponse, error)
 	// Start a process.
@@ -399,172 +399,172 @@ type TasksClient interface ***REMOVED***
 	Update(ctx context.Context, in *UpdateTaskRequest, opts ...grpc.CallOption) (*google_protobuf.Empty, error)
 	Metrics(ctx context.Context, in *MetricsRequest, opts ...grpc.CallOption) (*MetricsResponse, error)
 	Wait(ctx context.Context, in *WaitRequest, opts ...grpc.CallOption) (*WaitResponse, error)
-***REMOVED***
+}
 
-type tasksClient struct ***REMOVED***
+type tasksClient struct {
 	cc *grpc.ClientConn
-***REMOVED***
+}
 
-func NewTasksClient(cc *grpc.ClientConn) TasksClient ***REMOVED***
-	return &tasksClient***REMOVED***cc***REMOVED***
-***REMOVED***
+func NewTasksClient(cc *grpc.ClientConn) TasksClient {
+	return &tasksClient{cc}
+}
 
-func (c *tasksClient) Create(ctx context.Context, in *CreateTaskRequest, opts ...grpc.CallOption) (*CreateTaskResponse, error) ***REMOVED***
+func (c *tasksClient) Create(ctx context.Context, in *CreateTaskRequest, opts ...grpc.CallOption) (*CreateTaskResponse, error) {
 	out := new(CreateTaskResponse)
 	err := grpc.Invoke(ctx, "/containerd.services.tasks.v1.Tasks/Create", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *tasksClient) Start(ctx context.Context, in *StartRequest, opts ...grpc.CallOption) (*StartResponse, error) ***REMOVED***
+func (c *tasksClient) Start(ctx context.Context, in *StartRequest, opts ...grpc.CallOption) (*StartResponse, error) {
 	out := new(StartResponse)
 	err := grpc.Invoke(ctx, "/containerd.services.tasks.v1.Tasks/Start", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *tasksClient) Delete(ctx context.Context, in *DeleteTaskRequest, opts ...grpc.CallOption) (*DeleteResponse, error) ***REMOVED***
+func (c *tasksClient) Delete(ctx context.Context, in *DeleteTaskRequest, opts ...grpc.CallOption) (*DeleteResponse, error) {
 	out := new(DeleteResponse)
 	err := grpc.Invoke(ctx, "/containerd.services.tasks.v1.Tasks/Delete", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *tasksClient) DeleteProcess(ctx context.Context, in *DeleteProcessRequest, opts ...grpc.CallOption) (*DeleteResponse, error) ***REMOVED***
+func (c *tasksClient) DeleteProcess(ctx context.Context, in *DeleteProcessRequest, opts ...grpc.CallOption) (*DeleteResponse, error) {
 	out := new(DeleteResponse)
 	err := grpc.Invoke(ctx, "/containerd.services.tasks.v1.Tasks/DeleteProcess", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *tasksClient) Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error) ***REMOVED***
+func (c *tasksClient) Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error) {
 	out := new(GetResponse)
 	err := grpc.Invoke(ctx, "/containerd.services.tasks.v1.Tasks/Get", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *tasksClient) List(ctx context.Context, in *ListTasksRequest, opts ...grpc.CallOption) (*ListTasksResponse, error) ***REMOVED***
+func (c *tasksClient) List(ctx context.Context, in *ListTasksRequest, opts ...grpc.CallOption) (*ListTasksResponse, error) {
 	out := new(ListTasksResponse)
 	err := grpc.Invoke(ctx, "/containerd.services.tasks.v1.Tasks/List", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *tasksClient) Kill(ctx context.Context, in *KillRequest, opts ...grpc.CallOption) (*google_protobuf.Empty, error) ***REMOVED***
+func (c *tasksClient) Kill(ctx context.Context, in *KillRequest, opts ...grpc.CallOption) (*google_protobuf.Empty, error) {
 	out := new(google_protobuf.Empty)
 	err := grpc.Invoke(ctx, "/containerd.services.tasks.v1.Tasks/Kill", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *tasksClient) Exec(ctx context.Context, in *ExecProcessRequest, opts ...grpc.CallOption) (*google_protobuf.Empty, error) ***REMOVED***
+func (c *tasksClient) Exec(ctx context.Context, in *ExecProcessRequest, opts ...grpc.CallOption) (*google_protobuf.Empty, error) {
 	out := new(google_protobuf.Empty)
 	err := grpc.Invoke(ctx, "/containerd.services.tasks.v1.Tasks/Exec", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *tasksClient) ResizePty(ctx context.Context, in *ResizePtyRequest, opts ...grpc.CallOption) (*google_protobuf.Empty, error) ***REMOVED***
+func (c *tasksClient) ResizePty(ctx context.Context, in *ResizePtyRequest, opts ...grpc.CallOption) (*google_protobuf.Empty, error) {
 	out := new(google_protobuf.Empty)
 	err := grpc.Invoke(ctx, "/containerd.services.tasks.v1.Tasks/ResizePty", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *tasksClient) CloseIO(ctx context.Context, in *CloseIORequest, opts ...grpc.CallOption) (*google_protobuf.Empty, error) ***REMOVED***
+func (c *tasksClient) CloseIO(ctx context.Context, in *CloseIORequest, opts ...grpc.CallOption) (*google_protobuf.Empty, error) {
 	out := new(google_protobuf.Empty)
 	err := grpc.Invoke(ctx, "/containerd.services.tasks.v1.Tasks/CloseIO", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *tasksClient) Pause(ctx context.Context, in *PauseTaskRequest, opts ...grpc.CallOption) (*google_protobuf.Empty, error) ***REMOVED***
+func (c *tasksClient) Pause(ctx context.Context, in *PauseTaskRequest, opts ...grpc.CallOption) (*google_protobuf.Empty, error) {
 	out := new(google_protobuf.Empty)
 	err := grpc.Invoke(ctx, "/containerd.services.tasks.v1.Tasks/Pause", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *tasksClient) Resume(ctx context.Context, in *ResumeTaskRequest, opts ...grpc.CallOption) (*google_protobuf.Empty, error) ***REMOVED***
+func (c *tasksClient) Resume(ctx context.Context, in *ResumeTaskRequest, opts ...grpc.CallOption) (*google_protobuf.Empty, error) {
 	out := new(google_protobuf.Empty)
 	err := grpc.Invoke(ctx, "/containerd.services.tasks.v1.Tasks/Resume", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *tasksClient) ListPids(ctx context.Context, in *ListPidsRequest, opts ...grpc.CallOption) (*ListPidsResponse, error) ***REMOVED***
+func (c *tasksClient) ListPids(ctx context.Context, in *ListPidsRequest, opts ...grpc.CallOption) (*ListPidsResponse, error) {
 	out := new(ListPidsResponse)
 	err := grpc.Invoke(ctx, "/containerd.services.tasks.v1.Tasks/ListPids", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *tasksClient) Checkpoint(ctx context.Context, in *CheckpointTaskRequest, opts ...grpc.CallOption) (*CheckpointTaskResponse, error) ***REMOVED***
+func (c *tasksClient) Checkpoint(ctx context.Context, in *CheckpointTaskRequest, opts ...grpc.CallOption) (*CheckpointTaskResponse, error) {
 	out := new(CheckpointTaskResponse)
 	err := grpc.Invoke(ctx, "/containerd.services.tasks.v1.Tasks/Checkpoint", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *tasksClient) Update(ctx context.Context, in *UpdateTaskRequest, opts ...grpc.CallOption) (*google_protobuf.Empty, error) ***REMOVED***
+func (c *tasksClient) Update(ctx context.Context, in *UpdateTaskRequest, opts ...grpc.CallOption) (*google_protobuf.Empty, error) {
 	out := new(google_protobuf.Empty)
 	err := grpc.Invoke(ctx, "/containerd.services.tasks.v1.Tasks/Update", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *tasksClient) Metrics(ctx context.Context, in *MetricsRequest, opts ...grpc.CallOption) (*MetricsResponse, error) ***REMOVED***
+func (c *tasksClient) Metrics(ctx context.Context, in *MetricsRequest, opts ...grpc.CallOption) (*MetricsResponse, error) {
 	out := new(MetricsResponse)
 	err := grpc.Invoke(ctx, "/containerd.services.tasks.v1.Tasks/Metrics", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *tasksClient) Wait(ctx context.Context, in *WaitRequest, opts ...grpc.CallOption) (*WaitResponse, error) ***REMOVED***
+func (c *tasksClient) Wait(ctx context.Context, in *WaitRequest, opts ...grpc.CallOption) (*WaitResponse, error) {
 	out := new(WaitResponse)
 	err := grpc.Invoke(ctx, "/containerd.services.tasks.v1.Tasks/Wait", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
 // Server API for Tasks service
 
-type TasksServer interface ***REMOVED***
+type TasksServer interface {
 	// Create a task.
 	Create(context.Context, *CreateTaskRequest) (*CreateTaskResponse, error)
 	// Start a process.
@@ -586,1731 +586,1731 @@ type TasksServer interface ***REMOVED***
 	Update(context.Context, *UpdateTaskRequest) (*google_protobuf.Empty, error)
 	Metrics(context.Context, *MetricsRequest) (*MetricsResponse, error)
 	Wait(context.Context, *WaitRequest) (*WaitResponse, error)
-***REMOVED***
+}
 
-func RegisterTasksServer(s *grpc.Server, srv TasksServer) ***REMOVED***
+func RegisterTasksServer(s *grpc.Server, srv TasksServer) {
 	s.RegisterService(&_Tasks_serviceDesc, srv)
-***REMOVED***
+}
 
-func _Tasks_Create_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _Tasks_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateTaskRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(TasksServer).Create(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/containerd.services.tasks.v1.Tasks/Create",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(TasksServer).Create(ctx, req.(*CreateTaskRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _Tasks_Start_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _Tasks_Start_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(StartRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(TasksServer).Start(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/containerd.services.tasks.v1.Tasks/Start",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(TasksServer).Start(ctx, req.(*StartRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _Tasks_Delete_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _Tasks_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteTaskRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(TasksServer).Delete(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/containerd.services.tasks.v1.Tasks/Delete",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(TasksServer).Delete(ctx, req.(*DeleteTaskRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _Tasks_DeleteProcess_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _Tasks_DeleteProcess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteProcessRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(TasksServer).DeleteProcess(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/containerd.services.tasks.v1.Tasks/DeleteProcess",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(TasksServer).DeleteProcess(ctx, req.(*DeleteProcessRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _Tasks_Get_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _Tasks_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(TasksServer).Get(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/containerd.services.tasks.v1.Tasks/Get",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(TasksServer).Get(ctx, req.(*GetRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _Tasks_List_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _Tasks_List_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListTasksRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(TasksServer).List(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/containerd.services.tasks.v1.Tasks/List",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(TasksServer).List(ctx, req.(*ListTasksRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _Tasks_Kill_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _Tasks_Kill_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(KillRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(TasksServer).Kill(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/containerd.services.tasks.v1.Tasks/Kill",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(TasksServer).Kill(ctx, req.(*KillRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _Tasks_Exec_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _Tasks_Exec_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ExecProcessRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(TasksServer).Exec(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/containerd.services.tasks.v1.Tasks/Exec",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(TasksServer).Exec(ctx, req.(*ExecProcessRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _Tasks_ResizePty_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _Tasks_ResizePty_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ResizePtyRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(TasksServer).ResizePty(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/containerd.services.tasks.v1.Tasks/ResizePty",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(TasksServer).ResizePty(ctx, req.(*ResizePtyRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _Tasks_CloseIO_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _Tasks_CloseIO_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CloseIORequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(TasksServer).CloseIO(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/containerd.services.tasks.v1.Tasks/CloseIO",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(TasksServer).CloseIO(ctx, req.(*CloseIORequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _Tasks_Pause_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _Tasks_Pause_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(PauseTaskRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(TasksServer).Pause(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/containerd.services.tasks.v1.Tasks/Pause",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(TasksServer).Pause(ctx, req.(*PauseTaskRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _Tasks_Resume_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _Tasks_Resume_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ResumeTaskRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(TasksServer).Resume(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/containerd.services.tasks.v1.Tasks/Resume",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(TasksServer).Resume(ctx, req.(*ResumeTaskRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _Tasks_ListPids_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _Tasks_ListPids_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListPidsRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(TasksServer).ListPids(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/containerd.services.tasks.v1.Tasks/ListPids",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(TasksServer).ListPids(ctx, req.(*ListPidsRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _Tasks_Checkpoint_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _Tasks_Checkpoint_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CheckpointTaskRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(TasksServer).Checkpoint(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/containerd.services.tasks.v1.Tasks/Checkpoint",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(TasksServer).Checkpoint(ctx, req.(*CheckpointTaskRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _Tasks_Update_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _Tasks_Update_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateTaskRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(TasksServer).Update(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/containerd.services.tasks.v1.Tasks/Update",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(TasksServer).Update(ctx, req.(*UpdateTaskRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _Tasks_Metrics_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _Tasks_Metrics_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(MetricsRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(TasksServer).Metrics(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/containerd.services.tasks.v1.Tasks/Metrics",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(TasksServer).Metrics(ctx, req.(*MetricsRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _Tasks_Wait_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _Tasks_Wait_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(WaitRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(TasksServer).Wait(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/containerd.services.tasks.v1.Tasks/Wait",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(TasksServer).Wait(ctx, req.(*WaitRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-var _Tasks_serviceDesc = grpc.ServiceDesc***REMOVED***
+var _Tasks_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "containerd.services.tasks.v1.Tasks",
 	HandlerType: (*TasksServer)(nil),
-	Methods: []grpc.MethodDesc***REMOVED***
-		***REMOVED***
+	Methods: []grpc.MethodDesc{
+		{
 			MethodName: "Create",
 			Handler:    _Tasks_Create_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "Start",
 			Handler:    _Tasks_Start_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "Delete",
 			Handler:    _Tasks_Delete_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "DeleteProcess",
 			Handler:    _Tasks_DeleteProcess_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "Get",
 			Handler:    _Tasks_Get_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "List",
 			Handler:    _Tasks_List_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "Kill",
 			Handler:    _Tasks_Kill_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "Exec",
 			Handler:    _Tasks_Exec_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "ResizePty",
 			Handler:    _Tasks_ResizePty_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "CloseIO",
 			Handler:    _Tasks_CloseIO_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "Pause",
 			Handler:    _Tasks_Pause_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "Resume",
 			Handler:    _Tasks_Resume_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "ListPids",
 			Handler:    _Tasks_ListPids_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "Checkpoint",
 			Handler:    _Tasks_Checkpoint_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "Update",
 			Handler:    _Tasks_Update_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "Metrics",
 			Handler:    _Tasks_Metrics_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "Wait",
 			Handler:    _Tasks_Wait_Handler,
-		***REMOVED***,
-	***REMOVED***,
-	Streams:  []grpc.StreamDesc***REMOVED******REMOVED***,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
 	Metadata: "github.com/containerd/containerd/api/services/tasks/v1/tasks.proto",
-***REMOVED***
+}
 
-func (m *CreateTaskRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *CreateTaskRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *CreateTaskRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *CreateTaskRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ContainerID) > 0 ***REMOVED***
+	if len(m.ContainerID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(len(m.ContainerID)))
 		i += copy(dAtA[i:], m.ContainerID)
-	***REMOVED***
-	if len(m.Rootfs) > 0 ***REMOVED***
-		for _, msg := range m.Rootfs ***REMOVED***
+	}
+	if len(m.Rootfs) > 0 {
+		for _, msg := range m.Rootfs {
 			dAtA[i] = 0x1a
 			i++
 			i = encodeVarintTasks(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			i += n
-		***REMOVED***
-	***REMOVED***
-	if len(m.Stdin) > 0 ***REMOVED***
+		}
+	}
+	if len(m.Stdin) > 0 {
 		dAtA[i] = 0x22
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(len(m.Stdin)))
 		i += copy(dAtA[i:], m.Stdin)
-	***REMOVED***
-	if len(m.Stdout) > 0 ***REMOVED***
+	}
+	if len(m.Stdout) > 0 {
 		dAtA[i] = 0x2a
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(len(m.Stdout)))
 		i += copy(dAtA[i:], m.Stdout)
-	***REMOVED***
-	if len(m.Stderr) > 0 ***REMOVED***
+	}
+	if len(m.Stderr) > 0 {
 		dAtA[i] = 0x32
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(len(m.Stderr)))
 		i += copy(dAtA[i:], m.Stderr)
-	***REMOVED***
-	if m.Terminal ***REMOVED***
+	}
+	if m.Terminal {
 		dAtA[i] = 0x38
 		i++
-		if m.Terminal ***REMOVED***
+		if m.Terminal {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
-	if m.Checkpoint != nil ***REMOVED***
+	}
+	if m.Checkpoint != nil {
 		dAtA[i] = 0x42
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(m.Checkpoint.Size()))
 		n1, err := m.Checkpoint.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n1
-	***REMOVED***
-	if m.Options != nil ***REMOVED***
+	}
+	if m.Options != nil {
 		dAtA[i] = 0x4a
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(m.Options.Size()))
 		n2, err := m.Options.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n2
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *CreateTaskResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *CreateTaskResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *CreateTaskResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *CreateTaskResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ContainerID) > 0 ***REMOVED***
+	if len(m.ContainerID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(len(m.ContainerID)))
 		i += copy(dAtA[i:], m.ContainerID)
-	***REMOVED***
-	if m.Pid != 0 ***REMOVED***
+	}
+	if m.Pid != 0 {
 		dAtA[i] = 0x10
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(m.Pid))
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *StartRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *StartRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *StartRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *StartRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ContainerID) > 0 ***REMOVED***
+	if len(m.ContainerID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(len(m.ContainerID)))
 		i += copy(dAtA[i:], m.ContainerID)
-	***REMOVED***
-	if len(m.ExecID) > 0 ***REMOVED***
+	}
+	if len(m.ExecID) > 0 {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(len(m.ExecID)))
 		i += copy(dAtA[i:], m.ExecID)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *StartResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *StartResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *StartResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *StartResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.Pid != 0 ***REMOVED***
+	if m.Pid != 0 {
 		dAtA[i] = 0x8
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(m.Pid))
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *DeleteTaskRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *DeleteTaskRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *DeleteTaskRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *DeleteTaskRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ContainerID) > 0 ***REMOVED***
+	if len(m.ContainerID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(len(m.ContainerID)))
 		i += copy(dAtA[i:], m.ContainerID)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *DeleteResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *DeleteResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *DeleteResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *DeleteResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ID) > 0 ***REMOVED***
+	if len(m.ID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(len(m.ID)))
 		i += copy(dAtA[i:], m.ID)
-	***REMOVED***
-	if m.Pid != 0 ***REMOVED***
+	}
+	if m.Pid != 0 {
 		dAtA[i] = 0x10
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(m.Pid))
-	***REMOVED***
-	if m.ExitStatus != 0 ***REMOVED***
+	}
+	if m.ExitStatus != 0 {
 		dAtA[i] = 0x18
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(m.ExitStatus))
-	***REMOVED***
+	}
 	dAtA[i] = 0x22
 	i++
 	i = encodeVarintTasks(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.ExitedAt)))
 	n3, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.ExitedAt, dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n3
 	return i, nil
-***REMOVED***
+}
 
-func (m *DeleteProcessRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *DeleteProcessRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *DeleteProcessRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *DeleteProcessRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ContainerID) > 0 ***REMOVED***
+	if len(m.ContainerID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(len(m.ContainerID)))
 		i += copy(dAtA[i:], m.ContainerID)
-	***REMOVED***
-	if len(m.ExecID) > 0 ***REMOVED***
+	}
+	if len(m.ExecID) > 0 {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(len(m.ExecID)))
 		i += copy(dAtA[i:], m.ExecID)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *GetRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *GetRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *GetRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *GetRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ContainerID) > 0 ***REMOVED***
+	if len(m.ContainerID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(len(m.ContainerID)))
 		i += copy(dAtA[i:], m.ContainerID)
-	***REMOVED***
-	if len(m.ExecID) > 0 ***REMOVED***
+	}
+	if len(m.ExecID) > 0 {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(len(m.ExecID)))
 		i += copy(dAtA[i:], m.ExecID)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *GetResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *GetResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *GetResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *GetResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.Process != nil ***REMOVED***
+	if m.Process != nil {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(m.Process.Size()))
 		n4, err := m.Process.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n4
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *ListTasksRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *ListTasksRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *ListTasksRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *ListTasksRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Filter) > 0 ***REMOVED***
+	if len(m.Filter) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(len(m.Filter)))
 		i += copy(dAtA[i:], m.Filter)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *ListTasksResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *ListTasksResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *ListTasksResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *ListTasksResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Tasks) > 0 ***REMOVED***
-		for _, msg := range m.Tasks ***REMOVED***
+	if len(m.Tasks) > 0 {
+		for _, msg := range m.Tasks {
 			dAtA[i] = 0xa
 			i++
 			i = encodeVarintTasks(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			i += n
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *KillRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *KillRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *KillRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *KillRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ContainerID) > 0 ***REMOVED***
+	if len(m.ContainerID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(len(m.ContainerID)))
 		i += copy(dAtA[i:], m.ContainerID)
-	***REMOVED***
-	if len(m.ExecID) > 0 ***REMOVED***
+	}
+	if len(m.ExecID) > 0 {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(len(m.ExecID)))
 		i += copy(dAtA[i:], m.ExecID)
-	***REMOVED***
-	if m.Signal != 0 ***REMOVED***
+	}
+	if m.Signal != 0 {
 		dAtA[i] = 0x18
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(m.Signal))
-	***REMOVED***
-	if m.All ***REMOVED***
+	}
+	if m.All {
 		dAtA[i] = 0x20
 		i++
-		if m.All ***REMOVED***
+		if m.All {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *ExecProcessRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *ExecProcessRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *ExecProcessRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *ExecProcessRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ContainerID) > 0 ***REMOVED***
+	if len(m.ContainerID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(len(m.ContainerID)))
 		i += copy(dAtA[i:], m.ContainerID)
-	***REMOVED***
-	if len(m.Stdin) > 0 ***REMOVED***
+	}
+	if len(m.Stdin) > 0 {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(len(m.Stdin)))
 		i += copy(dAtA[i:], m.Stdin)
-	***REMOVED***
-	if len(m.Stdout) > 0 ***REMOVED***
+	}
+	if len(m.Stdout) > 0 {
 		dAtA[i] = 0x1a
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(len(m.Stdout)))
 		i += copy(dAtA[i:], m.Stdout)
-	***REMOVED***
-	if len(m.Stderr) > 0 ***REMOVED***
+	}
+	if len(m.Stderr) > 0 {
 		dAtA[i] = 0x22
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(len(m.Stderr)))
 		i += copy(dAtA[i:], m.Stderr)
-	***REMOVED***
-	if m.Terminal ***REMOVED***
+	}
+	if m.Terminal {
 		dAtA[i] = 0x28
 		i++
-		if m.Terminal ***REMOVED***
+		if m.Terminal {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
-	if m.Spec != nil ***REMOVED***
+	}
+	if m.Spec != nil {
 		dAtA[i] = 0x32
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(m.Spec.Size()))
 		n5, err := m.Spec.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n5
-	***REMOVED***
-	if len(m.ExecID) > 0 ***REMOVED***
+	}
+	if len(m.ExecID) > 0 {
 		dAtA[i] = 0x3a
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(len(m.ExecID)))
 		i += copy(dAtA[i:], m.ExecID)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *ExecProcessResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *ExecProcessResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *ExecProcessResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *ExecProcessResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
 	return i, nil
-***REMOVED***
+}
 
-func (m *ResizePtyRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *ResizePtyRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *ResizePtyRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *ResizePtyRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ContainerID) > 0 ***REMOVED***
+	if len(m.ContainerID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(len(m.ContainerID)))
 		i += copy(dAtA[i:], m.ContainerID)
-	***REMOVED***
-	if len(m.ExecID) > 0 ***REMOVED***
+	}
+	if len(m.ExecID) > 0 {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(len(m.ExecID)))
 		i += copy(dAtA[i:], m.ExecID)
-	***REMOVED***
-	if m.Width != 0 ***REMOVED***
+	}
+	if m.Width != 0 {
 		dAtA[i] = 0x18
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(m.Width))
-	***REMOVED***
-	if m.Height != 0 ***REMOVED***
+	}
+	if m.Height != 0 {
 		dAtA[i] = 0x20
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(m.Height))
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *CloseIORequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *CloseIORequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *CloseIORequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *CloseIORequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ContainerID) > 0 ***REMOVED***
+	if len(m.ContainerID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(len(m.ContainerID)))
 		i += copy(dAtA[i:], m.ContainerID)
-	***REMOVED***
-	if len(m.ExecID) > 0 ***REMOVED***
+	}
+	if len(m.ExecID) > 0 {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(len(m.ExecID)))
 		i += copy(dAtA[i:], m.ExecID)
-	***REMOVED***
-	if m.Stdin ***REMOVED***
+	}
+	if m.Stdin {
 		dAtA[i] = 0x18
 		i++
-		if m.Stdin ***REMOVED***
+		if m.Stdin {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *PauseTaskRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *PauseTaskRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *PauseTaskRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *PauseTaskRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ContainerID) > 0 ***REMOVED***
+	if len(m.ContainerID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(len(m.ContainerID)))
 		i += copy(dAtA[i:], m.ContainerID)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *ResumeTaskRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *ResumeTaskRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *ResumeTaskRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *ResumeTaskRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ContainerID) > 0 ***REMOVED***
+	if len(m.ContainerID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(len(m.ContainerID)))
 		i += copy(dAtA[i:], m.ContainerID)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *ListPidsRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *ListPidsRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *ListPidsRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *ListPidsRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ContainerID) > 0 ***REMOVED***
+	if len(m.ContainerID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(len(m.ContainerID)))
 		i += copy(dAtA[i:], m.ContainerID)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *ListPidsResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *ListPidsResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *ListPidsResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *ListPidsResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Processes) > 0 ***REMOVED***
-		for _, msg := range m.Processes ***REMOVED***
+	if len(m.Processes) > 0 {
+		for _, msg := range m.Processes {
 			dAtA[i] = 0xa
 			i++
 			i = encodeVarintTasks(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			i += n
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *CheckpointTaskRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *CheckpointTaskRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *CheckpointTaskRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *CheckpointTaskRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ContainerID) > 0 ***REMOVED***
+	if len(m.ContainerID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(len(m.ContainerID)))
 		i += copy(dAtA[i:], m.ContainerID)
-	***REMOVED***
-	if len(m.ParentCheckpoint) > 0 ***REMOVED***
+	}
+	if len(m.ParentCheckpoint) > 0 {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(len(m.ParentCheckpoint)))
 		i += copy(dAtA[i:], m.ParentCheckpoint)
-	***REMOVED***
-	if m.Options != nil ***REMOVED***
+	}
+	if m.Options != nil {
 		dAtA[i] = 0x1a
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(m.Options.Size()))
 		n6, err := m.Options.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n6
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *CheckpointTaskResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *CheckpointTaskResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *CheckpointTaskResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *CheckpointTaskResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Descriptors) > 0 ***REMOVED***
-		for _, msg := range m.Descriptors ***REMOVED***
+	if len(m.Descriptors) > 0 {
+		for _, msg := range m.Descriptors {
 			dAtA[i] = 0xa
 			i++
 			i = encodeVarintTasks(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			i += n
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *UpdateTaskRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *UpdateTaskRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *UpdateTaskRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *UpdateTaskRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ContainerID) > 0 ***REMOVED***
+	if len(m.ContainerID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(len(m.ContainerID)))
 		i += copy(dAtA[i:], m.ContainerID)
-	***REMOVED***
-	if m.Resources != nil ***REMOVED***
+	}
+	if m.Resources != nil {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(m.Resources.Size()))
 		n7, err := m.Resources.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n7
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *MetricsRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *MetricsRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *MetricsRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *MetricsRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Filters) > 0 ***REMOVED***
-		for _, s := range m.Filters ***REMOVED***
+	if len(m.Filters) > 0 {
+		for _, s := range m.Filters {
 			dAtA[i] = 0xa
 			i++
 			l = len(s)
-			for l >= 1<<7 ***REMOVED***
+			for l >= 1<<7 {
 				dAtA[i] = uint8(uint64(l)&0x7f | 0x80)
 				l >>= 7
 				i++
-			***REMOVED***
+			}
 			dAtA[i] = uint8(l)
 			i++
 			i += copy(dAtA[i:], s)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *MetricsResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *MetricsResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *MetricsResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *MetricsResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Metrics) > 0 ***REMOVED***
-		for _, msg := range m.Metrics ***REMOVED***
+	if len(m.Metrics) > 0 {
+		for _, msg := range m.Metrics {
 			dAtA[i] = 0xa
 			i++
 			i = encodeVarintTasks(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			i += n
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *WaitRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *WaitRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *WaitRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *WaitRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ContainerID) > 0 ***REMOVED***
+	if len(m.ContainerID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(len(m.ContainerID)))
 		i += copy(dAtA[i:], m.ContainerID)
-	***REMOVED***
-	if len(m.ExecID) > 0 ***REMOVED***
+	}
+	if len(m.ExecID) > 0 {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(len(m.ExecID)))
 		i += copy(dAtA[i:], m.ExecID)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *WaitResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *WaitResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *WaitResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *WaitResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.ExitStatus != 0 ***REMOVED***
+	if m.ExitStatus != 0 {
 		dAtA[i] = 0x8
 		i++
 		i = encodeVarintTasks(dAtA, i, uint64(m.ExitStatus))
-	***REMOVED***
+	}
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintTasks(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.ExitedAt)))
 	n8, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.ExitedAt, dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n8
 	return i, nil
-***REMOVED***
+}
 
-func encodeVarintTasks(dAtA []byte, offset int, v uint64) int ***REMOVED***
-	for v >= 1<<7 ***REMOVED***
+func encodeVarintTasks(dAtA []byte, offset int, v uint64) int {
+	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
-	***REMOVED***
+	}
 	dAtA[offset] = uint8(v)
 	return offset + 1
-***REMOVED***
-func (m *CreateTaskRequest) Size() (n int) ***REMOVED***
+}
+func (m *CreateTaskRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ContainerID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovTasks(uint64(l))
-	***REMOVED***
-	if len(m.Rootfs) > 0 ***REMOVED***
-		for _, e := range m.Rootfs ***REMOVED***
+	}
+	if len(m.Rootfs) > 0 {
+		for _, e := range m.Rootfs {
 			l = e.Size()
 			n += 1 + l + sovTasks(uint64(l))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	l = len(m.Stdin)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovTasks(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.Stdout)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovTasks(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.Stderr)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovTasks(uint64(l))
-	***REMOVED***
-	if m.Terminal ***REMOVED***
+	}
+	if m.Terminal {
 		n += 2
-	***REMOVED***
-	if m.Checkpoint != nil ***REMOVED***
+	}
+	if m.Checkpoint != nil {
 		l = m.Checkpoint.Size()
 		n += 1 + l + sovTasks(uint64(l))
-	***REMOVED***
-	if m.Options != nil ***REMOVED***
+	}
+	if m.Options != nil {
 		l = m.Options.Size()
 		n += 1 + l + sovTasks(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *CreateTaskResponse) Size() (n int) ***REMOVED***
+func (m *CreateTaskResponse) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ContainerID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovTasks(uint64(l))
-	***REMOVED***
-	if m.Pid != 0 ***REMOVED***
+	}
+	if m.Pid != 0 {
 		n += 1 + sovTasks(uint64(m.Pid))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *StartRequest) Size() (n int) ***REMOVED***
+func (m *StartRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ContainerID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovTasks(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.ExecID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovTasks(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *StartResponse) Size() (n int) ***REMOVED***
+func (m *StartResponse) Size() (n int) {
 	var l int
 	_ = l
-	if m.Pid != 0 ***REMOVED***
+	if m.Pid != 0 {
 		n += 1 + sovTasks(uint64(m.Pid))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *DeleteTaskRequest) Size() (n int) ***REMOVED***
+func (m *DeleteTaskRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ContainerID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovTasks(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *DeleteResponse) Size() (n int) ***REMOVED***
+func (m *DeleteResponse) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovTasks(uint64(l))
-	***REMOVED***
-	if m.Pid != 0 ***REMOVED***
+	}
+	if m.Pid != 0 {
 		n += 1 + sovTasks(uint64(m.Pid))
-	***REMOVED***
-	if m.ExitStatus != 0 ***REMOVED***
+	}
+	if m.ExitStatus != 0 {
 		n += 1 + sovTasks(uint64(m.ExitStatus))
-	***REMOVED***
+	}
 	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.ExitedAt)
 	n += 1 + l + sovTasks(uint64(l))
 	return n
-***REMOVED***
+}
 
-func (m *DeleteProcessRequest) Size() (n int) ***REMOVED***
+func (m *DeleteProcessRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ContainerID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovTasks(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.ExecID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovTasks(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *GetRequest) Size() (n int) ***REMOVED***
+func (m *GetRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ContainerID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovTasks(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.ExecID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovTasks(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *GetResponse) Size() (n int) ***REMOVED***
+func (m *GetResponse) Size() (n int) {
 	var l int
 	_ = l
-	if m.Process != nil ***REMOVED***
+	if m.Process != nil {
 		l = m.Process.Size()
 		n += 1 + l + sovTasks(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *ListTasksRequest) Size() (n int) ***REMOVED***
+func (m *ListTasksRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.Filter)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovTasks(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *ListTasksResponse) Size() (n int) ***REMOVED***
+func (m *ListTasksResponse) Size() (n int) {
 	var l int
 	_ = l
-	if len(m.Tasks) > 0 ***REMOVED***
-		for _, e := range m.Tasks ***REMOVED***
+	if len(m.Tasks) > 0 {
+		for _, e := range m.Tasks {
 			l = e.Size()
 			n += 1 + l + sovTasks(uint64(l))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
+}
 
-func (m *KillRequest) Size() (n int) ***REMOVED***
+func (m *KillRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ContainerID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovTasks(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.ExecID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovTasks(uint64(l))
-	***REMOVED***
-	if m.Signal != 0 ***REMOVED***
+	}
+	if m.Signal != 0 {
 		n += 1 + sovTasks(uint64(m.Signal))
-	***REMOVED***
-	if m.All ***REMOVED***
+	}
+	if m.All {
 		n += 2
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *ExecProcessRequest) Size() (n int) ***REMOVED***
+func (m *ExecProcessRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ContainerID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovTasks(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.Stdin)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovTasks(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.Stdout)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovTasks(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.Stderr)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovTasks(uint64(l))
-	***REMOVED***
-	if m.Terminal ***REMOVED***
+	}
+	if m.Terminal {
 		n += 2
-	***REMOVED***
-	if m.Spec != nil ***REMOVED***
+	}
+	if m.Spec != nil {
 		l = m.Spec.Size()
 		n += 1 + l + sovTasks(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.ExecID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovTasks(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *ExecProcessResponse) Size() (n int) ***REMOVED***
+func (m *ExecProcessResponse) Size() (n int) {
 	var l int
 	_ = l
 	return n
-***REMOVED***
+}
 
-func (m *ResizePtyRequest) Size() (n int) ***REMOVED***
+func (m *ResizePtyRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ContainerID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovTasks(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.ExecID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovTasks(uint64(l))
-	***REMOVED***
-	if m.Width != 0 ***REMOVED***
+	}
+	if m.Width != 0 {
 		n += 1 + sovTasks(uint64(m.Width))
-	***REMOVED***
-	if m.Height != 0 ***REMOVED***
+	}
+	if m.Height != 0 {
 		n += 1 + sovTasks(uint64(m.Height))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *CloseIORequest) Size() (n int) ***REMOVED***
+func (m *CloseIORequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ContainerID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovTasks(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.ExecID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovTasks(uint64(l))
-	***REMOVED***
-	if m.Stdin ***REMOVED***
+	}
+	if m.Stdin {
 		n += 2
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *PauseTaskRequest) Size() (n int) ***REMOVED***
+func (m *PauseTaskRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ContainerID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovTasks(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *ResumeTaskRequest) Size() (n int) ***REMOVED***
+func (m *ResumeTaskRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ContainerID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovTasks(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *ListPidsRequest) Size() (n int) ***REMOVED***
+func (m *ListPidsRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ContainerID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovTasks(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *ListPidsResponse) Size() (n int) ***REMOVED***
+func (m *ListPidsResponse) Size() (n int) {
 	var l int
 	_ = l
-	if len(m.Processes) > 0 ***REMOVED***
-		for _, e := range m.Processes ***REMOVED***
+	if len(m.Processes) > 0 {
+		for _, e := range m.Processes {
 			l = e.Size()
 			n += 1 + l + sovTasks(uint64(l))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
+}
 
-func (m *CheckpointTaskRequest) Size() (n int) ***REMOVED***
+func (m *CheckpointTaskRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ContainerID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovTasks(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.ParentCheckpoint)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovTasks(uint64(l))
-	***REMOVED***
-	if m.Options != nil ***REMOVED***
+	}
+	if m.Options != nil {
 		l = m.Options.Size()
 		n += 1 + l + sovTasks(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *CheckpointTaskResponse) Size() (n int) ***REMOVED***
+func (m *CheckpointTaskResponse) Size() (n int) {
 	var l int
 	_ = l
-	if len(m.Descriptors) > 0 ***REMOVED***
-		for _, e := range m.Descriptors ***REMOVED***
+	if len(m.Descriptors) > 0 {
+		for _, e := range m.Descriptors {
 			l = e.Size()
 			n += 1 + l + sovTasks(uint64(l))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
+}
 
-func (m *UpdateTaskRequest) Size() (n int) ***REMOVED***
+func (m *UpdateTaskRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ContainerID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovTasks(uint64(l))
-	***REMOVED***
-	if m.Resources != nil ***REMOVED***
+	}
+	if m.Resources != nil {
 		l = m.Resources.Size()
 		n += 1 + l + sovTasks(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *MetricsRequest) Size() (n int) ***REMOVED***
+func (m *MetricsRequest) Size() (n int) {
 	var l int
 	_ = l
-	if len(m.Filters) > 0 ***REMOVED***
-		for _, s := range m.Filters ***REMOVED***
+	if len(m.Filters) > 0 {
+		for _, s := range m.Filters {
 			l = len(s)
 			n += 1 + l + sovTasks(uint64(l))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
+}
 
-func (m *MetricsResponse) Size() (n int) ***REMOVED***
+func (m *MetricsResponse) Size() (n int) {
 	var l int
 	_ = l
-	if len(m.Metrics) > 0 ***REMOVED***
-		for _, e := range m.Metrics ***REMOVED***
+	if len(m.Metrics) > 0 {
+		for _, e := range m.Metrics {
 			l = e.Size()
 			n += 1 + l + sovTasks(uint64(l))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
+}
 
-func (m *WaitRequest) Size() (n int) ***REMOVED***
+func (m *WaitRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ContainerID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovTasks(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.ExecID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovTasks(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *WaitResponse) Size() (n int) ***REMOVED***
+func (m *WaitResponse) Size() (n int) {
 	var l int
 	_ = l
-	if m.ExitStatus != 0 ***REMOVED***
+	if m.ExitStatus != 0 {
 		n += 1 + sovTasks(uint64(m.ExitStatus))
-	***REMOVED***
+	}
 	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.ExitedAt)
 	n += 1 + l + sovTasks(uint64(l))
 	return n
-***REMOVED***
+}
 
-func sovTasks(x uint64) (n int) ***REMOVED***
-	for ***REMOVED***
+func sovTasks(x uint64) (n int) {
+	for {
 		n++
 		x >>= 7
-		if x == 0 ***REMOVED***
+		if x == 0 {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
-func sozTasks(x uint64) (n int) ***REMOVED***
+}
+func sozTasks(x uint64) (n int) {
 	return sovTasks(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-***REMOVED***
-func (this *CreateTaskRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *CreateTaskRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&CreateTaskRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&CreateTaskRequest{`,
 		`ContainerID:` + fmt.Sprintf("%v", this.ContainerID) + `,`,
 		`Rootfs:` + strings.Replace(fmt.Sprintf("%v", this.Rootfs), "Mount", "containerd_types.Mount", 1) + `,`,
 		`Stdin:` + fmt.Sprintf("%v", this.Stdin) + `,`,
@@ -2319,135 +2319,135 @@ func (this *CreateTaskRequest) String() string ***REMOVED***
 		`Terminal:` + fmt.Sprintf("%v", this.Terminal) + `,`,
 		`Checkpoint:` + strings.Replace(fmt.Sprintf("%v", this.Checkpoint), "Descriptor", "containerd_types2.Descriptor", 1) + `,`,
 		`Options:` + strings.Replace(fmt.Sprintf("%v", this.Options), "Any", "google_protobuf1.Any", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *CreateTaskResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *CreateTaskResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&CreateTaskResponse***REMOVED***`,
+	}
+	s := strings.Join([]string{`&CreateTaskResponse{`,
 		`ContainerID:` + fmt.Sprintf("%v", this.ContainerID) + `,`,
 		`Pid:` + fmt.Sprintf("%v", this.Pid) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *StartRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *StartRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&StartRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&StartRequest{`,
 		`ContainerID:` + fmt.Sprintf("%v", this.ContainerID) + `,`,
 		`ExecID:` + fmt.Sprintf("%v", this.ExecID) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *StartResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *StartResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&StartResponse***REMOVED***`,
+	}
+	s := strings.Join([]string{`&StartResponse{`,
 		`Pid:` + fmt.Sprintf("%v", this.Pid) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *DeleteTaskRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *DeleteTaskRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&DeleteTaskRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&DeleteTaskRequest{`,
 		`ContainerID:` + fmt.Sprintf("%v", this.ContainerID) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *DeleteResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *DeleteResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&DeleteResponse***REMOVED***`,
+	}
+	s := strings.Join([]string{`&DeleteResponse{`,
 		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
 		`Pid:` + fmt.Sprintf("%v", this.Pid) + `,`,
 		`ExitStatus:` + fmt.Sprintf("%v", this.ExitStatus) + `,`,
 		`ExitedAt:` + strings.Replace(strings.Replace(this.ExitedAt.String(), "Timestamp", "google_protobuf3.Timestamp", 1), `&`, ``, 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *DeleteProcessRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *DeleteProcessRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&DeleteProcessRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&DeleteProcessRequest{`,
 		`ContainerID:` + fmt.Sprintf("%v", this.ContainerID) + `,`,
 		`ExecID:` + fmt.Sprintf("%v", this.ExecID) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *GetRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *GetRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&GetRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&GetRequest{`,
 		`ContainerID:` + fmt.Sprintf("%v", this.ContainerID) + `,`,
 		`ExecID:` + fmt.Sprintf("%v", this.ExecID) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *GetResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *GetResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&GetResponse***REMOVED***`,
+	}
+	s := strings.Join([]string{`&GetResponse{`,
 		`Process:` + strings.Replace(fmt.Sprintf("%v", this.Process), "Process", "containerd_v1_types.Process", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *ListTasksRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *ListTasksRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&ListTasksRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&ListTasksRequest{`,
 		`Filter:` + fmt.Sprintf("%v", this.Filter) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *ListTasksResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *ListTasksResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&ListTasksResponse***REMOVED***`,
+	}
+	s := strings.Join([]string{`&ListTasksResponse{`,
 		`Tasks:` + strings.Replace(fmt.Sprintf("%v", this.Tasks), "Process", "containerd_v1_types.Process", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *KillRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *KillRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&KillRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&KillRequest{`,
 		`ContainerID:` + fmt.Sprintf("%v", this.ContainerID) + `,`,
 		`ExecID:` + fmt.Sprintf("%v", this.ExecID) + `,`,
 		`Signal:` + fmt.Sprintf("%v", this.Signal) + `,`,
 		`All:` + fmt.Sprintf("%v", this.All) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *ExecProcessRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *ExecProcessRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&ExecProcessRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&ExecProcessRequest{`,
 		`ContainerID:` + fmt.Sprintf("%v", this.ContainerID) + `,`,
 		`Stdin:` + fmt.Sprintf("%v", this.Stdin) + `,`,
 		`Stdout:` + fmt.Sprintf("%v", this.Stdout) + `,`,
@@ -2455,3235 +2455,3235 @@ func (this *ExecProcessRequest) String() string ***REMOVED***
 		`Terminal:` + fmt.Sprintf("%v", this.Terminal) + `,`,
 		`Spec:` + strings.Replace(fmt.Sprintf("%v", this.Spec), "Any", "google_protobuf1.Any", 1) + `,`,
 		`ExecID:` + fmt.Sprintf("%v", this.ExecID) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *ExecProcessResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *ExecProcessResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&ExecProcessResponse***REMOVED***`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+	}
+	s := strings.Join([]string{`&ExecProcessResponse{`,
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *ResizePtyRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *ResizePtyRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&ResizePtyRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&ResizePtyRequest{`,
 		`ContainerID:` + fmt.Sprintf("%v", this.ContainerID) + `,`,
 		`ExecID:` + fmt.Sprintf("%v", this.ExecID) + `,`,
 		`Width:` + fmt.Sprintf("%v", this.Width) + `,`,
 		`Height:` + fmt.Sprintf("%v", this.Height) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *CloseIORequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *CloseIORequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&CloseIORequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&CloseIORequest{`,
 		`ContainerID:` + fmt.Sprintf("%v", this.ContainerID) + `,`,
 		`ExecID:` + fmt.Sprintf("%v", this.ExecID) + `,`,
 		`Stdin:` + fmt.Sprintf("%v", this.Stdin) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *PauseTaskRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *PauseTaskRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&PauseTaskRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&PauseTaskRequest{`,
 		`ContainerID:` + fmt.Sprintf("%v", this.ContainerID) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *ResumeTaskRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *ResumeTaskRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&ResumeTaskRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&ResumeTaskRequest{`,
 		`ContainerID:` + fmt.Sprintf("%v", this.ContainerID) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *ListPidsRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *ListPidsRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&ListPidsRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&ListPidsRequest{`,
 		`ContainerID:` + fmt.Sprintf("%v", this.ContainerID) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *ListPidsResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *ListPidsResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&ListPidsResponse***REMOVED***`,
+	}
+	s := strings.Join([]string{`&ListPidsResponse{`,
 		`Processes:` + strings.Replace(fmt.Sprintf("%v", this.Processes), "ProcessInfo", "containerd_v1_types.ProcessInfo", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *CheckpointTaskRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *CheckpointTaskRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&CheckpointTaskRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&CheckpointTaskRequest{`,
 		`ContainerID:` + fmt.Sprintf("%v", this.ContainerID) + `,`,
 		`ParentCheckpoint:` + fmt.Sprintf("%v", this.ParentCheckpoint) + `,`,
 		`Options:` + strings.Replace(fmt.Sprintf("%v", this.Options), "Any", "google_protobuf1.Any", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *CheckpointTaskResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *CheckpointTaskResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&CheckpointTaskResponse***REMOVED***`,
+	}
+	s := strings.Join([]string{`&CheckpointTaskResponse{`,
 		`Descriptors:` + strings.Replace(fmt.Sprintf("%v", this.Descriptors), "Descriptor", "containerd_types2.Descriptor", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *UpdateTaskRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *UpdateTaskRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&UpdateTaskRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&UpdateTaskRequest{`,
 		`ContainerID:` + fmt.Sprintf("%v", this.ContainerID) + `,`,
 		`Resources:` + strings.Replace(fmt.Sprintf("%v", this.Resources), "Any", "google_protobuf1.Any", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *MetricsRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *MetricsRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&MetricsRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&MetricsRequest{`,
 		`Filters:` + fmt.Sprintf("%v", this.Filters) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *MetricsResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *MetricsResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&MetricsResponse***REMOVED***`,
+	}
+	s := strings.Join([]string{`&MetricsResponse{`,
 		`Metrics:` + strings.Replace(fmt.Sprintf("%v", this.Metrics), "Metric", "containerd_types1.Metric", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *WaitRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *WaitRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&WaitRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&WaitRequest{`,
 		`ContainerID:` + fmt.Sprintf("%v", this.ContainerID) + `,`,
 		`ExecID:` + fmt.Sprintf("%v", this.ExecID) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *WaitResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *WaitResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&WaitResponse***REMOVED***`,
+	}
+	s := strings.Join([]string{`&WaitResponse{`,
 		`ExitStatus:` + fmt.Sprintf("%v", this.ExitStatus) + `,`,
 		`ExitedAt:` + strings.Replace(strings.Replace(this.ExitedAt.String(), "Timestamp", "google_protobuf3.Timestamp", 1), `&`, ``, 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func valueToStringTasks(v interface***REMOVED******REMOVED***) string ***REMOVED***
+}
+func valueToStringTasks(v interface{}) string {
 	rv := reflect.ValueOf(v)
-	if rv.IsNil() ***REMOVED***
+	if rv.IsNil() {
 		return "nil"
-	***REMOVED***
+	}
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
-***REMOVED***
-func (m *CreateTaskRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *CreateTaskRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowTasks
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: CreateTaskRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: CreateTaskRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ContainerID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ContainerID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Rootfs", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.Rootfs = append(m.Rootfs, &containerd_types.Mount***REMOVED******REMOVED***)
-			if err := m.Rootfs[len(m.Rootfs)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			m.Rootfs = append(m.Rootfs, &containerd_types.Mount{})
+			if err := m.Rootfs[len(m.Rootfs)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 4:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Stdin", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Stdin = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 5:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Stdout", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Stdout = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 6:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Stderr", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Stderr = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 7:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Terminal", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			m.Terminal = bool(v != 0)
 		case 8:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Checkpoint", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Checkpoint == nil ***REMOVED***
-				m.Checkpoint = &containerd_types2.Descriptor***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.Checkpoint.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.Checkpoint == nil {
+				m.Checkpoint = &containerd_types2.Descriptor{}
+			}
+			if err := m.Checkpoint.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 9:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Options", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Options == nil ***REMOVED***
-				m.Options = &google_protobuf1.Any***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.Options.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.Options == nil {
+				m.Options = &google_protobuf1.Any{}
+			}
+			if err := m.Options.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTasks(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *CreateTaskResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *CreateTaskResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowTasks
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: CreateTaskResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: CreateTaskResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ContainerID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ContainerID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Pid", wireType)
-			***REMOVED***
+			}
 			m.Pid = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Pid |= (uint32(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTasks(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *StartRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *StartRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowTasks
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: StartRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: StartRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ContainerID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ContainerID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ExecID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ExecID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTasks(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *StartResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *StartResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowTasks
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: StartResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: StartResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Pid", wireType)
-			***REMOVED***
+			}
 			m.Pid = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Pid |= (uint32(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTasks(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *DeleteTaskRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *DeleteTaskRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowTasks
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: DeleteTaskRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: DeleteTaskRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ContainerID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ContainerID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTasks(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *DeleteResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *DeleteResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowTasks
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: DeleteResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: DeleteResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Pid", wireType)
-			***REMOVED***
+			}
 			m.Pid = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Pid |= (uint32(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 3:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ExitStatus", wireType)
-			***REMOVED***
+			}
 			m.ExitStatus = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.ExitStatus |= (uint32(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 4:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ExitedAt", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.ExitedAt, dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.ExitedAt, dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTasks(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *DeleteProcessRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *DeleteProcessRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowTasks
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: DeleteProcessRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: DeleteProcessRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ContainerID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ContainerID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ExecID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ExecID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTasks(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *GetRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *GetRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowTasks
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: GetRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: GetRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ContainerID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ContainerID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ExecID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ExecID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTasks(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *GetResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *GetResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowTasks
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: GetResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: GetResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Process", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Process == nil ***REMOVED***
-				m.Process = &containerd_v1_types.Process***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.Process.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.Process == nil {
+				m.Process = &containerd_v1_types.Process{}
+			}
+			if err := m.Process.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTasks(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *ListTasksRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *ListTasksRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowTasks
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: ListTasksRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: ListTasksRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Filter", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Filter = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTasks(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *ListTasksResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *ListTasksResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowTasks
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: ListTasksResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: ListTasksResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Tasks", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.Tasks = append(m.Tasks, &containerd_v1_types.Process***REMOVED******REMOVED***)
-			if err := m.Tasks[len(m.Tasks)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			m.Tasks = append(m.Tasks, &containerd_v1_types.Process{})
+			if err := m.Tasks[len(m.Tasks)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTasks(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *KillRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *KillRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowTasks
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: KillRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: KillRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ContainerID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ContainerID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ExecID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ExecID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Signal", wireType)
-			***REMOVED***
+			}
 			m.Signal = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Signal |= (uint32(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 4:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field All", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			m.All = bool(v != 0)
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTasks(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *ExecProcessRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *ExecProcessRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowTasks
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: ExecProcessRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: ExecProcessRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ContainerID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ContainerID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Stdin", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Stdin = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Stdout", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Stdout = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 4:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Stderr", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Stderr = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 5:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Terminal", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			m.Terminal = bool(v != 0)
 		case 6:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Spec", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Spec == nil ***REMOVED***
-				m.Spec = &google_protobuf1.Any***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.Spec.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.Spec == nil {
+				m.Spec = &google_protobuf1.Any{}
+			}
+			if err := m.Spec.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 7:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ExecID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ExecID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTasks(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *ExecProcessResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *ExecProcessResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowTasks
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: ExecProcessResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: ExecProcessResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTasks(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *ResizePtyRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *ResizePtyRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowTasks
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: ResizePtyRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: ResizePtyRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ContainerID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ContainerID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ExecID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ExecID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Width", wireType)
-			***REMOVED***
+			}
 			m.Width = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Width |= (uint32(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 4:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Height", wireType)
-			***REMOVED***
+			}
 			m.Height = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Height |= (uint32(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTasks(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *CloseIORequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *CloseIORequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowTasks
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: CloseIORequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: CloseIORequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ContainerID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ContainerID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ExecID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ExecID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Stdin", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			m.Stdin = bool(v != 0)
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTasks(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *PauseTaskRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *PauseTaskRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowTasks
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: PauseTaskRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: PauseTaskRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ContainerID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ContainerID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTasks(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *ResumeTaskRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *ResumeTaskRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowTasks
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: ResumeTaskRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: ResumeTaskRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ContainerID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ContainerID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTasks(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *ListPidsRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *ListPidsRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowTasks
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: ListPidsRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: ListPidsRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ContainerID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ContainerID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTasks(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *ListPidsResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *ListPidsResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowTasks
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: ListPidsResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: ListPidsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Processes", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.Processes = append(m.Processes, &containerd_v1_types.ProcessInfo***REMOVED******REMOVED***)
-			if err := m.Processes[len(m.Processes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			m.Processes = append(m.Processes, &containerd_v1_types.ProcessInfo{})
+			if err := m.Processes[len(m.Processes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTasks(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *CheckpointTaskRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *CheckpointTaskRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowTasks
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: CheckpointTaskRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: CheckpointTaskRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ContainerID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ContainerID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ParentCheckpoint", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ParentCheckpoint = github_com_opencontainers_go_digest.Digest(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Options", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Options == nil ***REMOVED***
-				m.Options = &google_protobuf1.Any***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.Options.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.Options == nil {
+				m.Options = &google_protobuf1.Any{}
+			}
+			if err := m.Options.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTasks(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *CheckpointTaskResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *CheckpointTaskResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowTasks
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: CheckpointTaskResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: CheckpointTaskResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Descriptors", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.Descriptors = append(m.Descriptors, &containerd_types2.Descriptor***REMOVED******REMOVED***)
-			if err := m.Descriptors[len(m.Descriptors)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			m.Descriptors = append(m.Descriptors, &containerd_types2.Descriptor{})
+			if err := m.Descriptors[len(m.Descriptors)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTasks(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *UpdateTaskRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *UpdateTaskRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowTasks
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: UpdateTaskRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: UpdateTaskRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ContainerID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ContainerID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Resources", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Resources == nil ***REMOVED***
-				m.Resources = &google_protobuf1.Any***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.Resources.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.Resources == nil {
+				m.Resources = &google_protobuf1.Any{}
+			}
+			if err := m.Resources.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTasks(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *MetricsRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *MetricsRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowTasks
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: MetricsRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: MetricsRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Filters", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Filters = append(m.Filters, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTasks(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *MetricsResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *MetricsResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowTasks
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: MetricsResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: MetricsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Metrics", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.Metrics = append(m.Metrics, &containerd_types1.Metric***REMOVED******REMOVED***)
-			if err := m.Metrics[len(m.Metrics)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			m.Metrics = append(m.Metrics, &containerd_types1.Metric{})
+			if err := m.Metrics[len(m.Metrics)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTasks(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *WaitRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *WaitRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowTasks
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: WaitRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: WaitRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ContainerID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ContainerID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ExecID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ExecID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTasks(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *WaitResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *WaitResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowTasks
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: WaitResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: WaitResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ExitStatus", wireType)
-			***REMOVED***
+			}
 			m.ExitStatus = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.ExitStatus |= (uint32(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ExitedAt", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.ExitedAt, dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.ExitedAt, dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTasks(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthTasks
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func skipTasks(dAtA []byte) (n int, err error) ***REMOVED***
+}
+func skipTasks(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return 0, ErrIntOverflowTasks
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return 0, io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		wireType := int(wire & 0x7)
-		switch wireType ***REMOVED***
+		switch wireType {
 		case 0:
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				iNdEx++
-				if dAtA[iNdEx-1] < 0x80 ***REMOVED***
+				if dAtA[iNdEx-1] < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return iNdEx, nil
 		case 1:
 			iNdEx += 8
 			return iNdEx, nil
 		case 2:
 			var length int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowTasks
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				length |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			iNdEx += length
-			if length < 0 ***REMOVED***
+			if length < 0 {
 				return 0, ErrInvalidLengthTasks
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 3:
-			for ***REMOVED***
+			for {
 				var innerWire uint64
 				var start int = iNdEx
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return 0, ErrIntOverflowTasks
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return 0, io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					innerWire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				innerWireType := int(innerWire & 0x7)
-				if innerWireType == 4 ***REMOVED***
+				if innerWireType == 4 {
 					break
-				***REMOVED***
+				}
 				next, err := skipTasks(dAtA[start:])
-				if err != nil ***REMOVED***
+				if err != nil {
 					return 0, err
-				***REMOVED***
+				}
 				iNdEx = start + next
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 4:
 			return iNdEx, nil
@@ -5692,21 +5692,21 @@ func skipTasks(dAtA []byte) (n int, err error) ***REMOVED***
 			return iNdEx, nil
 		default:
 			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	panic("unreachable")
-***REMOVED***
+}
 
 var (
 	ErrInvalidLengthTasks = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowTasks   = fmt.Errorf("proto: integer overflow")
 )
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterFile("github.com/containerd/containerd/api/services/tasks/v1/tasks.proto", fileDescriptorTasks)
-***REMOVED***
+}
 
-var fileDescriptorTasks = []byte***REMOVED***
+var fileDescriptorTasks = []byte{
 	// 1318 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x58, 0x4b, 0x6f, 0x1b, 0x45,
 	0x1c, 0xef, 0xfa, 0xed, 0xbf, 0x93, 0x36, 0x59, 0xd2, 0x60, 0x96, 0x2a, 0x0e, 0xcb, 0xc5, 0x04,
@@ -5791,4 +5791,4 @@ var fileDescriptorTasks = []byte***REMOVED***
 	0xfb, 0x63, 0xb0, 0xa4, 0xfd, 0x33, 0x58, 0xd2, 0x9e, 0xdc, 0x79, 0xb3, 0xbf, 0xec, 0xdd, 0x16,
 	0x8b, 0xc7, 0xb9, 0xa7, 0x25, 0x01, 0xd8, 0xcd, 0xff, 0x02, 0x00, 0x00, 0xff, 0xff, 0x85, 0xa2,
 	0x4f, 0xd1, 0x22, 0x14, 0x00, 0x00,
-***REMOVED***
+}

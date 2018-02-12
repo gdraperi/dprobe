@@ -13,34 +13,34 @@ import (
 	"golang.org/x/net/internal/socket"
 )
 
-func (so *sockOpt) getMulticastInterface(c *socket.Conn) (*net.Interface, error) ***REMOVED***
+func (so *sockOpt) getMulticastInterface(c *socket.Conn) (*net.Interface, error) {
 	return nil, errOpNoSupport
-***REMOVED***
+}
 
-func (so *sockOpt) setMulticastInterface(c *socket.Conn, ifi *net.Interface) error ***REMOVED***
+func (so *sockOpt) setMulticastInterface(c *socket.Conn, ifi *net.Interface) error {
 	return errOpNoSupport
-***REMOVED***
+}
 
-func (so *sockOpt) getICMPFilter(c *socket.Conn) (*ICMPFilter, error) ***REMOVED***
+func (so *sockOpt) getICMPFilter(c *socket.Conn) (*ICMPFilter, error) {
 	return nil, errOpNoSupport
-***REMOVED***
+}
 
-func (so *sockOpt) setICMPFilter(c *socket.Conn, f *ICMPFilter) error ***REMOVED***
+func (so *sockOpt) setICMPFilter(c *socket.Conn, f *ICMPFilter) error {
 	return errOpNoSupport
-***REMOVED***
+}
 
-func (so *sockOpt) getMTUInfo(c *socket.Conn) (*net.Interface, int, error) ***REMOVED***
+func (so *sockOpt) getMTUInfo(c *socket.Conn) (*net.Interface, int, error) {
 	return nil, 0, errOpNoSupport
-***REMOVED***
+}
 
-func (so *sockOpt) setGroup(c *socket.Conn, ifi *net.Interface, grp net.IP) error ***REMOVED***
+func (so *sockOpt) setGroup(c *socket.Conn, ifi *net.Interface, grp net.IP) error {
 	return errOpNoSupport
-***REMOVED***
+}
 
-func (so *sockOpt) setSourceGroup(c *socket.Conn, ifi *net.Interface, grp, src net.IP) error ***REMOVED***
+func (so *sockOpt) setSourceGroup(c *socket.Conn, ifi *net.Interface, grp, src net.IP) error {
 	return errOpNoSupport
-***REMOVED***
+}
 
-func (so *sockOpt) setBPF(c *socket.Conn, f []bpf.RawInstruction) error ***REMOVED***
+func (so *sockOpt) setBPF(c *socket.Conn, f []bpf.RawInstruction) error {
 	return errOpNoSupport
-***REMOVED***
+}

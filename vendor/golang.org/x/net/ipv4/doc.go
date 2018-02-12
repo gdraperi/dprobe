@@ -27,29 +27,29 @@
 // IPv4 header for each packet.
 //
 //	ln, err := net.Listen("tcp4", "0.0.0.0:1024")
-//	if err != nil ***REMOVED***
+//	if err != nil {
 //		// error handling
-//	***REMOVED***
+//	}
 //	defer ln.Close()
-//	for ***REMOVED***
+//	for {
 //		c, err := ln.Accept()
-//		if err != nil ***REMOVED***
+//		if err != nil {
 //			// error handling
-//		***REMOVED***
-//		go func(c net.Conn) ***REMOVED***
+//		}
+//		go func(c net.Conn) {
 //			defer c.Close()
 //
 // The outgoing packets will be labeled DiffServ assured forwarding
 // class 1 low drop precedence, known as AF11 packets.
 //
-//			if err := ipv4.NewConn(c).SetTOS(0x28); err != nil ***REMOVED***
+//			if err := ipv4.NewConn(c).SetTOS(0x28); err != nil {
 //				// error handling
-//			***REMOVED***
-//			if _, err := c.Write(data); err != nil ***REMOVED***
+//			}
+//			if _, err := c.Write(data); err != nil {
 //				// error handling
-//			***REMOVED***
-//		***REMOVED***(c)
-//	***REMOVED***
+//			}
+//		}(c)
+//	}
 //
 //
 // Multicasting
@@ -61,22 +61,22 @@
 // multicast groups.
 //
 //	en0, err := net.InterfaceByName("en0")
-//	if err != nil ***REMOVED***
+//	if err != nil {
 //		// error handling
-//	***REMOVED***
+//	}
 //	en1, err := net.InterfaceByIndex(911)
-//	if err != nil ***REMOVED***
+//	if err != nil {
 //		// error handling
-//	***REMOVED***
+//	}
 //	group := net.IPv4(224, 0, 0, 250)
 //
 // First, an application listens to an appropriate address with an
 // appropriate service port.
 //
 //	c, err := net.ListenPacket("udp4", "0.0.0.0:1024")
-//	if err != nil ***REMOVED***
+//	if err != nil {
 //		// error handling
-//	***REMOVED***
+//	}
 //	defer c.Close()
 //
 // Second, the application joins multicast groups, starts listening to
@@ -86,12 +86,12 @@
 // protocols, such as IPv4 and Ethernet.
 //
 //	p := ipv4.NewPacketConn(c)
-//	if err := p.JoinGroup(en0, &net.UDPAddr***REMOVED***IP: group***REMOVED***); err != nil ***REMOVED***
+//	if err := p.JoinGroup(en0, &net.UDPAddr{IP: group}); err != nil {
 //		// error handling
-//	***REMOVED***
-//	if err := p.JoinGroup(en1, &net.UDPAddr***REMOVED***IP: group***REMOVED***); err != nil ***REMOVED***
+//	}
+//	if err := p.JoinGroup(en1, &net.UDPAddr{IP: group}); err != nil {
 //		// error handling
-//	***REMOVED***
+//	}
 //
 // The application might set per packet control message transmissions
 // between the protocol stack within the kernel. When the application
@@ -99,47 +99,47 @@
 // SetControlMessage of PacketConn is used to enable control message
 // transmissions.
 //
-//	if err := p.SetControlMessage(ipv4.FlagDst, true); err != nil ***REMOVED***
+//	if err := p.SetControlMessage(ipv4.FlagDst, true); err != nil {
 //		// error handling
-//	***REMOVED***
+//	}
 //
 // The application could identify whether the received packets are
 // of interest by using the control message that contains the
 // destination address of the received packet.
 //
 //	b := make([]byte, 1500)
-//	for ***REMOVED***
+//	for {
 //		n, cm, src, err := p.ReadFrom(b)
-//		if err != nil ***REMOVED***
+//		if err != nil {
 //			// error handling
-//		***REMOVED***
-//		if cm.Dst.IsMulticast() ***REMOVED***
-//			if cm.Dst.Equal(group) ***REMOVED***
+//		}
+//		if cm.Dst.IsMulticast() {
+//			if cm.Dst.Equal(group) {
 //				// joined group, do something
-//			***REMOVED*** else ***REMOVED***
+//			} else {
 //				// unknown group, discard
 //				continue
-//			***REMOVED***
-//		***REMOVED***
+//			}
+//		}
 //
 // The application can also send both unicast and multicast packets.
 //
 //		p.SetTOS(0x0)
 //		p.SetTTL(16)
-//		if _, err := p.WriteTo(data, nil, src); err != nil ***REMOVED***
+//		if _, err := p.WriteTo(data, nil, src); err != nil {
 //			// error handling
-//		***REMOVED***
-//		dst := &net.UDPAddr***REMOVED***IP: group, Port: 1024***REMOVED***
-//		for _, ifi := range []*net.Interface***REMOVED***en0, en1***REMOVED*** ***REMOVED***
-//			if err := p.SetMulticastInterface(ifi); err != nil ***REMOVED***
+//		}
+//		dst := &net.UDPAddr{IP: group, Port: 1024}
+//		for _, ifi := range []*net.Interface{en0, en1} {
+//			if err := p.SetMulticastInterface(ifi); err != nil {
 //				// error handling
-//			***REMOVED***
+//			}
 //			p.SetMulticastTTL(2)
-//			if _, err := p.WriteTo(data, nil, dst); err != nil ***REMOVED***
+//			if _, err := p.WriteTo(data, nil, dst); err != nil {
 //				// error handling
-//			***REMOVED***
-//		***REMOVED***
-//	***REMOVED***
+//			}
+//		}
+//	}
 //
 //
 // More multicasting
@@ -150,20 +150,20 @@
 // interfaces by using:
 //
 //	c, err := net.ListenPacket("udp4", "0.0.0.0:1024")
-//	if err != nil ***REMOVED***
+//	if err != nil {
 //		// error handling
-//	***REMOVED***
+//	}
 //	defer c.Close()
 //	p := ipv4.NewPacketConn(c)
-//	if err := p.JoinGroup(en0, &net.UDPAddr***REMOVED***IP: net.IPv4(224, 0, 0, 248)***REMOVED***); err != nil ***REMOVED***
+//	if err := p.JoinGroup(en0, &net.UDPAddr{IP: net.IPv4(224, 0, 0, 248)}); err != nil {
 //		// error handling
-//	***REMOVED***
-//	if err := p.JoinGroup(en0, &net.UDPAddr***REMOVED***IP: net.IPv4(224, 0, 0, 249)***REMOVED***); err != nil ***REMOVED***
+//	}
+//	if err := p.JoinGroup(en0, &net.UDPAddr{IP: net.IPv4(224, 0, 0, 249)}); err != nil {
 //		// error handling
-//	***REMOVED***
-//	if err := p.JoinGroup(en1, &net.UDPAddr***REMOVED***IP: net.IPv4(224, 0, 0, 249)***REMOVED***); err != nil ***REMOVED***
+//	}
+//	if err := p.JoinGroup(en1, &net.UDPAddr{IP: net.IPv4(224, 0, 0, 249)}); err != nil {
 //		// error handling
-//	***REMOVED***
+//	}
 //
 // It is possible for multiple UDP listeners that listen on the same
 // UDP port to join the same multicast group. The net package will
@@ -172,33 +172,33 @@
 // the net.ListenPacket or net.ListenUDP.
 //
 //	c1, err := net.ListenPacket("udp4", "224.0.0.0:1024")
-//	if err != nil ***REMOVED***
+//	if err != nil {
 //		// error handling
-//	***REMOVED***
+//	}
 //	defer c1.Close()
 //	c2, err := net.ListenPacket("udp4", "224.0.0.0:1024")
-//	if err != nil ***REMOVED***
+//	if err != nil {
 //		// error handling
-//	***REMOVED***
+//	}
 //	defer c2.Close()
 //	p1 := ipv4.NewPacketConn(c1)
-//	if err := p1.JoinGroup(en0, &net.UDPAddr***REMOVED***IP: net.IPv4(224, 0, 0, 248)***REMOVED***); err != nil ***REMOVED***
+//	if err := p1.JoinGroup(en0, &net.UDPAddr{IP: net.IPv4(224, 0, 0, 248)}); err != nil {
 //		// error handling
-//	***REMOVED***
+//	}
 //	p2 := ipv4.NewPacketConn(c2)
-//	if err := p2.JoinGroup(en0, &net.UDPAddr***REMOVED***IP: net.IPv4(224, 0, 0, 248)***REMOVED***); err != nil ***REMOVED***
+//	if err := p2.JoinGroup(en0, &net.UDPAddr{IP: net.IPv4(224, 0, 0, 248)}); err != nil {
 //		// error handling
-//	***REMOVED***
+//	}
 //
 // Also it is possible for the application to leave or rejoin a
 // multicast group on the network interface.
 //
-//	if err := p.LeaveGroup(en0, &net.UDPAddr***REMOVED***IP: net.IPv4(224, 0, 0, 248)***REMOVED***); err != nil ***REMOVED***
+//	if err := p.LeaveGroup(en0, &net.UDPAddr{IP: net.IPv4(224, 0, 0, 248)}); err != nil {
 //		// error handling
-//	***REMOVED***
-//	if err := p.JoinGroup(en0, &net.UDPAddr***REMOVED***IP: net.IPv4(224, 0, 0, 250)***REMOVED***); err != nil ***REMOVED***
+//	}
+//	if err := p.JoinGroup(en0, &net.UDPAddr{IP: net.IPv4(224, 0, 0, 250)}); err != nil {
 //		// error handling
-//	***REMOVED***
+//	}
 //
 //
 // Source-specific multicasting
@@ -208,29 +208,29 @@
 // The application may use JoinSourceSpecificGroup and
 // LeaveSourceSpecificGroup for the operation known as "include" mode,
 //
-//	ssmgroup := net.UDPAddr***REMOVED***IP: net.IPv4(232, 7, 8, 9)***REMOVED***
-//	ssmsource := net.UDPAddr***REMOVED***IP: net.IPv4(192, 168, 0, 1)***REMOVED***)
-//	if err := p.JoinSourceSpecificGroup(en0, &ssmgroup, &ssmsource); err != nil ***REMOVED***
+//	ssmgroup := net.UDPAddr{IP: net.IPv4(232, 7, 8, 9)}
+//	ssmsource := net.UDPAddr{IP: net.IPv4(192, 168, 0, 1)})
+//	if err := p.JoinSourceSpecificGroup(en0, &ssmgroup, &ssmsource); err != nil {
 //		// error handling
-//	***REMOVED***
-//	if err := p.LeaveSourceSpecificGroup(en0, &ssmgroup, &ssmsource); err != nil ***REMOVED***
+//	}
+//	if err := p.LeaveSourceSpecificGroup(en0, &ssmgroup, &ssmsource); err != nil {
 //		// error handling
-//	***REMOVED***
+//	}
 //
 // or JoinGroup, ExcludeSourceSpecificGroup,
 // IncludeSourceSpecificGroup and LeaveGroup for the operation known
 // as "exclude" mode.
 //
-//	exclsource := net.UDPAddr***REMOVED***IP: net.IPv4(192, 168, 0, 254)***REMOVED***
-//	if err := p.JoinGroup(en0, &ssmgroup); err != nil ***REMOVED***
+//	exclsource := net.UDPAddr{IP: net.IPv4(192, 168, 0, 254)}
+//	if err := p.JoinGroup(en0, &ssmgroup); err != nil {
 //		// error handling
-//	***REMOVED***
-//	if err := p.ExcludeSourceSpecificGroup(en0, &ssmgroup, &exclsource); err != nil ***REMOVED***
+//	}
+//	if err := p.ExcludeSourceSpecificGroup(en0, &ssmgroup, &exclsource); err != nil {
 //		// error handling
-//	***REMOVED***
-//	if err := p.LeaveGroup(en0, &ssmgroup); err != nil ***REMOVED***
+//	}
+//	if err := p.LeaveGroup(en0, &ssmgroup); err != nil {
 //		// error handling
-//	***REMOVED***
+//	}
 //
 // Note that it depends on each platform implementation what happens
 // when an application which runs on IGMPv3 unsupported platform uses

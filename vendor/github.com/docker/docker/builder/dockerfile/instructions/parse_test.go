@@ -11,190 +11,190 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestCommandsExactlyOneArgument(t *testing.T) ***REMOVED***
-	commands := []string***REMOVED***
+func TestCommandsExactlyOneArgument(t *testing.T) {
+	commands := []string{
 		"MAINTAINER",
 		"WORKDIR",
 		"USER",
 		"STOPSIGNAL",
-	***REMOVED***
+	}
 
-	for _, command := range commands ***REMOVED***
+	for _, command := range commands {
 		ast, err := parser.Parse(strings.NewReader(command))
 		require.NoError(t, err)
 		_, err = ParseInstruction(ast.AST.Children[0])
 		assert.EqualError(t, err, errExactlyOneArgument(command).Error())
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestCommandsAtLeastOneArgument(t *testing.T) ***REMOVED***
-	commands := []string***REMOVED***
+func TestCommandsAtLeastOneArgument(t *testing.T) {
+	commands := []string{
 		"ENV",
 		"LABEL",
 		"ONBUILD",
 		"HEALTHCHECK",
 		"EXPOSE",
 		"VOLUME",
-	***REMOVED***
+	}
 
-	for _, command := range commands ***REMOVED***
+	for _, command := range commands {
 		ast, err := parser.Parse(strings.NewReader(command))
 		require.NoError(t, err)
 		_, err = ParseInstruction(ast.AST.Children[0])
 		assert.EqualError(t, err, errAtLeastOneArgument(command).Error())
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestCommandsNoDestinationArgument(t *testing.T) ***REMOVED***
-	commands := []string***REMOVED***
+func TestCommandsNoDestinationArgument(t *testing.T) {
+	commands := []string{
 		"ADD",
 		"COPY",
-	***REMOVED***
+	}
 
-	for _, command := range commands ***REMOVED***
+	for _, command := range commands {
 		ast, err := parser.Parse(strings.NewReader(command + " arg1"))
 		require.NoError(t, err)
 		_, err = ParseInstruction(ast.AST.Children[0])
 		assert.EqualError(t, err, errNoDestinationArgument(command).Error())
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestCommandsTooManyArguments(t *testing.T) ***REMOVED***
-	commands := []string***REMOVED***
+func TestCommandsTooManyArguments(t *testing.T) {
+	commands := []string{
 		"ENV",
 		"LABEL",
-	***REMOVED***
+	}
 
-	for _, command := range commands ***REMOVED***
-		node := &parser.Node***REMOVED***
+	for _, command := range commands {
+		node := &parser.Node{
 			Original: command + "arg1 arg2 arg3",
 			Value:    strings.ToLower(command),
-			Next: &parser.Node***REMOVED***
+			Next: &parser.Node{
 				Value: "arg1",
-				Next: &parser.Node***REMOVED***
+				Next: &parser.Node{
 					Value: "arg2",
-					Next: &parser.Node***REMOVED***
+					Next: &parser.Node{
 						Value: "arg3",
-					***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***
+					},
+				},
+			},
+		}
 		_, err := ParseInstruction(node)
 		assert.EqualError(t, err, errTooManyArguments(command).Error())
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestCommandsBlankNames(t *testing.T) ***REMOVED***
-	commands := []string***REMOVED***
+func TestCommandsBlankNames(t *testing.T) {
+	commands := []string{
 		"ENV",
 		"LABEL",
-	***REMOVED***
+	}
 
-	for _, command := range commands ***REMOVED***
-		node := &parser.Node***REMOVED***
+	for _, command := range commands {
+		node := &parser.Node{
 			Original: command + " =arg2",
 			Value:    strings.ToLower(command),
-			Next: &parser.Node***REMOVED***
+			Next: &parser.Node{
 				Value: "",
-				Next: &parser.Node***REMOVED***
+				Next: &parser.Node{
 					Value: "arg2",
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***
+				},
+			},
+		}
 		_, err := ParseInstruction(node)
 		assert.EqualError(t, err, errBlankCommandNames(command).Error())
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestHealthCheckCmd(t *testing.T) ***REMOVED***
-	node := &parser.Node***REMOVED***
+func TestHealthCheckCmd(t *testing.T) {
+	node := &parser.Node{
 		Value: command.Healthcheck,
-		Next: &parser.Node***REMOVED***
+		Next: &parser.Node{
 			Value: "CMD",
-			Next: &parser.Node***REMOVED***
+			Next: &parser.Node{
 				Value: "hello",
-				Next: &parser.Node***REMOVED***
+				Next: &parser.Node{
 					Value: "world",
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+				},
+			},
+		},
+	}
 	cmd, err := ParseInstruction(node)
 	assert.NoError(t, err)
 	hc, ok := cmd.(*HealthCheckCommand)
 	assert.True(t, ok)
-	expected := []string***REMOVED***"CMD-SHELL", "hello world"***REMOVED***
+	expected := []string{"CMD-SHELL", "hello world"}
 	assert.Equal(t, expected, hc.Health.Test)
-***REMOVED***
+}
 
-func TestParseOptInterval(t *testing.T) ***REMOVED***
-	flInterval := &Flag***REMOVED***
+func TestParseOptInterval(t *testing.T) {
+	flInterval := &Flag{
 		name:     "interval",
 		flagType: stringType,
 		Value:    "50ns",
-	***REMOVED***
+	}
 	_, err := parseOptInterval(flInterval)
 	testutil.ErrorContains(t, err, "cannot be less than 1ms")
 
 	flInterval.Value = "1ms"
 	_, err = parseOptInterval(flInterval)
 	require.NoError(t, err)
-***REMOVED***
+}
 
-func TestErrorCases(t *testing.T) ***REMOVED***
-	cases := []struct ***REMOVED***
+func TestErrorCases(t *testing.T) {
+	cases := []struct {
 		name          string
 		dockerfile    string
 		expectedError string
-	***REMOVED******REMOVED***
-		***REMOVED***
+	}{
+		{
 			name: "copyEmptyWhitespace",
 			dockerfile: `COPY	
 		quux \
       bar`,
 			expectedError: "COPY requires at least two arguments",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			name:          "ONBUILD forbidden FROM",
 			dockerfile:    "ONBUILD FROM scratch",
 			expectedError: "FROM isn't allowed as an ONBUILD trigger",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			name:          "ONBUILD forbidden MAINTAINER",
 			dockerfile:    "ONBUILD MAINTAINER docker.io",
 			expectedError: "MAINTAINER isn't allowed as an ONBUILD trigger",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			name:          "ARG two arguments",
 			dockerfile:    "ARG foo bar",
 			expectedError: "ARG requires exactly one argument",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			name:          "MAINTAINER unknown flag",
 			dockerfile:    "MAINTAINER --boo joe@example.com",
 			expectedError: "Unknown flag: boo",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			name:          "Chaining ONBUILD",
 			dockerfile:    `ONBUILD ONBUILD RUN touch foobar`,
 			expectedError: "Chaining ONBUILD via `ONBUILD ONBUILD` isn't allowed",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			name:          "Invalid instruction",
 			dockerfile:    `foo bar`,
 			expectedError: "unknown instruction: FOO",
-		***REMOVED***,
-	***REMOVED***
-	for _, c := range cases ***REMOVED***
+		},
+	}
+	for _, c := range cases {
 		r := strings.NewReader(c.dockerfile)
 		ast, err := parser.Parse(r)
 
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("Error when parsing Dockerfile: %s", err)
-		***REMOVED***
+		}
 		n := ast.AST.Children[0]
 		_, err = ParseInstruction(n)
 		testutil.ErrorContains(t, err, c.expectedError)
-	***REMOVED***
+	}
 
-***REMOVED***
+}

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-changelogFile=$***REMOVED***1:-CHANGELOG.md***REMOVED***
+changelogFile=${1:-CHANGELOG.md}
 
 if [ ! -r "$changelogFile" ]; then
   echo "Unable to read file $changelogFile" >&2

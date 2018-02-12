@@ -34,54 +34,54 @@ import (
 //
 // A Caser may be stateful and should therefore not be shared between
 // goroutines.
-type Caser struct ***REMOVED***
+type Caser struct {
 	t transform.SpanningTransformer
-***REMOVED***
+}
 
 // Bytes returns a new byte slice with the result of converting b to the case
 // form implemented by c.
-func (c Caser) Bytes(b []byte) []byte ***REMOVED***
+func (c Caser) Bytes(b []byte) []byte {
 	b, _, _ = transform.Bytes(c.t, b)
 	return b
-***REMOVED***
+}
 
 // String returns a string with the result of transforming s to the case form
 // implemented by c.
-func (c Caser) String(s string) string ***REMOVED***
+func (c Caser) String(s string) string {
 	s, _, _ = transform.String(c.t, s)
 	return s
-***REMOVED***
+}
 
 // Reset resets the Caser to be reused for new input after a previous call to
 // Transform.
-func (c Caser) Reset() ***REMOVED*** c.t.Reset() ***REMOVED***
+func (c Caser) Reset() { c.t.Reset() }
 
 // Transform implements the transform.Transformer interface and transforms the
 // given input to the case form implemented by c.
-func (c Caser) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) ***REMOVED***
+func (c Caser) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) {
 	return c.t.Transform(dst, src, atEOF)
-***REMOVED***
+}
 
 // Span implements the transform.SpanningTransformer interface.
-func (c Caser) Span(src []byte, atEOF bool) (n int, err error) ***REMOVED***
+func (c Caser) Span(src []byte, atEOF bool) (n int, err error) {
 	return c.t.Span(src, atEOF)
-***REMOVED***
+}
 
 // Upper returns a Caser for language-specific uppercasing.
-func Upper(t language.Tag, opts ...Option) Caser ***REMOVED***
-	return Caser***REMOVED***makeUpper(t, getOpts(opts...))***REMOVED***
-***REMOVED***
+func Upper(t language.Tag, opts ...Option) Caser {
+	return Caser{makeUpper(t, getOpts(opts...))}
+}
 
 // Lower returns a Caser for language-specific lowercasing.
-func Lower(t language.Tag, opts ...Option) Caser ***REMOVED***
-	return Caser***REMOVED***makeLower(t, getOpts(opts...))***REMOVED***
-***REMOVED***
+func Lower(t language.Tag, opts ...Option) Caser {
+	return Caser{makeLower(t, getOpts(opts...))}
+}
 
 // Title returns a Caser for language-specific title casing. It uses an
 // approximation of the default Unicode Word Break algorithm.
-func Title(t language.Tag, opts ...Option) Caser ***REMOVED***
-	return Caser***REMOVED***makeTitle(t, getOpts(opts...))***REMOVED***
-***REMOVED***
+func Title(t language.Tag, opts ...Option) Caser {
+	return Caser{makeTitle(t, getOpts(opts...))}
+}
 
 // Fold returns a Caser that implements Unicode case folding. The returned Caser
 // is stateless and safe to use concurrently by multiple goroutines.
@@ -90,9 +90,9 @@ func Title(t language.Tag, opts ...Option) Caser ***REMOVED***
 // Use the collate or search package for more convenient and linguistically
 // sound comparisons. Use golang.org/x/text/secure/precis for string comparisons
 // where security aspects are a concern.
-func Fold(opts ...Option) Caser ***REMOVED***
-	return Caser***REMOVED***makeFold(getOpts(opts...))***REMOVED***
-***REMOVED***
+func Fold(opts ...Option) Caser {
+	return Caser{makeFold(getOpts(opts...))}
+}
 
 // An Option is used to modify the behavior of a Caser.
 type Option func(o options) options
@@ -115,48 +115,48 @@ var (
 
 // TODO: option to preserve a normal form, if applicable?
 
-type options struct ***REMOVED***
+type options struct {
 	noLower bool
 	simple  bool
 
 	// TODO: segmenter, max ignorable, alternative versions, etc.
 
 	ignoreFinalSigma bool
-***REMOVED***
+}
 
-func getOpts(o ...Option) (res options) ***REMOVED***
-	for _, f := range o ***REMOVED***
+func getOpts(o ...Option) (res options) {
+	for _, f := range o {
 		res = f(res)
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func noLower(o options) options ***REMOVED***
+func noLower(o options) options {
 	o.noLower = true
 	return o
-***REMOVED***
+}
 
-func compact(o options) options ***REMOVED***
+func compact(o options) options {
 	o.simple = true
 	return o
-***REMOVED***
+}
 
 // HandleFinalSigma specifies whether the special handling of Greek final sigma
 // should be enabled. Unicode prescribes handling the Greek final sigma for all
 // locales, but standards like IDNA and PRECIS override this default.
-func HandleFinalSigma(enable bool) Option ***REMOVED***
-	if enable ***REMOVED***
+func HandleFinalSigma(enable bool) Option {
+	if enable {
 		return handleFinalSigma
-	***REMOVED***
+	}
 	return ignoreFinalSigma
-***REMOVED***
+}
 
-func ignoreFinalSigma(o options) options ***REMOVED***
+func ignoreFinalSigma(o options) options {
 	o.ignoreFinalSigma = true
 	return o
-***REMOVED***
+}
 
-func handleFinalSigma(o options) options ***REMOVED***
+func handleFinalSigma(o options) options {
 	o.ignoreFinalSigma = false
 	return o
-***REMOVED***
+}

@@ -9,16 +9,16 @@ import (
 // handlerWithGlobalMiddlewares wraps the handler function for a request with
 // the server's global middlewares. The order of the middlewares is backwards,
 // meaning that the first in the list will be evaluated last.
-func (s *Server) handlerWithGlobalMiddlewares(handler httputils.APIFunc) httputils.APIFunc ***REMOVED***
+func (s *Server) handlerWithGlobalMiddlewares(handler httputils.APIFunc) httputils.APIFunc {
 	next := handler
 
-	for _, m := range s.middlewares ***REMOVED***
+	for _, m := range s.middlewares {
 		next = m.WrapHandler(next)
-	***REMOVED***
+	}
 
-	if s.cfg.Logging && logrus.GetLevel() == logrus.DebugLevel ***REMOVED***
+	if s.cfg.Logging && logrus.GetLevel() == logrus.DebugLevel {
 		next = middleware.DebugRequestMiddleware(next)
-	***REMOVED***
+	}
 
 	return next
-***REMOVED***
+}

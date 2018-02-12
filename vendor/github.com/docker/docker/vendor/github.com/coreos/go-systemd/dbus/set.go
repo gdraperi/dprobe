@@ -14,34 +14,34 @@
 
 package dbus
 
-type set struct ***REMOVED***
+type set struct {
 	data map[string]bool
-***REMOVED***
+}
 
-func (s *set) Add(value string) ***REMOVED***
+func (s *set) Add(value string) {
 	s.data[value] = true
-***REMOVED***
+}
 
-func (s *set) Remove(value string) ***REMOVED***
+func (s *set) Remove(value string) {
 	delete(s.data, value)
-***REMOVED***
+}
 
-func (s *set) Contains(value string) (exists bool) ***REMOVED***
+func (s *set) Contains(value string) (exists bool) {
 	_, exists = s.data[value]
 	return
-***REMOVED***
+}
 
-func (s *set) Length() int ***REMOVED***
+func (s *set) Length() int {
 	return len(s.data)
-***REMOVED***
+}
 
-func (s *set) Values() (values []string) ***REMOVED***
-	for val, _ := range s.data ***REMOVED***
+func (s *set) Values() (values []string) {
+	for val, _ := range s.data {
 		values = append(values, val)
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func newSet() *set ***REMOVED***
-	return &set***REMOVED***make(map[string]bool)***REMOVED***
-***REMOVED***
+func newSet() *set {
+	return &set{make(map[string]bool)}
+}

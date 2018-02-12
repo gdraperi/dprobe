@@ -6,31 +6,31 @@ package socket
 
 import "unsafe"
 
-func (h *msghdr) pack(vs []iovec, bs [][]byte, oob []byte, sa []byte) ***REMOVED***
-	for i := range vs ***REMOVED***
+func (h *msghdr) pack(vs []iovec, bs [][]byte, oob []byte, sa []byte) {
+	for i := range vs {
 		vs[i].set(bs[i])
-	***REMOVED***
+	}
 	h.setIov(vs)
-	if len(oob) > 0 ***REMOVED***
+	if len(oob) > 0 {
 		h.setControl(oob)
-	***REMOVED***
-	if sa != nil ***REMOVED***
+	}
+	if sa != nil {
 		h.Name = (*byte)(unsafe.Pointer(&sa[0]))
 		h.Namelen = uint32(len(sa))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (h *msghdr) name() []byte ***REMOVED***
-	if h.Name != nil && h.Namelen > 0 ***REMOVED***
+func (h *msghdr) name() []byte {
+	if h.Name != nil && h.Namelen > 0 {
 		return (*[sizeofSockaddrInet6]byte)(unsafe.Pointer(h.Name))[:h.Namelen]
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (h *msghdr) controllen() int ***REMOVED***
+func (h *msghdr) controllen() int {
 	return int(h.Controllen)
-***REMOVED***
+}
 
-func (h *msghdr) flags() int ***REMOVED***
+func (h *msghdr) flags() int {
 	return int(h.Flags)
-***REMOVED***
+}

@@ -15,21 +15,21 @@ var (
 )
 
 // Server is the Cluster API gRPC server.
-type Server struct ***REMOVED***
+type Server struct {
 	store          *store.MemoryStore
 	raft           *raft.Node
 	securityConfig *ca.SecurityConfig
 	pg             plugingetter.PluginGetter
 	dr             *drivers.DriverProvider
-***REMOVED***
+}
 
 // NewServer creates a Cluster API server.
-func NewServer(store *store.MemoryStore, raft *raft.Node, securityConfig *ca.SecurityConfig, pg plugingetter.PluginGetter, dr *drivers.DriverProvider) *Server ***REMOVED***
-	return &Server***REMOVED***
+func NewServer(store *store.MemoryStore, raft *raft.Node, securityConfig *ca.SecurityConfig, pg plugingetter.PluginGetter, dr *drivers.DriverProvider) *Server {
+	return &Server{
 		store:          store,
 		dr:             dr,
 		raft:           raft,
 		securityConfig: securityConfig,
 		pg:             pg,
-	***REMOVED***
-***REMOVED***
+	}
+}

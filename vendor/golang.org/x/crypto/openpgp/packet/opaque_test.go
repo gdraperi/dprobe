@@ -14,51 +14,51 @@ import (
 // Test packet.Read error handling in OpaquePacket.Parse,
 // which attempts to re-read an OpaquePacket as a supported
 // Packet type.
-func TestOpaqueParseReason(t *testing.T) ***REMOVED***
+func TestOpaqueParseReason(t *testing.T) {
 	buf, err := hex.DecodeString(UnsupportedKeyHex)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	or := NewOpaqueReader(bytes.NewBuffer(buf))
 	count := 0
 	badPackets := 0
 	var uid *UserId
-	for ***REMOVED***
+	for {
 		op, err := or.Next()
-		if err == io.EOF ***REMOVED***
+		if err == io.EOF {
 			break
-		***REMOVED*** else if err != nil ***REMOVED***
+		} else if err != nil {
 			t.Errorf("#%d: opaque read error: %v", count, err)
 			break
-		***REMOVED***
+		}
 		// try to parse opaque packet
 		p, err := op.Parse()
-		switch pkt := p.(type) ***REMOVED***
+		switch pkt := p.(type) {
 		case *UserId:
 			uid = pkt
 		case *OpaquePacket:
 			// If an OpaquePacket can't re-parse, packet.Read
 			// certainly had its reasons.
-			if pkt.Reason == nil ***REMOVED***
+			if pkt.Reason == nil {
 				t.Errorf("#%d: opaque packet, no reason", count)
-			***REMOVED*** else ***REMOVED***
+			} else {
 				badPackets++
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		count++
-	***REMOVED***
+	}
 
 	const expectedBad = 3
 	// Test post-conditions, make sure we actually parsed packets as expected.
-	if badPackets != expectedBad ***REMOVED***
+	if badPackets != expectedBad {
 		t.Errorf("unexpected # unparseable packets: %d (want %d)", badPackets, expectedBad)
-	***REMOVED***
-	if uid == nil ***REMOVED***
+	}
+	if uid == nil {
 		t.Errorf("failed to find expected UID in unsupported keyring")
-	***REMOVED*** else if uid.Id != "Armin M. Warda <warda@nephilim.ruhr.de>" ***REMOVED***
+	} else if uid.Id != "Armin M. Warda <warda@nephilim.ruhr.de>" {
 		t.Errorf("unexpected UID: %v", uid.Id)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // This key material has public key and signature packet versions modified to
 // an unsupported value (1), so that trying to parse the OpaquePacket to

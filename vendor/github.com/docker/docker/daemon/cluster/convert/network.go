@@ -11,36 +11,36 @@ import (
 	gogotypes "github.com/gogo/protobuf/types"
 )
 
-func networkAttachmentFromGRPC(na *swarmapi.NetworkAttachment) types.NetworkAttachment ***REMOVED***
-	if na != nil ***REMOVED***
-		return types.NetworkAttachment***REMOVED***
+func networkAttachmentFromGRPC(na *swarmapi.NetworkAttachment) types.NetworkAttachment {
+	if na != nil {
+		return types.NetworkAttachment{
 			Network:   networkFromGRPC(na.Network),
 			Addresses: na.Addresses,
-		***REMOVED***
-	***REMOVED***
-	return types.NetworkAttachment***REMOVED******REMOVED***
-***REMOVED***
+		}
+	}
+	return types.NetworkAttachment{}
+}
 
-func networkFromGRPC(n *swarmapi.Network) types.Network ***REMOVED***
-	if n != nil ***REMOVED***
-		network := types.Network***REMOVED***
+func networkFromGRPC(n *swarmapi.Network) types.Network {
+	if n != nil {
+		network := types.Network{
 			ID: n.ID,
-			Spec: types.NetworkSpec***REMOVED***
+			Spec: types.NetworkSpec{
 				IPv6Enabled: n.Spec.Ipv6Enabled,
 				Internal:    n.Spec.Internal,
 				Attachable:  n.Spec.Attachable,
 				Ingress:     IsIngressNetwork(n),
 				IPAMOptions: ipamFromGRPC(n.Spec.IPAM),
 				Scope:       netconst.SwarmScope,
-			***REMOVED***,
+			},
 			IPAMOptions: ipamFromGRPC(n.IPAM),
-		***REMOVED***
+		}
 
-		if n.Spec.GetNetwork() != "" ***REMOVED***
-			network.Spec.ConfigFrom = &networktypes.ConfigReference***REMOVED***
+		if n.Spec.GetNetwork() != "" {
+			network.Spec.ConfigFrom = &networktypes.ConfigReference{
 				Network: n.Spec.GetNetwork(),
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		// Meta
 		network.Version.Index = n.Meta.Version.Index
@@ -51,113 +51,113 @@ func networkFromGRPC(n *swarmapi.Network) types.Network ***REMOVED***
 		network.Spec.Annotations = annotationsFromGRPC(n.Spec.Annotations)
 
 		//DriverConfiguration
-		if n.Spec.DriverConfig != nil ***REMOVED***
-			network.Spec.DriverConfiguration = &types.Driver***REMOVED***
+		if n.Spec.DriverConfig != nil {
+			network.Spec.DriverConfiguration = &types.Driver{
 				Name:    n.Spec.DriverConfig.Name,
 				Options: n.Spec.DriverConfig.Options,
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		//DriverState
-		if n.DriverState != nil ***REMOVED***
-			network.DriverState = types.Driver***REMOVED***
+		if n.DriverState != nil {
+			network.DriverState = types.Driver{
 				Name:    n.DriverState.Name,
 				Options: n.DriverState.Options,
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		return network
-	***REMOVED***
-	return types.Network***REMOVED******REMOVED***
-***REMOVED***
+	}
+	return types.Network{}
+}
 
-func ipamFromGRPC(i *swarmapi.IPAMOptions) *types.IPAMOptions ***REMOVED***
+func ipamFromGRPC(i *swarmapi.IPAMOptions) *types.IPAMOptions {
 	var ipam *types.IPAMOptions
-	if i != nil ***REMOVED***
-		ipam = &types.IPAMOptions***REMOVED******REMOVED***
-		if i.Driver != nil ***REMOVED***
+	if i != nil {
+		ipam = &types.IPAMOptions{}
+		if i.Driver != nil {
 			ipam.Driver.Name = i.Driver.Name
 			ipam.Driver.Options = i.Driver.Options
-		***REMOVED***
+		}
 
-		for _, config := range i.Configs ***REMOVED***
-			ipam.Configs = append(ipam.Configs, types.IPAMConfig***REMOVED***
+		for _, config := range i.Configs {
+			ipam.Configs = append(ipam.Configs, types.IPAMConfig{
 				Subnet:  config.Subnet,
 				Range:   config.Range,
 				Gateway: config.Gateway,
-			***REMOVED***)
-		***REMOVED***
-	***REMOVED***
+			})
+		}
+	}
 	return ipam
-***REMOVED***
+}
 
-func endpointSpecFromGRPC(es *swarmapi.EndpointSpec) *types.EndpointSpec ***REMOVED***
+func endpointSpecFromGRPC(es *swarmapi.EndpointSpec) *types.EndpointSpec {
 	var endpointSpec *types.EndpointSpec
-	if es != nil ***REMOVED***
-		endpointSpec = &types.EndpointSpec***REMOVED******REMOVED***
+	if es != nil {
+		endpointSpec = &types.EndpointSpec{}
 		endpointSpec.Mode = types.ResolutionMode(strings.ToLower(es.Mode.String()))
 
-		for _, portState := range es.Ports ***REMOVED***
+		for _, portState := range es.Ports {
 			endpointSpec.Ports = append(endpointSpec.Ports, swarmPortConfigToAPIPortConfig(portState))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return endpointSpec
-***REMOVED***
+}
 
-func endpointFromGRPC(e *swarmapi.Endpoint) types.Endpoint ***REMOVED***
-	endpoint := types.Endpoint***REMOVED******REMOVED***
-	if e != nil ***REMOVED***
-		if espec := endpointSpecFromGRPC(e.Spec); espec != nil ***REMOVED***
+func endpointFromGRPC(e *swarmapi.Endpoint) types.Endpoint {
+	endpoint := types.Endpoint{}
+	if e != nil {
+		if espec := endpointSpecFromGRPC(e.Spec); espec != nil {
 			endpoint.Spec = *espec
-		***REMOVED***
+		}
 
-		for _, portState := range e.Ports ***REMOVED***
+		for _, portState := range e.Ports {
 			endpoint.Ports = append(endpoint.Ports, swarmPortConfigToAPIPortConfig(portState))
-		***REMOVED***
+		}
 
-		for _, v := range e.VirtualIPs ***REMOVED***
-			endpoint.VirtualIPs = append(endpoint.VirtualIPs, types.EndpointVirtualIP***REMOVED***
+		for _, v := range e.VirtualIPs {
+			endpoint.VirtualIPs = append(endpoint.VirtualIPs, types.EndpointVirtualIP{
 				NetworkID: v.NetworkID,
-				Addr:      v.Addr***REMOVED***)
-		***REMOVED***
+				Addr:      v.Addr})
+		}
 
-	***REMOVED***
+	}
 
 	return endpoint
-***REMOVED***
+}
 
-func swarmPortConfigToAPIPortConfig(portConfig *swarmapi.PortConfig) types.PortConfig ***REMOVED***
-	return types.PortConfig***REMOVED***
+func swarmPortConfigToAPIPortConfig(portConfig *swarmapi.PortConfig) types.PortConfig {
+	return types.PortConfig{
 		Name:          portConfig.Name,
 		Protocol:      types.PortConfigProtocol(strings.ToLower(swarmapi.PortConfig_Protocol_name[int32(portConfig.Protocol)])),
 		PublishMode:   types.PortConfigPublishMode(strings.ToLower(swarmapi.PortConfig_PublishMode_name[int32(portConfig.PublishMode)])),
 		TargetPort:    portConfig.TargetPort,
 		PublishedPort: portConfig.PublishedPort,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // BasicNetworkFromGRPC converts a grpc Network to a NetworkResource.
-func BasicNetworkFromGRPC(n swarmapi.Network) basictypes.NetworkResource ***REMOVED***
+func BasicNetworkFromGRPC(n swarmapi.Network) basictypes.NetworkResource {
 	spec := n.Spec
 	var ipam networktypes.IPAM
-	if spec.IPAM != nil ***REMOVED***
-		if spec.IPAM.Driver != nil ***REMOVED***
+	if spec.IPAM != nil {
+		if spec.IPAM.Driver != nil {
 			ipam.Driver = spec.IPAM.Driver.Name
 			ipam.Options = spec.IPAM.Driver.Options
-		***REMOVED***
+		}
 		ipam.Config = make([]networktypes.IPAMConfig, 0, len(spec.IPAM.Configs))
-		for _, ic := range spec.IPAM.Configs ***REMOVED***
-			ipamConfig := networktypes.IPAMConfig***REMOVED***
+		for _, ic := range spec.IPAM.Configs {
+			ipamConfig := networktypes.IPAMConfig{
 				Subnet:     ic.Subnet,
 				IPRange:    ic.Range,
 				Gateway:    ic.Gateway,
 				AuxAddress: ic.Reserved,
-			***REMOVED***
+			}
 			ipam.Config = append(ipam.Config, ipamConfig)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	nr := basictypes.NetworkResource***REMOVED***
+	nr := basictypes.NetworkResource{
 		ID:         n.ID,
 		Name:       n.Spec.Annotations.Name,
 		Scope:      netconst.SwarmScope,
@@ -167,73 +167,73 @@ func BasicNetworkFromGRPC(n swarmapi.Network) basictypes.NetworkResource ***REMO
 		Attachable: spec.Attachable,
 		Ingress:    IsIngressNetwork(&n),
 		Labels:     n.Spec.Annotations.Labels,
-	***REMOVED***
+	}
 
-	if n.Spec.GetNetwork() != "" ***REMOVED***
-		nr.ConfigFrom = networktypes.ConfigReference***REMOVED***
+	if n.Spec.GetNetwork() != "" {
+		nr.ConfigFrom = networktypes.ConfigReference{
 			Network: n.Spec.GetNetwork(),
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if n.DriverState != nil ***REMOVED***
+	if n.DriverState != nil {
 		nr.Driver = n.DriverState.Name
 		nr.Options = n.DriverState.Options
-	***REMOVED***
+	}
 
 	return nr
-***REMOVED***
+}
 
 // BasicNetworkCreateToGRPC converts a NetworkCreateRequest to a grpc NetworkSpec.
-func BasicNetworkCreateToGRPC(create basictypes.NetworkCreateRequest) swarmapi.NetworkSpec ***REMOVED***
-	ns := swarmapi.NetworkSpec***REMOVED***
-		Annotations: swarmapi.Annotations***REMOVED***
+func BasicNetworkCreateToGRPC(create basictypes.NetworkCreateRequest) swarmapi.NetworkSpec {
+	ns := swarmapi.NetworkSpec{
+		Annotations: swarmapi.Annotations{
 			Name:   create.Name,
 			Labels: create.Labels,
-		***REMOVED***,
-		DriverConfig: &swarmapi.Driver***REMOVED***
+		},
+		DriverConfig: &swarmapi.Driver{
 			Name:    create.Driver,
 			Options: create.Options,
-		***REMOVED***,
+		},
 		Ipv6Enabled: create.EnableIPv6,
 		Internal:    create.Internal,
 		Attachable:  create.Attachable,
 		Ingress:     create.Ingress,
-	***REMOVED***
-	if create.IPAM != nil ***REMOVED***
+	}
+	if create.IPAM != nil {
 		driver := create.IPAM.Driver
-		if driver == "" ***REMOVED***
+		if driver == "" {
 			driver = "default"
-		***REMOVED***
-		ns.IPAM = &swarmapi.IPAMOptions***REMOVED***
-			Driver: &swarmapi.Driver***REMOVED***
+		}
+		ns.IPAM = &swarmapi.IPAMOptions{
+			Driver: &swarmapi.Driver{
 				Name:    driver,
 				Options: create.IPAM.Options,
-			***REMOVED***,
-		***REMOVED***
+			},
+		}
 		ipamSpec := make([]*swarmapi.IPAMConfig, 0, len(create.IPAM.Config))
-		for _, ipamConfig := range create.IPAM.Config ***REMOVED***
-			ipamSpec = append(ipamSpec, &swarmapi.IPAMConfig***REMOVED***
+		for _, ipamConfig := range create.IPAM.Config {
+			ipamSpec = append(ipamSpec, &swarmapi.IPAMConfig{
 				Subnet:  ipamConfig.Subnet,
 				Range:   ipamConfig.IPRange,
 				Gateway: ipamConfig.Gateway,
-			***REMOVED***)
-		***REMOVED***
+			})
+		}
 		ns.IPAM.Configs = ipamSpec
-	***REMOVED***
-	if create.ConfigFrom != nil ***REMOVED***
-		ns.ConfigFrom = &swarmapi.NetworkSpec_Network***REMOVED***
+	}
+	if create.ConfigFrom != nil {
+		ns.ConfigFrom = &swarmapi.NetworkSpec_Network{
 			Network: create.ConfigFrom.Network,
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return ns
-***REMOVED***
+}
 
 // IsIngressNetwork check if the swarm network is an ingress network
-func IsIngressNetwork(n *swarmapi.Network) bool ***REMOVED***
-	if n.Spec.Ingress ***REMOVED***
+func IsIngressNetwork(n *swarmapi.Network) bool {
+	if n.Spec.Ingress {
 		return true
-	***REMOVED***
+	}
 	// Check if legacy defined ingress network
 	_, ok := n.Spec.Annotations.Labels["com.docker.swarm.internal"]
 	return ok && n.Spec.Annotations.Name == "ingress"
-***REMOVED***
+}

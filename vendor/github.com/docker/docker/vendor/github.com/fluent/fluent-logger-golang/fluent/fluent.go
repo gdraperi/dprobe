@@ -30,7 +30,7 @@ const (
 	defaultSubSecondPrecision = false
 )
 
-type Config struct ***REMOVED***
+type Config struct {
 	FluentPort       int           `json:"fluent_port"`
 	FluentHost       string        `json:"fluent_host"`
 	FluentNetwork    string        `json:"fluent_network"`
@@ -47,9 +47,9 @@ type Config struct ***REMOVED***
 	// Sub-second precision timestamps are only possible for those using fluentd
 	// v0.14+ and serializing their messages with msgpack.
 	SubSecondPrecision bool `json:"sub_second_precision"`
-***REMOVED***
+}
 
-type Fluent struct ***REMOVED***
+type Fluent struct {
 	Config
 
 	mubuff  sync.Mutex
@@ -58,275 +58,275 @@ type Fluent struct ***REMOVED***
 	muconn       sync.Mutex
 	conn         net.Conn
 	reconnecting bool
-***REMOVED***
+}
 
 // New creates a new Logger.
-func New(config Config) (f *Fluent, err error) ***REMOVED***
-	if config.FluentNetwork == "" ***REMOVED***
+func New(config Config) (f *Fluent, err error) {
+	if config.FluentNetwork == "" {
 		config.FluentNetwork = defaultNetwork
-	***REMOVED***
-	if config.FluentHost == "" ***REMOVED***
+	}
+	if config.FluentHost == "" {
 		config.FluentHost = defaultHost
-	***REMOVED***
-	if config.FluentPort == 0 ***REMOVED***
+	}
+	if config.FluentPort == 0 {
 		config.FluentPort = defaultPort
-	***REMOVED***
-	if config.FluentSocketPath == "" ***REMOVED***
+	}
+	if config.FluentSocketPath == "" {
 		config.FluentSocketPath = defaultSocketPath
-	***REMOVED***
-	if config.Timeout == 0 ***REMOVED***
+	}
+	if config.Timeout == 0 {
 		config.Timeout = defaultTimeout
-	***REMOVED***
-	if config.WriteTimeout == 0 ***REMOVED***
+	}
+	if config.WriteTimeout == 0 {
 		config.WriteTimeout = defaultWriteTimeout
-	***REMOVED***
-	if config.BufferLimit == 0 ***REMOVED***
+	}
+	if config.BufferLimit == 0 {
 		config.BufferLimit = defaultBufferLimit
-	***REMOVED***
-	if config.RetryWait == 0 ***REMOVED***
+	}
+	if config.RetryWait == 0 {
 		config.RetryWait = defaultRetryWait
-	***REMOVED***
-	if config.MaxRetry == 0 ***REMOVED***
+	}
+	if config.MaxRetry == 0 {
 		config.MaxRetry = defaultMaxRetry
-	***REMOVED***
-	if config.AsyncConnect ***REMOVED***
-		f = &Fluent***REMOVED***Config: config, reconnecting: true***REMOVED***
+	}
+	if config.AsyncConnect {
+		f = &Fluent{Config: config, reconnecting: true}
 		go f.reconnect()
-	***REMOVED*** else ***REMOVED***
-		f = &Fluent***REMOVED***Config: config, reconnecting: false***REMOVED***
+	} else {
+		f = &Fluent{Config: config, reconnecting: false}
 		err = f.connect()
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // Post writes the output for a logging event.
 //
 // Examples:
 //
 //  // send map[string]
-//  mapStringData := map[string]string***REMOVED***
+//  mapStringData := map[string]string{
 //  	"foo":  "bar",
-//  ***REMOVED***
+//  }
 //  f.Post("tag_name", mapStringData)
 //
 //  // send message with specified time
-//  mapStringData := map[string]string***REMOVED***
+//  mapStringData := map[string]string{
 //  	"foo":  "bar",
-//  ***REMOVED***
+//  }
 //  tm := time.Now()
 //  f.PostWithTime("tag_name", tm, mapStringData)
 //
 //  // send struct
-//  structData := struct ***REMOVED***
+//  structData := struct {
 //  		Name string `msg:"name"`
-//  ***REMOVED*** ***REMOVED***
+//  } {
 //  		"john smith",
-//  ***REMOVED***
+//  }
 //  f.Post("tag_name", structData)
 //
-func (f *Fluent) Post(tag string, message interface***REMOVED******REMOVED***) error ***REMOVED***
+func (f *Fluent) Post(tag string, message interface{}) error {
 	timeNow := time.Now()
 	return f.PostWithTime(tag, timeNow, message)
-***REMOVED***
+}
 
-func (f *Fluent) PostWithTime(tag string, tm time.Time, message interface***REMOVED******REMOVED***) error ***REMOVED***
-	if len(f.TagPrefix) > 0 ***REMOVED***
+func (f *Fluent) PostWithTime(tag string, tm time.Time, message interface{}) error {
+	if len(f.TagPrefix) > 0 {
 		tag = f.TagPrefix + "." + tag
-	***REMOVED***
+	}
 
-	if m, ok := message.(msgp.Marshaler); ok ***REMOVED***
+	if m, ok := message.(msgp.Marshaler); ok {
 		return f.EncodeAndPostData(tag, tm, m)
-	***REMOVED***
+	}
 
 	msg := reflect.ValueOf(message)
 	msgtype := msg.Type()
 
-	if msgtype.Kind() == reflect.Struct ***REMOVED***
+	if msgtype.Kind() == reflect.Struct {
 		// message should be tagged by "codec" or "msg"
-		kv := make(map[string]interface***REMOVED******REMOVED***)
+		kv := make(map[string]interface{})
 		fields := msgtype.NumField()
-		for i := 0; i < fields; i++ ***REMOVED***
+		for i := 0; i < fields; i++ {
 			field := msgtype.Field(i)
 			name := field.Name
-			if n1 := field.Tag.Get("msg"); n1 != "" ***REMOVED***
+			if n1 := field.Tag.Get("msg"); n1 != "" {
 				name = n1
-			***REMOVED*** else if n2 := field.Tag.Get("codec"); n2 != "" ***REMOVED***
+			} else if n2 := field.Tag.Get("codec"); n2 != "" {
 				name = n2
-			***REMOVED***
+			}
 			kv[name] = msg.FieldByIndex(field.Index).Interface()
-		***REMOVED***
+		}
 		return f.EncodeAndPostData(tag, tm, kv)
-	***REMOVED***
+	}
 
-	if msgtype.Kind() != reflect.Map ***REMOVED***
+	if msgtype.Kind() != reflect.Map {
 		return errors.New("fluent#PostWithTime: message must be a map")
-	***REMOVED*** else if msgtype.Key().Kind() != reflect.String ***REMOVED***
+	} else if msgtype.Key().Kind() != reflect.String {
 		return errors.New("fluent#PostWithTime: map keys must be strings")
-	***REMOVED***
+	}
 
-	kv := make(map[string]interface***REMOVED******REMOVED***)
-	for _, k := range msg.MapKeys() ***REMOVED***
+	kv := make(map[string]interface{})
+	for _, k := range msg.MapKeys() {
 		kv[k.String()] = msg.MapIndex(k).Interface()
-	***REMOVED***
+	}
 
 	return f.EncodeAndPostData(tag, tm, kv)
-***REMOVED***
+}
 
-func (f *Fluent) EncodeAndPostData(tag string, tm time.Time, message interface***REMOVED******REMOVED***) error ***REMOVED***
+func (f *Fluent) EncodeAndPostData(tag string, tm time.Time, message interface{}) error {
 	var data []byte
 	var err error
-	if data, err = f.EncodeData(tag, tm, message); err != nil ***REMOVED***
+	if data, err = f.EncodeData(tag, tm, message); err != nil {
 		return fmt.Errorf("fluent#EncodeAndPostData: can't convert '%#v' to msgpack:%v", message, err)
-	***REMOVED***
+	}
 	return f.postRawData(data)
-***REMOVED***
+}
 
 // Deprecated: Use EncodeAndPostData instead
-func (f *Fluent) PostRawData(data []byte) ***REMOVED***
+func (f *Fluent) PostRawData(data []byte) {
 	f.postRawData(data)
-***REMOVED***
+}
 
-func (f *Fluent) postRawData(data []byte) error ***REMOVED***
-	if err := f.appendBuffer(data); err != nil ***REMOVED***
+func (f *Fluent) postRawData(data []byte) error {
+	if err := f.appendBuffer(data); err != nil {
 		return err
-	***REMOVED***
-	if err := f.send(); err != nil ***REMOVED***
+	}
+	if err := f.send(); err != nil {
 		f.close()
 		return err
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // For sending forward protocol adopted JSON
-type MessageChunk struct ***REMOVED***
+type MessageChunk struct {
 	message Message
-***REMOVED***
+}
 
 // Golang default marshaler does not support
-// ["value", "value2", ***REMOVED***"key":"value"***REMOVED***] style marshaling.
+// ["value", "value2", {"key":"value"}] style marshaling.
 // So, it should write JSON marshaler by hand.
-func (chunk *MessageChunk) MarshalJSON() ([]byte, error) ***REMOVED***
+func (chunk *MessageChunk) MarshalJSON() ([]byte, error) {
 	data, err := json.Marshal(chunk.message.Record)
 	return []byte(fmt.Sprintf("[\"%s\",%d,%s,null]", chunk.message.Tag,
 		chunk.message.Time, data)), err
-***REMOVED***
+}
 
-func (f *Fluent) EncodeData(tag string, tm time.Time, message interface***REMOVED******REMOVED***) (data []byte, err error) ***REMOVED***
+func (f *Fluent) EncodeData(tag string, tm time.Time, message interface{}) (data []byte, err error) {
 	timeUnix := tm.Unix()
-	if f.Config.MarshalAsJSON ***REMOVED***
-		msg := Message***REMOVED***Tag: tag, Time: timeUnix, Record: message***REMOVED***
-		chunk := &MessageChunk***REMOVED***message: msg***REMOVED***
+	if f.Config.MarshalAsJSON {
+		msg := Message{Tag: tag, Time: timeUnix, Record: message}
+		chunk := &MessageChunk{message: msg}
 		data, err = json.Marshal(chunk)
-	***REMOVED*** else if f.Config.SubSecondPrecision ***REMOVED***
-		msg := &MessageExt***REMOVED***Tag: tag, Time: EventTime(tm), Record: message***REMOVED***
+	} else if f.Config.SubSecondPrecision {
+		msg := &MessageExt{Tag: tag, Time: EventTime(tm), Record: message}
 		data, err = msg.MarshalMsg(nil)
-	***REMOVED*** else ***REMOVED***
-		msg := &Message***REMOVED***Tag: tag, Time: timeUnix, Record: message***REMOVED***
+	} else {
+		msg := &Message{Tag: tag, Time: timeUnix, Record: message}
 		data, err = msg.MarshalMsg(nil)
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // Close closes the connection.
-func (f *Fluent) Close() (err error) ***REMOVED***
-	if len(f.pending) > 0 ***REMOVED***
+func (f *Fluent) Close() (err error) {
+	if len(f.pending) > 0 {
 		err = f.send()
-	***REMOVED***
+	}
 	f.close()
 	return
-***REMOVED***
+}
 
 // appendBuffer appends data to buffer with lock.
-func (f *Fluent) appendBuffer(data []byte) error ***REMOVED***
+func (f *Fluent) appendBuffer(data []byte) error {
 	f.mubuff.Lock()
 	defer f.mubuff.Unlock()
-	if len(f.pending)+len(data) > f.Config.BufferLimit ***REMOVED***
+	if len(f.pending)+len(data) > f.Config.BufferLimit {
 		return errors.New(fmt.Sprintf("fluent#appendBuffer: Buffer full, limit %v", f.Config.BufferLimit))
-	***REMOVED***
+	}
 	f.pending = append(f.pending, data...)
 	return nil
-***REMOVED***
+}
 
 // close closes the connection.
-func (f *Fluent) close() ***REMOVED***
+func (f *Fluent) close() {
 	f.muconn.Lock()
-	if f.conn != nil ***REMOVED***
+	if f.conn != nil {
 		f.conn.Close()
 		f.conn = nil
-	***REMOVED***
+	}
 	f.muconn.Unlock()
-***REMOVED***
+}
 
 // connect establishes a new connection using the specified transport.
-func (f *Fluent) connect() (err error) ***REMOVED***
+func (f *Fluent) connect() (err error) {
 	f.muconn.Lock()
 	defer f.muconn.Unlock()
 
-	switch f.Config.FluentNetwork ***REMOVED***
+	switch f.Config.FluentNetwork {
 	case "tcp":
 		f.conn, err = net.DialTimeout(f.Config.FluentNetwork, f.Config.FluentHost+":"+strconv.Itoa(f.Config.FluentPort), f.Config.Timeout)
 	case "unix":
 		f.conn, err = net.DialTimeout(f.Config.FluentNetwork, f.Config.FluentSocketPath, f.Config.Timeout)
 	default:
 		err = net.UnknownNetworkError(f.Config.FluentNetwork)
-	***REMOVED***
+	}
 
-	if err == nil ***REMOVED***
+	if err == nil {
 		f.reconnecting = false
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func e(x, y float64) int ***REMOVED***
+func e(x, y float64) int {
 	return int(math.Pow(x, y))
-***REMOVED***
+}
 
-func (f *Fluent) reconnect() ***REMOVED***
-	for i := 0; ; i++ ***REMOVED***
+func (f *Fluent) reconnect() {
+	for i := 0; ; i++ {
 		err := f.connect()
-		if err == nil ***REMOVED***
+		if err == nil {
 			f.send()
 			return
-		***REMOVED***
-		if i == f.Config.MaxRetry ***REMOVED***
+		}
+		if i == f.Config.MaxRetry {
 			// TODO: What we can do when connection failed MaxRetry times?
 			panic("fluent#reconnect: failed to reconnect!")
-		***REMOVED***
+		}
 		waitTime := f.Config.RetryWait * e(defaultReconnectWaitIncreRate, float64(i-1))
 		time.Sleep(time.Duration(waitTime) * time.Millisecond)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (f *Fluent) send() error ***REMOVED***
+func (f *Fluent) send() error {
 	f.muconn.Lock()
 	defer f.muconn.Unlock()
 
-	if f.conn == nil ***REMOVED***
-		if f.reconnecting == false ***REMOVED***
+	if f.conn == nil {
+		if f.reconnecting == false {
 			f.reconnecting = true
 			go f.reconnect()
-		***REMOVED***
+		}
 		return errors.New("fluent#send: can't send logs, client is reconnecting")
-	***REMOVED***
+	}
 
 	f.mubuff.Lock()
 	defer f.mubuff.Unlock()
 
 	var err error
-	if len(f.pending) > 0 ***REMOVED***
+	if len(f.pending) > 0 {
 		t := f.Config.WriteTimeout
-		if time.Duration(0) < t ***REMOVED***
+		if time.Duration(0) < t {
 			f.conn.SetWriteDeadline(time.Now().Add(t))
-		***REMOVED*** else ***REMOVED***
-			f.conn.SetWriteDeadline(time.Time***REMOVED******REMOVED***)
-		***REMOVED***
+		} else {
+			f.conn.SetWriteDeadline(time.Time{})
+		}
 		_, err = f.conn.Write(f.pending)
-		if err != nil ***REMOVED***
+		if err != nil {
 			f.conn.Close()
 			f.conn = nil
-		***REMOVED*** else ***REMOVED***
+		} else {
 			f.pending = f.pending[:0]
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return err
-***REMOVED***
+}

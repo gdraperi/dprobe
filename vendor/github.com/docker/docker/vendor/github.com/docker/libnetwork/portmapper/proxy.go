@@ -12,108 +12,108 @@ import (
 
 var userlandProxyCommandName = "docker-proxy"
 
-type userlandProxy interface ***REMOVED***
+type userlandProxy interface {
 	Start() error
 	Stop() error
-***REMOVED***
+}
 
 // proxyCommand wraps an exec.Cmd to run the userland TCP and UDP
 // proxies as separate processes.
-type proxyCommand struct ***REMOVED***
+type proxyCommand struct {
 	cmd *exec.Cmd
-***REMOVED***
+}
 
-func (p *proxyCommand) Start() error ***REMOVED***
+func (p *proxyCommand) Start() error {
 	r, w, err := os.Pipe()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("proxy unable to open os.Pipe %s", err)
-	***REMOVED***
+	}
 	defer r.Close()
-	p.cmd.ExtraFiles = []*os.File***REMOVED***w***REMOVED***
-	if err := p.cmd.Start(); err != nil ***REMOVED***
+	p.cmd.ExtraFiles = []*os.File{w}
+	if err := p.cmd.Start(); err != nil {
 		return err
-	***REMOVED***
+	}
 	w.Close()
 
 	errchan := make(chan error, 1)
-	go func() ***REMOVED***
+	go func() {
 		buf := make([]byte, 2)
 		r.Read(buf)
 
-		if string(buf) != "0\n" ***REMOVED***
+		if string(buf) != "0\n" {
 			errStr, err := ioutil.ReadAll(r)
-			if err != nil ***REMOVED***
+			if err != nil {
 				errchan <- fmt.Errorf("Error reading exit status from userland proxy: %v", err)
 				return
-			***REMOVED***
+			}
 
 			errchan <- fmt.Errorf("Error starting userland proxy: %s", errStr)
 			return
-		***REMOVED***
+		}
 		errchan <- nil
-	***REMOVED***()
+	}()
 
-	select ***REMOVED***
+	select {
 	case err := <-errchan:
 		return err
 	case <-time.After(16 * time.Second):
 		return fmt.Errorf("Timed out proxy starting the userland proxy")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (p *proxyCommand) Stop() error ***REMOVED***
-	if p.cmd.Process != nil ***REMOVED***
-		if err := p.cmd.Process.Signal(os.Interrupt); err != nil ***REMOVED***
+func (p *proxyCommand) Stop() error {
+	if p.cmd.Process != nil {
+		if err := p.cmd.Process.Signal(os.Interrupt); err != nil {
 			return err
-		***REMOVED***
+		}
 		return p.cmd.Wait()
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // dummyProxy just listen on some port, it is needed to prevent accidental
 // port allocations on bound port, because without userland proxy we using
 // iptables rules and not net.Listen
-type dummyProxy struct ***REMOVED***
+type dummyProxy struct {
 	listener io.Closer
 	addr     net.Addr
-***REMOVED***
+}
 
-func newDummyProxy(proto string, hostIP net.IP, hostPort int) userlandProxy ***REMOVED***
-	switch proto ***REMOVED***
+func newDummyProxy(proto string, hostIP net.IP, hostPort int) userlandProxy {
+	switch proto {
 	case "tcp":
-		addr := &net.TCPAddr***REMOVED***IP: hostIP, Port: hostPort***REMOVED***
-		return &dummyProxy***REMOVED***addr: addr***REMOVED***
+		addr := &net.TCPAddr{IP: hostIP, Port: hostPort}
+		return &dummyProxy{addr: addr}
 	case "udp":
-		addr := &net.UDPAddr***REMOVED***IP: hostIP, Port: hostPort***REMOVED***
-		return &dummyProxy***REMOVED***addr: addr***REMOVED***
-	***REMOVED***
+		addr := &net.UDPAddr{IP: hostIP, Port: hostPort}
+		return &dummyProxy{addr: addr}
+	}
 	return nil
-***REMOVED***
+}
 
-func (p *dummyProxy) Start() error ***REMOVED***
-	switch addr := p.addr.(type) ***REMOVED***
+func (p *dummyProxy) Start() error {
+	switch addr := p.addr.(type) {
 	case *net.TCPAddr:
 		l, err := net.ListenTCP("tcp", addr)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		p.listener = l
 	case *net.UDPAddr:
 		l, err := net.ListenUDP("udp", addr)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		p.listener = l
 	default:
 		return fmt.Errorf("Unknown addr type: %T", p.addr)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (p *dummyProxy) Stop() error ***REMOVED***
-	if p.listener != nil ***REMOVED***
+func (p *dummyProxy) Stop() error {
+	if p.listener != nil {
 		return p.listener.Close()
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

@@ -32,63 +32,63 @@ import (
 	"time"
 )
 
-func NewPopulatedTimestamp(r interface ***REMOVED***
+func NewPopulatedTimestamp(r interface {
 	Int63() int64
-***REMOVED***, easy bool) *Timestamp ***REMOVED***
-	this := &Timestamp***REMOVED******REMOVED***
+}, easy bool) *Timestamp {
+	this := &Timestamp{}
 	ns := int64(r.Int63())
 	this.Seconds = ns / 1e9
 	this.Nanos = int32(ns % 1e9)
 	return this
-***REMOVED***
+}
 
-func (ts *Timestamp) String() string ***REMOVED***
+func (ts *Timestamp) String() string {
 	return TimestampString(ts)
-***REMOVED***
+}
 
-func NewPopulatedStdTime(r interface ***REMOVED***
+func NewPopulatedStdTime(r interface {
 	Int63() int64
-***REMOVED***, easy bool) *time.Time ***REMOVED***
+}, easy bool) *time.Time {
 	timestamp := NewPopulatedTimestamp(r, easy)
 	t, err := TimestampFromProto(timestamp)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil
-	***REMOVED***
+	}
 	return &t
-***REMOVED***
+}
 
-func SizeOfStdTime(t time.Time) int ***REMOVED***
+func SizeOfStdTime(t time.Time) int {
 	ts, err := TimestampProto(t)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0
-	***REMOVED***
+	}
 	return ts.Size()
-***REMOVED***
+}
 
-func StdTimeMarshal(t time.Time) ([]byte, error) ***REMOVED***
+func StdTimeMarshal(t time.Time) ([]byte, error) {
 	size := SizeOfStdTime(t)
 	buf := make([]byte, size)
 	_, err := StdTimeMarshalTo(t, buf)
 	return buf, err
-***REMOVED***
+}
 
-func StdTimeMarshalTo(t time.Time, data []byte) (int, error) ***REMOVED***
+func StdTimeMarshalTo(t time.Time, data []byte) (int, error) {
 	ts, err := TimestampProto(t)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	return ts.MarshalTo(data)
-***REMOVED***
+}
 
-func StdTimeUnmarshal(t *time.Time, data []byte) error ***REMOVED***
-	ts := &Timestamp***REMOVED******REMOVED***
-	if err := ts.Unmarshal(data); err != nil ***REMOVED***
+func StdTimeUnmarshal(t *time.Time, data []byte) error {
+	ts := &Timestamp{}
+	if err := ts.Unmarshal(data); err != nil {
 		return err
-	***REMOVED***
+	}
 	tt, err := TimestampFromProto(ts)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	*t = tt
 	return nil
-***REMOVED***
+}

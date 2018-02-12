@@ -1,23 +1,23 @@
 package main
 
-type Item struct ***REMOVED***
+type Item struct {
 	Quantity int
 	Name string
-***REMOVED***
+}
 
-type Config struct ***REMOVED***
+type Config struct {
 	NumApples int
 	NumOranges int
 	NumBananas int
-***REMOVED***
+}
 
-func main() ***REMOVED***
+func main() {
 	var cfg Config
-	items := []Item***REMOVED***
-		***REMOVED***cfg.NumApples, "apple"***REMOVED***,
-		***REMOVED***cfg.NumOranges, "orange"***REMOVED***,
-		***REMOVED***cfg.NumApples, "banana"***REMOVED***,
-	***REMOVED***
+	items := []Item{
+		{cfg.NumApples, "apple"},
+		{cfg.NumOranges, "orange"},
+		{cfg.NumApples, "banana"},
+	}
 
 	var a int
 	var b int
@@ -29,4 +29,4 @@ func main() ***REMOVED***
 	var h int
 	var i int
 	var j int
-***REMOVED***
+}

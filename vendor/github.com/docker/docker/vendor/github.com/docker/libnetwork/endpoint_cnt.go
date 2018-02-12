@@ -8,83 +8,83 @@ import (
 	"github.com/docker/libnetwork/datastore"
 )
 
-type endpointCnt struct ***REMOVED***
+type endpointCnt struct {
 	n        *network
 	Count    uint64
 	dbIndex  uint64
 	dbExists bool
 	sync.Mutex
-***REMOVED***
+}
 
 const epCntKeyPrefix = "endpoint_count"
 
-func (ec *endpointCnt) Key() []string ***REMOVED***
+func (ec *endpointCnt) Key() []string {
 	ec.Lock()
 	defer ec.Unlock()
 
-	return []string***REMOVED***epCntKeyPrefix, ec.n.id***REMOVED***
-***REMOVED***
+	return []string{epCntKeyPrefix, ec.n.id}
+}
 
-func (ec *endpointCnt) KeyPrefix() []string ***REMOVED***
+func (ec *endpointCnt) KeyPrefix() []string {
 	ec.Lock()
 	defer ec.Unlock()
 
-	return []string***REMOVED***epCntKeyPrefix, ec.n.id***REMOVED***
-***REMOVED***
+	return []string{epCntKeyPrefix, ec.n.id}
+}
 
-func (ec *endpointCnt) Value() []byte ***REMOVED***
+func (ec *endpointCnt) Value() []byte {
 	ec.Lock()
 	defer ec.Unlock()
 
 	b, err := json.Marshal(ec)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil
-	***REMOVED***
+	}
 	return b
-***REMOVED***
+}
 
-func (ec *endpointCnt) SetValue(value []byte) error ***REMOVED***
+func (ec *endpointCnt) SetValue(value []byte) error {
 	ec.Lock()
 	defer ec.Unlock()
 
 	return json.Unmarshal(value, &ec)
-***REMOVED***
+}
 
-func (ec *endpointCnt) Index() uint64 ***REMOVED***
+func (ec *endpointCnt) Index() uint64 {
 	ec.Lock()
 	defer ec.Unlock()
 	return ec.dbIndex
-***REMOVED***
+}
 
-func (ec *endpointCnt) SetIndex(index uint64) ***REMOVED***
+func (ec *endpointCnt) SetIndex(index uint64) {
 	ec.Lock()
 	ec.dbIndex = index
 	ec.dbExists = true
 	ec.Unlock()
-***REMOVED***
+}
 
-func (ec *endpointCnt) Exists() bool ***REMOVED***
+func (ec *endpointCnt) Exists() bool {
 	ec.Lock()
 	defer ec.Unlock()
 	return ec.dbExists
-***REMOVED***
+}
 
-func (ec *endpointCnt) Skip() bool ***REMOVED***
+func (ec *endpointCnt) Skip() bool {
 	ec.Lock()
 	defer ec.Unlock()
 	return !ec.n.persist
-***REMOVED***
+}
 
-func (ec *endpointCnt) New() datastore.KVObject ***REMOVED***
+func (ec *endpointCnt) New() datastore.KVObject {
 	ec.Lock()
 	defer ec.Unlock()
 
-	return &endpointCnt***REMOVED***
+	return &endpointCnt{
 		n: ec.n,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (ec *endpointCnt) CopyTo(o datastore.KVObject) error ***REMOVED***
+func (ec *endpointCnt) CopyTo(o datastore.KVObject) error {
 	ec.Lock()
 	defer ec.Unlock()
 
@@ -95,88 +95,88 @@ func (ec *endpointCnt) CopyTo(o datastore.KVObject) error ***REMOVED***
 	dstEc.dbIndex = ec.dbIndex
 
 	return nil
-***REMOVED***
+}
 
-func (ec *endpointCnt) DataScope() string ***REMOVED***
+func (ec *endpointCnt) DataScope() string {
 	return ec.n.DataScope()
-***REMOVED***
+}
 
-func (ec *endpointCnt) EndpointCnt() uint64 ***REMOVED***
+func (ec *endpointCnt) EndpointCnt() uint64 {
 	ec.Lock()
 	defer ec.Unlock()
 
 	return ec.Count
-***REMOVED***
+}
 
-func (ec *endpointCnt) updateStore() error ***REMOVED***
+func (ec *endpointCnt) updateStore() error {
 	store := ec.n.getController().getStore(ec.DataScope())
-	if store == nil ***REMOVED***
+	if store == nil {
 		return fmt.Errorf("store not found for scope %s on endpoint count update", ec.DataScope())
-	***REMOVED***
+	}
 	// make a copy of count and n to avoid being overwritten by store.GetObject
 	count := ec.EndpointCnt()
 	n := ec.n
-	for ***REMOVED***
-		if err := ec.n.getController().updateToStore(ec); err == nil || err != datastore.ErrKeyModified ***REMOVED***
+	for {
+		if err := ec.n.getController().updateToStore(ec); err == nil || err != datastore.ErrKeyModified {
 			return err
-		***REMOVED***
-		if err := store.GetObject(datastore.Key(ec.Key()...), ec); err != nil ***REMOVED***
+		}
+		if err := store.GetObject(datastore.Key(ec.Key()...), ec); err != nil {
 			return fmt.Errorf("could not update the kvobject to latest on endpoint count update: %v", err)
-		***REMOVED***
+		}
 		ec.Lock()
 		ec.Count = count
 		ec.n = n
 		ec.Unlock()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (ec *endpointCnt) setCnt(cnt uint64) error ***REMOVED***
+func (ec *endpointCnt) setCnt(cnt uint64) error {
 	ec.Lock()
 	ec.Count = cnt
 	ec.Unlock()
 	return ec.updateStore()
-***REMOVED***
+}
 
-func (ec *endpointCnt) atomicIncDecEpCnt(inc bool) error ***REMOVED***
+func (ec *endpointCnt) atomicIncDecEpCnt(inc bool) error {
 	store := ec.n.getController().getStore(ec.DataScope())
-	if store == nil ***REMOVED***
+	if store == nil {
 		return fmt.Errorf("store not found for scope %s", ec.DataScope())
-	***REMOVED***
+	}
 
-	tmp := &endpointCnt***REMOVED***n: ec.n***REMOVED***
-	if err := store.GetObject(datastore.Key(ec.Key()...), tmp); err != nil ***REMOVED***
+	tmp := &endpointCnt{n: ec.n}
+	if err := store.GetObject(datastore.Key(ec.Key()...), tmp); err != nil {
 		return err
-	***REMOVED***
+	}
 retry:
 	ec.Lock()
-	if inc ***REMOVED***
+	if inc {
 		ec.Count++
-	***REMOVED*** else ***REMOVED***
-		if ec.Count > 0 ***REMOVED***
+	} else {
+		if ec.Count > 0 {
 			ec.Count--
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	ec.Unlock()
 
-	if err := ec.n.getController().updateToStore(ec); err != nil ***REMOVED***
-		if err == datastore.ErrKeyModified ***REMOVED***
-			if err := store.GetObject(datastore.Key(ec.Key()...), ec); err != nil ***REMOVED***
+	if err := ec.n.getController().updateToStore(ec); err != nil {
+		if err == datastore.ErrKeyModified {
+			if err := store.GetObject(datastore.Key(ec.Key()...), ec); err != nil {
 				return fmt.Errorf("could not update the kvobject to latest when trying to atomic add endpoint count: %v", err)
-			***REMOVED***
+			}
 
 			goto retry
-		***REMOVED***
+		}
 
 		return err
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (ec *endpointCnt) IncEndpointCnt() error ***REMOVED***
+func (ec *endpointCnt) IncEndpointCnt() error {
 	return ec.atomicIncDecEpCnt(true)
-***REMOVED***
+}
 
-func (ec *endpointCnt) DecEndpointCnt() error ***REMOVED***
+func (ec *endpointCnt) DecEndpointCnt() error {
 	return ec.atomicIncDecEpCnt(false)
-***REMOVED***
+}

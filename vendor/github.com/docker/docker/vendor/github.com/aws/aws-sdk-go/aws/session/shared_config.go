@@ -31,16 +31,16 @@ const (
 	DefaultSharedConfigProfile = `default`
 )
 
-type assumeRoleConfig struct ***REMOVED***
+type assumeRoleConfig struct {
 	RoleARN         string
 	SourceProfile   string
 	ExternalID      string
 	MFASerial       string
 	RoleSessionName string
-***REMOVED***
+}
 
 // sharedConfig represents the configuration fields of the SDK config files.
-type sharedConfig struct ***REMOVED***
+type sharedConfig struct {
 	// Credentials values from the config file. Both aws_access_key_id
 	// and aws_secret_access_key must be provided together in the same file
 	// to be considered valid. The values will be ignored if not a complete group.
@@ -60,12 +60,12 @@ type sharedConfig struct ***REMOVED***
 	//
 	//	region
 	Region string
-***REMOVED***
+}
 
-type sharedConfigFile struct ***REMOVED***
+type sharedConfigFile struct {
 	Filename string
 	IniData  *ini.File
-***REMOVED***
+}
 
 // loadSharedConfig retrieves the configuration from the list of files
 // using the profile provided. The order the files are listed will determine
@@ -77,90 +77,90 @@ type sharedConfigFile struct ***REMOVED***
 //
 // See sharedConfig.setFromFile for information how the config files
 // will be loaded.
-func loadSharedConfig(profile string, filenames []string) (sharedConfig, error) ***REMOVED***
-	if len(profile) == 0 ***REMOVED***
+func loadSharedConfig(profile string, filenames []string) (sharedConfig, error) {
+	if len(profile) == 0 {
 		profile = DefaultSharedConfigProfile
-	***REMOVED***
+	}
 
 	files, err := loadSharedConfigIniFiles(filenames)
-	if err != nil ***REMOVED***
-		return sharedConfig***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return sharedConfig{}, err
+	}
 
-	cfg := sharedConfig***REMOVED******REMOVED***
-	if err = cfg.setFromIniFiles(profile, files); err != nil ***REMOVED***
-		return sharedConfig***REMOVED******REMOVED***, err
-	***REMOVED***
+	cfg := sharedConfig{}
+	if err = cfg.setFromIniFiles(profile, files); err != nil {
+		return sharedConfig{}, err
+	}
 
-	if len(cfg.AssumeRole.SourceProfile) > 0 ***REMOVED***
-		if err := cfg.setAssumeRoleSource(profile, files); err != nil ***REMOVED***
-			return sharedConfig***REMOVED******REMOVED***, err
-		***REMOVED***
-	***REMOVED***
+	if len(cfg.AssumeRole.SourceProfile) > 0 {
+		if err := cfg.setAssumeRoleSource(profile, files); err != nil {
+			return sharedConfig{}, err
+		}
+	}
 
 	return cfg, nil
-***REMOVED***
+}
 
-func loadSharedConfigIniFiles(filenames []string) ([]sharedConfigFile, error) ***REMOVED***
+func loadSharedConfigIniFiles(filenames []string) ([]sharedConfigFile, error) {
 	files := make([]sharedConfigFile, 0, len(filenames))
 
-	for _, filename := range filenames ***REMOVED***
+	for _, filename := range filenames {
 		b, err := ioutil.ReadFile(filename)
-		if err != nil ***REMOVED***
+		if err != nil {
 			// Skip files which can't be opened and read for whatever reason
 			continue
-		***REMOVED***
+		}
 
 		f, err := ini.Load(b)
-		if err != nil ***REMOVED***
-			return nil, SharedConfigLoadError***REMOVED***Filename: filename, Err: err***REMOVED***
-		***REMOVED***
+		if err != nil {
+			return nil, SharedConfigLoadError{Filename: filename, Err: err}
+		}
 
-		files = append(files, sharedConfigFile***REMOVED***
+		files = append(files, sharedConfigFile{
 			Filename: filename, IniData: f,
-		***REMOVED***)
-	***REMOVED***
+		})
+	}
 
 	return files, nil
-***REMOVED***
+}
 
-func (cfg *sharedConfig) setAssumeRoleSource(origProfile string, files []sharedConfigFile) error ***REMOVED***
+func (cfg *sharedConfig) setAssumeRoleSource(origProfile string, files []sharedConfigFile) error {
 	var assumeRoleSrc sharedConfig
 
 	// Multiple level assume role chains are not support
-	if cfg.AssumeRole.SourceProfile == origProfile ***REMOVED***
+	if cfg.AssumeRole.SourceProfile == origProfile {
 		assumeRoleSrc = *cfg
-		assumeRoleSrc.AssumeRole = assumeRoleConfig***REMOVED******REMOVED***
-	***REMOVED*** else ***REMOVED***
+		assumeRoleSrc.AssumeRole = assumeRoleConfig{}
+	} else {
 		err := assumeRoleSrc.setFromIniFiles(cfg.AssumeRole.SourceProfile, files)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if len(assumeRoleSrc.Creds.AccessKeyID) == 0 ***REMOVED***
-		return SharedConfigAssumeRoleError***REMOVED***RoleARN: cfg.AssumeRole.RoleARN***REMOVED***
-	***REMOVED***
+	if len(assumeRoleSrc.Creds.AccessKeyID) == 0 {
+		return SharedConfigAssumeRoleError{RoleARN: cfg.AssumeRole.RoleARN}
+	}
 
 	cfg.AssumeRoleSource = &assumeRoleSrc
 
 	return nil
-***REMOVED***
+}
 
-func (cfg *sharedConfig) setFromIniFiles(profile string, files []sharedConfigFile) error ***REMOVED***
+func (cfg *sharedConfig) setFromIniFiles(profile string, files []sharedConfigFile) error {
 	// Trim files from the list that don't exist.
-	for _, f := range files ***REMOVED***
-		if err := cfg.setFromIniFile(profile, f); err != nil ***REMOVED***
-			if _, ok := err.(SharedConfigProfileNotExistsError); ok ***REMOVED***
+	for _, f := range files {
+		if err := cfg.setFromIniFile(profile, f); err != nil {
+			if _, ok := err.(SharedConfigProfileNotExistsError); ok {
 				// Ignore proviles missings
 				continue
-			***REMOVED***
+			}
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
 // setFromFile loads the configuration from the file using
 // the profile provided. A sharedConfig pointer type value is used so that
@@ -170,126 +170,126 @@ func (cfg *sharedConfig) setFromIniFiles(profile string, files []sharedConfigFil
 // for incomplete grouped values in the config. Such as credentials. For example
 // if a config file only includes aws_access_key_id but no aws_secret_access_key
 // the aws_access_key_id will be ignored.
-func (cfg *sharedConfig) setFromIniFile(profile string, file sharedConfigFile) error ***REMOVED***
+func (cfg *sharedConfig) setFromIniFile(profile string, file sharedConfigFile) error {
 	section, err := file.IniData.GetSection(profile)
-	if err != nil ***REMOVED***
+	if err != nil {
 		// Fallback to to alternate profile name: profile <name>
 		section, err = file.IniData.GetSection(fmt.Sprintf("profile %s", profile))
-		if err != nil ***REMOVED***
-			return SharedConfigProfileNotExistsError***REMOVED***Profile: profile, Err: err***REMOVED***
-		***REMOVED***
-	***REMOVED***
+		if err != nil {
+			return SharedConfigProfileNotExistsError{Profile: profile, Err: err}
+		}
+	}
 
 	// Shared Credentials
 	akid := section.Key(accessKeyIDKey).String()
 	secret := section.Key(secretAccessKey).String()
-	if len(akid) > 0 && len(secret) > 0 ***REMOVED***
-		cfg.Creds = credentials.Value***REMOVED***
+	if len(akid) > 0 && len(secret) > 0 {
+		cfg.Creds = credentials.Value{
 			AccessKeyID:     akid,
 			SecretAccessKey: secret,
 			SessionToken:    section.Key(sessionTokenKey).String(),
 			ProviderName:    fmt.Sprintf("SharedConfigCredentials: %s", file.Filename),
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Assume Role
 	roleArn := section.Key(roleArnKey).String()
 	srcProfile := section.Key(sourceProfileKey).String()
-	if len(roleArn) > 0 && len(srcProfile) > 0 ***REMOVED***
-		cfg.AssumeRole = assumeRoleConfig***REMOVED***
+	if len(roleArn) > 0 && len(srcProfile) > 0 {
+		cfg.AssumeRole = assumeRoleConfig{
 			RoleARN:         roleArn,
 			SourceProfile:   srcProfile,
 			ExternalID:      section.Key(externalIDKey).String(),
 			MFASerial:       section.Key(mfaSerialKey).String(),
 			RoleSessionName: section.Key(roleSessionNameKey).String(),
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Region
-	if v := section.Key(regionKey).String(); len(v) > 0 ***REMOVED***
+	if v := section.Key(regionKey).String(); len(v) > 0 {
 		cfg.Region = v
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // SharedConfigLoadError is an error for the shared config file failed to load.
-type SharedConfigLoadError struct ***REMOVED***
+type SharedConfigLoadError struct {
 	Filename string
 	Err      error
-***REMOVED***
+}
 
 // Code is the short id of the error.
-func (e SharedConfigLoadError) Code() string ***REMOVED***
+func (e SharedConfigLoadError) Code() string {
 	return "SharedConfigLoadError"
-***REMOVED***
+}
 
 // Message is the description of the error
-func (e SharedConfigLoadError) Message() string ***REMOVED***
+func (e SharedConfigLoadError) Message() string {
 	return fmt.Sprintf("failed to load config file, %s", e.Filename)
-***REMOVED***
+}
 
 // OrigErr is the underlying error that caused the failure.
-func (e SharedConfigLoadError) OrigErr() error ***REMOVED***
+func (e SharedConfigLoadError) OrigErr() error {
 	return e.Err
-***REMOVED***
+}
 
 // Error satisfies the error interface.
-func (e SharedConfigLoadError) Error() string ***REMOVED***
+func (e SharedConfigLoadError) Error() string {
 	return awserr.SprintError(e.Code(), e.Message(), "", e.Err)
-***REMOVED***
+}
 
 // SharedConfigProfileNotExistsError is an error for the shared config when
 // the profile was not find in the config file.
-type SharedConfigProfileNotExistsError struct ***REMOVED***
+type SharedConfigProfileNotExistsError struct {
 	Profile string
 	Err     error
-***REMOVED***
+}
 
 // Code is the short id of the error.
-func (e SharedConfigProfileNotExistsError) Code() string ***REMOVED***
+func (e SharedConfigProfileNotExistsError) Code() string {
 	return "SharedConfigProfileNotExistsError"
-***REMOVED***
+}
 
 // Message is the description of the error
-func (e SharedConfigProfileNotExistsError) Message() string ***REMOVED***
+func (e SharedConfigProfileNotExistsError) Message() string {
 	return fmt.Sprintf("failed to get profile, %s", e.Profile)
-***REMOVED***
+}
 
 // OrigErr is the underlying error that caused the failure.
-func (e SharedConfigProfileNotExistsError) OrigErr() error ***REMOVED***
+func (e SharedConfigProfileNotExistsError) OrigErr() error {
 	return e.Err
-***REMOVED***
+}
 
 // Error satisfies the error interface.
-func (e SharedConfigProfileNotExistsError) Error() string ***REMOVED***
+func (e SharedConfigProfileNotExistsError) Error() string {
 	return awserr.SprintError(e.Code(), e.Message(), "", e.Err)
-***REMOVED***
+}
 
 // SharedConfigAssumeRoleError is an error for the shared config when the
 // profile contains assume role information, but that information is invalid
 // or not complete.
-type SharedConfigAssumeRoleError struct ***REMOVED***
+type SharedConfigAssumeRoleError struct {
 	RoleARN string
-***REMOVED***
+}
 
 // Code is the short id of the error.
-func (e SharedConfigAssumeRoleError) Code() string ***REMOVED***
+func (e SharedConfigAssumeRoleError) Code() string {
 	return "SharedConfigAssumeRoleError"
-***REMOVED***
+}
 
 // Message is the description of the error
-func (e SharedConfigAssumeRoleError) Message() string ***REMOVED***
+func (e SharedConfigAssumeRoleError) Message() string {
 	return fmt.Sprintf("failed to load assume role for %s, source profile has no shared credentials",
 		e.RoleARN)
-***REMOVED***
+}
 
 // OrigErr is the underlying error that caused the failure.
-func (e SharedConfigAssumeRoleError) OrigErr() error ***REMOVED***
+func (e SharedConfigAssumeRoleError) OrigErr() error {
 	return nil
-***REMOVED***
+}
 
 // Error satisfies the error interface.
-func (e SharedConfigAssumeRoleError) Error() string ***REMOVED***
+func (e SharedConfigAssumeRoleError) Error() string {
 	return awserr.SprintError(e.Code(), e.Message(), "", nil)
-***REMOVED***
+}

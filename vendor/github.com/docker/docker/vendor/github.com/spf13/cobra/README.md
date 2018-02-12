@@ -95,12 +95,12 @@ In the example above, 'server' is the command.
 A Command has the following structure:
 
 ```go
-type Command struct ***REMOVED***
+type Command struct {
     Use string // The one-line usage message.
     Short string // The short description shown in the 'help' output.
     Long string // The long message shown in the 'help <this-command>' output.
     Run func(cmd *Command, args []string) // Run runs the command.
-***REMOVED***
+}
 ```
 
 ## Flags
@@ -157,14 +157,14 @@ In a Cobra app, typically the main.go file is very bare. It serves, one purpose,
 ```go
 package main
 
-import "***REMOVED***pathToYourApp***REMOVED***/cmd"
+import "{pathToYourApp}/cmd"
 
-func main() ***REMOVED***
-	if err := cmd.RootCmd.Execute(); err != nil ***REMOVED***
+func main() {
+	if err := cmd.RootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(-1)
-	***REMOVED***
-***REMOVED***
+	}
+}
 ```
 
 ## Using the Cobra Generator
@@ -239,9 +239,9 @@ a custom license:
 
 ```yaml
 license:
-  header: This file is part of ***REMOVED******REMOVED*** .appName ***REMOVED******REMOVED***.
+  header: This file is part of {{ .appName }}.
   text: |
-    ***REMOVED******REMOVED*** .copyright ***REMOVED******REMOVED***
+    {{ .copyright }}
 
     This is my license. There are many like it, but this one is mine.
     My license is my best friend. It is my life. I must master it as I must
@@ -265,16 +265,16 @@ Cobra doesn't require any special constructors. Simply create your commands.
 Ideally you place this in app/cmd/root.go:
 
 ```go
-var RootCmd = &cobra.Command***REMOVED***
+var RootCmd = &cobra.Command{
 	Use:   "hugo",
 	Short: "Hugo is a very fast static site generator",
 	Long: `A Fast and Flexible Static Site Generator built with
                 love by spf13 and friends in Go.
                 Complete documentation is available at http://hugo.spf13.com`,
-	Run: func(cmd *cobra.Command, args []string) ***REMOVED***
+	Run: func(cmd *cobra.Command, args []string) {
 		// Do Stuff Here
-	***REMOVED***,
-***REMOVED***
+	},
+}
 ```
 
 You will additionally define flags and handle configuration in your init() function.
@@ -282,7 +282,7 @@ You will additionally define flags and handle configuration in your init() funct
 for example cmd/root.go:
 
 ```go
-func init() ***REMOVED***
+func init() {
 	cobra.OnInitialize(initConfig)
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cobra.yaml)")
 	RootCmd.PersistentFlags().StringVarP(&projectBase, "projectbase", "b", "", "base project directory eg. github.com/spf13/")
@@ -294,7 +294,7 @@ func init() ***REMOVED***
 	viper.BindPFlag("useViper", RootCmd.PersistentFlags().Lookup("viper"))
 	viper.SetDefault("author", "NAME HERE <EMAIL ADDRESS>")
 	viper.SetDefault("license", "apache")
-***REMOVED***
+}
 ```
 
 ### Create your main.go
@@ -307,14 +307,14 @@ In a Cobra app, typically the main.go file is very bare. It serves, one purpose,
 ```go
 package main
 
-import "***REMOVED***pathToYourApp***REMOVED***/cmd"
+import "{pathToYourApp}/cmd"
 
-func main() ***REMOVED***
-	if err := cmd.RootCmd.Execute(); err != nil ***REMOVED***
+func main() {
+	if err := cmd.RootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(-1)
-	***REMOVED***
-***REMOVED***
+	}
+}
 ```
 
 
@@ -333,18 +333,18 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func init() ***REMOVED***
+func init() {
 	RootCmd.AddCommand(versionCmd)
-***REMOVED***
+}
 
-var versionCmd = &cobra.Command***REMOVED***
+var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Print the version number of Hugo",
 	Long:  `All software has versions. This is Hugo's`,
-	Run: func(cmd *cobra.Command, args []string) ***REMOVED***
+	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Hugo Static Site Generator v0.9 -- HEAD")
-	***REMOVED***,
-***REMOVED***
+	},
+}
 ```
 
 ### Attach command to its parent
@@ -431,16 +431,16 @@ By default, `Args` uses the following legacy behaviour:
 
 
 ```go
-var HugoCmd = &cobra.Command***REMOVED***
+var HugoCmd = &cobra.Command{
     Use:   "hugo",
     Short: "Hugo is a very fast static site generator",
-    ValidArgs: []string***REMOVED***"one", "two"***REMOVED***
+    ValidArgs: []string{"one", "two"}
     Args: cobra.OnlyValidArgs
-    Run: func(cmd *cobra.Command, args []string) ***REMOVED***
+    Run: func(cmd *cobra.Command, args []string) {
         // args will only have the values one, two
         // or the cmd.Execute() will fail.
-***REMOVED***,
-***REMOVED***
+    },
+}
 ```
 
 ## Example
@@ -464,51 +464,51 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func main() ***REMOVED***
+func main() {
 
 	var echoTimes int
 
-	var cmdPrint = &cobra.Command***REMOVED***
+	var cmdPrint = &cobra.Command{
 		Use:   "print [string to print]",
 		Short: "Print anything to the screen",
 		Long: `print is for printing anything back to the screen.
             For many years people have printed back to the screen.
             `,
-		Run: func(cmd *cobra.Command, args []string) ***REMOVED***
+		Run: func(cmd *cobra.Command, args []string) {
 			fmt.Println("Print: " + strings.Join(args, " "))
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
-	var cmdEcho = &cobra.Command***REMOVED***
+	var cmdEcho = &cobra.Command{
 		Use:   "echo [string to echo]",
 		Short: "Echo anything to the screen",
 		Long: `echo is for echoing anything back.
             Echo works a lot like print, except it has a child command.
             `,
-		Run: func(cmd *cobra.Command, args []string) ***REMOVED***
+		Run: func(cmd *cobra.Command, args []string) {
 			fmt.Println("Print: " + strings.Join(args, " "))
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
-	var cmdTimes = &cobra.Command***REMOVED***
+	var cmdTimes = &cobra.Command{
 		Use:   "times [# times] [string to echo]",
 		Short: "Echo anything to the screen more times",
 		Long: `echo things multiple times back to the user by providing
             a count and a string.`,
-		Run: func(cmd *cobra.Command, args []string) ***REMOVED***
-			for i := 0; i < echoTimes; i++ ***REMOVED***
+		Run: func(cmd *cobra.Command, args []string) {
+			for i := 0; i < echoTimes; i++ {
 				fmt.Println("Echo: " + strings.Join(args, " "))
-			***REMOVED***
-		***REMOVED***,
-	***REMOVED***
+			}
+		},
+	}
 
 	cmdTimes.Flags().IntVarP(&echoTimes, "times", "t", 1, "times to echo the input")
 
-	var rootCmd = &cobra.Command***REMOVED***Use: "app"***REMOVED***
+	var rootCmd = &cobra.Command{Use: "app"}
 	rootCmd.AddCommand(cmdPrint, cmdEcho)
 	cmdEcho.AddCommand(cmdTimes)
 	rootCmd.Execute()
-***REMOVED***
+}
 ```
 
 For a more complete example of a larger application, please checkout [Hugo](http://gohugo.io/).
@@ -592,18 +592,18 @@ You can provide your own Help command or your own template for the default comma
 The default help command is
 
 ```go
-func (c *Command) initHelp() ***REMOVED***
-	if c.helpCommand == nil ***REMOVED***
-		c.helpCommand = &Command***REMOVED***
+func (c *Command) initHelp() {
+	if c.helpCommand == nil {
+		c.helpCommand = &Command{
 			Use:   "help [command]",
 			Short: "Help about any command",
 			Long: `Help provides help for any command in the application.
         Simply type ` + c.Name() + ` help [path to command] for full details.`,
 			Run: c.HelpFunc(),
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	c.AddCommand(c.helpCommand)
-***REMOVED***
+}
 ```
 
 You can provide your own command, function or template through the following methods:
@@ -677,10 +677,10 @@ You can provide your own usage function or template for Cobra to use.
 The default usage function is:
 
 ```go
-return func(c *Command) error ***REMOVED***
+return func(c *Command) error {
 	err := tmpl(c.Out(), c.UsageTemplate(), c)
 	return err
-***REMOVED***
+}
 ```
 
 Like help, the function and template are overridable through public methods:
@@ -712,53 +712,53 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func main() ***REMOVED***
+func main() {
 
-	var rootCmd = &cobra.Command***REMOVED***
+	var rootCmd = &cobra.Command{
 		Use:   "root [sub]",
 		Short: "My root command",
-		PersistentPreRun: func(cmd *cobra.Command, args []string) ***REMOVED***
+		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			fmt.Printf("Inside rootCmd PersistentPreRun with args: %v\n", args)
-		***REMOVED***,
-		PreRun: func(cmd *cobra.Command, args []string) ***REMOVED***
+		},
+		PreRun: func(cmd *cobra.Command, args []string) {
 			fmt.Printf("Inside rootCmd PreRun with args: %v\n", args)
-		***REMOVED***,
-		Run: func(cmd *cobra.Command, args []string) ***REMOVED***
+		},
+		Run: func(cmd *cobra.Command, args []string) {
 			fmt.Printf("Inside rootCmd Run with args: %v\n", args)
-		***REMOVED***,
-		PostRun: func(cmd *cobra.Command, args []string) ***REMOVED***
+		},
+		PostRun: func(cmd *cobra.Command, args []string) {
 			fmt.Printf("Inside rootCmd PostRun with args: %v\n", args)
-		***REMOVED***,
-		PersistentPostRun: func(cmd *cobra.Command, args []string) ***REMOVED***
+		},
+		PersistentPostRun: func(cmd *cobra.Command, args []string) {
 			fmt.Printf("Inside rootCmd PersistentPostRun with args: %v\n", args)
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
-	var subCmd = &cobra.Command***REMOVED***
+	var subCmd = &cobra.Command{
 		Use:   "sub [no options!]",
 		Short: "My subcommand",
-		PreRun: func(cmd *cobra.Command, args []string) ***REMOVED***
+		PreRun: func(cmd *cobra.Command, args []string) {
 			fmt.Printf("Inside subCmd PreRun with args: %v\n", args)
-		***REMOVED***,
-		Run: func(cmd *cobra.Command, args []string) ***REMOVED***
+		},
+		Run: func(cmd *cobra.Command, args []string) {
 			fmt.Printf("Inside subCmd Run with args: %v\n", args)
-		***REMOVED***,
-		PostRun: func(cmd *cobra.Command, args []string) ***REMOVED***
+		},
+		PostRun: func(cmd *cobra.Command, args []string) {
 			fmt.Printf("Inside subCmd PostRun with args: %v\n", args)
-		***REMOVED***,
-		PersistentPostRun: func(cmd *cobra.Command, args []string) ***REMOVED***
+		},
+		PersistentPostRun: func(cmd *cobra.Command, args []string) {
 			fmt.Printf("Inside subCmd PersistentPostRun with args: %v\n", args)
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
 	rootCmd.AddCommand(subCmd)
 
-	rootCmd.SetArgs([]string***REMOVED***""***REMOVED***)
+	rootCmd.SetArgs([]string{""})
 	_ = rootCmd.Execute()
 	fmt.Print("\n")
-	rootCmd.SetArgs([]string***REMOVED***"sub", "arg1", "arg2"***REMOVED***)
+	rootCmd.SetArgs([]string{"sub", "arg1", "arg2"})
 	_ = rootCmd.Execute()
-***REMOVED***
+}
 ```
 
 
@@ -789,23 +789,23 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func main() ***REMOVED***
-	var rootCmd = &cobra.Command***REMOVED***
+func main() {
+	var rootCmd = &cobra.Command{
 		Use:   "hugo",
 		Short: "Hugo is a very fast static site generator",
 		Long: `A Fast and Flexible Static Site Generator built with
                 love by spf13 and friends in Go.
                 Complete documentation is available at http://hugo.spf13.com`,
-		RunE: func(cmd *cobra.Command, args []string) error ***REMOVED***
+		RunE: func(cmd *cobra.Command, args []string) error {
 			// Do Stuff Here
 			return errors.New("some random error")
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
-	if err := rootCmd.Execute(); err != nil ***REMOVED***
+	if err := rootCmd.Execute(); err != nil {
 		log.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 ```
 
 ## Suggestions when "unknown command" happens

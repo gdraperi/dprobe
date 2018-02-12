@@ -30,7 +30,7 @@ option objc_class_prefix = "RPC";
 // the most specific error code that applies.  For example, prefer
 // `OUT_OF_RANGE` over `FAILED_PRECONDITION` if both codes apply.
 // Similarly prefer `NOT_FOUND` or `ALREADY_EXISTS` over `FAILED_PRECONDITION`.
-enum Code ***REMOVED***
+enum Code {
   // Not an error; returned on success
   //
   // HTTP Mapping: 200 OK
@@ -183,4 +183,4 @@ enum Code ***REMOVED***
   //
   // HTTP Mapping: 500 Internal Server Error
   DATA_LOSS = 15;
-***REMOVED***
+}

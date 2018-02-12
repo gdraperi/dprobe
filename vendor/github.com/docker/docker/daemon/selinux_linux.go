@@ -2,14 +2,14 @@ package daemon
 
 import "github.com/opencontainers/selinux/go-selinux"
 
-func selinuxSetDisabled() ***REMOVED***
+func selinuxSetDisabled() {
 	selinux.SetDisabled()
-***REMOVED***
+}
 
-func selinuxFreeLxcContexts(label string) ***REMOVED***
+func selinuxFreeLxcContexts(label string) {
 	selinux.ReleaseLabel(label)
-***REMOVED***
+}
 
-func selinuxEnabled() bool ***REMOVED***
+func selinuxEnabled() bool {
 	return selinux.GetEnabled()
-***REMOVED***
+}

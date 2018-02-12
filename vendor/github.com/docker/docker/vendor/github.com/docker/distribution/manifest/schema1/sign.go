@@ -10,59 +10,59 @@ import (
 // Sign signs the manifest with the provided private key, returning a
 // SignedManifest. This typically won't be used within the registry, except
 // for testing.
-func Sign(m *Manifest, pk libtrust.PrivateKey) (*SignedManifest, error) ***REMOVED***
+func Sign(m *Manifest, pk libtrust.PrivateKey) (*SignedManifest, error) {
 	p, err := json.MarshalIndent(m, "", "   ")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	js, err := libtrust.NewJSONSignature(p)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	if err := js.Sign(pk); err != nil ***REMOVED***
+	if err := js.Sign(pk); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	pretty, err := js.PrettySignature("signatures")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	return &SignedManifest***REMOVED***
+	return &SignedManifest{
 		Manifest:  *m,
 		all:       pretty,
 		Canonical: p,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // SignWithChain signs the manifest with the given private key and x509 chain.
 // The public key of the first element in the chain must be the public key
 // corresponding with the sign key.
-func SignWithChain(m *Manifest, key libtrust.PrivateKey, chain []*x509.Certificate) (*SignedManifest, error) ***REMOVED***
+func SignWithChain(m *Manifest, key libtrust.PrivateKey, chain []*x509.Certificate) (*SignedManifest, error) {
 	p, err := json.MarshalIndent(m, "", "   ")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	js, err := libtrust.NewJSONSignature(p)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	if err := js.SignWithChain(key, chain); err != nil ***REMOVED***
+	if err := js.SignWithChain(key, chain); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	pretty, err := js.PrettySignature("signatures")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	return &SignedManifest***REMOVED***
+	return &SignedManifest{
 		Manifest:  *m,
 		all:       pretty,
 		Canonical: p,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}

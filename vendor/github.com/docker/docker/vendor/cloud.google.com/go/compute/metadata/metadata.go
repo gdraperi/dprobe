@@ -50,41 +50,41 @@ const (
 	metadataHostEnv = "GCE_METADATA_HOST"
 )
 
-type cachedValue struct ***REMOVED***
+type cachedValue struct {
 	k    string
 	trim bool
 	mu   sync.Mutex
 	v    string
-***REMOVED***
+}
 
 var (
-	projID  = &cachedValue***REMOVED***k: "project/project-id", trim: true***REMOVED***
-	projNum = &cachedValue***REMOVED***k: "project/numeric-project-id", trim: true***REMOVED***
-	instID  = &cachedValue***REMOVED***k: "instance/id", trim: true***REMOVED***
+	projID  = &cachedValue{k: "project/project-id", trim: true}
+	projNum = &cachedValue{k: "project/numeric-project-id", trim: true}
+	instID  = &cachedValue{k: "instance/id", trim: true}
 )
 
 var (
-	metaClient = &http.Client***REMOVED***
-		Transport: &internal.Transport***REMOVED***
-			Base: &http.Transport***REMOVED***
-				Dial: (&net.Dialer***REMOVED***
+	metaClient = &http.Client{
+		Transport: &internal.Transport{
+			Base: &http.Transport{
+				Dial: (&net.Dialer{
 					Timeout:   2 * time.Second,
 					KeepAlive: 30 * time.Second,
-				***REMOVED***).Dial,
+				}).Dial,
 				ResponseHeaderTimeout: 2 * time.Second,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
-	subscribeClient = &http.Client***REMOVED***
-		Transport: &internal.Transport***REMOVED***
-			Base: &http.Transport***REMOVED***
-				Dial: (&net.Dialer***REMOVED***
+			},
+		},
+	}
+	subscribeClient = &http.Client{
+		Transport: &internal.Transport{
+			Base: &http.Transport{
+				Dial: (&net.Dialer{
 					Timeout:   2 * time.Second,
 					KeepAlive: 30 * time.Second,
-				***REMOVED***).Dial,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+				}).Dial,
+			},
+		},
+	}
 )
 
 // NotDefinedError is returned when requested metadata is not defined.
@@ -95,83 +95,83 @@ var (
 // string.
 type NotDefinedError string
 
-func (suffix NotDefinedError) Error() string ***REMOVED***
+func (suffix NotDefinedError) Error() string {
 	return fmt.Sprintf("metadata: GCE metadata %q not defined", string(suffix))
-***REMOVED***
+}
 
 // Get returns a value from the metadata service.
-// The suffix is appended to "http://$***REMOVED***GCE_METADATA_HOST***REMOVED***/computeMetadata/v1/".
+// The suffix is appended to "http://${GCE_METADATA_HOST}/computeMetadata/v1/".
 //
 // If the GCE_METADATA_HOST environment variable is not defined, a default of
 // 169.254.169.254 will be used instead.
 //
 // If the requested metadata is not defined, the returned error will
 // be of type NotDefinedError.
-func Get(suffix string) (string, error) ***REMOVED***
+func Get(suffix string) (string, error) {
 	val, _, err := getETag(metaClient, suffix)
 	return val, err
-***REMOVED***
+}
 
 // getETag returns a value from the metadata service as well as the associated
 // ETag using the provided client. This func is otherwise equivalent to Get.
-func getETag(client *http.Client, suffix string) (value, etag string, err error) ***REMOVED***
+func getETag(client *http.Client, suffix string) (value, etag string, err error) {
 	// Using a fixed IP makes it very difficult to spoof the metadata service in
 	// a container, which is an important use-case for local testing of cloud
 	// deployments. To enable spoofing of the metadata service, the environment
 	// variable GCE_METADATA_HOST is first inspected to decide where metadata
 	// requests shall go.
 	host := os.Getenv(metadataHostEnv)
-	if host == "" ***REMOVED***
+	if host == "" {
 		// Using 169.254.169.254 instead of "metadata" here because Go
 		// binaries built with the "netgo" tag and without cgo won't
 		// know the search suffix for "metadata" is
 		// ".google.internal", and this IP address is documented as
 		// being stable anyway.
 		host = metadataIP
-	***REMOVED***
+	}
 	url := "http://" + host + "/computeMetadata/v1/" + suffix
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Set("Metadata-Flavor", "Google")
 	res, err := client.Do(req)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", "", err
-	***REMOVED***
+	}
 	defer res.Body.Close()
-	if res.StatusCode == http.StatusNotFound ***REMOVED***
+	if res.StatusCode == http.StatusNotFound {
 		return "", "", NotDefinedError(suffix)
-	***REMOVED***
-	if res.StatusCode != 200 ***REMOVED***
+	}
+	if res.StatusCode != 200 {
 		return "", "", fmt.Errorf("status code %d trying to fetch %s", res.StatusCode, url)
-	***REMOVED***
+	}
 	all, err := ioutil.ReadAll(res.Body)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", "", err
-	***REMOVED***
+	}
 	return string(all), res.Header.Get("Etag"), nil
-***REMOVED***
+}
 
-func getTrimmed(suffix string) (s string, err error) ***REMOVED***
+func getTrimmed(suffix string) (s string, err error) {
 	s, err = Get(suffix)
 	s = strings.TrimSpace(s)
 	return
-***REMOVED***
+}
 
-func (c *cachedValue) get() (v string, err error) ***REMOVED***
+func (c *cachedValue) get() (v string, err error) {
 	defer c.mu.Unlock()
 	c.mu.Lock()
-	if c.v != "" ***REMOVED***
+	if c.v != "" {
 		return c.v, nil
-	***REMOVED***
-	if c.trim ***REMOVED***
+	}
+	if c.trim {
 		v, err = getTrimmed(c.k)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		v, err = Get(c.k)
-	***REMOVED***
-	if err == nil ***REMOVED***
+	}
+	if err == nil {
 		c.v = v
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 var (
 	onGCEOnce sync.Once
@@ -179,20 +179,20 @@ var (
 )
 
 // OnGCE reports whether this process is running on Google Compute Engine.
-func OnGCE() bool ***REMOVED***
+func OnGCE() bool {
 	onGCEOnce.Do(initOnGCE)
 	return onGCE
-***REMOVED***
+}
 
-func initOnGCE() ***REMOVED***
+func initOnGCE() {
 	onGCE = testOnGCE()
-***REMOVED***
+}
 
-func testOnGCE() bool ***REMOVED***
+func testOnGCE() bool {
 	// The user explicitly said they're on GCE, so trust them.
-	if os.Getenv(metadataHostEnv) != "" ***REMOVED***
+	if os.Getenv(metadataHostEnv) != "" {
 		return true
-	***REMOVED***
+	}
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -201,46 +201,46 @@ func testOnGCE() bool ***REMOVED***
 
 	// Try two strategies in parallel.
 	// See https://github.com/GoogleCloudPlatform/google-cloud-go/issues/194
-	go func() ***REMOVED***
+	go func() {
 		res, err := ctxhttp.Get(ctx, metaClient, "http://"+metadataIP)
-		if err != nil ***REMOVED***
+		if err != nil {
 			resc <- false
 			return
-		***REMOVED***
+		}
 		defer res.Body.Close()
 		resc <- res.Header.Get("Metadata-Flavor") == "Google"
-	***REMOVED***()
+	}()
 
-	go func() ***REMOVED***
+	go func() {
 		addrs, err := net.LookupHost("metadata.google.internal")
-		if err != nil || len(addrs) == 0 ***REMOVED***
+		if err != nil || len(addrs) == 0 {
 			resc <- false
 			return
-		***REMOVED***
+		}
 		resc <- strsContains(addrs, metadataIP)
-	***REMOVED***()
+	}()
 
 	tryHarder := systemInfoSuggestsGCE()
-	if tryHarder ***REMOVED***
+	if tryHarder {
 		res := <-resc
-		if res ***REMOVED***
+		if res {
 			// The first strategy succeeded, so let's use it.
 			return true
-		***REMOVED***
+		}
 		// Wait for either the DNS or metadata server probe to
 		// contradict the other one and say we are running on
 		// GCE. Give it a lot of time to do so, since the system
 		// info already suggests we're running on a GCE BIOS.
 		timer := time.NewTimer(5 * time.Second)
 		defer timer.Stop()
-		select ***REMOVED***
+		select {
 		case res = <-resc:
 			return res
 		case <-timer.C:
 			// Too slow. Who knows what this system is.
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// There's no hint from the system info that we're running on
 	// GCE, so use the first probe's result as truth, whether it's
@@ -251,24 +251,24 @@ func testOnGCE() bool ***REMOVED***
 	// metaClient's Transport.ResponseHeaderTimeout or
 	// Transport.Dial.Timeout fires (in two seconds).
 	return <-resc
-***REMOVED***
+}
 
 // systemInfoSuggestsGCE reports whether the local system (without
 // doing network requests) suggests that we're running on GCE. If this
 // returns true, testOnGCE tries a bit harder to reach its metadata
 // server.
-func systemInfoSuggestsGCE() bool ***REMOVED***
-	if runtime.GOOS != "linux" ***REMOVED***
+func systemInfoSuggestsGCE() bool {
+	if runtime.GOOS != "linux" {
 		// We don't have any non-Linux clues available, at least yet.
 		return false
-	***REMOVED***
+	}
 	slurp, _ := ioutil.ReadFile("/sys/class/dmi/id/product_name")
 	name := strings.TrimSpace(string(slurp))
 	return name == "Google" || name == "Google Compute Engine"
-***REMOVED***
+}
 
 // Subscribe subscribes to a value from the metadata service.
-// The suffix is appended to "http://$***REMOVED***GCE_METADATA_HOST***REMOVED***/computeMetadata/v1/".
+// The suffix is appended to "http://${GCE_METADATA_HOST}/computeMetadata/v1/".
 // The suffix may contain query parameters.
 //
 // Subscribe calls fn with the latest metadata value indicated by the provided
@@ -276,123 +276,123 @@ func systemInfoSuggestsGCE() bool ***REMOVED***
 // and ok false. Subscribe blocks until fn returns a non-nil error or the value
 // is deleted. Subscribe returns the error value returned from the last call to
 // fn, which may be nil when ok == false.
-func Subscribe(suffix string, fn func(v string, ok bool) error) error ***REMOVED***
+func Subscribe(suffix string, fn func(v string, ok bool) error) error {
 	const failedSubscribeSleep = time.Second * 5
 
 	// First check to see if the metadata value exists at all.
 	val, lastETag, err := getETag(subscribeClient, suffix)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if err := fn(val, true); err != nil ***REMOVED***
+	if err := fn(val, true); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	ok := true
-	if strings.ContainsRune(suffix, '?') ***REMOVED***
+	if strings.ContainsRune(suffix, '?') {
 		suffix += "&wait_for_change=true&last_etag="
-	***REMOVED*** else ***REMOVED***
+	} else {
 		suffix += "?wait_for_change=true&last_etag="
-	***REMOVED***
-	for ***REMOVED***
+	}
+	for {
 		val, etag, err := getETag(subscribeClient, suffix+url.QueryEscape(lastETag))
-		if err != nil ***REMOVED***
-			if _, deleted := err.(NotDefinedError); !deleted ***REMOVED***
+		if err != nil {
+			if _, deleted := err.(NotDefinedError); !deleted {
 				time.Sleep(failedSubscribeSleep)
 				continue // Retry on other errors.
-			***REMOVED***
+			}
 			ok = false
-		***REMOVED***
+		}
 		lastETag = etag
 
-		if err := fn(val, ok); err != nil || !ok ***REMOVED***
+		if err := fn(val, ok); err != nil || !ok {
 			return err
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // ProjectID returns the current instance's project ID string.
-func ProjectID() (string, error) ***REMOVED*** return projID.get() ***REMOVED***
+func ProjectID() (string, error) { return projID.get() }
 
 // NumericProjectID returns the current instance's numeric project ID.
-func NumericProjectID() (string, error) ***REMOVED*** return projNum.get() ***REMOVED***
+func NumericProjectID() (string, error) { return projNum.get() }
 
 // InternalIP returns the instance's primary internal IP address.
-func InternalIP() (string, error) ***REMOVED***
+func InternalIP() (string, error) {
 	return getTrimmed("instance/network-interfaces/0/ip")
-***REMOVED***
+}
 
 // ExternalIP returns the instance's primary external (public) IP address.
-func ExternalIP() (string, error) ***REMOVED***
+func ExternalIP() (string, error) {
 	return getTrimmed("instance/network-interfaces/0/access-configs/0/external-ip")
-***REMOVED***
+}
 
 // Hostname returns the instance's hostname. This will be of the form
 // "<instanceID>.c.<projID>.internal".
-func Hostname() (string, error) ***REMOVED***
+func Hostname() (string, error) {
 	return getTrimmed("instance/hostname")
-***REMOVED***
+}
 
 // InstanceTags returns the list of user-defined instance tags,
 // assigned when initially creating a GCE instance.
-func InstanceTags() ([]string, error) ***REMOVED***
+func InstanceTags() ([]string, error) {
 	var s []string
 	j, err := Get("instance/tags")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if err := json.NewDecoder(strings.NewReader(j)).Decode(&s); err != nil ***REMOVED***
+	}
+	if err := json.NewDecoder(strings.NewReader(j)).Decode(&s); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return s, nil
-***REMOVED***
+}
 
 // InstanceID returns the current VM's numeric instance ID.
-func InstanceID() (string, error) ***REMOVED***
+func InstanceID() (string, error) {
 	return instID.get()
-***REMOVED***
+}
 
 // InstanceName returns the current VM's instance ID string.
-func InstanceName() (string, error) ***REMOVED***
+func InstanceName() (string, error) {
 	host, err := Hostname()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	return strings.Split(host, ".")[0], nil
-***REMOVED***
+}
 
 // Zone returns the current VM's zone, such as "us-central1-b".
-func Zone() (string, error) ***REMOVED***
+func Zone() (string, error) {
 	zone, err := getTrimmed("instance/zone")
 	// zone is of the form "projects/<projNum>/zones/<zoneName>".
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	return zone[strings.LastIndex(zone, "/")+1:], nil
-***REMOVED***
+}
 
 // InstanceAttributes returns the list of user-defined attributes,
 // assigned when initially creating a GCE VM instance. The value of an
 // attribute can be obtained with InstanceAttributeValue.
-func InstanceAttributes() ([]string, error) ***REMOVED*** return lines("instance/attributes/") ***REMOVED***
+func InstanceAttributes() ([]string, error) { return lines("instance/attributes/") }
 
 // ProjectAttributes returns the list of user-defined attributes
 // applying to the project as a whole, not just this VM.  The value of
 // an attribute can be obtained with ProjectAttributeValue.
-func ProjectAttributes() ([]string, error) ***REMOVED*** return lines("project/attributes/") ***REMOVED***
+func ProjectAttributes() ([]string, error) { return lines("project/attributes/") }
 
-func lines(suffix string) ([]string, error) ***REMOVED***
+func lines(suffix string) ([]string, error) {
 	j, err := Get(suffix)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	s := strings.Split(strings.TrimSpace(j), "\n")
-	for i := range s ***REMOVED***
+	for i := range s {
 		s[i] = strings.TrimSpace(s[i])
-	***REMOVED***
+	}
 	return s, nil
-***REMOVED***
+}
 
 // InstanceAttributeValue returns the value of the provided VM
 // instance attribute.
@@ -402,9 +402,9 @@ func lines(suffix string) ([]string, error) ***REMOVED***
 //
 // InstanceAttributeValue may return ("", nil) if the attribute was
 // defined to be the empty string.
-func InstanceAttributeValue(attr string) (string, error) ***REMOVED***
+func InstanceAttributeValue(attr string) (string, error) {
 	return Get("instance/attributes/" + attr)
-***REMOVED***
+}
 
 // ProjectAttributeValue returns the value of the provided
 // project attribute.
@@ -414,25 +414,25 @@ func InstanceAttributeValue(attr string) (string, error) ***REMOVED***
 //
 // ProjectAttributeValue may return ("", nil) if the attribute was
 // defined to be the empty string.
-func ProjectAttributeValue(attr string) (string, error) ***REMOVED***
+func ProjectAttributeValue(attr string) (string, error) {
 	return Get("project/attributes/" + attr)
-***REMOVED***
+}
 
 // Scopes returns the service account scopes for the given account.
 // The account may be empty or the string "default" to use the instance's
 // main account.
-func Scopes(serviceAccount string) ([]string, error) ***REMOVED***
-	if serviceAccount == "" ***REMOVED***
+func Scopes(serviceAccount string) ([]string, error) {
+	if serviceAccount == "" {
 		serviceAccount = "default"
-	***REMOVED***
+	}
 	return lines("instance/service-accounts/" + serviceAccount + "/scopes")
-***REMOVED***
+}
 
-func strsContains(ss []string, s string) bool ***REMOVED***
-	for _, v := range ss ***REMOVED***
-		if v == s ***REMOVED***
+func strsContains(ss []string, s string) bool {
+	for _, v := range ss {
+		if v == s {
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false
-***REMOVED***
+}

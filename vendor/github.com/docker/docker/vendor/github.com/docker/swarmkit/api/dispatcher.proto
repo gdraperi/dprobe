@@ -12,22 +12,22 @@ import "google/protobuf/duration.proto";
 // connect to this service to receive task assignments and report status.
 //
 // API methods on this service are used only by agent nodes.
-service Dispatcher ***REMOVED*** // maybe dispatch, al likes this
+service Dispatcher { // maybe dispatch, al likes this
 	// Session starts an agent session with the dispatcher. The session is
 	// started after the first SessionMessage is received.
 	//
 	// Once started, the agent is controlled with a stream of SessionMessage.
 	// Agents should list on the stream at all times for instructions.
-	rpc Session(SessionRequest) returns (stream SessionMessage) ***REMOVED***
-		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED*** roles: "swarm-worker" roles: "swarm-manager" ***REMOVED***;
-	***REMOVED***;
+	rpc Session(SessionRequest) returns (stream SessionMessage) {
+		option (docker.protobuf.plugin.tls_authorization) = { roles: "swarm-worker" roles: "swarm-manager" };
+	};
 
 	// Heartbeat is heartbeat method for nodes. It returns new TTL in response.
 	// Node should send new heartbeat earlier than now + TTL, otherwise it will
 	// be deregistered from dispatcher and its status will be updated to NodeStatus_DOWN
-	rpc Heartbeat(HeartbeatRequest) returns (HeartbeatResponse) ***REMOVED***
-		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED*** roles: "swarm-worker" roles: "swarm-manager" ***REMOVED***;
-	***REMOVED***;
+	rpc Heartbeat(HeartbeatRequest) returns (HeartbeatResponse) {
+		option (docker.protobuf.plugin.tls_authorization) = { roles: "swarm-worker" roles: "swarm-manager" };
+	};
 
 	// UpdateTaskStatus updates status of task. Node should send such updates
 	// on every status change of its tasks.
@@ -38,40 +38,40 @@ service Dispatcher ***REMOVED*** // maybe dispatch, al likes this
 	//
 	// If a task is unknown the dispatcher, the status update should be
 	// accepted regardless.
-	rpc UpdateTaskStatus(UpdateTaskStatusRequest) returns (UpdateTaskStatusResponse) ***REMOVED***
-		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED*** roles: "swarm-worker" roles: "swarm-manager" ***REMOVED***;
-	***REMOVED***;
+	rpc UpdateTaskStatus(UpdateTaskStatusRequest) returns (UpdateTaskStatusResponse) {
+		option (docker.protobuf.plugin.tls_authorization) = { roles: "swarm-worker" roles: "swarm-manager" };
+	};
 
 	// Tasks is a stream of tasks state for node. Each message contains full list
 	// of tasks which should be run on node, if task is not present in that list,
 	// it should be terminated.
-	rpc Tasks(TasksRequest) returns (stream TasksMessage) ***REMOVED***
-		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED*** roles: "swarm-worker" roles: "swarm-manager" ***REMOVED***;
+	rpc Tasks(TasksRequest) returns (stream TasksMessage) {
+		option (docker.protobuf.plugin.tls_authorization) = { roles: "swarm-worker" roles: "swarm-manager" };
 		option deprecated = true;
-	***REMOVED***;
+	};
 
 	// Assignments is a stream of assignments such as tasks and secrets for node.
 	// The first message in the stream contains all of the tasks and secrets
 	// that are relevant to the node. Future messages in the stream are updates to
 	// the set of assignments.
-	rpc Assignments(AssignmentsRequest) returns (stream AssignmentsMessage) ***REMOVED***
-		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED*** roles: "swarm-worker" roles: "swarm-manager" ***REMOVED***;
-	***REMOVED***;
-***REMOVED***
+	rpc Assignments(AssignmentsRequest) returns (stream AssignmentsMessage) {
+		option (docker.protobuf.plugin.tls_authorization) = { roles: "swarm-worker" roles: "swarm-manager" };
+	};
+}
 
 // SessionRequest starts a session.
-message SessionRequest ***REMOVED***
+message SessionRequest {
 	NodeDescription description = 1;
 	// SessionID can be provided to attempt resuming an existing session. If the
 	// SessionID is empty or invalid, a new SessionID will be assigned.
 	//
 	// See SessionMessage.SessionID for details.
 	string session_id = 2;
-***REMOVED***
+}
 
 // SessionMessage instructs an agent on various actions as part of the current
 // session. An agent should act immediately on the contents.
-message SessionMessage ***REMOVED***
+message SessionMessage {
 	// SessionID is allocated after a successful registration. It should be
 	// used on all RPC calls after registration. A dispatcher may choose to
 	// change the SessionID, at which time an agent must re-register and obtain
@@ -129,75 +129,75 @@ message SessionMessage ***REMOVED***
 
 	// Which root certificates to trust
 	bytes RootCA = 5;
-***REMOVED***
+}
 
 // HeartbeatRequest provides identifying properties for a single heartbeat.
-message HeartbeatRequest ***REMOVED***
+message HeartbeatRequest {
 	string session_id = 1;
-***REMOVED***
+}
 
-message HeartbeatResponse ***REMOVED***
+message HeartbeatResponse {
 	// Period is the duration to wait before sending the next heartbeat.
 	// Well-behaved agents should update this on every heartbeat round trip.
 	google.protobuf.Duration period = 1 [(gogoproto.stdduration) = true, (gogoproto.nullable) = false];
-***REMOVED***
+}
 
-message UpdateTaskStatusRequest ***REMOVED***
+message UpdateTaskStatusRequest {
 	// Tasks should contain all statuses for running tasks. Only the status
 	// field must be set. The spec is not required.
 	string session_id = 1;
 
-	message TaskStatusUpdate ***REMOVED***
+	message TaskStatusUpdate {
 		string task_id = 1;
 		TaskStatus status = 2;
-	***REMOVED***
+	}
 
 	repeated TaskStatusUpdate updates = 3;
-***REMOVED***
+}
 
-message  UpdateTaskStatusResponse***REMOVED***
+message  UpdateTaskStatusResponse{
 	// void
-***REMOVED***
+}
 
-message TasksRequest ***REMOVED***
+message TasksRequest {
 	string session_id = 1;
-***REMOVED***
+}
 
-message TasksMessage ***REMOVED***
+message TasksMessage {
 	// Tasks is the set of tasks that should be running on the node.
 	// Tasks outside of this set running on the node should be terminated.
 	repeated Task tasks = 1;
-***REMOVED***
+}
 
-message AssignmentsRequest ***REMOVED***
+message AssignmentsRequest {
 	string session_id = 1;
-***REMOVED***
+}
 
-message Assignment ***REMOVED***
-	oneof item ***REMOVED***
+message Assignment {
+	oneof item {
 		Task task = 1;
 		Secret secret = 2;
 		Config config = 3;
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-message AssignmentChange ***REMOVED***
-	enum AssignmentAction ***REMOVED***
+message AssignmentChange {
+	enum AssignmentAction {
 		UPDATE = 0 [(gogoproto.enumvalue_customname) = "AssignmentActionUpdate"];
 		REMOVE = 1 [(gogoproto.enumvalue_customname) = "AssignmentActionRemove"];
-	***REMOVED***
+	}
 
 	Assignment assignment = 1;
 	AssignmentAction action = 2;
-***REMOVED***
+}
 
-message AssignmentsMessage ***REMOVED***
+message AssignmentsMessage {
 	// AssignmentType specifies whether this assignment message carries
 	// the full state, or is an update to an existing state.
-	enum Type ***REMOVED***
+	enum Type {
 		COMPLETE = 0;
 		INCREMENTAL = 1;
-	***REMOVED***
+	}
 
 	Type type = 1;
 
@@ -215,4 +215,4 @@ message AssignmentsMessage ***REMOVED***
 
 	// AssignmentChange is a set of changes to apply on this node.
 	repeated AssignmentChange changes = 4;
-***REMOVED***
+}

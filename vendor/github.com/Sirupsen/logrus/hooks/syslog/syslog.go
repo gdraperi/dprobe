@@ -11,28 +11,28 @@ import (
 )
 
 // SyslogHook to send logs via syslog.
-type SyslogHook struct ***REMOVED***
+type SyslogHook struct {
 	Writer        *syslog.Writer
 	SyslogNetwork string
 	SyslogRaddr   string
-***REMOVED***
+}
 
 // Creates a hook to be added to an instance of logger. This is called with
 // `hook, err := NewSyslogHook("udp", "localhost:514", syslog.LOG_DEBUG, "")`
-// `if err == nil ***REMOVED*** log.Hooks.Add(hook) ***REMOVED***`
-func NewSyslogHook(network, raddr string, priority syslog.Priority, tag string) (*SyslogHook, error) ***REMOVED***
+// `if err == nil { log.Hooks.Add(hook) }`
+func NewSyslogHook(network, raddr string, priority syslog.Priority, tag string) (*SyslogHook, error) {
 	w, err := syslog.Dial(network, raddr, priority, tag)
-	return &SyslogHook***REMOVED***w, network, raddr***REMOVED***, err
-***REMOVED***
+	return &SyslogHook{w, network, raddr}, err
+}
 
-func (hook *SyslogHook) Fire(entry *logrus.Entry) error ***REMOVED***
+func (hook *SyslogHook) Fire(entry *logrus.Entry) error {
 	line, err := entry.String()
-	if err != nil ***REMOVED***
+	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to read entry, %v", err)
 		return err
-	***REMOVED***
+	}
 
-	switch entry.Level ***REMOVED***
+	switch entry.Level {
 	case logrus.PanicLevel:
 		return hook.Writer.Crit(line)
 	case logrus.FatalLevel:
@@ -47,9 +47,9 @@ func (hook *SyslogHook) Fire(entry *logrus.Entry) error ***REMOVED***
 		return hook.Writer.Debug(line)
 	default:
 		return nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (hook *SyslogHook) Levels() []logrus.Level ***REMOVED***
+func (hook *SyslogHook) Levels() []logrus.Level {
 	return logrus.AllLevels
-***REMOVED***
+}

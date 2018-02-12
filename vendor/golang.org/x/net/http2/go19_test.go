@@ -14,46 +14,46 @@ import (
 	"time"
 )
 
-func TestServerGracefulShutdown(t *testing.T) ***REMOVED***
+func TestServerGracefulShutdown(t *testing.T) {
 	var st *serverTester
-	handlerDone := make(chan struct***REMOVED******REMOVED***)
-	st = newServerTester(t, func(w http.ResponseWriter, r *http.Request) ***REMOVED***
+	handlerDone := make(chan struct{})
+	st = newServerTester(t, func(w http.ResponseWriter, r *http.Request) {
 		defer close(handlerDone)
 		go st.ts.Config.Shutdown(context.Background())
 
 		ga := st.wantGoAway()
-		if ga.ErrCode != ErrCodeNo ***REMOVED***
+		if ga.ErrCode != ErrCodeNo {
 			t.Errorf("GOAWAY error = %v; want ErrCodeNo", ga.ErrCode)
-		***REMOVED***
-		if ga.LastStreamID != 1 ***REMOVED***
+		}
+		if ga.LastStreamID != 1 {
 			t.Errorf("GOAWAY LastStreamID = %v; want 1", ga.LastStreamID)
-		***REMOVED***
+		}
 
 		w.Header().Set("x-foo", "bar")
-	***REMOVED***)
+	})
 	defer st.Close()
 
 	st.greet()
 	st.bodylessReq1()
 
-	select ***REMOVED***
+	select {
 	case <-handlerDone:
 	case <-time.After(5 * time.Second):
 		t.Fatalf("server did not shutdown?")
-	***REMOVED***
+	}
 	hf := st.wantHeaders()
 	goth := st.decodeHeader(hf.HeaderBlockFragment())
-	wanth := [][2]string***REMOVED***
-		***REMOVED***":status", "200"***REMOVED***,
-		***REMOVED***"x-foo", "bar"***REMOVED***,
-		***REMOVED***"content-length", "0"***REMOVED***,
-	***REMOVED***
-	if !reflect.DeepEqual(goth, wanth) ***REMOVED***
+	wanth := [][2]string{
+		{":status", "200"},
+		{"x-foo", "bar"},
+		{"content-length", "0"},
+	}
+	if !reflect.DeepEqual(goth, wanth) {
 		t.Errorf("Got headers %v; want %v", goth, wanth)
-	***REMOVED***
+	}
 
-	n, err := st.cc.Read([]byte***REMOVED***0***REMOVED***)
-	if n != 0 || err == nil ***REMOVED***
+	n, err := st.cc.Read([]byte{0})
+	if n != 0 || err == nil {
 		t.Errorf("Read = %v, %v; want 0, non-nil", n, err)
-	***REMOVED***
-***REMOVED***
+	}
+}

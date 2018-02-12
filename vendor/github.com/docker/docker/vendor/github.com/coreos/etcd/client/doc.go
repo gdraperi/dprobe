@@ -24,15 +24,15 @@ Create a Config and exchange it for a Client:
 		"golang.org/x/net/context"
 	)
 
-	cfg := client.Config***REMOVED***
-		Endpoints: []string***REMOVED***"http://127.0.0.1:2379"***REMOVED***,
+	cfg := client.Config{
+		Endpoints: []string{"http://127.0.0.1:2379"},
 		Transport: DefaultTransport,
-	***REMOVED***
+	}
 
 	c, err := client.New(cfg)
-	if err != nil ***REMOVED***
+	if err != nil {
 		// handle error
-	***REMOVED***
+	}
 
 Clients are safe for concurrent use by multiple goroutines.
 
@@ -42,15 +42,15 @@ Create a KeysAPI using the Client, then use it to interact with etcd:
 
 	// create a new key /foo with the value "bar"
 	_, err = kAPI.Create(context.Background(), "/foo", "bar")
-	if err != nil ***REMOVED***
+	if err != nil {
 		// handle error
-	***REMOVED***
+	}
 
 	// delete the newly created key only if the value is still "bar"
-	_, err = kAPI.Delete(context.Background(), "/foo", &DeleteOptions***REMOVED***PrevValue: "bar"***REMOVED***)
-	if err != nil ***REMOVED***
+	_, err = kAPI.Delete(context.Background(), "/foo", &DeleteOptions{PrevValue: "bar"})
+	if err != nil {
 		// handle error
-	***REMOVED***
+	}
 
 Use a custom context to set timeouts on your operations:
 
@@ -61,13 +61,13 @@ Use a custom context to set timeouts on your operations:
 
 	// set a new key, ignoring it's previous state
 	_, err := kAPI.Set(ctx, "/ping", "pong", nil)
-	if err != nil ***REMOVED***
-		if err == context.DeadlineExceeded ***REMOVED***
+	if err != nil {
+		if err == context.DeadlineExceeded {
 			// request took longer than 5s
-		***REMOVED*** else ***REMOVED***
+		} else {
 			// handle error
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 */
 package client

@@ -35,68 +35,68 @@ import (
 	"strings"
 )
 
-type matcher interface ***REMOVED***
+type matcher interface {
 	match([]string) (int, error)
 	String() string
-***REMOVED***
+}
 
-type segment struct ***REMOVED***
+type segment struct {
 	matcher
 	name string
-***REMOVED***
+}
 
 type labelMatcher string
 
-func (ls labelMatcher) match(segments []string) (int, error) ***REMOVED***
-	if len(segments) == 0 ***REMOVED***
+func (ls labelMatcher) match(segments []string) (int, error) {
+	if len(segments) == 0 {
 		return 0, fmt.Errorf("expected %s but no more segments found", ls)
-	***REMOVED***
-	if segments[0] != string(ls) ***REMOVED***
+	}
+	if segments[0] != string(ls) {
 		return 0, fmt.Errorf("expected %s but got %s", ls, segments[0])
-	***REMOVED***
+	}
 	return 1, nil
-***REMOVED***
+}
 
-func (ls labelMatcher) String() string ***REMOVED***
+func (ls labelMatcher) String() string {
 	return string(ls)
-***REMOVED***
+}
 
 type wildcardMatcher int
 
-func (wm wildcardMatcher) match(segments []string) (int, error) ***REMOVED***
-	if len(segments) == 0 ***REMOVED***
+func (wm wildcardMatcher) match(segments []string) (int, error) {
+	if len(segments) == 0 {
 		return 0, errors.New("no more segments found")
-	***REMOVED***
+	}
 	return 1, nil
-***REMOVED***
+}
 
-func (wm wildcardMatcher) String() string ***REMOVED***
+func (wm wildcardMatcher) String() string {
 	return "*"
-***REMOVED***
+}
 
 type pathWildcardMatcher int
 
-func (pwm pathWildcardMatcher) match(segments []string) (int, error) ***REMOVED***
+func (pwm pathWildcardMatcher) match(segments []string) (int, error) {
 	length := len(segments) - int(pwm)
-	if length <= 0 ***REMOVED***
+	if length <= 0 {
 		return 0, errors.New("not sufficient segments are supplied for path wildcard")
-	***REMOVED***
+	}
 	return length, nil
-***REMOVED***
+}
 
-func (pwm pathWildcardMatcher) String() string ***REMOVED***
+func (pwm pathWildcardMatcher) String() string {
 	return "**"
-***REMOVED***
+}
 
-type ParseError struct ***REMOVED***
+type ParseError struct {
 	Pos      int
 	Template string
 	Message  string
-***REMOVED***
+}
 
-func (pe ParseError) Error() string ***REMOVED***
+func (pe ParseError) Error() string {
 	return fmt.Sprintf("at %d of template '%s', %s", pe.Pos, pe.Template, pe.Message)
-***REMOVED***
+}
 
 // PathTemplate manages the template to build and match with paths used
 // by API services. It holds a template and variable names in it, and
@@ -105,72 +105,72 @@ func (pe ParseError) Error() string ***REMOVED***
 //
 // See http.proto in github.com/googleapis/googleapis/ for the details of
 // the template syntax.
-type PathTemplate struct ***REMOVED***
+type PathTemplate struct {
 	segments []segment
-***REMOVED***
+}
 
 // NewPathTemplate parses a path template, and returns a PathTemplate
 // instance if successful.
-func NewPathTemplate(template string) (*PathTemplate, error) ***REMOVED***
+func NewPathTemplate(template string) (*PathTemplate, error) {
 	return parsePathTemplate(template)
-***REMOVED***
+}
 
 // MustCompilePathTemplate is like NewPathTemplate but panics if the
 // expression cannot be parsed. It simplifies safe initialization of
 // global variables holding compiled regular expressions.
-func MustCompilePathTemplate(template string) *PathTemplate ***REMOVED***
+func MustCompilePathTemplate(template string) *PathTemplate {
 	pt, err := NewPathTemplate(template)
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 	return pt
-***REMOVED***
+}
 
 // Match attempts to match the given path with the template, and returns
 // the mapping of the variable name to the matched pattern string.
-func (pt *PathTemplate) Match(path string) (map[string]string, error) ***REMOVED***
+func (pt *PathTemplate) Match(path string) (map[string]string, error) {
 	paths := strings.Split(path, "/")
-	values := map[string]string***REMOVED******REMOVED***
-	for _, segment := range pt.segments ***REMOVED***
+	values := map[string]string{}
+	for _, segment := range pt.segments {
 		length, err := segment.match(paths)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-		if segment.name != "" ***REMOVED***
+		}
+		if segment.name != "" {
 			value := strings.Join(paths[:length], "/")
-			if oldValue, ok := values[segment.name]; ok ***REMOVED***
+			if oldValue, ok := values[segment.name]; ok {
 				values[segment.name] = oldValue + "/" + value
-			***REMOVED*** else ***REMOVED***
+			} else {
 				values[segment.name] = value
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		paths = paths[length:]
-	***REMOVED***
-	if len(paths) != 0 ***REMOVED***
+	}
+	if len(paths) != 0 {
 		return nil, fmt.Errorf("Trailing path %s remains after the matching", strings.Join(paths, "/"))
-	***REMOVED***
+	}
 	return values, nil
-***REMOVED***
+}
 
 // Render creates a path string from its template and the binding from
 // the variable name to the value.
-func (pt *PathTemplate) Render(binding map[string]string) (string, error) ***REMOVED***
+func (pt *PathTemplate) Render(binding map[string]string) (string, error) {
 	result := make([]string, 0, len(pt.segments))
 	var lastVariableName string
-	for _, segment := range pt.segments ***REMOVED***
+	for _, segment := range pt.segments {
 		name := segment.name
-		if lastVariableName != "" && name == lastVariableName ***REMOVED***
+		if lastVariableName != "" && name == lastVariableName {
 			continue
-		***REMOVED***
+		}
 		lastVariableName = name
-		if name == "" ***REMOVED***
+		if name == "" {
 			result = append(result, segment.String())
-		***REMOVED*** else if value, ok := binding[name]; ok ***REMOVED***
+		} else if value, ok := binding[name]; ok {
 			result = append(result, value)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			return "", fmt.Errorf("%s is not found", name)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	built := strings.Join(result, "/")
 	return built, nil
-***REMOVED***
+}

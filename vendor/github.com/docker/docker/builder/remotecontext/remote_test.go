@@ -16,10 +16,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var binaryContext = []byte***REMOVED***0xFD, 0x37, 0x7A, 0x58, 0x5A, 0x00***REMOVED*** //xz magic
+var binaryContext = []byte{0xFD, 0x37, 0x7A, 0x58, 0x5A, 0x00} //xz magic
 
-func TestSelectAcceptableMIME(t *testing.T) ***REMOVED***
-	validMimeStrings := []string***REMOVED***
+func TestSelectAcceptableMIME(t *testing.T) {
+	validMimeStrings := []string{
 		"application/x-bzip2",
 		"application/bzip2",
 		"application/gzip",
@@ -30,151 +30,151 @@ func TestSelectAcceptableMIME(t *testing.T) ***REMOVED***
 		"application/x-tar",
 		"application/octet-stream",
 		"text/plain",
-	***REMOVED***
+	}
 
-	invalidMimeStrings := []string***REMOVED***
+	invalidMimeStrings := []string{
 		"",
 		"application/octet",
 		"application/json",
-	***REMOVED***
+	}
 
-	for _, m := range invalidMimeStrings ***REMOVED***
-		if len(selectAcceptableMIME(m)) > 0 ***REMOVED***
+	for _, m := range invalidMimeStrings {
+		if len(selectAcceptableMIME(m)) > 0 {
 			t.Fatalf("Should not have accepted %q", m)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	for _, m := range validMimeStrings ***REMOVED***
-		if str := selectAcceptableMIME(m); str == "" ***REMOVED***
+	for _, m := range validMimeStrings {
+		if str := selectAcceptableMIME(m); str == "" {
 			t.Fatalf("Should have accepted %q", m)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestInspectEmptyResponse(t *testing.T) ***REMOVED***
+func TestInspectEmptyResponse(t *testing.T) {
 	ct := "application/octet-stream"
 	br := ioutil.NopCloser(bytes.NewReader([]byte("")))
 	contentType, bReader, err := inspectResponse(ct, br, 0)
-	if err == nil ***REMOVED***
+	if err == nil {
 		t.Fatal("Should have generated an error for an empty response")
-	***REMOVED***
-	if contentType != "application/octet-stream" ***REMOVED***
+	}
+	if contentType != "application/octet-stream" {
 		t.Fatalf("Content type should be 'application/octet-stream' but is %q", contentType)
-	***REMOVED***
+	}
 	body, err := ioutil.ReadAll(bReader)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if len(body) != 0 ***REMOVED***
+	}
+	if len(body) != 0 {
 		t.Fatal("response body should remain empty")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestInspectResponseBinary(t *testing.T) ***REMOVED***
+func TestInspectResponseBinary(t *testing.T) {
 	ct := "application/octet-stream"
 	br := ioutil.NopCloser(bytes.NewReader(binaryContext))
 	contentType, bReader, err := inspectResponse(ct, br, int64(len(binaryContext)))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if contentType != "application/octet-stream" ***REMOVED***
+	}
+	if contentType != "application/octet-stream" {
 		t.Fatalf("Content type should be 'application/octet-stream' but is %q", contentType)
-	***REMOVED***
+	}
 	body, err := ioutil.ReadAll(bReader)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if len(body) != len(binaryContext) ***REMOVED***
+	}
+	if len(body) != len(binaryContext) {
 		t.Fatalf("Wrong response size %d, should be == len(binaryContext)", len(body))
-	***REMOVED***
-	for i := range body ***REMOVED***
-		if body[i] != binaryContext[i] ***REMOVED***
+	}
+	for i := range body {
+		if body[i] != binaryContext[i] {
 			t.Fatalf("Corrupted response body at byte index %d", i)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestResponseUnsupportedContentType(t *testing.T) ***REMOVED***
+func TestResponseUnsupportedContentType(t *testing.T) {
 	content := []byte(dockerfileContents)
 	ct := "application/json"
 	br := ioutil.NopCloser(bytes.NewReader(content))
 	contentType, bReader, err := inspectResponse(ct, br, int64(len(dockerfileContents)))
 
-	if err == nil ***REMOVED***
+	if err == nil {
 		t.Fatal("Should have returned an error on content-type 'application/json'")
-	***REMOVED***
-	if contentType != ct ***REMOVED***
+	}
+	if contentType != ct {
 		t.Fatalf("Should not have altered content-type: orig: %s, altered: %s", ct, contentType)
-	***REMOVED***
+	}
 	body, err := ioutil.ReadAll(bReader)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if string(body) != dockerfileContents ***REMOVED***
+	}
+	if string(body) != dockerfileContents {
 		t.Fatalf("Corrupted response body %s", body)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestInspectResponseTextSimple(t *testing.T) ***REMOVED***
+func TestInspectResponseTextSimple(t *testing.T) {
 	content := []byte(dockerfileContents)
 	ct := "text/plain"
 	br := ioutil.NopCloser(bytes.NewReader(content))
 	contentType, bReader, err := inspectResponse(ct, br, int64(len(content)))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if contentType != "text/plain" ***REMOVED***
+	}
+	if contentType != "text/plain" {
 		t.Fatalf("Content type should be 'text/plain' but is %q", contentType)
-	***REMOVED***
+	}
 	body, err := ioutil.ReadAll(bReader)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if string(body) != dockerfileContents ***REMOVED***
+	}
+	if string(body) != dockerfileContents {
 		t.Fatalf("Corrupted response body %s", body)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestInspectResponseEmptyContentType(t *testing.T) ***REMOVED***
+func TestInspectResponseEmptyContentType(t *testing.T) {
 	content := []byte(dockerfileContents)
 	br := ioutil.NopCloser(bytes.NewReader(content))
 	contentType, bodyReader, err := inspectResponse("", br, int64(len(content)))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if contentType != "text/plain" ***REMOVED***
+	}
+	if contentType != "text/plain" {
 		t.Fatalf("Content type should be 'text/plain' but is %q", contentType)
-	***REMOVED***
+	}
 	body, err := ioutil.ReadAll(bodyReader)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if string(body) != dockerfileContents ***REMOVED***
+	}
+	if string(body) != dockerfileContents {
 		t.Fatalf("Corrupted response body %s", body)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestUnknownContentLength(t *testing.T) ***REMOVED***
+func TestUnknownContentLength(t *testing.T) {
 	content := []byte(dockerfileContents)
 	ct := "text/plain"
 	br := ioutil.NopCloser(bytes.NewReader(content))
 	contentType, bReader, err := inspectResponse(ct, br, -1)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if contentType != "text/plain" ***REMOVED***
+	}
+	if contentType != "text/plain" {
 		t.Fatalf("Content type should be 'text/plain' but is %q", contentType)
-	***REMOVED***
+	}
 	body, err := ioutil.ReadAll(bReader)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if string(body) != dockerfileContents ***REMOVED***
+	}
+	if string(body) != dockerfileContents {
 		t.Fatalf("Corrupted response body %s", body)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestDownloadRemote(t *testing.T) ***REMOVED***
+func TestDownloadRemote(t *testing.T) {
 	contextDir := fs.NewDir(t, "test-builder-download-remote",
 		fs.WithFile(builder.DefaultDockerfileName, dockerfileContents))
 	defer contextDir.Remove()
@@ -195,49 +195,49 @@ func TestDownloadRemote(t *testing.T) ***REMOVED***
 	raw, err := ioutil.ReadAll(content)
 	require.NoError(t, err)
 	assert.Equal(t, dockerfileContents, string(raw))
-***REMOVED***
+}
 
-func TestGetWithStatusError(t *testing.T) ***REMOVED***
-	var testcases = []struct ***REMOVED***
+func TestGetWithStatusError(t *testing.T) {
+	var testcases = []struct {
 		err          error
 		statusCode   int
 		expectedErr  string
 		expectedBody string
-	***REMOVED******REMOVED***
-		***REMOVED***
+	}{
+		{
 			statusCode:   200,
 			expectedBody: "THE BODY",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			statusCode:   400,
 			expectedErr:  "with status 400 Bad Request: broke",
 			expectedBody: "broke",
-		***REMOVED***,
-	***REMOVED***
-	for _, testcase := range testcases ***REMOVED***
+		},
+	}
+	for _, testcase := range testcases {
 		ts := httptest.NewServer(
-			http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) ***REMOVED***
+			http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				buffer := bytes.NewBufferString(testcase.expectedBody)
 				w.WriteHeader(testcase.statusCode)
 				w.Write(buffer.Bytes())
-			***REMOVED***),
+			}),
 		)
 		defer ts.Close()
 		response, err := GetWithStatusError(ts.URL)
 
-		if testcase.expectedErr == "" ***REMOVED***
+		if testcase.expectedErr == "" {
 			require.NoError(t, err)
 
 			body, err := readBody(response.Body)
 			require.NoError(t, err)
 			assert.Contains(t, string(body), testcase.expectedBody)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			testutil.ErrorContains(t, err, testcase.expectedErr)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func readBody(b io.ReadCloser) ([]byte, error) ***REMOVED***
+func readBody(b io.ReadCloser) ([]byte, error) {
 	defer b.Close()
 	return ioutil.ReadAll(b)
-***REMOVED***
+}

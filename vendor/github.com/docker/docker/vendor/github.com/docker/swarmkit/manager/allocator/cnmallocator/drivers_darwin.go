@@ -6,12 +6,12 @@ import (
 	"github.com/docker/swarmkit/manager/allocator/networkallocator"
 )
 
-var initializers = []initializer***REMOVED***
-	***REMOVED***remote.Init, "remote"***REMOVED***,
-	***REMOVED***ovmanager.Init, "overlay"***REMOVED***,
-***REMOVED***
+var initializers = []initializer{
+	{remote.Init, "remote"},
+	{ovmanager.Init, "overlay"},
+}
 
 // PredefinedNetworks returns the list of predefined network structures
-func PredefinedNetworks() []networkallocator.PredefinedNetworkData ***REMOVED***
+func PredefinedNetworks() []networkallocator.PredefinedNetworkData {
 	return nil
-***REMOVED***
+}

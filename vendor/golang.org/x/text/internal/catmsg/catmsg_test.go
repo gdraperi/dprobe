@@ -12,316 +12,316 @@ import (
 	"golang.org/x/text/language"
 )
 
-type renderer struct ***REMOVED***
+type renderer struct {
 	args   []int
 	result string
-***REMOVED***
+}
 
-func (r *renderer) Arg(i int) interface***REMOVED******REMOVED*** ***REMOVED***
-	if i >= len(r.args) ***REMOVED***
+func (r *renderer) Arg(i int) interface{} {
+	if i >= len(r.args) {
 		return nil
-	***REMOVED***
+	}
 	return r.args[i]
-***REMOVED***
+}
 
-func (r *renderer) Render(s string) ***REMOVED***
-	if r.result != "" ***REMOVED***
+func (r *renderer) Render(s string) {
+	if r.result != "" {
 		r.result += "|"
-	***REMOVED***
+	}
 	r.result += s
-***REMOVED***
+}
 
-func TestCodec(t *testing.T) ***REMOVED***
-	type test struct ***REMOVED***
+func TestCodec(t *testing.T) {
+	type test struct {
 		args   []int
 		out    string
 		decErr string
-	***REMOVED***
-	single := func(out, err string) []test ***REMOVED*** return []test***REMOVED******REMOVED***out: out, decErr: err***REMOVED******REMOVED*** ***REMOVED***
-	testCases := []struct ***REMOVED***
+	}
+	single := func(out, err string) []test { return []test{{out: out, decErr: err}} }
+	testCases := []struct {
 		desc   string
 		m      Message
 		enc    string
 		encErr string
 		tests  []test
-	***REMOVED******REMOVED******REMOVED***
+	}{{
 		desc:   "unused variable",
-		m:      &Var***REMOVED***"name", String("foo")***REMOVED***,
+		m:      &Var{"name", String("foo")},
 		encErr: errIsVar.Error(),
 		tests:  single("", ""),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:  "empty",
-		m:     empty***REMOVED******REMOVED***,
+		m:     empty{},
 		tests: single("", ""),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:  "sequence with empty",
-		m:     seq***REMOVED***empty***REMOVED******REMOVED******REMOVED***,
+		m:     seq{empty{}},
 		tests: single("", ""),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:  "raw string",
 		m:     Raw("foo"),
 		tests: single("foo", ""),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:  "raw string no sub",
-		m:     Raw("$***REMOVED***foo***REMOVED***"),
-		enc:   "\x02$***REMOVED***foo***REMOVED***",
-		tests: single("$***REMOVED***foo***REMOVED***", ""),
-	***REMOVED***, ***REMOVED***
+		m:     Raw("${foo}"),
+		enc:   "\x02${foo}",
+		tests: single("${foo}", ""),
+	}, {
 		desc:  "simple string",
 		m:     String("foo"),
 		tests: single("foo", ""),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:  "affix",
-		m:     &Affix***REMOVED***String("foo"), "\t", "\n"***REMOVED***,
+		m:     &Affix{String("foo"), "\t", "\n"},
 		tests: single("\t|foo|\n", ""),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:   "missing var",
-		m:      String("foo$***REMOVED***bar***REMOVED***"),
+		m:      String("foo${bar}"),
 		enc:    "\x03\x03foo\x02\x03bar",
 		encErr: `unknown var "bar"`,
 		tests:  single("foo|bar", ""),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc: "empty var",
-		m: seq***REMOVED***
-			&Var***REMOVED***"bar", seq***REMOVED******REMOVED******REMOVED***,
-			String("foo$***REMOVED***bar***REMOVED***"),
-		***REMOVED***,
+		m: seq{
+			&Var{"bar", seq{}},
+			String("foo${bar}"),
+		},
 		enc: "\x00\x05\x04\x02bar\x03\x03foo\x00\x00",
 		// TODO: recognize that it is cheaper to substitute bar.
 		tests: single("foo|bar", ""),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc: "var after value",
-		m: seq***REMOVED***
-			String("foo$***REMOVED***bar***REMOVED***"),
-			&Var***REMOVED***"bar", String("baz")***REMOVED***,
-		***REMOVED***,
+		m: seq{
+			String("foo${bar}"),
+			&Var{"bar", String("baz")},
+		},
 		encErr: errIsVar.Error(),
 		tests:  single("foo|bar", ""),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc: "substitution",
-		m: seq***REMOVED***
-			&Var***REMOVED***"bar", String("baz")***REMOVED***,
-			String("foo$***REMOVED***bar***REMOVED***"),
-		***REMOVED***,
+		m: seq{
+			&Var{"bar", String("baz")},
+			String("foo${bar}"),
+		},
 		tests: single("foo|baz", ""),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc: "affix with substitution",
-		m: &Affix***REMOVED***seq***REMOVED***
-			&Var***REMOVED***"bar", String("baz")***REMOVED***,
-			String("foo$***REMOVED***bar***REMOVED***"),
-		***REMOVED***, "\t", "\n"***REMOVED***,
+		m: &Affix{seq{
+			&Var{"bar", String("baz")},
+			String("foo${bar}"),
+		}, "\t", "\n"},
 		tests: single("\t|foo|baz|\n", ""),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc: "shadowed variable",
-		m: seq***REMOVED***
-			&Var***REMOVED***"bar", String("baz")***REMOVED***,
-			seq***REMOVED***
-				&Var***REMOVED***"bar", String("BAZ")***REMOVED***,
-				String("foo$***REMOVED***bar***REMOVED***"),
-			***REMOVED***,
-		***REMOVED***,
+		m: seq{
+			&Var{"bar", String("baz")},
+			seq{
+				&Var{"bar", String("BAZ")},
+				String("foo${bar}"),
+			},
+		},
 		tests: single("foo|BAZ", ""),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:  "nested value",
-		m:     nestedLang***REMOVED***nestedLang***REMOVED***empty***REMOVED******REMOVED******REMOVED******REMOVED***,
+		m:     nestedLang{nestedLang{empty{}}},
 		tests: single("nl|nl", ""),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc: "not shadowed variable",
-		m: seq***REMOVED***
-			&Var***REMOVED***"bar", String("baz")***REMOVED***,
-			seq***REMOVED***
-				String("foo$***REMOVED***bar***REMOVED***"),
-				&Var***REMOVED***"bar", String("BAZ")***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
+		m: seq{
+			&Var{"bar", String("baz")},
+			seq{
+				String("foo${bar}"),
+				&Var{"bar", String("BAZ")},
+			},
+		},
 		encErr: errIsVar.Error(),
 		tests:  single("foo|baz", ""),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc: "duplicate variable",
-		m: seq***REMOVED***
-			&Var***REMOVED***"bar", String("baz")***REMOVED***,
-			&Var***REMOVED***"bar", String("BAZ")***REMOVED***,
-			String("$***REMOVED***bar***REMOVED***"),
-		***REMOVED***,
+		m: seq{
+			&Var{"bar", String("baz")},
+			&Var{"bar", String("BAZ")},
+			String("${bar}"),
+		},
 		encErr: "catmsg: duplicate variable \"bar\"",
 		tests:  single("baz", ""),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc: "complete incomplete variable",
-		m: seq***REMOVED***
-			&Var***REMOVED***"bar", incomplete***REMOVED******REMOVED******REMOVED***,
-			String("$***REMOVED***bar***REMOVED***"),
-		***REMOVED***,
+		m: seq{
+			&Var{"bar", incomplete{}},
+			String("${bar}"),
+		},
 		enc: "\x00\t\b\x01\x01\x14\x04\x02bar\x03\x00\x00\x00",
 		// TODO: recognize that it is cheaper to substitute bar.
 		tests: single("bar", ""),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc: "incomplete sequence",
-		m: seq***REMOVED***
-			incomplete***REMOVED******REMOVED***,
-			incomplete***REMOVED******REMOVED***,
-		***REMOVED***,
+		m: seq{
+			incomplete{},
+			incomplete{},
+		},
 		encErr: ErrIncomplete.Error(),
 		tests:  single("", ErrNoMatch.Error()),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc: "compile error variable",
-		m: seq***REMOVED***
-			&Var***REMOVED***"bar", errorCompileMsg***REMOVED******REMOVED******REMOVED***,
-			String("$***REMOVED***bar***REMOVED***"),
-		***REMOVED***,
+		m: seq{
+			&Var{"bar", errorCompileMsg{}},
+			String("${bar}"),
+		},
 		encErr: errCompileTest.Error(),
 		tests:  single("bar", ""),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:   "compile error message",
-		m:      errorCompileMsg***REMOVED******REMOVED***,
+		m:      errorCompileMsg{},
 		encErr: errCompileTest.Error(),
 		tests:  single("", ""),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc: "compile error sequence",
-		m: seq***REMOVED***
-			errorCompileMsg***REMOVED******REMOVED***,
-			errorCompileMsg***REMOVED******REMOVED***,
-		***REMOVED***,
+		m: seq{
+			errorCompileMsg{},
+			errorCompileMsg{},
+		},
 		encErr: errCompileTest.Error(),
 		tests:  single("", ""),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:  "macro",
-		m:     String("$***REMOVED***exists(1)***REMOVED***"),
+		m:     String("${exists(1)}"),
 		tests: single("you betya!", ""),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:  "macro incomplete",
-		m:     String("$***REMOVED***incomplete(1)***REMOVED***"),
+		m:     String("${incomplete(1)}"),
 		enc:   "\x03\x00\x01\nincomplete\x01",
 		tests: single("incomplete", ""),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:  "macro undefined at end",
-		m:     String("$***REMOVED***undefined(1)***REMOVED***"),
+		m:     String("${undefined(1)}"),
 		enc:   "\x03\x00\x01\tundefined\x01",
 		tests: single("undefined", "catmsg: undefined macro \"undefined\""),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:  "macro undefined with more text following",
-		m:     String("$***REMOVED***undefined(1)***REMOVED***."),
+		m:     String("${undefined(1)}."),
 		enc:   "\x03\x00\x01\tundefined\x01\x01.",
 		tests: single("undefined|.", "catmsg: undefined macro \"undefined\""),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:   "macro missing paren",
-		m:      String("$***REMOVED***missing(1***REMOVED***"),
+		m:      String("${missing(1}"),
 		encErr: "catmsg: missing ')'",
 		tests:  single("$!(MISSINGPAREN)", ""),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:   "macro bad num",
-		m:      String("aa$***REMOVED***bad(a)***REMOVED***"),
+		m:      String("aa${bad(a)}"),
 		encErr: "catmsg: invalid number \"a\"",
 		tests:  single("aa$!(BADNUM)", ""),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:   "var missing brace",
-		m:      String("a$***REMOVED***missing"),
-		encErr: "catmsg: missing '***REMOVED***'",
+		m:      String("a${missing"),
+		encErr: "catmsg: missing '}'",
 		tests:  single("a$!(MISSINGBRACE)", ""),
-	***REMOVED******REMOVED***
-	r := &renderer***REMOVED******REMOVED***
+	}}
+	r := &renderer{}
 	dec := NewDecoder(language.Und, r, macros)
-	for _, tc := range testCases ***REMOVED***
-		t.Run(tc.desc, func(t *testing.T) ***REMOVED***
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
 			// Use a language other than Und so that we can test
 			// passing the language to nested values.
 			data, err := Compile(language.Dutch, macros, tc.m)
-			if failErr(err, tc.encErr) ***REMOVED***
+			if failErr(err, tc.encErr) {
 				t.Errorf("encoding error: got %+q; want %+q", err, tc.encErr)
-			***REMOVED***
-			if tc.enc != "" && data != tc.enc ***REMOVED***
+			}
+			if tc.enc != "" && data != tc.enc {
 				t.Errorf("encoding: got %+q; want %+q", data, tc.enc)
-			***REMOVED***
-			for _, st := range tc.tests ***REMOVED***
-				t.Run("", func(t *testing.T) ***REMOVED***
-					*r = renderer***REMOVED***args: st.args***REMOVED***
-					if err = dec.Execute(data); failErr(err, st.decErr) ***REMOVED***
+			}
+			for _, st := range tc.tests {
+				t.Run("", func(t *testing.T) {
+					*r = renderer{args: st.args}
+					if err = dec.Execute(data); failErr(err, st.decErr) {
 						t.Errorf("decoding error: got %+q; want %+q", err, st.decErr)
-					***REMOVED***
-					if r.result != st.out ***REMOVED***
+					}
+					if r.result != st.out {
 						t.Errorf("decode: got %+q; want %+q", r.result, st.out)
-					***REMOVED***
-				***REMOVED***)
-			***REMOVED***
-		***REMOVED***)
-	***REMOVED***
-***REMOVED***
+					}
+				})
+			}
+		})
+	}
+}
 
-func failErr(got error, want string) bool ***REMOVED***
-	if got == nil ***REMOVED***
+func failErr(got error, want string) bool {
+	if got == nil {
 		return want != ""
-	***REMOVED***
+	}
 	return want == "" || !strings.Contains(got.Error(), want)
-***REMOVED***
+}
 
 type seq []Message
 
-func (s seq) Compile(e *Encoder) (err error) ***REMOVED***
+func (s seq) Compile(e *Encoder) (err error) {
 	err = ErrIncomplete
 	e.EncodeMessageType(msgFirst)
-	for _, m := range s ***REMOVED***
+	for _, m := range s {
 		// Pass only the last error, but allow erroneous or complete messages
 		// here to allow testing different scenarios.
 		err = e.EncodeMessage(m)
-	***REMOVED***
+	}
 	return err
-***REMOVED***
+}
 
-type empty struct***REMOVED******REMOVED***
+type empty struct{}
 
-func (empty) Compile(e *Encoder) (err error) ***REMOVED*** return nil ***REMOVED***
+func (empty) Compile(e *Encoder) (err error) { return nil }
 
 var msgIncomplete = Register(
 	"golang.org/x/text/internal/catmsg.incomplete",
-	func(d *Decoder) bool ***REMOVED*** return false ***REMOVED***)
+	func(d *Decoder) bool { return false })
 
-type incomplete struct***REMOVED******REMOVED***
+type incomplete struct{}
 
-func (incomplete) Compile(e *Encoder) (err error) ***REMOVED***
+func (incomplete) Compile(e *Encoder) (err error) {
 	e.EncodeMessageType(msgIncomplete)
 	return ErrIncomplete
-***REMOVED***
+}
 
 var msgNested = Register(
 	"golang.org/x/text/internal/catmsg.nested",
-	func(d *Decoder) bool ***REMOVED***
+	func(d *Decoder) bool {
 		d.Render(d.DecodeString())
 		d.ExecuteMessage()
 		return true
-	***REMOVED***)
+	})
 
-type nestedLang struct***REMOVED*** Message ***REMOVED***
+type nestedLang struct{ Message }
 
-func (n nestedLang) Compile(e *Encoder) (err error) ***REMOVED***
+func (n nestedLang) Compile(e *Encoder) (err error) {
 	e.EncodeMessageType(msgNested)
 	e.EncodeString(e.Language().String())
 	e.EncodeMessage(n.Message)
 	return nil
-***REMOVED***
+}
 
-type errorCompileMsg struct***REMOVED******REMOVED***
+type errorCompileMsg struct{}
 
 var errCompileTest = errors.New("catmsg: compile error test")
 
-func (errorCompileMsg) Compile(e *Encoder) (err error) ***REMOVED***
+func (errorCompileMsg) Compile(e *Encoder) (err error) {
 	return errCompileTest
-***REMOVED***
+}
 
-type dictionary struct***REMOVED******REMOVED***
+type dictionary struct{}
 
 var (
-	macros       = dictionary***REMOVED******REMOVED***
-	dictMessages = map[string]string***REMOVED***
+	macros       = dictionary{}
+	dictMessages = map[string]string{
 		"exists":     compile(String("you betya!")),
-		"incomplete": compile(incomplete***REMOVED******REMOVED***),
-	***REMOVED***
+		"incomplete": compile(incomplete{}),
+	}
 )
 
-func (d dictionary) Lookup(key string) (data string, ok bool) ***REMOVED***
+func (d dictionary) Lookup(key string) (data string, ok bool) {
 	data, ok = dictMessages[key]
 	return
-***REMOVED***
+}
 
-func compile(m Message) (data string) ***REMOVED***
+func compile(m Message) (data string) {
 	data, _ = Compile(language.Und, macros, m)
 	return data
-***REMOVED***
+}

@@ -40,20 +40,20 @@ You can find examples of usage for `libkv` under in `docs/examples.go`. Optional
 A **storage backend** in `libkv` should implement (fully or partially) this interface:
 
 ```go
-type Store interface ***REMOVED***
+type Store interface {
 	Put(key string, value []byte, options *WriteOptions) error
 	Get(key string) (*KVPair, error)
 	Delete(key string) error
 	Exists(key string) (bool, error)
-	Watch(key string, stopCh <-chan struct***REMOVED******REMOVED***) (<-chan *KVPair, error)
-	WatchTree(directory string, stopCh <-chan struct***REMOVED******REMOVED***) (<-chan []*KVPair, error)
+	Watch(key string, stopCh <-chan struct{}) (<-chan *KVPair, error)
+	WatchTree(directory string, stopCh <-chan struct{}) (<-chan []*KVPair, error)
 	NewLock(key string, options *LockOptions) (Locker, error)
 	List(directory string) ([]*KVPair, error)
 	DeleteTree(directory string) error
 	AtomicPut(key string, value []byte, previous *KVPair, options *WriteOptions) (bool, *KVPair, error)
 	AtomicDelete(key string, previous *KVPair) (bool, error)
 	Close()
-***REMOVED***
+}
 ```
 
 ## Compatibility matrix

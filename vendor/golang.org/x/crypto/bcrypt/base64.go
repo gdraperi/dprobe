@@ -10,26 +10,26 @@ const alphabet = "./ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234567
 
 var bcEncoding = base64.NewEncoding(alphabet)
 
-func base64Encode(src []byte) []byte ***REMOVED***
+func base64Encode(src []byte) []byte {
 	n := bcEncoding.EncodedLen(len(src))
 	dst := make([]byte, n)
 	bcEncoding.Encode(dst, src)
-	for dst[n-1] == '=' ***REMOVED***
+	for dst[n-1] == '=' {
 		n--
-	***REMOVED***
+	}
 	return dst[:n]
-***REMOVED***
+}
 
-func base64Decode(src []byte) ([]byte, error) ***REMOVED***
+func base64Decode(src []byte) ([]byte, error) {
 	numOfEquals := 4 - (len(src) % 4)
-	for i := 0; i < numOfEquals; i++ ***REMOVED***
+	for i := 0; i < numOfEquals; i++ {
 		src = append(src, '=')
-	***REMOVED***
+	}
 
 	dst := make([]byte, bcEncoding.DecodedLen(len(src)))
 	n, err := bcEncoding.Decode(dst, src)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dst[:n], nil
-***REMOVED***
+}

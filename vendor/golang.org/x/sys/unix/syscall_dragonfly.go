@@ -15,7 +15,7 @@ package unix
 import "unsafe"
 
 // SockaddrDatalink implements the Sockaddr interface for AF_LINK type sockets.
-type SockaddrDatalink struct ***REMOVED***
+type SockaddrDatalink struct {
 	Len    uint8
 	Family uint8
 	Index  uint16
@@ -27,10 +27,10 @@ type SockaddrDatalink struct ***REMOVED***
 	Rcf    uint16
 	Route  [16]uint16
 	raw    RawSockaddrDatalink
-***REMOVED***
+}
 
-// Translate "kern.hostname" to []_C_int***REMOVED***0,1,2,3***REMOVED***.
-func nametomib(name string) (mib []_C_int, err error) ***REMOVED***
+// Translate "kern.hostname" to []_C_int{0,1,2,3}.
+func nametomib(name string) (mib []_C_int, err error) {
 	const siz = unsafe.Sizeof(mib[0])
 
 	// NOTE(rsc): It seems strange to set the buffer to have
@@ -45,92 +45,92 @@ func nametomib(name string) (mib []_C_int, err error) ***REMOVED***
 
 	p := (*byte)(unsafe.Pointer(&buf[0]))
 	bytes, err := ByteSliceFromString(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// Magic sysctl: "setting" 0.3 to a string name
 	// lets you read back the array of integers form.
-	if err = sysctl([]_C_int***REMOVED***0, 3***REMOVED***, p, &n, &bytes[0], uintptr(len(name))); err != nil ***REMOVED***
+	if err = sysctl([]_C_int{0, 3}, p, &n, &bytes[0], uintptr(len(name))); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return buf[0 : n/siz], nil
-***REMOVED***
+}
 
 //sysnb pipe() (r int, w int, err error)
 
-func Pipe(p []int) (err error) ***REMOVED***
-	if len(p) != 2 ***REMOVED***
+func Pipe(p []int) (err error) {
+	if len(p) != 2 {
 		return EINVAL
-	***REMOVED***
+	}
 	p[0], p[1], err = pipe()
 	return
-***REMOVED***
+}
 
 //sys	extpread(fd int, p []byte, flags int, offset int64) (n int, err error)
-func Pread(fd int, p []byte, offset int64) (n int, err error) ***REMOVED***
+func Pread(fd int, p []byte, offset int64) (n int, err error) {
 	return extpread(fd, p, 0, offset)
-***REMOVED***
+}
 
 //sys	extpwrite(fd int, p []byte, flags int, offset int64) (n int, err error)
-func Pwrite(fd int, p []byte, offset int64) (n int, err error) ***REMOVED***
+func Pwrite(fd int, p []byte, offset int64) (n int, err error) {
 	return extpwrite(fd, p, 0, offset)
-***REMOVED***
+}
 
-func Accept4(fd, flags int) (nfd int, sa Sockaddr, err error) ***REMOVED***
+func Accept4(fd, flags int) (nfd int, sa Sockaddr, err error) {
 	var rsa RawSockaddrAny
 	var len _Socklen = SizeofSockaddrAny
 	nfd, err = accept4(fd, &rsa, &len, flags)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
-	if len > SizeofSockaddrAny ***REMOVED***
+	}
+	if len > SizeofSockaddrAny {
 		panic("RawSockaddrAny too small")
-	***REMOVED***
+	}
 	sa, err = anyToSockaddr(&rsa)
-	if err != nil ***REMOVED***
+	if err != nil {
 		Close(nfd)
 		nfd = 0
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 const ImplementsGetwd = true
 
 //sys	Getcwd(buf []byte) (n int, err error) = SYS___GETCWD
 
-func Getwd() (string, error) ***REMOVED***
+func Getwd() (string, error) {
 	var buf [PathMax]byte
 	_, err := Getcwd(buf[0:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	n := clen(buf[:])
-	if n < 1 ***REMOVED***
+	if n < 1 {
 		return "", EINVAL
-	***REMOVED***
+	}
 	return string(buf[:n]), nil
-***REMOVED***
+}
 
-func Getfsstat(buf []Statfs_t, flags int) (n int, err error) ***REMOVED***
+func Getfsstat(buf []Statfs_t, flags int) (n int, err error) {
 	var _p0 unsafe.Pointer
 	var bufsize uintptr
-	if len(buf) > 0 ***REMOVED***
+	if len(buf) > 0 {
 		_p0 = unsafe.Pointer(&buf[0])
-		bufsize = unsafe.Sizeof(Statfs_t***REMOVED******REMOVED***) * uintptr(len(buf))
-	***REMOVED***
+		bufsize = unsafe.Sizeof(Statfs_t{}) * uintptr(len(buf))
+	}
 	r0, _, e1 := Syscall(SYS_GETFSSTAT, uintptr(_p0), bufsize, uintptr(flags))
 	n = int(r0)
-	if e1 != 0 ***REMOVED***
+	if e1 != 0 {
 		err = e1
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func setattrlistTimes(path string, times []Timespec, flags int) error ***REMOVED***
+func setattrlistTimes(path string, times []Timespec, flags int) error {
 	// used on Darwin for UtimesNano
 	return ENOSYS
-***REMOVED***
+}
 
 //sys	ioctl(fd int, req uint, arg uintptr) (err error)
 
@@ -139,100 +139,100 @@ func setattrlistTimes(path string, times []Timespec, flags int) error ***REMOVED
 
 // IoctlSetInt performs an ioctl operation which sets an integer value
 // on fd, using the specified request number.
-func IoctlSetInt(fd int, req uint, value int) error ***REMOVED***
+func IoctlSetInt(fd int, req uint, value int) error {
 	return ioctl(fd, req, uintptr(value))
-***REMOVED***
+}
 
-func IoctlSetWinsize(fd int, req uint, value *Winsize) error ***REMOVED***
+func IoctlSetWinsize(fd int, req uint, value *Winsize) error {
 	return ioctl(fd, req, uintptr(unsafe.Pointer(value)))
-***REMOVED***
+}
 
-func IoctlSetTermios(fd int, req uint, value *Termios) error ***REMOVED***
+func IoctlSetTermios(fd int, req uint, value *Termios) error {
 	return ioctl(fd, req, uintptr(unsafe.Pointer(value)))
-***REMOVED***
+}
 
 // IoctlGetInt performs an ioctl operation which gets an integer value
 // from fd, using the specified request number.
-func IoctlGetInt(fd int, req uint) (int, error) ***REMOVED***
+func IoctlGetInt(fd int, req uint) (int, error) {
 	var value int
 	err := ioctl(fd, req, uintptr(unsafe.Pointer(&value)))
 	return value, err
-***REMOVED***
+}
 
-func IoctlGetWinsize(fd int, req uint) (*Winsize, error) ***REMOVED***
+func IoctlGetWinsize(fd int, req uint) (*Winsize, error) {
 	var value Winsize
 	err := ioctl(fd, req, uintptr(unsafe.Pointer(&value)))
 	return &value, err
-***REMOVED***
+}
 
-func IoctlGetTermios(fd int, req uint) (*Termios, error) ***REMOVED***
+func IoctlGetTermios(fd int, req uint) (*Termios, error) {
 	var value Termios
 	err := ioctl(fd, req, uintptr(unsafe.Pointer(&value)))
 	return &value, err
-***REMOVED***
+}
 
-func sysctlUname(mib []_C_int, old *byte, oldlen *uintptr) error ***REMOVED***
+func sysctlUname(mib []_C_int, old *byte, oldlen *uintptr) error {
 	err := sysctl(mib, old, oldlen, nil, 0)
-	if err != nil ***REMOVED***
+	if err != nil {
 		// Utsname members on Dragonfly are only 32 bytes and
 		// the syscall returns ENOMEM in case the actual value
 		// is longer.
-		if err == ENOMEM ***REMOVED***
+		if err == ENOMEM {
 			err = nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return err
-***REMOVED***
+}
 
-func Uname(uname *Utsname) error ***REMOVED***
-	mib := []_C_int***REMOVED***CTL_KERN, KERN_OSTYPE***REMOVED***
+func Uname(uname *Utsname) error {
+	mib := []_C_int{CTL_KERN, KERN_OSTYPE}
 	n := unsafe.Sizeof(uname.Sysname)
-	if err := sysctlUname(mib, &uname.Sysname[0], &n); err != nil ***REMOVED***
+	if err := sysctlUname(mib, &uname.Sysname[0], &n); err != nil {
 		return err
-	***REMOVED***
+	}
 	uname.Sysname[unsafe.Sizeof(uname.Sysname)-1] = 0
 
-	mib = []_C_int***REMOVED***CTL_KERN, KERN_HOSTNAME***REMOVED***
+	mib = []_C_int{CTL_KERN, KERN_HOSTNAME}
 	n = unsafe.Sizeof(uname.Nodename)
-	if err := sysctlUname(mib, &uname.Nodename[0], &n); err != nil ***REMOVED***
+	if err := sysctlUname(mib, &uname.Nodename[0], &n); err != nil {
 		return err
-	***REMOVED***
+	}
 	uname.Nodename[unsafe.Sizeof(uname.Nodename)-1] = 0
 
-	mib = []_C_int***REMOVED***CTL_KERN, KERN_OSRELEASE***REMOVED***
+	mib = []_C_int{CTL_KERN, KERN_OSRELEASE}
 	n = unsafe.Sizeof(uname.Release)
-	if err := sysctlUname(mib, &uname.Release[0], &n); err != nil ***REMOVED***
+	if err := sysctlUname(mib, &uname.Release[0], &n); err != nil {
 		return err
-	***REMOVED***
+	}
 	uname.Release[unsafe.Sizeof(uname.Release)-1] = 0
 
-	mib = []_C_int***REMOVED***CTL_KERN, KERN_VERSION***REMOVED***
+	mib = []_C_int{CTL_KERN, KERN_VERSION}
 	n = unsafe.Sizeof(uname.Version)
-	if err := sysctlUname(mib, &uname.Version[0], &n); err != nil ***REMOVED***
+	if err := sysctlUname(mib, &uname.Version[0], &n); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	// The version might have newlines or tabs in it, convert them to
 	// spaces.
-	for i, b := range uname.Version ***REMOVED***
-		if b == '\n' || b == '\t' ***REMOVED***
-			if i == len(uname.Version)-1 ***REMOVED***
+	for i, b := range uname.Version {
+		if b == '\n' || b == '\t' {
+			if i == len(uname.Version)-1 {
 				uname.Version[i] = 0
-			***REMOVED*** else ***REMOVED***
+			} else {
 				uname.Version[i] = ' '
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
-	mib = []_C_int***REMOVED***CTL_HW, HW_MACHINE***REMOVED***
+	mib = []_C_int{CTL_HW, HW_MACHINE}
 	n = unsafe.Sizeof(uname.Machine)
-	if err := sysctlUname(mib, &uname.Machine[0], &n); err != nil ***REMOVED***
+	if err := sysctlUname(mib, &uname.Machine[0], &n); err != nil {
 		return err
-	***REMOVED***
+	}
 	uname.Machine[unsafe.Sizeof(uname.Machine)-1] = 0
 
 	return nil
-***REMOVED***
+}
 
 /*
  * Exposed directly

@@ -22,121 +22,121 @@ import (
 const Name = "json-file"
 
 // JSONFileLogger is Logger implementation for default Docker logging.
-type JSONFileLogger struct ***REMOVED***
+type JSONFileLogger struct {
 	mu      sync.Mutex
 	closed  bool
 	writer  *loggerutils.LogFile
-	readers map[*logger.LogWatcher]struct***REMOVED******REMOVED*** // stores the active log followers
+	readers map[*logger.LogWatcher]struct{} // stores the active log followers
 	tag     string                          // tag values requested by the user to log
-***REMOVED***
+}
 
-func init() ***REMOVED***
-	if err := logger.RegisterLogDriver(Name, New); err != nil ***REMOVED***
+func init() {
+	if err := logger.RegisterLogDriver(Name, New); err != nil {
 		logrus.Fatal(err)
-	***REMOVED***
-	if err := logger.RegisterLogOptValidator(Name, ValidateLogOpt); err != nil ***REMOVED***
+	}
+	if err := logger.RegisterLogOptValidator(Name, ValidateLogOpt); err != nil {
 		logrus.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // New creates new JSONFileLogger which writes to filename passed in
 // on given context.
-func New(info logger.Info) (logger.Logger, error) ***REMOVED***
+func New(info logger.Info) (logger.Logger, error) {
 	var capval int64 = -1
-	if capacity, ok := info.Config["max-size"]; ok ***REMOVED***
+	if capacity, ok := info.Config["max-size"]; ok {
 		var err error
 		capval, err = units.FromHumanSize(capacity)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	var maxFiles = 1
-	if maxFileString, ok := info.Config["max-file"]; ok ***REMOVED***
+	if maxFileString, ok := info.Config["max-file"]; ok {
 		var err error
 		maxFiles, err = strconv.Atoi(maxFileString)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-		if maxFiles < 1 ***REMOVED***
+		}
+		if maxFiles < 1 {
 			return nil, fmt.Errorf("max-file cannot be less than 1")
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	attrs, err := info.ExtraAttributes(nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// no default template. only use a tag if the user asked for it
 	tag, err := loggerutils.ParseLogTag(info, "")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if tag != "" ***REMOVED***
+	}
+	if tag != "" {
 		attrs["tag"] = tag
-	***REMOVED***
+	}
 
 	var extra []byte
-	if len(attrs) > 0 ***REMOVED***
+	if len(attrs) > 0 {
 		var err error
 		extra, err = json.Marshal(attrs)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	buf := bytes.NewBuffer(nil)
-	marshalFunc := func(msg *logger.Message) ([]byte, error) ***REMOVED***
-		if err := marshalMessage(msg, extra, buf); err != nil ***REMOVED***
+	marshalFunc := func(msg *logger.Message) ([]byte, error) {
+		if err := marshalMessage(msg, extra, buf); err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		b := buf.Bytes()
 		buf.Reset()
 		return b, nil
-	***REMOVED***
+	}
 
 	writer, err := loggerutils.NewLogFile(info.LogPath, capval, maxFiles, marshalFunc, decodeFunc)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	return &JSONFileLogger***REMOVED***
+	return &JSONFileLogger{
 		writer:  writer,
-		readers: make(map[*logger.LogWatcher]struct***REMOVED******REMOVED***),
+		readers: make(map[*logger.LogWatcher]struct{}),
 		tag:     tag,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // Log converts logger.Message to jsonlog.JSONLog and serializes it to file.
-func (l *JSONFileLogger) Log(msg *logger.Message) error ***REMOVED***
+func (l *JSONFileLogger) Log(msg *logger.Message) error {
 	l.mu.Lock()
 	err := l.writer.WriteLogEntry(msg)
 	l.mu.Unlock()
 	return err
-***REMOVED***
+}
 
-func marshalMessage(msg *logger.Message, extra json.RawMessage, buf *bytes.Buffer) error ***REMOVED***
+func marshalMessage(msg *logger.Message, extra json.RawMessage, buf *bytes.Buffer) error {
 	logLine := msg.Line
-	if !msg.Partial ***REMOVED***
+	if !msg.Partial {
 		logLine = append(msg.Line, '\n')
-	***REMOVED***
-	err := (&jsonlog.JSONLogs***REMOVED***
+	}
+	err := (&jsonlog.JSONLogs{
 		Log:      logLine,
 		Stream:   msg.Source,
 		Created:  msg.Timestamp,
 		RawAttrs: extra,
-	***REMOVED***).MarshalJSONBuf(buf)
-	if err != nil ***REMOVED***
+	}).MarshalJSONBuf(buf)
+	if err != nil {
 		return errors.Wrap(err, "error writing log message to buffer")
-	***REMOVED***
+	}
 	err = buf.WriteByte('\n')
 	return errors.Wrap(err, "error finalizing log buffer")
-***REMOVED***
+}
 
 // ValidateLogOpt looks for json specific log options max-file & max-size.
-func ValidateLogOpt(cfg map[string]string) error ***REMOVED***
-	for key := range cfg ***REMOVED***
-		switch key ***REMOVED***
+func ValidateLogOpt(cfg map[string]string) error {
+	for key := range cfg {
+		switch key {
 		case "max-file":
 		case "max-size":
 		case "labels":
@@ -145,30 +145,30 @@ func ValidateLogOpt(cfg map[string]string) error ***REMOVED***
 		case "tag":
 		default:
 			return fmt.Errorf("unknown log opt '%s' for json-file log driver", key)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
 // LogPath returns the location the given json logger logs to.
-func (l *JSONFileLogger) LogPath() string ***REMOVED***
+func (l *JSONFileLogger) LogPath() string {
 	return l.writer.LogPath()
-***REMOVED***
+}
 
 // Close closes underlying file and signals all readers to stop.
-func (l *JSONFileLogger) Close() error ***REMOVED***
+func (l *JSONFileLogger) Close() error {
 	l.mu.Lock()
 	l.closed = true
 	err := l.writer.Close()
-	for r := range l.readers ***REMOVED***
+	for r := range l.readers {
 		r.Close()
 		delete(l.readers, r)
-	***REMOVED***
+	}
 	l.mu.Unlock()
 	return err
-***REMOVED***
+}
 
 // Name returns name of this logger.
-func (l *JSONFileLogger) Name() string ***REMOVED***
+func (l *JSONFileLogger) Name() string {
 	return Name
-***REMOVED***
+}

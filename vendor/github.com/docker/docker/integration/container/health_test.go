@@ -17,45 +17,45 @@ import (
 
 // TestHealthCheckWorkdir verifies that health-checks inherit the containers'
 // working-dir.
-func TestHealthCheckWorkdir(t *testing.T) ***REMOVED***
+func TestHealthCheckWorkdir(t *testing.T) {
 	defer setupTest(t)()
 	ctx := context.Background()
 	client := request.NewAPIClient(t)
 
 	c, err := client.ContainerCreate(ctx,
-		&container.Config***REMOVED***
+		&container.Config{
 			Image:      "busybox",
 			Tty:        true,
 			WorkingDir: "/foo",
-			Cmd:        strslice.StrSlice([]string***REMOVED***"top"***REMOVED***),
-			Healthcheck: &container.HealthConfig***REMOVED***
-				Test:     []string***REMOVED***"CMD-SHELL", "if [ \"$PWD\" = \"/foo\" ]; then exit 0; else exit 1; fi;"***REMOVED***,
+			Cmd:        strslice.StrSlice([]string{"top"}),
+			Healthcheck: &container.HealthConfig{
+				Test:     []string{"CMD-SHELL", "if [ \"$PWD\" = \"/foo\" ]; then exit 0; else exit 1; fi;"},
 				Interval: 50 * time.Millisecond,
 				Retries:  3,
-			***REMOVED***,
-		***REMOVED***,
-		&container.HostConfig***REMOVED******REMOVED***,
-		&network.NetworkingConfig***REMOVED******REMOVED***,
+			},
+		},
+		&container.HostConfig{},
+		&network.NetworkingConfig{},
 		"healthtest",
 	)
 	require.NoError(t, err)
-	err = client.ContainerStart(ctx, c.ID, types.ContainerStartOptions***REMOVED******REMOVED***)
+	err = client.ContainerStart(ctx, c.ID, types.ContainerStartOptions{})
 	require.NoError(t, err)
 
 	poll.WaitOn(t, pollForHealthStatus(ctx, client, c.ID, types.Healthy), poll.WithDelay(100*time.Millisecond))
-***REMOVED***
+}
 
-func pollForHealthStatus(ctx context.Context, client client.APIClient, containerID string, healthStatus string) func(log poll.LogT) poll.Result ***REMOVED***
-	return func(log poll.LogT) poll.Result ***REMOVED***
+func pollForHealthStatus(ctx context.Context, client client.APIClient, containerID string, healthStatus string) func(log poll.LogT) poll.Result {
+	return func(log poll.LogT) poll.Result {
 		inspect, err := client.ContainerInspect(ctx, containerID)
 
-		switch ***REMOVED***
+		switch {
 		case err != nil:
 			return poll.Error(err)
 		case inspect.State.Health.Status == healthStatus:
 			return poll.Success()
 		default:
 			return poll.Continue("waiting for container to become %s", healthStatus)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

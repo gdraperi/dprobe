@@ -21,7 +21,7 @@ import (
 )
 
 // Section represents a config section.
-type Section struct ***REMOVED***
+type Section struct {
 	f        *File
 	Comment  string
 	name     string
@@ -31,204 +31,204 @@ type Section struct ***REMOVED***
 
 	isRawSection bool
 	rawBody      string
-***REMOVED***
+}
 
-func newSection(f *File, name string) *Section ***REMOVED***
-	return &Section***REMOVED***
+func newSection(f *File, name string) *Section {
+	return &Section{
 		f:        f,
 		name:     name,
 		keys:     make(map[string]*Key),
 		keyList:  make([]string, 0, 10),
 		keysHash: make(map[string]string),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Name returns name of Section.
-func (s *Section) Name() string ***REMOVED***
+func (s *Section) Name() string {
 	return s.name
-***REMOVED***
+}
 
 // Body returns rawBody of Section if the section was marked as unparseable.
 // It still follows the other rules of the INI format surrounding leading/trailing whitespace.
-func (s *Section) Body() string ***REMOVED***
+func (s *Section) Body() string {
 	return strings.TrimSpace(s.rawBody)
-***REMOVED***
+}
 
 // NewKey creates a new key to given section.
-func (s *Section) NewKey(name, val string) (*Key, error) ***REMOVED***
-	if len(name) == 0 ***REMOVED***
+func (s *Section) NewKey(name, val string) (*Key, error) {
+	if len(name) == 0 {
 		return nil, errors.New("error creating new key: empty key name")
-	***REMOVED*** else if s.f.options.Insensitive ***REMOVED***
+	} else if s.f.options.Insensitive {
 		name = strings.ToLower(name)
-	***REMOVED***
+	}
 
-	if s.f.BlockMode ***REMOVED***
+	if s.f.BlockMode {
 		s.f.lock.Lock()
 		defer s.f.lock.Unlock()
-	***REMOVED***
+	}
 
-	if inSlice(name, s.keyList) ***REMOVED***
-		if s.f.options.AllowShadows ***REMOVED***
-			if err := s.keys[name].addShadow(val); err != nil ***REMOVED***
+	if inSlice(name, s.keyList) {
+		if s.f.options.AllowShadows {
+			if err := s.keys[name].addShadow(val); err != nil {
 				return nil, err
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
+			}
+		} else {
 			s.keys[name].value = val
-		***REMOVED***
+		}
 		return s.keys[name], nil
-	***REMOVED***
+	}
 
 	s.keyList = append(s.keyList, name)
 	s.keys[name] = newKey(s, name, val)
 	s.keysHash[name] = val
 	return s.keys[name], nil
-***REMOVED***
+}
 
 // NewBooleanKey creates a new boolean type key to given section.
-func (s *Section) NewBooleanKey(name string) (*Key, error) ***REMOVED***
+func (s *Section) NewBooleanKey(name string) (*Key, error) {
 	key, err := s.NewKey(name, "true")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	key.isBooleanType = true
 	return key, nil
-***REMOVED***
+}
 
 // GetKey returns key in section by given name.
-func (s *Section) GetKey(name string) (*Key, error) ***REMOVED***
+func (s *Section) GetKey(name string) (*Key, error) {
 	// FIXME: change to section level lock?
-	if s.f.BlockMode ***REMOVED***
+	if s.f.BlockMode {
 		s.f.lock.RLock()
-	***REMOVED***
-	if s.f.options.Insensitive ***REMOVED***
+	}
+	if s.f.options.Insensitive {
 		name = strings.ToLower(name)
-	***REMOVED***
+	}
 	key := s.keys[name]
-	if s.f.BlockMode ***REMOVED***
+	if s.f.BlockMode {
 		s.f.lock.RUnlock()
-	***REMOVED***
+	}
 
-	if key == nil ***REMOVED***
+	if key == nil {
 		// Check if it is a child-section.
 		sname := s.name
-		for ***REMOVED***
-			if i := strings.LastIndex(sname, "."); i > -1 ***REMOVED***
+		for {
+			if i := strings.LastIndex(sname, "."); i > -1 {
 				sname = sname[:i]
 				sec, err := s.f.GetSection(sname)
-				if err != nil ***REMOVED***
+				if err != nil {
 					continue
-				***REMOVED***
+				}
 				return sec.GetKey(name)
-			***REMOVED*** else ***REMOVED***
+			} else {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		return nil, fmt.Errorf("error when getting key of section '%s': key '%s' not exists", s.name, name)
-	***REMOVED***
+	}
 	return key, nil
-***REMOVED***
+}
 
 // HasKey returns true if section contains a key with given name.
-func (s *Section) HasKey(name string) bool ***REMOVED***
+func (s *Section) HasKey(name string) bool {
 	key, _ := s.GetKey(name)
 	return key != nil
-***REMOVED***
+}
 
 // Haskey is a backwards-compatible name for HasKey.
-func (s *Section) Haskey(name string) bool ***REMOVED***
+func (s *Section) Haskey(name string) bool {
 	return s.HasKey(name)
-***REMOVED***
+}
 
 // HasValue returns true if section contains given raw value.
-func (s *Section) HasValue(value string) bool ***REMOVED***
-	if s.f.BlockMode ***REMOVED***
+func (s *Section) HasValue(value string) bool {
+	if s.f.BlockMode {
 		s.f.lock.RLock()
 		defer s.f.lock.RUnlock()
-	***REMOVED***
+	}
 
-	for _, k := range s.keys ***REMOVED***
-		if value == k.value ***REMOVED***
+	for _, k := range s.keys {
+		if value == k.value {
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false
-***REMOVED***
+}
 
 // Key assumes named Key exists in section and returns a zero-value when not.
-func (s *Section) Key(name string) *Key ***REMOVED***
+func (s *Section) Key(name string) *Key {
 	key, err := s.GetKey(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		// It's OK here because the only possible error is empty key name,
 		// but if it's empty, this piece of code won't be executed.
 		key, _ = s.NewKey(name, "")
 		return key
-	***REMOVED***
+	}
 	return key
-***REMOVED***
+}
 
 // Keys returns list of keys of section.
-func (s *Section) Keys() []*Key ***REMOVED***
+func (s *Section) Keys() []*Key {
 	keys := make([]*Key, len(s.keyList))
-	for i := range s.keyList ***REMOVED***
+	for i := range s.keyList {
 		keys[i] = s.Key(s.keyList[i])
-	***REMOVED***
+	}
 	return keys
-***REMOVED***
+}
 
 // ParentKeys returns list of keys of parent section.
-func (s *Section) ParentKeys() []*Key ***REMOVED***
+func (s *Section) ParentKeys() []*Key {
 	var parentKeys []*Key
 	sname := s.name
-	for ***REMOVED***
-		if i := strings.LastIndex(sname, "."); i > -1 ***REMOVED***
+	for {
+		if i := strings.LastIndex(sname, "."); i > -1 {
 			sname = sname[:i]
 			sec, err := s.f.GetSection(sname)
-			if err != nil ***REMOVED***
+			if err != nil {
 				continue
-			***REMOVED***
+			}
 			parentKeys = append(parentKeys, sec.Keys()...)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			break
-		***REMOVED***
+		}
 
-	***REMOVED***
+	}
 	return parentKeys
-***REMOVED***
+}
 
 // KeyStrings returns list of key names of section.
-func (s *Section) KeyStrings() []string ***REMOVED***
+func (s *Section) KeyStrings() []string {
 	list := make([]string, len(s.keyList))
 	copy(list, s.keyList)
 	return list
-***REMOVED***
+}
 
 // KeysHash returns keys hash consisting of names and values.
-func (s *Section) KeysHash() map[string]string ***REMOVED***
-	if s.f.BlockMode ***REMOVED***
+func (s *Section) KeysHash() map[string]string {
+	if s.f.BlockMode {
 		s.f.lock.RLock()
 		defer s.f.lock.RUnlock()
-	***REMOVED***
+	}
 
-	hash := map[string]string***REMOVED******REMOVED***
-	for key, value := range s.keysHash ***REMOVED***
+	hash := map[string]string{}
+	for key, value := range s.keysHash {
 		hash[key] = value
-	***REMOVED***
+	}
 	return hash
-***REMOVED***
+}
 
 // DeleteKey deletes a key from section.
-func (s *Section) DeleteKey(name string) ***REMOVED***
-	if s.f.BlockMode ***REMOVED***
+func (s *Section) DeleteKey(name string) {
+	if s.f.BlockMode {
 		s.f.lock.Lock()
 		defer s.f.lock.Unlock()
-	***REMOVED***
+	}
 
-	for i, k := range s.keyList ***REMOVED***
-		if k == name ***REMOVED***
+	for i, k := range s.keyList {
+		if k == name {
 			s.keyList = append(s.keyList[:i], s.keyList[i+1:]...)
 			delete(s.keys, name)
 			return
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

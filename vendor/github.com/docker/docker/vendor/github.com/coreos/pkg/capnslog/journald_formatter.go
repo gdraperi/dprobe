@@ -25,18 +25,18 @@ import (
 	"github.com/coreos/go-systemd/journal"
 )
 
-func NewJournaldFormatter() (Formatter, error) ***REMOVED***
-	if !journal.Enabled() ***REMOVED***
+func NewJournaldFormatter() (Formatter, error) {
+	if !journal.Enabled() {
 		return nil, errors.New("No systemd detected")
-	***REMOVED***
-	return &journaldFormatter***REMOVED******REMOVED***, nil
-***REMOVED***
+	}
+	return &journaldFormatter{}, nil
+}
 
-type journaldFormatter struct***REMOVED******REMOVED***
+type journaldFormatter struct{}
 
-func (j *journaldFormatter) Format(pkg string, l LogLevel, _ int, entries ...interface***REMOVED******REMOVED***) ***REMOVED***
+func (j *journaldFormatter) Format(pkg string, l LogLevel, _ int, entries ...interface{}) {
 	var pri journal.Priority
-	switch l ***REMOVED***
+	switch l {
 	case CRITICAL:
 		pri = journal.PriCrit
 	case ERROR:
@@ -53,16 +53,16 @@ func (j *journaldFormatter) Format(pkg string, l LogLevel, _ int, entries ...int
 		pri = journal.PriDebug
 	default:
 		panic("Unhandled loglevel")
-	***REMOVED***
+	}
 	msg := fmt.Sprint(entries...)
-	tags := map[string]string***REMOVED***
+	tags := map[string]string{
 		"PACKAGE":           pkg,
 		"SYSLOG_IDENTIFIER": filepath.Base(os.Args[0]),
-	***REMOVED***
+	}
 	err := journal.Send(msg, pri, tags)
-	if err != nil ***REMOVED***
+	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (j *journaldFormatter) Flush() ***REMOVED******REMOVED***
+func (j *journaldFormatter) Flush() {}

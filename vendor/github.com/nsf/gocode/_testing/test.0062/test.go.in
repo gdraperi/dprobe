@@ -1,18 +1,18 @@
 package main
 
-type ABC struct ***REMOVED***
+type ABC struct {
 	A int
 	B int
 	C int
-***REMOVED***
+}
 
 type ABCAlias = ABC
 
-type Foo struct ***REMOVED***
+type Foo struct {
 	ABCAlias
-***REMOVED***
+}
 
-func main() ***REMOVED***
-	foo := Foo***REMOVED******REMOVED***
+func main() {
+	foo := Foo{}
 	foo.
-***REMOVED***
+}

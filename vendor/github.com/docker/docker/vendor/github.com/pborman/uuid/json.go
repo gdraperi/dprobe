@@ -6,29 +6,29 @@ package uuid
 
 import "errors"
 
-func (u UUID) MarshalJSON() ([]byte, error) ***REMOVED***
-	if len(u) != 16 ***REMOVED***
+func (u UUID) MarshalJSON() ([]byte, error) {
+	if len(u) != 16 {
 		return []byte(`""`), nil
-	***REMOVED***
+	}
 	var js [38]byte
 	js[0] = '"'
 	encodeHex(js[1:], u)
 	js[37] = '"'
 	return js[:], nil
-***REMOVED***
+}
 
-func (u *UUID) UnmarshalJSON(data []byte) error ***REMOVED***
-	if string(data) == `""` ***REMOVED***
+func (u *UUID) UnmarshalJSON(data []byte) error {
+	if string(data) == `""` {
 		return nil
-	***REMOVED***
-	if data[0] != '"' ***REMOVED***
+	}
+	if data[0] != '"' {
 		return errors.New("invalid UUID format")
-	***REMOVED***
+	}
 	data = data[1 : len(data)-1]
 	uu := Parse(string(data))
-	if uu == nil ***REMOVED***
+	if uu == nil {
 		return errors.New("invalid UUID format")
-	***REMOVED***
+	}
 	*u = uu
 	return nil
-***REMOVED***
+}

@@ -22,102 +22,102 @@ var (
 	testn = flag.Int("testn", -1, "specific test number to run or -1 for all")
 )
 
-// pc replaces any rune r that is repeated n times, for n > 1, with r***REMOVED***n***REMOVED***.
-func pc(s string) []byte ***REMOVED***
+// pc replaces any rune r that is repeated n times, for n > 1, with r{n}.
+func pc(s string) []byte {
 	b := bytes.NewBuffer(make([]byte, 0, len(s)))
-	for i := 0; i < len(s); ***REMOVED***
+	for i := 0; i < len(s); {
 		r, sz := utf8.DecodeRuneInString(s[i:])
 		n := 0
-		if sz == 1 ***REMOVED***
+		if sz == 1 {
 			// Special-case one-byte case to handle repetition for invalid UTF-8.
-			for c := s[i]; i+n < len(s) && s[i+n] == c; n++ ***REMOVED***
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
-			for _, r2 := range s[i:] ***REMOVED***
-				if r2 != r ***REMOVED***
+			for c := s[i]; i+n < len(s) && s[i+n] == c; n++ {
+			}
+		} else {
+			for _, r2 := range s[i:] {
+				if r2 != r {
 					break
-				***REMOVED***
+				}
 				n++
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		b.WriteString(s[i : i+sz])
-		if n > 1 ***REMOVED***
-			fmt.Fprintf(b, "***REMOVED***%d***REMOVED***", n)
-		***REMOVED***
+		if n > 1 {
+			fmt.Fprintf(b, "{%d}", n)
+		}
 		i += sz * n
-	***REMOVED***
+	}
 	return b.Bytes()
-***REMOVED***
+}
 
 // pidx finds the index from which two strings start to differ, plus context.
 // It returns the index and ellipsis if the index is greater than 0.
-func pidx(a, b string) (i int, prefix string) ***REMOVED***
-	for ; i < len(a) && i < len(b) && a[i] == b[i]; i++ ***REMOVED***
-	***REMOVED***
-	if i < 8 ***REMOVED***
+func pidx(a, b string) (i int, prefix string) {
+	for ; i < len(a) && i < len(b) && a[i] == b[i]; i++ {
+	}
+	if i < 8 {
 		return 0, ""
-	***REMOVED***
+	}
 	i -= 3 // ensure taking at least one full rune before the difference.
-	for k := i - 7; i > k && !utf8.RuneStart(a[i]); i-- ***REMOVED***
-	***REMOVED***
+	for k := i - 7; i > k && !utf8.RuneStart(a[i]); i-- {
+	}
 	return i, "..."
-***REMOVED***
+}
 
-type PositionTest struct ***REMOVED***
+type PositionTest struct {
 	input  string
 	pos    int
 	buffer string // expected contents of reorderBuffer, if applicable
-***REMOVED***
+}
 
 type positionFunc func(rb *reorderBuffer, s string) (int, []byte)
 
-func runPosTests(t *testing.T, name string, f Form, fn positionFunc, tests []PositionTest) ***REMOVED***
-	rb := reorderBuffer***REMOVED******REMOVED***
+func runPosTests(t *testing.T, name string, f Form, fn positionFunc, tests []PositionTest) {
+	rb := reorderBuffer{}
 	rb.init(f, nil)
-	for i, test := range tests ***REMOVED***
+	for i, test := range tests {
 		rb.reset()
 		rb.src = inputString(test.input)
 		rb.nsrc = len(test.input)
 		pos, out := fn(&rb, test.input)
-		if pos != test.pos ***REMOVED***
+		if pos != test.pos {
 			t.Errorf("%s:%d: position is %d; want %d", name, i, pos, test.pos)
-		***REMOVED***
-		if outs := string(out); outs != test.buffer ***REMOVED***
+		}
+		if outs := string(out); outs != test.buffer {
 			k, pfx := pidx(outs, test.buffer)
 			t.Errorf("%s:%d: buffer \nwas  %s%+q; \nwant %s%+q", name, i, pfx, pc(outs[k:]), pfx, pc(test.buffer[k:]))
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func grave(n int) string ***REMOVED***
+func grave(n int) string {
 	return rep(0x0300, n)
-***REMOVED***
+}
 
-func rep(r rune, n int) string ***REMOVED***
+func rep(r rune, n int) string {
 	return strings.Repeat(string(r), n)
-***REMOVED***
+}
 
 const segSize = maxByteBufferSize
 
 var cgj = GraphemeJoiner
 
-var decomposeSegmentTests = []PositionTest***REMOVED***
+var decomposeSegmentTests = []PositionTest{
 	// illegal runes
-	***REMOVED***"\xC2", 0, ""***REMOVED***,
-	***REMOVED***"\xC0", 1, "\xC0"***REMOVED***,
-	***REMOVED***"\u00E0\x80", 2, "\u0061\u0300"***REMOVED***,
+	{"\xC2", 0, ""},
+	{"\xC0", 1, "\xC0"},
+	{"\u00E0\x80", 2, "\u0061\u0300"},
 	// starter
-	***REMOVED***"a", 1, "a"***REMOVED***,
-	***REMOVED***"ab", 1, "a"***REMOVED***,
+	{"a", 1, "a"},
+	{"ab", 1, "a"},
 	// starter + composing
-	***REMOVED***"a\u0300", 3, "a\u0300"***REMOVED***,
-	***REMOVED***"a\u0300b", 3, "a\u0300"***REMOVED***,
+	{"a\u0300", 3, "a\u0300"},
+	{"a\u0300b", 3, "a\u0300"},
 	// with decomposition
-	***REMOVED***"\u00C0", 2, "A\u0300"***REMOVED***,
-	***REMOVED***"\u00C0b", 2, "A\u0300"***REMOVED***,
+	{"\u00C0", 2, "A\u0300"},
+	{"\u00C0b", 2, "A\u0300"},
 	// long
-	***REMOVED***grave(31), 60, grave(30) + cgj***REMOVED***,
-	***REMOVED***"a" + grave(31), 61, "a" + grave(30) + cgj***REMOVED***,
+	{grave(31), 60, grave(30) + cgj},
+	{"a" + grave(31), 61, "a" + grave(30) + cgj},
 
 	// Stability tests: see http://www.unicode.org/review/pr-29.html.
 	// U+0300 COMBINING GRAVE ACCENT;Mn;230;NSM;;;;;N;NON-SPACING GRAVE;;;;
@@ -125,442 +125,442 @@ var decomposeSegmentTests = []PositionTest***REMOVED***
 	// U+0B3E ORIYA VOWEL SIGN AA;Mc;0;L;;;;;N;;;;;
 	// U+1100 HANGUL CHOSEONG KIYEOK;Lo;0;L;;;;;N;;;;;
 	// U+1161 HANGUL JUNGSEONG A;Lo;0;L;;;;;N;;;;;
-	***REMOVED***"\u0B47\u0300\u0B3E", 8, "\u0B47\u0300\u0B3E"***REMOVED***,
-	***REMOVED***"\u1100\u0300\u1161", 8, "\u1100\u0300\u1161"***REMOVED***,
-	***REMOVED***"\u0B47\u0B3E", 6, "\u0B47\u0B3E"***REMOVED***,
-	***REMOVED***"\u1100\u1161", 6, "\u1100\u1161"***REMOVED***,
+	{"\u0B47\u0300\u0B3E", 8, "\u0B47\u0300\u0B3E"},
+	{"\u1100\u0300\u1161", 8, "\u1100\u0300\u1161"},
+	{"\u0B47\u0B3E", 6, "\u0B47\u0B3E"},
+	{"\u1100\u1161", 6, "\u1100\u1161"},
 
 	// U+04DA MALAYALAM VOWEL SIGN O;Mc;0;L;0D46 0D3E;;;;N;;;;;
 	// Sequence of decomposing characters that are starters and modifiers.
-	***REMOVED***"\u0d4a" + strings.Repeat("\u0d3e", 31), 90, "\u0d46" + strings.Repeat("\u0d3e", 30) + cgj***REMOVED***,
+	{"\u0d4a" + strings.Repeat("\u0d3e", 31), 90, "\u0d46" + strings.Repeat("\u0d3e", 30) + cgj},
 
-	***REMOVED***grave(30), 60, grave(30)***REMOVED***,
+	{grave(30), 60, grave(30)},
 	// U+FF9E is a starter, but decomposes to U+3099, which is not.
-	***REMOVED***grave(30) + "\uff9e", 60, grave(30) + cgj***REMOVED***,
+	{grave(30) + "\uff9e", 60, grave(30) + cgj},
 	// ends with incomplete UTF-8 encoding
-	***REMOVED***"\xCC", 0, ""***REMOVED***,
-	***REMOVED***"\u0300\xCC", 2, "\u0300"***REMOVED***,
-***REMOVED***
+	{"\xCC", 0, ""},
+	{"\u0300\xCC", 2, "\u0300"},
+}
 
-func decomposeSegmentF(rb *reorderBuffer, s string) (int, []byte) ***REMOVED***
+func decomposeSegmentF(rb *reorderBuffer, s string) (int, []byte) {
 	rb.initString(NFD, s)
 	rb.setFlusher(nil, appendFlush)
 	p := decomposeSegment(rb, 0, true)
 	return p, rb.out
-***REMOVED***
+}
 
-func TestDecomposeSegment(t *testing.T) ***REMOVED***
+func TestDecomposeSegment(t *testing.T) {
 	runPosTests(t, "TestDecomposeSegment", NFC, decomposeSegmentF, decomposeSegmentTests)
-***REMOVED***
+}
 
-var firstBoundaryTests = []PositionTest***REMOVED***
+var firstBoundaryTests = []PositionTest{
 	// no boundary
-	***REMOVED***"", -1, ""***REMOVED***,
-	***REMOVED***"\u0300", -1, ""***REMOVED***,
-	***REMOVED***"\x80\x80", -1, ""***REMOVED***,
+	{"", -1, ""},
+	{"\u0300", -1, ""},
+	{"\x80\x80", -1, ""},
 	// illegal runes
-	***REMOVED***"\xff", 0, ""***REMOVED***,
-	***REMOVED***"\u0300\xff", 2, ""***REMOVED***,
-	***REMOVED***"\u0300\xc0\x80\x80", 2, ""***REMOVED***,
+	{"\xff", 0, ""},
+	{"\u0300\xff", 2, ""},
+	{"\u0300\xc0\x80\x80", 2, ""},
 	// boundaries
-	***REMOVED***"a", 0, ""***REMOVED***,
-	***REMOVED***"\u0300a", 2, ""***REMOVED***,
+	{"a", 0, ""},
+	{"\u0300a", 2, ""},
 	// Hangul
-	***REMOVED***"\u1103\u1161", 0, ""***REMOVED***,
-	***REMOVED***"\u110B\u1173\u11B7", 0, ""***REMOVED***,
-	***REMOVED***"\u1161\u110B\u1173\u11B7", 3, ""***REMOVED***,
-	***REMOVED***"\u1173\u11B7\u1103\u1161", 6, ""***REMOVED***,
+	{"\u1103\u1161", 0, ""},
+	{"\u110B\u1173\u11B7", 0, ""},
+	{"\u1161\u110B\u1173\u11B7", 3, ""},
+	{"\u1173\u11B7\u1103\u1161", 6, ""},
 	// too many combining characters.
-	***REMOVED***grave(maxNonStarters - 1), -1, ""***REMOVED***,
-	***REMOVED***grave(maxNonStarters), 60, ""***REMOVED***,
-	***REMOVED***grave(maxNonStarters + 1), 60, ""***REMOVED***,
-***REMOVED***
+	{grave(maxNonStarters - 1), -1, ""},
+	{grave(maxNonStarters), 60, ""},
+	{grave(maxNonStarters + 1), 60, ""},
+}
 
-func firstBoundaryF(rb *reorderBuffer, s string) (int, []byte) ***REMOVED***
+func firstBoundaryF(rb *reorderBuffer, s string) (int, []byte) {
 	return rb.f.form.FirstBoundary([]byte(s)), nil
-***REMOVED***
+}
 
-func firstBoundaryStringF(rb *reorderBuffer, s string) (int, []byte) ***REMOVED***
+func firstBoundaryStringF(rb *reorderBuffer, s string) (int, []byte) {
 	return rb.f.form.FirstBoundaryInString(s), nil
-***REMOVED***
+}
 
-func TestFirstBoundary(t *testing.T) ***REMOVED***
+func TestFirstBoundary(t *testing.T) {
 	runPosTests(t, "TestFirstBoundary", NFC, firstBoundaryF, firstBoundaryTests)
 	runPosTests(t, "TestFirstBoundaryInString", NFC, firstBoundaryStringF, firstBoundaryTests)
-***REMOVED***
+}
 
-func TestNextBoundary(t *testing.T) ***REMOVED***
-	testCases := []struct ***REMOVED***
+func TestNextBoundary(t *testing.T) {
+	testCases := []struct {
 		input string
 		atEOF bool
 		want  int
-	***REMOVED******REMOVED***
+	}{
 		// no boundary
-		***REMOVED***"", true, 0***REMOVED***,
-		***REMOVED***"", false, -1***REMOVED***,
-		***REMOVED***"\u0300", true, 2***REMOVED***,
-		***REMOVED***"\u0300", false, -1***REMOVED***,
-		***REMOVED***"\x80\x80", true, 1***REMOVED***,
-		***REMOVED***"\x80\x80", false, 1***REMOVED***,
+		{"", true, 0},
+		{"", false, -1},
+		{"\u0300", true, 2},
+		{"\u0300", false, -1},
+		{"\x80\x80", true, 1},
+		{"\x80\x80", false, 1},
 		// illegal runes
-		***REMOVED***"\xff", false, 1***REMOVED***,
-		***REMOVED***"\u0300\xff", false, 2***REMOVED***,
-		***REMOVED***"\u0300\xc0\x80\x80", false, 2***REMOVED***,
-		***REMOVED***"\xc2\x80\x80", false, 2***REMOVED***,
-		***REMOVED***"\xc2", false, -1***REMOVED***,
-		***REMOVED***"\xc2", true, 1***REMOVED***,
-		***REMOVED***"a\u0300\xc2", false, -1***REMOVED***,
-		***REMOVED***"a\u0300\xc2", true, 3***REMOVED***,
+		{"\xff", false, 1},
+		{"\u0300\xff", false, 2},
+		{"\u0300\xc0\x80\x80", false, 2},
+		{"\xc2\x80\x80", false, 2},
+		{"\xc2", false, -1},
+		{"\xc2", true, 1},
+		{"a\u0300\xc2", false, -1},
+		{"a\u0300\xc2", true, 3},
 		// boundaries
-		***REMOVED***"a", true, 1***REMOVED***,
-		***REMOVED***"a", false, -1***REMOVED***,
-		***REMOVED***"aa", false, 1***REMOVED***,
-		***REMOVED***"\u0300", true, 2***REMOVED***,
-		***REMOVED***"\u0300", false, -1***REMOVED***,
-		***REMOVED***"\u0300a", false, 2***REMOVED***,
+		{"a", true, 1},
+		{"a", false, -1},
+		{"aa", false, 1},
+		{"\u0300", true, 2},
+		{"\u0300", false, -1},
+		{"\u0300a", false, 2},
 		// Hangul
-		***REMOVED***"\u1103\u1161", true, 6***REMOVED***,
-		***REMOVED***"\u1103\u1161", false, -1***REMOVED***,
-		***REMOVED***"\u110B\u1173\u11B7", false, -1***REMOVED***,
-		***REMOVED***"\u110B\u1173\u11B7\u110B\u1173\u11B7", false, 9***REMOVED***,
-		***REMOVED***"\u1161\u110B\u1173\u11B7", false, 3***REMOVED***,
-		***REMOVED***"\u1173\u11B7\u1103\u1161", false, 6***REMOVED***,
+		{"\u1103\u1161", true, 6},
+		{"\u1103\u1161", false, -1},
+		{"\u110B\u1173\u11B7", false, -1},
+		{"\u110B\u1173\u11B7\u110B\u1173\u11B7", false, 9},
+		{"\u1161\u110B\u1173\u11B7", false, 3},
+		{"\u1173\u11B7\u1103\u1161", false, 6},
 		// too many combining characters.
-		***REMOVED***grave(maxNonStarters - 1), false, -1***REMOVED***,
-		***REMOVED***grave(maxNonStarters), false, 60***REMOVED***,
-		***REMOVED***grave(maxNonStarters + 1), false, 60***REMOVED***,
-	***REMOVED***
+		{grave(maxNonStarters - 1), false, -1},
+		{grave(maxNonStarters), false, 60},
+		{grave(maxNonStarters + 1), false, 60},
+	}
 
-	for _, tc := range testCases ***REMOVED***
-		if got := NFC.NextBoundary([]byte(tc.input), tc.atEOF); got != tc.want ***REMOVED***
+	for _, tc := range testCases {
+		if got := NFC.NextBoundary([]byte(tc.input), tc.atEOF); got != tc.want {
 			t.Errorf("NextBoundary(%+q, %v) = %d; want %d", tc.input, tc.atEOF, got, tc.want)
-		***REMOVED***
-		if got := NFC.NextBoundaryInString(tc.input, tc.atEOF); got != tc.want ***REMOVED***
+		}
+		if got := NFC.NextBoundaryInString(tc.input, tc.atEOF); got != tc.want {
 			t.Errorf("NextBoundaryInString(%+q, %v) = %d; want %d", tc.input, tc.atEOF, got, tc.want)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-var decomposeToLastTests = []PositionTest***REMOVED***
+var decomposeToLastTests = []PositionTest{
 	// ends with inert character
-	***REMOVED***"Hello!", 6, ""***REMOVED***,
-	***REMOVED***"\u0632", 2, ""***REMOVED***,
-	***REMOVED***"a\u0301\u0635", 5, ""***REMOVED***,
+	{"Hello!", 6, ""},
+	{"\u0632", 2, ""},
+	{"a\u0301\u0635", 5, ""},
 	// ends with non-inert starter
-	***REMOVED***"a", 0, "a"***REMOVED***,
-	***REMOVED***"a\u0301a", 3, "a"***REMOVED***,
-	***REMOVED***"a\u0301\u03B9", 3, "\u03B9"***REMOVED***,
-	***REMOVED***"a\u0327", 0, "a\u0327"***REMOVED***,
+	{"a", 0, "a"},
+	{"a\u0301a", 3, "a"},
+	{"a\u0301\u03B9", 3, "\u03B9"},
+	{"a\u0327", 0, "a\u0327"},
 	// illegal runes
-	***REMOVED***"\xFF", 1, ""***REMOVED***,
-	***REMOVED***"aa\xFF", 3, ""***REMOVED***,
-	***REMOVED***"\xC0\x80\x80", 3, ""***REMOVED***,
-	***REMOVED***"\xCC\x80\x80", 3, ""***REMOVED***,
+	{"\xFF", 1, ""},
+	{"aa\xFF", 3, ""},
+	{"\xC0\x80\x80", 3, ""},
+	{"\xCC\x80\x80", 3, ""},
 	// ends with incomplete UTF-8 encoding
-	***REMOVED***"a\xCC", 2, ""***REMOVED***,
+	{"a\xCC", 2, ""},
 	// ends with combining characters
-	***REMOVED***"\u0300\u0301", 0, "\u0300\u0301"***REMOVED***,
-	***REMOVED***"a\u0300\u0301", 0, "a\u0300\u0301"***REMOVED***,
-	***REMOVED***"a\u0301\u0308", 0, "a\u0301\u0308"***REMOVED***,
-	***REMOVED***"a\u0308\u0301", 0, "a\u0308\u0301"***REMOVED***,
-	***REMOVED***"aaaa\u0300\u0301", 3, "a\u0300\u0301"***REMOVED***,
-	***REMOVED***"\u0300a\u0300\u0301", 2, "a\u0300\u0301"***REMOVED***,
-	***REMOVED***"\u00C0", 0, "A\u0300"***REMOVED***,
-	***REMOVED***"a\u00C0", 1, "A\u0300"***REMOVED***,
+	{"\u0300\u0301", 0, "\u0300\u0301"},
+	{"a\u0300\u0301", 0, "a\u0300\u0301"},
+	{"a\u0301\u0308", 0, "a\u0301\u0308"},
+	{"a\u0308\u0301", 0, "a\u0308\u0301"},
+	{"aaaa\u0300\u0301", 3, "a\u0300\u0301"},
+	{"\u0300a\u0300\u0301", 2, "a\u0300\u0301"},
+	{"\u00C0", 0, "A\u0300"},
+	{"a\u00C0", 1, "A\u0300"},
 	// decomposing
-	***REMOVED***"a\u0300\u00E0", 3, "a\u0300"***REMOVED***,
+	{"a\u0300\u00E0", 3, "a\u0300"},
 	// multisegment decompositions (flushes leading segments)
-	***REMOVED***"a\u0300\uFDC0", 7, "\u064A"***REMOVED***,
-	***REMOVED***"\uFDC0" + grave(29), 4, "\u064A" + grave(29)***REMOVED***,
-	***REMOVED***"\uFDC0" + grave(30), 4, "\u064A" + grave(30)***REMOVED***,
-	***REMOVED***"\uFDC0" + grave(31), 5, grave(30)***REMOVED***,
-	***REMOVED***"\uFDFA" + grave(14), 31, "\u0645" + grave(14)***REMOVED***,
+	{"a\u0300\uFDC0", 7, "\u064A"},
+	{"\uFDC0" + grave(29), 4, "\u064A" + grave(29)},
+	{"\uFDC0" + grave(30), 4, "\u064A" + grave(30)},
+	{"\uFDC0" + grave(31), 5, grave(30)},
+	{"\uFDFA" + grave(14), 31, "\u0645" + grave(14)},
 	// Overflow
-	***REMOVED***"\u00E0" + grave(29), 0, "a" + grave(30)***REMOVED***,
-	***REMOVED***"\u00E0" + grave(30), 2, grave(30)***REMOVED***,
+	{"\u00E0" + grave(29), 0, "a" + grave(30)},
+	{"\u00E0" + grave(30), 2, grave(30)},
 	// Hangul
-	***REMOVED***"a\u1103", 1, "\u1103"***REMOVED***,
-	***REMOVED***"a\u110B", 1, "\u110B"***REMOVED***,
-	***REMOVED***"a\u110B\u1173", 1, "\u110B\u1173"***REMOVED***,
+	{"a\u1103", 1, "\u1103"},
+	{"a\u110B", 1, "\u110B"},
+	{"a\u110B\u1173", 1, "\u110B\u1173"},
 	// See comment in composition.go:compBoundaryAfter.
-	***REMOVED***"a\u110B\u1173\u11B7", 1, "\u110B\u1173\u11B7"***REMOVED***,
-	***REMOVED***"a\uC73C", 1, "\u110B\u1173"***REMOVED***,
-	***REMOVED***"다음", 3, "\u110B\u1173\u11B7"***REMOVED***,
-	***REMOVED***"다", 0, "\u1103\u1161"***REMOVED***,
-	***REMOVED***"\u1103\u1161\u110B\u1173\u11B7", 6, "\u110B\u1173\u11B7"***REMOVED***,
-	***REMOVED***"\u110B\u1173\u11B7\u1103\u1161", 9, "\u1103\u1161"***REMOVED***,
-	***REMOVED***"다음음", 6, "\u110B\u1173\u11B7"***REMOVED***,
-	***REMOVED***"음다다", 6, "\u1103\u1161"***REMOVED***,
+	{"a\u110B\u1173\u11B7", 1, "\u110B\u1173\u11B7"},
+	{"a\uC73C", 1, "\u110B\u1173"},
+	{"다음", 3, "\u110B\u1173\u11B7"},
+	{"다", 0, "\u1103\u1161"},
+	{"\u1103\u1161\u110B\u1173\u11B7", 6, "\u110B\u1173\u11B7"},
+	{"\u110B\u1173\u11B7\u1103\u1161", 9, "\u1103\u1161"},
+	{"다음음", 6, "\u110B\u1173\u11B7"},
+	{"음다다", 6, "\u1103\u1161"},
 	// maximized buffer
-	***REMOVED***"a" + grave(30), 0, "a" + grave(30)***REMOVED***,
+	{"a" + grave(30), 0, "a" + grave(30)},
 	// Buffer overflow
-	***REMOVED***"a" + grave(31), 3, grave(30)***REMOVED***,
+	{"a" + grave(31), 3, grave(30)},
 	// weird UTF-8
-	***REMOVED***"a\u0300\u11B7", 0, "a\u0300\u11B7"***REMOVED***,
-***REMOVED***
+	{"a\u0300\u11B7", 0, "a\u0300\u11B7"},
+}
 
-func decomposeToLast(rb *reorderBuffer, s string) (int, []byte) ***REMOVED***
+func decomposeToLast(rb *reorderBuffer, s string) (int, []byte) {
 	rb.setFlusher([]byte(s), appendFlush)
 	decomposeToLastBoundary(rb)
 	buf := rb.flush(nil)
 	return len(rb.out), buf
-***REMOVED***
+}
 
-func TestDecomposeToLastBoundary(t *testing.T) ***REMOVED***
+func TestDecomposeToLastBoundary(t *testing.T) {
 	runPosTests(t, "TestDecomposeToLastBoundary", NFKC, decomposeToLast, decomposeToLastTests)
-***REMOVED***
+}
 
-var lastBoundaryTests = []PositionTest***REMOVED***
+var lastBoundaryTests = []PositionTest{
 	// ends with inert character
-	***REMOVED***"Hello!", 6, ""***REMOVED***,
-	***REMOVED***"\u0632", 2, ""***REMOVED***,
+	{"Hello!", 6, ""},
+	{"\u0632", 2, ""},
 	// ends with non-inert starter
-	***REMOVED***"a", 0, ""***REMOVED***,
+	{"a", 0, ""},
 	// illegal runes
-	***REMOVED***"\xff", 1, ""***REMOVED***,
-	***REMOVED***"aa\xff", 3, ""***REMOVED***,
-	***REMOVED***"a\xff\u0300", 1, ""***REMOVED***, // TODO: should probably be 2.
-	***REMOVED***"\xc0\x80\x80", 3, ""***REMOVED***,
-	***REMOVED***"\xc0\x80\x80\u0300", 3, ""***REMOVED***,
+	{"\xff", 1, ""},
+	{"aa\xff", 3, ""},
+	{"a\xff\u0300", 1, ""}, // TODO: should probably be 2.
+	{"\xc0\x80\x80", 3, ""},
+	{"\xc0\x80\x80\u0300", 3, ""},
 	// ends with incomplete UTF-8 encoding
-	***REMOVED***"\xCC", -1, ""***REMOVED***,
-	***REMOVED***"\xE0\x80", -1, ""***REMOVED***,
-	***REMOVED***"\xF0\x80\x80", -1, ""***REMOVED***,
-	***REMOVED***"a\xCC", 0, ""***REMOVED***,
-	***REMOVED***"\x80\xCC", 1, ""***REMOVED***,
-	***REMOVED***"\xCC\xCC", 1, ""***REMOVED***,
+	{"\xCC", -1, ""},
+	{"\xE0\x80", -1, ""},
+	{"\xF0\x80\x80", -1, ""},
+	{"a\xCC", 0, ""},
+	{"\x80\xCC", 1, ""},
+	{"\xCC\xCC", 1, ""},
 	// ends with combining characters
-	***REMOVED***"a\u0300\u0301", 0, ""***REMOVED***,
-	***REMOVED***"aaaa\u0300\u0301", 3, ""***REMOVED***,
-	***REMOVED***"\u0300a\u0300\u0301", 2, ""***REMOVED***,
-	***REMOVED***"\u00C2", 0, ""***REMOVED***,
-	***REMOVED***"a\u00C2", 1, ""***REMOVED***,
+	{"a\u0300\u0301", 0, ""},
+	{"aaaa\u0300\u0301", 3, ""},
+	{"\u0300a\u0300\u0301", 2, ""},
+	{"\u00C2", 0, ""},
+	{"a\u00C2", 1, ""},
 	// decomposition may recombine
-	***REMOVED***"\u0226", 0, ""***REMOVED***,
+	{"\u0226", 0, ""},
 	// no boundary
-	***REMOVED***"", -1, ""***REMOVED***,
-	***REMOVED***"\u0300\u0301", -1, ""***REMOVED***,
-	***REMOVED***"\u0300", -1, ""***REMOVED***,
-	***REMOVED***"\x80\x80", -1, ""***REMOVED***,
-	***REMOVED***"\x80\x80\u0301", -1, ""***REMOVED***,
+	{"", -1, ""},
+	{"\u0300\u0301", -1, ""},
+	{"\u0300", -1, ""},
+	{"\x80\x80", -1, ""},
+	{"\x80\x80\u0301", -1, ""},
 	// Hangul
-	***REMOVED***"다음", 3, ""***REMOVED***,
-	***REMOVED***"다", 0, ""***REMOVED***,
-	***REMOVED***"\u1103\u1161\u110B\u1173\u11B7", 6, ""***REMOVED***,
-	***REMOVED***"\u110B\u1173\u11B7\u1103\u1161", 9, ""***REMOVED***,
+	{"다음", 3, ""},
+	{"다", 0, ""},
+	{"\u1103\u1161\u110B\u1173\u11B7", 6, ""},
+	{"\u110B\u1173\u11B7\u1103\u1161", 9, ""},
 	// too many combining characters.
-	***REMOVED***grave(maxNonStarters - 1), -1, ""***REMOVED***,
+	{grave(maxNonStarters - 1), -1, ""},
 	// May still be preceded with a non-starter.
-	***REMOVED***grave(maxNonStarters), -1, ""***REMOVED***,
+	{grave(maxNonStarters), -1, ""},
 	// May still need to insert a cgj after the last combiner.
-	***REMOVED***grave(maxNonStarters + 1), 2, ""***REMOVED***,
-	***REMOVED***grave(maxNonStarters + 2), 4, ""***REMOVED***,
+	{grave(maxNonStarters + 1), 2, ""},
+	{grave(maxNonStarters + 2), 4, ""},
 
-	***REMOVED***"a" + grave(maxNonStarters-1), 0, ""***REMOVED***,
-	***REMOVED***"a" + grave(maxNonStarters), 0, ""***REMOVED***,
+	{"a" + grave(maxNonStarters-1), 0, ""},
+	{"a" + grave(maxNonStarters), 0, ""},
 	// May still need to insert a cgj after the last combiner.
-	***REMOVED***"a" + grave(maxNonStarters+1), 3, ""***REMOVED***,
-	***REMOVED***"a" + grave(maxNonStarters+2), 5, ""***REMOVED***,
-***REMOVED***
+	{"a" + grave(maxNonStarters+1), 3, ""},
+	{"a" + grave(maxNonStarters+2), 5, ""},
+}
 
-func lastBoundaryF(rb *reorderBuffer, s string) (int, []byte) ***REMOVED***
+func lastBoundaryF(rb *reorderBuffer, s string) (int, []byte) {
 	return rb.f.form.LastBoundary([]byte(s)), nil
-***REMOVED***
+}
 
-func TestLastBoundary(t *testing.T) ***REMOVED***
+func TestLastBoundary(t *testing.T) {
 	runPosTests(t, "TestLastBoundary", NFC, lastBoundaryF, lastBoundaryTests)
-***REMOVED***
+}
 
-type spanTest struct ***REMOVED***
+type spanTest struct {
 	input string
 	atEOF bool
 	n     int
 	err   error
-***REMOVED***
+}
 
-var quickSpanTests = []spanTest***REMOVED***
-	***REMOVED***"", true, 0, nil***REMOVED***,
+var quickSpanTests = []spanTest{
+	{"", true, 0, nil},
 	// starters
-	***REMOVED***"a", true, 1, nil***REMOVED***,
-	***REMOVED***"abc", true, 3, nil***REMOVED***,
-	***REMOVED***"\u043Eb", true, 3, nil***REMOVED***,
+	{"a", true, 1, nil},
+	{"abc", true, 3, nil},
+	{"\u043Eb", true, 3, nil},
 	// incomplete last rune.
-	***REMOVED***"\xCC", true, 1, nil***REMOVED***,
-	***REMOVED***"\xCC", false, 0, transform.ErrShortSrc***REMOVED***,
-	***REMOVED***"a\xCC", true, 2, nil***REMOVED***,
-	***REMOVED***"a\xCC", false, 0, transform.ErrShortSrc***REMOVED***, // TODO: could be 1 for NFD
+	{"\xCC", true, 1, nil},
+	{"\xCC", false, 0, transform.ErrShortSrc},
+	{"a\xCC", true, 2, nil},
+	{"a\xCC", false, 0, transform.ErrShortSrc}, // TODO: could be 1 for NFD
 	// incorrectly ordered combining characters
-	***REMOVED***"\u0300\u0316", true, 0, transform.ErrEndOfSpan***REMOVED***,
-	***REMOVED***"\u0300\u0316", false, 0, transform.ErrEndOfSpan***REMOVED***,
-	***REMOVED***"\u0300\u0316cd", true, 0, transform.ErrEndOfSpan***REMOVED***,
-	***REMOVED***"\u0300\u0316cd", false, 0, transform.ErrEndOfSpan***REMOVED***,
+	{"\u0300\u0316", true, 0, transform.ErrEndOfSpan},
+	{"\u0300\u0316", false, 0, transform.ErrEndOfSpan},
+	{"\u0300\u0316cd", true, 0, transform.ErrEndOfSpan},
+	{"\u0300\u0316cd", false, 0, transform.ErrEndOfSpan},
 	// have a maximum number of combining characters.
-	***REMOVED***rep(0x035D, 30) + "\u035B", true, 0, transform.ErrEndOfSpan***REMOVED***,
-	***REMOVED***"a" + rep(0x035D, 30) + "\u035B", true, 0, transform.ErrEndOfSpan***REMOVED***,
-	***REMOVED***"Ɵ" + rep(0x035D, 30) + "\u035B", true, 0, transform.ErrEndOfSpan***REMOVED***,
-	***REMOVED***"aa" + rep(0x035D, 30) + "\u035B", true, 1, transform.ErrEndOfSpan***REMOVED***,
-	***REMOVED***rep(0x035D, 30) + cgj + "\u035B", true, 64, nil***REMOVED***,
-	***REMOVED***"a" + rep(0x035D, 30) + cgj + "\u035B", true, 65, nil***REMOVED***,
-	***REMOVED***"Ɵ" + rep(0x035D, 30) + cgj + "\u035B", true, 66, nil***REMOVED***,
-	***REMOVED***"aa" + rep(0x035D, 30) + cgj + "\u035B", true, 66, nil***REMOVED***,
+	{rep(0x035D, 30) + "\u035B", true, 0, transform.ErrEndOfSpan},
+	{"a" + rep(0x035D, 30) + "\u035B", true, 0, transform.ErrEndOfSpan},
+	{"Ɵ" + rep(0x035D, 30) + "\u035B", true, 0, transform.ErrEndOfSpan},
+	{"aa" + rep(0x035D, 30) + "\u035B", true, 1, transform.ErrEndOfSpan},
+	{rep(0x035D, 30) + cgj + "\u035B", true, 64, nil},
+	{"a" + rep(0x035D, 30) + cgj + "\u035B", true, 65, nil},
+	{"Ɵ" + rep(0x035D, 30) + cgj + "\u035B", true, 66, nil},
+	{"aa" + rep(0x035D, 30) + cgj + "\u035B", true, 66, nil},
 
-	***REMOVED***"a" + rep(0x035D, 30) + cgj + "\u035B", false, 61, transform.ErrShortSrc***REMOVED***,
-	***REMOVED***"Ɵ" + rep(0x035D, 30) + cgj + "\u035B", false, 62, transform.ErrShortSrc***REMOVED***,
-	***REMOVED***"aa" + rep(0x035D, 30) + cgj + "\u035B", false, 62, transform.ErrShortSrc***REMOVED***,
-***REMOVED***
+	{"a" + rep(0x035D, 30) + cgj + "\u035B", false, 61, transform.ErrShortSrc},
+	{"Ɵ" + rep(0x035D, 30) + cgj + "\u035B", false, 62, transform.ErrShortSrc},
+	{"aa" + rep(0x035D, 30) + cgj + "\u035B", false, 62, transform.ErrShortSrc},
+}
 
-var quickSpanNFDTests = []spanTest***REMOVED***
+var quickSpanNFDTests = []spanTest{
 	// needs decomposing
-	***REMOVED***"\u00C0", true, 0, transform.ErrEndOfSpan***REMOVED***,
-	***REMOVED***"abc\u00C0", true, 3, transform.ErrEndOfSpan***REMOVED***,
+	{"\u00C0", true, 0, transform.ErrEndOfSpan},
+	{"abc\u00C0", true, 3, transform.ErrEndOfSpan},
 	// correctly ordered combining characters
-	***REMOVED***"\u0300", true, 2, nil***REMOVED***,
-	***REMOVED***"ab\u0300", true, 4, nil***REMOVED***,
-	***REMOVED***"ab\u0300cd", true, 6, nil***REMOVED***,
-	***REMOVED***"\u0300cd", true, 4, nil***REMOVED***,
-	***REMOVED***"\u0316\u0300", true, 4, nil***REMOVED***,
-	***REMOVED***"ab\u0316\u0300", true, 6, nil***REMOVED***,
-	***REMOVED***"ab\u0316\u0300cd", true, 8, nil***REMOVED***,
-	***REMOVED***"ab\u0316\u0300\u00C0", true, 6, transform.ErrEndOfSpan***REMOVED***,
-	***REMOVED***"\u0316\u0300cd", true, 6, nil***REMOVED***,
-	***REMOVED***"\u043E\u0308b", true, 5, nil***REMOVED***,
+	{"\u0300", true, 2, nil},
+	{"ab\u0300", true, 4, nil},
+	{"ab\u0300cd", true, 6, nil},
+	{"\u0300cd", true, 4, nil},
+	{"\u0316\u0300", true, 4, nil},
+	{"ab\u0316\u0300", true, 6, nil},
+	{"ab\u0316\u0300cd", true, 8, nil},
+	{"ab\u0316\u0300\u00C0", true, 6, transform.ErrEndOfSpan},
+	{"\u0316\u0300cd", true, 6, nil},
+	{"\u043E\u0308b", true, 5, nil},
 	// incorrectly ordered combining characters
-	***REMOVED***"ab\u0300\u0316", true, 1, transform.ErrEndOfSpan***REMOVED***, // TODO: we could skip 'b' as well.
-	***REMOVED***"ab\u0300\u0316cd", true, 1, transform.ErrEndOfSpan***REMOVED***,
+	{"ab\u0300\u0316", true, 1, transform.ErrEndOfSpan}, // TODO: we could skip 'b' as well.
+	{"ab\u0300\u0316cd", true, 1, transform.ErrEndOfSpan},
 	// Hangul
-	***REMOVED***"같은", true, 0, transform.ErrEndOfSpan***REMOVED***,
-***REMOVED***
+	{"같은", true, 0, transform.ErrEndOfSpan},
+}
 
-var quickSpanNFCTests = []spanTest***REMOVED***
+var quickSpanNFCTests = []spanTest{
 	// okay composed
-	***REMOVED***"\u00C0", true, 2, nil***REMOVED***,
-	***REMOVED***"abc\u00C0", true, 5, nil***REMOVED***,
+	{"\u00C0", true, 2, nil},
+	{"abc\u00C0", true, 5, nil},
 	// correctly ordered combining characters
 	// TODO: b may combine with modifiers, which is why this fails. We could
 	// make a more precise test that that actually checks whether last
 	// characters combines. Probably not worth it.
-	***REMOVED***"ab\u0300", true, 1, transform.ErrEndOfSpan***REMOVED***,
-	***REMOVED***"ab\u0300cd", true, 1, transform.ErrEndOfSpan***REMOVED***,
-	***REMOVED***"ab\u0316\u0300", true, 1, transform.ErrEndOfSpan***REMOVED***,
-	***REMOVED***"ab\u0316\u0300cd", true, 1, transform.ErrEndOfSpan***REMOVED***,
-	***REMOVED***"\u00C0\u035D", true, 4, nil***REMOVED***,
+	{"ab\u0300", true, 1, transform.ErrEndOfSpan},
+	{"ab\u0300cd", true, 1, transform.ErrEndOfSpan},
+	{"ab\u0316\u0300", true, 1, transform.ErrEndOfSpan},
+	{"ab\u0316\u0300cd", true, 1, transform.ErrEndOfSpan},
+	{"\u00C0\u035D", true, 4, nil},
 	// we do not special case leading combining characters
-	***REMOVED***"\u0300cd", true, 0, transform.ErrEndOfSpan***REMOVED***,
-	***REMOVED***"\u0300", true, 0, transform.ErrEndOfSpan***REMOVED***,
-	***REMOVED***"\u0316\u0300", true, 0, transform.ErrEndOfSpan***REMOVED***,
-	***REMOVED***"\u0316\u0300cd", true, 0, transform.ErrEndOfSpan***REMOVED***,
+	{"\u0300cd", true, 0, transform.ErrEndOfSpan},
+	{"\u0300", true, 0, transform.ErrEndOfSpan},
+	{"\u0316\u0300", true, 0, transform.ErrEndOfSpan},
+	{"\u0316\u0300cd", true, 0, transform.ErrEndOfSpan},
 	// incorrectly ordered combining characters
-	***REMOVED***"ab\u0300\u0316", true, 1, transform.ErrEndOfSpan***REMOVED***,
-	***REMOVED***"ab\u0300\u0316cd", true, 1, transform.ErrEndOfSpan***REMOVED***,
+	{"ab\u0300\u0316", true, 1, transform.ErrEndOfSpan},
+	{"ab\u0300\u0316cd", true, 1, transform.ErrEndOfSpan},
 	// Hangul
-	***REMOVED***"같은", true, 6, nil***REMOVED***,
-	***REMOVED***"같은", false, 3, transform.ErrShortSrc***REMOVED***,
+	{"같은", true, 6, nil},
+	{"같은", false, 3, transform.ErrShortSrc},
 	// We return the start of the violating segment in case of overflow.
-	***REMOVED***grave(30) + "\uff9e", true, 0, transform.ErrEndOfSpan***REMOVED***,
-	***REMOVED***grave(30), true, 0, transform.ErrEndOfSpan***REMOVED***,
-***REMOVED***
+	{grave(30) + "\uff9e", true, 0, transform.ErrEndOfSpan},
+	{grave(30), true, 0, transform.ErrEndOfSpan},
+}
 
-func runSpanTests(t *testing.T, name string, f Form, testCases []spanTest) ***REMOVED***
-	for i, tc := range testCases ***REMOVED***
+func runSpanTests(t *testing.T, name string, f Form, testCases []spanTest) {
+	for i, tc := range testCases {
 		s := fmt.Sprintf("Bytes/%s/%d=%+q/atEOF=%v", name, i, pc(tc.input), tc.atEOF)
-		ok := testtext.Run(t, s, func(t *testing.T) ***REMOVED***
+		ok := testtext.Run(t, s, func(t *testing.T) {
 			n, err := f.Span([]byte(tc.input), tc.atEOF)
-			if n != tc.n || err != tc.err ***REMOVED***
+			if n != tc.n || err != tc.err {
 				t.Errorf("\n got %d, %v;\nwant %d, %v", n, err, tc.n, tc.err)
-			***REMOVED***
-		***REMOVED***)
-		if !ok ***REMOVED***
+			}
+		})
+		if !ok {
 			continue // Don't do the String variant if the Bytes variant failed.
-		***REMOVED***
+		}
 		s = fmt.Sprintf("String/%s/%d=%+q/atEOF=%v", name, i, pc(tc.input), tc.atEOF)
-		testtext.Run(t, s, func(t *testing.T) ***REMOVED***
+		testtext.Run(t, s, func(t *testing.T) {
 			n, err := f.SpanString(tc.input, tc.atEOF)
-			if n != tc.n || err != tc.err ***REMOVED***
+			if n != tc.n || err != tc.err {
 				t.Errorf("\n got %d, %v;\nwant %d, %v", n, err, tc.n, tc.err)
-			***REMOVED***
-		***REMOVED***)
-	***REMOVED***
-***REMOVED***
+			}
+		})
+	}
+}
 
-func TestSpan(t *testing.T) ***REMOVED***
+func TestSpan(t *testing.T) {
 	runSpanTests(t, "NFD", NFD, quickSpanTests)
 	runSpanTests(t, "NFD", NFD, quickSpanNFDTests)
 	runSpanTests(t, "NFC", NFC, quickSpanTests)
 	runSpanTests(t, "NFC", NFC, quickSpanNFCTests)
-***REMOVED***
+}
 
-var isNormalTests = []PositionTest***REMOVED***
-	***REMOVED***"", 1, ""***REMOVED***,
+var isNormalTests = []PositionTest{
+	{"", 1, ""},
 	// illegal runes
-	***REMOVED***"\xff", 1, ""***REMOVED***,
+	{"\xff", 1, ""},
 	// starters
-	***REMOVED***"a", 1, ""***REMOVED***,
-	***REMOVED***"abc", 1, ""***REMOVED***,
-	***REMOVED***"\u043Eb", 1, ""***REMOVED***,
+	{"a", 1, ""},
+	{"abc", 1, ""},
+	{"\u043Eb", 1, ""},
 	// incorrectly ordered combining characters
-	***REMOVED***"\u0300\u0316", 0, ""***REMOVED***,
-	***REMOVED***"ab\u0300\u0316", 0, ""***REMOVED***,
-	***REMOVED***"ab\u0300\u0316cd", 0, ""***REMOVED***,
-	***REMOVED***"\u0300\u0316cd", 0, ""***REMOVED***,
-***REMOVED***
-var isNormalNFDTests = []PositionTest***REMOVED***
+	{"\u0300\u0316", 0, ""},
+	{"ab\u0300\u0316", 0, ""},
+	{"ab\u0300\u0316cd", 0, ""},
+	{"\u0300\u0316cd", 0, ""},
+}
+var isNormalNFDTests = []PositionTest{
 	// needs decomposing
-	***REMOVED***"\u00C0", 0, ""***REMOVED***,
-	***REMOVED***"abc\u00C0", 0, ""***REMOVED***,
+	{"\u00C0", 0, ""},
+	{"abc\u00C0", 0, ""},
 	// correctly ordered combining characters
-	***REMOVED***"\u0300", 1, ""***REMOVED***,
-	***REMOVED***"ab\u0300", 1, ""***REMOVED***,
-	***REMOVED***"ab\u0300cd", 1, ""***REMOVED***,
-	***REMOVED***"\u0300cd", 1, ""***REMOVED***,
-	***REMOVED***"\u0316\u0300", 1, ""***REMOVED***,
-	***REMOVED***"ab\u0316\u0300", 1, ""***REMOVED***,
-	***REMOVED***"ab\u0316\u0300cd", 1, ""***REMOVED***,
-	***REMOVED***"\u0316\u0300cd", 1, ""***REMOVED***,
-	***REMOVED***"\u043E\u0308b", 1, ""***REMOVED***,
+	{"\u0300", 1, ""},
+	{"ab\u0300", 1, ""},
+	{"ab\u0300cd", 1, ""},
+	{"\u0300cd", 1, ""},
+	{"\u0316\u0300", 1, ""},
+	{"ab\u0316\u0300", 1, ""},
+	{"ab\u0316\u0300cd", 1, ""},
+	{"\u0316\u0300cd", 1, ""},
+	{"\u043E\u0308b", 1, ""},
 	// Hangul
-	***REMOVED***"같은", 0, ""***REMOVED***,
-***REMOVED***
-var isNormalNFCTests = []PositionTest***REMOVED***
+	{"같은", 0, ""},
+}
+var isNormalNFCTests = []PositionTest{
 	// okay composed
-	***REMOVED***"\u00C0", 1, ""***REMOVED***,
-	***REMOVED***"abc\u00C0", 1, ""***REMOVED***,
+	{"\u00C0", 1, ""},
+	{"abc\u00C0", 1, ""},
 	// need reordering
-	***REMOVED***"a\u0300", 0, ""***REMOVED***,
-	***REMOVED***"a\u0300cd", 0, ""***REMOVED***,
-	***REMOVED***"a\u0316\u0300", 0, ""***REMOVED***,
-	***REMOVED***"a\u0316\u0300cd", 0, ""***REMOVED***,
+	{"a\u0300", 0, ""},
+	{"a\u0300cd", 0, ""},
+	{"a\u0316\u0300", 0, ""},
+	{"a\u0316\u0300cd", 0, ""},
 	// correctly ordered combining characters
-	***REMOVED***"ab\u0300", 1, ""***REMOVED***,
-	***REMOVED***"ab\u0300cd", 1, ""***REMOVED***,
-	***REMOVED***"ab\u0316\u0300", 1, ""***REMOVED***,
-	***REMOVED***"ab\u0316\u0300cd", 1, ""***REMOVED***,
-	***REMOVED***"\u00C0\u035D", 1, ""***REMOVED***,
-	***REMOVED***"\u0300", 1, ""***REMOVED***,
-	***REMOVED***"\u0316\u0300cd", 1, ""***REMOVED***,
+	{"ab\u0300", 1, ""},
+	{"ab\u0300cd", 1, ""},
+	{"ab\u0316\u0300", 1, ""},
+	{"ab\u0316\u0300cd", 1, ""},
+	{"\u00C0\u035D", 1, ""},
+	{"\u0300", 1, ""},
+	{"\u0316\u0300cd", 1, ""},
 	// Hangul
-	***REMOVED***"같은", 1, ""***REMOVED***,
-***REMOVED***
+	{"같은", 1, ""},
+}
 
-var isNormalNFKXTests = []PositionTest***REMOVED***
+var isNormalNFKXTests = []PositionTest{
 	// Special case.
-	***REMOVED***"\u00BC", 0, ""***REMOVED***,
-***REMOVED***
+	{"\u00BC", 0, ""},
+}
 
-func isNormalF(rb *reorderBuffer, s string) (int, []byte) ***REMOVED***
-	if rb.f.form.IsNormal([]byte(s)) ***REMOVED***
+func isNormalF(rb *reorderBuffer, s string) (int, []byte) {
+	if rb.f.form.IsNormal([]byte(s)) {
 		return 1, nil
-	***REMOVED***
+	}
 	return 0, nil
-***REMOVED***
+}
 
-func isNormalStringF(rb *reorderBuffer, s string) (int, []byte) ***REMOVED***
-	if rb.f.form.IsNormalString(s) ***REMOVED***
+func isNormalStringF(rb *reorderBuffer, s string) (int, []byte) {
+	if rb.f.form.IsNormalString(s) {
 		return 1, nil
-	***REMOVED***
+	}
 	return 0, nil
-***REMOVED***
+}
 
-func TestIsNormal(t *testing.T) ***REMOVED***
+func TestIsNormal(t *testing.T) {
 	runPosTests(t, "TestIsNormalNFD1", NFD, isNormalF, isNormalTests)
 	runPosTests(t, "TestIsNormalNFD2", NFD, isNormalF, isNormalNFDTests)
 	runPosTests(t, "TestIsNormalNFC1", NFC, isNormalF, isNormalTests)
@@ -571,461 +571,461 @@ func TestIsNormal(t *testing.T) ***REMOVED***
 	runPosTests(t, "TestIsNormalNFKC1", NFKC, isNormalF, isNormalTests)
 	runPosTests(t, "TestIsNormalNFKC2", NFKC, isNormalF, isNormalNFCTests)
 	runPosTests(t, "TestIsNormalNFKC3", NFKC, isNormalF, isNormalNFKXTests)
-***REMOVED***
+}
 
-func TestIsNormalString(t *testing.T) ***REMOVED***
+func TestIsNormalString(t *testing.T) {
 	runPosTests(t, "TestIsNormalNFD1", NFD, isNormalStringF, isNormalTests)
 	runPosTests(t, "TestIsNormalNFD2", NFD, isNormalStringF, isNormalNFDTests)
 	runPosTests(t, "TestIsNormalNFC1", NFC, isNormalStringF, isNormalTests)
 	runPosTests(t, "TestIsNormalNFC2", NFC, isNormalStringF, isNormalNFCTests)
-***REMOVED***
+}
 
-type AppendTest struct ***REMOVED***
+type AppendTest struct {
 	left  string
 	right string
 	out   string
-***REMOVED***
+}
 
 type appendFunc func(f Form, out []byte, s string) []byte
 
-var fstr = []string***REMOVED***"NFC", "NFD", "NFKC", "NFKD"***REMOVED***
+var fstr = []string{"NFC", "NFD", "NFKC", "NFKD"}
 
-func runNormTests(t *testing.T, name string, fn appendFunc) ***REMOVED***
-	for f := NFC; f <= NFKD; f++ ***REMOVED***
+func runNormTests(t *testing.T, name string, fn appendFunc) {
+	for f := NFC; f <= NFKD; f++ {
 		runAppendTests(t, name, f, fn, normTests[f])
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func runAppendTests(t *testing.T, name string, f Form, fn appendFunc, tests []AppendTest) ***REMOVED***
-	for i, test := range tests ***REMOVED***
-		t.Run(fmt.Sprintf("%s/%d", fstr[f], i), func(t *testing.T) ***REMOVED***
+func runAppendTests(t *testing.T, name string, f Form, fn appendFunc, tests []AppendTest) {
+	for i, test := range tests {
+		t.Run(fmt.Sprintf("%s/%d", fstr[f], i), func(t *testing.T) {
 			id := pc(test.left + test.right)
-			if *testn >= 0 && i != *testn ***REMOVED***
+			if *testn >= 0 && i != *testn {
 				return
-			***REMOVED***
-			t.Run("fn", func(t *testing.T) ***REMOVED***
+			}
+			t.Run("fn", func(t *testing.T) {
 				out := []byte(test.left)
 				have := string(fn(f, out, test.right))
-				if len(have) != len(test.out) ***REMOVED***
+				if len(have) != len(test.out) {
 					t.Errorf("%+q: length is %d; want %d (%+q vs %+q)", id, len(have), len(test.out), pc(have), pc(test.out))
-				***REMOVED***
-				if have != test.out ***REMOVED***
+				}
+				if have != test.out {
 					k, pf := pidx(have, test.out)
 					t.Errorf("%+q:\nwas  %s%+q; \nwant %s%+q", id, pf, pc(have[k:]), pf, pc(test.out[k:]))
-				***REMOVED***
-			***REMOVED***)
+				}
+			})
 
 			// Bootstrap by normalizing input. Ensures that the various variants
 			// behave the same.
-			for g := NFC; g <= NFKD; g++ ***REMOVED***
-				if f == g ***REMOVED***
+			for g := NFC; g <= NFKD; g++ {
+				if f == g {
 					continue
-				***REMOVED***
-				t.Run(fstr[g], func(t *testing.T) ***REMOVED***
+				}
+				t.Run(fstr[g], func(t *testing.T) {
 					want := g.String(test.left + test.right)
 					have := string(fn(g, g.AppendString(nil, test.left), test.right))
-					if len(have) != len(want) ***REMOVED***
+					if len(have) != len(want) {
 						t.Errorf("%+q: length is %d; want %d (%+q vs %+q)", id, len(have), len(want), pc(have), pc(want))
-					***REMOVED***
-					if have != want ***REMOVED***
+					}
+					if have != want {
 						k, pf := pidx(have, want)
 						t.Errorf("%+q:\nwas  %s%+q; \nwant %s%+q", id, pf, pc(have[k:]), pf, pc(want[k:]))
-					***REMOVED***
-				***REMOVED***)
-			***REMOVED***
-		***REMOVED***)
-	***REMOVED***
-***REMOVED***
+					}
+				})
+			}
+		})
+	}
+}
 
-var normTests = [][]AppendTest***REMOVED***
+var normTests = [][]AppendTest{
 	appendTestsNFC,
 	appendTestsNFD,
 	appendTestsNFKC,
 	appendTestsNFKD,
-***REMOVED***
+}
 
-var appendTestsNFC = []AppendTest***REMOVED***
-	***REMOVED***"", ascii, ascii***REMOVED***,
-	***REMOVED***"", txt_all, txt_all***REMOVED***,
-	***REMOVED***"\uff9e", grave(30), "\uff9e" + grave(29) + cgj + grave(1)***REMOVED***,
-	***REMOVED***grave(30), "\uff9e", grave(30) + cgj + "\uff9e"***REMOVED***,
+var appendTestsNFC = []AppendTest{
+	{"", ascii, ascii},
+	{"", txt_all, txt_all},
+	{"\uff9e", grave(30), "\uff9e" + grave(29) + cgj + grave(1)},
+	{grave(30), "\uff9e", grave(30) + cgj + "\uff9e"},
 
 	// Tests designed for Iter.
-	***REMOVED*** // ordering of non-composing combining characters
+	{ // ordering of non-composing combining characters
 		"",
 		"\u0305\u0316",
 		"\u0316\u0305",
-	***REMOVED***,
-	***REMOVED*** // segment overflow
+	},
+	{ // segment overflow
 		"",
 		"a" + rep(0x0305, maxNonStarters+4) + "\u0316",
 		"a" + rep(0x0305, maxNonStarters) + cgj + "\u0316" + rep(0x305, 4),
-	***REMOVED***,
+	},
 
-	***REMOVED*** // Combine across non-blocking non-starters.
+	{ // Combine across non-blocking non-starters.
 		// U+0327 COMBINING CEDILLA;Mn;202;NSM;;;;;N;NON-SPACING CEDILLA;;;;
 		// U+0325 COMBINING RING BELOW;Mn;220;NSM;;;;;N;NON-SPACING RING BELOW;;;;
 		"", "a\u0327\u0325", "\u1e01\u0327",
-	***REMOVED***,
+	},
 
-	***REMOVED*** // Jamo V+T does not combine.
+	{ // Jamo V+T does not combine.
 		"",
 		"\u1161\u11a8",
 		"\u1161\u11a8",
-	***REMOVED***,
+	},
 
 	// Stability tests: see http://www.unicode.org/review/pr-29.html.
-	***REMOVED***"", "\u0b47\u0300\u0b3e", "\u0b47\u0300\u0b3e"***REMOVED***,
-	***REMOVED***"", "\u1100\u0300\u1161", "\u1100\u0300\u1161"***REMOVED***,
-	***REMOVED***"", "\u0b47\u0b3e", "\u0b4b"***REMOVED***,
-	***REMOVED***"", "\u1100\u1161", "\uac00"***REMOVED***,
+	{"", "\u0b47\u0300\u0b3e", "\u0b47\u0300\u0b3e"},
+	{"", "\u1100\u0300\u1161", "\u1100\u0300\u1161"},
+	{"", "\u0b47\u0b3e", "\u0b4b"},
+	{"", "\u1100\u1161", "\uac00"},
 
 	// U+04DA MALAYALAM VOWEL SIGN O;Mc;0;L;0D46 0D3E;;;;N;;;;;
-	***REMOVED*** // 0d4a starts a new segment.
+	{ // 0d4a starts a new segment.
 		"",
 		"\u0d4a" + strings.Repeat("\u0d3e", 15) + "\u0d4a" + strings.Repeat("\u0d3e", 15),
 		"\u0d4a" + strings.Repeat("\u0d3e", 15) + "\u0d4a" + strings.Repeat("\u0d3e", 15),
-	***REMOVED***,
+	},
 
-	***REMOVED*** // Split combining characters.
+	{ // Split combining characters.
 		// TODO: don't insert CGJ before starters.
 		"",
 		"\u0d46" + strings.Repeat("\u0d3e", 31),
 		"\u0d4a" + strings.Repeat("\u0d3e", 29) + cgj + "\u0d3e",
-	***REMOVED***,
+	},
 
-	***REMOVED*** // Split combining characters.
+	{ // Split combining characters.
 		"",
 		"\u0d4a" + strings.Repeat("\u0d3e", 30),
 		"\u0d4a" + strings.Repeat("\u0d3e", 29) + cgj + "\u0d3e",
-	***REMOVED***,
+	},
 
-	***REMOVED*** //  https://golang.org/issues/20079
+	{ //  https://golang.org/issues/20079
 		"",
 		"\xeb\u0344",
 		"\xeb\u0308\u0301",
-	***REMOVED***,
+	},
 
-	***REMOVED*** //  https://golang.org/issues/20079
+	{ //  https://golang.org/issues/20079
 		"",
 		"\uac00" + strings.Repeat("\u0300", 30),
 		"\uac00" + strings.Repeat("\u0300", 29) + "\u034f\u0300",
-	***REMOVED***,
+	},
 
-	***REMOVED*** //  https://golang.org/issues/20079
+	{ //  https://golang.org/issues/20079
 		"",
 		"\xeb" + strings.Repeat("\u0300", 31),
 		"\xeb" + strings.Repeat("\u0300", 30) + "\u034f\u0300",
-	***REMOVED***,
-***REMOVED***
+	},
+}
 
-var appendTestsNFD = []AppendTest***REMOVED***
+var appendTestsNFD = []AppendTest{
 	// TODO: Move some of the tests here.
-***REMOVED***
+}
 
-var appendTestsNFKC = []AppendTest***REMOVED***
+var appendTestsNFKC = []AppendTest{
 	// empty buffers
-	***REMOVED***"", "", ""***REMOVED***,
-	***REMOVED***"a", "", "a"***REMOVED***,
-	***REMOVED***"", "a", "a"***REMOVED***,
-	***REMOVED***"", "\u0041\u0307\u0304", "\u01E0"***REMOVED***,
+	{"", "", ""},
+	{"a", "", "a"},
+	{"", "a", "a"},
+	{"", "\u0041\u0307\u0304", "\u01E0"},
 	// segment split across buffers
-	***REMOVED***"", "a\u0300b", "\u00E0b"***REMOVED***,
-	***REMOVED***"a", "\u0300b", "\u00E0b"***REMOVED***,
-	***REMOVED***"a", "\u0300\u0316", "\u00E0\u0316"***REMOVED***,
-	***REMOVED***"a", "\u0316\u0300", "\u00E0\u0316"***REMOVED***,
-	***REMOVED***"a", "\u0300a\u0300", "\u00E0\u00E0"***REMOVED***,
-	***REMOVED***"a", "\u0300a\u0300a\u0300", "\u00E0\u00E0\u00E0"***REMOVED***,
-	***REMOVED***"a", "\u0300aaa\u0300aaa\u0300", "\u00E0aa\u00E0aa\u00E0"***REMOVED***,
-	***REMOVED***"a\u0300", "\u0327", "\u00E0\u0327"***REMOVED***,
-	***REMOVED***"a\u0327", "\u0300", "\u00E0\u0327"***REMOVED***,
-	***REMOVED***"a\u0316", "\u0300", "\u00E0\u0316"***REMOVED***,
-	***REMOVED***"\u0041\u0307", "\u0304", "\u01E0"***REMOVED***,
+	{"", "a\u0300b", "\u00E0b"},
+	{"a", "\u0300b", "\u00E0b"},
+	{"a", "\u0300\u0316", "\u00E0\u0316"},
+	{"a", "\u0316\u0300", "\u00E0\u0316"},
+	{"a", "\u0300a\u0300", "\u00E0\u00E0"},
+	{"a", "\u0300a\u0300a\u0300", "\u00E0\u00E0\u00E0"},
+	{"a", "\u0300aaa\u0300aaa\u0300", "\u00E0aa\u00E0aa\u00E0"},
+	{"a\u0300", "\u0327", "\u00E0\u0327"},
+	{"a\u0327", "\u0300", "\u00E0\u0327"},
+	{"a\u0316", "\u0300", "\u00E0\u0316"},
+	{"\u0041\u0307", "\u0304", "\u01E0"},
 	// Hangul
-	***REMOVED***"", "\u110B\u1173", "\uC73C"***REMOVED***,
-	***REMOVED***"", "\u1103\u1161", "\uB2E4"***REMOVED***,
-	***REMOVED***"", "\u110B\u1173\u11B7", "\uC74C"***REMOVED***,
-	***REMOVED***"", "\u320E", "\x28\uAC00\x29"***REMOVED***,
-	***REMOVED***"", "\x28\u1100\u1161\x29", "\x28\uAC00\x29"***REMOVED***,
-	***REMOVED***"\u1103", "\u1161", "\uB2E4"***REMOVED***,
-	***REMOVED***"\u110B", "\u1173\u11B7", "\uC74C"***REMOVED***,
-	***REMOVED***"\u110B\u1173", "\u11B7", "\uC74C"***REMOVED***,
-	***REMOVED***"\uC73C", "\u11B7", "\uC74C"***REMOVED***,
+	{"", "\u110B\u1173", "\uC73C"},
+	{"", "\u1103\u1161", "\uB2E4"},
+	{"", "\u110B\u1173\u11B7", "\uC74C"},
+	{"", "\u320E", "\x28\uAC00\x29"},
+	{"", "\x28\u1100\u1161\x29", "\x28\uAC00\x29"},
+	{"\u1103", "\u1161", "\uB2E4"},
+	{"\u110B", "\u1173\u11B7", "\uC74C"},
+	{"\u110B\u1173", "\u11B7", "\uC74C"},
+	{"\uC73C", "\u11B7", "\uC74C"},
 	// UTF-8 encoding split across buffers
-	***REMOVED***"a\xCC", "\x80", "\u00E0"***REMOVED***,
-	***REMOVED***"a\xCC", "\x80b", "\u00E0b"***REMOVED***,
-	***REMOVED***"a\xCC", "\x80a\u0300", "\u00E0\u00E0"***REMOVED***,
-	***REMOVED***"a\xCC", "\x80\x80", "\u00E0\x80"***REMOVED***,
-	***REMOVED***"a\xCC", "\x80\xCC", "\u00E0\xCC"***REMOVED***,
-	***REMOVED***"a\u0316\xCC", "\x80a\u0316\u0300", "\u00E0\u0316\u00E0\u0316"***REMOVED***,
+	{"a\xCC", "\x80", "\u00E0"},
+	{"a\xCC", "\x80b", "\u00E0b"},
+	{"a\xCC", "\x80a\u0300", "\u00E0\u00E0"},
+	{"a\xCC", "\x80\x80", "\u00E0\x80"},
+	{"a\xCC", "\x80\xCC", "\u00E0\xCC"},
+	{"a\u0316\xCC", "\x80a\u0316\u0300", "\u00E0\u0316\u00E0\u0316"},
 	// ending in incomplete UTF-8 encoding
-	***REMOVED***"", "\xCC", "\xCC"***REMOVED***,
-	***REMOVED***"a", "\xCC", "a\xCC"***REMOVED***,
-	***REMOVED***"a", "b\xCC", "ab\xCC"***REMOVED***,
-	***REMOVED***"\u0226", "\xCC", "\u0226\xCC"***REMOVED***,
+	{"", "\xCC", "\xCC"},
+	{"a", "\xCC", "a\xCC"},
+	{"a", "b\xCC", "ab\xCC"},
+	{"\u0226", "\xCC", "\u0226\xCC"},
 	// illegal runes
-	***REMOVED***"", "\x80", "\x80"***REMOVED***,
-	***REMOVED***"", "\x80\x80\x80", "\x80\x80\x80"***REMOVED***,
-	***REMOVED***"", "\xCC\x80\x80\x80", "\xCC\x80\x80\x80"***REMOVED***,
-	***REMOVED***"", "a\x80", "a\x80"***REMOVED***,
-	***REMOVED***"", "a\x80\x80\x80", "a\x80\x80\x80"***REMOVED***,
-	***REMOVED***"", "a\x80\x80\x80\x80\x80\x80", "a\x80\x80\x80\x80\x80\x80"***REMOVED***,
-	***REMOVED***"a", "\x80\x80\x80", "a\x80\x80\x80"***REMOVED***,
+	{"", "\x80", "\x80"},
+	{"", "\x80\x80\x80", "\x80\x80\x80"},
+	{"", "\xCC\x80\x80\x80", "\xCC\x80\x80\x80"},
+	{"", "a\x80", "a\x80"},
+	{"", "a\x80\x80\x80", "a\x80\x80\x80"},
+	{"", "a\x80\x80\x80\x80\x80\x80", "a\x80\x80\x80\x80\x80\x80"},
+	{"a", "\x80\x80\x80", "a\x80\x80\x80"},
 	// overflow
-	***REMOVED***"", strings.Repeat("\x80", 33), strings.Repeat("\x80", 33)***REMOVED***,
-	***REMOVED***strings.Repeat("\x80", 33), "", strings.Repeat("\x80", 33)***REMOVED***,
-	***REMOVED***strings.Repeat("\x80", 33), strings.Repeat("\x80", 33), strings.Repeat("\x80", 66)***REMOVED***,
+	{"", strings.Repeat("\x80", 33), strings.Repeat("\x80", 33)},
+	{strings.Repeat("\x80", 33), "", strings.Repeat("\x80", 33)},
+	{strings.Repeat("\x80", 33), strings.Repeat("\x80", 33), strings.Repeat("\x80", 66)},
 	// overflow of combining characters
-	***REMOVED***"", grave(34), grave(30) + cgj + grave(4)***REMOVED***,
-	***REMOVED***"", grave(36), grave(30) + cgj + grave(6)***REMOVED***,
-	***REMOVED***grave(29), grave(5), grave(30) + cgj + grave(4)***REMOVED***,
-	***REMOVED***grave(30), grave(4), grave(30) + cgj + grave(4)***REMOVED***,
-	***REMOVED***grave(30), grave(3), grave(30) + cgj + grave(3)***REMOVED***,
-	***REMOVED***grave(30) + "\xCC", "\x80", grave(30) + cgj + grave(1)***REMOVED***,
-	***REMOVED***"", "\uFDFA" + grave(14), "\u0635\u0644\u0649 \u0627\u0644\u0644\u0647 \u0639\u0644\u064a\u0647 \u0648\u0633\u0644\u0645" + grave(14)***REMOVED***,
-	***REMOVED***"", "\uFDFA" + grave(28) + "\u0316", "\u0635\u0644\u0649 \u0627\u0644\u0644\u0647 \u0639\u0644\u064a\u0647 \u0648\u0633\u0644\u0645\u0316" + grave(28)***REMOVED***,
+	{"", grave(34), grave(30) + cgj + grave(4)},
+	{"", grave(36), grave(30) + cgj + grave(6)},
+	{grave(29), grave(5), grave(30) + cgj + grave(4)},
+	{grave(30), grave(4), grave(30) + cgj + grave(4)},
+	{grave(30), grave(3), grave(30) + cgj + grave(3)},
+	{grave(30) + "\xCC", "\x80", grave(30) + cgj + grave(1)},
+	{"", "\uFDFA" + grave(14), "\u0635\u0644\u0649 \u0627\u0644\u0644\u0647 \u0639\u0644\u064a\u0647 \u0648\u0633\u0644\u0645" + grave(14)},
+	{"", "\uFDFA" + grave(28) + "\u0316", "\u0635\u0644\u0649 \u0627\u0644\u0644\u0647 \u0639\u0644\u064a\u0647 \u0648\u0633\u0644\u0645\u0316" + grave(28)},
 	// - First rune has a trailing non-starter.
-	***REMOVED***"\u00d5", grave(30), "\u00d5" + grave(29) + cgj + grave(1)***REMOVED***,
+	{"\u00d5", grave(30), "\u00d5" + grave(29) + cgj + grave(1)},
 	// - U+FF9E decomposes into a non-starter in compatibility mode. A CGJ must be
 	//   inserted even when FF9E starts a new segment.
-	***REMOVED***"\uff9e", grave(30), "\u3099" + grave(29) + cgj + grave(1)***REMOVED***,
-	***REMOVED***grave(30), "\uff9e", grave(30) + cgj + "\u3099"***REMOVED***,
+	{"\uff9e", grave(30), "\u3099" + grave(29) + cgj + grave(1)},
+	{grave(30), "\uff9e", grave(30) + cgj + "\u3099"},
 	// - Many non-starter decompositions in a row causing overflow.
-	***REMOVED***"", rep(0x340, 31), rep(0x300, 30) + cgj + "\u0300"***REMOVED***,
-	***REMOVED***"", rep(0xFF9E, 31), rep(0x3099, 30) + cgj + "\u3099"***REMOVED***,
+	{"", rep(0x340, 31), rep(0x300, 30) + cgj + "\u0300"},
+	{"", rep(0xFF9E, 31), rep(0x3099, 30) + cgj + "\u3099"},
 
-	***REMOVED***"", "\u0644\u0625" + rep(0x300, 31), "\u0644\u0625" + rep(0x300, 29) + cgj + "\u0300\u0300"***REMOVED***,
-	***REMOVED***"", "\ufef9" + rep(0x300, 31), "\u0644\u0625" + rep(0x300, 29) + cgj + rep(0x0300, 2)***REMOVED***,
-	***REMOVED***"", "\ufef9" + rep(0x300, 31), "\u0644\u0625" + rep(0x300, 29) + cgj + rep(0x0300, 2)***REMOVED***,
+	{"", "\u0644\u0625" + rep(0x300, 31), "\u0644\u0625" + rep(0x300, 29) + cgj + "\u0300\u0300"},
+	{"", "\ufef9" + rep(0x300, 31), "\u0644\u0625" + rep(0x300, 29) + cgj + rep(0x0300, 2)},
+	{"", "\ufef9" + rep(0x300, 31), "\u0644\u0625" + rep(0x300, 29) + cgj + rep(0x0300, 2)},
 
 	// U+0F81 TIBETAN VOWEL SIGN REVERSED II splits into two modifiers.
-	***REMOVED***"", "\u0f7f" + rep(0xf71, 29) + "\u0f81", "\u0f7f" + rep(0xf71, 29) + cgj + "\u0f71\u0f80"***REMOVED***,
-	***REMOVED***"", "\u0f7f" + rep(0xf71, 28) + "\u0f81", "\u0f7f" + rep(0xf71, 29) + "\u0f80"***REMOVED***,
-	***REMOVED***"", "\u0f7f" + rep(0xf81, 16), "\u0f7f" + rep(0xf71, 15) + rep(0xf80, 15) + cgj + "\u0f71\u0f80"***REMOVED***,
+	{"", "\u0f7f" + rep(0xf71, 29) + "\u0f81", "\u0f7f" + rep(0xf71, 29) + cgj + "\u0f71\u0f80"},
+	{"", "\u0f7f" + rep(0xf71, 28) + "\u0f81", "\u0f7f" + rep(0xf71, 29) + "\u0f80"},
+	{"", "\u0f7f" + rep(0xf81, 16), "\u0f7f" + rep(0xf71, 15) + rep(0xf80, 15) + cgj + "\u0f71\u0f80"},
 
 	// weird UTF-8
-	***REMOVED***"\u00E0\xE1", "\x86", "\u00E0\xE1\x86"***REMOVED***,
-	***REMOVED***"a\u0300\u11B7", "\u0300", "\u00E0\u11B7\u0300"***REMOVED***,
-	***REMOVED***"a\u0300\u11B7\u0300", "\u0300", "\u00E0\u11B7\u0300\u0300"***REMOVED***,
-	***REMOVED***"\u0300", "\xF8\x80\x80\x80\x80\u0300", "\u0300\xF8\x80\x80\x80\x80\u0300"***REMOVED***,
-	***REMOVED***"\u0300", "\xFC\x80\x80\x80\x80\x80\u0300", "\u0300\xFC\x80\x80\x80\x80\x80\u0300"***REMOVED***,
-	***REMOVED***"\xF8\x80\x80\x80\x80\u0300", "\u0300", "\xF8\x80\x80\x80\x80\u0300\u0300"***REMOVED***,
-	***REMOVED***"\xFC\x80\x80\x80\x80\x80\u0300", "\u0300", "\xFC\x80\x80\x80\x80\x80\u0300\u0300"***REMOVED***,
-	***REMOVED***"\xF8\x80\x80\x80", "\x80\u0300\u0300", "\xF8\x80\x80\x80\x80\u0300\u0300"***REMOVED***,
+	{"\u00E0\xE1", "\x86", "\u00E0\xE1\x86"},
+	{"a\u0300\u11B7", "\u0300", "\u00E0\u11B7\u0300"},
+	{"a\u0300\u11B7\u0300", "\u0300", "\u00E0\u11B7\u0300\u0300"},
+	{"\u0300", "\xF8\x80\x80\x80\x80\u0300", "\u0300\xF8\x80\x80\x80\x80\u0300"},
+	{"\u0300", "\xFC\x80\x80\x80\x80\x80\u0300", "\u0300\xFC\x80\x80\x80\x80\x80\u0300"},
+	{"\xF8\x80\x80\x80\x80\u0300", "\u0300", "\xF8\x80\x80\x80\x80\u0300\u0300"},
+	{"\xFC\x80\x80\x80\x80\x80\u0300", "\u0300", "\xFC\x80\x80\x80\x80\x80\u0300\u0300"},
+	{"\xF8\x80\x80\x80", "\x80\u0300\u0300", "\xF8\x80\x80\x80\x80\u0300\u0300"},
 
-	***REMOVED***"", strings.Repeat("a\u0316\u0300", 6), strings.Repeat("\u00E0\u0316", 6)***REMOVED***,
+	{"", strings.Repeat("a\u0316\u0300", 6), strings.Repeat("\u00E0\u0316", 6)},
 	// large input.
-	***REMOVED***"", strings.Repeat("a\u0300\u0316", 31), strings.Repeat("\u00E0\u0316", 31)***REMOVED***,
-	***REMOVED***"", strings.Repeat("a\u0300\u0316", 4000), strings.Repeat("\u00E0\u0316", 4000)***REMOVED***,
-	***REMOVED***"", strings.Repeat("\x80\x80", 4000), strings.Repeat("\x80\x80", 4000)***REMOVED***,
-	***REMOVED***"", "\u0041\u0307\u0304", "\u01E0"***REMOVED***,
-***REMOVED***
+	{"", strings.Repeat("a\u0300\u0316", 31), strings.Repeat("\u00E0\u0316", 31)},
+	{"", strings.Repeat("a\u0300\u0316", 4000), strings.Repeat("\u00E0\u0316", 4000)},
+	{"", strings.Repeat("\x80\x80", 4000), strings.Repeat("\x80\x80", 4000)},
+	{"", "\u0041\u0307\u0304", "\u01E0"},
+}
 
-var appendTestsNFKD = []AppendTest***REMOVED***
-	***REMOVED***"", "a" + grave(64), "a" + grave(30) + cgj + grave(30) + cgj + grave(4)***REMOVED***,
+var appendTestsNFKD = []AppendTest{
+	{"", "a" + grave(64), "a" + grave(30) + cgj + grave(30) + cgj + grave(4)},
 
-	***REMOVED*** // segment overflow on unchanged character
+	{ // segment overflow on unchanged character
 		"",
 		"a" + grave(64) + "\u0316",
 		"a" + grave(30) + cgj + grave(30) + cgj + "\u0316" + grave(4),
-	***REMOVED***,
-	***REMOVED*** // segment overflow on unchanged character + start value
+	},
+	{ // segment overflow on unchanged character + start value
 		"",
 		"a" + grave(98) + "\u0316",
 		"a" + grave(30) + cgj + grave(30) + cgj + grave(30) + cgj + "\u0316" + grave(8),
-	***REMOVED***,
-	***REMOVED*** // segment overflow on decomposition. (U+0340 decomposes to U+0300.)
+	},
+	{ // segment overflow on decomposition. (U+0340 decomposes to U+0300.)
 		"",
 		"a" + grave(59) + "\u0340",
 		"a" + grave(30) + cgj + grave(30),
-	***REMOVED***,
-	***REMOVED*** // segment overflow on non-starter decomposition
+	},
+	{ // segment overflow on non-starter decomposition
 		"",
 		"a" + grave(33) + "\u0340" + grave(30) + "\u0320",
 		"a" + grave(30) + cgj + grave(30) + cgj + "\u0320" + grave(4),
-	***REMOVED***,
-	***REMOVED*** // start value after ASCII overflow
+	},
+	{ // start value after ASCII overflow
 		"",
 		rep('a', segSize) + grave(32) + "\u0320",
 		rep('a', segSize) + grave(30) + cgj + "\u0320" + grave(2),
-	***REMOVED***,
-	***REMOVED*** // Jamo overflow
+	},
+	{ // Jamo overflow
 		"",
 		"\u1100\u1161" + grave(30) + "\u0320" + grave(2),
 		"\u1100\u1161" + grave(29) + cgj + "\u0320" + grave(3),
-	***REMOVED***,
-	***REMOVED*** // Hangul
+	},
+	{ // Hangul
 		"",
 		"\uac00",
 		"\u1100\u1161",
-	***REMOVED***,
-	***REMOVED*** // Hangul overflow
+	},
+	{ // Hangul overflow
 		"",
 		"\uac00" + grave(32) + "\u0320",
 		"\u1100\u1161" + grave(29) + cgj + "\u0320" + grave(3),
-	***REMOVED***,
-	***REMOVED*** // Hangul overflow in Hangul mode.
+	},
+	{ // Hangul overflow in Hangul mode.
 		"",
 		"\uac00\uac00" + grave(32) + "\u0320",
 		"\u1100\u1161\u1100\u1161" + grave(29) + cgj + "\u0320" + grave(3),
-	***REMOVED***,
-	***REMOVED*** // Hangul overflow in Hangul mode.
+	},
+	{ // Hangul overflow in Hangul mode.
 		"",
 		strings.Repeat("\uac00", 3) + grave(32) + "\u0320",
 		strings.Repeat("\u1100\u1161", 3) + grave(29) + cgj + "\u0320" + grave(3),
-	***REMOVED***,
-	***REMOVED*** // start value after cc=0
+	},
+	{ // start value after cc=0
 		"",
 		"您您" + grave(34) + "\u0320",
 		"您您" + grave(30) + cgj + "\u0320" + grave(4),
-	***REMOVED***,
-	***REMOVED*** // start value after normalization
+	},
+	{ // start value after normalization
 		"",
 		"\u0300\u0320a" + grave(34) + "\u0320",
 		"\u0320\u0300a" + grave(30) + cgj + "\u0320" + grave(4),
-	***REMOVED***,
-	***REMOVED***
+	},
+	{
 		// U+0F81 TIBETAN VOWEL SIGN REVERSED II splits into two modifiers.
 		"",
 		"a\u0f7f" + rep(0xf71, 29) + "\u0f81",
 		"a\u0f7f" + rep(0xf71, 29) + cgj + "\u0f71\u0f80",
-	***REMOVED***,
-***REMOVED***
+	},
+}
 
-func TestAppend(t *testing.T) ***REMOVED***
-	runNormTests(t, "Append", func(f Form, out []byte, s string) []byte ***REMOVED***
+func TestAppend(t *testing.T) {
+	runNormTests(t, "Append", func(f Form, out []byte, s string) []byte {
 		return f.Append(out, []byte(s)...)
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func TestAppendString(t *testing.T) ***REMOVED***
-	runNormTests(t, "AppendString", func(f Form, out []byte, s string) []byte ***REMOVED***
+func TestAppendString(t *testing.T) {
+	runNormTests(t, "AppendString", func(f Form, out []byte, s string) []byte {
 		return f.AppendString(out, s)
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func TestBytes(t *testing.T) ***REMOVED***
-	runNormTests(t, "Bytes", func(f Form, out []byte, s string) []byte ***REMOVED***
-		buf := []byte***REMOVED******REMOVED***
+func TestBytes(t *testing.T) {
+	runNormTests(t, "Bytes", func(f Form, out []byte, s string) []byte {
+		buf := []byte{}
 		buf = append(buf, out...)
 		buf = append(buf, s...)
 		return f.Bytes(buf)
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func TestString(t *testing.T) ***REMOVED***
-	runNormTests(t, "String", func(f Form, out []byte, s string) []byte ***REMOVED***
+func TestString(t *testing.T) {
+	runNormTests(t, "String", func(f Form, out []byte, s string) []byte {
 		outs := string(out) + s
 		return []byte(f.String(outs))
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func TestLinking(t *testing.T) ***REMOVED***
+func TestLinking(t *testing.T) {
 	const prog = `
 	package main
 	import "fmt"
 	import "golang.org/x/text/unicode/norm"
-	func main() ***REMOVED*** fmt.Println(norm.%s) ***REMOVED***
+	func main() { fmt.Println(norm.%s) }
 	`
 	baseline, errB := testtext.CodeSize(fmt.Sprintf(prog, "MaxSegmentSize"))
 	withTables, errT := testtext.CodeSize(fmt.Sprintf(prog, `NFC.String("")`))
-	if errB != nil || errT != nil ***REMOVED***
+	if errB != nil || errT != nil {
 		t.Skipf("code size failed: %v and %v", errB, errT)
-	***REMOVED***
+	}
 	// Tables are at least 50K
-	if d := withTables - baseline; d < 50*1024 ***REMOVED***
+	if d := withTables - baseline; d < 50*1024 {
 		t.Errorf("tables appear not to be dropped: %d - %d = %d",
 			withTables, baseline, d)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func appendBench(f Form, in []byte) func() ***REMOVED***
+func appendBench(f Form, in []byte) func() {
 	buf := make([]byte, 0, 4*len(in))
-	return func() ***REMOVED***
+	return func() {
 		f.Append(buf, in...)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func bytesBench(f Form, in []byte) func() ***REMOVED***
-	return func() ***REMOVED***
+func bytesBench(f Form, in []byte) func() {
+	return func() {
 		f.Bytes(in)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func iterBench(f Form, in []byte) func() ***REMOVED***
-	iter := Iter***REMOVED******REMOVED***
-	return func() ***REMOVED***
+func iterBench(f Form, in []byte) func() {
+	iter := Iter{}
+	return func() {
 		iter.Init(f, in)
-		for !iter.Done() ***REMOVED***
+		for !iter.Done() {
 			iter.Next()
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func transformBench(f Form, in []byte) func() ***REMOVED***
+func transformBench(f Form, in []byte) func() {
 	buf := make([]byte, 4*len(in))
-	return func() ***REMOVED***
-		if _, n, err := f.Transform(buf, in, true); err != nil || len(in) != n ***REMOVED***
+	return func() {
+		if _, n, err := f.Transform(buf, in, true); err != nil || len(in) != n {
 			log.Panic(n, len(in), err)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func readerBench(f Form, in []byte) func() ***REMOVED***
+func readerBench(f Form, in []byte) func() {
 	buf := make([]byte, 4*len(in))
-	return func() ***REMOVED***
+	return func() {
 		r := f.Reader(bytes.NewReader(in))
 		var err error
-		for err == nil ***REMOVED***
+		for err == nil {
 			_, err = r.Read(buf)
-		***REMOVED***
-		if err != io.EOF ***REMOVED***
+		}
+		if err != io.EOF {
 			panic("")
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func writerBench(f Form, in []byte) func() ***REMOVED***
+func writerBench(f Form, in []byte) func() {
 	buf := make([]byte, 0, 4*len(in))
-	return func() ***REMOVED***
+	return func() {
 		r := f.Writer(bytes.NewBuffer(buf))
-		if _, err := r.Write(in); err != nil ***REMOVED***
+		if _, err := r.Write(in); err != nil {
 			panic("")
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func appendBenchmarks(bm []func(), f Form, in []byte) []func() ***REMOVED***
+func appendBenchmarks(bm []func(), f Form, in []byte) []func() {
 	bm = append(bm, appendBench(f, in))
 	bm = append(bm, iterBench(f, in))
 	bm = append(bm, transformBench(f, in))
 	bm = append(bm, readerBench(f, in))
 	bm = append(bm, writerBench(f, in))
 	return bm
-***REMOVED***
+}
 
-func doFormBenchmark(b *testing.B, inf, f Form, s string) ***REMOVED***
+func doFormBenchmark(b *testing.B, inf, f Form, s string) {
 	b.StopTimer()
 	in := inf.Bytes([]byte(s))
 	bm := appendBenchmarks(nil, f, in)
 	b.SetBytes(int64(len(in) * len(bm)))
 	b.StartTimer()
-	for i := 0; i < b.N; i++ ***REMOVED***
-		for _, fn := range bm ***REMOVED***
+	for i := 0; i < b.N; i++ {
+		for _, fn := range bm {
 			fn()
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func doSingle(b *testing.B, f func(Form, []byte) func(), s []byte) ***REMOVED***
+func doSingle(b *testing.B, f func(Form, []byte) func(), s []byte) {
 	b.StopTimer()
 	fn := f(NFC, s)
 	b.SetBytes(int64(len(s)))
 	b.StartTimer()
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		fn()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 var (
 	smallNoChange = []byte("nörmalization")
@@ -1033,151 +1033,151 @@ var (
 	ascii         = strings.Repeat("There is nothing to change here! ", 500)
 )
 
-func lowerBench(f Form, in []byte) func() ***REMOVED***
+func lowerBench(f Form, in []byte) func() {
 	// Use package strings instead of bytes as it doesn't allocate memory
 	// if there aren't any changes.
 	s := string(in)
-	return func() ***REMOVED***
+	return func() {
 		strings.ToLower(s)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func BenchmarkLowerCaseNoChange(b *testing.B) ***REMOVED***
+func BenchmarkLowerCaseNoChange(b *testing.B) {
 	doSingle(b, lowerBench, smallNoChange)
-***REMOVED***
-func BenchmarkLowerCaseChange(b *testing.B) ***REMOVED***
+}
+func BenchmarkLowerCaseChange(b *testing.B) {
 	doSingle(b, lowerBench, smallChange)
-***REMOVED***
+}
 
-func quickSpanBench(f Form, in []byte) func() ***REMOVED***
-	return func() ***REMOVED***
+func quickSpanBench(f Form, in []byte) func() {
+	return func() {
 		f.QuickSpan(in)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func BenchmarkQuickSpanChangeNFC(b *testing.B) ***REMOVED***
+func BenchmarkQuickSpanChangeNFC(b *testing.B) {
 	doSingle(b, quickSpanBench, smallNoChange)
-***REMOVED***
+}
 
-func BenchmarkBytesNoChangeNFC(b *testing.B) ***REMOVED***
+func BenchmarkBytesNoChangeNFC(b *testing.B) {
 	doSingle(b, bytesBench, smallNoChange)
-***REMOVED***
-func BenchmarkBytesChangeNFC(b *testing.B) ***REMOVED***
+}
+func BenchmarkBytesChangeNFC(b *testing.B) {
 	doSingle(b, bytesBench, smallChange)
-***REMOVED***
+}
 
-func BenchmarkAppendNoChangeNFC(b *testing.B) ***REMOVED***
+func BenchmarkAppendNoChangeNFC(b *testing.B) {
 	doSingle(b, appendBench, smallNoChange)
-***REMOVED***
-func BenchmarkAppendChangeNFC(b *testing.B) ***REMOVED***
+}
+func BenchmarkAppendChangeNFC(b *testing.B) {
 	doSingle(b, appendBench, smallChange)
-***REMOVED***
-func BenchmarkAppendLargeNFC(b *testing.B) ***REMOVED***
+}
+func BenchmarkAppendLargeNFC(b *testing.B) {
 	doSingle(b, appendBench, txt_all_bytes)
-***REMOVED***
+}
 
-func BenchmarkIterNoChangeNFC(b *testing.B) ***REMOVED***
+func BenchmarkIterNoChangeNFC(b *testing.B) {
 	doSingle(b, iterBench, smallNoChange)
-***REMOVED***
-func BenchmarkIterChangeNFC(b *testing.B) ***REMOVED***
+}
+func BenchmarkIterChangeNFC(b *testing.B) {
 	doSingle(b, iterBench, smallChange)
-***REMOVED***
-func BenchmarkIterLargeNFC(b *testing.B) ***REMOVED***
+}
+func BenchmarkIterLargeNFC(b *testing.B) {
 	doSingle(b, iterBench, txt_all_bytes)
-***REMOVED***
+}
 
-func BenchmarkTransformNoChangeNFC(b *testing.B) ***REMOVED***
+func BenchmarkTransformNoChangeNFC(b *testing.B) {
 	doSingle(b, transformBench, smallNoChange)
-***REMOVED***
-func BenchmarkTransformChangeNFC(b *testing.B) ***REMOVED***
+}
+func BenchmarkTransformChangeNFC(b *testing.B) {
 	doSingle(b, transformBench, smallChange)
-***REMOVED***
-func BenchmarkTransformLargeNFC(b *testing.B) ***REMOVED***
+}
+func BenchmarkTransformLargeNFC(b *testing.B) {
 	doSingle(b, transformBench, txt_all_bytes)
-***REMOVED***
+}
 
-func BenchmarkNormalizeAsciiNFC(b *testing.B) ***REMOVED***
+func BenchmarkNormalizeAsciiNFC(b *testing.B) {
 	doFormBenchmark(b, NFC, NFC, ascii)
-***REMOVED***
-func BenchmarkNormalizeAsciiNFD(b *testing.B) ***REMOVED***
+}
+func BenchmarkNormalizeAsciiNFD(b *testing.B) {
 	doFormBenchmark(b, NFC, NFD, ascii)
-***REMOVED***
-func BenchmarkNormalizeAsciiNFKC(b *testing.B) ***REMOVED***
+}
+func BenchmarkNormalizeAsciiNFKC(b *testing.B) {
 	doFormBenchmark(b, NFC, NFKC, ascii)
-***REMOVED***
-func BenchmarkNormalizeAsciiNFKD(b *testing.B) ***REMOVED***
+}
+func BenchmarkNormalizeAsciiNFKD(b *testing.B) {
 	doFormBenchmark(b, NFC, NFKD, ascii)
-***REMOVED***
+}
 
-func BenchmarkNormalizeNFC2NFC(b *testing.B) ***REMOVED***
+func BenchmarkNormalizeNFC2NFC(b *testing.B) {
 	doFormBenchmark(b, NFC, NFC, txt_all)
-***REMOVED***
-func BenchmarkNormalizeNFC2NFD(b *testing.B) ***REMOVED***
+}
+func BenchmarkNormalizeNFC2NFD(b *testing.B) {
 	doFormBenchmark(b, NFC, NFD, txt_all)
-***REMOVED***
-func BenchmarkNormalizeNFD2NFC(b *testing.B) ***REMOVED***
+}
+func BenchmarkNormalizeNFD2NFC(b *testing.B) {
 	doFormBenchmark(b, NFD, NFC, txt_all)
-***REMOVED***
-func BenchmarkNormalizeNFD2NFD(b *testing.B) ***REMOVED***
+}
+func BenchmarkNormalizeNFD2NFD(b *testing.B) {
 	doFormBenchmark(b, NFD, NFD, txt_all)
-***REMOVED***
+}
 
 // Hangul is often special-cased, so we test it separately.
-func BenchmarkNormalizeHangulNFC2NFC(b *testing.B) ***REMOVED***
+func BenchmarkNormalizeHangulNFC2NFC(b *testing.B) {
 	doFormBenchmark(b, NFC, NFC, txt_kr)
-***REMOVED***
-func BenchmarkNormalizeHangulNFC2NFD(b *testing.B) ***REMOVED***
+}
+func BenchmarkNormalizeHangulNFC2NFD(b *testing.B) {
 	doFormBenchmark(b, NFC, NFD, txt_kr)
-***REMOVED***
-func BenchmarkNormalizeHangulNFD2NFC(b *testing.B) ***REMOVED***
+}
+func BenchmarkNormalizeHangulNFD2NFC(b *testing.B) {
 	doFormBenchmark(b, NFD, NFC, txt_kr)
-***REMOVED***
-func BenchmarkNormalizeHangulNFD2NFD(b *testing.B) ***REMOVED***
+}
+func BenchmarkNormalizeHangulNFD2NFD(b *testing.B) {
 	doFormBenchmark(b, NFD, NFD, txt_kr)
-***REMOVED***
+}
 
-var forms = []Form***REMOVED***NFC, NFD, NFKC, NFKD***REMOVED***
+var forms = []Form{NFC, NFD, NFKC, NFKD}
 
-func doTextBenchmark(b *testing.B, s string) ***REMOVED***
+func doTextBenchmark(b *testing.B, s string) {
 	b.StopTimer()
 	in := []byte(s)
-	bm := []func()***REMOVED******REMOVED***
-	for _, f := range forms ***REMOVED***
+	bm := []func(){}
+	for _, f := range forms {
 		bm = appendBenchmarks(bm, f, in)
-	***REMOVED***
+	}
 	b.SetBytes(int64(len(s) * len(bm)))
 	b.StartTimer()
-	for i := 0; i < b.N; i++ ***REMOVED***
-		for _, f := range bm ***REMOVED***
+	for i := 0; i < b.N; i++ {
+		for _, f := range bm {
 			f()
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func BenchmarkCanonicalOrdering(b *testing.B) ***REMOVED***
+func BenchmarkCanonicalOrdering(b *testing.B) {
 	doTextBenchmark(b, txt_canon)
-***REMOVED***
-func BenchmarkExtendedLatin(b *testing.B) ***REMOVED***
+}
+func BenchmarkExtendedLatin(b *testing.B) {
 	doTextBenchmark(b, txt_vn)
-***REMOVED***
-func BenchmarkMiscTwoByteUtf8(b *testing.B) ***REMOVED***
+}
+func BenchmarkMiscTwoByteUtf8(b *testing.B) {
 	doTextBenchmark(b, twoByteUtf8)
-***REMOVED***
-func BenchmarkMiscThreeByteUtf8(b *testing.B) ***REMOVED***
+}
+func BenchmarkMiscThreeByteUtf8(b *testing.B) {
 	doTextBenchmark(b, threeByteUtf8)
-***REMOVED***
-func BenchmarkHangul(b *testing.B) ***REMOVED***
+}
+func BenchmarkHangul(b *testing.B) {
 	doTextBenchmark(b, txt_kr)
-***REMOVED***
-func BenchmarkJapanese(b *testing.B) ***REMOVED***
+}
+func BenchmarkJapanese(b *testing.B) {
 	doTextBenchmark(b, txt_jp)
-***REMOVED***
-func BenchmarkChinese(b *testing.B) ***REMOVED***
+}
+func BenchmarkChinese(b *testing.B) {
 	doTextBenchmark(b, txt_cn)
-***REMOVED***
-func BenchmarkOverflow(b *testing.B) ***REMOVED***
+}
+func BenchmarkOverflow(b *testing.B) {
 	doTextBenchmark(b, overflow)
-***REMOVED***
+}
 
 var overflow = string(bytes.Repeat([]byte("\u035D"), 4096)) + "\u035B"
 

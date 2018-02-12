@@ -10,84 +10,84 @@ import (
 	"github.com/docker/docker/pkg/archive"
 )
 
-func init() ***REMOVED***
+func init() {
 	// Do not sure chroot to speed run time and allow archive
 	// errors or hangs to be debugged directly from the test process.
 	graphdriver.ApplyUncompressedLayer = archive.ApplyUncompressedLayer
-***REMOVED***
+}
 
 // This avoids creating a new driver for each test if all tests are run
 // Make sure to put new tests between TestOverlaySetup and TestOverlayTeardown
-func TestOverlaySetup(t *testing.T) ***REMOVED***
+func TestOverlaySetup(t *testing.T) {
 	graphtest.GetDriver(t, "overlay")
-***REMOVED***
+}
 
-func TestOverlayCreateEmpty(t *testing.T) ***REMOVED***
+func TestOverlayCreateEmpty(t *testing.T) {
 	graphtest.DriverTestCreateEmpty(t, "overlay")
-***REMOVED***
+}
 
-func TestOverlayCreateBase(t *testing.T) ***REMOVED***
+func TestOverlayCreateBase(t *testing.T) {
 	graphtest.DriverTestCreateBase(t, "overlay")
-***REMOVED***
+}
 
-func TestOverlayCreateSnap(t *testing.T) ***REMOVED***
+func TestOverlayCreateSnap(t *testing.T) {
 	graphtest.DriverTestCreateSnap(t, "overlay")
-***REMOVED***
+}
 
-func TestOverlay50LayerRead(t *testing.T) ***REMOVED***
+func TestOverlay50LayerRead(t *testing.T) {
 	graphtest.DriverTestDeepLayerRead(t, 50, "overlay")
-***REMOVED***
+}
 
 // Fails due to bug in calculating changes after apply
 // likely related to https://github.com/docker/docker/issues/21555
-func TestOverlayDiffApply10Files(t *testing.T) ***REMOVED***
+func TestOverlayDiffApply10Files(t *testing.T) {
 	t.Skipf("Fails to compute changes after apply intermittently")
 	graphtest.DriverTestDiffApply(t, 10, "overlay")
-***REMOVED***
+}
 
-func TestOverlayChanges(t *testing.T) ***REMOVED***
+func TestOverlayChanges(t *testing.T) {
 	t.Skipf("Fails to compute changes intermittently")
 	graphtest.DriverTestChanges(t, "overlay")
-***REMOVED***
+}
 
-func TestOverlayTeardown(t *testing.T) ***REMOVED***
+func TestOverlayTeardown(t *testing.T) {
 	graphtest.PutDriver(t)
-***REMOVED***
+}
 
 // Benchmarks should always setup new driver
 
-func BenchmarkExists(b *testing.B) ***REMOVED***
+func BenchmarkExists(b *testing.B) {
 	graphtest.DriverBenchExists(b, "overlay")
-***REMOVED***
+}
 
-func BenchmarkGetEmpty(b *testing.B) ***REMOVED***
+func BenchmarkGetEmpty(b *testing.B) {
 	graphtest.DriverBenchGetEmpty(b, "overlay")
-***REMOVED***
+}
 
-func BenchmarkDiffBase(b *testing.B) ***REMOVED***
+func BenchmarkDiffBase(b *testing.B) {
 	graphtest.DriverBenchDiffBase(b, "overlay")
-***REMOVED***
+}
 
-func BenchmarkDiffSmallUpper(b *testing.B) ***REMOVED***
+func BenchmarkDiffSmallUpper(b *testing.B) {
 	graphtest.DriverBenchDiffN(b, 10, 10, "overlay")
-***REMOVED***
+}
 
-func BenchmarkDiff10KFileUpper(b *testing.B) ***REMOVED***
+func BenchmarkDiff10KFileUpper(b *testing.B) {
 	graphtest.DriverBenchDiffN(b, 10, 10000, "overlay")
-***REMOVED***
+}
 
-func BenchmarkDiff10KFilesBottom(b *testing.B) ***REMOVED***
+func BenchmarkDiff10KFilesBottom(b *testing.B) {
 	graphtest.DriverBenchDiffN(b, 10000, 10, "overlay")
-***REMOVED***
+}
 
-func BenchmarkDiffApply100(b *testing.B) ***REMOVED***
+func BenchmarkDiffApply100(b *testing.B) {
 	graphtest.DriverBenchDiffApplyN(b, 100, "overlay")
-***REMOVED***
+}
 
-func BenchmarkDiff20Layers(b *testing.B) ***REMOVED***
+func BenchmarkDiff20Layers(b *testing.B) {
 	graphtest.DriverBenchDeepLayerDiff(b, 20, "overlay")
-***REMOVED***
+}
 
-func BenchmarkRead20Layers(b *testing.B) ***REMOVED***
+func BenchmarkRead20Layers(b *testing.B) {
 	graphtest.DriverBenchDeepLayerRead(b, 20, "overlay")
-***REMOVED***
+}

@@ -58,21 +58,21 @@ const (
 // the problem.
 //
 // Every valid Timestamp can be represented by a time.Time, but the converse is not true.
-func validateTimestamp(ts *timestamp) error ***REMOVED***
-	if ts == nil ***REMOVED***
+func validateTimestamp(ts *timestamp) error {
+	if ts == nil {
 		return errors.New("timestamp: nil Timestamp")
-	***REMOVED***
-	if ts.Seconds < minValidSeconds ***REMOVED***
+	}
+	if ts.Seconds < minValidSeconds {
 		return fmt.Errorf("timestamp: %#v before 0001-01-01", ts)
-	***REMOVED***
-	if ts.Seconds >= maxValidSeconds ***REMOVED***
+	}
+	if ts.Seconds >= maxValidSeconds {
 		return fmt.Errorf("timestamp: %#v after 10000-01-01", ts)
-	***REMOVED***
-	if ts.Nanos < 0 || ts.Nanos >= 1e9 ***REMOVED***
+	}
+	if ts.Nanos < 0 || ts.Nanos >= 1e9 {
 		return fmt.Errorf("timestamp: %#v: nanos not in range [0, 1e9)", ts)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // TimestampFromProto converts a google.protobuf.Timestamp proto to a time.Time.
 // It returns an error if the argument is invalid.
@@ -85,29 +85,29 @@ func validateTimestamp(ts *timestamp) error ***REMOVED***
 //
 // A nil Timestamp returns an error. The first return value in that case is
 // undefined.
-func timestampFromProto(ts *timestamp) (time.Time, error) ***REMOVED***
+func timestampFromProto(ts *timestamp) (time.Time, error) {
 	// Don't return the zero value on error, because corresponds to a valid
 	// timestamp. Instead return whatever time.Unix gives us.
 	var t time.Time
-	if ts == nil ***REMOVED***
+	if ts == nil {
 		t = time.Unix(0, 0).UTC() // treat nil like the empty Timestamp
-	***REMOVED*** else ***REMOVED***
+	} else {
 		t = time.Unix(ts.Seconds, int64(ts.Nanos)).UTC()
-	***REMOVED***
+	}
 	return t, validateTimestamp(ts)
-***REMOVED***
+}
 
 // TimestampProto converts the time.Time to a google.protobuf.Timestamp proto.
 // It returns an error if the resulting Timestamp is invalid.
-func timestampProto(t time.Time) (*timestamp, error) ***REMOVED***
+func timestampProto(t time.Time) (*timestamp, error) {
 	seconds := t.Unix()
 	nanos := int32(t.Sub(time.Unix(seconds, 0)))
-	ts := &timestamp***REMOVED***
+	ts := &timestamp{
 		Seconds: seconds,
 		Nanos:   nanos,
-	***REMOVED***
-	if err := validateTimestamp(ts); err != nil ***REMOVED***
+	}
+	if err := validateTimestamp(ts); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return ts, nil
-***REMOVED***
+}

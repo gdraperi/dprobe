@@ -10,14 +10,14 @@
 
 package devices
 
-func getmajor(dev uint64) uint64 ***REMOVED***
+func getmajor(dev uint64) uint64 {
 	panic("getmajor() support requires cgo.")
-***REMOVED***
+}
 
-func getminor(dev uint64) uint64 ***REMOVED***
+func getminor(dev uint64) uint64 {
 	panic("getminor() support requires cgo.")
-***REMOVED***
+}
 
-func makedev(major int, minor int) int ***REMOVED***
+func makedev(major int, minor int) int {
 	panic("makedev() support requires cgo.")
-***REMOVED***
+}

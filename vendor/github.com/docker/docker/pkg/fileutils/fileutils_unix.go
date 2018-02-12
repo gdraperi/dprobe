@@ -12,11 +12,11 @@ import (
 
 // GetTotalUsedFds Returns the number of used File Descriptors by
 // reading it via /proc filesystem.
-func GetTotalUsedFds() int ***REMOVED***
-	if fds, err := ioutil.ReadDir(fmt.Sprintf("/proc/%d/fd", os.Getpid())); err != nil ***REMOVED***
+func GetTotalUsedFds() int {
+	if fds, err := ioutil.ReadDir(fmt.Sprintf("/proc/%d/fd", os.Getpid())); err != nil {
 		logrus.Errorf("Error opening /proc/%d/fd: %s", os.Getpid(), err)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		return len(fds)
-	***REMOVED***
+	}
 	return -1
-***REMOVED***
+}

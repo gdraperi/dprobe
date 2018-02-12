@@ -9,55 +9,55 @@ import (
 	"github.com/docker/docker/pkg/ioutils"
 )
 
-func loadPersistentState(root string) (*nodeStartConfig, error) ***REMOVED***
+func loadPersistentState(root string) (*nodeStartConfig, error) {
 	dt, err := ioutil.ReadFile(filepath.Join(root, stateFile))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	// missing certificate means no actual state to restore from
-	if _, err := os.Stat(filepath.Join(root, "certificates/swarm-node.crt")); err != nil ***REMOVED***
-		if os.IsNotExist(err) ***REMOVED***
+	if _, err := os.Stat(filepath.Join(root, "certificates/swarm-node.crt")); err != nil {
+		if os.IsNotExist(err) {
 			clearPersistentState(root)
-		***REMOVED***
+		}
 		return nil, err
-	***REMOVED***
+	}
 	var st nodeStartConfig
-	if err := json.Unmarshal(dt, &st); err != nil ***REMOVED***
+	if err := json.Unmarshal(dt, &st); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return &st, nil
-***REMOVED***
+}
 
-func savePersistentState(root string, config nodeStartConfig) error ***REMOVED***
+func savePersistentState(root string, config nodeStartConfig) error {
 	dt, err := json.Marshal(config)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return ioutils.AtomicWriteFile(filepath.Join(root, stateFile), dt, 0600)
-***REMOVED***
+}
 
-func clearPersistentState(root string) error ***REMOVED***
+func clearPersistentState(root string) error {
 	// todo: backup this data instead of removing?
 	// rather than delete the entire swarm directory, delete the contents in order to preserve the inode
 	// (for example, allowing it to be bind-mounted)
 	files, err := ioutil.ReadDir(root)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	for _, f := range files ***REMOVED***
-		if err := os.RemoveAll(filepath.Join(root, f.Name())); err != nil ***REMOVED***
+	for _, f := range files {
+		if err := os.RemoveAll(filepath.Join(root, f.Name())); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
-func removingManagerCausesLossOfQuorum(reachable, unreachable int) bool ***REMOVED***
+func removingManagerCausesLossOfQuorum(reachable, unreachable int) bool {
 	return reachable-2 <= unreachable
-***REMOVED***
+}
 
-func isLastManager(reachable, unreachable int) bool ***REMOVED***
+func isLastManager(reachable, unreachable int) bool {
 	return reachable == 1 && unreachable == 0
-***REMOVED***
+}

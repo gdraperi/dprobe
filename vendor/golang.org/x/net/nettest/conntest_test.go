@@ -15,50 +15,50 @@ import (
 	"golang.org/x/net/internal/nettest"
 )
 
-func TestTestConn(t *testing.T) ***REMOVED***
-	tests := []struct***REMOVED*** name, network string ***REMOVED******REMOVED***
-		***REMOVED***"TCP", "tcp"***REMOVED***,
-		***REMOVED***"UnixPipe", "unix"***REMOVED***,
-		***REMOVED***"UnixPacketPipe", "unixpacket"***REMOVED***,
-	***REMOVED***
+func TestTestConn(t *testing.T) {
+	tests := []struct{ name, network string }{
+		{"TCP", "tcp"},
+		{"UnixPipe", "unix"},
+		{"UnixPacketPipe", "unixpacket"},
+	}
 
-	for _, tt := range tests ***REMOVED***
-		t.Run(tt.name, func(t *testing.T) ***REMOVED***
-			if !nettest.TestableNetwork(tt.network) ***REMOVED***
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if !nettest.TestableNetwork(tt.network) {
 				t.Skipf("not supported on %s", runtime.GOOS)
-			***REMOVED***
+			}
 
-			mp := func() (c1, c2 net.Conn, stop func(), err error) ***REMOVED***
+			mp := func() (c1, c2 net.Conn, stop func(), err error) {
 				ln, err := nettest.NewLocalListener(tt.network)
-				if err != nil ***REMOVED***
+				if err != nil {
 					return nil, nil, nil, err
-				***REMOVED***
+				}
 
 				// Start a connection between two endpoints.
 				var err1, err2 error
 				done := make(chan bool)
-				go func() ***REMOVED***
+				go func() {
 					c2, err2 = ln.Accept()
 					close(done)
-				***REMOVED***()
+				}()
 				c1, err1 = net.Dial(ln.Addr().Network(), ln.Addr().String())
 				<-done
 
-				stop = func() ***REMOVED***
-					if err1 == nil ***REMOVED***
+				stop = func() {
+					if err1 == nil {
 						c1.Close()
-					***REMOVED***
-					if err2 == nil ***REMOVED***
+					}
+					if err2 == nil {
 						c2.Close()
-					***REMOVED***
+					}
 					ln.Close()
-					switch tt.network ***REMOVED***
+					switch tt.network {
 					case "unix", "unixpacket":
 						os.Remove(ln.Addr().String())
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 
-				switch ***REMOVED***
+				switch {
 				case err1 != nil:
 					stop()
 					return nil, nil, nil, err1
@@ -67,10 +67,10 @@ func TestTestConn(t *testing.T) ***REMOVED***
 					return nil, nil, nil, err2
 				default:
 					return c1, c2, stop, nil
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 
 			TestConn(t, mp)
-		***REMOVED***)
-	***REMOVED***
-***REMOVED***
+		})
+	}
+}

@@ -19,44 +19,44 @@ const maxVarintBytes = 10 // maximum length of a varint
 
 // encodeUint encodes x as a variable-sized integer into buf and returns the
 // number of bytes written. buf must be at least maxVarintBytes long
-func encodeUint(buf []byte, x uint64) (n int) ***REMOVED***
-	for ; x > 127; n++ ***REMOVED***
+func encodeUint(buf []byte, x uint64) (n int) {
+	for ; x > 127; n++ {
 		buf[n] = 0x80 | uint8(x&0x7F)
 		x >>= 7
-	***REMOVED***
+	}
 	buf[n] = uint8(x)
 	n++
 	return n
-***REMOVED***
+}
 
-func decodeUintString(s string) (x uint64, size int, err error) ***REMOVED***
+func decodeUintString(s string) (x uint64, size int, err error) {
 	i := 0
-	for shift := uint(0); shift < 64; shift += 7 ***REMOVED***
-		if i >= len(s) ***REMOVED***
+	for shift := uint(0); shift < 64; shift += 7 {
+		if i >= len(s) {
 			return 0, i, errIllegalVarint
-		***REMOVED***
+		}
 		b := uint64(s[i])
 		i++
 		x |= (b & 0x7F) << shift
-		if b&0x80 == 0 ***REMOVED***
+		if b&0x80 == 0 {
 			return x, i, nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return 0, i, errVarintTooLarge
-***REMOVED***
+}
 
-func decodeUint(b []byte) (x uint64, size int, err error) ***REMOVED***
+func decodeUint(b []byte) (x uint64, size int, err error) {
 	i := 0
-	for shift := uint(0); shift < 64; shift += 7 ***REMOVED***
-		if i >= len(b) ***REMOVED***
+	for shift := uint(0); shift < 64; shift += 7 {
+		if i >= len(b) {
 			return 0, i, errIllegalVarint
-		***REMOVED***
+		}
 		c := uint64(b[i])
 		i++
 		x |= (c & 0x7F) << shift
-		if c&0x80 == 0 ***REMOVED***
+		if c&0x80 == 0 {
 			return x, i, nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return 0, i, errVarintTooLarge
-***REMOVED***
+}

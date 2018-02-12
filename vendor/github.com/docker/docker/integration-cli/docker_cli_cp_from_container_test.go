@@ -23,8 +23,8 @@ import (
 // First get these easy error cases out of the way.
 
 // Test for error when SRC does not exist.
-func (s *DockerSuite) TestCpFromErrSrcNotExists(c *check.C) ***REMOVED***
-	containerID := makeTestContainer(c, testContainerOptions***REMOVED******REMOVED***)
+func (s *DockerSuite) TestCpFromErrSrcNotExists(c *check.C) {
+	containerID := makeTestContainer(c, testContainerOptions{})
 
 	tmpDir := getTestDir(c, "test-cp-from-err-src-not-exists")
 	defer os.RemoveAll(tmpDir)
@@ -33,13 +33,13 @@ func (s *DockerSuite) TestCpFromErrSrcNotExists(c *check.C) ***REMOVED***
 	c.Assert(err, checker.NotNil)
 
 	c.Assert(isCpNotExist(err), checker.True, check.Commentf("expected IsNotExist error, but got %T: %s", err, err))
-***REMOVED***
+}
 
 // Test for error when SRC ends in a trailing
 // path separator but it exists as a file.
-func (s *DockerSuite) TestCpFromErrSrcNotDir(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestCpFromErrSrcNotDir(c *check.C) {
 	testRequires(c, DaemonIsLinux)
-	containerID := makeTestContainer(c, testContainerOptions***REMOVED***addContent: true***REMOVED***)
+	containerID := makeTestContainer(c, testContainerOptions{addContent: true})
 
 	tmpDir := getTestDir(c, "test-cp-from-err-src-not-dir")
 	defer os.RemoveAll(tmpDir)
@@ -48,13 +48,13 @@ func (s *DockerSuite) TestCpFromErrSrcNotDir(c *check.C) ***REMOVED***
 	c.Assert(err, checker.NotNil)
 
 	c.Assert(isCpNotDir(err), checker.True, check.Commentf("expected IsNotDir error, but got %T: %s", err, err))
-***REMOVED***
+}
 
 // Test for error when DST ends in a trailing
 // path separator but exists as a file.
-func (s *DockerSuite) TestCpFromErrDstNotDir(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestCpFromErrDstNotDir(c *check.C) {
 	testRequires(c, DaemonIsLinux)
-	containerID := makeTestContainer(c, testContainerOptions***REMOVED***addContent: true***REMOVED***)
+	containerID := makeTestContainer(c, testContainerOptions{addContent: true})
 
 	tmpDir := getTestDir(c, "test-cp-from-err-dst-not-dir")
 	defer os.RemoveAll(tmpDir)
@@ -77,13 +77,13 @@ func (s *DockerSuite) TestCpFromErrDstNotDir(c *check.C) ***REMOVED***
 	c.Assert(err, checker.NotNil)
 
 	c.Assert(isCpNotDir(err), checker.True, check.Commentf("expected IsNotDir error, but got %T: %s", err, err))
-***REMOVED***
+}
 
 // Check that copying from a container to a local symlink copies to the symlink
 // target and does not overwrite the local symlink itself.
-func (s *DockerSuite) TestCpFromSymlinkDestination(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestCpFromSymlinkDestination(c *check.C) {
 	testRequires(c, DaemonIsLinux)
-	containerID := makeTestContainer(c, testContainerOptions***REMOVED***addContent: true***REMOVED***)
+	containerID := makeTestContainer(c, testContainerOptions{addContent: true})
 
 	tmpDir := getTestDir(c, "test-cp-from-err-dst-not-dir")
 	defer os.RemoveAll(tmpDir)
@@ -155,7 +155,7 @@ func (s *DockerSuite) TestCpFromSymlinkDestination(c *check.C) ***REMOVED***
 
 	// The "dirX" directory should now be a copy of "dir2".
 	c.Assert(fileContentEquals(c, cpPath(tmpDir, "dirX/file2-1"), "file2-1\n"), checker.IsNil)
-***REMOVED***
+}
 
 // Possibilities are reduced to the remaining 10 cases:
 //
@@ -176,11 +176,11 @@ func (s *DockerSuite) TestCpFromSymlinkDestination(c *check.C) ***REMOVED***
 // A. SRC specifies a file and DST (no trailing path separator) doesn't
 //    exist. This should create a file with the name DST and copy the
 //    contents of the source file into it.
-func (s *DockerSuite) TestCpFromCaseA(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestCpFromCaseA(c *check.C) {
 	testRequires(c, DaemonIsLinux)
-	containerID := makeTestContainer(c, testContainerOptions***REMOVED***
+	containerID := makeTestContainer(c, testContainerOptions{
 		addContent: true, workDir: "/root",
-	***REMOVED***)
+	})
 
 	tmpDir := getTestDir(c, "test-cp-from-case-a")
 	defer os.RemoveAll(tmpDir)
@@ -191,14 +191,14 @@ func (s *DockerSuite) TestCpFromCaseA(c *check.C) ***REMOVED***
 	c.Assert(runDockerCp(c, srcPath, dstPath, nil), checker.IsNil)
 
 	c.Assert(fileContentEquals(c, dstPath, "file1\n"), checker.IsNil)
-***REMOVED***
+}
 
 // B. SRC specifies a file and DST (with trailing path separator) doesn't
 //    exist. This should cause an error because the copy operation cannot
 //    create a directory when copying a single file.
-func (s *DockerSuite) TestCpFromCaseB(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestCpFromCaseB(c *check.C) {
 	testRequires(c, DaemonIsLinux)
-	containerID := makeTestContainer(c, testContainerOptions***REMOVED***addContent: true***REMOVED***)
+	containerID := makeTestContainer(c, testContainerOptions{addContent: true})
 
 	tmpDir := getTestDir(c, "test-cp-from-case-b")
 	defer os.RemoveAll(tmpDir)
@@ -210,15 +210,15 @@ func (s *DockerSuite) TestCpFromCaseB(c *check.C) ***REMOVED***
 	c.Assert(err, checker.NotNil)
 
 	c.Assert(isCpDirNotExist(err), checker.True, check.Commentf("expected DirNotExists error, but got %T: %s", err, err))
-***REMOVED***
+}
 
 // C. SRC specifies a file and DST exists as a file. This should overwrite
 //    the file at DST with the contents of the source file.
-func (s *DockerSuite) TestCpFromCaseC(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestCpFromCaseC(c *check.C) {
 	testRequires(c, DaemonIsLinux)
-	containerID := makeTestContainer(c, testContainerOptions***REMOVED***
+	containerID := makeTestContainer(c, testContainerOptions{
 		addContent: true, workDir: "/root",
-	***REMOVED***)
+	})
 
 	tmpDir := getTestDir(c, "test-cp-from-case-c")
 	defer os.RemoveAll(tmpDir)
@@ -234,14 +234,14 @@ func (s *DockerSuite) TestCpFromCaseC(c *check.C) ***REMOVED***
 	c.Assert(runDockerCp(c, srcPath, dstPath, nil), checker.IsNil)
 
 	c.Assert(fileContentEquals(c, dstPath, "file1\n"), checker.IsNil)
-***REMOVED***
+}
 
 // D. SRC specifies a file and DST exists as a directory. This should place
 //    a copy of the source file inside it using the basename from SRC. Ensure
 //    this works whether DST has a trailing path separator or not.
-func (s *DockerSuite) TestCpFromCaseD(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestCpFromCaseD(c *check.C) {
 	testRequires(c, DaemonIsLinux)
-	containerID := makeTestContainer(c, testContainerOptions***REMOVED***addContent: true***REMOVED***)
+	containerID := makeTestContainer(c, testContainerOptions{addContent: true})
 
 	tmpDir := getTestDir(c, "test-cp-from-case-d")
 	defer os.RemoveAll(tmpDir)
@@ -273,15 +273,15 @@ func (s *DockerSuite) TestCpFromCaseD(c *check.C) ***REMOVED***
 	c.Assert(runDockerCp(c, srcPath, dstDir, nil), checker.IsNil)
 
 	c.Assert(fileContentEquals(c, dstPath, "file1\n"), checker.IsNil)
-***REMOVED***
+}
 
 // E. SRC specifies a directory and DST does not exist. This should create a
 //    directory at DST and copy the contents of the SRC directory into the DST
 //    directory. Ensure this works whether DST has a trailing path separator or
 //    not.
-func (s *DockerSuite) TestCpFromCaseE(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestCpFromCaseE(c *check.C) {
 	testRequires(c, DaemonIsLinux)
-	containerID := makeTestContainer(c, testContainerOptions***REMOVED***addContent: true***REMOVED***)
+	containerID := makeTestContainer(c, testContainerOptions{addContent: true})
 
 	tmpDir := getTestDir(c, "test-cp-from-case-e")
 	defer os.RemoveAll(tmpDir)
@@ -304,15 +304,15 @@ func (s *DockerSuite) TestCpFromCaseE(c *check.C) ***REMOVED***
 	c.Assert(runDockerCp(c, srcDir, dstDir, nil), checker.IsNil)
 
 	c.Assert(fileContentEquals(c, dstPath, "file1-1\n"), checker.IsNil)
-***REMOVED***
+}
 
 // F. SRC specifies a directory and DST exists as a file. This should cause an
 //    error as it is not possible to overwrite a file with a directory.
-func (s *DockerSuite) TestCpFromCaseF(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestCpFromCaseF(c *check.C) {
 	testRequires(c, DaemonIsLinux)
-	containerID := makeTestContainer(c, testContainerOptions***REMOVED***
+	containerID := makeTestContainer(c, testContainerOptions{
 		addContent: true, workDir: "/root",
-	***REMOVED***)
+	})
 
 	tmpDir := getTestDir(c, "test-cp-from-case-f")
 	defer os.RemoveAll(tmpDir)
@@ -326,16 +326,16 @@ func (s *DockerSuite) TestCpFromCaseF(c *check.C) ***REMOVED***
 	c.Assert(err, checker.NotNil)
 
 	c.Assert(isCpCannotCopyDir(err), checker.True, check.Commentf("expected ErrCannotCopyDir error, but got %T: %s", err, err))
-***REMOVED***
+}
 
 // G. SRC specifies a directory and DST exists as a directory. This should copy
 //    the SRC directory and all its contents to the DST directory. Ensure this
 //    works whether DST has a trailing path separator or not.
-func (s *DockerSuite) TestCpFromCaseG(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestCpFromCaseG(c *check.C) {
 	testRequires(c, DaemonIsLinux)
-	containerID := makeTestContainer(c, testContainerOptions***REMOVED***
+	containerID := makeTestContainer(c, testContainerOptions{
 		addContent: true, workDir: "/root",
-	***REMOVED***)
+	})
 
 	tmpDir := getTestDir(c, "test-cp-from-case-g")
 	defer os.RemoveAll(tmpDir)
@@ -364,15 +364,15 @@ func (s *DockerSuite) TestCpFromCaseG(c *check.C) ***REMOVED***
 	c.Assert(runDockerCp(c, srcDir, dstDir, nil), checker.IsNil)
 
 	c.Assert(fileContentEquals(c, dstPath, "file1-1\n"), checker.IsNil)
-***REMOVED***
+}
 
 // H. SRC specifies a directory's contents only and DST does not exist. This
 //    should create a directory at DST and copy the contents of the SRC
 //    directory (but not the directory itself) into the DST directory. Ensure
 //    this works whether DST has a trailing path separator or not.
-func (s *DockerSuite) TestCpFromCaseH(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestCpFromCaseH(c *check.C) {
 	testRequires(c, DaemonIsLinux)
-	containerID := makeTestContainer(c, testContainerOptions***REMOVED***addContent: true***REMOVED***)
+	containerID := makeTestContainer(c, testContainerOptions{addContent: true})
 
 	tmpDir := getTestDir(c, "test-cp-from-case-h")
 	defer os.RemoveAll(tmpDir)
@@ -395,16 +395,16 @@ func (s *DockerSuite) TestCpFromCaseH(c *check.C) ***REMOVED***
 	c.Assert(runDockerCp(c, srcDir, dstDir, nil), checker.IsNil)
 
 	c.Assert(fileContentEquals(c, dstPath, "file1-1\n"), checker.IsNil)
-***REMOVED***
+}
 
 // I. SRC specifies a directory's contents only and DST exists as a file. This
 //    should cause an error as it is not possible to overwrite a file with a
 //    directory.
-func (s *DockerSuite) TestCpFromCaseI(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestCpFromCaseI(c *check.C) {
 	testRequires(c, DaemonIsLinux)
-	containerID := makeTestContainer(c, testContainerOptions***REMOVED***
+	containerID := makeTestContainer(c, testContainerOptions{
 		addContent: true, workDir: "/root",
-	***REMOVED***)
+	})
 
 	tmpDir := getTestDir(c, "test-cp-from-case-i")
 	defer os.RemoveAll(tmpDir)
@@ -418,17 +418,17 @@ func (s *DockerSuite) TestCpFromCaseI(c *check.C) ***REMOVED***
 	c.Assert(err, checker.NotNil)
 
 	c.Assert(isCpCannotCopyDir(err), checker.True, check.Commentf("expected ErrCannotCopyDir error, but got %T: %s", err, err))
-***REMOVED***
+}
 
 // J. SRC specifies a directory's contents only and DST exists as a directory.
 //    This should copy the contents of the SRC directory (but not the directory
 //    itself) into the DST directory. Ensure this works whether DST has a
 //    trailing path separator or not.
-func (s *DockerSuite) TestCpFromCaseJ(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestCpFromCaseJ(c *check.C) {
 	testRequires(c, DaemonIsLinux)
-	containerID := makeTestContainer(c, testContainerOptions***REMOVED***
+	containerID := makeTestContainer(c, testContainerOptions{
 		addContent: true, workDir: "/root",
-	***REMOVED***)
+	})
 
 	tmpDir := getTestDir(c, "test-cp-from-case-j")
 	defer os.RemoveAll(tmpDir)
@@ -456,4 +456,4 @@ func (s *DockerSuite) TestCpFromCaseJ(c *check.C) ***REMOVED***
 	c.Assert(runDockerCp(c, srcDir, dstDir, nil), checker.IsNil)
 
 	c.Assert(fileContentEquals(c, dstPath, "file1-1\n"), checker.IsNil)
-***REMOVED***
+}

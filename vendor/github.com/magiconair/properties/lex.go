@@ -20,23 +20,23 @@ import (
 )
 
 // item represents a token or text string returned from the scanner.
-type item struct ***REMOVED***
+type item struct {
 	typ itemType // The type of this item.
 	pos int      // The starting position, in bytes, of this item in the input string.
 	val string   // The value of this item.
-***REMOVED***
+}
 
-func (i item) String() string ***REMOVED***
-	switch ***REMOVED***
+func (i item) String() string {
+	switch {
 	case i.typ == itemEOF:
 		return "EOF"
 	case i.typ == itemError:
 		return i.val
 	case len(i.val) > 10:
 		return fmt.Sprintf("%.10q...", i.val)
-	***REMOVED***
+	}
 	return fmt.Sprintf("%q", i.val)
-***REMOVED***
+}
 
 // itemType identifies the type of lex items.
 type itemType int
@@ -59,7 +59,7 @@ const whitespace = " \f\t"
 type stateFn func(*lexer) stateFn
 
 // lexer holds the state of the scanner.
-type lexer struct ***REMOVED***
+type lexer struct {
 	input   string    // the string being scanned
 	state   stateFn   // the next lexing function to enter
 	pos     int       // current position in the input
@@ -68,122 +68,122 @@ type lexer struct ***REMOVED***
 	lastPos int       // position of most recent item returned by nextItem
 	runes   []rune    // scanned runes for this item
 	items   chan item // channel of scanned items
-***REMOVED***
+}
 
 // next returns the next rune in the input.
-func (l *lexer) next() rune ***REMOVED***
-	if l.pos >= len(l.input) ***REMOVED***
+func (l *lexer) next() rune {
+	if l.pos >= len(l.input) {
 		l.width = 0
 		return eof
-	***REMOVED***
+	}
 	r, w := utf8.DecodeRuneInString(l.input[l.pos:])
 	l.width = w
 	l.pos += l.width
 	return r
-***REMOVED***
+}
 
 // peek returns but does not consume the next rune in the input.
-func (l *lexer) peek() rune ***REMOVED***
+func (l *lexer) peek() rune {
 	r := l.next()
 	l.backup()
 	return r
-***REMOVED***
+}
 
 // backup steps back one rune. Can only be called once per call of next.
-func (l *lexer) backup() ***REMOVED***
+func (l *lexer) backup() {
 	l.pos -= l.width
-***REMOVED***
+}
 
 // emit passes an item back to the client.
-func (l *lexer) emit(t itemType) ***REMOVED***
-	i := item***REMOVED***t, l.start, string(l.runes)***REMOVED***
+func (l *lexer) emit(t itemType) {
+	i := item{t, l.start, string(l.runes)}
 	l.items <- i
 	l.start = l.pos
 	l.runes = l.runes[:0]
-***REMOVED***
+}
 
 // ignore skips over the pending input before this point.
-func (l *lexer) ignore() ***REMOVED***
+func (l *lexer) ignore() {
 	l.start = l.pos
-***REMOVED***
+}
 
 // appends the rune to the current value
-func (l *lexer) appendRune(r rune) ***REMOVED***
+func (l *lexer) appendRune(r rune) {
 	l.runes = append(l.runes, r)
-***REMOVED***
+}
 
 // accept consumes the next rune if it's from the valid set.
-func (l *lexer) accept(valid string) bool ***REMOVED***
-	if strings.ContainsRune(valid, l.next()) ***REMOVED***
+func (l *lexer) accept(valid string) bool {
+	if strings.ContainsRune(valid, l.next()) {
 		return true
-	***REMOVED***
+	}
 	l.backup()
 	return false
-***REMOVED***
+}
 
 // acceptRun consumes a run of runes from the valid set.
-func (l *lexer) acceptRun(valid string) ***REMOVED***
-	for strings.ContainsRune(valid, l.next()) ***REMOVED***
-	***REMOVED***
+func (l *lexer) acceptRun(valid string) {
+	for strings.ContainsRune(valid, l.next()) {
+	}
 	l.backup()
-***REMOVED***
+}
 
 // acceptRunUntil consumes a run of runes up to a terminator.
-func (l *lexer) acceptRunUntil(term rune) ***REMOVED***
-	for term != l.next() ***REMOVED***
-	***REMOVED***
+func (l *lexer) acceptRunUntil(term rune) {
+	for term != l.next() {
+	}
 	l.backup()
-***REMOVED***
+}
 
 // hasText returns true if the current parsed text is not empty.
-func (l *lexer) isNotEmpty() bool ***REMOVED***
+func (l *lexer) isNotEmpty() bool {
 	return l.pos > l.start
-***REMOVED***
+}
 
 // lineNumber reports which line we're on, based on the position of
 // the previous item returned by nextItem. Doing it this way
 // means we don't have to worry about peek double counting.
-func (l *lexer) lineNumber() int ***REMOVED***
+func (l *lexer) lineNumber() int {
 	return 1 + strings.Count(l.input[:l.lastPos], "\n")
-***REMOVED***
+}
 
 // errorf returns an error token and terminates the scan by passing
 // back a nil pointer that will be the next state, terminating l.nextItem.
-func (l *lexer) errorf(format string, args ...interface***REMOVED******REMOVED***) stateFn ***REMOVED***
-	l.items <- item***REMOVED***itemError, l.start, fmt.Sprintf(format, args...)***REMOVED***
+func (l *lexer) errorf(format string, args ...interface{}) stateFn {
+	l.items <- item{itemError, l.start, fmt.Sprintf(format, args...)}
 	return nil
-***REMOVED***
+}
 
 // nextItem returns the next item from the input.
-func (l *lexer) nextItem() item ***REMOVED***
+func (l *lexer) nextItem() item {
 	i := <-l.items
 	l.lastPos = i.pos
 	return i
-***REMOVED***
+}
 
 // lex creates a new scanner for the input string.
-func lex(input string) *lexer ***REMOVED***
-	l := &lexer***REMOVED***
+func lex(input string) *lexer {
+	l := &lexer{
 		input: input,
 		items: make(chan item),
 		runes: make([]rune, 0, 32),
-	***REMOVED***
+	}
 	go l.run()
 	return l
-***REMOVED***
+}
 
 // run runs the state machine for the lexer.
-func (l *lexer) run() ***REMOVED***
-	for l.state = lexBeforeKey(l); l.state != nil; ***REMOVED***
+func (l *lexer) run() {
+	for l.state = lexBeforeKey(l); l.state != nil; {
 		l.state = l.state(l)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // state functions
 
 // lexBeforeKey scans until a key begins.
-func lexBeforeKey(l *lexer) stateFn ***REMOVED***
-	switch r := l.next(); ***REMOVED***
+func lexBeforeKey(l *lexer) stateFn {
+	switch r := l.next(); {
 	case isEOF(r):
 		l.emit(itemEOF)
 		return nil
@@ -202,15 +202,15 @@ func lexBeforeKey(l *lexer) stateFn ***REMOVED***
 	default:
 		l.backup()
 		return lexKey
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // lexComment scans a comment line. The comment character has already been scanned.
-func lexComment(l *lexer) stateFn ***REMOVED***
+func lexComment(l *lexer) stateFn {
 	l.acceptRun(whitespace)
 	l.ignore()
-	for ***REMOVED***
-		switch r := l.next(); ***REMOVED***
+	for {
+		switch r := l.next(); {
 		case isEOF(r):
 			l.ignore()
 			l.emit(itemEOF)
@@ -220,23 +220,23 @@ func lexComment(l *lexer) stateFn ***REMOVED***
 			return lexBeforeKey
 		default:
 			l.appendRune(r)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // lexKey scans the key up to a delimiter
-func lexKey(l *lexer) stateFn ***REMOVED***
+func lexKey(l *lexer) stateFn {
 	var r rune
 
 Loop:
-	for ***REMOVED***
-		switch r = l.next(); ***REMOVED***
+	for {
+		switch r = l.next(); {
 
 		case isEscape(r):
 			err := l.scanEscapeSequence()
-			if err != nil ***REMOVED***
+			if err != nil {
 				return l.errorf(err.Error())
-			***REMOVED***
+			}
 
 		case isEndOfKey(r):
 			l.backup()
@@ -247,46 +247,46 @@ Loop:
 
 		default:
 			l.appendRune(r)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if len(l.runes) > 0 ***REMOVED***
+	if len(l.runes) > 0 {
 		l.emit(itemKey)
-	***REMOVED***
+	}
 
-	if isEOF(r) ***REMOVED***
+	if isEOF(r) {
 		l.emit(itemEOF)
 		return nil
-	***REMOVED***
+	}
 
 	return lexBeforeValue
-***REMOVED***
+}
 
 // lexBeforeValue scans the delimiter between key and value.
 // Leading and trailing whitespace is ignored.
 // We expect to be just after the key.
-func lexBeforeValue(l *lexer) stateFn ***REMOVED***
+func lexBeforeValue(l *lexer) stateFn {
 	l.acceptRun(whitespace)
 	l.accept(":=")
 	l.acceptRun(whitespace)
 	l.ignore()
 	return lexValue
-***REMOVED***
+}
 
 // lexValue scans text until the end of the line. We expect to be just after the delimiter.
-func lexValue(l *lexer) stateFn ***REMOVED***
-	for ***REMOVED***
-		switch r := l.next(); ***REMOVED***
+func lexValue(l *lexer) stateFn {
+	for {
+		switch r := l.next(); {
 		case isEscape(r):
-			if isEOL(l.peek()) ***REMOVED***
+			if isEOL(l.peek()) {
 				l.next()
 				l.acceptRun(whitespace)
-			***REMOVED*** else ***REMOVED***
+			} else {
 				err := l.scanEscapeSequence()
-				if err != nil ***REMOVED***
+				if err != nil {
 					return l.errorf(err.Error())
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 
 		case isEOL(r):
 			l.emit(itemValue)
@@ -300,14 +300,14 @@ func lexValue(l *lexer) stateFn ***REMOVED***
 
 		default:
 			l.appendRune(r)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // scanEscapeSequence scans either one of the escaped characters
 // or a unicode literal. We expect to be after the escape character.
-func (l *lexer) scanEscapeSequence() error ***REMOVED***
-	switch r := l.next(); ***REMOVED***
+func (l *lexer) scanEscapeSequence() error {
+	switch r := l.next(); {
 
 	case isEscapedCharacter(r):
 		l.appendRune(decodeEscapedCharacter(r))
@@ -323,33 +323,33 @@ func (l *lexer) scanEscapeSequence() error ***REMOVED***
 	default:
 		l.appendRune(r)
 		return nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // scans a unicode literal in the form \uXXXX. We expect to be after the \u.
-func (l *lexer) scanUnicodeLiteral() error ***REMOVED***
+func (l *lexer) scanUnicodeLiteral() error {
 	// scan the digits
 	d := make([]rune, 4)
-	for i := 0; i < 4; i++ ***REMOVED***
+	for i := 0; i < 4; i++ {
 		d[i] = l.next()
-		if d[i] == eof || !strings.ContainsRune("0123456789abcdefABCDEF", d[i]) ***REMOVED***
+		if d[i] == eof || !strings.ContainsRune("0123456789abcdefABCDEF", d[i]) {
 			return fmt.Errorf("invalid unicode literal")
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// decode the digits into a rune
 	r, err := strconv.ParseInt(string(d), 16, 0)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	l.appendRune(rune(r))
 	return nil
-***REMOVED***
+}
 
 // decodeEscapedCharacter returns the unescaped rune. We expect to be after the escape character.
-func decodeEscapedCharacter(r rune) rune ***REMOVED***
-	switch r ***REMOVED***
+func decodeEscapedCharacter(r rune) rune {
+	switch r {
 	case 'f':
 		return '\f'
 	case 'n':
@@ -360,48 +360,48 @@ func decodeEscapedCharacter(r rune) rune ***REMOVED***
 		return '\t'
 	default:
 		return r
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // atUnicodeLiteral reports whether we are at a unicode literal.
 // The escape character has already been consumed.
-func atUnicodeLiteral(r rune) bool ***REMOVED***
+func atUnicodeLiteral(r rune) bool {
 	return r == 'u'
-***REMOVED***
+}
 
 // isComment reports whether we are at the start of a comment.
-func isComment(r rune) bool ***REMOVED***
+func isComment(r rune) bool {
 	return r == '#' || r == '!'
-***REMOVED***
+}
 
 // isEndOfKey reports whether the rune terminates the current key.
-func isEndOfKey(r rune) bool ***REMOVED***
+func isEndOfKey(r rune) bool {
 	return strings.ContainsRune(" \f\t\r\n:=", r)
-***REMOVED***
+}
 
 // isEOF reports whether we are at EOF.
-func isEOF(r rune) bool ***REMOVED***
+func isEOF(r rune) bool {
 	return r == eof
-***REMOVED***
+}
 
 // isEOL reports whether we are at a new line character.
-func isEOL(r rune) bool ***REMOVED***
+func isEOL(r rune) bool {
 	return r == '\n' || r == '\r'
-***REMOVED***
+}
 
 // isEscape reports whether the rune is the escape character which
 // prefixes unicode literals and other escaped characters.
-func isEscape(r rune) bool ***REMOVED***
+func isEscape(r rune) bool {
 	return r == '\\'
-***REMOVED***
+}
 
 // isEscapedCharacter reports whether we are at one of the characters that need escaping.
 // The escape character has already been consumed.
-func isEscapedCharacter(r rune) bool ***REMOVED***
+func isEscapedCharacter(r rune) bool {
 	return strings.ContainsRune(" :=fnrt", r)
-***REMOVED***
+}
 
 // isWhitespace reports whether the rune is a whitespace character.
-func isWhitespace(r rune) bool ***REMOVED***
+func isWhitespace(r rune) bool {
 	return strings.ContainsRune(whitespace, r)
-***REMOVED***
+}

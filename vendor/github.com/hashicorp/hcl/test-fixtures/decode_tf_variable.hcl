@@ -1,10 +1,10 @@
-variable "foo" ***REMOVED***
+variable "foo" {
     default = "bar"
     description = "bar"
-***REMOVED***
+}
 
-variable "amis" ***REMOVED***
-    default = ***REMOVED***
+variable "amis" {
+    default = {
         east = "foo"
-***REMOVED***
-***REMOVED***
+    }
+}

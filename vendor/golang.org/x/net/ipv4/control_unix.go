@@ -13,61 +13,61 @@ import (
 	"golang.org/x/net/internal/socket"
 )
 
-func setControlMessage(c *socket.Conn, opt *rawOpt, cf ControlFlags, on bool) error ***REMOVED***
+func setControlMessage(c *socket.Conn, opt *rawOpt, cf ControlFlags, on bool) error {
 	opt.Lock()
 	defer opt.Unlock()
-	if so, ok := sockOpts[ssoReceiveTTL]; ok && cf&FlagTTL != 0 ***REMOVED***
-		if err := so.SetInt(c, boolint(on)); err != nil ***REMOVED***
+	if so, ok := sockOpts[ssoReceiveTTL]; ok && cf&FlagTTL != 0 {
+		if err := so.SetInt(c, boolint(on)); err != nil {
 			return err
-		***REMOVED***
-		if on ***REMOVED***
+		}
+		if on {
 			opt.set(FlagTTL)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			opt.clear(FlagTTL)
-		***REMOVED***
-	***REMOVED***
-	if so, ok := sockOpts[ssoPacketInfo]; ok ***REMOVED***
-		if cf&(FlagSrc|FlagDst|FlagInterface) != 0 ***REMOVED***
-			if err := so.SetInt(c, boolint(on)); err != nil ***REMOVED***
+		}
+	}
+	if so, ok := sockOpts[ssoPacketInfo]; ok {
+		if cf&(FlagSrc|FlagDst|FlagInterface) != 0 {
+			if err := so.SetInt(c, boolint(on)); err != nil {
 				return err
-			***REMOVED***
-			if on ***REMOVED***
+			}
+			if on {
 				opt.set(cf & (FlagSrc | FlagDst | FlagInterface))
-			***REMOVED*** else ***REMOVED***
+			} else {
 				opt.clear(cf & (FlagSrc | FlagDst | FlagInterface))
-			***REMOVED***
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
-		if so, ok := sockOpts[ssoReceiveDst]; ok && cf&FlagDst != 0 ***REMOVED***
-			if err := so.SetInt(c, boolint(on)); err != nil ***REMOVED***
+			}
+		}
+	} else {
+		if so, ok := sockOpts[ssoReceiveDst]; ok && cf&FlagDst != 0 {
+			if err := so.SetInt(c, boolint(on)); err != nil {
 				return err
-			***REMOVED***
-			if on ***REMOVED***
+			}
+			if on {
 				opt.set(FlagDst)
-			***REMOVED*** else ***REMOVED***
+			} else {
 				opt.clear(FlagDst)
-			***REMOVED***
-		***REMOVED***
-		if so, ok := sockOpts[ssoReceiveInterface]; ok && cf&FlagInterface != 0 ***REMOVED***
-			if err := so.SetInt(c, boolint(on)); err != nil ***REMOVED***
+			}
+		}
+		if so, ok := sockOpts[ssoReceiveInterface]; ok && cf&FlagInterface != 0 {
+			if err := so.SetInt(c, boolint(on)); err != nil {
 				return err
-			***REMOVED***
-			if on ***REMOVED***
+			}
+			if on {
 				opt.set(FlagInterface)
-			***REMOVED*** else ***REMOVED***
+			} else {
 				opt.clear(FlagInterface)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func marshalTTL(b []byte, cm *ControlMessage) []byte ***REMOVED***
+func marshalTTL(b []byte, cm *ControlMessage) []byte {
 	m := socket.ControlMessage(b)
 	m.MarshalHeader(iana.ProtocolIP, sysIP_RECVTTL, 1)
 	return m.Next(1)
-***REMOVED***
+}
 
-func parseTTL(cm *ControlMessage, b []byte) ***REMOVED***
+func parseTTL(cm *ControlMessage, b []byte) {
 	cm.TTL = int(*(*byte)(unsafe.Pointer(&b[:1][0])))
-***REMOVED***
+}

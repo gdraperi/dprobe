@@ -2,6 +2,6 @@
 
 package fsutil
 
-func chtimes(path string, un int64) error ***REMOVED***
+func chtimes(path string, un int64) error {
 	return nil
-***REMOVED***
+}

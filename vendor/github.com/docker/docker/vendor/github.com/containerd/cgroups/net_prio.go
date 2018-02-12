@@ -9,42 +9,42 @@ import (
 	specs "github.com/opencontainers/runtime-spec/specs-go"
 )
 
-func NewNetPrio(root string) *netprioController ***REMOVED***
-	return &netprioController***REMOVED***
+func NewNetPrio(root string) *netprioController {
+	return &netprioController{
 		root: filepath.Join(root, string(NetPrio)),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type netprioController struct ***REMOVED***
+type netprioController struct {
 	root string
-***REMOVED***
+}
 
-func (n *netprioController) Name() Name ***REMOVED***
+func (n *netprioController) Name() Name {
 	return NetPrio
-***REMOVED***
+}
 
-func (n *netprioController) Path(path string) string ***REMOVED***
+func (n *netprioController) Path(path string) string {
 	return filepath.Join(n.root, path)
-***REMOVED***
+}
 
-func (n *netprioController) Create(path string, resources *specs.LinuxResources) error ***REMOVED***
-	if err := os.MkdirAll(n.Path(path), defaultDirPerm); err != nil ***REMOVED***
+func (n *netprioController) Create(path string, resources *specs.LinuxResources) error {
+	if err := os.MkdirAll(n.Path(path), defaultDirPerm); err != nil {
 		return err
-	***REMOVED***
-	if resources.Network != nil ***REMOVED***
-		for _, prio := range resources.Network.Priorities ***REMOVED***
+	}
+	if resources.Network != nil {
+		for _, prio := range resources.Network.Priorities {
 			if err := ioutil.WriteFile(
 				filepath.Join(n.Path(path), "net_prio_ifpriomap"),
 				formatPrio(prio.Name, prio.Priority),
 				defaultFilePerm,
-			); err != nil ***REMOVED***
+			); err != nil {
 				return err
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func formatPrio(name string, prio uint32) []byte ***REMOVED***
+func formatPrio(name string, prio uint32) []byte {
 	return []byte(fmt.Sprintf("%s %d", name, prio))
-***REMOVED***
+}

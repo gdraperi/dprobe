@@ -62,7 +62,7 @@ exit:
 // I do not know why, but this seems to be the only way to call
 // ctlHandlerProc on Windows 7.
 
-// func servicectlhandler(ctl uint32, evtype uint32, evdata uintptr, context uintptr) uintptr ***REMOVED***
+// func servicectlhandler(ctl uint32, evtype uint32, evdata uintptr, context uintptr) uintptr {
 TEXT ·servicectlhandler(SB),7,$0
 	MOVL	·ctlHandlerExProc(SB), CX
 	JMP	CX

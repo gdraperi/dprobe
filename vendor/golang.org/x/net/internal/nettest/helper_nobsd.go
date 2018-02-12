@@ -6,10 +6,10 @@
 
 package nettest
 
-func supportsIPv6MulticastDeliveryOnLoopback() bool ***REMOVED***
+func supportsIPv6MulticastDeliveryOnLoopback() bool {
 	return true
-***REMOVED***
+}
 
-func causesIPv6Crash() bool ***REMOVED***
+func causesIPv6Crash() bool {
 	return false
-***REMOVED***
+}

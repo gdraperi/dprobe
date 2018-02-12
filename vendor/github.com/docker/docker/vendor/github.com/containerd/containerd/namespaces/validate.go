@@ -47,21 +47,21 @@ var (
 //
 // For the most part, this doesn't need to be called directly when using the
 // context-oriented functions.
-func Validate(s string) error ***REMOVED***
-	if len(s) > maxLength ***REMOVED***
+func Validate(s string) error {
+	if len(s) > maxLength {
 		return errors.Wrapf(errdefs.ErrInvalidArgument, "namespace %q greater than maximum length (%d characters)", s, maxLength)
-	***REMOVED***
+	}
 
-	if !namespaceRe.MatchString(s) ***REMOVED***
+	if !namespaceRe.MatchString(s) {
 		return errors.Wrapf(errdefs.ErrInvalidArgument, "namespace %q must match %v", s, namespaceRe)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func reGroup(s string) string ***REMOVED***
+func reGroup(s string) string {
 	return `(?:` + s + `)`
-***REMOVED***
+}
 
-func reAnchor(s string) string ***REMOVED***
+func reAnchor(s string) string {
 	return `^` + s + `$`
-***REMOVED***
+}

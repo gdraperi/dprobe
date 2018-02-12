@@ -6,10 +6,10 @@ Overview [![Build Status](https://travis-ci.org/magiconair/properties.svg?branch
 properties is a Go library for reading and writing properties files.
 
 It supports reading from multiple files or URLs and Spring style recursive
-property expansion of expressions like `$***REMOVED***key***REMOVED***` to their corresponding value.
-Value expressions can refer to other keys like in `$***REMOVED***key***REMOVED***` or to environment
-variables like in `$***REMOVED***USER***REMOVED***`.  Filenames can also contain environment variables
-like in `/home/$***REMOVED***USER***REMOVED***/myapp.properties`.
+property expansion of expressions like `${key}` to their corresponding value.
+Value expressions can refer to other keys like in `${key}` or to environment
+variables like in `${USER}`.  Filenames can also contain environment variables
+like in `/home/${USER}/myapp.properties`.
 
 Properties can be decoded into structs, maps, arrays and values through
 struct tags.
@@ -36,18 +36,18 @@ import (
 	"github.com/magiconair/properties"
 )
 
-func main() ***REMOVED***
+func main() {
 	// init from a file
-	p := properties.MustLoadFile("$***REMOVED***HOME***REMOVED***/config.properties", properties.UTF8)
+	p := properties.MustLoadFile("${HOME}/config.properties", properties.UTF8)
 
 	// or multiple files
-	p = properties.MustLoadFiles([]string***REMOVED***
-			"$***REMOVED***HOME***REMOVED***/config.properties",
-			"$***REMOVED***HOME***REMOVED***/config-$***REMOVED***USER***REMOVED***.properties",
-		***REMOVED***, properties.UTF8, true)
+	p = properties.MustLoadFiles([]string{
+			"${HOME}/config.properties",
+			"${HOME}/config-${USER}.properties",
+		}, properties.UTF8, true)
 
 	// or from a map
-	p = properties.LoadMap(map[string]string***REMOVED***"key": "value", "abc": "def"***REMOVED***)
+	p = properties.LoadMap(map[string]string{"key": "value", "abc": "def"})
 
 	// or from a string
 	p = properties.MustLoadString("key=value\nabc=def")
@@ -56,10 +56,10 @@ func main() ***REMOVED***
 	p = properties.MustLoadURL("http://host/path")
 
 	// or from multiple URLs
-	p = properties.MustLoadURL([]string***REMOVED***
+	p = properties.MustLoadURL([]string{
 			"http://host/config",
-			"http://host/config-$***REMOVED***USER***REMOVED***",
-		***REMOVED***, true)
+			"http://host/config-${USER}",
+		}, true)
 
 	// or from flags
 	p.MustFlag(flag.CommandLine)
@@ -69,17 +69,17 @@ func main() ***REMOVED***
 	port := p.GetInt("port", 8080)
 
 	// or through Decode
-	type Config struct ***REMOVED***
+	type Config struct {
 		Host    string        `properties:"host"`
 		Port    int           `properties:"port,default=9000"`
 		Accept  []string      `properties:"accept,default=image/png;image;gif"`
 		Timeout time.Duration `properties:"timeout,default=5s"`
-	***REMOVED***
+	}
 	var cfg Config
-	if err := p.Decode(&cfg); err != nil ***REMOVED***
+	if err := p.Decode(&cfg); err != nil {
 		log.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 ```
 

@@ -25,12 +25,12 @@ import (
 )
 
 // Backend defines the executor component for a swarm agent.
-type Backend interface ***REMOVED***
+type Backend interface {
 	CreateManagedNetwork(clustertypes.NetworkCreateRequest) error
 	DeleteManagedNetwork(networkID string) error
 	FindNetwork(idName string) (libnetwork.Network, error)
-	SetupIngress(clustertypes.NetworkCreateRequest, string) (<-chan struct***REMOVED******REMOVED***, error)
-	ReleaseIngress() (<-chan struct***REMOVED******REMOVED***, error)
+	SetupIngress(clustertypes.NetworkCreateRequest, string) (<-chan struct{}, error)
+	ReleaseIngress() (<-chan struct{}, error)
 	PullImage(ctx context.Context, image, tag, platform string, metaHeaders map[string][]string, authConfig *types.AuthConfig, outStream io.Writer) error
 	CreateManagedContainer(config types.ContainerCreateConfig) (container.ContainerCreateCreatedBody, error)
 	ContainerStart(name string, hostConfig *container.HostConfig, checkpoint string, checkpointDir string) error
@@ -54,8 +54,8 @@ type Backend interface ***REMOVED***
 	DaemonJoinsCluster(provider cluster.Provider)
 	DaemonLeavesCluster()
 	IsSwarmCompatible() error
-	SubscribeToEvents(since, until time.Time, filter filters.Args) ([]events.Message, chan interface***REMOVED******REMOVED***)
-	UnsubscribeFromEvents(listener chan interface***REMOVED******REMOVED***)
+	SubscribeToEvents(since, until time.Time, filter filters.Args) ([]events.Message, chan interface{})
+	UnsubscribeFromEvents(listener chan interface{})
 	UpdateAttachment(string, string, string, *network.NetworkingConfig) error
 	WaitForDetachment(context.Context, string, string, string, string) error
 	GetRepository(context.Context, reference.Named, *types.AuthConfig) (distribution.Repository, bool, error)
@@ -63,4 +63,4 @@ type Backend interface ***REMOVED***
 	PluginManager() *plugin.Manager
 	PluginGetter() *plugin.Store
 	GetAttachmentStore() *networkSettings.AttachmentStore
-***REMOVED***
+}

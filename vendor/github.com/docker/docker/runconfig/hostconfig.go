@@ -10,70 +10,70 @@ import (
 
 // DecodeHostConfig creates a HostConfig based on the specified Reader.
 // It assumes the content of the reader will be JSON, and decodes it.
-func decodeHostConfig(src io.Reader) (*container.HostConfig, error) ***REMOVED***
+func decodeHostConfig(src io.Reader) (*container.HostConfig, error) {
 	decoder := json.NewDecoder(src)
 
 	var w ContainerConfigWrapper
-	if err := decoder.Decode(&w); err != nil ***REMOVED***
+	if err := decoder.Decode(&w); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	hc := w.getHostConfig()
 	return hc, nil
-***REMOVED***
+}
 
 // SetDefaultNetModeIfBlank changes the NetworkMode in a HostConfig structure
 // to default if it is not populated. This ensures backwards compatibility after
 // the validation of the network mode was moved from the docker CLI to the
 // docker daemon.
-func SetDefaultNetModeIfBlank(hc *container.HostConfig) ***REMOVED***
-	if hc != nil ***REMOVED***
-		if hc.NetworkMode == container.NetworkMode("") ***REMOVED***
+func SetDefaultNetModeIfBlank(hc *container.HostConfig) {
+	if hc != nil {
+		if hc.NetworkMode == container.NetworkMode("") {
 			hc.NetworkMode = container.NetworkMode("default")
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // validateNetContainerMode ensures that the various combinations of requested
 // network settings wrt container mode are valid.
-func validateNetContainerMode(c *container.Config, hc *container.HostConfig) error ***REMOVED***
+func validateNetContainerMode(c *container.Config, hc *container.HostConfig) error {
 	// We may not be passed a host config, such as in the case of docker commit
-	if hc == nil ***REMOVED***
+	if hc == nil {
 		return nil
-	***REMOVED***
+	}
 	parts := strings.Split(string(hc.NetworkMode), ":")
-	if parts[0] == "container" ***REMOVED***
-		if len(parts) < 2 || parts[1] == "" ***REMOVED***
+	if parts[0] == "container" {
+		if len(parts) < 2 || parts[1] == "" {
 			return validationError("Invalid network mode: invalid container format container:<name|id>")
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if hc.NetworkMode.IsContainer() && c.Hostname != "" ***REMOVED***
+	if hc.NetworkMode.IsContainer() && c.Hostname != "" {
 		return ErrConflictNetworkHostname
-	***REMOVED***
+	}
 
-	if hc.NetworkMode.IsContainer() && len(hc.Links) > 0 ***REMOVED***
+	if hc.NetworkMode.IsContainer() && len(hc.Links) > 0 {
 		return ErrConflictContainerNetworkAndLinks
-	***REMOVED***
+	}
 
-	if hc.NetworkMode.IsContainer() && len(hc.DNS) > 0 ***REMOVED***
+	if hc.NetworkMode.IsContainer() && len(hc.DNS) > 0 {
 		return ErrConflictNetworkAndDNS
-	***REMOVED***
+	}
 
-	if hc.NetworkMode.IsContainer() && len(hc.ExtraHosts) > 0 ***REMOVED***
+	if hc.NetworkMode.IsContainer() && len(hc.ExtraHosts) > 0 {
 		return ErrConflictNetworkHosts
-	***REMOVED***
+	}
 
-	if (hc.NetworkMode.IsContainer() || hc.NetworkMode.IsHost()) && c.MacAddress != "" ***REMOVED***
+	if (hc.NetworkMode.IsContainer() || hc.NetworkMode.IsHost()) && c.MacAddress != "" {
 		return ErrConflictContainerNetworkAndMac
-	***REMOVED***
+	}
 
-	if hc.NetworkMode.IsContainer() && (len(hc.PortBindings) > 0 || hc.PublishAllPorts) ***REMOVED***
+	if hc.NetworkMode.IsContainer() && (len(hc.PortBindings) > 0 || hc.PublishAllPorts) {
 		return ErrConflictNetworkPublishPorts
-	***REMOVED***
+	}
 
-	if hc.NetworkMode.IsContainer() && len(c.ExposedPorts) > 0 ***REMOVED***
+	if hc.NetworkMode.IsContainer() && len(c.ExposedPorts) > 0 {
 		return ErrConflictNetworkExposePorts
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

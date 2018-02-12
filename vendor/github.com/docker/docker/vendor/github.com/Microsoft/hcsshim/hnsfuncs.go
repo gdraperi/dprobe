@@ -7,34 +7,34 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func hnsCall(method, path, request string, returnResponse interface***REMOVED******REMOVED***) error ***REMOVED***
+func hnsCall(method, path, request string, returnResponse interface{}) error {
 	var responseBuffer *uint16
 	logrus.Debugf("[%s]=>[%s] Request : %s", method, path, request)
 
 	err := _hnsCall(method, path, request, &responseBuffer)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return makeError(err, "hnsCall ", "")
-	***REMOVED***
+	}
 	response := convertAndFreeCoTaskMemString(responseBuffer)
 
-	hnsresponse := &hnsResponse***REMOVED******REMOVED***
-	if err = json.Unmarshal([]byte(response), &hnsresponse); err != nil ***REMOVED***
+	hnsresponse := &hnsResponse{}
+	if err = json.Unmarshal([]byte(response), &hnsresponse); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if !hnsresponse.Success ***REMOVED***
+	if !hnsresponse.Success {
 		return fmt.Errorf("HNS failed with error : %s", hnsresponse.Error)
-	***REMOVED***
+	}
 
-	if len(hnsresponse.Output) == 0 ***REMOVED***
+	if len(hnsresponse.Output) == 0 {
 		return nil
-	***REMOVED***
+	}
 
 	logrus.Debugf("Network Response : %s", hnsresponse.Output)
 	err = json.Unmarshal(hnsresponse.Output, returnResponse)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}

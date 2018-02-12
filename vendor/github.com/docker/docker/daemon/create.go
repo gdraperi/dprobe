@@ -25,64 +25,64 @@ import (
 )
 
 // CreateManagedContainer creates a container that is managed by a Service
-func (daemon *Daemon) CreateManagedContainer(params types.ContainerCreateConfig) (containertypes.ContainerCreateCreatedBody, error) ***REMOVED***
+func (daemon *Daemon) CreateManagedContainer(params types.ContainerCreateConfig) (containertypes.ContainerCreateCreatedBody, error) {
 	return daemon.containerCreate(params, true)
-***REMOVED***
+}
 
 // ContainerCreate creates a regular container
-func (daemon *Daemon) ContainerCreate(params types.ContainerCreateConfig) (containertypes.ContainerCreateCreatedBody, error) ***REMOVED***
+func (daemon *Daemon) ContainerCreate(params types.ContainerCreateConfig) (containertypes.ContainerCreateCreatedBody, error) {
 	return daemon.containerCreate(params, false)
-***REMOVED***
+}
 
-func (daemon *Daemon) containerCreate(params types.ContainerCreateConfig, managed bool) (containertypes.ContainerCreateCreatedBody, error) ***REMOVED***
+func (daemon *Daemon) containerCreate(params types.ContainerCreateConfig, managed bool) (containertypes.ContainerCreateCreatedBody, error) {
 	start := time.Now()
-	if params.Config == nil ***REMOVED***
-		return containertypes.ContainerCreateCreatedBody***REMOVED******REMOVED***, errdefs.InvalidParameter(errors.New("Config cannot be empty in order to create a container"))
-	***REMOVED***
+	if params.Config == nil {
+		return containertypes.ContainerCreateCreatedBody{}, errdefs.InvalidParameter(errors.New("Config cannot be empty in order to create a container"))
+	}
 
 	os := runtime.GOOS
-	if params.Config.Image != "" ***REMOVED***
+	if params.Config.Image != "" {
 		img, err := daemon.GetImage(params.Config.Image)
-		if err == nil ***REMOVED***
+		if err == nil {
 			os = img.OS
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
+		}
+	} else {
 		// This mean scratch. On Windows, we can safely assume that this is a linux
 		// container. On other platforms, it's the host OS (which it already is)
-		if runtime.GOOS == "windows" && system.LCOWSupported() ***REMOVED***
+		if runtime.GOOS == "windows" && system.LCOWSupported() {
 			os = "linux"
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	warnings, err := daemon.verifyContainerSettings(os, params.HostConfig, params.Config, false)
-	if err != nil ***REMOVED***
-		return containertypes.ContainerCreateCreatedBody***REMOVED***Warnings: warnings***REMOVED***, errdefs.InvalidParameter(err)
-	***REMOVED***
+	if err != nil {
+		return containertypes.ContainerCreateCreatedBody{Warnings: warnings}, errdefs.InvalidParameter(err)
+	}
 
 	err = verifyNetworkingConfig(params.NetworkingConfig)
-	if err != nil ***REMOVED***
-		return containertypes.ContainerCreateCreatedBody***REMOVED***Warnings: warnings***REMOVED***, errdefs.InvalidParameter(err)
-	***REMOVED***
+	if err != nil {
+		return containertypes.ContainerCreateCreatedBody{Warnings: warnings}, errdefs.InvalidParameter(err)
+	}
 
-	if params.HostConfig == nil ***REMOVED***
-		params.HostConfig = &containertypes.HostConfig***REMOVED******REMOVED***
-	***REMOVED***
+	if params.HostConfig == nil {
+		params.HostConfig = &containertypes.HostConfig{}
+	}
 	err = daemon.adaptContainerSettings(params.HostConfig, params.AdjustCPUShares)
-	if err != nil ***REMOVED***
-		return containertypes.ContainerCreateCreatedBody***REMOVED***Warnings: warnings***REMOVED***, errdefs.InvalidParameter(err)
-	***REMOVED***
+	if err != nil {
+		return containertypes.ContainerCreateCreatedBody{Warnings: warnings}, errdefs.InvalidParameter(err)
+	}
 
 	container, err := daemon.create(params, managed)
-	if err != nil ***REMOVED***
-		return containertypes.ContainerCreateCreatedBody***REMOVED***Warnings: warnings***REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return containertypes.ContainerCreateCreatedBody{Warnings: warnings}, err
+	}
 	containerActions.WithValues("create").UpdateSince(start)
 
-	return containertypes.ContainerCreateCreatedBody***REMOVED***ID: container.ID, Warnings: warnings***REMOVED***, nil
-***REMOVED***
+	return containertypes.ContainerCreateCreatedBody{ID: container.ID, Warnings: warnings}, nil
+}
 
 // Create creates a new container from the given configuration with a given name.
-func (daemon *Daemon) create(params types.ContainerCreateConfig, managed bool) (retC *container.Container, retErr error) ***REMOVED***
+func (daemon *Daemon) create(params types.ContainerCreateConfig, managed bool) (retC *container.Container, retErr error) {
 	var (
 		container *container.Container
 		img       *image.Image
@@ -91,52 +91,52 @@ func (daemon *Daemon) create(params types.ContainerCreateConfig, managed bool) (
 	)
 
 	os := runtime.GOOS
-	if params.Config.Image != "" ***REMOVED***
+	if params.Config.Image != "" {
 		img, err = daemon.GetImage(params.Config.Image)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-		if img.OS != "" ***REMOVED***
+		}
+		if img.OS != "" {
 			os = img.OS
-		***REMOVED*** else ***REMOVED***
+		} else {
 			// default to the host OS except on Windows with LCOW
-			if runtime.GOOS == "windows" && system.LCOWSupported() ***REMOVED***
+			if runtime.GOOS == "windows" && system.LCOWSupported() {
 				os = "linux"
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		imgID = img.ID()
 
-		if runtime.GOOS == "windows" && img.OS == "linux" && !system.LCOWSupported() ***REMOVED***
+		if runtime.GOOS == "windows" && img.OS == "linux" && !system.LCOWSupported() {
 			return nil, errors.New("operating system on which parent image was created is not Windows")
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
-		if runtime.GOOS == "windows" ***REMOVED***
+		}
+	} else {
+		if runtime.GOOS == "windows" {
 			os = "linux" // 'scratch' case.
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if err := daemon.mergeAndVerifyConfig(params.Config, img); err != nil ***REMOVED***
+	if err := daemon.mergeAndVerifyConfig(params.Config, img); err != nil {
 		return nil, errdefs.InvalidParameter(err)
-	***REMOVED***
+	}
 
-	if err := daemon.mergeAndVerifyLogConfig(&params.HostConfig.LogConfig); err != nil ***REMOVED***
+	if err := daemon.mergeAndVerifyLogConfig(&params.HostConfig.LogConfig); err != nil {
 		return nil, errdefs.InvalidParameter(err)
-	***REMOVED***
+	}
 
-	if container, err = daemon.newContainer(params.Name, os, params.Config, params.HostConfig, imgID, managed); err != nil ***REMOVED***
+	if container, err = daemon.newContainer(params.Name, os, params.Config, params.HostConfig, imgID, managed); err != nil {
 		return nil, err
-	***REMOVED***
-	defer func() ***REMOVED***
-		if retErr != nil ***REMOVED***
-			if err := daemon.cleanupContainer(container, true, true); err != nil ***REMOVED***
+	}
+	defer func() {
+		if retErr != nil {
+			if err := daemon.cleanupContainer(container, true, true); err != nil {
 				logrus.Errorf("failed to cleanup container on create error: %v", err)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***()
+			}
+		}
+	}()
 
-	if err := daemon.setSecurityOptions(container, params.HostConfig); err != nil ***REMOVED***
+	if err := daemon.setSecurityOptions(container, params.HostConfig); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	container.HostConfig.StorageOpt = params.HostConfig.StorageOpt
 
@@ -145,206 +145,206 @@ func (daemon *Daemon) create(params types.ContainerCreateConfig, managed bool) (
 	// Merge the daemon's storage options if they aren't already present. We only
 	// do this on Windows as there's no effective sandbox size limit other than
 	// physical on Linux.
-	if runtime.GOOS == "windows" ***REMOVED***
-		if container.HostConfig.StorageOpt == nil ***REMOVED***
+	if runtime.GOOS == "windows" {
+		if container.HostConfig.StorageOpt == nil {
 			container.HostConfig.StorageOpt = make(map[string]string)
-		***REMOVED***
-		for _, v := range daemon.configStore.GraphOptions ***REMOVED***
+		}
+		for _, v := range daemon.configStore.GraphOptions {
 			opt := strings.SplitN(v, "=", 2)
-			if _, ok := container.HostConfig.StorageOpt[opt[0]]; !ok ***REMOVED***
+			if _, ok := container.HostConfig.StorageOpt[opt[0]]; !ok {
 				container.HostConfig.StorageOpt[opt[0]] = opt[1]
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	// Set RWLayer for container after mount labels have been set
-	if err := daemon.setRWLayer(container); err != nil ***REMOVED***
+	if err := daemon.setRWLayer(container); err != nil {
 		return nil, errdefs.System(err)
-	***REMOVED***
+	}
 
 	rootIDs := daemon.idMappings.RootPair()
-	if err := idtools.MkdirAndChown(container.Root, 0700, rootIDs); err != nil ***REMOVED***
+	if err := idtools.MkdirAndChown(container.Root, 0700, rootIDs); err != nil {
 		return nil, err
-	***REMOVED***
-	if err := idtools.MkdirAndChown(container.CheckpointDir(), 0700, rootIDs); err != nil ***REMOVED***
+	}
+	if err := idtools.MkdirAndChown(container.CheckpointDir(), 0700, rootIDs); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	if err := daemon.setHostConfig(container, params.HostConfig); err != nil ***REMOVED***
+	if err := daemon.setHostConfig(container, params.HostConfig); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	if err := daemon.createContainerOSSpecificSettings(container, params.Config, params.HostConfig); err != nil ***REMOVED***
+	if err := daemon.createContainerOSSpecificSettings(container, params.Config, params.HostConfig); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	var endpointsConfigs map[string]*networktypes.EndpointSettings
-	if params.NetworkingConfig != nil ***REMOVED***
+	if params.NetworkingConfig != nil {
 		endpointsConfigs = params.NetworkingConfig.EndpointsConfig
-	***REMOVED***
+	}
 	// Make sure NetworkMode has an acceptable value. We do this to ensure
 	// backwards API compatibility.
 	runconfig.SetDefaultNetModeIfBlank(container.HostConfig)
 
 	daemon.updateContainerNetworkSettings(container, endpointsConfigs)
-	if err := daemon.Register(container); err != nil ***REMOVED***
+	if err := daemon.Register(container); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	stateCtr.set(container.ID, "stopped")
 	daemon.LogContainerEvent(container, "create")
 	return container, nil
-***REMOVED***
+}
 
-func toHostConfigSelinuxLabels(labels []string) []string ***REMOVED***
-	for i, l := range labels ***REMOVED***
+func toHostConfigSelinuxLabels(labels []string) []string {
+	for i, l := range labels {
 		labels[i] = "label=" + l
-	***REMOVED***
+	}
 	return labels
-***REMOVED***
+}
 
-func (daemon *Daemon) generateSecurityOpt(hostConfig *containertypes.HostConfig) ([]string, error) ***REMOVED***
-	for _, opt := range hostConfig.SecurityOpt ***REMOVED***
+func (daemon *Daemon) generateSecurityOpt(hostConfig *containertypes.HostConfig) ([]string, error) {
+	for _, opt := range hostConfig.SecurityOpt {
 		con := strings.Split(opt, "=")
-		if con[0] == "label" ***REMOVED***
+		if con[0] == "label" {
 			// Caller overrode SecurityOpts
 			return nil, nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	ipcMode := hostConfig.IpcMode
 	pidMode := hostConfig.PidMode
 	privileged := hostConfig.Privileged
-	if ipcMode.IsHost() || pidMode.IsHost() || privileged ***REMOVED***
+	if ipcMode.IsHost() || pidMode.IsHost() || privileged {
 		return toHostConfigSelinuxLabels(label.DisableSecOpt()), nil
-	***REMOVED***
+	}
 
 	var ipcLabel []string
 	var pidLabel []string
 	ipcContainer := ipcMode.Container()
 	pidContainer := pidMode.Container()
-	if ipcContainer != "" ***REMOVED***
+	if ipcContainer != "" {
 		c, err := daemon.GetContainer(ipcContainer)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		ipcLabel = label.DupSecOpt(c.ProcessLabel)
-		if pidContainer == "" ***REMOVED***
+		if pidContainer == "" {
 			return toHostConfigSelinuxLabels(ipcLabel), err
-		***REMOVED***
-	***REMOVED***
-	if pidContainer != "" ***REMOVED***
+		}
+	}
+	if pidContainer != "" {
 		c, err := daemon.GetContainer(pidContainer)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 
 		pidLabel = label.DupSecOpt(c.ProcessLabel)
-		if ipcContainer == "" ***REMOVED***
+		if ipcContainer == "" {
 			return toHostConfigSelinuxLabels(pidLabel), err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if pidLabel != nil && ipcLabel != nil ***REMOVED***
-		for i := 0; i < len(pidLabel); i++ ***REMOVED***
-			if pidLabel[i] != ipcLabel[i] ***REMOVED***
+	if pidLabel != nil && ipcLabel != nil {
+		for i := 0; i < len(pidLabel); i++ {
+			if pidLabel[i] != ipcLabel[i] {
 				return nil, fmt.Errorf("--ipc and --pid containers SELinux labels aren't the same")
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		return toHostConfigSelinuxLabels(pidLabel), nil
-	***REMOVED***
+	}
 	return nil, nil
-***REMOVED***
+}
 
-func (daemon *Daemon) setRWLayer(container *container.Container) error ***REMOVED***
+func (daemon *Daemon) setRWLayer(container *container.Container) error {
 	var layerID layer.ChainID
-	if container.ImageID != "" ***REMOVED***
+	if container.ImageID != "" {
 		img, err := daemon.imageStore.Get(container.ImageID)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		layerID = img.RootFS.ChainID()
-	***REMOVED***
+	}
 
-	rwLayerOpts := &layer.CreateRWLayerOpts***REMOVED***
+	rwLayerOpts := &layer.CreateRWLayerOpts{
 		MountLabel: container.MountLabel,
 		InitFunc:   daemon.getLayerInit(),
 		StorageOpt: container.HostConfig.StorageOpt,
-	***REMOVED***
+	}
 
 	// Indexing by OS is safe here as validation of OS has already been performed in create() (the only
 	// caller), and guaranteed non-nil
 	rwLayer, err := daemon.layerStores[container.OS].CreateRWLayer(container.ID, layerID, rwLayerOpts)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	container.RWLayer = rwLayer
 
 	return nil
-***REMOVED***
+}
 
 // VolumeCreate creates a volume with the specified name, driver, and opts
 // This is called directly from the Engine API
-func (daemon *Daemon) VolumeCreate(name, driverName string, opts, labels map[string]string) (*types.Volume, error) ***REMOVED***
-	if name == "" ***REMOVED***
+func (daemon *Daemon) VolumeCreate(name, driverName string, opts, labels map[string]string) (*types.Volume, error) {
+	if name == "" {
 		name = stringid.GenerateNonCryptoID()
-	***REMOVED***
+	}
 
 	v, err := daemon.volumes.Create(name, driverName, opts, labels)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	daemon.LogVolumeEvent(v.Name(), "create", map[string]string***REMOVED***"driver": v.DriverName()***REMOVED***)
+	daemon.LogVolumeEvent(v.Name(), "create", map[string]string{"driver": v.DriverName()})
 	apiV := volumeToAPIType(v)
 	apiV.Mountpoint = v.Path()
 	return apiV, nil
-***REMOVED***
+}
 
-func (daemon *Daemon) mergeAndVerifyConfig(config *containertypes.Config, img *image.Image) error ***REMOVED***
-	if img != nil && img.Config != nil ***REMOVED***
-		if err := merge(config, img.Config); err != nil ***REMOVED***
+func (daemon *Daemon) mergeAndVerifyConfig(config *containertypes.Config, img *image.Image) error {
+	if img != nil && img.Config != nil {
+		if err := merge(config, img.Config); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	// Reset the Entrypoint if it is [""]
-	if len(config.Entrypoint) == 1 && config.Entrypoint[0] == "" ***REMOVED***
+	if len(config.Entrypoint) == 1 && config.Entrypoint[0] == "" {
 		config.Entrypoint = nil
-	***REMOVED***
-	if len(config.Entrypoint) == 0 && len(config.Cmd) == 0 ***REMOVED***
+	}
+	if len(config.Entrypoint) == 0 && len(config.Cmd) == 0 {
 		return fmt.Errorf("No command specified")
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // Checks if the client set configurations for more than one network while creating a container
 // Also checks if the IPAMConfig is valid
-func verifyNetworkingConfig(nwConfig *networktypes.NetworkingConfig) error ***REMOVED***
-	if nwConfig == nil || len(nwConfig.EndpointsConfig) == 0 ***REMOVED***
+func verifyNetworkingConfig(nwConfig *networktypes.NetworkingConfig) error {
+	if nwConfig == nil || len(nwConfig.EndpointsConfig) == 0 {
 		return nil
-	***REMOVED***
-	if len(nwConfig.EndpointsConfig) == 1 ***REMOVED***
-		for k, v := range nwConfig.EndpointsConfig ***REMOVED***
-			if v == nil ***REMOVED***
+	}
+	if len(nwConfig.EndpointsConfig) == 1 {
+		for k, v := range nwConfig.EndpointsConfig {
+			if v == nil {
 				return errdefs.InvalidParameter(errors.Errorf("no EndpointSettings for %s", k))
-			***REMOVED***
-			if v.IPAMConfig != nil ***REMOVED***
-				if v.IPAMConfig.IPv4Address != "" && net.ParseIP(v.IPAMConfig.IPv4Address).To4() == nil ***REMOVED***
+			}
+			if v.IPAMConfig != nil {
+				if v.IPAMConfig.IPv4Address != "" && net.ParseIP(v.IPAMConfig.IPv4Address).To4() == nil {
 					return errors.Errorf("invalid IPv4 address: %s", v.IPAMConfig.IPv4Address)
-				***REMOVED***
-				if v.IPAMConfig.IPv6Address != "" ***REMOVED***
+				}
+				if v.IPAMConfig.IPv6Address != "" {
 					n := net.ParseIP(v.IPAMConfig.IPv6Address)
 					// if the address is an invalid network address (ParseIP == nil) or if it is
 					// an IPv4 address (To4() != nil), then it is an invalid IPv6 address
-					if n == nil || n.To4() != nil ***REMOVED***
+					if n == nil || n.To4() != nil {
 						return errors.Errorf("invalid IPv6 address: %s", v.IPAMConfig.IPv6Address)
-					***REMOVED***
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
+					}
+				}
+			}
+		}
 		return nil
-	***REMOVED***
+	}
 	l := make([]string, 0, len(nwConfig.EndpointsConfig))
-	for k := range nwConfig.EndpointsConfig ***REMOVED***
+	for k := range nwConfig.EndpointsConfig {
 		l = append(l, k)
-	***REMOVED***
+	}
 	return errors.Errorf("Container cannot be connected to network endpoints: %s", strings.Join(l, ", "))
-***REMOVED***
+}

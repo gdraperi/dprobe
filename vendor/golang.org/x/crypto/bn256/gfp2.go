@@ -14,107 +14,107 @@ import (
 
 // gfP2 implements a field of size p² as a quadratic extension of the base
 // field where i²=-1.
-type gfP2 struct ***REMOVED***
+type gfP2 struct {
 	x, y *big.Int // value is xi+y.
-***REMOVED***
+}
 
-func newGFp2(pool *bnPool) *gfP2 ***REMOVED***
-	return &gfP2***REMOVED***pool.Get(), pool.Get()***REMOVED***
-***REMOVED***
+func newGFp2(pool *bnPool) *gfP2 {
+	return &gfP2{pool.Get(), pool.Get()}
+}
 
-func (e *gfP2) String() string ***REMOVED***
+func (e *gfP2) String() string {
 	x := new(big.Int).Mod(e.x, p)
 	y := new(big.Int).Mod(e.y, p)
 	return "(" + x.String() + "," + y.String() + ")"
-***REMOVED***
+}
 
-func (e *gfP2) Put(pool *bnPool) ***REMOVED***
+func (e *gfP2) Put(pool *bnPool) {
 	pool.Put(e.x)
 	pool.Put(e.y)
-***REMOVED***
+}
 
-func (e *gfP2) Set(a *gfP2) *gfP2 ***REMOVED***
+func (e *gfP2) Set(a *gfP2) *gfP2 {
 	e.x.Set(a.x)
 	e.y.Set(a.y)
 	return e
-***REMOVED***
+}
 
-func (e *gfP2) SetZero() *gfP2 ***REMOVED***
+func (e *gfP2) SetZero() *gfP2 {
 	e.x.SetInt64(0)
 	e.y.SetInt64(0)
 	return e
-***REMOVED***
+}
 
-func (e *gfP2) SetOne() *gfP2 ***REMOVED***
+func (e *gfP2) SetOne() *gfP2 {
 	e.x.SetInt64(0)
 	e.y.SetInt64(1)
 	return e
-***REMOVED***
+}
 
-func (e *gfP2) Minimal() ***REMOVED***
-	if e.x.Sign() < 0 || e.x.Cmp(p) >= 0 ***REMOVED***
+func (e *gfP2) Minimal() {
+	if e.x.Sign() < 0 || e.x.Cmp(p) >= 0 {
 		e.x.Mod(e.x, p)
-	***REMOVED***
-	if e.y.Sign() < 0 || e.y.Cmp(p) >= 0 ***REMOVED***
+	}
+	if e.y.Sign() < 0 || e.y.Cmp(p) >= 0 {
 		e.y.Mod(e.y, p)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (e *gfP2) IsZero() bool ***REMOVED***
+func (e *gfP2) IsZero() bool {
 	return e.x.Sign() == 0 && e.y.Sign() == 0
-***REMOVED***
+}
 
-func (e *gfP2) IsOne() bool ***REMOVED***
-	if e.x.Sign() != 0 ***REMOVED***
+func (e *gfP2) IsOne() bool {
+	if e.x.Sign() != 0 {
 		return false
-	***REMOVED***
+	}
 	words := e.y.Bits()
 	return len(words) == 1 && words[0] == 1
-***REMOVED***
+}
 
-func (e *gfP2) Conjugate(a *gfP2) *gfP2 ***REMOVED***
+func (e *gfP2) Conjugate(a *gfP2) *gfP2 {
 	e.y.Set(a.y)
 	e.x.Neg(a.x)
 	return e
-***REMOVED***
+}
 
-func (e *gfP2) Negative(a *gfP2) *gfP2 ***REMOVED***
+func (e *gfP2) Negative(a *gfP2) *gfP2 {
 	e.x.Neg(a.x)
 	e.y.Neg(a.y)
 	return e
-***REMOVED***
+}
 
-func (e *gfP2) Add(a, b *gfP2) *gfP2 ***REMOVED***
+func (e *gfP2) Add(a, b *gfP2) *gfP2 {
 	e.x.Add(a.x, b.x)
 	e.y.Add(a.y, b.y)
 	return e
-***REMOVED***
+}
 
-func (e *gfP2) Sub(a, b *gfP2) *gfP2 ***REMOVED***
+func (e *gfP2) Sub(a, b *gfP2) *gfP2 {
 	e.x.Sub(a.x, b.x)
 	e.y.Sub(a.y, b.y)
 	return e
-***REMOVED***
+}
 
-func (e *gfP2) Double(a *gfP2) *gfP2 ***REMOVED***
+func (e *gfP2) Double(a *gfP2) *gfP2 {
 	e.x.Lsh(a.x, 1)
 	e.y.Lsh(a.y, 1)
 	return e
-***REMOVED***
+}
 
-func (c *gfP2) Exp(a *gfP2, power *big.Int, pool *bnPool) *gfP2 ***REMOVED***
+func (c *gfP2) Exp(a *gfP2, power *big.Int, pool *bnPool) *gfP2 {
 	sum := newGFp2(pool)
 	sum.SetOne()
 	t := newGFp2(pool)
 
-	for i := power.BitLen() - 1; i >= 0; i-- ***REMOVED***
+	for i := power.BitLen() - 1; i >= 0; i-- {
 		t.Square(sum, pool)
-		if power.Bit(i) != 0 ***REMOVED***
+		if power.Bit(i) != 0 {
 			sum.Mul(t, a, pool)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			sum.Set(t)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	c.Set(sum)
 
@@ -122,11 +122,11 @@ func (c *gfP2) Exp(a *gfP2, power *big.Int, pool *bnPool) *gfP2 ***REMOVED***
 	t.Put(pool)
 
 	return c
-***REMOVED***
+}
 
 // See "Multiplication and Squaring in Pairing-Friendly Fields",
 // http://eprint.iacr.org/2006/471.pdf
-func (e *gfP2) Mul(a, b *gfP2, pool *bnPool) *gfP2 ***REMOVED***
+func (e *gfP2) Mul(a, b *gfP2, pool *bnPool) *gfP2 {
 	tx := pool.Get().Mul(a.x, b.y)
 	t := pool.Get().Mul(b.x, a.y)
 	tx.Add(tx, t)
@@ -143,16 +143,16 @@ func (e *gfP2) Mul(a, b *gfP2, pool *bnPool) *gfP2 ***REMOVED***
 	pool.Put(t)
 
 	return e
-***REMOVED***
+}
 
-func (e *gfP2) MulScalar(a *gfP2, b *big.Int) *gfP2 ***REMOVED***
+func (e *gfP2) MulScalar(a *gfP2, b *big.Int) *gfP2 {
 	e.x.Mul(a.x, b)
 	e.y.Mul(a.y, b)
 	return e
-***REMOVED***
+}
 
 // MulXi sets e=ξa where ξ=i+3 and then returns e.
-func (e *gfP2) MulXi(a *gfP2, pool *bnPool) *gfP2 ***REMOVED***
+func (e *gfP2) MulXi(a *gfP2, pool *bnPool) *gfP2 {
 	// (xi+y)(i+3) = (3x+y)i+(3y-x)
 	tx := pool.Get().Lsh(a.x, 1)
 	tx.Add(tx, a.x)
@@ -169,9 +169,9 @@ func (e *gfP2) MulXi(a *gfP2, pool *bnPool) *gfP2 ***REMOVED***
 	pool.Put(ty)
 
 	return e
-***REMOVED***
+}
 
-func (e *gfP2) Square(a *gfP2, pool *bnPool) *gfP2 ***REMOVED***
+func (e *gfP2) Square(a *gfP2, pool *bnPool) *gfP2 {
 	// Complex squaring algorithm:
 	// (xi+b)² = (x+y)(y-x) + 2*i*x*y
 	t1 := pool.Get().Sub(a.y, a.x)
@@ -190,9 +190,9 @@ func (e *gfP2) Square(a *gfP2, pool *bnPool) *gfP2 ***REMOVED***
 	pool.Put(ty)
 
 	return e
-***REMOVED***
+}
 
-func (e *gfP2) Invert(a *gfP2, pool *bnPool) *gfP2 ***REMOVED***
+func (e *gfP2) Invert(a *gfP2, pool *bnPool) *gfP2 {
 	// See "Implementing cryptographic pairings", M. Scott, section 3.2.
 	// ftp://136.206.11.249/pub/crypto/pairings.pdf
 	t := pool.Get()
@@ -216,4 +216,4 @@ func (e *gfP2) Invert(a *gfP2, pool *bnPool) *gfP2 ***REMOVED***
 	pool.Put(inv)
 
 	return e
-***REMOVED***
+}

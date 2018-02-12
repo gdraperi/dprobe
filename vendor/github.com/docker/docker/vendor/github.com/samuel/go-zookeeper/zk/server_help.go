@@ -10,110 +10,110 @@ import (
 	"time"
 )
 
-type TestServer struct ***REMOVED***
+type TestServer struct {
 	Port int
 	Path string
 	Srv  *Server
-***REMOVED***
+}
 
-type TestCluster struct ***REMOVED***
+type TestCluster struct {
 	Path    string
 	Servers []TestServer
-***REMOVED***
+}
 
-func StartTestCluster(size int, stdout, stderr io.Writer) (*TestCluster, error) ***REMOVED***
+func StartTestCluster(size int, stdout, stderr io.Writer) (*TestCluster, error) {
 	tmpPath, err := ioutil.TempDir("", "gozk")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	success := false
 	startPort := int(rand.Int31n(6000) + 10000)
-	cluster := &TestCluster***REMOVED***Path: tmpPath***REMOVED***
-	defer func() ***REMOVED***
-		if !success ***REMOVED***
+	cluster := &TestCluster{Path: tmpPath}
+	defer func() {
+		if !success {
 			cluster.Stop()
-		***REMOVED***
-	***REMOVED***()
-	for serverN := 0; serverN < size; serverN++ ***REMOVED***
+		}
+	}()
+	for serverN := 0; serverN < size; serverN++ {
 		srvPath := filepath.Join(tmpPath, fmt.Sprintf("srv%d", serverN))
-		if err := os.Mkdir(srvPath, 0700); err != nil ***REMOVED***
+		if err := os.Mkdir(srvPath, 0700); err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		port := startPort + serverN*3
-		cfg := ServerConfig***REMOVED***
+		cfg := ServerConfig{
 			ClientPort: port,
 			DataDir:    srvPath,
-		***REMOVED***
-		for i := 0; i < size; i++ ***REMOVED***
-			cfg.Servers = append(cfg.Servers, ServerConfigServer***REMOVED***
+		}
+		for i := 0; i < size; i++ {
+			cfg.Servers = append(cfg.Servers, ServerConfigServer{
 				ID:                 i + 1,
 				Host:               "127.0.0.1",
 				PeerPort:           startPort + i*3 + 1,
 				LeaderElectionPort: startPort + i*3 + 2,
-			***REMOVED***)
-		***REMOVED***
+			})
+		}
 		cfgPath := filepath.Join(srvPath, "zoo.cfg")
 		fi, err := os.Create(cfgPath)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		err = cfg.Marshall(fi)
 		fi.Close()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 
 		fi, err = os.Create(filepath.Join(srvPath, "myid"))
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		_, err = fmt.Fprintf(fi, "%d\n", serverN+1)
 		fi.Close()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 
-		srv := &Server***REMOVED***
+		srv := &Server{
 			ConfigPath: cfgPath,
 			Stdout:     stdout,
 			Stderr:     stderr,
-		***REMOVED***
-		if err := srv.Start(); err != nil ***REMOVED***
+		}
+		if err := srv.Start(); err != nil {
 			return nil, err
-		***REMOVED***
-		cluster.Servers = append(cluster.Servers, TestServer***REMOVED***
+		}
+		cluster.Servers = append(cluster.Servers, TestServer{
 			Path: srvPath,
 			Port: cfg.ClientPort,
 			Srv:  srv,
-		***REMOVED***)
-	***REMOVED***
+		})
+	}
 	success = true
 	time.Sleep(time.Second) // Give the server time to become active. Should probably actually attempt to connect to verify.
 	return cluster, nil
-***REMOVED***
+}
 
-func (ts *TestCluster) Connect(idx int) (*Conn, error) ***REMOVED***
-	zk, _, err := Connect([]string***REMOVED***fmt.Sprintf("127.0.0.1:%d", ts.Servers[idx].Port)***REMOVED***, time.Second*15)
+func (ts *TestCluster) Connect(idx int) (*Conn, error) {
+	zk, _, err := Connect([]string{fmt.Sprintf("127.0.0.1:%d", ts.Servers[idx].Port)}, time.Second*15)
 	return zk, err
-***REMOVED***
+}
 
-func (ts *TestCluster) ConnectAll() (*Conn, <-chan Event, error) ***REMOVED***
+func (ts *TestCluster) ConnectAll() (*Conn, <-chan Event, error) {
 	return ts.ConnectAllTimeout(time.Second * 15)
-***REMOVED***
+}
 
-func (ts *TestCluster) ConnectAllTimeout(sessionTimeout time.Duration) (*Conn, <-chan Event, error) ***REMOVED***
+func (ts *TestCluster) ConnectAllTimeout(sessionTimeout time.Duration) (*Conn, <-chan Event, error) {
 	hosts := make([]string, len(ts.Servers))
-	for i, srv := range ts.Servers ***REMOVED***
+	for i, srv := range ts.Servers {
 		hosts[i] = fmt.Sprintf("127.0.0.1:%d", srv.Port)
-	***REMOVED***
+	}
 	zk, ch, err := Connect(hosts, sessionTimeout)
 	return zk, ch, err
-***REMOVED***
+}
 
-func (ts *TestCluster) Stop() error ***REMOVED***
-	for _, srv := range ts.Servers ***REMOVED***
+func (ts *TestCluster) Stop() error {
+	for _, srv := range ts.Servers {
 		srv.Srv.Stop()
-	***REMOVED***
+	}
 	defer os.RemoveAll(ts.Path)
 	return nil
-***REMOVED***
+}

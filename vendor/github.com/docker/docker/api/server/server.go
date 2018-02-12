@@ -18,107 +18,107 @@ import (
 
 // versionMatcher defines a variable matcher to be parsed by the router
 // when a request is about to be served.
-const versionMatcher = "/v***REMOVED***version:[0-9.]+***REMOVED***"
+const versionMatcher = "/v{version:[0-9.]+}"
 
 // Config provides the configuration for the API server
-type Config struct ***REMOVED***
+type Config struct {
 	Logging     bool
 	CorsHeaders string
 	Version     string
 	SocketGroup string
 	TLSConfig   *tls.Config
-***REMOVED***
+}
 
 // Server contains instance details for the server
-type Server struct ***REMOVED***
+type Server struct {
 	cfg           *Config
 	servers       []*HTTPServer
 	routers       []router.Router
 	routerSwapper *routerSwapper
 	middlewares   []middleware.Middleware
-***REMOVED***
+}
 
 // New returns a new instance of the server based on the specified configuration.
 // It allocates resources which will be needed for ServeAPI(ports, unix-sockets).
-func New(cfg *Config) *Server ***REMOVED***
-	return &Server***REMOVED***
+func New(cfg *Config) *Server {
+	return &Server{
 		cfg: cfg,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // UseMiddleware appends a new middleware to the request chain.
 // This needs to be called before the API routes are configured.
-func (s *Server) UseMiddleware(m middleware.Middleware) ***REMOVED***
+func (s *Server) UseMiddleware(m middleware.Middleware) {
 	s.middlewares = append(s.middlewares, m)
-***REMOVED***
+}
 
 // Accept sets a listener the server accepts connections into.
-func (s *Server) Accept(addr string, listeners ...net.Listener) ***REMOVED***
-	for _, listener := range listeners ***REMOVED***
-		httpServer := &HTTPServer***REMOVED***
-			srv: &http.Server***REMOVED***
+func (s *Server) Accept(addr string, listeners ...net.Listener) {
+	for _, listener := range listeners {
+		httpServer := &HTTPServer{
+			srv: &http.Server{
 				Addr: addr,
-			***REMOVED***,
+			},
 			l: listener,
-		***REMOVED***
+		}
 		s.servers = append(s.servers, httpServer)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Close closes servers and thus stop receiving requests
-func (s *Server) Close() ***REMOVED***
-	for _, srv := range s.servers ***REMOVED***
-		if err := srv.Close(); err != nil ***REMOVED***
+func (s *Server) Close() {
+	for _, srv := range s.servers {
+		if err := srv.Close(); err != nil {
 			logrus.Error(err)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // serveAPI loops through all initialized servers and spawns goroutine
 // with Serve method for each. It sets createMux() as Handler also.
-func (s *Server) serveAPI() error ***REMOVED***
+func (s *Server) serveAPI() error {
 	var chErrors = make(chan error, len(s.servers))
-	for _, srv := range s.servers ***REMOVED***
+	for _, srv := range s.servers {
 		srv.srv.Handler = s.routerSwapper
-		go func(srv *HTTPServer) ***REMOVED***
+		go func(srv *HTTPServer) {
 			var err error
 			logrus.Infof("API listen on %s", srv.l.Addr())
-			if err = srv.Serve(); err != nil && strings.Contains(err.Error(), "use of closed network connection") ***REMOVED***
+			if err = srv.Serve(); err != nil && strings.Contains(err.Error(), "use of closed network connection") {
 				err = nil
-			***REMOVED***
+			}
 			chErrors <- err
-		***REMOVED***(srv)
-	***REMOVED***
+		}(srv)
+	}
 
-	for range s.servers ***REMOVED***
+	for range s.servers {
 		err := <-chErrors
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
 // HTTPServer contains an instance of http server and the listener.
 // srv *http.Server, contains configuration to create an http server and a mux router with all api end points.
 // l   net.Listener, is a TCP or Socket listener that dispatches incoming request to the router.
-type HTTPServer struct ***REMOVED***
+type HTTPServer struct {
 	srv *http.Server
 	l   net.Listener
-***REMOVED***
+}
 
 // Serve starts listening for inbound requests.
-func (s *HTTPServer) Serve() error ***REMOVED***
+func (s *HTTPServer) Serve() error {
 	return s.srv.Serve(s.l)
-***REMOVED***
+}
 
 // Close closes the HTTPServer from listening for the inbound requests.
-func (s *HTTPServer) Close() error ***REMOVED***
+func (s *HTTPServer) Close() error {
 	return s.l.Close()
-***REMOVED***
+}
 
-func (s *Server) makeHTTPHandler(handler httputils.APIFunc) http.HandlerFunc ***REMOVED***
-	return func(w http.ResponseWriter, r *http.Request) ***REMOVED***
+func (s *Server) makeHTTPHandler(handler httputils.APIFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		// Define the context that we'll pass around to share info
 		// like the docker-request-id.
 		//
@@ -130,76 +130,76 @@ func (s *Server) makeHTTPHandler(handler httputils.APIFunc) http.HandlerFunc ***
 		handlerFunc := s.handlerWithGlobalMiddlewares(handler)
 
 		vars := mux.Vars(r)
-		if vars == nil ***REMOVED***
+		if vars == nil {
 			vars = make(map[string]string)
-		***REMOVED***
+		}
 
-		if err := handlerFunc(ctx, w, r, vars); err != nil ***REMOVED***
+		if err := handlerFunc(ctx, w, r, vars); err != nil {
 			statusCode := httputils.GetHTTPErrorStatusCode(err)
-			if statusCode >= 500 ***REMOVED***
+			if statusCode >= 500 {
 				logrus.Errorf("Handler for %s %s returned error: %v", r.Method, r.URL.Path, err)
-			***REMOVED***
+			}
 			httputils.MakeErrorHandler(err)(w, r)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // InitRouter initializes the list of routers for the server.
 // This method also enables the Go profiler if enableProfiler is true.
-func (s *Server) InitRouter(routers ...router.Router) ***REMOVED***
+func (s *Server) InitRouter(routers ...router.Router) {
 	s.routers = append(s.routers, routers...)
 
 	m := s.createMux()
-	s.routerSwapper = &routerSwapper***REMOVED***
+	s.routerSwapper = &routerSwapper{
 		router: m,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type pageNotFoundError struct***REMOVED******REMOVED***
+type pageNotFoundError struct{}
 
-func (pageNotFoundError) Error() string ***REMOVED***
+func (pageNotFoundError) Error() string {
 	return "page not found"
-***REMOVED***
+}
 
-func (pageNotFoundError) NotFound() ***REMOVED******REMOVED***
+func (pageNotFoundError) NotFound() {}
 
 // createMux initializes the main router the server uses.
-func (s *Server) createMux() *mux.Router ***REMOVED***
+func (s *Server) createMux() *mux.Router {
 	m := mux.NewRouter()
 
 	logrus.Debug("Registering routers")
-	for _, apiRouter := range s.routers ***REMOVED***
-		for _, r := range apiRouter.Routes() ***REMOVED***
+	for _, apiRouter := range s.routers {
+		for _, r := range apiRouter.Routes() {
 			f := s.makeHTTPHandler(r.Handler())
 
 			logrus.Debugf("Registering %s, %s", r.Method(), r.Path())
 			m.Path(versionMatcher + r.Path()).Methods(r.Method()).Handler(f)
 			m.Path(r.Path()).Methods(r.Method()).Handler(f)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	debugRouter := debug.NewRouter()
 	s.routers = append(s.routers, debugRouter)
-	for _, r := range debugRouter.Routes() ***REMOVED***
+	for _, r := range debugRouter.Routes() {
 		f := s.makeHTTPHandler(r.Handler())
 		m.Path("/debug" + r.Path()).Handler(f)
-	***REMOVED***
+	}
 
-	notFoundHandler := httputils.MakeErrorHandler(pageNotFoundError***REMOVED******REMOVED***)
-	m.HandleFunc(versionMatcher+"/***REMOVED***path:.****REMOVED***", notFoundHandler)
+	notFoundHandler := httputils.MakeErrorHandler(pageNotFoundError{})
+	m.HandleFunc(versionMatcher+"/{path:.*}", notFoundHandler)
 	m.NotFoundHandler = notFoundHandler
 
 	return m
-***REMOVED***
+}
 
 // Wait blocks the server goroutine until it exits.
 // It sends an error message if there is any error during
 // the API execution.
-func (s *Server) Wait(waitChan chan error) ***REMOVED***
-	if err := s.serveAPI(); err != nil ***REMOVED***
+func (s *Server) Wait(waitChan chan error) {
+	if err := s.serveAPI(); err != nil {
 		logrus.Errorf("ServeAPI error: %v", err)
 		waitChan <- err
 		return
-	***REMOVED***
+	}
 	waitChan <- nil
-***REMOVED***
+}

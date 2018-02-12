@@ -14,90 +14,90 @@ import (
 	"golang.org/x/text/transform"
 )
 
-type testCase struct ***REMOVED***
+type testCase struct {
 	input  string
 	output string
 	err    error
-***REMOVED***
+}
 
-func doTests(t *testing.T, fn func(t *testing.T, p *Profile, tc testCase)) ***REMOVED***
-	for _, g := range enforceTestCases ***REMOVED***
-		for i, tc := range g.cases ***REMOVED***
+func doTests(t *testing.T, fn func(t *testing.T, p *Profile, tc testCase)) {
+	for _, g := range enforceTestCases {
+		for i, tc := range g.cases {
 			name := fmt.Sprintf("%s:%d:%+q", g.name, i, tc.input)
-			testtext.Run(t, name, func(t *testing.T) ***REMOVED***
+			testtext.Run(t, name, func(t *testing.T) {
 				fn(t, g.p, tc)
-			***REMOVED***)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			})
+		}
+	}
+}
 
-func TestString(t *testing.T) ***REMOVED***
-	doTests(t, func(t *testing.T, p *Profile, tc testCase) ***REMOVED***
-		if e, err := p.String(tc.input); tc.err != err || e != tc.output ***REMOVED***
+func TestString(t *testing.T) {
+	doTests(t, func(t *testing.T, p *Profile, tc testCase) {
+		if e, err := p.String(tc.input); tc.err != err || e != tc.output {
 			t.Errorf("got %+q (err: %v); want %+q (err: %v)", e, err, tc.output, tc.err)
-		***REMOVED***
-	***REMOVED***)
-***REMOVED***
+		}
+	})
+}
 
-func TestBytes(t *testing.T) ***REMOVED***
-	doTests(t, func(t *testing.T, p *Profile, tc testCase) ***REMOVED***
-		if e, err := p.Bytes([]byte(tc.input)); tc.err != err || string(e) != tc.output ***REMOVED***
+func TestBytes(t *testing.T) {
+	doTests(t, func(t *testing.T, p *Profile, tc testCase) {
+		if e, err := p.Bytes([]byte(tc.input)); tc.err != err || string(e) != tc.output {
 			t.Errorf("got %+q (err: %v); want %+q (err: %v)", string(e), err, tc.output, tc.err)
-		***REMOVED***
-	***REMOVED***)
+		}
+	})
 
-	t.Run("Copy", func(t *testing.T) ***REMOVED***
+	t.Run("Copy", func(t *testing.T) {
 		// Test that calling Bytes with something that doesn't transform returns a
 		// copy.
 		orig := []byte("hello")
 		b, _ := NewFreeform().Bytes(orig)
-		if reflect.ValueOf(b).Pointer() == reflect.ValueOf(orig).Pointer() ***REMOVED***
+		if reflect.ValueOf(b).Pointer() == reflect.ValueOf(orig).Pointer() {
 			t.Error("original and result are the same slice; should be a copy")
-		***REMOVED***
-	***REMOVED***)
-***REMOVED***
+		}
+	})
+}
 
-func TestAppend(t *testing.T) ***REMOVED***
-	doTests(t, func(t *testing.T, p *Profile, tc testCase) ***REMOVED***
-		if e, err := p.Append(nil, []byte(tc.input)); tc.err != err || string(e) != tc.output ***REMOVED***
+func TestAppend(t *testing.T) {
+	doTests(t, func(t *testing.T, p *Profile, tc testCase) {
+		if e, err := p.Append(nil, []byte(tc.input)); tc.err != err || string(e) != tc.output {
 			t.Errorf("got %+q (err: %v); want %+q (err: %v)", string(e), err, tc.output, tc.err)
-		***REMOVED***
-	***REMOVED***)
-***REMOVED***
+		}
+	})
+}
 
-func TestStringMallocs(t *testing.T) ***REMOVED***
-	if n := testtext.AllocsPerRun(100, func() ***REMOVED*** UsernameCaseMapped.String("helloworld") ***REMOVED***); n > 0 ***REMOVED***
+func TestStringMallocs(t *testing.T) {
+	if n := testtext.AllocsPerRun(100, func() { UsernameCaseMapped.String("helloworld") }); n > 0 {
 		// TODO: reduce this to 0.
 		t.Skipf("got %f allocs, want 0", n)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestAppendMallocs(t *testing.T) ***REMOVED***
+func TestAppendMallocs(t *testing.T) {
 	str := []byte("helloworld")
 	out := make([]byte, 0, len(str))
-	if n := testtext.AllocsPerRun(100, func() ***REMOVED*** UsernameCaseMapped.Append(out, str) ***REMOVED***); n > 0 ***REMOVED***
+	if n := testtext.AllocsPerRun(100, func() { UsernameCaseMapped.Append(out, str) }); n > 0 {
 		t.Errorf("got %f allocs, want 0", n)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestTransformMallocs(t *testing.T) ***REMOVED***
+func TestTransformMallocs(t *testing.T) {
 	str := []byte("helloworld")
 	out := make([]byte, 0, len(str))
 	tr := UsernameCaseMapped.NewTransformer()
-	if n := testtext.AllocsPerRun(100, func() ***REMOVED***
+	if n := testtext.AllocsPerRun(100, func() {
 		tr.Reset()
 		tr.Transform(out, str, true)
-	***REMOVED***); n > 0 ***REMOVED***
+	}); n > 0 {
 		t.Errorf("got %f allocs, want 0", n)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func min(a, b int) int ***REMOVED***
-	if a < b ***REMOVED***
+func min(a, b int) int {
+	if a < b {
 		return a
-	***REMOVED***
+	}
 	return b
-***REMOVED***
+}
 
 // TestTransformerShortBuffers tests that the precis.Transformer implements the
 // spirit, not just the letter (the method signatures), of the
@@ -107,7 +107,7 @@ func min(a, b int) int ***REMOVED***
 // short, so that multiple Transform calls are required to complete the overall
 // transformation, the end result is identical to one Transform call with
 // sufficiently long buffers.
-func TestTransformerShortBuffers(t *testing.T) ***REMOVED***
+func TestTransformerShortBuffers(t *testing.T) {
 	srcUnit := []byte("a\u0300cce\u0301nts") // NFD normalization form.
 	wantUnit := []byte("àccénts")            // NFC normalization form.
 	src := bytes.Repeat(srcUnit, 16)
@@ -118,45 +118,45 @@ func TestTransformerShortBuffers(t *testing.T) ***REMOVED***
 	// 5, 7, 9, 11, 13, 16 and 17 are all pair-wise co-prime, which means that
 	// slicing the dst and src buffers into 5, 7, 13 and 17 byte chunks will
 	// fall at different places inside the repeated srcUnit's and wantUnit's.
-	if len(srcUnit) != 11 || len(wantUnit) != 9 || len(src) > long || len(want) > long ***REMOVED***
+	if len(srcUnit) != 11 || len(wantUnit) != 9 || len(src) > long || len(want) > long {
 		t.Fatal("inconsistent lengths")
-	***REMOVED***
+	}
 
 	tr := NewFreeform().NewTransformer()
-	for _, deltaD := range []int***REMOVED***5, 7, 13, 17, long***REMOVED*** ***REMOVED***
+	for _, deltaD := range []int{5, 7, 13, 17, long} {
 	loop:
-		for _, deltaS := range []int***REMOVED***5, 7, 13, 17, long***REMOVED*** ***REMOVED***
+		for _, deltaS := range []int{5, 7, 13, 17, long} {
 			tr.Reset()
 			d0 := 0
 			s0 := 0
-			for ***REMOVED***
+			for {
 				d1 := min(len(dst), d0+deltaD)
 				s1 := min(len(src), s0+deltaS)
 				nDst, nSrc, err := tr.Transform(dst[d0:d1:d1], src[s0:s1:s1], s1 == len(src))
 				d0 += nDst
 				s0 += nSrc
-				if err == nil ***REMOVED***
+				if err == nil {
 					break
-				***REMOVED***
-				if err == transform.ErrShortDst || err == transform.ErrShortSrc ***REMOVED***
+				}
+				if err == transform.ErrShortDst || err == transform.ErrShortSrc {
 					continue
-				***REMOVED***
+				}
 				t.Errorf("deltaD=%d, deltaS=%d: %v", deltaD, deltaS, err)
 				continue loop
-			***REMOVED***
-			if s0 != len(src) ***REMOVED***
+			}
+			if s0 != len(src) {
 				t.Errorf("deltaD=%d, deltaS=%d: s0: got %d, want %d", deltaD, deltaS, s0, len(src))
 				continue
-			***REMOVED***
-			if d0 != len(want) ***REMOVED***
+			}
+			if d0 != len(want) {
 				t.Errorf("deltaD=%d, deltaS=%d: d0: got %d, want %d", deltaD, deltaS, d0, len(want))
 				continue
-			***REMOVED***
+			}
 			got := dst[:d0]
-			if !bytes.Equal(got, want) ***REMOVED***
+			if !bytes.Equal(got, want) {
 				t.Errorf("deltaD=%d, deltaS=%d:\ngot  %q\nwant %q", deltaD, deltaS, got, want)
 				continue
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}

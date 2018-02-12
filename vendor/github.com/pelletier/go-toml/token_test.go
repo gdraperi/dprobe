@@ -2,66 +2,66 @@ package toml
 
 import "testing"
 
-func TestTokenStringer(t *testing.T) ***REMOVED***
-	var tests = []struct ***REMOVED***
+func TestTokenStringer(t *testing.T) {
+	var tests = []struct {
 		tt     tokenType
 		expect string
-	***REMOVED******REMOVED***
-		***REMOVED***tokenError, "Error"***REMOVED***,
-		***REMOVED***tokenEOF, "EOF"***REMOVED***,
-		***REMOVED***tokenComment, "Comment"***REMOVED***,
-		***REMOVED***tokenKey, "Key"***REMOVED***,
-		***REMOVED***tokenString, "String"***REMOVED***,
-		***REMOVED***tokenInteger, "Integer"***REMOVED***,
-		***REMOVED***tokenTrue, "True"***REMOVED***,
-		***REMOVED***tokenFalse, "False"***REMOVED***,
-		***REMOVED***tokenFloat, "Float"***REMOVED***,
-		***REMOVED***tokenEqual, "="***REMOVED***,
-		***REMOVED***tokenLeftBracket, "["***REMOVED***,
-		***REMOVED***tokenRightBracket, "]"***REMOVED***,
-		***REMOVED***tokenLeftCurlyBrace, "***REMOVED***"***REMOVED***,
-		***REMOVED***tokenRightCurlyBrace, "***REMOVED***"***REMOVED***,
-		***REMOVED***tokenLeftParen, "("***REMOVED***,
-		***REMOVED***tokenRightParen, ")"***REMOVED***,
-		***REMOVED***tokenDoubleLeftBracket, "]]"***REMOVED***,
-		***REMOVED***tokenDoubleRightBracket, "[["***REMOVED***,
-		***REMOVED***tokenDate, "Date"***REMOVED***,
-		***REMOVED***tokenKeyGroup, "KeyGroup"***REMOVED***,
-		***REMOVED***tokenKeyGroupArray, "KeyGroupArray"***REMOVED***,
-		***REMOVED***tokenComma, ","***REMOVED***,
-		***REMOVED***tokenColon, ":"***REMOVED***,
-		***REMOVED***tokenDollar, "$"***REMOVED***,
-		***REMOVED***tokenStar, "*"***REMOVED***,
-		***REMOVED***tokenQuestion, "?"***REMOVED***,
-		***REMOVED***tokenDot, "."***REMOVED***,
-		***REMOVED***tokenDotDot, ".."***REMOVED***,
-		***REMOVED***tokenEOL, "EOL"***REMOVED***,
-		***REMOVED***tokenEOL + 1, "Unknown"***REMOVED***,
-	***REMOVED***
+	}{
+		{tokenError, "Error"},
+		{tokenEOF, "EOF"},
+		{tokenComment, "Comment"},
+		{tokenKey, "Key"},
+		{tokenString, "String"},
+		{tokenInteger, "Integer"},
+		{tokenTrue, "True"},
+		{tokenFalse, "False"},
+		{tokenFloat, "Float"},
+		{tokenEqual, "="},
+		{tokenLeftBracket, "["},
+		{tokenRightBracket, "]"},
+		{tokenLeftCurlyBrace, "{"},
+		{tokenRightCurlyBrace, "}"},
+		{tokenLeftParen, "("},
+		{tokenRightParen, ")"},
+		{tokenDoubleLeftBracket, "]]"},
+		{tokenDoubleRightBracket, "[["},
+		{tokenDate, "Date"},
+		{tokenKeyGroup, "KeyGroup"},
+		{tokenKeyGroupArray, "KeyGroupArray"},
+		{tokenComma, ","},
+		{tokenColon, ":"},
+		{tokenDollar, "$"},
+		{tokenStar, "*"},
+		{tokenQuestion, "?"},
+		{tokenDot, "."},
+		{tokenDotDot, ".."},
+		{tokenEOL, "EOL"},
+		{tokenEOL + 1, "Unknown"},
+	}
 
-	for i, test := range tests ***REMOVED***
+	for i, test := range tests {
 		got := test.tt.String()
-		if got != test.expect ***REMOVED***
+		if got != test.expect {
 			t.Errorf("[%d] invalid string of token type; got %q, expected %q", i, got, test.expect)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestTokenString(t *testing.T) ***REMOVED***
-	var tests = []struct ***REMOVED***
+func TestTokenString(t *testing.T) {
+	var tests = []struct {
 		tok    token
 		expect string
-	***REMOVED******REMOVED***
-		***REMOVED***token***REMOVED***Position***REMOVED***1, 1***REMOVED***, tokenEOF, ""***REMOVED***, "EOF"***REMOVED***,
-		***REMOVED***token***REMOVED***Position***REMOVED***1, 1***REMOVED***, tokenError, "Δt"***REMOVED***, "Δt"***REMOVED***,
-		***REMOVED***token***REMOVED***Position***REMOVED***1, 1***REMOVED***, tokenString, "bar"***REMOVED***, `"bar"`***REMOVED***,
-		***REMOVED***token***REMOVED***Position***REMOVED***1, 1***REMOVED***, tokenString, "123456789012345"***REMOVED***, `"123456789012345"`***REMOVED***,
-	***REMOVED***
+	}{
+		{token{Position{1, 1}, tokenEOF, ""}, "EOF"},
+		{token{Position{1, 1}, tokenError, "Δt"}, "Δt"},
+		{token{Position{1, 1}, tokenString, "bar"}, `"bar"`},
+		{token{Position{1, 1}, tokenString, "123456789012345"}, `"123456789012345"`},
+	}
 
-	for i, test := range tests ***REMOVED***
+	for i, test := range tests {
 		got := test.tok.String()
-		if got != test.expect ***REMOVED***
+		if got != test.expect {
 			t.Errorf("[%d] invalid of string token; got %q, expected %q", i, got, test.expect)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

@@ -629,10 +629,10 @@
 				<relative type="0">this month</relative>
 				<relative type="1">next month</relative>
 				<relativeTime type="future">
-					<relativeTimePattern count="other">+***REMOVED***0***REMOVED*** m</relativeTimePattern>
+					<relativeTimePattern count="other">+{0} m</relativeTimePattern>
 				</relativeTime>
 				<relativeTime type="past">
-					<relativeTimePattern count="other">-***REMOVED***0***REMOVED*** m</relativeTimePattern>
+					<relativeTimePattern count="other">-{0} m</relativeTimePattern>
 				</relativeTime>
 			</field>
 			<field type="month-short">

@@ -4,21 +4,21 @@ import (
 	"testing"
 )
 
-func TestFindExistingPackage(t *testing.T) ***REMOVED***
+func TestFindExistingPackage(t *testing.T) {
 	path := findPackage("github.com/spf13/cobra")
-	if path == "" ***REMOVED***
+	if path == "" {
 		t.Fatal("findPackage didn't find the existing package")
-	***REMOVED***
-	if !hasGoPathPrefix(path) ***REMOVED***
+	}
+	if !hasGoPathPrefix(path) {
 		t.Fatalf("%q is not in GOPATH, but must be", path)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func hasGoPathPrefix(path string) bool ***REMOVED***
-	for _, srcPath := range srcPaths ***REMOVED***
-		if filepathHasPrefix(path, srcPath) ***REMOVED***
+func hasGoPathPrefix(path string) bool {
+	for _, srcPath := range srcPaths {
+		if filepathHasPrefix(path, srcPath) {
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false
-***REMOVED***
+}

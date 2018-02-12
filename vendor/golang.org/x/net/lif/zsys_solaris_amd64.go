@@ -11,12 +11,12 @@ const (
 	sysSOCK_DGRAM = 0x1
 )
 
-type sockaddrStorage struct ***REMOVED***
+type sockaddrStorage struct {
 	Family     uint16
 	X_ss_pad1  [6]int8
 	X_ss_align float64
 	X_ss_pad2  [240]int8
-***REMOVED***
+}
 
 const (
 	sysLIFC_NOXMIT          = 0x1
@@ -65,36 +65,36 @@ const (
 	sizeofLifIfinfoReq = 0x10
 )
 
-type lifnum struct ***REMOVED***
+type lifnum struct {
 	Family    uint16
 	Pad_cgo_0 [2]byte
 	Flags     int32
 	Count     int32
-***REMOVED***
+}
 
-type lifreq struct ***REMOVED***
+type lifreq struct {
 	Name   [32]int8
 	Lifru1 [4]byte
 	Type   uint32
 	Lifru  [336]byte
-***REMOVED***
+}
 
-type lifconf struct ***REMOVED***
+type lifconf struct {
 	Family    uint16
 	Pad_cgo_0 [2]byte
 	Flags     int32
 	Len       int32
 	Pad_cgo_1 [4]byte
 	Lifcu     [8]byte
-***REMOVED***
+}
 
-type lifIfinfoReq struct ***REMOVED***
+type lifIfinfoReq struct {
 	Maxhops      uint8
 	Pad_cgo_0    [3]byte
 	Reachtime    uint32
 	Reachretrans uint32
 	Maxmtu       uint32
-***REMOVED***
+}
 
 const (
 	sysIFT_IPV4 = 0xc8

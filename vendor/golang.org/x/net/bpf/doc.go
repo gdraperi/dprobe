@@ -54,29 +54,29 @@ Examples
 
 This packet filter selects all ARP packets.
 
-	bpf.Assemble([]bpf.Instruction***REMOVED***
+	bpf.Assemble([]bpf.Instruction{
 		// Load "EtherType" field from the ethernet header.
-		bpf.LoadAbsolute***REMOVED***Off: 12, Size: 2***REMOVED***,
+		bpf.LoadAbsolute{Off: 12, Size: 2},
 		// Skip over the next instruction if EtherType is not ARP.
-		bpf.JumpIf***REMOVED***Cond: bpf.JumpNotEqual, Val: 0x0806, SkipTrue: 1***REMOVED***,
+		bpf.JumpIf{Cond: bpf.JumpNotEqual, Val: 0x0806, SkipTrue: 1},
 		// Verdict is "send up to 4k of the packet to userspace."
-		bpf.RetConstant***REMOVED***Val: 4096***REMOVED***,
+		bpf.RetConstant{Val: 4096},
 		// Verdict is "ignore packet."
-		bpf.RetConstant***REMOVED***Val: 0***REMOVED***,
-	***REMOVED***)
+		bpf.RetConstant{Val: 0},
+	})
 
 This packet filter captures a random 1% sample of traffic.
 
-	bpf.Assemble([]bpf.Instruction***REMOVED***
+	bpf.Assemble([]bpf.Instruction{
 		// Get a 32-bit random number from the Linux kernel.
-		bpf.LoadExtension***REMOVED***Num: bpf.ExtRand***REMOVED***,
+		bpf.LoadExtension{Num: bpf.ExtRand},
 		// 1% dice roll?
-		bpf.JumpIf***REMOVED***Cond: bpf.JumpLessThan, Val: 2^32/100, SkipFalse: 1***REMOVED***,
+		bpf.JumpIf{Cond: bpf.JumpLessThan, Val: 2^32/100, SkipFalse: 1},
 		// Capture.
-		bpf.RetConstant***REMOVED***Val: 4096***REMOVED***,
+		bpf.RetConstant{Val: 4096},
 		// Ignore.
-		bpf.RetConstant***REMOVED***Val: 0***REMOVED***,
-	***REMOVED***)
+		bpf.RetConstant{Val: 0},
+	})
 
 */
 package bpf // import "golang.org/x/net/bpf"

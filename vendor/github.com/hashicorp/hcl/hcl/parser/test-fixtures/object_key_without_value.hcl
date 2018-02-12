@@ -1,3 +1,3 @@
-foo ***REMOVED***
+foo {
   bar
-***REMOVED***
+}

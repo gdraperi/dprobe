@@ -10,19 +10,19 @@ import (
 )
 
 // PluginInspectWithRaw inspects an existing plugin
-func (cli *Client) PluginInspectWithRaw(ctx context.Context, name string) (*types.Plugin, []byte, error) ***REMOVED***
+func (cli *Client) PluginInspectWithRaw(ctx context.Context, name string) (*types.Plugin, []byte, error) {
 	resp, err := cli.get(ctx, "/plugins/"+name+"/json", nil, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, nil, wrapResponseError(err, resp, "plugin", name)
-	***REMOVED***
+	}
 
 	defer ensureReaderClosed(resp)
 	body, err := ioutil.ReadAll(resp.body)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 	var p types.Plugin
 	rdr := bytes.NewReader(body)
 	err = json.NewDecoder(rdr).Decode(&p)
 	return &p, body, err
-***REMOVED***
+}

@@ -17,68 +17,68 @@
 
 static int g_session_established = 0;
 
-OtrlPolicy policy(void *opdata, ConnContext *context) ***REMOVED***
+OtrlPolicy policy(void *opdata, ConnContext *context) {
   return OTRL_POLICY_ALWAYS;
-***REMOVED***
+}
 
 int is_logged_in(void *opdata, const char *accountname, const char *protocol,
-                 const char *recipient) ***REMOVED***
+                 const char *recipient) {
   return 1;
-***REMOVED***
+}
 
 void inject_message(void *opdata, const char *accountname, const char *protocol,
-                    const char *recipient, const char *message) ***REMOVED***
+                    const char *recipient, const char *message) {
   printf("%s\n", message);
   fflush(stdout);
   fprintf(stderr, "libotr helper sent: %s\n", message);
-***REMOVED***
+}
 
-void update_context_list(void *opdata) ***REMOVED******REMOVED***
+void update_context_list(void *opdata) {}
 
 void new_fingerprint(void *opdata, OtrlUserState us, const char *accountname,
                      const char *protocol, const char *username,
-                     unsigned char fingerprint[20]) ***REMOVED***
+                     unsigned char fingerprint[20]) {
   fprintf(stderr, "NEW FINGERPRINT\n");
   g_session_established = 1;
-***REMOVED***
+}
 
-void write_fingerprints(void *opdata) ***REMOVED******REMOVED***
+void write_fingerprints(void *opdata) {}
 
-void gone_secure(void *opdata, ConnContext *context) ***REMOVED******REMOVED***
+void gone_secure(void *opdata, ConnContext *context) {}
 
-void gone_insecure(void *opdata, ConnContext *context) ***REMOVED******REMOVED***
+void gone_insecure(void *opdata, ConnContext *context) {}
 
-void still_secure(void *opdata, ConnContext *context, int is_reply) ***REMOVED******REMOVED***
+void still_secure(void *opdata, ConnContext *context, int is_reply) {}
 
-int max_message_size(void *opdata, ConnContext *context) ***REMOVED*** return 99999; ***REMOVED***
+int max_message_size(void *opdata, ConnContext *context) { return 99999; }
 
 const char *account_name(void *opdata, const char *account,
-                         const char *protocol) ***REMOVED***
+                         const char *protocol) {
   return "ACCOUNT";
-***REMOVED***
+}
 
-void account_name_free(void *opdata, const char *account_name) ***REMOVED******REMOVED***
+void account_name_free(void *opdata, const char *account_name) {}
 
 const char *error_message(void *opdata, ConnContext *context,
-                          OtrlErrorCode err_code) ***REMOVED***
+                          OtrlErrorCode err_code) {
   return "ERR";
-***REMOVED***
+}
 
-void error_message_free(void *opdata, const char *msg) ***REMOVED******REMOVED***
+void error_message_free(void *opdata, const char *msg) {}
 
-void resent_msg_prefix_free(void *opdata, const char *prefix) ***REMOVED******REMOVED***
+void resent_msg_prefix_free(void *opdata, const char *prefix) {}
 
 void handle_smp_event(void *opdata, OtrlSMPEvent smp_event,
                       ConnContext *context, unsigned short progress_event,
-                      char *question) ***REMOVED******REMOVED***
+                      char *question) {}
 
 void handle_msg_event(void *opdata, OtrlMessageEvent msg_event,
                       ConnContext *context, const char *message,
-                      gcry_error_t err) ***REMOVED***
+                      gcry_error_t err) {
   fprintf(stderr, "msg event: %d %s\n", msg_event, message);
-***REMOVED***
+}
 
-OtrlMessageAppOps uiops = ***REMOVED***
+OtrlMessageAppOps uiops = {
     policy,
     NULL,
     is_logged_in,
@@ -103,7 +103,7 @@ OtrlMessageAppOps uiops = ***REMOVED***
     NULL /* convert_msg */,
     NULL /* convert_free */,
     NULL /* timer_control */,
-***REMOVED***;
+};
 
 static const char kPrivateKeyData[] =
     "(privkeys (account (name \"account\") (protocol proto) (private-key (dsa "
@@ -123,23 +123,23 @@ static const char kPrivateKeyData[] =
     "3C0FF501E3DC673B76D7BABF349009B6ECF#) (x "
     "#14D0345A3562C480A039E3C72764F72D79043216#)))))\n";
 
-int main() ***REMOVED***
+int main() {
   OTRL_INIT;
 
   // We have to write the private key information to a file because the libotr
   // API demands a filename to read from.
   const char *tmpdir = "/tmp";
-  if (getenv("TMP")) ***REMOVED***
+  if (getenv("TMP")) {
     tmpdir = getenv("TMP");
-  ***REMOVED***
+  }
 
   char private_key_file[256];
   snprintf(private_key_file, sizeof(private_key_file),
            "%s/libotr_test_helper_privatekeys-XXXXXX", tmpdir);
   int fd = mkstemp(private_key_file);
-  if (fd == -1) ***REMOVED***
+  if (fd == -1) {
     perror("creating temp file");
-  ***REMOVED***
+  }
   write(fd, kPrivateKeyData, sizeof(kPrivateKeyData) - 1);
   close(fd);
 
@@ -151,11 +151,11 @@ int main() ***REMOVED***
 
   char buf[4096];
 
-  for (;;) ***REMOVED***
+  for (;;) {
     char *message = fgets(buf, sizeof(buf), stdin);
-    if (strlen(message) == 0) ***REMOVED***
+    if (strlen(message) == 0) {
       break;
-***REMOVED***
+    }
     message[strlen(message) - 1] = 0;
     fprintf(stderr, "libotr helper got: %s\n", message);
 
@@ -164,11 +164,11 @@ int main() ***REMOVED***
     int ignore_message = otrl_message_receiving(
         userstate, &uiops, NULL, "account", "proto", "peer", message,
         &newmessage, &tlvs, NULL, NULL, NULL);
-    if (tlvs) ***REMOVED***
+    if (tlvs) {
       otrl_tlv_free(tlvs);
-***REMOVED***
+    }
 
-    if (newmessage != NULL) ***REMOVED***
+    if (newmessage != NULL) {
       fprintf(stderr, "libotr got: %s\n", newmessage);
       otrl_message_free(newmessage);
 
@@ -178,10 +178,10 @@ int main() ***REMOVED***
       err = otrl_message_sending(userstate, &uiops, NULL, "account", "proto",
                                  "peer", 0, "test message", NULL, &newmessage,
                                  OTRL_FRAGMENT_SEND_SKIP, NULL, NULL, NULL);
-      if (newmessage == NULL) ***REMOVED***
+      if (newmessage == NULL) {
         fprintf(stderr, "libotr didn't encrypt message\n");
         return 1;
-  ***REMOVED***
+      }
       write(1, newmessage, strlen(newmessage));
       write(1, "\n", 1);
       fprintf(stderr, "libotr sent: %s\n", newmessage);
@@ -190,8 +190,8 @@ int main() ***REMOVED***
       g_session_established = 0;
       write(1, "?OTRv2?\n", 8);
       fprintf(stderr, "libotr sent: ?OTRv2\n");
-***REMOVED***
-  ***REMOVED***
+    }
+  }
 
   return 0;
-***REMOVED***
+}

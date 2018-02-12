@@ -8,7 +8,7 @@ import "fmt"
 
 // WriteScheduler is the interface implemented by HTTP/2 write schedulers.
 // Methods are never called concurrently.
-type WriteScheduler interface ***REMOVED***
+type WriteScheduler interface {
 	// OpenStream opens a new stream in the write scheduler.
 	// It is illegal to call this with streamID=0 or with a streamID that is
 	// already open -- the call may panic.
@@ -34,17 +34,17 @@ type WriteScheduler interface ***REMOVED***
 	// be written. Frames with a given wr.StreamID() are Pop'd in the same
 	// order they are Push'd.
 	Pop() (wr FrameWriteRequest, ok bool)
-***REMOVED***
+}
 
 // OpenStreamOptions specifies extra options for WriteScheduler.OpenStream.
-type OpenStreamOptions struct ***REMOVED***
+type OpenStreamOptions struct {
 	// PusherID is zero if the stream was initiated by the client. Otherwise,
 	// PusherID names the stream that pushed the newly opened stream.
 	PusherID uint32
-***REMOVED***
+}
 
 // FrameWriteRequest is a request to write a frame.
-type FrameWriteRequest struct ***REMOVED***
+type FrameWriteRequest struct {
 	// write is the interface value that does the writing, once the
 	// WriteScheduler has selected this frame to write. The write
 	// functions are all defined in write.go.
@@ -58,32 +58,32 @@ type FrameWriteRequest struct ***REMOVED***
 	// 1 message and is sent the return value from write (or an
 	// earlier error) when the frame has been written.
 	done chan error
-***REMOVED***
+}
 
 // StreamID returns the id of the stream this frame will be written to.
 // 0 is used for non-stream frames such as PING and SETTINGS.
-func (wr FrameWriteRequest) StreamID() uint32 ***REMOVED***
-	if wr.stream == nil ***REMOVED***
-		if se, ok := wr.write.(StreamError); ok ***REMOVED***
+func (wr FrameWriteRequest) StreamID() uint32 {
+	if wr.stream == nil {
+		if se, ok := wr.write.(StreamError); ok {
 			// (*serverConn).resetStream doesn't set
 			// stream because it doesn't necessarily have
 			// one. So special case this type of write
 			// message.
 			return se.StreamID
-		***REMOVED***
+		}
 		return 0
-	***REMOVED***
+	}
 	return wr.stream.id
-***REMOVED***
+}
 
 // DataSize returns the number of flow control bytes that must be consumed
 // to write this entire frame. This is 0 for non-DATA frames.
-func (wr FrameWriteRequest) DataSize() int ***REMOVED***
-	if wd, ok := wr.write.(*writeData); ok ***REMOVED***
+func (wr FrameWriteRequest) DataSize() int {
+	if wd, ok := wr.write.(*writeData); ok {
 		return len(wd.p)
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
 // Consume consumes min(n, available) bytes from this frame, where available
 // is the number of flow control bytes available on the stream. Consume returns
@@ -95,148 +95,148 @@ func (wr FrameWriteRequest) DataSize() int ***REMOVED***
 // returns (consumed, rest, 2), where 'consumed' contains the consumed bytes and
 // 'rest' contains the remaining bytes. The consumed bytes are deducted from the
 // underlying stream's flow control budget.
-func (wr FrameWriteRequest) Consume(n int32) (FrameWriteRequest, FrameWriteRequest, int) ***REMOVED***
+func (wr FrameWriteRequest) Consume(n int32) (FrameWriteRequest, FrameWriteRequest, int) {
 	var empty FrameWriteRequest
 
 	// Non-DATA frames are always consumed whole.
 	wd, ok := wr.write.(*writeData)
-	if !ok || len(wd.p) == 0 ***REMOVED***
+	if !ok || len(wd.p) == 0 {
 		return wr, empty, 1
-	***REMOVED***
+	}
 
 	// Might need to split after applying limits.
 	allowed := wr.stream.flow.available()
-	if n < allowed ***REMOVED***
+	if n < allowed {
 		allowed = n
-	***REMOVED***
-	if wr.stream.sc.maxFrameSize < allowed ***REMOVED***
+	}
+	if wr.stream.sc.maxFrameSize < allowed {
 		allowed = wr.stream.sc.maxFrameSize
-	***REMOVED***
-	if allowed <= 0 ***REMOVED***
+	}
+	if allowed <= 0 {
 		return empty, empty, 0
-	***REMOVED***
-	if len(wd.p) > int(allowed) ***REMOVED***
+	}
+	if len(wd.p) > int(allowed) {
 		wr.stream.flow.take(allowed)
-		consumed := FrameWriteRequest***REMOVED***
+		consumed := FrameWriteRequest{
 			stream: wr.stream,
-			write: &writeData***REMOVED***
+			write: &writeData{
 				streamID: wd.streamID,
 				p:        wd.p[:allowed],
 				// Even if the original had endStream set, there
 				// are bytes remaining because len(wd.p) > allowed,
 				// so we know endStream is false.
 				endStream: false,
-			***REMOVED***,
+			},
 			// Our caller is blocking on the final DATA frame, not
 			// this intermediate frame, so no need to wait.
 			done: nil,
-		***REMOVED***
-		rest := FrameWriteRequest***REMOVED***
+		}
+		rest := FrameWriteRequest{
 			stream: wr.stream,
-			write: &writeData***REMOVED***
+			write: &writeData{
 				streamID:  wd.streamID,
 				p:         wd.p[allowed:],
 				endStream: wd.endStream,
-			***REMOVED***,
+			},
 			done: wr.done,
-		***REMOVED***
+		}
 		return consumed, rest, 2
-	***REMOVED***
+	}
 
 	// The frame is consumed whole.
 	// NB: This cast cannot overflow because allowed is <= math.MaxInt32.
 	wr.stream.flow.take(int32(len(wd.p)))
 	return wr, empty, 1
-***REMOVED***
+}
 
 // String is for debugging only.
-func (wr FrameWriteRequest) String() string ***REMOVED***
+func (wr FrameWriteRequest) String() string {
 	var des string
-	if s, ok := wr.write.(fmt.Stringer); ok ***REMOVED***
+	if s, ok := wr.write.(fmt.Stringer); ok {
 		des = s.String()
-	***REMOVED*** else ***REMOVED***
+	} else {
 		des = fmt.Sprintf("%T", wr.write)
-	***REMOVED***
+	}
 	return fmt.Sprintf("[FrameWriteRequest stream=%d, ch=%v, writer=%v]", wr.StreamID(), wr.done != nil, des)
-***REMOVED***
+}
 
 // replyToWriter sends err to wr.done and panics if the send must block
 // This does nothing if wr.done is nil.
-func (wr *FrameWriteRequest) replyToWriter(err error) ***REMOVED***
-	if wr.done == nil ***REMOVED***
+func (wr *FrameWriteRequest) replyToWriter(err error) {
+	if wr.done == nil {
 		return
-	***REMOVED***
-	select ***REMOVED***
+	}
+	select {
 	case wr.done <- err:
 	default:
 		panic(fmt.Sprintf("unbuffered done channel passed in for type %T", wr.write))
-	***REMOVED***
+	}
 	wr.write = nil // prevent use (assume it's tainted after wr.done send)
-***REMOVED***
+}
 
 // writeQueue is used by implementations of WriteScheduler.
-type writeQueue struct ***REMOVED***
+type writeQueue struct {
 	s []FrameWriteRequest
-***REMOVED***
+}
 
-func (q *writeQueue) empty() bool ***REMOVED*** return len(q.s) == 0 ***REMOVED***
+func (q *writeQueue) empty() bool { return len(q.s) == 0 }
 
-func (q *writeQueue) push(wr FrameWriteRequest) ***REMOVED***
+func (q *writeQueue) push(wr FrameWriteRequest) {
 	q.s = append(q.s, wr)
-***REMOVED***
+}
 
-func (q *writeQueue) shift() FrameWriteRequest ***REMOVED***
-	if len(q.s) == 0 ***REMOVED***
+func (q *writeQueue) shift() FrameWriteRequest {
+	if len(q.s) == 0 {
 		panic("invalid use of queue")
-	***REMOVED***
+	}
 	wr := q.s[0]
 	// TODO: less copy-happy queue.
 	copy(q.s, q.s[1:])
-	q.s[len(q.s)-1] = FrameWriteRequest***REMOVED******REMOVED***
+	q.s[len(q.s)-1] = FrameWriteRequest{}
 	q.s = q.s[:len(q.s)-1]
 	return wr
-***REMOVED***
+}
 
 // consume consumes up to n bytes from q.s[0]. If the frame is
 // entirely consumed, it is removed from the queue. If the frame
 // is partially consumed, the frame is kept with the consumed
 // bytes removed. Returns true iff any bytes were consumed.
-func (q *writeQueue) consume(n int32) (FrameWriteRequest, bool) ***REMOVED***
-	if len(q.s) == 0 ***REMOVED***
-		return FrameWriteRequest***REMOVED******REMOVED***, false
-	***REMOVED***
+func (q *writeQueue) consume(n int32) (FrameWriteRequest, bool) {
+	if len(q.s) == 0 {
+		return FrameWriteRequest{}, false
+	}
 	consumed, rest, numresult := q.s[0].Consume(n)
-	switch numresult ***REMOVED***
+	switch numresult {
 	case 0:
-		return FrameWriteRequest***REMOVED******REMOVED***, false
+		return FrameWriteRequest{}, false
 	case 1:
 		q.shift()
 	case 2:
 		q.s[0] = rest
-	***REMOVED***
+	}
 	return consumed, true
-***REMOVED***
+}
 
 type writeQueuePool []*writeQueue
 
 // put inserts an unused writeQueue into the pool.
-func (p *writeQueuePool) put(q *writeQueue) ***REMOVED***
-	for i := range q.s ***REMOVED***
-		q.s[i] = FrameWriteRequest***REMOVED******REMOVED***
-	***REMOVED***
+func (p *writeQueuePool) put(q *writeQueue) {
+	for i := range q.s {
+		q.s[i] = FrameWriteRequest{}
+	}
 	q.s = q.s[:0]
 	*p = append(*p, q)
-***REMOVED***
+}
 
 // get returns an empty writeQueue.
-func (p *writeQueuePool) get() *writeQueue ***REMOVED***
+func (p *writeQueuePool) get() *writeQueue {
 	ln := len(*p)
-	if ln == 0 ***REMOVED***
+	if ln == 0 {
 		return new(writeQueue)
-	***REMOVED***
+	}
 	x := ln - 1
 	q := (*p)[x]
 	(*p)[x] = nil
 	*p = (*p)[:x]
 	return q
-***REMOVED***
+}

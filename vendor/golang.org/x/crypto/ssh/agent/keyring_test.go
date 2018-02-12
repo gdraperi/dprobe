@@ -6,58 +6,58 @@ package agent
 
 import "testing"
 
-func addTestKey(t *testing.T, a Agent, keyName string) ***REMOVED***
-	err := a.Add(AddedKey***REMOVED***
+func addTestKey(t *testing.T, a Agent, keyName string) {
+	err := a.Add(AddedKey{
 		PrivateKey: testPrivateKeys[keyName],
 		Comment:    keyName,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		t.Fatalf("failed to add key %q: %v", keyName, err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func removeTestKey(t *testing.T, a Agent, keyName string) ***REMOVED***
+func removeTestKey(t *testing.T, a Agent, keyName string) {
 	err := a.Remove(testPublicKeys[keyName])
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("failed to remove key %q: %v", keyName, err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func validateListedKeys(t *testing.T, a Agent, expectedKeys []string) ***REMOVED***
+func validateListedKeys(t *testing.T, a Agent, expectedKeys []string) {
 	listedKeys, err := a.List()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("failed to list keys: %v", err)
 		return
-	***REMOVED***
+	}
 	actualKeys := make(map[string]bool)
-	for _, key := range listedKeys ***REMOVED***
+	for _, key := range listedKeys {
 		actualKeys[key.Comment] = true
-	***REMOVED***
+	}
 
 	matchedKeys := make(map[string]bool)
-	for _, expectedKey := range expectedKeys ***REMOVED***
-		if !actualKeys[expectedKey] ***REMOVED***
+	for _, expectedKey := range expectedKeys {
+		if !actualKeys[expectedKey] {
 			t.Fatalf("expected key %q, but was not found", expectedKey)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			matchedKeys[expectedKey] = true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	for actualKey := range actualKeys ***REMOVED***
-		if !matchedKeys[actualKey] ***REMOVED***
+	for actualKey := range actualKeys {
+		if !matchedKeys[actualKey] {
 			t.Fatalf("key %q was found, but was not expected", actualKey)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestKeyringAddingAndRemoving(t *testing.T) ***REMOVED***
-	keyNames := []string***REMOVED***"dsa", "ecdsa", "rsa", "user"***REMOVED***
+func TestKeyringAddingAndRemoving(t *testing.T) {
+	keyNames := []string{"dsa", "ecdsa", "rsa", "user"}
 
 	// add all test private keys
 	k := NewKeyring()
-	for _, keyName := range keyNames ***REMOVED***
+	for _, keyName := range keyNames {
 		addTestKey(t, k, keyName)
-	***REMOVED***
+	}
 	validateListedKeys(t, k, keyNames)
 
 	// remove a key in the middle
@@ -69,8 +69,8 @@ func TestKeyringAddingAndRemoving(t *testing.T) ***REMOVED***
 
 	// remove all keys
 	err := k.RemoveAll()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("failed to remove all keys: %v", err)
-	***REMOVED***
-	validateListedKeys(t, k, []string***REMOVED******REMOVED***)
-***REMOVED***
+	}
+	validateListedKeys(t, k, []string{})
+}

@@ -14,81 +14,81 @@ import (
 )
 
 // DebugRequestMiddleware dumps the request to logger
-func DebugRequestMiddleware(handler func(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error) func(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error ***REMOVED***
-	return func(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error ***REMOVED***
+func DebugRequestMiddleware(handler func(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error) func(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error {
+	return func(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error {
 		logrus.Debugf("Calling %s %s", r.Method, r.RequestURI)
 
-		if r.Method != "POST" ***REMOVED***
+		if r.Method != "POST" {
 			return handler(ctx, w, r, vars)
-		***REMOVED***
-		if err := httputils.CheckForJSON(r); err != nil ***REMOVED***
+		}
+		if err := httputils.CheckForJSON(r); err != nil {
 			return handler(ctx, w, r, vars)
-		***REMOVED***
+		}
 		maxBodySize := 4096 // 4KB
-		if r.ContentLength > int64(maxBodySize) ***REMOVED***
+		if r.ContentLength > int64(maxBodySize) {
 			return handler(ctx, w, r, vars)
-		***REMOVED***
+		}
 
 		body := r.Body
 		bufReader := bufio.NewReaderSize(body, maxBodySize)
-		r.Body = ioutils.NewReadCloserWrapper(bufReader, func() error ***REMOVED*** return body.Close() ***REMOVED***)
+		r.Body = ioutils.NewReadCloserWrapper(bufReader, func() error { return body.Close() })
 
 		b, err := bufReader.Peek(maxBodySize)
-		if err != io.EOF ***REMOVED***
+		if err != io.EOF {
 			// either there was an error reading, or the buffer is full (in which case the request is too large)
 			return handler(ctx, w, r, vars)
-		***REMOVED***
+		}
 
-		var postForm map[string]interface***REMOVED******REMOVED***
-		if err := json.Unmarshal(b, &postForm); err == nil ***REMOVED***
+		var postForm map[string]interface{}
+		if err := json.Unmarshal(b, &postForm); err == nil {
 			maskSecretKeys(postForm, r.RequestURI)
 			formStr, errMarshal := json.Marshal(postForm)
-			if errMarshal == nil ***REMOVED***
+			if errMarshal == nil {
 				logrus.Debugf("form data: %s", string(formStr))
-			***REMOVED*** else ***REMOVED***
+			} else {
 				logrus.Debugf("form data: %q", postForm)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		return handler(ctx, w, r, vars)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func maskSecretKeys(inp interface***REMOVED******REMOVED***, path string) ***REMOVED***
+func maskSecretKeys(inp interface{}, path string) {
 	// Remove any query string from the path
 	idx := strings.Index(path, "?")
-	if idx != -1 ***REMOVED***
+	if idx != -1 {
 		path = path[:idx]
-	***REMOVED***
+	}
 	// Remove trailing / characters
 	path = strings.TrimRight(path, "/")
 
-	if arr, ok := inp.([]interface***REMOVED******REMOVED***); ok ***REMOVED***
-		for _, f := range arr ***REMOVED***
+	if arr, ok := inp.([]interface{}); ok {
+		for _, f := range arr {
 			maskSecretKeys(f, path)
-		***REMOVED***
+		}
 		return
-	***REMOVED***
+	}
 
-	if form, ok := inp.(map[string]interface***REMOVED******REMOVED***); ok ***REMOVED***
+	if form, ok := inp.(map[string]interface{}); ok {
 	loop0:
-		for k, v := range form ***REMOVED***
-			for _, m := range []string***REMOVED***"password", "secret", "jointoken", "unlockkey", "signingcakey"***REMOVED*** ***REMOVED***
-				if strings.EqualFold(m, k) ***REMOVED***
+		for k, v := range form {
+			for _, m := range []string{"password", "secret", "jointoken", "unlockkey", "signingcakey"} {
+				if strings.EqualFold(m, k) {
 					form[k] = "*****"
 					continue loop0
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			maskSecretKeys(v, path)
-		***REMOVED***
+		}
 
 		// Route-specific redactions
-		if strings.HasSuffix(path, "/secrets/create") ***REMOVED***
-			for k := range form ***REMOVED***
-				if k == "Data" ***REMOVED***
+		if strings.HasSuffix(path, "/secrets/create") {
+			for k := range form {
+				if k == "Data" {
 					form[k] = "*****"
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+				}
+			}
+		}
+	}
+}

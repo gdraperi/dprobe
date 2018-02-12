@@ -14,7 +14,7 @@ const (
 
 // Zpool is a ZFS zpool.  A pool is a top-level structure in ZFS, and can
 // contain many descendent datasets.
-type Zpool struct ***REMOVED***
+type Zpool struct {
 	Name          string
 	Health        string
 	Allocated     uint64
@@ -25,88 +25,88 @@ type Zpool struct ***REMOVED***
 	Freeing       uint64
 	Leaked        uint64
 	DedupRatio    float64
-***REMOVED***
+}
 
 // zpool is a helper function to wrap typical calls to zpool.
-func zpool(arg ...string) ([][]string, error) ***REMOVED***
-	c := command***REMOVED***Command: "zpool"***REMOVED***
+func zpool(arg ...string) ([][]string, error) {
+	c := command{Command: "zpool"}
 	return c.Run(arg...)
-***REMOVED***
+}
 
 // GetZpool retrieves a single ZFS zpool by name.
-func GetZpool(name string) (*Zpool, error) ***REMOVED***
+func GetZpool(name string) (*Zpool, error) {
 	args := zpoolArgs
 	args = append(args, name)
 	out, err := zpool(args...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// there is no -H
 	out = out[1:]
 
-	z := &Zpool***REMOVED***Name: name***REMOVED***
-	for _, line := range out ***REMOVED***
-		if err := z.parseLine(line); err != nil ***REMOVED***
+	z := &Zpool{Name: name}
+	for _, line := range out {
+		if err := z.parseLine(line); err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return z, nil
-***REMOVED***
+}
 
 // Datasets returns a slice of all ZFS datasets in a zpool.
-func (z *Zpool) Datasets() ([]*Dataset, error) ***REMOVED***
+func (z *Zpool) Datasets() ([]*Dataset, error) {
 	return Datasets(z.Name)
-***REMOVED***
+}
 
 // Snapshots returns a slice of all ZFS snapshots in a zpool.
-func (z *Zpool) Snapshots() ([]*Dataset, error) ***REMOVED***
+func (z *Zpool) Snapshots() ([]*Dataset, error) {
 	return Snapshots(z.Name)
-***REMOVED***
+}
 
 // CreateZpool creates a new ZFS zpool with the specified name, properties,
 // and optional arguments.
 // A full list of available ZFS properties and command-line arguments may be
 // found here: https://www.freebsd.org/cgi/man.cgi?zfs(8).
-func CreateZpool(name string, properties map[string]string, args ...string) (*Zpool, error) ***REMOVED***
+func CreateZpool(name string, properties map[string]string, args ...string) (*Zpool, error) {
 	cli := make([]string, 1, 4)
 	cli[0] = "create"
-	if properties != nil ***REMOVED***
+	if properties != nil {
 		cli = append(cli, propsSlice(properties)...)
-	***REMOVED***
+	}
 	cli = append(cli, name)
 	cli = append(cli, args...)
 	_, err := zpool(cli...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	return &Zpool***REMOVED***Name: name***REMOVED***, nil
-***REMOVED***
+	return &Zpool{Name: name}, nil
+}
 
 // Destroy destroys a ZFS zpool by name.
-func (z *Zpool) Destroy() error ***REMOVED***
+func (z *Zpool) Destroy() error {
 	_, err := zpool("destroy", z.Name)
 	return err
-***REMOVED***
+}
 
 // ListZpools list all ZFS zpools accessible on the current system.
-func ListZpools() ([]*Zpool, error) ***REMOVED***
-	args := []string***REMOVED***"list", "-Ho", "name"***REMOVED***
+func ListZpools() ([]*Zpool, error) {
+	args := []string{"list", "-Ho", "name"}
 	out, err := zpool(args...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	var pools []*Zpool
 
-	for _, line := range out ***REMOVED***
+	for _, line := range out {
 		z, err := GetZpool(line[0])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		pools = append(pools, z)
-	***REMOVED***
+	}
 	return pools, nil
-***REMOVED***
+}

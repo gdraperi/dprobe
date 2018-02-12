@@ -12,42 +12,42 @@ import (
 	"testing"
 )
 
-func TestJSON(t *testing.T) ***REMOVED***
+func TestJSON(t *testing.T) {
 	var buf bytes.Buffer
-	c := fakeNetConn***REMOVED***&buf, &buf***REMOVED***
+	c := fakeNetConn{&buf, &buf}
 	wc := newConn(c, true, 1024, 1024)
 	rc := newConn(c, false, 1024, 1024)
 
-	var actual, expect struct ***REMOVED***
+	var actual, expect struct {
 		A int
 		B string
-	***REMOVED***
+	}
 	expect.A = 1
 	expect.B = "hello"
 
-	if err := wc.WriteJSON(&expect); err != nil ***REMOVED***
+	if err := wc.WriteJSON(&expect); err != nil {
 		t.Fatal("write", err)
-	***REMOVED***
+	}
 
-	if err := rc.ReadJSON(&actual); err != nil ***REMOVED***
+	if err := rc.ReadJSON(&actual); err != nil {
 		t.Fatal("read", err)
-	***REMOVED***
+	}
 
-	if !reflect.DeepEqual(&actual, &expect) ***REMOVED***
+	if !reflect.DeepEqual(&actual, &expect) {
 		t.Fatal("equal", actual, expect)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestPartialJSONRead(t *testing.T) ***REMOVED***
+func TestPartialJSONRead(t *testing.T) {
 	var buf bytes.Buffer
-	c := fakeNetConn***REMOVED***&buf, &buf***REMOVED***
+	c := fakeNetConn{&buf, &buf}
 	wc := newConn(c, true, 1024, 1024)
 	rc := newConn(c, false, 1024, 1024)
 
-	var v struct ***REMOVED***
+	var v struct {
 		A int
 		B string
-	***REMOVED***
+	}
 	v.A = 1
 	v.B = "hello"
 
@@ -56,64 +56,64 @@ func TestPartialJSONRead(t *testing.T) ***REMOVED***
 	// Partial JSON values.
 
 	data, err := json.Marshal(v)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	for i := len(data) - 1; i >= 0; i-- ***REMOVED***
-		if err := wc.WriteMessage(TextMessage, data[:i]); err != nil ***REMOVED***
+	}
+	for i := len(data) - 1; i >= 0; i-- {
+		if err := wc.WriteMessage(TextMessage, data[:i]); err != nil {
 			t.Fatal(err)
-		***REMOVED***
+		}
 		messageCount++
-	***REMOVED***
+	}
 
 	// Whitespace.
 
-	if err := wc.WriteMessage(TextMessage, []byte(" ")); err != nil ***REMOVED***
+	if err := wc.WriteMessage(TextMessage, []byte(" ")); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	messageCount++
 
 	// Close.
 
-	if err := wc.WriteMessage(CloseMessage, FormatCloseMessage(CloseNormalClosure, "")); err != nil ***REMOVED***
+	if err := wc.WriteMessage(CloseMessage, FormatCloseMessage(CloseNormalClosure, "")); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	for i := 0; i < messageCount; i++ ***REMOVED***
+	for i := 0; i < messageCount; i++ {
 		err := rc.ReadJSON(&v)
-		if err != io.ErrUnexpectedEOF ***REMOVED***
+		if err != io.ErrUnexpectedEOF {
 			t.Error("read", i, err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	err = rc.ReadJSON(&v)
-	if _, ok := err.(*CloseError); !ok ***REMOVED***
+	if _, ok := err.(*CloseError); !ok {
 		t.Error("final", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestDeprecatedJSON(t *testing.T) ***REMOVED***
+func TestDeprecatedJSON(t *testing.T) {
 	var buf bytes.Buffer
-	c := fakeNetConn***REMOVED***&buf, &buf***REMOVED***
+	c := fakeNetConn{&buf, &buf}
 	wc := newConn(c, true, 1024, 1024)
 	rc := newConn(c, false, 1024, 1024)
 
-	var actual, expect struct ***REMOVED***
+	var actual, expect struct {
 		A int
 		B string
-	***REMOVED***
+	}
 	expect.A = 1
 	expect.B = "hello"
 
-	if err := WriteJSON(wc, &expect); err != nil ***REMOVED***
+	if err := WriteJSON(wc, &expect); err != nil {
 		t.Fatal("write", err)
-	***REMOVED***
+	}
 
-	if err := ReadJSON(rc, &actual); err != nil ***REMOVED***
+	if err := ReadJSON(rc, &actual); err != nil {
 		t.Fatal("read", err)
-	***REMOVED***
+	}
 
-	if !reflect.DeepEqual(&actual, &expect) ***REMOVED***
+	if !reflect.DeepEqual(&actual, &expect) {
 		t.Fatal("equal", actual, expect)
-	***REMOVED***
-***REMOVED***
+	}
+}

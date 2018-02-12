@@ -10,7 +10,7 @@ import "context"
 // given context.
 //
 //
-type Store interface ***REMOVED***
+type Store interface {
 	Create(ctx context.Context, namespace string, labels map[string]string) error
 	Labels(ctx context.Context, namespace string) (map[string]string, error)
 	SetLabel(ctx context.Context, namespace, key, value string) error
@@ -18,4 +18,4 @@ type Store interface ***REMOVED***
 
 	// Delete removes the namespace. The namespace must be empty to be deleted.
 	Delete(ctx context.Context, namespace string) error
-***REMOVED***
+}

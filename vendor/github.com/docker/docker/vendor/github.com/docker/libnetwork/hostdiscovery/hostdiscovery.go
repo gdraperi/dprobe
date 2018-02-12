@@ -16,53 +16,53 @@ import (
 	"github.com/docker/libnetwork/types"
 )
 
-type hostDiscovery struct ***REMOVED***
+type hostDiscovery struct {
 	watcher  discovery.Watcher
 	nodes    mapset.Set
-	stopChan chan struct***REMOVED******REMOVED***
+	stopChan chan struct{}
 	sync.Mutex
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	consul.Register()
 	etcd.Register()
 	zookeeper.Register()
-***REMOVED***
+}
 
 // NewHostDiscovery function creates a host discovery object
-func NewHostDiscovery(watcher discovery.Watcher) HostDiscovery ***REMOVED***
-	return &hostDiscovery***REMOVED***watcher: watcher, nodes: mapset.NewSet(), stopChan: make(chan struct***REMOVED******REMOVED***)***REMOVED***
-***REMOVED***
+func NewHostDiscovery(watcher discovery.Watcher) HostDiscovery {
+	return &hostDiscovery{watcher: watcher, nodes: mapset.NewSet(), stopChan: make(chan struct{})}
+}
 
-func (h *hostDiscovery) Watch(activeCallback ActiveCallback, joinCallback JoinCallback, leaveCallback LeaveCallback) error ***REMOVED***
+func (h *hostDiscovery) Watch(activeCallback ActiveCallback, joinCallback JoinCallback, leaveCallback LeaveCallback) error {
 	h.Lock()
 	d := h.watcher
 	h.Unlock()
-	if d == nil ***REMOVED***
+	if d == nil {
 		return types.BadRequestErrorf("invalid discovery watcher")
-	***REMOVED***
+	}
 	discoveryCh, errCh := d.Watch(h.stopChan)
 	go h.monitorDiscovery(discoveryCh, errCh, activeCallback, joinCallback, leaveCallback)
 	return nil
-***REMOVED***
+}
 
 func (h *hostDiscovery) monitorDiscovery(ch <-chan discovery.Entries, errCh <-chan error,
-	activeCallback ActiveCallback, joinCallback JoinCallback, leaveCallback LeaveCallback) ***REMOVED***
-	for ***REMOVED***
-		select ***REMOVED***
+	activeCallback ActiveCallback, joinCallback JoinCallback, leaveCallback LeaveCallback) {
+	for {
+		select {
 		case entries := <-ch:
 			h.processCallback(entries, activeCallback, joinCallback, leaveCallback)
 		case err := <-errCh:
-			if err != nil ***REMOVED***
+			if err != nil {
 				logrus.Errorf("discovery error: %v", err)
-			***REMOVED***
+			}
 		case <-h.stopChan:
 			return
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (h *hostDiscovery) StopDiscovery() error ***REMOVED***
+func (h *hostDiscovery) StopDiscovery() error {
 	h.Lock()
 	stopChan := h.stopChan
 	h.watcher = nil
@@ -70,10 +70,10 @@ func (h *hostDiscovery) StopDiscovery() error ***REMOVED***
 
 	close(stopChan)
 	return nil
-***REMOVED***
+}
 
 func (h *hostDiscovery) processCallback(entries discovery.Entries,
-	activeCallback ActiveCallback, joinCallback JoinCallback, leaveCallback LeaveCallback) ***REMOVED***
+	activeCallback ActiveCallback, joinCallback JoinCallback, leaveCallback LeaveCallback) {
 	updated := hosts(entries)
 	h.Lock()
 	existing := h.nodes
@@ -82,40 +82,40 @@ func (h *hostDiscovery) processCallback(entries discovery.Entries,
 	h.Unlock()
 
 	activeCallback()
-	if len(added) > 0 ***REMOVED***
+	if len(added) > 0 {
 		joinCallback(added)
-	***REMOVED***
-	if len(removed) > 0 ***REMOVED***
+	}
+	if len(removed) > 0 {
 		leaveCallback(removed)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func diff(existing mapset.Set, updated mapset.Set) (added []net.IP, removed []net.IP) ***REMOVED***
+func diff(existing mapset.Set, updated mapset.Set) (added []net.IP, removed []net.IP) {
 	addSlice := updated.Difference(existing).ToSlice()
 	removeSlice := existing.Difference(updated).ToSlice()
-	for _, ip := range addSlice ***REMOVED***
+	for _, ip := range addSlice {
 		added = append(added, net.ParseIP(ip.(string)))
-	***REMOVED***
-	for _, ip := range removeSlice ***REMOVED***
+	}
+	for _, ip := range removeSlice {
 		removed = append(removed, net.ParseIP(ip.(string)))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func (h *hostDiscovery) Fetch() []net.IP ***REMOVED***
+func (h *hostDiscovery) Fetch() []net.IP {
 	h.Lock()
 	defer h.Unlock()
-	ips := []net.IP***REMOVED******REMOVED***
-	for _, ipstr := range h.nodes.ToSlice() ***REMOVED***
+	ips := []net.IP{}
+	for _, ipstr := range h.nodes.ToSlice() {
 		ips = append(ips, net.ParseIP(ipstr.(string)))
-	***REMOVED***
+	}
 	return ips
-***REMOVED***
+}
 
-func hosts(entries discovery.Entries) mapset.Set ***REMOVED***
+func hosts(entries discovery.Entries) mapset.Set {
 	hosts := mapset.NewSet()
-	for _, entry := range entries ***REMOVED***
+	for _, entry := range entries {
 		hosts.Add(entry.Host)
-	***REMOVED***
+	}
 	return hosts
-***REMOVED***
+}

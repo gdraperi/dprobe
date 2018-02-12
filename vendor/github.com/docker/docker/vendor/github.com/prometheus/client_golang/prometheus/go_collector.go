@@ -7,233 +7,233 @@ import (
 	"time"
 )
 
-type goCollector struct ***REMOVED***
+type goCollector struct {
 	goroutines Gauge
 	gcDesc     *Desc
 
 	// metrics to describe and collect
 	metrics memStatsMetrics
-***REMOVED***
+}
 
 // NewGoCollector returns a collector which exports metrics about the current
 // go process.
-func NewGoCollector() *goCollector ***REMOVED***
-	return &goCollector***REMOVED***
-		goroutines: NewGauge(GaugeOpts***REMOVED***
+func NewGoCollector() *goCollector {
+	return &goCollector{
+		goroutines: NewGauge(GaugeOpts{
 			Namespace: "go",
 			Name:      "goroutines",
 			Help:      "Number of goroutines that currently exist.",
-		***REMOVED***),
+		}),
 		gcDesc: NewDesc(
 			"go_gc_duration_seconds",
 			"A summary of the GC invocation durations.",
 			nil, nil),
-		metrics: memStatsMetrics***REMOVED***
-			***REMOVED***
+		metrics: memStatsMetrics{
+			{
 				desc: NewDesc(
 					memstatNamespace("alloc_bytes"),
 					"Number of bytes allocated and still in use.",
 					nil, nil,
 				),
-				eval:    func(ms *runtime.MemStats) float64 ***REMOVED*** return float64(ms.Alloc) ***REMOVED***,
+				eval:    func(ms *runtime.MemStats) float64 { return float64(ms.Alloc) },
 				valType: GaugeValue,
-			***REMOVED***, ***REMOVED***
+			}, {
 				desc: NewDesc(
 					memstatNamespace("alloc_bytes_total"),
 					"Total number of bytes allocated, even if freed.",
 					nil, nil,
 				),
-				eval:    func(ms *runtime.MemStats) float64 ***REMOVED*** return float64(ms.TotalAlloc) ***REMOVED***,
+				eval:    func(ms *runtime.MemStats) float64 { return float64(ms.TotalAlloc) },
 				valType: CounterValue,
-			***REMOVED***, ***REMOVED***
+			}, {
 				desc: NewDesc(
 					memstatNamespace("sys_bytes"),
 					"Number of bytes obtained by system. Sum of all system allocations.",
 					nil, nil,
 				),
-				eval:    func(ms *runtime.MemStats) float64 ***REMOVED*** return float64(ms.Sys) ***REMOVED***,
+				eval:    func(ms *runtime.MemStats) float64 { return float64(ms.Sys) },
 				valType: GaugeValue,
-			***REMOVED***, ***REMOVED***
+			}, {
 				desc: NewDesc(
 					memstatNamespace("lookups_total"),
 					"Total number of pointer lookups.",
 					nil, nil,
 				),
-				eval:    func(ms *runtime.MemStats) float64 ***REMOVED*** return float64(ms.Lookups) ***REMOVED***,
+				eval:    func(ms *runtime.MemStats) float64 { return float64(ms.Lookups) },
 				valType: CounterValue,
-			***REMOVED***, ***REMOVED***
+			}, {
 				desc: NewDesc(
 					memstatNamespace("mallocs_total"),
 					"Total number of mallocs.",
 					nil, nil,
 				),
-				eval:    func(ms *runtime.MemStats) float64 ***REMOVED*** return float64(ms.Mallocs) ***REMOVED***,
+				eval:    func(ms *runtime.MemStats) float64 { return float64(ms.Mallocs) },
 				valType: CounterValue,
-			***REMOVED***, ***REMOVED***
+			}, {
 				desc: NewDesc(
 					memstatNamespace("frees_total"),
 					"Total number of frees.",
 					nil, nil,
 				),
-				eval:    func(ms *runtime.MemStats) float64 ***REMOVED*** return float64(ms.Frees) ***REMOVED***,
+				eval:    func(ms *runtime.MemStats) float64 { return float64(ms.Frees) },
 				valType: CounterValue,
-			***REMOVED***, ***REMOVED***
+			}, {
 				desc: NewDesc(
 					memstatNamespace("heap_alloc_bytes"),
 					"Number of heap bytes allocated and still in use.",
 					nil, nil,
 				),
-				eval:    func(ms *runtime.MemStats) float64 ***REMOVED*** return float64(ms.HeapAlloc) ***REMOVED***,
+				eval:    func(ms *runtime.MemStats) float64 { return float64(ms.HeapAlloc) },
 				valType: GaugeValue,
-			***REMOVED***, ***REMOVED***
+			}, {
 				desc: NewDesc(
 					memstatNamespace("heap_sys_bytes"),
 					"Number of heap bytes obtained from system.",
 					nil, nil,
 				),
-				eval:    func(ms *runtime.MemStats) float64 ***REMOVED*** return float64(ms.HeapSys) ***REMOVED***,
+				eval:    func(ms *runtime.MemStats) float64 { return float64(ms.HeapSys) },
 				valType: GaugeValue,
-			***REMOVED***, ***REMOVED***
+			}, {
 				desc: NewDesc(
 					memstatNamespace("heap_idle_bytes"),
 					"Number of heap bytes waiting to be used.",
 					nil, nil,
 				),
-				eval:    func(ms *runtime.MemStats) float64 ***REMOVED*** return float64(ms.HeapIdle) ***REMOVED***,
+				eval:    func(ms *runtime.MemStats) float64 { return float64(ms.HeapIdle) },
 				valType: GaugeValue,
-			***REMOVED***, ***REMOVED***
+			}, {
 				desc: NewDesc(
 					memstatNamespace("heap_inuse_bytes"),
 					"Number of heap bytes that are in use.",
 					nil, nil,
 				),
-				eval:    func(ms *runtime.MemStats) float64 ***REMOVED*** return float64(ms.HeapInuse) ***REMOVED***,
+				eval:    func(ms *runtime.MemStats) float64 { return float64(ms.HeapInuse) },
 				valType: GaugeValue,
-			***REMOVED***, ***REMOVED***
+			}, {
 				desc: NewDesc(
 					memstatNamespace("heap_released_bytes_total"),
 					"Total number of heap bytes released to OS.",
 					nil, nil,
 				),
-				eval:    func(ms *runtime.MemStats) float64 ***REMOVED*** return float64(ms.HeapReleased) ***REMOVED***,
+				eval:    func(ms *runtime.MemStats) float64 { return float64(ms.HeapReleased) },
 				valType: CounterValue,
-			***REMOVED***, ***REMOVED***
+			}, {
 				desc: NewDesc(
 					memstatNamespace("heap_objects"),
 					"Number of allocated objects.",
 					nil, nil,
 				),
-				eval:    func(ms *runtime.MemStats) float64 ***REMOVED*** return float64(ms.HeapObjects) ***REMOVED***,
+				eval:    func(ms *runtime.MemStats) float64 { return float64(ms.HeapObjects) },
 				valType: GaugeValue,
-			***REMOVED***, ***REMOVED***
+			}, {
 				desc: NewDesc(
 					memstatNamespace("stack_inuse_bytes"),
 					"Number of bytes in use by the stack allocator.",
 					nil, nil,
 				),
-				eval:    func(ms *runtime.MemStats) float64 ***REMOVED*** return float64(ms.StackInuse) ***REMOVED***,
+				eval:    func(ms *runtime.MemStats) float64 { return float64(ms.StackInuse) },
 				valType: GaugeValue,
-			***REMOVED***, ***REMOVED***
+			}, {
 				desc: NewDesc(
 					memstatNamespace("stack_sys_bytes"),
 					"Number of bytes obtained from system for stack allocator.",
 					nil, nil,
 				),
-				eval:    func(ms *runtime.MemStats) float64 ***REMOVED*** return float64(ms.StackSys) ***REMOVED***,
+				eval:    func(ms *runtime.MemStats) float64 { return float64(ms.StackSys) },
 				valType: GaugeValue,
-			***REMOVED***, ***REMOVED***
+			}, {
 				desc: NewDesc(
 					memstatNamespace("mspan_inuse_bytes"),
 					"Number of bytes in use by mspan structures.",
 					nil, nil,
 				),
-				eval:    func(ms *runtime.MemStats) float64 ***REMOVED*** return float64(ms.MSpanInuse) ***REMOVED***,
+				eval:    func(ms *runtime.MemStats) float64 { return float64(ms.MSpanInuse) },
 				valType: GaugeValue,
-			***REMOVED***, ***REMOVED***
+			}, {
 				desc: NewDesc(
 					memstatNamespace("mspan_sys_bytes"),
 					"Number of bytes used for mspan structures obtained from system.",
 					nil, nil,
 				),
-				eval:    func(ms *runtime.MemStats) float64 ***REMOVED*** return float64(ms.MSpanSys) ***REMOVED***,
+				eval:    func(ms *runtime.MemStats) float64 { return float64(ms.MSpanSys) },
 				valType: GaugeValue,
-			***REMOVED***, ***REMOVED***
+			}, {
 				desc: NewDesc(
 					memstatNamespace("mcache_inuse_bytes"),
 					"Number of bytes in use by mcache structures.",
 					nil, nil,
 				),
-				eval:    func(ms *runtime.MemStats) float64 ***REMOVED*** return float64(ms.MCacheInuse) ***REMOVED***,
+				eval:    func(ms *runtime.MemStats) float64 { return float64(ms.MCacheInuse) },
 				valType: GaugeValue,
-			***REMOVED***, ***REMOVED***
+			}, {
 				desc: NewDesc(
 					memstatNamespace("mcache_sys_bytes"),
 					"Number of bytes used for mcache structures obtained from system.",
 					nil, nil,
 				),
-				eval:    func(ms *runtime.MemStats) float64 ***REMOVED*** return float64(ms.MCacheSys) ***REMOVED***,
+				eval:    func(ms *runtime.MemStats) float64 { return float64(ms.MCacheSys) },
 				valType: GaugeValue,
-			***REMOVED***, ***REMOVED***
+			}, {
 				desc: NewDesc(
 					memstatNamespace("buck_hash_sys_bytes"),
 					"Number of bytes used by the profiling bucket hash table.",
 					nil, nil,
 				),
-				eval:    func(ms *runtime.MemStats) float64 ***REMOVED*** return float64(ms.BuckHashSys) ***REMOVED***,
+				eval:    func(ms *runtime.MemStats) float64 { return float64(ms.BuckHashSys) },
 				valType: GaugeValue,
-			***REMOVED***, ***REMOVED***
+			}, {
 				desc: NewDesc(
 					memstatNamespace("gc_sys_bytes"),
 					"Number of bytes used for garbage collection system metadata.",
 					nil, nil,
 				),
-				eval:    func(ms *runtime.MemStats) float64 ***REMOVED*** return float64(ms.GCSys) ***REMOVED***,
+				eval:    func(ms *runtime.MemStats) float64 { return float64(ms.GCSys) },
 				valType: GaugeValue,
-			***REMOVED***, ***REMOVED***
+			}, {
 				desc: NewDesc(
 					memstatNamespace("other_sys_bytes"),
 					"Number of bytes used for other system allocations.",
 					nil, nil,
 				),
-				eval:    func(ms *runtime.MemStats) float64 ***REMOVED*** return float64(ms.OtherSys) ***REMOVED***,
+				eval:    func(ms *runtime.MemStats) float64 { return float64(ms.OtherSys) },
 				valType: GaugeValue,
-			***REMOVED***, ***REMOVED***
+			}, {
 				desc: NewDesc(
 					memstatNamespace("next_gc_bytes"),
 					"Number of heap bytes when next garbage collection will take place.",
 					nil, nil,
 				),
-				eval:    func(ms *runtime.MemStats) float64 ***REMOVED*** return float64(ms.NextGC) ***REMOVED***,
+				eval:    func(ms *runtime.MemStats) float64 { return float64(ms.NextGC) },
 				valType: GaugeValue,
-			***REMOVED***, ***REMOVED***
+			}, {
 				desc: NewDesc(
 					memstatNamespace("last_gc_time_seconds"),
 					"Number of seconds since 1970 of last garbage collection.",
 					nil, nil,
 				),
-				eval:    func(ms *runtime.MemStats) float64 ***REMOVED*** return float64(ms.LastGC) / 1e9 ***REMOVED***,
+				eval:    func(ms *runtime.MemStats) float64 { return float64(ms.LastGC) / 1e9 },
 				valType: GaugeValue,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
-***REMOVED***
+			},
+		},
+	}
+}
 
-func memstatNamespace(s string) string ***REMOVED***
+func memstatNamespace(s string) string {
 	return fmt.Sprintf("go_memstats_%s", s)
-***REMOVED***
+}
 
 // Describe returns all descriptions of the collector.
-func (c *goCollector) Describe(ch chan<- *Desc) ***REMOVED***
+func (c *goCollector) Describe(ch chan<- *Desc) {
 	ch <- c.goroutines.Desc()
 	ch <- c.gcDesc
 
-	for _, i := range c.metrics ***REMOVED***
+	for _, i := range c.metrics {
 		ch <- i.desc
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Collect returns the current state of all metrics of the collector.
-func (c *goCollector) Collect(ch chan<- Metric) ***REMOVED***
+func (c *goCollector) Collect(ch chan<- Metric) {
 	c.goroutines.Set(float64(runtime.NumGoroutine()))
 	ch <- c.goroutines
 
@@ -242,22 +242,22 @@ func (c *goCollector) Collect(ch chan<- Metric) ***REMOVED***
 	debug.ReadGCStats(&stats)
 
 	quantiles := make(map[float64]float64)
-	for idx, pq := range stats.PauseQuantiles[1:] ***REMOVED***
+	for idx, pq := range stats.PauseQuantiles[1:] {
 		quantiles[float64(idx+1)/float64(len(stats.PauseQuantiles)-1)] = pq.Seconds()
-	***REMOVED***
+	}
 	quantiles[0.0] = stats.PauseQuantiles[0].Seconds()
 	ch <- MustNewConstSummary(c.gcDesc, uint64(stats.NumGC), float64(stats.PauseTotal.Seconds()), quantiles)
 
-	ms := &runtime.MemStats***REMOVED******REMOVED***
+	ms := &runtime.MemStats{}
 	runtime.ReadMemStats(ms)
-	for _, i := range c.metrics ***REMOVED***
+	for _, i := range c.metrics {
 		ch <- MustNewConstMetric(i.desc, i.valType, i.eval(ms))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // memStatsMetrics provide description, value, and value type for memstat metrics.
-type memStatsMetrics []struct ***REMOVED***
+type memStatsMetrics []struct {
 	desc    *Desc
 	eval    func(*runtime.MemStats) float64
 	valType ValueType
-***REMOVED***
+}

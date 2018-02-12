@@ -15,7 +15,7 @@ import (
 )
 
 // Store is an interface for creating and accessing images
-type Store interface ***REMOVED***
+type Store interface {
 	Create(config []byte) (ID, error)
 	Get(id ID) (*Image, error)
 	Delete(id ID) ([]layer.Metadata, error)
@@ -27,308 +27,308 @@ type Store interface ***REMOVED***
 	Children(id ID) []ID
 	Map() map[ID]*Image
 	Heads() map[ID]*Image
-***REMOVED***
+}
 
 // LayerGetReleaser is a minimal interface for getting and releasing images.
-type LayerGetReleaser interface ***REMOVED***
+type LayerGetReleaser interface {
 	Get(layer.ChainID) (layer.Layer, error)
 	Release(layer.Layer) ([]layer.Metadata, error)
-***REMOVED***
+}
 
-type imageMeta struct ***REMOVED***
+type imageMeta struct {
 	layer    layer.Layer
-	children map[ID]struct***REMOVED******REMOVED***
-***REMOVED***
+	children map[ID]struct{}
+}
 
-type store struct ***REMOVED***
+type store struct {
 	sync.RWMutex
 	lss       map[string]LayerGetReleaser
 	images    map[ID]*imageMeta
 	fs        StoreBackend
 	digestSet *digestset.Set
-***REMOVED***
+}
 
 // NewImageStore returns new store object for given set of layer stores
-func NewImageStore(fs StoreBackend, lss map[string]LayerGetReleaser) (Store, error) ***REMOVED***
-	is := &store***REMOVED***
+func NewImageStore(fs StoreBackend, lss map[string]LayerGetReleaser) (Store, error) {
+	is := &store{
 		lss:       lss,
 		images:    make(map[ID]*imageMeta),
 		fs:        fs,
 		digestSet: digestset.NewSet(),
-	***REMOVED***
+	}
 
 	// load all current images and retain layers
-	if err := is.restore(); err != nil ***REMOVED***
+	if err := is.restore(); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	return is, nil
-***REMOVED***
+}
 
-func (is *store) restore() error ***REMOVED***
-	err := is.fs.Walk(func(dgst digest.Digest) error ***REMOVED***
+func (is *store) restore() error {
+	err := is.fs.Walk(func(dgst digest.Digest) error {
 		img, err := is.Get(IDFromDigest(dgst))
-		if err != nil ***REMOVED***
+		if err != nil {
 			logrus.Errorf("invalid image %v, %v", dgst, err)
 			return nil
-		***REMOVED***
+		}
 		var l layer.Layer
-		if chainID := img.RootFS.ChainID(); chainID != "" ***REMOVED***
-			if !system.IsOSSupported(img.OperatingSystem()) ***REMOVED***
+		if chainID := img.RootFS.ChainID(); chainID != "" {
+			if !system.IsOSSupported(img.OperatingSystem()) {
 				return system.ErrNotSupportedOperatingSystem
-			***REMOVED***
+			}
 			l, err = is.lss[img.OperatingSystem()].Get(chainID)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-		***REMOVED***
-		if err := is.digestSet.Add(dgst); err != nil ***REMOVED***
+			}
+		}
+		if err := is.digestSet.Add(dgst); err != nil {
 			return err
-		***REMOVED***
+		}
 
-		imageMeta := &imageMeta***REMOVED***
+		imageMeta := &imageMeta{
 			layer:    l,
-			children: make(map[ID]struct***REMOVED******REMOVED***),
-		***REMOVED***
+			children: make(map[ID]struct{}),
+		}
 
 		is.images[IDFromDigest(dgst)] = imageMeta
 
 		return nil
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	// Second pass to fill in children maps
-	for id := range is.images ***REMOVED***
-		if parent, err := is.GetParent(id); err == nil ***REMOVED***
-			if parentMeta := is.images[parent]; parentMeta != nil ***REMOVED***
-				parentMeta.children[id] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+	for id := range is.images {
+		if parent, err := is.GetParent(id); err == nil {
+			if parentMeta := is.images[parent]; parentMeta != nil {
+				parentMeta.children[id] = struct{}{}
+			}
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (is *store) Create(config []byte) (ID, error) ***REMOVED***
+func (is *store) Create(config []byte) (ID, error) {
 	var img Image
 	err := json.Unmarshal(config, &img)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 
 	// Must reject any config that references diffIDs from the history
 	// which aren't among the rootfs layers.
-	rootFSLayers := make(map[layer.DiffID]struct***REMOVED******REMOVED***)
-	for _, diffID := range img.RootFS.DiffIDs ***REMOVED***
-		rootFSLayers[diffID] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	***REMOVED***
+	rootFSLayers := make(map[layer.DiffID]struct{})
+	for _, diffID := range img.RootFS.DiffIDs {
+		rootFSLayers[diffID] = struct{}{}
+	}
 
 	layerCounter := 0
-	for _, h := range img.History ***REMOVED***
-		if !h.EmptyLayer ***REMOVED***
+	for _, h := range img.History {
+		if !h.EmptyLayer {
 			layerCounter++
-		***REMOVED***
-	***REMOVED***
-	if layerCounter > len(img.RootFS.DiffIDs) ***REMOVED***
+		}
+	}
+	if layerCounter > len(img.RootFS.DiffIDs) {
 		return "", errors.New("too many non-empty layers in History section")
-	***REMOVED***
+	}
 
 	dgst, err := is.fs.Set(config)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	imageID := IDFromDigest(dgst)
 
 	is.Lock()
 	defer is.Unlock()
 
-	if _, exists := is.images[imageID]; exists ***REMOVED***
+	if _, exists := is.images[imageID]; exists {
 		return imageID, nil
-	***REMOVED***
+	}
 
 	layerID := img.RootFS.ChainID()
 
 	var l layer.Layer
-	if layerID != "" ***REMOVED***
-		if !system.IsOSSupported(img.OperatingSystem()) ***REMOVED***
+	if layerID != "" {
+		if !system.IsOSSupported(img.OperatingSystem()) {
 			return "", system.ErrNotSupportedOperatingSystem
-		***REMOVED***
+		}
 		l, err = is.lss[img.OperatingSystem()].Get(layerID)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return "", errors.Wrapf(err, "failed to get layer %s", layerID)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	imageMeta := &imageMeta***REMOVED***
+	imageMeta := &imageMeta{
 		layer:    l,
-		children: make(map[ID]struct***REMOVED******REMOVED***),
-	***REMOVED***
+		children: make(map[ID]struct{}),
+	}
 
 	is.images[imageID] = imageMeta
-	if err := is.digestSet.Add(imageID.Digest()); err != nil ***REMOVED***
+	if err := is.digestSet.Add(imageID.Digest()); err != nil {
 		delete(is.images, imageID)
 		return "", err
-	***REMOVED***
+	}
 
 	return imageID, nil
-***REMOVED***
+}
 
 type imageNotFoundError string
 
-func (e imageNotFoundError) Error() string ***REMOVED***
+func (e imageNotFoundError) Error() string {
 	return "No such image: " + string(e)
-***REMOVED***
+}
 
-func (imageNotFoundError) NotFound() ***REMOVED******REMOVED***
+func (imageNotFoundError) NotFound() {}
 
-func (is *store) Search(term string) (ID, error) ***REMOVED***
+func (is *store) Search(term string) (ID, error) {
 	dgst, err := is.digestSet.Lookup(term)
-	if err != nil ***REMOVED***
-		if err == digestset.ErrDigestNotFound ***REMOVED***
+	if err != nil {
+		if err == digestset.ErrDigestNotFound {
 			err = imageNotFoundError(term)
-		***REMOVED***
+		}
 		return "", errors.WithStack(err)
-	***REMOVED***
+	}
 	return IDFromDigest(dgst), nil
-***REMOVED***
+}
 
-func (is *store) Get(id ID) (*Image, error) ***REMOVED***
+func (is *store) Get(id ID) (*Image, error) {
 	// todo: Check if image is in images
 	// todo: Detect manual insertions and start using them
 	config, err := is.fs.Get(id.Digest())
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	img, err := NewFromJSON(config)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	img.computedID = id
 
 	img.Parent, err = is.GetParent(id)
-	if err != nil ***REMOVED***
+	if err != nil {
 		img.Parent = ""
-	***REMOVED***
+	}
 
 	return img, nil
-***REMOVED***
+}
 
-func (is *store) Delete(id ID) ([]layer.Metadata, error) ***REMOVED***
+func (is *store) Delete(id ID) ([]layer.Metadata, error) {
 	is.Lock()
 	defer is.Unlock()
 
 	imageMeta := is.images[id]
-	if imageMeta == nil ***REMOVED***
+	if imageMeta == nil {
 		return nil, fmt.Errorf("unrecognized image ID %s", id.String())
-	***REMOVED***
+	}
 	img, err := is.Get(id)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("unrecognized image %s, %v", id.String(), err)
-	***REMOVED***
-	if !system.IsOSSupported(img.OperatingSystem()) ***REMOVED***
+	}
+	if !system.IsOSSupported(img.OperatingSystem()) {
 		return nil, fmt.Errorf("unsupported image operating system %q", img.OperatingSystem())
-	***REMOVED***
-	for id := range imageMeta.children ***REMOVED***
+	}
+	for id := range imageMeta.children {
 		is.fs.DeleteMetadata(id.Digest(), "parent")
-	***REMOVED***
-	if parent, err := is.GetParent(id); err == nil && is.images[parent] != nil ***REMOVED***
+	}
+	if parent, err := is.GetParent(id); err == nil && is.images[parent] != nil {
 		delete(is.images[parent].children, id)
-	***REMOVED***
+	}
 
-	if err := is.digestSet.Remove(id.Digest()); err != nil ***REMOVED***
+	if err := is.digestSet.Remove(id.Digest()); err != nil {
 		logrus.Errorf("error removing %s from digest set: %q", id, err)
-	***REMOVED***
+	}
 	delete(is.images, id)
 	is.fs.Delete(id.Digest())
 
-	if imageMeta.layer != nil ***REMOVED***
+	if imageMeta.layer != nil {
 		return is.lss[img.OperatingSystem()].Release(imageMeta.layer)
-	***REMOVED***
+	}
 	return nil, nil
-***REMOVED***
+}
 
-func (is *store) SetParent(id, parent ID) error ***REMOVED***
+func (is *store) SetParent(id, parent ID) error {
 	is.Lock()
 	defer is.Unlock()
 	parentMeta := is.images[parent]
-	if parentMeta == nil ***REMOVED***
+	if parentMeta == nil {
 		return fmt.Errorf("unknown parent image ID %s", parent.String())
-	***REMOVED***
-	if parent, err := is.GetParent(id); err == nil && is.images[parent] != nil ***REMOVED***
+	}
+	if parent, err := is.GetParent(id); err == nil && is.images[parent] != nil {
 		delete(is.images[parent].children, id)
-	***REMOVED***
-	parentMeta.children[id] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
+	}
+	parentMeta.children[id] = struct{}{}
 	return is.fs.SetMetadata(id.Digest(), "parent", []byte(parent))
-***REMOVED***
+}
 
-func (is *store) GetParent(id ID) (ID, error) ***REMOVED***
+func (is *store) GetParent(id ID) (ID, error) {
 	d, err := is.fs.GetMetadata(id.Digest(), "parent")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	return ID(d), nil // todo: validate?
-***REMOVED***
+}
 
 // SetLastUpdated time for the image ID to the current time
-func (is *store) SetLastUpdated(id ID) error ***REMOVED***
+func (is *store) SetLastUpdated(id ID) error {
 	lastUpdated := []byte(time.Now().Format(time.RFC3339Nano))
 	return is.fs.SetMetadata(id.Digest(), "lastUpdated", lastUpdated)
-***REMOVED***
+}
 
 // GetLastUpdated time for the image ID
-func (is *store) GetLastUpdated(id ID) (time.Time, error) ***REMOVED***
+func (is *store) GetLastUpdated(id ID) (time.Time, error) {
 	bytes, err := is.fs.GetMetadata(id.Digest(), "lastUpdated")
-	if err != nil || len(bytes) == 0 ***REMOVED***
+	if err != nil || len(bytes) == 0 {
 		// No lastUpdated time
-		return time.Time***REMOVED******REMOVED***, nil
-	***REMOVED***
+		return time.Time{}, nil
+	}
 	return time.Parse(time.RFC3339Nano, string(bytes))
-***REMOVED***
+}
 
-func (is *store) Children(id ID) []ID ***REMOVED***
+func (is *store) Children(id ID) []ID {
 	is.RLock()
 	defer is.RUnlock()
 
 	return is.children(id)
-***REMOVED***
+}
 
-func (is *store) children(id ID) []ID ***REMOVED***
+func (is *store) children(id ID) []ID {
 	var ids []ID
-	if is.images[id] != nil ***REMOVED***
-		for id := range is.images[id].children ***REMOVED***
+	if is.images[id] != nil {
+		for id := range is.images[id].children {
 			ids = append(ids, id)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return ids
-***REMOVED***
+}
 
-func (is *store) Heads() map[ID]*Image ***REMOVED***
+func (is *store) Heads() map[ID]*Image {
 	return is.imagesMap(false)
-***REMOVED***
+}
 
-func (is *store) Map() map[ID]*Image ***REMOVED***
+func (is *store) Map() map[ID]*Image {
 	return is.imagesMap(true)
-***REMOVED***
+}
 
-func (is *store) imagesMap(all bool) map[ID]*Image ***REMOVED***
+func (is *store) imagesMap(all bool) map[ID]*Image {
 	is.RLock()
 	defer is.RUnlock()
 
 	images := make(map[ID]*Image)
 
-	for id := range is.images ***REMOVED***
-		if !all && len(is.children(id)) > 0 ***REMOVED***
+	for id := range is.images {
+		if !all && len(is.children(id)) > 0 {
 			continue
-		***REMOVED***
+		}
 		img, err := is.Get(id)
-		if err != nil ***REMOVED***
+		if err != nil {
 			logrus.Errorf("invalid image access: %q, error: %q", id, err)
 			continue
-		***REMOVED***
+		}
 		images[id] = img
-	***REMOVED***
+	}
 	return images
-***REMOVED***
+}

@@ -5,18 +5,18 @@ import (
 	"io"
 )
 
-func PrettyPrintTypeExpr(out io.Writer, e ast.Expr) ***REMOVED***
-	switch t := e.(type) ***REMOVED***
+func PrettyPrintTypeExpr(out io.Writer, e ast.Expr) {
+	switch t := e.(type) {
 	case *ast.StarExpr:
 		fmt.Fprintf(out, "*")
 		PrettyPrintTypeExpr(out, t.X)
 	case *ast.Ident:
 		// ast.Ident type decl as a reminder (note embedded type):
 		//
-		// type Ident struct ***REMOVED***
+		// type Ident struct {
 		//     token.Position         // identifier position
 		//     Obj            *Object // denoted object
-		// ***REMOVED***
+		// }
 		//
 		// Correct type inference in complex type switch statements +
 		// support for type embedding
@@ -35,24 +35,24 @@ func PrettyPrintTypeExpr(out io.Writer, e ast.Expr) ***REMOVED***
 		fmt.Fprintf(out, "]")
 		PrettyPrintTypeExpr(out, t.Value)
 	case *ast.InterfaceType:
-		fmt.Fprintf(out, "interface***REMOVED******REMOVED***")
+		fmt.Fprintf(out, "interface{}")
 	case *ast.Ellipsis:
 		fmt.Fprintf(out, "...")
 		PrettyPrintTypeExpr(out, t.Elt)
 	case *ast.StructType:
 		fmt.Fprintf(out, "struct")
 	case *ast.ChanType:
-		switch t.Dir ***REMOVED***
+		switch t.Dir {
 		case ast.RECV:
 			fmt.Fprintf(out, "<-chan ")
 		case ast.SEND:
 			fmt.Fprintf(out, "chan<- ")
 		case ast.SEND | ast.RECV:
 			fmt.Fprintf(out, "chan ")
-		***REMOVED***
+		}
 		PrettyPrintTypeExpr(out, t.Value)
 	default:
 		
 		panic("OMGWTFBBQ!")
-	***REMOVED***
-***REMOVED***
+	}
+}

@@ -24,202 +24,202 @@ const printerType = "golang.org/x/text/message.Printer"
 // machinery and rewrites strings to adopt best practices when possible.
 // If w is not nil the generated files are written to it, each files with a
 // "--- <filename>" header. Otherwise the files are overwritten.
-func Rewrite(w io.Writer, args ...string) error ***REMOVED***
-	conf := &loader.Config***REMOVED***
+func Rewrite(w io.Writer, args ...string) error {
+	conf := &loader.Config{
 		AllowErrors: true, // Allow unused instances of message.Printer.
-	***REMOVED***
+	}
 	prog, err := loadPackages(conf, args)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return wrap(err, "")
-	***REMOVED***
+	}
 
-	for _, info := range prog.InitialPackages() ***REMOVED***
-		for _, f := range info.Files ***REMOVED***
+	for _, info := range prog.InitialPackages() {
+		for _, f := range info.Files {
 			// Associate comments with nodes.
 
 			// Pick up initialized Printers at the package level.
-			r := rewriter***REMOVED***info: info, conf: conf***REMOVED***
-			for _, n := range info.InitOrder ***REMOVED***
-				if t := r.info.Types[n.Rhs].Type.String(); strings.HasSuffix(t, printerType) ***REMOVED***
+			r := rewriter{info: info, conf: conf}
+			for _, n := range info.InitOrder {
+				if t := r.info.Types[n.Rhs].Type.String(); strings.HasSuffix(t, printerType) {
 					r.printerVar = n.Lhs[0].Name()
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 
 			ast.Walk(&r, f)
 
 			w := w
-			if w == nil ***REMOVED***
+			if w == nil {
 				var err error
-				if w, err = os.Create(conf.Fset.File(f.Pos()).Name()); err != nil ***REMOVED***
+				if w, err = os.Create(conf.Fset.File(f.Pos()).Name()); err != nil {
 					return wrap(err, "open failed")
-				***REMOVED***
-			***REMOVED*** else ***REMOVED***
+				}
+			} else {
 				fmt.Fprintln(w, "---", conf.Fset.File(f.Pos()).Name())
-			***REMOVED***
+			}
 
-			if err := format.Node(w, conf.Fset, f); err != nil ***REMOVED***
+			if err := format.Node(w, conf.Fset, f); err != nil {
 				return wrap(err, "go format failed")
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
-type rewriter struct ***REMOVED***
+type rewriter struct {
 	info       *loader.PackageInfo
 	conf       *loader.Config
 	printerVar string
-***REMOVED***
+}
 
 // print returns Go syntax for the specified node.
-func (r *rewriter) print(n ast.Node) string ***REMOVED***
+func (r *rewriter) print(n ast.Node) string {
 	var buf bytes.Buffer
 	format.Node(&buf, r.conf.Fset, n)
 	return buf.String()
-***REMOVED***
+}
 
-func (r *rewriter) Visit(n ast.Node) ast.Visitor ***REMOVED***
+func (r *rewriter) Visit(n ast.Node) ast.Visitor {
 	// Save the state by scope.
-	if _, ok := n.(*ast.BlockStmt); ok ***REMOVED***
+	if _, ok := n.(*ast.BlockStmt); ok {
 		r := *r
 		return &r
-	***REMOVED***
+	}
 	// Find Printers created by assignment.
 	stmt, ok := n.(*ast.AssignStmt)
-	if ok ***REMOVED***
-		for _, v := range stmt.Lhs ***REMOVED***
-			if r.printerVar == r.print(v) ***REMOVED***
+	if ok {
+		for _, v := range stmt.Lhs {
+			if r.printerVar == r.print(v) {
 				r.printerVar = ""
-			***REMOVED***
-		***REMOVED***
-		for i, v := range stmt.Rhs ***REMOVED***
-			if t := r.info.Types[v].Type.String(); strings.HasSuffix(t, printerType) ***REMOVED***
+			}
+		}
+		for i, v := range stmt.Rhs {
+			if t := r.info.Types[v].Type.String(); strings.HasSuffix(t, printerType) {
 				r.printerVar = r.print(stmt.Lhs[i])
 				return r
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	// Find Printers created by variable declaration.
 	spec, ok := n.(*ast.ValueSpec)
-	if ok ***REMOVED***
-		for _, v := range spec.Names ***REMOVED***
-			if r.printerVar == r.print(v) ***REMOVED***
+	if ok {
+		for _, v := range spec.Names {
+			if r.printerVar == r.print(v) {
 				r.printerVar = ""
-			***REMOVED***
-		***REMOVED***
-		for i, v := range spec.Values ***REMOVED***
-			if t := r.info.Types[v].Type.String(); strings.HasSuffix(t, printerType) ***REMOVED***
+			}
+		}
+		for i, v := range spec.Values {
+			if t := r.info.Types[v].Type.String(); strings.HasSuffix(t, printerType) {
 				r.printerVar = r.print(spec.Names[i])
 				return r
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-	if r.printerVar == "" ***REMOVED***
+			}
+		}
+	}
+	if r.printerVar == "" {
 		return r
-	***REMOVED***
+	}
 	call, ok := n.(*ast.CallExpr)
-	if !ok ***REMOVED***
+	if !ok {
 		return r
-	***REMOVED***
+	}
 
 	// TODO: Handle literal values?
 	sel, ok := call.Fun.(*ast.SelectorExpr)
-	if !ok ***REMOVED***
+	if !ok {
 		return r
-	***REMOVED***
+	}
 	meth := r.info.Selections[sel]
 
 	source := r.print(sel.X)
 	fun := r.print(sel.Sel)
-	if meth != nil ***REMOVED***
+	if meth != nil {
 		source = meth.Recv().String()
 		fun = meth.Obj().Name()
-	***REMOVED***
+	}
 
 	// TODO: remove cheap hack and check if the type either
 	// implements some interface or is specifically of type
 	// "golang.org/x/text/message".Printer.
 	m, ok := rewriteFuncs[source]
-	if !ok ***REMOVED***
+	if !ok {
 		return r
-	***REMOVED***
+	}
 
 	rewriteType, ok := m[fun]
-	if !ok ***REMOVED***
+	if !ok {
 		return r
-	***REMOVED***
+	}
 	ident := ast.NewIdent(r.printerVar)
 	ident.NamePos = sel.X.Pos()
 	sel.X = ident
-	if rewriteType.method != "" ***REMOVED***
+	if rewriteType.method != "" {
 		sel.Sel.Name = rewriteType.method
-	***REMOVED***
+	}
 
 	// Analyze arguments.
 	argn := rewriteType.arg
-	if rewriteType.format || argn >= len(call.Args) ***REMOVED***
+	if rewriteType.format || argn >= len(call.Args) {
 		return r
-	***REMOVED***
+	}
 	hasConst := false
-	for _, a := range call.Args[argn:] ***REMOVED***
-		if v := r.info.Types[a].Value; v != nil && v.Kind() == constant.String ***REMOVED***
+	for _, a := range call.Args[argn:] {
+		if v := r.info.Types[a].Value; v != nil && v.Kind() == constant.String {
 			hasConst = true
 			break
-		***REMOVED***
-	***REMOVED***
-	if !hasConst ***REMOVED***
+		}
+	}
+	if !hasConst {
 		return r
-	***REMOVED***
+	}
 	sel.Sel.Name = rewriteType.methodf
 
 	// We are done if there is only a single string that does not need to be
 	// escaped.
-	if len(call.Args) == 1 ***REMOVED***
+	if len(call.Args) == 1 {
 		s, ok := constStr(r.info, call.Args[0])
-		if ok && !strings.Contains(s, "%") && !rewriteType.newLine ***REMOVED***
+		if ok && !strings.Contains(s, "%") && !rewriteType.newLine {
 			return r
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Rewrite arguments as format string.
-	expr := &ast.BasicLit***REMOVED***
+	expr := &ast.BasicLit{
 		ValuePos: call.Lparen,
 		Kind:     token.STRING,
-	***REMOVED***
+	}
 	newArgs := append(call.Args[:argn:argn], expr)
-	newStr := []string***REMOVED******REMOVED***
-	for i, a := range call.Args[argn:] ***REMOVED***
-		if s, ok := constStr(r.info, a); ok ***REMOVED***
+	newStr := []string{}
+	for i, a := range call.Args[argn:] {
+		if s, ok := constStr(r.info, a); ok {
 			newStr = append(newStr, strings.Replace(s, "%", "%%", -1))
-		***REMOVED*** else ***REMOVED***
+		} else {
 			newStr = append(newStr, "%v")
 			newArgs = append(newArgs, call.Args[argn+i])
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	s := strings.Join(newStr, rewriteType.sep)
-	if rewriteType.newLine ***REMOVED***
+	if rewriteType.newLine {
 		s += "\n"
-	***REMOVED***
+	}
 	expr.Value = fmt.Sprintf("%q", s)
 
 	call.Args = newArgs
 
 	// TODO: consider creating an expression instead of a constant string and
 	// then wrapping it in an escape function or so:
-	// call.Args[argn+i] = &ast.CallExpr***REMOVED***
-	// 		Fun: &ast.SelectorExpr***REMOVED***
+	// call.Args[argn+i] = &ast.CallExpr{
+	// 		Fun: &ast.SelectorExpr{
 	// 			X:   ast.NewIdent("message"),
 	// 			Sel: ast.NewIdent("Lookup"),
-	// 		***REMOVED***,
-	// 		Args: []ast.Expr***REMOVED***a***REMOVED***,
-	// 	***REMOVED***
-	// ***REMOVED***
+	// 		},
+	// 		Args: []ast.Expr{a},
+	// 	}
+	// }
 
 	return r
-***REMOVED***
+}
 
-type rewriteType struct ***REMOVED***
+type rewriteType struct {
 	// method is the name of the equivalent method on a printer, or "" if it is
 	// the same.
 	method string
@@ -238,31 +238,31 @@ type rewriteType struct ***REMOVED***
 
 	sep     string
 	newLine bool
-***REMOVED***
+}
 
 // rewriteFuncs list functions that can be directly mapped to the printer
 // functions of the message package.
-var rewriteFuncs = map[string]map[string]rewriteType***REMOVED***
+var rewriteFuncs = map[string]map[string]rewriteType{
 	// TODO: Printer -> *golang.org/x/text/message.Printer
-	"fmt": ***REMOVED***
-		"Print":  rewriteType***REMOVED***methodf: "Printf"***REMOVED***,
-		"Sprint": rewriteType***REMOVED***methodf: "Sprintf"***REMOVED***,
-		"Fprint": rewriteType***REMOVED***methodf: "Fprintf"***REMOVED***,
+	"fmt": {
+		"Print":  rewriteType{methodf: "Printf"},
+		"Sprint": rewriteType{methodf: "Sprintf"},
+		"Fprint": rewriteType{methodf: "Fprintf"},
 
-		"Println":  rewriteType***REMOVED***methodf: "Printf", sep: " ", newLine: true***REMOVED***,
-		"Sprintln": rewriteType***REMOVED***methodf: "Sprintf", sep: " ", newLine: true***REMOVED***,
-		"Fprintln": rewriteType***REMOVED***methodf: "Fprintf", sep: " ", newLine: true***REMOVED***,
+		"Println":  rewriteType{methodf: "Printf", sep: " ", newLine: true},
+		"Sprintln": rewriteType{methodf: "Sprintf", sep: " ", newLine: true},
+		"Fprintln": rewriteType{methodf: "Fprintf", sep: " ", newLine: true},
 
-		"Printf":  rewriteType***REMOVED***method: "Printf", format: true***REMOVED***,
-		"Sprintf": rewriteType***REMOVED***method: "Sprintf", format: true***REMOVED***,
-		"Fprintf": rewriteType***REMOVED***method: "Fprintf", format: true***REMOVED***,
-	***REMOVED***,
-***REMOVED***
+		"Printf":  rewriteType{method: "Printf", format: true},
+		"Sprintf": rewriteType{method: "Sprintf", format: true},
+		"Fprintf": rewriteType{method: "Fprintf", format: true},
+	},
+}
 
-func constStr(info *loader.PackageInfo, e ast.Expr) (s string, ok bool) ***REMOVED***
+func constStr(info *loader.PackageInfo, e ast.Expr) (s string, ok bool) {
 	v := info.Types[e].Value
-	if v == nil || v.Kind() != constant.String ***REMOVED***
+	if v == nil || v.Kind() != constant.String {
 		return "", false
-	***REMOVED***
+	}
 	return constant.StringVal(v), true
-***REMOVED***
+}

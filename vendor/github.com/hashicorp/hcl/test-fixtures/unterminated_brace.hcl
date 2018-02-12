@@ -1,2 +1,2 @@
-foo "baz" ***REMOVED***
+foo "baz" {
     bar = "baz"

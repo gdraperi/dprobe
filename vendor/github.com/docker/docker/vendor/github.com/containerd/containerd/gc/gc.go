@@ -15,11 +15,11 @@ type ResourceType uint8
 
 // Node presents a resource which has a type and key,
 // this node can be used to lookup other nodes.
-type Node struct ***REMOVED***
+type Node struct {
 	Type      ResourceType
 	Namespace string
 	Key       string
-***REMOVED***
+}
 
 // Tricolor implements basic, single-thread tri-color GC. Given the roots, the
 // complete set and a refs function, this function returns a map of all
@@ -32,38 +32,38 @@ type Node struct ***REMOVED***
 //
 // We can probably use this to inform a design for incremental GC by injecting
 // callbacks to the set modification algorithms.
-func Tricolor(roots []Node, refs func(ref Node) ([]Node, error)) (map[Node]struct***REMOVED******REMOVED***, error) ***REMOVED***
+func Tricolor(roots []Node, refs func(ref Node) ([]Node, error)) (map[Node]struct{}, error) {
 	var (
 		grays     []Node                // maintain a gray "stack"
-		seen      = map[Node]struct***REMOVED******REMOVED******REMOVED******REMOVED*** // or not "white", basically "seen"
-		reachable = map[Node]struct***REMOVED******REMOVED******REMOVED******REMOVED*** // or "black", in tri-color parlance
+		seen      = map[Node]struct{}{} // or not "white", basically "seen"
+		reachable = map[Node]struct{}{} // or "black", in tri-color parlance
 	)
 
 	grays = append(grays, roots...)
 
-	for len(grays) > 0 ***REMOVED***
+	for len(grays) > 0 {
 		// Pick any gray object
 		id := grays[len(grays)-1] // effectively "depth first" because first element
 		grays = grays[:len(grays)-1]
-		seen[id] = struct***REMOVED******REMOVED******REMOVED******REMOVED*** // post-mark this as not-white
+		seen[id] = struct{}{} // post-mark this as not-white
 		rs, err := refs(id)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 
 		// mark all the referenced objects as gray
-		for _, target := range rs ***REMOVED***
-			if _, ok := seen[target]; !ok ***REMOVED***
+		for _, target := range rs {
+			if _, ok := seen[target]; !ok {
 				grays = append(grays, target)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		// mark as black when done
-		reachable[id] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	***REMOVED***
+		reachable[id] = struct{}{}
+	}
 
 	return reachable, nil
-***REMOVED***
+}
 
 // ConcurrentMark implements simple, concurrent GC. All the roots are scanned
 // and the complete set of references is formed by calling the refs function
@@ -74,87 +74,87 @@ func Tricolor(roots []Node, refs func(ref Node) ([]Node, error)) (map[Node]struc
 // until the result is used to delete objects in the system.
 //
 // It will allocate memory proportional to the size of the reachable set.
-func ConcurrentMark(ctx context.Context, root <-chan Node, refs func(context.Context, Node, func(Node)) error) (map[Node]struct***REMOVED******REMOVED***, error) ***REMOVED***
+func ConcurrentMark(ctx context.Context, root <-chan Node, refs func(context.Context, Node, func(Node)) error) (map[Node]struct{}, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
 	var (
 		grays = make(chan Node)
-		seen  = map[Node]struct***REMOVED******REMOVED******REMOVED******REMOVED*** // or not "white", basically "seen"
+		seen  = map[Node]struct{}{} // or not "white", basically "seen"
 		wg    sync.WaitGroup
 
 		errOnce sync.Once
 		refErr  error
 	)
 
-	go func() ***REMOVED***
-		for gray := range grays ***REMOVED***
-			if _, ok := seen[gray]; ok ***REMOVED***
+	go func() {
+		for gray := range grays {
+			if _, ok := seen[gray]; ok {
 				wg.Done()
 				continue
-			***REMOVED***
-			seen[gray] = struct***REMOVED******REMOVED******REMOVED******REMOVED*** // post-mark this as non-white
+			}
+			seen[gray] = struct{}{} // post-mark this as non-white
 
-			go func(gray Node) ***REMOVED***
+			go func(gray Node) {
 				defer wg.Done()
 
-				send := func(n Node) ***REMOVED***
+				send := func(n Node) {
 					wg.Add(1)
-					select ***REMOVED***
+					select {
 					case grays <- n:
 					case <-ctx.Done():
 						wg.Done()
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 
-				if err := refs(ctx, gray, send); err != nil ***REMOVED***
-					errOnce.Do(func() ***REMOVED***
+				if err := refs(ctx, gray, send); err != nil {
+					errOnce.Do(func() {
 						refErr = err
 						cancel()
-					***REMOVED***)
-				***REMOVED***
+					})
+				}
 
-			***REMOVED***(gray)
-		***REMOVED***
-	***REMOVED***()
+			}(gray)
+		}
+	}()
 
-	for r := range root ***REMOVED***
+	for r := range root {
 		wg.Add(1)
-		select ***REMOVED***
+		select {
 		case grays <- r:
 		case <-ctx.Done():
 			wg.Done()
-		***REMOVED***
+		}
 
-	***REMOVED***
+	}
 
 	// Wait for outstanding grays to be processed
 	wg.Wait()
 
 	close(grays)
 
-	if refErr != nil ***REMOVED***
+	if refErr != nil {
 		return nil, refErr
-	***REMOVED***
-	if cErr := ctx.Err(); cErr != nil ***REMOVED***
+	}
+	if cErr := ctx.Err(); cErr != nil {
 		return nil, cErr
-	***REMOVED***
+	}
 
 	return seen, nil
-***REMOVED***
+}
 
 // Sweep removes all nodes returned through the channel which are not in
 // the reachable set by calling the provided remove function.
-func Sweep(reachable map[Node]struct***REMOVED******REMOVED***, all []Node, remove func(Node) error) error ***REMOVED***
+func Sweep(reachable map[Node]struct{}, all []Node, remove func(Node) error) error {
 	// All black objects are now reachable, and all white objects are
 	// unreachable. Free those that are white!
-	for _, node := range all ***REMOVED***
-		if _, ok := reachable[node]; !ok ***REMOVED***
-			if err := remove(node); err != nil ***REMOVED***
+	for _, node := range all {
+		if _, ok := reachable[node]; !ok {
+			if err := remove(node); err != nil {
 				return err
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	return nil
-***REMOVED***
+}

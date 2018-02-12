@@ -25,27 +25,27 @@ or other conditions. The main features are:
 
 Let's start registering a couple of URL paths and handlers:
 
-	func main() ***REMOVED***
+	func main() {
 		r := mux.NewRouter()
 		r.HandleFunc("/", HomeHandler)
 		r.HandleFunc("/products", ProductsHandler)
 		r.HandleFunc("/articles", ArticlesHandler)
 		http.Handle("/", r)
-	***REMOVED***
+	}
 
 Here we register three routes mapping URL paths to handlers. This is
 equivalent to how http.HandleFunc() works: if an incoming request URL matches
 one of the paths, the corresponding handler is called passing
 (http.ResponseWriter, *http.Request) as parameters.
 
-Paths can have variables. They are defined using the format ***REMOVED***name***REMOVED*** or
-***REMOVED***name:pattern***REMOVED***. If a regular expression pattern is not defined, the matched
+Paths can have variables. They are defined using the format {name} or
+{name:pattern}. If a regular expression pattern is not defined, the matched
 variable will be anything until the next slash. For example:
 
 	r := mux.NewRouter()
-	r.HandleFunc("/products/***REMOVED***key***REMOVED***", ProductHandler)
-	r.HandleFunc("/articles/***REMOVED***category***REMOVED***/", ArticlesCategoryHandler)
-	r.HandleFunc("/articles/***REMOVED***category***REMOVED***/***REMOVED***id:[0-9]+***REMOVED***", ArticleHandler)
+	r.HandleFunc("/products/{key}", ProductHandler)
+	r.HandleFunc("/articles/{category}/", ArticlesCategoryHandler)
+	r.HandleFunc("/articles/{category}/{id:[0-9]+}", ArticleHandler)
 
 The names are used to create a map of route variables which can be retrieved
 calling mux.Vars():
@@ -63,7 +63,7 @@ pattern to be matched. They can also have variables:
 	// Only matches if domain is "www.example.com".
 	r.Host("www.example.com")
 	// Matches a dynamic subdomain.
-	r.Host("***REMOVED***subdomain:[a-z]+***REMOVED***.domain.com")
+	r.Host("{subdomain:[a-z]+}.domain.com")
 
 There are several other matchers that can be added. To match path prefixes:
 
@@ -87,9 +87,9 @@ There are several other matchers that can be added. To match path prefixes:
 
 ...or to use a custom matcher function:
 
-	r.MatcherFunc(func(r *http.Request, rm *RouteMatch) bool ***REMOVED***
+	r.MatcherFunc(func(r *http.Request, rm *RouteMatch) bool {
 		return r.ProtoMajor == 0
-	***REMOVED***)
+	})
 
 ...and finally, it is possible to combine several matchers in a single route:
 
@@ -112,8 +112,8 @@ from it:
 Then register routes in the subrouter:
 
 	s.HandleFunc("/products/", ProductsHandler)
-	s.HandleFunc("/products/***REMOVED***key***REMOVED***", ProductHandler)
-	s.HandleFunc("/articles/***REMOVED***category***REMOVED***/***REMOVED***id:[0-9]+***REMOVED***"), ArticleHandler)
+	s.HandleFunc("/products/{key}", ProductHandler)
+	s.HandleFunc("/articles/{category}/{id:[0-9]+}"), ArticleHandler)
 
 The three URL paths we registered above will only be tested if the domain is
 "www.example.com", because the subrouter is tested first. This is not
@@ -131,10 +131,10 @@ the inner routes use it as base for their paths:
 	s := r.PathPrefix("/products").Subrouter()
 	// "/products/"
 	s.HandleFunc("/", ProductsHandler)
-	// "/products/***REMOVED***key***REMOVED***/"
-	s.HandleFunc("/***REMOVED***key***REMOVED***/", ProductHandler)
-	// "/products/***REMOVED***key***REMOVED***/details"
-	s.HandleFunc("/***REMOVED***key***REMOVED***/details", ProductDetailsHandler)
+	// "/products/{key}/"
+	s.HandleFunc("/{key}/", ProductHandler)
+	// "/products/{key}/details"
+	s.HandleFunc("/{key}/details", ProductDetailsHandler)
 
 Now let's see how to build registered URLs.
 
@@ -142,7 +142,7 @@ Routes can be named. All routes that define a name can have their URLs built,
 or "reversed". We define a name calling Name() on a route. For example:
 
 	r := mux.NewRouter()
-	r.HandleFunc("/articles/***REMOVED***category***REMOVED***/***REMOVED***id:[0-9]+***REMOVED***", ArticleHandler).
+	r.HandleFunc("/articles/{category}/{id:[0-9]+}", ArticleHandler).
 	  Name("article")
 
 To build a URL, get the route and call the URL() method, passing a sequence of
@@ -157,8 +157,8 @@ key/value pairs for the route variables. For the previous route, we would do:
 This also works for host variables:
 
 	r := mux.NewRouter()
-	r.Host("***REMOVED***subdomain***REMOVED***.domain.com").
-	  Path("/articles/***REMOVED***category***REMOVED***/***REMOVED***id:[0-9]+***REMOVED***").
+	r.Host("{subdomain}.domain.com").
+	  Path("/articles/{category}/{id:[0-9]+}").
 	  HandlerFunc(ArticleHandler).
 	  Name("article")
 
@@ -193,8 +193,8 @@ And if you use subrouters, host and path defined separately can be built
 as well:
 
 	r := mux.NewRouter()
-	s := r.Host("***REMOVED***subdomain***REMOVED***.domain.com").Subrouter()
-	s.Path("/articles/***REMOVED***category***REMOVED***/***REMOVED***id:[0-9]+***REMOVED***").
+	s := r.Host("{subdomain}.domain.com").Subrouter()
+	s.Path("/articles/{category}/{id:[0-9]+}").
 	  HandlerFunc(ArticleHandler).
 	  Name("article")
 

@@ -10,7 +10,7 @@ import (
 )
 
 // EndpointInfo provides an interface to retrieve network resources bound to the endpoint.
-type EndpointInfo interface ***REMOVED***
+type EndpointInfo interface {
 	// Iface returns InterfaceInfo, go interface that can be used
 	// to get more information on the interface which was assigned to
 	// the endpoint by the driver. This can be used after the
@@ -34,10 +34,10 @@ type EndpointInfo interface ***REMOVED***
 
 	// LoadBalancer returns whether the endpoint is the load balancer endpoint for the network.
 	LoadBalancer() bool
-***REMOVED***
+}
 
 // InterfaceInfo provides an interface to retrieve interface addresses bound to the endpoint.
-type InterfaceInfo interface ***REMOVED***
+type InterfaceInfo interface {
 	// MacAddress returns the MAC address assigned to the endpoint.
 	MacAddress() net.HardwareAddr
 
@@ -49,9 +49,9 @@ type InterfaceInfo interface ***REMOVED***
 
 	// LinkLocalAddresses returns the list of link-local (IPv4/IPv6) addresses assigned to the endpoint.
 	LinkLocalAddresses() []*net.IPNet
-***REMOVED***
+}
 
-type endpointInterface struct ***REMOVED***
+type endpointInterface struct {
 	mac       net.HardwareAddr
 	addr      *net.IPNet
 	addrv6    *net.IPNet
@@ -61,72 +61,72 @@ type endpointInterface struct ***REMOVED***
 	routes    []*net.IPNet
 	v4PoolID  string
 	v6PoolID  string
-***REMOVED***
+}
 
-func (epi *endpointInterface) MarshalJSON() ([]byte, error) ***REMOVED***
-	epMap := make(map[string]interface***REMOVED******REMOVED***)
-	if epi.mac != nil ***REMOVED***
+func (epi *endpointInterface) MarshalJSON() ([]byte, error) {
+	epMap := make(map[string]interface{})
+	if epi.mac != nil {
 		epMap["mac"] = epi.mac.String()
-	***REMOVED***
-	if epi.addr != nil ***REMOVED***
+	}
+	if epi.addr != nil {
 		epMap["addr"] = epi.addr.String()
-	***REMOVED***
-	if epi.addrv6 != nil ***REMOVED***
+	}
+	if epi.addrv6 != nil {
 		epMap["addrv6"] = epi.addrv6.String()
-	***REMOVED***
-	if len(epi.llAddrs) != 0 ***REMOVED***
+	}
+	if len(epi.llAddrs) != 0 {
 		list := make([]string, 0, len(epi.llAddrs))
-		for _, ll := range epi.llAddrs ***REMOVED***
+		for _, ll := range epi.llAddrs {
 			list = append(list, ll.String())
-		***REMOVED***
+		}
 		epMap["llAddrs"] = list
-	***REMOVED***
+	}
 	epMap["srcName"] = epi.srcName
 	epMap["dstPrefix"] = epi.dstPrefix
 	var routes []string
-	for _, route := range epi.routes ***REMOVED***
+	for _, route := range epi.routes {
 		routes = append(routes, route.String())
-	***REMOVED***
+	}
 	epMap["routes"] = routes
 	epMap["v4PoolID"] = epi.v4PoolID
 	epMap["v6PoolID"] = epi.v6PoolID
 	return json.Marshal(epMap)
-***REMOVED***
+}
 
-func (epi *endpointInterface) UnmarshalJSON(b []byte) error ***REMOVED***
+func (epi *endpointInterface) UnmarshalJSON(b []byte) error {
 	var (
 		err   error
-		epMap map[string]interface***REMOVED******REMOVED***
+		epMap map[string]interface{}
 	)
-	if err = json.Unmarshal(b, &epMap); err != nil ***REMOVED***
+	if err = json.Unmarshal(b, &epMap); err != nil {
 		return err
-	***REMOVED***
-	if v, ok := epMap["mac"]; ok ***REMOVED***
-		if epi.mac, err = net.ParseMAC(v.(string)); err != nil ***REMOVED***
+	}
+	if v, ok := epMap["mac"]; ok {
+		if epi.mac, err = net.ParseMAC(v.(string)); err != nil {
 			return types.InternalErrorf("failed to decode endpoint interface mac address after json unmarshal: %s", v.(string))
-		***REMOVED***
-	***REMOVED***
-	if v, ok := epMap["addr"]; ok ***REMOVED***
-		if epi.addr, err = types.ParseCIDR(v.(string)); err != nil ***REMOVED***
+		}
+	}
+	if v, ok := epMap["addr"]; ok {
+		if epi.addr, err = types.ParseCIDR(v.(string)); err != nil {
 			return types.InternalErrorf("failed to decode endpoint interface ipv4 address after json unmarshal: %v", err)
-		***REMOVED***
-	***REMOVED***
-	if v, ok := epMap["addrv6"]; ok ***REMOVED***
-		if epi.addrv6, err = types.ParseCIDR(v.(string)); err != nil ***REMOVED***
+		}
+	}
+	if v, ok := epMap["addrv6"]; ok {
+		if epi.addrv6, err = types.ParseCIDR(v.(string)); err != nil {
 			return types.InternalErrorf("failed to decode endpoint interface ipv6 address after json unmarshal: %v", err)
-		***REMOVED***
-	***REMOVED***
-	if v, ok := epMap["llAddrs"]; ok ***REMOVED***
-		list := v.([]interface***REMOVED******REMOVED***)
+		}
+	}
+	if v, ok := epMap["llAddrs"]; ok {
+		list := v.([]interface{})
 		epi.llAddrs = make([]*net.IPNet, 0, len(list))
-		for _, llS := range list ***REMOVED***
+		for _, llS := range list {
 			ll, err := types.ParseCIDR(llS.(string))
-			if err != nil ***REMOVED***
+			if err != nil {
 				return types.InternalErrorf("failed to decode endpoint interface link-local address (%v) after json unmarshal: %v", llS, err)
-			***REMOVED***
+			}
 			epi.llAddrs = append(epi.llAddrs, ll)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	epi.srcName = epMap["srcName"].(string)
 	epi.dstPrefix = epMap["dstPrefix"].(string)
 
@@ -134,20 +134,20 @@ func (epi *endpointInterface) UnmarshalJSON(b []byte) error ***REMOVED***
 	var routes []string
 	json.Unmarshal(rb, &routes)
 	epi.routes = make([]*net.IPNet, 0)
-	for _, route := range routes ***REMOVED***
+	for _, route := range routes {
 		ip, ipr, err := net.ParseCIDR(route)
-		if err == nil ***REMOVED***
+		if err == nil {
 			ipr.IP = ip
 			epi.routes = append(epi.routes, ipr)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	epi.v4PoolID = epMap["v4PoolID"].(string)
 	epi.v6PoolID = epMap["v6PoolID"].(string)
 
 	return nil
-***REMOVED***
+}
 
-func (epi *endpointInterface) CopyTo(dstEpi *endpointInterface) error ***REMOVED***
+func (epi *endpointInterface) CopyTo(dstEpi *endpointInterface) error {
 	dstEpi.mac = types.GetMacCopy(epi.mac)
 	dstEpi.addr = types.GetIPNetCopy(epi.addr)
 	dstEpi.addrv6 = types.GetIPNetCopy(epi.addrv6)
@@ -155,292 +155,292 @@ func (epi *endpointInterface) CopyTo(dstEpi *endpointInterface) error ***REMOVED
 	dstEpi.dstPrefix = epi.dstPrefix
 	dstEpi.v4PoolID = epi.v4PoolID
 	dstEpi.v6PoolID = epi.v6PoolID
-	if len(epi.llAddrs) != 0 ***REMOVED***
+	if len(epi.llAddrs) != 0 {
 		dstEpi.llAddrs = make([]*net.IPNet, 0, len(epi.llAddrs))
 		dstEpi.llAddrs = append(dstEpi.llAddrs, epi.llAddrs...)
-	***REMOVED***
+	}
 
-	for _, route := range epi.routes ***REMOVED***
+	for _, route := range epi.routes {
 		dstEpi.routes = append(dstEpi.routes, types.GetIPNetCopy(route))
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-type endpointJoinInfo struct ***REMOVED***
+type endpointJoinInfo struct {
 	gw                    net.IP
 	gw6                   net.IP
 	StaticRoutes          []*types.StaticRoute
 	driverTableEntries    []*tableEntry
 	disableGatewayService bool
-***REMOVED***
+}
 
-type tableEntry struct ***REMOVED***
+type tableEntry struct {
 	tableName string
 	key       string
 	value     []byte
-***REMOVED***
+}
 
-func (ep *endpoint) Info() EndpointInfo ***REMOVED***
-	if ep.sandboxID != "" ***REMOVED***
+func (ep *endpoint) Info() EndpointInfo {
+	if ep.sandboxID != "" {
 		return ep
-	***REMOVED***
+	}
 	n, err := ep.getNetworkFromStore()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil
-	***REMOVED***
+	}
 
 	ep, err = n.getEndpointFromStore(ep.ID())
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil
-	***REMOVED***
+	}
 
 	sb, ok := ep.getSandbox()
-	if !ok ***REMOVED***
+	if !ok {
 		// endpoint hasn't joined any sandbox.
 		// Just return the endpoint
 		return ep
-	***REMOVED***
+	}
 
 	return sb.getEndpoint(ep.ID())
-***REMOVED***
+}
 
-func (ep *endpoint) Iface() InterfaceInfo ***REMOVED***
+func (ep *endpoint) Iface() InterfaceInfo {
 	ep.Lock()
 	defer ep.Unlock()
 
-	if ep.iface != nil ***REMOVED***
+	if ep.iface != nil {
 		return ep.iface
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (ep *endpoint) Interface() driverapi.InterfaceInfo ***REMOVED***
+func (ep *endpoint) Interface() driverapi.InterfaceInfo {
 	ep.Lock()
 	defer ep.Unlock()
 
-	if ep.iface != nil ***REMOVED***
+	if ep.iface != nil {
 		return ep.iface
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (epi *endpointInterface) SetMacAddress(mac net.HardwareAddr) error ***REMOVED***
-	if epi.mac != nil ***REMOVED***
+func (epi *endpointInterface) SetMacAddress(mac net.HardwareAddr) error {
+	if epi.mac != nil {
 		return types.ForbiddenErrorf("endpoint interface MAC address present (%s). Cannot be modified with %s.", epi.mac, mac)
-	***REMOVED***
-	if mac == nil ***REMOVED***
+	}
+	if mac == nil {
 		return types.BadRequestErrorf("tried to set nil MAC address to endpoint interface")
-	***REMOVED***
+	}
 	epi.mac = types.GetMacCopy(mac)
 	return nil
-***REMOVED***
+}
 
-func (epi *endpointInterface) SetIPAddress(address *net.IPNet) error ***REMOVED***
-	if address.IP == nil ***REMOVED***
+func (epi *endpointInterface) SetIPAddress(address *net.IPNet) error {
+	if address.IP == nil {
 		return types.BadRequestErrorf("tried to set nil IP address to endpoint interface")
-	***REMOVED***
-	if address.IP.To4() == nil ***REMOVED***
+	}
+	if address.IP.To4() == nil {
 		return setAddress(&epi.addrv6, address)
-	***REMOVED***
+	}
 	return setAddress(&epi.addr, address)
-***REMOVED***
+}
 
-func setAddress(ifaceAddr **net.IPNet, address *net.IPNet) error ***REMOVED***
-	if *ifaceAddr != nil ***REMOVED***
+func setAddress(ifaceAddr **net.IPNet, address *net.IPNet) error {
+	if *ifaceAddr != nil {
 		return types.ForbiddenErrorf("endpoint interface IP present (%s). Cannot be modified with (%s).", *ifaceAddr, address)
-	***REMOVED***
+	}
 	*ifaceAddr = types.GetIPNetCopy(address)
 	return nil
-***REMOVED***
+}
 
-func (epi *endpointInterface) MacAddress() net.HardwareAddr ***REMOVED***
+func (epi *endpointInterface) MacAddress() net.HardwareAddr {
 	return types.GetMacCopy(epi.mac)
-***REMOVED***
+}
 
-func (epi *endpointInterface) Address() *net.IPNet ***REMOVED***
+func (epi *endpointInterface) Address() *net.IPNet {
 	return types.GetIPNetCopy(epi.addr)
-***REMOVED***
+}
 
-func (epi *endpointInterface) AddressIPv6() *net.IPNet ***REMOVED***
+func (epi *endpointInterface) AddressIPv6() *net.IPNet {
 	return types.GetIPNetCopy(epi.addrv6)
-***REMOVED***
+}
 
-func (epi *endpointInterface) LinkLocalAddresses() []*net.IPNet ***REMOVED***
+func (epi *endpointInterface) LinkLocalAddresses() []*net.IPNet {
 	return epi.llAddrs
-***REMOVED***
+}
 
-func (epi *endpointInterface) SetNames(srcName string, dstPrefix string) error ***REMOVED***
+func (epi *endpointInterface) SetNames(srcName string, dstPrefix string) error {
 	epi.srcName = srcName
 	epi.dstPrefix = dstPrefix
 	return nil
-***REMOVED***
+}
 
-func (ep *endpoint) InterfaceName() driverapi.InterfaceNameInfo ***REMOVED***
+func (ep *endpoint) InterfaceName() driverapi.InterfaceNameInfo {
 	ep.Lock()
 	defer ep.Unlock()
 
-	if ep.iface != nil ***REMOVED***
+	if ep.iface != nil {
 		return ep.iface
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (ep *endpoint) AddStaticRoute(destination *net.IPNet, routeType int, nextHop net.IP) error ***REMOVED***
+func (ep *endpoint) AddStaticRoute(destination *net.IPNet, routeType int, nextHop net.IP) error {
 	ep.Lock()
 	defer ep.Unlock()
 
-	r := types.StaticRoute***REMOVED***Destination: destination, RouteType: routeType, NextHop: nextHop***REMOVED***
+	r := types.StaticRoute{Destination: destination, RouteType: routeType, NextHop: nextHop}
 
-	if routeType == types.NEXTHOP ***REMOVED***
+	if routeType == types.NEXTHOP {
 		// If the route specifies a next-hop, then it's loosely routed (i.e. not bound to a particular interface).
 		ep.joinInfo.StaticRoutes = append(ep.joinInfo.StaticRoutes, &r)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		// If the route doesn't specify a next-hop, it must be a connected route, bound to an interface.
 		ep.iface.routes = append(ep.iface.routes, r.Destination)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (ep *endpoint) AddTableEntry(tableName, key string, value []byte) error ***REMOVED***
+func (ep *endpoint) AddTableEntry(tableName, key string, value []byte) error {
 	ep.Lock()
 	defer ep.Unlock()
 
-	ep.joinInfo.driverTableEntries = append(ep.joinInfo.driverTableEntries, &tableEntry***REMOVED***
+	ep.joinInfo.driverTableEntries = append(ep.joinInfo.driverTableEntries, &tableEntry{
 		tableName: tableName,
 		key:       key,
 		value:     value,
-	***REMOVED***)
+	})
 
 	return nil
-***REMOVED***
+}
 
-func (ep *endpoint) Sandbox() Sandbox ***REMOVED***
+func (ep *endpoint) Sandbox() Sandbox {
 	cnt, ok := ep.getSandbox()
-	if !ok ***REMOVED***
+	if !ok {
 		return nil
-	***REMOVED***
+	}
 	return cnt
-***REMOVED***
+}
 
-func (ep *endpoint) LoadBalancer() bool ***REMOVED***
+func (ep *endpoint) LoadBalancer() bool {
 	ep.Lock()
 	defer ep.Unlock()
 	return ep.loadBalancer
-***REMOVED***
+}
 
-func (ep *endpoint) StaticRoutes() []*types.StaticRoute ***REMOVED***
+func (ep *endpoint) StaticRoutes() []*types.StaticRoute {
 	ep.Lock()
 	defer ep.Unlock()
 
-	if ep.joinInfo == nil ***REMOVED***
+	if ep.joinInfo == nil {
 		return nil
-	***REMOVED***
+	}
 
 	return ep.joinInfo.StaticRoutes
-***REMOVED***
+}
 
-func (ep *endpoint) Gateway() net.IP ***REMOVED***
+func (ep *endpoint) Gateway() net.IP {
 	ep.Lock()
 	defer ep.Unlock()
 
-	if ep.joinInfo == nil ***REMOVED***
-		return net.IP***REMOVED******REMOVED***
-	***REMOVED***
+	if ep.joinInfo == nil {
+		return net.IP{}
+	}
 
 	return types.GetIPCopy(ep.joinInfo.gw)
-***REMOVED***
+}
 
-func (ep *endpoint) GatewayIPv6() net.IP ***REMOVED***
+func (ep *endpoint) GatewayIPv6() net.IP {
 	ep.Lock()
 	defer ep.Unlock()
 
-	if ep.joinInfo == nil ***REMOVED***
-		return net.IP***REMOVED******REMOVED***
-	***REMOVED***
+	if ep.joinInfo == nil {
+		return net.IP{}
+	}
 
 	return types.GetIPCopy(ep.joinInfo.gw6)
-***REMOVED***
+}
 
-func (ep *endpoint) SetGateway(gw net.IP) error ***REMOVED***
+func (ep *endpoint) SetGateway(gw net.IP) error {
 	ep.Lock()
 	defer ep.Unlock()
 
 	ep.joinInfo.gw = types.GetIPCopy(gw)
 	return nil
-***REMOVED***
+}
 
-func (ep *endpoint) SetGatewayIPv6(gw6 net.IP) error ***REMOVED***
+func (ep *endpoint) SetGatewayIPv6(gw6 net.IP) error {
 	ep.Lock()
 	defer ep.Unlock()
 
 	ep.joinInfo.gw6 = types.GetIPCopy(gw6)
 	return nil
-***REMOVED***
+}
 
-func (ep *endpoint) retrieveFromStore() (*endpoint, error) ***REMOVED***
+func (ep *endpoint) retrieveFromStore() (*endpoint, error) {
 	n, err := ep.getNetworkFromStore()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("could not find network in store to get latest endpoint %s: %v", ep.Name(), err)
-	***REMOVED***
+	}
 	return n.getEndpointFromStore(ep.ID())
-***REMOVED***
+}
 
-func (ep *endpoint) DisableGatewayService() ***REMOVED***
+func (ep *endpoint) DisableGatewayService() {
 	ep.Lock()
 	defer ep.Unlock()
 
 	ep.joinInfo.disableGatewayService = true
-***REMOVED***
+}
 
-func (epj *endpointJoinInfo) MarshalJSON() ([]byte, error) ***REMOVED***
-	epMap := make(map[string]interface***REMOVED******REMOVED***)
-	if epj.gw != nil ***REMOVED***
+func (epj *endpointJoinInfo) MarshalJSON() ([]byte, error) {
+	epMap := make(map[string]interface{})
+	if epj.gw != nil {
 		epMap["gw"] = epj.gw.String()
-	***REMOVED***
-	if epj.gw6 != nil ***REMOVED***
+	}
+	if epj.gw6 != nil {
 		epMap["gw6"] = epj.gw6.String()
-	***REMOVED***
+	}
 	epMap["disableGatewayService"] = epj.disableGatewayService
 	epMap["StaticRoutes"] = epj.StaticRoutes
 	return json.Marshal(epMap)
-***REMOVED***
+}
 
-func (epj *endpointJoinInfo) UnmarshalJSON(b []byte) error ***REMOVED***
+func (epj *endpointJoinInfo) UnmarshalJSON(b []byte) error {
 	var (
 		err   error
-		epMap map[string]interface***REMOVED******REMOVED***
+		epMap map[string]interface{}
 	)
-	if err = json.Unmarshal(b, &epMap); err != nil ***REMOVED***
+	if err = json.Unmarshal(b, &epMap); err != nil {
 		return err
-	***REMOVED***
-	if v, ok := epMap["gw"]; ok ***REMOVED***
+	}
+	if v, ok := epMap["gw"]; ok {
 		epj.gw = net.ParseIP(v.(string))
-	***REMOVED***
-	if v, ok := epMap["gw6"]; ok ***REMOVED***
+	}
+	if v, ok := epMap["gw6"]; ok {
 		epj.gw6 = net.ParseIP(v.(string))
-	***REMOVED***
+	}
 	epj.disableGatewayService = epMap["disableGatewayService"].(bool)
 
 	var tStaticRoute []types.StaticRoute
-	if v, ok := epMap["StaticRoutes"]; ok ***REMOVED***
+	if v, ok := epMap["StaticRoutes"]; ok {
 		tb, _ := json.Marshal(v)
 		var tStaticRoute []types.StaticRoute
 		json.Unmarshal(tb, &tStaticRoute)
-	***REMOVED***
+	}
 	var StaticRoutes []*types.StaticRoute
-	for _, r := range tStaticRoute ***REMOVED***
+	for _, r := range tStaticRoute {
 		StaticRoutes = append(StaticRoutes, &r)
-	***REMOVED***
+	}
 	epj.StaticRoutes = StaticRoutes
 
 	return nil
-***REMOVED***
+}
 
-func (epj *endpointJoinInfo) CopyTo(dstEpj *endpointJoinInfo) error ***REMOVED***
+func (epj *endpointJoinInfo) CopyTo(dstEpj *endpointJoinInfo) error {
 	dstEpj.disableGatewayService = epj.disableGatewayService
 	dstEpj.StaticRoutes = make([]*types.StaticRoute, len(epj.StaticRoutes))
 	copy(dstEpj.StaticRoutes, epj.StaticRoutes)
@@ -449,4 +449,4 @@ func (epj *endpointJoinInfo) CopyTo(dstEpj *endpointJoinInfo) error ***REMOVED**
 	dstEpj.gw = types.GetIPCopy(epj.gw)
 	dstEpj.gw6 = types.GetIPCopy(epj.gw6)
 	return nil
-***REMOVED***
+}

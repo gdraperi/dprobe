@@ -14,7 +14,7 @@ import (
 
 // Worker implements the core task management logic and persistence. It
 // coordinates the set of assignments with the executor.
-type Worker interface ***REMOVED***
+type Worker interface {
 	// Init prepares the worker for task assignment.
 	Init(ctx context.Context) error
 
@@ -44,18 +44,18 @@ type Worker interface ***REMOVED***
 
 	// Wait blocks until all task managers have closed
 	Wait(ctx context.Context) error
-***REMOVED***
+}
 
 // statusReporterKey protects removal map from panic.
-type statusReporterKey struct ***REMOVED***
+type statusReporterKey struct {
 	StatusReporter
-***REMOVED***
+}
 
-type worker struct ***REMOVED***
+type worker struct {
 	db                *bolt.DB
 	executor          exec.Executor
 	publisher         exec.LogPublisher
-	listeners         map[*statusReporterKey]struct***REMOVED******REMOVED***
+	listeners         map[*statusReporterKey]struct{}
 	taskevents        *watch.Queue
 	publisherProvider exec.LogPublisherProvider
 
@@ -64,21 +64,21 @@ type worker struct ***REMOVED***
 
 	closed  bool
 	closers sync.WaitGroup // keeps track of active closers
-***REMOVED***
+}
 
-func newWorker(db *bolt.DB, executor exec.Executor, publisherProvider exec.LogPublisherProvider) *worker ***REMOVED***
-	return &worker***REMOVED***
+func newWorker(db *bolt.DB, executor exec.Executor, publisherProvider exec.LogPublisherProvider) *worker {
+	return &worker{
 		db:                db,
 		executor:          executor,
 		publisherProvider: publisherProvider,
 		taskevents:        watch.NewQueue(),
-		listeners:         make(map[*statusReporterKey]struct***REMOVED******REMOVED***),
+		listeners:         make(map[*statusReporterKey]struct{}),
 		taskManagers:      make(map[string]*taskManager),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Init prepares the worker for assignments.
-func (w *worker) Init(ctx context.Context) error ***REMOVED***
+func (w *worker) Init(ctx context.Context) error {
 	w.mu.Lock()
 	defer w.mu.Unlock()
 
@@ -87,70 +87,70 @@ func (w *worker) Init(ctx context.Context) error ***REMOVED***
 	// TODO(stevvooe): Start task cleanup process.
 
 	// read the tasks from the database and start any task managers that may be needed.
-	return w.db.Update(func(tx *bolt.Tx) error ***REMOVED***
-		return WalkTasks(tx, func(task *api.Task) error ***REMOVED***
-			if !TaskAssigned(tx, task.ID) ***REMOVED***
+	return w.db.Update(func(tx *bolt.Tx) error {
+		return WalkTasks(tx, func(task *api.Task) error {
+			if !TaskAssigned(tx, task.ID) {
 				// NOTE(stevvooe): If tasks can survive worker restart, we need
 				// to startup the controller and ensure they are removed. For
 				// now, we can simply remove them from the database.
-				if err := DeleteTask(tx, task.ID); err != nil ***REMOVED***
+				if err := DeleteTask(tx, task.ID); err != nil {
 					log.G(ctx).WithError(err).Errorf("error removing task %v", task.ID)
-				***REMOVED***
+				}
 				return nil
-			***REMOVED***
+			}
 
 			status, err := GetTaskStatus(tx, task.ID)
-			if err != nil ***REMOVED***
+			if err != nil {
 				log.G(ctx).WithError(err).Error("unable to read tasks status")
 				return nil
-			***REMOVED***
+			}
 
 			task.Status = *status // merges the status into the task, ensuring we start at the right point.
 			return w.startTask(ctx, tx, task)
-		***REMOVED***)
-	***REMOVED***)
-***REMOVED***
+		})
+	})
+}
 
 // Close performs worker cleanup when no longer needed.
-func (w *worker) Close() ***REMOVED***
+func (w *worker) Close() {
 	w.mu.Lock()
 	w.closed = true
 	w.mu.Unlock()
 
 	w.taskevents.Close()
-***REMOVED***
+}
 
 // Assign assigns a full set of tasks, configs, and secrets to the worker.
 // Any tasks not previously known will be started. Any tasks that are in the task set
 // and already running will be updated, if possible. Any tasks currently running on
 // the worker outside the task set will be terminated.
 // Anything not in the set of assignments will be removed.
-func (w *worker) Assign(ctx context.Context, assignments []*api.AssignmentChange) error ***REMOVED***
+func (w *worker) Assign(ctx context.Context, assignments []*api.AssignmentChange) error {
 	w.mu.Lock()
 	defer w.mu.Unlock()
 
-	if w.closed ***REMOVED***
+	if w.closed {
 		return ErrClosed
-	***REMOVED***
+	}
 
-	log.G(ctx).WithFields(logrus.Fields***REMOVED***
+	log.G(ctx).WithFields(logrus.Fields{
 		"len(assignments)": len(assignments),
-	***REMOVED***).Debug("(*worker).Assign")
+	}).Debug("(*worker).Assign")
 
 	// Need to update dependencies before tasks
 
 	err := reconcileSecrets(ctx, w, assignments, true)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	err = reconcileConfigs(ctx, w, assignments, true)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	return reconcileTaskState(ctx, w, assignments, true)
-***REMOVED***
+}
 
 // Update updates the set of tasks, configs, and secrets for the worker.
 // Tasks in the added set will be added to the worker, and tasks in the removed set
@@ -159,446 +159,446 @@ func (w *worker) Assign(ctx context.Context, assignments []*api.AssignmentChange
 // will be removed from the worker.
 // Configs in the added set will be added to the worker, and configs in the removed set
 // will be removed from the worker.
-func (w *worker) Update(ctx context.Context, assignments []*api.AssignmentChange) error ***REMOVED***
+func (w *worker) Update(ctx context.Context, assignments []*api.AssignmentChange) error {
 	w.mu.Lock()
 	defer w.mu.Unlock()
 
-	if w.closed ***REMOVED***
+	if w.closed {
 		return ErrClosed
-	***REMOVED***
+	}
 
-	log.G(ctx).WithFields(logrus.Fields***REMOVED***
+	log.G(ctx).WithFields(logrus.Fields{
 		"len(assignments)": len(assignments),
-	***REMOVED***).Debug("(*worker).Update")
+	}).Debug("(*worker).Update")
 
 	err := reconcileSecrets(ctx, w, assignments, false)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	err = reconcileConfigs(ctx, w, assignments, false)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	return reconcileTaskState(ctx, w, assignments, false)
-***REMOVED***
+}
 
-func reconcileTaskState(ctx context.Context, w *worker, assignments []*api.AssignmentChange, fullSnapshot bool) error ***REMOVED***
+func reconcileTaskState(ctx context.Context, w *worker, assignments []*api.AssignmentChange, fullSnapshot bool) error {
 	var (
 		updatedTasks []*api.Task
 		removedTasks []*api.Task
 	)
-	for _, a := range assignments ***REMOVED***
-		if t := a.Assignment.GetTask(); t != nil ***REMOVED***
-			switch a.Action ***REMOVED***
+	for _, a := range assignments {
+		if t := a.Assignment.GetTask(); t != nil {
+			switch a.Action {
 			case api.AssignmentChange_AssignmentActionUpdate:
 				updatedTasks = append(updatedTasks, t)
 			case api.AssignmentChange_AssignmentActionRemove:
 				removedTasks = append(removedTasks, t)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
-	log.G(ctx).WithFields(logrus.Fields***REMOVED***
+	log.G(ctx).WithFields(logrus.Fields{
 		"len(updatedTasks)": len(updatedTasks),
 		"len(removedTasks)": len(removedTasks),
-	***REMOVED***).Debug("(*worker).reconcileTaskState")
+	}).Debug("(*worker).reconcileTaskState")
 
 	tx, err := w.db.Begin(true)
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.G(ctx).WithError(err).Error("failed starting transaction against task database")
 		return err
-	***REMOVED***
+	}
 	defer tx.Rollback()
 
-	assigned := map[string]struct***REMOVED******REMOVED******REMOVED******REMOVED***
+	assigned := map[string]struct{}{}
 
-	for _, task := range updatedTasks ***REMOVED***
+	for _, task := range updatedTasks {
 		log.G(ctx).WithFields(
-			logrus.Fields***REMOVED***
+			logrus.Fields{
 				"task.id":           task.ID,
-				"task.desiredstate": task.DesiredState***REMOVED***).Debug("assigned")
-		if err := PutTask(tx, task); err != nil ***REMOVED***
+				"task.desiredstate": task.DesiredState}).Debug("assigned")
+		if err := PutTask(tx, task); err != nil {
 			return err
-		***REMOVED***
+		}
 
-		if err := SetTaskAssignment(tx, task.ID, true); err != nil ***REMOVED***
+		if err := SetTaskAssignment(tx, task.ID, true); err != nil {
 			return err
-		***REMOVED***
+		}
 
-		if mgr, ok := w.taskManagers[task.ID]; ok ***REMOVED***
-			if err := mgr.Update(ctx, task); err != nil && err != ErrClosed ***REMOVED***
+		if mgr, ok := w.taskManagers[task.ID]; ok {
+			if err := mgr.Update(ctx, task); err != nil && err != ErrClosed {
 				log.G(ctx).WithError(err).Error("failed updating assigned task")
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
+			}
+		} else {
 			// we may have still seen the task, let's grab the status from
 			// storage and replace it with our status, if we have it.
 			status, err := GetTaskStatus(tx, task.ID)
-			if err != nil ***REMOVED***
-				if err != errTaskUnknown ***REMOVED***
+			if err != nil {
+				if err != errTaskUnknown {
 					return err
-				***REMOVED***
+				}
 
 				// never seen before, register the provided status
-				if err := PutTaskStatus(tx, task.ID, &task.Status); err != nil ***REMOVED***
+				if err := PutTaskStatus(tx, task.ID, &task.Status); err != nil {
 					return err
-				***REMOVED***
-			***REMOVED*** else ***REMOVED***
+				}
+			} else {
 				task.Status = *status
-			***REMOVED***
+			}
 			w.startTask(ctx, tx, task)
-		***REMOVED***
+		}
 
-		assigned[task.ID] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	***REMOVED***
+		assigned[task.ID] = struct{}{}
+	}
 
-	closeManager := func(tm *taskManager) ***REMOVED***
-		go func(tm *taskManager) ***REMOVED***
+	closeManager := func(tm *taskManager) {
+		go func(tm *taskManager) {
 			defer w.closers.Done()
 			// when a task is no longer assigned, we shutdown the task manager
-			if err := tm.Close(); err != nil ***REMOVED***
+			if err := tm.Close(); err != nil {
 				log.G(ctx).WithError(err).Error("error closing task manager")
-			***REMOVED***
-		***REMOVED***(tm)
+			}
+		}(tm)
 
 		// make an attempt at removing. this is best effort. any errors will be
 		// retried by the reaper later.
-		if err := tm.ctlr.Remove(ctx); err != nil ***REMOVED***
+		if err := tm.ctlr.Remove(ctx); err != nil {
 			log.G(ctx).WithError(err).WithField("task.id", tm.task.ID).Error("remove task failed")
-		***REMOVED***
+		}
 
-		if err := tm.ctlr.Close(); err != nil ***REMOVED***
+		if err := tm.ctlr.Close(); err != nil {
 			log.G(ctx).WithError(err).Error("error closing controller")
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	removeTaskAssignment := func(taskID string) error ***REMOVED***
+	removeTaskAssignment := func(taskID string) error {
 		ctx := log.WithLogger(ctx, log.G(ctx).WithField("task.id", taskID))
-		if err := SetTaskAssignment(tx, taskID, false); err != nil ***REMOVED***
+		if err := SetTaskAssignment(tx, taskID, false); err != nil {
 			log.G(ctx).WithError(err).Error("error setting task assignment in database")
-		***REMOVED***
+		}
 		return err
-	***REMOVED***
+	}
 
 	// If this was a complete set of assignments, we're going to remove all the remaining
 	// tasks.
-	if fullSnapshot ***REMOVED***
-		for id, tm := range w.taskManagers ***REMOVED***
-			if _, ok := assigned[id]; ok ***REMOVED***
+	if fullSnapshot {
+		for id, tm := range w.taskManagers {
+			if _, ok := assigned[id]; ok {
 				continue
-			***REMOVED***
+			}
 
 			err := removeTaskAssignment(id)
-			if err == nil ***REMOVED***
+			if err == nil {
 				delete(w.taskManagers, id)
 				go closeManager(tm)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
+			}
+		}
+	} else {
 		// If this was an incremental set of assignments, we're going to remove only the tasks
 		// in the removed set
-		for _, task := range removedTasks ***REMOVED***
+		for _, task := range removedTasks {
 			err := removeTaskAssignment(task.ID)
-			if err != nil ***REMOVED***
+			if err != nil {
 				continue
-			***REMOVED***
+			}
 
 			tm, ok := w.taskManagers[task.ID]
-			if ok ***REMOVED***
+			if ok {
 				delete(w.taskManagers, task.ID)
 				go closeManager(tm)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	return tx.Commit()
-***REMOVED***
+}
 
-func reconcileSecrets(ctx context.Context, w *worker, assignments []*api.AssignmentChange, fullSnapshot bool) error ***REMOVED***
+func reconcileSecrets(ctx context.Context, w *worker, assignments []*api.AssignmentChange, fullSnapshot bool) error {
 	var (
 		updatedSecrets []api.Secret
 		removedSecrets []string
 	)
-	for _, a := range assignments ***REMOVED***
-		if s := a.Assignment.GetSecret(); s != nil ***REMOVED***
-			switch a.Action ***REMOVED***
+	for _, a := range assignments {
+		if s := a.Assignment.GetSecret(); s != nil {
+			switch a.Action {
 			case api.AssignmentChange_AssignmentActionUpdate:
 				updatedSecrets = append(updatedSecrets, *s)
 			case api.AssignmentChange_AssignmentActionRemove:
 				removedSecrets = append(removedSecrets, s.ID)
-			***REMOVED***
+			}
 
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	secretsProvider, ok := w.executor.(exec.SecretsProvider)
-	if !ok ***REMOVED***
-		if len(updatedSecrets) != 0 || len(removedSecrets) != 0 ***REMOVED***
+	if !ok {
+		if len(updatedSecrets) != 0 || len(removedSecrets) != 0 {
 			log.G(ctx).Warn("secrets update ignored; executor does not support secrets")
-		***REMOVED***
+		}
 		return nil
-	***REMOVED***
+	}
 
 	secrets := secretsProvider.Secrets()
 
-	log.G(ctx).WithFields(logrus.Fields***REMOVED***
+	log.G(ctx).WithFields(logrus.Fields{
 		"len(updatedSecrets)": len(updatedSecrets),
 		"len(removedSecrets)": len(removedSecrets),
-	***REMOVED***).Debug("(*worker).reconcileSecrets")
+	}).Debug("(*worker).reconcileSecrets")
 
 	// If this was a complete set of secrets, we're going to clear the secrets map and add all of them
-	if fullSnapshot ***REMOVED***
+	if fullSnapshot {
 		secrets.Reset()
-	***REMOVED*** else ***REMOVED***
+	} else {
 		secrets.Remove(removedSecrets)
-	***REMOVED***
+	}
 	secrets.Add(updatedSecrets...)
 
 	return nil
-***REMOVED***
+}
 
-func reconcileConfigs(ctx context.Context, w *worker, assignments []*api.AssignmentChange, fullSnapshot bool) error ***REMOVED***
+func reconcileConfigs(ctx context.Context, w *worker, assignments []*api.AssignmentChange, fullSnapshot bool) error {
 	var (
 		updatedConfigs []api.Config
 		removedConfigs []string
 	)
-	for _, a := range assignments ***REMOVED***
-		if r := a.Assignment.GetConfig(); r != nil ***REMOVED***
-			switch a.Action ***REMOVED***
+	for _, a := range assignments {
+		if r := a.Assignment.GetConfig(); r != nil {
+			switch a.Action {
 			case api.AssignmentChange_AssignmentActionUpdate:
 				updatedConfigs = append(updatedConfigs, *r)
 			case api.AssignmentChange_AssignmentActionRemove:
 				removedConfigs = append(removedConfigs, r.ID)
-			***REMOVED***
+			}
 
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	configsProvider, ok := w.executor.(exec.ConfigsProvider)
-	if !ok ***REMOVED***
-		if len(updatedConfigs) != 0 || len(removedConfigs) != 0 ***REMOVED***
+	if !ok {
+		if len(updatedConfigs) != 0 || len(removedConfigs) != 0 {
 			log.G(ctx).Warn("configs update ignored; executor does not support configs")
-		***REMOVED***
+		}
 		return nil
-	***REMOVED***
+	}
 
 	configs := configsProvider.Configs()
 
-	log.G(ctx).WithFields(logrus.Fields***REMOVED***
+	log.G(ctx).WithFields(logrus.Fields{
 		"len(updatedConfigs)": len(updatedConfigs),
 		"len(removedConfigs)": len(removedConfigs),
-	***REMOVED***).Debug("(*worker).reconcileConfigs")
+	}).Debug("(*worker).reconcileConfigs")
 
 	// If this was a complete set of configs, we're going to clear the configs map and add all of them
-	if fullSnapshot ***REMOVED***
+	if fullSnapshot {
 		configs.Reset()
-	***REMOVED*** else ***REMOVED***
+	} else {
 		configs.Remove(removedConfigs)
-	***REMOVED***
+	}
 	configs.Add(updatedConfigs...)
 
 	return nil
-***REMOVED***
+}
 
-func (w *worker) Listen(ctx context.Context, reporter StatusReporter) ***REMOVED***
+func (w *worker) Listen(ctx context.Context, reporter StatusReporter) {
 	w.mu.Lock()
 	defer w.mu.Unlock()
 
-	key := &statusReporterKey***REMOVED***reporter***REMOVED***
-	w.listeners[key] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
+	key := &statusReporterKey{reporter}
+	w.listeners[key] = struct{}{}
 
-	go func() ***REMOVED***
+	go func() {
 		<-ctx.Done()
 		w.mu.Lock()
 		defer w.mu.Unlock()
 		delete(w.listeners, key) // remove the listener if the context is closed.
-	***REMOVED***()
+	}()
 
 	// report the current statuses to the new listener
-	if err := w.db.View(func(tx *bolt.Tx) error ***REMOVED***
-		return WalkTaskStatus(tx, func(id string, status *api.TaskStatus) error ***REMOVED***
+	if err := w.db.View(func(tx *bolt.Tx) error {
+		return WalkTaskStatus(tx, func(id string, status *api.TaskStatus) error {
 			return reporter.UpdateTaskStatus(ctx, id, status)
-		***REMOVED***)
-	***REMOVED***); err != nil ***REMOVED***
+		})
+	}); err != nil {
 		log.G(ctx).WithError(err).Errorf("failed reporting initial statuses to registered listener %v", reporter)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (w *worker) startTask(ctx context.Context, tx *bolt.Tx, task *api.Task) error ***REMOVED***
+func (w *worker) startTask(ctx context.Context, tx *bolt.Tx, task *api.Task) error {
 	_, err := w.taskManager(ctx, tx, task) // side-effect taskManager creation.
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.G(ctx).WithError(err).Error("failed to start taskManager")
 		// we ignore this error: it gets reported in the taskStatus within
 		// `newTaskManager`. We log it here and move on. If their is an
 		// attempted restart, the lack of taskManager will have this retry
 		// again.
 		return nil
-	***REMOVED***
+	}
 
 	// only publish if controller resolution was successful.
 	w.taskevents.Publish(task.Copy())
 	return nil
-***REMOVED***
+}
 
-func (w *worker) taskManager(ctx context.Context, tx *bolt.Tx, task *api.Task) (*taskManager, error) ***REMOVED***
-	if tm, ok := w.taskManagers[task.ID]; ok ***REMOVED***
+func (w *worker) taskManager(ctx context.Context, tx *bolt.Tx, task *api.Task) (*taskManager, error) {
+	if tm, ok := w.taskManagers[task.ID]; ok {
 		return tm, nil
-	***REMOVED***
+	}
 
 	tm, err := w.newTaskManager(ctx, tx, task)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	w.taskManagers[task.ID] = tm
 	// keep track of active tasks
 	w.closers.Add(1)
 	return tm, nil
-***REMOVED***
+}
 
-func (w *worker) newTaskManager(ctx context.Context, tx *bolt.Tx, task *api.Task) (*taskManager, error) ***REMOVED***
-	ctx = log.WithLogger(ctx, log.G(ctx).WithFields(logrus.Fields***REMOVED***
+func (w *worker) newTaskManager(ctx context.Context, tx *bolt.Tx, task *api.Task) (*taskManager, error) {
+	ctx = log.WithLogger(ctx, log.G(ctx).WithFields(logrus.Fields{
 		"task.id":    task.ID,
 		"service.id": task.ServiceID,
-	***REMOVED***))
+	}))
 
 	ctlr, status, err := exec.Resolve(ctx, task, w.executor)
-	if err := w.updateTaskStatus(ctx, tx, task.ID, status); err != nil ***REMOVED***
+	if err := w.updateTaskStatus(ctx, tx, task.ID, status); err != nil {
 		log.G(ctx).WithError(err).Error("error updating task status after controller resolution")
-	***REMOVED***
+	}
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.G(ctx).WithError(err).Error("controller resolution failed")
 		return nil, err
-	***REMOVED***
+	}
 
-	return newTaskManager(ctx, task, ctlr, statusReporterFunc(func(ctx context.Context, taskID string, status *api.TaskStatus) error ***REMOVED***
+	return newTaskManager(ctx, task, ctlr, statusReporterFunc(func(ctx context.Context, taskID string, status *api.TaskStatus) error {
 		w.mu.RLock()
 		defer w.mu.RUnlock()
 
-		return w.db.Update(func(tx *bolt.Tx) error ***REMOVED***
+		return w.db.Update(func(tx *bolt.Tx) error {
 			return w.updateTaskStatus(ctx, tx, taskID, status)
-		***REMOVED***)
-	***REMOVED***)), nil
-***REMOVED***
+		})
+	})), nil
+}
 
 // updateTaskStatus reports statuses to listeners, read lock must be held.
-func (w *worker) updateTaskStatus(ctx context.Context, tx *bolt.Tx, taskID string, status *api.TaskStatus) error ***REMOVED***
-	if err := PutTaskStatus(tx, taskID, status); err != nil ***REMOVED***
+func (w *worker) updateTaskStatus(ctx context.Context, tx *bolt.Tx, taskID string, status *api.TaskStatus) error {
+	if err := PutTaskStatus(tx, taskID, status); err != nil {
 		log.G(ctx).WithError(err).Error("failed writing status to disk")
 		return err
-	***REMOVED***
+	}
 
 	// broadcast the task status out.
-	for key := range w.listeners ***REMOVED***
-		if err := key.StatusReporter.UpdateTaskStatus(ctx, taskID, status); err != nil ***REMOVED***
+	for key := range w.listeners {
+		if err := key.StatusReporter.UpdateTaskStatus(ctx, taskID, status); err != nil {
 			log.G(ctx).WithError(err).Errorf("failed updating status for reporter %v", key.StatusReporter)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
 // Subscribe to log messages matching the subscription.
-func (w *worker) Subscribe(ctx context.Context, subscription *api.SubscriptionMessage) error ***REMOVED***
+func (w *worker) Subscribe(ctx context.Context, subscription *api.SubscriptionMessage) error {
 	log.G(ctx).Debugf("Received subscription %s (selector: %v)", subscription.ID, subscription.Selector)
 
 	publisher, cancel, err := w.publisherProvider.Publisher(ctx, subscription.ID)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	// Send a close once we're done
 	defer cancel()
 
-	match := func(t *api.Task) bool ***REMOVED***
+	match := func(t *api.Task) bool {
 		// TODO(aluzzardi): Consider using maps to limit the iterations.
-		for _, tid := range subscription.Selector.TaskIDs ***REMOVED***
-			if t.ID == tid ***REMOVED***
+		for _, tid := range subscription.Selector.TaskIDs {
+			if t.ID == tid {
 				return true
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
-		for _, sid := range subscription.Selector.ServiceIDs ***REMOVED***
-			if t.ServiceID == sid ***REMOVED***
+		for _, sid := range subscription.Selector.ServiceIDs {
+			if t.ServiceID == sid {
 				return true
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
-		for _, nid := range subscription.Selector.NodeIDs ***REMOVED***
-			if t.NodeID == nid ***REMOVED***
+		for _, nid := range subscription.Selector.NodeIDs {
+			if t.NodeID == nid {
 				return true
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		return false
-	***REMOVED***
+	}
 
-	wg := sync.WaitGroup***REMOVED******REMOVED***
+	wg := sync.WaitGroup{}
 	w.mu.Lock()
-	for _, tm := range w.taskManagers ***REMOVED***
-		if match(tm.task) ***REMOVED***
+	for _, tm := range w.taskManagers {
+		if match(tm.task) {
 			wg.Add(1)
-			go func(tm *taskManager) ***REMOVED***
+			go func(tm *taskManager) {
 				defer wg.Done()
 				tm.Logs(ctx, *subscription.Options, publisher)
-			***REMOVED***(tm)
-		***REMOVED***
-	***REMOVED***
+			}(tm)
+		}
+	}
 	w.mu.Unlock()
 
 	// If follow mode is disabled, wait for the current set of matched tasks
 	// to finish publishing logs, then close the subscription by returning.
-	if subscription.Options == nil || !subscription.Options.Follow ***REMOVED***
-		waitCh := make(chan struct***REMOVED******REMOVED***)
-		go func() ***REMOVED***
+	if subscription.Options == nil || !subscription.Options.Follow {
+		waitCh := make(chan struct{})
+		go func() {
 			defer close(waitCh)
 			wg.Wait()
-		***REMOVED***()
+		}()
 
-		select ***REMOVED***
+		select {
 		case <-ctx.Done():
 			return ctx.Err()
 		case <-waitCh:
 			return nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// In follow mode, watch for new tasks. Don't close the subscription
 	// until it's cancelled.
 	ch, cancel := w.taskevents.Watch()
 	defer cancel()
-	for ***REMOVED***
-		select ***REMOVED***
+	for {
+		select {
 		case v := <-ch:
 			task := v.(*api.Task)
-			if match(task) ***REMOVED***
+			if match(task) {
 				w.mu.RLock()
 				tm, ok := w.taskManagers[task.ID]
 				w.mu.RUnlock()
-				if !ok ***REMOVED***
+				if !ok {
 					continue
-				***REMOVED***
+				}
 
 				go tm.Logs(ctx, *subscription.Options, publisher)
-			***REMOVED***
+			}
 		case <-ctx.Done():
 			return ctx.Err()
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (w *worker) Wait(ctx context.Context) error ***REMOVED***
-	ch := make(chan struct***REMOVED******REMOVED***)
-	go func() ***REMOVED***
+func (w *worker) Wait(ctx context.Context) error {
+	ch := make(chan struct{})
+	go func() {
 		w.closers.Wait()
 		close(ch)
-	***REMOVED***()
+	}()
 
-	select ***REMOVED***
+	select {
 	case <-ch:
 		return nil
 	case <-ctx.Done():
 		return ctx.Err()
-	***REMOVED***
-***REMOVED***
+	}
+}

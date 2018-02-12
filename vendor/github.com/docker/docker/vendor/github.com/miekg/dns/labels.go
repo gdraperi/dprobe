@@ -3,40 +3,40 @@ package dns
 // Holds a bunch of helper functions for dealing with labels.
 
 // SplitDomainName splits a name string into it's labels.
-// www.miek.nl. returns []string***REMOVED***"www", "miek", "nl"***REMOVED***
+// www.miek.nl. returns []string{"www", "miek", "nl"}
 // The root label (.) returns nil. Note that using
 // strings.Split(s) will work in most cases, but does not handle
 // escaped dots (\.) for instance.
-func SplitDomainName(s string) (labels []string) ***REMOVED***
-	if len(s) == 0 ***REMOVED***
+func SplitDomainName(s string) (labels []string) {
+	if len(s) == 0 {
 		return nil
-	***REMOVED***
+	}
 	fqdnEnd := 0 // offset of the final '.' or the length of the name
 	idx := Split(s)
 	begin := 0
-	if s[len(s)-1] == '.' ***REMOVED***
+	if s[len(s)-1] == '.' {
 		fqdnEnd = len(s) - 1
-	***REMOVED*** else ***REMOVED***
+	} else {
 		fqdnEnd = len(s)
-	***REMOVED***
+	}
 
-	switch len(idx) ***REMOVED***
+	switch len(idx) {
 	case 0:
 		return nil
 	case 1:
 		// no-op
 	default:
 		end := 0
-		for i := 1; i < len(idx); i++ ***REMOVED***
+		for i := 1; i < len(idx); i++ {
 			end = idx[i]
 			labels = append(labels, s[begin:end-1])
 			begin = end
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	labels = append(labels, s[begin:fqdnEnd])
 	return labels
-***REMOVED***
+}
 
 // CompareDomainName compares the names s1 and s2 and
 // returns how many labels they have in common starting from the *right*.
@@ -45,16 +45,16 @@ func SplitDomainName(s string) (labels []string) ***REMOVED***
 //
 // www.miek.nl. and miek.nl. have two labels in common: miek and nl
 // www.miek.nl. and www.bla.nl. have one label in common: nl
-func CompareDomainName(s1, s2 string) (n int) ***REMOVED***
+func CompareDomainName(s1, s2 string) (n int) {
 	s1 = Fqdn(s1)
 	s2 = Fqdn(s2)
 	l1 := Split(s1)
 	l2 := Split(s2)
 
 	// the first check: root label
-	if l1 == nil || l2 == nil ***REMOVED***
+	if l1 == nil || l2 == nil {
 		return
-	***REMOVED***
+	}
 
 	j1 := len(l1) - 1 // end
 	i1 := len(l1) - 2 // start
@@ -62,101 +62,101 @@ func CompareDomainName(s1, s2 string) (n int) ***REMOVED***
 	i2 := len(l2) - 2
 	// the second check can be done here: last/only label
 	// before we fall through into the for-loop below
-	if s1[l1[j1]:] == s2[l2[j2]:] ***REMOVED***
+	if s1[l1[j1]:] == s2[l2[j2]:] {
 		n++
-	***REMOVED*** else ***REMOVED***
+	} else {
 		return
-	***REMOVED***
-	for ***REMOVED***
-		if i1 < 0 || i2 < 0 ***REMOVED***
+	}
+	for {
+		if i1 < 0 || i2 < 0 {
 			break
-		***REMOVED***
-		if s1[l1[i1]:l1[j1]] == s2[l2[i2]:l2[j2]] ***REMOVED***
+		}
+		if s1[l1[i1]:l1[j1]] == s2[l2[i2]:l2[j2]] {
 			n++
-		***REMOVED*** else ***REMOVED***
+		} else {
 			break
-		***REMOVED***
+		}
 		j1--
 		i1--
 		j2--
 		i2--
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // CountLabel counts the the number of labels in the string s.
-func CountLabel(s string) (labels int) ***REMOVED***
-	if s == "." ***REMOVED***
+func CountLabel(s string) (labels int) {
+	if s == "." {
 		return
-	***REMOVED***
+	}
 	off := 0
 	end := false
-	for ***REMOVED***
+	for {
 		off, end = NextLabel(s, off)
 		labels++
-		if end ***REMOVED***
+		if end {
 			return
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // Split splits a name s into its label indexes.
-// www.miek.nl. returns []int***REMOVED***0, 4, 9***REMOVED***, www.miek.nl also returns []int***REMOVED***0, 4, 9***REMOVED***.
+// www.miek.nl. returns []int{0, 4, 9}, www.miek.nl also returns []int{0, 4, 9}.
 // The root name (.) returns nil. Also see SplitDomainName.
-func Split(s string) []int ***REMOVED***
-	if s == "." ***REMOVED***
+func Split(s string) []int {
+	if s == "." {
 		return nil
-	***REMOVED***
+	}
 	idx := make([]int, 1, 3)
 	off := 0
 	end := false
 
-	for ***REMOVED***
+	for {
 		off, end = NextLabel(s, off)
-		if end ***REMOVED***
+		if end {
 			return idx
-		***REMOVED***
+		}
 		idx = append(idx, off)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // NextLabel returns the index of the start of the next label in the
 // string s starting at offset.
 // The bool end is true when the end of the string has been reached.
 // Also see PrevLabel.
-func NextLabel(s string, offset int) (i int, end bool) ***REMOVED***
+func NextLabel(s string, offset int) (i int, end bool) {
 	quote := false
-	for i = offset; i < len(s)-1; i++ ***REMOVED***
-		switch s[i] ***REMOVED***
+	for i = offset; i < len(s)-1; i++ {
+		switch s[i] {
 		case '\\':
 			quote = !quote
 		default:
 			quote = false
 		case '.':
-			if quote ***REMOVED***
+			if quote {
 				quote = !quote
 				continue
-			***REMOVED***
+			}
 			return i + 1, false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return i + 1, true
-***REMOVED***
+}
 
 // PrevLabel returns the index of the label when starting from the right and
 // jumping n labels to the left.
 // The bool start is true when the start of the string has been overshot.
 // Also see NextLabel.
-func PrevLabel(s string, n int) (i int, start bool) ***REMOVED***
-	if n == 0 ***REMOVED***
+func PrevLabel(s string, n int) (i int, start bool) {
+	if n == 0 {
 		return len(s), false
-	***REMOVED***
+	}
 	lab := Split(s)
-	if lab == nil ***REMOVED***
+	if lab == nil {
 		return 0, true
-	***REMOVED***
-	if n > len(lab) ***REMOVED***
+	}
+	if n > len(lab) {
 		return 0, true
-	***REMOVED***
+	}
 	return lab[len(lab)-n], false
-***REMOVED***
+}

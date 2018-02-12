@@ -16,16 +16,16 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestEmptyDockerfile(t *testing.T) ***REMOVED***
+func TestEmptyDockerfile(t *testing.T) {
 	contextDir, cleanup := createTestTempDir(t, "", "builder-dockerfile-test")
 	defer cleanup()
 
 	createTestTempFile(t, contextDir, builder.DefaultDockerfileName, "", 0777)
 
 	readAndCheckDockerfile(t, "emptyDockerfile", contextDir, "", "the Dockerfile (Dockerfile) cannot be empty")
-***REMOVED***
+}
 
-func TestSymlinkDockerfile(t *testing.T) ***REMOVED***
+func TestSymlinkDockerfile(t *testing.T) {
 	contextDir, cleanup := createTestTempDir(t, "", "builder-dockerfile-test")
 	defer cleanup()
 
@@ -38,133 +38,133 @@ func TestSymlinkDockerfile(t *testing.T) ***REMOVED***
 	expectedError := fmt.Sprintf("Cannot locate specified Dockerfile: %s", builder.DefaultDockerfileName)
 
 	readAndCheckDockerfile(t, "symlinkDockerfile", contextDir, builder.DefaultDockerfileName, expectedError)
-***REMOVED***
+}
 
-func TestDockerfileOutsideTheBuildContext(t *testing.T) ***REMOVED***
+func TestDockerfileOutsideTheBuildContext(t *testing.T) {
 	contextDir, cleanup := createTestTempDir(t, "", "builder-dockerfile-test")
 	defer cleanup()
 
 	expectedError := "Forbidden path outside the build context: ../../Dockerfile ()"
 
 	readAndCheckDockerfile(t, "DockerfileOutsideTheBuildContext", contextDir, "../../Dockerfile", expectedError)
-***REMOVED***
+}
 
-func TestNonExistingDockerfile(t *testing.T) ***REMOVED***
+func TestNonExistingDockerfile(t *testing.T) {
 	contextDir, cleanup := createTestTempDir(t, "", "builder-dockerfile-test")
 	defer cleanup()
 
 	expectedError := "Cannot locate specified Dockerfile: Dockerfile"
 
 	readAndCheckDockerfile(t, "NonExistingDockerfile", contextDir, "Dockerfile", expectedError)
-***REMOVED***
+}
 
-func readAndCheckDockerfile(t *testing.T, testName, contextDir, dockerfilePath, expectedError string) ***REMOVED***
+func readAndCheckDockerfile(t *testing.T, testName, contextDir, dockerfilePath, expectedError string) {
 	tarStream, err := archive.Tar(contextDir, archive.Uncompressed)
 	require.NoError(t, err)
 
-	defer func() ***REMOVED***
-		if err = tarStream.Close(); err != nil ***REMOVED***
+	defer func() {
+		if err = tarStream.Close(); err != nil {
 			t.Fatalf("Error when closing tar stream: %s", err)
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
-	if dockerfilePath == "" ***REMOVED*** // handled in BuildWithContext
+	if dockerfilePath == "" { // handled in BuildWithContext
 		dockerfilePath = builder.DefaultDockerfileName
-	***REMOVED***
+	}
 
-	config := backend.BuildConfig***REMOVED***
-		Options: &types.ImageBuildOptions***REMOVED***Dockerfile: dockerfilePath***REMOVED***,
+	config := backend.BuildConfig{
+		Options: &types.ImageBuildOptions{Dockerfile: dockerfilePath},
 		Source:  tarStream,
-	***REMOVED***
+	}
 	_, _, err = remotecontext.Detect(config)
 	assert.EqualError(t, err, expectedError)
-***REMOVED***
+}
 
-func TestCopyRunConfig(t *testing.T) ***REMOVED***
-	defaultEnv := []string***REMOVED***"foo=1"***REMOVED***
-	defaultCmd := []string***REMOVED***"old"***REMOVED***
+func TestCopyRunConfig(t *testing.T) {
+	defaultEnv := []string{"foo=1"}
+	defaultCmd := []string{"old"}
 
-	var testcases = []struct ***REMOVED***
+	var testcases = []struct {
 		doc       string
 		modifiers []runConfigModifier
 		expected  *container.Config
-	***REMOVED******REMOVED***
-		***REMOVED***
+	}{
+		{
 			doc:       "Set the command",
-			modifiers: []runConfigModifier***REMOVED***withCmd([]string***REMOVED***"new"***REMOVED***)***REMOVED***,
-			expected: &container.Config***REMOVED***
-				Cmd: []string***REMOVED***"new"***REMOVED***,
+			modifiers: []runConfigModifier{withCmd([]string{"new"})},
+			expected: &container.Config{
+				Cmd: []string{"new"},
 				Env: defaultEnv,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			},
+		},
+		{
 			doc:       "Set the command to a comment",
-			modifiers: []runConfigModifier***REMOVED***withCmdComment("comment", runtime.GOOS)***REMOVED***,
-			expected: &container.Config***REMOVED***
+			modifiers: []runConfigModifier{withCmdComment("comment", runtime.GOOS)},
+			expected: &container.Config{
 				Cmd: append(defaultShellForOS(runtime.GOOS), "#(nop) ", "comment"),
 				Env: defaultEnv,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			},
+		},
+		{
 			doc: "Set the command and env",
-			modifiers: []runConfigModifier***REMOVED***
-				withCmd([]string***REMOVED***"new"***REMOVED***),
-				withEnv([]string***REMOVED***"one", "two"***REMOVED***),
-			***REMOVED***,
-			expected: &container.Config***REMOVED***
-				Cmd: []string***REMOVED***"new"***REMOVED***,
-				Env: []string***REMOVED***"one", "two"***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+			modifiers: []runConfigModifier{
+				withCmd([]string{"new"}),
+				withEnv([]string{"one", "two"}),
+			},
+			expected: &container.Config{
+				Cmd: []string{"new"},
+				Env: []string{"one", "two"},
+			},
+		},
+	}
 
-	for _, testcase := range testcases ***REMOVED***
-		runConfig := &container.Config***REMOVED***
+	for _, testcase := range testcases {
+		runConfig := &container.Config{
 			Cmd: defaultCmd,
 			Env: defaultEnv,
-		***REMOVED***
+		}
 		runConfigCopy := copyRunConfig(runConfig, testcase.modifiers...)
 		assert.Equal(t, testcase.expected, runConfigCopy, testcase.doc)
 		// Assert the original was not modified
 		assert.NotEqual(t, runConfig, runConfigCopy, testcase.doc)
-	***REMOVED***
+	}
 
-***REMOVED***
+}
 
-func fullMutableRunConfig() *container.Config ***REMOVED***
-	return &container.Config***REMOVED***
-		Cmd: []string***REMOVED***"command", "arg1"***REMOVED***,
-		Env: []string***REMOVED***"env1=foo", "env2=bar"***REMOVED***,
-		ExposedPorts: nat.PortSet***REMOVED***
-			"1000/tcp": ***REMOVED******REMOVED***,
-			"1001/tcp": ***REMOVED******REMOVED***,
-		***REMOVED***,
-		Volumes: map[string]struct***REMOVED******REMOVED******REMOVED***
-			"one": ***REMOVED******REMOVED***,
-			"two": ***REMOVED******REMOVED***,
-		***REMOVED***,
-		Entrypoint: []string***REMOVED***"entry", "arg1"***REMOVED***,
-		OnBuild:    []string***REMOVED***"first", "next"***REMOVED***,
-		Labels: map[string]string***REMOVED***
+func fullMutableRunConfig() *container.Config {
+	return &container.Config{
+		Cmd: []string{"command", "arg1"},
+		Env: []string{"env1=foo", "env2=bar"},
+		ExposedPorts: nat.PortSet{
+			"1000/tcp": {},
+			"1001/tcp": {},
+		},
+		Volumes: map[string]struct{}{
+			"one": {},
+			"two": {},
+		},
+		Entrypoint: []string{"entry", "arg1"},
+		OnBuild:    []string{"first", "next"},
+		Labels: map[string]string{
 			"label1": "value1",
 			"label2": "value2",
-		***REMOVED***,
-		Shell: []string***REMOVED***"shell", "-c"***REMOVED***,
-	***REMOVED***
-***REMOVED***
+		},
+		Shell: []string{"shell", "-c"},
+	}
+}
 
-func TestDeepCopyRunConfig(t *testing.T) ***REMOVED***
+func TestDeepCopyRunConfig(t *testing.T) {
 	runConfig := fullMutableRunConfig()
 	copy := copyRunConfig(runConfig)
 	assert.Equal(t, fullMutableRunConfig(), copy)
 
 	copy.Cmd[1] = "arg2"
 	copy.Env[1] = "env2=new"
-	copy.ExposedPorts["10002"] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	copy.Volumes["three"] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
+	copy.ExposedPorts["10002"] = struct{}{}
+	copy.Volumes["three"] = struct{}{}
 	copy.Entrypoint[1] = "arg2"
 	copy.OnBuild[0] = "start"
 	copy.Labels["label3"] = "value3"
 	copy.Shell[0] = "sh"
 	assert.Equal(t, fullMutableRunConfig(), runConfig)
-***REMOVED***
+}

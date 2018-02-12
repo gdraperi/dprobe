@@ -14,43 +14,43 @@ var (
 )
 
 // Server is the store API gRPC server.
-type Server struct ***REMOVED***
+type Server struct {
 	store     *store.MemoryStore
 	mu        sync.Mutex
 	pctx      context.Context
 	cancelAll func()
-***REMOVED***
+}
 
 // NewServer creates a store API server.
-func NewServer(store *store.MemoryStore) *Server ***REMOVED***
-	return &Server***REMOVED***
+func NewServer(store *store.MemoryStore) *Server {
+	return &Server{
 		store: store,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Start starts the watch server.
-func (s *Server) Start(ctx context.Context) error ***REMOVED***
+func (s *Server) Start(ctx context.Context) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	if s.cancelAll != nil ***REMOVED***
+	if s.cancelAll != nil {
 		return errAlreadyRunning
-	***REMOVED***
+	}
 
 	s.pctx, s.cancelAll = context.WithCancel(ctx)
 	return nil
-***REMOVED***
+}
 
 // Stop stops the watch server.
-func (s *Server) Stop() error ***REMOVED***
+func (s *Server) Stop() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	if s.cancelAll == nil ***REMOVED***
+	if s.cancelAll == nil {
 		return errNotRunning
-	***REMOVED***
+	}
 	s.cancelAll()
 	s.cancelAll = nil
 
 	return nil
-***REMOVED***
+}

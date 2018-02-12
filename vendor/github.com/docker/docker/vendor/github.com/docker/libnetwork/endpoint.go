@@ -17,7 +17,7 @@ import (
 )
 
 // Endpoint represents a logical connection between a network and a sandbox.
-type Endpoint interface ***REMOVED***
+type Endpoint interface {
 	// A system generated id for this endpoint.
 	ID() string
 
@@ -38,18 +38,18 @@ type Endpoint interface ***REMOVED***
 	Info() EndpointInfo
 
 	// DriverInfo returns a collection of driver operational data related to this endpoint retrieved from the driver
-	DriverInfo() (map[string]interface***REMOVED******REMOVED***, error)
+	DriverInfo() (map[string]interface{}, error)
 
 	// Delete and detaches this endpoint from the network.
 	Delete(force bool) error
-***REMOVED***
+}
 
 // EndpointOption is an option setter function type used to pass various options to Network
 // and Endpoint interfaces methods. The various setter functions of type EndpointOption are
 // provided by libnetwork, they look like <Create|Join|Leave>Option[...](...)
 type EndpointOption func(ep *endpoint)
 
-type endpoint struct ***REMOVED***
+type endpoint struct {
 	name              string
 	id                string
 	network           *network
@@ -60,8 +60,8 @@ type endpoint struct ***REMOVED***
 	exposedPorts      []types.TransportPort
 	anonymous         bool
 	disableResolution bool
-	generic           map[string]interface***REMOVED******REMOVED***
-	joinLeaveDone     chan struct***REMOVED******REMOVED***
+	generic           map[string]interface{}
+	joinLeaveDone     chan struct{}
 	prefAddress       net.IP
 	prefAddressV6     net.IP
 	ipamOptions       map[string]string
@@ -77,21 +77,21 @@ type endpoint struct ***REMOVED***
 	serviceEnabled    bool
 	loadBalancer      bool
 	sync.Mutex
-***REMOVED***
+}
 
-func (ep *endpoint) MarshalJSON() ([]byte, error) ***REMOVED***
+func (ep *endpoint) MarshalJSON() ([]byte, error) {
 	ep.Lock()
 	defer ep.Unlock()
 
-	epMap := make(map[string]interface***REMOVED******REMOVED***)
+	epMap := make(map[string]interface{})
 	epMap["name"] = ep.name
 	epMap["id"] = ep.id
 	epMap["ep_iface"] = ep.iface
 	epMap["joinInfo"] = ep.joinInfo
 	epMap["exposed_ports"] = ep.exposedPorts
-	if ep.generic != nil ***REMOVED***
+	if ep.generic != nil {
 		epMap["generic"] = ep.generic
-	***REMOVED***
+	}
 	epMap["sandbox"] = ep.sandboxID
 	epMap["locator"] = ep.locator
 	epMap["anonymous"] = ep.anonymous
@@ -105,16 +105,16 @@ func (ep *endpoint) MarshalJSON() ([]byte, error) ***REMOVED***
 	epMap["loadBalancer"] = ep.loadBalancer
 
 	return json.Marshal(epMap)
-***REMOVED***
+}
 
-func (ep *endpoint) UnmarshalJSON(b []byte) (err error) ***REMOVED***
+func (ep *endpoint) UnmarshalJSON(b []byte) (err error) {
 	ep.Lock()
 	defer ep.Unlock()
 
-	var epMap map[string]interface***REMOVED******REMOVED***
-	if err := json.Unmarshal(b, &epMap); err != nil ***REMOVED***
+	var epMap map[string]interface{}
+	if err := json.Unmarshal(b, &epMap); err != nil {
 		return err
-	***REMOVED***
+	}
 	ep.name = epMap["name"].(string)
 	ep.id = epMap["id"].(string)
 
@@ -132,80 +132,80 @@ func (ep *endpoint) UnmarshalJSON(b []byte) (err error) ***REMOVED***
 	cb, _ := json.Marshal(epMap["sandbox"])
 	json.Unmarshal(cb, &ep.sandboxID)
 
-	if v, ok := epMap["generic"]; ok ***REMOVED***
-		ep.generic = v.(map[string]interface***REMOVED******REMOVED***)
+	if v, ok := epMap["generic"]; ok {
+		ep.generic = v.(map[string]interface{})
 
-		if opt, ok := ep.generic[netlabel.PortMap]; ok ***REMOVED***
-			pblist := []types.PortBinding***REMOVED******REMOVED***
+		if opt, ok := ep.generic[netlabel.PortMap]; ok {
+			pblist := []types.PortBinding{}
 
-			for i := 0; i < len(opt.([]interface***REMOVED******REMOVED***)); i++ ***REMOVED***
-				pb := types.PortBinding***REMOVED******REMOVED***
-				tmp := opt.([]interface***REMOVED******REMOVED***)[i].(map[string]interface***REMOVED******REMOVED***)
+			for i := 0; i < len(opt.([]interface{})); i++ {
+				pb := types.PortBinding{}
+				tmp := opt.([]interface{})[i].(map[string]interface{})
 
 				bytes, err := json.Marshal(tmp)
-				if err != nil ***REMOVED***
+				if err != nil {
 					logrus.Error(err)
 					break
-				***REMOVED***
+				}
 				err = json.Unmarshal(bytes, &pb)
-				if err != nil ***REMOVED***
+				if err != nil {
 					logrus.Error(err)
 					break
-				***REMOVED***
+				}
 				pblist = append(pblist, pb)
-			***REMOVED***
+			}
 			ep.generic[netlabel.PortMap] = pblist
-		***REMOVED***
+		}
 
-		if opt, ok := ep.generic[netlabel.ExposedPorts]; ok ***REMOVED***
-			tplist := []types.TransportPort***REMOVED******REMOVED***
+		if opt, ok := ep.generic[netlabel.ExposedPorts]; ok {
+			tplist := []types.TransportPort{}
 
-			for i := 0; i < len(opt.([]interface***REMOVED******REMOVED***)); i++ ***REMOVED***
-				tp := types.TransportPort***REMOVED******REMOVED***
-				tmp := opt.([]interface***REMOVED******REMOVED***)[i].(map[string]interface***REMOVED******REMOVED***)
+			for i := 0; i < len(opt.([]interface{})); i++ {
+				tp := types.TransportPort{}
+				tmp := opt.([]interface{})[i].(map[string]interface{})
 
 				bytes, err := json.Marshal(tmp)
-				if err != nil ***REMOVED***
+				if err != nil {
 					logrus.Error(err)
 					break
-				***REMOVED***
+				}
 				err = json.Unmarshal(bytes, &tp)
-				if err != nil ***REMOVED***
+				if err != nil {
 					logrus.Error(err)
 					break
-				***REMOVED***
+				}
 				tplist = append(tplist, tp)
-			***REMOVED***
+			}
 			ep.generic[netlabel.ExposedPorts] = tplist
 
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if v, ok := epMap["anonymous"]; ok ***REMOVED***
+	if v, ok := epMap["anonymous"]; ok {
 		ep.anonymous = v.(bool)
-	***REMOVED***
-	if v, ok := epMap["disableResolution"]; ok ***REMOVED***
+	}
+	if v, ok := epMap["disableResolution"]; ok {
 		ep.disableResolution = v.(bool)
-	***REMOVED***
-	if l, ok := epMap["locator"]; ok ***REMOVED***
+	}
+	if l, ok := epMap["locator"]; ok {
 		ep.locator = l.(string)
-	***REMOVED***
+	}
 
-	if sn, ok := epMap["svcName"]; ok ***REMOVED***
+	if sn, ok := epMap["svcName"]; ok {
 		ep.svcName = sn.(string)
-	***REMOVED***
+	}
 
-	if si, ok := epMap["svcID"]; ok ***REMOVED***
+	if si, ok := epMap["svcID"]; ok {
 		ep.svcID = si.(string)
-	***REMOVED***
+	}
 
-	if vip, ok := epMap["virtualIP"]; ok ***REMOVED***
+	if vip, ok := epMap["virtualIP"]; ok {
 		ep.virtualIP = net.ParseIP(vip.(string))
-	***REMOVED***
+	}
 
-	if v, ok := epMap["loadBalancer"]; ok ***REMOVED***
+	if v, ok := epMap["loadBalancer"]; ok {
 		ep.loadBalancer = v.(bool)
-	***REMOVED***
+	}
 
 	sal, _ := json.Marshal(epMap["svcAliases"])
 	var svcAliases []string
@@ -222,13 +222,13 @@ func (ep *endpoint) UnmarshalJSON(b []byte) (err error) ***REMOVED***
 	json.Unmarshal(ma, &myAliases)
 	ep.myAliases = myAliases
 	return nil
-***REMOVED***
+}
 
-func (ep *endpoint) New() datastore.KVObject ***REMOVED***
-	return &endpoint***REMOVED***network: ep.getNetwork()***REMOVED***
-***REMOVED***
+func (ep *endpoint) New() datastore.KVObject {
+	return &endpoint{network: ep.getNetwork()}
+}
 
-func (ep *endpoint) CopyTo(o datastore.KVObject) error ***REMOVED***
+func (ep *endpoint) CopyTo(o datastore.KVObject) error {
 	ep.Lock()
 	defer ep.Unlock()
 
@@ -252,15 +252,15 @@ func (ep *endpoint) CopyTo(o datastore.KVObject) error ***REMOVED***
 	dstEp.ingressPorts = make([]*PortConfig, len(ep.ingressPorts))
 	copy(dstEp.ingressPorts, ep.ingressPorts)
 
-	if ep.iface != nil ***REMOVED***
-		dstEp.iface = &endpointInterface***REMOVED******REMOVED***
+	if ep.iface != nil {
+		dstEp.iface = &endpointInterface{}
 		ep.iface.CopyTo(dstEp.iface)
-	***REMOVED***
+	}
 
-	if ep.joinInfo != nil ***REMOVED***
-		dstEp.joinInfo = &endpointJoinInfo***REMOVED******REMOVED***
+	if ep.joinInfo != nil {
+		dstEp.joinInfo = &endpointJoinInfo{}
 		ep.joinInfo.CopyTo(dstEp.joinInfo)
-	***REMOVED***
+	}
 
 	dstEp.exposedPorts = make([]types.TransportPort, len(ep.exposedPorts))
 	copy(dstEp.exposedPorts, ep.exposedPorts)
@@ -268,248 +268,248 @@ func (ep *endpoint) CopyTo(o datastore.KVObject) error ***REMOVED***
 	dstEp.myAliases = make([]string, len(ep.myAliases))
 	copy(dstEp.myAliases, ep.myAliases)
 
-	dstEp.generic = options.Generic***REMOVED******REMOVED***
-	for k, v := range ep.generic ***REMOVED***
+	dstEp.generic = options.Generic{}
+	for k, v := range ep.generic {
 		dstEp.generic[k] = v
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (ep *endpoint) ID() string ***REMOVED***
+func (ep *endpoint) ID() string {
 	ep.Lock()
 	defer ep.Unlock()
 
 	return ep.id
-***REMOVED***
+}
 
-func (ep *endpoint) Name() string ***REMOVED***
+func (ep *endpoint) Name() string {
 	ep.Lock()
 	defer ep.Unlock()
 
 	return ep.name
-***REMOVED***
+}
 
-func (ep *endpoint) MyAliases() []string ***REMOVED***
+func (ep *endpoint) MyAliases() []string {
 	ep.Lock()
 	defer ep.Unlock()
 
 	return ep.myAliases
-***REMOVED***
+}
 
-func (ep *endpoint) Network() string ***REMOVED***
-	if ep.network == nil ***REMOVED***
+func (ep *endpoint) Network() string {
+	if ep.network == nil {
 		return ""
-	***REMOVED***
+	}
 
 	return ep.network.name
-***REMOVED***
+}
 
-func (ep *endpoint) isAnonymous() bool ***REMOVED***
+func (ep *endpoint) isAnonymous() bool {
 	ep.Lock()
 	defer ep.Unlock()
 	return ep.anonymous
-***REMOVED***
+}
 
 // isServiceEnabled check if service is enabled on the endpoint
-func (ep *endpoint) isServiceEnabled() bool ***REMOVED***
+func (ep *endpoint) isServiceEnabled() bool {
 	ep.Lock()
 	defer ep.Unlock()
 	return ep.serviceEnabled
-***REMOVED***
+}
 
 // enableService sets service enabled on the endpoint
-func (ep *endpoint) enableService() ***REMOVED***
+func (ep *endpoint) enableService() {
 	ep.Lock()
 	defer ep.Unlock()
 	ep.serviceEnabled = true
-***REMOVED***
+}
 
 // disableService disables service on the endpoint
-func (ep *endpoint) disableService() ***REMOVED***
+func (ep *endpoint) disableService() {
 	ep.Lock()
 	defer ep.Unlock()
 	ep.serviceEnabled = false
-***REMOVED***
+}
 
-func (ep *endpoint) needResolver() bool ***REMOVED***
+func (ep *endpoint) needResolver() bool {
 	ep.Lock()
 	defer ep.Unlock()
 	return !ep.disableResolution
-***REMOVED***
+}
 
 // endpoint Key structure : endpoint/network-id/endpoint-id
-func (ep *endpoint) Key() []string ***REMOVED***
-	if ep.network == nil ***REMOVED***
+func (ep *endpoint) Key() []string {
+	if ep.network == nil {
 		return nil
-	***REMOVED***
+	}
 
-	return []string***REMOVED***datastore.EndpointKeyPrefix, ep.network.id, ep.id***REMOVED***
-***REMOVED***
+	return []string{datastore.EndpointKeyPrefix, ep.network.id, ep.id}
+}
 
-func (ep *endpoint) KeyPrefix() []string ***REMOVED***
-	if ep.network == nil ***REMOVED***
+func (ep *endpoint) KeyPrefix() []string {
+	if ep.network == nil {
 		return nil
-	***REMOVED***
+	}
 
-	return []string***REMOVED***datastore.EndpointKeyPrefix, ep.network.id***REMOVED***
-***REMOVED***
+	return []string{datastore.EndpointKeyPrefix, ep.network.id}
+}
 
-func (ep *endpoint) networkIDFromKey(key string) (string, error) ***REMOVED***
-	// endpoint Key structure : docker/libnetwork/endpoint/$***REMOVED***network-id***REMOVED***/$***REMOVED***endpoint-id***REMOVED***
+func (ep *endpoint) networkIDFromKey(key string) (string, error) {
+	// endpoint Key structure : docker/libnetwork/endpoint/${network-id}/${endpoint-id}
 	// it's an invalid key if the key doesn't have all the 5 key elements above
 	keyElements := strings.Split(key, "/")
-	if !strings.HasPrefix(key, datastore.Key(datastore.EndpointKeyPrefix)) || len(keyElements) < 5 ***REMOVED***
+	if !strings.HasPrefix(key, datastore.Key(datastore.EndpointKeyPrefix)) || len(keyElements) < 5 {
 		return "", fmt.Errorf("invalid endpoint key : %v", key)
-	***REMOVED***
+	}
 	// network-id is placed at index=3. pls refer to endpoint.Key() method
 	return strings.Split(key, "/")[3], nil
-***REMOVED***
+}
 
-func (ep *endpoint) Value() []byte ***REMOVED***
+func (ep *endpoint) Value() []byte {
 	b, err := json.Marshal(ep)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil
-	***REMOVED***
+	}
 	return b
-***REMOVED***
+}
 
-func (ep *endpoint) SetValue(value []byte) error ***REMOVED***
+func (ep *endpoint) SetValue(value []byte) error {
 	return json.Unmarshal(value, ep)
-***REMOVED***
+}
 
-func (ep *endpoint) Index() uint64 ***REMOVED***
+func (ep *endpoint) Index() uint64 {
 	ep.Lock()
 	defer ep.Unlock()
 	return ep.dbIndex
-***REMOVED***
+}
 
-func (ep *endpoint) SetIndex(index uint64) ***REMOVED***
+func (ep *endpoint) SetIndex(index uint64) {
 	ep.Lock()
 	defer ep.Unlock()
 	ep.dbIndex = index
 	ep.dbExists = true
-***REMOVED***
+}
 
-func (ep *endpoint) Exists() bool ***REMOVED***
+func (ep *endpoint) Exists() bool {
 	ep.Lock()
 	defer ep.Unlock()
 	return ep.dbExists
-***REMOVED***
+}
 
-func (ep *endpoint) Skip() bool ***REMOVED***
+func (ep *endpoint) Skip() bool {
 	return ep.getNetwork().Skip()
-***REMOVED***
+}
 
-func (ep *endpoint) processOptions(options ...EndpointOption) ***REMOVED***
+func (ep *endpoint) processOptions(options ...EndpointOption) {
 	ep.Lock()
 	defer ep.Unlock()
 
-	for _, opt := range options ***REMOVED***
-		if opt != nil ***REMOVED***
+	for _, opt := range options {
+		if opt != nil {
 			opt(ep)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (ep *endpoint) getNetwork() *network ***REMOVED***
+func (ep *endpoint) getNetwork() *network {
 	ep.Lock()
 	defer ep.Unlock()
 
 	return ep.network
-***REMOVED***
+}
 
-func (ep *endpoint) getNetworkFromStore() (*network, error) ***REMOVED***
-	if ep.network == nil ***REMOVED***
+func (ep *endpoint) getNetworkFromStore() (*network, error) {
+	if ep.network == nil {
 		return nil, fmt.Errorf("invalid network object in endpoint %s", ep.Name())
-	***REMOVED***
+	}
 
 	return ep.network.getController().getNetworkFromStore(ep.network.id)
-***REMOVED***
+}
 
-func (ep *endpoint) Join(sbox Sandbox, options ...EndpointOption) error ***REMOVED***
-	if sbox == nil ***REMOVED***
+func (ep *endpoint) Join(sbox Sandbox, options ...EndpointOption) error {
+	if sbox == nil {
 		return types.BadRequestErrorf("endpoint cannot be joined by nil container")
-	***REMOVED***
+	}
 
 	sb, ok := sbox.(*sandbox)
-	if !ok ***REMOVED***
+	if !ok {
 		return types.BadRequestErrorf("not a valid Sandbox interface")
-	***REMOVED***
+	}
 
 	sb.joinLeaveStart()
 	defer sb.joinLeaveEnd()
 
 	return ep.sbJoin(sb, options...)
-***REMOVED***
+}
 
-func (ep *endpoint) sbJoin(sb *sandbox, options ...EndpointOption) (err error) ***REMOVED***
+func (ep *endpoint) sbJoin(sb *sandbox, options ...EndpointOption) (err error) {
 	n, err := ep.getNetworkFromStore()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("failed to get network from store during join: %v", err)
-	***REMOVED***
+	}
 
 	ep, err = n.getEndpointFromStore(ep.ID())
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("failed to get endpoint from store during join: %v", err)
-	***REMOVED***
+	}
 
 	ep.Lock()
-	if ep.sandboxID != "" ***REMOVED***
+	if ep.sandboxID != "" {
 		ep.Unlock()
 		return types.ForbiddenErrorf("another container is attached to the same network endpoint")
-	***REMOVED***
+	}
 	ep.network = n
 	ep.sandboxID = sb.ID()
-	ep.joinInfo = &endpointJoinInfo***REMOVED******REMOVED***
+	ep.joinInfo = &endpointJoinInfo{}
 	epid := ep.id
 	ep.Unlock()
-	defer func() ***REMOVED***
-		if err != nil ***REMOVED***
+	defer func() {
+		if err != nil {
 			ep.Lock()
 			ep.sandboxID = ""
 			ep.Unlock()
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
 	nid := n.ID()
 
 	ep.processOptions(options...)
 
 	d, err := n.driver(true)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("failed to get driver during join: %v", err)
-	***REMOVED***
+	}
 
 	err = d.Join(nid, epid, sb.Key(), ep, sb.Labels())
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	defer func() ***REMOVED***
-		if err != nil ***REMOVED***
-			if e := d.Leave(nid, epid); e != nil ***REMOVED***
+	}
+	defer func() {
+		if err != nil {
+			if e := d.Leave(nid, epid); e != nil {
 				logrus.Warnf("driver leave failed while rolling back join: %v", e)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***()
+			}
+		}
+	}()
 
 	// Watch for service records
-	if !n.getController().isAgent() ***REMOVED***
+	if !n.getController().isAgent() {
 		n.getController().watchSvcRecord(ep)
-	***REMOVED***
+	}
 
-	if doUpdateHostsFile(n, sb) ***REMOVED***
+	if doUpdateHostsFile(n, sb) {
 		address := ""
-		if ip := ep.getFirstInterfaceAddress(); ip != nil ***REMOVED***
+		if ip := ep.getFirstInterfaceAddress(); ip != nil {
 			address = ip.String()
-		***REMOVED***
-		if err = sb.updateHostsFile(address); err != nil ***REMOVED***
+		}
+		if err = sb.updateHostsFile(address); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
-	if err = sb.updateDNS(n.enableIPv6); err != nil ***REMOVED***
+		}
+	}
+	if err = sb.updateDNS(n.enableIPv6); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	// Current endpoint providing external connectivity for the sandbox
 	extEp := sb.getGatewayEndpoint()
@@ -517,89 +517,89 @@ func (ep *endpoint) sbJoin(sb *sandbox, options ...EndpointOption) (err error) *
 	sb.Lock()
 	heap.Push(&sb.endpoints, ep)
 	sb.Unlock()
-	defer func() ***REMOVED***
-		if err != nil ***REMOVED***
+	defer func() {
+		if err != nil {
 			sb.removeEndpoint(ep)
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
-	if err = sb.populateNetworkResources(ep); err != nil ***REMOVED***
+	if err = sb.populateNetworkResources(ep); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if err = n.getController().updateToStore(ep); err != nil ***REMOVED***
+	if err = n.getController().updateToStore(ep); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if err = ep.addDriverInfoToCluster(); err != nil ***REMOVED***
+	if err = ep.addDriverInfoToCluster(); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	defer func() ***REMOVED***
-		if err != nil ***REMOVED***
-			if e := ep.deleteDriverInfoFromCluster(); e != nil ***REMOVED***
+	defer func() {
+		if err != nil {
+			if e := ep.deleteDriverInfoFromCluster(); e != nil {
 				logrus.Errorf("Could not delete endpoint state for endpoint %s from cluster on join failure: %v", ep.Name(), e)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***()
+			}
+		}
+	}()
 
-	if sb.needDefaultGW() && sb.getEndpointInGWNetwork() == nil ***REMOVED***
+	if sb.needDefaultGW() && sb.getEndpointInGWNetwork() == nil {
 		return sb.setupDefaultGW()
-	***REMOVED***
+	}
 
 	moveExtConn := sb.getGatewayEndpoint() != extEp
 
-	if moveExtConn ***REMOVED***
-		if extEp != nil ***REMOVED***
+	if moveExtConn {
+		if extEp != nil {
 			logrus.Debugf("Revoking external connectivity on endpoint %s (%s)", extEp.Name(), extEp.ID())
 			extN, err := extEp.getNetworkFromStore()
-			if err != nil ***REMOVED***
+			if err != nil {
 				return fmt.Errorf("failed to get network from store for revoking external connectivity during join: %v", err)
-			***REMOVED***
+			}
 			extD, err := extN.driver(true)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return fmt.Errorf("failed to get driver for revoking external connectivity during join: %v", err)
-			***REMOVED***
-			if err = extD.RevokeExternalConnectivity(extEp.network.ID(), extEp.ID()); err != nil ***REMOVED***
+			}
+			if err = extD.RevokeExternalConnectivity(extEp.network.ID(), extEp.ID()); err != nil {
 				return types.InternalErrorf(
 					"driver failed revoking external connectivity on endpoint %s (%s): %v",
 					extEp.Name(), extEp.ID(), err)
-			***REMOVED***
-			defer func() ***REMOVED***
-				if err != nil ***REMOVED***
-					if e := extD.ProgramExternalConnectivity(extEp.network.ID(), extEp.ID(), sb.Labels()); e != nil ***REMOVED***
+			}
+			defer func() {
+				if err != nil {
+					if e := extD.ProgramExternalConnectivity(extEp.network.ID(), extEp.ID(), sb.Labels()); e != nil {
 						logrus.Warnf("Failed to roll-back external connectivity on endpoint %s (%s): %v",
 							extEp.Name(), extEp.ID(), e)
-					***REMOVED***
-				***REMOVED***
-			***REMOVED***()
-		***REMOVED***
-		if !n.internal ***REMOVED***
+					}
+				}
+			}()
+		}
+		if !n.internal {
 			logrus.Debugf("Programming external connectivity on endpoint %s (%s)", ep.Name(), ep.ID())
-			if err = d.ProgramExternalConnectivity(n.ID(), ep.ID(), sb.Labels()); err != nil ***REMOVED***
+			if err = d.ProgramExternalConnectivity(n.ID(), ep.ID(), sb.Labels()); err != nil {
 				return types.InternalErrorf(
 					"driver failed programming external connectivity on endpoint %s (%s): %v",
 					ep.Name(), ep.ID(), err)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
-	***REMOVED***
+	}
 
-	if !sb.needDefaultGW() ***REMOVED***
-		if e := sb.clearDefaultGW(); e != nil ***REMOVED***
+	if !sb.needDefaultGW() {
+		if e := sb.clearDefaultGW(); e != nil {
 			logrus.Warnf("Failure while disconnecting sandbox %s (%s) from gateway network: %v",
 				sb.ID(), sb.ContainerID(), e)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
-func doUpdateHostsFile(n *network, sb *sandbox) bool ***REMOVED***
+func doUpdateHostsFile(n *network, sb *sandbox) bool {
 	return !n.ingress && n.Name() != libnGWNetwork
-***REMOVED***
+}
 
-func (ep *endpoint) rename(name string) error ***REMOVED***
+func (ep *endpoint) rename(name string) error {
 	var (
 		err      error
 		netWatch *netWatch
@@ -607,65 +607,65 @@ func (ep *endpoint) rename(name string) error ***REMOVED***
 	)
 
 	n := ep.getNetwork()
-	if n == nil ***REMOVED***
+	if n == nil {
 		return fmt.Errorf("network not connected for ep %q", ep.name)
-	***REMOVED***
+	}
 
 	c := n.getController()
 
 	sb, ok := ep.getSandbox()
-	if !ok ***REMOVED***
+	if !ok {
 		logrus.Warnf("rename for %s aborted, sandbox %s is not anymore present", ep.ID(), ep.sandboxID)
 		return nil
-	***REMOVED***
+	}
 
-	if c.isAgent() ***REMOVED***
-		if err = ep.deleteServiceInfoFromCluster(sb, "rename"); err != nil ***REMOVED***
+	if c.isAgent() {
+		if err = ep.deleteServiceInfoFromCluster(sb, "rename"); err != nil {
 			return types.InternalErrorf("Could not delete service state for endpoint %s from cluster on rename: %v", ep.Name(), err)
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
+		}
+	} else {
 		c.Lock()
 		netWatch, ok = c.nmap[n.ID()]
 		c.Unlock()
-		if !ok ***REMOVED***
+		if !ok {
 			return fmt.Errorf("watch null for network %q", n.Name())
-		***REMOVED***
+		}
 		n.updateSvcRecord(ep, c.getLocalEps(netWatch), false)
-	***REMOVED***
+	}
 
 	oldName := ep.name
 	oldAnonymous := ep.anonymous
 	ep.name = name
 	ep.anonymous = false
 
-	if c.isAgent() ***REMOVED***
-		if err = ep.addServiceInfoToCluster(sb); err != nil ***REMOVED***
+	if c.isAgent() {
+		if err = ep.addServiceInfoToCluster(sb); err != nil {
 			return types.InternalErrorf("Could not add service state for endpoint %s to cluster on rename: %v", ep.Name(), err)
-		***REMOVED***
-		defer func() ***REMOVED***
-			if err != nil ***REMOVED***
+		}
+		defer func() {
+			if err != nil {
 				ep.deleteServiceInfoFromCluster(sb, "rename")
 				ep.name = oldName
 				ep.anonymous = oldAnonymous
 				ep.addServiceInfoToCluster(sb)
-			***REMOVED***
-		***REMOVED***()
-	***REMOVED*** else ***REMOVED***
+			}
+		}()
+	} else {
 		n.updateSvcRecord(ep, c.getLocalEps(netWatch), true)
-		defer func() ***REMOVED***
-			if err != nil ***REMOVED***
+		defer func() {
+			if err != nil {
 				n.updateSvcRecord(ep, c.getLocalEps(netWatch), false)
 				ep.name = oldName
 				ep.anonymous = oldAnonymous
 				n.updateSvcRecord(ep, c.getLocalEps(netWatch), true)
-			***REMOVED***
-		***REMOVED***()
-	***REMOVED***
+			}
+		}()
+	}
 
 	// Update the store with the updated name
-	if err = c.updateToStore(ep); err != nil ***REMOVED***
+	if err = c.updateToStore(ep); err != nil {
 		return err
-	***REMOVED***
+	}
 	// After the name change do a dummy endpoint count update to
 	// trigger the service record update in the peer nodes
 
@@ -676,59 +676,59 @@ func (ep *endpoint) rename(name string) error ***REMOVED***
 	n.getEpCnt().updateStore()
 
 	return err
-***REMOVED***
+}
 
-func (ep *endpoint) hasInterface(iName string) bool ***REMOVED***
+func (ep *endpoint) hasInterface(iName string) bool {
 	ep.Lock()
 	defer ep.Unlock()
 
 	return ep.iface != nil && ep.iface.srcName == iName
-***REMOVED***
+}
 
-func (ep *endpoint) Leave(sbox Sandbox, options ...EndpointOption) error ***REMOVED***
-	if sbox == nil || sbox.ID() == "" || sbox.Key() == "" ***REMOVED***
+func (ep *endpoint) Leave(sbox Sandbox, options ...EndpointOption) error {
+	if sbox == nil || sbox.ID() == "" || sbox.Key() == "" {
 		return types.BadRequestErrorf("invalid Sandbox passed to endpoint leave: %v", sbox)
-	***REMOVED***
+	}
 
 	sb, ok := sbox.(*sandbox)
-	if !ok ***REMOVED***
+	if !ok {
 		return types.BadRequestErrorf("not a valid Sandbox interface")
-	***REMOVED***
+	}
 
 	sb.joinLeaveStart()
 	defer sb.joinLeaveEnd()
 
 	return ep.sbLeave(sb, false, options...)
-***REMOVED***
+}
 
-func (ep *endpoint) sbLeave(sb *sandbox, force bool, options ...EndpointOption) error ***REMOVED***
+func (ep *endpoint) sbLeave(sb *sandbox, force bool, options ...EndpointOption) error {
 	n, err := ep.getNetworkFromStore()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("failed to get network from store during leave: %v", err)
-	***REMOVED***
+	}
 
 	ep, err = n.getEndpointFromStore(ep.ID())
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("failed to get endpoint from store during leave: %v", err)
-	***REMOVED***
+	}
 
 	ep.Lock()
 	sid := ep.sandboxID
 	ep.Unlock()
 
-	if sid == "" ***REMOVED***
+	if sid == "" {
 		return types.ForbiddenErrorf("cannot leave endpoint with no attached sandbox")
-	***REMOVED***
-	if sid != sb.ID() ***REMOVED***
+	}
+	if sid != sb.ID() {
 		return types.ForbiddenErrorf("unexpected sandbox ID in leave request. Expected %s. Got %s", ep.sandboxID, sb.ID())
-	***REMOVED***
+	}
 
 	ep.processOptions(options...)
 
 	d, err := n.driver(!force)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("failed to get driver during endpoint leave: %v", err)
-	***REMOVED***
+	}
 
 	ep.Lock()
 	ep.sandboxID = ""
@@ -739,83 +739,83 @@ func (ep *endpoint) sbLeave(sb *sandbox, force bool, options ...EndpointOption) 
 	extEp := sb.getGatewayEndpoint()
 	moveExtConn := extEp != nil && (extEp.ID() == ep.ID())
 
-	if d != nil ***REMOVED***
-		if moveExtConn ***REMOVED***
+	if d != nil {
+		if moveExtConn {
 			logrus.Debugf("Revoking external connectivity on endpoint %s (%s)", ep.Name(), ep.ID())
-			if err := d.RevokeExternalConnectivity(n.id, ep.id); err != nil ***REMOVED***
+			if err := d.RevokeExternalConnectivity(n.id, ep.id); err != nil {
 				logrus.Warnf("driver failed revoking external connectivity on endpoint %s (%s): %v",
 					ep.Name(), ep.ID(), err)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
-		if err := d.Leave(n.id, ep.id); err != nil ***REMOVED***
-			if _, ok := err.(types.MaskableError); !ok ***REMOVED***
+		if err := d.Leave(n.id, ep.id); err != nil {
+			if _, ok := err.(types.MaskableError); !ok {
 				logrus.Warnf("driver error disconnecting container %s : %v", ep.name, err)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
-	if err := sb.clearNetworkResources(ep); err != nil ***REMOVED***
+	if err := sb.clearNetworkResources(ep); err != nil {
 		logrus.Warnf("Could not cleanup network resources on container %s disconnect: %v", ep.name, err)
-	***REMOVED***
+	}
 
 	// Update the store about the sandbox detach only after we
 	// have completed sb.clearNetworkresources above to avoid
 	// spurious logs when cleaning up the sandbox when the daemon
 	// ungracefully exits and restarts before completing sandbox
 	// detach but after store has been updated.
-	if err := n.getController().updateToStore(ep); err != nil ***REMOVED***
+	if err := n.getController().updateToStore(ep); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if e := ep.deleteDriverInfoFromCluster(); e != nil ***REMOVED***
+	if e := ep.deleteDriverInfoFromCluster(); e != nil {
 		logrus.Errorf("Could not delete endpoint state for endpoint %s from cluster: %v", ep.Name(), e)
-	***REMOVED***
+	}
 
 	sb.deleteHostsEntries(n.getSvcRecords(ep))
-	if !sb.inDelete && sb.needDefaultGW() && sb.getEndpointInGWNetwork() == nil ***REMOVED***
+	if !sb.inDelete && sb.needDefaultGW() && sb.getEndpointInGWNetwork() == nil {
 		return sb.setupDefaultGW()
-	***REMOVED***
+	}
 
 	// New endpoint providing external connectivity for the sandbox
 	extEp = sb.getGatewayEndpoint()
-	if moveExtConn && extEp != nil ***REMOVED***
+	if moveExtConn && extEp != nil {
 		logrus.Debugf("Programming external connectivity on endpoint %s (%s)", extEp.Name(), extEp.ID())
 		extN, err := extEp.getNetworkFromStore()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return fmt.Errorf("failed to get network from store for programming external connectivity during leave: %v", err)
-		***REMOVED***
+		}
 		extD, err := extN.driver(true)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return fmt.Errorf("failed to get driver for programming external connectivity during leave: %v", err)
-		***REMOVED***
-		if err := extD.ProgramExternalConnectivity(extEp.network.ID(), extEp.ID(), sb.Labels()); err != nil ***REMOVED***
+		}
+		if err := extD.ProgramExternalConnectivity(extEp.network.ID(), extEp.ID(), sb.Labels()); err != nil {
 			logrus.Warnf("driver failed programming external connectivity on endpoint %s: (%s) %v",
 				extEp.Name(), extEp.ID(), err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if !sb.needDefaultGW() ***REMOVED***
-		if err := sb.clearDefaultGW(); err != nil ***REMOVED***
+	if !sb.needDefaultGW() {
+		if err := sb.clearDefaultGW(); err != nil {
 			logrus.Warnf("Failure while disconnecting sandbox %s (%s) from gateway network: %v",
 				sb.ID(), sb.ContainerID(), err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (ep *endpoint) Delete(force bool) error ***REMOVED***
+func (ep *endpoint) Delete(force bool) error {
 	var err error
 	n, err := ep.getNetworkFromStore()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("failed to get network during Delete: %v", err)
-	***REMOVED***
+	}
 
 	ep, err = n.getEndpointFromStore(ep.ID())
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("failed to get endpoint from store during Delete: %v", err)
-	***REMOVED***
+	}
 
 	ep.Lock()
 	epid := ep.id
@@ -824,46 +824,46 @@ func (ep *endpoint) Delete(force bool) error ***REMOVED***
 	ep.Unlock()
 
 	sb, _ := n.getController().SandboxByID(sbid)
-	if sb != nil && !force ***REMOVED***
-		return &ActiveContainerError***REMOVED***name: name, id: epid***REMOVED***
-	***REMOVED***
+	if sb != nil && !force {
+		return &ActiveContainerError{name: name, id: epid}
+	}
 
-	if sb != nil ***REMOVED***
-		if e := ep.sbLeave(sb.(*sandbox), force); e != nil ***REMOVED***
+	if sb != nil {
+		if e := ep.sbLeave(sb.(*sandbox), force); e != nil {
 			logrus.Warnf("failed to leave sandbox for endpoint %s : %v", name, e)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if err = n.getController().deleteFromStore(ep); err != nil ***REMOVED***
+	if err = n.getController().deleteFromStore(ep); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	defer func() ***REMOVED***
-		if err != nil && !force ***REMOVED***
+	defer func() {
+		if err != nil && !force {
 			ep.dbExists = false
-			if e := n.getController().updateToStore(ep); e != nil ***REMOVED***
+			if e := n.getController().updateToStore(ep); e != nil {
 				logrus.Warnf("failed to recreate endpoint in store %s : %v", name, e)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***()
+			}
+		}
+	}()
 
 	// unwatch for service records
 	n.getController().unWatchSvcRecord(ep)
 
-	if err = ep.deleteEndpoint(force); err != nil && !force ***REMOVED***
+	if err = ep.deleteEndpoint(force); err != nil && !force {
 		return err
-	***REMOVED***
+	}
 
 	ep.releaseAddress()
 
-	if err := n.getEpCnt().DecEndpointCnt(); err != nil ***REMOVED***
+	if err := n.getEpCnt().DecEndpointCnt(); err != nil {
 		logrus.Warnf("failed to decrement endpoint count for ep %s: %v", ep.ID(), err)
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (ep *endpoint) deleteEndpoint(force bool) error ***REMOVED***
+func (ep *endpoint) deleteEndpoint(force bool) error {
 	ep.Lock()
 	n := ep.network
 	name := ep.name
@@ -871,28 +871,28 @@ func (ep *endpoint) deleteEndpoint(force bool) error ***REMOVED***
 	ep.Unlock()
 
 	driver, err := n.driver(!force)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("failed to delete endpoint: %v", err)
-	***REMOVED***
+	}
 
-	if driver == nil ***REMOVED***
+	if driver == nil {
 		return nil
-	***REMOVED***
+	}
 
-	if err := driver.DeleteEndpoint(n.id, epid); err != nil ***REMOVED***
-		if _, ok := err.(types.ForbiddenError); ok ***REMOVED***
+	if err := driver.DeleteEndpoint(n.id, epid); err != nil {
+		if _, ok := err.(types.ForbiddenError); ok {
 			return err
-		***REMOVED***
+		}
 
-		if _, ok := err.(types.MaskableError); !ok ***REMOVED***
+		if _, ok := err.(types.MaskableError); !ok {
 			logrus.Warnf("driver error deleting endpoint %s : %v", name, err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (ep *endpoint) getSandbox() (*sandbox, bool) ***REMOVED***
+func (ep *endpoint) getSandbox() (*sandbox, bool) {
 	c := ep.network.getController()
 	ep.Lock()
 	sid := ep.sandboxID
@@ -903,28 +903,28 @@ func (ep *endpoint) getSandbox() (*sandbox, bool) ***REMOVED***
 	c.Unlock()
 
 	return ps, ok
-***REMOVED***
+}
 
-func (ep *endpoint) getFirstInterfaceAddress() net.IP ***REMOVED***
+func (ep *endpoint) getFirstInterfaceAddress() net.IP {
 	ep.Lock()
 	defer ep.Unlock()
 
-	if ep.iface.addr != nil ***REMOVED***
+	if ep.iface.addr != nil {
 		return ep.iface.addr.IP
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // EndpointOptionGeneric function returns an option setter for a Generic option defined
 // in a Dictionary of Key-Value pair
-func EndpointOptionGeneric(generic map[string]interface***REMOVED******REMOVED***) EndpointOption ***REMOVED***
-	return func(ep *endpoint) ***REMOVED***
-		for k, v := range generic ***REMOVED***
+func EndpointOptionGeneric(generic map[string]interface{}) EndpointOption {
+	return func(ep *endpoint) {
+		for k, v := range generic {
 			ep.generic[k] = v
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 var (
 	linkLocalMask     = net.CIDRMask(16, 32)
@@ -932,151 +932,151 @@ var (
 )
 
 // CreateOptionIpam function returns an option setter for the ipam configuration for this endpoint
-func CreateOptionIpam(ipV4, ipV6 net.IP, llIPs []net.IP, ipamOptions map[string]string) EndpointOption ***REMOVED***
-	return func(ep *endpoint) ***REMOVED***
+func CreateOptionIpam(ipV4, ipV6 net.IP, llIPs []net.IP, ipamOptions map[string]string) EndpointOption {
+	return func(ep *endpoint) {
 		ep.prefAddress = ipV4
 		ep.prefAddressV6 = ipV6
-		if len(llIPs) != 0 ***REMOVED***
-			for _, ip := range llIPs ***REMOVED***
-				nw := &net.IPNet***REMOVED***IP: ip, Mask: linkLocalMask***REMOVED***
-				if ip.To4() == nil ***REMOVED***
+		if len(llIPs) != 0 {
+			for _, ip := range llIPs {
+				nw := &net.IPNet{IP: ip, Mask: linkLocalMask}
+				if ip.To4() == nil {
 					nw.Mask = linkLocalMaskIPv6
-				***REMOVED***
+				}
 				ep.iface.llAddrs = append(ep.iface.llAddrs, nw)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		ep.ipamOptions = ipamOptions
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // CreateOptionExposedPorts function returns an option setter for the container exposed
 // ports option to be passed to network.CreateEndpoint() method.
-func CreateOptionExposedPorts(exposedPorts []types.TransportPort) EndpointOption ***REMOVED***
-	return func(ep *endpoint) ***REMOVED***
+func CreateOptionExposedPorts(exposedPorts []types.TransportPort) EndpointOption {
+	return func(ep *endpoint) {
 		// Defensive copy
 		eps := make([]types.TransportPort, len(exposedPorts))
 		copy(eps, exposedPorts)
 		// Store endpoint label and in generic because driver needs it
 		ep.exposedPorts = eps
 		ep.generic[netlabel.ExposedPorts] = eps
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // CreateOptionPortMapping function returns an option setter for the mapping
 // ports option to be passed to network.CreateEndpoint() method.
-func CreateOptionPortMapping(portBindings []types.PortBinding) EndpointOption ***REMOVED***
-	return func(ep *endpoint) ***REMOVED***
+func CreateOptionPortMapping(portBindings []types.PortBinding) EndpointOption {
+	return func(ep *endpoint) {
 		// Store a copy of the bindings as generic data to pass to the driver
 		pbs := make([]types.PortBinding, len(portBindings))
 		copy(pbs, portBindings)
 		ep.generic[netlabel.PortMap] = pbs
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // CreateOptionDNS function returns an option setter for dns entry option to
 // be passed to container Create method.
-func CreateOptionDNS(dns []string) EndpointOption ***REMOVED***
-	return func(ep *endpoint) ***REMOVED***
+func CreateOptionDNS(dns []string) EndpointOption {
+	return func(ep *endpoint) {
 		ep.generic[netlabel.DNSServers] = dns
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // CreateOptionAnonymous function returns an option setter for setting
 // this endpoint as anonymous
-func CreateOptionAnonymous() EndpointOption ***REMOVED***
-	return func(ep *endpoint) ***REMOVED***
+func CreateOptionAnonymous() EndpointOption {
+	return func(ep *endpoint) {
 		ep.anonymous = true
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // CreateOptionDisableResolution function returns an option setter to indicate
 // this endpoint doesn't want embedded DNS server functionality
-func CreateOptionDisableResolution() EndpointOption ***REMOVED***
-	return func(ep *endpoint) ***REMOVED***
+func CreateOptionDisableResolution() EndpointOption {
+	return func(ep *endpoint) {
 		ep.disableResolution = true
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // CreateOptionAlias function returns an option setter for setting endpoint alias
-func CreateOptionAlias(name string, alias string) EndpointOption ***REMOVED***
-	return func(ep *endpoint) ***REMOVED***
-		if ep.aliases == nil ***REMOVED***
+func CreateOptionAlias(name string, alias string) EndpointOption {
+	return func(ep *endpoint) {
+		if ep.aliases == nil {
 			ep.aliases = make(map[string]string)
-		***REMOVED***
+		}
 		ep.aliases[alias] = name
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // CreateOptionService function returns an option setter for setting service binding configuration
-func CreateOptionService(name, id string, vip net.IP, ingressPorts []*PortConfig, aliases []string) EndpointOption ***REMOVED***
-	return func(ep *endpoint) ***REMOVED***
+func CreateOptionService(name, id string, vip net.IP, ingressPorts []*PortConfig, aliases []string) EndpointOption {
+	return func(ep *endpoint) {
 		ep.svcName = name
 		ep.svcID = id
 		ep.virtualIP = vip
 		ep.ingressPorts = ingressPorts
 		ep.svcAliases = aliases
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // CreateOptionMyAlias function returns an option setter for setting endpoint's self alias
-func CreateOptionMyAlias(alias string) EndpointOption ***REMOVED***
-	return func(ep *endpoint) ***REMOVED***
+func CreateOptionMyAlias(alias string) EndpointOption {
+	return func(ep *endpoint) {
 		ep.myAliases = append(ep.myAliases, alias)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // CreateOptionLoadBalancer function returns an option setter for denoting the endpoint is a load balancer for a network
-func CreateOptionLoadBalancer() EndpointOption ***REMOVED***
-	return func(ep *endpoint) ***REMOVED***
+func CreateOptionLoadBalancer() EndpointOption {
+	return func(ep *endpoint) {
 		ep.loadBalancer = true
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // JoinOptionPriority function returns an option setter for priority option to
 // be passed to the endpoint.Join() method.
-func JoinOptionPriority(ep Endpoint, prio int) EndpointOption ***REMOVED***
-	return func(ep *endpoint) ***REMOVED***
+func JoinOptionPriority(ep Endpoint, prio int) EndpointOption {
+	return func(ep *endpoint) {
 		// ep lock already acquired
 		c := ep.network.getController()
 		c.Lock()
 		sb, ok := c.sandboxes[ep.sandboxID]
 		c.Unlock()
-		if !ok ***REMOVED***
+		if !ok {
 			logrus.Errorf("Could not set endpoint priority value during Join to endpoint %s: No sandbox id present in endpoint", ep.id)
 			return
-		***REMOVED***
+		}
 		sb.epPriority[ep.id] = prio
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (ep *endpoint) DataScope() string ***REMOVED***
+func (ep *endpoint) DataScope() string {
 	return ep.getNetwork().DataScope()
-***REMOVED***
+}
 
-func (ep *endpoint) assignAddress(ipam ipamapi.Ipam, assignIPv4, assignIPv6 bool) error ***REMOVED***
+func (ep *endpoint) assignAddress(ipam ipamapi.Ipam, assignIPv4, assignIPv6 bool) error {
 	var err error
 
 	n := ep.getNetwork()
-	if n.hasSpecialDriver() ***REMOVED***
+	if n.hasSpecialDriver() {
 		return nil
-	***REMOVED***
+	}
 
 	logrus.Debugf("Assigning addresses for endpoint %s's interface on network %s", ep.Name(), n.Name())
 
-	if assignIPv4 ***REMOVED***
-		if err = ep.assignAddressVersion(4, ipam); err != nil ***REMOVED***
+	if assignIPv4 {
+		if err = ep.assignAddressVersion(4, ipam); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if assignIPv6 ***REMOVED***
+	if assignIPv6 {
 		err = ep.assignAddressVersion(6, ipam)
-	***REMOVED***
+	}
 
 	return err
-***REMOVED***
+}
 
-func (ep *endpoint) assignAddressVersion(ipVer int, ipam ipamapi.Ipam) error ***REMOVED***
+func (ep *endpoint) assignAddressVersion(ipVer int, ipam ipamapi.Ipam) error {
 	var (
 		poolID  *string
 		address **net.IPNet
@@ -1085,7 +1085,7 @@ func (ep *endpoint) assignAddressVersion(ipVer int, ipam ipamapi.Ipam) error ***
 	)
 
 	n := ep.getNetwork()
-	switch ipVer ***REMOVED***
+	switch ipVer {
 	case 4:
 		poolID = &ep.iface.v4PoolID
 		address = &ep.iface.addr
@@ -1096,116 +1096,116 @@ func (ep *endpoint) assignAddressVersion(ipVer int, ipam ipamapi.Ipam) error ***
 		prefAdd = ep.prefAddressV6
 	default:
 		return types.InternalErrorf("incorrect ip version number passed: %d", ipVer)
-	***REMOVED***
+	}
 
 	ipInfo := n.getIPInfo(ipVer)
 
 	// ipv6 address is not mandatory
-	if len(ipInfo) == 0 && ipVer == 6 ***REMOVED***
+	if len(ipInfo) == 0 && ipVer == 6 {
 		return nil
-	***REMOVED***
+	}
 
 	// The address to program may be chosen by the user or by the network driver in one specific
 	// case to support backward compatibility with `docker daemon --fixed-cidrv6` use case
-	if prefAdd != nil ***REMOVED***
+	if prefAdd != nil {
 		progAdd = prefAdd
-	***REMOVED*** else if *address != nil ***REMOVED***
+	} else if *address != nil {
 		progAdd = (*address).IP
-	***REMOVED***
+	}
 
-	for _, d := range ipInfo ***REMOVED***
-		if progAdd != nil && !d.Pool.Contains(progAdd) ***REMOVED***
+	for _, d := range ipInfo {
+		if progAdd != nil && !d.Pool.Contains(progAdd) {
 			continue
-		***REMOVED***
+		}
 		addr, _, err := ipam.RequestAddress(d.PoolID, progAdd, ep.ipamOptions)
-		if err == nil ***REMOVED***
+		if err == nil {
 			ep.Lock()
 			*address = addr
 			*poolID = d.PoolID
 			ep.Unlock()
 			return nil
-		***REMOVED***
-		if err != ipamapi.ErrNoAvailableIPs || progAdd != nil ***REMOVED***
+		}
+		if err != ipamapi.ErrNoAvailableIPs || progAdd != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
-	if progAdd != nil ***REMOVED***
+		}
+	}
+	if progAdd != nil {
 		return types.BadRequestErrorf("Invalid address %s: It does not belong to any of this network's subnets", prefAdd)
-	***REMOVED***
+	}
 	return fmt.Errorf("no available IPv%d addresses on this network's address pools: %s (%s)", ipVer, n.Name(), n.ID())
-***REMOVED***
+}
 
-func (ep *endpoint) releaseAddress() ***REMOVED***
+func (ep *endpoint) releaseAddress() {
 	n := ep.getNetwork()
-	if n.hasSpecialDriver() ***REMOVED***
+	if n.hasSpecialDriver() {
 		return
-	***REMOVED***
+	}
 
 	logrus.Debugf("Releasing addresses for endpoint %s's interface on network %s", ep.Name(), n.Name())
 
 	ipam, _, err := n.getController().getIPAMDriver(n.ipamType)
-	if err != nil ***REMOVED***
+	if err != nil {
 		logrus.Warnf("Failed to retrieve ipam driver to release interface address on delete of endpoint %s (%s): %v", ep.Name(), ep.ID(), err)
 		return
-	***REMOVED***
+	}
 
-	if ep.iface.addr != nil ***REMOVED***
-		if err := ipam.ReleaseAddress(ep.iface.v4PoolID, ep.iface.addr.IP); err != nil ***REMOVED***
+	if ep.iface.addr != nil {
+		if err := ipam.ReleaseAddress(ep.iface.v4PoolID, ep.iface.addr.IP); err != nil {
 			logrus.Warnf("Failed to release ip address %s on delete of endpoint %s (%s): %v", ep.iface.addr.IP, ep.Name(), ep.ID(), err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if ep.iface.addrv6 != nil && ep.iface.addrv6.IP.IsGlobalUnicast() ***REMOVED***
-		if err := ipam.ReleaseAddress(ep.iface.v6PoolID, ep.iface.addrv6.IP); err != nil ***REMOVED***
+	if ep.iface.addrv6 != nil && ep.iface.addrv6.IP.IsGlobalUnicast() {
+		if err := ipam.ReleaseAddress(ep.iface.v6PoolID, ep.iface.addrv6.IP); err != nil {
 			logrus.Warnf("Failed to release ip address %s on delete of endpoint %s (%s): %v", ep.iface.addrv6.IP, ep.Name(), ep.ID(), err)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (c *controller) cleanupLocalEndpoints() ***REMOVED***
+func (c *controller) cleanupLocalEndpoints() {
 	// Get used endpoints
-	eps := make(map[string]interface***REMOVED******REMOVED***)
-	for _, sb := range c.sandboxes ***REMOVED***
-		for _, ep := range sb.endpoints ***REMOVED***
+	eps := make(map[string]interface{})
+	for _, sb := range c.sandboxes {
+		for _, ep := range sb.endpoints {
 			eps[ep.id] = true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	nl, err := c.getNetworksForScope(datastore.LocalScope)
-	if err != nil ***REMOVED***
+	if err != nil {
 		logrus.Warnf("Could not get list of networks during endpoint cleanup: %v", err)
 		return
-	***REMOVED***
+	}
 
-	for _, n := range nl ***REMOVED***
-		if n.ConfigOnly() ***REMOVED***
+	for _, n := range nl {
+		if n.ConfigOnly() {
 			continue
-		***REMOVED***
+		}
 		epl, err := n.getEndpointsFromStore()
-		if err != nil ***REMOVED***
+		if err != nil {
 			logrus.Warnf("Could not get list of endpoints in network %s during endpoint cleanup: %v", n.name, err)
 			continue
-		***REMOVED***
+		}
 
-		for _, ep := range epl ***REMOVED***
-			if _, ok := eps[ep.id]; ok ***REMOVED***
+		for _, ep := range epl {
+			if _, ok := eps[ep.id]; ok {
 				continue
-			***REMOVED***
+			}
 			logrus.Infof("Removing stale endpoint %s (%s)", ep.name, ep.id)
-			if err := ep.Delete(true); err != nil ***REMOVED***
+			if err := ep.Delete(true); err != nil {
 				logrus.Warnf("Could not delete local endpoint %s during endpoint cleanup: %v", ep.name, err)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		epl, err = n.getEndpointsFromStore()
-		if err != nil ***REMOVED***
+		if err != nil {
 			logrus.Warnf("Could not get list of endpoints in network %s for count update: %v", n.name, err)
 			continue
-		***REMOVED***
+		}
 
 		epCnt := n.getEpCnt().EndpointCnt()
-		if epCnt != uint64(len(epl)) ***REMOVED***
+		if epCnt != uint64(len(epl)) {
 			logrus.Infof("Fixing inconsistent endpoint_cnt for network %s. Expected=%d, Actual=%d", n.name, len(epl), epCnt)
 			n.getEpCnt().setCnt(uint64(len(epl)))
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

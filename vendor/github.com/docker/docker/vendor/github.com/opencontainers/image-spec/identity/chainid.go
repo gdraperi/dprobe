@@ -27,16 +27,16 @@ import "github.com/opencontainers/go-digest"
 // the last entry. Typically, these are a list of layer DiffIDs, with the
 // result providing the ChainID identifying the result of sequential
 // application of the preceding layers.
-func ChainID(dgsts []digest.Digest) digest.Digest ***REMOVED***
+func ChainID(dgsts []digest.Digest) digest.Digest {
 	chainIDs := make([]digest.Digest, len(dgsts))
 	copy(chainIDs, dgsts)
 	ChainIDs(chainIDs)
 
-	if len(chainIDs) == 0 ***REMOVED***
+	if len(chainIDs) == 0 {
 		return ""
-	***REMOVED***
+	}
 	return chainIDs[len(chainIDs)-1]
-***REMOVED***
+}
 
 // ChainIDs calculates the recursively applied chain id for each identifier in
 // the slice. The result is written direcly back into the slice such that the
@@ -53,10 +53,10 @@ func ChainID(dgsts []digest.Digest) digest.Digest ***REMOVED***
 // Typically, these are a list of layer DiffIDs, with the
 // result providing the ChainID for each the result of each layer application
 // sequentially.
-func ChainIDs(dgsts []digest.Digest) []digest.Digest ***REMOVED***
-	if len(dgsts) < 2 ***REMOVED***
+func ChainIDs(dgsts []digest.Digest) []digest.Digest {
+	if len(dgsts) < 2 {
 		return dgsts
-	***REMOVED***
+	}
 
 	parent := digest.FromBytes([]byte(dgsts[0] + " " + dgsts[1]))
 	next := dgsts[1:]
@@ -64,4 +64,4 @@ func ChainIDs(dgsts []digest.Digest) []digest.Digest ***REMOVED***
 	ChainIDs(next)
 
 	return dgsts
-***REMOVED***
+}

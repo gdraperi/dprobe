@@ -12,22 +12,22 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestMiddlewareWrapHandler(t *testing.T) ***REMOVED***
-	server := authZPluginTestServer***REMOVED***t: t***REMOVED***
+func TestMiddlewareWrapHandler(t *testing.T) {
+	server := authZPluginTestServer{t: t}
 	server.start()
 	defer server.stop()
 
 	authZPlugin := createTestPlugin(t)
-	pluginNames := []string***REMOVED***authZPlugin.name***REMOVED***
+	pluginNames := []string{authZPlugin.name}
 
 	var pluginGetter plugingetter.PluginGetter
 	middleWare := NewMiddleware(pluginNames, pluginGetter)
-	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error ***REMOVED***
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error {
 		return nil
-	***REMOVED***
+	}
 
-	authList := []Plugin***REMOVED***authZPlugin***REMOVED***
-	middleWare.SetPlugins([]string***REMOVED***"My Test Plugin"***REMOVED***)
+	authList := []Plugin{authZPlugin}
+	middleWare.SetPlugins([]string{"My Test Plugin"})
 	setAuthzPlugins(middleWare, authList)
 	mdHandler := middleWare.WrapHandler(handler)
 	require.NotNil(t, mdHandler)
@@ -40,26 +40,26 @@ func TestMiddlewareWrapHandler(t *testing.T) ***REMOVED***
 	resp := httptest.NewRecorder()
 	ctx := context.Background()
 
-	t.Run("Error Test Case :", func(t *testing.T) ***REMOVED***
-		server.replayResponse = Response***REMOVED***
+	t.Run("Error Test Case :", func(t *testing.T) {
+		server.replayResponse = Response{
 			Allow: false,
 			Msg:   "Server Auth Not Allowed",
-		***REMOVED***
-		if err := mdHandler(ctx, resp, req, map[string]string***REMOVED******REMOVED***); err == nil ***REMOVED***
+		}
+		if err := mdHandler(ctx, resp, req, map[string]string{}); err == nil {
 			require.Error(t, err)
-		***REMOVED***
+		}
 
-	***REMOVED***)
+	})
 
-	t.Run("Positive Test Case :", func(t *testing.T) ***REMOVED***
-		server.replayResponse = Response***REMOVED***
+	t.Run("Positive Test Case :", func(t *testing.T) {
+		server.replayResponse = Response{
 			Allow: true,
 			Msg:   "Server Auth Allowed",
-		***REMOVED***
-		if err := mdHandler(ctx, resp, req, map[string]string***REMOVED******REMOVED***); err != nil ***REMOVED***
+		}
+		if err := mdHandler(ctx, resp, req, map[string]string{}); err != nil {
 			require.NoError(t, err)
-		***REMOVED***
+		}
 
-	***REMOVED***)
+	})
 
-***REMOVED***
+}

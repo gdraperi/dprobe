@@ -24,7 +24,7 @@ import (
 // multiplexed.
 // The format of the multiplexed stream is as follows:
 //
-//    [8]byte***REMOVED***STREAM_TYPE, 0, 0, 0, SIZE1, SIZE2, SIZE3, SIZE4***REMOVED***[]byte***REMOVED***OUTPUT***REMOVED***
+//    [8]byte{STREAM_TYPE, 0, 0, 0, SIZE1, SIZE2, SIZE3, SIZE4}[]byte{OUTPUT}
 //
 // STREAM_TYPE can be 1 for stdout and 2 for stderr
 //
@@ -33,48 +33,48 @@ import (
 //
 // You can use github.com/docker/docker/pkg/stdcopy.StdCopy to demultiplex this
 // stream.
-func (cli *Client) ContainerLogs(ctx context.Context, container string, options types.ContainerLogsOptions) (io.ReadCloser, error) ***REMOVED***
-	query := url.Values***REMOVED******REMOVED***
-	if options.ShowStdout ***REMOVED***
+func (cli *Client) ContainerLogs(ctx context.Context, container string, options types.ContainerLogsOptions) (io.ReadCloser, error) {
+	query := url.Values{}
+	if options.ShowStdout {
 		query.Set("stdout", "1")
-	***REMOVED***
+	}
 
-	if options.ShowStderr ***REMOVED***
+	if options.ShowStderr {
 		query.Set("stderr", "1")
-	***REMOVED***
+	}
 
-	if options.Since != "" ***REMOVED***
+	if options.Since != "" {
 		ts, err := timetypes.GetTimestamp(options.Since, time.Now())
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		query.Set("since", ts)
-	***REMOVED***
+	}
 
-	if options.Until != "" ***REMOVED***
+	if options.Until != "" {
 		ts, err := timetypes.GetTimestamp(options.Until, time.Now())
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		query.Set("until", ts)
-	***REMOVED***
+	}
 
-	if options.Timestamps ***REMOVED***
+	if options.Timestamps {
 		query.Set("timestamps", "1")
-	***REMOVED***
+	}
 
-	if options.Details ***REMOVED***
+	if options.Details {
 		query.Set("details", "1")
-	***REMOVED***
+	}
 
-	if options.Follow ***REMOVED***
+	if options.Follow {
 		query.Set("follow", "1")
-	***REMOVED***
+	}
 	query.Set("tail", options.Tail)
 
 	resp, err := cli.get(ctx, "/containers/"+container+"/logs", query, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, wrapResponseError(err, resp, "container", container)
-	***REMOVED***
+	}
 	return resp.body, nil
-***REMOVED***
+}

@@ -12,35 +12,35 @@ import (
 	"time"
 )
 
-type optsConfig struct***REMOVED******REMOVED***
+type optsConfig struct{}
 
 var validOpts map[string]bool
 
 // scopedPath verifies that the path where the volume is located
 // is under Docker's root and the valid local paths.
-func (r *Root) scopedPath(realPath string) bool ***REMOVED***
-	if strings.HasPrefix(realPath, filepath.Join(r.scope, volumesPathName)) && realPath != filepath.Join(r.scope, volumesPathName) ***REMOVED***
+func (r *Root) scopedPath(realPath string) bool {
+	if strings.HasPrefix(realPath, filepath.Join(r.scope, volumesPathName)) && realPath != filepath.Join(r.scope, volumesPathName) {
 		return true
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
-func setOpts(v *localVolume, opts map[string]string) error ***REMOVED***
-	if len(opts) > 0 ***REMOVED***
+func setOpts(v *localVolume, opts map[string]string) error {
+	if len(opts) > 0 {
 		return fmt.Errorf("options are not supported on this platform")
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (v *localVolume) mount() error ***REMOVED***
+func (v *localVolume) mount() error {
 	return nil
-***REMOVED***
+}
 
-func (v *localVolume) CreatedAt() (time.Time, error) ***REMOVED***
+func (v *localVolume) CreatedAt() (time.Time, error) {
 	fileInfo, err := os.Stat(v.path)
-	if err != nil ***REMOVED***
-		return time.Time***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return time.Time{}, err
+	}
 	ft := fileInfo.Sys().(*syscall.Win32FileAttributeData).CreationTime
 	return time.Unix(0, ft.Nanoseconds()), nil
-***REMOVED***
+}

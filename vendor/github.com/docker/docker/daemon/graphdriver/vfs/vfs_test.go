@@ -10,32 +10,32 @@ import (
 	"github.com/docker/docker/pkg/reexec"
 )
 
-func init() ***REMOVED***
+func init() {
 	reexec.Init()
-***REMOVED***
+}
 
 // This avoids creating a new driver for each test if all tests are run
 // Make sure to put new tests between TestVfsSetup and TestVfsTeardown
-func TestVfsSetup(t *testing.T) ***REMOVED***
+func TestVfsSetup(t *testing.T) {
 	graphtest.GetDriver(t, "vfs")
-***REMOVED***
+}
 
-func TestVfsCreateEmpty(t *testing.T) ***REMOVED***
+func TestVfsCreateEmpty(t *testing.T) {
 	graphtest.DriverTestCreateEmpty(t, "vfs")
-***REMOVED***
+}
 
-func TestVfsCreateBase(t *testing.T) ***REMOVED***
+func TestVfsCreateBase(t *testing.T) {
 	graphtest.DriverTestCreateBase(t, "vfs")
-***REMOVED***
+}
 
-func TestVfsCreateSnap(t *testing.T) ***REMOVED***
+func TestVfsCreateSnap(t *testing.T) {
 	graphtest.DriverTestCreateSnap(t, "vfs")
-***REMOVED***
+}
 
-func TestVfsSetQuota(t *testing.T) ***REMOVED***
+func TestVfsSetQuota(t *testing.T) {
 	graphtest.DriverTestSetQuota(t, "vfs", false)
-***REMOVED***
+}
 
-func TestVfsTeardown(t *testing.T) ***REMOVED***
+func TestVfsTeardown(t *testing.T) {
 	graphtest.PutDriver(t)
-***REMOVED***
+}

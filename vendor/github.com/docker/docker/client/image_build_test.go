@@ -16,64 +16,64 @@ import (
 	"github.com/docker/go-units"
 )
 
-func TestImageBuildError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestImageBuildError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
-	***REMOVED***
-	_, err := client.ImageBuild(context.Background(), nil, types.ImageBuildOptions***REMOVED******REMOVED***)
-	if err == nil || err.Error() != "Error response from daemon: Server error" ***REMOVED***
+	}
+	_, err := client.ImageBuild(context.Background(), nil, types.ImageBuildOptions{})
+	if err == nil || err.Error() != "Error response from daemon: Server error" {
 		t.Fatalf("expected a Server Error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestImageBuild(t *testing.T) ***REMOVED***
+func TestImageBuild(t *testing.T) {
 	v1 := "value1"
 	v2 := "value2"
 	emptyRegistryConfig := "bnVsbA=="
-	buildCases := []struct ***REMOVED***
+	buildCases := []struct {
 		buildOptions           types.ImageBuildOptions
 		expectedQueryParams    map[string]string
 		expectedTags           []string
 		expectedRegistryConfig string
-	***REMOVED******REMOVED***
-		***REMOVED***
-			buildOptions: types.ImageBuildOptions***REMOVED***
+	}{
+		{
+			buildOptions: types.ImageBuildOptions{
 				SuppressOutput: true,
 				NoCache:        true,
 				Remove:         true,
 				ForceRemove:    true,
 				PullParent:     true,
-			***REMOVED***,
-			expectedQueryParams: map[string]string***REMOVED***
+			},
+			expectedQueryParams: map[string]string{
 				"q":       "1",
 				"nocache": "1",
 				"rm":      "1",
 				"forcerm": "1",
 				"pull":    "1",
-			***REMOVED***,
-			expectedTags:           []string***REMOVED******REMOVED***,
+			},
+			expectedTags:           []string{},
 			expectedRegistryConfig: emptyRegistryConfig,
-		***REMOVED***,
-		***REMOVED***
-			buildOptions: types.ImageBuildOptions***REMOVED***
+		},
+		{
+			buildOptions: types.ImageBuildOptions{
 				SuppressOutput: false,
 				NoCache:        false,
 				Remove:         false,
 				ForceRemove:    false,
 				PullParent:     false,
-			***REMOVED***,
-			expectedQueryParams: map[string]string***REMOVED***
+			},
+			expectedQueryParams: map[string]string{
 				"q":       "",
 				"nocache": "",
 				"rm":      "0",
 				"forcerm": "",
 				"pull":    "",
-			***REMOVED***,
-			expectedTags:           []string***REMOVED******REMOVED***,
+			},
+			expectedTags:           []string{},
 			expectedRegistryConfig: emptyRegistryConfig,
-		***REMOVED***,
-		***REMOVED***
-			buildOptions: types.ImageBuildOptions***REMOVED***
+		},
+		{
+			buildOptions: types.ImageBuildOptions{
 				RemoteContext: "remoteContext",
 				Isolation:     container.Isolation("isolation"),
 				CPUSetCPUs:    "2",
@@ -86,8 +86,8 @@ func TestImageBuild(t *testing.T) ***REMOVED***
 				ShmSize:       10,
 				CgroupParent:  "cgroup_parent",
 				Dockerfile:    "Dockerfile",
-			***REMOVED***,
-			expectedQueryParams: map[string]string***REMOVED***
+			},
+			expectedQueryParams: map[string]string{
 				"remote":       "remoteContext",
 				"isolation":    "isolation",
 				"cpusetcpus":   "2",
@@ -101,133 +101,133 @@ func TestImageBuild(t *testing.T) ***REMOVED***
 				"cgroupparent": "cgroup_parent",
 				"dockerfile":   "Dockerfile",
 				"rm":           "0",
-			***REMOVED***,
-			expectedTags:           []string***REMOVED******REMOVED***,
+			},
+			expectedTags:           []string{},
 			expectedRegistryConfig: emptyRegistryConfig,
-		***REMOVED***,
-		***REMOVED***
-			buildOptions: types.ImageBuildOptions***REMOVED***
-				BuildArgs: map[string]*string***REMOVED***
+		},
+		{
+			buildOptions: types.ImageBuildOptions{
+				BuildArgs: map[string]*string{
 					"ARG1": &v1,
 					"ARG2": &v2,
 					"ARG3": nil,
-				***REMOVED***,
-			***REMOVED***,
-			expectedQueryParams: map[string]string***REMOVED***
-				"buildargs": `***REMOVED***"ARG1":"value1","ARG2":"value2","ARG3":null***REMOVED***`,
+				},
+			},
+			expectedQueryParams: map[string]string{
+				"buildargs": `{"ARG1":"value1","ARG2":"value2","ARG3":null}`,
 				"rm":        "0",
-			***REMOVED***,
-			expectedTags:           []string***REMOVED******REMOVED***,
+			},
+			expectedTags:           []string{},
 			expectedRegistryConfig: emptyRegistryConfig,
-		***REMOVED***,
-		***REMOVED***
-			buildOptions: types.ImageBuildOptions***REMOVED***
-				Ulimits: []*units.Ulimit***REMOVED***
-					***REMOVED***
+		},
+		{
+			buildOptions: types.ImageBuildOptions{
+				Ulimits: []*units.Ulimit{
+					{
 						Name: "nproc",
 						Hard: 65557,
 						Soft: 65557,
-					***REMOVED***,
-					***REMOVED***
+					},
+					{
 						Name: "nofile",
 						Hard: 20000,
 						Soft: 40000,
-					***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-			expectedQueryParams: map[string]string***REMOVED***
-				"ulimits": `[***REMOVED***"Name":"nproc","Hard":65557,"Soft":65557***REMOVED***,***REMOVED***"Name":"nofile","Hard":20000,"Soft":40000***REMOVED***]`,
+					},
+				},
+			},
+			expectedQueryParams: map[string]string{
+				"ulimits": `[{"Name":"nproc","Hard":65557,"Soft":65557},{"Name":"nofile","Hard":20000,"Soft":40000}]`,
 				"rm":      "0",
-			***REMOVED***,
-			expectedTags:           []string***REMOVED******REMOVED***,
+			},
+			expectedTags:           []string{},
 			expectedRegistryConfig: emptyRegistryConfig,
-		***REMOVED***,
-		***REMOVED***
-			buildOptions: types.ImageBuildOptions***REMOVED***
-				AuthConfigs: map[string]types.AuthConfig***REMOVED***
-					"https://index.docker.io/v1/": ***REMOVED***
+		},
+		{
+			buildOptions: types.ImageBuildOptions{
+				AuthConfigs: map[string]types.AuthConfig{
+					"https://index.docker.io/v1/": {
 						Auth: "dG90bwo=",
-					***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-			expectedQueryParams: map[string]string***REMOVED***
+					},
+				},
+			},
+			expectedQueryParams: map[string]string{
 				"rm": "0",
-			***REMOVED***,
-			expectedTags:           []string***REMOVED******REMOVED***,
+			},
+			expectedTags:           []string{},
 			expectedRegistryConfig: "eyJodHRwczovL2luZGV4LmRvY2tlci5pby92MS8iOnsiYXV0aCI6ImRHOTBid289In19",
-		***REMOVED***,
-	***REMOVED***
-	for _, buildCase := range buildCases ***REMOVED***
+		},
+	}
+	for _, buildCase := range buildCases {
 		expectedURL := "/build"
-		client := &Client***REMOVED***
-			client: newMockClient(func(r *http.Request) (*http.Response, error) ***REMOVED***
-				if !strings.HasPrefix(r.URL.Path, expectedURL) ***REMOVED***
+		client := &Client{
+			client: newMockClient(func(r *http.Request) (*http.Response, error) {
+				if !strings.HasPrefix(r.URL.Path, expectedURL) {
 					return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, r.URL)
-				***REMOVED***
+				}
 				// Check request headers
 				registryConfig := r.Header.Get("X-Registry-Config")
-				if registryConfig != buildCase.expectedRegistryConfig ***REMOVED***
+				if registryConfig != buildCase.expectedRegistryConfig {
 					return nil, fmt.Errorf("X-Registry-Config header not properly set in the request. Expected '%s', got %s", buildCase.expectedRegistryConfig, registryConfig)
-				***REMOVED***
+				}
 				contentType := r.Header.Get("Content-Type")
-				if contentType != "application/x-tar" ***REMOVED***
+				if contentType != "application/x-tar" {
 					return nil, fmt.Errorf("Content-type header not properly set in the request. Expected 'application/x-tar', got %s", contentType)
-				***REMOVED***
+				}
 
 				// Check query parameters
 				query := r.URL.Query()
-				for key, expected := range buildCase.expectedQueryParams ***REMOVED***
+				for key, expected := range buildCase.expectedQueryParams {
 					actual := query.Get(key)
-					if actual != expected ***REMOVED***
+					if actual != expected {
 						return nil, fmt.Errorf("%s not set in URL query properly. Expected '%s', got %s", key, expected, actual)
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 
 				// Check tags
-				if len(buildCase.expectedTags) > 0 ***REMOVED***
+				if len(buildCase.expectedTags) > 0 {
 					tags := query["t"]
-					if !reflect.DeepEqual(tags, buildCase.expectedTags) ***REMOVED***
+					if !reflect.DeepEqual(tags, buildCase.expectedTags) {
 						return nil, fmt.Errorf("t (tags) not set in URL query properly. Expected '%s', got %s", buildCase.expectedTags, tags)
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 
-				headers := http.Header***REMOVED******REMOVED***
+				headers := http.Header{}
 				headers.Add("Server", "Docker/v1.23 (MyOS)")
-				return &http.Response***REMOVED***
+				return &http.Response{
 					StatusCode: http.StatusOK,
 					Body:       ioutil.NopCloser(bytes.NewReader([]byte("body"))),
 					Header:     headers,
-				***REMOVED***, nil
-			***REMOVED***),
-		***REMOVED***
+				}, nil
+			}),
+		}
 		buildResponse, err := client.ImageBuild(context.Background(), nil, buildCase.buildOptions)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
-		if buildResponse.OSType != "MyOS" ***REMOVED***
+		}
+		if buildResponse.OSType != "MyOS" {
 			t.Fatalf("expected OSType to be 'MyOS', got %s", buildResponse.OSType)
-		***REMOVED***
+		}
 		response, err := ioutil.ReadAll(buildResponse.Body)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
+		}
 		buildResponse.Body.Close()
-		if string(response) != "body" ***REMOVED***
+		if string(response) != "body" {
 			t.Fatalf("expected Body to contain 'body' string, got %s", response)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestGetDockerOS(t *testing.T) ***REMOVED***
-	cases := map[string]string***REMOVED***
+func TestGetDockerOS(t *testing.T) {
+	cases := map[string]string{
 		"Docker/v1.22 (linux)":   "linux",
 		"Docker/v1.22 (windows)": "windows",
 		"Foo/v1.22 (bar)":        "",
-	***REMOVED***
-	for header, os := range cases ***REMOVED***
+	}
+	for header, os := range cases {
 		g := getDockerOS(header)
-		if g != os ***REMOVED***
+		if g != os {
 			t.Fatalf("Expected %s, got %s", os, g)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

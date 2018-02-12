@@ -12,63 +12,63 @@ import (
 
 var ensureHTTPServerOnce sync.Once
 
-func ensureHTTPServerImage(t testingT) ***REMOVED***
+func ensureHTTPServerImage(t testingT) {
 	var doIt bool
-	ensureHTTPServerOnce.Do(func() ***REMOVED***
+	ensureHTTPServerOnce.Do(func() {
 		doIt = true
-	***REMOVED***)
+	})
 
-	if !doIt ***REMOVED***
+	if !doIt {
 		return
-	***REMOVED***
+	}
 
 	defer testEnv.ProtectImage(t, "httpserver:latest")
 
 	tmp, err := ioutil.TempDir("", "docker-http-server-test")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("could not build http server: %v", err)
-	***REMOVED***
+	}
 	defer os.RemoveAll(tmp)
 
 	goos := testEnv.OSType
-	if goos == "" ***REMOVED***
+	if goos == "" {
 		goos = "linux"
-	***REMOVED***
+	}
 	goarch := os.Getenv("DOCKER_ENGINE_GOARCH")
-	if goarch == "" ***REMOVED***
+	if goarch == "" {
 		goarch = "amd64"
-	***REMOVED***
+	}
 
 	cpCmd, lookErr := exec.LookPath("cp")
-	if lookErr != nil ***REMOVED***
+	if lookErr != nil {
 		t.Fatalf("could not build http server: %v", lookErr)
-	***REMOVED***
+	}
 
-	if _, err = os.Stat("../contrib/httpserver/httpserver"); os.IsNotExist(err) ***REMOVED***
+	if _, err = os.Stat("../contrib/httpserver/httpserver"); os.IsNotExist(err) {
 		goCmd, lookErr := exec.LookPath("go")
-		if lookErr != nil ***REMOVED***
+		if lookErr != nil {
 			t.Fatalf("could not build http server: %v", lookErr)
-		***REMOVED***
+		}
 
 		cmd := exec.Command(goCmd, "build", "-o", filepath.Join(tmp, "httpserver"), "github.com/docker/docker/contrib/httpserver")
-		cmd.Env = append(os.Environ(), []string***REMOVED***
+		cmd.Env = append(os.Environ(), []string{
 			"CGO_ENABLED=0",
 			"GOOS=" + goos,
 			"GOARCH=" + goarch,
-		***REMOVED***...)
+		}...)
 		var out []byte
-		if out, err = cmd.CombinedOutput(); err != nil ***REMOVED***
+		if out, err = cmd.CombinedOutput(); err != nil {
 			t.Fatalf("could not build http server: %s", string(out))
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
-		if out, err := exec.Command(cpCmd, "../contrib/httpserver/httpserver", filepath.Join(tmp, "httpserver")).CombinedOutput(); err != nil ***REMOVED***
+		}
+	} else {
+		if out, err := exec.Command(cpCmd, "../contrib/httpserver/httpserver", filepath.Join(tmp, "httpserver")).CombinedOutput(); err != nil {
 			t.Fatalf("could not copy http server: %v", string(out))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if out, err := exec.Command(cpCmd, "../contrib/httpserver/Dockerfile", filepath.Join(tmp, "Dockerfile")).CombinedOutput(); err != nil ***REMOVED***
+	if out, err := exec.Command(cpCmd, "../contrib/httpserver/Dockerfile", filepath.Join(tmp, "Dockerfile")).CombinedOutput(); err != nil {
 		t.Fatalf("could not build http server: %v", string(out))
-	***REMOVED***
+	}
 
 	cli.DockerCmd(t, "build", "-q", "-t", "httpserver", tmp)
-***REMOVED***
+}

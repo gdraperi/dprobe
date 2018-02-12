@@ -31,7 +31,7 @@
 #include "namespace.h"
 
 /* Synchronisation values. */
-enum sync_t ***REMOVED***
+enum sync_t {
 	SYNC_USERMAP_PLS = 0x40, /* Request parent to map our users. */
 	SYNC_USERMAP_ACK = 0x41, /* Mapping finished by the parent. */
 	SYNC_RECVPID_PLS = 0x42, /* Tell parent we're sending the PID. */
@@ -41,7 +41,7 @@ enum sync_t ***REMOVED***
 
 	/* XXX: This doesn't help with segfaults and other such issues. */
 	SYNC_ERR = 0xFF, /* Fatal error, no turning back. The error code follows. */
-***REMOVED***;
+};
 
 /* longjmp() arguments. */
 #define JUMP_PARENT 0x00
@@ -52,7 +52,7 @@ enum sync_t ***REMOVED***
 #define JSON_MAX 4096
 
 /* Assume the stack grows down, so arguments should be above it. */
-struct clone_t ***REMOVED***
+struct clone_t {
 	/*
 	 * Reserve some space for clone() to locate arguments
 	 * and retcode in this place
@@ -63,9 +63,9 @@ struct clone_t ***REMOVED***
 	/* There's two children. This is used to execute the different code. */
 	jmp_buf *env;
 	int jmpval;
-***REMOVED***;
+};
 
-struct nlconfig_t ***REMOVED***
+struct nlconfig_t {
 	char *data;
 
 	/* Process settings. */
@@ -88,7 +88,7 @@ struct nlconfig_t ***REMOVED***
 	size_t uidmappath_len;
 	char *gidmappath;
 	size_t gidmappath_len;
-***REMOVED***;
+};
 
 /*
  * List of netlink message types sent to us as part of bootstrapping the init.
@@ -121,9 +121,9 @@ struct nlconfig_t ***REMOVED***
 #endif
 
 int setns(int fd, int nstype)
-***REMOVED***
+{
 	return syscall(SYS_setns, fd, nstype);
-***REMOVED***
+}
 #endif
 
 /* XXX: This is ugly. */
@@ -131,21 +131,21 @@ static int syncfd = -1;
 
 /* TODO(cyphar): Fix this so it correctly deals with syncT. */
 #define bail(fmt, ...)								\
-	do ***REMOVED***									\
+	do {									\
 		int ret = __COUNTER__ + 1;					\
 		fprintf(stderr, "nsenter: " fmt ": %m\n", ##__VA_ARGS__);	\
-		if (syncfd >= 0) ***REMOVED***						\
+		if (syncfd >= 0) {						\
 			enum sync_t s = SYNC_ERR;				\
 			if (write(syncfd, &s, sizeof(s)) != sizeof(s))		\
 				fprintf(stderr, "nsenter: failed: write(s)");	\
 			if (write(syncfd, &ret, sizeof(ret)) != sizeof(ret))	\
 				fprintf(stderr, "nsenter: failed: write(ret)");	\
-		***REMOVED***								\
+		}								\
 		exit(ret);							\
-	***REMOVED*** while(0)
+	} while(0)
 
 static int write_file(char *data, size_t data_len, char *pathfmt, ...)
-***REMOVED***
+{
 	int fd, len, ret = 0;
 	char path[PATH_MAX];
 
@@ -157,33 +157,33 @@ static int write_file(char *data, size_t data_len, char *pathfmt, ...)
 		return -1;
 
 	fd = open(path, O_RDWR);
-	if (fd < 0) ***REMOVED***
+	if (fd < 0) {
 		return -1;
-	***REMOVED***
+	}
 
 	len = write(fd, data, data_len);
-	if (len != data_len) ***REMOVED***
+	if (len != data_len) {
 		ret = -1;
 		goto out;
-	***REMOVED***
+	}
 
 out:
 	close(fd);
 	return ret;
-***REMOVED***
+}
 
-enum policy_t ***REMOVED***
+enum policy_t {
 	SETGROUPS_DEFAULT = 0,
 	SETGROUPS_ALLOW,
 	SETGROUPS_DENY,
-***REMOVED***;
+};
 
 /* This *must* be called before we touch gid_map. */
 static void update_setgroups(int pid, enum policy_t setgroup)
-***REMOVED***
+{
 	char *policy;
 
-	switch (setgroup) ***REMOVED***
+	switch (setgroup) {
 		case SETGROUPS_ALLOW:
 			policy = "allow";
 			break;
@@ -194,20 +194,20 @@ static void update_setgroups(int pid, enum policy_t setgroup)
 		default:
 			/* Nothing to do. */
 			return;
-	***REMOVED***
+	}
 
-	if (write_file(policy, strlen(policy), "/proc/%d/setgroups", pid) < 0) ***REMOVED***
+	if (write_file(policy, strlen(policy), "/proc/%d/setgroups", pid) < 0) {
 		/*
 		 * If the kernel is too old to support /proc/pid/setgroups,
 		 * open(2) or write(2) will return ENOENT. This is fine.
 		 */
 		if (errno != ENOENT)
 			bail("failed to write '%s' to /proc/%d/setgroups", policy, pid);
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 static int try_mapping_tool(const char *app, int pid, char *map, size_t map_len)
-***REMOVED***
+{
 	int child;
 
 	/*
@@ -223,10 +223,10 @@ static int try_mapping_tool(const char *app, int pid, char *map, size_t map_len)
 	if (child < 0)
 		bail("failed to fork");
 
-	if (!child) ***REMOVED***
+	if (!child) {
 #define MAX_ARGV 20
 		char *argv[MAX_ARGV];
-		char *envp[] = ***REMOVED***NULL***REMOVED***;
+		char *envp[] = {NULL};
 		char pid_fmt[16];
 		int argc = 0;
 		char *next;
@@ -240,91 +240,91 @@ static int try_mapping_tool(const char *app, int pid, char *map, size_t map_len)
 		 * newuidmap/newgidmap can understand.
 		 */
 
-		while (argc < MAX_ARGV) ***REMOVED***
-			if (*map == '\0') ***REMOVED***
+		while (argc < MAX_ARGV) {
+			if (*map == '\0') {
 				argv[argc++] = NULL;
 				break;
-			***REMOVED***
+			}
 			argv[argc++] = map;
 			next = strpbrk(map, "\n ");
 			if (next == NULL)
 				break;
 			*next++ = '\0';
 			map = next + strspn(next, "\n ");
-		***REMOVED***
+		}
 
 		execve(app, argv, envp);
 		bail("failed to execv");
-	***REMOVED*** else ***REMOVED***
+	} else {
 		int status;
 
-		while (true) ***REMOVED***
-			if (waitpid(child, &status, 0) < 0) ***REMOVED***
+		while (true) {
+			if (waitpid(child, &status, 0) < 0) {
 				if (errno == EINTR)
 					continue;
 				bail("failed to waitpid");
-			***REMOVED***
+			}
 			if (WIFEXITED(status) || WIFSIGNALED(status))
 				return WEXITSTATUS(status);
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return -1;
-***REMOVED***
+}
 
 static void update_uidmap(const char *path, int pid, char *map, size_t map_len)
-***REMOVED***
+{
 	if (map == NULL || map_len <= 0)
 		return;
 
-	if (write_file(map, map_len, "/proc/%d/uid_map", pid) < 0) ***REMOVED***
+	if (write_file(map, map_len, "/proc/%d/uid_map", pid) < 0) {
 		if (errno != EPERM)
 			bail("failed to update /proc/%d/uid_map", pid);
 		if (try_mapping_tool(path, pid, map, map_len))
 			bail("failed to use newuid map on %d", pid);
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 static void update_gidmap(const char *path, int pid, char *map, size_t map_len)
-***REMOVED***
+{
 	if (map == NULL || map_len <= 0)
 		return;
 
-	if (write_file(map, map_len, "/proc/%d/gid_map", pid) < 0) ***REMOVED***
+	if (write_file(map, map_len, "/proc/%d/gid_map", pid) < 0) {
 		if (errno != EPERM)
 			bail("failed to update /proc/%d/gid_map", pid);
 		if (try_mapping_tool(path, pid, map, map_len))
 			bail("failed to use newgid map on %d", pid);
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 static void update_oom_score_adj(char *data, size_t len)
-***REMOVED***
+{
 	if (data == NULL || len <= 0)
 		return;
 
 	if (write_file(data, len, "/proc/self/oom_score_adj") < 0)
 		bail("failed to update /proc/self/oom_score_adj");
-***REMOVED***
+}
 
 /* A dummy function that just jumps to the given jumpval. */
 static int child_func(void *arg) __attribute__ ((noinline));
 static int child_func(void *arg)
-***REMOVED***
+{
 	struct clone_t *ca = (struct clone_t *)arg;
 	longjmp(*ca->env, ca->jmpval);
-***REMOVED***
+}
 
 static int clone_parent(jmp_buf *env, int jmpval) __attribute__ ((noinline));
 static int clone_parent(jmp_buf *env, int jmpval)
-***REMOVED***
-	struct clone_t ca = ***REMOVED***
+{
+	struct clone_t ca = {
 		.env    = env,
 		.jmpval = jmpval,
-	***REMOVED***;
+	};
 
 	return clone(child_func, ca.stack_ptr, CLONE_PARENT | SIGCHLD, &ca);
-***REMOVED***
+}
 
 /*
  * Gets the init pipe fd from the environment, which is used to read the
@@ -332,7 +332,7 @@ static int clone_parent(jmp_buf *env, int jmpval)
  * setting up the environment.
  */
 static int initpipe(void)
-***REMOVED***
+{
 	int pipenum;
 	char *initpipe, *endptr;
 
@@ -345,11 +345,11 @@ static int initpipe(void)
 		bail("unable to parse _LIBCONTAINER_INITPIPE");
 
 	return pipenum;
-***REMOVED***
+}
 
 /* Returns the clone(2) flag for a namespace, given the name of a namespace. */
 static int nsflag(char *name)
-***REMOVED***
+{
 	if (!strcmp(name, "cgroup"))
 		return CLONE_NEWCGROUP;
 	else if (!strcmp(name, "ipc"))
@@ -367,20 +367,20 @@ static int nsflag(char *name)
 
 	/* If we don't recognise a name, fallback to 0. */
 	return 0;
-***REMOVED***
+}
 
 static uint32_t readint32(char *buf)
-***REMOVED***
+{
 	return *(uint32_t *) buf;
-***REMOVED***
+}
 
 static uint8_t readint8(char *buf)
-***REMOVED***
+{
 	return *(uint8_t *) buf;
-***REMOVED***
+}
 
 static void nl_parse(int fd, struct nlconfig_t *config)
-***REMOVED***
+{
 	size_t len, size;
 	struct nlmsghdr hdr;
 	char *data, *current;
@@ -408,7 +408,7 @@ static void nl_parse(int fd, struct nlconfig_t *config)
 
 	/* Parse the netlink payload. */
 	config->data = data;
-	while (current < data + size) ***REMOVED***
+	while (current < data + size) {
 		struct nlattr *nlattr = (struct nlattr *)current;
 		size_t payload_len = nlattr->nla_len - NLA_HDRLEN;
 
@@ -416,7 +416,7 @@ static void nl_parse(int fd, struct nlconfig_t *config)
 		current += NLA_HDRLEN;
 
 		/* Handle payload. */
-		switch (nlattr->nla_type) ***REMOVED***
+		switch (nlattr->nla_type) {
 		case CLONE_FLAGS_ATTR:
 			config->cloneflags = readint32(current);
 			break;
@@ -452,28 +452,28 @@ static void nl_parse(int fd, struct nlconfig_t *config)
 			break;
 		default:
 			bail("unknown netlink message type %d", nlattr->nla_type);
-		***REMOVED***
+		}
 
 		current += NLA_ALIGN(payload_len);
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 void nl_free(struct nlconfig_t *config)
-***REMOVED***
+{
 	free(config->data);
-***REMOVED***
+}
 
 void join_namespaces(char *nslist)
-***REMOVED***
+{
 	int num = 0, i;
 	char *saveptr = NULL;
 	char *namespace = strtok_r(nslist, ",", &saveptr);
-	struct namespace_t ***REMOVED***
+	struct namespace_t {
 		int fd;
 		int ns;
 		char type[PATH_MAX];
 		char path[PATH_MAX];
-	***REMOVED*** *namespaces = NULL;
+	} *namespaces = NULL;
 
 	if (!namespace || !strlen(namespace) || !strlen(nslist))
 		bail("ns paths are empty");
@@ -483,7 +483,7 @@ void join_namespaces(char *nslist)
 	 * we join the mnt namespace we might no longer be able to
 	 * access the paths.
 	 */
-	do ***REMOVED***
+	do {
 		int fd;
 		char *path;
 		struct namespace_t *ns;
@@ -507,7 +507,7 @@ void join_namespaces(char *nslist)
 		ns->fd = fd;
 		ns->ns = nsflag(namespace);
 		strncpy(ns->path, path, PATH_MAX);
-	***REMOVED*** while ((namespace = strtok_r(NULL, ",", &saveptr)) != NULL);
+	} while ((namespace = strtok_r(NULL, ",", &saveptr)) != NULL);
 
 	/*
 	 * The ordering in which we join namespaces is important. We should
@@ -516,24 +516,24 @@ void join_namespaces(char *nslist)
 	 * follow the order given to us.
 	 */
 
-	for (i = 0; i < num; i++) ***REMOVED***
+	for (i = 0; i < num; i++) {
 		struct namespace_t ns = namespaces[i];
 
 		if (setns(ns.fd, ns.ns) < 0)
 			bail("failed to setns to %s", ns.path);
 
 		close(ns.fd);
-	***REMOVED***
+	}
 
 	free(namespaces);
-***REMOVED***
+}
 
 void nsexec(void)
-***REMOVED***
+{
 	int pipenum;
 	jmp_buf env;
 	int sync_child_pipe[2], sync_grandchild_pipe[2];
-	struct nlconfig_t config = ***REMOVED***0***REMOVED***;
+	struct nlconfig_t config = {0};
 
 	/*
 	 * If we don't have an init pipe, just return to the go routine.
@@ -564,10 +564,10 @@ void nsexec(void)
 	 * ourselves to be non-dumpable only breaks things (like rootless
 	 * containers), which is the recommendation from the kernel folks.
 	 */
-	if (config.namespaces) ***REMOVED***
+	if (config.namespaces) {
 		if (prctl(PR_SET_DUMPABLE, 0, 0, 0, 0) < 0)
 			bail("failed to set process as non-dumpable");
-	***REMOVED***
+	}
 
 	/* Pipe so we can tell the child when we've finished setting up. */
 	if (socketpair(AF_LOCAL, SOCK_STREAM, 0, sync_child_pipe) < 0)
@@ -601,7 +601,7 @@ void nsexec(void)
 	 *
 	 * The parent no longer has permissions to do many things (unshare(2) drops
 	 * all capabilities in your old namespace), and the container cannot be set
-	 * up to have more than one ***REMOVED***uid,gid***REMOVED*** mapping. This is obviously less than
+	 * up to have more than one {uid,gid} mapping. This is obviously less than
 	 * ideal. In order to fix this, we have to first clone(2) and then unshare.
 	 *
 	 * Unfortunately, it's not as simple as that. We have to fork to enter the
@@ -610,7 +610,7 @@ void nsexec(void)
 	 * PID of the _actual_ init process (without doing more synchronisation than
 	 * I can deal with at the moment). So we'll just get the parent to send it
 	 * for us, the only job of this process is to update
-	 * /proc/pid/***REMOVED***setgroups,uid_map,gid_map***REMOVED***.
+	 * /proc/pid/{setgroups,uid_map,gid_map}.
 	 *
 	 * And as a result of the above, we also need to setns(2) in the first child
 	 * because if we join a PID namespace in the topmost parent then our child
@@ -629,7 +629,7 @@ void nsexec(void)
 	 * -- Aleksa "what has my life come to?" Sarai
 	 */
 
-	switch (setjmp(env)) ***REMOVED***
+	switch (setjmp(env)) {
 	/*
 	 * Stage 0: We're in the parent. Our job is just to create a new child
 	 *          (stage 1: JUMP_CHILD) process and write its uid_map and
@@ -637,7 +637,7 @@ void nsexec(void)
 	 *          it will send us its PID which we will send to the bootstrap
 	 *          process.
 	 */
-	case JUMP_PARENT: ***REMOVED***
+	case JUMP_PARENT: {
 			int len;
 			pid_t child, first_child = -1;
 			char buf[JSON_MAX];
@@ -658,7 +658,7 @@ void nsexec(void)
 			 * ready, so we can receive all possible error codes
 			 * generated by children.
 			 */
-			while (!ready) ***REMOVED***
+			while (!ready) {
 				enum sync_t s;
 				int ret;
 
@@ -668,7 +668,7 @@ void nsexec(void)
 				if (read(syncfd, &s, sizeof(s)) != sizeof(s))
 					bail("failed to sync with child: next state");
 
-				switch (s) ***REMOVED***
+				switch (s) {
 				case SYNC_ERR:
 					/* We have to mirror the error code of the child. */
 					if (read(syncfd, &ret, sizeof(ret)) != sizeof(ret))
@@ -682,10 +682,10 @@ void nsexec(void)
 					 * creating a rootless container (this is required since
 					 * Linux 3.19).
 					 */
-					if (config.is_rootless && config.is_setgroup) ***REMOVED***
+					if (config.is_rootless && config.is_setgroup) {
 						kill(child, SIGKILL);
 						bail("cannot allow setgroup in an unprivileged user namespace setup");
-					***REMOVED***
+					}
 
 					if (config.is_setgroup)
 						update_setgroups(child, SETGROUPS_ALLOW);
@@ -697,41 +697,41 @@ void nsexec(void)
 					update_gidmap(config.gidmappath, child, config.gidmap, config.gidmap_len);
 
 					s = SYNC_USERMAP_ACK;
-					if (write(syncfd, &s, sizeof(s)) != sizeof(s)) ***REMOVED***
+					if (write(syncfd, &s, sizeof(s)) != sizeof(s)) {
 						kill(child, SIGKILL);
 						bail("failed to sync with child: write(SYNC_USERMAP_ACK)");
-					***REMOVED***
+					}
 					break;
-				case SYNC_RECVPID_PLS: ***REMOVED***
+				case SYNC_RECVPID_PLS: {
 						first_child = child;
 
 						/* Get the init_func pid. */
-						if (read(syncfd, &child, sizeof(child)) != sizeof(child)) ***REMOVED***
+						if (read(syncfd, &child, sizeof(child)) != sizeof(child)) {
 							kill(first_child, SIGKILL);
 							bail("failed to sync with child: read(childpid)");
-						***REMOVED***
+						}
 
 						/* Send ACK. */
 						s = SYNC_RECVPID_ACK;
-						if (write(syncfd, &s, sizeof(s)) != sizeof(s)) ***REMOVED***
+						if (write(syncfd, &s, sizeof(s)) != sizeof(s)) {
 							kill(first_child, SIGKILL);
 							kill(child, SIGKILL);
 							bail("failed to sync with child: write(SYNC_RECVPID_ACK)");
-						***REMOVED***
-					***REMOVED***
+						}
+					}
 					break;
 				case SYNC_CHILD_READY:
 					ready = true;
 					break;
 				default:
 					bail("unexpected sync value: %u", s);
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 
 			/* Now sync with grandchild. */
 
 			ready = false;
-			while (!ready) ***REMOVED***
+			while (!ready) {
 				enum sync_t s;
 				int ret;
 
@@ -739,15 +739,15 @@ void nsexec(void)
 				close(sync_grandchild_pipe[0]);
 
 				s = SYNC_GRANDCHILD;
-				if (write(syncfd, &s, sizeof(s)) != sizeof(s)) ***REMOVED***
+				if (write(syncfd, &s, sizeof(s)) != sizeof(s)) {
 					kill(child, SIGKILL);
 					bail("failed to sync with child: write(SYNC_GRANDCHILD)");
-				***REMOVED***
+				}
 
 				if (read(syncfd, &s, sizeof(s)) != sizeof(s))
 					bail("failed to sync with child: next state");
 
-				switch (s) ***REMOVED***
+				switch (s) {
 				case SYNC_ERR:
 					/* We have to mirror the error code of the child. */
 					if (read(syncfd, &ret, sizeof(ret)) != sizeof(ret))
@@ -759,8 +759,8 @@ void nsexec(void)
 					break;
 				default:
 					bail("unexpected sync value: %u", s);
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 
 			/*
 			 * Send the init_func pid and the pid of the first child back to our parent.
@@ -768,18 +768,18 @@ void nsexec(void)
 			 * We need to send both back because we can't reap the first child we created (CLONE_PARENT).
 			 * It becomes the responsibility of our parent to reap the first child.
 			 */
-			len = snprintf(buf, JSON_MAX, "***REMOVED***\"pid\": %d, \"pid_first\": %d***REMOVED***\n", child, first_child);
-			if (len < 0) ***REMOVED***
+			len = snprintf(buf, JSON_MAX, "{\"pid\": %d, \"pid_first\": %d}\n", child, first_child);
+			if (len < 0) {
 				kill(child, SIGKILL);
 				bail("unable to generate JSON for child pid");
-			***REMOVED***
-			if (write(pipenum, buf, len) != len) ***REMOVED***
+			}
+			if (write(pipenum, buf, len) != len) {
 				kill(child, SIGKILL);
 				bail("unable to send child pid to bootstrapper");
-			***REMOVED***
+			}
 
 			exit(0);
-		***REMOVED***
+		}
 
 	/*
 	 * Stage 1: We're in the first child process. Our job is to join any
@@ -790,7 +790,7 @@ void nsexec(void)
 	 *          (stage 2: JUMP_INIT) for PID namespace. We then send the
 	 *          child's PID to our parent (stage 0).
 	 */
-	case JUMP_CHILD: ***REMOVED***
+	case JUMP_CHILD: {
 			pid_t child;
 			enum sync_t s;
 
@@ -828,17 +828,17 @@ void nsexec(void)
 			 * affect our ability to unshare other namespaces and are used as
 			 * context for privilege checks.
 			 */
-			if (config.cloneflags & CLONE_NEWUSER) ***REMOVED***
+			if (config.cloneflags & CLONE_NEWUSER) {
 				/*
 				 * We don't have the privileges to do any mapping here (see the
 				 * clone_parent rant). So signal our parent to hook us up.
 				 */
 
 				/* Switching is only necessary if we joined namespaces. */
-				if (config.namespaces) ***REMOVED***
+				if (config.namespaces) {
 					if (prctl(PR_SET_DUMPABLE, 1, 0, 0, 0) < 0)
 						bail("failed to set process as dumpable");
-				***REMOVED***
+				}
 				s = SYNC_USERMAP_PLS;
 				if (write(syncfd, &s, sizeof(s)) != sizeof(s))
 					bail("failed to sync with parent: write(SYNC_USERMAP_PLS)");
@@ -850,11 +850,11 @@ void nsexec(void)
 				if (s != SYNC_USERMAP_ACK)
 					bail("failed to sync with parent: SYNC_USERMAP_ACK: got %u", s);
 				/* Switching is only necessary if we joined namespaces. */
-				if (config.namespaces) ***REMOVED***
+				if (config.namespaces) {
 					if (prctl(PR_SET_DUMPABLE, 0, 0, 0, 0) < 0)
 						bail("failed to set process as dumpable");
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 
 			/*
 			 * TODO: What about non-namespace clone flags that we're dropping here?
@@ -871,35 +871,35 @@ void nsexec(void)
 
 			/* Send the child to our parent, which knows what it's doing. */
 			s = SYNC_RECVPID_PLS;
-			if (write(syncfd, &s, sizeof(s)) != sizeof(s)) ***REMOVED***
+			if (write(syncfd, &s, sizeof(s)) != sizeof(s)) {
 				kill(child, SIGKILL);
 				bail("failed to sync with parent: write(SYNC_RECVPID_PLS)");
-			***REMOVED***
-			if (write(syncfd, &child, sizeof(child)) != sizeof(child)) ***REMOVED***
+			}
+			if (write(syncfd, &child, sizeof(child)) != sizeof(child)) {
 				kill(child, SIGKILL);
 				bail("failed to sync with parent: write(childpid)");
-			***REMOVED***
+			}
 
 			/* ... wait for parent to get the pid ... */
 
-			if (read(syncfd, &s, sizeof(s)) != sizeof(s)) ***REMOVED***
+			if (read(syncfd, &s, sizeof(s)) != sizeof(s)) {
 				kill(child, SIGKILL);
 				bail("failed to sync with parent: read(SYNC_RECVPID_ACK)");
-			***REMOVED***
-			if (s != SYNC_RECVPID_ACK) ***REMOVED***
+			}
+			if (s != SYNC_RECVPID_ACK) {
 				kill(child, SIGKILL);
 				bail("failed to sync with parent: SYNC_RECVPID_ACK: got %u", s);
-			***REMOVED***
+			}
 
 			s = SYNC_CHILD_READY;
-			if (write(syncfd, &s, sizeof(s)) != sizeof(s)) ***REMOVED***
+			if (write(syncfd, &s, sizeof(s)) != sizeof(s)) {
 				kill(child, SIGKILL);
 				bail("failed to sync with parent: write(SYNC_CHILD_READY)");
-			***REMOVED***
+			}
 
 			/* Our work is done. [Stage 2: JUMP_INIT] is doing the rest of the work. */
 			exit(0);
-		***REMOVED***
+		}
 
 	/*
 	 * Stage 2: We're the final child process, and the only process that will
@@ -907,7 +907,7 @@ void nsexec(void)
 	 *          final cleanup steps and then return to the Go runtime to allow
 	 *          init_linux.go to run.
 	 */
-	case JUMP_INIT: ***REMOVED***
+	case JUMP_INIT: {
 			/*
 			 * We're inside the child now, having jumped from the
 			 * start_child() code after forking in the parent.
@@ -937,10 +937,10 @@ void nsexec(void)
 			if (setgid(0) < 0)
 				bail("setgid failed");
 
-			if (!config.is_rootless && config.is_setgroup) ***REMOVED***
+			if (!config.is_rootless && config.is_setgroup) {
 				if (setgroups(0, NULL) < 0)
 					bail("setgroups failed");
-			***REMOVED***
+			}
 
 			s = SYNC_CHILD_READY;
 			if (write(syncfd, &s, sizeof(s)) != sizeof(s))
@@ -954,11 +954,11 @@ void nsexec(void)
 
 			/* Finish executing, let the Go runtime take over. */
 			return;
-		***REMOVED***
+		}
 	default:
 		bail("unexpected jump value");
-	***REMOVED***
+	}
 
 	/* Should never be reached. */
 	bail("should never be reached");
-***REMOVED***
+}

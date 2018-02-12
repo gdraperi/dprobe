@@ -17,23 +17,23 @@ import (
 
 var elog debug.Log
 
-type myservice struct***REMOVED******REMOVED***
+type myservice struct{}
 
-func (m *myservice) Execute(args []string, r <-chan svc.ChangeRequest, changes chan<- svc.Status) (ssec bool, errno uint32) ***REMOVED***
+func (m *myservice) Execute(args []string, r <-chan svc.ChangeRequest, changes chan<- svc.Status) (ssec bool, errno uint32) {
 	const cmdsAccepted = svc.AcceptStop | svc.AcceptShutdown | svc.AcceptPauseAndContinue
-	changes <- svc.Status***REMOVED***State: svc.StartPending***REMOVED***
+	changes <- svc.Status{State: svc.StartPending}
 	fasttick := time.Tick(500 * time.Millisecond)
 	slowtick := time.Tick(2 * time.Second)
 	tick := fasttick
-	changes <- svc.Status***REMOVED***State: svc.Running, Accepts: cmdsAccepted***REMOVED***
+	changes <- svc.Status{State: svc.Running, Accepts: cmdsAccepted}
 loop:
-	for ***REMOVED***
-		select ***REMOVED***
+	for {
+		select {
 		case <-tick:
 			beep()
 			elog.Info(1, "beep")
 		case c := <-r:
-			switch c.Cmd ***REMOVED***
+			switch c.Cmd {
 			case svc.Interrogate:
 				changes <- c.CurrentStatus
 				// Testing deadlock from https://code.google.com/p/winsvc/issues/detail?id=4
@@ -42,41 +42,41 @@ loop:
 			case svc.Stop, svc.Shutdown:
 				break loop
 			case svc.Pause:
-				changes <- svc.Status***REMOVED***State: svc.Paused, Accepts: cmdsAccepted***REMOVED***
+				changes <- svc.Status{State: svc.Paused, Accepts: cmdsAccepted}
 				tick = slowtick
 			case svc.Continue:
-				changes <- svc.Status***REMOVED***State: svc.Running, Accepts: cmdsAccepted***REMOVED***
+				changes <- svc.Status{State: svc.Running, Accepts: cmdsAccepted}
 				tick = fasttick
 			default:
 				elog.Error(1, fmt.Sprintf("unexpected control request #%d", c))
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-	changes <- svc.Status***REMOVED***State: svc.StopPending***REMOVED***
+			}
+		}
+	}
+	changes <- svc.Status{State: svc.StopPending}
 	return
-***REMOVED***
+}
 
-func runService(name string, isDebug bool) ***REMOVED***
+func runService(name string, isDebug bool) {
 	var err error
-	if isDebug ***REMOVED***
+	if isDebug {
 		elog = debug.New(name)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		elog, err = eventlog.Open(name)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	defer elog.Close()
 
 	elog.Info(1, fmt.Sprintf("starting %s service", name))
 	run := svc.Run
-	if isDebug ***REMOVED***
+	if isDebug {
 		run = debug.Run
-	***REMOVED***
-	err = run(name, &myservice***REMOVED******REMOVED***)
-	if err != nil ***REMOVED***
+	}
+	err = run(name, &myservice{})
+	if err != nil {
 		elog.Error(1, fmt.Sprintf("%s service failed: %v", name, err))
 		return
-	***REMOVED***
+	}
 	elog.Info(1, fmt.Sprintf("%s service stopped", name))
-***REMOVED***
+}

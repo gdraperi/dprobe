@@ -4,7 +4,7 @@ package memberlist
 // notifications about members joining and leaving. The methods in this
 // delegate may be called by multiple goroutines, but never concurrently.
 // This allows you to reason about ordering.
-type EventDelegate interface ***REMOVED***
+type EventDelegate interface {
 	// NotifyJoin is invoked when a node is detected to have joined.
 	// The Node argument must not be modified.
 	NotifyJoin(*Node)
@@ -17,7 +17,7 @@ type EventDelegate interface ***REMOVED***
 	// updated, usually involving the meta data. The Node argument
 	// must not be modified.
 	NotifyUpdate(*Node)
-***REMOVED***
+}
 
 // ChannelEventDelegate is used to enable an application to receive
 // events about joins and leaves over a channel instead of a direct
@@ -25,9 +25,9 @@ type EventDelegate interface ***REMOVED***
 //
 // Care must be taken that events are processed in a timely manner from
 // the channel, since this delegate will block until an event can be sent.
-type ChannelEventDelegate struct ***REMOVED***
+type ChannelEventDelegate struct {
 	Ch chan<- NodeEvent
-***REMOVED***
+}
 
 // NodeEventType are the types of events that can be sent from the
 // ChannelEventDelegate.
@@ -43,19 +43,19 @@ const (
 // The Node member of this struct must not be directly modified. It is passed
 // as a pointer to avoid unnecessary copies. If you wish to modify the node,
 // make a copy first.
-type NodeEvent struct ***REMOVED***
+type NodeEvent struct {
 	Event NodeEventType
 	Node  *Node
-***REMOVED***
+}
 
-func (c *ChannelEventDelegate) NotifyJoin(n *Node) ***REMOVED***
-	c.Ch <- NodeEvent***REMOVED***NodeJoin, n***REMOVED***
-***REMOVED***
+func (c *ChannelEventDelegate) NotifyJoin(n *Node) {
+	c.Ch <- NodeEvent{NodeJoin, n}
+}
 
-func (c *ChannelEventDelegate) NotifyLeave(n *Node) ***REMOVED***
-	c.Ch <- NodeEvent***REMOVED***NodeLeave, n***REMOVED***
-***REMOVED***
+func (c *ChannelEventDelegate) NotifyLeave(n *Node) {
+	c.Ch <- NodeEvent{NodeLeave, n}
+}
 
-func (c *ChannelEventDelegate) NotifyUpdate(n *Node) ***REMOVED***
-	c.Ch <- NodeEvent***REMOVED***NodeUpdate, n***REMOVED***
-***REMOVED***
+func (c *ChannelEventDelegate) NotifyUpdate(n *Node) {
+	c.Ch <- NodeEvent{NodeUpdate, n}
+}

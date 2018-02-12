@@ -8,57 +8,57 @@ import (
 	"github.com/docker/docker/plugin/v2"
 )
 
-func TestFilterByCapNeg(t *testing.T) ***REMOVED***
-	p := v2.Plugin***REMOVED***PluginObj: types.Plugin***REMOVED***Name: "test:latest"***REMOVED******REMOVED***
-	iType := types.PluginInterfaceType***REMOVED***Capability: "volumedriver", Prefix: "docker", Version: "1.0"***REMOVED***
-	i := types.PluginConfigInterface***REMOVED***Socket: "plugins.sock", Types: []types.PluginInterfaceType***REMOVED***iType***REMOVED******REMOVED***
+func TestFilterByCapNeg(t *testing.T) {
+	p := v2.Plugin{PluginObj: types.Plugin{Name: "test:latest"}}
+	iType := types.PluginInterfaceType{Capability: "volumedriver", Prefix: "docker", Version: "1.0"}
+	i := types.PluginConfigInterface{Socket: "plugins.sock", Types: []types.PluginInterfaceType{iType}}
 	p.PluginObj.Config.Interface = i
 
 	_, err := p.FilterByCap("foobar")
-	if err == nil ***REMOVED***
+	if err == nil {
 		t.Fatalf("expected inadequate error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestFilterByCapPos(t *testing.T) ***REMOVED***
-	p := v2.Plugin***REMOVED***PluginObj: types.Plugin***REMOVED***Name: "test:latest"***REMOVED******REMOVED***
+func TestFilterByCapPos(t *testing.T) {
+	p := v2.Plugin{PluginObj: types.Plugin{Name: "test:latest"}}
 
-	iType := types.PluginInterfaceType***REMOVED***Capability: "volumedriver", Prefix: "docker", Version: "1.0"***REMOVED***
-	i := types.PluginConfigInterface***REMOVED***Socket: "plugins.sock", Types: []types.PluginInterfaceType***REMOVED***iType***REMOVED******REMOVED***
+	iType := types.PluginInterfaceType{Capability: "volumedriver", Prefix: "docker", Version: "1.0"}
+	i := types.PluginConfigInterface{Socket: "plugins.sock", Types: []types.PluginInterfaceType{iType}}
 	p.PluginObj.Config.Interface = i
 
 	_, err := p.FilterByCap("volumedriver")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestStoreGetPluginNotMatchCapRefs(t *testing.T) ***REMOVED***
+func TestStoreGetPluginNotMatchCapRefs(t *testing.T) {
 	s := NewStore()
-	p := v2.Plugin***REMOVED***PluginObj: types.Plugin***REMOVED***Name: "test:latest"***REMOVED******REMOVED***
+	p := v2.Plugin{PluginObj: types.Plugin{Name: "test:latest"}}
 
-	iType := types.PluginInterfaceType***REMOVED***Capability: "whatever", Prefix: "docker", Version: "1.0"***REMOVED***
-	i := types.PluginConfigInterface***REMOVED***Socket: "plugins.sock", Types: []types.PluginInterfaceType***REMOVED***iType***REMOVED******REMOVED***
+	iType := types.PluginInterfaceType{Capability: "whatever", Prefix: "docker", Version: "1.0"}
+	i := types.PluginConfigInterface{Socket: "plugins.sock", Types: []types.PluginInterfaceType{iType}}
 	p.PluginObj.Config.Interface = i
 
-	if err := s.Add(&p); err != nil ***REMOVED***
+	if err := s.Add(&p); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if _, err := s.Get("test", "volumedriver", plugingetter.Acquire); err == nil ***REMOVED***
+	if _, err := s.Get("test", "volumedriver", plugingetter.Acquire); err == nil {
 		t.Fatal("exepcted error when getting plugin that doesn't match the passed in capability")
-	***REMOVED***
+	}
 
-	if refs := p.GetRefCount(); refs != 0 ***REMOVED***
+	if refs := p.GetRefCount(); refs != 0 {
 		t.Fatalf("reference count should be 0, got: %d", refs)
-	***REMOVED***
+	}
 
 	p.PluginObj.Enabled = true
-	if _, err := s.Get("test", "volumedriver", plugingetter.Acquire); err == nil ***REMOVED***
+	if _, err := s.Get("test", "volumedriver", plugingetter.Acquire); err == nil {
 		t.Fatal("exepcted error when getting plugin that doesn't match the passed in capability")
-	***REMOVED***
+	}
 
-	if refs := p.GetRefCount(); refs != 0 ***REMOVED***
+	if refs := p.GetRefCount(); refs != 0 {
 		t.Fatalf("reference count should be 0, got: %d", refs)
-	***REMOVED***
-***REMOVED***
+	}
+}

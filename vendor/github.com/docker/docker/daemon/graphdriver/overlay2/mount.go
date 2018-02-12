@@ -14,76 +14,76 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-func init() ***REMOVED***
+func init() {
 	reexec.Register("docker-mountfrom", mountFromMain)
-***REMOVED***
+}
 
-func fatal(err error) ***REMOVED***
+func fatal(err error) {
 	fmt.Fprint(os.Stderr, err)
 	os.Exit(1)
-***REMOVED***
+}
 
-type mountOptions struct ***REMOVED***
+type mountOptions struct {
 	Device string
 	Target string
 	Type   string
 	Label  string
 	Flag   uint32
-***REMOVED***
+}
 
-func mountFrom(dir, device, target, mType string, flags uintptr, label string) error ***REMOVED***
-	options := &mountOptions***REMOVED***
+func mountFrom(dir, device, target, mType string, flags uintptr, label string) error {
+	options := &mountOptions{
 		Device: device,
 		Target: target,
 		Type:   mType,
 		Flag:   uint32(flags),
 		Label:  label,
-	***REMOVED***
+	}
 
 	cmd := reexec.Command("docker-mountfrom", dir)
 	w, err := cmd.StdinPipe()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("mountfrom error on pipe creation: %v", err)
-	***REMOVED***
+	}
 
 	output := bytes.NewBuffer(nil)
 	cmd.Stdout = output
 	cmd.Stderr = output
-	if err := cmd.Start(); err != nil ***REMOVED***
+	if err := cmd.Start(); err != nil {
 		w.Close()
 		return fmt.Errorf("mountfrom error on re-exec cmd: %v", err)
-	***REMOVED***
+	}
 	//write the options to the pipe for the untar exec to read
-	if err := json.NewEncoder(w).Encode(options); err != nil ***REMOVED***
+	if err := json.NewEncoder(w).Encode(options); err != nil {
 		w.Close()
 		return fmt.Errorf("mountfrom json encode to pipe failed: %v", err)
-	***REMOVED***
+	}
 	w.Close()
 
-	if err := cmd.Wait(); err != nil ***REMOVED***
+	if err := cmd.Wait(); err != nil {
 		return fmt.Errorf("mountfrom re-exec error: %v: output: %v", err, output)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // mountfromMain is the entry-point for docker-mountfrom on re-exec.
-func mountFromMain() ***REMOVED***
+func mountFromMain() {
 	runtime.LockOSThread()
 	flag.Parse()
 
 	var options *mountOptions
 
-	if err := json.NewDecoder(os.Stdin).Decode(&options); err != nil ***REMOVED***
+	if err := json.NewDecoder(os.Stdin).Decode(&options); err != nil {
 		fatal(err)
-	***REMOVED***
+	}
 
-	if err := os.Chdir(flag.Arg(0)); err != nil ***REMOVED***
+	if err := os.Chdir(flag.Arg(0)); err != nil {
 		fatal(err)
-	***REMOVED***
+	}
 
-	if err := unix.Mount(options.Device, options.Target, options.Type, uintptr(options.Flag), options.Label); err != nil ***REMOVED***
+	if err := unix.Mount(options.Device, options.Target, options.Type, uintptr(options.Flag), options.Label); err != nil {
 		fatal(err)
-	***REMOVED***
+	}
 
 	os.Exit(0)
-***REMOVED***
+}

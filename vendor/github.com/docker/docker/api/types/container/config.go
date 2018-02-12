@@ -14,14 +14,14 @@ import (
 const MinimumDuration = 1 * time.Millisecond
 
 // HealthConfig holds configuration settings for the HEALTHCHECK feature.
-type HealthConfig struct ***REMOVED***
+type HealthConfig struct {
 	// Test is the test to perform to check that the container is healthy.
 	// An empty slice means to inherit the default.
 	// The options are:
-	// ***REMOVED******REMOVED*** : inherit healthcheck
-	// ***REMOVED***"NONE"***REMOVED*** : disable healthcheck
-	// ***REMOVED***"CMD", args...***REMOVED*** : exec arguments directly
-	// ***REMOVED***"CMD-SHELL", command***REMOVED*** : run command with system's default shell
+	// {} : inherit healthcheck
+	// {"NONE"} : disable healthcheck
+	// {"CMD", args...} : exec arguments directly
+	// {"CMD-SHELL", command} : run command with system's default shell
 	Test []string `json:",omitempty"`
 
 	// Zero means to inherit. Durations are expressed as integer nanoseconds.
@@ -32,7 +32,7 @@ type HealthConfig struct ***REMOVED***
 	// Retries is the number of consecutive failures needed to consider a container as unhealthy.
 	// Zero means inherit.
 	Retries int `json:",omitempty"`
-***REMOVED***
+}
 
 // Config contains the configuration data about a container.
 // It should hold only portable information about the container.
@@ -40,7 +40,7 @@ type HealthConfig struct ***REMOVED***
 // Non-portable information *should* appear in HostConfig.
 // All fields added to this struct must be marked `omitempty` to keep getting
 // predictable hashes from the old `v1Compatibility` configuration.
-type Config struct ***REMOVED***
+type Config struct {
 	Hostname        string              // Hostname
 	Domainname      string              // Domainname
 	User            string              // User that will run the command(s) inside the container, also support user:group
@@ -56,7 +56,7 @@ type Config struct ***REMOVED***
 	Healthcheck     *HealthConfig       `json:",omitempty"` // Healthcheck describes how to check the container is healthy
 	ArgsEscaped     bool                `json:",omitempty"` // True if command is already escaped (Windows specific)
 	Image           string              // Name of the image as it was passed by the operator (e.g. could be symbolic)
-	Volumes         map[string]struct***REMOVED******REMOVED*** // List of volumes (mounts) used for the container
+	Volumes         map[string]struct{} // List of volumes (mounts) used for the container
 	WorkingDir      string              // Current directory (PWD) in the command will be launched
 	Entrypoint      strslice.StrSlice   // Entrypoint to run when starting the container
 	NetworkDisabled bool                `json:",omitempty"` // Is network disabled
@@ -66,4 +66,4 @@ type Config struct ***REMOVED***
 	StopSignal      string              `json:",omitempty"` // Signal to stop a container
 	StopTimeout     *int                `json:",omitempty"` // Timeout (in seconds) to stop a container
 	Shell           strslice.StrSlice   `json:",omitempty"` // Shell for shell-form of RUN, CMD, ENTRYPOINT
-***REMOVED***
+}

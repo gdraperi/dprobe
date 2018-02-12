@@ -10,7 +10,7 @@ import (
 
 // headerFieldTable implements a list of HeaderFields.
 // This is used to implement the static and dynamic tables.
-type headerFieldTable struct ***REMOVED***
+type headerFieldTable struct {
 	// For static tables, entries are never evicted.
 	//
 	// For dynamic tables, entries are evicted from ents[0] and added to the end.
@@ -36,55 +36,55 @@ type headerFieldTable struct ***REMOVED***
 	// byNameValue maps a HeaderField name/value pair to the unique id of the newest
 	// entry with the same name and value. See above for a definition of "unique id".
 	byNameValue map[pairNameValue]uint64
-***REMOVED***
+}
 
-type pairNameValue struct ***REMOVED***
+type pairNameValue struct {
 	name, value string
-***REMOVED***
+}
 
-func (t *headerFieldTable) init() ***REMOVED***
+func (t *headerFieldTable) init() {
 	t.byName = make(map[string]uint64)
 	t.byNameValue = make(map[pairNameValue]uint64)
-***REMOVED***
+}
 
 // len reports the number of entries in the table.
-func (t *headerFieldTable) len() int ***REMOVED***
+func (t *headerFieldTable) len() int {
 	return len(t.ents)
-***REMOVED***
+}
 
 // addEntry adds a new entry.
-func (t *headerFieldTable) addEntry(f HeaderField) ***REMOVED***
+func (t *headerFieldTable) addEntry(f HeaderField) {
 	id := uint64(t.len()) + t.evictCount + 1
 	t.byName[f.Name] = id
-	t.byNameValue[pairNameValue***REMOVED***f.Name, f.Value***REMOVED***] = id
+	t.byNameValue[pairNameValue{f.Name, f.Value}] = id
 	t.ents = append(t.ents, f)
-***REMOVED***
+}
 
 // evictOldest evicts the n oldest entries in the table.
-func (t *headerFieldTable) evictOldest(n int) ***REMOVED***
-	if n > t.len() ***REMOVED***
+func (t *headerFieldTable) evictOldest(n int) {
+	if n > t.len() {
 		panic(fmt.Sprintf("evictOldest(%v) on table with %v entries", n, t.len()))
-	***REMOVED***
-	for k := 0; k < n; k++ ***REMOVED***
+	}
+	for k := 0; k < n; k++ {
 		f := t.ents[k]
 		id := t.evictCount + uint64(k) + 1
-		if t.byName[f.Name] == id ***REMOVED***
+		if t.byName[f.Name] == id {
 			delete(t.byName, f.Name)
-		***REMOVED***
-		if p := (pairNameValue***REMOVED***f.Name, f.Value***REMOVED***); t.byNameValue[p] == id ***REMOVED***
+		}
+		if p := (pairNameValue{f.Name, f.Value}); t.byNameValue[p] == id {
 			delete(t.byNameValue, p)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	copy(t.ents, t.ents[n:])
-	for k := t.len() - n; k < t.len(); k++ ***REMOVED***
-		t.ents[k] = HeaderField***REMOVED******REMOVED*** // so strings can be garbage collected
-	***REMOVED***
+	for k := t.len() - n; k < t.len(); k++ {
+		t.ents[k] = HeaderField{} // so strings can be garbage collected
+	}
 	t.ents = t.ents[:t.len()-n]
-	if t.evictCount+uint64(n) < t.evictCount ***REMOVED***
+	if t.evictCount+uint64(n) < t.evictCount {
 		panic("evictCount overflow")
-	***REMOVED***
+	}
 	t.evictCount += uint64(n)
-***REMOVED***
+}
 
 // search finds f in the table. If there is no match, i is 0.
 // If both name and value match, i is the matched index and nameValueMatch
@@ -100,107 +100,107 @@ func (t *headerFieldTable) evictOldest(n int) ***REMOVED***
 // staticTable pointer.
 //
 // See Section 2.3.3.
-func (t *headerFieldTable) search(f HeaderField) (i uint64, nameValueMatch bool) ***REMOVED***
-	if !f.Sensitive ***REMOVED***
-		if id := t.byNameValue[pairNameValue***REMOVED***f.Name, f.Value***REMOVED***]; id != 0 ***REMOVED***
+func (t *headerFieldTable) search(f HeaderField) (i uint64, nameValueMatch bool) {
+	if !f.Sensitive {
+		if id := t.byNameValue[pairNameValue{f.Name, f.Value}]; id != 0 {
 			return t.idToIndex(id), true
-		***REMOVED***
-	***REMOVED***
-	if id := t.byName[f.Name]; id != 0 ***REMOVED***
+		}
+	}
+	if id := t.byName[f.Name]; id != 0 {
 		return t.idToIndex(id), false
-	***REMOVED***
+	}
 	return 0, false
-***REMOVED***
+}
 
 // idToIndex converts a unique id to an HPACK index.
 // See Section 2.3.3.
-func (t *headerFieldTable) idToIndex(id uint64) uint64 ***REMOVED***
-	if id <= t.evictCount ***REMOVED***
+func (t *headerFieldTable) idToIndex(id uint64) uint64 {
+	if id <= t.evictCount {
 		panic(fmt.Sprintf("id (%v) <= evictCount (%v)", id, t.evictCount))
-	***REMOVED***
+	}
 	k := id - t.evictCount - 1 // convert id to an index t.ents[k]
-	if t != staticTable ***REMOVED***
+	if t != staticTable {
 		return uint64(t.len()) - k // dynamic table
-	***REMOVED***
+	}
 	return k + 1
-***REMOVED***
+}
 
 // http://tools.ietf.org/html/draft-ietf-httpbis-header-compression-07#appendix-B
 var staticTable = newStaticTable()
-var staticTableEntries = [...]HeaderField***REMOVED***
-	***REMOVED***Name: ":authority"***REMOVED***,
-	***REMOVED***Name: ":method", Value: "GET"***REMOVED***,
-	***REMOVED***Name: ":method", Value: "POST"***REMOVED***,
-	***REMOVED***Name: ":path", Value: "/"***REMOVED***,
-	***REMOVED***Name: ":path", Value: "/index.html"***REMOVED***,
-	***REMOVED***Name: ":scheme", Value: "http"***REMOVED***,
-	***REMOVED***Name: ":scheme", Value: "https"***REMOVED***,
-	***REMOVED***Name: ":status", Value: "200"***REMOVED***,
-	***REMOVED***Name: ":status", Value: "204"***REMOVED***,
-	***REMOVED***Name: ":status", Value: "206"***REMOVED***,
-	***REMOVED***Name: ":status", Value: "304"***REMOVED***,
-	***REMOVED***Name: ":status", Value: "400"***REMOVED***,
-	***REMOVED***Name: ":status", Value: "404"***REMOVED***,
-	***REMOVED***Name: ":status", Value: "500"***REMOVED***,
-	***REMOVED***Name: "accept-charset"***REMOVED***,
-	***REMOVED***Name: "accept-encoding", Value: "gzip, deflate"***REMOVED***,
-	***REMOVED***Name: "accept-language"***REMOVED***,
-	***REMOVED***Name: "accept-ranges"***REMOVED***,
-	***REMOVED***Name: "accept"***REMOVED***,
-	***REMOVED***Name: "access-control-allow-origin"***REMOVED***,
-	***REMOVED***Name: "age"***REMOVED***,
-	***REMOVED***Name: "allow"***REMOVED***,
-	***REMOVED***Name: "authorization"***REMOVED***,
-	***REMOVED***Name: "cache-control"***REMOVED***,
-	***REMOVED***Name: "content-disposition"***REMOVED***,
-	***REMOVED***Name: "content-encoding"***REMOVED***,
-	***REMOVED***Name: "content-language"***REMOVED***,
-	***REMOVED***Name: "content-length"***REMOVED***,
-	***REMOVED***Name: "content-location"***REMOVED***,
-	***REMOVED***Name: "content-range"***REMOVED***,
-	***REMOVED***Name: "content-type"***REMOVED***,
-	***REMOVED***Name: "cookie"***REMOVED***,
-	***REMOVED***Name: "date"***REMOVED***,
-	***REMOVED***Name: "etag"***REMOVED***,
-	***REMOVED***Name: "expect"***REMOVED***,
-	***REMOVED***Name: "expires"***REMOVED***,
-	***REMOVED***Name: "from"***REMOVED***,
-	***REMOVED***Name: "host"***REMOVED***,
-	***REMOVED***Name: "if-match"***REMOVED***,
-	***REMOVED***Name: "if-modified-since"***REMOVED***,
-	***REMOVED***Name: "if-none-match"***REMOVED***,
-	***REMOVED***Name: "if-range"***REMOVED***,
-	***REMOVED***Name: "if-unmodified-since"***REMOVED***,
-	***REMOVED***Name: "last-modified"***REMOVED***,
-	***REMOVED***Name: "link"***REMOVED***,
-	***REMOVED***Name: "location"***REMOVED***,
-	***REMOVED***Name: "max-forwards"***REMOVED***,
-	***REMOVED***Name: "proxy-authenticate"***REMOVED***,
-	***REMOVED***Name: "proxy-authorization"***REMOVED***,
-	***REMOVED***Name: "range"***REMOVED***,
-	***REMOVED***Name: "referer"***REMOVED***,
-	***REMOVED***Name: "refresh"***REMOVED***,
-	***REMOVED***Name: "retry-after"***REMOVED***,
-	***REMOVED***Name: "server"***REMOVED***,
-	***REMOVED***Name: "set-cookie"***REMOVED***,
-	***REMOVED***Name: "strict-transport-security"***REMOVED***,
-	***REMOVED***Name: "transfer-encoding"***REMOVED***,
-	***REMOVED***Name: "user-agent"***REMOVED***,
-	***REMOVED***Name: "vary"***REMOVED***,
-	***REMOVED***Name: "via"***REMOVED***,
-	***REMOVED***Name: "www-authenticate"***REMOVED***,
-***REMOVED***
+var staticTableEntries = [...]HeaderField{
+	{Name: ":authority"},
+	{Name: ":method", Value: "GET"},
+	{Name: ":method", Value: "POST"},
+	{Name: ":path", Value: "/"},
+	{Name: ":path", Value: "/index.html"},
+	{Name: ":scheme", Value: "http"},
+	{Name: ":scheme", Value: "https"},
+	{Name: ":status", Value: "200"},
+	{Name: ":status", Value: "204"},
+	{Name: ":status", Value: "206"},
+	{Name: ":status", Value: "304"},
+	{Name: ":status", Value: "400"},
+	{Name: ":status", Value: "404"},
+	{Name: ":status", Value: "500"},
+	{Name: "accept-charset"},
+	{Name: "accept-encoding", Value: "gzip, deflate"},
+	{Name: "accept-language"},
+	{Name: "accept-ranges"},
+	{Name: "accept"},
+	{Name: "access-control-allow-origin"},
+	{Name: "age"},
+	{Name: "allow"},
+	{Name: "authorization"},
+	{Name: "cache-control"},
+	{Name: "content-disposition"},
+	{Name: "content-encoding"},
+	{Name: "content-language"},
+	{Name: "content-length"},
+	{Name: "content-location"},
+	{Name: "content-range"},
+	{Name: "content-type"},
+	{Name: "cookie"},
+	{Name: "date"},
+	{Name: "etag"},
+	{Name: "expect"},
+	{Name: "expires"},
+	{Name: "from"},
+	{Name: "host"},
+	{Name: "if-match"},
+	{Name: "if-modified-since"},
+	{Name: "if-none-match"},
+	{Name: "if-range"},
+	{Name: "if-unmodified-since"},
+	{Name: "last-modified"},
+	{Name: "link"},
+	{Name: "location"},
+	{Name: "max-forwards"},
+	{Name: "proxy-authenticate"},
+	{Name: "proxy-authorization"},
+	{Name: "range"},
+	{Name: "referer"},
+	{Name: "refresh"},
+	{Name: "retry-after"},
+	{Name: "server"},
+	{Name: "set-cookie"},
+	{Name: "strict-transport-security"},
+	{Name: "transfer-encoding"},
+	{Name: "user-agent"},
+	{Name: "vary"},
+	{Name: "via"},
+	{Name: "www-authenticate"},
+}
 
-func newStaticTable() *headerFieldTable ***REMOVED***
-	t := &headerFieldTable***REMOVED******REMOVED***
+func newStaticTable() *headerFieldTable {
+	t := &headerFieldTable{}
 	t.init()
-	for _, e := range staticTableEntries[:] ***REMOVED***
+	for _, e := range staticTableEntries[:] {
 		t.addEntry(e)
-	***REMOVED***
+	}
 	return t
-***REMOVED***
+}
 
-var huffmanCodes = [256]uint32***REMOVED***
+var huffmanCodes = [256]uint32{
 	0x1ff8,
 	0x7fffd8,
 	0xfffffe2,
@@ -457,9 +457,9 @@ var huffmanCodes = [256]uint32***REMOVED***
 	0x7ffffef,
 	0x7fffff0,
 	0x3ffffee,
-***REMOVED***
+}
 
-var huffmanCodeLen = [256]uint8***REMOVED***
+var huffmanCodeLen = [256]uint8{
 	13, 23, 28, 28, 28, 28, 28, 28, 28, 24, 30, 28, 28, 30, 28, 28,
 	28, 28, 28, 28, 28, 28, 30, 28, 28, 28, 28, 28, 28, 28, 28, 28,
 	6, 10, 10, 12, 13, 6, 8, 11, 10, 10, 8, 11, 8, 6, 6, 6,
@@ -476,4 +476,4 @@ var huffmanCodeLen = [256]uint8***REMOVED***
 	19, 21, 26, 27, 27, 26, 27, 24, 21, 21, 26, 26, 28, 27, 27, 27,
 	20, 24, 20, 21, 22, 21, 21, 23, 22, 22, 25, 25, 24, 24, 26, 23,
 	26, 27, 26, 26, 27, 27, 27, 27, 27, 28, 27, 27, 27, 27, 27, 26,
-***REMOVED***
+}

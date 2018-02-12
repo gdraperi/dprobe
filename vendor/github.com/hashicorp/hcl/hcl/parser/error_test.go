@@ -4,6 +4,6 @@ import (
 	"testing"
 )
 
-func TestPosError_impl(t *testing.T) ***REMOVED***
+func TestPosError_impl(t *testing.T) {
 	var _ error = new(PosError)
-***REMOVED***
+}

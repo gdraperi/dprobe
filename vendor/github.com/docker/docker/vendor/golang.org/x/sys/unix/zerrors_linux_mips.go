@@ -2081,7 +2081,7 @@ const (
 )
 
 // Error table
-var errors = [...]string***REMOVED***
+var errors = [...]string{
 	1:    "operation not permitted",
 	2:    "no such file or directory",
 	3:    "no such process",
@@ -2216,10 +2216,10 @@ var errors = [...]string***REMOVED***
 	167:  "operation not possible due to RF-kill",
 	168:  "memory page has hardware error",
 	1133: "disk quota exceeded",
-***REMOVED***
+}
 
 // Signal table
-var signals = [...]string***REMOVED***
+var signals = [...]string{
 	1:  "hangup",
 	2:  "interrupt",
 	3:  "quit",
@@ -2251,4 +2251,4 @@ var signals = [...]string***REMOVED***
 	29: "profiling timer expired",
 	30: "CPU time limit exceeded",
 	31: "file size limit exceeded",
-***REMOVED***
+}

@@ -56,68 +56,68 @@ const (
 	ruleInvalid
 )
 
-type ruleTransition struct ***REMOVED***
+type ruleTransition struct {
 	next ruleState
 	mask uint16
-***REMOVED***
+}
 
-var transitions = [...][2]ruleTransition***REMOVED***
+var transitions = [...][2]ruleTransition{
 	// [2.1] The first character must be a character with Bidi property L, R, or
 	// AL. If it has the R or AL property, it is an RTL label; if it has the L
 	// property, it is an LTR label.
-	ruleInitial: ***REMOVED***
-		***REMOVED***ruleLTRFinal, 1 << bidi.L***REMOVED***,
-		***REMOVED***ruleRTLFinal, 1<<bidi.R | 1<<bidi.AL***REMOVED***,
-	***REMOVED***,
-	ruleRTL: ***REMOVED***
+	ruleInitial: {
+		{ruleLTRFinal, 1 << bidi.L},
+		{ruleRTLFinal, 1<<bidi.R | 1<<bidi.AL},
+	},
+	ruleRTL: {
 		// [2.3] In an RTL label, the end of the label must be a character with
 		// Bidi property R, AL, EN, or AN, followed by zero or more characters
 		// with Bidi property NSM.
-		***REMOVED***ruleRTLFinal, 1<<bidi.R | 1<<bidi.AL | 1<<bidi.EN | 1<<bidi.AN***REMOVED***,
+		{ruleRTLFinal, 1<<bidi.R | 1<<bidi.AL | 1<<bidi.EN | 1<<bidi.AN},
 
 		// [2.2] In an RTL label, only characters with the Bidi properties R,
 		// AL, AN, EN, ES, CS, ET, ON, BN, or NSM are allowed.
 		// We exclude the entries from [2.3]
-		***REMOVED***ruleRTL, 1<<bidi.ES | 1<<bidi.CS | 1<<bidi.ET | 1<<bidi.ON | 1<<bidi.BN | 1<<bidi.NSM***REMOVED***,
-	***REMOVED***,
-	ruleRTLFinal: ***REMOVED***
+		{ruleRTL, 1<<bidi.ES | 1<<bidi.CS | 1<<bidi.ET | 1<<bidi.ON | 1<<bidi.BN | 1<<bidi.NSM},
+	},
+	ruleRTLFinal: {
 		// [2.3] In an RTL label, the end of the label must be a character with
 		// Bidi property R, AL, EN, or AN, followed by zero or more characters
 		// with Bidi property NSM.
-		***REMOVED***ruleRTLFinal, 1<<bidi.R | 1<<bidi.AL | 1<<bidi.EN | 1<<bidi.AN | 1<<bidi.NSM***REMOVED***,
+		{ruleRTLFinal, 1<<bidi.R | 1<<bidi.AL | 1<<bidi.EN | 1<<bidi.AN | 1<<bidi.NSM},
 
 		// [2.2] In an RTL label, only characters with the Bidi properties R,
 		// AL, AN, EN, ES, CS, ET, ON, BN, or NSM are allowed.
 		// We exclude the entries from [2.3] and NSM.
-		***REMOVED***ruleRTL, 1<<bidi.ES | 1<<bidi.CS | 1<<bidi.ET | 1<<bidi.ON | 1<<bidi.BN***REMOVED***,
-	***REMOVED***,
-	ruleLTR: ***REMOVED***
+		{ruleRTL, 1<<bidi.ES | 1<<bidi.CS | 1<<bidi.ET | 1<<bidi.ON | 1<<bidi.BN},
+	},
+	ruleLTR: {
 		// [2.6] In an LTR label, the end of the label must be a character with
 		// Bidi property L or EN, followed by zero or more characters with Bidi
 		// property NSM.
-		***REMOVED***ruleLTRFinal, 1<<bidi.L | 1<<bidi.EN***REMOVED***,
+		{ruleLTRFinal, 1<<bidi.L | 1<<bidi.EN},
 
 		// [2.5] In an LTR label, only characters with the Bidi properties L,
 		// EN, ES, CS, ET, ON, BN, or NSM are allowed.
 		// We exclude the entries from [2.6].
-		***REMOVED***ruleLTR, 1<<bidi.ES | 1<<bidi.CS | 1<<bidi.ET | 1<<bidi.ON | 1<<bidi.BN | 1<<bidi.NSM***REMOVED***,
-	***REMOVED***,
-	ruleLTRFinal: ***REMOVED***
+		{ruleLTR, 1<<bidi.ES | 1<<bidi.CS | 1<<bidi.ET | 1<<bidi.ON | 1<<bidi.BN | 1<<bidi.NSM},
+	},
+	ruleLTRFinal: {
 		// [2.6] In an LTR label, the end of the label must be a character with
 		// Bidi property L or EN, followed by zero or more characters with Bidi
 		// property NSM.
-		***REMOVED***ruleLTRFinal, 1<<bidi.L | 1<<bidi.EN | 1<<bidi.NSM***REMOVED***,
+		{ruleLTRFinal, 1<<bidi.L | 1<<bidi.EN | 1<<bidi.NSM},
 
 		// [2.5] In an LTR label, only characters with the Bidi properties L,
 		// EN, ES, CS, ET, ON, BN, or NSM are allowed.
 		// We exclude the entries from [2.6].
-		***REMOVED***ruleLTR, 1<<bidi.ES | 1<<bidi.CS | 1<<bidi.ET | 1<<bidi.ON | 1<<bidi.BN***REMOVED***,
-	***REMOVED***,
-	ruleInvalid: ***REMOVED***
-		***REMOVED***ruleInvalid, 0***REMOVED***,
-		***REMOVED***ruleInvalid, 0***REMOVED***,
-	***REMOVED***,
-***REMOVED***
+		{ruleLTR, 1<<bidi.ES | 1<<bidi.CS | 1<<bidi.ET | 1<<bidi.ON | 1<<bidi.BN},
+	},
+	ruleInvalid: {
+		{ruleInvalid, 0},
+		{ruleInvalid, 0},
+	},
+}
 
 // [2.4] In an RTL label, if an EN is present, no AN may be present, and
 // vice versa.
@@ -132,211 +132,211 @@ const exclusiveRTL = uint16(1<<bidi.EN | 1<<bidi.AN)
 // Direction reports the direction of the given label as defined by RFC 5893.
 // The Bidi Rule does not have to be applied to labels of the category
 // LeftToRight.
-func Direction(b []byte) bidi.Direction ***REMOVED***
-	for i := 0; i < len(b); ***REMOVED***
+func Direction(b []byte) bidi.Direction {
+	for i := 0; i < len(b); {
 		e, sz := bidi.Lookup(b[i:])
-		if sz == 0 ***REMOVED***
+		if sz == 0 {
 			i++
-		***REMOVED***
+		}
 		c := e.Class()
-		if c == bidi.R || c == bidi.AL || c == bidi.AN ***REMOVED***
+		if c == bidi.R || c == bidi.AL || c == bidi.AN {
 			return bidi.RightToLeft
-		***REMOVED***
+		}
 		i += sz
-	***REMOVED***
+	}
 	return bidi.LeftToRight
-***REMOVED***
+}
 
 // DirectionString reports the direction of the given label as defined by RFC
 // 5893. The Bidi Rule does not have to be applied to labels of the category
 // LeftToRight.
-func DirectionString(s string) bidi.Direction ***REMOVED***
-	for i := 0; i < len(s); ***REMOVED***
+func DirectionString(s string) bidi.Direction {
+	for i := 0; i < len(s); {
 		e, sz := bidi.LookupString(s[i:])
-		if sz == 0 ***REMOVED***
+		if sz == 0 {
 			i++
-		***REMOVED***
+		}
 		c := e.Class()
-		if c == bidi.R || c == bidi.AL || c == bidi.AN ***REMOVED***
+		if c == bidi.R || c == bidi.AL || c == bidi.AN {
 			return bidi.RightToLeft
-		***REMOVED***
+		}
 		i += sz
-	***REMOVED***
+	}
 	return bidi.LeftToRight
-***REMOVED***
+}
 
 // Valid reports whether b conforms to the BiDi rule.
-func Valid(b []byte) bool ***REMOVED***
+func Valid(b []byte) bool {
 	var t Transformer
-	if n, ok := t.advance(b); !ok || n < len(b) ***REMOVED***
+	if n, ok := t.advance(b); !ok || n < len(b) {
 		return false
-	***REMOVED***
+	}
 	return t.isFinal()
-***REMOVED***
+}
 
 // ValidString reports whether s conforms to the BiDi rule.
-func ValidString(s string) bool ***REMOVED***
+func ValidString(s string) bool {
 	var t Transformer
-	if n, ok := t.advanceString(s); !ok || n < len(s) ***REMOVED***
+	if n, ok := t.advanceString(s); !ok || n < len(s) {
 		return false
-	***REMOVED***
+	}
 	return t.isFinal()
-***REMOVED***
+}
 
 // New returns a Transformer that verifies that input adheres to the Bidi Rule.
-func New() *Transformer ***REMOVED***
-	return &Transformer***REMOVED******REMOVED***
-***REMOVED***
+func New() *Transformer {
+	return &Transformer{}
+}
 
 // Transformer implements transform.Transform.
-type Transformer struct ***REMOVED***
+type Transformer struct {
 	state  ruleState
 	hasRTL bool
 	seen   uint16
-***REMOVED***
+}
 
 // A rule can only be violated for "Bidi Domain names", meaning if one of the
 // following categories has been observed.
-func (t *Transformer) isRTL() bool ***REMOVED***
+func (t *Transformer) isRTL() bool {
 	const isRTL = 1<<bidi.R | 1<<bidi.AL | 1<<bidi.AN
 	return t.seen&isRTL != 0
-***REMOVED***
+}
 
-func (t *Transformer) isFinal() bool ***REMOVED***
-	if !t.isRTL() ***REMOVED***
+func (t *Transformer) isFinal() bool {
+	if !t.isRTL() {
 		return true
-	***REMOVED***
+	}
 	return t.state == ruleLTRFinal || t.state == ruleRTLFinal || t.state == ruleInitial
-***REMOVED***
+}
 
 // Reset implements transform.Transformer.
-func (t *Transformer) Reset() ***REMOVED*** *t = Transformer***REMOVED******REMOVED*** ***REMOVED***
+func (t *Transformer) Reset() { *t = Transformer{} }
 
 // Transform implements transform.Transformer. This Transformer has state and
 // needs to be reset between uses.
-func (t *Transformer) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) ***REMOVED***
-	if len(dst) < len(src) ***REMOVED***
+func (t *Transformer) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) {
+	if len(dst) < len(src) {
 		src = src[:len(dst)]
 		atEOF = false
 		err = transform.ErrShortDst
-	***REMOVED***
+	}
 	n, err1 := t.Span(src, atEOF)
 	copy(dst, src[:n])
-	if err == nil || err1 != nil && err1 != transform.ErrShortSrc ***REMOVED***
+	if err == nil || err1 != nil && err1 != transform.ErrShortSrc {
 		err = err1
-	***REMOVED***
+	}
 	return n, n, err
-***REMOVED***
+}
 
 // Span returns the first n bytes of src that conform to the Bidi rule.
-func (t *Transformer) Span(src []byte, atEOF bool) (n int, err error) ***REMOVED***
-	if t.state == ruleInvalid && t.isRTL() ***REMOVED***
+func (t *Transformer) Span(src []byte, atEOF bool) (n int, err error) {
+	if t.state == ruleInvalid && t.isRTL() {
 		return 0, ErrInvalid
-	***REMOVED***
+	}
 	n, ok := t.advance(src)
-	switch ***REMOVED***
+	switch {
 	case !ok:
 		err = ErrInvalid
 	case n < len(src):
-		if !atEOF ***REMOVED***
+		if !atEOF {
 			err = transform.ErrShortSrc
 			break
-		***REMOVED***
+		}
 		err = ErrInvalid
 	case !t.isFinal():
 		err = ErrInvalid
-	***REMOVED***
+	}
 	return n, err
-***REMOVED***
+}
 
 // Precomputing the ASCII values decreases running time for the ASCII fast path
 // by about 30%.
 var asciiTable [128]bidi.Properties
 
-func init() ***REMOVED***
-	for i := range asciiTable ***REMOVED***
+func init() {
+	for i := range asciiTable {
 		p, _ := bidi.LookupRune(rune(i))
 		asciiTable[i] = p
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (t *Transformer) advance(s []byte) (n int, ok bool) ***REMOVED***
+func (t *Transformer) advance(s []byte) (n int, ok bool) {
 	var e bidi.Properties
 	var sz int
-	for n < len(s) ***REMOVED***
-		if s[n] < utf8.RuneSelf ***REMOVED***
+	for n < len(s) {
+		if s[n] < utf8.RuneSelf {
 			e, sz = asciiTable[s[n]], 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			e, sz = bidi.Lookup(s[n:])
-			if sz <= 1 ***REMOVED***
-				if sz == 1 ***REMOVED***
+			if sz <= 1 {
+				if sz == 1 {
 					// We always consider invalid UTF-8 to be invalid, even if
 					// the string has not yet been determined to be RTL.
 					// TODO: is this correct?
 					return n, false
-				***REMOVED***
+				}
 				return n, true // incomplete UTF-8 encoding
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		// TODO: using CompactClass would result in noticeable speedup.
 		// See unicode/bidi/prop.go:Properties.CompactClass.
 		c := uint16(1 << e.Class())
 		t.seen |= c
-		if t.seen&exclusiveRTL == exclusiveRTL ***REMOVED***
+		if t.seen&exclusiveRTL == exclusiveRTL {
 			t.state = ruleInvalid
 			return n, false
-		***REMOVED***
-		switch tr := transitions[t.state]; ***REMOVED***
+		}
+		switch tr := transitions[t.state]; {
 		case tr[0].mask&c != 0:
 			t.state = tr[0].next
 		case tr[1].mask&c != 0:
 			t.state = tr[1].next
 		default:
 			t.state = ruleInvalid
-			if t.isRTL() ***REMOVED***
+			if t.isRTL() {
 				return n, false
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		n += sz
-	***REMOVED***
+	}
 	return n, true
-***REMOVED***
+}
 
-func (t *Transformer) advanceString(s string) (n int, ok bool) ***REMOVED***
+func (t *Transformer) advanceString(s string) (n int, ok bool) {
 	var e bidi.Properties
 	var sz int
-	for n < len(s) ***REMOVED***
-		if s[n] < utf8.RuneSelf ***REMOVED***
+	for n < len(s) {
+		if s[n] < utf8.RuneSelf {
 			e, sz = asciiTable[s[n]], 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			e, sz = bidi.LookupString(s[n:])
-			if sz <= 1 ***REMOVED***
-				if sz == 1 ***REMOVED***
+			if sz <= 1 {
+				if sz == 1 {
 					return n, false // invalid UTF-8
-				***REMOVED***
+				}
 				return n, true // incomplete UTF-8 encoding
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		// TODO: using CompactClass results in noticeable speedup.
 		// See unicode/bidi/prop.go:Properties.CompactClass.
 		c := uint16(1 << e.Class())
 		t.seen |= c
-		if t.seen&exclusiveRTL == exclusiveRTL ***REMOVED***
+		if t.seen&exclusiveRTL == exclusiveRTL {
 			t.state = ruleInvalid
 			return n, false
-		***REMOVED***
-		switch tr := transitions[t.state]; ***REMOVED***
+		}
+		switch tr := transitions[t.state]; {
 		case tr[0].mask&c != 0:
 			t.state = tr[0].next
 		case tr[1].mask&c != 0:
 			t.state = tr[1].next
 		default:
 			t.state = ruleInvalid
-			if t.isRTL() ***REMOVED***
+			if t.isRTL() {
 				return n, false
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		n += sz
-	***REMOVED***
+	}
 	return n, true
-***REMOVED***
+}

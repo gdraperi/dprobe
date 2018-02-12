@@ -83,72 +83,72 @@ const (
 	emptyStringSHA256 = `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`
 )
 
-var ignoredHeaders = rules***REMOVED***
-	blacklist***REMOVED***
-		mapRule***REMOVED***
-			"Authorization":   struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-			"User-Agent":      struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-			"X-Amzn-Trace-Id": struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-		***REMOVED***,
-	***REMOVED***,
-***REMOVED***
+var ignoredHeaders = rules{
+	blacklist{
+		mapRule{
+			"Authorization":   struct{}{},
+			"User-Agent":      struct{}{},
+			"X-Amzn-Trace-Id": struct{}{},
+		},
+	},
+}
 
 // requiredSignedHeaders is a whitelist for build canonical headers.
-var requiredSignedHeaders = rules***REMOVED***
-	whitelist***REMOVED***
-		mapRule***REMOVED***
-			"Cache-Control":                                               struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-			"Content-Disposition":                                         struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-			"Content-Encoding":                                            struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-			"Content-Language":                                            struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-			"Content-Md5":                                                 struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-			"Content-Type":                                                struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-			"Expires":                                                     struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-			"If-Match":                                                    struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-			"If-Modified-Since":                                           struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-			"If-None-Match":                                               struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-			"If-Unmodified-Since":                                         struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-			"Range":                                                       struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-			"X-Amz-Acl":                                                   struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-			"X-Amz-Copy-Source":                                           struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-			"X-Amz-Copy-Source-If-Match":                                  struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-			"X-Amz-Copy-Source-If-Modified-Since":                         struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-			"X-Amz-Copy-Source-If-None-Match":                             struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-			"X-Amz-Copy-Source-If-Unmodified-Since":                       struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-			"X-Amz-Copy-Source-Range":                                     struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-			"X-Amz-Copy-Source-Server-Side-Encryption-Customer-Algorithm": struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-			"X-Amz-Copy-Source-Server-Side-Encryption-Customer-Key":       struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-			"X-Amz-Copy-Source-Server-Side-Encryption-Customer-Key-Md5":   struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-			"X-Amz-Grant-Full-control":                                    struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-			"X-Amz-Grant-Read":                                            struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-			"X-Amz-Grant-Read-Acp":                                        struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-			"X-Amz-Grant-Write":                                           struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-			"X-Amz-Grant-Write-Acp":                                       struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-			"X-Amz-Metadata-Directive":                                    struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-			"X-Amz-Mfa":                                                   struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-			"X-Amz-Request-Payer":                                         struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-			"X-Amz-Server-Side-Encryption":                                struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-			"X-Amz-Server-Side-Encryption-Aws-Kms-Key-Id":                 struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-			"X-Amz-Server-Side-Encryption-Customer-Algorithm":             struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-			"X-Amz-Server-Side-Encryption-Customer-Key":                   struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-			"X-Amz-Server-Side-Encryption-Customer-Key-Md5":               struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-			"X-Amz-Storage-Class":                                         struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-			"X-Amz-Website-Redirect-Location":                             struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-		***REMOVED***,
-	***REMOVED***,
-	patterns***REMOVED***"X-Amz-Meta-"***REMOVED***,
-***REMOVED***
+var requiredSignedHeaders = rules{
+	whitelist{
+		mapRule{
+			"Cache-Control":                                               struct{}{},
+			"Content-Disposition":                                         struct{}{},
+			"Content-Encoding":                                            struct{}{},
+			"Content-Language":                                            struct{}{},
+			"Content-Md5":                                                 struct{}{},
+			"Content-Type":                                                struct{}{},
+			"Expires":                                                     struct{}{},
+			"If-Match":                                                    struct{}{},
+			"If-Modified-Since":                                           struct{}{},
+			"If-None-Match":                                               struct{}{},
+			"If-Unmodified-Since":                                         struct{}{},
+			"Range":                                                       struct{}{},
+			"X-Amz-Acl":                                                   struct{}{},
+			"X-Amz-Copy-Source":                                           struct{}{},
+			"X-Amz-Copy-Source-If-Match":                                  struct{}{},
+			"X-Amz-Copy-Source-If-Modified-Since":                         struct{}{},
+			"X-Amz-Copy-Source-If-None-Match":                             struct{}{},
+			"X-Amz-Copy-Source-If-Unmodified-Since":                       struct{}{},
+			"X-Amz-Copy-Source-Range":                                     struct{}{},
+			"X-Amz-Copy-Source-Server-Side-Encryption-Customer-Algorithm": struct{}{},
+			"X-Amz-Copy-Source-Server-Side-Encryption-Customer-Key":       struct{}{},
+			"X-Amz-Copy-Source-Server-Side-Encryption-Customer-Key-Md5":   struct{}{},
+			"X-Amz-Grant-Full-control":                                    struct{}{},
+			"X-Amz-Grant-Read":                                            struct{}{},
+			"X-Amz-Grant-Read-Acp":                                        struct{}{},
+			"X-Amz-Grant-Write":                                           struct{}{},
+			"X-Amz-Grant-Write-Acp":                                       struct{}{},
+			"X-Amz-Metadata-Directive":                                    struct{}{},
+			"X-Amz-Mfa":                                                   struct{}{},
+			"X-Amz-Request-Payer":                                         struct{}{},
+			"X-Amz-Server-Side-Encryption":                                struct{}{},
+			"X-Amz-Server-Side-Encryption-Aws-Kms-Key-Id":                 struct{}{},
+			"X-Amz-Server-Side-Encryption-Customer-Algorithm":             struct{}{},
+			"X-Amz-Server-Side-Encryption-Customer-Key":                   struct{}{},
+			"X-Amz-Server-Side-Encryption-Customer-Key-Md5":               struct{}{},
+			"X-Amz-Storage-Class":                                         struct{}{},
+			"X-Amz-Website-Redirect-Location":                             struct{}{},
+		},
+	},
+	patterns{"X-Amz-Meta-"},
+}
 
 // allowedHoisting is a whitelist for build query headers. The boolean value
 // represents whether or not it is a pattern.
-var allowedQueryHoisting = inclusiveRules***REMOVED***
-	blacklist***REMOVED***requiredSignedHeaders***REMOVED***,
-	patterns***REMOVED***"X-Amz-"***REMOVED***,
-***REMOVED***
+var allowedQueryHoisting = inclusiveRules{
+	blacklist{requiredSignedHeaders},
+	patterns{"X-Amz-"},
+}
 
 // Signer applies AWS v4 signing to given request. Use this to sign requests
 // that need to be signed with AWS V4 Signatures.
-type Signer struct ***REMOVED***
+type Signer struct {
 	// The authentication credentials the request will be signed against.
 	// This value must be set to sign requests.
 	Credentials *credentials.Credentials
@@ -197,24 +197,24 @@ type Signer struct ***REMOVED***
 	// UnsignedPayload will prevent signing of the payload. This will only
 	// work for services that have support for this.
 	UnsignedPayload bool
-***REMOVED***
+}
 
 // NewSigner returns a Signer pointer configured with the credentials and optional
 // option values provided. If not options are provided the Signer will use its
 // default configuration.
-func NewSigner(credentials *credentials.Credentials, options ...func(*Signer)) *Signer ***REMOVED***
-	v4 := &Signer***REMOVED***
+func NewSigner(credentials *credentials.Credentials, options ...func(*Signer)) *Signer {
+	v4 := &Signer{
 		Credentials: credentials,
-	***REMOVED***
+	}
 
-	for _, option := range options ***REMOVED***
+	for _, option := range options {
 		option(v4)
-	***REMOVED***
+	}
 
 	return v4
-***REMOVED***
+}
 
-type signingCtx struct ***REMOVED***
+type signingCtx struct {
 	ServiceName      string
 	Region           string
 	Request          *http.Request
@@ -240,7 +240,7 @@ type signingCtx struct ***REMOVED***
 	stringToSign     string
 	signature        string
 	authorization    string
-***REMOVED***
+}
 
 // Sign signs AWS v4 requests with the provided body, service name, region the
 // request is made to, and time the request is signed at. The signTime allows
@@ -267,9 +267,9 @@ type signingCtx struct ***REMOVED***
 // generated. To bypass the signer computing the hash you can set the
 // "X-Amz-Content-Sha256" header with a precomputed value. The signer will
 // only compute the hash if the request header value is empty.
-func (v4 Signer) Sign(r *http.Request, body io.ReadSeeker, service, region string, signTime time.Time) (http.Header, error) ***REMOVED***
+func (v4 Signer) Sign(r *http.Request, body io.ReadSeeker, service, region string, signTime time.Time) (http.Header, error) {
 	return v4.signWithBody(r, body, service, region, 0, false, signTime)
-***REMOVED***
+}
 
 // Presign signs AWS v4 requests with the provided body, service name, region
 // the request is made to, and time the request is signed at. The signTime
@@ -301,17 +301,17 @@ func (v4 Signer) Sign(r *http.Request, body io.ReadSeeker, service, region strin
 // PUT/GET capabilities. If you would like to include the body's SHA256 in the
 // presigned request's signature you can set the "X-Amz-Content-Sha256"
 // HTTP header and that will be included in the request's signature.
-func (v4 Signer) Presign(r *http.Request, body io.ReadSeeker, service, region string, exp time.Duration, signTime time.Time) (http.Header, error) ***REMOVED***
+func (v4 Signer) Presign(r *http.Request, body io.ReadSeeker, service, region string, exp time.Duration, signTime time.Time) (http.Header, error) {
 	return v4.signWithBody(r, body, service, region, exp, true, signTime)
-***REMOVED***
+}
 
-func (v4 Signer) signWithBody(r *http.Request, body io.ReadSeeker, service, region string, exp time.Duration, isPresign bool, signTime time.Time) (http.Header, error) ***REMOVED***
+func (v4 Signer) signWithBody(r *http.Request, body io.ReadSeeker, service, region string, exp time.Duration, isPresign bool, signTime time.Time) (http.Header, error) {
 	currentTimeFn := v4.currentTimeFn
-	if currentTimeFn == nil ***REMOVED***
+	if currentTimeFn == nil {
 		currentTimeFn = time.Now
-	***REMOVED***
+	}
 
-	ctx := &signingCtx***REMOVED***
+	ctx := &signingCtx{
 		Request:                r,
 		Body:                   body,
 		Query:                  r.URL.Query(),
@@ -322,22 +322,22 @@ func (v4 Signer) signWithBody(r *http.Request, body io.ReadSeeker, service, regi
 		Region:                 region,
 		DisableURIPathEscaping: v4.DisableURIPathEscaping,
 		unsignedPayload:        v4.UnsignedPayload,
-	***REMOVED***
+	}
 
-	for key := range ctx.Query ***REMOVED***
+	for key := range ctx.Query {
 		sort.Strings(ctx.Query[key])
-	***REMOVED***
+	}
 
-	if ctx.isRequestSigned() ***REMOVED***
+	if ctx.isRequestSigned() {
 		ctx.Time = currentTimeFn()
 		ctx.handlePresignRemoval()
-	***REMOVED***
+	}
 
 	var err error
 	ctx.credValues, err = v4.Credentials.Get()
-	if err != nil ***REMOVED***
-		return http.Header***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return http.Header{}, err
+	}
 
 	ctx.sanitizeHostForHeader()
 	ctx.assignAmzQueryValues()
@@ -346,32 +346,32 @@ func (v4 Signer) signWithBody(r *http.Request, body io.ReadSeeker, service, regi
 	// If the request is not presigned the body should be attached to it. This
 	// prevents the confusion of wanting to send a signed request without
 	// the body the request was signed for attached.
-	if !(v4.DisableRequestBodyOverwrite || ctx.isPresign) ***REMOVED***
+	if !(v4.DisableRequestBodyOverwrite || ctx.isPresign) {
 		var reader io.ReadCloser
-		if body != nil ***REMOVED***
+		if body != nil {
 			var ok bool
-			if reader, ok = body.(io.ReadCloser); !ok ***REMOVED***
+			if reader, ok = body.(io.ReadCloser); !ok {
 				reader = ioutil.NopCloser(body)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		r.Body = reader
-	***REMOVED***
+	}
 
-	if v4.Debug.Matches(aws.LogDebugWithSigning) ***REMOVED***
+	if v4.Debug.Matches(aws.LogDebugWithSigning) {
 		v4.logSigningInfo(ctx)
-	***REMOVED***
+	}
 
 	return ctx.SignedHeaderVals, nil
-***REMOVED***
+}
 
-func (ctx *signingCtx) sanitizeHostForHeader() ***REMOVED***
+func (ctx *signingCtx) sanitizeHostForHeader() {
 	request.SanitizeHostForHeader(ctx.Request)
-***REMOVED***
+}
 
-func (ctx *signingCtx) handlePresignRemoval() ***REMOVED***
-	if !ctx.isPresign ***REMOVED***
+func (ctx *signingCtx) handlePresignRemoval() {
+	if !ctx.isPresign {
 		return
-	***REMOVED***
+	}
 
 	// The credentials have expired for this request. The current signing
 	// is invalid, and needs to be request because the request will fail.
@@ -380,30 +380,30 @@ func (ctx *signingCtx) handlePresignRemoval() ***REMOVED***
 	// Update the request's query string to ensure the values stays in
 	// sync in the case retrieving the new credentials fails.
 	ctx.Request.URL.RawQuery = ctx.Query.Encode()
-***REMOVED***
+}
 
-func (ctx *signingCtx) assignAmzQueryValues() ***REMOVED***
-	if ctx.isPresign ***REMOVED***
+func (ctx *signingCtx) assignAmzQueryValues() {
+	if ctx.isPresign {
 		ctx.Query.Set("X-Amz-Algorithm", authHeaderPrefix)
-		if ctx.credValues.SessionToken != "" ***REMOVED***
+		if ctx.credValues.SessionToken != "" {
 			ctx.Query.Set("X-Amz-Security-Token", ctx.credValues.SessionToken)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			ctx.Query.Del("X-Amz-Security-Token")
-		***REMOVED***
+		}
 
 		return
-	***REMOVED***
+	}
 
-	if ctx.credValues.SessionToken != "" ***REMOVED***
+	if ctx.credValues.SessionToken != "" {
 		ctx.Request.Header.Set("X-Amz-Security-Token", ctx.credValues.SessionToken)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // SignRequestHandler is a named request handler the SDK will use to sign
 // service client request with using the V4 signature.
-var SignRequestHandler = request.NamedHandler***REMOVED***
+var SignRequestHandler = request.NamedHandler{
 	Name: "v4.SignRequestHandler", Fn: SignSDKRequest,
-***REMOVED***
+}
 
 // SignSDKRequest signs an AWS request with the V4 signature. This
 // request handler should only be used with the SDK's built in service client's
@@ -416,73 +416,73 @@ var SignRequestHandler = request.NamedHandler***REMOVED***
 //
 // If the credentials of the request's config are set to
 // credentials.AnonymousCredentials the request will not be signed.
-func SignSDKRequest(req *request.Request) ***REMOVED***
+func SignSDKRequest(req *request.Request) {
 	signSDKRequestWithCurrTime(req, time.Now)
-***REMOVED***
+}
 
 // BuildNamedHandler will build a generic handler for signing.
-func BuildNamedHandler(name string, opts ...func(*Signer)) request.NamedHandler ***REMOVED***
-	return request.NamedHandler***REMOVED***
+func BuildNamedHandler(name string, opts ...func(*Signer)) request.NamedHandler {
+	return request.NamedHandler{
 		Name: name,
-		Fn: func(req *request.Request) ***REMOVED***
+		Fn: func(req *request.Request) {
 			signSDKRequestWithCurrTime(req, time.Now, opts...)
-		***REMOVED***,
-	***REMOVED***
-***REMOVED***
+		},
+	}
+}
 
-func signSDKRequestWithCurrTime(req *request.Request, curTimeFn func() time.Time, opts ...func(*Signer)) ***REMOVED***
+func signSDKRequestWithCurrTime(req *request.Request, curTimeFn func() time.Time, opts ...func(*Signer)) {
 	// If the request does not need to be signed ignore the signing of the
 	// request if the AnonymousCredentials object is used.
-	if req.Config.Credentials == credentials.AnonymousCredentials ***REMOVED***
+	if req.Config.Credentials == credentials.AnonymousCredentials {
 		return
-	***REMOVED***
+	}
 
 	region := req.ClientInfo.SigningRegion
-	if region == "" ***REMOVED***
+	if region == "" {
 		region = aws.StringValue(req.Config.Region)
-	***REMOVED***
+	}
 
 	name := req.ClientInfo.SigningName
-	if name == "" ***REMOVED***
+	if name == "" {
 		name = req.ClientInfo.ServiceName
-	***REMOVED***
+	}
 
-	v4 := NewSigner(req.Config.Credentials, func(v4 *Signer) ***REMOVED***
+	v4 := NewSigner(req.Config.Credentials, func(v4 *Signer) {
 		v4.Debug = req.Config.LogLevel.Value()
 		v4.Logger = req.Config.Logger
 		v4.DisableHeaderHoisting = req.NotHoist
 		v4.currentTimeFn = curTimeFn
-		if name == "s3" ***REMOVED***
+		if name == "s3" {
 			// S3 service should not have any escaping applied
 			v4.DisableURIPathEscaping = true
-		***REMOVED***
+		}
 		// Prevents setting the HTTPRequest's Body. Since the Body could be
 		// wrapped in a custom io.Closer that we do not want to be stompped
 		// on top of by the signer.
 		v4.DisableRequestBodyOverwrite = true
-	***REMOVED***)
+	})
 
-	for _, opt := range opts ***REMOVED***
+	for _, opt := range opts {
 		opt(v4)
-	***REMOVED***
+	}
 
 	signingTime := req.Time
-	if !req.LastSignedAt.IsZero() ***REMOVED***
+	if !req.LastSignedAt.IsZero() {
 		signingTime = req.LastSignedAt
-	***REMOVED***
+	}
 
 	signedHeaders, err := v4.signWithBody(req.HTTPRequest, req.GetBody(),
 		name, region, req.ExpireTime, req.ExpireTime > 0, signingTime,
 	)
-	if err != nil ***REMOVED***
+	if err != nil {
 		req.Error = err
 		req.SignedHeaderVals = nil
 		return
-	***REMOVED***
+	}
 
 	req.SignedHeaderVals = signedHeaders
 	req.LastSignedAt = curTimeFn()
-***REMOVED***
+}
 
 const logSignInfoMsg = `DEBUG: Request Signature:
 ---[ CANONICAL STRING  ]-----------------------------
@@ -494,164 +494,164 @@ const logSignedURLMsg = `
 ---[ SIGNED URL ]------------------------------------
 %s`
 
-func (v4 *Signer) logSigningInfo(ctx *signingCtx) ***REMOVED***
+func (v4 *Signer) logSigningInfo(ctx *signingCtx) {
 	signedURLMsg := ""
-	if ctx.isPresign ***REMOVED***
+	if ctx.isPresign {
 		signedURLMsg = fmt.Sprintf(logSignedURLMsg, ctx.Request.URL.String())
-	***REMOVED***
+	}
 	msg := fmt.Sprintf(logSignInfoMsg, ctx.canonicalString, ctx.stringToSign, signedURLMsg)
 	v4.Logger.Log(msg)
-***REMOVED***
+}
 
-func (ctx *signingCtx) build(disableHeaderHoisting bool) ***REMOVED***
+func (ctx *signingCtx) build(disableHeaderHoisting bool) {
 	ctx.buildTime()             // no depends
 	ctx.buildCredentialString() // no depends
 
 	ctx.buildBodyDigest()
 
 	unsignedHeaders := ctx.Request.Header
-	if ctx.isPresign ***REMOVED***
-		if !disableHeaderHoisting ***REMOVED***
-			urlValues := url.Values***REMOVED******REMOVED***
+	if ctx.isPresign {
+		if !disableHeaderHoisting {
+			urlValues := url.Values{}
 			urlValues, unsignedHeaders = buildQuery(allowedQueryHoisting, unsignedHeaders) // no depends
-			for k := range urlValues ***REMOVED***
+			for k := range urlValues {
 				ctx.Query[k] = urlValues[k]
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	ctx.buildCanonicalHeaders(ignoredHeaders, unsignedHeaders)
 	ctx.buildCanonicalString() // depends on canon headers / signed headers
 	ctx.buildStringToSign()    // depends on canon string
 	ctx.buildSignature()       // depends on string to sign
 
-	if ctx.isPresign ***REMOVED***
+	if ctx.isPresign {
 		ctx.Request.URL.RawQuery += "&X-Amz-Signature=" + ctx.signature
-	***REMOVED*** else ***REMOVED***
-		parts := []string***REMOVED***
+	} else {
+		parts := []string{
 			authHeaderPrefix + " Credential=" + ctx.credValues.AccessKeyID + "/" + ctx.credentialString,
 			"SignedHeaders=" + ctx.signedHeaders,
 			"Signature=" + ctx.signature,
-		***REMOVED***
+		}
 		ctx.Request.Header.Set("Authorization", strings.Join(parts, ", "))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (ctx *signingCtx) buildTime() ***REMOVED***
+func (ctx *signingCtx) buildTime() {
 	ctx.formattedTime = ctx.Time.UTC().Format(timeFormat)
 	ctx.formattedShortTime = ctx.Time.UTC().Format(shortTimeFormat)
 
-	if ctx.isPresign ***REMOVED***
+	if ctx.isPresign {
 		duration := int64(ctx.ExpireTime / time.Second)
 		ctx.Query.Set("X-Amz-Date", ctx.formattedTime)
 		ctx.Query.Set("X-Amz-Expires", strconv.FormatInt(duration, 10))
-	***REMOVED*** else ***REMOVED***
+	} else {
 		ctx.Request.Header.Set("X-Amz-Date", ctx.formattedTime)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (ctx *signingCtx) buildCredentialString() ***REMOVED***
-	ctx.credentialString = strings.Join([]string***REMOVED***
+func (ctx *signingCtx) buildCredentialString() {
+	ctx.credentialString = strings.Join([]string{
 		ctx.formattedShortTime,
 		ctx.Region,
 		ctx.ServiceName,
 		"aws4_request",
-	***REMOVED***, "/")
+	}, "/")
 
-	if ctx.isPresign ***REMOVED***
+	if ctx.isPresign {
 		ctx.Query.Set("X-Amz-Credential", ctx.credValues.AccessKeyID+"/"+ctx.credentialString)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func buildQuery(r rule, header http.Header) (url.Values, http.Header) ***REMOVED***
-	query := url.Values***REMOVED******REMOVED***
-	unsignedHeaders := http.Header***REMOVED******REMOVED***
-	for k, h := range header ***REMOVED***
-		if r.IsValid(k) ***REMOVED***
+func buildQuery(r rule, header http.Header) (url.Values, http.Header) {
+	query := url.Values{}
+	unsignedHeaders := http.Header{}
+	for k, h := range header {
+		if r.IsValid(k) {
 			query[k] = h
-		***REMOVED*** else ***REMOVED***
+		} else {
 			unsignedHeaders[k] = h
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return query, unsignedHeaders
-***REMOVED***
-func (ctx *signingCtx) buildCanonicalHeaders(r rule, header http.Header) ***REMOVED***
+}
+func (ctx *signingCtx) buildCanonicalHeaders(r rule, header http.Header) {
 	var headers []string
 	headers = append(headers, "host")
-	for k, v := range header ***REMOVED***
+	for k, v := range header {
 		canonicalKey := http.CanonicalHeaderKey(k)
-		if !r.IsValid(canonicalKey) ***REMOVED***
+		if !r.IsValid(canonicalKey) {
 			continue // ignored header
-		***REMOVED***
-		if ctx.SignedHeaderVals == nil ***REMOVED***
+		}
+		if ctx.SignedHeaderVals == nil {
 			ctx.SignedHeaderVals = make(http.Header)
-		***REMOVED***
+		}
 
 		lowerCaseKey := strings.ToLower(k)
-		if _, ok := ctx.SignedHeaderVals[lowerCaseKey]; ok ***REMOVED***
+		if _, ok := ctx.SignedHeaderVals[lowerCaseKey]; ok {
 			// include additional values
 			ctx.SignedHeaderVals[lowerCaseKey] = append(ctx.SignedHeaderVals[lowerCaseKey], v...)
 			continue
-		***REMOVED***
+		}
 
 		headers = append(headers, lowerCaseKey)
 		ctx.SignedHeaderVals[lowerCaseKey] = v
-	***REMOVED***
+	}
 	sort.Strings(headers)
 
 	ctx.signedHeaders = strings.Join(headers, ";")
 
-	if ctx.isPresign ***REMOVED***
+	if ctx.isPresign {
 		ctx.Query.Set("X-Amz-SignedHeaders", ctx.signedHeaders)
-	***REMOVED***
+	}
 
 	headerValues := make([]string, len(headers))
-	for i, k := range headers ***REMOVED***
-		if k == "host" ***REMOVED***
-			if ctx.Request.Host != "" ***REMOVED***
+	for i, k := range headers {
+		if k == "host" {
+			if ctx.Request.Host != "" {
 				headerValues[i] = "host:" + ctx.Request.Host
-			***REMOVED*** else ***REMOVED***
+			} else {
 				headerValues[i] = "host:" + ctx.Request.URL.Host
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
+			}
+		} else {
 			headerValues[i] = k + ":" +
 				strings.Join(ctx.SignedHeaderVals[k], ",")
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	stripExcessSpaces(headerValues)
 	ctx.canonicalHeaders = strings.Join(headerValues, "\n")
-***REMOVED***
+}
 
-func (ctx *signingCtx) buildCanonicalString() ***REMOVED***
+func (ctx *signingCtx) buildCanonicalString() {
 	ctx.Request.URL.RawQuery = strings.Replace(ctx.Query.Encode(), "+", "%20", -1)
 
 	uri := getURIPath(ctx.Request.URL)
 
-	if !ctx.DisableURIPathEscaping ***REMOVED***
+	if !ctx.DisableURIPathEscaping {
 		uri = rest.EscapePath(uri, false)
-	***REMOVED***
+	}
 
-	ctx.canonicalString = strings.Join([]string***REMOVED***
+	ctx.canonicalString = strings.Join([]string{
 		ctx.Request.Method,
 		uri,
 		ctx.Request.URL.RawQuery,
 		ctx.canonicalHeaders + "\n",
 		ctx.signedHeaders,
 		ctx.bodyDigest,
-	***REMOVED***, "\n")
-***REMOVED***
+	}, "\n")
+}
 
-func (ctx *signingCtx) buildStringToSign() ***REMOVED***
-	ctx.stringToSign = strings.Join([]string***REMOVED***
+func (ctx *signingCtx) buildStringToSign() {
+	ctx.stringToSign = strings.Join([]string{
 		authHeaderPrefix,
 		ctx.formattedTime,
 		ctx.credentialString,
 		hex.EncodeToString(makeSha256([]byte(ctx.canonicalString))),
-	***REMOVED***, "\n")
-***REMOVED***
+	}, "\n")
+}
 
-func (ctx *signingCtx) buildSignature() ***REMOVED***
+func (ctx *signingCtx) buildSignature() {
 	secret := ctx.credValues.SecretAccessKey
 	date := makeHmac([]byte("AWS4"+secret), []byte(ctx.formattedShortTime))
 	region := makeHmac(date, []byte(ctx.Region))
@@ -659,39 +659,39 @@ func (ctx *signingCtx) buildSignature() ***REMOVED***
 	credentials := makeHmac(service, []byte("aws4_request"))
 	signature := makeHmac(credentials, []byte(ctx.stringToSign))
 	ctx.signature = hex.EncodeToString(signature)
-***REMOVED***
+}
 
-func (ctx *signingCtx) buildBodyDigest() ***REMOVED***
+func (ctx *signingCtx) buildBodyDigest() {
 	hash := ctx.Request.Header.Get("X-Amz-Content-Sha256")
-	if hash == "" ***REMOVED***
-		if ctx.unsignedPayload || (ctx.isPresign && ctx.ServiceName == "s3") ***REMOVED***
+	if hash == "" {
+		if ctx.unsignedPayload || (ctx.isPresign && ctx.ServiceName == "s3") {
 			hash = "UNSIGNED-PAYLOAD"
-		***REMOVED*** else if ctx.Body == nil ***REMOVED***
+		} else if ctx.Body == nil {
 			hash = emptyStringSHA256
-		***REMOVED*** else ***REMOVED***
+		} else {
 			hash = hex.EncodeToString(makeSha256Reader(ctx.Body))
-		***REMOVED***
-		if ctx.unsignedPayload || ctx.ServiceName == "s3" || ctx.ServiceName == "glacier" ***REMOVED***
+		}
+		if ctx.unsignedPayload || ctx.ServiceName == "s3" || ctx.ServiceName == "glacier" {
 			ctx.Request.Header.Set("X-Amz-Content-Sha256", hash)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	ctx.bodyDigest = hash
-***REMOVED***
+}
 
 // isRequestSigned returns if the request is currently signed or presigned
-func (ctx *signingCtx) isRequestSigned() bool ***REMOVED***
-	if ctx.isPresign && ctx.Query.Get("X-Amz-Signature") != "" ***REMOVED***
+func (ctx *signingCtx) isRequestSigned() bool {
+	if ctx.isPresign && ctx.Query.Get("X-Amz-Signature") != "" {
 		return true
-	***REMOVED***
-	if ctx.Request.Header.Get("Authorization") != "" ***REMOVED***
+	}
+	if ctx.Request.Header.Get("Authorization") != "" {
 		return true
-	***REMOVED***
+	}
 
 	return false
-***REMOVED***
+}
 
 // unsign removes signing flags for both signed and presigned requests.
-func (ctx *signingCtx) removePresign() ***REMOVED***
+func (ctx *signingCtx) removePresign() {
 	ctx.Query.Del("X-Amz-Algorithm")
 	ctx.Query.Del("X-Amz-Signature")
 	ctx.Query.Del("X-Amz-Security-Token")
@@ -699,69 +699,69 @@ func (ctx *signingCtx) removePresign() ***REMOVED***
 	ctx.Query.Del("X-Amz-Expires")
 	ctx.Query.Del("X-Amz-Credential")
 	ctx.Query.Del("X-Amz-SignedHeaders")
-***REMOVED***
+}
 
-func makeHmac(key []byte, data []byte) []byte ***REMOVED***
+func makeHmac(key []byte, data []byte) []byte {
 	hash := hmac.New(sha256.New, key)
 	hash.Write(data)
 	return hash.Sum(nil)
-***REMOVED***
+}
 
-func makeSha256(data []byte) []byte ***REMOVED***
+func makeSha256(data []byte) []byte {
 	hash := sha256.New()
 	hash.Write(data)
 	return hash.Sum(nil)
-***REMOVED***
+}
 
-func makeSha256Reader(reader io.ReadSeeker) []byte ***REMOVED***
+func makeSha256Reader(reader io.ReadSeeker) []byte {
 	hash := sha256.New()
 	start, _ := reader.Seek(0, 1)
 	defer reader.Seek(start, 0)
 
 	io.Copy(hash, reader)
 	return hash.Sum(nil)
-***REMOVED***
+}
 
 const doubleSpace = "  "
 
 // stripExcessSpaces will rewrite the passed in slice's string values to not
 // contain muliple side-by-side spaces.
-func stripExcessSpaces(vals []string) ***REMOVED***
+func stripExcessSpaces(vals []string) {
 	var j, k, l, m, spaces int
-	for i, str := range vals ***REMOVED***
+	for i, str := range vals {
 		// Trim trailing spaces
-		for j = len(str) - 1; j >= 0 && str[j] == ' '; j-- ***REMOVED***
-		***REMOVED***
+		for j = len(str) - 1; j >= 0 && str[j] == ' '; j-- {
+		}
 
 		// Trim leading spaces
-		for k = 0; k < j && str[k] == ' '; k++ ***REMOVED***
-		***REMOVED***
+		for k = 0; k < j && str[k] == ' '; k++ {
+		}
 		str = str[k : j+1]
 
 		// Strip multiple spaces.
 		j = strings.Index(str, doubleSpace)
-		if j < 0 ***REMOVED***
+		if j < 0 {
 			vals[i] = str
 			continue
-		***REMOVED***
+		}
 
 		buf := []byte(str)
-		for k, m, l = j, j, len(buf); k < l; k++ ***REMOVED***
-			if buf[k] == ' ' ***REMOVED***
-				if spaces == 0 ***REMOVED***
+		for k, m, l = j, j, len(buf); k < l; k++ {
+			if buf[k] == ' ' {
+				if spaces == 0 {
 					// First space.
 					buf[m] = buf[k]
 					m++
-				***REMOVED***
+				}
 				spaces++
-			***REMOVED*** else ***REMOVED***
+			} else {
 				// End of multiple spaces.
 				spaces = 0
 				buf[m] = buf[k]
 				m++
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		vals[i] = string(buf[:m])
-	***REMOVED***
-***REMOVED***
+	}
+}

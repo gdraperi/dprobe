@@ -2,12 +2,12 @@
 
 package daemon
 
-func selinuxSetDisabled() ***REMOVED***
-***REMOVED***
+func selinuxSetDisabled() {
+}
 
-func selinuxFreeLxcContexts(label string) ***REMOVED***
-***REMOVED***
+func selinuxFreeLxcContexts(label string) {
+}
 
-func selinuxEnabled() bool ***REMOVED***
+func selinuxEnabled() bool {
 	return false
-***REMOVED***
+}

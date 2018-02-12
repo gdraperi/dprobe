@@ -5,237 +5,237 @@ import (
 	"testing"
 )
 
-func TestNoArgs(t *testing.T) ***REMOVED***
-	c := &Command***REMOVED***Use: "c", Args: NoArgs, Run: emptyRun***REMOVED***
+func TestNoArgs(t *testing.T) {
+	c := &Command{Use: "c", Args: NoArgs, Run: emptyRun}
 
 	output, err := executeCommand(c)
-	if output != "" ***REMOVED***
+	if output != "" {
 		t.Errorf("Unexpected string: %v", output)
-	***REMOVED***
-	if err != nil ***REMOVED***
+	}
+	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestNoArgsWithArgs(t *testing.T) ***REMOVED***
-	c := &Command***REMOVED***Use: "c", Args: NoArgs, Run: emptyRun***REMOVED***
+func TestNoArgsWithArgs(t *testing.T) {
+	c := &Command{Use: "c", Args: NoArgs, Run: emptyRun}
 
 	_, err := executeCommand(c, "illegal")
-	if err == nil ***REMOVED***
+	if err == nil {
 		t.Fatal("Expected an error")
-	***REMOVED***
+	}
 
 	got := err.Error()
 	expected := `unknown command "illegal" for "c"`
-	if got != expected ***REMOVED***
+	if got != expected {
 		t.Errorf("Expected: %q, got: %q", expected, got)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestOnlyValidArgs(t *testing.T) ***REMOVED***
-	c := &Command***REMOVED***
+func TestOnlyValidArgs(t *testing.T) {
+	c := &Command{
 		Use:       "c",
 		Args:      OnlyValidArgs,
-		ValidArgs: []string***REMOVED***"one", "two"***REMOVED***,
+		ValidArgs: []string{"one", "two"},
 		Run:       emptyRun,
-	***REMOVED***
+	}
 
 	output, err := executeCommand(c, "one", "two")
-	if output != "" ***REMOVED***
+	if output != "" {
 		t.Errorf("Unexpected output: %v", output)
-	***REMOVED***
-	if err != nil ***REMOVED***
+	}
+	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestOnlyValidArgsWithInvalidArgs(t *testing.T) ***REMOVED***
-	c := &Command***REMOVED***
+func TestOnlyValidArgsWithInvalidArgs(t *testing.T) {
+	c := &Command{
 		Use:       "c",
 		Args:      OnlyValidArgs,
-		ValidArgs: []string***REMOVED***"one", "two"***REMOVED***,
+		ValidArgs: []string{"one", "two"},
 		Run:       emptyRun,
-	***REMOVED***
+	}
 
 	_, err := executeCommand(c, "three")
-	if err == nil ***REMOVED***
+	if err == nil {
 		t.Fatal("Expected an error")
-	***REMOVED***
+	}
 
 	got := err.Error()
 	expected := `invalid argument "three" for "c"`
-	if got != expected ***REMOVED***
+	if got != expected {
 		t.Errorf("Expected: %q, got: %q", expected, got)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestArbitraryArgs(t *testing.T) ***REMOVED***
-	c := &Command***REMOVED***Use: "c", Args: ArbitraryArgs, Run: emptyRun***REMOVED***
+func TestArbitraryArgs(t *testing.T) {
+	c := &Command{Use: "c", Args: ArbitraryArgs, Run: emptyRun}
 	output, err := executeCommand(c, "a", "b")
-	if output != "" ***REMOVED***
+	if output != "" {
 		t.Errorf("Unexpected output: %v", output)
-	***REMOVED***
-	if err != nil ***REMOVED***
+	}
+	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestMinimumNArgs(t *testing.T) ***REMOVED***
-	c := &Command***REMOVED***Use: "c", Args: MinimumNArgs(2), Run: emptyRun***REMOVED***
+func TestMinimumNArgs(t *testing.T) {
+	c := &Command{Use: "c", Args: MinimumNArgs(2), Run: emptyRun}
 	output, err := executeCommand(c, "a", "b", "c")
-	if output != "" ***REMOVED***
+	if output != "" {
 		t.Errorf("Unexpected output: %v", output)
-	***REMOVED***
-	if err != nil ***REMOVED***
+	}
+	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestMinimumNArgsWithLessArgs(t *testing.T) ***REMOVED***
-	c := &Command***REMOVED***Use: "c", Args: MinimumNArgs(2), Run: emptyRun***REMOVED***
+func TestMinimumNArgsWithLessArgs(t *testing.T) {
+	c := &Command{Use: "c", Args: MinimumNArgs(2), Run: emptyRun}
 	_, err := executeCommand(c, "a")
 
-	if err == nil ***REMOVED***
+	if err == nil {
 		t.Fatal("Expected an error")
-	***REMOVED***
+	}
 
 	got := err.Error()
 	expected := "requires at least 2 arg(s), only received 1"
-	if got != expected ***REMOVED***
+	if got != expected {
 		t.Fatalf("Expected %q, got %q", expected, got)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestMaximumNArgs(t *testing.T) ***REMOVED***
-	c := &Command***REMOVED***Use: "c", Args: MaximumNArgs(3), Run: emptyRun***REMOVED***
+func TestMaximumNArgs(t *testing.T) {
+	c := &Command{Use: "c", Args: MaximumNArgs(3), Run: emptyRun}
 	output, err := executeCommand(c, "a", "b")
-	if output != "" ***REMOVED***
+	if output != "" {
 		t.Errorf("Unexpected output: %v", output)
-	***REMOVED***
-	if err != nil ***REMOVED***
+	}
+	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestMaximumNArgsWithMoreArgs(t *testing.T) ***REMOVED***
-	c := &Command***REMOVED***Use: "c", Args: MaximumNArgs(2), Run: emptyRun***REMOVED***
+func TestMaximumNArgsWithMoreArgs(t *testing.T) {
+	c := &Command{Use: "c", Args: MaximumNArgs(2), Run: emptyRun}
 	_, err := executeCommand(c, "a", "b", "c")
 
-	if err == nil ***REMOVED***
+	if err == nil {
 		t.Fatal("Expected an error")
-	***REMOVED***
+	}
 
 	got := err.Error()
 	expected := "accepts at most 2 arg(s), received 3"
-	if got != expected ***REMOVED***
+	if got != expected {
 		t.Fatalf("Expected %q, got %q", expected, got)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestExactArgs(t *testing.T) ***REMOVED***
-	c := &Command***REMOVED***Use: "c", Args: ExactArgs(3), Run: emptyRun***REMOVED***
+func TestExactArgs(t *testing.T) {
+	c := &Command{Use: "c", Args: ExactArgs(3), Run: emptyRun}
 	output, err := executeCommand(c, "a", "b", "c")
-	if output != "" ***REMOVED***
+	if output != "" {
 		t.Errorf("Unexpected output: %v", output)
-	***REMOVED***
-	if err != nil ***REMOVED***
+	}
+	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestExactArgsWithInvalidCount(t *testing.T) ***REMOVED***
-	c := &Command***REMOVED***Use: "c", Args: ExactArgs(2), Run: emptyRun***REMOVED***
+func TestExactArgsWithInvalidCount(t *testing.T) {
+	c := &Command{Use: "c", Args: ExactArgs(2), Run: emptyRun}
 	_, err := executeCommand(c, "a", "b", "c")
 
-	if err == nil ***REMOVED***
+	if err == nil {
 		t.Fatal("Expected an error")
-	***REMOVED***
+	}
 
 	got := err.Error()
 	expected := "accepts 2 arg(s), received 3"
-	if got != expected ***REMOVED***
+	if got != expected {
 		t.Fatalf("Expected %q, got %q", expected, got)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestRangeArgs(t *testing.T) ***REMOVED***
-	c := &Command***REMOVED***Use: "c", Args: RangeArgs(2, 4), Run: emptyRun***REMOVED***
+func TestRangeArgs(t *testing.T) {
+	c := &Command{Use: "c", Args: RangeArgs(2, 4), Run: emptyRun}
 	output, err := executeCommand(c, "a", "b", "c")
-	if output != "" ***REMOVED***
+	if output != "" {
 		t.Errorf("Unexpected output: %v", output)
-	***REMOVED***
-	if err != nil ***REMOVED***
+	}
+	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestRangeArgsWithInvalidCount(t *testing.T) ***REMOVED***
-	c := &Command***REMOVED***Use: "c", Args: RangeArgs(2, 4), Run: emptyRun***REMOVED***
+func TestRangeArgsWithInvalidCount(t *testing.T) {
+	c := &Command{Use: "c", Args: RangeArgs(2, 4), Run: emptyRun}
 	_, err := executeCommand(c, "a")
 
-	if err == nil ***REMOVED***
+	if err == nil {
 		t.Fatal("Expected an error")
-	***REMOVED***
+	}
 
 	got := err.Error()
 	expected := "accepts between 2 and 4 arg(s), received 1"
-	if got != expected ***REMOVED***
+	if got != expected {
 		t.Fatalf("Expected %q, got %q", expected, got)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestRootTakesNoArgs(t *testing.T) ***REMOVED***
-	rootCmd := &Command***REMOVED***Use: "root", Run: emptyRun***REMOVED***
-	childCmd := &Command***REMOVED***Use: "child", Run: emptyRun***REMOVED***
+func TestRootTakesNoArgs(t *testing.T) {
+	rootCmd := &Command{Use: "root", Run: emptyRun}
+	childCmd := &Command{Use: "child", Run: emptyRun}
 	rootCmd.AddCommand(childCmd)
 
 	_, err := executeCommand(rootCmd, "illegal", "args")
-	if err == nil ***REMOVED***
+	if err == nil {
 		t.Fatal("Expected an error")
-	***REMOVED***
+	}
 
 	got := err.Error()
 	expected := `unknown command "illegal" for "root"`
-	if !strings.Contains(got, expected) ***REMOVED***
+	if !strings.Contains(got, expected) {
 		t.Errorf("expected %q, got %q", expected, got)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestRootTakesArgs(t *testing.T) ***REMOVED***
-	rootCmd := &Command***REMOVED***Use: "root", Args: ArbitraryArgs, Run: emptyRun***REMOVED***
-	childCmd := &Command***REMOVED***Use: "child", Run: emptyRun***REMOVED***
+func TestRootTakesArgs(t *testing.T) {
+	rootCmd := &Command{Use: "root", Args: ArbitraryArgs, Run: emptyRun}
+	childCmd := &Command{Use: "child", Run: emptyRun}
 	rootCmd.AddCommand(childCmd)
 
 	_, err := executeCommand(rootCmd, "legal", "args")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestChildTakesNoArgs(t *testing.T) ***REMOVED***
-	rootCmd := &Command***REMOVED***Use: "root", Run: emptyRun***REMOVED***
-	childCmd := &Command***REMOVED***Use: "child", Args: NoArgs, Run: emptyRun***REMOVED***
+func TestChildTakesNoArgs(t *testing.T) {
+	rootCmd := &Command{Use: "root", Run: emptyRun}
+	childCmd := &Command{Use: "child", Args: NoArgs, Run: emptyRun}
 	rootCmd.AddCommand(childCmd)
 
 	_, err := executeCommand(rootCmd, "child", "illegal", "args")
-	if err == nil ***REMOVED***
+	if err == nil {
 		t.Fatal("Expected an error")
-	***REMOVED***
+	}
 
 	got := err.Error()
 	expected := `unknown command "illegal" for "root child"`
-	if !strings.Contains(got, expected) ***REMOVED***
+	if !strings.Contains(got, expected) {
 		t.Errorf("expected %q, got %q", expected, got)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestChildTakesArgs(t *testing.T) ***REMOVED***
-	rootCmd := &Command***REMOVED***Use: "root", Run: emptyRun***REMOVED***
-	childCmd := &Command***REMOVED***Use: "child", Args: ArbitraryArgs, Run: emptyRun***REMOVED***
+func TestChildTakesArgs(t *testing.T) {
+	rootCmd := &Command{Use: "root", Run: emptyRun}
+	childCmd := &Command{Use: "child", Args: ArbitraryArgs, Run: emptyRun}
 	rootCmd.AddCommand(childCmd)
 
 	_, err := executeCommand(rootCmd, "child", "legal", "args")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}

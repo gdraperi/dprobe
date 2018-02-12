@@ -45,7 +45,7 @@ be found.
 ### Logging
 
 + Add support for logging driver plugins [#28403](https://github.com/docker/docker/pull/28403)
-* Add support for showing logs of individual tasks to `docker service logs`, and add `/task/***REMOVED***id***REMOVED***/logs` REST endpoint [#32015](https://github.com/docker/docker/pull/32015)
+* Add support for showing logs of individual tasks to `docker service logs`, and add `/task/{id}/logs` REST endpoint [#32015](https://github.com/docker/docker/pull/32015)
 * Add `--log-opt env-regex` option to match environment variables using a regular expression [#27565](https://github.com/docker/docker/pull/27565)
 
 ### Networking
@@ -183,7 +183,7 @@ be found.
 * Fix autoremove on older api [#31692](https://github.com/docker/docker/pull/31692)
 * Fix default network customization for a stack [#31258](https://github.com/docker/docker/pull/31258/)
 * Correct CPU usage calculation in presence of offline CPUs and newer Linux [#31802](https://github.com/docker/docker/pull/31802)
-* Fix issue where service healthcheck is `***REMOVED******REMOVED***` in remote API [#30197](https://github.com/docker/docker/pull/30197)
+* Fix issue where service healthcheck is `{}` in remote API [#30197](https://github.com/docker/docker/pull/30197)
 
 ### Runtime
 
@@ -468,7 +468,7 @@ To manually remove all plugins and resolve this problem, take the following step
 + Add `docker top` support in Windows [#25891](https://github.com/docker/docker/pull/25891)
 + Record pid of exec'd process [#27470](https://github.com/docker/docker/pull/27470)
 + Add support for looking up user/groups via `getent` [#27599](https://github.com/docker/docker/pull/27599)
-+ Add new `docker system` command with `df` and `prune` subcommands for system resource management, as well as `docker ***REMOVED***container,image,volume,network***REMOVED*** prune` subcommands [#26108](https://github.com/docker/docker/pull/26108) [#27525](https://github.com/docker/docker/pull/27525) / [#27525](https://github.com/docker/docker/pull/27525)
++ Add new `docker system` command with `df` and `prune` subcommands for system resource management, as well as `docker {container,image,volume,network} prune` subcommands [#26108](https://github.com/docker/docker/pull/26108) [#27525](https://github.com/docker/docker/pull/27525) / [#27525](https://github.com/docker/docker/pull/27525)
 - Fix an issue where containers could not be stopped or killed by setting xfs max_retries to 0 upon ENOSPC with devicemapper [#26212](https://github.com/docker/docker/pull/26212)
 - Fix `docker cp` failing to copy to a container's volume dir on CentOS with devicemapper [#28047](https://github.com/docker/docker/pull/28047)
 * Promote overlay(2) graphdriver [#27932](https://github.com/docker/docker/pull/27932)
@@ -1056,7 +1056,7 @@ installing docker, please make sure to update them accordingly.
 + Enable syslog logger to have access to env and labels [#21724](https://github.com/docker/docker/pull/21724)
 + An additional syslog-format option `rfc5424micro` to allow microsecond resolution in syslog timestamp [#21844](https://github.com/docker/docker/pull/21844)
 * Inherit the daemon log options when creating containers [#21153](https://github.com/docker/docker/pull/21153)
-* Remove `docker/` prefix from log messages tag and replace it with `***REMOVED******REMOVED***.DaemonName***REMOVED******REMOVED***` so that users have the option of changing the prefix [#22384](https://github.com/docker/docker/pull/22384)
+* Remove `docker/` prefix from log messages tag and replace it with `{{.DaemonName}}` so that users have the option of changing the prefix [#22384](https://github.com/docker/docker/pull/22384)
 
 ### Networking
 
@@ -1072,7 +1072,7 @@ installing docker, please make sure to update them accordingly.
 * Add container's short-id as default network alias [#21901](https://github.com/docker/docker/pull/21901)
 * `run` options `--dns` and `--net=host` are no longer mutually exclusive [#22408](https://github.com/docker/docker/pull/22408)
 - Fix DNS issue when renaming containers with generated names [#22716](https://github.com/docker/docker/pull/22716)
-- Allow both `network inspect -f ***REMOVED******REMOVED***.Id***REMOVED******REMOVED***` and `network inspect -f ***REMOVED******REMOVED***.ID***REMOVED******REMOVED***` to address inconsistency with inspect output [#23226](https://github.com/docker/docker/pull/23226)
+- Allow both `network inspect -f {{.Id}}` and `network inspect -f {{.ID}}` to address inconsistency with inspect output [#23226](https://github.com/docker/docker/pull/23226)
 
 ### Plugins (experimental)
 
@@ -1616,7 +1616,7 @@ Engine 1.10 migrator can be found on Docker Hub: https://hub.docker.com/r/docker
 
 - Fix `docker login` on windows (#17738)
 - Fix bug with `docker inspect` output when not connected to daemon (#17715)
-- Fix `docker inspect -f ***REMOVED******REMOVED***.HostConfig.Dns***REMOVED******REMOVED*** somecontainer` (#17680)
+- Fix `docker inspect -f {{.HostConfig.Dns}} somecontainer` (#17680)
 
 ### Builder
 
@@ -1655,7 +1655,7 @@ process stopping signal (#15307)
 + Add a new `unless-stopped` restart policy (#15348)
 + Inspecting an image now returns tags (#13185)
 + Add container size information to `docker inspect` (#15796)
-+ Add `RepoTags` and `RepoDigests` field to `/images/***REMOVED***name:.****REMOVED***/json` (#17275)
++ Add `RepoTags` and `RepoDigests` field to `/images/{name:.*}/json` (#17275)
 - Remove the deprecated `/container/ps` endpoint from the API (#15972)
 - Send and document correct HTTP codes for `/exec/<name>/start` (#16250)
 - Share shm and mqueue between containers sharing IPC namespace (#15862)
@@ -1804,7 +1804,7 @@ by another client (#15489)
 * Validate status= filter to docker ps
 * Display when a container is in --net=host in docker ps
 * Extend docker inspect to export image metadata related to graph driver
-* Restore --default-gateway***REMOVED***,-v6***REMOVED*** daemon options
+* Restore --default-gateway{,-v6} daemon options
 * Add missing unpublished ports in docker ps
 * Allow duration strings in `docker events` as --since/--until
 * Expose more mounts information in `docker inspect`
@@ -1917,7 +1917,7 @@ by another client (#15489)
 + Sending SIGUSR1 to a daemon will dump all goroutines stacks without exiting
 
 #### Build
-+ Support $***REMOVED***variable:-value***REMOVED*** and $***REMOVED***variable:+value***REMOVED*** syntax for environment variables
++ Support ${variable:-value} and ${variable:+value} syntax for environment variables
 + Support resource management flags `--cgroup-parent`, `--cpu-period`, `--cpu-quota`, `--cpuset-cpus`, `--cpuset-mems`
 + git context changes with branches and directories
 * The .dockerignore file support exclusion rules

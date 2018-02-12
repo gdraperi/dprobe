@@ -5,7 +5,7 @@ package types
 
 // PluginMount plugin mount
 // swagger:model PluginMount
-type PluginMount struct ***REMOVED***
+type PluginMount struct {
 
 	// description
 	// Required: true
@@ -34,4 +34,4 @@ type PluginMount struct ***REMOVED***
 	// type
 	// Required: true
 	Type string `json:"Type"`
-***REMOVED***
+}

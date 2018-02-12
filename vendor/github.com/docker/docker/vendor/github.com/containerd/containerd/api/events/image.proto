@@ -7,16 +7,16 @@ import weak "github.com/containerd/containerd/protobuf/plugin/fieldpath.proto";
 option go_package = "github.com/containerd/containerd/api/events;events";
 option (containerd.plugin.fieldpath_all) = true;
 
-message ImageCreate ***REMOVED***
+message ImageCreate {
 	string name = 1;
 	map<string, string> labels = 2;
-***REMOVED***
+}
 
-message ImageUpdate ***REMOVED***
+message ImageUpdate {
 	string name = 1;
 	map<string, string> labels = 2;
-***REMOVED***
+}
 
-message ImageDelete ***REMOVED***
+message ImageDelete {
 	string name = 1;
-***REMOVED***
+}

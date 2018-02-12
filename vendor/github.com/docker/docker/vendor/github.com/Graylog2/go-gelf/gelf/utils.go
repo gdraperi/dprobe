@@ -11,31 +11,31 @@ import (
 // parent function, and so on.  Any suffixes passed to getCaller are
 // path fragments like "/pkg/log/log.go", and functions in the call
 // stack from that file are ignored.
-func getCaller(callDepth int, suffixesToIgnore ...string) (file string, line int) ***REMOVED***
+func getCaller(callDepth int, suffixesToIgnore ...string) (file string, line int) {
 	// bump by 1 to ignore the getCaller (this) stackframe
 	callDepth++
 outer:
-	for ***REMOVED***
+	for {
 		var ok bool
 		_, file, line, ok = runtime.Caller(callDepth)
-		if !ok ***REMOVED***
+		if !ok {
 			file = "???"
 			line = 0
 			break
-		***REMOVED***
+		}
 
-		for _, s := range suffixesToIgnore ***REMOVED***
-			if strings.HasSuffix(file, s) ***REMOVED***
+		for _, s := range suffixesToIgnore {
+			if strings.HasSuffix(file, s) {
 				callDepth++
 				continue outer
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		break
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func getCallerIgnoringLogMulti(callDepth int) (string, int) ***REMOVED***
+func getCallerIgnoringLogMulti(callDepth int) (string, int) {
 	// the +1 is to ignore this (getCallerIgnoringLogMulti) frame
 	return getCaller(callDepth+1, "/pkg/log/log.go", "/pkg/io/multi.go")
-***REMOVED***
+}

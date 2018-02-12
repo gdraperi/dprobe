@@ -7,12 +7,12 @@ import (
 )
 
 // SwarmLeave leaves the swarm.
-func (cli *Client) SwarmLeave(ctx context.Context, force bool) error ***REMOVED***
-	query := url.Values***REMOVED******REMOVED***
-	if force ***REMOVED***
+func (cli *Client) SwarmLeave(ctx context.Context, force bool) error {
+	query := url.Values{}
+	if force {
 		query.Set("force", "1")
-	***REMOVED***
+	}
 	resp, err := cli.post(ctx, "/swarm/leave", query, nil, nil)
 	ensureReaderClosed(resp)
 	return err
-***REMOVED***
+}

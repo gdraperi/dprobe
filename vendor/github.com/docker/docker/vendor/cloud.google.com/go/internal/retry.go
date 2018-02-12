@@ -28,28 +28,28 @@ import (
 // When f's first return value is true, Retry immediately returns with f's second
 // return value.
 // When the provided context is done, Retry returns with ctx.Err().
-func Retry(ctx context.Context, bo gax.Backoff, f func() (stop bool, err error)) error ***REMOVED***
+func Retry(ctx context.Context, bo gax.Backoff, f func() (stop bool, err error)) error {
 	return retry(ctx, bo, f, gax.Sleep)
-***REMOVED***
+}
 
 func retry(ctx context.Context, bo gax.Backoff, f func() (stop bool, err error),
-	sleep func(context.Context, time.Duration) error) error ***REMOVED***
+	sleep func(context.Context, time.Duration) error) error {
 	var lastErr error
-	for ***REMOVED***
+	for {
 		stop, err := f()
-		if stop ***REMOVED***
+		if stop {
 			return err
-		***REMOVED***
+		}
 		// Remember the last "real" error from f.
-		if err != nil && err != context.Canceled && err != context.DeadlineExceeded ***REMOVED***
+		if err != nil && err != context.Canceled && err != context.DeadlineExceeded {
 			lastErr = err
-		***REMOVED***
+		}
 		p := bo.Pause()
-		if cerr := sleep(ctx, p); cerr != nil ***REMOVED***
-			if lastErr != nil ***REMOVED***
+		if cerr := sleep(ctx, p); cerr != nil {
+			if lastErr != nil {
 				return fmt.Errorf("%v; last function err: %v", cerr, lastErr)
-			***REMOVED***
+			}
 			return cerr
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

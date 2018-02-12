@@ -20,115 +20,115 @@ import (
 // original.  After
 //    pre, post := w.fork();
 // the overall sequence of bytes represented is logically w+pre+post.
-type forkableWriter struct ***REMOVED***
+type forkableWriter struct {
 	*bytes.Buffer
 	pre, post *forkableWriter
-***REMOVED***
+}
 
-func newForkableWriter() *forkableWriter ***REMOVED***
-	return &forkableWriter***REMOVED***new(bytes.Buffer), nil, nil***REMOVED***
-***REMOVED***
+func newForkableWriter() *forkableWriter {
+	return &forkableWriter{new(bytes.Buffer), nil, nil}
+}
 
-func (f *forkableWriter) fork() (pre, post *forkableWriter) ***REMOVED***
-	if f.pre != nil || f.post != nil ***REMOVED***
+func (f *forkableWriter) fork() (pre, post *forkableWriter) {
+	if f.pre != nil || f.post != nil {
 		panic("have already forked")
-	***REMOVED***
+	}
 	f.pre = newForkableWriter()
 	f.post = newForkableWriter()
 	return f.pre, f.post
-***REMOVED***
+}
 
-func (f *forkableWriter) Len() (l int) ***REMOVED***
+func (f *forkableWriter) Len() (l int) {
 	l += f.Buffer.Len()
-	if f.pre != nil ***REMOVED***
+	if f.pre != nil {
 		l += f.pre.Len()
-	***REMOVED***
-	if f.post != nil ***REMOVED***
+	}
+	if f.post != nil {
 		l += f.post.Len()
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func (f *forkableWriter) writeTo(out io.Writer) (n int, err error) ***REMOVED***
+func (f *forkableWriter) writeTo(out io.Writer) (n int, err error) {
 	n, err = out.Write(f.Bytes())
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
 	var nn int
 
-	if f.pre != nil ***REMOVED***
+	if f.pre != nil {
 		nn, err = f.pre.writeTo(out)
 		n += nn
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if f.post != nil ***REMOVED***
+	if f.post != nil {
 		nn, err = f.post.writeTo(out)
 		n += nn
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func marshalBase128Int(out *forkableWriter, n int64) (err error) ***REMOVED***
-	if n == 0 ***REMOVED***
+func marshalBase128Int(out *forkableWriter, n int64) (err error) {
+	if n == 0 {
 		err = out.WriteByte(0)
 		return
-	***REMOVED***
+	}
 
 	l := 0
-	for i := n; i > 0; i >>= 7 ***REMOVED***
+	for i := n; i > 0; i >>= 7 {
 		l++
-	***REMOVED***
+	}
 
-	for i := l - 1; i >= 0; i-- ***REMOVED***
+	for i := l - 1; i >= 0; i-- {
 		o := byte(n >> uint(i*7))
 		o &= 0x7f
-		if i != 0 ***REMOVED***
+		if i != 0 {
 			o |= 0x80
-		***REMOVED***
+		}
 		err = out.WriteByte(o)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
-func marshalInt64(out *forkableWriter, i int64) (err error) ***REMOVED***
+func marshalInt64(out *forkableWriter, i int64) (err error) {
 	n := int64Length(i)
 
-	for ; n > 0; n-- ***REMOVED***
+	for ; n > 0; n-- {
 		err = out.WriteByte(byte(i >> uint((n-1)*8)))
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
-func int64Length(i int64) (numBytes int) ***REMOVED***
+func int64Length(i int64) (numBytes int) {
 	numBytes = 1
 
-	for i > 127 ***REMOVED***
+	for i > 127 {
 		numBytes++
 		i >>= 8
-	***REMOVED***
+	}
 
-	for i < -128 ***REMOVED***
+	for i < -128 {
 		numBytes++
 		i >>= 8
-	***REMOVED***
+	}
 
 	return
-***REMOVED***
+}
 
-func marshalBigInt(out *forkableWriter, n *big.Int) (err error) ***REMOVED***
-	if n.Sign() < 0 ***REMOVED***
+func marshalBigInt(out *forkableWriter, n *big.Int) (err error) {
+	if n.Sign() < 0 {
 		// A negative number has to be converted to two's-complement
 		// form. So we'll subtract 1 and invert. If the
 		// most-significant-bit isn't set then we'll need to pad the
@@ -136,210 +136,210 @@ func marshalBigInt(out *forkableWriter, n *big.Int) (err error) ***REMOVED***
 		nMinus1 := new(big.Int).Neg(n)
 		nMinus1.Sub(nMinus1, bigOne)
 		bytes := nMinus1.Bytes()
-		for i := range bytes ***REMOVED***
+		for i := range bytes {
 			bytes[i] ^= 0xff
-		***REMOVED***
-		if len(bytes) == 0 || bytes[0]&0x80 == 0 ***REMOVED***
+		}
+		if len(bytes) == 0 || bytes[0]&0x80 == 0 {
 			err = out.WriteByte(0xff)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		_, err = out.Write(bytes)
-	***REMOVED*** else if n.Sign() == 0 ***REMOVED***
+	} else if n.Sign() == 0 {
 		// Zero is written as a single 0 zero rather than no bytes.
 		err = out.WriteByte(0x00)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		bytes := n.Bytes()
-		if len(bytes) > 0 && bytes[0]&0x80 != 0 ***REMOVED***
+		if len(bytes) > 0 && bytes[0]&0x80 != 0 {
 			// We'll have to pad this with 0x00 in order to stop it
 			// looking like a negative number.
 			err = out.WriteByte(0)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		_, err = out.Write(bytes)
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func marshalLength(out *forkableWriter, i int) (err error) ***REMOVED***
+func marshalLength(out *forkableWriter, i int) (err error) {
 	n := lengthLength(i)
 
-	for ; n > 0; n-- ***REMOVED***
+	for ; n > 0; n-- {
 		err = out.WriteByte(byte(i >> uint((n-1)*8)))
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
-func lengthLength(i int) (numBytes int) ***REMOVED***
+func lengthLength(i int) (numBytes int) {
 	numBytes = 1
-	for i > 255 ***REMOVED***
+	for i > 255 {
 		numBytes++
 		i >>= 8
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func marshalTagAndLength(out *forkableWriter, t tagAndLength) (err error) ***REMOVED***
+func marshalTagAndLength(out *forkableWriter, t tagAndLength) (err error) {
 	b := uint8(t.class) << 6
-	if t.isCompound ***REMOVED***
+	if t.isCompound {
 		b |= 0x20
-	***REMOVED***
-	if t.tag >= 31 ***REMOVED***
+	}
+	if t.tag >= 31 {
 		b |= 0x1f
 		err = out.WriteByte(b)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
+		}
 		err = marshalBase128Int(out, int64(t.tag))
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
+		}
+	} else {
 		b |= uint8(t.tag)
 		err = out.WriteByte(b)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if t.length >= 128 ***REMOVED***
+	if t.length >= 128 {
 		l := lengthLength(t.length)
 		err = out.WriteByte(0x80 | byte(l))
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
+		}
 		err = marshalLength(out, t.length)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
+		}
+	} else {
 		err = out.WriteByte(byte(t.length))
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
-func marshalBitString(out *forkableWriter, b BitString) (err error) ***REMOVED***
+func marshalBitString(out *forkableWriter, b BitString) (err error) {
 	paddingBits := byte((8 - b.BitLength%8) % 8)
 	err = out.WriteByte(paddingBits)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	_, err = out.Write(b.Bytes)
 	return
-***REMOVED***
+}
 
-func marshalObjectIdentifier(out *forkableWriter, oid []int) (err error) ***REMOVED***
-	if len(oid) < 2 || oid[0] > 2 || (oid[0] < 2 && oid[1] >= 40) ***REMOVED***
-		return StructuralError***REMOVED***"invalid object identifier"***REMOVED***
-	***REMOVED***
+func marshalObjectIdentifier(out *forkableWriter, oid []int) (err error) {
+	if len(oid) < 2 || oid[0] > 2 || (oid[0] < 2 && oid[1] >= 40) {
+		return StructuralError{"invalid object identifier"}
+	}
 
 	err = marshalBase128Int(out, int64(oid[0]*40+oid[1]))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
-	for i := 2; i < len(oid); i++ ***REMOVED***
+	}
+	for i := 2; i < len(oid); i++ {
 		err = marshalBase128Int(out, int64(oid[i]))
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return
-***REMOVED***
+}
 
-func marshalPrintableString(out *forkableWriter, s string) (err error) ***REMOVED***
+func marshalPrintableString(out *forkableWriter, s string) (err error) {
 	b := []byte(s)
-	for _, c := range b ***REMOVED***
-		if !isPrintable(c) ***REMOVED***
-			return StructuralError***REMOVED***"PrintableString contains invalid character"***REMOVED***
-		***REMOVED***
-	***REMOVED***
+	for _, c := range b {
+		if !isPrintable(c) {
+			return StructuralError{"PrintableString contains invalid character"}
+		}
+	}
 
 	_, err = out.Write(b)
 	return
-***REMOVED***
+}
 
-func marshalIA5String(out *forkableWriter, s string) (err error) ***REMOVED***
+func marshalIA5String(out *forkableWriter, s string) (err error) {
 	b := []byte(s)
-	for _, c := range b ***REMOVED***
-		if c > 127 ***REMOVED***
-			return StructuralError***REMOVED***"IA5String contains invalid character"***REMOVED***
-		***REMOVED***
-	***REMOVED***
+	for _, c := range b {
+		if c > 127 {
+			return StructuralError{"IA5String contains invalid character"}
+		}
+	}
 
 	_, err = out.Write(b)
 	return
-***REMOVED***
+}
 
-func marshalUTF8String(out *forkableWriter, s string) (err error) ***REMOVED***
+func marshalUTF8String(out *forkableWriter, s string) (err error) {
 	_, err = out.Write([]byte(s))
 	return
-***REMOVED***
+}
 
-func marshalTwoDigits(out *forkableWriter, v int) (err error) ***REMOVED***
+func marshalTwoDigits(out *forkableWriter, v int) (err error) {
 	err = out.WriteByte(byte('0' + (v/10)%10))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	return out.WriteByte(byte('0' + v%10))
-***REMOVED***
+}
 
-func marshalUTCTime(out *forkableWriter, t time.Time) (err error) ***REMOVED***
+func marshalUTCTime(out *forkableWriter, t time.Time) (err error) {
 	year, month, day := t.Date()
 
-	switch ***REMOVED***
+	switch {
 	case 1950 <= year && year < 2000:
 		err = marshalTwoDigits(out, int(year-1900))
 	case 2000 <= year && year < 2050:
 		err = marshalTwoDigits(out, int(year-2000))
 	default:
-		return StructuralError***REMOVED***"cannot represent time as UTCTime"***REMOVED***
-	***REMOVED***
-	if err != nil ***REMOVED***
+		return StructuralError{"cannot represent time as UTCTime"}
+	}
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
 	err = marshalTwoDigits(out, int(month))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
 	err = marshalTwoDigits(out, day)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
 	hour, min, sec := t.Clock()
 
 	err = marshalTwoDigits(out, hour)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
 	err = marshalTwoDigits(out, min)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
 	err = marshalTwoDigits(out, sec)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
 	_, offset := t.Zone()
 
-	switch ***REMOVED***
+	switch {
 	case offset/60 == 0:
 		err = out.WriteByte('Z')
 		return
@@ -347,36 +347,36 @@ func marshalUTCTime(out *forkableWriter, t time.Time) (err error) ***REMOVED***
 		err = out.WriteByte('+')
 	case offset < 0:
 		err = out.WriteByte('-')
-	***REMOVED***
+	}
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
 	offsetMinutes := offset / 60
-	if offsetMinutes < 0 ***REMOVED***
+	if offsetMinutes < 0 {
 		offsetMinutes = -offsetMinutes
-	***REMOVED***
+	}
 
 	err = marshalTwoDigits(out, offsetMinutes/60)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
 	err = marshalTwoDigits(out, offsetMinutes%60)
 	return
-***REMOVED***
+}
 
-func stripTagAndLength(in []byte) []byte ***REMOVED***
+func stripTagAndLength(in []byte) []byte {
 	_, offset, err := parseTagAndLength(in, 0)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return in
-	***REMOVED***
+	}
 	return in[offset:]
-***REMOVED***
+}
 
-func marshalBody(out *forkableWriter, value reflect.Value, params fieldParameters) (err error) ***REMOVED***
-	switch value.Type() ***REMOVED***
+func marshalBody(out *forkableWriter, value reflect.Value, params fieldParameters) (err error) {
+	switch value.Type() {
 	case timeType:
 		return marshalUTCTime(out, value.Interface().(time.Time))
 	case bitStringType:
@@ -385,15 +385,15 @@ func marshalBody(out *forkableWriter, value reflect.Value, params fieldParameter
 		return marshalObjectIdentifier(out, value.Interface().(ObjectIdentifier))
 	case bigIntType:
 		return marshalBigInt(out, value.Interface().(*big.Int))
-	***REMOVED***
+	}
 
-	switch v := value; v.Kind() ***REMOVED***
+	switch v := value; v.Kind() {
 	case reflect.Bool:
-		if v.Bool() ***REMOVED***
+		if v.Bool() {
 			return out.WriteByte(255)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			return out.WriteByte(0)
-		***REMOVED***
+		}
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		return marshalInt64(out, int64(v.Int()))
 	case reflect.Struct:
@@ -403,179 +403,179 @@ func marshalBody(out *forkableWriter, value reflect.Value, params fieldParameter
 
 		// If the first element of the structure is a non-empty
 		// RawContents, then we don't bother serializing the rest.
-		if t.NumField() > 0 && t.Field(0).Type == rawContentsType ***REMOVED***
+		if t.NumField() > 0 && t.Field(0).Type == rawContentsType {
 			s := v.Field(0)
-			if s.Len() > 0 ***REMOVED***
+			if s.Len() > 0 {
 				bytes := make([]byte, s.Len())
-				for i := 0; i < s.Len(); i++ ***REMOVED***
+				for i := 0; i < s.Len(); i++ {
 					bytes[i] = uint8(s.Index(i).Uint())
-				***REMOVED***
+				}
 				/* The RawContents will contain the tag and
 				 * length fields but we'll also be writing
 				 * those ourselves, so we strip them out of
 				 * bytes */
 				_, err = out.Write(stripTagAndLength(bytes))
 				return
-			***REMOVED*** else ***REMOVED***
+			} else {
 				startingField = 1
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
-		for i := startingField; i < t.NumField(); i++ ***REMOVED***
+		for i := startingField; i < t.NumField(); i++ {
 			var pre *forkableWriter
 			pre, out = out.fork()
 			err = marshalField(pre, v.Field(i), parseFieldParameters(t.Field(i).Tag.Get("asn1")))
-			if err != nil ***REMOVED***
+			if err != nil {
 				return
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		return
 	case reflect.Slice:
 		sliceType := v.Type()
-		if sliceType.Elem().Kind() == reflect.Uint8 ***REMOVED***
+		if sliceType.Elem().Kind() == reflect.Uint8 {
 			bytes := make([]byte, v.Len())
-			for i := 0; i < v.Len(); i++ ***REMOVED***
+			for i := 0; i < v.Len(); i++ {
 				bytes[i] = uint8(v.Index(i).Uint())
-			***REMOVED***
+			}
 			_, err = out.Write(bytes)
 			return
-		***REMOVED***
+		}
 
 		var fp fieldParameters
-		for i := 0; i < v.Len(); i++ ***REMOVED***
+		for i := 0; i < v.Len(); i++ {
 			var pre *forkableWriter
 			pre, out = out.fork()
 			err = marshalField(pre, v.Index(i), fp)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		return
 	case reflect.String:
-		switch params.stringType ***REMOVED***
+		switch params.stringType {
 		case tagIA5String:
 			return marshalIA5String(out, v.String())
 		case tagPrintableString:
 			return marshalPrintableString(out, v.String())
 		default:
 			return marshalUTF8String(out, v.String())
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	return StructuralError***REMOVED***"unknown Go type"***REMOVED***
-***REMOVED***
+	return StructuralError{"unknown Go type"}
+}
 
-func marshalField(out *forkableWriter, v reflect.Value, params fieldParameters) (err error) ***REMOVED***
-	// If the field is an interface***REMOVED******REMOVED*** then recurse into it.
-	if v.Kind() == reflect.Interface && v.Type().NumMethod() == 0 ***REMOVED***
+func marshalField(out *forkableWriter, v reflect.Value, params fieldParameters) (err error) {
+	// If the field is an interface{} then recurse into it.
+	if v.Kind() == reflect.Interface && v.Type().NumMethod() == 0 {
 		return marshalField(out, v.Elem(), params)
-	***REMOVED***
+	}
 
-	if v.Kind() == reflect.Slice && v.Len() == 0 && params.omitEmpty ***REMOVED***
+	if v.Kind() == reflect.Slice && v.Len() == 0 && params.omitEmpty {
 		return
-	***REMOVED***
+	}
 
-	if params.optional && reflect.DeepEqual(v.Interface(), reflect.Zero(v.Type()).Interface()) ***REMOVED***
+	if params.optional && reflect.DeepEqual(v.Interface(), reflect.Zero(v.Type()).Interface()) {
 		return
-	***REMOVED***
+	}
 
-	if v.Type() == rawValueType ***REMOVED***
+	if v.Type() == rawValueType {
 		rv := v.Interface().(RawValue)
-		if len(rv.FullBytes) != 0 ***REMOVED***
+		if len(rv.FullBytes) != 0 {
 			_, err = out.Write(rv.FullBytes)
-		***REMOVED*** else ***REMOVED***
-			err = marshalTagAndLength(out, tagAndLength***REMOVED***rv.Class, rv.Tag, len(rv.Bytes), rv.IsCompound***REMOVED***)
-			if err != nil ***REMOVED***
+		} else {
+			err = marshalTagAndLength(out, tagAndLength{rv.Class, rv.Tag, len(rv.Bytes), rv.IsCompound})
+			if err != nil {
 				return
-			***REMOVED***
+			}
 			_, err = out.Write(rv.Bytes)
-		***REMOVED***
+		}
 		return
-	***REMOVED***
+	}
 
 	tag, isCompound, ok := getUniversalType(v.Type())
-	if !ok ***REMOVED***
-		err = StructuralError***REMOVED***fmt.Sprintf("unknown Go type: %v", v.Type())***REMOVED***
+	if !ok {
+		err = StructuralError{fmt.Sprintf("unknown Go type: %v", v.Type())}
 		return
-	***REMOVED***
+	}
 	class := classUniversal
 
-	if params.stringType != 0 && tag != tagPrintableString ***REMOVED***
-		return StructuralError***REMOVED***"explicit string type given to non-string member"***REMOVED***
-	***REMOVED***
+	if params.stringType != 0 && tag != tagPrintableString {
+		return StructuralError{"explicit string type given to non-string member"}
+	}
 
-	if tag == tagPrintableString ***REMOVED***
-		if params.stringType == 0 ***REMOVED***
+	if tag == tagPrintableString {
+		if params.stringType == 0 {
 			// This is a string without an explicit string type. We'll use
 			// a PrintableString if the character set in the string is
 			// sufficiently limited, otherwise we'll use a UTF8String.
-			for _, r := range v.String() ***REMOVED***
-				if r >= utf8.RuneSelf || !isPrintable(byte(r)) ***REMOVED***
-					if !utf8.ValidString(v.String()) ***REMOVED***
+			for _, r := range v.String() {
+				if r >= utf8.RuneSelf || !isPrintable(byte(r)) {
+					if !utf8.ValidString(v.String()) {
 						return errors.New("asn1: string not valid UTF-8")
-					***REMOVED***
+					}
 					tag = tagUTF8String
 					break
-				***REMOVED***
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
+				}
+			}
+		} else {
 			tag = params.stringType
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if params.set ***REMOVED***
-		if tag != tagSequence ***REMOVED***
-			return StructuralError***REMOVED***"non sequence tagged as set"***REMOVED***
-		***REMOVED***
+	if params.set {
+		if tag != tagSequence {
+			return StructuralError{"non sequence tagged as set"}
+		}
 		tag = tagSet
-	***REMOVED***
+	}
 
 	tags, body := out.fork()
 
 	err = marshalBody(body, v, params)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
 	bodyLen := body.Len()
 
 	var explicitTag *forkableWriter
-	if params.explicit ***REMOVED***
+	if params.explicit {
 		explicitTag, tags = tags.fork()
-	***REMOVED***
+	}
 
-	if !params.explicit && params.tag != nil ***REMOVED***
+	if !params.explicit && params.tag != nil {
 		// implicit tag.
 		tag = *params.tag
 		class = classContextSpecific
-	***REMOVED***
+	}
 
-	err = marshalTagAndLength(tags, tagAndLength***REMOVED***class, tag, bodyLen, isCompound***REMOVED***)
-	if err != nil ***REMOVED***
+	err = marshalTagAndLength(tags, tagAndLength{class, tag, bodyLen, isCompound})
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
-	if params.explicit ***REMOVED***
-		err = marshalTagAndLength(explicitTag, tagAndLength***REMOVED***
+	if params.explicit {
+		err = marshalTagAndLength(explicitTag, tagAndLength{
 			class:      classContextSpecific,
 			tag:        *params.tag,
 			length:     bodyLen + tags.Len(),
 			isCompound: true,
-		***REMOVED***)
-	***REMOVED***
+		})
+	}
 
 	return nil
-***REMOVED***
+}
 
 // Marshal returns the ASN.1 encoding of val.
-func Marshal(val interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func Marshal(val interface{}) ([]byte, error) {
 	var out bytes.Buffer
 	v := reflect.ValueOf(val)
 	f := newForkableWriter()
-	err := marshalField(f, v, fieldParameters***REMOVED******REMOVED***)
-	if err != nil ***REMOVED***
+	err := marshalField(f, v, fieldParameters{})
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	_, err = f.writeTo(&out)
 	return out.Bytes(), nil
-***REMOVED***
+}

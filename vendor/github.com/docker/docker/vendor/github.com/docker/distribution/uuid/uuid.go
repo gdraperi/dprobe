@@ -29,7 +29,7 @@ var (
 
 	// Loggerf can be used to override the default logging destination. Such
 	// log messages in this library should be logged at warning or higher.
-	Loggerf = func(format string, args ...interface***REMOVED******REMOVED***) ***REMOVED******REMOVED***
+	Loggerf = func(format string, args ...interface{}) {}
 )
 
 // UUID represents a UUID value. UUIDs can be compared and set to other values
@@ -37,7 +37,7 @@ var (
 type UUID [Size]byte
 
 // Generate creates a new, version 4 uuid.
-func Generate() (u UUID) ***REMOVED***
+func Generate() (u UUID) {
 	const (
 		// ensures we backoff for less than 450ms total. Use the following to
 		// select new value, in units of 10ms:
@@ -52,7 +52,7 @@ func Generate() (u UUID) ***REMOVED***
 		retries      int
 	)
 
-	for ***REMOVED***
+	for {
 		// This should never block but the read may fail. Because of this,
 		// we just try to read the random number generator until we get
 		// something. This is a very rare condition but may happen.
@@ -61,40 +61,40 @@ func Generate() (u UUID) ***REMOVED***
 		totalBackoff += b
 
 		n, err := io.ReadFull(rand.Reader, u[count:])
-		if err != nil ***REMOVED***
-			if retryOnError(err) && retries < maxretries ***REMOVED***
+		if err != nil {
+			if retryOnError(err) && retries < maxretries {
 				count += n
 				retries++
 				Loggerf("error generating version 4 uuid, retrying: %v", err)
 				continue
-			***REMOVED***
+			}
 
 			// Any other errors represent a system problem. What did someone
 			// do to /dev/urandom?
 			panic(fmt.Errorf("error reading random number generator, retried for %v: %v", totalBackoff.String(), err))
-		***REMOVED***
+		}
 
 		break
-	***REMOVED***
+	}
 
 	u[6] = (u[6] & 0x0f) | 0x40 // set version byte
-	u[8] = (u[8] & 0x3f) | 0x80 // set high order byte 0b10***REMOVED***8,9,a,b***REMOVED***
+	u[8] = (u[8] & 0x3f) | 0x80 // set high order byte 0b10{8,9,a,b}
 
 	return u
-***REMOVED***
+}
 
 // Parse attempts to extract a uuid from the string or returns an error.
-func Parse(s string) (u UUID, err error) ***REMOVED***
-	if len(s) != 36 ***REMOVED***
-		return UUID***REMOVED******REMOVED***, ErrUUIDInvalid
-	***REMOVED***
+func Parse(s string) (u UUID, err error) {
+	if len(s) != 36 {
+		return UUID{}, ErrUUIDInvalid
+	}
 
 	// create stack addresses for each section of the uuid.
 	p := make([][]byte, 5)
 
-	if _, err := fmt.Sscanf(s, format, &p[0], &p[1], &p[2], &p[3], &p[4]); err != nil ***REMOVED***
+	if _, err := fmt.Sscanf(s, format, &p[0], &p[1], &p[2], &p[3], &p[4]); err != nil {
 		return u, err
-	***REMOVED***
+	}
 
 	copy(u[0:4], p[0])
 	copy(u[4:6], p[1])
@@ -103,24 +103,24 @@ func Parse(s string) (u UUID, err error) ***REMOVED***
 	copy(u[10:16], p[4])
 
 	return
-***REMOVED***
+}
 
-func (u UUID) String() string ***REMOVED***
+func (u UUID) String() string {
 	return fmt.Sprintf(format, u[:4], u[4:6], u[6:8], u[8:10], u[10:])
-***REMOVED***
+}
 
 // retryOnError tries to detect whether or not retrying would be fruitful.
-func retryOnError(err error) bool ***REMOVED***
-	switch err := err.(type) ***REMOVED***
+func retryOnError(err error) bool {
+	switch err := err.(type) {
 	case *os.PathError:
 		return retryOnError(err.Err) // unpack the target error
 	case syscall.Errno:
-		if err == syscall.EPERM ***REMOVED***
+		if err == syscall.EPERM {
 			// EPERM represents an entropy pool exhaustion, a condition under
 			// which we backoff and retry.
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return false
-***REMOVED***
+}

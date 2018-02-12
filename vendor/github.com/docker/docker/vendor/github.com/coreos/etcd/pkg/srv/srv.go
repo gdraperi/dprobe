@@ -32,109 +32,109 @@ var (
 
 // GetCluster gets the cluster information via DNS discovery.
 // Also sees each entry as a separate instance.
-func GetCluster(service, name, dns string, apurls types.URLs) ([]string, error) ***REMOVED***
+func GetCluster(service, name, dns string, apurls types.URLs) ([]string, error) {
 	tempName := int(0)
 	tcp2ap := make(map[string]url.URL)
 
 	// First, resolve the apurls
-	for _, url := range apurls ***REMOVED***
+	for _, url := range apurls {
 		tcpAddr, err := resolveTCPAddr("tcp", url.Host)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		tcp2ap[tcpAddr.String()] = url
-	***REMOVED***
+	}
 
-	stringParts := []string***REMOVED******REMOVED***
-	updateNodeMap := func(service, scheme string) error ***REMOVED***
+	stringParts := []string{}
+	updateNodeMap := func(service, scheme string) error {
 		_, addrs, err := lookupSRV(service, "tcp", dns)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-		for _, srv := range addrs ***REMOVED***
+		}
+		for _, srv := range addrs {
 			port := fmt.Sprintf("%d", srv.Port)
 			host := net.JoinHostPort(srv.Target, port)
 			tcpAddr, terr := resolveTCPAddr("tcp", host)
-			if terr != nil ***REMOVED***
+			if terr != nil {
 				err = terr
 				continue
-			***REMOVED***
+			}
 			n := ""
 			url, ok := tcp2ap[tcpAddr.String()]
-			if ok ***REMOVED***
+			if ok {
 				n = name
-			***REMOVED***
-			if n == "" ***REMOVED***
+			}
+			if n == "" {
 				n = fmt.Sprintf("%d", tempName)
 				tempName++
-			***REMOVED***
+			}
 			// SRV records have a trailing dot but URL shouldn't.
 			shortHost := strings.TrimSuffix(srv.Target, ".")
 			urlHost := net.JoinHostPort(shortHost, port)
 			stringParts = append(stringParts, fmt.Sprintf("%s=%s://%s", n, scheme, urlHost))
-			if ok && url.Scheme != scheme ***REMOVED***
+			if ok && url.Scheme != scheme {
 				err = fmt.Errorf("bootstrap at %s from DNS for %s has scheme mismatch with expected peer %s", scheme+"://"+urlHost, service, url.String())
-			***REMOVED***
-		***REMOVED***
-		if len(stringParts) == 0 ***REMOVED***
+			}
+		}
+		if len(stringParts) == 0 {
 			return err
-		***REMOVED***
+		}
 		return nil
-	***REMOVED***
+	}
 
 	failCount := 0
 	err := updateNodeMap(service+"-ssl", "https")
 	srvErr := make([]string, 2)
-	if err != nil ***REMOVED***
+	if err != nil {
 		srvErr[0] = fmt.Sprintf("error querying DNS SRV records for _%s-ssl %s", service, err)
 		failCount++
-	***REMOVED***
+	}
 	err = updateNodeMap(service, "http")
-	if err != nil ***REMOVED***
+	if err != nil {
 		srvErr[1] = fmt.Sprintf("error querying DNS SRV records for _%s %s", service, err)
 		failCount++
-	***REMOVED***
-	if failCount == 2 ***REMOVED***
+	}
+	if failCount == 2 {
 		return nil, fmt.Errorf("srv: too many errors querying DNS SRV records (%q, %q)", srvErr[0], srvErr[1])
-	***REMOVED***
+	}
 	return stringParts, nil
-***REMOVED***
+}
 
-type SRVClients struct ***REMOVED***
+type SRVClients struct {
 	Endpoints []string
 	SRVs      []*net.SRV
-***REMOVED***
+}
 
 // GetClient looks up the client endpoints for a service and domain.
-func GetClient(service, domain string) (*SRVClients, error) ***REMOVED***
+func GetClient(service, domain string) (*SRVClients, error) {
 	var urls []*url.URL
 	var srvs []*net.SRV
 
-	updateURLs := func(service, scheme string) error ***REMOVED***
+	updateURLs := func(service, scheme string) error {
 		_, addrs, err := lookupSRV(service, "tcp", domain)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-		for _, srv := range addrs ***REMOVED***
-			urls = append(urls, &url.URL***REMOVED***
+		}
+		for _, srv := range addrs {
+			urls = append(urls, &url.URL{
 				Scheme: scheme,
 				Host:   net.JoinHostPort(srv.Target, fmt.Sprintf("%d", srv.Port)),
-			***REMOVED***)
-		***REMOVED***
+			})
+		}
 		srvs = append(srvs, addrs...)
 		return nil
-	***REMOVED***
+	}
 
 	errHTTPS := updateURLs(service+"-ssl", "https")
 	errHTTP := updateURLs(service, "http")
 
-	if errHTTPS != nil && errHTTP != nil ***REMOVED***
+	if errHTTPS != nil && errHTTP != nil {
 		return nil, fmt.Errorf("dns lookup errors: %s and %s", errHTTPS, errHTTP)
-	***REMOVED***
+	}
 
 	endpoints := make([]string, len(urls))
-	for i := range urls ***REMOVED***
+	for i := range urls {
 		endpoints[i] = urls[i].String()
-	***REMOVED***
-	return &SRVClients***REMOVED***Endpoints: endpoints, SRVs: srvs***REMOVED***, nil
-***REMOVED***
+	}
+	return &SRVClients{Endpoints: endpoints, SRVs: srvs}, nil
+}

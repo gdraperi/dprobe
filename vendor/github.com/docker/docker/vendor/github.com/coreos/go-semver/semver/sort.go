@@ -20,19 +20,19 @@ import (
 
 type Versions []*Version
 
-func (s Versions) Len() int ***REMOVED***
+func (s Versions) Len() int {
 	return len(s)
-***REMOVED***
+}
 
-func (s Versions) Swap(i, j int) ***REMOVED***
+func (s Versions) Swap(i, j int) {
 	s[i], s[j] = s[j], s[i]
-***REMOVED***
+}
 
-func (s Versions) Less(i, j int) bool ***REMOVED***
+func (s Versions) Less(i, j int) bool {
 	return s[i].LessThan(*s[j])
-***REMOVED***
+}
 
 // Sort sorts the given slice of Version
-func Sort(versions []*Version) ***REMOVED***
+func Sort(versions []*Version) {
 	sort.Sort(Versions(versions))
-***REMOVED***
+}

@@ -23,104 +23,104 @@ import (
 var genFiles = flag.Bool("gen", false, "generate output files instead of comparing")
 
 // setHelper is testing.T.Helper on Go 1.9+, overridden by go19_test.go.
-var setHelper = func(t *testing.T) ***REMOVED******REMOVED***
+var setHelper = func(t *testing.T) {}
 
-func TestFullCycle(t *testing.T) ***REMOVED***
+func TestFullCycle(t *testing.T) {
 	const path = "./testdata"
 	dirs, err := ioutil.ReadDir(path)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	for _, f := range dirs ***REMOVED***
-		t.Run(f.Name(), func(t *testing.T) ***REMOVED***
-			chk := func(t *testing.T, err error) ***REMOVED***
+	}
+	for _, f := range dirs {
+		t.Run(f.Name(), func(t *testing.T) {
+			chk := func(t *testing.T, err error) {
 				setHelper(t)
-				if err != nil ***REMOVED***
+				if err != nil {
 					t.Fatal(err)
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			dir := filepath.Join(path, f.Name())
 			pkgPath := fmt.Sprintf("%s/%s", path, f.Name())
-			config := Config***REMOVED***
+			config := Config{
 				SourceLanguage: language.AmericanEnglish,
-				Packages:       []string***REMOVED***pkgPath***REMOVED***,
+				Packages:       []string{pkgPath},
 				Dir:            filepath.Join(dir, "locales"),
 				GenFile:        "catalog_gen.go",
 				GenPackage:     pkgPath,
-			***REMOVED***
+			}
 			// TODO: load config if available.
 			s, err := Extract(&config)
 			chk(t, err)
 			chk(t, s.Import())
 			chk(t, s.Merge())
 			// TODO:
-			//  for range s.Config.Actions ***REMOVED***
+			//  for range s.Config.Actions {
 			//  	//  TODO: do the actions.
-			//  ***REMOVED***
+			//  }
 			chk(t, s.Export())
 			chk(t, s.Generate())
 
 			writeJSON(t, filepath.Join(dir, "extracted.gotext.json"), s.Extracted)
 			checkOutput(t, dir)
-		***REMOVED***)
-	***REMOVED***
-***REMOVED***
+		})
+	}
+}
 
-func checkOutput(t *testing.T, p string) ***REMOVED***
-	filepath.Walk(p, func(p string, f os.FileInfo, err error) error ***REMOVED***
-		if f.IsDir() ***REMOVED***
+func checkOutput(t *testing.T, p string) {
+	filepath.Walk(p, func(p string, f os.FileInfo, err error) error {
+		if f.IsDir() {
 			return nil
-		***REMOVED***
-		if filepath.Ext(p) != ".want" ***REMOVED***
+		}
+		if filepath.Ext(p) != ".want" {
 			return nil
-		***REMOVED***
+		}
 		gotFile := p[:len(p)-len(".want")]
 		got, err := ioutil.ReadFile(gotFile)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Errorf("failed to read %q", p)
 			return nil
-		***REMOVED***
-		if *genFiles ***REMOVED***
-			if err := ioutil.WriteFile(p, got, 0644); err != nil ***REMOVED***
+		}
+		if *genFiles {
+			if err := ioutil.WriteFile(p, got, 0644); err != nil {
 				t.Fatal(err)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		want, err := ioutil.ReadFile(p)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Errorf("failed to read %q", p)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			scanGot := bufio.NewScanner(bytes.NewReader(got))
 			scanWant := bufio.NewScanner(bytes.NewReader(want))
 			line := 0
-			clean := func(s string) string ***REMOVED***
-				if i := strings.LastIndex(s, "//"); i != -1 ***REMOVED***
+			clean := func(s string) string {
+				if i := strings.LastIndex(s, "//"); i != -1 {
 					s = s[:i]
-				***REMOVED***
+				}
 				return path.Clean(filepath.ToSlash(s))
-			***REMOVED***
-			for scanGot.Scan() && scanWant.Scan() ***REMOVED***
+			}
+			for scanGot.Scan() && scanWant.Scan() {
 				got := clean(scanGot.Text())
 				want := clean(scanWant.Text())
-				if got != want ***REMOVED***
+				if got != want {
 					t.Errorf("file %q differs from .want file at line %d:\n\t%s\n\t%s", gotFile, line, got, want)
 					break
-				***REMOVED***
+				}
 				line++
-			***REMOVED***
-			if scanGot.Scan() || scanWant.Scan() ***REMOVED***
+			}
+			if scanGot.Scan() || scanWant.Scan() {
 				t.Errorf("file %q differs from .want file at line %d.", gotFile, line)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		return nil
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func writeJSON(t *testing.T, path string, x interface***REMOVED******REMOVED***) ***REMOVED***
+func writeJSON(t *testing.T, path string, x interface{}) {
 	data, err := json.MarshalIndent(x, "", "    ")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if err := ioutil.WriteFile(path, data, 0644); err != nil ***REMOVED***
+	}
+	if err := ioutil.WriteFile(path, data, 0644); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}

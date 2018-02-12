@@ -11,7 +11,7 @@ import (
 	"golang.org/x/text/encoding/ianaindex"
 )
 
-func ExampleIndex() ***REMOVED***
+func ExampleIndex() {
 	fmt.Println(ianaindex.MIME.Name(charmap.ISO8859_7))
 	fmt.Println(ianaindex.IANA.Name(charmap.ISO8859_7))
 	fmt.Println(ianaindex.MIB.Name(charmap.ISO8859_7))
@@ -24,4 +24,4 @@ func ExampleIndex() ***REMOVED***
 	// ISO_8859-7:1987 <nil>
 	// ISOLatinGreek <nil>
 	// IBM437 <nil>
-***REMOVED***
+}

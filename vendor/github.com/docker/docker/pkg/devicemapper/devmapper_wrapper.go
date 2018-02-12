@@ -11,7 +11,7 @@ package devicemapper
 extern void DevmapperLogCallback(int level, char *file, int line, int dm_errno_or_class, char *str);
 
 static void	log_cb(int level, const char *file, int line, int dm_errno_or_class, const char *f, ...)
-***REMOVED***
+{
 	char *buffer = NULL;
 	va_list ap;
 	int ret;
@@ -19,19 +19,19 @@ static void	log_cb(int level, const char *file, int line, int dm_errno_or_class,
 	va_start(ap, f);
 	ret = vasprintf(&buffer, f, ap);
 	va_end(ap);
-	if (ret < 0) ***REMOVED***
+	if (ret < 0) {
 		// memory allocation failed -- should never happen?
 		return;
-	***REMOVED***
+	}
 
 	DevmapperLogCallback(level, (char *)file, line, dm_errno_or_class, buffer);
 	free(buffer);
-***REMOVED***
+}
 
 static void	log_with_errno_init()
-***REMOVED***
+{
 	dm_log_with_errno_init(log_cb);
-***REMOVED***
+}
 */
 import "C"
 
@@ -85,59 +85,59 @@ var (
 	DmTaskGetInfoWithDeferred = dmTaskGetInfoWithDeferredFct
 )
 
-func free(p *C.char) ***REMOVED***
+func free(p *C.char) {
 	C.free(unsafe.Pointer(p))
-***REMOVED***
+}
 
-func dmTaskDestroyFct(task *cdmTask) ***REMOVED***
+func dmTaskDestroyFct(task *cdmTask) {
 	C.dm_task_destroy((*C.struct_dm_task)(task))
-***REMOVED***
+}
 
-func dmTaskCreateFct(taskType int) *cdmTask ***REMOVED***
+func dmTaskCreateFct(taskType int) *cdmTask {
 	return (*cdmTask)(C.dm_task_create(C.int(taskType)))
-***REMOVED***
+}
 
-func dmTaskRunFct(task *cdmTask) int ***REMOVED***
+func dmTaskRunFct(task *cdmTask) int {
 	ret, _ := C.dm_task_run((*C.struct_dm_task)(task))
 	return int(ret)
-***REMOVED***
+}
 
-func dmTaskSetNameFct(task *cdmTask, name string) int ***REMOVED***
+func dmTaskSetNameFct(task *cdmTask, name string) int {
 	Cname := C.CString(name)
 	defer free(Cname)
 
 	return int(C.dm_task_set_name((*C.struct_dm_task)(task), Cname))
-***REMOVED***
+}
 
-func dmTaskSetMessageFct(task *cdmTask, message string) int ***REMOVED***
+func dmTaskSetMessageFct(task *cdmTask, message string) int {
 	Cmessage := C.CString(message)
 	defer free(Cmessage)
 
 	return int(C.dm_task_set_message((*C.struct_dm_task)(task), Cmessage))
-***REMOVED***
+}
 
-func dmTaskSetSectorFct(task *cdmTask, sector uint64) int ***REMOVED***
+func dmTaskSetSectorFct(task *cdmTask, sector uint64) int {
 	return int(C.dm_task_set_sector((*C.struct_dm_task)(task), C.uint64_t(sector)))
-***REMOVED***
+}
 
-func dmTaskSetCookieFct(task *cdmTask, cookie *uint, flags uint16) int ***REMOVED***
+func dmTaskSetCookieFct(task *cdmTask, cookie *uint, flags uint16) int {
 	cCookie := C.uint32_t(*cookie)
-	defer func() ***REMOVED***
+	defer func() {
 		*cookie = uint(cCookie)
-	***REMOVED***()
+	}()
 	return int(C.dm_task_set_cookie((*C.struct_dm_task)(task), &cCookie, C.uint16_t(flags)))
-***REMOVED***
+}
 
-func dmTaskSetAddNodeFct(task *cdmTask, addNode AddNodeType) int ***REMOVED***
+func dmTaskSetAddNodeFct(task *cdmTask, addNode AddNodeType) int {
 	return int(C.dm_task_set_add_node((*C.struct_dm_task)(task), C.dm_add_node_t(addNode)))
-***REMOVED***
+}
 
-func dmTaskSetRoFct(task *cdmTask) int ***REMOVED***
+func dmTaskSetRoFct(task *cdmTask) int {
 	return int(C.dm_task_set_ro((*C.struct_dm_task)(task)))
-***REMOVED***
+}
 
 func dmTaskAddTargetFct(task *cdmTask,
-	start, size uint64, ttype, params string) int ***REMOVED***
+	start, size uint64, ttype, params string) int {
 
 	Cttype := C.CString(ttype)
 	defer free(Cttype)
@@ -146,35 +146,35 @@ func dmTaskAddTargetFct(task *cdmTask,
 	defer free(Cparams)
 
 	return int(C.dm_task_add_target((*C.struct_dm_task)(task), C.uint64_t(start), C.uint64_t(size), Cttype, Cparams))
-***REMOVED***
+}
 
-func dmTaskGetDepsFct(task *cdmTask) *Deps ***REMOVED***
+func dmTaskGetDepsFct(task *cdmTask) *Deps {
 	Cdeps := C.dm_task_get_deps((*C.struct_dm_task)(task))
-	if Cdeps == nil ***REMOVED***
+	if Cdeps == nil {
 		return nil
-	***REMOVED***
+	}
 
 	// golang issue: https://github.com/golang/go/issues/11925
-	hdr := reflect.SliceHeader***REMOVED***
+	hdr := reflect.SliceHeader{
 		Data: uintptr(unsafe.Pointer(uintptr(unsafe.Pointer(Cdeps)) + unsafe.Sizeof(*Cdeps))),
 		Len:  int(Cdeps.count),
 		Cap:  int(Cdeps.count),
-	***REMOVED***
+	}
 	devices := *(*[]C.uint64_t)(unsafe.Pointer(&hdr))
 
-	deps := &Deps***REMOVED***
+	deps := &Deps{
 		Count:  uint32(Cdeps.count),
 		Filler: uint32(Cdeps.filler),
-	***REMOVED***
-	for _, device := range devices ***REMOVED***
+	}
+	for _, device := range devices {
 		deps.Device = append(deps.Device, uint64(device))
-	***REMOVED***
+	}
 	return deps
-***REMOVED***
+}
 
-func dmTaskGetInfoFct(task *cdmTask, info *Info) int ***REMOVED***
-	Cinfo := C.struct_dm_info***REMOVED******REMOVED***
-	defer func() ***REMOVED***
+func dmTaskGetInfoFct(task *cdmTask, info *Info) int {
+	Cinfo := C.struct_dm_info{}
+	defer func() {
 		info.Exists = int(Cinfo.exists)
 		info.Suspended = int(Cinfo.suspended)
 		info.LiveTable = int(Cinfo.live_table)
@@ -185,68 +185,68 @@ func dmTaskGetInfoFct(task *cdmTask, info *Info) int ***REMOVED***
 		info.Minor = uint32(Cinfo.minor)
 		info.ReadOnly = int(Cinfo.read_only)
 		info.TargetCount = int32(Cinfo.target_count)
-	***REMOVED***()
+	}()
 	return int(C.dm_task_get_info((*C.struct_dm_task)(task), &Cinfo))
-***REMOVED***
+}
 
-func dmTaskGetDriverVersionFct(task *cdmTask) string ***REMOVED***
+func dmTaskGetDriverVersionFct(task *cdmTask) string {
 	buffer := C.malloc(128)
 	defer C.free(buffer)
 	res := C.dm_task_get_driver_version((*C.struct_dm_task)(task), (*C.char)(buffer), 128)
-	if res == 0 ***REMOVED***
+	if res == 0 {
 		return ""
-	***REMOVED***
+	}
 	return C.GoString((*C.char)(buffer))
-***REMOVED***
+}
 
-func dmGetNextTargetFct(task *cdmTask, next unsafe.Pointer, start, length *uint64, target, params *string) unsafe.Pointer ***REMOVED***
+func dmGetNextTargetFct(task *cdmTask, next unsafe.Pointer, start, length *uint64, target, params *string) unsafe.Pointer {
 	var (
 		Cstart, Clength      C.uint64_t
 		CtargetType, Cparams *C.char
 	)
-	defer func() ***REMOVED***
+	defer func() {
 		*start = uint64(Cstart)
 		*length = uint64(Clength)
 		*target = C.GoString(CtargetType)
 		*params = C.GoString(Cparams)
-	***REMOVED***()
+	}()
 
 	nextp := C.dm_get_next_target((*C.struct_dm_task)(task), next, &Cstart, &Clength, &CtargetType, &Cparams)
 	return nextp
-***REMOVED***
+}
 
-func dmUdevSetSyncSupportFct(syncWithUdev int) ***REMOVED***
+func dmUdevSetSyncSupportFct(syncWithUdev int) {
 	(C.dm_udev_set_sync_support(C.int(syncWithUdev)))
-***REMOVED***
+}
 
-func dmUdevGetSyncSupportFct() int ***REMOVED***
+func dmUdevGetSyncSupportFct() int {
 	return int(C.dm_udev_get_sync_support())
-***REMOVED***
+}
 
-func dmUdevWaitFct(cookie uint) int ***REMOVED***
+func dmUdevWaitFct(cookie uint) int {
 	return int(C.dm_udev_wait(C.uint32_t(cookie)))
-***REMOVED***
+}
 
-func dmCookieSupportedFct() int ***REMOVED***
+func dmCookieSupportedFct() int {
 	return int(C.dm_cookie_supported())
-***REMOVED***
+}
 
-func logWithErrnoInitFct() ***REMOVED***
+func logWithErrnoInitFct() {
 	C.log_with_errno_init()
-***REMOVED***
+}
 
-func dmSetDevDirFct(dir string) int ***REMOVED***
+func dmSetDevDirFct(dir string) int {
 	Cdir := C.CString(dir)
 	defer free(Cdir)
 
 	return int(C.dm_set_dev_dir(Cdir))
-***REMOVED***
+}
 
-func dmGetLibraryVersionFct(version *string) int ***REMOVED***
+func dmGetLibraryVersionFct(version *string) int {
 	buffer := C.CString(string(make([]byte, 128)))
 	defer free(buffer)
-	defer func() ***REMOVED***
+	defer func() {
 		*version = C.GoString(buffer)
-	***REMOVED***()
+	}()
 	return int(C.dm_get_library_version(buffer, 128))
-***REMOVED***
+}

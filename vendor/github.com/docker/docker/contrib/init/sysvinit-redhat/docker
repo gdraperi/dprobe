@@ -31,16 +31,16 @@ logfile="/var/log/$prog"
 
 [ -e /etc/sysconfig/$prog ] && . /etc/sysconfig/$prog
 
-prestart() ***REMOVED***
+prestart() {
 	service cgconfig status > /dev/null
 
 	if [[ $? != 0 ]]; then
 		service cgconfig start
 	fi
 
-***REMOVED***
+}
 
-start() ***REMOVED***
+start() {
 	if [ ! -x $exec ]; then
 		if [ ! -e $exec ]; then
 			echo "Docker executable $exec not found"
@@ -80,44 +80,44 @@ start() ***REMOVED***
 		printf "$pidfile still exists...\n"
 		exit 7
 	fi
-***REMOVED***
+}
 
-stop() ***REMOVED***
+stop() {
 	echo -n $"Stopping $prog: "
 	killproc -p $pidfile -d 300 $prog
 	retval=$?
 	echo
 	[ $retval -eq 0 ] && rm -f $lockfile
 	return $retval
-***REMOVED***
+}
 
-restart() ***REMOVED***
+restart() {
 	stop
 	start
-***REMOVED***
+}
 
-reload() ***REMOVED***
+reload() {
 	restart
-***REMOVED***
+}
 
-force_reload() ***REMOVED***
+force_reload() {
 	restart
-***REMOVED***
+}
 
-rh_status() ***REMOVED***
+rh_status() {
 	status -p $pidfile $prog
-***REMOVED***
+}
 
-rh_status_q() ***REMOVED***
+rh_status_q() {
 	rh_status >/dev/null 2>&1
-***REMOVED***
+}
 
 
-check_for_cleanup() ***REMOVED***
-	if [ -f $***REMOVED***pidfile***REMOVED*** ]; then
-		/bin/ps -fp $(cat $***REMOVED***pidfile***REMOVED***) > /dev/null || rm $***REMOVED***pidfile***REMOVED***
+check_for_cleanup() {
+	if [ -f ${pidfile} ]; then
+		/bin/ps -fp $(cat ${pidfile}) > /dev/null || rm ${pidfile}
 	fi
-***REMOVED***
+}
 
 case "$1" in
 	start)
@@ -146,7 +146,7 @@ case "$1" in
 		restart
 		;;
 	*)
-		echo $"Usage: $0 ***REMOVED***start|stop|status|restart|condrestart|try-restart|reload|force-reload***REMOVED***"
+		echo $"Usage: $0 {start|stop|status|restart|condrestart|try-restart|reload|force-reload}"
 		exit 2
 esac
 

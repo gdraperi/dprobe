@@ -170,7 +170,7 @@ f, err := afero.TempFile(fs,"", "ioutil-test")
 
 ```go
 fs := afero.NewMemMapFs()
-afs := &afero.Afero***REMOVED***Fs: fs***REMOVED***
+afs := &afero.Afero{Fs: fs}
 f, err := afs.TempFile("", "ioutil-test")
 ```
 
@@ -200,7 +200,7 @@ independent, with no test relying on the state left by an earlier test.
 
 Then in my tests I would initialize a new MemMapFs for each test:
 ```go
-func TestExist(t *testing.T) ***REMOVED***
+func TestExist(t *testing.T) {
 	appFS := afero.NewMemMapFs()
 	// create test files and directories
 	appFS.MkdirAll("src/a", 0755)
@@ -208,10 +208,10 @@ func TestExist(t *testing.T) ***REMOVED***
 	afero.WriteFile(appFS, "src/c", []byte("file c"), 0644)
 	name := "src/c"
 	_, err := appFS.Stat(name)
-	if os.IsNotExist(err) ***REMOVED***
+	if os.IsNotExist(err) {
 		t.Errorf("file \"%s\" does not exist.\n", name)
-	***REMOVED***
-***REMOVED***
+	}
+}
 ```
 
 # Available Backends

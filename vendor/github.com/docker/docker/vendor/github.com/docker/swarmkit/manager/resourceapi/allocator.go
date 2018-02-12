@@ -19,14 +19,14 @@ var (
 )
 
 // ResourceAllocator handles resource allocation of cluster entities.
-type ResourceAllocator struct ***REMOVED***
+type ResourceAllocator struct {
 	store *store.MemoryStore
-***REMOVED***
+}
 
 // New returns an instance of the allocator
-func New(store *store.MemoryStore) *ResourceAllocator ***REMOVED***
-	return &ResourceAllocator***REMOVED***store: store***REMOVED***
-***REMOVED***
+func New(store *store.MemoryStore) *ResourceAllocator {
+	return &ResourceAllocator{store: store}
+}
 
 // AttachNetwork allows the node to request the resources
 // allocation needed for a network attachment on the specific node.
@@ -34,91 +34,91 @@ func New(store *store.MemoryStore) *ResourceAllocator ***REMOVED***
 // - Returns `NotFound` if the Network is not found.
 // - Returns `PermissionDenied` if the Network is not manually attachable.
 // - Returns an error if the creation fails.
-func (ra *ResourceAllocator) AttachNetwork(ctx context.Context, request *api.AttachNetworkRequest) (*api.AttachNetworkResponse, error) ***REMOVED***
+func (ra *ResourceAllocator) AttachNetwork(ctx context.Context, request *api.AttachNetworkRequest) (*api.AttachNetworkResponse, error) {
 	nodeInfo, err := ca.RemoteNode(ctx)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	var network *api.Network
-	ra.store.View(func(tx store.ReadTx) ***REMOVED***
+	ra.store.View(func(tx store.ReadTx) {
 		network = store.GetNetwork(tx, request.Config.Target)
-		if network == nil ***REMOVED***
-			if networks, err := store.FindNetworks(tx, store.ByName(request.Config.Target)); err == nil && len(networks) == 1 ***REMOVED***
+		if network == nil {
+			if networks, err := store.FindNetworks(tx, store.ByName(request.Config.Target)); err == nil && len(networks) == 1 {
 				network = networks[0]
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***)
-	if network == nil ***REMOVED***
+			}
+		}
+	})
+	if network == nil {
 		return nil, status.Errorf(codes.NotFound, "network %s not found", request.Config.Target)
-	***REMOVED***
+	}
 
-	if !network.Spec.Attachable ***REMOVED***
+	if !network.Spec.Attachable {
 		return nil, status.Errorf(codes.PermissionDenied, "network %s not manually attachable", request.Config.Target)
-	***REMOVED***
+	}
 
-	t := &api.Task***REMOVED***
+	t := &api.Task{
 		ID:     identity.NewID(),
 		NodeID: nodeInfo.NodeID,
-		Spec: api.TaskSpec***REMOVED***
-			Runtime: &api.TaskSpec_Attachment***REMOVED***
-				Attachment: &api.NetworkAttachmentSpec***REMOVED***
+		Spec: api.TaskSpec{
+			Runtime: &api.TaskSpec_Attachment{
+				Attachment: &api.NetworkAttachmentSpec{
 					ContainerID: request.ContainerID,
-				***REMOVED***,
-			***REMOVED***,
-			Networks: []*api.NetworkAttachmentConfig***REMOVED***
-				***REMOVED***
+				},
+			},
+			Networks: []*api.NetworkAttachmentConfig{
+				{
 					Target:    network.ID,
 					Addresses: request.Config.Addresses,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		Status: api.TaskStatus***REMOVED***
+				},
+			},
+		},
+		Status: api.TaskStatus{
 			State:     api.TaskStateNew,
 			Timestamp: ptypes.MustTimestampProto(time.Now()),
 			Message:   "created",
-		***REMOVED***,
+		},
 		DesiredState: api.TaskStateRunning,
 		// TODO: Add Network attachment.
-	***REMOVED***
+	}
 
-	if err := ra.store.Update(func(tx store.Tx) error ***REMOVED***
+	if err := ra.store.Update(func(tx store.Tx) error {
 		return store.CreateTask(tx, t)
-	***REMOVED***); err != nil ***REMOVED***
+	}); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	return &api.AttachNetworkResponse***REMOVED***AttachmentID: t.ID***REMOVED***, nil
-***REMOVED***
+	return &api.AttachNetworkResponse{AttachmentID: t.ID}, nil
+}
 
 // DetachNetwork allows the node to request the release of
 // the resources associated to the network attachment.
 // - Returns `InvalidArgument` if attachment ID is not provided.
 // - Returns `NotFound` if the attachment is not found.
 // - Returns an error if the deletion fails.
-func (ra *ResourceAllocator) DetachNetwork(ctx context.Context, request *api.DetachNetworkRequest) (*api.DetachNetworkResponse, error) ***REMOVED***
-	if request.AttachmentID == "" ***REMOVED***
+func (ra *ResourceAllocator) DetachNetwork(ctx context.Context, request *api.DetachNetworkRequest) (*api.DetachNetworkResponse, error) {
+	if request.AttachmentID == "" {
 		return nil, status.Errorf(codes.InvalidArgument, errInvalidArgument.Error())
-	***REMOVED***
+	}
 
 	nodeInfo, err := ca.RemoteNode(ctx)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	if err := ra.store.Update(func(tx store.Tx) error ***REMOVED***
+	if err := ra.store.Update(func(tx store.Tx) error {
 		t := store.GetTask(tx, request.AttachmentID)
-		if t == nil ***REMOVED***
+		if t == nil {
 			return status.Errorf(codes.NotFound, "attachment %s not found", request.AttachmentID)
-		***REMOVED***
-		if t.NodeID != nodeInfo.NodeID ***REMOVED***
+		}
+		if t.NodeID != nodeInfo.NodeID {
 			return status.Errorf(codes.PermissionDenied, "attachment %s doesn't belong to this node", request.AttachmentID)
-		***REMOVED***
+		}
 
 		return store.DeleteTask(tx, request.AttachmentID)
-	***REMOVED***); err != nil ***REMOVED***
+	}); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	return &api.DetachNetworkResponse***REMOVED******REMOVED***, nil
-***REMOVED***
+	return &api.DetachNetworkResponse{}, nil
+}

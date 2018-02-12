@@ -51,7 +51,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
-type Namespace struct ***REMOVED***
+type Namespace struct {
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Labels provides an area to include arbitrary data on namespaces.
 	//
@@ -60,66 +60,66 @@ type Namespace struct ***REMOVED***
 	// Note that to add a new value to this field, read the existing set and
 	// include the entire result in the update call.
 	Labels map[string]string `protobuf:"bytes,2,rep,name=labels" json:"labels,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-***REMOVED***
+}
 
-func (m *Namespace) Reset()                    ***REMOVED*** *m = Namespace***REMOVED******REMOVED*** ***REMOVED***
-func (*Namespace) ProtoMessage()               ***REMOVED******REMOVED***
-func (*Namespace) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorNamespace, []int***REMOVED***0***REMOVED*** ***REMOVED***
+func (m *Namespace) Reset()                    { *m = Namespace{} }
+func (*Namespace) ProtoMessage()               {}
+func (*Namespace) Descriptor() ([]byte, []int) { return fileDescriptorNamespace, []int{0} }
 
-type GetNamespaceRequest struct ***REMOVED***
+type GetNamespaceRequest struct {
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-***REMOVED***
+}
 
-func (m *GetNamespaceRequest) Reset()                    ***REMOVED*** *m = GetNamespaceRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*GetNamespaceRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*GetNamespaceRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorNamespace, []int***REMOVED***1***REMOVED*** ***REMOVED***
+func (m *GetNamespaceRequest) Reset()                    { *m = GetNamespaceRequest{} }
+func (*GetNamespaceRequest) ProtoMessage()               {}
+func (*GetNamespaceRequest) Descriptor() ([]byte, []int) { return fileDescriptorNamespace, []int{1} }
 
-type GetNamespaceResponse struct ***REMOVED***
+type GetNamespaceResponse struct {
 	Namespace Namespace `protobuf:"bytes,1,opt,name=namespace" json:"namespace"`
-***REMOVED***
+}
 
-func (m *GetNamespaceResponse) Reset()                    ***REMOVED*** *m = GetNamespaceResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*GetNamespaceResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*GetNamespaceResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorNamespace, []int***REMOVED***2***REMOVED*** ***REMOVED***
+func (m *GetNamespaceResponse) Reset()                    { *m = GetNamespaceResponse{} }
+func (*GetNamespaceResponse) ProtoMessage()               {}
+func (*GetNamespaceResponse) Descriptor() ([]byte, []int) { return fileDescriptorNamespace, []int{2} }
 
-type ListNamespacesRequest struct ***REMOVED***
+type ListNamespacesRequest struct {
 	Filter string `protobuf:"bytes,1,opt,name=filter,proto3" json:"filter,omitempty"`
-***REMOVED***
+}
 
-func (m *ListNamespacesRequest) Reset()                    ***REMOVED*** *m = ListNamespacesRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*ListNamespacesRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*ListNamespacesRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorNamespace, []int***REMOVED***3***REMOVED*** ***REMOVED***
+func (m *ListNamespacesRequest) Reset()                    { *m = ListNamespacesRequest{} }
+func (*ListNamespacesRequest) ProtoMessage()               {}
+func (*ListNamespacesRequest) Descriptor() ([]byte, []int) { return fileDescriptorNamespace, []int{3} }
 
-type ListNamespacesResponse struct ***REMOVED***
+type ListNamespacesResponse struct {
 	Namespaces []Namespace `protobuf:"bytes,1,rep,name=namespaces" json:"namespaces"`
-***REMOVED***
+}
 
-func (m *ListNamespacesResponse) Reset()                    ***REMOVED*** *m = ListNamespacesResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*ListNamespacesResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*ListNamespacesResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorNamespace, []int***REMOVED***4***REMOVED*** ***REMOVED***
+func (m *ListNamespacesResponse) Reset()                    { *m = ListNamespacesResponse{} }
+func (*ListNamespacesResponse) ProtoMessage()               {}
+func (*ListNamespacesResponse) Descriptor() ([]byte, []int) { return fileDescriptorNamespace, []int{4} }
 
-type CreateNamespaceRequest struct ***REMOVED***
+type CreateNamespaceRequest struct {
 	Namespace Namespace `protobuf:"bytes,1,opt,name=namespace" json:"namespace"`
-***REMOVED***
+}
 
-func (m *CreateNamespaceRequest) Reset()                    ***REMOVED*** *m = CreateNamespaceRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*CreateNamespaceRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*CreateNamespaceRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorNamespace, []int***REMOVED***5***REMOVED*** ***REMOVED***
+func (m *CreateNamespaceRequest) Reset()                    { *m = CreateNamespaceRequest{} }
+func (*CreateNamespaceRequest) ProtoMessage()               {}
+func (*CreateNamespaceRequest) Descriptor() ([]byte, []int) { return fileDescriptorNamespace, []int{5} }
 
-type CreateNamespaceResponse struct ***REMOVED***
+type CreateNamespaceResponse struct {
 	Namespace Namespace `protobuf:"bytes,1,opt,name=namespace" json:"namespace"`
-***REMOVED***
+}
 
-func (m *CreateNamespaceResponse) Reset()                    ***REMOVED*** *m = CreateNamespaceResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*CreateNamespaceResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*CreateNamespaceResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorNamespace, []int***REMOVED***6***REMOVED*** ***REMOVED***
+func (m *CreateNamespaceResponse) Reset()                    { *m = CreateNamespaceResponse{} }
+func (*CreateNamespaceResponse) ProtoMessage()               {}
+func (*CreateNamespaceResponse) Descriptor() ([]byte, []int) { return fileDescriptorNamespace, []int{6} }
 
 // UpdateNamespaceRequest updates the metadata for a namespace.
 //
 // The operation should follow semantics described in
 // https://developers.google.com/protocol-buffers/docs/reference/csharp/class/google/protobuf/well-known-types/field-mask,
 // unless otherwise qualified.
-type UpdateNamespaceRequest struct ***REMOVED***
+type UpdateNamespaceRequest struct {
 	// Namespace provides the target value, as declared by the mask, for the update.
 	//
 	// The namespace field must be set.
@@ -131,29 +131,29 @@ type UpdateNamespaceRequest struct ***REMOVED***
 	// the namespace. While field masks are typically limited to ascii alphas
 	// and digits, we just take everything after the "labels." as the map key.
 	UpdateMask *google_protobuf2.FieldMask `protobuf:"bytes,2,opt,name=update_mask,json=updateMask" json:"update_mask,omitempty"`
-***REMOVED***
+}
 
-func (m *UpdateNamespaceRequest) Reset()                    ***REMOVED*** *m = UpdateNamespaceRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*UpdateNamespaceRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*UpdateNamespaceRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorNamespace, []int***REMOVED***7***REMOVED*** ***REMOVED***
+func (m *UpdateNamespaceRequest) Reset()                    { *m = UpdateNamespaceRequest{} }
+func (*UpdateNamespaceRequest) ProtoMessage()               {}
+func (*UpdateNamespaceRequest) Descriptor() ([]byte, []int) { return fileDescriptorNamespace, []int{7} }
 
-type UpdateNamespaceResponse struct ***REMOVED***
+type UpdateNamespaceResponse struct {
 	Namespace Namespace `protobuf:"bytes,1,opt,name=namespace" json:"namespace"`
-***REMOVED***
+}
 
-func (m *UpdateNamespaceResponse) Reset()                    ***REMOVED*** *m = UpdateNamespaceResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*UpdateNamespaceResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*UpdateNamespaceResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorNamespace, []int***REMOVED***8***REMOVED*** ***REMOVED***
+func (m *UpdateNamespaceResponse) Reset()                    { *m = UpdateNamespaceResponse{} }
+func (*UpdateNamespaceResponse) ProtoMessage()               {}
+func (*UpdateNamespaceResponse) Descriptor() ([]byte, []int) { return fileDescriptorNamespace, []int{8} }
 
-type DeleteNamespaceRequest struct ***REMOVED***
+type DeleteNamespaceRequest struct {
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-***REMOVED***
+}
 
-func (m *DeleteNamespaceRequest) Reset()                    ***REMOVED*** *m = DeleteNamespaceRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*DeleteNamespaceRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*DeleteNamespaceRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorNamespace, []int***REMOVED***9***REMOVED*** ***REMOVED***
+func (m *DeleteNamespaceRequest) Reset()                    { *m = DeleteNamespaceRequest{} }
+func (*DeleteNamespaceRequest) ProtoMessage()               {}
+func (*DeleteNamespaceRequest) Descriptor() ([]byte, []int) { return fileDescriptorNamespace, []int{9} }
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*Namespace)(nil), "containerd.services.namespaces.v1.Namespace")
 	proto.RegisterType((*GetNamespaceRequest)(nil), "containerd.services.namespaces.v1.GetNamespaceRequest")
 	proto.RegisterType((*GetNamespaceResponse)(nil), "containerd.services.namespaces.v1.GetNamespaceResponse")
@@ -164,7 +164,7 @@ func init() ***REMOVED***
 	proto.RegisterType((*UpdateNamespaceRequest)(nil), "containerd.services.namespaces.v1.UpdateNamespaceRequest")
 	proto.RegisterType((*UpdateNamespaceResponse)(nil), "containerd.services.namespaces.v1.UpdateNamespaceResponse")
 	proto.RegisterType((*DeleteNamespaceRequest)(nil), "containerd.services.namespaces.v1.DeleteNamespaceRequest")
-***REMOVED***
+}
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
@@ -176,223 +176,223 @@ const _ = grpc.SupportPackageIsVersion4
 
 // Client API for Namespaces service
 
-type NamespacesClient interface ***REMOVED***
+type NamespacesClient interface {
 	Get(ctx context.Context, in *GetNamespaceRequest, opts ...grpc.CallOption) (*GetNamespaceResponse, error)
 	List(ctx context.Context, in *ListNamespacesRequest, opts ...grpc.CallOption) (*ListNamespacesResponse, error)
 	Create(ctx context.Context, in *CreateNamespaceRequest, opts ...grpc.CallOption) (*CreateNamespaceResponse, error)
 	Update(ctx context.Context, in *UpdateNamespaceRequest, opts ...grpc.CallOption) (*UpdateNamespaceResponse, error)
 	Delete(ctx context.Context, in *DeleteNamespaceRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error)
-***REMOVED***
+}
 
-type namespacesClient struct ***REMOVED***
+type namespacesClient struct {
 	cc *grpc.ClientConn
-***REMOVED***
+}
 
-func NewNamespacesClient(cc *grpc.ClientConn) NamespacesClient ***REMOVED***
-	return &namespacesClient***REMOVED***cc***REMOVED***
-***REMOVED***
+func NewNamespacesClient(cc *grpc.ClientConn) NamespacesClient {
+	return &namespacesClient{cc}
+}
 
-func (c *namespacesClient) Get(ctx context.Context, in *GetNamespaceRequest, opts ...grpc.CallOption) (*GetNamespaceResponse, error) ***REMOVED***
+func (c *namespacesClient) Get(ctx context.Context, in *GetNamespaceRequest, opts ...grpc.CallOption) (*GetNamespaceResponse, error) {
 	out := new(GetNamespaceResponse)
 	err := grpc.Invoke(ctx, "/containerd.services.namespaces.v1.Namespaces/Get", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *namespacesClient) List(ctx context.Context, in *ListNamespacesRequest, opts ...grpc.CallOption) (*ListNamespacesResponse, error) ***REMOVED***
+func (c *namespacesClient) List(ctx context.Context, in *ListNamespacesRequest, opts ...grpc.CallOption) (*ListNamespacesResponse, error) {
 	out := new(ListNamespacesResponse)
 	err := grpc.Invoke(ctx, "/containerd.services.namespaces.v1.Namespaces/List", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *namespacesClient) Create(ctx context.Context, in *CreateNamespaceRequest, opts ...grpc.CallOption) (*CreateNamespaceResponse, error) ***REMOVED***
+func (c *namespacesClient) Create(ctx context.Context, in *CreateNamespaceRequest, opts ...grpc.CallOption) (*CreateNamespaceResponse, error) {
 	out := new(CreateNamespaceResponse)
 	err := grpc.Invoke(ctx, "/containerd.services.namespaces.v1.Namespaces/Create", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *namespacesClient) Update(ctx context.Context, in *UpdateNamespaceRequest, opts ...grpc.CallOption) (*UpdateNamespaceResponse, error) ***REMOVED***
+func (c *namespacesClient) Update(ctx context.Context, in *UpdateNamespaceRequest, opts ...grpc.CallOption) (*UpdateNamespaceResponse, error) {
 	out := new(UpdateNamespaceResponse)
 	err := grpc.Invoke(ctx, "/containerd.services.namespaces.v1.Namespaces/Update", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *namespacesClient) Delete(ctx context.Context, in *DeleteNamespaceRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error) ***REMOVED***
+func (c *namespacesClient) Delete(ctx context.Context, in *DeleteNamespaceRequest, opts ...grpc.CallOption) (*google_protobuf1.Empty, error) {
 	out := new(google_protobuf1.Empty)
 	err := grpc.Invoke(ctx, "/containerd.services.namespaces.v1.Namespaces/Delete", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
 // Server API for Namespaces service
 
-type NamespacesServer interface ***REMOVED***
+type NamespacesServer interface {
 	Get(context.Context, *GetNamespaceRequest) (*GetNamespaceResponse, error)
 	List(context.Context, *ListNamespacesRequest) (*ListNamespacesResponse, error)
 	Create(context.Context, *CreateNamespaceRequest) (*CreateNamespaceResponse, error)
 	Update(context.Context, *UpdateNamespaceRequest) (*UpdateNamespaceResponse, error)
 	Delete(context.Context, *DeleteNamespaceRequest) (*google_protobuf1.Empty, error)
-***REMOVED***
+}
 
-func RegisterNamespacesServer(s *grpc.Server, srv NamespacesServer) ***REMOVED***
+func RegisterNamespacesServer(s *grpc.Server, srv NamespacesServer) {
 	s.RegisterService(&_Namespaces_serviceDesc, srv)
-***REMOVED***
+}
 
-func _Namespaces_Get_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _Namespaces_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetNamespaceRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(NamespacesServer).Get(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/containerd.services.namespaces.v1.Namespaces/Get",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(NamespacesServer).Get(ctx, req.(*GetNamespaceRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _Namespaces_List_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _Namespaces_List_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListNamespacesRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(NamespacesServer).List(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/containerd.services.namespaces.v1.Namespaces/List",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(NamespacesServer).List(ctx, req.(*ListNamespacesRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _Namespaces_Create_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _Namespaces_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateNamespaceRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(NamespacesServer).Create(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/containerd.services.namespaces.v1.Namespaces/Create",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(NamespacesServer).Create(ctx, req.(*CreateNamespaceRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _Namespaces_Update_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _Namespaces_Update_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateNamespaceRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(NamespacesServer).Update(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/containerd.services.namespaces.v1.Namespaces/Update",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(NamespacesServer).Update(ctx, req.(*UpdateNamespaceRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _Namespaces_Delete_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _Namespaces_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteNamespaceRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(NamespacesServer).Delete(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/containerd.services.namespaces.v1.Namespaces/Delete",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(NamespacesServer).Delete(ctx, req.(*DeleteNamespaceRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-var _Namespaces_serviceDesc = grpc.ServiceDesc***REMOVED***
+var _Namespaces_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "containerd.services.namespaces.v1.Namespaces",
 	HandlerType: (*NamespacesServer)(nil),
-	Methods: []grpc.MethodDesc***REMOVED***
-		***REMOVED***
+	Methods: []grpc.MethodDesc{
+		{
 			MethodName: "Get",
 			Handler:    _Namespaces_Get_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "List",
 			Handler:    _Namespaces_List_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "Create",
 			Handler:    _Namespaces_Create_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "Update",
 			Handler:    _Namespaces_Update_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "Delete",
 			Handler:    _Namespaces_Delete_Handler,
-		***REMOVED***,
-	***REMOVED***,
-	Streams:  []grpc.StreamDesc***REMOVED******REMOVED***,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
 	Metadata: "github.com/containerd/containerd/api/services/namespaces/v1/namespace.proto",
-***REMOVED***
+}
 
-func (m *Namespace) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *Namespace) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *Namespace) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *Namespace) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Name) > 0 ***REMOVED***
+	if len(m.Name) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintNamespace(dAtA, i, uint64(len(m.Name)))
 		i += copy(dAtA[i:], m.Name)
-	***REMOVED***
-	if len(m.Labels) > 0 ***REMOVED***
-		for k, _ := range m.Labels ***REMOVED***
+	}
+	if len(m.Labels) > 0 {
+		for k, _ := range m.Labels {
 			dAtA[i] = 0x12
 			i++
 			v := m.Labels[k]
@@ -406,46 +406,46 @@ func (m *Namespace) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
 			i++
 			i = encodeVarintNamespace(dAtA, i, uint64(len(v)))
 			i += copy(dAtA[i:], v)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *GetNamespaceRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *GetNamespaceRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *GetNamespaceRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *GetNamespaceRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Name) > 0 ***REMOVED***
+	if len(m.Name) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintNamespace(dAtA, i, uint64(len(m.Name)))
 		i += copy(dAtA[i:], m.Name)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *GetNamespaceResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *GetNamespaceResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *GetNamespaceResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *GetNamespaceResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -454,78 +454,78 @@ func (m *GetNamespaceResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
 	i++
 	i = encodeVarintNamespace(dAtA, i, uint64(m.Namespace.Size()))
 	n1, err := m.Namespace.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n1
 	return i, nil
-***REMOVED***
+}
 
-func (m *ListNamespacesRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *ListNamespacesRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *ListNamespacesRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *ListNamespacesRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Filter) > 0 ***REMOVED***
+	if len(m.Filter) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintNamespace(dAtA, i, uint64(len(m.Filter)))
 		i += copy(dAtA[i:], m.Filter)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *ListNamespacesResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *ListNamespacesResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *ListNamespacesResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *ListNamespacesResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Namespaces) > 0 ***REMOVED***
-		for _, msg := range m.Namespaces ***REMOVED***
+	if len(m.Namespaces) > 0 {
+		for _, msg := range m.Namespaces {
 			dAtA[i] = 0xa
 			i++
 			i = encodeVarintNamespace(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			i += n
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *CreateNamespaceRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *CreateNamespaceRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *CreateNamespaceRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *CreateNamespaceRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -534,24 +534,24 @@ func (m *CreateNamespaceRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED*
 	i++
 	i = encodeVarintNamespace(dAtA, i, uint64(m.Namespace.Size()))
 	n2, err := m.Namespace.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n2
 	return i, nil
-***REMOVED***
+}
 
-func (m *CreateNamespaceResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *CreateNamespaceResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *CreateNamespaceResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *CreateNamespaceResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -560,24 +560,24 @@ func (m *CreateNamespaceResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED
 	i++
 	i = encodeVarintNamespace(dAtA, i, uint64(m.Namespace.Size()))
 	n3, err := m.Namespace.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n3
 	return i, nil
-***REMOVED***
+}
 
-func (m *UpdateNamespaceRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *UpdateNamespaceRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *UpdateNamespaceRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *UpdateNamespaceRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -586,34 +586,34 @@ func (m *UpdateNamespaceRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED*
 	i++
 	i = encodeVarintNamespace(dAtA, i, uint64(m.Namespace.Size()))
 	n4, err := m.Namespace.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n4
-	if m.UpdateMask != nil ***REMOVED***
+	if m.UpdateMask != nil {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintNamespace(dAtA, i, uint64(m.UpdateMask.Size()))
 		n5, err := m.UpdateMask.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n5
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *UpdateNamespaceResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *UpdateNamespaceResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *UpdateNamespaceResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *UpdateNamespaceResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -622,1318 +622,1318 @@ func (m *UpdateNamespaceResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED
 	i++
 	i = encodeVarintNamespace(dAtA, i, uint64(m.Namespace.Size()))
 	n6, err := m.Namespace.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n6
 	return i, nil
-***REMOVED***
+}
 
-func (m *DeleteNamespaceRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *DeleteNamespaceRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *DeleteNamespaceRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *DeleteNamespaceRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Name) > 0 ***REMOVED***
+	if len(m.Name) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintNamespace(dAtA, i, uint64(len(m.Name)))
 		i += copy(dAtA[i:], m.Name)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func encodeVarintNamespace(dAtA []byte, offset int, v uint64) int ***REMOVED***
-	for v >= 1<<7 ***REMOVED***
+func encodeVarintNamespace(dAtA []byte, offset int, v uint64) int {
+	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
-	***REMOVED***
+	}
 	dAtA[offset] = uint8(v)
 	return offset + 1
-***REMOVED***
-func (m *Namespace) Size() (n int) ***REMOVED***
+}
+func (m *Namespace) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.Name)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovNamespace(uint64(l))
-	***REMOVED***
-	if len(m.Labels) > 0 ***REMOVED***
-		for k, v := range m.Labels ***REMOVED***
+	}
+	if len(m.Labels) > 0 {
+		for k, v := range m.Labels {
 			_ = k
 			_ = v
 			mapEntrySize := 1 + len(k) + sovNamespace(uint64(len(k))) + 1 + len(v) + sovNamespace(uint64(len(v)))
 			n += mapEntrySize + 1 + sovNamespace(uint64(mapEntrySize))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
+}
 
-func (m *GetNamespaceRequest) Size() (n int) ***REMOVED***
+func (m *GetNamespaceRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.Name)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovNamespace(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *GetNamespaceResponse) Size() (n int) ***REMOVED***
+func (m *GetNamespaceResponse) Size() (n int) {
 	var l int
 	_ = l
 	l = m.Namespace.Size()
 	n += 1 + l + sovNamespace(uint64(l))
 	return n
-***REMOVED***
+}
 
-func (m *ListNamespacesRequest) Size() (n int) ***REMOVED***
+func (m *ListNamespacesRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.Filter)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovNamespace(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *ListNamespacesResponse) Size() (n int) ***REMOVED***
+func (m *ListNamespacesResponse) Size() (n int) {
 	var l int
 	_ = l
-	if len(m.Namespaces) > 0 ***REMOVED***
-		for _, e := range m.Namespaces ***REMOVED***
+	if len(m.Namespaces) > 0 {
+		for _, e := range m.Namespaces {
 			l = e.Size()
 			n += 1 + l + sovNamespace(uint64(l))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
+}
 
-func (m *CreateNamespaceRequest) Size() (n int) ***REMOVED***
+func (m *CreateNamespaceRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = m.Namespace.Size()
 	n += 1 + l + sovNamespace(uint64(l))
 	return n
-***REMOVED***
+}
 
-func (m *CreateNamespaceResponse) Size() (n int) ***REMOVED***
+func (m *CreateNamespaceResponse) Size() (n int) {
 	var l int
 	_ = l
 	l = m.Namespace.Size()
 	n += 1 + l + sovNamespace(uint64(l))
 	return n
-***REMOVED***
+}
 
-func (m *UpdateNamespaceRequest) Size() (n int) ***REMOVED***
+func (m *UpdateNamespaceRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = m.Namespace.Size()
 	n += 1 + l + sovNamespace(uint64(l))
-	if m.UpdateMask != nil ***REMOVED***
+	if m.UpdateMask != nil {
 		l = m.UpdateMask.Size()
 		n += 1 + l + sovNamespace(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *UpdateNamespaceResponse) Size() (n int) ***REMOVED***
+func (m *UpdateNamespaceResponse) Size() (n int) {
 	var l int
 	_ = l
 	l = m.Namespace.Size()
 	n += 1 + l + sovNamespace(uint64(l))
 	return n
-***REMOVED***
+}
 
-func (m *DeleteNamespaceRequest) Size() (n int) ***REMOVED***
+func (m *DeleteNamespaceRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.Name)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovNamespace(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func sovNamespace(x uint64) (n int) ***REMOVED***
-	for ***REMOVED***
+func sovNamespace(x uint64) (n int) {
+	for {
 		n++
 		x >>= 7
-		if x == 0 ***REMOVED***
+		if x == 0 {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
-func sozNamespace(x uint64) (n int) ***REMOVED***
+}
+func sozNamespace(x uint64) (n int) {
 	return sovNamespace(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-***REMOVED***
-func (this *Namespace) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Namespace) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	keysForLabels := make([]string, 0, len(this.Labels))
-	for k, _ := range this.Labels ***REMOVED***
+	for k, _ := range this.Labels {
 		keysForLabels = append(keysForLabels, k)
-	***REMOVED***
+	}
 	github_com_gogo_protobuf_sortkeys.Strings(keysForLabels)
-	mapStringForLabels := "map[string]string***REMOVED***"
-	for _, k := range keysForLabels ***REMOVED***
+	mapStringForLabels := "map[string]string{"
+	for _, k := range keysForLabels {
 		mapStringForLabels += fmt.Sprintf("%v: %v,", k, this.Labels[k])
-	***REMOVED***
-	mapStringForLabels += "***REMOVED***"
-	s := strings.Join([]string***REMOVED***`&Namespace***REMOVED***`,
+	}
+	mapStringForLabels += "}"
+	s := strings.Join([]string{`&Namespace{`,
 		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
 		`Labels:` + mapStringForLabels + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *GetNamespaceRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *GetNamespaceRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&GetNamespaceRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&GetNamespaceRequest{`,
 		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *GetNamespaceResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *GetNamespaceResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&GetNamespaceResponse***REMOVED***`,
+	}
+	s := strings.Join([]string{`&GetNamespaceResponse{`,
 		`Namespace:` + strings.Replace(strings.Replace(this.Namespace.String(), "Namespace", "Namespace", 1), `&`, ``, 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *ListNamespacesRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *ListNamespacesRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&ListNamespacesRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&ListNamespacesRequest{`,
 		`Filter:` + fmt.Sprintf("%v", this.Filter) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *ListNamespacesResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *ListNamespacesResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&ListNamespacesResponse***REMOVED***`,
+	}
+	s := strings.Join([]string{`&ListNamespacesResponse{`,
 		`Namespaces:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Namespaces), "Namespace", "Namespace", 1), `&`, ``, 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *CreateNamespaceRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *CreateNamespaceRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&CreateNamespaceRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&CreateNamespaceRequest{`,
 		`Namespace:` + strings.Replace(strings.Replace(this.Namespace.String(), "Namespace", "Namespace", 1), `&`, ``, 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *CreateNamespaceResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *CreateNamespaceResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&CreateNamespaceResponse***REMOVED***`,
+	}
+	s := strings.Join([]string{`&CreateNamespaceResponse{`,
 		`Namespace:` + strings.Replace(strings.Replace(this.Namespace.String(), "Namespace", "Namespace", 1), `&`, ``, 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *UpdateNamespaceRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *UpdateNamespaceRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&UpdateNamespaceRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&UpdateNamespaceRequest{`,
 		`Namespace:` + strings.Replace(strings.Replace(this.Namespace.String(), "Namespace", "Namespace", 1), `&`, ``, 1) + `,`,
 		`UpdateMask:` + strings.Replace(fmt.Sprintf("%v", this.UpdateMask), "FieldMask", "google_protobuf2.FieldMask", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *UpdateNamespaceResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *UpdateNamespaceResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&UpdateNamespaceResponse***REMOVED***`,
+	}
+	s := strings.Join([]string{`&UpdateNamespaceResponse{`,
 		`Namespace:` + strings.Replace(strings.Replace(this.Namespace.String(), "Namespace", "Namespace", 1), `&`, ``, 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *DeleteNamespaceRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *DeleteNamespaceRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&DeleteNamespaceRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&DeleteNamespaceRequest{`,
 		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func valueToStringNamespace(v interface***REMOVED******REMOVED***) string ***REMOVED***
+}
+func valueToStringNamespace(v interface{}) string {
 	rv := reflect.ValueOf(v)
-	if rv.IsNil() ***REMOVED***
+	if rv.IsNil() {
 		return "nil"
-	***REMOVED***
+	}
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
-***REMOVED***
-func (m *Namespace) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *Namespace) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowNamespace
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: Namespace: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: Namespace: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNamespace
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthNamespace
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Name = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Labels", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNamespace
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthNamespace
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Labels == nil ***REMOVED***
+			}
+			if m.Labels == nil {
 				m.Labels = make(map[string]string)
-			***REMOVED***
+			}
 			var mapkey string
 			var mapvalue string
-			for iNdEx < postIndex ***REMOVED***
+			for iNdEx < postIndex {
 				entryPreIndex := iNdEx
 				var wire uint64
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return ErrIntOverflowNamespace
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					wire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				fieldNum := int32(wire >> 3)
-				if fieldNum == 1 ***REMOVED***
+				if fieldNum == 1 {
 					var stringLenmapkey uint64
-					for shift := uint(0); ; shift += 7 ***REMOVED***
-						if shift >= 64 ***REMOVED***
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
 							return ErrIntOverflowNamespace
-						***REMOVED***
-						if iNdEx >= l ***REMOVED***
+						}
+						if iNdEx >= l {
 							return io.ErrUnexpectedEOF
-						***REMOVED***
+						}
 						b := dAtA[iNdEx]
 						iNdEx++
 						stringLenmapkey |= (uint64(b) & 0x7F) << shift
-						if b < 0x80 ***REMOVED***
+						if b < 0x80 {
 							break
-						***REMOVED***
-					***REMOVED***
+						}
+					}
 					intStringLenmapkey := int(stringLenmapkey)
-					if intStringLenmapkey < 0 ***REMOVED***
+					if intStringLenmapkey < 0 {
 						return ErrInvalidLengthNamespace
-					***REMOVED***
+					}
 					postStringIndexmapkey := iNdEx + intStringLenmapkey
-					if postStringIndexmapkey > l ***REMOVED***
+					if postStringIndexmapkey > l {
 						return io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
 					iNdEx = postStringIndexmapkey
-				***REMOVED*** else if fieldNum == 2 ***REMOVED***
+				} else if fieldNum == 2 {
 					var stringLenmapvalue uint64
-					for shift := uint(0); ; shift += 7 ***REMOVED***
-						if shift >= 64 ***REMOVED***
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
 							return ErrIntOverflowNamespace
-						***REMOVED***
-						if iNdEx >= l ***REMOVED***
+						}
+						if iNdEx >= l {
 							return io.ErrUnexpectedEOF
-						***REMOVED***
+						}
 						b := dAtA[iNdEx]
 						iNdEx++
 						stringLenmapvalue |= (uint64(b) & 0x7F) << shift
-						if b < 0x80 ***REMOVED***
+						if b < 0x80 {
 							break
-						***REMOVED***
-					***REMOVED***
+						}
+					}
 					intStringLenmapvalue := int(stringLenmapvalue)
-					if intStringLenmapvalue < 0 ***REMOVED***
+					if intStringLenmapvalue < 0 {
 						return ErrInvalidLengthNamespace
-					***REMOVED***
+					}
 					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
-					if postStringIndexmapvalue > l ***REMOVED***
+					if postStringIndexmapvalue > l {
 						return io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					mapvalue = string(dAtA[iNdEx:postStringIndexmapvalue])
 					iNdEx = postStringIndexmapvalue
-				***REMOVED*** else ***REMOVED***
+				} else {
 					iNdEx = entryPreIndex
 					skippy, err := skipNamespace(dAtA[iNdEx:])
-					if err != nil ***REMOVED***
+					if err != nil {
 						return err
-					***REMOVED***
-					if skippy < 0 ***REMOVED***
+					}
+					if skippy < 0 {
 						return ErrInvalidLengthNamespace
-					***REMOVED***
-					if (iNdEx + skippy) > postIndex ***REMOVED***
+					}
+					if (iNdEx + skippy) > postIndex {
 						return io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					iNdEx += skippy
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			m.Labels[mapkey] = mapvalue
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipNamespace(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthNamespace
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *GetNamespaceRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *GetNamespaceRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowNamespace
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: GetNamespaceRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: GetNamespaceRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNamespace
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthNamespace
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Name = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipNamespace(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthNamespace
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *GetNamespaceResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *GetNamespaceResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowNamespace
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: GetNamespaceResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: GetNamespaceResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Namespace", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNamespace
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthNamespace
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Namespace.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Namespace.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipNamespace(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthNamespace
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *ListNamespacesRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *ListNamespacesRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowNamespace
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: ListNamespacesRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: ListNamespacesRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Filter", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNamespace
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthNamespace
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Filter = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipNamespace(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthNamespace
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *ListNamespacesResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *ListNamespacesResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowNamespace
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: ListNamespacesResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: ListNamespacesResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Namespaces", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNamespace
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthNamespace
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.Namespaces = append(m.Namespaces, Namespace***REMOVED******REMOVED***)
-			if err := m.Namespaces[len(m.Namespaces)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			m.Namespaces = append(m.Namespaces, Namespace{})
+			if err := m.Namespaces[len(m.Namespaces)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipNamespace(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthNamespace
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *CreateNamespaceRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *CreateNamespaceRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowNamespace
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: CreateNamespaceRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: CreateNamespaceRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Namespace", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNamespace
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthNamespace
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Namespace.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Namespace.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipNamespace(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthNamespace
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *CreateNamespaceResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *CreateNamespaceResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowNamespace
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: CreateNamespaceResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: CreateNamespaceResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Namespace", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNamespace
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthNamespace
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Namespace.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Namespace.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipNamespace(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthNamespace
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *UpdateNamespaceRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *UpdateNamespaceRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowNamespace
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: UpdateNamespaceRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: UpdateNamespaceRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Namespace", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNamespace
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthNamespace
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Namespace.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Namespace.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field UpdateMask", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNamespace
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthNamespace
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.UpdateMask == nil ***REMOVED***
-				m.UpdateMask = &google_protobuf2.FieldMask***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.UpdateMask.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.UpdateMask == nil {
+				m.UpdateMask = &google_protobuf2.FieldMask{}
+			}
+			if err := m.UpdateMask.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipNamespace(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthNamespace
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *UpdateNamespaceResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *UpdateNamespaceResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowNamespace
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: UpdateNamespaceResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: UpdateNamespaceResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Namespace", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNamespace
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthNamespace
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Namespace.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Namespace.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipNamespace(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthNamespace
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *DeleteNamespaceRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *DeleteNamespaceRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowNamespace
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: DeleteNamespaceRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: DeleteNamespaceRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNamespace
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthNamespace
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Name = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipNamespace(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthNamespace
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func skipNamespace(dAtA []byte) (n int, err error) ***REMOVED***
+}
+func skipNamespace(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return 0, ErrIntOverflowNamespace
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return 0, io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		wireType := int(wire & 0x7)
-		switch wireType ***REMOVED***
+		switch wireType {
 		case 0:
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowNamespace
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				iNdEx++
-				if dAtA[iNdEx-1] < 0x80 ***REMOVED***
+				if dAtA[iNdEx-1] < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return iNdEx, nil
 		case 1:
 			iNdEx += 8
 			return iNdEx, nil
 		case 2:
 			var length int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowNamespace
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				length |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			iNdEx += length
-			if length < 0 ***REMOVED***
+			if length < 0 {
 				return 0, ErrInvalidLengthNamespace
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 3:
-			for ***REMOVED***
+			for {
 				var innerWire uint64
 				var start int = iNdEx
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return 0, ErrIntOverflowNamespace
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return 0, io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					innerWire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				innerWireType := int(innerWire & 0x7)
-				if innerWireType == 4 ***REMOVED***
+				if innerWireType == 4 {
 					break
-				***REMOVED***
+				}
 				next, err := skipNamespace(dAtA[start:])
-				if err != nil ***REMOVED***
+				if err != nil {
 					return 0, err
-				***REMOVED***
+				}
 				iNdEx = start + next
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 4:
 			return iNdEx, nil
@@ -1942,21 +1942,21 @@ func skipNamespace(dAtA []byte) (n int, err error) ***REMOVED***
 			return iNdEx, nil
 		default:
 			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	panic("unreachable")
-***REMOVED***
+}
 
 var (
 	ErrInvalidLengthNamespace = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowNamespace   = fmt.Errorf("proto: integer overflow")
 )
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterFile("github.com/containerd/containerd/api/services/namespaces/v1/namespace.proto", fileDescriptorNamespace)
-***REMOVED***
+}
 
-var fileDescriptorNamespace = []byte***REMOVED***
+var fileDescriptorNamespace = []byte{
 	// 551 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x55, 0xcd, 0x6e, 0xd3, 0x4c,
 	0x14, 0xcd, 0x24, 0xf9, 0x2c, 0xe5, 0x7a, 0xf3, 0x69, 0x08, 0x26, 0x32, 0x92, 0x09, 0x5e, 0x15,
@@ -1993,4 +1993,4 @@ var fileDescriptorNamespace = []byte***REMOVED***
 	0x06, 0x9a, 0xcd, 0x0d, 0xf4, 0x75, 0x6e, 0xa0, 0xf3, 0xb9, 0x81, 0x5e, 0x1d, 0xff, 0xc1, 0x2f,
 	0xf4, 0xa0, 0xe8, 0x5e, 0xd6, 0xfa, 0x8a, 0xe4, 0xbc, 0xff, 0x23, 0x00, 0x00, 0xff, 0xff, 0x4f,
 	0x4a, 0x87, 0xf3, 0x95, 0x07, 0x00, 0x00,
-***REMOVED***
+}

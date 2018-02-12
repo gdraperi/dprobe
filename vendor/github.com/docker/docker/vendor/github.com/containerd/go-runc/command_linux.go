@@ -6,18 +6,18 @@ import (
 	"syscall"
 )
 
-func (r *Runc) command(context context.Context, args ...string) *exec.Cmd ***REMOVED***
+func (r *Runc) command(context context.Context, args ...string) *exec.Cmd {
 	command := r.Command
-	if command == "" ***REMOVED***
+	if command == "" {
 		command = DefaultCommand
-	***REMOVED***
+	}
 	cmd := exec.CommandContext(context, command, append(r.args(), args...)...)
-	cmd.SysProcAttr = &syscall.SysProcAttr***REMOVED***
+	cmd.SysProcAttr = &syscall.SysProcAttr{
 		Setpgid: r.Setpgid,
-	***REMOVED***
-	if r.PdeathSignal != 0 ***REMOVED***
+	}
+	if r.PdeathSignal != 0 {
 		cmd.SysProcAttr.Pdeathsig = r.PdeathSignal
-	***REMOVED***
+	}
 
 	return cmd
-***REMOVED***
+}

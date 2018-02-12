@@ -54,7 +54,7 @@ var (
 	ErrInvalidUnlockKey = errors.New("node is locked, and needs a valid unlock key")
 )
 
-func init() ***REMOVED***
+func init() {
 	ns := metrics.NewNamespace("swarm", "node", nil)
 	nodeInfo = ns.NewLabeledGauge("info", "Information related to the swarm", "",
 		"swarm_id",
@@ -62,10 +62,10 @@ func init() ***REMOVED***
 	)
 	nodeManager = ns.NewGauge("manager", "Whether this node is a manager or not", "")
 	metrics.Register(ns)
-***REMOVED***
+}
 
 // Config provides values for a Node.
-type Config struct ***REMOVED***
+type Config struct {
 	// Hostname is the name of host for agent instance.
 	Hostname string
 
@@ -123,11 +123,11 @@ type Config struct ***REMOVED***
 
 	// PluginGetter provides access to docker's plugin inventory.
 	PluginGetter plugingetter.PluginGetter
-***REMOVED***
+}
 
 // Node implements the primary node functionality for a member of a swarm
 // cluster. Node handles workloads and may also run as a manager.
-type Node struct ***REMOVED***
+type Node struct {
 	sync.RWMutex
 	config           *Config
 	remotes          *persistentRemotes
@@ -137,148 +137,148 @@ type Node struct ***REMOVED***
 	conn             *grpc.ClientConn
 	connCond         *sync.Cond
 	nodeID           string
-	started          chan struct***REMOVED******REMOVED***
+	started          chan struct{}
 	startOnce        sync.Once
-	stopped          chan struct***REMOVED******REMOVED***
+	stopped          chan struct{}
 	stopOnce         sync.Once
-	ready            chan struct***REMOVED******REMOVED*** // closed when agent has completed registration and manager(if enabled) is ready to receive control requests
-	closed           chan struct***REMOVED******REMOVED***
+	ready            chan struct{} // closed when agent has completed registration and manager(if enabled) is ready to receive control requests
+	closed           chan struct{}
 	err              error
 	agent            *agent.Agent
 	manager          *manager.Manager
 	notifyNodeChange chan *agent.NodeChanges // used by the agent to relay node updates from the dispatcher Session stream to (*Node).run
 	unlockKey        []byte
-***REMOVED***
+}
 
-type lastSeenRole struct ***REMOVED***
+type lastSeenRole struct {
 	role api.NodeRole
-***REMOVED***
+}
 
 // observe notes the latest value of this node role, and returns true if it
 // is the first seen value, or is different from the most recently seen value.
-func (l *lastSeenRole) observe(newRole api.NodeRole) bool ***REMOVED***
+func (l *lastSeenRole) observe(newRole api.NodeRole) bool {
 	changed := l.role != newRole
 	l.role = newRole
 	return changed
-***REMOVED***
+}
 
 // RemoteAPIAddr returns address on which remote manager api listens.
 // Returns nil if node is not manager.
-func (n *Node) RemoteAPIAddr() (string, error) ***REMOVED***
+func (n *Node) RemoteAPIAddr() (string, error) {
 	n.RLock()
 	defer n.RUnlock()
-	if n.manager == nil ***REMOVED***
+	if n.manager == nil {
 		return "", errors.New("manager is not running")
-	***REMOVED***
+	}
 	addr := n.manager.Addr()
-	if addr == "" ***REMOVED***
+	if addr == "" {
 		return "", errors.New("manager addr is not set")
-	***REMOVED***
+	}
 	return addr, nil
-***REMOVED***
+}
 
 // New returns new Node instance.
-func New(c *Config) (*Node, error) ***REMOVED***
-	if err := os.MkdirAll(c.StateDir, 0700); err != nil ***REMOVED***
+func New(c *Config) (*Node, error) {
+	if err := os.MkdirAll(c.StateDir, 0700); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	stateFile := filepath.Join(c.StateDir, stateFilename)
 	dt, err := ioutil.ReadFile(stateFile)
 	var p []api.Peer
-	if err != nil && !os.IsNotExist(err) ***REMOVED***
+	if err != nil && !os.IsNotExist(err) {
 		return nil, err
-	***REMOVED***
-	if err == nil ***REMOVED***
-		if err := json.Unmarshal(dt, &p); err != nil ***REMOVED***
+	}
+	if err == nil {
+		if err := json.Unmarshal(dt, &p); err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
-	n := &Node***REMOVED***
+		}
+	}
+	n := &Node{
 		remotes:          newPersistentRemotes(stateFile, p...),
 		role:             ca.WorkerRole,
 		config:           c,
-		started:          make(chan struct***REMOVED******REMOVED***),
-		stopped:          make(chan struct***REMOVED******REMOVED***),
-		closed:           make(chan struct***REMOVED******REMOVED***),
-		ready:            make(chan struct***REMOVED******REMOVED***),
+		started:          make(chan struct{}),
+		stopped:          make(chan struct{}),
+		closed:           make(chan struct{}),
+		ready:            make(chan struct{}),
 		notifyNodeChange: make(chan *agent.NodeChanges, 1),
 		unlockKey:        c.UnlockKey,
-	***REMOVED***
+	}
 
-	if n.config.JoinAddr != "" || n.config.ForceNewCluster ***REMOVED***
+	if n.config.JoinAddr != "" || n.config.ForceNewCluster {
 		n.remotes = newPersistentRemotes(filepath.Join(n.config.StateDir, stateFilename))
-		if n.config.JoinAddr != "" ***REMOVED***
-			n.remotes.Observe(api.Peer***REMOVED***Addr: n.config.JoinAddr***REMOVED***, remotes.DefaultObservationWeight)
-		***REMOVED***
-	***REMOVED***
+		if n.config.JoinAddr != "" {
+			n.remotes.Observe(api.Peer{Addr: n.config.JoinAddr}, remotes.DefaultObservationWeight)
+		}
+	}
 
 	n.connBroker = connectionbroker.New(n.remotes)
 
 	n.roleCond = sync.NewCond(n.RLocker())
 	n.connCond = sync.NewCond(n.RLocker())
 	return n, nil
-***REMOVED***
+}
 
 // BindRemote starts a listener that exposes the remote API.
-func (n *Node) BindRemote(ctx context.Context, listenAddr string, advertiseAddr string) error ***REMOVED***
+func (n *Node) BindRemote(ctx context.Context, listenAddr string, advertiseAddr string) error {
 	n.RLock()
 	defer n.RUnlock()
 
-	if n.manager == nil ***REMOVED***
+	if n.manager == nil {
 		return errors.New("manager is not running")
-	***REMOVED***
+	}
 
-	return n.manager.BindRemote(ctx, manager.RemoteAddrs***REMOVED***
+	return n.manager.BindRemote(ctx, manager.RemoteAddrs{
 		ListenAddr:    listenAddr,
 		AdvertiseAddr: advertiseAddr,
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
 // Start starts a node instance.
-func (n *Node) Start(ctx context.Context) error ***REMOVED***
+func (n *Node) Start(ctx context.Context) error {
 	err := errNodeStarted
 
-	n.startOnce.Do(func() ***REMOVED***
+	n.startOnce.Do(func() {
 		close(n.started)
 		go n.run(ctx)
 		err = nil // clear error above, only once.
-	***REMOVED***)
+	})
 
 	return err
-***REMOVED***
+}
 
-func (n *Node) currentRole() api.NodeRole ***REMOVED***
+func (n *Node) currentRole() api.NodeRole {
 	n.Lock()
 	currentRole := api.NodeRoleWorker
-	if n.role == ca.ManagerRole ***REMOVED***
+	if n.role == ca.ManagerRole {
 		currentRole = api.NodeRoleManager
-	***REMOVED***
+	}
 	n.Unlock()
 	return currentRole
-***REMOVED***
+}
 
-func (n *Node) run(ctx context.Context) (err error) ***REMOVED***
-	defer func() ***REMOVED***
+func (n *Node) run(ctx context.Context) (err error) {
+	defer func() {
 		n.err = err
 		close(n.closed)
-	***REMOVED***()
+	}()
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	ctx = log.WithModule(ctx, "node")
 
-	go func(ctx context.Context) ***REMOVED***
-		select ***REMOVED***
+	go func(ctx context.Context) {
+		select {
 		case <-ctx.Done():
 		case <-n.stopped:
 			cancel()
-		***REMOVED***
-	***REMOVED***(ctx)
+		}
+	}(ctx)
 
 	paths := ca.NewConfigPaths(filepath.Join(n.config.StateDir, certDirectory))
 	securityConfig, secConfigCancel, err := n.loadSecurityConfig(ctx, paths)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer secConfigCancel()
 
 	renewer := ca.NewTLSRenewer(securityConfig, n.connBroker, paths.RootCA)
@@ -286,29 +286,29 @@ func (n *Node) run(ctx context.Context) (err error) ***REMOVED***
 	ctx = log.WithLogger(ctx, log.G(ctx).WithField("node.id", n.NodeID()))
 
 	taskDBPath := filepath.Join(n.config.StateDir, "worker", "tasks.db")
-	if err := os.MkdirAll(filepath.Dir(taskDBPath), 0777); err != nil ***REMOVED***
+	if err := os.MkdirAll(filepath.Dir(taskDBPath), 0777); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	db, err := bolt.Open(taskDBPath, 0666, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer db.Close()
 
-	agentDone := make(chan struct***REMOVED******REMOVED***)
+	agentDone := make(chan struct{})
 
-	go func() ***REMOVED***
+	go func() {
 		// lastNodeDesiredRole is the last-seen value of Node.Spec.DesiredRole,
 		// used to make role changes "edge triggered" and avoid renewal loops.
-		lastNodeDesiredRole := lastSeenRole***REMOVED***role: n.currentRole()***REMOVED***
+		lastNodeDesiredRole := lastSeenRole{role: n.currentRole()}
 
-		for ***REMOVED***
-			select ***REMOVED***
+		for {
+			select {
 			case <-agentDone:
 				return
 			case nodeChanges := <-n.notifyNodeChange:
-				if nodeChanges.Node != nil ***REMOVED***
+				if nodeChanges.Node != nil {
 					// This is a bit complex to be backward compatible with older CAs that
 					// don't support the Node.Role field. They only use what's presently
 					// called DesiredRole.
@@ -319,40 +319,40 @@ func (n *Node) run(ctx context.Context) (err error) ***REMOVED***
 					// 2) If the server is sending us IssuanceStateRotate, renew the cert as
 					//    requested by the CA.
 					desiredRoleChanged := lastNodeDesiredRole.observe(nodeChanges.Node.Spec.DesiredRole)
-					if desiredRoleChanged ***REMOVED***
-						switch nodeChanges.Node.Spec.DesiredRole ***REMOVED***
+					if desiredRoleChanged {
+						switch nodeChanges.Node.Spec.DesiredRole {
 						case api.NodeRoleManager:
 							renewer.SetExpectedRole(ca.ManagerRole)
 						case api.NodeRoleWorker:
 							renewer.SetExpectedRole(ca.WorkerRole)
-						***REMOVED***
-					***REMOVED***
-					if desiredRoleChanged || nodeChanges.Node.Certificate.Status.State == api.IssuanceStateRotate ***REMOVED***
+						}
+					}
+					if desiredRoleChanged || nodeChanges.Node.Certificate.Status.State == api.IssuanceStateRotate {
 						renewer.Renew()
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 
-				if nodeChanges.RootCert != nil ***REMOVED***
-					if bytes.Equal(nodeChanges.RootCert, securityConfig.RootCA().Certs) ***REMOVED***
+				if nodeChanges.RootCert != nil {
+					if bytes.Equal(nodeChanges.RootCert, securityConfig.RootCA().Certs) {
 						continue
-					***REMOVED***
+					}
 					newRootCA, err := ca.NewRootCA(nodeChanges.RootCert, nil, nil, ca.DefaultNodeCertExpiration, nil)
-					if err != nil ***REMOVED***
+					if err != nil {
 						log.G(ctx).WithError(err).Error("invalid new root certificate from the dispatcher")
 						continue
-					***REMOVED***
-					if err := securityConfig.UpdateRootCA(&newRootCA); err != nil ***REMOVED***
+					}
+					if err := securityConfig.UpdateRootCA(&newRootCA); err != nil {
 						log.G(ctx).WithError(err).Error("could not use new root CA from dispatcher")
 						continue
-					***REMOVED***
-					if err := ca.SaveRootCA(newRootCA, paths.RootCA); err != nil ***REMOVED***
+					}
+					if err := ca.SaveRootCA(newRootCA, paths.RootCA); err != nil {
 						log.G(ctx).WithError(err).Error("could not save new root certificate from the dispatcher")
 						continue
-					***REMOVED***
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***()
+					}
+				}
+			}
+		}
+	}()
 
 	var wg sync.WaitGroup
 	wg.Add(3)
@@ -362,147 +362,147 @@ func (n *Node) run(ctx context.Context) (err error) ***REMOVED***
 		securityConfig.ClientTLSCreds.NodeID(),
 	).Set(1)
 
-	if n.currentRole() == api.NodeRoleManager ***REMOVED***
+	if n.currentRole() == api.NodeRoleManager {
 		nodeManager.Set(1)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		nodeManager.Set(0)
-	***REMOVED***
+	}
 
 	updates := renewer.Start(ctx)
-	go func() ***REMOVED***
-		for certUpdate := range updates ***REMOVED***
-			if certUpdate.Err != nil ***REMOVED***
+	go func() {
+		for certUpdate := range updates {
+			if certUpdate.Err != nil {
 				logrus.Warnf("error renewing TLS certificate: %v", certUpdate.Err)
 				continue
-			***REMOVED***
+			}
 			n.Lock()
 			n.role = certUpdate.Role
 			n.roleCond.Broadcast()
 			n.Unlock()
 
 			// Export the new role.
-			if n.currentRole() == api.NodeRoleManager ***REMOVED***
+			if n.currentRole() == api.NodeRoleManager {
 				nodeManager.Set(1)
-			***REMOVED*** else ***REMOVED***
+			} else {
 				nodeManager.Set(0)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		wg.Done()
-	***REMOVED***()
+	}()
 
 	role := n.role
 
-	managerReady := make(chan struct***REMOVED******REMOVED***)
-	agentReady := make(chan struct***REMOVED******REMOVED***)
+	managerReady := make(chan struct{})
+	agentReady := make(chan struct{})
 	var managerErr error
 	var agentErr error
-	go func() ***REMOVED***
+	go func() {
 		managerErr = n.superviseManager(ctx, securityConfig, paths.RootCA, managerReady, renewer) // store err and loop
 		wg.Done()
 		cancel()
-	***REMOVED***()
-	go func() ***REMOVED***
+	}()
+	go func() {
 		agentErr = n.runAgent(ctx, db, securityConfig, agentReady)
 		wg.Done()
 		cancel()
 		close(agentDone)
-	***REMOVED***()
+	}()
 
-	go func() ***REMOVED***
+	go func() {
 		<-agentReady
-		if role == ca.ManagerRole ***REMOVED***
-			workerRole := make(chan struct***REMOVED******REMOVED***)
+		if role == ca.ManagerRole {
+			workerRole := make(chan struct{})
 			waitRoleCtx, waitRoleCancel := context.WithCancel(ctx)
-			go func() ***REMOVED***
-				if n.waitRole(waitRoleCtx, ca.WorkerRole) == nil ***REMOVED***
+			go func() {
+				if n.waitRole(waitRoleCtx, ca.WorkerRole) == nil {
 					close(workerRole)
-				***REMOVED***
-			***REMOVED***()
-			select ***REMOVED***
+				}
+			}()
+			select {
 			case <-managerReady:
 			case <-workerRole:
-			***REMOVED***
+			}
 			waitRoleCancel()
-		***REMOVED***
+		}
 		close(n.ready)
-	***REMOVED***()
+	}()
 
 	wg.Wait()
-	if managerErr != nil && errors.Cause(managerErr) != context.Canceled ***REMOVED***
+	if managerErr != nil && errors.Cause(managerErr) != context.Canceled {
 		return managerErr
-	***REMOVED***
-	if agentErr != nil && errors.Cause(agentErr) != context.Canceled ***REMOVED***
+	}
+	if agentErr != nil && errors.Cause(agentErr) != context.Canceled {
 		return agentErr
-	***REMOVED***
+	}
 	return err
-***REMOVED***
+}
 
 // Stop stops node execution
-func (n *Node) Stop(ctx context.Context) error ***REMOVED***
-	select ***REMOVED***
+func (n *Node) Stop(ctx context.Context) error {
+	select {
 	case <-n.started:
 	default:
 		return errNodeNotStarted
-	***REMOVED***
+	}
 	// ask agent to clean up assignments
 	n.Lock()
-	if n.agent != nil ***REMOVED***
-		if err := n.agent.Leave(ctx); err != nil ***REMOVED***
+	if n.agent != nil {
+		if err := n.agent.Leave(ctx); err != nil {
 			log.G(ctx).WithError(err).Error("agent failed to clean up assignments")
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	n.Unlock()
 
-	n.stopOnce.Do(func() ***REMOVED***
+	n.stopOnce.Do(func() {
 		close(n.stopped)
-	***REMOVED***)
+	})
 
-	select ***REMOVED***
+	select {
 	case <-n.closed:
 		return nil
 	case <-ctx.Done():
 		return ctx.Err()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Err returns the error that caused the node to shutdown or nil. Err blocks
 // until the node has fully shut down.
-func (n *Node) Err(ctx context.Context) error ***REMOVED***
-	select ***REMOVED***
+func (n *Node) Err(ctx context.Context) error {
+	select {
 	case <-n.closed:
 		return n.err
 	case <-ctx.Done():
 		return ctx.Err()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (n *Node) runAgent(ctx context.Context, db *bolt.DB, securityConfig *ca.SecurityConfig, ready chan<- struct***REMOVED******REMOVED***) error ***REMOVED***
+func (n *Node) runAgent(ctx context.Context, db *bolt.DB, securityConfig *ca.SecurityConfig, ready chan<- struct{}) error {
 	waitCtx, waitCancel := context.WithCancel(ctx)
 	remotesCh := n.remotes.WaitSelect(ctx)
 	controlCh := n.ListenControlSocket(waitCtx)
 
 waitPeer:
-	for ***REMOVED***
-		select ***REMOVED***
+	for {
+		select {
 		case <-ctx.Done():
 			break waitPeer
 		case <-remotesCh:
 			break waitPeer
 		case conn := <-controlCh:
-			if conn != nil ***REMOVED***
+			if conn != nil {
 				break waitPeer
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	waitCancel()
 
-	select ***REMOVED***
+	select {
 	case <-ctx.Done():
 		return ctx.Err()
 	default:
-	***REMOVED***
+	}
 
 	secChangesCh, secChangesCancel := securityConfig.Watch()
 	defer secChangesCancel()
@@ -510,7 +510,7 @@ waitPeer:
 	rootCA := securityConfig.RootCA()
 	issuer := securityConfig.IssuerInfo()
 
-	agentConfig := &agent.Config***REMOVED***
+	agentConfig := &agent.Config{
 		Hostname:         n.config.Hostname,
 		ConnBroker:       n.connBroker,
 		Executor:         n.config.Executor,
@@ -518,200 +518,200 @@ waitPeer:
 		NotifyNodeChange: n.notifyNodeChange,
 		NotifyTLSChange:  secChangesCh,
 		Credentials:      securityConfig.ClientTLSCreds,
-		NodeTLSInfo: &api.NodeTLSInfo***REMOVED***
+		NodeTLSInfo: &api.NodeTLSInfo{
 			TrustRoot:           rootCA.Certs,
 			CertIssuerPublicKey: issuer.PublicKey,
 			CertIssuerSubject:   issuer.Subject,
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 	// if a join address has been specified, then if the agent fails to connect due to a TLS error, fail fast - don't
 	// keep re-trying to join
-	if n.config.JoinAddr != "" ***REMOVED***
-		agentConfig.SessionTracker = &firstSessionErrorTracker***REMOVED******REMOVED***
-	***REMOVED***
+	if n.config.JoinAddr != "" {
+		agentConfig.SessionTracker = &firstSessionErrorTracker{}
+	}
 
 	a, err := agent.New(agentConfig)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	if err := a.Start(ctx); err != nil ***REMOVED***
+	}
+	if err := a.Start(ctx); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	n.Lock()
 	n.agent = a
 	n.Unlock()
 
-	defer func() ***REMOVED***
+	defer func() {
 		n.Lock()
 		n.agent = nil
 		n.Unlock()
-	***REMOVED***()
+	}()
 
-	go func() ***REMOVED***
+	go func() {
 		<-a.Ready()
 		close(ready)
-	***REMOVED***()
+	}()
 
 	// todo: manually call stop on context cancellation?
 
 	return a.Err(context.Background())
-***REMOVED***
+}
 
 // Ready returns a channel that is closed after node's initialization has
 // completes for the first time.
-func (n *Node) Ready() <-chan struct***REMOVED******REMOVED*** ***REMOVED***
+func (n *Node) Ready() <-chan struct{} {
 	return n.ready
-***REMOVED***
+}
 
-func (n *Node) setControlSocket(conn *grpc.ClientConn) ***REMOVED***
+func (n *Node) setControlSocket(conn *grpc.ClientConn) {
 	n.Lock()
-	if n.conn != nil ***REMOVED***
+	if n.conn != nil {
 		n.conn.Close()
-	***REMOVED***
+	}
 	n.conn = conn
 	n.connBroker.SetLocalConn(conn)
 	n.connCond.Broadcast()
 	n.Unlock()
-***REMOVED***
+}
 
 // ListenControlSocket listens changes of a connection for managing the
 // cluster control api
-func (n *Node) ListenControlSocket(ctx context.Context) <-chan *grpc.ClientConn ***REMOVED***
+func (n *Node) ListenControlSocket(ctx context.Context) <-chan *grpc.ClientConn {
 	c := make(chan *grpc.ClientConn, 1)
 	n.RLock()
 	conn := n.conn
 	c <- conn
-	done := make(chan struct***REMOVED******REMOVED***)
-	go func() ***REMOVED***
-		select ***REMOVED***
+	done := make(chan struct{})
+	go func() {
+		select {
 		case <-ctx.Done():
 			n.connCond.Broadcast()
 		case <-done:
-		***REMOVED***
-	***REMOVED***()
-	go func() ***REMOVED***
+		}
+	}()
+	go func() {
 		defer close(c)
 		defer close(done)
 		defer n.RUnlock()
-		for ***REMOVED***
-			select ***REMOVED***
+		for {
+			select {
 			case <-ctx.Done():
 				return
 			default:
-			***REMOVED***
-			if conn == n.conn ***REMOVED***
+			}
+			if conn == n.conn {
 				n.connCond.Wait()
 				continue
-			***REMOVED***
+			}
 			conn = n.conn
-			select ***REMOVED***
+			select {
 			case c <- conn:
 			case <-ctx.Done():
 				return
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***()
+			}
+		}
+	}()
 	return c
-***REMOVED***
+}
 
 // NodeID returns current node's ID. May be empty if not set.
-func (n *Node) NodeID() string ***REMOVED***
+func (n *Node) NodeID() string {
 	n.RLock()
 	defer n.RUnlock()
 	return n.nodeID
-***REMOVED***
+}
 
 // Manager returns manager instance started by node. May be nil.
-func (n *Node) Manager() *manager.Manager ***REMOVED***
+func (n *Node) Manager() *manager.Manager {
 	n.RLock()
 	defer n.RUnlock()
 	return n.manager
-***REMOVED***
+}
 
 // Agent returns agent instance started by node. May be nil.
-func (n *Node) Agent() *agent.Agent ***REMOVED***
+func (n *Node) Agent() *agent.Agent {
 	n.RLock()
 	defer n.RUnlock()
 	return n.agent
-***REMOVED***
+}
 
 // IsStateDirty returns true if any objects have been added to raft which make
 // the state "dirty". Currently, the existence of any object other than the
 // default cluster or the local node implies a dirty state.
-func (n *Node) IsStateDirty() (bool, error) ***REMOVED***
+func (n *Node) IsStateDirty() (bool, error) {
 	n.RLock()
 	defer n.RUnlock()
 
-	if n.manager == nil ***REMOVED***
+	if n.manager == nil {
 		return false, errors.New("node is not a manager")
-	***REMOVED***
+	}
 
 	return n.manager.IsStateDirty()
-***REMOVED***
+}
 
 // Remotes returns a list of known peers known to node.
-func (n *Node) Remotes() []api.Peer ***REMOVED***
+func (n *Node) Remotes() []api.Peer {
 	weights := n.remotes.Weights()
 	remotes := make([]api.Peer, 0, len(weights))
-	for p := range weights ***REMOVED***
+	for p := range weights {
 		remotes = append(remotes, p)
-	***REMOVED***
+	}
 	return remotes
-***REMOVED***
+}
 
-func (n *Node) loadSecurityConfig(ctx context.Context, paths *ca.SecurityConfigPaths) (*ca.SecurityConfig, func() error, error) ***REMOVED***
+func (n *Node) loadSecurityConfig(ctx context.Context, paths *ca.SecurityConfigPaths) (*ca.SecurityConfig, func() error, error) {
 	var (
 		securityConfig *ca.SecurityConfig
 		cancel         func() error
 	)
 
-	krw := ca.NewKeyReadWriter(paths.Node, n.unlockKey, &manager.RaftDEKData***REMOVED******REMOVED***)
-	if err := krw.Migrate(); err != nil ***REMOVED***
+	krw := ca.NewKeyReadWriter(paths.Node, n.unlockKey, &manager.RaftDEKData{})
+	if err := krw.Migrate(); err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 
 	// Check if we already have a valid certificates on disk.
 	rootCA, err := ca.GetLocalRootCA(paths.RootCA)
-	if err != nil && err != ca.ErrNoLocalRootCA ***REMOVED***
+	if err != nil && err != ca.ErrNoLocalRootCA {
 		return nil, nil, err
-	***REMOVED***
-	if err == nil ***REMOVED***
+	}
+	if err == nil {
 		// if forcing a new cluster, we allow the certificates to be expired - a new set will be generated
 		securityConfig, cancel, err = ca.LoadSecurityConfig(ctx, rootCA, krw, n.config.ForceNewCluster)
-		if err != nil ***REMOVED***
+		if err != nil {
 			_, isInvalidKEK := errors.Cause(err).(ca.ErrInvalidKEK)
-			if isInvalidKEK ***REMOVED***
+			if isInvalidKEK {
 				return nil, nil, ErrInvalidUnlockKey
-			***REMOVED*** else if !os.IsNotExist(err) ***REMOVED***
+			} else if !os.IsNotExist(err) {
 				return nil, nil, errors.Wrapf(err, "error while loading TLS certificate in %s", paths.Node.Cert)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
-	if securityConfig == nil ***REMOVED***
-		if n.config.JoinAddr == "" ***REMOVED***
+	if securityConfig == nil {
+		if n.config.JoinAddr == "" {
 			// if we're not joining a cluster, bootstrap a new one - and we have to set the unlock key
 			n.unlockKey = nil
-			if n.config.AutoLockManagers ***REMOVED***
+			if n.config.AutoLockManagers {
 				n.unlockKey = encryption.GenerateSecretKey()
-			***REMOVED***
-			krw = ca.NewKeyReadWriter(paths.Node, n.unlockKey, &manager.RaftDEKData***REMOVED******REMOVED***)
+			}
+			krw = ca.NewKeyReadWriter(paths.Node, n.unlockKey, &manager.RaftDEKData{})
 			rootCA, err = ca.CreateRootCA(ca.DefaultRootCN)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, nil, err
-			***REMOVED***
-			if err := ca.SaveRootCA(rootCA, paths.RootCA); err != nil ***REMOVED***
+			}
+			if err := ca.SaveRootCA(rootCA, paths.RootCA); err != nil {
 				return nil, nil, err
-			***REMOVED***
+			}
 			log.G(ctx).Debug("generated CA key and certificate")
-		***REMOVED*** else if err == ca.ErrNoLocalRootCA ***REMOVED*** // from previous error loading the root CA from disk
+		} else if err == ca.ErrNoLocalRootCA { // from previous error loading the root CA from disk
 			rootCA, err = ca.DownloadRootCA(ctx, paths.RootCA, n.config.JoinToken, n.connBroker)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, nil, err
-			***REMOVED***
+			}
 			log.G(ctx).Debug("downloaded CA certificate")
-		***REMOVED***
+		}
 
 		// Obtain new certs and setup TLS certificates renewal for this node:
 		// - If certificates weren't present on disk, we call CreateSecurityConfig, which blocks
@@ -720,27 +720,27 @@ func (n *Node) loadSecurityConfig(ctx context.Context, paths *ca.SecurityConfigP
 
 		// Attempt to load certificate from disk
 		securityConfig, cancel, err = ca.LoadSecurityConfig(ctx, rootCA, krw, n.config.ForceNewCluster)
-		if err == nil ***REMOVED***
-			log.G(ctx).WithFields(logrus.Fields***REMOVED***
+		if err == nil {
+			log.G(ctx).WithFields(logrus.Fields{
 				"node.id": securityConfig.ClientTLSCreds.NodeID(),
-			***REMOVED***).Debugf("loaded TLS certificate")
-		***REMOVED*** else ***REMOVED***
-			if _, ok := errors.Cause(err).(ca.ErrInvalidKEK); ok ***REMOVED***
+			}).Debugf("loaded TLS certificate")
+		} else {
+			if _, ok := errors.Cause(err).(ca.ErrInvalidKEK); ok {
 				return nil, nil, ErrInvalidUnlockKey
-			***REMOVED***
+			}
 			log.G(ctx).WithError(err).Debugf("no node credentials found in: %s", krw.Target())
 
-			securityConfig, cancel, err = rootCA.CreateSecurityConfig(ctx, krw, ca.CertificateRequestConfig***REMOVED***
+			securityConfig, cancel, err = rootCA.CreateSecurityConfig(ctx, krw, ca.CertificateRequestConfig{
 				Token:        n.config.JoinToken,
 				Availability: n.config.Availability,
 				ConnBroker:   n.connBroker,
-			***REMOVED***)
+			})
 
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, nil, err
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	n.Lock()
 	n.role = securityConfig.ClientTLSCreds.Role()
@@ -749,89 +749,89 @@ func (n *Node) loadSecurityConfig(ctx context.Context, paths *ca.SecurityConfigP
 	n.Unlock()
 
 	return securityConfig, cancel, nil
-***REMOVED***
+}
 
-func (n *Node) initManagerConnection(ctx context.Context, ready chan<- struct***REMOVED******REMOVED***) error ***REMOVED***
-	opts := []grpc.DialOption***REMOVED***
+func (n *Node) initManagerConnection(ctx context.Context, ready chan<- struct{}) error {
+	opts := []grpc.DialOption{
 		grpc.WithUnaryInterceptor(grpc_prometheus.UnaryClientInterceptor),
 		grpc.WithStreamInterceptor(grpc_prometheus.StreamClientInterceptor),
-	***REMOVED***
-	insecureCreds := credentials.NewTLS(&tls.Config***REMOVED***InsecureSkipVerify: true***REMOVED***)
+	}
+	insecureCreds := credentials.NewTLS(&tls.Config{InsecureSkipVerify: true})
 	opts = append(opts, grpc.WithTransportCredentials(insecureCreds))
 	addr := n.config.ListenControlAPI
 	opts = append(opts, grpc.WithDialer(
-		func(addr string, timeout time.Duration) (net.Conn, error) ***REMOVED***
+		func(addr string, timeout time.Duration) (net.Conn, error) {
 			return xnet.DialTimeoutLocal(addr, timeout)
-		***REMOVED***))
+		}))
 	conn, err := grpc.Dial(addr, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	client := api.NewHealthClient(conn)
-	for ***REMOVED***
-		resp, err := client.Check(ctx, &api.HealthCheckRequest***REMOVED***Service: "ControlAPI"***REMOVED***)
-		if err != nil ***REMOVED***
+	for {
+		resp, err := client.Check(ctx, &api.HealthCheckRequest{Service: "ControlAPI"})
+		if err != nil {
 			return err
-		***REMOVED***
-		if resp.Status == api.HealthCheckResponse_SERVING ***REMOVED***
+		}
+		if resp.Status == api.HealthCheckResponse_SERVING {
 			break
-		***REMOVED***
+		}
 		time.Sleep(500 * time.Millisecond)
-	***REMOVED***
+	}
 	n.setControlSocket(conn)
-	if ready != nil ***REMOVED***
+	if ready != nil {
 		close(ready)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (n *Node) waitRole(ctx context.Context, role string) error ***REMOVED***
+func (n *Node) waitRole(ctx context.Context, role string) error {
 	n.roleCond.L.Lock()
-	if role == n.role ***REMOVED***
+	if role == n.role {
 		n.roleCond.L.Unlock()
 		return nil
-	***REMOVED***
-	finishCh := make(chan struct***REMOVED******REMOVED***)
+	}
+	finishCh := make(chan struct{})
 	defer close(finishCh)
-	go func() ***REMOVED***
-		select ***REMOVED***
+	go func() {
+		select {
 		case <-finishCh:
 		case <-ctx.Done():
 			// call broadcast to shutdown this function
 			n.roleCond.Broadcast()
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 	defer n.roleCond.L.Unlock()
-	for role != n.role ***REMOVED***
+	for role != n.role {
 		n.roleCond.Wait()
-		select ***REMOVED***
+		select {
 		case <-ctx.Done():
 			return ctx.Err()
 		default:
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (n *Node) runManager(ctx context.Context, securityConfig *ca.SecurityConfig, rootPaths ca.CertPaths, ready chan struct***REMOVED******REMOVED***, workerRole <-chan struct***REMOVED******REMOVED***) (bool, error) ***REMOVED***
+func (n *Node) runManager(ctx context.Context, securityConfig *ca.SecurityConfig, rootPaths ca.CertPaths, ready chan struct{}, workerRole <-chan struct{}) (bool, error) {
 	var remoteAPI *manager.RemoteAddrs
-	if n.config.ListenRemoteAPI != "" ***REMOVED***
-		remoteAPI = &manager.RemoteAddrs***REMOVED***
+	if n.config.ListenRemoteAPI != "" {
+		remoteAPI = &manager.RemoteAddrs{
 			ListenAddr:    n.config.ListenRemoteAPI,
 			AdvertiseAddr: n.config.AdvertiseRemoteAPI,
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	joinAddr := n.config.JoinAddr
-	if joinAddr == "" ***REMOVED***
+	if joinAddr == "" {
 		remoteAddr, err := n.remotes.Select(n.NodeID())
-		if err == nil ***REMOVED***
+		if err == nil {
 			joinAddr = remoteAddr.Addr
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	m, err := manager.New(&manager.Config***REMOVED***
+	m, err := manager.New(&manager.Config{
 		ForceNewCluster:  n.config.ForceNewCluster,
 		RemoteAPI:        remoteAPI,
 		ControlAPI:       n.config.ListenControlAPI,
@@ -847,28 +847,28 @@ func (n *Node) runManager(ctx context.Context, securityConfig *ca.SecurityConfig
 		Availability:     n.config.Availability,
 		PluginGetter:     n.config.PluginGetter,
 		RootCAPaths:      rootPaths,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		return false, err
-	***REMOVED***
-	done := make(chan struct***REMOVED******REMOVED***)
+	}
+	done := make(chan struct{})
 	var runErr error
-	go func(logger *logrus.Entry) ***REMOVED***
-		if err := m.Run(log.WithLogger(context.Background(), logger)); err != nil ***REMOVED***
+	go func(logger *logrus.Entry) {
+		if err := m.Run(log.WithLogger(context.Background(), logger)); err != nil {
 			runErr = err
-		***REMOVED***
+		}
 		close(done)
-	***REMOVED***(log.G(ctx))
+	}(log.G(ctx))
 
 	var clearData bool
-	defer func() ***REMOVED***
+	defer func() {
 		n.Lock()
 		n.manager = nil
 		n.Unlock()
 		m.Stop(ctx, clearData)
 		<-done
 		n.setControlSocket(nil)
-	***REMOVED***()
+	}()
 
 	n.Lock()
 	n.manager = m
@@ -880,7 +880,7 @@ func (n *Node) runManager(ctx context.Context, securityConfig *ca.SecurityConfig
 	go n.initManagerConnection(connCtx, ready)
 
 	// wait for manager stop or for role change
-	select ***REMOVED***
+	select {
 	case <-done:
 		return false, runErr
 	case <-workerRole:
@@ -891,51 +891,51 @@ func (n *Node) runManager(ctx context.Context, securityConfig *ca.SecurityConfig
 		clearData = true
 	case <-ctx.Done():
 		return false, ctx.Err()
-	***REMOVED***
+	}
 	return clearData, nil
-***REMOVED***
+}
 
-func (n *Node) superviseManager(ctx context.Context, securityConfig *ca.SecurityConfig, rootPaths ca.CertPaths, ready chan struct***REMOVED******REMOVED***, renewer *ca.TLSRenewer) error ***REMOVED***
-	for ***REMOVED***
-		if err := n.waitRole(ctx, ca.ManagerRole); err != nil ***REMOVED***
+func (n *Node) superviseManager(ctx context.Context, securityConfig *ca.SecurityConfig, rootPaths ca.CertPaths, ready chan struct{}, renewer *ca.TLSRenewer) error {
+	for {
+		if err := n.waitRole(ctx, ca.ManagerRole); err != nil {
 			return err
-		***REMOVED***
+		}
 
-		workerRole := make(chan struct***REMOVED******REMOVED***)
+		workerRole := make(chan struct{})
 		waitRoleCtx, waitRoleCancel := context.WithCancel(ctx)
-		go func() ***REMOVED***
-			if n.waitRole(waitRoleCtx, ca.WorkerRole) == nil ***REMOVED***
+		go func() {
+			if n.waitRole(waitRoleCtx, ca.WorkerRole) == nil {
 				close(workerRole)
-			***REMOVED***
-		***REMOVED***()
+			}
+		}()
 
 		wasRemoved, err := n.runManager(ctx, securityConfig, rootPaths, ready, workerRole)
-		if err != nil ***REMOVED***
+		if err != nil {
 			waitRoleCancel()
 			return errors.Wrap(err, "manager stopped")
-		***REMOVED***
+		}
 
 		// If the manager stopped running and our role is still
 		// "manager", it's possible that the manager was demoted and
 		// the agent hasn't realized this yet. We should wait for the
 		// role to change instead of restarting the manager immediately.
-		err = func() error ***REMOVED***
+		err = func() error {
 			timer := time.NewTimer(roleChangeTimeout)
 			defer timer.Stop()
 			defer waitRoleCancel()
 
-			select ***REMOVED***
+			select {
 			case <-timer.C:
 			case <-workerRole:
 				return nil
 			case <-ctx.Done():
 				return ctx.Err()
-			***REMOVED***
+			}
 
-			if !wasRemoved ***REMOVED***
+			if !wasRemoved {
 				log.G(ctx).Warn("failed to get worker role after manager stop, restarting manager")
 				return nil
-			***REMOVED***
+			}
 			// We need to be extra careful about restarting the
 			// manager. It may cause the node to wrongly join under
 			// a new Raft ID. Since we didn't see a role change
@@ -954,150 +954,150 @@ func (n *Node) superviseManager(ctx context.Context, securityConfig *ca.Security
 
 			// Now that the renewal request has been sent to the
 			// renewal goroutine, wait for a change in role.
-			select ***REMOVED***
+			select {
 			case <-timer.C:
 				log.G(ctx).Warn("failed to get worker role after manager stop, restarting manager")
 			case <-workerRole:
 			case <-ctx.Done():
 				return ctx.Err()
-			***REMOVED***
+			}
 			return nil
-		***REMOVED***()
-		if err != nil ***REMOVED***
+		}()
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 
 		ready = nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type persistentRemotes struct ***REMOVED***
+type persistentRemotes struct {
 	sync.RWMutex
 	c *sync.Cond
 	remotes.Remotes
 	storePath      string
 	lastSavedState []api.Peer
-***REMOVED***
+}
 
-func newPersistentRemotes(f string, peers ...api.Peer) *persistentRemotes ***REMOVED***
-	pr := &persistentRemotes***REMOVED***
+func newPersistentRemotes(f string, peers ...api.Peer) *persistentRemotes {
+	pr := &persistentRemotes{
 		storePath: f,
 		Remotes:   remotes.NewRemotes(peers...),
-	***REMOVED***
+	}
 	pr.c = sync.NewCond(pr.RLocker())
 	return pr
-***REMOVED***
+}
 
-func (s *persistentRemotes) Observe(peer api.Peer, weight int) ***REMOVED***
+func (s *persistentRemotes) Observe(peer api.Peer, weight int) {
 	s.Lock()
 	defer s.Unlock()
 	s.Remotes.Observe(peer, weight)
 	s.c.Broadcast()
-	if err := s.save(); err != nil ***REMOVED***
+	if err := s.save(); err != nil {
 		logrus.Errorf("error writing cluster state file: %v", err)
 		return
-	***REMOVED***
+	}
 	return
-***REMOVED***
-func (s *persistentRemotes) Remove(peers ...api.Peer) ***REMOVED***
+}
+func (s *persistentRemotes) Remove(peers ...api.Peer) {
 	s.Lock()
 	defer s.Unlock()
 	s.Remotes.Remove(peers...)
-	if err := s.save(); err != nil ***REMOVED***
+	if err := s.save(); err != nil {
 		logrus.Errorf("error writing cluster state file: %v", err)
 		return
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func (s *persistentRemotes) save() error ***REMOVED***
+func (s *persistentRemotes) save() error {
 	weights := s.Weights()
 	remotes := make([]api.Peer, 0, len(weights))
-	for r := range weights ***REMOVED***
+	for r := range weights {
 		remotes = append(remotes, r)
-	***REMOVED***
+	}
 	sort.Sort(sortablePeers(remotes))
-	if reflect.DeepEqual(remotes, s.lastSavedState) ***REMOVED***
+	if reflect.DeepEqual(remotes, s.lastSavedState) {
 		return nil
-	***REMOVED***
+	}
 	dt, err := json.Marshal(remotes)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	s.lastSavedState = remotes
 	return ioutils.AtomicWriteFile(s.storePath, dt, 0600)
-***REMOVED***
+}
 
 // WaitSelect waits until at least one remote becomes available and then selects one.
-func (s *persistentRemotes) WaitSelect(ctx context.Context) <-chan api.Peer ***REMOVED***
+func (s *persistentRemotes) WaitSelect(ctx context.Context) <-chan api.Peer {
 	c := make(chan api.Peer, 1)
 	s.RLock()
-	done := make(chan struct***REMOVED******REMOVED***)
-	go func() ***REMOVED***
-		select ***REMOVED***
+	done := make(chan struct{})
+	go func() {
+		select {
 		case <-ctx.Done():
 			s.c.Broadcast()
 		case <-done:
-		***REMOVED***
-	***REMOVED***()
-	go func() ***REMOVED***
+		}
+	}()
+	go func() {
 		defer s.RUnlock()
 		defer close(c)
 		defer close(done)
-		for ***REMOVED***
-			if ctx.Err() != nil ***REMOVED***
+		for {
+			if ctx.Err() != nil {
 				return
-			***REMOVED***
+			}
 			p, err := s.Select()
-			if err == nil ***REMOVED***
+			if err == nil {
 				c <- p
 				return
-			***REMOVED***
+			}
 			s.c.Wait()
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 	return c
-***REMOVED***
+}
 
 // sortablePeers is a sort wrapper for []api.Peer
 type sortablePeers []api.Peer
 
-func (sp sortablePeers) Less(i, j int) bool ***REMOVED*** return sp[i].NodeID < sp[j].NodeID ***REMOVED***
+func (sp sortablePeers) Less(i, j int) bool { return sp[i].NodeID < sp[j].NodeID }
 
-func (sp sortablePeers) Len() int ***REMOVED*** return len(sp) ***REMOVED***
+func (sp sortablePeers) Len() int { return len(sp) }
 
-func (sp sortablePeers) Swap(i, j int) ***REMOVED*** sp[i], sp[j] = sp[j], sp[i] ***REMOVED***
+func (sp sortablePeers) Swap(i, j int) { sp[i], sp[j] = sp[j], sp[i] }
 
 // firstSessionErrorTracker is a utility that helps determine whether the agent should exit after
 // a TLS failure on establishing the first session.  This should only happen if a join address
 // is specified.  If establishing the first session succeeds, but later on some session fails
 // because of a TLS error, we don't want to exit the agent because a previously successful
 // session indicates that the TLS error may be a transient issue.
-type firstSessionErrorTracker struct ***REMOVED***
+type firstSessionErrorTracker struct {
 	mu               sync.Mutex
 	pastFirstSession bool
 	err              error
-***REMOVED***
+}
 
-func (fs *firstSessionErrorTracker) SessionEstablished() ***REMOVED***
+func (fs *firstSessionErrorTracker) SessionEstablished() {
 	fs.mu.Lock()
 	fs.pastFirstSession = true
 	fs.mu.Unlock()
-***REMOVED***
+}
 
-func (fs *firstSessionErrorTracker) SessionError(err error) ***REMOVED***
+func (fs *firstSessionErrorTracker) SessionError(err error) {
 	fs.mu.Lock()
 	fs.err = err
 	fs.mu.Unlock()
-***REMOVED***
+}
 
-func (fs *firstSessionErrorTracker) SessionClosed() error ***REMOVED***
+func (fs *firstSessionErrorTracker) SessionClosed() error {
 	fs.mu.Lock()
 	defer fs.mu.Unlock()
 	// unfortunately grpc connection errors are type grpc.rpcError, which are not exposed, and we can't get at the underlying error type
 	if !fs.pastFirstSession && grpc.Code(fs.err) == codes.Internal &&
-		strings.HasPrefix(grpc.ErrorDesc(fs.err), "connection error") && strings.Contains(grpc.ErrorDesc(fs.err), "transport: x509:") ***REMOVED***
+		strings.HasPrefix(grpc.ErrorDesc(fs.err), "connection error") && strings.Contains(grpc.ErrorDesc(fs.err), "transport: x509:") {
 		return fs.err
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

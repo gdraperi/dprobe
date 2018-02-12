@@ -13,45 +13,45 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (daemon *Daemon) getRuntimeScript(container *container.Container) (string, error) ***REMOVED***
+func (daemon *Daemon) getRuntimeScript(container *container.Container) (string, error) {
 	name := container.HostConfig.Runtime
 	rt := daemon.configStore.GetRuntime(name)
-	if rt == nil ***REMOVED***
+	if rt == nil {
 		return "", errdefs.InvalidParameter(errors.Errorf("no such runtime '%s'", name))
-	***REMOVED***
+	}
 
-	if len(rt.Args) > 0 ***REMOVED***
+	if len(rt.Args) > 0 {
 		// First check that the target exist, as using it in a script won't
 		// give us the right error
-		if _, err := exec.LookPath(rt.Path); err != nil ***REMOVED***
+		if _, err := exec.LookPath(rt.Path); err != nil {
 			return "", translateContainerdStartErr(container.Path, container.SetExitCode, err)
-		***REMOVED***
+		}
 		return filepath.Join(daemon.configStore.Root, "runtimes", name), nil
-	***REMOVED***
+	}
 	return rt.Path, nil
-***REMOVED***
+}
 
 // getLibcontainerdCreateOptions callers must hold a lock on the container
-func (daemon *Daemon) getLibcontainerdCreateOptions(container *container.Container) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func (daemon *Daemon) getLibcontainerdCreateOptions(container *container.Container) (interface{}, error) {
 	// Ensure a runtime has been assigned to this container
-	if container.HostConfig.Runtime == "" ***REMOVED***
+	if container.HostConfig.Runtime == "" {
 		container.HostConfig.Runtime = daemon.configStore.GetDefaultRuntimeName()
 		container.CheckpointTo(daemon.containersReplica)
-	***REMOVED***
+	}
 
 	path, err := daemon.getRuntimeScript(container)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	opts := &runctypes.RuncOptions***REMOVED***
+	}
+	opts := &runctypes.RuncOptions{
 		Runtime: path,
 		RuntimeRoot: filepath.Join(daemon.configStore.ExecRoot,
 			fmt.Sprintf("runtime-%s", container.HostConfig.Runtime)),
-	***REMOVED***
+	}
 
-	if UsingSystemd(daemon.configStore) ***REMOVED***
+	if UsingSystemd(daemon.configStore) {
 		opts.SystemdCgroup = true
-	***REMOVED***
+	}
 
 	return opts, nil
-***REMOVED***
+}

@@ -17,22 +17,22 @@ import (
 // ID is the content-addressable ID of an image.
 type ID digest.Digest
 
-func (id ID) String() string ***REMOVED***
+func (id ID) String() string {
 	return id.Digest().String()
-***REMOVED***
+}
 
 // Digest converts ID into a digest
-func (id ID) Digest() digest.Digest ***REMOVED***
+func (id ID) Digest() digest.Digest {
 	return digest.Digest(id)
-***REMOVED***
+}
 
 // IDFromDigest creates an ID from a digest
-func IDFromDigest(digest digest.Digest) ID ***REMOVED***
+func IDFromDigest(digest digest.Digest) ID {
 	return ID(digest)
-***REMOVED***
+}
 
 // V1Image stores the V1 image configuration.
-type V1Image struct ***REMOVED***
+type V1Image struct {
 	// ID is a unique 64 character identifier of the image
 	ID string `json:"id,omitempty"`
 	// Parent is the ID of the parent image
@@ -57,10 +57,10 @@ type V1Image struct ***REMOVED***
 	OS string `json:"os,omitempty"`
 	// Size is the total size of the image including all layers it is composed of
 	Size int64 `json:",omitempty"`
-***REMOVED***
+}
 
 // Image stores the image configuration
-type Image struct ***REMOVED***
+type Image struct {
 	V1Image
 	Parent     ID        `json:"parent,omitempty"`
 	RootFS     *RootFS   `json:"rootfs,omitempty"`
@@ -74,87 +74,87 @@ type Image struct ***REMOVED***
 	// computedID is the ID computed from the hash of the image config.
 	// Not to be confused with the legacy V1 ID in V1Image.
 	computedID ID
-***REMOVED***
+}
 
 // RawJSON returns the immutable JSON associated with the image.
-func (img *Image) RawJSON() []byte ***REMOVED***
+func (img *Image) RawJSON() []byte {
 	return img.rawJSON
-***REMOVED***
+}
 
 // ID returns the image's content-addressable ID.
-func (img *Image) ID() ID ***REMOVED***
+func (img *Image) ID() ID {
 	return img.computedID
-***REMOVED***
+}
 
 // ImageID stringifies ID.
-func (img *Image) ImageID() string ***REMOVED***
+func (img *Image) ImageID() string {
 	return img.ID().String()
-***REMOVED***
+}
 
 // RunConfig returns the image's container config.
-func (img *Image) RunConfig() *container.Config ***REMOVED***
+func (img *Image) RunConfig() *container.Config {
 	return img.Config
-***REMOVED***
+}
 
 // OperatingSystem returns the image's operating system. If not populated, defaults to the host runtime OS.
-func (img *Image) OperatingSystem() string ***REMOVED***
+func (img *Image) OperatingSystem() string {
 	os := img.OS
-	if os == "" ***REMOVED***
+	if os == "" {
 		os = runtime.GOOS
-	***REMOVED***
+	}
 	return os
-***REMOVED***
+}
 
 // MarshalJSON serializes the image to JSON. It sorts the top-level keys so
 // that JSON that's been manipulated by a push/pull cycle with a legacy
 // registry won't end up with a different key order.
-func (img *Image) MarshalJSON() ([]byte, error) ***REMOVED***
+func (img *Image) MarshalJSON() ([]byte, error) {
 	type MarshalImage Image
 
 	pass1, err := json.Marshal(MarshalImage(*img))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	var c map[string]*json.RawMessage
-	if err := json.Unmarshal(pass1, &c); err != nil ***REMOVED***
+	if err := json.Unmarshal(pass1, &c); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return json.Marshal(c)
-***REMOVED***
+}
 
 // ChildConfig is the configuration to apply to an Image to create a new
 // Child image. Other properties of the image are copied from the parent.
-type ChildConfig struct ***REMOVED***
+type ChildConfig struct {
 	ContainerID     string
 	Author          string
 	Comment         string
 	DiffID          layer.DiffID
 	ContainerConfig *container.Config
 	Config          *container.Config
-***REMOVED***
+}
 
 // NewChildImage creates a new Image as a child of this image.
-func NewChildImage(img *Image, child ChildConfig, platform string) *Image ***REMOVED***
+func NewChildImage(img *Image, child ChildConfig, platform string) *Image {
 	isEmptyLayer := layer.IsEmpty(child.DiffID)
 	var rootFS *RootFS
-	if img.RootFS != nil ***REMOVED***
+	if img.RootFS != nil {
 		rootFS = img.RootFS.Clone()
-	***REMOVED*** else ***REMOVED***
+	} else {
 		rootFS = NewRootFS()
-	***REMOVED***
+	}
 
-	if !isEmptyLayer ***REMOVED***
+	if !isEmptyLayer {
 		rootFS.Append(child.DiffID)
-	***REMOVED***
+	}
 	imgHistory := NewHistory(
 		child.Author,
 		child.Comment,
 		strings.Join(child.ContainerConfig.Cmd, " "),
 		isEmptyLayer)
 
-	return &Image***REMOVED***
-		V1Image: V1Image***REMOVED***
+	return &Image{
+		V1Image: V1Image{
 			DockerVersion:   dockerversion.Version,
 			Config:          child.Config,
 			Architecture:    runtime.GOARCH,
@@ -163,16 +163,16 @@ func NewChildImage(img *Image, child ChildConfig, platform string) *Image ***REM
 			ContainerConfig: *child.ContainerConfig,
 			Author:          child.Author,
 			Created:         imgHistory.Created,
-		***REMOVED***,
+		},
 		RootFS:     rootFS,
 		History:    append(img.History, imgHistory),
 		OSFeatures: img.OSFeatures,
 		OSVersion:  img.OSVersion,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // History stores build commands that were used to create an image
-type History struct ***REMOVED***
+type History struct {
 	// Created is the timestamp at which the image was created
 	Created time.Time `json:"created"`
 	// Author is the name of the author that was specified when committing the image
@@ -185,39 +185,39 @@ type History struct ***REMOVED***
 	// layer. Otherwise, the history item is associated with the next
 	// layer in the RootFS section.
 	EmptyLayer bool `json:"empty_layer,omitempty"`
-***REMOVED***
+}
 
 // NewHistory creates a new history struct from arguments, and sets the created
 // time to the current time in UTC
-func NewHistory(author, comment, createdBy string, isEmptyLayer bool) History ***REMOVED***
-	return History***REMOVED***
+func NewHistory(author, comment, createdBy string, isEmptyLayer bool) History {
+	return History{
 		Author:     author,
 		Created:    time.Now().UTC(),
 		CreatedBy:  createdBy,
 		Comment:    comment,
 		EmptyLayer: isEmptyLayer,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Exporter provides interface for loading and saving images
-type Exporter interface ***REMOVED***
+type Exporter interface {
 	Load(io.ReadCloser, io.Writer, bool) error
 	// TODO: Load(net.Context, io.ReadCloser, <- chan StatusMessage) error
 	Save([]string, io.Writer) error
-***REMOVED***
+}
 
 // NewFromJSON creates an Image configuration from json.
-func NewFromJSON(src []byte) (*Image, error) ***REMOVED***
-	img := &Image***REMOVED******REMOVED***
+func NewFromJSON(src []byte) (*Image, error) {
+	img := &Image{}
 
-	if err := json.Unmarshal(src, img); err != nil ***REMOVED***
+	if err := json.Unmarshal(src, img); err != nil {
 		return nil, err
-	***REMOVED***
-	if img.RootFS == nil ***REMOVED***
+	}
+	if img.RootFS == nil {
 		return nil, errors.New("invalid image JSON, no RootFS key")
-	***REMOVED***
+	}
 
 	img.rawJSON = src
 
 	return img, nil
-***REMOVED***
+}

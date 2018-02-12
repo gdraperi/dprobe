@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	reTimestamp  = `(?P<timestamp>\d***REMOVED***4***REMOVED***-\d***REMOVED***2***REMOVED***-\d***REMOVED***2***REMOVED***T\d***REMOVED***2***REMOVED***:\d***REMOVED***2***REMOVED***:\d***REMOVED***2***REMOVED***.\d***REMOVED***9***REMOVED***(:?(:?(:?-|\+)\d***REMOVED***2***REMOVED***:\d***REMOVED***2***REMOVED***)|Z))`
+	reTimestamp  = `(?P<timestamp>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{9}(:?(:?(:?-|\+)\d{2}:\d{2})|Z))`
 	reEventType  = `(?P<eventType>\w+)`
 	reAction     = `(?P<action>\w+)`
 	reID         = `(?P<id>[^\s]+)`
@@ -24,53 +24,53 @@ var (
 
 // ScanMap turns an event string like the default ones formatted in the cli output
 // and turns it into map.
-func ScanMap(text string) map[string]string ***REMOVED***
+func ScanMap(text string) map[string]string {
 	matches := eventCliRegexp.FindAllStringSubmatch(text, -1)
-	md := map[string]string***REMOVED******REMOVED***
-	if len(matches) == 0 ***REMOVED***
+	md := map[string]string{}
+	if len(matches) == 0 {
 		return md
-	***REMOVED***
+	}
 
 	names := eventCliRegexp.SubexpNames()
-	for i, n := range matches[0] ***REMOVED***
+	for i, n := range matches[0] {
 		md[names[i]] = n
-	***REMOVED***
+	}
 	return md
-***REMOVED***
+}
 
 // Scan turns an event string like the default ones formatted in the cli output
 // and turns it into an event message.
-func Scan(text string) (*events.Message, error) ***REMOVED***
+func Scan(text string) (*events.Message, error) {
 	md := ScanMap(text)
-	if len(md) == 0 ***REMOVED***
+	if len(md) == 0 {
 		return nil, fmt.Errorf("text is not an event: %s", text)
-	***REMOVED***
+	}
 
 	f, err := timetypes.GetTimestamp(md["timestamp"], time.Now())
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	t, tn, err := timetypes.ParseTimestamps(f, -1)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	attrs := make(map[string]string)
-	for _, a := range strings.SplitN(md["attributes"], ", ", -1) ***REMOVED***
+	for _, a := range strings.SplitN(md["attributes"], ", ", -1) {
 		kv := strings.SplitN(a, "=", 2)
 		attrs[kv[0]] = kv[1]
-	***REMOVED***
+	}
 
 	tu := time.Unix(t, tn)
-	return &events.Message***REMOVED***
+	return &events.Message{
 		Time:     t,
 		TimeNano: tu.UnixNano(),
 		Type:     md["eventType"],
 		Action:   md["action"],
-		Actor: events.Actor***REMOVED***
+		Actor: events.Actor{
 			ID:         md["id"],
 			Attributes: attrs,
-		***REMOVED***,
-	***REMOVED***, nil
-***REMOVED***
+		},
+	}, nil
+}

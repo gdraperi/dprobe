@@ -10,11 +10,11 @@ import (
 	"syscall"
 )
 
-func maxOpenFiles() int ***REMOVED***
+func maxOpenFiles() int {
 	return 4 * defaultMaxOpenFiles /* actually it's 16581375 */
-***REMOVED***
+}
 
-func supportsRawIPSocket() (string, bool) ***REMOVED***
+func supportsRawIPSocket() (string, bool) {
 	// From http://msdn.microsoft.com/en-us/library/windows/desktop/ms740548.aspx:
 	// Note: To use a socket of type SOCK_RAW requires administrative privileges.
 	// Users running Winsock applications that use raw sockets must be a member of
@@ -23,20 +23,20 @@ func supportsRawIPSocket() (string, bool) ***REMOVED***
 	// for raw sockets is enforced at socket creation. In earlier versions of Windows,
 	// access for raw sockets is enforced during other socket operations.
 	s, err := syscall.Socket(syscall.AF_INET, syscall.SOCK_RAW, 0)
-	if err == syscall.WSAEACCES ***REMOVED***
+	if err == syscall.WSAEACCES {
 		return fmt.Sprintf("no access to raw socket allowed on %s", runtime.GOOS), false
-	***REMOVED***
-	if err != nil ***REMOVED***
+	}
+	if err != nil {
 		return err.Error(), false
-	***REMOVED***
+	}
 	syscall.Closesocket(s)
 	return "", true
-***REMOVED***
+}
 
-func supportsIPv6MulticastDeliveryOnLoopback() bool ***REMOVED***
+func supportsIPv6MulticastDeliveryOnLoopback() bool {
 	return true
-***REMOVED***
+}
 
-func causesIPv6Crash() bool ***REMOVED***
+func causesIPv6Crash() bool {
 	return false
-***REMOVED***
+}

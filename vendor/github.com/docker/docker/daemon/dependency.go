@@ -5,13 +5,13 @@ import (
 )
 
 // SetContainerDependencyStore sets the dependency store backend for the container
-func (daemon *Daemon) SetContainerDependencyStore(name string, store exec.DependencyGetter) error ***REMOVED***
+func (daemon *Daemon) SetContainerDependencyStore(name string, store exec.DependencyGetter) error {
 	c, err := daemon.GetContainer(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	c.DependencyStore = store
 
 	return nil
-***REMOVED***
+}

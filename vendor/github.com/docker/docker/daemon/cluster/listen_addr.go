@@ -16,25 +16,25 @@ const (
 	errBadDefaultAdvertiseAddr configError = "default advertise address must be a non-zero IP address or network interface (without a port number)"
 )
 
-func resolveListenAddr(specifiedAddr string) (string, string, error) ***REMOVED***
+func resolveListenAddr(specifiedAddr string) (string, string, error) {
 	specifiedHost, specifiedPort, err := net.SplitHostPort(specifiedAddr)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", "", fmt.Errorf("could not parse listen address %s", specifiedAddr)
-	***REMOVED***
+	}
 	// Does the host component match any of the interface names on the
 	// system? If so, use the address from that interface.
 	specifiedIP, err := resolveInputIPAddr(specifiedHost, true)
-	if err != nil ***REMOVED***
-		if err == errBadNetworkIdentifier ***REMOVED***
+	if err != nil {
+		if err == errBadNetworkIdentifier {
 			err = errBadListenAddr
-		***REMOVED***
+		}
 		return "", "", err
-	***REMOVED***
+	}
 
 	return specifiedIP.String(), specifiedPort, nil
-***REMOVED***
+}
 
-func (c *Cluster) resolveAdvertiseAddr(advertiseAddr, listenAddrPort string) (string, string, error) ***REMOVED***
+func (c *Cluster) resolveAdvertiseAddr(advertiseAddr, listenAddrPort string) (string, string, error) {
 	// Approach:
 	// - If an advertise address is specified, use that. Resolve the
 	//   interface's address if an interface was specified in
@@ -45,142 +45,142 @@ func (c *Cluster) resolveAdvertiseAddr(advertiseAddr, listenAddrPort string) (st
 	// - Otherwise, try to autodetect the system's address. Use the port in
 	//   listenAddrPort with this address if autodetection succeeds.
 
-	if advertiseAddr != "" ***REMOVED***
+	if advertiseAddr != "" {
 		advertiseHost, advertisePort, err := net.SplitHostPort(advertiseAddr)
-		if err != nil ***REMOVED***
+		if err != nil {
 			// Not a host:port specification
 			advertiseHost = advertiseAddr
 			advertisePort = listenAddrPort
-		***REMOVED***
+		}
 		// Does the host component match any of the interface names on the
 		// system? If so, use the address from that interface.
 		advertiseIP, err := resolveInputIPAddr(advertiseHost, false)
-		if err != nil ***REMOVED***
-			if err == errBadNetworkIdentifier ***REMOVED***
+		if err != nil {
+			if err == errBadNetworkIdentifier {
 				err = errBadAdvertiseAddr
-			***REMOVED***
+			}
 			return "", "", err
-		***REMOVED***
+		}
 
 		return advertiseIP.String(), advertisePort, nil
-	***REMOVED***
+	}
 
-	if c.config.DefaultAdvertiseAddr != "" ***REMOVED***
+	if c.config.DefaultAdvertiseAddr != "" {
 		// Does the default advertise address component match any of the
 		// interface names on the system? If so, use the address from
 		// that interface.
 		defaultAdvertiseIP, err := resolveInputIPAddr(c.config.DefaultAdvertiseAddr, false)
-		if err != nil ***REMOVED***
-			if err == errBadNetworkIdentifier ***REMOVED***
+		if err != nil {
+			if err == errBadNetworkIdentifier {
 				err = errBadDefaultAdvertiseAddr
-			***REMOVED***
+			}
 			return "", "", err
-		***REMOVED***
+		}
 
 		return defaultAdvertiseIP.String(), listenAddrPort, nil
-	***REMOVED***
+	}
 
 	systemAddr, err := c.resolveSystemAddr()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", "", err
-	***REMOVED***
+	}
 	return systemAddr.String(), listenAddrPort, nil
-***REMOVED***
+}
 
-func resolveDataPathAddr(dataPathAddr string) (string, error) ***REMOVED***
-	if dataPathAddr == "" ***REMOVED***
+func resolveDataPathAddr(dataPathAddr string) (string, error) {
+	if dataPathAddr == "" {
 		// dataPathAddr is not defined
 		return "", nil
-	***REMOVED***
+	}
 	// If a data path flag is specified try to resolve the IP address.
 	dataPathIP, err := resolveInputIPAddr(dataPathAddr, false)
-	if err != nil ***REMOVED***
-		if err == errBadNetworkIdentifier ***REMOVED***
+	if err != nil {
+		if err == errBadNetworkIdentifier {
 			err = errBadDataPathAddr
-		***REMOVED***
+		}
 		return "", err
-	***REMOVED***
+	}
 	return dataPathIP.String(), nil
-***REMOVED***
+}
 
-func resolveInterfaceAddr(specifiedInterface string) (net.IP, error) ***REMOVED***
+func resolveInterfaceAddr(specifiedInterface string) (net.IP, error) {
 	// Use a specific interface's IP address.
 	intf, err := net.InterfaceByName(specifiedInterface)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, errNoSuchInterface
-	***REMOVED***
+	}
 
 	addrs, err := intf.Addrs()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	var interfaceAddr4, interfaceAddr6 net.IP
 
-	for _, addr := range addrs ***REMOVED***
+	for _, addr := range addrs {
 		ipAddr, ok := addr.(*net.IPNet)
 
-		if ok ***REMOVED***
-			if ipAddr.IP.To4() != nil ***REMOVED***
+		if ok {
+			if ipAddr.IP.To4() != nil {
 				// IPv4
-				if interfaceAddr4 != nil ***REMOVED***
+				if interfaceAddr4 != nil {
 					return nil, configError(fmt.Sprintf("interface %s has more than one IPv4 address (%s and %s)", specifiedInterface, interfaceAddr4, ipAddr.IP))
-				***REMOVED***
+				}
 				interfaceAddr4 = ipAddr.IP
-			***REMOVED*** else ***REMOVED***
+			} else {
 				// IPv6
-				if interfaceAddr6 != nil ***REMOVED***
+				if interfaceAddr6 != nil {
 					return nil, configError(fmt.Sprintf("interface %s has more than one IPv6 address (%s and %s)", specifiedInterface, interfaceAddr6, ipAddr.IP))
-				***REMOVED***
+				}
 				interfaceAddr6 = ipAddr.IP
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
-	if interfaceAddr4 == nil && interfaceAddr6 == nil ***REMOVED***
+	if interfaceAddr4 == nil && interfaceAddr6 == nil {
 		return nil, configError(fmt.Sprintf("interface %s has no usable IPv4 or IPv6 address", specifiedInterface))
-	***REMOVED***
+	}
 
 	// In the case that there's exactly one IPv4 address
 	// and exactly one IPv6 address, favor IPv4 over IPv6.
-	if interfaceAddr4 != nil ***REMOVED***
+	if interfaceAddr4 != nil {
 		return interfaceAddr4, nil
-	***REMOVED***
+	}
 	return interfaceAddr6, nil
-***REMOVED***
+}
 
 // resolveInputIPAddr tries to resolve the IP address from the string passed as input
 // - tries to match the string as an interface name, if so returns the IP address associated with it
 // - on failure of previous step tries to parse the string as an IP address itself
 //	 if succeeds returns the IP address
-func resolveInputIPAddr(input string, isUnspecifiedValid bool) (net.IP, error) ***REMOVED***
+func resolveInputIPAddr(input string, isUnspecifiedValid bool) (net.IP, error) {
 	// Try to see if it is an interface name
 	interfaceAddr, err := resolveInterfaceAddr(input)
-	if err == nil ***REMOVED***
+	if err == nil {
 		return interfaceAddr, nil
-	***REMOVED***
+	}
 	// String matched interface but there is a potential ambiguity to be resolved
-	if err != errNoSuchInterface ***REMOVED***
+	if err != errNoSuchInterface {
 		return nil, err
-	***REMOVED***
+	}
 
 	// String is not an interface check if it is a valid IP
-	if ip := net.ParseIP(input); ip != nil && (isUnspecifiedValid || !ip.IsUnspecified()) ***REMOVED***
+	if ip := net.ParseIP(input); ip != nil && (isUnspecifiedValid || !ip.IsUnspecified()) {
 		return ip, nil
-	***REMOVED***
+	}
 
 	// Not valid IP found
 	return nil, errBadNetworkIdentifier
-***REMOVED***
+}
 
-func (c *Cluster) resolveSystemAddrViaSubnetCheck() (net.IP, error) ***REMOVED***
+func (c *Cluster) resolveSystemAddrViaSubnetCheck() (net.IP, error) {
 	// Use the system's only IP address, or fail if there are
 	// multiple addresses to choose from. Skip interfaces which
 	// are managed by docker via subnet check.
 	interfaces, err := net.Interfaces()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	var systemAddr net.IP
 	var systemInterface string
@@ -189,113 +189,113 @@ func (c *Cluster) resolveSystemAddrViaSubnetCheck() (net.IP, error) ***REMOVED**
 	v4Subnets, v6Subnets := c.config.NetworkSubnetsProvider.Subnets()
 
 ifaceLoop:
-	for _, intf := range interfaces ***REMOVED***
+	for _, intf := range interfaces {
 		// Skip inactive interfaces and loopback interfaces
-		if (intf.Flags&net.FlagUp == 0) || (intf.Flags&net.FlagLoopback) != 0 ***REMOVED***
+		if (intf.Flags&net.FlagUp == 0) || (intf.Flags&net.FlagLoopback) != 0 {
 			continue
-		***REMOVED***
+		}
 
 		addrs, err := intf.Addrs()
-		if err != nil ***REMOVED***
+		if err != nil {
 			continue
-		***REMOVED***
+		}
 
 		var interfaceAddr4, interfaceAddr6 net.IP
 
-		for _, addr := range addrs ***REMOVED***
+		for _, addr := range addrs {
 			ipAddr, ok := addr.(*net.IPNet)
 
 			// Skip loopback and link-local addresses
-			if !ok || !ipAddr.IP.IsGlobalUnicast() ***REMOVED***
+			if !ok || !ipAddr.IP.IsGlobalUnicast() {
 				continue
-			***REMOVED***
+			}
 
-			if ipAddr.IP.To4() != nil ***REMOVED***
+			if ipAddr.IP.To4() != nil {
 				// IPv4
 
 				// Ignore addresses in subnets that are managed by Docker.
-				for _, subnet := range v4Subnets ***REMOVED***
-					if subnet.Contains(ipAddr.IP) ***REMOVED***
+				for _, subnet := range v4Subnets {
+					if subnet.Contains(ipAddr.IP) {
 						continue ifaceLoop
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 
-				if interfaceAddr4 != nil ***REMOVED***
+				if interfaceAddr4 != nil {
 					return nil, errMultipleIPs(intf.Name, intf.Name, interfaceAddr4, ipAddr.IP)
-				***REMOVED***
+				}
 
 				interfaceAddr4 = ipAddr.IP
-			***REMOVED*** else ***REMOVED***
+			} else {
 				// IPv6
 
 				// Ignore addresses in subnets that are managed by Docker.
-				for _, subnet := range v6Subnets ***REMOVED***
-					if subnet.Contains(ipAddr.IP) ***REMOVED***
+				for _, subnet := range v6Subnets {
+					if subnet.Contains(ipAddr.IP) {
 						continue ifaceLoop
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 
-				if interfaceAddr6 != nil ***REMOVED***
+				if interfaceAddr6 != nil {
 					return nil, errMultipleIPs(intf.Name, intf.Name, interfaceAddr6, ipAddr.IP)
-				***REMOVED***
+				}
 
 				interfaceAddr6 = ipAddr.IP
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		// In the case that this interface has exactly one IPv4 address
 		// and exactly one IPv6 address, favor IPv4 over IPv6.
-		if interfaceAddr4 != nil ***REMOVED***
-			if systemAddr != nil ***REMOVED***
+		if interfaceAddr4 != nil {
+			if systemAddr != nil {
 				return nil, errMultipleIPs(systemInterface, intf.Name, systemAddr, interfaceAddr4)
-			***REMOVED***
+			}
 			systemAddr = interfaceAddr4
 			systemInterface = intf.Name
-		***REMOVED*** else if interfaceAddr6 != nil ***REMOVED***
-			if systemAddr != nil ***REMOVED***
+		} else if interfaceAddr6 != nil {
+			if systemAddr != nil {
 				return nil, errMultipleIPs(systemInterface, intf.Name, systemAddr, interfaceAddr6)
-			***REMOVED***
+			}
 			systemAddr = interfaceAddr6
 			systemInterface = intf.Name
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if systemAddr == nil ***REMOVED***
+	if systemAddr == nil {
 		return nil, errNoIP
-	***REMOVED***
+	}
 
 	return systemAddr, nil
-***REMOVED***
+}
 
-func listSystemIPs() []net.IP ***REMOVED***
+func listSystemIPs() []net.IP {
 	interfaces, err := net.Interfaces()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil
-	***REMOVED***
+	}
 
 	var systemAddrs []net.IP
 
-	for _, intf := range interfaces ***REMOVED***
+	for _, intf := range interfaces {
 		addrs, err := intf.Addrs()
-		if err != nil ***REMOVED***
+		if err != nil {
 			continue
-		***REMOVED***
+		}
 
-		for _, addr := range addrs ***REMOVED***
+		for _, addr := range addrs {
 			ipAddr, ok := addr.(*net.IPNet)
 
-			if ok ***REMOVED***
+			if ok {
 				systemAddrs = append(systemAddrs, ipAddr.IP)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	return systemAddrs
-***REMOVED***
+}
 
-func errMultipleIPs(interfaceA, interfaceB string, addrA, addrB net.IP) error ***REMOVED***
-	if interfaceA == interfaceB ***REMOVED***
+func errMultipleIPs(interfaceA, interfaceB string, addrA, addrB net.IP) error {
+	if interfaceA == interfaceB {
 		return configError(fmt.Sprintf("could not choose an IP address to advertise since this system has multiple addresses on interface %s (%s and %s)", interfaceA, addrA, addrB))
-	***REMOVED***
+	}
 	return configError(fmt.Sprintf("could not choose an IP address to advertise since this system has multiple addresses on different interfaces (%s on %s and %s on %s)", addrA, interfaceA, addrB, interfaceB))
-***REMOVED***
+}

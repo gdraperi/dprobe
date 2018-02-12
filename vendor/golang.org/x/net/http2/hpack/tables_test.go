@@ -12,8 +12,8 @@ import (
 	"testing"
 )
 
-func TestHeaderFieldTable(t *testing.T) ***REMOVED***
-	table := &headerFieldTable***REMOVED******REMOVED***
+func TestHeaderFieldTable(t *testing.T) {
+	table := &headerFieldTable{}
 	table.init()
 	table.addEntry(pair("key1", "value1-1"))
 	table.addEntry(pair("key2", "value2-1"))
@@ -24,73 +24,73 @@ func TestHeaderFieldTable(t *testing.T) ***REMOVED***
 
 	// Tests will be run twice: once before evicting anything, and
 	// again after evicting the three oldest entries.
-	tests := []struct ***REMOVED***
+	tests := []struct {
 		f                 HeaderField
 		beforeWantStaticI uint64
 		beforeWantMatch   bool
 		afterWantStaticI  uint64
 		afterWantMatch    bool
-	***REMOVED******REMOVED***
-		***REMOVED***HeaderField***REMOVED***"key1", "value1-1", false***REMOVED***, 1, true, 0, false***REMOVED***,
-		***REMOVED***HeaderField***REMOVED***"key1", "value1-2", false***REMOVED***, 3, true, 0, false***REMOVED***,
-		***REMOVED***HeaderField***REMOVED***"key1", "value1-3", false***REMOVED***, 3, false, 0, false***REMOVED***,
-		***REMOVED***HeaderField***REMOVED***"key2", "value2-1", false***REMOVED***, 2, true, 3, false***REMOVED***,
-		***REMOVED***HeaderField***REMOVED***"key2", "value2-2", false***REMOVED***, 6, true, 3, true***REMOVED***,
-		***REMOVED***HeaderField***REMOVED***"key2", "value2-3", false***REMOVED***, 6, false, 3, false***REMOVED***,
-		***REMOVED***HeaderField***REMOVED***"key4", "value4-1", false***REMOVED***, 5, true, 2, true***REMOVED***,
+	}{
+		{HeaderField{"key1", "value1-1", false}, 1, true, 0, false},
+		{HeaderField{"key1", "value1-2", false}, 3, true, 0, false},
+		{HeaderField{"key1", "value1-3", false}, 3, false, 0, false},
+		{HeaderField{"key2", "value2-1", false}, 2, true, 3, false},
+		{HeaderField{"key2", "value2-2", false}, 6, true, 3, true},
+		{HeaderField{"key2", "value2-3", false}, 6, false, 3, false},
+		{HeaderField{"key4", "value4-1", false}, 5, true, 2, true},
 		// Name match only, because sensitive.
-		***REMOVED***HeaderField***REMOVED***"key4", "value4-1", true***REMOVED***, 5, false, 2, false***REMOVED***,
+		{HeaderField{"key4", "value4-1", true}, 5, false, 2, false},
 		// Key not found.
-		***REMOVED***HeaderField***REMOVED***"key5", "value5-x", false***REMOVED***, 0, false, 0, false***REMOVED***,
-	***REMOVED***
+		{HeaderField{"key5", "value5-x", false}, 0, false, 0, false},
+	}
 
-	staticToDynamic := func(i uint64) uint64 ***REMOVED***
-		if i == 0 ***REMOVED***
+	staticToDynamic := func(i uint64) uint64 {
+		if i == 0 {
 			return 0
-		***REMOVED***
+		}
 		return uint64(table.len()) - i + 1 // dynamic is the reversed table
-	***REMOVED***
+	}
 
-	searchStatic := func(f HeaderField) (uint64, bool) ***REMOVED***
+	searchStatic := func(f HeaderField) (uint64, bool) {
 		old := staticTable
 		staticTable = table
-		defer func() ***REMOVED*** staticTable = old ***REMOVED***()
+		defer func() { staticTable = old }()
 		return staticTable.search(f)
-	***REMOVED***
+	}
 
-	searchDynamic := func(f HeaderField) (uint64, bool) ***REMOVED***
+	searchDynamic := func(f HeaderField) (uint64, bool) {
 		return table.search(f)
-	***REMOVED***
+	}
 
-	for _, test := range tests ***REMOVED***
+	for _, test := range tests {
 		gotI, gotMatch := searchStatic(test.f)
-		if wantI, wantMatch := test.beforeWantStaticI, test.beforeWantMatch; gotI != wantI || gotMatch != wantMatch ***REMOVED***
+		if wantI, wantMatch := test.beforeWantStaticI, test.beforeWantMatch; gotI != wantI || gotMatch != wantMatch {
 			t.Errorf("before evictions: searchStatic(%+v)=%v,%v want %v,%v", test.f, gotI, gotMatch, wantI, wantMatch)
-		***REMOVED***
+		}
 		gotI, gotMatch = searchDynamic(test.f)
 		wantDynamicI := staticToDynamic(test.beforeWantStaticI)
-		if wantI, wantMatch := wantDynamicI, test.beforeWantMatch; gotI != wantI || gotMatch != wantMatch ***REMOVED***
+		if wantI, wantMatch := wantDynamicI, test.beforeWantMatch; gotI != wantI || gotMatch != wantMatch {
 			t.Errorf("before evictions: searchDynamic(%+v)=%v,%v want %v,%v", test.f, gotI, gotMatch, wantI, wantMatch)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	table.evictOldest(3)
 
-	for _, test := range tests ***REMOVED***
+	for _, test := range tests {
 		gotI, gotMatch := searchStatic(test.f)
-		if wantI, wantMatch := test.afterWantStaticI, test.afterWantMatch; gotI != wantI || gotMatch != wantMatch ***REMOVED***
+		if wantI, wantMatch := test.afterWantStaticI, test.afterWantMatch; gotI != wantI || gotMatch != wantMatch {
 			t.Errorf("after evictions: searchStatic(%+v)=%v,%v want %v,%v", test.f, gotI, gotMatch, wantI, wantMatch)
-		***REMOVED***
+		}
 		gotI, gotMatch = searchDynamic(test.f)
 		wantDynamicI := staticToDynamic(test.afterWantStaticI)
-		if wantI, wantMatch := wantDynamicI, test.afterWantMatch; gotI != wantI || gotMatch != wantMatch ***REMOVED***
+		if wantI, wantMatch := wantDynamicI, test.afterWantMatch; gotI != wantI || gotMatch != wantMatch {
 			t.Errorf("after evictions: searchDynamic(%+v)=%v,%v want %v,%v", test.f, gotI, gotMatch, wantI, wantMatch)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestHeaderFieldTable_LookupMapEviction(t *testing.T) ***REMOVED***
-	table := &headerFieldTable***REMOVED******REMOVED***
+func TestHeaderFieldTable_LookupMapEviction(t *testing.T) {
+	table := &headerFieldTable{}
 	table.init()
 	table.addEntry(pair("key1", "value1-1"))
 	table.addEntry(pair("key2", "value2-1"))
@@ -102,20 +102,20 @@ func TestHeaderFieldTable_LookupMapEviction(t *testing.T) ***REMOVED***
 	// evict all pairs
 	table.evictOldest(table.len())
 
-	if l := table.len(); l > 0 ***REMOVED***
+	if l := table.len(); l > 0 {
 		t.Errorf("table.len() = %d, want 0", l)
-	***REMOVED***
+	}
 
-	if l := len(table.byName); l > 0 ***REMOVED***
+	if l := len(table.byName); l > 0 {
 		t.Errorf("len(table.byName) = %d, want 0", l)
-	***REMOVED***
+	}
 
-	if l := len(table.byNameValue); l > 0 ***REMOVED***
+	if l := len(table.byNameValue); l > 0 {
 		t.Errorf("len(table.byNameValue) = %d, want 0", l)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestStaticTable(t *testing.T) ***REMOVED***
+func TestStaticTable(t *testing.T) {
 	fromSpec := `
           +-------+-----------------------------+---------------+
           | 1     | :authority                  |               |
@@ -183,32 +183,32 @@ func TestStaticTable(t *testing.T) ***REMOVED***
 `
 	bs := bufio.NewScanner(strings.NewReader(fromSpec))
 	re := regexp.MustCompile(`\| (\d+)\s+\| (\S+)\s*\| (\S(.*\S)?)?\s+\|`)
-	for bs.Scan() ***REMOVED***
+	for bs.Scan() {
 		l := bs.Text()
-		if !strings.Contains(l, "|") ***REMOVED***
+		if !strings.Contains(l, "|") {
 			continue
-		***REMOVED***
+		}
 		m := re.FindStringSubmatch(l)
-		if m == nil ***REMOVED***
+		if m == nil {
 			continue
-		***REMOVED***
+		}
 		i, err := strconv.Atoi(m[1])
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Errorf("Bogus integer on line %q", l)
 			continue
-		***REMOVED***
-		if i < 1 || i > staticTable.len() ***REMOVED***
+		}
+		if i < 1 || i > staticTable.len() {
 			t.Errorf("Bogus index %d on line %q", i, l)
 			continue
-		***REMOVED***
-		if got, want := staticTable.ents[i-1].Name, m[2]; got != want ***REMOVED***
+		}
+		if got, want := staticTable.ents[i-1].Name, m[2]; got != want {
 			t.Errorf("header index %d name = %q; want %q", i, got, want)
-		***REMOVED***
-		if got, want := staticTable.ents[i-1].Value, m[3]; got != want ***REMOVED***
+		}
+		if got, want := staticTable.ents[i-1].Value, m[3]; got != want {
 			t.Errorf("header index %d value = %q; want %q", i, got, want)
-		***REMOVED***
-	***REMOVED***
-	if err := bs.Err(); err != nil ***REMOVED***
+		}
+	}
+	if err := bs.Err(); err != nil {
 		t.Error(err)
-	***REMOVED***
-***REMOVED***
+	}
+}

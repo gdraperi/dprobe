@@ -2,6 +2,6 @@
 
 package gcplogs
 
-func ensureHomeIfIAmStatic() error ***REMOVED***
+func ensureHomeIfIAmStatic() error {
 	return nil
-***REMOVED***
+}

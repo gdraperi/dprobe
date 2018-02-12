@@ -14,26 +14,26 @@ var (
 	wireFormats  map[int]*wireFormat
 )
 
-func init() ***REMOVED***
+func init() {
 	i := uint32(1)
 	b := (*[4]byte)(unsafe.Pointer(&i))
-	if b[0] == 1 ***REMOVED***
+	if b[0] == 1 {
 		nativeEndian = littleEndian
-	***REMOVED*** else ***REMOVED***
+	} else {
 		nativeEndian = bigEndian
-	***REMOVED***
+	}
 	kernelAlign, wireFormats = probeRoutingStack()
-***REMOVED***
+}
 
-func roundup(l int) int ***REMOVED***
-	if l == 0 ***REMOVED***
+func roundup(l int) int {
+	if l == 0 {
 		return kernelAlign
-	***REMOVED***
+	}
 	return (l + kernelAlign - 1) & ^(kernelAlign - 1)
-***REMOVED***
+}
 
-type wireFormat struct ***REMOVED***
+type wireFormat struct {
 	extOff  int // offset of header extension
 	bodyOff int // offset of message body
 	parse   func(RIBType, []byte) (Message, error)
-***REMOVED***
+}

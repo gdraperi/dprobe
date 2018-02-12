@@ -10,7 +10,7 @@ import "google/protobuf/empty.proto";
 option go_package = "github.com/containerd/containerd/api/services/content/v1;content";
 
 // Content provides access to a content addressable storage system.
-service Content ***REMOVED***
+service Content {
 	// Info returns information about a committed object.
 	//
 	// This call can be used for getting the size of content and checking for
@@ -72,9 +72,9 @@ service Content ***REMOVED***
 	// Abort cancels the ongoing write named in the request. Any resources
 	// associated with the write will be collected.
 	rpc Abort(AbortRequest) returns (google.protobuf.Empty);
-***REMOVED***
+}
 
-message Info ***REMOVED***
+message Info {
 	// Digest is the hash identity of the blob.
 	string digest = 1 [(gogoproto.customtype) = "github.com/opencontainers/go-digest.Digest", (gogoproto.nullable) = false];
 
@@ -91,17 +91,17 @@ message Info ***REMOVED***
 	//
 	// The combined size of a key/value pair cannot exceed 4096 bytes.
 	map<string, string> labels  = 5;
-***REMOVED***
+}
 
-message InfoRequest ***REMOVED***
+message InfoRequest {
 	string digest = 1 [(gogoproto.customtype) = "github.com/opencontainers/go-digest.Digest", (gogoproto.nullable) = false];
-***REMOVED***
+}
 
-message InfoResponse ***REMOVED***
+message InfoResponse {
 	Info info = 1 [(gogoproto.nullable) = false];
-***REMOVED***
+}
 
-message UpdateRequest ***REMOVED***
+message UpdateRequest {
 	Info info = 1 [(gogoproto.nullable) = false];
 
 	// UpdateMask specifies which fields to perform the update on. If empty,
@@ -111,13 +111,13 @@ message UpdateRequest ***REMOVED***
 	// other field may be updated using this mask.
 	// If no mask is provided, all mutable field are updated.
 	google.protobuf.FieldMask update_mask = 2;
-***REMOVED***
+}
 
-message UpdateResponse ***REMOVED***
+message UpdateResponse {
 	Info info = 1 [(gogoproto.nullable) = false];
-***REMOVED***
+}
 
-message ListContentRequest ***REMOVED***
+message ListContentRequest {
 	// Filters contains one or more filters using the syntax defined in the
 	// containerd filter package.
 	//
@@ -129,20 +129,20 @@ message ListContentRequest ***REMOVED***
 	//
 	// If filters is zero-length or nil, all items will be returned.
 	repeated string filters = 1;
-***REMOVED***
+}
 
-message ListContentResponse ***REMOVED***
+message ListContentResponse {
 	repeated Info info = 1 [(gogoproto.nullable) = false];
-***REMOVED***
+}
 
-message DeleteContentRequest ***REMOVED***
+message DeleteContentRequest {
 	// Digest specifies which content to delete.
 	string digest = 1 [(gogoproto.customtype) = "github.com/opencontainers/go-digest.Digest", (gogoproto.nullable) = false];
-***REMOVED***
+}
 
 // ReadContentRequest defines the fields that make up a request to read a portion of
 // data from a stored object.
-message ReadContentRequest ***REMOVED***
+message ReadContentRequest {
 	// Digest is the hash identity to read.
 	string digest = 1 [(gogoproto.customtype) = "github.com/opencontainers/go-digest.Digest", (gogoproto.nullable) = false];
 
@@ -154,42 +154,42 @@ message ReadContentRequest ***REMOVED***
 	// size is the total size of the read. If zero, the entire blob will be
 	// returned by the service.
 	int64 size = 3;
-***REMOVED***
+}
 
 // ReadContentResponse carries byte data for a read request.
-message ReadContentResponse ***REMOVED***
+message ReadContentResponse {
 	int64 offset = 1; // offset of the returned data
 	bytes data = 2; // actual data
-***REMOVED***
+}
 
-message Status ***REMOVED***
+message Status {
 	google.protobuf.Timestamp started_at = 1 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
 	google.protobuf.Timestamp updated_at = 2 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
 	string ref = 3;
 	int64 offset = 4;
 	int64 total = 5;
 	string expected = 6 [(gogoproto.customtype) = "github.com/opencontainers/go-digest.Digest", (gogoproto.nullable) = false];
-***REMOVED***
+}
 
 
-message StatusRequest ***REMOVED***
+message StatusRequest {
 	string ref = 1;
-***REMOVED***
+}
 
-message StatusResponse ***REMOVED***
+message StatusResponse {
 	Status status = 1;
-***REMOVED***
+}
 
-message ListStatusesRequest ***REMOVED***
+message ListStatusesRequest {
 	repeated string filters = 1;
-***REMOVED***
+}
 
-message ListStatusesResponse ***REMOVED***
+message ListStatusesResponse {
 	repeated Status statuses = 1 [(gogoproto.nullable) = false];
-***REMOVED***
+}
 
 // WriteAction defines the behavior of a WriteRequest.
-enum WriteAction ***REMOVED***
+enum WriteAction {
 	option (gogoproto.goproto_enum_prefix) = false;
 	option (gogoproto.enum_customname) = "WriteAction";
 
@@ -213,10 +213,10 @@ enum WriteAction ***REMOVED***
 	//
 	// This action will always terminate the write.
 	COMMIT = 2 [(gogoproto.enumvalue_customname) = "WriteActionCommit"];
-***REMOVED***
+}
 
 // WriteContentRequest writes data to the request ref at offset.
-message WriteContentRequest ***REMOVED***
+message WriteContentRequest {
 	// Action sets the behavior of the write.
 	//
 	// When this is a write and the ref is not yet allocated, the ref will be
@@ -276,10 +276,10 @@ message WriteContentRequest ***REMOVED***
 	//
 	// The combined size of a key/value pair cannot exceed 4096 bytes.
 	map<string, string> labels  = 7;
-***REMOVED***
+}
 
 // WriteContentResponse is returned on the culmination of a write call.
-message WriteContentResponse ***REMOVED***
+message WriteContentResponse {
 	// Action contains the action for the final message of the stream. A writer
 	// should confirm that they match the intended result.
 	WriteAction action = 1;
@@ -311,8 +311,8 @@ message WriteContentResponse ***REMOVED***
 	// bytes. If action is commit, this field will be set. It is implementation
 	// defined if this is set for other actions.
 	string digest = 6 [(gogoproto.customtype) = "github.com/opencontainers/go-digest.Digest", (gogoproto.nullable) = false];
-***REMOVED***
+}
 
-message AbortRequest ***REMOVED***
+message AbortRequest {
 	string ref = 1;
-***REMOVED***
+}

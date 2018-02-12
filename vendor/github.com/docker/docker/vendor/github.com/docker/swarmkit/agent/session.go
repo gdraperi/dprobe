@@ -27,7 +27,7 @@ var (
 // All communication with the master is done through session.  Changes that
 // flow into the agent, such as task assignment, are called back into the
 // agent through errs, messages and tasks.
-type session struct ***REMOVED***
+type session struct {
 	conn *connectionbroker.Conn
 
 	agent         *Agent
@@ -39,24 +39,24 @@ type session struct ***REMOVED***
 	subscriptions chan *api.SubscriptionMessage
 
 	cancel     func()        // this is assumed to be never nil, and set whenever a session is created
-	registered chan struct***REMOVED******REMOVED*** // closed registration
-	closed     chan struct***REMOVED******REMOVED***
+	registered chan struct{} // closed registration
+	closed     chan struct{}
 	closeOnce  sync.Once
-***REMOVED***
+}
 
-func newSession(ctx context.Context, agent *Agent, delay time.Duration, sessionID string, description *api.NodeDescription) *session ***REMOVED***
+func newSession(ctx context.Context, agent *Agent, delay time.Duration, sessionID string, description *api.NodeDescription) *session {
 	sessionCtx, sessionCancel := context.WithCancel(ctx)
-	s := &session***REMOVED***
+	s := &session{
 		agent:         agent,
 		sessionID:     sessionID,
 		errs:          make(chan error, 1),
 		messages:      make(chan *api.SessionMessage),
 		assignments:   make(chan *api.AssignmentsMessage),
 		subscriptions: make(chan *api.SubscriptionMessage),
-		registered:    make(chan struct***REMOVED******REMOVED***),
-		closed:        make(chan struct***REMOVED******REMOVED***),
+		registered:    make(chan struct{}),
+		closed:        make(chan struct{}),
 		cancel:        sessionCancel,
-	***REMOVED***
+	}
 
 	// TODO(stevvooe): Need to move connection management up a level or create
 	// independent connection for log broker client.
@@ -65,33 +65,33 @@ func newSession(ctx context.Context, agent *Agent, delay time.Duration, sessionI
 		grpc.WithTransportCredentials(agent.config.Credentials),
 		grpc.WithTimeout(dispatcherRPCTimeout),
 	)
-	if err != nil ***REMOVED***
+	if err != nil {
 		s.errs <- err
 		return s
-	***REMOVED***
+	}
 	s.conn = cc
 
 	go s.run(sessionCtx, delay, description)
 	return s
-***REMOVED***
+}
 
-func (s *session) run(ctx context.Context, delay time.Duration, description *api.NodeDescription) ***REMOVED***
+func (s *session) run(ctx context.Context, delay time.Duration, description *api.NodeDescription) {
 	timer := time.NewTimer(delay) // delay before registering.
 	defer timer.Stop()
-	select ***REMOVED***
+	select {
 	case <-timer.C:
 	case <-ctx.Done():
 		return
-	***REMOVED***
+	}
 
-	if err := s.start(ctx, description); err != nil ***REMOVED***
-		select ***REMOVED***
+	if err := s.start(ctx, description); err != nil {
+		select {
 		case s.errs <- err:
 		case <-s.closed:
 		case <-ctx.Done():
-		***REMOVED***
+		}
 		return
-	***REMOVED***
+	}
 
 	ctx = log.WithLogger(ctx, log.G(ctx).WithField("session.id", s.sessionID))
 
@@ -101,10 +101,10 @@ func (s *session) run(ctx context.Context, delay time.Duration, description *api
 	go runctx(ctx, s.closed, s.errs, s.logSubscriptions)
 
 	close(s.registered)
-***REMOVED***
+}
 
 // start begins the session and returns the first SessionMessage.
-func (s *session) start(ctx context.Context, description *api.NodeDescription) error ***REMOVED***
+func (s *session) start(ctx context.Context, description *api.NodeDescription) error {
 	log.G(ctx).Debugf("(*session).start")
 
 	errChan := make(chan error, 1)
@@ -128,134 +128,134 @@ func (s *session) start(ctx context.Context, description *api.NodeDescription) e
 
 	// Need to run Session in a goroutine since there's no way to set a
 	// timeout for an individual Recv call in a stream.
-	go func() ***REMOVED***
+	go func() {
 		client := api.NewDispatcherClient(s.conn.ClientConn)
 
-		stream, err = client.Session(sessionCtx, &api.SessionRequest***REMOVED***
+		stream, err = client.Session(sessionCtx, &api.SessionRequest{
 			Description: description,
 			SessionID:   s.sessionID,
-		***REMOVED***)
-		if err != nil ***REMOVED***
+		})
+		if err != nil {
 			errChan <- err
 			return
-		***REMOVED***
+		}
 
 		msg, err = stream.Recv()
 		errChan <- err
-	***REMOVED***()
+	}()
 
-	select ***REMOVED***
+	select {
 	case err := <-errChan:
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 	case <-time.After(dispatcherRPCTimeout):
 		cancelSession()
 		return errors.New("session initiation timed out")
-	***REMOVED***
+	}
 
 	s.sessionID = msg.SessionID
 	s.session = stream
 
 	return s.handleSessionMessage(ctx, msg)
-***REMOVED***
+}
 
-func (s *session) heartbeat(ctx context.Context) error ***REMOVED***
+func (s *session) heartbeat(ctx context.Context) error {
 	log.G(ctx).Debugf("(*session).heartbeat")
 	client := api.NewDispatcherClient(s.conn.ClientConn)
 	heartbeat := time.NewTimer(1) // send out a heartbeat right away
 	defer heartbeat.Stop()
 
-	for ***REMOVED***
-		select ***REMOVED***
+	for {
+		select {
 		case <-heartbeat.C:
 			heartbeatCtx, cancel := context.WithTimeout(ctx, dispatcherRPCTimeout)
-			resp, err := client.Heartbeat(heartbeatCtx, &api.HeartbeatRequest***REMOVED***
+			resp, err := client.Heartbeat(heartbeatCtx, &api.HeartbeatRequest{
 				SessionID: s.sessionID,
-			***REMOVED***)
+			})
 			cancel()
-			if err != nil ***REMOVED***
-				if grpc.Code(err) == codes.NotFound ***REMOVED***
+			if err != nil {
+				if grpc.Code(err) == codes.NotFound {
 					err = errNodeNotRegistered
-				***REMOVED***
+				}
 
 				return err
-			***REMOVED***
+			}
 
 			heartbeat.Reset(resp.Period)
 		case <-s.closed:
 			return errSessionClosed
 		case <-ctx.Done():
 			return ctx.Err()
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (s *session) listen(ctx context.Context) error ***REMOVED***
+func (s *session) listen(ctx context.Context) error {
 	defer s.session.CloseSend()
 	log.G(ctx).Debugf("(*session).listen")
-	for ***REMOVED***
+	for {
 		msg, err := s.session.Recv()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 
-		if err := s.handleSessionMessage(ctx, msg); err != nil ***REMOVED***
+		if err := s.handleSessionMessage(ctx, msg); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (s *session) handleSessionMessage(ctx context.Context, msg *api.SessionMessage) error ***REMOVED***
-	select ***REMOVED***
+func (s *session) handleSessionMessage(ctx context.Context, msg *api.SessionMessage) error {
+	select {
 	case s.messages <- msg:
 		return nil
 	case <-s.closed:
 		return errSessionClosed
 	case <-ctx.Done():
 		return ctx.Err()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *session) logSubscriptions(ctx context.Context) error ***REMOVED***
-	log := log.G(ctx).WithFields(logrus.Fields***REMOVED***"method": "(*session).logSubscriptions"***REMOVED***)
+func (s *session) logSubscriptions(ctx context.Context) error {
+	log := log.G(ctx).WithFields(logrus.Fields{"method": "(*session).logSubscriptions"})
 	log.Debugf("")
 
 	client := api.NewLogBrokerClient(s.conn.ClientConn)
-	subscriptions, err := client.ListenSubscriptions(ctx, &api.ListenSubscriptionsRequest***REMOVED******REMOVED***)
-	if err != nil ***REMOVED***
+	subscriptions, err := client.ListenSubscriptions(ctx, &api.ListenSubscriptionsRequest{})
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer subscriptions.CloseSend()
 
-	for ***REMOVED***
+	for {
 		resp, err := subscriptions.Recv()
-		if grpc.Code(err) == codes.Unimplemented ***REMOVED***
+		if grpc.Code(err) == codes.Unimplemented {
 			log.Warning("manager does not support log subscriptions")
 			// Don't return, because returning would bounce the session
-			select ***REMOVED***
+			select {
 			case <-s.closed:
 				return errSessionClosed
 			case <-ctx.Done():
 				return ctx.Err()
-			***REMOVED***
-		***REMOVED***
-		if err != nil ***REMOVED***
+			}
+		}
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 
-		select ***REMOVED***
+		select {
 		case s.subscriptions <- resp:
 		case <-s.closed:
 			return errSessionClosed
 		case <-ctx.Done():
 			return ctx.Err()
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (s *session) watch(ctx context.Context) error ***REMOVED***
-	log := log.G(ctx).WithFields(logrus.Fields***REMOVED***"method": "(*session).watch"***REMOVED***)
+func (s *session) watch(ctx context.Context) error {
+	log := log.G(ctx).WithFields(logrus.Fields{"method": "(*session).watch"})
 	log.Debugf("")
 	var (
 		resp            *api.AssignmentsMessage
@@ -267,157 +267,157 @@ func (s *session) watch(ctx context.Context) error ***REMOVED***
 	)
 
 	client := api.NewDispatcherClient(s.conn.ClientConn)
-	for ***REMOVED***
+	for {
 		// If this is the first time we're running the loop, or there was a reference mismatch
 		// attempt to get the assignmentWatch
-		if assignmentWatch == nil && !tasksFallback ***REMOVED***
-			assignmentWatch, err = client.Assignments(ctx, &api.AssignmentsRequest***REMOVED***SessionID: s.sessionID***REMOVED***)
-			if err != nil ***REMOVED***
+		if assignmentWatch == nil && !tasksFallback {
+			assignmentWatch, err = client.Assignments(ctx, &api.AssignmentsRequest{SessionID: s.sessionID})
+			if err != nil {
 				return err
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		// We have an assignmentWatch, let's try to receive an AssignmentMessage
-		if assignmentWatch != nil ***REMOVED***
+		if assignmentWatch != nil {
 			// If we get a code = 12 desc = unknown method Assignments, try to use tasks
 			resp, err = assignmentWatch.Recv()
-			if err != nil ***REMOVED***
-				if grpc.Code(err) != codes.Unimplemented ***REMOVED***
+			if err != nil {
+				if grpc.Code(err) != codes.Unimplemented {
 					return err
-				***REMOVED***
+				}
 				tasksFallback = true
 				assignmentWatch = nil
 				log.WithError(err).Infof("falling back to Tasks")
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		// This code is here for backwards compatibility (so that newer clients can use the
 		// older method Tasks)
-		if tasksWatch == nil && tasksFallback ***REMOVED***
-			tasksWatch, err = client.Tasks(ctx, &api.TasksRequest***REMOVED***SessionID: s.sessionID***REMOVED***)
-			if err != nil ***REMOVED***
+		if tasksWatch == nil && tasksFallback {
+			tasksWatch, err = client.Tasks(ctx, &api.TasksRequest{SessionID: s.sessionID})
+			if err != nil {
 				return err
-			***REMOVED***
-		***REMOVED***
-		if tasksWatch != nil ***REMOVED***
+			}
+		}
+		if tasksWatch != nil {
 			// When falling back to Tasks because of an old managers, we wrap the tasks in assignments.
 			var taskResp *api.TasksMessage
 			var assignmentChanges []*api.AssignmentChange
 			taskResp, err = tasksWatch.Recv()
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			for _, t := range taskResp.Tasks ***REMOVED***
-				taskChange := &api.AssignmentChange***REMOVED***
-					Assignment: &api.Assignment***REMOVED***
-						Item: &api.Assignment_Task***REMOVED***
+			}
+			for _, t := range taskResp.Tasks {
+				taskChange := &api.AssignmentChange{
+					Assignment: &api.Assignment{
+						Item: &api.Assignment_Task{
 							Task: t,
-						***REMOVED***,
-					***REMOVED***,
+						},
+					},
 					Action: api.AssignmentChange_AssignmentActionUpdate,
-				***REMOVED***
+				}
 
 				assignmentChanges = append(assignmentChanges, taskChange)
-			***REMOVED***
-			resp = &api.AssignmentsMessage***REMOVED***Type: api.AssignmentsMessage_COMPLETE, Changes: assignmentChanges***REMOVED***
-		***REMOVED***
+			}
+			resp = &api.AssignmentsMessage{Type: api.AssignmentsMessage_COMPLETE, Changes: assignmentChanges}
+		}
 
 		// If there seems to be a gap in the stream, let's break out of the inner for and
 		// re-sync (by calling Assignments again).
-		if streamReference != "" && streamReference != resp.AppliesTo ***REMOVED***
+		if streamReference != "" && streamReference != resp.AppliesTo {
 			assignmentWatch = nil
-		***REMOVED*** else ***REMOVED***
+		} else {
 			streamReference = resp.ResultsIn
-		***REMOVED***
+		}
 
-		select ***REMOVED***
+		select {
 		case s.assignments <- resp:
 		case <-s.closed:
 			return errSessionClosed
 		case <-ctx.Done():
 			return ctx.Err()
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // sendTaskStatus uses the current session to send the status of a single task.
-func (s *session) sendTaskStatus(ctx context.Context, taskID string, status *api.TaskStatus) error ***REMOVED***
+func (s *session) sendTaskStatus(ctx context.Context, taskID string, status *api.TaskStatus) error {
 	client := api.NewDispatcherClient(s.conn.ClientConn)
-	if _, err := client.UpdateTaskStatus(ctx, &api.UpdateTaskStatusRequest***REMOVED***
+	if _, err := client.UpdateTaskStatus(ctx, &api.UpdateTaskStatusRequest{
 		SessionID: s.sessionID,
-		Updates: []*api.UpdateTaskStatusRequest_TaskStatusUpdate***REMOVED***
-			***REMOVED***
+		Updates: []*api.UpdateTaskStatusRequest_TaskStatusUpdate{
+			{
 				TaskID: taskID,
 				Status: status,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***); err != nil ***REMOVED***
+			},
+		},
+	}); err != nil {
 		// TODO(stevvooe): Dispatcher should not return this error. Status
 		// reports for unknown tasks should be ignored.
-		if grpc.Code(err) == codes.NotFound ***REMOVED***
+		if grpc.Code(err) == codes.NotFound {
 			return errTaskUnknown
-		***REMOVED***
+		}
 
 		return err
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (s *session) sendTaskStatuses(ctx context.Context, updates ...*api.UpdateTaskStatusRequest_TaskStatusUpdate) ([]*api.UpdateTaskStatusRequest_TaskStatusUpdate, error) ***REMOVED***
-	if len(updates) < 1 ***REMOVED***
+func (s *session) sendTaskStatuses(ctx context.Context, updates ...*api.UpdateTaskStatusRequest_TaskStatusUpdate) ([]*api.UpdateTaskStatusRequest_TaskStatusUpdate, error) {
+	if len(updates) < 1 {
 		return nil, nil
-	***REMOVED***
+	}
 
 	const batchSize = 1024
-	select ***REMOVED***
+	select {
 	case <-s.registered:
-		select ***REMOVED***
+		select {
 		case <-s.closed:
 			return updates, ErrClosed
 		default:
-		***REMOVED***
+		}
 	case <-s.closed:
 		return updates, ErrClosed
 	case <-ctx.Done():
 		return updates, ctx.Err()
-	***REMOVED***
+	}
 
 	client := api.NewDispatcherClient(s.conn.ClientConn)
 	n := batchSize
 
-	if len(updates) < n ***REMOVED***
+	if len(updates) < n {
 		n = len(updates)
-	***REMOVED***
+	}
 
-	if _, err := client.UpdateTaskStatus(ctx, &api.UpdateTaskStatusRequest***REMOVED***
+	if _, err := client.UpdateTaskStatus(ctx, &api.UpdateTaskStatusRequest{
 		SessionID: s.sessionID,
 		Updates:   updates[:n],
-	***REMOVED***); err != nil ***REMOVED***
+	}); err != nil {
 		log.G(ctx).WithError(err).Errorf("failed sending task status batch size of %d", len(updates[:n]))
 		return updates, err
-	***REMOVED***
+	}
 
 	return updates[n:], nil
-***REMOVED***
+}
 
 // sendError is used to send errors to errs channel and trigger session recreation
-func (s *session) sendError(err error) ***REMOVED***
-	select ***REMOVED***
+func (s *session) sendError(err error) {
+	select {
 	case s.errs <- err:
 	case <-s.closed:
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // close closing session. It should be called only in <-session.errs branch
 // of event loop, or when cleaning up the agent.
-func (s *session) close() error ***REMOVED***
-	s.closeOnce.Do(func() ***REMOVED***
+func (s *session) close() error {
+	s.closeOnce.Do(func() {
 		s.cancel()
-		if s.conn != nil ***REMOVED***
+		if s.conn != nil {
 			s.conn.Close(false)
-		***REMOVED***
+		}
 		close(s.closed)
-	***REMOVED***)
+	})
 
 	return nil
-***REMOVED***
+}

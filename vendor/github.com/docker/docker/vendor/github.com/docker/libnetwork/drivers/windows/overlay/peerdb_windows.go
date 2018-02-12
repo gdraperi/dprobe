@@ -15,45 +15,45 @@ import (
 const ovPeerTable = "overlay_peer_table"
 
 func (d *driver) peerAdd(nid, eid string, peerIP net.IP, peerIPMask net.IPMask,
-	peerMac net.HardwareAddr, vtep net.IP, updateDb bool) error ***REMOVED***
+	peerMac net.HardwareAddr, vtep net.IP, updateDb bool) error {
 
 	logrus.Debugf("WINOVERLAY: Enter peerAdd for ca ip %s with ca mac %s", peerIP.String(), peerMac.String())
 
-	if err := validateID(nid, eid); err != nil ***REMOVED***
+	if err := validateID(nid, eid); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	n := d.network(nid)
-	if n == nil ***REMOVED***
+	if n == nil {
 		return nil
-	***REMOVED***
+	}
 
-	if updateDb ***REMOVED***
+	if updateDb {
 		logrus.Info("WINOVERLAY: peerAdd: notifying HNS of the REMOTE endpoint")
 
-		hnsEndpoint := &hcsshim.HNSEndpoint***REMOVED***
+		hnsEndpoint := &hcsshim.HNSEndpoint{
 			Name:             eid,
 			VirtualNetwork:   n.hnsID,
 			MacAddress:       peerMac.String(),
 			IPAddress:        peerIP,
 			IsRemoteEndpoint: true,
-		***REMOVED***
+		}
 
-		paPolicy, err := json.Marshal(hcsshim.PaPolicy***REMOVED***
+		paPolicy, err := json.Marshal(hcsshim.PaPolicy{
 			Type: "PA",
 			PA:   vtep.String(),
-		***REMOVED***)
+		})
 
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 
 		hnsEndpoint.Policies = append(hnsEndpoint.Policies, paPolicy)
 
 		configurationb, err := json.Marshal(hnsEndpoint)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 
 		// Temp: We have to create an endpoint object to keep track of the HNS ID for
 		// this endpoint so that we can retrieve it later when the endpoint is deleted.
@@ -62,59 +62,59 @@ func (d *driver) peerAdd(nid, eid string, peerIP net.IP, peerIPMask net.IPMask,
 		// it's own local ID for the endpoint
 
 		addr, err := types.ParseCIDR(peerIP.String() + "/32")
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 
 		n.removeEndpointWithAddress(addr)
 
 		hnsresponse, err := hcsshim.HNSEndpointRequest("POST", "", string(configurationb))
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 
-		ep := &endpoint***REMOVED***
+		ep := &endpoint{
 			id:        eid,
 			nid:       nid,
 			addr:      addr,
 			mac:       peerMac,
 			profileID: hnsresponse.Id,
 			remote:    true,
-		***REMOVED***
+		}
 
 		n.addEndpoint(ep)
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 func (d *driver) peerDelete(nid, eid string, peerIP net.IP, peerIPMask net.IPMask,
-	peerMac net.HardwareAddr, vtep net.IP, updateDb bool) error ***REMOVED***
+	peerMac net.HardwareAddr, vtep net.IP, updateDb bool) error {
 
 	logrus.Infof("WINOVERLAY: Enter peerDelete for endpoint %s and peer ip %s", eid, peerIP.String())
 
-	if err := validateID(nid, eid); err != nil ***REMOVED***
+	if err := validateID(nid, eid); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	n := d.network(nid)
-	if n == nil ***REMOVED***
+	if n == nil {
 		return nil
-	***REMOVED***
+	}
 
 	ep := n.endpoint(eid)
-	if ep == nil ***REMOVED***
+	if ep == nil {
 		return fmt.Errorf("could not find endpoint with id %s", eid)
-	***REMOVED***
+	}
 
-	if updateDb ***REMOVED***
+	if updateDb {
 		_, err := hcsshim.HNSEndpointRequest("DELETE", ep.profileID, "")
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 
 		n.deleteEndpoint(eid)
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}

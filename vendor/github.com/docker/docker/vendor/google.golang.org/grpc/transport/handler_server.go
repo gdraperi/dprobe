@@ -59,76 +59,76 @@ import (
 // NewServerHandlerTransport returns a ServerTransport handling gRPC
 // from inside an http.Handler. It requires that the http Server
 // supports HTTP/2.
-func NewServerHandlerTransport(w http.ResponseWriter, r *http.Request) (ServerTransport, error) ***REMOVED***
-	if r.ProtoMajor != 2 ***REMOVED***
+func NewServerHandlerTransport(w http.ResponseWriter, r *http.Request) (ServerTransport, error) {
+	if r.ProtoMajor != 2 {
 		return nil, errors.New("gRPC requires HTTP/2")
-	***REMOVED***
-	if r.Method != "POST" ***REMOVED***
+	}
+	if r.Method != "POST" {
 		return nil, errors.New("invalid gRPC request method")
-	***REMOVED***
-	if !validContentType(r.Header.Get("Content-Type")) ***REMOVED***
+	}
+	if !validContentType(r.Header.Get("Content-Type")) {
 		return nil, errors.New("invalid gRPC request content-type")
-	***REMOVED***
-	if _, ok := w.(http.Flusher); !ok ***REMOVED***
+	}
+	if _, ok := w.(http.Flusher); !ok {
 		return nil, errors.New("gRPC requires a ResponseWriter supporting http.Flusher")
-	***REMOVED***
-	if _, ok := w.(http.CloseNotifier); !ok ***REMOVED***
+	}
+	if _, ok := w.(http.CloseNotifier); !ok {
 		return nil, errors.New("gRPC requires a ResponseWriter supporting http.CloseNotifier")
-	***REMOVED***
+	}
 
-	st := &serverHandlerTransport***REMOVED***
+	st := &serverHandlerTransport{
 		rw:       w,
 		req:      r,
-		closedCh: make(chan struct***REMOVED******REMOVED***),
+		closedCh: make(chan struct{}),
 		writes:   make(chan func()),
-	***REMOVED***
+	}
 
-	if v := r.Header.Get("grpc-timeout"); v != "" ***REMOVED***
+	if v := r.Header.Get("grpc-timeout"); v != "" {
 		to, err := decodeTimeout(v)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, streamErrorf(codes.Internal, "malformed time-out: %v", err)
-		***REMOVED***
+		}
 		st.timeoutSet = true
 		st.timeout = to
-	***REMOVED***
+	}
 
 	var metakv []string
-	if r.Host != "" ***REMOVED***
+	if r.Host != "" {
 		metakv = append(metakv, ":authority", r.Host)
-	***REMOVED***
-	for k, vv := range r.Header ***REMOVED***
+	}
+	for k, vv := range r.Header {
 		k = strings.ToLower(k)
-		if isReservedHeader(k) && !isWhitelistedPseudoHeader(k) ***REMOVED***
+		if isReservedHeader(k) && !isWhitelistedPseudoHeader(k) {
 			continue
-		***REMOVED***
-		for _, v := range vv ***REMOVED***
-			if k == "user-agent" ***REMOVED***
+		}
+		for _, v := range vv {
+			if k == "user-agent" {
 				// user-agent is special. Copying logic of http_util.go.
-				if i := strings.LastIndex(v, " "); i == -1 ***REMOVED***
+				if i := strings.LastIndex(v, " "); i == -1 {
 					// There is no application user agent string being set
 					continue
-				***REMOVED*** else ***REMOVED***
+				} else {
 					v = v[:i]
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			v, err := decodeMetadataHeader(k, v)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, streamErrorf(codes.InvalidArgument, "malformed binary metadata: %v", err)
-			***REMOVED***
+			}
 			metakv = append(metakv, k, v)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	st.headerMD = metadata.Pairs(metakv...)
 
 	return st, nil
-***REMOVED***
+}
 
 // serverHandlerTransport is an implementation of ServerTransport
 // which replies to exactly one gRPC request (exactly one HTTP request),
 // using the net/http.Handler interface. This http.Handler is guaranteed
 // at this point to be speaking over HTTP/2, so it's able to speak valid
 // gRPC.
-type serverHandlerTransport struct ***REMOVED***
+type serverHandlerTransport struct {
 	rw               http.ResponseWriter
 	req              *http.Request
 	timeoutSet       bool
@@ -138,29 +138,29 @@ type serverHandlerTransport struct ***REMOVED***
 	headerMD metadata.MD
 
 	closeOnce sync.Once
-	closedCh  chan struct***REMOVED******REMOVED*** // closed on Close
+	closedCh  chan struct{} // closed on Close
 
 	// writes is a channel of code to run serialized in the
 	// ServeHTTP (HandleStreams) goroutine. The channel is closed
 	// when WriteStatus is called.
 	writes chan func()
-***REMOVED***
+}
 
-func (ht *serverHandlerTransport) Close() error ***REMOVED***
+func (ht *serverHandlerTransport) Close() error {
 	ht.closeOnce.Do(ht.closeCloseChanOnce)
 	return nil
-***REMOVED***
+}
 
-func (ht *serverHandlerTransport) closeCloseChanOnce() ***REMOVED*** close(ht.closedCh) ***REMOVED***
+func (ht *serverHandlerTransport) closeCloseChanOnce() { close(ht.closedCh) }
 
-func (ht *serverHandlerTransport) RemoteAddr() net.Addr ***REMOVED*** return strAddr(ht.req.RemoteAddr) ***REMOVED***
+func (ht *serverHandlerTransport) RemoteAddr() net.Addr { return strAddr(ht.req.RemoteAddr) }
 
 // strAddr is a net.Addr backed by either a TCP "ip:port" string, or
 // the empty string if unknown.
 type strAddr string
 
-func (a strAddr) Network() string ***REMOVED***
-	if a != "" ***REMOVED***
+func (a strAddr) Network() string {
+	if a != "" {
 		// Per the documentation on net/http.Request.RemoteAddr, if this is
 		// set, it's set to the IP:port of the peer (hence, TCP):
 		// https://golang.org/pkg/net/http/#Request
@@ -171,24 +171,24 @@ func (a strAddr) Network() string ***REMOVED***
 		// format, or probably better: we can attach it to the
 		// context and use that from serverHandlerTransport.RemoteAddr.
 		return "tcp"
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (a strAddr) String() string ***REMOVED*** return string(a) ***REMOVED***
+func (a strAddr) String() string { return string(a) }
 
 // do runs fn in the ServeHTTP goroutine.
-func (ht *serverHandlerTransport) do(fn func()) error ***REMOVED***
-	select ***REMOVED***
+func (ht *serverHandlerTransport) do(fn func()) error {
+	select {
 	case ht.writes <- fn:
 		return nil
 	case <-ht.closedCh:
 		return ErrConnClosing
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (ht *serverHandlerTransport) WriteStatus(s *Stream, st *status.Status) error ***REMOVED***
-	err := ht.do(func() ***REMOVED***
+func (ht *serverHandlerTransport) WriteStatus(s *Stream, st *status.Status) error {
+	err := ht.do(func() {
 		ht.writeCommonHeaders(s)
 
 		// And flush, in case no header or body has been sent yet.
@@ -198,36 +198,36 @@ func (ht *serverHandlerTransport) WriteStatus(s *Stream, st *status.Status) erro
 
 		h := ht.rw.Header()
 		h.Set("Grpc-Status", fmt.Sprintf("%d", st.Code()))
-		if m := st.Message(); m != "" ***REMOVED***
+		if m := st.Message(); m != "" {
 			h.Set("Grpc-Message", encodeGrpcMessage(m))
-		***REMOVED***
+		}
 
 		// TODO: Support Grpc-Status-Details-Bin
 
-		if md := s.Trailer(); len(md) > 0 ***REMOVED***
-			for k, vv := range md ***REMOVED***
+		if md := s.Trailer(); len(md) > 0 {
+			for k, vv := range md {
 				// Clients don't tolerate reading restricted headers after some non restricted ones were sent.
-				if isReservedHeader(k) ***REMOVED***
+				if isReservedHeader(k) {
 					continue
-				***REMOVED***
-				for _, v := range vv ***REMOVED***
+				}
+				for _, v := range vv {
 					// http2 ResponseWriter mechanism to send undeclared Trailers after
 					// the headers have possibly been written.
 					h.Add(http2.TrailerPrefix+k, encodeMetadataHeader(k, v))
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***)
+				}
+			}
+		}
+	})
 	close(ht.writes)
 	return err
-***REMOVED***
+}
 
 // writeCommonHeaders sets common headers on the first write
 // call (Write, WriteHeader, or WriteStatus).
-func (ht *serverHandlerTransport) writeCommonHeaders(s *Stream) ***REMOVED***
-	if ht.didCommonHeaders ***REMOVED***
+func (ht *serverHandlerTransport) writeCommonHeaders(s *Stream) {
+	if ht.didCommonHeaders {
 		return
-	***REMOVED***
+	}
 	ht.didCommonHeaders = true
 
 	h := ht.rw.Header()
@@ -243,113 +243,113 @@ func (ht *serverHandlerTransport) writeCommonHeaders(s *Stream) ***REMOVED***
 	h.Add("Trailer", "Grpc-Message")
 	// TODO: Support Grpc-Status-Details-Bin
 
-	if s.sendCompress != "" ***REMOVED***
+	if s.sendCompress != "" {
 		h.Set("Grpc-Encoding", s.sendCompress)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (ht *serverHandlerTransport) Write(s *Stream, data []byte, opts *Options) error ***REMOVED***
-	return ht.do(func() ***REMOVED***
+func (ht *serverHandlerTransport) Write(s *Stream, data []byte, opts *Options) error {
+	return ht.do(func() {
 		ht.writeCommonHeaders(s)
 		ht.rw.Write(data)
-		if !opts.Delay ***REMOVED***
+		if !opts.Delay {
 			ht.rw.(http.Flusher).Flush()
-		***REMOVED***
-	***REMOVED***)
-***REMOVED***
+		}
+	})
+}
 
-func (ht *serverHandlerTransport) WriteHeader(s *Stream, md metadata.MD) error ***REMOVED***
-	return ht.do(func() ***REMOVED***
+func (ht *serverHandlerTransport) WriteHeader(s *Stream, md metadata.MD) error {
+	return ht.do(func() {
 		ht.writeCommonHeaders(s)
 		h := ht.rw.Header()
-		for k, vv := range md ***REMOVED***
+		for k, vv := range md {
 			// Clients don't tolerate reading restricted headers after some non restricted ones were sent.
-			if isReservedHeader(k) ***REMOVED***
+			if isReservedHeader(k) {
 				continue
-			***REMOVED***
-			for _, v := range vv ***REMOVED***
+			}
+			for _, v := range vv {
 				v = encodeMetadataHeader(k, v)
 				h.Add(k, v)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		ht.rw.WriteHeader(200)
 		ht.rw.(http.Flusher).Flush()
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func (ht *serverHandlerTransport) HandleStreams(startStream func(*Stream), traceCtx func(context.Context, string) context.Context) ***REMOVED***
+func (ht *serverHandlerTransport) HandleStreams(startStream func(*Stream), traceCtx func(context.Context, string) context.Context) {
 	// With this transport type there will be exactly 1 stream: this HTTP request.
 
 	var ctx context.Context
 	var cancel context.CancelFunc
-	if ht.timeoutSet ***REMOVED***
+	if ht.timeoutSet {
 		ctx, cancel = context.WithTimeout(context.Background(), ht.timeout)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		ctx, cancel = context.WithCancel(context.Background())
-	***REMOVED***
+	}
 
 	// requestOver is closed when either the request's context is done
 	// or the status has been written via WriteStatus.
-	requestOver := make(chan struct***REMOVED******REMOVED***)
+	requestOver := make(chan struct{})
 
 	// clientGone receives a single value if peer is gone, either
 	// because the underlying connection is dead or because the
 	// peer sends an http2 RST_STREAM.
 	clientGone := ht.rw.(http.CloseNotifier).CloseNotify()
-	go func() ***REMOVED***
-		select ***REMOVED***
+	go func() {
+		select {
 		case <-requestOver:
 			return
 		case <-ht.closedCh:
 		case <-clientGone:
-		***REMOVED***
+		}
 		cancel()
-	***REMOVED***()
+	}()
 
 	req := ht.req
 
-	s := &Stream***REMOVED***
+	s := &Stream{
 		id:            0,            // irrelevant
-		windowHandler: func(int) ***REMOVED******REMOVED***, // nothing
+		windowHandler: func(int) {}, // nothing
 		cancel:        cancel,
 		buf:           newRecvBuffer(),
 		st:            ht,
 		method:        req.URL.Path,
 		recvCompress:  req.Header.Get("grpc-encoding"),
-	***REMOVED***
-	pr := &peer.Peer***REMOVED***
+	}
+	pr := &peer.Peer{
 		Addr: ht.RemoteAddr(),
-	***REMOVED***
-	if req.TLS != nil ***REMOVED***
-		pr.AuthInfo = credentials.TLSInfo***REMOVED***State: *req.TLS***REMOVED***
-	***REMOVED***
+	}
+	if req.TLS != nil {
+		pr.AuthInfo = credentials.TLSInfo{State: *req.TLS}
+	}
 	ctx = metadata.NewIncomingContext(ctx, ht.headerMD)
 	ctx = peer.NewContext(ctx, pr)
 	s.ctx = newContextWithStream(ctx, s)
-	s.dec = &recvBufferReader***REMOVED***ctx: s.ctx, recv: s.buf***REMOVED***
+	s.dec = &recvBufferReader{ctx: s.ctx, recv: s.buf}
 
 	// readerDone is closed when the Body.Read-ing goroutine exits.
-	readerDone := make(chan struct***REMOVED******REMOVED***)
-	go func() ***REMOVED***
+	readerDone := make(chan struct{})
+	go func() {
 		defer close(readerDone)
 
 		// TODO: minimize garbage, optimize recvBuffer code/ownership
 		const readSize = 8196
-		for buf := make([]byte, readSize); ; ***REMOVED***
+		for buf := make([]byte, readSize); ; {
 			n, err := req.Body.Read(buf)
-			if n > 0 ***REMOVED***
-				s.buf.put(&recvMsg***REMOVED***data: buf[:n:n]***REMOVED***)
+			if n > 0 {
+				s.buf.put(&recvMsg{data: buf[:n:n]})
 				buf = buf[n:]
-			***REMOVED***
-			if err != nil ***REMOVED***
-				s.buf.put(&recvMsg***REMOVED***err: mapRecvMsgError(err)***REMOVED***)
+			}
+			if err != nil {
+				s.buf.put(&recvMsg{err: mapRecvMsgError(err)})
 				return
-			***REMOVED***
-			if len(buf) == 0 ***REMOVED***
+			}
+			if len(buf) == 0 {
 				buf = make([]byte, readSize)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***()
+			}
+		}
+	}()
 
 	// startStream is provided by the *grpc.Server's serveStreams.
 	// It starts a goroutine serving s and exits immediately.
@@ -363,25 +363,25 @@ func (ht *serverHandlerTransport) HandleStreams(startStream func(*Stream), trace
 	// Wait for reading goroutine to finish.
 	req.Body.Close()
 	<-readerDone
-***REMOVED***
+}
 
-func (ht *serverHandlerTransport) runStream() ***REMOVED***
-	for ***REMOVED***
-		select ***REMOVED***
+func (ht *serverHandlerTransport) runStream() {
+	for {
+		select {
 		case fn, ok := <-ht.writes:
-			if !ok ***REMOVED***
+			if !ok {
 				return
-			***REMOVED***
+			}
 			fn()
 		case <-ht.closedCh:
 			return
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (ht *serverHandlerTransport) Drain() ***REMOVED***
+func (ht *serverHandlerTransport) Drain() {
 	panic("Drain() is not implemented")
-***REMOVED***
+}
 
 // mapRecvMsgError returns the non-nil err into the appropriate
 // error value as expected by callers of *grpc.parser.recvMsg.
@@ -390,17 +390,17 @@ func (ht *serverHandlerTransport) Drain() ***REMOVED***
 //   * io.ErrUnexpectedEOF
 //   * of type transport.ConnectionError
 //   * of type transport.StreamError
-func mapRecvMsgError(err error) error ***REMOVED***
-	if err == io.EOF || err == io.ErrUnexpectedEOF ***REMOVED***
+func mapRecvMsgError(err error) error {
+	if err == io.EOF || err == io.ErrUnexpectedEOF {
 		return err
-	***REMOVED***
-	if se, ok := err.(http2.StreamError); ok ***REMOVED***
-		if code, ok := http2ErrConvTab[se.Code]; ok ***REMOVED***
-			return StreamError***REMOVED***
+	}
+	if se, ok := err.(http2.StreamError); ok {
+		if code, ok := http2ErrConvTab[se.Code]; ok {
+			return StreamError{
 				Code: code,
 				Desc: se.Error(),
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return connectionErrorf(true, err, err.Error())
-***REMOVED***
+}

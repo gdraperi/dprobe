@@ -2,6 +2,6 @@
 
 package daemon
 
-func ensureDefaultAppArmorProfile() error ***REMOVED***
+func ensureDefaultAppArmorProfile() error {
 	return nil
-***REMOVED***
+}

@@ -21,7 +21,7 @@ import (
 )
 
 var (
-	separator    = []byte***REMOVED***0***REMOVED***
+	separator    = []byte{0}
 	MetricNameRE = regexp.MustCompile(`^[a-zA-Z_][a-zA-Z0-9_:]*$`)
 )
 
@@ -30,69 +30,69 @@ var (
 type Metric LabelSet
 
 // Equal compares the metrics.
-func (m Metric) Equal(o Metric) bool ***REMOVED***
+func (m Metric) Equal(o Metric) bool {
 	return LabelSet(m).Equal(LabelSet(o))
-***REMOVED***
+}
 
 // Before compares the metrics' underlying label sets.
-func (m Metric) Before(o Metric) bool ***REMOVED***
+func (m Metric) Before(o Metric) bool {
 	return LabelSet(m).Before(LabelSet(o))
-***REMOVED***
+}
 
 // Clone returns a copy of the Metric.
-func (m Metric) Clone() Metric ***REMOVED***
-	clone := Metric***REMOVED******REMOVED***
-	for k, v := range m ***REMOVED***
+func (m Metric) Clone() Metric {
+	clone := Metric{}
+	for k, v := range m {
 		clone[k] = v
-	***REMOVED***
+	}
 	return clone
-***REMOVED***
+}
 
-func (m Metric) String() string ***REMOVED***
+func (m Metric) String() string {
 	metricName, hasName := m[MetricNameLabel]
 	numLabels := len(m) - 1
-	if !hasName ***REMOVED***
+	if !hasName {
 		numLabels = len(m)
-	***REMOVED***
+	}
 	labelStrings := make([]string, 0, numLabels)
-	for label, value := range m ***REMOVED***
-		if label != MetricNameLabel ***REMOVED***
+	for label, value := range m {
+		if label != MetricNameLabel {
 			labelStrings = append(labelStrings, fmt.Sprintf("%s=%q", label, value))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	switch numLabels ***REMOVED***
+	switch numLabels {
 	case 0:
-		if hasName ***REMOVED***
+		if hasName {
 			return string(metricName)
-		***REMOVED***
-		return "***REMOVED******REMOVED***"
+		}
+		return "{}"
 	default:
 		sort.Strings(labelStrings)
-		return fmt.Sprintf("%s***REMOVED***%s***REMOVED***", metricName, strings.Join(labelStrings, ", "))
-	***REMOVED***
-***REMOVED***
+		return fmt.Sprintf("%s{%s}", metricName, strings.Join(labelStrings, ", "))
+	}
+}
 
 // Fingerprint returns a Metric's Fingerprint.
-func (m Metric) Fingerprint() Fingerprint ***REMOVED***
+func (m Metric) Fingerprint() Fingerprint {
 	return LabelSet(m).Fingerprint()
-***REMOVED***
+}
 
 // FastFingerprint returns a Metric's Fingerprint calculated by a faster hashing
 // algorithm, which is, however, more susceptible to hash collisions.
-func (m Metric) FastFingerprint() Fingerprint ***REMOVED***
+func (m Metric) FastFingerprint() Fingerprint {
 	return LabelSet(m).FastFingerprint()
-***REMOVED***
+}
 
 // IsValidMetricName returns true iff name matches the pattern of MetricNameRE.
-func IsValidMetricName(n LabelValue) bool ***REMOVED***
-	if len(n) == 0 ***REMOVED***
+func IsValidMetricName(n LabelValue) bool {
+	if len(n) == 0 {
 		return false
-	***REMOVED***
-	for i, b := range n ***REMOVED***
-		if !((b >= 'a' && b <= 'z') || (b >= 'A' && b <= 'Z') || b == '_' || b == ':' || (b >= '0' && b <= '9' && i > 0)) ***REMOVED***
+	}
+	for i, b := range n {
+		if !((b >= 'a' && b <= 'z') || (b >= 'A' && b <= 'Z') || b == '_' || b == ':' || (b >= '0' && b <= '9' && i > 0)) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}

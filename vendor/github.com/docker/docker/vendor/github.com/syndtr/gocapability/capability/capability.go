@@ -7,7 +7,7 @@
 // Package capability provides utilities for manipulating POSIX capabilities.
 package capability
 
-type Capabilities interface ***REMOVED***
+type Capabilities interface {
 	// Get check whether a capability present in the given
 	// capabilities set. The 'which' value should be one of EFFECTIVE,
 	// PERMITTED, INHERITABLE or BOUNDING.
@@ -58,15 +58,15 @@ type Capabilities interface ***REMOVED***
 	// Apply apply the capabilities settings, so all changes will take
 	// effect.
 	Apply(kind CapType) error
-***REMOVED***
+}
 
 // NewPid create new initialized Capabilities object for given pid when it
 // is nonzero, or for the current pid if pid is 0
-func NewPid(pid int) (Capabilities, error) ***REMOVED***
+func NewPid(pid int) (Capabilities, error) {
 	return newPid(pid)
-***REMOVED***
+}
 
 // NewFile create new initialized Capabilities object for given named file.
-func NewFile(name string) (Capabilities, error) ***REMOVED***
+func NewFile(name string) (Capabilities, error) {
 	return newFile(name)
-***REMOVED***
+}

@@ -12,48 +12,48 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestConfigRemoveUnsupported(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestConfigRemoveUnsupported(t *testing.T) {
+	client := &Client{
 		version: "1.29",
-		client:  &http.Client***REMOVED******REMOVED***,
-	***REMOVED***
+		client:  &http.Client{},
+	}
 	err := client.ConfigRemove(context.Background(), "config_id")
 	assert.EqualError(t, err, `"config remove" requires API version 1.30, but the Docker daemon API version is 1.29`)
-***REMOVED***
+}
 
-func TestConfigRemoveError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestConfigRemoveError(t *testing.T) {
+	client := &Client{
 		version: "1.30",
 		client:  newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
-	***REMOVED***
+	}
 
 	err := client.ConfigRemove(context.Background(), "config_id")
-	if err == nil || err.Error() != "Error response from daemon: Server error" ***REMOVED***
+	if err == nil || err.Error() != "Error response from daemon: Server error" {
 		t.Fatalf("expected a Server Error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestConfigRemove(t *testing.T) ***REMOVED***
+func TestConfigRemove(t *testing.T) {
 	expectedURL := "/v1.30/configs/config_id"
 
-	client := &Client***REMOVED***
+	client := &Client{
 		version: "1.30",
-		client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-			if !strings.HasPrefix(req.URL.Path, expectedURL) ***REMOVED***
+		client: newMockClient(func(req *http.Request) (*http.Response, error) {
+			if !strings.HasPrefix(req.URL.Path, expectedURL) {
 				return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, req.URL)
-			***REMOVED***
-			if req.Method != "DELETE" ***REMOVED***
+			}
+			if req.Method != "DELETE" {
 				return nil, fmt.Errorf("expected DELETE method, got %s", req.Method)
-			***REMOVED***
-			return &http.Response***REMOVED***
+			}
+			return &http.Response{
 				StatusCode: http.StatusOK,
 				Body:       ioutil.NopCloser(bytes.NewReader([]byte("body"))),
-			***REMOVED***, nil
-		***REMOVED***),
-	***REMOVED***
+			}, nil
+		}),
+	}
 
 	err := client.ConfigRemove(context.Background(), "config_id")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}

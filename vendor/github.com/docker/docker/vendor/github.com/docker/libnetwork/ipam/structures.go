@@ -13,22 +13,22 @@ import (
 )
 
 // SubnetKey is the pointer to the configured pools in each address space
-type SubnetKey struct ***REMOVED***
+type SubnetKey struct {
 	AddressSpace string
 	Subnet       string
 	ChildSubnet  string
-***REMOVED***
+}
 
 // PoolData contains the configured pool data
-type PoolData struct ***REMOVED***
+type PoolData struct {
 	ParentKey SubnetKey
 	Pool      *net.IPNet
 	Range     *AddressRange `json:",omitempty"`
 	RefCount  int
-***REMOVED***
+}
 
 // addrSpace contains the pool configurations for the address space
-type addrSpace struct ***REMOVED***
+type addrSpace struct {
 	subnets  map[SubnetKey]*PoolData
 	dbIndex  uint64
 	dbExists bool
@@ -37,193 +37,193 @@ type addrSpace struct ***REMOVED***
 	ds       datastore.DataStore
 	alloc    *Allocator
 	sync.Mutex
-***REMOVED***
+}
 
 // AddressRange specifies first and last ip ordinal which
 // identifies a range in a pool of addresses
-type AddressRange struct ***REMOVED***
+type AddressRange struct {
 	Sub        *net.IPNet
 	Start, End uint64
-***REMOVED***
+}
 
 // String returns the string form of the AddressRange object
-func (r *AddressRange) String() string ***REMOVED***
+func (r *AddressRange) String() string {
 	return fmt.Sprintf("Sub: %s, range [%d, %d]", r.Sub, r.Start, r.End)
-***REMOVED***
+}
 
 // MarshalJSON returns the JSON encoding of the Range object
-func (r *AddressRange) MarshalJSON() ([]byte, error) ***REMOVED***
-	m := map[string]interface***REMOVED******REMOVED******REMOVED***
+func (r *AddressRange) MarshalJSON() ([]byte, error) {
+	m := map[string]interface{}{
 		"Sub":   r.Sub.String(),
 		"Start": r.Start,
 		"End":   r.End,
-	***REMOVED***
+	}
 	return json.Marshal(m)
-***REMOVED***
+}
 
 // UnmarshalJSON decodes data into the Range object
-func (r *AddressRange) UnmarshalJSON(data []byte) error ***REMOVED***
-	m := map[string]interface***REMOVED******REMOVED******REMOVED******REMOVED***
+func (r *AddressRange) UnmarshalJSON(data []byte) error {
+	m := map[string]interface{}{}
 	err := json.Unmarshal(data, &m)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	if r.Sub, err = types.ParseCIDR(m["Sub"].(string)); err != nil ***REMOVED***
+	}
+	if r.Sub, err = types.ParseCIDR(m["Sub"].(string)); err != nil {
 		return err
-	***REMOVED***
+	}
 	r.Start = uint64(m["Start"].(float64))
 	r.End = uint64(m["End"].(float64))
 	return nil
-***REMOVED***
+}
 
 // String returns the string form of the SubnetKey object
-func (s *SubnetKey) String() string ***REMOVED***
+func (s *SubnetKey) String() string {
 	k := fmt.Sprintf("%s/%s", s.AddressSpace, s.Subnet)
-	if s.ChildSubnet != "" ***REMOVED***
+	if s.ChildSubnet != "" {
 		k = fmt.Sprintf("%s/%s", k, s.ChildSubnet)
-	***REMOVED***
+	}
 	return k
-***REMOVED***
+}
 
 // FromString populates the SubnetKey object reading it from string
-func (s *SubnetKey) FromString(str string) error ***REMOVED***
-	if str == "" || !strings.Contains(str, "/") ***REMOVED***
+func (s *SubnetKey) FromString(str string) error {
+	if str == "" || !strings.Contains(str, "/") {
 		return types.BadRequestErrorf("invalid string form for subnetkey: %s", str)
-	***REMOVED***
+	}
 
 	p := strings.Split(str, "/")
-	if len(p) != 3 && len(p) != 5 ***REMOVED***
+	if len(p) != 3 && len(p) != 5 {
 		return types.BadRequestErrorf("invalid string form for subnetkey: %s", str)
-	***REMOVED***
+	}
 	s.AddressSpace = p[0]
 	s.Subnet = fmt.Sprintf("%s/%s", p[1], p[2])
-	if len(p) == 5 ***REMOVED***
+	if len(p) == 5 {
 		s.ChildSubnet = fmt.Sprintf("%s/%s", p[3], p[4])
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // String returns the string form of the PoolData object
-func (p *PoolData) String() string ***REMOVED***
+func (p *PoolData) String() string {
 	return fmt.Sprintf("ParentKey: %s, Pool: %s, Range: %s, RefCount: %d",
 		p.ParentKey.String(), p.Pool.String(), p.Range, p.RefCount)
-***REMOVED***
+}
 
 // MarshalJSON returns the JSON encoding of the PoolData object
-func (p *PoolData) MarshalJSON() ([]byte, error) ***REMOVED***
-	m := map[string]interface***REMOVED******REMOVED******REMOVED***
+func (p *PoolData) MarshalJSON() ([]byte, error) {
+	m := map[string]interface{}{
 		"ParentKey": p.ParentKey,
 		"RefCount":  p.RefCount,
-	***REMOVED***
-	if p.Pool != nil ***REMOVED***
+	}
+	if p.Pool != nil {
 		m["Pool"] = p.Pool.String()
-	***REMOVED***
-	if p.Range != nil ***REMOVED***
+	}
+	if p.Range != nil {
 		m["Range"] = p.Range
-	***REMOVED***
+	}
 	return json.Marshal(m)
-***REMOVED***
+}
 
 // UnmarshalJSON decodes data into the PoolData object
-func (p *PoolData) UnmarshalJSON(data []byte) error ***REMOVED***
+func (p *PoolData) UnmarshalJSON(data []byte) error {
 	var (
 		err error
-		t   struct ***REMOVED***
+		t   struct {
 			ParentKey SubnetKey
 			Pool      string
 			Range     *AddressRange `json:",omitempty"`
 			RefCount  int
-		***REMOVED***
+		}
 	)
 
-	if err = json.Unmarshal(data, &t); err != nil ***REMOVED***
+	if err = json.Unmarshal(data, &t); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	p.ParentKey = t.ParentKey
 	p.Range = t.Range
 	p.RefCount = t.RefCount
-	if t.Pool != "" ***REMOVED***
-		if p.Pool, err = types.ParseCIDR(t.Pool); err != nil ***REMOVED***
+	if t.Pool != "" {
+		if p.Pool, err = types.ParseCIDR(t.Pool); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
 // MarshalJSON returns the JSON encoding of the addrSpace object
-func (aSpace *addrSpace) MarshalJSON() ([]byte, error) ***REMOVED***
+func (aSpace *addrSpace) MarshalJSON() ([]byte, error) {
 	aSpace.Lock()
 	defer aSpace.Unlock()
 
-	m := map[string]interface***REMOVED******REMOVED******REMOVED***
+	m := map[string]interface{}{
 		"Scope": string(aSpace.scope),
-	***REMOVED***
+	}
 
-	if aSpace.subnets != nil ***REMOVED***
-		s := map[string]*PoolData***REMOVED******REMOVED***
-		for k, v := range aSpace.subnets ***REMOVED***
+	if aSpace.subnets != nil {
+		s := map[string]*PoolData{}
+		for k, v := range aSpace.subnets {
 			s[k.String()] = v
-		***REMOVED***
+		}
 		m["Subnets"] = s
-	***REMOVED***
+	}
 
 	return json.Marshal(m)
-***REMOVED***
+}
 
 // UnmarshalJSON decodes data into the addrSpace object
-func (aSpace *addrSpace) UnmarshalJSON(data []byte) error ***REMOVED***
+func (aSpace *addrSpace) UnmarshalJSON(data []byte) error {
 	aSpace.Lock()
 	defer aSpace.Unlock()
 
-	m := map[string]interface***REMOVED******REMOVED******REMOVED******REMOVED***
+	m := map[string]interface{}{}
 	err := json.Unmarshal(data, &m)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	aSpace.scope = datastore.LocalScope
 	s := m["Scope"].(string)
-	if s == string(datastore.GlobalScope) ***REMOVED***
+	if s == string(datastore.GlobalScope) {
 		aSpace.scope = datastore.GlobalScope
-	***REMOVED***
+	}
 
-	if v, ok := m["Subnets"]; ok ***REMOVED***
+	if v, ok := m["Subnets"]; ok {
 		sb, _ := json.Marshal(v)
 		var s map[string]*PoolData
 		err := json.Unmarshal(sb, &s)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-		for ks, v := range s ***REMOVED***
-			k := SubnetKey***REMOVED******REMOVED***
+		}
+		for ks, v := range s {
+			k := SubnetKey{}
 			k.FromString(ks)
 			aSpace.subnets[k] = v
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
 // CopyTo deep copies the pool data to the destination pooldata
-func (p *PoolData) CopyTo(dstP *PoolData) error ***REMOVED***
+func (p *PoolData) CopyTo(dstP *PoolData) error {
 	dstP.ParentKey = p.ParentKey
 	dstP.Pool = types.GetIPNetCopy(p.Pool)
 
-	if p.Range != nil ***REMOVED***
-		dstP.Range = &AddressRange***REMOVED******REMOVED***
+	if p.Range != nil {
+		dstP.Range = &AddressRange{}
 		dstP.Range.Sub = types.GetIPNetCopy(p.Range.Sub)
 		dstP.Range.Start = p.Range.Start
 		dstP.Range.End = p.Range.End
-	***REMOVED***
+	}
 
 	dstP.RefCount = p.RefCount
 	return nil
-***REMOVED***
+}
 
-func (aSpace *addrSpace) CopyTo(o datastore.KVObject) error ***REMOVED***
+func (aSpace *addrSpace) CopyTo(o datastore.KVObject) error {
 	aSpace.Lock()
 	defer aSpace.Unlock()
 
@@ -237,126 +237,126 @@ func (aSpace *addrSpace) CopyTo(o datastore.KVObject) error ***REMOVED***
 	dstAspace.dbExists = aSpace.dbExists
 
 	dstAspace.subnets = make(map[SubnetKey]*PoolData)
-	for k, v := range aSpace.subnets ***REMOVED***
-		dstAspace.subnets[k] = &PoolData***REMOVED******REMOVED***
+	for k, v := range aSpace.subnets {
+		dstAspace.subnets[k] = &PoolData{}
 		v.CopyTo(dstAspace.subnets[k])
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (aSpace *addrSpace) New() datastore.KVObject ***REMOVED***
+func (aSpace *addrSpace) New() datastore.KVObject {
 	aSpace.Lock()
 	defer aSpace.Unlock()
 
-	return &addrSpace***REMOVED***
+	return &addrSpace{
 		id:    aSpace.id,
 		ds:    aSpace.ds,
 		alloc: aSpace.alloc,
 		scope: aSpace.scope,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (aSpace *addrSpace) updatePoolDBOnAdd(k SubnetKey, nw *net.IPNet, ipr *AddressRange, pdf bool) (func() error, error) ***REMOVED***
+func (aSpace *addrSpace) updatePoolDBOnAdd(k SubnetKey, nw *net.IPNet, ipr *AddressRange, pdf bool) (func() error, error) {
 	aSpace.Lock()
 	defer aSpace.Unlock()
 
 	// Check if already allocated
-	if p, ok := aSpace.subnets[k]; ok ***REMOVED***
-		if pdf ***REMOVED***
+	if p, ok := aSpace.subnets[k]; ok {
+		if pdf {
 			return nil, types.InternalMaskableErrorf("predefined pool %s is already reserved", nw)
-		***REMOVED***
+		}
 		aSpace.incRefCount(p, 1)
-		return func() error ***REMOVED*** return nil ***REMOVED***, nil
-	***REMOVED***
+		return func() error { return nil }, nil
+	}
 
 	// If master pool, check for overlap
-	if ipr == nil ***REMOVED***
-		if aSpace.contains(k.AddressSpace, nw) ***REMOVED***
+	if ipr == nil {
+		if aSpace.contains(k.AddressSpace, nw) {
 			return nil, ipamapi.ErrPoolOverlap
-		***REMOVED***
+		}
 		// This is a new master pool, add it along with corresponding bitmask
-		aSpace.subnets[k] = &PoolData***REMOVED***Pool: nw, RefCount: 1***REMOVED***
-		return func() error ***REMOVED*** return aSpace.alloc.insertBitMask(k, nw) ***REMOVED***, nil
-	***REMOVED***
+		aSpace.subnets[k] = &PoolData{Pool: nw, RefCount: 1}
+		return func() error { return aSpace.alloc.insertBitMask(k, nw) }, nil
+	}
 
 	// This is a new non-master pool
-	p := &PoolData***REMOVED***
-		ParentKey: SubnetKey***REMOVED***AddressSpace: k.AddressSpace, Subnet: k.Subnet***REMOVED***,
+	p := &PoolData{
+		ParentKey: SubnetKey{AddressSpace: k.AddressSpace, Subnet: k.Subnet},
 		Pool:      nw,
 		Range:     ipr,
 		RefCount:  1,
-	***REMOVED***
+	}
 	aSpace.subnets[k] = p
 
 	// Look for parent pool
 	pp, ok := aSpace.subnets[p.ParentKey]
-	if ok ***REMOVED***
+	if ok {
 		aSpace.incRefCount(pp, 1)
-		return func() error ***REMOVED*** return nil ***REMOVED***, nil
-	***REMOVED***
+		return func() error { return nil }, nil
+	}
 
 	// Parent pool does not exist, add it along with corresponding bitmask
-	aSpace.subnets[p.ParentKey] = &PoolData***REMOVED***Pool: nw, RefCount: 1***REMOVED***
-	return func() error ***REMOVED*** return aSpace.alloc.insertBitMask(p.ParentKey, nw) ***REMOVED***, nil
-***REMOVED***
+	aSpace.subnets[p.ParentKey] = &PoolData{Pool: nw, RefCount: 1}
+	return func() error { return aSpace.alloc.insertBitMask(p.ParentKey, nw) }, nil
+}
 
-func (aSpace *addrSpace) updatePoolDBOnRemoval(k SubnetKey) (func() error, error) ***REMOVED***
+func (aSpace *addrSpace) updatePoolDBOnRemoval(k SubnetKey) (func() error, error) {
 	aSpace.Lock()
 	defer aSpace.Unlock()
 
 	p, ok := aSpace.subnets[k]
-	if !ok ***REMOVED***
+	if !ok {
 		return nil, ipamapi.ErrBadPool
-	***REMOVED***
+	}
 
 	aSpace.incRefCount(p, -1)
 
 	c := p
-	for ok ***REMOVED***
-		if c.RefCount == 0 ***REMOVED***
+	for ok {
+		if c.RefCount == 0 {
 			delete(aSpace.subnets, k)
-			if c.Range == nil ***REMOVED***
-				return func() error ***REMOVED***
+			if c.Range == nil {
+				return func() error {
 					bm, err := aSpace.alloc.retrieveBitmask(k, c.Pool)
-					if err != nil ***REMOVED***
+					if err != nil {
 						return types.InternalErrorf("could not find bitmask in datastore for pool %s removal: %v", k.String(), err)
-					***REMOVED***
+					}
 					return bm.Destroy()
-				***REMOVED***, nil
-			***REMOVED***
-		***REMOVED***
+				}, nil
+			}
+		}
 		k = c.ParentKey
 		c, ok = aSpace.subnets[k]
-	***REMOVED***
+	}
 
-	return func() error ***REMOVED*** return nil ***REMOVED***, nil
-***REMOVED***
+	return func() error { return nil }, nil
+}
 
-func (aSpace *addrSpace) incRefCount(p *PoolData, delta int) ***REMOVED***
+func (aSpace *addrSpace) incRefCount(p *PoolData, delta int) {
 	c := p
 	ok := true
-	for ok ***REMOVED***
+	for ok {
 		c.RefCount += delta
 		c, ok = aSpace.subnets[c.ParentKey]
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Checks whether the passed subnet is a superset or subset of any of the subset in this config db
-func (aSpace *addrSpace) contains(space string, nw *net.IPNet) bool ***REMOVED***
-	for k, v := range aSpace.subnets ***REMOVED***
-		if space == k.AddressSpace && k.ChildSubnet == "" ***REMOVED***
-			if nw.Contains(v.Pool.IP) || v.Pool.Contains(nw.IP) ***REMOVED***
+func (aSpace *addrSpace) contains(space string, nw *net.IPNet) bool {
+	for k, v := range aSpace.subnets {
+		if space == k.AddressSpace && k.ChildSubnet == "" {
+			if nw.Contains(v.Pool.IP) || v.Pool.Contains(nw.IP) {
 				return true
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return false
-***REMOVED***
+}
 
-func (aSpace *addrSpace) store() datastore.DataStore ***REMOVED***
+func (aSpace *addrSpace) store() datastore.DataStore {
 	aSpace.Lock()
 	defer aSpace.Unlock()
 
 	return aSpace.ds
-***REMOVED***
+}

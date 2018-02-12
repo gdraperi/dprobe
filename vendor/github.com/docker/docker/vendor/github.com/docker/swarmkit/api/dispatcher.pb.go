@@ -47,21 +47,21 @@ const (
 	AssignmentChange_AssignmentActionRemove AssignmentChange_AssignmentAction = 1
 )
 
-var AssignmentChange_AssignmentAction_name = map[int32]string***REMOVED***
+var AssignmentChange_AssignmentAction_name = map[int32]string{
 	0: "UPDATE",
 	1: "REMOVE",
-***REMOVED***
-var AssignmentChange_AssignmentAction_value = map[string]int32***REMOVED***
+}
+var AssignmentChange_AssignmentAction_value = map[string]int32{
 	"UPDATE": 0,
 	"REMOVE": 1,
-***REMOVED***
+}
 
-func (x AssignmentChange_AssignmentAction) String() string ***REMOVED***
+func (x AssignmentChange_AssignmentAction) String() string {
 	return proto.EnumName(AssignmentChange_AssignmentAction_name, int32(x))
-***REMOVED***
-func (AssignmentChange_AssignmentAction) EnumDescriptor() ([]byte, []int) ***REMOVED***
-	return fileDescriptorDispatcher, []int***REMOVED***10, 0***REMOVED***
-***REMOVED***
+}
+func (AssignmentChange_AssignmentAction) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptorDispatcher, []int{10, 0}
+}
 
 // AssignmentType specifies whether this assignment message carries
 // the full state, or is an update to an existing state.
@@ -72,39 +72,39 @@ const (
 	AssignmentsMessage_INCREMENTAL AssignmentsMessage_Type = 1
 )
 
-var AssignmentsMessage_Type_name = map[int32]string***REMOVED***
+var AssignmentsMessage_Type_name = map[int32]string{
 	0: "COMPLETE",
 	1: "INCREMENTAL",
-***REMOVED***
-var AssignmentsMessage_Type_value = map[string]int32***REMOVED***
+}
+var AssignmentsMessage_Type_value = map[string]int32{
 	"COMPLETE":    0,
 	"INCREMENTAL": 1,
-***REMOVED***
+}
 
-func (x AssignmentsMessage_Type) String() string ***REMOVED***
+func (x AssignmentsMessage_Type) String() string {
 	return proto.EnumName(AssignmentsMessage_Type_name, int32(x))
-***REMOVED***
-func (AssignmentsMessage_Type) EnumDescriptor() ([]byte, []int) ***REMOVED***
-	return fileDescriptorDispatcher, []int***REMOVED***11, 0***REMOVED***
-***REMOVED***
+}
+func (AssignmentsMessage_Type) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptorDispatcher, []int{11, 0}
+}
 
 // SessionRequest starts a session.
-type SessionRequest struct ***REMOVED***
+type SessionRequest struct {
 	Description *NodeDescription `protobuf:"bytes,1,opt,name=description" json:"description,omitempty"`
 	// SessionID can be provided to attempt resuming an existing session. If the
 	// SessionID is empty or invalid, a new SessionID will be assigned.
 	//
 	// See SessionMessage.SessionID for details.
 	SessionID string `protobuf:"bytes,2,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
-***REMOVED***
+}
 
-func (m *SessionRequest) Reset()                    ***REMOVED*** *m = SessionRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*SessionRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*SessionRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorDispatcher, []int***REMOVED***0***REMOVED*** ***REMOVED***
+func (m *SessionRequest) Reset()                    { *m = SessionRequest{} }
+func (*SessionRequest) ProtoMessage()               {}
+func (*SessionRequest) Descriptor() ([]byte, []int) { return fileDescriptorDispatcher, []int{0} }
 
 // SessionMessage instructs an agent on various actions as part of the current
 // session. An agent should act immediately on the contents.
-type SessionMessage struct ***REMOVED***
+type SessionMessage struct {
 	// SessionID is allocated after a successful registration. It should be
 	// used on all RPC calls after registration. A dispatcher may choose to
 	// change the SessionID, at which time an agent must re-register and obtain
@@ -158,223 +158,223 @@ type SessionMessage struct ***REMOVED***
 	NetworkBootstrapKeys []*EncryptionKey `protobuf:"bytes,4,rep,name=network_bootstrap_keys,json=networkBootstrapKeys" json:"network_bootstrap_keys,omitempty"`
 	// Which root certificates to trust
 	RootCA []byte `protobuf:"bytes,5,opt,name=RootCA,proto3" json:"RootCA,omitempty"`
-***REMOVED***
+}
 
-func (m *SessionMessage) Reset()                    ***REMOVED*** *m = SessionMessage***REMOVED******REMOVED*** ***REMOVED***
-func (*SessionMessage) ProtoMessage()               ***REMOVED******REMOVED***
-func (*SessionMessage) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorDispatcher, []int***REMOVED***1***REMOVED*** ***REMOVED***
+func (m *SessionMessage) Reset()                    { *m = SessionMessage{} }
+func (*SessionMessage) ProtoMessage()               {}
+func (*SessionMessage) Descriptor() ([]byte, []int) { return fileDescriptorDispatcher, []int{1} }
 
 // HeartbeatRequest provides identifying properties for a single heartbeat.
-type HeartbeatRequest struct ***REMOVED***
+type HeartbeatRequest struct {
 	SessionID string `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
-***REMOVED***
+}
 
-func (m *HeartbeatRequest) Reset()                    ***REMOVED*** *m = HeartbeatRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*HeartbeatRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*HeartbeatRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorDispatcher, []int***REMOVED***2***REMOVED*** ***REMOVED***
+func (m *HeartbeatRequest) Reset()                    { *m = HeartbeatRequest{} }
+func (*HeartbeatRequest) ProtoMessage()               {}
+func (*HeartbeatRequest) Descriptor() ([]byte, []int) { return fileDescriptorDispatcher, []int{2} }
 
-type HeartbeatResponse struct ***REMOVED***
+type HeartbeatResponse struct {
 	// Period is the duration to wait before sending the next heartbeat.
 	// Well-behaved agents should update this on every heartbeat round trip.
 	Period time.Duration `protobuf:"bytes,1,opt,name=period,stdduration" json:"period"`
-***REMOVED***
+}
 
-func (m *HeartbeatResponse) Reset()                    ***REMOVED*** *m = HeartbeatResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*HeartbeatResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*HeartbeatResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorDispatcher, []int***REMOVED***3***REMOVED*** ***REMOVED***
+func (m *HeartbeatResponse) Reset()                    { *m = HeartbeatResponse{} }
+func (*HeartbeatResponse) ProtoMessage()               {}
+func (*HeartbeatResponse) Descriptor() ([]byte, []int) { return fileDescriptorDispatcher, []int{3} }
 
-type UpdateTaskStatusRequest struct ***REMOVED***
+type UpdateTaskStatusRequest struct {
 	// Tasks should contain all statuses for running tasks. Only the status
 	// field must be set. The spec is not required.
 	SessionID string                                      `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
 	Updates   []*UpdateTaskStatusRequest_TaskStatusUpdate `protobuf:"bytes,3,rep,name=updates" json:"updates,omitempty"`
-***REMOVED***
+}
 
-func (m *UpdateTaskStatusRequest) Reset()      ***REMOVED*** *m = UpdateTaskStatusRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*UpdateTaskStatusRequest) ProtoMessage() ***REMOVED******REMOVED***
-func (*UpdateTaskStatusRequest) Descriptor() ([]byte, []int) ***REMOVED***
-	return fileDescriptorDispatcher, []int***REMOVED***4***REMOVED***
-***REMOVED***
+func (m *UpdateTaskStatusRequest) Reset()      { *m = UpdateTaskStatusRequest{} }
+func (*UpdateTaskStatusRequest) ProtoMessage() {}
+func (*UpdateTaskStatusRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorDispatcher, []int{4}
+}
 
-type UpdateTaskStatusRequest_TaskStatusUpdate struct ***REMOVED***
+type UpdateTaskStatusRequest_TaskStatusUpdate struct {
 	TaskID string      `protobuf:"bytes,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
 	Status *TaskStatus `protobuf:"bytes,2,opt,name=status" json:"status,omitempty"`
-***REMOVED***
+}
 
-func (m *UpdateTaskStatusRequest_TaskStatusUpdate) Reset() ***REMOVED***
-	*m = UpdateTaskStatusRequest_TaskStatusUpdate***REMOVED******REMOVED***
-***REMOVED***
-func (*UpdateTaskStatusRequest_TaskStatusUpdate) ProtoMessage() ***REMOVED******REMOVED***
-func (*UpdateTaskStatusRequest_TaskStatusUpdate) Descriptor() ([]byte, []int) ***REMOVED***
-	return fileDescriptorDispatcher, []int***REMOVED***4, 0***REMOVED***
-***REMOVED***
+func (m *UpdateTaskStatusRequest_TaskStatusUpdate) Reset() {
+	*m = UpdateTaskStatusRequest_TaskStatusUpdate{}
+}
+func (*UpdateTaskStatusRequest_TaskStatusUpdate) ProtoMessage() {}
+func (*UpdateTaskStatusRequest_TaskStatusUpdate) Descriptor() ([]byte, []int) {
+	return fileDescriptorDispatcher, []int{4, 0}
+}
 
-type UpdateTaskStatusResponse struct ***REMOVED***
-***REMOVED***
+type UpdateTaskStatusResponse struct {
+}
 
-func (m *UpdateTaskStatusResponse) Reset()      ***REMOVED*** *m = UpdateTaskStatusResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*UpdateTaskStatusResponse) ProtoMessage() ***REMOVED******REMOVED***
-func (*UpdateTaskStatusResponse) Descriptor() ([]byte, []int) ***REMOVED***
-	return fileDescriptorDispatcher, []int***REMOVED***5***REMOVED***
-***REMOVED***
+func (m *UpdateTaskStatusResponse) Reset()      { *m = UpdateTaskStatusResponse{} }
+func (*UpdateTaskStatusResponse) ProtoMessage() {}
+func (*UpdateTaskStatusResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptorDispatcher, []int{5}
+}
 
-type TasksRequest struct ***REMOVED***
+type TasksRequest struct {
 	SessionID string `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
-***REMOVED***
+}
 
-func (m *TasksRequest) Reset()                    ***REMOVED*** *m = TasksRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*TasksRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*TasksRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorDispatcher, []int***REMOVED***6***REMOVED*** ***REMOVED***
+func (m *TasksRequest) Reset()                    { *m = TasksRequest{} }
+func (*TasksRequest) ProtoMessage()               {}
+func (*TasksRequest) Descriptor() ([]byte, []int) { return fileDescriptorDispatcher, []int{6} }
 
-type TasksMessage struct ***REMOVED***
+type TasksMessage struct {
 	// Tasks is the set of tasks that should be running on the node.
 	// Tasks outside of this set running on the node should be terminated.
 	Tasks []*Task `protobuf:"bytes,1,rep,name=tasks" json:"tasks,omitempty"`
-***REMOVED***
+}
 
-func (m *TasksMessage) Reset()                    ***REMOVED*** *m = TasksMessage***REMOVED******REMOVED*** ***REMOVED***
-func (*TasksMessage) ProtoMessage()               ***REMOVED******REMOVED***
-func (*TasksMessage) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorDispatcher, []int***REMOVED***7***REMOVED*** ***REMOVED***
+func (m *TasksMessage) Reset()                    { *m = TasksMessage{} }
+func (*TasksMessage) ProtoMessage()               {}
+func (*TasksMessage) Descriptor() ([]byte, []int) { return fileDescriptorDispatcher, []int{7} }
 
-type AssignmentsRequest struct ***REMOVED***
+type AssignmentsRequest struct {
 	SessionID string `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
-***REMOVED***
+}
 
-func (m *AssignmentsRequest) Reset()                    ***REMOVED*** *m = AssignmentsRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*AssignmentsRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*AssignmentsRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorDispatcher, []int***REMOVED***8***REMOVED*** ***REMOVED***
+func (m *AssignmentsRequest) Reset()                    { *m = AssignmentsRequest{} }
+func (*AssignmentsRequest) ProtoMessage()               {}
+func (*AssignmentsRequest) Descriptor() ([]byte, []int) { return fileDescriptorDispatcher, []int{8} }
 
-type Assignment struct ***REMOVED***
+type Assignment struct {
 	// Types that are valid to be assigned to Item:
 	//	*Assignment_Task
 	//	*Assignment_Secret
 	//	*Assignment_Config
 	Item isAssignment_Item `protobuf_oneof:"item"`
-***REMOVED***
+}
 
-func (m *Assignment) Reset()                    ***REMOVED*** *m = Assignment***REMOVED******REMOVED*** ***REMOVED***
-func (*Assignment) ProtoMessage()               ***REMOVED******REMOVED***
-func (*Assignment) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorDispatcher, []int***REMOVED***9***REMOVED*** ***REMOVED***
+func (m *Assignment) Reset()                    { *m = Assignment{} }
+func (*Assignment) ProtoMessage()               {}
+func (*Assignment) Descriptor() ([]byte, []int) { return fileDescriptorDispatcher, []int{9} }
 
-type isAssignment_Item interface ***REMOVED***
+type isAssignment_Item interface {
 	isAssignment_Item()
 	MarshalTo([]byte) (int, error)
 	Size() int
-***REMOVED***
+}
 
-type Assignment_Task struct ***REMOVED***
+type Assignment_Task struct {
 	Task *Task `protobuf:"bytes,1,opt,name=task,oneof"`
-***REMOVED***
-type Assignment_Secret struct ***REMOVED***
+}
+type Assignment_Secret struct {
 	Secret *Secret `protobuf:"bytes,2,opt,name=secret,oneof"`
-***REMOVED***
-type Assignment_Config struct ***REMOVED***
+}
+type Assignment_Config struct {
 	Config *Config `protobuf:"bytes,3,opt,name=config,oneof"`
-***REMOVED***
+}
 
-func (*Assignment_Task) isAssignment_Item()   ***REMOVED******REMOVED***
-func (*Assignment_Secret) isAssignment_Item() ***REMOVED******REMOVED***
-func (*Assignment_Config) isAssignment_Item() ***REMOVED******REMOVED***
+func (*Assignment_Task) isAssignment_Item()   {}
+func (*Assignment_Secret) isAssignment_Item() {}
+func (*Assignment_Config) isAssignment_Item() {}
 
-func (m *Assignment) GetItem() isAssignment_Item ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Assignment) GetItem() isAssignment_Item {
+	if m != nil {
 		return m.Item
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *Assignment) GetTask() *Task ***REMOVED***
-	if x, ok := m.GetItem().(*Assignment_Task); ok ***REMOVED***
+func (m *Assignment) GetTask() *Task {
+	if x, ok := m.GetItem().(*Assignment_Task); ok {
 		return x.Task
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *Assignment) GetSecret() *Secret ***REMOVED***
-	if x, ok := m.GetItem().(*Assignment_Secret); ok ***REMOVED***
+func (m *Assignment) GetSecret() *Secret {
+	if x, ok := m.GetItem().(*Assignment_Secret); ok {
 		return x.Secret
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *Assignment) GetConfig() *Config ***REMOVED***
-	if x, ok := m.GetItem().(*Assignment_Config); ok ***REMOVED***
+func (m *Assignment) GetConfig() *Config {
+	if x, ok := m.GetItem().(*Assignment_Config); ok {
 		return x.Config
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // XXX_OneofFuncs is for the internal use of the proto package.
-func (*Assignment) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface***REMOVED******REMOVED***) ***REMOVED***
-	return _Assignment_OneofMarshaler, _Assignment_OneofUnmarshaler, _Assignment_OneofSizer, []interface***REMOVED******REMOVED******REMOVED***
+func (*Assignment) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
+	return _Assignment_OneofMarshaler, _Assignment_OneofUnmarshaler, _Assignment_OneofSizer, []interface{}{
 		(*Assignment_Task)(nil),
 		(*Assignment_Secret)(nil),
 		(*Assignment_Config)(nil),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func _Assignment_OneofMarshaler(msg proto.Message, b *proto.Buffer) error ***REMOVED***
+func _Assignment_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
 	m := msg.(*Assignment)
 	// item
-	switch x := m.Item.(type) ***REMOVED***
+	switch x := m.Item.(type) {
 	case *Assignment_Task:
 		_ = b.EncodeVarint(1<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Task); err != nil ***REMOVED***
+		if err := b.EncodeMessage(x.Task); err != nil {
 			return err
-		***REMOVED***
+		}
 	case *Assignment_Secret:
 		_ = b.EncodeVarint(2<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Secret); err != nil ***REMOVED***
+		if err := b.EncodeMessage(x.Secret); err != nil {
 			return err
-		***REMOVED***
+		}
 	case *Assignment_Config:
 		_ = b.EncodeVarint(3<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Config); err != nil ***REMOVED***
+		if err := b.EncodeMessage(x.Config); err != nil {
 			return err
-		***REMOVED***
+		}
 	case nil:
 	default:
 		return fmt.Errorf("Assignment.Item has unexpected type %T", x)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func _Assignment_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) ***REMOVED***
+func _Assignment_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
 	m := msg.(*Assignment)
-	switch tag ***REMOVED***
+	switch tag {
 	case 1: // item.task
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		msg := new(Task)
 		err := b.DecodeMessage(msg)
-		m.Item = &Assignment_Task***REMOVED***msg***REMOVED***
+		m.Item = &Assignment_Task{msg}
 		return true, err
 	case 2: // item.secret
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		msg := new(Secret)
 		err := b.DecodeMessage(msg)
-		m.Item = &Assignment_Secret***REMOVED***msg***REMOVED***
+		m.Item = &Assignment_Secret{msg}
 		return true, err
 	case 3: // item.config
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		msg := new(Config)
 		err := b.DecodeMessage(msg)
-		m.Item = &Assignment_Config***REMOVED***msg***REMOVED***
+		m.Item = &Assignment_Config{msg}
 		return true, err
 	default:
 		return false, nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func _Assignment_OneofSizer(msg proto.Message) (n int) ***REMOVED***
+func _Assignment_OneofSizer(msg proto.Message) (n int) {
 	m := msg.(*Assignment)
 	// item
-	switch x := m.Item.(type) ***REMOVED***
+	switch x := m.Item.(type) {
 	case *Assignment_Task:
 		s := proto.Size(x.Task)
 		n += proto.SizeVarint(1<<3 | proto.WireBytes)
@@ -393,20 +393,20 @@ func _Assignment_OneofSizer(msg proto.Message) (n int) ***REMOVED***
 	case nil:
 	default:
 		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-type AssignmentChange struct ***REMOVED***
+type AssignmentChange struct {
 	Assignment *Assignment                       `protobuf:"bytes,1,opt,name=assignment" json:"assignment,omitempty"`
 	Action     AssignmentChange_AssignmentAction `protobuf:"varint,2,opt,name=action,proto3,enum=docker.swarmkit.v1.AssignmentChange_AssignmentAction" json:"action,omitempty"`
-***REMOVED***
+}
 
-func (m *AssignmentChange) Reset()                    ***REMOVED*** *m = AssignmentChange***REMOVED******REMOVED*** ***REMOVED***
-func (*AssignmentChange) ProtoMessage()               ***REMOVED******REMOVED***
-func (*AssignmentChange) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorDispatcher, []int***REMOVED***10***REMOVED*** ***REMOVED***
+func (m *AssignmentChange) Reset()                    { *m = AssignmentChange{} }
+func (*AssignmentChange) ProtoMessage()               {}
+func (*AssignmentChange) Descriptor() ([]byte, []int) { return fileDescriptorDispatcher, []int{10} }
 
-type AssignmentsMessage struct ***REMOVED***
+type AssignmentsMessage struct {
 	Type AssignmentsMessage_Type `protobuf:"varint,1,opt,name=type,proto3,enum=docker.swarmkit.v1.AssignmentsMessage_Type" json:"type,omitempty"`
 	// AppliesTo references the previous ResultsIn value, to chain
 	// incremental updates together. For the first update in a stream,
@@ -420,13 +420,13 @@ type AssignmentsMessage struct ***REMOVED***
 	ResultsIn string `protobuf:"bytes,3,opt,name=results_in,json=resultsIn,proto3" json:"results_in,omitempty"`
 	// AssignmentChange is a set of changes to apply on this node.
 	Changes []*AssignmentChange `protobuf:"bytes,4,rep,name=changes" json:"changes,omitempty"`
-***REMOVED***
+}
 
-func (m *AssignmentsMessage) Reset()                    ***REMOVED*** *m = AssignmentsMessage***REMOVED******REMOVED*** ***REMOVED***
-func (*AssignmentsMessage) ProtoMessage()               ***REMOVED******REMOVED***
-func (*AssignmentsMessage) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorDispatcher, []int***REMOVED***11***REMOVED*** ***REMOVED***
+func (m *AssignmentsMessage) Reset()                    { *m = AssignmentsMessage{} }
+func (*AssignmentsMessage) ProtoMessage()               {}
+func (*AssignmentsMessage) Descriptor() ([]byte, []int) { return fileDescriptorDispatcher, []int{11} }
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*SessionRequest)(nil), "docker.swarmkit.v1.SessionRequest")
 	proto.RegisterType((*SessionMessage)(nil), "docker.swarmkit.v1.SessionMessage")
 	proto.RegisterType((*HeartbeatRequest)(nil), "docker.swarmkit.v1.HeartbeatRequest")
@@ -442,333 +442,333 @@ func init() ***REMOVED***
 	proto.RegisterType((*AssignmentsMessage)(nil), "docker.swarmkit.v1.AssignmentsMessage")
 	proto.RegisterEnum("docker.swarmkit.v1.AssignmentChange_AssignmentAction", AssignmentChange_AssignmentAction_name, AssignmentChange_AssignmentAction_value)
 	proto.RegisterEnum("docker.swarmkit.v1.AssignmentsMessage_Type", AssignmentsMessage_Type_name, AssignmentsMessage_Type_value)
-***REMOVED***
+}
 
-type authenticatedWrapperDispatcherServer struct ***REMOVED***
+type authenticatedWrapperDispatcherServer struct {
 	local     DispatcherServer
 	authorize func(context.Context, []string) error
-***REMOVED***
+}
 
-func NewAuthenticatedWrapperDispatcherServer(local DispatcherServer, authorize func(context.Context, []string) error) DispatcherServer ***REMOVED***
-	return &authenticatedWrapperDispatcherServer***REMOVED***
+func NewAuthenticatedWrapperDispatcherServer(local DispatcherServer, authorize func(context.Context, []string) error) DispatcherServer {
+	return &authenticatedWrapperDispatcherServer{
 		local:     local,
 		authorize: authorize,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (p *authenticatedWrapperDispatcherServer) Session(r *SessionRequest, stream Dispatcher_SessionServer) error ***REMOVED***
+func (p *authenticatedWrapperDispatcherServer) Session(r *SessionRequest, stream Dispatcher_SessionServer) error {
 
-	if err := p.authorize(stream.Context(), []string***REMOVED***"swarm-worker", "swarm-manager"***REMOVED***); err != nil ***REMOVED***
+	if err := p.authorize(stream.Context(), []string{"swarm-worker", "swarm-manager"}); err != nil {
 		return err
-	***REMOVED***
+	}
 	return p.local.Session(r, stream)
-***REMOVED***
+}
 
-func (p *authenticatedWrapperDispatcherServer) Heartbeat(ctx context.Context, r *HeartbeatRequest) (*HeartbeatResponse, error) ***REMOVED***
+func (p *authenticatedWrapperDispatcherServer) Heartbeat(ctx context.Context, r *HeartbeatRequest) (*HeartbeatResponse, error) {
 
-	if err := p.authorize(ctx, []string***REMOVED***"swarm-worker", "swarm-manager"***REMOVED***); err != nil ***REMOVED***
+	if err := p.authorize(ctx, []string{"swarm-worker", "swarm-manager"}); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return p.local.Heartbeat(ctx, r)
-***REMOVED***
+}
 
-func (p *authenticatedWrapperDispatcherServer) UpdateTaskStatus(ctx context.Context, r *UpdateTaskStatusRequest) (*UpdateTaskStatusResponse, error) ***REMOVED***
+func (p *authenticatedWrapperDispatcherServer) UpdateTaskStatus(ctx context.Context, r *UpdateTaskStatusRequest) (*UpdateTaskStatusResponse, error) {
 
-	if err := p.authorize(ctx, []string***REMOVED***"swarm-worker", "swarm-manager"***REMOVED***); err != nil ***REMOVED***
+	if err := p.authorize(ctx, []string{"swarm-worker", "swarm-manager"}); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return p.local.UpdateTaskStatus(ctx, r)
-***REMOVED***
+}
 
-func (p *authenticatedWrapperDispatcherServer) Tasks(r *TasksRequest, stream Dispatcher_TasksServer) error ***REMOVED***
+func (p *authenticatedWrapperDispatcherServer) Tasks(r *TasksRequest, stream Dispatcher_TasksServer) error {
 
-	if err := p.authorize(stream.Context(), []string***REMOVED***"swarm-worker", "swarm-manager"***REMOVED***); err != nil ***REMOVED***
+	if err := p.authorize(stream.Context(), []string{"swarm-worker", "swarm-manager"}); err != nil {
 		return err
-	***REMOVED***
+	}
 	return p.local.Tasks(r, stream)
-***REMOVED***
+}
 
-func (p *authenticatedWrapperDispatcherServer) Assignments(r *AssignmentsRequest, stream Dispatcher_AssignmentsServer) error ***REMOVED***
+func (p *authenticatedWrapperDispatcherServer) Assignments(r *AssignmentsRequest, stream Dispatcher_AssignmentsServer) error {
 
-	if err := p.authorize(stream.Context(), []string***REMOVED***"swarm-worker", "swarm-manager"***REMOVED***); err != nil ***REMOVED***
+	if err := p.authorize(stream.Context(), []string{"swarm-worker", "swarm-manager"}); err != nil {
 		return err
-	***REMOVED***
+	}
 	return p.local.Assignments(r, stream)
-***REMOVED***
+}
 
-func (m *SessionRequest) Copy() *SessionRequest ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *SessionRequest) Copy() *SessionRequest {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &SessionRequest***REMOVED******REMOVED***
+	}
+	o := &SessionRequest{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *SessionRequest) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *SessionRequest) CopyFrom(src interface{}) {
 
 	o := src.(*SessionRequest)
 	*m = *o
-	if o.Description != nil ***REMOVED***
-		m.Description = &NodeDescription***REMOVED******REMOVED***
+	if o.Description != nil {
+		m.Description = &NodeDescription{}
 		github_com_docker_swarmkit_api_deepcopy.Copy(m.Description, o.Description)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (m *SessionMessage) Copy() *SessionMessage ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *SessionMessage) Copy() *SessionMessage {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &SessionMessage***REMOVED******REMOVED***
+	}
+	o := &SessionMessage{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *SessionMessage) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *SessionMessage) CopyFrom(src interface{}) {
 
 	o := src.(*SessionMessage)
 	*m = *o
-	if o.Node != nil ***REMOVED***
-		m.Node = &Node***REMOVED******REMOVED***
+	if o.Node != nil {
+		m.Node = &Node{}
 		github_com_docker_swarmkit_api_deepcopy.Copy(m.Node, o.Node)
-	***REMOVED***
-	if o.Managers != nil ***REMOVED***
+	}
+	if o.Managers != nil {
 		m.Managers = make([]*WeightedPeer, len(o.Managers))
-		for i := range m.Managers ***REMOVED***
-			m.Managers[i] = &WeightedPeer***REMOVED******REMOVED***
+		for i := range m.Managers {
+			m.Managers[i] = &WeightedPeer{}
 			github_com_docker_swarmkit_api_deepcopy.Copy(m.Managers[i], o.Managers[i])
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if o.NetworkBootstrapKeys != nil ***REMOVED***
+	if o.NetworkBootstrapKeys != nil {
 		m.NetworkBootstrapKeys = make([]*EncryptionKey, len(o.NetworkBootstrapKeys))
-		for i := range m.NetworkBootstrapKeys ***REMOVED***
-			m.NetworkBootstrapKeys[i] = &EncryptionKey***REMOVED******REMOVED***
+		for i := range m.NetworkBootstrapKeys {
+			m.NetworkBootstrapKeys[i] = &EncryptionKey{}
 			github_com_docker_swarmkit_api_deepcopy.Copy(m.NetworkBootstrapKeys[i], o.NetworkBootstrapKeys[i])
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if o.RootCA != nil ***REMOVED***
+	if o.RootCA != nil {
 		m.RootCA = make([]byte, len(o.RootCA))
 		copy(m.RootCA, o.RootCA)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (m *HeartbeatRequest) Copy() *HeartbeatRequest ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *HeartbeatRequest) Copy() *HeartbeatRequest {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &HeartbeatRequest***REMOVED******REMOVED***
+	}
+	o := &HeartbeatRequest{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *HeartbeatRequest) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *HeartbeatRequest) CopyFrom(src interface{}) {
 
 	o := src.(*HeartbeatRequest)
 	*m = *o
-***REMOVED***
+}
 
-func (m *HeartbeatResponse) Copy() *HeartbeatResponse ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *HeartbeatResponse) Copy() *HeartbeatResponse {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &HeartbeatResponse***REMOVED******REMOVED***
+	}
+	o := &HeartbeatResponse{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *HeartbeatResponse) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *HeartbeatResponse) CopyFrom(src interface{}) {
 
 	o := src.(*HeartbeatResponse)
 	*m = *o
 	github_com_docker_swarmkit_api_deepcopy.Copy(&m.Period, &o.Period)
-***REMOVED***
+}
 
-func (m *UpdateTaskStatusRequest) Copy() *UpdateTaskStatusRequest ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *UpdateTaskStatusRequest) Copy() *UpdateTaskStatusRequest {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &UpdateTaskStatusRequest***REMOVED******REMOVED***
+	}
+	o := &UpdateTaskStatusRequest{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *UpdateTaskStatusRequest) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *UpdateTaskStatusRequest) CopyFrom(src interface{}) {
 
 	o := src.(*UpdateTaskStatusRequest)
 	*m = *o
-	if o.Updates != nil ***REMOVED***
+	if o.Updates != nil {
 		m.Updates = make([]*UpdateTaskStatusRequest_TaskStatusUpdate, len(o.Updates))
-		for i := range m.Updates ***REMOVED***
-			m.Updates[i] = &UpdateTaskStatusRequest_TaskStatusUpdate***REMOVED******REMOVED***
+		for i := range m.Updates {
+			m.Updates[i] = &UpdateTaskStatusRequest_TaskStatusUpdate{}
 			github_com_docker_swarmkit_api_deepcopy.Copy(m.Updates[i], o.Updates[i])
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-***REMOVED***
+}
 
-func (m *UpdateTaskStatusRequest_TaskStatusUpdate) Copy() *UpdateTaskStatusRequest_TaskStatusUpdate ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *UpdateTaskStatusRequest_TaskStatusUpdate) Copy() *UpdateTaskStatusRequest_TaskStatusUpdate {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &UpdateTaskStatusRequest_TaskStatusUpdate***REMOVED******REMOVED***
+	}
+	o := &UpdateTaskStatusRequest_TaskStatusUpdate{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *UpdateTaskStatusRequest_TaskStatusUpdate) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *UpdateTaskStatusRequest_TaskStatusUpdate) CopyFrom(src interface{}) {
 
 	o := src.(*UpdateTaskStatusRequest_TaskStatusUpdate)
 	*m = *o
-	if o.Status != nil ***REMOVED***
-		m.Status = &TaskStatus***REMOVED******REMOVED***
+	if o.Status != nil {
+		m.Status = &TaskStatus{}
 		github_com_docker_swarmkit_api_deepcopy.Copy(m.Status, o.Status)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (m *UpdateTaskStatusResponse) Copy() *UpdateTaskStatusResponse ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *UpdateTaskStatusResponse) Copy() *UpdateTaskStatusResponse {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &UpdateTaskStatusResponse***REMOVED******REMOVED***
+	}
+	o := &UpdateTaskStatusResponse{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *UpdateTaskStatusResponse) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED******REMOVED***
-func (m *TasksRequest) Copy() *TasksRequest ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *UpdateTaskStatusResponse) CopyFrom(src interface{}) {}
+func (m *TasksRequest) Copy() *TasksRequest {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &TasksRequest***REMOVED******REMOVED***
+	}
+	o := &TasksRequest{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *TasksRequest) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *TasksRequest) CopyFrom(src interface{}) {
 
 	o := src.(*TasksRequest)
 	*m = *o
-***REMOVED***
+}
 
-func (m *TasksMessage) Copy() *TasksMessage ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *TasksMessage) Copy() *TasksMessage {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &TasksMessage***REMOVED******REMOVED***
+	}
+	o := &TasksMessage{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *TasksMessage) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *TasksMessage) CopyFrom(src interface{}) {
 
 	o := src.(*TasksMessage)
 	*m = *o
-	if o.Tasks != nil ***REMOVED***
+	if o.Tasks != nil {
 		m.Tasks = make([]*Task, len(o.Tasks))
-		for i := range m.Tasks ***REMOVED***
-			m.Tasks[i] = &Task***REMOVED******REMOVED***
+		for i := range m.Tasks {
+			m.Tasks[i] = &Task{}
 			github_com_docker_swarmkit_api_deepcopy.Copy(m.Tasks[i], o.Tasks[i])
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-***REMOVED***
+}
 
-func (m *AssignmentsRequest) Copy() *AssignmentsRequest ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *AssignmentsRequest) Copy() *AssignmentsRequest {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &AssignmentsRequest***REMOVED******REMOVED***
+	}
+	o := &AssignmentsRequest{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *AssignmentsRequest) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *AssignmentsRequest) CopyFrom(src interface{}) {
 
 	o := src.(*AssignmentsRequest)
 	*m = *o
-***REMOVED***
+}
 
-func (m *Assignment) Copy() *Assignment ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *Assignment) Copy() *Assignment {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &Assignment***REMOVED******REMOVED***
+	}
+	o := &Assignment{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *Assignment) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *Assignment) CopyFrom(src interface{}) {
 
 	o := src.(*Assignment)
 	*m = *o
-	if o.Item != nil ***REMOVED***
-		switch o.Item.(type) ***REMOVED***
+	if o.Item != nil {
+		switch o.Item.(type) {
 		case *Assignment_Task:
-			v := Assignment_Task***REMOVED***
-				Task: &Task***REMOVED******REMOVED***,
-			***REMOVED***
+			v := Assignment_Task{
+				Task: &Task{},
+			}
 			github_com_docker_swarmkit_api_deepcopy.Copy(v.Task, o.GetTask())
 			m.Item = &v
 		case *Assignment_Secret:
-			v := Assignment_Secret***REMOVED***
-				Secret: &Secret***REMOVED******REMOVED***,
-			***REMOVED***
+			v := Assignment_Secret{
+				Secret: &Secret{},
+			}
 			github_com_docker_swarmkit_api_deepcopy.Copy(v.Secret, o.GetSecret())
 			m.Item = &v
 		case *Assignment_Config:
-			v := Assignment_Config***REMOVED***
-				Config: &Config***REMOVED******REMOVED***,
-			***REMOVED***
+			v := Assignment_Config{
+				Config: &Config{},
+			}
 			github_com_docker_swarmkit_api_deepcopy.Copy(v.Config, o.GetConfig())
 			m.Item = &v
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-***REMOVED***
+}
 
-func (m *AssignmentChange) Copy() *AssignmentChange ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *AssignmentChange) Copy() *AssignmentChange {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &AssignmentChange***REMOVED******REMOVED***
+	}
+	o := &AssignmentChange{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *AssignmentChange) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *AssignmentChange) CopyFrom(src interface{}) {
 
 	o := src.(*AssignmentChange)
 	*m = *o
-	if o.Assignment != nil ***REMOVED***
-		m.Assignment = &Assignment***REMOVED******REMOVED***
+	if o.Assignment != nil {
+		m.Assignment = &Assignment{}
 		github_com_docker_swarmkit_api_deepcopy.Copy(m.Assignment, o.Assignment)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (m *AssignmentsMessage) Copy() *AssignmentsMessage ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *AssignmentsMessage) Copy() *AssignmentsMessage {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &AssignmentsMessage***REMOVED******REMOVED***
+	}
+	o := &AssignmentsMessage{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *AssignmentsMessage) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *AssignmentsMessage) CopyFrom(src interface{}) {
 
 	o := src.(*AssignmentsMessage)
 	*m = *o
-	if o.Changes != nil ***REMOVED***
+	if o.Changes != nil {
 		m.Changes = make([]*AssignmentChange, len(o.Changes))
-		for i := range m.Changes ***REMOVED***
-			m.Changes[i] = &AssignmentChange***REMOVED******REMOVED***
+		for i := range m.Changes {
+			m.Changes[i] = &AssignmentChange{}
 			github_com_docker_swarmkit_api_deepcopy.Copy(m.Changes[i], o.Changes[i])
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-***REMOVED***
+}
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
@@ -780,7 +780,7 @@ const _ = grpc.SupportPackageIsVersion4
 
 // Client API for Dispatcher service
 
-type DispatcherClient interface ***REMOVED***
+type DispatcherClient interface {
 	// Session starts an agent session with the dispatcher. The session is
 	// started after the first SessionMessage is received.
 	//
@@ -810,133 +810,133 @@ type DispatcherClient interface ***REMOVED***
 	// that are relevant to the node. Future messages in the stream are updates to
 	// the set of assignments.
 	Assignments(ctx context.Context, in *AssignmentsRequest, opts ...grpc.CallOption) (Dispatcher_AssignmentsClient, error)
-***REMOVED***
+}
 
-type dispatcherClient struct ***REMOVED***
+type dispatcherClient struct {
 	cc *grpc.ClientConn
-***REMOVED***
+}
 
-func NewDispatcherClient(cc *grpc.ClientConn) DispatcherClient ***REMOVED***
-	return &dispatcherClient***REMOVED***cc***REMOVED***
-***REMOVED***
+func NewDispatcherClient(cc *grpc.ClientConn) DispatcherClient {
+	return &dispatcherClient{cc}
+}
 
-func (c *dispatcherClient) Session(ctx context.Context, in *SessionRequest, opts ...grpc.CallOption) (Dispatcher_SessionClient, error) ***REMOVED***
+func (c *dispatcherClient) Session(ctx context.Context, in *SessionRequest, opts ...grpc.CallOption) (Dispatcher_SessionClient, error) {
 	stream, err := grpc.NewClientStream(ctx, &_Dispatcher_serviceDesc.Streams[0], c.cc, "/docker.swarmkit.v1.Dispatcher/Session", opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	x := &dispatcherSessionClient***REMOVED***stream***REMOVED***
-	if err := x.ClientStream.SendMsg(in); err != nil ***REMOVED***
+	}
+	x := &dispatcherSessionClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if err := x.ClientStream.CloseSend(); err != nil ***REMOVED***
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return x, nil
-***REMOVED***
+}
 
-type Dispatcher_SessionClient interface ***REMOVED***
+type Dispatcher_SessionClient interface {
 	Recv() (*SessionMessage, error)
 	grpc.ClientStream
-***REMOVED***
+}
 
-type dispatcherSessionClient struct ***REMOVED***
+type dispatcherSessionClient struct {
 	grpc.ClientStream
-***REMOVED***
+}
 
-func (x *dispatcherSessionClient) Recv() (*SessionMessage, error) ***REMOVED***
+func (x *dispatcherSessionClient) Recv() (*SessionMessage, error) {
 	m := new(SessionMessage)
-	if err := x.ClientStream.RecvMsg(m); err != nil ***REMOVED***
+	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return m, nil
-***REMOVED***
+}
 
-func (c *dispatcherClient) Heartbeat(ctx context.Context, in *HeartbeatRequest, opts ...grpc.CallOption) (*HeartbeatResponse, error) ***REMOVED***
+func (c *dispatcherClient) Heartbeat(ctx context.Context, in *HeartbeatRequest, opts ...grpc.CallOption) (*HeartbeatResponse, error) {
 	out := new(HeartbeatResponse)
 	err := grpc.Invoke(ctx, "/docker.swarmkit.v1.Dispatcher/Heartbeat", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *dispatcherClient) UpdateTaskStatus(ctx context.Context, in *UpdateTaskStatusRequest, opts ...grpc.CallOption) (*UpdateTaskStatusResponse, error) ***REMOVED***
+func (c *dispatcherClient) UpdateTaskStatus(ctx context.Context, in *UpdateTaskStatusRequest, opts ...grpc.CallOption) (*UpdateTaskStatusResponse, error) {
 	out := new(UpdateTaskStatusResponse)
 	err := grpc.Invoke(ctx, "/docker.swarmkit.v1.Dispatcher/UpdateTaskStatus", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *dispatcherClient) Tasks(ctx context.Context, in *TasksRequest, opts ...grpc.CallOption) (Dispatcher_TasksClient, error) ***REMOVED***
+func (c *dispatcherClient) Tasks(ctx context.Context, in *TasksRequest, opts ...grpc.CallOption) (Dispatcher_TasksClient, error) {
 	stream, err := grpc.NewClientStream(ctx, &_Dispatcher_serviceDesc.Streams[1], c.cc, "/docker.swarmkit.v1.Dispatcher/Tasks", opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	x := &dispatcherTasksClient***REMOVED***stream***REMOVED***
-	if err := x.ClientStream.SendMsg(in); err != nil ***REMOVED***
+	}
+	x := &dispatcherTasksClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if err := x.ClientStream.CloseSend(); err != nil ***REMOVED***
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return x, nil
-***REMOVED***
+}
 
-type Dispatcher_TasksClient interface ***REMOVED***
+type Dispatcher_TasksClient interface {
 	Recv() (*TasksMessage, error)
 	grpc.ClientStream
-***REMOVED***
+}
 
-type dispatcherTasksClient struct ***REMOVED***
+type dispatcherTasksClient struct {
 	grpc.ClientStream
-***REMOVED***
+}
 
-func (x *dispatcherTasksClient) Recv() (*TasksMessage, error) ***REMOVED***
+func (x *dispatcherTasksClient) Recv() (*TasksMessage, error) {
 	m := new(TasksMessage)
-	if err := x.ClientStream.RecvMsg(m); err != nil ***REMOVED***
+	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return m, nil
-***REMOVED***
+}
 
-func (c *dispatcherClient) Assignments(ctx context.Context, in *AssignmentsRequest, opts ...grpc.CallOption) (Dispatcher_AssignmentsClient, error) ***REMOVED***
+func (c *dispatcherClient) Assignments(ctx context.Context, in *AssignmentsRequest, opts ...grpc.CallOption) (Dispatcher_AssignmentsClient, error) {
 	stream, err := grpc.NewClientStream(ctx, &_Dispatcher_serviceDesc.Streams[2], c.cc, "/docker.swarmkit.v1.Dispatcher/Assignments", opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	x := &dispatcherAssignmentsClient***REMOVED***stream***REMOVED***
-	if err := x.ClientStream.SendMsg(in); err != nil ***REMOVED***
+	}
+	x := &dispatcherAssignmentsClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if err := x.ClientStream.CloseSend(); err != nil ***REMOVED***
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return x, nil
-***REMOVED***
+}
 
-type Dispatcher_AssignmentsClient interface ***REMOVED***
+type Dispatcher_AssignmentsClient interface {
 	Recv() (*AssignmentsMessage, error)
 	grpc.ClientStream
-***REMOVED***
+}
 
-type dispatcherAssignmentsClient struct ***REMOVED***
+type dispatcherAssignmentsClient struct {
 	grpc.ClientStream
-***REMOVED***
+}
 
-func (x *dispatcherAssignmentsClient) Recv() (*AssignmentsMessage, error) ***REMOVED***
+func (x *dispatcherAssignmentsClient) Recv() (*AssignmentsMessage, error) {
 	m := new(AssignmentsMessage)
-	if err := x.ClientStream.RecvMsg(m); err != nil ***REMOVED***
+	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return m, nil
-***REMOVED***
+}
 
 // Server API for Dispatcher service
 
-type DispatcherServer interface ***REMOVED***
+type DispatcherServer interface {
 	// Session starts an agent session with the dispatcher. The session is
 	// started after the first SessionMessage is received.
 	//
@@ -966,277 +966,277 @@ type DispatcherServer interface ***REMOVED***
 	// that are relevant to the node. Future messages in the stream are updates to
 	// the set of assignments.
 	Assignments(*AssignmentsRequest, Dispatcher_AssignmentsServer) error
-***REMOVED***
+}
 
-func RegisterDispatcherServer(s *grpc.Server, srv DispatcherServer) ***REMOVED***
+func RegisterDispatcherServer(s *grpc.Server, srv DispatcherServer) {
 	s.RegisterService(&_Dispatcher_serviceDesc, srv)
-***REMOVED***
+}
 
-func _Dispatcher_Session_Handler(srv interface***REMOVED******REMOVED***, stream grpc.ServerStream) error ***REMOVED***
+func _Dispatcher_Session_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(SessionRequest)
-	if err := stream.RecvMsg(m); err != nil ***REMOVED***
+	if err := stream.RecvMsg(m); err != nil {
 		return err
-	***REMOVED***
-	return srv.(DispatcherServer).Session(m, &dispatcherSessionServer***REMOVED***stream***REMOVED***)
-***REMOVED***
+	}
+	return srv.(DispatcherServer).Session(m, &dispatcherSessionServer{stream})
+}
 
-type Dispatcher_SessionServer interface ***REMOVED***
+type Dispatcher_SessionServer interface {
 	Send(*SessionMessage) error
 	grpc.ServerStream
-***REMOVED***
+}
 
-type dispatcherSessionServer struct ***REMOVED***
+type dispatcherSessionServer struct {
 	grpc.ServerStream
-***REMOVED***
+}
 
-func (x *dispatcherSessionServer) Send(m *SessionMessage) error ***REMOVED***
+func (x *dispatcherSessionServer) Send(m *SessionMessage) error {
 	return x.ServerStream.SendMsg(m)
-***REMOVED***
+}
 
-func _Dispatcher_Heartbeat_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _Dispatcher_Heartbeat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(HeartbeatRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(DispatcherServer).Heartbeat(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/docker.swarmkit.v1.Dispatcher/Heartbeat",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(DispatcherServer).Heartbeat(ctx, req.(*HeartbeatRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _Dispatcher_UpdateTaskStatus_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _Dispatcher_UpdateTaskStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateTaskStatusRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(DispatcherServer).UpdateTaskStatus(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/docker.swarmkit.v1.Dispatcher/UpdateTaskStatus",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(DispatcherServer).UpdateTaskStatus(ctx, req.(*UpdateTaskStatusRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _Dispatcher_Tasks_Handler(srv interface***REMOVED******REMOVED***, stream grpc.ServerStream) error ***REMOVED***
+func _Dispatcher_Tasks_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(TasksRequest)
-	if err := stream.RecvMsg(m); err != nil ***REMOVED***
+	if err := stream.RecvMsg(m); err != nil {
 		return err
-	***REMOVED***
-	return srv.(DispatcherServer).Tasks(m, &dispatcherTasksServer***REMOVED***stream***REMOVED***)
-***REMOVED***
+	}
+	return srv.(DispatcherServer).Tasks(m, &dispatcherTasksServer{stream})
+}
 
-type Dispatcher_TasksServer interface ***REMOVED***
+type Dispatcher_TasksServer interface {
 	Send(*TasksMessage) error
 	grpc.ServerStream
-***REMOVED***
+}
 
-type dispatcherTasksServer struct ***REMOVED***
+type dispatcherTasksServer struct {
 	grpc.ServerStream
-***REMOVED***
+}
 
-func (x *dispatcherTasksServer) Send(m *TasksMessage) error ***REMOVED***
+func (x *dispatcherTasksServer) Send(m *TasksMessage) error {
 	return x.ServerStream.SendMsg(m)
-***REMOVED***
+}
 
-func _Dispatcher_Assignments_Handler(srv interface***REMOVED******REMOVED***, stream grpc.ServerStream) error ***REMOVED***
+func _Dispatcher_Assignments_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(AssignmentsRequest)
-	if err := stream.RecvMsg(m); err != nil ***REMOVED***
+	if err := stream.RecvMsg(m); err != nil {
 		return err
-	***REMOVED***
-	return srv.(DispatcherServer).Assignments(m, &dispatcherAssignmentsServer***REMOVED***stream***REMOVED***)
-***REMOVED***
+	}
+	return srv.(DispatcherServer).Assignments(m, &dispatcherAssignmentsServer{stream})
+}
 
-type Dispatcher_AssignmentsServer interface ***REMOVED***
+type Dispatcher_AssignmentsServer interface {
 	Send(*AssignmentsMessage) error
 	grpc.ServerStream
-***REMOVED***
+}
 
-type dispatcherAssignmentsServer struct ***REMOVED***
+type dispatcherAssignmentsServer struct {
 	grpc.ServerStream
-***REMOVED***
+}
 
-func (x *dispatcherAssignmentsServer) Send(m *AssignmentsMessage) error ***REMOVED***
+func (x *dispatcherAssignmentsServer) Send(m *AssignmentsMessage) error {
 	return x.ServerStream.SendMsg(m)
-***REMOVED***
+}
 
-var _Dispatcher_serviceDesc = grpc.ServiceDesc***REMOVED***
+var _Dispatcher_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "docker.swarmkit.v1.Dispatcher",
 	HandlerType: (*DispatcherServer)(nil),
-	Methods: []grpc.MethodDesc***REMOVED***
-		***REMOVED***
+	Methods: []grpc.MethodDesc{
+		{
 			MethodName: "Heartbeat",
 			Handler:    _Dispatcher_Heartbeat_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "UpdateTaskStatus",
 			Handler:    _Dispatcher_UpdateTaskStatus_Handler,
-		***REMOVED***,
-	***REMOVED***,
-	Streams: []grpc.StreamDesc***REMOVED***
-		***REMOVED***
+		},
+	},
+	Streams: []grpc.StreamDesc{
+		{
 			StreamName:    "Session",
 			Handler:       _Dispatcher_Session_Handler,
 			ServerStreams: true,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			StreamName:    "Tasks",
 			Handler:       _Dispatcher_Tasks_Handler,
 			ServerStreams: true,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			StreamName:    "Assignments",
 			Handler:       _Dispatcher_Assignments_Handler,
 			ServerStreams: true,
-		***REMOVED***,
-	***REMOVED***,
+		},
+	},
 	Metadata: "github.com/docker/swarmkit/api/dispatcher.proto",
-***REMOVED***
+}
 
-func (m *SessionRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *SessionRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *SessionRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *SessionRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.Description != nil ***REMOVED***
+	if m.Description != nil {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintDispatcher(dAtA, i, uint64(m.Description.Size()))
 		n1, err := m.Description.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n1
-	***REMOVED***
-	if len(m.SessionID) > 0 ***REMOVED***
+	}
+	if len(m.SessionID) > 0 {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintDispatcher(dAtA, i, uint64(len(m.SessionID)))
 		i += copy(dAtA[i:], m.SessionID)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *SessionMessage) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *SessionMessage) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *SessionMessage) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *SessionMessage) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.SessionID) > 0 ***REMOVED***
+	if len(m.SessionID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintDispatcher(dAtA, i, uint64(len(m.SessionID)))
 		i += copy(dAtA[i:], m.SessionID)
-	***REMOVED***
-	if m.Node != nil ***REMOVED***
+	}
+	if m.Node != nil {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintDispatcher(dAtA, i, uint64(m.Node.Size()))
 		n2, err := m.Node.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n2
-	***REMOVED***
-	if len(m.Managers) > 0 ***REMOVED***
-		for _, msg := range m.Managers ***REMOVED***
+	}
+	if len(m.Managers) > 0 {
+		for _, msg := range m.Managers {
 			dAtA[i] = 0x1a
 			i++
 			i = encodeVarintDispatcher(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			i += n
-		***REMOVED***
-	***REMOVED***
-	if len(m.NetworkBootstrapKeys) > 0 ***REMOVED***
-		for _, msg := range m.NetworkBootstrapKeys ***REMOVED***
+		}
+	}
+	if len(m.NetworkBootstrapKeys) > 0 {
+		for _, msg := range m.NetworkBootstrapKeys {
 			dAtA[i] = 0x22
 			i++
 			i = encodeVarintDispatcher(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			i += n
-		***REMOVED***
-	***REMOVED***
-	if len(m.RootCA) > 0 ***REMOVED***
+		}
+	}
+	if len(m.RootCA) > 0 {
 		dAtA[i] = 0x2a
 		i++
 		i = encodeVarintDispatcher(dAtA, i, uint64(len(m.RootCA)))
 		i += copy(dAtA[i:], m.RootCA)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *HeartbeatRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *HeartbeatRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *HeartbeatRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *HeartbeatRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.SessionID) > 0 ***REMOVED***
+	if len(m.SessionID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintDispatcher(dAtA, i, uint64(len(m.SessionID)))
 		i += copy(dAtA[i:], m.SessionID)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *HeartbeatResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *HeartbeatResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *HeartbeatResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *HeartbeatResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -1245,327 +1245,327 @@ func (m *HeartbeatResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
 	i++
 	i = encodeVarintDispatcher(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(m.Period)))
 	n3, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(m.Period, dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n3
 	return i, nil
-***REMOVED***
+}
 
-func (m *UpdateTaskStatusRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *UpdateTaskStatusRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *UpdateTaskStatusRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *UpdateTaskStatusRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.SessionID) > 0 ***REMOVED***
+	if len(m.SessionID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintDispatcher(dAtA, i, uint64(len(m.SessionID)))
 		i += copy(dAtA[i:], m.SessionID)
-	***REMOVED***
-	if len(m.Updates) > 0 ***REMOVED***
-		for _, msg := range m.Updates ***REMOVED***
+	}
+	if len(m.Updates) > 0 {
+		for _, msg := range m.Updates {
 			dAtA[i] = 0x1a
 			i++
 			i = encodeVarintDispatcher(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			i += n
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *UpdateTaskStatusRequest_TaskStatusUpdate) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *UpdateTaskStatusRequest_TaskStatusUpdate) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *UpdateTaskStatusRequest_TaskStatusUpdate) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *UpdateTaskStatusRequest_TaskStatusUpdate) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.TaskID) > 0 ***REMOVED***
+	if len(m.TaskID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintDispatcher(dAtA, i, uint64(len(m.TaskID)))
 		i += copy(dAtA[i:], m.TaskID)
-	***REMOVED***
-	if m.Status != nil ***REMOVED***
+	}
+	if m.Status != nil {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintDispatcher(dAtA, i, uint64(m.Status.Size()))
 		n4, err := m.Status.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n4
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *UpdateTaskStatusResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *UpdateTaskStatusResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *UpdateTaskStatusResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *UpdateTaskStatusResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
 	return i, nil
-***REMOVED***
+}
 
-func (m *TasksRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *TasksRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *TasksRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *TasksRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.SessionID) > 0 ***REMOVED***
+	if len(m.SessionID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintDispatcher(dAtA, i, uint64(len(m.SessionID)))
 		i += copy(dAtA[i:], m.SessionID)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *TasksMessage) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *TasksMessage) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *TasksMessage) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *TasksMessage) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Tasks) > 0 ***REMOVED***
-		for _, msg := range m.Tasks ***REMOVED***
+	if len(m.Tasks) > 0 {
+		for _, msg := range m.Tasks {
 			dAtA[i] = 0xa
 			i++
 			i = encodeVarintDispatcher(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			i += n
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *AssignmentsRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *AssignmentsRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *AssignmentsRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *AssignmentsRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.SessionID) > 0 ***REMOVED***
+	if len(m.SessionID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintDispatcher(dAtA, i, uint64(len(m.SessionID)))
 		i += copy(dAtA[i:], m.SessionID)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *Assignment) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *Assignment) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *Assignment) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *Assignment) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.Item != nil ***REMOVED***
+	if m.Item != nil {
 		nn5, err := m.Item.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += nn5
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *Assignment_Task) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *Assignment_Task) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
-	if m.Task != nil ***REMOVED***
+	if m.Task != nil {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintDispatcher(dAtA, i, uint64(m.Task.Size()))
 		n6, err := m.Task.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n6
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
-func (m *Assignment_Secret) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+}
+func (m *Assignment_Secret) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
-	if m.Secret != nil ***REMOVED***
+	if m.Secret != nil {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintDispatcher(dAtA, i, uint64(m.Secret.Size()))
 		n7, err := m.Secret.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n7
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
-func (m *Assignment_Config) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+}
+func (m *Assignment_Config) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
-	if m.Config != nil ***REMOVED***
+	if m.Config != nil {
 		dAtA[i] = 0x1a
 		i++
 		i = encodeVarintDispatcher(dAtA, i, uint64(m.Config.Size()))
 		n8, err := m.Config.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n8
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
-func (m *AssignmentChange) Marshal() (dAtA []byte, err error) ***REMOVED***
+}
+func (m *AssignmentChange) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *AssignmentChange) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *AssignmentChange) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.Assignment != nil ***REMOVED***
+	if m.Assignment != nil {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintDispatcher(dAtA, i, uint64(m.Assignment.Size()))
 		n9, err := m.Assignment.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n9
-	***REMOVED***
-	if m.Action != 0 ***REMOVED***
+	}
+	if m.Action != 0 {
 		dAtA[i] = 0x10
 		i++
 		i = encodeVarintDispatcher(dAtA, i, uint64(m.Action))
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *AssignmentsMessage) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *AssignmentsMessage) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *AssignmentsMessage) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *AssignmentsMessage) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.Type != 0 ***REMOVED***
+	if m.Type != 0 {
 		dAtA[i] = 0x8
 		i++
 		i = encodeVarintDispatcher(dAtA, i, uint64(m.Type))
-	***REMOVED***
-	if len(m.AppliesTo) > 0 ***REMOVED***
+	}
+	if len(m.AppliesTo) > 0 {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintDispatcher(dAtA, i, uint64(len(m.AppliesTo)))
 		i += copy(dAtA[i:], m.AppliesTo)
-	***REMOVED***
-	if len(m.ResultsIn) > 0 ***REMOVED***
+	}
+	if len(m.ResultsIn) > 0 {
 		dAtA[i] = 0x1a
 		i++
 		i = encodeVarintDispatcher(dAtA, i, uint64(len(m.ResultsIn)))
 		i += copy(dAtA[i:], m.ResultsIn)
-	***REMOVED***
-	if len(m.Changes) > 0 ***REMOVED***
-		for _, msg := range m.Changes ***REMOVED***
+	}
+	if len(m.Changes) > 0 {
+		for _, msg := range m.Changes {
 			dAtA[i] = 0x22
 			i++
 			i = encodeVarintDispatcher(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			i += n
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return i, nil
-***REMOVED***
+}
 
-func encodeFixed64Dispatcher(dAtA []byte, offset int, v uint64) int ***REMOVED***
+func encodeFixed64Dispatcher(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
 	dAtA[offset+2] = uint8(v >> 16)
@@ -1575,2192 +1575,2192 @@ func encodeFixed64Dispatcher(dAtA []byte, offset int, v uint64) int ***REMOVED**
 	dAtA[offset+6] = uint8(v >> 48)
 	dAtA[offset+7] = uint8(v >> 56)
 	return offset + 8
-***REMOVED***
-func encodeFixed32Dispatcher(dAtA []byte, offset int, v uint32) int ***REMOVED***
+}
+func encodeFixed32Dispatcher(dAtA []byte, offset int, v uint32) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
 	dAtA[offset+2] = uint8(v >> 16)
 	dAtA[offset+3] = uint8(v >> 24)
 	return offset + 4
-***REMOVED***
-func encodeVarintDispatcher(dAtA []byte, offset int, v uint64) int ***REMOVED***
-	for v >= 1<<7 ***REMOVED***
+}
+func encodeVarintDispatcher(dAtA []byte, offset int, v uint64) int {
+	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
-	***REMOVED***
+	}
 	dAtA[offset] = uint8(v)
 	return offset + 1
-***REMOVED***
+}
 
-type raftProxyDispatcherServer struct ***REMOVED***
+type raftProxyDispatcherServer struct {
 	local                       DispatcherServer
 	connSelector                raftselector.ConnProvider
 	localCtxMods, remoteCtxMods []func(context.Context) (context.Context, error)
-***REMOVED***
+}
 
-func NewRaftProxyDispatcherServer(local DispatcherServer, connSelector raftselector.ConnProvider, localCtxMod, remoteCtxMod func(context.Context) (context.Context, error)) DispatcherServer ***REMOVED***
-	redirectChecker := func(ctx context.Context) (context.Context, error) ***REMOVED***
+func NewRaftProxyDispatcherServer(local DispatcherServer, connSelector raftselector.ConnProvider, localCtxMod, remoteCtxMod func(context.Context) (context.Context, error)) DispatcherServer {
+	redirectChecker := func(ctx context.Context) (context.Context, error) {
 		s, ok := transport.StreamFromContext(ctx)
-		if !ok ***REMOVED***
+		if !ok {
 			return ctx, status.Errorf(codes.InvalidArgument, "remote addr is not found in context")
-		***REMOVED***
+		}
 		addr := s.ServerTransport().RemoteAddr().String()
 		md, ok := metadata.FromContext(ctx)
-		if ok && len(md["redirect"]) != 0 ***REMOVED***
+		if ok && len(md["redirect"]) != 0 {
 			return ctx, status.Errorf(codes.ResourceExhausted, "more than one redirect to leader from: %s", md["redirect"])
-		***REMOVED***
-		if !ok ***REMOVED***
-			md = metadata.New(map[string]string***REMOVED******REMOVED***)
-		***REMOVED***
+		}
+		if !ok {
+			md = metadata.New(map[string]string{})
+		}
 		md["redirect"] = append(md["redirect"], addr)
 		return metadata.NewContext(ctx, md), nil
-	***REMOVED***
-	remoteMods := []func(context.Context) (context.Context, error)***REMOVED***redirectChecker***REMOVED***
+	}
+	remoteMods := []func(context.Context) (context.Context, error){redirectChecker}
 	remoteMods = append(remoteMods, remoteCtxMod)
 
 	var localMods []func(context.Context) (context.Context, error)
-	if localCtxMod != nil ***REMOVED***
-		localMods = []func(context.Context) (context.Context, error)***REMOVED***localCtxMod***REMOVED***
-	***REMOVED***
+	if localCtxMod != nil {
+		localMods = []func(context.Context) (context.Context, error){localCtxMod}
+	}
 
-	return &raftProxyDispatcherServer***REMOVED***
+	return &raftProxyDispatcherServer{
 		local:         local,
 		connSelector:  connSelector,
 		localCtxMods:  localMods,
 		remoteCtxMods: remoteMods,
-	***REMOVED***
-***REMOVED***
-func (p *raftProxyDispatcherServer) runCtxMods(ctx context.Context, ctxMods []func(context.Context) (context.Context, error)) (context.Context, error) ***REMOVED***
+	}
+}
+func (p *raftProxyDispatcherServer) runCtxMods(ctx context.Context, ctxMods []func(context.Context) (context.Context, error)) (context.Context, error) {
 	var err error
-	for _, mod := range ctxMods ***REMOVED***
+	for _, mod := range ctxMods {
 		ctx, err = mod(ctx)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return ctx, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return ctx, nil
-***REMOVED***
-func (p *raftProxyDispatcherServer) pollNewLeaderConn(ctx context.Context) (*grpc.ClientConn, error) ***REMOVED***
+}
+func (p *raftProxyDispatcherServer) pollNewLeaderConn(ctx context.Context) (*grpc.ClientConn, error) {
 	ticker := rafttime.NewTicker(500 * rafttime.Millisecond)
 	defer ticker.Stop()
-	for ***REMOVED***
-		select ***REMOVED***
+	for {
+		select {
 		case <-ticker.C:
 			conn, err := p.connSelector.LeaderConn(ctx)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 
 			client := NewHealthClient(conn)
 
-			resp, err := client.Check(ctx, &HealthCheckRequest***REMOVED***Service: "Raft"***REMOVED***)
-			if err != nil || resp.Status != HealthCheckResponse_SERVING ***REMOVED***
+			resp, err := client.Check(ctx, &HealthCheckRequest{Service: "Raft"})
+			if err != nil || resp.Status != HealthCheckResponse_SERVING {
 				continue
-			***REMOVED***
+			}
 			return conn, nil
 		case <-ctx.Done():
 			return nil, ctx.Err()
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-type Dispatcher_SessionServerWrapper struct ***REMOVED***
+type Dispatcher_SessionServerWrapper struct {
 	Dispatcher_SessionServer
 	ctx context.Context
-***REMOVED***
+}
 
-func (s Dispatcher_SessionServerWrapper) Context() context.Context ***REMOVED***
+func (s Dispatcher_SessionServerWrapper) Context() context.Context {
 	return s.ctx
-***REMOVED***
+}
 
-func (p *raftProxyDispatcherServer) Session(r *SessionRequest, stream Dispatcher_SessionServer) error ***REMOVED***
+func (p *raftProxyDispatcherServer) Session(r *SessionRequest, stream Dispatcher_SessionServer) error {
 	ctx := stream.Context()
 	conn, err := p.connSelector.LeaderConn(ctx)
-	if err != nil ***REMOVED***
-		if err == raftselector.ErrIsLeader ***REMOVED***
+	if err != nil {
+		if err == raftselector.ErrIsLeader {
 			ctx, err = p.runCtxMods(ctx, p.localCtxMods)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			streamWrapper := Dispatcher_SessionServerWrapper***REMOVED***
+			}
+			streamWrapper := Dispatcher_SessionServerWrapper{
 				Dispatcher_SessionServer: stream,
 				ctx: ctx,
-			***REMOVED***
+			}
 			return p.local.Session(r, streamWrapper)
-		***REMOVED***
+		}
 		return err
-	***REMOVED***
+	}
 	ctx, err = p.runCtxMods(ctx, p.remoteCtxMods)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	clientStream, err := NewDispatcherClient(conn).Session(ctx, r)
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	for ***REMOVED***
+	for {
 		msg, err := clientStream.Recv()
-		if err == io.EOF ***REMOVED***
+		if err == io.EOF {
 			break
-		***REMOVED***
-		if err != nil ***REMOVED***
+		}
+		if err != nil {
 			return err
-		***REMOVED***
-		if err := stream.Send(msg); err != nil ***REMOVED***
+		}
+		if err := stream.Send(msg); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func (p *raftProxyDispatcherServer) Heartbeat(ctx context.Context, r *HeartbeatRequest) (*HeartbeatResponse, error) ***REMOVED***
+func (p *raftProxyDispatcherServer) Heartbeat(ctx context.Context, r *HeartbeatRequest) (*HeartbeatResponse, error) {
 
 	conn, err := p.connSelector.LeaderConn(ctx)
-	if err != nil ***REMOVED***
-		if err == raftselector.ErrIsLeader ***REMOVED***
+	if err != nil {
+		if err == raftselector.ErrIsLeader {
 			ctx, err = p.runCtxMods(ctx, p.localCtxMods)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			return p.local.Heartbeat(ctx, r)
-		***REMOVED***
+		}
 		return nil, err
-	***REMOVED***
+	}
 	modCtx, err := p.runCtxMods(ctx, p.remoteCtxMods)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	resp, err := NewDispatcherClient(conn).Heartbeat(modCtx, r)
-	if err != nil ***REMOVED***
-		if !strings.Contains(err.Error(), "is closing") && !strings.Contains(err.Error(), "the connection is unavailable") && !strings.Contains(err.Error(), "connection error") ***REMOVED***
+	if err != nil {
+		if !strings.Contains(err.Error(), "is closing") && !strings.Contains(err.Error(), "the connection is unavailable") && !strings.Contains(err.Error(), "connection error") {
 			return resp, err
-		***REMOVED***
+		}
 		conn, err := p.pollNewLeaderConn(ctx)
-		if err != nil ***REMOVED***
-			if err == raftselector.ErrIsLeader ***REMOVED***
+		if err != nil {
+			if err == raftselector.ErrIsLeader {
 				return p.local.Heartbeat(ctx, r)
-			***REMOVED***
+			}
 			return nil, err
-		***REMOVED***
+		}
 		return NewDispatcherClient(conn).Heartbeat(modCtx, r)
-	***REMOVED***
+	}
 	return resp, err
-***REMOVED***
+}
 
-func (p *raftProxyDispatcherServer) UpdateTaskStatus(ctx context.Context, r *UpdateTaskStatusRequest) (*UpdateTaskStatusResponse, error) ***REMOVED***
+func (p *raftProxyDispatcherServer) UpdateTaskStatus(ctx context.Context, r *UpdateTaskStatusRequest) (*UpdateTaskStatusResponse, error) {
 
 	conn, err := p.connSelector.LeaderConn(ctx)
-	if err != nil ***REMOVED***
-		if err == raftselector.ErrIsLeader ***REMOVED***
+	if err != nil {
+		if err == raftselector.ErrIsLeader {
 			ctx, err = p.runCtxMods(ctx, p.localCtxMods)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			return p.local.UpdateTaskStatus(ctx, r)
-		***REMOVED***
+		}
 		return nil, err
-	***REMOVED***
+	}
 	modCtx, err := p.runCtxMods(ctx, p.remoteCtxMods)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	resp, err := NewDispatcherClient(conn).UpdateTaskStatus(modCtx, r)
-	if err != nil ***REMOVED***
-		if !strings.Contains(err.Error(), "is closing") && !strings.Contains(err.Error(), "the connection is unavailable") && !strings.Contains(err.Error(), "connection error") ***REMOVED***
+	if err != nil {
+		if !strings.Contains(err.Error(), "is closing") && !strings.Contains(err.Error(), "the connection is unavailable") && !strings.Contains(err.Error(), "connection error") {
 			return resp, err
-		***REMOVED***
+		}
 		conn, err := p.pollNewLeaderConn(ctx)
-		if err != nil ***REMOVED***
-			if err == raftselector.ErrIsLeader ***REMOVED***
+		if err != nil {
+			if err == raftselector.ErrIsLeader {
 				return p.local.UpdateTaskStatus(ctx, r)
-			***REMOVED***
+			}
 			return nil, err
-		***REMOVED***
+		}
 		return NewDispatcherClient(conn).UpdateTaskStatus(modCtx, r)
-	***REMOVED***
+	}
 	return resp, err
-***REMOVED***
+}
 
-type Dispatcher_TasksServerWrapper struct ***REMOVED***
+type Dispatcher_TasksServerWrapper struct {
 	Dispatcher_TasksServer
 	ctx context.Context
-***REMOVED***
+}
 
-func (s Dispatcher_TasksServerWrapper) Context() context.Context ***REMOVED***
+func (s Dispatcher_TasksServerWrapper) Context() context.Context {
 	return s.ctx
-***REMOVED***
+}
 
-func (p *raftProxyDispatcherServer) Tasks(r *TasksRequest, stream Dispatcher_TasksServer) error ***REMOVED***
+func (p *raftProxyDispatcherServer) Tasks(r *TasksRequest, stream Dispatcher_TasksServer) error {
 	ctx := stream.Context()
 	conn, err := p.connSelector.LeaderConn(ctx)
-	if err != nil ***REMOVED***
-		if err == raftselector.ErrIsLeader ***REMOVED***
+	if err != nil {
+		if err == raftselector.ErrIsLeader {
 			ctx, err = p.runCtxMods(ctx, p.localCtxMods)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			streamWrapper := Dispatcher_TasksServerWrapper***REMOVED***
+			}
+			streamWrapper := Dispatcher_TasksServerWrapper{
 				Dispatcher_TasksServer: stream,
 				ctx: ctx,
-			***REMOVED***
+			}
 			return p.local.Tasks(r, streamWrapper)
-		***REMOVED***
+		}
 		return err
-	***REMOVED***
+	}
 	ctx, err = p.runCtxMods(ctx, p.remoteCtxMods)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	clientStream, err := NewDispatcherClient(conn).Tasks(ctx, r)
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	for ***REMOVED***
+	for {
 		msg, err := clientStream.Recv()
-		if err == io.EOF ***REMOVED***
+		if err == io.EOF {
 			break
-		***REMOVED***
-		if err != nil ***REMOVED***
+		}
+		if err != nil {
 			return err
-		***REMOVED***
-		if err := stream.Send(msg); err != nil ***REMOVED***
+		}
+		if err := stream.Send(msg); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-type Dispatcher_AssignmentsServerWrapper struct ***REMOVED***
+type Dispatcher_AssignmentsServerWrapper struct {
 	Dispatcher_AssignmentsServer
 	ctx context.Context
-***REMOVED***
+}
 
-func (s Dispatcher_AssignmentsServerWrapper) Context() context.Context ***REMOVED***
+func (s Dispatcher_AssignmentsServerWrapper) Context() context.Context {
 	return s.ctx
-***REMOVED***
+}
 
-func (p *raftProxyDispatcherServer) Assignments(r *AssignmentsRequest, stream Dispatcher_AssignmentsServer) error ***REMOVED***
+func (p *raftProxyDispatcherServer) Assignments(r *AssignmentsRequest, stream Dispatcher_AssignmentsServer) error {
 	ctx := stream.Context()
 	conn, err := p.connSelector.LeaderConn(ctx)
-	if err != nil ***REMOVED***
-		if err == raftselector.ErrIsLeader ***REMOVED***
+	if err != nil {
+		if err == raftselector.ErrIsLeader {
 			ctx, err = p.runCtxMods(ctx, p.localCtxMods)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			streamWrapper := Dispatcher_AssignmentsServerWrapper***REMOVED***
+			}
+			streamWrapper := Dispatcher_AssignmentsServerWrapper{
 				Dispatcher_AssignmentsServer: stream,
 				ctx: ctx,
-			***REMOVED***
+			}
 			return p.local.Assignments(r, streamWrapper)
-		***REMOVED***
+		}
 		return err
-	***REMOVED***
+	}
 	ctx, err = p.runCtxMods(ctx, p.remoteCtxMods)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	clientStream, err := NewDispatcherClient(conn).Assignments(ctx, r)
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	for ***REMOVED***
+	for {
 		msg, err := clientStream.Recv()
-		if err == io.EOF ***REMOVED***
+		if err == io.EOF {
 			break
-		***REMOVED***
-		if err != nil ***REMOVED***
+		}
+		if err != nil {
 			return err
-		***REMOVED***
-		if err := stream.Send(msg); err != nil ***REMOVED***
+		}
+		if err := stream.Send(msg); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *SessionRequest) Size() (n int) ***REMOVED***
+func (m *SessionRequest) Size() (n int) {
 	var l int
 	_ = l
-	if m.Description != nil ***REMOVED***
+	if m.Description != nil {
 		l = m.Description.Size()
 		n += 1 + l + sovDispatcher(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.SessionID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovDispatcher(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *SessionMessage) Size() (n int) ***REMOVED***
+func (m *SessionMessage) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.SessionID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovDispatcher(uint64(l))
-	***REMOVED***
-	if m.Node != nil ***REMOVED***
+	}
+	if m.Node != nil {
 		l = m.Node.Size()
 		n += 1 + l + sovDispatcher(uint64(l))
-	***REMOVED***
-	if len(m.Managers) > 0 ***REMOVED***
-		for _, e := range m.Managers ***REMOVED***
+	}
+	if len(m.Managers) > 0 {
+		for _, e := range m.Managers {
 			l = e.Size()
 			n += 1 + l + sovDispatcher(uint64(l))
-		***REMOVED***
-	***REMOVED***
-	if len(m.NetworkBootstrapKeys) > 0 ***REMOVED***
-		for _, e := range m.NetworkBootstrapKeys ***REMOVED***
+		}
+	}
+	if len(m.NetworkBootstrapKeys) > 0 {
+		for _, e := range m.NetworkBootstrapKeys {
 			l = e.Size()
 			n += 1 + l + sovDispatcher(uint64(l))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	l = len(m.RootCA)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovDispatcher(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *HeartbeatRequest) Size() (n int) ***REMOVED***
+func (m *HeartbeatRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.SessionID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovDispatcher(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *HeartbeatResponse) Size() (n int) ***REMOVED***
+func (m *HeartbeatResponse) Size() (n int) {
 	var l int
 	_ = l
 	l = github_com_gogo_protobuf_types.SizeOfStdDuration(m.Period)
 	n += 1 + l + sovDispatcher(uint64(l))
 	return n
-***REMOVED***
+}
 
-func (m *UpdateTaskStatusRequest) Size() (n int) ***REMOVED***
+func (m *UpdateTaskStatusRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.SessionID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovDispatcher(uint64(l))
-	***REMOVED***
-	if len(m.Updates) > 0 ***REMOVED***
-		for _, e := range m.Updates ***REMOVED***
+	}
+	if len(m.Updates) > 0 {
+		for _, e := range m.Updates {
 			l = e.Size()
 			n += 1 + l + sovDispatcher(uint64(l))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
+}
 
-func (m *UpdateTaskStatusRequest_TaskStatusUpdate) Size() (n int) ***REMOVED***
+func (m *UpdateTaskStatusRequest_TaskStatusUpdate) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.TaskID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovDispatcher(uint64(l))
-	***REMOVED***
-	if m.Status != nil ***REMOVED***
+	}
+	if m.Status != nil {
 		l = m.Status.Size()
 		n += 1 + l + sovDispatcher(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *UpdateTaskStatusResponse) Size() (n int) ***REMOVED***
+func (m *UpdateTaskStatusResponse) Size() (n int) {
 	var l int
 	_ = l
 	return n
-***REMOVED***
+}
 
-func (m *TasksRequest) Size() (n int) ***REMOVED***
+func (m *TasksRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.SessionID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovDispatcher(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *TasksMessage) Size() (n int) ***REMOVED***
+func (m *TasksMessage) Size() (n int) {
 	var l int
 	_ = l
-	if len(m.Tasks) > 0 ***REMOVED***
-		for _, e := range m.Tasks ***REMOVED***
+	if len(m.Tasks) > 0 {
+		for _, e := range m.Tasks {
 			l = e.Size()
 			n += 1 + l + sovDispatcher(uint64(l))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
+}
 
-func (m *AssignmentsRequest) Size() (n int) ***REMOVED***
+func (m *AssignmentsRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.SessionID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovDispatcher(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *Assignment) Size() (n int) ***REMOVED***
+func (m *Assignment) Size() (n int) {
 	var l int
 	_ = l
-	if m.Item != nil ***REMOVED***
+	if m.Item != nil {
 		n += m.Item.Size()
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *Assignment_Task) Size() (n int) ***REMOVED***
+func (m *Assignment_Task) Size() (n int) {
 	var l int
 	_ = l
-	if m.Task != nil ***REMOVED***
+	if m.Task != nil {
 		l = m.Task.Size()
 		n += 1 + l + sovDispatcher(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
-func (m *Assignment_Secret) Size() (n int) ***REMOVED***
+}
+func (m *Assignment_Secret) Size() (n int) {
 	var l int
 	_ = l
-	if m.Secret != nil ***REMOVED***
+	if m.Secret != nil {
 		l = m.Secret.Size()
 		n += 1 + l + sovDispatcher(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
-func (m *Assignment_Config) Size() (n int) ***REMOVED***
+}
+func (m *Assignment_Config) Size() (n int) {
 	var l int
 	_ = l
-	if m.Config != nil ***REMOVED***
+	if m.Config != nil {
 		l = m.Config.Size()
 		n += 1 + l + sovDispatcher(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
-func (m *AssignmentChange) Size() (n int) ***REMOVED***
+}
+func (m *AssignmentChange) Size() (n int) {
 	var l int
 	_ = l
-	if m.Assignment != nil ***REMOVED***
+	if m.Assignment != nil {
 		l = m.Assignment.Size()
 		n += 1 + l + sovDispatcher(uint64(l))
-	***REMOVED***
-	if m.Action != 0 ***REMOVED***
+	}
+	if m.Action != 0 {
 		n += 1 + sovDispatcher(uint64(m.Action))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *AssignmentsMessage) Size() (n int) ***REMOVED***
+func (m *AssignmentsMessage) Size() (n int) {
 	var l int
 	_ = l
-	if m.Type != 0 ***REMOVED***
+	if m.Type != 0 {
 		n += 1 + sovDispatcher(uint64(m.Type))
-	***REMOVED***
+	}
 	l = len(m.AppliesTo)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovDispatcher(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.ResultsIn)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovDispatcher(uint64(l))
-	***REMOVED***
-	if len(m.Changes) > 0 ***REMOVED***
-		for _, e := range m.Changes ***REMOVED***
+	}
+	if len(m.Changes) > 0 {
+		for _, e := range m.Changes {
 			l = e.Size()
 			n += 1 + l + sovDispatcher(uint64(l))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
+}
 
-func sovDispatcher(x uint64) (n int) ***REMOVED***
-	for ***REMOVED***
+func sovDispatcher(x uint64) (n int) {
+	for {
 		n++
 		x >>= 7
-		if x == 0 ***REMOVED***
+		if x == 0 {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
-func sozDispatcher(x uint64) (n int) ***REMOVED***
+}
+func sozDispatcher(x uint64) (n int) {
 	return sovDispatcher(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-***REMOVED***
-func (this *SessionRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *SessionRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&SessionRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&SessionRequest{`,
 		`Description:` + strings.Replace(fmt.Sprintf("%v", this.Description), "NodeDescription", "NodeDescription", 1) + `,`,
 		`SessionID:` + fmt.Sprintf("%v", this.SessionID) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *SessionMessage) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *SessionMessage) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&SessionMessage***REMOVED***`,
+	}
+	s := strings.Join([]string{`&SessionMessage{`,
 		`SessionID:` + fmt.Sprintf("%v", this.SessionID) + `,`,
 		`Node:` + strings.Replace(fmt.Sprintf("%v", this.Node), "Node", "Node", 1) + `,`,
 		`Managers:` + strings.Replace(fmt.Sprintf("%v", this.Managers), "WeightedPeer", "WeightedPeer", 1) + `,`,
 		`NetworkBootstrapKeys:` + strings.Replace(fmt.Sprintf("%v", this.NetworkBootstrapKeys), "EncryptionKey", "EncryptionKey", 1) + `,`,
 		`RootCA:` + fmt.Sprintf("%v", this.RootCA) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *HeartbeatRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *HeartbeatRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&HeartbeatRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&HeartbeatRequest{`,
 		`SessionID:` + fmt.Sprintf("%v", this.SessionID) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *HeartbeatResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *HeartbeatResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&HeartbeatResponse***REMOVED***`,
+	}
+	s := strings.Join([]string{`&HeartbeatResponse{`,
 		`Period:` + strings.Replace(strings.Replace(this.Period.String(), "Duration", "google_protobuf1.Duration", 1), `&`, ``, 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *UpdateTaskStatusRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *UpdateTaskStatusRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&UpdateTaskStatusRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&UpdateTaskStatusRequest{`,
 		`SessionID:` + fmt.Sprintf("%v", this.SessionID) + `,`,
 		`Updates:` + strings.Replace(fmt.Sprintf("%v", this.Updates), "UpdateTaskStatusRequest_TaskStatusUpdate", "UpdateTaskStatusRequest_TaskStatusUpdate", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *UpdateTaskStatusRequest_TaskStatusUpdate) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *UpdateTaskStatusRequest_TaskStatusUpdate) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&UpdateTaskStatusRequest_TaskStatusUpdate***REMOVED***`,
+	}
+	s := strings.Join([]string{`&UpdateTaskStatusRequest_TaskStatusUpdate{`,
 		`TaskID:` + fmt.Sprintf("%v", this.TaskID) + `,`,
 		`Status:` + strings.Replace(fmt.Sprintf("%v", this.Status), "TaskStatus", "TaskStatus", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *UpdateTaskStatusResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *UpdateTaskStatusResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&UpdateTaskStatusResponse***REMOVED***`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+	}
+	s := strings.Join([]string{`&UpdateTaskStatusResponse{`,
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *TasksRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *TasksRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&TasksRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&TasksRequest{`,
 		`SessionID:` + fmt.Sprintf("%v", this.SessionID) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *TasksMessage) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *TasksMessage) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&TasksMessage***REMOVED***`,
+	}
+	s := strings.Join([]string{`&TasksMessage{`,
 		`Tasks:` + strings.Replace(fmt.Sprintf("%v", this.Tasks), "Task", "Task", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *AssignmentsRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *AssignmentsRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&AssignmentsRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&AssignmentsRequest{`,
 		`SessionID:` + fmt.Sprintf("%v", this.SessionID) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *Assignment) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Assignment) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&Assignment***REMOVED***`,
+	}
+	s := strings.Join([]string{`&Assignment{`,
 		`Item:` + fmt.Sprintf("%v", this.Item) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *Assignment_Task) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Assignment_Task) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&Assignment_Task***REMOVED***`,
+	}
+	s := strings.Join([]string{`&Assignment_Task{`,
 		`Task:` + strings.Replace(fmt.Sprintf("%v", this.Task), "Task", "Task", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *Assignment_Secret) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Assignment_Secret) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&Assignment_Secret***REMOVED***`,
+	}
+	s := strings.Join([]string{`&Assignment_Secret{`,
 		`Secret:` + strings.Replace(fmt.Sprintf("%v", this.Secret), "Secret", "Secret", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *Assignment_Config) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Assignment_Config) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&Assignment_Config***REMOVED***`,
+	}
+	s := strings.Join([]string{`&Assignment_Config{`,
 		`Config:` + strings.Replace(fmt.Sprintf("%v", this.Config), "Config", "Config", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *AssignmentChange) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *AssignmentChange) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&AssignmentChange***REMOVED***`,
+	}
+	s := strings.Join([]string{`&AssignmentChange{`,
 		`Assignment:` + strings.Replace(fmt.Sprintf("%v", this.Assignment), "Assignment", "Assignment", 1) + `,`,
 		`Action:` + fmt.Sprintf("%v", this.Action) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *AssignmentsMessage) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *AssignmentsMessage) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&AssignmentsMessage***REMOVED***`,
+	}
+	s := strings.Join([]string{`&AssignmentsMessage{`,
 		`Type:` + fmt.Sprintf("%v", this.Type) + `,`,
 		`AppliesTo:` + fmt.Sprintf("%v", this.AppliesTo) + `,`,
 		`ResultsIn:` + fmt.Sprintf("%v", this.ResultsIn) + `,`,
 		`Changes:` + strings.Replace(fmt.Sprintf("%v", this.Changes), "AssignmentChange", "AssignmentChange", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func valueToStringDispatcher(v interface***REMOVED******REMOVED***) string ***REMOVED***
+}
+func valueToStringDispatcher(v interface{}) string {
 	rv := reflect.ValueOf(v)
-	if rv.IsNil() ***REMOVED***
+	if rv.IsNil() {
 		return "nil"
-	***REMOVED***
+	}
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
-***REMOVED***
-func (m *SessionRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *SessionRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowDispatcher
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: SessionRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: SessionRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowDispatcher
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthDispatcher
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Description == nil ***REMOVED***
-				m.Description = &NodeDescription***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.Description.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.Description == nil {
+				m.Description = &NodeDescription{}
+			}
+			if err := m.Description.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field SessionID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowDispatcher
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthDispatcher
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.SessionID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipDispatcher(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthDispatcher
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *SessionMessage) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *SessionMessage) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowDispatcher
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: SessionMessage: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: SessionMessage: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field SessionID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowDispatcher
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthDispatcher
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.SessionID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Node", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowDispatcher
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthDispatcher
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Node == nil ***REMOVED***
-				m.Node = &Node***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.Node.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.Node == nil {
+				m.Node = &Node{}
+			}
+			if err := m.Node.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Managers", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowDispatcher
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthDispatcher
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.Managers = append(m.Managers, &WeightedPeer***REMOVED******REMOVED***)
-			if err := m.Managers[len(m.Managers)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			m.Managers = append(m.Managers, &WeightedPeer{})
+			if err := m.Managers[len(m.Managers)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 4:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field NetworkBootstrapKeys", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowDispatcher
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthDispatcher
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.NetworkBootstrapKeys = append(m.NetworkBootstrapKeys, &EncryptionKey***REMOVED******REMOVED***)
-			if err := m.NetworkBootstrapKeys[len(m.NetworkBootstrapKeys)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			m.NetworkBootstrapKeys = append(m.NetworkBootstrapKeys, &EncryptionKey{})
+			if err := m.NetworkBootstrapKeys[len(m.NetworkBootstrapKeys)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 5:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RootCA", wireType)
-			***REMOVED***
+			}
 			var byteLen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowDispatcher
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				byteLen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if byteLen < 0 ***REMOVED***
+				}
+			}
+			if byteLen < 0 {
 				return ErrInvalidLengthDispatcher
-			***REMOVED***
+			}
 			postIndex := iNdEx + byteLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.RootCA = append(m.RootCA[:0], dAtA[iNdEx:postIndex]...)
-			if m.RootCA == nil ***REMOVED***
-				m.RootCA = []byte***REMOVED******REMOVED***
-			***REMOVED***
+			if m.RootCA == nil {
+				m.RootCA = []byte{}
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipDispatcher(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthDispatcher
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *HeartbeatRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *HeartbeatRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowDispatcher
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: HeartbeatRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: HeartbeatRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field SessionID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowDispatcher
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthDispatcher
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.SessionID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipDispatcher(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthDispatcher
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *HeartbeatResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *HeartbeatResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowDispatcher
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: HeartbeatResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: HeartbeatResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Period", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowDispatcher
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthDispatcher
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(&m.Period, dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(&m.Period, dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipDispatcher(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthDispatcher
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *UpdateTaskStatusRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *UpdateTaskStatusRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowDispatcher
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: UpdateTaskStatusRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: UpdateTaskStatusRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field SessionID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowDispatcher
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthDispatcher
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.SessionID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Updates", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowDispatcher
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthDispatcher
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.Updates = append(m.Updates, &UpdateTaskStatusRequest_TaskStatusUpdate***REMOVED******REMOVED***)
-			if err := m.Updates[len(m.Updates)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			m.Updates = append(m.Updates, &UpdateTaskStatusRequest_TaskStatusUpdate{})
+			if err := m.Updates[len(m.Updates)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipDispatcher(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthDispatcher
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *UpdateTaskStatusRequest_TaskStatusUpdate) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *UpdateTaskStatusRequest_TaskStatusUpdate) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowDispatcher
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: TaskStatusUpdate: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: TaskStatusUpdate: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field TaskID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowDispatcher
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthDispatcher
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.TaskID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowDispatcher
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthDispatcher
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Status == nil ***REMOVED***
-				m.Status = &TaskStatus***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.Status.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.Status == nil {
+				m.Status = &TaskStatus{}
+			}
+			if err := m.Status.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipDispatcher(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthDispatcher
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *UpdateTaskStatusResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *UpdateTaskStatusResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowDispatcher
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: UpdateTaskStatusResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: UpdateTaskStatusResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		default:
 			iNdEx = preIndex
 			skippy, err := skipDispatcher(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthDispatcher
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *TasksRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *TasksRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowDispatcher
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: TasksRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: TasksRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field SessionID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowDispatcher
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthDispatcher
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.SessionID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipDispatcher(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthDispatcher
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *TasksMessage) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *TasksMessage) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowDispatcher
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: TasksMessage: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: TasksMessage: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Tasks", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowDispatcher
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthDispatcher
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.Tasks = append(m.Tasks, &Task***REMOVED******REMOVED***)
-			if err := m.Tasks[len(m.Tasks)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			m.Tasks = append(m.Tasks, &Task{})
+			if err := m.Tasks[len(m.Tasks)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipDispatcher(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthDispatcher
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *AssignmentsRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *AssignmentsRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowDispatcher
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: AssignmentsRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: AssignmentsRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field SessionID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowDispatcher
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthDispatcher
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.SessionID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipDispatcher(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthDispatcher
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *Assignment) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *Assignment) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowDispatcher
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: Assignment: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: Assignment: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Task", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowDispatcher
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthDispatcher
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			v := &Task***REMOVED******REMOVED***
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			v := &Task{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
-			m.Item = &Assignment_Task***REMOVED***v***REMOVED***
+			}
+			m.Item = &Assignment_Task{v}
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Secret", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowDispatcher
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthDispatcher
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			v := &Secret***REMOVED******REMOVED***
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			v := &Secret{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
-			m.Item = &Assignment_Secret***REMOVED***v***REMOVED***
+			}
+			m.Item = &Assignment_Secret{v}
 			iNdEx = postIndex
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Config", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowDispatcher
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthDispatcher
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			v := &Config***REMOVED******REMOVED***
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			v := &Config{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
-			m.Item = &Assignment_Config***REMOVED***v***REMOVED***
+			}
+			m.Item = &Assignment_Config{v}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipDispatcher(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthDispatcher
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *AssignmentChange) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *AssignmentChange) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowDispatcher
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: AssignmentChange: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: AssignmentChange: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Assignment", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowDispatcher
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthDispatcher
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Assignment == nil ***REMOVED***
-				m.Assignment = &Assignment***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.Assignment.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.Assignment == nil {
+				m.Assignment = &Assignment{}
+			}
+			if err := m.Assignment.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 2:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Action", wireType)
-			***REMOVED***
+			}
 			m.Action = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowDispatcher
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Action |= (AssignmentChange_AssignmentAction(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipDispatcher(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthDispatcher
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *AssignmentsMessage) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *AssignmentsMessage) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowDispatcher
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: AssignmentsMessage: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: AssignmentsMessage: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
-			***REMOVED***
+			}
 			m.Type = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowDispatcher
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Type |= (AssignmentsMessage_Type(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field AppliesTo", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowDispatcher
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthDispatcher
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.AppliesTo = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ResultsIn", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowDispatcher
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthDispatcher
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ResultsIn = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 4:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Changes", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowDispatcher
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthDispatcher
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.Changes = append(m.Changes, &AssignmentChange***REMOVED******REMOVED***)
-			if err := m.Changes[len(m.Changes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			m.Changes = append(m.Changes, &AssignmentChange{})
+			if err := m.Changes[len(m.Changes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipDispatcher(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthDispatcher
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func skipDispatcher(dAtA []byte) (n int, err error) ***REMOVED***
+}
+func skipDispatcher(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return 0, ErrIntOverflowDispatcher
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return 0, io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		wireType := int(wire & 0x7)
-		switch wireType ***REMOVED***
+		switch wireType {
 		case 0:
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowDispatcher
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				iNdEx++
-				if dAtA[iNdEx-1] < 0x80 ***REMOVED***
+				if dAtA[iNdEx-1] < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return iNdEx, nil
 		case 1:
 			iNdEx += 8
 			return iNdEx, nil
 		case 2:
 			var length int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowDispatcher
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				length |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			iNdEx += length
-			if length < 0 ***REMOVED***
+			if length < 0 {
 				return 0, ErrInvalidLengthDispatcher
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 3:
-			for ***REMOVED***
+			for {
 				var innerWire uint64
 				var start int = iNdEx
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return 0, ErrIntOverflowDispatcher
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return 0, io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					innerWire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				innerWireType := int(innerWire & 0x7)
-				if innerWireType == 4 ***REMOVED***
+				if innerWireType == 4 {
 					break
-				***REMOVED***
+				}
 				next, err := skipDispatcher(dAtA[start:])
-				if err != nil ***REMOVED***
+				if err != nil {
 					return 0, err
-				***REMOVED***
+				}
 				iNdEx = start + next
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 4:
 			return iNdEx, nil
@@ -3769,21 +3769,21 @@ func skipDispatcher(dAtA []byte) (n int, err error) ***REMOVED***
 			return iNdEx, nil
 		default:
 			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	panic("unreachable")
-***REMOVED***
+}
 
 var (
 	ErrInvalidLengthDispatcher = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowDispatcher   = fmt.Errorf("proto: integer overflow")
 )
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterFile("github.com/docker/swarmkit/api/dispatcher.proto", fileDescriptorDispatcher)
-***REMOVED***
+}
 
-var fileDescriptorDispatcher = []byte***REMOVED***
+var fileDescriptorDispatcher = []byte{
 	// 1007 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x55, 0x4f, 0x6f, 0xe3, 0x44,
 	0x1c, 0xcd, 0xa4, 0xa9, 0xdb, 0xfc, 0xd2, 0x2d, 0x61, 0xb4, 0x2a, 0xc6, 0xd2, 0xa6, 0xc1, 0x65,
@@ -3848,4 +3848,4 @@ var fileDescriptorDispatcher = []byte***REMOVED***
 	0x23, 0x53, 0x76, 0x44, 0x4d, 0x3f, 0x7b, 0x55, 0xca, 0xfc, 0xf9, 0xaa, 0x94, 0xf9, 0xb6, 0x5f,
 	0x42, 0x67, 0xfd, 0x12, 0xfa, 0xa3, 0x5f, 0x42, 0x7f, 0xf7, 0x4b, 0xa8, 0xa5, 0xc9, 0x2b, 0xf8,
 	0xc3, 0xff, 0x02, 0x00, 0x00, 0xff, 0xff, 0xe0, 0xf0, 0x6a, 0xcb, 0xae, 0x0a, 0x00, 0x00,
-***REMOVED***
+}

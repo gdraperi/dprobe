@@ -21,8 +21,8 @@ const (
 	EventQuery
 )
 
-func (t EventType) String() string ***REMOVED***
-	switch t ***REMOVED***
+func (t EventType) String() string {
+	switch t {
 	case EventMemberJoin:
 		return "member-join"
 	case EventMemberLeave:
@@ -39,30 +39,30 @@ func (t EventType) String() string ***REMOVED***
 		return "query"
 	default:
 		panic(fmt.Sprintf("unknown event type: %d", t))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Event is a generic interface for exposing Serf events
 // Clients will usually need to use a type switches to get
 // to a more useful type
-type Event interface ***REMOVED***
+type Event interface {
 	EventType() EventType
 	String() string
-***REMOVED***
+}
 
 // MemberEvent is the struct used for member related events
 // Because Serf coalesces events, an event may contain multiple members.
-type MemberEvent struct ***REMOVED***
+type MemberEvent struct {
 	Type    EventType
 	Members []Member
-***REMOVED***
+}
 
-func (m MemberEvent) EventType() EventType ***REMOVED***
+func (m MemberEvent) EventType() EventType {
 	return m.Type
-***REMOVED***
+}
 
-func (m MemberEvent) String() string ***REMOVED***
-	switch m.Type ***REMOVED***
+func (m MemberEvent) String() string {
+	switch m.Type {
 	case EventMemberJoin:
 		return "member-join"
 	case EventMemberLeave:
@@ -75,28 +75,28 @@ func (m MemberEvent) String() string ***REMOVED***
 		return "member-reap"
 	default:
 		panic(fmt.Sprintf("unknown event type: %d", m.Type))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // UserEvent is the struct used for events that are triggered
 // by the user and are not related to members
-type UserEvent struct ***REMOVED***
+type UserEvent struct {
 	LTime    LamportTime
 	Name     string
 	Payload  []byte
 	Coalesce bool
-***REMOVED***
+}
 
-func (u UserEvent) EventType() EventType ***REMOVED***
+func (u UserEvent) EventType() EventType {
 	return EventUser
-***REMOVED***
+}
 
-func (u UserEvent) String() string ***REMOVED***
+func (u UserEvent) String() string {
 	return fmt.Sprintf("user-event: %s", u.Name)
-***REMOVED***
+}
 
 // Query is the struct used EventQuery type events
-type Query struct ***REMOVED***
+type Query struct {
 	LTime   LamportTime
 	Name    string
 	Payload []byte
@@ -107,62 +107,62 @@ type Query struct ***REMOVED***
 	port     uint16    // Port to respond to
 	deadline time.Time // Must respond by this deadline
 	respLock sync.Mutex
-***REMOVED***
+}
 
-func (q *Query) EventType() EventType ***REMOVED***
+func (q *Query) EventType() EventType {
 	return EventQuery
-***REMOVED***
+}
 
-func (q *Query) String() string ***REMOVED***
+func (q *Query) String() string {
 	return fmt.Sprintf("query: %s", q.Name)
-***REMOVED***
+}
 
 // Deadline returns the time by which a response must be sent
-func (q *Query) Deadline() time.Time ***REMOVED***
+func (q *Query) Deadline() time.Time {
 	return q.deadline
-***REMOVED***
+}
 
 // Respond is used to send a response to the user query
-func (q *Query) Respond(buf []byte) error ***REMOVED***
+func (q *Query) Respond(buf []byte) error {
 	q.respLock.Lock()
 	defer q.respLock.Unlock()
 
 	// Check if we've already responded
-	if q.deadline.IsZero() ***REMOVED***
+	if q.deadline.IsZero() {
 		return fmt.Errorf("Response already sent")
-	***REMOVED***
+	}
 
 	// Ensure we aren't past our response deadline
-	if time.Now().After(q.deadline) ***REMOVED***
+	if time.Now().After(q.deadline) {
 		return fmt.Errorf("Response is past the deadline")
-	***REMOVED***
+	}
 
 	// Create response
-	resp := messageQueryResponse***REMOVED***
+	resp := messageQueryResponse{
 		LTime:   q.LTime,
 		ID:      q.id,
 		From:    q.serf.config.NodeName,
 		Payload: buf,
-	***REMOVED***
+	}
 
 	// Format the response
 	raw, err := encodeMessage(messageQueryResponseType, &resp)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("Failed to format response: %v", err)
-	***REMOVED***
+	}
 
 	// Check the size limit
-	if len(raw) > q.serf.config.QueryResponseSizeLimit ***REMOVED***
+	if len(raw) > q.serf.config.QueryResponseSizeLimit {
 		return fmt.Errorf("response exceeds limit of %d bytes", q.serf.config.QueryResponseSizeLimit)
-	***REMOVED***
+	}
 
 	// Send the response
-	addr := net.UDPAddr***REMOVED***IP: q.addr, Port: int(q.port)***REMOVED***
-	if err := q.serf.memberlist.SendTo(&addr, raw); err != nil ***REMOVED***
+	addr := net.UDPAddr{IP: q.addr, Port: int(q.port)}
+	if err := q.serf.memberlist.SendTo(&addr, raw); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	// Clera the deadline, response sent
-	q.deadline = time.Time***REMOVED******REMOVED***
+	q.deadline = time.Time{}
 	return nil
-***REMOVED***
+}

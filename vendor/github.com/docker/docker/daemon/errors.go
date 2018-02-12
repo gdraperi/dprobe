@@ -10,126 +10,126 @@ import (
 	"google.golang.org/grpc"
 )
 
-func errNotRunning(id string) error ***REMOVED***
+func errNotRunning(id string) error {
 	return errdefs.Conflict(errors.Errorf("Container %s is not running", id))
-***REMOVED***
+}
 
-func containerNotFound(id string) error ***REMOVED***
-	return objNotFoundError***REMOVED***"container", id***REMOVED***
-***REMOVED***
+func containerNotFound(id string) error {
+	return objNotFoundError{"container", id}
+}
 
-func volumeNotFound(id string) error ***REMOVED***
-	return objNotFoundError***REMOVED***"volume", id***REMOVED***
-***REMOVED***
+func volumeNotFound(id string) error {
+	return objNotFoundError{"volume", id}
+}
 
-type objNotFoundError struct ***REMOVED***
+type objNotFoundError struct {
 	object string
 	id     string
-***REMOVED***
+}
 
-func (e objNotFoundError) Error() string ***REMOVED***
+func (e objNotFoundError) Error() string {
 	return "No such " + e.object + ": " + e.id
-***REMOVED***
+}
 
-func (e objNotFoundError) NotFound() ***REMOVED******REMOVED***
+func (e objNotFoundError) NotFound() {}
 
-func errContainerIsRestarting(containerID string) error ***REMOVED***
+func errContainerIsRestarting(containerID string) error {
 	cause := errors.Errorf("Container %s is restarting, wait until the container is running", containerID)
 	return errdefs.Conflict(cause)
-***REMOVED***
+}
 
-func errExecNotFound(id string) error ***REMOVED***
-	return objNotFoundError***REMOVED***"exec instance", id***REMOVED***
-***REMOVED***
+func errExecNotFound(id string) error {
+	return objNotFoundError{"exec instance", id}
+}
 
-func errExecPaused(id string) error ***REMOVED***
+func errExecPaused(id string) error {
 	cause := errors.Errorf("Container %s is paused, unpause the container before exec", id)
 	return errdefs.Conflict(cause)
-***REMOVED***
+}
 
-func errNotPaused(id string) error ***REMOVED***
+func errNotPaused(id string) error {
 	cause := errors.Errorf("Container %s is already paused", id)
 	return errdefs.Conflict(cause)
-***REMOVED***
+}
 
-type nameConflictError struct ***REMOVED***
+type nameConflictError struct {
 	id   string
 	name string
-***REMOVED***
+}
 
-func (e nameConflictError) Error() string ***REMOVED***
+func (e nameConflictError) Error() string {
 	return fmt.Sprintf("Conflict. The container name %q is already in use by container %q. You have to remove (or rename) that container to be able to reuse that name.", e.name, e.id)
-***REMOVED***
+}
 
-func (nameConflictError) Conflict() ***REMOVED******REMOVED***
+func (nameConflictError) Conflict() {}
 
-type containerNotModifiedError struct ***REMOVED***
+type containerNotModifiedError struct {
 	running bool
-***REMOVED***
+}
 
-func (e containerNotModifiedError) Error() string ***REMOVED***
-	if e.running ***REMOVED***
+func (e containerNotModifiedError) Error() string {
+	if e.running {
 		return "Container is already started"
-	***REMOVED***
+	}
 	return "Container is already stopped"
-***REMOVED***
+}
 
-func (e containerNotModifiedError) NotModified() ***REMOVED******REMOVED***
+func (e containerNotModifiedError) NotModified() {}
 
 type invalidIdentifier string
 
-func (e invalidIdentifier) Error() string ***REMOVED***
+func (e invalidIdentifier) Error() string {
 	return fmt.Sprintf("invalid name or ID supplied: %q", string(e))
-***REMOVED***
+}
 
-func (invalidIdentifier) InvalidParameter() ***REMOVED******REMOVED***
+func (invalidIdentifier) InvalidParameter() {}
 
 type duplicateMountPointError string
 
-func (e duplicateMountPointError) Error() string ***REMOVED***
+func (e duplicateMountPointError) Error() string {
 	return "Duplicate mount point: " + string(e)
-***REMOVED***
-func (duplicateMountPointError) InvalidParameter() ***REMOVED******REMOVED***
+}
+func (duplicateMountPointError) InvalidParameter() {}
 
-type containerFileNotFound struct ***REMOVED***
+type containerFileNotFound struct {
 	file      string
 	container string
-***REMOVED***
+}
 
-func (e containerFileNotFound) Error() string ***REMOVED***
+func (e containerFileNotFound) Error() string {
 	return "Could not find the file " + e.file + " in container " + e.container
-***REMOVED***
+}
 
-func (containerFileNotFound) NotFound() ***REMOVED******REMOVED***
+func (containerFileNotFound) NotFound() {}
 
-type invalidFilter struct ***REMOVED***
+type invalidFilter struct {
 	filter string
-	value  interface***REMOVED******REMOVED***
-***REMOVED***
+	value  interface{}
+}
 
-func (e invalidFilter) Error() string ***REMOVED***
+func (e invalidFilter) Error() string {
 	msg := "Invalid filter '" + e.filter
-	if e.value != nil ***REMOVED***
+	if e.value != nil {
 		msg += fmt.Sprintf("=%s", e.value)
-	***REMOVED***
+	}
 	return msg + "'"
-***REMOVED***
+}
 
-func (e invalidFilter) InvalidParameter() ***REMOVED******REMOVED***
+func (e invalidFilter) InvalidParameter() {}
 
 type startInvalidConfigError string
 
-func (e startInvalidConfigError) Error() string ***REMOVED***
+func (e startInvalidConfigError) Error() string {
 	return string(e)
-***REMOVED***
+}
 
-func (e startInvalidConfigError) InvalidParameter() ***REMOVED******REMOVED*** // Is this right???
+func (e startInvalidConfigError) InvalidParameter() {} // Is this right???
 
-func translateContainerdStartErr(cmd string, setExitCode func(int), err error) error ***REMOVED***
+func translateContainerdStartErr(cmd string, setExitCode func(int), err error) error {
 	errDesc := grpc.ErrorDesc(err)
-	contains := func(s1, s2 string) bool ***REMOVED***
+	contains := func(s1, s2 string) bool {
 		return strings.Contains(strings.ToLower(s1), s2)
-	***REMOVED***
+	}
 	var retErr = errdefs.Unknown(errors.New(errDesc))
 	// if we receive an internal error from the initial start of a container then lets
 	// return it instead of entering the restart loop
@@ -137,23 +137,23 @@ func translateContainerdStartErr(cmd string, setExitCode func(int), err error) e
 	if contains(errDesc, cmd) &&
 		(contains(errDesc, "executable file not found") ||
 			contains(errDesc, "no such file or directory") ||
-			contains(errDesc, "system cannot find the file specified")) ***REMOVED***
+			contains(errDesc, "system cannot find the file specified")) {
 		setExitCode(127)
 		retErr = startInvalidConfigError(errDesc)
-	***REMOVED***
+	}
 	// set to 126 for container cmd can't be invoked errors
-	if contains(errDesc, syscall.EACCES.Error()) ***REMOVED***
+	if contains(errDesc, syscall.EACCES.Error()) {
 		setExitCode(126)
 		retErr = startInvalidConfigError(errDesc)
-	***REMOVED***
+	}
 
 	// attempted to mount a file onto a directory, or a directory onto a file, maybe from user specified bind mounts
-	if contains(errDesc, syscall.ENOTDIR.Error()) ***REMOVED***
+	if contains(errDesc, syscall.ENOTDIR.Error()) {
 		errDesc += ": Are you trying to mount a directory onto a file (or vice-versa)? Check if the specified host path exists and is the expected type"
 		setExitCode(127)
 		retErr = startInvalidConfigError(errDesc)
-	***REMOVED***
+	}
 
 	// TODO: it would be nice to get some better errors from containerd so we can return better errors here
 	return retErr
-***REMOVED***
+}

@@ -13,174 +13,174 @@ import (
 	"testing"
 )
 
-func fromHex(s string) []byte ***REMOVED***
+func fromHex(s string) []byte {
 	b, err := hex.DecodeString(s)
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 	return b
-***REMOVED***
+}
 
-func TestHashes(t *testing.T) ***REMOVED***
-	defer func(sse4, avx, avx2 bool) ***REMOVED***
+func TestHashes(t *testing.T) {
+	defer func(sse4, avx, avx2 bool) {
 		useSSE4, useAVX, useAVX2 = sse4, avx, avx2
-	***REMOVED***(useSSE4, useAVX, useAVX2)
+	}(useSSE4, useAVX, useAVX2)
 
-	if useAVX2 ***REMOVED***
+	if useAVX2 {
 		t.Log("AVX2 version")
 		testHashes(t)
 		useAVX2 = false
-	***REMOVED***
-	if useAVX ***REMOVED***
+	}
+	if useAVX {
 		t.Log("AVX version")
 		testHashes(t)
 		useAVX = false
-	***REMOVED***
-	if useSSE4 ***REMOVED***
+	}
+	if useSSE4 {
 		t.Log("SSE4 version")
 		testHashes(t)
 		useSSE4 = false
-	***REMOVED***
+	}
 	t.Log("generic version")
 	testHashes(t)
-***REMOVED***
+}
 
-func TestHashes2X(t *testing.T) ***REMOVED***
-	defer func(sse4, avx, avx2 bool) ***REMOVED***
+func TestHashes2X(t *testing.T) {
+	defer func(sse4, avx, avx2 bool) {
 		useSSE4, useAVX, useAVX2 = sse4, avx, avx2
-	***REMOVED***(useSSE4, useAVX, useAVX2)
+	}(useSSE4, useAVX, useAVX2)
 
-	if useAVX2 ***REMOVED***
+	if useAVX2 {
 		t.Log("AVX2 version")
 		testHashes2X(t)
 		useAVX2 = false
-	***REMOVED***
-	if useAVX ***REMOVED***
+	}
+	if useAVX {
 		t.Log("AVX version")
 		testHashes2X(t)
 		useAVX = false
-	***REMOVED***
-	if useSSE4 ***REMOVED***
+	}
+	if useSSE4 {
 		t.Log("SSE4 version")
 		testHashes2X(t)
 		useSSE4 = false
-	***REMOVED***
+	}
 	t.Log("generic version")
 	testHashes2X(t)
-***REMOVED***
+}
 
-func testHashes(t *testing.T) ***REMOVED***
+func testHashes(t *testing.T) {
 	key, _ := hex.DecodeString("000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f")
 
 	input := make([]byte, 255)
-	for i := range input ***REMOVED***
+	for i := range input {
 		input[i] = byte(i)
-	***REMOVED***
+	}
 
-	for i, expectedHex := range hashes ***REMOVED***
+	for i, expectedHex := range hashes {
 		h, err := New512(key)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("#%d: error from New512: %v", i, err)
-		***REMOVED***
+		}
 
 		h.Write(input[:i])
 		sum := h.Sum(nil)
 
-		if gotHex := fmt.Sprintf("%x", sum); gotHex != expectedHex ***REMOVED***
+		if gotHex := fmt.Sprintf("%x", sum); gotHex != expectedHex {
 			t.Fatalf("#%d (single write): got %s, wanted %s", i, gotHex, expectedHex)
-		***REMOVED***
+		}
 
 		h.Reset()
-		for j := 0; j < i; j++ ***REMOVED***
+		for j := 0; j < i; j++ {
 			h.Write(input[j : j+1])
-		***REMOVED***
+		}
 
 		sum = h.Sum(sum[:0])
-		if gotHex := fmt.Sprintf("%x", sum); gotHex != expectedHex ***REMOVED***
+		if gotHex := fmt.Sprintf("%x", sum); gotHex != expectedHex {
 			t.Fatalf("#%d (byte-by-byte): got %s, wanted %s", i, gotHex, expectedHex)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func testHashes2X(t *testing.T) ***REMOVED***
+func testHashes2X(t *testing.T) {
 	key, _ := hex.DecodeString("000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f")
 
 	input := make([]byte, 256)
-	for i := range input ***REMOVED***
+	for i := range input {
 		input[i] = byte(i)
-	***REMOVED***
+	}
 
-	for i, expectedHex := range hashes2X ***REMOVED***
+	for i, expectedHex := range hashes2X {
 		length := uint32(len(expectedHex) / 2)
 		sum := make([]byte, int(length))
 
 		h, err := NewXOF(length, key)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("#%d: error from NewXOF: %v", i, err)
-		***REMOVED***
+		}
 
-		if _, err := h.Write(input); err != nil ***REMOVED***
+		if _, err := h.Write(input); err != nil {
 			t.Fatalf("#%d (single write): error from Write: %v", i, err)
-		***REMOVED***
-		if _, err := h.Read(sum); err != nil ***REMOVED***
+		}
+		if _, err := h.Read(sum); err != nil {
 			t.Fatalf("#%d (single write): error from Read: %v", i, err)
-		***REMOVED***
-		if n, err := h.Read(sum); n != 0 || err != io.EOF ***REMOVED***
+		}
+		if n, err := h.Read(sum); n != 0 || err != io.EOF {
 			t.Fatalf("#%d (single write): Read did not return (0, io.EOF) after exhaustion, got (%v, %v)", i, n, err)
-		***REMOVED***
-		if gotHex := fmt.Sprintf("%x", sum); gotHex != expectedHex ***REMOVED***
+		}
+		if gotHex := fmt.Sprintf("%x", sum); gotHex != expectedHex {
 			t.Fatalf("#%d (single write): got %s, wanted %s", i, gotHex, expectedHex)
-		***REMOVED***
+		}
 
 		h.Reset()
-		for j := 0; j < len(input); j++ ***REMOVED***
+		for j := 0; j < len(input); j++ {
 			h.Write(input[j : j+1])
-		***REMOVED***
-		for j := 0; j < len(sum); j++ ***REMOVED***
+		}
+		for j := 0; j < len(sum); j++ {
 			h = h.Clone()
-			if _, err := h.Read(sum[j : j+1]); err != nil ***REMOVED***
+			if _, err := h.Read(sum[j : j+1]); err != nil {
 				t.Fatalf("#%d (byte-by-byte) - Read %d: error from Read: %v", i, j, err)
-			***REMOVED***
-		***REMOVED***
-		if gotHex := fmt.Sprintf("%x", sum); gotHex != expectedHex ***REMOVED***
+			}
+		}
+		if gotHex := fmt.Sprintf("%x", sum); gotHex != expectedHex {
 			t.Fatalf("#%d (byte-by-byte): got %s, wanted %s", i, gotHex, expectedHex)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	h, err := NewXOF(OutputLengthUnknown, key)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("#unknown length: error from NewXOF: %v", err)
-	***REMOVED***
-	if _, err := h.Write(input); err != nil ***REMOVED***
+	}
+	if _, err := h.Write(input); err != nil {
 		t.Fatalf("#unknown length: error from Write: %v", err)
-	***REMOVED***
+	}
 
 	var result [64]byte
-	if n, err := h.Read(result[:]); err != nil ***REMOVED***
+	if n, err := h.Read(result[:]); err != nil {
 		t.Fatalf("#unknown length: error from Read: %v", err)
-	***REMOVED*** else if n != len(result) ***REMOVED***
+	} else if n != len(result) {
 		t.Fatalf("#unknown length: Read returned %d bytes, want %d", n, len(result))
-	***REMOVED***
+	}
 
 	const expected = "3dbba8516da76bf7330055c66ea36cf1005e92714262b24d9710f51d9e126406e1bcd6497059f9331f1091c3634b695428d475ed432f987040575520a1c29f5e"
-	if fmt.Sprintf("%x", result) != expected ***REMOVED***
+	if fmt.Sprintf("%x", result) != expected {
 		t.Fatalf("#unknown length: bad result %x, wanted %s", result, expected)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func generateSequence(out []byte, seed uint32) ***REMOVED***
+func generateSequence(out []byte, seed uint32) {
 	a := 0xDEAD4BAD * seed // prime
 	b := uint32(1)
 
-	for i := range out ***REMOVED*** // fill the buf
+	for i := range out { // fill the buf
 		a, b = b, a+b
 		out[i] = byte(b >> 24)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func computeMAC(msg []byte, hashSize int, key []byte) (sum []byte) ***REMOVED***
+func computeMAC(msg []byte, hashSize int, key []byte) (sum []byte) {
 	var h hash.Hash
-	switch hashSize ***REMOVED***
+	switch hashSize {
 	case Size:
 		h, _ = New512(key)
 	case Size384:
@@ -191,14 +191,14 @@ func computeMAC(msg []byte, hashSize int, key []byte) (sum []byte) ***REMOVED***
 		h, _ = newDigest(20, key)
 	default:
 		panic("unexpected hashSize")
-	***REMOVED***
+	}
 
 	h.Write(msg)
 	return h.Sum(sum)
-***REMOVED***
+}
 
-func computeHash(msg []byte, hashSize int) (sum []byte) ***REMOVED***
-	switch hashSize ***REMOVED***
+func computeHash(msg []byte, hashSize int) (sum []byte) {
+	switch hashSize {
 	case Size:
 		hash := Sum512(msg)
 		return hash[:]
@@ -214,20 +214,20 @@ func computeHash(msg []byte, hashSize int) (sum []byte) ***REMOVED***
 		return hash[:20]
 	default:
 		panic("unexpected hashSize")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Test function from RFC 7693.
-func TestSelfTest(t *testing.T) ***REMOVED***
-	hashLens := [4]int***REMOVED***20, 32, 48, 64***REMOVED***
-	msgLens := [6]int***REMOVED***0, 3, 128, 129, 255, 1024***REMOVED***
+func TestSelfTest(t *testing.T) {
+	hashLens := [4]int{20, 32, 48, 64}
+	msgLens := [6]int{0, 3, 128, 129, 255, 1024}
 
 	msg := make([]byte, 1024)
 	key := make([]byte, 64)
 
 	h, _ := New256(nil)
-	for _, hashSize := range hashLens ***REMOVED***
-		for _, msgLength := range msgLens ***REMOVED***
+	for _, hashSize := range hashLens {
+		for _, msgLength := range msgLens {
 			generateSequence(msg[:msgLength], uint32(msgLength)) // unkeyed hash
 
 			md := computeHash(msg[:msgLength], hashSize)
@@ -236,50 +236,50 @@ func TestSelfTest(t *testing.T) ***REMOVED***
 			generateSequence(key[:], uint32(hashSize)) // keyed hash
 			md = computeMAC(msg[:msgLength], hashSize, key[:hashSize])
 			h.Write(md)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	sum := h.Sum(nil)
-	expected := [32]byte***REMOVED***
+	expected := [32]byte{
 		0xc2, 0x3a, 0x78, 0x00, 0xd9, 0x81, 0x23, 0xbd,
 		0x10, 0xf5, 0x06, 0xc6, 0x1e, 0x29, 0xda, 0x56,
 		0x03, 0xd7, 0x63, 0xb8, 0xbb, 0xad, 0x2e, 0x73,
 		0x7f, 0x5e, 0x76, 0x5a, 0x7b, 0xcc, 0xd4, 0x75,
-	***REMOVED***
-	if !bytes.Equal(sum, expected[:]) ***REMOVED***
+	}
+	if !bytes.Equal(sum, expected[:]) {
 		t.Fatalf("got %x, wanted %x", sum, expected)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Benchmarks
 
-func benchmarkSum(b *testing.B, size int) ***REMOVED***
+func benchmarkSum(b *testing.B, size int) {
 	data := make([]byte, size)
 	b.SetBytes(int64(size))
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		Sum512(data)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func benchmarkWrite(b *testing.B, size int) ***REMOVED***
+func benchmarkWrite(b *testing.B, size int) {
 	data := make([]byte, size)
 	h, _ := New512(nil)
 	b.SetBytes(int64(size))
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		h.Write(data)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func BenchmarkWrite128(b *testing.B) ***REMOVED*** benchmarkWrite(b, 128) ***REMOVED***
-func BenchmarkWrite1K(b *testing.B)  ***REMOVED*** benchmarkWrite(b, 1024) ***REMOVED***
+func BenchmarkWrite128(b *testing.B) { benchmarkWrite(b, 128) }
+func BenchmarkWrite1K(b *testing.B)  { benchmarkWrite(b, 1024) }
 
-func BenchmarkSum128(b *testing.B) ***REMOVED*** benchmarkSum(b, 128) ***REMOVED***
-func BenchmarkSum1K(b *testing.B)  ***REMOVED*** benchmarkSum(b, 1024) ***REMOVED***
+func BenchmarkSum128(b *testing.B) { benchmarkSum(b, 128) }
+func BenchmarkSum1K(b *testing.B)  { benchmarkSum(b, 1024) }
 
 // These values were taken from https://blake2.net/blake2b-test.txt.
-var hashes = []string***REMOVED***
+var hashes = []string{
 	"10ebb67700b1868efb4417987acf4690ae9d972fb7a590c2f02871799aaa4786b5e996e8f0f4eb981fc214b005f42d2ff4233499391653df7aefcbc13fc51568",
 	"961f6dd1e4dd30f63901690c512e78e4b45e4742ed197c3c5e45c549fd25f2e4187b0bc9fe30492b16b0d0bc4ef9b0f34c7003fac09a5ef1532e69430234cebd",
 	"da2cfbe2d8409a0f38026113884f84b50156371ae304c4430173d08a99d9fb1b983164a3770706d537f49e0c916d9f32b95cc37a95b99d857436f0232c88a965",
@@ -536,9 +536,9 @@ var hashes = []string***REMOVED***
 	"a6213743568e3b3158b9184301f3690847554c68457cb40fc9a4b8cfd8d4a118c301a07737aeda0f929c68913c5f51c80394f53bff1c3e83b2e40ca97eba9e15",
 	"d444bfa2362a96df213d070e33fa841f51334e4e76866b8139e8af3bb3398be2dfaddcbc56b9146de9f68118dc5829e74b0c28d7711907b121f9161cb92b69a9",
 	"142709d62e28fcccd0af97fad0f8465b971e82201dc51070faa0372aa43e92484be1c1e73ba10906d5d1853db6a4106e0a7bf9800d373d6dee2d46d62ef2a461",
-***REMOVED***
+}
 
-var hashes2X = []string***REMOVED***
+var hashes2X = []string{
 	"64",
 	"f457",
 	"e8c045",
@@ -795,4 +795,4 @@ var hashes2X = []string***REMOVED***
 	"ff9c6125b2f60bfd6c2427b279df070e430075096647599bdc68c531152c58e13858b82385d78c856092d6c74106e87ccf51ac7e673936332d9b223444eaa0e762ee258d8a733d3a515ec68ed73285e5ca183ae3278b4820b0ab2797feb1e7d8cc864df585dfb5ebe02a993325a9ad5e2d7d49d3132cf66013898351d044e0fe908ccdfeeebf651983601e3673a1f92d36510c0cc19b2e75856db8e4a41f92a51efa66d6cc22e414944c2c34a5a89ccde0be76f51410824e330d8e7c613194338c93732e8aea651fca18bcf1ac1824340c5553aff1e58d4ab8d7c8842b4712021e517cd6c140f6743c69c7bee05b10a8f24050a8caa4f96d1664909c5a06",
 	"6e85c2f8e1fdc3aaeb969da1258cb504bbf0070cd03d23b3fb5ee08feea5ee2e0ee1c71a5d0f4f701b351f4e4b4d74cb1e2ae6184814f77b62d2f08134b7236ebf6b67d8a6c9f01b4248b30667c555f5d8646dbfe291151b23c9c9857e33a4d5c847be29a5ee7b402e03bac02d1a4319acc0dd8f25e9c7a266f5e5c896cc11b5b238df96a0963ae806cb277abc515c298a3e61a3036b177acf87a56ca4478c4c6d0d468913de602ec891318bbaf52c97a77c35c5b7d164816cf24e4c4b0b5f45853882f716d61eb947a45ce2efa78f1c70a918512af1ad536cbe6148083385b34e207f5f690d7a954021e4b5f4258a385fd8a87809a481f34202af4caccb82",
 	"1e9b2c454e9de3a2d723d850331037dbf54133dbe27488ff757dd255833a27d8eb8a128ad12d0978b6884e25737086a704fb289aaaccf930d5b582ab4df1f55f0c429b6875edec3fe45464fa74164be056a55e243c4222c586bec5b18f39036aa903d98180f24f83d09a454dfa1e03a60e6a3ba4613e99c35f874d790174ee48a557f4f021ade4d1b278d7997ef094569b37b3db0505951e9ee8400adaea275c6db51b325ee730c69df97745b556ae41cd98741e28aa3a49544541eeb3da1b1e8fa4e8e9100d66dd0c7f5e2c271b1ecc077de79c462b9fe4c273543ecd82a5bea63c5acc01eca5fb780c7d7c8c9fe208ae8bd50cad1769693d92c6c8649d20d8",
-***REMOVED***
+}

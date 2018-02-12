@@ -31,327 +31,327 @@ package gogoproto
 import google_protobuf "github.com/gogo/protobuf/protoc-gen-gogo/descriptor"
 import proto "github.com/gogo/protobuf/proto"
 
-func IsEmbed(field *google_protobuf.FieldDescriptorProto) bool ***REMOVED***
+func IsEmbed(field *google_protobuf.FieldDescriptorProto) bool {
 	return proto.GetBoolExtension(field.Options, E_Embed, false)
-***REMOVED***
+}
 
-func IsNullable(field *google_protobuf.FieldDescriptorProto) bool ***REMOVED***
+func IsNullable(field *google_protobuf.FieldDescriptorProto) bool {
 	return proto.GetBoolExtension(field.Options, E_Nullable, true)
-***REMOVED***
+}
 
-func IsStdTime(field *google_protobuf.FieldDescriptorProto) bool ***REMOVED***
+func IsStdTime(field *google_protobuf.FieldDescriptorProto) bool {
 	return proto.GetBoolExtension(field.Options, E_Stdtime, false)
-***REMOVED***
+}
 
-func IsStdDuration(field *google_protobuf.FieldDescriptorProto) bool ***REMOVED***
+func IsStdDuration(field *google_protobuf.FieldDescriptorProto) bool {
 	return proto.GetBoolExtension(field.Options, E_Stdduration, false)
-***REMOVED***
+}
 
-func NeedsNilCheck(proto3 bool, field *google_protobuf.FieldDescriptorProto) bool ***REMOVED***
+func NeedsNilCheck(proto3 bool, field *google_protobuf.FieldDescriptorProto) bool {
 	nullable := IsNullable(field)
-	if field.IsMessage() || IsCustomType(field) ***REMOVED***
+	if field.IsMessage() || IsCustomType(field) {
 		return nullable
-	***REMOVED***
-	if proto3 ***REMOVED***
+	}
+	if proto3 {
 		return false
-	***REMOVED***
+	}
 	return nullable || *field.Type == google_protobuf.FieldDescriptorProto_TYPE_BYTES
-***REMOVED***
+}
 
-func IsCustomType(field *google_protobuf.FieldDescriptorProto) bool ***REMOVED***
+func IsCustomType(field *google_protobuf.FieldDescriptorProto) bool {
 	typ := GetCustomType(field)
-	if len(typ) > 0 ***REMOVED***
+	if len(typ) > 0 {
 		return true
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
-func IsCastType(field *google_protobuf.FieldDescriptorProto) bool ***REMOVED***
+func IsCastType(field *google_protobuf.FieldDescriptorProto) bool {
 	typ := GetCastType(field)
-	if len(typ) > 0 ***REMOVED***
+	if len(typ) > 0 {
 		return true
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
-func IsCastKey(field *google_protobuf.FieldDescriptorProto) bool ***REMOVED***
+func IsCastKey(field *google_protobuf.FieldDescriptorProto) bool {
 	typ := GetCastKey(field)
-	if len(typ) > 0 ***REMOVED***
+	if len(typ) > 0 {
 		return true
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
-func IsCastValue(field *google_protobuf.FieldDescriptorProto) bool ***REMOVED***
+func IsCastValue(field *google_protobuf.FieldDescriptorProto) bool {
 	typ := GetCastValue(field)
-	if len(typ) > 0 ***REMOVED***
+	if len(typ) > 0 {
 		return true
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
-func HasEnumDecl(file *google_protobuf.FileDescriptorProto, enum *google_protobuf.EnumDescriptorProto) bool ***REMOVED***
+func HasEnumDecl(file *google_protobuf.FileDescriptorProto, enum *google_protobuf.EnumDescriptorProto) bool {
 	return proto.GetBoolExtension(enum.Options, E_Enumdecl, proto.GetBoolExtension(file.Options, E_EnumdeclAll, true))
-***REMOVED***
+}
 
-func HasTypeDecl(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool ***REMOVED***
+func HasTypeDecl(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool {
 	return proto.GetBoolExtension(message.Options, E_Typedecl, proto.GetBoolExtension(file.Options, E_TypedeclAll, true))
-***REMOVED***
+}
 
-func GetCustomType(field *google_protobuf.FieldDescriptorProto) string ***REMOVED***
-	if field == nil ***REMOVED***
+func GetCustomType(field *google_protobuf.FieldDescriptorProto) string {
+	if field == nil {
 		return ""
-	***REMOVED***
-	if field.Options != nil ***REMOVED***
+	}
+	if field.Options != nil {
 		v, err := proto.GetExtension(field.Options, E_Customtype)
-		if err == nil && v.(*string) != nil ***REMOVED***
+		if err == nil && v.(*string) != nil {
 			return *(v.(*string))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return ""
-***REMOVED***
+}
 
-func GetCastType(field *google_protobuf.FieldDescriptorProto) string ***REMOVED***
-	if field == nil ***REMOVED***
+func GetCastType(field *google_protobuf.FieldDescriptorProto) string {
+	if field == nil {
 		return ""
-	***REMOVED***
-	if field.Options != nil ***REMOVED***
+	}
+	if field.Options != nil {
 		v, err := proto.GetExtension(field.Options, E_Casttype)
-		if err == nil && v.(*string) != nil ***REMOVED***
+		if err == nil && v.(*string) != nil {
 			return *(v.(*string))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return ""
-***REMOVED***
+}
 
-func GetCastKey(field *google_protobuf.FieldDescriptorProto) string ***REMOVED***
-	if field == nil ***REMOVED***
+func GetCastKey(field *google_protobuf.FieldDescriptorProto) string {
+	if field == nil {
 		return ""
-	***REMOVED***
-	if field.Options != nil ***REMOVED***
+	}
+	if field.Options != nil {
 		v, err := proto.GetExtension(field.Options, E_Castkey)
-		if err == nil && v.(*string) != nil ***REMOVED***
+		if err == nil && v.(*string) != nil {
 			return *(v.(*string))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return ""
-***REMOVED***
+}
 
-func GetCastValue(field *google_protobuf.FieldDescriptorProto) string ***REMOVED***
-	if field == nil ***REMOVED***
+func GetCastValue(field *google_protobuf.FieldDescriptorProto) string {
+	if field == nil {
 		return ""
-	***REMOVED***
-	if field.Options != nil ***REMOVED***
+	}
+	if field.Options != nil {
 		v, err := proto.GetExtension(field.Options, E_Castvalue)
-		if err == nil && v.(*string) != nil ***REMOVED***
+		if err == nil && v.(*string) != nil {
 			return *(v.(*string))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return ""
-***REMOVED***
+}
 
-func IsCustomName(field *google_protobuf.FieldDescriptorProto) bool ***REMOVED***
+func IsCustomName(field *google_protobuf.FieldDescriptorProto) bool {
 	name := GetCustomName(field)
-	if len(name) > 0 ***REMOVED***
+	if len(name) > 0 {
 		return true
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
-func IsEnumCustomName(field *google_protobuf.EnumDescriptorProto) bool ***REMOVED***
+func IsEnumCustomName(field *google_protobuf.EnumDescriptorProto) bool {
 	name := GetEnumCustomName(field)
-	if len(name) > 0 ***REMOVED***
+	if len(name) > 0 {
 		return true
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
-func IsEnumValueCustomName(field *google_protobuf.EnumValueDescriptorProto) bool ***REMOVED***
+func IsEnumValueCustomName(field *google_protobuf.EnumValueDescriptorProto) bool {
 	name := GetEnumValueCustomName(field)
-	if len(name) > 0 ***REMOVED***
+	if len(name) > 0 {
 		return true
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
-func GetCustomName(field *google_protobuf.FieldDescriptorProto) string ***REMOVED***
-	if field == nil ***REMOVED***
+func GetCustomName(field *google_protobuf.FieldDescriptorProto) string {
+	if field == nil {
 		return ""
-	***REMOVED***
-	if field.Options != nil ***REMOVED***
+	}
+	if field.Options != nil {
 		v, err := proto.GetExtension(field.Options, E_Customname)
-		if err == nil && v.(*string) != nil ***REMOVED***
+		if err == nil && v.(*string) != nil {
 			return *(v.(*string))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return ""
-***REMOVED***
+}
 
-func GetEnumCustomName(field *google_protobuf.EnumDescriptorProto) string ***REMOVED***
-	if field == nil ***REMOVED***
+func GetEnumCustomName(field *google_protobuf.EnumDescriptorProto) string {
+	if field == nil {
 		return ""
-	***REMOVED***
-	if field.Options != nil ***REMOVED***
+	}
+	if field.Options != nil {
 		v, err := proto.GetExtension(field.Options, E_EnumCustomname)
-		if err == nil && v.(*string) != nil ***REMOVED***
+		if err == nil && v.(*string) != nil {
 			return *(v.(*string))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return ""
-***REMOVED***
+}
 
-func GetEnumValueCustomName(field *google_protobuf.EnumValueDescriptorProto) string ***REMOVED***
-	if field == nil ***REMOVED***
+func GetEnumValueCustomName(field *google_protobuf.EnumValueDescriptorProto) string {
+	if field == nil {
 		return ""
-	***REMOVED***
-	if field.Options != nil ***REMOVED***
+	}
+	if field.Options != nil {
 		v, err := proto.GetExtension(field.Options, E_EnumvalueCustomname)
-		if err == nil && v.(*string) != nil ***REMOVED***
+		if err == nil && v.(*string) != nil {
 			return *(v.(*string))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return ""
-***REMOVED***
+}
 
-func GetJsonTag(field *google_protobuf.FieldDescriptorProto) *string ***REMOVED***
-	if field == nil ***REMOVED***
+func GetJsonTag(field *google_protobuf.FieldDescriptorProto) *string {
+	if field == nil {
 		return nil
-	***REMOVED***
-	if field.Options != nil ***REMOVED***
+	}
+	if field.Options != nil {
 		v, err := proto.GetExtension(field.Options, E_Jsontag)
-		if err == nil && v.(*string) != nil ***REMOVED***
+		if err == nil && v.(*string) != nil {
 			return (v.(*string))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func GetMoreTags(field *google_protobuf.FieldDescriptorProto) *string ***REMOVED***
-	if field == nil ***REMOVED***
+func GetMoreTags(field *google_protobuf.FieldDescriptorProto) *string {
+	if field == nil {
 		return nil
-	***REMOVED***
-	if field.Options != nil ***REMOVED***
+	}
+	if field.Options != nil {
 		v, err := proto.GetExtension(field.Options, E_Moretags)
-		if err == nil && v.(*string) != nil ***REMOVED***
+		if err == nil && v.(*string) != nil {
 			return (v.(*string))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
 type EnableFunc func(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool
 
-func EnabledGoEnumPrefix(file *google_protobuf.FileDescriptorProto, enum *google_protobuf.EnumDescriptorProto) bool ***REMOVED***
+func EnabledGoEnumPrefix(file *google_protobuf.FileDescriptorProto, enum *google_protobuf.EnumDescriptorProto) bool {
 	return proto.GetBoolExtension(enum.Options, E_GoprotoEnumPrefix, proto.GetBoolExtension(file.Options, E_GoprotoEnumPrefixAll, true))
-***REMOVED***
+}
 
-func EnabledGoStringer(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool ***REMOVED***
+func EnabledGoStringer(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool {
 	return proto.GetBoolExtension(message.Options, E_GoprotoStringer, proto.GetBoolExtension(file.Options, E_GoprotoStringerAll, true))
-***REMOVED***
+}
 
-func HasGoGetters(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool ***REMOVED***
+func HasGoGetters(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool {
 	return proto.GetBoolExtension(message.Options, E_GoprotoGetters, proto.GetBoolExtension(file.Options, E_GoprotoGettersAll, true))
-***REMOVED***
+}
 
-func IsUnion(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool ***REMOVED***
+func IsUnion(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool {
 	return proto.GetBoolExtension(message.Options, E_Onlyone, proto.GetBoolExtension(file.Options, E_OnlyoneAll, false))
-***REMOVED***
+}
 
-func HasGoString(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool ***REMOVED***
+func HasGoString(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool {
 	return proto.GetBoolExtension(message.Options, E_Gostring, proto.GetBoolExtension(file.Options, E_GostringAll, false))
-***REMOVED***
+}
 
-func HasEqual(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool ***REMOVED***
+func HasEqual(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool {
 	return proto.GetBoolExtension(message.Options, E_Equal, proto.GetBoolExtension(file.Options, E_EqualAll, false))
-***REMOVED***
+}
 
-func HasVerboseEqual(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool ***REMOVED***
+func HasVerboseEqual(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool {
 	return proto.GetBoolExtension(message.Options, E_VerboseEqual, proto.GetBoolExtension(file.Options, E_VerboseEqualAll, false))
-***REMOVED***
+}
 
-func IsStringer(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool ***REMOVED***
+func IsStringer(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool {
 	return proto.GetBoolExtension(message.Options, E_Stringer, proto.GetBoolExtension(file.Options, E_StringerAll, false))
-***REMOVED***
+}
 
-func IsFace(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool ***REMOVED***
+func IsFace(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool {
 	return proto.GetBoolExtension(message.Options, E_Face, proto.GetBoolExtension(file.Options, E_FaceAll, false))
-***REMOVED***
+}
 
-func HasDescription(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool ***REMOVED***
+func HasDescription(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool {
 	return proto.GetBoolExtension(message.Options, E_Description, proto.GetBoolExtension(file.Options, E_DescriptionAll, false))
-***REMOVED***
+}
 
-func HasPopulate(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool ***REMOVED***
+func HasPopulate(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool {
 	return proto.GetBoolExtension(message.Options, E_Populate, proto.GetBoolExtension(file.Options, E_PopulateAll, false))
-***REMOVED***
+}
 
-func HasTestGen(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool ***REMOVED***
+func HasTestGen(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool {
 	return proto.GetBoolExtension(message.Options, E_Testgen, proto.GetBoolExtension(file.Options, E_TestgenAll, false))
-***REMOVED***
+}
 
-func HasBenchGen(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool ***REMOVED***
+func HasBenchGen(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool {
 	return proto.GetBoolExtension(message.Options, E_Benchgen, proto.GetBoolExtension(file.Options, E_BenchgenAll, false))
-***REMOVED***
+}
 
-func IsMarshaler(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool ***REMOVED***
+func IsMarshaler(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool {
 	return proto.GetBoolExtension(message.Options, E_Marshaler, proto.GetBoolExtension(file.Options, E_MarshalerAll, false))
-***REMOVED***
+}
 
-func IsUnmarshaler(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool ***REMOVED***
+func IsUnmarshaler(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool {
 	return proto.GetBoolExtension(message.Options, E_Unmarshaler, proto.GetBoolExtension(file.Options, E_UnmarshalerAll, false))
-***REMOVED***
+}
 
-func IsStableMarshaler(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool ***REMOVED***
+func IsStableMarshaler(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool {
 	return proto.GetBoolExtension(message.Options, E_StableMarshaler, proto.GetBoolExtension(file.Options, E_StableMarshalerAll, false))
-***REMOVED***
+}
 
-func IsSizer(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool ***REMOVED***
+func IsSizer(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool {
 	return proto.GetBoolExtension(message.Options, E_Sizer, proto.GetBoolExtension(file.Options, E_SizerAll, false))
-***REMOVED***
+}
 
-func IsProtoSizer(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool ***REMOVED***
+func IsProtoSizer(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool {
 	return proto.GetBoolExtension(message.Options, E_Protosizer, proto.GetBoolExtension(file.Options, E_ProtosizerAll, false))
-***REMOVED***
+}
 
-func IsGoEnumStringer(file *google_protobuf.FileDescriptorProto, enum *google_protobuf.EnumDescriptorProto) bool ***REMOVED***
+func IsGoEnumStringer(file *google_protobuf.FileDescriptorProto, enum *google_protobuf.EnumDescriptorProto) bool {
 	return proto.GetBoolExtension(enum.Options, E_GoprotoEnumStringer, proto.GetBoolExtension(file.Options, E_GoprotoEnumStringerAll, true))
-***REMOVED***
+}
 
-func IsEnumStringer(file *google_protobuf.FileDescriptorProto, enum *google_protobuf.EnumDescriptorProto) bool ***REMOVED***
+func IsEnumStringer(file *google_protobuf.FileDescriptorProto, enum *google_protobuf.EnumDescriptorProto) bool {
 	return proto.GetBoolExtension(enum.Options, E_EnumStringer, proto.GetBoolExtension(file.Options, E_EnumStringerAll, false))
-***REMOVED***
+}
 
-func IsUnsafeMarshaler(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool ***REMOVED***
+func IsUnsafeMarshaler(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool {
 	return proto.GetBoolExtension(message.Options, E_UnsafeMarshaler, proto.GetBoolExtension(file.Options, E_UnsafeMarshalerAll, false))
-***REMOVED***
+}
 
-func IsUnsafeUnmarshaler(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool ***REMOVED***
+func IsUnsafeUnmarshaler(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool {
 	return proto.GetBoolExtension(message.Options, E_UnsafeUnmarshaler, proto.GetBoolExtension(file.Options, E_UnsafeUnmarshalerAll, false))
-***REMOVED***
+}
 
-func HasExtensionsMap(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool ***REMOVED***
+func HasExtensionsMap(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool {
 	return proto.GetBoolExtension(message.Options, E_GoprotoExtensionsMap, proto.GetBoolExtension(file.Options, E_GoprotoExtensionsMapAll, true))
-***REMOVED***
+}
 
-func HasUnrecognized(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool ***REMOVED***
-	if IsProto3(file) ***REMOVED***
+func HasUnrecognized(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool {
+	if IsProto3(file) {
 		return false
-	***REMOVED***
+	}
 	return proto.GetBoolExtension(message.Options, E_GoprotoUnrecognized, proto.GetBoolExtension(file.Options, E_GoprotoUnrecognizedAll, true))
-***REMOVED***
+}
 
-func IsProto3(file *google_protobuf.FileDescriptorProto) bool ***REMOVED***
+func IsProto3(file *google_protobuf.FileDescriptorProto) bool {
 	return file.GetSyntax() == "proto3"
-***REMOVED***
+}
 
-func ImportsGoGoProto(file *google_protobuf.FileDescriptorProto) bool ***REMOVED***
+func ImportsGoGoProto(file *google_protobuf.FileDescriptorProto) bool {
 	return proto.GetBoolExtension(file.Options, E_GogoprotoImport, true)
-***REMOVED***
+}
 
-func HasCompare(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool ***REMOVED***
+func HasCompare(file *google_protobuf.FileDescriptorProto, message *google_protobuf.DescriptorProto) bool {
 	return proto.GetBoolExtension(message.Options, E_Compare, proto.GetBoolExtension(file.Options, E_CompareAll, false))
-***REMOVED***
+}
 
-func RegistersGolangProto(file *google_protobuf.FileDescriptorProto) bool ***REMOVED***
+func RegistersGolangProto(file *google_protobuf.FileDescriptorProto) bool {
 	return proto.GetBoolExtension(file.Options, E_GoprotoRegistration, false)
-***REMOVED***
+}

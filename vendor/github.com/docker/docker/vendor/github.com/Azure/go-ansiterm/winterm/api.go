@@ -112,216 +112,216 @@ const (
 // -- See https://msdn.microsoft.com/en-us/library/windows/desktop/ms682101(v=vs.85).aspx for Console specific types (e.g., COORD)
 // -- See https://msdn.microsoft.com/en-us/library/aa296569(v=vs.60).aspx for comments on alignment
 type (
-	CHAR_INFO struct ***REMOVED***
+	CHAR_INFO struct {
 		UnicodeChar uint16
 		Attributes  uint16
-	***REMOVED***
+	}
 
-	CONSOLE_CURSOR_INFO struct ***REMOVED***
+	CONSOLE_CURSOR_INFO struct {
 		Size    uint32
 		Visible int32
-	***REMOVED***
+	}
 
-	CONSOLE_SCREEN_BUFFER_INFO struct ***REMOVED***
+	CONSOLE_SCREEN_BUFFER_INFO struct {
 		Size              COORD
 		CursorPosition    COORD
 		Attributes        uint16
 		Window            SMALL_RECT
 		MaximumWindowSize COORD
-	***REMOVED***
+	}
 
-	COORD struct ***REMOVED***
+	COORD struct {
 		X int16
 		Y int16
-	***REMOVED***
+	}
 
-	SMALL_RECT struct ***REMOVED***
+	SMALL_RECT struct {
 		Left   int16
 		Top    int16
 		Right  int16
 		Bottom int16
-	***REMOVED***
+	}
 
 	// INPUT_RECORD is a C/C++ union of which KEY_EVENT_RECORD is one case, it is also the largest
 	// See https://msdn.microsoft.com/en-us/library/windows/desktop/ms683499(v=vs.85).aspx.
-	INPUT_RECORD struct ***REMOVED***
+	INPUT_RECORD struct {
 		EventType uint16
 		KeyEvent  KEY_EVENT_RECORD
-	***REMOVED***
+	}
 
-	KEY_EVENT_RECORD struct ***REMOVED***
+	KEY_EVENT_RECORD struct {
 		KeyDown         int32
 		RepeatCount     uint16
 		VirtualKeyCode  uint16
 		VirtualScanCode uint16
 		UnicodeChar     uint16
 		ControlKeyState uint32
-	***REMOVED***
+	}
 
-	WINDOW_BUFFER_SIZE struct ***REMOVED***
+	WINDOW_BUFFER_SIZE struct {
 		Size COORD
-	***REMOVED***
+	}
 )
 
 // boolToBOOL converts a Go bool into a Windows int32.
-func boolToBOOL(f bool) int32 ***REMOVED***
-	if f ***REMOVED***
+func boolToBOOL(f bool) int32 {
+	if f {
 		return int32(1)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		return int32(0)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // GetConsoleCursorInfo retrieves information about the size and visiblity of the console cursor.
 // See https://msdn.microsoft.com/en-us/library/windows/desktop/ms683163(v=vs.85).aspx.
-func GetConsoleCursorInfo(handle uintptr, cursorInfo *CONSOLE_CURSOR_INFO) error ***REMOVED***
+func GetConsoleCursorInfo(handle uintptr, cursorInfo *CONSOLE_CURSOR_INFO) error {
 	r1, r2, err := getConsoleCursorInfoProc.Call(handle, uintptr(unsafe.Pointer(cursorInfo)), 0)
 	return checkError(r1, r2, err)
-***REMOVED***
+}
 
 // SetConsoleCursorInfo sets the size and visiblity of the console cursor.
 // See https://msdn.microsoft.com/en-us/library/windows/desktop/ms686019(v=vs.85).aspx.
-func SetConsoleCursorInfo(handle uintptr, cursorInfo *CONSOLE_CURSOR_INFO) error ***REMOVED***
+func SetConsoleCursorInfo(handle uintptr, cursorInfo *CONSOLE_CURSOR_INFO) error {
 	r1, r2, err := setConsoleCursorInfoProc.Call(handle, uintptr(unsafe.Pointer(cursorInfo)), 0)
 	return checkError(r1, r2, err)
-***REMOVED***
+}
 
 // SetConsoleCursorPosition location of the console cursor.
 // See https://msdn.microsoft.com/en-us/library/windows/desktop/ms686025(v=vs.85).aspx.
-func SetConsoleCursorPosition(handle uintptr, coord COORD) error ***REMOVED***
+func SetConsoleCursorPosition(handle uintptr, coord COORD) error {
 	r1, r2, err := setConsoleCursorPositionProc.Call(handle, coordToPointer(coord))
 	use(coord)
 	return checkError(r1, r2, err)
-***REMOVED***
+}
 
 // GetConsoleMode gets the console mode for given file descriptor
 // See http://msdn.microsoft.com/en-us/library/windows/desktop/ms683167(v=vs.85).aspx.
-func GetConsoleMode(handle uintptr) (mode uint32, err error) ***REMOVED***
+func GetConsoleMode(handle uintptr) (mode uint32, err error) {
 	err = syscall.GetConsoleMode(syscall.Handle(handle), &mode)
 	return mode, err
-***REMOVED***
+}
 
 // SetConsoleMode sets the console mode for given file descriptor
 // See http://msdn.microsoft.com/en-us/library/windows/desktop/ms686033(v=vs.85).aspx.
-func SetConsoleMode(handle uintptr, mode uint32) error ***REMOVED***
+func SetConsoleMode(handle uintptr, mode uint32) error {
 	r1, r2, err := setConsoleModeProc.Call(handle, uintptr(mode), 0)
 	use(mode)
 	return checkError(r1, r2, err)
-***REMOVED***
+}
 
 // GetConsoleScreenBufferInfo retrieves information about the specified console screen buffer.
 // See http://msdn.microsoft.com/en-us/library/windows/desktop/ms683171(v=vs.85).aspx.
-func GetConsoleScreenBufferInfo(handle uintptr) (*CONSOLE_SCREEN_BUFFER_INFO, error) ***REMOVED***
-	info := CONSOLE_SCREEN_BUFFER_INFO***REMOVED******REMOVED***
+func GetConsoleScreenBufferInfo(handle uintptr) (*CONSOLE_SCREEN_BUFFER_INFO, error) {
+	info := CONSOLE_SCREEN_BUFFER_INFO{}
 	err := checkError(getConsoleScreenBufferInfoProc.Call(handle, uintptr(unsafe.Pointer(&info)), 0))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return &info, nil
-***REMOVED***
+}
 
-func ScrollConsoleScreenBuffer(handle uintptr, scrollRect SMALL_RECT, clipRect SMALL_RECT, destOrigin COORD, char CHAR_INFO) error ***REMOVED***
+func ScrollConsoleScreenBuffer(handle uintptr, scrollRect SMALL_RECT, clipRect SMALL_RECT, destOrigin COORD, char CHAR_INFO) error {
 	r1, r2, err := scrollConsoleScreenBufferProc.Call(handle, uintptr(unsafe.Pointer(&scrollRect)), uintptr(unsafe.Pointer(&clipRect)), coordToPointer(destOrigin), uintptr(unsafe.Pointer(&char)))
 	use(scrollRect)
 	use(clipRect)
 	use(destOrigin)
 	use(char)
 	return checkError(r1, r2, err)
-***REMOVED***
+}
 
 // SetConsoleScreenBufferSize sets the size of the console screen buffer.
 // See https://msdn.microsoft.com/en-us/library/windows/desktop/ms686044(v=vs.85).aspx.
-func SetConsoleScreenBufferSize(handle uintptr, coord COORD) error ***REMOVED***
+func SetConsoleScreenBufferSize(handle uintptr, coord COORD) error {
 	r1, r2, err := setConsoleScreenBufferSizeProc.Call(handle, coordToPointer(coord))
 	use(coord)
 	return checkError(r1, r2, err)
-***REMOVED***
+}
 
 // SetConsoleTextAttribute sets the attributes of characters written to the
 // console screen buffer by the WriteFile or WriteConsole function.
 // See http://msdn.microsoft.com/en-us/library/windows/desktop/ms686047(v=vs.85).aspx.
-func SetConsoleTextAttribute(handle uintptr, attribute uint16) error ***REMOVED***
+func SetConsoleTextAttribute(handle uintptr, attribute uint16) error {
 	r1, r2, err := setConsoleTextAttributeProc.Call(handle, uintptr(attribute), 0)
 	use(attribute)
 	return checkError(r1, r2, err)
-***REMOVED***
+}
 
 // SetConsoleWindowInfo sets the size and position of the console screen buffer's window.
 // Note that the size and location must be within and no larger than the backing console screen buffer.
 // See https://msdn.microsoft.com/en-us/library/windows/desktop/ms686125(v=vs.85).aspx.
-func SetConsoleWindowInfo(handle uintptr, isAbsolute bool, rect SMALL_RECT) error ***REMOVED***
+func SetConsoleWindowInfo(handle uintptr, isAbsolute bool, rect SMALL_RECT) error {
 	r1, r2, err := setConsoleWindowInfoProc.Call(handle, uintptr(boolToBOOL(isAbsolute)), uintptr(unsafe.Pointer(&rect)))
 	use(isAbsolute)
 	use(rect)
 	return checkError(r1, r2, err)
-***REMOVED***
+}
 
 // WriteConsoleOutput writes the CHAR_INFOs from the provided buffer to the active console buffer.
 // See https://msdn.microsoft.com/en-us/library/windows/desktop/ms687404(v=vs.85).aspx.
-func WriteConsoleOutput(handle uintptr, buffer []CHAR_INFO, bufferSize COORD, bufferCoord COORD, writeRegion *SMALL_RECT) error ***REMOVED***
+func WriteConsoleOutput(handle uintptr, buffer []CHAR_INFO, bufferSize COORD, bufferCoord COORD, writeRegion *SMALL_RECT) error {
 	r1, r2, err := writeConsoleOutputProc.Call(handle, uintptr(unsafe.Pointer(&buffer[0])), coordToPointer(bufferSize), coordToPointer(bufferCoord), uintptr(unsafe.Pointer(writeRegion)))
 	use(buffer)
 	use(bufferSize)
 	use(bufferCoord)
 	return checkError(r1, r2, err)
-***REMOVED***
+}
 
 // ReadConsoleInput reads (and removes) data from the console input buffer.
 // See https://msdn.microsoft.com/en-us/library/windows/desktop/ms684961(v=vs.85).aspx.
-func ReadConsoleInput(handle uintptr, buffer []INPUT_RECORD, count *uint32) error ***REMOVED***
+func ReadConsoleInput(handle uintptr, buffer []INPUT_RECORD, count *uint32) error {
 	r1, r2, err := readConsoleInputProc.Call(handle, uintptr(unsafe.Pointer(&buffer[0])), uintptr(len(buffer)), uintptr(unsafe.Pointer(count)))
 	use(buffer)
 	return checkError(r1, r2, err)
-***REMOVED***
+}
 
 // WaitForSingleObject waits for the passed handle to be signaled.
 // It returns true if the handle was signaled; false otherwise.
 // See https://msdn.microsoft.com/en-us/library/windows/desktop/ms687032(v=vs.85).aspx.
-func WaitForSingleObject(handle uintptr, msWait uint32) (bool, error) ***REMOVED***
+func WaitForSingleObject(handle uintptr, msWait uint32) (bool, error) {
 	r1, _, err := waitForSingleObjectProc.Call(handle, uintptr(uint32(msWait)))
-	switch r1 ***REMOVED***
+	switch r1 {
 	case WAIT_ABANDONED, WAIT_TIMEOUT:
 		return false, nil
 	case WAIT_SIGNALED:
 		return true, nil
-	***REMOVED***
+	}
 	use(msWait)
 	return false, err
-***REMOVED***
+}
 
 // String helpers
-func (info CONSOLE_SCREEN_BUFFER_INFO) String() string ***REMOVED***
+func (info CONSOLE_SCREEN_BUFFER_INFO) String() string {
 	return fmt.Sprintf("Size(%v) Cursor(%v) Window(%v) Max(%v)", info.Size, info.CursorPosition, info.Window, info.MaximumWindowSize)
-***REMOVED***
+}
 
-func (coord COORD) String() string ***REMOVED***
+func (coord COORD) String() string {
 	return fmt.Sprintf("%v,%v", coord.X, coord.Y)
-***REMOVED***
+}
 
-func (rect SMALL_RECT) String() string ***REMOVED***
+func (rect SMALL_RECT) String() string {
 	return fmt.Sprintf("(%v,%v),(%v,%v)", rect.Left, rect.Top, rect.Right, rect.Bottom)
-***REMOVED***
+}
 
 // checkError evaluates the results of a Windows API call and returns the error if it failed.
-func checkError(r1, r2 uintptr, err error) error ***REMOVED***
+func checkError(r1, r2 uintptr, err error) error {
 	// Windows APIs return non-zero to indicate success
-	if r1 != 0 ***REMOVED***
+	if r1 != 0 {
 		return nil
-	***REMOVED***
+	}
 
 	// Return the error if provided, otherwise default to EINVAL
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return syscall.EINVAL
-***REMOVED***
+}
 
 // coordToPointer converts a COORD into a uintptr (by fooling the type system).
-func coordToPointer(c COORD) uintptr ***REMOVED***
+func coordToPointer(c COORD) uintptr {
 	// Note: This code assumes the two SHORTs are correctly laid out; the "cast" to uint32 is just to get a pointer to pass.
 	return uintptr(*((*uint32)(unsafe.Pointer(&c))))
-***REMOVED***
+}
 
 // use is a no-op, but the compiler cannot see that it is.
 // Calling use(p) ensures that p is kept live until that point.
-func use(p interface***REMOVED******REMOVED***) ***REMOVED******REMOVED***
+func use(p interface{}) {}

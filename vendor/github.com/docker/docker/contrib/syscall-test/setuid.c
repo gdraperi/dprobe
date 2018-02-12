@@ -2,10 +2,10 @@
 #include <unistd.h>
 #include <stdio.h>
 
-int main() ***REMOVED***
-	if (setuid(1) == -1) ***REMOVED***
+int main() {
+	if (setuid(1) == -1) {
 		perror("setuid");
 		return 1;
-	***REMOVED***
+	}
 	return 0;
-***REMOVED***
+}

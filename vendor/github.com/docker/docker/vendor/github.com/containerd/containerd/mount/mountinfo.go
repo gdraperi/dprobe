@@ -2,7 +2,7 @@ package mount
 
 // Info reveals information about a particular mounted filesystem. This
 // struct is populated from the content in the /proc/<pid>/mountinfo file.
-type Info struct ***REMOVED***
+type Info struct {
 	// ID is a unique identifier of the mount (may be reused after umount).
 	ID int
 
@@ -37,4 +37,4 @@ type Info struct ***REMOVED***
 
 	// VFSOptions represents per super block options.
 	VFSOptions string
-***REMOVED***
+}

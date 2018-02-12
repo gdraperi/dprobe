@@ -9,15 +9,15 @@ package container
 
 // ContainerWaitOKBodyError container waiting error, if any
 // swagger:model ContainerWaitOKBodyError
-type ContainerWaitOKBodyError struct ***REMOVED***
+type ContainerWaitOKBodyError struct {
 
 	// Details of an error
 	Message string `json:"Message,omitempty"`
-***REMOVED***
+}
 
 // ContainerWaitOKBody OK response to ContainerWait operation
 // swagger:model ContainerWaitOKBody
-type ContainerWaitOKBody struct ***REMOVED***
+type ContainerWaitOKBody struct {
 
 	// error
 	// Required: true
@@ -26,4 +26,4 @@ type ContainerWaitOKBody struct ***REMOVED***
 	// Exit code of the container
 	// Required: true
 	StatusCode int64 `json:"StatusCode"`
-***REMOVED***
+}

@@ -9,7 +9,7 @@ package container
 
 // ContainerCreateCreatedBody OK response to ContainerCreate operation
 // swagger:model ContainerCreateCreatedBody
-type ContainerCreateCreatedBody struct ***REMOVED***
+type ContainerCreateCreatedBody struct {
 
 	// The ID of the created container
 	// Required: true
@@ -18,4 +18,4 @@ type ContainerCreateCreatedBody struct ***REMOVED***
 	// Warnings encountered when creating the container
 	// Required: true
 	Warnings []string `json:"Warnings"`
-***REMOVED***
+}

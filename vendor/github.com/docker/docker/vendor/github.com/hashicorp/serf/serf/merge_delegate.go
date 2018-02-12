@@ -6,29 +6,29 @@ import (
 	"github.com/hashicorp/memberlist"
 )
 
-type MergeDelegate interface ***REMOVED***
+type MergeDelegate interface {
 	NotifyMerge([]*Member) error
-***REMOVED***
+}
 
-type mergeDelegate struct ***REMOVED***
+type mergeDelegate struct {
 	serf *Serf
-***REMOVED***
+}
 
-func (m *mergeDelegate) NotifyMerge(nodes []*memberlist.Node) error ***REMOVED***
+func (m *mergeDelegate) NotifyMerge(nodes []*memberlist.Node) error {
 	members := make([]*Member, len(nodes))
-	for idx, n := range nodes ***REMOVED***
+	for idx, n := range nodes {
 		members[idx] = m.nodeToMember(n)
-	***REMOVED***
+	}
 	return m.serf.config.Merge.NotifyMerge(members)
-***REMOVED***
+}
 
-func (m *mergeDelegate) NotifyAlive(peer *memberlist.Node) error ***REMOVED***
+func (m *mergeDelegate) NotifyAlive(peer *memberlist.Node) error {
 	member := m.nodeToMember(peer)
-	return m.serf.config.Merge.NotifyMerge([]*Member***REMOVED***member***REMOVED***)
-***REMOVED***
+	return m.serf.config.Merge.NotifyMerge([]*Member{member})
+}
 
-func (m *mergeDelegate) nodeToMember(n *memberlist.Node) *Member ***REMOVED***
-	return &Member***REMOVED***
+func (m *mergeDelegate) nodeToMember(n *memberlist.Node) *Member {
+	return &Member{
 		Name:        n.Name,
 		Addr:        net.IP(n.Addr),
 		Port:        n.Port,
@@ -40,5 +40,5 @@ func (m *mergeDelegate) nodeToMember(n *memberlist.Node) *Member ***REMOVED***
 		DelegateMin: n.DMin,
 		DelegateMax: n.DMax,
 		DelegateCur: n.DCur,
-	***REMOVED***
-***REMOVED***
+	}
+}

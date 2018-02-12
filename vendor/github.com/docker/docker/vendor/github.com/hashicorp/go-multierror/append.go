@@ -6,25 +6,25 @@ package multierror
 // If err is not a multierror.Error, then it will be turned into
 // one. If any of the errs are multierr.Error, they will be flattened
 // one level into err.
-func Append(err error, errs ...error) *Error ***REMOVED***
-	switch err := err.(type) ***REMOVED***
+func Append(err error, errs ...error) *Error {
+	switch err := err.(type) {
 	case *Error:
 		// Typed nils can reach here, so initialize if we are nil
-		if err == nil ***REMOVED***
+		if err == nil {
 			err = new(Error)
-		***REMOVED***
+		}
 
 		err.Errors = append(err.Errors, errs...)
 		return err
 	default:
 		newErrs := make([]error, 0, len(errs)+1)
-		if err != nil ***REMOVED***
+		if err != nil {
 			newErrs = append(newErrs, err)
-		***REMOVED***
+		}
 		newErrs = append(newErrs, errs...)
 
-		return &Error***REMOVED***
+		return &Error{
 			Errors: newErrs,
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

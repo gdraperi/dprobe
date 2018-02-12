@@ -3,7 +3,7 @@ package urlutil
 import "testing"
 
 var (
-	gitUrls = []string***REMOVED***
+	gitUrls = []string{
 		"git://github.com/docker/docker",
 		"git@github.com:docker/docker.git",
 		"git@bitbucket.org:atlassianlabs/atlassian-docker.git",
@@ -11,46 +11,46 @@ var (
 		"http://github.com/docker/docker.git",
 		"http://github.com/docker/docker.git#branch",
 		"http://github.com/docker/docker.git#:dir",
-	***REMOVED***
-	incompleteGitUrls = []string***REMOVED***
+	}
+	incompleteGitUrls = []string{
 		"github.com/docker/docker",
-	***REMOVED***
-	invalidGitUrls = []string***REMOVED***
+	}
+	invalidGitUrls = []string{
 		"http://github.com/docker/docker.git:#branch",
-	***REMOVED***
-	transportUrls = []string***REMOVED***
+	}
+	transportUrls = []string{
 		"tcp://example.com",
 		"tcp+tls://example.com",
 		"udp://example.com",
 		"unix:///example",
 		"unixgram:///example",
-	***REMOVED***
+	}
 )
 
-func TestIsGIT(t *testing.T) ***REMOVED***
-	for _, url := range gitUrls ***REMOVED***
-		if !IsGitURL(url) ***REMOVED***
+func TestIsGIT(t *testing.T) {
+	for _, url := range gitUrls {
+		if !IsGitURL(url) {
 			t.Fatalf("%q should be detected as valid Git url", url)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	for _, url := range incompleteGitUrls ***REMOVED***
-		if !IsGitURL(url) ***REMOVED***
+	for _, url := range incompleteGitUrls {
+		if !IsGitURL(url) {
 			t.Fatalf("%q should be detected as valid Git url", url)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	for _, url := range invalidGitUrls ***REMOVED***
-		if IsGitURL(url) ***REMOVED***
+	for _, url := range invalidGitUrls {
+		if IsGitURL(url) {
 			t.Fatalf("%q should not be detected as valid Git prefix", url)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestIsTransport(t *testing.T) ***REMOVED***
-	for _, url := range transportUrls ***REMOVED***
-		if !IsTransportURL(url) ***REMOVED***
+func TestIsTransport(t *testing.T) {
+	for _, url := range transportUrls {
+		if !IsTransportURL(url) {
 			t.Fatalf("%q should be detected as valid Transport url", url)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

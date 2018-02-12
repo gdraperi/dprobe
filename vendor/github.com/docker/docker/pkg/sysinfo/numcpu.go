@@ -7,6 +7,6 @@ import (
 )
 
 // NumCPU returns the number of CPUs
-func NumCPU() int ***REMOVED***
+func NumCPU() int {
 	return runtime.NumCPU()
-***REMOVED***
+}

@@ -15,25 +15,25 @@ var (
 	errTooManyLinks = errors.New("too many links")
 )
 
-type currentPath struct ***REMOVED***
+type currentPath struct {
 	path     string
 	f        os.FileInfo
 	fullPath string
-***REMOVED***
+}
 
-func pathChange(lower, upper *currentPath) (ChangeKind, string) ***REMOVED***
-	if lower == nil ***REMOVED***
-		if upper == nil ***REMOVED***
+func pathChange(lower, upper *currentPath) (ChangeKind, string) {
+	if lower == nil {
+		if upper == nil {
 			panic("cannot compare nil paths")
-		***REMOVED***
+		}
 		return ChangeKindAdd, upper.path
-	***REMOVED***
-	if upper == nil ***REMOVED***
+	}
+	if upper == nil {
 		return ChangeKindDelete, lower.path
-	***REMOVED***
+	}
 	// TODO: compare by directory
 
-	switch i := strings.Compare(lower.path, upper.path); ***REMOVED***
+	switch i := strings.Compare(lower.path, upper.path); {
 	case i < 0:
 		// File in lower that is not in upper
 		return ChangeKindDelete, lower.path
@@ -42,235 +42,235 @@ func pathChange(lower, upper *currentPath) (ChangeKind, string) ***REMOVED***
 		return ChangeKindAdd, upper.path
 	default:
 		return ChangeKindModify, upper.path
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func sameFile(f1, f2 *currentPath) (bool, error) ***REMOVED***
-	if os.SameFile(f1.f, f2.f) ***REMOVED***
+func sameFile(f1, f2 *currentPath) (bool, error) {
+	if os.SameFile(f1.f, f2.f) {
 		return true, nil
-	***REMOVED***
+	}
 
 	equalStat, err := compareSysStat(f1.f.Sys(), f2.f.Sys())
-	if err != nil || !equalStat ***REMOVED***
+	if err != nil || !equalStat {
 		return equalStat, err
-	***REMOVED***
+	}
 
-	if eq, err := compareCapabilities(f1.fullPath, f2.fullPath); err != nil || !eq ***REMOVED***
+	if eq, err := compareCapabilities(f1.fullPath, f2.fullPath); err != nil || !eq {
 		return eq, err
-	***REMOVED***
+	}
 
 	// If not a directory also check size, modtime, and content
-	if !f1.f.IsDir() ***REMOVED***
-		if f1.f.Size() != f2.f.Size() ***REMOVED***
+	if !f1.f.IsDir() {
+		if f1.f.Size() != f2.f.Size() {
 			return false, nil
-		***REMOVED***
+		}
 		t1 := f1.f.ModTime()
 		t2 := f2.f.ModTime()
 
-		if t1.Unix() != t2.Unix() ***REMOVED***
+		if t1.Unix() != t2.Unix() {
 			return false, nil
-		***REMOVED***
+		}
 
 		// If the timestamp may have been truncated in one of the
 		// files, check content of file to determine difference
-		if t1.Nanosecond() == 0 || t2.Nanosecond() == 0 ***REMOVED***
+		if t1.Nanosecond() == 0 || t2.Nanosecond() == 0 {
 			var eq bool
-			if (f1.f.Mode() & os.ModeSymlink) == os.ModeSymlink ***REMOVED***
+			if (f1.f.Mode() & os.ModeSymlink) == os.ModeSymlink {
 				eq, err = compareSymlinkTarget(f1.fullPath, f2.fullPath)
-			***REMOVED*** else if f1.f.Size() > 0 ***REMOVED***
+			} else if f1.f.Size() > 0 {
 				eq, err = compareFileContent(f1.fullPath, f2.fullPath)
-			***REMOVED***
-			if err != nil || !eq ***REMOVED***
+			}
+			if err != nil || !eq {
 				return eq, err
-			***REMOVED***
-		***REMOVED*** else if t1.Nanosecond() != t2.Nanosecond() ***REMOVED***
+			}
+		} else if t1.Nanosecond() != t2.Nanosecond() {
 			return false, nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return true, nil
-***REMOVED***
+}
 
-func compareSymlinkTarget(p1, p2 string) (bool, error) ***REMOVED***
+func compareSymlinkTarget(p1, p2 string) (bool, error) {
 	t1, err := os.Readlink(p1)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return false, err
-	***REMOVED***
+	}
 	t2, err := os.Readlink(p2)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return false, err
-	***REMOVED***
+	}
 	return t1 == t2, nil
-***REMOVED***
+}
 
 const compareChuckSize = 32 * 1024
 
 // compareFileContent compares the content of 2 same sized files
 // by comparing each byte.
-func compareFileContent(p1, p2 string) (bool, error) ***REMOVED***
+func compareFileContent(p1, p2 string) (bool, error) {
 	f1, err := os.Open(p1)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return false, err
-	***REMOVED***
+	}
 	defer f1.Close()
 	f2, err := os.Open(p2)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return false, err
-	***REMOVED***
+	}
 	defer f2.Close()
 
 	b1 := make([]byte, compareChuckSize)
 	b2 := make([]byte, compareChuckSize)
-	for ***REMOVED***
+	for {
 		n1, err1 := f1.Read(b1)
-		if err1 != nil && err1 != io.EOF ***REMOVED***
+		if err1 != nil && err1 != io.EOF {
 			return false, err1
-		***REMOVED***
+		}
 		n2, err2 := f2.Read(b2)
-		if err2 != nil && err2 != io.EOF ***REMOVED***
+		if err2 != nil && err2 != io.EOF {
 			return false, err2
-		***REMOVED***
-		if n1 != n2 || !bytes.Equal(b1[:n1], b2[:n2]) ***REMOVED***
+		}
+		if n1 != n2 || !bytes.Equal(b1[:n1], b2[:n2]) {
 			return false, nil
-		***REMOVED***
-		if err1 == io.EOF && err2 == io.EOF ***REMOVED***
+		}
+		if err1 == io.EOF && err2 == io.EOF {
 			return true, nil
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func pathWalk(ctx context.Context, root string, pathC chan<- *currentPath) error ***REMOVED***
-	return filepath.Walk(root, func(path string, f os.FileInfo, err error) error ***REMOVED***
-		if err != nil ***REMOVED***
+func pathWalk(ctx context.Context, root string, pathC chan<- *currentPath) error {
+	return filepath.Walk(root, func(path string, f os.FileInfo, err error) error {
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 
 		// Rebase path
 		path, err = filepath.Rel(root, path)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 
 		path = filepath.Join(string(os.PathSeparator), path)
 
 		// Skip root
-		if path == string(os.PathSeparator) ***REMOVED***
+		if path == string(os.PathSeparator) {
 			return nil
-		***REMOVED***
+		}
 
-		p := &currentPath***REMOVED***
+		p := &currentPath{
 			path:     path,
 			f:        f,
 			fullPath: filepath.Join(root, path),
-		***REMOVED***
+		}
 
-		select ***REMOVED***
+		select {
 		case <-ctx.Done():
 			return ctx.Err()
 		case pathC <- p:
 			return nil
-		***REMOVED***
-	***REMOVED***)
-***REMOVED***
+		}
+	})
+}
 
-func nextPath(ctx context.Context, pathC <-chan *currentPath) (*currentPath, error) ***REMOVED***
-	select ***REMOVED***
+func nextPath(ctx context.Context, pathC <-chan *currentPath) (*currentPath, error) {
+	select {
 	case <-ctx.Done():
 		return nil, ctx.Err()
 	case p := <-pathC:
 		return p, nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // RootPath joins a path with a root, evaluating and bounding any
 // symlink to the root directory.
-func RootPath(root, path string) (string, error) ***REMOVED***
-	if path == "" ***REMOVED***
+func RootPath(root, path string) (string, error) {
+	if path == "" {
 		return root, nil
-	***REMOVED***
+	}
 	var linksWalked int // to protect against cycles
-	for ***REMOVED***
+	for {
 		i := linksWalked
 		newpath, err := walkLinks(root, path, &linksWalked)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return "", err
-		***REMOVED***
+		}
 		path = newpath
-		if i == linksWalked ***REMOVED***
+		if i == linksWalked {
 			newpath = filepath.Join("/", newpath)
-			if path == newpath ***REMOVED***
+			if path == newpath {
 				return filepath.Join(root, newpath), nil
-			***REMOVED***
+			}
 			path = newpath
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func walkLink(root, path string, linksWalked *int) (newpath string, islink bool, err error) ***REMOVED***
-	if *linksWalked > 255 ***REMOVED***
+func walkLink(root, path string, linksWalked *int) (newpath string, islink bool, err error) {
+	if *linksWalked > 255 {
 		return "", false, errTooManyLinks
-	***REMOVED***
+	}
 
 	path = filepath.Join("/", path)
-	if path == "/" ***REMOVED***
+	if path == "/" {
 		return path, false, nil
-	***REMOVED***
+	}
 	realPath := filepath.Join(root, path)
 
 	fi, err := os.Lstat(realPath)
-	if err != nil ***REMOVED***
+	if err != nil {
 		// If path does not yet exist, treat as non-symlink
-		if os.IsNotExist(err) ***REMOVED***
+		if os.IsNotExist(err) {
 			return path, false, nil
-		***REMOVED***
+		}
 		return "", false, err
-	***REMOVED***
-	if fi.Mode()&os.ModeSymlink == 0 ***REMOVED***
+	}
+	if fi.Mode()&os.ModeSymlink == 0 {
 		return path, false, nil
-	***REMOVED***
+	}
 	newpath, err = os.Readlink(realPath)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", false, err
-	***REMOVED***
-	if filepath.IsAbs(newpath) && strings.HasPrefix(newpath, root) ***REMOVED***
+	}
+	if filepath.IsAbs(newpath) && strings.HasPrefix(newpath, root) {
 		newpath = newpath[:len(root)]
-		if !strings.HasPrefix(newpath, "/") ***REMOVED***
+		if !strings.HasPrefix(newpath, "/") {
 			newpath = "/" + newpath
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	*linksWalked++
 	return newpath, true, nil
-***REMOVED***
+}
 
-func walkLinks(root, path string, linksWalked *int) (string, error) ***REMOVED***
-	switch dir, file := filepath.Split(path); ***REMOVED***
+func walkLinks(root, path string, linksWalked *int) (string, error) {
+	switch dir, file := filepath.Split(path); {
 	case dir == "":
 		newpath, _, err := walkLink(root, file, linksWalked)
 		return newpath, err
 	case file == "":
-		if os.IsPathSeparator(dir[len(dir)-1]) ***REMOVED***
-			if dir == "/" ***REMOVED***
+		if os.IsPathSeparator(dir[len(dir)-1]) {
+			if dir == "/" {
 				return dir, nil
-			***REMOVED***
+			}
 			return walkLinks(root, dir[:len(dir)-1], linksWalked)
-		***REMOVED***
+		}
 		newpath, _, err := walkLink(root, dir, linksWalked)
 		return newpath, err
 	default:
 		newdir, err := walkLinks(root, dir, linksWalked)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return "", err
-		***REMOVED***
+		}
 		newpath, islink, err := walkLink(root, filepath.Join(newdir, file), linksWalked)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return "", err
-		***REMOVED***
-		if !islink ***REMOVED***
+		}
+		if !islink {
 			return newpath, nil
-		***REMOVED***
-		if filepath.IsAbs(newpath) ***REMOVED***
+		}
+		if filepath.IsAbs(newpath) {
 			return newpath, nil
-		***REMOVED***
+		}
 		return filepath.Join(newdir, newpath), nil
-	***REMOVED***
-***REMOVED***
+	}
+}

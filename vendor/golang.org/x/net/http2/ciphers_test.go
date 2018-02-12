@@ -6,30 +6,30 @@ package http2
 
 import "testing"
 
-func TestIsBadCipherBad(t *testing.T) ***REMOVED***
-	for _, c := range badCiphers ***REMOVED***
-		if !isBadCipher(c) ***REMOVED***
+func TestIsBadCipherBad(t *testing.T) {
+	for _, c := range badCiphers {
+		if !isBadCipher(c) {
 			t.Errorf("Wrong result for isBadCipher(%d), want true", c)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // verify we don't give false positives on ciphers not on blacklist
-func TestIsBadCipherGood(t *testing.T) ***REMOVED***
-	goodCiphers := map[uint16]string***REMOVED***
+func TestIsBadCipherGood(t *testing.T) {
+	goodCiphers := map[uint16]string{
 		cipher_TLS_DHE_RSA_WITH_AES_256_CCM:                "cipher_TLS_DHE_RSA_WITH_AES_256_CCM",
 		cipher_TLS_ECDHE_ECDSA_WITH_AES_128_CCM:            "cipher_TLS_ECDHE_ECDSA_WITH_AES_128_CCM",
 		cipher_TLS_ECDHE_PSK_WITH_CHACHA20_POLY1305_SHA256: "cipher_TLS_ECDHE_PSK_WITH_CHACHA20_POLY1305_SHA256",
-	***REMOVED***
-	for c, name := range goodCiphers ***REMOVED***
-		if isBadCipher(c) ***REMOVED***
+	}
+	for c, name := range goodCiphers {
+		if isBadCipher(c) {
 			t.Errorf("Wrong result for isBadCipher(%d) %s, want false", c, name)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // copied from https://http2.github.io/http2-spec/#BadCipherSuites,
-var badCiphers = []uint16***REMOVED***
+var badCiphers = []uint16{
 	cipher_TLS_NULL_WITH_NULL_NULL,
 	cipher_TLS_RSA_WITH_NULL_MD5,
 	cipher_TLS_RSA_WITH_NULL_SHA,
@@ -306,4 +306,4 @@ var badCiphers = []uint16***REMOVED***
 	cipher_TLS_PSK_WITH_AES_256_CCM,
 	cipher_TLS_PSK_WITH_AES_128_CCM_8,
 	cipher_TLS_PSK_WITH_AES_256_CCM_8,
-***REMOVED***
+}

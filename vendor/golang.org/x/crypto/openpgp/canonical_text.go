@@ -8,52 +8,52 @@ import "hash"
 
 // NewCanonicalTextHash reformats text written to it into the canonical
 // form and then applies the hash h.  See RFC 4880, section 5.2.1.
-func NewCanonicalTextHash(h hash.Hash) hash.Hash ***REMOVED***
-	return &canonicalTextHash***REMOVED***h, 0***REMOVED***
-***REMOVED***
+func NewCanonicalTextHash(h hash.Hash) hash.Hash {
+	return &canonicalTextHash{h, 0}
+}
 
-type canonicalTextHash struct ***REMOVED***
+type canonicalTextHash struct {
 	h hash.Hash
 	s int
-***REMOVED***
+}
 
-var newline = []byte***REMOVED***'\r', '\n'***REMOVED***
+var newline = []byte{'\r', '\n'}
 
-func (cth *canonicalTextHash) Write(buf []byte) (int, error) ***REMOVED***
+func (cth *canonicalTextHash) Write(buf []byte) (int, error) {
 	start := 0
 
-	for i, c := range buf ***REMOVED***
-		switch cth.s ***REMOVED***
+	for i, c := range buf {
+		switch cth.s {
 		case 0:
-			if c == '\r' ***REMOVED***
+			if c == '\r' {
 				cth.s = 1
-			***REMOVED*** else if c == '\n' ***REMOVED***
+			} else if c == '\n' {
 				cth.h.Write(buf[start:i])
 				cth.h.Write(newline)
 				start = i + 1
-			***REMOVED***
+			}
 		case 1:
 			cth.s = 0
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	cth.h.Write(buf[start:])
 	return len(buf), nil
-***REMOVED***
+}
 
-func (cth *canonicalTextHash) Sum(in []byte) []byte ***REMOVED***
+func (cth *canonicalTextHash) Sum(in []byte) []byte {
 	return cth.h.Sum(in)
-***REMOVED***
+}
 
-func (cth *canonicalTextHash) Reset() ***REMOVED***
+func (cth *canonicalTextHash) Reset() {
 	cth.h.Reset()
 	cth.s = 0
-***REMOVED***
+}
 
-func (cth *canonicalTextHash) Size() int ***REMOVED***
+func (cth *canonicalTextHash) Size() int {
 	return cth.h.Size()
-***REMOVED***
+}
 
-func (cth *canonicalTextHash) BlockSize() int ***REMOVED***
+func (cth *canonicalTextHash) BlockSize() int {
 	return cth.h.BlockSize()
-***REMOVED***
+}

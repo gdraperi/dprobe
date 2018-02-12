@@ -24,85 +24,85 @@ const (
 )
 
 // SupportedNlFamilies contains the list of netlink families this netlink package supports
-var SupportedNlFamilies = []int***REMOVED***syscall.NETLINK_ROUTE, syscall.NETLINK_XFRM, syscall.NETLINK_NETFILTER***REMOVED***
+var SupportedNlFamilies = []int{syscall.NETLINK_ROUTE, syscall.NETLINK_XFRM, syscall.NETLINK_NETFILTER}
 
 var nextSeqNr uint32
 
 // GetIPFamily returns the family type of a net.IP.
-func GetIPFamily(ip net.IP) int ***REMOVED***
-	if len(ip) <= net.IPv4len ***REMOVED***
+func GetIPFamily(ip net.IP) int {
+	if len(ip) <= net.IPv4len {
 		return FAMILY_V4
-	***REMOVED***
-	if ip.To4() != nil ***REMOVED***
+	}
+	if ip.To4() != nil {
 		return FAMILY_V4
-	***REMOVED***
+	}
 	return FAMILY_V6
-***REMOVED***
+}
 
 var nativeEndian binary.ByteOrder
 
 // Get native endianness for the system
-func NativeEndian() binary.ByteOrder ***REMOVED***
-	if nativeEndian == nil ***REMOVED***
+func NativeEndian() binary.ByteOrder {
+	if nativeEndian == nil {
 		var x uint32 = 0x01020304
-		if *(*byte)(unsafe.Pointer(&x)) == 0x01 ***REMOVED***
+		if *(*byte)(unsafe.Pointer(&x)) == 0x01 {
 			nativeEndian = binary.BigEndian
-		***REMOVED*** else ***REMOVED***
+		} else {
 			nativeEndian = binary.LittleEndian
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nativeEndian
-***REMOVED***
+}
 
 // Byte swap a 16 bit value if we aren't big endian
-func Swap16(i uint16) uint16 ***REMOVED***
-	if NativeEndian() == binary.BigEndian ***REMOVED***
+func Swap16(i uint16) uint16 {
+	if NativeEndian() == binary.BigEndian {
 		return i
-	***REMOVED***
+	}
 	return (i&0xff00)>>8 | (i&0xff)<<8
-***REMOVED***
+}
 
 // Byte swap a 32 bit value if aren't big endian
-func Swap32(i uint32) uint32 ***REMOVED***
-	if NativeEndian() == binary.BigEndian ***REMOVED***
+func Swap32(i uint32) uint32 {
+	if NativeEndian() == binary.BigEndian {
 		return i
-	***REMOVED***
+	}
 	return (i&0xff000000)>>24 | (i&0xff0000)>>8 | (i&0xff00)<<8 | (i&0xff)<<24
-***REMOVED***
+}
 
-type NetlinkRequestData interface ***REMOVED***
+type NetlinkRequestData interface {
 	Len() int
 	Serialize() []byte
-***REMOVED***
+}
 
 // IfInfomsg is related to links, but it is used for list requests as well
-type IfInfomsg struct ***REMOVED***
+type IfInfomsg struct {
 	syscall.IfInfomsg
-***REMOVED***
+}
 
 // Create an IfInfomsg with family specified
-func NewIfInfomsg(family int) *IfInfomsg ***REMOVED***
-	return &IfInfomsg***REMOVED***
-		IfInfomsg: syscall.IfInfomsg***REMOVED***
+func NewIfInfomsg(family int) *IfInfomsg {
+	return &IfInfomsg{
+		IfInfomsg: syscall.IfInfomsg{
 			Family: uint8(family),
-		***REMOVED***,
-	***REMOVED***
-***REMOVED***
+		},
+	}
+}
 
-func DeserializeIfInfomsg(b []byte) *IfInfomsg ***REMOVED***
+func DeserializeIfInfomsg(b []byte) *IfInfomsg {
 	return (*IfInfomsg)(unsafe.Pointer(&b[0:syscall.SizeofIfInfomsg][0]))
-***REMOVED***
+}
 
-func (msg *IfInfomsg) Serialize() []byte ***REMOVED***
+func (msg *IfInfomsg) Serialize() []byte {
 	return (*(*[syscall.SizeofIfInfomsg]byte)(unsafe.Pointer(msg)))[:]
-***REMOVED***
+}
 
-func (msg *IfInfomsg) Len() int ***REMOVED***
+func (msg *IfInfomsg) Len() int {
 	return syscall.SizeofIfInfomsg
-***REMOVED***
+}
 
-func (msg *IfInfomsg) EncapType() string ***REMOVED***
-	switch msg.Type ***REMOVED***
+func (msg *IfInfomsg) EncapType() string {
+	switch msg.Type {
 	case 0:
 		return "generic"
 	case syscall.ARPHRD_ETHER:
@@ -238,101 +238,101 @@ func (msg *IfInfomsg) EncapType() string ***REMOVED***
 		return "none"
 	case 65535:
 		return "void"
-	***REMOVED***
+	}
 	return fmt.Sprintf("unknown%d", msg.Type)
-***REMOVED***
+}
 
-func rtaAlignOf(attrlen int) int ***REMOVED***
+func rtaAlignOf(attrlen int) int {
 	return (attrlen + syscall.RTA_ALIGNTO - 1) & ^(syscall.RTA_ALIGNTO - 1)
-***REMOVED***
+}
 
-func NewIfInfomsgChild(parent *RtAttr, family int) *IfInfomsg ***REMOVED***
+func NewIfInfomsgChild(parent *RtAttr, family int) *IfInfomsg {
 	msg := NewIfInfomsg(family)
 	parent.children = append(parent.children, msg)
 	return msg
-***REMOVED***
+}
 
 // Extend RtAttr to handle data and children
-type RtAttr struct ***REMOVED***
+type RtAttr struct {
 	syscall.RtAttr
 	Data     []byte
 	children []NetlinkRequestData
-***REMOVED***
+}
 
 // Create a new Extended RtAttr object
-func NewRtAttr(attrType int, data []byte) *RtAttr ***REMOVED***
-	return &RtAttr***REMOVED***
-		RtAttr: syscall.RtAttr***REMOVED***
+func NewRtAttr(attrType int, data []byte) *RtAttr {
+	return &RtAttr{
+		RtAttr: syscall.RtAttr{
 			Type: uint16(attrType),
-		***REMOVED***,
-		children: []NetlinkRequestData***REMOVED******REMOVED***,
+		},
+		children: []NetlinkRequestData{},
 		Data:     data,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Create a new RtAttr obj anc add it as a child of an existing object
-func NewRtAttrChild(parent *RtAttr, attrType int, data []byte) *RtAttr ***REMOVED***
+func NewRtAttrChild(parent *RtAttr, attrType int, data []byte) *RtAttr {
 	attr := NewRtAttr(attrType, data)
 	parent.children = append(parent.children, attr)
 	return attr
-***REMOVED***
+}
 
-func (a *RtAttr) Len() int ***REMOVED***
-	if len(a.children) == 0 ***REMOVED***
+func (a *RtAttr) Len() int {
+	if len(a.children) == 0 {
 		return (syscall.SizeofRtAttr + len(a.Data))
-	***REMOVED***
+	}
 
 	l := 0
-	for _, child := range a.children ***REMOVED***
+	for _, child := range a.children {
 		l += rtaAlignOf(child.Len())
-	***REMOVED***
+	}
 	l += syscall.SizeofRtAttr
 	return rtaAlignOf(l + len(a.Data))
-***REMOVED***
+}
 
 // Serialize the RtAttr into a byte array
 // This can't just unsafe.cast because it must iterate through children.
-func (a *RtAttr) Serialize() []byte ***REMOVED***
+func (a *RtAttr) Serialize() []byte {
 	native := NativeEndian()
 
 	length := a.Len()
 	buf := make([]byte, rtaAlignOf(length))
 
 	next := 4
-	if a.Data != nil ***REMOVED***
+	if a.Data != nil {
 		copy(buf[next:], a.Data)
 		next += rtaAlignOf(len(a.Data))
-	***REMOVED***
-	if len(a.children) > 0 ***REMOVED***
-		for _, child := range a.children ***REMOVED***
+	}
+	if len(a.children) > 0 {
+		for _, child := range a.children {
 			childBuf := child.Serialize()
 			copy(buf[next:], childBuf)
 			next += rtaAlignOf(len(childBuf))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if l := uint16(length); l != 0 ***REMOVED***
+	if l := uint16(length); l != 0 {
 		native.PutUint16(buf[0:2], l)
-	***REMOVED***
+	}
 	native.PutUint16(buf[2:4], a.Type)
 	return buf
-***REMOVED***
+}
 
-type NetlinkRequest struct ***REMOVED***
+type NetlinkRequest struct {
 	syscall.NlMsghdr
 	Data    []NetlinkRequestData
 	RawData []byte
 	Sockets map[int]*SocketHandle
-***REMOVED***
+}
 
 // Serialize the Netlink Request into a byte array
-func (req *NetlinkRequest) Serialize() []byte ***REMOVED***
+func (req *NetlinkRequest) Serialize() []byte {
 	length := syscall.SizeofNlMsghdr
 	dataBytes := make([][]byte, len(req.Data))
-	for i, data := range req.Data ***REMOVED***
+	for i, data := range req.Data {
 		dataBytes[i] = data.Serialize()
 		length = length + len(dataBytes[i])
-	***REMOVED***
+	}
 	length += len(req.RawData)
 
 	req.Len = uint32(length)
@@ -340,160 +340,160 @@ func (req *NetlinkRequest) Serialize() []byte ***REMOVED***
 	hdr := (*(*[syscall.SizeofNlMsghdr]byte)(unsafe.Pointer(req)))[:]
 	next := syscall.SizeofNlMsghdr
 	copy(b[0:next], hdr)
-	for _, data := range dataBytes ***REMOVED***
-		for _, dataByte := range data ***REMOVED***
+	for _, data := range dataBytes {
+		for _, dataByte := range data {
 			b[next] = dataByte
 			next = next + 1
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	// Add the raw data if any
-	if len(req.RawData) > 0 ***REMOVED***
+	if len(req.RawData) > 0 {
 		copy(b[next:length], req.RawData)
-	***REMOVED***
+	}
 	return b
-***REMOVED***
+}
 
-func (req *NetlinkRequest) AddData(data NetlinkRequestData) ***REMOVED***
-	if data != nil ***REMOVED***
+func (req *NetlinkRequest) AddData(data NetlinkRequestData) {
+	if data != nil {
 		req.Data = append(req.Data, data)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // AddRawData adds raw bytes to the end of the NetlinkRequest object during serialization
-func (req *NetlinkRequest) AddRawData(data []byte) ***REMOVED***
-	if data != nil ***REMOVED***
+func (req *NetlinkRequest) AddRawData(data []byte) {
+	if data != nil {
 		req.RawData = append(req.RawData, data...)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Execute the request against a the given sockType.
 // Returns a list of netlink messages in serialized format, optionally filtered
 // by resType.
-func (req *NetlinkRequest) Execute(sockType int, resType uint16) ([][]byte, error) ***REMOVED***
+func (req *NetlinkRequest) Execute(sockType int, resType uint16) ([][]byte, error) {
 	var (
 		s   *NetlinkSocket
 		err error
 	)
 
-	if req.Sockets != nil ***REMOVED***
-		if sh, ok := req.Sockets[sockType]; ok ***REMOVED***
+	if req.Sockets != nil {
+		if sh, ok := req.Sockets[sockType]; ok {
 			s = sh.Socket
 			req.Seq = atomic.AddUint32(&sh.Seq, 1)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	sharedSocket := s != nil
 
-	if s == nil ***REMOVED***
+	if s == nil {
 		s, err = getNetlinkSocket(sockType)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		defer s.Close()
-	***REMOVED*** else ***REMOVED***
+	} else {
 		s.Lock()
 		defer s.Unlock()
-	***REMOVED***
+	}
 
-	if err := s.Send(req); err != nil ***REMOVED***
+	if err := s.Send(req); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	pid, err := s.GetPid()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	var res [][]byte
 
 done:
-	for ***REMOVED***
+	for {
 		msgs, err := s.Receive()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-		for _, m := range msgs ***REMOVED***
-			if m.Header.Seq != req.Seq ***REMOVED***
-				if sharedSocket ***REMOVED***
+		}
+		for _, m := range msgs {
+			if m.Header.Seq != req.Seq {
+				if sharedSocket {
 					continue
-				***REMOVED***
+				}
 				return nil, fmt.Errorf("Wrong Seq nr %d, expected %d", m.Header.Seq, req.Seq)
-			***REMOVED***
-			if m.Header.Pid != pid ***REMOVED***
+			}
+			if m.Header.Pid != pid {
 				return nil, fmt.Errorf("Wrong pid %d, expected %d", m.Header.Pid, pid)
-			***REMOVED***
-			if m.Header.Type == syscall.NLMSG_DONE ***REMOVED***
+			}
+			if m.Header.Type == syscall.NLMSG_DONE {
 				break done
-			***REMOVED***
-			if m.Header.Type == syscall.NLMSG_ERROR ***REMOVED***
+			}
+			if m.Header.Type == syscall.NLMSG_ERROR {
 				native := NativeEndian()
 				error := int32(native.Uint32(m.Data[0:4]))
-				if error == 0 ***REMOVED***
+				if error == 0 {
 					break done
-				***REMOVED***
+				}
 				return nil, syscall.Errno(-error)
-			***REMOVED***
-			if resType != 0 && m.Header.Type != resType ***REMOVED***
+			}
+			if resType != 0 && m.Header.Type != resType {
 				continue
-			***REMOVED***
+			}
 			res = append(res, m.Data)
-			if m.Header.Flags&syscall.NLM_F_MULTI == 0 ***REMOVED***
+			if m.Header.Flags&syscall.NLM_F_MULTI == 0 {
 				break done
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return res, nil
-***REMOVED***
+}
 
 // Create a new netlink request from proto and flags
 // Note the Len value will be inaccurate once data is added until
 // the message is serialized
-func NewNetlinkRequest(proto, flags int) *NetlinkRequest ***REMOVED***
-	return &NetlinkRequest***REMOVED***
-		NlMsghdr: syscall.NlMsghdr***REMOVED***
+func NewNetlinkRequest(proto, flags int) *NetlinkRequest {
+	return &NetlinkRequest{
+		NlMsghdr: syscall.NlMsghdr{
 			Len:   uint32(syscall.SizeofNlMsghdr),
 			Type:  uint16(proto),
 			Flags: syscall.NLM_F_REQUEST | uint16(flags),
 			Seq:   atomic.AddUint32(&nextSeqNr, 1),
-		***REMOVED***,
-	***REMOVED***
-***REMOVED***
+		},
+	}
+}
 
-type NetlinkSocket struct ***REMOVED***
+type NetlinkSocket struct {
 	fd  int32
 	lsa syscall.SockaddrNetlink
 	sync.Mutex
-***REMOVED***
+}
 
-func getNetlinkSocket(protocol int) (*NetlinkSocket, error) ***REMOVED***
+func getNetlinkSocket(protocol int) (*NetlinkSocket, error) {
 	fd, err := syscall.Socket(syscall.AF_NETLINK, syscall.SOCK_RAW|syscall.SOCK_CLOEXEC, protocol)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	s := &NetlinkSocket***REMOVED***
+	}
+	s := &NetlinkSocket{
 		fd: int32(fd),
-	***REMOVED***
+	}
 	s.lsa.Family = syscall.AF_NETLINK
-	if err := syscall.Bind(fd, &s.lsa); err != nil ***REMOVED***
+	if err := syscall.Bind(fd, &s.lsa); err != nil {
 		syscall.Close(fd)
 		return nil, err
-	***REMOVED***
+	}
 
 	return s, nil
-***REMOVED***
+}
 
 // GetNetlinkSocketAt opens a netlink socket in the network namespace newNs
 // and positions the thread back into the network namespace specified by curNs,
 // when done. If curNs is close, the function derives the current namespace and
 // moves back into it when done. If newNs is close, the socket will be opened
 // in the current network namespace.
-func GetNetlinkSocketAt(newNs, curNs netns.NsHandle, protocol int) (*NetlinkSocket, error) ***REMOVED***
+func GetNetlinkSocketAt(newNs, curNs netns.NsHandle, protocol int) (*NetlinkSocket, error) {
 	c, err := executeInNetns(newNs, curNs)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	defer c()
 	return getNetlinkSocket(protocol)
-***REMOVED***
+}
 
 // executeInNetns sets execution of the code following this call to the
 // network namespace newNs, then moves the thread back to curNs if open,
@@ -501,232 +501,232 @@ func GetNetlinkSocketAt(newNs, curNs netns.NsHandle, protocol int) (*NetlinkSock
 // In case of success, the caller is expected to execute the returned function
 // at the end of the code that needs to be executed in the network namespace.
 // Example:
-// func jobAt(...) error ***REMOVED***
+// func jobAt(...) error {
 //      d, err := executeInNetns(...)
-//      if err != nil ***REMOVED*** return err***REMOVED***
+//      if err != nil { return err}
 //      defer d()
 //      < code which needs to be executed in specific netns>
-//  ***REMOVED***
+//  }
 // TODO: his function probably belongs to netns pkg.
-func executeInNetns(newNs, curNs netns.NsHandle) (func(), error) ***REMOVED***
+func executeInNetns(newNs, curNs netns.NsHandle) (func(), error) {
 	var (
 		err       error
 		moveBack  func(netns.NsHandle) error
 		closeNs   func() error
 		unlockThd func()
 	)
-	restore := func() ***REMOVED***
+	restore := func() {
 		// order matters
-		if moveBack != nil ***REMOVED***
+		if moveBack != nil {
 			moveBack(curNs)
-		***REMOVED***
-		if closeNs != nil ***REMOVED***
+		}
+		if closeNs != nil {
 			closeNs()
-		***REMOVED***
-		if unlockThd != nil ***REMOVED***
+		}
+		if unlockThd != nil {
 			unlockThd()
-		***REMOVED***
-	***REMOVED***
-	if newNs.IsOpen() ***REMOVED***
+		}
+	}
+	if newNs.IsOpen() {
 		runtime.LockOSThread()
 		unlockThd = runtime.UnlockOSThread
-		if !curNs.IsOpen() ***REMOVED***
-			if curNs, err = netns.Get(); err != nil ***REMOVED***
+		if !curNs.IsOpen() {
+			if curNs, err = netns.Get(); err != nil {
 				restore()
 				return nil, fmt.Errorf("could not get current namespace while creating netlink socket: %v", err)
-			***REMOVED***
+			}
 			closeNs = curNs.Close
-		***REMOVED***
-		if err := netns.Set(newNs); err != nil ***REMOVED***
+		}
+		if err := netns.Set(newNs); err != nil {
 			restore()
 			return nil, fmt.Errorf("failed to set into network namespace %d while creating netlink socket: %v", newNs, err)
-		***REMOVED***
+		}
 		moveBack = netns.Set
-	***REMOVED***
+	}
 	return restore, nil
-***REMOVED***
+}
 
 // Create a netlink socket with a given protocol (e.g. NETLINK_ROUTE)
 // and subscribe it to multicast groups passed in variable argument list.
 // Returns the netlink socket on which Receive() method can be called
 // to retrieve the messages from the kernel.
-func Subscribe(protocol int, groups ...uint) (*NetlinkSocket, error) ***REMOVED***
+func Subscribe(protocol int, groups ...uint) (*NetlinkSocket, error) {
 	fd, err := syscall.Socket(syscall.AF_NETLINK, syscall.SOCK_RAW, protocol)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	s := &NetlinkSocket***REMOVED***
+	}
+	s := &NetlinkSocket{
 		fd: int32(fd),
-	***REMOVED***
+	}
 	s.lsa.Family = syscall.AF_NETLINK
 
-	for _, g := range groups ***REMOVED***
+	for _, g := range groups {
 		s.lsa.Groups |= (1 << (g - 1))
-	***REMOVED***
+	}
 
-	if err := syscall.Bind(fd, &s.lsa); err != nil ***REMOVED***
+	if err := syscall.Bind(fd, &s.lsa); err != nil {
 		syscall.Close(fd)
 		return nil, err
-	***REMOVED***
+	}
 
 	return s, nil
-***REMOVED***
+}
 
 // SubscribeAt works like Subscribe plus let's the caller choose the network
 // namespace in which the socket would be opened (newNs). Then control goes back
 // to curNs if open, otherwise to the netns at the time this function was called.
-func SubscribeAt(newNs, curNs netns.NsHandle, protocol int, groups ...uint) (*NetlinkSocket, error) ***REMOVED***
+func SubscribeAt(newNs, curNs netns.NsHandle, protocol int, groups ...uint) (*NetlinkSocket, error) {
 	c, err := executeInNetns(newNs, curNs)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	defer c()
 	return Subscribe(protocol, groups...)
-***REMOVED***
+}
 
-func (s *NetlinkSocket) Close() ***REMOVED***
+func (s *NetlinkSocket) Close() {
 	fd := int(atomic.SwapInt32(&s.fd, -1))
 	syscall.Close(fd)
-***REMOVED***
+}
 
-func (s *NetlinkSocket) GetFd() int ***REMOVED***
+func (s *NetlinkSocket) GetFd() int {
 	return int(atomic.LoadInt32(&s.fd))
-***REMOVED***
+}
 
-func (s *NetlinkSocket) Send(request *NetlinkRequest) error ***REMOVED***
+func (s *NetlinkSocket) Send(request *NetlinkRequest) error {
 	fd := int(atomic.LoadInt32(&s.fd))
-	if fd < 0 ***REMOVED***
+	if fd < 0 {
 		return fmt.Errorf("Send called on a closed socket")
-	***REMOVED***
-	if err := syscall.Sendto(fd, request.Serialize(), 0, &s.lsa); err != nil ***REMOVED***
+	}
+	if err := syscall.Sendto(fd, request.Serialize(), 0, &s.lsa); err != nil {
 		return err
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (s *NetlinkSocket) Receive() ([]syscall.NetlinkMessage, error) ***REMOVED***
+func (s *NetlinkSocket) Receive() ([]syscall.NetlinkMessage, error) {
 	fd := int(atomic.LoadInt32(&s.fd))
-	if fd < 0 ***REMOVED***
+	if fd < 0 {
 		return nil, fmt.Errorf("Receive called on a closed socket")
-	***REMOVED***
+	}
 	rb := make([]byte, syscall.Getpagesize())
 	nr, _, err := syscall.Recvfrom(fd, rb, 0)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if nr < syscall.NLMSG_HDRLEN ***REMOVED***
+	}
+	if nr < syscall.NLMSG_HDRLEN {
 		return nil, fmt.Errorf("Got short response from netlink")
-	***REMOVED***
+	}
 	rb = rb[:nr]
 	return syscall.ParseNetlinkMessage(rb)
-***REMOVED***
+}
 
 // SetSendTimeout allows to set a send timeout on the socket
-func (s *NetlinkSocket) SetSendTimeout(timeout *syscall.Timeval) error ***REMOVED***
+func (s *NetlinkSocket) SetSendTimeout(timeout *syscall.Timeval) error {
 	// Set a send timeout of SOCKET_SEND_TIMEOUT, this will allow the Send to periodically unblock and avoid that a routine
 	// remains stuck on a send on a closed fd
 	return syscall.SetsockoptTimeval(int(s.fd), syscall.SOL_SOCKET, syscall.SO_SNDTIMEO, timeout)
-***REMOVED***
+}
 
 // SetReceiveTimeout allows to set a receive timeout on the socket
-func (s *NetlinkSocket) SetReceiveTimeout(timeout *syscall.Timeval) error ***REMOVED***
+func (s *NetlinkSocket) SetReceiveTimeout(timeout *syscall.Timeval) error {
 	// Set a read timeout of SOCKET_READ_TIMEOUT, this will allow the Read to periodically unblock and avoid that a routine
 	// remains stuck on a recvmsg on a closed fd
 	return syscall.SetsockoptTimeval(int(s.fd), syscall.SOL_SOCKET, syscall.SO_RCVTIMEO, timeout)
-***REMOVED***
+}
 
-func (s *NetlinkSocket) GetPid() (uint32, error) ***REMOVED***
+func (s *NetlinkSocket) GetPid() (uint32, error) {
 	fd := int(atomic.LoadInt32(&s.fd))
 	lsa, err := syscall.Getsockname(fd)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
-	switch v := lsa.(type) ***REMOVED***
+	}
+	switch v := lsa.(type) {
 	case *syscall.SockaddrNetlink:
 		return v.Pid, nil
-	***REMOVED***
+	}
 	return 0, fmt.Errorf("Wrong socket type")
-***REMOVED***
+}
 
-func ZeroTerminated(s string) []byte ***REMOVED***
+func ZeroTerminated(s string) []byte {
 	bytes := make([]byte, len(s)+1)
-	for i := 0; i < len(s); i++ ***REMOVED***
+	for i := 0; i < len(s); i++ {
 		bytes[i] = s[i]
-	***REMOVED***
+	}
 	bytes[len(s)] = 0
 	return bytes
-***REMOVED***
+}
 
-func NonZeroTerminated(s string) []byte ***REMOVED***
+func NonZeroTerminated(s string) []byte {
 	bytes := make([]byte, len(s))
-	for i := 0; i < len(s); i++ ***REMOVED***
+	for i := 0; i < len(s); i++ {
 		bytes[i] = s[i]
-	***REMOVED***
+	}
 	return bytes
-***REMOVED***
+}
 
-func BytesToString(b []byte) string ***REMOVED***
-	n := bytes.Index(b, []byte***REMOVED***0***REMOVED***)
+func BytesToString(b []byte) string {
+	n := bytes.Index(b, []byte{0})
 	return string(b[:n])
-***REMOVED***
+}
 
-func Uint8Attr(v uint8) []byte ***REMOVED***
-	return []byte***REMOVED***byte(v)***REMOVED***
-***REMOVED***
+func Uint8Attr(v uint8) []byte {
+	return []byte{byte(v)}
+}
 
-func Uint16Attr(v uint16) []byte ***REMOVED***
+func Uint16Attr(v uint16) []byte {
 	native := NativeEndian()
 	bytes := make([]byte, 2)
 	native.PutUint16(bytes, v)
 	return bytes
-***REMOVED***
+}
 
-func Uint32Attr(v uint32) []byte ***REMOVED***
+func Uint32Attr(v uint32) []byte {
 	native := NativeEndian()
 	bytes := make([]byte, 4)
 	native.PutUint32(bytes, v)
 	return bytes
-***REMOVED***
+}
 
-func Uint64Attr(v uint64) []byte ***REMOVED***
+func Uint64Attr(v uint64) []byte {
 	native := NativeEndian()
 	bytes := make([]byte, 8)
 	native.PutUint64(bytes, v)
 	return bytes
-***REMOVED***
+}
 
-func ParseRouteAttr(b []byte) ([]syscall.NetlinkRouteAttr, error) ***REMOVED***
+func ParseRouteAttr(b []byte) ([]syscall.NetlinkRouteAttr, error) {
 	var attrs []syscall.NetlinkRouteAttr
-	for len(b) >= syscall.SizeofRtAttr ***REMOVED***
+	for len(b) >= syscall.SizeofRtAttr {
 		a, vbuf, alen, err := netlinkRouteAttrAndValue(b)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-		ra := syscall.NetlinkRouteAttr***REMOVED***Attr: *a, Value: vbuf[:int(a.Len)-syscall.SizeofRtAttr]***REMOVED***
+		}
+		ra := syscall.NetlinkRouteAttr{Attr: *a, Value: vbuf[:int(a.Len)-syscall.SizeofRtAttr]}
 		attrs = append(attrs, ra)
 		b = b[alen:]
-	***REMOVED***
+	}
 	return attrs, nil
-***REMOVED***
+}
 
-func netlinkRouteAttrAndValue(b []byte) (*syscall.RtAttr, []byte, int, error) ***REMOVED***
+func netlinkRouteAttrAndValue(b []byte) (*syscall.RtAttr, []byte, int, error) {
 	a := (*syscall.RtAttr)(unsafe.Pointer(&b[0]))
-	if int(a.Len) < syscall.SizeofRtAttr || int(a.Len) > len(b) ***REMOVED***
+	if int(a.Len) < syscall.SizeofRtAttr || int(a.Len) > len(b) {
 		return nil, nil, 0, syscall.EINVAL
-	***REMOVED***
+	}
 	return a, b[syscall.SizeofRtAttr:], rtaAlignOf(int(a.Len)), nil
-***REMOVED***
+}
 
 // SocketHandle contains the netlink socket and the associated
 // sequence counter for a specific netlink family
-type SocketHandle struct ***REMOVED***
+type SocketHandle struct {
 	Seq    uint32
 	Socket *NetlinkSocket
-***REMOVED***
+}
 
 // Close closes the netlink socket
-func (sh *SocketHandle) Close() ***REMOVED***
-	if sh.Socket != nil ***REMOVED***
+func (sh *SocketHandle) Close() {
+	if sh.Socket != nil {
 		sh.Socket.Close()
-	***REMOVED***
-***REMOVED***
+	}
+}

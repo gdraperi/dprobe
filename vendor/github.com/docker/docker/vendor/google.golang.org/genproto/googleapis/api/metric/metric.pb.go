@@ -48,25 +48,25 @@ const (
 	MetricDescriptor_CUMULATIVE MetricDescriptor_MetricKind = 3
 )
 
-var MetricDescriptor_MetricKind_name = map[int32]string***REMOVED***
+var MetricDescriptor_MetricKind_name = map[int32]string{
 	0: "METRIC_KIND_UNSPECIFIED",
 	1: "GAUGE",
 	2: "DELTA",
 	3: "CUMULATIVE",
-***REMOVED***
-var MetricDescriptor_MetricKind_value = map[string]int32***REMOVED***
+}
+var MetricDescriptor_MetricKind_value = map[string]int32{
 	"METRIC_KIND_UNSPECIFIED": 0,
 	"GAUGE":                   1,
 	"DELTA":                   2,
 	"CUMULATIVE":              3,
-***REMOVED***
+}
 
-func (x MetricDescriptor_MetricKind) String() string ***REMOVED***
+func (x MetricDescriptor_MetricKind) String() string {
 	return proto.EnumName(MetricDescriptor_MetricKind_name, int32(x))
-***REMOVED***
-func (MetricDescriptor_MetricKind) EnumDescriptor() ([]byte, []int) ***REMOVED***
-	return fileDescriptor0, []int***REMOVED***0, 0***REMOVED***
-***REMOVED***
+}
+func (MetricDescriptor_MetricKind) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor0, []int{0, 0}
+}
 
 // The value type of a metric.
 type MetricDescriptor_ValueType int32
@@ -90,7 +90,7 @@ const (
 	MetricDescriptor_MONEY MetricDescriptor_ValueType = 6
 )
 
-var MetricDescriptor_ValueType_name = map[int32]string***REMOVED***
+var MetricDescriptor_ValueType_name = map[int32]string{
 	0: "VALUE_TYPE_UNSPECIFIED",
 	1: "BOOL",
 	2: "INT64",
@@ -98,8 +98,8 @@ var MetricDescriptor_ValueType_name = map[int32]string***REMOVED***
 	4: "STRING",
 	5: "DISTRIBUTION",
 	6: "MONEY",
-***REMOVED***
-var MetricDescriptor_ValueType_value = map[string]int32***REMOVED***
+}
+var MetricDescriptor_ValueType_value = map[string]int32{
 	"VALUE_TYPE_UNSPECIFIED": 0,
 	"BOOL":         1,
 	"INT64":        2,
@@ -107,19 +107,19 @@ var MetricDescriptor_ValueType_value = map[string]int32***REMOVED***
 	"STRING":       4,
 	"DISTRIBUTION": 5,
 	"MONEY":        6,
-***REMOVED***
+}
 
-func (x MetricDescriptor_ValueType) String() string ***REMOVED***
+func (x MetricDescriptor_ValueType) String() string {
 	return proto.EnumName(MetricDescriptor_ValueType_name, int32(x))
-***REMOVED***
-func (MetricDescriptor_ValueType) EnumDescriptor() ([]byte, []int) ***REMOVED***
-	return fileDescriptor0, []int***REMOVED***0, 1***REMOVED***
-***REMOVED***
+}
+func (MetricDescriptor_ValueType) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor0, []int{0, 1}
+}
 
 // Defines a metric type and its schema. Once a metric descriptor is created,
 // deleting or altering it stops data collection and makes the metric type's
 // existing data unusable.
-type MetricDescriptor struct ***REMOVED***
+type MetricDescriptor struct {
 	// The resource name of the metric descriptor. Depending on the
 	// implementation, the name typically includes: (1) the parent resource name
 	// that defines the scope of the metric type or of its data; and (2) the
@@ -198,131 +198,131 @@ type MetricDescriptor struct ***REMOVED***
 	//
 	// The grammar for a unit is as follows:
 	//
-	//     Expression = Component ***REMOVED*** "." Component ***REMOVED*** ***REMOVED*** "/" Component ***REMOVED*** ;
+	//     Expression = Component { "." Component } { "/" Component } ;
 	//
 	//     Component = [ PREFIX ] UNIT [ Annotation ]
 	//               | Annotation
 	//               | "1"
 	//               ;
 	//
-	//     Annotation = "***REMOVED***" NAME "***REMOVED***" ;
+	//     Annotation = "{" NAME "}" ;
 	//
 	// Notes:
 	//
 	// * `Annotation` is just a comment if it follows a `UNIT` and is
 	//    equivalent to `1` if it is used alone. For examples,
-	//    `***REMOVED***requests***REMOVED***/s == 1/s`, `By***REMOVED***transmitted***REMOVED***/s == By/s`.
+	//    `{requests}/s == 1/s`, `By{transmitted}/s == By/s`.
 	// * `NAME` is a sequence of non-blank printable ASCII characters not
-	//    containing '***REMOVED***' or '***REMOVED***'.
+	//    containing '{' or '}'.
 	Unit string `protobuf:"bytes,5,opt,name=unit" json:"unit,omitempty"`
 	// A detailed description of the metric, which can be used in documentation.
 	Description string `protobuf:"bytes,6,opt,name=description" json:"description,omitempty"`
 	// A concise name for the metric, which can be displayed in user interfaces.
 	// Use sentence case without an ending period, for example "Request count".
 	DisplayName string `protobuf:"bytes,7,opt,name=display_name,json=displayName" json:"display_name,omitempty"`
-***REMOVED***
+}
 
-func (m *MetricDescriptor) Reset()                    ***REMOVED*** *m = MetricDescriptor***REMOVED******REMOVED*** ***REMOVED***
-func (m *MetricDescriptor) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*MetricDescriptor) ProtoMessage()               ***REMOVED******REMOVED***
-func (*MetricDescriptor) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***0***REMOVED*** ***REMOVED***
+func (m *MetricDescriptor) Reset()                    { *m = MetricDescriptor{} }
+func (m *MetricDescriptor) String() string            { return proto.CompactTextString(m) }
+func (*MetricDescriptor) ProtoMessage()               {}
+func (*MetricDescriptor) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
-func (m *MetricDescriptor) GetName() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *MetricDescriptor) GetName() string {
+	if m != nil {
 		return m.Name
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *MetricDescriptor) GetType() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *MetricDescriptor) GetType() string {
+	if m != nil {
 		return m.Type
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *MetricDescriptor) GetLabels() []*google_api.LabelDescriptor ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *MetricDescriptor) GetLabels() []*google_api.LabelDescriptor {
+	if m != nil {
 		return m.Labels
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *MetricDescriptor) GetMetricKind() MetricDescriptor_MetricKind ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *MetricDescriptor) GetMetricKind() MetricDescriptor_MetricKind {
+	if m != nil {
 		return m.MetricKind
-	***REMOVED***
+	}
 	return MetricDescriptor_METRIC_KIND_UNSPECIFIED
-***REMOVED***
+}
 
-func (m *MetricDescriptor) GetValueType() MetricDescriptor_ValueType ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *MetricDescriptor) GetValueType() MetricDescriptor_ValueType {
+	if m != nil {
 		return m.ValueType
-	***REMOVED***
+	}
 	return MetricDescriptor_VALUE_TYPE_UNSPECIFIED
-***REMOVED***
+}
 
-func (m *MetricDescriptor) GetUnit() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *MetricDescriptor) GetUnit() string {
+	if m != nil {
 		return m.Unit
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *MetricDescriptor) GetDescription() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *MetricDescriptor) GetDescription() string {
+	if m != nil {
 		return m.Description
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *MetricDescriptor) GetDisplayName() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *MetricDescriptor) GetDisplayName() string {
+	if m != nil {
 		return m.DisplayName
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
 // A specific metric, identified by specifying values for all of the
 // labels of a [`MetricDescriptor`][google.api.MetricDescriptor].
-type Metric struct ***REMOVED***
+type Metric struct {
 	// An existing metric type, see [google.api.MetricDescriptor][google.api.MetricDescriptor].
 	// For example, `custom.googleapis.com/invoice/paid/amount`.
 	Type string `protobuf:"bytes,3,opt,name=type" json:"type,omitempty"`
 	// The set of label values that uniquely identify this metric. All
 	// labels listed in the `MetricDescriptor` must be assigned values.
 	Labels map[string]string `protobuf:"bytes,2,rep,name=labels" json:"labels,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-***REMOVED***
+}
 
-func (m *Metric) Reset()                    ***REMOVED*** *m = Metric***REMOVED******REMOVED*** ***REMOVED***
-func (m *Metric) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*Metric) ProtoMessage()               ***REMOVED******REMOVED***
-func (*Metric) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***1***REMOVED*** ***REMOVED***
+func (m *Metric) Reset()                    { *m = Metric{} }
+func (m *Metric) String() string            { return proto.CompactTextString(m) }
+func (*Metric) ProtoMessage()               {}
+func (*Metric) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
 
-func (m *Metric) GetType() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Metric) GetType() string {
+	if m != nil {
 		return m.Type
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *Metric) GetLabels() map[string]string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Metric) GetLabels() map[string]string {
+	if m != nil {
 		return m.Labels
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*MetricDescriptor)(nil), "google.api.MetricDescriptor")
 	proto.RegisterType((*Metric)(nil), "google.api.Metric")
 	proto.RegisterEnum("google.api.MetricDescriptor_MetricKind", MetricDescriptor_MetricKind_name, MetricDescriptor_MetricKind_value)
 	proto.RegisterEnum("google.api.MetricDescriptor_ValueType", MetricDescriptor_ValueType_name, MetricDescriptor_ValueType_value)
-***REMOVED***
+}
 
-func init() ***REMOVED*** proto.RegisterFile("google/api/metric.proto", fileDescriptor0) ***REMOVED***
+func init() { proto.RegisterFile("google/api/metric.proto", fileDescriptor0) }
 
-var fileDescriptor0 = []byte***REMOVED***
+var fileDescriptor0 = []byte{
 	// 506 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x7c, 0x53, 0x4d, 0x6f, 0xda, 0x40,
 	0x10, 0xad, 0x3f, 0x70, 0xc3, 0x10, 0xa1, 0xd5, 0xaa, 0x4a, 0x2c, 0x22, 0x55, 0x94, 0x43, 0xcb,
@@ -356,4 +356,4 @@ var fileDescriptor0 = []byte***REMOVED***
 	0x15, 0xd1, 0x38, 0xa2, 0x29, 0x8f, 0xfb, 0x58, 0x94, 0xc2, 0x3c, 0xde, 0x35, 0x3e, 0x97, 0x6f,
 	0xe2, 0xe7, 0xaf, 0xac, 0xce, 0x27, 0x4b, 0xf3, 0x5e, 0xe3, 0xd2, 0xab, 0x7f, 0x01, 0x00, 0x00,
 	0xff, 0xff, 0x18, 0x04, 0x05, 0x82, 0x58, 0x03, 0x00, 0x00,
-***REMOVED***
+}

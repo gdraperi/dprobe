@@ -11,28 +11,28 @@ var (
 	maxTime time.Time
 )
 
-func init() ***REMOVED***
-	if unsafe.Sizeof(syscall.Timespec***REMOVED******REMOVED***.Nsec) == 8 ***REMOVED***
+func init() {
+	if unsafe.Sizeof(syscall.Timespec{}.Nsec) == 8 {
 		// This is a 64 bit timespec
 		// os.Chtimes limits time to the following
 		maxTime = time.Unix(0, 1<<63-1)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		// This is a 32 bit timespec
 		maxTime = time.Unix(1<<31-1, 0)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func boundTime(t time.Time) time.Time ***REMOVED***
-	if t.Before(minTime) || t.After(maxTime) ***REMOVED***
+func boundTime(t time.Time) time.Time {
+	if t.Before(minTime) || t.After(maxTime) {
 		return minTime
-	***REMOVED***
+	}
 
 	return t
-***REMOVED***
+}
 
-func latestTime(t1, t2 time.Time) time.Time ***REMOVED***
-	if t1.Before(t2) ***REMOVED***
+func latestTime(t1, t2 time.Time) time.Time {
+	if t1.Before(t2) {
 		return t2
-	***REMOVED***
+	}
 	return t1
-***REMOVED***
+}

@@ -12,23 +12,23 @@ import (
 
 const defaultSocketGroup = "docker"
 
-func lookupGID(name string) (int, error) ***REMOVED***
+func lookupGID(name string) (int, error) {
 	groupFile, err := user.GetGroupPath()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return -1, errors.Wrap(err, "error looking up groups")
-	***REMOVED***
-	groups, err := user.ParseGroupFileFilter(groupFile, func(g user.Group) bool ***REMOVED***
+	}
+	groups, err := user.ParseGroupFileFilter(groupFile, func(g user.Group) bool {
 		return g.Name == name || strconv.Itoa(g.Gid) == name
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		return -1, errors.Wrapf(err, "error parsing groups for %s", name)
-	***REMOVED***
-	if len(groups) > 0 ***REMOVED***
+	}
+	if len(groups) > 0 {
 		return groups[0].Gid, nil
-	***REMOVED***
+	}
 	gid, err := strconv.Atoi(name)
-	if err == nil ***REMOVED***
+	if err == nil {
 		return gid, nil
-	***REMOVED***
+	}
 	return -1, fmt.Errorf("group %s not found", name)
-***REMOVED***
+}

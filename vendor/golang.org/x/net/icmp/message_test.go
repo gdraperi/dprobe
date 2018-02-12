@@ -15,120 +15,120 @@ import (
 	"golang.org/x/net/ipv6"
 )
 
-var marshalAndParseMessageForIPv4Tests = []icmp.Message***REMOVED***
-	***REMOVED***
+var marshalAndParseMessageForIPv4Tests = []icmp.Message{
+	{
 		Type: ipv4.ICMPTypeDestinationUnreachable, Code: 15,
-		Body: &icmp.DstUnreach***REMOVED***
+		Body: &icmp.DstUnreach{
 			Data: []byte("ERROR-INVOKING-PACKET"),
-		***REMOVED***,
-	***REMOVED***,
-	***REMOVED***
+		},
+	},
+	{
 		Type: ipv4.ICMPTypeTimeExceeded, Code: 1,
-		Body: &icmp.TimeExceeded***REMOVED***
+		Body: &icmp.TimeExceeded{
 			Data: []byte("ERROR-INVOKING-PACKET"),
-		***REMOVED***,
-	***REMOVED***,
-	***REMOVED***
+		},
+	},
+	{
 		Type: ipv4.ICMPTypeParameterProblem, Code: 2,
-		Body: &icmp.ParamProb***REMOVED***
+		Body: &icmp.ParamProb{
 			Pointer: 8,
 			Data:    []byte("ERROR-INVOKING-PACKET"),
-		***REMOVED***,
-	***REMOVED***,
-	***REMOVED***
+		},
+	},
+	{
 		Type: ipv4.ICMPTypeEcho, Code: 0,
-		Body: &icmp.Echo***REMOVED***
+		Body: &icmp.Echo{
 			ID: 1, Seq: 2,
 			Data: []byte("HELLO-R-U-THERE"),
-		***REMOVED***,
-	***REMOVED***,
-	***REMOVED***
+		},
+	},
+	{
 		Type: ipv4.ICMPTypePhoturis,
-		Body: &icmp.DefaultMessageBody***REMOVED***
-			Data: []byte***REMOVED***0x80, 0x40, 0x20, 0x10***REMOVED***,
-		***REMOVED***,
-	***REMOVED***,
-***REMOVED***
+		Body: &icmp.DefaultMessageBody{
+			Data: []byte{0x80, 0x40, 0x20, 0x10},
+		},
+	},
+}
 
-func TestMarshalAndParseMessageForIPv4(t *testing.T) ***REMOVED***
-	for i, tt := range marshalAndParseMessageForIPv4Tests ***REMOVED***
+func TestMarshalAndParseMessageForIPv4(t *testing.T) {
+	for i, tt := range marshalAndParseMessageForIPv4Tests {
 		b, err := tt.Marshal(nil)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
+		}
 		m, err := icmp.ParseMessage(iana.ProtocolICMP, b)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
-		if m.Type != tt.Type || m.Code != tt.Code ***REMOVED***
+		}
+		if m.Type != tt.Type || m.Code != tt.Code {
 			t.Errorf("#%v: got %v; want %v", i, m, &tt)
-		***REMOVED***
-		if !reflect.DeepEqual(m.Body, tt.Body) ***REMOVED***
+		}
+		if !reflect.DeepEqual(m.Body, tt.Body) {
 			t.Errorf("#%v: got %v; want %v", i, m.Body, tt.Body)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-var marshalAndParseMessageForIPv6Tests = []icmp.Message***REMOVED***
-	***REMOVED***
+var marshalAndParseMessageForIPv6Tests = []icmp.Message{
+	{
 		Type: ipv6.ICMPTypeDestinationUnreachable, Code: 6,
-		Body: &icmp.DstUnreach***REMOVED***
+		Body: &icmp.DstUnreach{
 			Data: []byte("ERROR-INVOKING-PACKET"),
-		***REMOVED***,
-	***REMOVED***,
-	***REMOVED***
+		},
+	},
+	{
 		Type: ipv6.ICMPTypePacketTooBig, Code: 0,
-		Body: &icmp.PacketTooBig***REMOVED***
+		Body: &icmp.PacketTooBig{
 			MTU:  1<<16 - 1,
 			Data: []byte("ERROR-INVOKING-PACKET"),
-		***REMOVED***,
-	***REMOVED***,
-	***REMOVED***
+		},
+	},
+	{
 		Type: ipv6.ICMPTypeTimeExceeded, Code: 1,
-		Body: &icmp.TimeExceeded***REMOVED***
+		Body: &icmp.TimeExceeded{
 			Data: []byte("ERROR-INVOKING-PACKET"),
-		***REMOVED***,
-	***REMOVED***,
-	***REMOVED***
+		},
+	},
+	{
 		Type: ipv6.ICMPTypeParameterProblem, Code: 2,
-		Body: &icmp.ParamProb***REMOVED***
+		Body: &icmp.ParamProb{
 			Pointer: 8,
 			Data:    []byte("ERROR-INVOKING-PACKET"),
-		***REMOVED***,
-	***REMOVED***,
-	***REMOVED***
+		},
+	},
+	{
 		Type: ipv6.ICMPTypeEchoRequest, Code: 0,
-		Body: &icmp.Echo***REMOVED***
+		Body: &icmp.Echo{
 			ID: 1, Seq: 2,
 			Data: []byte("HELLO-R-U-THERE"),
-		***REMOVED***,
-	***REMOVED***,
-	***REMOVED***
+		},
+	},
+	{
 		Type: ipv6.ICMPTypeDuplicateAddressConfirmation,
-		Body: &icmp.DefaultMessageBody***REMOVED***
-			Data: []byte***REMOVED***0x80, 0x40, 0x20, 0x10***REMOVED***,
-		***REMOVED***,
-	***REMOVED***,
-***REMOVED***
+		Body: &icmp.DefaultMessageBody{
+			Data: []byte{0x80, 0x40, 0x20, 0x10},
+		},
+	},
+}
 
-func TestMarshalAndParseMessageForIPv6(t *testing.T) ***REMOVED***
+func TestMarshalAndParseMessageForIPv6(t *testing.T) {
 	pshicmp := icmp.IPv6PseudoHeader(net.ParseIP("fe80::1"), net.ParseIP("ff02::1"))
-	for i, tt := range marshalAndParseMessageForIPv6Tests ***REMOVED***
-		for _, psh := range [][]byte***REMOVED***pshicmp, nil***REMOVED*** ***REMOVED***
+	for i, tt := range marshalAndParseMessageForIPv6Tests {
+		for _, psh := range [][]byte{pshicmp, nil} {
 			b, err := tt.Marshal(psh)
-			if err != nil ***REMOVED***
+			if err != nil {
 				t.Fatal(err)
-			***REMOVED***
+			}
 			m, err := icmp.ParseMessage(iana.ProtocolIPv6ICMP, b)
-			if err != nil ***REMOVED***
+			if err != nil {
 				t.Fatal(err)
-			***REMOVED***
-			if m.Type != tt.Type || m.Code != tt.Code ***REMOVED***
+			}
+			if m.Type != tt.Type || m.Code != tt.Code {
 				t.Errorf("#%v: got %v; want %v", i, m, &tt)
-			***REMOVED***
-			if !reflect.DeepEqual(m.Body, tt.Body) ***REMOVED***
+			}
+			if !reflect.DeepEqual(m.Body, tt.Body) {
 				t.Errorf("#%v: got %v; want %v", i, m.Body, tt.Body)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}

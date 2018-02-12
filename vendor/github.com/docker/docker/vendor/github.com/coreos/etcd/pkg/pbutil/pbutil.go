@@ -21,40 +21,40 @@ var (
 	plog = capnslog.NewPackageLogger("github.com/coreos/etcd", "pkg/pbutil")
 )
 
-type Marshaler interface ***REMOVED***
+type Marshaler interface {
 	Marshal() (data []byte, err error)
-***REMOVED***
+}
 
-type Unmarshaler interface ***REMOVED***
+type Unmarshaler interface {
 	Unmarshal(data []byte) error
-***REMOVED***
+}
 
-func MustMarshal(m Marshaler) []byte ***REMOVED***
+func MustMarshal(m Marshaler) []byte {
 	d, err := m.Marshal()
-	if err != nil ***REMOVED***
+	if err != nil {
 		plog.Panicf("marshal should never fail (%v)", err)
-	***REMOVED***
+	}
 	return d
-***REMOVED***
+}
 
-func MustUnmarshal(um Unmarshaler, data []byte) ***REMOVED***
-	if err := um.Unmarshal(data); err != nil ***REMOVED***
+func MustUnmarshal(um Unmarshaler, data []byte) {
+	if err := um.Unmarshal(data); err != nil {
 		plog.Panicf("unmarshal should never fail (%v)", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func MaybeUnmarshal(um Unmarshaler, data []byte) bool ***REMOVED***
-	if err := um.Unmarshal(data); err != nil ***REMOVED***
+func MaybeUnmarshal(um Unmarshaler, data []byte) bool {
+	if err := um.Unmarshal(data); err != nil {
 		return false
-	***REMOVED***
+	}
 	return true
-***REMOVED***
+}
 
-func GetBool(v *bool) (vv bool, set bool) ***REMOVED***
-	if v == nil ***REMOVED***
+func GetBool(v *bool) (vv bool, set bool) {
+	if v == nil {
 		return false, false
-	***REMOVED***
+	}
 	return *v, true
-***REMOVED***
+}
 
-func Boolp(b bool) *bool ***REMOVED*** return &b ***REMOVED***
+func Boolp(b bool) *bool { return &b }

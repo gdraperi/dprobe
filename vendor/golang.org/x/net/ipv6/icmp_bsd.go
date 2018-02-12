@@ -6,24 +6,24 @@
 
 package ipv6
 
-func (f *icmpv6Filter) accept(typ ICMPType) ***REMOVED***
+func (f *icmpv6Filter) accept(typ ICMPType) {
 	f.Filt[typ>>5] |= 1 << (uint32(typ) & 31)
-***REMOVED***
+}
 
-func (f *icmpv6Filter) block(typ ICMPType) ***REMOVED***
+func (f *icmpv6Filter) block(typ ICMPType) {
 	f.Filt[typ>>5] &^= 1 << (uint32(typ) & 31)
-***REMOVED***
+}
 
-func (f *icmpv6Filter) setAll(block bool) ***REMOVED***
-	for i := range f.Filt ***REMOVED***
-		if block ***REMOVED***
+func (f *icmpv6Filter) setAll(block bool) {
+	for i := range f.Filt {
+		if block {
 			f.Filt[i] = 0
-		***REMOVED*** else ***REMOVED***
+		} else {
 			f.Filt[i] = 1<<32 - 1
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (f *icmpv6Filter) willBlock(typ ICMPType) bool ***REMOVED***
+func (f *icmpv6Filter) willBlock(typ ICMPType) bool {
 	return f.Filt[typ>>5]&(1<<(uint32(typ)&31)) == 0
-***REMOVED***
+}

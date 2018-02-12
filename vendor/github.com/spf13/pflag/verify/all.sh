@@ -4,22 +4,22 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-ROOT=$(dirname "$***REMOVED***BASH_SOURCE***REMOVED***")/..
+ROOT=$(dirname "${BASH_SOURCE}")/..
 
 # Some useful colors.
-if [[ -z "$***REMOVED***color_start-***REMOVED***" ]]; then
+if [[ -z "${color_start-}" ]]; then
   declare -r color_start="\033["
-  declare -r color_red="$***REMOVED***color_start***REMOVED***0;31m"
-  declare -r color_yellow="$***REMOVED***color_start***REMOVED***0;33m"
-  declare -r color_green="$***REMOVED***color_start***REMOVED***0;32m"
-  declare -r color_norm="$***REMOVED***color_start***REMOVED***0m"
+  declare -r color_red="${color_start}0;31m"
+  declare -r color_yellow="${color_start}0;33m"
+  declare -r color_green="${color_start}0;32m"
+  declare -r color_norm="${color_start}0m"
 fi
 
 SILENT=true
 
-function is-excluded ***REMOVED***
+function is-excluded {
   for e in $EXCLUDE; do
-    if [[ $1 -ef $***REMOVED***BASH_SOURCE***REMOVED*** ]]; then
+    if [[ $1 -ef ${BASH_SOURCE} ]]; then
       return
     fi
     if [[ $1 -ef "$ROOT/hack/$e" ]]; then
@@ -27,7 +27,7 @@ function is-excluded ***REMOVED***
     fi
   done
   return 1
-***REMOVED***
+}
 
 while getopts ":v" opt; do
   case $opt in
@@ -57,9 +57,9 @@ do
   if $SILENT ; then
     echo -e "Verifying $t"
     if bash "$t" &> /dev/null; then
-      echo -e "$***REMOVED***color_green***REMOVED***SUCCESS$***REMOVED***color_norm***REMOVED***"
+      echo -e "${color_green}SUCCESS${color_norm}"
     else
-      echo -e "$***REMOVED***color_red***REMOVED***FAILED$***REMOVED***color_norm***REMOVED***"
+      echo -e "${color_red}FAILED${color_norm}"
       ret=1
     fi
   else

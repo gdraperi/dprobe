@@ -2,6 +2,6 @@ package fileutils
 
 // GetTotalUsedFds Returns the number of used File Descriptors. Not supported
 // on Windows.
-func GetTotalUsedFds() int ***REMOVED***
+func GetTotalUsedFds() int {
 	return -1
-***REMOVED***
+}

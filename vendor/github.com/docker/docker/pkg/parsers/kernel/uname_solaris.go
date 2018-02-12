@@ -4,11 +4,11 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-func uname() (*unix.Utsname, error) ***REMOVED***
-	uts := &unix.Utsname***REMOVED******REMOVED***
+func uname() (*unix.Utsname, error) {
+	uts := &unix.Utsname{}
 
-	if err := unix.Uname(uts); err != nil ***REMOVED***
+	if err := unix.Uname(uts); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return uts, nil
-***REMOVED***
+}

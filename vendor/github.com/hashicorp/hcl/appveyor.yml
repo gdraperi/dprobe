@@ -1,4 +1,4 @@
-version: "build-***REMOVED***branch***REMOVED***-***REMOVED***build***REMOVED***"
+version: "build-{branch}-{build}"
 image: Visual Studio 2015
 clone_folder: c:\gopath\src\github.com\hashicorp\hcl
 environment:

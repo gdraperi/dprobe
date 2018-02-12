@@ -9,205 +9,205 @@ import (
 )
 
 // Just to make life easier
-func newPortNoError(proto, port string) nat.Port ***REMOVED***
+func newPortNoError(proto, port string) nat.Port {
 	p, _ := nat.NewPort(proto, port)
 	return p
-***REMOVED***
+}
 
-func TestLinkNaming(t *testing.T) ***REMOVED***
+func TestLinkNaming(t *testing.T) {
 	ports := make(nat.PortSet)
-	ports[newPortNoError("tcp", "6379")] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
+	ports[newPortNoError("tcp", "6379")] = struct{}{}
 
 	link := NewLink("172.0.17.3", "172.0.17.2", "/db/docker-1", nil, ports)
 
 	rawEnv := link.ToEnv()
 	env := make(map[string]string, len(rawEnv))
-	for _, e := range rawEnv ***REMOVED***
+	for _, e := range rawEnv {
 		parts := strings.Split(e, "=")
-		if len(parts) != 2 ***REMOVED***
+		if len(parts) != 2 {
 			t.FailNow()
-		***REMOVED***
+		}
 		env[parts[0]] = parts[1]
-	***REMOVED***
+	}
 
 	value, ok := env["DOCKER_1_PORT"]
 
-	if !ok ***REMOVED***
+	if !ok {
 		t.Fatal("DOCKER_1_PORT not found in env")
-	***REMOVED***
+	}
 
-	if value != "tcp://172.0.17.2:6379" ***REMOVED***
+	if value != "tcp://172.0.17.2:6379" {
 		t.Fatalf("Expected 172.0.17.2:6379, got %s", env["DOCKER_1_PORT"])
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestLinkNew(t *testing.T) ***REMOVED***
+func TestLinkNew(t *testing.T) {
 	ports := make(nat.PortSet)
-	ports[newPortNoError("tcp", "6379")] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
+	ports[newPortNoError("tcp", "6379")] = struct{}{}
 
 	link := NewLink("172.0.17.3", "172.0.17.2", "/db/docker", nil, ports)
 
-	if link.Name != "/db/docker" ***REMOVED***
+	if link.Name != "/db/docker" {
 		t.Fail()
-	***REMOVED***
-	if link.ParentIP != "172.0.17.3" ***REMOVED***
+	}
+	if link.ParentIP != "172.0.17.3" {
 		t.Fail()
-	***REMOVED***
-	if link.ChildIP != "172.0.17.2" ***REMOVED***
+	}
+	if link.ChildIP != "172.0.17.2" {
 		t.Fail()
-	***REMOVED***
-	for _, p := range link.Ports ***REMOVED***
-		if p != newPortNoError("tcp", "6379") ***REMOVED***
+	}
+	for _, p := range link.Ports {
+		if p != newPortNoError("tcp", "6379") {
 			t.Fail()
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestLinkEnv(t *testing.T) ***REMOVED***
+func TestLinkEnv(t *testing.T) {
 	ports := make(nat.PortSet)
-	ports[newPortNoError("tcp", "6379")] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
+	ports[newPortNoError("tcp", "6379")] = struct{}{}
 
-	link := NewLink("172.0.17.3", "172.0.17.2", "/db/docker", []string***REMOVED***"PASSWORD=gordon"***REMOVED***, ports)
+	link := NewLink("172.0.17.3", "172.0.17.2", "/db/docker", []string{"PASSWORD=gordon"}, ports)
 
 	rawEnv := link.ToEnv()
 	env := make(map[string]string, len(rawEnv))
-	for _, e := range rawEnv ***REMOVED***
+	for _, e := range rawEnv {
 		parts := strings.Split(e, "=")
-		if len(parts) != 2 ***REMOVED***
+		if len(parts) != 2 {
 			t.FailNow()
-		***REMOVED***
+		}
 		env[parts[0]] = parts[1]
-	***REMOVED***
-	if env["DOCKER_PORT"] != "tcp://172.0.17.2:6379" ***REMOVED***
+	}
+	if env["DOCKER_PORT"] != "tcp://172.0.17.2:6379" {
 		t.Fatalf("Expected 172.0.17.2:6379, got %s", env["DOCKER_PORT"])
-	***REMOVED***
-	if env["DOCKER_PORT_6379_TCP"] != "tcp://172.0.17.2:6379" ***REMOVED***
+	}
+	if env["DOCKER_PORT_6379_TCP"] != "tcp://172.0.17.2:6379" {
 		t.Fatalf("Expected tcp://172.0.17.2:6379, got %s", env["DOCKER_PORT_6379_TCP"])
-	***REMOVED***
-	if env["DOCKER_PORT_6379_TCP_PROTO"] != "tcp" ***REMOVED***
+	}
+	if env["DOCKER_PORT_6379_TCP_PROTO"] != "tcp" {
 		t.Fatalf("Expected tcp, got %s", env["DOCKER_PORT_6379_TCP_PROTO"])
-	***REMOVED***
-	if env["DOCKER_PORT_6379_TCP_ADDR"] != "172.0.17.2" ***REMOVED***
+	}
+	if env["DOCKER_PORT_6379_TCP_ADDR"] != "172.0.17.2" {
 		t.Fatalf("Expected 172.0.17.2, got %s", env["DOCKER_PORT_6379_TCP_ADDR"])
-	***REMOVED***
-	if env["DOCKER_PORT_6379_TCP_PORT"] != "6379" ***REMOVED***
+	}
+	if env["DOCKER_PORT_6379_TCP_PORT"] != "6379" {
 		t.Fatalf("Expected 6379, got %s", env["DOCKER_PORT_6379_TCP_PORT"])
-	***REMOVED***
-	if env["DOCKER_NAME"] != "/db/docker" ***REMOVED***
+	}
+	if env["DOCKER_NAME"] != "/db/docker" {
 		t.Fatalf("Expected /db/docker, got %s", env["DOCKER_NAME"])
-	***REMOVED***
-	if env["DOCKER_ENV_PASSWORD"] != "gordon" ***REMOVED***
+	}
+	if env["DOCKER_ENV_PASSWORD"] != "gordon" {
 		t.Fatalf("Expected gordon, got %s", env["DOCKER_ENV_PASSWORD"])
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestLinkMultipleEnv(t *testing.T) ***REMOVED***
+func TestLinkMultipleEnv(t *testing.T) {
 	ports := make(nat.PortSet)
-	ports[newPortNoError("tcp", "6379")] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	ports[newPortNoError("tcp", "6380")] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	ports[newPortNoError("tcp", "6381")] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
+	ports[newPortNoError("tcp", "6379")] = struct{}{}
+	ports[newPortNoError("tcp", "6380")] = struct{}{}
+	ports[newPortNoError("tcp", "6381")] = struct{}{}
 
-	link := NewLink("172.0.17.3", "172.0.17.2", "/db/docker", []string***REMOVED***"PASSWORD=gordon"***REMOVED***, ports)
+	link := NewLink("172.0.17.3", "172.0.17.2", "/db/docker", []string{"PASSWORD=gordon"}, ports)
 
 	rawEnv := link.ToEnv()
 	env := make(map[string]string, len(rawEnv))
-	for _, e := range rawEnv ***REMOVED***
+	for _, e := range rawEnv {
 		parts := strings.Split(e, "=")
-		if len(parts) != 2 ***REMOVED***
+		if len(parts) != 2 {
 			t.FailNow()
-		***REMOVED***
+		}
 		env[parts[0]] = parts[1]
-	***REMOVED***
-	if env["DOCKER_PORT"] != "tcp://172.0.17.2:6379" ***REMOVED***
+	}
+	if env["DOCKER_PORT"] != "tcp://172.0.17.2:6379" {
 		t.Fatalf("Expected 172.0.17.2:6379, got %s", env["DOCKER_PORT"])
-	***REMOVED***
-	if env["DOCKER_PORT_6379_TCP_START"] != "tcp://172.0.17.2:6379" ***REMOVED***
+	}
+	if env["DOCKER_PORT_6379_TCP_START"] != "tcp://172.0.17.2:6379" {
 		t.Fatalf("Expected tcp://172.0.17.2:6379, got %s", env["DOCKER_PORT_6379_TCP_START"])
-	***REMOVED***
-	if env["DOCKER_PORT_6379_TCP_END"] != "tcp://172.0.17.2:6381" ***REMOVED***
+	}
+	if env["DOCKER_PORT_6379_TCP_END"] != "tcp://172.0.17.2:6381" {
 		t.Fatalf("Expected tcp://172.0.17.2:6381, got %s", env["DOCKER_PORT_6379_TCP_END"])
-	***REMOVED***
-	if env["DOCKER_PORT_6379_TCP_PROTO"] != "tcp" ***REMOVED***
+	}
+	if env["DOCKER_PORT_6379_TCP_PROTO"] != "tcp" {
 		t.Fatalf("Expected tcp, got %s", env["DOCKER_PORT_6379_TCP_PROTO"])
-	***REMOVED***
-	if env["DOCKER_PORT_6379_TCP_ADDR"] != "172.0.17.2" ***REMOVED***
+	}
+	if env["DOCKER_PORT_6379_TCP_ADDR"] != "172.0.17.2" {
 		t.Fatalf("Expected 172.0.17.2, got %s", env["DOCKER_PORT_6379_TCP_ADDR"])
-	***REMOVED***
-	if env["DOCKER_PORT_6379_TCP_PORT_START"] != "6379" ***REMOVED***
+	}
+	if env["DOCKER_PORT_6379_TCP_PORT_START"] != "6379" {
 		t.Fatalf("Expected 6379, got %s", env["DOCKER_PORT_6379_TCP_PORT_START"])
-	***REMOVED***
-	if env["DOCKER_PORT_6379_TCP_PORT_END"] != "6381" ***REMOVED***
+	}
+	if env["DOCKER_PORT_6379_TCP_PORT_END"] != "6381" {
 		t.Fatalf("Expected 6381, got %s", env["DOCKER_PORT_6379_TCP_PORT_END"])
-	***REMOVED***
-	if env["DOCKER_NAME"] != "/db/docker" ***REMOVED***
+	}
+	if env["DOCKER_NAME"] != "/db/docker" {
 		t.Fatalf("Expected /db/docker, got %s", env["DOCKER_NAME"])
-	***REMOVED***
-	if env["DOCKER_ENV_PASSWORD"] != "gordon" ***REMOVED***
+	}
+	if env["DOCKER_ENV_PASSWORD"] != "gordon" {
 		t.Fatalf("Expected gordon, got %s", env["DOCKER_ENV_PASSWORD"])
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestLinkPortRangeEnv(t *testing.T) ***REMOVED***
+func TestLinkPortRangeEnv(t *testing.T) {
 	ports := make(nat.PortSet)
-	ports[newPortNoError("tcp", "6379")] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	ports[newPortNoError("tcp", "6380")] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	ports[newPortNoError("tcp", "6381")] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
+	ports[newPortNoError("tcp", "6379")] = struct{}{}
+	ports[newPortNoError("tcp", "6380")] = struct{}{}
+	ports[newPortNoError("tcp", "6381")] = struct{}{}
 
-	link := NewLink("172.0.17.3", "172.0.17.2", "/db/docker", []string***REMOVED***"PASSWORD=gordon"***REMOVED***, ports)
+	link := NewLink("172.0.17.3", "172.0.17.2", "/db/docker", []string{"PASSWORD=gordon"}, ports)
 
 	rawEnv := link.ToEnv()
 	env := make(map[string]string, len(rawEnv))
-	for _, e := range rawEnv ***REMOVED***
+	for _, e := range rawEnv {
 		parts := strings.Split(e, "=")
-		if len(parts) != 2 ***REMOVED***
+		if len(parts) != 2 {
 			t.FailNow()
-		***REMOVED***
+		}
 		env[parts[0]] = parts[1]
-	***REMOVED***
+	}
 
-	if env["DOCKER_PORT"] != "tcp://172.0.17.2:6379" ***REMOVED***
+	if env["DOCKER_PORT"] != "tcp://172.0.17.2:6379" {
 		t.Fatalf("Expected 172.0.17.2:6379, got %s", env["DOCKER_PORT"])
-	***REMOVED***
-	if env["DOCKER_PORT_6379_TCP_START"] != "tcp://172.0.17.2:6379" ***REMOVED***
+	}
+	if env["DOCKER_PORT_6379_TCP_START"] != "tcp://172.0.17.2:6379" {
 		t.Fatalf("Expected tcp://172.0.17.2:6379, got %s", env["DOCKER_PORT_6379_TCP_START"])
-	***REMOVED***
-	if env["DOCKER_PORT_6379_TCP_END"] != "tcp://172.0.17.2:6381" ***REMOVED***
+	}
+	if env["DOCKER_PORT_6379_TCP_END"] != "tcp://172.0.17.2:6381" {
 		t.Fatalf("Expected tcp://172.0.17.2:6381, got %s", env["DOCKER_PORT_6379_TCP_END"])
-	***REMOVED***
-	if env["DOCKER_PORT_6379_TCP_PROTO"] != "tcp" ***REMOVED***
+	}
+	if env["DOCKER_PORT_6379_TCP_PROTO"] != "tcp" {
 		t.Fatalf("Expected tcp, got %s", env["DOCKER_PORT_6379_TCP_PROTO"])
-	***REMOVED***
-	if env["DOCKER_PORT_6379_TCP_ADDR"] != "172.0.17.2" ***REMOVED***
+	}
+	if env["DOCKER_PORT_6379_TCP_ADDR"] != "172.0.17.2" {
 		t.Fatalf("Expected 172.0.17.2, got %s", env["DOCKER_PORT_6379_TCP_ADDR"])
-	***REMOVED***
-	if env["DOCKER_PORT_6379_TCP_PORT_START"] != "6379" ***REMOVED***
+	}
+	if env["DOCKER_PORT_6379_TCP_PORT_START"] != "6379" {
 		t.Fatalf("Expected 6379, got %s", env["DOCKER_PORT_6379_TCP_PORT_START"])
-	***REMOVED***
-	if env["DOCKER_PORT_6379_TCP_PORT_END"] != "6381" ***REMOVED***
+	}
+	if env["DOCKER_PORT_6379_TCP_PORT_END"] != "6381" {
 		t.Fatalf("Expected 6381, got %s", env["DOCKER_PORT_6379_TCP_PORT_END"])
-	***REMOVED***
-	if env["DOCKER_NAME"] != "/db/docker" ***REMOVED***
+	}
+	if env["DOCKER_NAME"] != "/db/docker" {
 		t.Fatalf("Expected /db/docker, got %s", env["DOCKER_NAME"])
-	***REMOVED***
-	if env["DOCKER_ENV_PASSWORD"] != "gordon" ***REMOVED***
+	}
+	if env["DOCKER_ENV_PASSWORD"] != "gordon" {
 		t.Fatalf("Expected gordon, got %s", env["DOCKER_ENV_PASSWORD"])
-	***REMOVED***
-	for _, i := range []int***REMOVED***6379, 6380, 6381***REMOVED*** ***REMOVED***
+	}
+	for _, i := range []int{6379, 6380, 6381} {
 		tcpaddr := fmt.Sprintf("DOCKER_PORT_%d_TCP_ADDR", i)
 		tcpport := fmt.Sprintf("DOCKER_PORT_%d_TCP_PORT", i)
 		tcpproto := fmt.Sprintf("DOCKER_PORT_%d_TCP_PROTO", i)
 		tcp := fmt.Sprintf("DOCKER_PORT_%d_TCP", i)
-		if env[tcpaddr] != "172.0.17.2" ***REMOVED***
+		if env[tcpaddr] != "172.0.17.2" {
 			t.Fatalf("Expected env %s  = 172.0.17.2, got %s", tcpaddr, env[tcpaddr])
-		***REMOVED***
-		if env[tcpport] != fmt.Sprintf("%d", i) ***REMOVED***
+		}
+		if env[tcpport] != fmt.Sprintf("%d", i) {
 			t.Fatalf("Expected env %s  = %d, got %s", tcpport, i, env[tcpport])
-		***REMOVED***
-		if env[tcpproto] != "tcp" ***REMOVED***
+		}
+		if env[tcpproto] != "tcp" {
 			t.Fatalf("Expected env %s  = tcp, got %s", tcpproto, env[tcpproto])
-		***REMOVED***
-		if env[tcp] != fmt.Sprintf("tcp://172.0.17.2:%d", i) ***REMOVED***
+		}
+		if env[tcp] != fmt.Sprintf("tcp://172.0.17.2:%d", i) {
 			t.Fatalf("Expected env %s  = tcp://172.0.17.2:%d, got %s", tcp, i, env[tcp])
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

@@ -2,6 +2,6 @@
 
 package bridge
 
-func ifrDataByte(b byte) int8 ***REMOVED***
+func ifrDataByte(b byte) int8 {
 	return int8(b)
-***REMOVED***
+}

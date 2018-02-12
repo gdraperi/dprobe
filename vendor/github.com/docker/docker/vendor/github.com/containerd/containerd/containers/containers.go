@@ -11,7 +11,7 @@ import (
 // noted, the resources here are considered in use by the container.
 //
 // The resources specified in this object are used to create tasks from the container.
-type Container struct ***REMOVED***
+type Container struct {
 	// ID uniquely identifies the container in a nameapace.
 	//
 	// This property is required and cannot be changed after creation.
@@ -60,16 +60,16 @@ type Container struct ***REMOVED***
 
 	// Extensions stores client-specified metadata
 	Extensions map[string]types.Any
-***REMOVED***
+}
 
 // RuntimeInfo holds runtime specific information
-type RuntimeInfo struct ***REMOVED***
+type RuntimeInfo struct {
 	Name    string
 	Options *types.Any
-***REMOVED***
+}
 
 // Store interacts with the underlying container storage
-type Store interface ***REMOVED***
+type Store interface {
 	Get(ctx context.Context, id string) (Container, error)
 
 	// List returns containers that match one or more of the provided filters.
@@ -89,4 +89,4 @@ type Store interface ***REMOVED***
 	// nil will be returned on success. If the container is not known to the
 	// store, ErrNotFound will be returned.
 	Delete(ctx context.Context, id string) error
-***REMOVED***
+}

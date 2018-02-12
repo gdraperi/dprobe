@@ -1,22 +1,22 @@
 #!/usr/bin/env bash
 set -e
 
-TESTFLAGS=$***REMOVED***TESTFLAGS:-""***REMOVED***
+TESTFLAGS=${TESTFLAGS:-""}
 # Currently only DockerSuite and DockerNetworkSuite have been adapted for E2E testing
-TESTFLAGS_LEGACY=$***REMOVED***TESTFLAGS_LEGACY:-""***REMOVED***
-TIMEOUT=$***REMOVED***TIMEOUT:-60m***REMOVED***
+TESTFLAGS_LEGACY=${TESTFLAGS_LEGACY:-""}
+TIMEOUT=${TIMEOUT:-60m}
 
-SCRIPTDIR="$(dirname $***REMOVED***BASH_SOURCE[0]***REMOVED***)"
+SCRIPTDIR="$(dirname ${BASH_SOURCE[0]})"
 
-export DOCKER_ENGINE_GOARCH=$***REMOVED***DOCKER_ENGINE_GOARCH:-amd64***REMOVED***
+export DOCKER_ENGINE_GOARCH=${DOCKER_ENGINE_GOARCH:-amd64}
 
-run_test_integration() ***REMOVED***
+run_test_integration() {
   run_test_integration_suites
   run_test_integration_legacy_suites
-***REMOVED***
+}
 
-run_test_integration_suites() ***REMOVED***
-  local flags="-test.timeout=$***REMOVED***TIMEOUT***REMOVED*** $TESTFLAGS"
+run_test_integration_suites() {
+  local flags="-test.timeout=${TIMEOUT} $TESTFLAGS"
   for dir in /tests/integration/*; do
     if ! (
       cd $dir
@@ -24,16 +24,16 @@ run_test_integration_suites() ***REMOVED***
       ./test.main $flags
     ); then exit 1; fi
   done
-***REMOVED***
+}
 
-run_test_integration_legacy_suites() ***REMOVED***
+run_test_integration_legacy_suites() {
   (
-    flags="-check.timeout=$***REMOVED***TIMEOUT***REMOVED*** -test.timeout=360m $TESTFLAGS_LEGACY"
+    flags="-check.timeout=${TIMEOUT} -test.timeout=360m $TESTFLAGS_LEGACY"
     cd /tests/integration-cli
     echo "Running $PWD"
     ./test.main $flags
   )
-***REMOVED***
+}
 
 bash $SCRIPTDIR/ensure-emptyfs.sh
 

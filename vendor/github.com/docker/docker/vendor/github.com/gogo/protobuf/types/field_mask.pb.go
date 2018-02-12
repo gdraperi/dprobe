@@ -53,14 +53,14 @@ const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 // specified in the mask. For example, if the mask in the previous
 // example is applied to a response message as follows:
 //
-//     f ***REMOVED***
+//     f {
 //       a : 22
-//       b ***REMOVED***
+//       b {
 //         d : 1
 //         x : 2
-//   ***REMOVED***
+//       }
 //       y : 13
-// ***REMOVED***
+//     }
 //     z: 8
 //
 // The result will not contain specific values for fields x,y and z
@@ -68,12 +68,12 @@ const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 // output):
 //
 //
-//     f ***REMOVED***
+//     f {
 //       a : 22
-//       b ***REMOVED***
+//       b {
 //         d : 1
-//   ***REMOVED***
-// ***REMOVED***
+//       }
+//     }
 //
 // A repeated field is not allowed except at the last position of a
 // field mask.
@@ -110,21 +110,21 @@ const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 // update operation, then the existing sub-message in the target resource is
 // overwritten. Given the target message:
 //
-//     f ***REMOVED***
-//       b ***REMOVED***
+//     f {
+//       b {
 //         d : 1
 //         x : 2
-//   ***REMOVED***
+//       }
 //       c : 1
-// ***REMOVED***
+//     }
 //
 // And an update message:
 //
-//     f ***REMOVED***
-//       b ***REMOVED***
+//     f {
+//       b {
 //         d : 10
-//   ***REMOVED***
-// ***REMOVED***
+//       }
+//     }
 //
 // then if the field mask is:
 //
@@ -132,12 +132,12 @@ const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 //
 // then the result will be:
 //
-//     f ***REMOVED***
-//       b ***REMOVED***
+//     f {
+//       b {
 //         d : 10
-//   ***REMOVED***
+//       }
 //       c : 1
-// ***REMOVED***
+//     }
 //
 // However, if the update mask was:
 //
@@ -145,13 +145,13 @@ const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 //
 // then the result would be:
 //
-//     f ***REMOVED***
-//       b ***REMOVED***
+//     f {
+//       b {
 //         d : 10
 //         x : 2
-//   ***REMOVED***
+//       }
 //       c : 1
-// ***REMOVED***
+//     }
 //
 // In order to reset a field's value to the default, the field must
 // be in the mask and set to the default value in the provided resource.
@@ -186,201 +186,201 @@ const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 //
 // As an example, consider the following message declarations:
 //
-//     message Profile ***REMOVED***
+//     message Profile {
 //       User user = 1;
 //       Photo photo = 2;
-// ***REMOVED***
-//     message User ***REMOVED***
+//     }
+//     message User {
 //       string display_name = 1;
 //       string address = 2;
-// ***REMOVED***
+//     }
 //
 // In proto a field mask for `Profile` may look as such:
 //
-//     mask ***REMOVED***
+//     mask {
 //       paths: "user.display_name"
 //       paths: "photo"
-// ***REMOVED***
+//     }
 //
 // In JSON, the same mask is represented as below:
 //
-//     ***REMOVED***
+//     {
 //       mask: "user.displayName,photo"
-// ***REMOVED***
+//     }
 //
 // # Field Masks and Oneof Fields
 //
 // Field masks treat fields in oneofs just as regular fields. Consider the
 // following message:
 //
-//     message SampleMessage ***REMOVED***
-//       oneof test_oneof ***REMOVED***
+//     message SampleMessage {
+//       oneof test_oneof {
 //         string name = 4;
 //         SubMessage sub_message = 9;
-//   ***REMOVED***
-// ***REMOVED***
+//       }
+//     }
 //
 // The field mask can be:
 //
-//     mask ***REMOVED***
+//     mask {
 //       paths: "name"
-// ***REMOVED***
+//     }
 //
 // Or:
 //
-//     mask ***REMOVED***
+//     mask {
 //       paths: "sub_message"
-// ***REMOVED***
+//     }
 //
 // Note that oneof type names ("test_oneof" in this case) cannot be used in
 // paths.
-type FieldMask struct ***REMOVED***
+type FieldMask struct {
 	// The set of field mask paths.
 	Paths []string `protobuf:"bytes,1,rep,name=paths" json:"paths,omitempty"`
-***REMOVED***
+}
 
-func (m *FieldMask) Reset()                    ***REMOVED*** *m = FieldMask***REMOVED******REMOVED*** ***REMOVED***
-func (*FieldMask) ProtoMessage()               ***REMOVED******REMOVED***
-func (*FieldMask) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorFieldMask, []int***REMOVED***0***REMOVED*** ***REMOVED***
+func (m *FieldMask) Reset()                    { *m = FieldMask{} }
+func (*FieldMask) ProtoMessage()               {}
+func (*FieldMask) Descriptor() ([]byte, []int) { return fileDescriptorFieldMask, []int{0} }
 
-func (m *FieldMask) GetPaths() []string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *FieldMask) GetPaths() []string {
+	if m != nil {
 		return m.Paths
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*FieldMask)(nil), "google.protobuf.FieldMask")
-***REMOVED***
-func (this *FieldMask) Compare(that interface***REMOVED******REMOVED***) int ***REMOVED***
-	if that == nil ***REMOVED***
-		if this == nil ***REMOVED***
+}
+func (this *FieldMask) Compare(that interface{}) int {
+	if that == nil {
+		if this == nil {
 			return 0
-		***REMOVED***
+		}
 		return 1
-	***REMOVED***
+	}
 
 	that1, ok := that.(*FieldMask)
-	if !ok ***REMOVED***
+	if !ok {
 		that2, ok := that.(FieldMask)
-		if ok ***REMOVED***
+		if ok {
 			that1 = &that2
-		***REMOVED*** else ***REMOVED***
+		} else {
 			return 1
-		***REMOVED***
-	***REMOVED***
-	if that1 == nil ***REMOVED***
-		if this == nil ***REMOVED***
+		}
+	}
+	if that1 == nil {
+		if this == nil {
 			return 0
-		***REMOVED***
+		}
 		return 1
-	***REMOVED*** else if this == nil ***REMOVED***
+	} else if this == nil {
 		return -1
-	***REMOVED***
-	if len(this.Paths) != len(that1.Paths) ***REMOVED***
-		if len(this.Paths) < len(that1.Paths) ***REMOVED***
+	}
+	if len(this.Paths) != len(that1.Paths) {
+		if len(this.Paths) < len(that1.Paths) {
 			return -1
-		***REMOVED***
+		}
 		return 1
-	***REMOVED***
-	for i := range this.Paths ***REMOVED***
-		if this.Paths[i] != that1.Paths[i] ***REMOVED***
-			if this.Paths[i] < that1.Paths[i] ***REMOVED***
+	}
+	for i := range this.Paths {
+		if this.Paths[i] != that1.Paths[i] {
+			if this.Paths[i] < that1.Paths[i] {
 				return -1
-			***REMOVED***
+			}
 			return 1
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return 0
-***REMOVED***
-func (this *FieldMask) Equal(that interface***REMOVED******REMOVED***) bool ***REMOVED***
-	if that == nil ***REMOVED***
-		if this == nil ***REMOVED***
+}
+func (this *FieldMask) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
 			return true
-		***REMOVED***
+		}
 		return false
-	***REMOVED***
+	}
 
 	that1, ok := that.(*FieldMask)
-	if !ok ***REMOVED***
+	if !ok {
 		that2, ok := that.(FieldMask)
-		if ok ***REMOVED***
+		if ok {
 			that1 = &that2
-		***REMOVED*** else ***REMOVED***
+		} else {
 			return false
-		***REMOVED***
-	***REMOVED***
-	if that1 == nil ***REMOVED***
-		if this == nil ***REMOVED***
+		}
+	}
+	if that1 == nil {
+		if this == nil {
 			return true
-		***REMOVED***
+		}
 		return false
-	***REMOVED*** else if this == nil ***REMOVED***
+	} else if this == nil {
 		return false
-	***REMOVED***
-	if len(this.Paths) != len(that1.Paths) ***REMOVED***
+	}
+	if len(this.Paths) != len(that1.Paths) {
 		return false
-	***REMOVED***
-	for i := range this.Paths ***REMOVED***
-		if this.Paths[i] != that1.Paths[i] ***REMOVED***
+	}
+	for i := range this.Paths {
+		if this.Paths[i] != that1.Paths[i] {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
-func (this *FieldMask) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *FieldMask) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 5)
-	s = append(s, "&types.FieldMask***REMOVED***")
+	s = append(s, "&types.FieldMask{")
 	s = append(s, "Paths: "+fmt.Sprintf("%#v", this.Paths)+",\n")
-	s = append(s, "***REMOVED***")
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func valueToGoStringFieldMask(v interface***REMOVED******REMOVED***, typ string) string ***REMOVED***
+}
+func valueToGoStringFieldMask(v interface{}, typ string) string {
 	rv := reflect.ValueOf(v)
-	if rv.IsNil() ***REMOVED***
+	if rv.IsNil() {
 		return "nil"
-	***REMOVED***
+	}
 	pv := reflect.Indirect(rv).Interface()
-	return fmt.Sprintf("func(v %v) *%v ***REMOVED*** return &v ***REMOVED*** ( %#v )", typ, typ, pv)
-***REMOVED***
-func (m *FieldMask) Marshal() (dAtA []byte, err error) ***REMOVED***
+	return fmt.Sprintf("func(v %v) *%v { return &v } ( %#v )", typ, typ, pv)
+}
+func (m *FieldMask) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *FieldMask) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *FieldMask) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Paths) > 0 ***REMOVED***
-		for _, s := range m.Paths ***REMOVED***
+	if len(m.Paths) > 0 {
+		for _, s := range m.Paths {
 			dAtA[i] = 0xa
 			i++
 			l = len(s)
-			for l >= 1<<7 ***REMOVED***
+			for l >= 1<<7 {
 				dAtA[i] = uint8(uint64(l)&0x7f | 0x80)
 				l >>= 7
 				i++
-			***REMOVED***
+			}
 			dAtA[i] = uint8(l)
 			i++
 			i += copy(dAtA[i:], s)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return i, nil
-***REMOVED***
+}
 
-func encodeFixed64FieldMask(dAtA []byte, offset int, v uint64) int ***REMOVED***
+func encodeFixed64FieldMask(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
 	dAtA[offset+2] = uint8(v >> 16)
@@ -390,82 +390,82 @@ func encodeFixed64FieldMask(dAtA []byte, offset int, v uint64) int ***REMOVED***
 	dAtA[offset+6] = uint8(v >> 48)
 	dAtA[offset+7] = uint8(v >> 56)
 	return offset + 8
-***REMOVED***
-func encodeFixed32FieldMask(dAtA []byte, offset int, v uint32) int ***REMOVED***
+}
+func encodeFixed32FieldMask(dAtA []byte, offset int, v uint32) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
 	dAtA[offset+2] = uint8(v >> 16)
 	dAtA[offset+3] = uint8(v >> 24)
 	return offset + 4
-***REMOVED***
-func encodeVarintFieldMask(dAtA []byte, offset int, v uint64) int ***REMOVED***
-	for v >= 1<<7 ***REMOVED***
+}
+func encodeVarintFieldMask(dAtA []byte, offset int, v uint64) int {
+	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
-	***REMOVED***
+	}
 	dAtA[offset] = uint8(v)
 	return offset + 1
-***REMOVED***
-func NewPopulatedFieldMask(r randyFieldMask, easy bool) *FieldMask ***REMOVED***
-	this := &FieldMask***REMOVED******REMOVED***
+}
+func NewPopulatedFieldMask(r randyFieldMask, easy bool) *FieldMask {
+	this := &FieldMask{}
 	v1 := r.Intn(10)
 	this.Paths = make([]string, v1)
-	for i := 0; i < v1; i++ ***REMOVED***
+	for i := 0; i < v1; i++ {
 		this.Paths[i] = string(randStringFieldMask(r))
-	***REMOVED***
-	if !easy && r.Intn(10) != 0 ***REMOVED***
-	***REMOVED***
+	}
+	if !easy && r.Intn(10) != 0 {
+	}
 	return this
-***REMOVED***
+}
 
-type randyFieldMask interface ***REMOVED***
+type randyFieldMask interface {
 	Float32() float32
 	Float64() float64
 	Int63() int64
 	Int31() int32
 	Uint32() uint32
 	Intn(n int) int
-***REMOVED***
+}
 
-func randUTF8RuneFieldMask(r randyFieldMask) rune ***REMOVED***
+func randUTF8RuneFieldMask(r randyFieldMask) rune {
 	ru := r.Intn(62)
-	if ru < 10 ***REMOVED***
+	if ru < 10 {
 		return rune(ru + 48)
-	***REMOVED*** else if ru < 36 ***REMOVED***
+	} else if ru < 36 {
 		return rune(ru + 55)
-	***REMOVED***
+	}
 	return rune(ru + 61)
-***REMOVED***
-func randStringFieldMask(r randyFieldMask) string ***REMOVED***
+}
+func randStringFieldMask(r randyFieldMask) string {
 	v2 := r.Intn(100)
 	tmps := make([]rune, v2)
-	for i := 0; i < v2; i++ ***REMOVED***
+	for i := 0; i < v2; i++ {
 		tmps[i] = randUTF8RuneFieldMask(r)
-	***REMOVED***
+	}
 	return string(tmps)
-***REMOVED***
-func randUnrecognizedFieldMask(r randyFieldMask, maxFieldNumber int) (dAtA []byte) ***REMOVED***
+}
+func randUnrecognizedFieldMask(r randyFieldMask, maxFieldNumber int) (dAtA []byte) {
 	l := r.Intn(5)
-	for i := 0; i < l; i++ ***REMOVED***
+	for i := 0; i < l; i++ {
 		wire := r.Intn(4)
-		if wire == 3 ***REMOVED***
+		if wire == 3 {
 			wire = 5
-		***REMOVED***
+		}
 		fieldNumber := maxFieldNumber + r.Intn(100)
 		dAtA = randFieldFieldMask(dAtA, r, fieldNumber, wire)
-	***REMOVED***
+	}
 	return dAtA
-***REMOVED***
-func randFieldFieldMask(dAtA []byte, r randyFieldMask, fieldNumber int, wire int) []byte ***REMOVED***
+}
+func randFieldFieldMask(dAtA []byte, r randyFieldMask, fieldNumber int, wire int) []byte {
 	key := uint32(fieldNumber)<<3 | uint32(wire)
-	switch wire ***REMOVED***
+	switch wire {
 	case 0:
 		dAtA = encodeVarintPopulateFieldMask(dAtA, uint64(key))
 		v3 := r.Int63()
-		if r.Intn(2) == 0 ***REMOVED***
+		if r.Intn(2) == 0 {
 			v3 *= -1
-		***REMOVED***
+		}
 		dAtA = encodeVarintPopulateFieldMask(dAtA, uint64(v3))
 	case 1:
 		dAtA = encodeVarintPopulateFieldMask(dAtA, uint64(key))
@@ -474,232 +474,232 @@ func randFieldFieldMask(dAtA []byte, r randyFieldMask, fieldNumber int, wire int
 		dAtA = encodeVarintPopulateFieldMask(dAtA, uint64(key))
 		ll := r.Intn(100)
 		dAtA = encodeVarintPopulateFieldMask(dAtA, uint64(ll))
-		for j := 0; j < ll; j++ ***REMOVED***
+		for j := 0; j < ll; j++ {
 			dAtA = append(dAtA, byte(r.Intn(256)))
-		***REMOVED***
+		}
 	default:
 		dAtA = encodeVarintPopulateFieldMask(dAtA, uint64(key))
 		dAtA = append(dAtA, byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)))
-	***REMOVED***
+	}
 	return dAtA
-***REMOVED***
-func encodeVarintPopulateFieldMask(dAtA []byte, v uint64) []byte ***REMOVED***
-	for v >= 1<<7 ***REMOVED***
+}
+func encodeVarintPopulateFieldMask(dAtA []byte, v uint64) []byte {
+	for v >= 1<<7 {
 		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
-	***REMOVED***
+	}
 	dAtA = append(dAtA, uint8(v))
 	return dAtA
-***REMOVED***
-func (m *FieldMask) Size() (n int) ***REMOVED***
+}
+func (m *FieldMask) Size() (n int) {
 	var l int
 	_ = l
-	if len(m.Paths) > 0 ***REMOVED***
-		for _, s := range m.Paths ***REMOVED***
+	if len(m.Paths) > 0 {
+		for _, s := range m.Paths {
 			l = len(s)
 			n += 1 + l + sovFieldMask(uint64(l))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
+}
 
-func sovFieldMask(x uint64) (n int) ***REMOVED***
-	for ***REMOVED***
+func sovFieldMask(x uint64) (n int) {
+	for {
 		n++
 		x >>= 7
-		if x == 0 ***REMOVED***
+		if x == 0 {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
-func sozFieldMask(x uint64) (n int) ***REMOVED***
+}
+func sozFieldMask(x uint64) (n int) {
 	return sovFieldMask(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-***REMOVED***
-func (this *FieldMask) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *FieldMask) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&FieldMask***REMOVED***`,
+	}
+	s := strings.Join([]string{`&FieldMask{`,
 		`Paths:` + fmt.Sprintf("%v", this.Paths) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func valueToStringFieldMask(v interface***REMOVED******REMOVED***) string ***REMOVED***
+}
+func valueToStringFieldMask(v interface{}) string {
 	rv := reflect.ValueOf(v)
-	if rv.IsNil() ***REMOVED***
+	if rv.IsNil() {
 		return "nil"
-	***REMOVED***
+	}
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
-***REMOVED***
-func (m *FieldMask) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *FieldMask) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowFieldMask
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: FieldMask: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: FieldMask: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Paths", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowFieldMask
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthFieldMask
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Paths = append(m.Paths, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipFieldMask(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthFieldMask
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func skipFieldMask(dAtA []byte) (n int, err error) ***REMOVED***
+}
+func skipFieldMask(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return 0, ErrIntOverflowFieldMask
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return 0, io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		wireType := int(wire & 0x7)
-		switch wireType ***REMOVED***
+		switch wireType {
 		case 0:
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowFieldMask
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				iNdEx++
-				if dAtA[iNdEx-1] < 0x80 ***REMOVED***
+				if dAtA[iNdEx-1] < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return iNdEx, nil
 		case 1:
 			iNdEx += 8
 			return iNdEx, nil
 		case 2:
 			var length int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowFieldMask
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				length |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			iNdEx += length
-			if length < 0 ***REMOVED***
+			if length < 0 {
 				return 0, ErrInvalidLengthFieldMask
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 3:
-			for ***REMOVED***
+			for {
 				var innerWire uint64
 				var start int = iNdEx
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return 0, ErrIntOverflowFieldMask
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return 0, io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					innerWire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				innerWireType := int(innerWire & 0x7)
-				if innerWireType == 4 ***REMOVED***
+				if innerWireType == 4 {
 					break
-				***REMOVED***
+				}
 				next, err := skipFieldMask(dAtA[start:])
-				if err != nil ***REMOVED***
+				if err != nil {
 					return 0, err
-				***REMOVED***
+				}
 				iNdEx = start + next
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 4:
 			return iNdEx, nil
@@ -708,19 +708,19 @@ func skipFieldMask(dAtA []byte) (n int, err error) ***REMOVED***
 			return iNdEx, nil
 		default:
 			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	panic("unreachable")
-***REMOVED***
+}
 
 var (
 	ErrInvalidLengthFieldMask = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowFieldMask   = fmt.Errorf("proto: integer overflow")
 )
 
-func init() ***REMOVED*** proto.RegisterFile("field_mask.proto", fileDescriptorFieldMask) ***REMOVED***
+func init() { proto.RegisterFile("field_mask.proto", fileDescriptorFieldMask) }
 
-var fileDescriptorFieldMask = []byte***REMOVED***
+var fileDescriptorFieldMask = []byte{
 	// 196 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0x48, 0xcb, 0x4c, 0xcd,
 	0x49, 0x89, 0xcf, 0x4d, 0x2c, 0xce, 0xd6, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0xe2, 0x4f, 0xcf,
@@ -735,4 +735,4 @@ var fileDescriptorFieldMask = []byte***REMOVED***
 	0x3d, 0x01, 0x50, 0x3d, 0x7a, 0xe1, 0xa9, 0x39, 0x39, 0xde, 0x79, 0xf9, 0xe5, 0x79, 0x21, 0x20,
 	0x95, 0x49, 0x6c, 0x60, 0xc3, 0x8c, 0x01, 0x01, 0x00, 0x00, 0xff, 0xff, 0xea, 0xb1, 0x3a, 0xd5,
 	0xd9, 0x00, 0x00, 0x00,
-***REMOVED***
+}

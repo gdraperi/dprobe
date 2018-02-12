@@ -9,44 +9,44 @@ import (
 	swarmapi "github.com/docker/swarmkit/api"
 )
 
-func newListNodesFilters(filter filters.Args) (*swarmapi.ListNodesRequest_Filters, error) ***REMOVED***
-	accepted := map[string]bool***REMOVED***
+func newListNodesFilters(filter filters.Args) (*swarmapi.ListNodesRequest_Filters, error) {
+	accepted := map[string]bool{
 		"name":       true,
 		"id":         true,
 		"label":      true,
 		"role":       true,
 		"membership": true,
-	***REMOVED***
-	if err := filter.Validate(accepted); err != nil ***REMOVED***
+	}
+	if err := filter.Validate(accepted); err != nil {
 		return nil, err
-	***REMOVED***
-	f := &swarmapi.ListNodesRequest_Filters***REMOVED***
+	}
+	f := &swarmapi.ListNodesRequest_Filters{
 		NamePrefixes: filter.Get("name"),
 		IDPrefixes:   filter.Get("id"),
 		Labels:       runconfigopts.ConvertKVStringsToMap(filter.Get("label")),
-	***REMOVED***
+	}
 
-	for _, r := range filter.Get("role") ***REMOVED***
-		if role, ok := swarmapi.NodeRole_value[strings.ToUpper(r)]; ok ***REMOVED***
+	for _, r := range filter.Get("role") {
+		if role, ok := swarmapi.NodeRole_value[strings.ToUpper(r)]; ok {
 			f.Roles = append(f.Roles, swarmapi.NodeRole(role))
-		***REMOVED*** else if r != "" ***REMOVED***
+		} else if r != "" {
 			return nil, fmt.Errorf("Invalid role filter: '%s'", r)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	for _, a := range filter.Get("membership") ***REMOVED***
-		if membership, ok := swarmapi.NodeSpec_Membership_value[strings.ToUpper(a)]; ok ***REMOVED***
+	for _, a := range filter.Get("membership") {
+		if membership, ok := swarmapi.NodeSpec_Membership_value[strings.ToUpper(a)]; ok {
 			f.Memberships = append(f.Memberships, swarmapi.NodeSpec_Membership(membership))
-		***REMOVED*** else if a != "" ***REMOVED***
+		} else if a != "" {
 			return nil, fmt.Errorf("Invalid membership filter: '%s'", a)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return f, nil
-***REMOVED***
+}
 
-func newListTasksFilters(filter filters.Args, transformFunc func(filters.Args) error) (*swarmapi.ListTasksRequest_Filters, error) ***REMOVED***
-	accepted := map[string]bool***REMOVED***
+func newListTasksFilters(filter filters.Args, transformFunc func(filters.Args) error) (*swarmapi.ListTasksRequest_Filters, error) {
+	accepted := map[string]bool{
 		"name":          true,
 		"id":            true,
 		"label":         true,
@@ -58,16 +58,16 @@ func newListTasksFilters(filter filters.Args, transformFunc func(filters.Args) e
 		// we prefix it with a '_'.
 		"_up-to-date": true,
 		"runtime":     true,
-	***REMOVED***
-	if err := filter.Validate(accepted); err != nil ***REMOVED***
+	}
+	if err := filter.Validate(accepted); err != nil {
 		return nil, err
-	***REMOVED***
-	if transformFunc != nil ***REMOVED***
-		if err := transformFunc(filter); err != nil ***REMOVED***
+	}
+	if transformFunc != nil {
+		if err := transformFunc(filter); err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
-	f := &swarmapi.ListTasksRequest_Filters***REMOVED***
+		}
+	}
+	f := &swarmapi.ListTasksRequest_Filters{
 		NamePrefixes: filter.Get("name"),
 		IDPrefixes:   filter.Get("id"),
 		Labels:       runconfigopts.ConvertKVStringsToMap(filter.Get("label")),
@@ -75,49 +75,49 @@ func newListTasksFilters(filter filters.Args, transformFunc func(filters.Args) e
 		NodeIDs:      filter.Get("node"),
 		UpToDate:     len(filter.Get("_up-to-date")) != 0,
 		Runtimes:     filter.Get("runtime"),
-	***REMOVED***
+	}
 
-	for _, s := range filter.Get("desired-state") ***REMOVED***
-		if state, ok := swarmapi.TaskState_value[strings.ToUpper(s)]; ok ***REMOVED***
+	for _, s := range filter.Get("desired-state") {
+		if state, ok := swarmapi.TaskState_value[strings.ToUpper(s)]; ok {
 			f.DesiredStates = append(f.DesiredStates, swarmapi.TaskState(state))
-		***REMOVED*** else if s != "" ***REMOVED***
+		} else if s != "" {
 			return nil, fmt.Errorf("Invalid desired-state filter: '%s'", s)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return f, nil
-***REMOVED***
+}
 
-func newListSecretsFilters(filter filters.Args) (*swarmapi.ListSecretsRequest_Filters, error) ***REMOVED***
-	accepted := map[string]bool***REMOVED***
+func newListSecretsFilters(filter filters.Args) (*swarmapi.ListSecretsRequest_Filters, error) {
+	accepted := map[string]bool{
 		"names": true,
 		"name":  true,
 		"id":    true,
 		"label": true,
-	***REMOVED***
-	if err := filter.Validate(accepted); err != nil ***REMOVED***
+	}
+	if err := filter.Validate(accepted); err != nil {
 		return nil, err
-	***REMOVED***
-	return &swarmapi.ListSecretsRequest_Filters***REMOVED***
+	}
+	return &swarmapi.ListSecretsRequest_Filters{
 		Names:        filter.Get("names"),
 		NamePrefixes: filter.Get("name"),
 		IDPrefixes:   filter.Get("id"),
 		Labels:       runconfigopts.ConvertKVStringsToMap(filter.Get("label")),
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-func newListConfigsFilters(filter filters.Args) (*swarmapi.ListConfigsRequest_Filters, error) ***REMOVED***
-	accepted := map[string]bool***REMOVED***
+func newListConfigsFilters(filter filters.Args) (*swarmapi.ListConfigsRequest_Filters, error) {
+	accepted := map[string]bool{
 		"name":  true,
 		"id":    true,
 		"label": true,
-	***REMOVED***
-	if err := filter.Validate(accepted); err != nil ***REMOVED***
+	}
+	if err := filter.Validate(accepted); err != nil {
 		return nil, err
-	***REMOVED***
-	return &swarmapi.ListConfigsRequest_Filters***REMOVED***
+	}
+	return &swarmapi.ListConfigsRequest_Filters{
 		NamePrefixes: filter.Get("name"),
 		IDPrefixes:   filter.Get("id"),
 		Labels:       runconfigopts.ConvertKVStringsToMap(filter.Get("label")),
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}

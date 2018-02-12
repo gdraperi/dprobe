@@ -8,4 +8,4 @@ package testtext
 
 // AllocsPerRun always returns 0 for gccgo until gccgo implements escape
 // analysis equal or better to that of gc.
-func AllocsPerRun(runs int, f func()) (avg float64) ***REMOVED*** return 0 ***REMOVED***
+func AllocsPerRun(runs int, f func()) (avg float64) { return 0 }

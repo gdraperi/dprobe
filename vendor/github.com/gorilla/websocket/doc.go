@@ -9,35 +9,35 @@
 // The Conn type represents a WebSocket connection. A server application calls
 // the Upgrader.Upgrade method from an HTTP request handler to get a *Conn:
 //
-//  var upgrader = websocket.Upgrader***REMOVED***
+//  var upgrader = websocket.Upgrader{
 //      ReadBufferSize:  1024,
 //      WriteBufferSize: 1024,
-//  ***REMOVED***
+//  }
 //
-//  func handler(w http.ResponseWriter, r *http.Request) ***REMOVED***
+//  func handler(w http.ResponseWriter, r *http.Request) {
 //      conn, err := upgrader.Upgrade(w, r, nil)
-//      if err != nil ***REMOVED***
+//      if err != nil {
 //          log.Println(err)
 //          return
-//  ***REMOVED***
+//      }
 //      ... Use conn to send and receive messages.
-//  ***REMOVED***
+//  }
 //
 // Call the connection's WriteMessage and ReadMessage methods to send and
 // receive messages as a slice of bytes. This snippet of code shows how to echo
 // messages using these methods:
 //
-//  for ***REMOVED***
+//  for {
 //      messageType, p, err := conn.ReadMessage()
-//      if err != nil ***REMOVED***
+//      if err != nil {
 //          log.Println(err)
 //          return
-//  ***REMOVED***
-//      if err := conn.WriteMessage(messageType, p); err != nil ***REMOVED***
+//      }
+//      if err := conn.WriteMessage(messageType, p); err != nil {
 //          log.Println(err)
 //          return
-//  ***REMOVED***
-//  ***REMOVED***
+//      }
+//  }
 //
 // In above snippet of code, p is a []byte and messageType is an int with value
 // websocket.BinaryMessage or websocket.TextMessage.
@@ -49,22 +49,22 @@
 // method to get an io.Reader and read until io.EOF is returned. This snippet
 // shows how to echo messages using the NextWriter and NextReader methods:
 //
-//  for ***REMOVED***
+//  for {
 //      messageType, r, err := conn.NextReader()
-//      if err != nil ***REMOVED***
+//      if err != nil {
 //          return
-//  ***REMOVED***
+//      }
 //      w, err := conn.NextWriter(messageType)
-//      if err != nil ***REMOVED***
+//      if err != nil {
 //          return err
-//  ***REMOVED***
-//      if _, err := io.Copy(w, r); err != nil ***REMOVED***
+//      }
+//      if _, err := io.Copy(w, r); err != nil {
 //          return err
-//  ***REMOVED***
-//      if err := w.Close(); err != nil ***REMOVED***
+//      }
+//      if err := w.Close(); err != nil {
 //          return err
-//  ***REMOVED***
-//  ***REMOVED***
+//      }
+//  }
 //
 // Data Messages
 //
@@ -110,14 +110,14 @@
 // in messages from the peer, then the application should start a goroutine to
 // read and discard messages from the peer. A simple example is:
 //
-//  func readLoop(c *websocket.Conn) ***REMOVED***
-//      for ***REMOVED***
-//          if _, _, err := c.NextReader(); err != nil ***REMOVED***
+//  func readLoop(c *websocket.Conn) {
+//      for {
+//          if _, _, err := c.NextReader(); err != nil {
 //              c.Close()
 //              break
-//      ***REMOVED***
-//  ***REMOVED***
-//  ***REMOVED***
+//          }
+//      }
+//  }
 //
 // Concurrency
 //
@@ -158,9 +158,9 @@
 // to true in Dialer or Upgrader will attempt to negotiate per message deflate
 // support.
 //
-//  var upgrader = websocket.Upgrader***REMOVED***
+//  var upgrader = websocket.Upgrader{
 //      EnableCompression: true,
-//  ***REMOVED***
+//  }
 //
 // If compression was successfully negotiated with the connection's peer, any
 // message received in compressed form will be automatically decompressed.

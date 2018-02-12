@@ -35,7 +35,7 @@ const (
 // image, container, namespace, snapshot, and content data
 // while proxying data shared across namespaces to backend
 // datastores for content and snapshots.
-type DB struct ***REMOVED***
+type DB struct {
 	db *bolt.DB
 	ss map[string]*snapshotter
 	cs *contentStore
@@ -50,41 +50,41 @@ type DB struct ***REMOVED***
 	// since the last garbage collection. These datastores will will be garbage
 	// collected during the next garbage collection.
 	dirtyL  sync.Mutex
-	dirtySS map[string]struct***REMOVED******REMOVED***
+	dirtySS map[string]struct{}
 	dirtyCS bool
 
 	// mutationCallbacks are called after each mutation with the flag
 	// set indicating whether any dirty flags are set
 	mutationCallbacks []func(bool)
-***REMOVED***
+}
 
 // NewDB creates a new metadata database using the provided
 // bolt database, content store, and snapshotters.
-func NewDB(db *bolt.DB, cs content.Store, ss map[string]snapshots.Snapshotter) *DB ***REMOVED***
-	m := &DB***REMOVED***
+func NewDB(db *bolt.DB, cs content.Store, ss map[string]snapshots.Snapshotter) *DB {
+	m := &DB{
 		db:      db,
 		ss:      make(map[string]*snapshotter, len(ss)),
-		dirtySS: map[string]struct***REMOVED******REMOVED******REMOVED******REMOVED***,
-	***REMOVED***
+		dirtySS: map[string]struct{}{},
+	}
 
 	// Initialize data stores
 	m.cs = newContentStore(m, cs)
-	for name, sn := range ss ***REMOVED***
+	for name, sn := range ss {
 		m.ss[name] = newSnapshotter(m, name, sn)
-	***REMOVED***
+	}
 
 	return m
-***REMOVED***
+}
 
 // Init ensures the database is at the correct version
 // and performs any needed migrations.
-func (m *DB) Init(ctx context.Context) error ***REMOVED***
+func (m *DB) Init(ctx context.Context) error {
 	// errSkip is used when no migration or version needs to be written
 	// to the database and the transaction can be immediately rolled
 	// back rather than performing a much slower and unnecessary commit.
 	var errSkip = errors.New("skip update")
 
-	err := m.db.Update(func(tx *bolt.Tx) error ***REMOVED***
+	err := m.db.Update(func(tx *bolt.Tx) error {
 		var (
 			// current schema and version
 			schema  = "v0"
@@ -99,178 +99,178 @@ func (m *DB) Init(ctx context.Context) error ***REMOVED***
 		// database version
 		i := len(migrations)
 
-		for ; i > 0; i-- ***REMOVED***
+		for ; i > 0; i-- {
 			migration := migrations[i-1]
 
 			bkt := tx.Bucket([]byte(migration.schema))
-			if bkt == nil ***REMOVED***
+			if bkt == nil {
 				// Hasn't encountered another schema, go to next migration
-				if schema == "v0" ***REMOVED***
+				if schema == "v0" {
 					continue
-				***REMOVED***
+				}
 				break
-			***REMOVED***
-			if schema == "v0" ***REMOVED***
+			}
+			if schema == "v0" {
 				schema = migration.schema
 				vb := bkt.Get(bucketKeyDBVersion)
-				if vb != nil ***REMOVED***
+				if vb != nil {
 					v, _ := binary.Varint(vb)
 					version = int(v)
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 
-			if version >= migration.version ***REMOVED***
+			if version >= migration.version {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		// Previous version fo database found
-		if schema != "v0" ***REMOVED***
+		if schema != "v0" {
 			updates := migrations[i:]
 
 			// No migration updates, return immediately
-			if len(updates) == 0 ***REMOVED***
+			if len(updates) == 0 {
 				return errSkip
-			***REMOVED***
+			}
 
-			for _, m := range updates ***REMOVED***
+			for _, m := range updates {
 				t0 := time.Now()
-				if err := m.migrate(tx); err != nil ***REMOVED***
+				if err := m.migrate(tx); err != nil {
 					return errors.Wrapf(err, "failed to migrate to %s.%d", m.schema, m.version)
-				***REMOVED***
+				}
 				log.G(ctx).WithField("d", time.Now().Sub(t0)).Debugf("finished database migration to %s.%d", m.schema, m.version)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		bkt, err := tx.CreateBucketIfNotExists(bucketKeyVersion)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 
 		versionEncoded, err := encodeInt(dbVersion)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 
 		return bkt.Put(bucketKeyDBVersion, versionEncoded)
-	***REMOVED***)
-	if err == errSkip ***REMOVED***
+	})
+	if err == errSkip {
 		err = nil
-	***REMOVED***
+	}
 	return err
-***REMOVED***
+}
 
 // ContentStore returns a namespaced content store
 // proxied to a content store.
-func (m *DB) ContentStore() content.Store ***REMOVED***
-	if m.cs == nil ***REMOVED***
+func (m *DB) ContentStore() content.Store {
+	if m.cs == nil {
 		return nil
-	***REMOVED***
+	}
 	return m.cs
-***REMOVED***
+}
 
 // Snapshotter returns a namespaced content store for
 // the requested snapshotter name proxied to a snapshotter.
-func (m *DB) Snapshotter(name string) snapshots.Snapshotter ***REMOVED***
+func (m *DB) Snapshotter(name string) snapshots.Snapshotter {
 	sn, ok := m.ss[name]
-	if !ok ***REMOVED***
+	if !ok {
 		return nil
-	***REMOVED***
+	}
 	return sn
-***REMOVED***
+}
 
 // View runs a readonly transaction on the metadata store.
-func (m *DB) View(fn func(*bolt.Tx) error) error ***REMOVED***
+func (m *DB) View(fn func(*bolt.Tx) error) error {
 	return m.db.View(fn)
-***REMOVED***
+}
 
 // Update runs a writable transaction on the metadata store.
-func (m *DB) Update(fn func(*bolt.Tx) error) error ***REMOVED***
+func (m *DB) Update(fn func(*bolt.Tx) error) error {
 	m.wlock.RLock()
 	defer m.wlock.RUnlock()
 	err := m.db.Update(fn)
-	if err == nil ***REMOVED***
+	if err == nil {
 		m.dirtyL.Lock()
 		dirty := m.dirtyCS || len(m.dirtySS) > 0
-		for _, fn := range m.mutationCallbacks ***REMOVED***
+		for _, fn := range m.mutationCallbacks {
 			fn(dirty)
-		***REMOVED***
+		}
 		m.dirtyL.Unlock()
-	***REMOVED***
+	}
 
 	return err
-***REMOVED***
+}
 
 // RegisterMutationCallback registers a function to be called after a metadata
 // mutations has been performed.
 //
 // The callback function in an argument for whether a deletion has occurred
 // since the last garbage collection.
-func (m *DB) RegisterMutationCallback(fn func(bool)) ***REMOVED***
+func (m *DB) RegisterMutationCallback(fn func(bool)) {
 	m.dirtyL.Lock()
 	m.mutationCallbacks = append(m.mutationCallbacks, fn)
 	m.dirtyL.Unlock()
-***REMOVED***
+}
 
 // GCStats holds the duration for the different phases of the garbage collector
-type GCStats struct ***REMOVED***
+type GCStats struct {
 	MetaD     time.Duration
 	ContentD  time.Duration
 	SnapshotD map[string]time.Duration
-***REMOVED***
+}
 
 // GarbageCollect starts garbage collection
-func (m *DB) GarbageCollect(ctx context.Context) (stats GCStats, err error) ***REMOVED***
+func (m *DB) GarbageCollect(ctx context.Context) (stats GCStats, err error) {
 	m.wlock.Lock()
 	t1 := time.Now()
 
 	marked, err := m.getMarked(ctx)
-	if err != nil ***REMOVED***
+	if err != nil {
 		m.wlock.Unlock()
-		return GCStats***REMOVED******REMOVED***, err
-	***REMOVED***
+		return GCStats{}, err
+	}
 
 	m.dirtyL.Lock()
 
-	if err := m.db.Update(func(tx *bolt.Tx) error ***REMOVED***
+	if err := m.db.Update(func(tx *bolt.Tx) error {
 		ctx, cancel := context.WithCancel(ctx)
 		defer cancel()
 
-		rm := func(ctx context.Context, n gc.Node) error ***REMOVED***
-			if _, ok := marked[n]; ok ***REMOVED***
+		rm := func(ctx context.Context, n gc.Node) error {
+			if _, ok := marked[n]; ok {
 				return nil
-			***REMOVED***
+			}
 
-			if n.Type == ResourceSnapshot ***REMOVED***
-				if idx := strings.IndexRune(n.Key, '/'); idx > 0 ***REMOVED***
-					m.dirtySS[n.Key[:idx]] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-				***REMOVED***
-			***REMOVED*** else if n.Type == ResourceContent ***REMOVED***
+			if n.Type == ResourceSnapshot {
+				if idx := strings.IndexRune(n.Key, '/'); idx > 0 {
+					m.dirtySS[n.Key[:idx]] = struct{}{}
+				}
+			} else if n.Type == ResourceContent {
 				m.dirtyCS = true
-			***REMOVED***
+			}
 			return remove(ctx, tx, n)
-		***REMOVED***
+		}
 
-		if err := scanAll(ctx, tx, rm); err != nil ***REMOVED***
+		if err := scanAll(ctx, tx, rm); err != nil {
 			return errors.Wrap(err, "failed to scan and remove")
-		***REMOVED***
+		}
 
 		return nil
-	***REMOVED***); err != nil ***REMOVED***
+	}); err != nil {
 		m.dirtyL.Unlock()
 		m.wlock.Unlock()
-		return GCStats***REMOVED******REMOVED***, err
-	***REMOVED***
+		return GCStats{}, err
+	}
 
 	var wg sync.WaitGroup
 
-	if len(m.dirtySS) > 0 ***REMOVED***
+	if len(m.dirtySS) > 0 {
 		var sl sync.Mutex
-		stats.SnapshotD = map[string]time.Duration***REMOVED******REMOVED***
+		stats.SnapshotD = map[string]time.Duration{}
 		wg.Add(len(m.dirtySS))
-		for snapshotterName := range m.dirtySS ***REMOVED***
+		for snapshotterName := range m.dirtySS {
 			log.G(ctx).WithField("snapshotter", snapshotterName).Debug("schedule snapshotter cleanup")
-			go func(snapshotterName string) ***REMOVED***
+			go func(snapshotterName string) {
 				st1 := time.Now()
 				m.cleanupSnapshotter(snapshotterName)
 
@@ -279,22 +279,22 @@ func (m *DB) GarbageCollect(ctx context.Context) (stats GCStats, err error) ***R
 				sl.Unlock()
 
 				wg.Done()
-			***REMOVED***(snapshotterName)
-		***REMOVED***
-		m.dirtySS = map[string]struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	***REMOVED***
+			}(snapshotterName)
+		}
+		m.dirtySS = map[string]struct{}{}
+	}
 
-	if m.dirtyCS ***REMOVED***
+	if m.dirtyCS {
 		wg.Add(1)
 		log.G(ctx).Debug("schedule content cleanup")
-		go func() ***REMOVED***
+		go func() {
 			ct1 := time.Now()
 			m.cleanupContent()
 			stats.ContentD = time.Now().Sub(ct1)
 			wg.Done()
-		***REMOVED***()
+		}()
 		m.dirtyCS = false
-	***REMOVED***
+	}
 
 	m.dirtyL.Unlock()
 
@@ -304,11 +304,11 @@ func (m *DB) GarbageCollect(ctx context.Context) (stats GCStats, err error) ***R
 	wg.Wait()
 
 	return
-***REMOVED***
+}
 
-func (m *DB) getMarked(ctx context.Context) (map[gc.Node]struct***REMOVED******REMOVED***, error) ***REMOVED***
-	var marked map[gc.Node]struct***REMOVED******REMOVED***
-	if err := m.db.View(func(tx *bolt.Tx) error ***REMOVED***
+func (m *DB) getMarked(ctx context.Context) (map[gc.Node]struct{}, error) {
+	var marked map[gc.Node]struct{}
+	if err := m.db.View(func(tx *bolt.Tx) error {
 		ctx, cancel := context.WithCancel(ctx)
 		defer cancel()
 
@@ -318,71 +318,71 @@ func (m *DB) getMarked(ctx context.Context) (map[gc.Node]struct***REMOVED******R
 			roots = make(chan gc.Node)
 		)
 		wg.Add(1)
-		go func() ***REMOVED***
+		go func() {
 			defer wg.Done()
-			for n := range roots ***REMOVED***
+			for n := range roots {
 				nodes = append(nodes, n)
-			***REMOVED***
-		***REMOVED***()
+			}
+		}()
 		// Call roots
-		if err := scanRoots(ctx, tx, roots); err != nil ***REMOVED***
+		if err := scanRoots(ctx, tx, roots); err != nil {
 			cancel()
 			return err
-		***REMOVED***
+		}
 		close(roots)
 		wg.Wait()
 
-		refs := func(n gc.Node) ([]gc.Node, error) ***REMOVED***
+		refs := func(n gc.Node) ([]gc.Node, error) {
 			var sn []gc.Node
-			if err := references(ctx, tx, n, func(nn gc.Node) ***REMOVED***
+			if err := references(ctx, tx, n, func(nn gc.Node) {
 				sn = append(sn, nn)
-			***REMOVED***); err != nil ***REMOVED***
+			}); err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			return sn, nil
-		***REMOVED***
+		}
 
 		reachable, err := gc.Tricolor(nodes, refs)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		marked = reachable
 		return nil
-	***REMOVED***); err != nil ***REMOVED***
+	}); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return marked, nil
-***REMOVED***
+}
 
-func (m *DB) cleanupSnapshotter(name string) (time.Duration, error) ***REMOVED***
+func (m *DB) cleanupSnapshotter(name string) (time.Duration, error) {
 	ctx := context.Background()
 	sn, ok := m.ss[name]
-	if !ok ***REMOVED***
+	if !ok {
 		return 0, nil
-	***REMOVED***
+	}
 
 	d, err := sn.garbageCollect(ctx)
 	logger := log.G(ctx).WithField("snapshotter", name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		logger.WithError(err).Warn("snapshot garbage collection failed")
-	***REMOVED*** else ***REMOVED***
+	} else {
 		logger.WithField("d", d).Debugf("snapshot garbage collected")
-	***REMOVED***
+	}
 	return d, err
-***REMOVED***
+}
 
-func (m *DB) cleanupContent() (time.Duration, error) ***REMOVED***
+func (m *DB) cleanupContent() (time.Duration, error) {
 	ctx := context.Background()
-	if m.cs == nil ***REMOVED***
+	if m.cs == nil {
 		return 0, nil
-	***REMOVED***
+	}
 
 	d, err := m.cs.garbageCollect(ctx)
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.G(ctx).WithError(err).Warn("content garbage collection failed")
-	***REMOVED*** else ***REMOVED***
+	} else {
 		log.G(ctx).WithField("d", d).Debugf("content garbage collected")
-	***REMOVED***
+	}
 
 	return d, err
-***REMOVED***
+}

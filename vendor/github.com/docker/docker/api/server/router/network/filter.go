@@ -6,88 +6,88 @@ import (
 	"github.com/docker/docker/runconfig"
 )
 
-func filterNetworkByType(nws []types.NetworkResource, netType string) ([]types.NetworkResource, error) ***REMOVED***
-	retNws := []types.NetworkResource***REMOVED******REMOVED***
-	switch netType ***REMOVED***
+func filterNetworkByType(nws []types.NetworkResource, netType string) ([]types.NetworkResource, error) {
+	retNws := []types.NetworkResource{}
+	switch netType {
 	case "builtin":
-		for _, nw := range nws ***REMOVED***
-			if runconfig.IsPreDefinedNetwork(nw.Name) ***REMOVED***
+		for _, nw := range nws {
+			if runconfig.IsPreDefinedNetwork(nw.Name) {
 				retNws = append(retNws, nw)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 	case "custom":
-		for _, nw := range nws ***REMOVED***
-			if !runconfig.IsPreDefinedNetwork(nw.Name) ***REMOVED***
+		for _, nw := range nws {
+			if !runconfig.IsPreDefinedNetwork(nw.Name) {
 				retNws = append(retNws, nw)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 	default:
 		return nil, invalidFilter(netType)
-	***REMOVED***
+	}
 	return retNws, nil
-***REMOVED***
+}
 
 type invalidFilter string
 
-func (e invalidFilter) Error() string ***REMOVED***
+func (e invalidFilter) Error() string {
 	return "Invalid filter: 'type'='" + string(e) + "'"
-***REMOVED***
+}
 
-func (e invalidFilter) InvalidParameter() ***REMOVED******REMOVED***
+func (e invalidFilter) InvalidParameter() {}
 
 // filterNetworks filters network list according to user specified filter
 // and returns user chosen networks
-func filterNetworks(nws []types.NetworkResource, filter filters.Args) ([]types.NetworkResource, error) ***REMOVED***
+func filterNetworks(nws []types.NetworkResource, filter filters.Args) ([]types.NetworkResource, error) {
 	// if filter is empty, return original network list
-	if filter.Len() == 0 ***REMOVED***
+	if filter.Len() == 0 {
 		return nws, nil
-	***REMOVED***
+	}
 
-	displayNet := []types.NetworkResource***REMOVED******REMOVED***
-	for _, nw := range nws ***REMOVED***
-		if filter.Contains("driver") ***REMOVED***
-			if !filter.ExactMatch("driver", nw.Driver) ***REMOVED***
+	displayNet := []types.NetworkResource{}
+	for _, nw := range nws {
+		if filter.Contains("driver") {
+			if !filter.ExactMatch("driver", nw.Driver) {
 				continue
-			***REMOVED***
-		***REMOVED***
-		if filter.Contains("name") ***REMOVED***
-			if !filter.Match("name", nw.Name) ***REMOVED***
+			}
+		}
+		if filter.Contains("name") {
+			if !filter.Match("name", nw.Name) {
 				continue
-			***REMOVED***
-		***REMOVED***
-		if filter.Contains("id") ***REMOVED***
-			if !filter.Match("id", nw.ID) ***REMOVED***
+			}
+		}
+		if filter.Contains("id") {
+			if !filter.Match("id", nw.ID) {
 				continue
-			***REMOVED***
-		***REMOVED***
-		if filter.Contains("label") ***REMOVED***
-			if !filter.MatchKVList("label", nw.Labels) ***REMOVED***
+			}
+		}
+		if filter.Contains("label") {
+			if !filter.MatchKVList("label", nw.Labels) {
 				continue
-			***REMOVED***
-		***REMOVED***
-		if filter.Contains("scope") ***REMOVED***
-			if !filter.ExactMatch("scope", nw.Scope) ***REMOVED***
+			}
+		}
+		if filter.Contains("scope") {
+			if !filter.ExactMatch("scope", nw.Scope) {
 				continue
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		displayNet = append(displayNet, nw)
-	***REMOVED***
+	}
 
-	if filter.Contains("type") ***REMOVED***
-		typeNet := []types.NetworkResource***REMOVED******REMOVED***
-		errFilter := filter.WalkValues("type", func(fval string) error ***REMOVED***
+	if filter.Contains("type") {
+		typeNet := []types.NetworkResource{}
+		errFilter := filter.WalkValues("type", func(fval string) error {
 			passList, err := filterNetworkByType(displayNet, fval)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
+			}
 			typeNet = append(typeNet, passList...)
 			return nil
-		***REMOVED***)
-		if errFilter != nil ***REMOVED***
+		})
+		if errFilter != nil {
 			return nil, errFilter
-		***REMOVED***
+		}
 		displayNet = typeNet
-	***REMOVED***
+	}
 
 	return displayNet, nil
-***REMOVED***
+}

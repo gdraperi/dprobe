@@ -8,14 +8,14 @@ import (
 )
 
 // SwarmInspect inspects the swarm.
-func (cli *Client) SwarmInspect(ctx context.Context) (swarm.Swarm, error) ***REMOVED***
+func (cli *Client) SwarmInspect(ctx context.Context) (swarm.Swarm, error) {
 	serverResp, err := cli.get(ctx, "/swarm", nil, nil)
-	if err != nil ***REMOVED***
-		return swarm.Swarm***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return swarm.Swarm{}, err
+	}
 
 	var response swarm.Swarm
 	err = json.NewDecoder(serverResp.body).Decode(&response)
 	ensureReaderClosed(serverResp)
 	return response, err
-***REMOVED***
+}

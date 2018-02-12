@@ -13,108 +13,108 @@ import (
 var ErrDuplicatePath = errors.New("duplicates of file paths not supported")
 
 // Packer describes the methods to pack Entries to a storage destination
-type Packer interface ***REMOVED***
+type Packer interface {
 	// AddEntry packs the Entry and returns its position
 	AddEntry(e Entry) (int, error)
-***REMOVED***
+}
 
 // Unpacker describes the methods to read Entries from a source
-type Unpacker interface ***REMOVED***
+type Unpacker interface {
 	// Next returns the next Entry being unpacked, or error, until io.EOF
 	Next() (*Entry, error)
-***REMOVED***
+}
 
 /* TODO(vbatts) figure out a good model for this
-type PackUnpacker interface ***REMOVED***
+type PackUnpacker interface {
 	Packer
 	Unpacker
-***REMOVED***
+}
 */
 
-type jsonUnpacker struct ***REMOVED***
+type jsonUnpacker struct {
 	seen seenNames
 	dec  *json.Decoder
-***REMOVED***
+}
 
-func (jup *jsonUnpacker) Next() (*Entry, error) ***REMOVED***
+func (jup *jsonUnpacker) Next() (*Entry, error) {
 	var e Entry
 	err := jup.dec.Decode(&e)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// check for dup name
-	if e.Type == FileType ***REMOVED***
+	if e.Type == FileType {
 		cName := filepath.Clean(e.GetName())
-		if _, ok := jup.seen[cName]; ok ***REMOVED***
+		if _, ok := jup.seen[cName]; ok {
 			return nil, ErrDuplicatePath
-		***REMOVED***
-		jup.seen[cName] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	***REMOVED***
+		}
+		jup.seen[cName] = struct{}{}
+	}
 
 	return &e, err
-***REMOVED***
+}
 
 // NewJSONUnpacker provides an Unpacker that reads Entries (SegmentType and
 // FileType) as a json document.
 //
 // Each Entry read are expected to be delimited by new line.
-func NewJSONUnpacker(r io.Reader) Unpacker ***REMOVED***
-	return &jsonUnpacker***REMOVED***
+func NewJSONUnpacker(r io.Reader) Unpacker {
+	return &jsonUnpacker{
 		dec:  json.NewDecoder(r),
-		seen: seenNames***REMOVED******REMOVED***,
-	***REMOVED***
-***REMOVED***
+		seen: seenNames{},
+	}
+}
 
-type jsonPacker struct ***REMOVED***
+type jsonPacker struct {
 	w    io.Writer
 	e    *json.Encoder
 	pos  int
 	seen seenNames
-***REMOVED***
+}
 
-type seenNames map[string]struct***REMOVED******REMOVED***
+type seenNames map[string]struct{}
 
-func (jp *jsonPacker) AddEntry(e Entry) (int, error) ***REMOVED***
+func (jp *jsonPacker) AddEntry(e Entry) (int, error) {
 	// if Name is not valid utf8, switch it to raw first.
-	if e.Name != "" ***REMOVED***
-		if !utf8.ValidString(e.Name) ***REMOVED***
+	if e.Name != "" {
+		if !utf8.ValidString(e.Name) {
 			e.NameRaw = []byte(e.Name)
 			e.Name = ""
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// check early for dup name
-	if e.Type == FileType ***REMOVED***
+	if e.Type == FileType {
 		cName := filepath.Clean(e.GetName())
-		if _, ok := jp.seen[cName]; ok ***REMOVED***
+		if _, ok := jp.seen[cName]; ok {
 			return -1, ErrDuplicatePath
-		***REMOVED***
-		jp.seen[cName] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	***REMOVED***
+		}
+		jp.seen[cName] = struct{}{}
+	}
 
 	e.Position = jp.pos
 	err := jp.e.Encode(e)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return -1, err
-	***REMOVED***
+	}
 
 	// made it this far, increment now
 	jp.pos++
 	return e.Position, nil
-***REMOVED***
+}
 
 // NewJSONPacker provides a Packer that writes each Entry (SegmentType and
 // FileType) as a json document.
 //
 // The Entries are delimited by new line.
-func NewJSONPacker(w io.Writer) Packer ***REMOVED***
-	return &jsonPacker***REMOVED***
+func NewJSONPacker(w io.Writer) Packer {
+	return &jsonPacker{
 		w:    w,
 		e:    json.NewEncoder(w),
-		seen: seenNames***REMOVED******REMOVED***,
-	***REMOVED***
-***REMOVED***
+		seen: seenNames{},
+	}
+}
 
 /*
 TODO(vbatts) perhaps have a more compact packer/unpacker, maybe using msgapck

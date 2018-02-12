@@ -14,41 +14,41 @@ const (
 	debugSockFile = "docker-containerd-debug.sock"
 )
 
-func (r *remote) setDefaults() ***REMOVED***
-	if r.GRPC.Address == "" ***REMOVED***
+func (r *remote) setDefaults() {
+	if r.GRPC.Address == "" {
 		r.GRPC.Address = filepath.Join(r.stateDir, sockFile)
-	***REMOVED***
-	if r.Debug.Address == "" ***REMOVED***
+	}
+	if r.Debug.Address == "" {
 		r.Debug.Address = filepath.Join(r.stateDir, debugSockFile)
-	***REMOVED***
-	if r.Debug.Level == "" ***REMOVED***
+	}
+	if r.Debug.Level == "" {
 		r.Debug.Level = "info"
-	***REMOVED***
-	if r.OOMScore == 0 ***REMOVED***
+	}
+	if r.OOMScore == 0 {
 		r.OOMScore = -999
-	***REMOVED***
-	if r.snapshotter == "" ***REMOVED***
+	}
+	if r.snapshotter == "" {
 		r.snapshotter = "overlay"
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (r *remote) stopDaemon() ***REMOVED***
+func (r *remote) stopDaemon() {
 	// Ask the daemon to quit
 	syscall.Kill(r.daemonPid, syscall.SIGTERM)
 	// Wait up to 15secs for it to stop
-	for i := time.Duration(0); i < shutdownTimeout; i += time.Second ***REMOVED***
-		if !system.IsProcessAlive(r.daemonPid) ***REMOVED***
+	for i := time.Duration(0); i < shutdownTimeout; i += time.Second {
+		if !system.IsProcessAlive(r.daemonPid) {
 			break
-		***REMOVED***
+		}
 		time.Sleep(time.Second)
-	***REMOVED***
+	}
 
-	if system.IsProcessAlive(r.daemonPid) ***REMOVED***
+	if system.IsProcessAlive(r.daemonPid) {
 		r.logger.WithField("pid", r.daemonPid).Warn("daemon didn't stop within 15 secs, killing it")
 		syscall.Kill(r.daemonPid, syscall.SIGKILL)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (r *remote) platformCleanup() ***REMOVED***
+func (r *remote) platformCleanup() {
 	os.Remove(filepath.Join(r.stateDir, sockFile))
-***REMOVED***
+}

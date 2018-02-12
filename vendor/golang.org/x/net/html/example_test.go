@@ -13,28 +13,28 @@ import (
 	"golang.org/x/net/html"
 )
 
-func ExampleParse() ***REMOVED***
+func ExampleParse() {
 	s := `<p>Links:</p><ul><li><a href="foo">Foo</a><li><a href="/bar/baz">BarBaz</a></ul>`
 	doc, err := html.Parse(strings.NewReader(s))
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatal(err)
-	***REMOVED***
+	}
 	var f func(*html.Node)
-	f = func(n *html.Node) ***REMOVED***
-		if n.Type == html.ElementNode && n.Data == "a" ***REMOVED***
-			for _, a := range n.Attr ***REMOVED***
-				if a.Key == "href" ***REMOVED***
+	f = func(n *html.Node) {
+		if n.Type == html.ElementNode && n.Data == "a" {
+			for _, a := range n.Attr {
+				if a.Key == "href" {
 					fmt.Println(a.Val)
 					break
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-		for c := n.FirstChild; c != nil; c = c.NextSibling ***REMOVED***
+				}
+			}
+		}
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
 			f(c)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	f(doc)
 	// Output:
 	// foo
 	// /bar/baz
-***REMOVED***
+}

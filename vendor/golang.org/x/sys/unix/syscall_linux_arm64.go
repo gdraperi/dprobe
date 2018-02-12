@@ -22,10 +22,10 @@ package unix
 //sys	Pwrite(fd int, p []byte, offset int64) (n int, err error) = SYS_PWRITE64
 //sys	Seek(fd int, offset int64, whence int) (off int64, err error) = SYS_LSEEK
 
-func Select(nfd int, r *FdSet, w *FdSet, e *FdSet, timeout *Timeval) (n int, err error) ***REMOVED***
-	ts := Timespec***REMOVED***Sec: timeout.Sec, Nsec: timeout.Usec * 1000***REMOVED***
+func Select(nfd int, r *FdSet, w *FdSet, e *FdSet, timeout *Timeval) (n int, err error) {
+	ts := Timespec{Sec: timeout.Sec, Nsec: timeout.Usec * 1000}
 	return Pselect(nfd, r, w, e, &ts, nil)
-***REMOVED***
+}
 
 //sys	sendfile(outfd int, infd int, offset *int64, count int) (written int, err error)
 //sys	Setfsgid(gid int) (err error)
@@ -38,17 +38,17 @@ func Select(nfd int, r *FdSet, w *FdSet, e *FdSet, timeout *Timeval) (n int, err
 //sys	Shutdown(fd int, how int) (err error)
 //sys	Splice(rfd int, roff *int64, wfd int, woff *int64, len int, flags int) (n int64, err error)
 
-func Stat(path string, stat *Stat_t) (err error) ***REMOVED***
+func Stat(path string, stat *Stat_t) (err error) {
 	return Fstatat(AT_FDCWD, path, stat, 0)
-***REMOVED***
+}
 
-func Lchown(path string, uid int, gid int) (err error) ***REMOVED***
+func Lchown(path string, uid int, gid int) (err error) {
 	return Fchownat(AT_FDCWD, path, uid, gid, AT_SYMLINK_NOFOLLOW)
-***REMOVED***
+}
 
-func Lstat(path string, stat *Stat_t) (err error) ***REMOVED***
+func Lstat(path string, stat *Stat_t) (err error) {
 	return Fstatat(AT_FDCWD, path, stat, AT_SYMLINK_NOFOLLOW)
-***REMOVED***
+}
 
 //sys	Statfs(path string, buf *Statfs_t) (err error)
 //sys	SyncFileRange(fd int, off int64, n int64, flags int) (err error)
@@ -73,89 +73,89 @@ func Lstat(path string, stat *Stat_t) (err error) ***REMOVED***
 
 //sysnb	Gettimeofday(tv *Timeval) (err error)
 
-func setTimespec(sec, nsec int64) Timespec ***REMOVED***
-	return Timespec***REMOVED***Sec: sec, Nsec: nsec***REMOVED***
-***REMOVED***
+func setTimespec(sec, nsec int64) Timespec {
+	return Timespec{Sec: sec, Nsec: nsec}
+}
 
-func setTimeval(sec, usec int64) Timeval ***REMOVED***
-	return Timeval***REMOVED***Sec: sec, Usec: usec***REMOVED***
-***REMOVED***
+func setTimeval(sec, usec int64) Timeval {
+	return Timeval{Sec: sec, Usec: usec}
+}
 
-func Time(t *Time_t) (Time_t, error) ***REMOVED***
+func Time(t *Time_t) (Time_t, error) {
 	var tv Timeval
 	err := Gettimeofday(&tv)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
-	if t != nil ***REMOVED***
+	}
+	if t != nil {
 		*t = Time_t(tv.Sec)
-	***REMOVED***
+	}
 	return Time_t(tv.Sec), nil
-***REMOVED***
+}
 
-func Utime(path string, buf *Utimbuf) error ***REMOVED***
-	tv := []Timeval***REMOVED***
-		***REMOVED***Sec: buf.Actime***REMOVED***,
-		***REMOVED***Sec: buf.Modtime***REMOVED***,
-	***REMOVED***
+func Utime(path string, buf *Utimbuf) error {
+	tv := []Timeval{
+		{Sec: buf.Actime},
+		{Sec: buf.Modtime},
+	}
 	return Utimes(path, tv)
-***REMOVED***
+}
 
-func Pipe(p []int) (err error) ***REMOVED***
-	if len(p) != 2 ***REMOVED***
+func Pipe(p []int) (err error) {
+	if len(p) != 2 {
 		return EINVAL
-	***REMOVED***
+	}
 	var pp [2]_C_int
 	err = pipe2(&pp, 0)
 	p[0] = int(pp[0])
 	p[1] = int(pp[1])
 	return
-***REMOVED***
+}
 
 //sysnb pipe2(p *[2]_C_int, flags int) (err error)
 
-func Pipe2(p []int, flags int) (err error) ***REMOVED***
-	if len(p) != 2 ***REMOVED***
+func Pipe2(p []int, flags int) (err error) {
+	if len(p) != 2 {
 		return EINVAL
-	***REMOVED***
+	}
 	var pp [2]_C_int
 	err = pipe2(&pp, flags)
 	p[0] = int(pp[0])
 	p[1] = int(pp[1])
 	return
-***REMOVED***
+}
 
-func (r *PtraceRegs) PC() uint64 ***REMOVED*** return r.Pc ***REMOVED***
+func (r *PtraceRegs) PC() uint64 { return r.Pc }
 
-func (r *PtraceRegs) SetPC(pc uint64) ***REMOVED*** r.Pc = pc ***REMOVED***
+func (r *PtraceRegs) SetPC(pc uint64) { r.Pc = pc }
 
-func (iov *Iovec) SetLen(length int) ***REMOVED***
+func (iov *Iovec) SetLen(length int) {
 	iov.Len = uint64(length)
-***REMOVED***
+}
 
-func (msghdr *Msghdr) SetControllen(length int) ***REMOVED***
+func (msghdr *Msghdr) SetControllen(length int) {
 	msghdr.Controllen = uint64(length)
-***REMOVED***
+}
 
-func (cmsg *Cmsghdr) SetLen(length int) ***REMOVED***
+func (cmsg *Cmsghdr) SetLen(length int) {
 	cmsg.Len = uint64(length)
-***REMOVED***
+}
 
-func InotifyInit() (fd int, err error) ***REMOVED***
+func InotifyInit() (fd int, err error) {
 	return InotifyInit1(0)
-***REMOVED***
+}
 
-func Dup2(oldfd int, newfd int) (err error) ***REMOVED***
+func Dup2(oldfd int, newfd int) (err error) {
 	return Dup3(oldfd, newfd, 0)
-***REMOVED***
+}
 
-func Pause() (err error) ***REMOVED***
+func Pause() (err error) {
 	_, _, e1 := Syscall6(SYS_PPOLL, 0, 0, 0, 0, 0, 0)
-	if e1 != 0 ***REMOVED***
+	if e1 != 0 {
 		err = errnoErr(e1)
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // TODO(dfc): constants that should be in zsysnum_linux_arm64.go, remove
 // these when the deprecated syscalls that the syscall package relies on
@@ -173,14 +173,14 @@ const (
 	SYS_EPOLL_WAIT   = 1069
 )
 
-func Poll(fds []PollFd, timeout int) (n int, err error) ***REMOVED***
+func Poll(fds []PollFd, timeout int) (n int, err error) {
 	var ts *Timespec
-	if timeout >= 0 ***REMOVED***
+	if timeout >= 0 {
 		ts = new(Timespec)
 		*ts = NsecToTimespec(int64(timeout) * 1e6)
-	***REMOVED***
-	if len(fds) == 0 ***REMOVED***
+	}
+	if len(fds) == 0 {
 		return ppoll(nil, 0, ts, nil)
-	***REMOVED***
+	}
 	return ppoll(&fds[0], len(fds), ts, nil)
-***REMOVED***
+}

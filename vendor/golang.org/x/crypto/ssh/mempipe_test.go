@@ -12,99 +12,99 @@ import (
 
 // An in-memory packetConn. It is safe to call Close and writePacket
 // from different goroutines.
-type memTransport struct ***REMOVED***
+type memTransport struct {
 	eof     bool
 	pending [][]byte
 	write   *memTransport
 	sync.Mutex
 	*sync.Cond
-***REMOVED***
+}
 
-func (t *memTransport) readPacket() ([]byte, error) ***REMOVED***
+func (t *memTransport) readPacket() ([]byte, error) {
 	t.Lock()
 	defer t.Unlock()
-	for ***REMOVED***
-		if len(t.pending) > 0 ***REMOVED***
+	for {
+		if len(t.pending) > 0 {
 			r := t.pending[0]
 			t.pending = t.pending[1:]
 			return r, nil
-		***REMOVED***
-		if t.eof ***REMOVED***
+		}
+		if t.eof {
 			return nil, io.EOF
-		***REMOVED***
+		}
 		t.Cond.Wait()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (t *memTransport) closeSelf() error ***REMOVED***
+func (t *memTransport) closeSelf() error {
 	t.Lock()
 	defer t.Unlock()
-	if t.eof ***REMOVED***
+	if t.eof {
 		return io.EOF
-	***REMOVED***
+	}
 	t.eof = true
 	t.Cond.Broadcast()
 	return nil
-***REMOVED***
+}
 
-func (t *memTransport) Close() error ***REMOVED***
+func (t *memTransport) Close() error {
 	err := t.write.closeSelf()
 	t.closeSelf()
 	return err
-***REMOVED***
+}
 
-func (t *memTransport) writePacket(p []byte) error ***REMOVED***
+func (t *memTransport) writePacket(p []byte) error {
 	t.write.Lock()
 	defer t.write.Unlock()
-	if t.write.eof ***REMOVED***
+	if t.write.eof {
 		return io.EOF
-	***REMOVED***
+	}
 	c := make([]byte, len(p))
 	copy(c, p)
 	t.write.pending = append(t.write.pending, c)
 	t.write.Cond.Signal()
 	return nil
-***REMOVED***
+}
 
-func memPipe() (a, b packetConn) ***REMOVED***
-	t1 := memTransport***REMOVED******REMOVED***
-	t2 := memTransport***REMOVED******REMOVED***
+func memPipe() (a, b packetConn) {
+	t1 := memTransport{}
+	t2 := memTransport{}
 	t1.write = &t2
 	t2.write = &t1
 	t1.Cond = sync.NewCond(&t1.Mutex)
 	t2.Cond = sync.NewCond(&t2.Mutex)
 	return &t1, &t2
-***REMOVED***
+}
 
-func TestMemPipe(t *testing.T) ***REMOVED***
+func TestMemPipe(t *testing.T) {
 	a, b := memPipe()
-	if err := a.writePacket([]byte***REMOVED***42***REMOVED***); err != nil ***REMOVED***
+	if err := a.writePacket([]byte{42}); err != nil {
 		t.Fatalf("writePacket: %v", err)
-	***REMOVED***
-	if err := a.Close(); err != nil ***REMOVED***
+	}
+	if err := a.Close(); err != nil {
 		t.Fatal("Close: ", err)
-	***REMOVED***
+	}
 	p, err := b.readPacket()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal("readPacket: ", err)
-	***REMOVED***
-	if len(p) != 1 || p[0] != 42 ***REMOVED***
-		t.Fatalf("got %v, want ***REMOVED***42***REMOVED***", p)
-	***REMOVED***
+	}
+	if len(p) != 1 || p[0] != 42 {
+		t.Fatalf("got %v, want {42}", p)
+	}
 	p, err = b.readPacket()
-	if err != io.EOF ***REMOVED***
+	if err != io.EOF {
 		t.Fatalf("got %v, %v, want EOF", p, err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestDoubleClose(t *testing.T) ***REMOVED***
+func TestDoubleClose(t *testing.T) {
 	a, _ := memPipe()
 	err := a.Close()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("Close: %v", err)
-	***REMOVED***
+	}
 	err = a.Close()
-	if err != io.EOF ***REMOVED***
+	if err != io.EOF {
 		t.Errorf("expect EOF on double close.")
-	***REMOVED***
-***REMOVED***
+	}
+}

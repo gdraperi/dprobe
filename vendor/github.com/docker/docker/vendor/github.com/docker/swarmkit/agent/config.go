@@ -12,13 +12,13 @@ import (
 
 // NodeChanges encapsulates changes that should be made to the node as per session messages
 // from the dispatcher
-type NodeChanges struct ***REMOVED***
+type NodeChanges struct {
 	Node     *api.Node
 	RootCert []byte
-***REMOVED***
+}
 
 // Config provides values for an Agent.
-type Config struct ***REMOVED***
+type Config struct {
 	// Hostname the name of host for agent instance.
 	Hostname string
 
@@ -47,30 +47,30 @@ type Config struct ***REMOVED***
 	// SessionTracker, if provided, will have its SessionClosed and SessionError methods called
 	// when sessions close and error.
 	SessionTracker SessionTracker
-***REMOVED***
+}
 
-func (c *Config) validate() error ***REMOVED***
-	if c.Credentials == nil ***REMOVED***
+func (c *Config) validate() error {
+	if c.Credentials == nil {
 		return errors.New("agent: Credentials is required")
-	***REMOVED***
+	}
 
-	if c.Executor == nil ***REMOVED***
+	if c.Executor == nil {
 		return errors.New("agent: executor required")
-	***REMOVED***
+	}
 
-	if c.DB == nil ***REMOVED***
+	if c.DB == nil {
 		return errors.New("agent: database required")
-	***REMOVED***
+	}
 
-	if c.NodeTLSInfo == nil ***REMOVED***
+	if c.NodeTLSInfo == nil {
 		return errors.New("agent: Node TLS info is required")
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // A SessionTracker gets notified when sessions close and error
-type SessionTracker interface ***REMOVED***
+type SessionTracker interface {
 	// SessionClosed is called whenever a session is closed - if the function errors, the agent
 	// will exit with the returned error.  Otherwise the agent can continue and rebuild a new session.
 	SessionClosed() error
@@ -80,4 +80,4 @@ type SessionTracker interface ***REMOVED***
 
 	// SessionEstablished is called whenever a session is established
 	SessionEstablished()
-***REMOVED***
+}

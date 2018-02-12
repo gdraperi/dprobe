@@ -11,6 +11,6 @@ import (
 	"golang.org/x/net/internal/socket"
 )
 
-func (so *sockOpt) setAttachFilter(c *socket.Conn, f []bpf.RawInstruction) error ***REMOVED***
+func (so *sockOpt) setAttachFilter(c *socket.Conn, f []bpf.RawInstruction) error {
 	return errOpNoSupport
-***REMOVED***
+}

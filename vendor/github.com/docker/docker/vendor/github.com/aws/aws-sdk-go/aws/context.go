@@ -9,7 +9,7 @@ import (
 // API methods with Go v1.6 and a Context type such as golang.org/x/net/context.
 //
 // See https://golang.org/pkg/context on how to use contexts.
-type Context interface ***REMOVED***
+type Context interface {
 	// Deadline returns the time when work done on behalf of this context
 	// should be canceled. Deadline returns ok==false when no deadline is
 	// set. Successive calls to Deadline return the same results.
@@ -18,7 +18,7 @@ type Context interface ***REMOVED***
 	// Done returns a channel that's closed when work done on behalf of this
 	// context should be canceled. Done may return nil if this context can
 	// never be canceled. Successive calls to Done return the same value.
-	Done() <-chan struct***REMOVED******REMOVED***
+	Done() <-chan struct{}
 
 	// Err returns a non-nil error value after Done is closed. Err returns
 	// Canceled if the context was canceled or DeadlineExceeded if the
@@ -33,8 +33,8 @@ type Context interface ***REMOVED***
 	// Use context values only for request-scoped data that transits
 	// processes and API boundaries, not for passing optional parameters to
 	// functions.
-	Value(key interface***REMOVED******REMOVED***) interface***REMOVED******REMOVED***
-***REMOVED***
+	Value(key interface{}) interface{}
+}
 
 // BackgroundContext returns a context that will never be canceled, has no
 // values, and no deadline. This context is used by the SDK to provide
@@ -47,25 +47,25 @@ type Context interface ***REMOVED***
 // The context returned will be the value returned by context.Background()
 //
 // See https://golang.org/pkg/context for more information on Contexts.
-func BackgroundContext() Context ***REMOVED***
+func BackgroundContext() Context {
 	return backgroundCtx
-***REMOVED***
+}
 
 // SleepWithContext will wait for the timer duration to expire, or the context
 // is canceled. Which ever happens first. If the context is canceled the Context's
 // error will be returned.
 //
 // Expects Context to always return a non-nil error if the Done channel is closed.
-func SleepWithContext(ctx Context, dur time.Duration) error ***REMOVED***
+func SleepWithContext(ctx Context, dur time.Duration) error {
 	t := time.NewTimer(dur)
 	defer t.Stop()
 
-	select ***REMOVED***
+	select {
 	case <-t.C:
 		break
 	case <-ctx.Done():
 		return ctx.Err()
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}

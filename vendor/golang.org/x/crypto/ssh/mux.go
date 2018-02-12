@@ -18,7 +18,7 @@ import (
 const debugMux = false
 
 // chanList is a thread safe channel list.
-type chanList struct ***REMOVED***
+type chanList struct {
 	// protects concurrent access to chans
 	sync.Mutex
 
@@ -30,169 +30,169 @@ type chanList struct ***REMOVED***
 	// amount. This helps distinguish otherwise identical
 	// server/client muxes
 	offset uint32
-***REMOVED***
+}
 
 // Assigns a channel ID to the given channel.
-func (c *chanList) add(ch *channel) uint32 ***REMOVED***
+func (c *chanList) add(ch *channel) uint32 {
 	c.Lock()
 	defer c.Unlock()
-	for i := range c.chans ***REMOVED***
-		if c.chans[i] == nil ***REMOVED***
+	for i := range c.chans {
+		if c.chans[i] == nil {
 			c.chans[i] = ch
 			return uint32(i) + c.offset
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	c.chans = append(c.chans, ch)
 	return uint32(len(c.chans)-1) + c.offset
-***REMOVED***
+}
 
 // getChan returns the channel for the given ID.
-func (c *chanList) getChan(id uint32) *channel ***REMOVED***
+func (c *chanList) getChan(id uint32) *channel {
 	id -= c.offset
 
 	c.Lock()
 	defer c.Unlock()
-	if id < uint32(len(c.chans)) ***REMOVED***
+	if id < uint32(len(c.chans)) {
 		return c.chans[id]
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (c *chanList) remove(id uint32) ***REMOVED***
+func (c *chanList) remove(id uint32) {
 	id -= c.offset
 	c.Lock()
-	if id < uint32(len(c.chans)) ***REMOVED***
+	if id < uint32(len(c.chans)) {
 		c.chans[id] = nil
-	***REMOVED***
+	}
 	c.Unlock()
-***REMOVED***
+}
 
 // dropAll forgets all channels it knows, returning them in a slice.
-func (c *chanList) dropAll() []*channel ***REMOVED***
+func (c *chanList) dropAll() []*channel {
 	c.Lock()
 	defer c.Unlock()
 	var r []*channel
 
-	for _, ch := range c.chans ***REMOVED***
-		if ch == nil ***REMOVED***
+	for _, ch := range c.chans {
+		if ch == nil {
 			continue
-		***REMOVED***
+		}
 		r = append(r, ch)
-	***REMOVED***
+	}
 	c.chans = nil
 	return r
-***REMOVED***
+}
 
 // mux represents the state for the SSH connection protocol, which
 // multiplexes many channels onto a single packet transport.
-type mux struct ***REMOVED***
+type mux struct {
 	conn     packetConn
 	chanList chanList
 
 	incomingChannels chan NewChannel
 
 	globalSentMu     sync.Mutex
-	globalResponses  chan interface***REMOVED******REMOVED***
+	globalResponses  chan interface{}
 	incomingRequests chan *Request
 
 	errCond *sync.Cond
 	err     error
-***REMOVED***
+}
 
 // When debugging, each new chanList instantiation has a different
 // offset.
 var globalOff uint32
 
-func (m *mux) Wait() error ***REMOVED***
+func (m *mux) Wait() error {
 	m.errCond.L.Lock()
 	defer m.errCond.L.Unlock()
-	for m.err == nil ***REMOVED***
+	for m.err == nil {
 		m.errCond.Wait()
-	***REMOVED***
+	}
 	return m.err
-***REMOVED***
+}
 
 // newMux returns a mux that runs over the given connection.
-func newMux(p packetConn) *mux ***REMOVED***
-	m := &mux***REMOVED***
+func newMux(p packetConn) *mux {
+	m := &mux{
 		conn:             p,
 		incomingChannels: make(chan NewChannel, chanSize),
-		globalResponses:  make(chan interface***REMOVED******REMOVED***, 1),
+		globalResponses:  make(chan interface{}, 1),
 		incomingRequests: make(chan *Request, chanSize),
 		errCond:          newCond(),
-	***REMOVED***
-	if debugMux ***REMOVED***
+	}
+	if debugMux {
 		m.chanList.offset = atomic.AddUint32(&globalOff, 1)
-	***REMOVED***
+	}
 
 	go m.loop()
 	return m
-***REMOVED***
+}
 
-func (m *mux) sendMessage(msg interface***REMOVED******REMOVED***) error ***REMOVED***
+func (m *mux) sendMessage(msg interface{}) error {
 	p := Marshal(msg)
-	if debugMux ***REMOVED***
+	if debugMux {
 		log.Printf("send global(%d): %#v", m.chanList.offset, msg)
-	***REMOVED***
+	}
 	return m.conn.writePacket(p)
-***REMOVED***
+}
 
-func (m *mux) SendRequest(name string, wantReply bool, payload []byte) (bool, []byte, error) ***REMOVED***
-	if wantReply ***REMOVED***
+func (m *mux) SendRequest(name string, wantReply bool, payload []byte) (bool, []byte, error) {
+	if wantReply {
 		m.globalSentMu.Lock()
 		defer m.globalSentMu.Unlock()
-	***REMOVED***
+	}
 
-	if err := m.sendMessage(globalRequestMsg***REMOVED***
+	if err := m.sendMessage(globalRequestMsg{
 		Type:      name,
 		WantReply: wantReply,
 		Data:      payload,
-	***REMOVED***); err != nil ***REMOVED***
+	}); err != nil {
 		return false, nil, err
-	***REMOVED***
+	}
 
-	if !wantReply ***REMOVED***
+	if !wantReply {
 		return false, nil, nil
-	***REMOVED***
+	}
 
 	msg, ok := <-m.globalResponses
-	if !ok ***REMOVED***
+	if !ok {
 		return false, nil, io.EOF
-	***REMOVED***
-	switch msg := msg.(type) ***REMOVED***
+	}
+	switch msg := msg.(type) {
 	case *globalRequestFailureMsg:
 		return false, msg.Data, nil
 	case *globalRequestSuccessMsg:
 		return true, msg.Data, nil
 	default:
 		return false, nil, fmt.Errorf("ssh: unexpected response to request: %#v", msg)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // ackRequest must be called after processing a global request that
 // has WantReply set.
-func (m *mux) ackRequest(ok bool, data []byte) error ***REMOVED***
-	if ok ***REMOVED***
-		return m.sendMessage(globalRequestSuccessMsg***REMOVED***Data: data***REMOVED***)
-	***REMOVED***
-	return m.sendMessage(globalRequestFailureMsg***REMOVED***Data: data***REMOVED***)
-***REMOVED***
+func (m *mux) ackRequest(ok bool, data []byte) error {
+	if ok {
+		return m.sendMessage(globalRequestSuccessMsg{Data: data})
+	}
+	return m.sendMessage(globalRequestFailureMsg{Data: data})
+}
 
-func (m *mux) Close() error ***REMOVED***
+func (m *mux) Close() error {
 	return m.conn.Close()
-***REMOVED***
+}
 
 // loop runs the connection machine. It will process packets until an
 // error is encountered. To synchronize on loop exit, use mux.Wait.
-func (m *mux) loop() ***REMOVED***
+func (m *mux) loop() {
 	var err error
-	for err == nil ***REMOVED***
+	for err == nil {
 		err = m.onePacket()
-	***REMOVED***
+	}
 
-	for _, ch := range m.chanList.dropAll() ***REMOVED***
+	for _, ch := range m.chanList.dropAll() {
 		ch.close()
-	***REMOVED***
+	}
 
 	close(m.incomingChannels)
 	close(m.incomingRequests)
@@ -205,86 +205,86 @@ func (m *mux) loop() ***REMOVED***
 	m.errCond.Broadcast()
 	m.errCond.L.Unlock()
 
-	if debugMux ***REMOVED***
+	if debugMux {
 		log.Println("loop exit", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // onePacket reads and processes one packet.
-func (m *mux) onePacket() error ***REMOVED***
+func (m *mux) onePacket() error {
 	packet, err := m.conn.readPacket()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if debugMux ***REMOVED***
-		if packet[0] == msgChannelData || packet[0] == msgChannelExtendedData ***REMOVED***
+	if debugMux {
+		if packet[0] == msgChannelData || packet[0] == msgChannelExtendedData {
 			log.Printf("decoding(%d): data packet - %d bytes", m.chanList.offset, len(packet))
-		***REMOVED*** else ***REMOVED***
+		} else {
 			p, _ := decode(packet)
 			log.Printf("decoding(%d): %d %#v - %d bytes", m.chanList.offset, packet[0], p, len(packet))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	switch packet[0] ***REMOVED***
+	switch packet[0] {
 	case msgChannelOpen:
 		return m.handleChannelOpen(packet)
 	case msgGlobalRequest, msgRequestSuccess, msgRequestFailure:
 		return m.handleGlobalPacket(packet)
-	***REMOVED***
+	}
 
 	// assume a channel packet.
-	if len(packet) < 5 ***REMOVED***
+	if len(packet) < 5 {
 		return parseError(packet[0])
-	***REMOVED***
+	}
 	id := binary.BigEndian.Uint32(packet[1:])
 	ch := m.chanList.getChan(id)
-	if ch == nil ***REMOVED***
+	if ch == nil {
 		return fmt.Errorf("ssh: invalid channel %d", id)
-	***REMOVED***
+	}
 
 	return ch.handlePacket(packet)
-***REMOVED***
+}
 
-func (m *mux) handleGlobalPacket(packet []byte) error ***REMOVED***
+func (m *mux) handleGlobalPacket(packet []byte) error {
 	msg, err := decode(packet)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	switch msg := msg.(type) ***REMOVED***
+	switch msg := msg.(type) {
 	case *globalRequestMsg:
-		m.incomingRequests <- &Request***REMOVED***
+		m.incomingRequests <- &Request{
 			Type:      msg.Type,
 			WantReply: msg.WantReply,
 			Payload:   msg.Data,
 			mux:       m,
-		***REMOVED***
+		}
 	case *globalRequestSuccessMsg, *globalRequestFailureMsg:
 		m.globalResponses <- msg
 	default:
 		panic(fmt.Sprintf("not a global message %#v", msg))
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // handleChannelOpen schedules a channel to be Accept()ed.
-func (m *mux) handleChannelOpen(packet []byte) error ***REMOVED***
+func (m *mux) handleChannelOpen(packet []byte) error {
 	var msg channelOpenMsg
-	if err := Unmarshal(packet, &msg); err != nil ***REMOVED***
+	if err := Unmarshal(packet, &msg); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if msg.MaxPacketSize < minPacketLength || msg.MaxPacketSize > 1<<31 ***REMOVED***
-		failMsg := channelOpenFailureMsg***REMOVED***
+	if msg.MaxPacketSize < minPacketLength || msg.MaxPacketSize > 1<<31 {
+		failMsg := channelOpenFailureMsg{
 			PeersID:  msg.PeersID,
 			Reason:   ConnectionFailed,
 			Message:  "invalid request",
 			Language: "en_US.UTF-8",
-		***REMOVED***
+		}
 		return m.sendMessage(failMsg)
-	***REMOVED***
+	}
 
 	c := m.newChannel(msg.ChanType, channelInbound, msg.TypeSpecificData)
 	c.remoteId = msg.PeersID
@@ -292,39 +292,39 @@ func (m *mux) handleChannelOpen(packet []byte) error ***REMOVED***
 	c.remoteWin.add(msg.PeersWindow)
 	m.incomingChannels <- c
 	return nil
-***REMOVED***
+}
 
-func (m *mux) OpenChannel(chanType string, extra []byte) (Channel, <-chan *Request, error) ***REMOVED***
+func (m *mux) OpenChannel(chanType string, extra []byte) (Channel, <-chan *Request, error) {
 	ch, err := m.openChannel(chanType, extra)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 
 	return ch, ch.incomingRequests, nil
-***REMOVED***
+}
 
-func (m *mux) openChannel(chanType string, extra []byte) (*channel, error) ***REMOVED***
+func (m *mux) openChannel(chanType string, extra []byte) (*channel, error) {
 	ch := m.newChannel(chanType, channelOutbound, extra)
 
 	ch.maxIncomingPayload = channelMaxPacket
 
-	open := channelOpenMsg***REMOVED***
+	open := channelOpenMsg{
 		ChanType:         chanType,
 		PeersWindow:      ch.myWindow,
 		MaxPacketSize:    ch.maxIncomingPayload,
 		TypeSpecificData: extra,
 		PeersID:          ch.localId,
-	***REMOVED***
-	if err := m.sendMessage(open); err != nil ***REMOVED***
+	}
+	if err := m.sendMessage(open); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	switch msg := (<-ch.msg).(type) ***REMOVED***
+	switch msg := (<-ch.msg).(type) {
 	case *channelOpenConfirmMsg:
 		return ch, nil
 	case *channelOpenFailureMsg:
-		return nil, &OpenChannelError***REMOVED***msg.Reason, msg.Message***REMOVED***
+		return nil, &OpenChannelError{msg.Reason, msg.Message}
 	default:
 		return nil, fmt.Errorf("ssh: unexpected packet in response to channel open: %T", msg)
-	***REMOVED***
-***REMOVED***
+	}
+}

@@ -13,54 +13,54 @@ import (
 // tarName returns platform-specific filepath
 // to canonical posix-style path for tar archival. p is relative
 // path.
-func tarName(p string) (string, error) ***REMOVED***
+func tarName(p string) (string, error) {
 	// windows: convert windows style relative path with backslashes
 	// into forward slashes. Since windows does not allow '/' or '\'
 	// in file names, it is mostly safe to replace however we must
 	// check just in case
-	if strings.Contains(p, "/") ***REMOVED***
+	if strings.Contains(p, "/") {
 		return "", fmt.Errorf("Windows path contains forward slash: %s", p)
-	***REMOVED***
+	}
 
 	return strings.Replace(p, string(os.PathSeparator), "/", -1), nil
-***REMOVED***
+}
 
 // chmodTarEntry is used to adjust the file permissions used in tar header based
 // on the platform the archival is done.
-func chmodTarEntry(perm os.FileMode) os.FileMode ***REMOVED***
+func chmodTarEntry(perm os.FileMode) os.FileMode {
 	perm &= 0755
 	// Add the x bit: make everything +x from windows
 	perm |= 0111
 
 	return perm
-***REMOVED***
+}
 
-func setHeaderForSpecialDevice(*tar.Header, string, os.FileInfo) error ***REMOVED***
+func setHeaderForSpecialDevice(*tar.Header, string, os.FileInfo) error {
 	// do nothing. no notion of Rdev, Inode, Nlink in stat on Windows
 	return nil
-***REMOVED***
+}
 
-func open(p string) (*os.File, error) ***REMOVED***
+func open(p string) (*os.File, error) {
 	// We use sys.OpenSequential to ensure we use sequential file
 	// access on Windows to avoid depleting the standby list.
 	return sys.OpenSequential(p)
-***REMOVED***
+}
 
-func openFile(name string, flag int, perm os.FileMode) (*os.File, error) ***REMOVED***
+func openFile(name string, flag int, perm os.FileMode) (*os.File, error) {
 	// Source is regular file. We use sys.OpenFileSequential to use sequential
 	// file access to avoid depleting the standby list on Windows.
 	return sys.OpenFileSequential(name, flag, perm)
-***REMOVED***
+}
 
-func mkdirAll(path string, perm os.FileMode) error ***REMOVED***
+func mkdirAll(path string, perm os.FileMode) error {
 	return sys.MkdirAll(path, perm)
-***REMOVED***
+}
 
-func mkdir(path string, perm os.FileMode) error ***REMOVED***
+func mkdir(path string, perm os.FileMode) error {
 	return os.Mkdir(path, perm)
-***REMOVED***
+}
 
-func skipFile(hdr *tar.Header) bool ***REMOVED***
+func skipFile(hdr *tar.Header) bool {
 	// Windows does not support filenames with colons in them. Ignore
 	// these files. This is not a problem though (although it might
 	// appear that it is). Let's suppose a client is running docker pull.
@@ -75,29 +75,29 @@ func skipFile(hdr *tar.Header) bool ***REMOVED***
 	// specific or Linux-specific, this warning should be changed to an error
 	// to cater for the situation where someone does manage to upload a Linux
 	// image but have it tagged as Windows inadvertently.
-	if strings.Contains(hdr.Name, ":") ***REMOVED***
+	if strings.Contains(hdr.Name, ":") {
 		return true
-	***REMOVED***
+	}
 
 	return false
-***REMOVED***
+}
 
 // handleTarTypeBlockCharFifo is an OS-specific helper function used by
 // createTarFile to handle the following types of header: Block; Char; Fifo
-func handleTarTypeBlockCharFifo(hdr *tar.Header, path string) error ***REMOVED***
+func handleTarTypeBlockCharFifo(hdr *tar.Header, path string) error {
 	return nil
-***REMOVED***
+}
 
-func handleLChmod(hdr *tar.Header, path string, hdrInfo os.FileInfo) error ***REMOVED***
+func handleLChmod(hdr *tar.Header, path string, hdrInfo os.FileInfo) error {
 	return nil
-***REMOVED***
+}
 
-func getxattr(path, attr string) ([]byte, error) ***REMOVED***
+func getxattr(path, attr string) ([]byte, error) {
 	return nil, nil
-***REMOVED***
+}
 
-func setxattr(path, key, value string) error ***REMOVED***
+func setxattr(path, key, value string) error {
 	// Return not support error, do not wrap underlying not supported
 	// since xattrs should not exist in windows diff archives
 	return errors.New("xattrs not supported on Windows")
-***REMOVED***
+}

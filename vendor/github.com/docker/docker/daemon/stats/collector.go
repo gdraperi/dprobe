@@ -12,82 +12,82 @@ import (
 // Collect registers the container with the collector and adds it to
 // the event loop for collection on the specified interval returning
 // a channel for the subscriber to receive on.
-func (s *Collector) Collect(c *container.Container) chan interface***REMOVED******REMOVED*** ***REMOVED***
+func (s *Collector) Collect(c *container.Container) chan interface{} {
 	s.m.Lock()
 	defer s.m.Unlock()
 	publisher, exists := s.publishers[c]
-	if !exists ***REMOVED***
+	if !exists {
 		publisher = pubsub.NewPublisher(100*time.Millisecond, 1024)
 		s.publishers[c] = publisher
-	***REMOVED***
+	}
 	return publisher.Subscribe()
-***REMOVED***
+}
 
 // StopCollection closes the channels for all subscribers and removes
 // the container from metrics collection.
-func (s *Collector) StopCollection(c *container.Container) ***REMOVED***
+func (s *Collector) StopCollection(c *container.Container) {
 	s.m.Lock()
-	if publisher, exists := s.publishers[c]; exists ***REMOVED***
+	if publisher, exists := s.publishers[c]; exists {
 		publisher.Close()
 		delete(s.publishers, c)
-	***REMOVED***
+	}
 	s.m.Unlock()
-***REMOVED***
+}
 
 // Unsubscribe removes a specific subscriber from receiving updates for a container's stats.
-func (s *Collector) Unsubscribe(c *container.Container, ch chan interface***REMOVED******REMOVED***) ***REMOVED***
+func (s *Collector) Unsubscribe(c *container.Container, ch chan interface{}) {
 	s.m.Lock()
 	publisher := s.publishers[c]
-	if publisher != nil ***REMOVED***
+	if publisher != nil {
 		publisher.Evict(ch)
-		if publisher.Len() == 0 ***REMOVED***
+		if publisher.Len() == 0 {
 			delete(s.publishers, c)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	s.m.Unlock()
-***REMOVED***
+}
 
 // Run starts the collectors and will indefinitely collect stats from the supervisor
-func (s *Collector) Run() ***REMOVED***
-	type publishersPair struct ***REMOVED***
+func (s *Collector) Run() {
+	type publishersPair struct {
 		container *container.Container
 		publisher *pubsub.Publisher
-	***REMOVED***
+	}
 	// we cannot determine the capacity here.
 	// it will grow enough in first iteration
 	var pairs []publishersPair
 
-	for range time.Tick(s.interval) ***REMOVED***
+	for range time.Tick(s.interval) {
 		// it does not make sense in the first iteration,
 		// but saves allocations in further iterations
 		pairs = pairs[:0]
 
 		s.m.Lock()
-		for container, publisher := range s.publishers ***REMOVED***
+		for container, publisher := range s.publishers {
 			// copy pointers here to release the lock ASAP
-			pairs = append(pairs, publishersPair***REMOVED***container, publisher***REMOVED***)
-		***REMOVED***
+			pairs = append(pairs, publishersPair{container, publisher})
+		}
 		s.m.Unlock()
-		if len(pairs) == 0 ***REMOVED***
+		if len(pairs) == 0 {
 			continue
-		***REMOVED***
+		}
 
 		systemUsage, err := s.getSystemCPUUsage()
-		if err != nil ***REMOVED***
+		if err != nil {
 			logrus.Errorf("collecting system cpu usage: %v", err)
 			continue
-		***REMOVED***
+		}
 
 		onlineCPUs, err := s.getNumberOnlineCPUs()
-		if err != nil ***REMOVED***
+		if err != nil {
 			logrus.Errorf("collecting system online cpu count: %v", err)
 			continue
-		***REMOVED***
+		}
 
-		for _, pair := range pairs ***REMOVED***
+		for _, pair := range pairs {
 			stats, err := s.supervisor.GetContainerStats(pair.container)
 
-			switch err.(type) ***REMOVED***
+			switch err.(type) {
 			case nil:
 				// FIXME: move to containerd on Linux (not Windows)
 				stats.CPUStats.SystemUsage = systemUsage
@@ -97,24 +97,24 @@ func (s *Collector) Run() ***REMOVED***
 
 			case notRunningErr, notFoundErr:
 				// publish empty stats containing only name and ID if not running or not found
-				pair.publisher.Publish(types.StatsJSON***REMOVED***
+				pair.publisher.Publish(types.StatsJSON{
 					Name: pair.container.Name,
 					ID:   pair.container.ID,
-				***REMOVED***)
+				})
 
 			default:
 				logrus.Errorf("collecting stats for %s: %v", pair.container.ID, err)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}
 
-type notRunningErr interface ***REMOVED***
+type notRunningErr interface {
 	error
 	Conflict()
-***REMOVED***
+}
 
-type notFoundErr interface ***REMOVED***
+type notFoundErr interface {
 	error
 	NotFound()
-***REMOVED***
+}

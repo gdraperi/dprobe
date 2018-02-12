@@ -12,11 +12,11 @@
 #
 set -eu -o pipefail
 
-TESTFLAGS+=" -test.timeout=$***REMOVED***TIMEOUT:-5m***REMOVED***"
+TESTFLAGS+=" -test.timeout=${TIMEOUT:-5m}"
 BUILDFLAGS=( -tags "netgo seccomp libdm_no_deferred_remove" )
-TESTDIRS="$***REMOVED***TESTDIRS:-"./..."***REMOVED***"
+TESTDIRS="${TESTDIRS:-"./..."}"
 
 exclude_paths="/vendor/|/integration"
 pkg_list=$(go list $TESTDIRS | grep -vE "($exclude_paths)")
 
-go test -cover "$***REMOVED***BUILDFLAGS[@]***REMOVED***" $TESTFLAGS $pkg_list
+go test -cover "${BUILDFLAGS[@]}" $TESTFLAGS $pkg_list

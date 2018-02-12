@@ -1,1 +1,1 @@
-resource "foo" ***REMOVED******REMOVED***
+resource "foo" {}

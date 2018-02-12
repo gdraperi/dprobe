@@ -1,12 +1,12 @@
-variable "foo" ***REMOVED******REMOVED***
-variable "foo" ***REMOVED******REMOVED***
+variable "foo" {}
+variable "foo" {}
 
-variable "foo" ***REMOVED***
+variable "foo" {
   # Standalone comment should be still here
-***REMOVED***
+}
 
-foo ***REMOVED******REMOVED***
+foo {}
 
-foo ***REMOVED***
+foo {
   bar = "mssola"
-***REMOVED***
+}

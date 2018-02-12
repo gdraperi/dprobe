@@ -20,336 +20,336 @@ import (
 )
 
 var (
-	stringIDRegexp      = regexp.MustCompile(`^[a-f0-9]***REMOVED***64***REMOVED***(-init)?$`)
-	supportedAlgorithms = []digest.Algorithm***REMOVED***
+	stringIDRegexp      = regexp.MustCompile(`^[a-f0-9]{64}(-init)?$`)
+	supportedAlgorithms = []digest.Algorithm{
 		digest.SHA256,
 		// digest.SHA384, // Currently not used
 		// digest.SHA512, // Currently not used
-	***REMOVED***
+	}
 )
 
-type fileMetadataStore struct ***REMOVED***
+type fileMetadataStore struct {
 	root string
-***REMOVED***
+}
 
-type fileMetadataTransaction struct ***REMOVED***
+type fileMetadataTransaction struct {
 	store *fileMetadataStore
 	ws    *ioutils.AtomicWriteSet
-***REMOVED***
+}
 
 // NewFSMetadataStore returns an instance of a metadata store
 // which is backed by files on disk using the provided root
 // as the root of metadata files.
-func NewFSMetadataStore(root string) (MetadataStore, error) ***REMOVED***
-	if err := os.MkdirAll(root, 0700); err != nil ***REMOVED***
+func NewFSMetadataStore(root string) (MetadataStore, error) {
+	if err := os.MkdirAll(root, 0700); err != nil {
 		return nil, err
-	***REMOVED***
-	return &fileMetadataStore***REMOVED***
+	}
+	return &fileMetadataStore{
 		root: root,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-func (fms *fileMetadataStore) getLayerDirectory(layer ChainID) string ***REMOVED***
+func (fms *fileMetadataStore) getLayerDirectory(layer ChainID) string {
 	dgst := digest.Digest(layer)
 	return filepath.Join(fms.root, string(dgst.Algorithm()), dgst.Hex())
-***REMOVED***
+}
 
-func (fms *fileMetadataStore) getLayerFilename(layer ChainID, filename string) string ***REMOVED***
+func (fms *fileMetadataStore) getLayerFilename(layer ChainID, filename string) string {
 	return filepath.Join(fms.getLayerDirectory(layer), filename)
-***REMOVED***
+}
 
-func (fms *fileMetadataStore) getMountDirectory(mount string) string ***REMOVED***
+func (fms *fileMetadataStore) getMountDirectory(mount string) string {
 	return filepath.Join(fms.root, "mounts", mount)
-***REMOVED***
+}
 
-func (fms *fileMetadataStore) getMountFilename(mount, filename string) string ***REMOVED***
+func (fms *fileMetadataStore) getMountFilename(mount, filename string) string {
 	return filepath.Join(fms.getMountDirectory(mount), filename)
-***REMOVED***
+}
 
-func (fms *fileMetadataStore) StartTransaction() (MetadataTransaction, error) ***REMOVED***
+func (fms *fileMetadataStore) StartTransaction() (MetadataTransaction, error) {
 	tmpDir := filepath.Join(fms.root, "tmp")
-	if err := os.MkdirAll(tmpDir, 0755); err != nil ***REMOVED***
+	if err := os.MkdirAll(tmpDir, 0755); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	ws, err := ioutils.NewAtomicWriteSet(tmpDir)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	return &fileMetadataTransaction***REMOVED***
+	return &fileMetadataTransaction{
 		store: fms,
 		ws:    ws,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-func (fm *fileMetadataTransaction) SetSize(size int64) error ***REMOVED***
+func (fm *fileMetadataTransaction) SetSize(size int64) error {
 	content := fmt.Sprintf("%d", size)
 	return fm.ws.WriteFile("size", []byte(content), 0644)
-***REMOVED***
+}
 
-func (fm *fileMetadataTransaction) SetParent(parent ChainID) error ***REMOVED***
+func (fm *fileMetadataTransaction) SetParent(parent ChainID) error {
 	return fm.ws.WriteFile("parent", []byte(digest.Digest(parent).String()), 0644)
-***REMOVED***
+}
 
-func (fm *fileMetadataTransaction) SetDiffID(diff DiffID) error ***REMOVED***
+func (fm *fileMetadataTransaction) SetDiffID(diff DiffID) error {
 	return fm.ws.WriteFile("diff", []byte(digest.Digest(diff).String()), 0644)
-***REMOVED***
+}
 
-func (fm *fileMetadataTransaction) SetCacheID(cacheID string) error ***REMOVED***
+func (fm *fileMetadataTransaction) SetCacheID(cacheID string) error {
 	return fm.ws.WriteFile("cache-id", []byte(cacheID), 0644)
-***REMOVED***
+}
 
-func (fm *fileMetadataTransaction) SetDescriptor(ref distribution.Descriptor) error ***REMOVED***
+func (fm *fileMetadataTransaction) SetDescriptor(ref distribution.Descriptor) error {
 	jsonRef, err := json.Marshal(ref)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return fm.ws.WriteFile("descriptor.json", jsonRef, 0644)
-***REMOVED***
+}
 
-func (fm *fileMetadataTransaction) TarSplitWriter(compressInput bool) (io.WriteCloser, error) ***REMOVED***
+func (fm *fileMetadataTransaction) TarSplitWriter(compressInput bool) (io.WriteCloser, error) {
 	f, err := fm.ws.FileWriter("tar-split.json.gz", os.O_TRUNC|os.O_CREATE|os.O_WRONLY, 0644)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	var wc io.WriteCloser
-	if compressInput ***REMOVED***
+	if compressInput {
 		wc = gzip.NewWriter(f)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		wc = f
-	***REMOVED***
+	}
 
-	return ioutils.NewWriteCloserWrapper(wc, func() error ***REMOVED***
+	return ioutils.NewWriteCloserWrapper(wc, func() error {
 		wc.Close()
 		return f.Close()
-	***REMOVED***), nil
-***REMOVED***
+	}), nil
+}
 
-func (fm *fileMetadataTransaction) Commit(layer ChainID) error ***REMOVED***
+func (fm *fileMetadataTransaction) Commit(layer ChainID) error {
 	finalDir := fm.store.getLayerDirectory(layer)
-	if err := os.MkdirAll(filepath.Dir(finalDir), 0755); err != nil ***REMOVED***
+	if err := os.MkdirAll(filepath.Dir(finalDir), 0755); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	return fm.ws.Commit(finalDir)
-***REMOVED***
+}
 
-func (fm *fileMetadataTransaction) Cancel() error ***REMOVED***
+func (fm *fileMetadataTransaction) Cancel() error {
 	return fm.ws.Cancel()
-***REMOVED***
+}
 
-func (fm *fileMetadataTransaction) String() string ***REMOVED***
+func (fm *fileMetadataTransaction) String() string {
 	return fm.ws.String()
-***REMOVED***
+}
 
-func (fms *fileMetadataStore) GetSize(layer ChainID) (int64, error) ***REMOVED***
+func (fms *fileMetadataStore) GetSize(layer ChainID) (int64, error) {
 	content, err := ioutil.ReadFile(fms.getLayerFilename(layer, "size"))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 
 	size, err := strconv.ParseInt(string(content), 10, 64)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 
 	return size, nil
-***REMOVED***
+}
 
-func (fms *fileMetadataStore) GetParent(layer ChainID) (ChainID, error) ***REMOVED***
+func (fms *fileMetadataStore) GetParent(layer ChainID) (ChainID, error) {
 	content, err := ioutil.ReadFile(fms.getLayerFilename(layer, "parent"))
-	if err != nil ***REMOVED***
-		if os.IsNotExist(err) ***REMOVED***
+	if err != nil {
+		if os.IsNotExist(err) {
 			return "", nil
-		***REMOVED***
+		}
 		return "", err
-	***REMOVED***
+	}
 
 	dgst, err := digest.Parse(strings.TrimSpace(string(content)))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 
 	return ChainID(dgst), nil
-***REMOVED***
+}
 
-func (fms *fileMetadataStore) GetDiffID(layer ChainID) (DiffID, error) ***REMOVED***
+func (fms *fileMetadataStore) GetDiffID(layer ChainID) (DiffID, error) {
 	content, err := ioutil.ReadFile(fms.getLayerFilename(layer, "diff"))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 
 	dgst, err := digest.Parse(strings.TrimSpace(string(content)))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 
 	return DiffID(dgst), nil
-***REMOVED***
+}
 
-func (fms *fileMetadataStore) GetCacheID(layer ChainID) (string, error) ***REMOVED***
+func (fms *fileMetadataStore) GetCacheID(layer ChainID) (string, error) {
 	contentBytes, err := ioutil.ReadFile(fms.getLayerFilename(layer, "cache-id"))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	content := strings.TrimSpace(string(contentBytes))
 
-	if !stringIDRegexp.MatchString(content) ***REMOVED***
+	if !stringIDRegexp.MatchString(content) {
 		return "", errors.New("invalid cache id value")
-	***REMOVED***
+	}
 
 	return content, nil
-***REMOVED***
+}
 
-func (fms *fileMetadataStore) GetDescriptor(layer ChainID) (distribution.Descriptor, error) ***REMOVED***
+func (fms *fileMetadataStore) GetDescriptor(layer ChainID) (distribution.Descriptor, error) {
 	content, err := ioutil.ReadFile(fms.getLayerFilename(layer, "descriptor.json"))
-	if err != nil ***REMOVED***
-		if os.IsNotExist(err) ***REMOVED***
+	if err != nil {
+		if os.IsNotExist(err) {
 			// only return empty descriptor to represent what is stored
-			return distribution.Descriptor***REMOVED******REMOVED***, nil
-		***REMOVED***
-		return distribution.Descriptor***REMOVED******REMOVED***, err
-	***REMOVED***
+			return distribution.Descriptor{}, nil
+		}
+		return distribution.Descriptor{}, err
+	}
 
 	var ref distribution.Descriptor
 	err = json.Unmarshal(content, &ref)
-	if err != nil ***REMOVED***
-		return distribution.Descriptor***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return distribution.Descriptor{}, err
+	}
 	return ref, err
-***REMOVED***
+}
 
-func (fms *fileMetadataStore) TarSplitReader(layer ChainID) (io.ReadCloser, error) ***REMOVED***
+func (fms *fileMetadataStore) TarSplitReader(layer ChainID) (io.ReadCloser, error) {
 	fz, err := os.Open(fms.getLayerFilename(layer, "tar-split.json.gz"))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	f, err := gzip.NewReader(fz)
-	if err != nil ***REMOVED***
+	if err != nil {
 		fz.Close()
 		return nil, err
-	***REMOVED***
+	}
 
-	return ioutils.NewReadCloserWrapper(f, func() error ***REMOVED***
+	return ioutils.NewReadCloserWrapper(f, func() error {
 		f.Close()
 		return fz.Close()
-	***REMOVED***), nil
-***REMOVED***
+	}), nil
+}
 
-func (fms *fileMetadataStore) SetMountID(mount string, mountID string) error ***REMOVED***
-	if err := os.MkdirAll(fms.getMountDirectory(mount), 0755); err != nil ***REMOVED***
+func (fms *fileMetadataStore) SetMountID(mount string, mountID string) error {
+	if err := os.MkdirAll(fms.getMountDirectory(mount), 0755); err != nil {
 		return err
-	***REMOVED***
+	}
 	return ioutil.WriteFile(fms.getMountFilename(mount, "mount-id"), []byte(mountID), 0644)
-***REMOVED***
+}
 
-func (fms *fileMetadataStore) SetInitID(mount string, init string) error ***REMOVED***
-	if err := os.MkdirAll(fms.getMountDirectory(mount), 0755); err != nil ***REMOVED***
+func (fms *fileMetadataStore) SetInitID(mount string, init string) error {
+	if err := os.MkdirAll(fms.getMountDirectory(mount), 0755); err != nil {
 		return err
-	***REMOVED***
+	}
 	return ioutil.WriteFile(fms.getMountFilename(mount, "init-id"), []byte(init), 0644)
-***REMOVED***
+}
 
-func (fms *fileMetadataStore) SetMountParent(mount string, parent ChainID) error ***REMOVED***
-	if err := os.MkdirAll(fms.getMountDirectory(mount), 0755); err != nil ***REMOVED***
+func (fms *fileMetadataStore) SetMountParent(mount string, parent ChainID) error {
+	if err := os.MkdirAll(fms.getMountDirectory(mount), 0755); err != nil {
 		return err
-	***REMOVED***
+	}
 	return ioutil.WriteFile(fms.getMountFilename(mount, "parent"), []byte(digest.Digest(parent).String()), 0644)
-***REMOVED***
+}
 
-func (fms *fileMetadataStore) GetMountID(mount string) (string, error) ***REMOVED***
+func (fms *fileMetadataStore) GetMountID(mount string) (string, error) {
 	contentBytes, err := ioutil.ReadFile(fms.getMountFilename(mount, "mount-id"))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	content := strings.TrimSpace(string(contentBytes))
 
-	if !stringIDRegexp.MatchString(content) ***REMOVED***
+	if !stringIDRegexp.MatchString(content) {
 		return "", errors.New("invalid mount id value")
-	***REMOVED***
+	}
 
 	return content, nil
-***REMOVED***
+}
 
-func (fms *fileMetadataStore) GetInitID(mount string) (string, error) ***REMOVED***
+func (fms *fileMetadataStore) GetInitID(mount string) (string, error) {
 	contentBytes, err := ioutil.ReadFile(fms.getMountFilename(mount, "init-id"))
-	if err != nil ***REMOVED***
-		if os.IsNotExist(err) ***REMOVED***
+	if err != nil {
+		if os.IsNotExist(err) {
 			return "", nil
-		***REMOVED***
+		}
 		return "", err
-	***REMOVED***
+	}
 	content := strings.TrimSpace(string(contentBytes))
 
-	if !stringIDRegexp.MatchString(content) ***REMOVED***
+	if !stringIDRegexp.MatchString(content) {
 		return "", errors.New("invalid init id value")
-	***REMOVED***
+	}
 
 	return content, nil
-***REMOVED***
+}
 
-func (fms *fileMetadataStore) GetMountParent(mount string) (ChainID, error) ***REMOVED***
+func (fms *fileMetadataStore) GetMountParent(mount string) (ChainID, error) {
 	content, err := ioutil.ReadFile(fms.getMountFilename(mount, "parent"))
-	if err != nil ***REMOVED***
-		if os.IsNotExist(err) ***REMOVED***
+	if err != nil {
+		if os.IsNotExist(err) {
 			return "", nil
-		***REMOVED***
+		}
 		return "", err
-	***REMOVED***
+	}
 
 	dgst, err := digest.Parse(strings.TrimSpace(string(content)))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 
 	return ChainID(dgst), nil
-***REMOVED***
+}
 
-func (fms *fileMetadataStore) List() ([]ChainID, []string, error) ***REMOVED***
+func (fms *fileMetadataStore) List() ([]ChainID, []string, error) {
 	var ids []ChainID
-	for _, algorithm := range supportedAlgorithms ***REMOVED***
+	for _, algorithm := range supportedAlgorithms {
 		fileInfos, err := ioutil.ReadDir(filepath.Join(fms.root, string(algorithm)))
-		if err != nil ***REMOVED***
-			if os.IsNotExist(err) ***REMOVED***
+		if err != nil {
+			if os.IsNotExist(err) {
 				continue
-			***REMOVED***
+			}
 			return nil, nil, err
-		***REMOVED***
+		}
 
-		for _, fi := range fileInfos ***REMOVED***
-			if fi.IsDir() && fi.Name() != "mounts" ***REMOVED***
+		for _, fi := range fileInfos {
+			if fi.IsDir() && fi.Name() != "mounts" {
 				dgst := digest.NewDigestFromHex(string(algorithm), fi.Name())
-				if err := dgst.Validate(); err != nil ***REMOVED***
+				if err := dgst.Validate(); err != nil {
 					logrus.Debugf("Ignoring invalid digest %s:%s", algorithm, fi.Name())
-				***REMOVED*** else ***REMOVED***
+				} else {
 					ids = append(ids, ChainID(dgst))
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+				}
+			}
+		}
+	}
 
 	fileInfos, err := ioutil.ReadDir(filepath.Join(fms.root, "mounts"))
-	if err != nil ***REMOVED***
-		if os.IsNotExist(err) ***REMOVED***
-			return ids, []string***REMOVED******REMOVED***, nil
-		***REMOVED***
+	if err != nil {
+		if os.IsNotExist(err) {
+			return ids, []string{}, nil
+		}
 		return nil, nil, err
-	***REMOVED***
+	}
 
 	var mounts []string
-	for _, fi := range fileInfos ***REMOVED***
-		if fi.IsDir() ***REMOVED***
+	for _, fi := range fileInfos {
+		if fi.IsDir() {
 			mounts = append(mounts, fi.Name())
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return ids, mounts, nil
-***REMOVED***
+}
 
-func (fms *fileMetadataStore) Remove(layer ChainID) error ***REMOVED***
+func (fms *fileMetadataStore) Remove(layer ChainID) error {
 	return os.RemoveAll(fms.getLayerDirectory(layer))
-***REMOVED***
+}
 
-func (fms *fileMetadataStore) RemoveMount(mount string) error ***REMOVED***
+func (fms *fileMetadataStore) RemoveMount(mount string) error {
 	return os.RemoveAll(fms.getMountDirectory(mount))
-***REMOVED***
+}

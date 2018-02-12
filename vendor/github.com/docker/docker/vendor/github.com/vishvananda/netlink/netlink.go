@@ -22,18 +22,18 @@ var (
 // This is valuable because addresses in netlink are often IPNets and
 // ParseCIDR returns an IPNet with the IP part set to the base IP of the
 // range.
-func ParseIPNet(s string) (*net.IPNet, error) ***REMOVED***
+func ParseIPNet(s string) (*net.IPNet, error) {
 	ip, ipNet, err := net.ParseCIDR(s)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	return &net.IPNet***REMOVED***IP: ip, Mask: ipNet.Mask***REMOVED***, nil
-***REMOVED***
+	}
+	return &net.IPNet{IP: ip, Mask: ipNet.Mask}, nil
+}
 
 // NewIPNet generates an IPNet from an ip address using a netmask of 32 or 128.
-func NewIPNet(ip net.IP) *net.IPNet ***REMOVED***
-	if ip.To4() != nil ***REMOVED***
-		return &net.IPNet***REMOVED***IP: ip, Mask: net.CIDRMask(32, 32)***REMOVED***
-	***REMOVED***
-	return &net.IPNet***REMOVED***IP: ip, Mask: net.CIDRMask(128, 128)***REMOVED***
-***REMOVED***
+func NewIPNet(ip net.IP) *net.IPNet {
+	if ip.To4() != nil {
+		return &net.IPNet{IP: ip, Mask: net.CIDRMask(32, 32)}
+	}
+	return &net.IPNet{IP: ip, Mask: net.CIDRMask(128, 128)}
+}

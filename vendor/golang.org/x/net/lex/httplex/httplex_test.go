@@ -8,112 +8,112 @@ import (
 	"testing"
 )
 
-func isChar(c rune) bool ***REMOVED*** return c <= 127 ***REMOVED***
+func isChar(c rune) bool { return c <= 127 }
 
-func isCtl(c rune) bool ***REMOVED*** return c <= 31 || c == 127 ***REMOVED***
+func isCtl(c rune) bool { return c <= 31 || c == 127 }
 
-func isSeparator(c rune) bool ***REMOVED***
-	switch c ***REMOVED***
-	case '(', ')', '<', '>', '@', ',', ';', ':', '\\', '"', '/', '[', ']', '?', '=', '***REMOVED***', '***REMOVED***', ' ', '\t':
+func isSeparator(c rune) bool {
+	switch c {
+	case '(', ')', '<', '>', '@', ',', ';', ':', '\\', '"', '/', '[', ']', '?', '=', '{', '}', ' ', '\t':
 		return true
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
-func TestIsToken(t *testing.T) ***REMOVED***
-	for i := 0; i <= 130; i++ ***REMOVED***
+func TestIsToken(t *testing.T) {
+	for i := 0; i <= 130; i++ {
 		r := rune(i)
 		expected := isChar(r) && !isCtl(r) && !isSeparator(r)
-		if IsTokenRune(r) != expected ***REMOVED***
+		if IsTokenRune(r) != expected {
 			t.Errorf("isToken(0x%x) = %v", r, !expected)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestHeaderValuesContainsToken(t *testing.T) ***REMOVED***
-	tests := []struct ***REMOVED***
+func TestHeaderValuesContainsToken(t *testing.T) {
+	tests := []struct {
 		vals  []string
 		token string
 		want  bool
-	***REMOVED******REMOVED***
-		***REMOVED***
-			vals:  []string***REMOVED***"foo"***REMOVED***,
+	}{
+		{
+			vals:  []string{"foo"},
 			token: "foo",
 			want:  true,
-		***REMOVED***,
-		***REMOVED***
-			vals:  []string***REMOVED***"bar", "foo"***REMOVED***,
+		},
+		{
+			vals:  []string{"bar", "foo"},
 			token: "foo",
 			want:  true,
-		***REMOVED***,
-		***REMOVED***
-			vals:  []string***REMOVED***"foo"***REMOVED***,
+		},
+		{
+			vals:  []string{"foo"},
 			token: "FOO",
 			want:  true,
-		***REMOVED***,
-		***REMOVED***
-			vals:  []string***REMOVED***"foo"***REMOVED***,
+		},
+		{
+			vals:  []string{"foo"},
 			token: "bar",
 			want:  false,
-		***REMOVED***,
-		***REMOVED***
-			vals:  []string***REMOVED***" foo "***REMOVED***,
+		},
+		{
+			vals:  []string{" foo "},
 			token: "FOO",
 			want:  true,
-		***REMOVED***,
-		***REMOVED***
-			vals:  []string***REMOVED***"foo,bar"***REMOVED***,
+		},
+		{
+			vals:  []string{"foo,bar"},
 			token: "FOO",
 			want:  true,
-		***REMOVED***,
-		***REMOVED***
-			vals:  []string***REMOVED***"bar,foo,bar"***REMOVED***,
+		},
+		{
+			vals:  []string{"bar,foo,bar"},
 			token: "FOO",
 			want:  true,
-		***REMOVED***,
-		***REMOVED***
-			vals:  []string***REMOVED***"bar , foo"***REMOVED***,
+		},
+		{
+			vals:  []string{"bar , foo"},
 			token: "FOO",
 			want:  true,
-		***REMOVED***,
-		***REMOVED***
-			vals:  []string***REMOVED***"foo ,bar "***REMOVED***,
+		},
+		{
+			vals:  []string{"foo ,bar "},
 			token: "FOO",
 			want:  true,
-		***REMOVED***,
-		***REMOVED***
-			vals:  []string***REMOVED***"bar, foo ,bar"***REMOVED***,
+		},
+		{
+			vals:  []string{"bar, foo ,bar"},
 			token: "FOO",
 			want:  true,
-		***REMOVED***,
-		***REMOVED***
-			vals:  []string***REMOVED***"bar , foo"***REMOVED***,
+		},
+		{
+			vals:  []string{"bar , foo"},
 			token: "FOO",
 			want:  true,
-		***REMOVED***,
-	***REMOVED***
-	for _, tt := range tests ***REMOVED***
+		},
+	}
+	for _, tt := range tests {
 		got := HeaderValuesContainsToken(tt.vals, tt.token)
-		if got != tt.want ***REMOVED***
+		if got != tt.want {
 			t.Errorf("headerValuesContainsToken(%q, %q) = %v; want %v", tt.vals, tt.token, got, tt.want)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestPunycodeHostPort(t *testing.T) ***REMOVED***
-	tests := []struct ***REMOVED***
+func TestPunycodeHostPort(t *testing.T) {
+	tests := []struct {
 		in, want string
-	***REMOVED******REMOVED***
-		***REMOVED***"www.google.com", "www.google.com"***REMOVED***,
-		***REMOVED***"гофер.рф", "xn--c1ae0ajs.xn--p1ai"***REMOVED***,
-		***REMOVED***"bücher.de", "xn--bcher-kva.de"***REMOVED***,
-		***REMOVED***"bücher.de:8080", "xn--bcher-kva.de:8080"***REMOVED***,
-		***REMOVED***"[1::6]:8080", "[1::6]:8080"***REMOVED***,
-	***REMOVED***
-	for _, tt := range tests ***REMOVED***
+	}{
+		{"www.google.com", "www.google.com"},
+		{"гофер.рф", "xn--c1ae0ajs.xn--p1ai"},
+		{"bücher.de", "xn--bcher-kva.de"},
+		{"bücher.de:8080", "xn--bcher-kva.de:8080"},
+		{"[1::6]:8080", "[1::6]:8080"},
+	}
+	for _, tt := range tests {
 		got, err := PunycodeHostPort(tt.in)
-		if tt.want != got || err != nil ***REMOVED***
+		if tt.want != got || err != nil {
 			t.Errorf("PunycodeHostPort(%q) = %q, %v, want %q, nil", tt.in, got, err, tt.want)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

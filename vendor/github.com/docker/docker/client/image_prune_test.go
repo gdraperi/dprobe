@@ -15,19 +15,19 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestImagesPruneError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestImagesPruneError(t *testing.T) {
+	client := &Client{
 		client:  newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
 		version: "1.25",
-	***REMOVED***
+	}
 
 	filters := filters.NewArgs()
 
 	_, err := client.ImagesPrune(context.Background(), filters)
 	assert.EqualError(t, err, "Error response from daemon: Server error")
-***REMOVED***
+}
 
-func TestImagesPrune(t *testing.T) ***REMOVED***
+func TestImagesPrune(t *testing.T) {
 	expectedURL := "/v1.25/images/prune"
 
 	danglingFilters := filters.NewArgs()
@@ -41,79 +41,79 @@ func TestImagesPrune(t *testing.T) ***REMOVED***
 	labelFilters.Add("label", "label1=foo")
 	labelFilters.Add("label", "label2!=bar")
 
-	listCases := []struct ***REMOVED***
+	listCases := []struct {
 		filters             filters.Args
 		expectedQueryParams map[string]string
-	***REMOVED******REMOVED***
-		***REMOVED***
-			filters: filters.Args***REMOVED******REMOVED***,
-			expectedQueryParams: map[string]string***REMOVED***
+	}{
+		{
+			filters: filters.Args{},
+			expectedQueryParams: map[string]string{
 				"until":   "",
 				"filter":  "",
 				"filters": "",
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			},
+		},
+		{
 			filters: danglingFilters,
-			expectedQueryParams: map[string]string***REMOVED***
+			expectedQueryParams: map[string]string{
 				"until":   "",
 				"filter":  "",
-				"filters": `***REMOVED***"dangling":***REMOVED***"true":true***REMOVED******REMOVED***`,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+				"filters": `{"dangling":{"true":true}}`,
+			},
+		},
+		{
 			filters: noDanglingFilters,
-			expectedQueryParams: map[string]string***REMOVED***
+			expectedQueryParams: map[string]string{
 				"until":   "",
 				"filter":  "",
-				"filters": `***REMOVED***"dangling":***REMOVED***"false":true***REMOVED******REMOVED***`,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+				"filters": `{"dangling":{"false":true}}`,
+			},
+		},
+		{
 			filters: labelFilters,
-			expectedQueryParams: map[string]string***REMOVED***
+			expectedQueryParams: map[string]string{
 				"until":   "",
 				"filter":  "",
-				"filters": `***REMOVED***"dangling":***REMOVED***"true":true***REMOVED***,"label":***REMOVED***"label1=foo":true,"label2!=bar":true***REMOVED******REMOVED***`,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
-	for _, listCase := range listCases ***REMOVED***
-		client := &Client***REMOVED***
-			client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-				if !strings.HasPrefix(req.URL.Path, expectedURL) ***REMOVED***
+				"filters": `{"dangling":{"true":true},"label":{"label1=foo":true,"label2!=bar":true}}`,
+			},
+		},
+	}
+	for _, listCase := range listCases {
+		client := &Client{
+			client: newMockClient(func(req *http.Request) (*http.Response, error) {
+				if !strings.HasPrefix(req.URL.Path, expectedURL) {
 					return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, req.URL)
-				***REMOVED***
+				}
 				query := req.URL.Query()
-				for key, expected := range listCase.expectedQueryParams ***REMOVED***
+				for key, expected := range listCase.expectedQueryParams {
 					actual := query.Get(key)
 					assert.Equal(t, expected, actual)
-				***REMOVED***
-				content, err := json.Marshal(types.ImagesPruneReport***REMOVED***
-					ImagesDeleted: []types.ImageDeleteResponseItem***REMOVED***
-						***REMOVED***
+				}
+				content, err := json.Marshal(types.ImagesPruneReport{
+					ImagesDeleted: []types.ImageDeleteResponseItem{
+						{
 							Deleted: "image_id1",
-						***REMOVED***,
-						***REMOVED***
+						},
+						{
 							Deleted: "image_id2",
-						***REMOVED***,
-					***REMOVED***,
+						},
+					},
 					SpaceReclaimed: 9999,
-				***REMOVED***)
-				if err != nil ***REMOVED***
+				})
+				if err != nil {
 					return nil, err
-				***REMOVED***
-				return &http.Response***REMOVED***
+				}
+				return &http.Response{
 					StatusCode: http.StatusOK,
 					Body:       ioutil.NopCloser(bytes.NewReader(content)),
-				***REMOVED***, nil
-			***REMOVED***),
+				}, nil
+			}),
 			version: "1.25",
-		***REMOVED***
+		}
 
 		report, err := client.ImagesPrune(context.Background(), listCase.filters)
 		assert.NoError(t, err)
 		assert.Len(t, report.ImagesDeleted, 2)
 		assert.Equal(t, uint64(9999), report.SpaceReclaimed)
-	***REMOVED***
-***REMOVED***
+	}
+}

@@ -8,20 +8,20 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func startMetricsServer(addr string) error ***REMOVED***
-	if err := allocateDaemonPort(addr); err != nil ***REMOVED***
+func startMetricsServer(addr string) error {
+	if err := allocateDaemonPort(addr); err != nil {
 		return err
-	***REMOVED***
+	}
 	l, err := net.Listen("tcp", addr)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	mux := http.NewServeMux()
 	mux.Handle("/metrics", metrics.Handler())
-	go func() ***REMOVED***
-		if err := http.Serve(l, mux); err != nil ***REMOVED***
+	go func() {
+		if err := http.Serve(l, mux); err != nil {
 			logrus.Errorf("serve metrics api: %s", err)
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 	return nil
-***REMOVED***
+}

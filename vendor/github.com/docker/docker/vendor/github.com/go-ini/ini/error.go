@@ -18,15 +18,15 @@ import (
 	"fmt"
 )
 
-type ErrDelimiterNotFound struct ***REMOVED***
+type ErrDelimiterNotFound struct {
 	Line string
-***REMOVED***
+}
 
-func IsErrDelimiterNotFound(err error) bool ***REMOVED***
+func IsErrDelimiterNotFound(err error) bool {
 	_, ok := err.(ErrDelimiterNotFound)
 	return ok
-***REMOVED***
+}
 
-func (err ErrDelimiterNotFound) Error() string ***REMOVED***
+func (err ErrDelimiterNotFound) Error() string {
 	return fmt.Sprintf("key-value delimiter not found: %s", err.Line)
-***REMOVED***
+}

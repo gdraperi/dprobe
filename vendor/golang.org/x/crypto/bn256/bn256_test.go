@@ -11,7 +11,7 @@ import (
 	"testing"
 )
 
-func TestGFp2Invert(t *testing.T) ***REMOVED***
+func TestGFp2Invert(t *testing.T) {
 	pool := new(bnPool)
 
 	a := newGFp2(pool)
@@ -22,28 +22,28 @@ func TestGFp2Invert(t *testing.T) ***REMOVED***
 	inv.Invert(a, pool)
 
 	b := newGFp2(pool).Mul(inv, a, pool)
-	if b.x.Int64() != 0 || b.y.Int64() != 1 ***REMOVED***
+	if b.x.Int64() != 0 || b.y.Int64() != 1 {
 		t.Fatalf("bad result for a^-1*a: %s %s", b.x, b.y)
-	***REMOVED***
+	}
 
 	a.Put(pool)
 	b.Put(pool)
 	inv.Put(pool)
 
-	if c := pool.Count(); c > 0 ***REMOVED***
+	if c := pool.Count(); c > 0 {
 		t.Errorf("Pool count non-zero: %d\n", c)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func isZero(n *big.Int) bool ***REMOVED***
+func isZero(n *big.Int) bool {
 	return new(big.Int).Mod(n, p).Int64() == 0
-***REMOVED***
+}
 
-func isOne(n *big.Int) bool ***REMOVED***
+func isOne(n *big.Int) bool {
 	return new(big.Int).Mod(n, p).Int64() == 1
-***REMOVED***
+}
 
-func TestGFp6Invert(t *testing.T) ***REMOVED***
+func TestGFp6Invert(t *testing.T) {
 	pool := new(bnPool)
 
 	a := newGFp6(pool)
@@ -63,20 +63,20 @@ func TestGFp6Invert(t *testing.T) ***REMOVED***
 		!isZero(b.y.x) ||
 		!isZero(b.y.y) ||
 		!isZero(b.z.x) ||
-		!isOne(b.z.y) ***REMOVED***
+		!isOne(b.z.y) {
 		t.Fatalf("bad result for a^-1*a: %s", b)
-	***REMOVED***
+	}
 
 	a.Put(pool)
 	b.Put(pool)
 	inv.Put(pool)
 
-	if c := pool.Count(); c > 0 ***REMOVED***
+	if c := pool.Count(); c > 0 {
 		t.Errorf("Pool count non-zero: %d\n", c)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestGFp12Invert(t *testing.T) ***REMOVED***
+func TestGFp12Invert(t *testing.T) {
 	pool := new(bnPool)
 
 	a := newGFp12(pool)
@@ -108,28 +108,28 @@ func TestGFp12Invert(t *testing.T) ***REMOVED***
 		!isZero(b.y.y.x) ||
 		!isZero(b.y.y.y) ||
 		!isZero(b.y.z.x) ||
-		!isOne(b.y.z.y) ***REMOVED***
+		!isOne(b.y.z.y) {
 		t.Fatalf("bad result for a^-1*a: %s", b)
-	***REMOVED***
+	}
 
 	a.Put(pool)
 	b.Put(pool)
 	inv.Put(pool)
 
-	if c := pool.Count(); c > 0 ***REMOVED***
+	if c := pool.Count(); c > 0 {
 		t.Errorf("Pool count non-zero: %d\n", c)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestCurveImpl(t *testing.T) ***REMOVED***
+func TestCurveImpl(t *testing.T) {
 	pool := new(bnPool)
 
-	g := &curvePoint***REMOVED***
+	g := &curvePoint{
 		pool.Get().SetInt64(1),
 		pool.Get().SetInt64(-2),
 		pool.Get().SetInt64(1),
 		pool.Get().SetInt64(0),
-	***REMOVED***
+	}
 
 	x := pool.Get().SetInt64(32498273234)
 	X := newCurvePoint(pool).Mul(g, x, pool)
@@ -141,9 +141,9 @@ func TestCurveImpl(t *testing.T) ***REMOVED***
 	s2 := newCurvePoint(pool).Mul(Y, x, pool).MakeAffine(pool)
 
 	if s1.x.Cmp(s2.x) != 0 ||
-		s2.x.Cmp(s1.x) != 0 ***REMOVED***
+		s2.x.Cmp(s1.x) != 0 {
 		t.Errorf("DH points don't match: (%s, %s) (%s, %s)", s1.x, s1.y, s2.x, s2.y)
-	***REMOVED***
+	}
 
 	pool.Put(x)
 	X.Put(pool)
@@ -153,30 +153,30 @@ func TestCurveImpl(t *testing.T) ***REMOVED***
 	s2.Put(pool)
 	g.Put(pool)
 
-	if c := pool.Count(); c > 0 ***REMOVED***
+	if c := pool.Count(); c > 0 {
 		t.Errorf("Pool count non-zero: %d\n", c)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestOrderG1(t *testing.T) ***REMOVED***
+func TestOrderG1(t *testing.T) {
 	g := new(G1).ScalarBaseMult(Order)
-	if !g.p.IsInfinity() ***REMOVED***
+	if !g.p.IsInfinity() {
 		t.Error("G1 has incorrect order")
-	***REMOVED***
+	}
 
 	one := new(G1).ScalarBaseMult(new(big.Int).SetInt64(1))
 	g.Add(g, one)
 	g.p.MakeAffine(nil)
-	if g.p.x.Cmp(one.p.x) != 0 || g.p.y.Cmp(one.p.y) != 0 ***REMOVED***
+	if g.p.x.Cmp(one.p.x) != 0 || g.p.y.Cmp(one.p.y) != 0 {
 		t.Errorf("1+0 != 1 in G1")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestOrderG2(t *testing.T) ***REMOVED***
+func TestOrderG2(t *testing.T) {
 	g := new(G2).ScalarBaseMult(Order)
-	if !g.p.IsInfinity() ***REMOVED***
+	if !g.p.IsInfinity() {
 		t.Error("G2 has incorrect order")
-	***REMOVED***
+	}
 
 	one := new(G2).ScalarBaseMult(new(big.Int).SetInt64(1))
 	g.Add(g, one)
@@ -184,91 +184,91 @@ func TestOrderG2(t *testing.T) ***REMOVED***
 	if g.p.x.x.Cmp(one.p.x.x) != 0 ||
 		g.p.x.y.Cmp(one.p.x.y) != 0 ||
 		g.p.y.x.Cmp(one.p.y.x) != 0 ||
-		g.p.y.y.Cmp(one.p.y.y) != 0 ***REMOVED***
+		g.p.y.y.Cmp(one.p.y.y) != 0 {
 		t.Errorf("1+0 != 1 in G2")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestOrderGT(t *testing.T) ***REMOVED***
-	gt := Pair(&G1***REMOVED***curveGen***REMOVED***, &G2***REMOVED***twistGen***REMOVED***)
+func TestOrderGT(t *testing.T) {
+	gt := Pair(&G1{curveGen}, &G2{twistGen})
 	g := new(GT).ScalarMult(gt, Order)
-	if !g.p.IsOne() ***REMOVED***
+	if !g.p.IsOne() {
 		t.Error("GT has incorrect order")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestBilinearity(t *testing.T) ***REMOVED***
-	for i := 0; i < 2; i++ ***REMOVED***
+func TestBilinearity(t *testing.T) {
+	for i := 0; i < 2; i++ {
 		a, p1, _ := RandomG1(rand.Reader)
 		b, p2, _ := RandomG2(rand.Reader)
 		e1 := Pair(p1, p2)
 
-		e2 := Pair(&G1***REMOVED***curveGen***REMOVED***, &G2***REMOVED***twistGen***REMOVED***)
+		e2 := Pair(&G1{curveGen}, &G2{twistGen})
 		e2.ScalarMult(e2, a)
 		e2.ScalarMult(e2, b)
 
 		minusE2 := new(GT).Neg(e2)
 		e1.Add(e1, minusE2)
 
-		if !e1.p.IsOne() ***REMOVED***
+		if !e1.p.IsOne() {
 			t.Fatalf("bad pairing result: %s", e1)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestG1Marshal(t *testing.T) ***REMOVED***
+func TestG1Marshal(t *testing.T) {
 	g := new(G1).ScalarBaseMult(new(big.Int).SetInt64(1))
 	form := g.Marshal()
 	_, ok := new(G1).Unmarshal(form)
-	if !ok ***REMOVED***
+	if !ok {
 		t.Fatalf("failed to unmarshal")
-	***REMOVED***
+	}
 
 	g.ScalarBaseMult(Order)
 	form = g.Marshal()
 	g2, ok := new(G1).Unmarshal(form)
-	if !ok ***REMOVED***
+	if !ok {
 		t.Fatalf("failed to unmarshal ∞")
-	***REMOVED***
-	if !g2.p.IsInfinity() ***REMOVED***
+	}
+	if !g2.p.IsInfinity() {
 		t.Fatalf("∞ unmarshaled incorrectly")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestG2Marshal(t *testing.T) ***REMOVED***
+func TestG2Marshal(t *testing.T) {
 	g := new(G2).ScalarBaseMult(new(big.Int).SetInt64(1))
 	form := g.Marshal()
 	_, ok := new(G2).Unmarshal(form)
-	if !ok ***REMOVED***
+	if !ok {
 		t.Fatalf("failed to unmarshal")
-	***REMOVED***
+	}
 
 	g.ScalarBaseMult(Order)
 	form = g.Marshal()
 	g2, ok := new(G2).Unmarshal(form)
-	if !ok ***REMOVED***
+	if !ok {
 		t.Fatalf("failed to unmarshal ∞")
-	***REMOVED***
-	if !g2.p.IsInfinity() ***REMOVED***
+	}
+	if !g2.p.IsInfinity() {
 		t.Fatalf("∞ unmarshaled incorrectly")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestG1Identity(t *testing.T) ***REMOVED***
+func TestG1Identity(t *testing.T) {
 	g := new(G1).ScalarBaseMult(new(big.Int).SetInt64(0))
-	if !g.p.IsInfinity() ***REMOVED***
+	if !g.p.IsInfinity() {
 		t.Error("failure")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestG2Identity(t *testing.T) ***REMOVED***
+func TestG2Identity(t *testing.T) {
 	g := new(G2).ScalarBaseMult(new(big.Int).SetInt64(0))
-	if !g.p.IsInfinity() ***REMOVED***
+	if !g.p.IsInfinity() {
 		t.Error("failure")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestTripartiteDiffieHellman(t *testing.T) ***REMOVED***
+func TestTripartiteDiffieHellman(t *testing.T) {
 	a, _ := rand.Int(rand.Reader, Order)
 	b, _ := rand.Int(rand.Reader, Order)
 	c, _ := rand.Int(rand.Reader, Order)
@@ -292,13 +292,13 @@ func TestTripartiteDiffieHellman(t *testing.T) ***REMOVED***
 	k3.ScalarMult(k3, c)
 	k3Bytes := k3.Marshal()
 
-	if !bytes.Equal(k1Bytes, k2Bytes) || !bytes.Equal(k2Bytes, k3Bytes) ***REMOVED***
+	if !bytes.Equal(k1Bytes, k2Bytes) || !bytes.Equal(k2Bytes, k3Bytes) {
 		t.Errorf("keys didn't agree")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func BenchmarkPairing(b *testing.B) ***REMOVED***
-	for i := 0; i < b.N; i++ ***REMOVED***
-		Pair(&G1***REMOVED***curveGen***REMOVED***, &G2***REMOVED***twistGen***REMOVED***)
-	***REMOVED***
-***REMOVED***
+func BenchmarkPairing(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		Pair(&G1{curveGen}, &G2{twistGen})
+	}
+}

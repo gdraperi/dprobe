@@ -10,7 +10,7 @@ import (
 )
 
 // installConfigFlags adds flags to the pflag.FlagSet to configure the daemon
-func installConfigFlags(conf *config.Config, flags *pflag.FlagSet) ***REMOVED***
+func installConfigFlags(conf *config.Config, flags *pflag.FlagSet) {
 	// First handle install flags which are consistent cross-platform
 	installCommonConfigFlags(conf, flags)
 
@@ -44,4 +44,4 @@ func installConfigFlags(conf *config.Config, flags *pflag.FlagSet) ***REMOVED***
 	flags.Var(&conf.ShmSize, "default-shm-size", "Default shm size for containers")
 	flags.BoolVar(&conf.NoNewPrivileges, "no-new-privileges", false, "Set no-new-privileges by default for new containers")
 	flags.StringVar(&conf.IpcMode, "default-ipc-mode", config.DefaultIpcMode, `Default mode for containers ipc ("shareable" | "private")`)
-***REMOVED***
+}

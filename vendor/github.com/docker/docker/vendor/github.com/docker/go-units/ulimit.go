@@ -7,18 +7,18 @@ import (
 )
 
 // Ulimit is a human friendly version of Rlimit.
-type Ulimit struct ***REMOVED***
+type Ulimit struct {
 	Name string
 	Hard int64
 	Soft int64
-***REMOVED***
+}
 
 // Rlimit specifies the resource limits, such as max open files.
-type Rlimit struct ***REMOVED***
+type Rlimit struct {
 	Type int    `json:"type,omitempty"`
 	Hard uint64 `json:"hard,omitempty"`
 	Soft uint64 `json:"soft,omitempty"`
-***REMOVED***
+}
 
 const (
 	// magic numbers for making the syscall
@@ -43,7 +43,7 @@ const (
 	rlimitStack      = 3
 )
 
-var ulimitNameMapping = map[string]int***REMOVED***
+var ulimitNameMapping = map[string]int{
 	//"as":         rlimitAs, // Disabled since this doesn't seem usable with the way Docker inits a container.
 	"core":       rlimitCore,
 	"cpu":        rlimitCPU,
@@ -60,18 +60,18 @@ var ulimitNameMapping = map[string]int***REMOVED***
 	"rttime":     rlimitRttime,
 	"sigpending": rlimitSigpending,
 	"stack":      rlimitStack,
-***REMOVED***
+}
 
 // ParseUlimit parses and returns a Ulimit from the specified string.
-func ParseUlimit(val string) (*Ulimit, error) ***REMOVED***
+func ParseUlimit(val string) (*Ulimit, error) {
 	parts := strings.SplitN(val, "=", 2)
-	if len(parts) != 2 ***REMOVED***
+	if len(parts) != 2 {
 		return nil, fmt.Errorf("invalid ulimit argument: %s", val)
-	***REMOVED***
+	}
 
-	if _, exists := ulimitNameMapping[parts[0]]; !exists ***REMOVED***
+	if _, exists := ulimitNameMapping[parts[0]]; !exists {
 		return nil, fmt.Errorf("invalid ulimit type: %s", parts[0])
-	***REMOVED***
+	}
 
 	var (
 		soft int64
@@ -79,40 +79,40 @@ func ParseUlimit(val string) (*Ulimit, error) ***REMOVED***
 		temp int64
 		err  error
 	)
-	switch limitVals := strings.Split(parts[1], ":"); len(limitVals) ***REMOVED***
+	switch limitVals := strings.Split(parts[1], ":"); len(limitVals) {
 	case 2:
 		temp, err = strconv.ParseInt(limitVals[1], 10, 64)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		hard = &temp
 		fallthrough
 	case 1:
 		soft, err = strconv.ParseInt(limitVals[0], 10, 64)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 	default:
 		return nil, fmt.Errorf("too many limit value arguments - %s, can only have up to two, `soft[:hard]`", parts[1])
-	***REMOVED***
+	}
 
-	if soft > *hard ***REMOVED***
+	if soft > *hard {
 		return nil, fmt.Errorf("ulimit soft limit must be less than or equal to hard limit: %d > %d", soft, *hard)
-	***REMOVED***
+	}
 
-	return &Ulimit***REMOVED***Name: parts[0], Soft: soft, Hard: *hard***REMOVED***, nil
-***REMOVED***
+	return &Ulimit{Name: parts[0], Soft: soft, Hard: *hard}, nil
+}
 
 // GetRlimit returns the RLimit corresponding to Ulimit.
-func (u *Ulimit) GetRlimit() (*Rlimit, error) ***REMOVED***
+func (u *Ulimit) GetRlimit() (*Rlimit, error) {
 	t, exists := ulimitNameMapping[u.Name]
-	if !exists ***REMOVED***
+	if !exists {
 		return nil, fmt.Errorf("invalid ulimit name %s", u.Name)
-	***REMOVED***
+	}
 
-	return &Rlimit***REMOVED***Type: t, Soft: uint64(u.Soft), Hard: uint64(u.Hard)***REMOVED***, nil
-***REMOVED***
+	return &Rlimit{Type: t, Soft: uint64(u.Soft), Hard: uint64(u.Hard)}, nil
+}
 
-func (u *Ulimit) String() string ***REMOVED***
+func (u *Ulimit) String() string {
 	return fmt.Sprintf("%s=%d:%d", u.Name, u.Soft, u.Hard)
-***REMOVED***
+}

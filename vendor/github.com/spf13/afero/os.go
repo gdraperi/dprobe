@@ -23,72 +23,72 @@ import (
 //
 // For details in any method, check the documentation of the os package
 // (http://golang.org/pkg/os/).
-type OsFs struct***REMOVED******REMOVED***
+type OsFs struct{}
 
-func NewOsFs() Fs ***REMOVED***
-	return &OsFs***REMOVED******REMOVED***
-***REMOVED***
+func NewOsFs() Fs {
+	return &OsFs{}
+}
 
-func (OsFs) Name() string ***REMOVED*** return "OsFs" ***REMOVED***
+func (OsFs) Name() string { return "OsFs" }
 
-func (OsFs) Create(name string) (File, error) ***REMOVED***
+func (OsFs) Create(name string) (File, error) {
 	f, e := os.Create(name)
-	if f == nil ***REMOVED***
+	if f == nil {
 		// while this looks strange, we need to return a bare nil (of type nil) not
 		// a nil value of type *os.File or nil won't be nil
 		return nil, e
-	***REMOVED***
+	}
 	return f, e
-***REMOVED***
+}
 
-func (OsFs) Mkdir(name string, perm os.FileMode) error ***REMOVED***
+func (OsFs) Mkdir(name string, perm os.FileMode) error {
 	return os.Mkdir(name, perm)
-***REMOVED***
+}
 
-func (OsFs) MkdirAll(path string, perm os.FileMode) error ***REMOVED***
+func (OsFs) MkdirAll(path string, perm os.FileMode) error {
 	return os.MkdirAll(path, perm)
-***REMOVED***
+}
 
-func (OsFs) Open(name string) (File, error) ***REMOVED***
+func (OsFs) Open(name string) (File, error) {
 	f, e := os.Open(name)
-	if f == nil ***REMOVED***
+	if f == nil {
 		// while this looks strange, we need to return a bare nil (of type nil) not
 		// a nil value of type *os.File or nil won't be nil
 		return nil, e
-	***REMOVED***
+	}
 	return f, e
-***REMOVED***
+}
 
-func (OsFs) OpenFile(name string, flag int, perm os.FileMode) (File, error) ***REMOVED***
+func (OsFs) OpenFile(name string, flag int, perm os.FileMode) (File, error) {
 	f, e := os.OpenFile(name, flag, perm)
-	if f == nil ***REMOVED***
+	if f == nil {
 		// while this looks strange, we need to return a bare nil (of type nil) not
 		// a nil value of type *os.File or nil won't be nil
 		return nil, e
-	***REMOVED***
+	}
 	return f, e
-***REMOVED***
+}
 
-func (OsFs) Remove(name string) error ***REMOVED***
+func (OsFs) Remove(name string) error {
 	return os.Remove(name)
-***REMOVED***
+}
 
-func (OsFs) RemoveAll(path string) error ***REMOVED***
+func (OsFs) RemoveAll(path string) error {
 	return os.RemoveAll(path)
-***REMOVED***
+}
 
-func (OsFs) Rename(oldname, newname string) error ***REMOVED***
+func (OsFs) Rename(oldname, newname string) error {
 	return os.Rename(oldname, newname)
-***REMOVED***
+}
 
-func (OsFs) Stat(name string) (os.FileInfo, error) ***REMOVED***
+func (OsFs) Stat(name string) (os.FileInfo, error) {
 	return os.Stat(name)
-***REMOVED***
+}
 
-func (OsFs) Chmod(name string, mode os.FileMode) error ***REMOVED***
+func (OsFs) Chmod(name string, mode os.FileMode) error {
 	return os.Chmod(name, mode)
-***REMOVED***
+}
 
-func (OsFs) Chtimes(name string, atime time.Time, mtime time.Time) error ***REMOVED***
+func (OsFs) Chtimes(name string, atime time.Time, mtime time.Time) error {
 	return os.Chtimes(name, atime, mtime)
-***REMOVED***
+}

@@ -23,18 +23,18 @@ const ProviderName = "EC2RoleProvider"
 // Example how to configure the EC2RoleProvider with custom http Client, Endpoint
 // or ExpiryWindow
 //
-//     p := &ec2rolecreds.EC2RoleProvider***REMOVED***
+//     p := &ec2rolecreds.EC2RoleProvider{
 //         // Pass in a custom timeout to be used when requesting
 //         // IAM EC2 Role credentials.
-//         Client: ec2metadata.New(sess, aws.Config***REMOVED***
-//             HTTPClient: &http.Client***REMOVED***Timeout: 10 * time.Second***REMOVED***,
-//     ***REMOVED***),
+//         Client: ec2metadata.New(sess, aws.Config{
+//             HTTPClient: &http.Client{Timeout: 10 * time.Second},
+//         }),
 //
 //         // Do not use early expiry of credentials. If a non zero value is
 //         // specified the credentials will be expired early
 //         ExpiryWindow: 0,
-// ***REMOVED***
-type EC2RoleProvider struct ***REMOVED***
+//     }
+type EC2RoleProvider struct {
 	credentials.Expiry
 
 	// Required EC2Metadata client to use when connecting to EC2 metadata service.
@@ -50,70 +50,70 @@ type EC2RoleProvider struct ***REMOVED***
 	//
 	// If ExpiryWindow is 0 or less it will be ignored.
 	ExpiryWindow time.Duration
-***REMOVED***
+}
 
 // NewCredentials returns a pointer to a new Credentials object wrapping
 // the EC2RoleProvider. Takes a ConfigProvider to create a EC2Metadata client.
 // The ConfigProvider is satisfied by the session.Session type.
-func NewCredentials(c client.ConfigProvider, options ...func(*EC2RoleProvider)) *credentials.Credentials ***REMOVED***
-	p := &EC2RoleProvider***REMOVED***
+func NewCredentials(c client.ConfigProvider, options ...func(*EC2RoleProvider)) *credentials.Credentials {
+	p := &EC2RoleProvider{
 		Client: ec2metadata.New(c),
-	***REMOVED***
+	}
 
-	for _, option := range options ***REMOVED***
+	for _, option := range options {
 		option(p)
-	***REMOVED***
+	}
 
 	return credentials.NewCredentials(p)
-***REMOVED***
+}
 
 // NewCredentialsWithClient returns a pointer to a new Credentials object wrapping
 // the EC2RoleProvider. Takes a EC2Metadata client to use when connecting to EC2
 // metadata service.
-func NewCredentialsWithClient(client *ec2metadata.EC2Metadata, options ...func(*EC2RoleProvider)) *credentials.Credentials ***REMOVED***
-	p := &EC2RoleProvider***REMOVED***
+func NewCredentialsWithClient(client *ec2metadata.EC2Metadata, options ...func(*EC2RoleProvider)) *credentials.Credentials {
+	p := &EC2RoleProvider{
 		Client: client,
-	***REMOVED***
+	}
 
-	for _, option := range options ***REMOVED***
+	for _, option := range options {
 		option(p)
-	***REMOVED***
+	}
 
 	return credentials.NewCredentials(p)
-***REMOVED***
+}
 
 // Retrieve retrieves credentials from the EC2 service.
 // Error will be returned if the request fails, or unable to extract
 // the desired credentials.
-func (m *EC2RoleProvider) Retrieve() (credentials.Value, error) ***REMOVED***
+func (m *EC2RoleProvider) Retrieve() (credentials.Value, error) {
 	credsList, err := requestCredList(m.Client)
-	if err != nil ***REMOVED***
-		return credentials.Value***REMOVED***ProviderName: ProviderName***REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return credentials.Value{ProviderName: ProviderName}, err
+	}
 
-	if len(credsList) == 0 ***REMOVED***
-		return credentials.Value***REMOVED***ProviderName: ProviderName***REMOVED***, awserr.New("EmptyEC2RoleList", "empty EC2 Role list", nil)
-	***REMOVED***
+	if len(credsList) == 0 {
+		return credentials.Value{ProviderName: ProviderName}, awserr.New("EmptyEC2RoleList", "empty EC2 Role list", nil)
+	}
 	credsName := credsList[0]
 
 	roleCreds, err := requestCred(m.Client, credsName)
-	if err != nil ***REMOVED***
-		return credentials.Value***REMOVED***ProviderName: ProviderName***REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return credentials.Value{ProviderName: ProviderName}, err
+	}
 
 	m.SetExpiration(roleCreds.Expiration, m.ExpiryWindow)
 
-	return credentials.Value***REMOVED***
+	return credentials.Value{
 		AccessKeyID:     roleCreds.AccessKeyID,
 		SecretAccessKey: roleCreds.SecretAccessKey,
 		SessionToken:    roleCreds.Token,
 		ProviderName:    ProviderName,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // A ec2RoleCredRespBody provides the shape for unmarshaling credential
 // request responses.
-type ec2RoleCredRespBody struct ***REMOVED***
+type ec2RoleCredRespBody struct {
 	// Success State
 	Expiration      time.Time
 	AccessKeyID     string
@@ -123,56 +123,56 @@ type ec2RoleCredRespBody struct ***REMOVED***
 	// Error state
 	Code    string
 	Message string
-***REMOVED***
+}
 
 const iamSecurityCredsPath = "/iam/security-credentials"
 
 // requestCredList requests a list of credentials from the EC2 service.
 // If there are no credentials, or there is an error making or receiving the request
-func requestCredList(client *ec2metadata.EC2Metadata) ([]string, error) ***REMOVED***
+func requestCredList(client *ec2metadata.EC2Metadata) ([]string, error) {
 	resp, err := client.GetMetadata(iamSecurityCredsPath)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, awserr.New("EC2RoleRequestError", "no EC2 instance role found", err)
-	***REMOVED***
+	}
 
-	credsList := []string***REMOVED******REMOVED***
+	credsList := []string{}
 	s := bufio.NewScanner(strings.NewReader(resp))
-	for s.Scan() ***REMOVED***
+	for s.Scan() {
 		credsList = append(credsList, s.Text())
-	***REMOVED***
+	}
 
-	if err := s.Err(); err != nil ***REMOVED***
+	if err := s.Err(); err != nil {
 		return nil, awserr.New("SerializationError", "failed to read EC2 instance role from metadata service", err)
-	***REMOVED***
+	}
 
 	return credsList, nil
-***REMOVED***
+}
 
 // requestCred requests the credentials for a specific credentials from the EC2 service.
 //
 // If the credentials cannot be found, or there is an error reading the response
 // and error will be returned.
-func requestCred(client *ec2metadata.EC2Metadata, credsName string) (ec2RoleCredRespBody, error) ***REMOVED***
+func requestCred(client *ec2metadata.EC2Metadata, credsName string) (ec2RoleCredRespBody, error) {
 	resp, err := client.GetMetadata(path.Join(iamSecurityCredsPath, credsName))
-	if err != nil ***REMOVED***
-		return ec2RoleCredRespBody***REMOVED******REMOVED***,
+	if err != nil {
+		return ec2RoleCredRespBody{},
 			awserr.New("EC2RoleRequestError",
 				fmt.Sprintf("failed to get %s EC2 instance role credentials", credsName),
 				err)
-	***REMOVED***
+	}
 
-	respCreds := ec2RoleCredRespBody***REMOVED******REMOVED***
-	if err := json.NewDecoder(strings.NewReader(resp)).Decode(&respCreds); err != nil ***REMOVED***
-		return ec2RoleCredRespBody***REMOVED******REMOVED***,
+	respCreds := ec2RoleCredRespBody{}
+	if err := json.NewDecoder(strings.NewReader(resp)).Decode(&respCreds); err != nil {
+		return ec2RoleCredRespBody{},
 			awserr.New("SerializationError",
 				fmt.Sprintf("failed to decode %s EC2 instance role credentials", credsName),
 				err)
-	***REMOVED***
+	}
 
-	if respCreds.Code != "Success" ***REMOVED***
+	if respCreds.Code != "Success" {
 		// If an error code was returned something failed requesting the role.
-		return ec2RoleCredRespBody***REMOVED******REMOVED***, awserr.New(respCreds.Code, respCreds.Message, nil)
-	***REMOVED***
+		return ec2RoleCredRespBody{}, awserr.New(respCreds.Code, respCreds.Message, nil)
+	}
 
 	return respCreds, nil
-***REMOVED***
+}

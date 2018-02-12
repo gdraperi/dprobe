@@ -19,21 +19,21 @@ import (
 // The rc2 block size in bytes
 const BlockSize = 8
 
-type rc2Cipher struct ***REMOVED***
+type rc2Cipher struct {
 	k [64]uint16
-***REMOVED***
+}
 
 // New returns a new rc2 cipher with the given key and effective key length t1
-func New(key []byte, t1 int) (cipher.Block, error) ***REMOVED***
+func New(key []byte, t1 int) (cipher.Block, error) {
 	// TODO(dgryski): error checking for key length
-	return &rc2Cipher***REMOVED***
+	return &rc2Cipher{
 		k: expandKey(key, t1),
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-func (*rc2Cipher) BlockSize() int ***REMOVED*** return BlockSize ***REMOVED***
+func (*rc2Cipher) BlockSize() int { return BlockSize }
 
-var piTable = [256]byte***REMOVED***
+var piTable = [256]byte{
 	0xd9, 0x78, 0xf9, 0xc4, 0x19, 0xdd, 0xb5, 0xed, 0x28, 0xe9, 0xfd, 0x79, 0x4a, 0xa0, 0xd8, 0x9d,
 	0xc6, 0x7e, 0x37, 0x83, 0x2b, 0x76, 0x53, 0x8e, 0x62, 0x4c, 0x64, 0x88, 0x44, 0x8b, 0xfb, 0xa2,
 	0x17, 0x9a, 0x59, 0xf5, 0x87, 0xb3, 0x4f, 0x13, 0x61, 0x45, 0x6d, 0x8d, 0x09, 0x81, 0x7d, 0x32,
@@ -50,9 +50,9 @@ var piTable = [256]byte***REMOVED***
 	0xd3, 0x00, 0xe6, 0xcf, 0xe1, 0x9e, 0xa8, 0x2c, 0x63, 0x16, 0x01, 0x3f, 0x58, 0xe2, 0x89, 0xa9,
 	0x0d, 0x38, 0x34, 0x1b, 0xab, 0x33, 0xff, 0xb0, 0xbb, 0x48, 0x0c, 0x5f, 0xb9, 0xb1, 0xcd, 0x2e,
 	0xc5, 0xf3, 0xdb, 0x47, 0xe5, 0xa5, 0x9c, 0x77, 0x0a, 0xa6, 0x20, 0x68, 0xfe, 0x7f, 0xc1, 0xad,
-***REMOVED***
+}
 
-func expandKey(key []byte, t1 int) [64]uint16 ***REMOVED***
+func expandKey(key []byte, t1 int) [64]uint16 {
 
 	l := make([]byte, 128)
 	copy(l, key)
@@ -61,30 +61,30 @@ func expandKey(key []byte, t1 int) [64]uint16 ***REMOVED***
 	var t8 = (t1 + 7) / 8
 	var tm = byte(255 % uint(1<<(8+uint(t1)-8*uint(t8))))
 
-	for i := len(key); i < 128; i++ ***REMOVED***
+	for i := len(key); i < 128; i++ {
 		l[i] = piTable[l[i-1]+l[uint8(i-t)]]
-	***REMOVED***
+	}
 
 	l[128-t8] = piTable[l[128-t8]&tm]
 
-	for i := 127 - t8; i >= 0; i-- ***REMOVED***
+	for i := 127 - t8; i >= 0; i-- {
 		l[i] = piTable[l[i+1]^l[i+t8]]
-	***REMOVED***
+	}
 
 	var k [64]uint16
 
-	for i := range k ***REMOVED***
+	for i := range k {
 		k[i] = uint16(l[2*i]) + uint16(l[2*i+1])*256
-	***REMOVED***
+	}
 
 	return k
-***REMOVED***
+}
 
-func rotl16(x uint16, b uint) uint16 ***REMOVED***
+func rotl16(x uint16, b uint) uint16 {
 	return (x >> (16 - b)) | (x << b)
-***REMOVED***
+}
 
-func (c *rc2Cipher) Encrypt(dst, src []byte) ***REMOVED***
+func (c *rc2Cipher) Encrypt(dst, src []byte) {
 
 	r0 := binary.LittleEndian.Uint16(src[0:])
 	r1 := binary.LittleEndian.Uint16(src[2:])
@@ -93,7 +93,7 @@ func (c *rc2Cipher) Encrypt(dst, src []byte) ***REMOVED***
 
 	var j int
 
-	for j <= 16 ***REMOVED***
+	for j <= 16 {
 		// mix r0
 		r0 = r0 + c.k[j] + (r3 & r2) + ((^r3) & r1)
 		r0 = rotl16(r0, 1)
@@ -114,14 +114,14 @@ func (c *rc2Cipher) Encrypt(dst, src []byte) ***REMOVED***
 		r3 = rotl16(r3, 5)
 		j++
 
-	***REMOVED***
+	}
 
 	r0 = r0 + c.k[r3&63]
 	r1 = r1 + c.k[r0&63]
 	r2 = r2 + c.k[r1&63]
 	r3 = r3 + c.k[r2&63]
 
-	for j <= 40 ***REMOVED***
+	for j <= 40 {
 		// mix r0
 		r0 = r0 + c.k[j] + (r3 & r2) + ((^r3) & r1)
 		r0 = rotl16(r0, 1)
@@ -142,14 +142,14 @@ func (c *rc2Cipher) Encrypt(dst, src []byte) ***REMOVED***
 		r3 = rotl16(r3, 5)
 		j++
 
-	***REMOVED***
+	}
 
 	r0 = r0 + c.k[r3&63]
 	r1 = r1 + c.k[r0&63]
 	r2 = r2 + c.k[r1&63]
 	r3 = r3 + c.k[r2&63]
 
-	for j <= 60 ***REMOVED***
+	for j <= 60 {
 		// mix r0
 		r0 = r0 + c.k[j] + (r3 & r2) + ((^r3) & r1)
 		r0 = rotl16(r0, 1)
@@ -169,15 +169,15 @@ func (c *rc2Cipher) Encrypt(dst, src []byte) ***REMOVED***
 		r3 = r3 + c.k[j] + (r2 & r1) + ((^r2) & r0)
 		r3 = rotl16(r3, 5)
 		j++
-	***REMOVED***
+	}
 
 	binary.LittleEndian.PutUint16(dst[0:], r0)
 	binary.LittleEndian.PutUint16(dst[2:], r1)
 	binary.LittleEndian.PutUint16(dst[4:], r2)
 	binary.LittleEndian.PutUint16(dst[6:], r3)
-***REMOVED***
+}
 
-func (c *rc2Cipher) Decrypt(dst, src []byte) ***REMOVED***
+func (c *rc2Cipher) Decrypt(dst, src []byte) {
 
 	r0 := binary.LittleEndian.Uint16(src[0:])
 	r1 := binary.LittleEndian.Uint16(src[2:])
@@ -186,7 +186,7 @@ func (c *rc2Cipher) Decrypt(dst, src []byte) ***REMOVED***
 
 	j := 63
 
-	for j >= 44 ***REMOVED***
+	for j >= 44 {
 		// unmix r3
 		r3 = rotl16(r3, 16-5)
 		r3 = r3 - c.k[j] - (r2 & r1) - ((^r2) & r0)
@@ -206,14 +206,14 @@ func (c *rc2Cipher) Decrypt(dst, src []byte) ***REMOVED***
 		r0 = rotl16(r0, 16-1)
 		r0 = r0 - c.k[j] - (r3 & r2) - ((^r3) & r1)
 		j--
-	***REMOVED***
+	}
 
 	r3 = r3 - c.k[r2&63]
 	r2 = r2 - c.k[r1&63]
 	r1 = r1 - c.k[r0&63]
 	r0 = r0 - c.k[r3&63]
 
-	for j >= 20 ***REMOVED***
+	for j >= 20 {
 		// unmix r3
 		r3 = rotl16(r3, 16-5)
 		r3 = r3 - c.k[j] - (r2 & r1) - ((^r2) & r0)
@@ -234,14 +234,14 @@ func (c *rc2Cipher) Decrypt(dst, src []byte) ***REMOVED***
 		r0 = r0 - c.k[j] - (r3 & r2) - ((^r3) & r1)
 		j--
 
-	***REMOVED***
+	}
 
 	r3 = r3 - c.k[r2&63]
 	r2 = r2 - c.k[r1&63]
 	r1 = r1 - c.k[r0&63]
 	r0 = r0 - c.k[r3&63]
 
-	for j >= 0 ***REMOVED***
+	for j >= 0 {
 		// unmix r3
 		r3 = rotl16(r3, 16-5)
 		r3 = r3 - c.k[j] - (r2 & r1) - ((^r2) & r0)
@@ -262,10 +262,10 @@ func (c *rc2Cipher) Decrypt(dst, src []byte) ***REMOVED***
 		r0 = r0 - c.k[j] - (r3 & r2) - ((^r3) & r1)
 		j--
 
-	***REMOVED***
+	}
 
 	binary.LittleEndian.PutUint16(dst[0:], r0)
 	binary.LittleEndian.PutUint16(dst[2:], r1)
 	binary.LittleEndian.PutUint16(dst[4:], r2)
 	binary.LittleEndian.PutUint16(dst[6:], r3)
-***REMOVED***
+}

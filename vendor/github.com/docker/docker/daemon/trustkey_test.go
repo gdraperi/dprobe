@@ -13,7 +13,7 @@ import (
 )
 
 // LoadOrCreateTrustKey
-func TestLoadOrCreateTrustKeyInvalidKeyFile(t *testing.T) ***REMOVED***
+func TestLoadOrCreateTrustKeyInvalidKeyFile(t *testing.T) {
 	tmpKeyFolderPath, err := ioutil.TempDir("", "api-trustkey-test")
 	require.NoError(t, err)
 	defer os.RemoveAll(tmpKeyFolderPath)
@@ -23,9 +23,9 @@ func TestLoadOrCreateTrustKeyInvalidKeyFile(t *testing.T) ***REMOVED***
 
 	_, err = loadOrCreateTrustKey(tmpKeyFile.Name())
 	testutil.ErrorContains(t, err, "Error loading key file")
-***REMOVED***
+}
 
-func TestLoadOrCreateTrustKeyCreateKeyWhenFileDoesNotExist(t *testing.T) ***REMOVED***
+func TestLoadOrCreateTrustKeyCreateKeyWhenFileDoesNotExist(t *testing.T) {
 	tmpKeyFolderPath := fs.NewDir(t, "api-trustkey-test")
 	defer tmpKeyFolderPath.Remove()
 
@@ -38,9 +38,9 @@ func TestLoadOrCreateTrustKeyCreateKeyWhenFileDoesNotExist(t *testing.T) ***REMO
 
 	_, err = os.Stat(tmpKeyFile)
 	require.NoError(t, err, "key file doesn't exist")
-***REMOVED***
+}
 
-func TestLoadOrCreateTrustKeyCreateKeyWhenDirectoryDoesNotExist(t *testing.T) ***REMOVED***
+func TestLoadOrCreateTrustKeyCreateKeyWhenDirectoryDoesNotExist(t *testing.T) {
 	tmpKeyFolderPath := fs.NewDir(t, "api-trustkey-test")
 	defer tmpKeyFolderPath.Remove()
 	tmpKeyFile := tmpKeyFolderPath.Join("folder/hierarchy/keyfile")
@@ -51,9 +51,9 @@ func TestLoadOrCreateTrustKeyCreateKeyWhenDirectoryDoesNotExist(t *testing.T) **
 
 	_, err = os.Stat(tmpKeyFile)
 	require.NoError(t, err, "key file doesn't exist")
-***REMOVED***
+}
 
-func TestLoadOrCreateTrustKeyCreateKeyNoPath(t *testing.T) ***REMOVED***
+func TestLoadOrCreateTrustKeyCreateKeyNoPath(t *testing.T) {
 	defer os.Remove("keyfile")
 	key, err := loadOrCreateTrustKey("keyfile")
 	require.NoError(t, err)
@@ -61,12 +61,12 @@ func TestLoadOrCreateTrustKeyCreateKeyNoPath(t *testing.T) ***REMOVED***
 
 	_, err = os.Stat("keyfile")
 	require.NoError(t, err, "key file doesn't exist")
-***REMOVED***
+}
 
-func TestLoadOrCreateTrustKeyLoadValidKey(t *testing.T) ***REMOVED***
+func TestLoadOrCreateTrustKeyLoadValidKey(t *testing.T) {
 	tmpKeyFile := filepath.Join("testdata", "keyfile")
 	key, err := loadOrCreateTrustKey(tmpKeyFile)
 	require.NoError(t, err)
 	expected := "AWX2:I27X:WQFX:IOMK:CNAK:O7PW:VYNB:ZLKC:CVAE:YJP2:SI4A:XXAY"
 	assert.Contains(t, key.String(), expected)
-***REMOVED***
+}

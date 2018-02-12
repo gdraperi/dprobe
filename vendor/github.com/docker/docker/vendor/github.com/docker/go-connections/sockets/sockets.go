@@ -18,21 +18,21 @@ var ErrProtocolNotAvailable = errors.New("protocol not available")
 // specified proto and addr.
 // If the proto is unix (using a unix socket to communicate) or npipe the
 // compression is disabled.
-func ConfigureTransport(tr *http.Transport, proto, addr string) error ***REMOVED***
-	switch proto ***REMOVED***
+func ConfigureTransport(tr *http.Transport, proto, addr string) error {
+	switch proto {
 	case "unix":
 		return configureUnixTransport(tr, proto, addr)
 	case "npipe":
 		return configureNpipeTransport(tr, proto, addr)
 	default:
 		tr.Proxy = http.ProxyFromEnvironment
-		dialer, err := DialerFromEnvironment(&net.Dialer***REMOVED***
+		dialer, err := DialerFromEnvironment(&net.Dialer{
 			Timeout: defaultTimeout,
-		***REMOVED***)
-		if err != nil ***REMOVED***
+		})
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		tr.Dial = dialer.Dial
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

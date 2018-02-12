@@ -20,95 +20,95 @@ var (
 )
 
 // profileData holds information about the given profile for generation.
-type profileData struct ***REMOVED***
+type profileData struct {
 	// Name is profile name.
 	Name string
 	// Imports defines the apparmor functions to import, before defining the profile.
 	Imports []string
 	// InnerImports defines the apparmor functions to import in the profile.
 	InnerImports []string
-	// Version is the ***REMOVED***major, minor, patch***REMOVED*** version of apparmor_parser as a single number.
+	// Version is the {major, minor, patch} version of apparmor_parser as a single number.
 	Version int
-***REMOVED***
+}
 
 // generateDefault creates an apparmor profile from ProfileData.
-func (p *profileData) generateDefault(out io.Writer) error ***REMOVED***
+func (p *profileData) generateDefault(out io.Writer) error {
 	compiled, err := template.New("apparmor_profile").Parse(baseTemplate)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if macroExists("tunables/global") ***REMOVED***
+	if macroExists("tunables/global") {
 		p.Imports = append(p.Imports, "#include <tunables/global>")
-	***REMOVED*** else ***REMOVED***
-		p.Imports = append(p.Imports, "@***REMOVED***PROC***REMOVED***=/proc/")
-	***REMOVED***
+	} else {
+		p.Imports = append(p.Imports, "@{PROC}=/proc/")
+	}
 
-	if macroExists("abstractions/base") ***REMOVED***
+	if macroExists("abstractions/base") {
 		p.InnerImports = append(p.InnerImports, "#include <abstractions/base>")
-	***REMOVED***
+	}
 
 	ver, err := aaparser.GetVersion()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	p.Version = ver
 
 	return compiled.Execute(out, p)
-***REMOVED***
+}
 
 // macrosExists checks if the passed macro exists.
-func macroExists(m string) bool ***REMOVED***
+func macroExists(m string) bool {
 	_, err := os.Stat(path.Join(profileDirectory, m))
 	return err == nil
-***REMOVED***
+}
 
 // InstallDefault generates a default profile in a temp directory determined by
 // os.TempDir(), then loads the profile into the kernel using 'apparmor_parser'.
-func InstallDefault(name string) error ***REMOVED***
-	p := profileData***REMOVED***
+func InstallDefault(name string) error {
+	p := profileData{
 		Name: name,
-	***REMOVED***
+	}
 
 	// Install to a temporary directory.
 	f, err := ioutil.TempFile("", name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	profilePath := f.Name()
 
 	defer f.Close()
 	defer os.Remove(profilePath)
 
-	if err := p.generateDefault(f); err != nil ***REMOVED***
+	if err := p.generateDefault(f); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	return aaparser.LoadProfile(profilePath)
-***REMOVED***
+}
 
 // IsLoaded checks if a profile with the given name has been loaded into the
 // kernel.
-func IsLoaded(name string) (bool, error) ***REMOVED***
+func IsLoaded(name string) (bool, error) {
 	file, err := os.Open("/sys/kernel/security/apparmor/profiles")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return false, err
-	***REMOVED***
+	}
 	defer file.Close()
 
 	r := bufio.NewReader(file)
-	for ***REMOVED***
+	for {
 		p, err := r.ReadString('\n')
-		if err == io.EOF ***REMOVED***
+		if err == io.EOF {
 			break
-		***REMOVED***
-		if err != nil ***REMOVED***
+		}
+		if err != nil {
 			return false, err
-		***REMOVED***
-		if strings.HasPrefix(p, name+" ") ***REMOVED***
+		}
+		if strings.HasPrefix(p, name+" ") {
 			return true, nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return false, nil
-***REMOVED***
+}

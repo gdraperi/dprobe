@@ -35,32 +35,32 @@ var (
 	errInvalidExtension = errors.New("invalid extension")
 )
 
-func checksum(b []byte) uint16 ***REMOVED***
+func checksum(b []byte) uint16 {
 	csumcv := len(b) - 1 // checksum coverage
 	s := uint32(0)
-	for i := 0; i < csumcv; i += 2 ***REMOVED***
+	for i := 0; i < csumcv; i += 2 {
 		s += uint32(b[i+1])<<8 | uint32(b[i])
-	***REMOVED***
-	if csumcv&1 == 0 ***REMOVED***
+	}
+	if csumcv&1 == 0 {
 		s += uint32(b[csumcv])
-	***REMOVED***
+	}
 	s = s>>16 + s&0xffff
 	s = s + s>>16
 	return ^uint16(s)
-***REMOVED***
+}
 
 // A Type represents an ICMP message type.
-type Type interface ***REMOVED***
+type Type interface {
 	Protocol() int
-***REMOVED***
+}
 
 // A Message represents an ICMP message.
-type Message struct ***REMOVED***
+type Message struct {
 	Type     Type        // type, either ipv4.ICMPType or ipv6.ICMPType
 	Code     int         // code
 	Checksum int         // checksum
 	Body     MessageBody // body
-***REMOVED***
+}
 
 // Marshal returns the binary encoding of the ICMP message m.
 //
@@ -71,43 +71,43 @@ type Message struct ***REMOVED***
 // checksum field when psh is not nil, otherwise the kernel will
 // compute the checksum field during the message transmission.
 // When psh is not nil, it must be the pseudo header for IPv6.
-func (m *Message) Marshal(psh []byte) ([]byte, error) ***REMOVED***
+func (m *Message) Marshal(psh []byte) ([]byte, error) {
 	var mtype int
-	switch typ := m.Type.(type) ***REMOVED***
+	switch typ := m.Type.(type) {
 	case ipv4.ICMPType:
 		mtype = int(typ)
 	case ipv6.ICMPType:
 		mtype = int(typ)
 	default:
 		return nil, syscall.EINVAL
-	***REMOVED***
-	b := []byte***REMOVED***byte(mtype), byte(m.Code), 0, 0***REMOVED***
-	if m.Type.Protocol() == iana.ProtocolIPv6ICMP && psh != nil ***REMOVED***
+	}
+	b := []byte{byte(mtype), byte(m.Code), 0, 0}
+	if m.Type.Protocol() == iana.ProtocolIPv6ICMP && psh != nil {
 		b = append(psh, b...)
-	***REMOVED***
-	if m.Body != nil && m.Body.Len(m.Type.Protocol()) != 0 ***REMOVED***
+	}
+	if m.Body != nil && m.Body.Len(m.Type.Protocol()) != 0 {
 		mb, err := m.Body.Marshal(m.Type.Protocol())
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		b = append(b, mb...)
-	***REMOVED***
-	if m.Type.Protocol() == iana.ProtocolIPv6ICMP ***REMOVED***
-		if psh == nil ***REMOVED*** // cannot calculate checksum here
+	}
+	if m.Type.Protocol() == iana.ProtocolIPv6ICMP {
+		if psh == nil { // cannot calculate checksum here
 			return b, nil
-		***REMOVED***
+		}
 		off, l := 2*net.IPv6len, len(b)-len(psh)
 		binary.BigEndian.PutUint32(b[off:off+4], uint32(l))
-	***REMOVED***
+	}
 	s := checksum(b)
 	// Place checksum back in header; using ^= avoids the
 	// assumption the checksum bytes are zero.
 	b[len(psh)+2] ^= byte(s)
 	b[len(psh)+3] ^= byte(s >> 8)
 	return b[len(psh):], nil
-***REMOVED***
+}
 
-var parseFns = map[Type]func(int, []byte) (MessageBody, error)***REMOVED***
+var parseFns = map[Type]func(int, []byte) (MessageBody, error){
 	ipv4.ICMPTypeDestinationUnreachable: parseDstUnreach,
 	ipv4.ICMPTypeTimeExceeded:           parseTimeExceeded,
 	ipv4.ICMPTypeParameterProblem:       parseParamProb,
@@ -122,31 +122,31 @@ var parseFns = map[Type]func(int, []byte) (MessageBody, error)***REMOVED***
 
 	ipv6.ICMPTypeEchoRequest: parseEcho,
 	ipv6.ICMPTypeEchoReply:   parseEcho,
-***REMOVED***
+}
 
 // ParseMessage parses b as an ICMP message.
 // Proto must be either the ICMPv4 or ICMPv6 protocol number.
-func ParseMessage(proto int, b []byte) (*Message, error) ***REMOVED***
-	if len(b) < 4 ***REMOVED***
+func ParseMessage(proto int, b []byte) (*Message, error) {
+	if len(b) < 4 {
 		return nil, errMessageTooShort
-	***REMOVED***
+	}
 	var err error
-	m := &Message***REMOVED***Code: int(b[1]), Checksum: int(binary.BigEndian.Uint16(b[2:4]))***REMOVED***
-	switch proto ***REMOVED***
+	m := &Message{Code: int(b[1]), Checksum: int(binary.BigEndian.Uint16(b[2:4]))}
+	switch proto {
 	case iana.ProtocolICMP:
 		m.Type = ipv4.ICMPType(b[0])
 	case iana.ProtocolIPv6ICMP:
 		m.Type = ipv6.ICMPType(b[0])
 	default:
 		return nil, syscall.EINVAL
-	***REMOVED***
-	if fn, ok := parseFns[m.Type]; !ok ***REMOVED***
+	}
+	if fn, ok := parseFns[m.Type]; !ok {
 		m.Body, err = parseDefaultMessageBody(proto, b[4:])
-	***REMOVED*** else ***REMOVED***
+	} else {
 		m.Body, err = fn(proto, b[4:])
-	***REMOVED***
-	if err != nil ***REMOVED***
+	}
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return m, nil
-***REMOVED***
+}

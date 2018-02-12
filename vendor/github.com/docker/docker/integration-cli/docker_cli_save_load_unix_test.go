@@ -19,7 +19,7 @@ import (
 )
 
 // save a repo and try to load it using stdout
-func (s *DockerSuite) TestSaveAndLoadRepoStdout(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestSaveAndLoadRepoStdout(c *check.C) {
 	name := "test-save-and-load-repo-stdout"
 	dockerCmd(c, "run", "--name", name, "busybox", "true")
 
@@ -31,10 +31,10 @@ func (s *DockerSuite) TestSaveAndLoadRepoStdout(c *check.C) ***REMOVED***
 	c.Assert(err, check.IsNil)
 	defer os.Remove(tmpFile.Name())
 
-	icmd.RunCmd(icmd.Cmd***REMOVED***
-		Command: []string***REMOVED***dockerBinary, "save", repoName***REMOVED***,
+	icmd.RunCmd(icmd.Cmd{
+		Command: []string{dockerBinary, "save", repoName},
 		Stdout:  tmpFile,
-	***REMOVED***).Assert(c, icmd.Success)
+	}).Assert(c, icmd.Success)
 
 	tmpFile, err = os.Open(tmpFile.Name())
 	c.Assert(err, check.IsNil)
@@ -42,10 +42,10 @@ func (s *DockerSuite) TestSaveAndLoadRepoStdout(c *check.C) ***REMOVED***
 
 	deleteImages(repoName)
 
-	icmd.RunCmd(icmd.Cmd***REMOVED***
-		Command: []string***REMOVED***dockerBinary, "load"***REMOVED***,
+	icmd.RunCmd(icmd.Cmd{
+		Command: []string{dockerBinary, "load"},
 		Stdin:   tmpFile,
-	***REMOVED***).Assert(c, icmd.Success)
+	}).Assert(c, icmd.Success)
 
 	after := inspectField(c, repoName, "Id")
 	after = strings.TrimRight(after, "\n")
@@ -68,9 +68,9 @@ func (s *DockerSuite) TestSaveAndLoadRepoStdout(c *check.C) ***REMOVED***
 	n, err := pty.Read(buf)
 	c.Assert(err, check.IsNil) //could not read tty output
 	c.Assert(string(buf[:n]), checker.Contains, "cowardly refusing", check.Commentf("help output is not being yielded"))
-***REMOVED***
+}
 
-func (s *DockerSuite) TestSaveAndLoadWithProgressBar(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestSaveAndLoadWithProgressBar(c *check.C) {
 	name := "test-load"
 	buildImageSuccessfully(c, name, build.WithDockerfile(`FROM busybox
 	RUN touch aa
@@ -85,10 +85,10 @@ func (s *DockerSuite) TestSaveAndLoadWithProgressBar(c *check.C) ***REMOVED***
 	out, _ := dockerCmd(c, "load", "-i", tmptar)
 	expected := fmt.Sprintf("The image %s:latest already exists, renaming the old one with ID", name)
 	c.Assert(out, checker.Contains, expected)
-***REMOVED***
+}
 
 // fail because load didn't receive data from stdin
-func (s *DockerSuite) TestLoadNoStdinFail(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestLoadNoStdinFail(c *check.C) {
 	pty, tty, err := pty.Open()
 	c.Assert(err, check.IsNil)
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -104,4 +104,4 @@ func (s *DockerSuite) TestLoadNoStdinFail(c *check.C) ***REMOVED***
 	n, err := pty.Read(buf)
 	c.Assert(err, check.IsNil) //could not read tty output
 	c.Assert(string(buf[:n]), checker.Contains, "requested load from stdin, but stdin is empty")
-***REMOVED***
+}

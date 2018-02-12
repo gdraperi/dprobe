@@ -9,125 +9,125 @@ import (
 	"testing"
 )
 
-type sumTest struct ***REMOVED***
+type sumTest struct {
 	value        int64
 	sum          int64
 	sumOfSquares float64
 	total        int64
-***REMOVED***
+}
 
-var sumTests = []sumTest***REMOVED***
-	***REMOVED***100, 100, 10000, 1***REMOVED***,
-	***REMOVED***50, 150, 12500, 2***REMOVED***,
-	***REMOVED***50, 200, 15000, 3***REMOVED***,
-	***REMOVED***50, 250, 17500, 4***REMOVED***,
-***REMOVED***
+var sumTests = []sumTest{
+	{100, 100, 10000, 1},
+	{50, 150, 12500, 2},
+	{50, 200, 15000, 3},
+	{50, 250, 17500, 4},
+}
 
-type bucketingTest struct ***REMOVED***
+type bucketingTest struct {
 	in     int64
 	log    int
 	bucket int
-***REMOVED***
+}
 
-var bucketingTests = []bucketingTest***REMOVED***
-	***REMOVED***0, 0, 0***REMOVED***,
-	***REMOVED***1, 1, 0***REMOVED***,
-	***REMOVED***2, 2, 1***REMOVED***,
-	***REMOVED***3, 2, 1***REMOVED***,
-	***REMOVED***4, 3, 2***REMOVED***,
-	***REMOVED***1000, 10, 9***REMOVED***,
-	***REMOVED***1023, 10, 9***REMOVED***,
-	***REMOVED***1024, 11, 10***REMOVED***,
-	***REMOVED***1000000, 20, 19***REMOVED***,
-***REMOVED***
+var bucketingTests = []bucketingTest{
+	{0, 0, 0},
+	{1, 1, 0},
+	{2, 2, 1},
+	{3, 2, 1},
+	{4, 3, 2},
+	{1000, 10, 9},
+	{1023, 10, 9},
+	{1024, 11, 10},
+	{1000000, 20, 19},
+}
 
-type multiplyTest struct ***REMOVED***
+type multiplyTest struct {
 	in                   int64
 	ratio                float64
 	expectedSum          int64
 	expectedTotal        int64
 	expectedSumOfSquares float64
-***REMOVED***
+}
 
-var multiplyTests = []multiplyTest***REMOVED***
-	***REMOVED***15, 2.5, 37, 2, 562.5***REMOVED***,
-	***REMOVED***128, 4.6, 758, 13, 77953.9***REMOVED***,
-***REMOVED***
+var multiplyTests = []multiplyTest{
+	{15, 2.5, 37, 2, 562.5},
+	{128, 4.6, 758, 13, 77953.9},
+}
 
-type percentileTest struct ***REMOVED***
+type percentileTest struct {
 	fraction float64
 	expected int64
-***REMOVED***
+}
 
-var percentileTests = []percentileTest***REMOVED***
-	***REMOVED***0.25, 48***REMOVED***,
-	***REMOVED***0.5, 96***REMOVED***,
-	***REMOVED***0.6, 109***REMOVED***,
-	***REMOVED***0.75, 128***REMOVED***,
-	***REMOVED***0.90, 205***REMOVED***,
-	***REMOVED***0.95, 230***REMOVED***,
-	***REMOVED***0.99, 256***REMOVED***,
-***REMOVED***
+var percentileTests = []percentileTest{
+	{0.25, 48},
+	{0.5, 96},
+	{0.6, 109},
+	{0.75, 128},
+	{0.90, 205},
+	{0.95, 230},
+	{0.99, 256},
+}
 
-func TestSum(t *testing.T) ***REMOVED***
+func TestSum(t *testing.T) {
 	var h histogram
 
-	for _, test := range sumTests ***REMOVED***
+	for _, test := range sumTests {
 		h.addMeasurement(test.value)
 		sum := h.sum
-		if sum != test.sum ***REMOVED***
+		if sum != test.sum {
 			t.Errorf("h.Sum = %v WANT: %v", sum, test.sum)
-		***REMOVED***
+		}
 
 		sumOfSquares := h.sumOfSquares
-		if sumOfSquares != test.sumOfSquares ***REMOVED***
+		if sumOfSquares != test.sumOfSquares {
 			t.Errorf("h.SumOfSquares = %v WANT: %v", sumOfSquares, test.sumOfSquares)
-		***REMOVED***
+		}
 
 		total := h.total()
-		if total != test.total ***REMOVED***
+		if total != test.total {
 			t.Errorf("h.Total = %v WANT: %v", total, test.total)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestMultiply(t *testing.T) ***REMOVED***
+func TestMultiply(t *testing.T) {
 	var h histogram
-	for i, test := range multiplyTests ***REMOVED***
+	for i, test := range multiplyTests {
 		h.addMeasurement(test.in)
 		h.Multiply(test.ratio)
-		if h.sum != test.expectedSum ***REMOVED***
+		if h.sum != test.expectedSum {
 			t.Errorf("#%v: h.sum = %v WANT: %v", i, h.sum, test.expectedSum)
-		***REMOVED***
-		if h.total() != test.expectedTotal ***REMOVED***
+		}
+		if h.total() != test.expectedTotal {
 			t.Errorf("#%v: h.total = %v WANT: %v", i, h.total(), test.expectedTotal)
-		***REMOVED***
-		if h.sumOfSquares != test.expectedSumOfSquares ***REMOVED***
+		}
+		if h.sumOfSquares != test.expectedSumOfSquares {
 			t.Errorf("#%v: h.SumOfSquares = %v WANT: %v", i, test.expectedSumOfSquares, h.sumOfSquares)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestBucketingFunctions(t *testing.T) ***REMOVED***
-	for _, test := range bucketingTests ***REMOVED***
+func TestBucketingFunctions(t *testing.T) {
+	for _, test := range bucketingTests {
 		log := log2(test.in)
-		if log != test.log ***REMOVED***
+		if log != test.log {
 			t.Errorf("log2 = %v WANT: %v", log, test.log)
-		***REMOVED***
+		}
 
 		bucket := getBucket(test.in)
-		if bucket != test.bucket ***REMOVED***
+		if bucket != test.bucket {
 			t.Errorf("getBucket = %v WANT: %v", bucket, test.bucket)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestAverage(t *testing.T) ***REMOVED***
+func TestAverage(t *testing.T) {
 	a := new(histogram)
 	average := a.average()
-	if average != 0 ***REMOVED***
+	if average != 0 {
 		t.Errorf("Average of empty histogram was %v WANT: 0", average)
-	***REMOVED***
+	}
 
 	a.addMeasurement(1)
 	a.addMeasurement(1)
@@ -135,12 +135,12 @@ func TestAverage(t *testing.T) ***REMOVED***
 	const expected = float64(5) / float64(3)
 	average = a.average()
 
-	if !isApproximate(average, expected) ***REMOVED***
+	if !isApproximate(average, expected) {
 		t.Errorf("Average = %g WANT: %v", average, expected)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestStandardDeviation(t *testing.T) ***REMOVED***
+func TestStandardDeviation(t *testing.T) {
 	a := new(histogram)
 	add(a, 10, 1<<4)
 	add(a, 10, 1<<5)
@@ -148,91 +148,91 @@ func TestStandardDeviation(t *testing.T) ***REMOVED***
 	stdDev := a.standardDeviation()
 	const expected = 19.95
 
-	if !isApproximate(stdDev, expected) ***REMOVED***
+	if !isApproximate(stdDev, expected) {
 		t.Errorf("StandardDeviation = %v WANT: %v", stdDev, expected)
-	***REMOVED***
+	}
 
 	// No values
 	a = new(histogram)
 	stdDev = a.standardDeviation()
 
-	if !isApproximate(stdDev, 0) ***REMOVED***
+	if !isApproximate(stdDev, 0) {
 		t.Errorf("StandardDeviation = %v WANT: 0", stdDev)
-	***REMOVED***
+	}
 
 	add(a, 1, 1<<4)
-	if !isApproximate(stdDev, 0) ***REMOVED***
+	if !isApproximate(stdDev, 0) {
 		t.Errorf("StandardDeviation = %v WANT: 0", stdDev)
-	***REMOVED***
+	}
 
 	add(a, 10, 1<<4)
-	if !isApproximate(stdDev, 0) ***REMOVED***
+	if !isApproximate(stdDev, 0) {
 		t.Errorf("StandardDeviation = %v WANT: 0", stdDev)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestPercentileBoundary(t *testing.T) ***REMOVED***
+func TestPercentileBoundary(t *testing.T) {
 	a := new(histogram)
 	add(a, 5, 1<<4)
 	add(a, 10, 1<<6)
 	add(a, 5, 1<<7)
 
-	for _, test := range percentileTests ***REMOVED***
+	for _, test := range percentileTests {
 		percentile := a.percentileBoundary(test.fraction)
-		if percentile != test.expected ***REMOVED***
+		if percentile != test.expected {
 			t.Errorf("h.PercentileBoundary (fraction=%v) = %v WANT: %v", test.fraction, percentile, test.expected)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestCopyFrom(t *testing.T) ***REMOVED***
-	a := histogram***REMOVED***5, 25, []int64***REMOVED***1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
-		19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38***REMOVED***, 4, -1***REMOVED***
-	b := histogram***REMOVED***6, 36, []int64***REMOVED***2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-		20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39***REMOVED***, 5, -1***REMOVED***
+func TestCopyFrom(t *testing.T) {
+	a := histogram{5, 25, []int64{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+		19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38}, 4, -1}
+	b := histogram{6, 36, []int64{2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+		20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39}, 5, -1}
 
 	a.CopyFrom(&b)
 
-	if a.String() != b.String() ***REMOVED***
+	if a.String() != b.String() {
 		t.Errorf("a.String = %s WANT: %s", a.String(), b.String())
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestClear(t *testing.T) ***REMOVED***
-	a := histogram***REMOVED***5, 25, []int64***REMOVED***1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
-		19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38***REMOVED***, 4, -1***REMOVED***
+func TestClear(t *testing.T) {
+	a := histogram{5, 25, []int64{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+		19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38}, 4, -1}
 
 	a.Clear()
 
 	expected := "0, 0.000000, 0, 0, []"
-	if a.String() != expected ***REMOVED***
+	if a.String() != expected {
 		t.Errorf("a.String = %s WANT %s", a.String(), expected)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestNew(t *testing.T) ***REMOVED***
-	a := histogram***REMOVED***5, 25, []int64***REMOVED***1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
-		19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38***REMOVED***, 4, -1***REMOVED***
+func TestNew(t *testing.T) {
+	a := histogram{5, 25, []int64{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+		19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38}, 4, -1}
 	b := a.New()
 
 	expected := "0, 0.000000, 0, 0, []"
-	if b.(*histogram).String() != expected ***REMOVED***
+	if b.(*histogram).String() != expected {
 		t.Errorf("b.(*histogram).String = %s WANT: %s", b.(*histogram).String(), expected)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestAdd(t *testing.T) ***REMOVED***
+func TestAdd(t *testing.T) {
 	// The tests here depend on the associativity of addMeasurement and Add.
 	// Add empty observation
-	a := histogram***REMOVED***5, 25, []int64***REMOVED***1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
-		19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38***REMOVED***, 4, -1***REMOVED***
+	a := histogram{5, 25, []int64{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+		19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38}, 4, -1}
 	b := a.New()
 
 	expected := a.String()
 	a.Add(b)
-	if a.String() != expected ***REMOVED***
+	if a.String() != expected {
 		t.Errorf("a.String = %s WANT: %s", a.String(), expected)
-	***REMOVED***
+	}
 
 	// Add same bucketed value, no new buckets
 	c := new(histogram)
@@ -243,9 +243,9 @@ func TestAdd(t *testing.T) ***REMOVED***
 	e.addMeasurement(12)
 	e.addMeasurement(11)
 	c.Add(d)
-	if c.String() != e.String() ***REMOVED***
+	if c.String() != e.String() {
 		t.Errorf("c.String = %s WANT: %s", c.String(), e.String())
-	***REMOVED***
+	}
 
 	// Add bucketed values
 	f := new(histogram)
@@ -264,9 +264,9 @@ func TestAdd(t *testing.T) ***REMOVED***
 	h.addMeasurement(36)
 	h.addMeasurement(255)
 	f.Add(g)
-	if f.String() != h.String() ***REMOVED***
+	if f.String() != h.String() {
 		t.Errorf("f.String = %q WANT: %q", f.String(), h.String())
-	***REMOVED***
+	}
 
 	// add buckets to no buckets
 	i := new(histogram)
@@ -279,9 +279,9 @@ func TestAdd(t *testing.T) ***REMOVED***
 	k.addMeasurement(36)
 	k.addMeasurement(255)
 	i.Add(j)
-	if i.String() != k.String() ***REMOVED***
+	if i.String() != k.String() {
 		t.Errorf("i.String = %q WANT: %q", i.String(), k.String())
-	***REMOVED***
+	}
 
 	// add buckets to single value (no overlap)
 	l := new(histogram)
@@ -296,9 +296,9 @@ func TestAdd(t *testing.T) ***REMOVED***
 	n.addMeasurement(36)
 	n.addMeasurement(255)
 	l.Add(m)
-	if l.String() != n.String() ***REMOVED***
+	if l.String() != n.String() {
 		t.Errorf("l.String = %q WANT: %q", l.String(), n.String())
-	***REMOVED***
+	}
 
 	// mixed order
 	o := new(histogram)
@@ -309,17 +309,17 @@ func TestAdd(t *testing.T) ***REMOVED***
 	p.addMeasurement(0)
 	p.addMeasurement(0)
 	p.addMeasurement(2)
-	if o.String() != p.String() ***REMOVED***
+	if o.String() != p.String() {
 		t.Errorf("o.String = %q WANT: %q", o.String(), p.String())
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func add(h *histogram, times int, val int64) ***REMOVED***
-	for i := 0; i < times; i++ ***REMOVED***
+func add(h *histogram, times int, val int64) {
+	for i := 0; i < times; i++ {
 		h.addMeasurement(val)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func isApproximate(x, y float64) bool ***REMOVED***
+func isApproximate(x, y float64) bool {
 	return math.Abs(x-y) < 1e-2
-***REMOVED***
+}

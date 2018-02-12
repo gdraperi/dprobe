@@ -9,6 +9,6 @@ import (
 )
 
 // InitSpec creates an OCI spec from the plugin's config.
-func (p *Plugin) InitSpec(execRoot string) (*specs.Spec, error) ***REMOVED***
+func (p *Plugin) InitSpec(execRoot string) (*specs.Spec, error) {
 	return nil, errors.New("not supported")
-***REMOVED***
+}

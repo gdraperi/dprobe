@@ -11,7 +11,7 @@ import "github.com/containerd/containerd/api/types/mount.proto";
 option go_package = "github.com/containerd/containerd/api/services/snapshots/v1;snapshots";
 
 // Snapshot service manages snapshots
-service Snapshots ***REMOVED***
+service Snapshots {
 	rpc Prepare(PrepareSnapshotRequest) returns (PrepareSnapshotResponse);
 	rpc View(ViewSnapshotRequest) returns (ViewSnapshotResponse);
 	rpc Mounts(MountsRequest) returns (MountsResponse);
@@ -21,9 +21,9 @@ service Snapshots ***REMOVED***
 	rpc Update(UpdateSnapshotRequest) returns (UpdateSnapshotResponse);
 	rpc List(ListSnapshotsRequest) returns (stream ListSnapshotsResponse);
 	rpc Usage(UsageRequest) returns (UsageResponse);
-***REMOVED***
+}
 
-message PrepareSnapshotRequest ***REMOVED***
+message PrepareSnapshotRequest {
 	string snapshotter = 1;
 	string key = 2;
 	string parent = 3;
@@ -32,13 +32,13 @@ message PrepareSnapshotRequest ***REMOVED***
 	//
 	// The combined size of a key/value pair cannot exceed 4096 bytes.
 	map<string, string> labels  = 4;
-***REMOVED***
+}
 
-message PrepareSnapshotResponse ***REMOVED***
+message PrepareSnapshotResponse {
 	repeated containerd.types.Mount mounts = 1;
-***REMOVED***
+}
 
-message ViewSnapshotRequest ***REMOVED***
+message ViewSnapshotRequest {
 	string snapshotter = 1;
 	string key = 2;
 	string parent = 3;
@@ -47,27 +47,27 @@ message ViewSnapshotRequest ***REMOVED***
 	//
 	// The combined size of a key/value pair cannot exceed 4096 bytes.
 	map<string, string> labels  = 4;
-***REMOVED***
+}
 
-message ViewSnapshotResponse ***REMOVED***
+message ViewSnapshotResponse {
 	repeated containerd.types.Mount mounts = 1;
-***REMOVED***
+}
 
-message MountsRequest ***REMOVED***
+message MountsRequest {
 	string snapshotter = 1;
 	string key = 2;
-***REMOVED***
+}
 
-message MountsResponse ***REMOVED***
+message MountsResponse {
 	repeated containerd.types.Mount mounts = 1;
-***REMOVED***
+}
 
-message RemoveSnapshotRequest ***REMOVED***
+message RemoveSnapshotRequest {
 	string snapshotter = 1;
 	string key = 2;
-***REMOVED***
+}
 
-message CommitSnapshotRequest ***REMOVED***
+message CommitSnapshotRequest {
 	string snapshotter = 1;
 	string name = 2;
 	string key = 3;
@@ -76,14 +76,14 @@ message CommitSnapshotRequest ***REMOVED***
 	//
 	// The combined size of a key/value pair cannot exceed 4096 bytes.
 	map<string, string> labels  = 4;
-***REMOVED***
+}
 
-message StatSnapshotRequest ***REMOVED***
+message StatSnapshotRequest {
 	string snapshotter = 1;
 	string key = 2;
-***REMOVED***
+}
 
-enum Kind ***REMOVED***
+enum Kind {
 	option (gogoproto.goproto_enum_prefix) = false;
 	option (gogoproto.enum_customname) = "Kind";
 
@@ -91,9 +91,9 @@ enum Kind ***REMOVED***
 	VIEW = 1 [(gogoproto.enumvalue_customname) = "KindView"];
 	ACTIVE = 2 [(gogoproto.enumvalue_customname) = "KindActive"];
 	COMMITTED = 3 [(gogoproto.enumvalue_customname) = "KindCommitted"];
-***REMOVED***
+}
 
-message Info ***REMOVED***
+message Info {
 	string name = 1;
 	string parent = 2;
 	Kind kind = 3;
@@ -108,13 +108,13 @@ message Info ***REMOVED***
 	//
 	// The combined size of a key/value pair cannot exceed 4096 bytes.
 	map<string, string> labels  = 6;
-***REMOVED***
+}
 
-message StatSnapshotResponse ***REMOVED***
+message StatSnapshotResponse {
 	Info info = 1 [(gogoproto.nullable) = false];
-***REMOVED***
+}
 
-message UpdateSnapshotRequest ***REMOVED***
+message UpdateSnapshotRequest {
 	string snapshotter = 1;
 	Info info = 2 [(gogoproto.nullable) = false];
 
@@ -125,26 +125,26 @@ message UpdateSnapshotRequest ***REMOVED***
 	// other field may be updated using this mask.
 	// If no mask is provided, all mutable field are updated.
 	google.protobuf.FieldMask update_mask = 3;
-***REMOVED***
+}
 
-message UpdateSnapshotResponse ***REMOVED***
+message UpdateSnapshotResponse {
 	Info info = 1 [(gogoproto.nullable) = false];
-***REMOVED***
+}
 
-message ListSnapshotsRequest***REMOVED***
+message ListSnapshotsRequest{
 	string snapshotter = 1;
-***REMOVED***
+}
 
-message ListSnapshotsResponse ***REMOVED***
+message ListSnapshotsResponse {
 	repeated Info info = 1 [(gogoproto.nullable) = false];
-***REMOVED***
+}
 
-message UsageRequest ***REMOVED***
+message UsageRequest {
 	string snapshotter = 1;
 	string key = 2;
-***REMOVED***
+}
 
-message UsageResponse ***REMOVED***
+message UsageResponse {
 	int64 size = 1;
 	int64 inodes = 2;
-***REMOVED***
+}

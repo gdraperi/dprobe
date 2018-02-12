@@ -32,7 +32,7 @@ var (
 	defaultLeaderSuffix    = "/leader"
 )
 
-type Member struct ***REMOVED***
+type Member struct {
 	// ID is the unique identifier of this Member.
 	ID string `json:"id"`
 
@@ -46,55 +46,55 @@ type Member struct ***REMOVED***
 	// ClientURLs represents the HTTP(S) endpoints on which this Member
 	// serves it's client-facing APIs.
 	ClientURLs []string `json:"clientURLs"`
-***REMOVED***
+}
 
 type memberCollection []Member
 
-func (c *memberCollection) UnmarshalJSON(data []byte) error ***REMOVED***
-	d := struct ***REMOVED***
+func (c *memberCollection) UnmarshalJSON(data []byte) error {
+	d := struct {
 		Members []Member
-	***REMOVED******REMOVED******REMOVED***
+	}{}
 
-	if err := json.Unmarshal(data, &d); err != nil ***REMOVED***
+	if err := json.Unmarshal(data, &d); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if d.Members == nil ***REMOVED***
+	if d.Members == nil {
 		*c = make([]Member, 0)
 		return nil
-	***REMOVED***
+	}
 
 	*c = d.Members
 	return nil
-***REMOVED***
+}
 
-type memberCreateOrUpdateRequest struct ***REMOVED***
+type memberCreateOrUpdateRequest struct {
 	PeerURLs types.URLs
-***REMOVED***
+}
 
-func (m *memberCreateOrUpdateRequest) MarshalJSON() ([]byte, error) ***REMOVED***
-	s := struct ***REMOVED***
+func (m *memberCreateOrUpdateRequest) MarshalJSON() ([]byte, error) {
+	s := struct {
 		PeerURLs []string `json:"peerURLs"`
-	***REMOVED******REMOVED***
+	}{
 		PeerURLs: make([]string, len(m.PeerURLs)),
-	***REMOVED***
+	}
 
-	for i, u := range m.PeerURLs ***REMOVED***
+	for i, u := range m.PeerURLs {
 		s.PeerURLs[i] = u.String()
-	***REMOVED***
+	}
 
 	return json.Marshal(&s)
-***REMOVED***
+}
 
 // NewMembersAPI constructs a new MembersAPI that uses HTTP to
 // interact with etcd's membership API.
-func NewMembersAPI(c Client) MembersAPI ***REMOVED***
-	return &httpMembersAPI***REMOVED***
+func NewMembersAPI(c Client) MembersAPI {
+	return &httpMembersAPI{
 		client: c,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type MembersAPI interface ***REMOVED***
+type MembersAPI interface {
 	// List enumerates the current cluster membership.
 	List(ctx context.Context) ([]Member, error)
 
@@ -109,196 +109,196 @@ type MembersAPI interface ***REMOVED***
 
 	// Leader gets current leader of the cluster
 	Leader(ctx context.Context) (*Member, error)
-***REMOVED***
+}
 
-type httpMembersAPI struct ***REMOVED***
+type httpMembersAPI struct {
 	client httpClient
-***REMOVED***
+}
 
-func (m *httpMembersAPI) List(ctx context.Context) ([]Member, error) ***REMOVED***
-	req := &membersAPIActionList***REMOVED******REMOVED***
+func (m *httpMembersAPI) List(ctx context.Context) ([]Member, error) {
+	req := &membersAPIActionList{}
 	resp, body, err := m.client.Do(ctx, req)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	if err := assertStatusCode(resp.StatusCode, http.StatusOK); err != nil ***REMOVED***
+	if err := assertStatusCode(resp.StatusCode, http.StatusOK); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	var mCollection memberCollection
-	if err := json.Unmarshal(body, &mCollection); err != nil ***REMOVED***
+	if err := json.Unmarshal(body, &mCollection); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	return []Member(mCollection), nil
-***REMOVED***
+}
 
-func (m *httpMembersAPI) Add(ctx context.Context, peerURL string) (*Member, error) ***REMOVED***
-	urls, err := types.NewURLs([]string***REMOVED***peerURL***REMOVED***)
-	if err != nil ***REMOVED***
+func (m *httpMembersAPI) Add(ctx context.Context, peerURL string) (*Member, error) {
+	urls, err := types.NewURLs([]string{peerURL})
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	req := &membersAPIActionAdd***REMOVED***peerURLs: urls***REMOVED***
+	req := &membersAPIActionAdd{peerURLs: urls}
 	resp, body, err := m.client.Do(ctx, req)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	if err := assertStatusCode(resp.StatusCode, http.StatusCreated, http.StatusConflict); err != nil ***REMOVED***
+	if err := assertStatusCode(resp.StatusCode, http.StatusCreated, http.StatusConflict); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	if resp.StatusCode != http.StatusCreated ***REMOVED***
+	if resp.StatusCode != http.StatusCreated {
 		var merr membersError
-		if err := json.Unmarshal(body, &merr); err != nil ***REMOVED***
+		if err := json.Unmarshal(body, &merr); err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		return nil, merr
-	***REMOVED***
+	}
 
 	var memb Member
-	if err := json.Unmarshal(body, &memb); err != nil ***REMOVED***
+	if err := json.Unmarshal(body, &memb); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	return &memb, nil
-***REMOVED***
+}
 
-func (m *httpMembersAPI) Update(ctx context.Context, memberID string, peerURLs []string) error ***REMOVED***
+func (m *httpMembersAPI) Update(ctx context.Context, memberID string, peerURLs []string) error {
 	urls, err := types.NewURLs(peerURLs)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	req := &membersAPIActionUpdate***REMOVED***peerURLs: urls, memberID: memberID***REMOVED***
+	req := &membersAPIActionUpdate{peerURLs: urls, memberID: memberID}
 	resp, body, err := m.client.Do(ctx, req)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if err := assertStatusCode(resp.StatusCode, http.StatusNoContent, http.StatusNotFound, http.StatusConflict); err != nil ***REMOVED***
+	if err := assertStatusCode(resp.StatusCode, http.StatusNoContent, http.StatusNotFound, http.StatusConflict); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if resp.StatusCode != http.StatusNoContent ***REMOVED***
+	if resp.StatusCode != http.StatusNoContent {
 		var merr membersError
-		if err := json.Unmarshal(body, &merr); err != nil ***REMOVED***
+		if err := json.Unmarshal(body, &merr); err != nil {
 			return err
-		***REMOVED***
+		}
 		return merr
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (m *httpMembersAPI) Remove(ctx context.Context, memberID string) error ***REMOVED***
-	req := &membersAPIActionRemove***REMOVED***memberID: memberID***REMOVED***
+func (m *httpMembersAPI) Remove(ctx context.Context, memberID string) error {
+	req := &membersAPIActionRemove{memberID: memberID}
 	resp, _, err := m.client.Do(ctx, req)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	return assertStatusCode(resp.StatusCode, http.StatusNoContent, http.StatusGone)
-***REMOVED***
+}
 
-func (m *httpMembersAPI) Leader(ctx context.Context) (*Member, error) ***REMOVED***
-	req := &membersAPIActionLeader***REMOVED******REMOVED***
+func (m *httpMembersAPI) Leader(ctx context.Context) (*Member, error) {
+	req := &membersAPIActionLeader{}
 	resp, body, err := m.client.Do(ctx, req)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	if err := assertStatusCode(resp.StatusCode, http.StatusOK); err != nil ***REMOVED***
+	if err := assertStatusCode(resp.StatusCode, http.StatusOK); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	var leader Member
-	if err := json.Unmarshal(body, &leader); err != nil ***REMOVED***
+	if err := json.Unmarshal(body, &leader); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	return &leader, nil
-***REMOVED***
+}
 
-type membersAPIActionList struct***REMOVED******REMOVED***
+type membersAPIActionList struct{}
 
-func (l *membersAPIActionList) HTTPRequest(ep url.URL) *http.Request ***REMOVED***
+func (l *membersAPIActionList) HTTPRequest(ep url.URL) *http.Request {
 	u := v2MembersURL(ep)
 	req, _ := http.NewRequest("GET", u.String(), nil)
 	return req
-***REMOVED***
+}
 
-type membersAPIActionRemove struct ***REMOVED***
+type membersAPIActionRemove struct {
 	memberID string
-***REMOVED***
+}
 
-func (d *membersAPIActionRemove) HTTPRequest(ep url.URL) *http.Request ***REMOVED***
+func (d *membersAPIActionRemove) HTTPRequest(ep url.URL) *http.Request {
 	u := v2MembersURL(ep)
 	u.Path = path.Join(u.Path, d.memberID)
 	req, _ := http.NewRequest("DELETE", u.String(), nil)
 	return req
-***REMOVED***
+}
 
-type membersAPIActionAdd struct ***REMOVED***
+type membersAPIActionAdd struct {
 	peerURLs types.URLs
-***REMOVED***
+}
 
-func (a *membersAPIActionAdd) HTTPRequest(ep url.URL) *http.Request ***REMOVED***
+func (a *membersAPIActionAdd) HTTPRequest(ep url.URL) *http.Request {
 	u := v2MembersURL(ep)
-	m := memberCreateOrUpdateRequest***REMOVED***PeerURLs: a.peerURLs***REMOVED***
+	m := memberCreateOrUpdateRequest{PeerURLs: a.peerURLs}
 	b, _ := json.Marshal(&m)
 	req, _ := http.NewRequest("POST", u.String(), bytes.NewReader(b))
 	req.Header.Set("Content-Type", "application/json")
 	return req
-***REMOVED***
+}
 
-type membersAPIActionUpdate struct ***REMOVED***
+type membersAPIActionUpdate struct {
 	memberID string
 	peerURLs types.URLs
-***REMOVED***
+}
 
-func (a *membersAPIActionUpdate) HTTPRequest(ep url.URL) *http.Request ***REMOVED***
+func (a *membersAPIActionUpdate) HTTPRequest(ep url.URL) *http.Request {
 	u := v2MembersURL(ep)
-	m := memberCreateOrUpdateRequest***REMOVED***PeerURLs: a.peerURLs***REMOVED***
+	m := memberCreateOrUpdateRequest{PeerURLs: a.peerURLs}
 	u.Path = path.Join(u.Path, a.memberID)
 	b, _ := json.Marshal(&m)
 	req, _ := http.NewRequest("PUT", u.String(), bytes.NewReader(b))
 	req.Header.Set("Content-Type", "application/json")
 	return req
-***REMOVED***
+}
 
-func assertStatusCode(got int, want ...int) (err error) ***REMOVED***
-	for _, w := range want ***REMOVED***
-		if w == got ***REMOVED***
+func assertStatusCode(got int, want ...int) (err error) {
+	for _, w := range want {
+		if w == got {
 			return nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return fmt.Errorf("unexpected status code %d", got)
-***REMOVED***
+}
 
-type membersAPIActionLeader struct***REMOVED******REMOVED***
+type membersAPIActionLeader struct{}
 
-func (l *membersAPIActionLeader) HTTPRequest(ep url.URL) *http.Request ***REMOVED***
+func (l *membersAPIActionLeader) HTTPRequest(ep url.URL) *http.Request {
 	u := v2MembersURL(ep)
 	u.Path = path.Join(u.Path, defaultLeaderSuffix)
 	req, _ := http.NewRequest("GET", u.String(), nil)
 	return req
-***REMOVED***
+}
 
 // v2MembersURL add the necessary path to the provided endpoint
 // to route requests to the default v2 members API.
-func v2MembersURL(ep url.URL) *url.URL ***REMOVED***
+func v2MembersURL(ep url.URL) *url.URL {
 	ep.Path = path.Join(ep.Path, defaultV2MembersPrefix)
 	return &ep
-***REMOVED***
+}
 
-type membersError struct ***REMOVED***
+type membersError struct {
 	Message string `json:"message"`
 	Code    int    `json:"-"`
-***REMOVED***
+}
 
-func (e membersError) Error() string ***REMOVED***
+func (e membersError) Error() string {
 	return e.Message
-***REMOVED***
+}

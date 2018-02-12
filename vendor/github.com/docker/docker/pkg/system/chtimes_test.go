@@ -9,21 +9,21 @@ import (
 )
 
 // prepareTempFile creates a temporary file in a temporary directory.
-func prepareTempFile(t *testing.T) (string, string) ***REMOVED***
+func prepareTempFile(t *testing.T) (string, string) {
 	dir, err := ioutil.TempDir("", "docker-system-test")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	file := filepath.Join(dir, "exist")
-	if err := ioutil.WriteFile(file, []byte("hello"), 0644); err != nil ***REMOVED***
+	if err := ioutil.WriteFile(file, []byte("hello"), 0644); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	return file, dir
-***REMOVED***
+}
 
 // TestChtimes tests Chtimes on a tempfile. Test only mTime, because aTime is OS dependent
-func TestChtimes(t *testing.T) ***REMOVED***
+func TestChtimes(t *testing.T) {
 	file, dir := prepareTempFile(t)
 	defer os.RemoveAll(dir)
 
@@ -36,59 +36,59 @@ func TestChtimes(t *testing.T) ***REMOVED***
 	Chtimes(file, unixEpochTime, unixEpochTime)
 
 	f, err := os.Stat(file)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if f.ModTime() != unixEpochTime ***REMOVED***
+	if f.ModTime() != unixEpochTime {
 		t.Fatalf("Expected: %s, got: %s", unixEpochTime, f.ModTime())
-	***REMOVED***
+	}
 
 	// Test aTime before Unix Epoch and mTime set to Unix Epoch
 	Chtimes(file, beforeUnixEpochTime, unixEpochTime)
 
 	f, err = os.Stat(file)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if f.ModTime() != unixEpochTime ***REMOVED***
+	if f.ModTime() != unixEpochTime {
 		t.Fatalf("Expected: %s, got: %s", unixEpochTime, f.ModTime())
-	***REMOVED***
+	}
 
 	// Test aTime set to Unix Epoch and mTime before Unix Epoch
 	Chtimes(file, unixEpochTime, beforeUnixEpochTime)
 
 	f, err = os.Stat(file)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if f.ModTime() != unixEpochTime ***REMOVED***
+	if f.ModTime() != unixEpochTime {
 		t.Fatalf("Expected: %s, got: %s", unixEpochTime, f.ModTime())
-	***REMOVED***
+	}
 
 	// Test both aTime and mTime set to after Unix Epoch (valid time)
 	Chtimes(file, afterUnixEpochTime, afterUnixEpochTime)
 
 	f, err = os.Stat(file)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if f.ModTime() != afterUnixEpochTime ***REMOVED***
+	if f.ModTime() != afterUnixEpochTime {
 		t.Fatalf("Expected: %s, got: %s", afterUnixEpochTime, f.ModTime())
-	***REMOVED***
+	}
 
 	// Test both aTime and mTime set to Unix max time
 	Chtimes(file, unixMaxTime, unixMaxTime)
 
 	f, err = os.Stat(file)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if f.ModTime().Truncate(time.Second) != unixMaxTime.Truncate(time.Second) ***REMOVED***
+	if f.ModTime().Truncate(time.Second) != unixMaxTime.Truncate(time.Second) {
 		t.Fatalf("Expected: %s, got: %s", unixMaxTime.Truncate(time.Second), f.ModTime().Truncate(time.Second))
-	***REMOVED***
-***REMOVED***
+	}
+}

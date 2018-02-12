@@ -19,7 +19,7 @@ import (
 	"github.com/kr/pty"
 )
 
-func (s *DockerSuite) TestUpdateRunningContainer(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestUpdateRunningContainer(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	testRequires(c, memoryLimitSupport)
 
@@ -32,9 +32,9 @@ func (s *DockerSuite) TestUpdateRunningContainer(c *check.C) ***REMOVED***
 	file := "/sys/fs/cgroup/memory/memory.limit_in_bytes"
 	out, _ := dockerCmd(c, "exec", name, "cat", file)
 	c.Assert(strings.TrimSpace(out), checker.Equals, "524288000")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestUpdateRunningContainerWithRestart(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestUpdateRunningContainerWithRestart(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	testRequires(c, memoryLimitSupport)
 
@@ -48,9 +48,9 @@ func (s *DockerSuite) TestUpdateRunningContainerWithRestart(c *check.C) ***REMOV
 	file := "/sys/fs/cgroup/memory/memory.limit_in_bytes"
 	out, _ := dockerCmd(c, "exec", name, "cat", file)
 	c.Assert(strings.TrimSpace(out), checker.Equals, "524288000")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestUpdateStoppedContainer(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestUpdateStoppedContainer(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	testRequires(c, memoryLimitSupport)
 
@@ -63,9 +63,9 @@ func (s *DockerSuite) TestUpdateStoppedContainer(c *check.C) ***REMOVED***
 
 	out, _ := dockerCmd(c, "start", "-a", name)
 	c.Assert(strings.TrimSpace(out), checker.Equals, "524288000")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestUpdatePausedContainer(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestUpdatePausedContainer(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	testRequires(c, cpuShare)
 
@@ -80,9 +80,9 @@ func (s *DockerSuite) TestUpdatePausedContainer(c *check.C) ***REMOVED***
 	file := "/sys/fs/cgroup/cpu/cpu.shares"
 	out, _ := dockerCmd(c, "exec", name, "cat", file)
 	c.Assert(strings.TrimSpace(out), checker.Equals, "500")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestUpdateWithUntouchedFields(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestUpdateWithUntouchedFields(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	testRequires(c, memoryLimitSupport)
 	testRequires(c, cpuShare)
@@ -98,9 +98,9 @@ func (s *DockerSuite) TestUpdateWithUntouchedFields(c *check.C) ***REMOVED***
 	file := "/sys/fs/cgroup/cpu/cpu.shares"
 	out, _ = dockerCmd(c, "exec", name, "cat", file)
 	c.Assert(strings.TrimSpace(out), checker.Equals, "800")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestUpdateContainerInvalidValue(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestUpdateContainerInvalidValue(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	testRequires(c, memoryLimitSupport)
 
@@ -110,9 +110,9 @@ func (s *DockerSuite) TestUpdateContainerInvalidValue(c *check.C) ***REMOVED***
 	c.Assert(err, check.NotNil)
 	expected := "Minimum memory limit allowed is 4MB"
 	c.Assert(out, checker.Contains, expected)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestUpdateContainerWithoutFlags(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestUpdateContainerWithoutFlags(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	testRequires(c, memoryLimitSupport)
 
@@ -120,9 +120,9 @@ func (s *DockerSuite) TestUpdateContainerWithoutFlags(c *check.C) ***REMOVED***
 	dockerCmd(c, "run", "-d", "--name", name, "-m", "300M", "busybox", "true")
 	_, _, err := dockerCmdWithError("update", name)
 	c.Assert(err, check.NotNil)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestUpdateKernelMemory(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestUpdateKernelMemory(c *check.C) {
 	testRequires(c, DaemonIsLinux, kernelMemorySupport)
 
 	name := "test-update-container"
@@ -134,9 +134,9 @@ func (s *DockerSuite) TestUpdateKernelMemory(c *check.C) ***REMOVED***
 	file := "/sys/fs/cgroup/memory/memory.kmem.limit_in_bytes"
 	out, _ := dockerCmd(c, "exec", name, "cat", file)
 	c.Assert(strings.TrimSpace(out), checker.Equals, "104857600")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestUpdateKernelMemoryUninitialized(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestUpdateKernelMemoryUninitialized(c *check.C) {
 	testRequires(c, DaemonIsLinux, kernelMemorySupport)
 
 	isNewKernel := CheckKernelVersion(4, 6, 0)
@@ -145,19 +145,19 @@ func (s *DockerSuite) TestUpdateKernelMemoryUninitialized(c *check.C) ***REMOVED
 	_, _, err := dockerCmdWithError("update", "--kernel-memory", "100M", name)
 	// Update kernel memory to a running container without kernel memory initialized
 	// is not allowed before kernel version 4.6.
-	if !isNewKernel ***REMOVED***
+	if !isNewKernel {
 		c.Assert(err, check.NotNil)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		c.Assert(err, check.IsNil)
-	***REMOVED***
+	}
 
 	dockerCmd(c, "pause", name)
 	_, _, err = dockerCmdWithError("update", "--kernel-memory", "200M", name)
-	if !isNewKernel ***REMOVED***
+	if !isNewKernel {
 		c.Assert(err, check.NotNil)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		c.Assert(err, check.IsNil)
-	***REMOVED***
+	}
 	dockerCmd(c, "unpause", name)
 
 	dockerCmd(c, "stop", name)
@@ -169,21 +169,21 @@ func (s *DockerSuite) TestUpdateKernelMemoryUninitialized(c *check.C) ***REMOVED
 	file := "/sys/fs/cgroup/memory/memory.kmem.limit_in_bytes"
 	out, _ := dockerCmd(c, "exec", name, "cat", file)
 	c.Assert(strings.TrimSpace(out), checker.Equals, "314572800")
-***REMOVED***
+}
 
 // GetKernelVersion gets the current kernel version.
-func GetKernelVersion() *kernel.VersionInfo ***REMOVED***
+func GetKernelVersion() *kernel.VersionInfo {
 	v, _ := kernel.ParseRelease(testEnv.DaemonInfo.KernelVersion)
 	return v
-***REMOVED***
+}
 
 // CheckKernelVersion checks if current kernel is newer than (or equal to)
 // the given version.
-func CheckKernelVersion(k, major, minor int) bool ***REMOVED***
-	return kernel.CompareKernelVersion(*GetKernelVersion(), kernel.VersionInfo***REMOVED***Kernel: k, Major: major, Minor: minor***REMOVED***) >= 0
-***REMOVED***
+func CheckKernelVersion(k, major, minor int) bool {
+	return kernel.CompareKernelVersion(*GetKernelVersion(), kernel.VersionInfo{Kernel: k, Major: major, Minor: minor}) >= 0
+}
 
-func (s *DockerSuite) TestUpdateSwapMemoryOnly(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestUpdateSwapMemoryOnly(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	testRequires(c, memoryLimitSupport)
 	testRequires(c, swapMemorySupport)
@@ -197,9 +197,9 @@ func (s *DockerSuite) TestUpdateSwapMemoryOnly(c *check.C) ***REMOVED***
 	file := "/sys/fs/cgroup/memory/memory.memsw.limit_in_bytes"
 	out, _ := dockerCmd(c, "exec", name, "cat", file)
 	c.Assert(strings.TrimSpace(out), checker.Equals, "629145600")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestUpdateInvalidSwapMemory(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestUpdateInvalidSwapMemory(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	testRequires(c, memoryLimitSupport)
 	testRequires(c, swapMemorySupport)
@@ -222,9 +222,9 @@ func (s *DockerSuite) TestUpdateInvalidSwapMemory(c *check.C) ***REMOVED***
 	file := "/sys/fs/cgroup/memory/memory.memsw.limit_in_bytes"
 	out, _ := dockerCmd(c, "exec", name, "cat", file)
 	c.Assert(strings.TrimSpace(out), checker.Equals, "629145600")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestUpdateStats(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestUpdateStats(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	testRequires(c, memoryLimitSupport)
 	testRequires(c, cpuCfsQuota)
@@ -233,7 +233,7 @@ func (s *DockerSuite) TestUpdateStats(c *check.C) ***REMOVED***
 
 	c.Assert(waitRun(name), checker.IsNil)
 
-	getMemLimit := func(id string) uint64 ***REMOVED***
+	getMemLimit := func(id string) uint64 {
 		resp, body, err := request.Get(fmt.Sprintf("/containers/%s/stats?stream=false", id))
 		c.Assert(err, checker.IsNil)
 		c.Assert(resp.Header.Get("Content-Type"), checker.Equals, "application/json")
@@ -244,7 +244,7 @@ func (s *DockerSuite) TestUpdateStats(c *check.C) ***REMOVED***
 		body.Close()
 
 		return v.MemoryStats.Limit
-	***REMOVED***
+	}
 	preMemLimit := getMemLimit(name)
 
 	dockerCmd(c, "update", "--cpu-quota", "2000", name)
@@ -253,9 +253,9 @@ func (s *DockerSuite) TestUpdateStats(c *check.C) ***REMOVED***
 
 	c.Assert(preMemLimit, checker.Equals, curMemLimit)
 
-***REMOVED***
+}
 
-func (s *DockerSuite) TestUpdateMemoryWithSwapMemory(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestUpdateMemoryWithSwapMemory(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	testRequires(c, memoryLimitSupport)
 	testRequires(c, swapMemorySupport)
@@ -267,9 +267,9 @@ func (s *DockerSuite) TestUpdateMemoryWithSwapMemory(c *check.C) ***REMOVED***
 	c.Assert(out, checker.Contains, "Memory limit should be smaller than already set memoryswap limit")
 
 	dockerCmd(c, "update", "--memory", "800M", "--memory-swap", "1000M", name)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestUpdateNotAffectMonitorRestartPolicy(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestUpdateNotAffectMonitorRestartPolicy(c *check.C) {
 	testRequires(c, DaemonIsLinux, cpuShare)
 
 	out, _ := dockerCmd(c, "run", "-tid", "--restart=always", "busybox", "sh")
@@ -292,12 +292,12 @@ func (s *DockerSuite) TestUpdateNotAffectMonitorRestartPolicy(c *check.C) ***REM
 	c.Assert(cmd.Wait(), checker.IsNil)
 
 	// container should restart again and keep running
-	err = waitInspect(id, "***REMOVED******REMOVED***.RestartCount***REMOVED******REMOVED***", "1", 30*time.Second)
+	err = waitInspect(id, "{{.RestartCount}}", "1", 30*time.Second)
 	c.Assert(err, checker.IsNil)
 	c.Assert(waitRun(id), checker.IsNil)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestUpdateWithNanoCPUs(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestUpdateWithNanoCPUs(c *check.C) {
 	testRequires(c, cpuCfsQuota, cpuCfsPeriod)
 
 	file1 := "/sys/fs/cgroup/cpu/cpu.cfs_quota_us"
@@ -336,4 +336,4 @@ func (s *DockerSuite) TestUpdateWithNanoCPUs(c *check.C) ***REMOVED***
 
 	out, _ = dockerCmd(c, "exec", "top", "sh", "-c", fmt.Sprintf("cat %s && cat %s", file1, file2))
 	c.Assert(strings.TrimSpace(out), checker.Equals, "80000\n100000")
-***REMOVED***
+}

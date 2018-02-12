@@ -6,155 +6,155 @@ import (
 )
 
 // EvictCallback is used to get a callback when a cache entry is evicted
-type EvictCallback func(key interface***REMOVED******REMOVED***, value interface***REMOVED******REMOVED***)
+type EvictCallback func(key interface{}, value interface{})
 
 // LRU implements a non-thread safe fixed size LRU cache
-type LRU struct ***REMOVED***
+type LRU struct {
 	size      int
 	evictList *list.List
-	items     map[interface***REMOVED******REMOVED***]*list.Element
+	items     map[interface{}]*list.Element
 	onEvict   EvictCallback
-***REMOVED***
+}
 
 // entry is used to hold a value in the evictList
-type entry struct ***REMOVED***
-	key   interface***REMOVED******REMOVED***
-	value interface***REMOVED******REMOVED***
-***REMOVED***
+type entry struct {
+	key   interface{}
+	value interface{}
+}
 
 // NewLRU constructs an LRU of the given size
-func NewLRU(size int, onEvict EvictCallback) (*LRU, error) ***REMOVED***
-	if size <= 0 ***REMOVED***
+func NewLRU(size int, onEvict EvictCallback) (*LRU, error) {
+	if size <= 0 {
 		return nil, errors.New("Must provide a positive size")
-	***REMOVED***
-	c := &LRU***REMOVED***
+	}
+	c := &LRU{
 		size:      size,
 		evictList: list.New(),
-		items:     make(map[interface***REMOVED******REMOVED***]*list.Element),
+		items:     make(map[interface{}]*list.Element),
 		onEvict:   onEvict,
-	***REMOVED***
+	}
 	return c, nil
-***REMOVED***
+}
 
 // Purge is used to completely clear the cache
-func (c *LRU) Purge() ***REMOVED***
-	for k, v := range c.items ***REMOVED***
-		if c.onEvict != nil ***REMOVED***
+func (c *LRU) Purge() {
+	for k, v := range c.items {
+		if c.onEvict != nil {
 			c.onEvict(k, v.Value.(*entry).value)
-		***REMOVED***
+		}
 		delete(c.items, k)
-	***REMOVED***
+	}
 	c.evictList.Init()
-***REMOVED***
+}
 
 // Add adds a value to the cache.  Returns true if an eviction occured.
-func (c *LRU) Add(key, value interface***REMOVED******REMOVED***) bool ***REMOVED***
+func (c *LRU) Add(key, value interface{}) bool {
 	// Check for existing item
-	if ent, ok := c.items[key]; ok ***REMOVED***
+	if ent, ok := c.items[key]; ok {
 		c.evictList.MoveToFront(ent)
 		ent.Value.(*entry).value = value
 		return false
-	***REMOVED***
+	}
 
 	// Add new item
-	ent := &entry***REMOVED***key, value***REMOVED***
+	ent := &entry{key, value}
 	entry := c.evictList.PushFront(ent)
 	c.items[key] = entry
 
 	evict := c.evictList.Len() > c.size
 	// Verify size not exceeded
-	if evict ***REMOVED***
+	if evict {
 		c.removeOldest()
-	***REMOVED***
+	}
 	return evict
-***REMOVED***
+}
 
 // Get looks up a key's value from the cache.
-func (c *LRU) Get(key interface***REMOVED******REMOVED***) (value interface***REMOVED******REMOVED***, ok bool) ***REMOVED***
-	if ent, ok := c.items[key]; ok ***REMOVED***
+func (c *LRU) Get(key interface{}) (value interface{}, ok bool) {
+	if ent, ok := c.items[key]; ok {
 		c.evictList.MoveToFront(ent)
 		return ent.Value.(*entry).value, true
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // Check if a key is in the cache, without updating the recent-ness
 // or deleting it for being stale.
-func (c *LRU) Contains(key interface***REMOVED******REMOVED***) (ok bool) ***REMOVED***
+func (c *LRU) Contains(key interface{}) (ok bool) {
 	_, ok = c.items[key]
 	return ok
-***REMOVED***
+}
 
 // Returns the key value (or undefined if not found) without updating
 // the "recently used"-ness of the key.
-func (c *LRU) Peek(key interface***REMOVED******REMOVED***) (value interface***REMOVED******REMOVED***, ok bool) ***REMOVED***
-	if ent, ok := c.items[key]; ok ***REMOVED***
+func (c *LRU) Peek(key interface{}) (value interface{}, ok bool) {
+	if ent, ok := c.items[key]; ok {
 		return ent.Value.(*entry).value, true
-	***REMOVED***
+	}
 	return nil, ok
-***REMOVED***
+}
 
 // Remove removes the provided key from the cache, returning if the
 // key was contained.
-func (c *LRU) Remove(key interface***REMOVED******REMOVED***) bool ***REMOVED***
-	if ent, ok := c.items[key]; ok ***REMOVED***
+func (c *LRU) Remove(key interface{}) bool {
+	if ent, ok := c.items[key]; ok {
 		c.removeElement(ent)
 		return true
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
 // RemoveOldest removes the oldest item from the cache.
-func (c *LRU) RemoveOldest() (interface***REMOVED******REMOVED***, interface***REMOVED******REMOVED***, bool) ***REMOVED***
+func (c *LRU) RemoveOldest() (interface{}, interface{}, bool) {
 	ent := c.evictList.Back()
-	if ent != nil ***REMOVED***
+	if ent != nil {
 		c.removeElement(ent)
 		kv := ent.Value.(*entry)
 		return kv.key, kv.value, true
-	***REMOVED***
+	}
 	return nil, nil, false
-***REMOVED***
+}
 
 // GetOldest returns the oldest entry
-func (c *LRU) GetOldest() (interface***REMOVED******REMOVED***, interface***REMOVED******REMOVED***, bool) ***REMOVED***
+func (c *LRU) GetOldest() (interface{}, interface{}, bool) {
 	ent := c.evictList.Back()
-	if ent != nil ***REMOVED***
+	if ent != nil {
 		kv := ent.Value.(*entry)
 		return kv.key, kv.value, true
-	***REMOVED***
+	}
 	return nil, nil, false
-***REMOVED***
+}
 
 // Keys returns a slice of the keys in the cache, from oldest to newest.
-func (c *LRU) Keys() []interface***REMOVED******REMOVED*** ***REMOVED***
-	keys := make([]interface***REMOVED******REMOVED***, len(c.items))
+func (c *LRU) Keys() []interface{} {
+	keys := make([]interface{}, len(c.items))
 	i := 0
-	for ent := c.evictList.Back(); ent != nil; ent = ent.Prev() ***REMOVED***
+	for ent := c.evictList.Back(); ent != nil; ent = ent.Prev() {
 		keys[i] = ent.Value.(*entry).key
 		i++
-	***REMOVED***
+	}
 	return keys
-***REMOVED***
+}
 
 // Len returns the number of items in the cache.
-func (c *LRU) Len() int ***REMOVED***
+func (c *LRU) Len() int {
 	return c.evictList.Len()
-***REMOVED***
+}
 
 // removeOldest removes the oldest item from the cache.
-func (c *LRU) removeOldest() ***REMOVED***
+func (c *LRU) removeOldest() {
 	ent := c.evictList.Back()
-	if ent != nil ***REMOVED***
+	if ent != nil {
 		c.removeElement(ent)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // removeElement is used to remove a given list element from the cache
-func (c *LRU) removeElement(e *list.Element) ***REMOVED***
+func (c *LRU) removeElement(e *list.Element) {
 	c.evictList.Remove(e)
 	kv := e.Value.(*entry)
 	delete(c.items, kv.key)
-	if c.onEvict != nil ***REMOVED***
+	if c.onEvict != nil {
 		c.onEvict(kv.key, kv.value)
-	***REMOVED***
-***REMOVED***
+	}
+}

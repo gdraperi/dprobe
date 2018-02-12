@@ -58,9 +58,9 @@ const (
 
 ## type Reader
 ``` go
-type Reader struct ***REMOVED***
+type Reader struct {
     // contains filtered or unexported fields
-***REMOVED***
+}
 ```
 Reader is a buffered look-ahead reader
 
@@ -200,9 +200,9 @@ WriteTo implements `io.WriterTo`
 
 ## type Writer
 ``` go
-type Writer struct ***REMOVED***
+type Writer struct {
     // contains filtered or unexported fields
-***REMOVED***
+}
 ```
 Writer is a buffered writer
 

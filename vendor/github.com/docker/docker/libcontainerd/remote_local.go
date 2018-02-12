@@ -8,7 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type remote struct ***REMOVED***
+type remote struct {
 	sync.RWMutex
 
 	logger  *logrus.Entry
@@ -17,18 +17,18 @@ type remote struct ***REMOVED***
 	// Options
 	rootDir  string
 	stateDir string
-***REMOVED***
+}
 
 // New creates a fresh instance of libcontainerd remote.
-func New(rootDir, stateDir string, options ...RemoteOption) (Remote, error) ***REMOVED***
-	return &remote***REMOVED***
+func New(rootDir, stateDir string, options ...RemoteOption) (Remote, error) {
+	return &remote{
 		logger:   logrus.WithField("module", "libcontainerd"),
 		rootDir:  rootDir,
 		stateDir: stateDir,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-type client struct ***REMOVED***
+type client struct {
 	sync.Mutex
 
 	rootDir    string
@@ -37,23 +37,23 @@ type client struct ***REMOVED***
 	logger     *logrus.Entry
 	eventQ     queue
 	containers map[string]*container
-***REMOVED***
+}
 
-func (r *remote) NewClient(ns string, b Backend) (Client, error) ***REMOVED***
-	c := &client***REMOVED***
+func (r *remote) NewClient(ns string, b Backend) (Client, error) {
+	c := &client{
 		rootDir:    r.rootDir,
 		stateDir:   r.stateDir,
 		backend:    b,
 		logger:     r.logger.WithField("namespace", ns),
 		containers: make(map[string]*container),
-	***REMOVED***
+	}
 	r.Lock()
 	r.clients = append(r.clients, c)
 	r.Unlock()
 
 	return c, nil
-***REMOVED***
+}
 
-func (r *remote) Cleanup() ***REMOVED***
+func (r *remote) Cleanup() {
 	// Nothing to do
-***REMOVED***
+}

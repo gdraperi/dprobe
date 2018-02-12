@@ -37,18 +37,18 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
-type RuncOptions struct ***REMOVED***
+type RuncOptions struct {
 	Runtime       string `protobuf:"bytes,1,opt,name=runtime,proto3" json:"runtime,omitempty"`
 	RuntimeRoot   string `protobuf:"bytes,2,opt,name=runtime_root,json=runtimeRoot,proto3" json:"runtime_root,omitempty"`
 	CriuPath      string `protobuf:"bytes,3,opt,name=criu_path,json=criuPath,proto3" json:"criu_path,omitempty"`
 	SystemdCgroup bool   `protobuf:"varint,4,opt,name=systemd_cgroup,json=systemdCgroup,proto3" json:"systemd_cgroup,omitempty"`
-***REMOVED***
+}
 
-func (m *RuncOptions) Reset()                    ***REMOVED*** *m = RuncOptions***REMOVED******REMOVED*** ***REMOVED***
-func (*RuncOptions) ProtoMessage()               ***REMOVED******REMOVED***
-func (*RuncOptions) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorRunc, []int***REMOVED***0***REMOVED*** ***REMOVED***
+func (m *RuncOptions) Reset()                    { *m = RuncOptions{} }
+func (*RuncOptions) ProtoMessage()               {}
+func (*RuncOptions) Descriptor() ([]byte, []int) { return fileDescriptorRunc, []int{0} }
 
-type CreateOptions struct ***REMOVED***
+type CreateOptions struct {
 	NoPivotRoot         bool     `protobuf:"varint,1,opt,name=no_pivot_root,json=noPivotRoot,proto3" json:"no_pivot_root,omitempty"`
 	OpenTcp             bool     `protobuf:"varint,2,opt,name=open_tcp,json=openTcp,proto3" json:"open_tcp,omitempty"`
 	ExternalUnixSockets bool     `protobuf:"varint,3,opt,name=external_unix_sockets,json=externalUnixSockets,proto3" json:"external_unix_sockets,omitempty"`
@@ -60,13 +60,13 @@ type CreateOptions struct ***REMOVED***
 	ShimCgroup          string   `protobuf:"bytes,9,opt,name=shim_cgroup,json=shimCgroup,proto3" json:"shim_cgroup,omitempty"`
 	IoUid               uint32   `protobuf:"varint,10,opt,name=io_uid,json=ioUid,proto3" json:"io_uid,omitempty"`
 	IoGid               uint32   `protobuf:"varint,11,opt,name=io_gid,json=ioGid,proto3" json:"io_gid,omitempty"`
-***REMOVED***
+}
 
-func (m *CreateOptions) Reset()                    ***REMOVED*** *m = CreateOptions***REMOVED******REMOVED*** ***REMOVED***
-func (*CreateOptions) ProtoMessage()               ***REMOVED******REMOVED***
-func (*CreateOptions) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorRunc, []int***REMOVED***1***REMOVED*** ***REMOVED***
+func (m *CreateOptions) Reset()                    { *m = CreateOptions{} }
+func (*CreateOptions) ProtoMessage()               {}
+func (*CreateOptions) Descriptor() ([]byte, []int) { return fileDescriptorRunc, []int{1} }
 
-type CheckpointOptions struct ***REMOVED***
+type CheckpointOptions struct {
 	Exit                bool     `protobuf:"varint,1,opt,name=exit,proto3" json:"exit,omitempty"`
 	OpenTcp             bool     `protobuf:"varint,2,opt,name=open_tcp,json=openTcp,proto3" json:"open_tcp,omitempty"`
 	ExternalUnixSockets bool     `protobuf:"varint,3,opt,name=external_unix_sockets,json=externalUnixSockets,proto3" json:"external_unix_sockets,omitempty"`
@@ -74,446 +74,446 @@ type CheckpointOptions struct ***REMOVED***
 	FileLocks           bool     `protobuf:"varint,5,opt,name=file_locks,json=fileLocks,proto3" json:"file_locks,omitempty"`
 	EmptyNamespaces     []string `protobuf:"bytes,6,rep,name=empty_namespaces,json=emptyNamespaces" json:"empty_namespaces,omitempty"`
 	CgroupsMode         string   `protobuf:"bytes,7,opt,name=cgroups_mode,json=cgroupsMode,proto3" json:"cgroups_mode,omitempty"`
-***REMOVED***
+}
 
-func (m *CheckpointOptions) Reset()                    ***REMOVED*** *m = CheckpointOptions***REMOVED******REMOVED*** ***REMOVED***
-func (*CheckpointOptions) ProtoMessage()               ***REMOVED******REMOVED***
-func (*CheckpointOptions) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorRunc, []int***REMOVED***2***REMOVED*** ***REMOVED***
+func (m *CheckpointOptions) Reset()                    { *m = CheckpointOptions{} }
+func (*CheckpointOptions) ProtoMessage()               {}
+func (*CheckpointOptions) Descriptor() ([]byte, []int) { return fileDescriptorRunc, []int{2} }
 
-type ProcessDetails struct ***REMOVED***
+type ProcessDetails struct {
 	ExecID string `protobuf:"bytes,1,opt,name=exec_id,json=execId,proto3" json:"exec_id,omitempty"`
-***REMOVED***
+}
 
-func (m *ProcessDetails) Reset()                    ***REMOVED*** *m = ProcessDetails***REMOVED******REMOVED*** ***REMOVED***
-func (*ProcessDetails) ProtoMessage()               ***REMOVED******REMOVED***
-func (*ProcessDetails) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorRunc, []int***REMOVED***3***REMOVED*** ***REMOVED***
+func (m *ProcessDetails) Reset()                    { *m = ProcessDetails{} }
+func (*ProcessDetails) ProtoMessage()               {}
+func (*ProcessDetails) Descriptor() ([]byte, []int) { return fileDescriptorRunc, []int{3} }
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*RuncOptions)(nil), "containerd.linux.runc.RuncOptions")
 	proto.RegisterType((*CreateOptions)(nil), "containerd.linux.runc.CreateOptions")
 	proto.RegisterType((*CheckpointOptions)(nil), "containerd.linux.runc.CheckpointOptions")
 	proto.RegisterType((*ProcessDetails)(nil), "containerd.linux.runc.ProcessDetails")
-***REMOVED***
-func (m *RuncOptions) Marshal() (dAtA []byte, err error) ***REMOVED***
+}
+func (m *RuncOptions) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *RuncOptions) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *RuncOptions) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Runtime) > 0 ***REMOVED***
+	if len(m.Runtime) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintRunc(dAtA, i, uint64(len(m.Runtime)))
 		i += copy(dAtA[i:], m.Runtime)
-	***REMOVED***
-	if len(m.RuntimeRoot) > 0 ***REMOVED***
+	}
+	if len(m.RuntimeRoot) > 0 {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintRunc(dAtA, i, uint64(len(m.RuntimeRoot)))
 		i += copy(dAtA[i:], m.RuntimeRoot)
-	***REMOVED***
-	if len(m.CriuPath) > 0 ***REMOVED***
+	}
+	if len(m.CriuPath) > 0 {
 		dAtA[i] = 0x1a
 		i++
 		i = encodeVarintRunc(dAtA, i, uint64(len(m.CriuPath)))
 		i += copy(dAtA[i:], m.CriuPath)
-	***REMOVED***
-	if m.SystemdCgroup ***REMOVED***
+	}
+	if m.SystemdCgroup {
 		dAtA[i] = 0x20
 		i++
-		if m.SystemdCgroup ***REMOVED***
+		if m.SystemdCgroup {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *CreateOptions) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *CreateOptions) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *CreateOptions) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *CreateOptions) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.NoPivotRoot ***REMOVED***
+	if m.NoPivotRoot {
 		dAtA[i] = 0x8
 		i++
-		if m.NoPivotRoot ***REMOVED***
+		if m.NoPivotRoot {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
-	if m.OpenTcp ***REMOVED***
+	}
+	if m.OpenTcp {
 		dAtA[i] = 0x10
 		i++
-		if m.OpenTcp ***REMOVED***
+		if m.OpenTcp {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
-	if m.ExternalUnixSockets ***REMOVED***
+	}
+	if m.ExternalUnixSockets {
 		dAtA[i] = 0x18
 		i++
-		if m.ExternalUnixSockets ***REMOVED***
+		if m.ExternalUnixSockets {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
-	if m.Terminal ***REMOVED***
+	}
+	if m.Terminal {
 		dAtA[i] = 0x20
 		i++
-		if m.Terminal ***REMOVED***
+		if m.Terminal {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
-	if m.FileLocks ***REMOVED***
+	}
+	if m.FileLocks {
 		dAtA[i] = 0x28
 		i++
-		if m.FileLocks ***REMOVED***
+		if m.FileLocks {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
-	if len(m.EmptyNamespaces) > 0 ***REMOVED***
-		for _, s := range m.EmptyNamespaces ***REMOVED***
+	}
+	if len(m.EmptyNamespaces) > 0 {
+		for _, s := range m.EmptyNamespaces {
 			dAtA[i] = 0x32
 			i++
 			l = len(s)
-			for l >= 1<<7 ***REMOVED***
+			for l >= 1<<7 {
 				dAtA[i] = uint8(uint64(l)&0x7f | 0x80)
 				l >>= 7
 				i++
-			***REMOVED***
+			}
 			dAtA[i] = uint8(l)
 			i++
 			i += copy(dAtA[i:], s)
-		***REMOVED***
-	***REMOVED***
-	if len(m.CgroupsMode) > 0 ***REMOVED***
+		}
+	}
+	if len(m.CgroupsMode) > 0 {
 		dAtA[i] = 0x3a
 		i++
 		i = encodeVarintRunc(dAtA, i, uint64(len(m.CgroupsMode)))
 		i += copy(dAtA[i:], m.CgroupsMode)
-	***REMOVED***
-	if m.NoNewKeyring ***REMOVED***
+	}
+	if m.NoNewKeyring {
 		dAtA[i] = 0x40
 		i++
-		if m.NoNewKeyring ***REMOVED***
+		if m.NoNewKeyring {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
-	if len(m.ShimCgroup) > 0 ***REMOVED***
+	}
+	if len(m.ShimCgroup) > 0 {
 		dAtA[i] = 0x4a
 		i++
 		i = encodeVarintRunc(dAtA, i, uint64(len(m.ShimCgroup)))
 		i += copy(dAtA[i:], m.ShimCgroup)
-	***REMOVED***
-	if m.IoUid != 0 ***REMOVED***
+	}
+	if m.IoUid != 0 {
 		dAtA[i] = 0x50
 		i++
 		i = encodeVarintRunc(dAtA, i, uint64(m.IoUid))
-	***REMOVED***
-	if m.IoGid != 0 ***REMOVED***
+	}
+	if m.IoGid != 0 {
 		dAtA[i] = 0x58
 		i++
 		i = encodeVarintRunc(dAtA, i, uint64(m.IoGid))
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *CheckpointOptions) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *CheckpointOptions) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *CheckpointOptions) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *CheckpointOptions) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.Exit ***REMOVED***
+	if m.Exit {
 		dAtA[i] = 0x8
 		i++
-		if m.Exit ***REMOVED***
+		if m.Exit {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
-	if m.OpenTcp ***REMOVED***
+	}
+	if m.OpenTcp {
 		dAtA[i] = 0x10
 		i++
-		if m.OpenTcp ***REMOVED***
+		if m.OpenTcp {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
-	if m.ExternalUnixSockets ***REMOVED***
+	}
+	if m.ExternalUnixSockets {
 		dAtA[i] = 0x18
 		i++
-		if m.ExternalUnixSockets ***REMOVED***
+		if m.ExternalUnixSockets {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
-	if m.Terminal ***REMOVED***
+	}
+	if m.Terminal {
 		dAtA[i] = 0x20
 		i++
-		if m.Terminal ***REMOVED***
+		if m.Terminal {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
-	if m.FileLocks ***REMOVED***
+	}
+	if m.FileLocks {
 		dAtA[i] = 0x28
 		i++
-		if m.FileLocks ***REMOVED***
+		if m.FileLocks {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
-	if len(m.EmptyNamespaces) > 0 ***REMOVED***
-		for _, s := range m.EmptyNamespaces ***REMOVED***
+	}
+	if len(m.EmptyNamespaces) > 0 {
+		for _, s := range m.EmptyNamespaces {
 			dAtA[i] = 0x32
 			i++
 			l = len(s)
-			for l >= 1<<7 ***REMOVED***
+			for l >= 1<<7 {
 				dAtA[i] = uint8(uint64(l)&0x7f | 0x80)
 				l >>= 7
 				i++
-			***REMOVED***
+			}
 			dAtA[i] = uint8(l)
 			i++
 			i += copy(dAtA[i:], s)
-		***REMOVED***
-	***REMOVED***
-	if len(m.CgroupsMode) > 0 ***REMOVED***
+		}
+	}
+	if len(m.CgroupsMode) > 0 {
 		dAtA[i] = 0x3a
 		i++
 		i = encodeVarintRunc(dAtA, i, uint64(len(m.CgroupsMode)))
 		i += copy(dAtA[i:], m.CgroupsMode)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *ProcessDetails) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *ProcessDetails) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *ProcessDetails) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *ProcessDetails) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ExecID) > 0 ***REMOVED***
+	if len(m.ExecID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintRunc(dAtA, i, uint64(len(m.ExecID)))
 		i += copy(dAtA[i:], m.ExecID)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func encodeVarintRunc(dAtA []byte, offset int, v uint64) int ***REMOVED***
-	for v >= 1<<7 ***REMOVED***
+func encodeVarintRunc(dAtA []byte, offset int, v uint64) int {
+	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
-	***REMOVED***
+	}
 	dAtA[offset] = uint8(v)
 	return offset + 1
-***REMOVED***
-func (m *RuncOptions) Size() (n int) ***REMOVED***
+}
+func (m *RuncOptions) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.Runtime)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovRunc(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.RuntimeRoot)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovRunc(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.CriuPath)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovRunc(uint64(l))
-	***REMOVED***
-	if m.SystemdCgroup ***REMOVED***
+	}
+	if m.SystemdCgroup {
 		n += 2
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *CreateOptions) Size() (n int) ***REMOVED***
+func (m *CreateOptions) Size() (n int) {
 	var l int
 	_ = l
-	if m.NoPivotRoot ***REMOVED***
+	if m.NoPivotRoot {
 		n += 2
-	***REMOVED***
-	if m.OpenTcp ***REMOVED***
+	}
+	if m.OpenTcp {
 		n += 2
-	***REMOVED***
-	if m.ExternalUnixSockets ***REMOVED***
+	}
+	if m.ExternalUnixSockets {
 		n += 2
-	***REMOVED***
-	if m.Terminal ***REMOVED***
+	}
+	if m.Terminal {
 		n += 2
-	***REMOVED***
-	if m.FileLocks ***REMOVED***
+	}
+	if m.FileLocks {
 		n += 2
-	***REMOVED***
-	if len(m.EmptyNamespaces) > 0 ***REMOVED***
-		for _, s := range m.EmptyNamespaces ***REMOVED***
+	}
+	if len(m.EmptyNamespaces) > 0 {
+		for _, s := range m.EmptyNamespaces {
 			l = len(s)
 			n += 1 + l + sovRunc(uint64(l))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	l = len(m.CgroupsMode)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovRunc(uint64(l))
-	***REMOVED***
-	if m.NoNewKeyring ***REMOVED***
+	}
+	if m.NoNewKeyring {
 		n += 2
-	***REMOVED***
+	}
 	l = len(m.ShimCgroup)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovRunc(uint64(l))
-	***REMOVED***
-	if m.IoUid != 0 ***REMOVED***
+	}
+	if m.IoUid != 0 {
 		n += 1 + sovRunc(uint64(m.IoUid))
-	***REMOVED***
-	if m.IoGid != 0 ***REMOVED***
+	}
+	if m.IoGid != 0 {
 		n += 1 + sovRunc(uint64(m.IoGid))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *CheckpointOptions) Size() (n int) ***REMOVED***
+func (m *CheckpointOptions) Size() (n int) {
 	var l int
 	_ = l
-	if m.Exit ***REMOVED***
+	if m.Exit {
 		n += 2
-	***REMOVED***
-	if m.OpenTcp ***REMOVED***
+	}
+	if m.OpenTcp {
 		n += 2
-	***REMOVED***
-	if m.ExternalUnixSockets ***REMOVED***
+	}
+	if m.ExternalUnixSockets {
 		n += 2
-	***REMOVED***
-	if m.Terminal ***REMOVED***
+	}
+	if m.Terminal {
 		n += 2
-	***REMOVED***
-	if m.FileLocks ***REMOVED***
+	}
+	if m.FileLocks {
 		n += 2
-	***REMOVED***
-	if len(m.EmptyNamespaces) > 0 ***REMOVED***
-		for _, s := range m.EmptyNamespaces ***REMOVED***
+	}
+	if len(m.EmptyNamespaces) > 0 {
+		for _, s := range m.EmptyNamespaces {
 			l = len(s)
 			n += 1 + l + sovRunc(uint64(l))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	l = len(m.CgroupsMode)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovRunc(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *ProcessDetails) Size() (n int) ***REMOVED***
+func (m *ProcessDetails) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ExecID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovRunc(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func sovRunc(x uint64) (n int) ***REMOVED***
-	for ***REMOVED***
+func sovRunc(x uint64) (n int) {
+	for {
 		n++
 		x >>= 7
-		if x == 0 ***REMOVED***
+		if x == 0 {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
-func sozRunc(x uint64) (n int) ***REMOVED***
+}
+func sozRunc(x uint64) (n int) {
 	return sovRunc(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-***REMOVED***
-func (this *RuncOptions) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *RuncOptions) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&RuncOptions***REMOVED***`,
+	}
+	s := strings.Join([]string{`&RuncOptions{`,
 		`Runtime:` + fmt.Sprintf("%v", this.Runtime) + `,`,
 		`RuntimeRoot:` + fmt.Sprintf("%v", this.RuntimeRoot) + `,`,
 		`CriuPath:` + fmt.Sprintf("%v", this.CriuPath) + `,`,
 		`SystemdCgroup:` + fmt.Sprintf("%v", this.SystemdCgroup) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *CreateOptions) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *CreateOptions) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&CreateOptions***REMOVED***`,
+	}
+	s := strings.Join([]string{`&CreateOptions{`,
 		`NoPivotRoot:` + fmt.Sprintf("%v", this.NoPivotRoot) + `,`,
 		`OpenTcp:` + fmt.Sprintf("%v", this.OpenTcp) + `,`,
 		`ExternalUnixSockets:` + fmt.Sprintf("%v", this.ExternalUnixSockets) + `,`,
@@ -525,15 +525,15 @@ func (this *CreateOptions) String() string ***REMOVED***
 		`ShimCgroup:` + fmt.Sprintf("%v", this.ShimCgroup) + `,`,
 		`IoUid:` + fmt.Sprintf("%v", this.IoUid) + `,`,
 		`IoGid:` + fmt.Sprintf("%v", this.IoGid) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *CheckpointOptions) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *CheckpointOptions) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&CheckpointOptions***REMOVED***`,
+	}
+	s := strings.Join([]string{`&CheckpointOptions{`,
 		`Exit:` + fmt.Sprintf("%v", this.Exit) + `,`,
 		`OpenTcp:` + fmt.Sprintf("%v", this.OpenTcp) + `,`,
 		`ExternalUnixSockets:` + fmt.Sprintf("%v", this.ExternalUnixSockets) + `,`,
@@ -541,854 +541,854 @@ func (this *CheckpointOptions) String() string ***REMOVED***
 		`FileLocks:` + fmt.Sprintf("%v", this.FileLocks) + `,`,
 		`EmptyNamespaces:` + fmt.Sprintf("%v", this.EmptyNamespaces) + `,`,
 		`CgroupsMode:` + fmt.Sprintf("%v", this.CgroupsMode) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *ProcessDetails) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *ProcessDetails) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&ProcessDetails***REMOVED***`,
+	}
+	s := strings.Join([]string{`&ProcessDetails{`,
 		`ExecID:` + fmt.Sprintf("%v", this.ExecID) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func valueToStringRunc(v interface***REMOVED******REMOVED***) string ***REMOVED***
+}
+func valueToStringRunc(v interface{}) string {
 	rv := reflect.ValueOf(v)
-	if rv.IsNil() ***REMOVED***
+	if rv.IsNil() {
 		return "nil"
-	***REMOVED***
+	}
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
-***REMOVED***
-func (m *RuncOptions) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *RuncOptions) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowRunc
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: RuncOptions: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: RuncOptions: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Runtime", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRunc
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthRunc
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Runtime = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RuntimeRoot", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRunc
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthRunc
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.RuntimeRoot = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CriuPath", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRunc
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthRunc
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.CriuPath = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 4:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field SystemdCgroup", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRunc
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			m.SystemdCgroup = bool(v != 0)
 		default:
 			iNdEx = preIndex
 			skippy, err := skipRunc(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthRunc
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *CreateOptions) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *CreateOptions) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowRunc
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: CreateOptions: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: CreateOptions: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field NoPivotRoot", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRunc
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			m.NoPivotRoot = bool(v != 0)
 		case 2:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field OpenTcp", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRunc
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			m.OpenTcp = bool(v != 0)
 		case 3:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ExternalUnixSockets", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRunc
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			m.ExternalUnixSockets = bool(v != 0)
 		case 4:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Terminal", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRunc
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			m.Terminal = bool(v != 0)
 		case 5:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field FileLocks", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRunc
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			m.FileLocks = bool(v != 0)
 		case 6:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field EmptyNamespaces", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRunc
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthRunc
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.EmptyNamespaces = append(m.EmptyNamespaces, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		case 7:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CgroupsMode", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRunc
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthRunc
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.CgroupsMode = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 8:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field NoNewKeyring", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRunc
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			m.NoNewKeyring = bool(v != 0)
 		case 9:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ShimCgroup", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRunc
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthRunc
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ShimCgroup = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 10:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field IoUid", wireType)
-			***REMOVED***
+			}
 			m.IoUid = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRunc
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.IoUid |= (uint32(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 11:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field IoGid", wireType)
-			***REMOVED***
+			}
 			m.IoGid = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRunc
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.IoGid |= (uint32(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipRunc(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthRunc
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *CheckpointOptions) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *CheckpointOptions) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowRunc
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: CheckpointOptions: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: CheckpointOptions: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Exit", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRunc
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			m.Exit = bool(v != 0)
 		case 2:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field OpenTcp", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRunc
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			m.OpenTcp = bool(v != 0)
 		case 3:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ExternalUnixSockets", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRunc
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			m.ExternalUnixSockets = bool(v != 0)
 		case 4:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Terminal", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRunc
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			m.Terminal = bool(v != 0)
 		case 5:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field FileLocks", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRunc
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			m.FileLocks = bool(v != 0)
 		case 6:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field EmptyNamespaces", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRunc
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthRunc
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.EmptyNamespaces = append(m.EmptyNamespaces, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		case 7:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CgroupsMode", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRunc
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthRunc
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.CgroupsMode = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipRunc(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthRunc
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *ProcessDetails) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *ProcessDetails) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowRunc
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: ProcessDetails: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: ProcessDetails: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ExecID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRunc
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthRunc
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ExecID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipRunc(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthRunc
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func skipRunc(dAtA []byte) (n int, err error) ***REMOVED***
+}
+func skipRunc(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return 0, ErrIntOverflowRunc
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return 0, io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		wireType := int(wire & 0x7)
-		switch wireType ***REMOVED***
+		switch wireType {
 		case 0:
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowRunc
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				iNdEx++
-				if dAtA[iNdEx-1] < 0x80 ***REMOVED***
+				if dAtA[iNdEx-1] < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return iNdEx, nil
 		case 1:
 			iNdEx += 8
 			return iNdEx, nil
 		case 2:
 			var length int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowRunc
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				length |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			iNdEx += length
-			if length < 0 ***REMOVED***
+			if length < 0 {
 				return 0, ErrInvalidLengthRunc
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 3:
-			for ***REMOVED***
+			for {
 				var innerWire uint64
 				var start int = iNdEx
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return 0, ErrIntOverflowRunc
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return 0, io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					innerWire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				innerWireType := int(innerWire & 0x7)
-				if innerWireType == 4 ***REMOVED***
+				if innerWireType == 4 {
 					break
-				***REMOVED***
+				}
 				next, err := skipRunc(dAtA[start:])
-				if err != nil ***REMOVED***
+				if err != nil {
 					return 0, err
-				***REMOVED***
+				}
 				iNdEx = start + next
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 4:
 			return iNdEx, nil
@@ -1397,21 +1397,21 @@ func skipRunc(dAtA []byte) (n int, err error) ***REMOVED***
 			return iNdEx, nil
 		default:
 			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	panic("unreachable")
-***REMOVED***
+}
 
 var (
 	ErrInvalidLengthRunc = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowRunc   = fmt.Errorf("proto: integer overflow")
 )
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterFile("github.com/containerd/containerd/linux/runctypes/runc.proto", fileDescriptorRunc)
-***REMOVED***
+}
 
-var fileDescriptorRunc = []byte***REMOVED***
+var fileDescriptorRunc = []byte{
 	// 540 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xdc, 0x93, 0xc1, 0x6e, 0xd3, 0x40,
 	0x10, 0x86, 0x6b, 0xda, 0x26, 0xce, 0xa4, 0x29, 0xb0, 0x50, 0xc9, 0x14, 0x91, 0x86, 0x00, 0x52,
@@ -1447,4 +1447,4 @@ var fileDescriptorRunc = []byte***REMOVED***
 	0x95, 0xcb, 0x79, 0x37, 0xb8, 0x9a, 0x77, 0x83, 0x6f, 0xf3, 0x6e, 0xf0, 0x73, 0xde, 0x0d, 0x3e,
 	0xbd, 0xfc, 0xd7, 0x83, 0xde, 0x5b, 0xaa, 0x8f, 0x2b, 0xe7, 0x0d, 0x7f, 0xab, 0xcf, 0x7f, 0x07,
 	0x00, 0x00, 0xff, 0xff, 0xb1, 0xca, 0x85, 0x39, 0x17, 0x04, 0x00, 0x00,
-***REMOVED***
+}

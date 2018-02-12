@@ -10,152 +10,152 @@ import (
 // Retryer is an interface to control retry logic for a given service.
 // The default implementation used by most services is the client.DefaultRetryer
 // structure, which contains basic retry logic using exponential backoff.
-type Retryer interface ***REMOVED***
+type Retryer interface {
 	RetryRules(*Request) time.Duration
 	ShouldRetry(*Request) bool
 	MaxRetries() int
-***REMOVED***
+}
 
 // WithRetryer sets a config Retryer value to the given Config returning it
 // for chaining.
-func WithRetryer(cfg *aws.Config, retryer Retryer) *aws.Config ***REMOVED***
+func WithRetryer(cfg *aws.Config, retryer Retryer) *aws.Config {
 	cfg.Retryer = retryer
 	return cfg
-***REMOVED***
+}
 
 // retryableCodes is a collection of service response codes which are retry-able
 // without any further action.
-var retryableCodes = map[string]struct***REMOVED******REMOVED******REMOVED***
-	"RequestError":            ***REMOVED******REMOVED***,
-	"RequestTimeout":          ***REMOVED******REMOVED***,
-	ErrCodeResponseTimeout:    ***REMOVED******REMOVED***,
-	"RequestTimeoutException": ***REMOVED******REMOVED***, // Glacier's flavor of RequestTimeout
-***REMOVED***
+var retryableCodes = map[string]struct{}{
+	"RequestError":            {},
+	"RequestTimeout":          {},
+	ErrCodeResponseTimeout:    {},
+	"RequestTimeoutException": {}, // Glacier's flavor of RequestTimeout
+}
 
-var throttleCodes = map[string]struct***REMOVED******REMOVED******REMOVED***
-	"ProvisionedThroughputExceededException": ***REMOVED******REMOVED***,
-	"Throttling":                             ***REMOVED******REMOVED***,
-	"ThrottlingException":                    ***REMOVED******REMOVED***,
-	"RequestLimitExceeded":                   ***REMOVED******REMOVED***,
-	"RequestThrottled":                       ***REMOVED******REMOVED***,
-	"TooManyRequestsException":               ***REMOVED******REMOVED***, // Lambda functions
-	"PriorRequestNotComplete":                ***REMOVED******REMOVED***, // Route53
-***REMOVED***
+var throttleCodes = map[string]struct{}{
+	"ProvisionedThroughputExceededException": {},
+	"Throttling":                             {},
+	"ThrottlingException":                    {},
+	"RequestLimitExceeded":                   {},
+	"RequestThrottled":                       {},
+	"TooManyRequestsException":               {}, // Lambda functions
+	"PriorRequestNotComplete":                {}, // Route53
+}
 
 // credsExpiredCodes is a collection of error codes which signify the credentials
 // need to be refreshed. Expired tokens require refreshing of credentials, and
 // resigning before the request can be retried.
-var credsExpiredCodes = map[string]struct***REMOVED******REMOVED******REMOVED***
-	"ExpiredToken":          ***REMOVED******REMOVED***,
-	"ExpiredTokenException": ***REMOVED******REMOVED***,
-	"RequestExpired":        ***REMOVED******REMOVED***, // EC2 Only
-***REMOVED***
+var credsExpiredCodes = map[string]struct{}{
+	"ExpiredToken":          {},
+	"ExpiredTokenException": {},
+	"RequestExpired":        {}, // EC2 Only
+}
 
-func isCodeThrottle(code string) bool ***REMOVED***
+func isCodeThrottle(code string) bool {
 	_, ok := throttleCodes[code]
 	return ok
-***REMOVED***
+}
 
-func isCodeRetryable(code string) bool ***REMOVED***
-	if _, ok := retryableCodes[code]; ok ***REMOVED***
+func isCodeRetryable(code string) bool {
+	if _, ok := retryableCodes[code]; ok {
 		return true
-	***REMOVED***
+	}
 
 	return isCodeExpiredCreds(code)
-***REMOVED***
+}
 
-func isCodeExpiredCreds(code string) bool ***REMOVED***
+func isCodeExpiredCreds(code string) bool {
 	_, ok := credsExpiredCodes[code]
 	return ok
-***REMOVED***
+}
 
-var validParentCodes = map[string]struct***REMOVED******REMOVED******REMOVED***
-	ErrCodeSerialization: ***REMOVED******REMOVED***,
-	ErrCodeRead:          ***REMOVED******REMOVED***,
-***REMOVED***
+var validParentCodes = map[string]struct{}{
+	ErrCodeSerialization: {},
+	ErrCodeRead:          {},
+}
 
-type temporaryError interface ***REMOVED***
+type temporaryError interface {
 	Temporary() bool
-***REMOVED***
+}
 
-func isNestedErrorRetryable(parentErr awserr.Error) bool ***REMOVED***
-	if parentErr == nil ***REMOVED***
+func isNestedErrorRetryable(parentErr awserr.Error) bool {
+	if parentErr == nil {
 		return false
-	***REMOVED***
+	}
 
-	if _, ok := validParentCodes[parentErr.Code()]; !ok ***REMOVED***
+	if _, ok := validParentCodes[parentErr.Code()]; !ok {
 		return false
-	***REMOVED***
+	}
 
 	err := parentErr.OrigErr()
-	if err == nil ***REMOVED***
+	if err == nil {
 		return false
-	***REMOVED***
+	}
 
-	if aerr, ok := err.(awserr.Error); ok ***REMOVED***
+	if aerr, ok := err.(awserr.Error); ok {
 		return isCodeRetryable(aerr.Code())
-	***REMOVED***
+	}
 
-	if t, ok := err.(temporaryError); ok ***REMOVED***
+	if t, ok := err.(temporaryError); ok {
 		return t.Temporary()
-	***REMOVED***
+	}
 
 	return isErrConnectionReset(err)
-***REMOVED***
+}
 
 // IsErrorRetryable returns whether the error is retryable, based on its Code.
 // Returns false if error is nil.
-func IsErrorRetryable(err error) bool ***REMOVED***
-	if err != nil ***REMOVED***
-		if aerr, ok := err.(awserr.Error); ok ***REMOVED***
+func IsErrorRetryable(err error) bool {
+	if err != nil {
+		if aerr, ok := err.(awserr.Error); ok {
 			return isCodeRetryable(aerr.Code()) || isNestedErrorRetryable(aerr)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false
-***REMOVED***
+}
 
 // IsErrorThrottle returns whether the error is to be throttled based on its code.
 // Returns false if error is nil.
-func IsErrorThrottle(err error) bool ***REMOVED***
-	if err != nil ***REMOVED***
-		if aerr, ok := err.(awserr.Error); ok ***REMOVED***
+func IsErrorThrottle(err error) bool {
+	if err != nil {
+		if aerr, ok := err.(awserr.Error); ok {
 			return isCodeThrottle(aerr.Code())
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false
-***REMOVED***
+}
 
 // IsErrorExpiredCreds returns whether the error code is a credential expiry error.
 // Returns false if error is nil.
-func IsErrorExpiredCreds(err error) bool ***REMOVED***
-	if err != nil ***REMOVED***
-		if aerr, ok := err.(awserr.Error); ok ***REMOVED***
+func IsErrorExpiredCreds(err error) bool {
+	if err != nil {
+		if aerr, ok := err.(awserr.Error); ok {
 			return isCodeExpiredCreds(aerr.Code())
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false
-***REMOVED***
+}
 
 // IsErrorRetryable returns whether the error is retryable, based on its Code.
 // Returns false if the request has no Error set.
 //
 // Alias for the utility function IsErrorRetryable
-func (r *Request) IsErrorRetryable() bool ***REMOVED***
+func (r *Request) IsErrorRetryable() bool {
 	return IsErrorRetryable(r.Error)
-***REMOVED***
+}
 
 // IsErrorThrottle returns whether the error is to be throttled based on its code.
 // Returns false if the request has no Error set
 //
 // Alias for the utility function IsErrorThrottle
-func (r *Request) IsErrorThrottle() bool ***REMOVED***
+func (r *Request) IsErrorThrottle() bool {
 	return IsErrorThrottle(r.Error)
-***REMOVED***
+}
 
 // IsErrorExpired returns whether the error code is a credential expiry error.
 // Returns false if the request has no Error set.
 //
 // Alias for the utility function IsErrorExpiredCreds
-func (r *Request) IsErrorExpired() bool ***REMOVED***
+func (r *Request) IsErrorExpired() bool {
 	return IsErrorExpiredCreds(r.Error)
-***REMOVED***
+}

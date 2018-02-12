@@ -11,48 +11,48 @@ import (
 
 var tempDirs []string
 
-func NewTempOsBaseFs(t *testing.T) Fs ***REMOVED***
+func NewTempOsBaseFs(t *testing.T) Fs {
 	name, err := TempDir(NewOsFs(), "", "")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Error("error creating tempDir", err)
-	***REMOVED***
+	}
 
 	tempDirs = append(tempDirs, name)
 
 	return NewBasePathFs(NewOsFs(), name)
-***REMOVED***
+}
 
-func CleanupTempDirs(t *testing.T) ***REMOVED***
+func CleanupTempDirs(t *testing.T) {
 	osfs := NewOsFs()
-	type ev struct ***REMOVED***
+	type ev struct {
 		path string
 		e    error
-	***REMOVED***
+	}
 
-	errs := []ev***REMOVED******REMOVED***
+	errs := []ev{}
 
-	for _, x := range tempDirs ***REMOVED***
+	for _, x := range tempDirs {
 		err := osfs.RemoveAll(x)
-		if err != nil ***REMOVED***
-			errs = append(errs, ev***REMOVED***path: x, e: err***REMOVED***)
-		***REMOVED***
-	***REMOVED***
+		if err != nil {
+			errs = append(errs, ev{path: x, e: err})
+		}
+	}
 
-	for _, e := range errs ***REMOVED***
+	for _, e := range errs {
 		fmt.Println("error removing tempDir", e.path, e.e)
-	***REMOVED***
+	}
 
-	if len(errs) > 0 ***REMOVED***
+	if len(errs) > 0 {
 		t.Error("error cleaning up tempDirs")
-	***REMOVED***
-	tempDirs = []string***REMOVED******REMOVED***
-***REMOVED***
+	}
+	tempDirs = []string{}
+}
 
-func TestUnionCreateExisting(t *testing.T) ***REMOVED***
-	base := &MemMapFs***REMOVED******REMOVED***
-	roBase := &ReadOnlyFs***REMOVED***source: base***REMOVED***
+func TestUnionCreateExisting(t *testing.T) {
+	base := &MemMapFs{}
+	roBase := &ReadOnlyFs{source: base}
 
-	ufs := NewCopyOnWriteFs(roBase, &MemMapFs***REMOVED******REMOVED***)
+	ufs := NewCopyOnWriteFs(roBase, &MemMapFs{})
 
 	base.MkdirAll("/home/test", 0777)
 	fh, _ := base.Create("/home/test/file.txt")
@@ -60,49 +60,49 @@ func TestUnionCreateExisting(t *testing.T) ***REMOVED***
 	fh.Close()
 
 	fh, err := ufs.OpenFile("/home/test/file.txt", os.O_RDWR, 0666)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("Failed to open file r/w: %s", err)
-	***REMOVED***
+	}
 
 	_, err = fh.Write([]byte("####"))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("Failed to write file: %s", err)
-	***REMOVED***
+	}
 	fh.Seek(0, 0)
 	data, err := ioutil.ReadAll(fh)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("Failed to read file: %s", err)
-	***REMOVED***
-	if string(data) != "#### is a test" ***REMOVED***
+	}
+	if string(data) != "#### is a test" {
 		t.Errorf("Got wrong data")
-	***REMOVED***
+	}
 	fh.Close()
 
 	fh, _ = base.Open("/home/test/file.txt")
 	data, err = ioutil.ReadAll(fh)
-	if string(data) != "This is a test" ***REMOVED***
+	if string(data) != "This is a test" {
 		t.Errorf("Got wrong data in base file")
-	***REMOVED***
+	}
 	fh.Close()
 
 	fh, err = ufs.Create("/home/test/file.txt")
-	switch err ***REMOVED***
+	switch err {
 	case nil:
-		if fi, _ := fh.Stat(); fi.Size() != 0 ***REMOVED***
+		if fi, _ := fh.Stat(); fi.Size() != 0 {
 			t.Errorf("Create did not truncate file")
-		***REMOVED***
+		}
 		fh.Close()
 	default:
 		t.Errorf("Create failed on existing file")
-	***REMOVED***
+	}
 
-***REMOVED***
+}
 
-func TestUnionMergeReaddir(t *testing.T) ***REMOVED***
-	base := &MemMapFs***REMOVED******REMOVED***
-	roBase := &ReadOnlyFs***REMOVED***source: base***REMOVED***
+func TestUnionMergeReaddir(t *testing.T) {
+	base := &MemMapFs{}
+	roBase := &ReadOnlyFs{source: base}
 
-	ufs := &CopyOnWriteFs***REMOVED***base: roBase, layer: &MemMapFs***REMOVED******REMOVED******REMOVED***
+	ufs := &CopyOnWriteFs{base: roBase, layer: &MemMapFs{}}
 
 	base.MkdirAll("/home/test", 0777)
 	fh, _ := base.Create("/home/test/file.txt")
@@ -115,20 +115,20 @@ func TestUnionMergeReaddir(t *testing.T) ***REMOVED***
 
 	fh, _ = ufs.Open("/home/test")
 	files, err := fh.Readdirnames(-1)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("Readdirnames failed")
-	***REMOVED***
-	if len(files) != 2 ***REMOVED***
+	}
+	if len(files) != 2 {
 		t.Errorf("Got wrong number of files: %v", files)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestExistingDirectoryCollisionReaddir(t *testing.T) ***REMOVED***
-	base := &MemMapFs***REMOVED******REMOVED***
-	roBase := &ReadOnlyFs***REMOVED***source: base***REMOVED***
-	overlay := &MemMapFs***REMOVED******REMOVED***
+func TestExistingDirectoryCollisionReaddir(t *testing.T) {
+	base := &MemMapFs{}
+	roBase := &ReadOnlyFs{source: base}
+	overlay := &MemMapFs{}
 
-	ufs := &CopyOnWriteFs***REMOVED***base: roBase, layer: overlay***REMOVED***
+	ufs := &CopyOnWriteFs{base: roBase, layer: overlay}
 
 	base.MkdirAll("/home/test", 0777)
 	fh, _ := base.Create("/home/test/file.txt")
@@ -146,29 +146,29 @@ func TestExistingDirectoryCollisionReaddir(t *testing.T) ***REMOVED***
 
 	fh, _ = ufs.Open("/home/test")
 	files, err := fh.Readdirnames(-1)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("Readdirnames failed")
-	***REMOVED***
-	if len(files) != 3 ***REMOVED***
+	}
+	if len(files) != 3 {
 		t.Errorf("Got wrong number of files in union: %v", files)
-	***REMOVED***
+	}
 
 	fh, _ = overlay.Open("/home/test")
 	files, err = fh.Readdirnames(-1)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("Readdirnames failed")
-	***REMOVED***
-	if len(files) != 2 ***REMOVED***
+	}
+	if len(files) != 2 {
 		t.Errorf("Got wrong number of files in overlay: %v", files)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestNestedDirBaseReaddir(t *testing.T) ***REMOVED***
-	base := &MemMapFs***REMOVED******REMOVED***
-	roBase := &ReadOnlyFs***REMOVED***source: base***REMOVED***
-	overlay := &MemMapFs***REMOVED******REMOVED***
+func TestNestedDirBaseReaddir(t *testing.T) {
+	base := &MemMapFs{}
+	roBase := &ReadOnlyFs{source: base}
+	overlay := &MemMapFs{}
 
-	ufs := &CopyOnWriteFs***REMOVED***base: roBase, layer: overlay***REMOVED***
+	ufs := &CopyOnWriteFs{base: roBase, layer: overlay}
 
 	base.MkdirAll("/home/test/foo/bar", 0777)
 	fh, _ := base.Create("/home/test/file.txt")
@@ -187,23 +187,23 @@ func TestNestedDirBaseReaddir(t *testing.T) ***REMOVED***
 	// Opening something only in the base
 	fh, _ = ufs.Open("/home/test/foo")
 	list, err := fh.Readdir(-1)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("Readdir failed %s", err)
-	***REMOVED***
-	if len(list) != 2 ***REMOVED***
-		for _, x := range list ***REMOVED***
+	}
+	if len(list) != 2 {
+		for _, x := range list {
 			fmt.Println(x.Name())
-		***REMOVED***
+		}
 		t.Errorf("Got wrong number of files in union: %v", len(list))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestNestedDirOverlayReaddir(t *testing.T) ***REMOVED***
-	base := &MemMapFs***REMOVED******REMOVED***
-	roBase := &ReadOnlyFs***REMOVED***source: base***REMOVED***
-	overlay := &MemMapFs***REMOVED******REMOVED***
+func TestNestedDirOverlayReaddir(t *testing.T) {
+	base := &MemMapFs{}
+	roBase := &ReadOnlyFs{source: base}
+	overlay := &MemMapFs{}
 
-	ufs := &CopyOnWriteFs***REMOVED***base: roBase, layer: overlay***REMOVED***
+	ufs := &CopyOnWriteFs{base: roBase, layer: overlay}
 
 	base.MkdirAll("/", 0777)
 	overlay.MkdirAll("/home/test/foo/bar", 0777)
@@ -220,24 +220,24 @@ func TestNestedDirOverlayReaddir(t *testing.T) ***REMOVED***
 	// Opening nested dir only in the overlay
 	fh, _ = ufs.Open("/home/test/foo")
 	list, err := fh.Readdir(-1)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("Readdir failed %s", err)
-	***REMOVED***
-	if len(list) != 2 ***REMOVED***
-		for _, x := range list ***REMOVED***
+	}
+	if len(list) != 2 {
+		for _, x := range list {
 			fmt.Println(x.Name())
-		***REMOVED***
+		}
 		t.Errorf("Got wrong number of files in union: %v", len(list))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestNestedDirOverlayOsFsReaddir(t *testing.T) ***REMOVED***
+func TestNestedDirOverlayOsFsReaddir(t *testing.T) {
 	defer CleanupTempDirs(t)
 	base := NewTempOsBaseFs(t)
-	roBase := &ReadOnlyFs***REMOVED***source: base***REMOVED***
+	roBase := &ReadOnlyFs{source: base}
 	overlay := NewTempOsBaseFs(t)
 
-	ufs := &CopyOnWriteFs***REMOVED***base: roBase, layer: overlay***REMOVED***
+	ufs := &CopyOnWriteFs{base: roBase, layer: overlay}
 
 	base.MkdirAll("/", 0777)
 	overlay.MkdirAll("/home/test/foo/bar", 0777)
@@ -255,24 +255,24 @@ func TestNestedDirOverlayOsFsReaddir(t *testing.T) ***REMOVED***
 	fh, _ = ufs.Open("/home/test/foo")
 	list, err := fh.Readdir(-1)
 	fh.Close()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("Readdir failed %s", err)
-	***REMOVED***
-	if len(list) != 2 ***REMOVED***
-		for _, x := range list ***REMOVED***
+	}
+	if len(list) != 2 {
+		for _, x := range list {
 			fmt.Println(x.Name())
-		***REMOVED***
+		}
 		t.Errorf("Got wrong number of files in union: %v", len(list))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestCopyOnWriteFsWithOsFs(t *testing.T) ***REMOVED***
+func TestCopyOnWriteFsWithOsFs(t *testing.T) {
 	defer CleanupTempDirs(t)
 	base := NewTempOsBaseFs(t)
-	roBase := &ReadOnlyFs***REMOVED***source: base***REMOVED***
+	roBase := &ReadOnlyFs{source: base}
 	overlay := NewTempOsBaseFs(t)
 
-	ufs := &CopyOnWriteFs***REMOVED***base: roBase, layer: overlay***REMOVED***
+	ufs := &CopyOnWriteFs{base: roBase, layer: overlay}
 
 	base.MkdirAll("/home/test", 0777)
 	fh, _ := base.Create("/home/test/file.txt")
@@ -291,40 +291,40 @@ func TestCopyOnWriteFsWithOsFs(t *testing.T) ***REMOVED***
 	fh, _ = ufs.Open("/home/test")
 	files, err := fh.Readdirnames(-1)
 	fh.Close()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("Readdirnames failed")
-	***REMOVED***
-	if len(files) != 3 ***REMOVED***
+	}
+	if len(files) != 3 {
 		t.Errorf("Got wrong number of files in union: %v", files)
-	***REMOVED***
+	}
 
 	fh, _ = overlay.Open("/home/test")
 	files, err = fh.Readdirnames(-1)
 	fh.Close()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("Readdirnames failed")
-	***REMOVED***
-	if len(files) != 2 ***REMOVED***
+	}
+	if len(files) != 2 {
 		t.Errorf("Got wrong number of files in overlay: %v", files)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestUnionCacheWrite(t *testing.T) ***REMOVED***
-	base := &MemMapFs***REMOVED******REMOVED***
-	layer := &MemMapFs***REMOVED******REMOVED***
+func TestUnionCacheWrite(t *testing.T) {
+	base := &MemMapFs{}
+	layer := &MemMapFs{}
 
 	ufs := NewCacheOnReadFs(base, layer, 0)
 
 	base.Mkdir("/data", 0777)
 
 	fh, err := ufs.Create("/data/file.txt")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("Failed to create file")
-	***REMOVED***
+	}
 	_, err = fh.Write([]byte("This is a test"))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("Failed to write file")
-	***REMOVED***
+	}
 
 	fh.Seek(0, os.SEEK_SET)
 	buf := make([]byte, 4)
@@ -334,26 +334,26 @@ func TestUnionCacheWrite(t *testing.T) ***REMOVED***
 
 	baseData, _ := ReadFile(base, "/data/file.txt")
 	layerData, _ := ReadFile(layer, "/data/file.txt")
-	if string(baseData) != string(layerData) ***REMOVED***
+	if string(baseData) != string(layerData) {
 		t.Errorf("Different data: %s <=> %s", baseData, layerData)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestUnionCacheExpire(t *testing.T) ***REMOVED***
-	base := &MemMapFs***REMOVED******REMOVED***
-	layer := &MemMapFs***REMOVED******REMOVED***
-	ufs := &CacheOnReadFs***REMOVED***base: base, layer: layer, cacheTime: 1 * time.Second***REMOVED***
+func TestUnionCacheExpire(t *testing.T) {
+	base := &MemMapFs{}
+	layer := &MemMapFs{}
+	ufs := &CacheOnReadFs{base: base, layer: layer, cacheTime: 1 * time.Second}
 
 	base.Mkdir("/data", 0777)
 
 	fh, err := ufs.Create("/data/file.txt")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("Failed to create file")
-	***REMOVED***
+	}
 	_, err = fh.Write([]byte("This is a test"))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("Failed to write file")
-	***REMOVED***
+	}
 	fh.Close()
 
 	fh, _ = base.Create("/data/file.txt")
@@ -363,42 +363,42 @@ func TestUnionCacheExpire(t *testing.T) ***REMOVED***
 	fh.Close()
 
 	data, _ := ReadFile(ufs, "/data/file.txt")
-	if string(data) != "Another test" ***REMOVED***
+	if string(data) != "Another test" {
 		t.Errorf("cache time failed: <%s>", data)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestCacheOnReadFsNotInLayer(t *testing.T) ***REMOVED***
+func TestCacheOnReadFsNotInLayer(t *testing.T) {
 	base := NewMemMapFs()
 	layer := NewMemMapFs()
 	fs := NewCacheOnReadFs(base, layer, 0)
 
 	fh, err := base.Create("/file.txt")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal("unable to create file: ", err)
-	***REMOVED***
+	}
 
 	txt := []byte("This is a test")
 	fh.Write(txt)
 	fh.Close()
 
 	fh, err = fs.Open("/file.txt")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal("could not open file: ", err)
-	***REMOVED***
+	}
 
 	b, err := ReadAll(fh)
 	fh.Close()
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal("could not read file: ", err)
-	***REMOVED*** else if !bytes.Equal(txt, b) ***REMOVED***
+	} else if !bytes.Equal(txt, b) {
 		t.Fatalf("wanted file text %q, got %q", txt, b)
-	***REMOVED***
+	}
 
 	fh, err = layer.Open("/file.txt")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal("could not open file from layer: ", err)
-	***REMOVED***
+	}
 	fh.Close()
-***REMOVED***
+}

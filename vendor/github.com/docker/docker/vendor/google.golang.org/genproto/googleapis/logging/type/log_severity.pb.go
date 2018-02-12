@@ -53,7 +53,7 @@ const (
 	LogSeverity_EMERGENCY LogSeverity = 800
 )
 
-var LogSeverity_name = map[int32]string***REMOVED***
+var LogSeverity_name = map[int32]string{
 	0:   "DEFAULT",
 	100: "DEBUG",
 	200: "INFO",
@@ -63,8 +63,8 @@ var LogSeverity_name = map[int32]string***REMOVED***
 	600: "CRITICAL",
 	700: "ALERT",
 	800: "EMERGENCY",
-***REMOVED***
-var LogSeverity_value = map[string]int32***REMOVED***
+}
+var LogSeverity_value = map[string]int32{
 	"DEFAULT":   0,
 	"DEBUG":     100,
 	"INFO":      200,
@@ -74,20 +74,20 @@ var LogSeverity_value = map[string]int32***REMOVED***
 	"CRITICAL":  600,
 	"ALERT":     700,
 	"EMERGENCY": 800,
-***REMOVED***
+}
 
-func (x LogSeverity) String() string ***REMOVED***
+func (x LogSeverity) String() string {
 	return proto.EnumName(LogSeverity_name, int32(x))
-***REMOVED***
-func (LogSeverity) EnumDescriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor1, []int***REMOVED***0***REMOVED*** ***REMOVED***
+}
+func (LogSeverity) EnumDescriptor() ([]byte, []int) { return fileDescriptor1, []int{0} }
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterEnum("google.logging.type.LogSeverity", LogSeverity_name, LogSeverity_value)
-***REMOVED***
+}
 
-func init() ***REMOVED*** proto.RegisterFile("google/logging/type/log_severity.proto", fileDescriptor1) ***REMOVED***
+func init() { proto.RegisterFile("google/logging/type/log_severity.proto", fileDescriptor1) }
 
-var fileDescriptor1 = []byte***REMOVED***
+var fileDescriptor1 = []byte{
 	// 297 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x52, 0x4b, 0xcf, 0xcf, 0x4f,
 	0xcf, 0x49, 0xd5, 0xcf, 0xc9, 0x4f, 0x4f, 0xcf, 0xcc, 0x4b, 0xd7, 0x2f, 0xa9, 0x2c, 0x00, 0x73,
@@ -108,4 +108,4 @@ var fileDescriptor1 = []byte***REMOVED***
 	0x75, 0x0e, 0x88, 0x5c, 0xc5, 0x24, 0xe9, 0x0e, 0xd1, 0xea, 0x9c, 0x93, 0x5f, 0x9a, 0xa2, 0xe7,
 	0x03, 0xb5, 0x29, 0xa4, 0xb2, 0x20, 0x35, 0x89, 0x0d, 0x6c, 0x80, 0x31, 0x20, 0x00, 0x00, 0xff,
 	0xff, 0x1b, 0x91, 0x99, 0x37, 0x6e, 0x01, 0x00, 0x00,
-***REMOVED***
+}

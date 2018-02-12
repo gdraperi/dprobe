@@ -11,11 +11,11 @@ import (
 	"github.com/go-check/check"
 )
 
-func (s *DockerSwarmSuite) TestServiceUpdatePort(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestServiceUpdatePort(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 
 	serviceName := "TestServiceUpdatePort"
-	serviceArgs := append([]string***REMOVED***"service", "create", "--detach", "--no-resolve-image", "--name", serviceName, "-p", "8080:8081", defaultSleepImage***REMOVED***, sleepCommandForDaemonPlatform()...)
+	serviceArgs := append([]string{"service", "create", "--detach", "--no-resolve-image", "--name", serviceName, "-p", "8080:8081", defaultSleepImage}, sleepCommandForDaemonPlatform()...)
 
 	// Create a service with a port mapping of 8080:8081.
 	out, err := d.Cmd(serviceArgs...)
@@ -27,26 +27,26 @@ func (s *DockerSwarmSuite) TestServiceUpdatePort(c *check.C) ***REMOVED***
 	c.Assert(err, checker.IsNil)
 
 	// Inspect the service and verify port mapping
-	expected := []swarm.PortConfig***REMOVED***
-		***REMOVED***
+	expected := []swarm.PortConfig{
+		{
 			Protocol:      "tcp",
 			PublishedPort: 8082,
 			TargetPort:    8083,
 			PublishMode:   "ingress",
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
-	out, err = d.Cmd("service", "inspect", "--format", "***REMOVED******REMOVED*** json .Spec.EndpointSpec.Ports ***REMOVED******REMOVED***", serviceName)
+	out, err = d.Cmd("service", "inspect", "--format", "{{ json .Spec.EndpointSpec.Ports }}", serviceName)
 	c.Assert(err, checker.IsNil)
 
 	var portConfig []swarm.PortConfig
-	if err := json.Unmarshal([]byte(out), &portConfig); err != nil ***REMOVED***
+	if err := json.Unmarshal([]byte(out), &portConfig); err != nil {
 		c.Fatalf("invalid JSON in inspect result: %v (%s)", err, out)
-	***REMOVED***
+	}
 	c.Assert(portConfig, checker.DeepEquals, expected)
-***REMOVED***
+}
 
-func (s *DockerSwarmSuite) TestServiceUpdateLabel(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestServiceUpdateLabel(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 	out, err := d.Cmd("service", "create", "--detach", "--no-resolve-image", "--name=test", "busybox", "top")
 	c.Assert(err, checker.IsNil, check.Commentf(out))
@@ -85,17 +85,17 @@ func (s *DockerSwarmSuite) TestServiceUpdateLabel(c *check.C) ***REMOVED***
 	service = d.GetService(c, "test")
 	c.Assert(service.Spec.Labels, checker.HasLen, 1)
 	c.Assert(service.Spec.Labels["foo"], checker.Equals, "bar")
-***REMOVED***
+}
 
-func (s *DockerSwarmSuite) TestServiceUpdateSecrets(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestServiceUpdateSecrets(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 	testName := "test_secret"
-	id := d.CreateSecret(c, swarm.SecretSpec***REMOVED***
-		Annotations: swarm.Annotations***REMOVED***
+	id := d.CreateSecret(c, swarm.SecretSpec{
+		Annotations: swarm.Annotations{
 			Name: testName,
-		***REMOVED***,
+		},
 		Data: []byte("TESTINGDATA"),
-	***REMOVED***)
+	})
 	c.Assert(id, checker.Not(checker.Equals), "", check.Commentf("secrets: %s", id))
 	testTarget := "testing"
 	serviceName := "test"
@@ -107,7 +107,7 @@ func (s *DockerSwarmSuite) TestServiceUpdateSecrets(c *check.C) ***REMOVED***
 	out, err = d.CmdRetryOutOfSequence("service", "update", "--detach", "test", "--secret-add", fmt.Sprintf("source=%s,target=%s", testName, testTarget))
 	c.Assert(err, checker.IsNil, check.Commentf(out))
 
-	out, err = d.Cmd("service", "inspect", "--format", "***REMOVED******REMOVED*** json .Spec.TaskTemplate.ContainerSpec.Secrets ***REMOVED******REMOVED***", serviceName)
+	out, err = d.Cmd("service", "inspect", "--format", "{{ json .Spec.TaskTemplate.ContainerSpec.Secrets }}", serviceName)
 	c.Assert(err, checker.IsNil)
 
 	var refs []swarm.SecretReference
@@ -122,22 +122,22 @@ func (s *DockerSwarmSuite) TestServiceUpdateSecrets(c *check.C) ***REMOVED***
 	out, err = d.CmdRetryOutOfSequence("service", "update", "--detach", "test", "--secret-rm", testName)
 	c.Assert(err, checker.IsNil, check.Commentf(out))
 
-	out, err = d.Cmd("service", "inspect", "--format", "***REMOVED******REMOVED*** json .Spec.TaskTemplate.ContainerSpec.Secrets ***REMOVED******REMOVED***", serviceName)
+	out, err = d.Cmd("service", "inspect", "--format", "{{ json .Spec.TaskTemplate.ContainerSpec.Secrets }}", serviceName)
 	c.Assert(err, checker.IsNil)
 
 	c.Assert(json.Unmarshal([]byte(out), &refs), checker.IsNil)
 	c.Assert(refs, checker.HasLen, 0)
-***REMOVED***
+}
 
-func (s *DockerSwarmSuite) TestServiceUpdateConfigs(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestServiceUpdateConfigs(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 	testName := "test_config"
-	id := d.CreateConfig(c, swarm.ConfigSpec***REMOVED***
-		Annotations: swarm.Annotations***REMOVED***
+	id := d.CreateConfig(c, swarm.ConfigSpec{
+		Annotations: swarm.Annotations{
 			Name: testName,
-		***REMOVED***,
+		},
 		Data: []byte("TESTINGDATA"),
-	***REMOVED***)
+	})
 	c.Assert(id, checker.Not(checker.Equals), "", check.Commentf("configs: %s", id))
 	testTarget := "/testing"
 	serviceName := "test"
@@ -149,7 +149,7 @@ func (s *DockerSwarmSuite) TestServiceUpdateConfigs(c *check.C) ***REMOVED***
 	out, err = d.CmdRetryOutOfSequence("service", "update", "--detach", "test", "--config-add", fmt.Sprintf("source=%s,target=%s", testName, testTarget))
 	c.Assert(err, checker.IsNil, check.Commentf(out))
 
-	out, err = d.Cmd("service", "inspect", "--format", "***REMOVED******REMOVED*** json .Spec.TaskTemplate.ContainerSpec.Configs ***REMOVED******REMOVED***", serviceName)
+	out, err = d.Cmd("service", "inspect", "--format", "{{ json .Spec.TaskTemplate.ContainerSpec.Configs }}", serviceName)
 	c.Assert(err, checker.IsNil)
 
 	var refs []swarm.ConfigReference
@@ -164,9 +164,9 @@ func (s *DockerSwarmSuite) TestServiceUpdateConfigs(c *check.C) ***REMOVED***
 	out, err = d.CmdRetryOutOfSequence("service", "update", "--detach", "test", "--config-rm", testName)
 	c.Assert(err, checker.IsNil, check.Commentf(out))
 
-	out, err = d.Cmd("service", "inspect", "--format", "***REMOVED******REMOVED*** json .Spec.TaskTemplate.ContainerSpec.Configs ***REMOVED******REMOVED***", serviceName)
+	out, err = d.Cmd("service", "inspect", "--format", "{{ json .Spec.TaskTemplate.ContainerSpec.Configs }}", serviceName)
 	c.Assert(err, checker.IsNil)
 
 	c.Assert(json.Unmarshal([]byte(out), &refs), checker.IsNil)
 	c.Assert(refs, checker.HasLen, 0)
-***REMOVED***
+}

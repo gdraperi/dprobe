@@ -5,18 +5,18 @@
 
 set -e
 
-die () ***REMOVED***
+die () {
     echo >&2 "$@"
     exit 1
-***REMOVED***
+}
 
 [ "$#" -eq 1 ] || die "1 argument(s) required, $# provided. Usage: ./mkimage-crux.sh /path/to/iso"
 
-ISO=$***REMOVED***1***REMOVED***
+ISO=${1}
 
-ROOTFS=$(mktemp -d $***REMOVED***TMPDIR:-/var/tmp***REMOVED***/rootfs-crux-XXXXXXXXXX)
-CRUX=$(mktemp -d $***REMOVED***TMPDIR:-/var/tmp***REMOVED***/crux-XXXXXXXXXX)
-TMP=$(mktemp -d $***REMOVED***TMPDIR:-/var/tmp***REMOVED***/XXXXXXXXXX)
+ROOTFS=$(mktemp -d ${TMPDIR:-/var/tmp}/rootfs-crux-XXXXXXXXXX)
+CRUX=$(mktemp -d ${TMPDIR:-/var/tmp}/crux-XXXXXXXXXX)
+TMP=$(mktemp -d ${TMPDIR:-/var/tmp}/XXXXXXXXXX)
 
 VERSION=$(basename --suffix=.iso $ISO | sed 's/[^0-9.]*\([0-9.]*\).*/\1/')
 
@@ -37,11 +37,11 @@ for pkg in $CRUX/crux/core/*; do
 done
 
 # Remove agetty and inittab config
-if (grep agetty $***REMOVED***ROOTFS***REMOVED***/etc/inittab 2>&1 > /dev/null); then
+if (grep agetty ${ROOTFS}/etc/inittab 2>&1 > /dev/null); then
     echo "Removing agetty from /etc/inittab ..."
-    chroot $***REMOVED***ROOTFS***REMOVED*** sed -i -e "/agetty/d" /etc/inittab
-    chroot $***REMOVED***ROOTFS***REMOVED*** sed -i -e "/shutdown/d" /etc/inittab
-    chroot $***REMOVED***ROOTFS***REMOVED*** sed -i -e "/^$/N;/^\n$/d" /etc/inittab
+    chroot ${ROOTFS} sed -i -e "/agetty/d" /etc/inittab
+    chroot ${ROOTFS} sed -i -e "/shutdown/d" /etc/inittab
+    chroot ${ROOTFS} sed -i -e "/^$/N;/^\n$/d" /etc/inittab
 fi
 
 # Remove kernel source

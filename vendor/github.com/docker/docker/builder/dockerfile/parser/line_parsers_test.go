@@ -6,69 +6,69 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestParseNameValOldFormat(t *testing.T) ***REMOVED***
-	directive := Directive***REMOVED******REMOVED***
+func TestParseNameValOldFormat(t *testing.T) {
+	directive := Directive{}
 	node, err := parseNameVal("foo bar", "LABEL", &directive)
 	assert.NoError(t, err)
 
-	expected := &Node***REMOVED***
+	expected := &Node{
 		Value: "foo",
-		Next:  &Node***REMOVED***Value: "bar"***REMOVED***,
-	***REMOVED***
+		Next:  &Node{Value: "bar"},
+	}
 	assert.Equal(t, expected, node)
-***REMOVED***
+}
 
-func TestParseNameValNewFormat(t *testing.T) ***REMOVED***
-	directive := Directive***REMOVED******REMOVED***
+func TestParseNameValNewFormat(t *testing.T) {
+	directive := Directive{}
 	node, err := parseNameVal("foo=bar thing=star", "LABEL", &directive)
 	assert.NoError(t, err)
 
-	expected := &Node***REMOVED***
+	expected := &Node{
 		Value: "foo",
-		Next: &Node***REMOVED***
+		Next: &Node{
 			Value: "bar",
-			Next: &Node***REMOVED***
+			Next: &Node{
 				Value: "thing",
-				Next: &Node***REMOVED***
+				Next: &Node{
 					Value: "star",
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+				},
+			},
+		},
+	}
 	assert.Equal(t, expected, node)
-***REMOVED***
+}
 
-func TestNodeFromLabels(t *testing.T) ***REMOVED***
-	labels := map[string]string***REMOVED***
+func TestNodeFromLabels(t *testing.T) {
+	labels := map[string]string{
 		"foo":   "bar",
 		"weird": "first' second",
-	***REMOVED***
-	expected := &Node***REMOVED***
+	}
+	expected := &Node{
 		Value:    "label",
 		Original: `LABEL "foo"='bar' "weird"='first' second'`,
-		Next: &Node***REMOVED***
+		Next: &Node{
 			Value: "foo",
-			Next: &Node***REMOVED***
+			Next: &Node{
 				Value: "'bar'",
-				Next: &Node***REMOVED***
+				Next: &Node{
 					Value: "weird",
-					Next: &Node***REMOVED***
+					Next: &Node{
 						Value: "'first' second'",
-					***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+					},
+				},
+			},
+		},
+	}
 
 	node := NodeFromLabels(labels)
 	assert.Equal(t, expected, node)
 
-***REMOVED***
+}
 
-func TestParseNameValWithoutVal(t *testing.T) ***REMOVED***
-	directive := Directive***REMOVED******REMOVED***
+func TestParseNameValWithoutVal(t *testing.T) {
+	directive := Directive{}
 	// In Config.Env, a variable without `=` is removed from the environment. (#31634)
 	// However, in Dockerfile, we don't allow "unsetting" an environment variable. (#11922)
 	_, err := parseNameVal("foo", "ENV", &directive)
 	assert.Error(t, err, "ENV must have two arguments")
-***REMOVED***
+}

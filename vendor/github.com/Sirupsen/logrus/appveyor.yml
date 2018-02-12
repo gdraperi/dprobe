@@ -1,4 +1,4 @@
-version: "***REMOVED***build***REMOVED***"
+version: "{build}"
 platform: x64
 clone_folder: c:\gopath\src\github.com\sirupsen\logrus
 environment:  

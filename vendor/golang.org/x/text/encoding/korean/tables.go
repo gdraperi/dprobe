@@ -5,7 +5,7 @@ package korean // import "golang.org/x/text/encoding/korean"
 
 // decode is the decoding table from EUC-KR code to Unicode.
 // It is defined at http://encoding.spec.whatwg.org/index-euc-kr.txt
-var decode = [...]uint16***REMOVED***
+var decode = [...]uint16{
 	0:     0xAC02,
 	1:     0xAC03,
 	2:     0xAC05,
@@ -17054,7 +17054,7 @@ var decode = [...]uint16***REMOVED***
 	17627: 0x7A00,
 	17628: 0x7FB2,
 	17629: 0x8A70,
-***REMOVED***
+}
 
 const numEncodeTables = 7
 
@@ -17070,7 +17070,7 @@ const numEncodeTables = 7
 
 const encode0Low, encode0High = 19968, 40861
 
-var encode0 = [...]uint16***REMOVED***
+var encode0 = [...]uint16{
 	19968 - 19968: 0xECE9,
 	19969 - 19968: 0xEFCB,
 	19971 - 19968: 0xF6D2,
@@ -21691,11 +21691,11 @@ var encode0 = [...]uint16***REMOVED***
 	40848 - 19968: 0xDBC2,
 	40853 - 19968: 0xCAFE,
 	40860 - 19968: 0xCFCF,
-***REMOVED***
+}
 
 const encode1Low, encode1High = 44032, 55204
 
-var encode1 = [...]uint16***REMOVED***
+var encode1 = [...]uint16{
 	44032 - 44032: 0xB0A1,
 	44033 - 44032: 0xB0A2,
 	44034 - 44032: 0x8141,
@@ -32868,11 +32868,11 @@ var encode1 = [...]uint16***REMOVED***
 	55201 - 44032: 0xC650,
 	55202 - 44032: 0xC651,
 	55203 - 44032: 0xC652,
-***REMOVED***
+}
 
 const encode2Low, encode2High = 8213, 9838
 
-var encode2 = [...]uint16***REMOVED***
+var encode2 = [...]uint16{
 	8213 - 8213: 0xA1AA,
 	8216 - 8213: 0xA1AE,
 	8217 - 8213: 0xA1AF,
@@ -33172,11 +33172,11 @@ var encode2 = [...]uint16***REMOVED***
 	9834 - 8213: 0xA2DC,
 	9836 - 8213: 0xA2DD,
 	9837 - 8213: 0xA2DA,
-***REMOVED***
+}
 
 const encode3Low, encode3High = 12288, 13278
 
-var encode3 = [...]uint16***REMOVED***
+var encode3 = [...]uint16{
 	12288 - 12288: 0xA1A1,
 	12289 - 12288: 0xA1A2,
 	12290 - 12288: 0xA1A3,
@@ -33595,11 +33595,11 @@ var encode3 = [...]uint16***REMOVED***
 	13275 - 12288: 0xA7E4,
 	13276 - 12288: 0xA7EE,
 	13277 - 12288: 0xA7E9,
-***REMOVED***
+}
 
 const encode4Low, encode4High = 161, 1106
 
-var encode4 = [...]uint16***REMOVED***
+var encode4 = [...]uint16{
 	161 - 161:  0xA2AE,
 	164 - 161:  0xA2B4,
 	167 - 161:  0xA1D7,
@@ -33771,11 +33771,11 @@ var encode4 = [...]uint16***REMOVED***
 	1102 - 161: 0xACF0,
 	1103 - 161: 0xACF1,
 	1105 - 161: 0xACD7,
-***REMOVED***
+}
 
 const encode5Low, encode5High = 63744, 64012
 
-var encode5 = [...]uint16***REMOVED***
+var encode5 = [...]uint16{
 	63744 - 63744: 0xCBD0,
 	63745 - 63744: 0xCBD6,
 	63746 - 63744: 0xCBE7,
@@ -34044,11 +34044,11 @@ var encode5 = [...]uint16***REMOVED***
 	64009 - 63744: 0xFAA2,
 	64010 - 63744: 0xFAE6,
 	64011 - 63744: 0xFCA9,
-***REMOVED***
+}
 
 const encode6Low, encode6High = 65281, 65511
 
-var encode6 = [...]uint16***REMOVED***
+var encode6 = [...]uint16{
 	65281 - 65281: 0xA3A1,
 	65282 - 65281: 0xA3A2,
 	65283 - 65281: 0xA3A3,
@@ -34149,4 +34149,4 @@ var encode6 = [...]uint16***REMOVED***
 	65507 - 65281: 0xA3FE,
 	65509 - 65281: 0xA1CD,
 	65510 - 65281: 0xA3DC,
-***REMOVED***
+}

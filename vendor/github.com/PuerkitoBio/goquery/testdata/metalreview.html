@@ -20,12 +20,12 @@
 <body>
     <script type="text/javascript">
         var _comscore = _comscore || [];
-        _comscore.push(***REMOVED*** c1: "2", c2: "9290245" ***REMOVED***);
-        (function () ***REMOVED***
+        _comscore.push({ c1: "2", c2: "9290245" });
+        (function () {
             var s = document.createElement("script"), el = document.getElementsByTagName("script")[0]; s.async = true;
             s.src = (document.location.protocol == "https:" ? "https://sb" : "http://b") + ".scorecardresearch.com/beacon.js";
             el.parentNode.insertBefore(s, el);
-    ***REMOVED***)();
+        })();
     </script>
     <noscript>
     <img src="http://b.scorecardresearch.com/p?c1=2&c2=9290245&cv=2.0&cj=1" />
@@ -284,15 +284,15 @@
   
 
  <script type="text/javascript">
-     $(document).ready(function () ***REMOVED***
-         $('#latest-reviews-slider').cycle(***REMOVED***
+     $(document).ready(function () {
+         $('#latest-reviews-slider').cycle({
              fx: 'scrollRight',
              speed: 'fast',
              timeout: 0,
              next: '#slider-next-button',
              prev: '#slider-back-button'
-     ***REMOVED***);
- ***REMOVED***);
+         });
+     });
 </script>
 
 <div id="homepage-mid-horizontal-zone">

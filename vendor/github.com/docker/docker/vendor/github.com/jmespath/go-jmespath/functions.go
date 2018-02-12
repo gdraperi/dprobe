@@ -12,7 +12,7 @@ import (
 	"unicode/utf8"
 )
 
-type jpFunction func(arguments []interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error)
+type jpFunction func(arguments []interface{}) (interface{}, error)
 
 type jpType string
 
@@ -28,815 +28,815 @@ const (
 	jpAny         jpType = "any"
 )
 
-type functionEntry struct ***REMOVED***
+type functionEntry struct {
 	name      string
 	arguments []argSpec
 	handler   jpFunction
 	hasExpRef bool
-***REMOVED***
+}
 
-type argSpec struct ***REMOVED***
+type argSpec struct {
 	types    []jpType
 	variadic bool
-***REMOVED***
+}
 
-type byExprString struct ***REMOVED***
+type byExprString struct {
 	intr     *treeInterpreter
 	node     ASTNode
-	items    []interface***REMOVED******REMOVED***
+	items    []interface{}
 	hasError bool
-***REMOVED***
+}
 
-func (a *byExprString) Len() int ***REMOVED***
+func (a *byExprString) Len() int {
 	return len(a.items)
-***REMOVED***
-func (a *byExprString) Swap(i, j int) ***REMOVED***
+}
+func (a *byExprString) Swap(i, j int) {
 	a.items[i], a.items[j] = a.items[j], a.items[i]
-***REMOVED***
-func (a *byExprString) Less(i, j int) bool ***REMOVED***
+}
+func (a *byExprString) Less(i, j int) bool {
 	first, err := a.intr.Execute(a.node, a.items[i])
-	if err != nil ***REMOVED***
+	if err != nil {
 		a.hasError = true
 		// Return a dummy value.
 		return true
-	***REMOVED***
+	}
 	ith, ok := first.(string)
-	if !ok ***REMOVED***
+	if !ok {
 		a.hasError = true
 		return true
-	***REMOVED***
+	}
 	second, err := a.intr.Execute(a.node, a.items[j])
-	if err != nil ***REMOVED***
+	if err != nil {
 		a.hasError = true
 		// Return a dummy value.
 		return true
-	***REMOVED***
+	}
 	jth, ok := second.(string)
-	if !ok ***REMOVED***
+	if !ok {
 		a.hasError = true
 		return true
-	***REMOVED***
+	}
 	return ith < jth
-***REMOVED***
+}
 
-type byExprFloat struct ***REMOVED***
+type byExprFloat struct {
 	intr     *treeInterpreter
 	node     ASTNode
-	items    []interface***REMOVED******REMOVED***
+	items    []interface{}
 	hasError bool
-***REMOVED***
+}
 
-func (a *byExprFloat) Len() int ***REMOVED***
+func (a *byExprFloat) Len() int {
 	return len(a.items)
-***REMOVED***
-func (a *byExprFloat) Swap(i, j int) ***REMOVED***
+}
+func (a *byExprFloat) Swap(i, j int) {
 	a.items[i], a.items[j] = a.items[j], a.items[i]
-***REMOVED***
-func (a *byExprFloat) Less(i, j int) bool ***REMOVED***
+}
+func (a *byExprFloat) Less(i, j int) bool {
 	first, err := a.intr.Execute(a.node, a.items[i])
-	if err != nil ***REMOVED***
+	if err != nil {
 		a.hasError = true
 		// Return a dummy value.
 		return true
-	***REMOVED***
+	}
 	ith, ok := first.(float64)
-	if !ok ***REMOVED***
+	if !ok {
 		a.hasError = true
 		return true
-	***REMOVED***
+	}
 	second, err := a.intr.Execute(a.node, a.items[j])
-	if err != nil ***REMOVED***
+	if err != nil {
 		a.hasError = true
 		// Return a dummy value.
 		return true
-	***REMOVED***
+	}
 	jth, ok := second.(float64)
-	if !ok ***REMOVED***
+	if !ok {
 		a.hasError = true
 		return true
-	***REMOVED***
+	}
 	return ith < jth
-***REMOVED***
+}
 
-type functionCaller struct ***REMOVED***
+type functionCaller struct {
 	functionTable map[string]functionEntry
-***REMOVED***
+}
 
-func newFunctionCaller() *functionCaller ***REMOVED***
-	caller := &functionCaller***REMOVED******REMOVED***
-	caller.functionTable = map[string]functionEntry***REMOVED***
-		"length": ***REMOVED***
+func newFunctionCaller() *functionCaller {
+	caller := &functionCaller{}
+	caller.functionTable = map[string]functionEntry{
+		"length": {
 			name: "length",
-			arguments: []argSpec***REMOVED***
-				***REMOVED***types: []jpType***REMOVED***jpString, jpArray, jpObject***REMOVED******REMOVED***,
-			***REMOVED***,
+			arguments: []argSpec{
+				{types: []jpType{jpString, jpArray, jpObject}},
+			},
 			handler: jpfLength,
-		***REMOVED***,
-		"starts_with": ***REMOVED***
+		},
+		"starts_with": {
 			name: "starts_with",
-			arguments: []argSpec***REMOVED***
-				***REMOVED***types: []jpType***REMOVED***jpString***REMOVED******REMOVED***,
-				***REMOVED***types: []jpType***REMOVED***jpString***REMOVED******REMOVED***,
-			***REMOVED***,
+			arguments: []argSpec{
+				{types: []jpType{jpString}},
+				{types: []jpType{jpString}},
+			},
 			handler: jpfStartsWith,
-		***REMOVED***,
-		"abs": ***REMOVED***
+		},
+		"abs": {
 			name: "abs",
-			arguments: []argSpec***REMOVED***
-				***REMOVED***types: []jpType***REMOVED***jpNumber***REMOVED******REMOVED***,
-			***REMOVED***,
+			arguments: []argSpec{
+				{types: []jpType{jpNumber}},
+			},
 			handler: jpfAbs,
-		***REMOVED***,
-		"avg": ***REMOVED***
+		},
+		"avg": {
 			name: "avg",
-			arguments: []argSpec***REMOVED***
-				***REMOVED***types: []jpType***REMOVED***jpArrayNumber***REMOVED******REMOVED***,
-			***REMOVED***,
+			arguments: []argSpec{
+				{types: []jpType{jpArrayNumber}},
+			},
 			handler: jpfAvg,
-		***REMOVED***,
-		"ceil": ***REMOVED***
+		},
+		"ceil": {
 			name: "ceil",
-			arguments: []argSpec***REMOVED***
-				***REMOVED***types: []jpType***REMOVED***jpNumber***REMOVED******REMOVED***,
-			***REMOVED***,
+			arguments: []argSpec{
+				{types: []jpType{jpNumber}},
+			},
 			handler: jpfCeil,
-		***REMOVED***,
-		"contains": ***REMOVED***
+		},
+		"contains": {
 			name: "contains",
-			arguments: []argSpec***REMOVED***
-				***REMOVED***types: []jpType***REMOVED***jpArray, jpString***REMOVED******REMOVED***,
-				***REMOVED***types: []jpType***REMOVED***jpAny***REMOVED******REMOVED***,
-			***REMOVED***,
+			arguments: []argSpec{
+				{types: []jpType{jpArray, jpString}},
+				{types: []jpType{jpAny}},
+			},
 			handler: jpfContains,
-		***REMOVED***,
-		"ends_with": ***REMOVED***
+		},
+		"ends_with": {
 			name: "ends_with",
-			arguments: []argSpec***REMOVED***
-				***REMOVED***types: []jpType***REMOVED***jpString***REMOVED******REMOVED***,
-				***REMOVED***types: []jpType***REMOVED***jpString***REMOVED******REMOVED***,
-			***REMOVED***,
+			arguments: []argSpec{
+				{types: []jpType{jpString}},
+				{types: []jpType{jpString}},
+			},
 			handler: jpfEndsWith,
-		***REMOVED***,
-		"floor": ***REMOVED***
+		},
+		"floor": {
 			name: "floor",
-			arguments: []argSpec***REMOVED***
-				***REMOVED***types: []jpType***REMOVED***jpNumber***REMOVED******REMOVED***,
-			***REMOVED***,
+			arguments: []argSpec{
+				{types: []jpType{jpNumber}},
+			},
 			handler: jpfFloor,
-		***REMOVED***,
-		"map": ***REMOVED***
+		},
+		"map": {
 			name: "amp",
-			arguments: []argSpec***REMOVED***
-				***REMOVED***types: []jpType***REMOVED***jpExpref***REMOVED******REMOVED***,
-				***REMOVED***types: []jpType***REMOVED***jpArray***REMOVED******REMOVED***,
-			***REMOVED***,
+			arguments: []argSpec{
+				{types: []jpType{jpExpref}},
+				{types: []jpType{jpArray}},
+			},
 			handler:   jpfMap,
 			hasExpRef: true,
-		***REMOVED***,
-		"max": ***REMOVED***
+		},
+		"max": {
 			name: "max",
-			arguments: []argSpec***REMOVED***
-				***REMOVED***types: []jpType***REMOVED***jpArrayNumber, jpArrayString***REMOVED******REMOVED***,
-			***REMOVED***,
+			arguments: []argSpec{
+				{types: []jpType{jpArrayNumber, jpArrayString}},
+			},
 			handler: jpfMax,
-		***REMOVED***,
-		"merge": ***REMOVED***
+		},
+		"merge": {
 			name: "merge",
-			arguments: []argSpec***REMOVED***
-				***REMOVED***types: []jpType***REMOVED***jpObject***REMOVED***, variadic: true***REMOVED***,
-			***REMOVED***,
+			arguments: []argSpec{
+				{types: []jpType{jpObject}, variadic: true},
+			},
 			handler: jpfMerge,
-		***REMOVED***,
-		"max_by": ***REMOVED***
+		},
+		"max_by": {
 			name: "max_by",
-			arguments: []argSpec***REMOVED***
-				***REMOVED***types: []jpType***REMOVED***jpArray***REMOVED******REMOVED***,
-				***REMOVED***types: []jpType***REMOVED***jpExpref***REMOVED******REMOVED***,
-			***REMOVED***,
+			arguments: []argSpec{
+				{types: []jpType{jpArray}},
+				{types: []jpType{jpExpref}},
+			},
 			handler:   jpfMaxBy,
 			hasExpRef: true,
-		***REMOVED***,
-		"sum": ***REMOVED***
+		},
+		"sum": {
 			name: "sum",
-			arguments: []argSpec***REMOVED***
-				***REMOVED***types: []jpType***REMOVED***jpArrayNumber***REMOVED******REMOVED***,
-			***REMOVED***,
+			arguments: []argSpec{
+				{types: []jpType{jpArrayNumber}},
+			},
 			handler: jpfSum,
-		***REMOVED***,
-		"min": ***REMOVED***
+		},
+		"min": {
 			name: "min",
-			arguments: []argSpec***REMOVED***
-				***REMOVED***types: []jpType***REMOVED***jpArrayNumber, jpArrayString***REMOVED******REMOVED***,
-			***REMOVED***,
+			arguments: []argSpec{
+				{types: []jpType{jpArrayNumber, jpArrayString}},
+			},
 			handler: jpfMin,
-		***REMOVED***,
-		"min_by": ***REMOVED***
+		},
+		"min_by": {
 			name: "min_by",
-			arguments: []argSpec***REMOVED***
-				***REMOVED***types: []jpType***REMOVED***jpArray***REMOVED******REMOVED***,
-				***REMOVED***types: []jpType***REMOVED***jpExpref***REMOVED******REMOVED***,
-			***REMOVED***,
+			arguments: []argSpec{
+				{types: []jpType{jpArray}},
+				{types: []jpType{jpExpref}},
+			},
 			handler:   jpfMinBy,
 			hasExpRef: true,
-		***REMOVED***,
-		"type": ***REMOVED***
+		},
+		"type": {
 			name: "type",
-			arguments: []argSpec***REMOVED***
-				***REMOVED***types: []jpType***REMOVED***jpAny***REMOVED******REMOVED***,
-			***REMOVED***,
+			arguments: []argSpec{
+				{types: []jpType{jpAny}},
+			},
 			handler: jpfType,
-		***REMOVED***,
-		"keys": ***REMOVED***
+		},
+		"keys": {
 			name: "keys",
-			arguments: []argSpec***REMOVED***
-				***REMOVED***types: []jpType***REMOVED***jpObject***REMOVED******REMOVED***,
-			***REMOVED***,
+			arguments: []argSpec{
+				{types: []jpType{jpObject}},
+			},
 			handler: jpfKeys,
-		***REMOVED***,
-		"values": ***REMOVED***
+		},
+		"values": {
 			name: "values",
-			arguments: []argSpec***REMOVED***
-				***REMOVED***types: []jpType***REMOVED***jpObject***REMOVED******REMOVED***,
-			***REMOVED***,
+			arguments: []argSpec{
+				{types: []jpType{jpObject}},
+			},
 			handler: jpfValues,
-		***REMOVED***,
-		"sort": ***REMOVED***
+		},
+		"sort": {
 			name: "sort",
-			arguments: []argSpec***REMOVED***
-				***REMOVED***types: []jpType***REMOVED***jpArrayString, jpArrayNumber***REMOVED******REMOVED***,
-			***REMOVED***,
+			arguments: []argSpec{
+				{types: []jpType{jpArrayString, jpArrayNumber}},
+			},
 			handler: jpfSort,
-		***REMOVED***,
-		"sort_by": ***REMOVED***
+		},
+		"sort_by": {
 			name: "sort_by",
-			arguments: []argSpec***REMOVED***
-				***REMOVED***types: []jpType***REMOVED***jpArray***REMOVED******REMOVED***,
-				***REMOVED***types: []jpType***REMOVED***jpExpref***REMOVED******REMOVED***,
-			***REMOVED***,
+			arguments: []argSpec{
+				{types: []jpType{jpArray}},
+				{types: []jpType{jpExpref}},
+			},
 			handler:   jpfSortBy,
 			hasExpRef: true,
-		***REMOVED***,
-		"join": ***REMOVED***
+		},
+		"join": {
 			name: "join",
-			arguments: []argSpec***REMOVED***
-				***REMOVED***types: []jpType***REMOVED***jpString***REMOVED******REMOVED***,
-				***REMOVED***types: []jpType***REMOVED***jpArrayString***REMOVED******REMOVED***,
-			***REMOVED***,
+			arguments: []argSpec{
+				{types: []jpType{jpString}},
+				{types: []jpType{jpArrayString}},
+			},
 			handler: jpfJoin,
-		***REMOVED***,
-		"reverse": ***REMOVED***
+		},
+		"reverse": {
 			name: "reverse",
-			arguments: []argSpec***REMOVED***
-				***REMOVED***types: []jpType***REMOVED***jpArray, jpString***REMOVED******REMOVED***,
-			***REMOVED***,
+			arguments: []argSpec{
+				{types: []jpType{jpArray, jpString}},
+			},
 			handler: jpfReverse,
-		***REMOVED***,
-		"to_array": ***REMOVED***
+		},
+		"to_array": {
 			name: "to_array",
-			arguments: []argSpec***REMOVED***
-				***REMOVED***types: []jpType***REMOVED***jpAny***REMOVED******REMOVED***,
-			***REMOVED***,
+			arguments: []argSpec{
+				{types: []jpType{jpAny}},
+			},
 			handler: jpfToArray,
-		***REMOVED***,
-		"to_string": ***REMOVED***
+		},
+		"to_string": {
 			name: "to_string",
-			arguments: []argSpec***REMOVED***
-				***REMOVED***types: []jpType***REMOVED***jpAny***REMOVED******REMOVED***,
-			***REMOVED***,
+			arguments: []argSpec{
+				{types: []jpType{jpAny}},
+			},
 			handler: jpfToString,
-		***REMOVED***,
-		"to_number": ***REMOVED***
+		},
+		"to_number": {
 			name: "to_number",
-			arguments: []argSpec***REMOVED***
-				***REMOVED***types: []jpType***REMOVED***jpAny***REMOVED******REMOVED***,
-			***REMOVED***,
+			arguments: []argSpec{
+				{types: []jpType{jpAny}},
+			},
 			handler: jpfToNumber,
-		***REMOVED***,
-		"not_null": ***REMOVED***
+		},
+		"not_null": {
 			name: "not_null",
-			arguments: []argSpec***REMOVED***
-				***REMOVED***types: []jpType***REMOVED***jpAny***REMOVED***, variadic: true***REMOVED***,
-			***REMOVED***,
+			arguments: []argSpec{
+				{types: []jpType{jpAny}, variadic: true},
+			},
 			handler: jpfNotNull,
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 	return caller
-***REMOVED***
+}
 
-func (e *functionEntry) resolveArgs(arguments []interface***REMOVED******REMOVED***) ([]interface***REMOVED******REMOVED***, error) ***REMOVED***
-	if len(e.arguments) == 0 ***REMOVED***
+func (e *functionEntry) resolveArgs(arguments []interface{}) ([]interface{}, error) {
+	if len(e.arguments) == 0 {
 		return arguments, nil
-	***REMOVED***
-	if !e.arguments[len(e.arguments)-1].variadic ***REMOVED***
-		if len(e.arguments) != len(arguments) ***REMOVED***
+	}
+	if !e.arguments[len(e.arguments)-1].variadic {
+		if len(e.arguments) != len(arguments) {
 			return nil, errors.New("incorrect number of args")
-		***REMOVED***
-		for i, spec := range e.arguments ***REMOVED***
+		}
+		for i, spec := range e.arguments {
 			userArg := arguments[i]
 			err := spec.typeCheck(userArg)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		return arguments, nil
-	***REMOVED***
-	if len(arguments) < len(e.arguments) ***REMOVED***
+	}
+	if len(arguments) < len(e.arguments) {
 		return nil, errors.New("Invalid arity.")
-	***REMOVED***
+	}
 	return arguments, nil
-***REMOVED***
+}
 
-func (a *argSpec) typeCheck(arg interface***REMOVED******REMOVED***) error ***REMOVED***
-	for _, t := range a.types ***REMOVED***
-		switch t ***REMOVED***
+func (a *argSpec) typeCheck(arg interface{}) error {
+	for _, t := range a.types {
+		switch t {
 		case jpNumber:
-			if _, ok := arg.(float64); ok ***REMOVED***
+			if _, ok := arg.(float64); ok {
 				return nil
-			***REMOVED***
+			}
 		case jpString:
-			if _, ok := arg.(string); ok ***REMOVED***
+			if _, ok := arg.(string); ok {
 				return nil
-			***REMOVED***
+			}
 		case jpArray:
-			if isSliceType(arg) ***REMOVED***
+			if isSliceType(arg) {
 				return nil
-			***REMOVED***
+			}
 		case jpObject:
-			if _, ok := arg.(map[string]interface***REMOVED******REMOVED***); ok ***REMOVED***
+			if _, ok := arg.(map[string]interface{}); ok {
 				return nil
-			***REMOVED***
+			}
 		case jpArrayNumber:
-			if _, ok := toArrayNum(arg); ok ***REMOVED***
+			if _, ok := toArrayNum(arg); ok {
 				return nil
-			***REMOVED***
+			}
 		case jpArrayString:
-			if _, ok := toArrayStr(arg); ok ***REMOVED***
+			if _, ok := toArrayStr(arg); ok {
 				return nil
-			***REMOVED***
+			}
 		case jpAny:
 			return nil
 		case jpExpref:
-			if _, ok := arg.(expRef); ok ***REMOVED***
+			if _, ok := arg.(expRef); ok {
 				return nil
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return fmt.Errorf("Invalid type for: %v, expected: %#v", arg, a.types)
-***REMOVED***
+}
 
-func (f *functionCaller) CallFunction(name string, arguments []interface***REMOVED******REMOVED***, intr *treeInterpreter) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func (f *functionCaller) CallFunction(name string, arguments []interface{}, intr *treeInterpreter) (interface{}, error) {
 	entry, ok := f.functionTable[name]
-	if !ok ***REMOVED***
+	if !ok {
 		return nil, errors.New("unknown function: " + name)
-	***REMOVED***
+	}
 	resolvedArgs, err := entry.resolveArgs(arguments)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if entry.hasExpRef ***REMOVED***
-		var extra []interface***REMOVED******REMOVED***
+	}
+	if entry.hasExpRef {
+		var extra []interface{}
 		extra = append(extra, intr)
 		resolvedArgs = append(extra, resolvedArgs...)
-	***REMOVED***
+	}
 	return entry.handler(resolvedArgs)
-***REMOVED***
+}
 
-func jpfAbs(arguments []interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func jpfAbs(arguments []interface{}) (interface{}, error) {
 	num := arguments[0].(float64)
 	return math.Abs(num), nil
-***REMOVED***
+}
 
-func jpfLength(arguments []interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func jpfLength(arguments []interface{}) (interface{}, error) {
 	arg := arguments[0]
-	if c, ok := arg.(string); ok ***REMOVED***
+	if c, ok := arg.(string); ok {
 		return float64(utf8.RuneCountInString(c)), nil
-	***REMOVED*** else if isSliceType(arg) ***REMOVED***
+	} else if isSliceType(arg) {
 		v := reflect.ValueOf(arg)
 		return float64(v.Len()), nil
-	***REMOVED*** else if c, ok := arg.(map[string]interface***REMOVED******REMOVED***); ok ***REMOVED***
+	} else if c, ok := arg.(map[string]interface{}); ok {
 		return float64(len(c)), nil
-	***REMOVED***
+	}
 	return nil, errors.New("could not compute length()")
-***REMOVED***
+}
 
-func jpfStartsWith(arguments []interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func jpfStartsWith(arguments []interface{}) (interface{}, error) {
 	search := arguments[0].(string)
 	prefix := arguments[1].(string)
 	return strings.HasPrefix(search, prefix), nil
-***REMOVED***
+}
 
-func jpfAvg(arguments []interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func jpfAvg(arguments []interface{}) (interface{}, error) {
 	// We've already type checked the value so we can safely use
 	// type assertions.
-	args := arguments[0].([]interface***REMOVED******REMOVED***)
+	args := arguments[0].([]interface{})
 	length := float64(len(args))
 	numerator := 0.0
-	for _, n := range args ***REMOVED***
+	for _, n := range args {
 		numerator += n.(float64)
-	***REMOVED***
+	}
 	return numerator / length, nil
-***REMOVED***
-func jpfCeil(arguments []interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+}
+func jpfCeil(arguments []interface{}) (interface{}, error) {
 	val := arguments[0].(float64)
 	return math.Ceil(val), nil
-***REMOVED***
-func jpfContains(arguments []interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+}
+func jpfContains(arguments []interface{}) (interface{}, error) {
 	search := arguments[0]
 	el := arguments[1]
-	if searchStr, ok := search.(string); ok ***REMOVED***
-		if elStr, ok := el.(string); ok ***REMOVED***
+	if searchStr, ok := search.(string); ok {
+		if elStr, ok := el.(string); ok {
 			return strings.Index(searchStr, elStr) != -1, nil
-		***REMOVED***
+		}
 		return false, nil
-	***REMOVED***
-	// Otherwise this is a generic contains for []interface***REMOVED******REMOVED***
-	general := search.([]interface***REMOVED******REMOVED***)
-	for _, item := range general ***REMOVED***
-		if item == el ***REMOVED***
+	}
+	// Otherwise this is a generic contains for []interface{}
+	general := search.([]interface{})
+	for _, item := range general {
+		if item == el {
 			return true, nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false, nil
-***REMOVED***
-func jpfEndsWith(arguments []interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+}
+func jpfEndsWith(arguments []interface{}) (interface{}, error) {
 	search := arguments[0].(string)
 	suffix := arguments[1].(string)
 	return strings.HasSuffix(search, suffix), nil
-***REMOVED***
-func jpfFloor(arguments []interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+}
+func jpfFloor(arguments []interface{}) (interface{}, error) {
 	val := arguments[0].(float64)
 	return math.Floor(val), nil
-***REMOVED***
-func jpfMap(arguments []interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+}
+func jpfMap(arguments []interface{}) (interface{}, error) {
 	intr := arguments[0].(*treeInterpreter)
 	exp := arguments[1].(expRef)
 	node := exp.ref
-	arr := arguments[2].([]interface***REMOVED******REMOVED***)
-	mapped := make([]interface***REMOVED******REMOVED***, 0, len(arr))
-	for _, value := range arr ***REMOVED***
+	arr := arguments[2].([]interface{})
+	mapped := make([]interface{}, 0, len(arr))
+	for _, value := range arr {
 		current, err := intr.Execute(node, value)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		mapped = append(mapped, current)
-	***REMOVED***
+	}
 	return mapped, nil
-***REMOVED***
-func jpfMax(arguments []interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
-	if items, ok := toArrayNum(arguments[0]); ok ***REMOVED***
-		if len(items) == 0 ***REMOVED***
+}
+func jpfMax(arguments []interface{}) (interface{}, error) {
+	if items, ok := toArrayNum(arguments[0]); ok {
+		if len(items) == 0 {
 			return nil, nil
-		***REMOVED***
-		if len(items) == 1 ***REMOVED***
+		}
+		if len(items) == 1 {
 			return items[0], nil
-		***REMOVED***
+		}
 		best := items[0]
-		for _, item := range items[1:] ***REMOVED***
-			if item > best ***REMOVED***
+		for _, item := range items[1:] {
+			if item > best {
 				best = item
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		return best, nil
-	***REMOVED***
+	}
 	// Otherwise we're dealing with a max() of strings.
 	items, _ := toArrayStr(arguments[0])
-	if len(items) == 0 ***REMOVED***
+	if len(items) == 0 {
 		return nil, nil
-	***REMOVED***
-	if len(items) == 1 ***REMOVED***
+	}
+	if len(items) == 1 {
 		return items[0], nil
-	***REMOVED***
+	}
 	best := items[0]
-	for _, item := range items[1:] ***REMOVED***
-		if item > best ***REMOVED***
+	for _, item := range items[1:] {
+		if item > best {
 			best = item
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return best, nil
-***REMOVED***
-func jpfMerge(arguments []interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
-	final := make(map[string]interface***REMOVED******REMOVED***)
-	for _, m := range arguments ***REMOVED***
-		mapped := m.(map[string]interface***REMOVED******REMOVED***)
-		for key, value := range mapped ***REMOVED***
+}
+func jpfMerge(arguments []interface{}) (interface{}, error) {
+	final := make(map[string]interface{})
+	for _, m := range arguments {
+		mapped := m.(map[string]interface{})
+		for key, value := range mapped {
 			final[key] = value
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return final, nil
-***REMOVED***
-func jpfMaxBy(arguments []interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+}
+func jpfMaxBy(arguments []interface{}) (interface{}, error) {
 	intr := arguments[0].(*treeInterpreter)
-	arr := arguments[1].([]interface***REMOVED******REMOVED***)
+	arr := arguments[1].([]interface{})
 	exp := arguments[2].(expRef)
 	node := exp.ref
-	if len(arr) == 0 ***REMOVED***
+	if len(arr) == 0 {
 		return nil, nil
-	***REMOVED*** else if len(arr) == 1 ***REMOVED***
+	} else if len(arr) == 1 {
 		return arr[0], nil
-	***REMOVED***
+	}
 	start, err := intr.Execute(node, arr[0])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	switch t := start.(type) ***REMOVED***
+	}
+	switch t := start.(type) {
 	case float64:
 		bestVal := t
 		bestItem := arr[0]
-		for _, item := range arr[1:] ***REMOVED***
+		for _, item := range arr[1:] {
 			result, err := intr.Execute(node, item)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			current, ok := result.(float64)
-			if !ok ***REMOVED***
+			if !ok {
 				return nil, errors.New("invalid type, must be number")
-			***REMOVED***
-			if current > bestVal ***REMOVED***
+			}
+			if current > bestVal {
 				bestVal = current
 				bestItem = item
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		return bestItem, nil
 	case string:
 		bestVal := t
 		bestItem := arr[0]
-		for _, item := range arr[1:] ***REMOVED***
+		for _, item := range arr[1:] {
 			result, err := intr.Execute(node, item)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			current, ok := result.(string)
-			if !ok ***REMOVED***
+			if !ok {
 				return nil, errors.New("invalid type, must be string")
-			***REMOVED***
-			if current > bestVal ***REMOVED***
+			}
+			if current > bestVal {
 				bestVal = current
 				bestItem = item
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		return bestItem, nil
 	default:
 		return nil, errors.New("invalid type, must be number of string")
-	***REMOVED***
-***REMOVED***
-func jpfSum(arguments []interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+}
+func jpfSum(arguments []interface{}) (interface{}, error) {
 	items, _ := toArrayNum(arguments[0])
 	sum := 0.0
-	for _, item := range items ***REMOVED***
+	for _, item := range items {
 		sum += item
-	***REMOVED***
+	}
 	return sum, nil
-***REMOVED***
+}
 
-func jpfMin(arguments []interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
-	if items, ok := toArrayNum(arguments[0]); ok ***REMOVED***
-		if len(items) == 0 ***REMOVED***
+func jpfMin(arguments []interface{}) (interface{}, error) {
+	if items, ok := toArrayNum(arguments[0]); ok {
+		if len(items) == 0 {
 			return nil, nil
-		***REMOVED***
-		if len(items) == 1 ***REMOVED***
+		}
+		if len(items) == 1 {
 			return items[0], nil
-		***REMOVED***
+		}
 		best := items[0]
-		for _, item := range items[1:] ***REMOVED***
-			if item < best ***REMOVED***
+		for _, item := range items[1:] {
+			if item < best {
 				best = item
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		return best, nil
-	***REMOVED***
+	}
 	items, _ := toArrayStr(arguments[0])
-	if len(items) == 0 ***REMOVED***
+	if len(items) == 0 {
 		return nil, nil
-	***REMOVED***
-	if len(items) == 1 ***REMOVED***
+	}
+	if len(items) == 1 {
 		return items[0], nil
-	***REMOVED***
+	}
 	best := items[0]
-	for _, item := range items[1:] ***REMOVED***
-		if item < best ***REMOVED***
+	for _, item := range items[1:] {
+		if item < best {
 			best = item
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return best, nil
-***REMOVED***
+}
 
-func jpfMinBy(arguments []interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func jpfMinBy(arguments []interface{}) (interface{}, error) {
 	intr := arguments[0].(*treeInterpreter)
-	arr := arguments[1].([]interface***REMOVED******REMOVED***)
+	arr := arguments[1].([]interface{})
 	exp := arguments[2].(expRef)
 	node := exp.ref
-	if len(arr) == 0 ***REMOVED***
+	if len(arr) == 0 {
 		return nil, nil
-	***REMOVED*** else if len(arr) == 1 ***REMOVED***
+	} else if len(arr) == 1 {
 		return arr[0], nil
-	***REMOVED***
+	}
 	start, err := intr.Execute(node, arr[0])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if t, ok := start.(float64); ok ***REMOVED***
+	}
+	if t, ok := start.(float64); ok {
 		bestVal := t
 		bestItem := arr[0]
-		for _, item := range arr[1:] ***REMOVED***
+		for _, item := range arr[1:] {
 			result, err := intr.Execute(node, item)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			current, ok := result.(float64)
-			if !ok ***REMOVED***
+			if !ok {
 				return nil, errors.New("invalid type, must be number")
-			***REMOVED***
-			if current < bestVal ***REMOVED***
+			}
+			if current < bestVal {
 				bestVal = current
 				bestItem = item
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		return bestItem, nil
-	***REMOVED*** else if t, ok := start.(string); ok ***REMOVED***
+	} else if t, ok := start.(string); ok {
 		bestVal := t
 		bestItem := arr[0]
-		for _, item := range arr[1:] ***REMOVED***
+		for _, item := range arr[1:] {
 			result, err := intr.Execute(node, item)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			current, ok := result.(string)
-			if !ok ***REMOVED***
+			if !ok {
 				return nil, errors.New("invalid type, must be string")
-			***REMOVED***
-			if current < bestVal ***REMOVED***
+			}
+			if current < bestVal {
 				bestVal = current
 				bestItem = item
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		return bestItem, nil
-	***REMOVED*** else ***REMOVED***
+	} else {
 		return nil, errors.New("invalid type, must be number of string")
-	***REMOVED***
-***REMOVED***
-func jpfType(arguments []interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+}
+func jpfType(arguments []interface{}) (interface{}, error) {
 	arg := arguments[0]
-	if _, ok := arg.(float64); ok ***REMOVED***
+	if _, ok := arg.(float64); ok {
 		return "number", nil
-	***REMOVED***
-	if _, ok := arg.(string); ok ***REMOVED***
+	}
+	if _, ok := arg.(string); ok {
 		return "string", nil
-	***REMOVED***
-	if _, ok := arg.([]interface***REMOVED******REMOVED***); ok ***REMOVED***
+	}
+	if _, ok := arg.([]interface{}); ok {
 		return "array", nil
-	***REMOVED***
-	if _, ok := arg.(map[string]interface***REMOVED******REMOVED***); ok ***REMOVED***
+	}
+	if _, ok := arg.(map[string]interface{}); ok {
 		return "object", nil
-	***REMOVED***
-	if arg == nil ***REMOVED***
+	}
+	if arg == nil {
 		return "null", nil
-	***REMOVED***
-	if arg == true || arg == false ***REMOVED***
+	}
+	if arg == true || arg == false {
 		return "boolean", nil
-	***REMOVED***
+	}
 	return nil, errors.New("unknown type")
-***REMOVED***
-func jpfKeys(arguments []interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
-	arg := arguments[0].(map[string]interface***REMOVED******REMOVED***)
-	collected := make([]interface***REMOVED******REMOVED***, 0, len(arg))
-	for key := range arg ***REMOVED***
+}
+func jpfKeys(arguments []interface{}) (interface{}, error) {
+	arg := arguments[0].(map[string]interface{})
+	collected := make([]interface{}, 0, len(arg))
+	for key := range arg {
 		collected = append(collected, key)
-	***REMOVED***
+	}
 	return collected, nil
-***REMOVED***
-func jpfValues(arguments []interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
-	arg := arguments[0].(map[string]interface***REMOVED******REMOVED***)
-	collected := make([]interface***REMOVED******REMOVED***, 0, len(arg))
-	for _, value := range arg ***REMOVED***
+}
+func jpfValues(arguments []interface{}) (interface{}, error) {
+	arg := arguments[0].(map[string]interface{})
+	collected := make([]interface{}, 0, len(arg))
+	for _, value := range arg {
 		collected = append(collected, value)
-	***REMOVED***
+	}
 	return collected, nil
-***REMOVED***
-func jpfSort(arguments []interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
-	if items, ok := toArrayNum(arguments[0]); ok ***REMOVED***
+}
+func jpfSort(arguments []interface{}) (interface{}, error) {
+	if items, ok := toArrayNum(arguments[0]); ok {
 		d := sort.Float64Slice(items)
 		sort.Stable(d)
-		final := make([]interface***REMOVED******REMOVED***, len(d))
-		for i, val := range d ***REMOVED***
+		final := make([]interface{}, len(d))
+		for i, val := range d {
 			final[i] = val
-		***REMOVED***
+		}
 		return final, nil
-	***REMOVED***
+	}
 	// Otherwise we're dealing with sort()'ing strings.
 	items, _ := toArrayStr(arguments[0])
 	d := sort.StringSlice(items)
 	sort.Stable(d)
-	final := make([]interface***REMOVED******REMOVED***, len(d))
-	for i, val := range d ***REMOVED***
+	final := make([]interface{}, len(d))
+	for i, val := range d {
 		final[i] = val
-	***REMOVED***
+	}
 	return final, nil
-***REMOVED***
-func jpfSortBy(arguments []interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+}
+func jpfSortBy(arguments []interface{}) (interface{}, error) {
 	intr := arguments[0].(*treeInterpreter)
-	arr := arguments[1].([]interface***REMOVED******REMOVED***)
+	arr := arguments[1].([]interface{})
 	exp := arguments[2].(expRef)
 	node := exp.ref
-	if len(arr) == 0 ***REMOVED***
+	if len(arr) == 0 {
 		return arr, nil
-	***REMOVED*** else if len(arr) == 1 ***REMOVED***
+	} else if len(arr) == 1 {
 		return arr, nil
-	***REMOVED***
+	}
 	start, err := intr.Execute(node, arr[0])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if _, ok := start.(float64); ok ***REMOVED***
-		sortable := &byExprFloat***REMOVED***intr, node, arr, false***REMOVED***
+	}
+	if _, ok := start.(float64); ok {
+		sortable := &byExprFloat{intr, node, arr, false}
 		sort.Stable(sortable)
-		if sortable.hasError ***REMOVED***
+		if sortable.hasError {
 			return nil, errors.New("error in sort_by comparison")
-		***REMOVED***
+		}
 		return arr, nil
-	***REMOVED*** else if _, ok := start.(string); ok ***REMOVED***
-		sortable := &byExprString***REMOVED***intr, node, arr, false***REMOVED***
+	} else if _, ok := start.(string); ok {
+		sortable := &byExprString{intr, node, arr, false}
 		sort.Stable(sortable)
-		if sortable.hasError ***REMOVED***
+		if sortable.hasError {
 			return nil, errors.New("error in sort_by comparison")
-		***REMOVED***
+		}
 		return arr, nil
-	***REMOVED*** else ***REMOVED***
+	} else {
 		return nil, errors.New("invalid type, must be number of string")
-	***REMOVED***
-***REMOVED***
-func jpfJoin(arguments []interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+}
+func jpfJoin(arguments []interface{}) (interface{}, error) {
 	sep := arguments[0].(string)
 	// We can't just do arguments[1].([]string), we have to
 	// manually convert each item to a string.
-	arrayStr := []string***REMOVED******REMOVED***
-	for _, item := range arguments[1].([]interface***REMOVED******REMOVED***) ***REMOVED***
+	arrayStr := []string{}
+	for _, item := range arguments[1].([]interface{}) {
 		arrayStr = append(arrayStr, item.(string))
-	***REMOVED***
+	}
 	return strings.Join(arrayStr, sep), nil
-***REMOVED***
-func jpfReverse(arguments []interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
-	if s, ok := arguments[0].(string); ok ***REMOVED***
+}
+func jpfReverse(arguments []interface{}) (interface{}, error) {
+	if s, ok := arguments[0].(string); ok {
 		r := []rune(s)
-		for i, j := 0, len(r)-1; i < len(r)/2; i, j = i+1, j-1 ***REMOVED***
+		for i, j := 0, len(r)-1; i < len(r)/2; i, j = i+1, j-1 {
 			r[i], r[j] = r[j], r[i]
-		***REMOVED***
+		}
 		return string(r), nil
-	***REMOVED***
-	items := arguments[0].([]interface***REMOVED******REMOVED***)
+	}
+	items := arguments[0].([]interface{})
 	length := len(items)
-	reversed := make([]interface***REMOVED******REMOVED***, length)
-	for i, item := range items ***REMOVED***
+	reversed := make([]interface{}, length)
+	for i, item := range items {
 		reversed[length-(i+1)] = item
-	***REMOVED***
+	}
 	return reversed, nil
-***REMOVED***
-func jpfToArray(arguments []interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
-	if _, ok := arguments[0].([]interface***REMOVED******REMOVED***); ok ***REMOVED***
+}
+func jpfToArray(arguments []interface{}) (interface{}, error) {
+	if _, ok := arguments[0].([]interface{}); ok {
 		return arguments[0], nil
-	***REMOVED***
+	}
 	return arguments[:1:1], nil
-***REMOVED***
-func jpfToString(arguments []interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
-	if v, ok := arguments[0].(string); ok ***REMOVED***
+}
+func jpfToString(arguments []interface{}) (interface{}, error) {
+	if v, ok := arguments[0].(string); ok {
 		return v, nil
-	***REMOVED***
+	}
 	result, err := json.Marshal(arguments[0])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return string(result), nil
-***REMOVED***
-func jpfToNumber(arguments []interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+}
+func jpfToNumber(arguments []interface{}) (interface{}, error) {
 	arg := arguments[0]
-	if v, ok := arg.(float64); ok ***REMOVED***
+	if v, ok := arg.(float64); ok {
 		return v, nil
-	***REMOVED***
-	if v, ok := arg.(string); ok ***REMOVED***
+	}
+	if v, ok := arg.(string); ok {
 		conv, err := strconv.ParseFloat(v, 64)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, nil
-		***REMOVED***
+		}
 		return conv, nil
-	***REMOVED***
-	if _, ok := arg.([]interface***REMOVED******REMOVED***); ok ***REMOVED***
+	}
+	if _, ok := arg.([]interface{}); ok {
 		return nil, nil
-	***REMOVED***
-	if _, ok := arg.(map[string]interface***REMOVED******REMOVED***); ok ***REMOVED***
+	}
+	if _, ok := arg.(map[string]interface{}); ok {
 		return nil, nil
-	***REMOVED***
-	if arg == nil ***REMOVED***
+	}
+	if arg == nil {
 		return nil, nil
-	***REMOVED***
-	if arg == true || arg == false ***REMOVED***
+	}
+	if arg == true || arg == false {
 		return nil, nil
-	***REMOVED***
+	}
 	return nil, errors.New("unknown type")
-***REMOVED***
-func jpfNotNull(arguments []interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
-	for _, arg := range arguments ***REMOVED***
-		if arg != nil ***REMOVED***
+}
+func jpfNotNull(arguments []interface{}) (interface{}, error) {
+	for _, arg := range arguments {
+		if arg != nil {
 			return arg, nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil, nil
-***REMOVED***
+}

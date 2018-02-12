@@ -8,20 +8,20 @@ import (
 	"github.com/Microsoft/go-winio"
 )
 
-func configureUnixTransport(tr *http.Transport, proto, addr string) error ***REMOVED***
+func configureUnixTransport(tr *http.Transport, proto, addr string) error {
 	return ErrProtocolNotAvailable
-***REMOVED***
+}
 
-func configureNpipeTransport(tr *http.Transport, proto, addr string) error ***REMOVED***
+func configureNpipeTransport(tr *http.Transport, proto, addr string) error {
 	// No need for compression in local communications.
 	tr.DisableCompression = true
-	tr.Dial = func(_, _ string) (net.Conn, error) ***REMOVED***
+	tr.Dial = func(_, _ string) (net.Conn, error) {
 		return DialPipe(addr, defaultTimeout)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // DialPipe connects to a Windows named pipe.
-func DialPipe(addr string, timeout time.Duration) (net.Conn, error) ***REMOVED***
+func DialPipe(addr string, timeout time.Duration) (net.Conn, error) {
 	return winio.DialPipe(addr, &timeout)
-***REMOVED***
+}

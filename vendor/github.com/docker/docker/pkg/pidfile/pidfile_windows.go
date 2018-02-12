@@ -10,16 +10,16 @@ const (
 	stillActive = 259
 )
 
-func processExists(pid int) bool ***REMOVED***
+func processExists(pid int) bool {
 	h, err := windows.OpenProcess(processQueryLimitedInformation, false, uint32(pid))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return false
-	***REMOVED***
+	}
 	var c uint32
 	err = windows.GetExitCodeProcess(h, &c)
 	windows.Close(h)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return c == stillActive
-	***REMOVED***
+	}
 	return true
-***REMOVED***
+}

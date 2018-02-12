@@ -16,16 +16,16 @@ set -e
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
 versions=( "$@" )
-if [ $***REMOVED***#versions[@]***REMOVED*** -eq 0 ]; then
+if [ ${#versions[@]} -eq 0 ]; then
 	versions=( */ )
 fi
-versions=( "$***REMOVED***versions[@]%/***REMOVED***" )
+versions=( "${versions[@]%/}" )
 
-for version in "$***REMOVED***versions[@]***REMOVED***"; do
-	echo "$***REMOVED***versions[@]***REMOVED***"
-	distro="$***REMOVED***version%-****REMOVED***"
-	suite="$***REMOVED***version##*-***REMOVED***"
-	from="aarch64/$***REMOVED***distro***REMOVED***:$***REMOVED***suite***REMOVED***"
+for version in "${versions[@]}"; do
+	echo "${versions[@]}"
+	distro="${version%-*}"
+	suite="${version##*-}"
+	from="aarch64/${distro}:${suite}"
 
 	mkdir -p "$version"
 	echo "$version -> FROM $from"
@@ -93,11 +93,11 @@ for version in "$***REMOVED***versions[@]***REMOVED***"; do
 	esac
 
 	# update and install packages
-	echo "RUN apt-get update && apt-get install -y $***REMOVED***packages[*]***REMOVED*** --no-install-recommends && rm -rf /var/lib/apt/lists/*" >> "$version/Dockerfile"
+	echo "RUN apt-get update && apt-get install -y ${packages[*]} --no-install-recommends && rm -rf /var/lib/apt/lists/*" >> "$version/Dockerfile"
 	echo >> "$version/Dockerfile"
 
-	awk '$1 == "ENV" && $2 == "GO_VERSION" ***REMOVED*** print; exit ***REMOVED***' ../../../../Dockerfile.aarch64 >> "$version/Dockerfile"
-	echo 'RUN curl -fSL "https://golang.org/dl/go$***REMOVED***GO_VERSION***REMOVED***.linux-arm64.tar.gz" | tar xzC /usr/local' >> "$version/Dockerfile"
+	awk '$1 == "ENV" && $2 == "GO_VERSION" { print; exit }' ../../../../Dockerfile.aarch64 >> "$version/Dockerfile"
+	echo 'RUN curl -fSL "https://golang.org/dl/go${GO_VERSION}.linux-arm64.tar.gz" | tar xzC /usr/local' >> "$version/Dockerfile"
 	echo 'ENV PATH $PATH:/usr/local/go/bin' >> "$version/Dockerfile"
 	echo >> "$version/Dockerfile"
 

@@ -1,15 +1,15 @@
-***REMOVED***
-    "resource": ***REMOVED***
-        "aws_instance": ***REMOVED***
-            "db": ***REMOVED***
+{
+    "resource": {
+        "aws_instance": {
+            "db": {
                 "vpc": "foo",
-                "provisioner": [***REMOVED***
-                    "file": ***REMOVED***
+                "provisioner": [{
+                    "file": {
                         "source": "foo",
                         "destination": "bar"
-                ***REMOVED***
-            ***REMOVED***]
-        ***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+                    }
+                }]
+            }
+		}
+	}
+}

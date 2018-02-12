@@ -23,63 +23,63 @@ import (
 var ErrNoSuchLock = errors.New("no such lock")
 
 // Locker provides a locking mechanism based on the passed in reference name
-type Locker struct ***REMOVED***
+type Locker struct {
 	mu    sync.Mutex
 	locks map[string]*lockCtr
-***REMOVED***
+}
 
 // lockCtr is used by Locker to represent a lock with a given name.
-type lockCtr struct ***REMOVED***
+type lockCtr struct {
 	mu sync.Mutex
 	// waiters is the number of waiters waiting to acquire the lock
 	// this is int32 instead of uint32 so we can add `-1` in `dec()`
 	waiters int32
-***REMOVED***
+}
 
 // inc increments the number of waiters waiting for the lock
-func (l *lockCtr) inc() ***REMOVED***
+func (l *lockCtr) inc() {
 	atomic.AddInt32(&l.waiters, 1)
-***REMOVED***
+}
 
 // dec decrements the number of waiters waiting on the lock
-func (l *lockCtr) dec() ***REMOVED***
+func (l *lockCtr) dec() {
 	atomic.AddInt32(&l.waiters, -1)
-***REMOVED***
+}
 
 // count gets the current number of waiters
-func (l *lockCtr) count() int32 ***REMOVED***
+func (l *lockCtr) count() int32 {
 	return atomic.LoadInt32(&l.waiters)
-***REMOVED***
+}
 
 // Lock locks the mutex
-func (l *lockCtr) Lock() ***REMOVED***
+func (l *lockCtr) Lock() {
 	l.mu.Lock()
-***REMOVED***
+}
 
 // Unlock unlocks the mutex
-func (l *lockCtr) Unlock() ***REMOVED***
+func (l *lockCtr) Unlock() {
 	l.mu.Unlock()
-***REMOVED***
+}
 
 // New creates a new Locker
-func New() *Locker ***REMOVED***
-	return &Locker***REMOVED***
+func New() *Locker {
+	return &Locker{
 		locks: make(map[string]*lockCtr),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Lock locks a mutex with the given name. If it doesn't exist, one is created
-func (l *Locker) Lock(name string) ***REMOVED***
+func (l *Locker) Lock(name string) {
 	l.mu.Lock()
-	if l.locks == nil ***REMOVED***
+	if l.locks == nil {
 		l.locks = make(map[string]*lockCtr)
-	***REMOVED***
+	}
 
 	nameLock, exists := l.locks[name]
-	if !exists ***REMOVED***
-		nameLock = &lockCtr***REMOVED******REMOVED***
+	if !exists {
+		nameLock = &lockCtr{}
 		l.locks[name] = nameLock
-	***REMOVED***
+	}
 
 	// increment the nameLock waiters while inside the main mutex
 	// this makes sure that the lock isn't deleted if `Lock` and `Unlock` are called concurrently
@@ -90,23 +90,23 @@ func (l *Locker) Lock(name string) ***REMOVED***
 	// once locked then we can decrement the number of waiters for this lock
 	nameLock.Lock()
 	nameLock.dec()
-***REMOVED***
+}
 
 // Unlock unlocks the mutex with the given name
 // If the given lock is not being waited on by any other callers, it is deleted
-func (l *Locker) Unlock(name string) error ***REMOVED***
+func (l *Locker) Unlock(name string) error {
 	l.mu.Lock()
 	nameLock, exists := l.locks[name]
-	if !exists ***REMOVED***
+	if !exists {
 		l.mu.Unlock()
 		return ErrNoSuchLock
-	***REMOVED***
+	}
 
-	if nameLock.count() == 0 ***REMOVED***
+	if nameLock.count() == 0 {
 		delete(l.locks, name)
-	***REMOVED***
+	}
 	nameLock.Unlock()
 
 	l.mu.Unlock()
 	return nil
-***REMOVED***
+}

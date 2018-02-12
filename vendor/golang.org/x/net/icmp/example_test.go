@@ -14,50 +14,50 @@ import (
 	"golang.org/x/net/ipv6"
 )
 
-func ExamplePacketConn_nonPrivilegedPing() ***REMOVED***
-	switch runtime.GOOS ***REMOVED***
+func ExamplePacketConn_nonPrivilegedPing() {
+	switch runtime.GOOS {
 	case "darwin":
 	case "linux":
 		log.Println("you may need to adjust the net.ipv4.ping_group_range kernel state")
 	default:
 		log.Println("not supported on", runtime.GOOS)
 		return
-	***REMOVED***
+	}
 
 	c, err := icmp.ListenPacket("udp6", "fe80::1%en0")
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatal(err)
-	***REMOVED***
+	}
 	defer c.Close()
 
-	wm := icmp.Message***REMOVED***
+	wm := icmp.Message{
 		Type: ipv6.ICMPTypeEchoRequest, Code: 0,
-		Body: &icmp.Echo***REMOVED***
+		Body: &icmp.Echo{
 			ID: os.Getpid() & 0xffff, Seq: 1,
 			Data: []byte("HELLO-R-U-THERE"),
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 	wb, err := wm.Marshal(nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatal(err)
-	***REMOVED***
-	if _, err := c.WriteTo(wb, &net.UDPAddr***REMOVED***IP: net.ParseIP("ff02::1"), Zone: "en0"***REMOVED***); err != nil ***REMOVED***
+	}
+	if _, err := c.WriteTo(wb, &net.UDPAddr{IP: net.ParseIP("ff02::1"), Zone: "en0"}); err != nil {
 		log.Fatal(err)
-	***REMOVED***
+	}
 
 	rb := make([]byte, 1500)
 	n, peer, err := c.ReadFrom(rb)
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatal(err)
-	***REMOVED***
+	}
 	rm, err := icmp.ParseMessage(58, rb[:n])
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatal(err)
-	***REMOVED***
-	switch rm.Type ***REMOVED***
+	}
+	switch rm.Type {
 	case ipv6.ICMPTypeEchoReply:
 		log.Printf("got reflection from %v", peer)
 	default:
 		log.Printf("got %+v; want echo reply", rm)
-	***REMOVED***
-***REMOVED***
+	}
+}

@@ -14,7 +14,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-type subscription struct ***REMOVED***
+type subscription struct {
 	mu sync.RWMutex
 	wg sync.WaitGroup
 
@@ -26,223 +26,223 @@ type subscription struct ***REMOVED***
 	cancel context.CancelFunc
 
 	errors       []error
-	nodes        map[string]struct***REMOVED******REMOVED***
-	pendingTasks map[string]struct***REMOVED******REMOVED***
-***REMOVED***
+	nodes        map[string]struct{}
+	pendingTasks map[string]struct{}
+}
 
-func newSubscription(store *store.MemoryStore, message *api.SubscriptionMessage, changed *watch.Queue) *subscription ***REMOVED***
-	return &subscription***REMOVED***
+func newSubscription(store *store.MemoryStore, message *api.SubscriptionMessage, changed *watch.Queue) *subscription {
+	return &subscription{
 		store:        store,
 		message:      message,
 		changed:      changed,
-		nodes:        make(map[string]struct***REMOVED******REMOVED***),
-		pendingTasks: make(map[string]struct***REMOVED******REMOVED***),
-	***REMOVED***
-***REMOVED***
+		nodes:        make(map[string]struct{}),
+		pendingTasks: make(map[string]struct{}),
+	}
+}
 
-func (s *subscription) follow() bool ***REMOVED***
+func (s *subscription) follow() bool {
 	return s.message.Options != nil && s.message.Options.Follow
-***REMOVED***
+}
 
-func (s *subscription) Contains(nodeID string) bool ***REMOVED***
+func (s *subscription) Contains(nodeID string) bool {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
 	_, ok := s.nodes[nodeID]
 	return ok
-***REMOVED***
+}
 
-func (s *subscription) Nodes() []string ***REMOVED***
+func (s *subscription) Nodes() []string {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
 	nodes := make([]string, 0, len(s.nodes))
-	for node := range s.nodes ***REMOVED***
+	for node := range s.nodes {
 		nodes = append(nodes, node)
-	***REMOVED***
+	}
 	return nodes
-***REMOVED***
+}
 
-func (s *subscription) Run(ctx context.Context) ***REMOVED***
+func (s *subscription) Run(ctx context.Context) {
 	s.ctx, s.cancel = context.WithCancel(ctx)
 
-	if s.follow() ***REMOVED***
+	if s.follow() {
 		wq := s.store.WatchQueue()
-		ch, cancel := state.Watch(wq, api.EventCreateTask***REMOVED******REMOVED***, api.EventUpdateTask***REMOVED******REMOVED***)
-		go func() ***REMOVED***
+		ch, cancel := state.Watch(wq, api.EventCreateTask{}, api.EventUpdateTask{})
+		go func() {
 			defer cancel()
 			s.watch(ch)
-		***REMOVED***()
-	***REMOVED***
+		}()
+	}
 
 	s.match()
-***REMOVED***
+}
 
-func (s *subscription) Stop() ***REMOVED***
-	if s.cancel != nil ***REMOVED***
+func (s *subscription) Stop() {
+	if s.cancel != nil {
 		s.cancel()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *subscription) Wait(ctx context.Context) <-chan struct***REMOVED******REMOVED*** ***REMOVED***
+func (s *subscription) Wait(ctx context.Context) <-chan struct{} {
 	// Follow subscriptions never end
-	if s.follow() ***REMOVED***
+	if s.follow() {
 		return nil
-	***REMOVED***
+	}
 
-	ch := make(chan struct***REMOVED******REMOVED***)
-	go func() ***REMOVED***
+	ch := make(chan struct{})
+	go func() {
 		defer close(ch)
 		s.wg.Wait()
-	***REMOVED***()
+	}()
 	return ch
-***REMOVED***
+}
 
-func (s *subscription) Done(nodeID string, err error) ***REMOVED***
+func (s *subscription) Done(nodeID string, err error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		s.errors = append(s.errors, err)
-	***REMOVED***
+	}
 
-	if s.follow() ***REMOVED***
+	if s.follow() {
 		return
-	***REMOVED***
+	}
 
-	if _, ok := s.nodes[nodeID]; !ok ***REMOVED***
+	if _, ok := s.nodes[nodeID]; !ok {
 		return
-	***REMOVED***
+	}
 
 	delete(s.nodes, nodeID)
 	s.wg.Done()
-***REMOVED***
+}
 
-func (s *subscription) Err() error ***REMOVED***
+func (s *subscription) Err() error {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
-	if len(s.errors) == 0 && len(s.pendingTasks) == 0 ***REMOVED***
+	if len(s.errors) == 0 && len(s.pendingTasks) == 0 {
 		return nil
-	***REMOVED***
+	}
 
 	messages := make([]string, 0, len(s.errors))
-	for _, err := range s.errors ***REMOVED***
+	for _, err := range s.errors {
 		messages = append(messages, err.Error())
-	***REMOVED***
-	for t := range s.pendingTasks ***REMOVED***
+	}
+	for t := range s.pendingTasks {
 		messages = append(messages, fmt.Sprintf("task %s has not been scheduled", t))
-	***REMOVED***
+	}
 
 	return fmt.Errorf("warning: incomplete log stream. some logs could not be retrieved for the following reasons: %s", strings.Join(messages, ", "))
-***REMOVED***
+}
 
-func (s *subscription) Close() ***REMOVED***
+func (s *subscription) Close() {
 	s.mu.Lock()
 	s.message.Close = true
 	s.mu.Unlock()
-***REMOVED***
+}
 
-func (s *subscription) Closed() bool ***REMOVED***
+func (s *subscription) Closed() bool {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	return s.message.Close
-***REMOVED***
+}
 
-func (s *subscription) match() ***REMOVED***
+func (s *subscription) match() {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	add := func(t *api.Task) ***REMOVED***
-		if t.NodeID == "" ***REMOVED***
-			s.pendingTasks[t.ID] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
+	add := func(t *api.Task) {
+		if t.NodeID == "" {
+			s.pendingTasks[t.ID] = struct{}{}
 			return
-		***REMOVED***
-		if _, ok := s.nodes[t.NodeID]; !ok ***REMOVED***
-			s.nodes[t.NodeID] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
+		}
+		if _, ok := s.nodes[t.NodeID]; !ok {
+			s.nodes[t.NodeID] = struct{}{}
 			s.wg.Add(1)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	s.store.View(func(tx store.ReadTx) ***REMOVED***
-		for _, nid := range s.message.Selector.NodeIDs ***REMOVED***
-			s.nodes[nid] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-		***REMOVED***
+	s.store.View(func(tx store.ReadTx) {
+		for _, nid := range s.message.Selector.NodeIDs {
+			s.nodes[nid] = struct{}{}
+		}
 
-		for _, tid := range s.message.Selector.TaskIDs ***REMOVED***
-			if task := store.GetTask(tx, tid); task != nil ***REMOVED***
+		for _, tid := range s.message.Selector.TaskIDs {
+			if task := store.GetTask(tx, tid); task != nil {
 				add(task)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
-		for _, sid := range s.message.Selector.ServiceIDs ***REMOVED***
+		for _, sid := range s.message.Selector.ServiceIDs {
 			tasks, err := store.FindTasks(tx, store.ByServiceID(sid))
-			if err != nil ***REMOVED***
+			if err != nil {
 				log.L.Warning(err)
 				continue
-			***REMOVED***
-			for _, task := range tasks ***REMOVED***
+			}
+			for _, task := range tasks {
 				// if we're not following, don't add tasks that aren't running yet
-				if !s.follow() && task.Status.State < api.TaskStateRunning ***REMOVED***
+				if !s.follow() && task.Status.State < api.TaskStateRunning {
 					continue
-				***REMOVED***
+				}
 				add(task)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***)
-***REMOVED***
+			}
+		}
+	})
+}
 
-func (s *subscription) watch(ch <-chan events.Event) error ***REMOVED***
-	matchTasks := map[string]struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	for _, tid := range s.message.Selector.TaskIDs ***REMOVED***
-		matchTasks[tid] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	***REMOVED***
+func (s *subscription) watch(ch <-chan events.Event) error {
+	matchTasks := map[string]struct{}{}
+	for _, tid := range s.message.Selector.TaskIDs {
+		matchTasks[tid] = struct{}{}
+	}
 
-	matchServices := map[string]struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	for _, sid := range s.message.Selector.ServiceIDs ***REMOVED***
-		matchServices[sid] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	***REMOVED***
+	matchServices := map[string]struct{}{}
+	for _, sid := range s.message.Selector.ServiceIDs {
+		matchServices[sid] = struct{}{}
+	}
 
-	add := func(t *api.Task) ***REMOVED***
+	add := func(t *api.Task) {
 		s.mu.Lock()
 		defer s.mu.Unlock()
 
 		// Un-allocated task.
-		if t.NodeID == "" ***REMOVED***
-			s.pendingTasks[t.ID] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
+		if t.NodeID == "" {
+			s.pendingTasks[t.ID] = struct{}{}
 			return
-		***REMOVED***
+		}
 
 		delete(s.pendingTasks, t.ID)
-		if _, ok := s.nodes[t.NodeID]; !ok ***REMOVED***
-			s.nodes[t.NodeID] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
+		if _, ok := s.nodes[t.NodeID]; !ok {
+			s.nodes[t.NodeID] = struct{}{}
 			s.changed.Publish(s)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	for ***REMOVED***
+	for {
 		var t *api.Task
-		select ***REMOVED***
+		select {
 		case <-s.ctx.Done():
 			return s.ctx.Err()
 		case event := <-ch:
-			switch v := event.(type) ***REMOVED***
+			switch v := event.(type) {
 			case api.EventCreateTask:
 				t = v.Task
 			case api.EventUpdateTask:
 				t = v.Task
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
-		if t == nil ***REMOVED***
+		if t == nil {
 			panic("received invalid task from the watch queue")
-		***REMOVED***
+		}
 
-		if _, ok := matchTasks[t.ID]; ok ***REMOVED***
+		if _, ok := matchTasks[t.ID]; ok {
 			add(t)
-		***REMOVED***
-		if _, ok := matchServices[t.ServiceID]; ok ***REMOVED***
+		}
+		if _, ok := matchServices[t.ServiceID]; ok {
 			add(t)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

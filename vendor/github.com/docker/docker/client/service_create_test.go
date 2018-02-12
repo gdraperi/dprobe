@@ -18,193 +18,193 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestServiceCreateError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestServiceCreateError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
-	***REMOVED***
-	_, err := client.ServiceCreate(context.Background(), swarm.ServiceSpec***REMOVED******REMOVED***, types.ServiceCreateOptions***REMOVED******REMOVED***)
-	if err == nil || err.Error() != "Error response from daemon: Server error" ***REMOVED***
+	}
+	_, err := client.ServiceCreate(context.Background(), swarm.ServiceSpec{}, types.ServiceCreateOptions{})
+	if err == nil || err.Error() != "Error response from daemon: Server error" {
 		t.Fatalf("expected a Server Error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestServiceCreate(t *testing.T) ***REMOVED***
+func TestServiceCreate(t *testing.T) {
 	expectedURL := "/services/create"
-	client := &Client***REMOVED***
-		client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-			if !strings.HasPrefix(req.URL.Path, expectedURL) ***REMOVED***
+	client := &Client{
+		client: newMockClient(func(req *http.Request) (*http.Response, error) {
+			if !strings.HasPrefix(req.URL.Path, expectedURL) {
 				return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, req.URL)
-			***REMOVED***
-			if req.Method != "POST" ***REMOVED***
+			}
+			if req.Method != "POST" {
 				return nil, fmt.Errorf("expected POST method, got %s", req.Method)
-			***REMOVED***
-			b, err := json.Marshal(types.ServiceCreateResponse***REMOVED***
+			}
+			b, err := json.Marshal(types.ServiceCreateResponse{
 				ID: "service_id",
-			***REMOVED***)
-			if err != nil ***REMOVED***
+			})
+			if err != nil {
 				return nil, err
-			***REMOVED***
-			return &http.Response***REMOVED***
+			}
+			return &http.Response{
 				StatusCode: http.StatusOK,
 				Body:       ioutil.NopCloser(bytes.NewReader(b)),
-			***REMOVED***, nil
-		***REMOVED***),
-	***REMOVED***
+			}, nil
+		}),
+	}
 
-	r, err := client.ServiceCreate(context.Background(), swarm.ServiceSpec***REMOVED******REMOVED***, types.ServiceCreateOptions***REMOVED******REMOVED***)
-	if err != nil ***REMOVED***
+	r, err := client.ServiceCreate(context.Background(), swarm.ServiceSpec{}, types.ServiceCreateOptions{})
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if r.ID != "service_id" ***REMOVED***
+	}
+	if r.ID != "service_id" {
 		t.Fatalf("expected `service_id`, got %s", r.ID)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestServiceCreateCompatiblePlatforms(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestServiceCreateCompatiblePlatforms(t *testing.T) {
+	client := &Client{
 		version: "1.30",
-		client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-			if strings.HasPrefix(req.URL.Path, "/v1.30/services/create") ***REMOVED***
+		client: newMockClient(func(req *http.Request) (*http.Response, error) {
+			if strings.HasPrefix(req.URL.Path, "/v1.30/services/create") {
 				var serviceSpec swarm.ServiceSpec
 
 				// check if the /distribution endpoint returned correct output
 				err := json.NewDecoder(req.Body).Decode(&serviceSpec)
-				if err != nil ***REMOVED***
+				if err != nil {
 					return nil, err
-				***REMOVED***
+				}
 
 				assert.Equal(t, "foobar:1.0@sha256:c0537ff6a5218ef531ece93d4984efc99bbf3f7497c0a7726c88e2bb7584dc96", serviceSpec.TaskTemplate.ContainerSpec.Image)
 				assert.Len(t, serviceSpec.TaskTemplate.Placement.Platforms, 1)
 
 				p := serviceSpec.TaskTemplate.Placement.Platforms[0]
-				b, err := json.Marshal(types.ServiceCreateResponse***REMOVED***
+				b, err := json.Marshal(types.ServiceCreateResponse{
 					ID: "service_" + p.OS + "_" + p.Architecture,
-				***REMOVED***)
-				if err != nil ***REMOVED***
+				})
+				if err != nil {
 					return nil, err
-				***REMOVED***
-				return &http.Response***REMOVED***
+				}
+				return &http.Response{
 					StatusCode: http.StatusOK,
 					Body:       ioutil.NopCloser(bytes.NewReader(b)),
-				***REMOVED***, nil
-			***REMOVED*** else if strings.HasPrefix(req.URL.Path, "/v1.30/distribution/") ***REMOVED***
-				b, err := json.Marshal(registrytypes.DistributionInspect***REMOVED***
-					Descriptor: v1.Descriptor***REMOVED***
+				}, nil
+			} else if strings.HasPrefix(req.URL.Path, "/v1.30/distribution/") {
+				b, err := json.Marshal(registrytypes.DistributionInspect{
+					Descriptor: v1.Descriptor{
 						Digest: "sha256:c0537ff6a5218ef531ece93d4984efc99bbf3f7497c0a7726c88e2bb7584dc96",
-					***REMOVED***,
-					Platforms: []v1.Platform***REMOVED***
-						***REMOVED***
+					},
+					Platforms: []v1.Platform{
+						{
 							Architecture: "amd64",
 							OS:           "linux",
-						***REMOVED***,
-					***REMOVED***,
-				***REMOVED***)
-				if err != nil ***REMOVED***
+						},
+					},
+				})
+				if err != nil {
 					return nil, err
-				***REMOVED***
-				return &http.Response***REMOVED***
+				}
+				return &http.Response{
 					StatusCode: http.StatusOK,
 					Body:       ioutil.NopCloser(bytes.NewReader(b)),
-				***REMOVED***, nil
-			***REMOVED*** else ***REMOVED***
+				}, nil
+			} else {
 				return nil, fmt.Errorf("unexpected URL '%s'", req.URL.Path)
-			***REMOVED***
-		***REMOVED***),
-	***REMOVED***
+			}
+		}),
+	}
 
-	spec := swarm.ServiceSpec***REMOVED***TaskTemplate: swarm.TaskSpec***REMOVED***ContainerSpec: &swarm.ContainerSpec***REMOVED***Image: "foobar:1.0"***REMOVED******REMOVED******REMOVED***
+	spec := swarm.ServiceSpec{TaskTemplate: swarm.TaskSpec{ContainerSpec: &swarm.ContainerSpec{Image: "foobar:1.0"}}}
 
-	r, err := client.ServiceCreate(context.Background(), spec, types.ServiceCreateOptions***REMOVED***QueryRegistry: true***REMOVED***)
+	r, err := client.ServiceCreate(context.Background(), spec, types.ServiceCreateOptions{QueryRegistry: true})
 	assert.NoError(t, err)
 	assert.Equal(t, "service_linux_amd64", r.ID)
-***REMOVED***
+}
 
-func TestServiceCreateDigestPinning(t *testing.T) ***REMOVED***
+func TestServiceCreateDigestPinning(t *testing.T) {
 	dgst := "sha256:c0537ff6a5218ef531ece93d4984efc99bbf3f7497c0a7726c88e2bb7584dc96"
 	dgstAlt := "sha256:37ffbf3f7497c07584dc9637ffbf3f7497c0758c0537ffbf3f7497c0c88e2bb7"
 	serviceCreateImage := ""
-	pinByDigestTests := []struct ***REMOVED***
+	pinByDigestTests := []struct {
 		img      string // input image provided by the user
 		expected string // expected image after digest pinning
-	***REMOVED******REMOVED***
+	}{
 		// default registry returns familiar string
-		***REMOVED***"docker.io/library/alpine", "alpine:latest@" + dgst***REMOVED***,
+		{"docker.io/library/alpine", "alpine:latest@" + dgst},
 		// provided tag is preserved and digest added
-		***REMOVED***"alpine:edge", "alpine:edge@" + dgst***REMOVED***,
+		{"alpine:edge", "alpine:edge@" + dgst},
 		// image with provided alternative digest remains unchanged
-		***REMOVED***"alpine@" + dgstAlt, "alpine@" + dgstAlt***REMOVED***,
+		{"alpine@" + dgstAlt, "alpine@" + dgstAlt},
 		// image with provided tag and alternative digest remains unchanged
-		***REMOVED***"alpine:edge@" + dgstAlt, "alpine:edge@" + dgstAlt***REMOVED***,
+		{"alpine:edge@" + dgstAlt, "alpine:edge@" + dgstAlt},
 		// image on alternative registry does not result in familiar string
-		***REMOVED***"alternate.registry/library/alpine", "alternate.registry/library/alpine:latest@" + dgst***REMOVED***,
+		{"alternate.registry/library/alpine", "alternate.registry/library/alpine:latest@" + dgst},
 		// unresolvable image does not get a digest
-		***REMOVED***"cannotresolve", "cannotresolve:latest"***REMOVED***,
-	***REMOVED***
+		{"cannotresolve", "cannotresolve:latest"},
+	}
 
-	client := &Client***REMOVED***
+	client := &Client{
 		version: "1.30",
-		client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-			if strings.HasPrefix(req.URL.Path, "/v1.30/services/create") ***REMOVED***
+		client: newMockClient(func(req *http.Request) (*http.Response, error) {
+			if strings.HasPrefix(req.URL.Path, "/v1.30/services/create") {
 				// reset and set image received by the service create endpoint
 				serviceCreateImage = ""
 				var service swarm.ServiceSpec
-				if err := json.NewDecoder(req.Body).Decode(&service); err != nil ***REMOVED***
+				if err := json.NewDecoder(req.Body).Decode(&service); err != nil {
 					return nil, fmt.Errorf("could not parse service create request")
-				***REMOVED***
+				}
 				serviceCreateImage = service.TaskTemplate.ContainerSpec.Image
 
-				b, err := json.Marshal(types.ServiceCreateResponse***REMOVED***
+				b, err := json.Marshal(types.ServiceCreateResponse{
 					ID: "service_id",
-				***REMOVED***)
-				if err != nil ***REMOVED***
+				})
+				if err != nil {
 					return nil, err
-				***REMOVED***
-				return &http.Response***REMOVED***
+				}
+				return &http.Response{
 					StatusCode: http.StatusOK,
 					Body:       ioutil.NopCloser(bytes.NewReader(b)),
-				***REMOVED***, nil
-			***REMOVED*** else if strings.HasPrefix(req.URL.Path, "/v1.30/distribution/cannotresolve") ***REMOVED***
+				}, nil
+			} else if strings.HasPrefix(req.URL.Path, "/v1.30/distribution/cannotresolve") {
 				// unresolvable image
 				return nil, fmt.Errorf("cannot resolve image")
-			***REMOVED*** else if strings.HasPrefix(req.URL.Path, "/v1.30/distribution/") ***REMOVED***
+			} else if strings.HasPrefix(req.URL.Path, "/v1.30/distribution/") {
 				// resolvable images
-				b, err := json.Marshal(registrytypes.DistributionInspect***REMOVED***
-					Descriptor: v1.Descriptor***REMOVED***
+				b, err := json.Marshal(registrytypes.DistributionInspect{
+					Descriptor: v1.Descriptor{
 						Digest: digest.Digest(dgst),
-					***REMOVED***,
-				***REMOVED***)
-				if err != nil ***REMOVED***
+					},
+				})
+				if err != nil {
 					return nil, err
-				***REMOVED***
-				return &http.Response***REMOVED***
+				}
+				return &http.Response{
 					StatusCode: http.StatusOK,
 					Body:       ioutil.NopCloser(bytes.NewReader(b)),
-				***REMOVED***, nil
-			***REMOVED***
+				}, nil
+			}
 			return nil, fmt.Errorf("unexpected URL '%s'", req.URL.Path)
-		***REMOVED***),
-	***REMOVED***
+		}),
+	}
 
 	// run pin by digest tests
-	for _, p := range pinByDigestTests ***REMOVED***
-		r, err := client.ServiceCreate(context.Background(), swarm.ServiceSpec***REMOVED***
-			TaskTemplate: swarm.TaskSpec***REMOVED***
-				ContainerSpec: &swarm.ContainerSpec***REMOVED***
+	for _, p := range pinByDigestTests {
+		r, err := client.ServiceCreate(context.Background(), swarm.ServiceSpec{
+			TaskTemplate: swarm.TaskSpec{
+				ContainerSpec: &swarm.ContainerSpec{
 					Image: p.img,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***, types.ServiceCreateOptions***REMOVED***QueryRegistry: true***REMOVED***)
+				},
+			},
+		}, types.ServiceCreateOptions{QueryRegistry: true})
 
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
+		}
 
-		if r.ID != "service_id" ***REMOVED***
+		if r.ID != "service_id" {
 			t.Fatalf("expected `service_id`, got %s", r.ID)
-		***REMOVED***
+		}
 
-		if p.expected != serviceCreateImage ***REMOVED***
+		if p.expected != serviceCreateImage {
 			t.Fatalf("expected image %s, got %s", p.expected, serviceCreateImage)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

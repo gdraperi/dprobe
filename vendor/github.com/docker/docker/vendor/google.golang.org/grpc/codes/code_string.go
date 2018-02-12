@@ -6,11 +6,11 @@ import "fmt"
 
 const _Code_name = "OKCanceledUnknownInvalidArgumentDeadlineExceededNotFoundAlreadyExistsPermissionDeniedResourceExhaustedFailedPreconditionAbortedOutOfRangeUnimplementedInternalUnavailableDataLossUnauthenticated"
 
-var _Code_index = [...]uint8***REMOVED***0, 2, 10, 17, 32, 48, 56, 69, 85, 102, 120, 127, 137, 150, 158, 169, 177, 192***REMOVED***
+var _Code_index = [...]uint8{0, 2, 10, 17, 32, 48, 56, 69, 85, 102, 120, 127, 137, 150, 158, 169, 177, 192}
 
-func (i Code) String() string ***REMOVED***
-	if i+1 >= Code(len(_Code_index)) ***REMOVED***
+func (i Code) String() string {
+	if i+1 >= Code(len(_Code_index)) {
 		return fmt.Sprintf("Code(%d)", i)
-	***REMOVED***
+	}
 	return _Code_name[_Code_index[i]:_Code_index[i+1]]
-***REMOVED***
+}

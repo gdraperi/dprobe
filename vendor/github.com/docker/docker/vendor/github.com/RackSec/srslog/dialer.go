@@ -10,15 +10,15 @@ import (
 // getDialer method returns the correct dialer function. However, if you ever
 // find that you need to check which dialer function you have, this would also
 // be useful for you without having to use reflection.
-type dialerFunctionWrapper struct ***REMOVED***
+type dialerFunctionWrapper struct {
 	Name   string
 	Dialer func() (serverConn, string, error)
-***REMOVED***
+}
 
 // Call the wrapped dialer function and return its return values.
-func (df dialerFunctionWrapper) Call() (serverConn, string, error) ***REMOVED***
+func (df dialerFunctionWrapper) Call() (serverConn, string, error) {
 	return df.Dialer()
-***REMOVED***
+}
 
 // getDialer returns a "dialer" function that can be called to connect to a
 // syslog server.
@@ -33,55 +33,55 @@ func (df dialerFunctionWrapper) Call() (serverConn, string, error) ***REMOVED***
 // conditional, we have a map of network -> dialer function (with a sane default
 // value), and adding a new network type is as easy as writing the dialer
 // function and adding it to the map.
-func (w *Writer) getDialer() dialerFunctionWrapper ***REMOVED***
-	dialers := map[string]dialerFunctionWrapper***REMOVED***
-		"":        dialerFunctionWrapper***REMOVED***"unixDialer", w.unixDialer***REMOVED***,
-		"tcp+tls": dialerFunctionWrapper***REMOVED***"tlsDialer", w.tlsDialer***REMOVED***,
-	***REMOVED***
+func (w *Writer) getDialer() dialerFunctionWrapper {
+	dialers := map[string]dialerFunctionWrapper{
+		"":        dialerFunctionWrapper{"unixDialer", w.unixDialer},
+		"tcp+tls": dialerFunctionWrapper{"tlsDialer", w.tlsDialer},
+	}
 	dialer, ok := dialers[w.network]
-	if !ok ***REMOVED***
-		dialer = dialerFunctionWrapper***REMOVED***"basicDialer", w.basicDialer***REMOVED***
-	***REMOVED***
+	if !ok {
+		dialer = dialerFunctionWrapper{"basicDialer", w.basicDialer}
+	}
 	return dialer
-***REMOVED***
+}
 
 // unixDialer uses the unixSyslog method to open a connection to the syslog
 // daemon running on the local machine.
-func (w *Writer) unixDialer() (serverConn, string, error) ***REMOVED***
+func (w *Writer) unixDialer() (serverConn, string, error) {
 	sc, err := unixSyslog()
 	hostname := w.hostname
-	if hostname == "" ***REMOVED***
+	if hostname == "" {
 		hostname = "localhost"
-	***REMOVED***
+	}
 	return sc, hostname, err
-***REMOVED***
+}
 
 // tlsDialer connects to TLS over TCP, and is used for the "tcp+tls" network
 // type.
-func (w *Writer) tlsDialer() (serverConn, string, error) ***REMOVED***
+func (w *Writer) tlsDialer() (serverConn, string, error) {
 	c, err := tls.Dial("tcp", w.raddr, w.tlsConfig)
 	var sc serverConn
 	hostname := w.hostname
-	if err == nil ***REMOVED***
-		sc = &netConn***REMOVED***conn: c***REMOVED***
-		if hostname == "" ***REMOVED***
+	if err == nil {
+		sc = &netConn{conn: c}
+		if hostname == "" {
 			hostname = c.LocalAddr().String()
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return sc, hostname, err
-***REMOVED***
+}
 
 // basicDialer is the most common dialer for syslog, and supports both TCP and
 // UDP connections.
-func (w *Writer) basicDialer() (serverConn, string, error) ***REMOVED***
+func (w *Writer) basicDialer() (serverConn, string, error) {
 	c, err := net.Dial(w.network, w.raddr)
 	var sc serverConn
 	hostname := w.hostname
-	if err == nil ***REMOVED***
-		sc = &netConn***REMOVED***conn: c***REMOVED***
-		if hostname == "" ***REMOVED***
+	if err == nil {
+		sc = &netConn{conn: c}
+		if hostname == "" {
 			hostname = c.LocalAddr().String()
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return sc, hostname, err
-***REMOVED***
+}

@@ -15,7 +15,7 @@ package unix
 import "unsafe"
 
 // SockaddrDatalink implements the Sockaddr interface for AF_LINK type sockets.
-type SockaddrDatalink struct ***REMOVED***
+type SockaddrDatalink struct {
 	Len    uint8
 	Family uint8
 	Index  uint16
@@ -25,10 +25,10 @@ type SockaddrDatalink struct ***REMOVED***
 	Slen   uint8
 	Data   [46]int8
 	raw    RawSockaddrDatalink
-***REMOVED***
+}
 
-// Translate "kern.hostname" to []_C_int***REMOVED***0,1,2,3***REMOVED***.
-func nametomib(name string) (mib []_C_int, err error) ***REMOVED***
+// Translate "kern.hostname" to []_C_int{0,1,2,3}.
+func nametomib(name string) (mib []_C_int, err error) {
 	const siz = unsafe.Sizeof(mib[0])
 
 	// NOTE(rsc): It seems strange to set the buffer to have
@@ -43,246 +43,246 @@ func nametomib(name string) (mib []_C_int, err error) ***REMOVED***
 
 	p := (*byte)(unsafe.Pointer(&buf[0]))
 	bytes, err := ByteSliceFromString(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// Magic sysctl: "setting" 0.3 to a string name
 	// lets you read back the array of integers form.
-	if err = sysctl([]_C_int***REMOVED***0, 3***REMOVED***, p, &n, &bytes[0], uintptr(len(name))); err != nil ***REMOVED***
+	if err = sysctl([]_C_int{0, 3}, p, &n, &bytes[0], uintptr(len(name))); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return buf[0 : n/siz], nil
-***REMOVED***
+}
 
 //sysnb pipe() (r int, w int, err error)
 
-func Pipe(p []int) (err error) ***REMOVED***
-	if len(p) != 2 ***REMOVED***
+func Pipe(p []int) (err error) {
+	if len(p) != 2 {
 		return EINVAL
-	***REMOVED***
+	}
 	p[0], p[1], err = pipe()
 	return
-***REMOVED***
+}
 
-func GetsockoptIPMreqn(fd, level, opt int) (*IPMreqn, error) ***REMOVED***
+func GetsockoptIPMreqn(fd, level, opt int) (*IPMreqn, error) {
 	var value IPMreqn
 	vallen := _Socklen(SizeofIPMreqn)
 	errno := getsockopt(fd, level, opt, unsafe.Pointer(&value), &vallen)
 	return &value, errno
-***REMOVED***
+}
 
-func SetsockoptIPMreqn(fd, level, opt int, mreq *IPMreqn) (err error) ***REMOVED***
+func SetsockoptIPMreqn(fd, level, opt int, mreq *IPMreqn) (err error) {
 	return setsockopt(fd, level, opt, unsafe.Pointer(mreq), unsafe.Sizeof(*mreq))
-***REMOVED***
+}
 
-func Accept4(fd, flags int) (nfd int, sa Sockaddr, err error) ***REMOVED***
+func Accept4(fd, flags int) (nfd int, sa Sockaddr, err error) {
 	var rsa RawSockaddrAny
 	var len _Socklen = SizeofSockaddrAny
 	nfd, err = accept4(fd, &rsa, &len, flags)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
-	if len > SizeofSockaddrAny ***REMOVED***
+	}
+	if len > SizeofSockaddrAny {
 		panic("RawSockaddrAny too small")
-	***REMOVED***
+	}
 	sa, err = anyToSockaddr(&rsa)
-	if err != nil ***REMOVED***
+	if err != nil {
 		Close(nfd)
 		nfd = 0
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 const ImplementsGetwd = true
 
 //sys	Getcwd(buf []byte) (n int, err error) = SYS___GETCWD
 
-func Getwd() (string, error) ***REMOVED***
+func Getwd() (string, error) {
 	var buf [PathMax]byte
 	_, err := Getcwd(buf[0:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	n := clen(buf[:])
-	if n < 1 ***REMOVED***
+	if n < 1 {
 		return "", EINVAL
-	***REMOVED***
+	}
 	return string(buf[:n]), nil
-***REMOVED***
+}
 
-func Getfsstat(buf []Statfs_t, flags int) (n int, err error) ***REMOVED***
+func Getfsstat(buf []Statfs_t, flags int) (n int, err error) {
 	var _p0 unsafe.Pointer
 	var bufsize uintptr
-	if len(buf) > 0 ***REMOVED***
+	if len(buf) > 0 {
 		_p0 = unsafe.Pointer(&buf[0])
-		bufsize = unsafe.Sizeof(Statfs_t***REMOVED******REMOVED***) * uintptr(len(buf))
-	***REMOVED***
+		bufsize = unsafe.Sizeof(Statfs_t{}) * uintptr(len(buf))
+	}
 	r0, _, e1 := Syscall(SYS_GETFSSTAT, uintptr(_p0), bufsize, uintptr(flags))
 	n = int(r0)
-	if e1 != 0 ***REMOVED***
+	if e1 != 0 {
 		err = e1
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func setattrlistTimes(path string, times []Timespec, flags int) error ***REMOVED***
+func setattrlistTimes(path string, times []Timespec, flags int) error {
 	// used on Darwin for UtimesNano
 	return ENOSYS
-***REMOVED***
+}
 
 // Derive extattr namespace and attribute name
 
-func xattrnamespace(fullattr string) (ns int, attr string, err error) ***REMOVED***
+func xattrnamespace(fullattr string) (ns int, attr string, err error) {
 	s := -1
-	for idx, val := range fullattr ***REMOVED***
-		if val == '.' ***REMOVED***
+	for idx, val := range fullattr {
+		if val == '.' {
 			s = idx
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if s == -1 ***REMOVED***
+	if s == -1 {
 		return -1, "", ENOATTR
-	***REMOVED***
+	}
 
 	namespace := fullattr[0:s]
 	attr = fullattr[s+1:]
 
-	switch namespace ***REMOVED***
+	switch namespace {
 	case "user":
 		return EXTATTR_NAMESPACE_USER, attr, nil
 	case "system":
 		return EXTATTR_NAMESPACE_SYSTEM, attr, nil
 	default:
 		return -1, "", ENOATTR
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func initxattrdest(dest []byte, idx int) (d unsafe.Pointer) ***REMOVED***
-	if len(dest) > idx ***REMOVED***
+func initxattrdest(dest []byte, idx int) (d unsafe.Pointer) {
+	if len(dest) > idx {
 		return unsafe.Pointer(&dest[idx])
-	***REMOVED*** else ***REMOVED***
+	} else {
 		return unsafe.Pointer(_zero)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // FreeBSD implements its own syscalls to handle extended attributes
 
-func Getxattr(file string, attr string, dest []byte) (sz int, err error) ***REMOVED***
+func Getxattr(file string, attr string, dest []byte) (sz int, err error) {
 	d := initxattrdest(dest, 0)
 	destsize := len(dest)
 
 	nsid, a, err := xattrnamespace(attr)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return -1, err
-	***REMOVED***
+	}
 
 	return ExtattrGetFile(file, nsid, a, uintptr(d), destsize)
-***REMOVED***
+}
 
-func Fgetxattr(fd int, attr string, dest []byte) (sz int, err error) ***REMOVED***
+func Fgetxattr(fd int, attr string, dest []byte) (sz int, err error) {
 	d := initxattrdest(dest, 0)
 	destsize := len(dest)
 
 	nsid, a, err := xattrnamespace(attr)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return -1, err
-	***REMOVED***
+	}
 
 	return ExtattrGetFd(fd, nsid, a, uintptr(d), destsize)
-***REMOVED***
+}
 
-func Lgetxattr(link string, attr string, dest []byte) (sz int, err error) ***REMOVED***
+func Lgetxattr(link string, attr string, dest []byte) (sz int, err error) {
 	d := initxattrdest(dest, 0)
 	destsize := len(dest)
 
 	nsid, a, err := xattrnamespace(attr)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return -1, err
-	***REMOVED***
+	}
 
 	return ExtattrGetLink(link, nsid, a, uintptr(d), destsize)
-***REMOVED***
+}
 
 // flags are unused on FreeBSD
 
-func Fsetxattr(fd int, attr string, data []byte, flags int) (err error) ***REMOVED***
+func Fsetxattr(fd int, attr string, data []byte, flags int) (err error) {
 	d := unsafe.Pointer(&data[0])
 	datasiz := len(data)
 
 	nsid, a, err := xattrnamespace(attr)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
 	_, err = ExtattrSetFd(fd, nsid, a, uintptr(d), datasiz)
 	return
-***REMOVED***
+}
 
-func Setxattr(file string, attr string, data []byte, flags int) (err error) ***REMOVED***
+func Setxattr(file string, attr string, data []byte, flags int) (err error) {
 	d := unsafe.Pointer(&data[0])
 	datasiz := len(data)
 
 	nsid, a, err := xattrnamespace(attr)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
 	_, err = ExtattrSetFile(file, nsid, a, uintptr(d), datasiz)
 	return
-***REMOVED***
+}
 
-func Lsetxattr(link string, attr string, data []byte, flags int) (err error) ***REMOVED***
+func Lsetxattr(link string, attr string, data []byte, flags int) (err error) {
 	d := unsafe.Pointer(&data[0])
 	datasiz := len(data)
 
 	nsid, a, err := xattrnamespace(attr)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
 	_, err = ExtattrSetLink(link, nsid, a, uintptr(d), datasiz)
 	return
-***REMOVED***
+}
 
-func Removexattr(file string, attr string) (err error) ***REMOVED***
+func Removexattr(file string, attr string) (err error) {
 	nsid, a, err := xattrnamespace(attr)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
 	err = ExtattrDeleteFile(file, nsid, a)
 	return
-***REMOVED***
+}
 
-func Fremovexattr(fd int, attr string) (err error) ***REMOVED***
+func Fremovexattr(fd int, attr string) (err error) {
 	nsid, a, err := xattrnamespace(attr)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
 	err = ExtattrDeleteFd(fd, nsid, a)
 	return
-***REMOVED***
+}
 
-func Lremovexattr(link string, attr string) (err error) ***REMOVED***
+func Lremovexattr(link string, attr string) (err error) {
 	nsid, a, err := xattrnamespace(attr)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
 	err = ExtattrDeleteLink(link, nsid, a)
 	return
-***REMOVED***
+}
 
-func Listxattr(file string, dest []byte) (sz int, err error) ***REMOVED***
+func Listxattr(file string, dest []byte) (sz int, err error) {
 	d := initxattrdest(dest, 0)
 	destsiz := len(dest)
 
 	// FreeBSD won't allow you to list xattrs from multiple namespaces
 	s := 0
-	for _, nsid := range [...]int***REMOVED***EXTATTR_NAMESPACE_USER, EXTATTR_NAMESPACE_SYSTEM***REMOVED*** ***REMOVED***
+	for _, nsid := range [...]int{EXTATTR_NAMESPACE_USER, EXTATTR_NAMESPACE_SYSTEM} {
 		stmp, e := ExtattrListFile(file, nsid, uintptr(d), destsiz)
 
 		/* Errors accessing system attrs are ignored so that
@@ -292,70 +292,70 @@ func Listxattr(file string, dest []byte) (sz int, err error) ***REMOVED***
 		 * Linux will still error if we ask for user attributes on a file that
 		 * we don't have read permissions on, so don't ignore those errors
 		 */
-		if e != nil && e == EPERM && nsid != EXTATTR_NAMESPACE_USER ***REMOVED***
+		if e != nil && e == EPERM && nsid != EXTATTR_NAMESPACE_USER {
 			continue
-		***REMOVED*** else if e != nil ***REMOVED***
+		} else if e != nil {
 			return s, e
-		***REMOVED***
+		}
 
 		s += stmp
 		destsiz -= s
-		if destsiz < 0 ***REMOVED***
+		if destsiz < 0 {
 			destsiz = 0
-		***REMOVED***
+		}
 		d = initxattrdest(dest, s)
-	***REMOVED***
+	}
 
 	return s, nil
-***REMOVED***
+}
 
-func Flistxattr(fd int, dest []byte) (sz int, err error) ***REMOVED***
+func Flistxattr(fd int, dest []byte) (sz int, err error) {
 	d := initxattrdest(dest, 0)
 	destsiz := len(dest)
 
 	s := 0
-	for _, nsid := range [...]int***REMOVED***EXTATTR_NAMESPACE_USER, EXTATTR_NAMESPACE_SYSTEM***REMOVED*** ***REMOVED***
+	for _, nsid := range [...]int{EXTATTR_NAMESPACE_USER, EXTATTR_NAMESPACE_SYSTEM} {
 		stmp, e := ExtattrListFd(fd, nsid, uintptr(d), destsiz)
-		if e != nil && e == EPERM && nsid != EXTATTR_NAMESPACE_USER ***REMOVED***
+		if e != nil && e == EPERM && nsid != EXTATTR_NAMESPACE_USER {
 			continue
-		***REMOVED*** else if e != nil ***REMOVED***
+		} else if e != nil {
 			return s, e
-		***REMOVED***
+		}
 
 		s += stmp
 		destsiz -= s
-		if destsiz < 0 ***REMOVED***
+		if destsiz < 0 {
 			destsiz = 0
-		***REMOVED***
+		}
 		d = initxattrdest(dest, s)
-	***REMOVED***
+	}
 
 	return s, nil
-***REMOVED***
+}
 
-func Llistxattr(link string, dest []byte) (sz int, err error) ***REMOVED***
+func Llistxattr(link string, dest []byte) (sz int, err error) {
 	d := initxattrdest(dest, 0)
 	destsiz := len(dest)
 
 	s := 0
-	for _, nsid := range [...]int***REMOVED***EXTATTR_NAMESPACE_USER, EXTATTR_NAMESPACE_SYSTEM***REMOVED*** ***REMOVED***
+	for _, nsid := range [...]int{EXTATTR_NAMESPACE_USER, EXTATTR_NAMESPACE_SYSTEM} {
 		stmp, e := ExtattrListLink(link, nsid, uintptr(d), destsiz)
-		if e != nil && e == EPERM && nsid != EXTATTR_NAMESPACE_USER ***REMOVED***
+		if e != nil && e == EPERM && nsid != EXTATTR_NAMESPACE_USER {
 			continue
-		***REMOVED*** else if e != nil ***REMOVED***
+		} else if e != nil {
 			return s, e
-		***REMOVED***
+		}
 
 		s += stmp
 		destsiz -= s
-		if destsiz < 0 ***REMOVED***
+		if destsiz < 0 {
 			destsiz = 0
-		***REMOVED***
+		}
 		d = initxattrdest(dest, s)
-	***REMOVED***
+	}
 
 	return s, nil
-***REMOVED***
+}
 
 //sys   ioctl(fd int, req uint, arg uintptr) (err error)
 
@@ -364,83 +364,83 @@ func Llistxattr(link string, dest []byte) (sz int, err error) ***REMOVED***
 
 // IoctlSetInt performs an ioctl operation which sets an integer value
 // on fd, using the specified request number.
-func IoctlSetInt(fd int, req uint, value int) error ***REMOVED***
+func IoctlSetInt(fd int, req uint, value int) error {
 	return ioctl(fd, req, uintptr(value))
-***REMOVED***
+}
 
-func IoctlSetWinsize(fd int, req uint, value *Winsize) error ***REMOVED***
+func IoctlSetWinsize(fd int, req uint, value *Winsize) error {
 	return ioctl(fd, req, uintptr(unsafe.Pointer(value)))
-***REMOVED***
+}
 
-func IoctlSetTermios(fd int, req uint, value *Termios) error ***REMOVED***
+func IoctlSetTermios(fd int, req uint, value *Termios) error {
 	return ioctl(fd, req, uintptr(unsafe.Pointer(value)))
-***REMOVED***
+}
 
 // IoctlGetInt performs an ioctl operation which gets an integer value
 // from fd, using the specified request number.
-func IoctlGetInt(fd int, req uint) (int, error) ***REMOVED***
+func IoctlGetInt(fd int, req uint) (int, error) {
 	var value int
 	err := ioctl(fd, req, uintptr(unsafe.Pointer(&value)))
 	return value, err
-***REMOVED***
+}
 
-func IoctlGetWinsize(fd int, req uint) (*Winsize, error) ***REMOVED***
+func IoctlGetWinsize(fd int, req uint) (*Winsize, error) {
 	var value Winsize
 	err := ioctl(fd, req, uintptr(unsafe.Pointer(&value)))
 	return &value, err
-***REMOVED***
+}
 
-func IoctlGetTermios(fd int, req uint) (*Termios, error) ***REMOVED***
+func IoctlGetTermios(fd int, req uint) (*Termios, error) {
 	var value Termios
 	err := ioctl(fd, req, uintptr(unsafe.Pointer(&value)))
 	return &value, err
-***REMOVED***
+}
 
-func Uname(uname *Utsname) error ***REMOVED***
-	mib := []_C_int***REMOVED***CTL_KERN, KERN_OSTYPE***REMOVED***
+func Uname(uname *Utsname) error {
+	mib := []_C_int{CTL_KERN, KERN_OSTYPE}
 	n := unsafe.Sizeof(uname.Sysname)
-	if err := sysctl(mib, &uname.Sysname[0], &n, nil, 0); err != nil ***REMOVED***
+	if err := sysctl(mib, &uname.Sysname[0], &n, nil, 0); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	mib = []_C_int***REMOVED***CTL_KERN, KERN_HOSTNAME***REMOVED***
+	mib = []_C_int{CTL_KERN, KERN_HOSTNAME}
 	n = unsafe.Sizeof(uname.Nodename)
-	if err := sysctl(mib, &uname.Nodename[0], &n, nil, 0); err != nil ***REMOVED***
+	if err := sysctl(mib, &uname.Nodename[0], &n, nil, 0); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	mib = []_C_int***REMOVED***CTL_KERN, KERN_OSRELEASE***REMOVED***
+	mib = []_C_int{CTL_KERN, KERN_OSRELEASE}
 	n = unsafe.Sizeof(uname.Release)
-	if err := sysctl(mib, &uname.Release[0], &n, nil, 0); err != nil ***REMOVED***
+	if err := sysctl(mib, &uname.Release[0], &n, nil, 0); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	mib = []_C_int***REMOVED***CTL_KERN, KERN_VERSION***REMOVED***
+	mib = []_C_int{CTL_KERN, KERN_VERSION}
 	n = unsafe.Sizeof(uname.Version)
-	if err := sysctl(mib, &uname.Version[0], &n, nil, 0); err != nil ***REMOVED***
+	if err := sysctl(mib, &uname.Version[0], &n, nil, 0); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	// The version might have newlines or tabs in it, convert them to
 	// spaces.
-	for i, b := range uname.Version ***REMOVED***
-		if b == '\n' || b == '\t' ***REMOVED***
-			if i == len(uname.Version)-1 ***REMOVED***
+	for i, b := range uname.Version {
+		if b == '\n' || b == '\t' {
+			if i == len(uname.Version)-1 {
 				uname.Version[i] = 0
-			***REMOVED*** else ***REMOVED***
+			} else {
 				uname.Version[i] = ' '
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
-	mib = []_C_int***REMOVED***CTL_HW, HW_MACHINE***REMOVED***
+	mib = []_C_int{CTL_HW, HW_MACHINE}
 	n = unsafe.Sizeof(uname.Machine)
-	if err := sysctl(mib, &uname.Machine[0], &n, nil, 0); err != nil ***REMOVED***
+	if err := sysctl(mib, &uname.Machine[0], &n, nil, 0); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 /*
  * Exposed directly

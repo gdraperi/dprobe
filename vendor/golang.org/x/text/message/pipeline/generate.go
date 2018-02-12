@@ -28,205 +28,205 @@ var transRe = regexp.MustCompile(`messages\.(.*)\.json`)
 // Generate writes a Go file that defines a Catalog with translated messages.
 // Translations are retrieved from s.Messages, not s.Translations, so it
 // is assumed Merge has been called.
-func (s *State) Generate() error ***REMOVED***
+func (s *State) Generate() error {
 	path := s.Config.GenPackage
-	if path == "" ***REMOVED***
+	if path == "" {
 		path = "."
-	***REMOVED***
+	}
 	isDir := path[0] == '.'
-	prog, err := loadPackages(&loader.Config***REMOVED******REMOVED***, []string***REMOVED***path***REMOVED***)
-	if err != nil ***REMOVED***
+	prog, err := loadPackages(&loader.Config{}, []string{path})
+	if err != nil {
 		return wrap(err, "could not load package")
-	***REMOVED***
+	}
 	pkgs := prog.InitialPackages()
-	if len(pkgs) != 1 ***REMOVED***
+	if len(pkgs) != 1 {
 		return errorf("more than one package selected: %v", pkgs)
-	***REMOVED***
+	}
 	pkg := pkgs[0].Pkg.Name()
 
 	cw, err := s.generate()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	if !isDir ***REMOVED***
+	}
+	if !isDir {
 		gopath := build.Default.GOPATH
 		path = filepath.Join(gopath, filepath.FromSlash(pkgs[0].Pkg.Path()))
-	***REMOVED***
+	}
 	path = filepath.Join(path, s.Config.GenFile)
 	cw.WriteGoFile(path, pkg) // TODO: WriteGoFile should return error.
 	return err
-***REMOVED***
+}
 
 // WriteGen writes a Go file with the given package name to w that defines a
 // Catalog with translated messages. Translations are retrieved from s.Messages,
 // not s.Translations, so it is assumed Merge has been called.
-func (s *State) WriteGen(w io.Writer, pkg string) error ***REMOVED***
+func (s *State) WriteGen(w io.Writer, pkg string) error {
 	cw, err := s.generate()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	_, err = cw.WriteGo(w, pkg, "")
 	return err
-***REMOVED***
+}
 
 // Generate is deprecated; use (*State).Generate().
-func Generate(w io.Writer, pkg string, extracted *Messages, trans ...Messages) (n int, err error) ***REMOVED***
-	s := State***REMOVED***
+func Generate(w io.Writer, pkg string, extracted *Messages, trans ...Messages) (n int, err error) {
+	s := State{
 		Extracted:    *extracted,
 		Translations: trans,
-	***REMOVED***
+	}
 	cw, err := s.generate()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	return cw.WriteGo(w, pkg, "")
-***REMOVED***
+}
 
-func (s *State) generate() (*gen.CodeWriter, error) ***REMOVED***
+func (s *State) generate() (*gen.CodeWriter, error) {
 	// Build up index of translations and original messages.
-	translations := map[language.Tag]map[string]Message***REMOVED******REMOVED***
-	languages := []language.Tag***REMOVED******REMOVED***
-	usedKeys := map[string]int***REMOVED******REMOVED***
+	translations := map[language.Tag]map[string]Message{}
+	languages := []language.Tag{}
+	usedKeys := map[string]int{}
 
-	for _, loc := range s.Messages ***REMOVED***
+	for _, loc := range s.Messages {
 		tag := loc.Language
-		if _, ok := translations[tag]; !ok ***REMOVED***
-			translations[tag] = map[string]Message***REMOVED******REMOVED***
+		if _, ok := translations[tag]; !ok {
+			translations[tag] = map[string]Message{}
 			languages = append(languages, tag)
-		***REMOVED***
-		for _, m := range loc.Messages ***REMOVED***
-			if !m.Translation.IsEmpty() ***REMOVED***
-				for _, id := range m.ID ***REMOVED***
-					if _, ok := translations[tag][id]; ok ***REMOVED***
+		}
+		for _, m := range loc.Messages {
+			if !m.Translation.IsEmpty() {
+				for _, id := range m.ID {
+					if _, ok := translations[tag][id]; ok {
 						warnf("Duplicate translation in locale %q for message %q", tag, id)
-					***REMOVED***
+					}
 					translations[tag][id] = m
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+				}
+			}
+		}
+	}
 
 	// Verify completeness and register keys.
 	internal.SortTags(languages)
 
-	langVars := []string***REMOVED******REMOVED***
-	for _, tag := range languages ***REMOVED***
+	langVars := []string{}
+	for _, tag := range languages {
 		langVars = append(langVars, strings.Replace(tag.String(), "-", "_", -1))
 		dict := translations[tag]
-		for _, msg := range s.Extracted.Messages ***REMOVED***
-			for _, id := range msg.ID ***REMOVED***
-				if trans, ok := dict[id]; ok && !trans.Translation.IsEmpty() ***REMOVED***
-					if _, ok := usedKeys[msg.Key]; !ok ***REMOVED***
+		for _, msg := range s.Extracted.Messages {
+			for _, id := range msg.ID {
+				if trans, ok := dict[id]; ok && !trans.Translation.IsEmpty() {
+					if _, ok := usedKeys[msg.Key]; !ok {
 						usedKeys[msg.Key] = len(usedKeys)
-					***REMOVED***
+					}
 					break
-				***REMOVED***
+				}
 				// TODO: log missing entry.
 				warnf("%s: Missing entry for %q.", tag, id)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	cw := gen.NewCodeWriter()
 
-	x := &struct ***REMOVED***
+	x := &struct {
 		Fallback  language.Tag
 		Languages []string
-	***REMOVED******REMOVED***
+	}{
 		Fallback:  s.Extracted.Language,
 		Languages: langVars,
-	***REMOVED***
+	}
 
-	if err := lookup.Execute(cw, x); err != nil ***REMOVED***
+	if err := lookup.Execute(cw, x); err != nil {
 		return nil, wrap(err, "error")
-	***REMOVED***
+	}
 
-	keyToIndex := []string***REMOVED******REMOVED***
-	for k := range usedKeys ***REMOVED***
+	keyToIndex := []string{}
+	for k := range usedKeys {
 		keyToIndex = append(keyToIndex, k)
-	***REMOVED***
+	}
 	sort.Strings(keyToIndex)
-	fmt.Fprint(cw, "var messageKeyToIndex = map[string]int***REMOVED***\n")
-	for _, k := range keyToIndex ***REMOVED***
+	fmt.Fprint(cw, "var messageKeyToIndex = map[string]int{\n")
+	for _, k := range keyToIndex {
 		fmt.Fprintf(cw, "%q: %d,\n", k, usedKeys[k])
-	***REMOVED***
-	fmt.Fprint(cw, "***REMOVED***\n\n")
+	}
+	fmt.Fprint(cw, "}\n\n")
 
-	for i, tag := range languages ***REMOVED***
+	for i, tag := range languages {
 		dict := translations[tag]
 		a := make([]string, len(usedKeys))
-		for _, msg := range s.Extracted.Messages ***REMOVED***
-			for _, id := range msg.ID ***REMOVED***
-				if trans, ok := dict[id]; ok && !trans.Translation.IsEmpty() ***REMOVED***
+		for _, msg := range s.Extracted.Messages {
+			for _, id := range msg.ID {
+				if trans, ok := dict[id]; ok && !trans.Translation.IsEmpty() {
 					m, err := assemble(&msg, &trans.Translation)
-					if err != nil ***REMOVED***
+					if err != nil {
 						return nil, wrap(err, "error")
-					***REMOVED***
+					}
 					_, leadWS, trailWS := trimWS(msg.Key)
-					if leadWS != "" || trailWS != "" ***REMOVED***
-						m = catmsg.Affix***REMOVED***
+					if leadWS != "" || trailWS != "" {
+						m = catmsg.Affix{
 							Message: m,
 							Prefix:  leadWS,
 							Suffix:  trailWS,
-						***REMOVED***
-					***REMOVED***
+						}
+					}
 					// TODO: support macros.
 					data, err := catmsg.Compile(tag, nil, m)
-					if err != nil ***REMOVED***
+					if err != nil {
 						return nil, wrap(err, "error")
-					***REMOVED***
+					}
 					key := usedKeys[msg.Key]
-					if d := a[key]; d != "" && d != data ***REMOVED***
+					if d := a[key]; d != "" && d != data {
 						warnf("Duplicate non-consistent translation for key %q, picking the one for message %q", msg.Key, id)
-					***REMOVED***
+					}
 					a[key] = string(data)
 					break
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-		index := []uint32***REMOVED***0***REMOVED***
+				}
+			}
+		}
+		index := []uint32{0}
 		p := 0
-		for _, s := range a ***REMOVED***
+		for _, s := range a {
 			p += len(s)
 			index = append(index, uint32(p))
-		***REMOVED***
+		}
 
 		cw.WriteVar(langVars[i]+"Index", index)
 		cw.WriteConst(langVars[i]+"Data", strings.Join(a, ""))
-	***REMOVED***
+	}
 	return cw, nil
-***REMOVED***
+}
 
-func assemble(m *Message, t *Text) (msg catmsg.Message, err error) ***REMOVED***
-	keys := []string***REMOVED******REMOVED***
-	for k := range t.Var ***REMOVED***
+func assemble(m *Message, t *Text) (msg catmsg.Message, err error) {
+	keys := []string{}
+	for k := range t.Var {
 		keys = append(keys, k)
-	***REMOVED***
+	}
 	sort.Strings(keys)
 	var a []catmsg.Message
-	for _, k := range keys ***REMOVED***
+	for _, k := range keys {
 		t := t.Var[k]
 		m, err := assemble(m, &t)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-		a = append(a, &catmsg.Var***REMOVED***Name: k, Message: m***REMOVED***)
-	***REMOVED***
-	if t.Select != nil ***REMOVED***
+		}
+		a = append(a, &catmsg.Var{Name: k, Message: m})
+	}
+	if t.Select != nil {
 		s, err := assembleSelect(m, t.Select)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		a = append(a, s)
-	***REMOVED***
-	if t.Msg != "" ***REMOVED***
+	}
+	if t.Msg != "" {
 		sub, err := m.Substitute(t.Msg)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		a = append(a, catmsg.String(sub))
-	***REMOVED***
-	switch len(a) ***REMOVED***
+	}
+	switch len(a) {
 	case 0:
 		return nil, errorf("generate: empty message")
 	case 1:
@@ -234,46 +234,46 @@ func assemble(m *Message, t *Text) (msg catmsg.Message, err error) ***REMOVED***
 	default:
 		return catmsg.FirstOf(a), nil
 
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func assembleSelect(m *Message, s *Select) (msg catmsg.Message, err error) ***REMOVED***
-	cases := []string***REMOVED******REMOVED***
-	for c := range s.Cases ***REMOVED***
+func assembleSelect(m *Message, s *Select) (msg catmsg.Message, err error) {
+	cases := []string{}
+	for c := range s.Cases {
 		cases = append(cases, c)
-	***REMOVED***
+	}
 	sortCases(cases)
 
-	caseMsg := []interface***REMOVED******REMOVED******REMOVED******REMOVED***
-	for _, c := range cases ***REMOVED***
+	caseMsg := []interface{}{}
+	for _, c := range cases {
 		cm := s.Cases[c]
 		m, err := assemble(m, &cm)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		caseMsg = append(caseMsg, c, m)
-	***REMOVED***
+	}
 
 	ph := m.Placeholder(s.Arg)
 
-	switch s.Feature ***REMOVED***
+	switch s.Feature {
 	case "plural":
 		// TODO: only printf-style selects are supported as of yet.
 		return plural.Selectf(ph.ArgNum, ph.String, caseMsg...), nil
-	***REMOVED***
+	}
 	return nil, errorf("unknown feature type %q", s.Feature)
-***REMOVED***
+}
 
-func sortCases(cases []string) ***REMOVED***
+func sortCases(cases []string) {
 	// TODO: implement full interface.
-	sort.Slice(cases, func(i, j int) bool ***REMOVED***
-		if cases[j] == "other" && cases[i] != "other" ***REMOVED***
+	sort.Slice(cases, func(i, j int) bool {
+		if cases[j] == "other" && cases[i] != "other" {
 			return true
-		***REMOVED***
+		}
 		// the following code relies on '<' < '=' < any letter.
 		return cmpNumeric(cases[i], cases[j]) == -1
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
 var cmpNumeric = collate.New(language.Und, collate.Numeric).CompareString
 
@@ -284,31 +284,31 @@ import (
 	"golang.org/x/text/message/catalog"
 )
 
-type dictionary struct ***REMOVED***
+type dictionary struct {
 	index []uint32
 	data  string
-***REMOVED***
+}
 
-func (d *dictionary) Lookup(key string) (data string, ok bool) ***REMOVED***
+func (d *dictionary) Lookup(key string) (data string, ok bool) {
 	p := messageKeyToIndex[key]
 	start, end := d.index[p], d.index[p+1]
-	if start == end ***REMOVED***
+	if start == end {
 		return "", false
-	***REMOVED***
+	}
 	return d.data[start:end], true
-***REMOVED***
+}
 
-func init() ***REMOVED***
-	dict := map[string]catalog.Dictionary***REMOVED***
-		***REMOVED******REMOVED***range .Languages***REMOVED******REMOVED***"***REMOVED******REMOVED***.***REMOVED******REMOVED***": &dictionary***REMOVED***index: ***REMOVED******REMOVED***.***REMOVED******REMOVED***Index, data: ***REMOVED******REMOVED***.***REMOVED******REMOVED***Data ***REMOVED***,
-		***REMOVED******REMOVED***end***REMOVED******REMOVED***
-	***REMOVED***
-	fallback := language.MustParse("***REMOVED******REMOVED***.Fallback***REMOVED******REMOVED***")
+func init() {
+	dict := map[string]catalog.Dictionary{
+		{{range .Languages}}"{{.}}": &dictionary{index: {{.}}Index, data: {{.}}Data },
+		{{end}}
+	}
+	fallback := language.MustParse("{{.Fallback}}")
 	cat, err := catalog.NewFromMap(dict, catalog.Fallback(fallback))
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 	message.DefaultCatalog = cat
-***REMOVED***
+}
 
 `))

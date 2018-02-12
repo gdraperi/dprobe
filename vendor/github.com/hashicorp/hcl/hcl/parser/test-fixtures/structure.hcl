@@ -1,5 +1,5 @@
 // This is a test structure for the lexer
-foo bar "baz" ***REMOVED***
+foo bar "baz" {
 	key = 7
 	foo = "bar"
-***REMOVED***
+}

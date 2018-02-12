@@ -21,67 +21,67 @@ const InvalidHandle = ^Handle(0)
 // StringToUTF16 is deprecated. Use UTF16FromString instead.
 // If s contains a NUL byte this function panics instead of
 // returning an error.
-func StringToUTF16(s string) []uint16 ***REMOVED***
+func StringToUTF16(s string) []uint16 {
 	a, err := UTF16FromString(s)
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic("windows: string with NUL passed to StringToUTF16")
-	***REMOVED***
+	}
 	return a
-***REMOVED***
+}
 
 // UTF16FromString returns the UTF-16 encoding of the UTF-8 string
 // s, with a terminating NUL added. If s contains a NUL byte at any
 // location, it returns (nil, syscall.EINVAL).
-func UTF16FromString(s string) ([]uint16, error) ***REMOVED***
-	for i := 0; i < len(s); i++ ***REMOVED***
-		if s[i] == 0 ***REMOVED***
+func UTF16FromString(s string) ([]uint16, error) {
+	for i := 0; i < len(s); i++ {
+		if s[i] == 0 {
 			return nil, syscall.EINVAL
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return utf16.Encode([]rune(s + "\x00")), nil
-***REMOVED***
+}
 
 // UTF16ToString returns the UTF-8 encoding of the UTF-16 sequence s,
 // with a terminating NUL removed.
-func UTF16ToString(s []uint16) string ***REMOVED***
-	for i, v := range s ***REMOVED***
-		if v == 0 ***REMOVED***
+func UTF16ToString(s []uint16) string {
+	for i, v := range s {
+		if v == 0 {
 			s = s[0:i]
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return string(utf16.Decode(s))
-***REMOVED***
+}
 
 // StringToUTF16Ptr is deprecated. Use UTF16PtrFromString instead.
 // If s contains a NUL byte this function panics instead of
 // returning an error.
-func StringToUTF16Ptr(s string) *uint16 ***REMOVED*** return &StringToUTF16(s)[0] ***REMOVED***
+func StringToUTF16Ptr(s string) *uint16 { return &StringToUTF16(s)[0] }
 
 // UTF16PtrFromString returns pointer to the UTF-16 encoding of
 // the UTF-8 string s, with a terminating NUL added. If s
 // contains a NUL byte at any location, it returns (nil, syscall.EINVAL).
-func UTF16PtrFromString(s string) (*uint16, error) ***REMOVED***
+func UTF16PtrFromString(s string) (*uint16, error) {
 	a, err := UTF16FromString(s)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return &a[0], nil
-***REMOVED***
+}
 
-func Getpagesize() int ***REMOVED*** return 4096 ***REMOVED***
+func Getpagesize() int { return 4096 }
 
 // NewCallback converts a Go function to a function pointer conforming to the stdcall calling convention.
 // This is useful when interoperating with Windows code requiring callbacks.
-func NewCallback(fn interface***REMOVED******REMOVED***) uintptr ***REMOVED***
+func NewCallback(fn interface{}) uintptr {
 	return syscall.NewCallback(fn)
-***REMOVED***
+}
 
 // NewCallbackCDecl converts a Go function to a function pointer conforming to the cdecl calling convention.
 // This is useful when interoperating with Windows code requiring callbacks.
-func NewCallbackCDecl(fn interface***REMOVED******REMOVED***) uintptr ***REMOVED***
+func NewCallbackCDecl(fn interface{}) uintptr {
 	return syscall.NewCallbackCDecl(fn)
-***REMOVED***
+}
 
 // windows api calls
 
@@ -204,59 +204,59 @@ func NewCallbackCDecl(fn interface***REMOVED******REMOVED***) uintptr ***REMOVED
 
 // GetProcAddressByOrdinal retrieves the address of the exported
 // function from module by ordinal.
-func GetProcAddressByOrdinal(module Handle, ordinal uintptr) (proc uintptr, err error) ***REMOVED***
+func GetProcAddressByOrdinal(module Handle, ordinal uintptr) (proc uintptr, err error) {
 	r0, _, e1 := syscall.Syscall(procGetProcAddress.Addr(), 2, uintptr(module), ordinal, 0)
 	proc = uintptr(r0)
-	if proc == 0 ***REMOVED***
-		if e1 != 0 ***REMOVED***
+	if proc == 0 {
+		if e1 != 0 {
 			err = errnoErr(e1)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			err = syscall.EINVAL
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}
 
-func Exit(code int) ***REMOVED*** ExitProcess(uint32(code)) ***REMOVED***
+func Exit(code int) { ExitProcess(uint32(code)) }
 
-func makeInheritSa() *SecurityAttributes ***REMOVED***
+func makeInheritSa() *SecurityAttributes {
 	var sa SecurityAttributes
 	sa.Length = uint32(unsafe.Sizeof(sa))
 	sa.InheritHandle = 1
 	return &sa
-***REMOVED***
+}
 
-func Open(path string, mode int, perm uint32) (fd Handle, err error) ***REMOVED***
-	if len(path) == 0 ***REMOVED***
+func Open(path string, mode int, perm uint32) (fd Handle, err error) {
+	if len(path) == 0 {
 		return InvalidHandle, ERROR_FILE_NOT_FOUND
-	***REMOVED***
+	}
 	pathp, err := UTF16PtrFromString(path)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return InvalidHandle, err
-	***REMOVED***
+	}
 	var access uint32
-	switch mode & (O_RDONLY | O_WRONLY | O_RDWR) ***REMOVED***
+	switch mode & (O_RDONLY | O_WRONLY | O_RDWR) {
 	case O_RDONLY:
 		access = GENERIC_READ
 	case O_WRONLY:
 		access = GENERIC_WRITE
 	case O_RDWR:
 		access = GENERIC_READ | GENERIC_WRITE
-	***REMOVED***
-	if mode&O_CREAT != 0 ***REMOVED***
+	}
+	if mode&O_CREAT != 0 {
 		access |= GENERIC_WRITE
-	***REMOVED***
-	if mode&O_APPEND != 0 ***REMOVED***
+	}
+	if mode&O_APPEND != 0 {
 		access &^= GENERIC_WRITE
 		access |= FILE_APPEND_DATA
-	***REMOVED***
+	}
 	sharemode := uint32(FILE_SHARE_READ | FILE_SHARE_WRITE)
 	var sa *SecurityAttributes
-	if mode&O_CLOEXEC == 0 ***REMOVED***
+	if mode&O_CLOEXEC == 0 {
 		sa = makeInheritSa()
-	***REMOVED***
+	}
 	var createmode uint32
-	switch ***REMOVED***
+	switch {
 	case mode&(O_CREAT|O_EXCL) == (O_CREAT | O_EXCL):
 		createmode = CREATE_NEW
 	case mode&(O_CREAT|O_TRUNC) == (O_CREAT | O_TRUNC):
@@ -267,74 +267,74 @@ func Open(path string, mode int, perm uint32) (fd Handle, err error) ***REMOVED*
 		createmode = TRUNCATE_EXISTING
 	default:
 		createmode = OPEN_EXISTING
-	***REMOVED***
+	}
 	h, e := CreateFile(pathp, access, sharemode, sa, createmode, FILE_ATTRIBUTE_NORMAL, 0)
 	return h, e
-***REMOVED***
+}
 
-func Read(fd Handle, p []byte) (n int, err error) ***REMOVED***
+func Read(fd Handle, p []byte) (n int, err error) {
 	var done uint32
 	e := ReadFile(fd, p, &done, nil)
-	if e != nil ***REMOVED***
-		if e == ERROR_BROKEN_PIPE ***REMOVED***
+	if e != nil {
+		if e == ERROR_BROKEN_PIPE {
 			// NOTE(brainman): work around ERROR_BROKEN_PIPE is returned on reading EOF from stdin
 			return 0, nil
-		***REMOVED***
+		}
 		return 0, e
-	***REMOVED***
-	if raceenabled ***REMOVED***
-		if done > 0 ***REMOVED***
+	}
+	if raceenabled {
+		if done > 0 {
 			raceWriteRange(unsafe.Pointer(&p[0]), int(done))
-		***REMOVED***
+		}
 		raceAcquire(unsafe.Pointer(&ioSync))
-	***REMOVED***
+	}
 	return int(done), nil
-***REMOVED***
+}
 
-func Write(fd Handle, p []byte) (n int, err error) ***REMOVED***
-	if raceenabled ***REMOVED***
+func Write(fd Handle, p []byte) (n int, err error) {
+	if raceenabled {
 		raceReleaseMerge(unsafe.Pointer(&ioSync))
-	***REMOVED***
+	}
 	var done uint32
 	e := WriteFile(fd, p, &done, nil)
-	if e != nil ***REMOVED***
+	if e != nil {
 		return 0, e
-	***REMOVED***
-	if raceenabled && done > 0 ***REMOVED***
+	}
+	if raceenabled && done > 0 {
 		raceReadRange(unsafe.Pointer(&p[0]), int(done))
-	***REMOVED***
+	}
 	return int(done), nil
-***REMOVED***
+}
 
 var ioSync int64
 
-func Seek(fd Handle, offset int64, whence int) (newoffset int64, err error) ***REMOVED***
+func Seek(fd Handle, offset int64, whence int) (newoffset int64, err error) {
 	var w uint32
-	switch whence ***REMOVED***
+	switch whence {
 	case 0:
 		w = FILE_BEGIN
 	case 1:
 		w = FILE_CURRENT
 	case 2:
 		w = FILE_END
-	***REMOVED***
+	}
 	hi := int32(offset >> 32)
 	lo := int32(offset)
 	// use GetFileType to check pipe, pipe can't do seek
 	ft, _ := GetFileType(fd)
-	if ft == FILE_TYPE_PIPE ***REMOVED***
+	if ft == FILE_TYPE_PIPE {
 		return 0, syscall.EPIPE
-	***REMOVED***
+	}
 	rlo, e := SetFilePointer(fd, lo, &hi, w)
-	if e != nil ***REMOVED***
+	if e != nil {
 		return 0, e
-	***REMOVED***
+	}
 	return int64(hi)<<32 + int64(rlo), nil
-***REMOVED***
+}
 
-func Close(fd Handle) (err error) ***REMOVED***
+func Close(fd Handle) (err error) {
 	return CloseHandle(fd)
-***REMOVED***
+}
 
 var (
 	Stdin  = getStdHandle(STD_INPUT_HANDLE)
@@ -342,190 +342,190 @@ var (
 	Stderr = getStdHandle(STD_ERROR_HANDLE)
 )
 
-func getStdHandle(stdhandle uint32) (fd Handle) ***REMOVED***
+func getStdHandle(stdhandle uint32) (fd Handle) {
 	r, _ := GetStdHandle(stdhandle)
 	CloseOnExec(r)
 	return r
-***REMOVED***
+}
 
 const ImplementsGetwd = true
 
-func Getwd() (wd string, err error) ***REMOVED***
+func Getwd() (wd string, err error) {
 	b := make([]uint16, 300)
 	n, e := GetCurrentDirectory(uint32(len(b)), &b[0])
-	if e != nil ***REMOVED***
+	if e != nil {
 		return "", e
-	***REMOVED***
+	}
 	return string(utf16.Decode(b[0:n])), nil
-***REMOVED***
+}
 
-func Chdir(path string) (err error) ***REMOVED***
+func Chdir(path string) (err error) {
 	pathp, err := UTF16PtrFromString(path)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return SetCurrentDirectory(pathp)
-***REMOVED***
+}
 
-func Mkdir(path string, mode uint32) (err error) ***REMOVED***
+func Mkdir(path string, mode uint32) (err error) {
 	pathp, err := UTF16PtrFromString(path)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return CreateDirectory(pathp, nil)
-***REMOVED***
+}
 
-func Rmdir(path string) (err error) ***REMOVED***
+func Rmdir(path string) (err error) {
 	pathp, err := UTF16PtrFromString(path)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return RemoveDirectory(pathp)
-***REMOVED***
+}
 
-func Unlink(path string) (err error) ***REMOVED***
+func Unlink(path string) (err error) {
 	pathp, err := UTF16PtrFromString(path)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return DeleteFile(pathp)
-***REMOVED***
+}
 
-func Rename(oldpath, newpath string) (err error) ***REMOVED***
+func Rename(oldpath, newpath string) (err error) {
 	from, err := UTF16PtrFromString(oldpath)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	to, err := UTF16PtrFromString(newpath)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return MoveFileEx(from, to, MOVEFILE_REPLACE_EXISTING)
-***REMOVED***
+}
 
-func ComputerName() (name string, err error) ***REMOVED***
+func ComputerName() (name string, err error) {
 	var n uint32 = MAX_COMPUTERNAME_LENGTH + 1
 	b := make([]uint16, n)
 	e := GetComputerName(&b[0], &n)
-	if e != nil ***REMOVED***
+	if e != nil {
 		return "", e
-	***REMOVED***
+	}
 	return string(utf16.Decode(b[0:n])), nil
-***REMOVED***
+}
 
-func Ftruncate(fd Handle, length int64) (err error) ***REMOVED***
+func Ftruncate(fd Handle, length int64) (err error) {
 	curoffset, e := Seek(fd, 0, 1)
-	if e != nil ***REMOVED***
+	if e != nil {
 		return e
-	***REMOVED***
+	}
 	defer Seek(fd, curoffset, 0)
 	_, e = Seek(fd, length, 0)
-	if e != nil ***REMOVED***
+	if e != nil {
 		return e
-	***REMOVED***
+	}
 	e = SetEndOfFile(fd)
-	if e != nil ***REMOVED***
+	if e != nil {
 		return e
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func Gettimeofday(tv *Timeval) (err error) ***REMOVED***
+func Gettimeofday(tv *Timeval) (err error) {
 	var ft Filetime
 	GetSystemTimeAsFileTime(&ft)
 	*tv = NsecToTimeval(ft.Nanoseconds())
 	return nil
-***REMOVED***
+}
 
-func Pipe(p []Handle) (err error) ***REMOVED***
-	if len(p) != 2 ***REMOVED***
+func Pipe(p []Handle) (err error) {
+	if len(p) != 2 {
 		return syscall.EINVAL
-	***REMOVED***
+	}
 	var r, w Handle
 	e := CreatePipe(&r, &w, makeInheritSa(), 0)
-	if e != nil ***REMOVED***
+	if e != nil {
 		return e
-	***REMOVED***
+	}
 	p[0] = r
 	p[1] = w
 	return nil
-***REMOVED***
+}
 
-func Utimes(path string, tv []Timeval) (err error) ***REMOVED***
-	if len(tv) != 2 ***REMOVED***
+func Utimes(path string, tv []Timeval) (err error) {
+	if len(tv) != 2 {
 		return syscall.EINVAL
-	***REMOVED***
+	}
 	pathp, e := UTF16PtrFromString(path)
-	if e != nil ***REMOVED***
+	if e != nil {
 		return e
-	***REMOVED***
+	}
 	h, e := CreateFile(pathp,
 		FILE_WRITE_ATTRIBUTES, FILE_SHARE_WRITE, nil,
 		OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, 0)
-	if e != nil ***REMOVED***
+	if e != nil {
 		return e
-	***REMOVED***
+	}
 	defer Close(h)
 	a := NsecToFiletime(tv[0].Nanoseconds())
 	w := NsecToFiletime(tv[1].Nanoseconds())
 	return SetFileTime(h, nil, &a, &w)
-***REMOVED***
+}
 
-func UtimesNano(path string, ts []Timespec) (err error) ***REMOVED***
-	if len(ts) != 2 ***REMOVED***
+func UtimesNano(path string, ts []Timespec) (err error) {
+	if len(ts) != 2 {
 		return syscall.EINVAL
-	***REMOVED***
+	}
 	pathp, e := UTF16PtrFromString(path)
-	if e != nil ***REMOVED***
+	if e != nil {
 		return e
-	***REMOVED***
+	}
 	h, e := CreateFile(pathp,
 		FILE_WRITE_ATTRIBUTES, FILE_SHARE_WRITE, nil,
 		OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, 0)
-	if e != nil ***REMOVED***
+	if e != nil {
 		return e
-	***REMOVED***
+	}
 	defer Close(h)
 	a := NsecToFiletime(TimespecToNsec(ts[0]))
 	w := NsecToFiletime(TimespecToNsec(ts[1]))
 	return SetFileTime(h, nil, &a, &w)
-***REMOVED***
+}
 
-func Fsync(fd Handle) (err error) ***REMOVED***
+func Fsync(fd Handle) (err error) {
 	return FlushFileBuffers(fd)
-***REMOVED***
+}
 
-func Chmod(path string, mode uint32) (err error) ***REMOVED***
-	if mode == 0 ***REMOVED***
+func Chmod(path string, mode uint32) (err error) {
+	if mode == 0 {
 		return syscall.EINVAL
-	***REMOVED***
+	}
 	p, e := UTF16PtrFromString(path)
-	if e != nil ***REMOVED***
+	if e != nil {
 		return e
-	***REMOVED***
+	}
 	attrs, e := GetFileAttributes(p)
-	if e != nil ***REMOVED***
+	if e != nil {
 		return e
-	***REMOVED***
-	if mode&S_IWRITE != 0 ***REMOVED***
+	}
+	if mode&S_IWRITE != 0 {
 		attrs &^= FILE_ATTRIBUTE_READONLY
-	***REMOVED*** else ***REMOVED***
+	} else {
 		attrs |= FILE_ATTRIBUTE_READONLY
-	***REMOVED***
+	}
 	return SetFileAttributes(p, attrs)
-***REMOVED***
+}
 
-func LoadGetSystemTimePreciseAsFileTime() error ***REMOVED***
+func LoadGetSystemTimePreciseAsFileTime() error {
 	return procGetSystemTimePreciseAsFileTime.Find()
-***REMOVED***
+}
 
-func LoadCancelIoEx() error ***REMOVED***
+func LoadCancelIoEx() error {
 	return procCancelIoEx.Find()
-***REMOVED***
+}
 
-func LoadSetFileCompletionNotificationModes() error ***REMOVED***
+func LoadSetFileCompletionNotificationModes() error {
 	return procSetFileCompletionNotificationModes.Find()
-***REMOVED***
+}
 
 // net api calls
 
@@ -571,88 +571,88 @@ const socket_error = uintptr(^uint32(0))
 // creation of IPv6 sockets to return EAFNOSUPPORT.
 var SocketDisableIPv6 bool
 
-type RawSockaddrInet4 struct ***REMOVED***
+type RawSockaddrInet4 struct {
 	Family uint16
 	Port   uint16
 	Addr   [4]byte /* in_addr */
 	Zero   [8]uint8
-***REMOVED***
+}
 
-type RawSockaddrInet6 struct ***REMOVED***
+type RawSockaddrInet6 struct {
 	Family   uint16
 	Port     uint16
 	Flowinfo uint32
 	Addr     [16]byte /* in6_addr */
 	Scope_id uint32
-***REMOVED***
+}
 
-type RawSockaddr struct ***REMOVED***
+type RawSockaddr struct {
 	Family uint16
 	Data   [14]int8
-***REMOVED***
+}
 
-type RawSockaddrAny struct ***REMOVED***
+type RawSockaddrAny struct {
 	Addr RawSockaddr
 	Pad  [96]int8
-***REMOVED***
+}
 
-type Sockaddr interface ***REMOVED***
+type Sockaddr interface {
 	sockaddr() (ptr unsafe.Pointer, len int32, err error) // lowercase; only we can define Sockaddrs
-***REMOVED***
+}
 
-type SockaddrInet4 struct ***REMOVED***
+type SockaddrInet4 struct {
 	Port int
 	Addr [4]byte
 	raw  RawSockaddrInet4
-***REMOVED***
+}
 
-func (sa *SockaddrInet4) sockaddr() (unsafe.Pointer, int32, error) ***REMOVED***
-	if sa.Port < 0 || sa.Port > 0xFFFF ***REMOVED***
+func (sa *SockaddrInet4) sockaddr() (unsafe.Pointer, int32, error) {
+	if sa.Port < 0 || sa.Port > 0xFFFF {
 		return nil, 0, syscall.EINVAL
-	***REMOVED***
+	}
 	sa.raw.Family = AF_INET
 	p := (*[2]byte)(unsafe.Pointer(&sa.raw.Port))
 	p[0] = byte(sa.Port >> 8)
 	p[1] = byte(sa.Port)
-	for i := 0; i < len(sa.Addr); i++ ***REMOVED***
+	for i := 0; i < len(sa.Addr); i++ {
 		sa.raw.Addr[i] = sa.Addr[i]
-	***REMOVED***
+	}
 	return unsafe.Pointer(&sa.raw), int32(unsafe.Sizeof(sa.raw)), nil
-***REMOVED***
+}
 
-type SockaddrInet6 struct ***REMOVED***
+type SockaddrInet6 struct {
 	Port   int
 	ZoneId uint32
 	Addr   [16]byte
 	raw    RawSockaddrInet6
-***REMOVED***
+}
 
-func (sa *SockaddrInet6) sockaddr() (unsafe.Pointer, int32, error) ***REMOVED***
-	if sa.Port < 0 || sa.Port > 0xFFFF ***REMOVED***
+func (sa *SockaddrInet6) sockaddr() (unsafe.Pointer, int32, error) {
+	if sa.Port < 0 || sa.Port > 0xFFFF {
 		return nil, 0, syscall.EINVAL
-	***REMOVED***
+	}
 	sa.raw.Family = AF_INET6
 	p := (*[2]byte)(unsafe.Pointer(&sa.raw.Port))
 	p[0] = byte(sa.Port >> 8)
 	p[1] = byte(sa.Port)
 	sa.raw.Scope_id = sa.ZoneId
-	for i := 0; i < len(sa.Addr); i++ ***REMOVED***
+	for i := 0; i < len(sa.Addr); i++ {
 		sa.raw.Addr[i] = sa.Addr[i]
-	***REMOVED***
+	}
 	return unsafe.Pointer(&sa.raw), int32(unsafe.Sizeof(sa.raw)), nil
-***REMOVED***
+}
 
-type SockaddrUnix struct ***REMOVED***
+type SockaddrUnix struct {
 	Name string
-***REMOVED***
+}
 
-func (sa *SockaddrUnix) sockaddr() (unsafe.Pointer, int32, error) ***REMOVED***
+func (sa *SockaddrUnix) sockaddr() (unsafe.Pointer, int32, error) {
 	// TODO(brainman): implement SockaddrUnix.sockaddr()
 	return nil, 0, syscall.EWINDOWS
-***REMOVED***
+}
 
-func (rsa *RawSockaddrAny) Sockaddr() (Sockaddr, error) ***REMOVED***
-	switch rsa.Addr.Family ***REMOVED***
+func (rsa *RawSockaddrAny) Sockaddr() (Sockaddr, error) {
+	switch rsa.Addr.Family {
 	case AF_UNIX:
 		return nil, syscall.EWINDOWS
 
@@ -661,9 +661,9 @@ func (rsa *RawSockaddrAny) Sockaddr() (Sockaddr, error) ***REMOVED***
 		sa := new(SockaddrInet4)
 		p := (*[2]byte)(unsafe.Pointer(&pp.Port))
 		sa.Port = int(p[0])<<8 + int(p[1])
-		for i := 0; i < len(sa.Addr); i++ ***REMOVED***
+		for i := 0; i < len(sa.Addr); i++ {
 			sa.Addr[i] = pp.Addr[i]
-		***REMOVED***
+		}
 		return sa, nil
 
 	case AF_INET6:
@@ -672,93 +672,93 @@ func (rsa *RawSockaddrAny) Sockaddr() (Sockaddr, error) ***REMOVED***
 		p := (*[2]byte)(unsafe.Pointer(&pp.Port))
 		sa.Port = int(p[0])<<8 + int(p[1])
 		sa.ZoneId = pp.Scope_id
-		for i := 0; i < len(sa.Addr); i++ ***REMOVED***
+		for i := 0; i < len(sa.Addr); i++ {
 			sa.Addr[i] = pp.Addr[i]
-		***REMOVED***
+		}
 		return sa, nil
-	***REMOVED***
+	}
 	return nil, syscall.EAFNOSUPPORT
-***REMOVED***
+}
 
-func Socket(domain, typ, proto int) (fd Handle, err error) ***REMOVED***
-	if domain == AF_INET6 && SocketDisableIPv6 ***REMOVED***
+func Socket(domain, typ, proto int) (fd Handle, err error) {
+	if domain == AF_INET6 && SocketDisableIPv6 {
 		return InvalidHandle, syscall.EAFNOSUPPORT
-	***REMOVED***
+	}
 	return socket(int32(domain), int32(typ), int32(proto))
-***REMOVED***
+}
 
-func SetsockoptInt(fd Handle, level, opt int, value int) (err error) ***REMOVED***
+func SetsockoptInt(fd Handle, level, opt int, value int) (err error) {
 	v := int32(value)
 	return Setsockopt(fd, int32(level), int32(opt), (*byte)(unsafe.Pointer(&v)), int32(unsafe.Sizeof(v)))
-***REMOVED***
+}
 
-func Bind(fd Handle, sa Sockaddr) (err error) ***REMOVED***
+func Bind(fd Handle, sa Sockaddr) (err error) {
 	ptr, n, err := sa.sockaddr()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return bind(fd, ptr, n)
-***REMOVED***
+}
 
-func Connect(fd Handle, sa Sockaddr) (err error) ***REMOVED***
+func Connect(fd Handle, sa Sockaddr) (err error) {
 	ptr, n, err := sa.sockaddr()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return connect(fd, ptr, n)
-***REMOVED***
+}
 
-func Getsockname(fd Handle) (sa Sockaddr, err error) ***REMOVED***
+func Getsockname(fd Handle) (sa Sockaddr, err error) {
 	var rsa RawSockaddrAny
 	l := int32(unsafe.Sizeof(rsa))
-	if err = getsockname(fd, &rsa, &l); err != nil ***REMOVED***
+	if err = getsockname(fd, &rsa, &l); err != nil {
 		return
-	***REMOVED***
+	}
 	return rsa.Sockaddr()
-***REMOVED***
+}
 
-func Getpeername(fd Handle) (sa Sockaddr, err error) ***REMOVED***
+func Getpeername(fd Handle) (sa Sockaddr, err error) {
 	var rsa RawSockaddrAny
 	l := int32(unsafe.Sizeof(rsa))
-	if err = getpeername(fd, &rsa, &l); err != nil ***REMOVED***
+	if err = getpeername(fd, &rsa, &l); err != nil {
 		return
-	***REMOVED***
+	}
 	return rsa.Sockaddr()
-***REMOVED***
+}
 
-func Listen(s Handle, n int) (err error) ***REMOVED***
+func Listen(s Handle, n int) (err error) {
 	return listen(s, int32(n))
-***REMOVED***
+}
 
-func Shutdown(fd Handle, how int) (err error) ***REMOVED***
+func Shutdown(fd Handle, how int) (err error) {
 	return shutdown(fd, int32(how))
-***REMOVED***
+}
 
-func WSASendto(s Handle, bufs *WSABuf, bufcnt uint32, sent *uint32, flags uint32, to Sockaddr, overlapped *Overlapped, croutine *byte) (err error) ***REMOVED***
+func WSASendto(s Handle, bufs *WSABuf, bufcnt uint32, sent *uint32, flags uint32, to Sockaddr, overlapped *Overlapped, croutine *byte) (err error) {
 	rsa, l, err := to.sockaddr()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return WSASendTo(s, bufs, bufcnt, sent, flags, (*RawSockaddrAny)(unsafe.Pointer(rsa)), l, overlapped, croutine)
-***REMOVED***
+}
 
-func LoadGetAddrInfo() error ***REMOVED***
+func LoadGetAddrInfo() error {
 	return procGetAddrInfoW.Find()
-***REMOVED***
+}
 
-var connectExFunc struct ***REMOVED***
+var connectExFunc struct {
 	once sync.Once
 	addr uintptr
 	err  error
-***REMOVED***
+}
 
-func LoadConnectEx() error ***REMOVED***
-	connectExFunc.once.Do(func() ***REMOVED***
+func LoadConnectEx() error {
+	connectExFunc.once.Do(func() {
 		var s Handle
 		s, connectExFunc.err = Socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)
-		if connectExFunc.err != nil ***REMOVED***
+		if connectExFunc.err != nil {
 			return
-		***REMOVED***
+		}
 		defer CloseHandle(s)
 		var n uint32
 		connectExFunc.err = WSAIoctl(s,
@@ -768,87 +768,87 @@ func LoadConnectEx() error ***REMOVED***
 			(*byte)(unsafe.Pointer(&connectExFunc.addr)),
 			uint32(unsafe.Sizeof(connectExFunc.addr)),
 			&n, nil, 0)
-	***REMOVED***)
+	})
 	return connectExFunc.err
-***REMOVED***
+}
 
-func connectEx(s Handle, name unsafe.Pointer, namelen int32, sendBuf *byte, sendDataLen uint32, bytesSent *uint32, overlapped *Overlapped) (err error) ***REMOVED***
+func connectEx(s Handle, name unsafe.Pointer, namelen int32, sendBuf *byte, sendDataLen uint32, bytesSent *uint32, overlapped *Overlapped) (err error) {
 	r1, _, e1 := syscall.Syscall9(connectExFunc.addr, 7, uintptr(s), uintptr(name), uintptr(namelen), uintptr(unsafe.Pointer(sendBuf)), uintptr(sendDataLen), uintptr(unsafe.Pointer(bytesSent)), uintptr(unsafe.Pointer(overlapped)), 0, 0)
-	if r1 == 0 ***REMOVED***
-		if e1 != 0 ***REMOVED***
+	if r1 == 0 {
+		if e1 != 0 {
 			err = error(e1)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			err = syscall.EINVAL
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}
 
-func ConnectEx(fd Handle, sa Sockaddr, sendBuf *byte, sendDataLen uint32, bytesSent *uint32, overlapped *Overlapped) error ***REMOVED***
+func ConnectEx(fd Handle, sa Sockaddr, sendBuf *byte, sendDataLen uint32, bytesSent *uint32, overlapped *Overlapped) error {
 	err := LoadConnectEx()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return errorspkg.New("failed to find ConnectEx: " + err.Error())
-	***REMOVED***
+	}
 	ptr, n, err := sa.sockaddr()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return connectEx(fd, ptr, n, sendBuf, sendDataLen, bytesSent, overlapped)
-***REMOVED***
+}
 
 // Invented structures to support what package os expects.
-type Rusage struct ***REMOVED***
+type Rusage struct {
 	CreationTime Filetime
 	ExitTime     Filetime
 	KernelTime   Filetime
 	UserTime     Filetime
-***REMOVED***
+}
 
-type WaitStatus struct ***REMOVED***
+type WaitStatus struct {
 	ExitCode uint32
-***REMOVED***
+}
 
-func (w WaitStatus) Exited() bool ***REMOVED*** return true ***REMOVED***
+func (w WaitStatus) Exited() bool { return true }
 
-func (w WaitStatus) ExitStatus() int ***REMOVED*** return int(w.ExitCode) ***REMOVED***
+func (w WaitStatus) ExitStatus() int { return int(w.ExitCode) }
 
-func (w WaitStatus) Signal() Signal ***REMOVED*** return -1 ***REMOVED***
+func (w WaitStatus) Signal() Signal { return -1 }
 
-func (w WaitStatus) CoreDump() bool ***REMOVED*** return false ***REMOVED***
+func (w WaitStatus) CoreDump() bool { return false }
 
-func (w WaitStatus) Stopped() bool ***REMOVED*** return false ***REMOVED***
+func (w WaitStatus) Stopped() bool { return false }
 
-func (w WaitStatus) Continued() bool ***REMOVED*** return false ***REMOVED***
+func (w WaitStatus) Continued() bool { return false }
 
-func (w WaitStatus) StopSignal() Signal ***REMOVED*** return -1 ***REMOVED***
+func (w WaitStatus) StopSignal() Signal { return -1 }
 
-func (w WaitStatus) Signaled() bool ***REMOVED*** return false ***REMOVED***
+func (w WaitStatus) Signaled() bool { return false }
 
-func (w WaitStatus) TrapCause() int ***REMOVED*** return -1 ***REMOVED***
+func (w WaitStatus) TrapCause() int { return -1 }
 
 // Timespec is an invented structure on Windows, but here for
 // consistency with the corresponding package for other operating systems.
-type Timespec struct ***REMOVED***
+type Timespec struct {
 	Sec  int64
 	Nsec int64
-***REMOVED***
+}
 
-func TimespecToNsec(ts Timespec) int64 ***REMOVED*** return int64(ts.Sec)*1e9 + int64(ts.Nsec) ***REMOVED***
+func TimespecToNsec(ts Timespec) int64 { return int64(ts.Sec)*1e9 + int64(ts.Nsec) }
 
-func NsecToTimespec(nsec int64) (ts Timespec) ***REMOVED***
+func NsecToTimespec(nsec int64) (ts Timespec) {
 	ts.Sec = nsec / 1e9
 	ts.Nsec = nsec % 1e9
 	return
-***REMOVED***
+}
 
 // TODO(brainman): fix all needed for net
 
-func Accept(fd Handle) (nfd Handle, sa Sockaddr, err error) ***REMOVED*** return 0, nil, syscall.EWINDOWS ***REMOVED***
-func Recvfrom(fd Handle, p []byte, flags int) (n int, from Sockaddr, err error) ***REMOVED***
+func Accept(fd Handle) (nfd Handle, sa Sockaddr, err error) { return 0, nil, syscall.EWINDOWS }
+func Recvfrom(fd Handle, p []byte, flags int) (n int, from Sockaddr, err error) {
 	return 0, nil, syscall.EWINDOWS
-***REMOVED***
-func Sendto(fd Handle, p []byte, flags int, to Sockaddr) (err error)       ***REMOVED*** return syscall.EWINDOWS ***REMOVED***
-func SetsockoptTimeval(fd Handle, level, opt int, tv *Timeval) (err error) ***REMOVED*** return syscall.EWINDOWS ***REMOVED***
+}
+func Sendto(fd Handle, p []byte, flags int, to Sockaddr) (err error)       { return syscall.EWINDOWS }
+func SetsockoptTimeval(fd Handle, level, opt int, tv *Timeval) (err error) { return syscall.EWINDOWS }
 
 // The Linger struct is wrong but we only noticed after Go 1.
 // sysLinger is the real system call structure.
@@ -857,46 +857,46 @@ func SetsockoptTimeval(fd Handle, level, opt int, tv *Timeval) (err error) ***RE
 // with Setsockopt and Getsockopt.
 // Use SetsockoptLinger instead.
 
-type Linger struct ***REMOVED***
+type Linger struct {
 	Onoff  int32
 	Linger int32
-***REMOVED***
+}
 
-type sysLinger struct ***REMOVED***
+type sysLinger struct {
 	Onoff  uint16
 	Linger uint16
-***REMOVED***
+}
 
-type IPMreq struct ***REMOVED***
+type IPMreq struct {
 	Multiaddr [4]byte /* in_addr */
 	Interface [4]byte /* in_addr */
-***REMOVED***
+}
 
-type IPv6Mreq struct ***REMOVED***
+type IPv6Mreq struct {
 	Multiaddr [16]byte /* in6_addr */
 	Interface uint32
-***REMOVED***
+}
 
-func GetsockoptInt(fd Handle, level, opt int) (int, error) ***REMOVED*** return -1, syscall.EWINDOWS ***REMOVED***
+func GetsockoptInt(fd Handle, level, opt int) (int, error) { return -1, syscall.EWINDOWS }
 
-func SetsockoptLinger(fd Handle, level, opt int, l *Linger) (err error) ***REMOVED***
-	sys := sysLinger***REMOVED***Onoff: uint16(l.Onoff), Linger: uint16(l.Linger)***REMOVED***
+func SetsockoptLinger(fd Handle, level, opt int, l *Linger) (err error) {
+	sys := sysLinger{Onoff: uint16(l.Onoff), Linger: uint16(l.Linger)}
 	return Setsockopt(fd, int32(level), int32(opt), (*byte)(unsafe.Pointer(&sys)), int32(unsafe.Sizeof(sys)))
-***REMOVED***
+}
 
-func SetsockoptInet4Addr(fd Handle, level, opt int, value [4]byte) (err error) ***REMOVED***
+func SetsockoptInet4Addr(fd Handle, level, opt int, value [4]byte) (err error) {
 	return Setsockopt(fd, int32(level), int32(opt), (*byte)(unsafe.Pointer(&value[0])), 4)
-***REMOVED***
-func SetsockoptIPMreq(fd Handle, level, opt int, mreq *IPMreq) (err error) ***REMOVED***
+}
+func SetsockoptIPMreq(fd Handle, level, opt int, mreq *IPMreq) (err error) {
 	return Setsockopt(fd, int32(level), int32(opt), (*byte)(unsafe.Pointer(mreq)), int32(unsafe.Sizeof(*mreq)))
-***REMOVED***
-func SetsockoptIPv6Mreq(fd Handle, level, opt int, mreq *IPv6Mreq) (err error) ***REMOVED***
+}
+func SetsockoptIPv6Mreq(fd Handle, level, opt int, mreq *IPv6Mreq) (err error) {
 	return syscall.EWINDOWS
-***REMOVED***
+}
 
-func Getpid() (pid int) ***REMOVED*** return int(getCurrentProcessId()) ***REMOVED***
+func Getpid() (pid int) { return int(getCurrentProcessId()) }
 
-func FindFirstFile(name *uint16, data *Win32finddata) (handle Handle, err error) ***REMOVED***
+func FindFirstFile(name *uint16, data *Win32finddata) (handle Handle, err error) {
 	// NOTE(rsc): The Win32finddata struct is wrong for the system call:
 	// the two paths are each one uint16 short. Use the correct struct,
 	// a win32finddata1, and then copy the results out.
@@ -907,104 +907,104 @@ func FindFirstFile(name *uint16, data *Win32finddata) (handle Handle, err error)
 	// adjusting the fields in the result directly.
 	var data1 win32finddata1
 	handle, err = findFirstFile1(name, &data1)
-	if err == nil ***REMOVED***
+	if err == nil {
 		copyFindData(data, &data1)
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func FindNextFile(handle Handle, data *Win32finddata) (err error) ***REMOVED***
+func FindNextFile(handle Handle, data *Win32finddata) (err error) {
 	var data1 win32finddata1
 	err = findNextFile1(handle, &data1)
-	if err == nil ***REMOVED***
+	if err == nil {
 		copyFindData(data, &data1)
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func getProcessEntry(pid int) (*ProcessEntry32, error) ***REMOVED***
+func getProcessEntry(pid int) (*ProcessEntry32, error) {
 	snapshot, err := CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	defer CloseHandle(snapshot)
 	var procEntry ProcessEntry32
 	procEntry.Size = uint32(unsafe.Sizeof(procEntry))
-	if err = Process32First(snapshot, &procEntry); err != nil ***REMOVED***
+	if err = Process32First(snapshot, &procEntry); err != nil {
 		return nil, err
-	***REMOVED***
-	for ***REMOVED***
-		if procEntry.ProcessID == uint32(pid) ***REMOVED***
+	}
+	for {
+		if procEntry.ProcessID == uint32(pid) {
 			return &procEntry, nil
-		***REMOVED***
+		}
 		err = Process32Next(snapshot, &procEntry)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func Getppid() (ppid int) ***REMOVED***
+func Getppid() (ppid int) {
 	pe, err := getProcessEntry(Getpid())
-	if err != nil ***REMOVED***
+	if err != nil {
 		return -1
-	***REMOVED***
+	}
 	return int(pe.ParentProcessID)
-***REMOVED***
+}
 
 // TODO(brainman): fix all needed for os
-func Fchdir(fd Handle) (err error)             ***REMOVED*** return syscall.EWINDOWS ***REMOVED***
-func Link(oldpath, newpath string) (err error) ***REMOVED*** return syscall.EWINDOWS ***REMOVED***
-func Symlink(path, link string) (err error)    ***REMOVED*** return syscall.EWINDOWS ***REMOVED***
+func Fchdir(fd Handle) (err error)             { return syscall.EWINDOWS }
+func Link(oldpath, newpath string) (err error) { return syscall.EWINDOWS }
+func Symlink(path, link string) (err error)    { return syscall.EWINDOWS }
 
-func Fchmod(fd Handle, mode uint32) (err error)        ***REMOVED*** return syscall.EWINDOWS ***REMOVED***
-func Chown(path string, uid int, gid int) (err error)  ***REMOVED*** return syscall.EWINDOWS ***REMOVED***
-func Lchown(path string, uid int, gid int) (err error) ***REMOVED*** return syscall.EWINDOWS ***REMOVED***
-func Fchown(fd Handle, uid int, gid int) (err error)   ***REMOVED*** return syscall.EWINDOWS ***REMOVED***
+func Fchmod(fd Handle, mode uint32) (err error)        { return syscall.EWINDOWS }
+func Chown(path string, uid int, gid int) (err error)  { return syscall.EWINDOWS }
+func Lchown(path string, uid int, gid int) (err error) { return syscall.EWINDOWS }
+func Fchown(fd Handle, uid int, gid int) (err error)   { return syscall.EWINDOWS }
 
-func Getuid() (uid int)                  ***REMOVED*** return -1 ***REMOVED***
-func Geteuid() (euid int)                ***REMOVED*** return -1 ***REMOVED***
-func Getgid() (gid int)                  ***REMOVED*** return -1 ***REMOVED***
-func Getegid() (egid int)                ***REMOVED*** return -1 ***REMOVED***
-func Getgroups() (gids []int, err error) ***REMOVED*** return nil, syscall.EWINDOWS ***REMOVED***
+func Getuid() (uid int)                  { return -1 }
+func Geteuid() (euid int)                { return -1 }
+func Getgid() (gid int)                  { return -1 }
+func Getegid() (egid int)                { return -1 }
+func Getgroups() (gids []int, err error) { return nil, syscall.EWINDOWS }
 
 type Signal int
 
-func (s Signal) Signal() ***REMOVED******REMOVED***
+func (s Signal) Signal() {}
 
-func (s Signal) String() string ***REMOVED***
-	if 0 <= s && int(s) < len(signals) ***REMOVED***
+func (s Signal) String() string {
+	if 0 <= s && int(s) < len(signals) {
 		str := signals[s]
-		if str != "" ***REMOVED***
+		if str != "" {
 			return str
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return "signal " + itoa(int(s))
-***REMOVED***
+}
 
-func LoadCreateSymbolicLink() error ***REMOVED***
+func LoadCreateSymbolicLink() error {
 	return procCreateSymbolicLinkW.Find()
-***REMOVED***
+}
 
 // Readlink returns the destination of the named symbolic link.
-func Readlink(path string, buf []byte) (n int, err error) ***REMOVED***
+func Readlink(path string, buf []byte) (n int, err error) {
 	fd, err := CreateFile(StringToUTF16Ptr(path), GENERIC_READ, 0, nil, OPEN_EXISTING,
 		FILE_FLAG_OPEN_REPARSE_POINT|FILE_FLAG_BACKUP_SEMANTICS, 0)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return -1, err
-	***REMOVED***
+	}
 	defer CloseHandle(fd)
 
 	rdbbuf := make([]byte, MAXIMUM_REPARSE_DATA_BUFFER_SIZE)
 	var bytesReturned uint32
 	err = DeviceIoControl(fd, FSCTL_GET_REPARSE_POINT, nil, 0, &rdbbuf[0], uint32(len(rdbbuf)), &bytesReturned, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return -1, err
-	***REMOVED***
+	}
 
 	rdb := (*reparseDataBuffer)(unsafe.Pointer(&rdbbuf[0]))
 	var s string
-	switch rdb.ReparseTag ***REMOVED***
+	switch rdb.ReparseTag {
 	case IO_REPARSE_TAG_SYMLINK:
 		data := (*symbolicLinkReparseBuffer)(unsafe.Pointer(&rdb.reparseBuffer))
 		p := (*[0xffff]uint16)(unsafe.Pointer(&data.PathBuffer[0]))
@@ -1017,8 +1017,8 @@ func Readlink(path string, buf []byte) (n int, err error) ***REMOVED***
 		// the path is not a symlink or junction but another type of reparse
 		// point
 		return -1, syscall.ENOENT
-	***REMOVED***
+	}
 	n = copy(buf, []byte(s))
 
 	return n, nil
-***REMOVED***
+}

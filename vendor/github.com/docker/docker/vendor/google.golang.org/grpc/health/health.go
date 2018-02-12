@@ -12,41 +12,41 @@ import (
 )
 
 // Server implements `service Health`.
-type Server struct ***REMOVED***
+type Server struct {
 	mu sync.Mutex
 	// statusMap stores the serving status of the services this Server monitors.
 	statusMap map[string]healthpb.HealthCheckResponse_ServingStatus
-***REMOVED***
+}
 
 // NewServer returns a new Server.
-func NewServer() *Server ***REMOVED***
-	return &Server***REMOVED***
+func NewServer() *Server {
+	return &Server{
 		statusMap: make(map[string]healthpb.HealthCheckResponse_ServingStatus),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Check implements `service Health`.
-func (s *Server) Check(ctx context.Context, in *healthpb.HealthCheckRequest) (*healthpb.HealthCheckResponse, error) ***REMOVED***
+func (s *Server) Check(ctx context.Context, in *healthpb.HealthCheckRequest) (*healthpb.HealthCheckResponse, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if in.Service == "" ***REMOVED***
+	if in.Service == "" {
 		// check the server overall health status.
-		return &healthpb.HealthCheckResponse***REMOVED***
+		return &healthpb.HealthCheckResponse{
 			Status: healthpb.HealthCheckResponse_SERVING,
-		***REMOVED***, nil
-	***REMOVED***
-	if status, ok := s.statusMap[in.Service]; ok ***REMOVED***
-		return &healthpb.HealthCheckResponse***REMOVED***
+		}, nil
+	}
+	if status, ok := s.statusMap[in.Service]; ok {
+		return &healthpb.HealthCheckResponse{
 			Status: status,
-		***REMOVED***, nil
-	***REMOVED***
+		}, nil
+	}
 	return nil, grpc.Errorf(codes.NotFound, "unknown service")
-***REMOVED***
+}
 
 // SetServingStatus is called when need to reset the serving status of a service
 // or insert a new service entry into the statusMap.
-func (s *Server) SetServingStatus(service string, status healthpb.HealthCheckResponse_ServingStatus) ***REMOVED***
+func (s *Server) SetServingStatus(service string, status healthpb.HealthCheckResponse_ServingStatus) {
 	s.mu.Lock()
 	s.statusMap[service] = status
 	s.mu.Unlock()
-***REMOVED***
+}

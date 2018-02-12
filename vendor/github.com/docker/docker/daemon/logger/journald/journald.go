@@ -17,111 +17,111 @@ import (
 
 const name = "journald"
 
-type journald struct ***REMOVED***
+type journald struct {
 	mu      sync.Mutex
 	vars    map[string]string // additional variables and values to send to the journal along with the log message
 	readers readerList
 	closed  bool
-***REMOVED***
+}
 
-type readerList struct ***REMOVED***
+type readerList struct {
 	readers map[*logger.LogWatcher]*logger.LogWatcher
-***REMOVED***
+}
 
-func init() ***REMOVED***
-	if err := logger.RegisterLogDriver(name, New); err != nil ***REMOVED***
+func init() {
+	if err := logger.RegisterLogDriver(name, New); err != nil {
 		logrus.Fatal(err)
-	***REMOVED***
-	if err := logger.RegisterLogOptValidator(name, validateLogOpt); err != nil ***REMOVED***
+	}
+	if err := logger.RegisterLogOptValidator(name, validateLogOpt); err != nil {
 		logrus.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // sanitizeKeyMode returns the sanitized string so that it could be used in journald.
 // In journald log, there are special requirements for fields.
 // Fields must be composed of uppercase letters, numbers, and underscores, but must
 // not start with an underscore.
-func sanitizeKeyMod(s string) string ***REMOVED***
+func sanitizeKeyMod(s string) string {
 	n := ""
-	for _, v := range s ***REMOVED***
-		if 'a' <= v && v <= 'z' ***REMOVED***
+	for _, v := range s {
+		if 'a' <= v && v <= 'z' {
 			v = unicode.ToUpper(v)
-		***REMOVED*** else if ('Z' < v || v < 'A') && ('9' < v || v < '0') ***REMOVED***
+		} else if ('Z' < v || v < 'A') && ('9' < v || v < '0') {
 			v = '_'
-		***REMOVED***
+		}
 		// If (n == "" && v == '_'), then we will skip as this is the beginning with '_'
-		if !(n == "" && v == '_') ***REMOVED***
+		if !(n == "" && v == '_') {
 			n += string(v)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
+}
 
 // New creates a journald logger using the configuration passed in on
 // the context.
-func New(info logger.Info) (logger.Logger, error) ***REMOVED***
-	if !journal.Enabled() ***REMOVED***
+func New(info logger.Info) (logger.Logger, error) {
+	if !journal.Enabled() {
 		return nil, fmt.Errorf("journald is not enabled on this host")
-	***REMOVED***
+	}
 
 	// parse log tag
 	tag, err := loggerutils.ParseLogTag(info, loggerutils.DefaultTemplate)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	vars := map[string]string***REMOVED***
+	vars := map[string]string{
 		"CONTAINER_ID":      info.ContainerID[:12],
 		"CONTAINER_ID_FULL": info.ContainerID,
 		"CONTAINER_NAME":    info.Name(),
 		"CONTAINER_TAG":     tag,
 		"SYSLOG_IDENTIFIER": tag,
-	***REMOVED***
+	}
 	extraAttrs, err := info.ExtraAttributes(sanitizeKeyMod)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	for k, v := range extraAttrs ***REMOVED***
+	}
+	for k, v := range extraAttrs {
 		vars[k] = v
-	***REMOVED***
-	return &journald***REMOVED***vars: vars, readers: readerList***REMOVED***readers: make(map[*logger.LogWatcher]*logger.LogWatcher)***REMOVED******REMOVED***, nil
-***REMOVED***
+	}
+	return &journald{vars: vars, readers: readerList{readers: make(map[*logger.LogWatcher]*logger.LogWatcher)}}, nil
+}
 
 // We don't actually accept any options, but we have to supply a callback for
 // the factory to pass the (probably empty) configuration map to.
-func validateLogOpt(cfg map[string]string) error ***REMOVED***
-	for key := range cfg ***REMOVED***
-		switch key ***REMOVED***
+func validateLogOpt(cfg map[string]string) error {
+	for key := range cfg {
+		switch key {
 		case "labels":
 		case "env":
 		case "env-regex":
 		case "tag":
 		default:
 			return fmt.Errorf("unknown log opt '%s' for journald log driver", key)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func (s *journald) Log(msg *logger.Message) error ***REMOVED***
-	vars := map[string]string***REMOVED******REMOVED***
-	for k, v := range s.vars ***REMOVED***
+func (s *journald) Log(msg *logger.Message) error {
+	vars := map[string]string{}
+	for k, v := range s.vars {
 		vars[k] = v
-	***REMOVED***
-	if msg.Partial ***REMOVED***
+	}
+	if msg.Partial {
 		vars["CONTAINER_PARTIAL_MESSAGE"] = "true"
-	***REMOVED***
+	}
 
 	line := string(msg.Line)
 	source := msg.Source
 	logger.PutMessage(msg)
 
-	if source == "stderr" ***REMOVED***
+	if source == "stderr" {
 		return journal.Send(line, journal.PriErr, vars)
-	***REMOVED***
+	}
 	return journal.Send(line, journal.PriInfo, vars)
-***REMOVED***
+}
 
-func (s *journald) Name() string ***REMOVED***
+func (s *journald) Name() string {
 	return name
-***REMOVED***
+}

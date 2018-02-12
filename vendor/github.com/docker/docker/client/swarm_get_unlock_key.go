@@ -8,14 +8,14 @@ import (
 )
 
 // SwarmGetUnlockKey retrieves the swarm's unlock key.
-func (cli *Client) SwarmGetUnlockKey(ctx context.Context) (types.SwarmUnlockKeyResponse, error) ***REMOVED***
+func (cli *Client) SwarmGetUnlockKey(ctx context.Context) (types.SwarmUnlockKeyResponse, error) {
 	serverResp, err := cli.get(ctx, "/swarm/unlockkey", nil, nil)
-	if err != nil ***REMOVED***
-		return types.SwarmUnlockKeyResponse***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return types.SwarmUnlockKeyResponse{}, err
+	}
 
 	var response types.SwarmUnlockKeyResponse
 	err = json.NewDecoder(serverResp.body).Decode(&response)
 	ensureReaderClosed(serverResp)
 	return response, err
-***REMOVED***
+}

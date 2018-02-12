@@ -11,11 +11,11 @@ import (
 
 var unfuns [_maxtype]func(jsWriter, []byte, []byte) ([]byte, []byte, error)
 
-func init() ***REMOVED***
+func init() {
 
 	// NOTE(pmh): this is best expressed as a jump table,
 	// but gc doesn't do that yet. revisit post-go1.5.
-	unfuns = [_maxtype]func(jsWriter, []byte, []byte) ([]byte, []byte, error)***REMOVED***
+	unfuns = [_maxtype]func(jsWriter, []byte, []byte) ([]byte, []byte, error){
 		StrType:        rwStringBytes,
 		BinType:        rwBytesBytes,
 		MapType:        rwMapBytes,
@@ -30,334 +30,334 @@ func init() ***REMOVED***
 		Complex64Type:  rwExtensionBytes,
 		Complex128Type: rwExtensionBytes,
 		TimeType:       rwTimeBytes,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // UnmarshalAsJSON takes raw messagepack and writes
 // it as JSON to 'w'. If an error is returned, the
 // bytes not translated will also be returned. If
 // no errors are encountered, the length of the returned
 // slice will be zero.
-func UnmarshalAsJSON(w io.Writer, msg []byte) ([]byte, error) ***REMOVED***
+func UnmarshalAsJSON(w io.Writer, msg []byte) ([]byte, error) {
 	var (
 		scratch []byte
 		cast    bool
 		dst     jsWriter
 		err     error
 	)
-	if jsw, ok := w.(jsWriter); ok ***REMOVED***
+	if jsw, ok := w.(jsWriter); ok {
 		dst = jsw
 		cast = true
-	***REMOVED*** else ***REMOVED***
+	} else {
 		dst = bufio.NewWriterSize(w, 512)
-	***REMOVED***
-	for len(msg) > 0 && err == nil ***REMOVED***
+	}
+	for len(msg) > 0 && err == nil {
 		msg, scratch, err = writeNext(dst, msg, scratch)
-	***REMOVED***
-	if !cast && err == nil ***REMOVED***
+	}
+	if !cast && err == nil {
 		err = dst.(*bufio.Writer).Flush()
-	***REMOVED***
+	}
 	return msg, err
-***REMOVED***
+}
 
-func writeNext(w jsWriter, msg []byte, scratch []byte) ([]byte, []byte, error) ***REMOVED***
-	if len(msg) < 1 ***REMOVED***
+func writeNext(w jsWriter, msg []byte, scratch []byte) ([]byte, []byte, error) {
+	if len(msg) < 1 {
 		return msg, scratch, ErrShortBytes
-	***REMOVED***
+	}
 	t := getType(msg[0])
-	if t == InvalidType ***REMOVED***
+	if t == InvalidType {
 		return msg, scratch, InvalidPrefixError(msg[0])
-	***REMOVED***
-	if t == ExtensionType ***REMOVED***
+	}
+	if t == ExtensionType {
 		et, err := peekExtension(msg)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, scratch, err
-		***REMOVED***
-		if et == TimeExtension ***REMOVED***
+		}
+		if et == TimeExtension {
 			t = TimeType
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return unfuns[t](w, msg, scratch)
-***REMOVED***
+}
 
-func rwArrayBytes(w jsWriter, msg []byte, scratch []byte) ([]byte, []byte, error) ***REMOVED***
+func rwArrayBytes(w jsWriter, msg []byte, scratch []byte) ([]byte, []byte, error) {
 	sz, msg, err := ReadArrayHeaderBytes(msg)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return msg, scratch, err
-	***REMOVED***
+	}
 	err = w.WriteByte('[')
-	if err != nil ***REMOVED***
+	if err != nil {
 		return msg, scratch, err
-	***REMOVED***
-	for i := uint32(0); i < sz; i++ ***REMOVED***
-		if i != 0 ***REMOVED***
+	}
+	for i := uint32(0); i < sz; i++ {
+		if i != 0 {
 			err = w.WriteByte(',')
-			if err != nil ***REMOVED***
+			if err != nil {
 				return msg, scratch, err
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		msg, scratch, err = writeNext(w, msg, scratch)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return msg, scratch, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	err = w.WriteByte(']')
 	return msg, scratch, err
-***REMOVED***
+}
 
-func rwMapBytes(w jsWriter, msg []byte, scratch []byte) ([]byte, []byte, error) ***REMOVED***
+func rwMapBytes(w jsWriter, msg []byte, scratch []byte) ([]byte, []byte, error) {
 	sz, msg, err := ReadMapHeaderBytes(msg)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return msg, scratch, err
-	***REMOVED***
-	err = w.WriteByte('***REMOVED***')
-	if err != nil ***REMOVED***
+	}
+	err = w.WriteByte('{')
+	if err != nil {
 		return msg, scratch, err
-	***REMOVED***
-	for i := uint32(0); i < sz; i++ ***REMOVED***
-		if i != 0 ***REMOVED***
+	}
+	for i := uint32(0); i < sz; i++ {
+		if i != 0 {
 			err = w.WriteByte(',')
-			if err != nil ***REMOVED***
+			if err != nil {
 				return msg, scratch, err
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		msg, scratch, err = rwMapKeyBytes(w, msg, scratch)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return msg, scratch, err
-		***REMOVED***
+		}
 		err = w.WriteByte(':')
-		if err != nil ***REMOVED***
+		if err != nil {
 			return msg, scratch, err
-		***REMOVED***
+		}
 		msg, scratch, err = writeNext(w, msg, scratch)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return msg, scratch, err
-		***REMOVED***
-	***REMOVED***
-	err = w.WriteByte('***REMOVED***')
+		}
+	}
+	err = w.WriteByte('}')
 	return msg, scratch, err
-***REMOVED***
+}
 
-func rwMapKeyBytes(w jsWriter, msg []byte, scratch []byte) ([]byte, []byte, error) ***REMOVED***
+func rwMapKeyBytes(w jsWriter, msg []byte, scratch []byte) ([]byte, []byte, error) {
 	msg, scratch, err := rwStringBytes(w, msg, scratch)
-	if err != nil ***REMOVED***
-		if tperr, ok := err.(TypeError); ok && tperr.Encoded == BinType ***REMOVED***
+	if err != nil {
+		if tperr, ok := err.(TypeError); ok && tperr.Encoded == BinType {
 			return rwBytesBytes(w, msg, scratch)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return msg, scratch, err
-***REMOVED***
+}
 
-func rwStringBytes(w jsWriter, msg []byte, scratch []byte) ([]byte, []byte, error) ***REMOVED***
+func rwStringBytes(w jsWriter, msg []byte, scratch []byte) ([]byte, []byte, error) {
 	str, msg, err := ReadStringZC(msg)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return msg, scratch, err
-	***REMOVED***
+	}
 	_, err = rwquoted(w, str)
 	return msg, scratch, err
-***REMOVED***
+}
 
-func rwBytesBytes(w jsWriter, msg []byte, scratch []byte) ([]byte, []byte, error) ***REMOVED***
+func rwBytesBytes(w jsWriter, msg []byte, scratch []byte) ([]byte, []byte, error) {
 	bts, msg, err := ReadBytesZC(msg)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return msg, scratch, err
-	***REMOVED***
+	}
 	l := base64.StdEncoding.EncodedLen(len(bts))
-	if cap(scratch) >= l ***REMOVED***
+	if cap(scratch) >= l {
 		scratch = scratch[0:l]
-	***REMOVED*** else ***REMOVED***
+	} else {
 		scratch = make([]byte, l)
-	***REMOVED***
+	}
 	base64.StdEncoding.Encode(scratch, bts)
 	err = w.WriteByte('"')
-	if err != nil ***REMOVED***
+	if err != nil {
 		return msg, scratch, err
-	***REMOVED***
+	}
 	_, err = w.Write(scratch)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return msg, scratch, err
-	***REMOVED***
+	}
 	err = w.WriteByte('"')
 	return msg, scratch, err
-***REMOVED***
+}
 
-func rwNullBytes(w jsWriter, msg []byte, scratch []byte) ([]byte, []byte, error) ***REMOVED***
+func rwNullBytes(w jsWriter, msg []byte, scratch []byte) ([]byte, []byte, error) {
 	msg, err := ReadNilBytes(msg)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return msg, scratch, err
-	***REMOVED***
+	}
 	_, err = w.Write(null)
 	return msg, scratch, err
-***REMOVED***
+}
 
-func rwBoolBytes(w jsWriter, msg []byte, scratch []byte) ([]byte, []byte, error) ***REMOVED***
+func rwBoolBytes(w jsWriter, msg []byte, scratch []byte) ([]byte, []byte, error) {
 	b, msg, err := ReadBoolBytes(msg)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return msg, scratch, err
-	***REMOVED***
-	if b ***REMOVED***
+	}
+	if b {
 		_, err = w.WriteString("true")
 		return msg, scratch, err
-	***REMOVED***
+	}
 	_, err = w.WriteString("false")
 	return msg, scratch, err
-***REMOVED***
+}
 
-func rwIntBytes(w jsWriter, msg []byte, scratch []byte) ([]byte, []byte, error) ***REMOVED***
+func rwIntBytes(w jsWriter, msg []byte, scratch []byte) ([]byte, []byte, error) {
 	i, msg, err := ReadInt64Bytes(msg)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return msg, scratch, err
-	***REMOVED***
+	}
 	scratch = strconv.AppendInt(scratch[0:0], i, 10)
 	_, err = w.Write(scratch)
 	return msg, scratch, err
-***REMOVED***
+}
 
-func rwUintBytes(w jsWriter, msg []byte, scratch []byte) ([]byte, []byte, error) ***REMOVED***
+func rwUintBytes(w jsWriter, msg []byte, scratch []byte) ([]byte, []byte, error) {
 	u, msg, err := ReadUint64Bytes(msg)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return msg, scratch, err
-	***REMOVED***
+	}
 	scratch = strconv.AppendUint(scratch[0:0], u, 10)
 	_, err = w.Write(scratch)
 	return msg, scratch, err
-***REMOVED***
+}
 
-func rwFloatBytes(w jsWriter, msg []byte, f64 bool, scratch []byte) ([]byte, []byte, error) ***REMOVED***
+func rwFloatBytes(w jsWriter, msg []byte, f64 bool, scratch []byte) ([]byte, []byte, error) {
 	var f float64
 	var err error
 	var sz int
-	if f64 ***REMOVED***
+	if f64 {
 		sz = 64
 		f, msg, err = ReadFloat64Bytes(msg)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		sz = 32
 		var v float32
 		v, msg, err = ReadFloat32Bytes(msg)
 		f = float64(v)
-	***REMOVED***
-	if err != nil ***REMOVED***
+	}
+	if err != nil {
 		return msg, scratch, err
-	***REMOVED***
+	}
 	scratch = strconv.AppendFloat(scratch, f, 'f', -1, sz)
 	_, err = w.Write(scratch)
 	return msg, scratch, err
-***REMOVED***
+}
 
-func rwFloat32Bytes(w jsWriter, msg []byte, scratch []byte) ([]byte, []byte, error) ***REMOVED***
+func rwFloat32Bytes(w jsWriter, msg []byte, scratch []byte) ([]byte, []byte, error) {
 	var f float32
 	var err error
 	f, msg, err = ReadFloat32Bytes(msg)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return msg, scratch, err
-	***REMOVED***
+	}
 	scratch = strconv.AppendFloat(scratch[:0], float64(f), 'f', -1, 32)
 	_, err = w.Write(scratch)
 	return msg, scratch, err
-***REMOVED***
+}
 
-func rwFloat64Bytes(w jsWriter, msg []byte, scratch []byte) ([]byte, []byte, error) ***REMOVED***
+func rwFloat64Bytes(w jsWriter, msg []byte, scratch []byte) ([]byte, []byte, error) {
 	var f float64
 	var err error
 	f, msg, err = ReadFloat64Bytes(msg)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return msg, scratch, err
-	***REMOVED***
+	}
 	scratch = strconv.AppendFloat(scratch[:0], f, 'f', -1, 64)
 	_, err = w.Write(scratch)
 	return msg, scratch, err
-***REMOVED***
+}
 
-func rwTimeBytes(w jsWriter, msg []byte, scratch []byte) ([]byte, []byte, error) ***REMOVED***
+func rwTimeBytes(w jsWriter, msg []byte, scratch []byte) ([]byte, []byte, error) {
 	var t time.Time
 	var err error
 	t, msg, err = ReadTimeBytes(msg)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return msg, scratch, err
-	***REMOVED***
+	}
 	bts, err := t.MarshalJSON()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return msg, scratch, err
-	***REMOVED***
+	}
 	_, err = w.Write(bts)
 	return msg, scratch, err
-***REMOVED***
+}
 
-func rwExtensionBytes(w jsWriter, msg []byte, scratch []byte) ([]byte, []byte, error) ***REMOVED***
+func rwExtensionBytes(w jsWriter, msg []byte, scratch []byte) ([]byte, []byte, error) {
 	var err error
 	var et int8
 	et, err = peekExtension(msg)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return msg, scratch, err
-	***REMOVED***
+	}
 
 	// if it's time.Time
-	if et == TimeExtension ***REMOVED***
+	if et == TimeExtension {
 		var tm time.Time
 		tm, msg, err = ReadTimeBytes(msg)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return msg, scratch, err
-		***REMOVED***
+		}
 		bts, err := tm.MarshalJSON()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return msg, scratch, err
-		***REMOVED***
+		}
 		_, err = w.Write(bts)
 		return msg, scratch, err
-	***REMOVED***
+	}
 
 	// if the extension is registered,
 	// use its canonical JSON form
-	if f, ok := extensionReg[et]; ok ***REMOVED***
+	if f, ok := extensionReg[et]; ok {
 		e := f()
 		msg, err = ReadExtensionBytes(msg, e)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return msg, scratch, err
-		***REMOVED***
+		}
 		bts, err := json.Marshal(e)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return msg, scratch, err
-		***REMOVED***
+		}
 		_, err = w.Write(bts)
 		return msg, scratch, err
-	***REMOVED***
+	}
 
-	// otherwise, write `***REMOVED***"type": <num>, "data": "<base64data>"***REMOVED***`
-	r := RawExtension***REMOVED******REMOVED***
+	// otherwise, write `{"type": <num>, "data": "<base64data>"}`
+	r := RawExtension{}
 	r.Type = et
 	msg, err = ReadExtensionBytes(msg, &r)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return msg, scratch, err
-	***REMOVED***
+	}
 	scratch, err = writeExt(w, r, scratch)
 	return msg, scratch, err
-***REMOVED***
+}
 
-func writeExt(w jsWriter, r RawExtension, scratch []byte) ([]byte, error) ***REMOVED***
-	_, err := w.WriteString(`***REMOVED***"type":`)
-	if err != nil ***REMOVED***
+func writeExt(w jsWriter, r RawExtension, scratch []byte) ([]byte, error) {
+	_, err := w.WriteString(`{"type":`)
+	if err != nil {
 		return scratch, err
-	***REMOVED***
+	}
 	scratch = strconv.AppendInt(scratch[0:0], int64(r.Type), 10)
 	_, err = w.Write(scratch)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return scratch, err
-	***REMOVED***
+	}
 	_, err = w.WriteString(`,"data":"`)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return scratch, err
-	***REMOVED***
+	}
 	l := base64.StdEncoding.EncodedLen(len(r.Data))
-	if cap(scratch) >= l ***REMOVED***
+	if cap(scratch) >= l {
 		scratch = scratch[0:l]
-	***REMOVED*** else ***REMOVED***
+	} else {
 		scratch = make([]byte, l)
-	***REMOVED***
+	}
 	base64.StdEncoding.Encode(scratch, r.Data)
 	_, err = w.Write(scratch)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return scratch, err
-	***REMOVED***
-	_, err = w.WriteString(`"***REMOVED***`)
+	}
+	_, err = w.WriteString(`"}`)
 	return scratch, err
-***REMOVED***
+}

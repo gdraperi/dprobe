@@ -88,7 +88,7 @@ const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 //     timestamp = Timestamp(seconds=seconds, nanos=nanos)
 //
 //
-type Timestamp struct ***REMOVED***
+type Timestamp struct {
 	// Represents seconds of UTC time since Unix epoch
 	// 1970-01-01T00:00:00Z. Must be from from 0001-01-01T00:00:00Z to
 	// 9999-12-31T23:59:59Z inclusive.
@@ -98,150 +98,150 @@ type Timestamp struct ***REMOVED***
 	// that count forward in time. Must be from 0 to 999,999,999
 	// inclusive.
 	Nanos int32 `protobuf:"varint,2,opt,name=nanos,proto3" json:"nanos,omitempty"`
-***REMOVED***
+}
 
-func (m *Timestamp) Reset()                    ***REMOVED*** *m = Timestamp***REMOVED******REMOVED*** ***REMOVED***
-func (*Timestamp) ProtoMessage()               ***REMOVED******REMOVED***
-func (*Timestamp) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorTimestamp, []int***REMOVED***0***REMOVED*** ***REMOVED***
-func (*Timestamp) XXX_WellKnownType() string   ***REMOVED*** return "Timestamp" ***REMOVED***
+func (m *Timestamp) Reset()                    { *m = Timestamp{} }
+func (*Timestamp) ProtoMessage()               {}
+func (*Timestamp) Descriptor() ([]byte, []int) { return fileDescriptorTimestamp, []int{0} }
+func (*Timestamp) XXX_WellKnownType() string   { return "Timestamp" }
 
-func (m *Timestamp) GetSeconds() int64 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Timestamp) GetSeconds() int64 {
+	if m != nil {
 		return m.Seconds
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *Timestamp) GetNanos() int32 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Timestamp) GetNanos() int32 {
+	if m != nil {
 		return m.Nanos
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*Timestamp)(nil), "google.protobuf.Timestamp")
-***REMOVED***
-func (this *Timestamp) Compare(that interface***REMOVED******REMOVED***) int ***REMOVED***
-	if that == nil ***REMOVED***
-		if this == nil ***REMOVED***
+}
+func (this *Timestamp) Compare(that interface{}) int {
+	if that == nil {
+		if this == nil {
 			return 0
-		***REMOVED***
+		}
 		return 1
-	***REMOVED***
+	}
 
 	that1, ok := that.(*Timestamp)
-	if !ok ***REMOVED***
+	if !ok {
 		that2, ok := that.(Timestamp)
-		if ok ***REMOVED***
+		if ok {
 			that1 = &that2
-		***REMOVED*** else ***REMOVED***
+		} else {
 			return 1
-		***REMOVED***
-	***REMOVED***
-	if that1 == nil ***REMOVED***
-		if this == nil ***REMOVED***
+		}
+	}
+	if that1 == nil {
+		if this == nil {
 			return 0
-		***REMOVED***
+		}
 		return 1
-	***REMOVED*** else if this == nil ***REMOVED***
+	} else if this == nil {
 		return -1
-	***REMOVED***
-	if this.Seconds != that1.Seconds ***REMOVED***
-		if this.Seconds < that1.Seconds ***REMOVED***
+	}
+	if this.Seconds != that1.Seconds {
+		if this.Seconds < that1.Seconds {
 			return -1
-		***REMOVED***
+		}
 		return 1
-	***REMOVED***
-	if this.Nanos != that1.Nanos ***REMOVED***
-		if this.Nanos < that1.Nanos ***REMOVED***
+	}
+	if this.Nanos != that1.Nanos {
+		if this.Nanos < that1.Nanos {
 			return -1
-		***REMOVED***
+		}
 		return 1
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
-func (this *Timestamp) Equal(that interface***REMOVED******REMOVED***) bool ***REMOVED***
-	if that == nil ***REMOVED***
-		if this == nil ***REMOVED***
+}
+func (this *Timestamp) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
 			return true
-		***REMOVED***
+		}
 		return false
-	***REMOVED***
+	}
 
 	that1, ok := that.(*Timestamp)
-	if !ok ***REMOVED***
+	if !ok {
 		that2, ok := that.(Timestamp)
-		if ok ***REMOVED***
+		if ok {
 			that1 = &that2
-		***REMOVED*** else ***REMOVED***
+		} else {
 			return false
-		***REMOVED***
-	***REMOVED***
-	if that1 == nil ***REMOVED***
-		if this == nil ***REMOVED***
+		}
+	}
+	if that1 == nil {
+		if this == nil {
 			return true
-		***REMOVED***
+		}
 		return false
-	***REMOVED*** else if this == nil ***REMOVED***
+	} else if this == nil {
 		return false
-	***REMOVED***
-	if this.Seconds != that1.Seconds ***REMOVED***
+	}
+	if this.Seconds != that1.Seconds {
 		return false
-	***REMOVED***
-	if this.Nanos != that1.Nanos ***REMOVED***
+	}
+	if this.Nanos != that1.Nanos {
 		return false
-	***REMOVED***
+	}
 	return true
-***REMOVED***
-func (this *Timestamp) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Timestamp) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 6)
-	s = append(s, "&types.Timestamp***REMOVED***")
+	s = append(s, "&types.Timestamp{")
 	s = append(s, "Seconds: "+fmt.Sprintf("%#v", this.Seconds)+",\n")
 	s = append(s, "Nanos: "+fmt.Sprintf("%#v", this.Nanos)+",\n")
-	s = append(s, "***REMOVED***")
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func valueToGoStringTimestamp(v interface***REMOVED******REMOVED***, typ string) string ***REMOVED***
+}
+func valueToGoStringTimestamp(v interface{}, typ string) string {
 	rv := reflect.ValueOf(v)
-	if rv.IsNil() ***REMOVED***
+	if rv.IsNil() {
 		return "nil"
-	***REMOVED***
+	}
 	pv := reflect.Indirect(rv).Interface()
-	return fmt.Sprintf("func(v %v) *%v ***REMOVED*** return &v ***REMOVED*** ( %#v )", typ, typ, pv)
-***REMOVED***
-func (m *Timestamp) Marshal() (dAtA []byte, err error) ***REMOVED***
+	return fmt.Sprintf("func(v %v) *%v { return &v } ( %#v )", typ, typ, pv)
+}
+func (m *Timestamp) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *Timestamp) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *Timestamp) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.Seconds != 0 ***REMOVED***
+	if m.Seconds != 0 {
 		dAtA[i] = 0x8
 		i++
 		i = encodeVarintTimestamp(dAtA, i, uint64(m.Seconds))
-	***REMOVED***
-	if m.Nanos != 0 ***REMOVED***
+	}
+	if m.Nanos != 0 {
 		dAtA[i] = 0x10
 		i++
 		i = encodeVarintTimestamp(dAtA, i, uint64(m.Nanos))
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func encodeFixed64Timestamp(dAtA []byte, offset int, v uint64) int ***REMOVED***
+func encodeFixed64Timestamp(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
 	dAtA[offset+2] = uint8(v >> 16)
@@ -251,223 +251,223 @@ func encodeFixed64Timestamp(dAtA []byte, offset int, v uint64) int ***REMOVED***
 	dAtA[offset+6] = uint8(v >> 48)
 	dAtA[offset+7] = uint8(v >> 56)
 	return offset + 8
-***REMOVED***
-func encodeFixed32Timestamp(dAtA []byte, offset int, v uint32) int ***REMOVED***
+}
+func encodeFixed32Timestamp(dAtA []byte, offset int, v uint32) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
 	dAtA[offset+2] = uint8(v >> 16)
 	dAtA[offset+3] = uint8(v >> 24)
 	return offset + 4
-***REMOVED***
-func encodeVarintTimestamp(dAtA []byte, offset int, v uint64) int ***REMOVED***
-	for v >= 1<<7 ***REMOVED***
+}
+func encodeVarintTimestamp(dAtA []byte, offset int, v uint64) int {
+	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
-	***REMOVED***
+	}
 	dAtA[offset] = uint8(v)
 	return offset + 1
-***REMOVED***
-func (m *Timestamp) Size() (n int) ***REMOVED***
+}
+func (m *Timestamp) Size() (n int) {
 	var l int
 	_ = l
-	if m.Seconds != 0 ***REMOVED***
+	if m.Seconds != 0 {
 		n += 1 + sovTimestamp(uint64(m.Seconds))
-	***REMOVED***
-	if m.Nanos != 0 ***REMOVED***
+	}
+	if m.Nanos != 0 {
 		n += 1 + sovTimestamp(uint64(m.Nanos))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func sovTimestamp(x uint64) (n int) ***REMOVED***
-	for ***REMOVED***
+func sovTimestamp(x uint64) (n int) {
+	for {
 		n++
 		x >>= 7
-		if x == 0 ***REMOVED***
+		if x == 0 {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
-func sozTimestamp(x uint64) (n int) ***REMOVED***
+}
+func sozTimestamp(x uint64) (n int) {
 	return sovTimestamp(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-***REMOVED***
-func (m *Timestamp) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *Timestamp) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowTimestamp
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: Timestamp: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: Timestamp: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Seconds", wireType)
-			***REMOVED***
+			}
 			m.Seconds = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTimestamp
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Seconds |= (int64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 2:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Nanos", wireType)
-			***REMOVED***
+			}
 			m.Nanos = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTimestamp
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Nanos |= (int32(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTimestamp(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthTimestamp
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func skipTimestamp(dAtA []byte) (n int, err error) ***REMOVED***
+}
+func skipTimestamp(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return 0, ErrIntOverflowTimestamp
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return 0, io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		wireType := int(wire & 0x7)
-		switch wireType ***REMOVED***
+		switch wireType {
 		case 0:
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowTimestamp
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				iNdEx++
-				if dAtA[iNdEx-1] < 0x80 ***REMOVED***
+				if dAtA[iNdEx-1] < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return iNdEx, nil
 		case 1:
 			iNdEx += 8
 			return iNdEx, nil
 		case 2:
 			var length int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowTimestamp
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				length |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			iNdEx += length
-			if length < 0 ***REMOVED***
+			if length < 0 {
 				return 0, ErrInvalidLengthTimestamp
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 3:
-			for ***REMOVED***
+			for {
 				var innerWire uint64
 				var start int = iNdEx
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return 0, ErrIntOverflowTimestamp
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return 0, io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					innerWire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				innerWireType := int(innerWire & 0x7)
-				if innerWireType == 4 ***REMOVED***
+				if innerWireType == 4 {
 					break
-				***REMOVED***
+				}
 				next, err := skipTimestamp(dAtA[start:])
-				if err != nil ***REMOVED***
+				if err != nil {
 					return 0, err
-				***REMOVED***
+				}
 				iNdEx = start + next
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 4:
 			return iNdEx, nil
@@ -476,19 +476,19 @@ func skipTimestamp(dAtA []byte) (n int, err error) ***REMOVED***
 			return iNdEx, nil
 		default:
 			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	panic("unreachable")
-***REMOVED***
+}
 
 var (
 	ErrInvalidLengthTimestamp = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowTimestamp   = fmt.Errorf("proto: integer overflow")
 )
 
-func init() ***REMOVED*** proto.RegisterFile("timestamp.proto", fileDescriptorTimestamp) ***REMOVED***
+func init() { proto.RegisterFile("timestamp.proto", fileDescriptorTimestamp) }
 
-var fileDescriptorTimestamp = []byte***REMOVED***
+var fileDescriptorTimestamp = []byte{
 	// 208 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x2f, 0xc9, 0xcc, 0x4d,
 	0x2d, 0x2e, 0x49, 0xcc, 0x2d, 0xd0, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0xe2, 0x4f, 0xcf, 0xcf,
@@ -503,4 +503,4 @@ var fileDescriptorTimestamp = []byte***REMOVED***
 	0x71, 0x11, 0x13, 0xb3, 0x7b, 0x80, 0xd3, 0x2a, 0x26, 0x39, 0x77, 0x88, 0xb6, 0x00, 0xa8, 0x36,
 	0xbd, 0xf0, 0xd4, 0x9c, 0x1c, 0xef, 0xbc, 0xfc, 0xf2, 0xbc, 0x10, 0x90, 0xe2, 0x24, 0x36, 0xb0,
 	0x79, 0xc6, 0x80, 0x00, 0x00, 0x00, 0xff, 0xff, 0x7c, 0x4d, 0xbd, 0x9c, 0xed, 0x00, 0x00, 0x00,
-***REMOVED***
+}

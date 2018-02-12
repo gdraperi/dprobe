@@ -1,5 +1,5 @@
 package daemon
 
-func configsSupported() bool ***REMOVED***
+func configsSupported() bool {
 	return true
-***REMOVED***
+}

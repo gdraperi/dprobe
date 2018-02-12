@@ -11,18 +11,18 @@ import (
 	"testing"
 )
 
-type parseAddrsTest struct ***REMOVED***
+type parseAddrsTest struct {
 	attrs uint
 	fn    func(int, []byte) (int, Addr, error)
 	b     []byte
 	as    []Addr
-***REMOVED***
+}
 
-var parseAddrsLittleEndianTests = []parseAddrsTest***REMOVED***
-	***REMOVED***
+var parseAddrsLittleEndianTests = []parseAddrsTest{
+	{
 		sysRTA_DST | sysRTA_GATEWAY | sysRTA_NETMASK | sysRTA_BRD,
 		parseKernelInetAddr,
-		[]byte***REMOVED***
+		[]byte{
 			0x38, 0x12, 0x0, 0x0, 0xff, 0xff, 0xff, 0x0,
 			0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
 			0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
@@ -44,22 +44,22 @@ var parseAddrsLittleEndianTests = []parseAddrsTest***REMOVED***
 
 			0x10, 0x2, 0x0, 0x0, 0xac, 0x10, 0xdc, 0xff,
 			0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
-		***REMOVED***,
-		[]Addr***REMOVED***
-			&LinkAddr***REMOVED***Index: 0***REMOVED***,
-			&LinkAddr***REMOVED***Index: 2, Name: "em1", Addr: []byte***REMOVED***0x00, 0x0c, 0x29, 0x66, 0x2c, 0xdc***REMOVED******REMOVED***,
-			&Inet4Addr***REMOVED***IP: [4]byte***REMOVED***172, 16, 220, 180***REMOVED******REMOVED***,
+		},
+		[]Addr{
+			&LinkAddr{Index: 0},
+			&LinkAddr{Index: 2, Name: "em1", Addr: []byte{0x00, 0x0c, 0x29, 0x66, 0x2c, 0xdc}},
+			&Inet4Addr{IP: [4]byte{172, 16, 220, 180}},
 			nil,
 			nil,
 			nil,
 			nil,
-			&Inet4Addr***REMOVED***IP: [4]byte***REMOVED***172, 16, 220, 255***REMOVED******REMOVED***,
-		***REMOVED***,
-	***REMOVED***,
-	***REMOVED***
+			&Inet4Addr{IP: [4]byte{172, 16, 220, 255}},
+		},
+	},
+	{
 		sysRTA_NETMASK | sysRTA_IFP | sysRTA_IFA,
 		parseKernelInetAddr,
-		[]byte***REMOVED***
+		[]byte{
 			0x7, 0x0, 0x0, 0x0, 0xff, 0xff, 0xff, 0x0,
 
 			0x18, 0x12, 0xa, 0x0, 0x87, 0x8, 0x0, 0x0,
@@ -68,36 +68,36 @@ var parseAddrsLittleEndianTests = []parseAddrsTest***REMOVED***
 
 			0x10, 0x2, 0x0, 0x0, 0xa9, 0xfe, 0x0, 0x1,
 			0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
-		***REMOVED***,
-		[]Addr***REMOVED***
+		},
+		[]Addr{
 			nil,
 			nil,
-			&Inet4Addr***REMOVED***IP: [4]byte***REMOVED***255, 255, 255, 0***REMOVED******REMOVED***,
+			&Inet4Addr{IP: [4]byte{255, 255, 255, 0}},
 			nil,
-			&LinkAddr***REMOVED***Index: 10, Name: "vlan5682"***REMOVED***,
-			&Inet4Addr***REMOVED***IP: [4]byte***REMOVED***169, 254, 0, 1***REMOVED******REMOVED***,
+			&LinkAddr{Index: 10, Name: "vlan5682"},
+			&Inet4Addr{IP: [4]byte{169, 254, 0, 1}},
 			nil,
 			nil,
-		***REMOVED***,
-	***REMOVED***,
-***REMOVED***
+		},
+	},
+}
 
-func TestParseAddrs(t *testing.T) ***REMOVED***
+func TestParseAddrs(t *testing.T) {
 	tests := parseAddrsLittleEndianTests
-	if nativeEndian != littleEndian ***REMOVED***
+	if nativeEndian != littleEndian {
 		t.Skip("no test for non-little endian machine yet")
-	***REMOVED***
+	}
 
-	for i, tt := range tests ***REMOVED***
+	for i, tt := range tests {
 		as, err := parseAddrs(tt.attrs, tt.fn, tt.b)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Error(i, err)
 			continue
-		***REMOVED***
+		}
 		as = as[:8] // the list varies between operating systems
-		if !reflect.DeepEqual(as, tt.as) ***REMOVED***
+		if !reflect.DeepEqual(as, tt.as) {
 			t.Errorf("#%d: got %+v; want %+v", i, as, tt.as)
 			continue
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

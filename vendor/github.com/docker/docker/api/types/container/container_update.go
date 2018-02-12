@@ -9,9 +9,9 @@ package container
 
 // ContainerUpdateOKBody OK response to ContainerUpdate operation
 // swagger:model ContainerUpdateOKBody
-type ContainerUpdateOKBody struct ***REMOVED***
+type ContainerUpdateOKBody struct {
 
 	// warnings
 	// Required: true
 	Warnings []string `json:"Warnings"`
-***REMOVED***
+}

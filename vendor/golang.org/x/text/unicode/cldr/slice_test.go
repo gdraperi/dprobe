@@ -11,16 +11,16 @@ import (
 
 type testSlice []*Common
 
-func mkElem(alt, typ, ref string) *Common ***REMOVED***
-	return &Common***REMOVED***
+func mkElem(alt, typ, ref string) *Common {
+	return &Common{
 		Type:      typ,
 		Reference: ref,
 		Alt:       alt,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 var (
-	testSlice1 = testSlice***REMOVED***
+	testSlice1 = testSlice{
 		mkElem("1", "a", "i.a"),
 		mkElem("1", "b", "i.b"),
 		mkElem("1", "c", "i.c"),
@@ -28,148 +28,148 @@ var (
 		mkElem("3", "c", "iii"),
 		mkElem("4", "a", "iv.a"),
 		mkElem("4", "d", "iv.d"),
-	***REMOVED***
-	testSliceE = testSlice***REMOVED******REMOVED***
+	}
+	testSliceE = testSlice{}
 )
 
-func panics(f func()) (panics bool) ***REMOVED***
-	defer func() ***REMOVED***
-		if err := recover(); err != nil ***REMOVED***
+func panics(f func()) (panics bool) {
+	defer func() {
+		if err := recover(); err != nil {
 			panics = true
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 	f()
 	return panics
-***REMOVED***
+}
 
-func TestMakeSlice(t *testing.T) ***REMOVED***
+func TestMakeSlice(t *testing.T) {
 	foo := 1
-	bar := []int***REMOVED******REMOVED***
-	tests := []struct ***REMOVED***
-		i      interface***REMOVED******REMOVED***
+	bar := []int{}
+	tests := []struct {
+		i      interface{}
 		panics bool
 		err    string
-	***REMOVED******REMOVED***
-		***REMOVED***&foo, true, "should panic when passed a pointer to the wrong type"***REMOVED***,
-		***REMOVED***&bar, true, "should panic when slice element of the wrong type"***REMOVED***,
-		***REMOVED***testSlice1, true, "should panic when passed a slice"***REMOVED***,
-		***REMOVED***&testSlice1, false, "should not panic"***REMOVED***,
-	***REMOVED***
-	for i, tt := range tests ***REMOVED***
-		if panics(func() ***REMOVED*** MakeSlice(tt.i) ***REMOVED***) != tt.panics ***REMOVED***
+	}{
+		{&foo, true, "should panic when passed a pointer to the wrong type"},
+		{&bar, true, "should panic when slice element of the wrong type"},
+		{testSlice1, true, "should panic when passed a slice"},
+		{&testSlice1, false, "should not panic"},
+	}
+	for i, tt := range tests {
+		if panics(func() { MakeSlice(tt.i) }) != tt.panics {
 			t.Errorf("%d: %s", i, tt.err)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-var anyOfTests = []struct ***REMOVED***
+var anyOfTests = []struct {
 	sl     testSlice
 	values []string
 	n      int
-***REMOVED******REMOVED***
-	***REMOVED***testSliceE, []string***REMOVED******REMOVED***, 0***REMOVED***,
-	***REMOVED***testSliceE, []string***REMOVED***"1", "2", "3"***REMOVED***, 0***REMOVED***,
-	***REMOVED***testSlice1, []string***REMOVED******REMOVED***, 0***REMOVED***,
-	***REMOVED***testSlice1, []string***REMOVED***"1"***REMOVED***, 3***REMOVED***,
-	***REMOVED***testSlice1, []string***REMOVED***"2"***REMOVED***, 1***REMOVED***,
-	***REMOVED***testSlice1, []string***REMOVED***"5"***REMOVED***, 0***REMOVED***,
-	***REMOVED***testSlice1, []string***REMOVED***"1", "2", "3"***REMOVED***, 5***REMOVED***,
-***REMOVED***
+}{
+	{testSliceE, []string{}, 0},
+	{testSliceE, []string{"1", "2", "3"}, 0},
+	{testSlice1, []string{}, 0},
+	{testSlice1, []string{"1"}, 3},
+	{testSlice1, []string{"2"}, 1},
+	{testSlice1, []string{"5"}, 0},
+	{testSlice1, []string{"1", "2", "3"}, 5},
+}
 
-func TestSelectAnyOf(t *testing.T) ***REMOVED***
-	for i, tt := range anyOfTests ***REMOVED***
+func TestSelectAnyOf(t *testing.T) {
+	for i, tt := range anyOfTests {
 		sl := tt.sl
 		s := MakeSlice(&sl)
 		s.SelectAnyOf("alt", tt.values...)
-		if len(sl) != tt.n ***REMOVED***
+		if len(sl) != tt.n {
 			t.Errorf("%d: found len == %d; want %d", i, len(sl), tt.n)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	sl := testSlice1
 	s := MakeSlice(&sl)
-	if !panics(func() ***REMOVED*** s.SelectAnyOf("foo") ***REMOVED***) ***REMOVED***
+	if !panics(func() { s.SelectAnyOf("foo") }) {
 		t.Errorf("should panic on non-existing attribute")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestFilter(t *testing.T) ***REMOVED***
-	for i, tt := range anyOfTests ***REMOVED***
+func TestFilter(t *testing.T) {
+	for i, tt := range anyOfTests {
 		sl := tt.sl
 		s := MakeSlice(&sl)
-		s.Filter(func(e Elem) bool ***REMOVED***
+		s.Filter(func(e Elem) bool {
 			v, _ := findField(reflect.ValueOf(e), "alt")
 			return in(tt.values, v.String())
-		***REMOVED***)
-		if len(sl) != tt.n ***REMOVED***
+		})
+		if len(sl) != tt.n {
 			t.Errorf("%d: found len == %d; want %d", i, len(sl), tt.n)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestGroup(t *testing.T) ***REMOVED***
-	f := func(excl ...string) func(Elem) string ***REMOVED***
-		return func(e Elem) string ***REMOVED***
+func TestGroup(t *testing.T) {
+	f := func(excl ...string) func(Elem) string {
+		return func(e Elem) string {
 			return Key(e, excl...)
-		***REMOVED***
-	***REMOVED***
-	tests := []struct ***REMOVED***
+		}
+	}
+	tests := []struct {
 		sl   testSlice
 		f    func(Elem) string
 		lens []int
-	***REMOVED******REMOVED***
-		***REMOVED***testSliceE, f(), []int***REMOVED******REMOVED******REMOVED***,
-		***REMOVED***testSlice1, f(), []int***REMOVED***1, 1, 1, 1, 1, 1, 1***REMOVED******REMOVED***,
-		***REMOVED***testSlice1, f("type"), []int***REMOVED***3, 1, 1, 2***REMOVED******REMOVED***,
-		***REMOVED***testSlice1, f("alt"), []int***REMOVED***2, 2, 2, 1***REMOVED******REMOVED***,
-		***REMOVED***testSlice1, f("alt", "type"), []int***REMOVED***7***REMOVED******REMOVED***,
-		***REMOVED***testSlice1, f("alt", "type"), []int***REMOVED***7***REMOVED******REMOVED***,
-	***REMOVED***
-	for i, tt := range tests ***REMOVED***
+	}{
+		{testSliceE, f(), []int{}},
+		{testSlice1, f(), []int{1, 1, 1, 1, 1, 1, 1}},
+		{testSlice1, f("type"), []int{3, 1, 1, 2}},
+		{testSlice1, f("alt"), []int{2, 2, 2, 1}},
+		{testSlice1, f("alt", "type"), []int{7}},
+		{testSlice1, f("alt", "type"), []int{7}},
+	}
+	for i, tt := range tests {
 		sl := tt.sl
 		s := MakeSlice(&sl)
 		g := s.Group(tt.f)
-		if len(tt.lens) != len(g) ***REMOVED***
+		if len(tt.lens) != len(g) {
 			t.Errorf("%d: found %d; want %d", i, len(g), len(tt.lens))
 			continue
-		***REMOVED***
-		for j, v := range tt.lens ***REMOVED***
-			if n := g[j].Value().Len(); n != v ***REMOVED***
+		}
+		for j, v := range tt.lens {
+			if n := g[j].Value().Len(); n != v {
 				t.Errorf("%d: found %d for length of group %d; want %d", i, n, j, v)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}
 
-func TestSelectOnePerGroup(t *testing.T) ***REMOVED***
-	tests := []struct ***REMOVED***
+func TestSelectOnePerGroup(t *testing.T) {
+	tests := []struct {
 		sl     testSlice
 		attr   string
 		values []string
 		refs   []string
-	***REMOVED******REMOVED***
-		***REMOVED***testSliceE, "alt", []string***REMOVED***"1"***REMOVED***, []string***REMOVED******REMOVED******REMOVED***,
-		***REMOVED***testSliceE, "type", []string***REMOVED***"a"***REMOVED***, []string***REMOVED******REMOVED******REMOVED***,
-		***REMOVED***testSlice1, "alt", []string***REMOVED***"2", "3", "1"***REMOVED***, []string***REMOVED***"i.a", "ii", "iii"***REMOVED******REMOVED***,
-		***REMOVED***testSlice1, "alt", []string***REMOVED***"1", "4"***REMOVED***, []string***REMOVED***"i.a", "i.b", "i.c", "iv.d"***REMOVED******REMOVED***,
-		***REMOVED***testSlice1, "type", []string***REMOVED***"c", "d"***REMOVED***, []string***REMOVED***"i.c", "iii", "iv.d"***REMOVED******REMOVED***,
-	***REMOVED***
-	for i, tt := range tests ***REMOVED***
+	}{
+		{testSliceE, "alt", []string{"1"}, []string{}},
+		{testSliceE, "type", []string{"a"}, []string{}},
+		{testSlice1, "alt", []string{"2", "3", "1"}, []string{"i.a", "ii", "iii"}},
+		{testSlice1, "alt", []string{"1", "4"}, []string{"i.a", "i.b", "i.c", "iv.d"}},
+		{testSlice1, "type", []string{"c", "d"}, []string{"i.c", "iii", "iv.d"}},
+	}
+	for i, tt := range tests {
 		sl := tt.sl
 		s := MakeSlice(&sl)
 		s.SelectOnePerGroup(tt.attr, tt.values)
-		if len(sl) != len(tt.refs) ***REMOVED***
+		if len(sl) != len(tt.refs) {
 			t.Errorf("%d: found result length %d; want %d", i, len(sl), len(tt.refs))
 			continue
-		***REMOVED***
-		for j, e := range sl ***REMOVED***
-			if tt.refs[j] != e.Reference ***REMOVED***
+		}
+		for j, e := range sl {
+			if tt.refs[j] != e.Reference {
 				t.Errorf("%d:%d found %s; want %s", i, j, e.Reference, tt.refs[i])
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	sl := testSlice1
 	s := MakeSlice(&sl)
-	if !panics(func() ***REMOVED*** s.SelectOnePerGroup("foo", nil) ***REMOVED***) ***REMOVED***
+	if !panics(func() { s.SelectOnePerGroup("foo", nil) }) {
 		t.Errorf("should panic on non-existing attribute")
-	***REMOVED***
-***REMOVED***
+	}
+}

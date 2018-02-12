@@ -39,84 +39,84 @@ var (
 
 // IsDirWriteable checks if dir is writable by writing and removing a file
 // to dir. It returns nil if dir is writable.
-func IsDirWriteable(dir string) error ***REMOVED***
+func IsDirWriteable(dir string) error {
 	f := filepath.Join(dir, ".touch")
-	if err := ioutil.WriteFile(f, []byte(""), PrivateFileMode); err != nil ***REMOVED***
+	if err := ioutil.WriteFile(f, []byte(""), PrivateFileMode); err != nil {
 		return err
-	***REMOVED***
+	}
 	return os.Remove(f)
-***REMOVED***
+}
 
 // ReadDir returns the filenames in the given directory in sorted order.
-func ReadDir(dirpath string) ([]string, error) ***REMOVED***
+func ReadDir(dirpath string) ([]string, error) {
 	dir, err := os.Open(dirpath)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	defer dir.Close()
 	names, err := dir.Readdirnames(-1)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	sort.Strings(names)
 	return names, nil
-***REMOVED***
+}
 
 // TouchDirAll is similar to os.MkdirAll. It creates directories with 0700 permission if any directory
 // does not exists. TouchDirAll also ensures the given directory is writable.
-func TouchDirAll(dir string) error ***REMOVED***
+func TouchDirAll(dir string) error {
 	// If path is already a directory, MkdirAll does nothing
 	// and returns nil.
 	err := os.MkdirAll(dir, PrivateDirMode)
-	if err != nil ***REMOVED***
+	if err != nil {
 		// if mkdirAll("a/text") and "text" is not
 		// a directory, this will return syscall.ENOTDIR
 		return err
-	***REMOVED***
+	}
 	return IsDirWriteable(dir)
-***REMOVED***
+}
 
 // CreateDirAll is similar to TouchDirAll but returns error
 // if the deepest directory was not empty.
-func CreateDirAll(dir string) error ***REMOVED***
+func CreateDirAll(dir string) error {
 	err := TouchDirAll(dir)
-	if err == nil ***REMOVED***
+	if err == nil {
 		var ns []string
 		ns, err = ReadDir(dir)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-		if len(ns) != 0 ***REMOVED***
+		}
+		if len(ns) != 0 {
 			err = fmt.Errorf("expected %q to be empty, got %q", dir, ns)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return err
-***REMOVED***
+}
 
-func Exist(name string) bool ***REMOVED***
+func Exist(name string) bool {
 	_, err := os.Stat(name)
 	return err == nil
-***REMOVED***
+}
 
 // ZeroToEnd zeros a file starting from SEEK_CUR to its SEEK_END. May temporarily
 // shorten the length of the file.
-func ZeroToEnd(f *os.File) error ***REMOVED***
+func ZeroToEnd(f *os.File) error {
 	// TODO: support FALLOC_FL_ZERO_RANGE
 	off, err := f.Seek(0, io.SeekCurrent)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	lenf, lerr := f.Seek(0, io.SeekEnd)
-	if lerr != nil ***REMOVED***
+	if lerr != nil {
 		return lerr
-	***REMOVED***
-	if err = f.Truncate(off); err != nil ***REMOVED***
+	}
+	if err = f.Truncate(off); err != nil {
 		return err
-	***REMOVED***
+	}
 	// make sure blocks remain allocated
-	if err = Preallocate(f, lenf, true); err != nil ***REMOVED***
+	if err = Preallocate(f, lenf, true); err != nil {
 		return err
-	***REMOVED***
+	}
 	_, err = f.Seek(off, io.SeekStart)
 	return err
-***REMOVED***
+}

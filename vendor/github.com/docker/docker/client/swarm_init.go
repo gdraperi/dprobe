@@ -8,14 +8,14 @@ import (
 )
 
 // SwarmInit initializes the swarm.
-func (cli *Client) SwarmInit(ctx context.Context, req swarm.InitRequest) (string, error) ***REMOVED***
+func (cli *Client) SwarmInit(ctx context.Context, req swarm.InitRequest) (string, error) {
 	serverResp, err := cli.post(ctx, "/swarm/init", nil, req, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 
 	var response string
 	err = json.NewDecoder(serverResp.body).Decode(&response)
 	ensureReaderClosed(serverResp)
 	return response, err
-***REMOVED***
+}

@@ -6,65 +6,65 @@ import (
 	"time"
 )
 
-type ReadOnlyFs struct ***REMOVED***
+type ReadOnlyFs struct {
 	source Fs
-***REMOVED***
+}
 
-func NewReadOnlyFs(source Fs) Fs ***REMOVED***
-	return &ReadOnlyFs***REMOVED***source: source***REMOVED***
-***REMOVED***
+func NewReadOnlyFs(source Fs) Fs {
+	return &ReadOnlyFs{source: source}
+}
 
-func (r *ReadOnlyFs) ReadDir(name string) ([]os.FileInfo, error) ***REMOVED***
+func (r *ReadOnlyFs) ReadDir(name string) ([]os.FileInfo, error) {
 	return ReadDir(r.source, name)
-***REMOVED***
+}
 
-func (r *ReadOnlyFs) Chtimes(n string, a, m time.Time) error ***REMOVED***
+func (r *ReadOnlyFs) Chtimes(n string, a, m time.Time) error {
 	return syscall.EPERM
-***REMOVED***
+}
 
-func (r *ReadOnlyFs) Chmod(n string, m os.FileMode) error ***REMOVED***
+func (r *ReadOnlyFs) Chmod(n string, m os.FileMode) error {
 	return syscall.EPERM
-***REMOVED***
+}
 
-func (r *ReadOnlyFs) Name() string ***REMOVED***
+func (r *ReadOnlyFs) Name() string {
 	return "ReadOnlyFilter"
-***REMOVED***
+}
 
-func (r *ReadOnlyFs) Stat(name string) (os.FileInfo, error) ***REMOVED***
+func (r *ReadOnlyFs) Stat(name string) (os.FileInfo, error) {
 	return r.source.Stat(name)
-***REMOVED***
+}
 
-func (r *ReadOnlyFs) Rename(o, n string) error ***REMOVED***
+func (r *ReadOnlyFs) Rename(o, n string) error {
 	return syscall.EPERM
-***REMOVED***
+}
 
-func (r *ReadOnlyFs) RemoveAll(p string) error ***REMOVED***
+func (r *ReadOnlyFs) RemoveAll(p string) error {
 	return syscall.EPERM
-***REMOVED***
+}
 
-func (r *ReadOnlyFs) Remove(n string) error ***REMOVED***
+func (r *ReadOnlyFs) Remove(n string) error {
 	return syscall.EPERM
-***REMOVED***
+}
 
-func (r *ReadOnlyFs) OpenFile(name string, flag int, perm os.FileMode) (File, error) ***REMOVED***
-	if flag&(os.O_WRONLY|syscall.O_RDWR|os.O_APPEND|os.O_CREATE|os.O_TRUNC) != 0 ***REMOVED***
+func (r *ReadOnlyFs) OpenFile(name string, flag int, perm os.FileMode) (File, error) {
+	if flag&(os.O_WRONLY|syscall.O_RDWR|os.O_APPEND|os.O_CREATE|os.O_TRUNC) != 0 {
 		return nil, syscall.EPERM
-	***REMOVED***
+	}
 	return r.source.OpenFile(name, flag, perm)
-***REMOVED***
+}
 
-func (r *ReadOnlyFs) Open(n string) (File, error) ***REMOVED***
+func (r *ReadOnlyFs) Open(n string) (File, error) {
 	return r.source.Open(n)
-***REMOVED***
+}
 
-func (r *ReadOnlyFs) Mkdir(n string, p os.FileMode) error ***REMOVED***
+func (r *ReadOnlyFs) Mkdir(n string, p os.FileMode) error {
 	return syscall.EPERM
-***REMOVED***
+}
 
-func (r *ReadOnlyFs) MkdirAll(n string, p os.FileMode) error ***REMOVED***
+func (r *ReadOnlyFs) MkdirAll(n string, p os.FileMode) error {
 	return syscall.EPERM
-***REMOVED***
+}
 
-func (r *ReadOnlyFs) Create(n string) (File, error) ***REMOVED***
+func (r *ReadOnlyFs) Create(n string) (File, error) {
 	return nil, syscall.EPERM
-***REMOVED***
+}

@@ -1,19 +1,19 @@
 package main
 
-func (x *Baz) MethodMe() bool ***REMOVED*** return true ***REMOVED***
+func (x *Baz) MethodMe() bool { return true }
 
-func (x *Bar) MethodYou() bool ***REMOVED*** return false ***REMOVED***
+func (x *Bar) MethodYou() bool { return false }
 
-type Foo struct ***REMOVED***
+type Foo struct {
 	A int
 	B int
 	C int
-***REMOVED***
+}
 
 type Bar = Foo
 type Baz = Bar
 
-func main() ***REMOVED***
+func main() {
 	var f Foo
 	f.
-***REMOVED***
+}

@@ -14,88 +14,88 @@ import (
 )
 
 var (
-	initializers = map[string]initializerFunc***REMOVED******REMOVED***
+	initializers = map[string]initializerFunc{}
 )
 
 type initializerFunc func(string) error
 
 // Mounter handles mount and unmount
-type Mounter interface ***REMOVED***
+type Mounter interface {
 	Mount(target string, mounts ...mount.Mount) error
 	Unmount(target string) error
-***REMOVED***
+}
 
 // InitRootFS initializes the snapshot for use as a rootfs
-func InitRootFS(ctx context.Context, name string, parent digest.Digest, readonly bool, snapshotter snapshots.Snapshotter, mounter Mounter) ([]mount.Mount, error) ***REMOVED***
+func InitRootFS(ctx context.Context, name string, parent digest.Digest, readonly bool, snapshotter snapshots.Snapshotter, mounter Mounter) ([]mount.Mount, error) {
 	_, err := snapshotter.Stat(ctx, name)
-	if err == nil ***REMOVED***
+	if err == nil {
 		return nil, errors.Errorf("rootfs already exists")
-	***REMOVED***
+	}
 	// TODO: ensure not exist error once added to snapshot package
 
 	parentS := parent.String()
 
 	initName := defaultInitializer
 	initFn := initializers[initName]
-	if initFn != nil ***REMOVED***
+	if initFn != nil {
 		parentS, err = createInitLayer(ctx, parentS, initName, initFn, snapshotter, mounter)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if readonly ***REMOVED***
+	if readonly {
 		return snapshotter.View(ctx, name, parentS)
-	***REMOVED***
+	}
 
 	return snapshotter.Prepare(ctx, name, parentS)
-***REMOVED***
+}
 
-func createInitLayer(ctx context.Context, parent, initName string, initFn func(string) error, snapshotter snapshots.Snapshotter, mounter Mounter) (string, error) ***REMOVED***
+func createInitLayer(ctx context.Context, parent, initName string, initFn func(string) error, snapshotter snapshots.Snapshotter, mounter Mounter) (string, error) {
 	initS := fmt.Sprintf("%s %s", parent, initName)
-	if _, err := snapshotter.Stat(ctx, initS); err == nil ***REMOVED***
+	if _, err := snapshotter.Stat(ctx, initS); err == nil {
 		return initS, nil
-	***REMOVED***
+	}
 	// TODO: ensure not exist error once added to snapshot package
 
 	// Create tempdir
 	td, err := ioutil.TempDir("", "create-init-")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	defer os.RemoveAll(td)
 
 	mounts, err := snapshotter.Prepare(ctx, td, parent)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 
-	defer func() ***REMOVED***
-		if err != nil ***REMOVED***
-			if rerr := snapshotter.Remove(ctx, td); rerr != nil ***REMOVED***
+	defer func() {
+		if err != nil {
+			if rerr := snapshotter.Remove(ctx, td); rerr != nil {
 				log.G(ctx).Errorf("Failed to remove snapshot %s: %v", td, rerr)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***()
+			}
+		}
+	}()
 
-	if err = mounter.Mount(td, mounts...); err != nil ***REMOVED***
+	if err = mounter.Mount(td, mounts...); err != nil {
 		return "", err
-	***REMOVED***
+	}
 
-	if err = initFn(td); err != nil ***REMOVED***
-		if merr := mounter.Unmount(td); merr != nil ***REMOVED***
+	if err = initFn(td); err != nil {
+		if merr := mounter.Unmount(td); merr != nil {
 			log.G(ctx).Errorf("Failed to unmount %s: %v", td, merr)
-		***REMOVED***
+		}
 		return "", err
-	***REMOVED***
+	}
 
-	if err = mounter.Unmount(td); err != nil ***REMOVED***
+	if err = mounter.Unmount(td); err != nil {
 		return "", err
-	***REMOVED***
+	}
 
-	if err := snapshotter.Commit(ctx, initS, td); err != nil ***REMOVED***
+	if err := snapshotter.Commit(ctx, initS, td); err != nil {
 		return "", err
-	***REMOVED***
+	}
 
 	return initS, nil
-***REMOVED***
+}

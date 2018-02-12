@@ -2,6 +2,6 @@
 
 package daemon
 
-func (d *Daemon) setupDumpStackTrap(_ string) ***REMOVED***
+func (d *Daemon) setupDumpStackTrap(_ string) {
 	return
-***REMOVED***
+}

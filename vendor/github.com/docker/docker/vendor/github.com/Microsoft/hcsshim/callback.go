@@ -7,8 +7,8 @@ import (
 
 var (
 	nextCallback    uintptr
-	callbackMap     = map[uintptr]*notifcationWatcherContext***REMOVED******REMOVED***
-	callbackMapLock = sync.RWMutex***REMOVED******REMOVED***
+	callbackMap     = map[uintptr]*notifcationWatcherContext{}
+	callbackMapLock = sync.RWMutex{}
 
 	notificationWatcherCallback = syscall.NewCallback(notificationWatcher)
 
@@ -30,14 +30,14 @@ var (
 type hcsNotification uint32
 type notificationChannel chan error
 
-type notifcationWatcherContext struct ***REMOVED***
+type notifcationWatcherContext struct {
 	channels notificationChannels
 	handle   hcsCallback
-***REMOVED***
+}
 
 type notificationChannels map[hcsNotification]notificationChannel
 
-func newChannels() notificationChannels ***REMOVED***
+func newChannels() notificationChannels {
 	channels := make(notificationChannels)
 
 	channels[hcsNotificationSystemExited] = make(notificationChannel, 1)
@@ -48,8 +48,8 @@ func newChannels() notificationChannels ***REMOVED***
 	channels[hcsNotificationProcessExited] = make(notificationChannel, 1)
 	channels[hcsNotificationServiceDisconnect] = make(notificationChannel, 1)
 	return channels
-***REMOVED***
-func closeChannels(channels notificationChannels) ***REMOVED***
+}
+func closeChannels(channels notificationChannels) {
 	close(channels[hcsNotificationSystemExited])
 	close(channels[hcsNotificationSystemCreateCompleted])
 	close(channels[hcsNotificationSystemStartCompleted])
@@ -57,23 +57,23 @@ func closeChannels(channels notificationChannels) ***REMOVED***
 	close(channels[hcsNotificationSystemResumeCompleted])
 	close(channels[hcsNotificationProcessExited])
 	close(channels[hcsNotificationServiceDisconnect])
-***REMOVED***
+}
 
-func notificationWatcher(notificationType hcsNotification, callbackNumber uintptr, notificationStatus uintptr, notificationData *uint16) uintptr ***REMOVED***
+func notificationWatcher(notificationType hcsNotification, callbackNumber uintptr, notificationStatus uintptr, notificationData *uint16) uintptr {
 	var result error
-	if int32(notificationStatus) < 0 ***REMOVED***
+	if int32(notificationStatus) < 0 {
 		result = syscall.Errno(win32FromHresult(notificationStatus))
-	***REMOVED***
+	}
 
 	callbackMapLock.RLock()
 	context := callbackMap[callbackNumber]
 	callbackMapLock.RUnlock()
 
-	if context == nil ***REMOVED***
+	if context == nil {
 		return 0
-	***REMOVED***
+	}
 
 	context.channels[notificationType] <- result
 
 	return 0
-***REMOVED***
+}

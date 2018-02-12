@@ -27,10 +27,10 @@ import (
 // to mutate the Session concurrently.
 //
 // The Session satisfies the service client's client.ClientConfigProvider.
-type Session struct ***REMOVED***
+type Session struct {
 	Config   *aws.Config
 	Handlers request.Handlers
-***REMOVED***
+}
 
 // New creates a new instance of the handlers merging in the provided configs
 // on top of the SDK's default configurations. Once the Session is created it
@@ -53,13 +53,13 @@ type Session struct ***REMOVED***
 // Deprecated: Use NewSession functions to create sessions instead. NewSession
 // has the same functionality as New except an error can be returned when the
 // func is called instead of waiting to receive an error until a request is made.
-func New(cfgs ...*aws.Config) *Session ***REMOVED***
+func New(cfgs ...*aws.Config) *Session {
 	// load initial config from environment
 	envCfg := loadEnvConfig()
 
-	if envCfg.EnableSharedConfig ***REMOVED***
-		s, err := newSession(Options***REMOVED******REMOVED***, envCfg, cfgs...)
-		if err != nil ***REMOVED***
+	if envCfg.EnableSharedConfig {
+		s, err := newSession(Options{}, envCfg, cfgs...)
+		if err != nil {
 			// Old session.New expected all errors to be discovered when
 			// a request is made, and would report the errors then. This
 			// needs to be replicated if an error occurs while creating
@@ -69,18 +69,18 @@ func New(cfgs ...*aws.Config) *Session ***REMOVED***
 
 			// Session creation failed, need to report the error and prevent
 			// any requests from succeeding.
-			s = &Session***REMOVED***Config: defaults.Config()***REMOVED***
+			s = &Session{Config: defaults.Config()}
 			s.Config.MergeIn(cfgs...)
 			s.Config.Logger.Log("ERROR:", msg, "Error:", err)
-			s.Handlers.Validate.PushBack(func(r *request.Request) ***REMOVED***
+			s.Handlers.Validate.PushBack(func(r *request.Request) {
 				r.Error = err
-			***REMOVED***)
-		***REMOVED***
+			})
+		}
 		return s
-	***REMOVED***
+	}
 
 	return deprecatedNewSession(cfgs...)
-***REMOVED***
+}
 
 // NewSession returns a new Session created from SDK defaults, config files,
 // environment, and user provided config files. Once the Session is created
@@ -97,12 +97,12 @@ func New(cfgs ...*aws.Config) *Session ***REMOVED***
 // See the NewSessionWithOptions func for information on how to override or
 // control through code how the Session will be created. Such as specifying the
 // config profile, and controlling if shared config is enabled or not.
-func NewSession(cfgs ...*aws.Config) (*Session, error) ***REMOVED***
-	opts := Options***REMOVED******REMOVED***
+func NewSession(cfgs ...*aws.Config) (*Session, error) {
+	opts := Options{}
 	opts.Config.MergeIn(cfgs...)
 
 	return NewSessionWithOptions(opts)
-***REMOVED***
+}
 
 // SharedConfigState provides the ability to optionally override the state
 // of the session's creation based on the shared config being enabled or
@@ -127,7 +127,7 @@ const (
 // Options provides the means to control how a Session is created and what
 // configuration values will be loaded.
 //
-type Options struct ***REMOVED***
+type Options struct {
 	// Provides config values for the SDK to use when creating service clients
 	// and making API requests to services. Any value set in with this field
 	// will override the associated value provided by the SDK defaults,
@@ -193,7 +193,7 @@ type Options struct ***REMOVED***
 	// to also enable this feature. CustomCABundle session option field has priority
 	// over the AWS_CA_BUNDLE environment variable, and will be used if both are set.
 	CustomCABundle io.Reader
-***REMOVED***
+}
 
 // NewSessionWithOptions returns a new Session created from SDK defaults, config files,
 // environment, and user provided config files. This func uses the Options
@@ -207,62 +207,62 @@ type Options struct ***REMOVED***
 // to be built with retrieving credentials with AssumeRole set in the config.
 //
 //     // Equivalent to session.New
-//     sess := session.Must(session.NewSessionWithOptions(session.Options***REMOVED******REMOVED***))
+//     sess := session.Must(session.NewSessionWithOptions(session.Options{}))
 //
 //     // Specify profile to load for the session's config
-//     sess := session.Must(session.NewSessionWithOptions(session.Options***REMOVED***
+//     sess := session.Must(session.NewSessionWithOptions(session.Options{
 //          Profile: "profile_name",
-// ***REMOVED***))
+//     }))
 //
 //     // Specify profile for config and region for requests
-//     sess := session.Must(session.NewSessionWithOptions(session.Options***REMOVED***
-//          Config: aws.Config***REMOVED***Region: aws.String("us-east-1")***REMOVED***,
+//     sess := session.Must(session.NewSessionWithOptions(session.Options{
+//          Config: aws.Config{Region: aws.String("us-east-1")},
 //          Profile: "profile_name",
-// ***REMOVED***))
+//     }))
 //
 //     // Force enable Shared Config support
-//     sess := session.Must(session.NewSessionWithOptions(session.Options***REMOVED***
+//     sess := session.Must(session.NewSessionWithOptions(session.Options{
 //         SharedConfigState: session.SharedConfigEnable,
-// ***REMOVED***))
-func NewSessionWithOptions(opts Options) (*Session, error) ***REMOVED***
+//     }))
+func NewSessionWithOptions(opts Options) (*Session, error) {
 	var envCfg envConfig
-	if opts.SharedConfigState == SharedConfigEnable ***REMOVED***
+	if opts.SharedConfigState == SharedConfigEnable {
 		envCfg = loadSharedEnvConfig()
-	***REMOVED*** else ***REMOVED***
+	} else {
 		envCfg = loadEnvConfig()
-	***REMOVED***
+	}
 
-	if len(opts.Profile) > 0 ***REMOVED***
+	if len(opts.Profile) > 0 {
 		envCfg.Profile = opts.Profile
-	***REMOVED***
+	}
 
-	switch opts.SharedConfigState ***REMOVED***
+	switch opts.SharedConfigState {
 	case SharedConfigDisable:
 		envCfg.EnableSharedConfig = false
 	case SharedConfigEnable:
 		envCfg.EnableSharedConfig = true
-	***REMOVED***
+	}
 
-	if len(envCfg.SharedCredentialsFile) == 0 ***REMOVED***
+	if len(envCfg.SharedCredentialsFile) == 0 {
 		envCfg.SharedCredentialsFile = defaults.SharedCredentialsFilename()
-	***REMOVED***
-	if len(envCfg.SharedConfigFile) == 0 ***REMOVED***
+	}
+	if len(envCfg.SharedConfigFile) == 0 {
 		envCfg.SharedConfigFile = defaults.SharedConfigFilename()
-	***REMOVED***
+	}
 
 	// Only use AWS_CA_BUNDLE if session option is not provided.
-	if len(envCfg.CustomCABundle) != 0 && opts.CustomCABundle == nil ***REMOVED***
+	if len(envCfg.CustomCABundle) != 0 && opts.CustomCABundle == nil {
 		f, err := os.Open(envCfg.CustomCABundle)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, awserr.New("LoadCustomCABundleError",
 				"failed to open custom CA bundle PEM file", err)
-		***REMOVED***
+		}
 		defer f.Close()
 		opts.CustomCABundle = f
-	***REMOVED***
+	}
 
 	return newSession(opts, envCfg, &opts.Config)
-***REMOVED***
+}
 
 // Must is a helper function to ensure the Session is valid and there was no
 // error when calling a NewSession function.
@@ -271,283 +271,283 @@ func NewSessionWithOptions(opts Options) (*Session, error) ***REMOVED***
 // Session and configuration at startup. Such as:
 //
 //     var sess = session.Must(session.NewSession())
-func Must(sess *Session, err error) *Session ***REMOVED***
-	if err != nil ***REMOVED***
+func Must(sess *Session, err error) *Session {
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 
 	return sess
-***REMOVED***
+}
 
-func deprecatedNewSession(cfgs ...*aws.Config) *Session ***REMOVED***
+func deprecatedNewSession(cfgs ...*aws.Config) *Session {
 	cfg := defaults.Config()
 	handlers := defaults.Handlers()
 
 	// Apply the passed in configs so the configuration can be applied to the
 	// default credential chain
 	cfg.MergeIn(cfgs...)
-	if cfg.EndpointResolver == nil ***REMOVED***
+	if cfg.EndpointResolver == nil {
 		// An endpoint resolver is required for a session to be able to provide
 		// endpoints for service client configurations.
 		cfg.EndpointResolver = endpoints.DefaultResolver()
-	***REMOVED***
+	}
 	cfg.Credentials = defaults.CredChain(cfg, handlers)
 
 	// Reapply any passed in configs to override credentials if set
 	cfg.MergeIn(cfgs...)
 
-	s := &Session***REMOVED***
+	s := &Session{
 		Config:   cfg,
 		Handlers: handlers,
-	***REMOVED***
+	}
 
 	initHandlers(s)
 
 	return s
-***REMOVED***
+}
 
-func newSession(opts Options, envCfg envConfig, cfgs ...*aws.Config) (*Session, error) ***REMOVED***
+func newSession(opts Options, envCfg envConfig, cfgs ...*aws.Config) (*Session, error) {
 	cfg := defaults.Config()
 	handlers := defaults.Handlers()
 
 	// Get a merged version of the user provided config to determine if
 	// credentials were.
-	userCfg := &aws.Config***REMOVED******REMOVED***
+	userCfg := &aws.Config{}
 	userCfg.MergeIn(cfgs...)
 
 	// Ordered config files will be loaded in with later files overwriting
 	// previous config file values.
 	var cfgFiles []string
-	if opts.SharedConfigFiles != nil ***REMOVED***
+	if opts.SharedConfigFiles != nil {
 		cfgFiles = opts.SharedConfigFiles
-	***REMOVED*** else ***REMOVED***
-		cfgFiles = []string***REMOVED***envCfg.SharedConfigFile, envCfg.SharedCredentialsFile***REMOVED***
-		if !envCfg.EnableSharedConfig ***REMOVED***
+	} else {
+		cfgFiles = []string{envCfg.SharedConfigFile, envCfg.SharedCredentialsFile}
+		if !envCfg.EnableSharedConfig {
 			// The shared config file (~/.aws/config) is only loaded if instructed
 			// to load via the envConfig.EnableSharedConfig (AWS_SDK_LOAD_CONFIG).
 			cfgFiles = cfgFiles[1:]
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Load additional config from file(s)
 	sharedCfg, err := loadSharedConfig(envCfg.Profile, cfgFiles)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	if err := mergeConfigSrcs(cfg, userCfg, envCfg, sharedCfg, handlers, opts); err != nil ***REMOVED***
+	if err := mergeConfigSrcs(cfg, userCfg, envCfg, sharedCfg, handlers, opts); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	s := &Session***REMOVED***
+	s := &Session{
 		Config:   cfg,
 		Handlers: handlers,
-	***REMOVED***
+	}
 
 	initHandlers(s)
 
 	// Setup HTTP client with custom cert bundle if enabled
-	if opts.CustomCABundle != nil ***REMOVED***
-		if err := loadCustomCABundle(s, opts.CustomCABundle); err != nil ***REMOVED***
+	if opts.CustomCABundle != nil {
+		if err := loadCustomCABundle(s, opts.CustomCABundle); err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return s, nil
-***REMOVED***
+}
 
-func loadCustomCABundle(s *Session, bundle io.Reader) error ***REMOVED***
+func loadCustomCABundle(s *Session, bundle io.Reader) error {
 	var t *http.Transport
-	switch v := s.Config.HTTPClient.Transport.(type) ***REMOVED***
+	switch v := s.Config.HTTPClient.Transport.(type) {
 	case *http.Transport:
 		t = v
 	default:
-		if s.Config.HTTPClient.Transport != nil ***REMOVED***
+		if s.Config.HTTPClient.Transport != nil {
 			return awserr.New("LoadCustomCABundleError",
 				"unable to load custom CA bundle, HTTPClient's transport unsupported type", nil)
-		***REMOVED***
-	***REMOVED***
-	if t == nil ***REMOVED***
-		t = &http.Transport***REMOVED******REMOVED***
-	***REMOVED***
+		}
+	}
+	if t == nil {
+		t = &http.Transport{}
+	}
 
 	p, err := loadCertPool(bundle)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	if t.TLSClientConfig == nil ***REMOVED***
-		t.TLSClientConfig = &tls.Config***REMOVED******REMOVED***
-	***REMOVED***
+	}
+	if t.TLSClientConfig == nil {
+		t.TLSClientConfig = &tls.Config{}
+	}
 	t.TLSClientConfig.RootCAs = p
 
 	s.Config.HTTPClient.Transport = t
 
 	return nil
-***REMOVED***
+}
 
-func loadCertPool(r io.Reader) (*x509.CertPool, error) ***REMOVED***
+func loadCertPool(r io.Reader) (*x509.CertPool, error) {
 	b, err := ioutil.ReadAll(r)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, awserr.New("LoadCustomCABundleError",
 			"failed to read custom CA bundle PEM file", err)
-	***REMOVED***
+	}
 
 	p := x509.NewCertPool()
-	if !p.AppendCertsFromPEM(b) ***REMOVED***
+	if !p.AppendCertsFromPEM(b) {
 		return nil, awserr.New("LoadCustomCABundleError",
 			"failed to load custom CA bundle PEM file", err)
-	***REMOVED***
+	}
 
 	return p, nil
-***REMOVED***
+}
 
-func mergeConfigSrcs(cfg, userCfg *aws.Config, envCfg envConfig, sharedCfg sharedConfig, handlers request.Handlers, sessOpts Options) error ***REMOVED***
+func mergeConfigSrcs(cfg, userCfg *aws.Config, envCfg envConfig, sharedCfg sharedConfig, handlers request.Handlers, sessOpts Options) error {
 	// Merge in user provided configuration
 	cfg.MergeIn(userCfg)
 
 	// Region if not already set by user
-	if len(aws.StringValue(cfg.Region)) == 0 ***REMOVED***
-		if len(envCfg.Region) > 0 ***REMOVED***
+	if len(aws.StringValue(cfg.Region)) == 0 {
+		if len(envCfg.Region) > 0 {
 			cfg.WithRegion(envCfg.Region)
-		***REMOVED*** else if envCfg.EnableSharedConfig && len(sharedCfg.Region) > 0 ***REMOVED***
+		} else if envCfg.EnableSharedConfig && len(sharedCfg.Region) > 0 {
 			cfg.WithRegion(sharedCfg.Region)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Configure credentials if not already set
-	if cfg.Credentials == credentials.AnonymousCredentials && userCfg.Credentials == nil ***REMOVED***
-		if len(envCfg.Creds.AccessKeyID) > 0 ***REMOVED***
+	if cfg.Credentials == credentials.AnonymousCredentials && userCfg.Credentials == nil {
+		if len(envCfg.Creds.AccessKeyID) > 0 {
 			cfg.Credentials = credentials.NewStaticCredentialsFromCreds(
 				envCfg.Creds,
 			)
-		***REMOVED*** else if envCfg.EnableSharedConfig && len(sharedCfg.AssumeRole.RoleARN) > 0 && sharedCfg.AssumeRoleSource != nil ***REMOVED***
+		} else if envCfg.EnableSharedConfig && len(sharedCfg.AssumeRole.RoleARN) > 0 && sharedCfg.AssumeRoleSource != nil {
 			cfgCp := *cfg
 			cfgCp.Credentials = credentials.NewStaticCredentialsFromCreds(
 				sharedCfg.AssumeRoleSource.Creds,
 			)
-			if len(sharedCfg.AssumeRole.MFASerial) > 0 && sessOpts.AssumeRoleTokenProvider == nil ***REMOVED***
+			if len(sharedCfg.AssumeRole.MFASerial) > 0 && sessOpts.AssumeRoleTokenProvider == nil {
 				// AssumeRole Token provider is required if doing Assume Role
 				// with MFA.
-				return AssumeRoleTokenProviderNotSetError***REMOVED******REMOVED***
-			***REMOVED***
+				return AssumeRoleTokenProviderNotSetError{}
+			}
 			cfg.Credentials = stscreds.NewCredentials(
-				&Session***REMOVED***
+				&Session{
 					Config:   &cfgCp,
 					Handlers: handlers.Copy(),
-				***REMOVED***,
+				},
 				sharedCfg.AssumeRole.RoleARN,
-				func(opt *stscreds.AssumeRoleProvider) ***REMOVED***
+				func(opt *stscreds.AssumeRoleProvider) {
 					opt.RoleSessionName = sharedCfg.AssumeRole.RoleSessionName
 
 					// Assume role with external ID
-					if len(sharedCfg.AssumeRole.ExternalID) > 0 ***REMOVED***
+					if len(sharedCfg.AssumeRole.ExternalID) > 0 {
 						opt.ExternalID = aws.String(sharedCfg.AssumeRole.ExternalID)
-					***REMOVED***
+					}
 
 					// Assume role with MFA
-					if len(sharedCfg.AssumeRole.MFASerial) > 0 ***REMOVED***
+					if len(sharedCfg.AssumeRole.MFASerial) > 0 {
 						opt.SerialNumber = aws.String(sharedCfg.AssumeRole.MFASerial)
 						opt.TokenProvider = sessOpts.AssumeRoleTokenProvider
-					***REMOVED***
-				***REMOVED***,
+					}
+				},
 			)
-		***REMOVED*** else if len(sharedCfg.Creds.AccessKeyID) > 0 ***REMOVED***
+		} else if len(sharedCfg.Creds.AccessKeyID) > 0 {
 			cfg.Credentials = credentials.NewStaticCredentialsFromCreds(
 				sharedCfg.Creds,
 			)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			// Fallback to default credentials provider, include mock errors
 			// for the credential chain so user can identify why credentials
 			// failed to be retrieved.
-			cfg.Credentials = credentials.NewCredentials(&credentials.ChainProvider***REMOVED***
+			cfg.Credentials = credentials.NewCredentials(&credentials.ChainProvider{
 				VerboseErrors: aws.BoolValue(cfg.CredentialsChainVerboseErrors),
-				Providers: []credentials.Provider***REMOVED***
-					&credProviderError***REMOVED***Err: awserr.New("EnvAccessKeyNotFound", "failed to find credentials in the environment.", nil)***REMOVED***,
-					&credProviderError***REMOVED***Err: awserr.New("SharedCredsLoad", fmt.Sprintf("failed to load profile, %s.", envCfg.Profile), nil)***REMOVED***,
+				Providers: []credentials.Provider{
+					&credProviderError{Err: awserr.New("EnvAccessKeyNotFound", "failed to find credentials in the environment.", nil)},
+					&credProviderError{Err: awserr.New("SharedCredsLoad", fmt.Sprintf("failed to load profile, %s.", envCfg.Profile), nil)},
 					defaults.RemoteCredProvider(*cfg, handlers),
-				***REMOVED***,
-			***REMOVED***)
-		***REMOVED***
-	***REMOVED***
+				},
+			})
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
 // AssumeRoleTokenProviderNotSetError is an error returned when creating a session when the
 // MFAToken option is not set when shared config is configured load assume a
 // role with an MFA token.
-type AssumeRoleTokenProviderNotSetError struct***REMOVED******REMOVED***
+type AssumeRoleTokenProviderNotSetError struct{}
 
 // Code is the short id of the error.
-func (e AssumeRoleTokenProviderNotSetError) Code() string ***REMOVED***
+func (e AssumeRoleTokenProviderNotSetError) Code() string {
 	return "AssumeRoleTokenProviderNotSetError"
-***REMOVED***
+}
 
 // Message is the description of the error
-func (e AssumeRoleTokenProviderNotSetError) Message() string ***REMOVED***
+func (e AssumeRoleTokenProviderNotSetError) Message() string {
 	return fmt.Sprintf("assume role with MFA enabled, but AssumeRoleTokenProvider session option not set.")
-***REMOVED***
+}
 
 // OrigErr is the underlying error that caused the failure.
-func (e AssumeRoleTokenProviderNotSetError) OrigErr() error ***REMOVED***
+func (e AssumeRoleTokenProviderNotSetError) OrigErr() error {
 	return nil
-***REMOVED***
+}
 
 // Error satisfies the error interface.
-func (e AssumeRoleTokenProviderNotSetError) Error() string ***REMOVED***
+func (e AssumeRoleTokenProviderNotSetError) Error() string {
 	return awserr.SprintError(e.Code(), e.Message(), "", nil)
-***REMOVED***
+}
 
-type credProviderError struct ***REMOVED***
+type credProviderError struct {
 	Err error
-***REMOVED***
+}
 
-var emptyCreds = credentials.Value***REMOVED******REMOVED***
+var emptyCreds = credentials.Value{}
 
-func (c credProviderError) Retrieve() (credentials.Value, error) ***REMOVED***
-	return credentials.Value***REMOVED******REMOVED***, c.Err
-***REMOVED***
-func (c credProviderError) IsExpired() bool ***REMOVED***
+func (c credProviderError) Retrieve() (credentials.Value, error) {
+	return credentials.Value{}, c.Err
+}
+func (c credProviderError) IsExpired() bool {
 	return true
-***REMOVED***
+}
 
-func initHandlers(s *Session) ***REMOVED***
+func initHandlers(s *Session) {
 	// Add the Validate parameter handler if it is not disabled.
 	s.Handlers.Validate.Remove(corehandlers.ValidateParametersHandler)
-	if !aws.BoolValue(s.Config.DisableParamValidation) ***REMOVED***
+	if !aws.BoolValue(s.Config.DisableParamValidation) {
 		s.Handlers.Validate.PushBackNamed(corehandlers.ValidateParametersHandler)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Copy creates and returns a copy of the current Session, coping the config
 // and handlers. If any additional configs are provided they will be merged
 // on top of the Session's copied config.
 //
 //     // Create a copy of the current Session, configured for the us-west-2 region.
-//     sess.Copy(&aws.Config***REMOVED***Region: aws.String("us-west-2")***REMOVED***)
-func (s *Session) Copy(cfgs ...*aws.Config) *Session ***REMOVED***
-	newSession := &Session***REMOVED***
+//     sess.Copy(&aws.Config{Region: aws.String("us-west-2")})
+func (s *Session) Copy(cfgs ...*aws.Config) *Session {
+	newSession := &Session{
 		Config:   s.Config.Copy(cfgs...),
 		Handlers: s.Handlers.Copy(),
-	***REMOVED***
+	}
 
 	initHandlers(newSession)
 
 	return newSession
-***REMOVED***
+}
 
 // ClientConfig satisfies the client.ConfigProvider interface and is used to
 // configure the service client instances. Passing the Session to the service
 // client's constructor (New) will use this method to configure the client.
-func (s *Session) ClientConfig(serviceName string, cfgs ...*aws.Config) client.Config ***REMOVED***
+func (s *Session) ClientConfig(serviceName string, cfgs ...*aws.Config) client.Config {
 	// Backwards compatibility, the error will be eaten if user calls ClientConfig
 	// directly. All SDK services will use ClientconfigWithError.
 	cfg, _ := s.clientConfigWithErr(serviceName, cfgs...)
 
 	return cfg
-***REMOVED***
+}
 
-func (s *Session) clientConfigWithErr(serviceName string, cfgs ...*aws.Config) (client.Config, error) ***REMOVED***
+func (s *Session) clientConfigWithErr(serviceName string, cfgs ...*aws.Config) (client.Config, error) {
 	s = s.Copy(cfgs...)
 
 	var resolved endpoints.ResolvedEndpoint
@@ -555,52 +555,52 @@ func (s *Session) clientConfigWithErr(serviceName string, cfgs ...*aws.Config) (
 
 	region := aws.StringValue(s.Config.Region)
 
-	if endpoint := aws.StringValue(s.Config.Endpoint); len(endpoint) != 0 ***REMOVED***
+	if endpoint := aws.StringValue(s.Config.Endpoint); len(endpoint) != 0 {
 		resolved.URL = endpoints.AddScheme(endpoint, aws.BoolValue(s.Config.DisableSSL))
 		resolved.SigningRegion = region
-	***REMOVED*** else ***REMOVED***
+	} else {
 		resolved, err = s.Config.EndpointResolver.EndpointFor(
 			serviceName, region,
-			func(opt *endpoints.Options) ***REMOVED***
+			func(opt *endpoints.Options) {
 				opt.DisableSSL = aws.BoolValue(s.Config.DisableSSL)
 				opt.UseDualStack = aws.BoolValue(s.Config.UseDualStack)
 
 				// Support the condition where the service is modeled but its
 				// endpoint metadata is not available.
 				opt.ResolveUnknownService = true
-			***REMOVED***,
+			},
 		)
-	***REMOVED***
+	}
 
-	return client.Config***REMOVED***
+	return client.Config{
 		Config:        s.Config,
 		Handlers:      s.Handlers,
 		Endpoint:      resolved.URL,
 		SigningRegion: resolved.SigningRegion,
 		SigningName:   resolved.SigningName,
-	***REMOVED***, err
-***REMOVED***
+	}, err
+}
 
 // ClientConfigNoResolveEndpoint is the same as ClientConfig with the exception
 // that the EndpointResolver will not be used to resolve the endpoint. The only
 // endpoint set must come from the aws.Config.Endpoint field.
-func (s *Session) ClientConfigNoResolveEndpoint(cfgs ...*aws.Config) client.Config ***REMOVED***
+func (s *Session) ClientConfigNoResolveEndpoint(cfgs ...*aws.Config) client.Config {
 	s = s.Copy(cfgs...)
 
 	var resolved endpoints.ResolvedEndpoint
 
 	region := aws.StringValue(s.Config.Region)
 
-	if ep := aws.StringValue(s.Config.Endpoint); len(ep) > 0 ***REMOVED***
+	if ep := aws.StringValue(s.Config.Endpoint); len(ep) > 0 {
 		resolved.URL = endpoints.AddScheme(ep, aws.BoolValue(s.Config.DisableSSL))
 		resolved.SigningRegion = region
-	***REMOVED***
+	}
 
-	return client.Config***REMOVED***
+	return client.Config{
 		Config:        s.Config,
 		Handlers:      s.Handlers,
 		Endpoint:      resolved.URL,
 		SigningRegion: resolved.SigningRegion,
 		SigningName:   resolved.SigningName,
-	***REMOVED***
-***REMOVED***
+	}
+}

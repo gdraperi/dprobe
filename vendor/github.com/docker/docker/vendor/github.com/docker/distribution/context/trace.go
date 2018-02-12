@@ -23,11 +23,11 @@ import (
 //
 // Here is an example of the usage:
 //
-// 	func timedOperation(ctx Context) ***REMOVED***
+// 	func timedOperation(ctx Context) {
 // 		ctx, done := WithTrace(ctx)
 // 		defer done("this will be the log message")
 // 		// ... function body ...
-// 	***REMOVED***
+// 	}
 //
 // If the function ran for roughly 1s, such a usage would emit a log message
 // as follows:
@@ -36,14 +36,14 @@ import (
 //
 // Notice that the function name is automatically resolved, along with the
 // package and a trace id is emitted that can be linked with parent ids.
-func WithTrace(ctx Context) (Context, func(format string, a ...interface***REMOVED******REMOVED***)) ***REMOVED***
-	if ctx == nil ***REMOVED***
+func WithTrace(ctx Context) (Context, func(format string, a ...interface{})) {
+	if ctx == nil {
 		ctx = Background()
-	***REMOVED***
+	}
 
 	pc, file, line, _ := runtime.Caller(1)
 	f := runtime.FuncForPC(pc)
-	ctx = &traced***REMOVED***
+	ctx = &traced{
 		Context: ctx,
 		id:      uuid.Generate().String(),
 		start:   time.Now(),
@@ -51,9 +51,9 @@ func WithTrace(ctx Context) (Context, func(format string, a ...interface***REMOV
 		fnname:  f.Name(),
 		file:    file,
 		line:    line,
-	***REMOVED***
+	}
 
-	return ctx, func(format string, a ...interface***REMOVED******REMOVED***) ***REMOVED***
+	return ctx, func(format string, a ...interface{}) {
 		GetLogger(ctx,
 			"trace.duration",
 			"trace.id",
@@ -62,13 +62,13 @@ func WithTrace(ctx Context) (Context, func(format string, a ...interface***REMOV
 			"trace.file",
 			"trace.line").
 			Debugf(format, a...)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // traced represents a context that is traced for function call timing. It
 // also provides fast lookup for the various attributes that are available on
 // the trace.
-type traced struct ***REMOVED***
+type traced struct {
 	Context
 	id     string
 	parent string
@@ -76,10 +76,10 @@ type traced struct ***REMOVED***
 	fnname string
 	file   string
 	line   int
-***REMOVED***
+}
 
-func (ts *traced) Value(key interface***REMOVED******REMOVED***) interface***REMOVED******REMOVED*** ***REMOVED***
-	switch key ***REMOVED***
+func (ts *traced) Value(key interface{}) interface{} {
+	switch key {
 	case "trace.start":
 		return ts.start
 	case "trace.duration":
@@ -87,9 +87,9 @@ func (ts *traced) Value(key interface***REMOVED******REMOVED***) interface***REM
 	case "trace.id":
 		return ts.id
 	case "trace.parent.id":
-		if ts.parent == "" ***REMOVED***
+		if ts.parent == "" {
 			return nil // must return nil to signal no parent.
-		***REMOVED***
+		}
 
 		return ts.parent
 	case "trace.func":
@@ -98,7 +98,7 @@ func (ts *traced) Value(key interface***REMOVED******REMOVED***) interface***REM
 		return ts.file
 	case "trace.line":
 		return ts.line
-	***REMOVED***
+	}
 
 	return ts.Context.Value(key)
-***REMOVED***
+}

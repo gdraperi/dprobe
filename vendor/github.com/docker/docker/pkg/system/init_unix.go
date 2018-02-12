@@ -3,5 +3,5 @@
 package system
 
 // InitLCOW does nothing since LCOW is a windows only feature
-func InitLCOW(experimental bool) ***REMOVED***
-***REMOVED***
+func InitLCOW(experimental bool) {
+}

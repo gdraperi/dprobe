@@ -15,22 +15,22 @@ const (
 
 type conflictError string
 
-func (e conflictError) Error() string ***REMOVED***
+func (e conflictError) Error() string {
 	return string(e)
-***REMOVED***
-func (conflictError) Conflict() ***REMOVED******REMOVED***
+}
+func (conflictError) Conflict() {}
 
 type notFoundError string
 
-func (e notFoundError) Error() string ***REMOVED***
+func (e notFoundError) Error() string {
 	return string(e)
-***REMOVED***
+}
 
-func (notFoundError) NotFound() ***REMOVED******REMOVED***
+func (notFoundError) NotFound() {}
 
 // OpErr is the error type returned by functions in the store package. It describes
 // the operation, volume name, and error.
-type OpErr struct ***REMOVED***
+type OpErr struct {
 	// Err is the error that occurred during the operation.
 	Err error
 	// Op is the operation which caused the error, such as "create", or "list".
@@ -39,57 +39,57 @@ type OpErr struct ***REMOVED***
 	Name string
 	// Refs is the list of references associated with the resource.
 	Refs []string
-***REMOVED***
+}
 
 // Error satisfies the built-in error interface type.
-func (e *OpErr) Error() string ***REMOVED***
-	if e == nil ***REMOVED***
+func (e *OpErr) Error() string {
+	if e == nil {
 		return "<nil>"
-	***REMOVED***
+	}
 	s := e.Op
-	if e.Name != "" ***REMOVED***
+	if e.Name != "" {
 		s = s + " " + e.Name
-	***REMOVED***
+	}
 
 	s = s + ": " + e.Err.Error()
-	if len(e.Refs) > 0 ***REMOVED***
+	if len(e.Refs) > 0 {
 		s = s + " - " + "[" + strings.Join(e.Refs, ", ") + "]"
-	***REMOVED***
+	}
 	return s
-***REMOVED***
+}
 
 // Cause returns the error the caused this error
-func (e *OpErr) Cause() error ***REMOVED***
+func (e *OpErr) Cause() error {
 	return e.Err
-***REMOVED***
+}
 
 // IsInUse returns a boolean indicating whether the error indicates that a
 // volume is in use
-func IsInUse(err error) bool ***REMOVED***
+func IsInUse(err error) bool {
 	return isErr(err, errVolumeInUse)
-***REMOVED***
+}
 
 // IsNotExist returns a boolean indicating whether the error indicates that the volume does not exist
-func IsNotExist(err error) bool ***REMOVED***
+func IsNotExist(err error) bool {
 	return isErr(err, errNoSuchVolume)
-***REMOVED***
+}
 
 // IsNameConflict returns a boolean indicating whether the error indicates that a
 // volume name is already taken
-func IsNameConflict(err error) bool ***REMOVED***
+func IsNameConflict(err error) bool {
 	return isErr(err, errNameConflict)
-***REMOVED***
+}
 
-type causal interface ***REMOVED***
+type causal interface {
 	Cause() error
-***REMOVED***
+}
 
-func isErr(err error, expected error) bool ***REMOVED***
-	switch pe := err.(type) ***REMOVED***
+func isErr(err error, expected error) bool {
+	switch pe := err.(type) {
 	case nil:
 		return false
 	case causal:
 		return isErr(pe.Cause(), expected)
-	***REMOVED***
+	}
 	return err == expected
-***REMOVED***
+}

@@ -10,11 +10,11 @@ import (
 )
 
 // runtimeArchitecture gets the name of the current architecture (x86, x86_64, i86pc, sun4v, ...)
-func runtimeArchitecture() (string, error) ***REMOVED***
+func runtimeArchitecture() (string, error) {
 	cmd := exec.Command("/usr/bin/uname", "-m")
 	machine, err := cmd.Output()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	return strings.TrimSpace(string(machine)), nil
-***REMOVED***
+}

@@ -7,8 +7,8 @@ DOCKER_INCREMENTAL_BINARY := $(if $(DOCKER_INCREMENTAL_BINARY),$(DOCKER_INCREMEN
 export DOCKER_INCREMENTAL_BINARY
 
 # get OS/Arch of docker engine
-DOCKER_OSARCH := $(shell bash -c 'source hack/make/.detect-daemon-osarch && echo $$***REMOVED***DOCKER_ENGINE_OSARCH***REMOVED***')
-DOCKERFILE := $(shell bash -c 'source hack/make/.detect-daemon-osarch && echo $$***REMOVED***DOCKERFILE***REMOVED***')
+DOCKER_OSARCH := $(shell bash -c 'source hack/make/.detect-daemon-osarch && echo $${DOCKER_ENGINE_OSARCH}')
+DOCKERFILE := $(shell bash -c 'source hack/make/.detect-daemon-osarch && echo $${DOCKERFILE}')
 
 DOCKER_GITCOMMIT := $(shell git rev-parse --short HEAD || echo unsupported)
 export DOCKER_GITCOMMIT
@@ -121,8 +121,8 @@ dynbinary: build ## build the linux dynbinaries
 	$(DOCKER_RUN_DOCKER) hack/make.sh dynbinary
 
 build: bundles init-go-pkg-cache
-	$(warning The docker client CLI has moved to github.com/docker/cli. For a dev-test cycle involving the CLI, run:$***REMOVED***\n***REMOVED*** DOCKER_CLI_PATH=/host/path/to/cli/binary make shell $***REMOVED***\n***REMOVED*** then change the cli and compile into a binary at the same location.$***REMOVED***\n***REMOVED***)
-	docker build $***REMOVED***BUILD_APT_MIRROR***REMOVED*** $***REMOVED***DOCKER_BUILD_ARGS***REMOVED*** -t "$(DOCKER_IMAGE)" -f "$(DOCKERFILE)" .
+	$(warning The docker client CLI has moved to github.com/docker/cli. For a dev-test cycle involving the CLI, run:${\n} DOCKER_CLI_PATH=/host/path/to/cli/binary make shell ${\n} then change the cli and compile into a binary at the same location.${\n})
+	docker build ${BUILD_APT_MIRROR} ${DOCKER_BUILD_ARGS} -t "$(DOCKER_IMAGE)" -f "$(DOCKERFILE)" .
 
 bundles:
 	mkdir bundles
@@ -131,7 +131,7 @@ clean: clean-pkg-cache-vol ## clean up cached resources
 
 clean-pkg-cache-vol:
 	@- $(foreach mapping,$(PKGCACHE_MAP), \
-		$(shell docker volume rm $(PKGCACHE_VOLROOT)-$(shell echo $(mapping) | awk -F':/' '***REMOVED*** print $$1 ***REMOVED***') > /dev/null 2>&1) \
+		$(shell docker volume rm $(PKGCACHE_VOLROOT)-$(shell echo $(mapping) | awk -F':/' '{ print $$1 }') > /dev/null 2>&1) \
 	)
 
 cross: build ## cross build the binaries for darwin, freebsd and\nwindows
@@ -142,7 +142,7 @@ deb: build  ## build the deb packages
 
 
 help: ## this help
-	@awk 'BEGIN ***REMOVED***FS = ":.*?## "***REMOVED*** /^[a-zA-Z_-]+:.*?## / ***REMOVED***sub("\\\\n",sprintf("\n%22c"," "), $$2);printf "\033[36m%-20s\033[0m %s\n", $$1, $$2***REMOVED***' $(MAKEFILE_LIST)
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {sub("\\\\n",sprintf("\n%22c"," "), $$2);printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
 init-go-pkg-cache:
 	$(if $(PKGCACHE_DIR), mkdir -p $(shell echo $(PKGCACHE_MAP) | sed -E 's@([^: ]*):[^ ]*@$(PKGCACHE_DIR)/\1@g'))

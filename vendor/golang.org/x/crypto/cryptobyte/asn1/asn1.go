@@ -20,10 +20,10 @@ const (
 )
 
 // Constructed returns t with the constructed class bit set.
-func (t Tag) Constructed() Tag ***REMOVED*** return t | classConstructed ***REMOVED***
+func (t Tag) Constructed() Tag { return t | classConstructed }
 
 // ContextSpecific returns t with the context-specific class bit set.
-func (t Tag) ContextSpecific() Tag ***REMOVED*** return t | classContextSpecific ***REMOVED***
+func (t Tag) ContextSpecific() Tag { return t | classContextSpecific }
 
 // The following is a list of standard tag and class combinations.
 const (

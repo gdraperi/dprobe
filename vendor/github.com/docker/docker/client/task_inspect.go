@@ -10,20 +10,20 @@ import (
 )
 
 // TaskInspectWithRaw returns the task information and its raw representation..
-func (cli *Client) TaskInspectWithRaw(ctx context.Context, taskID string) (swarm.Task, []byte, error) ***REMOVED***
+func (cli *Client) TaskInspectWithRaw(ctx context.Context, taskID string) (swarm.Task, []byte, error) {
 	serverResp, err := cli.get(ctx, "/tasks/"+taskID, nil, nil)
-	if err != nil ***REMOVED***
-		return swarm.Task***REMOVED******REMOVED***, nil, wrapResponseError(err, serverResp, "task", taskID)
-	***REMOVED***
+	if err != nil {
+		return swarm.Task{}, nil, wrapResponseError(err, serverResp, "task", taskID)
+	}
 	defer ensureReaderClosed(serverResp)
 
 	body, err := ioutil.ReadAll(serverResp.body)
-	if err != nil ***REMOVED***
-		return swarm.Task***REMOVED******REMOVED***, nil, err
-	***REMOVED***
+	if err != nil {
+		return swarm.Task{}, nil, err
+	}
 
 	var response swarm.Task
 	rdr := bytes.NewReader(body)
 	err = json.NewDecoder(rdr).Decode(&response)
 	return response, body, err
-***REMOVED***
+}

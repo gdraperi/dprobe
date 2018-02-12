@@ -35,138 +35,138 @@ var (
 	addr      = flag.String("addr", ":8080", "http service address")
 	homeTempl = template.Must(template.New("").Parse(homeHTML))
 	filename  string
-	upgrader  = websocket.Upgrader***REMOVED***
+	upgrader  = websocket.Upgrader{
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
-	***REMOVED***
+	}
 )
 
-func readFileIfModified(lastMod time.Time) ([]byte, time.Time, error) ***REMOVED***
+func readFileIfModified(lastMod time.Time) ([]byte, time.Time, error) {
 	fi, err := os.Stat(filename)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, lastMod, err
-	***REMOVED***
-	if !fi.ModTime().After(lastMod) ***REMOVED***
+	}
+	if !fi.ModTime().After(lastMod) {
 		return nil, lastMod, nil
-	***REMOVED***
+	}
 	p, err := ioutil.ReadFile(filename)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fi.ModTime(), err
-	***REMOVED***
+	}
 	return p, fi.ModTime(), nil
-***REMOVED***
+}
 
-func reader(ws *websocket.Conn) ***REMOVED***
+func reader(ws *websocket.Conn) {
 	defer ws.Close()
 	ws.SetReadLimit(512)
 	ws.SetReadDeadline(time.Now().Add(pongWait))
-	ws.SetPongHandler(func(string) error ***REMOVED*** ws.SetReadDeadline(time.Now().Add(pongWait)); return nil ***REMOVED***)
-	for ***REMOVED***
+	ws.SetPongHandler(func(string) error { ws.SetReadDeadline(time.Now().Add(pongWait)); return nil })
+	for {
 		_, _, err := ws.ReadMessage()
-		if err != nil ***REMOVED***
+		if err != nil {
 			break
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func writer(ws *websocket.Conn, lastMod time.Time) ***REMOVED***
+func writer(ws *websocket.Conn, lastMod time.Time) {
 	lastError := ""
 	pingTicker := time.NewTicker(pingPeriod)
 	fileTicker := time.NewTicker(filePeriod)
-	defer func() ***REMOVED***
+	defer func() {
 		pingTicker.Stop()
 		fileTicker.Stop()
 		ws.Close()
-	***REMOVED***()
-	for ***REMOVED***
-		select ***REMOVED***
+	}()
+	for {
+		select {
 		case <-fileTicker.C:
 			var p []byte
 			var err error
 
 			p, lastMod, err = readFileIfModified(lastMod)
 
-			if err != nil ***REMOVED***
-				if s := err.Error(); s != lastError ***REMOVED***
+			if err != nil {
+				if s := err.Error(); s != lastError {
 					lastError = s
 					p = []byte(lastError)
-				***REMOVED***
-			***REMOVED*** else ***REMOVED***
+				}
+			} else {
 				lastError = ""
-			***REMOVED***
+			}
 
-			if p != nil ***REMOVED***
+			if p != nil {
 				ws.SetWriteDeadline(time.Now().Add(writeWait))
-				if err := ws.WriteMessage(websocket.TextMessage, p); err != nil ***REMOVED***
+				if err := ws.WriteMessage(websocket.TextMessage, p); err != nil {
 					return
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case <-pingTicker.C:
 			ws.SetWriteDeadline(time.Now().Add(writeWait))
-			if err := ws.WriteMessage(websocket.PingMessage, []byte***REMOVED******REMOVED***); err != nil ***REMOVED***
+			if err := ws.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
 				return
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}
 
-func serveWs(w http.ResponseWriter, r *http.Request) ***REMOVED***
+func serveWs(w http.ResponseWriter, r *http.Request) {
 	ws, err := upgrader.Upgrade(w, r, nil)
-	if err != nil ***REMOVED***
-		if _, ok := err.(websocket.HandshakeError); !ok ***REMOVED***
+	if err != nil {
+		if _, ok := err.(websocket.HandshakeError); !ok {
 			log.Println(err)
-		***REMOVED***
+		}
 		return
-	***REMOVED***
+	}
 
 	var lastMod time.Time
-	if n, err := strconv.ParseInt(r.FormValue("lastMod"), 16, 64); err == nil ***REMOVED***
+	if n, err := strconv.ParseInt(r.FormValue("lastMod"), 16, 64); err == nil {
 		lastMod = time.Unix(0, n)
-	***REMOVED***
+	}
 
 	go writer(ws, lastMod)
 	reader(ws)
-***REMOVED***
+}
 
-func serveHome(w http.ResponseWriter, r *http.Request) ***REMOVED***
-	if r.URL.Path != "/" ***REMOVED***
+func serveHome(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/" {
 		http.Error(w, "Not found", 404)
 		return
-	***REMOVED***
-	if r.Method != "GET" ***REMOVED***
+	}
+	if r.Method != "GET" {
 		http.Error(w, "Method not allowed", 405)
 		return
-	***REMOVED***
+	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	p, lastMod, err := readFileIfModified(time.Time***REMOVED******REMOVED***)
-	if err != nil ***REMOVED***
+	p, lastMod, err := readFileIfModified(time.Time{})
+	if err != nil {
 		p = []byte(err.Error())
 		lastMod = time.Unix(0, 0)
-	***REMOVED***
-	var v = struct ***REMOVED***
+	}
+	var v = struct {
 		Host    string
 		Data    string
 		LastMod string
-	***REMOVED******REMOVED***
+	}{
 		r.Host,
 		string(p),
 		strconv.FormatInt(lastMod.UnixNano(), 16),
-	***REMOVED***
+	}
 	homeTempl.Execute(w, &v)
-***REMOVED***
+}
 
-func main() ***REMOVED***
+func main() {
 	flag.Parse()
-	if flag.NArg() != 1 ***REMOVED***
+	if flag.NArg() != 1 {
 		log.Fatal("filename not specified")
-	***REMOVED***
+	}
 	filename = flag.Args()[0]
 	http.HandleFunc("/", serveHome)
 	http.HandleFunc("/ws", serveWs)
-	if err := http.ListenAndServe(*addr, nil); err != nil ***REMOVED***
+	if err := http.ListenAndServe(*addr, nil); err != nil {
 		log.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 const homeHTML = `<!DOCTYPE html>
 <html lang="en">
@@ -174,19 +174,19 @@ const homeHTML = `<!DOCTYPE html>
         <title>WebSocket Example</title>
     </head>
     <body>
-        <pre id="fileData">***REMOVED******REMOVED***.Data***REMOVED******REMOVED***</pre>
+        <pre id="fileData">{{.Data}}</pre>
         <script type="text/javascript">
-            (function() ***REMOVED***
+            (function() {
                 var data = document.getElementById("fileData");
-                var conn = new WebSocket("ws://***REMOVED******REMOVED***.Host***REMOVED******REMOVED***/ws?lastMod=***REMOVED******REMOVED***.LastMod***REMOVED******REMOVED***");
-                conn.onclose = function(evt) ***REMOVED***
+                var conn = new WebSocket("ws://{{.Host}}/ws?lastMod={{.LastMod}}");
+                conn.onclose = function(evt) {
                     data.textContent = 'Connection closed';
-            ***REMOVED***
-                conn.onmessage = function(evt) ***REMOVED***
+                }
+                conn.onmessage = function(evt) {
                     console.log('file updated');
                     data.textContent = evt.data;
-            ***REMOVED***
-        ***REMOVED***)();
+                }
+            })();
         </script>
     </body>
 </html>

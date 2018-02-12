@@ -27,18 +27,18 @@ var (
 	stateCtr *stateCounter
 )
 
-func init() ***REMOVED***
+func init() {
 	ns := metrics.NewNamespace("engine", "daemon", nil)
 	containerActions = ns.NewLabeledTimer("container_actions", "The number of seconds it takes to process each container action", "action")
-	for _, a := range []string***REMOVED***
+	for _, a := range []string{
 		"start",
 		"changes",
 		"commit",
 		"create",
 		"delete",
-	***REMOVED*** ***REMOVED***
+	} {
 		containerActions.WithValues(a).Update(0)
-	***REMOVED***
+	}
 
 	networkActions = ns.NewLabeledTimer("network_actions", "The number of seconds it takes to process each network action", "action")
 	engineInfo = ns.NewLabeledGauge("engine", "The information related to the engine and the OS it is running on", metrics.Unit("info"),
@@ -60,114 +60,114 @@ func init() ***REMOVED***
 	ns.Add(stateCtr)
 
 	metrics.Register(ns)
-***REMOVED***
+}
 
-type stateCounter struct ***REMOVED***
+type stateCounter struct {
 	mu     sync.Mutex
 	states map[string]string
 	desc   *prometheus.Desc
-***REMOVED***
+}
 
-func newStateCounter(desc *prometheus.Desc) *stateCounter ***REMOVED***
-	return &stateCounter***REMOVED***
+func newStateCounter(desc *prometheus.Desc) *stateCounter {
+	return &stateCounter{
 		states: make(map[string]string),
 		desc:   desc,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (ctr *stateCounter) get() (running int, paused int, stopped int) ***REMOVED***
+func (ctr *stateCounter) get() (running int, paused int, stopped int) {
 	ctr.mu.Lock()
 	defer ctr.mu.Unlock()
 
-	states := map[string]int***REMOVED***
+	states := map[string]int{
 		"running": 0,
 		"paused":  0,
 		"stopped": 0,
-	***REMOVED***
-	for _, state := range ctr.states ***REMOVED***
+	}
+	for _, state := range ctr.states {
 		states[state]++
-	***REMOVED***
+	}
 	return states["running"], states["paused"], states["stopped"]
-***REMOVED***
+}
 
-func (ctr *stateCounter) set(id, label string) ***REMOVED***
+func (ctr *stateCounter) set(id, label string) {
 	ctr.mu.Lock()
 	ctr.states[id] = label
 	ctr.mu.Unlock()
-***REMOVED***
+}
 
-func (ctr *stateCounter) del(id string) ***REMOVED***
+func (ctr *stateCounter) del(id string) {
 	ctr.mu.Lock()
 	delete(ctr.states, id)
 	ctr.mu.Unlock()
-***REMOVED***
+}
 
-func (ctr *stateCounter) Describe(ch chan<- *prometheus.Desc) ***REMOVED***
+func (ctr *stateCounter) Describe(ch chan<- *prometheus.Desc) {
 	ch <- ctr.desc
-***REMOVED***
+}
 
-func (ctr *stateCounter) Collect(ch chan<- prometheus.Metric) ***REMOVED***
+func (ctr *stateCounter) Collect(ch chan<- prometheus.Metric) {
 	running, paused, stopped := ctr.get()
 	ch <- prometheus.MustNewConstMetric(ctr.desc, prometheus.GaugeValue, float64(running), "running")
 	ch <- prometheus.MustNewConstMetric(ctr.desc, prometheus.GaugeValue, float64(paused), "paused")
 	ch <- prometheus.MustNewConstMetric(ctr.desc, prometheus.GaugeValue, float64(stopped), "stopped")
-***REMOVED***
+}
 
-func (d *Daemon) cleanupMetricsPlugins() ***REMOVED***
+func (d *Daemon) cleanupMetricsPlugins() {
 	ls := d.PluginStore.GetAllManagedPluginsByCap(metricsPluginType)
 	var wg sync.WaitGroup
 	wg.Add(len(ls))
 
-	for _, plugin := range ls ***REMOVED***
+	for _, plugin := range ls {
 		p := plugin
-		go func() ***REMOVED***
+		go func() {
 			defer wg.Done()
 			pluginStopMetricsCollection(p)
-		***REMOVED***()
-	***REMOVED***
+		}()
+	}
 	wg.Wait()
 
-	if d.metricsPluginListener != nil ***REMOVED***
+	if d.metricsPluginListener != nil {
 		d.metricsPluginListener.Close()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type metricsPlugin struct ***REMOVED***
+type metricsPlugin struct {
 	plugingetter.CompatPlugin
-***REMOVED***
+}
 
-func (p metricsPlugin) sock() string ***REMOVED***
+func (p metricsPlugin) sock() string {
 	return "metrics.sock"
-***REMOVED***
+}
 
-func (p metricsPlugin) sockBase() string ***REMOVED***
+func (p metricsPlugin) sockBase() string {
 	return filepath.Join(p.BasePath(), "run", "docker")
-***REMOVED***
+}
 
-func pluginStartMetricsCollection(p plugingetter.CompatPlugin) error ***REMOVED***
-	type metricsPluginResponse struct ***REMOVED***
+func pluginStartMetricsCollection(p plugingetter.CompatPlugin) error {
+	type metricsPluginResponse struct {
 		Err string
-	***REMOVED***
+	}
 	var res metricsPluginResponse
-	if err := p.Client().Call(metricsPluginType+".StartMetrics", nil, &res); err != nil ***REMOVED***
+	if err := p.Client().Call(metricsPluginType+".StartMetrics", nil, &res); err != nil {
 		return errors.Wrap(err, "could not start metrics plugin")
-	***REMOVED***
-	if res.Err != "" ***REMOVED***
+	}
+	if res.Err != "" {
 		return errors.New(res.Err)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func pluginStopMetricsCollection(p plugingetter.CompatPlugin) ***REMOVED***
-	if err := p.Client().Call(metricsPluginType+".StopMetrics", nil, nil); err != nil ***REMOVED***
+func pluginStopMetricsCollection(p plugingetter.CompatPlugin) {
+	if err := p.Client().Call(metricsPluginType+".StopMetrics", nil, nil); err != nil {
 		logrus.WithError(err).WithField("name", p.Name()).Error("error stopping metrics collector")
-	***REMOVED***
+	}
 
-	mp := metricsPlugin***REMOVED***p***REMOVED***
+	mp := metricsPlugin{p}
 	sockPath := filepath.Join(mp.sockBase(), mp.sock())
-	if err := mount.Unmount(sockPath); err != nil ***REMOVED***
-		if mounted, _ := mount.Mounted(sockPath); mounted ***REMOVED***
+	if err := mount.Unmount(sockPath); err != nil {
+		if mounted, _ := mount.Mounted(sockPath); mounted {
 			logrus.WithError(err).WithField("name", p.Name()).WithField("socket", sockPath).Error("error unmounting metrics socket for plugin")
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

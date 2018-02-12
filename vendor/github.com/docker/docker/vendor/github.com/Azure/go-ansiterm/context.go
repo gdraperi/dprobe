@@ -1,7 +1,7 @@
 package ansiterm
 
-type ansiContext struct ***REMOVED***
+type ansiContext struct {
 	currentChar byte
 	paramBuffer []byte
 	interBuffer []byte
-***REMOVED***
+}

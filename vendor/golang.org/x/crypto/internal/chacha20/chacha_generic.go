@@ -11,7 +11,7 @@ const rounds = 20
 
 // core applies the ChaCha20 core function to 16-byte input in, 32-byte key k,
 // and 16-byte constant c, and puts the result into 64-byte array out.
-func core(out *[64]byte, in *[16]byte, k *[32]byte) ***REMOVED***
+func core(out *[64]byte, in *[16]byte, k *[32]byte) {
 	j0 := uint32(0x61707865)
 	j1 := uint32(0x3320646e)
 	j2 := uint32(0x79622d32)
@@ -32,7 +32,7 @@ func core(out *[64]byte, in *[16]byte, k *[32]byte) ***REMOVED***
 	x0, x1, x2, x3, x4, x5, x6, x7 := j0, j1, j2, j3, j4, j5, j6, j7
 	x8, x9, x10, x11, x12, x13, x14, x15 := j8, j9, j10, j11, j12, j13, j14, j15
 
-	for i := 0; i < rounds; i += 2 ***REMOVED***
+	for i := 0; i < rounds; i += 2 {
 		x0 += x4
 		x12 ^= x0
 		x12 = (x12 << 16) | (x12 >> (16))
@@ -129,7 +129,7 @@ func core(out *[64]byte, in *[16]byte, k *[32]byte) ***REMOVED***
 		x9 += x14
 		x4 ^= x9
 		x4 = (x4 << 7) | (x4 >> 25)
-	***REMOVED***
+	}
 
 	x0 += j0
 	x1 += j1
@@ -164,35 +164,35 @@ func core(out *[64]byte, in *[16]byte, k *[32]byte) ***REMOVED***
 	binary.LittleEndian.PutUint32(out[52:56], x13)
 	binary.LittleEndian.PutUint32(out[56:60], x14)
 	binary.LittleEndian.PutUint32(out[60:64], x15)
-***REMOVED***
+}
 
 // XORKeyStream crypts bytes from in to out using the given key and counters.
 // In and out must overlap entirely or not at all. Counter contains the raw
 // ChaCha20 counter bytes (i.e. block counter followed by nonce).
-func XORKeyStream(out, in []byte, counter *[16]byte, key *[32]byte) ***REMOVED***
+func XORKeyStream(out, in []byte, counter *[16]byte, key *[32]byte) {
 	var block [64]byte
 	var counterCopy [16]byte
 	copy(counterCopy[:], counter[:])
 
-	for len(in) >= 64 ***REMOVED***
+	for len(in) >= 64 {
 		core(&block, &counterCopy, key)
-		for i, x := range block ***REMOVED***
+		for i, x := range block {
 			out[i] = in[i] ^ x
-		***REMOVED***
+		}
 		u := uint32(1)
-		for i := 0; i < 4; i++ ***REMOVED***
+		for i := 0; i < 4; i++ {
 			u += uint32(counterCopy[i])
 			counterCopy[i] = byte(u)
 			u >>= 8
-		***REMOVED***
+		}
 		in = in[64:]
 		out = out[64:]
-	***REMOVED***
+	}
 
-	if len(in) > 0 ***REMOVED***
+	if len(in) > 0 {
 		core(&block, &counterCopy, key)
-		for i, v := range in ***REMOVED***
+		for i, v := range in {
 			out[i] = v ^ block[i]
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

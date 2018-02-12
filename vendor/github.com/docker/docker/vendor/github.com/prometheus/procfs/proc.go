@@ -9,204 +9,204 @@ import (
 )
 
 // Proc provides information about a running process.
-type Proc struct ***REMOVED***
+type Proc struct {
 	// The process ID.
 	PID int
 
 	fs FS
-***REMOVED***
+}
 
 // Procs represents a list of Proc structs.
 type Procs []Proc
 
-func (p Procs) Len() int           ***REMOVED*** return len(p) ***REMOVED***
-func (p Procs) Swap(i, j int)      ***REMOVED*** p[i], p[j] = p[j], p[i] ***REMOVED***
-func (p Procs) Less(i, j int) bool ***REMOVED*** return p[i].PID < p[j].PID ***REMOVED***
+func (p Procs) Len() int           { return len(p) }
+func (p Procs) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
+func (p Procs) Less(i, j int) bool { return p[i].PID < p[j].PID }
 
 // Self returns a process for the current process read via /proc/self.
-func Self() (Proc, error) ***REMOVED***
+func Self() (Proc, error) {
 	fs, err := NewFS(DefaultMountPoint)
-	if err != nil ***REMOVED***
-		return Proc***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return Proc{}, err
+	}
 	return fs.Self()
-***REMOVED***
+}
 
 // NewProc returns a process for the given pid under /proc.
-func NewProc(pid int) (Proc, error) ***REMOVED***
+func NewProc(pid int) (Proc, error) {
 	fs, err := NewFS(DefaultMountPoint)
-	if err != nil ***REMOVED***
-		return Proc***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return Proc{}, err
+	}
 	return fs.NewProc(pid)
-***REMOVED***
+}
 
 // AllProcs returns a list of all currently available processes under /proc.
-func AllProcs() (Procs, error) ***REMOVED***
+func AllProcs() (Procs, error) {
 	fs, err := NewFS(DefaultMountPoint)
-	if err != nil ***REMOVED***
-		return Procs***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return Procs{}, err
+	}
 	return fs.AllProcs()
-***REMOVED***
+}
 
 // Self returns a process for the current process.
-func (fs FS) Self() (Proc, error) ***REMOVED***
+func (fs FS) Self() (Proc, error) {
 	p, err := os.Readlink(fs.Path("self"))
-	if err != nil ***REMOVED***
-		return Proc***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return Proc{}, err
+	}
 	pid, err := strconv.Atoi(strings.Replace(p, string(fs), "", -1))
-	if err != nil ***REMOVED***
-		return Proc***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return Proc{}, err
+	}
 	return fs.NewProc(pid)
-***REMOVED***
+}
 
 // NewProc returns a process for the given pid.
-func (fs FS) NewProc(pid int) (Proc, error) ***REMOVED***
-	if _, err := os.Stat(fs.Path(strconv.Itoa(pid))); err != nil ***REMOVED***
-		return Proc***REMOVED******REMOVED***, err
-	***REMOVED***
-	return Proc***REMOVED***PID: pid, fs: fs***REMOVED***, nil
-***REMOVED***
+func (fs FS) NewProc(pid int) (Proc, error) {
+	if _, err := os.Stat(fs.Path(strconv.Itoa(pid))); err != nil {
+		return Proc{}, err
+	}
+	return Proc{PID: pid, fs: fs}, nil
+}
 
 // AllProcs returns a list of all currently available processes.
-func (fs FS) AllProcs() (Procs, error) ***REMOVED***
+func (fs FS) AllProcs() (Procs, error) {
 	d, err := os.Open(fs.Path())
-	if err != nil ***REMOVED***
-		return Procs***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return Procs{}, err
+	}
 	defer d.Close()
 
 	names, err := d.Readdirnames(-1)
-	if err != nil ***REMOVED***
-		return Procs***REMOVED******REMOVED***, fmt.Errorf("could not read %s: %s", d.Name(), err)
-	***REMOVED***
+	if err != nil {
+		return Procs{}, fmt.Errorf("could not read %s: %s", d.Name(), err)
+	}
 
-	p := Procs***REMOVED******REMOVED***
-	for _, n := range names ***REMOVED***
+	p := Procs{}
+	for _, n := range names {
 		pid, err := strconv.ParseInt(n, 10, 64)
-		if err != nil ***REMOVED***
+		if err != nil {
 			continue
-		***REMOVED***
-		p = append(p, Proc***REMOVED***PID: int(pid), fs: fs***REMOVED***)
-	***REMOVED***
+		}
+		p = append(p, Proc{PID: int(pid), fs: fs})
+	}
 
 	return p, nil
-***REMOVED***
+}
 
 // CmdLine returns the command line of a process.
-func (p Proc) CmdLine() ([]string, error) ***REMOVED***
+func (p Proc) CmdLine() ([]string, error) {
 	f, err := os.Open(p.path("cmdline"))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	defer f.Close()
 
 	data, err := ioutil.ReadAll(f)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	if len(data) < 1 ***REMOVED***
-		return []string***REMOVED******REMOVED***, nil
-	***REMOVED***
+	if len(data) < 1 {
+		return []string{}, nil
+	}
 
 	return strings.Split(string(data[:len(data)-1]), string(byte(0))), nil
-***REMOVED***
+}
 
 // Comm returns the command name of a process.
-func (p Proc) Comm() (string, error) ***REMOVED***
+func (p Proc) Comm() (string, error) {
 	f, err := os.Open(p.path("comm"))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	defer f.Close()
 
 	data, err := ioutil.ReadAll(f)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 
 	return strings.TrimSpace(string(data)), nil
-***REMOVED***
+}
 
 // Executable returns the absolute path of the executable command of a process.
-func (p Proc) Executable() (string, error) ***REMOVED***
+func (p Proc) Executable() (string, error) {
 	exe, err := os.Readlink(p.path("exe"))
-	if os.IsNotExist(err) ***REMOVED***
+	if os.IsNotExist(err) {
 		return "", nil
-	***REMOVED***
+	}
 
 	return exe, err
-***REMOVED***
+}
 
 // FileDescriptors returns the currently open file descriptors of a process.
-func (p Proc) FileDescriptors() ([]uintptr, error) ***REMOVED***
+func (p Proc) FileDescriptors() ([]uintptr, error) {
 	names, err := p.fileDescriptors()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	fds := make([]uintptr, len(names))
-	for i, n := range names ***REMOVED***
+	for i, n := range names {
 		fd, err := strconv.ParseInt(n, 10, 32)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, fmt.Errorf("could not parse fd %s: %s", n, err)
-		***REMOVED***
+		}
 		fds[i] = uintptr(fd)
-	***REMOVED***
+	}
 
 	return fds, nil
-***REMOVED***
+}
 
 // FileDescriptorTargets returns the targets of all file descriptors of a process.
 // If a file descriptor is not a symlink to a file (like a socket), that value will be the empty string.
-func (p Proc) FileDescriptorTargets() ([]string, error) ***REMOVED***
+func (p Proc) FileDescriptorTargets() ([]string, error) {
 	names, err := p.fileDescriptors()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	targets := make([]string, len(names))
 
-	for i, name := range names ***REMOVED***
+	for i, name := range names {
 		target, err := os.Readlink(p.path("fd", name))
-		if err == nil ***REMOVED***
+		if err == nil {
 			targets[i] = target
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return targets, nil
-***REMOVED***
+}
 
 // FileDescriptorsLen returns the number of currently open file descriptors of
 // a process.
-func (p Proc) FileDescriptorsLen() (int, error) ***REMOVED***
+func (p Proc) FileDescriptorsLen() (int, error) {
 	fds, err := p.fileDescriptors()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 
 	return len(fds), nil
-***REMOVED***
+}
 
-func (p Proc) fileDescriptors() ([]string, error) ***REMOVED***
+func (p Proc) fileDescriptors() ([]string, error) {
 	d, err := os.Open(p.path("fd"))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	defer d.Close()
 
 	names, err := d.Readdirnames(-1)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("could not read %s: %s", d.Name(), err)
-	***REMOVED***
+	}
 
 	return names, nil
-***REMOVED***
+}
 
-func (p Proc) path(pa ...string) string ***REMOVED***
-	return p.fs.Path(append([]string***REMOVED***strconv.Itoa(p.PID)***REMOVED***, pa...)...)
-***REMOVED***
+func (p Proc) path(pa ...string) string {
+	return p.fs.Path(append([]string{strconv.Itoa(p.PID)}, pa...)...)
+}

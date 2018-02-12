@@ -10,23 +10,23 @@ import (
 	"testing"
 )
 
-func TestBannerCallbackAgainstOpenSSH(t *testing.T) ***REMOVED***
+func TestBannerCallbackAgainstOpenSSH(t *testing.T) {
 	server := newServer(t)
 	defer server.Shutdown()
 
 	clientConf := clientConfig()
 
 	var receivedBanner string
-	clientConf.BannerCallback = func(message string) error ***REMOVED***
+	clientConf.BannerCallback = func(message string) error {
 		receivedBanner = message
 		return nil
-	***REMOVED***
+	}
 
 	conn := server.Dial(clientConf)
 	defer conn.Close()
 
 	expected := "Server Banner"
-	if receivedBanner != expected ***REMOVED***
+	if receivedBanner != expected {
 		t.Fatalf("got %v; want %v", receivedBanner, expected)
-	***REMOVED***
-***REMOVED***
+	}
+}

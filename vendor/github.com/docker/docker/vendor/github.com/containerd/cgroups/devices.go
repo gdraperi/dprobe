@@ -15,60 +15,60 @@ const (
 	wildcard        = -1
 )
 
-func NewDevices(root string) *devicesController ***REMOVED***
-	return &devicesController***REMOVED***
+func NewDevices(root string) *devicesController {
+	return &devicesController{
 		root: filepath.Join(root, string(Devices)),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type devicesController struct ***REMOVED***
+type devicesController struct {
 	root string
-***REMOVED***
+}
 
-func (d *devicesController) Name() Name ***REMOVED***
+func (d *devicesController) Name() Name {
 	return Devices
-***REMOVED***
+}
 
-func (d *devicesController) Path(path string) string ***REMOVED***
+func (d *devicesController) Path(path string) string {
 	return filepath.Join(d.root, path)
-***REMOVED***
+}
 
-func (d *devicesController) Create(path string, resources *specs.LinuxResources) error ***REMOVED***
-	if err := os.MkdirAll(d.Path(path), defaultDirPerm); err != nil ***REMOVED***
+func (d *devicesController) Create(path string, resources *specs.LinuxResources) error {
+	if err := os.MkdirAll(d.Path(path), defaultDirPerm); err != nil {
 		return err
-	***REMOVED***
-	for _, device := range resources.Devices ***REMOVED***
+	}
+	for _, device := range resources.Devices {
 		file := denyDeviceFile
-		if device.Allow ***REMOVED***
+		if device.Allow {
 			file = allowDeviceFile
-		***REMOVED***
+		}
 		if err := ioutil.WriteFile(
 			filepath.Join(d.Path(path), file),
 			[]byte(deviceString(device)),
 			defaultFilePerm,
-		); err != nil ***REMOVED***
+		); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func (d *devicesController) Update(path string, resources *specs.LinuxResources) error ***REMOVED***
+func (d *devicesController) Update(path string, resources *specs.LinuxResources) error {
 	return d.Create(path, resources)
-***REMOVED***
+}
 
-func deviceString(device specs.LinuxDeviceCgroup) string ***REMOVED***
+func deviceString(device specs.LinuxDeviceCgroup) string {
 	return fmt.Sprintf("%c %s:%s %s",
 		&device.Type,
 		deviceNumber(device.Major),
 		deviceNumber(device.Minor),
 		&device.Access,
 	)
-***REMOVED***
+}
 
-func deviceNumber(number *int64) string ***REMOVED***
-	if number == nil || *number == wildcard ***REMOVED***
+func deviceNumber(number *int64) string {
+	if number == nil || *number == wildcard {
 		return "*"
-	***REMOVED***
+	}
 	return fmt.Sprint(*number)
-***REMOVED***
+}

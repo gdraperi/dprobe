@@ -26,7 +26,7 @@ const (
 )
 
 // Driver is for creating and removing volumes.
-type Driver interface ***REMOVED***
+type Driver interface {
 	// Name returns the name of the volume driver.
 	Name() string
 	// Create makes a new volume with the given name.
@@ -40,19 +40,19 @@ type Driver interface ***REMOVED***
 	// Scope returns the scope of the driver (e.g. `global` or `local`).
 	// Scope determines how the driver is handled at a cluster level
 	Scope() string
-***REMOVED***
+}
 
 // Capability defines a set of capabilities that a driver is able to handle.
-type Capability struct ***REMOVED***
+type Capability struct {
 	// Scope is the scope of the driver, `global` or `local`
 	// A `global` scope indicates that the driver manages volumes across the cluster
 	// A `local` scope indicates that the driver only manages volumes resources local to the host
 	// Scope is declared by the driver
 	Scope string
-***REMOVED***
+}
 
 // Volume is a place to store data. It is backed by a specific driver, and can be mounted.
-type Volume interface ***REMOVED***
+type Volume interface {
 	// Name returns the name of the volume
 	Name() string
 	// DriverName returns the name of the driver which owns this volume.
@@ -67,21 +67,21 @@ type Volume interface ***REMOVED***
 	// CreatedAt returns Volume Creation time
 	CreatedAt() (time.Time, error)
 	// Status returns low-level status information about a volume
-	Status() map[string]interface***REMOVED******REMOVED***
-***REMOVED***
+	Status() map[string]interface{}
+}
 
 // DetailedVolume wraps a Volume with user-defined labels, options, and cluster scope (e.g., `local` or `global`)
-type DetailedVolume interface ***REMOVED***
+type DetailedVolume interface {
 	Labels() map[string]string
 	Options() map[string]string
 	Scope() string
 	Volume
-***REMOVED***
+}
 
 // MountPoint is the intersection point between a volume and a container. It
 // specifies which volume is to be used and where inside a container it should
 // be mounted.
-type MountPoint struct ***REMOVED***
+type MountPoint struct {
 	// Source is the source path of the mount.
 	// E.g. `mount --bind /foo /bar`, `/foo` is the `Source`.
 	Source string
@@ -127,105 +127,105 @@ type MountPoint struct ***REMOVED***
 	// Specifically needed for containers which are running and calls to `docker cp`
 	// because both these actions require mounting the volumes.
 	active int
-***REMOVED***
+}
 
 // Cleanup frees resources used by the mountpoint
-func (m *MountPoint) Cleanup() error ***REMOVED***
-	if m.Volume == nil || m.ID == "" ***REMOVED***
+func (m *MountPoint) Cleanup() error {
+	if m.Volume == nil || m.ID == "" {
 		return nil
-	***REMOVED***
+	}
 
-	if err := m.Volume.Unmount(m.ID); err != nil ***REMOVED***
+	if err := m.Volume.Unmount(m.ID); err != nil {
 		return errors.Wrapf(err, "error unmounting volume %s", m.Volume.Name())
-	***REMOVED***
+	}
 
 	m.active--
-	if m.active == 0 ***REMOVED***
+	if m.active == 0 {
 		m.ID = ""
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // Setup sets up a mount point by either mounting the volume if it is
 // configured, or creating the source directory if supplied.
 // The, optional, checkFun parameter allows doing additional checking
 // before creating the source directory on the host.
-func (m *MountPoint) Setup(mountLabel string, rootIDs idtools.IDPair, checkFun func(m *MountPoint) error) (path string, err error) ***REMOVED***
-	defer func() ***REMOVED***
-		if err != nil || !label.RelabelNeeded(m.Mode) ***REMOVED***
+func (m *MountPoint) Setup(mountLabel string, rootIDs idtools.IDPair, checkFun func(m *MountPoint) error) (path string, err error) {
+	defer func() {
+		if err != nil || !label.RelabelNeeded(m.Mode) {
 			return
-		***REMOVED***
+		}
 
 		var sourcePath string
 		sourcePath, err = filepath.EvalSymlinks(m.Source)
-		if err != nil ***REMOVED***
+		if err != nil {
 			path = ""
 			err = errors.Wrapf(err, "error evaluating symlinks from mount source %q", m.Source)
 			return
-		***REMOVED***
+		}
 		err = label.Relabel(sourcePath, mountLabel, label.IsShared(m.Mode))
-		if err == syscall.ENOTSUP ***REMOVED***
+		if err == syscall.ENOTSUP {
 			err = nil
-		***REMOVED***
-		if err != nil ***REMOVED***
+		}
+		if err != nil {
 			path = ""
 			err = errors.Wrapf(err, "error setting label on mount source '%s'", sourcePath)
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
-	if m.Volume != nil ***REMOVED***
+	if m.Volume != nil {
 		id := m.ID
-		if id == "" ***REMOVED***
+		if id == "" {
 			id = stringid.GenerateNonCryptoID()
-		***REMOVED***
+		}
 		path, err := m.Volume.Mount(id)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return "", errors.Wrapf(err, "error while mounting volume '%s'", m.Source)
-		***REMOVED***
+		}
 
 		m.ID = id
 		m.active++
 		return path, nil
-	***REMOVED***
+	}
 
-	if len(m.Source) == 0 ***REMOVED***
+	if len(m.Source) == 0 {
 		return "", fmt.Errorf("Unable to setup mount point, neither source nor volume defined")
-	***REMOVED***
+	}
 
-	if m.Type == mounttypes.TypeBind ***REMOVED***
+	if m.Type == mounttypes.TypeBind {
 		// Before creating the source directory on the host, invoke checkFun if it's not nil. One of
 		// the use case is to forbid creating the daemon socket as a directory if the daemon is in
 		// the process of shutting down.
-		if checkFun != nil ***REMOVED***
-			if err := checkFun(m); err != nil ***REMOVED***
+		if checkFun != nil {
+			if err := checkFun(m); err != nil {
 				return "", err
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		// idtools.MkdirAllNewAs() produces an error if m.Source exists and is a file (not a directory)
 		// also, makes sure that if the directory is created, the correct remapped rootUID/rootGID will own it
-		if err := idtools.MkdirAllAndChownNew(m.Source, 0755, rootIDs); err != nil ***REMOVED***
-			if perr, ok := err.(*os.PathError); ok ***REMOVED***
-				if perr.Err != syscall.ENOTDIR ***REMOVED***
+		if err := idtools.MkdirAllAndChownNew(m.Source, 0755, rootIDs); err != nil {
+			if perr, ok := err.(*os.PathError); ok {
+				if perr.Err != syscall.ENOTDIR {
 					return "", errors.Wrapf(err, "error while creating mount source path '%s'", m.Source)
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+				}
+			}
+		}
+	}
 	return m.Source, nil
-***REMOVED***
+}
 
 // Path returns the path of a volume in a mount point.
-func (m *MountPoint) Path() string ***REMOVED***
-	if m.Volume != nil ***REMOVED***
+func (m *MountPoint) Path() string {
+	if m.Volume != nil {
 		return m.Volume.Path()
-	***REMOVED***
+	}
 	return m.Source
-***REMOVED***
+}
 
-func errInvalidMode(mode string) error ***REMOVED***
+func errInvalidMode(mode string) error {
 	return errors.Errorf("invalid mode: %v", mode)
-***REMOVED***
+}
 
-func errInvalidSpec(spec string) error ***REMOVED***
+func errInvalidSpec(spec string) error {
 	return errors.Errorf("invalid volume specification: '%s'", spec)
-***REMOVED***
+}

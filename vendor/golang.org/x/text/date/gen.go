@@ -33,297 +33,297 @@ var (
 // - zone to metaZone mappings (in supplemental)
 // - Add more enum values and also some key maps for some of the elements.
 
-func main() ***REMOVED***
+func main() {
 	gen.Init()
 
 	r := gen.OpenCLDRCoreZip()
 	defer r.Close()
 
-	d := &cldr.Decoder***REMOVED******REMOVED***
+	d := &cldr.Decoder{}
 	d.SetDirFilter("supplemental", "main")
 	d.SetSectionFilter("dates")
 	data, err := d.DecodeZip(r)
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatalf("DecodeZip: %v", err)
-	***REMOVED***
+	}
 
 	dates := cldrtree.New("dates")
 	buildCLDRTree(data, dates)
 
 	w := gen.NewCodeWriter()
-	if err := dates.Gen(w); err != nil ***REMOVED***
+	if err := dates.Gen(w); err != nil {
 		log.Fatal(err)
-	***REMOVED***
+	}
 	gen.WriteCLDRVersion(w)
 	w.WriteGoFile("tables.go", "date")
 
 	w = gen.NewCodeWriter()
-	if err := dates.GenTestData(w); err != nil ***REMOVED***
+	if err := dates.GenTestData(w); err != nil {
 		log.Fatal(err)
-	***REMOVED***
+	}
 	w.WriteGoFile("data_test.go", "date")
-***REMOVED***
+}
 
-func buildCLDRTree(data *cldr.CLDR, dates *cldrtree.Builder) ***REMOVED***
+func buildCLDRTree(data *cldr.CLDR, dates *cldrtree.Builder) {
 	context := cldrtree.Enum("context")
-	widthMap := func(s string) string ***REMOVED***
+	widthMap := func(s string) string {
 		// Align era with width values.
-		if r, ok := map[string]string***REMOVED***
+		if r, ok := map[string]string{
 			"eraAbbr":   "abbreviated",
 			"eraNarrow": "narrow",
 			"eraNames":  "wide",
-		***REMOVED***[s]; ok ***REMOVED***
+		}[s]; ok {
 			s = r
-		***REMOVED***
+		}
 		// Prefix width to disambiguate with some overlapping length values.
 		return "width" + strings.Title(s)
-	***REMOVED***
+	}
 	width := cldrtree.EnumFunc("width", widthMap, "abbreviated", "narrow", "wide")
 	length := cldrtree.Enum("length", "short", "long")
 	month := cldrtree.Enum("month", "leap7")
-	relTime := cldrtree.EnumFunc("relTime", func(s string) string ***REMOVED***
+	relTime := cldrtree.EnumFunc("relTime", func(s string) string {
 		x, err := strconv.ParseInt(s, 10, 8)
-		if err != nil ***REMOVED***
+		if err != nil {
 			log.Fatal("Invalid number:", err)
-		***REMOVED***
-		return []string***REMOVED***
+		}
+		return []string{
 			"before2",
 			"before1",
 			"current",
 			"after1",
 			"after2",
 			"after3",
-		***REMOVED***[x+2]
-	***REMOVED***)
+		}[x+2]
+	})
 	// Disambiguate keys like 'months' and 'sun'.
-	cycleType := cldrtree.EnumFunc("cycleType", func(s string) string ***REMOVED***
+	cycleType := cldrtree.EnumFunc("cycleType", func(s string) string {
 		return s + "CycleType"
-	***REMOVED***)
-	field := cldrtree.EnumFunc("field", func(s string) string ***REMOVED***
+	})
+	field := cldrtree.EnumFunc("field", func(s string) string {
 		return s + "Field"
-	***REMOVED***)
-	timeType := cldrtree.EnumFunc("timeType", func(s string) string ***REMOVED***
-		if s == "" ***REMOVED***
+	})
+	timeType := cldrtree.EnumFunc("timeType", func(s string) string {
+		if s == "" {
 			return "genericTime"
-		***REMOVED***
+		}
 		return s + "Time"
-	***REMOVED***, "generic")
+	}, "generic")
 
-	zoneType := []cldrtree.Option***REMOVED***cldrtree.SharedType(), timeType***REMOVED***
-	metaZoneType := []cldrtree.Option***REMOVED***cldrtree.SharedType(), timeType***REMOVED***
+	zoneType := []cldrtree.Option{cldrtree.SharedType(), timeType}
+	metaZoneType := []cldrtree.Option{cldrtree.SharedType(), timeType}
 
-	for _, lang := range data.Locales() ***REMOVED***
+	for _, lang := range data.Locales() {
 		tag := language.Make(lang)
 		ldml := data.RawLDML(lang)
-		if ldml.Dates == nil ***REMOVED***
+		if ldml.Dates == nil {
 			continue
-		***REMOVED***
+		}
 		x := dates.Locale(tag)
-		if x := x.Index(ldml.Dates.Calendars); x != nil ***REMOVED***
-			for _, cal := range ldml.Dates.Calendars.Calendar ***REMOVED***
+		if x := x.Index(ldml.Dates.Calendars); x != nil {
+			for _, cal := range ldml.Dates.Calendars.Calendar {
 				x := x.IndexFromType(cal)
-				if x := x.Index(cal.Months); x != nil ***REMOVED***
-					for _, mc := range cal.Months.MonthContext ***REMOVED***
+				if x := x.Index(cal.Months); x != nil {
+					for _, mc := range cal.Months.MonthContext {
 						x := x.IndexFromType(mc, context)
-						for _, mw := range mc.MonthWidth ***REMOVED***
+						for _, mw := range mc.MonthWidth {
 							x := x.IndexFromType(mw, width)
-							for _, m := range mw.Month ***REMOVED***
+							for _, m := range mw.Month {
 								x.SetValue(m.Yeartype+m.Type, m, month)
-							***REMOVED***
-						***REMOVED***
-					***REMOVED***
-				***REMOVED***
-				if x := x.Index(cal.MonthPatterns); x != nil ***REMOVED***
-					for _, mc := range cal.MonthPatterns.MonthPatternContext ***REMOVED***
+							}
+						}
+					}
+				}
+				if x := x.Index(cal.MonthPatterns); x != nil {
+					for _, mc := range cal.MonthPatterns.MonthPatternContext {
 						x := x.IndexFromType(mc, context)
-						for _, mw := range mc.MonthPatternWidth ***REMOVED***
+						for _, mw := range mc.MonthPatternWidth {
 							// Value is always leap, so no need to create a
 							// subindex.
-							for _, m := range mw.MonthPattern ***REMOVED***
+							for _, m := range mw.MonthPattern {
 								x.SetValue(mw.Type, m, width)
-							***REMOVED***
-						***REMOVED***
-					***REMOVED***
-				***REMOVED***
-				if x := x.Index(cal.CyclicNameSets); x != nil ***REMOVED***
-					for _, cns := range cal.CyclicNameSets.CyclicNameSet ***REMOVED***
+							}
+						}
+					}
+				}
+				if x := x.Index(cal.CyclicNameSets); x != nil {
+					for _, cns := range cal.CyclicNameSets.CyclicNameSet {
 						x := x.IndexFromType(cns, cycleType)
-						for _, cc := range cns.CyclicNameContext ***REMOVED***
+						for _, cc := range cns.CyclicNameContext {
 							x := x.IndexFromType(cc, context)
-							for _, cw := range cc.CyclicNameWidth ***REMOVED***
+							for _, cw := range cc.CyclicNameWidth {
 								x := x.IndexFromType(cw, width)
-								for _, c := range cw.CyclicName ***REMOVED***
+								for _, c := range cw.CyclicName {
 									x.SetValue(c.Type, c)
-								***REMOVED***
-							***REMOVED***
-						***REMOVED***
-					***REMOVED***
-				***REMOVED***
-				if x := x.Index(cal.Days); x != nil ***REMOVED***
-					for _, dc := range cal.Days.DayContext ***REMOVED***
+								}
+							}
+						}
+					}
+				}
+				if x := x.Index(cal.Days); x != nil {
+					for _, dc := range cal.Days.DayContext {
 						x := x.IndexFromType(dc, context)
-						for _, dw := range dc.DayWidth ***REMOVED***
+						for _, dw := range dc.DayWidth {
 							x := x.IndexFromType(dw, width)
-							for _, d := range dw.Day ***REMOVED***
+							for _, d := range dw.Day {
 								x.SetValue(d.Type, d)
-							***REMOVED***
-						***REMOVED***
-					***REMOVED***
-				***REMOVED***
-				if x := x.Index(cal.Quarters); x != nil ***REMOVED***
-					for _, qc := range cal.Quarters.QuarterContext ***REMOVED***
+							}
+						}
+					}
+				}
+				if x := x.Index(cal.Quarters); x != nil {
+					for _, qc := range cal.Quarters.QuarterContext {
 						x := x.IndexFromType(qc, context)
-						for _, qw := range qc.QuarterWidth ***REMOVED***
+						for _, qw := range qc.QuarterWidth {
 							x := x.IndexFromType(qw, width)
-							for _, q := range qw.Quarter ***REMOVED***
+							for _, q := range qw.Quarter {
 								x.SetValue(q.Type, q)
-							***REMOVED***
-						***REMOVED***
-					***REMOVED***
-				***REMOVED***
-				if x := x.Index(cal.DayPeriods); x != nil ***REMOVED***
-					for _, dc := range cal.DayPeriods.DayPeriodContext ***REMOVED***
+							}
+						}
+					}
+				}
+				if x := x.Index(cal.DayPeriods); x != nil {
+					for _, dc := range cal.DayPeriods.DayPeriodContext {
 						x := x.IndexFromType(dc, context)
-						for _, dw := range dc.DayPeriodWidth ***REMOVED***
+						for _, dw := range dc.DayPeriodWidth {
 							x := x.IndexFromType(dw, width)
-							for _, d := range dw.DayPeriod ***REMOVED***
+							for _, d := range dw.DayPeriod {
 								x.IndexFromType(d).SetValue(d.Alt, d)
-							***REMOVED***
-						***REMOVED***
-					***REMOVED***
-				***REMOVED***
-				if x := x.Index(cal.Eras); x != nil ***REMOVED***
-					opts := []cldrtree.Option***REMOVED***width, cldrtree.SharedType()***REMOVED***
-					if x := x.Index(cal.Eras.EraNames, opts...); x != nil ***REMOVED***
-						for _, e := range cal.Eras.EraNames.Era ***REMOVED***
+							}
+						}
+					}
+				}
+				if x := x.Index(cal.Eras); x != nil {
+					opts := []cldrtree.Option{width, cldrtree.SharedType()}
+					if x := x.Index(cal.Eras.EraNames, opts...); x != nil {
+						for _, e := range cal.Eras.EraNames.Era {
 							x.IndexFromAlt(e).SetValue(e.Type, e)
-						***REMOVED***
-					***REMOVED***
-					if x := x.Index(cal.Eras.EraAbbr, opts...); x != nil ***REMOVED***
-						for _, e := range cal.Eras.EraAbbr.Era ***REMOVED***
+						}
+					}
+					if x := x.Index(cal.Eras.EraAbbr, opts...); x != nil {
+						for _, e := range cal.Eras.EraAbbr.Era {
 							x.IndexFromAlt(e).SetValue(e.Type, e)
-						***REMOVED***
-					***REMOVED***
-					if x := x.Index(cal.Eras.EraNarrow, opts...); x != nil ***REMOVED***
-						for _, e := range cal.Eras.EraNarrow.Era ***REMOVED***
+						}
+					}
+					if x := x.Index(cal.Eras.EraNarrow, opts...); x != nil {
+						for _, e := range cal.Eras.EraNarrow.Era {
 							x.IndexFromAlt(e).SetValue(e.Type, e)
-						***REMOVED***
-					***REMOVED***
-				***REMOVED***
-				if x := x.Index(cal.DateFormats); x != nil ***REMOVED***
-					for _, dfl := range cal.DateFormats.DateFormatLength ***REMOVED***
+						}
+					}
+				}
+				if x := x.Index(cal.DateFormats); x != nil {
+					for _, dfl := range cal.DateFormats.DateFormatLength {
 						x := x.IndexFromType(dfl, length)
-						for _, df := range dfl.DateFormat ***REMOVED***
-							for _, p := range df.Pattern ***REMOVED***
+						for _, df := range dfl.DateFormat {
+							for _, p := range df.Pattern {
 								x.SetValue(p.Alt, p)
-							***REMOVED***
-						***REMOVED***
-					***REMOVED***
-				***REMOVED***
-				if x := x.Index(cal.TimeFormats); x != nil ***REMOVED***
-					for _, tfl := range cal.TimeFormats.TimeFormatLength ***REMOVED***
+							}
+						}
+					}
+				}
+				if x := x.Index(cal.TimeFormats); x != nil {
+					for _, tfl := range cal.TimeFormats.TimeFormatLength {
 						x := x.IndexFromType(tfl, length)
-						for _, tf := range tfl.TimeFormat ***REMOVED***
-							for _, p := range tf.Pattern ***REMOVED***
+						for _, tf := range tfl.TimeFormat {
+							for _, p := range tf.Pattern {
 								x.SetValue(p.Alt, p)
-							***REMOVED***
-						***REMOVED***
-					***REMOVED***
-				***REMOVED***
-				if x := x.Index(cal.DateTimeFormats); x != nil ***REMOVED***
-					for _, dtfl := range cal.DateTimeFormats.DateTimeFormatLength ***REMOVED***
+							}
+						}
+					}
+				}
+				if x := x.Index(cal.DateTimeFormats); x != nil {
+					for _, dtfl := range cal.DateTimeFormats.DateTimeFormatLength {
 						x := x.IndexFromType(dtfl, length)
-						for _, dtf := range dtfl.DateTimeFormat ***REMOVED***
-							for _, p := range dtf.Pattern ***REMOVED***
+						for _, dtf := range dtfl.DateTimeFormat {
+							for _, p := range dtf.Pattern {
 								x.SetValue(p.Alt, p)
-							***REMOVED***
-						***REMOVED***
-					***REMOVED***
+							}
+						}
+					}
 					// TODO:
 					// - appendItems
 					// - intervalFormats
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
+				}
+			}
+		}
 		// TODO: this is a lot of data and is probably relatively little used.
 		// Store this somewhere else.
-		if x := x.Index(ldml.Dates.Fields); x != nil ***REMOVED***
-			for _, f := range ldml.Dates.Fields.Field ***REMOVED***
+		if x := x.Index(ldml.Dates.Fields); x != nil {
+			for _, f := range ldml.Dates.Fields.Field {
 				x := x.IndexFromType(f, field)
-				for _, d := range f.DisplayName ***REMOVED***
+				for _, d := range f.DisplayName {
 					x.Index(d).SetValue(d.Alt, d)
-				***REMOVED***
-				for _, r := range f.Relative ***REMOVED***
+				}
+				for _, r := range f.Relative {
 					x.Index(r).SetValue(r.Type, r, relTime)
-				***REMOVED***
-				for _, rt := range f.RelativeTime ***REMOVED***
+				}
+				for _, rt := range f.RelativeTime {
 					x := x.Index(rt).IndexFromType(rt)
-					for _, p := range rt.RelativeTimePattern ***REMOVED***
+					for _, p := range rt.RelativeTimePattern {
 						x.SetValue(p.Count, p)
-					***REMOVED***
-				***REMOVED***
-				for _, rp := range f.RelativePeriod ***REMOVED***
+					}
+				}
+				for _, rp := range f.RelativePeriod {
 					x.Index(rp).SetValue(rp.Alt, rp)
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-		if x := x.Index(ldml.Dates.TimeZoneNames); x != nil ***REMOVED***
+				}
+			}
+		}
+		if x := x.Index(ldml.Dates.TimeZoneNames); x != nil {
 			format := x.IndexWithName("zoneFormat")
-			for _, h := range ldml.Dates.TimeZoneNames.HourFormat ***REMOVED***
+			for _, h := range ldml.Dates.TimeZoneNames.HourFormat {
 				format.SetValue(h.Element(), h)
-			***REMOVED***
-			for _, g := range ldml.Dates.TimeZoneNames.GmtFormat ***REMOVED***
+			}
+			for _, g := range ldml.Dates.TimeZoneNames.GmtFormat {
 				format.SetValue(g.Element(), g)
-			***REMOVED***
-			for _, g := range ldml.Dates.TimeZoneNames.GmtZeroFormat ***REMOVED***
+			}
+			for _, g := range ldml.Dates.TimeZoneNames.GmtZeroFormat {
 				format.SetValue(g.Element(), g)
-			***REMOVED***
-			for _, r := range ldml.Dates.TimeZoneNames.RegionFormat ***REMOVED***
+			}
+			for _, r := range ldml.Dates.TimeZoneNames.RegionFormat {
 				x.Index(r).SetValue(r.Type, r, timeType)
-			***REMOVED***
+			}
 
-			set := func(x *cldrtree.Index, e []*cldr.Common, zone string) ***REMOVED***
-				for _, n := range e ***REMOVED***
+			set := func(x *cldrtree.Index, e []*cldr.Common, zone string) {
+				for _, n := range e {
 					x.Index(n, zoneType...).SetValue(zone, n)
-				***REMOVED***
-			***REMOVED***
-			zoneWidth := []cldrtree.Option***REMOVED***length, cldrtree.SharedType()***REMOVED***
+				}
+			}
+			zoneWidth := []cldrtree.Option{length, cldrtree.SharedType()}
 			zs := x.IndexWithName("zone")
-			for _, z := range ldml.Dates.TimeZoneNames.Zone ***REMOVED***
-				for _, l := range z.Long ***REMOVED***
+			for _, z := range ldml.Dates.TimeZoneNames.Zone {
+				for _, l := range z.Long {
 					x := zs.Index(l, zoneWidth...)
 					set(x, l.Generic, z.Type)
 					set(x, l.Standard, z.Type)
 					set(x, l.Daylight, z.Type)
-				***REMOVED***
-				for _, s := range z.Short ***REMOVED***
+				}
+				for _, s := range z.Short {
 					x := zs.Index(s, zoneWidth...)
 					set(x, s.Generic, z.Type)
 					set(x, s.Standard, z.Type)
 					set(x, s.Daylight, z.Type)
-				***REMOVED***
-			***REMOVED***
-			set = func(x *cldrtree.Index, e []*cldr.Common, zone string) ***REMOVED***
-				for _, n := range e ***REMOVED***
+				}
+			}
+			set = func(x *cldrtree.Index, e []*cldr.Common, zone string) {
+				for _, n := range e {
 					x.Index(n, metaZoneType...).SetValue(zone, n)
-				***REMOVED***
-			***REMOVED***
-			zoneWidth = []cldrtree.Option***REMOVED***length, cldrtree.SharedType()***REMOVED***
+				}
+			}
+			zoneWidth = []cldrtree.Option{length, cldrtree.SharedType()}
 			zs = x.IndexWithName("metaZone")
-			for _, z := range ldml.Dates.TimeZoneNames.Metazone ***REMOVED***
-				for _, l := range z.Long ***REMOVED***
+			for _, z := range ldml.Dates.TimeZoneNames.Metazone {
+				for _, l := range z.Long {
 					x := zs.Index(l, zoneWidth...)
 					set(x, l.Generic, z.Type)
 					set(x, l.Standard, z.Type)
 					set(x, l.Daylight, z.Type)
-				***REMOVED***
-				for _, s := range z.Short ***REMOVED***
+				}
+				for _, s := range z.Short {
 					x := zs.Index(s, zoneWidth...)
 					set(x, s.Generic, z.Type)
 					set(x, s.Standard, z.Type)
 					set(x, s.Daylight, z.Type)
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+				}
+			}
+		}
+	}
+}

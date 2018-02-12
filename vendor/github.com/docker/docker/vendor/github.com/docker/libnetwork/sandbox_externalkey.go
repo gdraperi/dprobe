@@ -2,11 +2,11 @@ package libnetwork
 
 import "github.com/docker/docker/pkg/reexec"
 
-type setKeyData struct ***REMOVED***
+type setKeyData struct {
 	ContainerID string
 	Key         string
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	reexec.Register("libnetwork-setkey", processSetKeyReexec)
-***REMOVED***
+}

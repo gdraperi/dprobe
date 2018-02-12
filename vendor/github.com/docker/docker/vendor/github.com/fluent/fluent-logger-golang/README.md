@@ -32,31 +32,31 @@ import (
   "time"
 )
 
-func main() ***REMOVED***
-  logger, err := fluent.New(fluent.Config***REMOVED******REMOVED***)
-  if err != nil ***REMOVED***
+func main() {
+  logger, err := fluent.New(fluent.Config{})
+  if err != nil {
     fmt.Println(err)
-  ***REMOVED***
+  }
   defer logger.Close()
   tag := "myapp.access"
-  var data = map[string]string***REMOVED***
+  var data = map[string]string{
     "foo":  "bar",
     "hoge": "hoge",
-  ***REMOVED***
+  }
   error := logger.Post(tag, data)
   // error := logger.PostWithTime(tag, time.Now(), data)
-  if error != nil ***REMOVED***
+  if error != nil {
     panic(error)
-  ***REMOVED***
-***REMOVED***
+  }
+}
 ```
 
-`data` must be a value like `map[string]literal`, `map[string]interface***REMOVED******REMOVED***`, `struct` or [`msgp.Marshaler`](http://godoc.org/github.com/tinylib/msgp/msgp#Marshaler). Logger refers tags `msg` or `codec` of each fields of structs.
+`data` must be a value like `map[string]literal`, `map[string]interface{}`, `struct` or [`msgp.Marshaler`](http://godoc.org/github.com/tinylib/msgp/msgp#Marshaler). Logger refers tags `msg` or `codec` of each fields of structs.
 
 ## Setting config values
 
 ```go
-f := fluent.New(fluent.Config***REMOVED***FluentPort: 80, FluentHost: "example.com"***REMOVED***)
+f := fluent.New(fluent.Config{FluentPort: 80, FluentHost: "example.com"})
 ```
 
 ### WriteTimeout

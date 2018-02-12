@@ -18,17 +18,17 @@ import (
 
 // FollowSymlinkInScope is a wrapper around evalSymlinksInScope that returns an
 // absolute path. This function handles paths in a platform-agnostic manner.
-func FollowSymlinkInScope(path, root string) (string, error) ***REMOVED***
+func FollowSymlinkInScope(path, root string) (string, error) {
 	path, err := filepath.Abs(filepath.FromSlash(path))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	root, err = filepath.Abs(filepath.FromSlash(root))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	return evalSymlinksInScope(path, root)
-***REMOVED***
+}
 
 // evalSymlinksInScope will evaluate symlinks in `path` within a scope `root` and return
 // a result guaranteed to be contained within the scope `root`, at the time of the call.
@@ -47,24 +47,24 @@ func FollowSymlinkInScope(path, root string) (string, error) ***REMOVED***
 // previously-safe path, unsafe. Example: if /foo/bar does not exist, evalSymlinksInScope("/foo/bar", "/foo")
 // would return "/foo/bar". If one makes /foo/bar a symlink to /baz subsequently, then "/foo/bar" should
 // no longer be considered safely contained in "/foo".
-func evalSymlinksInScope(path, root string) (string, error) ***REMOVED***
+func evalSymlinksInScope(path, root string) (string, error) {
 	root = filepath.Clean(root)
-	if path == root ***REMOVED***
+	if path == root {
 		return path, nil
-	***REMOVED***
-	if !strings.HasPrefix(path, root) ***REMOVED***
+	}
+	if !strings.HasPrefix(path, root) {
 		return "", errors.New("evalSymlinksInScope: " + path + " is not in " + root)
-	***REMOVED***
+	}
 	const maxIter = 255
 	originalPath := path
 	// given root of "/a" and path of "/a/b/../../c" we want path to be "/b/../../c"
 	path = path[len(root):]
-	if root == string(filepath.Separator) ***REMOVED***
+	if root == string(filepath.Separator) {
 		path = string(filepath.Separator) + path
-	***REMOVED***
-	if !strings.HasPrefix(path, string(filepath.Separator)) ***REMOVED***
+	}
+	if !strings.HasPrefix(path, string(filepath.Separator)) {
 		return "", errors.New("evalSymlinksInScope: " + path + " is not in " + root)
-	***REMOVED***
+	}
 	path = filepath.Clean(path)
 	// consume path by taking each frontmost path element,
 	// expanding it if it's a symlink, and appending it to b
@@ -72,73 +72,73 @@ func evalSymlinksInScope(path, root string) (string, error) ***REMOVED***
 	// b here will always be considered to be the "current absolute path inside
 	// root" when we append paths to it, we also append a slash and use
 	// filepath.Clean after the loop to trim the trailing slash
-	for n := 0; path != ""; n++ ***REMOVED***
-		if n > maxIter ***REMOVED***
+	for n := 0; path != ""; n++ {
+		if n > maxIter {
 			return "", errors.New("evalSymlinksInScope: too many links in " + originalPath)
-		***REMOVED***
+		}
 
 		// find next path component, p
 		i := strings.IndexRune(path, filepath.Separator)
 		var p string
-		if i == -1 ***REMOVED***
+		if i == -1 {
 			p, path = path, ""
-		***REMOVED*** else ***REMOVED***
+		} else {
 			p, path = path[:i], path[i+1:]
-		***REMOVED***
+		}
 
-		if p == "" ***REMOVED***
+		if p == "" {
 			continue
-		***REMOVED***
+		}
 
 		// this takes a b.String() like "b/../" and a p like "c" and turns it
 		// into "/b/../c" which then gets filepath.Cleaned into "/c" and then
 		// root gets prepended and we Clean again (to remove any trailing slash
 		// if the first Clean gave us just "/")
 		cleanP := filepath.Clean(string(filepath.Separator) + b.String() + p)
-		if isDriveOrRoot(cleanP) ***REMOVED***
+		if isDriveOrRoot(cleanP) {
 			// never Lstat "/" itself, or drive letters on Windows
 			b.Reset()
 			continue
-		***REMOVED***
+		}
 		fullP := filepath.Clean(root + cleanP)
 
 		fi, err := os.Lstat(fullP)
-		if os.IsNotExist(err) ***REMOVED***
+		if os.IsNotExist(err) {
 			// if p does not exist, accept it
 			b.WriteString(p)
 			b.WriteRune(filepath.Separator)
 			continue
-		***REMOVED***
-		if err != nil ***REMOVED***
+		}
+		if err != nil {
 			return "", err
-		***REMOVED***
-		if fi.Mode()&os.ModeSymlink == 0 ***REMOVED***
+		}
+		if fi.Mode()&os.ModeSymlink == 0 {
 			b.WriteString(p)
 			b.WriteRune(filepath.Separator)
 			continue
-		***REMOVED***
+		}
 
 		// it's a symlink, put it at the front of path
 		dest, err := os.Readlink(fullP)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return "", err
-		***REMOVED***
-		if system.IsAbs(dest) ***REMOVED***
+		}
+		if system.IsAbs(dest) {
 			b.Reset()
-		***REMOVED***
+		}
 		path = dest + string(filepath.Separator) + path
-	***REMOVED***
+	}
 
 	// see note above on "fullP := ..." for why this is double-cleaned and
 	// what's happening here
 	return filepath.Clean(root + filepath.Clean(string(filepath.Separator)+b.String())), nil
-***REMOVED***
+}
 
 // EvalSymlinks returns the path name after the evaluation of any symbolic
 // links.
 // If path is relative the result will be relative to the current directory,
 // unless one of the components is an absolute symbolic link.
 // This version has been updated to support long paths prepended with `\\?\`.
-func EvalSymlinks(path string) (string, error) ***REMOVED***
+func EvalSymlinks(path string) (string, error) {
 	return evalSymlinks(path)
-***REMOVED***
+}

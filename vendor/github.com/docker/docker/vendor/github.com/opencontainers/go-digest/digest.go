@@ -22,22 +22,22 @@ import (
 type Digest string
 
 // NewDigest returns a Digest from alg and a hash.Hash object.
-func NewDigest(alg Algorithm, h hash.Hash) Digest ***REMOVED***
+func NewDigest(alg Algorithm, h hash.Hash) Digest {
 	return NewDigestFromBytes(alg, h.Sum(nil))
-***REMOVED***
+}
 
 // NewDigestFromBytes returns a new digest from the byte contents of p.
 // Typically, this can come from hash.Hash.Sum(...) or xxx.SumXXX(...)
 // functions. This is also useful for rebuilding digests from binary
 // serializations.
-func NewDigestFromBytes(alg Algorithm, p []byte) Digest ***REMOVED***
+func NewDigestFromBytes(alg Algorithm, p []byte) Digest {
 	return Digest(fmt.Sprintf("%s:%x", alg, p))
-***REMOVED***
+}
 
 // NewDigestFromHex returns a Digest from alg and a the hex encoded digest.
-func NewDigestFromHex(alg, hex string) Digest ***REMOVED***
+func NewDigestFromHex(alg, hex string) Digest {
 	return Digest(fmt.Sprintf("%s:%s", alg, hex))
-***REMOVED***
+}
 
 // DigestRegexp matches valid digest types.
 var DigestRegexp = regexp.MustCompile(`[a-zA-Z0-9-_+.]+:[a-fA-F0-9]+`)
@@ -58,83 +58,83 @@ var (
 
 // Parse parses s and returns the validated digest object. An error will
 // be returned if the format is invalid.
-func Parse(s string) (Digest, error) ***REMOVED***
+func Parse(s string) (Digest, error) {
 	d := Digest(s)
 	return d, d.Validate()
-***REMOVED***
+}
 
 // FromReader consumes the content of rd until io.EOF, returning canonical digest.
-func FromReader(rd io.Reader) (Digest, error) ***REMOVED***
+func FromReader(rd io.Reader) (Digest, error) {
 	return Canonical.FromReader(rd)
-***REMOVED***
+}
 
 // FromBytes digests the input and returns a Digest.
-func FromBytes(p []byte) Digest ***REMOVED***
+func FromBytes(p []byte) Digest {
 	return Canonical.FromBytes(p)
-***REMOVED***
+}
 
 // FromString digests the input and returns a Digest.
-func FromString(s string) Digest ***REMOVED***
+func FromString(s string) Digest {
 	return Canonical.FromString(s)
-***REMOVED***
+}
 
 // Validate checks that the contents of d is a valid digest, returning an
 // error if not.
-func (d Digest) Validate() error ***REMOVED***
+func (d Digest) Validate() error {
 	s := string(d)
 
 	i := strings.Index(s, ":")
 
 	// validate i then run through regexp
-	if i < 0 || i+1 == len(s) || !DigestRegexpAnchored.MatchString(s) ***REMOVED***
+	if i < 0 || i+1 == len(s) || !DigestRegexpAnchored.MatchString(s) {
 		return ErrDigestInvalidFormat
-	***REMOVED***
+	}
 
 	algorithm := Algorithm(s[:i])
-	if !algorithm.Available() ***REMOVED***
+	if !algorithm.Available() {
 		return ErrDigestUnsupported
-	***REMOVED***
+	}
 
 	// Digests much always be hex-encoded, ensuring that their hex portion will
 	// always be size*2
-	if algorithm.Size()*2 != len(s[i+1:]) ***REMOVED***
+	if algorithm.Size()*2 != len(s[i+1:]) {
 		return ErrDigestInvalidLength
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // Algorithm returns the algorithm portion of the digest. This will panic if
 // the underlying digest is not in a valid format.
-func (d Digest) Algorithm() Algorithm ***REMOVED***
+func (d Digest) Algorithm() Algorithm {
 	return Algorithm(d[:d.sepIndex()])
-***REMOVED***
+}
 
 // Verifier returns a writer object that can be used to verify a stream of
 // content against the digest. If the digest is invalid, the method will panic.
-func (d Digest) Verifier() Verifier ***REMOVED***
-	return hashVerifier***REMOVED***
+func (d Digest) Verifier() Verifier {
+	return hashVerifier{
 		hash:   d.Algorithm().Hash(),
 		digest: d,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Hex returns the hex digest portion of the digest. This will panic if the
 // underlying digest is not in a valid format.
-func (d Digest) Hex() string ***REMOVED***
+func (d Digest) Hex() string {
 	return string(d[d.sepIndex()+1:])
-***REMOVED***
+}
 
-func (d Digest) String() string ***REMOVED***
+func (d Digest) String() string {
 	return string(d)
-***REMOVED***
+}
 
-func (d Digest) sepIndex() int ***REMOVED***
+func (d Digest) sepIndex() int {
 	i := strings.Index(string(d), ":")
 
-	if i < 0 ***REMOVED***
+	if i < 0 {
 		panic(fmt.Sprintf("no ':' separator in digest %q", d))
-	***REMOVED***
+	}
 
 	return i
-***REMOVED***
+}

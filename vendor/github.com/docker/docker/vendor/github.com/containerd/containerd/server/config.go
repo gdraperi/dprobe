@@ -10,7 +10,7 @@ import (
 )
 
 // Config provides containerd configuration data for the server
-type Config struct ***REMOVED***
+type Config struct {
 	// Root is the path to a directory where containerd will store persistent data
 	Root string `toml:"root"`
 	// State is the path to a directory where containerd will store transient data
@@ -31,64 +31,64 @@ type Config struct ***REMOVED***
 	Cgroup CgroupConfig `toml:"cgroup"`
 
 	md toml.MetaData
-***REMOVED***
+}
 
 // GRPCConfig provides GRPC configuration for the socket
-type GRPCConfig struct ***REMOVED***
+type GRPCConfig struct {
 	Address string `toml:"address"`
 	UID     int    `toml:"uid"`
 	GID     int    `toml:"gid"`
-***REMOVED***
+}
 
 // Debug provides debug configuration
-type Debug struct ***REMOVED***
+type Debug struct {
 	Address string `toml:"address"`
 	UID     int    `toml:"uid"`
 	GID     int    `toml:"gid"`
 	Level   string `toml:"level"`
-***REMOVED***
+}
 
 // MetricsConfig provides metrics configuration
-type MetricsConfig struct ***REMOVED***
+type MetricsConfig struct {
 	Address string `toml:"address"`
-***REMOVED***
+}
 
 // CgroupConfig provides cgroup configuration
-type CgroupConfig struct ***REMOVED***
+type CgroupConfig struct {
 	Path string `toml:"path"`
-***REMOVED***
+}
 
 // Decode unmarshals a plugin specific configuration by plugin id
-func (c *Config) Decode(id string, v interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func (c *Config) Decode(id string, v interface{}) (interface{}, error) {
 	data, ok := c.Plugins[id]
-	if !ok ***REMOVED***
+	if !ok {
 		return v, nil
-	***REMOVED***
-	if err := c.md.PrimitiveDecode(data, v); err != nil ***REMOVED***
+	}
+	if err := c.md.PrimitiveDecode(data, v); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return v, nil
-***REMOVED***
+}
 
 // WriteTo marshals the config to the provided writer
-func (c *Config) WriteTo(w io.Writer) (int64, error) ***REMOVED***
+func (c *Config) WriteTo(w io.Writer) (int64, error) {
 	buf := bytes.NewBuffer(nil)
 	e := toml.NewEncoder(buf)
-	if err := e.Encode(c); err != nil ***REMOVED***
+	if err := e.Encode(c); err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	return io.Copy(w, buf)
-***REMOVED***
+}
 
 // LoadConfig loads the containerd server config from the provided path
-func LoadConfig(path string, v *Config) error ***REMOVED***
-	if v == nil ***REMOVED***
+func LoadConfig(path string, v *Config) error {
+	if v == nil {
 		return errors.Wrapf(errdefs.ErrInvalidArgument, "argument v must not be nil")
-	***REMOVED***
+	}
 	md, err := toml.DecodeFile(path, v)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	v.md = md
 	return nil
-***REMOVED***
+}

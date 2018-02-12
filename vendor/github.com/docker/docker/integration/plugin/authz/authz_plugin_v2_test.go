@@ -29,7 +29,7 @@ var (
 	nonexistentAuthzPluginName = "riyaz/nonexistent-authz-plugin"
 )
 
-func setupTestV2(t *testing.T) func() ***REMOVED***
+func setupTestV2(t *testing.T) func() {
 	skip.IfCondition(t, testEnv.DaemonInfo.OSType != "linux")
 	skip.IfCondition(t, !requirement.HasHubConnectivity(t))
 
@@ -38,9 +38,9 @@ func setupTestV2(t *testing.T) func() ***REMOVED***
 	d.Start(t)
 
 	return teardown
-***REMOVED***
+}
 
-func TestAuthZPluginV2AllowNonVolumeRequest(t *testing.T) ***REMOVED***
+func TestAuthZPluginV2AllowNonVolumeRequest(t *testing.T) {
 	skip.IfCondition(t, os.Getenv("DOCKER_ENGINE_GOARCH") != "amd64")
 	defer setupTestV2(t)()
 
@@ -56,17 +56,17 @@ func TestAuthZPluginV2AllowNonVolumeRequest(t *testing.T) ***REMOVED***
 	d.LoadBusybox(t)
 
 	// Ensure docker run command and accompanying docker ps are successful
-	createResponse, err := client.ContainerCreate(context.Background(), &container.Config***REMOVED***Cmd: []string***REMOVED***"top"***REMOVED***, Image: "busybox"***REMOVED***, &container.HostConfig***REMOVED******REMOVED***, &networktypes.NetworkingConfig***REMOVED******REMOVED***, "")
+	createResponse, err := client.ContainerCreate(context.Background(), &container.Config{Cmd: []string{"top"}, Image: "busybox"}, &container.HostConfig{}, &networktypes.NetworkingConfig{}, "")
 	require.Nil(t, err)
 
-	err = client.ContainerStart(context.Background(), createResponse.ID, types.ContainerStartOptions***REMOVED******REMOVED***)
+	err = client.ContainerStart(context.Background(), createResponse.ID, types.ContainerStartOptions{})
 	require.Nil(t, err)
 
 	_, err = client.ContainerInspect(context.Background(), createResponse.ID)
 	require.Nil(t, err)
-***REMOVED***
+}
 
-func TestAuthZPluginV2Disable(t *testing.T) ***REMOVED***
+func TestAuthZPluginV2Disable(t *testing.T) {
 	skip.IfCondition(t, os.Getenv("DOCKER_ENGINE_GOARCH") != "amd64")
 	defer setupTestV2(t)()
 
@@ -80,20 +80,20 @@ func TestAuthZPluginV2Disable(t *testing.T) ***REMOVED***
 	d.Restart(t, "--authorization-plugin="+authzPluginNameWithTag)
 	d.LoadBusybox(t)
 
-	_, err = client.VolumeCreate(context.Background(), volumetypes.VolumesCreateBody***REMOVED***Driver: "local"***REMOVED***)
+	_, err = client.VolumeCreate(context.Background(), volumetypes.VolumesCreateBody{Driver: "local"})
 	require.NotNil(t, err)
 	require.True(t, strings.Contains(err.Error(), fmt.Sprintf("Error response from daemon: plugin %s failed with error:", authzPluginNameWithTag)))
 
 	// disable the plugin
-	err = client.PluginDisable(context.Background(), authzPluginNameWithTag, types.PluginDisableOptions***REMOVED******REMOVED***)
+	err = client.PluginDisable(context.Background(), authzPluginNameWithTag, types.PluginDisableOptions{})
 	require.Nil(t, err)
 
 	// now test to see if the docker api works.
-	_, err = client.VolumeCreate(context.Background(), volumetypes.VolumesCreateBody***REMOVED***Driver: "local"***REMOVED***)
+	_, err = client.VolumeCreate(context.Background(), volumetypes.VolumesCreateBody{Driver: "local"})
 	require.Nil(t, err)
-***REMOVED***
+}
 
-func TestAuthZPluginV2RejectVolumeRequests(t *testing.T) ***REMOVED***
+func TestAuthZPluginV2RejectVolumeRequests(t *testing.T) {
 	skip.IfCondition(t, os.Getenv("DOCKER_ENGINE_GOARCH") != "amd64")
 	defer setupTestV2(t)()
 
@@ -107,11 +107,11 @@ func TestAuthZPluginV2RejectVolumeRequests(t *testing.T) ***REMOVED***
 	// restart the daemon with the plugin
 	d.Restart(t, "--authorization-plugin="+authzPluginNameWithTag)
 
-	_, err = client.VolumeCreate(context.Background(), volumetypes.VolumesCreateBody***REMOVED***Driver: "local"***REMOVED***)
+	_, err = client.VolumeCreate(context.Background(), volumetypes.VolumesCreateBody{Driver: "local"})
 	require.NotNil(t, err)
 	require.True(t, strings.Contains(err.Error(), fmt.Sprintf("Error response from daemon: plugin %s failed with error:", authzPluginNameWithTag)))
 
-	_, err = client.VolumeList(context.Background(), filters.Args***REMOVED******REMOVED***)
+	_, err = client.VolumeList(context.Background(), filters.Args{})
 	require.NotNil(t, err)
 	require.True(t, strings.Contains(err.Error(), fmt.Sprintf("Error response from daemon: plugin %s failed with error:", authzPluginNameWithTag)))
 
@@ -124,12 +124,12 @@ func TestAuthZPluginV2RejectVolumeRequests(t *testing.T) ***REMOVED***
 	require.NotNil(t, err)
 	require.True(t, strings.Contains(err.Error(), fmt.Sprintf("Error response from daemon: plugin %s failed with error:", authzPluginNameWithTag)))
 
-	_, err = client.VolumesPrune(context.Background(), filters.Args***REMOVED******REMOVED***)
+	_, err = client.VolumesPrune(context.Background(), filters.Args{})
 	require.NotNil(t, err)
 	require.True(t, strings.Contains(err.Error(), fmt.Sprintf("Error response from daemon: plugin %s failed with error:", authzPluginNameWithTag)))
-***REMOVED***
+}
 
-func TestAuthZPluginV2BadManifestFailsDaemonStart(t *testing.T) ***REMOVED***
+func TestAuthZPluginV2BadManifestFailsDaemonStart(t *testing.T) {
 	skip.IfCondition(t, os.Getenv("DOCKER_ENGINE_GOARCH") != "amd64")
 	defer setupTestV2(t)()
 
@@ -146,9 +146,9 @@ func TestAuthZPluginV2BadManifestFailsDaemonStart(t *testing.T) ***REMOVED***
 
 	// restarting the daemon without requiring the plugin will succeed
 	d.Start(t)
-***REMOVED***
+}
 
-func TestAuthZPluginV2NonexistentFailsDaemonStart(t *testing.T) ***REMOVED***
+func TestAuthZPluginV2NonexistentFailsDaemonStart(t *testing.T) {
 	defer setupTestV2(t)()
 
 	// start the daemon with a non-existent authz plugin, it will error
@@ -157,22 +157,22 @@ func TestAuthZPluginV2NonexistentFailsDaemonStart(t *testing.T) ***REMOVED***
 
 	// restarting the daemon without requiring the plugin will succeed
 	d.Start(t)
-***REMOVED***
+}
 
-func pluginInstallGrantAllPermissions(client client.APIClient, name string) error ***REMOVED***
+func pluginInstallGrantAllPermissions(client client.APIClient, name string) error {
 	ctx := context.Background()
-	options := types.PluginInstallOptions***REMOVED***
+	options := types.PluginInstallOptions{
 		RemoteRef:            name,
 		AcceptAllPermissions: true,
-	***REMOVED***
+	}
 	responseReader, err := client.PluginInstall(ctx, "", options)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer responseReader.Close()
 	// we have to read the response out here because the client API
 	// actually starts a goroutine which we can only be sure has
 	// completed when we get EOF from reading responseBody
 	_, err = ioutil.ReadAll(responseReader)
 	return err
-***REMOVED***
+}

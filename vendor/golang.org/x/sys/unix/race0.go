@@ -12,14 +12,14 @@ import (
 
 const raceenabled = false
 
-func raceAcquire(addr unsafe.Pointer) ***REMOVED***
-***REMOVED***
+func raceAcquire(addr unsafe.Pointer) {
+}
 
-func raceReleaseMerge(addr unsafe.Pointer) ***REMOVED***
-***REMOVED***
+func raceReleaseMerge(addr unsafe.Pointer) {
+}
 
-func raceReadRange(addr unsafe.Pointer, len int) ***REMOVED***
-***REMOVED***
+func raceReadRange(addr unsafe.Pointer, len int) {
+}
 
-func raceWriteRange(addr unsafe.Pointer, len int) ***REMOVED***
-***REMOVED***
+func raceWriteRange(addr unsafe.Pointer, len int) {
+}

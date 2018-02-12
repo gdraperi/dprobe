@@ -12,34 +12,34 @@ import (
 	"golang.org/x/text/message"
 )
 
-func ExampleFormatter() ***REMOVED***
+func ExampleFormatter() {
 	message.SetString(language.Dutch, "In %v people speak %v.", "In %v spreekt men %v.")
 
 	fr := language.French
 	region, _ := fr.Region()
-	for _, tag := range []string***REMOVED***"en", "nl"***REMOVED*** ***REMOVED***
+	for _, tag := range []string{"en", "nl"} {
 		p := message.NewPrinter(language.Make(tag))
 
 		p.Printf("In %v people speak %v.", display.Region(region), display.Language(fr))
 		p.Println()
-	***REMOVED***
+	}
 
 	// Output:
 	// In France people speak French.
 	// In Frankrijk spreekt men Frans.
-***REMOVED***
+}
 
-func ExampleNamer() ***REMOVED***
-	supported := []string***REMOVED***
+func ExampleNamer() {
+	supported := []string{
 		"en-US", "en-GB", "ja", "zh", "zh-Hans", "zh-Hant", "pt", "pt-PT", "ko", "ar", "el", "ru", "uk", "pa",
-	***REMOVED***
+	}
 
 	en := display.English.Languages()
 
-	for _, s := range supported ***REMOVED***
+	for _, s := range supported {
 		t := language.MustParse(s)
 		fmt.Printf("%-20s (%s)\n", en.Name(t), display.Self.Name(t))
-	***REMOVED***
+	}
 
 	// Output:
 	// American English     (American English)
@@ -56,9 +56,9 @@ func ExampleNamer() ***REMOVED***
 	// Russian              (русский)
 	// Ukrainian            (українська)
 	// Punjabi              (ਪੰਜਾਬੀ)
-***REMOVED***
+}
 
-func ExampleTags() ***REMOVED***
+func ExampleTags() {
 	n := display.Tags(language.English)
 	fmt.Println(n.Name(language.Make("nl")))
 	fmt.Println(n.Name(language.Make("nl-BE")))
@@ -72,36 +72,36 @@ func ExampleTags() ***REMOVED***
 	// Dutch (Curaçao)
 	// Dutch (Arabic)
 	// Dutch (Cyrillic, Russia)
-***REMOVED***
+}
 
 // ExampleDictionary shows how to reduce the amount of data linked into your
 // binary by only using the predefined Dictionary variables of the languages you
 // wish to support.
-func ExampleDictionary() ***REMOVED***
-	tags := []language.Tag***REMOVED***
+func ExampleDictionary() {
+	tags := []language.Tag{
 		language.English,
 		language.German,
 		language.Japanese,
 		language.Russian,
-	***REMOVED***
-	dicts := []*display.Dictionary***REMOVED***
+	}
+	dicts := []*display.Dictionary{
 		display.English,
 		display.German,
 		display.Japanese,
 		display.Russian,
-	***REMOVED***
+	}
 
 	m := language.NewMatcher(tags)
 
-	getDict := func(t language.Tag) *display.Dictionary ***REMOVED***
+	getDict := func(t language.Tag) *display.Dictionary {
 		_, i, confidence := m.Match(t)
 		// Skip this check if you want to support a fall-back language, which
 		// will be the first one passed to NewMatcher.
-		if confidence == language.No ***REMOVED***
+		if confidence == language.No {
 			return nil
-		***REMOVED***
+		}
 		return dicts[i]
-	***REMOVED***
+	}
 
 	// The matcher will match Swiss German to German.
 	n := getDict(language.Make("gsw")).Languages()
@@ -113,4 +113,4 @@ func ExampleDictionary() ***REMOVED***
 	// Deutsch
 	// Schweizer Hochdeutsch
 	// Schweizerdeutsch
-***REMOVED***
+}

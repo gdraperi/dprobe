@@ -8,10 +8,10 @@ package socket
 
 import "errors"
 
-func recvmmsg(s uintptr, hs []mmsghdr, flags int) (int, error) ***REMOVED***
+func recvmmsg(s uintptr, hs []mmsghdr, flags int) (int, error) {
 	return 0, errors.New("not implemented")
-***REMOVED***
+}
 
-func sendmmsg(s uintptr, hs []mmsghdr, flags int) (int, error) ***REMOVED***
+func sendmmsg(s uintptr, hs []mmsghdr, flags int) (int, error) {
 	return 0, errors.New("not implemented")
-***REMOVED***
+}

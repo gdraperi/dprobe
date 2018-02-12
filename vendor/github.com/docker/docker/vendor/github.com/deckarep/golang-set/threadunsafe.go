@@ -31,216 +31,216 @@ import (
 	"strings"
 )
 
-type threadUnsafeSet map[interface***REMOVED******REMOVED***]struct***REMOVED******REMOVED***
+type threadUnsafeSet map[interface{}]struct{}
 
-type orderedPair struct ***REMOVED***
-	first  interface***REMOVED******REMOVED***
-	second interface***REMOVED******REMOVED***
-***REMOVED***
+type orderedPair struct {
+	first  interface{}
+	second interface{}
+}
 
-func newThreadUnsafeSet() threadUnsafeSet ***REMOVED***
+func newThreadUnsafeSet() threadUnsafeSet {
 	return make(threadUnsafeSet)
-***REMOVED***
+}
 
-func (pair *orderedPair) Equal(other orderedPair) bool ***REMOVED***
+func (pair *orderedPair) Equal(other orderedPair) bool {
 	if pair.first == other.first &&
-		pair.second == other.second ***REMOVED***
+		pair.second == other.second {
 		return true
-	***REMOVED***
+	}
 
 	return false
-***REMOVED***
+}
 
-func (set *threadUnsafeSet) Add(i interface***REMOVED******REMOVED***) bool ***REMOVED***
+func (set *threadUnsafeSet) Add(i interface{}) bool {
 	_, found := (*set)[i]
-	(*set)[i] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
+	(*set)[i] = struct{}{}
 	return !found //False if it existed already
-***REMOVED***
+}
 
-func (set *threadUnsafeSet) Contains(i ...interface***REMOVED******REMOVED***) bool ***REMOVED***
-	for _, val := range i ***REMOVED***
-		if _, ok := (*set)[val]; !ok ***REMOVED***
+func (set *threadUnsafeSet) Contains(i ...interface{}) bool {
+	for _, val := range i {
+		if _, ok := (*set)[val]; !ok {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}
 
-func (set *threadUnsafeSet) IsSubset(other Set) bool ***REMOVED***
+func (set *threadUnsafeSet) IsSubset(other Set) bool {
 	_ = other.(*threadUnsafeSet)
-	for elem := range *set ***REMOVED***
-		if !other.Contains(elem) ***REMOVED***
+	for elem := range *set {
+		if !other.Contains(elem) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}
 
-func (set *threadUnsafeSet) IsSuperset(other Set) bool ***REMOVED***
+func (set *threadUnsafeSet) IsSuperset(other Set) bool {
 	return other.IsSubset(set)
-***REMOVED***
+}
 
-func (set *threadUnsafeSet) Union(other Set) Set ***REMOVED***
+func (set *threadUnsafeSet) Union(other Set) Set {
 	o := other.(*threadUnsafeSet)
 
 	unionedSet := newThreadUnsafeSet()
 
-	for elem := range *set ***REMOVED***
+	for elem := range *set {
 		unionedSet.Add(elem)
-	***REMOVED***
-	for elem := range *o ***REMOVED***
+	}
+	for elem := range *o {
 		unionedSet.Add(elem)
-	***REMOVED***
+	}
 	return &unionedSet
-***REMOVED***
+}
 
-func (set *threadUnsafeSet) Intersect(other Set) Set ***REMOVED***
+func (set *threadUnsafeSet) Intersect(other Set) Set {
 	o := other.(*threadUnsafeSet)
 
 	intersection := newThreadUnsafeSet()
 	// loop over smaller set
-	if set.Cardinality() < other.Cardinality() ***REMOVED***
-		for elem := range *set ***REMOVED***
-			if other.Contains(elem) ***REMOVED***
+	if set.Cardinality() < other.Cardinality() {
+		for elem := range *set {
+			if other.Contains(elem) {
 				intersection.Add(elem)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
-		for elem := range *o ***REMOVED***
-			if set.Contains(elem) ***REMOVED***
+			}
+		}
+	} else {
+		for elem := range *o {
+			if set.Contains(elem) {
 				intersection.Add(elem)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return &intersection
-***REMOVED***
+}
 
-func (set *threadUnsafeSet) Difference(other Set) Set ***REMOVED***
+func (set *threadUnsafeSet) Difference(other Set) Set {
 	_ = other.(*threadUnsafeSet)
 
 	difference := newThreadUnsafeSet()
-	for elem := range *set ***REMOVED***
-		if !other.Contains(elem) ***REMOVED***
+	for elem := range *set {
+		if !other.Contains(elem) {
 			difference.Add(elem)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return &difference
-***REMOVED***
+}
 
-func (set *threadUnsafeSet) SymmetricDifference(other Set) Set ***REMOVED***
+func (set *threadUnsafeSet) SymmetricDifference(other Set) Set {
 	_ = other.(*threadUnsafeSet)
 
 	aDiff := set.Difference(other)
 	bDiff := other.Difference(set)
 	return aDiff.Union(bDiff)
-***REMOVED***
+}
 
-func (set *threadUnsafeSet) Clear() ***REMOVED***
+func (set *threadUnsafeSet) Clear() {
 	*set = newThreadUnsafeSet()
-***REMOVED***
+}
 
-func (set *threadUnsafeSet) Remove(i interface***REMOVED******REMOVED***) ***REMOVED***
+func (set *threadUnsafeSet) Remove(i interface{}) {
 	delete(*set, i)
-***REMOVED***
+}
 
-func (set *threadUnsafeSet) Cardinality() int ***REMOVED***
+func (set *threadUnsafeSet) Cardinality() int {
 	return len(*set)
-***REMOVED***
+}
 
-func (set *threadUnsafeSet) Iter() <-chan interface***REMOVED******REMOVED*** ***REMOVED***
-	ch := make(chan interface***REMOVED******REMOVED***)
-	go func() ***REMOVED***
-		for elem := range *set ***REMOVED***
+func (set *threadUnsafeSet) Iter() <-chan interface{} {
+	ch := make(chan interface{})
+	go func() {
+		for elem := range *set {
 			ch <- elem
-		***REMOVED***
+		}
 		close(ch)
-	***REMOVED***()
+	}()
 
 	return ch
-***REMOVED***
+}
 
-func (set *threadUnsafeSet) Equal(other Set) bool ***REMOVED***
+func (set *threadUnsafeSet) Equal(other Set) bool {
 	_ = other.(*threadUnsafeSet)
 
-	if set.Cardinality() != other.Cardinality() ***REMOVED***
+	if set.Cardinality() != other.Cardinality() {
 		return false
-	***REMOVED***
-	for elem := range *set ***REMOVED***
-		if !other.Contains(elem) ***REMOVED***
+	}
+	for elem := range *set {
+		if !other.Contains(elem) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}
 
-func (set *threadUnsafeSet) Clone() Set ***REMOVED***
+func (set *threadUnsafeSet) Clone() Set {
 	clonedSet := newThreadUnsafeSet()
-	for elem := range *set ***REMOVED***
+	for elem := range *set {
 		clonedSet.Add(elem)
-	***REMOVED***
+	}
 	return &clonedSet
-***REMOVED***
+}
 
-func (set *threadUnsafeSet) String() string ***REMOVED***
+func (set *threadUnsafeSet) String() string {
 	items := make([]string, 0, len(*set))
 
-	for elem := range *set ***REMOVED***
+	for elem := range *set {
 		items = append(items, fmt.Sprintf("%v", elem))
-	***REMOVED***
-	return fmt.Sprintf("Set***REMOVED***%s***REMOVED***", strings.Join(items, ", "))
-***REMOVED***
+	}
+	return fmt.Sprintf("Set{%s}", strings.Join(items, ", "))
+}
 
-func (pair orderedPair) String() string ***REMOVED***
+func (pair orderedPair) String() string {
 	return fmt.Sprintf("(%v, %v)", pair.first, pair.second)
-***REMOVED***
+}
 
-func (set *threadUnsafeSet) PowerSet() Set ***REMOVED***
+func (set *threadUnsafeSet) PowerSet() Set {
 	powSet := NewThreadUnsafeSet()
 	nullset := newThreadUnsafeSet()
 	powSet.Add(&nullset)
 
-	for es := range *set ***REMOVED***
+	for es := range *set {
 		u := newThreadUnsafeSet()
 		j := powSet.Iter()
-		for er := range j ***REMOVED***
+		for er := range j {
 			p := newThreadUnsafeSet()
-			if reflect.TypeOf(er).Name() == "" ***REMOVED***
+			if reflect.TypeOf(er).Name() == "" {
 				k := er.(*threadUnsafeSet)
-				for ek := range *(k) ***REMOVED***
+				for ek := range *(k) {
 					p.Add(ek)
-				***REMOVED***
-			***REMOVED*** else ***REMOVED***
+				}
+			} else {
 				p.Add(er)
-			***REMOVED***
+			}
 			p.Add(es)
 			u.Add(&p)
-		***REMOVED***
+		}
 
 		powSet = powSet.Union(&u)
-	***REMOVED***
+	}
 
 	return powSet
-***REMOVED***
+}
 
-func (set *threadUnsafeSet) CartesianProduct(other Set) Set ***REMOVED***
+func (set *threadUnsafeSet) CartesianProduct(other Set) Set {
 	o := other.(*threadUnsafeSet)
 	cartProduct := NewThreadUnsafeSet()
 
-	for i := range *set ***REMOVED***
-		for j := range *o ***REMOVED***
-			elem := orderedPair***REMOVED***first: i, second: j***REMOVED***
+	for i := range *set {
+		for j := range *o {
+			elem := orderedPair{first: i, second: j}
 			cartProduct.Add(elem)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return cartProduct
-***REMOVED***
+}
 
-func (set *threadUnsafeSet) ToSlice() []interface***REMOVED******REMOVED*** ***REMOVED***
-	keys := make([]interface***REMOVED******REMOVED***, 0, set.Cardinality())
-	for elem := range *set ***REMOVED***
+func (set *threadUnsafeSet) ToSlice() []interface{} {
+	keys := make([]interface{}, 0, set.Cardinality())
+	for elem := range *set {
 		keys = append(keys, elem)
-	***REMOVED***
+	}
 
 	return keys
-***REMOVED***
+}

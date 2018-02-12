@@ -20,305 +20,305 @@ import (
 	"github.com/hashicorp/hcl/testhelper"
 )
 
-var fixtureExtensions = []string***REMOVED***"hcl"***REMOVED***
+var fixtureExtensions = []string{"hcl"}
 
-func init() ***REMOVED***
+func init() {
 	sort.Sort(ByFilename(fixtures))
-***REMOVED***
+}
 
-func TestIsValidFile(t *testing.T) ***REMOVED***
+func TestIsValidFile(t *testing.T) {
 	const fixtureDir = "./test-fixtures"
 
-	cases := []struct ***REMOVED***
+	cases := []struct {
 		Path     string
 		Expected bool
-	***REMOVED******REMOVED***
-		***REMOVED***"good.hcl", true***REMOVED***,
-		***REMOVED***".hidden.ignore", false***REMOVED***,
-		***REMOVED***"file.ignore", false***REMOVED***,
-		***REMOVED***"dir.ignore", false***REMOVED***,
-	***REMOVED***
+	}{
+		{"good.hcl", true},
+		{".hidden.ignore", false},
+		{"file.ignore", false},
+		{"dir.ignore", false},
+	}
 
-	for _, tc := range cases ***REMOVED***
+	for _, tc := range cases {
 		file, err := os.Stat(filepath.Join(fixtureDir, tc.Path))
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Errorf("unexpected error: %s", err)
-		***REMOVED***
+		}
 
-		if res := isValidFile(file, fixtureExtensions); res != tc.Expected ***REMOVED***
+		if res := isValidFile(file, fixtureExtensions); res != tc.Expected {
 			t.Errorf("want: %b, got: %b", tc.Expected, res)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestRunMultiplePaths(t *testing.T) ***REMOVED***
+func TestRunMultiplePaths(t *testing.T) {
 	path1, err := renderFixtures("")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("unexpected error: %s", err)
-	***REMOVED***
+	}
 	defer os.RemoveAll(path1)
 	path2, err := renderFixtures("")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("unexpected error: %s", err)
-	***REMOVED***
+	}
 	defer os.RemoveAll(path2)
 
 	var expectedOut bytes.Buffer
-	for _, path := range []string***REMOVED***path1, path2***REMOVED*** ***REMOVED***
-		for _, fixture := range fixtures ***REMOVED***
-			if !bytes.Equal(fixture.golden, fixture.input) ***REMOVED***
+	for _, path := range []string{path1, path2} {
+		for _, fixture := range fixtures {
+			if !bytes.Equal(fixture.golden, fixture.input) {
 				expectedOut.WriteString(filepath.Join(path, fixture.filename) + "\n")
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	_, stdout := mockIO()
 	err = Run(
-		[]string***REMOVED***path1, path2***REMOVED***,
+		[]string{path1, path2},
 		fixtureExtensions,
 		nil, stdout,
-		Options***REMOVED***
+		Options{
 			List: true,
-		***REMOVED***,
+		},
 	)
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("unexpected error: %s", err)
-	***REMOVED***
-	if stdout.String() != expectedOut.String() ***REMOVED***
+	}
+	if stdout.String() != expectedOut.String() {
 		t.Errorf("stdout want:\n%s\ngot:\n%s", expectedOut, stdout)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestRunSubDirectories(t *testing.T) ***REMOVED***
+func TestRunSubDirectories(t *testing.T) {
 	pathParent, err := ioutil.TempDir("", "")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("unexpected error: %s", err)
-	***REMOVED***
+	}
 	defer os.RemoveAll(pathParent)
 
 	path1, err := renderFixtures(pathParent)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("unexpected error: %s", err)
-	***REMOVED***
+	}
 	path2, err := renderFixtures(pathParent)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("unexpected error: %s", err)
-	***REMOVED***
+	}
 
-	paths := []string***REMOVED***path1, path2***REMOVED***
+	paths := []string{path1, path2}
 	sort.Strings(paths)
 
 	var expectedOut bytes.Buffer
-	for _, path := range paths ***REMOVED***
-		for _, fixture := range fixtures ***REMOVED***
-			if !bytes.Equal(fixture.golden, fixture.input) ***REMOVED***
+	for _, path := range paths {
+		for _, fixture := range fixtures {
+			if !bytes.Equal(fixture.golden, fixture.input) {
 				expectedOut.WriteString(filepath.Join(path, fixture.filename) + "\n")
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	_, stdout := mockIO()
 	err = Run(
-		[]string***REMOVED***pathParent***REMOVED***,
+		[]string{pathParent},
 		fixtureExtensions,
 		nil, stdout,
-		Options***REMOVED***
+		Options{
 			List: true,
-		***REMOVED***,
+		},
 	)
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("unexpected error: %s", err)
-	***REMOVED***
-	if stdout.String() != expectedOut.String() ***REMOVED***
+	}
+	if stdout.String() != expectedOut.String() {
 		t.Errorf("stdout want:\n%s\ngot:\n%s", expectedOut, stdout)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestRunStdin(t *testing.T) ***REMOVED***
+func TestRunStdin(t *testing.T) {
 	var expectedOut bytes.Buffer
-	for i, fixture := range fixtures ***REMOVED***
-		if i != 0 ***REMOVED***
+	for i, fixture := range fixtures {
+		if i != 0 {
 			expectedOut.WriteString("\n")
-		***REMOVED***
+		}
 		expectedOut.Write(fixture.golden)
-	***REMOVED***
+	}
 
 	stdin, stdout := mockIO()
-	for _, fixture := range fixtures ***REMOVED***
+	for _, fixture := range fixtures {
 		stdin.Write(fixture.input)
-	***REMOVED***
+	}
 
 	err := Run(
-		[]string***REMOVED******REMOVED***,
+		[]string{},
 		fixtureExtensions,
 		stdin, stdout,
-		Options***REMOVED******REMOVED***,
+		Options{},
 	)
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("unexpected error: %s", err)
-	***REMOVED***
-	if !bytes.Equal(stdout.Bytes(), expectedOut.Bytes()) ***REMOVED***
+	}
+	if !bytes.Equal(stdout.Bytes(), expectedOut.Bytes()) {
 		t.Errorf("stdout want:\n%s\ngot:\n%s", expectedOut, stdout)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestRunStdinAndWrite(t *testing.T) ***REMOVED***
-	var expectedOut = []byte***REMOVED******REMOVED***
+func TestRunStdinAndWrite(t *testing.T) {
+	var expectedOut = []byte{}
 
 	stdin, stdout := mockIO()
 	stdin.WriteString("")
 	err := Run(
-		[]string***REMOVED******REMOVED***, []string***REMOVED******REMOVED***,
+		[]string{}, []string{},
 		stdin, stdout,
-		Options***REMOVED***
+		Options{
 			Write: true,
-		***REMOVED***,
+		},
 	)
 
-	if err != ErrWriteStdin ***REMOVED***
+	if err != ErrWriteStdin {
 		t.Errorf("error want:\n%s\ngot:\n%s", ErrWriteStdin, err)
-	***REMOVED***
-	if !bytes.Equal(stdout.Bytes(), expectedOut) ***REMOVED***
+	}
+	if !bytes.Equal(stdout.Bytes(), expectedOut) {
 		t.Errorf("stdout want:\n%s\ngot:\n%s", expectedOut, stdout)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestRunFileError(t *testing.T) ***REMOVED***
+func TestRunFileError(t *testing.T) {
 	path, err := ioutil.TempDir("", "")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("unexpected error: %s", err)
-	***REMOVED***
+	}
 	defer os.RemoveAll(path)
 	filename := filepath.Join(path, "unreadable.hcl")
 
-	var expectedError = &os.PathError***REMOVED***
+	var expectedError = &os.PathError{
 		Op:   "open",
 		Path: filename,
 		Err:  syscall.EACCES,
-	***REMOVED***
+	}
 
-	err = ioutil.WriteFile(filename, []byte***REMOVED******REMOVED***, 0000)
-	if err != nil ***REMOVED***
+	err = ioutil.WriteFile(filename, []byte{}, 0000)
+	if err != nil {
 		t.Errorf("unexpected error: %s", err)
-	***REMOVED***
+	}
 
 	_, stdout := mockIO()
 	err = Run(
-		[]string***REMOVED***path***REMOVED***,
+		[]string{path},
 		fixtureExtensions,
 		nil, stdout,
-		Options***REMOVED******REMOVED***,
+		Options{},
 	)
 
-	if !reflect.DeepEqual(err, expectedError) ***REMOVED***
+	if !reflect.DeepEqual(err, expectedError) {
 		t.Errorf("error want: %#v, got: %#v", expectedError, err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestRunNoOptions(t *testing.T) ***REMOVED***
+func TestRunNoOptions(t *testing.T) {
 	path, err := renderFixtures("")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("unexpected error: %s", err)
-	***REMOVED***
+	}
 	defer os.RemoveAll(path)
 
 	var expectedOut bytes.Buffer
-	for _, fixture := range fixtures ***REMOVED***
+	for _, fixture := range fixtures {
 		expectedOut.Write(fixture.golden)
-	***REMOVED***
+	}
 
 	_, stdout := mockIO()
 	err = Run(
-		[]string***REMOVED***path***REMOVED***,
+		[]string{path},
 		fixtureExtensions,
 		nil, stdout,
-		Options***REMOVED******REMOVED***,
+		Options{},
 	)
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("unexpected error: %s", err)
-	***REMOVED***
-	if stdout.String() != expectedOut.String() ***REMOVED***
+	}
+	if stdout.String() != expectedOut.String() {
 		t.Errorf("stdout want:\n%s\ngot:\n%s", expectedOut, stdout)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestRunList(t *testing.T) ***REMOVED***
+func TestRunList(t *testing.T) {
 	path, err := renderFixtures("")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("unexpected error: %s", err)
-	***REMOVED***
+	}
 	defer os.RemoveAll(path)
 
 	var expectedOut bytes.Buffer
-	for _, fixture := range fixtures ***REMOVED***
-		if !bytes.Equal(fixture.golden, fixture.input) ***REMOVED***
+	for _, fixture := range fixtures {
+		if !bytes.Equal(fixture.golden, fixture.input) {
 			expectedOut.WriteString(fmt.Sprintln(filepath.Join(path, fixture.filename)))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	_, stdout := mockIO()
 	err = Run(
-		[]string***REMOVED***path***REMOVED***,
+		[]string{path},
 		fixtureExtensions,
 		nil, stdout,
-		Options***REMOVED***
+		Options{
 			List: true,
-		***REMOVED***,
+		},
 	)
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("unexpected error: %s", err)
-	***REMOVED***
-	if stdout.String() != expectedOut.String() ***REMOVED***
+	}
+	if stdout.String() != expectedOut.String() {
 		t.Errorf("stdout want:\n%s\ngot:\n%s", expectedOut, stdout)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestRunWrite(t *testing.T) ***REMOVED***
+func TestRunWrite(t *testing.T) {
 	path, err := renderFixtures("")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("unexpected error: %s", err)
-	***REMOVED***
+	}
 	defer os.RemoveAll(path)
 
 	_, stdout := mockIO()
 	err = Run(
-		[]string***REMOVED***path***REMOVED***,
+		[]string{path},
 		fixtureExtensions,
 		nil, stdout,
-		Options***REMOVED***
+		Options{
 			Write: true,
-		***REMOVED***,
+		},
 	)
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("unexpected error: %s", err)
-	***REMOVED***
-	for _, fixture := range fixtures ***REMOVED***
+	}
+	for _, fixture := range fixtures {
 		res, err := ioutil.ReadFile(filepath.Join(path, fixture.filename))
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Errorf("unexpected error: %s", err)
-		***REMOVED***
-		if !bytes.Equal(res, fixture.golden) ***REMOVED***
+		}
+		if !bytes.Equal(res, fixture.golden) {
 			t.Errorf("file %q contents want:\n%s\ngot:\n%s", fixture.filename, fixture.golden, res)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestRunDiff(t *testing.T) ***REMOVED***
+func TestRunDiff(t *testing.T) {
 	path, err := renderFixtures("")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("unexpected error: %s", err)
-	***REMOVED***
+	}
 	defer os.RemoveAll(path)
 
 	var expectedOut bytes.Buffer
-	for _, fixture := range fixtures ***REMOVED***
-		if len(fixture.diff) > 0 ***REMOVED***
+	for _, fixture := range fixtures {
+		if len(fixture.diff) > 0 {
 			expectedOut.WriteString(
 				regexp.QuoteMeta(
 					fmt.Sprintf("diff a/%s/%s b/%s/%s\n", path, fixture.filename, path, fixture.filename),
@@ -328,113 +328,113 @@ func TestRunDiff(t *testing.T) ***REMOVED***
 			expectedOut.WriteString(`--- .+?\n`)
 			expectedOut.WriteString(`\+\+\+ .+?\n`)
 			expectedOut.WriteString(regexp.QuoteMeta(string(fixture.diff)))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	expectedOutString := testhelper.Unix2dos(expectedOut.String())
 
 	_, stdout := mockIO()
 	err = Run(
-		[]string***REMOVED***path***REMOVED***,
+		[]string{path},
 		fixtureExtensions,
 		nil, stdout,
-		Options***REMOVED***
+		Options{
 			Diff: true,
-		***REMOVED***,
+		},
 	)
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("unexpected error: %s", err)
-	***REMOVED***
-	if !regexp.MustCompile(expectedOutString).Match(stdout.Bytes()) ***REMOVED***
+	}
+	if !regexp.MustCompile(expectedOutString).Match(stdout.Bytes()) {
 		t.Errorf("stdout want match:\n%s\ngot:\n%q", expectedOutString, stdout)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func mockIO() (stdin, stdout *bytes.Buffer) ***REMOVED***
+func mockIO() (stdin, stdout *bytes.Buffer) {
 	return new(bytes.Buffer), new(bytes.Buffer)
-***REMOVED***
+}
 
-type fixture struct ***REMOVED***
+type fixture struct {
 	filename            string
 	input, golden, diff []byte
-***REMOVED***
+}
 
 type ByFilename []fixture
 
-func (s ByFilename) Len() int           ***REMOVED*** return len(s) ***REMOVED***
-func (s ByFilename) Swap(i, j int)      ***REMOVED*** s[i], s[j] = s[j], s[i] ***REMOVED***
-func (s ByFilename) Less(i, j int) bool ***REMOVED*** return len(s[i].filename) > len(s[j].filename) ***REMOVED***
+func (s ByFilename) Len() int           { return len(s) }
+func (s ByFilename) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
+func (s ByFilename) Less(i, j int) bool { return len(s[i].filename) > len(s[j].filename) }
 
-var fixtures = []fixture***REMOVED***
-	***REMOVED***
+var fixtures = []fixture{
+	{
 		"noop.hcl",
-		[]byte(`resource "aws_security_group" "firewall" ***REMOVED***
+		[]byte(`resource "aws_security_group" "firewall" {
   count = 5
-***REMOVED***
+}
 `),
-		[]byte(`resource "aws_security_group" "firewall" ***REMOVED***
+		[]byte(`resource "aws_security_group" "firewall" {
   count = 5
-***REMOVED***
+}
 `),
 		[]byte(``),
-	***REMOVED***, ***REMOVED***
+	}, {
 		"align_equals.hcl",
-		[]byte(`variable "foo" ***REMOVED***
+		[]byte(`variable "foo" {
   default = "bar"
   description = "bar"
-***REMOVED***
+}
 `),
-		[]byte(`variable "foo" ***REMOVED***
+		[]byte(`variable "foo" {
   default     = "bar"
   description = "bar"
-***REMOVED***
+}
 `),
 		[]byte(`@@ -1,4 +1,4 @@
- variable "foo" ***REMOVED***
+ variable "foo" {
 -  default = "bar"
 +  default     = "bar"
    description = "bar"
- ***REMOVED***
+ }
 `),
-	***REMOVED***, ***REMOVED***
+	}, {
 		"indentation.hcl",
-		[]byte(`provider "aws" ***REMOVED***
+		[]byte(`provider "aws" {
     access_key = "foo"
     secret_key = "bar"
-***REMOVED***
+}
 `),
-		[]byte(`provider "aws" ***REMOVED***
+		[]byte(`provider "aws" {
   access_key = "foo"
   secret_key = "bar"
-***REMOVED***
+}
 `),
 		[]byte(`@@ -1,4 +1,4 @@
- provider "aws" ***REMOVED***
+ provider "aws" {
 -    access_key = "foo"
 -    secret_key = "bar"
 +  access_key = "foo"
 +  secret_key = "bar"
- ***REMOVED***
+ }
 `),
-	***REMOVED***,
-***REMOVED***
+	},
+}
 
 // parent can be an empty string, in which case the system's default
 // temporary directory will be used.
-func renderFixtures(parent string) (path string, err error) ***REMOVED***
+func renderFixtures(parent string) (path string, err error) {
 	path, err = ioutil.TempDir(parent, "")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 
-	for _, fixture := range fixtures ***REMOVED***
+	for _, fixture := range fixtures {
 		err = ioutil.WriteFile(filepath.Join(path, fixture.filename), []byte(fixture.input), 0644)
-		if err != nil ***REMOVED***
+		if err != nil {
 			os.RemoveAll(path)
 			return "", err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return path, nil
-***REMOVED***
+}

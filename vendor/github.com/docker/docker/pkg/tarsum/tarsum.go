@@ -44,58 +44,58 @@ const (
 // This is used for calculating checksums of layers of an image, in some cases
 // including the byte payload of the image's json metadata as well, and for
 // calculating the checksums for buildcache.
-func NewTarSum(r io.Reader, dc bool, v Version) (TarSum, error) ***REMOVED***
+func NewTarSum(r io.Reader, dc bool, v Version) (TarSum, error) {
 	return NewTarSumHash(r, dc, v, DefaultTHash)
-***REMOVED***
+}
 
 // NewTarSumHash creates a new TarSum, providing a THash to use rather than
 // the DefaultTHash.
-func NewTarSumHash(r io.Reader, dc bool, v Version, tHash THash) (TarSum, error) ***REMOVED***
+func NewTarSumHash(r io.Reader, dc bool, v Version, tHash THash) (TarSum, error) {
 	headerSelector, err := getTarHeaderSelector(v)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	ts := &tarSum***REMOVED***Reader: r, DisableCompression: dc, tarSumVersion: v, headerSelector: headerSelector, tHash: tHash***REMOVED***
+	}
+	ts := &tarSum{Reader: r, DisableCompression: dc, tarSumVersion: v, headerSelector: headerSelector, tHash: tHash}
 	err = ts.initTarSum()
 	return ts, err
-***REMOVED***
+}
 
 // NewTarSumForLabel creates a new TarSum using the provided TarSum version+hash label.
-func NewTarSumForLabel(r io.Reader, disableCompression bool, label string) (TarSum, error) ***REMOVED***
+func NewTarSumForLabel(r io.Reader, disableCompression bool, label string) (TarSum, error) {
 	parts := strings.SplitN(label, "+", 2)
-	if len(parts) != 2 ***REMOVED***
-		return nil, errors.New("tarsum label string should be of the form: ***REMOVED***tarsum_version***REMOVED***+***REMOVED***hash_name***REMOVED***")
-	***REMOVED***
+	if len(parts) != 2 {
+		return nil, errors.New("tarsum label string should be of the form: {tarsum_version}+{hash_name}")
+	}
 
 	versionName, hashName := parts[0], parts[1]
 
 	version, ok := tarSumVersionsByName[versionName]
-	if !ok ***REMOVED***
+	if !ok {
 		return nil, fmt.Errorf("unknown TarSum version name: %q", versionName)
-	***REMOVED***
+	}
 
 	hashConfig, ok := standardHashConfigs[hashName]
-	if !ok ***REMOVED***
+	if !ok {
 		return nil, fmt.Errorf("unknown TarSum hash name: %q", hashName)
-	***REMOVED***
+	}
 
 	tHash := NewTHash(hashConfig.name, hashConfig.hash.New)
 
 	return NewTarSumHash(r, disableCompression, version, tHash)
-***REMOVED***
+}
 
 // TarSum is the generic interface for calculating fixed time
 // checksums of a tar archive.
-type TarSum interface ***REMOVED***
+type TarSum interface {
 	io.Reader
 	GetSums() FileInfoSums
 	Sum([]byte) string
 	Version() Version
 	Hash() THash
-***REMOVED***
+}
 
 // tarSum struct is the structure for a Version0 checksum calculation.
-type tarSum struct ***REMOVED***
+type tarSum struct {
 	io.Reader
 	tarR               *tar.Reader
 	tarW               *tar.Writer
@@ -113,86 +113,86 @@ type tarSum struct ***REMOVED***
 	DisableCompression bool              // false by default. When false, the output gzip compressed.
 	tarSumVersion      Version           // this field is not exported so it can not be mutated during use
 	headerSelector     tarHeaderSelector // handles selecting and ordering headers for files in the archive
-***REMOVED***
+}
 
-func (ts tarSum) Hash() THash ***REMOVED***
+func (ts tarSum) Hash() THash {
 	return ts.tHash
-***REMOVED***
+}
 
-func (ts tarSum) Version() Version ***REMOVED***
+func (ts tarSum) Version() Version {
 	return ts.tarSumVersion
-***REMOVED***
+}
 
 // THash provides a hash.Hash type generator and its name.
-type THash interface ***REMOVED***
+type THash interface {
 	Hash() hash.Hash
 	Name() string
-***REMOVED***
+}
 
 // NewTHash is a convenience method for creating a THash.
-func NewTHash(name string, h func() hash.Hash) THash ***REMOVED***
-	return simpleTHash***REMOVED***n: name, h: h***REMOVED***
-***REMOVED***
+func NewTHash(name string, h func() hash.Hash) THash {
+	return simpleTHash{n: name, h: h}
+}
 
-type tHashConfig struct ***REMOVED***
+type tHashConfig struct {
 	name string
 	hash crypto.Hash
-***REMOVED***
+}
 
 var (
 	// NOTE: DO NOT include MD5 or SHA1, which are considered insecure.
-	standardHashConfigs = map[string]tHashConfig***REMOVED***
-		"sha256": ***REMOVED***name: "sha256", hash: crypto.SHA256***REMOVED***,
-		"sha512": ***REMOVED***name: "sha512", hash: crypto.SHA512***REMOVED***,
-	***REMOVED***
+	standardHashConfigs = map[string]tHashConfig{
+		"sha256": {name: "sha256", hash: crypto.SHA256},
+		"sha512": {name: "sha512", hash: crypto.SHA512},
+	}
 )
 
 // DefaultTHash is default TarSum hashing algorithm - "sha256".
 var DefaultTHash = NewTHash("sha256", sha256.New)
 
-type simpleTHash struct ***REMOVED***
+type simpleTHash struct {
 	n string
 	h func() hash.Hash
-***REMOVED***
+}
 
-func (sth simpleTHash) Name() string    ***REMOVED*** return sth.n ***REMOVED***
-func (sth simpleTHash) Hash() hash.Hash ***REMOVED*** return sth.h() ***REMOVED***
+func (sth simpleTHash) Name() string    { return sth.n }
+func (sth simpleTHash) Hash() hash.Hash { return sth.h() }
 
-func (ts *tarSum) encodeHeader(h *tar.Header) error ***REMOVED***
-	for _, elem := range ts.headerSelector.selectHeaders(h) ***REMOVED***
-		if _, err := ts.h.Write([]byte(elem[0] + elem[1])); err != nil ***REMOVED***
+func (ts *tarSum) encodeHeader(h *tar.Header) error {
+	for _, elem := range ts.headerSelector.selectHeaders(h) {
+		if _, err := ts.h.Write([]byte(elem[0] + elem[1])); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func (ts *tarSum) initTarSum() error ***REMOVED***
-	ts.bufTar = bytes.NewBuffer([]byte***REMOVED******REMOVED***)
-	ts.bufWriter = bytes.NewBuffer([]byte***REMOVED******REMOVED***)
+func (ts *tarSum) initTarSum() error {
+	ts.bufTar = bytes.NewBuffer([]byte{})
+	ts.bufWriter = bytes.NewBuffer([]byte{})
 	ts.tarR = tar.NewReader(ts.Reader)
 	ts.tarW = tar.NewWriter(ts.bufTar)
-	if !ts.DisableCompression ***REMOVED***
+	if !ts.DisableCompression {
 		ts.writer = gzip.NewWriter(ts.bufWriter)
-	***REMOVED*** else ***REMOVED***
-		ts.writer = &nopCloseFlusher***REMOVED***Writer: ts.bufWriter***REMOVED***
-	***REMOVED***
-	if ts.tHash == nil ***REMOVED***
+	} else {
+		ts.writer = &nopCloseFlusher{Writer: ts.bufWriter}
+	}
+	if ts.tHash == nil {
 		ts.tHash = DefaultTHash
-	***REMOVED***
+	}
 	ts.h = ts.tHash.Hash()
 	ts.h.Reset()
 	ts.first = true
-	ts.sums = FileInfoSums***REMOVED******REMOVED***
+	ts.sums = FileInfoSums{}
 	return nil
-***REMOVED***
+}
 
-func (ts *tarSum) Read(buf []byte) (int, error) ***REMOVED***
-	if ts.finished ***REMOVED***
+func (ts *tarSum) Read(buf []byte) (int, error) {
+	if ts.finished {
 		return ts.bufWriter.Read(buf)
-	***REMOVED***
-	if len(ts.bufData) < len(buf) ***REMOVED***
-		switch ***REMOVED***
+	}
+	if len(ts.bufData) < len(buf) {
+		switch {
 		case len(buf) <= buf8K:
 			ts.bufData = make([]byte, buf8K)
 		case len(buf) <= buf16K:
@@ -201,95 +201,95 @@ func (ts *tarSum) Read(buf []byte) (int, error) ***REMOVED***
 			ts.bufData = make([]byte, buf32K)
 		default:
 			ts.bufData = make([]byte, len(buf))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	buf2 := ts.bufData[:len(buf)]
 
 	n, err := ts.tarR.Read(buf2)
-	if err != nil ***REMOVED***
-		if err == io.EOF ***REMOVED***
-			if _, err := ts.h.Write(buf2[:n]); err != nil ***REMOVED***
+	if err != nil {
+		if err == io.EOF {
+			if _, err := ts.h.Write(buf2[:n]); err != nil {
 				return 0, err
-			***REMOVED***
-			if !ts.first ***REMOVED***
-				ts.sums = append(ts.sums, fileInfoSum***REMOVED***name: ts.currentFile, sum: hex.EncodeToString(ts.h.Sum(nil)), pos: ts.fileCounter***REMOVED***)
+			}
+			if !ts.first {
+				ts.sums = append(ts.sums, fileInfoSum{name: ts.currentFile, sum: hex.EncodeToString(ts.h.Sum(nil)), pos: ts.fileCounter})
 				ts.fileCounter++
 				ts.h.Reset()
-			***REMOVED*** else ***REMOVED***
+			} else {
 				ts.first = false
-			***REMOVED***
+			}
 
 			currentHeader, err := ts.tarR.Next()
-			if err != nil ***REMOVED***
-				if err == io.EOF ***REMOVED***
-					if err := ts.tarW.Close(); err != nil ***REMOVED***
+			if err != nil {
+				if err == io.EOF {
+					if err := ts.tarW.Close(); err != nil {
 						return 0, err
-					***REMOVED***
-					if _, err := io.Copy(ts.writer, ts.bufTar); err != nil ***REMOVED***
+					}
+					if _, err := io.Copy(ts.writer, ts.bufTar); err != nil {
 						return 0, err
-					***REMOVED***
-					if err := ts.writer.Close(); err != nil ***REMOVED***
+					}
+					if err := ts.writer.Close(); err != nil {
 						return 0, err
-					***REMOVED***
+					}
 					ts.finished = true
 					return n, nil
-				***REMOVED***
+				}
 				return n, err
-			***REMOVED***
+			}
 			ts.currentFile = path.Clean(currentHeader.Name)
-			if err := ts.encodeHeader(currentHeader); err != nil ***REMOVED***
+			if err := ts.encodeHeader(currentHeader); err != nil {
 				return 0, err
-			***REMOVED***
-			if err := ts.tarW.WriteHeader(currentHeader); err != nil ***REMOVED***
+			}
+			if err := ts.tarW.WriteHeader(currentHeader); err != nil {
 				return 0, err
-			***REMOVED***
-			if _, err := ts.tarW.Write(buf2[:n]); err != nil ***REMOVED***
+			}
+			if _, err := ts.tarW.Write(buf2[:n]); err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			ts.tarW.Flush()
-			if _, err := io.Copy(ts.writer, ts.bufTar); err != nil ***REMOVED***
+			if _, err := io.Copy(ts.writer, ts.bufTar); err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			ts.writer.Flush()
 
 			return ts.bufWriter.Read(buf)
-		***REMOVED***
+		}
 		return n, err
-	***REMOVED***
+	}
 
 	// Filling the hash buffer
-	if _, err = ts.h.Write(buf2[:n]); err != nil ***REMOVED***
+	if _, err = ts.h.Write(buf2[:n]); err != nil {
 		return 0, err
-	***REMOVED***
+	}
 
 	// Filling the tar writer
-	if _, err = ts.tarW.Write(buf2[:n]); err != nil ***REMOVED***
+	if _, err = ts.tarW.Write(buf2[:n]); err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	ts.tarW.Flush()
 
 	// Filling the output writer
-	if _, err = io.Copy(ts.writer, ts.bufTar); err != nil ***REMOVED***
+	if _, err = io.Copy(ts.writer, ts.bufTar); err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	ts.writer.Flush()
 
 	return ts.bufWriter.Read(buf)
-***REMOVED***
+}
 
-func (ts *tarSum) Sum(extra []byte) string ***REMOVED***
+func (ts *tarSum) Sum(extra []byte) string {
 	ts.sums.SortBySums()
 	h := ts.tHash.Hash()
-	if extra != nil ***REMOVED***
+	if extra != nil {
 		h.Write(extra)
-	***REMOVED***
-	for _, fis := range ts.sums ***REMOVED***
+	}
+	for _, fis := range ts.sums {
 		h.Write([]byte(fis.Sum()))
-	***REMOVED***
+	}
 	checksum := ts.Version().String() + "+" + ts.tHash.Name() + ":" + hex.EncodeToString(h.Sum(nil))
 	return checksum
-***REMOVED***
+}
 
-func (ts *tarSum) GetSums() FileInfoSums ***REMOVED***
+func (ts *tarSum) GetSums() FileInfoSums {
 	return ts.sums
-***REMOVED***
+}

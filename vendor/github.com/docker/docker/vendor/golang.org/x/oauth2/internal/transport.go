@@ -18,7 +18,7 @@ var HTTPClient ContextKey
 // ContextKey is just an empty struct. It exists so HTTPClient can be
 // an immutable public variable with a unique type. It's immutable
 // because nobody else can create a ContextKey, being unexported.
-type ContextKey struct***REMOVED******REMOVED***
+type ContextKey struct{}
 
 // ContextClientFunc is a func which tries to return an *http.Client
 // given a Context value. If it returns an error, the search stops
@@ -28,42 +28,42 @@ type ContextClientFunc func(context.Context) (*http.Client, error)
 
 var contextClientFuncs []ContextClientFunc
 
-func RegisterContextClientFunc(fn ContextClientFunc) ***REMOVED***
+func RegisterContextClientFunc(fn ContextClientFunc) {
 	contextClientFuncs = append(contextClientFuncs, fn)
-***REMOVED***
+}
 
-func ContextClient(ctx context.Context) (*http.Client, error) ***REMOVED***
-	if ctx != nil ***REMOVED***
-		if hc, ok := ctx.Value(HTTPClient).(*http.Client); ok ***REMOVED***
+func ContextClient(ctx context.Context) (*http.Client, error) {
+	if ctx != nil {
+		if hc, ok := ctx.Value(HTTPClient).(*http.Client); ok {
 			return hc, nil
-		***REMOVED***
-	***REMOVED***
-	for _, fn := range contextClientFuncs ***REMOVED***
+		}
+	}
+	for _, fn := range contextClientFuncs {
 		c, err := fn(ctx)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-		if c != nil ***REMOVED***
+		}
+		if c != nil {
 			return c, nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return http.DefaultClient, nil
-***REMOVED***
+}
 
-func ContextTransport(ctx context.Context) http.RoundTripper ***REMOVED***
+func ContextTransport(ctx context.Context) http.RoundTripper {
 	hc, err := ContextClient(ctx)
 	// This is a rare error case (somebody using nil on App Engine).
-	if err != nil ***REMOVED***
-		return ErrorTransport***REMOVED***err***REMOVED***
-	***REMOVED***
+	if err != nil {
+		return ErrorTransport{err}
+	}
 	return hc.Transport
-***REMOVED***
+}
 
 // ErrorTransport returns the specified error on RoundTrip.
 // This RoundTripper should be used in rare error cases where
 // error handling can be postponed to response handling time.
-type ErrorTransport struct***REMOVED*** Err error ***REMOVED***
+type ErrorTransport struct{ Err error }
 
-func (t ErrorTransport) RoundTrip(*http.Request) (*http.Response, error) ***REMOVED***
+func (t ErrorTransport) RoundTrip(*http.Request) (*http.Response, error) {
 	return nil, t.Err
-***REMOVED***
+}

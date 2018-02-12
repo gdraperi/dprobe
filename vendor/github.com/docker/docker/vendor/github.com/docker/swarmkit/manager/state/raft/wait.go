@@ -5,73 +5,73 @@ import (
 	"sync"
 )
 
-type waitItem struct ***REMOVED***
+type waitItem struct {
 	// channel to wait up the waiter
-	ch chan interface***REMOVED******REMOVED***
+	ch chan interface{}
 	// callback which is called synchronously when the wait is triggered
 	cb func()
 	// callback which is called to cancel a waiter
 	cancel func()
-***REMOVED***
+}
 
-type wait struct ***REMOVED***
+type wait struct {
 	l sync.Mutex
 	m map[uint64]waitItem
-***REMOVED***
+}
 
-func newWait() *wait ***REMOVED***
-	return &wait***REMOVED***m: make(map[uint64]waitItem)***REMOVED***
-***REMOVED***
+func newWait() *wait {
+	return &wait{m: make(map[uint64]waitItem)}
+}
 
-func (w *wait) register(id uint64, cb func(), cancel func()) <-chan interface***REMOVED******REMOVED*** ***REMOVED***
+func (w *wait) register(id uint64, cb func(), cancel func()) <-chan interface{} {
 	w.l.Lock()
 	defer w.l.Unlock()
 	_, ok := w.m[id]
-	if !ok ***REMOVED***
-		ch := make(chan interface***REMOVED******REMOVED***, 1)
-		w.m[id] = waitItem***REMOVED***ch: ch, cb: cb, cancel: cancel***REMOVED***
+	if !ok {
+		ch := make(chan interface{}, 1)
+		w.m[id] = waitItem{ch: ch, cb: cb, cancel: cancel}
 		return ch
-	***REMOVED***
+	}
 	panic(fmt.Sprintf("duplicate id %x", id))
-***REMOVED***
+}
 
-func (w *wait) trigger(id uint64, x interface***REMOVED******REMOVED***) bool ***REMOVED***
+func (w *wait) trigger(id uint64, x interface{}) bool {
 	w.l.Lock()
 	waitItem, ok := w.m[id]
 	delete(w.m, id)
 	w.l.Unlock()
-	if ok ***REMOVED***
-		if waitItem.cb != nil ***REMOVED***
+	if ok {
+		if waitItem.cb != nil {
 			waitItem.cb()
-		***REMOVED***
+		}
 		waitItem.ch <- x
 		return true
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
-func (w *wait) cancel(id uint64) ***REMOVED***
+func (w *wait) cancel(id uint64) {
 	w.l.Lock()
 	waitItem, ok := w.m[id]
 	delete(w.m, id)
 	w.l.Unlock()
-	if ok ***REMOVED***
-		if waitItem.cancel != nil ***REMOVED***
+	if ok {
+		if waitItem.cancel != nil {
 			waitItem.cancel()
-		***REMOVED***
+		}
 		close(waitItem.ch)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (w *wait) cancelAll() ***REMOVED***
+func (w *wait) cancelAll() {
 	w.l.Lock()
 	defer w.l.Unlock()
 
-	for id, waitItem := range w.m ***REMOVED***
+	for id, waitItem := range w.m {
 		delete(w.m, id)
-		if waitItem.cancel != nil ***REMOVED***
+		if waitItem.cancel != nil {
 			waitItem.cancel()
-		***REMOVED***
+		}
 		close(waitItem.ch)
-	***REMOVED***
-***REMOVED***
+	}
+}

@@ -26,79 +26,79 @@ import (
 //   the docker daemon is not restarted and also running under systemd.
 //   Fixes https://github.com/docker/docker/issues/19728
 //
-func Trap(cleanup func(), logger interface ***REMOVED***
-	Info(args ...interface***REMOVED******REMOVED***)
-***REMOVED***) ***REMOVED***
+func Trap(cleanup func(), logger interface {
+	Info(args ...interface{})
+}) {
 	c := make(chan os.Signal, 1)
 	// we will handle INT, TERM, QUIT, SIGPIPE here
-	signals := []os.Signal***REMOVED***os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGPIPE***REMOVED***
+	signals := []os.Signal{os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGPIPE}
 	gosignal.Notify(c, signals...)
-	go func() ***REMOVED***
+	go func() {
 		interruptCount := uint32(0)
-		for sig := range c ***REMOVED***
-			if sig == syscall.SIGPIPE ***REMOVED***
+		for sig := range c {
+			if sig == syscall.SIGPIPE {
 				continue
-			***REMOVED***
+			}
 
-			go func(sig os.Signal) ***REMOVED***
+			go func(sig os.Signal) {
 				logger.Info(fmt.Sprintf("Processing signal '%v'", sig))
-				switch sig ***REMOVED***
+				switch sig {
 				case os.Interrupt, syscall.SIGTERM:
-					if atomic.LoadUint32(&interruptCount) < 3 ***REMOVED***
+					if atomic.LoadUint32(&interruptCount) < 3 {
 						// Initiate the cleanup only once
-						if atomic.AddUint32(&interruptCount, 1) == 1 ***REMOVED***
+						if atomic.AddUint32(&interruptCount, 1) == 1 {
 							// Call the provided cleanup handler
 							cleanup()
 							os.Exit(0)
-						***REMOVED*** else ***REMOVED***
+						} else {
 							return
-						***REMOVED***
-					***REMOVED*** else ***REMOVED***
+						}
+					} else {
 						// 3 SIGTERM/INT signals received; force exit without cleanup
 						logger.Info("Forcing docker daemon shutdown without cleanup; 3 interrupts received")
-					***REMOVED***
+					}
 				case syscall.SIGQUIT:
 					DumpStacks("")
 					logger.Info("Forcing docker daemon shutdown without cleanup on SIGQUIT")
-				***REMOVED***
+				}
 				//for the SIGINT/TERM, and SIGQUIT non-clean shutdown case, exit with 128 + signal #
 				os.Exit(128 + int(sig.(syscall.Signal)))
-			***REMOVED***(sig)
-		***REMOVED***
-	***REMOVED***()
-***REMOVED***
+			}(sig)
+		}
+	}()
+}
 
 const stacksLogNameTemplate = "goroutine-stacks-%s.log"
 
 // DumpStacks appends the runtime stack into file in dir and returns full path
 // to that file.
-func DumpStacks(dir string) (string, error) ***REMOVED***
+func DumpStacks(dir string) (string, error) {
 	var (
 		buf       []byte
 		stackSize int
 	)
 	bufferLen := 16384
-	for stackSize == len(buf) ***REMOVED***
+	for stackSize == len(buf) {
 		buf = make([]byte, bufferLen)
 		stackSize = runtime.Stack(buf, true)
 		bufferLen *= 2
-	***REMOVED***
+	}
 	buf = buf[:stackSize]
 	var f *os.File
-	if dir != "" ***REMOVED***
+	if dir != "" {
 		path := filepath.Join(dir, fmt.Sprintf(stacksLogNameTemplate, strings.Replace(time.Now().Format(time.RFC3339), ":", "", -1)))
 		var err error
 		f, err = os.OpenFile(path, os.O_CREATE|os.O_WRONLY, 0666)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return "", errors.Wrap(err, "failed to open file to write the goroutine stacks")
-		***REMOVED***
+		}
 		defer f.Close()
 		defer f.Sync()
-	***REMOVED*** else ***REMOVED***
+	} else {
 		f = os.Stderr
-	***REMOVED***
-	if _, err := f.Write(buf); err != nil ***REMOVED***
+	}
+	if _, err := f.Write(buf); err != nil {
 		return "", errors.Wrap(err, "failed to write goroutine stacks")
-	***REMOVED***
+	}
 	return f.Name(), nil
-***REMOVED***
+}

@@ -41,51 +41,51 @@ var ErrUnknown = errors.New("unkown command")
 
 // ExportedError is the serialized version of the a Go error.
 // It also provides a trivial implementation of the error interface.
-type ExportedError struct ***REMOVED***
+type ExportedError struct {
 	ErrString string
 	ErrNum    int `json:",omitempty"`
-***REMOVED***
+}
 
 // Error returns an error string
-func (ee *ExportedError) Error() string ***REMOVED***
+func (ee *ExportedError) Error() string {
 	return ee.ErrString
-***REMOVED***
+}
 
 // FileInfo is the stat struct returned by the remotefs system. It
 // fulfills the os.FileInfo interface.
-type FileInfo struct ***REMOVED***
+type FileInfo struct {
 	NameVar    string
 	SizeVar    int64
 	ModeVar    os.FileMode
 	ModTimeVar int64 // Serialization of time.Time breaks in travis, so use an int
 	IsDirVar   bool
-***REMOVED***
+}
 
-var _ os.FileInfo = &FileInfo***REMOVED******REMOVED***
+var _ os.FileInfo = &FileInfo{}
 
 // Name returns the filename from a FileInfo structure
-func (f *FileInfo) Name() string ***REMOVED*** return f.NameVar ***REMOVED***
+func (f *FileInfo) Name() string { return f.NameVar }
 
 // Size returns the size from a FileInfo structure
-func (f *FileInfo) Size() int64 ***REMOVED*** return f.SizeVar ***REMOVED***
+func (f *FileInfo) Size() int64 { return f.SizeVar }
 
 // Mode returns the mode from a FileInfo structure
-func (f *FileInfo) Mode() os.FileMode ***REMOVED*** return f.ModeVar ***REMOVED***
+func (f *FileInfo) Mode() os.FileMode { return f.ModeVar }
 
 // ModTime returns the modification time from a FileInfo structure
-func (f *FileInfo) ModTime() time.Time ***REMOVED*** return time.Unix(0, f.ModTimeVar) ***REMOVED***
+func (f *FileInfo) ModTime() time.Time { return time.Unix(0, f.ModTimeVar) }
 
 // IsDir returns the is-directory indicator from a FileInfo structure
-func (f *FileInfo) IsDir() bool ***REMOVED*** return f.IsDirVar ***REMOVED***
+func (f *FileInfo) IsDir() bool { return f.IsDirVar }
 
 // Sys provides an interface to a FileInfo structure
-func (f *FileInfo) Sys() interface***REMOVED******REMOVED*** ***REMOVED*** return nil ***REMOVED***
+func (f *FileInfo) Sys() interface{} { return nil }
 
 // FileHeader is a header for remote *os.File operations for remotefs.OpenFile
-type FileHeader struct ***REMOVED***
+type FileHeader struct {
 	Cmd  uint32
 	Size uint64
-***REMOVED***
+}
 
 const (
 	// Read request command.
@@ -103,7 +103,7 @@ const (
 )
 
 // SeekHeader is header for the Seek operation for remotefs.OpenFile
-type SeekHeader struct ***REMOVED***
+type SeekHeader struct {
 	Offset int64
 	Whence int32
-***REMOVED***
+}

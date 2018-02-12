@@ -10,86 +10,86 @@ import (
 	"testing"
 )
 
-var equalASCIIFoldTests = []struct ***REMOVED***
+var equalASCIIFoldTests = []struct {
 	t, s string
 	eq   bool
-***REMOVED******REMOVED***
-	***REMOVED***"WebSocket", "websocket", true***REMOVED***,
-	***REMOVED***"websocket", "WebSocket", true***REMOVED***,
-	***REMOVED***"Öyster", "öyster", false***REMOVED***,
-***REMOVED***
+}{
+	{"WebSocket", "websocket", true},
+	{"websocket", "WebSocket", true},
+	{"Öyster", "öyster", false},
+}
 
-func TestEqualASCIIFold(t *testing.T) ***REMOVED***
-	for _, tt := range equalASCIIFoldTests ***REMOVED***
+func TestEqualASCIIFold(t *testing.T) {
+	for _, tt := range equalASCIIFoldTests {
 		eq := equalASCIIFold(tt.s, tt.t)
-		if eq != tt.eq ***REMOVED***
+		if eq != tt.eq {
 			t.Errorf("equalASCIIFold(%q, %q) = %v, want %v", tt.s, tt.t, eq, tt.eq)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-var tokenListContainsValueTests = []struct ***REMOVED***
+var tokenListContainsValueTests = []struct {
 	value string
 	ok    bool
-***REMOVED******REMOVED***
-	***REMOVED***"WebSocket", true***REMOVED***,
-	***REMOVED***"WEBSOCKET", true***REMOVED***,
-	***REMOVED***"websocket", true***REMOVED***,
-	***REMOVED***"websockets", false***REMOVED***,
-	***REMOVED***"x websocket", false***REMOVED***,
-	***REMOVED***"websocket x", false***REMOVED***,
-	***REMOVED***"other,websocket,more", true***REMOVED***,
-	***REMOVED***"other, websocket, more", true***REMOVED***,
-***REMOVED***
+}{
+	{"WebSocket", true},
+	{"WEBSOCKET", true},
+	{"websocket", true},
+	{"websockets", false},
+	{"x websocket", false},
+	{"websocket x", false},
+	{"other,websocket,more", true},
+	{"other, websocket, more", true},
+}
 
-func TestTokenListContainsValue(t *testing.T) ***REMOVED***
-	for _, tt := range tokenListContainsValueTests ***REMOVED***
-		h := http.Header***REMOVED***"Upgrade": ***REMOVED***tt.value***REMOVED******REMOVED***
+func TestTokenListContainsValue(t *testing.T) {
+	for _, tt := range tokenListContainsValueTests {
+		h := http.Header{"Upgrade": {tt.value}}
 		ok := tokenListContainsValue(h, "Upgrade", "websocket")
-		if ok != tt.ok ***REMOVED***
+		if ok != tt.ok {
 			t.Errorf("tokenListContainsValue(h, n, %q) = %v, want %v", tt.value, ok, tt.ok)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-var parseExtensionTests = []struct ***REMOVED***
+var parseExtensionTests = []struct {
 	value      string
 	extensions []map[string]string
-***REMOVED******REMOVED***
-	***REMOVED***`foo`, []map[string]string***REMOVED******REMOVED***"": "foo"***REMOVED******REMOVED******REMOVED***,
-	***REMOVED***`foo, bar; baz=2`, []map[string]string***REMOVED***
-		***REMOVED***"": "foo"***REMOVED***,
-		***REMOVED***"": "bar", "baz": "2"***REMOVED******REMOVED******REMOVED***,
-	***REMOVED***`foo; bar="b,a;z"`, []map[string]string***REMOVED***
-		***REMOVED***"": "foo", "bar": "b,a;z"***REMOVED******REMOVED******REMOVED***,
-	***REMOVED***`foo , bar; baz = 2`, []map[string]string***REMOVED***
-		***REMOVED***"": "foo"***REMOVED***,
-		***REMOVED***"": "bar", "baz": "2"***REMOVED******REMOVED******REMOVED***,
-	***REMOVED***`foo, bar; baz=2 junk`, []map[string]string***REMOVED***
-		***REMOVED***"": "foo"***REMOVED******REMOVED******REMOVED***,
-	***REMOVED***`foo junk, bar; baz=2 junk`, nil***REMOVED***,
-	***REMOVED***`mux; max-channels=4; flow-control, deflate-stream`, []map[string]string***REMOVED***
-		***REMOVED***"": "mux", "max-channels": "4", "flow-control": ""***REMOVED***,
-		***REMOVED***"": "deflate-stream"***REMOVED******REMOVED******REMOVED***,
-	***REMOVED***`permessage-foo; x="10"`, []map[string]string***REMOVED***
-		***REMOVED***"": "permessage-foo", "x": "10"***REMOVED******REMOVED******REMOVED***,
-	***REMOVED***`permessage-foo; use_y, permessage-foo`, []map[string]string***REMOVED***
-		***REMOVED***"": "permessage-foo", "use_y": ""***REMOVED***,
-		***REMOVED***"": "permessage-foo"***REMOVED******REMOVED******REMOVED***,
-	***REMOVED***`permessage-deflate; client_max_window_bits; server_max_window_bits=10 , permessage-deflate; client_max_window_bits`, []map[string]string***REMOVED***
-		***REMOVED***"": "permessage-deflate", "client_max_window_bits": "", "server_max_window_bits": "10"***REMOVED***,
-		***REMOVED***"": "permessage-deflate", "client_max_window_bits": ""***REMOVED******REMOVED******REMOVED***,
-	***REMOVED***"permessage-deflate; server_no_context_takeover; client_max_window_bits=15", []map[string]string***REMOVED***
-		***REMOVED***"": "permessage-deflate", "server_no_context_takeover": "", "client_max_window_bits": "15"***REMOVED***,
-	***REMOVED******REMOVED***,
-***REMOVED***
+}{
+	{`foo`, []map[string]string{{"": "foo"}}},
+	{`foo, bar; baz=2`, []map[string]string{
+		{"": "foo"},
+		{"": "bar", "baz": "2"}}},
+	{`foo; bar="b,a;z"`, []map[string]string{
+		{"": "foo", "bar": "b,a;z"}}},
+	{`foo , bar; baz = 2`, []map[string]string{
+		{"": "foo"},
+		{"": "bar", "baz": "2"}}},
+	{`foo, bar; baz=2 junk`, []map[string]string{
+		{"": "foo"}}},
+	{`foo junk, bar; baz=2 junk`, nil},
+	{`mux; max-channels=4; flow-control, deflate-stream`, []map[string]string{
+		{"": "mux", "max-channels": "4", "flow-control": ""},
+		{"": "deflate-stream"}}},
+	{`permessage-foo; x="10"`, []map[string]string{
+		{"": "permessage-foo", "x": "10"}}},
+	{`permessage-foo; use_y, permessage-foo`, []map[string]string{
+		{"": "permessage-foo", "use_y": ""},
+		{"": "permessage-foo"}}},
+	{`permessage-deflate; client_max_window_bits; server_max_window_bits=10 , permessage-deflate; client_max_window_bits`, []map[string]string{
+		{"": "permessage-deflate", "client_max_window_bits": "", "server_max_window_bits": "10"},
+		{"": "permessage-deflate", "client_max_window_bits": ""}}},
+	{"permessage-deflate; server_no_context_takeover; client_max_window_bits=15", []map[string]string{
+		{"": "permessage-deflate", "server_no_context_takeover": "", "client_max_window_bits": "15"},
+	}},
+}
 
-func TestParseExtensions(t *testing.T) ***REMOVED***
-	for _, tt := range parseExtensionTests ***REMOVED***
-		h := http.Header***REMOVED***http.CanonicalHeaderKey("Sec-WebSocket-Extensions"): ***REMOVED***tt.value***REMOVED******REMOVED***
+func TestParseExtensions(t *testing.T) {
+	for _, tt := range parseExtensionTests {
+		h := http.Header{http.CanonicalHeaderKey("Sec-WebSocket-Extensions"): {tt.value}}
 		extensions := parseExtensions(h)
-		if !reflect.DeepEqual(extensions, tt.extensions) ***REMOVED***
+		if !reflect.DeepEqual(extensions, tt.extensions) {
 			t.Errorf("parseExtensions(%q)\n    = %v,\nwant %v", tt.value, extensions, tt.extensions)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

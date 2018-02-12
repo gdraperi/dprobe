@@ -9,14 +9,14 @@ import (
 )
 
 // Client interface used by SpecOpt
-type Client interface ***REMOVED***
+type Client interface {
 	SnapshotService(snapshotterName string) snapshots.Snapshotter
-***REMOVED***
+}
 
 // Image interface used by some SpecOpt to query image configuration
-type Image interface ***REMOVED***
+type Image interface {
 	// Config descriptor for the image.
 	Config(ctx context.Context) (ocispec.Descriptor, error)
 	// ContentStore provides a content store which contains image blob data
 	ContentStore() content.Store
-***REMOVED***
+}

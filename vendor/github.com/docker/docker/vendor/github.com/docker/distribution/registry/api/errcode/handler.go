@@ -8,37 +8,37 @@ import (
 // ServeJSON attempts to serve the errcode in a JSON envelope. It marshals err
 // and sets the content-type header to 'application/json'. It will handle
 // ErrorCoder and Errors, and if necessary will create an envelope.
-func ServeJSON(w http.ResponseWriter, err error) error ***REMOVED***
+func ServeJSON(w http.ResponseWriter, err error) error {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	var sc int
 
-	switch errs := err.(type) ***REMOVED***
+	switch errs := err.(type) {
 	case Errors:
-		if len(errs) < 1 ***REMOVED***
+		if len(errs) < 1 {
 			break
-		***REMOVED***
+		}
 
-		if err, ok := errs[0].(ErrorCoder); ok ***REMOVED***
+		if err, ok := errs[0].(ErrorCoder); ok {
 			sc = err.ErrorCode().Descriptor().HTTPStatusCode
-		***REMOVED***
+		}
 	case ErrorCoder:
 		sc = errs.ErrorCode().Descriptor().HTTPStatusCode
-		err = Errors***REMOVED***err***REMOVED*** // create an envelope.
+		err = Errors{err} // create an envelope.
 	default:
 		// We just have an unhandled error type, so just place in an envelope
 		// and move along.
-		err = Errors***REMOVED***err***REMOVED***
-	***REMOVED***
+		err = Errors{err}
+	}
 
-	if sc == 0 ***REMOVED***
+	if sc == 0 {
 		sc = http.StatusInternalServerError
-	***REMOVED***
+	}
 
 	w.WriteHeader(sc)
 
-	if err := json.NewEncoder(w).Encode(err); err != nil ***REMOVED***
+	if err := json.NewEncoder(w).Encode(err); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}

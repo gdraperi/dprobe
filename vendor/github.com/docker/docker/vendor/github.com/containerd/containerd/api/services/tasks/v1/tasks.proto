@@ -13,7 +13,7 @@ import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/containerd/containerd/api/services/tasks/v1;tasks";
 
-service Tasks ***REMOVED***
+service Tasks {
 	// Create a task.
 	rpc Create(CreateTaskRequest) returns (CreateTaskResponse);
 
@@ -51,9 +51,9 @@ service Tasks ***REMOVED***
 	rpc Metrics(MetricsRequest) returns (MetricsResponse);
 
 	rpc Wait(WaitRequest) returns (WaitResponse);
-***REMOVED***
+}
 
-message CreateTaskRequest ***REMOVED***
+message CreateTaskRequest {
 	string container_id = 1;
 
 	// RootFS provides the pre-chroot mounts to perform in the shim before
@@ -72,63 +72,63 @@ message CreateTaskRequest ***REMOVED***
 	containerd.types.Descriptor checkpoint = 8;
 
 	google.protobuf.Any options = 9;
-***REMOVED***
+}
 
-message CreateTaskResponse ***REMOVED***
+message CreateTaskResponse {
 	string container_id = 1;
 	uint32 pid = 2;
-***REMOVED***
+}
 
-message StartRequest ***REMOVED***
+message StartRequest {
 	string container_id = 1;
 	string exec_id = 2;
-***REMOVED***
+}
 
-message StartResponse ***REMOVED***
+message StartResponse {
 	uint32 pid = 1;
-***REMOVED***
+}
 
-message DeleteTaskRequest ***REMOVED***
+message DeleteTaskRequest {
 	string container_id = 1;
-***REMOVED***
+}
 
-message DeleteResponse ***REMOVED***
+message DeleteResponse {
 	string id = 1;
 	uint32 pid = 2;
 	uint32 exit_status = 3;
 	google.protobuf.Timestamp exited_at = 4 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
-***REMOVED***
+}
 
-message DeleteProcessRequest ***REMOVED***
+message DeleteProcessRequest {
 	string container_id = 1;
 	string exec_id = 2;
-***REMOVED***
+}
 
-message GetRequest ***REMOVED***
+message GetRequest {
 	string container_id = 1;
 	string exec_id = 2;
-***REMOVED***
+}
 
-message GetResponse ***REMOVED***
+message GetResponse {
 	containerd.v1.types.Process process = 1;
-***REMOVED***
+}
 
-message ListTasksRequest ***REMOVED***
+message ListTasksRequest {
 	string filter = 1;
-***REMOVED***
+}
 
-message ListTasksResponse ***REMOVED***
+message ListTasksResponse {
 	repeated containerd.v1.types.Process tasks = 1;
-***REMOVED***
+}
 
-message KillRequest ***REMOVED***
+message KillRequest {
 	string container_id = 1;
 	string exec_id = 2;
 	uint32 signal = 3;
 	bool all = 4;
-***REMOVED***
+}
 
-message ExecProcessRequest ***REMOVED***
+message ExecProcessRequest {
 	string container_id = 1;
 	string stdin = 2;
 	string stdout = 3;
@@ -140,70 +140,70 @@ message ExecProcessRequest ***REMOVED***
 	google.protobuf.Any spec = 6;
 	// id of the exec process
 	string exec_id = 7;
-***REMOVED***
+}
 
-message ExecProcessResponse ***REMOVED***
-***REMOVED***
+message ExecProcessResponse {
+}
 
-message ResizePtyRequest ***REMOVED***
+message ResizePtyRequest {
 	string container_id = 1;
 	string exec_id = 2;
 	uint32 width = 3;
 	uint32 height = 4;
-***REMOVED***
+}
 
-message CloseIORequest ***REMOVED***
+message CloseIORequest {
 	string container_id = 1;
 	string exec_id = 2;
 	bool stdin = 3;
-***REMOVED***
+}
 
-message PauseTaskRequest ***REMOVED***
+message PauseTaskRequest {
 	string container_id = 1;
-***REMOVED***
+}
 
-message ResumeTaskRequest ***REMOVED***
+message ResumeTaskRequest {
 	string container_id = 1;
-***REMOVED***
+}
 
-message ListPidsRequest ***REMOVED***
+message ListPidsRequest {
 	string container_id = 1;
-***REMOVED***
+}
 
-message ListPidsResponse ***REMOVED***
+message ListPidsResponse {
 	// Processes includes the process ID and additional process information
 	repeated containerd.v1.types.ProcessInfo processes = 1;
-***REMOVED***
+}
 
-message CheckpointTaskRequest ***REMOVED***
+message CheckpointTaskRequest {
 	string container_id = 1;
 	string parent_checkpoint = 2 [(gogoproto.customtype) = "github.com/opencontainers/go-digest.Digest", (gogoproto.nullable) = false];
 	google.protobuf.Any options = 3;
-***REMOVED***
+}
 
-message CheckpointTaskResponse ***REMOVED***
+message CheckpointTaskResponse {
 	repeated containerd.types.Descriptor descriptors = 1;
-***REMOVED***
+}
 
-message UpdateTaskRequest ***REMOVED***
+message UpdateTaskRequest {
 	string container_id = 1;
 	google.protobuf.Any resources = 2;
-***REMOVED***
+}
 
-message MetricsRequest ***REMOVED***
+message MetricsRequest {
 	repeated string filters = 1;
-***REMOVED***
+}
 
-message MetricsResponse ***REMOVED***
+message MetricsResponse {
 	repeated types.Metric metrics = 1;
-***REMOVED***
+}
 
-message WaitRequest ***REMOVED***
+message WaitRequest {
 	string container_id = 1;
 	string exec_id = 2;
-***REMOVED***
+}
 
-message WaitResponse ***REMOVED***
+message WaitResponse {
 	uint32 exit_status = 1;
 	google.protobuf.Timestamp exited_at = 2 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
-***REMOVED***
+}

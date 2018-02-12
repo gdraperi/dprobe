@@ -12,22 +12,22 @@ import (
 	"github.com/go-check/check"
 )
 
-func (s *DockerSuite) TestResizeAPIResponse(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestResizeAPIResponse(c *check.C) {
 	out := runSleepingContainer(c, "-d")
 	cleanedContainerID := strings.TrimSpace(out)
 	cli, err := client.NewEnvClient()
 	c.Assert(err, checker.IsNil)
 	defer cli.Close()
 
-	options := types.ResizeOptions***REMOVED***
+	options := types.ResizeOptions{
 		Height: 40,
 		Width:  40,
-	***REMOVED***
+	}
 	err = cli.ContainerResize(context.Background(), cleanedContainerID, options)
 	c.Assert(err, check.IsNil)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestResizeAPIHeightWidthNoInt(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestResizeAPIHeightWidthNoInt(c *check.C) {
 	out := runSleepingContainer(c, "-d")
 	cleanedContainerID := strings.TrimSpace(out)
 
@@ -35,9 +35,9 @@ func (s *DockerSuite) TestResizeAPIHeightWidthNoInt(c *check.C) ***REMOVED***
 	res, _, err := request.Post(endpoint)
 	c.Assert(res.StatusCode, check.Equals, http.StatusBadRequest)
 	c.Assert(err, check.IsNil)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestResizeAPIResponseWhenContainerNotStarted(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestResizeAPIResponseWhenContainerNotStarted(c *check.C) {
 	out, _ := dockerCmd(c, "run", "-d", "busybox", "true")
 	cleanedContainerID := strings.TrimSpace(out)
 
@@ -48,11 +48,11 @@ func (s *DockerSuite) TestResizeAPIResponseWhenContainerNotStarted(c *check.C) *
 	c.Assert(err, checker.IsNil)
 	defer cli.Close()
 
-	options := types.ResizeOptions***REMOVED***
+	options := types.ResizeOptions{
 		Height: 40,
 		Width:  40,
-	***REMOVED***
+	}
 
 	err = cli.ContainerResize(context.Background(), cleanedContainerID, options)
 	c.Assert(err.Error(), checker.Contains, "is not running")
-***REMOVED***
+}

@@ -12,120 +12,120 @@ var (
 	ErrNotLocked = errors.New("zk: not locked")
 )
 
-type Lock struct ***REMOVED***
+type Lock struct {
 	c        *Conn
 	path     string
 	acl      []ACL
 	lockPath string
 	seq      int
-***REMOVED***
+}
 
-func NewLock(c *Conn, path string, acl []ACL) *Lock ***REMOVED***
-	return &Lock***REMOVED***
+func NewLock(c *Conn, path string, acl []ACL) *Lock {
+	return &Lock{
 		c:    c,
 		path: path,
 		acl:  acl,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func parseSeq(path string) (int, error) ***REMOVED***
+func parseSeq(path string) (int, error) {
 	parts := strings.Split(path, "-")
 	return strconv.Atoi(parts[len(parts)-1])
-***REMOVED***
+}
 
-func (l *Lock) Lock() error ***REMOVED***
-	if l.lockPath != "" ***REMOVED***
+func (l *Lock) Lock() error {
+	if l.lockPath != "" {
 		return ErrDeadlock
-	***REMOVED***
+	}
 
 	prefix := fmt.Sprintf("%s/lock-", l.path)
 
 	path := ""
 	var err error
-	for i := 0; i < 3; i++ ***REMOVED***
-		path, err = l.c.CreateProtectedEphemeralSequential(prefix, []byte***REMOVED******REMOVED***, l.acl)
-		if err == ErrNoNode ***REMOVED***
+	for i := 0; i < 3; i++ {
+		path, err = l.c.CreateProtectedEphemeralSequential(prefix, []byte{}, l.acl)
+		if err == ErrNoNode {
 			// Create parent node.
 			parts := strings.Split(l.path, "/")
 			pth := ""
-			for _, p := range parts[1:] ***REMOVED***
+			for _, p := range parts[1:] {
 				pth += "/" + p
-				_, err := l.c.Create(pth, []byte***REMOVED******REMOVED***, 0, l.acl)
-				if err != nil && err != ErrNodeExists ***REMOVED***
+				_, err := l.c.Create(pth, []byte{}, 0, l.acl)
+				if err != nil && err != ErrNodeExists {
 					return err
-				***REMOVED***
-			***REMOVED***
-		***REMOVED*** else if err == nil ***REMOVED***
+				}
+			}
+		} else if err == nil {
 			break
-		***REMOVED*** else ***REMOVED***
+		} else {
 			return err
-		***REMOVED***
-	***REMOVED***
-	if err != nil ***REMOVED***
+		}
+	}
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	seq, err := parseSeq(path)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	for ***REMOVED***
+	for {
 		children, _, err := l.c.Children(l.path)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 
 		lowestSeq := seq
 		prevSeq := 0
 		prevSeqPath := ""
-		for _, p := range children ***REMOVED***
+		for _, p := range children {
 			s, err := parseSeq(p)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if s < lowestSeq ***REMOVED***
+			}
+			if s < lowestSeq {
 				lowestSeq = s
-			***REMOVED***
-			if s < seq && s > prevSeq ***REMOVED***
+			}
+			if s < seq && s > prevSeq {
 				prevSeq = s
 				prevSeqPath = p
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
-		if seq == lowestSeq ***REMOVED***
+		if seq == lowestSeq {
 			// Acquired the lock
 			break
-		***REMOVED***
+		}
 
 		// Wait on the node next in line for the lock
 		_, _, ch, err := l.c.GetW(l.path + "/" + prevSeqPath)
-		if err != nil && err != ErrNoNode ***REMOVED***
+		if err != nil && err != ErrNoNode {
 			return err
-		***REMOVED*** else if err != nil && err == ErrNoNode ***REMOVED***
+		} else if err != nil && err == ErrNoNode {
 			// try again
 			continue
-		***REMOVED***
+		}
 
 		ev := <-ch
-		if ev.Err != nil ***REMOVED***
+		if ev.Err != nil {
 			return ev.Err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	l.seq = seq
 	l.lockPath = path
 	return nil
-***REMOVED***
+}
 
-func (l *Lock) Unlock() error ***REMOVED***
-	if l.lockPath == "" ***REMOVED***
+func (l *Lock) Unlock() error {
+	if l.lockPath == "" {
 		return ErrNotLocked
-	***REMOVED***
-	if err := l.c.Delete(l.lockPath, -1); err != nil ***REMOVED***
+	}
+	if err := l.c.Delete(l.lockPath, -1); err != nil {
 		return err
-	***REMOVED***
+	}
 	l.lockPath = ""
 	l.seq = 0
 	return nil
-***REMOVED***
+}

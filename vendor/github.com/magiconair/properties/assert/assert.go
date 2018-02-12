@@ -20,71 +20,71 @@ const skip = 2
 
 // Equal asserts that got and want are equal as defined by
 // reflect.DeepEqual. The test fails with msg if they are not equal.
-func Equal(t *testing.T, got, want interface***REMOVED******REMOVED***, msg ...string) ***REMOVED***
-	if x := equal(2, got, want, msg...); x != "" ***REMOVED***
+func Equal(t *testing.T, got, want interface{}, msg ...string) {
+	if x := equal(2, got, want, msg...); x != "" {
 		fmt.Println(x)
 		t.Fail()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func equal(skip int, got, want interface***REMOVED******REMOVED***, msg ...string) string ***REMOVED***
-	if !reflect.DeepEqual(got, want) ***REMOVED***
+func equal(skip int, got, want interface{}, msg ...string) string {
+	if !reflect.DeepEqual(got, want) {
 		return fail(skip, "got %v want %v %s", got, want, strings.Join(msg, " "))
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
 // Panic asserts that function fn() panics.
 // It assumes that recover() either returns a string or
 // an error and fails if the message does not match
 // the regular expression in 'matches'.
-func Panic(t *testing.T, fn func(), matches string) ***REMOVED***
-	if x := doesPanic(2, fn, matches); x != "" ***REMOVED***
+func Panic(t *testing.T, fn func(), matches string) {
+	if x := doesPanic(2, fn, matches); x != "" {
 		fmt.Println(x)
 		t.Fail()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func doesPanic(skip int, fn func(), expr string) (err string) ***REMOVED***
-	defer func() ***REMOVED***
+func doesPanic(skip int, fn func(), expr string) (err string) {
+	defer func() {
 		r := recover()
-		if r == nil ***REMOVED***
+		if r == nil {
 			err = fail(skip, "did not panic")
 			return
-		***REMOVED***
+		}
 		var v string
-		switch r.(type) ***REMOVED***
+		switch r.(type) {
 		case error:
 			v = r.(error).Error()
 		case string:
 			v = r.(string)
-		***REMOVED***
+		}
 		err = matches(skip, v, expr)
-	***REMOVED***()
+	}()
 	fn()
 	return ""
-***REMOVED***
+}
 
 // Matches asserts that a value matches a given regular expression.
-func Matches(t *testing.T, value, expr string) ***REMOVED***
-	if x := matches(2, value, expr); x != "" ***REMOVED***
+func Matches(t *testing.T, value, expr string) {
+	if x := matches(2, value, expr); x != "" {
 		fmt.Println(x)
 		t.Fail()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func matches(skip int, value, expr string) string ***REMOVED***
+func matches(skip int, value, expr string) string {
 	ok, err := regexp.MatchString(expr, value)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fail(skip, "invalid pattern %q. %s", expr, err)
-	***REMOVED***
-	if !ok ***REMOVED***
+	}
+	if !ok {
 		return fail(skip, "got %s which does not match %s", value, expr)
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func fail(skip int, format string, args ...interface***REMOVED******REMOVED***) string ***REMOVED***
+func fail(skip int, format string, args ...interface{}) string {
 	_, file, line, _ := runtime.Caller(skip)
 	return fmt.Sprintf("\t%s:%d: %s\n", filepath.Base(file), line, fmt.Sprintf(format, args...))
-***REMOVED***
+}

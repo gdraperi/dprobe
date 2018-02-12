@@ -11,14 +11,14 @@ import (
 	"testing"
 )
 
-var commonKey128 = []byte***REMOVED***0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c***REMOVED***
+var commonKey128 = []byte{0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c}
 
-func testOCFB(t *testing.T, resync OCFBResyncOption) ***REMOVED***
+func testOCFB(t *testing.T, resync OCFBResyncOption) {
 	block, err := aes.NewCipher(commonKey128)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Error(err)
 		return
-	***REMOVED***
+	}
 
 	plaintext := []byte("this is the plaintext, which is long enough to span several blocks.")
 	randData := make([]byte, block.BlockSize())
@@ -28,19 +28,19 @@ func testOCFB(t *testing.T, resync OCFBResyncOption) ***REMOVED***
 	ocfb.XORKeyStream(ciphertext, plaintext)
 
 	ocfbdec := NewOCFBDecrypter(block, prefix, resync)
-	if ocfbdec == nil ***REMOVED***
+	if ocfbdec == nil {
 		t.Errorf("NewOCFBDecrypter failed (resync: %t)", resync)
 		return
-	***REMOVED***
+	}
 	plaintextCopy := make([]byte, len(plaintext))
 	ocfbdec.XORKeyStream(plaintextCopy, ciphertext)
 
-	if !bytes.Equal(plaintextCopy, plaintext) ***REMOVED***
+	if !bytes.Equal(plaintextCopy, plaintext) {
 		t.Errorf("got: %x, want: %x (resync: %t)", plaintextCopy, plaintext, resync)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestOCFB(t *testing.T) ***REMOVED***
+func TestOCFB(t *testing.T) {
 	testOCFB(t, OCFBNoResync)
 	testOCFB(t, OCFBResync)
-***REMOVED***
+}

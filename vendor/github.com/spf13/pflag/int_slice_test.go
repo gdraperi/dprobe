@@ -11,155 +11,155 @@ import (
 	"testing"
 )
 
-func setUpISFlagSet(isp *[]int) *FlagSet ***REMOVED***
+func setUpISFlagSet(isp *[]int) *FlagSet {
 	f := NewFlagSet("test", ContinueOnError)
-	f.IntSliceVar(isp, "is", []int***REMOVED******REMOVED***, "Command separated list!")
+	f.IntSliceVar(isp, "is", []int{}, "Command separated list!")
 	return f
-***REMOVED***
+}
 
-func setUpISFlagSetWithDefault(isp *[]int) *FlagSet ***REMOVED***
+func setUpISFlagSetWithDefault(isp *[]int) *FlagSet {
 	f := NewFlagSet("test", ContinueOnError)
-	f.IntSliceVar(isp, "is", []int***REMOVED***0, 1***REMOVED***, "Command separated list!")
+	f.IntSliceVar(isp, "is", []int{0, 1}, "Command separated list!")
 	return f
-***REMOVED***
+}
 
-func TestEmptyIS(t *testing.T) ***REMOVED***
+func TestEmptyIS(t *testing.T) {
 	var is []int
 	f := setUpISFlagSet(&is)
-	err := f.Parse([]string***REMOVED******REMOVED***)
-	if err != nil ***REMOVED***
+	err := f.Parse([]string{})
+	if err != nil {
 		t.Fatal("expected no error; got", err)
-	***REMOVED***
+	}
 
 	getIS, err := f.GetIntSlice("is")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal("got an error from GetIntSlice():", err)
-	***REMOVED***
-	if len(getIS) != 0 ***REMOVED***
+	}
+	if len(getIS) != 0 {
 		t.Fatalf("got is %v with len=%d but expected length=0", getIS, len(getIS))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestIS(t *testing.T) ***REMOVED***
+func TestIS(t *testing.T) {
 	var is []int
 	f := setUpISFlagSet(&is)
 
-	vals := []string***REMOVED***"1", "2", "4", "3"***REMOVED***
+	vals := []string{"1", "2", "4", "3"}
 	arg := fmt.Sprintf("--is=%s", strings.Join(vals, ","))
-	err := f.Parse([]string***REMOVED***arg***REMOVED***)
-	if err != nil ***REMOVED***
+	err := f.Parse([]string{arg})
+	if err != nil {
 		t.Fatal("expected no error; got", err)
-	***REMOVED***
-	for i, v := range is ***REMOVED***
+	}
+	for i, v := range is {
 		d, err := strconv.Atoi(vals[i])
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("got error: %v", err)
-		***REMOVED***
-		if d != v ***REMOVED***
+		}
+		if d != v {
 			t.Fatalf("expected is[%d] to be %s but got: %d", i, vals[i], v)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	getIS, err := f.GetIntSlice("is")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("got error: %v", err)
-	***REMOVED***
-	for i, v := range getIS ***REMOVED***
+	}
+	for i, v := range getIS {
 		d, err := strconv.Atoi(vals[i])
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("got error: %v", err)
-		***REMOVED***
-		if d != v ***REMOVED***
+		}
+		if d != v {
 			t.Fatalf("expected is[%d] to be %s but got: %d from GetIntSlice", i, vals[i], v)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestISDefault(t *testing.T) ***REMOVED***
+func TestISDefault(t *testing.T) {
 	var is []int
 	f := setUpISFlagSetWithDefault(&is)
 
-	vals := []string***REMOVED***"0", "1"***REMOVED***
+	vals := []string{"0", "1"}
 
-	err := f.Parse([]string***REMOVED******REMOVED***)
-	if err != nil ***REMOVED***
+	err := f.Parse([]string{})
+	if err != nil {
 		t.Fatal("expected no error; got", err)
-	***REMOVED***
-	for i, v := range is ***REMOVED***
+	}
+	for i, v := range is {
 		d, err := strconv.Atoi(vals[i])
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("got error: %v", err)
-		***REMOVED***
-		if d != v ***REMOVED***
+		}
+		if d != v {
 			t.Fatalf("expected is[%d] to be %d but got: %d", i, d, v)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	getIS, err := f.GetIntSlice("is")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal("got an error from GetIntSlice():", err)
-	***REMOVED***
-	for i, v := range getIS ***REMOVED***
+	}
+	for i, v := range getIS {
 		d, err := strconv.Atoi(vals[i])
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatal("got an error from GetIntSlice():", err)
-		***REMOVED***
-		if d != v ***REMOVED***
+		}
+		if d != v {
 			t.Fatalf("expected is[%d] to be %d from GetIntSlice but got: %d", i, d, v)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestISWithDefault(t *testing.T) ***REMOVED***
+func TestISWithDefault(t *testing.T) {
 	var is []int
 	f := setUpISFlagSetWithDefault(&is)
 
-	vals := []string***REMOVED***"1", "2"***REMOVED***
+	vals := []string{"1", "2"}
 	arg := fmt.Sprintf("--is=%s", strings.Join(vals, ","))
-	err := f.Parse([]string***REMOVED***arg***REMOVED***)
-	if err != nil ***REMOVED***
+	err := f.Parse([]string{arg})
+	if err != nil {
 		t.Fatal("expected no error; got", err)
-	***REMOVED***
-	for i, v := range is ***REMOVED***
+	}
+	for i, v := range is {
 		d, err := strconv.Atoi(vals[i])
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("got error: %v", err)
-		***REMOVED***
-		if d != v ***REMOVED***
+		}
+		if d != v {
 			t.Fatalf("expected is[%d] to be %d but got: %d", i, d, v)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	getIS, err := f.GetIntSlice("is")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal("got an error from GetIntSlice():", err)
-	***REMOVED***
-	for i, v := range getIS ***REMOVED***
+	}
+	for i, v := range getIS {
 		d, err := strconv.Atoi(vals[i])
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("got error: %v", err)
-		***REMOVED***
-		if d != v ***REMOVED***
+		}
+		if d != v {
 			t.Fatalf("expected is[%d] to be %d from GetIntSlice but got: %d", i, d, v)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestISCalledTwice(t *testing.T) ***REMOVED***
+func TestISCalledTwice(t *testing.T) {
 	var is []int
 	f := setUpISFlagSet(&is)
 
-	in := []string***REMOVED***"1,2", "3"***REMOVED***
-	expected := []int***REMOVED***1, 2, 3***REMOVED***
+	in := []string{"1,2", "3"}
+	expected := []int{1, 2, 3}
 	argfmt := "--is=%s"
 	arg1 := fmt.Sprintf(argfmt, in[0])
 	arg2 := fmt.Sprintf(argfmt, in[1])
-	err := f.Parse([]string***REMOVED***arg1, arg2***REMOVED***)
-	if err != nil ***REMOVED***
+	err := f.Parse([]string{arg1, arg2})
+	if err != nil {
 		t.Fatal("expected no error; got", err)
-	***REMOVED***
-	for i, v := range is ***REMOVED***
-		if expected[i] != v ***REMOVED***
+	}
+	for i, v := range is {
+		if expected[i] != v {
 			t.Fatalf("expected is[%d] to be %d but got: %d", i, expected[i], v)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

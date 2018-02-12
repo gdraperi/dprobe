@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-var pubKeyTests = []struct ***REMOVED***
+var pubKeyTests = []struct {
 	hexData        string
 	hexFingerprint string
 	creationTime   time.Time
@@ -19,172 +19,172 @@ var pubKeyTests = []struct ***REMOVED***
 	keyId          uint64
 	keyIdString    string
 	keyIdShort     string
-***REMOVED******REMOVED***
-	***REMOVED***rsaPkDataHex, rsaFingerprintHex, time.Unix(0x4d3c5c10, 0), PubKeyAlgoRSA, 0xa34d7e18c20c31bb, "A34D7E18C20C31BB", "C20C31BB"***REMOVED***,
-	***REMOVED***dsaPkDataHex, dsaFingerprintHex, time.Unix(0x4d432f89, 0), PubKeyAlgoDSA, 0x8e8fbe54062f19ed, "8E8FBE54062F19ED", "062F19ED"***REMOVED***,
-	***REMOVED***ecdsaPkDataHex, ecdsaFingerprintHex, time.Unix(0x5071c294, 0), PubKeyAlgoECDSA, 0x43fe956c542ca00b, "43FE956C542CA00B", "542CA00B"***REMOVED***,
-***REMOVED***
+}{
+	{rsaPkDataHex, rsaFingerprintHex, time.Unix(0x4d3c5c10, 0), PubKeyAlgoRSA, 0xa34d7e18c20c31bb, "A34D7E18C20C31BB", "C20C31BB"},
+	{dsaPkDataHex, dsaFingerprintHex, time.Unix(0x4d432f89, 0), PubKeyAlgoDSA, 0x8e8fbe54062f19ed, "8E8FBE54062F19ED", "062F19ED"},
+	{ecdsaPkDataHex, ecdsaFingerprintHex, time.Unix(0x5071c294, 0), PubKeyAlgoECDSA, 0x43fe956c542ca00b, "43FE956C542CA00B", "542CA00B"},
+}
 
-func TestPublicKeyRead(t *testing.T) ***REMOVED***
-	for i, test := range pubKeyTests ***REMOVED***
+func TestPublicKeyRead(t *testing.T) {
+	for i, test := range pubKeyTests {
 		packet, err := Read(readerFromHex(test.hexData))
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Errorf("#%d: Read error: %s", i, err)
 			continue
-		***REMOVED***
+		}
 		pk, ok := packet.(*PublicKey)
-		if !ok ***REMOVED***
+		if !ok {
 			t.Errorf("#%d: failed to parse, got: %#v", i, packet)
 			continue
-		***REMOVED***
-		if pk.PubKeyAlgo != test.pubKeyAlgo ***REMOVED***
+		}
+		if pk.PubKeyAlgo != test.pubKeyAlgo {
 			t.Errorf("#%d: bad public key algorithm got:%x want:%x", i, pk.PubKeyAlgo, test.pubKeyAlgo)
-		***REMOVED***
-		if !pk.CreationTime.Equal(test.creationTime) ***REMOVED***
+		}
+		if !pk.CreationTime.Equal(test.creationTime) {
 			t.Errorf("#%d: bad creation time got:%v want:%v", i, pk.CreationTime, test.creationTime)
-		***REMOVED***
+		}
 		expectedFingerprint, _ := hex.DecodeString(test.hexFingerprint)
-		if !bytes.Equal(expectedFingerprint, pk.Fingerprint[:]) ***REMOVED***
+		if !bytes.Equal(expectedFingerprint, pk.Fingerprint[:]) {
 			t.Errorf("#%d: bad fingerprint got:%x want:%x", i, pk.Fingerprint[:], expectedFingerprint)
-		***REMOVED***
-		if pk.KeyId != test.keyId ***REMOVED***
+		}
+		if pk.KeyId != test.keyId {
 			t.Errorf("#%d: bad keyid got:%x want:%x", i, pk.KeyId, test.keyId)
-		***REMOVED***
-		if g, e := pk.KeyIdString(), test.keyIdString; g != e ***REMOVED***
+		}
+		if g, e := pk.KeyIdString(), test.keyIdString; g != e {
 			t.Errorf("#%d: bad KeyIdString got:%q want:%q", i, g, e)
-		***REMOVED***
-		if g, e := pk.KeyIdShortString(), test.keyIdShort; g != e ***REMOVED***
+		}
+		if g, e := pk.KeyIdShortString(), test.keyIdShort; g != e {
 			t.Errorf("#%d: bad KeyIdShortString got:%q want:%q", i, g, e)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestPublicKeySerialize(t *testing.T) ***REMOVED***
-	for i, test := range pubKeyTests ***REMOVED***
+func TestPublicKeySerialize(t *testing.T) {
+	for i, test := range pubKeyTests {
 		packet, err := Read(readerFromHex(test.hexData))
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Errorf("#%d: Read error: %s", i, err)
 			continue
-		***REMOVED***
+		}
 		pk, ok := packet.(*PublicKey)
-		if !ok ***REMOVED***
+		if !ok {
 			t.Errorf("#%d: failed to parse, got: %#v", i, packet)
 			continue
-		***REMOVED***
+		}
 		serializeBuf := bytes.NewBuffer(nil)
 		err = pk.Serialize(serializeBuf)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Errorf("#%d: failed to serialize: %s", i, err)
 			continue
-		***REMOVED***
+		}
 
 		packet, err = Read(serializeBuf)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Errorf("#%d: Read error (from serialized data): %s", i, err)
 			continue
-		***REMOVED***
+		}
 		pk, ok = packet.(*PublicKey)
-		if !ok ***REMOVED***
+		if !ok {
 			t.Errorf("#%d: failed to parse serialized data, got: %#v", i, packet)
 			continue
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestEcc384Serialize(t *testing.T) ***REMOVED***
+func TestEcc384Serialize(t *testing.T) {
 	r := readerFromHex(ecc384PubHex)
 	var w bytes.Buffer
-	for i := 0; i < 2; i++ ***REMOVED***
+	for i := 0; i < 2; i++ {
 		// Public key
 		p, err := Read(r)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Error(err)
-		***REMOVED***
+		}
 		pubkey := p.(*PublicKey)
-		if !bytes.Equal(pubkey.ec.oid, []byte***REMOVED***0x2b, 0x81, 0x04, 0x00, 0x22***REMOVED***) ***REMOVED***
+		if !bytes.Equal(pubkey.ec.oid, []byte{0x2b, 0x81, 0x04, 0x00, 0x22}) {
 			t.Errorf("Unexpected pubkey OID: %x", pubkey.ec.oid)
-		***REMOVED***
-		if !bytes.Equal(pubkey.ec.p.bytes[:5], []byte***REMOVED***0x04, 0xf6, 0xb8, 0xc5, 0xac***REMOVED***) ***REMOVED***
+		}
+		if !bytes.Equal(pubkey.ec.p.bytes[:5], []byte{0x04, 0xf6, 0xb8, 0xc5, 0xac}) {
 			t.Errorf("Unexpected pubkey P[:5]: %x", pubkey.ec.p.bytes)
-		***REMOVED***
-		if pubkey.KeyId != 0x098033880F54719F ***REMOVED***
+		}
+		if pubkey.KeyId != 0x098033880F54719F {
 			t.Errorf("Unexpected pubkey ID: %x", pubkey.KeyId)
-		***REMOVED***
+		}
 		err = pubkey.Serialize(&w)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Error(err)
-		***REMOVED***
+		}
 		// User ID
 		p, err = Read(r)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Error(err)
-		***REMOVED***
+		}
 		uid := p.(*UserId)
-		if uid.Id != "ec_dsa_dh_384 <openpgp@brainhub.org>" ***REMOVED***
+		if uid.Id != "ec_dsa_dh_384 <openpgp@brainhub.org>" {
 			t.Error("Unexpected UID:", uid.Id)
-		***REMOVED***
+		}
 		err = uid.Serialize(&w)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Error(err)
-		***REMOVED***
+		}
 		// User ID Sig
 		p, err = Read(r)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Error(err)
-		***REMOVED***
+		}
 		uidSig := p.(*Signature)
 		err = pubkey.VerifyUserIdSignature(uid.Id, pubkey, uidSig)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Error(err, ": UID")
-		***REMOVED***
+		}
 		err = uidSig.Serialize(&w)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Error(err)
-		***REMOVED***
+		}
 		// Subkey
 		p, err = Read(r)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Error(err)
-		***REMOVED***
+		}
 		subkey := p.(*PublicKey)
-		if !bytes.Equal(subkey.ec.oid, []byte***REMOVED***0x2b, 0x81, 0x04, 0x00, 0x22***REMOVED***) ***REMOVED***
+		if !bytes.Equal(subkey.ec.oid, []byte{0x2b, 0x81, 0x04, 0x00, 0x22}) {
 			t.Errorf("Unexpected subkey OID: %x", subkey.ec.oid)
-		***REMOVED***
-		if !bytes.Equal(subkey.ec.p.bytes[:5], []byte***REMOVED***0x04, 0x2f, 0xaa, 0x84, 0x02***REMOVED***) ***REMOVED***
+		}
+		if !bytes.Equal(subkey.ec.p.bytes[:5], []byte{0x04, 0x2f, 0xaa, 0x84, 0x02}) {
 			t.Errorf("Unexpected subkey P[:5]: %x", subkey.ec.p.bytes)
-		***REMOVED***
-		if subkey.ecdh.KdfHash != 0x09 ***REMOVED***
+		}
+		if subkey.ecdh.KdfHash != 0x09 {
 			t.Error("Expected KDF hash function SHA384 (0x09), got", subkey.ecdh.KdfHash)
-		***REMOVED***
-		if subkey.ecdh.KdfAlgo != 0x09 ***REMOVED***
+		}
+		if subkey.ecdh.KdfAlgo != 0x09 {
 			t.Error("Expected KDF symmetric alg AES256 (0x09), got", subkey.ecdh.KdfAlgo)
-		***REMOVED***
-		if subkey.KeyId != 0xAA8B938F9A201946 ***REMOVED***
+		}
+		if subkey.KeyId != 0xAA8B938F9A201946 {
 			t.Errorf("Unexpected subkey ID: %x", subkey.KeyId)
-		***REMOVED***
+		}
 		err = subkey.Serialize(&w)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Error(err)
-		***REMOVED***
+		}
 		// Subkey Sig
 		p, err = Read(r)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Error(err)
-		***REMOVED***
+		}
 		subkeySig := p.(*Signature)
 		err = pubkey.VerifyKeySignature(subkey, subkeySig)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Error(err)
-		***REMOVED***
+		}
 		err = subkeySig.Serialize(&w)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Error(err)
-		***REMOVED***
+		}
 		// Now read back what we've written again
 		r = bytes.NewBuffer(w.Bytes())
 		w.Reset()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 const rsaFingerprintHex = "5fb74b1d03b1e3cb31bc2f8aa34d7e18c20c31bb"
 

@@ -9,48 +9,48 @@ import (
 )
 
 // Stat represents kernel/system statistics.
-type Stat struct ***REMOVED***
+type Stat struct {
 	// Boot time in seconds since the Epoch.
 	BootTime int64
-***REMOVED***
+}
 
 // NewStat returns kernel/system statistics read from /proc/stat.
-func NewStat() (Stat, error) ***REMOVED***
+func NewStat() (Stat, error) {
 	fs, err := NewFS(DefaultMountPoint)
-	if err != nil ***REMOVED***
-		return Stat***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return Stat{}, err
+	}
 
 	return fs.NewStat()
-***REMOVED***
+}
 
 // NewStat returns an information about current kernel/system statistics.
-func (fs FS) NewStat() (Stat, error) ***REMOVED***
+func (fs FS) NewStat() (Stat, error) {
 	f, err := os.Open(fs.Path("stat"))
-	if err != nil ***REMOVED***
-		return Stat***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return Stat{}, err
+	}
 	defer f.Close()
 
 	s := bufio.NewScanner(f)
-	for s.Scan() ***REMOVED***
+	for s.Scan() {
 		line := s.Text()
-		if !strings.HasPrefix(line, "btime") ***REMOVED***
+		if !strings.HasPrefix(line, "btime") {
 			continue
-		***REMOVED***
+		}
 		fields := strings.Fields(line)
-		if len(fields) != 2 ***REMOVED***
-			return Stat***REMOVED******REMOVED***, fmt.Errorf("couldn't parse %s line %s", f.Name(), line)
-		***REMOVED***
+		if len(fields) != 2 {
+			return Stat{}, fmt.Errorf("couldn't parse %s line %s", f.Name(), line)
+		}
 		i, err := strconv.ParseInt(fields[1], 10, 32)
-		if err != nil ***REMOVED***
-			return Stat***REMOVED******REMOVED***, fmt.Errorf("couldn't parse %s: %s", fields[1], err)
-		***REMOVED***
-		return Stat***REMOVED***BootTime: i***REMOVED***, nil
-	***REMOVED***
-	if err := s.Err(); err != nil ***REMOVED***
-		return Stat***REMOVED******REMOVED***, fmt.Errorf("couldn't parse %s: %s", f.Name(), err)
-	***REMOVED***
+		if err != nil {
+			return Stat{}, fmt.Errorf("couldn't parse %s: %s", fields[1], err)
+		}
+		return Stat{BootTime: i}, nil
+	}
+	if err := s.Err(); err != nil {
+		return Stat{}, fmt.Errorf("couldn't parse %s: %s", f.Name(), err)
+	}
 
-	return Stat***REMOVED******REMOVED***, fmt.Errorf("couldn't parse %s, missing btime", f.Name())
-***REMOVED***
+	return Stat{}, fmt.Errorf("couldn't parse %s, missing btime", f.Name())
+}

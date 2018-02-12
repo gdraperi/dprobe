@@ -28,53 +28,53 @@ const addKeyName = `SYSTEM\CurrentControlSet\Services\EventLog\Application`
 // the event message file is installed as REG_EXPAND_SZ value,
 // otherwise as REG_SZ. Use bitwise of log.Error, log.Warning and
 // log.Info to specify events supported by the new event source.
-func Install(src, msgFile string, useExpandKey bool, eventsSupported uint32) error ***REMOVED***
+func Install(src, msgFile string, useExpandKey bool, eventsSupported uint32) error {
 	appkey, err := registry.OpenKey(registry.LOCAL_MACHINE, addKeyName, registry.CREATE_SUB_KEY)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer appkey.Close()
 
 	sk, alreadyExist, err := registry.CreateKey(appkey, src, registry.SET_VALUE)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer sk.Close()
-	if alreadyExist ***REMOVED***
+	if alreadyExist {
 		return errors.New(addKeyName + `\` + src + " registry key already exists")
-	***REMOVED***
+	}
 
 	err = sk.SetDWordValue("CustomSource", 1)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	if useExpandKey ***REMOVED***
+	}
+	if useExpandKey {
 		err = sk.SetExpandStringValue("EventMessageFile", msgFile)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		err = sk.SetStringValue("EventMessageFile", msgFile)
-	***REMOVED***
-	if err != nil ***REMOVED***
+	}
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	err = sk.SetDWordValue("TypesSupported", eventsSupported)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // InstallAsEventCreate is the same as Install, but uses
 // %SystemRoot%\System32\EventCreate.exe as the event message file.
-func InstallAsEventCreate(src string, eventsSupported uint32) error ***REMOVED***
+func InstallAsEventCreate(src string, eventsSupported uint32) error {
 	return Install(src, "%SystemRoot%\\System32\\EventCreate.exe", true, eventsSupported)
-***REMOVED***
+}
 
 // Remove deletes all registry elements installed by the correspondent Install.
-func Remove(src string) error ***REMOVED***
+func Remove(src string) error {
 	appkey, err := registry.OpenKey(registry.LOCAL_MACHINE, addKeyName, registry.SET_VALUE)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer appkey.Close()
 	return registry.DeleteKey(appkey, src)
-***REMOVED***
+}

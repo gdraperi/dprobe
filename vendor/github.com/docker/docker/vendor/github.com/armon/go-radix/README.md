@@ -29,8 +29,8 @@ r.Insert("foobar", 2)
 
 // Find the longest prefix match
 m, _, _ := r.LongestPrefix("foozip")
-if m != "foo" ***REMOVED***
+if m != "foo" {
     panic("should be foo")
-***REMOVED***
+}
 ```
 

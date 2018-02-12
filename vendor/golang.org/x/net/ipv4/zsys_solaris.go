@@ -57,44 +57,44 @@ const (
 	sizeofGroupSourceReq = 0x204
 )
 
-type sockaddrStorage struct ***REMOVED***
+type sockaddrStorage struct {
 	Family     uint16
 	X_ss_pad1  [6]int8
 	X_ss_align float64
 	X_ss_pad2  [240]int8
-***REMOVED***
+}
 
-type sockaddrInet struct ***REMOVED***
+type sockaddrInet struct {
 	Family uint16
 	Port   uint16
 	Addr   [4]byte /* in_addr */
 	Zero   [8]int8
-***REMOVED***
+}
 
-type inetPktinfo struct ***REMOVED***
+type inetPktinfo struct {
 	Ifindex  uint32
 	Spec_dst [4]byte /* in_addr */
 	Addr     [4]byte /* in_addr */
-***REMOVED***
+}
 
-type ipMreq struct ***REMOVED***
+type ipMreq struct {
 	Multiaddr [4]byte /* in_addr */
 	Interface [4]byte /* in_addr */
-***REMOVED***
+}
 
-type ipMreqSource struct ***REMOVED***
+type ipMreqSource struct {
 	Multiaddr  [4]byte /* in_addr */
 	Sourceaddr [4]byte /* in_addr */
 	Interface  [4]byte /* in_addr */
-***REMOVED***
+}
 
-type groupReq struct ***REMOVED***
+type groupReq struct {
 	Interface uint32
 	Pad_cgo_0 [256]byte
-***REMOVED***
+}
 
-type groupSourceReq struct ***REMOVED***
+type groupSourceReq struct {
 	Interface uint32
 	Pad_cgo_0 [256]byte
 	Pad_cgo_1 [256]byte
-***REMOVED***
+}

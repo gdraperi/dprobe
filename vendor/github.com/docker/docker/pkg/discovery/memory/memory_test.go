@@ -8,35 +8,35 @@ import (
 )
 
 // Hook up gocheck into the "go test" runner.
-func Test(t *testing.T) ***REMOVED*** check.TestingT(t) ***REMOVED***
+func Test(t *testing.T) { check.TestingT(t) }
 
-type discoverySuite struct***REMOVED******REMOVED***
+type discoverySuite struct{}
 
-var _ = check.Suite(&discoverySuite***REMOVED******REMOVED***)
+var _ = check.Suite(&discoverySuite{})
 
-func (s *discoverySuite) TestWatch(c *check.C) ***REMOVED***
-	d := &Discovery***REMOVED******REMOVED***
+func (s *discoverySuite) TestWatch(c *check.C) {
+	d := &Discovery{}
 	d.Initialize("foo", 1000, 0, nil)
-	stopCh := make(chan struct***REMOVED******REMOVED***)
+	stopCh := make(chan struct{})
 	ch, errCh := d.Watch(stopCh)
 
 	// We have to drain the error channel otherwise Watch will get stuck.
-	go func() ***REMOVED***
-		for range errCh ***REMOVED***
-		***REMOVED***
-	***REMOVED***()
+	go func() {
+		for range errCh {
+		}
+	}()
 
-	expected := discovery.Entries***REMOVED***
-		&discovery.Entry***REMOVED***Host: "1.1.1.1", Port: "1111"***REMOVED***,
-	***REMOVED***
+	expected := discovery.Entries{
+		&discovery.Entry{Host: "1.1.1.1", Port: "1111"},
+	}
 
 	c.Assert(d.Register("1.1.1.1:1111"), check.IsNil)
 	c.Assert(<-ch, check.DeepEquals, expected)
 
-	expected = discovery.Entries***REMOVED***
-		&discovery.Entry***REMOVED***Host: "1.1.1.1", Port: "1111"***REMOVED***,
-		&discovery.Entry***REMOVED***Host: "2.2.2.2", Port: "2222"***REMOVED***,
-	***REMOVED***
+	expected = discovery.Entries{
+		&discovery.Entry{Host: "1.1.1.1", Port: "1111"},
+		&discovery.Entry{Host: "2.2.2.2", Port: "2222"},
+	}
 
 	c.Assert(d.Register("2.2.2.2:2222"), check.IsNil)
 	c.Assert(<-ch, check.DeepEquals, expected)
@@ -45,4 +45,4 @@ func (s *discoverySuite) TestWatch(c *check.C) ***REMOVED***
 	close(stopCh)
 	c.Assert(<-ch, check.IsNil)
 	c.Assert(<-errCh, check.IsNil)
-***REMOVED***
+}

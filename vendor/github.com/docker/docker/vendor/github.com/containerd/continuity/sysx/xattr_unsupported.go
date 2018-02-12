@@ -4,41 +4,41 @@ package sysx
 
 // Listxattr calls syscall listxattr and reads all content
 // and returns a string array
-func Listxattr(path string) ([]string, error) ***REMOVED***
-	return []string***REMOVED******REMOVED***, nil
-***REMOVED***
+func Listxattr(path string) ([]string, error) {
+	return []string{}, nil
+}
 
 // Removexattr calls syscall removexattr
-func Removexattr(path string, attr string) (err error) ***REMOVED***
+func Removexattr(path string, attr string) (err error) {
 	return unsupported
-***REMOVED***
+}
 
 // Setxattr calls syscall setxattr
-func Setxattr(path string, attr string, data []byte, flags int) (err error) ***REMOVED***
+func Setxattr(path string, attr string, data []byte, flags int) (err error) {
 	return unsupported
-***REMOVED***
+}
 
 // Getxattr calls syscall getxattr
-func Getxattr(path, attr string) ([]byte, error) ***REMOVED***
-	return []byte***REMOVED******REMOVED***, unsupported
-***REMOVED***
+func Getxattr(path, attr string) ([]byte, error) {
+	return []byte{}, unsupported
+}
 
 // LListxattr lists xattrs, not following symlinks
-func LListxattr(path string) ([]string, error) ***REMOVED***
-	return []string***REMOVED******REMOVED***, nil
-***REMOVED***
+func LListxattr(path string) ([]string, error) {
+	return []string{}, nil
+}
 
 // LRemovexattr removes an xattr, not following symlinks
-func LRemovexattr(path string, attr string) (err error) ***REMOVED***
+func LRemovexattr(path string, attr string) (err error) {
 	return unsupported
-***REMOVED***
+}
 
 // LSetxattr sets an xattr, not following symlinks
-func LSetxattr(path string, attr string, data []byte, flags int) (err error) ***REMOVED***
+func LSetxattr(path string, attr string, data []byte, flags int) (err error) {
 	return unsupported
-***REMOVED***
+}
 
 // LGetxattr gets an xattr, not following symlinks
-func LGetxattr(path, attr string) ([]byte, error) ***REMOVED***
-	return []byte***REMOVED******REMOVED***, nil
-***REMOVED***
+func LGetxattr(path, attr string) ([]byte, error) {
+	return []byte{}, nil
+}

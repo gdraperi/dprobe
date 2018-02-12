@@ -7,24 +7,24 @@ import "sort"
 type History []*Container
 
 // Len returns the number of containers in the history.
-func (history *History) Len() int ***REMOVED***
+func (history *History) Len() int {
 	return len(*history)
-***REMOVED***
+}
 
 // Less compares two containers and returns true if the second one
 // was created before the first one.
-func (history *History) Less(i, j int) bool ***REMOVED***
+func (history *History) Less(i, j int) bool {
 	containers := *history
 	return containers[j].Created.Before(containers[i].Created)
-***REMOVED***
+}
 
 // Swap switches containers i and j positions in the history.
-func (history *History) Swap(i, j int) ***REMOVED***
+func (history *History) Swap(i, j int) {
 	containers := *history
 	containers[i], containers[j] = containers[j], containers[i]
-***REMOVED***
+}
 
 // sort orders the history by creation date in descendant order.
-func (history *History) sort() ***REMOVED***
+func (history *History) sort() {
 	sort.Sort(history)
-***REMOVED***
+}

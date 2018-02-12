@@ -18,168 +18,168 @@ import (
 // operator with Number compares
 // both the type and the value
 // of the number.
-type Number struct ***REMOVED***
+type Number struct {
 	// internally, this
 	// is just a tagged union.
 	// the raw bits of the number
 	// are stored the same way regardless.
 	bits uint64
 	typ  Type
-***REMOVED***
+}
 
 // AsInt sets the number to an int64.
-func (n *Number) AsInt(i int64) ***REMOVED***
+func (n *Number) AsInt(i int64) {
 
 	// we always store int(0)
-	// as ***REMOVED***0, InvalidType***REMOVED*** in
+	// as {0, InvalidType} in
 	// order to preserve
 	// the behavior of the == operator
-	if i == 0 ***REMOVED***
+	if i == 0 {
 		n.typ = InvalidType
 		n.bits = 0
 		return
-	***REMOVED***
+	}
 
 	n.typ = IntType
 	n.bits = uint64(i)
-***REMOVED***
+}
 
 // AsUint sets the number to a uint64.
-func (n *Number) AsUint(u uint64) ***REMOVED***
+func (n *Number) AsUint(u uint64) {
 	n.typ = UintType
 	n.bits = u
-***REMOVED***
+}
 
 // AsFloat32 sets the value of the number
 // to a float32.
-func (n *Number) AsFloat32(f float32) ***REMOVED***
+func (n *Number) AsFloat32(f float32) {
 	n.typ = Float32Type
 	n.bits = uint64(math.Float32bits(f))
-***REMOVED***
+}
 
 // AsFloat64 sets the value of the
 // number to a float64.
-func (n *Number) AsFloat64(f float64) ***REMOVED***
+func (n *Number) AsFloat64(f float64) {
 	n.typ = Float64Type
 	n.bits = math.Float64bits(f)
-***REMOVED***
+}
 
 // Int casts the number as an int64, and
 // returns whether or not that was the
 // underlying type.
-func (n *Number) Int() (int64, bool) ***REMOVED***
+func (n *Number) Int() (int64, bool) {
 	return int64(n.bits), n.typ == IntType || n.typ == InvalidType
-***REMOVED***
+}
 
 // Uint casts the number as a uint64, and returns
 // whether or not that was the underlying type.
-func (n *Number) Uint() (uint64, bool) ***REMOVED***
+func (n *Number) Uint() (uint64, bool) {
 	return n.bits, n.typ == UintType
-***REMOVED***
+}
 
 // Float casts the number to a float64, and
 // returns whether or not that was the underlying
 // type (either a float64 or a float32).
-func (n *Number) Float() (float64, bool) ***REMOVED***
-	switch n.typ ***REMOVED***
+func (n *Number) Float() (float64, bool) {
+	switch n.typ {
 	case Float32Type:
 		return float64(math.Float32frombits(uint32(n.bits))), true
 	case Float64Type:
 		return math.Float64frombits(n.bits), true
 	default:
 		return 0.0, false
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Type will return one of:
 // Float64Type, Float32Type, UintType, or IntType.
-func (n *Number) Type() Type ***REMOVED***
-	if n.typ == InvalidType ***REMOVED***
+func (n *Number) Type() Type {
+	if n.typ == InvalidType {
 		return IntType
-	***REMOVED***
+	}
 	return n.typ
-***REMOVED***
+}
 
 // DecodeMsg implements msgp.Decodable
-func (n *Number) DecodeMsg(r *Reader) error ***REMOVED***
+func (n *Number) DecodeMsg(r *Reader) error {
 	typ, err := r.NextType()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	switch typ ***REMOVED***
+	}
+	switch typ {
 	case Float32Type:
 		f, err := r.ReadFloat32()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		n.AsFloat32(f)
 		return nil
 	case Float64Type:
 		f, err := r.ReadFloat64()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		n.AsFloat64(f)
 		return nil
 	case IntType:
 		i, err := r.ReadInt64()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		n.AsInt(i)
 		return nil
 	case UintType:
 		u, err := r.ReadUint64()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		n.AsUint(u)
 		return nil
 	default:
-		return TypeError***REMOVED***Encoded: typ, Method: IntType***REMOVED***
-	***REMOVED***
-***REMOVED***
+		return TypeError{Encoded: typ, Method: IntType}
+	}
+}
 
 // UnmarshalMsg implements msgp.Unmarshaler
-func (n *Number) UnmarshalMsg(b []byte) ([]byte, error) ***REMOVED***
+func (n *Number) UnmarshalMsg(b []byte) ([]byte, error) {
 	typ := NextType(b)
-	switch typ ***REMOVED***
+	switch typ {
 	case IntType:
 		i, o, err := ReadInt64Bytes(b)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return b, err
-		***REMOVED***
+		}
 		n.AsInt(i)
 		return o, nil
 	case UintType:
 		u, o, err := ReadUint64Bytes(b)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return b, err
-		***REMOVED***
+		}
 		n.AsUint(u)
 		return o, nil
 	case Float64Type:
 		f, o, err := ReadFloat64Bytes(b)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return b, err
-		***REMOVED***
+		}
 		n.AsFloat64(f)
 		return o, nil
 	case Float32Type:
 		f, o, err := ReadFloat32Bytes(b)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return b, err
-		***REMOVED***
+		}
 		n.AsFloat32(f)
 		return o, nil
 	default:
-		return b, TypeError***REMOVED***Method: IntType, Encoded: typ***REMOVED***
-	***REMOVED***
-***REMOVED***
+		return b, TypeError{Method: IntType, Encoded: typ}
+	}
+}
 
 // MarshalMsg implements msgp.Marshaler
-func (n *Number) MarshalMsg(b []byte) ([]byte, error) ***REMOVED***
-	switch n.typ ***REMOVED***
+func (n *Number) MarshalMsg(b []byte) ([]byte, error) {
+	switch n.typ {
 	case IntType:
 		return AppendInt64(b, int64(n.bits)), nil
 	case UintType:
@@ -190,12 +190,12 @@ func (n *Number) MarshalMsg(b []byte) ([]byte, error) ***REMOVED***
 		return AppendFloat32(b, math.Float32frombits(uint32(n.bits))), nil
 	default:
 		return AppendInt64(b, 0), nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // EncodeMsg implements msgp.Encodable
-func (n *Number) EncodeMsg(w *Writer) error ***REMOVED***
-	switch n.typ ***REMOVED***
+func (n *Number) EncodeMsg(w *Writer) error {
+	switch n.typ {
 	case IntType:
 		return w.WriteInt64(int64(n.bits))
 	case UintType:
@@ -206,12 +206,12 @@ func (n *Number) EncodeMsg(w *Writer) error ***REMOVED***
 		return w.WriteFloat32(math.Float32frombits(uint32(n.bits)))
 	default:
 		return w.WriteInt64(0)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Msgsize implements msgp.Sizer
-func (n *Number) Msgsize() int ***REMOVED***
-	switch n.typ ***REMOVED***
+func (n *Number) Msgsize() int {
+	switch n.typ {
 	case Float32Type:
 		return Float32Size
 	case Float64Type:
@@ -222,17 +222,17 @@ func (n *Number) Msgsize() int ***REMOVED***
 		return Uint64Size
 	default:
 		return 1 // fixint(0)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // MarshalJSON implements json.Marshaler
-func (n *Number) MarshalJSON() ([]byte, error) ***REMOVED***
+func (n *Number) MarshalJSON() ([]byte, error) {
 	t := n.Type()
-	if t == InvalidType ***REMOVED***
-		return []byte***REMOVED***'0'***REMOVED***, nil
-	***REMOVED***
+	if t == InvalidType {
+		return []byte{'0'}, nil
+	}
 	out := make([]byte, 0, 32)
-	switch t ***REMOVED***
+	switch t {
 	case Float32Type, Float64Type:
 		f, _ := n.Float()
 		return strconv.AppendFloat(out, f, 'f', -1, 64), nil
@@ -244,12 +244,12 @@ func (n *Number) MarshalJSON() ([]byte, error) ***REMOVED***
 		return strconv.AppendUint(out, u, 10), nil
 	default:
 		panic("(*Number).typ is invalid")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // String implements fmt.Stringer
-func (n *Number) String() string ***REMOVED***
-	switch n.typ ***REMOVED***
+func (n *Number) String() string {
+	switch n.typ {
 	case InvalidType:
 		return "0"
 	case Float32Type, Float64Type:
@@ -263,5 +263,5 @@ func (n *Number) String() string ***REMOVED***
 		return strconv.FormatUint(u, 10)
 	default:
 		panic("(*Number).typ is invalid")
-	***REMOVED***
-***REMOVED***
+	}
+}

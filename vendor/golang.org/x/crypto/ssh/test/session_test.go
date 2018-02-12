@@ -19,24 +19,24 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-func TestRunCommandSuccess(t *testing.T) ***REMOVED***
+func TestRunCommandSuccess(t *testing.T) {
 	server := newServer(t)
 	defer server.Shutdown()
 	conn := server.Dial(clientConfig())
 	defer conn.Close()
 
 	session, err := conn.NewSession()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("session failed: %v", err)
-	***REMOVED***
+	}
 	defer session.Close()
 	err = session.Run("true")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("session failed: %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestHostKeyCheck(t *testing.T) ***REMOVED***
+func TestHostKeyCheck(t *testing.T) {
 	server := newServer(t)
 	defer server.Shutdown()
 
@@ -50,24 +50,24 @@ func TestHostKeyCheck(t *testing.T) ***REMOVED***
 	hostDB.keys[ssh.KeyAlgoECDSA256][25]++
 
 	conn, err := server.TryDial(conf)
-	if err == nil ***REMOVED***
+	if err == nil {
 		conn.Close()
 		t.Fatalf("dial should have failed.")
-	***REMOVED*** else if !strings.Contains(err.Error(), "host key mismatch") ***REMOVED***
+	} else if !strings.Contains(err.Error(), "host key mismatch") {
 		t.Fatalf("'host key mismatch' not found in %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestRunCommandStdin(t *testing.T) ***REMOVED***
+func TestRunCommandStdin(t *testing.T) {
 	server := newServer(t)
 	defer server.Shutdown()
 	conn := server.Dial(clientConfig())
 	defer conn.Close()
 
 	session, err := conn.NewSession()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("session failed: %v", err)
-	***REMOVED***
+	}
 	defer session.Close()
 
 	r, w := io.Pipe()
@@ -76,21 +76,21 @@ func TestRunCommandStdin(t *testing.T) ***REMOVED***
 	session.Stdin = r
 
 	err = session.Run("true")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("session failed: %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestRunCommandStdinError(t *testing.T) ***REMOVED***
+func TestRunCommandStdinError(t *testing.T) {
 	server := newServer(t)
 	defer server.Shutdown()
 	conn := server.Dial(clientConfig())
 	defer conn.Close()
 
 	session, err := conn.NewSession()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("session failed: %v", err)
-	***REMOVED***
+	}
 	defer session.Close()
 
 	r, w := io.Pipe()
@@ -100,81 +100,81 @@ func TestRunCommandStdinError(t *testing.T) ***REMOVED***
 	w.CloseWithError(pipeErr)
 
 	err = session.Run("true")
-	if err != pipeErr ***REMOVED***
+	if err != pipeErr {
 		t.Fatalf("expected %v, found %v", pipeErr, err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestRunCommandFailed(t *testing.T) ***REMOVED***
+func TestRunCommandFailed(t *testing.T) {
 	server := newServer(t)
 	defer server.Shutdown()
 	conn := server.Dial(clientConfig())
 	defer conn.Close()
 
 	session, err := conn.NewSession()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("session failed: %v", err)
-	***REMOVED***
+	}
 	defer session.Close()
 	err = session.Run(`bash -c "kill -9 $$"`)
-	if err == nil ***REMOVED***
+	if err == nil {
 		t.Fatalf("session succeeded: %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestRunCommandWeClosed(t *testing.T) ***REMOVED***
+func TestRunCommandWeClosed(t *testing.T) {
 	server := newServer(t)
 	defer server.Shutdown()
 	conn := server.Dial(clientConfig())
 	defer conn.Close()
 
 	session, err := conn.NewSession()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("session failed: %v", err)
-	***REMOVED***
+	}
 	err = session.Shell()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("shell failed: %v", err)
-	***REMOVED***
+	}
 	err = session.Close()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("shell failed: %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestFuncLargeRead(t *testing.T) ***REMOVED***
+func TestFuncLargeRead(t *testing.T) {
 	server := newServer(t)
 	defer server.Shutdown()
 	conn := server.Dial(clientConfig())
 	defer conn.Close()
 
 	session, err := conn.NewSession()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("unable to create new session: %s", err)
-	***REMOVED***
+	}
 
 	stdout, err := session.StdoutPipe()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("unable to acquire stdout pipe: %s", err)
-	***REMOVED***
+	}
 
 	err = session.Start("dd if=/dev/urandom bs=2048 count=1024")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("unable to execute remote command: %s", err)
-	***REMOVED***
+	}
 
 	buf := new(bytes.Buffer)
 	n, err := io.Copy(buf, stdout)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("error reading from remote stdout: %s", err)
-	***REMOVED***
+	}
 
-	if n != 2048*1024 ***REMOVED***
+	if n != 2048*1024 {
 		t.Fatalf("Expected %d bytes but read only %d from remote command", 2048, n)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestKeyChange(t *testing.T) ***REMOVED***
+func TestKeyChange(t *testing.T) {
 	server := newServer(t)
 	defer server.Shutdown()
 	conf := clientConfig()
@@ -184,260 +184,260 @@ func TestKeyChange(t *testing.T) ***REMOVED***
 	conn := server.Dial(conf)
 	defer conn.Close()
 
-	for i := 0; i < 4; i++ ***REMOVED***
+	for i := 0; i < 4; i++ {
 		session, err := conn.NewSession()
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("unable to create new session: %s", err)
-		***REMOVED***
+		}
 
 		stdout, err := session.StdoutPipe()
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("unable to acquire stdout pipe: %s", err)
-		***REMOVED***
+		}
 
 		err = session.Start("dd if=/dev/urandom bs=1024 count=1")
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("unable to execute remote command: %s", err)
-		***REMOVED***
+		}
 		buf := new(bytes.Buffer)
 		n, err := io.Copy(buf, stdout)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("error reading from remote stdout: %s", err)
-		***REMOVED***
+		}
 
 		want := int64(1024)
-		if n != want ***REMOVED***
+		if n != want {
 			t.Fatalf("Expected %d bytes but read only %d from remote command", want, n)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if changes := hostDB.checkCount; changes < 4 ***REMOVED***
+	if changes := hostDB.checkCount; changes < 4 {
 		t.Errorf("got %d key changes, want 4", changes)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestInvalidTerminalMode(t *testing.T) ***REMOVED***
+func TestInvalidTerminalMode(t *testing.T) {
 	server := newServer(t)
 	defer server.Shutdown()
 	conn := server.Dial(clientConfig())
 	defer conn.Close()
 
 	session, err := conn.NewSession()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("session failed: %v", err)
-	***REMOVED***
+	}
 	defer session.Close()
 
-	if err = session.RequestPty("vt100", 80, 40, ssh.TerminalModes***REMOVED***255: 1984***REMOVED***); err == nil ***REMOVED***
+	if err = session.RequestPty("vt100", 80, 40, ssh.TerminalModes{255: 1984}); err == nil {
 		t.Fatalf("req-pty failed: successful request with invalid mode")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestValidTerminalMode(t *testing.T) ***REMOVED***
+func TestValidTerminalMode(t *testing.T) {
 	server := newServer(t)
 	defer server.Shutdown()
 	conn := server.Dial(clientConfig())
 	defer conn.Close()
 
 	session, err := conn.NewSession()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("session failed: %v", err)
-	***REMOVED***
+	}
 	defer session.Close()
 
 	stdout, err := session.StdoutPipe()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("unable to acquire stdout pipe: %s", err)
-	***REMOVED***
+	}
 
 	stdin, err := session.StdinPipe()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("unable to acquire stdin pipe: %s", err)
-	***REMOVED***
+	}
 
-	tm := ssh.TerminalModes***REMOVED***ssh.ECHO: 0***REMOVED***
-	if err = session.RequestPty("xterm", 80, 40, tm); err != nil ***REMOVED***
+	tm := ssh.TerminalModes{ssh.ECHO: 0}
+	if err = session.RequestPty("xterm", 80, 40, tm); err != nil {
 		t.Fatalf("req-pty failed: %s", err)
-	***REMOVED***
+	}
 
 	err = session.Shell()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("session failed: %s", err)
-	***REMOVED***
+	}
 
 	stdin.Write([]byte("stty -a && exit\n"))
 
 	var buf bytes.Buffer
-	if _, err := io.Copy(&buf, stdout); err != nil ***REMOVED***
+	if _, err := io.Copy(&buf, stdout); err != nil {
 		t.Fatalf("reading failed: %s", err)
-	***REMOVED***
+	}
 
-	if sttyOutput := buf.String(); !strings.Contains(sttyOutput, "-echo ") ***REMOVED***
+	if sttyOutput := buf.String(); !strings.Contains(sttyOutput, "-echo ") {
 		t.Fatalf("terminal mode failure: expected -echo in stty output, got %s", sttyOutput)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestWindowChange(t *testing.T) ***REMOVED***
+func TestWindowChange(t *testing.T) {
 	server := newServer(t)
 	defer server.Shutdown()
 	conn := server.Dial(clientConfig())
 	defer conn.Close()
 
 	session, err := conn.NewSession()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("session failed: %v", err)
-	***REMOVED***
+	}
 	defer session.Close()
 
 	stdout, err := session.StdoutPipe()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("unable to acquire stdout pipe: %s", err)
-	***REMOVED***
+	}
 
 	stdin, err := session.StdinPipe()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("unable to acquire stdin pipe: %s", err)
-	***REMOVED***
+	}
 
-	tm := ssh.TerminalModes***REMOVED***ssh.ECHO: 0***REMOVED***
-	if err = session.RequestPty("xterm", 80, 40, tm); err != nil ***REMOVED***
+	tm := ssh.TerminalModes{ssh.ECHO: 0}
+	if err = session.RequestPty("xterm", 80, 40, tm); err != nil {
 		t.Fatalf("req-pty failed: %s", err)
-	***REMOVED***
+	}
 
-	if err := session.WindowChange(100, 100); err != nil ***REMOVED***
+	if err := session.WindowChange(100, 100); err != nil {
 		t.Fatalf("window-change failed: %s", err)
-	***REMOVED***
+	}
 
 	err = session.Shell()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("session failed: %s", err)
-	***REMOVED***
+	}
 
 	stdin.Write([]byte("stty size && exit\n"))
 
 	var buf bytes.Buffer
-	if _, err := io.Copy(&buf, stdout); err != nil ***REMOVED***
+	if _, err := io.Copy(&buf, stdout); err != nil {
 		t.Fatalf("reading failed: %s", err)
-	***REMOVED***
+	}
 
-	if sttyOutput := buf.String(); !strings.Contains(sttyOutput, "100 100") ***REMOVED***
+	if sttyOutput := buf.String(); !strings.Contains(sttyOutput, "100 100") {
 		t.Fatalf("terminal WindowChange failure: expected \"100 100\" stty output, got %s", sttyOutput)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func testOneCipher(t *testing.T, cipher string, cipherOrder []string) ***REMOVED***
+func testOneCipher(t *testing.T, cipher string, cipherOrder []string) {
 	server := newServer(t)
 	defer server.Shutdown()
 	conf := clientConfig()
-	conf.Ciphers = []string***REMOVED***cipher***REMOVED***
+	conf.Ciphers = []string{cipher}
 	// Don't fail if sshd doesn't have the cipher.
 	conf.Ciphers = append(conf.Ciphers, cipherOrder...)
 	conn, err := server.TryDial(conf)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("TryDial: %v", err)
-	***REMOVED***
+	}
 	defer conn.Close()
 
 	numBytes := 4096
 
 	// Exercise sending data to the server
-	if _, _, err := conn.Conn.SendRequest("drop-me", false, make([]byte, numBytes)); err != nil ***REMOVED***
+	if _, _, err := conn.Conn.SendRequest("drop-me", false, make([]byte, numBytes)); err != nil {
 		t.Fatalf("SendRequest: %v", err)
-	***REMOVED***
+	}
 
 	// Exercise receiving data from the server
 	session, err := conn.NewSession()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("NewSession: %v", err)
-	***REMOVED***
+	}
 
 	out, err := session.Output(fmt.Sprintf("dd if=/dev/zero of=/dev/stdout bs=%d count=1", numBytes))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("Output: %v", err)
-	***REMOVED***
+	}
 
-	if len(out) != numBytes ***REMOVED***
+	if len(out) != numBytes {
 		t.Fatalf("got %d bytes, want %d bytes", len(out), numBytes)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-var deprecatedCiphers = []string***REMOVED***
+var deprecatedCiphers = []string{
 	"aes128-cbc", "3des-cbc",
 	"arcfour128", "arcfour256",
-***REMOVED***
+}
 
-func TestCiphers(t *testing.T) ***REMOVED***
+func TestCiphers(t *testing.T) {
 	var config ssh.Config
 	config.SetDefaults()
 	cipherOrder := append(config.Ciphers, deprecatedCiphers...)
 
-	for _, ciph := range cipherOrder ***REMOVED***
-		t.Run(ciph, func(t *testing.T) ***REMOVED***
+	for _, ciph := range cipherOrder {
+		t.Run(ciph, func(t *testing.T) {
 			testOneCipher(t, ciph, cipherOrder)
-		***REMOVED***)
-	***REMOVED***
-***REMOVED***
+		})
+	}
+}
 
-func TestMACs(t *testing.T) ***REMOVED***
+func TestMACs(t *testing.T) {
 	var config ssh.Config
 	config.SetDefaults()
 	macOrder := config.MACs
 
-	for _, mac := range macOrder ***REMOVED***
+	for _, mac := range macOrder {
 		server := newServer(t)
 		defer server.Shutdown()
 		conf := clientConfig()
-		conf.MACs = []string***REMOVED***mac***REMOVED***
+		conf.MACs = []string{mac}
 		// Don't fail if sshd doesn't have the MAC.
 		conf.MACs = append(conf.MACs, macOrder...)
-		if conn, err := server.TryDial(conf); err == nil ***REMOVED***
+		if conn, err := server.TryDial(conf); err == nil {
 			conn.Close()
-		***REMOVED*** else ***REMOVED***
+		} else {
 			t.Fatalf("failed for MAC %q", mac)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestKeyExchanges(t *testing.T) ***REMOVED***
+func TestKeyExchanges(t *testing.T) {
 	var config ssh.Config
 	config.SetDefaults()
 	kexOrder := config.KeyExchanges
-	for _, kex := range kexOrder ***REMOVED***
+	for _, kex := range kexOrder {
 		server := newServer(t)
 		defer server.Shutdown()
 		conf := clientConfig()
 		// Don't fail if sshd doesn't have the kex.
-		conf.KeyExchanges = append([]string***REMOVED***kex***REMOVED***, kexOrder...)
+		conf.KeyExchanges = append([]string{kex}, kexOrder...)
 		conn, err := server.TryDial(conf)
-		if err == nil ***REMOVED***
+		if err == nil {
 			conn.Close()
-		***REMOVED*** else ***REMOVED***
+		} else {
 			t.Errorf("failed for kex %q", kex)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestClientAuthAlgorithms(t *testing.T) ***REMOVED***
-	for _, key := range []string***REMOVED***
+func TestClientAuthAlgorithms(t *testing.T) {
+	for _, key := range []string{
 		"rsa",
 		"dsa",
 		"ecdsa",
 		"ed25519",
-	***REMOVED*** ***REMOVED***
+	} {
 		server := newServer(t)
 		conf := clientConfig()
 		conf.SetDefaults()
-		conf.Auth = []ssh.AuthMethod***REMOVED***
+		conf.Auth = []ssh.AuthMethod{
 			ssh.PublicKeys(testSigners[key]),
-		***REMOVED***
+		}
 
 		conn, err := server.TryDial(conf)
-		if err == nil ***REMOVED***
+		if err == nil {
 			conn.Close()
-		***REMOVED*** else ***REMOVED***
+		} else {
 			t.Errorf("failed for key %q", key)
-		***REMOVED***
+		}
 
 		server.Shutdown()
-	***REMOVED***
-***REMOVED***
+	}
+}

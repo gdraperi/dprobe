@@ -82,35 +82,35 @@ import (
     "github.com/davecgh/go-spew/spew"
 )
 
-func handler(w http.ResponseWriter, r *http.Request) ***REMOVED***
+func handler(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Content-Type", "text/html")
     fmt.Fprintf(w, "Hi there, %s!", r.URL.Path[1:])
     fmt.Fprintf(w, "<!--\n" + html.EscapeString(spew.Sdump(w)) + "\n-->")
-***REMOVED***
+}
 
-func main() ***REMOVED***
+func main() {
     http.HandleFunc("/", handler)
     http.ListenAndServe(":8080", nil)
-***REMOVED***
+}
 ```
 
 ## Sample Dump Output
 
 ```
-(main.Foo) ***REMOVED***
- unexportedField: (*main.Bar)(0xf84002e210)(***REMOVED***
+(main.Foo) {
+ unexportedField: (*main.Bar)(0xf84002e210)({
   flag: (main.Flag) flagTwo,
   data: (uintptr) <nil>
- ***REMOVED***),
- ExportedField: (map[interface ***REMOVED******REMOVED***]interface ***REMOVED******REMOVED***) ***REMOVED***
+ }),
+ ExportedField: (map[interface {}]interface {}) {
   (string) "one": (bool) true
- ***REMOVED***
-***REMOVED***
-([]uint8) ***REMOVED***
+ }
+}
+([]uint8) {
  00000000  11 12 13 14 15 16 17 18  19 1a 1b 1c 1d 1e 1f 20  |............... |
  00000010  21 22 23 24 25 26 27 28  29 2a 2b 2c 2d 2e 2f 30  |!"#$%&'()*+,-./0|
  00000020  31 32                                             |12|
-***REMOVED***
+}
 ```
 
 ## Sample Formatter Output
@@ -125,10 +125,10 @@ Double pointer to a uint8:
 
 Pointer to circular struct with a uint8 field and a pointer to itself:
 ```
-	  %v: <*>***REMOVED***1 <*><shown>***REMOVED***
-	 %+v: <*>(0xf84003e260)***REMOVED***ui8:1 c:<*>(0xf84003e260)<shown>***REMOVED***
-	 %#v: (*main.circular)***REMOVED***ui8:(uint8)1 c:(*main.circular)<shown>***REMOVED***
-	%#+v: (*main.circular)(0xf84003e260)***REMOVED***ui8:(uint8)1 c:(*main.circular)(0xf84003e260)<shown>***REMOVED***
+	  %v: <*>{1 <*><shown>}
+	 %+v: <*>(0xf84003e260){ui8:1 c:<*>(0xf84003e260)<shown>}
+	 %#v: (*main.circular){ui8:(uint8)1 c:(*main.circular)<shown>}
+	%#+v: (*main.circular)(0xf84003e260){ui8:(uint8)1 c:(*main.circular)(0xf84003e260)<shown>}
 ```
 
 ## Configuration Options

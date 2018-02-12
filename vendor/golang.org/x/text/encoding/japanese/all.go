@@ -9,4 +9,4 @@ import (
 )
 
 // All is a list of all defined encodings in this package.
-var All = []encoding.Encoding***REMOVED***EUCJP, ISO2022JP, ShiftJIS***REMOVED***
+var All = []encoding.Encoding{EUCJP, ISO2022JP, ShiftJIS}

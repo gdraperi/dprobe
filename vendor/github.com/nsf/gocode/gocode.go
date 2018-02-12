@@ -20,15 +20,15 @@ var (
 	g_profile   = flag.Int("profile", 0, "port on which to expose profiling information for pprof; 0 to disable profiling")
 )
 
-func get_socket_filename() string ***REMOVED***
+func get_socket_filename() string {
 	user := os.Getenv("USER")
-	if user == "" ***REMOVED***
+	if user == "" {
 		user = "all"
-	***REMOVED***
+	}
 	return filepath.Join(os.TempDir(), fmt.Sprintf("gocode-daemon.%s", user))
-***REMOVED***
+}
 
-func show_usage() ***REMOVED***
+func show_usage() {
 	fmt.Fprintf(os.Stderr,
 		"Usage: %s [-s] [-f=<format>] [-in=<path>] [-sock=<type>] [-addr=<addr>]\n"+
 			"       <command> [<args>]\n\n",
@@ -45,18 +45,18 @@ func show_usage() ***REMOVED***
 			"  set [<name> [<value>]]             list or set config options\n"+
 			"  status                             gocode daemon status report\n"+
 			"")
-***REMOVED***
+}
 
-func main() ***REMOVED***
+func main() {
 	flag.Usage = show_usage
 	flag.Parse()
 
 	var retval int
-	if *g_is_server ***REMOVED***
-		go func() ***REMOVED***
-			if *g_profile <= 0 ***REMOVED***
+	if *g_is_server {
+		go func() {
+			if *g_profile <= 0 {
 				return
-			***REMOVED***
+			}
 			addr := fmt.Sprintf("localhost:%d", *g_profile)
 			// Use the following commands to profile the binary:
 			// go tool pprof http://localhost:6060/debug/pprof/profile   # 30-second CPU profile
@@ -65,10 +65,10 @@ func main() ***REMOVED***
 			// See http://blog.golang.org/profiling-go-programs for more info.
 			log.Printf("enabling  profiler on %s", addr)
 			log.Print(http.ListenAndServe(addr, nil))
-		***REMOVED***()
+		}()
 		retval = do_server()
-	***REMOVED*** else ***REMOVED***
+	} else {
 		retval = do_client()
-	***REMOVED***
+	}
 	os.Exit(retval)
-***REMOVED***
+}

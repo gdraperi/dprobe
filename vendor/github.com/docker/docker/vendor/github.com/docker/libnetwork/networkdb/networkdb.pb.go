@@ -71,7 +71,7 @@ const (
 	MessageTypeNodeEvent MessageType = 6
 )
 
-var MessageType_name = map[int32]string***REMOVED***
+var MessageType_name = map[int32]string{
 	0: "INVALID",
 	1: "NETWORK_EVENT",
 	2: "TABLE_EVENT",
@@ -79,8 +79,8 @@ var MessageType_name = map[int32]string***REMOVED***
 	4: "BULK_SYNC",
 	5: "COMPOUND",
 	6: "NODE_EVENT",
-***REMOVED***
-var MessageType_value = map[string]int32***REMOVED***
+}
+var MessageType_value = map[string]int32{
 	"INVALID":       0,
 	"NETWORK_EVENT": 1,
 	"TABLE_EVENT":   2,
@@ -88,12 +88,12 @@ var MessageType_value = map[string]int32***REMOVED***
 	"BULK_SYNC":     4,
 	"COMPOUND":      5,
 	"NODE_EVENT":    6,
-***REMOVED***
+}
 
-func (x MessageType) String() string ***REMOVED***
+func (x MessageType) String() string {
 	return proto.EnumName(MessageType_name, int32(x))
-***REMOVED***
-func (MessageType) EnumDescriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorNetworkdb, []int***REMOVED***0***REMOVED*** ***REMOVED***
+}
+func (MessageType) EnumDescriptor() ([]byte, []int) { return fileDescriptorNetworkdb, []int{0} }
 
 type NodeEvent_Type int32
 
@@ -105,21 +105,21 @@ const (
 	NodeEventTypeLeave NodeEvent_Type = 2
 )
 
-var NodeEvent_Type_name = map[int32]string***REMOVED***
+var NodeEvent_Type_name = map[int32]string{
 	0: "INVALID",
 	1: "JOIN",
 	2: "LEAVE",
-***REMOVED***
-var NodeEvent_Type_value = map[string]int32***REMOVED***
+}
+var NodeEvent_Type_value = map[string]int32{
 	"INVALID": 0,
 	"JOIN":    1,
 	"LEAVE":   2,
-***REMOVED***
+}
 
-func (x NodeEvent_Type) String() string ***REMOVED***
+func (x NodeEvent_Type) String() string {
 	return proto.EnumName(NodeEvent_Type_name, int32(x))
-***REMOVED***
-func (NodeEvent_Type) EnumDescriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorNetworkdb, []int***REMOVED***1, 0***REMOVED*** ***REMOVED***
+}
+func (NodeEvent_Type) EnumDescriptor() ([]byte, []int) { return fileDescriptorNetworkdb, []int{1, 0} }
 
 type NetworkEvent_Type int32
 
@@ -131,21 +131,21 @@ const (
 	NetworkEventTypeLeave NetworkEvent_Type = 2
 )
 
-var NetworkEvent_Type_name = map[int32]string***REMOVED***
+var NetworkEvent_Type_name = map[int32]string{
 	0: "INVALID",
 	1: "JOIN",
 	2: "LEAVE",
-***REMOVED***
-var NetworkEvent_Type_value = map[string]int32***REMOVED***
+}
+var NetworkEvent_Type_value = map[string]int32{
 	"INVALID": 0,
 	"JOIN":    1,
 	"LEAVE":   2,
-***REMOVED***
+}
 
-func (x NetworkEvent_Type) String() string ***REMOVED***
+func (x NetworkEvent_Type) String() string {
 	return proto.EnumName(NetworkEvent_Type_name, int32(x))
-***REMOVED***
-func (NetworkEvent_Type) EnumDescriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorNetworkdb, []int***REMOVED***2, 0***REMOVED*** ***REMOVED***
+}
+func (NetworkEvent_Type) EnumDescriptor() ([]byte, []int) { return fileDescriptorNetworkdb, []int{2, 0} }
 
 type TableEvent_Type int32
 
@@ -162,50 +162,50 @@ const (
 	TableEventTypeDelete TableEvent_Type = 3
 )
 
-var TableEvent_Type_name = map[int32]string***REMOVED***
+var TableEvent_Type_name = map[int32]string{
 	0: "INVALID",
 	1: "CREATE",
 	2: "UPDATE",
 	3: "DELETE",
-***REMOVED***
-var TableEvent_Type_value = map[string]int32***REMOVED***
+}
+var TableEvent_Type_value = map[string]int32{
 	"INVALID": 0,
 	"CREATE":  1,
 	"UPDATE":  2,
 	"DELETE":  3,
-***REMOVED***
+}
 
-func (x TableEvent_Type) String() string ***REMOVED***
+func (x TableEvent_Type) String() string {
 	return proto.EnumName(TableEvent_Type_name, int32(x))
-***REMOVED***
-func (TableEvent_Type) EnumDescriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorNetworkdb, []int***REMOVED***5, 0***REMOVED*** ***REMOVED***
+}
+func (TableEvent_Type) EnumDescriptor() ([]byte, []int) { return fileDescriptorNetworkdb, []int{5, 0} }
 
 // GossipMessage is a basic message header used by all messages types.
-type GossipMessage struct ***REMOVED***
+type GossipMessage struct {
 	Type MessageType `protobuf:"varint,1,opt,name=type,proto3,enum=networkdb.MessageType" json:"type,omitempty"`
 	Data []byte      `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
-***REMOVED***
+}
 
-func (m *GossipMessage) Reset()                    ***REMOVED*** *m = GossipMessage***REMOVED******REMOVED*** ***REMOVED***
-func (*GossipMessage) ProtoMessage()               ***REMOVED******REMOVED***
-func (*GossipMessage) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorNetworkdb, []int***REMOVED***0***REMOVED*** ***REMOVED***
+func (m *GossipMessage) Reset()                    { *m = GossipMessage{} }
+func (*GossipMessage) ProtoMessage()               {}
+func (*GossipMessage) Descriptor() ([]byte, []int) { return fileDescriptorNetworkdb, []int{0} }
 
-func (m *GossipMessage) GetType() MessageType ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *GossipMessage) GetType() MessageType {
+	if m != nil {
 		return m.Type
-	***REMOVED***
+	}
 	return MessageTypeInvalid
-***REMOVED***
+}
 
-func (m *GossipMessage) GetData() []byte ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *GossipMessage) GetData() []byte {
+	if m != nil {
 		return m.Data
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // NodeEvent message payload definition.
-type NodeEvent struct ***REMOVED***
+type NodeEvent struct {
 	Type NodeEvent_Type `protobuf:"varint,1,opt,name=type,proto3,enum=networkdb.NodeEvent_Type" json:"type,omitempty"`
 	// Lamport time using a network lamport clock indicating the
 	// time this event was generated on the node where it was
@@ -213,28 +213,28 @@ type NodeEvent struct ***REMOVED***
 	LTime github_com_hashicorp_serf_serf.LamportTime `protobuf:"varint,2,opt,name=l_time,json=lTime,proto3,customtype=github.com/hashicorp/serf/serf.LamportTime" json:"l_time"`
 	// Source node name.
 	NodeName string `protobuf:"bytes,3,opt,name=node_name,json=nodeName,proto3" json:"node_name,omitempty"`
-***REMOVED***
+}
 
-func (m *NodeEvent) Reset()                    ***REMOVED*** *m = NodeEvent***REMOVED******REMOVED*** ***REMOVED***
-func (*NodeEvent) ProtoMessage()               ***REMOVED******REMOVED***
-func (*NodeEvent) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorNetworkdb, []int***REMOVED***1***REMOVED*** ***REMOVED***
+func (m *NodeEvent) Reset()                    { *m = NodeEvent{} }
+func (*NodeEvent) ProtoMessage()               {}
+func (*NodeEvent) Descriptor() ([]byte, []int) { return fileDescriptorNetworkdb, []int{1} }
 
-func (m *NodeEvent) GetType() NodeEvent_Type ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *NodeEvent) GetType() NodeEvent_Type {
+	if m != nil {
 		return m.Type
-	***REMOVED***
+	}
 	return NodeEventTypeInvalid
-***REMOVED***
+}
 
-func (m *NodeEvent) GetNodeName() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *NodeEvent) GetNodeName() string {
+	if m != nil {
 		return m.NodeName
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
 // NetworkEvent message payload definition.
-type NetworkEvent struct ***REMOVED***
+type NetworkEvent struct {
 	Type NetworkEvent_Type `protobuf:"varint,1,opt,name=type,proto3,enum=networkdb.NetworkEvent_Type" json:"type,omitempty"`
 	// Lamport time using a network lamport clock indicating the
 	// time this event was generated on the node where it was
@@ -244,35 +244,35 @@ type NetworkEvent struct ***REMOVED***
 	NodeName string `protobuf:"bytes,3,opt,name=node_name,json=nodeName,proto3" json:"node_name,omitempty"`
 	// ID of the network for which the event is generated.
 	NetworkID string `protobuf:"bytes,4,opt,name=network_id,json=networkId,proto3" json:"network_id,omitempty"`
-***REMOVED***
+}
 
-func (m *NetworkEvent) Reset()                    ***REMOVED*** *m = NetworkEvent***REMOVED******REMOVED*** ***REMOVED***
-func (*NetworkEvent) ProtoMessage()               ***REMOVED******REMOVED***
-func (*NetworkEvent) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorNetworkdb, []int***REMOVED***2***REMOVED*** ***REMOVED***
+func (m *NetworkEvent) Reset()                    { *m = NetworkEvent{} }
+func (*NetworkEvent) ProtoMessage()               {}
+func (*NetworkEvent) Descriptor() ([]byte, []int) { return fileDescriptorNetworkdb, []int{2} }
 
-func (m *NetworkEvent) GetType() NetworkEvent_Type ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *NetworkEvent) GetType() NetworkEvent_Type {
+	if m != nil {
 		return m.Type
-	***REMOVED***
+	}
 	return NetworkEventTypeInvalid
-***REMOVED***
+}
 
-func (m *NetworkEvent) GetNodeName() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *NetworkEvent) GetNodeName() string {
+	if m != nil {
 		return m.NodeName
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *NetworkEvent) GetNetworkID() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *NetworkEvent) GetNetworkID() string {
+	if m != nil {
 		return m.NetworkID
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
 // NetworkEntry for push pull of networks.
-type NetworkEntry struct ***REMOVED***
+type NetworkEntry struct {
 	// ID of the network
 	NetworkID string `protobuf:"bytes,1,opt,name=network_id,json=networkId,proto3" json:"network_id,omitempty"`
 	// Latest lamport time of the network attachment when this
@@ -282,62 +282,62 @@ type NetworkEntry struct ***REMOVED***
 	NodeName string `protobuf:"bytes,3,opt,name=node_name,json=nodeName,proto3" json:"node_name,omitempty"`
 	// Indicates if a leave from this network is in progress.
 	Leaving bool `protobuf:"varint,4,opt,name=leaving,proto3" json:"leaving,omitempty"`
-***REMOVED***
+}
 
-func (m *NetworkEntry) Reset()                    ***REMOVED*** *m = NetworkEntry***REMOVED******REMOVED*** ***REMOVED***
-func (*NetworkEntry) ProtoMessage()               ***REMOVED******REMOVED***
-func (*NetworkEntry) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorNetworkdb, []int***REMOVED***3***REMOVED*** ***REMOVED***
+func (m *NetworkEntry) Reset()                    { *m = NetworkEntry{} }
+func (*NetworkEntry) ProtoMessage()               {}
+func (*NetworkEntry) Descriptor() ([]byte, []int) { return fileDescriptorNetworkdb, []int{3} }
 
-func (m *NetworkEntry) GetNetworkID() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *NetworkEntry) GetNetworkID() string {
+	if m != nil {
 		return m.NetworkID
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *NetworkEntry) GetNodeName() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *NetworkEntry) GetNodeName() string {
+	if m != nil {
 		return m.NodeName
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *NetworkEntry) GetLeaving() bool ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *NetworkEntry) GetLeaving() bool {
+	if m != nil {
 		return m.Leaving
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
 // NetworkPushpull message payload definition.
-type NetworkPushPull struct ***REMOVED***
+type NetworkPushPull struct {
 	// Lamport time when this push pull was initiated.
 	LTime    github_com_hashicorp_serf_serf.LamportTime `protobuf:"varint,1,opt,name=l_time,json=lTime,proto3,customtype=github.com/hashicorp/serf/serf.LamportTime" json:"l_time"`
 	Networks []*NetworkEntry                            `protobuf:"bytes,2,rep,name=networks" json:"networks,omitempty"`
 	// Name of the node sending this push pull payload.
 	NodeName string `protobuf:"bytes,3,opt,name=node_name,json=nodeName,proto3" json:"node_name,omitempty"`
-***REMOVED***
+}
 
-func (m *NetworkPushPull) Reset()                    ***REMOVED*** *m = NetworkPushPull***REMOVED******REMOVED*** ***REMOVED***
-func (*NetworkPushPull) ProtoMessage()               ***REMOVED******REMOVED***
-func (*NetworkPushPull) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorNetworkdb, []int***REMOVED***4***REMOVED*** ***REMOVED***
+func (m *NetworkPushPull) Reset()                    { *m = NetworkPushPull{} }
+func (*NetworkPushPull) ProtoMessage()               {}
+func (*NetworkPushPull) Descriptor() ([]byte, []int) { return fileDescriptorNetworkdb, []int{4} }
 
-func (m *NetworkPushPull) GetNetworks() []*NetworkEntry ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *NetworkPushPull) GetNetworks() []*NetworkEntry {
+	if m != nil {
 		return m.Networks
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *NetworkPushPull) GetNodeName() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *NetworkPushPull) GetNodeName() string {
+	if m != nil {
 		return m.NodeName
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
 // TableEvent message payload definition.
-type TableEvent struct ***REMOVED***
+type TableEvent struct {
 	Type TableEvent_Type `protobuf:"varint,1,opt,name=type,proto3,enum=networkdb.TableEvent_Type" json:"type,omitempty"`
 	// Lamport time when this event was generated.
 	LTime github_com_hashicorp_serf_serf.LamportTime `protobuf:"varint,2,opt,name=l_time,json=lTime,proto3,customtype=github.com/hashicorp/serf/serf.LamportTime" json:"l_time"`
@@ -353,63 +353,63 @@ type TableEvent struct ***REMOVED***
 	Value []byte `protobuf:"bytes,7,opt,name=value,proto3" json:"value,omitempty"`
 	// Residual reap time for the entry before getting deleted in seconds
 	ResidualReapTime int32 `protobuf:"varint,8,opt,name=residual_reap_time,json=residualReapTime,proto3" json:"residual_reap_time,omitempty"`
-***REMOVED***
+}
 
-func (m *TableEvent) Reset()                    ***REMOVED*** *m = TableEvent***REMOVED******REMOVED*** ***REMOVED***
-func (*TableEvent) ProtoMessage()               ***REMOVED******REMOVED***
-func (*TableEvent) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorNetworkdb, []int***REMOVED***5***REMOVED*** ***REMOVED***
+func (m *TableEvent) Reset()                    { *m = TableEvent{} }
+func (*TableEvent) ProtoMessage()               {}
+func (*TableEvent) Descriptor() ([]byte, []int) { return fileDescriptorNetworkdb, []int{5} }
 
-func (m *TableEvent) GetType() TableEvent_Type ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *TableEvent) GetType() TableEvent_Type {
+	if m != nil {
 		return m.Type
-	***REMOVED***
+	}
 	return TableEventTypeInvalid
-***REMOVED***
+}
 
-func (m *TableEvent) GetNodeName() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *TableEvent) GetNodeName() string {
+	if m != nil {
 		return m.NodeName
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *TableEvent) GetNetworkID() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *TableEvent) GetNetworkID() string {
+	if m != nil {
 		return m.NetworkID
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *TableEvent) GetTableName() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *TableEvent) GetTableName() string {
+	if m != nil {
 		return m.TableName
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *TableEvent) GetKey() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *TableEvent) GetKey() string {
+	if m != nil {
 		return m.Key
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *TableEvent) GetValue() []byte ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *TableEvent) GetValue() []byte {
+	if m != nil {
 		return m.Value
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *TableEvent) GetResidualReapTime() int32 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *TableEvent) GetResidualReapTime() int32 {
+	if m != nil {
 		return m.ResidualReapTime
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
 // BulkSync message payload definition.
-type BulkSyncMessage struct ***REMOVED***
+type BulkSyncMessage struct {
 	// Lamport time when this bulk sync was initiated.
 	LTime github_com_hashicorp_serf_serf.LamportTime `protobuf:"varint,1,opt,name=l_time,json=lTime,proto3,customtype=github.com/hashicorp/serf/serf.LamportTime" json:"l_time"`
 	// Indicates if this bulksync is a response to a bulk sync
@@ -422,77 +422,77 @@ type BulkSyncMessage struct ***REMOVED***
 	Networks []string `protobuf:"bytes,4,rep,name=networks" json:"networks,omitempty"`
 	// Bulksync payload
 	Payload []byte `protobuf:"bytes,5,opt,name=payload,proto3" json:"payload,omitempty"`
-***REMOVED***
+}
 
-func (m *BulkSyncMessage) Reset()                    ***REMOVED*** *m = BulkSyncMessage***REMOVED******REMOVED*** ***REMOVED***
-func (*BulkSyncMessage) ProtoMessage()               ***REMOVED******REMOVED***
-func (*BulkSyncMessage) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorNetworkdb, []int***REMOVED***6***REMOVED*** ***REMOVED***
+func (m *BulkSyncMessage) Reset()                    { *m = BulkSyncMessage{} }
+func (*BulkSyncMessage) ProtoMessage()               {}
+func (*BulkSyncMessage) Descriptor() ([]byte, []int) { return fileDescriptorNetworkdb, []int{6} }
 
-func (m *BulkSyncMessage) GetUnsolicited() bool ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *BulkSyncMessage) GetUnsolicited() bool {
+	if m != nil {
 		return m.Unsolicited
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
-func (m *BulkSyncMessage) GetNodeName() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *BulkSyncMessage) GetNodeName() string {
+	if m != nil {
 		return m.NodeName
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *BulkSyncMessage) GetNetworks() []string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *BulkSyncMessage) GetNetworks() []string {
+	if m != nil {
 		return m.Networks
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *BulkSyncMessage) GetPayload() []byte ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *BulkSyncMessage) GetPayload() []byte {
+	if m != nil {
 		return m.Payload
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // Compound message payload definition.
-type CompoundMessage struct ***REMOVED***
+type CompoundMessage struct {
 	// A list of simple messages.
 	Messages []*CompoundMessage_SimpleMessage `protobuf:"bytes,1,rep,name=messages" json:"messages,omitempty"`
-***REMOVED***
+}
 
-func (m *CompoundMessage) Reset()                    ***REMOVED*** *m = CompoundMessage***REMOVED******REMOVED*** ***REMOVED***
-func (*CompoundMessage) ProtoMessage()               ***REMOVED******REMOVED***
-func (*CompoundMessage) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorNetworkdb, []int***REMOVED***7***REMOVED*** ***REMOVED***
+func (m *CompoundMessage) Reset()                    { *m = CompoundMessage{} }
+func (*CompoundMessage) ProtoMessage()               {}
+func (*CompoundMessage) Descriptor() ([]byte, []int) { return fileDescriptorNetworkdb, []int{7} }
 
-func (m *CompoundMessage) GetMessages() []*CompoundMessage_SimpleMessage ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *CompoundMessage) GetMessages() []*CompoundMessage_SimpleMessage {
+	if m != nil {
 		return m.Messages
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-type CompoundMessage_SimpleMessage struct ***REMOVED***
+type CompoundMessage_SimpleMessage struct {
 	// Bytestring payload of a message constructed using
 	// other message type definitions.
 	Payload []byte `protobuf:"bytes,1,opt,name=Payload,proto3" json:"Payload,omitempty"`
-***REMOVED***
+}
 
-func (m *CompoundMessage_SimpleMessage) Reset()      ***REMOVED*** *m = CompoundMessage_SimpleMessage***REMOVED******REMOVED*** ***REMOVED***
-func (*CompoundMessage_SimpleMessage) ProtoMessage() ***REMOVED******REMOVED***
-func (*CompoundMessage_SimpleMessage) Descriptor() ([]byte, []int) ***REMOVED***
-	return fileDescriptorNetworkdb, []int***REMOVED***7, 0***REMOVED***
-***REMOVED***
+func (m *CompoundMessage_SimpleMessage) Reset()      { *m = CompoundMessage_SimpleMessage{} }
+func (*CompoundMessage_SimpleMessage) ProtoMessage() {}
+func (*CompoundMessage_SimpleMessage) Descriptor() ([]byte, []int) {
+	return fileDescriptorNetworkdb, []int{7, 0}
+}
 
-func (m *CompoundMessage_SimpleMessage) GetPayload() []byte ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *CompoundMessage_SimpleMessage) GetPayload() []byte {
+	if m != nil {
 		return m.Payload
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*GossipMessage)(nil), "networkdb.GossipMessage")
 	proto.RegisterType((*NodeEvent)(nil), "networkdb.NodeEvent")
 	proto.RegisterType((*NetworkEvent)(nil), "networkdb.NetworkEvent")
@@ -506,76 +506,76 @@ func init() ***REMOVED***
 	proto.RegisterEnum("networkdb.NodeEvent_Type", NodeEvent_Type_name, NodeEvent_Type_value)
 	proto.RegisterEnum("networkdb.NetworkEvent_Type", NetworkEvent_Type_name, NetworkEvent_Type_value)
 	proto.RegisterEnum("networkdb.TableEvent_Type", TableEvent_Type_name, TableEvent_Type_value)
-***REMOVED***
-func (this *GossipMessage) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *GossipMessage) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 6)
-	s = append(s, "&networkdb.GossipMessage***REMOVED***")
+	s = append(s, "&networkdb.GossipMessage{")
 	s = append(s, "Type: "+fmt.Sprintf("%#v", this.Type)+",\n")
 	s = append(s, "Data: "+fmt.Sprintf("%#v", this.Data)+",\n")
-	s = append(s, "***REMOVED***")
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func (this *NodeEvent) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *NodeEvent) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 7)
-	s = append(s, "&networkdb.NodeEvent***REMOVED***")
+	s = append(s, "&networkdb.NodeEvent{")
 	s = append(s, "Type: "+fmt.Sprintf("%#v", this.Type)+",\n")
 	s = append(s, "LTime: "+fmt.Sprintf("%#v", this.LTime)+",\n")
 	s = append(s, "NodeName: "+fmt.Sprintf("%#v", this.NodeName)+",\n")
-	s = append(s, "***REMOVED***")
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func (this *NetworkEvent) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *NetworkEvent) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 8)
-	s = append(s, "&networkdb.NetworkEvent***REMOVED***")
+	s = append(s, "&networkdb.NetworkEvent{")
 	s = append(s, "Type: "+fmt.Sprintf("%#v", this.Type)+",\n")
 	s = append(s, "LTime: "+fmt.Sprintf("%#v", this.LTime)+",\n")
 	s = append(s, "NodeName: "+fmt.Sprintf("%#v", this.NodeName)+",\n")
 	s = append(s, "NetworkID: "+fmt.Sprintf("%#v", this.NetworkID)+",\n")
-	s = append(s, "***REMOVED***")
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func (this *NetworkEntry) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *NetworkEntry) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 8)
-	s = append(s, "&networkdb.NetworkEntry***REMOVED***")
+	s = append(s, "&networkdb.NetworkEntry{")
 	s = append(s, "NetworkID: "+fmt.Sprintf("%#v", this.NetworkID)+",\n")
 	s = append(s, "LTime: "+fmt.Sprintf("%#v", this.LTime)+",\n")
 	s = append(s, "NodeName: "+fmt.Sprintf("%#v", this.NodeName)+",\n")
 	s = append(s, "Leaving: "+fmt.Sprintf("%#v", this.Leaving)+",\n")
-	s = append(s, "***REMOVED***")
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func (this *NetworkPushPull) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *NetworkPushPull) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 7)
-	s = append(s, "&networkdb.NetworkPushPull***REMOVED***")
+	s = append(s, "&networkdb.NetworkPushPull{")
 	s = append(s, "LTime: "+fmt.Sprintf("%#v", this.LTime)+",\n")
-	if this.Networks != nil ***REMOVED***
+	if this.Networks != nil {
 		s = append(s, "Networks: "+fmt.Sprintf("%#v", this.Networks)+",\n")
-	***REMOVED***
+	}
 	s = append(s, "NodeName: "+fmt.Sprintf("%#v", this.NodeName)+",\n")
-	s = append(s, "***REMOVED***")
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func (this *TableEvent) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *TableEvent) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 12)
-	s = append(s, "&networkdb.TableEvent***REMOVED***")
+	s = append(s, "&networkdb.TableEvent{")
 	s = append(s, "Type: "+fmt.Sprintf("%#v", this.Type)+",\n")
 	s = append(s, "LTime: "+fmt.Sprintf("%#v", this.LTime)+",\n")
 	s = append(s, "NodeName: "+fmt.Sprintf("%#v", this.NodeName)+",\n")
@@ -584,420 +584,420 @@ func (this *TableEvent) GoString() string ***REMOVED***
 	s = append(s, "Key: "+fmt.Sprintf("%#v", this.Key)+",\n")
 	s = append(s, "Value: "+fmt.Sprintf("%#v", this.Value)+",\n")
 	s = append(s, "ResidualReapTime: "+fmt.Sprintf("%#v", this.ResidualReapTime)+",\n")
-	s = append(s, "***REMOVED***")
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func (this *BulkSyncMessage) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *BulkSyncMessage) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 9)
-	s = append(s, "&networkdb.BulkSyncMessage***REMOVED***")
+	s = append(s, "&networkdb.BulkSyncMessage{")
 	s = append(s, "LTime: "+fmt.Sprintf("%#v", this.LTime)+",\n")
 	s = append(s, "Unsolicited: "+fmt.Sprintf("%#v", this.Unsolicited)+",\n")
 	s = append(s, "NodeName: "+fmt.Sprintf("%#v", this.NodeName)+",\n")
 	s = append(s, "Networks: "+fmt.Sprintf("%#v", this.Networks)+",\n")
 	s = append(s, "Payload: "+fmt.Sprintf("%#v", this.Payload)+",\n")
-	s = append(s, "***REMOVED***")
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func (this *CompoundMessage) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *CompoundMessage) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 5)
-	s = append(s, "&networkdb.CompoundMessage***REMOVED***")
-	if this.Messages != nil ***REMOVED***
+	s = append(s, "&networkdb.CompoundMessage{")
+	if this.Messages != nil {
 		s = append(s, "Messages: "+fmt.Sprintf("%#v", this.Messages)+",\n")
-	***REMOVED***
-	s = append(s, "***REMOVED***")
+	}
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func (this *CompoundMessage_SimpleMessage) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *CompoundMessage_SimpleMessage) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 5)
-	s = append(s, "&networkdb.CompoundMessage_SimpleMessage***REMOVED***")
+	s = append(s, "&networkdb.CompoundMessage_SimpleMessage{")
 	s = append(s, "Payload: "+fmt.Sprintf("%#v", this.Payload)+",\n")
-	s = append(s, "***REMOVED***")
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func valueToGoStringNetworkdb(v interface***REMOVED******REMOVED***, typ string) string ***REMOVED***
+}
+func valueToGoStringNetworkdb(v interface{}, typ string) string {
 	rv := reflect.ValueOf(v)
-	if rv.IsNil() ***REMOVED***
+	if rv.IsNil() {
 		return "nil"
-	***REMOVED***
+	}
 	pv := reflect.Indirect(rv).Interface()
-	return fmt.Sprintf("func(v %v) *%v ***REMOVED*** return &v ***REMOVED*** ( %#v )", typ, typ, pv)
-***REMOVED***
-func (m *GossipMessage) Marshal() (dAtA []byte, err error) ***REMOVED***
+	return fmt.Sprintf("func(v %v) *%v { return &v } ( %#v )", typ, typ, pv)
+}
+func (m *GossipMessage) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *GossipMessage) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *GossipMessage) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.Type != 0 ***REMOVED***
+	if m.Type != 0 {
 		dAtA[i] = 0x8
 		i++
 		i = encodeVarintNetworkdb(dAtA, i, uint64(m.Type))
-	***REMOVED***
-	if len(m.Data) > 0 ***REMOVED***
+	}
+	if len(m.Data) > 0 {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintNetworkdb(dAtA, i, uint64(len(m.Data)))
 		i += copy(dAtA[i:], m.Data)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *NodeEvent) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *NodeEvent) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *NodeEvent) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *NodeEvent) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.Type != 0 ***REMOVED***
+	if m.Type != 0 {
 		dAtA[i] = 0x8
 		i++
 		i = encodeVarintNetworkdb(dAtA, i, uint64(m.Type))
-	***REMOVED***
-	if m.LTime != 0 ***REMOVED***
+	}
+	if m.LTime != 0 {
 		dAtA[i] = 0x10
 		i++
 		i = encodeVarintNetworkdb(dAtA, i, uint64(m.LTime))
-	***REMOVED***
-	if len(m.NodeName) > 0 ***REMOVED***
+	}
+	if len(m.NodeName) > 0 {
 		dAtA[i] = 0x1a
 		i++
 		i = encodeVarintNetworkdb(dAtA, i, uint64(len(m.NodeName)))
 		i += copy(dAtA[i:], m.NodeName)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *NetworkEvent) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *NetworkEvent) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *NetworkEvent) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *NetworkEvent) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.Type != 0 ***REMOVED***
+	if m.Type != 0 {
 		dAtA[i] = 0x8
 		i++
 		i = encodeVarintNetworkdb(dAtA, i, uint64(m.Type))
-	***REMOVED***
-	if m.LTime != 0 ***REMOVED***
+	}
+	if m.LTime != 0 {
 		dAtA[i] = 0x10
 		i++
 		i = encodeVarintNetworkdb(dAtA, i, uint64(m.LTime))
-	***REMOVED***
-	if len(m.NodeName) > 0 ***REMOVED***
+	}
+	if len(m.NodeName) > 0 {
 		dAtA[i] = 0x1a
 		i++
 		i = encodeVarintNetworkdb(dAtA, i, uint64(len(m.NodeName)))
 		i += copy(dAtA[i:], m.NodeName)
-	***REMOVED***
-	if len(m.NetworkID) > 0 ***REMOVED***
+	}
+	if len(m.NetworkID) > 0 {
 		dAtA[i] = 0x22
 		i++
 		i = encodeVarintNetworkdb(dAtA, i, uint64(len(m.NetworkID)))
 		i += copy(dAtA[i:], m.NetworkID)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *NetworkEntry) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *NetworkEntry) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *NetworkEntry) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *NetworkEntry) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.NetworkID) > 0 ***REMOVED***
+	if len(m.NetworkID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintNetworkdb(dAtA, i, uint64(len(m.NetworkID)))
 		i += copy(dAtA[i:], m.NetworkID)
-	***REMOVED***
-	if m.LTime != 0 ***REMOVED***
+	}
+	if m.LTime != 0 {
 		dAtA[i] = 0x10
 		i++
 		i = encodeVarintNetworkdb(dAtA, i, uint64(m.LTime))
-	***REMOVED***
-	if len(m.NodeName) > 0 ***REMOVED***
+	}
+	if len(m.NodeName) > 0 {
 		dAtA[i] = 0x1a
 		i++
 		i = encodeVarintNetworkdb(dAtA, i, uint64(len(m.NodeName)))
 		i += copy(dAtA[i:], m.NodeName)
-	***REMOVED***
-	if m.Leaving ***REMOVED***
+	}
+	if m.Leaving {
 		dAtA[i] = 0x20
 		i++
-		if m.Leaving ***REMOVED***
+		if m.Leaving {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *NetworkPushPull) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *NetworkPushPull) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *NetworkPushPull) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *NetworkPushPull) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.LTime != 0 ***REMOVED***
+	if m.LTime != 0 {
 		dAtA[i] = 0x8
 		i++
 		i = encodeVarintNetworkdb(dAtA, i, uint64(m.LTime))
-	***REMOVED***
-	if len(m.Networks) > 0 ***REMOVED***
-		for _, msg := range m.Networks ***REMOVED***
+	}
+	if len(m.Networks) > 0 {
+		for _, msg := range m.Networks {
 			dAtA[i] = 0x12
 			i++
 			i = encodeVarintNetworkdb(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			i += n
-		***REMOVED***
-	***REMOVED***
-	if len(m.NodeName) > 0 ***REMOVED***
+		}
+	}
+	if len(m.NodeName) > 0 {
 		dAtA[i] = 0x1a
 		i++
 		i = encodeVarintNetworkdb(dAtA, i, uint64(len(m.NodeName)))
 		i += copy(dAtA[i:], m.NodeName)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *TableEvent) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *TableEvent) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *TableEvent) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *TableEvent) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.Type != 0 ***REMOVED***
+	if m.Type != 0 {
 		dAtA[i] = 0x8
 		i++
 		i = encodeVarintNetworkdb(dAtA, i, uint64(m.Type))
-	***REMOVED***
-	if m.LTime != 0 ***REMOVED***
+	}
+	if m.LTime != 0 {
 		dAtA[i] = 0x10
 		i++
 		i = encodeVarintNetworkdb(dAtA, i, uint64(m.LTime))
-	***REMOVED***
-	if len(m.NodeName) > 0 ***REMOVED***
+	}
+	if len(m.NodeName) > 0 {
 		dAtA[i] = 0x1a
 		i++
 		i = encodeVarintNetworkdb(dAtA, i, uint64(len(m.NodeName)))
 		i += copy(dAtA[i:], m.NodeName)
-	***REMOVED***
-	if len(m.NetworkID) > 0 ***REMOVED***
+	}
+	if len(m.NetworkID) > 0 {
 		dAtA[i] = 0x22
 		i++
 		i = encodeVarintNetworkdb(dAtA, i, uint64(len(m.NetworkID)))
 		i += copy(dAtA[i:], m.NetworkID)
-	***REMOVED***
-	if len(m.TableName) > 0 ***REMOVED***
+	}
+	if len(m.TableName) > 0 {
 		dAtA[i] = 0x2a
 		i++
 		i = encodeVarintNetworkdb(dAtA, i, uint64(len(m.TableName)))
 		i += copy(dAtA[i:], m.TableName)
-	***REMOVED***
-	if len(m.Key) > 0 ***REMOVED***
+	}
+	if len(m.Key) > 0 {
 		dAtA[i] = 0x32
 		i++
 		i = encodeVarintNetworkdb(dAtA, i, uint64(len(m.Key)))
 		i += copy(dAtA[i:], m.Key)
-	***REMOVED***
-	if len(m.Value) > 0 ***REMOVED***
+	}
+	if len(m.Value) > 0 {
 		dAtA[i] = 0x3a
 		i++
 		i = encodeVarintNetworkdb(dAtA, i, uint64(len(m.Value)))
 		i += copy(dAtA[i:], m.Value)
-	***REMOVED***
-	if m.ResidualReapTime != 0 ***REMOVED***
+	}
+	if m.ResidualReapTime != 0 {
 		dAtA[i] = 0x40
 		i++
 		i = encodeVarintNetworkdb(dAtA, i, uint64(m.ResidualReapTime))
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *BulkSyncMessage) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *BulkSyncMessage) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *BulkSyncMessage) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *BulkSyncMessage) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.LTime != 0 ***REMOVED***
+	if m.LTime != 0 {
 		dAtA[i] = 0x8
 		i++
 		i = encodeVarintNetworkdb(dAtA, i, uint64(m.LTime))
-	***REMOVED***
-	if m.Unsolicited ***REMOVED***
+	}
+	if m.Unsolicited {
 		dAtA[i] = 0x10
 		i++
-		if m.Unsolicited ***REMOVED***
+		if m.Unsolicited {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
-	if len(m.NodeName) > 0 ***REMOVED***
+	}
+	if len(m.NodeName) > 0 {
 		dAtA[i] = 0x1a
 		i++
 		i = encodeVarintNetworkdb(dAtA, i, uint64(len(m.NodeName)))
 		i += copy(dAtA[i:], m.NodeName)
-	***REMOVED***
-	if len(m.Networks) > 0 ***REMOVED***
-		for _, s := range m.Networks ***REMOVED***
+	}
+	if len(m.Networks) > 0 {
+		for _, s := range m.Networks {
 			dAtA[i] = 0x22
 			i++
 			l = len(s)
-			for l >= 1<<7 ***REMOVED***
+			for l >= 1<<7 {
 				dAtA[i] = uint8(uint64(l)&0x7f | 0x80)
 				l >>= 7
 				i++
-			***REMOVED***
+			}
 			dAtA[i] = uint8(l)
 			i++
 			i += copy(dAtA[i:], s)
-		***REMOVED***
-	***REMOVED***
-	if len(m.Payload) > 0 ***REMOVED***
+		}
+	}
+	if len(m.Payload) > 0 {
 		dAtA[i] = 0x2a
 		i++
 		i = encodeVarintNetworkdb(dAtA, i, uint64(len(m.Payload)))
 		i += copy(dAtA[i:], m.Payload)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *CompoundMessage) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *CompoundMessage) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *CompoundMessage) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *CompoundMessage) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Messages) > 0 ***REMOVED***
-		for _, msg := range m.Messages ***REMOVED***
+	if len(m.Messages) > 0 {
+		for _, msg := range m.Messages {
 			dAtA[i] = 0xa
 			i++
 			i = encodeVarintNetworkdb(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			i += n
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *CompoundMessage_SimpleMessage) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *CompoundMessage_SimpleMessage) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *CompoundMessage_SimpleMessage) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *CompoundMessage_SimpleMessage) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Payload) > 0 ***REMOVED***
+	if len(m.Payload) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintNetworkdb(dAtA, i, uint64(len(m.Payload)))
 		i += copy(dAtA[i:], m.Payload)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func encodeFixed64Networkdb(dAtA []byte, offset int, v uint64) int ***REMOVED***
+func encodeFixed64Networkdb(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
 	dAtA[offset+2] = uint8(v >> 16)
@@ -1007,273 +1007,273 @@ func encodeFixed64Networkdb(dAtA []byte, offset int, v uint64) int ***REMOVED***
 	dAtA[offset+6] = uint8(v >> 48)
 	dAtA[offset+7] = uint8(v >> 56)
 	return offset + 8
-***REMOVED***
-func encodeFixed32Networkdb(dAtA []byte, offset int, v uint32) int ***REMOVED***
+}
+func encodeFixed32Networkdb(dAtA []byte, offset int, v uint32) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
 	dAtA[offset+2] = uint8(v >> 16)
 	dAtA[offset+3] = uint8(v >> 24)
 	return offset + 4
-***REMOVED***
-func encodeVarintNetworkdb(dAtA []byte, offset int, v uint64) int ***REMOVED***
-	for v >= 1<<7 ***REMOVED***
+}
+func encodeVarintNetworkdb(dAtA []byte, offset int, v uint64) int {
+	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
-	***REMOVED***
+	}
 	dAtA[offset] = uint8(v)
 	return offset + 1
-***REMOVED***
-func (m *GossipMessage) Size() (n int) ***REMOVED***
+}
+func (m *GossipMessage) Size() (n int) {
 	var l int
 	_ = l
-	if m.Type != 0 ***REMOVED***
+	if m.Type != 0 {
 		n += 1 + sovNetworkdb(uint64(m.Type))
-	***REMOVED***
+	}
 	l = len(m.Data)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovNetworkdb(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *NodeEvent) Size() (n int) ***REMOVED***
+func (m *NodeEvent) Size() (n int) {
 	var l int
 	_ = l
-	if m.Type != 0 ***REMOVED***
+	if m.Type != 0 {
 		n += 1 + sovNetworkdb(uint64(m.Type))
-	***REMOVED***
-	if m.LTime != 0 ***REMOVED***
+	}
+	if m.LTime != 0 {
 		n += 1 + sovNetworkdb(uint64(m.LTime))
-	***REMOVED***
+	}
 	l = len(m.NodeName)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovNetworkdb(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *NetworkEvent) Size() (n int) ***REMOVED***
+func (m *NetworkEvent) Size() (n int) {
 	var l int
 	_ = l
-	if m.Type != 0 ***REMOVED***
+	if m.Type != 0 {
 		n += 1 + sovNetworkdb(uint64(m.Type))
-	***REMOVED***
-	if m.LTime != 0 ***REMOVED***
+	}
+	if m.LTime != 0 {
 		n += 1 + sovNetworkdb(uint64(m.LTime))
-	***REMOVED***
+	}
 	l = len(m.NodeName)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovNetworkdb(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.NetworkID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovNetworkdb(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *NetworkEntry) Size() (n int) ***REMOVED***
+func (m *NetworkEntry) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.NetworkID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovNetworkdb(uint64(l))
-	***REMOVED***
-	if m.LTime != 0 ***REMOVED***
+	}
+	if m.LTime != 0 {
 		n += 1 + sovNetworkdb(uint64(m.LTime))
-	***REMOVED***
+	}
 	l = len(m.NodeName)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovNetworkdb(uint64(l))
-	***REMOVED***
-	if m.Leaving ***REMOVED***
+	}
+	if m.Leaving {
 		n += 2
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *NetworkPushPull) Size() (n int) ***REMOVED***
+func (m *NetworkPushPull) Size() (n int) {
 	var l int
 	_ = l
-	if m.LTime != 0 ***REMOVED***
+	if m.LTime != 0 {
 		n += 1 + sovNetworkdb(uint64(m.LTime))
-	***REMOVED***
-	if len(m.Networks) > 0 ***REMOVED***
-		for _, e := range m.Networks ***REMOVED***
+	}
+	if len(m.Networks) > 0 {
+		for _, e := range m.Networks {
 			l = e.Size()
 			n += 1 + l + sovNetworkdb(uint64(l))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	l = len(m.NodeName)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovNetworkdb(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *TableEvent) Size() (n int) ***REMOVED***
+func (m *TableEvent) Size() (n int) {
 	var l int
 	_ = l
-	if m.Type != 0 ***REMOVED***
+	if m.Type != 0 {
 		n += 1 + sovNetworkdb(uint64(m.Type))
-	***REMOVED***
-	if m.LTime != 0 ***REMOVED***
+	}
+	if m.LTime != 0 {
 		n += 1 + sovNetworkdb(uint64(m.LTime))
-	***REMOVED***
+	}
 	l = len(m.NodeName)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovNetworkdb(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.NetworkID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovNetworkdb(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.TableName)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovNetworkdb(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.Key)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovNetworkdb(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.Value)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovNetworkdb(uint64(l))
-	***REMOVED***
-	if m.ResidualReapTime != 0 ***REMOVED***
+	}
+	if m.ResidualReapTime != 0 {
 		n += 1 + sovNetworkdb(uint64(m.ResidualReapTime))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *BulkSyncMessage) Size() (n int) ***REMOVED***
+func (m *BulkSyncMessage) Size() (n int) {
 	var l int
 	_ = l
-	if m.LTime != 0 ***REMOVED***
+	if m.LTime != 0 {
 		n += 1 + sovNetworkdb(uint64(m.LTime))
-	***REMOVED***
-	if m.Unsolicited ***REMOVED***
+	}
+	if m.Unsolicited {
 		n += 2
-	***REMOVED***
+	}
 	l = len(m.NodeName)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovNetworkdb(uint64(l))
-	***REMOVED***
-	if len(m.Networks) > 0 ***REMOVED***
-		for _, s := range m.Networks ***REMOVED***
+	}
+	if len(m.Networks) > 0 {
+		for _, s := range m.Networks {
 			l = len(s)
 			n += 1 + l + sovNetworkdb(uint64(l))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	l = len(m.Payload)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovNetworkdb(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *CompoundMessage) Size() (n int) ***REMOVED***
+func (m *CompoundMessage) Size() (n int) {
 	var l int
 	_ = l
-	if len(m.Messages) > 0 ***REMOVED***
-		for _, e := range m.Messages ***REMOVED***
+	if len(m.Messages) > 0 {
+		for _, e := range m.Messages {
 			l = e.Size()
 			n += 1 + l + sovNetworkdb(uint64(l))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
+}
 
-func (m *CompoundMessage_SimpleMessage) Size() (n int) ***REMOVED***
+func (m *CompoundMessage_SimpleMessage) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.Payload)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovNetworkdb(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func sovNetworkdb(x uint64) (n int) ***REMOVED***
-	for ***REMOVED***
+func sovNetworkdb(x uint64) (n int) {
+	for {
 		n++
 		x >>= 7
-		if x == 0 ***REMOVED***
+		if x == 0 {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
-func sozNetworkdb(x uint64) (n int) ***REMOVED***
+}
+func sozNetworkdb(x uint64) (n int) {
 	return sovNetworkdb(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-***REMOVED***
-func (this *GossipMessage) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *GossipMessage) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&GossipMessage***REMOVED***`,
+	}
+	s := strings.Join([]string{`&GossipMessage{`,
 		`Type:` + fmt.Sprintf("%v", this.Type) + `,`,
 		`Data:` + fmt.Sprintf("%v", this.Data) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *NodeEvent) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *NodeEvent) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&NodeEvent***REMOVED***`,
+	}
+	s := strings.Join([]string{`&NodeEvent{`,
 		`Type:` + fmt.Sprintf("%v", this.Type) + `,`,
 		`LTime:` + fmt.Sprintf("%v", this.LTime) + `,`,
 		`NodeName:` + fmt.Sprintf("%v", this.NodeName) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *NetworkEvent) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *NetworkEvent) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&NetworkEvent***REMOVED***`,
+	}
+	s := strings.Join([]string{`&NetworkEvent{`,
 		`Type:` + fmt.Sprintf("%v", this.Type) + `,`,
 		`LTime:` + fmt.Sprintf("%v", this.LTime) + `,`,
 		`NodeName:` + fmt.Sprintf("%v", this.NodeName) + `,`,
 		`NetworkID:` + fmt.Sprintf("%v", this.NetworkID) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *NetworkEntry) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *NetworkEntry) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&NetworkEntry***REMOVED***`,
+	}
+	s := strings.Join([]string{`&NetworkEntry{`,
 		`NetworkID:` + fmt.Sprintf("%v", this.NetworkID) + `,`,
 		`LTime:` + fmt.Sprintf("%v", this.LTime) + `,`,
 		`NodeName:` + fmt.Sprintf("%v", this.NodeName) + `,`,
 		`Leaving:` + fmt.Sprintf("%v", this.Leaving) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *NetworkPushPull) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *NetworkPushPull) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&NetworkPushPull***REMOVED***`,
+	}
+	s := strings.Join([]string{`&NetworkPushPull{`,
 		`LTime:` + fmt.Sprintf("%v", this.LTime) + `,`,
 		`Networks:` + strings.Replace(fmt.Sprintf("%v", this.Networks), "NetworkEntry", "NetworkEntry", 1) + `,`,
 		`NodeName:` + fmt.Sprintf("%v", this.NodeName) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *TableEvent) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *TableEvent) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&TableEvent***REMOVED***`,
+	}
+	s := strings.Join([]string{`&TableEvent{`,
 		`Type:` + fmt.Sprintf("%v", this.Type) + `,`,
 		`LTime:` + fmt.Sprintf("%v", this.LTime) + `,`,
 		`NodeName:` + fmt.Sprintf("%v", this.NodeName) + `,`,
@@ -1282,1372 +1282,1372 @@ func (this *TableEvent) String() string ***REMOVED***
 		`Key:` + fmt.Sprintf("%v", this.Key) + `,`,
 		`Value:` + fmt.Sprintf("%v", this.Value) + `,`,
 		`ResidualReapTime:` + fmt.Sprintf("%v", this.ResidualReapTime) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *BulkSyncMessage) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *BulkSyncMessage) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&BulkSyncMessage***REMOVED***`,
+	}
+	s := strings.Join([]string{`&BulkSyncMessage{`,
 		`LTime:` + fmt.Sprintf("%v", this.LTime) + `,`,
 		`Unsolicited:` + fmt.Sprintf("%v", this.Unsolicited) + `,`,
 		`NodeName:` + fmt.Sprintf("%v", this.NodeName) + `,`,
 		`Networks:` + fmt.Sprintf("%v", this.Networks) + `,`,
 		`Payload:` + fmt.Sprintf("%v", this.Payload) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *CompoundMessage) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *CompoundMessage) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&CompoundMessage***REMOVED***`,
+	}
+	s := strings.Join([]string{`&CompoundMessage{`,
 		`Messages:` + strings.Replace(fmt.Sprintf("%v", this.Messages), "CompoundMessage_SimpleMessage", "CompoundMessage_SimpleMessage", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *CompoundMessage_SimpleMessage) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *CompoundMessage_SimpleMessage) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&CompoundMessage_SimpleMessage***REMOVED***`,
+	}
+	s := strings.Join([]string{`&CompoundMessage_SimpleMessage{`,
 		`Payload:` + fmt.Sprintf("%v", this.Payload) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func valueToStringNetworkdb(v interface***REMOVED******REMOVED***) string ***REMOVED***
+}
+func valueToStringNetworkdb(v interface{}) string {
 	rv := reflect.ValueOf(v)
-	if rv.IsNil() ***REMOVED***
+	if rv.IsNil() {
 		return "nil"
-	***REMOVED***
+	}
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
-***REMOVED***
-func (m *GossipMessage) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *GossipMessage) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowNetworkdb
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: GossipMessage: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: GossipMessage: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
-			***REMOVED***
+			}
 			m.Type = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNetworkdb
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Type |= (MessageType(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Data", wireType)
-			***REMOVED***
+			}
 			var byteLen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNetworkdb
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				byteLen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if byteLen < 0 ***REMOVED***
+				}
+			}
+			if byteLen < 0 {
 				return ErrInvalidLengthNetworkdb
-			***REMOVED***
+			}
 			postIndex := iNdEx + byteLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Data = append(m.Data[:0], dAtA[iNdEx:postIndex]...)
-			if m.Data == nil ***REMOVED***
-				m.Data = []byte***REMOVED******REMOVED***
-			***REMOVED***
+			if m.Data == nil {
+				m.Data = []byte{}
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipNetworkdb(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthNetworkdb
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *NodeEvent) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *NodeEvent) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowNetworkdb
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: NodeEvent: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: NodeEvent: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
-			***REMOVED***
+			}
 			m.Type = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNetworkdb
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Type |= (NodeEvent_Type(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 2:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field LTime", wireType)
-			***REMOVED***
+			}
 			m.LTime = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNetworkdb
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.LTime |= (github_com_hashicorp_serf_serf.LamportTime(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field NodeName", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNetworkdb
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthNetworkdb
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.NodeName = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipNetworkdb(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthNetworkdb
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *NetworkEvent) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *NetworkEvent) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowNetworkdb
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: NetworkEvent: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: NetworkEvent: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
-			***REMOVED***
+			}
 			m.Type = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNetworkdb
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Type |= (NetworkEvent_Type(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 2:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field LTime", wireType)
-			***REMOVED***
+			}
 			m.LTime = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNetworkdb
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.LTime |= (github_com_hashicorp_serf_serf.LamportTime(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field NodeName", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNetworkdb
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthNetworkdb
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.NodeName = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 4:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field NetworkID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNetworkdb
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthNetworkdb
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.NetworkID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipNetworkdb(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthNetworkdb
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *NetworkEntry) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *NetworkEntry) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowNetworkdb
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: NetworkEntry: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: NetworkEntry: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field NetworkID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNetworkdb
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthNetworkdb
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.NetworkID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field LTime", wireType)
-			***REMOVED***
+			}
 			m.LTime = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNetworkdb
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.LTime |= (github_com_hashicorp_serf_serf.LamportTime(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field NodeName", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNetworkdb
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthNetworkdb
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.NodeName = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 4:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Leaving", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNetworkdb
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			m.Leaving = bool(v != 0)
 		default:
 			iNdEx = preIndex
 			skippy, err := skipNetworkdb(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthNetworkdb
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *NetworkPushPull) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *NetworkPushPull) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowNetworkdb
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: NetworkPushPull: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: NetworkPushPull: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field LTime", wireType)
-			***REMOVED***
+			}
 			m.LTime = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNetworkdb
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.LTime |= (github_com_hashicorp_serf_serf.LamportTime(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Networks", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNetworkdb
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthNetworkdb
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.Networks = append(m.Networks, &NetworkEntry***REMOVED******REMOVED***)
-			if err := m.Networks[len(m.Networks)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			m.Networks = append(m.Networks, &NetworkEntry{})
+			if err := m.Networks[len(m.Networks)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field NodeName", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNetworkdb
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthNetworkdb
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.NodeName = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipNetworkdb(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthNetworkdb
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *TableEvent) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *TableEvent) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowNetworkdb
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: TableEvent: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: TableEvent: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
-			***REMOVED***
+			}
 			m.Type = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNetworkdb
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Type |= (TableEvent_Type(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 2:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field LTime", wireType)
-			***REMOVED***
+			}
 			m.LTime = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNetworkdb
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.LTime |= (github_com_hashicorp_serf_serf.LamportTime(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field NodeName", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNetworkdb
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthNetworkdb
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.NodeName = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 4:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field NetworkID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNetworkdb
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthNetworkdb
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.NetworkID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 5:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field TableName", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNetworkdb
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthNetworkdb
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.TableName = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 6:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Key", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNetworkdb
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthNetworkdb
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Key = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 7:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Value", wireType)
-			***REMOVED***
+			}
 			var byteLen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNetworkdb
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				byteLen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if byteLen < 0 ***REMOVED***
+				}
+			}
+			if byteLen < 0 {
 				return ErrInvalidLengthNetworkdb
-			***REMOVED***
+			}
 			postIndex := iNdEx + byteLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Value = append(m.Value[:0], dAtA[iNdEx:postIndex]...)
-			if m.Value == nil ***REMOVED***
-				m.Value = []byte***REMOVED******REMOVED***
-			***REMOVED***
+			if m.Value == nil {
+				m.Value = []byte{}
+			}
 			iNdEx = postIndex
 		case 8:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ResidualReapTime", wireType)
-			***REMOVED***
+			}
 			m.ResidualReapTime = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNetworkdb
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.ResidualReapTime |= (int32(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipNetworkdb(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthNetworkdb
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *BulkSyncMessage) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *BulkSyncMessage) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowNetworkdb
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: BulkSyncMessage: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: BulkSyncMessage: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field LTime", wireType)
-			***REMOVED***
+			}
 			m.LTime = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNetworkdb
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.LTime |= (github_com_hashicorp_serf_serf.LamportTime(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 2:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Unsolicited", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNetworkdb
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			m.Unsolicited = bool(v != 0)
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field NodeName", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNetworkdb
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthNetworkdb
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.NodeName = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 4:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Networks", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNetworkdb
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthNetworkdb
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Networks = append(m.Networks, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		case 5:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Payload", wireType)
-			***REMOVED***
+			}
 			var byteLen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNetworkdb
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				byteLen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if byteLen < 0 ***REMOVED***
+				}
+			}
+			if byteLen < 0 {
 				return ErrInvalidLengthNetworkdb
-			***REMOVED***
+			}
 			postIndex := iNdEx + byteLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Payload = append(m.Payload[:0], dAtA[iNdEx:postIndex]...)
-			if m.Payload == nil ***REMOVED***
-				m.Payload = []byte***REMOVED******REMOVED***
-			***REMOVED***
+			if m.Payload == nil {
+				m.Payload = []byte{}
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipNetworkdb(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthNetworkdb
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *CompoundMessage) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *CompoundMessage) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowNetworkdb
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: CompoundMessage: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: CompoundMessage: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Messages", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNetworkdb
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthNetworkdb
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.Messages = append(m.Messages, &CompoundMessage_SimpleMessage***REMOVED******REMOVED***)
-			if err := m.Messages[len(m.Messages)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			m.Messages = append(m.Messages, &CompoundMessage_SimpleMessage{})
+			if err := m.Messages[len(m.Messages)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipNetworkdb(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthNetworkdb
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *CompoundMessage_SimpleMessage) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *CompoundMessage_SimpleMessage) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowNetworkdb
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: SimpleMessage: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: SimpleMessage: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Payload", wireType)
-			***REMOVED***
+			}
 			var byteLen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowNetworkdb
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				byteLen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if byteLen < 0 ***REMOVED***
+				}
+			}
+			if byteLen < 0 {
 				return ErrInvalidLengthNetworkdb
-			***REMOVED***
+			}
 			postIndex := iNdEx + byteLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Payload = append(m.Payload[:0], dAtA[iNdEx:postIndex]...)
-			if m.Payload == nil ***REMOVED***
-				m.Payload = []byte***REMOVED******REMOVED***
-			***REMOVED***
+			if m.Payload == nil {
+				m.Payload = []byte{}
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipNetworkdb(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthNetworkdb
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func skipNetworkdb(dAtA []byte) (n int, err error) ***REMOVED***
+}
+func skipNetworkdb(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return 0, ErrIntOverflowNetworkdb
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return 0, io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		wireType := int(wire & 0x7)
-		switch wireType ***REMOVED***
+		switch wireType {
 		case 0:
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowNetworkdb
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				iNdEx++
-				if dAtA[iNdEx-1] < 0x80 ***REMOVED***
+				if dAtA[iNdEx-1] < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return iNdEx, nil
 		case 1:
 			iNdEx += 8
 			return iNdEx, nil
 		case 2:
 			var length int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowNetworkdb
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				length |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			iNdEx += length
-			if length < 0 ***REMOVED***
+			if length < 0 {
 				return 0, ErrInvalidLengthNetworkdb
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 3:
-			for ***REMOVED***
+			for {
 				var innerWire uint64
 				var start int = iNdEx
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return 0, ErrIntOverflowNetworkdb
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return 0, io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					innerWire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				innerWireType := int(innerWire & 0x7)
-				if innerWireType == 4 ***REMOVED***
+				if innerWireType == 4 {
 					break
-				***REMOVED***
+				}
 				next, err := skipNetworkdb(dAtA[start:])
-				if err != nil ***REMOVED***
+				if err != nil {
 					return 0, err
-				***REMOVED***
+				}
 				iNdEx = start + next
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 4:
 			return iNdEx, nil
@@ -2656,19 +2656,19 @@ func skipNetworkdb(dAtA []byte) (n int, err error) ***REMOVED***
 			return iNdEx, nil
 		default:
 			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	panic("unreachable")
-***REMOVED***
+}
 
 var (
 	ErrInvalidLengthNetworkdb = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowNetworkdb   = fmt.Errorf("proto: integer overflow")
 )
 
-func init() ***REMOVED*** proto.RegisterFile("networkdb.proto", fileDescriptorNetworkdb) ***REMOVED***
+func init() { proto.RegisterFile("networkdb.proto", fileDescriptorNetworkdb) }
 
-var fileDescriptorNetworkdb = []byte***REMOVED***
+var fileDescriptorNetworkdb = []byte{
 	// 953 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x96, 0xcd, 0x6e, 0xe3, 0x54,
 	0x14, 0xc7, 0x7b, 0xf3, 0xd5, 0xe4, 0x34, 0xa5, 0xe6, 0x4e, 0x67, 0xc6, 0xe3, 0x81, 0xc4, 0x98,
@@ -2730,4 +2730,4 @@ var fileDescriptorNetworkdb = []byte***REMOVED***
 	0x7e, 0x5d, 0xda, 0xfa, 0xeb, 0xba, 0x84, 0xbe, 0x59, 0x94, 0xd0, 0xeb, 0x45, 0x09, 0xfd, 0xba,
 	0x28, 0xa1, 0x3f, 0x17, 0x25, 0x74, 0x9e, 0x63, 0x7f, 0x9d, 0x9e, 0xfe, 0x1d, 0x00, 0x00, 0xff,
 	0xff, 0x92, 0x82, 0xdb, 0x1a, 0x6e, 0x09, 0x00, 0x00,
-***REMOVED***
+}

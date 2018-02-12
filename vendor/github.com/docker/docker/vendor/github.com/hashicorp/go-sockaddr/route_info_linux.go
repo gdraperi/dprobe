@@ -5,33 +5,33 @@ import (
 	"os/exec"
 )
 
-var cmds map[string][]string = map[string][]string***REMOVED***
-	"ip": ***REMOVED***"/sbin/ip", "route"***REMOVED***,
-***REMOVED***
+var cmds map[string][]string = map[string][]string{
+	"ip": {"/sbin/ip", "route"},
+}
 
-type routeInfo struct ***REMOVED***
+type routeInfo struct {
 	cmds map[string][]string
-***REMOVED***
+}
 
 // NewRouteInfo returns a Linux-specific implementation of the RouteInfo
 // interface.
-func NewRouteInfo() (routeInfo, error) ***REMOVED***
-	return routeInfo***REMOVED***
+func NewRouteInfo() (routeInfo, error) {
+	return routeInfo{
 		cmds: cmds,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // GetDefaultInterfaceName returns the interface name attached to the default
 // route on the default interface.
-func (ri routeInfo) GetDefaultInterfaceName() (string, error) ***REMOVED***
+func (ri routeInfo) GetDefaultInterfaceName() (string, error) {
 	out, err := exec.Command(cmds["ip"][0], cmds["ip"][1:]...).Output()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 
 	var ifName string
-	if ifName, err = parseDefaultIfNameFromIPCmd(string(out)); err != nil ***REMOVED***
+	if ifName, err = parseDefaultIfNameFromIPCmd(string(out)); err != nil {
 		return "", errors.New("No default interface found")
-	***REMOVED***
+	}
 	return ifName, nil
-***REMOVED***
+}

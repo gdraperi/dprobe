@@ -45,145 +45,145 @@ import (
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //-------------------------------------------------------------------------
 
-type gc_parser struct ***REMOVED***
+type gc_parser struct {
 	scanner      scanner.Scanner
 	tok          rune
 	lit          string
 	path_to_name map[string]string
 	beautify     bool
 	pfc          *package_file_cache
-***REMOVED***
+}
 
-func (p *gc_parser) init(data []byte, pfc *package_file_cache) ***REMOVED***
+func (p *gc_parser) init(data []byte, pfc *package_file_cache) {
 	p.scanner.Init(bytes.NewReader(data))
-	p.scanner.Error = func(_ *scanner.Scanner, msg string) ***REMOVED*** p.error(msg) ***REMOVED***
+	p.scanner.Error = func(_ *scanner.Scanner, msg string) { p.error(msg) }
 	p.scanner.Mode = scanner.ScanIdents | scanner.ScanInts | scanner.ScanStrings |
 		scanner.ScanComments | scanner.ScanChars | scanner.SkipComments
 	p.scanner.Whitespace = 1<<'\t' | 1<<' ' | 1<<'\r' | 1<<'\v' | 1<<'\f'
 	p.scanner.Filename = "package.go"
 	p.next()
 	// and the built-in "unsafe" package to the path_to_name map
-	p.path_to_name = map[string]string***REMOVED***"unsafe": "unsafe"***REMOVED***
+	p.path_to_name = map[string]string{"unsafe": "unsafe"}
 	p.pfc = pfc
-***REMOVED***
+}
 
-func (p *gc_parser) next() ***REMOVED***
+func (p *gc_parser) next() {
 	p.tok = p.scanner.Scan()
-	switch p.tok ***REMOVED***
+	switch p.tok {
 	case scanner.Ident, scanner.Int, scanner.String:
 		p.lit = p.scanner.TokenText()
 	default:
 		p.lit = ""
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (p *gc_parser) error(msg string) ***REMOVED***
+func (p *gc_parser) error(msg string) {
 	panic(errors.New(msg))
-***REMOVED***
+}
 
-func (p *gc_parser) errorf(format string, args ...interface***REMOVED******REMOVED***) ***REMOVED***
+func (p *gc_parser) errorf(format string, args ...interface{}) {
 	p.error(fmt.Sprintf(format, args...))
-***REMOVED***
+}
 
-func (p *gc_parser) expect(tok rune) string ***REMOVED***
+func (p *gc_parser) expect(tok rune) string {
 	lit := p.lit
-	if p.tok != tok ***REMOVED***
+	if p.tok != tok {
 		p.errorf("expected %s, got %s (%q)", scanner.TokenString(tok),
 			scanner.TokenString(p.tok), lit)
-	***REMOVED***
+	}
 	p.next()
 	return lit
-***REMOVED***
+}
 
-func (p *gc_parser) expect_keyword(keyword string) ***REMOVED***
+func (p *gc_parser) expect_keyword(keyword string) {
 	lit := p.expect(scanner.Ident)
-	if lit != keyword ***REMOVED***
+	if lit != keyword {
 		p.errorf("expected keyword: %s, got: %q", keyword, lit)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (p *gc_parser) expect_special(what string) ***REMOVED***
+func (p *gc_parser) expect_special(what string) {
 	i := 0
-	for i < len(what) ***REMOVED***
-		if p.tok != rune(what[i]) ***REMOVED***
+	for i < len(what) {
+		if p.tok != rune(what[i]) {
 			break
-		***REMOVED***
+		}
 
 		nc := p.scanner.Peek()
-		if i != len(what)-1 && nc <= ' ' ***REMOVED***
+		if i != len(what)-1 && nc <= ' ' {
 			break
-		***REMOVED***
+		}
 
 		p.next()
 		i++
-	***REMOVED***
+	}
 
-	if i < len(what) ***REMOVED***
+	if i < len(what) {
 		p.errorf("expected: %q, got: %q", what, what[0:i])
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-// dotIdentifier = "?" | ( ident | '·' ) ***REMOVED*** ident | int | '·' ***REMOVED*** .
+// dotIdentifier = "?" | ( ident | '·' ) { ident | int | '·' } .
 // we're doing lexer job here, kind of
-func (p *gc_parser) parse_dot_ident() string ***REMOVED***
-	if p.tok == '?' ***REMOVED***
+func (p *gc_parser) parse_dot_ident() string {
+	if p.tok == '?' {
 		p.next()
 		return "?"
-	***REMOVED***
+	}
 
 	ident := ""
 	sep := 'x'
 	i, j := 0, -1
-	for (p.tok == scanner.Ident || p.tok == scanner.Int || p.tok == '·') && sep > ' ' ***REMOVED***
+	for (p.tok == scanner.Ident || p.tok == scanner.Int || p.tok == '·') && sep > ' ' {
 		ident += p.lit
-		if p.tok == '·' ***REMOVED***
+		if p.tok == '·' {
 			ident += "·"
 			j = i
 			i++
-		***REMOVED***
+		}
 		i += len(p.lit)
 		sep = p.scanner.Peek()
 		p.next()
-	***REMOVED***
+	}
 	// middot = \xc2\xb7
-	if j != -1 && i > j+1 ***REMOVED***
+	if j != -1 && i > j+1 {
 		c := ident[j+2]
-		if c >= '0' && c <= '9' ***REMOVED***
+		if c >= '0' && c <= '9' {
 			ident = ident[0:j]
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return ident
-***REMOVED***
+}
 
 // ImportPath = string_lit .
 // quoted name of the path, but we return it as an identifier, taking an alias
 // from 'pathToAlias' map, it is filled by import statements
-func (p *gc_parser) parse_package() *ast.Ident ***REMOVED***
+func (p *gc_parser) parse_package() *ast.Ident {
 	path, err := strconv.Unquote(p.expect(scanner.String))
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 
 	return ast.NewIdent(path)
-***REMOVED***
+}
 
 // ExportedName = "@" ImportPath "." dotIdentifier .
-func (p *gc_parser) parse_exported_name() *ast.SelectorExpr ***REMOVED***
+func (p *gc_parser) parse_exported_name() *ast.SelectorExpr {
 	p.expect('@')
 	pkg := p.parse_package()
-	if pkg.Name == "" ***REMOVED***
+	if pkg.Name == "" {
 		pkg.Name = "!" + p.pfc.name + "!" + p.pfc.defalias
-	***REMOVED*** else ***REMOVED***
+	} else {
 		pkg.Name = p.path_to_name[pkg.Name]
-	***REMOVED***
+	}
 	p.expect('.')
 	name := ast.NewIdent(p.parse_dot_ident())
-	return &ast.SelectorExpr***REMOVED***X: pkg, Sel: name***REMOVED***
-***REMOVED***
+	return &ast.SelectorExpr{X: pkg, Sel: name}
+}
 
 // Name = identifier | "?" | ExportedName .
-func (p *gc_parser) parse_name() (string, ast.Expr) ***REMOVED***
-	switch p.tok ***REMOVED***
+func (p *gc_parser) parse_name() (string, ast.Expr) {
+	switch p.tok {
 	case scanner.Ident:
 		name := p.lit
 		p.next()
@@ -194,226 +194,226 @@ func (p *gc_parser) parse_name() (string, ast.Expr) ***REMOVED***
 	case '@':
 		en := p.parse_exported_name()
 		return en.Sel.Name, en
-	***REMOVED***
+	}
 	p.error("name expected")
 	return "", nil
-***REMOVED***
+}
 
 // Field = Name Type [ string_lit ] .
-func (p *gc_parser) parse_field() *ast.Field ***REMOVED***
+func (p *gc_parser) parse_field() *ast.Field {
 	var tag string
 	name, _ := p.parse_name()
 	typ := p.parse_type()
-	if p.tok == scanner.String ***REMOVED***
+	if p.tok == scanner.String {
 		tag = p.expect(scanner.String)
-	***REMOVED***
+	}
 
 	var names []*ast.Ident
-	if name != "?" ***REMOVED***
-		names = []*ast.Ident***REMOVED***ast.NewIdent(name)***REMOVED***
-	***REMOVED***
+	if name != "?" {
+		names = []*ast.Ident{ast.NewIdent(name)}
+	}
 
-	return &ast.Field***REMOVED***
+	return &ast.Field{
 		Names: names,
 		Type:  typ,
-		Tag:   &ast.BasicLit***REMOVED***Kind: token.STRING, Value: tag***REMOVED***,
-	***REMOVED***
-***REMOVED***
+		Tag:   &ast.BasicLit{Kind: token.STRING, Value: tag},
+	}
+}
 
 // Parameter = ( identifier | "?" ) [ "..." ] Type [ string_lit ] .
-func (p *gc_parser) parse_parameter() *ast.Field ***REMOVED***
+func (p *gc_parser) parse_parameter() *ast.Field {
 	// name
 	name, _ := p.parse_name()
 
 	// type
 	var typ ast.Expr
-	if p.tok == '.' ***REMOVED***
+	if p.tok == '.' {
 		p.expect_special("...")
-		typ = &ast.Ellipsis***REMOVED***Elt: p.parse_type()***REMOVED***
-	***REMOVED*** else ***REMOVED***
+		typ = &ast.Ellipsis{Elt: p.parse_type()}
+	} else {
 		typ = p.parse_type()
-	***REMOVED***
+	}
 
 	var tag string
-	if p.tok == scanner.String ***REMOVED***
+	if p.tok == scanner.String {
 		tag = p.expect(scanner.String)
-	***REMOVED***
+	}
 
-	return &ast.Field***REMOVED***
-		Names: []*ast.Ident***REMOVED***ast.NewIdent(name)***REMOVED***,
+	return &ast.Field{
+		Names: []*ast.Ident{ast.NewIdent(name)},
 		Type:  typ,
-		Tag:   &ast.BasicLit***REMOVED***Kind: token.STRING, Value: tag***REMOVED***,
-	***REMOVED***
-***REMOVED***
+		Tag:   &ast.BasicLit{Kind: token.STRING, Value: tag},
+	}
+}
 
 // Parameters = "(" [ ParameterList ] ")" .
-// ParameterList = ***REMOVED*** Parameter "," ***REMOVED*** Parameter .
-func (p *gc_parser) parse_parameters() *ast.FieldList ***REMOVED***
-	flds := []*ast.Field***REMOVED******REMOVED***
-	parse_parameter := func() ***REMOVED***
+// ParameterList = { Parameter "," } Parameter .
+func (p *gc_parser) parse_parameters() *ast.FieldList {
+	flds := []*ast.Field{}
+	parse_parameter := func() {
 		par := p.parse_parameter()
 		flds = append(flds, par)
-	***REMOVED***
+	}
 
 	p.expect('(')
-	if p.tok != ')' ***REMOVED***
+	if p.tok != ')' {
 		parse_parameter()
-		for p.tok == ',' ***REMOVED***
+		for p.tok == ',' {
 			p.next()
 			parse_parameter()
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	p.expect(')')
-	return &ast.FieldList***REMOVED***List: flds***REMOVED***
-***REMOVED***
+	return &ast.FieldList{List: flds}
+}
 
 // Signature = Parameters [ Result ] .
 // Result = Type | Parameters .
-func (p *gc_parser) parse_signature() *ast.FuncType ***REMOVED***
+func (p *gc_parser) parse_signature() *ast.FuncType {
 	var params *ast.FieldList
 	var results *ast.FieldList
 
 	params = p.parse_parameters()
-	switch p.tok ***REMOVED***
+	switch p.tok {
 	case scanner.Ident, '[', '*', '<', '@':
-		fld := &ast.Field***REMOVED***Type: p.parse_type()***REMOVED***
-		results = &ast.FieldList***REMOVED***List: []*ast.Field***REMOVED***fld***REMOVED******REMOVED***
+		fld := &ast.Field{Type: p.parse_type()}
+		results = &ast.FieldList{List: []*ast.Field{fld}}
 	case '(':
 		results = p.parse_parameters()
-	***REMOVED***
-	return &ast.FuncType***REMOVED***Params: params, Results: results***REMOVED***
-***REMOVED***
+	}
+	return &ast.FuncType{Params: params, Results: results}
+}
 
 // MethodOrEmbedSpec = Name [ Signature ] .
-func (p *gc_parser) parse_method_or_embed_spec() *ast.Field ***REMOVED***
+func (p *gc_parser) parse_method_or_embed_spec() *ast.Field {
 	name, nameexpr := p.parse_name()
-	if p.tok == '(' ***REMOVED***
+	if p.tok == '(' {
 		typ := p.parse_signature()
-		return &ast.Field***REMOVED***
-			Names: []*ast.Ident***REMOVED***ast.NewIdent(name)***REMOVED***,
+		return &ast.Field{
+			Names: []*ast.Ident{ast.NewIdent(name)},
 			Type:  typ,
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	return &ast.Field***REMOVED***
+	return &ast.Field{
 		Type: nameexpr,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-// int_lit = [ "-" | "+" ] ***REMOVED*** "0" ... "9" ***REMOVED*** .
-func (p *gc_parser) parse_int() ***REMOVED***
-	switch p.tok ***REMOVED***
+// int_lit = [ "-" | "+" ] { "0" ... "9" } .
+func (p *gc_parser) parse_int() {
+	switch p.tok {
 	case '-', '+':
 		p.next()
-	***REMOVED***
+	}
 	p.expect(scanner.Int)
-***REMOVED***
+}
 
 // number = int_lit [ "p" int_lit ] .
-func (p *gc_parser) parse_number() ***REMOVED***
+func (p *gc_parser) parse_number() {
 	p.parse_int()
-	if p.lit == "p" ***REMOVED***
+	if p.lit == "p" {
 		p.next()
 		p.parse_int()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 //-------------------------------------------------------------------------------
 // gc_parser.types
 //-------------------------------------------------------------------------------
 
-// InterfaceType = "interface" "***REMOVED***" [ MethodOrEmbedList ] "***REMOVED***" .
-// MethodOrEmbedList = MethodOrEmbedSpec ***REMOVED*** ";" MethodOrEmbedSpec ***REMOVED*** .
-func (p *gc_parser) parse_interface_type() ast.Expr ***REMOVED***
+// InterfaceType = "interface" "{" [ MethodOrEmbedList ] "}" .
+// MethodOrEmbedList = MethodOrEmbedSpec { ";" MethodOrEmbedSpec } .
+func (p *gc_parser) parse_interface_type() ast.Expr {
 	var methods []*ast.Field
-	parse_method := func() ***REMOVED***
+	parse_method := func() {
 		meth := p.parse_method_or_embed_spec()
 		methods = append(methods, meth)
-	***REMOVED***
+	}
 
 	p.expect_keyword("interface")
-	p.expect('***REMOVED***')
-	if p.tok != '***REMOVED***' ***REMOVED***
+	p.expect('{')
+	if p.tok != '}' {
 		parse_method()
-		for p.tok == ';' ***REMOVED***
+		for p.tok == ';' {
 			p.next()
 			parse_method()
-		***REMOVED***
-	***REMOVED***
-	p.expect('***REMOVED***')
-	return &ast.InterfaceType***REMOVED***Methods: &ast.FieldList***REMOVED***List: methods***REMOVED******REMOVED***
-***REMOVED***
+		}
+	}
+	p.expect('}')
+	return &ast.InterfaceType{Methods: &ast.FieldList{List: methods}}
+}
 
-// StructType = "struct" "***REMOVED***" [ FieldList ] "***REMOVED***" .
-// FieldList = Field ***REMOVED*** ";" Field ***REMOVED*** .
-func (p *gc_parser) parse_struct_type() ast.Expr ***REMOVED***
+// StructType = "struct" "{" [ FieldList ] "}" .
+// FieldList = Field { ";" Field } .
+func (p *gc_parser) parse_struct_type() ast.Expr {
 	var fields []*ast.Field
-	parse_field := func() ***REMOVED***
+	parse_field := func() {
 		fld := p.parse_field()
 		fields = append(fields, fld)
-	***REMOVED***
+	}
 
 	p.expect_keyword("struct")
-	p.expect('***REMOVED***')
-	if p.tok != '***REMOVED***' ***REMOVED***
+	p.expect('{')
+	if p.tok != '}' {
 		parse_field()
-		for p.tok == ';' ***REMOVED***
+		for p.tok == ';' {
 			p.next()
 			parse_field()
-		***REMOVED***
-	***REMOVED***
-	p.expect('***REMOVED***')
-	return &ast.StructType***REMOVED***Fields: &ast.FieldList***REMOVED***List: fields***REMOVED******REMOVED***
-***REMOVED***
+		}
+	}
+	p.expect('}')
+	return &ast.StructType{Fields: &ast.FieldList{List: fields}}
+}
 
 // MapType = "map" "[" Type "]" Type .
-func (p *gc_parser) parse_map_type() ast.Expr ***REMOVED***
+func (p *gc_parser) parse_map_type() ast.Expr {
 	p.expect_keyword("map")
 	p.expect('[')
 	key := p.parse_type()
 	p.expect(']')
 	elt := p.parse_type()
-	return &ast.MapType***REMOVED***Key: key, Value: elt***REMOVED***
-***REMOVED***
+	return &ast.MapType{Key: key, Value: elt}
+}
 
 // ChanType = ( "chan" [ "<-" ] | "<-" "chan" ) Type .
-func (p *gc_parser) parse_chan_type() ast.Expr ***REMOVED***
+func (p *gc_parser) parse_chan_type() ast.Expr {
 	dir := ast.SEND | ast.RECV
-	if p.tok == scanner.Ident ***REMOVED***
+	if p.tok == scanner.Ident {
 		p.expect_keyword("chan")
-		if p.tok == '<' ***REMOVED***
+		if p.tok == '<' {
 			p.expect_special("<-")
 			dir = ast.SEND
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
+		}
+	} else {
 		p.expect_special("<-")
 		p.expect_keyword("chan")
 		dir = ast.RECV
-	***REMOVED***
+	}
 
 	elt := p.parse_type()
-	return &ast.ChanType***REMOVED***Dir: dir, Value: elt***REMOVED***
-***REMOVED***
+	return &ast.ChanType{Dir: dir, Value: elt}
+}
 
 // ArrayOrSliceType = ArrayType | SliceType .
 // ArrayType = "[" int_lit "]" Type .
 // SliceType = "[" "]" Type .
-func (p *gc_parser) parse_array_or_slice_type() ast.Expr ***REMOVED***
+func (p *gc_parser) parse_array_or_slice_type() ast.Expr {
 	p.expect('[')
-	if p.tok == ']' ***REMOVED***
+	if p.tok == ']' {
 		// SliceType
 		p.next() // skip ']'
-		return &ast.ArrayType***REMOVED***Len: nil, Elt: p.parse_type()***REMOVED***
-	***REMOVED***
+		return &ast.ArrayType{Len: nil, Elt: p.parse_type()}
+	}
 
 	// ArrayType
 	lit := p.expect(scanner.Int)
 	p.expect(']')
-	return &ast.ArrayType***REMOVED***
-		Len: &ast.BasicLit***REMOVED***Kind: token.INT, Value: lit***REMOVED***,
+	return &ast.ArrayType{
+		Len: &ast.BasicLit{Kind: token.INT, Value: lit},
 		Elt: p.parse_type(),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Type =
 //	BasicType | TypeName | ArrayType | SliceType | StructType |
@@ -424,10 +424,10 @@ func (p *gc_parser) parse_array_or_slice_type() ast.Expr ***REMOVED***
 // SliceType = "[" "]" Type .
 // PointerType = "*" Type .
 // FuncType = "func" Signature .
-func (p *gc_parser) parse_type() ast.Expr ***REMOVED***
-	switch p.tok ***REMOVED***
+func (p *gc_parser) parse_type() ast.Expr {
+	switch p.tok {
 	case scanner.Ident:
-		switch p.lit ***REMOVED***
+		switch p.lit {
 		case "struct":
 			return p.parse_struct_type()
 		case "func":
@@ -443,14 +443,14 @@ func (p *gc_parser) parse_type() ast.Expr ***REMOVED***
 			lit := p.lit
 			p.next()
 			return ast.NewIdent(lit)
-		***REMOVED***
+		}
 	case '@':
 		return p.parse_exported_name()
 	case '[':
 		return p.parse_array_or_slice_type()
 	case '*':
 		p.next()
-		return &ast.StarExpr***REMOVED***X: p.parse_type()***REMOVED***
+		return &ast.StarExpr{X: p.parse_type()}
 	case '<':
 		return p.parse_chan_type()
 	case '(':
@@ -458,45 +458,45 @@ func (p *gc_parser) parse_type() ast.Expr ***REMOVED***
 		typ := p.parse_type()
 		p.expect(')')
 		return typ
-	***REMOVED***
+	}
 	p.errorf("unexpected token: %s", scanner.TokenString(p.tok))
 	return nil
-***REMOVED***
+}
 
 //-------------------------------------------------------------------------------
 // gc_parser.declarations
 //-------------------------------------------------------------------------------
 
 // ImportDecl = "import" identifier string_lit .
-func (p *gc_parser) parse_import_decl() ***REMOVED***
+func (p *gc_parser) parse_import_decl() {
 	p.expect_keyword("import")
 	alias := p.expect(scanner.Ident)
 	path := p.parse_package()
 	fullName := "!" + path.Name + "!" + alias
 	p.path_to_name[path.Name] = fullName
 	p.pfc.add_package_to_scope(fullName, path.Name)
-***REMOVED***
+}
 
 // ConstDecl   = "const" ExportedName [ Type ] "=" Literal .
 // Literal     = bool_lit | int_lit | float_lit | complex_lit | string_lit .
 // bool_lit    = "true" | "false" .
 // complex_lit = "(" float_lit "+" float_lit ")" .
 // rune_lit    = "(" int_lit "+" int_lit ")" .
-// string_lit  = `"` ***REMOVED*** unicode_char ***REMOVED*** `"` .
-func (p *gc_parser) parse_const_decl() (string, *ast.GenDecl) ***REMOVED***
+// string_lit  = `"` { unicode_char } `"` .
+func (p *gc_parser) parse_const_decl() (string, *ast.GenDecl) {
 	// TODO: do we really need actual const value? gocode doesn't use this
 	p.expect_keyword("const")
 	name := p.parse_exported_name()
 
 	var typ ast.Expr
-	if p.tok != '=' ***REMOVED***
+	if p.tok != '=' {
 		typ = p.parse_type()
-	***REMOVED***
+	}
 
 	p.expect('=')
 
 	// skip the value
-	switch p.tok ***REMOVED***
+	switch p.tok {
 	case scanner.Ident:
 		// must be bool, true or false
 		p.next()
@@ -506,11 +506,11 @@ func (p *gc_parser) parse_const_decl() (string, *ast.GenDecl) ***REMOVED***
 	case '(':
 		// complex_lit or rune_lit
 		p.next() // skip '('
-		if p.tok == scanner.Char ***REMOVED***
+		if p.tok == scanner.Char {
 			p.next()
-		***REMOVED*** else ***REMOVED***
+		} else {
 			p.parse_number()
-		***REMOVED***
+		}
 		p.expect('+')
 		p.parse_number()
 		p.expect(')')
@@ -520,125 +520,125 @@ func (p *gc_parser) parse_const_decl() (string, *ast.GenDecl) ***REMOVED***
 		p.next()
 	default:
 		p.error("expected literal")
-	***REMOVED***
+	}
 
-	return name.X.(*ast.Ident).Name, &ast.GenDecl***REMOVED***
+	return name.X.(*ast.Ident).Name, &ast.GenDecl{
 		Tok: token.CONST,
-		Specs: []ast.Spec***REMOVED***
-			&ast.ValueSpec***REMOVED***
-				Names:  []*ast.Ident***REMOVED***name.Sel***REMOVED***,
+		Specs: []ast.Spec{
+			&ast.ValueSpec{
+				Names:  []*ast.Ident{name.Sel},
 				Type:   typ,
-				Values: []ast.Expr***REMOVED***&ast.BasicLit***REMOVED***Kind: token.INT, Value: "0"***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
-***REMOVED***
+				Values: []ast.Expr{&ast.BasicLit{Kind: token.INT, Value: "0"}},
+			},
+		},
+	}
+}
 
 // TypeDecl = "type" ExportedName Type .
-func (p *gc_parser) parse_type_decl() (string, *ast.GenDecl) ***REMOVED***
+func (p *gc_parser) parse_type_decl() (string, *ast.GenDecl) {
 	p.expect_keyword("type")
 	name := p.parse_exported_name()
 	typ := p.parse_type()
-	return name.X.(*ast.Ident).Name, &ast.GenDecl***REMOVED***
+	return name.X.(*ast.Ident).Name, &ast.GenDecl{
 		Tok: token.TYPE,
-		Specs: []ast.Spec***REMOVED***
-			&ast.TypeSpec***REMOVED***
+		Specs: []ast.Spec{
+			&ast.TypeSpec{
 				Name: name.Sel,
 				Type: typ,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
-***REMOVED***
+			},
+		},
+	}
+}
 
 // VarDecl = "var" ExportedName Type .
-func (p *gc_parser) parse_var_decl() (string, *ast.GenDecl) ***REMOVED***
+func (p *gc_parser) parse_var_decl() (string, *ast.GenDecl) {
 	p.expect_keyword("var")
 	name := p.parse_exported_name()
 	typ := p.parse_type()
-	return name.X.(*ast.Ident).Name, &ast.GenDecl***REMOVED***
+	return name.X.(*ast.Ident).Name, &ast.GenDecl{
 		Tok: token.VAR,
-		Specs: []ast.Spec***REMOVED***
-			&ast.ValueSpec***REMOVED***
-				Names: []*ast.Ident***REMOVED***name.Sel***REMOVED***,
+		Specs: []ast.Spec{
+			&ast.ValueSpec{
+				Names: []*ast.Ident{name.Sel},
 				Type:  typ,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
-***REMOVED***
+			},
+		},
+	}
+}
 
-// FuncBody = "***REMOVED***" ... "***REMOVED***" .
-func (p *gc_parser) parse_func_body() ***REMOVED***
-	p.expect('***REMOVED***')
-	for i := 1; i > 0; p.next() ***REMOVED***
-		switch p.tok ***REMOVED***
-		case '***REMOVED***':
+// FuncBody = "{" ... "}" .
+func (p *gc_parser) parse_func_body() {
+	p.expect('{')
+	for i := 1; i > 0; p.next() {
+		switch p.tok {
+		case '{':
 			i++
-		case '***REMOVED***':
+		case '}':
 			i--
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // FuncDecl = "func" ExportedName Signature [ FuncBody ] .
-func (p *gc_parser) parse_func_decl() (string, *ast.FuncDecl) ***REMOVED***
+func (p *gc_parser) parse_func_decl() (string, *ast.FuncDecl) {
 	// "func" was already consumed by lookahead
 	name := p.parse_exported_name()
 	typ := p.parse_signature()
-	if p.tok == '***REMOVED***' ***REMOVED***
+	if p.tok == '{' {
 		p.parse_func_body()
-	***REMOVED***
-	return name.X.(*ast.Ident).Name, &ast.FuncDecl***REMOVED***
+	}
+	return name.X.(*ast.Ident).Name, &ast.FuncDecl{
 		Name: name.Sel,
 		Type: typ,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func strip_method_receiver(recv *ast.FieldList) string ***REMOVED***
+func strip_method_receiver(recv *ast.FieldList) string {
 	var sel *ast.SelectorExpr
 
 	// find selector expression
 	typ := recv.List[0].Type
-	switch t := typ.(type) ***REMOVED***
+	switch t := typ.(type) {
 	case *ast.StarExpr:
 		sel = t.X.(*ast.SelectorExpr)
 	case *ast.SelectorExpr:
 		sel = t
-	***REMOVED***
+	}
 
 	// extract package path
 	pkg := sel.X.(*ast.Ident).Name
 
 	// write back stripped type
-	switch t := typ.(type) ***REMOVED***
+	switch t := typ.(type) {
 	case *ast.StarExpr:
 		t.X = sel.Sel
 	case *ast.SelectorExpr:
 		recv.List[0].Type = sel.Sel
-	***REMOVED***
+	}
 
 	return pkg
-***REMOVED***
+}
 
 // MethodDecl = "func" Receiver Name Signature .
 // Receiver = "(" ( identifier | "?" ) [ "*" ] ExportedName ")" [ FuncBody ] .
-func (p *gc_parser) parse_method_decl() (string, *ast.FuncDecl) ***REMOVED***
+func (p *gc_parser) parse_method_decl() (string, *ast.FuncDecl) {
 	recv := p.parse_parameters()
 	pkg := strip_method_receiver(recv)
 	name, _ := p.parse_name()
 	typ := p.parse_signature()
-	if p.tok == '***REMOVED***' ***REMOVED***
+	if p.tok == '{' {
 		p.parse_func_body()
-	***REMOVED***
-	return pkg, &ast.FuncDecl***REMOVED***
+	}
+	return pkg, &ast.FuncDecl{
 		Recv: recv,
 		Name: ast.NewIdent(name),
 		Type: typ,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Decl = [ ImportDecl | ConstDecl | TypeDecl | VarDecl | FuncDecl | MethodDecl ] "\n" .
-func (p *gc_parser) parse_decl() (pkg string, decl ast.Decl) ***REMOVED***
-	switch p.lit ***REMOVED***
+func (p *gc_parser) parse_decl() (pkg string, decl ast.Decl) {
+	switch p.lit {
 	case "import":
 		p.parse_import_decl()
 	case "const":
@@ -649,30 +649,30 @@ func (p *gc_parser) parse_decl() (pkg string, decl ast.Decl) ***REMOVED***
 		pkg, decl = p.parse_var_decl()
 	case "func":
 		p.next()
-		if p.tok == '(' ***REMOVED***
+		if p.tok == '(' {
 			pkg, decl = p.parse_method_decl()
-		***REMOVED*** else ***REMOVED***
+		} else {
 			pkg, decl = p.parse_func_decl()
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	p.expect('\n')
 	return
-***REMOVED***
+}
 
-// Export = PackageClause ***REMOVED*** Decl ***REMOVED*** "$$" .
+// Export = PackageClause { Decl } "$$" .
 // PackageClause = "package" identifier [ "safe" ] "\n" .
-func (p *gc_parser) parse_export(callback func(string, ast.Decl)) ***REMOVED***
+func (p *gc_parser) parse_export(callback func(string, ast.Decl)) {
 	p.expect_keyword("package")
 	p.pfc.defalias = p.expect(scanner.Ident)
-	if p.tok != '\n' ***REMOVED***
+	if p.tok != '\n' {
 		p.expect_keyword("safe")
-	***REMOVED***
+	}
 	p.expect('\n')
 
-	for p.tok != '$' && p.tok != scanner.EOF ***REMOVED***
+	for p.tok != '$' && p.tok != scanner.EOF {
 		pkg, decl := p.parse_decl()
-		if decl != nil ***REMOVED***
+		if decl != nil {
 			callback(pkg, decl)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

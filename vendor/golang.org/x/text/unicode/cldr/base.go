@@ -11,31 +11,31 @@ import (
 )
 
 // Elem is implemented by every XML element.
-type Elem interface ***REMOVED***
+type Elem interface {
 	setEnclosing(Elem)
 	setName(string)
 	enclosing() Elem
 
 	GetCommon() *Common
-***REMOVED***
+}
 
-type hidden struct ***REMOVED***
+type hidden struct {
 	CharData string `xml:",chardata"`
-	Alias    *struct ***REMOVED***
+	Alias    *struct {
 		Common
 		Source string `xml:"source,attr"`
 		Path   string `xml:"path,attr"`
-	***REMOVED*** `xml:"alias"`
-	Def *struct ***REMOVED***
+	} `xml:"alias"`
+	Def *struct {
 		Common
 		Choice string `xml:"choice,attr,omitempty"`
 		Type   string `xml:"type,attr,omitempty"`
-	***REMOVED*** `xml:"default"`
-***REMOVED***
+	} `xml:"default"`
+}
 
 // Common holds several of the most common attributes and sub elements
 // of an XML element.
-type Common struct ***REMOVED***
+type Common struct {
 	XMLName         xml.Name
 	name            string
 	enclElem        Elem
@@ -45,61 +45,61 @@ type Common struct ***REMOVED***
 	ValidSubLocales string `xml:"validSubLocales,attr,omitempty"`
 	Draft           string `xml:"draft,attr,omitempty"`
 	hidden
-***REMOVED***
+}
 
 // Default returns the default type to select from the enclosed list
 // or "" if no default value is specified.
-func (e *Common) Default() string ***REMOVED***
-	if e.Def == nil ***REMOVED***
+func (e *Common) Default() string {
+	if e.Def == nil {
 		return ""
-	***REMOVED***
-	if e.Def.Choice != "" ***REMOVED***
+	}
+	if e.Def.Choice != "" {
 		return e.Def.Choice
-	***REMOVED*** else if e.Def.Type != "" ***REMOVED***
+	} else if e.Def.Type != "" {
 		// Type is still used by the default element in collation.
 		return e.Def.Type
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
 // Element returns the XML element name.
-func (e *Common) Element() string ***REMOVED***
+func (e *Common) Element() string {
 	return e.name
-***REMOVED***
+}
 
 // GetCommon returns e. It is provided such that Common implements Elem.
-func (e *Common) GetCommon() *Common ***REMOVED***
+func (e *Common) GetCommon() *Common {
 	return e
-***REMOVED***
+}
 
 // Data returns the character data accumulated for this element.
-func (e *Common) Data() string ***REMOVED***
+func (e *Common) Data() string {
 	e.CharData = charRe.ReplaceAllStringFunc(e.CharData, replaceUnicode)
 	return e.CharData
-***REMOVED***
+}
 
-func (e *Common) setName(s string) ***REMOVED***
+func (e *Common) setName(s string) {
 	e.name = s
-***REMOVED***
+}
 
-func (e *Common) enclosing() Elem ***REMOVED***
+func (e *Common) enclosing() Elem {
 	return e.enclElem
-***REMOVED***
+}
 
-func (e *Common) setEnclosing(en Elem) ***REMOVED***
+func (e *Common) setEnclosing(en Elem) {
 	e.enclElem = en
-***REMOVED***
+}
 
 // Escape characters that can be escaped without further escaping the string.
-var charRe = regexp.MustCompile(`&#x[0-9a-fA-F]*;|\\u[0-9a-fA-F]***REMOVED***4***REMOVED***|\\U[0-9a-fA-F]***REMOVED***8***REMOVED***|\\x[0-9a-fA-F]***REMOVED***2***REMOVED***|\\[0-7]***REMOVED***3***REMOVED***|\\[abtnvfr]`)
+var charRe = regexp.MustCompile(`&#x[0-9a-fA-F]*;|\\u[0-9a-fA-F]{4}|\\U[0-9a-fA-F]{8}|\\x[0-9a-fA-F]{2}|\\[0-7]{3}|\\[abtnvfr]`)
 
 // replaceUnicode converts hexadecimal Unicode codepoint notations to a one-rune string.
 // It assumes the input string is correctly formatted.
-func replaceUnicode(s string) string ***REMOVED***
-	if s[1] == '#' ***REMOVED***
+func replaceUnicode(s string) string {
+	if s[1] == '#' {
 		r, _ := strconv.ParseInt(s[3:len(s)-1], 16, 32)
 		return string(r)
-	***REMOVED***
+	}
 	r, _, _, _ := strconv.UnquoteChar(s, 0)
 	return string(r)
-***REMOVED***
+}

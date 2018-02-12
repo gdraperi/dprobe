@@ -7,13 +7,13 @@ var (
 )
 
 // ErrQuotaNotSupported indicates if were found the FS didn't have projects quotas available
-var ErrQuotaNotSupported = errQuotaNotSupported***REMOVED******REMOVED***
+var ErrQuotaNotSupported = errQuotaNotSupported{}
 
-type errQuotaNotSupported struct ***REMOVED***
-***REMOVED***
+type errQuotaNotSupported struct {
+}
 
-func (e errQuotaNotSupported) NotImplemented() ***REMOVED******REMOVED***
+func (e errQuotaNotSupported) NotImplemented() {}
 
-func (e errQuotaNotSupported) Error() string ***REMOVED***
+func (e errQuotaNotSupported) Error() string {
 	return "Filesystem does not support, or has not enabled quotas"
-***REMOVED***
+}

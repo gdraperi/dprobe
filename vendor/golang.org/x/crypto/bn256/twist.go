@@ -11,64 +11,64 @@ import (
 // twistPoint implements the elliptic curve y²=x³+3/ξ over GF(p²). Points are
 // kept in Jacobian form and t=z² when valid. The group G₂ is the set of
 // n-torsion points of this curve over GF(p²) (where n = Order)
-type twistPoint struct ***REMOVED***
+type twistPoint struct {
 	x, y, z, t *gfP2
-***REMOVED***
+}
 
-var twistB = &gfP2***REMOVED***
+var twistB = &gfP2{
 	bigFromBase10("6500054969564660373279643874235990574282535810762300357187714502686418407178"),
 	bigFromBase10("45500384786952622612957507119651934019977750675336102500314001518804928850249"),
-***REMOVED***
+}
 
 // twistGen is the generator of group G₂.
-var twistGen = &twistPoint***REMOVED***
-	&gfP2***REMOVED***
+var twistGen = &twistPoint{
+	&gfP2{
 		bigFromBase10("21167961636542580255011770066570541300993051739349375019639421053990175267184"),
 		bigFromBase10("64746500191241794695844075326670126197795977525365406531717464316923369116492"),
-	***REMOVED***,
-	&gfP2***REMOVED***
+	},
+	&gfP2{
 		bigFromBase10("20666913350058776956210519119118544732556678129809273996262322366050359951122"),
 		bigFromBase10("17778617556404439934652658462602675281523610326338642107814333856843981424549"),
-	***REMOVED***,
-	&gfP2***REMOVED***
+	},
+	&gfP2{
 		bigFromBase10("0"),
 		bigFromBase10("1"),
-	***REMOVED***,
-	&gfP2***REMOVED***
+	},
+	&gfP2{
 		bigFromBase10("0"),
 		bigFromBase10("1"),
-	***REMOVED***,
-***REMOVED***
+	},
+}
 
-func newTwistPoint(pool *bnPool) *twistPoint ***REMOVED***
-	return &twistPoint***REMOVED***
+func newTwistPoint(pool *bnPool) *twistPoint {
+	return &twistPoint{
 		newGFp2(pool),
 		newGFp2(pool),
 		newGFp2(pool),
 		newGFp2(pool),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (c *twistPoint) String() string ***REMOVED***
+func (c *twistPoint) String() string {
 	return "(" + c.x.String() + ", " + c.y.String() + ", " + c.z.String() + ")"
-***REMOVED***
+}
 
-func (c *twistPoint) Put(pool *bnPool) ***REMOVED***
+func (c *twistPoint) Put(pool *bnPool) {
 	c.x.Put(pool)
 	c.y.Put(pool)
 	c.z.Put(pool)
 	c.t.Put(pool)
-***REMOVED***
+}
 
-func (c *twistPoint) Set(a *twistPoint) ***REMOVED***
+func (c *twistPoint) Set(a *twistPoint) {
 	c.x.Set(a.x)
 	c.y.Set(a.y)
 	c.z.Set(a.z)
 	c.t.Set(a.t)
-***REMOVED***
+}
 
 // IsOnCurve returns true iff c is on the curve where c must be in affine form.
-func (c *twistPoint) IsOnCurve() bool ***REMOVED***
+func (c *twistPoint) IsOnCurve() bool {
 	pool := new(bnPool)
 	yy := newGFp2(pool).Square(c.y, pool)
 	xxx := newGFp2(pool).Square(c.x, pool)
@@ -77,27 +77,27 @@ func (c *twistPoint) IsOnCurve() bool ***REMOVED***
 	yy.Sub(yy, twistB)
 	yy.Minimal()
 	return yy.x.Sign() == 0 && yy.y.Sign() == 0
-***REMOVED***
+}
 
-func (c *twistPoint) SetInfinity() ***REMOVED***
+func (c *twistPoint) SetInfinity() {
 	c.z.SetZero()
-***REMOVED***
+}
 
-func (c *twistPoint) IsInfinity() bool ***REMOVED***
+func (c *twistPoint) IsInfinity() bool {
 	return c.z.IsZero()
-***REMOVED***
+}
 
-func (c *twistPoint) Add(a, b *twistPoint, pool *bnPool) ***REMOVED***
+func (c *twistPoint) Add(a, b *twistPoint, pool *bnPool) {
 	// For additional comments, see the same function in curve.go.
 
-	if a.IsInfinity() ***REMOVED***
+	if a.IsInfinity() {
 		c.Set(b)
 		return
-	***REMOVED***
-	if b.IsInfinity() ***REMOVED***
+	}
+	if b.IsInfinity() {
 		c.Set(a)
 		return
-	***REMOVED***
+	}
 
 	// See http://hyperelliptic.org/EFD/g1p/auto-code/shortw/jacobian-0/addition/add-2007-bl.op3
 	z1z1 := newGFp2(pool).Square(a.z, pool)
@@ -120,10 +120,10 @@ func (c *twistPoint) Add(a, b *twistPoint, pool *bnPool) ***REMOVED***
 
 	t.Sub(s2, s1)
 	yEqual := t.IsZero()
-	if xEqual && yEqual ***REMOVED***
+	if xEqual && yEqual {
 		c.Double(a, pool)
 		return
-	***REMOVED***
+	}
 	r := newGFp2(pool).Add(t, t)
 
 	v := newGFp2(pool).Mul(u1, i, pool)
@@ -159,9 +159,9 @@ func (c *twistPoint) Add(a, b *twistPoint, pool *bnPool) ***REMOVED***
 	v.Put(pool)
 	t4.Put(pool)
 	t6.Put(pool)
-***REMOVED***
+}
 
-func (c *twistPoint) Double(a *twistPoint, pool *bnPool) ***REMOVED***
+func (c *twistPoint) Double(a *twistPoint, pool *bnPool) {
 	// See http://hyperelliptic.org/EFD/g1p/auto-code/shortw/jacobian-0/doubling/dbl-2009-l.op3
 	A := newGFp2(pool).Square(a.x, pool)
 	B := newGFp2(pool).Square(a.y, pool)
@@ -197,32 +197,32 @@ func (c *twistPoint) Double(a *twistPoint, pool *bnPool) ***REMOVED***
 	d.Put(pool)
 	e.Put(pool)
 	f.Put(pool)
-***REMOVED***
+}
 
-func (c *twistPoint) Mul(a *twistPoint, scalar *big.Int, pool *bnPool) *twistPoint ***REMOVED***
+func (c *twistPoint) Mul(a *twistPoint, scalar *big.Int, pool *bnPool) *twistPoint {
 	sum := newTwistPoint(pool)
 	sum.SetInfinity()
 	t := newTwistPoint(pool)
 
-	for i := scalar.BitLen(); i >= 0; i-- ***REMOVED***
+	for i := scalar.BitLen(); i >= 0; i-- {
 		t.Double(sum, pool)
-		if scalar.Bit(i) != 0 ***REMOVED***
+		if scalar.Bit(i) != 0 {
 			sum.Add(t, a, pool)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			sum.Set(t)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	c.Set(sum)
 	sum.Put(pool)
 	t.Put(pool)
 	return c
-***REMOVED***
+}
 
-func (c *twistPoint) MakeAffine(pool *bnPool) *twistPoint ***REMOVED***
-	if c.z.IsOne() ***REMOVED***
+func (c *twistPoint) MakeAffine(pool *bnPool) *twistPoint {
+	if c.z.IsOne() {
 		return c
-	***REMOVED***
+	}
 
 	zInv := newGFp2(pool).Invert(c.z, pool)
 	t := newGFp2(pool).Mul(c.y, zInv, pool)
@@ -238,12 +238,12 @@ func (c *twistPoint) MakeAffine(pool *bnPool) *twistPoint ***REMOVED***
 	zInv2.Put(pool)
 
 	return c
-***REMOVED***
+}
 
-func (c *twistPoint) Negative(a *twistPoint, pool *bnPool) ***REMOVED***
+func (c *twistPoint) Negative(a *twistPoint, pool *bnPool) {
 	c.x.Set(a.x)
 	c.y.SetZero()
 	c.y.Sub(c.y, a.y)
 	c.z.Set(a.z)
 	c.t.SetZero()
-***REMOVED***
+}

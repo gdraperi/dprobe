@@ -8,9 +8,9 @@ package websocket
 
 import "crypto/tls"
 
-func cloneTLSConfig(cfg *tls.Config) *tls.Config ***REMOVED***
-	if cfg == nil ***REMOVED***
-		return &tls.Config***REMOVED******REMOVED***
-	***REMOVED***
+func cloneTLSConfig(cfg *tls.Config) *tls.Config {
+	if cfg == nil {
+		return &tls.Config{}
+	}
 	return cfg.Clone()
-***REMOVED***
+}

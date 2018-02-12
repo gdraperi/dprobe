@@ -24,65 +24,65 @@ var (
 	defaultIP          = net.ParseIP("0.0.0.0")
 	once               sync.Once
 	instance           *PortAllocator
-	createInstance     = func() ***REMOVED*** instance = newInstance() ***REMOVED***
+	createInstance     = func() { instance = newInstance() }
 )
 
 // ErrPortAlreadyAllocated is the returned error information when a requested port is already being used
-type ErrPortAlreadyAllocated struct ***REMOVED***
+type ErrPortAlreadyAllocated struct {
 	ip   string
 	port int
-***REMOVED***
+}
 
-func newErrPortAlreadyAllocated(ip string, port int) ErrPortAlreadyAllocated ***REMOVED***
-	return ErrPortAlreadyAllocated***REMOVED***
+func newErrPortAlreadyAllocated(ip string, port int) ErrPortAlreadyAllocated {
+	return ErrPortAlreadyAllocated{
 		ip:   ip,
 		port: port,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // IP returns the address to which the used port is associated
-func (e ErrPortAlreadyAllocated) IP() string ***REMOVED***
+func (e ErrPortAlreadyAllocated) IP() string {
 	return e.ip
-***REMOVED***
+}
 
 // Port returns the value of the already used port
-func (e ErrPortAlreadyAllocated) Port() int ***REMOVED***
+func (e ErrPortAlreadyAllocated) Port() int {
 	return e.port
-***REMOVED***
+}
 
 // IPPort returns the address and the port in the form ip:port
-func (e ErrPortAlreadyAllocated) IPPort() string ***REMOVED***
+func (e ErrPortAlreadyAllocated) IPPort() string {
 	return fmt.Sprintf("%s:%d", e.ip, e.port)
-***REMOVED***
+}
 
 // Error is the implementation of error.Error interface
-func (e ErrPortAlreadyAllocated) Error() string ***REMOVED***
+func (e ErrPortAlreadyAllocated) Error() string {
 	return fmt.Sprintf("Bind for %s:%d failed: port is already allocated", e.ip, e.port)
-***REMOVED***
+}
 
 type (
 	// PortAllocator manages the transport ports database
-	PortAllocator struct ***REMOVED***
+	PortAllocator struct {
 		mutex sync.Mutex
 		ipMap ipMapping
 		Begin int
 		End   int
-	***REMOVED***
-	portRange struct ***REMOVED***
+	}
+	portRange struct {
 		begin int
 		end   int
 		last  int
-	***REMOVED***
-	portMap struct ***REMOVED***
-		p            map[int]struct***REMOVED******REMOVED***
+	}
+	portMap struct {
+		p            map[int]struct{}
 		defaultRange string
 		portRanges   map[string]*portRange
-	***REMOVED***
+	}
 	protoMap map[string]*portMap
 )
 
 // Get returns the default instance of PortAllocator
-func Get() *PortAllocator ***REMOVED***
+func Get() *PortAllocator {
 	// Port Allocator is a singleton
 	// Note: Long term solution will be each PortAllocator will have access to
 	// the OS so that it can have up to date view of the OS port allocation.
@@ -90,159 +90,159 @@ func Get() *PortAllocator ***REMOVED***
 	// need to worry about this, they will not see a change in behavior.
 	once.Do(createInstance)
 	return instance
-***REMOVED***
+}
 
-func newInstance() *PortAllocator ***REMOVED***
+func newInstance() *PortAllocator {
 	start, end, err := getDynamicPortRange()
-	if err != nil ***REMOVED***
+	if err != nil {
 		start, end = DefaultPortRangeStart, DefaultPortRangeEnd
-	***REMOVED***
-	return &PortAllocator***REMOVED***
-		ipMap: ipMapping***REMOVED******REMOVED***,
+	}
+	return &PortAllocator{
+		ipMap: ipMapping{},
 		Begin: start,
 		End:   end,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // RequestPort requests new port from global ports pool for specified ip and proto.
 // If port is 0 it returns first free port. Otherwise it checks port availability
 // in proto's pool and returns that port or error if port is already busy.
-func (p *PortAllocator) RequestPort(ip net.IP, proto string, port int) (int, error) ***REMOVED***
+func (p *PortAllocator) RequestPort(ip net.IP, proto string, port int) (int, error) {
 	return p.RequestPortInRange(ip, proto, port, port)
-***REMOVED***
+}
 
 // RequestPortInRange requests new port from global ports pool for specified ip and proto.
 // If portStart and portEnd are 0 it returns the first free port in the default ephemeral range.
 // If portStart != portEnd it returns the first free port in the requested range.
 // Otherwise (portStart == portEnd) it checks port availability in the requested proto's port-pool
 // and returns that port or error if port is already busy.
-func (p *PortAllocator) RequestPortInRange(ip net.IP, proto string, portStart, portEnd int) (int, error) ***REMOVED***
+func (p *PortAllocator) RequestPortInRange(ip net.IP, proto string, portStart, portEnd int) (int, error) {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 
-	if proto != "tcp" && proto != "udp" ***REMOVED***
+	if proto != "tcp" && proto != "udp" {
 		return 0, ErrUnknownProtocol
-	***REMOVED***
+	}
 
-	if ip == nil ***REMOVED***
+	if ip == nil {
 		ip = defaultIP
-	***REMOVED***
+	}
 	ipstr := ip.String()
 	protomap, ok := p.ipMap[ipstr]
-	if !ok ***REMOVED***
-		protomap = protoMap***REMOVED***
+	if !ok {
+		protomap = protoMap{
 			"tcp": p.newPortMap(),
 			"udp": p.newPortMap(),
-		***REMOVED***
+		}
 
 		p.ipMap[ipstr] = protomap
-	***REMOVED***
+	}
 	mapping := protomap[proto]
-	if portStart > 0 && portStart == portEnd ***REMOVED***
-		if _, ok := mapping.p[portStart]; !ok ***REMOVED***
-			mapping.p[portStart] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
+	if portStart > 0 && portStart == portEnd {
+		if _, ok := mapping.p[portStart]; !ok {
+			mapping.p[portStart] = struct{}{}
 			return portStart, nil
-		***REMOVED***
+		}
 		return 0, newErrPortAlreadyAllocated(ipstr, portStart)
-	***REMOVED***
+	}
 
 	port, err := mapping.findPort(portStart, portEnd)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	return port, nil
-***REMOVED***
+}
 
 // ReleasePort releases port from global ports pool for specified ip and proto.
-func (p *PortAllocator) ReleasePort(ip net.IP, proto string, port int) error ***REMOVED***
+func (p *PortAllocator) ReleasePort(ip net.IP, proto string, port int) error {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 
-	if ip == nil ***REMOVED***
+	if ip == nil {
 		ip = defaultIP
-	***REMOVED***
+	}
 	protomap, ok := p.ipMap[ip.String()]
-	if !ok ***REMOVED***
+	if !ok {
 		return nil
-	***REMOVED***
+	}
 	delete(protomap[proto].p, port)
 	return nil
-***REMOVED***
+}
 
-func (p *PortAllocator) newPortMap() *portMap ***REMOVED***
+func (p *PortAllocator) newPortMap() *portMap {
 	defaultKey := getRangeKey(p.Begin, p.End)
-	pm := &portMap***REMOVED***
-		p:            map[int]struct***REMOVED******REMOVED******REMOVED******REMOVED***,
+	pm := &portMap{
+		p:            map[int]struct{}{},
 		defaultRange: defaultKey,
-		portRanges: map[string]*portRange***REMOVED***
+		portRanges: map[string]*portRange{
 			defaultKey: newPortRange(p.Begin, p.End),
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 	return pm
-***REMOVED***
+}
 
 // ReleaseAll releases all ports for all ips.
-func (p *PortAllocator) ReleaseAll() error ***REMOVED***
+func (p *PortAllocator) ReleaseAll() error {
 	p.mutex.Lock()
-	p.ipMap = ipMapping***REMOVED******REMOVED***
+	p.ipMap = ipMapping{}
 	p.mutex.Unlock()
 	return nil
-***REMOVED***
+}
 
-func getRangeKey(portStart, portEnd int) string ***REMOVED***
+func getRangeKey(portStart, portEnd int) string {
 	return fmt.Sprintf("%d-%d", portStart, portEnd)
-***REMOVED***
+}
 
-func newPortRange(portStart, portEnd int) *portRange ***REMOVED***
-	return &portRange***REMOVED***
+func newPortRange(portStart, portEnd int) *portRange {
+	return &portRange{
 		begin: portStart,
 		end:   portEnd,
 		last:  portEnd,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (pm *portMap) getPortRange(portStart, portEnd int) (*portRange, error) ***REMOVED***
+func (pm *portMap) getPortRange(portStart, portEnd int) (*portRange, error) {
 	var key string
-	if portStart == 0 && portEnd == 0 ***REMOVED***
+	if portStart == 0 && portEnd == 0 {
 		key = pm.defaultRange
-	***REMOVED*** else ***REMOVED***
+	} else {
 		key = getRangeKey(portStart, portEnd)
 		if portStart == portEnd ||
 			portStart == 0 || portEnd == 0 ||
-			portEnd < portStart ***REMOVED***
+			portEnd < portStart {
 			return nil, fmt.Errorf("invalid port range: %s", key)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Return existing port range, if already known.
-	if pr, exists := pm.portRanges[key]; exists ***REMOVED***
+	if pr, exists := pm.portRanges[key]; exists {
 		return pr, nil
-	***REMOVED***
+	}
 
 	// Otherwise create a new port range.
 	pr := newPortRange(portStart, portEnd)
 	pm.portRanges[key] = pr
 	return pr, nil
-***REMOVED***
+}
 
-func (pm *portMap) findPort(portStart, portEnd int) (int, error) ***REMOVED***
+func (pm *portMap) findPort(portStart, portEnd int) (int, error) {
 	pr, err := pm.getPortRange(portStart, portEnd)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	port := pr.last
 
-	for i := 0; i <= pr.end-pr.begin; i++ ***REMOVED***
+	for i := 0; i <= pr.end-pr.begin; i++ {
 		port++
-		if port > pr.end ***REMOVED***
+		if port > pr.end {
 			port = pr.begin
-		***REMOVED***
+		}
 
-		if _, ok := pm.p[port]; !ok ***REMOVED***
-			pm.p[port] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
+		if _, ok := pm.p[port]; !ok {
+			pm.p[port] = struct{}{}
 			pr.last = port
 			return port, nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return 0, ErrAllPortsAllocated
-***REMOVED***
+}

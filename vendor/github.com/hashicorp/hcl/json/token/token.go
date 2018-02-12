@@ -8,11 +8,11 @@ import (
 )
 
 // Token defines a single HCL token which can be obtained via the Scanner
-type Token struct ***REMOVED***
+type Token struct {
 	Type Type
 	Pos  Pos
 	Text string
-***REMOVED***
+}
 
 // Type is the set of lexical tokens of the HCL (HashiCorp Configuration Language)
 type Type int
@@ -34,18 +34,18 @@ const (
 
 	operator_beg
 	LBRACK // [
-	LBRACE // ***REMOVED***
+	LBRACE // {
 	COMMA  // ,
 	PERIOD // .
 	COLON  // :
 
 	RBRACK // ]
-	RBRACE // ***REMOVED***
+	RBRACE // }
 
 	operator_end
 )
 
-var tokens = [...]string***REMOVED***
+var tokens = [...]string{
 	ILLEGAL: "ILLEGAL",
 
 	EOF: "EOF",
@@ -64,55 +64,55 @@ var tokens = [...]string***REMOVED***
 
 	RBRACK: "RBRACK",
 	RBRACE: "RBRACE",
-***REMOVED***
+}
 
 // String returns the string corresponding to the token tok.
-func (t Type) String() string ***REMOVED***
+func (t Type) String() string {
 	s := ""
-	if 0 <= t && t < Type(len(tokens)) ***REMOVED***
+	if 0 <= t && t < Type(len(tokens)) {
 		s = tokens[t]
-	***REMOVED***
-	if s == "" ***REMOVED***
+	}
+	if s == "" {
 		s = "token(" + strconv.Itoa(int(t)) + ")"
-	***REMOVED***
+	}
 	return s
-***REMOVED***
+}
 
 // IsIdentifier returns true for tokens corresponding to identifiers and basic
 // type literals; it returns false otherwise.
-func (t Type) IsIdentifier() bool ***REMOVED*** return identifier_beg < t && t < identifier_end ***REMOVED***
+func (t Type) IsIdentifier() bool { return identifier_beg < t && t < identifier_end }
 
 // IsLiteral returns true for tokens corresponding to basic type literals; it
 // returns false otherwise.
-func (t Type) IsLiteral() bool ***REMOVED*** return literal_beg < t && t < literal_end ***REMOVED***
+func (t Type) IsLiteral() bool { return literal_beg < t && t < literal_end }
 
 // IsOperator returns true for tokens corresponding to operators and
 // delimiters; it returns false otherwise.
-func (t Type) IsOperator() bool ***REMOVED*** return operator_beg < t && t < operator_end ***REMOVED***
+func (t Type) IsOperator() bool { return operator_beg < t && t < operator_end }
 
 // String returns the token's literal text. Note that this is only
 // applicable for certain token types, such as token.IDENT,
 // token.STRING, etc..
-func (t Token) String() string ***REMOVED***
+func (t Token) String() string {
 	return fmt.Sprintf("%s %s %s", t.Pos.String(), t.Type.String(), t.Text)
-***REMOVED***
+}
 
 // HCLToken converts this token to an HCL token.
 //
 // The token type must be a literal type or this will panic.
-func (t Token) HCLToken() hcltoken.Token ***REMOVED***
-	switch t.Type ***REMOVED***
+func (t Token) HCLToken() hcltoken.Token {
+	switch t.Type {
 	case BOOL:
-		return hcltoken.Token***REMOVED***Type: hcltoken.BOOL, Text: t.Text***REMOVED***
+		return hcltoken.Token{Type: hcltoken.BOOL, Text: t.Text}
 	case FLOAT:
-		return hcltoken.Token***REMOVED***Type: hcltoken.FLOAT, Text: t.Text***REMOVED***
+		return hcltoken.Token{Type: hcltoken.FLOAT, Text: t.Text}
 	case NULL:
-		return hcltoken.Token***REMOVED***Type: hcltoken.STRING, Text: ""***REMOVED***
+		return hcltoken.Token{Type: hcltoken.STRING, Text: ""}
 	case NUMBER:
-		return hcltoken.Token***REMOVED***Type: hcltoken.NUMBER, Text: t.Text***REMOVED***
+		return hcltoken.Token{Type: hcltoken.NUMBER, Text: t.Text}
 	case STRING:
-		return hcltoken.Token***REMOVED***Type: hcltoken.STRING, Text: t.Text, JSON: true***REMOVED***
+		return hcltoken.Token{Type: hcltoken.STRING, Text: t.Text, JSON: true}
 	default:
 		panic(fmt.Sprintf("unimplemented HCLToken for type: %s", t.Type))
-	***REMOVED***
-***REMOVED***
+	}
+}

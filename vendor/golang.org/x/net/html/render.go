@@ -12,11 +12,11 @@ import (
 	"strings"
 )
 
-type writer interface ***REMOVED***
+type writer interface {
 	io.Writer
 	io.ByteWriter
 	WriteString(string) (int, error)
-***REMOVED***
+}
 
 // Render renders the parse tree n to the given writer.
 //
@@ -42,216 +42,216 @@ type writer interface ***REMOVED***
 // text node would become a tree containing <html>, <head> and <body> elements.
 // Another example is that the programmatic equivalent of "a<head>b</head>c"
 // becomes "<html><head><head/><body>abc</body></html>".
-func Render(w io.Writer, n *Node) error ***REMOVED***
-	if x, ok := w.(writer); ok ***REMOVED***
+func Render(w io.Writer, n *Node) error {
+	if x, ok := w.(writer); ok {
 		return render(x, n)
-	***REMOVED***
+	}
 	buf := bufio.NewWriter(w)
-	if err := render(buf, n); err != nil ***REMOVED***
+	if err := render(buf, n); err != nil {
 		return err
-	***REMOVED***
+	}
 	return buf.Flush()
-***REMOVED***
+}
 
 // plaintextAbort is returned from render1 when a <plaintext> element
 // has been rendered. No more end tags should be rendered after that.
 var plaintextAbort = errors.New("html: internal error (plaintext abort)")
 
-func render(w writer, n *Node) error ***REMOVED***
+func render(w writer, n *Node) error {
 	err := render1(w, n)
-	if err == plaintextAbort ***REMOVED***
+	if err == plaintextAbort {
 		err = nil
-	***REMOVED***
+	}
 	return err
-***REMOVED***
+}
 
-func render1(w writer, n *Node) error ***REMOVED***
+func render1(w writer, n *Node) error {
 	// Render non-element nodes; these are the easy cases.
-	switch n.Type ***REMOVED***
+	switch n.Type {
 	case ErrorNode:
 		return errors.New("html: cannot render an ErrorNode node")
 	case TextNode:
 		return escape(w, n.Data)
 	case DocumentNode:
-		for c := n.FirstChild; c != nil; c = c.NextSibling ***REMOVED***
-			if err := render1(w, c); err != nil ***REMOVED***
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			if err := render1(w, c); err != nil {
 				return err
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		return nil
 	case ElementNode:
 		// No-op.
 	case CommentNode:
-		if _, err := w.WriteString("<!--"); err != nil ***REMOVED***
+		if _, err := w.WriteString("<!--"); err != nil {
 			return err
-		***REMOVED***
-		if _, err := w.WriteString(n.Data); err != nil ***REMOVED***
+		}
+		if _, err := w.WriteString(n.Data); err != nil {
 			return err
-		***REMOVED***
-		if _, err := w.WriteString("-->"); err != nil ***REMOVED***
+		}
+		if _, err := w.WriteString("-->"); err != nil {
 			return err
-		***REMOVED***
+		}
 		return nil
 	case DoctypeNode:
-		if _, err := w.WriteString("<!DOCTYPE "); err != nil ***REMOVED***
+		if _, err := w.WriteString("<!DOCTYPE "); err != nil {
 			return err
-		***REMOVED***
-		if _, err := w.WriteString(n.Data); err != nil ***REMOVED***
+		}
+		if _, err := w.WriteString(n.Data); err != nil {
 			return err
-		***REMOVED***
-		if n.Attr != nil ***REMOVED***
+		}
+		if n.Attr != nil {
 			var p, s string
-			for _, a := range n.Attr ***REMOVED***
-				switch a.Key ***REMOVED***
+			for _, a := range n.Attr {
+				switch a.Key {
 				case "public":
 					p = a.Val
 				case "system":
 					s = a.Val
-				***REMOVED***
-			***REMOVED***
-			if p != "" ***REMOVED***
-				if _, err := w.WriteString(" PUBLIC "); err != nil ***REMOVED***
+				}
+			}
+			if p != "" {
+				if _, err := w.WriteString(" PUBLIC "); err != nil {
 					return err
-				***REMOVED***
-				if err := writeQuoted(w, p); err != nil ***REMOVED***
+				}
+				if err := writeQuoted(w, p); err != nil {
 					return err
-				***REMOVED***
-				if s != "" ***REMOVED***
-					if err := w.WriteByte(' '); err != nil ***REMOVED***
+				}
+				if s != "" {
+					if err := w.WriteByte(' '); err != nil {
 						return err
-					***REMOVED***
-					if err := writeQuoted(w, s); err != nil ***REMOVED***
+					}
+					if err := writeQuoted(w, s); err != nil {
 						return err
-					***REMOVED***
-				***REMOVED***
-			***REMOVED*** else if s != "" ***REMOVED***
-				if _, err := w.WriteString(" SYSTEM "); err != nil ***REMOVED***
+					}
+				}
+			} else if s != "" {
+				if _, err := w.WriteString(" SYSTEM "); err != nil {
 					return err
-				***REMOVED***
-				if err := writeQuoted(w, s); err != nil ***REMOVED***
+				}
+				if err := writeQuoted(w, s); err != nil {
 					return err
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
+				}
+			}
+		}
 		return w.WriteByte('>')
 	default:
 		return errors.New("html: unknown node type")
-	***REMOVED***
+	}
 
 	// Render the <xxx> opening tag.
-	if err := w.WriteByte('<'); err != nil ***REMOVED***
+	if err := w.WriteByte('<'); err != nil {
 		return err
-	***REMOVED***
-	if _, err := w.WriteString(n.Data); err != nil ***REMOVED***
+	}
+	if _, err := w.WriteString(n.Data); err != nil {
 		return err
-	***REMOVED***
-	for _, a := range n.Attr ***REMOVED***
-		if err := w.WriteByte(' '); err != nil ***REMOVED***
+	}
+	for _, a := range n.Attr {
+		if err := w.WriteByte(' '); err != nil {
 			return err
-		***REMOVED***
-		if a.Namespace != "" ***REMOVED***
-			if _, err := w.WriteString(a.Namespace); err != nil ***REMOVED***
+		}
+		if a.Namespace != "" {
+			if _, err := w.WriteString(a.Namespace); err != nil {
 				return err
-			***REMOVED***
-			if err := w.WriteByte(':'); err != nil ***REMOVED***
+			}
+			if err := w.WriteByte(':'); err != nil {
 				return err
-			***REMOVED***
-		***REMOVED***
-		if _, err := w.WriteString(a.Key); err != nil ***REMOVED***
+			}
+		}
+		if _, err := w.WriteString(a.Key); err != nil {
 			return err
-		***REMOVED***
-		if _, err := w.WriteString(`="`); err != nil ***REMOVED***
+		}
+		if _, err := w.WriteString(`="`); err != nil {
 			return err
-		***REMOVED***
-		if err := escape(w, a.Val); err != nil ***REMOVED***
+		}
+		if err := escape(w, a.Val); err != nil {
 			return err
-		***REMOVED***
-		if err := w.WriteByte('"'); err != nil ***REMOVED***
+		}
+		if err := w.WriteByte('"'); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
-	if voidElements[n.Data] ***REMOVED***
-		if n.FirstChild != nil ***REMOVED***
+		}
+	}
+	if voidElements[n.Data] {
+		if n.FirstChild != nil {
 			return fmt.Errorf("html: void element <%s> has child nodes", n.Data)
-		***REMOVED***
+		}
 		_, err := w.WriteString("/>")
 		return err
-	***REMOVED***
-	if err := w.WriteByte('>'); err != nil ***REMOVED***
+	}
+	if err := w.WriteByte('>'); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	// Add initial newline where there is danger of a newline beging ignored.
-	if c := n.FirstChild; c != nil && c.Type == TextNode && strings.HasPrefix(c.Data, "\n") ***REMOVED***
-		switch n.Data ***REMOVED***
+	if c := n.FirstChild; c != nil && c.Type == TextNode && strings.HasPrefix(c.Data, "\n") {
+		switch n.Data {
 		case "pre", "listing", "textarea":
-			if err := w.WriteByte('\n'); err != nil ***REMOVED***
+			if err := w.WriteByte('\n'); err != nil {
 				return err
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	// Render any child nodes.
-	switch n.Data ***REMOVED***
+	switch n.Data {
 	case "iframe", "noembed", "noframes", "noscript", "plaintext", "script", "style", "xmp":
-		for c := n.FirstChild; c != nil; c = c.NextSibling ***REMOVED***
-			if c.Type == TextNode ***REMOVED***
-				if _, err := w.WriteString(c.Data); err != nil ***REMOVED***
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			if c.Type == TextNode {
+				if _, err := w.WriteString(c.Data); err != nil {
 					return err
-				***REMOVED***
-			***REMOVED*** else ***REMOVED***
-				if err := render1(w, c); err != nil ***REMOVED***
+				}
+			} else {
+				if err := render1(w, c); err != nil {
 					return err
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-		if n.Data == "plaintext" ***REMOVED***
+				}
+			}
+		}
+		if n.Data == "plaintext" {
 			// Don't render anything else. <plaintext> must be the
 			// last element in the file, with no closing tag.
 			return plaintextAbort
-		***REMOVED***
+		}
 	default:
-		for c := n.FirstChild; c != nil; c = c.NextSibling ***REMOVED***
-			if err := render1(w, c); err != nil ***REMOVED***
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			if err := render1(w, c); err != nil {
 				return err
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	// Render the </xxx> closing tag.
-	if _, err := w.WriteString("</"); err != nil ***REMOVED***
+	if _, err := w.WriteString("</"); err != nil {
 		return err
-	***REMOVED***
-	if _, err := w.WriteString(n.Data); err != nil ***REMOVED***
+	}
+	if _, err := w.WriteString(n.Data); err != nil {
 		return err
-	***REMOVED***
+	}
 	return w.WriteByte('>')
-***REMOVED***
+}
 
 // writeQuoted writes s to w surrounded by quotes. Normally it will use double
 // quotes, but if s contains a double quote, it will use single quotes.
 // It is used for writing the identifiers in a doctype declaration.
 // In valid HTML, they can't contain both types of quotes.
-func writeQuoted(w writer, s string) error ***REMOVED***
+func writeQuoted(w writer, s string) error {
 	var q byte = '"'
-	if strings.Contains(s, `"`) ***REMOVED***
+	if strings.Contains(s, `"`) {
 		q = '\''
-	***REMOVED***
-	if err := w.WriteByte(q); err != nil ***REMOVED***
+	}
+	if err := w.WriteByte(q); err != nil {
 		return err
-	***REMOVED***
-	if _, err := w.WriteString(s); err != nil ***REMOVED***
+	}
+	if _, err := w.WriteString(s); err != nil {
 		return err
-	***REMOVED***
-	if err := w.WriteByte(q); err != nil ***REMOVED***
+	}
+	if err := w.WriteByte(q); err != nil {
 		return err
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // Section 12.1.2, "Elements", gives this list of void elements. Void elements
 // are those that can't have any contents.
-var voidElements = map[string]bool***REMOVED***
+var voidElements = map[string]bool{
 	"area":    true,
 	"base":    true,
 	"br":      true,
@@ -268,4 +268,4 @@ var voidElements = map[string]bool***REMOVED***
 	"source":  true,
 	"track":   true,
 	"wbr":     true,
-***REMOVED***
+}

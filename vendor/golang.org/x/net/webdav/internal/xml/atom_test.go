@@ -6,24 +6,24 @@ package xml
 
 import "time"
 
-var atomValue = &Feed***REMOVED***
-	XMLName: Name***REMOVED***"http://www.w3.org/2005/Atom", "feed"***REMOVED***,
+var atomValue = &Feed{
+	XMLName: Name{"http://www.w3.org/2005/Atom", "feed"},
 	Title:   "Example Feed",
-	Link:    []Link***REMOVED******REMOVED***Href: "http://example.org/"***REMOVED******REMOVED***,
+	Link:    []Link{{Href: "http://example.org/"}},
 	Updated: ParseTime("2003-12-13T18:30:02Z"),
-	Author:  Person***REMOVED***Name: "John Doe"***REMOVED***,
+	Author:  Person{Name: "John Doe"},
 	Id:      "urn:uuid:60a76c80-d399-11d9-b93C-0003939e0af6",
 
-	Entry: []Entry***REMOVED***
-		***REMOVED***
+	Entry: []Entry{
+		{
 			Title:   "Atom-Powered Robots Run Amok",
-			Link:    []Link***REMOVED******REMOVED***Href: "http://example.org/2003/12/13/atom03"***REMOVED******REMOVED***,
+			Link:    []Link{{Href: "http://example.org/2003/12/13/atom03"}},
 			Id:      "urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a",
 			Updated: ParseTime("2003-12-13T18:30:02Z"),
 			Summary: NewText("Some text."),
-		***REMOVED***,
-	***REMOVED***,
-***REMOVED***
+		},
+	},
+}
 
 var atomXml = `` +
 	`<feed xmlns="http://www.w3.org/2005/Atom" updated="2003-12-13T18:30:02Z">` +
@@ -41,16 +41,16 @@ var atomXml = `` +
 	`</entry>` +
 	`</feed>`
 
-func ParseTime(str string) time.Time ***REMOVED***
+func ParseTime(str string) time.Time {
 	t, err := time.Parse(time.RFC3339, str)
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 	return t
-***REMOVED***
+}
 
-func NewText(text string) Text ***REMOVED***
-	return Text***REMOVED***
+func NewText(text string) Text {
+	return Text{
 		Body: text,
-	***REMOVED***
-***REMOVED***
+	}
+}

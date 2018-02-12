@@ -7,21 +7,21 @@ import (
 // broadcast is an implementation of memberlist.Broadcast and is used
 // to manage broadcasts across the memberlist channel that are related
 // only to Serf.
-type broadcast struct ***REMOVED***
+type broadcast struct {
 	msg    []byte
-	notify chan<- struct***REMOVED******REMOVED***
-***REMOVED***
+	notify chan<- struct{}
+}
 
-func (b *broadcast) Invalidates(other memberlist.Broadcast) bool ***REMOVED***
+func (b *broadcast) Invalidates(other memberlist.Broadcast) bool {
 	return false
-***REMOVED***
+}
 
-func (b *broadcast) Message() []byte ***REMOVED***
+func (b *broadcast) Message() []byte {
 	return b.msg
-***REMOVED***
+}
 
-func (b *broadcast) Finished() ***REMOVED***
-	if b.notify != nil ***REMOVED***
+func (b *broadcast) Finished() {
+	if b.notify != nil {
 		close(b.notify)
-	***REMOVED***
-***REMOVED***
+	}
+}

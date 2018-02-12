@@ -12,25 +12,25 @@ import (
 // ShellLex performs shell word splitting and variable expansion.
 //
 // ShellLex takes a string and an array of env variables and
-// process all quotes (" and ') as well as $xxx and $***REMOVED***xxx***REMOVED*** env variable
+// process all quotes (" and ') as well as $xxx and ${xxx} env variable
 // tokens.  Tries to mimic bash shell process.
-// It doesn't support all flavors of $***REMOVED***xx:...***REMOVED*** formats but new ones can
-// be added by adding code to the "special $***REMOVED******REMOVED*** format processing" section
-type ShellLex struct ***REMOVED***
+// It doesn't support all flavors of ${xx:...} formats but new ones can
+// be added by adding code to the "special ${} format processing" section
+type ShellLex struct {
 	escapeToken rune
-***REMOVED***
+}
 
 // NewShellLex creates a new ShellLex which uses escapeToken to escape quotes.
-func NewShellLex(escapeToken rune) *ShellLex ***REMOVED***
-	return &ShellLex***REMOVED***escapeToken: escapeToken***REMOVED***
-***REMOVED***
+func NewShellLex(escapeToken rune) *ShellLex {
+	return &ShellLex{escapeToken: escapeToken}
+}
 
 // ProcessWord will use the 'env' list of environment variables,
 // and replace any env var references in 'word'.
-func (s *ShellLex) ProcessWord(word string, env []string) (string, error) ***REMOVED***
+func (s *ShellLex) ProcessWord(word string, env []string) (string, error) {
 	word, _, err := s.process(word, env)
 	return word, err
-***REMOVED***
+}
 
 // ProcessWords will use the 'env' list of environment variables,
 // and replace any env var references in 'word' then it will also
@@ -39,138 +39,138 @@ func (s *ShellLex) ProcessWord(word string, env []string) (string, error) ***REM
 // this splitting is done **after** the env var substitutions are done.
 // Note, each one is trimmed to remove leading and trailing spaces (unless
 // they are quoted", but ProcessWord retains spaces between words.
-func (s *ShellLex) ProcessWords(word string, env []string) ([]string, error) ***REMOVED***
+func (s *ShellLex) ProcessWords(word string, env []string) ([]string, error) {
 	_, words, err := s.process(word, env)
 	return words, err
-***REMOVED***
+}
 
-func (s *ShellLex) process(word string, env []string) (string, []string, error) ***REMOVED***
-	sw := &shellWord***REMOVED***
+func (s *ShellLex) process(word string, env []string) (string, []string, error) {
+	sw := &shellWord{
 		envs:        env,
 		escapeToken: s.escapeToken,
-	***REMOVED***
+	}
 	sw.scanner.Init(strings.NewReader(word))
 	return sw.process(word)
-***REMOVED***
+}
 
-type shellWord struct ***REMOVED***
+type shellWord struct {
 	scanner     scanner.Scanner
 	envs        []string
 	escapeToken rune
-***REMOVED***
+}
 
-func (sw *shellWord) process(source string) (string, []string, error) ***REMOVED***
+func (sw *shellWord) process(source string) (string, []string, error) {
 	word, words, err := sw.processStopOn(scanner.EOF)
-	if err != nil ***REMOVED***
+	if err != nil {
 		err = errors.Wrapf(err, "failed to process %q", source)
-	***REMOVED***
+	}
 	return word, words, err
-***REMOVED***
+}
 
-type wordsStruct struct ***REMOVED***
+type wordsStruct struct {
 	word   string
 	words  []string
 	inWord bool
-***REMOVED***
+}
 
-func (w *wordsStruct) addChar(ch rune) ***REMOVED***
-	if unicode.IsSpace(ch) && w.inWord ***REMOVED***
-		if len(w.word) != 0 ***REMOVED***
+func (w *wordsStruct) addChar(ch rune) {
+	if unicode.IsSpace(ch) && w.inWord {
+		if len(w.word) != 0 {
 			w.words = append(w.words, w.word)
 			w.word = ""
 			w.inWord = false
-		***REMOVED***
-	***REMOVED*** else if !unicode.IsSpace(ch) ***REMOVED***
+		}
+	} else if !unicode.IsSpace(ch) {
 		w.addRawChar(ch)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (w *wordsStruct) addRawChar(ch rune) ***REMOVED***
+func (w *wordsStruct) addRawChar(ch rune) {
 	w.word += string(ch)
 	w.inWord = true
-***REMOVED***
+}
 
-func (w *wordsStruct) addString(str string) ***REMOVED***
+func (w *wordsStruct) addString(str string) {
 	var scan scanner.Scanner
 	scan.Init(strings.NewReader(str))
-	for scan.Peek() != scanner.EOF ***REMOVED***
+	for scan.Peek() != scanner.EOF {
 		w.addChar(scan.Next())
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (w *wordsStruct) addRawString(str string) ***REMOVED***
+func (w *wordsStruct) addRawString(str string) {
 	w.word += str
 	w.inWord = true
-***REMOVED***
+}
 
-func (w *wordsStruct) getWords() []string ***REMOVED***
-	if len(w.word) > 0 ***REMOVED***
+func (w *wordsStruct) getWords() []string {
+	if len(w.word) > 0 {
 		w.words = append(w.words, w.word)
 
 		// Just in case we're called again by mistake
 		w.word = ""
 		w.inWord = false
-	***REMOVED***
+	}
 	return w.words
-***REMOVED***
+}
 
 // Process the word, starting at 'pos', and stop when we get to the
 // end of the word or the 'stopChar' character
-func (sw *shellWord) processStopOn(stopChar rune) (string, []string, error) ***REMOVED***
+func (sw *shellWord) processStopOn(stopChar rune) (string, []string, error) {
 	var result bytes.Buffer
 	var words wordsStruct
 
-	var charFuncMapping = map[rune]func() (string, error)***REMOVED***
+	var charFuncMapping = map[rune]func() (string, error){
 		'\'': sw.processSingleQuote,
 		'"':  sw.processDoubleQuote,
 		'$':  sw.processDollar,
-	***REMOVED***
+	}
 
-	for sw.scanner.Peek() != scanner.EOF ***REMOVED***
+	for sw.scanner.Peek() != scanner.EOF {
 		ch := sw.scanner.Peek()
 
-		if stopChar != scanner.EOF && ch == stopChar ***REMOVED***
+		if stopChar != scanner.EOF && ch == stopChar {
 			sw.scanner.Next()
 			break
-		***REMOVED***
-		if fn, ok := charFuncMapping[ch]; ok ***REMOVED***
+		}
+		if fn, ok := charFuncMapping[ch]; ok {
 			// Call special processing func for certain chars
 			tmp, err := fn()
-			if err != nil ***REMOVED***
-				return "", []string***REMOVED******REMOVED***, err
-			***REMOVED***
+			if err != nil {
+				return "", []string{}, err
+			}
 			result.WriteString(tmp)
 
-			if ch == rune('$') ***REMOVED***
+			if ch == rune('$') {
 				words.addString(tmp)
-			***REMOVED*** else ***REMOVED***
+			} else {
 				words.addRawString(tmp)
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
+			}
+		} else {
 			// Not special, just add it to the result
 			ch = sw.scanner.Next()
 
-			if ch == sw.escapeToken ***REMOVED***
+			if ch == sw.escapeToken {
 				// '\' (default escape token, but ` allowed) escapes, except end of line
 				ch = sw.scanner.Next()
 
-				if ch == scanner.EOF ***REMOVED***
+				if ch == scanner.EOF {
 					break
-				***REMOVED***
+				}
 
 				words.addRawChar(ch)
-			***REMOVED*** else ***REMOVED***
+			} else {
 				words.addChar(ch)
-			***REMOVED***
+			}
 
 			result.WriteRune(ch)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return result.String(), words.getWords(), nil
-***REMOVED***
+}
 
-func (sw *shellWord) processSingleQuote() (string, error) ***REMOVED***
+func (sw *shellWord) processSingleQuote() (string, error) {
 	// All chars between single quotes are taken as-is
 	// Note, you can't escape '
 	//
@@ -184,19 +184,19 @@ func (sw *shellWord) processSingleQuote() (string, error) ***REMOVED***
 
 	sw.scanner.Next()
 
-	for ***REMOVED***
+	for {
 		ch := sw.scanner.Next()
-		switch ch ***REMOVED***
+		switch ch {
 		case scanner.EOF:
 			return "", errors.New("unexpected end of statement while looking for matching single-quote")
 		case '\'':
 			return result.String(), nil
-		***REMOVED***
+		}
 		result.WriteRune(ch)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (sw *shellWord) processDoubleQuote() (string, error) ***REMOVED***
+func (sw *shellWord) processDoubleQuote() (string, error) {
 	// All chars up to the next " are taken as-is, even ', except any $ chars
 	// But you can escape " with a \ (or ` if escape token set accordingly)
 	//
@@ -213,8 +213,8 @@ func (sw *shellWord) processDoubleQuote() (string, error) ***REMOVED***
 
 	sw.scanner.Next()
 
-	for ***REMOVED***
-		switch sw.scanner.Peek() ***REMOVED***
+	for {
+		switch sw.scanner.Peek() {
 		case scanner.EOF:
 			return "", errors.New("unexpected end of statement while looking for matching double-quote")
 		case '"':
@@ -222,14 +222,14 @@ func (sw *shellWord) processDoubleQuote() (string, error) ***REMOVED***
 			return result.String(), nil
 		case '$':
 			value, err := sw.processDollar()
-			if err != nil ***REMOVED***
+			if err != nil {
 				return "", err
-			***REMOVED***
+			}
 			result.WriteString(value)
 		default:
 			ch := sw.scanner.Next()
-			if ch == sw.escapeToken ***REMOVED***
-				switch sw.scanner.Peek() ***REMOVED***
+			if ch == sw.escapeToken {
+				switch sw.scanner.Peek() {
 				case scanner.EOF:
 					// Ignore \ at end of word
 					continue
@@ -239,106 +239,106 @@ func (sw *shellWord) processDoubleQuote() (string, error) ***REMOVED***
 					// Not sure what to do with them anyway since we're not going
 					// to execute the text in there (not now anyway).
 					ch = sw.scanner.Next()
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			result.WriteRune(ch)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (sw *shellWord) processDollar() (string, error) ***REMOVED***
+func (sw *shellWord) processDollar() (string, error) {
 	sw.scanner.Next()
 
 	// $xxx case
-	if sw.scanner.Peek() != '***REMOVED***' ***REMOVED***
+	if sw.scanner.Peek() != '{' {
 		name := sw.processName()
-		if name == "" ***REMOVED***
+		if name == "" {
 			return "$", nil
-		***REMOVED***
+		}
 		return sw.getEnv(name), nil
-	***REMOVED***
+	}
 
 	sw.scanner.Next()
 	name := sw.processName()
 	ch := sw.scanner.Peek()
-	if ch == '***REMOVED***' ***REMOVED***
-		// Normal $***REMOVED***xx***REMOVED*** case
+	if ch == '}' {
+		// Normal ${xx} case
 		sw.scanner.Next()
 		return sw.getEnv(name), nil
-	***REMOVED***
-	if ch == ':' ***REMOVED***
-		// Special $***REMOVED***xx:...***REMOVED*** format processing
+	}
+	if ch == ':' {
+		// Special ${xx:...} format processing
 		// Yes it allows for recursive $'s in the ... spot
 
 		sw.scanner.Next() // skip over :
 		modifier := sw.scanner.Next()
 
-		word, _, err := sw.processStopOn('***REMOVED***')
-		if err != nil ***REMOVED***
+		word, _, err := sw.processStopOn('}')
+		if err != nil {
 			return "", err
-		***REMOVED***
+		}
 
 		// Grab the current value of the variable in question so we
 		// can use to to determine what to do based on the modifier
 		newValue := sw.getEnv(name)
 
-		switch modifier ***REMOVED***
+		switch modifier {
 		case '+':
-			if newValue != "" ***REMOVED***
+			if newValue != "" {
 				newValue = word
-			***REMOVED***
+			}
 			return newValue, nil
 
 		case '-':
-			if newValue == "" ***REMOVED***
+			if newValue == "" {
 				newValue = word
-			***REMOVED***
+			}
 			return newValue, nil
 
 		default:
 			return "", errors.Errorf("unsupported modifier (%c) in substitution", modifier)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return "", errors.Errorf("missing ':' in substitution")
-***REMOVED***
+}
 
-func (sw *shellWord) processName() string ***REMOVED***
+func (sw *shellWord) processName() string {
 	// Read in a name (alphanumeric or _)
 	// If it starts with a numeric then just return $#
 	var name bytes.Buffer
 
-	for sw.scanner.Peek() != scanner.EOF ***REMOVED***
+	for sw.scanner.Peek() != scanner.EOF {
 		ch := sw.scanner.Peek()
-		if name.Len() == 0 && unicode.IsDigit(ch) ***REMOVED***
+		if name.Len() == 0 && unicode.IsDigit(ch) {
 			ch = sw.scanner.Next()
 			return string(ch)
-		***REMOVED***
-		if !unicode.IsLetter(ch) && !unicode.IsDigit(ch) && ch != '_' ***REMOVED***
+		}
+		if !unicode.IsLetter(ch) && !unicode.IsDigit(ch) && ch != '_' {
 			break
-		***REMOVED***
+		}
 		ch = sw.scanner.Next()
 		name.WriteRune(ch)
-	***REMOVED***
+	}
 
 	return name.String()
-***REMOVED***
+}
 
-func (sw *shellWord) getEnv(name string) string ***REMOVED***
-	for _, env := range sw.envs ***REMOVED***
+func (sw *shellWord) getEnv(name string) string {
+	for _, env := range sw.envs {
 		i := strings.Index(env, "=")
-		if i < 0 ***REMOVED***
-			if equalEnvKeys(name, env) ***REMOVED***
+		if i < 0 {
+			if equalEnvKeys(name, env) {
 				// Should probably never get here, but just in case treat
 				// it like "var" and "var=" are the same
 				return ""
-			***REMOVED***
+			}
 			continue
-		***REMOVED***
+		}
 		compareName := env[:i]
-		if !equalEnvKeys(name, compareName) ***REMOVED***
+		if !equalEnvKeys(name, compareName) {
 			continue
-		***REMOVED***
+		}
 		return env[i+1:]
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}

@@ -29,7 +29,7 @@ import (
 	"golang.org/x/sync/syncmap"
 )
 
-var validCommitCommands = map[string]bool***REMOVED***
+var validCommitCommands = map[string]bool{
 	"cmd":         true,
 	"entrypoint":  true,
 	"healthcheck": true,
@@ -40,137 +40,137 @@ var validCommitCommands = map[string]bool***REMOVED***
 	"user":        true,
 	"volume":      true,
 	"workdir":     true,
-***REMOVED***
+}
 
 const (
 	stepFormat = "Step %d/%d : %v"
 )
 
 // SessionGetter is object used to get access to a session by uuid
-type SessionGetter interface ***REMOVED***
+type SessionGetter interface {
 	Get(ctx context.Context, uuid string) (session.Caller, error)
-***REMOVED***
+}
 
 // BuildManager is shared across all Builder objects
-type BuildManager struct ***REMOVED***
+type BuildManager struct {
 	idMappings *idtools.IDMappings
 	backend    builder.Backend
 	pathCache  pathCache // TODO: make this persistent
 	sg         SessionGetter
 	fsCache    *fscache.FSCache
-***REMOVED***
+}
 
 // NewBuildManager creates a BuildManager
-func NewBuildManager(b builder.Backend, sg SessionGetter, fsCache *fscache.FSCache, idMappings *idtools.IDMappings) (*BuildManager, error) ***REMOVED***
-	bm := &BuildManager***REMOVED***
+func NewBuildManager(b builder.Backend, sg SessionGetter, fsCache *fscache.FSCache, idMappings *idtools.IDMappings) (*BuildManager, error) {
+	bm := &BuildManager{
 		backend:    b,
-		pathCache:  &syncmap.Map***REMOVED******REMOVED***,
+		pathCache:  &syncmap.Map{},
 		sg:         sg,
 		idMappings: idMappings,
 		fsCache:    fsCache,
-	***REMOVED***
-	if err := fsCache.RegisterTransport(remotecontext.ClientSessionRemote, NewClientSessionTransport()); err != nil ***REMOVED***
+	}
+	if err := fsCache.RegisterTransport(remotecontext.ClientSessionRemote, NewClientSessionTransport()); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return bm, nil
-***REMOVED***
+}
 
 // Build starts a new build from a BuildConfig
-func (bm *BuildManager) Build(ctx context.Context, config backend.BuildConfig) (*builder.Result, error) ***REMOVED***
+func (bm *BuildManager) Build(ctx context.Context, config backend.BuildConfig) (*builder.Result, error) {
 	buildsTriggered.Inc()
-	if config.Options.Dockerfile == "" ***REMOVED***
+	if config.Options.Dockerfile == "" {
 		config.Options.Dockerfile = builder.DefaultDockerfileName
-	***REMOVED***
+	}
 
 	source, dockerfile, err := remotecontext.Detect(config)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	defer func() ***REMOVED***
-		if source != nil ***REMOVED***
-			if err := source.Close(); err != nil ***REMOVED***
+	}
+	defer func() {
+		if source != nil {
+			if err := source.Close(); err != nil {
 				logrus.Debugf("[BUILDER] failed to remove temporary context: %v", err)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***()
+			}
+		}
+	}()
 
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	if src, err := bm.initializeClientSession(ctx, cancel, config.Options); err != nil ***REMOVED***
+	if src, err := bm.initializeClientSession(ctx, cancel, config.Options); err != nil {
 		return nil, err
-	***REMOVED*** else if src != nil ***REMOVED***
+	} else if src != nil {
 		source = src
-	***REMOVED***
+	}
 
 	os := runtime.GOOS
 	optionsPlatform := system.ParsePlatform(config.Options.Platform)
-	if dockerfile.OS != "" ***REMOVED***
-		if optionsPlatform.OS != "" && optionsPlatform.OS != dockerfile.OS ***REMOVED***
+	if dockerfile.OS != "" {
+		if optionsPlatform.OS != "" && optionsPlatform.OS != dockerfile.OS {
 			return nil, fmt.Errorf("invalid platform")
-		***REMOVED***
+		}
 		os = dockerfile.OS
-	***REMOVED*** else if optionsPlatform.OS != "" ***REMOVED***
+	} else if optionsPlatform.OS != "" {
 		os = optionsPlatform.OS
-	***REMOVED***
+	}
 	config.Options.Platform = os
 	dockerfile.OS = os
 
-	builderOptions := builderOptions***REMOVED***
+	builderOptions := builderOptions{
 		Options:        config.Options,
 		ProgressWriter: config.ProgressWriter,
 		Backend:        bm.backend,
 		PathCache:      bm.pathCache,
 		IDMappings:     bm.idMappings,
-	***REMOVED***
+	}
 	return newBuilder(ctx, builderOptions).build(source, dockerfile)
-***REMOVED***
+}
 
-func (bm *BuildManager) initializeClientSession(ctx context.Context, cancel func(), options *types.ImageBuildOptions) (builder.Source, error) ***REMOVED***
-	if options.SessionID == "" || bm.sg == nil ***REMOVED***
+func (bm *BuildManager) initializeClientSession(ctx context.Context, cancel func(), options *types.ImageBuildOptions) (builder.Source, error) {
+	if options.SessionID == "" || bm.sg == nil {
 		return nil, nil
-	***REMOVED***
+	}
 	logrus.Debug("client is session enabled")
 
 	connectCtx, cancelCtx := context.WithTimeout(ctx, sessionConnectTimeout)
 	defer cancelCtx()
 
 	c, err := bm.sg.Get(connectCtx, options.SessionID)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	go func() ***REMOVED***
+	}
+	go func() {
 		<-c.Context().Done()
 		cancel()
-	***REMOVED***()
-	if options.RemoteContext == remotecontext.ClientSessionRemote ***REMOVED***
+	}()
+	if options.RemoteContext == remotecontext.ClientSessionRemote {
 		st := time.Now()
 		csi, err := NewClientSessionSourceIdentifier(ctx, bm.sg, options.SessionID)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		src, err := bm.fsCache.SyncFrom(ctx, csi)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		logrus.Debugf("sync-time: %v", time.Since(st))
 		return src, nil
-	***REMOVED***
+	}
 	return nil, nil
-***REMOVED***
+}
 
 // builderOptions are the dependencies required by the builder
-type builderOptions struct ***REMOVED***
+type builderOptions struct {
 	Options        *types.ImageBuildOptions
 	Backend        builder.Backend
 	ProgressWriter backend.ProgressWriter
 	PathCache      pathCache
 	IDMappings     *idtools.IDMappings
-***REMOVED***
+}
 
 // Builder is a Dockerfile builder
 // It implements the builder.Backend interface.
-type Builder struct ***REMOVED***
+type Builder struct {
 	options *types.ImageBuildOptions
 
 	Stdout io.Writer
@@ -187,16 +187,16 @@ type Builder struct ***REMOVED***
 	pathCache        pathCache
 	containerManager *containerManager
 	imageProber      ImageProber
-***REMOVED***
+}
 
 // newBuilder creates a new Dockerfile builder from an optional dockerfile and a Options.
-func newBuilder(clientCtx context.Context, options builderOptions) *Builder ***REMOVED***
+func newBuilder(clientCtx context.Context, options builderOptions) *Builder {
 	config := options.Options
-	if config == nil ***REMOVED***
+	if config == nil {
 		config = new(types.ImageBuildOptions)
-	***REMOVED***
+	}
 
-	b := &Builder***REMOVED***
+	b := &Builder{
 		clientCtx:        clientCtx,
 		options:          config,
 		Stdout:           options.ProgressWriter.StdoutFormatter,
@@ -209,106 +209,106 @@ func newBuilder(clientCtx context.Context, options builderOptions) *Builder ***R
 		pathCache:        options.PathCache,
 		imageProber:      newImageProber(options.Backend, config.CacheFrom, config.NoCache),
 		containerManager: newContainerManager(options.Backend),
-	***REMOVED***
+	}
 
 	return b
-***REMOVED***
+}
 
 // Build runs the Dockerfile builder by parsing the Dockerfile and executing
 // the instructions from the file.
-func (b *Builder) build(source builder.Source, dockerfile *parser.Result) (*builder.Result, error) ***REMOVED***
+func (b *Builder) build(source builder.Source, dockerfile *parser.Result) (*builder.Result, error) {
 	defer b.imageSources.Unmount()
 
 	addNodesForLabelOption(dockerfile.AST, b.options.Labels)
 
 	stages, metaArgs, err := instructions.Parse(dockerfile.AST)
-	if err != nil ***REMOVED***
-		if instructions.IsUnknownInstruction(err) ***REMOVED***
+	if err != nil {
+		if instructions.IsUnknownInstruction(err) {
 			buildsFailed.WithValues(metricsUnknownInstructionError).Inc()
-		***REMOVED***
+		}
 		return nil, errdefs.InvalidParameter(err)
-	***REMOVED***
-	if b.options.Target != "" ***REMOVED***
+	}
+	if b.options.Target != "" {
 		targetIx, found := instructions.HasStage(stages, b.options.Target)
-		if !found ***REMOVED***
+		if !found {
 			buildsFailed.WithValues(metricsBuildTargetNotReachableError).Inc()
 			return nil, errors.Errorf("failed to reach build target %s in Dockerfile", b.options.Target)
-		***REMOVED***
+		}
 		stages = stages[:targetIx+1]
-	***REMOVED***
+	}
 
 	dockerfile.PrintWarnings(b.Stderr)
 	dispatchState, err := b.dispatchDockerfileWithCancellation(stages, metaArgs, dockerfile.EscapeToken, source)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if dispatchState.imageID == "" ***REMOVED***
+	}
+	if dispatchState.imageID == "" {
 		buildsFailed.WithValues(metricsDockerfileEmptyError).Inc()
 		return nil, errors.New("No image was generated. Is your Dockerfile empty?")
-	***REMOVED***
-	return &builder.Result***REMOVED***ImageID: dispatchState.imageID, FromImage: dispatchState.baseImage***REMOVED***, nil
-***REMOVED***
+	}
+	return &builder.Result{ImageID: dispatchState.imageID, FromImage: dispatchState.baseImage}, nil
+}
 
-func emitImageID(aux *streamformatter.AuxFormatter, state *dispatchState) error ***REMOVED***
-	if aux == nil || state.imageID == "" ***REMOVED***
+func emitImageID(aux *streamformatter.AuxFormatter, state *dispatchState) error {
+	if aux == nil || state.imageID == "" {
 		return nil
-	***REMOVED***
-	return aux.Emit(types.BuildResult***REMOVED***ID: state.imageID***REMOVED***)
-***REMOVED***
+	}
+	return aux.Emit(types.BuildResult{ID: state.imageID})
+}
 
-func processMetaArg(meta instructions.ArgCommand, shlex *ShellLex, args *buildArgs) error ***REMOVED***
+func processMetaArg(meta instructions.ArgCommand, shlex *ShellLex, args *buildArgs) error {
 	// ShellLex currently only support the concatenated string format
 	envs := convertMapToEnvList(args.GetAllAllowed())
-	if err := meta.Expand(func(word string) (string, error) ***REMOVED***
+	if err := meta.Expand(func(word string) (string, error) {
 		return shlex.ProcessWord(word, envs)
-	***REMOVED***); err != nil ***REMOVED***
+	}); err != nil {
 		return err
-	***REMOVED***
+	}
 	args.AddArg(meta.Key, meta.Value)
 	args.AddMetaArg(meta.Key, meta.Value)
 	return nil
-***REMOVED***
+}
 
-func printCommand(out io.Writer, currentCommandIndex int, totalCommands int, cmd interface***REMOVED******REMOVED***) int ***REMOVED***
+func printCommand(out io.Writer, currentCommandIndex int, totalCommands int, cmd interface{}) int {
 	fmt.Fprintf(out, stepFormat, currentCommandIndex, totalCommands, cmd)
 	fmt.Fprintln(out)
 	return currentCommandIndex + 1
-***REMOVED***
+}
 
-func (b *Builder) dispatchDockerfileWithCancellation(parseResult []instructions.Stage, metaArgs []instructions.ArgCommand, escapeToken rune, source builder.Source) (*dispatchState, error) ***REMOVED***
-	dispatchRequest := dispatchRequest***REMOVED******REMOVED***
+func (b *Builder) dispatchDockerfileWithCancellation(parseResult []instructions.Stage, metaArgs []instructions.ArgCommand, escapeToken rune, source builder.Source) (*dispatchState, error) {
+	dispatchRequest := dispatchRequest{}
 	buildArgs := newBuildArgs(b.options.BuildArgs)
 	totalCommands := len(metaArgs) + len(parseResult)
 	currentCommandIndex := 1
-	for _, stage := range parseResult ***REMOVED***
+	for _, stage := range parseResult {
 		totalCommands += len(stage.Commands)
-	***REMOVED***
+	}
 	shlex := NewShellLex(escapeToken)
-	for _, meta := range metaArgs ***REMOVED***
+	for _, meta := range metaArgs {
 		currentCommandIndex = printCommand(b.Stdout, currentCommandIndex, totalCommands, &meta)
 
 		err := processMetaArg(meta, shlex, buildArgs)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	stagesResults := newStagesBuildResults()
 
-	for _, stage := range parseResult ***REMOVED***
-		if err := stagesResults.checkStageNameAvailable(stage.Name); err != nil ***REMOVED***
+	for _, stage := range parseResult {
+		if err := stagesResults.checkStageNameAvailable(stage.Name); err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		dispatchRequest = newDispatchRequest(b, escapeToken, source, buildArgs, stagesResults)
 
 		currentCommandIndex = printCommand(b.Stdout, currentCommandIndex, totalCommands, stage.SourceCode)
-		if err := initializeStage(dispatchRequest, &stage); err != nil ***REMOVED***
+		if err := initializeStage(dispatchRequest, &stage); err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		dispatchRequest.state.updateRunConfig()
 		fmt.Fprintf(b.Stdout, " ---> %s\n", stringid.TruncateID(dispatchRequest.state.imageID))
-		for _, cmd := range stage.Commands ***REMOVED***
-			select ***REMOVED***
+		for _, cmd := range stage.Commands {
+			select {
 			case <-b.clientCtx.Done():
 				logrus.Debug("Builder: build cancelled!")
 				fmt.Fprint(b.Stdout, "Build cancelled\n")
@@ -316,37 +316,37 @@ func (b *Builder) dispatchDockerfileWithCancellation(parseResult []instructions.
 				return nil, errors.New("Build cancelled")
 			default:
 				// Not cancelled yet, keep going...
-			***REMOVED***
+			}
 
 			currentCommandIndex = printCommand(b.Stdout, currentCommandIndex, totalCommands, cmd)
 
-			if err := dispatch(dispatchRequest, cmd); err != nil ***REMOVED***
+			if err := dispatch(dispatchRequest, cmd); err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			dispatchRequest.state.updateRunConfig()
 			fmt.Fprintf(b.Stdout, " ---> %s\n", stringid.TruncateID(dispatchRequest.state.imageID))
 
-		***REMOVED***
-		if err := emitImageID(b.Aux, dispatchRequest.state); err != nil ***REMOVED***
+		}
+		if err := emitImageID(b.Aux, dispatchRequest.state); err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		buildArgs.MergeReferencedArgs(dispatchRequest.state.buildArgs)
-		if err := commitStage(dispatchRequest.state, stagesResults); err != nil ***REMOVED***
+		if err := commitStage(dispatchRequest.state, stagesResults); err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	buildArgs.WarnOnUnusedBuildArgs(b.Stdout)
 	return dispatchRequest.state, nil
-***REMOVED***
+}
 
-func addNodesForLabelOption(dockerfile *parser.Node, labels map[string]string) ***REMOVED***
-	if len(labels) == 0 ***REMOVED***
+func addNodesForLabelOption(dockerfile *parser.Node, labels map[string]string) {
+	if len(labels) == 0 {
 		return
-	***REMOVED***
+	}
 
 	node := parser.NodeFromLabels(labels)
 	dockerfile.Children = append(dockerfile.Children, node)
-***REMOVED***
+}
 
 // BuildFromConfig builds directly from `changes`, treating it as if it were the contents of a Dockerfile
 // It will:
@@ -357,63 +357,63 @@ func addNodesForLabelOption(dockerfile *parser.Node, labels map[string]string) *
 // coming from the query parameter of the same name.
 //
 // TODO: Remove?
-func BuildFromConfig(config *container.Config, changes []string, os string) (*container.Config, error) ***REMOVED***
-	if !system.IsOSSupported(os) ***REMOVED***
+func BuildFromConfig(config *container.Config, changes []string, os string) (*container.Config, error) {
+	if !system.IsOSSupported(os) {
 		return nil, errdefs.InvalidParameter(system.ErrNotSupportedOperatingSystem)
-	***REMOVED***
-	if len(changes) == 0 ***REMOVED***
+	}
+	if len(changes) == 0 {
 		return config, nil
-	***REMOVED***
+	}
 
 	dockerfile, err := parser.Parse(bytes.NewBufferString(strings.Join(changes, "\n")))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, errdefs.InvalidParameter(err)
-	***REMOVED***
+	}
 
-	b := newBuilder(context.Background(), builderOptions***REMOVED***
-		Options: &types.ImageBuildOptions***REMOVED***NoCache: true***REMOVED***,
-	***REMOVED***)
+	b := newBuilder(context.Background(), builderOptions{
+		Options: &types.ImageBuildOptions{NoCache: true},
+	})
 
 	// ensure that the commands are valid
-	for _, n := range dockerfile.AST.Children ***REMOVED***
-		if !validCommitCommands[n.Value] ***REMOVED***
+	for _, n := range dockerfile.AST.Children {
+		if !validCommitCommands[n.Value] {
 			return nil, errdefs.InvalidParameter(errors.Errorf("%s is not a valid change command", n.Value))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	b.Stdout = ioutil.Discard
 	b.Stderr = ioutil.Discard
 	b.disableCommit = true
 
-	commands := []instructions.Command***REMOVED******REMOVED***
-	for _, n := range dockerfile.AST.Children ***REMOVED***
+	commands := []instructions.Command{}
+	for _, n := range dockerfile.AST.Children {
 		cmd, err := instructions.ParseCommand(n)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, errdefs.InvalidParameter(err)
-		***REMOVED***
+		}
 		commands = append(commands, cmd)
-	***REMOVED***
+	}
 
 	dispatchRequest := newDispatchRequest(b, dockerfile.EscapeToken, nil, newBuildArgs(b.options.BuildArgs), newStagesBuildResults())
 	// We make mutations to the configuration, ensure we have a copy
 	dispatchRequest.state.runConfig = copyRunConfig(config)
 	dispatchRequest.state.imageID = config.Image
 	dispatchRequest.state.operatingSystem = os
-	for _, cmd := range commands ***REMOVED***
+	for _, cmd := range commands {
 		err := dispatch(dispatchRequest, cmd)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, errdefs.InvalidParameter(err)
-		***REMOVED***
+		}
 		dispatchRequest.state.updateRunConfig()
-	***REMOVED***
+	}
 
 	return dispatchRequest.state.runConfig, nil
-***REMOVED***
+}
 
-func convertMapToEnvList(m map[string]string) []string ***REMOVED***
-	result := []string***REMOVED******REMOVED***
-	for k, v := range m ***REMOVED***
+func convertMapToEnvList(m map[string]string) []string {
+	result := []string{}
+	for k, v := range m {
 		result = append(result, k+"="+v)
-	***REMOVED***
+	}
 	return result
-***REMOVED***
+}

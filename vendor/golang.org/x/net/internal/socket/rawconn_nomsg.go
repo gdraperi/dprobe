@@ -9,10 +9,10 @@ package socket
 
 import "errors"
 
-func (c *Conn) recvMsg(m *Message, flags int) error ***REMOVED***
+func (c *Conn) recvMsg(m *Message, flags int) error {
 	return errors.New("not implemented")
-***REMOVED***
+}
 
-func (c *Conn) sendMsg(m *Message, flags int) error ***REMOVED***
+func (c *Conn) sendMsg(m *Message, flags int) error {
 	return errors.New("not implemented")
-***REMOVED***
+}

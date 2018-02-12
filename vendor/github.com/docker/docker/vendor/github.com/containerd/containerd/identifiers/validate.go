@@ -33,25 +33,25 @@ var (
 //
 // In general, identifiers that pass this validation, should be safe for use as
 // a domain names or filesystem path component.
-func Validate(s string) error ***REMOVED***
-	if len(s) == 0 ***REMOVED***
+func Validate(s string) error {
+	if len(s) == 0 {
 		return errors.Wrapf(errdefs.ErrInvalidArgument, "identifier must not be empty")
-	***REMOVED***
+	}
 
-	if len(s) > maxLength ***REMOVED***
+	if len(s) > maxLength {
 		return errors.Wrapf(errdefs.ErrInvalidArgument, "identifier %q greater than maximum length (%d characters)", s, maxLength)
-	***REMOVED***
+	}
 
-	if !identifierRe.MatchString(s) ***REMOVED***
+	if !identifierRe.MatchString(s) {
 		return errors.Wrapf(errdefs.ErrInvalidArgument, "identifier %q must match %v", s, identifierRe)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func reGroup(s string) string ***REMOVED***
+func reGroup(s string) string {
 	return `(?:` + s + `)`
-***REMOVED***
+}
 
-func reAnchor(s string) string ***REMOVED***
+func reAnchor(s string) string {
 	return `^` + s + `$`
-***REMOVED***
+}

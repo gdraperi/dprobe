@@ -40,7 +40,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
-type WatchSelectors struct ***REMOVED***
+type WatchSelectors struct {
 	// supported by all object types
 	ID           *bool `protobuf:"varint,1,opt,name=id" json:"id,omitempty"`
 	IDPrefix     *bool `protobuf:"varint,2,opt,name=id_prefix,json=idPrefix" json:"id_prefix,omitempty"`
@@ -59,22 +59,22 @@ type WatchSelectors struct ***REMOVED***
 	// supported by: resource
 	Kind             *bool  `protobuf:"varint,13,opt,name=kind" json:"kind,omitempty"`
 	XXX_unrecognized []byte `json:"-"`
-***REMOVED***
+}
 
-func (m *WatchSelectors) Reset()                    ***REMOVED*** *m = WatchSelectors***REMOVED******REMOVED*** ***REMOVED***
-func (*WatchSelectors) ProtoMessage()               ***REMOVED******REMOVED***
-func (*WatchSelectors) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorPlugin, []int***REMOVED***0***REMOVED*** ***REMOVED***
+func (m *WatchSelectors) Reset()                    { *m = WatchSelectors{} }
+func (*WatchSelectors) ProtoMessage()               {}
+func (*WatchSelectors) Descriptor() ([]byte, []int) { return fileDescriptorPlugin, []int{0} }
 
-type StoreObject struct ***REMOVED***
+type StoreObject struct {
 	WatchSelectors   *WatchSelectors `protobuf:"bytes,1,req,name=watch_selectors,json=watchSelectors" json:"watch_selectors,omitempty"`
 	XXX_unrecognized []byte          `json:"-"`
-***REMOVED***
+}
 
-func (m *StoreObject) Reset()                    ***REMOVED*** *m = StoreObject***REMOVED******REMOVED*** ***REMOVED***
-func (*StoreObject) ProtoMessage()               ***REMOVED******REMOVED***
-func (*StoreObject) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorPlugin, []int***REMOVED***1***REMOVED*** ***REMOVED***
+func (m *StoreObject) Reset()                    { *m = StoreObject{} }
+func (*StoreObject) ProtoMessage()               {}
+func (*StoreObject) Descriptor() ([]byte, []int) { return fileDescriptorPlugin, []int{1} }
 
-type TLSAuthorization struct ***REMOVED***
+type TLSAuthorization struct {
 	// Roles contains the acceptable TLS OU roles for the handler.
 	Roles []string `protobuf:"bytes,1,rep,name=roles" json:"roles,omitempty"`
 	// Insecure is set to true if this method does not require
@@ -82,333 +82,333 @@ type TLSAuthorization struct ***REMOVED***
 	// list of roles is invalid. This would fail at codegen time.
 	Insecure         *bool  `protobuf:"varint,2,opt,name=insecure" json:"insecure,omitempty"`
 	XXX_unrecognized []byte `json:"-"`
-***REMOVED***
+}
 
-func (m *TLSAuthorization) Reset()                    ***REMOVED*** *m = TLSAuthorization***REMOVED******REMOVED*** ***REMOVED***
-func (*TLSAuthorization) ProtoMessage()               ***REMOVED******REMOVED***
-func (*TLSAuthorization) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorPlugin, []int***REMOVED***2***REMOVED*** ***REMOVED***
+func (m *TLSAuthorization) Reset()                    { *m = TLSAuthorization{} }
+func (*TLSAuthorization) ProtoMessage()               {}
+func (*TLSAuthorization) Descriptor() ([]byte, []int) { return fileDescriptorPlugin, []int{2} }
 
-var E_Deepcopy = &proto.ExtensionDesc***REMOVED***
+var E_Deepcopy = &proto.ExtensionDesc{
 	ExtendedType:  (*google_protobuf.MessageOptions)(nil),
 	ExtensionType: (*bool)(nil),
 	Field:         70000,
 	Name:          "docker.protobuf.plugin.deepcopy",
 	Tag:           "varint,70000,opt,name=deepcopy,def=1",
 	Filename:      "github.com/docker/swarmkit/protobuf/plugin/plugin.proto",
-***REMOVED***
+}
 
-var E_StoreObject = &proto.ExtensionDesc***REMOVED***
+var E_StoreObject = &proto.ExtensionDesc{
 	ExtendedType:  (*google_protobuf.MessageOptions)(nil),
 	ExtensionType: (*StoreObject)(nil),
 	Field:         70001,
 	Name:          "docker.protobuf.plugin.store_object",
 	Tag:           "bytes,70001,opt,name=store_object,json=storeObject",
 	Filename:      "github.com/docker/swarmkit/protobuf/plugin/plugin.proto",
-***REMOVED***
+}
 
-var E_TlsAuthorization = &proto.ExtensionDesc***REMOVED***
+var E_TlsAuthorization = &proto.ExtensionDesc{
 	ExtendedType:  (*google_protobuf.MethodOptions)(nil),
 	ExtensionType: (*TLSAuthorization)(nil),
 	Field:         73626345,
 	Name:          "docker.protobuf.plugin.tls_authorization",
 	Tag:           "bytes,73626345,opt,name=tls_authorization,json=tlsAuthorization",
 	Filename:      "github.com/docker/swarmkit/protobuf/plugin/plugin.proto",
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*WatchSelectors)(nil), "docker.protobuf.plugin.WatchSelectors")
 	proto.RegisterType((*StoreObject)(nil), "docker.protobuf.plugin.StoreObject")
 	proto.RegisterType((*TLSAuthorization)(nil), "docker.protobuf.plugin.TLSAuthorization")
 	proto.RegisterExtension(E_Deepcopy)
 	proto.RegisterExtension(E_StoreObject)
 	proto.RegisterExtension(E_TlsAuthorization)
-***REMOVED***
+}
 
-func (m *WatchSelectors) Copy() *WatchSelectors ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *WatchSelectors) Copy() *WatchSelectors {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &WatchSelectors***REMOVED******REMOVED***
+	}
+	o := &WatchSelectors{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *WatchSelectors) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *WatchSelectors) CopyFrom(src interface{}) {
 
 	o := src.(*WatchSelectors)
 	*m = *o
-***REMOVED***
+}
 
-func (m *StoreObject) Copy() *StoreObject ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *StoreObject) Copy() *StoreObject {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &StoreObject***REMOVED******REMOVED***
+	}
+	o := &StoreObject{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *StoreObject) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *StoreObject) CopyFrom(src interface{}) {
 
 	o := src.(*StoreObject)
 	*m = *o
-	if o.WatchSelectors != nil ***REMOVED***
-		m.WatchSelectors = &WatchSelectors***REMOVED******REMOVED***
+	if o.WatchSelectors != nil {
+		m.WatchSelectors = &WatchSelectors{}
 		github_com_docker_swarmkit_api_deepcopy.Copy(m.WatchSelectors, o.WatchSelectors)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (m *TLSAuthorization) Copy() *TLSAuthorization ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *TLSAuthorization) Copy() *TLSAuthorization {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &TLSAuthorization***REMOVED******REMOVED***
+	}
+	o := &TLSAuthorization{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *TLSAuthorization) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *TLSAuthorization) CopyFrom(src interface{}) {
 
 	o := src.(*TLSAuthorization)
 	*m = *o
-	if o.Roles != nil ***REMOVED***
+	if o.Roles != nil {
 		m.Roles = make([]string, len(o.Roles))
 		copy(m.Roles, o.Roles)
-	***REMOVED***
+	}
 
-***REMOVED***
+}
 
-func (m *WatchSelectors) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *WatchSelectors) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *WatchSelectors) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *WatchSelectors) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.ID != nil ***REMOVED***
+	if m.ID != nil {
 		dAtA[i] = 0x8
 		i++
-		if *m.ID ***REMOVED***
+		if *m.ID {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
-	if m.IDPrefix != nil ***REMOVED***
+	}
+	if m.IDPrefix != nil {
 		dAtA[i] = 0x10
 		i++
-		if *m.IDPrefix ***REMOVED***
+		if *m.IDPrefix {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
-	if m.Name != nil ***REMOVED***
+	}
+	if m.Name != nil {
 		dAtA[i] = 0x18
 		i++
-		if *m.Name ***REMOVED***
+		if *m.Name {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
-	if m.NamePrefix != nil ***REMOVED***
+	}
+	if m.NamePrefix != nil {
 		dAtA[i] = 0x20
 		i++
-		if *m.NamePrefix ***REMOVED***
+		if *m.NamePrefix {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
-	if m.Custom != nil ***REMOVED***
+	}
+	if m.Custom != nil {
 		dAtA[i] = 0x28
 		i++
-		if *m.Custom ***REMOVED***
+		if *m.Custom {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
-	if m.CustomPrefix != nil ***REMOVED***
+	}
+	if m.CustomPrefix != nil {
 		dAtA[i] = 0x30
 		i++
-		if *m.CustomPrefix ***REMOVED***
+		if *m.CustomPrefix {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
-	if m.ServiceID != nil ***REMOVED***
+	}
+	if m.ServiceID != nil {
 		dAtA[i] = 0x38
 		i++
-		if *m.ServiceID ***REMOVED***
+		if *m.ServiceID {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
-	if m.NodeID != nil ***REMOVED***
+	}
+	if m.NodeID != nil {
 		dAtA[i] = 0x40
 		i++
-		if *m.NodeID ***REMOVED***
+		if *m.NodeID {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
-	if m.Slot != nil ***REMOVED***
+	}
+	if m.Slot != nil {
 		dAtA[i] = 0x48
 		i++
-		if *m.Slot ***REMOVED***
+		if *m.Slot {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
-	if m.DesiredState != nil ***REMOVED***
+	}
+	if m.DesiredState != nil {
 		dAtA[i] = 0x50
 		i++
-		if *m.DesiredState ***REMOVED***
+		if *m.DesiredState {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
-	if m.Role != nil ***REMOVED***
+	}
+	if m.Role != nil {
 		dAtA[i] = 0x58
 		i++
-		if *m.Role ***REMOVED***
+		if *m.Role {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
-	if m.Membership != nil ***REMOVED***
+	}
+	if m.Membership != nil {
 		dAtA[i] = 0x60
 		i++
-		if *m.Membership ***REMOVED***
+		if *m.Membership {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
-	if m.Kind != nil ***REMOVED***
+	}
+	if m.Kind != nil {
 		dAtA[i] = 0x68
 		i++
-		if *m.Kind ***REMOVED***
+		if *m.Kind {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
-	if m.XXX_unrecognized != nil ***REMOVED***
+	}
+	if m.XXX_unrecognized != nil {
 		i += copy(dAtA[i:], m.XXX_unrecognized)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *StoreObject) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *StoreObject) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *StoreObject) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *StoreObject) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.WatchSelectors == nil ***REMOVED***
+	if m.WatchSelectors == nil {
 		return 0, github_com_gogo_protobuf_proto.NewRequiredNotSetError("watch_selectors")
-	***REMOVED*** else ***REMOVED***
+	} else {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintPlugin(dAtA, i, uint64(m.WatchSelectors.Size()))
 		n1, err := m.WatchSelectors.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n1
-	***REMOVED***
-	if m.XXX_unrecognized != nil ***REMOVED***
+	}
+	if m.XXX_unrecognized != nil {
 		i += copy(dAtA[i:], m.XXX_unrecognized)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *TLSAuthorization) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *TLSAuthorization) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *TLSAuthorization) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *TLSAuthorization) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Roles) > 0 ***REMOVED***
-		for _, s := range m.Roles ***REMOVED***
+	if len(m.Roles) > 0 {
+		for _, s := range m.Roles {
 			dAtA[i] = 0xa
 			i++
 			l = len(s)
-			for l >= 1<<7 ***REMOVED***
+			for l >= 1<<7 {
 				dAtA[i] = uint8(uint64(l)&0x7f | 0x80)
 				l >>= 7
 				i++
-			***REMOVED***
+			}
 			dAtA[i] = uint8(l)
 			i++
 			i += copy(dAtA[i:], s)
-		***REMOVED***
-	***REMOVED***
-	if m.Insecure != nil ***REMOVED***
+		}
+	}
+	if m.Insecure != nil {
 		dAtA[i] = 0x10
 		i++
-		if *m.Insecure ***REMOVED***
+		if *m.Insecure {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
-	if m.XXX_unrecognized != nil ***REMOVED***
+	}
+	if m.XXX_unrecognized != nil {
 		i += copy(dAtA[i:], m.XXX_unrecognized)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func encodeFixed64Plugin(dAtA []byte, offset int, v uint64) int ***REMOVED***
+func encodeFixed64Plugin(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
 	dAtA[offset+2] = uint8(v >> 16)
@@ -418,121 +418,121 @@ func encodeFixed64Plugin(dAtA []byte, offset int, v uint64) int ***REMOVED***
 	dAtA[offset+6] = uint8(v >> 48)
 	dAtA[offset+7] = uint8(v >> 56)
 	return offset + 8
-***REMOVED***
-func encodeFixed32Plugin(dAtA []byte, offset int, v uint32) int ***REMOVED***
+}
+func encodeFixed32Plugin(dAtA []byte, offset int, v uint32) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
 	dAtA[offset+2] = uint8(v >> 16)
 	dAtA[offset+3] = uint8(v >> 24)
 	return offset + 4
-***REMOVED***
-func encodeVarintPlugin(dAtA []byte, offset int, v uint64) int ***REMOVED***
-	for v >= 1<<7 ***REMOVED***
+}
+func encodeVarintPlugin(dAtA []byte, offset int, v uint64) int {
+	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
-	***REMOVED***
+	}
 	dAtA[offset] = uint8(v)
 	return offset + 1
-***REMOVED***
+}
 
-func (m *WatchSelectors) Size() (n int) ***REMOVED***
+func (m *WatchSelectors) Size() (n int) {
 	var l int
 	_ = l
-	if m.ID != nil ***REMOVED***
+	if m.ID != nil {
 		n += 2
-	***REMOVED***
-	if m.IDPrefix != nil ***REMOVED***
+	}
+	if m.IDPrefix != nil {
 		n += 2
-	***REMOVED***
-	if m.Name != nil ***REMOVED***
+	}
+	if m.Name != nil {
 		n += 2
-	***REMOVED***
-	if m.NamePrefix != nil ***REMOVED***
+	}
+	if m.NamePrefix != nil {
 		n += 2
-	***REMOVED***
-	if m.Custom != nil ***REMOVED***
+	}
+	if m.Custom != nil {
 		n += 2
-	***REMOVED***
-	if m.CustomPrefix != nil ***REMOVED***
+	}
+	if m.CustomPrefix != nil {
 		n += 2
-	***REMOVED***
-	if m.ServiceID != nil ***REMOVED***
+	}
+	if m.ServiceID != nil {
 		n += 2
-	***REMOVED***
-	if m.NodeID != nil ***REMOVED***
+	}
+	if m.NodeID != nil {
 		n += 2
-	***REMOVED***
-	if m.Slot != nil ***REMOVED***
+	}
+	if m.Slot != nil {
 		n += 2
-	***REMOVED***
-	if m.DesiredState != nil ***REMOVED***
+	}
+	if m.DesiredState != nil {
 		n += 2
-	***REMOVED***
-	if m.Role != nil ***REMOVED***
+	}
+	if m.Role != nil {
 		n += 2
-	***REMOVED***
-	if m.Membership != nil ***REMOVED***
+	}
+	if m.Membership != nil {
 		n += 2
-	***REMOVED***
-	if m.Kind != nil ***REMOVED***
+	}
+	if m.Kind != nil {
 		n += 2
-	***REMOVED***
-	if m.XXX_unrecognized != nil ***REMOVED***
+	}
+	if m.XXX_unrecognized != nil {
 		n += len(m.XXX_unrecognized)
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *StoreObject) Size() (n int) ***REMOVED***
+func (m *StoreObject) Size() (n int) {
 	var l int
 	_ = l
-	if m.WatchSelectors != nil ***REMOVED***
+	if m.WatchSelectors != nil {
 		l = m.WatchSelectors.Size()
 		n += 1 + l + sovPlugin(uint64(l))
-	***REMOVED***
-	if m.XXX_unrecognized != nil ***REMOVED***
+	}
+	if m.XXX_unrecognized != nil {
 		n += len(m.XXX_unrecognized)
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *TLSAuthorization) Size() (n int) ***REMOVED***
+func (m *TLSAuthorization) Size() (n int) {
 	var l int
 	_ = l
-	if len(m.Roles) > 0 ***REMOVED***
-		for _, s := range m.Roles ***REMOVED***
+	if len(m.Roles) > 0 {
+		for _, s := range m.Roles {
 			l = len(s)
 			n += 1 + l + sovPlugin(uint64(l))
-		***REMOVED***
-	***REMOVED***
-	if m.Insecure != nil ***REMOVED***
+		}
+	}
+	if m.Insecure != nil {
 		n += 2
-	***REMOVED***
-	if m.XXX_unrecognized != nil ***REMOVED***
+	}
+	if m.XXX_unrecognized != nil {
 		n += len(m.XXX_unrecognized)
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func sovPlugin(x uint64) (n int) ***REMOVED***
-	for ***REMOVED***
+func sovPlugin(x uint64) (n int) {
+	for {
 		n++
 		x >>= 7
-		if x == 0 ***REMOVED***
+		if x == 0 {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
-func sozPlugin(x uint64) (n int) ***REMOVED***
+}
+func sozPlugin(x uint64) (n int) {
 	return sovPlugin(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-***REMOVED***
-func (this *WatchSelectors) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *WatchSelectors) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&WatchSelectors***REMOVED***`,
+	}
+	s := strings.Join([]string{`&WatchSelectors{`,
 		`ID:` + valueToStringPlugin(this.ID) + `,`,
 		`IDPrefix:` + valueToStringPlugin(this.IDPrefix) + `,`,
 		`Name:` + valueToStringPlugin(this.Name) + `,`,
@@ -547,642 +547,642 @@ func (this *WatchSelectors) String() string ***REMOVED***
 		`Membership:` + valueToStringPlugin(this.Membership) + `,`,
 		`Kind:` + valueToStringPlugin(this.Kind) + `,`,
 		`XXX_unrecognized:` + fmt.Sprintf("%v", this.XXX_unrecognized) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *StoreObject) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *StoreObject) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&StoreObject***REMOVED***`,
+	}
+	s := strings.Join([]string{`&StoreObject{`,
 		`WatchSelectors:` + strings.Replace(fmt.Sprintf("%v", this.WatchSelectors), "WatchSelectors", "WatchSelectors", 1) + `,`,
 		`XXX_unrecognized:` + fmt.Sprintf("%v", this.XXX_unrecognized) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *TLSAuthorization) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *TLSAuthorization) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&TLSAuthorization***REMOVED***`,
+	}
+	s := strings.Join([]string{`&TLSAuthorization{`,
 		`Roles:` + fmt.Sprintf("%v", this.Roles) + `,`,
 		`Insecure:` + valueToStringPlugin(this.Insecure) + `,`,
 		`XXX_unrecognized:` + fmt.Sprintf("%v", this.XXX_unrecognized) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func valueToStringPlugin(v interface***REMOVED******REMOVED***) string ***REMOVED***
+}
+func valueToStringPlugin(v interface{}) string {
 	rv := reflect.ValueOf(v)
-	if rv.IsNil() ***REMOVED***
+	if rv.IsNil() {
 		return "nil"
-	***REMOVED***
+	}
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
-***REMOVED***
-func (m *WatchSelectors) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *WatchSelectors) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowPlugin
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: WatchSelectors: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: WatchSelectors: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowPlugin
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			b := bool(v != 0)
 			m.ID = &b
 		case 2:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field IDPrefix", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowPlugin
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			b := bool(v != 0)
 			m.IDPrefix = &b
 		case 3:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowPlugin
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			b := bool(v != 0)
 			m.Name = &b
 		case 4:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field NamePrefix", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowPlugin
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			b := bool(v != 0)
 			m.NamePrefix = &b
 		case 5:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Custom", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowPlugin
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			b := bool(v != 0)
 			m.Custom = &b
 		case 6:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CustomPrefix", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowPlugin
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			b := bool(v != 0)
 			m.CustomPrefix = &b
 		case 7:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ServiceID", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowPlugin
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			b := bool(v != 0)
 			m.ServiceID = &b
 		case 8:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field NodeID", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowPlugin
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			b := bool(v != 0)
 			m.NodeID = &b
 		case 9:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Slot", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowPlugin
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			b := bool(v != 0)
 			m.Slot = &b
 		case 10:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field DesiredState", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowPlugin
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			b := bool(v != 0)
 			m.DesiredState = &b
 		case 11:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Role", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowPlugin
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			b := bool(v != 0)
 			m.Role = &b
 		case 12:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Membership", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowPlugin
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			b := bool(v != 0)
 			m.Membership = &b
 		case 13:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Kind", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowPlugin
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			b := bool(v != 0)
 			m.Kind = &b
 		default:
 			iNdEx = preIndex
 			skippy, err := skipPlugin(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthPlugin
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *StoreObject) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *StoreObject) Unmarshal(dAtA []byte) error {
 	var hasFields [1]uint64
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowPlugin
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: StoreObject: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: StoreObject: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field WatchSelectors", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowPlugin
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthPlugin
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.WatchSelectors == nil ***REMOVED***
-				m.WatchSelectors = &WatchSelectors***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.WatchSelectors.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.WatchSelectors == nil {
+				m.WatchSelectors = &WatchSelectors{}
+			}
+			if err := m.WatchSelectors.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 			hasFields[0] |= uint64(0x00000001)
 		default:
 			iNdEx = preIndex
 			skippy, err := skipPlugin(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthPlugin
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
-	if hasFields[0]&uint64(0x00000001) == 0 ***REMOVED***
+		}
+	}
+	if hasFields[0]&uint64(0x00000001) == 0 {
 		return github_com_gogo_protobuf_proto.NewRequiredNotSetError("watch_selectors")
-	***REMOVED***
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *TLSAuthorization) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *TLSAuthorization) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowPlugin
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: TLSAuthorization: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: TLSAuthorization: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Roles", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowPlugin
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthPlugin
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Roles = append(m.Roles, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		case 2:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Insecure", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowPlugin
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			b := bool(v != 0)
 			m.Insecure = &b
 		default:
 			iNdEx = preIndex
 			skippy, err := skipPlugin(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthPlugin
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func skipPlugin(dAtA []byte) (n int, err error) ***REMOVED***
+}
+func skipPlugin(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return 0, ErrIntOverflowPlugin
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return 0, io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		wireType := int(wire & 0x7)
-		switch wireType ***REMOVED***
+		switch wireType {
 		case 0:
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowPlugin
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				iNdEx++
-				if dAtA[iNdEx-1] < 0x80 ***REMOVED***
+				if dAtA[iNdEx-1] < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return iNdEx, nil
 		case 1:
 			iNdEx += 8
 			return iNdEx, nil
 		case 2:
 			var length int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowPlugin
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				length |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			iNdEx += length
-			if length < 0 ***REMOVED***
+			if length < 0 {
 				return 0, ErrInvalidLengthPlugin
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 3:
-			for ***REMOVED***
+			for {
 				var innerWire uint64
 				var start int = iNdEx
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return 0, ErrIntOverflowPlugin
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return 0, io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					innerWire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				innerWireType := int(innerWire & 0x7)
-				if innerWireType == 4 ***REMOVED***
+				if innerWireType == 4 {
 					break
-				***REMOVED***
+				}
 				next, err := skipPlugin(dAtA[start:])
-				if err != nil ***REMOVED***
+				if err != nil {
 					return 0, err
-				***REMOVED***
+				}
 				iNdEx = start + next
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 4:
 			return iNdEx, nil
@@ -1191,21 +1191,21 @@ func skipPlugin(dAtA []byte) (n int, err error) ***REMOVED***
 			return iNdEx, nil
 		default:
 			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	panic("unreachable")
-***REMOVED***
+}
 
 var (
 	ErrInvalidLengthPlugin = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowPlugin   = fmt.Errorf("proto: integer overflow")
 )
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterFile("github.com/docker/swarmkit/protobuf/plugin/plugin.proto", fileDescriptorPlugin)
-***REMOVED***
+}
 
-var fileDescriptorPlugin = []byte***REMOVED***
+var fileDescriptorPlugin = []byte{
 	// 575 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x52, 0xc1, 0x6e, 0xd3, 0x4c,
 	0x10, 0xae, 0xd3, 0x36, 0x4d, 0x26, 0x69, 0xff, 0xfe, 0x2b, 0x54, 0xad, 0x7a, 0x70, 0xaa, 0x46,
@@ -1243,4 +1243,4 @@ var fileDescriptorPlugin = []byte***REMOVED***
 	0x77, 0xcd, 0xfb, 0xfb, 0x25, 0xc3, 0x7d, 0x9d, 0xa8, 0x35, 0xe4, 0x94, 0x5e, 0x5d, 0xfb, 0x1b,
 	0x5f, 0xaf, 0xfd, 0x8d, 0x0f, 0x85, 0xef, 0x5d, 0x15, 0xbe, 0xf7, 0xa5, 0xf0, 0xbd, 0x6f, 0x85,
 	0xef, 0xfd, 0x0e, 0x00, 0x00, 0xff, 0xff, 0xb3, 0x99, 0x7d, 0xfb, 0xf9, 0x03, 0x00, 0x00,
-***REMOVED***
+}

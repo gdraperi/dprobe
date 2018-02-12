@@ -14,7 +14,7 @@ var (
 )
 
 // see http://msdn.microsoft.com/en-us/library/windows/desktop/ms724958(v=vs.85).aspx
-type systeminfo struct ***REMOVED***
+type systeminfo struct {
 	wProcessorArchitecture      uint16
 	wReserved                   uint16
 	dwPageSize                  uint32
@@ -26,7 +26,7 @@ type systeminfo struct ***REMOVED***
 	dwAllocationGranularity     uint32
 	wProcessorLevel             uint16
 	wProcessorRevision          uint16
-***REMOVED***
+}
 
 // Constants
 const (
@@ -37,10 +37,10 @@ const (
 )
 
 // runtimeArchitecture gets the name of the current architecture (x86, x86_64, …)
-func runtimeArchitecture() (string, error) ***REMOVED***
+func runtimeArchitecture() (string, error) {
 	var sysinfo systeminfo
 	syscall.Syscall(procGetSystemInfo.Addr(), 1, uintptr(unsafe.Pointer(&sysinfo)), 0, 0)
-	switch sysinfo.wProcessorArchitecture ***REMOVED***
+	switch sysinfo.wProcessorArchitecture {
 	case ProcessorArchitecture64, ProcessorArchitectureIA64:
 		return "x86_64", nil
 	case ProcessorArchitecture32:
@@ -49,12 +49,12 @@ func runtimeArchitecture() (string, error) ***REMOVED***
 		return "arm", nil
 	default:
 		return "", fmt.Errorf("Unknown processor architecture")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // NumProcs returns the number of processors on the system
-func NumProcs() uint32 ***REMOVED***
+func NumProcs() uint32 {
 	var sysinfo systeminfo
 	syscall.Syscall(procGetSystemInfo.Addr(), 1, uintptr(unsafe.Pointer(&sysinfo)), 0, 0)
 	return sysinfo.dwNumberOfProcessors
-***REMOVED***
+}

@@ -7,28 +7,28 @@ import (
 	"github.com/docker/docker/api/types/mount"
 )
 
-var lcowSpecificValidators mountValidator = func(m *mount.Mount) error ***REMOVED***
-	if path.Clean(m.Target) == "/" ***REMOVED***
+var lcowSpecificValidators mountValidator = func(m *mount.Mount) error {
+	if path.Clean(m.Target) == "/" {
 		return ErrVolumeTargetIsRoot
-	***REMOVED***
-	if m.Type == mount.TypeNamedPipe ***REMOVED***
+	}
+	if m.Type == mount.TypeNamedPipe {
 		return errors.New("Linux containers on Windows do not support named pipe mounts")
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-type lcowParser struct ***REMOVED***
+type lcowParser struct {
 	windowsParser
-***REMOVED***
+}
 
-func (p *lcowParser) ValidateMountConfig(mnt *mount.Mount) error ***REMOVED***
+func (p *lcowParser) ValidateMountConfig(mnt *mount.Mount) error {
 	return p.validateMountConfigReg(mnt, rxLCOWDestination, lcowSpecificValidators)
-***REMOVED***
+}
 
-func (p *lcowParser) ParseMountRaw(raw, volumeDriver string) (*MountPoint, error) ***REMOVED***
+func (p *lcowParser) ParseMountRaw(raw, volumeDriver string) (*MountPoint, error) {
 	return p.parseMountRaw(raw, volumeDriver, rxLCOWDestination, false, lcowSpecificValidators)
-***REMOVED***
+}
 
-func (p *lcowParser) ParseMountSpec(cfg mount.Mount) (*MountPoint, error) ***REMOVED***
+func (p *lcowParser) ParseMountSpec(cfg mount.Mount) (*MountPoint, error) {
 	return p.parseMountSpec(cfg, rxLCOWDestination, false, lcowSpecificValidators)
-***REMOVED***
+}

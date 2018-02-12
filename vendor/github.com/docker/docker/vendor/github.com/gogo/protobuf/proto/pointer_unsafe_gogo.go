@@ -37,22 +37,22 @@ import (
 	"unsafe"
 )
 
-func structPointer_InterfaceAt(p structPointer, f field, t reflect.Type) interface***REMOVED******REMOVED*** ***REMOVED***
+func structPointer_InterfaceAt(p structPointer, f field, t reflect.Type) interface{} {
 	point := unsafe.Pointer(uintptr(p) + uintptr(f))
 	r := reflect.NewAt(t, point)
 	return r.Interface()
-***REMOVED***
+}
 
-func structPointer_InterfaceRef(p structPointer, f field, t reflect.Type) interface***REMOVED******REMOVED*** ***REMOVED***
+func structPointer_InterfaceRef(p structPointer, f field, t reflect.Type) interface{} {
 	point := unsafe.Pointer(uintptr(p) + uintptr(f))
 	r := reflect.NewAt(t, point)
-	if r.Elem().IsNil() ***REMOVED***
+	if r.Elem().IsNil() {
 		return nil
-	***REMOVED***
+	}
 	return r.Elem().Interface()
-***REMOVED***
+}
 
-func copyUintPtr(oldptr, newptr uintptr, size int) ***REMOVED***
+func copyUintPtr(oldptr, newptr uintptr, size int) {
 	oldbytes := make([]byte, 0)
 	oldslice := (*reflect.SliceHeader)(unsafe.Pointer(&oldbytes))
 	oldslice.Data = oldptr
@@ -64,13 +64,13 @@ func copyUintPtr(oldptr, newptr uintptr, size int) ***REMOVED***
 	newslice.Len = size
 	newslice.Cap = size
 	copy(newbytes, oldbytes)
-***REMOVED***
+}
 
-func structPointer_Copy(oldptr structPointer, newptr structPointer, size int) ***REMOVED***
+func structPointer_Copy(oldptr structPointer, newptr structPointer, size int) {
 	copyUintPtr(uintptr(oldptr), uintptr(newptr), size)
-***REMOVED***
+}
 
-func appendStructPointer(base structPointer, f field, typ reflect.Type) structPointer ***REMOVED***
+func appendStructPointer(base structPointer, f field, typ reflect.Type) structPointer {
 	size := typ.Elem().Size()
 
 	oldHeader := structPointer_GetSliceHeader(base, f)
@@ -84,45 +84,45 @@ func appendStructPointer(base structPointer, f field, typ reflect.Type) structPo
 	oldHeader.Cap = newLen
 
 	return structPointer(unsafe.Pointer(uintptr(unsafe.Pointer(bas)) + uintptr(uintptr(newLen-1)*size)))
-***REMOVED***
+}
 
-func structPointer_FieldPointer(p structPointer, f field) structPointer ***REMOVED***
+func structPointer_FieldPointer(p structPointer, f field) structPointer {
 	return structPointer(unsafe.Pointer(uintptr(p) + uintptr(f)))
-***REMOVED***
+}
 
-func structPointer_GetRefStructPointer(p structPointer, f field) structPointer ***REMOVED***
+func structPointer_GetRefStructPointer(p structPointer, f field) structPointer {
 	return structPointer((*structPointer)(unsafe.Pointer(uintptr(p) + uintptr(f))))
-***REMOVED***
+}
 
-func structPointer_GetSliceHeader(p structPointer, f field) *reflect.SliceHeader ***REMOVED***
+func structPointer_GetSliceHeader(p structPointer, f field) *reflect.SliceHeader {
 	return (*reflect.SliceHeader)(unsafe.Pointer(uintptr(p) + uintptr(f)))
-***REMOVED***
+}
 
-func structPointer_Add(p structPointer, size field) structPointer ***REMOVED***
+func structPointer_Add(p structPointer, size field) structPointer {
 	return structPointer(unsafe.Pointer(uintptr(p) + uintptr(size)))
-***REMOVED***
+}
 
-func structPointer_Len(p structPointer, f field) int ***REMOVED***
-	return len(*(*[]interface***REMOVED******REMOVED***)(unsafe.Pointer(structPointer_GetRefStructPointer(p, f))))
-***REMOVED***
+func structPointer_Len(p structPointer, f field) int {
+	return len(*(*[]interface{})(unsafe.Pointer(structPointer_GetRefStructPointer(p, f))))
+}
 
-func structPointer_StructRefSlice(p structPointer, f field, size uintptr) *structRefSlice ***REMOVED***
-	return &structRefSlice***REMOVED***p: p, f: f, size: size***REMOVED***
-***REMOVED***
+func structPointer_StructRefSlice(p structPointer, f field, size uintptr) *structRefSlice {
+	return &structRefSlice{p: p, f: f, size: size}
+}
 
 // A structRefSlice represents a slice of structs (themselves submessages or groups).
-type structRefSlice struct ***REMOVED***
+type structRefSlice struct {
 	p    structPointer
 	f    field
 	size uintptr
-***REMOVED***
+}
 
-func (v *structRefSlice) Len() int ***REMOVED***
+func (v *structRefSlice) Len() int {
 	return structPointer_Len(v.p, v.f)
-***REMOVED***
+}
 
-func (v *structRefSlice) Index(i int) structPointer ***REMOVED***
+func (v *structRefSlice) Index(i int) structPointer {
 	ss := structPointer_GetStructPointer(v.p, v.f)
 	ss1 := structPointer_GetRefStructPointer(ss, 0)
 	return structPointer_Add(ss1, field(uintptr(i)*v.size))
-***REMOVED***
+}

@@ -35,9 +35,9 @@ info:
     The API uses standard HTTP status codes to indicate the success or failure of the API call. The body of the response will be JSON in the following format:
 
     ```
-    ***REMOVED***
+    {
       "message": "page not found"
-***REMOVED***
+    }
     ```
 
     # Versioning
@@ -68,12 +68,12 @@ info:
     Authentication for registries is handled client side. The client has to send authentication details to various endpoints that need to communicate with registries, such as `POST /images/(name)/push`. These are sent as `X-Registry-Auth` header as a Base64 encoded (JSON) string with the following structure:
 
     ```
-    ***REMOVED***
+    {
       "username": "string",
       "password": "string",
       "email": "string",
       "serveraddress": "string"
-***REMOVED***
+    }
     ```
 
     The `serveraddress` is a domain/IP without a protocol. Throughout this structure, double quotes are required.
@@ -81,9 +81,9 @@ info:
     If you have already got an identity token from the [`/auth` endpoint](#operation/SystemAuth), you can just pass this instead of credentials:
 
     ```
-    ***REMOVED***
+    {
       "identitytoken": "9cbaf023786cd7..."
-***REMOVED***
+    }
     ```
 
 # The tags on paths define the menu sections in the ReDoc documentation, so
@@ -346,7 +346,7 @@ definitions:
         maximum: 1000
       BlkioWeightDevice:
         description: |
-          Block IO weight (relative device weight) in the form `[***REMOVED***"Path": "device_path", "Weight": weight***REMOVED***]`.
+          Block IO weight (relative device weight) in the form `[{"Path": "device_path", "Weight": weight}]`.
         type: "array"
         items:
           type: "object"
@@ -358,25 +358,25 @@ definitions:
               minimum: 0
       BlkioDeviceReadBps:
         description: |
-          Limit read rate (bytes per second) from a device, in the form `[***REMOVED***"Path": "device_path", "Rate": rate***REMOVED***]`.
+          Limit read rate (bytes per second) from a device, in the form `[{"Path": "device_path", "Rate": rate}]`.
         type: "array"
         items:
           $ref: "#/definitions/ThrottleDevice"
       BlkioDeviceWriteBps:
         description: |
-          Limit write rate (bytes per second) to a device, in the form `[***REMOVED***"Path": "device_path", "Rate": rate***REMOVED***]`.
+          Limit write rate (bytes per second) to a device, in the form `[{"Path": "device_path", "Rate": rate}]`.
         type: "array"
         items:
           $ref: "#/definitions/ThrottleDevice"
       BlkioDeviceReadIOps:
         description: |
-          Limit read rate (IO per second) from a device, in the form `[***REMOVED***"Path": "device_path", "Rate": rate***REMOVED***]`.
+          Limit read rate (IO per second) from a device, in the form `[{"Path": "device_path", "Rate": rate}]`.
         type: "array"
         items:
           $ref: "#/definitions/ThrottleDevice"
       BlkioDeviceWriteIOps:
         description: |
-          Limit write rate (IO per second) to a device, in the form `[***REMOVED***"Path": "device_path", "Rate": rate***REMOVED***]`.
+          Limit write rate (IO per second) to a device, in the form `[{"Path": "device_path", "Rate": rate}]`.
         type: "array"
         items:
           $ref: "#/definitions/ThrottleDevice"
@@ -453,7 +453,7 @@ definitions:
         format: "int64"
       Ulimits:
         description: |
-          A list of resource limits to set in the container. For example: `***REMOVED***"Name": "nofile", "Soft": 1024, "Hard": 2048***REMOVED***`"
+          A list of resource limits to set in the container. For example: `{"Name": "nofile", "Soft": 1024, "Hard": 2048}`"
         type: "array"
         items:
           type: "object"
@@ -727,13 +727,13 @@ definitions:
           StorageOpt:
             type: "object"
             description: |
-              Storage driver options for this container, in the form `***REMOVED***"size": "120G"***REMOVED***`.
+              Storage driver options for this container, in the form `{"size": "120G"}`.
             additionalProperties:
               type: "string"
           Tmpfs:
             type: "object"
             description: |
-              A map of container directories which should be replaced by tmpfs mounts, and their corresponding mount options. For example: `***REMOVED*** "/run": "rw,noexec,nosuid,size=65536k" ***REMOVED***`.
+              A map of container directories which should be replaced by tmpfs mounts, and their corresponding mount options. For example: `{ "/run": "rw,noexec,nosuid,size=65536k" }`.
             additionalProperties:
               type: "string"
           UTSMode:
@@ -749,7 +749,7 @@ definitions:
           Sysctls:
             type: "object"
             description: |
-              A list of kernel parameters (sysctls) to set in the container. For example: `***REMOVED***"net.ipv4.ip_forward": "1"***REMOVED***`
+              A list of kernel parameters (sysctls) to set in the container. For example: `{"net.ipv4.ip_forward": "1"}`
             additionalProperties:
               type: "string"
           Runtime:
@@ -801,13 +801,13 @@ definitions:
         description: |
           An object mapping ports to an empty object in the form:
 
-          `***REMOVED***"<port>/<tcp|udp>": ***REMOVED******REMOVED******REMOVED***`
+          `{"<port>/<tcp|udp>": {}}`
         type: "object"
         additionalProperties:
           type: "object"
           enum:
-            - ***REMOVED******REMOVED***
-          default: ***REMOVED******REMOVED***
+            - {}
+          default: {}
       Tty:
         description: "Attach standard streams to a TTY, including `stdin` if it is not closed."
         type: "boolean"
@@ -846,8 +846,8 @@ definitions:
           additionalProperties:
             type: "object"
             enum:
-              - ***REMOVED******REMOVED***
-            default: ***REMOVED******REMOVED***
+              - {}
+            default: {}
       WorkingDir:
         description: "The working directory for commands to run in."
         type: "string"
@@ -1317,7 +1317,7 @@ definitions:
         description: |
           Low-level details about the volume, provided by the volume driver.
           Details are returned as a map with key/value pairs:
-          `***REMOVED***"key":"value","key2":"value2"***REMOVED***`.
+          `{"key":"value","key2":"value2"}`.
 
           The `Status` field is optional, and is omitted if the volume driver
           does not support this feature.
@@ -1455,7 +1455,7 @@ definitions:
         type: "string"
         default: "default"
       Config:
-        description: "List of IPAM configuration options, specified as a map: `***REMOVED***\"Subnet\": <CIDR>, \"IPRange\": <CIDR>, \"Gateway\": <IP address>, \"AuxAddress\": <device_name:IP address>***REMOVED***`"
+        description: "List of IPAM configuration options, specified as a map: `{\"Subnet\": <CIDR>, \"IPRange\": <CIDR>, \"Gateway\": <IP address>, \"AuxAddress\": <device_name:IP address>}`"
         type: "array"
         items:
           type: "object"
@@ -2873,12 +2873,12 @@ definitions:
         ContainerSpec:
           Image: "redis"
         Resources:
-          Limits: ***REMOVED******REMOVED***
-          Reservations: ***REMOVED******REMOVED***
+          Limits: {}
+          Reservations: {}
         RestartPolicy:
           Condition: "any"
           MaxAttempts: 0
-        Placement: ***REMOVED******REMOVED***
+        Placement: {}
       ServiceID: "9mnpnzenvg8p8tdbtq4wvbkcz"
       Slot: 1
       NodeID: "60gvrl6tm78dmak4yl7srz94v"
@@ -2901,9 +2901,9 @@ definitions:
               Name: "ingress"
               Labels:
                 com.docker.swarm.internal: "true"
-              DriverConfiguration: ***REMOVED******REMOVED***
+              DriverConfiguration: {}
               IPAMOptions:
-                Driver: ***REMOVED******REMOVED***
+                Driver: {}
                 Configs:
                   - Subnet: "10.255.0.0/16"
                     Gateway: "10.255.0.1"
@@ -3151,12 +3151,12 @@ definitions:
           ContainerSpec:
             Image: "redis"
           Resources:
-            Limits: ***REMOVED******REMOVED***
-            Reservations: ***REMOVED******REMOVED***
+            Limits: {}
+            Reservations: {}
           RestartPolicy:
             Condition: "any"
             MaxAttempts: 0
-          Placement: ***REMOVED******REMOVED***
+          Placement: {}
           ForceUpdate: 0
         Mode:
           Replicated:
@@ -4188,7 +4188,7 @@ paths:
         - name: "filters"
           in: "query"
           description: |
-            Filters to process on the container list, encoded as JSON (a `map[string][]string`). For example, `***REMOVED***"status": ["paused"]***REMOVED***` will only return paused containers. Available filters:
+            Filters to process on the container list, encoded as JSON (a `map[string][]string`). For example, `{"status": ["paused"]}` will only return paused containers. Available filters:
 
             - `ancestor`=(`<image-name>[:<tag>]`, `<image id>`, or `<image@digest>`)
             - `before`=(`<container id>` or `<container name>`)
@@ -4264,7 +4264,7 @@ paths:
                 State: "Exited"
                 Status: "Exit 0"
                 Ports: []
-                Labels: ***REMOVED******REMOVED***
+                Labels: {}
                 SizeRw: 12288
                 SizeRootFs: 0
                 HostConfig:
@@ -4292,7 +4292,7 @@ paths:
                 State: "Exited"
                 Status: "Exit 0"
                 Ports: []
-                Labels: ***REMOVED******REMOVED***
+                Labels: {}
                 SizeRw: 12288
                 SizeRootFs: 0
                 HostConfig:
@@ -4320,7 +4320,7 @@ paths:
                 State: "Exited"
                 Status: "Exit 0"
                 Ports: []
-                Labels: ***REMOVED******REMOVED***
+                Labels: {}
                 SizeRw: 12288
                 SizeRootFs: 0
                 HostConfig:
@@ -4403,12 +4403,12 @@ paths:
                 com.example.license: "GPL"
                 com.example.version: "1.0"
               Volumes:
-                /volumes/data: ***REMOVED******REMOVED***
+                /volumes/data: {}
               WorkingDir: ""
               NetworkDisabled: false
               MacAddress: "12:34:56:78:9a:bc"
               ExposedPorts:
-                22/tcp: ***REMOVED******REMOVED***
+                22/tcp: {}
               StopSignal: "SIGTERM"
               StopTimeout: 10
               HostConfig:
@@ -4433,15 +4433,15 @@ paths:
                 MaximumIOBps: 0
                 BlkioWeight: 300
                 BlkioWeightDevice:
-                  - ***REMOVED******REMOVED***
+                  - {}
                 BlkioDeviceReadBps:
-                  - ***REMOVED******REMOVED***
+                  - {}
                 BlkioDeviceReadIOps:
-                  - ***REMOVED******REMOVED***
+                  - {}
                 BlkioDeviceWriteBps:
-                  - ***REMOVED******REMOVED***
+                  - {}
                 BlkioDeviceWriteIOps:
-                  - ***REMOVED******REMOVED***
+                  - {}
                 MemorySwappiness: 60
                 OomKillDisable: false
                 OomScoreAdj: 500
@@ -4475,12 +4475,12 @@ paths:
                 NetworkMode: "bridge"
                 Devices: []
                 Ulimits:
-                  - ***REMOVED******REMOVED***
+                  - {}
                 LogConfig:
                   Type: "json-file"
-                  Config: ***REMOVED******REMOVED***
+                  Config: {}
                 SecurityOpt: []
-                StorageOpt: ***REMOVED******REMOVED***
+                StorageOpt: {}
                 CgroupParent: ""
                 VolumeDriver: ""
                 ShmSize: 67108864
@@ -4544,7 +4544,7 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
       tags: ["Container"]
-  /containers/***REMOVED***id***REMOVED***/json:
+  /containers/{id}/json:
     get:
       summary: "Inspect a container"
       description: "Return low-level information about a container."
@@ -4697,7 +4697,7 @@ paths:
                 Tty: false
                 User: ""
                 Volumes:
-                  /volumes/data: ***REMOVED******REMOVED***
+                  /volumes/data: {}
                 WorkingDir: ""
                 StopSignal: "SIGTERM"
                 StopTimeout: 10
@@ -4708,15 +4708,15 @@ paths:
                 MaximumIOBps: 0
                 BlkioWeight: 0
                 BlkioWeightDevice:
-                  - ***REMOVED******REMOVED***
+                  - {}
                 BlkioDeviceReadBps:
-                  - ***REMOVED******REMOVED***
+                  - {}
                 BlkioDeviceWriteBps:
-                  - ***REMOVED******REMOVED***
+                  - {}
                 BlkioDeviceReadIOps:
-                  - ***REMOVED******REMOVED***
+                  - {}
                 BlkioDeviceWriteIOps:
-                  - ***REMOVED******REMOVED***
+                  - {}
                 ContainerIDFile: ""
                 CpusetCpus: ""
                 CpusetMems: ""
@@ -4736,7 +4736,7 @@ paths:
                 OomScoreAdj: 500
                 NetworkMode: "bridge"
                 PidMode: ""
-                PortBindings: ***REMOVED******REMOVED***
+                PortBindings: {}
                 Privileged: false
                 ReadonlyRootfs: false
                 PublishAllPorts: false
@@ -4748,7 +4748,7 @@ paths:
                 Sysctls:
                   net.ipv4.ip_forward: "1"
                 Ulimits:
-                  - ***REMOVED******REMOVED***
+                  - {}
                 VolumeDriver: ""
                 ShmSize: 67108864
               HostnamePath: "/var/lib/docker/containers/ba033ac4401106a3b513bc9d639eee123ad78ca3616b921167cd74b20e25ed39/hostname"
@@ -4831,7 +4831,7 @@ paths:
           default: false
           description: "Return the size of container as fields `SizeRw` and `SizeRootFs`"
       tags: ["Container"]
-  /containers/***REMOVED***id***REMOVED***/top:
+  /containers/{id}/top:
     get:
       summary: "List processes running inside a container"
       description: "On Unix systems, this is done by running the `ps` command. This endpoint is not supported on Windows."
@@ -4909,7 +4909,7 @@ paths:
           type: "string"
           default: "-ef"
       tags: ["Container"]
-  /containers/***REMOVED***id***REMOVED***/logs:
+  /containers/{id}/logs:
     get:
       summary: "Get container logs"
       description: |
@@ -4983,7 +4983,7 @@ paths:
           type: "string"
           default: "all"
       tags: ["Container"]
-  /containers/***REMOVED***id***REMOVED***/changes:
+  /containers/{id}/changes:
     get:
       summary: "Get changes on a container’s filesystem"
       description: |
@@ -5043,7 +5043,7 @@ paths:
           description: "ID or name of the container"
           type: "string"
       tags: ["Container"]
-  /containers/***REMOVED***id***REMOVED***/export:
+  /containers/{id}/export:
     get:
       summary: "Export a container"
       description: "Export the contents of a container as a tarball."
@@ -5071,7 +5071,7 @@ paths:
           description: "ID or name of the container"
           type: "string"
       tags: ["Container"]
-  /containers/***REMOVED***id***REMOVED***/stats:
+  /containers/{id}/stats:
     get:
       summary: "Get container stats based on resource usage"
       description: |
@@ -5151,7 +5151,7 @@ paths:
                 usage: 6537216
                 failcnt: 0
                 limit: 67108864
-              blkio_stats: ***REMOVED******REMOVED***
+              blkio_stats: {}
               cpu_stats:
                 cpu_usage:
                   percpu_usage:
@@ -5207,7 +5207,7 @@ paths:
           type: "boolean"
           default: true
       tags: ["Container"]
-  /containers/***REMOVED***id***REMOVED***/resize:
+  /containers/{id}/resize:
     post:
       summary: "Resize a container TTY"
       description: "Resize the TTY for a container. You must restart the container for the resize to take effect."
@@ -5245,7 +5245,7 @@ paths:
           description: "Width of the tty session in characters"
           type: "integer"
       tags: ["Container"]
-  /containers/***REMOVED***id***REMOVED***/start:
+  /containers/{id}/start:
     post:
       summary: "Start a container"
       operationId: "ContainerStart"
@@ -5278,7 +5278,7 @@ paths:
           description: "Override the key sequence for detaching a container. Format is a single character `[a-Z]` or `ctrl-<value>` where `<value>` is one of: `a-z`, `@`, `^`, `[`, `,` or `_`."
           type: "string"
       tags: ["Container"]
-  /containers/***REMOVED***id***REMOVED***/stop:
+  /containers/{id}/stop:
     post:
       summary: "Stop a container"
       operationId: "ContainerStop"
@@ -5311,7 +5311,7 @@ paths:
           description: "Number of seconds to wait before killing the container"
           type: "integer"
       tags: ["Container"]
-  /containers/***REMOVED***id***REMOVED***/restart:
+  /containers/{id}/restart:
     post:
       summary: "Restart a container"
       operationId: "ContainerRestart"
@@ -5340,7 +5340,7 @@ paths:
           description: "Number of seconds to wait before killing the container"
           type: "integer"
       tags: ["Container"]
-  /containers/***REMOVED***id***REMOVED***/kill:
+  /containers/{id}/kill:
     post:
       summary: "Kill a container"
       description: "Send a POSIX signal to a container, defaulting to killing to the container."
@@ -5371,7 +5371,7 @@ paths:
           type: "string"
           default: "SIGKILL"
       tags: ["Container"]
-  /containers/***REMOVED***id***REMOVED***/update:
+  /containers/{id}/update:
     post:
       summary: "Update a container"
       description: "Change various configuration options of a container without having to recreate it."
@@ -5434,7 +5434,7 @@ paths:
                 MaximumRetryCount: 4
                 Name: "on-failure"
       tags: ["Container"]
-  /containers/***REMOVED***id***REMOVED***/rename:
+  /containers/{id}/rename:
     post:
       summary: "Rename a container"
       operationId: "ContainerRename"
@@ -5468,7 +5468,7 @@ paths:
           description: "New name for the container"
           type: "string"
       tags: ["Container"]
-  /containers/***REMOVED***id***REMOVED***/pause:
+  /containers/{id}/pause:
     post:
       summary: "Pause a container"
       description: |
@@ -5497,7 +5497,7 @@ paths:
           description: "ID or name of the container"
           type: "string"
       tags: ["Container"]
-  /containers/***REMOVED***id***REMOVED***/unpause:
+  /containers/{id}/unpause:
     post:
       summary: "Unpause a container"
       description: "Resume a container which has been paused."
@@ -5523,7 +5523,7 @@ paths:
           description: "ID or name of the container"
           type: "string"
       tags: ["Container"]
-  /containers/***REMOVED***id***REMOVED***/attach:
+  /containers/{id}/attach:
     post:
       summary: "Attach to a container"
       description: |
@@ -5578,7 +5578,7 @@ paths:
         It is encoded on the first eight bytes like this:
 
         ```go
-        header := [8]byte***REMOVED***STREAM_TYPE, 0, 0, 0, SIZE1, SIZE2, SIZE3, SIZE4***REMOVED***
+        header := [8]byte{STREAM_TYPE, 0, 0, 0, SIZE1, SIZE2, SIZE3, SIZE4}
         ```
 
         `STREAM_TYPE` can be:
@@ -5667,7 +5667,7 @@ paths:
           type: "boolean"
           default: false
       tags: ["Container"]
-  /containers/***REMOVED***id***REMOVED***/attach/ws:
+  /containers/{id}/attach/ws:
     get:
       summary: "Attach to a container via a websocket"
       operationId: "ContainerAttachWebsocket"
@@ -5727,7 +5727,7 @@ paths:
           type: "boolean"
           default: false
       tags: ["Container"]
-  /containers/***REMOVED***id***REMOVED***/wait:
+  /containers/{id}/wait:
     post:
       summary: "Wait for a container"
       description: "Block until a container stops, then returns the exit code."
@@ -5776,7 +5776,7 @@ paths:
           type: "string"
           default: "not-running"
       tags: ["Container"]
-  /containers/***REMOVED***id***REMOVED***:
+  /containers/{id}:
     delete:
       summary: "Remove a container"
       operationId: "ContainerDelete"
@@ -5827,7 +5827,7 @@ paths:
           type: "boolean"
           default: false
       tags: ["Container"]
-  /containers/***REMOVED***id***REMOVED***/archive:
+  /containers/{id}/archive:
     head:
       summary: "Get information about files in a container"
       description: "A response header `X-Docker-Container-Path-Stat` is return containing a base64 - encoded JSON object with some filesystem header information about the path."
@@ -6028,7 +6028,7 @@ paths:
                 Size: 103579269
                 VirtualSize: 103579269
                 SharedSize: 0
-                Labels: ***REMOVED******REMOVED***
+                Labels: {}
                 Containers: 2
               - Id: "sha256:3e314f95dcace0f5e4fd37b10862fe8398e3c60ed36600bc0ca5fda78b087175"
                 ParentId: ""
@@ -6042,7 +6042,7 @@ paths:
                 Size: 172064416
                 VirtualSize: 172064416
                 SharedSize: 0
-                Labels: ***REMOVED******REMOVED***
+                Labels: {}
                 Containers: 5
         500:
           description: "server error"
@@ -6200,16 +6200,16 @@ paths:
             The key is a registry URL, and the value is an auth configuration object, [as described in the authentication section](#section/Authentication). For example:
 
             ```
-            ***REMOVED***
-              "docker.example.com": ***REMOVED***
+            {
+              "docker.example.com": {
                 "username": "janedoe",
                 "password": "hunter2"
-          ***REMOVED***,
-              "https://index.docker.io/v1/": ***REMOVED***
+              },
+              "https://index.docker.io/v1/": {
                 "username": "mobydock",
                 "password": "conta1n3rize14"
-          ***REMOVED***
-        ***REMOVED***
+              }
+            }
             ```
 
             Only the registry domain name (and port if not the default 443) are required. However, for legacy reasons, the Docker Hub registry must be specified with both a `https://` prefix and a `/v1/` suffix even though Docker will prefer to use the v2 registry API.
@@ -6307,7 +6307,7 @@ paths:
           type: "string"
           default: ""
       tags: ["Image"]
-  /images/***REMOVED***name***REMOVED***/json:
+  /images/{name}/json:
     get:
       summary: "Inspect an image"
       description: "Return low-level information about an image."
@@ -6360,7 +6360,7 @@ paths:
               Created: "2015-09-10T08:30:53.26995814Z"
               GraphDriver:
                 Name: "aufs"
-                Data: ***REMOVED******REMOVED***
+                Data: {}
               RepoDigests:
                 - "localhost:5000/test/busybox/example@sha256:cbbf2f9a99b47fc460d422812b6a5adff7dfee951d8fa2e4a98caa0382cfbdbf"
               RepoTags:
@@ -6414,7 +6414,7 @@ paths:
           type: "string"
           required: true
       tags: ["Image"]
-  /images/***REMOVED***name***REMOVED***/history:
+  /images/{name}/history:
     get:
       summary: "Get the history of an image"
       description: "Return parent layers of an image."
@@ -6492,7 +6492,7 @@ paths:
           type: "string"
           required: true
       tags: ["Image"]
-  /images/***REMOVED***name***REMOVED***/push:
+  /images/{name}/push:
     post:
       summary: "Push an image"
       description: |
@@ -6531,7 +6531,7 @@ paths:
           type: "string"
           required: true
       tags: ["Image"]
-  /images/***REMOVED***name***REMOVED***/tag:
+  /images/{name}/tag:
     post:
       summary: "Tag an image"
       description: "Tag an image so that it becomes part of a repository."
@@ -6570,7 +6570,7 @@ paths:
           description: "The name of the new tag."
           type: "string"
       tags: ["Image"]
-  /images/***REMOVED***name***REMOVED***:
+  /images/{name}:
     delete:
       summary: "Remove an image"
       description: |
@@ -7089,7 +7089,7 @@ paths:
                   Size: 1092588
                   SharedSize: 0
                   VirtualSize: 1092588
-                  Labels: ***REMOVED******REMOVED***
+                  Labels: {}
                   Containers: 1
               Containers:
                 -
@@ -7102,7 +7102,7 @@ paths:
                   Created: 1472592424
                   Ports: []
                   SizeRootFs: 1092588
-                  Labels: ***REMOVED******REMOVED***
+                  Labels: {}
                   State: "exited"
                   Status: "Exited (0) 56 minutes ago"
                   HostConfig:
@@ -7139,7 +7139,7 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
       tags: ["System"]
-  /images/***REMOVED***name***REMOVED***/get:
+  /images/{name}/get:
     get:
       summary: "Export an image"
       description: |
@@ -7160,11 +7160,11 @@ paths:
         If the tarball defines a repository, the tarball should also include a `repositories` file at the root that contains a list of repository and tag names mapped to layer IDs.
 
         ```json
-        ***REMOVED***
-          "hello-world": ***REMOVED***
+        {
+          "hello-world": {
             "latest": "565a9d68a73f6706862bfe8409a7f659776d4d60a8d096eb4a3cbce6999cc2a1"
-      ***REMOVED***
-    ***REMOVED***
+          }
+        }
         ```
       operationId: "ImageGet"
       produces:
@@ -7248,7 +7248,7 @@ paths:
           type: "boolean"
           default: false
       tags: ["Image"]
-  /containers/***REMOVED***id***REMOVED***/exec:
+  /containers/{id}/exec:
     post:
       summary: "Create an exec instance"
       description: "Run a command inside a running container."
@@ -7337,7 +7337,7 @@ paths:
           type: "string"
           required: true
       tags: ["Exec"]
-  /exec/***REMOVED***id***REMOVED***/start:
+  /exec/{id}/start:
     post:
       summary: "Start an exec instance"
       description: "Starts a previously set up exec instance. If detach is true, this endpoint returns immediately after starting the command. Otherwise, it sets up an interactive session with the command."
@@ -7378,7 +7378,7 @@ paths:
           required: true
           type: "string"
       tags: ["Exec"]
-  /exec/***REMOVED***id***REMOVED***/resize:
+  /exec/{id}/resize:
     post:
       summary: "Resize an exec instance"
       description: "Resize the TTY session used by an exec instance. This endpoint only works if `tty` was specified as part of creating and starting the exec instance."
@@ -7405,7 +7405,7 @@ paths:
           description: "Width of the TTY session in characters"
           type: "integer"
       tags: ["Exec"]
-  /exec/***REMOVED***id***REMOVED***/json:
+  /exec/{id}/json:
     get:
       summary: "Inspect an exec instance"
       description: "Return low-level information about an exec instance."
@@ -7593,7 +7593,7 @@ paths:
               Driver: "custom"
       tags: ["Volume"]
 
-  /volumes/***REMOVED***name***REMOVED***:
+  /volumes/{name}:
     get:
       summary: "Inspect a volume"
       operationId: "VolumeInspect"
@@ -7739,8 +7739,8 @@ paths:
                 IPAM:
                   Driver: "default"
                   Config: []
-                Containers: ***REMOVED******REMOVED***
-                Options: ***REMOVED******REMOVED***
+                Containers: {}
+                Options: {}
               - Name: "host"
                 Id: "13e871235c677f196c4e1ecebb9dc733b9b2d2ab589e30c539efeda84a24215e"
                 Created: "0001-01-01T00:00:00Z"
@@ -7753,8 +7753,8 @@ paths:
                 IPAM:
                   Driver: "default"
                   Config: []
-                Containers: ***REMOVED******REMOVED***
-                Options: ***REMOVED******REMOVED***
+                Containers: {}
+                Options: {}
         500:
           description: "Server error"
           schema:
@@ -7774,7 +7774,7 @@ paths:
           type: "string"
       tags: ["Network"]
 
-  /networks/***REMOVED***id***REMOVED***:
+  /networks/{id}:
     get:
       summary: "Inspect a network"
       operationId: "NetworkInspect"
@@ -7945,7 +7945,7 @@ paths:
                 com.example.some-other-label: "some-other-value"
       tags: ["Network"]
 
-  /networks/***REMOVED***id***REMOVED***/connect:
+  /networks/{id}/connect:
     post:
       summary: "Connect a container to a network"
       operationId: "NetworkConnect"
@@ -7991,7 +7991,7 @@ paths:
                   IPv6Address: "2001:db8::5689"
       tags: ["Network"]
 
-  /networks/***REMOVED***id***REMOVED***/disconnect:
+  /networks/{id}/disconnect:
     post:
       summary: "Disconnect a container from a network"
       operationId: "NetworkDisconnect"
@@ -8145,7 +8145,7 @@ paths:
       summary: "Install a plugin"
       operationId: "PluginPull"
       description: |
-        Pulls and installs a plugin. After the plugin is installed, it can be enabled using the [`POST /plugins/***REMOVED***name***REMOVED***/enable` endpoint](#operation/PostPluginsEnable).
+        Pulls and installs a plugin. After the plugin is installed, it can be enabled using the [`POST /plugins/{name}/enable` endpoint](#operation/PostPluginsEnable).
       produces:
         - "application/json"
       responses:
@@ -8206,7 +8206,7 @@ paths:
                 Value:
                   - "/dev/cpu_dma_latency"
       tags: ["Plugin"]
-  /plugins/***REMOVED***name***REMOVED***/json:
+  /plugins/{name}/json:
     get:
       summary: "Inspect a plugin"
       operationId: "PluginInspect"
@@ -8230,7 +8230,7 @@ paths:
           required: true
           type: "string"
       tags: ["Plugin"]
-  /plugins/***REMOVED***name***REMOVED***:
+  /plugins/{name}:
     delete:
       summary: "Remove a plugin"
       operationId: "PluginDelete"
@@ -8259,7 +8259,7 @@ paths:
           type: "boolean"
           default: false
       tags: ["Plugin"]
-  /plugins/***REMOVED***name***REMOVED***/enable:
+  /plugins/{name}/enable:
     post:
       summary: "Enable a plugin"
       operationId: "PluginEnable"
@@ -8286,7 +8286,7 @@ paths:
           type: "integer"
           default: 0
       tags: ["Plugin"]
-  /plugins/***REMOVED***name***REMOVED***/disable:
+  /plugins/{name}/disable:
     post:
       summary: "Disable a plugin"
       operationId: "PluginDisable"
@@ -8308,7 +8308,7 @@ paths:
           required: true
           type: "string"
       tags: ["Plugin"]
-  /plugins/***REMOVED***name***REMOVED***/upgrade:
+  /plugins/{name}/upgrade:
     post:
       summary: "Upgrade a plugin"
       operationId: "PluginUpgrade"
@@ -8397,7 +8397,7 @@ paths:
             type: "string"
             format: "binary"
       tags: ["Plugin"]
-  /plugins/***REMOVED***name***REMOVED***/push:
+  /plugins/{name}/push:
     post:
       summary: "Push a plugin"
       operationId: "PluginPush"
@@ -8421,7 +8421,7 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
       tags: ["Plugin"]
-  /plugins/***REMOVED***name***REMOVED***/set:
+  /plugins/{name}/set:
     post:
       summary: "Configure a plugin"
       operationId: "PluginSet"
@@ -8485,7 +8485,7 @@ paths:
             - `role=`(`manager`|`worker`)`
           type: "string"
       tags: ["Node"]
-  /nodes/***REMOVED***id***REMOVED***:
+  /nodes/{id}:
     get:
       summary: "Inspect a node"
       operationId: "NodeInspect"
@@ -8543,7 +8543,7 @@ paths:
           default: false
           type: "boolean"
       tags: ["Node"]
-  /nodes/***REMOVED***id***REMOVED***/update:
+  /nodes/{id}/update:
     post:
       summary: "Update a node"
       operationId: "NodeUpdate"
@@ -8664,10 +8664,10 @@ paths:
               AdvertiseAddr: "192.168.1.1:2377"
               ForceNewCluster: false
               Spec:
-                Orchestration: ***REMOVED******REMOVED***
-                Raft: ***REMOVED******REMOVED***
-                Dispatcher: ***REMOVED******REMOVED***
-                CAConfig: ***REMOVED******REMOVED***
+                Orchestration: {}
+                Raft: {}
+                Dispatcher: {}
+                CAConfig: {}
                 EncryptionConfig:
                   AutoLockManagers: false
       tags: ["Swarm"]
@@ -8950,7 +8950,7 @@ paths:
                           Target: "/usr/share/nginx/html"
                           Type: "volume"
                           VolumeOptions:
-                            DriverConfig: ***REMOVED******REMOVED***
+                            DriverConfig: {}
                             Labels:
                               com.example.something: "something-value"
                       Hosts: ["10.10.10.10 host1", "ABCD:EF01:2345:6789:ABCD:EF01:2345:6789 host2"]
@@ -8973,11 +8973,11 @@ paths:
                       Options:
                         max-file: "3"
                         max-size: "10M"
-                    Placement: ***REMOVED******REMOVED***
+                    Placement: {}
                     Resources:
                       Limits:
                         MemoryBytes: 104857600
-                      Reservations: ***REMOVED******REMOVED***
+                      Reservations: {}
                     RestartPolicy:
                       Condition: "on-failure"
                       Delay: 10000000000
@@ -9010,7 +9010,7 @@ paths:
           description: "A base64-encoded auth configuration for pulling from private registries. [See the authentication section for details.](#section/Authentication)"
           type: "string"
       tags: ["Service"]
-  /services/***REMOVED***id***REMOVED***:
+  /services/{id}:
     get:
       summary: "Inspect a service"
       operationId: "ServiceInspect"
@@ -9068,7 +9068,7 @@ paths:
           required: true
           type: "string"
       tags: ["Service"]
-  /services/***REMOVED***id***REMOVED***/update:
+  /services/{id}/update:
     post:
       summary: "Update a service"
       operationId: "ServiceUpdate"
@@ -9116,12 +9116,12 @@ paths:
                       Args:
                         - "top"
                     Resources:
-                      Limits: ***REMOVED******REMOVED***
-                      Reservations: ***REMOVED******REMOVED***
+                      Limits: {}
+                      Reservations: {}
                     RestartPolicy:
                       Condition: "any"
                       MaxAttempts: 0
-                    Placement: ***REMOVED******REMOVED***
+                    Placement: {}
                     ForceUpdate: 0
                   Mode:
                     Replicated:
@@ -9165,7 +9165,7 @@ paths:
           type: "string"
 
       tags: ["Service"]
-  /services/***REMOVED***id***REMOVED***/logs:
+  /services/{id}/logs:
     get:
       summary: "Get service logs"
       description: |
@@ -9269,12 +9269,12 @@ paths:
                   ContainerSpec:
                     Image: "redis"
                   Resources:
-                    Limits: ***REMOVED******REMOVED***
-                    Reservations: ***REMOVED******REMOVED***
+                    Limits: {}
+                    Reservations: {}
                   RestartPolicy:
                     Condition: "any"
                     MaxAttempts: 0
-                  Placement: ***REMOVED******REMOVED***
+                  Placement: {}
                 ServiceID: "9mnpnzenvg8p8tdbtq4wvbkcz"
                 Slot: 1
                 NodeID: "60gvrl6tm78dmak4yl7srz94v"
@@ -9297,9 +9297,9 @@ paths:
                         Name: "ingress"
                         Labels:
                           com.docker.swarm.internal: "true"
-                        DriverConfiguration: ***REMOVED******REMOVED***
+                        DriverConfiguration: {}
                         IPAMOptions:
-                          Driver: ***REMOVED******REMOVED***
+                          Driver: {}
                           Configs:
                             - Subnet: "10.255.0.0/16"
                               Gateway: "10.255.0.1"
@@ -9325,12 +9325,12 @@ paths:
                   ContainerSpec:
                     Image: "redis"
                   Resources:
-                    Limits: ***REMOVED******REMOVED***
-                    Reservations: ***REMOVED******REMOVED***
+                    Limits: {}
+                    Reservations: {}
                   RestartPolicy:
                     Condition: "any"
                     MaxAttempts: 0
-                  Placement: ***REMOVED******REMOVED***
+                  Placement: {}
                 ServiceID: "9mnpnzenvg8p8tdbtq4wvbkcz"
                 Slot: 1
                 NodeID: "60gvrl6tm78dmak4yl7srz94v"
@@ -9352,9 +9352,9 @@ paths:
                         Name: "ingress"
                         Labels:
                           com.docker.swarm.internal: "true"
-                        DriverConfiguration: ***REMOVED******REMOVED***
+                        DriverConfiguration: {}
                         IPAMOptions:
-                          Driver: ***REMOVED******REMOVED***
+                          Driver: {}
                           Configs:
                             - Subnet: "10.255.0.0/16"
                               Gateway: "10.255.0.1"
@@ -9392,7 +9392,7 @@ paths:
             - `node=<node id or name>`
             - `service=<service name>`
       tags: ["Task"]
-  /tasks/***REMOVED***id***REMOVED***:
+  /tasks/{id}:
     get:
       summary: "Inspect a task"
       operationId: "TaskInspect"
@@ -9422,7 +9422,7 @@ paths:
           required: true
           type: "string"
       tags: ["Task"]
-  /tasks/***REMOVED***id***REMOVED***/logs:
+  /tasks/{id}/logs:
     get:
       summary: "Get task logs"
       description: |
@@ -9602,7 +9602,7 @@ paths:
                       OptionA: "value for driver option A"
                       OptionB: "value for driver option B"
       tags: ["Secret"]
-  /secrets/***REMOVED***id***REMOVED***:
+  /secrets/{id}:
     get:
       summary: "Inspect a secret"
       operationId: "SecretInspect"
@@ -9676,7 +9676,7 @@ paths:
           type: "string"
           description: "ID of the secret"
       tags: ["Secret"]
-  /secrets/***REMOVED***id***REMOVED***/update:
+  /secrets/{id}/update:
     post:
       summary: "Update a Secret"
       operationId: "SecretUpdate"
@@ -9796,7 +9796,7 @@ paths:
                     foo: "bar"
                   Data: "VEhJUyBJUyBOT1QgQSBSRUFMIENFUlRJRklDQVRFCg=="
       tags: ["Config"]
-  /configs/***REMOVED***id***REMOVED***:
+  /configs/{id}:
     get:
       summary: "Inspect a config"
       operationId: "ConfigInspect"
@@ -9862,7 +9862,7 @@ paths:
           type: "string"
           description: "ID of the config"
       tags: ["Config"]
-  /configs/***REMOVED***id***REMOVED***/update:
+  /configs/{id}/update:
     post:
       summary: "Update a Config"
       operationId: "ConfigUpdate"
@@ -9903,7 +9903,7 @@ paths:
           format: "int64"
           required: true
       tags: ["Config"]
-  /distribution/***REMOVED***name***REMOVED***/json:
+  /distribution/{name}/json:
     get:
       summary: "Get image information from the registry"
       description: "Return image digest and platform information by contacting the registry."

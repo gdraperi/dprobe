@@ -13,44 +13,44 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestSwarmInspectError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestSwarmInspectError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
-	***REMOVED***
+	}
 
 	_, err := client.SwarmInspect(context.Background())
-	if err == nil || err.Error() != "Error response from daemon: Server error" ***REMOVED***
+	if err == nil || err.Error() != "Error response from daemon: Server error" {
 		t.Fatalf("expected a Server Error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestSwarmInspect(t *testing.T) ***REMOVED***
+func TestSwarmInspect(t *testing.T) {
 	expectedURL := "/swarm"
-	client := &Client***REMOVED***
-		client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-			if !strings.HasPrefix(req.URL.Path, expectedURL) ***REMOVED***
+	client := &Client{
+		client: newMockClient(func(req *http.Request) (*http.Response, error) {
+			if !strings.HasPrefix(req.URL.Path, expectedURL) {
 				return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, req.URL)
-			***REMOVED***
-			content, err := json.Marshal(swarm.Swarm***REMOVED***
-				ClusterInfo: swarm.ClusterInfo***REMOVED***
+			}
+			content, err := json.Marshal(swarm.Swarm{
+				ClusterInfo: swarm.ClusterInfo{
 					ID: "swarm_id",
-				***REMOVED***,
-			***REMOVED***)
-			if err != nil ***REMOVED***
+				},
+			})
+			if err != nil {
 				return nil, err
-			***REMOVED***
-			return &http.Response***REMOVED***
+			}
+			return &http.Response{
 				StatusCode: http.StatusOK,
 				Body:       ioutil.NopCloser(bytes.NewReader(content)),
-			***REMOVED***, nil
-		***REMOVED***),
-	***REMOVED***
+			}, nil
+		}),
+	}
 
 	swarmInspect, err := client.SwarmInspect(context.Background())
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if swarmInspect.ID != "swarm_id" ***REMOVED***
+	}
+	if swarmInspect.ID != "swarm_id" {
 		t.Fatalf("expected `swarm_id`, got %s", swarmInspect.ID)
-	***REMOVED***
-***REMOVED***
+	}
+}

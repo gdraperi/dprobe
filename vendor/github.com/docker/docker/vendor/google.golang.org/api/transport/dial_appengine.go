@@ -25,10 +25,10 @@ import (
 	"google.golang.org/grpc"
 )
 
-func init() ***REMOVED***
-	appengineDialerHook = func(ctx context.Context) grpc.DialOption ***REMOVED***
-		return grpc.WithDialer(func(addr string, timeout time.Duration) (net.Conn, error) ***REMOVED***
+func init() {
+	appengineDialerHook = func(ctx context.Context) grpc.DialOption {
+		return grpc.WithDialer(func(addr string, timeout time.Duration) (net.Conn, error) {
 			return socket.DialTimeout(ctx, "tcp", addr, timeout)
-		***REMOVED***)
-	***REMOVED***
-***REMOVED***
+		})
+	}
+}

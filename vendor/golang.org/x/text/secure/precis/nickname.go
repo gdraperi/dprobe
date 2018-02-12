@@ -11,18 +11,18 @@ import (
 	"golang.org/x/text/transform"
 )
 
-type nickAdditionalMapping struct ***REMOVED***
+type nickAdditionalMapping struct {
 	// TODO: This transformer needs to be stateless somehow…
 	notStart  bool
 	prevSpace bool
-***REMOVED***
+}
 
-func (t *nickAdditionalMapping) Reset() ***REMOVED***
+func (t *nickAdditionalMapping) Reset() {
 	t.prevSpace = false
 	t.notStart = false
-***REMOVED***
+}
 
-func (t *nickAdditionalMapping) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) ***REMOVED***
+func (t *nickAdditionalMapping) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) {
 	// RFC 8266 §2.1.  Rules
 	//
 	// 2.  Additional Mapping Rule: The additional mapping rule consists of
@@ -43,30 +43,30 @@ func (t *nickAdditionalMapping) Transform(dst, src []byte, atEOF bool) (nDst, nS
 	//     c.  Map interior sequences of more than one ASCII space character
 	//         to a single ASCII space character (e.g., "St  Peter" is
 	//         mapped to "St Peter").
-	for nSrc < len(src) ***REMOVED***
+	for nSrc < len(src) {
 		r, size := utf8.DecodeRune(src[nSrc:])
-		if size == 0 ***REMOVED*** // Incomplete UTF-8 encoding
-			if !atEOF ***REMOVED***
+		if size == 0 { // Incomplete UTF-8 encoding
+			if !atEOF {
 				return nDst, nSrc, transform.ErrShortSrc
-			***REMOVED***
+			}
 			size = 1
-		***REMOVED***
-		if unicode.Is(unicode.Zs, r) ***REMOVED***
+		}
+		if unicode.Is(unicode.Zs, r) {
 			t.prevSpace = true
-		***REMOVED*** else ***REMOVED***
-			if t.prevSpace && t.notStart ***REMOVED***
+		} else {
+			if t.prevSpace && t.notStart {
 				dst[nDst] = ' '
 				nDst += 1
-			***REMOVED***
-			if size != copy(dst[nDst:], src[nSrc:nSrc+size]) ***REMOVED***
+			}
+			if size != copy(dst[nDst:], src[nSrc:nSrc+size]) {
 				nDst += size
 				return nDst, nSrc, transform.ErrShortDst
-			***REMOVED***
+			}
 			nDst += size
 			t.prevSpace = false
 			t.notStart = true
-		***REMOVED***
+		}
 		nSrc += size
-	***REMOVED***
+	}
 	return nDst, nSrc, nil
-***REMOVED***
+}

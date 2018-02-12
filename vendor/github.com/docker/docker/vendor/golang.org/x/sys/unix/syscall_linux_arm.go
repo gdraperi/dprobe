@@ -11,49 +11,49 @@ import (
 	"unsafe"
 )
 
-func setTimespec(sec, nsec int64) Timespec ***REMOVED***
-	return Timespec***REMOVED***Sec: int32(sec), Nsec: int32(nsec)***REMOVED***
-***REMOVED***
+func setTimespec(sec, nsec int64) Timespec {
+	return Timespec{Sec: int32(sec), Nsec: int32(nsec)}
+}
 
-func setTimeval(sec, usec int64) Timeval ***REMOVED***
-	return Timeval***REMOVED***Sec: int32(sec), Usec: int32(usec)***REMOVED***
-***REMOVED***
+func setTimeval(sec, usec int64) Timeval {
+	return Timeval{Sec: int32(sec), Usec: int32(usec)}
+}
 
-func Pipe(p []int) (err error) ***REMOVED***
-	if len(p) != 2 ***REMOVED***
+func Pipe(p []int) (err error) {
+	if len(p) != 2 {
 		return EINVAL
-	***REMOVED***
+	}
 	var pp [2]_C_int
 	err = pipe2(&pp, 0)
 	p[0] = int(pp[0])
 	p[1] = int(pp[1])
 	return
-***REMOVED***
+}
 
 //sysnb pipe2(p *[2]_C_int, flags int) (err error)
 
-func Pipe2(p []int, flags int) (err error) ***REMOVED***
-	if len(p) != 2 ***REMOVED***
+func Pipe2(p []int, flags int) (err error) {
+	if len(p) != 2 {
 		return EINVAL
-	***REMOVED***
+	}
 	var pp [2]_C_int
 	err = pipe2(&pp, flags)
 	p[0] = int(pp[0])
 	p[1] = int(pp[1])
 	return
-***REMOVED***
+}
 
 // Underlying system call writes to newoffset via pointer.
 // Implemented in assembly to avoid allocation.
 func seek(fd int, offset int64, whence int) (newoffset int64, err syscall.Errno)
 
-func Seek(fd int, offset int64, whence int) (newoffset int64, err error) ***REMOVED***
+func Seek(fd int, offset int64, whence int) (newoffset int64, err error) {
 	newoffset, errno := seek(fd, offset, whence)
-	if errno != 0 ***REMOVED***
+	if errno != 0 {
 		return 0, errno
-	***REMOVED***
+	}
 	return newoffset, nil
-***REMOVED***
+}
 
 //sys	accept(s int, rsa *RawSockaddrAny, addrlen *_Socklen) (fd int, err error)
 //sys	accept4(s int, rsa *RawSockaddrAny, addrlen *_Socklen, flags int) (fd int, err error)
@@ -102,153 +102,153 @@ func Seek(fd int, offset int64, whence int) (newoffset int64, err error) ***REMO
 //sys	EpollWait(epfd int, events []EpollEvent, msec int) (n int, err error)
 //sys	Pause() (err error)
 
-func Time(t *Time_t) (Time_t, error) ***REMOVED***
+func Time(t *Time_t) (Time_t, error) {
 	var tv Timeval
 	err := Gettimeofday(&tv)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
-	if t != nil ***REMOVED***
+	}
+	if t != nil {
 		*t = Time_t(tv.Sec)
-	***REMOVED***
+	}
 	return Time_t(tv.Sec), nil
-***REMOVED***
+}
 
-func Utime(path string, buf *Utimbuf) error ***REMOVED***
-	tv := []Timeval***REMOVED***
-		***REMOVED***Sec: buf.Actime***REMOVED***,
-		***REMOVED***Sec: buf.Modtime***REMOVED***,
-	***REMOVED***
+func Utime(path string, buf *Utimbuf) error {
+	tv := []Timeval{
+		{Sec: buf.Actime},
+		{Sec: buf.Modtime},
+	}
 	return Utimes(path, tv)
-***REMOVED***
+}
 
 //sys   Pread(fd int, p []byte, offset int64) (n int, err error) = SYS_PREAD64
 //sys   Pwrite(fd int, p []byte, offset int64) (n int, err error) = SYS_PWRITE64
 //sys	Truncate(path string, length int64) (err error) = SYS_TRUNCATE64
 //sys	Ftruncate(fd int, length int64) (err error) = SYS_FTRUNCATE64
 
-func Fadvise(fd int, offset int64, length int64, advice int) (err error) ***REMOVED***
+func Fadvise(fd int, offset int64, length int64, advice int) (err error) {
 	_, _, e1 := Syscall6(SYS_ARM_FADVISE64_64, uintptr(fd), uintptr(advice), uintptr(offset), uintptr(offset>>32), uintptr(length), uintptr(length>>32))
-	if e1 != 0 ***REMOVED***
+	if e1 != 0 {
 		err = errnoErr(e1)
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 //sys	mmap2(addr uintptr, length uintptr, prot int, flags int, fd int, pageOffset uintptr) (xaddr uintptr, err error)
 
-func Fstatfs(fd int, buf *Statfs_t) (err error) ***REMOVED***
+func Fstatfs(fd int, buf *Statfs_t) (err error) {
 	_, _, e := Syscall(SYS_FSTATFS64, uintptr(fd), unsafe.Sizeof(*buf), uintptr(unsafe.Pointer(buf)))
-	if e != 0 ***REMOVED***
+	if e != 0 {
 		err = e
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func Statfs(path string, buf *Statfs_t) (err error) ***REMOVED***
+func Statfs(path string, buf *Statfs_t) (err error) {
 	pathp, err := BytePtrFromString(path)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	_, _, e := Syscall(SYS_STATFS64, uintptr(unsafe.Pointer(pathp)), unsafe.Sizeof(*buf), uintptr(unsafe.Pointer(buf)))
-	if e != 0 ***REMOVED***
+	if e != 0 {
 		err = e
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func mmap(addr uintptr, length uintptr, prot int, flags int, fd int, offset int64) (xaddr uintptr, err error) ***REMOVED***
+func mmap(addr uintptr, length uintptr, prot int, flags int, fd int, offset int64) (xaddr uintptr, err error) {
 	page := uintptr(offset / 4096)
-	if offset != int64(page)*4096 ***REMOVED***
+	if offset != int64(page)*4096 {
 		return 0, EINVAL
-	***REMOVED***
+	}
 	return mmap2(addr, length, prot, flags, fd, page)
-***REMOVED***
+}
 
-type rlimit32 struct ***REMOVED***
+type rlimit32 struct {
 	Cur uint32
 	Max uint32
-***REMOVED***
+}
 
 //sysnb getrlimit(resource int, rlim *rlimit32) (err error) = SYS_UGETRLIMIT
 
 const rlimInf32 = ^uint32(0)
 const rlimInf64 = ^uint64(0)
 
-func Getrlimit(resource int, rlim *Rlimit) (err error) ***REMOVED***
+func Getrlimit(resource int, rlim *Rlimit) (err error) {
 	err = prlimit(0, resource, nil, rlim)
-	if err != ENOSYS ***REMOVED***
+	if err != ENOSYS {
 		return err
-	***REMOVED***
+	}
 
-	rl := rlimit32***REMOVED******REMOVED***
+	rl := rlimit32{}
 	err = getrlimit(resource, &rl)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
-	if rl.Cur == rlimInf32 ***REMOVED***
+	if rl.Cur == rlimInf32 {
 		rlim.Cur = rlimInf64
-	***REMOVED*** else ***REMOVED***
+	} else {
 		rlim.Cur = uint64(rl.Cur)
-	***REMOVED***
+	}
 
-	if rl.Max == rlimInf32 ***REMOVED***
+	if rl.Max == rlimInf32 {
 		rlim.Max = rlimInf64
-	***REMOVED*** else ***REMOVED***
+	} else {
 		rlim.Max = uint64(rl.Max)
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 //sysnb setrlimit(resource int, rlim *rlimit32) (err error) = SYS_SETRLIMIT
 
-func Setrlimit(resource int, rlim *Rlimit) (err error) ***REMOVED***
+func Setrlimit(resource int, rlim *Rlimit) (err error) {
 	err = prlimit(0, resource, rlim, nil)
-	if err != ENOSYS ***REMOVED***
+	if err != ENOSYS {
 		return err
-	***REMOVED***
+	}
 
-	rl := rlimit32***REMOVED******REMOVED***
-	if rlim.Cur == rlimInf64 ***REMOVED***
+	rl := rlimit32{}
+	if rlim.Cur == rlimInf64 {
 		rl.Cur = rlimInf32
-	***REMOVED*** else if rlim.Cur < uint64(rlimInf32) ***REMOVED***
+	} else if rlim.Cur < uint64(rlimInf32) {
 		rl.Cur = uint32(rlim.Cur)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		return EINVAL
-	***REMOVED***
-	if rlim.Max == rlimInf64 ***REMOVED***
+	}
+	if rlim.Max == rlimInf64 {
 		rl.Max = rlimInf32
-	***REMOVED*** else if rlim.Max < uint64(rlimInf32) ***REMOVED***
+	} else if rlim.Max < uint64(rlimInf32) {
 		rl.Max = uint32(rlim.Max)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		return EINVAL
-	***REMOVED***
+	}
 
 	return setrlimit(resource, &rl)
-***REMOVED***
+}
 
-func (r *PtraceRegs) PC() uint64 ***REMOVED*** return uint64(r.Uregs[15]) ***REMOVED***
+func (r *PtraceRegs) PC() uint64 { return uint64(r.Uregs[15]) }
 
-func (r *PtraceRegs) SetPC(pc uint64) ***REMOVED*** r.Uregs[15] = uint32(pc) ***REMOVED***
+func (r *PtraceRegs) SetPC(pc uint64) { r.Uregs[15] = uint32(pc) }
 
-func (iov *Iovec) SetLen(length int) ***REMOVED***
+func (iov *Iovec) SetLen(length int) {
 	iov.Len = uint32(length)
-***REMOVED***
+}
 
-func (msghdr *Msghdr) SetControllen(length int) ***REMOVED***
+func (msghdr *Msghdr) SetControllen(length int) {
 	msghdr.Controllen = uint32(length)
-***REMOVED***
+}
 
-func (cmsg *Cmsghdr) SetLen(length int) ***REMOVED***
+func (cmsg *Cmsghdr) SetLen(length int) {
 	cmsg.Len = uint32(length)
-***REMOVED***
+}
 
 //sys	poll(fds *PollFd, nfds int, timeout int) (n int, err error)
 
-func Poll(fds []PollFd, timeout int) (n int, err error) ***REMOVED***
-	if len(fds) == 0 ***REMOVED***
+func Poll(fds []PollFd, timeout int) (n int, err error) {
+	if len(fds) == 0 {
 		return poll(nil, 0, timeout)
-	***REMOVED***
+	}
 	return poll(&fds[0], len(fds), timeout)
-***REMOVED***
+}

@@ -89,7 +89,7 @@ RUN apt-get update && apt-get install -y \
 #            with a heads-up.
 # IMPORTANT: When updating this please note that stdlib archive/tar pkg is vendored
 ENV GO_VERSION 1.9.3
-RUN curl -fsSL "https://golang.org/dl/go$***REMOVED***GO_VERSION***REMOVED***.linux-amd64.tar.gz" \
+RUN curl -fsSL "https://golang.org/dl/go${GO_VERSION}.linux-amd64.tar.gz" \
 	| tar -xzC /usr/local
 
 ENV PATH /go/bin:/usr/local/go/bin:$PATH
@@ -98,7 +98,7 @@ ENV GOPATH /go
 # Install CRIU for checkpoint/restore support
 ENV CRIU_VERSION 3.6
 RUN mkdir -p /usr/src/criu \
-	&& curl -sSL https://github.com/checkpoint-restore/criu/archive/v$***REMOVED***CRIU_VERSION***REMOVED***.tar.gz | tar -C /usr/src/criu/ -xz --strip-components=1 \
+	&& curl -sSL https://github.com/checkpoint-restore/criu/archive/v${CRIU_VERSION}.tar.gz | tar -C /usr/src/criu/ -xz --strip-components=1 \
 	&& cd /usr/src/criu \
 	&& make \
 	&& make install-criu

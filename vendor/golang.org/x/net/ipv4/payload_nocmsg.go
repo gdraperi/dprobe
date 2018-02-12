@@ -15,15 +15,15 @@ import (
 // endpoint c, copying the payload into b. It returns the number of
 // bytes copied into b, the control message cm and the source address
 // src of the received datagram.
-func (c *payloadHandler) ReadFrom(b []byte) (n int, cm *ControlMessage, src net.Addr, err error) ***REMOVED***
-	if !c.ok() ***REMOVED***
+func (c *payloadHandler) ReadFrom(b []byte) (n int, cm *ControlMessage, src net.Addr, err error) {
+	if !c.ok() {
 		return 0, nil, nil, syscall.EINVAL
-	***REMOVED***
-	if n, src, err = c.PacketConn.ReadFrom(b); err != nil ***REMOVED***
+	}
+	if n, src, err = c.PacketConn.ReadFrom(b); err != nil {
 		return 0, nil, nil, err
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // WriteTo writes a payload of the IPv4 datagram, to the destination
 // address dst through the endpoint c, copying the payload from b. It
@@ -31,12 +31,12 @@ func (c *payloadHandler) ReadFrom(b []byte) (n int, cm *ControlMessage, src net.
 // the datagram path and the outgoing interface to be specified.
 // Currently only Darwin and Linux support this. The cm may be nil if
 // control of the outgoing datagram is not required.
-func (c *payloadHandler) WriteTo(b []byte, cm *ControlMessage, dst net.Addr) (n int, err error) ***REMOVED***
-	if !c.ok() ***REMOVED***
+func (c *payloadHandler) WriteTo(b []byte, cm *ControlMessage, dst net.Addr) (n int, err error) {
+	if !c.ok() {
 		return 0, syscall.EINVAL
-	***REMOVED***
-	if dst == nil ***REMOVED***
+	}
+	if dst == nil {
 		return 0, errMissingAddress
-	***REMOVED***
+	}
 	return c.PacketConn.WriteTo(b, dst)
-***REMOVED***
+}

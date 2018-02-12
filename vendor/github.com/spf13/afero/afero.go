@@ -29,12 +29,12 @@ import (
 	"time"
 )
 
-type Afero struct ***REMOVED***
+type Afero struct {
 	Fs
-***REMOVED***
+}
 
 // File represents a file in the filesystem.
-type File interface ***REMOVED***
+type File interface {
 	io.Closer
 	io.Reader
 	io.ReaderAt
@@ -49,12 +49,12 @@ type File interface ***REMOVED***
 	Sync() error
 	Truncate(size int64) error
 	WriteString(s string) (ret int, err error)
-***REMOVED***
+}
 
 // Fs is the filesystem interface.
 //
 // Any simulated or real filesystem should implement this interface.
-type Fs interface ***REMOVED***
+type Fs interface {
 	// Create creates a file in the filesystem, returning the file and an
 	// error, if any happens.
 	Create(name string) (File, error)
@@ -96,7 +96,7 @@ type Fs interface ***REMOVED***
 
 	//Chtimes changes the access and modification times of the named file
 	Chtimes(name string, atime time.Time, mtime time.Time) error
-***REMOVED***
+}
 
 var (
 	ErrFileClosed        = errors.New("File is closed")

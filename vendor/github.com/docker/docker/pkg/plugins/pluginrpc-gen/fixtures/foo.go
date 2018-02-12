@@ -6,22 +6,22 @@ import (
 	"github.com/docker/docker/pkg/plugins/pluginrpc-gen/fixtures/otherfixture"
 )
 
-type wobble struct ***REMOVED***
+type wobble struct {
 	Some      string
 	Val       string
 	Inception *wobble
-***REMOVED***
+}
 
 // Fooer is an empty interface used for tests.
-type Fooer interface***REMOVED******REMOVED***
+type Fooer interface{}
 
 // Fooer2 is an interface used for tests.
-type Fooer2 interface ***REMOVED***
+type Fooer2 interface {
 	Foo()
-***REMOVED***
+}
 
 // Fooer3 is an interface used for tests.
-type Fooer3 interface ***REMOVED***
+type Fooer3 interface {
 	Foo()
 	Bar(a string)
 	Baz(a string) (err error)
@@ -29,55 +29,55 @@ type Fooer3 interface ***REMOVED***
 	Wobble() (w *wobble)
 	Wiggle() (w wobble)
 	WiggleWobble(a []*wobble, b []wobble, c map[string]*wobble, d map[*wobble]wobble, e map[string][]wobble, f []*otherfixture.Spaceship) (g map[*wobble]wobble, h [][]*wobble, i otherfixture.Spaceship, j *otherfixture.Spaceship, k map[*otherfixture.Spaceship]otherfixture.Spaceship, l []otherfixture.Spaceship)
-***REMOVED***
+}
 
 // Fooer4 is an interface used for tests.
-type Fooer4 interface ***REMOVED***
+type Fooer4 interface {
 	Foo() error
-***REMOVED***
+}
 
 // Bar is an interface used for tests.
-type Bar interface ***REMOVED***
+type Bar interface {
 	Boo(a string, b string) (s string, err error)
-***REMOVED***
+}
 
 // Fooer5 is an interface used for tests.
-type Fooer5 interface ***REMOVED***
+type Fooer5 interface {
 	Foo()
 	Bar
-***REMOVED***
+}
 
 // Fooer6 is an interface used for tests.
-type Fooer6 interface ***REMOVED***
+type Fooer6 interface {
 	Foo(a otherfixture.Spaceship)
-***REMOVED***
+}
 
 // Fooer7 is an interface used for tests.
-type Fooer7 interface ***REMOVED***
+type Fooer7 interface {
 	Foo(a *otherfixture.Spaceship)
-***REMOVED***
+}
 
 // Fooer8 is an interface used for tests.
-type Fooer8 interface ***REMOVED***
+type Fooer8 interface {
 	Foo(a map[string]otherfixture.Spaceship)
-***REMOVED***
+}
 
 // Fooer9 is an interface used for tests.
-type Fooer9 interface ***REMOVED***
+type Fooer9 interface {
 	Foo(a map[string]*otherfixture.Spaceship)
-***REMOVED***
+}
 
 // Fooer10 is an interface used for tests.
-type Fooer10 interface ***REMOVED***
+type Fooer10 interface {
 	Foo(a []otherfixture.Spaceship)
-***REMOVED***
+}
 
 // Fooer11 is an interface used for tests.
-type Fooer11 interface ***REMOVED***
+type Fooer11 interface {
 	Foo(a []*otherfixture.Spaceship)
-***REMOVED***
+}
 
 // Fooer12 is an interface used for tests.
-type Fooer12 interface ***REMOVED***
+type Fooer12 interface {
 	Foo(a aliasedio.Reader)
-***REMOVED***
+}

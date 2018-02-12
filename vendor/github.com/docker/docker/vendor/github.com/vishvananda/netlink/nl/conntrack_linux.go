@@ -10,15 +10,15 @@ const (
 	SizeofNfctTupleHead = 52
 )
 
-var L4ProtoMap = map[uint8]string***REMOVED***
+var L4ProtoMap = map[uint8]string{
 	6:  "tcp",
 	17: "udp",
-***REMOVED***
+}
 
 // All the following constants are coming from:
 // https://github.com/torvalds/linux/blob/master/include/uapi/linux/netfilter/nfnetlink_conntrack.h
 
-// enum cntl_msg_types ***REMOVED***
+// enum cntl_msg_types {
 // 	IPCTNL_MSG_CT_NEW,
 // 	IPCTNL_MSG_CT_GET,
 // 	IPCTNL_MSG_CT_DELETE,
@@ -29,7 +29,7 @@ var L4ProtoMap = map[uint8]string***REMOVED***
 // 	IPCTNL_MSG_CT_GET_UNCONFIRMED,
 //
 // 	IPCTNL_MSG_MAX
-// ***REMOVED***;
+// };
 const (
 	IPCTNL_MSG_CT_GET    = 1
 	IPCTNL_MSG_CT_DELETE = 2
@@ -45,7 +45,7 @@ const (
 	NLA_F_NESTED = (1 << 15)
 )
 
-// enum ctattr_type ***REMOVED***
+// enum ctattr_type {
 // 	CTA_UNSPEC,
 // 	CTA_TUPLE_ORIG,
 // 	CTA_TUPLE_REPLY,
@@ -74,7 +74,7 @@ const (
 // 	CTA_LABELS,
 // 	CTA_LABELS_MASK,
 // 	__CTA_MAX
-// ***REMOVED***;
+// };
 const (
 	CTA_TUPLE_ORIG  = 1
 	CTA_TUPLE_REPLY = 2
@@ -84,27 +84,27 @@ const (
 	CTA_PROTOINFO   = 4
 )
 
-// enum ctattr_tuple ***REMOVED***
+// enum ctattr_tuple {
 // 	CTA_TUPLE_UNSPEC,
 // 	CTA_TUPLE_IP,
 // 	CTA_TUPLE_PROTO,
 // 	CTA_TUPLE_ZONE,
 // 	__CTA_TUPLE_MAX
-// ***REMOVED***;
+// };
 // #define CTA_TUPLE_MAX (__CTA_TUPLE_MAX - 1)
 const (
 	CTA_TUPLE_IP    = 1
 	CTA_TUPLE_PROTO = 2
 )
 
-// enum ctattr_ip ***REMOVED***
+// enum ctattr_ip {
 // 	CTA_IP_UNSPEC,
 // 	CTA_IP_V4_SRC,
 // 	CTA_IP_V4_DST,
 // 	CTA_IP_V6_SRC,
 // 	CTA_IP_V6_DST,
 // 	__CTA_IP_MAX
-// ***REMOVED***;
+// };
 // #define CTA_IP_MAX (__CTA_IP_MAX - 1)
 const (
 	CTA_IP_V4_SRC = 1
@@ -113,7 +113,7 @@ const (
 	CTA_IP_V6_DST = 4
 )
 
-// enum ctattr_l4proto ***REMOVED***
+// enum ctattr_l4proto {
 // 	CTA_PROTO_UNSPEC,
 // 	CTA_PROTO_NUM,
 // 	CTA_PROTO_SRC_PORT,
@@ -125,7 +125,7 @@ const (
 // 	CTA_PROTO_ICMPV6_TYPE,
 // 	CTA_PROTO_ICMPV6_CODE,
 // 	__CTA_PROTO_MAX
-// ***REMOVED***;
+// };
 // #define CTA_PROTO_MAX (__CTA_PROTO_MAX - 1)
 const (
 	CTA_PROTO_NUM      = 1
@@ -133,19 +133,19 @@ const (
 	CTA_PROTO_DST_PORT = 3
 )
 
-// enum ctattr_protoinfo ***REMOVED***
+// enum ctattr_protoinfo {
 // 	CTA_PROTOINFO_UNSPEC,
 // 	CTA_PROTOINFO_TCP,
 // 	CTA_PROTOINFO_DCCP,
 // 	CTA_PROTOINFO_SCTP,
 // 	__CTA_PROTOINFO_MAX
-// ***REMOVED***;
+// };
 // #define CTA_PROTOINFO_MAX (__CTA_PROTOINFO_MAX - 1)
 const (
 	CTA_PROTOINFO_TCP = 1
 )
 
-// enum ctattr_protoinfo_tcp ***REMOVED***
+// enum ctattr_protoinfo_tcp {
 // 	CTA_PROTOINFO_TCP_UNSPEC,
 // 	CTA_PROTOINFO_TCP_STATE,
 // 	CTA_PROTOINFO_TCP_WSCALE_ORIGINAL,
@@ -153,7 +153,7 @@ const (
 // 	CTA_PROTOINFO_TCP_FLAGS_ORIGINAL,
 // 	CTA_PROTOINFO_TCP_FLAGS_REPLY,
 // 	__CTA_PROTOINFO_TCP_MAX
-// ***REMOVED***;
+// };
 // #define CTA_PROTOINFO_TCP_MAX (__CTA_PROTOINFO_TCP_MAX - 1)
 const (
 	CTA_PROTOINFO_TCP_STATE           = 1
@@ -165,25 +165,25 @@ const (
 
 // /* General form of address family dependent message.
 //  */
-// struct nfgenmsg ***REMOVED***
+// struct nfgenmsg {
 // 	__u8  nfgen_family;		/* AF_xxx */
 // 	__u8  version;		/* nfnetlink version */
 // 	__be16    res_id;		/* resource id */
-// ***REMOVED***;
-type Nfgenmsg struct ***REMOVED***
+// };
+type Nfgenmsg struct {
 	NfgenFamily uint8
 	Version     uint8
 	ResId       uint16 // big endian
-***REMOVED***
+}
 
-func (msg *Nfgenmsg) Len() int ***REMOVED***
+func (msg *Nfgenmsg) Len() int {
 	return SizeofNfgenmsg
-***REMOVED***
+}
 
-func DeserializeNfgenmsg(b []byte) *Nfgenmsg ***REMOVED***
+func DeserializeNfgenmsg(b []byte) *Nfgenmsg {
 	return (*Nfgenmsg)(unsafe.Pointer(&b[0:SizeofNfgenmsg][0]))
-***REMOVED***
+}
 
-func (msg *Nfgenmsg) Serialize() []byte ***REMOVED***
+func (msg *Nfgenmsg) Serialize() []byte {
 	return (*(*[SizeofNfgenmsg]byte)(unsafe.Pointer(msg)))[:]
-***REMOVED***
+}

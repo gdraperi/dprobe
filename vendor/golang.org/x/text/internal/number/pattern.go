@@ -38,7 +38,7 @@ import (
 // the number of patterns is not very large, we want to keep this small.
 //
 // This type is only intended for internal use.
-type Pattern struct ***REMOVED***
+type Pattern struct {
 	RoundingContext
 
 	Affix       string // includes prefix and suffix. First byte is prefix length.
@@ -49,12 +49,12 @@ type Pattern struct ***REMOVED***
 
 	GroupingSize [2]uint8
 	Flags        PatternFlag
-***REMOVED***
+}
 
 // A RoundingContext indicates how a number should be converted to digits.
 // It contains all information needed to determine the "visible digits" as
 // required by the pluralization rules.
-type RoundingContext struct ***REMOVED***
+type RoundingContext struct {
 	// TODO: unify these two fields so that there is a more unambiguous meaning
 	// of how precision is handled.
 	MaxSignificantDigits int16 // -1 is unlimited
@@ -75,69 +75,69 @@ type RoundingContext struct ***REMOVED***
 	MinSignificantDigits uint8
 
 	MinExponentDigits uint8
-***REMOVED***
+}
 
 // RoundSignificantDigits returns the number of significant digits an
 // implementation of Convert may round to or n < 0 if there is no maximum or
 // a maximum is not recommended.
-func (r *RoundingContext) RoundSignificantDigits() (n int) ***REMOVED***
-	if r.MaxFractionDigits == 0 && r.MaxSignificantDigits > 0 ***REMOVED***
+func (r *RoundingContext) RoundSignificantDigits() (n int) {
+	if r.MaxFractionDigits == 0 && r.MaxSignificantDigits > 0 {
 		return int(r.MaxSignificantDigits)
-	***REMOVED*** else if r.isScientific() && r.MaxIntegerDigits == 1 ***REMOVED***
+	} else if r.isScientific() && r.MaxIntegerDigits == 1 {
 		if r.MaxSignificantDigits == 0 ||
-			int(r.MaxFractionDigits+1) == int(r.MaxSignificantDigits) ***REMOVED***
+			int(r.MaxFractionDigits+1) == int(r.MaxSignificantDigits) {
 			// Note: don't add DigitShift: it is only used for decimals.
 			return int(r.MaxFractionDigits) + 1
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return -1
-***REMOVED***
+}
 
 // RoundFractionDigits returns the number of fraction digits an implementation
 // of Convert may round to or n < 0 if there is no maximum or a maximum is not
 // recommended.
-func (r *RoundingContext) RoundFractionDigits() (n int) ***REMOVED***
+func (r *RoundingContext) RoundFractionDigits() (n int) {
 	if r.MinExponentDigits == 0 &&
 		r.MaxSignificantDigits == 0 &&
-		r.MaxFractionDigits >= 0 ***REMOVED***
+		r.MaxFractionDigits >= 0 {
 		return int(r.MaxFractionDigits) + int(r.DigitShift)
-	***REMOVED***
+	}
 	return -1
-***REMOVED***
+}
 
 // SetScale fixes the RoundingContext to a fixed number of fraction digits.
-func (r *RoundingContext) SetScale(scale int) ***REMOVED***
+func (r *RoundingContext) SetScale(scale int) {
 	r.MinFractionDigits = uint8(scale)
 	r.MaxFractionDigits = int16(scale)
-***REMOVED***
+}
 
-func (r *RoundingContext) SetPrecision(prec int) ***REMOVED***
+func (r *RoundingContext) SetPrecision(prec int) {
 	r.MaxSignificantDigits = int16(prec)
-***REMOVED***
+}
 
-func (r *RoundingContext) isScientific() bool ***REMOVED***
+func (r *RoundingContext) isScientific() bool {
 	return r.MinExponentDigits > 0
-***REMOVED***
+}
 
-func (f *Pattern) needsSep(pos int) bool ***REMOVED***
+func (f *Pattern) needsSep(pos int) bool {
 	p := pos - 1
 	size := int(f.GroupingSize[0])
-	if size == 0 || p == 0 ***REMOVED***
+	if size == 0 || p == 0 {
 		return false
-	***REMOVED***
-	if p == size ***REMOVED***
+	}
+	if p == size {
 		return true
-	***REMOVED***
-	if p -= size; p < 0 ***REMOVED***
+	}
+	if p -= size; p < 0 {
 		return false
-	***REMOVED***
+	}
 	// TODO: make second groupingsize the same as first if 0 so that we can
 	// avoid this check.
-	if x := int(f.GroupingSize[1]); x != 0 ***REMOVED***
+	if x := int(f.GroupingSize[1]); x != 0 {
 		size = x
-	***REMOVED***
+	}
 	return p%size == 0
-***REMOVED***
+}
 
 // A PatternFlag is a bit mask for the flag field of a Pattern.
 type PatternFlag uint8
@@ -159,7 +159,7 @@ const (
 	PadMask         = PadAfterNumber | PadAfterAffix
 )
 
-type parser struct ***REMOVED***
+type parser struct {
 	*Pattern
 
 	leadingSharps int
@@ -170,23 +170,23 @@ type parser struct ***REMOVED***
 	groupingCount  uint
 	hasGroup       bool
 	buf            []byte
-***REMOVED***
+}
 
-func (p *parser) setError(err error) ***REMOVED***
-	if p.err == nil ***REMOVED***
+func (p *parser) setError(err error) {
+	if p.err == nil {
 		p.err = err
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (p *parser) updateGrouping() ***REMOVED***
+func (p *parser) updateGrouping() {
 	if p.hasGroup &&
-		0 < p.groupingCount && p.groupingCount < 255 ***REMOVED***
+		0 < p.groupingCount && p.groupingCount < 255 {
 		p.GroupingSize[1] = p.GroupingSize[0]
 		p.GroupingSize[0] = uint8(p.groupingCount)
-	***REMOVED***
+	}
 	p.groupingCount = 0
 	p.hasGroup = true
-***REMOVED***
+}
 
 var (
 	// TODO: more sensible and localizeable error messages.
@@ -202,41 +202,41 @@ var (
 // ParsePattern extracts formatting information from a CLDR number pattern.
 //
 // See http://unicode.org/reports/tr35/tr35-numbers.html#Number_Format_Patterns.
-func ParsePattern(s string) (f *Pattern, err error) ***REMOVED***
-	p := parser***REMOVED***Pattern: &Pattern***REMOVED******REMOVED******REMOVED***
+func ParsePattern(s string) (f *Pattern, err error) {
+	p := parser{Pattern: &Pattern{}}
 
 	s = p.parseSubPattern(s)
 
-	if s != "" ***REMOVED***
+	if s != "" {
 		// Parse negative sub pattern.
-		if s[0] != ';' ***REMOVED***
+		if s[0] != ';' {
 			p.setError(errors.New("format: error parsing first sub pattern"))
 			return nil, p.err
-		***REMOVED***
-		neg := parser***REMOVED***Pattern: &Pattern***REMOVED******REMOVED******REMOVED*** // just for extracting the affixes.
+		}
+		neg := parser{Pattern: &Pattern{}} // just for extracting the affixes.
 		s = neg.parseSubPattern(s[len(";"):])
 		p.NegOffset = uint16(len(p.buf))
 		p.buf = append(p.buf, neg.buf...)
-	***REMOVED***
-	if s != "" ***REMOVED***
+	}
+	if s != "" {
 		p.setError(errors.New("format: spurious characters at end of pattern"))
-	***REMOVED***
-	if p.err != nil ***REMOVED***
+	}
+	if p.err != nil {
 		return nil, p.err
-	***REMOVED***
-	if affix := string(p.buf); affix == "\x00\x00" || affix == "\x00\x00\x00\x00" ***REMOVED***
+	}
+	if affix := string(p.buf); affix == "\x00\x00" || affix == "\x00\x00\x00\x00" {
 		// No prefix or suffixes.
 		p.NegOffset = 0
-	***REMOVED*** else ***REMOVED***
+	} else {
 		p.Affix = affix
-	***REMOVED***
-	if p.Increment == 0 ***REMOVED***
+	}
+	if p.Increment == 0 {
 		p.IncrementScale = 0
-	***REMOVED***
+	}
 	return p.Pattern, nil
-***REMOVED***
+}
 
-func (p *parser) parseSubPattern(s string) string ***REMOVED***
+func (p *parser) parseSubPattern(s string) string {
 	s = p.parsePad(s, PadBeforePrefix)
 	s = p.parseAffix(s)
 	s = p.parsePad(s, PadAfterPrefix)
@@ -248,35 +248,35 @@ func (p *parser) parseSubPattern(s string) string ***REMOVED***
 	s = p.parseAffix(s)
 	s = p.parsePad(s, PadAfterSuffix)
 	return s
-***REMOVED***
+}
 
-func (p *parser) parsePad(s string, f PatternFlag) (tail string) ***REMOVED***
-	if len(s) >= 2 && s[0] == '*' ***REMOVED***
+func (p *parser) parsePad(s string, f PatternFlag) (tail string) {
+	if len(s) >= 2 && s[0] == '*' {
 		r, sz := utf8.DecodeRuneInString(s[1:])
-		if p.PadRune != 0 ***REMOVED***
+		if p.PadRune != 0 {
 			p.err = errMultiplePadSpecifiers
-		***REMOVED*** else ***REMOVED***
+		} else {
 			p.Flags |= f
 			p.PadRune = r
-		***REMOVED***
+		}
 		return s[1+sz:]
-	***REMOVED***
+	}
 	return s
-***REMOVED***
+}
 
-func (p *parser) parseAffix(s string) string ***REMOVED***
+func (p *parser) parseAffix(s string) string {
 	x := len(p.buf)
 	p.buf = append(p.buf, 0) // placeholder for affix length
 
 	s = p.parse(p.affix, s)
 
 	n := len(p.buf) - x - 1
-	if n > 0xFF ***REMOVED***
+	if n > 0xFF {
 		p.setError(errAffixTooLarge)
-	***REMOVED***
+	}
 	p.buf[x] = uint8(n)
 	return s
-***REMOVED***
+}
 
 // state implements a state transition. It returns the new state. A state
 // function may set an error on the parser or may simply return on an incorrect
@@ -285,22 +285,22 @@ type state func(r rune) state
 
 // parse repeatedly applies a state function on the given string until a
 // termination condition is reached.
-func (p *parser) parse(fn state, s string) (tail string) ***REMOVED***
-	for i, r := range s ***REMOVED***
+func (p *parser) parse(fn state, s string) (tail string) {
+	for i, r := range s {
 		p.doNotTerminate = false
-		if fn = fn(r); fn == nil || p.err != nil ***REMOVED***
+		if fn = fn(r); fn == nil || p.err != nil {
 			return s[i:]
-		***REMOVED***
+		}
 		p.FormatWidth++
-	***REMOVED***
-	if p.doNotTerminate ***REMOVED***
+	}
+	if p.doNotTerminate {
 		p.setError(errUnexpectedEnd)
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (p *parser) affix(r rune) state ***REMOVED***
-	switch r ***REMOVED***
+func (p *parser) affix(r rune) state {
+	switch r {
 	case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
 		'#', '@', '.', '*', ',', ';':
 		return nil
@@ -308,50 +308,50 @@ func (p *parser) affix(r rune) state ***REMOVED***
 		p.FormatWidth--
 		return p.escapeFirst
 	case '%':
-		if p.DigitShift != 0 ***REMOVED***
+		if p.DigitShift != 0 {
 			p.setError(errDuplicatePercentSign)
-		***REMOVED***
+		}
 		p.DigitShift = 2
 	case '\u2030': // ‰ Per mille
-		if p.DigitShift != 0 ***REMOVED***
+		if p.DigitShift != 0 {
 			p.setError(errDuplicatePermilleSign)
-		***REMOVED***
+		}
 		p.DigitShift = 3
 		// TODO: handle currency somehow: ¤, ¤¤, ¤¤¤, ¤¤¤¤
-	***REMOVED***
+	}
 	p.buf = append(p.buf, string(r)...)
 	return p.affix
-***REMOVED***
+}
 
-func (p *parser) escapeFirst(r rune) state ***REMOVED***
-	switch r ***REMOVED***
+func (p *parser) escapeFirst(r rune) state {
+	switch r {
 	case '\'':
 		p.buf = append(p.buf, "\\'"...)
 		return p.affix
 	default:
 		p.buf = append(p.buf, '\'')
 		p.buf = append(p.buf, string(r)...)
-	***REMOVED***
+	}
 	return p.escape
-***REMOVED***
+}
 
-func (p *parser) escape(r rune) state ***REMOVED***
-	switch r ***REMOVED***
+func (p *parser) escape(r rune) state {
+	switch r {
 	case '\'':
 		p.FormatWidth--
 		p.buf = append(p.buf, '\'')
 		return p.affix
 	default:
 		p.buf = append(p.buf, string(r)...)
-	***REMOVED***
+	}
 	return p.escape
-***REMOVED***
+}
 
 // number parses a number. The BNF says the integer part should always have
 // a '0', but that does not appear to be the case according to the rest of the
 // documentation. We will allow having only '#' numbers.
-func (p *parser) number(r rune) state ***REMOVED***
-	switch r ***REMOVED***
+func (p *parser) number(r rune) state {
+	switch r {
 	case '#':
 		p.groupingCount++
 		p.leadingSharps++
@@ -361,9 +361,9 @@ func (p *parser) number(r rune) state ***REMOVED***
 		p.MaxFractionDigits = -1
 		return p.sigDigits(r)
 	case ',':
-		if p.leadingSharps == 0 ***REMOVED*** // no leading commas
+		if p.leadingSharps == 0 { // no leading commas
 			return nil
-		***REMOVED***
+		}
 		p.updateGrouping()
 	case 'E':
 		p.MaxIntegerDigits = uint8(p.leadingSharps)
@@ -375,35 +375,35 @@ func (p *parser) number(r rune) state ***REMOVED***
 		return p.integer(r)
 	default:
 		return nil
-	***REMOVED***
+	}
 	return p.number
-***REMOVED***
+}
 
-func (p *parser) integer(r rune) state ***REMOVED***
-	if !('0' <= r && r <= '9') ***REMOVED***
+func (p *parser) integer(r rune) state {
+	if !('0' <= r && r <= '9') {
 		var next state
-		switch r ***REMOVED***
+		switch r {
 		case 'E':
-			if p.leadingSharps > 0 ***REMOVED***
+			if p.leadingSharps > 0 {
 				p.MaxIntegerDigits = uint8(p.leadingSharps) + p.MinIntegerDigits
-			***REMOVED***
+			}
 			next = p.exponent
 		case '.':
 			next = p.fraction
 		case ',':
 			next = p.integer
-		***REMOVED***
+		}
 		p.updateGrouping()
 		return next
-	***REMOVED***
+	}
 	p.Increment = p.Increment*10 + uint32(r-'0')
 	p.groupingCount++
 	p.MinIntegerDigits++
 	return p.integer
-***REMOVED***
+}
 
-func (p *parser) sigDigits(r rune) state ***REMOVED***
-	switch r ***REMOVED***
+func (p *parser) sigDigits(r rune) state {
+	switch r {
 	case '@':
 		p.groupingCount++
 		p.MaxSignificantDigits++
@@ -416,12 +416,12 @@ func (p *parser) sigDigits(r rune) state ***REMOVED***
 	default:
 		p.updateGrouping()
 		return nil
-	***REMOVED***
+	}
 	return p.sigDigits
-***REMOVED***
+}
 
-func (p *parser) sigDigitsFinal(r rune) state ***REMOVED***
-	switch r ***REMOVED***
+func (p *parser) sigDigitsFinal(r rune) state {
+	switch r {
 	case '#':
 		p.groupingCount++
 		p.MaxSignificantDigits++
@@ -431,20 +431,20 @@ func (p *parser) sigDigitsFinal(r rune) state ***REMOVED***
 	default:
 		p.updateGrouping()
 		return nil
-	***REMOVED***
+	}
 	return p.sigDigitsFinal
-***REMOVED***
+}
 
-func (p *parser) normalizeSigDigitsWithExponent() state ***REMOVED***
+func (p *parser) normalizeSigDigitsWithExponent() state {
 	p.MinIntegerDigits, p.MaxIntegerDigits = 1, 1
 	p.MinFractionDigits = p.MinSignificantDigits - 1
 	p.MaxFractionDigits = p.MaxSignificantDigits - 1
 	p.MinSignificantDigits, p.MaxSignificantDigits = 0, 0
 	return p.exponent
-***REMOVED***
+}
 
-func (p *parser) fraction(r rune) state ***REMOVED***
-	switch r ***REMOVED***
+func (p *parser) fraction(r rune) state {
+	switch r {
 	case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
 		p.Increment = p.Increment*10 + uint32(r-'0')
 		p.IncrementScale++
@@ -453,33 +453,33 @@ func (p *parser) fraction(r rune) state ***REMOVED***
 	case '#':
 		p.MaxFractionDigits++
 	case 'E':
-		if p.leadingSharps > 0 ***REMOVED***
+		if p.leadingSharps > 0 {
 			p.MaxIntegerDigits = uint8(p.leadingSharps) + p.MinIntegerDigits
-		***REMOVED***
+		}
 		return p.exponent
 	default:
 		return nil
-	***REMOVED***
+	}
 	return p.fraction
-***REMOVED***
+}
 
-func (p *parser) exponent(r rune) state ***REMOVED***
-	switch r ***REMOVED***
+func (p *parser) exponent(r rune) state {
+	switch r {
 	case '+':
 		// Set mode and check it wasn't already set.
-		if p.Flags&AlwaysExpSign != 0 || p.MinExponentDigits > 0 ***REMOVED***
+		if p.Flags&AlwaysExpSign != 0 || p.MinExponentDigits > 0 {
 			break
-		***REMOVED***
+		}
 		p.Flags |= AlwaysExpSign
 		p.doNotTerminate = true
 		return p.exponent
 	case '0':
 		p.MinExponentDigits++
 		return p.exponent
-	***REMOVED***
+	}
 	// termination condition
-	if p.MinExponentDigits == 0 ***REMOVED***
+	if p.MinExponentDigits == 0 {
 		p.setError(errors.New("format: need at least one digit"))
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

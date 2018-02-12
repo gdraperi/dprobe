@@ -2,19 +2,19 @@ package clock
 
 import "time"
 
-type Ticker interface ***REMOVED***
+type Ticker interface {
 	C() <-chan time.Time
 	Stop()
-***REMOVED***
+}
 
-type realTicker struct ***REMOVED***
+type realTicker struct {
 	t *time.Ticker
-***REMOVED***
+}
 
-func (t *realTicker) C() <-chan time.Time ***REMOVED***
+func (t *realTicker) C() <-chan time.Time {
 	return t.t.C
-***REMOVED***
+}
 
-func (t *realTicker) Stop() ***REMOVED***
+func (t *realTicker) Stop() {
 	t.t.Stop()
-***REMOVED***
+}

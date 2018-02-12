@@ -34,511 +34,511 @@ const (
 )
 
 // Generates i multi-line events each with j lines
-func (l *logStream) logGenerator(lineCount int, multilineCount int) ***REMOVED***
-	for i := 0; i < multilineCount; i++ ***REMOVED***
-		l.Log(&logger.Message***REMOVED***
+func (l *logStream) logGenerator(lineCount int, multilineCount int) {
+	for i := 0; i < multilineCount; i++ {
+		l.Log(&logger.Message{
 			Line:      []byte(multilineLogline),
-			Timestamp: time.Time***REMOVED******REMOVED***,
-		***REMOVED***)
-		for j := 0; j < lineCount; j++ ***REMOVED***
-			l.Log(&logger.Message***REMOVED***
+			Timestamp: time.Time{},
+		})
+		for j := 0; j < lineCount; j++ {
+			l.Log(&logger.Message{
 				Line:      []byte(logline),
-				Timestamp: time.Time***REMOVED******REMOVED***,
-			***REMOVED***)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+				Timestamp: time.Time{},
+			})
+		}
+	}
+}
 
-func testEventBatch(events []wrappedEvent) *eventBatch ***REMOVED***
+func testEventBatch(events []wrappedEvent) *eventBatch {
 	batch := newEventBatch()
-	for _, event := range events ***REMOVED***
+	for _, event := range events {
 		eventlen := len([]byte(*event.inputLogEvent.Message))
 		batch.add(event, eventlen)
-	***REMOVED***
+	}
 	return batch
-***REMOVED***
+}
 
-func TestNewAWSLogsClientUserAgentHandler(t *testing.T) ***REMOVED***
-	info := logger.Info***REMOVED***
-		Config: map[string]string***REMOVED***
+func TestNewAWSLogsClientUserAgentHandler(t *testing.T) {
+	info := logger.Info{
+		Config: map[string]string{
 			regionKey: "us-east-1",
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
 	client, err := newAWSLogsClient(info)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	realClient, ok := client.(*cloudwatchlogs.CloudWatchLogs)
-	if !ok ***REMOVED***
+	if !ok {
 		t.Fatal("Could not cast client to cloudwatchlogs.CloudWatchLogs")
-	***REMOVED***
+	}
 	buildHandlerList := realClient.Handlers.Build
-	request := &request.Request***REMOVED***
-		HTTPRequest: &http.Request***REMOVED***
-			Header: http.Header***REMOVED******REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+	request := &request.Request{
+		HTTPRequest: &http.Request{
+			Header: http.Header{},
+		},
+	}
 	buildHandlerList.Run(request)
 	expectedUserAgentString := fmt.Sprintf("Docker %s (%s) %s/%s (%s; %s; %s)",
 		dockerversion.Version, runtime.GOOS, aws.SDKName, aws.SDKVersion, runtime.Version(), runtime.GOOS, runtime.GOARCH)
 	userAgent := request.HTTPRequest.Header.Get("User-Agent")
-	if userAgent != expectedUserAgentString ***REMOVED***
+	if userAgent != expectedUserAgentString {
 		t.Errorf("Wrong User-Agent string, expected \"%s\" but was \"%s\"",
 			expectedUserAgentString, userAgent)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestNewAWSLogsClientRegionDetect(t *testing.T) ***REMOVED***
-	info := logger.Info***REMOVED***
-		Config: map[string]string***REMOVED******REMOVED***,
-	***REMOVED***
+func TestNewAWSLogsClientRegionDetect(t *testing.T) {
+	info := logger.Info{
+		Config: map[string]string{},
+	}
 
 	mockMetadata := newMockMetadataClient()
-	newRegionFinder = func() regionFinder ***REMOVED***
+	newRegionFinder = func() regionFinder {
 		return mockMetadata
-	***REMOVED***
-	mockMetadata.regionResult <- &regionResult***REMOVED***
+	}
+	mockMetadata.regionResult <- &regionResult{
 		successResult: "us-east-1",
-	***REMOVED***
+	}
 
 	_, err := newAWSLogsClient(info)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestCreateSuccess(t *testing.T) ***REMOVED***
+func TestCreateSuccess(t *testing.T) {
 	mockClient := newMockClient()
-	stream := &logStream***REMOVED***
+	stream := &logStream{
 		client:        mockClient,
 		logGroupName:  groupName,
 		logStreamName: streamName,
-	***REMOVED***
-	mockClient.createLogStreamResult <- &createLogStreamResult***REMOVED******REMOVED***
+	}
+	mockClient.createLogStreamResult <- &createLogStreamResult{}
 
 	err := stream.create()
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("Received unexpected err: %v\n", err)
-	***REMOVED***
+	}
 	argument := <-mockClient.createLogStreamArgument
-	if argument.LogGroupName == nil ***REMOVED***
+	if argument.LogGroupName == nil {
 		t.Fatal("Expected non-nil LogGroupName")
-	***REMOVED***
-	if *argument.LogGroupName != groupName ***REMOVED***
+	}
+	if *argument.LogGroupName != groupName {
 		t.Errorf("Expected LogGroupName to be %s", groupName)
-	***REMOVED***
-	if argument.LogStreamName == nil ***REMOVED***
+	}
+	if argument.LogStreamName == nil {
 		t.Fatal("Expected non-nil LogStreamName")
-	***REMOVED***
-	if *argument.LogStreamName != streamName ***REMOVED***
+	}
+	if *argument.LogStreamName != streamName {
 		t.Errorf("Expected LogStreamName to be %s", streamName)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestCreateLogGroupSuccess(t *testing.T) ***REMOVED***
+func TestCreateLogGroupSuccess(t *testing.T) {
 	mockClient := newMockClient()
-	stream := &logStream***REMOVED***
+	stream := &logStream{
 		client:         mockClient,
 		logGroupName:   groupName,
 		logStreamName:  streamName,
 		logCreateGroup: true,
-	***REMOVED***
-	mockClient.createLogGroupResult <- &createLogGroupResult***REMOVED******REMOVED***
-	mockClient.createLogStreamResult <- &createLogStreamResult***REMOVED******REMOVED***
+	}
+	mockClient.createLogGroupResult <- &createLogGroupResult{}
+	mockClient.createLogStreamResult <- &createLogStreamResult{}
 
 	err := stream.create()
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("Received unexpected err: %v\n", err)
-	***REMOVED***
+	}
 	argument := <-mockClient.createLogStreamArgument
-	if argument.LogGroupName == nil ***REMOVED***
+	if argument.LogGroupName == nil {
 		t.Fatal("Expected non-nil LogGroupName")
-	***REMOVED***
-	if *argument.LogGroupName != groupName ***REMOVED***
+	}
+	if *argument.LogGroupName != groupName {
 		t.Errorf("Expected LogGroupName to be %s", groupName)
-	***REMOVED***
-	if argument.LogStreamName == nil ***REMOVED***
+	}
+	if argument.LogStreamName == nil {
 		t.Fatal("Expected non-nil LogStreamName")
-	***REMOVED***
-	if *argument.LogStreamName != streamName ***REMOVED***
+	}
+	if *argument.LogStreamName != streamName {
 		t.Errorf("Expected LogStreamName to be %s", streamName)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestCreateError(t *testing.T) ***REMOVED***
+func TestCreateError(t *testing.T) {
 	mockClient := newMockClient()
-	stream := &logStream***REMOVED***
+	stream := &logStream{
 		client: mockClient,
-	***REMOVED***
-	mockClient.createLogStreamResult <- &createLogStreamResult***REMOVED***
+	}
+	mockClient.createLogStreamResult <- &createLogStreamResult{
 		errorResult: errors.New("Error"),
-	***REMOVED***
+	}
 
 	err := stream.create()
 
-	if err == nil ***REMOVED***
+	if err == nil {
 		t.Fatal("Expected non-nil err")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestCreateAlreadyExists(t *testing.T) ***REMOVED***
+func TestCreateAlreadyExists(t *testing.T) {
 	mockClient := newMockClient()
-	stream := &logStream***REMOVED***
+	stream := &logStream{
 		client: mockClient,
-	***REMOVED***
-	mockClient.createLogStreamResult <- &createLogStreamResult***REMOVED***
+	}
+	mockClient.createLogStreamResult <- &createLogStreamResult{
 		errorResult: awserr.New(resourceAlreadyExistsCode, "", nil),
-	***REMOVED***
+	}
 
 	err := stream.create()
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal("Expected nil err")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestPublishBatchSuccess(t *testing.T) ***REMOVED***
+func TestPublishBatchSuccess(t *testing.T) {
 	mockClient := newMockClient()
-	stream := &logStream***REMOVED***
+	stream := &logStream{
 		client:        mockClient,
 		logGroupName:  groupName,
 		logStreamName: streamName,
 		sequenceToken: aws.String(sequenceToken),
-	***REMOVED***
-	mockClient.putLogEventsResult <- &putLogEventsResult***REMOVED***
-		successResult: &cloudwatchlogs.PutLogEventsOutput***REMOVED***
+	}
+	mockClient.putLogEventsResult <- &putLogEventsResult{
+		successResult: &cloudwatchlogs.PutLogEventsOutput{
 			NextSequenceToken: aws.String(nextSequenceToken),
-		***REMOVED***,
-	***REMOVED***
-	events := []wrappedEvent***REMOVED***
-		***REMOVED***
-			inputLogEvent: &cloudwatchlogs.InputLogEvent***REMOVED***
+		},
+	}
+	events := []wrappedEvent{
+		{
+			inputLogEvent: &cloudwatchlogs.InputLogEvent{
 				Message: aws.String(logline),
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+			},
+		},
+	}
 
 	stream.publishBatch(testEventBatch(events))
-	if stream.sequenceToken == nil ***REMOVED***
+	if stream.sequenceToken == nil {
 		t.Fatal("Expected non-nil sequenceToken")
-	***REMOVED***
-	if *stream.sequenceToken != nextSequenceToken ***REMOVED***
+	}
+	if *stream.sequenceToken != nextSequenceToken {
 		t.Errorf("Expected sequenceToken to be %s, but was %s", nextSequenceToken, *stream.sequenceToken)
-	***REMOVED***
+	}
 	argument := <-mockClient.putLogEventsArgument
-	if argument == nil ***REMOVED***
+	if argument == nil {
 		t.Fatal("Expected non-nil PutLogEventsInput")
-	***REMOVED***
-	if argument.SequenceToken == nil ***REMOVED***
+	}
+	if argument.SequenceToken == nil {
 		t.Fatal("Expected non-nil PutLogEventsInput.SequenceToken")
-	***REMOVED***
-	if *argument.SequenceToken != sequenceToken ***REMOVED***
+	}
+	if *argument.SequenceToken != sequenceToken {
 		t.Errorf("Expected PutLogEventsInput.SequenceToken to be %s, but was %s", sequenceToken, *argument.SequenceToken)
-	***REMOVED***
-	if len(argument.LogEvents) != 1 ***REMOVED***
+	}
+	if len(argument.LogEvents) != 1 {
 		t.Errorf("Expected LogEvents to contain 1 element, but contains %d", len(argument.LogEvents))
-	***REMOVED***
-	if argument.LogEvents[0] != events[0].inputLogEvent ***REMOVED***
+	}
+	if argument.LogEvents[0] != events[0].inputLogEvent {
 		t.Error("Expected event to equal input")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestPublishBatchError(t *testing.T) ***REMOVED***
+func TestPublishBatchError(t *testing.T) {
 	mockClient := newMockClient()
-	stream := &logStream***REMOVED***
+	stream := &logStream{
 		client:        mockClient,
 		logGroupName:  groupName,
 		logStreamName: streamName,
 		sequenceToken: aws.String(sequenceToken),
-	***REMOVED***
-	mockClient.putLogEventsResult <- &putLogEventsResult***REMOVED***
+	}
+	mockClient.putLogEventsResult <- &putLogEventsResult{
 		errorResult: errors.New("Error"),
-	***REMOVED***
+	}
 
-	events := []wrappedEvent***REMOVED***
-		***REMOVED***
-			inputLogEvent: &cloudwatchlogs.InputLogEvent***REMOVED***
+	events := []wrappedEvent{
+		{
+			inputLogEvent: &cloudwatchlogs.InputLogEvent{
 				Message: aws.String(logline),
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+			},
+		},
+	}
 
 	stream.publishBatch(testEventBatch(events))
-	if stream.sequenceToken == nil ***REMOVED***
+	if stream.sequenceToken == nil {
 		t.Fatal("Expected non-nil sequenceToken")
-	***REMOVED***
-	if *stream.sequenceToken != sequenceToken ***REMOVED***
+	}
+	if *stream.sequenceToken != sequenceToken {
 		t.Errorf("Expected sequenceToken to be %s, but was %s", sequenceToken, *stream.sequenceToken)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestPublishBatchInvalidSeqSuccess(t *testing.T) ***REMOVED***
+func TestPublishBatchInvalidSeqSuccess(t *testing.T) {
 	mockClient := newMockClientBuffered(2)
-	stream := &logStream***REMOVED***
+	stream := &logStream{
 		client:        mockClient,
 		logGroupName:  groupName,
 		logStreamName: streamName,
 		sequenceToken: aws.String(sequenceToken),
-	***REMOVED***
-	mockClient.putLogEventsResult <- &putLogEventsResult***REMOVED***
+	}
+	mockClient.putLogEventsResult <- &putLogEventsResult{
 		errorResult: awserr.New(invalidSequenceTokenCode, "use token token", nil),
-	***REMOVED***
-	mockClient.putLogEventsResult <- &putLogEventsResult***REMOVED***
-		successResult: &cloudwatchlogs.PutLogEventsOutput***REMOVED***
+	}
+	mockClient.putLogEventsResult <- &putLogEventsResult{
+		successResult: &cloudwatchlogs.PutLogEventsOutput{
 			NextSequenceToken: aws.String(nextSequenceToken),
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
-	events := []wrappedEvent***REMOVED***
-		***REMOVED***
-			inputLogEvent: &cloudwatchlogs.InputLogEvent***REMOVED***
+	events := []wrappedEvent{
+		{
+			inputLogEvent: &cloudwatchlogs.InputLogEvent{
 				Message: aws.String(logline),
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+			},
+		},
+	}
 
 	stream.publishBatch(testEventBatch(events))
-	if stream.sequenceToken == nil ***REMOVED***
+	if stream.sequenceToken == nil {
 		t.Fatal("Expected non-nil sequenceToken")
-	***REMOVED***
-	if *stream.sequenceToken != nextSequenceToken ***REMOVED***
+	}
+	if *stream.sequenceToken != nextSequenceToken {
 		t.Errorf("Expected sequenceToken to be %s, but was %s", nextSequenceToken, *stream.sequenceToken)
-	***REMOVED***
+	}
 
 	argument := <-mockClient.putLogEventsArgument
-	if argument == nil ***REMOVED***
+	if argument == nil {
 		t.Fatal("Expected non-nil PutLogEventsInput")
-	***REMOVED***
-	if argument.SequenceToken == nil ***REMOVED***
+	}
+	if argument.SequenceToken == nil {
 		t.Fatal("Expected non-nil PutLogEventsInput.SequenceToken")
-	***REMOVED***
-	if *argument.SequenceToken != sequenceToken ***REMOVED***
+	}
+	if *argument.SequenceToken != sequenceToken {
 		t.Errorf("Expected PutLogEventsInput.SequenceToken to be %s, but was %s", sequenceToken, *argument.SequenceToken)
-	***REMOVED***
-	if len(argument.LogEvents) != 1 ***REMOVED***
+	}
+	if len(argument.LogEvents) != 1 {
 		t.Errorf("Expected LogEvents to contain 1 element, but contains %d", len(argument.LogEvents))
-	***REMOVED***
-	if argument.LogEvents[0] != events[0].inputLogEvent ***REMOVED***
+	}
+	if argument.LogEvents[0] != events[0].inputLogEvent {
 		t.Error("Expected event to equal input")
-	***REMOVED***
+	}
 
 	argument = <-mockClient.putLogEventsArgument
-	if argument == nil ***REMOVED***
+	if argument == nil {
 		t.Fatal("Expected non-nil PutLogEventsInput")
-	***REMOVED***
-	if argument.SequenceToken == nil ***REMOVED***
+	}
+	if argument.SequenceToken == nil {
 		t.Fatal("Expected non-nil PutLogEventsInput.SequenceToken")
-	***REMOVED***
-	if *argument.SequenceToken != "token" ***REMOVED***
+	}
+	if *argument.SequenceToken != "token" {
 		t.Errorf("Expected PutLogEventsInput.SequenceToken to be %s, but was %s", "token", *argument.SequenceToken)
-	***REMOVED***
-	if len(argument.LogEvents) != 1 ***REMOVED***
+	}
+	if len(argument.LogEvents) != 1 {
 		t.Errorf("Expected LogEvents to contain 1 element, but contains %d", len(argument.LogEvents))
-	***REMOVED***
-	if argument.LogEvents[0] != events[0].inputLogEvent ***REMOVED***
+	}
+	if argument.LogEvents[0] != events[0].inputLogEvent {
 		t.Error("Expected event to equal input")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestPublishBatchAlreadyAccepted(t *testing.T) ***REMOVED***
+func TestPublishBatchAlreadyAccepted(t *testing.T) {
 	mockClient := newMockClient()
-	stream := &logStream***REMOVED***
+	stream := &logStream{
 		client:        mockClient,
 		logGroupName:  groupName,
 		logStreamName: streamName,
 		sequenceToken: aws.String(sequenceToken),
-	***REMOVED***
-	mockClient.putLogEventsResult <- &putLogEventsResult***REMOVED***
+	}
+	mockClient.putLogEventsResult <- &putLogEventsResult{
 		errorResult: awserr.New(dataAlreadyAcceptedCode, "use token token", nil),
-	***REMOVED***
+	}
 
-	events := []wrappedEvent***REMOVED***
-		***REMOVED***
-			inputLogEvent: &cloudwatchlogs.InputLogEvent***REMOVED***
+	events := []wrappedEvent{
+		{
+			inputLogEvent: &cloudwatchlogs.InputLogEvent{
 				Message: aws.String(logline),
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+			},
+		},
+	}
 
 	stream.publishBatch(testEventBatch(events))
-	if stream.sequenceToken == nil ***REMOVED***
+	if stream.sequenceToken == nil {
 		t.Fatal("Expected non-nil sequenceToken")
-	***REMOVED***
-	if *stream.sequenceToken != "token" ***REMOVED***
+	}
+	if *stream.sequenceToken != "token" {
 		t.Errorf("Expected sequenceToken to be %s, but was %s", "token", *stream.sequenceToken)
-	***REMOVED***
+	}
 
 	argument := <-mockClient.putLogEventsArgument
-	if argument == nil ***REMOVED***
+	if argument == nil {
 		t.Fatal("Expected non-nil PutLogEventsInput")
-	***REMOVED***
-	if argument.SequenceToken == nil ***REMOVED***
+	}
+	if argument.SequenceToken == nil {
 		t.Fatal("Expected non-nil PutLogEventsInput.SequenceToken")
-	***REMOVED***
-	if *argument.SequenceToken != sequenceToken ***REMOVED***
+	}
+	if *argument.SequenceToken != sequenceToken {
 		t.Errorf("Expected PutLogEventsInput.SequenceToken to be %s, but was %s", sequenceToken, *argument.SequenceToken)
-	***REMOVED***
-	if len(argument.LogEvents) != 1 ***REMOVED***
+	}
+	if len(argument.LogEvents) != 1 {
 		t.Errorf("Expected LogEvents to contain 1 element, but contains %d", len(argument.LogEvents))
-	***REMOVED***
-	if argument.LogEvents[0] != events[0].inputLogEvent ***REMOVED***
+	}
+	if argument.LogEvents[0] != events[0].inputLogEvent {
 		t.Error("Expected event to equal input")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestCollectBatchSimple(t *testing.T) ***REMOVED***
+func TestCollectBatchSimple(t *testing.T) {
 	mockClient := newMockClient()
-	stream := &logStream***REMOVED***
+	stream := &logStream{
 		client:        mockClient,
 		logGroupName:  groupName,
 		logStreamName: streamName,
 		sequenceToken: aws.String(sequenceToken),
 		messages:      make(chan *logger.Message),
-	***REMOVED***
-	mockClient.putLogEventsResult <- &putLogEventsResult***REMOVED***
-		successResult: &cloudwatchlogs.PutLogEventsOutput***REMOVED***
+	}
+	mockClient.putLogEventsResult <- &putLogEventsResult{
+		successResult: &cloudwatchlogs.PutLogEventsOutput{
 			NextSequenceToken: aws.String(nextSequenceToken),
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 	ticks := make(chan time.Time)
-	newTicker = func(_ time.Duration) *time.Ticker ***REMOVED***
-		return &time.Ticker***REMOVED***
+	newTicker = func(_ time.Duration) *time.Ticker {
+		return &time.Ticker{
 			C: ticks,
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	go stream.collectBatch()
 
-	stream.Log(&logger.Message***REMOVED***
+	stream.Log(&logger.Message{
 		Line:      []byte(logline),
-		Timestamp: time.Time***REMOVED******REMOVED***,
-	***REMOVED***)
+		Timestamp: time.Time{},
+	})
 
-	ticks <- time.Time***REMOVED******REMOVED***
+	ticks <- time.Time{}
 	stream.Close()
 
 	argument := <-mockClient.putLogEventsArgument
-	if argument == nil ***REMOVED***
+	if argument == nil {
 		t.Fatal("Expected non-nil PutLogEventsInput")
-	***REMOVED***
-	if len(argument.LogEvents) != 1 ***REMOVED***
+	}
+	if len(argument.LogEvents) != 1 {
 		t.Errorf("Expected LogEvents to contain 1 element, but contains %d", len(argument.LogEvents))
-	***REMOVED***
-	if *argument.LogEvents[0].Message != logline ***REMOVED***
+	}
+	if *argument.LogEvents[0].Message != logline {
 		t.Errorf("Expected message to be %s but was %s", logline, *argument.LogEvents[0].Message)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestCollectBatchTicker(t *testing.T) ***REMOVED***
+func TestCollectBatchTicker(t *testing.T) {
 	mockClient := newMockClient()
-	stream := &logStream***REMOVED***
+	stream := &logStream{
 		client:        mockClient,
 		logGroupName:  groupName,
 		logStreamName: streamName,
 		sequenceToken: aws.String(sequenceToken),
 		messages:      make(chan *logger.Message),
-	***REMOVED***
-	mockClient.putLogEventsResult <- &putLogEventsResult***REMOVED***
-		successResult: &cloudwatchlogs.PutLogEventsOutput***REMOVED***
+	}
+	mockClient.putLogEventsResult <- &putLogEventsResult{
+		successResult: &cloudwatchlogs.PutLogEventsOutput{
 			NextSequenceToken: aws.String(nextSequenceToken),
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 	ticks := make(chan time.Time)
-	newTicker = func(_ time.Duration) *time.Ticker ***REMOVED***
-		return &time.Ticker***REMOVED***
+	newTicker = func(_ time.Duration) *time.Ticker {
+		return &time.Ticker{
 			C: ticks,
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	go stream.collectBatch()
 
-	stream.Log(&logger.Message***REMOVED***
+	stream.Log(&logger.Message{
 		Line:      []byte(logline + " 1"),
-		Timestamp: time.Time***REMOVED******REMOVED***,
-	***REMOVED***)
-	stream.Log(&logger.Message***REMOVED***
+		Timestamp: time.Time{},
+	})
+	stream.Log(&logger.Message{
 		Line:      []byte(logline + " 2"),
-		Timestamp: time.Time***REMOVED******REMOVED***,
-	***REMOVED***)
+		Timestamp: time.Time{},
+	})
 
-	ticks <- time.Time***REMOVED******REMOVED***
+	ticks <- time.Time{}
 
 	// Verify first batch
 	argument := <-mockClient.putLogEventsArgument
-	if argument == nil ***REMOVED***
+	if argument == nil {
 		t.Fatal("Expected non-nil PutLogEventsInput")
-	***REMOVED***
-	if len(argument.LogEvents) != 2 ***REMOVED***
+	}
+	if len(argument.LogEvents) != 2 {
 		t.Errorf("Expected LogEvents to contain 2 elements, but contains %d", len(argument.LogEvents))
-	***REMOVED***
-	if *argument.LogEvents[0].Message != logline+" 1" ***REMOVED***
+	}
+	if *argument.LogEvents[0].Message != logline+" 1" {
 		t.Errorf("Expected message to be %s but was %s", logline+" 1", *argument.LogEvents[0].Message)
-	***REMOVED***
-	if *argument.LogEvents[1].Message != logline+" 2" ***REMOVED***
+	}
+	if *argument.LogEvents[1].Message != logline+" 2" {
 		t.Errorf("Expected message to be %s but was %s", logline+" 2", *argument.LogEvents[0].Message)
-	***REMOVED***
+	}
 
-	stream.Log(&logger.Message***REMOVED***
+	stream.Log(&logger.Message{
 		Line:      []byte(logline + " 3"),
-		Timestamp: time.Time***REMOVED******REMOVED***,
-	***REMOVED***)
+		Timestamp: time.Time{},
+	})
 
-	ticks <- time.Time***REMOVED******REMOVED***
+	ticks <- time.Time{}
 	argument = <-mockClient.putLogEventsArgument
-	if argument == nil ***REMOVED***
+	if argument == nil {
 		t.Fatal("Expected non-nil PutLogEventsInput")
-	***REMOVED***
-	if len(argument.LogEvents) != 1 ***REMOVED***
+	}
+	if len(argument.LogEvents) != 1 {
 		t.Errorf("Expected LogEvents to contain 1 elements, but contains %d", len(argument.LogEvents))
-	***REMOVED***
-	if *argument.LogEvents[0].Message != logline+" 3" ***REMOVED***
+	}
+	if *argument.LogEvents[0].Message != logline+" 3" {
 		t.Errorf("Expected message to be %s but was %s", logline+" 3", *argument.LogEvents[0].Message)
-	***REMOVED***
+	}
 
 	stream.Close()
 
-***REMOVED***
+}
 
-func TestCollectBatchMultilinePattern(t *testing.T) ***REMOVED***
+func TestCollectBatchMultilinePattern(t *testing.T) {
 	mockClient := newMockClient()
 	multilinePattern := regexp.MustCompile("xxxx")
-	stream := &logStream***REMOVED***
+	stream := &logStream{
 		client:           mockClient,
 		logGroupName:     groupName,
 		logStreamName:    streamName,
 		multilinePattern: multilinePattern,
 		sequenceToken:    aws.String(sequenceToken),
 		messages:         make(chan *logger.Message),
-	***REMOVED***
-	mockClient.putLogEventsResult <- &putLogEventsResult***REMOVED***
-		successResult: &cloudwatchlogs.PutLogEventsOutput***REMOVED***
+	}
+	mockClient.putLogEventsResult <- &putLogEventsResult{
+		successResult: &cloudwatchlogs.PutLogEventsOutput{
 			NextSequenceToken: aws.String(nextSequenceToken),
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 	ticks := make(chan time.Time)
-	newTicker = func(_ time.Duration) *time.Ticker ***REMOVED***
-		return &time.Ticker***REMOVED***
+	newTicker = func(_ time.Duration) *time.Ticker {
+		return &time.Ticker{
 			C: ticks,
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	go stream.collectBatch()
 
-	stream.Log(&logger.Message***REMOVED***
+	stream.Log(&logger.Message{
 		Line:      []byte(logline),
 		Timestamp: time.Now(),
-	***REMOVED***)
-	stream.Log(&logger.Message***REMOVED***
+	})
+	stream.Log(&logger.Message{
 		Line:      []byte(logline),
 		Timestamp: time.Now(),
-	***REMOVED***)
-	stream.Log(&logger.Message***REMOVED***
+	})
+	stream.Log(&logger.Message{
 		Line:      []byte("xxxx " + logline),
 		Timestamp: time.Now(),
-	***REMOVED***)
+	})
 
 	ticks <- time.Now()
 
@@ -555,102 +555,102 @@ func TestCollectBatchMultilinePattern(t *testing.T) ***REMOVED***
 	assert.NotNil(t, argument, "Expected non-nil PutLogEventsInput")
 	assert.Equal(t, 1, len(argument.LogEvents), "Expected single multiline event")
 	assert.Equal(t, "xxxx "+logline+"\n", *argument.LogEvents[0].Message, "Received incorrect multiline message")
-***REMOVED***
+}
 
-func BenchmarkCollectBatch(b *testing.B) ***REMOVED***
-	for i := 0; i < b.N; i++ ***REMOVED***
+func BenchmarkCollectBatch(b *testing.B) {
+	for i := 0; i < b.N; i++ {
 		mockClient := newMockClient()
-		stream := &logStream***REMOVED***
+		stream := &logStream{
 			client:        mockClient,
 			logGroupName:  groupName,
 			logStreamName: streamName,
 			sequenceToken: aws.String(sequenceToken),
 			messages:      make(chan *logger.Message),
-		***REMOVED***
-		mockClient.putLogEventsResult <- &putLogEventsResult***REMOVED***
-			successResult: &cloudwatchlogs.PutLogEventsOutput***REMOVED***
+		}
+		mockClient.putLogEventsResult <- &putLogEventsResult{
+			successResult: &cloudwatchlogs.PutLogEventsOutput{
 				NextSequenceToken: aws.String(nextSequenceToken),
-			***REMOVED***,
-		***REMOVED***
+			},
+		}
 		ticks := make(chan time.Time)
-		newTicker = func(_ time.Duration) *time.Ticker ***REMOVED***
-			return &time.Ticker***REMOVED***
+		newTicker = func(_ time.Duration) *time.Ticker {
+			return &time.Ticker{
 				C: ticks,
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		go stream.collectBatch()
 		stream.logGenerator(10, 100)
-		ticks <- time.Time***REMOVED******REMOVED***
+		ticks <- time.Time{}
 		stream.Close()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func BenchmarkCollectBatchMultilinePattern(b *testing.B) ***REMOVED***
-	for i := 0; i < b.N; i++ ***REMOVED***
+func BenchmarkCollectBatchMultilinePattern(b *testing.B) {
+	for i := 0; i < b.N; i++ {
 		mockClient := newMockClient()
-		multilinePattern := regexp.MustCompile(`\d***REMOVED***4***REMOVED***-(?:0[1-9]|1[0-2])-(?:0[1-9]|[1,2][0-9]|3[0,1]) (?:[0,1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]`)
-		stream := &logStream***REMOVED***
+		multilinePattern := regexp.MustCompile(`\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[1,2][0-9]|3[0,1]) (?:[0,1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]`)
+		stream := &logStream{
 			client:           mockClient,
 			logGroupName:     groupName,
 			logStreamName:    streamName,
 			multilinePattern: multilinePattern,
 			sequenceToken:    aws.String(sequenceToken),
 			messages:         make(chan *logger.Message),
-		***REMOVED***
-		mockClient.putLogEventsResult <- &putLogEventsResult***REMOVED***
-			successResult: &cloudwatchlogs.PutLogEventsOutput***REMOVED***
+		}
+		mockClient.putLogEventsResult <- &putLogEventsResult{
+			successResult: &cloudwatchlogs.PutLogEventsOutput{
 				NextSequenceToken: aws.String(nextSequenceToken),
-			***REMOVED***,
-		***REMOVED***
+			},
+		}
 		ticks := make(chan time.Time)
-		newTicker = func(_ time.Duration) *time.Ticker ***REMOVED***
-			return &time.Ticker***REMOVED***
+		newTicker = func(_ time.Duration) *time.Ticker {
+			return &time.Ticker{
 				C: ticks,
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		go stream.collectBatch()
 		stream.logGenerator(10, 100)
-		ticks <- time.Time***REMOVED******REMOVED***
+		ticks <- time.Time{}
 		stream.Close()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestCollectBatchMultilinePatternMaxEventAge(t *testing.T) ***REMOVED***
+func TestCollectBatchMultilinePatternMaxEventAge(t *testing.T) {
 	mockClient := newMockClient()
 	multilinePattern := regexp.MustCompile("xxxx")
-	stream := &logStream***REMOVED***
+	stream := &logStream{
 		client:           mockClient,
 		logGroupName:     groupName,
 		logStreamName:    streamName,
 		multilinePattern: multilinePattern,
 		sequenceToken:    aws.String(sequenceToken),
 		messages:         make(chan *logger.Message),
-	***REMOVED***
-	mockClient.putLogEventsResult <- &putLogEventsResult***REMOVED***
-		successResult: &cloudwatchlogs.PutLogEventsOutput***REMOVED***
+	}
+	mockClient.putLogEventsResult <- &putLogEventsResult{
+		successResult: &cloudwatchlogs.PutLogEventsOutput{
 			NextSequenceToken: aws.String(nextSequenceToken),
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 	ticks := make(chan time.Time)
-	newTicker = func(_ time.Duration) *time.Ticker ***REMOVED***
-		return &time.Ticker***REMOVED***
+	newTicker = func(_ time.Duration) *time.Ticker {
+		return &time.Ticker{
 			C: ticks,
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	go stream.collectBatch()
 
-	stream.Log(&logger.Message***REMOVED***
+	stream.Log(&logger.Message{
 		Line:      []byte(logline),
 		Timestamp: time.Now(),
-	***REMOVED***)
+	})
 
 	// Log an event 1 second later
-	stream.Log(&logger.Message***REMOVED***
+	stream.Log(&logger.Message{
 		Line:      []byte(logline),
 		Timestamp: time.Now().Add(time.Second),
-	***REMOVED***)
+	})
 
 	// Fire ticker batchPublishFrequency seconds later
 	ticks <- time.Now().Add(batchPublishFrequency + time.Second)
@@ -662,10 +662,10 @@ func TestCollectBatchMultilinePatternMaxEventAge(t *testing.T) ***REMOVED***
 	assert.Equal(t, logline+"\n"+logline+"\n", *argument.LogEvents[0].Message, "Received incorrect multiline message")
 
 	// Log an event 1 second later
-	stream.Log(&logger.Message***REMOVED***
+	stream.Log(&logger.Message{
 		Line:      []byte(logline),
 		Timestamp: time.Now().Add(time.Second),
-	***REMOVED***)
+	})
 
 	// Fire ticker another batchPublishFrequency seconds later
 	ticks <- time.Now().Add(2*batchPublishFrequency + time.Second)
@@ -676,43 +676,43 @@ func TestCollectBatchMultilinePatternMaxEventAge(t *testing.T) ***REMOVED***
 	assert.Equal(t, 1, len(argument.LogEvents), "Expected single multiline event")
 	assert.Equal(t, logline+"\n", *argument.LogEvents[0].Message, "Received incorrect multiline message")
 	stream.Close()
-***REMOVED***
+}
 
-func TestCollectBatchMultilinePatternNegativeEventAge(t *testing.T) ***REMOVED***
+func TestCollectBatchMultilinePatternNegativeEventAge(t *testing.T) {
 	mockClient := newMockClient()
 	multilinePattern := regexp.MustCompile("xxxx")
-	stream := &logStream***REMOVED***
+	stream := &logStream{
 		client:           mockClient,
 		logGroupName:     groupName,
 		logStreamName:    streamName,
 		multilinePattern: multilinePattern,
 		sequenceToken:    aws.String(sequenceToken),
 		messages:         make(chan *logger.Message),
-	***REMOVED***
-	mockClient.putLogEventsResult <- &putLogEventsResult***REMOVED***
-		successResult: &cloudwatchlogs.PutLogEventsOutput***REMOVED***
+	}
+	mockClient.putLogEventsResult <- &putLogEventsResult{
+		successResult: &cloudwatchlogs.PutLogEventsOutput{
 			NextSequenceToken: aws.String(nextSequenceToken),
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 	ticks := make(chan time.Time)
-	newTicker = func(_ time.Duration) *time.Ticker ***REMOVED***
-		return &time.Ticker***REMOVED***
+	newTicker = func(_ time.Duration) *time.Ticker {
+		return &time.Ticker{
 			C: ticks,
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	go stream.collectBatch()
 
-	stream.Log(&logger.Message***REMOVED***
+	stream.Log(&logger.Message{
 		Line:      []byte(logline),
 		Timestamp: time.Now(),
-	***REMOVED***)
+	})
 
 	// Log an event 1 second later
-	stream.Log(&logger.Message***REMOVED***
+	stream.Log(&logger.Message{
 		Line:      []byte(logline),
 		Timestamp: time.Now().Add(time.Second),
-	***REMOVED***)
+	})
 
 	// Fire ticker in past to simulate negative event buffer age
 	ticks <- time.Now().Add(-time.Second)
@@ -724,46 +724,46 @@ func TestCollectBatchMultilinePatternNegativeEventAge(t *testing.T) ***REMOVED**
 	assert.Equal(t, logline+"\n"+logline+"\n", *argument.LogEvents[0].Message, "Received incorrect multiline message")
 
 	stream.Close()
-***REMOVED***
+}
 
-func TestCollectBatchMultilinePatternMaxEventSize(t *testing.T) ***REMOVED***
+func TestCollectBatchMultilinePatternMaxEventSize(t *testing.T) {
 	mockClient := newMockClient()
 	multilinePattern := regexp.MustCompile("xxxx")
-	stream := &logStream***REMOVED***
+	stream := &logStream{
 		client:           mockClient,
 		logGroupName:     groupName,
 		logStreamName:    streamName,
 		multilinePattern: multilinePattern,
 		sequenceToken:    aws.String(sequenceToken),
 		messages:         make(chan *logger.Message),
-	***REMOVED***
-	mockClient.putLogEventsResult <- &putLogEventsResult***REMOVED***
-		successResult: &cloudwatchlogs.PutLogEventsOutput***REMOVED***
+	}
+	mockClient.putLogEventsResult <- &putLogEventsResult{
+		successResult: &cloudwatchlogs.PutLogEventsOutput{
 			NextSequenceToken: aws.String(nextSequenceToken),
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 	ticks := make(chan time.Time)
-	newTicker = func(_ time.Duration) *time.Ticker ***REMOVED***
-		return &time.Ticker***REMOVED***
+	newTicker = func(_ time.Duration) *time.Ticker {
+		return &time.Ticker{
 			C: ticks,
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	go stream.collectBatch()
 
 	// Log max event size
 	longline := strings.Repeat("A", maximumBytesPerEvent)
-	stream.Log(&logger.Message***REMOVED***
+	stream.Log(&logger.Message{
 		Line:      []byte(longline),
 		Timestamp: time.Now(),
-	***REMOVED***)
+	})
 
 	// Log short event
 	shortline := strings.Repeat("B", 100)
-	stream.Log(&logger.Message***REMOVED***
+	stream.Log(&logger.Message{
 		Line:      []byte(shortline),
 		Timestamp: time.Now(),
-	***REMOVED***)
+	})
 
 	// Fire ticker
 	ticks <- time.Now().Add(batchPublishFrequency)
@@ -777,173 +777,173 @@ func TestCollectBatchMultilinePatternMaxEventSize(t *testing.T) ***REMOVED***
 	assert.Equal(t, longline, *argument.LogEvents[0].Message, "Received incorrect multiline message")
 	assert.Equal(t, shortline+"\n", *argument.LogEvents[1].Message, "Received incorrect multiline message")
 	stream.Close()
-***REMOVED***
+}
 
-func TestCollectBatchClose(t *testing.T) ***REMOVED***
+func TestCollectBatchClose(t *testing.T) {
 	mockClient := newMockClient()
-	stream := &logStream***REMOVED***
+	stream := &logStream{
 		client:        mockClient,
 		logGroupName:  groupName,
 		logStreamName: streamName,
 		sequenceToken: aws.String(sequenceToken),
 		messages:      make(chan *logger.Message),
-	***REMOVED***
-	mockClient.putLogEventsResult <- &putLogEventsResult***REMOVED***
-		successResult: &cloudwatchlogs.PutLogEventsOutput***REMOVED***
+	}
+	mockClient.putLogEventsResult <- &putLogEventsResult{
+		successResult: &cloudwatchlogs.PutLogEventsOutput{
 			NextSequenceToken: aws.String(nextSequenceToken),
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 	var ticks = make(chan time.Time)
-	newTicker = func(_ time.Duration) *time.Ticker ***REMOVED***
-		return &time.Ticker***REMOVED***
+	newTicker = func(_ time.Duration) *time.Ticker {
+		return &time.Ticker{
 			C: ticks,
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	go stream.collectBatch()
 
-	stream.Log(&logger.Message***REMOVED***
+	stream.Log(&logger.Message{
 		Line:      []byte(logline),
-		Timestamp: time.Time***REMOVED******REMOVED***,
-	***REMOVED***)
+		Timestamp: time.Time{},
+	})
 
 	// no ticks
 	stream.Close()
 
 	argument := <-mockClient.putLogEventsArgument
-	if argument == nil ***REMOVED***
+	if argument == nil {
 		t.Fatal("Expected non-nil PutLogEventsInput")
-	***REMOVED***
-	if len(argument.LogEvents) != 1 ***REMOVED***
+	}
+	if len(argument.LogEvents) != 1 {
 		t.Errorf("Expected LogEvents to contain 1 element, but contains %d", len(argument.LogEvents))
-	***REMOVED***
-	if *argument.LogEvents[0].Message != logline ***REMOVED***
+	}
+	if *argument.LogEvents[0].Message != logline {
 		t.Errorf("Expected message to be %s but was %s", logline, *argument.LogEvents[0].Message)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestCollectBatchLineSplit(t *testing.T) ***REMOVED***
+func TestCollectBatchLineSplit(t *testing.T) {
 	mockClient := newMockClient()
-	stream := &logStream***REMOVED***
+	stream := &logStream{
 		client:        mockClient,
 		logGroupName:  groupName,
 		logStreamName: streamName,
 		sequenceToken: aws.String(sequenceToken),
 		messages:      make(chan *logger.Message),
-	***REMOVED***
-	mockClient.putLogEventsResult <- &putLogEventsResult***REMOVED***
-		successResult: &cloudwatchlogs.PutLogEventsOutput***REMOVED***
+	}
+	mockClient.putLogEventsResult <- &putLogEventsResult{
+		successResult: &cloudwatchlogs.PutLogEventsOutput{
 			NextSequenceToken: aws.String(nextSequenceToken),
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 	var ticks = make(chan time.Time)
-	newTicker = func(_ time.Duration) *time.Ticker ***REMOVED***
-		return &time.Ticker***REMOVED***
+	newTicker = func(_ time.Duration) *time.Ticker {
+		return &time.Ticker{
 			C: ticks,
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	go stream.collectBatch()
 
 	longline := strings.Repeat("A", maximumBytesPerEvent)
-	stream.Log(&logger.Message***REMOVED***
+	stream.Log(&logger.Message{
 		Line:      []byte(longline + "B"),
-		Timestamp: time.Time***REMOVED******REMOVED***,
-	***REMOVED***)
+		Timestamp: time.Time{},
+	})
 
 	// no ticks
 	stream.Close()
 
 	argument := <-mockClient.putLogEventsArgument
-	if argument == nil ***REMOVED***
+	if argument == nil {
 		t.Fatal("Expected non-nil PutLogEventsInput")
-	***REMOVED***
-	if len(argument.LogEvents) != 2 ***REMOVED***
+	}
+	if len(argument.LogEvents) != 2 {
 		t.Errorf("Expected LogEvents to contain 2 elements, but contains %d", len(argument.LogEvents))
-	***REMOVED***
-	if *argument.LogEvents[0].Message != longline ***REMOVED***
+	}
+	if *argument.LogEvents[0].Message != longline {
 		t.Errorf("Expected message to be %s but was %s", longline, *argument.LogEvents[0].Message)
-	***REMOVED***
-	if *argument.LogEvents[1].Message != "B" ***REMOVED***
+	}
+	if *argument.LogEvents[1].Message != "B" {
 		t.Errorf("Expected message to be %s but was %s", "B", *argument.LogEvents[1].Message)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestCollectBatchMaxEvents(t *testing.T) ***REMOVED***
+func TestCollectBatchMaxEvents(t *testing.T) {
 	mockClient := newMockClientBuffered(1)
-	stream := &logStream***REMOVED***
+	stream := &logStream{
 		client:        mockClient,
 		logGroupName:  groupName,
 		logStreamName: streamName,
 		sequenceToken: aws.String(sequenceToken),
 		messages:      make(chan *logger.Message),
-	***REMOVED***
-	mockClient.putLogEventsResult <- &putLogEventsResult***REMOVED***
-		successResult: &cloudwatchlogs.PutLogEventsOutput***REMOVED***
+	}
+	mockClient.putLogEventsResult <- &putLogEventsResult{
+		successResult: &cloudwatchlogs.PutLogEventsOutput{
 			NextSequenceToken: aws.String(nextSequenceToken),
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 	var ticks = make(chan time.Time)
-	newTicker = func(_ time.Duration) *time.Ticker ***REMOVED***
-		return &time.Ticker***REMOVED***
+	newTicker = func(_ time.Duration) *time.Ticker {
+		return &time.Ticker{
 			C: ticks,
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	go stream.collectBatch()
 
 	line := "A"
-	for i := 0; i <= maximumLogEventsPerPut; i++ ***REMOVED***
-		stream.Log(&logger.Message***REMOVED***
+	for i := 0; i <= maximumLogEventsPerPut; i++ {
+		stream.Log(&logger.Message{
 			Line:      []byte(line),
-			Timestamp: time.Time***REMOVED******REMOVED***,
-		***REMOVED***)
-	***REMOVED***
+			Timestamp: time.Time{},
+		})
+	}
 
 	// no ticks
 	stream.Close()
 
 	argument := <-mockClient.putLogEventsArgument
-	if argument == nil ***REMOVED***
+	if argument == nil {
 		t.Fatal("Expected non-nil PutLogEventsInput")
-	***REMOVED***
-	if len(argument.LogEvents) != maximumLogEventsPerPut ***REMOVED***
+	}
+	if len(argument.LogEvents) != maximumLogEventsPerPut {
 		t.Errorf("Expected LogEvents to contain %d elements, but contains %d", maximumLogEventsPerPut, len(argument.LogEvents))
-	***REMOVED***
+	}
 
 	argument = <-mockClient.putLogEventsArgument
-	if argument == nil ***REMOVED***
+	if argument == nil {
 		t.Fatal("Expected non-nil PutLogEventsInput")
-	***REMOVED***
-	if len(argument.LogEvents) != 1 ***REMOVED***
+	}
+	if len(argument.LogEvents) != 1 {
 		t.Errorf("Expected LogEvents to contain %d elements, but contains %d", 1, len(argument.LogEvents))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestCollectBatchMaxTotalBytes(t *testing.T) ***REMOVED***
+func TestCollectBatchMaxTotalBytes(t *testing.T) {
 	expectedPuts := 2
 	mockClient := newMockClientBuffered(expectedPuts)
-	stream := &logStream***REMOVED***
+	stream := &logStream{
 		client:        mockClient,
 		logGroupName:  groupName,
 		logStreamName: streamName,
 		sequenceToken: aws.String(sequenceToken),
 		messages:      make(chan *logger.Message),
-	***REMOVED***
-	for i := 0; i < expectedPuts; i++ ***REMOVED***
-		mockClient.putLogEventsResult <- &putLogEventsResult***REMOVED***
-			successResult: &cloudwatchlogs.PutLogEventsOutput***REMOVED***
+	}
+	for i := 0; i < expectedPuts; i++ {
+		mockClient.putLogEventsResult <- &putLogEventsResult{
+			successResult: &cloudwatchlogs.PutLogEventsOutput{
 				NextSequenceToken: aws.String(nextSequenceToken),
-			***REMOVED***,
-		***REMOVED***
-	***REMOVED***
+			},
+		}
+	}
 
 	var ticks = make(chan time.Time)
-	newTicker = func(_ time.Duration) *time.Ticker ***REMOVED***
-		return &time.Ticker***REMOVED***
+	newTicker = func(_ time.Duration) *time.Ticker {
+		return &time.Ticker{
 			C: ticks,
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	go stream.collectBatch()
 
@@ -954,242 +954,242 @@ func TestCollectBatchMaxTotalBytes(t *testing.T) ***REMOVED***
 	// This will be split and batched up to the `maximumBytesPerPut'
 	// (+/- `maximumBytesPerEvent'). This /should/ be aligned, but
 	// should also tolerate an offset within that range.
-	stream.Log(&logger.Message***REMOVED***
+	stream.Log(&logger.Message{
 		Line:      []byte(maxline[:len(maxline)/2]),
-		Timestamp: time.Time***REMOVED******REMOVED***,
-	***REMOVED***)
-	stream.Log(&logger.Message***REMOVED***
+		Timestamp: time.Time{},
+	})
+	stream.Log(&logger.Message{
 		Line:      []byte(maxline[len(maxline)/2:]),
-		Timestamp: time.Time***REMOVED******REMOVED***,
-	***REMOVED***)
-	stream.Log(&logger.Message***REMOVED***
+		Timestamp: time.Time{},
+	})
+	stream.Log(&logger.Message{
 		Line:      []byte("B"),
-		Timestamp: time.Time***REMOVED******REMOVED***,
-	***REMOVED***)
+		Timestamp: time.Time{},
+	})
 
 	// no ticks, guarantee batch by size (and chan close)
 	stream.Close()
 
 	argument := <-mockClient.putLogEventsArgument
-	if argument == nil ***REMOVED***
+	if argument == nil {
 		t.Fatal("Expected non-nil PutLogEventsInput")
-	***REMOVED***
+	}
 
 	// Should total to the maximum allowed bytes.
 	eventBytes := 0
-	for _, event := range argument.LogEvents ***REMOVED***
+	for _, event := range argument.LogEvents {
 		eventBytes += len(*event.Message)
-	***REMOVED***
+	}
 	eventsOverhead := len(argument.LogEvents) * perEventBytes
 	payloadTotal := eventBytes + eventsOverhead
 	// lowestMaxBatch allows the payload to be offset if the messages
 	// don't lend themselves to align with the maximum event size.
 	lowestMaxBatch := maximumBytesPerPut - maximumBytesPerEvent
 
-	if payloadTotal > maximumBytesPerPut ***REMOVED***
+	if payloadTotal > maximumBytesPerPut {
 		t.Errorf("Expected <= %d bytes but was %d", maximumBytesPerPut, payloadTotal)
-	***REMOVED***
-	if payloadTotal < lowestMaxBatch ***REMOVED***
+	}
+	if payloadTotal < lowestMaxBatch {
 		t.Errorf("Batch to be no less than %d but was %d", lowestMaxBatch, payloadTotal)
-	***REMOVED***
+	}
 
 	argument = <-mockClient.putLogEventsArgument
-	if len(argument.LogEvents) != 1 ***REMOVED***
+	if len(argument.LogEvents) != 1 {
 		t.Errorf("Expected LogEvents to contain 1 elements, but contains %d", len(argument.LogEvents))
-	***REMOVED***
+	}
 	message := *argument.LogEvents[len(argument.LogEvents)-1].Message
-	if message[len(message)-1:] != "B" ***REMOVED***
+	if message[len(message)-1:] != "B" {
 		t.Errorf("Expected message to be %s but was %s", "B", message[len(message)-1:])
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestCollectBatchWithDuplicateTimestamps(t *testing.T) ***REMOVED***
+func TestCollectBatchWithDuplicateTimestamps(t *testing.T) {
 	mockClient := newMockClient()
-	stream := &logStream***REMOVED***
+	stream := &logStream{
 		client:        mockClient,
 		logGroupName:  groupName,
 		logStreamName: streamName,
 		sequenceToken: aws.String(sequenceToken),
 		messages:      make(chan *logger.Message),
-	***REMOVED***
-	mockClient.putLogEventsResult <- &putLogEventsResult***REMOVED***
-		successResult: &cloudwatchlogs.PutLogEventsOutput***REMOVED***
+	}
+	mockClient.putLogEventsResult <- &putLogEventsResult{
+		successResult: &cloudwatchlogs.PutLogEventsOutput{
 			NextSequenceToken: aws.String(nextSequenceToken),
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 	ticks := make(chan time.Time)
-	newTicker = func(_ time.Duration) *time.Ticker ***REMOVED***
-		return &time.Ticker***REMOVED***
+	newTicker = func(_ time.Duration) *time.Ticker {
+		return &time.Ticker{
 			C: ticks,
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	go stream.collectBatch()
 
 	times := maximumLogEventsPerPut
-	expectedEvents := []*cloudwatchlogs.InputLogEvent***REMOVED******REMOVED***
+	expectedEvents := []*cloudwatchlogs.InputLogEvent{}
 	timestamp := time.Now()
-	for i := 0; i < times; i++ ***REMOVED***
+	for i := 0; i < times; i++ {
 		line := fmt.Sprintf("%d", i)
-		if i%2 == 0 ***REMOVED***
+		if i%2 == 0 {
 			timestamp.Add(1 * time.Nanosecond)
-		***REMOVED***
-		stream.Log(&logger.Message***REMOVED***
+		}
+		stream.Log(&logger.Message{
 			Line:      []byte(line),
 			Timestamp: timestamp,
-		***REMOVED***)
-		expectedEvents = append(expectedEvents, &cloudwatchlogs.InputLogEvent***REMOVED***
+		})
+		expectedEvents = append(expectedEvents, &cloudwatchlogs.InputLogEvent{
 			Message:   aws.String(line),
 			Timestamp: aws.Int64(timestamp.UnixNano() / int64(time.Millisecond)),
-		***REMOVED***)
-	***REMOVED***
+		})
+	}
 
-	ticks <- time.Time***REMOVED******REMOVED***
+	ticks <- time.Time{}
 	stream.Close()
 
 	argument := <-mockClient.putLogEventsArgument
-	if argument == nil ***REMOVED***
+	if argument == nil {
 		t.Fatal("Expected non-nil PutLogEventsInput")
-	***REMOVED***
-	if len(argument.LogEvents) != times ***REMOVED***
+	}
+	if len(argument.LogEvents) != times {
 		t.Errorf("Expected LogEvents to contain %d elements, but contains %d", times, len(argument.LogEvents))
-	***REMOVED***
-	for i := 0; i < times; i++ ***REMOVED***
-		if !reflect.DeepEqual(*argument.LogEvents[i], *expectedEvents[i]) ***REMOVED***
+	}
+	for i := 0; i < times; i++ {
+		if !reflect.DeepEqual(*argument.LogEvents[i], *expectedEvents[i]) {
 			t.Errorf("Expected event to be %v but was %v", *expectedEvents[i], *argument.LogEvents[i])
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestParseLogOptionsMultilinePattern(t *testing.T) ***REMOVED***
-	info := logger.Info***REMOVED***
-		Config: map[string]string***REMOVED***
+func TestParseLogOptionsMultilinePattern(t *testing.T) {
+	info := logger.Info{
+		Config: map[string]string{
 			multilinePatternKey: "^xxxx",
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
 	multilinePattern, err := parseMultilineOptions(info)
 	assert.Nil(t, err, "Received unexpected error")
 	assert.True(t, multilinePattern.MatchString("xxxx"), "No multiline pattern match found")
-***REMOVED***
+}
 
-func TestParseLogOptionsDatetimeFormat(t *testing.T) ***REMOVED***
-	datetimeFormatTests := []struct ***REMOVED***
+func TestParseLogOptionsDatetimeFormat(t *testing.T) {
+	datetimeFormatTests := []struct {
 		format string
 		match  string
-	***REMOVED******REMOVED***
-		***REMOVED***"%d/%m/%y %a %H:%M:%S%L %Z", "31/12/10 Mon 08:42:44.345 NZDT"***REMOVED***,
-		***REMOVED***"%Y-%m-%d %A %I:%M:%S.%f%p%z", "2007-12-04 Monday 08:42:44.123456AM+1200"***REMOVED***,
-		***REMOVED***"%b|%b|%b|%b|%b|%b|%b|%b|%b|%b|%b|%b", "Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec"***REMOVED***,
-		***REMOVED***"%B|%B|%B|%B|%B|%B|%B|%B|%B|%B|%B|%B", "January|February|March|April|May|June|July|August|September|October|November|December"***REMOVED***,
-		***REMOVED***"%A|%A|%A|%A|%A|%A|%A", "Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday"***REMOVED***,
-		***REMOVED***"%a|%a|%a|%a|%a|%a|%a", "Mon|Tue|Wed|Thu|Fri|Sat|Sun"***REMOVED***,
-		***REMOVED***"Day of the week: %w, Day of the year: %j", "Day of the week: 4, Day of the year: 091"***REMOVED***,
-	***REMOVED***
-	for _, dt := range datetimeFormatTests ***REMOVED***
-		t.Run(dt.match, func(t *testing.T) ***REMOVED***
-			info := logger.Info***REMOVED***
-				Config: map[string]string***REMOVED***
+	}{
+		{"%d/%m/%y %a %H:%M:%S%L %Z", "31/12/10 Mon 08:42:44.345 NZDT"},
+		{"%Y-%m-%d %A %I:%M:%S.%f%p%z", "2007-12-04 Monday 08:42:44.123456AM+1200"},
+		{"%b|%b|%b|%b|%b|%b|%b|%b|%b|%b|%b|%b", "Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec"},
+		{"%B|%B|%B|%B|%B|%B|%B|%B|%B|%B|%B|%B", "January|February|March|April|May|June|July|August|September|October|November|December"},
+		{"%A|%A|%A|%A|%A|%A|%A", "Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday"},
+		{"%a|%a|%a|%a|%a|%a|%a", "Mon|Tue|Wed|Thu|Fri|Sat|Sun"},
+		{"Day of the week: %w, Day of the year: %j", "Day of the week: 4, Day of the year: 091"},
+	}
+	for _, dt := range datetimeFormatTests {
+		t.Run(dt.match, func(t *testing.T) {
+			info := logger.Info{
+				Config: map[string]string{
 					datetimeFormatKey: dt.format,
-				***REMOVED***,
-			***REMOVED***
+				},
+			}
 			multilinePattern, err := parseMultilineOptions(info)
 			assert.Nil(t, err, "Received unexpected error")
 			assert.True(t, multilinePattern.MatchString(dt.match), "No multiline pattern match found")
-		***REMOVED***)
-	***REMOVED***
-***REMOVED***
+		})
+	}
+}
 
-func TestValidateLogOptionsDatetimeFormatAndMultilinePattern(t *testing.T) ***REMOVED***
-	cfg := map[string]string***REMOVED***
+func TestValidateLogOptionsDatetimeFormatAndMultilinePattern(t *testing.T) {
+	cfg := map[string]string{
 		multilinePatternKey: "^xxxx",
 		datetimeFormatKey:   "%Y-%m-%d",
 		logGroupKey:         groupName,
-	***REMOVED***
+	}
 	conflictingLogOptionsError := "you cannot configure log opt 'awslogs-datetime-format' and 'awslogs-multiline-pattern' at the same time"
 
 	err := ValidateLogOpt(cfg)
 	assert.NotNil(t, err, "Expected an error")
 	assert.Equal(t, err.Error(), conflictingLogOptionsError, "Received invalid error")
-***REMOVED***
+}
 
-func TestCreateTagSuccess(t *testing.T) ***REMOVED***
+func TestCreateTagSuccess(t *testing.T) {
 	mockClient := newMockClient()
-	info := logger.Info***REMOVED***
+	info := logger.Info{
 		ContainerName: "/test-container",
 		ContainerID:   "container-abcdefghijklmnopqrstuvwxyz01234567890",
-		Config:        map[string]string***REMOVED***"tag": "***REMOVED******REMOVED***.Name***REMOVED******REMOVED***/***REMOVED******REMOVED***.FullID***REMOVED******REMOVED***"***REMOVED***,
-	***REMOVED***
+		Config:        map[string]string{"tag": "{{.Name}}/{{.FullID}}"},
+	}
 	logStreamName, e := loggerutils.ParseLogTag(info, loggerutils.DefaultTemplate)
-	if e != nil ***REMOVED***
+	if e != nil {
 		t.Errorf("Error generating tag: %q", e)
-	***REMOVED***
-	stream := &logStream***REMOVED***
+	}
+	stream := &logStream{
 		client:        mockClient,
 		logGroupName:  groupName,
 		logStreamName: logStreamName,
-	***REMOVED***
-	mockClient.createLogStreamResult <- &createLogStreamResult***REMOVED******REMOVED***
+	}
+	mockClient.createLogStreamResult <- &createLogStreamResult{}
 
 	err := stream.create()
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("Received unexpected err: %v\n", err)
-	***REMOVED***
+	}
 	argument := <-mockClient.createLogStreamArgument
 
-	if *argument.LogStreamName != "test-container/container-abcdefghijklmnopqrstuvwxyz01234567890" ***REMOVED***
+	if *argument.LogStreamName != "test-container/container-abcdefghijklmnopqrstuvwxyz01234567890" {
 		t.Errorf("Expected LogStreamName to be %s", "test-container/container-abcdefghijklmnopqrstuvwxyz01234567890")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestIsSizedLogger(t *testing.T) ***REMOVED***
-	awslogs := &logStream***REMOVED******REMOVED***
+func TestIsSizedLogger(t *testing.T) {
+	awslogs := &logStream{}
 	assert.Implements(t, (*logger.SizedLogger)(nil), awslogs, "awslogs should implement SizedLogger")
-***REMOVED***
+}
 
-func BenchmarkUnwrapEvents(b *testing.B) ***REMOVED***
+func BenchmarkUnwrapEvents(b *testing.B) {
 	events := make([]wrappedEvent, maximumLogEventsPerPut)
-	for i := 0; i < maximumLogEventsPerPut; i++ ***REMOVED***
+	for i := 0; i < maximumLogEventsPerPut; i++ {
 		mes := strings.Repeat("0", maximumBytesPerEvent)
-		events[i].inputLogEvent = &cloudwatchlogs.InputLogEvent***REMOVED***
+		events[i].inputLogEvent = &cloudwatchlogs.InputLogEvent{
 			Message: &mes,
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	as := assert.New(b)
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		res := unwrapEvents(events)
 		as.Len(res, maximumLogEventsPerPut)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestNewAWSLogsClientCredentialEndpointDetect(t *testing.T) ***REMOVED***
+func TestNewAWSLogsClientCredentialEndpointDetect(t *testing.T) {
 	// required for the cloudwatchlogs client
 	os.Setenv("AWS_REGION", "us-west-2")
 	defer os.Unsetenv("AWS_REGION")
 
-	credsResp := `***REMOVED***
+	credsResp := `{
 		"AccessKeyId" :    "test-access-key-id",
 		"SecretAccessKey": "test-secret-access-key"
-		***REMOVED***`
+		}`
 
 	expectedAccessKeyID := "test-access-key-id"
 	expectedSecretAccessKey := "test-secret-access-key"
 
-	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) ***REMOVED***
+	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprintln(w, credsResp)
-	***REMOVED***))
+	}))
 	defer testServer.Close()
 
 	// set the SDKEndpoint in the driver
 	newSDKEndpoint = testServer.URL
 
-	info := logger.Info***REMOVED***
-		Config: map[string]string***REMOVED******REMOVED***,
-	***REMOVED***
+	info := logger.Info{
+		Config: map[string]string{},
+	}
 
 	info.Config["awslogs-credentials-endpoint"] = "/creds"
 
@@ -1203,9 +1203,9 @@ func TestNewAWSLogsClientCredentialEndpointDetect(t *testing.T) ***REMOVED***
 
 	assert.Equal(t, expectedAccessKeyID, creds.AccessKeyID)
 	assert.Equal(t, expectedSecretAccessKey, creds.SecretAccessKey)
-***REMOVED***
+}
 
-func TestNewAWSLogsClientCredentialEnvironmentVariable(t *testing.T) ***REMOVED***
+func TestNewAWSLogsClientCredentialEnvironmentVariable(t *testing.T) {
 	// required for the cloudwatchlogs client
 	os.Setenv("AWS_REGION", "us-west-2")
 	defer os.Unsetenv("AWS_REGION")
@@ -1219,9 +1219,9 @@ func TestNewAWSLogsClientCredentialEnvironmentVariable(t *testing.T) ***REMOVED*
 	os.Setenv("AWS_SECRET_ACCESS_KEY", expectedSecretAccessKey)
 	defer os.Unsetenv("AWS_SECRET_ACCESS_KEY")
 
-	info := logger.Info***REMOVED***
-		Config: map[string]string***REMOVED******REMOVED***,
-	***REMOVED***
+	info := logger.Info{
+		Config: map[string]string{},
+	}
 
 	c, err := newAWSLogsClient(info)
 	assert.NoError(t, err)
@@ -1234,9 +1234,9 @@ func TestNewAWSLogsClientCredentialEnvironmentVariable(t *testing.T) ***REMOVED*
 	assert.Equal(t, expectedAccessKeyID, creds.AccessKeyID)
 	assert.Equal(t, expectedSecretAccessKey, creds.SecretAccessKey)
 
-***REMOVED***
+}
 
-func TestNewAWSLogsClientCredentialSharedFile(t *testing.T) ***REMOVED***
+func TestNewAWSLogsClientCredentialSharedFile(t *testing.T) {
 	// required for the cloudwatchlogs client
 	os.Setenv("AWS_REGION", "us-west-2")
 	defer os.Unsetenv("AWS_REGION")
@@ -1267,9 +1267,9 @@ func TestNewAWSLogsClientCredentialSharedFile(t *testing.T) ***REMOVED***
 	os.Setenv("AWS_SHARED_CREDENTIALS_FILE", tmpfile.Name())
 	defer os.Unsetenv("AWS_SHARED_CREDENTIALS_FILE")
 
-	info := logger.Info***REMOVED***
-		Config: map[string]string***REMOVED******REMOVED***,
-	***REMOVED***
+	info := logger.Info{
+		Config: map[string]string{},
+	}
 
 	c, err := newAWSLogsClient(info)
 	assert.NoError(t, err)
@@ -1281,4 +1281,4 @@ func TestNewAWSLogsClientCredentialSharedFile(t *testing.T) ***REMOVED***
 
 	assert.Equal(t, expectedAccessKeyID, creds.AccessKeyID)
 	assert.Equal(t, expectedSecretAccessKey, creds.SecretAccessKey)
-***REMOVED***
+}

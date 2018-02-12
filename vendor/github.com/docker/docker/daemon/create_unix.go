@@ -16,66 +16,66 @@ import (
 )
 
 // createContainerOSSpecificSettings performs host-OS specific container create functionality
-func (daemon *Daemon) createContainerOSSpecificSettings(container *container.Container, config *containertypes.Config, hostConfig *containertypes.HostConfig) error ***REMOVED***
-	if err := daemon.Mount(container); err != nil ***REMOVED***
+func (daemon *Daemon) createContainerOSSpecificSettings(container *container.Container, config *containertypes.Config, hostConfig *containertypes.HostConfig) error {
+	if err := daemon.Mount(container); err != nil {
 		return err
-	***REMOVED***
+	}
 	defer daemon.Unmount(container)
 
 	rootIDs := daemon.idMappings.RootPair()
-	if err := container.SetupWorkingDirectory(rootIDs); err != nil ***REMOVED***
+	if err := container.SetupWorkingDirectory(rootIDs); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	for spec := range config.Volumes ***REMOVED***
+	for spec := range config.Volumes {
 		name := stringid.GenerateNonCryptoID()
 		destination := filepath.Clean(spec)
 
 		// Skip volumes for which we already have something mounted on that
 		// destination because of a --volume-from.
-		if container.IsDestinationMounted(destination) ***REMOVED***
+		if container.IsDestinationMounted(destination) {
 			continue
-		***REMOVED***
+		}
 		path, err := container.GetResourcePath(destination)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 
 		stat, err := os.Stat(path)
-		if err == nil && !stat.IsDir() ***REMOVED***
+		if err == nil && !stat.IsDir() {
 			return fmt.Errorf("cannot mount volume over existing file, file exists %s", path)
-		***REMOVED***
+		}
 
 		v, err := daemon.volumes.CreateWithRef(name, hostConfig.VolumeDriver, container.ID, nil, nil)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 
-		if err := label.Relabel(v.Path(), container.MountLabel, true); err != nil ***REMOVED***
+		if err := label.Relabel(v.Path(), container.MountLabel, true); err != nil {
 			return err
-		***REMOVED***
+		}
 
 		container.AddMountPointWithVolume(destination, v, true)
-	***REMOVED***
+	}
 	return daemon.populateVolumes(container)
-***REMOVED***
+}
 
 // populateVolumes copies data from the container's rootfs into the volume for non-binds.
 // this is only called when the container is created.
-func (daemon *Daemon) populateVolumes(c *container.Container) error ***REMOVED***
-	for _, mnt := range c.MountPoints ***REMOVED***
-		if mnt.Volume == nil ***REMOVED***
+func (daemon *Daemon) populateVolumes(c *container.Container) error {
+	for _, mnt := range c.MountPoints {
+		if mnt.Volume == nil {
 			continue
-		***REMOVED***
+		}
 
-		if mnt.Type != mounttypes.TypeVolume || !mnt.CopyData ***REMOVED***
+		if mnt.Type != mounttypes.TypeVolume || !mnt.CopyData {
 			continue
-		***REMOVED***
+		}
 
 		logrus.Debugf("copying image data from %s:%s, to %s", c.ID, mnt.Destination, mnt.Name)
-		if err := c.CopyImagePathContent(mnt.Volume, mnt.Destination); err != nil ***REMOVED***
+		if err := c.CopyImagePathContent(mnt.Volume, mnt.Destination); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}

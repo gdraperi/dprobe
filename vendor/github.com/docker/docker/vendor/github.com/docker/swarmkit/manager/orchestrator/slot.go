@@ -14,8 +14,8 @@ type Slot []*api.Task
 // SlotTuple identifies a unique slot, in the broad sense described above. It's
 // a combination of either a service ID and a slot number (replicated services),
 // or a service ID and a node ID (global services).
-type SlotTuple struct ***REMOVED***
+type SlotTuple struct {
 	Slot      uint64 // unset for global service tasks
 	ServiceID string
 	NodeID    string // unset for replicated service tasks
-***REMOVED***
+}

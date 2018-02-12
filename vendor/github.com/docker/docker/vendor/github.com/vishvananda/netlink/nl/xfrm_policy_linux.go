@@ -10,33 +10,33 @@ const (
 	SizeofXfrmUserTmpl       = 0x40
 )
 
-// struct xfrm_userpolicy_id ***REMOVED***
+// struct xfrm_userpolicy_id {
 //   struct xfrm_selector    sel;
 //   __u32       index;
 //   __u8        dir;
-// ***REMOVED***;
+// };
 //
 
-type XfrmUserpolicyId struct ***REMOVED***
+type XfrmUserpolicyId struct {
 	Sel   XfrmSelector
 	Index uint32
 	Dir   uint8
 	Pad   [3]byte
-***REMOVED***
+}
 
-func (msg *XfrmUserpolicyId) Len() int ***REMOVED***
+func (msg *XfrmUserpolicyId) Len() int {
 	return SizeofXfrmUserpolicyId
-***REMOVED***
+}
 
-func DeserializeXfrmUserpolicyId(b []byte) *XfrmUserpolicyId ***REMOVED***
+func DeserializeXfrmUserpolicyId(b []byte) *XfrmUserpolicyId {
 	return (*XfrmUserpolicyId)(unsafe.Pointer(&b[0:SizeofXfrmUserpolicyId][0]))
-***REMOVED***
+}
 
-func (msg *XfrmUserpolicyId) Serialize() []byte ***REMOVED***
+func (msg *XfrmUserpolicyId) Serialize() []byte {
 	return (*(*[SizeofXfrmUserpolicyId]byte)(unsafe.Pointer(msg)))[:]
-***REMOVED***
+}
 
-// struct xfrm_userpolicy_info ***REMOVED***
+// struct xfrm_userpolicy_info {
 //   struct xfrm_selector    sel;
 //   struct xfrm_lifetime_cfg  lft;
 //   struct xfrm_lifetime_cur  curlft;
@@ -51,9 +51,9 @@ func (msg *XfrmUserpolicyId) Serialize() []byte ***REMOVED***
 //   /* Automatically expand selector to include matching ICMP payloads. */
 // #define XFRM_POLICY_ICMP  2
 //   __u8        share;
-// ***REMOVED***;
+// };
 
-type XfrmUserpolicyInfo struct ***REMOVED***
+type XfrmUserpolicyInfo struct {
 	Sel      XfrmSelector
 	Lft      XfrmLifetimeCfg
 	Curlft   XfrmLifetimeCur
@@ -64,21 +64,21 @@ type XfrmUserpolicyInfo struct ***REMOVED***
 	Flags    uint8
 	Share    uint8
 	Pad      [4]byte
-***REMOVED***
+}
 
-func (msg *XfrmUserpolicyInfo) Len() int ***REMOVED***
+func (msg *XfrmUserpolicyInfo) Len() int {
 	return SizeofXfrmUserpolicyInfo
-***REMOVED***
+}
 
-func DeserializeXfrmUserpolicyInfo(b []byte) *XfrmUserpolicyInfo ***REMOVED***
+func DeserializeXfrmUserpolicyInfo(b []byte) *XfrmUserpolicyInfo {
 	return (*XfrmUserpolicyInfo)(unsafe.Pointer(&b[0:SizeofXfrmUserpolicyInfo][0]))
-***REMOVED***
+}
 
-func (msg *XfrmUserpolicyInfo) Serialize() []byte ***REMOVED***
+func (msg *XfrmUserpolicyInfo) Serialize() []byte {
 	return (*(*[SizeofXfrmUserpolicyInfo]byte)(unsafe.Pointer(msg)))[:]
-***REMOVED***
+}
 
-// struct xfrm_user_tmpl ***REMOVED***
+// struct xfrm_user_tmpl {
 //   struct xfrm_id    id;
 //   __u16     family;
 //   xfrm_address_t    saddr;
@@ -89,9 +89,9 @@ func (msg *XfrmUserpolicyInfo) Serialize() []byte ***REMOVED***
 //   __u32     aalgos;
 //   __u32     ealgos;
 //   __u32     calgos;
-// ***REMOVED***
+// }
 
-type XfrmUserTmpl struct ***REMOVED***
+type XfrmUserTmpl struct {
 	XfrmId   XfrmId
 	Family   uint16
 	Pad1     [2]byte
@@ -104,16 +104,16 @@ type XfrmUserTmpl struct ***REMOVED***
 	Aalgos   uint32
 	Ealgos   uint32
 	Calgos   uint32
-***REMOVED***
+}
 
-func (msg *XfrmUserTmpl) Len() int ***REMOVED***
+func (msg *XfrmUserTmpl) Len() int {
 	return SizeofXfrmUserTmpl
-***REMOVED***
+}
 
-func DeserializeXfrmUserTmpl(b []byte) *XfrmUserTmpl ***REMOVED***
+func DeserializeXfrmUserTmpl(b []byte) *XfrmUserTmpl {
 	return (*XfrmUserTmpl)(unsafe.Pointer(&b[0:SizeofXfrmUserTmpl][0]))
-***REMOVED***
+}
 
-func (msg *XfrmUserTmpl) Serialize() []byte ***REMOVED***
+func (msg *XfrmUserTmpl) Serialize() []byte {
 	return (*(*[SizeofXfrmUserTmpl]byte)(unsafe.Pointer(msg)))[:]
-***REMOVED***
+}

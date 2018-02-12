@@ -5,22 +5,22 @@ import (
 	"time"
 )
 
-func TestDurationToSecondsString(t *testing.T) ***REMOVED***
-	cases := []struct ***REMOVED***
+func TestDurationToSecondsString(t *testing.T) {
+	cases := []struct {
 		in       time.Duration
 		expected string
-	***REMOVED******REMOVED***
-		***REMOVED***0 * time.Second, "0"***REMOVED***,
-		***REMOVED***1 * time.Second, "1"***REMOVED***,
-		***REMOVED***1 * time.Minute, "60"***REMOVED***,
-		***REMOVED***24 * time.Hour, "86400"***REMOVED***,
-	***REMOVED***
+	}{
+		{0 * time.Second, "0"},
+		{1 * time.Second, "1"},
+		{1 * time.Minute, "60"},
+		{24 * time.Hour, "86400"},
+	}
 
-	for _, c := range cases ***REMOVED***
+	for _, c := range cases {
 		s := DurationToSecondsString(c.in)
-		if s != c.expected ***REMOVED***
+		if s != c.expected {
 			t.Errorf("wrong value for input `%v`: expected `%s`, got `%s`", c.in, c.expected, s)
 			t.Fail()
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

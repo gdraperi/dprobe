@@ -25,75 +25,75 @@ import (
 
 // Repair tries to repair ErrUnexpectedEOF in the
 // last wal file by truncating.
-func Repair(dirpath string) bool ***REMOVED***
+func Repair(dirpath string) bool {
 	f, err := openLast(dirpath)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return false
-	***REMOVED***
+	}
 	defer f.Close()
 
-	rec := &walpb.Record***REMOVED******REMOVED***
+	rec := &walpb.Record{}
 	decoder := newDecoder(f)
-	for ***REMOVED***
+	for {
 		lastOffset := decoder.lastOffset()
 		err := decoder.decode(rec)
-		switch err ***REMOVED***
+		switch err {
 		case nil:
 			// update crc of the decoder when necessary
-			switch rec.Type ***REMOVED***
+			switch rec.Type {
 			case crcType:
 				crc := decoder.crc.Sum32()
 				// current crc of decoder must match the crc of the record.
 				// do no need to match 0 crc, since the decoder is a new one at this case.
-				if crc != 0 && rec.Validate(crc) != nil ***REMOVED***
+				if crc != 0 && rec.Validate(crc) != nil {
 					return false
-				***REMOVED***
+				}
 				decoder.updateCRC(rec.Crc)
-			***REMOVED***
+			}
 			continue
 		case io.EOF:
 			return true
 		case io.ErrUnexpectedEOF:
 			plog.Noticef("repairing %v", f.Name())
 			bf, bferr := os.Create(f.Name() + ".broken")
-			if bferr != nil ***REMOVED***
+			if bferr != nil {
 				plog.Errorf("could not repair %v, failed to create backup file", f.Name())
 				return false
-			***REMOVED***
+			}
 			defer bf.Close()
 
-			if _, err = f.Seek(0, io.SeekStart); err != nil ***REMOVED***
+			if _, err = f.Seek(0, io.SeekStart); err != nil {
 				plog.Errorf("could not repair %v, failed to read file", f.Name())
 				return false
-			***REMOVED***
+			}
 
-			if _, err = io.Copy(bf, f); err != nil ***REMOVED***
+			if _, err = io.Copy(bf, f); err != nil {
 				plog.Errorf("could not repair %v, failed to copy file", f.Name())
 				return false
-			***REMOVED***
+			}
 
-			if err = f.Truncate(int64(lastOffset)); err != nil ***REMOVED***
+			if err = f.Truncate(int64(lastOffset)); err != nil {
 				plog.Errorf("could not repair %v, failed to truncate file", f.Name())
 				return false
-			***REMOVED***
-			if err = fileutil.Fsync(f.File); err != nil ***REMOVED***
+			}
+			if err = fileutil.Fsync(f.File); err != nil {
 				plog.Errorf("could not repair %v, failed to sync file", f.Name())
 				return false
-			***REMOVED***
+			}
 			return true
 		default:
 			plog.Errorf("could not repair error (%v)", err)
 			return false
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // openLast opens the last wal file for read and write.
-func openLast(dirpath string) (*fileutil.LockedFile, error) ***REMOVED***
+func openLast(dirpath string) (*fileutil.LockedFile, error) {
 	names, err := readWalNames(dirpath)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	last := filepath.Join(dirpath, names[len(names)-1])
 	return fileutil.LockFile(last, os.O_RDWR, fileutil.PrivateFileMode)
-***REMOVED***
+}

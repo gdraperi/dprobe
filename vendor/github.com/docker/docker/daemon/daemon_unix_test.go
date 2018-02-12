@@ -20,272 +20,272 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-type fakeContainerGetter struct ***REMOVED***
+type fakeContainerGetter struct {
 	containers map[string]*container.Container
-***REMOVED***
+}
 
-func (f *fakeContainerGetter) GetContainer(cid string) (*container.Container, error) ***REMOVED***
+func (f *fakeContainerGetter) GetContainer(cid string) (*container.Container, error) {
 	container, ok := f.containers[cid]
-	if !ok ***REMOVED***
+	if !ok {
 		return nil, errors.New("container not found")
-	***REMOVED***
+	}
 	return container, nil
-***REMOVED***
+}
 
 // Unix test as uses settings which are not available on Windows
-func TestAdjustSharedNamespaceContainerName(t *testing.T) ***REMOVED***
+func TestAdjustSharedNamespaceContainerName(t *testing.T) {
 	fakeID := "abcdef1234567890"
-	hostConfig := &containertypes.HostConfig***REMOVED***
+	hostConfig := &containertypes.HostConfig{
 		IpcMode:     containertypes.IpcMode("container:base"),
 		PidMode:     containertypes.PidMode("container:base"),
 		NetworkMode: containertypes.NetworkMode("container:base"),
-	***REMOVED***
-	containerStore := &fakeContainerGetter***REMOVED******REMOVED***
+	}
+	containerStore := &fakeContainerGetter{}
 	containerStore.containers = make(map[string]*container.Container)
-	containerStore.containers["base"] = &container.Container***REMOVED***
+	containerStore.containers["base"] = &container.Container{
 		ID: fakeID,
-	***REMOVED***
+	}
 
 	adaptSharedNamespaceContainer(containerStore, hostConfig)
-	if hostConfig.IpcMode != containertypes.IpcMode("container:"+fakeID) ***REMOVED***
+	if hostConfig.IpcMode != containertypes.IpcMode("container:"+fakeID) {
 		t.Errorf("Expected IpcMode to be container:%s", fakeID)
-	***REMOVED***
-	if hostConfig.PidMode != containertypes.PidMode("container:"+fakeID) ***REMOVED***
+	}
+	if hostConfig.PidMode != containertypes.PidMode("container:"+fakeID) {
 		t.Errorf("Expected PidMode to be container:%s", fakeID)
-	***REMOVED***
-	if hostConfig.NetworkMode != containertypes.NetworkMode("container:"+fakeID) ***REMOVED***
+	}
+	if hostConfig.NetworkMode != containertypes.NetworkMode("container:"+fakeID) {
 		t.Errorf("Expected NetworkMode to be container:%s", fakeID)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Unix test as uses settings which are not available on Windows
-func TestAdjustCPUShares(t *testing.T) ***REMOVED***
+func TestAdjustCPUShares(t *testing.T) {
 	tmp, err := ioutil.TempDir("", "docker-daemon-unix-test-")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	defer os.RemoveAll(tmp)
-	daemon := &Daemon***REMOVED***
+	daemon := &Daemon{
 		repository: tmp,
 		root:       tmp,
-	***REMOVED***
+	}
 
-	hostConfig := &containertypes.HostConfig***REMOVED***
-		Resources: containertypes.Resources***REMOVED***CPUShares: linuxMinCPUShares - 1***REMOVED***,
-	***REMOVED***
+	hostConfig := &containertypes.HostConfig{
+		Resources: containertypes.Resources{CPUShares: linuxMinCPUShares - 1},
+	}
 	daemon.adaptContainerSettings(hostConfig, true)
-	if hostConfig.CPUShares != linuxMinCPUShares ***REMOVED***
+	if hostConfig.CPUShares != linuxMinCPUShares {
 		t.Errorf("Expected CPUShares to be %d", linuxMinCPUShares)
-	***REMOVED***
+	}
 
 	hostConfig.CPUShares = linuxMaxCPUShares + 1
 	daemon.adaptContainerSettings(hostConfig, true)
-	if hostConfig.CPUShares != linuxMaxCPUShares ***REMOVED***
+	if hostConfig.CPUShares != linuxMaxCPUShares {
 		t.Errorf("Expected CPUShares to be %d", linuxMaxCPUShares)
-	***REMOVED***
+	}
 
 	hostConfig.CPUShares = 0
 	daemon.adaptContainerSettings(hostConfig, true)
-	if hostConfig.CPUShares != 0 ***REMOVED***
+	if hostConfig.CPUShares != 0 {
 		t.Error("Expected CPUShares to be unchanged")
-	***REMOVED***
+	}
 
 	hostConfig.CPUShares = 1024
 	daemon.adaptContainerSettings(hostConfig, true)
-	if hostConfig.CPUShares != 1024 ***REMOVED***
+	if hostConfig.CPUShares != 1024 {
 		t.Error("Expected CPUShares to be unchanged")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Unix test as uses settings which are not available on Windows
-func TestAdjustCPUSharesNoAdjustment(t *testing.T) ***REMOVED***
+func TestAdjustCPUSharesNoAdjustment(t *testing.T) {
 	tmp, err := ioutil.TempDir("", "docker-daemon-unix-test-")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	defer os.RemoveAll(tmp)
-	daemon := &Daemon***REMOVED***
+	daemon := &Daemon{
 		repository: tmp,
 		root:       tmp,
-	***REMOVED***
+	}
 
-	hostConfig := &containertypes.HostConfig***REMOVED***
-		Resources: containertypes.Resources***REMOVED***CPUShares: linuxMinCPUShares - 1***REMOVED***,
-	***REMOVED***
+	hostConfig := &containertypes.HostConfig{
+		Resources: containertypes.Resources{CPUShares: linuxMinCPUShares - 1},
+	}
 	daemon.adaptContainerSettings(hostConfig, false)
-	if hostConfig.CPUShares != linuxMinCPUShares-1 ***REMOVED***
+	if hostConfig.CPUShares != linuxMinCPUShares-1 {
 		t.Errorf("Expected CPUShares to be %d", linuxMinCPUShares-1)
-	***REMOVED***
+	}
 
 	hostConfig.CPUShares = linuxMaxCPUShares + 1
 	daemon.adaptContainerSettings(hostConfig, false)
-	if hostConfig.CPUShares != linuxMaxCPUShares+1 ***REMOVED***
+	if hostConfig.CPUShares != linuxMaxCPUShares+1 {
 		t.Errorf("Expected CPUShares to be %d", linuxMaxCPUShares+1)
-	***REMOVED***
+	}
 
 	hostConfig.CPUShares = 0
 	daemon.adaptContainerSettings(hostConfig, false)
-	if hostConfig.CPUShares != 0 ***REMOVED***
+	if hostConfig.CPUShares != 0 {
 		t.Error("Expected CPUShares to be unchanged")
-	***REMOVED***
+	}
 
 	hostConfig.CPUShares = 1024
 	daemon.adaptContainerSettings(hostConfig, false)
-	if hostConfig.CPUShares != 1024 ***REMOVED***
+	if hostConfig.CPUShares != 1024 {
 		t.Error("Expected CPUShares to be unchanged")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Unix test as uses settings which are not available on Windows
-func TestParseSecurityOptWithDeprecatedColon(t *testing.T) ***REMOVED***
-	container := &container.Container***REMOVED******REMOVED***
-	config := &containertypes.HostConfig***REMOVED******REMOVED***
+func TestParseSecurityOptWithDeprecatedColon(t *testing.T) {
+	container := &container.Container{}
+	config := &containertypes.HostConfig{}
 
 	// test apparmor
-	config.SecurityOpt = []string***REMOVED***"apparmor=test_profile"***REMOVED***
-	if err := parseSecurityOpt(container, config); err != nil ***REMOVED***
+	config.SecurityOpt = []string{"apparmor=test_profile"}
+	if err := parseSecurityOpt(container, config); err != nil {
 		t.Fatalf("Unexpected parseSecurityOpt error: %v", err)
-	***REMOVED***
-	if container.AppArmorProfile != "test_profile" ***REMOVED***
+	}
+	if container.AppArmorProfile != "test_profile" {
 		t.Fatalf("Unexpected AppArmorProfile, expected: \"test_profile\", got %q", container.AppArmorProfile)
-	***REMOVED***
+	}
 
 	// test seccomp
 	sp := "/path/to/seccomp_test.json"
-	config.SecurityOpt = []string***REMOVED***"seccomp=" + sp***REMOVED***
-	if err := parseSecurityOpt(container, config); err != nil ***REMOVED***
+	config.SecurityOpt = []string{"seccomp=" + sp}
+	if err := parseSecurityOpt(container, config); err != nil {
 		t.Fatalf("Unexpected parseSecurityOpt error: %v", err)
-	***REMOVED***
-	if container.SeccompProfile != sp ***REMOVED***
+	}
+	if container.SeccompProfile != sp {
 		t.Fatalf("Unexpected AppArmorProfile, expected: %q, got %q", sp, container.SeccompProfile)
-	***REMOVED***
+	}
 
 	// test valid label
-	config.SecurityOpt = []string***REMOVED***"label=user:USER"***REMOVED***
-	if err := parseSecurityOpt(container, config); err != nil ***REMOVED***
+	config.SecurityOpt = []string{"label=user:USER"}
+	if err := parseSecurityOpt(container, config); err != nil {
 		t.Fatalf("Unexpected parseSecurityOpt error: %v", err)
-	***REMOVED***
+	}
 
 	// test invalid label
-	config.SecurityOpt = []string***REMOVED***"label"***REMOVED***
-	if err := parseSecurityOpt(container, config); err == nil ***REMOVED***
+	config.SecurityOpt = []string{"label"}
+	if err := parseSecurityOpt(container, config); err == nil {
 		t.Fatal("Expected parseSecurityOpt error, got nil")
-	***REMOVED***
+	}
 
 	// test invalid opt
-	config.SecurityOpt = []string***REMOVED***"test"***REMOVED***
-	if err := parseSecurityOpt(container, config); err == nil ***REMOVED***
+	config.SecurityOpt = []string{"test"}
+	if err := parseSecurityOpt(container, config); err == nil {
 		t.Fatal("Expected parseSecurityOpt error, got nil")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestParseSecurityOpt(t *testing.T) ***REMOVED***
-	container := &container.Container***REMOVED******REMOVED***
-	config := &containertypes.HostConfig***REMOVED******REMOVED***
+func TestParseSecurityOpt(t *testing.T) {
+	container := &container.Container{}
+	config := &containertypes.HostConfig{}
 
 	// test apparmor
-	config.SecurityOpt = []string***REMOVED***"apparmor=test_profile"***REMOVED***
-	if err := parseSecurityOpt(container, config); err != nil ***REMOVED***
+	config.SecurityOpt = []string{"apparmor=test_profile"}
+	if err := parseSecurityOpt(container, config); err != nil {
 		t.Fatalf("Unexpected parseSecurityOpt error: %v", err)
-	***REMOVED***
-	if container.AppArmorProfile != "test_profile" ***REMOVED***
+	}
+	if container.AppArmorProfile != "test_profile" {
 		t.Fatalf("Unexpected AppArmorProfile, expected: \"test_profile\", got %q", container.AppArmorProfile)
-	***REMOVED***
+	}
 
 	// test seccomp
 	sp := "/path/to/seccomp_test.json"
-	config.SecurityOpt = []string***REMOVED***"seccomp=" + sp***REMOVED***
-	if err := parseSecurityOpt(container, config); err != nil ***REMOVED***
+	config.SecurityOpt = []string{"seccomp=" + sp}
+	if err := parseSecurityOpt(container, config); err != nil {
 		t.Fatalf("Unexpected parseSecurityOpt error: %v", err)
-	***REMOVED***
-	if container.SeccompProfile != sp ***REMOVED***
+	}
+	if container.SeccompProfile != sp {
 		t.Fatalf("Unexpected SeccompProfile, expected: %q, got %q", sp, container.SeccompProfile)
-	***REMOVED***
+	}
 
 	// test valid label
-	config.SecurityOpt = []string***REMOVED***"label=user:USER"***REMOVED***
-	if err := parseSecurityOpt(container, config); err != nil ***REMOVED***
+	config.SecurityOpt = []string{"label=user:USER"}
+	if err := parseSecurityOpt(container, config); err != nil {
 		t.Fatalf("Unexpected parseSecurityOpt error: %v", err)
-	***REMOVED***
+	}
 
 	// test invalid label
-	config.SecurityOpt = []string***REMOVED***"label"***REMOVED***
-	if err := parseSecurityOpt(container, config); err == nil ***REMOVED***
+	config.SecurityOpt = []string{"label"}
+	if err := parseSecurityOpt(container, config); err == nil {
 		t.Fatal("Expected parseSecurityOpt error, got nil")
-	***REMOVED***
+	}
 
 	// test invalid opt
-	config.SecurityOpt = []string***REMOVED***"test"***REMOVED***
-	if err := parseSecurityOpt(container, config); err == nil ***REMOVED***
+	config.SecurityOpt = []string{"test"}
+	if err := parseSecurityOpt(container, config); err == nil {
 		t.Fatal("Expected parseSecurityOpt error, got nil")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestParseNNPSecurityOptions(t *testing.T) ***REMOVED***
-	daemon := &Daemon***REMOVED***
-		configStore: &config.Config***REMOVED***NoNewPrivileges: true***REMOVED***,
-	***REMOVED***
-	container := &container.Container***REMOVED******REMOVED***
-	config := &containertypes.HostConfig***REMOVED******REMOVED***
+func TestParseNNPSecurityOptions(t *testing.T) {
+	daemon := &Daemon{
+		configStore: &config.Config{NoNewPrivileges: true},
+	}
+	container := &container.Container{}
+	config := &containertypes.HostConfig{}
 
 	// test NNP when "daemon:true" and "no-new-privileges=false""
-	config.SecurityOpt = []string***REMOVED***"no-new-privileges=false"***REMOVED***
+	config.SecurityOpt = []string{"no-new-privileges=false"}
 
-	if err := daemon.parseSecurityOpt(container, config); err != nil ***REMOVED***
+	if err := daemon.parseSecurityOpt(container, config); err != nil {
 		t.Fatalf("Unexpected daemon.parseSecurityOpt error: %v", err)
-	***REMOVED***
-	if container.NoNewPrivileges ***REMOVED***
+	}
+	if container.NoNewPrivileges {
 		t.Fatalf("container.NoNewPrivileges should be FALSE: %v", container.NoNewPrivileges)
-	***REMOVED***
+	}
 
 	// test NNP when "daemon:false" and "no-new-privileges=true""
 	daemon.configStore.NoNewPrivileges = false
-	config.SecurityOpt = []string***REMOVED***"no-new-privileges=true"***REMOVED***
+	config.SecurityOpt = []string{"no-new-privileges=true"}
 
-	if err := daemon.parseSecurityOpt(container, config); err != nil ***REMOVED***
+	if err := daemon.parseSecurityOpt(container, config); err != nil {
 		t.Fatalf("Unexpected daemon.parseSecurityOpt error: %v", err)
-	***REMOVED***
-	if !container.NoNewPrivileges ***REMOVED***
+	}
+	if !container.NoNewPrivileges {
 		t.Fatalf("container.NoNewPrivileges should be TRUE: %v", container.NoNewPrivileges)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestNetworkOptions(t *testing.T) ***REMOVED***
-	daemon := &Daemon***REMOVED******REMOVED***
-	dconfigCorrect := &config.Config***REMOVED***
-		CommonConfig: config.CommonConfig***REMOVED***
+func TestNetworkOptions(t *testing.T) {
+	daemon := &Daemon{}
+	dconfigCorrect := &config.Config{
+		CommonConfig: config.CommonConfig{
 			ClusterStore:     "consul://localhost:8500",
 			ClusterAdvertise: "192.168.0.1:8000",
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
-	if _, err := daemon.networkOptions(dconfigCorrect, nil, nil); err != nil ***REMOVED***
+	if _, err := daemon.networkOptions(dconfigCorrect, nil, nil); err != nil {
 		t.Fatalf("Expect networkOptions success, got error: %v", err)
-	***REMOVED***
+	}
 
-	dconfigWrong := &config.Config***REMOVED***
-		CommonConfig: config.CommonConfig***REMOVED***
+	dconfigWrong := &config.Config{
+		CommonConfig: config.CommonConfig{
 			ClusterStore: "consul://localhost:8500://test://bbb",
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
-	if _, err := daemon.networkOptions(dconfigWrong, nil, nil); err == nil ***REMOVED***
+	if _, err := daemon.networkOptions(dconfigWrong, nil, nil); err == nil {
 		t.Fatal("Expected networkOptions error, got nil")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestMigratePre17Volumes(t *testing.T) ***REMOVED***
+func TestMigratePre17Volumes(t *testing.T) {
 	rootDir, err := ioutil.TempDir("", "test-daemon-volumes")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	defer os.RemoveAll(rootDir)
 
 	volumeRoot := filepath.Join(rootDir, "volumes")
 	err = os.MkdirAll(volumeRoot, 0755)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	containerRoot := filepath.Join(rootDir, "containers")
 	cid := "1234"
@@ -298,60 +298,60 @@ func TestMigratePre17Volumes(t *testing.T) ***REMOVED***
 	require.NoError(t, err)
 
 	config := []byte(`
-		***REMOVED***
+		{
 			"ID": "` + cid + `",
-			"Volumes": ***REMOVED***
+			"Volumes": {
 				"/foo": "` + vfsPath + `",
 				"/bar": "/foo",
 				"/quux": "/quux"
-			***REMOVED***,
-			"VolumesRW": ***REMOVED***
+			},
+			"VolumesRW": {
 				"/foo": true,
 				"/bar": true,
 				"/quux": false
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 	`)
 
 	volStore, err := store.New(volumeRoot)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	drv, err := local.New(volumeRoot, idtools.IDPair***REMOVED***UID: 0, GID: 0***REMOVED***)
-	if err != nil ***REMOVED***
+	}
+	drv, err := local.New(volumeRoot, idtools.IDPair{UID: 0, GID: 0})
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	volumedrivers.Register(drv, volume.DefaultDriverName)
 
-	daemon := &Daemon***REMOVED***
+	daemon := &Daemon{
 		root:       rootDir,
 		repository: containerRoot,
 		volumes:    volStore,
-	***REMOVED***
+	}
 	err = ioutil.WriteFile(filepath.Join(containerRoot, cid, "config.v2.json"), config, 600)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	c, err := daemon.load(cid)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if err := daemon.verifyVolumesInfo(c); err != nil ***REMOVED***
+	}
+	if err := daemon.verifyVolumesInfo(c); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	expected := map[string]volume.MountPoint***REMOVED***
-		"/foo":  ***REMOVED***Destination: "/foo", RW: true, Name: vid***REMOVED***,
-		"/bar":  ***REMOVED***Source: "/foo", Destination: "/bar", RW: true***REMOVED***,
-		"/quux": ***REMOVED***Source: "/quux", Destination: "/quux", RW: false***REMOVED***,
-	***REMOVED***
-	for id, mp := range c.MountPoints ***REMOVED***
+	expected := map[string]volume.MountPoint{
+		"/foo":  {Destination: "/foo", RW: true, Name: vid},
+		"/bar":  {Source: "/foo", Destination: "/bar", RW: true},
+		"/quux": {Source: "/quux", Destination: "/quux", RW: false},
+	}
+	for id, mp := range c.MountPoints {
 		x, exists := expected[id]
-		if !exists ***REMOVED***
+		if !exists {
 			t.Fatal("volume not migrated")
-		***REMOVED***
-		if mp.Source != x.Source || mp.Destination != x.Destination || mp.RW != x.RW || mp.Name != x.Name ***REMOVED***
+		}
+		if mp.Source != x.Source || mp.Destination != x.Destination || mp.RW != x.RW || mp.Name != x.Name {
 			t.Fatalf("got unexpected mountpoint, expected: %+v, got: %+v", x, mp)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

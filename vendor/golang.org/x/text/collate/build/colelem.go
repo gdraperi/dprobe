@@ -17,16 +17,16 @@ const (
 	maxTertiary      = 0x1F
 )
 
-type rawCE struct ***REMOVED***
+type rawCE struct {
 	w   []int
 	ccc uint8
-***REMOVED***
+}
 
-func makeRawCE(w []int, ccc uint8) rawCE ***REMOVED***
-	ce := rawCE***REMOVED***w: make([]int, 4), ccc: ccc***REMOVED***
+func makeRawCE(w []int, ccc uint8) rawCE {
+	ce := rawCE{w: make([]int, 4), ccc: ccc}
 	copy(ce.w, w)
 	return ce
-***REMOVED***
+}
 
 // A collation element is represented as an uint32.
 // In the typical case, a rune maps to a single collation element. If a rune
@@ -41,10 +41,10 @@ const (
 	maxTertiaryBits  = 8
 )
 
-func makeCE(ce rawCE) (uint32, error) ***REMOVED***
+func makeCE(ce rawCE) (uint32, error) {
 	v, e := colltab.MakeElem(ce.w[0], ce.w[1], ce.w[2], ce.ccc)
 	return uint32(v), e
-***REMOVED***
+}
 
 // For contractions, collation elements are of the form
 // 110bbbbb bbbbbbbb iiiiiiii iiiinnnn, where
@@ -59,22 +59,22 @@ const (
 	maxContractOffsetBits = 13
 )
 
-func makeContractIndex(h ctHandle, offset int) (uint32, error) ***REMOVED***
-	if h.n >= 1<<maxNBits ***REMOVED***
+func makeContractIndex(h ctHandle, offset int) (uint32, error) {
+	if h.n >= 1<<maxNBits {
 		return 0, fmt.Errorf("size of contraction trie node too large: %d >= %d", h.n, 1<<maxNBits)
-	***REMOVED***
-	if h.index >= 1<<maxTrieIndexBits ***REMOVED***
+	}
+	if h.index >= 1<<maxTrieIndexBits {
 		return 0, fmt.Errorf("size of contraction trie offset too large: %d >= %d", h.index, 1<<maxTrieIndexBits)
-	***REMOVED***
-	if offset >= 1<<maxContractOffsetBits ***REMOVED***
+	}
+	if offset >= 1<<maxContractOffsetBits {
 		return 0, fmt.Errorf("contraction offset out of bounds: %x >= %x", offset, 1<<maxContractOffsetBits)
-	***REMOVED***
+	}
 	ce := uint32(contractID)
 	ce += uint32(offset << (maxNBits + maxTrieIndexBits))
 	ce += uint32(h.index << maxNBits)
 	ce += uint32(h.n)
 	return ce, nil
-***REMOVED***
+}
 
 // For expansions, collation elements are of the form
 // 11100000 00000000 bbbbbbbb bbbbbbbb,
@@ -84,18 +84,18 @@ const (
 	maxExpandIndexBits = 16
 )
 
-func makeExpandIndex(index int) (uint32, error) ***REMOVED***
-	if index >= 1<<maxExpandIndexBits ***REMOVED***
+func makeExpandIndex(index int) (uint32, error) {
+	if index >= 1<<maxExpandIndexBits {
 		return 0, fmt.Errorf("expansion index out of bounds: %x >= %x", index, 1<<maxExpandIndexBits)
-	***REMOVED***
+	}
 	return expandID + uint32(index), nil
-***REMOVED***
+}
 
 // Each list of collation elements corresponding to an expansion starts with
 // a header indicating the length of the sequence.
-func makeExpansionHeader(n int) (uint32, error) ***REMOVED***
+func makeExpansionHeader(n int) (uint32, error) {
 	return uint32(n), nil
-***REMOVED***
+}
 
 // Some runes can be expanded using NFKD decomposition. Instead of storing the full
 // sequence of collation elements, we decompose the rune and lookup the collation
@@ -110,15 +110,15 @@ const (
 	decompID = 0xF0000000
 )
 
-func makeDecompose(t1, t2 int) (uint32, error) ***REMOVED***
-	if t1 >= 256 || t1 < 0 ***REMOVED***
+func makeDecompose(t1, t2 int) (uint32, error) {
+	if t1 >= 256 || t1 < 0 {
 		return 0, fmt.Errorf("first tertiary weight out of bounds: %d >= 256", t1)
-	***REMOVED***
-	if t2 >= 256 || t2 < 0 ***REMOVED***
+	}
+	if t2 >= 256 || t2 < 0 {
 		return 0, fmt.Errorf("second tertiary weight out of bounds: %d >= 256", t2)
-	***REMOVED***
+	}
 	return uint32(t2<<8+t1) + decompID, nil
-***REMOVED***
+}
 
 const (
 	// These constants were taken from http://www.unicode.org/versions/Unicode6.0.0/ch12.pdf.
@@ -142,21 +142,21 @@ const (
 // We take a different approach from the one specified in
 // http://unicode.org/reports/tr10/#Implicit_Weights,
 // but preserve the resulting relative ordering of the runes.
-func implicitPrimary(r rune) int ***REMOVED***
-	if unicode.Is(unicode.Ideographic, r) ***REMOVED***
-		if r >= minUnified && r <= maxUnified ***REMOVED***
+func implicitPrimary(r rune) int {
+	if unicode.Is(unicode.Ideographic, r) {
+		if r >= minUnified && r <= maxUnified {
 			// The most common case for CJK.
 			return int(r) + commonUnifiedOffset
-		***REMOVED***
-		if r >= minCompatibility && r <= maxCompatibility ***REMOVED***
+		}
+		if r >= minCompatibility && r <= maxCompatibility {
 			// This will typically not hit. The DUCET explicitly specifies mappings
 			// for all characters that do not decompose.
 			return int(r) + commonUnifiedOffset
-		***REMOVED***
+		}
 		return int(r) + rareUnifiedOffset
-	***REMOVED***
+	}
 	return int(r) + otherOffset
-***REMOVED***
+}
 
 // convertLargeWeights converts collation elements with large
 // primaries (either double primaries or for illegal runes)
@@ -166,7 +166,7 @@ func implicitPrimary(r rune) int ***REMOVED***
 // We will rewrite these characters to a single CE.
 // We assume the CJK values start at 0x8000.
 // See http://unicode.org/reports/tr10/#Implicit_Weights
-func convertLargeWeights(elems []rawCE) (res []rawCE, err error) ***REMOVED***
+func convertLargeWeights(elems []rawCE) (res []rawCE, err error) {
 	const (
 		cjkPrimaryStart   = 0xFB40
 		rarePrimaryStart  = 0xFB80
@@ -177,118 +177,118 @@ func convertLargeWeights(elems []rawCE) (res []rawCE, err error) ***REMOVED***
 		lowBitsFlag       = 0x8000
 		shiftBits         = 15
 	)
-	for i := 0; i < len(elems); i++ ***REMOVED***
+	for i := 0; i < len(elems); i++ {
 		ce := elems[i].w
 		p := ce[0]
-		if p < cjkPrimaryStart ***REMOVED***
+		if p < cjkPrimaryStart {
 			continue
-		***REMOVED***
-		if p > 0xFFFF ***REMOVED***
+		}
+		if p > 0xFFFF {
 			return elems, fmt.Errorf("found primary weight %X; should be <= 0xFFFF", p)
-		***REMOVED***
-		if p >= illegalPrimary ***REMOVED***
+		}
+		if p >= illegalPrimary {
 			ce[0] = illegalOffset + p - illegalPrimary
-		***REMOVED*** else ***REMOVED***
-			if i+1 >= len(elems) ***REMOVED***
+		} else {
+			if i+1 >= len(elems) {
 				return elems, fmt.Errorf("second part of double primary weight missing: %v", elems)
-			***REMOVED***
-			if elems[i+1].w[0]&lowBitsFlag == 0 ***REMOVED***
+			}
+			if elems[i+1].w[0]&lowBitsFlag == 0 {
 				return elems, fmt.Errorf("malformed second part of double primary weight: %v", elems)
-			***REMOVED***
+			}
 			np := ((p & highBitsMask) << shiftBits) + elems[i+1].w[0]&lowBitsMask
-			switch ***REMOVED***
+			switch {
 			case p < rarePrimaryStart:
 				np += commonUnifiedOffset
 			case p < otherPrimaryStart:
 				np += rareUnifiedOffset
 			default:
 				p += otherOffset
-			***REMOVED***
+			}
 			ce[0] = np
-			for j := i + 1; j+1 < len(elems); j++ ***REMOVED***
+			for j := i + 1; j+1 < len(elems); j++ {
 				elems[j] = elems[j+1]
-			***REMOVED***
+			}
 			elems = elems[:len(elems)-1]
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return elems, nil
-***REMOVED***
+}
 
 // nextWeight computes the first possible collation weights following elems
 // for the given level.
-func nextWeight(level colltab.Level, elems []rawCE) []rawCE ***REMOVED***
-	if level == colltab.Identity ***REMOVED***
+func nextWeight(level colltab.Level, elems []rawCE) []rawCE {
+	if level == colltab.Identity {
 		next := make([]rawCE, len(elems))
 		copy(next, elems)
 		return next
-	***REMOVED***
-	next := []rawCE***REMOVED***makeRawCE(elems[0].w, elems[0].ccc)***REMOVED***
+	}
+	next := []rawCE{makeRawCE(elems[0].w, elems[0].ccc)}
 	next[0].w[level]++
-	if level < colltab.Secondary ***REMOVED***
+	if level < colltab.Secondary {
 		next[0].w[colltab.Secondary] = defaultSecondary
-	***REMOVED***
-	if level < colltab.Tertiary ***REMOVED***
+	}
+	if level < colltab.Tertiary {
 		next[0].w[colltab.Tertiary] = defaultTertiary
-	***REMOVED***
+	}
 	// Filter entries that cannot influence ordering.
-	for _, ce := range elems[1:] ***REMOVED***
+	for _, ce := range elems[1:] {
 		skip := true
-		for i := colltab.Primary; i < level; i++ ***REMOVED***
+		for i := colltab.Primary; i < level; i++ {
 			skip = skip && ce.w[i] == 0
-		***REMOVED***
-		if !skip ***REMOVED***
+		}
+		if !skip {
 			next = append(next, ce)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return next
-***REMOVED***
+}
 
-func nextVal(elems []rawCE, i int, level colltab.Level) (index, value int) ***REMOVED***
-	for ; i < len(elems) && elems[i].w[level] == 0; i++ ***REMOVED***
-	***REMOVED***
-	if i < len(elems) ***REMOVED***
+func nextVal(elems []rawCE, i int, level colltab.Level) (index, value int) {
+	for ; i < len(elems) && elems[i].w[level] == 0; i++ {
+	}
+	if i < len(elems) {
 		return i, elems[i].w[level]
-	***REMOVED***
+	}
 	return i, 0
-***REMOVED***
+}
 
 // compareWeights returns -1 if a < b, 1 if a > b, or 0 otherwise.
 // It also returns the collation level at which the difference is found.
-func compareWeights(a, b []rawCE) (result int, level colltab.Level) ***REMOVED***
-	for level := colltab.Primary; level < colltab.Identity; level++ ***REMOVED***
+func compareWeights(a, b []rawCE) (result int, level colltab.Level) {
+	for level := colltab.Primary; level < colltab.Identity; level++ {
 		var va, vb int
-		for ia, ib := 0, 0; ia < len(a) || ib < len(b); ia, ib = ia+1, ib+1 ***REMOVED***
+		for ia, ib := 0, 0; ia < len(a) || ib < len(b); ia, ib = ia+1, ib+1 {
 			ia, va = nextVal(a, ia, level)
 			ib, vb = nextVal(b, ib, level)
-			if va != vb ***REMOVED***
-				if va < vb ***REMOVED***
+			if va != vb {
+				if va < vb {
 					return -1, level
-				***REMOVED*** else ***REMOVED***
+				} else {
 					return 1, level
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+				}
+			}
+		}
+	}
 	return 0, colltab.Identity
-***REMOVED***
+}
 
-func equalCE(a, b rawCE) bool ***REMOVED***
-	for i := 0; i < 3; i++ ***REMOVED***
-		if b.w[i] != a.w[i] ***REMOVED***
+func equalCE(a, b rawCE) bool {
+	for i := 0; i < 3; i++ {
+		if b.w[i] != a.w[i] {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}
 
-func equalCEArrays(a, b []rawCE) bool ***REMOVED***
-	if len(a) != len(b) ***REMOVED***
+func equalCEArrays(a, b []rawCE) bool {
+	if len(a) != len(b) {
 		return false
-	***REMOVED***
-	for i := range a ***REMOVED***
-		if !equalCE(a[i], b[i]) ***REMOVED***
+	}
+	for i := range a {
+		if !equalCE(a[i], b[i]) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}

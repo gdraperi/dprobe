@@ -13,36 +13,36 @@ import (
 
 // LimitListener returns a Listener that accepts at most n simultaneous
 // connections from the provided Listener.
-func LimitListener(l net.Listener, n int) net.Listener ***REMOVED***
-	return &limitListener***REMOVED***l, make(chan struct***REMOVED******REMOVED***, n)***REMOVED***
-***REMOVED***
+func LimitListener(l net.Listener, n int) net.Listener {
+	return &limitListener{l, make(chan struct{}, n)}
+}
 
-type limitListener struct ***REMOVED***
+type limitListener struct {
 	net.Listener
-	sem chan struct***REMOVED******REMOVED***
-***REMOVED***
+	sem chan struct{}
+}
 
-func (l *limitListener) acquire() ***REMOVED*** l.sem <- struct***REMOVED******REMOVED******REMOVED******REMOVED*** ***REMOVED***
-func (l *limitListener) release() ***REMOVED*** <-l.sem ***REMOVED***
+func (l *limitListener) acquire() { l.sem <- struct{}{} }
+func (l *limitListener) release() { <-l.sem }
 
-func (l *limitListener) Accept() (net.Conn, error) ***REMOVED***
+func (l *limitListener) Accept() (net.Conn, error) {
 	l.acquire()
 	c, err := l.Listener.Accept()
-	if err != nil ***REMOVED***
+	if err != nil {
 		l.release()
 		return nil, err
-	***REMOVED***
-	return &limitListenerConn***REMOVED***Conn: c, release: l.release***REMOVED***, nil
-***REMOVED***
+	}
+	return &limitListenerConn{Conn: c, release: l.release}, nil
+}
 
-type limitListenerConn struct ***REMOVED***
+type limitListenerConn struct {
 	net.Conn
 	releaseOnce sync.Once
 	release     func()
-***REMOVED***
+}
 
-func (l *limitListenerConn) Close() error ***REMOVED***
+func (l *limitListenerConn) Close() error {
 	err := l.Conn.Close()
 	l.releaseOnce.Do(l.release)
 	return err
-***REMOVED***
+}

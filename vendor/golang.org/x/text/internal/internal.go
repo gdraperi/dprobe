@@ -15,37 +15,37 @@ import (
 )
 
 // SortTags sorts tags in place.
-func SortTags(tags []language.Tag) ***REMOVED***
+func SortTags(tags []language.Tag) {
 	sort.Sort(sorter(tags))
-***REMOVED***
+}
 
 type sorter []language.Tag
 
-func (s sorter) Len() int ***REMOVED***
+func (s sorter) Len() int {
 	return len(s)
-***REMOVED***
+}
 
-func (s sorter) Swap(i, j int) ***REMOVED***
+func (s sorter) Swap(i, j int) {
 	s[i], s[j] = s[j], s[i]
-***REMOVED***
+}
 
-func (s sorter) Less(i, j int) bool ***REMOVED***
+func (s sorter) Less(i, j int) bool {
 	return s[i].String() < s[j].String()
-***REMOVED***
+}
 
 // UniqueTags sorts and filters duplicate tags in place and returns a slice with
 // only unique tags.
-func UniqueTags(tags []language.Tag) []language.Tag ***REMOVED***
-	if len(tags) <= 1 ***REMOVED***
+func UniqueTags(tags []language.Tag) []language.Tag {
+	if len(tags) <= 1 {
 		return tags
-	***REMOVED***
+	}
 	SortTags(tags)
 	k := 0
-	for i := 1; i < len(tags); i++ ***REMOVED***
-		if tags[k].String() < tags[i].String() ***REMOVED***
+	for i := 1; i < len(tags); i++ {
+		if tags[k].String() < tags[i].String() {
 			k++
 			tags[k] = tags[i]
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return tags[:k+1]
-***REMOVED***
+}

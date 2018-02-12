@@ -11,10 +11,10 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var defaultEscapeSequence = []byte***REMOVED***16, 17***REMOVED*** // ctrl-p, ctrl-q
+var defaultEscapeSequence = []byte{16, 17} // ctrl-p, ctrl-q
 
 // AttachConfig is the config struct used to attach a client to a stream's stdio
-type AttachConfig struct ***REMOVED***
+type AttachConfig struct {
 	// Tells the attach copier that the stream's stdin is a TTY and to look for
 	// escape sequences in stdin to detach from the stream.
 	// When true the escape sequence is not passed to the underlying stream
@@ -39,147 +39,147 @@ type AttachConfig struct ***REMOVED***
 	// Provide client streams to wire up to
 	Stdin          io.ReadCloser
 	Stdout, Stderr io.Writer
-***REMOVED***
+}
 
 // AttachStreams attaches the container's streams to the AttachConfig
-func (c *Config) AttachStreams(cfg *AttachConfig) ***REMOVED***
-	if cfg.UseStdin ***REMOVED***
+func (c *Config) AttachStreams(cfg *AttachConfig) {
+	if cfg.UseStdin {
 		cfg.CStdin = c.StdinPipe()
-	***REMOVED***
+	}
 
-	if cfg.UseStdout ***REMOVED***
+	if cfg.UseStdout {
 		cfg.CStdout = c.StdoutPipe()
-	***REMOVED***
+	}
 
-	if cfg.UseStderr ***REMOVED***
+	if cfg.UseStderr {
 		cfg.CStderr = c.StderrPipe()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // CopyStreams starts goroutines to copy data in and out to/from the container
-func (c *Config) CopyStreams(ctx context.Context, cfg *AttachConfig) <-chan error ***REMOVED***
+func (c *Config) CopyStreams(ctx context.Context, cfg *AttachConfig) <-chan error {
 	var (
 		wg     sync.WaitGroup
 		errors = make(chan error, 3)
 	)
 
-	if cfg.Stdin != nil ***REMOVED***
+	if cfg.Stdin != nil {
 		wg.Add(1)
-	***REMOVED***
+	}
 
-	if cfg.Stdout != nil ***REMOVED***
+	if cfg.Stdout != nil {
 		wg.Add(1)
-	***REMOVED***
+	}
 
-	if cfg.Stderr != nil ***REMOVED***
+	if cfg.Stderr != nil {
 		wg.Add(1)
-	***REMOVED***
+	}
 
 	// Connect stdin of container to the attach stdin stream.
-	go func() ***REMOVED***
-		if cfg.Stdin == nil ***REMOVED***
+	go func() {
+		if cfg.Stdin == nil {
 			return
-		***REMOVED***
+		}
 		logrus.Debug("attach: stdin: begin")
 
 		var err error
-		if cfg.TTY ***REMOVED***
+		if cfg.TTY {
 			_, err = copyEscapable(cfg.CStdin, cfg.Stdin, cfg.DetachKeys)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			_, err = pools.Copy(cfg.CStdin, cfg.Stdin)
-		***REMOVED***
-		if err == io.ErrClosedPipe ***REMOVED***
+		}
+		if err == io.ErrClosedPipe {
 			err = nil
-		***REMOVED***
-		if err != nil ***REMOVED***
+		}
+		if err != nil {
 			logrus.Errorf("attach: stdin: %s", err)
 			errors <- err
-		***REMOVED***
-		if cfg.CloseStdin && !cfg.TTY ***REMOVED***
+		}
+		if cfg.CloseStdin && !cfg.TTY {
 			cfg.CStdin.Close()
-		***REMOVED*** else ***REMOVED***
+		} else {
 			// No matter what, when stdin is closed (io.Copy unblock), close stdout and stderr
-			if cfg.CStdout != nil ***REMOVED***
+			if cfg.CStdout != nil {
 				cfg.CStdout.Close()
-			***REMOVED***
-			if cfg.CStderr != nil ***REMOVED***
+			}
+			if cfg.CStderr != nil {
 				cfg.CStderr.Close()
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		logrus.Debug("attach: stdin: end")
 		wg.Done()
-	***REMOVED***()
+	}()
 
-	attachStream := func(name string, stream io.Writer, streamPipe io.ReadCloser) ***REMOVED***
-		if stream == nil ***REMOVED***
+	attachStream := func(name string, stream io.Writer, streamPipe io.ReadCloser) {
+		if stream == nil {
 			return
-		***REMOVED***
+		}
 
 		logrus.Debugf("attach: %s: begin", name)
 		_, err := pools.Copy(stream, streamPipe)
-		if err == io.ErrClosedPipe ***REMOVED***
+		if err == io.ErrClosedPipe {
 			err = nil
-		***REMOVED***
-		if err != nil ***REMOVED***
+		}
+		if err != nil {
 			logrus.Errorf("attach: %s: %v", name, err)
 			errors <- err
-		***REMOVED***
+		}
 		// Make sure stdin gets closed
-		if cfg.Stdin != nil ***REMOVED***
+		if cfg.Stdin != nil {
 			cfg.Stdin.Close()
-		***REMOVED***
+		}
 		streamPipe.Close()
 		logrus.Debugf("attach: %s: end", name)
 		wg.Done()
-	***REMOVED***
+	}
 
 	go attachStream("stdout", cfg.Stdout, cfg.CStdout)
 	go attachStream("stderr", cfg.Stderr, cfg.CStderr)
 
 	errs := make(chan error, 1)
 
-	go func() ***REMOVED***
+	go func() {
 		defer close(errs)
-		errs <- func() error ***REMOVED***
-			done := make(chan struct***REMOVED******REMOVED***)
-			go func() ***REMOVED***
+		errs <- func() error {
+			done := make(chan struct{})
+			go func() {
 				wg.Wait()
 				close(done)
-			***REMOVED***()
-			select ***REMOVED***
+			}()
+			select {
 			case <-done:
 			case <-ctx.Done():
 				// close all pipes
-				if cfg.CStdin != nil ***REMOVED***
+				if cfg.CStdin != nil {
 					cfg.CStdin.Close()
-				***REMOVED***
-				if cfg.CStdout != nil ***REMOVED***
+				}
+				if cfg.CStdout != nil {
 					cfg.CStdout.Close()
-				***REMOVED***
-				if cfg.CStderr != nil ***REMOVED***
+				}
+				if cfg.CStderr != nil {
 					cfg.CStderr.Close()
-				***REMOVED***
+				}
 				<-done
-			***REMOVED***
+			}
 			close(errors)
-			for err := range errors ***REMOVED***
-				if err != nil ***REMOVED***
+			for err := range errors {
+				if err != nil {
 					return err
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return nil
-		***REMOVED***()
-	***REMOVED***()
+		}()
+	}()
 
 	return errs
-***REMOVED***
+}
 
-func copyEscapable(dst io.Writer, src io.ReadCloser, keys []byte) (written int64, err error) ***REMOVED***
-	if len(keys) == 0 ***REMOVED***
+func copyEscapable(dst io.Writer, src io.ReadCloser, keys []byte) (written int64, err error) {
+	if len(keys) == 0 {
 		keys = defaultEscapeSequence
-	***REMOVED***
+	}
 	pr := term.NewEscapeProxy(src, keys)
 	defer src.Close()
 
 	return pools.Copy(dst, pr)
-***REMOVED***
+}

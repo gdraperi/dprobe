@@ -43,14 +43,14 @@ import (
 )
 
 // dialContext connects to the address on the named network.
-func dialContext(ctx context.Context, network, address string) (net.Conn, error) ***REMOVED***
-	return (&net.Dialer***REMOVED***Cancel: ctx.Done()***REMOVED***).Dial(network, address)
-***REMOVED***
+func dialContext(ctx context.Context, network, address string) (net.Conn, error) {
+	return (&net.Dialer{Cancel: ctx.Done()}).Dial(network, address)
+}
 
-func sendHTTPRequest(ctx context.Context, req *http.Request, conn net.Conn) error ***REMOVED***
+func sendHTTPRequest(ctx context.Context, req *http.Request, conn net.Conn) error {
 	req.Cancel = ctx.Done()
-	if err := req.Write(conn); err != nil ***REMOVED***
+	if err := req.Write(conn); err != nil {
 		return fmt.Errorf("failed to write the HTTP request: %v", err)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

@@ -31,7 +31,7 @@ var Done = errors.New("no more items in iterator")
 var errMixed = errors.New("iterator: Next and NextPage called on same iterator")
 
 // PageInfo contains information about an iterator's paging state.
-type PageInfo struct ***REMOVED***
+type PageInfo struct {
 	// Token is the token used to retrieve the next page of items from the
 	// API. You may set Token immediately after creating an iterator to
 	// begin iteration at a particular point. If Token is the empty string,
@@ -71,12 +71,12 @@ type PageInfo struct ***REMOVED***
 	bufLen func() int
 
 	// Function that returns the buffer, after setting the buffer variable to nil.
-	takeBuf func() interface***REMOVED******REMOVED***
+	takeBuf func() interface{}
 
 	// Set to true on first call to PageInfo.next or Pager.NextPage. Used to check
 	// for calls to both Next and NextPage with the same iterator.
 	nextCalled, nextPageCalled bool
-***REMOVED***
+}
 
 // NewPageInfo exposes internals for iterator implementations.
 // It is not a stable interface.
@@ -91,75 +91,75 @@ var NewPageInfo = newPageInfo
 //
 // The return value is the PageInfo.next method bound to the returned PageInfo value.
 // (Returning it avoids exporting PageInfo.next.)
-func newPageInfo(fetch func(int, string) (string, error), bufLen func() int, takeBuf func() interface***REMOVED******REMOVED***) (*PageInfo, func() error) ***REMOVED***
-	pi := &PageInfo***REMOVED***
+func newPageInfo(fetch func(int, string) (string, error), bufLen func() int, takeBuf func() interface{}) (*PageInfo, func() error) {
+	pi := &PageInfo{
 		fetch:   fetch,
 		bufLen:  bufLen,
 		takeBuf: takeBuf,
-	***REMOVED***
+	}
 	return pi, pi.next
-***REMOVED***
+}
 
 // Remaining returns the number of items available before the iterator makes another API call.
-func (pi *PageInfo) Remaining() int ***REMOVED*** return pi.bufLen() ***REMOVED***
+func (pi *PageInfo) Remaining() int { return pi.bufLen() }
 
 // next provides support for an iterator's Next function. An iterator's Next
 // should return the error returned by next if non-nil; else it can assume
 // there is at least one item in its buffer, and it should return that item and
 // remove it from the buffer.
-func (pi *PageInfo) next() error ***REMOVED***
+func (pi *PageInfo) next() error {
 	pi.nextCalled = true
-	if pi.err != nil ***REMOVED*** // Once we get an error, always return it.
+	if pi.err != nil { // Once we get an error, always return it.
 		// TODO(jba): fix so users can retry on transient errors? Probably not worth it.
 		return pi.err
-	***REMOVED***
-	if pi.nextPageCalled ***REMOVED***
+	}
+	if pi.nextPageCalled {
 		pi.err = errMixed
 		return pi.err
-	***REMOVED***
+	}
 	// Loop until we get some items or reach the end.
-	for pi.bufLen() == 0 && !pi.atEnd ***REMOVED***
-		if err := pi.fill(pi.MaxSize); err != nil ***REMOVED***
+	for pi.bufLen() == 0 && !pi.atEnd {
+		if err := pi.fill(pi.MaxSize); err != nil {
 			pi.err = err
 			return pi.err
-		***REMOVED***
-		if pi.Token == "" ***REMOVED***
+		}
+		if pi.Token == "" {
 			pi.atEnd = true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	// Either the buffer is non-empty or pi.atEnd is true (or both).
-	if pi.bufLen() == 0 ***REMOVED***
+	if pi.bufLen() == 0 {
 		// The buffer is empty and pi.atEnd is true, i.e. the service has no
 		// more items.
 		pi.err = Done
-	***REMOVED***
+	}
 	return pi.err
-***REMOVED***
+}
 
 // Call the service to fill the buffer, using size and pi.Token. Set pi.Token to the
 // next-page token returned by the call.
 // If fill returns a non-nil error, the buffer will be empty.
-func (pi *PageInfo) fill(size int) error ***REMOVED***
+func (pi *PageInfo) fill(size int) error {
 	tok, err := pi.fetch(size, pi.Token)
-	if err != nil ***REMOVED***
+	if err != nil {
 		pi.takeBuf() // clear the buffer
 		return err
-	***REMOVED***
+	}
 	pi.Token = tok
 	return nil
-***REMOVED***
+}
 
 // Pageable is implemented by iterators that support paging.
-type Pageable interface ***REMOVED***
+type Pageable interface {
 	// PageInfo returns paging information associated with the iterator.
 	PageInfo() *PageInfo
-***REMOVED***
+}
 
 // Pager supports retrieving iterator items a page at a time.
-type Pager struct ***REMOVED***
+type Pager struct {
 	pageInfo *PageInfo
 	pageSize int
-***REMOVED***
+}
 
 // NewPager returns a pager that uses iter. Calls to its NextPage method will
 // obtain exactly pageSize items, unless fewer remain. The pageToken argument
@@ -167,17 +167,17 @@ type Pager struct ***REMOVED***
 // the beginning, or pass a token retrieved from a call to Pager.NextPage.
 //
 // If you use an iterator with a Pager, you must not call Next on the iterator.
-func NewPager(iter Pageable, pageSize int, pageToken string) *Pager ***REMOVED***
-	p := &Pager***REMOVED***
+func NewPager(iter Pageable, pageSize int, pageToken string) *Pager {
+	p := &Pager{
 		pageInfo: iter.PageInfo(),
 		pageSize: pageSize,
-	***REMOVED***
+	}
 	p.pageInfo.Token = pageToken
-	if pageSize <= 0 ***REMOVED***
+	if pageSize <= 0 {
 		p.pageInfo.err = errors.New("iterator: page size must be positive")
-	***REMOVED***
+	}
 	return p
-***REMOVED***
+}
 
 // NextPage retrieves a sequence of items from the iterator and appends them
 // to slicep, which must be a pointer to a slice of the iterator's item type.
@@ -194,38 +194,38 @@ func NewPager(iter Pageable, pageSize int, pageToken string) *Pager ***REMOVED**
 //
 // It is possible for NextPage to return a single zero-length page along with
 // an empty page token when there are no more items in the iteration.
-func (p *Pager) NextPage(slicep interface***REMOVED******REMOVED***) (nextPageToken string, err error) ***REMOVED***
+func (p *Pager) NextPage(slicep interface{}) (nextPageToken string, err error) {
 	p.pageInfo.nextPageCalled = true
-	if p.pageInfo.err != nil ***REMOVED***
+	if p.pageInfo.err != nil {
 		return "", p.pageInfo.err
-	***REMOVED***
-	if p.pageInfo.nextCalled ***REMOVED***
+	}
+	if p.pageInfo.nextCalled {
 		p.pageInfo.err = errMixed
 		return "", p.pageInfo.err
-	***REMOVED***
-	if p.pageInfo.bufLen() > 0 ***REMOVED***
+	}
+	if p.pageInfo.bufLen() > 0 {
 		return "", errors.New("must call NextPage with an empty buffer")
-	***REMOVED***
+	}
 	// The buffer must be empty here, so takeBuf is a no-op. We call it just to get
 	// the buffer's type.
 	wantSliceType := reflect.PtrTo(reflect.ValueOf(p.pageInfo.takeBuf()).Type())
-	if slicep == nil ***REMOVED***
+	if slicep == nil {
 		return "", errors.New("nil passed to Pager.NextPage")
-	***REMOVED***
+	}
 	vslicep := reflect.ValueOf(slicep)
-	if vslicep.Type() != wantSliceType ***REMOVED***
+	if vslicep.Type() != wantSliceType {
 		return "", fmt.Errorf("slicep should be of type %s, got %T", wantSliceType, slicep)
-	***REMOVED***
-	for p.pageInfo.bufLen() < p.pageSize ***REMOVED***
-		if err := p.pageInfo.fill(p.pageSize - p.pageInfo.bufLen()); err != nil ***REMOVED***
+	}
+	for p.pageInfo.bufLen() < p.pageSize {
+		if err := p.pageInfo.fill(p.pageSize - p.pageInfo.bufLen()); err != nil {
 			p.pageInfo.err = err
 			return "", p.pageInfo.err
-		***REMOVED***
-		if p.pageInfo.Token == "" ***REMOVED***
+		}
+		if p.pageInfo.Token == "" {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	e := vslicep.Elem()
 	e.Set(reflect.AppendSlice(e, reflect.ValueOf(p.pageInfo.takeBuf())))
 	return p.pageInfo.Token, nil
-***REMOVED***
+}

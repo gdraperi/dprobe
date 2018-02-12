@@ -7,30 +7,30 @@ import (
 	"fmt"
 )
 
-type signatureAlgorithm struct ***REMOVED***
+type signatureAlgorithm struct {
 	algHeaderParam string
 	hashID         crypto.Hash
-***REMOVED***
+}
 
-func (h *signatureAlgorithm) HeaderParam() string ***REMOVED***
+func (h *signatureAlgorithm) HeaderParam() string {
 	return h.algHeaderParam
-***REMOVED***
+}
 
-func (h *signatureAlgorithm) HashID() crypto.Hash ***REMOVED***
+func (h *signatureAlgorithm) HashID() crypto.Hash {
 	return h.hashID
-***REMOVED***
+}
 
 var (
-	rs256 = &signatureAlgorithm***REMOVED***"RS256", crypto.SHA256***REMOVED***
-	rs384 = &signatureAlgorithm***REMOVED***"RS384", crypto.SHA384***REMOVED***
-	rs512 = &signatureAlgorithm***REMOVED***"RS512", crypto.SHA512***REMOVED***
-	es256 = &signatureAlgorithm***REMOVED***"ES256", crypto.SHA256***REMOVED***
-	es384 = &signatureAlgorithm***REMOVED***"ES384", crypto.SHA384***REMOVED***
-	es512 = &signatureAlgorithm***REMOVED***"ES512", crypto.SHA512***REMOVED***
+	rs256 = &signatureAlgorithm{"RS256", crypto.SHA256}
+	rs384 = &signatureAlgorithm{"RS384", crypto.SHA384}
+	rs512 = &signatureAlgorithm{"RS512", crypto.SHA512}
+	es256 = &signatureAlgorithm{"ES256", crypto.SHA256}
+	es384 = &signatureAlgorithm{"ES384", crypto.SHA384}
+	es512 = &signatureAlgorithm{"ES512", crypto.SHA512}
 )
 
-func rsaSignatureAlgorithmByName(alg string) (*signatureAlgorithm, error) ***REMOVED***
-	switch ***REMOVED***
+func rsaSignatureAlgorithmByName(alg string) (*signatureAlgorithm, error) {
+	switch {
 	case alg == "RS256":
 		return rs256, nil
 	case alg == "RS384":
@@ -39,11 +39,11 @@ func rsaSignatureAlgorithmByName(alg string) (*signatureAlgorithm, error) ***REM
 		return rs512, nil
 	default:
 		return nil, fmt.Errorf("RSA Digital Signature Algorithm %q not supported", alg)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func rsaPKCS1v15SignatureAlgorithmForHashID(hashID crypto.Hash) *signatureAlgorithm ***REMOVED***
-	switch ***REMOVED***
+func rsaPKCS1v15SignatureAlgorithmForHashID(hashID crypto.Hash) *signatureAlgorithm {
+	switch {
 	case hashID == crypto.SHA512:
 		return rs512
 	case hashID == crypto.SHA384:
@@ -52,5 +52,5 @@ func rsaPKCS1v15SignatureAlgorithmForHashID(hashID crypto.Hash) *signatureAlgori
 		fallthrough
 	default:
 		return rs256
-	***REMOVED***
-***REMOVED***
+	}
+}

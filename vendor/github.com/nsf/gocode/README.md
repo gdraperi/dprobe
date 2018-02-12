@@ -53,15 +53,15 @@ In order to install vim scripts, you need to fulfill the following steps:
 		#!/bin/sh
 		mkdir -p "$HOME/.vim/autoload"
 		mkdir -p "$HOME/.vim/ftplugin/go"
-		cp "$***REMOVED***0%/****REMOVED***/autoload/gocomplete.vim" "$HOME/.vim/autoload"
-		cp "$***REMOVED***0%/****REMOVED***/ftplugin/go/gocomplete.vim" "$HOME/.vim/ftplugin/go"
+		cp "${0%/*}/autoload/gocomplete.vim" "$HOME/.vim/autoload"
+		cp "${0%/*}/ftplugin/go/gocomplete.vim" "$HOME/.vim/ftplugin/go"
 
     2.2. Alternatively, you can create symlinks using symlink.sh script in order to avoid running update.sh after every gocode update.
 
     **symlink.sh** script does the following:
 
 		#!/bin/sh
-		cd "$***REMOVED***0%/****REMOVED***"
+		cd "${0%/*}"
 		ROOTDIR=`pwd`
 		mkdir -p "$HOME/.vim/autoload"
 		mkdir -p "$HOME/.vim/ftplugin/go"
@@ -78,7 +78,7 @@ In order to install vim scripts, you need to fulfill the following steps:
 
 Add the following line to your **.vimrc**:
 
-`Plugin 'nsf/gocode', ***REMOVED***'rtp': 'vim/'***REMOVED***`
+`Plugin 'nsf/gocode', {'rtp': 'vim/'}`
 
 And then update your packages by running `:PluginInstall`.
 
@@ -86,7 +86,7 @@ And then update your packages by running `:PluginInstall`.
 
 Add the following line to your **.vimrc**:
 
-`Plug 'nsf/gocode', ***REMOVED*** 'rtp': 'vim', 'do': '~/.vim/plugged/gocode/vim/symlink.sh' ***REMOVED***`
+`Plug 'nsf/gocode', { 'rtp': 'vim', 'do': '~/.vim/plugged/gocode/vim/symlink.sh' }`
 
 And then update your packages by running `:PlugInstall`.
 
@@ -103,7 +103,7 @@ Alternatively take a look at the vundle/pathogen friendly repo: https://github.c
 
 Add the following line to your **init.vim**:
 
-`Plugin 'nsf/gocode', ***REMOVED***'rtp': 'nvim/'***REMOVED***`
+`Plugin 'nsf/gocode', {'rtp': 'nvim/'}`
 
 And then update your packages by running `:PluginInstall`.
 
@@ -111,7 +111,7 @@ And then update your packages by running `:PluginInstall`.
 
 Add the following line to your **init.vim**:
 
-`Plug 'nsf/gocode', ***REMOVED*** 'rtp': 'nvim', 'do': '~/.config/nvim/plugged/gocode/nvim/symlink.sh' ***REMOVED***`
+`Plug 'nsf/gocode', { 'rtp': 'nvim', 'do': '~/.config/nvim/plugged/gocode/nvim/symlink.sh' }`
 
 And then update your packages by running `:PlugInstall`.
 

@@ -8,13 +8,13 @@ import (
 
 // excludeByIsolation is a platform specific helper function to support PS
 // filtering by Isolation. This is a Windows-only concept, so is a no-op on Unix.
-func excludeByIsolation(container *container.Snapshot, ctx *listContext) iterationAction ***REMOVED***
+func excludeByIsolation(container *container.Snapshot, ctx *listContext) iterationAction {
 	i := strings.ToLower(string(container.HostConfig.Isolation))
-	if i == "" ***REMOVED***
+	if i == "" {
 		i = "default"
-	***REMOVED***
-	if !ctx.filters.Match("isolation", i) ***REMOVED***
+	}
+	if !ctx.filters.Match("isolation", i) {
 		return excludeContainer
-	***REMOVED***
+	}
 	return includeContainer
-***REMOVED***
+}

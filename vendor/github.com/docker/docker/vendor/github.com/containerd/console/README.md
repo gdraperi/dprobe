@@ -10,8 +10,8 @@ Golang package for dealing with consoles.  Light on deps and a simple API.
 current := console.Current()
 defer current.Reset()
 
-if err := current.SetRaw(); err != nil ***REMOVED***
-***REMOVED***
+if err := current.SetRaw(); err != nil {
+}
 ws, err := current.Size()
 current.Resize(ws)
 ```

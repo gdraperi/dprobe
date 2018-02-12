@@ -31,80 +31,80 @@ import (
 //
 // This was adapted from (http://golang.org/pkg/path/filepath) and uses several
 // built-ins from that package.
-func Glob(fs Fs, pattern string) (matches []string, err error) ***REMOVED***
-	if !hasMeta(pattern) ***REMOVED***
+func Glob(fs Fs, pattern string) (matches []string, err error) {
+	if !hasMeta(pattern) {
 		// afero does not support Lstat directly.
-		if _, err = lstatIfOs(fs, pattern); err != nil ***REMOVED***
+		if _, err = lstatIfOs(fs, pattern); err != nil {
 			return nil, nil
-		***REMOVED***
-		return []string***REMOVED***pattern***REMOVED***, nil
-	***REMOVED***
+		}
+		return []string{pattern}, nil
+	}
 
 	dir, file := filepath.Split(pattern)
-	switch dir ***REMOVED***
+	switch dir {
 	case "":
 		dir = "."
 	case string(filepath.Separator):
 	// nothing
 	default:
 		dir = dir[0 : len(dir)-1] // chop off trailing separator
-	***REMOVED***
+	}
 
-	if !hasMeta(dir) ***REMOVED***
+	if !hasMeta(dir) {
 		return glob(fs, dir, file, nil)
-	***REMOVED***
+	}
 
 	var m []string
 	m, err = Glob(fs, dir)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
-	for _, d := range m ***REMOVED***
+	}
+	for _, d := range m {
 		matches, err = glob(fs, d, file, matches)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}
 
 // glob searches for files matching pattern in the directory dir
 // and appends them to matches. If the directory cannot be
 // opened, it returns the existing matches. New matches are
 // added in lexicographical order.
-func glob(fs Fs, dir, pattern string, matches []string) (m []string, e error) ***REMOVED***
+func glob(fs Fs, dir, pattern string, matches []string) (m []string, e error) {
 	m = matches
 	fi, err := fs.Stat(dir)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
-	if !fi.IsDir() ***REMOVED***
+	}
+	if !fi.IsDir() {
 		return
-	***REMOVED***
+	}
 	d, err := fs.Open(dir)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	defer d.Close()
 
 	names, _ := d.Readdirnames(-1)
 	sort.Strings(names)
 
-	for _, n := range names ***REMOVED***
+	for _, n := range names {
 		matched, err := filepath.Match(pattern, n)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return m, err
-		***REMOVED***
-		if matched ***REMOVED***
+		}
+		if matched {
 			m = append(m, filepath.Join(dir, n))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}
 
 // hasMeta reports whether path contains any of the magic characters
 // recognized by Match.
-func hasMeta(path string) bool ***REMOVED***
+func hasMeta(path string) bool {
 	// TODO(niemeyer): Should other magic characters be added here?
 	return strings.IndexAny(path, "*?[") >= 0
-***REMOVED***
+}

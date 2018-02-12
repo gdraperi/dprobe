@@ -9,52 +9,52 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type link struct ***REMOVED***
+type link struct {
 	parentIP string
 	childIP  string
 	ports    []types.TransportPort
 	bridge   string
-***REMOVED***
+}
 
-func (l *link) String() string ***REMOVED***
+func (l *link) String() string {
 	return fmt.Sprintf("%s <-> %s [%v] on %s", l.parentIP, l.childIP, l.ports, l.bridge)
-***REMOVED***
+}
 
-func newLink(parentIP, childIP string, ports []types.TransportPort, bridge string) *link ***REMOVED***
-	return &link***REMOVED***
+func newLink(parentIP, childIP string, ports []types.TransportPort, bridge string) *link {
+	return &link{
 		childIP:  childIP,
 		parentIP: parentIP,
 		ports:    ports,
 		bridge:   bridge,
-	***REMOVED***
+	}
 
-***REMOVED***
+}
 
-func (l *link) Enable() error ***REMOVED***
+func (l *link) Enable() error {
 	// -A == iptables append flag
-	linkFunction := func() error ***REMOVED***
+	linkFunction := func() error {
 		return linkContainers("-A", l.parentIP, l.childIP, l.ports, l.bridge, false)
-	***REMOVED***
+	}
 
-	iptables.OnReloaded(func() ***REMOVED*** linkFunction() ***REMOVED***)
+	iptables.OnReloaded(func() { linkFunction() })
 	return linkFunction()
-***REMOVED***
+}
 
-func (l *link) Disable() ***REMOVED***
+func (l *link) Disable() {
 	// -D == iptables delete flag
 	err := linkContainers("-D", l.parentIP, l.childIP, l.ports, l.bridge, true)
-	if err != nil ***REMOVED***
+	if err != nil {
 		logrus.Errorf("Error removing IPTables rules for a link %s due to %s", l.String(), err.Error())
-	***REMOVED***
+	}
 	// Return proper error once we move to use a proper iptables package
 	// that returns typed errors
-***REMOVED***
+}
 
 func linkContainers(action, parentIP, childIP string, ports []types.TransportPort, bridge string,
-	ignoreErrors bool) error ***REMOVED***
+	ignoreErrors bool) error {
 	var nfAction iptables.Action
 
-	switch action ***REMOVED***
+	switch action {
 	case "-A":
 		nfAction = iptables.Append
 	case "-I":
@@ -63,23 +63,23 @@ func linkContainers(action, parentIP, childIP string, ports []types.TransportPor
 		nfAction = iptables.Delete
 	default:
 		return InvalidIPTablesCfgError(action)
-	***REMOVED***
+	}
 
 	ip1 := net.ParseIP(parentIP)
-	if ip1 == nil ***REMOVED***
+	if ip1 == nil {
 		return InvalidLinkIPAddrError(parentIP)
-	***REMOVED***
+	}
 	ip2 := net.ParseIP(childIP)
-	if ip2 == nil ***REMOVED***
+	if ip2 == nil {
 		return InvalidLinkIPAddrError(childIP)
-	***REMOVED***
+	}
 
-	chain := iptables.ChainInfo***REMOVED***Name: DockerChain***REMOVED***
-	for _, port := range ports ***REMOVED***
+	chain := iptables.ChainInfo{Name: DockerChain}
+	for _, port := range ports {
 		err := chain.Link(nfAction, ip1, ip2, int(port.Port), port.Proto.String(), bridge)
-		if !ignoreErrors && err != nil ***REMOVED***
+		if !ignoreErrors && err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}

@@ -17,21 +17,21 @@ package idna
 //
 // The per-rune values have the following format:
 //
-//   if mapped ***REMOVED***
-//     if inlinedXOR ***REMOVED***
+//   if mapped {
+//     if inlinedXOR {
 //       15..13 inline XOR marker
 //       12..11 unused
 //       10..3  inline XOR mask
-// ***REMOVED*** else ***REMOVED***
+//     } else {
 //       15..3  index into xor or mapping table
-// ***REMOVED***
-//   ***REMOVED*** else ***REMOVED***
+//     }
+//   } else {
 //       15..14 unused
 //       13     mayNeedNorm
 //       12..11 attributes
 //       10..8  joining type
 //        7..3  category type
-//   ***REMOVED***
+//   }
 //      2  use xor pattern
 //   1..0  mapped category
 //
@@ -91,29 +91,29 @@ const (
 	numJoinTypes
 )
 
-func (c info) isMapped() bool ***REMOVED***
+func (c info) isMapped() bool {
 	return c&0x3 != 0
-***REMOVED***
+}
 
-func (c info) category() category ***REMOVED***
+func (c info) category() category {
 	small := c & catSmallMask
-	if small != 0 ***REMOVED***
+	if small != 0 {
 		return category(small)
-	***REMOVED***
+	}
 	return category(c & catBigMask)
-***REMOVED***
+}
 
-func (c info) joinType() info ***REMOVED***
-	if c.isMapped() ***REMOVED***
+func (c info) joinType() info {
+	if c.isMapped() {
 		return 0
-	***REMOVED***
+	}
 	return (c >> joinShift) & joinMask
-***REMOVED***
+}
 
-func (c info) isModifier() bool ***REMOVED***
+func (c info) isModifier() bool {
 	return c&(modifier|catSmallMask) == modifier
-***REMOVED***
+}
 
-func (c info) isViramaModifier() bool ***REMOVED***
+func (c info) isViramaModifier() bool {
 	return c&(attributesMask|catSmallMask) == viramaModifier
-***REMOVED***
+}

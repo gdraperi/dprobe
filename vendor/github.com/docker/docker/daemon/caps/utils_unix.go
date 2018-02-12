@@ -11,77 +11,77 @@ import (
 
 var capabilityList Capabilities
 
-func init() ***REMOVED***
+func init() {
 	last := capability.CAP_LAST_CAP
 	// hack for RHEL6 which has no /proc/sys/kernel/cap_last_cap
-	if last == capability.Cap(63) ***REMOVED***
+	if last == capability.Cap(63) {
 		last = capability.CAP_BLOCK_SUSPEND
-	***REMOVED***
-	for _, cap := range capability.List() ***REMOVED***
-		if cap > last ***REMOVED***
+	}
+	for _, cap := range capability.List() {
+		if cap > last {
 			continue
-		***REMOVED***
+		}
 		capabilityList = append(capabilityList,
-			&CapabilityMapping***REMOVED***
+			&CapabilityMapping{
 				Key:   "CAP_" + strings.ToUpper(cap.String()),
 				Value: cap,
-			***REMOVED***,
+			},
 		)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 type (
 	// CapabilityMapping maps linux capability name to its value of capability.Cap type
 	// Capabilities is one of the security systems in Linux Security Module (LSM)
 	// framework provided by the kernel.
 	// For more details on capabilities, see http://man7.org/linux/man-pages/man7/capabilities.7.html
-	CapabilityMapping struct ***REMOVED***
+	CapabilityMapping struct {
 		Key   string         `json:"key,omitempty"`
 		Value capability.Cap `json:"value,omitempty"`
-	***REMOVED***
+	}
 	// Capabilities contains all CapabilityMapping
 	Capabilities []*CapabilityMapping
 )
 
 // String returns <key> of CapabilityMapping
-func (c *CapabilityMapping) String() string ***REMOVED***
+func (c *CapabilityMapping) String() string {
 	return c.Key
-***REMOVED***
+}
 
 // GetCapability returns CapabilityMapping which contains specific key
-func GetCapability(key string) *CapabilityMapping ***REMOVED***
-	for _, capp := range capabilityList ***REMOVED***
-		if capp.Key == key ***REMOVED***
+func GetCapability(key string) *CapabilityMapping {
+	for _, capp := range capabilityList {
+		if capp.Key == key {
 			cpy := *capp
 			return &cpy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
 // GetAllCapabilities returns all of the capabilities
-func GetAllCapabilities() []string ***REMOVED***
+func GetAllCapabilities() []string {
 	output := make([]string, len(capabilityList))
-	for i, capability := range capabilityList ***REMOVED***
+	for i, capability := range capabilityList {
 		output[i] = capability.String()
-	***REMOVED***
+	}
 	return output
-***REMOVED***
+}
 
 // inSlice tests whether a string is contained in a slice of strings or not.
 // Comparison is case insensitive
-func inSlice(slice []string, s string) bool ***REMOVED***
-	for _, ss := range slice ***REMOVED***
-		if strings.ToLower(s) == strings.ToLower(ss) ***REMOVED***
+func inSlice(slice []string, s string) bool {
+	for _, ss := range slice {
+		if strings.ToLower(s) == strings.ToLower(ss) {
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false
-***REMOVED***
+}
 
 // TweakCapabilities can tweak capabilities by adding or dropping capabilities
 // based on the basics capabilities.
-func TweakCapabilities(basics, adds, drops []string) ([]string, error) ***REMOVED***
+func TweakCapabilities(basics, adds, drops []string) ([]string, error) {
 	var (
 		newCaps []string
 		allCaps = GetAllCapabilities()
@@ -91,51 +91,51 @@ func TweakCapabilities(basics, adds, drops []string) ([]string, error) ***REMOVE
 	// Currently they are mixed in here. We should do conversion in one place.
 
 	// look for invalid cap in the drop list
-	for _, cap := range drops ***REMOVED***
-		if strings.ToLower(cap) == "all" ***REMOVED***
+	for _, cap := range drops {
+		if strings.ToLower(cap) == "all" {
 			continue
-		***REMOVED***
+		}
 
-		if !inSlice(allCaps, "CAP_"+cap) ***REMOVED***
+		if !inSlice(allCaps, "CAP_"+cap) {
 			return nil, fmt.Errorf("Unknown capability drop: %q", cap)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// handle --cap-add=all
-	if inSlice(adds, "all") ***REMOVED***
+	if inSlice(adds, "all") {
 		basics = allCaps
-	***REMOVED***
+	}
 
-	if !inSlice(drops, "all") ***REMOVED***
-		for _, cap := range basics ***REMOVED***
+	if !inSlice(drops, "all") {
+		for _, cap := range basics {
 			// skip `all` already handled above
-			if strings.ToLower(cap) == "all" ***REMOVED***
+			if strings.ToLower(cap) == "all" {
 				continue
-			***REMOVED***
+			}
 
 			// if we don't drop `all`, add back all the non-dropped caps
-			if !inSlice(drops, cap[4:]) ***REMOVED***
+			if !inSlice(drops, cap[4:]) {
 				newCaps = append(newCaps, strings.ToUpper(cap))
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
-	for _, cap := range adds ***REMOVED***
+	for _, cap := range adds {
 		// skip `all` already handled above
-		if strings.ToLower(cap) == "all" ***REMOVED***
+		if strings.ToLower(cap) == "all" {
 			continue
-		***REMOVED***
+		}
 
 		cap = "CAP_" + cap
 
-		if !inSlice(allCaps, cap) ***REMOVED***
+		if !inSlice(allCaps, cap) {
 			return nil, fmt.Errorf("Unknown capability to add: %q", cap)
-		***REMOVED***
+		}
 
 		// add cap if not already in the list
-		if !inSlice(newCaps, cap) ***REMOVED***
+		if !inSlice(newCaps, cap) {
 			newCaps = append(newCaps, strings.ToUpper(cap))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return newCaps, nil
-***REMOVED***
+}

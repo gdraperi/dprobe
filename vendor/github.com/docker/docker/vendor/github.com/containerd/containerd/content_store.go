@@ -11,198 +11,198 @@ import (
 	digest "github.com/opencontainers/go-digest"
 )
 
-type remoteContent struct ***REMOVED***
+type remoteContent struct {
 	client contentapi.ContentClient
-***REMOVED***
+}
 
 // NewContentStoreFromClient returns a new content store
-func NewContentStoreFromClient(client contentapi.ContentClient) content.Store ***REMOVED***
-	return &remoteContent***REMOVED***
+func NewContentStoreFromClient(client contentapi.ContentClient) content.Store {
+	return &remoteContent{
 		client: client,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (rs *remoteContent) Info(ctx context.Context, dgst digest.Digest) (content.Info, error) ***REMOVED***
-	resp, err := rs.client.Info(ctx, &contentapi.InfoRequest***REMOVED***
+func (rs *remoteContent) Info(ctx context.Context, dgst digest.Digest) (content.Info, error) {
+	resp, err := rs.client.Info(ctx, &contentapi.InfoRequest{
 		Digest: dgst,
-	***REMOVED***)
-	if err != nil ***REMOVED***
-		return content.Info***REMOVED******REMOVED***, errdefs.FromGRPC(err)
-	***REMOVED***
+	})
+	if err != nil {
+		return content.Info{}, errdefs.FromGRPC(err)
+	}
 
 	return infoFromGRPC(resp.Info), nil
-***REMOVED***
+}
 
-func (rs *remoteContent) Walk(ctx context.Context, fn content.WalkFunc, filters ...string) error ***REMOVED***
-	session, err := rs.client.List(ctx, &contentapi.ListContentRequest***REMOVED***
+func (rs *remoteContent) Walk(ctx context.Context, fn content.WalkFunc, filters ...string) error {
+	session, err := rs.client.List(ctx, &contentapi.ListContentRequest{
 		Filters: filters,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		return errdefs.FromGRPC(err)
-	***REMOVED***
+	}
 
-	for ***REMOVED***
+	for {
 		msg, err := session.Recv()
-		if err != nil ***REMOVED***
-			if err != io.EOF ***REMOVED***
+		if err != nil {
+			if err != io.EOF {
 				return errdefs.FromGRPC(err)
-			***REMOVED***
+			}
 
 			break
-		***REMOVED***
+		}
 
-		for _, info := range msg.Info ***REMOVED***
-			if err := fn(infoFromGRPC(info)); err != nil ***REMOVED***
+		for _, info := range msg.Info {
+			if err := fn(infoFromGRPC(info)); err != nil {
 				return err
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (rs *remoteContent) Delete(ctx context.Context, dgst digest.Digest) error ***REMOVED***
-	if _, err := rs.client.Delete(ctx, &contentapi.DeleteContentRequest***REMOVED***
+func (rs *remoteContent) Delete(ctx context.Context, dgst digest.Digest) error {
+	if _, err := rs.client.Delete(ctx, &contentapi.DeleteContentRequest{
 		Digest: dgst,
-	***REMOVED***); err != nil ***REMOVED***
+	}); err != nil {
 		return errdefs.FromGRPC(err)
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (rs *remoteContent) ReaderAt(ctx context.Context, dgst digest.Digest) (content.ReaderAt, error) ***REMOVED***
+func (rs *remoteContent) ReaderAt(ctx context.Context, dgst digest.Digest) (content.ReaderAt, error) {
 	i, err := rs.Info(ctx, dgst)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	return &remoteReaderAt***REMOVED***
+	return &remoteReaderAt{
 		ctx:    ctx,
 		digest: dgst,
 		size:   i.Size,
 		client: rs.client,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-func (rs *remoteContent) Status(ctx context.Context, ref string) (content.Status, error) ***REMOVED***
-	resp, err := rs.client.Status(ctx, &contentapi.StatusRequest***REMOVED***
+func (rs *remoteContent) Status(ctx context.Context, ref string) (content.Status, error) {
+	resp, err := rs.client.Status(ctx, &contentapi.StatusRequest{
 		Ref: ref,
-	***REMOVED***)
-	if err != nil ***REMOVED***
-		return content.Status***REMOVED******REMOVED***, errdefs.FromGRPC(err)
-	***REMOVED***
+	})
+	if err != nil {
+		return content.Status{}, errdefs.FromGRPC(err)
+	}
 
 	status := resp.Status
-	return content.Status***REMOVED***
+	return content.Status{
 		Ref:       status.Ref,
 		StartedAt: status.StartedAt,
 		UpdatedAt: status.UpdatedAt,
 		Offset:    status.Offset,
 		Total:     status.Total,
 		Expected:  status.Expected,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-func (rs *remoteContent) Update(ctx context.Context, info content.Info, fieldpaths ...string) (content.Info, error) ***REMOVED***
-	resp, err := rs.client.Update(ctx, &contentapi.UpdateRequest***REMOVED***
+func (rs *remoteContent) Update(ctx context.Context, info content.Info, fieldpaths ...string) (content.Info, error) {
+	resp, err := rs.client.Update(ctx, &contentapi.UpdateRequest{
 		Info: infoToGRPC(info),
-		UpdateMask: &protobuftypes.FieldMask***REMOVED***
+		UpdateMask: &protobuftypes.FieldMask{
 			Paths: fieldpaths,
-		***REMOVED***,
-	***REMOVED***)
-	if err != nil ***REMOVED***
-		return content.Info***REMOVED******REMOVED***, errdefs.FromGRPC(err)
-	***REMOVED***
+		},
+	})
+	if err != nil {
+		return content.Info{}, errdefs.FromGRPC(err)
+	}
 	return infoFromGRPC(resp.Info), nil
-***REMOVED***
+}
 
-func (rs *remoteContent) ListStatuses(ctx context.Context, filters ...string) ([]content.Status, error) ***REMOVED***
-	resp, err := rs.client.ListStatuses(ctx, &contentapi.ListStatusesRequest***REMOVED***
+func (rs *remoteContent) ListStatuses(ctx context.Context, filters ...string) ([]content.Status, error) {
+	resp, err := rs.client.ListStatuses(ctx, &contentapi.ListStatusesRequest{
 		Filters: filters,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		return nil, errdefs.FromGRPC(err)
-	***REMOVED***
+	}
 
 	var statuses []content.Status
-	for _, status := range resp.Statuses ***REMOVED***
-		statuses = append(statuses, content.Status***REMOVED***
+	for _, status := range resp.Statuses {
+		statuses = append(statuses, content.Status{
 			Ref:       status.Ref,
 			StartedAt: status.StartedAt,
 			UpdatedAt: status.UpdatedAt,
 			Offset:    status.Offset,
 			Total:     status.Total,
 			Expected:  status.Expected,
-		***REMOVED***)
-	***REMOVED***
+		})
+	}
 
 	return statuses, nil
-***REMOVED***
+}
 
-func (rs *remoteContent) Writer(ctx context.Context, ref string, size int64, expected digest.Digest) (content.Writer, error) ***REMOVED***
+func (rs *remoteContent) Writer(ctx context.Context, ref string, size int64, expected digest.Digest) (content.Writer, error) {
 	wrclient, offset, err := rs.negotiate(ctx, ref, size, expected)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, errdefs.FromGRPC(err)
-	***REMOVED***
+	}
 
-	return &remoteWriter***REMOVED***
+	return &remoteWriter{
 		ref:    ref,
 		client: wrclient,
 		offset: offset,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // Abort implements asynchronous abort. It starts a new write session on the ref l
-func (rs *remoteContent) Abort(ctx context.Context, ref string) error ***REMOVED***
-	if _, err := rs.client.Abort(ctx, &contentapi.AbortRequest***REMOVED***
+func (rs *remoteContent) Abort(ctx context.Context, ref string) error {
+	if _, err := rs.client.Abort(ctx, &contentapi.AbortRequest{
 		Ref: ref,
-	***REMOVED***); err != nil ***REMOVED***
+	}); err != nil {
 		return errdefs.FromGRPC(err)
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (rs *remoteContent) negotiate(ctx context.Context, ref string, size int64, expected digest.Digest) (contentapi.Content_WriteClient, int64, error) ***REMOVED***
+func (rs *remoteContent) negotiate(ctx context.Context, ref string, size int64, expected digest.Digest) (contentapi.Content_WriteClient, int64, error) {
 	wrclient, err := rs.client.Write(ctx)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, 0, err
-	***REMOVED***
+	}
 
-	if err := wrclient.Send(&contentapi.WriteContentRequest***REMOVED***
+	if err := wrclient.Send(&contentapi.WriteContentRequest{
 		Action:   contentapi.WriteActionStat,
 		Ref:      ref,
 		Total:    size,
 		Expected: expected,
-	***REMOVED***); err != nil ***REMOVED***
+	}); err != nil {
 		return nil, 0, err
-	***REMOVED***
+	}
 
 	resp, err := wrclient.Recv()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, 0, err
-	***REMOVED***
+	}
 
 	return wrclient, resp.Offset, nil
-***REMOVED***
+}
 
-func infoToGRPC(info content.Info) contentapi.Info ***REMOVED***
-	return contentapi.Info***REMOVED***
+func infoToGRPC(info content.Info) contentapi.Info {
+	return contentapi.Info{
 		Digest:    info.Digest,
 		Size_:     info.Size,
 		CreatedAt: info.CreatedAt,
 		UpdatedAt: info.UpdatedAt,
 		Labels:    info.Labels,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func infoFromGRPC(info contentapi.Info) content.Info ***REMOVED***
-	return content.Info***REMOVED***
+func infoFromGRPC(info contentapi.Info) content.Info {
+	return content.Info{
 		Digest:    info.Digest,
 		Size:      info.Size_,
 		CreatedAt: info.CreatedAt,
 		UpdatedAt: info.UpdatedAt,
 		Labels:    info.Labels,
-	***REMOVED***
-***REMOVED***
+	}
+}

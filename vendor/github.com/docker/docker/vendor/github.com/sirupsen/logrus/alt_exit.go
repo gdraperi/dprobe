@@ -27,29 +27,29 @@ import (
 	"os"
 )
 
-var handlers = []func()***REMOVED******REMOVED***
+var handlers = []func(){}
 
-func runHandler(handler func()) ***REMOVED***
-	defer func() ***REMOVED***
-		if err := recover(); err != nil ***REMOVED***
+func runHandler(handler func()) {
+	defer func() {
+		if err := recover(); err != nil {
 			fmt.Fprintln(os.Stderr, "Error: Logrus exit handler error:", err)
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
 	handler()
-***REMOVED***
+}
 
-func runHandlers() ***REMOVED***
-	for _, handler := range handlers ***REMOVED***
+func runHandlers() {
+	for _, handler := range handlers {
 		runHandler(handler)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Exit runs all the Logrus atexit handlers and then terminates the program using os.Exit(code)
-func Exit(code int) ***REMOVED***
+func Exit(code int) {
 	runHandlers()
 	os.Exit(code)
-***REMOVED***
+}
 
 // RegisterExitHandler adds a Logrus Exit handler, call logrus.Exit to invoke
 // all handlers. The handlers will also be invoked when any Fatal log entry is
@@ -59,6 +59,6 @@ func Exit(code int) ***REMOVED***
 // message but also needs to gracefully shutdown. An example usecase could be
 // closing database connections, or sending a alert that the application is
 // closing.
-func RegisterExitHandler(handler func()) ***REMOVED***
+func RegisterExitHandler(handler func()) {
 	handlers = append(handlers, handler)
-***REMOVED***
+}

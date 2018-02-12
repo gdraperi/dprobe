@@ -12,39 +12,39 @@ import (
 	"testing"
 )
 
-func TestParseUserAttribute(t *testing.T) ***REMOVED***
+func TestParseUserAttribute(t *testing.T) {
 	r := base64.NewDecoder(base64.StdEncoding, bytes.NewBufferString(userAttributePacket))
-	for i := 0; i < 2; i++ ***REMOVED***
+	for i := 0; i < 2; i++ {
 		p, err := Read(r)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
+		}
 		uat := p.(*UserAttribute)
 		imgs := uat.ImageData()
-		if len(imgs) != 1 ***REMOVED***
+		if len(imgs) != 1 {
 			t.Errorf("Unexpected number of images in user attribute packet: %d", len(imgs))
-		***REMOVED***
-		if len(imgs[0]) != 3395 ***REMOVED***
+		}
+		if len(imgs[0]) != 3395 {
 			t.Errorf("Unexpected JPEG image size: %d", len(imgs[0]))
-		***REMOVED***
+		}
 		img, err := jpeg.Decode(bytes.NewBuffer(imgs[0]))
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Errorf("Error decoding JPEG image: %v", err)
-		***REMOVED***
+		}
 		// A pixel in my right eye.
 		pixel := color.NRGBAModel.Convert(img.At(56, 36))
-		ref := color.NRGBA***REMOVED***R: 157, G: 128, B: 124, A: 255***REMOVED***
-		if pixel != ref ***REMOVED***
+		ref := color.NRGBA{R: 157, G: 128, B: 124, A: 255}
+		if pixel != ref {
 			t.Errorf("Unexpected pixel color: %v", pixel)
-		***REMOVED***
+		}
 		w := bytes.NewBuffer(nil)
 		err = uat.Serialize(w)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Errorf("Error writing user attribute: %v", err)
-		***REMOVED***
+		}
 		r = bytes.NewBuffer(w.Bytes())
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 const userAttributePacket = `
 0cyWzJQBEAABAQAAAAAAAAAAAAAAAP/Y/+AAEEpGSUYAAQIAAAEAAQAA/9sAQwAFAwQEBAMFBAQE

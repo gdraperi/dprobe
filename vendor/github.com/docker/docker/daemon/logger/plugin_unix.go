@@ -11,10 +11,10 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-func openPluginStream(a *pluginAdapter) (io.WriteCloser, error) ***REMOVED***
+func openPluginStream(a *pluginAdapter) (io.WriteCloser, error) {
 	f, err := fifo.OpenFifo(context.Background(), a.fifoPath, unix.O_WRONLY|unix.O_CREAT|unix.O_NONBLOCK, 0700)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, errors.Wrapf(err, "error creating i/o pipe for log plugin: %s", a.Name())
-	***REMOVED***
+	}
 	return f, nil
-***REMOVED***
+}

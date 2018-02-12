@@ -3,16 +3,16 @@ package httputils
 import "testing"
 
 // matchesContentType
-func TestJsonContentType(t *testing.T) ***REMOVED***
-	if !matchesContentType("application/json", "application/json") ***REMOVED***
+func TestJsonContentType(t *testing.T) {
+	if !matchesContentType("application/json", "application/json") {
 		t.Fail()
-	***REMOVED***
+	}
 
-	if !matchesContentType("application/json; charset=utf-8", "application/json") ***REMOVED***
+	if !matchesContentType("application/json; charset=utf-8", "application/json") {
 		t.Fail()
-	***REMOVED***
+	}
 
-	if matchesContentType("dockerapplication/json", "application/json") ***REMOVED***
+	if matchesContentType("dockerapplication/json", "application/json") {
 		t.Fail()
-	***REMOVED***
-***REMOVED***
+	}
+}

@@ -10,7 +10,7 @@
 <meta name='flags' content='http'>
 <meta name="assert" content="A page with no encoding information in HTTP, BOM, XML declaration or meta element will be treated as UTF-8.">
 <style type='text/css'>
-.test div ***REMOVED*** width: 50px; ***REMOVED***</style>
+.test div { width: 50px; }</style>
 <link rel="stylesheet" type="text/css" href="the-input-byte-stream/support/encodingtests-utf8.css">
 </head>
 <body>
@@ -36,9 +36,9 @@
 <div class='prereq'>Assumptions: <ul><li>The test is read from a server that supports HTTP.</li></ul></div>
 </div>
 <script>
-test(function() ***REMOVED***
+test(function() {
 assert_equals(document.getElementById('box').offsetWidth, 100);
-***REMOVED***, " ");
+}, " ");
 </script>
 
 </body>

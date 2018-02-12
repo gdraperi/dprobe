@@ -12,7 +12,7 @@ import "io"
 // trie value block. A trie value block holds all possible values for the last
 // byte of a UTF-8 encoded rune. Excluding ASCII characters, a trie value block
 // always has 64 values, as a UTF-8 encoding ends with a byte in [0x80, 0xC0).
-type Compacter interface ***REMOVED***
+type Compacter interface {
 	// Size returns whether the Compacter could encode the given block as well
 	// as its size in case it can. len(v) is always 64.
 	Size(v []uint64) (sz int, ok bool)
@@ -32,27 +32,27 @@ type Compacter interface ***REMOVED***
 	// encoding, where 0x80 <= b < 0xC0, for which to do the lookup in the
 	// block.
 	Handler() string
-***REMOVED***
+}
 
 // simpleCompacter is the default Compacter used by builder. It implements a
 // normal trie block.
 type simpleCompacter builder
 
-func (b *simpleCompacter) Size([]uint64) (sz int, ok bool) ***REMOVED***
+func (b *simpleCompacter) Size([]uint64) (sz int, ok bool) {
 	return blockSize * b.ValueSize, true
-***REMOVED***
+}
 
-func (b *simpleCompacter) Store(v []uint64) uint32 ***REMOVED***
+func (b *simpleCompacter) Store(v []uint64) uint32 {
 	h := uint32(len(b.ValueBlocks) - blockOffset)
 	b.ValueBlocks = append(b.ValueBlocks, v)
 	return h
-***REMOVED***
+}
 
-func (b *simpleCompacter) Print(io.Writer) error ***REMOVED***
+func (b *simpleCompacter) Print(io.Writer) error {
 	// Structures are printed in print.go.
 	return nil
-***REMOVED***
+}
 
-func (b *simpleCompacter) Handler() string ***REMOVED***
+func (b *simpleCompacter) Handler() string {
 	panic("Handler should be special-cased for this Compacter")
-***REMOVED***
+}

@@ -39,19 +39,19 @@ var (
 
 type headerError []string
 
-func (he headerError) Error() string ***REMOVED***
+func (he headerError) Error() string {
 	const prefix = "tar: cannot encode header"
 	var ss []string
-	for _, s := range he ***REMOVED***
-		if s != "" ***REMOVED***
+	for _, s := range he {
+		if s != "" {
 			ss = append(ss, s)
-		***REMOVED***
-	***REMOVED***
-	if len(ss) == 0 ***REMOVED***
+		}
+	}
+	if len(ss) == 0 {
 		return prefix
-	***REMOVED***
+	}
 	return fmt.Sprintf("%s: %v", prefix, strings.Join(ss, "; and "))
-***REMOVED***
+}
 
 // Type flags for Header.Typeflag.
 const (
@@ -127,10 +127,10 @@ const (
 // This does not contain "charset" or "comment", which are both PAX-specific,
 // so adding them as first-class features of Header is unlikely.
 // Users can use the PAXRecords field to set it themselves.
-var basicKeys = map[string]bool***REMOVED***
+var basicKeys = map[string]bool{
 	paxPath: true, paxLinkpath: true, paxSize: true, paxUid: true, paxGid: true,
 	paxUname: true, paxGname: true, paxMtime: true, paxAtime: true, paxCtime: true,
-***REMOVED***
+}
 
 // A Header represents a single header in a tar archive.
 // Some fields may not be populated.
@@ -139,7 +139,7 @@ var basicKeys = map[string]bool***REMOVED***
 // mutate it in some ways, and then pass it back to Writer.WriteHeader
 // should do so by creating a new Header and copying the fields
 // that they are interested in preserving.
-type Header struct ***REMOVED***
+type Header struct {
 	Typeflag byte // Type of header entry (should be TypeReg for most files)
 
 	Name     string // Name of file entry
@@ -212,12 +212,12 @@ type Header struct ***REMOVED***
 	// then it uses the first format (in the order of USTAR, PAX, GNU)
 	// capable of encoding this Header (see Format).
 	Format Format
-***REMOVED***
+}
 
 // SparseEntry represents a Length-sized fragment at Offset in the file.
-type SparseEntry struct***REMOVED*** Offset, Length int64 ***REMOVED***
+type SparseEntry struct{ Offset, Length int64 }
 
-func (s SparseEntry) endOffset() int64 ***REMOVED*** return s.Offset + s.Length ***REMOVED***
+func (s SparseEntry) endOffset() int64 { return s.Offset + s.Length }
 
 // A sparse file can be represented as either a sparseDatas or a sparseHoles.
 // As long as the total size is known, they are equivalent and one can be
@@ -236,15 +236,15 @@ func (s SparseEntry) endOffset() int64 ***REMOVED*** return s.Offset + s.Length 
 //	var compactFile = "abcdefgh"
 //
 // And the sparse map has the following entries:
-//	var spd sparseDatas = []sparseEntry***REMOVED***
-//		***REMOVED***Offset: 2,  Length: 5***REMOVED***,  // Data fragment for 2..6
-//		***REMOVED***Offset: 18, Length: 3***REMOVED***,  // Data fragment for 18..20
-//	***REMOVED***
-//	var sph sparseHoles = []SparseEntry***REMOVED***
-//		***REMOVED***Offset: 0,  Length: 2***REMOVED***,  // Hole fragment for 0..1
-//		***REMOVED***Offset: 7,  Length: 11***REMOVED***, // Hole fragment for 7..17
-//		***REMOVED***Offset: 21, Length: 4***REMOVED***,  // Hole fragment for 21..24
-//	***REMOVED***
+//	var spd sparseDatas = []sparseEntry{
+//		{Offset: 2,  Length: 5},  // Data fragment for 2..6
+//		{Offset: 18, Length: 3},  // Data fragment for 18..20
+//	}
+//	var sph sparseHoles = []SparseEntry{
+//		{Offset: 0,  Length: 2},  // Hole fragment for 0..1
+//		{Offset: 7,  Length: 11}, // Hole fragment for 7..17
+//		{Offset: 21, Length: 4},  // Hole fragment for 21..24
+//	}
 //
 // Then the content of the resulting sparse file with a Header.Size of 25 is:
 //	var sparseFile = "\x00"*2 + "abcde" + "\x00"*11 + "fgh" + "\x00"*4
@@ -255,15 +255,15 @@ type (
 
 // validateSparseEntries reports whether sp is a valid sparse map.
 // It does not matter whether sp represents data fragments or hole fragments.
-func validateSparseEntries(sp []SparseEntry, size int64) bool ***REMOVED***
+func validateSparseEntries(sp []SparseEntry, size int64) bool {
 	// Validate all sparse entries. These are the same checks as performed by
 	// the BSD tar utility.
-	if size < 0 ***REMOVED***
+	if size < 0 {
 		return false
-	***REMOVED***
+	}
 	var pre SparseEntry
-	for _, cur := range sp ***REMOVED***
-		switch ***REMOVED***
+	for _, cur := range sp {
+		switch {
 		case cur.Offset < 0 || cur.Length < 0:
 			return false // Negative values are never okay
 		case cur.Offset > math.MaxInt64-cur.Length:
@@ -272,11 +272,11 @@ func validateSparseEntries(sp []SparseEntry, size int64) bool ***REMOVED***
 			return false // Region extends beyond the actual size
 		case pre.endOffset() > cur.Offset:
 			return false // Regions cannot overlap and must be in order
-		***REMOVED***
+		}
 		pre = cur
-	***REMOVED***
+	}
 	return true
-***REMOVED***
+}
 
 // alignSparseEntries mutates src and returns dst where each fragment's
 // starting offset is aligned up to the nearest block edge, and each
@@ -285,20 +285,20 @@ func validateSparseEntries(sp []SparseEntry, size int64) bool ***REMOVED***
 // Even though the Go tar Reader and the BSD tar utility can handle entries
 // with arbitrary offsets and lengths, the GNU tar utility can only handle
 // offsets and lengths that are multiples of blockSize.
-func alignSparseEntries(src []SparseEntry, size int64) []SparseEntry ***REMOVED***
+func alignSparseEntries(src []SparseEntry, size int64) []SparseEntry {
 	dst := src[:0]
-	for _, s := range src ***REMOVED***
+	for _, s := range src {
 		pos, end := s.Offset, s.endOffset()
 		pos += blockPadding(+pos) // Round-up to nearest blockSize
-		if end != size ***REMOVED***
+		if end != size {
 			end -= blockPadding(-end) // Round-down to nearest blockSize
-		***REMOVED***
-		if pos < end ***REMOVED***
-			dst = append(dst, SparseEntry***REMOVED***Offset: pos, Length: end - pos***REMOVED***)
-		***REMOVED***
-	***REMOVED***
+		}
+		if pos < end {
+			dst = append(dst, SparseEntry{Offset: pos, Length: end - pos})
+		}
+	}
 	return dst
-***REMOVED***
+}
 
 // invertSparseEntries converts a sparse map from one form to the other.
 // If the input is sparseHoles, then it will output sparseDatas and vice-versa.
@@ -308,31 +308,31 @@ func alignSparseEntries(src []SparseEntry, size int64) []SparseEntry ***REMOVED*
 //	* adjacent fragments are coalesced together
 //	* only the last fragment may be empty
 //	* the endOffset of the last fragment is the total size
-func invertSparseEntries(src []SparseEntry, size int64) []SparseEntry ***REMOVED***
+func invertSparseEntries(src []SparseEntry, size int64) []SparseEntry {
 	dst := src[:0]
 	var pre SparseEntry
-	for _, cur := range src ***REMOVED***
-		if cur.Length == 0 ***REMOVED***
+	for _, cur := range src {
+		if cur.Length == 0 {
 			continue // Skip empty fragments
-		***REMOVED***
+		}
 		pre.Length = cur.Offset - pre.Offset
-		if pre.Length > 0 ***REMOVED***
+		if pre.Length > 0 {
 			dst = append(dst, pre) // Only add non-empty fragments
-		***REMOVED***
+		}
 		pre.Offset = cur.endOffset()
-	***REMOVED***
+	}
 	pre.Length = size - pre.Offset // Possibly the only empty fragment
 	return append(dst, pre)
-***REMOVED***
+}
 
 // fileState tracks the number of logical (includes sparse holes) and physical
 // (actual in tar archive) bytes remaining for the current file.
 //
 // Invariant: LogicalRemaining >= PhysicalRemaining
-type fileState interface ***REMOVED***
+type fileState interface {
 	LogicalRemaining() int64
 	PhysicalRemaining() int64
-***REMOVED***
+}
 
 // allowedFormats determines which formats can be used.
 // The value returned is the logical OR of multiple possible formats.
@@ -342,86 +342,86 @@ type fileState interface ***REMOVED***
 // As a by-product of checking the fields, this function returns paxHdrs, which
 // contain all fields that could not be directly encoded.
 // A value receiver ensures that this method does not mutate the source Header.
-func (h Header) allowedFormats() (format Format, paxHdrs map[string]string, err error) ***REMOVED***
+func (h Header) allowedFormats() (format Format, paxHdrs map[string]string, err error) {
 	format = FormatUSTAR | FormatPAX | FormatGNU
 	paxHdrs = make(map[string]string)
 
 	var whyNoUSTAR, whyNoPAX, whyNoGNU string
 	var preferPAX bool // Prefer PAX over USTAR
-	verifyString := func(s string, size int, name, paxKey string) ***REMOVED***
+	verifyString := func(s string, size int, name, paxKey string) {
 		// NUL-terminator is optional for path and linkpath.
 		// Technically, it is required for uname and gname,
 		// but neither GNU nor BSD tar checks for it.
 		tooLong := len(s) > size
 		allowLongGNU := paxKey == paxPath || paxKey == paxLinkpath
-		if hasNUL(s) || (tooLong && !allowLongGNU) ***REMOVED***
+		if hasNUL(s) || (tooLong && !allowLongGNU) {
 			whyNoGNU = fmt.Sprintf("GNU cannot encode %s=%q", name, s)
 			format.mustNotBe(FormatGNU)
-		***REMOVED***
-		if !isASCII(s) || tooLong ***REMOVED***
+		}
+		if !isASCII(s) || tooLong {
 			canSplitUSTAR := paxKey == paxPath
-			if _, _, ok := splitUSTARPath(s); !canSplitUSTAR || !ok ***REMOVED***
+			if _, _, ok := splitUSTARPath(s); !canSplitUSTAR || !ok {
 				whyNoUSTAR = fmt.Sprintf("USTAR cannot encode %s=%q", name, s)
 				format.mustNotBe(FormatUSTAR)
-			***REMOVED***
-			if paxKey == paxNone ***REMOVED***
+			}
+			if paxKey == paxNone {
 				whyNoPAX = fmt.Sprintf("PAX cannot encode %s=%q", name, s)
 				format.mustNotBe(FormatPAX)
-			***REMOVED*** else ***REMOVED***
+			} else {
 				paxHdrs[paxKey] = s
-			***REMOVED***
-		***REMOVED***
-		if v, ok := h.PAXRecords[paxKey]; ok && v == s ***REMOVED***
+			}
+		}
+		if v, ok := h.PAXRecords[paxKey]; ok && v == s {
 			paxHdrs[paxKey] = v
-		***REMOVED***
-	***REMOVED***
-	verifyNumeric := func(n int64, size int, name, paxKey string) ***REMOVED***
-		if !fitsInBase256(size, n) ***REMOVED***
+		}
+	}
+	verifyNumeric := func(n int64, size int, name, paxKey string) {
+		if !fitsInBase256(size, n) {
 			whyNoGNU = fmt.Sprintf("GNU cannot encode %s=%d", name, n)
 			format.mustNotBe(FormatGNU)
-		***REMOVED***
-		if !fitsInOctal(size, n) ***REMOVED***
+		}
+		if !fitsInOctal(size, n) {
 			whyNoUSTAR = fmt.Sprintf("USTAR cannot encode %s=%d", name, n)
 			format.mustNotBe(FormatUSTAR)
-			if paxKey == paxNone ***REMOVED***
+			if paxKey == paxNone {
 				whyNoPAX = fmt.Sprintf("PAX cannot encode %s=%d", name, n)
 				format.mustNotBe(FormatPAX)
-			***REMOVED*** else ***REMOVED***
+			} else {
 				paxHdrs[paxKey] = strconv.FormatInt(n, 10)
-			***REMOVED***
-		***REMOVED***
-		if v, ok := h.PAXRecords[paxKey]; ok && v == strconv.FormatInt(n, 10) ***REMOVED***
+			}
+		}
+		if v, ok := h.PAXRecords[paxKey]; ok && v == strconv.FormatInt(n, 10) {
 			paxHdrs[paxKey] = v
-		***REMOVED***
-	***REMOVED***
-	verifyTime := func(ts time.Time, size int, name, paxKey string) ***REMOVED***
-		if ts.IsZero() ***REMOVED***
+		}
+	}
+	verifyTime := func(ts time.Time, size int, name, paxKey string) {
+		if ts.IsZero() {
 			return // Always okay
-		***REMOVED***
-		if !fitsInBase256(size, ts.Unix()) ***REMOVED***
+		}
+		if !fitsInBase256(size, ts.Unix()) {
 			whyNoGNU = fmt.Sprintf("GNU cannot encode %s=%v", name, ts)
 			format.mustNotBe(FormatGNU)
-		***REMOVED***
+		}
 		isMtime := paxKey == paxMtime
 		fitsOctal := fitsInOctal(size, ts.Unix())
-		if (isMtime && !fitsOctal) || !isMtime ***REMOVED***
+		if (isMtime && !fitsOctal) || !isMtime {
 			whyNoUSTAR = fmt.Sprintf("USTAR cannot encode %s=%v", name, ts)
 			format.mustNotBe(FormatUSTAR)
-		***REMOVED***
+		}
 		needsNano := ts.Nanosecond() != 0
-		if !isMtime || !fitsOctal || needsNano ***REMOVED***
+		if !isMtime || !fitsOctal || needsNano {
 			preferPAX = true // USTAR may truncate sub-second measurements
-			if paxKey == paxNone ***REMOVED***
+			if paxKey == paxNone {
 				whyNoPAX = fmt.Sprintf("PAX cannot encode %s=%v", name, ts)
 				format.mustNotBe(FormatPAX)
-			***REMOVED*** else ***REMOVED***
+			} else {
 				paxHdrs[paxKey] = formatPAXTime(ts)
-			***REMOVED***
-		***REMOVED***
-		if v, ok := h.PAXRecords[paxKey]; ok && v == formatPAXTime(ts) ***REMOVED***
+			}
+		}
+		if v, ok := h.PAXRecords[paxKey]; ok && v == formatPAXTime(ts) {
 			paxHdrs[paxKey] = v
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Check basic fields.
 	var blk block
@@ -444,93 +444,93 @@ func (h Header) allowedFormats() (format Format, paxHdrs map[string]string, err 
 
 	// Check for header-only types.
 	var whyOnlyPAX, whyOnlyGNU string
-	switch h.Typeflag ***REMOVED***
+	switch h.Typeflag {
 	case TypeReg, TypeChar, TypeBlock, TypeFifo, TypeGNUSparse:
 		// Exclude TypeLink and TypeSymlink, since they may reference directories.
-		if strings.HasSuffix(h.Name, "/") ***REMOVED***
-			return FormatUnknown, nil, headerError***REMOVED***"filename may not have trailing slash"***REMOVED***
-		***REMOVED***
+		if strings.HasSuffix(h.Name, "/") {
+			return FormatUnknown, nil, headerError{"filename may not have trailing slash"}
+		}
 	case TypeXHeader, TypeGNULongName, TypeGNULongLink:
-		return FormatUnknown, nil, headerError***REMOVED***"cannot manually encode TypeXHeader, TypeGNULongName, or TypeGNULongLink headers"***REMOVED***
+		return FormatUnknown, nil, headerError{"cannot manually encode TypeXHeader, TypeGNULongName, or TypeGNULongLink headers"}
 	case TypeXGlobalHeader:
-		if !reflect.DeepEqual(h, Header***REMOVED***Typeflag: h.Typeflag, Xattrs: h.Xattrs, PAXRecords: h.PAXRecords, Format: h.Format***REMOVED***) ***REMOVED***
-			return FormatUnknown, nil, headerError***REMOVED***"only PAXRecords may be set for TypeXGlobalHeader"***REMOVED***
-		***REMOVED***
+		if !reflect.DeepEqual(h, Header{Typeflag: h.Typeflag, Xattrs: h.Xattrs, PAXRecords: h.PAXRecords, Format: h.Format}) {
+			return FormatUnknown, nil, headerError{"only PAXRecords may be set for TypeXGlobalHeader"}
+		}
 		whyOnlyPAX = "only PAX supports TypeXGlobalHeader"
 		format.mayOnlyBe(FormatPAX)
-	***REMOVED***
-	if !isHeaderOnlyType(h.Typeflag) && h.Size < 0 ***REMOVED***
-		return FormatUnknown, nil, headerError***REMOVED***"negative size on header-only type"***REMOVED***
-	***REMOVED***
+	}
+	if !isHeaderOnlyType(h.Typeflag) && h.Size < 0 {
+		return FormatUnknown, nil, headerError{"negative size on header-only type"}
+	}
 
 	// Check PAX records.
-	if len(h.Xattrs) > 0 ***REMOVED***
-		for k, v := range h.Xattrs ***REMOVED***
+	if len(h.Xattrs) > 0 {
+		for k, v := range h.Xattrs {
 			paxHdrs[paxSchilyXattr+k] = v
-		***REMOVED***
+		}
 		whyOnlyPAX = "only PAX supports Xattrs"
 		format.mayOnlyBe(FormatPAX)
-	***REMOVED***
-	if len(h.PAXRecords) > 0 ***REMOVED***
-		for k, v := range h.PAXRecords ***REMOVED***
-			switch _, exists := paxHdrs[k]; ***REMOVED***
+	}
+	if len(h.PAXRecords) > 0 {
+		for k, v := range h.PAXRecords {
+			switch _, exists := paxHdrs[k]; {
 			case exists:
 				continue // Do not overwrite existing records
 			case h.Typeflag == TypeXGlobalHeader:
 				paxHdrs[k] = v // Copy all records
 			case !basicKeys[k] && !strings.HasPrefix(k, paxGNUSparse):
 				paxHdrs[k] = v // Ignore local records that may conflict
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		whyOnlyPAX = "only PAX supports PAXRecords"
 		format.mayOnlyBe(FormatPAX)
-	***REMOVED***
-	for k, v := range paxHdrs ***REMOVED***
-		if !validPAXRecord(k, v) ***REMOVED***
-			return FormatUnknown, nil, headerError***REMOVED***fmt.Sprintf("invalid PAX record: %q", k+" = "+v)***REMOVED***
-		***REMOVED***
-	***REMOVED***
+	}
+	for k, v := range paxHdrs {
+		if !validPAXRecord(k, v) {
+			return FormatUnknown, nil, headerError{fmt.Sprintf("invalid PAX record: %q", k+" = "+v)}
+		}
+	}
 
 	// Check sparse files.
-	if len(h.SparseHoles) > 0 || h.Typeflag == TypeGNUSparse ***REMOVED***
-		if isHeaderOnlyType(h.Typeflag) ***REMOVED***
-			return FormatUnknown, nil, headerError***REMOVED***"header-only type cannot be sparse"***REMOVED***
-		***REMOVED***
-		if !validateSparseEntries(h.SparseHoles, h.Size) ***REMOVED***
-			return FormatUnknown, nil, headerError***REMOVED***"invalid sparse holes"***REMOVED***
-		***REMOVED***
-		if h.Typeflag == TypeGNUSparse ***REMOVED***
+	if len(h.SparseHoles) > 0 || h.Typeflag == TypeGNUSparse {
+		if isHeaderOnlyType(h.Typeflag) {
+			return FormatUnknown, nil, headerError{"header-only type cannot be sparse"}
+		}
+		if !validateSparseEntries(h.SparseHoles, h.Size) {
+			return FormatUnknown, nil, headerError{"invalid sparse holes"}
+		}
+		if h.Typeflag == TypeGNUSparse {
 			whyOnlyGNU = "only GNU supports TypeGNUSparse"
 			format.mayOnlyBe(FormatGNU)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			whyNoGNU = "GNU supports sparse files only with TypeGNUSparse"
 			format.mustNotBe(FormatGNU)
-		***REMOVED***
+		}
 		whyNoUSTAR = "USTAR does not support sparse files"
 		format.mustNotBe(FormatUSTAR)
-	***REMOVED***
+	}
 
 	// Check desired format.
-	if wantFormat := h.Format; wantFormat != FormatUnknown ***REMOVED***
-		if wantFormat.has(FormatPAX) && !preferPAX ***REMOVED***
+	if wantFormat := h.Format; wantFormat != FormatUnknown {
+		if wantFormat.has(FormatPAX) && !preferPAX {
 			wantFormat.mayBe(FormatUSTAR) // PAX implies USTAR allowed too
-		***REMOVED***
+		}
 		format.mayOnlyBe(wantFormat) // Set union of formats allowed and format wanted
-	***REMOVED***
-	if format == FormatUnknown ***REMOVED***
-		switch h.Format ***REMOVED***
+	}
+	if format == FormatUnknown {
+		switch h.Format {
 		case FormatUSTAR:
-			err = headerError***REMOVED***"Format specifies USTAR", whyNoUSTAR, whyOnlyPAX, whyOnlyGNU***REMOVED***
+			err = headerError{"Format specifies USTAR", whyNoUSTAR, whyOnlyPAX, whyOnlyGNU}
 		case FormatPAX:
-			err = headerError***REMOVED***"Format specifies PAX", whyNoPAX, whyOnlyGNU***REMOVED***
+			err = headerError{"Format specifies PAX", whyNoPAX, whyOnlyGNU}
 		case FormatGNU:
-			err = headerError***REMOVED***"Format specifies GNU", whyNoGNU, whyOnlyPAX***REMOVED***
+			err = headerError{"Format specifies GNU", whyNoGNU, whyOnlyPAX}
 		default:
-			err = headerError***REMOVED***whyNoUSTAR, whyNoPAX, whyNoGNU, whyOnlyPAX, whyOnlyGNU***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			err = headerError{whyNoUSTAR, whyNoPAX, whyNoGNU, whyOnlyPAX, whyOnlyGNU}
+		}
+	}
 	return format, paxHdrs, err
-***REMOVED***
+}
 
 var sysSparseDetect func(f *os.File) (sparseHoles, error)
 var sysSparsePunch func(f *os.File, sph sparseHoles) error
@@ -541,21 +541,21 @@ var sysSparsePunch func(f *os.File, sph sparseHoles) error
 //
 // When packing a sparse file, DetectSparseHoles should be called prior to
 // serializing the header to the archive with Writer.WriteHeader.
-func (h *Header) DetectSparseHoles(f *os.File) (err error) ***REMOVED***
-	defer func() ***REMOVED***
-		if _, serr := f.Seek(0, io.SeekStart); err == nil ***REMOVED***
+func (h *Header) DetectSparseHoles(f *os.File) (err error) {
+	defer func() {
+		if _, serr := f.Seek(0, io.SeekStart); err == nil {
 			err = serr
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
 	h.SparseHoles = nil
-	if sysSparseDetect != nil ***REMOVED***
+	if sysSparseDetect != nil {
 		sph, err := sysSparseDetect(f)
 		h.SparseHoles = sph
 		return err
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // PunchSparseHoles destroys the contents of f, and prepares a sparse file
 // (on supported operating systems and filesystems)
@@ -564,75 +564,75 @@ func (h *Header) DetectSparseHoles(f *os.File) (err error) ***REMOVED***
 //
 // When extracting a sparse file, PunchSparseHoles should be called prior to
 // populating the content of a file with Reader.WriteTo.
-func (h *Header) PunchSparseHoles(f *os.File) (err error) ***REMOVED***
-	defer func() ***REMOVED***
-		if _, serr := f.Seek(0, io.SeekStart); err == nil ***REMOVED***
+func (h *Header) PunchSparseHoles(f *os.File) (err error) {
+	defer func() {
+		if _, serr := f.Seek(0, io.SeekStart); err == nil {
 			err = serr
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
-	if err := f.Truncate(0); err != nil ***REMOVED***
+	if err := f.Truncate(0); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	var size int64
-	if len(h.SparseHoles) > 0 ***REMOVED***
+	if len(h.SparseHoles) > 0 {
 		size = h.SparseHoles[len(h.SparseHoles)-1].endOffset()
-	***REMOVED***
-	if !validateSparseEntries(h.SparseHoles, size) ***REMOVED***
+	}
+	if !validateSparseEntries(h.SparseHoles, size) {
 		return errors.New("tar: invalid sparse holes")
-	***REMOVED***
+	}
 
-	if size == 0 ***REMOVED***
+	if size == 0 {
 		return nil // For non-sparse files, do nothing (other than Truncate)
-	***REMOVED***
-	if sysSparsePunch != nil ***REMOVED***
+	}
+	if sysSparsePunch != nil {
 		return sysSparsePunch(f, h.SparseHoles)
-	***REMOVED***
+	}
 	return f.Truncate(size)
-***REMOVED***
+}
 
 // FileInfo returns an os.FileInfo for the Header.
-func (h *Header) FileInfo() os.FileInfo ***REMOVED***
-	return headerFileInfo***REMOVED***h***REMOVED***
-***REMOVED***
+func (h *Header) FileInfo() os.FileInfo {
+	return headerFileInfo{h}
+}
 
 // headerFileInfo implements os.FileInfo.
-type headerFileInfo struct ***REMOVED***
+type headerFileInfo struct {
 	h *Header
-***REMOVED***
+}
 
-func (fi headerFileInfo) Size() int64        ***REMOVED*** return fi.h.Size ***REMOVED***
-func (fi headerFileInfo) IsDir() bool        ***REMOVED*** return fi.Mode().IsDir() ***REMOVED***
-func (fi headerFileInfo) ModTime() time.Time ***REMOVED*** return fi.h.ModTime ***REMOVED***
-func (fi headerFileInfo) Sys() interface***REMOVED******REMOVED***   ***REMOVED*** return fi.h ***REMOVED***
+func (fi headerFileInfo) Size() int64        { return fi.h.Size }
+func (fi headerFileInfo) IsDir() bool        { return fi.Mode().IsDir() }
+func (fi headerFileInfo) ModTime() time.Time { return fi.h.ModTime }
+func (fi headerFileInfo) Sys() interface{}   { return fi.h }
 
 // Name returns the base name of the file.
-func (fi headerFileInfo) Name() string ***REMOVED***
-	if fi.IsDir() ***REMOVED***
+func (fi headerFileInfo) Name() string {
+	if fi.IsDir() {
 		return path.Base(path.Clean(fi.h.Name))
-	***REMOVED***
+	}
 	return path.Base(fi.h.Name)
-***REMOVED***
+}
 
 // Mode returns the permission and mode bits for the headerFileInfo.
-func (fi headerFileInfo) Mode() (mode os.FileMode) ***REMOVED***
+func (fi headerFileInfo) Mode() (mode os.FileMode) {
 	// Set file permission bits.
 	mode = os.FileMode(fi.h.Mode).Perm()
 
 	// Set setuid, setgid and sticky bits.
-	if fi.h.Mode&c_ISUID != 0 ***REMOVED***
+	if fi.h.Mode&c_ISUID != 0 {
 		mode |= os.ModeSetuid
-	***REMOVED***
-	if fi.h.Mode&c_ISGID != 0 ***REMOVED***
+	}
+	if fi.h.Mode&c_ISGID != 0 {
 		mode |= os.ModeSetgid
-	***REMOVED***
-	if fi.h.Mode&c_ISVTX != 0 ***REMOVED***
+	}
+	if fi.h.Mode&c_ISVTX != 0 {
 		mode |= os.ModeSticky
-	***REMOVED***
+	}
 
 	// Set file mode bits; clear perm, setuid, setgid, and sticky bits.
-	switch m := os.FileMode(fi.h.Mode) &^ 07777; m ***REMOVED***
+	switch m := os.FileMode(fi.h.Mode) &^ 07777; m {
 	case c_ISDIR:
 		mode |= os.ModeDir
 	case c_ISFIFO:
@@ -646,9 +646,9 @@ func (fi headerFileInfo) Mode() (mode os.FileMode) ***REMOVED***
 		mode |= os.ModeCharDevice
 	case c_ISSOCK:
 		mode |= os.ModeSocket
-	***REMOVED***
+	}
 
-	switch fi.h.Typeflag ***REMOVED***
+	switch fi.h.Typeflag {
 	case TypeSymlink:
 		mode |= os.ModeSymlink
 	case TypeChar:
@@ -660,10 +660,10 @@ func (fi headerFileInfo) Mode() (mode os.FileMode) ***REMOVED***
 		mode |= os.ModeDir
 	case TypeFifo:
 		mode |= os.ModeNamedPipe
-	***REMOVED***
+	}
 
 	return mode
-***REMOVED***
+}
 
 // sysStat, if non-nil, populates h from system-dependent fields of fi.
 var sysStat func(fi os.FileInfo, h *Header) error
@@ -696,17 +696,17 @@ const (
 //
 // This function does not populate Header.SparseHoles;
 // for sparse file support, additionally call Header.DetectSparseHoles.
-func FileInfoHeader(fi os.FileInfo, link string) (*Header, error) ***REMOVED***
-	if fi == nil ***REMOVED***
+func FileInfoHeader(fi os.FileInfo, link string) (*Header, error) {
+	if fi == nil {
 		return nil, errors.New("tar: FileInfo is nil")
-	***REMOVED***
+	}
 	fm := fi.Mode()
-	h := &Header***REMOVED***
+	h := &Header{
 		Name:    fi.Name(),
 		ModTime: fi.ModTime(),
 		Mode:    int64(fm.Perm()), // or'd with c_IS* constants later
-	***REMOVED***
-	switch ***REMOVED***
+	}
+	switch {
 	case fm.IsRegular():
 		h.Typeflag = TypeReg
 		h.Size = fi.Size()
@@ -717,30 +717,30 @@ func FileInfoHeader(fi os.FileInfo, link string) (*Header, error) ***REMOVED***
 		h.Typeflag = TypeSymlink
 		h.Linkname = link
 	case fm&os.ModeDevice != 0:
-		if fm&os.ModeCharDevice != 0 ***REMOVED***
+		if fm&os.ModeCharDevice != 0 {
 			h.Typeflag = TypeChar
-		***REMOVED*** else ***REMOVED***
+		} else {
 			h.Typeflag = TypeBlock
-		***REMOVED***
+		}
 	case fm&os.ModeNamedPipe != 0:
 		h.Typeflag = TypeFifo
 	case fm&os.ModeSocket != 0:
 		return nil, fmt.Errorf("tar: sockets not supported")
 	default:
 		return nil, fmt.Errorf("tar: unknown file mode %v", fm)
-	***REMOVED***
-	if fm&os.ModeSetuid != 0 ***REMOVED***
+	}
+	if fm&os.ModeSetuid != 0 {
 		h.Mode |= c_ISUID
-	***REMOVED***
-	if fm&os.ModeSetgid != 0 ***REMOVED***
+	}
+	if fm&os.ModeSetgid != 0 {
 		h.Mode |= c_ISGID
-	***REMOVED***
-	if fm&os.ModeSticky != 0 ***REMOVED***
+	}
+	if fm&os.ModeSticky != 0 {
 		h.Mode |= c_ISVTX
-	***REMOVED***
+	}
 	// If possible, populate additional fields from OS-specific
 	// FileInfo fields.
-	if sys, ok := fi.Sys().(*Header); ok ***REMOVED***
+	if sys, ok := fi.Sys().(*Header); ok {
 		// This FileInfo came from a Header (not the OS). Use the
 		// original Header to populate all remaining fields.
 		h.Uid = sys.Uid
@@ -749,48 +749,48 @@ func FileInfoHeader(fi os.FileInfo, link string) (*Header, error) ***REMOVED***
 		h.Gname = sys.Gname
 		h.AccessTime = sys.AccessTime
 		h.ChangeTime = sys.ChangeTime
-		if sys.Xattrs != nil ***REMOVED***
+		if sys.Xattrs != nil {
 			h.Xattrs = make(map[string]string)
-			for k, v := range sys.Xattrs ***REMOVED***
+			for k, v := range sys.Xattrs {
 				h.Xattrs[k] = v
-			***REMOVED***
-		***REMOVED***
-		if sys.Typeflag == TypeLink ***REMOVED***
+			}
+		}
+		if sys.Typeflag == TypeLink {
 			// hard link
 			h.Typeflag = TypeLink
 			h.Size = 0
 			h.Linkname = sys.Linkname
-		***REMOVED***
-		if sys.SparseHoles != nil ***REMOVED***
-			h.SparseHoles = append([]SparseEntry***REMOVED******REMOVED***, sys.SparseHoles...)
-		***REMOVED***
-		if sys.PAXRecords != nil ***REMOVED***
+		}
+		if sys.SparseHoles != nil {
+			h.SparseHoles = append([]SparseEntry{}, sys.SparseHoles...)
+		}
+		if sys.PAXRecords != nil {
 			h.PAXRecords = make(map[string]string)
-			for k, v := range sys.PAXRecords ***REMOVED***
+			for k, v := range sys.PAXRecords {
 				h.PAXRecords[k] = v
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-	if sysStat != nil ***REMOVED***
+			}
+		}
+	}
+	if sysStat != nil {
 		return h, sysStat(fi, h)
-	***REMOVED***
+	}
 	return h, nil
-***REMOVED***
+}
 
 // isHeaderOnlyType checks if the given type flag is of the type that has no
 // data section even if a size is specified.
-func isHeaderOnlyType(flag byte) bool ***REMOVED***
-	switch flag ***REMOVED***
+func isHeaderOnlyType(flag byte) bool {
+	switch flag {
 	case TypeLink, TypeSymlink, TypeChar, TypeBlock, TypeDir, TypeFifo:
 		return true
 	default:
 		return false
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func min(a, b int64) int64 ***REMOVED***
-	if a < b ***REMOVED***
+func min(a, b int64) int64 {
+	if a < b {
 		return a
-	***REMOVED***
+	}
 	return b
-***REMOVED***
+}

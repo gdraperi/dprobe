@@ -1,9 +1,9 @@
-variable "environment" ***REMOVED***
-  default = ***REMOVED******REMOVED***
+variable "environment" {
+  default = {}
 
-  # default ***REMOVED***
+  # default {
   #    "region" = "us-west-2"
   #    "sg"     = "playground"
   #    "env"    = "prod"
-  #  ***REMOVED***
-***REMOVED***
+  #  }
+}

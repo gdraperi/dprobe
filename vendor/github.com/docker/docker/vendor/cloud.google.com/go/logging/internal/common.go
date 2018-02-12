@@ -24,7 +24,7 @@ const (
 	Version  = "0.2.0"
 )
 
-func LogPath(parent, logID string) string ***REMOVED***
+func LogPath(parent, logID string) string {
 	logID = strings.Replace(logID, "/", "%2F", -1)
 	return fmt.Sprintf("%s/logs/%s", parent, logID)
-***REMOVED***
+}

@@ -1,2 +1,2 @@
-environment = "aws" ***REMOVED***
-***REMOVED***
+environment = "aws" {
+}

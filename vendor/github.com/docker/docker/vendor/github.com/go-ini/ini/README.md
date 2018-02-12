@@ -101,7 +101,7 @@ skip-name-resolve
 By default, this is considered as missing value. But if you know you're going to deal with those cases, you can assign advanced load options:
 
 ```go
-cfg, err := LoadSources(LoadOptions***REMOVED***AllowBooleanKeys: true***REMOVED***, "my.cnf"))
+cfg, err := LoadSources(LoadOptions{AllowBooleanKeys: true}, "my.cnf"))
 ```
 
 The value of those keys are always `true`, and when you save to a file, it will keep in the same foramt as you read.
@@ -207,12 +207,12 @@ val := cfg.Section("").Key("key name").String()
 To validate key value on the fly:
 
 ```go
-val := cfg.Section("").Key("key name").Validate(func(in string) string ***REMOVED***
-	if len(in) == 0 ***REMOVED***
+val := cfg.Section("").Key("key name").Validate(func(in string) string {
+	if len(in) == 0 {
 		return "default"
-	***REMOVED***
+	}
 	return in
-***REMOVED***)
+})
 ```
 
 If you do not want any auto-transformation (such as recursive read) for the values, you can get raw value directly (this way you get much better performance):
@@ -309,9 +309,9 @@ cfg.Section("advance").Key("lots_of_lines").String() // 1 2 3 4
 Well, I hate continuation lines, how do I disable that?
 
 ```go
-cfg, err := ini.LoadSources(ini.LoadOptions***REMOVED***
+cfg, err := ini.LoadSources(ini.LoadOptions{
 	IgnoreContinuation: true,
-***REMOVED***, "filename")
+}, "filename")
 ```
 
 Holy crap! 
@@ -330,14 +330,14 @@ That's all? Hmm, no.
 To get value with given candidates:
 
 ```go
-v = cfg.Section("").Key("STRING").In("default", []string***REMOVED***"str", "arr", "types"***REMOVED***)
-v = cfg.Section("").Key("FLOAT64").InFloat64(1.1, []float64***REMOVED***1.25, 2.5, 3.75***REMOVED***)
-v = cfg.Section("").Key("INT").InInt(5, []int***REMOVED***10, 20, 30***REMOVED***)
-v = cfg.Section("").Key("INT64").InInt64(10, []int64***REMOVED***10, 20, 30***REMOVED***)
-v = cfg.Section("").Key("UINT").InUint(4, []int***REMOVED***3, 6, 9***REMOVED***)
-v = cfg.Section("").Key("UINT64").InUint64(8, []int64***REMOVED***3, 6, 9***REMOVED***)
-v = cfg.Section("").Key("TIME").InTimeFormat(time.RFC3339, time.Now(), []time.Time***REMOVED***time1, time2, time3***REMOVED***)
-v = cfg.Section("").Key("TIME").InTime(time.Now(), []time.Time***REMOVED***time1, time2, time3***REMOVED***) // RFC3339
+v = cfg.Section("").Key("STRING").In("default", []string{"str", "arr", "types"})
+v = cfg.Section("").Key("FLOAT64").InFloat64(1.1, []float64{1.25, 2.5, 3.75})
+v = cfg.Section("").Key("INT").InInt(5, []int{10, 20, 30})
+v = cfg.Section("").Key("INT64").InInt64(10, []int64{10, 20, 30})
+v = cfg.Section("").Key("UINT").InUint(4, []int{3, 6, 9})
+v = cfg.Section("").Key("UINT64").InUint64(8, []int64{3, 6, 9})
+v = cfg.Section("").Key("TIME").InTimeFormat(time.RFC3339, time.Now(), []time.Time{time1, time2, time3})
+v = cfg.Section("").Key("TIME").InTime(time.Now(), []time.Time{time1, time2, time3}) // RFC3339
 ```
 
 Default value will be presented if value of key is not in candidates you given, and default value does not need be one of candidates.
@@ -474,7 +474,7 @@ cfg.Section("package.sub").ParentKeys() // ["CLONE_URL"]
 Sometimes, you have sections that do not contain key-value pairs but raw content, to handle such case, you can use `LoadOptions.UnparsableSections`:
 
 ```go
-cfg, err := LoadSources(LoadOptions***REMOVED***UnparseableSections: []string***REMOVED***"COMMENTS"***REMOVED******REMOVED***, `[COMMENTS]
+cfg, err := LoadSources(LoadOptions{UnparseableSections: []string{"COMMENTS"}}, `[COMMENTS]
 <1><L.Slide#2> This slide has the fuel listed in the wrong units <e.1>`))
 
 body := cfg.Section("COMMENTS").Body()
@@ -496,7 +496,7 @@ If key name is `-` in data source, then it would be seen as special syntax for a
 ```
 
 ```go
-cfg.Section("features").KeyStrings()	// []***REMOVED***"#1", "#2", "#3"***REMOVED***
+cfg.Section("features").KeyStrings()	// []{"#1", "#2", "#3"}
 ```
 
 ### Map To Struct
@@ -515,21 +515,21 @@ Cities = HangZhou, Boston
 ```
 
 ```go
-type Note struct ***REMOVED***
+type Note struct {
 	Content string
 	Cities  []string
-***REMOVED***
+}
 
-type Person struct ***REMOVED***
+type Person struct {
 	Name string
 	Age  int `ini:"age"`
 	Male bool
 	Born time.Time
 	Note
 	Created time.Time `ini:"-"`
-***REMOVED***
+}
 
-func main() ***REMOVED***
+func main() {
 	cfg, err := ini.Load("path/to/ini")
 	// ...
 	p := new(Person)
@@ -544,7 +544,7 @@ func main() ***REMOVED***
 	n := new(Note)
 	err = cfg.Section("Note").MapTo(n)
 	// ...
-***REMOVED***
+}
 ```
 
 Can I have default value for field? Absolutely.
@@ -553,9 +553,9 @@ Assign it before you map to struct. It will keep the value as it is if the key i
 
 ```go
 // ...
-p := &Person***REMOVED***
+p := &Person{
 	Name: "Joe",
-***REMOVED***
+}
 // ...
 ```
 
@@ -566,32 +566,32 @@ It's really cool, but what's the point if you can't give me my file back from st
 Why not?
 
 ```go
-type Embeded struct ***REMOVED***
+type Embeded struct {
 	Dates  []time.Time `delim:"|"`
 	Places []string    `ini:"places,omitempty"`
 	None   []int       `ini:",omitempty"`
-***REMOVED***
+}
 
-type Author struct ***REMOVED***
+type Author struct {
 	Name      string `ini:"NAME"`
 	Male      bool
 	Age       int
 	GPA       float64
 	NeverMind string `ini:"-"`
 	*Embeded
-***REMOVED***
+}
 
-func main() ***REMOVED***
-	a := &Author***REMOVED***"Unknwon", true, 21, 2.8, "",
-		&Embeded***REMOVED***
-			[]time.Time***REMOVED***time.Now(), time.Now()***REMOVED***,
-			[]string***REMOVED***"HangZhou", "Boston"***REMOVED***,
-			[]int***REMOVED******REMOVED***,
-		***REMOVED******REMOVED***
+func main() {
+	a := &Author{"Unknwon", true, 21, 2.8, "",
+		&Embeded{
+			[]time.Time{time.Now(), time.Now()},
+			[]string{"HangZhou", "Boston"},
+			[]int{},
+		}}
 	cfg := ini.Empty()
 	err = ini.ReflectFrom(cfg, a)
 	// ...
-***REMOVED***
+}
 ```
 
 So, what do I get?
@@ -619,12 +619,12 @@ There are 2 built-in name mappers:
 To use them:
 
 ```go
-type Info struct ***REMOVED***
+type Info struct {
 	PackageName string
-***REMOVED***
+}
 
-func main() ***REMOVED***
-	err = ini.MapToWithMapper(&Info***REMOVED******REMOVED***, ini.TitleUnderscore, []byte("package_name=ini"))
+func main() {
+	err = ini.MapToWithMapper(&Info{}, ini.TitleUnderscore, []byte("package_name=ini"))
 	// ...
 
 	cfg, err := ini.Load([]byte("PACKAGE_NAME=ini"))
@@ -633,7 +633,7 @@ func main() ***REMOVED***
 	cfg.NameMapper = ini.AllCapsUnderscore
 	err = cfg.MapTo(info)
 	// ...
-***REMOVED***
+}
 ```
 
 Same rules of name mapper apply to `ini.ReflectFromWithMapper` function.
@@ -643,17 +643,17 @@ Same rules of name mapper apply to `ini.ReflectFromWithMapper` function.
 To expand values (e.g. from environment variables), you can use the `ValueMapper` to transform values:
 
 ```go
-type Env struct ***REMOVED***
+type Env struct {
 	Foo string `ini:"foo"`
-***REMOVED***
+}
 
-func main() ***REMOVED***
-	cfg, err := ini.Load([]byte("[env]\nfoo = $***REMOVED***MY_VAR***REMOVED***\n")
+func main() {
+	cfg, err := ini.Load([]byte("[env]\nfoo = ${MY_VAR}\n")
 	cfg.ValueMapper = os.ExpandEnv
 	// ...
-	env := &Env***REMOVED******REMOVED***
+	env := &Env{}
 	err = cfg.Section("env").MapTo(env)
-***REMOVED***
+}
 ```
 
 This would set the value of `env.Foo` to the value of the environment variable `MY_VAR`.
@@ -663,19 +663,19 @@ This would set the value of `env.Foo` to the value of the environment variable `
 Any embedded struct is treated as a section by default, and there is no automatic parent-child relations in map/reflect feature:
 
 ```go
-type Child struct ***REMOVED***
+type Child struct {
 	Age string
-***REMOVED***
+}
 
-type Parent struct ***REMOVED***
+type Parent struct {
 	Name string
 	Child
-***REMOVED***
+}
 
-type Config struct ***REMOVED***
+type Config struct {
 	City string
 	Parent
-***REMOVED***
+}
 ```
 
 Example configuration:
@@ -693,19 +693,19 @@ Age = 21
 What if, yes, I'm paranoid, I want embedded struct to be in the same section. Well, all roads lead to Rome.
 
 ```go
-type Child struct ***REMOVED***
+type Child struct {
 	Age string
-***REMOVED***
+}
 
-type Parent struct ***REMOVED***
+type Parent struct {
 	Name string
 	Child `ini:"Parent"`
-***REMOVED***
+}
 
-type Config struct ***REMOVED***
+type Config struct {
 	City string
 	Parent
-***REMOVED***
+}
 ```
 
 Example configuration:

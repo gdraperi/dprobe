@@ -13,11 +13,11 @@ var (
 	OSType string
 )
 
-func init() ***REMOVED***
+func init() {
 	var err error
 	Architecture, err = runtimeArchitecture()
-	if err != nil ***REMOVED***
+	if err != nil {
 		logrus.Errorf("Could not read system architecture info: %v", err)
-	***REMOVED***
+	}
 	OSType = runtime.GOOS
-***REMOVED***
+}

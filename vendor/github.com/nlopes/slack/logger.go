@@ -7,11 +7,11 @@ import (
 
 // SetLogger let's library users supply a logger, so that api debugging
 // can be logged along with the application's debugging info.
-func SetLogger(l logProvider) ***REMOVED***
+func SetLogger(l logProvider) {
 	loggerMutex.Lock()
-	logger = ilogger***REMOVED***logProvider: l***REMOVED***
+	logger = ilogger{logProvider: l}
 	loggerMutex.Unlock()
-***REMOVED***
+}
 
 var (
 	loggerMutex = new(sync.Mutex)
@@ -20,34 +20,34 @@ var (
 
 // logProvider is a logger interface compatible with both stdlib and some
 // 3rd party loggers such as logrus.
-type logProvider interface ***REMOVED***
+type logProvider interface {
 	Output(int, string) error
-***REMOVED***
+}
 
 // logInternal represents the internal logging api we use.
-type logInternal interface ***REMOVED***
-	Print(...interface***REMOVED******REMOVED***)
-	Printf(string, ...interface***REMOVED******REMOVED***)
-	Println(...interface***REMOVED******REMOVED***)
+type logInternal interface {
+	Print(...interface{})
+	Printf(string, ...interface{})
+	Println(...interface{})
 	Output(int, string) error
-***REMOVED***
+}
 
 // ilogger implements the additional methods used by our internal logging.
-type ilogger struct ***REMOVED***
+type ilogger struct {
 	logProvider
-***REMOVED***
+}
 
 // Println replicates the behaviour of the standard logger.
-func (t ilogger) Println(v ...interface***REMOVED******REMOVED***) ***REMOVED***
+func (t ilogger) Println(v ...interface{}) {
 	t.Output(2, fmt.Sprintln(v...))
-***REMOVED***
+}
 
 // Printf replicates the behaviour of the standard logger.
-func (t ilogger) Printf(format string, v ...interface***REMOVED******REMOVED***) ***REMOVED***
+func (t ilogger) Printf(format string, v ...interface{}) {
 	t.Output(2, fmt.Sprintf(format, v...))
-***REMOVED***
+}
 
 // Print replicates the behaviour of the standard logger.
-func (t ilogger) Print(v ...interface***REMOVED******REMOVED***) ***REMOVED***
+func (t ilogger) Print(v ...interface{}) {
 	t.Output(2, fmt.Sprint(v...))
-***REMOVED***
+}

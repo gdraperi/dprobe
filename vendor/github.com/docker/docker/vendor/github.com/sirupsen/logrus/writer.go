@@ -6,24 +6,24 @@ import (
 	"runtime"
 )
 
-func (logger *Logger) Writer() *io.PipeWriter ***REMOVED***
+func (logger *Logger) Writer() *io.PipeWriter {
 	return logger.WriterLevel(InfoLevel)
-***REMOVED***
+}
 
-func (logger *Logger) WriterLevel(level Level) *io.PipeWriter ***REMOVED***
+func (logger *Logger) WriterLevel(level Level) *io.PipeWriter {
 	return NewEntry(logger).WriterLevel(level)
-***REMOVED***
+}
 
-func (entry *Entry) Writer() *io.PipeWriter ***REMOVED***
+func (entry *Entry) Writer() *io.PipeWriter {
 	return entry.WriterLevel(InfoLevel)
-***REMOVED***
+}
 
-func (entry *Entry) WriterLevel(level Level) *io.PipeWriter ***REMOVED***
+func (entry *Entry) WriterLevel(level Level) *io.PipeWriter {
 	reader, writer := io.Pipe()
 
-	var printFunc func(args ...interface***REMOVED******REMOVED***)
+	var printFunc func(args ...interface{})
 
-	switch level ***REMOVED***
+	switch level {
 	case DebugLevel:
 		printFunc = entry.Debug
 	case InfoLevel:
@@ -38,25 +38,25 @@ func (entry *Entry) WriterLevel(level Level) *io.PipeWriter ***REMOVED***
 		printFunc = entry.Panic
 	default:
 		printFunc = entry.Print
-	***REMOVED***
+	}
 
 	go entry.writerScanner(reader, printFunc)
 	runtime.SetFinalizer(writer, writerFinalizer)
 
 	return writer
-***REMOVED***
+}
 
-func (entry *Entry) writerScanner(reader *io.PipeReader, printFunc func(args ...interface***REMOVED******REMOVED***)) ***REMOVED***
+func (entry *Entry) writerScanner(reader *io.PipeReader, printFunc func(args ...interface{})) {
 	scanner := bufio.NewScanner(reader)
-	for scanner.Scan() ***REMOVED***
+	for scanner.Scan() {
 		printFunc(scanner.Text())
-	***REMOVED***
-	if err := scanner.Err(); err != nil ***REMOVED***
+	}
+	if err := scanner.Err(); err != nil {
 		entry.Errorf("Error while reading from Writer: %s", err)
-	***REMOVED***
+	}
 	reader.Close()
-***REMOVED***
+}
 
-func writerFinalizer(writer *io.PipeWriter) ***REMOVED***
+func writerFinalizer(writer *io.PipeWriter) {
 	writer.Close()
-***REMOVED***
+}

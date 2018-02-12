@@ -48,44 +48,44 @@ var (
 )
 
 // dumpState contains information about the state of a dump operation.
-type dumpState struct ***REMOVED***
+type dumpState struct {
 	w                io.Writer
 	depth            int
 	pointers         map[uintptr]int
 	ignoreNextType   bool
 	ignoreNextIndent bool
 	cs               *ConfigState
-***REMOVED***
+}
 
 // indent performs indentation according to the depth level and cs.Indent
 // option.
-func (d *dumpState) indent() ***REMOVED***
-	if d.ignoreNextIndent ***REMOVED***
+func (d *dumpState) indent() {
+	if d.ignoreNextIndent {
 		d.ignoreNextIndent = false
 		return
-	***REMOVED***
+	}
 	d.w.Write(bytes.Repeat([]byte(d.cs.Indent), d.depth))
-***REMOVED***
+}
 
 // unpackValue returns values inside of non-nil interfaces when possible.
 // This is useful for data types like structs, arrays, slices, and maps which
 // can contain varying types packed inside an interface.
-func (d *dumpState) unpackValue(v reflect.Value) reflect.Value ***REMOVED***
-	if v.Kind() == reflect.Interface && !v.IsNil() ***REMOVED***
+func (d *dumpState) unpackValue(v reflect.Value) reflect.Value {
+	if v.Kind() == reflect.Interface && !v.IsNil() {
 		v = v.Elem()
-	***REMOVED***
+	}
 	return v
-***REMOVED***
+}
 
 // dumpPtr handles formatting of pointers by indirecting them as necessary.
-func (d *dumpState) dumpPtr(v reflect.Value) ***REMOVED***
+func (d *dumpState) dumpPtr(v reflect.Value) {
 	// Remove pointers at or below the current depth from map used to detect
 	// circular refs.
-	for k, depth := range d.pointers ***REMOVED***
-		if depth >= d.depth ***REMOVED***
+	for k, depth := range d.pointers {
+		if depth >= d.depth {
 			delete(d.pointers, k)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Keep list of all dereferenced pointers to show later.
 	pointerChain := make([]uintptr, 0)
@@ -97,30 +97,30 @@ func (d *dumpState) dumpPtr(v reflect.Value) ***REMOVED***
 	cycleFound := false
 	indirects := 0
 	ve := v
-	for ve.Kind() == reflect.Ptr ***REMOVED***
-		if ve.IsNil() ***REMOVED***
+	for ve.Kind() == reflect.Ptr {
+		if ve.IsNil() {
 			nilFound = true
 			break
-		***REMOVED***
+		}
 		indirects++
 		addr := ve.Pointer()
 		pointerChain = append(pointerChain, addr)
-		if pd, ok := d.pointers[addr]; ok && pd < d.depth ***REMOVED***
+		if pd, ok := d.pointers[addr]; ok && pd < d.depth {
 			cycleFound = true
 			indirects--
 			break
-		***REMOVED***
+		}
 		d.pointers[addr] = d.depth
 
 		ve = ve.Elem()
-		if ve.Kind() == reflect.Interface ***REMOVED***
-			if ve.IsNil() ***REMOVED***
+		if ve.Kind() == reflect.Interface {
+			if ve.IsNil() {
 				nilFound = true
 				break
-			***REMOVED***
+			}
 			ve = ve.Elem()
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Display type information.
 	d.w.Write(openParenBytes)
@@ -129,20 +129,20 @@ func (d *dumpState) dumpPtr(v reflect.Value) ***REMOVED***
 	d.w.Write(closeParenBytes)
 
 	// Display pointer information.
-	if !d.cs.DisablePointerAddresses && len(pointerChain) > 0 ***REMOVED***
+	if !d.cs.DisablePointerAddresses && len(pointerChain) > 0 {
 		d.w.Write(openParenBytes)
-		for i, addr := range pointerChain ***REMOVED***
-			if i > 0 ***REMOVED***
+		for i, addr := range pointerChain {
+			if i > 0 {
 				d.w.Write(pointerChainBytes)
-			***REMOVED***
+			}
 			printHexPtr(d.w, addr)
-		***REMOVED***
+		}
 		d.w.Write(closeParenBytes)
-	***REMOVED***
+	}
 
 	// Display dereferenced value.
 	d.w.Write(openParenBytes)
-	switch ***REMOVED***
+	switch {
 	case nilFound == true:
 		d.w.Write(nilAngleBytes)
 
@@ -152,13 +152,13 @@ func (d *dumpState) dumpPtr(v reflect.Value) ***REMOVED***
 	default:
 		d.ignoreNextType = true
 		d.dump(ve)
-	***REMOVED***
+	}
 	d.w.Write(closeParenBytes)
-***REMOVED***
+}
 
 // dumpSlice handles formatting of arrays and slices.  Byte (uint8 under
 // reflection) arrays and slices are dumped in hexdump -C fashion.
-func (d *dumpState) dumpSlice(v reflect.Value) ***REMOVED***
+func (d *dumpState) dumpSlice(v reflect.Value) {
 	// Determine whether this type should be hex dumped or not.  Also,
 	// for types which should be hexdumped, try to use the underlying data
 	// first, then fall back to trying to convert them to a uint8 slice.
@@ -166,10 +166,10 @@ func (d *dumpState) dumpSlice(v reflect.Value) ***REMOVED***
 	doConvert := false
 	doHexDump := false
 	numEntries := v.Len()
-	if numEntries > 0 ***REMOVED***
+	if numEntries > 0 {
 		vt := v.Index(0).Type()
 		vts := vt.String()
-		switch ***REMOVED***
+		switch {
 		// C types that need to be converted.
 		case cCharRE.MatchString(vts):
 			fallthrough
@@ -189,127 +189,127 @@ func (d *dumpState) dumpSlice(v reflect.Value) ***REMOVED***
 			// bypass these restrictions since this package does not
 			// mutate the values.
 			vs := v
-			if !vs.CanInterface() || !vs.CanAddr() ***REMOVED***
+			if !vs.CanInterface() || !vs.CanAddr() {
 				vs = unsafeReflectValue(vs)
-			***REMOVED***
-			if !UnsafeDisabled ***REMOVED***
+			}
+			if !UnsafeDisabled {
 				vs = vs.Slice(0, numEntries)
 
 				// Use the existing uint8 slice if it can be
 				// type asserted.
 				iface := vs.Interface()
-				if slice, ok := iface.([]uint8); ok ***REMOVED***
+				if slice, ok := iface.([]uint8); ok {
 					buf = slice
 					doHexDump = true
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 
 			// The underlying data needs to be converted if it can't
 			// be type asserted to a uint8 slice.
 			doConvert = true
-		***REMOVED***
+		}
 
 		// Copy and convert the underlying type if needed.
-		if doConvert && vt.ConvertibleTo(uint8Type) ***REMOVED***
+		if doConvert && vt.ConvertibleTo(uint8Type) {
 			// Convert and copy each element into a uint8 byte
 			// slice.
 			buf = make([]uint8, numEntries)
-			for i := 0; i < numEntries; i++ ***REMOVED***
+			for i := 0; i < numEntries; i++ {
 				vv := v.Index(i)
 				buf[i] = uint8(vv.Convert(uint8Type).Uint())
-			***REMOVED***
+			}
 			doHexDump = true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Hexdump the entire slice as needed.
-	if doHexDump ***REMOVED***
+	if doHexDump {
 		indent := strings.Repeat(d.cs.Indent, d.depth)
 		str := indent + hex.Dump(buf)
 		str = strings.Replace(str, "\n", "\n"+indent, -1)
 		str = strings.TrimRight(str, d.cs.Indent)
 		d.w.Write([]byte(str))
 		return
-	***REMOVED***
+	}
 
 	// Recursively call dump for each item.
-	for i := 0; i < numEntries; i++ ***REMOVED***
+	for i := 0; i < numEntries; i++ {
 		d.dump(d.unpackValue(v.Index(i)))
-		if i < (numEntries - 1) ***REMOVED***
+		if i < (numEntries - 1) {
 			d.w.Write(commaNewlineBytes)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			d.w.Write(newlineBytes)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // dump is the main workhorse for dumping a value.  It uses the passed reflect
 // value to figure out what kind of object we are dealing with and formats it
 // appropriately.  It is a recursive function, however circular data structures
 // are detected and handled properly.
-func (d *dumpState) dump(v reflect.Value) ***REMOVED***
+func (d *dumpState) dump(v reflect.Value) {
 	// Handle invalid reflect values immediately.
 	kind := v.Kind()
-	if kind == reflect.Invalid ***REMOVED***
+	if kind == reflect.Invalid {
 		d.w.Write(invalidAngleBytes)
 		return
-	***REMOVED***
+	}
 
 	// Handle pointers specially.
-	if kind == reflect.Ptr ***REMOVED***
+	if kind == reflect.Ptr {
 		d.indent()
 		d.dumpPtr(v)
 		return
-	***REMOVED***
+	}
 
 	// Print type information unless already handled elsewhere.
-	if !d.ignoreNextType ***REMOVED***
+	if !d.ignoreNextType {
 		d.indent()
 		d.w.Write(openParenBytes)
 		d.w.Write([]byte(v.Type().String()))
 		d.w.Write(closeParenBytes)
 		d.w.Write(spaceBytes)
-	***REMOVED***
+	}
 	d.ignoreNextType = false
 
 	// Display length and capacity if the built-in len and cap functions
 	// work with the value's kind and the len/cap itself is non-zero.
 	valueLen, valueCap := 0, 0
-	switch v.Kind() ***REMOVED***
+	switch v.Kind() {
 	case reflect.Array, reflect.Slice, reflect.Chan:
 		valueLen, valueCap = v.Len(), v.Cap()
 	case reflect.Map, reflect.String:
 		valueLen = v.Len()
-	***REMOVED***
-	if valueLen != 0 || !d.cs.DisableCapacities && valueCap != 0 ***REMOVED***
+	}
+	if valueLen != 0 || !d.cs.DisableCapacities && valueCap != 0 {
 		d.w.Write(openParenBytes)
-		if valueLen != 0 ***REMOVED***
+		if valueLen != 0 {
 			d.w.Write(lenEqualsBytes)
 			printInt(d.w, int64(valueLen), 10)
-		***REMOVED***
-		if !d.cs.DisableCapacities && valueCap != 0 ***REMOVED***
-			if valueLen != 0 ***REMOVED***
+		}
+		if !d.cs.DisableCapacities && valueCap != 0 {
+			if valueLen != 0 {
 				d.w.Write(spaceBytes)
-			***REMOVED***
+			}
 			d.w.Write(capEqualsBytes)
 			printInt(d.w, int64(valueCap), 10)
-		***REMOVED***
+		}
 		d.w.Write(closeParenBytes)
 		d.w.Write(spaceBytes)
-	***REMOVED***
+	}
 
 	// Call Stringer/error interfaces if they exist and the handle methods flag
 	// is enabled
-	if !d.cs.DisableMethods ***REMOVED***
-		if (kind != reflect.Invalid) && (kind != reflect.Interface) ***REMOVED***
-			if handled := handleMethods(d.cs, d.w, v); handled ***REMOVED***
+	if !d.cs.DisableMethods {
+		if (kind != reflect.Invalid) && (kind != reflect.Interface) {
+			if handled := handleMethods(d.cs, d.w, v); handled {
 				return
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
-	switch kind ***REMOVED***
+	switch kind {
 	case reflect.Invalid:
 		// Do nothing.  We should never get here since invalid has already
 		// been handled above.
@@ -336,21 +336,21 @@ func (d *dumpState) dump(v reflect.Value) ***REMOVED***
 		printComplex(d.w, v.Complex(), 64)
 
 	case reflect.Slice:
-		if v.IsNil() ***REMOVED***
+		if v.IsNil() {
 			d.w.Write(nilAngleBytes)
 			break
-		***REMOVED***
+		}
 		fallthrough
 
 	case reflect.Array:
 		d.w.Write(openBraceNewlineBytes)
 		d.depth++
-		if (d.cs.MaxDepth != 0) && (d.depth > d.cs.MaxDepth) ***REMOVED***
+		if (d.cs.MaxDepth != 0) && (d.depth > d.cs.MaxDepth) {
 			d.indent()
 			d.w.Write(maxNewlineBytes)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			d.dumpSlice(v)
-		***REMOVED***
+		}
 		d.depth--
 		d.indent()
 		d.w.Write(closeBraceBytes)
@@ -361,9 +361,9 @@ func (d *dumpState) dump(v reflect.Value) ***REMOVED***
 	case reflect.Interface:
 		// The only time we should get here is for nil interfaces due to
 		// unpackValue calls.
-		if v.IsNil() ***REMOVED***
+		if v.IsNil() {
 			d.w.Write(nilAngleBytes)
-		***REMOVED***
+		}
 
 	case reflect.Ptr:
 		// Do nothing.  We should never get here since pointers have already
@@ -371,34 +371,34 @@ func (d *dumpState) dump(v reflect.Value) ***REMOVED***
 
 	case reflect.Map:
 		// nil maps should be indicated as different than empty maps
-		if v.IsNil() ***REMOVED***
+		if v.IsNil() {
 			d.w.Write(nilAngleBytes)
 			break
-		***REMOVED***
+		}
 
 		d.w.Write(openBraceNewlineBytes)
 		d.depth++
-		if (d.cs.MaxDepth != 0) && (d.depth > d.cs.MaxDepth) ***REMOVED***
+		if (d.cs.MaxDepth != 0) && (d.depth > d.cs.MaxDepth) {
 			d.indent()
 			d.w.Write(maxNewlineBytes)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			numEntries := v.Len()
 			keys := v.MapKeys()
-			if d.cs.SortKeys ***REMOVED***
+			if d.cs.SortKeys {
 				sortValues(keys, d.cs)
-			***REMOVED***
-			for i, key := range keys ***REMOVED***
+			}
+			for i, key := range keys {
 				d.dump(d.unpackValue(key))
 				d.w.Write(colonSpaceBytes)
 				d.ignoreNextIndent = true
 				d.dump(d.unpackValue(v.MapIndex(key)))
-				if i < (numEntries - 1) ***REMOVED***
+				if i < (numEntries - 1) {
 					d.w.Write(commaNewlineBytes)
-				***REMOVED*** else ***REMOVED***
+				} else {
 					d.w.Write(newlineBytes)
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
+				}
+			}
+		}
 		d.depth--
 		d.indent()
 		d.w.Write(closeBraceBytes)
@@ -406,26 +406,26 @@ func (d *dumpState) dump(v reflect.Value) ***REMOVED***
 	case reflect.Struct:
 		d.w.Write(openBraceNewlineBytes)
 		d.depth++
-		if (d.cs.MaxDepth != 0) && (d.depth > d.cs.MaxDepth) ***REMOVED***
+		if (d.cs.MaxDepth != 0) && (d.depth > d.cs.MaxDepth) {
 			d.indent()
 			d.w.Write(maxNewlineBytes)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			vt := v.Type()
 			numFields := v.NumField()
-			for i := 0; i < numFields; i++ ***REMOVED***
+			for i := 0; i < numFields; i++ {
 				d.indent()
 				vtf := vt.Field(i)
 				d.w.Write([]byte(vtf.Name))
 				d.w.Write(colonSpaceBytes)
 				d.ignoreNextIndent = true
 				d.dump(d.unpackValue(v.Field(i)))
-				if i < (numFields - 1) ***REMOVED***
+				if i < (numFields - 1) {
 					d.w.Write(commaNewlineBytes)
-				***REMOVED*** else ***REMOVED***
+				} else {
 					d.w.Write(newlineBytes)
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
+				}
+			}
+		}
 		d.depth--
 		d.indent()
 		d.w.Write(closeBraceBytes)
@@ -440,46 +440,46 @@ func (d *dumpState) dump(v reflect.Value) ***REMOVED***
 	// fall back to letting the default fmt package handle it in case any new
 	// types are added.
 	default:
-		if v.CanInterface() ***REMOVED***
+		if v.CanInterface() {
 			fmt.Fprintf(d.w, "%v", v.Interface())
-		***REMOVED*** else ***REMOVED***
+		} else {
 			fmt.Fprintf(d.w, "%v", v.String())
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // fdump is a helper function to consolidate the logic from the various public
 // methods which take varying writers and config states.
-func fdump(cs *ConfigState, w io.Writer, a ...interface***REMOVED******REMOVED***) ***REMOVED***
-	for _, arg := range a ***REMOVED***
-		if arg == nil ***REMOVED***
+func fdump(cs *ConfigState, w io.Writer, a ...interface{}) {
+	for _, arg := range a {
+		if arg == nil {
 			w.Write(interfaceBytes)
 			w.Write(spaceBytes)
 			w.Write(nilAngleBytes)
 			w.Write(newlineBytes)
 			continue
-		***REMOVED***
+		}
 
-		d := dumpState***REMOVED***w: w, cs: cs***REMOVED***
+		d := dumpState{w: w, cs: cs}
 		d.pointers = make(map[uintptr]int)
 		d.dump(reflect.ValueOf(arg))
 		d.w.Write(newlineBytes)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Fdump formats and displays the passed arguments to io.Writer w.  It formats
 // exactly the same as Dump.
-func Fdump(w io.Writer, a ...interface***REMOVED******REMOVED***) ***REMOVED***
+func Fdump(w io.Writer, a ...interface{}) {
 	fdump(&Config, w, a...)
-***REMOVED***
+}
 
 // Sdump returns a string with the passed arguments formatted exactly the same
 // as Dump.
-func Sdump(a ...interface***REMOVED******REMOVED***) string ***REMOVED***
+func Sdump(a ...interface{}) string {
 	var buf bytes.Buffer
 	fdump(&Config, &buf, a...)
 	return buf.String()
-***REMOVED***
+}
 
 /*
 Dump displays the passed parameters to standard out with newlines, customizable
@@ -504,6 +504,6 @@ spew.Config.  See ConfigState for options documentation.
 See Fdump if you would prefer dumping to an arbitrary io.Writer or Sdump to
 get the formatted result as a string.
 */
-func Dump(a ...interface***REMOVED******REMOVED***) ***REMOVED***
+func Dump(a ...interface{}) {
 	fdump(&Config, os.Stdout, a...)
-***REMOVED***
+}

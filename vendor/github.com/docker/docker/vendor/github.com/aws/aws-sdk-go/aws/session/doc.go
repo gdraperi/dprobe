@@ -48,9 +48,9 @@ Requires the AWS_PROFILE to be set, or "default" is used.
 	sess := session.Must(session.NewSession())
 
 	// Create a Session with a custom region
-	sess := session.Must(session.NewSession(&aws.Config***REMOVED***
+	sess := session.Must(session.NewSession(&aws.Config{
 		Region: aws.String("us-east-1"),
-	***REMOVED***))
+	}))
 
 	// Create a S3 client instance from a session
 	sess := session.Must(session.NewSession())
@@ -67,25 +67,25 @@ Use NewSessionWithOptions when you want to provide the config profile, or
 override the shared config state (AWS_SDK_LOAD_CONFIG).
 
 	// Equivalent to session.NewSession()
-	sess := session.Must(session.NewSessionWithOptions(session.Options***REMOVED***
+	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		// Options
-	***REMOVED***))
+	}))
 
 	// Specify profile to load for the session's config
-	sess := session.Must(session.NewSessionWithOptions(session.Options***REMOVED***
+	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		 Profile: "profile_name",
-	***REMOVED***))
+	}))
 
 	// Specify profile for config and region for requests
-	sess := session.Must(session.NewSessionWithOptions(session.Options***REMOVED***
-		 Config: aws.Config***REMOVED***Region: aws.String("us-east-1")***REMOVED***,
+	sess := session.Must(session.NewSessionWithOptions(session.Options{
+		 Config: aws.Config{Region: aws.String("us-east-1")},
 		 Profile: "profile_name",
-	***REMOVED***))
+	}))
 
 	// Force enable Shared Config support
-	sess := session.Must(session.NewSessionWithOptions(session.Options***REMOVED***
+	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
-	***REMOVED***))
+	}))
 
 Adding Handlers
 
@@ -97,11 +97,11 @@ handler logs every request and its payload made by a service client:
 	// clients created with the Session to inherit. Adds logging handler.
 	sess := session.Must(session.NewSession())
 
-	sess.Handlers.Send.PushFront(func(r *request.Request) ***REMOVED***
+	sess.Handlers.Send.PushFront(func(r *request.Request) {
 		// Log every request made and its payload
 		logger.Println("Request: %s/%s, Payload: %s",
 			r.ClientInfo.ServiceName, r.Operation, r.Params)
-	***REMOVED***)
+	})
 
 Deprecated "New" function
 
@@ -175,9 +175,9 @@ If mfa_serial is set in the configuration, the SDK will assume the role, and
 the AssumeRoleTokenProvider session option is not set an an error will
 be returned when creating the session.
 
-    sess := session.Must(session.NewSessionWithOptions(session.Options***REMOVED***
+    sess := session.Must(session.NewSessionWithOptions(session.Options{
         AssumeRoleTokenProvider: stscreds.StdinTokenProvider,
-***REMOVED***))
+    }))
 
     // Create service client value configured for credentials
     // from assumed role.

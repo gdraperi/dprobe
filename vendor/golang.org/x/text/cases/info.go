@@ -4,20 +4,20 @@
 
 package cases
 
-func (c info) cccVal() info ***REMOVED***
-	if c&exceptionBit != 0 ***REMOVED***
+func (c info) cccVal() info {
+	if c&exceptionBit != 0 {
 		return info(exceptions[c>>exceptionShift]) & cccMask
-	***REMOVED***
+	}
 	return c & cccMask
-***REMOVED***
+}
 
-func (c info) cccType() info ***REMOVED***
+func (c info) cccType() info {
 	ccc := c.cccVal()
-	if ccc <= cccZero ***REMOVED***
+	if ccc <= cccZero {
 		return cccZero
-	***REMOVED***
+	}
 	return ccc
-***REMOVED***
+}
 
 // TODO: Implement full Unicode breaking algorithm:
 // 1) Implement breaking in separate package.
@@ -67,16 +67,16 @@ func (c info) cccType() info ***REMOVED***
 // is undesirable for our purposes. ICU prevents breaks in such cases as well.
 
 // isBreak returns whether this rune should introduce a break.
-func (c info) isBreak() bool ***REMOVED***
+func (c info) isBreak() bool {
 	return c.cccVal() == cccBreak
-***REMOVED***
+}
 
 // isLetter returns whether the rune is of break type ALetter, Hebrew_Letter,
 // Numeric, ExtendNumLet, or Extend.
-func (c info) isLetter() bool ***REMOVED***
+func (c info) isLetter() bool {
 	ccc := c.cccVal()
-	if ccc == cccZero ***REMOVED***
+	if ccc == cccZero {
 		return !c.isCaseIgnorable()
-	***REMOVED***
+	}
 	return ccc != cccBreak
-***REMOVED***
+}

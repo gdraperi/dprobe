@@ -2,6 +2,6 @@
 
 package libnetwork
 
-func (r *resolver) setupIPTable() error ***REMOVED***
+func (r *resolver) setupIPTable() error {
 	return nil
-***REMOVED***
+}

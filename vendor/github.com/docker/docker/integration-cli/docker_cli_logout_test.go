@@ -12,7 +12,7 @@ import (
 	"github.com/go-check/check"
 )
 
-func (s *DockerRegistryAuthHtpasswdSuite) TestLogoutWithExternalAuth(c *check.C) ***REMOVED***
+func (s *DockerRegistryAuthHtpasswdSuite) TestLogoutWithExternalAuth(c *check.C) {
 	s.d.StartWithBusybox(c)
 
 	osPath := os.Getenv("PATH")
@@ -32,7 +32,7 @@ func (s *DockerRegistryAuthHtpasswdSuite) TestLogoutWithExternalAuth(c *check.C)
 	c.Assert(err, checker.IsNil)
 	defer os.RemoveAll(tmp)
 
-	externalAuthConfig := `***REMOVED*** "credsStore": "shell-test" ***REMOVED***`
+	externalAuthConfig := `{ "credsStore": "shell-test" }`
 
 	configPath := filepath.Join(tmp, "config.json")
 	err = ioutil.WriteFile(configPath, []byte(externalAuthConfig), 0644)
@@ -61,10 +61,10 @@ func (s *DockerRegistryAuthHtpasswdSuite) TestLogoutWithExternalAuth(c *check.C)
 	out, err := s.d.Cmd("--config", tmp, "pull", repoName)
 	c.Assert(err, check.NotNil, check.Commentf(out))
 	c.Assert(out, checker.Contains, "no basic auth credentials")
-***REMOVED***
+}
 
 // #23100
-func (s *DockerRegistryAuthHtpasswdSuite) TestLogoutWithWrongHostnamesStored(c *check.C) ***REMOVED***
+func (s *DockerRegistryAuthHtpasswdSuite) TestLogoutWithWrongHostnamesStored(c *check.C) {
 	osPath := os.Getenv("PATH")
 	defer os.Setenv("PATH", osPath)
 
@@ -77,14 +77,14 @@ func (s *DockerRegistryAuthHtpasswdSuite) TestLogoutWithWrongHostnamesStored(c *
 	os.Setenv("PATH", testPath)
 
 	cmd := exec.Command("docker-credential-shell-test", "store")
-	stdin := bytes.NewReader([]byte(fmt.Sprintf(`***REMOVED***"ServerURL": "https://%s", "Username": "%s", "Secret": "%s"***REMOVED***`, privateRegistryURL, s.reg.Username(), s.reg.Password())))
+	stdin := bytes.NewReader([]byte(fmt.Sprintf(`{"ServerURL": "https://%s", "Username": "%s", "Secret": "%s"}`, privateRegistryURL, s.reg.Username(), s.reg.Password())))
 	cmd.Stdin = stdin
 	c.Assert(cmd.Run(), checker.IsNil)
 
 	tmp, err := ioutil.TempDir("", "integration-cli-")
 	c.Assert(err, checker.IsNil)
 
-	externalAuthConfig := fmt.Sprintf(`***REMOVED*** "auths": ***REMOVED***"https://%s": ***REMOVED******REMOVED******REMOVED***, "credsStore": "shell-test" ***REMOVED***`, privateRegistryURL)
+	externalAuthConfig := fmt.Sprintf(`{ "auths": {"https://%s": {}}, "credsStore": "shell-test" }`, privateRegistryURL)
 
 	configPath := filepath.Join(tmp, "config.json")
 	err = ioutil.WriteFile(configPath, []byte(externalAuthConfig), 0644)
@@ -94,13 +94,13 @@ func (s *DockerRegistryAuthHtpasswdSuite) TestLogoutWithWrongHostnamesStored(c *
 
 	b, err := ioutil.ReadFile(configPath)
 	c.Assert(err, checker.IsNil)
-	c.Assert(string(b), checker.Contains, fmt.Sprintf("\"https://%s\": ***REMOVED******REMOVED***", privateRegistryURL))
-	c.Assert(string(b), checker.Contains, fmt.Sprintf("\"%s\": ***REMOVED******REMOVED***", privateRegistryURL))
+	c.Assert(string(b), checker.Contains, fmt.Sprintf("\"https://%s\": {}", privateRegistryURL))
+	c.Assert(string(b), checker.Contains, fmt.Sprintf("\"%s\": {}", privateRegistryURL))
 
 	dockerCmd(c, "--config", tmp, "logout", privateRegistryURL)
 
 	b, err = ioutil.ReadFile(configPath)
 	c.Assert(err, checker.IsNil)
-	c.Assert(string(b), checker.Not(checker.Contains), fmt.Sprintf("\"https://%s\": ***REMOVED******REMOVED***", privateRegistryURL))
-	c.Assert(string(b), checker.Not(checker.Contains), fmt.Sprintf("\"%s\": ***REMOVED******REMOVED***", privateRegistryURL))
-***REMOVED***
+	c.Assert(string(b), checker.Not(checker.Contains), fmt.Sprintf("\"https://%s\": {}", privateRegistryURL))
+	c.Assert(string(b), checker.Not(checker.Contains), fmt.Sprintf("\"%s\": {}", privateRegistryURL))
+}

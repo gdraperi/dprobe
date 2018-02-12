@@ -28,44 +28,44 @@ import (
 // ByteSliceFromString returns a NUL-terminated slice of bytes
 // containing the text of s. If s contains a NUL byte at any
 // location, it returns (nil, syscall.EINVAL).
-func ByteSliceFromString(s string) ([]byte, error) ***REMOVED***
-	for i := 0; i < len(s); i++ ***REMOVED***
-		if s[i] == 0 ***REMOVED***
+func ByteSliceFromString(s string) ([]byte, error) {
+	for i := 0; i < len(s); i++ {
+		if s[i] == 0 {
 			return nil, syscall.EINVAL
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	a := make([]byte, len(s)+1)
 	copy(a, s)
 	return a, nil
-***REMOVED***
+}
 
 // BytePtrFromString returns a pointer to a NUL-terminated array of
 // bytes containing the text of s. If s contains a NUL byte at any
 // location, it returns (nil, syscall.EINVAL).
-func BytePtrFromString(s string) (*byte, error) ***REMOVED***
+func BytePtrFromString(s string) (*byte, error) {
 	a, err := ByteSliceFromString(s)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return &a[0], nil
-***REMOVED***
+}
 
 // Single-word zero for use when we need a valid pointer to 0 bytes.
 // See mksyscall.pl.
 var _zero uintptr
 
-func (ts *Timespec) Unix() (sec int64, nsec int64) ***REMOVED***
+func (ts *Timespec) Unix() (sec int64, nsec int64) {
 	return int64(ts.Sec), int64(ts.Nsec)
-***REMOVED***
+}
 
-func (tv *Timeval) Unix() (sec int64, nsec int64) ***REMOVED***
+func (tv *Timeval) Unix() (sec int64, nsec int64) {
 	return int64(tv.Sec), int64(tv.Usec) * 1000
-***REMOVED***
+}
 
-func (ts *Timespec) Nano() int64 ***REMOVED***
+func (ts *Timespec) Nano() int64 {
 	return int64(ts.Sec)*1e9 + int64(ts.Nsec)
-***REMOVED***
+}
 
-func (tv *Timeval) Nano() int64 ***REMOVED***
+func (tv *Timeval) Nano() int64 {
 	return int64(tv.Sec)*1e9 + int64(tv.Usec)*1000
-***REMOVED***
+}

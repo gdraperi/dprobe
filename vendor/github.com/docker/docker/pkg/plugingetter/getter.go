@@ -14,24 +14,24 @@ const (
 )
 
 // CompatPlugin is an abstraction to handle both v2(new) and v1(legacy) plugins.
-type CompatPlugin interface ***REMOVED***
+type CompatPlugin interface {
 	Client() *plugins.Client
 	Name() string
 	BasePath() string
 	IsV1() bool
-***REMOVED***
+}
 
 // CountedPlugin is a plugin which is reference counted.
-type CountedPlugin interface ***REMOVED***
+type CountedPlugin interface {
 	Acquire()
 	Release()
 	CompatPlugin
-***REMOVED***
+}
 
 // PluginGetter is the interface implemented by Store
-type PluginGetter interface ***REMOVED***
+type PluginGetter interface {
 	Get(name, capability string, mode int) (CompatPlugin, error)
 	GetAllByCap(capability string) ([]CompatPlugin, error)
 	GetAllManagedPluginsByCap(capability string) []CompatPlugin
 	Handle(capability string, callback func(string, *plugins.Client))
-***REMOVED***
+}

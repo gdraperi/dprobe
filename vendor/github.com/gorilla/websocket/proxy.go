@@ -16,62 +16,62 @@ import (
 
 type netDialerFunc func(netowrk, addr string) (net.Conn, error)
 
-func (fn netDialerFunc) Dial(network, addr string) (net.Conn, error) ***REMOVED***
+func (fn netDialerFunc) Dial(network, addr string) (net.Conn, error) {
 	return fn(network, addr)
-***REMOVED***
+}
 
-func init() ***REMOVED***
-	proxy_RegisterDialerType("http", func(proxyURL *url.URL, forwardDialer proxy_Dialer) (proxy_Dialer, error) ***REMOVED***
-		return &httpProxyDialer***REMOVED***proxyURL: proxyURL, fowardDial: forwardDialer.Dial***REMOVED***, nil
-	***REMOVED***)
-***REMOVED***
+func init() {
+	proxy_RegisterDialerType("http", func(proxyURL *url.URL, forwardDialer proxy_Dialer) (proxy_Dialer, error) {
+		return &httpProxyDialer{proxyURL: proxyURL, fowardDial: forwardDialer.Dial}, nil
+	})
+}
 
-type httpProxyDialer struct ***REMOVED***
+type httpProxyDialer struct {
 	proxyURL   *url.URL
 	fowardDial func(network, addr string) (net.Conn, error)
-***REMOVED***
+}
 
-func (hpd *httpProxyDialer) Dial(network string, addr string) (net.Conn, error) ***REMOVED***
+func (hpd *httpProxyDialer) Dial(network string, addr string) (net.Conn, error) {
 	hostPort, _ := hostPortNoPort(hpd.proxyURL)
 	conn, err := hpd.fowardDial(network, hostPort)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	connectHeader := make(http.Header)
-	if user := hpd.proxyURL.User; user != nil ***REMOVED***
+	if user := hpd.proxyURL.User; user != nil {
 		proxyUser := user.Username()
-		if proxyPassword, passwordSet := user.Password(); passwordSet ***REMOVED***
+		if proxyPassword, passwordSet := user.Password(); passwordSet {
 			credential := base64.StdEncoding.EncodeToString([]byte(proxyUser + ":" + proxyPassword))
 			connectHeader.Set("Proxy-Authorization", "Basic "+credential)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	connectReq := &http.Request***REMOVED***
+	connectReq := &http.Request{
 		Method: "CONNECT",
-		URL:    &url.URL***REMOVED***Opaque: addr***REMOVED***,
+		URL:    &url.URL{Opaque: addr},
 		Host:   addr,
 		Header: connectHeader,
-	***REMOVED***
+	}
 
-	if err := connectReq.Write(conn); err != nil ***REMOVED***
+	if err := connectReq.Write(conn); err != nil {
 		conn.Close()
 		return nil, err
-	***REMOVED***
+	}
 
 	// Read response. It's OK to use and discard buffered reader here becaue
 	// the remote server does not speak until spoken to.
 	br := bufio.NewReader(conn)
 	resp, err := http.ReadResponse(br, connectReq)
-	if err != nil ***REMOVED***
+	if err != nil {
 		conn.Close()
 		return nil, err
-	***REMOVED***
+	}
 
-	if resp.StatusCode != 200 ***REMOVED***
+	if resp.StatusCode != 200 {
 		conn.Close()
 		f := strings.SplitN(resp.Status, " ", 2)
 		return nil, errors.New(f[1])
-	***REMOVED***
+	}
 	return conn, nil
-***REMOVED***
+}

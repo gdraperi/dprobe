@@ -13,29 +13,29 @@ import (
 	"golang.org/x/crypto/ssh/agent"
 )
 
-func ExampleClientAgent() ***REMOVED***
+func ExampleClientAgent() {
 	// ssh-agent has a UNIX socket under $SSH_AUTH_SOCK
 	socket := os.Getenv("SSH_AUTH_SOCK")
 	conn, err := net.Dial("unix", socket)
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatalf("net.Dial: %v", err)
-	***REMOVED***
+	}
 	agentClient := agent.NewClient(conn)
-	config := &ssh.ClientConfig***REMOVED***
+	config := &ssh.ClientConfig{
 		User: "username",
-		Auth: []ssh.AuthMethod***REMOVED***
+		Auth: []ssh.AuthMethod{
 			// Use a callback rather than PublicKeys
 			// so we only consult the agent once the remote server
 			// wants it.
 			ssh.PublicKeysCallback(agentClient.Signers),
-		***REMOVED***,
+		},
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
-	***REMOVED***
+	}
 
 	sshc, err := ssh.Dial("tcp", "localhost:22", config)
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatalf("Dial: %v", err)
-	***REMOVED***
+	}
 	// .. use sshc
 	sshc.Close()
-***REMOVED***
+}

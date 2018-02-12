@@ -9,47 +9,47 @@ import (
 	"google.golang.org/grpc"
 )
 
-func sendDiffCopy(stream grpc.Stream, dir string, includes, excludes []string, progress progressCb, _map func(*fsutil.Stat) bool) error ***REMOVED***
-	return fsutil.Send(stream.Context(), stream, dir, &fsutil.WalkOpt***REMOVED***
+func sendDiffCopy(stream grpc.Stream, dir string, includes, excludes []string, progress progressCb, _map func(*fsutil.Stat) bool) error {
+	return fsutil.Send(stream.Context(), stream, dir, &fsutil.WalkOpt{
 		ExcludePatterns: excludes,
 		IncludePatterns: includes,
 		Map:             _map,
-	***REMOVED***, progress)
-***REMOVED***
+	}, progress)
+}
 
-func recvDiffCopy(ds grpc.Stream, dest string, cu CacheUpdater, progress progressCb) error ***REMOVED***
+func recvDiffCopy(ds grpc.Stream, dest string, cu CacheUpdater, progress progressCb) error {
 	st := time.Now()
-	defer func() ***REMOVED***
+	defer func() {
 		logrus.Debugf("diffcopy took: %v", time.Since(st))
-	***REMOVED***()
+	}()
 	var cf fsutil.ChangeFunc
 	var ch fsutil.ContentHasher
-	if cu != nil ***REMOVED***
+	if cu != nil {
 		cu.MarkSupported(true)
 		cf = cu.HandleChange
 		ch = cu.ContentHasher()
-	***REMOVED***
-	return fsutil.Receive(ds.Context(), ds, dest, fsutil.ReceiveOpt***REMOVED***
+	}
+	return fsutil.Receive(ds.Context(), ds, dest, fsutil.ReceiveOpt{
 		NotifyHashed:  cf,
 		ContentHasher: ch,
 		ProgressCb:    progress,
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func syncTargetDiffCopy(ds grpc.Stream, dest string) error ***REMOVED***
-	if err := os.MkdirAll(dest, 0700); err != nil ***REMOVED***
+func syncTargetDiffCopy(ds grpc.Stream, dest string) error {
+	if err := os.MkdirAll(dest, 0700); err != nil {
 		return err
-	***REMOVED***
-	return fsutil.Receive(ds.Context(), ds, dest, fsutil.ReceiveOpt***REMOVED***
+	}
+	return fsutil.Receive(ds.Context(), ds, dest, fsutil.ReceiveOpt{
 		Merge: true,
-		Filter: func() func(*fsutil.Stat) bool ***REMOVED***
+		Filter: func() func(*fsutil.Stat) bool {
 			uid := os.Getuid()
 			gid := os.Getgid()
-			return func(st *fsutil.Stat) bool ***REMOVED***
+			return func(st *fsutil.Stat) bool {
 				st.Uid = uint32(uid)
 				st.Gid = uint32(gid)
 				return true
-			***REMOVED***
-		***REMOVED***(),
-	***REMOVED***)
-***REMOVED***
+			}
+		}(),
+	})
+}

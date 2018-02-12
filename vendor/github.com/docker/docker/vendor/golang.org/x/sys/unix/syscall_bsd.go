@@ -25,52 +25,52 @@ import (
 //sysnb	getgroups(ngid int, gid *_Gid_t) (n int, err error)
 //sysnb	setgroups(ngid int, gid *_Gid_t) (err error)
 
-func Getgroups() (gids []int, err error) ***REMOVED***
+func Getgroups() (gids []int, err error) {
 	n, err := getgroups(0, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if n == 0 ***REMOVED***
+	}
+	if n == 0 {
 		return nil, nil
-	***REMOVED***
+	}
 
 	// Sanity check group count. Max is 16 on BSD.
-	if n < 0 || n > 1000 ***REMOVED***
+	if n < 0 || n > 1000 {
 		return nil, EINVAL
-	***REMOVED***
+	}
 
 	a := make([]_Gid_t, n)
 	n, err = getgroups(n, &a[0])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	gids = make([]int, n)
-	for i, v := range a[0:n] ***REMOVED***
+	for i, v := range a[0:n] {
 		gids[i] = int(v)
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func Setgroups(gids []int) (err error) ***REMOVED***
-	if len(gids) == 0 ***REMOVED***
+func Setgroups(gids []int) (err error) {
+	if len(gids) == 0 {
 		return setgroups(0, nil)
-	***REMOVED***
+	}
 
 	a := make([]_Gid_t, len(gids))
-	for i, v := range gids ***REMOVED***
+	for i, v := range gids {
 		a[i] = _Gid_t(v)
-	***REMOVED***
+	}
 	return setgroups(len(a), &a[0])
-***REMOVED***
+}
 
-func ReadDirent(fd int, buf []byte) (n int, err error) ***REMOVED***
+func ReadDirent(fd int, buf []byte) (n int, err error) {
 	// Final argument is (basep *uintptr) and the syscall doesn't take nil.
 	// 64 bits should be enough. (32 bits isn't even on 386). Since the
 	// actual system call is getdirentries64, 64 is a good guess.
 	// TODO(rsc): Can we use a single global basep for all calls?
 	var base = (*uintptr)(unsafe.Pointer(new(uint64)))
 	return Getdirentries(fd, buf, base)
-***REMOVED***
+}
 
 // Wait status is 7 bits at bottom, either 0 (exited),
 // 0x7F (stopped), or a signal number that caused an exit.
@@ -89,50 +89,50 @@ const (
 	stopped = 0x7F
 )
 
-func (w WaitStatus) Exited() bool ***REMOVED*** return w&mask == exited ***REMOVED***
+func (w WaitStatus) Exited() bool { return w&mask == exited }
 
-func (w WaitStatus) ExitStatus() int ***REMOVED***
-	if w&mask != exited ***REMOVED***
+func (w WaitStatus) ExitStatus() int {
+	if w&mask != exited {
 		return -1
-	***REMOVED***
+	}
 	return int(w >> shift)
-***REMOVED***
+}
 
-func (w WaitStatus) Signaled() bool ***REMOVED*** return w&mask != stopped && w&mask != 0 ***REMOVED***
+func (w WaitStatus) Signaled() bool { return w&mask != stopped && w&mask != 0 }
 
-func (w WaitStatus) Signal() syscall.Signal ***REMOVED***
+func (w WaitStatus) Signal() syscall.Signal {
 	sig := syscall.Signal(w & mask)
-	if sig == stopped || sig == 0 ***REMOVED***
+	if sig == stopped || sig == 0 {
 		return -1
-	***REMOVED***
+	}
 	return sig
-***REMOVED***
+}
 
-func (w WaitStatus) CoreDump() bool ***REMOVED*** return w.Signaled() && w&core != 0 ***REMOVED***
+func (w WaitStatus) CoreDump() bool { return w.Signaled() && w&core != 0 }
 
-func (w WaitStatus) Stopped() bool ***REMOVED*** return w&mask == stopped && syscall.Signal(w>>shift) != SIGSTOP ***REMOVED***
+func (w WaitStatus) Stopped() bool { return w&mask == stopped && syscall.Signal(w>>shift) != SIGSTOP }
 
-func (w WaitStatus) Continued() bool ***REMOVED*** return w&mask == stopped && syscall.Signal(w>>shift) == SIGSTOP ***REMOVED***
+func (w WaitStatus) Continued() bool { return w&mask == stopped && syscall.Signal(w>>shift) == SIGSTOP }
 
-func (w WaitStatus) StopSignal() syscall.Signal ***REMOVED***
-	if !w.Stopped() ***REMOVED***
+func (w WaitStatus) StopSignal() syscall.Signal {
+	if !w.Stopped() {
 		return -1
-	***REMOVED***
+	}
 	return syscall.Signal(w>>shift) & 0xFF
-***REMOVED***
+}
 
-func (w WaitStatus) TrapCause() int ***REMOVED*** return -1 ***REMOVED***
+func (w WaitStatus) TrapCause() int { return -1 }
 
 //sys	wait4(pid int, wstatus *_C_int, options int, rusage *Rusage) (wpid int, err error)
 
-func Wait4(pid int, wstatus *WaitStatus, options int, rusage *Rusage) (wpid int, err error) ***REMOVED***
+func Wait4(pid int, wstatus *WaitStatus, options int, rusage *Rusage) (wpid int, err error) {
 	var status _C_int
 	wpid, err = wait4(pid, &status, options, rusage)
-	if wstatus != nil ***REMOVED***
+	if wstatus != nil {
 		*wstatus = WaitStatus(status)
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 //sys	accept(s int, rsa *RawSockaddrAny, addrlen *_Socklen) (fd int, err error)
 //sys	bind(s int, addr unsafe.Pointer, addrlen _Socklen) (err error)
@@ -144,55 +144,55 @@ func Wait4(pid int, wstatus *WaitStatus, options int, rusage *Rusage) (wpid int,
 //sysnb	getsockname(fd int, rsa *RawSockaddrAny, addrlen *_Socklen) (err error)
 //sys	Shutdown(s int, how int) (err error)
 
-func (sa *SockaddrInet4) sockaddr() (unsafe.Pointer, _Socklen, error) ***REMOVED***
-	if sa.Port < 0 || sa.Port > 0xFFFF ***REMOVED***
+func (sa *SockaddrInet4) sockaddr() (unsafe.Pointer, _Socklen, error) {
+	if sa.Port < 0 || sa.Port > 0xFFFF {
 		return nil, 0, EINVAL
-	***REMOVED***
+	}
 	sa.raw.Len = SizeofSockaddrInet4
 	sa.raw.Family = AF_INET
 	p := (*[2]byte)(unsafe.Pointer(&sa.raw.Port))
 	p[0] = byte(sa.Port >> 8)
 	p[1] = byte(sa.Port)
-	for i := 0; i < len(sa.Addr); i++ ***REMOVED***
+	for i := 0; i < len(sa.Addr); i++ {
 		sa.raw.Addr[i] = sa.Addr[i]
-	***REMOVED***
+	}
 	return unsafe.Pointer(&sa.raw), _Socklen(sa.raw.Len), nil
-***REMOVED***
+}
 
-func (sa *SockaddrInet6) sockaddr() (unsafe.Pointer, _Socklen, error) ***REMOVED***
-	if sa.Port < 0 || sa.Port > 0xFFFF ***REMOVED***
+func (sa *SockaddrInet6) sockaddr() (unsafe.Pointer, _Socklen, error) {
+	if sa.Port < 0 || sa.Port > 0xFFFF {
 		return nil, 0, EINVAL
-	***REMOVED***
+	}
 	sa.raw.Len = SizeofSockaddrInet6
 	sa.raw.Family = AF_INET6
 	p := (*[2]byte)(unsafe.Pointer(&sa.raw.Port))
 	p[0] = byte(sa.Port >> 8)
 	p[1] = byte(sa.Port)
 	sa.raw.Scope_id = sa.ZoneId
-	for i := 0; i < len(sa.Addr); i++ ***REMOVED***
+	for i := 0; i < len(sa.Addr); i++ {
 		sa.raw.Addr[i] = sa.Addr[i]
-	***REMOVED***
+	}
 	return unsafe.Pointer(&sa.raw), _Socklen(sa.raw.Len), nil
-***REMOVED***
+}
 
-func (sa *SockaddrUnix) sockaddr() (unsafe.Pointer, _Socklen, error) ***REMOVED***
+func (sa *SockaddrUnix) sockaddr() (unsafe.Pointer, _Socklen, error) {
 	name := sa.Name
 	n := len(name)
-	if n >= len(sa.raw.Path) || n == 0 ***REMOVED***
+	if n >= len(sa.raw.Path) || n == 0 {
 		return nil, 0, EINVAL
-	***REMOVED***
+	}
 	sa.raw.Len = byte(3 + n) // 2 for Family, Len; 1 for NUL
 	sa.raw.Family = AF_UNIX
-	for i := 0; i < n; i++ ***REMOVED***
+	for i := 0; i < n; i++ {
 		sa.raw.Path[i] = int8(name[i])
-	***REMOVED***
+	}
 	return unsafe.Pointer(&sa.raw), _Socklen(sa.raw.Len), nil
-***REMOVED***
+}
 
-func (sa *SockaddrDatalink) sockaddr() (unsafe.Pointer, _Socklen, error) ***REMOVED***
-	if sa.Index == 0 ***REMOVED***
+func (sa *SockaddrDatalink) sockaddr() (unsafe.Pointer, _Socklen, error) {
+	if sa.Index == 0 {
 		return nil, 0, EINVAL
-	***REMOVED***
+	}
 	sa.raw.Len = sa.Len
 	sa.raw.Family = AF_LINK
 	sa.raw.Index = sa.Index
@@ -200,14 +200,14 @@ func (sa *SockaddrDatalink) sockaddr() (unsafe.Pointer, _Socklen, error) ***REMO
 	sa.raw.Nlen = sa.Nlen
 	sa.raw.Alen = sa.Alen
 	sa.raw.Slen = sa.Slen
-	for i := 0; i < len(sa.raw.Data); i++ ***REMOVED***
+	for i := 0; i < len(sa.raw.Data); i++ {
 		sa.raw.Data[i] = sa.Data[i]
-	***REMOVED***
+	}
 	return unsafe.Pointer(&sa.raw), SizeofSockaddrDatalink, nil
-***REMOVED***
+}
 
-func anyToSockaddr(rsa *RawSockaddrAny) (Sockaddr, error) ***REMOVED***
-	switch rsa.Addr.Family ***REMOVED***
+func anyToSockaddr(rsa *RawSockaddrAny) (Sockaddr, error) {
+	switch rsa.Addr.Family {
 	case AF_LINK:
 		pp := (*RawSockaddrDatalink)(unsafe.Pointer(rsa))
 		sa := new(SockaddrDatalink)
@@ -218,16 +218,16 @@ func anyToSockaddr(rsa *RawSockaddrAny) (Sockaddr, error) ***REMOVED***
 		sa.Nlen = pp.Nlen
 		sa.Alen = pp.Alen
 		sa.Slen = pp.Slen
-		for i := 0; i < len(sa.Data); i++ ***REMOVED***
+		for i := 0; i < len(sa.Data); i++ {
 			sa.Data[i] = pp.Data[i]
-		***REMOVED***
+		}
 		return sa, nil
 
 	case AF_UNIX:
 		pp := (*RawSockaddrUnix)(unsafe.Pointer(rsa))
-		if pp.Len < 2 || pp.Len > SizeofSockaddrUnix ***REMOVED***
+		if pp.Len < 2 || pp.Len > SizeofSockaddrUnix {
 			return nil, EINVAL
-		***REMOVED***
+		}
 		sa := new(SockaddrUnix)
 
 		// Some BSDs include the trailing NUL in the length, whereas
@@ -235,14 +235,14 @@ func anyToSockaddr(rsa *RawSockaddrAny) (Sockaddr, error) ***REMOVED***
 		// family and len. The path is then scanned to see if a NUL
 		// terminator still exists within the length.
 		n := int(pp.Len) - 2 // subtract leading Family, Len
-		for i := 0; i < n; i++ ***REMOVED***
-			if pp.Path[i] == 0 ***REMOVED***
+		for i := 0; i < n; i++ {
+			if pp.Path[i] == 0 {
 				// found early NUL; assume Len included the NUL
 				// or was overestimating.
 				n = i
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		bytes := (*[10000]byte)(unsafe.Pointer(&pp.Path[0]))[0:n]
 		sa.Name = string(bytes)
 		return sa, nil
@@ -252,9 +252,9 @@ func anyToSockaddr(rsa *RawSockaddrAny) (Sockaddr, error) ***REMOVED***
 		sa := new(SockaddrInet4)
 		p := (*[2]byte)(unsafe.Pointer(&pp.Port))
 		sa.Port = int(p[0])<<8 + int(p[1])
-		for i := 0; i < len(sa.Addr); i++ ***REMOVED***
+		for i := 0; i < len(sa.Addr); i++ {
 			sa.Addr[i] = pp.Addr[i]
-		***REMOVED***
+		}
 		return sa, nil
 
 	case AF_INET6:
@@ -263,377 +263,377 @@ func anyToSockaddr(rsa *RawSockaddrAny) (Sockaddr, error) ***REMOVED***
 		p := (*[2]byte)(unsafe.Pointer(&pp.Port))
 		sa.Port = int(p[0])<<8 + int(p[1])
 		sa.ZoneId = pp.Scope_id
-		for i := 0; i < len(sa.Addr); i++ ***REMOVED***
+		for i := 0; i < len(sa.Addr); i++ {
 			sa.Addr[i] = pp.Addr[i]
-		***REMOVED***
+		}
 		return sa, nil
-	***REMOVED***
+	}
 	return nil, EAFNOSUPPORT
-***REMOVED***
+}
 
-func Accept(fd int) (nfd int, sa Sockaddr, err error) ***REMOVED***
+func Accept(fd int) (nfd int, sa Sockaddr, err error) {
 	var rsa RawSockaddrAny
 	var len _Socklen = SizeofSockaddrAny
 	nfd, err = accept(fd, &rsa, &len)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
-	if runtime.GOOS == "darwin" && len == 0 ***REMOVED***
+	}
+	if runtime.GOOS == "darwin" && len == 0 {
 		// Accepted socket has no address.
 		// This is likely due to a bug in xnu kernels,
 		// where instead of ECONNABORTED error socket
 		// is accepted, but has no address.
 		Close(nfd)
 		return 0, nil, ECONNABORTED
-	***REMOVED***
+	}
 	sa, err = anyToSockaddr(&rsa)
-	if err != nil ***REMOVED***
+	if err != nil {
 		Close(nfd)
 		nfd = 0
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func Getsockname(fd int) (sa Sockaddr, err error) ***REMOVED***
+func Getsockname(fd int) (sa Sockaddr, err error) {
 	var rsa RawSockaddrAny
 	var len _Socklen = SizeofSockaddrAny
-	if err = getsockname(fd, &rsa, &len); err != nil ***REMOVED***
+	if err = getsockname(fd, &rsa, &len); err != nil {
 		return
-	***REMOVED***
+	}
 	// TODO(jsing): DragonFly has a "bug" (see issue 3349), which should be
 	// reported upstream.
-	if runtime.GOOS == "dragonfly" && rsa.Addr.Family == AF_UNSPEC && rsa.Addr.Len == 0 ***REMOVED***
+	if runtime.GOOS == "dragonfly" && rsa.Addr.Family == AF_UNSPEC && rsa.Addr.Len == 0 {
 		rsa.Addr.Family = AF_UNIX
 		rsa.Addr.Len = SizeofSockaddrUnix
-	***REMOVED***
+	}
 	return anyToSockaddr(&rsa)
-***REMOVED***
+}
 
 //sysnb socketpair(domain int, typ int, proto int, fd *[2]int32) (err error)
 
-func GetsockoptByte(fd, level, opt int) (value byte, err error) ***REMOVED***
+func GetsockoptByte(fd, level, opt int) (value byte, err error) {
 	var n byte
 	vallen := _Socklen(1)
 	err = getsockopt(fd, level, opt, unsafe.Pointer(&n), &vallen)
 	return n, err
-***REMOVED***
+}
 
-func GetsockoptInet4Addr(fd, level, opt int) (value [4]byte, err error) ***REMOVED***
+func GetsockoptInet4Addr(fd, level, opt int) (value [4]byte, err error) {
 	vallen := _Socklen(4)
 	err = getsockopt(fd, level, opt, unsafe.Pointer(&value[0]), &vallen)
 	return value, err
-***REMOVED***
+}
 
-func GetsockoptIPMreq(fd, level, opt int) (*IPMreq, error) ***REMOVED***
+func GetsockoptIPMreq(fd, level, opt int) (*IPMreq, error) {
 	var value IPMreq
 	vallen := _Socklen(SizeofIPMreq)
 	err := getsockopt(fd, level, opt, unsafe.Pointer(&value), &vallen)
 	return &value, err
-***REMOVED***
+}
 
-func GetsockoptIPv6Mreq(fd, level, opt int) (*IPv6Mreq, error) ***REMOVED***
+func GetsockoptIPv6Mreq(fd, level, opt int) (*IPv6Mreq, error) {
 	var value IPv6Mreq
 	vallen := _Socklen(SizeofIPv6Mreq)
 	err := getsockopt(fd, level, opt, unsafe.Pointer(&value), &vallen)
 	return &value, err
-***REMOVED***
+}
 
-func GetsockoptIPv6MTUInfo(fd, level, opt int) (*IPv6MTUInfo, error) ***REMOVED***
+func GetsockoptIPv6MTUInfo(fd, level, opt int) (*IPv6MTUInfo, error) {
 	var value IPv6MTUInfo
 	vallen := _Socklen(SizeofIPv6MTUInfo)
 	err := getsockopt(fd, level, opt, unsafe.Pointer(&value), &vallen)
 	return &value, err
-***REMOVED***
+}
 
-func GetsockoptICMPv6Filter(fd, level, opt int) (*ICMPv6Filter, error) ***REMOVED***
+func GetsockoptICMPv6Filter(fd, level, opt int) (*ICMPv6Filter, error) {
 	var value ICMPv6Filter
 	vallen := _Socklen(SizeofICMPv6Filter)
 	err := getsockopt(fd, level, opt, unsafe.Pointer(&value), &vallen)
 	return &value, err
-***REMOVED***
+}
 
 //sys   recvfrom(fd int, p []byte, flags int, from *RawSockaddrAny, fromlen *_Socklen) (n int, err error)
 //sys   sendto(s int, buf []byte, flags int, to unsafe.Pointer, addrlen _Socklen) (err error)
 //sys	recvmsg(s int, msg *Msghdr, flags int) (n int, err error)
 
-func Recvmsg(fd int, p, oob []byte, flags int) (n, oobn int, recvflags int, from Sockaddr, err error) ***REMOVED***
+func Recvmsg(fd int, p, oob []byte, flags int) (n, oobn int, recvflags int, from Sockaddr, err error) {
 	var msg Msghdr
 	var rsa RawSockaddrAny
 	msg.Name = (*byte)(unsafe.Pointer(&rsa))
 	msg.Namelen = uint32(SizeofSockaddrAny)
 	var iov Iovec
-	if len(p) > 0 ***REMOVED***
+	if len(p) > 0 {
 		iov.Base = (*byte)(unsafe.Pointer(&p[0]))
 		iov.SetLen(len(p))
-	***REMOVED***
+	}
 	var dummy byte
-	if len(oob) > 0 ***REMOVED***
+	if len(oob) > 0 {
 		// receive at least one normal byte
-		if len(p) == 0 ***REMOVED***
+		if len(p) == 0 {
 			iov.Base = &dummy
 			iov.SetLen(1)
-		***REMOVED***
+		}
 		msg.Control = (*byte)(unsafe.Pointer(&oob[0]))
 		msg.SetControllen(len(oob))
-	***REMOVED***
+	}
 	msg.Iov = &iov
 	msg.Iovlen = 1
-	if n, err = recvmsg(fd, &msg, flags); err != nil ***REMOVED***
+	if n, err = recvmsg(fd, &msg, flags); err != nil {
 		return
-	***REMOVED***
+	}
 	oobn = int(msg.Controllen)
 	recvflags = int(msg.Flags)
 	// source address is only specified if the socket is unconnected
-	if rsa.Addr.Family != AF_UNSPEC ***REMOVED***
+	if rsa.Addr.Family != AF_UNSPEC {
 		from, err = anyToSockaddr(&rsa)
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 //sys	sendmsg(s int, msg *Msghdr, flags int) (n int, err error)
 
-func Sendmsg(fd int, p, oob []byte, to Sockaddr, flags int) (err error) ***REMOVED***
+func Sendmsg(fd int, p, oob []byte, to Sockaddr, flags int) (err error) {
 	_, err = SendmsgN(fd, p, oob, to, flags)
 	return
-***REMOVED***
+}
 
-func SendmsgN(fd int, p, oob []byte, to Sockaddr, flags int) (n int, err error) ***REMOVED***
+func SendmsgN(fd int, p, oob []byte, to Sockaddr, flags int) (n int, err error) {
 	var ptr unsafe.Pointer
 	var salen _Socklen
-	if to != nil ***REMOVED***
+	if to != nil {
 		ptr, salen, err = to.sockaddr()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	var msg Msghdr
 	msg.Name = (*byte)(unsafe.Pointer(ptr))
 	msg.Namelen = uint32(salen)
 	var iov Iovec
-	if len(p) > 0 ***REMOVED***
+	if len(p) > 0 {
 		iov.Base = (*byte)(unsafe.Pointer(&p[0]))
 		iov.SetLen(len(p))
-	***REMOVED***
+	}
 	var dummy byte
-	if len(oob) > 0 ***REMOVED***
+	if len(oob) > 0 {
 		// send at least one normal byte
-		if len(p) == 0 ***REMOVED***
+		if len(p) == 0 {
 			iov.Base = &dummy
 			iov.SetLen(1)
-		***REMOVED***
+		}
 		msg.Control = (*byte)(unsafe.Pointer(&oob[0]))
 		msg.SetControllen(len(oob))
-	***REMOVED***
+	}
 	msg.Iov = &iov
 	msg.Iovlen = 1
-	if n, err = sendmsg(fd, &msg, flags); err != nil ***REMOVED***
+	if n, err = sendmsg(fd, &msg, flags); err != nil {
 		return 0, err
-	***REMOVED***
-	if len(oob) > 0 && len(p) == 0 ***REMOVED***
+	}
+	if len(oob) > 0 && len(p) == 0 {
 		n = 0
-	***REMOVED***
+	}
 	return n, nil
-***REMOVED***
+}
 
 //sys	kevent(kq int, change unsafe.Pointer, nchange int, event unsafe.Pointer, nevent int, timeout *Timespec) (n int, err error)
 
-func Kevent(kq int, changes, events []Kevent_t, timeout *Timespec) (n int, err error) ***REMOVED***
+func Kevent(kq int, changes, events []Kevent_t, timeout *Timespec) (n int, err error) {
 	var change, event unsafe.Pointer
-	if len(changes) > 0 ***REMOVED***
+	if len(changes) > 0 {
 		change = unsafe.Pointer(&changes[0])
-	***REMOVED***
-	if len(events) > 0 ***REMOVED***
+	}
+	if len(events) > 0 {
 		event = unsafe.Pointer(&events[0])
-	***REMOVED***
+	}
 	return kevent(kq, change, len(changes), event, len(events), timeout)
-***REMOVED***
+}
 
 //sys	sysctl(mib []_C_int, old *byte, oldlen *uintptr, new *byte, newlen uintptr) (err error) = SYS___SYSCTL
 
 // sysctlmib translates name to mib number and appends any additional args.
-func sysctlmib(name string, args ...int) ([]_C_int, error) ***REMOVED***
+func sysctlmib(name string, args ...int) ([]_C_int, error) {
 	// Translate name to mib number.
 	mib, err := nametomib(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	for _, a := range args ***REMOVED***
+	for _, a := range args {
 		mib = append(mib, _C_int(a))
-	***REMOVED***
+	}
 
 	return mib, nil
-***REMOVED***
+}
 
-func Sysctl(name string) (string, error) ***REMOVED***
+func Sysctl(name string) (string, error) {
 	return SysctlArgs(name)
-***REMOVED***
+}
 
-func SysctlArgs(name string, args ...int) (string, error) ***REMOVED***
+func SysctlArgs(name string, args ...int) (string, error) {
 	buf, err := SysctlRaw(name, args...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	n := len(buf)
 
 	// Throw away terminating NUL.
-	if n > 0 && buf[n-1] == '\x00' ***REMOVED***
+	if n > 0 && buf[n-1] == '\x00' {
 		n--
-	***REMOVED***
+	}
 	return string(buf[0:n]), nil
-***REMOVED***
+}
 
-func SysctlUint32(name string) (uint32, error) ***REMOVED***
+func SysctlUint32(name string) (uint32, error) {
 	return SysctlUint32Args(name)
-***REMOVED***
+}
 
-func SysctlUint32Args(name string, args ...int) (uint32, error) ***REMOVED***
+func SysctlUint32Args(name string, args ...int) (uint32, error) {
 	mib, err := sysctlmib(name, args...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 
 	n := uintptr(4)
 	buf := make([]byte, 4)
-	if err := sysctl(mib, &buf[0], &n, nil, 0); err != nil ***REMOVED***
+	if err := sysctl(mib, &buf[0], &n, nil, 0); err != nil {
 		return 0, err
-	***REMOVED***
-	if n != 4 ***REMOVED***
+	}
+	if n != 4 {
 		return 0, EIO
-	***REMOVED***
+	}
 	return *(*uint32)(unsafe.Pointer(&buf[0])), nil
-***REMOVED***
+}
 
-func SysctlUint64(name string, args ...int) (uint64, error) ***REMOVED***
+func SysctlUint64(name string, args ...int) (uint64, error) {
 	mib, err := sysctlmib(name, args...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 
 	n := uintptr(8)
 	buf := make([]byte, 8)
-	if err := sysctl(mib, &buf[0], &n, nil, 0); err != nil ***REMOVED***
+	if err := sysctl(mib, &buf[0], &n, nil, 0); err != nil {
 		return 0, err
-	***REMOVED***
-	if n != 8 ***REMOVED***
+	}
+	if n != 8 {
 		return 0, EIO
-	***REMOVED***
+	}
 	return *(*uint64)(unsafe.Pointer(&buf[0])), nil
-***REMOVED***
+}
 
-func SysctlRaw(name string, args ...int) ([]byte, error) ***REMOVED***
+func SysctlRaw(name string, args ...int) ([]byte, error) {
 	mib, err := sysctlmib(name, args...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// Find size.
 	n := uintptr(0)
-	if err := sysctl(mib, nil, &n, nil, 0); err != nil ***REMOVED***
+	if err := sysctl(mib, nil, &n, nil, 0); err != nil {
 		return nil, err
-	***REMOVED***
-	if n == 0 ***REMOVED***
+	}
+	if n == 0 {
 		return nil, nil
-	***REMOVED***
+	}
 
 	// Read into buffer of that size.
 	buf := make([]byte, n)
-	if err := sysctl(mib, &buf[0], &n, nil, 0); err != nil ***REMOVED***
+	if err := sysctl(mib, &buf[0], &n, nil, 0); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// The actual call may return less than the original reported required
 	// size so ensure we deal with that.
 	return buf[:n], nil
-***REMOVED***
+}
 
 //sys	utimes(path string, timeval *[2]Timeval) (err error)
 
-func Utimes(path string, tv []Timeval) error ***REMOVED***
-	if tv == nil ***REMOVED***
+func Utimes(path string, tv []Timeval) error {
+	if tv == nil {
 		return utimes(path, nil)
-	***REMOVED***
-	if len(tv) != 2 ***REMOVED***
+	}
+	if len(tv) != 2 {
 		return EINVAL
-	***REMOVED***
+	}
 	return utimes(path, (*[2]Timeval)(unsafe.Pointer(&tv[0])))
-***REMOVED***
+}
 
-func UtimesNano(path string, ts []Timespec) error ***REMOVED***
-	if ts == nil ***REMOVED***
+func UtimesNano(path string, ts []Timespec) error {
+	if ts == nil {
 		err := utimensat(AT_FDCWD, path, nil, 0)
-		if err != ENOSYS ***REMOVED***
+		if err != ENOSYS {
 			return err
-		***REMOVED***
+		}
 		return utimes(path, nil)
-	***REMOVED***
-	if len(ts) != 2 ***REMOVED***
+	}
+	if len(ts) != 2 {
 		return EINVAL
-	***REMOVED***
+	}
 	err := utimensat(AT_FDCWD, path, (*[2]Timespec)(unsafe.Pointer(&ts[0])), 0)
-	if err != ENOSYS ***REMOVED***
+	if err != ENOSYS {
 		return err
-	***REMOVED***
+	}
 	// Not as efficient as it could be because Timespec and
 	// Timeval have different types in the different OSes
-	tv := [2]Timeval***REMOVED***
+	tv := [2]Timeval{
 		NsecToTimeval(TimespecToNsec(ts[0])),
 		NsecToTimeval(TimespecToNsec(ts[1])),
-	***REMOVED***
+	}
 	return utimes(path, (*[2]Timeval)(unsafe.Pointer(&tv[0])))
-***REMOVED***
+}
 
-func UtimesNanoAt(dirfd int, path string, ts []Timespec, flags int) error ***REMOVED***
-	if ts == nil ***REMOVED***
+func UtimesNanoAt(dirfd int, path string, ts []Timespec, flags int) error {
+	if ts == nil {
 		return utimensat(dirfd, path, nil, flags)
-	***REMOVED***
-	if len(ts) != 2 ***REMOVED***
+	}
+	if len(ts) != 2 {
 		return EINVAL
-	***REMOVED***
+	}
 	return utimensat(dirfd, path, (*[2]Timespec)(unsafe.Pointer(&ts[0])), flags)
-***REMOVED***
+}
 
 //sys	futimes(fd int, timeval *[2]Timeval) (err error)
 
-func Futimes(fd int, tv []Timeval) error ***REMOVED***
-	if tv == nil ***REMOVED***
+func Futimes(fd int, tv []Timeval) error {
+	if tv == nil {
 		return futimes(fd, nil)
-	***REMOVED***
-	if len(tv) != 2 ***REMOVED***
+	}
+	if len(tv) != 2 {
 		return EINVAL
-	***REMOVED***
+	}
 	return futimes(fd, (*[2]Timeval)(unsafe.Pointer(&tv[0])))
-***REMOVED***
+}
 
 //sys	fcntl(fd int, cmd int, arg int) (val int, err error)
 
 //sys   poll(fds *PollFd, nfds int, timeout int) (n int, err error)
 
-func Poll(fds []PollFd, timeout int) (n int, err error) ***REMOVED***
-	if len(fds) == 0 ***REMOVED***
+func Poll(fds []PollFd, timeout int) (n int, err error) {
+	if len(fds) == 0 {
 		return poll(nil, 0, timeout)
-	***REMOVED***
+	}
 	return poll(&fds[0], len(fds), timeout)
-***REMOVED***
+}
 
 // TODO: wrap
 //	Acct(name nil-string) (err error)
 //	Gethostuuid(uuid *byte, timeout *Timespec) (err error)
 //	Ptrace(req int, pid int, addr uintptr, data int) (ret uintptr, err error)
 
-var mapper = &mmapper***REMOVED***
+var mapper = &mmapper{
 	active: make(map[*byte][]byte),
 	mmap:   mmap,
 	munmap: munmap,
-***REMOVED***
+}
 
-func Mmap(fd int, offset int64, length int, prot int, flags int) (data []byte, err error) ***REMOVED***
+func Mmap(fd int, offset int64, length int, prot int, flags int) (data []byte, err error) {
 	return mapper.Mmap(fd, offset, length, prot, flags)
-***REMOVED***
+}
 
-func Munmap(b []byte) (err error) ***REMOVED***
+func Munmap(b []byte) (err error) {
 	return mapper.Munmap(b)
-***REMOVED***
+}
 
 //sys	Madvise(b []byte, behav int) (err error)
 //sys	Mlock(b []byte) (err error)

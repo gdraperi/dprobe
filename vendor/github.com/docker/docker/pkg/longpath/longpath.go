@@ -13,14 +13,14 @@ const Prefix = `\\?\`
 
 // AddPrefix will add the Windows long path prefix to the path provided if
 // it does not already have it.
-func AddPrefix(path string) string ***REMOVED***
-	if !strings.HasPrefix(path, Prefix) ***REMOVED***
-		if strings.HasPrefix(path, `\\`) ***REMOVED***
+func AddPrefix(path string) string {
+	if !strings.HasPrefix(path, Prefix) {
+		if strings.HasPrefix(path, `\\`) {
 			// This is a UNC path, so we need to add 'UNC' to the path as well.
 			path = Prefix + `UNC` + path[1:]
-		***REMOVED*** else ***REMOVED***
+		} else {
 			path = Prefix + path
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return path
-***REMOVED***
+}

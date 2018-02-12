@@ -29,13 +29,13 @@ You can [read more about the code generation options here](http://github.com/tin
 Field names can be set in much the same way as the `encoding/json` package. For example:
 
 ```go
-type Person struct ***REMOVED***
+type Person struct {
 	Name       string `msg:"name"`
 	Address    string `msg:"address"`
 	Age        int    `msg:"age"`
 	Hidden     string `msg:"-"` // this field is ignored
 	unexported bool             // this field is also ignored
-***REMOVED***
+}
 ```
 
 By default, the code generator will satisfy `msgp.Sizer`, `msgp.Encodable`, `msgp.Decodable`, 
@@ -65,11 +65,11 @@ const Eight = 8
 type MyInt int
 type Data []byte
 
-type Struct struct ***REMOVED***
+type Struct struct {
 	Which  map[string]*MyInt `msg:"which"`
 	Other  Data              `msg:"other"`
 	Nums   [Eight]float64    `msg:"nums"`
-***REMOVED***
+}
 ```
 As long as the declarations of `MyInt` and `Data` are in the same file as `Struct`, the parser will determine that the type information for `MyInt` and `Data` can be passed into the definition of `Struct` before its methods are generated.
 
@@ -90,8 +90,8 @@ Here some of the known limitations/restrictions:
 
 - Identifiers from outside the processed source file are assumed (optimistically) to satisfy the generator's interfaces. If this isn't the case, your code will fail to compile.
 - Like most serializers, `chan` and `func` fields are ignored, as well as non-exported fields.
-- Encoding of `interface***REMOVED******REMOVED***` is limited to built-ins or types that have explicit encoding methods.
-- _Maps must have `string` keys._ This is intentional (as it preserves JSON interop.) Although non-string map keys are not forbidden by the MessagePack standard, many serializers impose this restriction. (It also means *any* well-formed `struct` can be de-serialized into a `map[string]interface***REMOVED******REMOVED***`.) The only exception to this rule is that the deserializers will allow you to read map keys encoded as `bin` types, due to the fact that some legacy encodings permitted this. (However, those values will still be cast to Go `string`s, and they will be converted to `str` types when re-encoded. It is the responsibility of the user to ensure that map keys are UTF-8 safe in this case.) The same rules hold true for JSON translation.
+- Encoding of `interface{}` is limited to built-ins or types that have explicit encoding methods.
+- _Maps must have `string` keys._ This is intentional (as it preserves JSON interop.) Although non-string map keys are not forbidden by the MessagePack standard, many serializers impose this restriction. (It also means *any* well-formed `struct` can be de-serialized into a `map[string]interface{}`.) The only exception to this rule is that the deserializers will allow you to read map keys encoded as `bin` types, due to the fact that some legacy encodings permitted this. (However, those values will still be cast to Go `string`s, and they will be converted to `str` types when re-encoded. It is the responsibility of the user to ensure that map keys are UTF-8 safe in this case.) The same rules hold true for JSON translation.
 
 If the output compiles, then there's a pretty good chance things are fine. (Plus, we generate tests for you.) *Please, please, please* file an issue if you think the generator is writing broken code.
 

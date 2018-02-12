@@ -11,9 +11,9 @@ import (
 //
 //   - Linux/Unix: $HOME/.aws/credentials
 //   - Windows: %USERPROFILE%\.aws\credentials
-func SharedCredentialsFilename() string ***REMOVED***
+func SharedCredentialsFilename() string {
 	return shareddefaults.SharedCredentialsFilename()
-***REMOVED***
+}
 
 // SharedConfigFilename returns the SDK's default file path for
 // the shared config file.
@@ -22,6 +22,6 @@ func SharedCredentialsFilename() string ***REMOVED***
 //
 //   - Linux/Unix: $HOME/.aws/config
 //   - Windows: %USERPROFILE%\.aws\config
-func SharedConfigFilename() string ***REMOVED***
+func SharedConfigFilename() string {
 	return shareddefaults.SharedConfigFilename()
-***REMOVED***
+}

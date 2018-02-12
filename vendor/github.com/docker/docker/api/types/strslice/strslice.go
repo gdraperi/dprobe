@@ -8,23 +8,23 @@ type StrSlice []string
 
 // UnmarshalJSON decodes the byte slice whether it's a string or an array of
 // strings. This method is needed to implement json.Unmarshaler.
-func (e *StrSlice) UnmarshalJSON(b []byte) error ***REMOVED***
-	if len(b) == 0 ***REMOVED***
+func (e *StrSlice) UnmarshalJSON(b []byte) error {
+	if len(b) == 0 {
 		// With no input, we preserve the existing value by returning nil and
 		// leaving the target alone. This allows defining default values for
 		// the type.
 		return nil
-	***REMOVED***
+	}
 
 	p := make([]string, 0, 1)
-	if err := json.Unmarshal(b, &p); err != nil ***REMOVED***
+	if err := json.Unmarshal(b, &p); err != nil {
 		var s string
-		if err := json.Unmarshal(b, &s); err != nil ***REMOVED***
+		if err := json.Unmarshal(b, &s); err != nil {
 			return err
-		***REMOVED***
+		}
 		p = append(p, s)
-	***REMOVED***
+	}
 
 	*e = p
 	return nil
-***REMOVED***
+}

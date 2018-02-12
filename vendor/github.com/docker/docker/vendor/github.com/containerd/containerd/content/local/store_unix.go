@@ -10,11 +10,11 @@ import (
 	"github.com/containerd/containerd/sys"
 )
 
-func getATime(fi os.FileInfo) time.Time ***REMOVED***
-	if st, ok := fi.Sys().(*syscall.Stat_t); ok ***REMOVED***
+func getATime(fi os.FileInfo) time.Time {
+	if st, ok := fi.Sys().(*syscall.Stat_t); ok {
 		return time.Unix(int64(sys.StatAtime(st).Sec),
 			int64(sys.StatAtime(st).Nsec))
-	***REMOVED***
+	}
 
 	return fi.ModTime()
-***REMOVED***
+}

@@ -14,26 +14,26 @@ const (
 	_IOC_PARAM_MASK  = (1 << _IOC_PARAM_SHIFT) - 1
 )
 
-func _IOC_PARM_LEN(ioctl uintptr) uintptr ***REMOVED***
+func _IOC_PARM_LEN(ioctl uintptr) uintptr {
 	return (ioctl >> 16) & _IOC_PARAM_MASK
-***REMOVED***
+}
 
-func _IOC(inout uintptr, group byte, ioctl_num uintptr, param_len uintptr) uintptr ***REMOVED***
+func _IOC(inout uintptr, group byte, ioctl_num uintptr, param_len uintptr) uintptr {
 	return inout | (param_len&_IOC_PARAM_MASK)<<16 | uintptr(group)<<8 | ioctl_num
-***REMOVED***
+}
 
-func _IO(group byte, ioctl_num uintptr) uintptr ***REMOVED***
+func _IO(group byte, ioctl_num uintptr) uintptr {
 	return _IOC(_IOC_VOID, group, ioctl_num, 0)
-***REMOVED***
+}
 
-func _IOR(group byte, ioctl_num uintptr, param_len uintptr) uintptr ***REMOVED***
+func _IOR(group byte, ioctl_num uintptr, param_len uintptr) uintptr {
 	return _IOC(_IOC_OUT, group, ioctl_num, param_len)
-***REMOVED***
+}
 
-func _IOW(group byte, ioctl_num uintptr, param_len uintptr) uintptr ***REMOVED***
+func _IOW(group byte, ioctl_num uintptr, param_len uintptr) uintptr {
 	return _IOC(_IOC_IN, group, ioctl_num, param_len)
-***REMOVED***
+}
 
-func _IOWR(group byte, ioctl_num uintptr, param_len uintptr) uintptr ***REMOVED***
+func _IOWR(group byte, ioctl_num uintptr, param_len uintptr) uintptr {
 	return _IOC(_IOC_IN_OUT, group, ioctl_num, param_len)
-***REMOVED***
+}

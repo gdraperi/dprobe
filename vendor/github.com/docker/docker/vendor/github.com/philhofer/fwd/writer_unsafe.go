@@ -8,11 +8,11 @@ import (
 )
 
 // unsafe cast string as []byte
-func unsafestr(b string) []byte ***REMOVED***
+func unsafestr(b string) []byte {
 	l := len(b)
-	return *(*[]byte)(unsafe.Pointer(&reflect.SliceHeader***REMOVED***
+	return *(*[]byte)(unsafe.Pointer(&reflect.SliceHeader{
 		Len:  l,
 		Cap:  l,
 		Data: (*reflect.StringHeader)(unsafe.Pointer(&b)).Data,
-	***REMOVED***))
-***REMOVED***
+	}))
+}

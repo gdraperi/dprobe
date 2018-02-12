@@ -17,7 +17,7 @@ const (
 )
 
 // installCommonConfigFlags adds flags to the pflag.FlagSet to configure the daemon
-func installCommonConfigFlags(conf *config.Config, flags *pflag.FlagSet) ***REMOVED***
+func installCommonConfigFlags(conf *config.Config, flags *pflag.FlagSet) {
 	var maxConcurrentDownloads, maxConcurrentUploads int
 
 	installRegistryServiceFlags(&conf.ServiceOptions, flags)
@@ -40,9 +40,9 @@ func installCommonConfigFlags(conf *config.Config, flags *pflag.FlagSet) ***REMO
 	flags.MarkDeprecated("restart", "Please use a restart policy on docker run")
 
 	// Windows doesn't support setting the storage driver - there is no choice as to which ones to use.
-	if runtime.GOOS != "windows" ***REMOVED***
+	if runtime.GOOS != "windows" {
 		flags.StringVarP(&conf.GraphDriver, "storage-driver", "s", "", "Storage driver to use")
-	***REMOVED***
+	}
 
 	flags.IntVar(&conf.Mtu, "mtu", 0, "Set the containers network MTU")
 	flags.BoolVar(&conf.RawLogs, "raw-logs", false, "Full timestamps without ANSI coloring")
@@ -80,9 +80,9 @@ func installCommonConfigFlags(conf *config.Config, flags *pflag.FlagSet) ***REMO
 
 	conf.MaxConcurrentDownloads = &maxConcurrentDownloads
 	conf.MaxConcurrentUploads = &maxConcurrentUploads
-***REMOVED***
+}
 
-func installRegistryServiceFlags(options *registry.ServiceOptions, flags *pflag.FlagSet) ***REMOVED***
+func installRegistryServiceFlags(options *registry.ServiceOptions, flags *pflag.FlagSet) {
 	ana := opts.NewNamedListOptsRef("allow-nondistributable-artifacts", &options.AllowNondistributableArtifacts, registry.ValidateIndexName)
 	mirrors := opts.NewNamedListOptsRef("registry-mirrors", &options.Mirrors, registry.ValidateMirror)
 	insecureRegistries := opts.NewNamedListOptsRef("insecure-registries", &options.InsecureRegistries, registry.ValidateIndexName)
@@ -91,9 +91,9 @@ func installRegistryServiceFlags(options *registry.ServiceOptions, flags *pflag.
 	flags.Var(mirrors, "registry-mirror", "Preferred Docker registry mirror")
 	flags.Var(insecureRegistries, "insecure-registry", "Enable insecure registry communication")
 
-	if runtime.GOOS != "windows" ***REMOVED***
+	if runtime.GOOS != "windows" {
 		// TODO: Remove this flag after 3 release cycles (18.03)
 		flags.BoolVar(&options.V2Only, "disable-legacy-registry", true, "Disable contacting legacy registries")
 		flags.MarkHidden("disable-legacy-registry")
-	***REMOVED***
-***REMOVED***
+	}
+}

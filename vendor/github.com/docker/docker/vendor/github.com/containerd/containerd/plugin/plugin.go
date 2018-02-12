@@ -25,17 +25,17 @@ var (
 )
 
 // IsSkipPlugin returns true if the error is skipping the plugin
-func IsSkipPlugin(err error) bool ***REMOVED***
-	if errors.Cause(err) == ErrSkipPlugin ***REMOVED***
+func IsSkipPlugin(err error) bool {
+	if errors.Cause(err) == ErrSkipPlugin {
 		return true
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
 // Type is the type of the plugin
 type Type string
 
-func (t Type) String() string ***REMOVED*** return string(t) ***REMOVED***
+func (t Type) String() string { return string(t) }
 
 const (
 	// AllPlugins declares that the plugin should be initialized after all others.
@@ -59,114 +59,114 @@ const (
 )
 
 // Registration contains information for registering a plugin
-type Registration struct ***REMOVED***
+type Registration struct {
 	// Type of the plugin
 	Type Type
 	// ID of the plugin
 	ID string
 	// Config specific to the plugin
-	Config interface***REMOVED******REMOVED***
+	Config interface{}
 	// Requires is a list of plugins that the registered plugin requires to be available
 	Requires []Type
 
 	// InitFn is called when initializing a plugin. The registration and
 	// context are passed in. The init function may modify the registration to
 	// add exports, capabilites and platform support declarations.
-	InitFn func(*InitContext) (interface***REMOVED******REMOVED***, error)
-***REMOVED***
+	InitFn func(*InitContext) (interface{}, error)
+}
 
 // Init the registered plugin
-func (r *Registration) Init(ic *InitContext) *Plugin ***REMOVED***
+func (r *Registration) Init(ic *InitContext) *Plugin {
 	p, err := r.InitFn(ic)
-	return &Plugin***REMOVED***
+	return &Plugin{
 		Registration: r,
 		Config:       ic.Config,
 		Meta:         ic.Meta,
 		instance:     p,
 		err:          err,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // URI returns the full plugin URI
-func (r *Registration) URI() string ***REMOVED***
+func (r *Registration) URI() string {
 	return fmt.Sprintf("%s.%s", r.Type, r.ID)
-***REMOVED***
+}
 
 // Service allows GRPC services to be registered with the underlying server
-type Service interface ***REMOVED***
+type Service interface {
 	Register(*grpc.Server) error
-***REMOVED***
+}
 
-var register = struct ***REMOVED***
+var register = struct {
 	sync.RWMutex
 	r []*Registration
-***REMOVED******REMOVED******REMOVED***
+}{}
 
 // Load loads all plugins at the provided path into containerd
-func Load(path string) (err error) ***REMOVED***
-	defer func() ***REMOVED***
-		if v := recover(); v != nil ***REMOVED***
+func Load(path string) (err error) {
+	defer func() {
+		if v := recover(); v != nil {
 			rerr, ok := v.(error)
-			if !ok ***REMOVED***
+			if !ok {
 				rerr = fmt.Errorf("%s", v)
-			***REMOVED***
+			}
 			err = rerr
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 	return loadPlugins(path)
-***REMOVED***
+}
 
 // Register allows plugins to register
-func Register(r *Registration) ***REMOVED***
+func Register(r *Registration) {
 	register.Lock()
 	defer register.Unlock()
-	if r.Type == "" ***REMOVED***
+	if r.Type == "" {
 		panic(ErrNoType)
-	***REMOVED***
-	if r.ID == "" ***REMOVED***
+	}
+	if r.ID == "" {
 		panic(ErrNoPluginID)
-	***REMOVED***
+	}
 
 	var last bool
-	for _, requires := range r.Requires ***REMOVED***
-		if requires == "*" ***REMOVED***
+	for _, requires := range r.Requires {
+		if requires == "*" {
 			last = true
-		***REMOVED***
-	***REMOVED***
-	if last && len(r.Requires) != 1 ***REMOVED***
+		}
+	}
+	if last && len(r.Requires) != 1 {
 		panic(ErrInvalidRequires)
-	***REMOVED***
+	}
 
 	register.r = append(register.r, r)
-***REMOVED***
+}
 
 // Graph returns an ordered list of registered plugins for initialization
-func Graph() (ordered []*Registration) ***REMOVED***
+func Graph() (ordered []*Registration) {
 	register.RLock()
 	defer register.RUnlock()
 
-	added := map[*Registration]bool***REMOVED******REMOVED***
-	for _, r := range register.r ***REMOVED***
+	added := map[*Registration]bool{}
+	for _, r := range register.r {
 
 		children(r.ID, r.Requires, added, &ordered)
-		if !added[r] ***REMOVED***
+		if !added[r] {
 			ordered = append(ordered, r)
 			added[r] = true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return ordered
-***REMOVED***
+}
 
-func children(id string, types []Type, added map[*Registration]bool, ordered *[]*Registration) ***REMOVED***
-	for _, t := range types ***REMOVED***
-		for _, r := range register.r ***REMOVED***
-			if r.ID != id && (t == "*" || r.Type == t) ***REMOVED***
+func children(id string, types []Type, added map[*Registration]bool, ordered *[]*Registration) {
+	for _, t := range types {
+		for _, r := range register.r {
+			if r.ID != id && (t == "*" || r.Type == t) {
 				children(r.ID, r.Requires, added, ordered)
-				if !added[r] ***REMOVED***
+				if !added[r] {
 					*ordered = append(*ordered, r)
 					added[r] = true
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+				}
+			}
+		}
+	}
+}

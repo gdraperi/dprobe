@@ -12,121 +12,121 @@ import (
 	"golang.org/x/net/dns/dnsmessage"
 )
 
-func mustNewName(name string) dnsmessage.Name ***REMOVED***
+func mustNewName(name string) dnsmessage.Name {
 	n, err := dnsmessage.NewName(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func ExampleParser() ***REMOVED***
-	msg := dnsmessage.Message***REMOVED***
-		Header: dnsmessage.Header***REMOVED***Response: true, Authoritative: true***REMOVED***,
-		Questions: []dnsmessage.Question***REMOVED***
-			***REMOVED***
+func ExampleParser() {
+	msg := dnsmessage.Message{
+		Header: dnsmessage.Header{Response: true, Authoritative: true},
+		Questions: []dnsmessage.Question{
+			{
 				Name:  mustNewName("foo.bar.example.com."),
 				Type:  dnsmessage.TypeA,
 				Class: dnsmessage.ClassINET,
-			***REMOVED***,
-			***REMOVED***
+			},
+			{
 				Name:  mustNewName("bar.example.com."),
 				Type:  dnsmessage.TypeA,
 				Class: dnsmessage.ClassINET,
-			***REMOVED***,
-		***REMOVED***,
-		Answers: []dnsmessage.Resource***REMOVED***
-			***REMOVED***
-				dnsmessage.ResourceHeader***REMOVED***
+			},
+		},
+		Answers: []dnsmessage.Resource{
+			{
+				dnsmessage.ResourceHeader{
 					Name:  mustNewName("foo.bar.example.com."),
 					Type:  dnsmessage.TypeA,
 					Class: dnsmessage.ClassINET,
-				***REMOVED***,
-				&dnsmessage.AResource***REMOVED***[4]byte***REMOVED***127, 0, 0, 1***REMOVED******REMOVED***,
-			***REMOVED***,
-			***REMOVED***
-				dnsmessage.ResourceHeader***REMOVED***
+				},
+				&dnsmessage.AResource{[4]byte{127, 0, 0, 1}},
+			},
+			{
+				dnsmessage.ResourceHeader{
 					Name:  mustNewName("bar.example.com."),
 					Type:  dnsmessage.TypeA,
 					Class: dnsmessage.ClassINET,
-				***REMOVED***,
-				&dnsmessage.AResource***REMOVED***[4]byte***REMOVED***127, 0, 0, 2***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+				},
+				&dnsmessage.AResource{[4]byte{127, 0, 0, 2}},
+			},
+		},
+	}
 
 	buf, err := msg.Pack()
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 
 	wantName := "bar.example.com."
 
 	var p dnsmessage.Parser
-	if _, err := p.Start(buf); err != nil ***REMOVED***
+	if _, err := p.Start(buf); err != nil {
 		panic(err)
-	***REMOVED***
+	}
 
-	for ***REMOVED***
+	for {
 		q, err := p.Question()
-		if err == dnsmessage.ErrSectionDone ***REMOVED***
+		if err == dnsmessage.ErrSectionDone {
 			break
-		***REMOVED***
-		if err != nil ***REMOVED***
+		}
+		if err != nil {
 			panic(err)
-		***REMOVED***
+		}
 
-		if q.Name.String() != wantName ***REMOVED***
+		if q.Name.String() != wantName {
 			continue
-		***REMOVED***
+		}
 
 		fmt.Println("Found question for name", wantName)
-		if err := p.SkipAllQuestions(); err != nil ***REMOVED***
+		if err := p.SkipAllQuestions(); err != nil {
 			panic(err)
-		***REMOVED***
+		}
 		break
-	***REMOVED***
+	}
 
 	var gotIPs []net.IP
-	for ***REMOVED***
+	for {
 		h, err := p.AnswerHeader()
-		if err == dnsmessage.ErrSectionDone ***REMOVED***
+		if err == dnsmessage.ErrSectionDone {
 			break
-		***REMOVED***
-		if err != nil ***REMOVED***
+		}
+		if err != nil {
 			panic(err)
-		***REMOVED***
+		}
 
-		if (h.Type != dnsmessage.TypeA && h.Type != dnsmessage.TypeAAAA) || h.Class != dnsmessage.ClassINET ***REMOVED***
+		if (h.Type != dnsmessage.TypeA && h.Type != dnsmessage.TypeAAAA) || h.Class != dnsmessage.ClassINET {
 			continue
-		***REMOVED***
+		}
 
-		if !strings.EqualFold(h.Name.String(), wantName) ***REMOVED***
-			if err := p.SkipAnswer(); err != nil ***REMOVED***
+		if !strings.EqualFold(h.Name.String(), wantName) {
+			if err := p.SkipAnswer(); err != nil {
 				panic(err)
-			***REMOVED***
+			}
 			continue
-		***REMOVED***
+		}
 
-		switch h.Type ***REMOVED***
+		switch h.Type {
 		case dnsmessage.TypeA:
 			r, err := p.AResource()
-			if err != nil ***REMOVED***
+			if err != nil {
 				panic(err)
-			***REMOVED***
+			}
 			gotIPs = append(gotIPs, r.A[:])
 		case dnsmessage.TypeAAAA:
 			r, err := p.AAAAResource()
-			if err != nil ***REMOVED***
+			if err != nil {
 				panic(err)
-			***REMOVED***
+			}
 			gotIPs = append(gotIPs, r.AAAA[:])
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	fmt.Printf("Found A/AAAA records for name %s: %v\n", wantName, gotIPs)
 
 	// Output:
 	// Found question for name bar.example.com.
 	// Found A/AAAA records for name bar.example.com.: [127.0.0.2]
-***REMOVED***
+}

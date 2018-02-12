@@ -7,43 +7,43 @@ package norm
 import "testing"
 
 // TestCase is used for most tests.
-type TestCase struct ***REMOVED***
+type TestCase struct {
 	in  []rune
 	out []rune
-***REMOVED***
+}
 
-func runTests(t *testing.T, name string, fm Form, tests []TestCase) ***REMOVED***
-	rb := reorderBuffer***REMOVED******REMOVED***
+func runTests(t *testing.T, name string, fm Form, tests []TestCase) {
+	rb := reorderBuffer{}
 	rb.init(fm, nil)
-	for i, test := range tests ***REMOVED***
+	for i, test := range tests {
 		rb.setFlusher(nil, appendFlush)
-		for j, rune := range test.in ***REMOVED***
+		for j, rune := range test.in {
 			b := []byte(string(rune))
 			src := inputBytes(b)
 			info := rb.f.info(src, 0)
-			if j == 0 ***REMOVED***
+			if j == 0 {
 				rb.ss.first(info)
-			***REMOVED*** else ***REMOVED***
+			} else {
 				rb.ss.next(info)
-			***REMOVED***
-			if rb.insertFlush(src, 0, info) < 0 ***REMOVED***
+			}
+			if rb.insertFlush(src, 0, info) < 0 {
 				t.Errorf("%s:%d: insert failed for rune %d", name, i, j)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		rb.doFlush()
 		was := string(rb.out)
 		want := string(test.out)
-		if len(was) != len(want) ***REMOVED***
+		if len(was) != len(want) {
 			t.Errorf("%s:%d: length = %d; want %d", name, i, len(was), len(want))
-		***REMOVED***
-		if was != want ***REMOVED***
+		}
+		if was != want {
 			k, pfx := pidx(was, want)
 			t.Errorf("%s:%d: \nwas  %s%+q; \nwant %s%+q", name, i, pfx, was[k:], pfx, want[k:])
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestFlush(t *testing.T) ***REMOVED***
+func TestFlush(t *testing.T) {
 	const (
 		hello = "Hello "
 		world = "world!"
@@ -51,80 +51,80 @@ func TestFlush(t *testing.T) ***REMOVED***
 	buf := make([]byte, maxByteBufferSize)
 	p := copy(buf, hello)
 	out := buf[p:]
-	rb := reorderBuffer***REMOVED******REMOVED***
+	rb := reorderBuffer{}
 	rb.initString(NFC, world)
-	if i := rb.flushCopy(out); i != 0 ***REMOVED***
+	if i := rb.flushCopy(out); i != 0 {
 		t.Errorf("wrote bytes on flush of empty buffer. (len(out) = %d)", i)
-	***REMOVED***
+	}
 
-	for i := range world ***REMOVED***
+	for i := range world {
 		// No need to set streamSafe values for this test.
 		rb.insertFlush(rb.src, i, rb.f.info(rb.src, i))
 		n := rb.flushCopy(out)
 		out = out[n:]
 		p += n
-	***REMOVED***
+	}
 
 	was := buf[:p]
 	want := hello + world
-	if string(was) != want ***REMOVED***
+	if string(was) != want {
 		t.Errorf(`output after flush was "%s"; want "%s"`, string(was), want)
-	***REMOVED***
-	if rb.nrune != 0 ***REMOVED***
+	}
+	if rb.nrune != 0 {
 		t.Errorf("non-null size of info buffer (rb.nrune == %d)", rb.nrune)
-	***REMOVED***
-	if rb.nbyte != 0 ***REMOVED***
+	}
+	if rb.nbyte != 0 {
 		t.Errorf("non-null size of byte buffer (rb.nbyte == %d)", rb.nbyte)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-var insertTests = []TestCase***REMOVED***
-	***REMOVED***[]rune***REMOVED***'a'***REMOVED***, []rune***REMOVED***'a'***REMOVED******REMOVED***,
-	***REMOVED***[]rune***REMOVED***0x300***REMOVED***, []rune***REMOVED***0x300***REMOVED******REMOVED***,
-	***REMOVED***[]rune***REMOVED***0x300, 0x316***REMOVED***, []rune***REMOVED***0x316, 0x300***REMOVED******REMOVED***, // CCC(0x300)==230; CCC(0x316)==220
-	***REMOVED***[]rune***REMOVED***0x316, 0x300***REMOVED***, []rune***REMOVED***0x316, 0x300***REMOVED******REMOVED***,
-	***REMOVED***[]rune***REMOVED***0x41, 0x316, 0x300***REMOVED***, []rune***REMOVED***0x41, 0x316, 0x300***REMOVED******REMOVED***,
-	***REMOVED***[]rune***REMOVED***0x41, 0x300, 0x316***REMOVED***, []rune***REMOVED***0x41, 0x316, 0x300***REMOVED******REMOVED***,
-	***REMOVED***[]rune***REMOVED***0x300, 0x316, 0x41***REMOVED***, []rune***REMOVED***0x316, 0x300, 0x41***REMOVED******REMOVED***,
-	***REMOVED***[]rune***REMOVED***0x41, 0x300, 0x40, 0x316***REMOVED***, []rune***REMOVED***0x41, 0x300, 0x40, 0x316***REMOVED******REMOVED***,
-***REMOVED***
+var insertTests = []TestCase{
+	{[]rune{'a'}, []rune{'a'}},
+	{[]rune{0x300}, []rune{0x300}},
+	{[]rune{0x300, 0x316}, []rune{0x316, 0x300}}, // CCC(0x300)==230; CCC(0x316)==220
+	{[]rune{0x316, 0x300}, []rune{0x316, 0x300}},
+	{[]rune{0x41, 0x316, 0x300}, []rune{0x41, 0x316, 0x300}},
+	{[]rune{0x41, 0x300, 0x316}, []rune{0x41, 0x316, 0x300}},
+	{[]rune{0x300, 0x316, 0x41}, []rune{0x316, 0x300, 0x41}},
+	{[]rune{0x41, 0x300, 0x40, 0x316}, []rune{0x41, 0x300, 0x40, 0x316}},
+}
 
-func TestInsert(t *testing.T) ***REMOVED***
+func TestInsert(t *testing.T) {
 	runTests(t, "TestInsert", NFD, insertTests)
-***REMOVED***
+}
 
-var decompositionNFDTest = []TestCase***REMOVED***
-	***REMOVED***[]rune***REMOVED***0xC0***REMOVED***, []rune***REMOVED***0x41, 0x300***REMOVED******REMOVED***,
-	***REMOVED***[]rune***REMOVED***0xAC00***REMOVED***, []rune***REMOVED***0x1100, 0x1161***REMOVED******REMOVED***,
-	***REMOVED***[]rune***REMOVED***0x01C4***REMOVED***, []rune***REMOVED***0x01C4***REMOVED******REMOVED***,
-	***REMOVED***[]rune***REMOVED***0x320E***REMOVED***, []rune***REMOVED***0x320E***REMOVED******REMOVED***,
-	***REMOVED***[]rune("음ẻ과"), []rune***REMOVED***0x110B, 0x1173, 0x11B7, 0x65, 0x309, 0x1100, 0x116A***REMOVED******REMOVED***,
-***REMOVED***
+var decompositionNFDTest = []TestCase{
+	{[]rune{0xC0}, []rune{0x41, 0x300}},
+	{[]rune{0xAC00}, []rune{0x1100, 0x1161}},
+	{[]rune{0x01C4}, []rune{0x01C4}},
+	{[]rune{0x320E}, []rune{0x320E}},
+	{[]rune("음ẻ과"), []rune{0x110B, 0x1173, 0x11B7, 0x65, 0x309, 0x1100, 0x116A}},
+}
 
-var decompositionNFKDTest = []TestCase***REMOVED***
-	***REMOVED***[]rune***REMOVED***0xC0***REMOVED***, []rune***REMOVED***0x41, 0x300***REMOVED******REMOVED***,
-	***REMOVED***[]rune***REMOVED***0xAC00***REMOVED***, []rune***REMOVED***0x1100, 0x1161***REMOVED******REMOVED***,
-	***REMOVED***[]rune***REMOVED***0x01C4***REMOVED***, []rune***REMOVED***0x44, 0x5A, 0x030C***REMOVED******REMOVED***,
-	***REMOVED***[]rune***REMOVED***0x320E***REMOVED***, []rune***REMOVED***0x28, 0x1100, 0x1161, 0x29***REMOVED******REMOVED***,
-***REMOVED***
+var decompositionNFKDTest = []TestCase{
+	{[]rune{0xC0}, []rune{0x41, 0x300}},
+	{[]rune{0xAC00}, []rune{0x1100, 0x1161}},
+	{[]rune{0x01C4}, []rune{0x44, 0x5A, 0x030C}},
+	{[]rune{0x320E}, []rune{0x28, 0x1100, 0x1161, 0x29}},
+}
 
-func TestDecomposition(t *testing.T) ***REMOVED***
+func TestDecomposition(t *testing.T) {
 	runTests(t, "TestDecompositionNFD", NFD, decompositionNFDTest)
 	runTests(t, "TestDecompositionNFKD", NFKD, decompositionNFKDTest)
-***REMOVED***
+}
 
-var compositionTest = []TestCase***REMOVED***
-	***REMOVED***[]rune***REMOVED***0x41, 0x300***REMOVED***, []rune***REMOVED***0xC0***REMOVED******REMOVED***,
-	***REMOVED***[]rune***REMOVED***0x41, 0x316***REMOVED***, []rune***REMOVED***0x41, 0x316***REMOVED******REMOVED***,
-	***REMOVED***[]rune***REMOVED***0x41, 0x300, 0x35D***REMOVED***, []rune***REMOVED***0xC0, 0x35D***REMOVED******REMOVED***,
-	***REMOVED***[]rune***REMOVED***0x41, 0x316, 0x300***REMOVED***, []rune***REMOVED***0xC0, 0x316***REMOVED******REMOVED***,
+var compositionTest = []TestCase{
+	{[]rune{0x41, 0x300}, []rune{0xC0}},
+	{[]rune{0x41, 0x316}, []rune{0x41, 0x316}},
+	{[]rune{0x41, 0x300, 0x35D}, []rune{0xC0, 0x35D}},
+	{[]rune{0x41, 0x316, 0x300}, []rune{0xC0, 0x316}},
 	// blocking starter
-	***REMOVED***[]rune***REMOVED***0x41, 0x316, 0x40, 0x300***REMOVED***, []rune***REMOVED***0x41, 0x316, 0x40, 0x300***REMOVED******REMOVED***,
-	***REMOVED***[]rune***REMOVED***0x1100, 0x1161***REMOVED***, []rune***REMOVED***0xAC00***REMOVED******REMOVED***,
+	{[]rune{0x41, 0x316, 0x40, 0x300}, []rune{0x41, 0x316, 0x40, 0x300}},
+	{[]rune{0x1100, 0x1161}, []rune{0xAC00}},
 	// parenthesized Hangul, alternate between ASCII and Hangul.
-	***REMOVED***[]rune***REMOVED***0x28, 0x1100, 0x1161, 0x29***REMOVED***, []rune***REMOVED***0x28, 0xAC00, 0x29***REMOVED******REMOVED***,
-***REMOVED***
+	{[]rune{0x28, 0x1100, 0x1161, 0x29}, []rune{0x28, 0xAC00, 0x29}},
+}
 
-func TestComposition(t *testing.T) ***REMOVED***
+func TestComposition(t *testing.T) {
 	runTests(t, "TestComposition", NFC, compositionTest)
-***REMOVED***
+}

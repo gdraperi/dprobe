@@ -11,25 +11,25 @@ import (
 )
 
 // GetKernelVersion gets the current kernel version.
-func GetKernelVersion() (*VersionInfo, error) ***REMOVED***
+func GetKernelVersion() (*VersionInfo, error) {
 	uts, err := uname()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// Remove the \x00 from the release for Atoi to parse correctly
 	return ParseRelease(string(uts.Release[:bytes.IndexByte(uts.Release[:], 0)]))
-***REMOVED***
+}
 
 // CheckKernelVersion checks if current kernel is newer than (or equal to)
 // the given version.
-func CheckKernelVersion(k, major, minor int) bool ***REMOVED***
-	if v, err := GetKernelVersion(); err != nil ***REMOVED***
+func CheckKernelVersion(k, major, minor int) bool {
+	if v, err := GetKernelVersion(); err != nil {
 		logrus.Warnf("error getting kernel version: %s", err)
-	***REMOVED*** else ***REMOVED***
-		if CompareKernelVersion(*v, VersionInfo***REMOVED***Kernel: k, Major: major, Minor: minor***REMOVED***) < 0 ***REMOVED***
+	} else {
+		if CompareKernelVersion(*v, VersionInfo{Kernel: k, Major: major, Minor: minor}) < 0 {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}

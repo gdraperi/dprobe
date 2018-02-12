@@ -20,64 +20,64 @@ package x509
 //
 // Note: The CFDataRef returned in pemRoots must be released (using CFRelease) after
 // we've consumed its content.
-int FetchPEMRootsCTX509(CFDataRef *pemRoots) ***REMOVED***
-	if (pemRoots == NULL) ***REMOVED***
+int FetchPEMRootsCTX509(CFDataRef *pemRoots) {
+	if (pemRoots == NULL) {
 		return -1;
-	***REMOVED***
+	}
 
 	CFArrayRef certs = NULL;
 	OSStatus err = SecTrustCopyAnchorCertificates(&certs);
-	if (err != noErr) ***REMOVED***
+	if (err != noErr) {
 		return -1;
-	***REMOVED***
+	}
 
 	CFMutableDataRef combinedData = CFDataCreateMutable(kCFAllocatorDefault, 0);
 	int i, ncerts = CFArrayGetCount(certs);
-	for (i = 0; i < ncerts; i++) ***REMOVED***
+	for (i = 0; i < ncerts; i++) {
 		CFDataRef data = NULL;
 		SecCertificateRef cert = (SecCertificateRef)CFArrayGetValueAtIndex(certs, i);
-		if (cert == NULL) ***REMOVED***
+		if (cert == NULL) {
 			continue;
-		***REMOVED***
+		}
 
 		// Note: SecKeychainItemExport is deprecated as of 10.7 in favor of SecItemExport.
 		// Once we support weak imports via cgo we should prefer that, and fall back to this
 		// for older systems.
 		err = SecKeychainItemExport(cert, kSecFormatX509Cert, kSecItemPemArmour, NULL, &data);
-		if (err != noErr) ***REMOVED***
+		if (err != noErr) {
 			continue;
-		***REMOVED***
+		}
 
-		if (data != NULL) ***REMOVED***
+		if (data != NULL) {
 			CFDataAppendBytes(combinedData, CFDataGetBytePtr(data), CFDataGetLength(data));
 			CFRelease(data);
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	CFRelease(certs);
 
 	*pemRoots = combinedData;
 	return 0;
-***REMOVED***
+}
 */
 import "C"
 import "unsafe"
 
-func (c *Certificate) systemVerify(opts *VerifyOptions) (chains [][]*Certificate, err error) ***REMOVED***
+func (c *Certificate) systemVerify(opts *VerifyOptions) (chains [][]*Certificate, err error) {
 	return nil, nil
-***REMOVED***
+}
 
-func initSystemRoots() ***REMOVED***
+func initSystemRoots() {
 	roots := NewCertPool()
 
 	var data C.CFDataRef = nil
 	err := C.FetchPEMRootsCTX509(&data)
-	if err == -1 ***REMOVED***
+	if err == -1 {
 		return
-	***REMOVED***
+	}
 
 	defer C.CFRelease(C.CFTypeRef(data))
 	buf := C.GoBytes(unsafe.Pointer(C.CFDataGetBytePtr(data)), C.int(C.CFDataGetLength(data)))
 	roots.AppendCertsFromPEM(buf)
 	systemRoots = roots
-***REMOVED***
+}

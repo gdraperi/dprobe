@@ -10,7 +10,7 @@ import (
 )
 
 // KVPair is used to represent a single K/V entry
-type KVPair struct ***REMOVED***
+type KVPair struct {
 	Key         string
 	CreateIndex uint64
 	ModifyIndex uint64
@@ -18,219 +18,219 @@ type KVPair struct ***REMOVED***
 	Flags       uint64
 	Value       []byte
 	Session     string
-***REMOVED***
+}
 
 // KVPairs is a list of KVPair objects
 type KVPairs []*KVPair
 
 // KV is used to manipulate the K/V API
-type KV struct ***REMOVED***
+type KV struct {
 	c *Client
-***REMOVED***
+}
 
 // KV is used to return a handle to the K/V apis
-func (c *Client) KV() *KV ***REMOVED***
-	return &KV***REMOVED***c***REMOVED***
-***REMOVED***
+func (c *Client) KV() *KV {
+	return &KV{c}
+}
 
 // Get is used to lookup a single key
-func (k *KV) Get(key string, q *QueryOptions) (*KVPair, *QueryMeta, error) ***REMOVED***
+func (k *KV) Get(key string, q *QueryOptions) (*KVPair, *QueryMeta, error) {
 	resp, qm, err := k.getInternal(key, nil, q)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, nil, err
-	***REMOVED***
-	if resp == nil ***REMOVED***
+	}
+	if resp == nil {
 		return nil, qm, nil
-	***REMOVED***
+	}
 	defer resp.Body.Close()
 
 	var entries []*KVPair
-	if err := decodeBody(resp, &entries); err != nil ***REMOVED***
+	if err := decodeBody(resp, &entries); err != nil {
 		return nil, nil, err
-	***REMOVED***
-	if len(entries) > 0 ***REMOVED***
+	}
+	if len(entries) > 0 {
 		return entries[0], qm, nil
-	***REMOVED***
+	}
 	return nil, qm, nil
-***REMOVED***
+}
 
 // List is used to lookup all keys under a prefix
-func (k *KV) List(prefix string, q *QueryOptions) (KVPairs, *QueryMeta, error) ***REMOVED***
-	resp, qm, err := k.getInternal(prefix, map[string]string***REMOVED***"recurse": ""***REMOVED***, q)
-	if err != nil ***REMOVED***
+func (k *KV) List(prefix string, q *QueryOptions) (KVPairs, *QueryMeta, error) {
+	resp, qm, err := k.getInternal(prefix, map[string]string{"recurse": ""}, q)
+	if err != nil {
 		return nil, nil, err
-	***REMOVED***
-	if resp == nil ***REMOVED***
+	}
+	if resp == nil {
 		return nil, qm, nil
-	***REMOVED***
+	}
 	defer resp.Body.Close()
 
 	var entries []*KVPair
-	if err := decodeBody(resp, &entries); err != nil ***REMOVED***
+	if err := decodeBody(resp, &entries); err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 	return entries, qm, nil
-***REMOVED***
+}
 
 // Keys is used to list all the keys under a prefix. Optionally,
 // a separator can be used to limit the responses.
-func (k *KV) Keys(prefix, separator string, q *QueryOptions) ([]string, *QueryMeta, error) ***REMOVED***
-	params := map[string]string***REMOVED***"keys": ""***REMOVED***
-	if separator != "" ***REMOVED***
+func (k *KV) Keys(prefix, separator string, q *QueryOptions) ([]string, *QueryMeta, error) {
+	params := map[string]string{"keys": ""}
+	if separator != "" {
 		params["separator"] = separator
-	***REMOVED***
+	}
 	resp, qm, err := k.getInternal(prefix, params, q)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, nil, err
-	***REMOVED***
-	if resp == nil ***REMOVED***
+	}
+	if resp == nil {
 		return nil, qm, nil
-	***REMOVED***
+	}
 	defer resp.Body.Close()
 
 	var entries []string
-	if err := decodeBody(resp, &entries); err != nil ***REMOVED***
+	if err := decodeBody(resp, &entries); err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 	return entries, qm, nil
-***REMOVED***
+}
 
-func (k *KV) getInternal(key string, params map[string]string, q *QueryOptions) (*http.Response, *QueryMeta, error) ***REMOVED***
+func (k *KV) getInternal(key string, params map[string]string, q *QueryOptions) (*http.Response, *QueryMeta, error) {
 	r := k.c.newRequest("GET", "/v1/kv/"+key)
 	r.setQueryOptions(q)
-	for param, val := range params ***REMOVED***
+	for param, val := range params {
 		r.params.Set(param, val)
-	***REMOVED***
+	}
 	rtt, resp, err := k.c.doRequest(r)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 
-	qm := &QueryMeta***REMOVED******REMOVED***
+	qm := &QueryMeta{}
 	parseQueryMeta(resp, qm)
 	qm.RequestTime = rtt
 
-	if resp.StatusCode == 404 ***REMOVED***
+	if resp.StatusCode == 404 {
 		resp.Body.Close()
 		return nil, qm, nil
-	***REMOVED*** else if resp.StatusCode != 200 ***REMOVED***
+	} else if resp.StatusCode != 200 {
 		resp.Body.Close()
 		return nil, nil, fmt.Errorf("Unexpected response code: %d", resp.StatusCode)
-	***REMOVED***
+	}
 	return resp, qm, nil
-***REMOVED***
+}
 
 // Put is used to write a new value. Only the
 // Key, Flags and Value is respected.
-func (k *KV) Put(p *KVPair, q *WriteOptions) (*WriteMeta, error) ***REMOVED***
+func (k *KV) Put(p *KVPair, q *WriteOptions) (*WriteMeta, error) {
 	params := make(map[string]string, 1)
-	if p.Flags != 0 ***REMOVED***
+	if p.Flags != 0 {
 		params["flags"] = strconv.FormatUint(p.Flags, 10)
-	***REMOVED***
+	}
 	_, wm, err := k.put(p.Key, params, p.Value, q)
 	return wm, err
-***REMOVED***
+}
 
 // CAS is used for a Check-And-Set operation. The Key,
 // ModifyIndex, Flags and Value are respected. Returns true
 // on success or false on failures.
-func (k *KV) CAS(p *KVPair, q *WriteOptions) (bool, *WriteMeta, error) ***REMOVED***
+func (k *KV) CAS(p *KVPair, q *WriteOptions) (bool, *WriteMeta, error) {
 	params := make(map[string]string, 2)
-	if p.Flags != 0 ***REMOVED***
+	if p.Flags != 0 {
 		params["flags"] = strconv.FormatUint(p.Flags, 10)
-	***REMOVED***
+	}
 	params["cas"] = strconv.FormatUint(p.ModifyIndex, 10)
 	return k.put(p.Key, params, p.Value, q)
-***REMOVED***
+}
 
 // Acquire is used for a lock acquisiiton operation. The Key,
 // Flags, Value and Session are respected. Returns true
 // on success or false on failures.
-func (k *KV) Acquire(p *KVPair, q *WriteOptions) (bool, *WriteMeta, error) ***REMOVED***
+func (k *KV) Acquire(p *KVPair, q *WriteOptions) (bool, *WriteMeta, error) {
 	params := make(map[string]string, 2)
-	if p.Flags != 0 ***REMOVED***
+	if p.Flags != 0 {
 		params["flags"] = strconv.FormatUint(p.Flags, 10)
-	***REMOVED***
+	}
 	params["acquire"] = p.Session
 	return k.put(p.Key, params, p.Value, q)
-***REMOVED***
+}
 
 // Release is used for a lock release operation. The Key,
 // Flags, Value and Session are respected. Returns true
 // on success or false on failures.
-func (k *KV) Release(p *KVPair, q *WriteOptions) (bool, *WriteMeta, error) ***REMOVED***
+func (k *KV) Release(p *KVPair, q *WriteOptions) (bool, *WriteMeta, error) {
 	params := make(map[string]string, 2)
-	if p.Flags != 0 ***REMOVED***
+	if p.Flags != 0 {
 		params["flags"] = strconv.FormatUint(p.Flags, 10)
-	***REMOVED***
+	}
 	params["release"] = p.Session
 	return k.put(p.Key, params, p.Value, q)
-***REMOVED***
+}
 
-func (k *KV) put(key string, params map[string]string, body []byte, q *WriteOptions) (bool, *WriteMeta, error) ***REMOVED***
+func (k *KV) put(key string, params map[string]string, body []byte, q *WriteOptions) (bool, *WriteMeta, error) {
 	r := k.c.newRequest("PUT", "/v1/kv/"+key)
 	r.setWriteOptions(q)
-	for param, val := range params ***REMOVED***
+	for param, val := range params {
 		r.params.Set(param, val)
-	***REMOVED***
+	}
 	r.body = bytes.NewReader(body)
 	rtt, resp, err := requireOK(k.c.doRequest(r))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return false, nil, err
-	***REMOVED***
+	}
 	defer resp.Body.Close()
 
-	qm := &WriteMeta***REMOVED******REMOVED***
+	qm := &WriteMeta{}
 	qm.RequestTime = rtt
 
 	var buf bytes.Buffer
-	if _, err := io.Copy(&buf, resp.Body); err != nil ***REMOVED***
+	if _, err := io.Copy(&buf, resp.Body); err != nil {
 		return false, nil, fmt.Errorf("Failed to read response: %v", err)
-	***REMOVED***
+	}
 	res := strings.Contains(string(buf.Bytes()), "true")
 	return res, qm, nil
-***REMOVED***
+}
 
 // Delete is used to delete a single key
-func (k *KV) Delete(key string, w *WriteOptions) (*WriteMeta, error) ***REMOVED***
+func (k *KV) Delete(key string, w *WriteOptions) (*WriteMeta, error) {
 	_, qm, err := k.deleteInternal(key, nil, w)
 	return qm, err
-***REMOVED***
+}
 
 // DeleteCAS is used for a Delete Check-And-Set operation. The Key
 // and ModifyIndex are respected. Returns true on success or false on failures.
-func (k *KV) DeleteCAS(p *KVPair, q *WriteOptions) (bool, *WriteMeta, error) ***REMOVED***
-	params := map[string]string***REMOVED***
+func (k *KV) DeleteCAS(p *KVPair, q *WriteOptions) (bool, *WriteMeta, error) {
+	params := map[string]string{
 		"cas": strconv.FormatUint(p.ModifyIndex, 10),
-	***REMOVED***
+	}
 	return k.deleteInternal(p.Key, params, q)
-***REMOVED***
+}
 
 // DeleteTree is used to delete all keys under a prefix
-func (k *KV) DeleteTree(prefix string, w *WriteOptions) (*WriteMeta, error) ***REMOVED***
-	_, qm, err := k.deleteInternal(prefix, map[string]string***REMOVED***"recurse": ""***REMOVED***, w)
+func (k *KV) DeleteTree(prefix string, w *WriteOptions) (*WriteMeta, error) {
+	_, qm, err := k.deleteInternal(prefix, map[string]string{"recurse": ""}, w)
 	return qm, err
-***REMOVED***
+}
 
-func (k *KV) deleteInternal(key string, params map[string]string, q *WriteOptions) (bool, *WriteMeta, error) ***REMOVED***
+func (k *KV) deleteInternal(key string, params map[string]string, q *WriteOptions) (bool, *WriteMeta, error) {
 	r := k.c.newRequest("DELETE", "/v1/kv/"+key)
 	r.setWriteOptions(q)
-	for param, val := range params ***REMOVED***
+	for param, val := range params {
 		r.params.Set(param, val)
-	***REMOVED***
+	}
 	rtt, resp, err := requireOK(k.c.doRequest(r))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return false, nil, err
-	***REMOVED***
+	}
 	defer resp.Body.Close()
 
-	qm := &WriteMeta***REMOVED******REMOVED***
+	qm := &WriteMeta{}
 	qm.RequestTime = rtt
 
 	var buf bytes.Buffer
-	if _, err := io.Copy(&buf, resp.Body); err != nil ***REMOVED***
+	if _, err := io.Copy(&buf, resp.Body); err != nil {
 		return false, nil, fmt.Errorf("Failed to read response: %v", err)
-	***REMOVED***
+	}
 	res := strings.Contains(string(buf.Bytes()), "true")
 	return res, qm, nil
-***REMOVED***
+}

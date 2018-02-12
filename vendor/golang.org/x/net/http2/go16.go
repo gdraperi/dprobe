@@ -11,6 +11,6 @@ import (
 	"time"
 )
 
-func transportExpectContinueTimeout(t1 *http.Transport) time.Duration ***REMOVED***
+func transportExpectContinueTimeout(t1 *http.Transport) time.Duration {
 	return t1.ExpectContinueTimeout
-***REMOVED***
+}

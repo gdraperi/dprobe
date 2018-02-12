@@ -37,28 +37,28 @@ var (
 	publicObject = flag.Bool("write_object_is_public", false, "Whether the object created by --write_object should be public.")
 )
 
-func readFile(v string) string ***REMOVED***
+func readFile(v string) string {
 	slurp, err := ioutil.ReadFile(v)
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatalf("Error reading %s: %v", v, err)
-	***REMOVED***
+	}
 	return strings.TrimSpace(string(slurp))
-***REMOVED***
+}
 
-var config = &oauth2.Config***REMOVED***
+var config = &oauth2.Config{
 	// The client-id and secret should be for an "Installed Application" when using
 	// the CLI. Later we'll use a web application with a callback.
 	ClientID:     readFile("client-id.dat"),
 	ClientSecret: readFile("client-secret.dat"),
 	Endpoint:     google.Endpoint,
-	Scopes: []string***REMOVED***
+	Scopes: []string{
 		compute.DevstorageFullControlScope,
 		compute.ComputeScope,
 		"https://www.googleapis.com/auth/sqlservice",
 		"https://www.googleapis.com/auth/sqlservice.admin",
-	***REMOVED***,
+	},
 	RedirectURL: "urn:ietf:wg:oauth:2.0:oob",
-***REMOVED***
+}
 
 const baseConfig = `#cloud-config
 coreos:
@@ -80,11 +80,11 @@ coreos:
         WantedBy=multi-user.target
 `
 
-func main() ***REMOVED***
+func main() {
 	flag.Parse()
-	if *proj == "" ***REMOVED***
+	if *proj == "" {
 		log.Fatalf("Missing --project flag")
-	***REMOVED***
+	}
 	prefix := "https://www.googleapis.com/compute/v1/projects/" + *proj
 	machType := prefix + "/zones/" + *zone + "/machineTypes/" + *mach
 
@@ -92,10 +92,10 @@ func main() ***REMOVED***
 	tokenFile := tokenCacheFile(tokenFileName)
 	tokenSource := oauth2.ReuseTokenSource(nil, tokenFile)
 	token, err := tokenSource.Token()
-	if err != nil ***REMOVED***
-		if *writeObject != "" ***REMOVED***
+	if err != nil {
+		if *writeObject != "" {
 			log.Fatalf("Can't use --write_object without a valid token.dat file already cached.")
-		***REMOVED***
+		}
 		log.Printf("Error getting token from %s: %v", tokenFileName, err)
 		log.Printf("Get auth code from %v", config.AuthCodeURL("my-state"))
 		fmt.Print("\nEnter auth code: ")
@@ -103,200 +103,200 @@ func main() ***REMOVED***
 		sc.Scan()
 		authCode := strings.TrimSpace(sc.Text())
 		token, err = config.Exchange(oauth2.NoContext, authCode)
-		if err != nil ***REMOVED***
+		if err != nil {
 			log.Fatalf("Error exchanging auth code for a token: %v", err)
-		***REMOVED***
-		if err := tokenFile.WriteToken(token); err != nil ***REMOVED***
+		}
+		if err := tokenFile.WriteToken(token); err != nil {
 			log.Fatalf("Error writing to %s: %v", tokenFileName, err)
-		***REMOVED***
+		}
 		tokenSource = oauth2.ReuseTokenSource(token, nil)
-	***REMOVED***
+	}
 
 	oauthClient := oauth2.NewClient(oauth2.NoContext, tokenSource)
 
-	if *writeObject != "" ***REMOVED***
+	if *writeObject != "" {
 		writeCloudStorageObject(oauthClient)
 		return
-	***REMOVED***
+	}
 
 	computeService, _ := compute.New(oauthClient)
 
 	natIP := *staticIP
-	if natIP == "" ***REMOVED***
+	if natIP == "" {
 		// Try to find it by name.
 		aggAddrList, err := computeService.Addresses.AggregatedList(*proj).Do()
-		if err != nil ***REMOVED***
+		if err != nil {
 			log.Fatal(err)
-		***REMOVED***
+		}
 		// http://godoc.org/code.google.com/p/google-api-go-client/compute/v1#AddressAggregatedList
 	IPLoop:
-		for _, asl := range aggAddrList.Items ***REMOVED***
-			for _, addr := range asl.Addresses ***REMOVED***
-				if addr.Name == *instName+"-ip" && addr.Status == "RESERVED" ***REMOVED***
+		for _, asl := range aggAddrList.Items {
+			for _, addr := range asl.Addresses {
+				if addr.Name == *instName+"-ip" && addr.Status == "RESERVED" {
 					natIP = addr.Address
 					break IPLoop
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+				}
+			}
+		}
+	}
 
 	cloudConfig := baseConfig
-	if *sshPub != "" ***REMOVED***
+	if *sshPub != "" {
 		key := strings.TrimSpace(readFile(*sshPub))
 		cloudConfig += fmt.Sprintf("\nssh_authorized_keys:\n    - %s\n", key)
-	***REMOVED***
-	if os.Getenv("USER") == "bradfitz" ***REMOVED***
+	}
+	if os.Getenv("USER") == "bradfitz" {
 		cloudConfig += fmt.Sprintf("\nssh_authorized_keys:\n    - %s\n", "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAIEAwks9dwWKlRC+73gRbvYtVg0vdCwDSuIlyt4z6xa/YU/jTDynM4R4W10hm2tPjy8iR1k8XhDv4/qdxe6m07NjG/By1tkmGpm1mGwho4Pr5kbAAy/Qg+NLCSdAYnnE00FQEcFOC15GFVMOW2AzDGKisReohwH9eIzHPzdYQNPRWXE= bradfitz@papag.bradfitz.com")
-	***REMOVED***
+	}
 	const maxCloudConfig = 32 << 10 // per compute API docs
-	if len(cloudConfig) > maxCloudConfig ***REMOVED***
+	if len(cloudConfig) > maxCloudConfig {
 		log.Fatalf("cloud config length of %d bytes is over %d byte limit", len(cloudConfig), maxCloudConfig)
-	***REMOVED***
+	}
 
-	instance := &compute.Instance***REMOVED***
+	instance := &compute.Instance{
 		Name:        *instName,
 		Description: "Go Builder",
 		MachineType: machType,
-		Disks:       []*compute.AttachedDisk***REMOVED***instanceDisk(computeService)***REMOVED***,
-		Tags: &compute.Tags***REMOVED***
-			Items: []string***REMOVED***"http-server", "https-server"***REMOVED***,
-		***REMOVED***,
-		Metadata: &compute.Metadata***REMOVED***
-			Items: []*compute.MetadataItems***REMOVED***
-				***REMOVED***
+		Disks:       []*compute.AttachedDisk{instanceDisk(computeService)},
+		Tags: &compute.Tags{
+			Items: []string{"http-server", "https-server"},
+		},
+		Metadata: &compute.Metadata{
+			Items: []*compute.MetadataItems{
+				{
 					Key:   "user-data",
 					Value: &cloudConfig,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		NetworkInterfaces: []*compute.NetworkInterface***REMOVED***
-			***REMOVED***
-				AccessConfigs: []*compute.AccessConfig***REMOVED***
-					***REMOVED***
+				},
+			},
+		},
+		NetworkInterfaces: []*compute.NetworkInterface{
+			{
+				AccessConfigs: []*compute.AccessConfig{
+					{
 						Type:  "ONE_TO_ONE_NAT",
 						Name:  "External NAT",
 						NatIP: natIP,
-					***REMOVED***,
-				***REMOVED***,
+					},
+				},
 				Network: prefix + "/global/networks/default",
-			***REMOVED***,
-		***REMOVED***,
-		ServiceAccounts: []*compute.ServiceAccount***REMOVED***
-			***REMOVED***
+			},
+		},
+		ServiceAccounts: []*compute.ServiceAccount{
+			{
 				Email: "default",
-				Scopes: []string***REMOVED***
+				Scopes: []string{
 					compute.DevstorageFullControlScope,
 					compute.ComputeScope,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+				},
+			},
+		},
+	}
 
 	log.Printf("Creating instance...")
 	op, err := computeService.Instances.Insert(*proj, *zone, instance).Do()
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatalf("Failed to create instance: %v", err)
-	***REMOVED***
+	}
 	opName := op.Name
 	log.Printf("Created. Waiting on operation %v", opName)
 OpLoop:
-	for ***REMOVED***
+	for {
 		time.Sleep(2 * time.Second)
 		op, err := computeService.ZoneOperations.Get(*proj, *zone, opName).Do()
-		if err != nil ***REMOVED***
+		if err != nil {
 			log.Fatalf("Failed to get op %s: %v", opName, err)
-		***REMOVED***
-		switch op.Status ***REMOVED***
+		}
+		switch op.Status {
 		case "PENDING", "RUNNING":
 			log.Printf("Waiting on operation %v", opName)
 			continue
 		case "DONE":
-			if op.Error != nil ***REMOVED***
-				for _, operr := range op.Error.Errors ***REMOVED***
+			if op.Error != nil {
+				for _, operr := range op.Error.Errors {
 					log.Printf("Error: %+v", operr)
-				***REMOVED***
+				}
 				log.Fatalf("Failed to start.")
-			***REMOVED***
+			}
 			log.Printf("Success. %+v", op)
 			break OpLoop
 		default:
 			log.Fatalf("Unknown status %q: %+v", op.Status, op)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	inst, err := computeService.Instances.Get(*proj, *zone, *instName).Do()
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatalf("Error getting instance after creation: %v", err)
-	***REMOVED***
+	}
 	ij, _ := json.MarshalIndent(inst, "", "    ")
 	log.Printf("Instance: %s", ij)
-***REMOVED***
+}
 
-func instanceDisk(svc *compute.Service) *compute.AttachedDisk ***REMOVED***
+func instanceDisk(svc *compute.Service) *compute.AttachedDisk {
 	const imageURL = "https://www.googleapis.com/compute/v1/projects/coreos-cloud/global/images/coreos-stable-444-5-0-v20141016"
 	diskName := *instName + "-disk"
 
-	return &compute.AttachedDisk***REMOVED***
+	return &compute.AttachedDisk{
 		AutoDelete: true,
 		Boot:       true,
 		Type:       "PERSISTENT",
-		InitializeParams: &compute.AttachedDiskInitializeParams***REMOVED***
+		InitializeParams: &compute.AttachedDiskInitializeParams{
 			DiskName:    diskName,
 			SourceImage: imageURL,
 			DiskSizeGb:  50,
-		***REMOVED***,
-	***REMOVED***
-***REMOVED***
+		},
+	}
+}
 
-func writeCloudStorageObject(httpClient *http.Client) ***REMOVED***
+func writeCloudStorageObject(httpClient *http.Client) {
 	content := os.Stdin
 	const maxSlurp = 1 << 20
 	var buf bytes.Buffer
 	n, err := io.CopyN(&buf, content, maxSlurp)
-	if err != nil && err != io.EOF ***REMOVED***
+	if err != nil && err != io.EOF {
 		log.Fatalf("Error reading from stdin: %v, %v", n, err)
-	***REMOVED***
+	}
 	contentType := http.DetectContentType(buf.Bytes())
 
 	req, err := http.NewRequest("PUT", "https://storage.googleapis.com/"+*writeObject, io.MultiReader(&buf, content))
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatal(err)
-	***REMOVED***
+	}
 	req.Header.Set("x-goog-api-version", "2")
-	if *publicObject ***REMOVED***
+	if *publicObject {
 		req.Header.Set("x-goog-acl", "public-read")
-	***REMOVED***
+	}
 	req.Header.Set("Content-Type", contentType)
 	res, err := httpClient.Do(req)
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatal(err)
-	***REMOVED***
-	if res.StatusCode != 200 ***REMOVED***
+	}
+	if res.StatusCode != 200 {
 		res.Write(os.Stderr)
 		log.Fatalf("Failed.")
-	***REMOVED***
+	}
 	log.Printf("Success.")
 	os.Exit(0)
-***REMOVED***
+}
 
 type tokenCacheFile string
 
-func (f tokenCacheFile) Token() (*oauth2.Token, error) ***REMOVED***
+func (f tokenCacheFile) Token() (*oauth2.Token, error) {
 	slurp, err := ioutil.ReadFile(string(f))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	t := new(oauth2.Token)
-	if err := json.Unmarshal(slurp, t); err != nil ***REMOVED***
+	if err := json.Unmarshal(slurp, t); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return t, nil
-***REMOVED***
+}
 
-func (f tokenCacheFile) WriteToken(t *oauth2.Token) error ***REMOVED***
+func (f tokenCacheFile) WriteToken(t *oauth2.Token) error {
 	jt, err := json.Marshal(t)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return ioutil.WriteFile(string(f), jt, 0600)
-***REMOVED***
+}

@@ -31,92 +31,92 @@ const supportedFlags = "0-+# "
 // about the state of a formatting operation.  The NewFormatter function can
 // be used to get a new Formatter which can be used directly as arguments
 // in standard fmt package printing calls.
-type formatState struct ***REMOVED***
-	value          interface***REMOVED******REMOVED***
+type formatState struct {
+	value          interface{}
 	fs             fmt.State
 	depth          int
 	pointers       map[uintptr]int
 	ignoreNextType bool
 	cs             *ConfigState
-***REMOVED***
+}
 
 // buildDefaultFormat recreates the original format string without precision
 // and width information to pass in to fmt.Sprintf in the case of an
 // unrecognized type.  Unless new types are added to the language, this
 // function won't ever be called.
-func (f *formatState) buildDefaultFormat() (format string) ***REMOVED***
+func (f *formatState) buildDefaultFormat() (format string) {
 	buf := bytes.NewBuffer(percentBytes)
 
-	for _, flag := range supportedFlags ***REMOVED***
-		if f.fs.Flag(int(flag)) ***REMOVED***
+	for _, flag := range supportedFlags {
+		if f.fs.Flag(int(flag)) {
 			buf.WriteRune(flag)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	buf.WriteRune('v')
 
 	format = buf.String()
 	return format
-***REMOVED***
+}
 
 // constructOrigFormat recreates the original format string including precision
 // and width information to pass along to the standard fmt package.  This allows
 // automatic deferral of all format strings this package doesn't support.
-func (f *formatState) constructOrigFormat(verb rune) (format string) ***REMOVED***
+func (f *formatState) constructOrigFormat(verb rune) (format string) {
 	buf := bytes.NewBuffer(percentBytes)
 
-	for _, flag := range supportedFlags ***REMOVED***
-		if f.fs.Flag(int(flag)) ***REMOVED***
+	for _, flag := range supportedFlags {
+		if f.fs.Flag(int(flag)) {
 			buf.WriteRune(flag)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if width, ok := f.fs.Width(); ok ***REMOVED***
+	if width, ok := f.fs.Width(); ok {
 		buf.WriteString(strconv.Itoa(width))
-	***REMOVED***
+	}
 
-	if precision, ok := f.fs.Precision(); ok ***REMOVED***
+	if precision, ok := f.fs.Precision(); ok {
 		buf.Write(precisionBytes)
 		buf.WriteString(strconv.Itoa(precision))
-	***REMOVED***
+	}
 
 	buf.WriteRune(verb)
 
 	format = buf.String()
 	return format
-***REMOVED***
+}
 
 // unpackValue returns values inside of non-nil interfaces when possible and
 // ensures that types for values which have been unpacked from an interface
 // are displayed when the show types flag is also set.
 // This is useful for data types like structs, arrays, slices, and maps which
 // can contain varying types packed inside an interface.
-func (f *formatState) unpackValue(v reflect.Value) reflect.Value ***REMOVED***
-	if v.Kind() == reflect.Interface ***REMOVED***
+func (f *formatState) unpackValue(v reflect.Value) reflect.Value {
+	if v.Kind() == reflect.Interface {
 		f.ignoreNextType = false
-		if !v.IsNil() ***REMOVED***
+		if !v.IsNil() {
 			v = v.Elem()
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return v
-***REMOVED***
+}
 
 // formatPtr handles formatting of pointers by indirecting them as necessary.
-func (f *formatState) formatPtr(v reflect.Value) ***REMOVED***
+func (f *formatState) formatPtr(v reflect.Value) {
 	// Display nil if top level pointer is nil.
 	showTypes := f.fs.Flag('#')
-	if v.IsNil() && (!showTypes || f.ignoreNextType) ***REMOVED***
+	if v.IsNil() && (!showTypes || f.ignoreNextType) {
 		f.fs.Write(nilAngleBytes)
 		return
-	***REMOVED***
+	}
 
 	// Remove pointers at or below the current depth from map used to detect
 	// circular refs.
-	for k, depth := range f.pointers ***REMOVED***
-		if depth >= f.depth ***REMOVED***
+	for k, depth := range f.pointers {
+		if depth >= f.depth {
 			delete(f.pointers, k)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Keep list of all dereferenced pointers to possibly show later.
 	pointerChain := make([]uintptr, 0)
@@ -128,60 +128,60 @@ func (f *formatState) formatPtr(v reflect.Value) ***REMOVED***
 	cycleFound := false
 	indirects := 0
 	ve := v
-	for ve.Kind() == reflect.Ptr ***REMOVED***
-		if ve.IsNil() ***REMOVED***
+	for ve.Kind() == reflect.Ptr {
+		if ve.IsNil() {
 			nilFound = true
 			break
-		***REMOVED***
+		}
 		indirects++
 		addr := ve.Pointer()
 		pointerChain = append(pointerChain, addr)
-		if pd, ok := f.pointers[addr]; ok && pd < f.depth ***REMOVED***
+		if pd, ok := f.pointers[addr]; ok && pd < f.depth {
 			cycleFound = true
 			indirects--
 			break
-		***REMOVED***
+		}
 		f.pointers[addr] = f.depth
 
 		ve = ve.Elem()
-		if ve.Kind() == reflect.Interface ***REMOVED***
-			if ve.IsNil() ***REMOVED***
+		if ve.Kind() == reflect.Interface {
+			if ve.IsNil() {
 				nilFound = true
 				break
-			***REMOVED***
+			}
 			ve = ve.Elem()
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Display type or indirection level depending on flags.
-	if showTypes && !f.ignoreNextType ***REMOVED***
+	if showTypes && !f.ignoreNextType {
 		f.fs.Write(openParenBytes)
 		f.fs.Write(bytes.Repeat(asteriskBytes, indirects))
 		f.fs.Write([]byte(ve.Type().String()))
 		f.fs.Write(closeParenBytes)
-	***REMOVED*** else ***REMOVED***
-		if nilFound || cycleFound ***REMOVED***
+	} else {
+		if nilFound || cycleFound {
 			indirects += strings.Count(ve.Type().String(), "*")
-		***REMOVED***
+		}
 		f.fs.Write(openAngleBytes)
 		f.fs.Write([]byte(strings.Repeat("*", indirects)))
 		f.fs.Write(closeAngleBytes)
-	***REMOVED***
+	}
 
 	// Display pointer information depending on flags.
-	if f.fs.Flag('+') && (len(pointerChain) > 0) ***REMOVED***
+	if f.fs.Flag('+') && (len(pointerChain) > 0) {
 		f.fs.Write(openParenBytes)
-		for i, addr := range pointerChain ***REMOVED***
-			if i > 0 ***REMOVED***
+		for i, addr := range pointerChain {
+			if i > 0 {
 				f.fs.Write(pointerChainBytes)
-			***REMOVED***
+			}
 			printHexPtr(f.fs, addr)
-		***REMOVED***
+		}
 		f.fs.Write(closeParenBytes)
-	***REMOVED***
+	}
 
 	// Display dereferenced value.
-	switch ***REMOVED***
+	switch {
 	case nilFound == true:
 		f.fs.Write(nilAngleBytes)
 
@@ -191,46 +191,46 @@ func (f *formatState) formatPtr(v reflect.Value) ***REMOVED***
 	default:
 		f.ignoreNextType = true
 		f.format(ve)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // format is the main workhorse for providing the Formatter interface.  It
 // uses the passed reflect value to figure out what kind of object we are
 // dealing with and formats it appropriately.  It is a recursive function,
 // however circular data structures are detected and handled properly.
-func (f *formatState) format(v reflect.Value) ***REMOVED***
+func (f *formatState) format(v reflect.Value) {
 	// Handle invalid reflect values immediately.
 	kind := v.Kind()
-	if kind == reflect.Invalid ***REMOVED***
+	if kind == reflect.Invalid {
 		f.fs.Write(invalidAngleBytes)
 		return
-	***REMOVED***
+	}
 
 	// Handle pointers specially.
-	if kind == reflect.Ptr ***REMOVED***
+	if kind == reflect.Ptr {
 		f.formatPtr(v)
 		return
-	***REMOVED***
+	}
 
 	// Print type information unless already handled elsewhere.
-	if !f.ignoreNextType && f.fs.Flag('#') ***REMOVED***
+	if !f.ignoreNextType && f.fs.Flag('#') {
 		f.fs.Write(openParenBytes)
 		f.fs.Write([]byte(v.Type().String()))
 		f.fs.Write(closeParenBytes)
-	***REMOVED***
+	}
 	f.ignoreNextType = false
 
 	// Call Stringer/error interfaces if they exist and the handle methods
 	// flag is enabled.
-	if !f.cs.DisableMethods ***REMOVED***
-		if (kind != reflect.Invalid) && (kind != reflect.Interface) ***REMOVED***
-			if handled := handleMethods(f.cs, f.fs, v); handled ***REMOVED***
+	if !f.cs.DisableMethods {
+		if (kind != reflect.Invalid) && (kind != reflect.Interface) {
+			if handled := handleMethods(f.cs, f.fs, v); handled {
 				return
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
-	switch kind ***REMOVED***
+	switch kind {
 	case reflect.Invalid:
 		// Do nothing.  We should never get here since invalid has already
 		// been handled above.
@@ -257,27 +257,27 @@ func (f *formatState) format(v reflect.Value) ***REMOVED***
 		printComplex(f.fs, v.Complex(), 64)
 
 	case reflect.Slice:
-		if v.IsNil() ***REMOVED***
+		if v.IsNil() {
 			f.fs.Write(nilAngleBytes)
 			break
-		***REMOVED***
+		}
 		fallthrough
 
 	case reflect.Array:
 		f.fs.Write(openBracketBytes)
 		f.depth++
-		if (f.cs.MaxDepth != 0) && (f.depth > f.cs.MaxDepth) ***REMOVED***
+		if (f.cs.MaxDepth != 0) && (f.depth > f.cs.MaxDepth) {
 			f.fs.Write(maxShortBytes)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			numEntries := v.Len()
-			for i := 0; i < numEntries; i++ ***REMOVED***
-				if i > 0 ***REMOVED***
+			for i := 0; i < numEntries; i++ {
+				if i > 0 {
 					f.fs.Write(spaceBytes)
-				***REMOVED***
+				}
 				f.ignoreNextType = true
 				f.format(f.unpackValue(v.Index(i)))
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		f.depth--
 		f.fs.Write(closeBracketBytes)
 
@@ -287,9 +287,9 @@ func (f *formatState) format(v reflect.Value) ***REMOVED***
 	case reflect.Interface:
 		// The only time we should get here is for nil interfaces due to
 		// unpackValue calls.
-		if v.IsNil() ***REMOVED***
+		if v.IsNil() {
 			f.fs.Write(nilAngleBytes)
-		***REMOVED***
+		}
 
 	case reflect.Ptr:
 		// Do nothing.  We should never get here since pointers have already
@@ -297,31 +297,31 @@ func (f *formatState) format(v reflect.Value) ***REMOVED***
 
 	case reflect.Map:
 		// nil maps should be indicated as different than empty maps
-		if v.IsNil() ***REMOVED***
+		if v.IsNil() {
 			f.fs.Write(nilAngleBytes)
 			break
-		***REMOVED***
+		}
 
 		f.fs.Write(openMapBytes)
 		f.depth++
-		if (f.cs.MaxDepth != 0) && (f.depth > f.cs.MaxDepth) ***REMOVED***
+		if (f.cs.MaxDepth != 0) && (f.depth > f.cs.MaxDepth) {
 			f.fs.Write(maxShortBytes)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			keys := v.MapKeys()
-			if f.cs.SortKeys ***REMOVED***
+			if f.cs.SortKeys {
 				sortValues(keys, f.cs)
-			***REMOVED***
-			for i, key := range keys ***REMOVED***
-				if i > 0 ***REMOVED***
+			}
+			for i, key := range keys {
+				if i > 0 {
 					f.fs.Write(spaceBytes)
-				***REMOVED***
+				}
 				f.ignoreNextType = true
 				f.format(f.unpackValue(key))
 				f.fs.Write(colonBytes)
 				f.ignoreNextType = true
 				f.format(f.unpackValue(v.MapIndex(key)))
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		f.depth--
 		f.fs.Write(closeMapBytes)
 
@@ -329,22 +329,22 @@ func (f *formatState) format(v reflect.Value) ***REMOVED***
 		numFields := v.NumField()
 		f.fs.Write(openBraceBytes)
 		f.depth++
-		if (f.cs.MaxDepth != 0) && (f.depth > f.cs.MaxDepth) ***REMOVED***
+		if (f.cs.MaxDepth != 0) && (f.depth > f.cs.MaxDepth) {
 			f.fs.Write(maxShortBytes)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			vt := v.Type()
-			for i := 0; i < numFields; i++ ***REMOVED***
-				if i > 0 ***REMOVED***
+			for i := 0; i < numFields; i++ {
+				if i > 0 {
 					f.fs.Write(spaceBytes)
-				***REMOVED***
+				}
 				vtf := vt.Field(i)
-				if f.fs.Flag('+') || f.fs.Flag('#') ***REMOVED***
+				if f.fs.Flag('+') || f.fs.Flag('#') {
 					f.fs.Write([]byte(vtf.Name))
 					f.fs.Write(colonBytes)
-				***REMOVED***
+				}
 				f.format(f.unpackValue(v.Field(i)))
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		f.depth--
 		f.fs.Write(closeBraceBytes)
 
@@ -358,44 +358,44 @@ func (f *formatState) format(v reflect.Value) ***REMOVED***
 	// fall back to letting the default fmt package handle it if any get added.
 	default:
 		format := f.buildDefaultFormat()
-		if v.CanInterface() ***REMOVED***
+		if v.CanInterface() {
 			fmt.Fprintf(f.fs, format, v.Interface())
-		***REMOVED*** else ***REMOVED***
+		} else {
 			fmt.Fprintf(f.fs, format, v.String())
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // Format satisfies the fmt.Formatter interface. See NewFormatter for usage
 // details.
-func (f *formatState) Format(fs fmt.State, verb rune) ***REMOVED***
+func (f *formatState) Format(fs fmt.State, verb rune) {
 	f.fs = fs
 
 	// Use standard formatting for verbs that are not v.
-	if verb != 'v' ***REMOVED***
+	if verb != 'v' {
 		format := f.constructOrigFormat(verb)
 		fmt.Fprintf(fs, format, f.value)
 		return
-	***REMOVED***
+	}
 
-	if f.value == nil ***REMOVED***
-		if fs.Flag('#') ***REMOVED***
+	if f.value == nil {
+		if fs.Flag('#') {
 			fs.Write(interfaceBytes)
-		***REMOVED***
+		}
 		fs.Write(nilAngleBytes)
 		return
-	***REMOVED***
+	}
 
 	f.format(reflect.ValueOf(f.value))
-***REMOVED***
+}
 
 // newFormatter is a helper function to consolidate the logic from the various
 // public methods which take varying config states.
-func newFormatter(cs *ConfigState, v interface***REMOVED******REMOVED***) fmt.Formatter ***REMOVED***
-	fs := &formatState***REMOVED***value: v, cs: cs***REMOVED***
+func newFormatter(cs *ConfigState, v interface{}) fmt.Formatter {
+	fs := &formatState{value: v, cs: cs}
 	fs.pointers = make(map[uintptr]int)
 	return fs
-***REMOVED***
+}
 
 /*
 NewFormatter returns a custom formatter that satisfies the fmt.Formatter
@@ -414,6 +414,6 @@ Typically this function shouldn't be called directly.  It is much easier to make
 use of the custom formatter by calling one of the convenience functions such as
 Printf, Println, or Fprintf.
 */
-func NewFormatter(v interface***REMOVED******REMOVED***) fmt.Formatter ***REMOVED***
+func NewFormatter(v interface{}) fmt.Formatter {
 	return newFormatter(&Config, v)
-***REMOVED***
+}

@@ -148,7 +148,7 @@
         (unless (string= match "func()")
           (setq args (ac-go-split-args s))
           (dolist (arg args)
-            (setq ret (concat ret "$***REMOVED***" arg "***REMOVED***, ")))
+            (setq ret (concat ret "${" arg "}, ")))
           (when (> (length ret) 2)
             (setq ret (substring ret 0 (- (length ret) 2)))))
         (setq ret (concat "(" ret ")"))

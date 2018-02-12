@@ -10,68 +10,68 @@ import (
 
 // We take the smallest, largest and an arbitrary value for each
 // of the UTF-8 sequence lengths.
-var testRunes = []rune***REMOVED***
+var testRunes = []rune{
 	0x01, 0x0C, 0x7F, // 1-byte sequences
 	0x80, 0x100, 0x7FF, // 2-byte sequences
 	0x800, 0x999, 0xFFFF, // 3-byte sequences
 	0x10000, 0x10101, 0x10FFFF, // 4-byte sequences
 	0x200, 0x201, 0x202, 0x210, 0x215, // five entries in one sparse block
-***REMOVED***
+}
 
 // Test cases for illegal runes.
-type trietest struct ***REMOVED***
+type trietest struct {
 	size  int
 	bytes []byte
-***REMOVED***
+}
 
-var tests = []trietest***REMOVED***
+var tests = []trietest{
 	// illegal runes
-	***REMOVED***1, []byte***REMOVED***0x80***REMOVED******REMOVED***,
-	***REMOVED***1, []byte***REMOVED***0xFF***REMOVED******REMOVED***,
-	***REMOVED***1, []byte***REMOVED***t2, tx - 1***REMOVED******REMOVED***,
-	***REMOVED***1, []byte***REMOVED***t2, t2***REMOVED******REMOVED***,
-	***REMOVED***2, []byte***REMOVED***t3, tx, tx - 1***REMOVED******REMOVED***,
-	***REMOVED***2, []byte***REMOVED***t3, tx, t2***REMOVED******REMOVED***,
-	***REMOVED***1, []byte***REMOVED***t3, tx - 1, tx***REMOVED******REMOVED***,
-	***REMOVED***3, []byte***REMOVED***t4, tx, tx, tx - 1***REMOVED******REMOVED***,
-	***REMOVED***3, []byte***REMOVED***t4, tx, tx, t2***REMOVED******REMOVED***,
-	***REMOVED***1, []byte***REMOVED***t4, t2, tx, tx - 1***REMOVED******REMOVED***,
-	***REMOVED***2, []byte***REMOVED***t4, tx, t2, tx - 1***REMOVED******REMOVED***,
+	{1, []byte{0x80}},
+	{1, []byte{0xFF}},
+	{1, []byte{t2, tx - 1}},
+	{1, []byte{t2, t2}},
+	{2, []byte{t3, tx, tx - 1}},
+	{2, []byte{t3, tx, t2}},
+	{1, []byte{t3, tx - 1, tx}},
+	{3, []byte{t4, tx, tx, tx - 1}},
+	{3, []byte{t4, tx, tx, t2}},
+	{1, []byte{t4, t2, tx, tx - 1}},
+	{2, []byte{t4, tx, t2, tx - 1}},
 
 	// short runes
-	***REMOVED***0, []byte***REMOVED***t2***REMOVED******REMOVED***,
-	***REMOVED***0, []byte***REMOVED***t3, tx***REMOVED******REMOVED***,
-	***REMOVED***0, []byte***REMOVED***t4, tx, tx***REMOVED******REMOVED***,
+	{0, []byte{t2}},
+	{0, []byte{t3, tx}},
+	{0, []byte{t4, tx, tx}},
 
 	// we only support UTF-8 up to utf8.UTFMax bytes (4 bytes)
-	***REMOVED***1, []byte***REMOVED***t5, tx, tx, tx, tx***REMOVED******REMOVED***,
-	***REMOVED***1, []byte***REMOVED***t6, tx, tx, tx, tx, tx***REMOVED******REMOVED***,
-***REMOVED***
+	{1, []byte{t5, tx, tx, tx, tx}},
+	{1, []byte{t6, tx, tx, tx, tx, tx}},
+}
 
-func TestLookupTrie(t *testing.T) ***REMOVED***
-	for i, r := range testRunes ***REMOVED***
+func TestLookupTrie(t *testing.T) {
+	for i, r := range testRunes {
 		b := []byte(string(r))
 		v, sz := testTrie.lookup(b)
-		if int(v) != i ***REMOVED***
+		if int(v) != i {
 			t.Errorf("lookup(%U): found value %#x, expected %#x", r, v, i)
-		***REMOVED***
-		if sz != len(b) ***REMOVED***
+		}
+		if sz != len(b) {
 			t.Errorf("lookup(%U): found size %d, expected %d", r, sz, len(b))
-		***REMOVED***
-	***REMOVED***
-	for i, tt := range tests ***REMOVED***
+		}
+	}
+	for i, tt := range tests {
 		v, sz := testTrie.lookup(tt.bytes)
-		if int(v) != 0 ***REMOVED***
+		if int(v) != 0 {
 			t.Errorf("lookup of illegal rune, case %d: found value %#x, expected 0", i, v)
-		***REMOVED***
-		if sz != tt.size ***REMOVED***
+		}
+		if sz != tt.size {
 			t.Errorf("lookup of illegal rune, case %d: found size %d, expected %d", i, sz, tt.size)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // test data is taken from exp/collate/locale/build/trie_test.go
-var testValues = [832]uint32***REMOVED***
+var testValues = [832]uint32{
 	0x000c: 0x00000001,
 	0x007f: 0x00000002,
 	0x00c0: 0x00000003,
@@ -86,9 +86,9 @@ var testValues = [832]uint32***REMOVED***
 	0x0280: 0x00000009,
 	0x02c1: 0x0000000a,
 	0x033f: 0x0000000b,
-***REMOVED***
+}
 
-var testLookup = [640]uint16***REMOVED***
+var testLookup = [640]uint16{
 	0x0e0: 0x05, 0x0e6: 0x06,
 	0x13f: 0x07,
 	0x140: 0x08, 0x144: 0x09,
@@ -101,6 +101,6 @@ var testLookup = [640]uint16***REMOVED***
 	0x260: 0x01,
 	0x26f: 0x02,
 	0x270: 0x04, 0x274: 0x06,
-***REMOVED***
+}
 
-var testTrie = Trie***REMOVED***testLookup[6*blockSize:], testValues[:], testLookup[:], testValues[:]***REMOVED***
+var testTrie = Trie{testLookup[6*blockSize:], testValues[:], testLookup[:], testValues[:]}

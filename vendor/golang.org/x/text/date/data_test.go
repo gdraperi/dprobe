@@ -2,7 +2,7 @@
 
 package date
 
-var enumMap = map[string]uint16***REMOVED***
+var enumMap = map[string]uint16{
 	"":                           0,
 	"calendars":                  0,
 	"fields":                     1,
@@ -330,6 +330,6 @@ var enumMap = map[string]uint16***REMOVED***
 	"Lanka":                      155,
 	"Macau":                      156,
 	"Qyzylorda":                  157,
-***REMOVED***
+}
 
 // Total table size 0 bytes (0KiB); checksum: 811C9DC5

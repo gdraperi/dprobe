@@ -49,17 +49,17 @@ with the `oauth2` package.
 		"appengine"
 	)
 
-	func handler(w http.ResponseWriter, r *http.Request) ***REMOVED***
+	func handler(w http.ResponseWriter, r *http.Request) {
 		var c appengine.Context = appengine.NewContext(r)
 		c.Infof("Logging a message with the old package")
 
 		var ctx context.Context = newappengine.NewContext(r)
-		client := &http.Client***REMOVED***
-			Transport: &oauth2.Transport***REMOVED***
+		client := &http.Client{
+			Transport: &oauth2.Transport{
 				Source: google.AppEngineTokenSource(ctx, "scope"),
-				Base:   &newurlfetch.Transport***REMOVED***Context: ctx***REMOVED***,
-			***REMOVED***,
-		***REMOVED***
+				Base:   &newurlfetch.Transport{Context: ctx},
+			},
+		}
 		client.Get("...")
-	***REMOVED***
+	}
 

@@ -11,37 +11,37 @@ import (
 	"unicode/utf8"
 )
 
-type varParser struct ***REMOVED***
+type varParser struct {
 	tokens []varToken
 	i      int
-***REMOVED***
+}
 
-func (p *varParser) backup() ***REMOVED***
+func (p *varParser) backup() {
 	p.i--
-***REMOVED***
+}
 
-func (p *varParser) next() varToken ***REMOVED***
-	if p.i < len(p.tokens) ***REMOVED***
+func (p *varParser) next() varToken {
+	if p.i < len(p.tokens) {
 		t := p.tokens[p.i]
 		p.i++
 		return t
-	***REMOVED***
-	return varToken***REMOVED***typ: tokEOF***REMOVED***
-***REMOVED***
+	}
+	return varToken{typ: tokEOF}
+}
 
-type varNode interface ***REMOVED***
+type varNode interface {
 	Infer() (Signature, error)
 	String() string
 	Sigs() sigSet
-	Value(Signature) (interface***REMOVED******REMOVED***, error)
-***REMOVED***
+	Value(Signature) (interface{}, error)
+}
 
-func varMakeNode(p *varParser) (varNode, error) ***REMOVED***
+func varMakeNode(p *varParser) (varNode, error) {
 	var sig Signature
 
-	for ***REMOVED***
+	for {
 		t := p.next()
-		switch t.typ ***REMOVED***
+		switch t.typ {
 		case tokEOF:
 			return nil, io.ErrUnexpectedEOF
 		case tokError:
@@ -51,13 +51,13 @@ func varMakeNode(p *varParser) (varNode, error) ***REMOVED***
 		case tokString:
 			return varMakeStringNode(t, sig)
 		case tokBool:
-			if sig.str != "" && sig.str != "b" ***REMOVED***
-				return nil, varTypeError***REMOVED***t.val, sig***REMOVED***
-			***REMOVED***
+			if sig.str != "" && sig.str != "b" {
+				return nil, varTypeError{t.val, sig}
+			}
 			b, err := strconv.ParseBool(t.val)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			return boolNode(b), nil
 		case tokArrayStart:
 			return varMakeArrayNode(p, sig)
@@ -66,134 +66,134 @@ func varMakeNode(p *varParser) (varNode, error) ***REMOVED***
 		case tokDictStart:
 			return varMakeDictNode(p, sig)
 		case tokType:
-			if sig.str != "" ***REMOVED***
+			if sig.str != "" {
 				return nil, errors.New("unexpected type annotation")
-			***REMOVED***
-			if t.val[0] == '@' ***REMOVED***
+			}
+			if t.val[0] == '@' {
 				sig.str = t.val[1:]
-			***REMOVED*** else ***REMOVED***
+			} else {
 				sig.str = varTypeMap[t.val]
-			***REMOVED***
+			}
 		case tokByteString:
-			if sig.str != "" && sig.str != "ay" ***REMOVED***
-				return nil, varTypeError***REMOVED***t.val, sig***REMOVED***
-			***REMOVED***
+			if sig.str != "" && sig.str != "ay" {
+				return nil, varTypeError{t.val, sig}
+			}
 			b, err := varParseByteString(t.val)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			return byteStringNode(b), nil
 		default:
 			return nil, fmt.Errorf("unexpected %q", t.val)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-type varTypeError struct ***REMOVED***
+type varTypeError struct {
 	val string
 	sig Signature
-***REMOVED***
+}
 
-func (e varTypeError) Error() string ***REMOVED***
+func (e varTypeError) Error() string {
 	return fmt.Sprintf("dbus: can't parse %q as type %q", e.val, e.sig.str)
-***REMOVED***
+}
 
 type sigSet map[Signature]bool
 
-func (s sigSet) Empty() bool ***REMOVED***
+func (s sigSet) Empty() bool {
 	return len(s) == 0
-***REMOVED***
+}
 
-func (s sigSet) Intersect(s2 sigSet) sigSet ***REMOVED***
+func (s sigSet) Intersect(s2 sigSet) sigSet {
 	r := make(sigSet)
-	for k := range s ***REMOVED***
-		if s2[k] ***REMOVED***
+	for k := range s {
+		if s2[k] {
 			r[k] = true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return r
-***REMOVED***
+}
 
-func (s sigSet) Single() (Signature, bool) ***REMOVED***
-	if len(s) == 1 ***REMOVED***
-		for k := range s ***REMOVED***
+func (s sigSet) Single() (Signature, bool) {
+	if len(s) == 1 {
+		for k := range s {
 			return k, true
-		***REMOVED***
-	***REMOVED***
-	return Signature***REMOVED******REMOVED***, false
-***REMOVED***
+		}
+	}
+	return Signature{}, false
+}
 
-func (s sigSet) ToArray() sigSet ***REMOVED***
+func (s sigSet) ToArray() sigSet {
 	r := make(sigSet, len(s))
-	for k := range s ***REMOVED***
-		r[Signature***REMOVED***"a" + k.str***REMOVED***] = true
-	***REMOVED***
+	for k := range s {
+		r[Signature{"a" + k.str}] = true
+	}
 	return r
-***REMOVED***
+}
 
-type numNode struct ***REMOVED***
+type numNode struct {
 	sig Signature
 	str string
-	val interface***REMOVED******REMOVED***
-***REMOVED***
+	val interface{}
+}
 
-var numSigSet = sigSet***REMOVED***
-	Signature***REMOVED***"y"***REMOVED***: true,
-	Signature***REMOVED***"n"***REMOVED***: true,
-	Signature***REMOVED***"q"***REMOVED***: true,
-	Signature***REMOVED***"i"***REMOVED***: true,
-	Signature***REMOVED***"u"***REMOVED***: true,
-	Signature***REMOVED***"x"***REMOVED***: true,
-	Signature***REMOVED***"t"***REMOVED***: true,
-	Signature***REMOVED***"d"***REMOVED***: true,
-***REMOVED***
+var numSigSet = sigSet{
+	Signature{"y"}: true,
+	Signature{"n"}: true,
+	Signature{"q"}: true,
+	Signature{"i"}: true,
+	Signature{"u"}: true,
+	Signature{"x"}: true,
+	Signature{"t"}: true,
+	Signature{"d"}: true,
+}
 
-func (n numNode) Infer() (Signature, error) ***REMOVED***
-	if strings.ContainsAny(n.str, ".e") ***REMOVED***
-		return Signature***REMOVED***"d"***REMOVED***, nil
-	***REMOVED***
-	return Signature***REMOVED***"i"***REMOVED***, nil
-***REMOVED***
+func (n numNode) Infer() (Signature, error) {
+	if strings.ContainsAny(n.str, ".e") {
+		return Signature{"d"}, nil
+	}
+	return Signature{"i"}, nil
+}
 
-func (n numNode) String() string ***REMOVED***
+func (n numNode) String() string {
 	return n.str
-***REMOVED***
+}
 
-func (n numNode) Sigs() sigSet ***REMOVED***
-	if n.sig.str != "" ***REMOVED***
-		return sigSet***REMOVED***n.sig: true***REMOVED***
-	***REMOVED***
-	if strings.ContainsAny(n.str, ".e") ***REMOVED***
-		return sigSet***REMOVED***Signature***REMOVED***"d"***REMOVED***: true***REMOVED***
-	***REMOVED***
+func (n numNode) Sigs() sigSet {
+	if n.sig.str != "" {
+		return sigSet{n.sig: true}
+	}
+	if strings.ContainsAny(n.str, ".e") {
+		return sigSet{Signature{"d"}: true}
+	}
 	return numSigSet
-***REMOVED***
+}
 
-func (n numNode) Value(sig Signature) (interface***REMOVED******REMOVED***, error) ***REMOVED***
-	if n.sig.str != "" && n.sig != sig ***REMOVED***
-		return nil, varTypeError***REMOVED***n.str, sig***REMOVED***
-	***REMOVED***
-	if n.val != nil ***REMOVED***
+func (n numNode) Value(sig Signature) (interface{}, error) {
+	if n.sig.str != "" && n.sig != sig {
+		return nil, varTypeError{n.str, sig}
+	}
+	if n.val != nil {
 		return n.val, nil
-	***REMOVED***
+	}
 	return varNumAs(n.str, sig)
-***REMOVED***
+}
 
-func varMakeNumNode(tok varToken, sig Signature) (varNode, error) ***REMOVED***
-	if sig.str == "" ***REMOVED***
-		return numNode***REMOVED***str: tok.val***REMOVED***, nil
-	***REMOVED***
+func varMakeNumNode(tok varToken, sig Signature) (varNode, error) {
+	if sig.str == "" {
+		return numNode{str: tok.val}, nil
+	}
 	num, err := varNumAs(tok.val, sig)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	return numNode***REMOVED***sig: sig, val: num***REMOVED***, nil
-***REMOVED***
+	}
+	return numNode{sig: sig, val: num}, nil
+}
 
-func varNumAs(s string, sig Signature) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func varNumAs(s string, sig Signature) (interface{}, error) {
 	isUnsigned := false
 	size := 32
-	switch sig.str ***REMOVED***
+	switch sig.str {
 	case "n":
 		size = 16
 	case "i":
@@ -212,142 +212,142 @@ func varNumAs(s string, sig Signature) (interface***REMOVED******REMOVED***, err
 		isUnsigned = true
 	case "d":
 		d, err := strconv.ParseFloat(s, 64)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		return d, nil
 	default:
-		return nil, varTypeError***REMOVED***s, sig***REMOVED***
-	***REMOVED***
+		return nil, varTypeError{s, sig}
+	}
 	base := 10
-	if strings.HasPrefix(s, "0x") ***REMOVED***
+	if strings.HasPrefix(s, "0x") {
 		base = 16
 		s = s[2:]
-	***REMOVED***
-	if strings.HasPrefix(s, "0") && len(s) != 1 ***REMOVED***
+	}
+	if strings.HasPrefix(s, "0") && len(s) != 1 {
 		base = 8
 		s = s[1:]
-	***REMOVED***
-	if isUnsigned ***REMOVED***
+	}
+	if isUnsigned {
 		i, err := strconv.ParseUint(s, base, size)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-		var v interface***REMOVED******REMOVED*** = i
-		switch sig.str ***REMOVED***
+		}
+		var v interface{} = i
+		switch sig.str {
 		case "y":
 			v = byte(i)
 		case "q":
 			v = uint16(i)
 		case "u":
 			v = uint32(i)
-		***REMOVED***
+		}
 		return v, nil
-	***REMOVED***
+	}
 	i, err := strconv.ParseInt(s, base, size)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	var v interface***REMOVED******REMOVED*** = i
-	switch sig.str ***REMOVED***
+	}
+	var v interface{} = i
+	switch sig.str {
 	case "n":
 		v = int16(i)
 	case "i":
 		v = int32(i)
-	***REMOVED***
+	}
 	return v, nil
-***REMOVED***
+}
 
-type stringNode struct ***REMOVED***
+type stringNode struct {
 	sig Signature
 	str string      // parsed
-	val interface***REMOVED******REMOVED*** // has correct type
-***REMOVED***
+	val interface{} // has correct type
+}
 
-var stringSigSet = sigSet***REMOVED***
-	Signature***REMOVED***"s"***REMOVED***: true,
-	Signature***REMOVED***"g"***REMOVED***: true,
-	Signature***REMOVED***"o"***REMOVED***: true,
-***REMOVED***
+var stringSigSet = sigSet{
+	Signature{"s"}: true,
+	Signature{"g"}: true,
+	Signature{"o"}: true,
+}
 
-func (n stringNode) Infer() (Signature, error) ***REMOVED***
-	return Signature***REMOVED***"s"***REMOVED***, nil
-***REMOVED***
+func (n stringNode) Infer() (Signature, error) {
+	return Signature{"s"}, nil
+}
 
-func (n stringNode) String() string ***REMOVED***
+func (n stringNode) String() string {
 	return n.str
-***REMOVED***
+}
 
-func (n stringNode) Sigs() sigSet ***REMOVED***
-	if n.sig.str != "" ***REMOVED***
-		return sigSet***REMOVED***n.sig: true***REMOVED***
-	***REMOVED***
+func (n stringNode) Sigs() sigSet {
+	if n.sig.str != "" {
+		return sigSet{n.sig: true}
+	}
 	return stringSigSet
-***REMOVED***
+}
 
-func (n stringNode) Value(sig Signature) (interface***REMOVED******REMOVED***, error) ***REMOVED***
-	if n.sig.str != "" && n.sig != sig ***REMOVED***
-		return nil, varTypeError***REMOVED***n.str, sig***REMOVED***
-	***REMOVED***
-	if n.val != nil ***REMOVED***
+func (n stringNode) Value(sig Signature) (interface{}, error) {
+	if n.sig.str != "" && n.sig != sig {
+		return nil, varTypeError{n.str, sig}
+	}
+	if n.val != nil {
 		return n.val, nil
-	***REMOVED***
-	switch ***REMOVED***
+	}
+	switch {
 	case sig.str == "g":
-		return Signature***REMOVED***n.str***REMOVED***, nil
+		return Signature{n.str}, nil
 	case sig.str == "o":
 		return ObjectPath(n.str), nil
 	case sig.str == "s":
 		return n.str, nil
 	default:
-		return nil, varTypeError***REMOVED***n.str, sig***REMOVED***
-	***REMOVED***
-***REMOVED***
+		return nil, varTypeError{n.str, sig}
+	}
+}
 
-func varMakeStringNode(tok varToken, sig Signature) (varNode, error) ***REMOVED***
-	if sig.str != "" && sig.str != "s" && sig.str != "g" && sig.str != "o" ***REMOVED***
+func varMakeStringNode(tok varToken, sig Signature) (varNode, error) {
+	if sig.str != "" && sig.str != "s" && sig.str != "g" && sig.str != "o" {
 		return nil, fmt.Errorf("invalid type %q for string", sig.str)
-	***REMOVED***
+	}
 	s, err := varParseString(tok.val)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	n := stringNode***REMOVED***str: s***REMOVED***
-	if sig.str == "" ***REMOVED***
-		return stringNode***REMOVED***str: s***REMOVED***, nil
-	***REMOVED***
+	}
+	n := stringNode{str: s}
+	if sig.str == "" {
+		return stringNode{str: s}, nil
+	}
 	n.sig = sig
-	switch sig.str ***REMOVED***
+	switch sig.str {
 	case "o":
 		n.val = ObjectPath(s)
 	case "g":
-		n.val = Signature***REMOVED***s***REMOVED***
+		n.val = Signature{s}
 	case "s":
 		n.val = s
-	***REMOVED***
+	}
 	return n, nil
-***REMOVED***
+}
 
-func varParseString(s string) (string, error) ***REMOVED***
+func varParseString(s string) (string, error) {
 	// quotes are guaranteed to be there
 	s = s[1 : len(s)-1]
 	buf := new(bytes.Buffer)
-	for len(s) != 0 ***REMOVED***
+	for len(s) != 0 {
 		r, size := utf8.DecodeRuneInString(s)
-		if r == utf8.RuneError && size == 1 ***REMOVED***
+		if r == utf8.RuneError && size == 1 {
 			return "", errors.New("invalid UTF-8")
-		***REMOVED***
+		}
 		s = s[size:]
-		if r != '\\' ***REMOVED***
+		if r != '\\' {
 			buf.WriteRune(r)
 			continue
-		***REMOVED***
+		}
 		r, size = utf8.DecodeRuneInString(s)
-		if r == utf8.RuneError && size == 1 ***REMOVED***
+		if r == utf8.RuneError && size == 1 {
 			return "", errors.New("invalid UTF-8")
-		***REMOVED***
+		}
 		s = s[size:]
-		switch r ***REMOVED***
+		switch r {
 		case 'a':
 			buf.WriteRune(0x7)
 		case 'b':
@@ -362,146 +362,146 @@ func varParseString(s string) (string, error) ***REMOVED***
 			buf.WriteRune('\t')
 		case '\n':
 		case 'u':
-			if len(s) < 4 ***REMOVED***
+			if len(s) < 4 {
 				return "", errors.New("short unicode escape")
-			***REMOVED***
+			}
 			r, err := strconv.ParseUint(s[:4], 16, 32)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return "", err
-			***REMOVED***
+			}
 			buf.WriteRune(rune(r))
 			s = s[4:]
 		case 'U':
-			if len(s) < 8 ***REMOVED***
+			if len(s) < 8 {
 				return "", errors.New("short unicode escape")
-			***REMOVED***
+			}
 			r, err := strconv.ParseUint(s[:8], 16, 32)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return "", err
-			***REMOVED***
+			}
 			buf.WriteRune(rune(r))
 			s = s[8:]
 		default:
 			buf.WriteRune(r)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return buf.String(), nil
-***REMOVED***
+}
 
-var boolSigSet = sigSet***REMOVED***Signature***REMOVED***"b"***REMOVED***: true***REMOVED***
+var boolSigSet = sigSet{Signature{"b"}: true}
 
 type boolNode bool
 
-func (boolNode) Infer() (Signature, error) ***REMOVED***
-	return Signature***REMOVED***"b"***REMOVED***, nil
-***REMOVED***
+func (boolNode) Infer() (Signature, error) {
+	return Signature{"b"}, nil
+}
 
-func (b boolNode) String() string ***REMOVED***
-	if b ***REMOVED***
+func (b boolNode) String() string {
+	if b {
 		return "true"
-	***REMOVED***
+	}
 	return "false"
-***REMOVED***
+}
 
-func (boolNode) Sigs() sigSet ***REMOVED***
+func (boolNode) Sigs() sigSet {
 	return boolSigSet
-***REMOVED***
+}
 
-func (b boolNode) Value(sig Signature) (interface***REMOVED******REMOVED***, error) ***REMOVED***
-	if sig.str != "b" ***REMOVED***
-		return nil, varTypeError***REMOVED***b.String(), sig***REMOVED***
-	***REMOVED***
+func (b boolNode) Value(sig Signature) (interface{}, error) {
+	if sig.str != "b" {
+		return nil, varTypeError{b.String(), sig}
+	}
 	return bool(b), nil
-***REMOVED***
+}
 
-type arrayNode struct ***REMOVED***
+type arrayNode struct {
 	set      sigSet
 	children []varNode
-	val      interface***REMOVED******REMOVED***
-***REMOVED***
+	val      interface{}
+}
 
-func (n arrayNode) Infer() (Signature, error) ***REMOVED***
-	for _, v := range n.children ***REMOVED***
+func (n arrayNode) Infer() (Signature, error) {
+	for _, v := range n.children {
 		csig, err := varInfer(v)
-		if err != nil ***REMOVED***
+		if err != nil {
 			continue
-		***REMOVED***
-		return Signature***REMOVED***"a" + csig.str***REMOVED***, nil
-	***REMOVED***
-	return Signature***REMOVED******REMOVED***, fmt.Errorf("can't infer type for %q", n.String())
-***REMOVED***
+		}
+		return Signature{"a" + csig.str}, nil
+	}
+	return Signature{}, fmt.Errorf("can't infer type for %q", n.String())
+}
 
-func (n arrayNode) String() string ***REMOVED***
+func (n arrayNode) String() string {
 	s := "["
-	for i, v := range n.children ***REMOVED***
+	for i, v := range n.children {
 		s += v.String()
-		if i != len(n.children)-1 ***REMOVED***
+		if i != len(n.children)-1 {
 			s += ", "
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return s + "]"
-***REMOVED***
+}
 
-func (n arrayNode) Sigs() sigSet ***REMOVED***
+func (n arrayNode) Sigs() sigSet {
 	return n.set
-***REMOVED***
+}
 
-func (n arrayNode) Value(sig Signature) (interface***REMOVED******REMOVED***, error) ***REMOVED***
-	if n.set.Empty() ***REMOVED***
+func (n arrayNode) Value(sig Signature) (interface{}, error) {
+	if n.set.Empty() {
 		// no type information whatsoever, so this must be an empty slice
 		return reflect.MakeSlice(typeFor(sig.str), 0, 0).Interface(), nil
-	***REMOVED***
-	if !n.set[sig] ***REMOVED***
-		return nil, varTypeError***REMOVED***n.String(), sig***REMOVED***
-	***REMOVED***
+	}
+	if !n.set[sig] {
+		return nil, varTypeError{n.String(), sig}
+	}
 	s := reflect.MakeSlice(typeFor(sig.str), len(n.children), len(n.children))
-	for i, v := range n.children ***REMOVED***
-		rv, err := v.Value(Signature***REMOVED***sig.str[1:]***REMOVED***)
-		if err != nil ***REMOVED***
+	for i, v := range n.children {
+		rv, err := v.Value(Signature{sig.str[1:]})
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		s.Index(i).Set(reflect.ValueOf(rv))
-	***REMOVED***
+	}
 	return s.Interface(), nil
-***REMOVED***
+}
 
-func varMakeArrayNode(p *varParser, sig Signature) (varNode, error) ***REMOVED***
+func varMakeArrayNode(p *varParser, sig Signature) (varNode, error) {
 	var n arrayNode
-	if sig.str != "" ***REMOVED***
-		n.set = sigSet***REMOVED***sig: true***REMOVED***
-	***REMOVED***
-	if t := p.next(); t.typ == tokArrayEnd ***REMOVED***
+	if sig.str != "" {
+		n.set = sigSet{sig: true}
+	}
+	if t := p.next(); t.typ == tokArrayEnd {
 		return n, nil
-	***REMOVED*** else ***REMOVED***
+	} else {
 		p.backup()
-	***REMOVED***
+	}
 Loop:
-	for ***REMOVED***
+	for {
 		t := p.next()
-		switch t.typ ***REMOVED***
+		switch t.typ {
 		case tokEOF:
 			return nil, io.ErrUnexpectedEOF
 		case tokError:
 			return nil, errors.New(t.val)
-		***REMOVED***
+		}
 		p.backup()
 		cn, err := varMakeNode(p)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-		if cset := cn.Sigs(); !cset.Empty() ***REMOVED***
-			if n.set.Empty() ***REMOVED***
+		}
+		if cset := cn.Sigs(); !cset.Empty() {
+			if n.set.Empty() {
 				n.set = cset.ToArray()
-			***REMOVED*** else ***REMOVED***
+			} else {
 				nset := cset.ToArray().Intersect(n.set)
-				if nset.Empty() ***REMOVED***
+				if nset.Empty() {
 					return nil, fmt.Errorf("can't parse %q with given type information", cn.String())
-				***REMOVED***
+				}
 				n.set = nset
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		n.children = append(n.children, cn)
-		switch t := p.next(); t.typ ***REMOVED***
+		switch t := p.next(); t.typ {
 		case tokEOF:
 			return nil, io.ErrUnexpectedEOF
 		case tokError:
@@ -512,177 +512,177 @@ Loop:
 			continue
 		default:
 			return nil, fmt.Errorf("unexpected %q", t.val)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n, nil
-***REMOVED***
+}
 
-type variantNode struct ***REMOVED***
+type variantNode struct {
 	n varNode
-***REMOVED***
+}
 
-var variantSet = sigSet***REMOVED***
-	Signature***REMOVED***"v"***REMOVED***: true,
-***REMOVED***
+var variantSet = sigSet{
+	Signature{"v"}: true,
+}
 
-func (variantNode) Infer() (Signature, error) ***REMOVED***
-	return Signature***REMOVED***"v"***REMOVED***, nil
-***REMOVED***
+func (variantNode) Infer() (Signature, error) {
+	return Signature{"v"}, nil
+}
 
-func (n variantNode) String() string ***REMOVED***
+func (n variantNode) String() string {
 	return "<" + n.n.String() + ">"
-***REMOVED***
+}
 
-func (variantNode) Sigs() sigSet ***REMOVED***
+func (variantNode) Sigs() sigSet {
 	return variantSet
-***REMOVED***
+}
 
-func (n variantNode) Value(sig Signature) (interface***REMOVED******REMOVED***, error) ***REMOVED***
-	if sig.str != "v" ***REMOVED***
-		return nil, varTypeError***REMOVED***n.String(), sig***REMOVED***
-	***REMOVED***
+func (n variantNode) Value(sig Signature) (interface{}, error) {
+	if sig.str != "v" {
+		return nil, varTypeError{n.String(), sig}
+	}
 	sig, err := varInfer(n.n)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	v, err := n.n.Value(sig)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return MakeVariant(v), nil
-***REMOVED***
+}
 
-func varMakeVariantNode(p *varParser, sig Signature) (varNode, error) ***REMOVED***
+func varMakeVariantNode(p *varParser, sig Signature) (varNode, error) {
 	n, err := varMakeNode(p)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if t := p.next(); t.typ != tokVariantEnd ***REMOVED***
+	}
+	if t := p.next(); t.typ != tokVariantEnd {
 		return nil, fmt.Errorf("unexpected %q", t.val)
-	***REMOVED***
-	vn := variantNode***REMOVED***n***REMOVED***
-	if sig.str != "" && sig.str != "v" ***REMOVED***
-		return nil, varTypeError***REMOVED***vn.String(), sig***REMOVED***
-	***REMOVED***
-	return variantNode***REMOVED***n***REMOVED***, nil
-***REMOVED***
+	}
+	vn := variantNode{n}
+	if sig.str != "" && sig.str != "v" {
+		return nil, varTypeError{vn.String(), sig}
+	}
+	return variantNode{n}, nil
+}
 
-type dictEntry struct ***REMOVED***
+type dictEntry struct {
 	key, val varNode
-***REMOVED***
+}
 
-type dictNode struct ***REMOVED***
+type dictNode struct {
 	kset, vset sigSet
 	children   []dictEntry
-	val        interface***REMOVED******REMOVED***
-***REMOVED***
+	val        interface{}
+}
 
-func (n dictNode) Infer() (Signature, error) ***REMOVED***
-	for _, v := range n.children ***REMOVED***
+func (n dictNode) Infer() (Signature, error) {
+	for _, v := range n.children {
 		ksig, err := varInfer(v.key)
-		if err != nil ***REMOVED***
+		if err != nil {
 			continue
-		***REMOVED***
+		}
 		vsig, err := varInfer(v.val)
-		if err != nil ***REMOVED***
+		if err != nil {
 			continue
-		***REMOVED***
-		return Signature***REMOVED***"a***REMOVED***" + ksig.str + vsig.str + "***REMOVED***"***REMOVED***, nil
-	***REMOVED***
-	return Signature***REMOVED******REMOVED***, fmt.Errorf("can't infer type for %q", n.String())
-***REMOVED***
+		}
+		return Signature{"a{" + ksig.str + vsig.str + "}"}, nil
+	}
+	return Signature{}, fmt.Errorf("can't infer type for %q", n.String())
+}
 
-func (n dictNode) String() string ***REMOVED***
-	s := "***REMOVED***"
-	for i, v := range n.children ***REMOVED***
+func (n dictNode) String() string {
+	s := "{"
+	for i, v := range n.children {
 		s += v.key.String() + ": " + v.val.String()
-		if i != len(n.children)-1 ***REMOVED***
+		if i != len(n.children)-1 {
 			s += ", "
-		***REMOVED***
-	***REMOVED***
-	return s + "***REMOVED***"
-***REMOVED***
+		}
+	}
+	return s + "}"
+}
 
-func (n dictNode) Sigs() sigSet ***REMOVED***
-	r := sigSet***REMOVED******REMOVED***
-	for k := range n.kset ***REMOVED***
-		for v := range n.vset ***REMOVED***
-			sig := "a***REMOVED***" + k.str + v.str + "***REMOVED***"
-			r[Signature***REMOVED***sig***REMOVED***] = true
-		***REMOVED***
-	***REMOVED***
+func (n dictNode) Sigs() sigSet {
+	r := sigSet{}
+	for k := range n.kset {
+		for v := range n.vset {
+			sig := "a{" + k.str + v.str + "}"
+			r[Signature{sig}] = true
+		}
+	}
 	return r
-***REMOVED***
+}
 
-func (n dictNode) Value(sig Signature) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func (n dictNode) Value(sig Signature) (interface{}, error) {
 	set := n.Sigs()
-	if set.Empty() ***REMOVED***
+	if set.Empty() {
 		// no type information -> empty dict
 		return reflect.MakeMap(typeFor(sig.str)).Interface(), nil
-	***REMOVED***
-	if !set[sig] ***REMOVED***
-		return nil, varTypeError***REMOVED***n.String(), sig***REMOVED***
-	***REMOVED***
+	}
+	if !set[sig] {
+		return nil, varTypeError{n.String(), sig}
+	}
 	m := reflect.MakeMap(typeFor(sig.str))
-	ksig := Signature***REMOVED***sig.str[2:3]***REMOVED***
-	vsig := Signature***REMOVED***sig.str[3 : len(sig.str)-1]***REMOVED***
-	for _, v := range n.children ***REMOVED***
+	ksig := Signature{sig.str[2:3]}
+	vsig := Signature{sig.str[3 : len(sig.str)-1]}
+	for _, v := range n.children {
 		kv, err := v.key.Value(ksig)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		vv, err := v.val.Value(vsig)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		m.SetMapIndex(reflect.ValueOf(kv), reflect.ValueOf(vv))
-	***REMOVED***
+	}
 	return m.Interface(), nil
-***REMOVED***
+}
 
-func varMakeDictNode(p *varParser, sig Signature) (varNode, error) ***REMOVED***
+func varMakeDictNode(p *varParser, sig Signature) (varNode, error) {
 	var n dictNode
 
-	if sig.str != "" ***REMOVED***
-		if len(sig.str) < 5 ***REMOVED***
+	if sig.str != "" {
+		if len(sig.str) < 5 {
 			return nil, fmt.Errorf("invalid signature %q for dict type", sig)
-		***REMOVED***
-		ksig := Signature***REMOVED***string(sig.str[2])***REMOVED***
-		vsig := Signature***REMOVED***sig.str[3 : len(sig.str)-1]***REMOVED***
-		n.kset = sigSet***REMOVED***ksig: true***REMOVED***
-		n.vset = sigSet***REMOVED***vsig: true***REMOVED***
-	***REMOVED***
-	if t := p.next(); t.typ == tokDictEnd ***REMOVED***
+		}
+		ksig := Signature{string(sig.str[2])}
+		vsig := Signature{sig.str[3 : len(sig.str)-1]}
+		n.kset = sigSet{ksig: true}
+		n.vset = sigSet{vsig: true}
+	}
+	if t := p.next(); t.typ == tokDictEnd {
 		return n, nil
-	***REMOVED*** else ***REMOVED***
+	} else {
 		p.backup()
-	***REMOVED***
+	}
 Loop:
-	for ***REMOVED***
+	for {
 		t := p.next()
-		switch t.typ ***REMOVED***
+		switch t.typ {
 		case tokEOF:
 			return nil, io.ErrUnexpectedEOF
 		case tokError:
 			return nil, errors.New(t.val)
-		***REMOVED***
+		}
 		p.backup()
 		kn, err := varMakeNode(p)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-		if kset := kn.Sigs(); !kset.Empty() ***REMOVED***
-			if n.kset.Empty() ***REMOVED***
+		}
+		if kset := kn.Sigs(); !kset.Empty() {
+			if n.kset.Empty() {
 				n.kset = kset
-			***REMOVED*** else ***REMOVED***
+			} else {
 				n.kset = kset.Intersect(n.kset)
-				if n.kset.Empty() ***REMOVED***
+				if n.kset.Empty() {
 					return nil, fmt.Errorf("can't parse %q with given type information", kn.String())
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
+				}
+			}
+		}
 		t = p.next()
-		switch t.typ ***REMOVED***
+		switch t.typ {
 		case tokEOF:
 			return nil, io.ErrUnexpectedEOF
 		case tokError:
@@ -690,32 +690,32 @@ Loop:
 		case tokColon:
 		default:
 			return nil, fmt.Errorf("unexpected %q", t.val)
-		***REMOVED***
+		}
 		t = p.next()
-		switch t.typ ***REMOVED***
+		switch t.typ {
 		case tokEOF:
 			return nil, io.ErrUnexpectedEOF
 		case tokError:
 			return nil, errors.New(t.val)
-		***REMOVED***
+		}
 		p.backup()
 		vn, err := varMakeNode(p)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-		if vset := vn.Sigs(); !vset.Empty() ***REMOVED***
-			if n.vset.Empty() ***REMOVED***
+		}
+		if vset := vn.Sigs(); !vset.Empty() {
+			if n.vset.Empty() {
 				n.vset = vset
-			***REMOVED*** else ***REMOVED***
+			} else {
 				n.vset = n.vset.Intersect(vset)
-				if n.vset.Empty() ***REMOVED***
+				if n.vset.Empty() {
 					return nil, fmt.Errorf("can't parse %q with given type information", vn.String())
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-		n.children = append(n.children, dictEntry***REMOVED***kn, vn***REMOVED***)
+				}
+			}
+		}
+		n.children = append(n.children, dictEntry{kn, vn})
 		t = p.next()
-		switch t.typ ***REMOVED***
+		switch t.typ {
 		case tokEOF:
 			return nil, io.ErrUnexpectedEOF
 		case tokError:
@@ -726,50 +726,50 @@ Loop:
 			continue
 		default:
 			return nil, fmt.Errorf("unexpected %q", t.val)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n, nil
-***REMOVED***
+}
 
 type byteStringNode []byte
 
-var byteStringSet = sigSet***REMOVED***
-	Signature***REMOVED***"ay"***REMOVED***: true,
-***REMOVED***
+var byteStringSet = sigSet{
+	Signature{"ay"}: true,
+}
 
-func (byteStringNode) Infer() (Signature, error) ***REMOVED***
-	return Signature***REMOVED***"ay"***REMOVED***, nil
-***REMOVED***
+func (byteStringNode) Infer() (Signature, error) {
+	return Signature{"ay"}, nil
+}
 
-func (b byteStringNode) String() string ***REMOVED***
+func (b byteStringNode) String() string {
 	return string(b)
-***REMOVED***
+}
 
-func (b byteStringNode) Sigs() sigSet ***REMOVED***
+func (b byteStringNode) Sigs() sigSet {
 	return byteStringSet
-***REMOVED***
+}
 
-func (b byteStringNode) Value(sig Signature) (interface***REMOVED******REMOVED***, error) ***REMOVED***
-	if sig.str != "ay" ***REMOVED***
-		return nil, varTypeError***REMOVED***b.String(), sig***REMOVED***
-	***REMOVED***
+func (b byteStringNode) Value(sig Signature) (interface{}, error) {
+	if sig.str != "ay" {
+		return nil, varTypeError{b.String(), sig}
+	}
 	return []byte(b), nil
-***REMOVED***
+}
 
-func varParseByteString(s string) ([]byte, error) ***REMOVED***
+func varParseByteString(s string) ([]byte, error) {
 	// quotes and b at start are guaranteed to be there
 	b := make([]byte, 0, 1)
 	s = s[2 : len(s)-1]
-	for len(s) != 0 ***REMOVED***
+	for len(s) != 0 {
 		c := s[0]
 		s = s[1:]
-		if c != '\\' ***REMOVED***
+		if c != '\\' {
 			b = append(b, c)
 			continue
-		***REMOVED***
+		}
 		c = s[0]
 		s = s[1:]
-		switch c ***REMOVED***
+		switch c {
 		case 'a':
 			b = append(b, 0x7)
 		case 'b':
@@ -783,35 +783,35 @@ func varParseByteString(s string) ([]byte, error) ***REMOVED***
 		case 't':
 			b = append(b, '\t')
 		case 'x':
-			if len(s) < 2 ***REMOVED***
+			if len(s) < 2 {
 				return nil, errors.New("short escape")
-			***REMOVED***
+			}
 			n, err := strconv.ParseUint(s[:2], 16, 8)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			b = append(b, byte(n))
 			s = s[2:]
 		case '0':
-			if len(s) < 3 ***REMOVED***
+			if len(s) < 3 {
 				return nil, errors.New("short escape")
-			***REMOVED***
+			}
 			n, err := strconv.ParseUint(s[:3], 8, 8)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			b = append(b, byte(n))
 			s = s[3:]
 		default:
 			b = append(b, c)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return append(b, 0), nil
-***REMOVED***
+}
 
-func varInfer(n varNode) (Signature, error) ***REMOVED***
-	if sig, ok := n.Sigs().Single(); ok ***REMOVED***
+func varInfer(n varNode) (Signature, error) {
+	if sig, ok := n.Sigs().Single(); ok {
 		return sig, nil
-	***REMOVED***
+	}
 	return n.Infer()
-***REMOVED***
+}

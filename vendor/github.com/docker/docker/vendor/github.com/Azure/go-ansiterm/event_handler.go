@@ -1,6 +1,6 @@
 package ansiterm
 
-type AnsiEventHandler interface ***REMOVED***
+type AnsiEventHandler interface {
 	// Print
 	Print(b byte) error
 
@@ -87,4 +87,4 @@ type AnsiEventHandler interface ***REMOVED***
 
 	// Flush updates from previous commands
 	Flush() error
-***REMOVED***
+}

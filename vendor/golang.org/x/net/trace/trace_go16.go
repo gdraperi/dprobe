@@ -10,12 +10,12 @@ import "golang.org/x/net/context"
 
 // NewContext returns a copy of the parent context
 // and associates it with a Trace.
-func NewContext(ctx context.Context, tr Trace) context.Context ***REMOVED***
+func NewContext(ctx context.Context, tr Trace) context.Context {
 	return context.WithValue(ctx, contextKey, tr)
-***REMOVED***
+}
 
 // FromContext returns the Trace bound to the context, if any.
-func FromContext(ctx context.Context) (tr Trace, ok bool) ***REMOVED***
+func FromContext(ctx context.Context) (tr Trace, ok bool) {
 	tr, ok = ctx.Value(contextKey).(Trace)
 	return
-***REMOVED***
+}

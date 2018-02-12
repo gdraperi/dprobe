@@ -12,24 +12,24 @@ import (
 )
 
 // Response is the basic response structure used in all responses.
-type Response struct ***REMOVED***
+type Response struct {
 	Err string
-***REMOVED***
+}
 
 // GetError returns the error from the response, if any.
-func (r *Response) GetError() string ***REMOVED***
+func (r *Response) GetError() string {
 	return r.Err
-***REMOVED***
+}
 
 // GetCapabilityResponse is the response of GetCapability request
-type GetCapabilityResponse struct ***REMOVED***
+type GetCapabilityResponse struct {
 	Response
 	Scope             string
 	ConnectivityScope string
-***REMOVED***
+}
 
 // AllocateNetworkRequest requests allocation of new network by manager
-type AllocateNetworkRequest struct ***REMOVED***
+type AllocateNetworkRequest struct {
 	// A network ID that remote plugins are expected to store for future
 	// reference.
 	NetworkID string
@@ -39,183 +39,183 @@ type AllocateNetworkRequest struct ***REMOVED***
 
 	// IPAMData contains the address pool information for this network
 	IPv4Data, IPv6Data []driverapi.IPAMData
-***REMOVED***
+}
 
 // AllocateNetworkResponse is the response to the AllocateNetworkRequest.
-type AllocateNetworkResponse struct ***REMOVED***
+type AllocateNetworkResponse struct {
 	Response
 	// A free form plugin specific string->string object to be sent in
 	// CreateNetworkRequest call in the libnetwork agents
 	Options map[string]string
-***REMOVED***
+}
 
 // FreeNetworkRequest is the request to free allocated network in the manager
-type FreeNetworkRequest struct ***REMOVED***
+type FreeNetworkRequest struct {
 	// The ID of the network to be freed.
 	NetworkID string
-***REMOVED***
+}
 
 // FreeNetworkResponse is the response to a request for freeing a network.
-type FreeNetworkResponse struct ***REMOVED***
+type FreeNetworkResponse struct {
 	Response
-***REMOVED***
+}
 
 // CreateNetworkRequest requests a new network.
-type CreateNetworkRequest struct ***REMOVED***
+type CreateNetworkRequest struct {
 	// A network ID that remote plugins are expected to store for future
 	// reference.
 	NetworkID string
 
 	// A free form map->object interface for communication of options.
-	Options map[string]interface***REMOVED******REMOVED***
+	Options map[string]interface{}
 
 	// IPAMData contains the address pool information for this network
 	IPv4Data, IPv6Data []driverapi.IPAMData
-***REMOVED***
+}
 
 // CreateNetworkResponse is the response to the CreateNetworkRequest.
-type CreateNetworkResponse struct ***REMOVED***
+type CreateNetworkResponse struct {
 	Response
-***REMOVED***
+}
 
 // DeleteNetworkRequest is the request to delete an existing network.
-type DeleteNetworkRequest struct ***REMOVED***
+type DeleteNetworkRequest struct {
 	// The ID of the network to delete.
 	NetworkID string
-***REMOVED***
+}
 
 // DeleteNetworkResponse is the response to a request for deleting a network.
-type DeleteNetworkResponse struct ***REMOVED***
+type DeleteNetworkResponse struct {
 	Response
-***REMOVED***
+}
 
 // CreateEndpointRequest is the request to create an endpoint within a network.
-type CreateEndpointRequest struct ***REMOVED***
+type CreateEndpointRequest struct {
 	// Provided at create time, this will be the network id referenced.
 	NetworkID string
 	// The ID of the endpoint for later reference.
 	EndpointID string
 	Interface  *EndpointInterface
-	Options    map[string]interface***REMOVED******REMOVED***
-***REMOVED***
+	Options    map[string]interface{}
+}
 
 // EndpointInterface represents an interface endpoint.
-type EndpointInterface struct ***REMOVED***
+type EndpointInterface struct {
 	Address     string
 	AddressIPv6 string
 	MacAddress  string
-***REMOVED***
+}
 
 // CreateEndpointResponse is the response to the CreateEndpoint action.
-type CreateEndpointResponse struct ***REMOVED***
+type CreateEndpointResponse struct {
 	Response
 	Interface *EndpointInterface
-***REMOVED***
+}
 
 // Interface is the representation of a linux interface.
-type Interface struct ***REMOVED***
+type Interface struct {
 	Address     *net.IPNet
 	AddressIPv6 *net.IPNet
 	MacAddress  net.HardwareAddr
-***REMOVED***
+}
 
 // DeleteEndpointRequest describes the API for deleting an endpoint.
-type DeleteEndpointRequest struct ***REMOVED***
+type DeleteEndpointRequest struct {
 	NetworkID  string
 	EndpointID string
-***REMOVED***
+}
 
 // DeleteEndpointResponse is the response to the DeleteEndpoint action.
-type DeleteEndpointResponse struct ***REMOVED***
+type DeleteEndpointResponse struct {
 	Response
-***REMOVED***
+}
 
 // EndpointInfoRequest retrieves information about the endpoint from the network driver.
-type EndpointInfoRequest struct ***REMOVED***
+type EndpointInfoRequest struct {
 	NetworkID  string
 	EndpointID string
-***REMOVED***
+}
 
 // EndpointInfoResponse is the response to an EndpointInfoRequest.
-type EndpointInfoResponse struct ***REMOVED***
+type EndpointInfoResponse struct {
 	Response
-	Value map[string]interface***REMOVED******REMOVED***
-***REMOVED***
+	Value map[string]interface{}
+}
 
 // JoinRequest describes the API for joining an endpoint to a sandbox.
-type JoinRequest struct ***REMOVED***
+type JoinRequest struct {
 	NetworkID  string
 	EndpointID string
 	SandboxKey string
-	Options    map[string]interface***REMOVED******REMOVED***
-***REMOVED***
+	Options    map[string]interface{}
+}
 
 // InterfaceName is the struct represetation of a pair of devices with source
 // and destination, for the purposes of putting an endpoint into a container.
-type InterfaceName struct ***REMOVED***
+type InterfaceName struct {
 	SrcName   string
 	DstName   string
 	DstPrefix string
-***REMOVED***
+}
 
 // StaticRoute is the plain JSON representation of a static route.
-type StaticRoute struct ***REMOVED***
+type StaticRoute struct {
 	Destination string
 	RouteType   int
 	NextHop     string
-***REMOVED***
+}
 
 // JoinResponse is the response to a JoinRequest.
-type JoinResponse struct ***REMOVED***
+type JoinResponse struct {
 	Response
 	InterfaceName         *InterfaceName
 	Gateway               string
 	GatewayIPv6           string
 	StaticRoutes          []StaticRoute
 	DisableGatewayService bool
-***REMOVED***
+}
 
 // LeaveRequest describes the API for detaching an endpoint from a sandbox.
-type LeaveRequest struct ***REMOVED***
+type LeaveRequest struct {
 	NetworkID  string
 	EndpointID string
-***REMOVED***
+}
 
 // LeaveResponse is the answer to LeaveRequest.
-type LeaveResponse struct ***REMOVED***
+type LeaveResponse struct {
 	Response
-***REMOVED***
+}
 
 // ProgramExternalConnectivityRequest describes the API for programming the external connectivity for the given endpoint.
-type ProgramExternalConnectivityRequest struct ***REMOVED***
+type ProgramExternalConnectivityRequest struct {
 	NetworkID  string
 	EndpointID string
-	Options    map[string]interface***REMOVED******REMOVED***
-***REMOVED***
+	Options    map[string]interface{}
+}
 
 // ProgramExternalConnectivityResponse is the answer to ProgramExternalConnectivityRequest.
-type ProgramExternalConnectivityResponse struct ***REMOVED***
+type ProgramExternalConnectivityResponse struct {
 	Response
-***REMOVED***
+}
 
 // RevokeExternalConnectivityRequest describes the API for revoking the external connectivity for the given endpoint.
-type RevokeExternalConnectivityRequest struct ***REMOVED***
+type RevokeExternalConnectivityRequest struct {
 	NetworkID  string
 	EndpointID string
-***REMOVED***
+}
 
 // RevokeExternalConnectivityResponse is the answer to RevokeExternalConnectivityRequest.
-type RevokeExternalConnectivityResponse struct ***REMOVED***
+type RevokeExternalConnectivityResponse struct {
 	Response
-***REMOVED***
+}
 
 // DiscoveryNotification represents a discovery notification
-type DiscoveryNotification struct ***REMOVED***
+type DiscoveryNotification struct {
 	DiscoveryType discoverapi.DiscoveryType
-	DiscoveryData interface***REMOVED******REMOVED***
-***REMOVED***
+	DiscoveryData interface{}
+}
 
 // DiscoveryResponse is used by libnetwork to log any plugin error processing the discovery notifications
-type DiscoveryResponse struct ***REMOVED***
+type DiscoveryResponse struct {
 	Response
-***REMOVED***
+}

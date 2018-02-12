@@ -23,18 +23,18 @@ var (
 
 // errnoErr returns common boxed Errno values, to prevent
 // allocations at runtime.
-func errnoErr(e syscall.Errno) error ***REMOVED***
-	switch e ***REMOVED***
+func errnoErr(e syscall.Errno) error {
+	switch e {
 	case 0:
 		return nil
 	case errnoERROR_IO_PENDING:
 		return errERROR_IO_PENDING
-	***REMOVED***
+	}
 	// TODO: add more here, after collecting data on the common
 	// error values see on Windows. (perhaps when running
 	// all.bat?)
 	return e
-***REMOVED***
+}
 
 var (
 	modkernel32 = windows.NewLazySystemDLL("kernel32.dll")
@@ -73,456 +73,456 @@ var (
 	procBackupWrite                                          = modkernel32.NewProc("BackupWrite")
 )
 
-func cancelIoEx(file syscall.Handle, o *syscall.Overlapped) (err error) ***REMOVED***
+func cancelIoEx(file syscall.Handle, o *syscall.Overlapped) (err error) {
 	r1, _, e1 := syscall.Syscall(procCancelIoEx.Addr(), 2, uintptr(file), uintptr(unsafe.Pointer(o)), 0)
-	if r1 == 0 ***REMOVED***
-		if e1 != 0 ***REMOVED***
+	if r1 == 0 {
+		if e1 != 0 {
 			err = errnoErr(e1)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			err = syscall.EINVAL
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}
 
-func createIoCompletionPort(file syscall.Handle, port syscall.Handle, key uintptr, threadCount uint32) (newport syscall.Handle, err error) ***REMOVED***
+func createIoCompletionPort(file syscall.Handle, port syscall.Handle, key uintptr, threadCount uint32) (newport syscall.Handle, err error) {
 	r0, _, e1 := syscall.Syscall6(procCreateIoCompletionPort.Addr(), 4, uintptr(file), uintptr(port), uintptr(key), uintptr(threadCount), 0, 0)
 	newport = syscall.Handle(r0)
-	if newport == 0 ***REMOVED***
-		if e1 != 0 ***REMOVED***
+	if newport == 0 {
+		if e1 != 0 {
 			err = errnoErr(e1)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			err = syscall.EINVAL
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}
 
-func getQueuedCompletionStatus(port syscall.Handle, bytes *uint32, key *uintptr, o **ioOperation, timeout uint32) (err error) ***REMOVED***
+func getQueuedCompletionStatus(port syscall.Handle, bytes *uint32, key *uintptr, o **ioOperation, timeout uint32) (err error) {
 	r1, _, e1 := syscall.Syscall6(procGetQueuedCompletionStatus.Addr(), 5, uintptr(port), uintptr(unsafe.Pointer(bytes)), uintptr(unsafe.Pointer(key)), uintptr(unsafe.Pointer(o)), uintptr(timeout), 0)
-	if r1 == 0 ***REMOVED***
-		if e1 != 0 ***REMOVED***
+	if r1 == 0 {
+		if e1 != 0 {
 			err = errnoErr(e1)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			err = syscall.EINVAL
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}
 
-func setFileCompletionNotificationModes(h syscall.Handle, flags uint8) (err error) ***REMOVED***
+func setFileCompletionNotificationModes(h syscall.Handle, flags uint8) (err error) {
 	r1, _, e1 := syscall.Syscall(procSetFileCompletionNotificationModes.Addr(), 2, uintptr(h), uintptr(flags), 0)
-	if r1 == 0 ***REMOVED***
-		if e1 != 0 ***REMOVED***
+	if r1 == 0 {
+		if e1 != 0 {
 			err = errnoErr(e1)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			err = syscall.EINVAL
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}
 
-func timeBeginPeriod(period uint32) (n int32) ***REMOVED***
+func timeBeginPeriod(period uint32) (n int32) {
 	r0, _, _ := syscall.Syscall(proctimeBeginPeriod.Addr(), 1, uintptr(period), 0, 0)
 	n = int32(r0)
 	return
-***REMOVED***
+}
 
-func connectNamedPipe(pipe syscall.Handle, o *syscall.Overlapped) (err error) ***REMOVED***
+func connectNamedPipe(pipe syscall.Handle, o *syscall.Overlapped) (err error) {
 	r1, _, e1 := syscall.Syscall(procConnectNamedPipe.Addr(), 2, uintptr(pipe), uintptr(unsafe.Pointer(o)), 0)
-	if r1 == 0 ***REMOVED***
-		if e1 != 0 ***REMOVED***
+	if r1 == 0 {
+		if e1 != 0 {
 			err = errnoErr(e1)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			err = syscall.EINVAL
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}
 
-func createNamedPipe(name string, flags uint32, pipeMode uint32, maxInstances uint32, outSize uint32, inSize uint32, defaultTimeout uint32, sa *syscall.SecurityAttributes) (handle syscall.Handle, err error) ***REMOVED***
+func createNamedPipe(name string, flags uint32, pipeMode uint32, maxInstances uint32, outSize uint32, inSize uint32, defaultTimeout uint32, sa *syscall.SecurityAttributes) (handle syscall.Handle, err error) {
 	var _p0 *uint16
 	_p0, err = syscall.UTF16PtrFromString(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	return _createNamedPipe(_p0, flags, pipeMode, maxInstances, outSize, inSize, defaultTimeout, sa)
-***REMOVED***
+}
 
-func _createNamedPipe(name *uint16, flags uint32, pipeMode uint32, maxInstances uint32, outSize uint32, inSize uint32, defaultTimeout uint32, sa *syscall.SecurityAttributes) (handle syscall.Handle, err error) ***REMOVED***
+func _createNamedPipe(name *uint16, flags uint32, pipeMode uint32, maxInstances uint32, outSize uint32, inSize uint32, defaultTimeout uint32, sa *syscall.SecurityAttributes) (handle syscall.Handle, err error) {
 	r0, _, e1 := syscall.Syscall9(procCreateNamedPipeW.Addr(), 8, uintptr(unsafe.Pointer(name)), uintptr(flags), uintptr(pipeMode), uintptr(maxInstances), uintptr(outSize), uintptr(inSize), uintptr(defaultTimeout), uintptr(unsafe.Pointer(sa)), 0)
 	handle = syscall.Handle(r0)
-	if handle == syscall.InvalidHandle ***REMOVED***
-		if e1 != 0 ***REMOVED***
+	if handle == syscall.InvalidHandle {
+		if e1 != 0 {
 			err = errnoErr(e1)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			err = syscall.EINVAL
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}
 
-func createFile(name string, access uint32, mode uint32, sa *syscall.SecurityAttributes, createmode uint32, attrs uint32, templatefile syscall.Handle) (handle syscall.Handle, err error) ***REMOVED***
+func createFile(name string, access uint32, mode uint32, sa *syscall.SecurityAttributes, createmode uint32, attrs uint32, templatefile syscall.Handle) (handle syscall.Handle, err error) {
 	var _p0 *uint16
 	_p0, err = syscall.UTF16PtrFromString(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	return _createFile(_p0, access, mode, sa, createmode, attrs, templatefile)
-***REMOVED***
+}
 
-func _createFile(name *uint16, access uint32, mode uint32, sa *syscall.SecurityAttributes, createmode uint32, attrs uint32, templatefile syscall.Handle) (handle syscall.Handle, err error) ***REMOVED***
+func _createFile(name *uint16, access uint32, mode uint32, sa *syscall.SecurityAttributes, createmode uint32, attrs uint32, templatefile syscall.Handle) (handle syscall.Handle, err error) {
 	r0, _, e1 := syscall.Syscall9(procCreateFileW.Addr(), 7, uintptr(unsafe.Pointer(name)), uintptr(access), uintptr(mode), uintptr(unsafe.Pointer(sa)), uintptr(createmode), uintptr(attrs), uintptr(templatefile), 0, 0)
 	handle = syscall.Handle(r0)
-	if handle == syscall.InvalidHandle ***REMOVED***
-		if e1 != 0 ***REMOVED***
+	if handle == syscall.InvalidHandle {
+		if e1 != 0 {
 			err = errnoErr(e1)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			err = syscall.EINVAL
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}
 
-func waitNamedPipe(name string, timeout uint32) (err error) ***REMOVED***
+func waitNamedPipe(name string, timeout uint32) (err error) {
 	var _p0 *uint16
 	_p0, err = syscall.UTF16PtrFromString(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	return _waitNamedPipe(_p0, timeout)
-***REMOVED***
+}
 
-func _waitNamedPipe(name *uint16, timeout uint32) (err error) ***REMOVED***
+func _waitNamedPipe(name *uint16, timeout uint32) (err error) {
 	r1, _, e1 := syscall.Syscall(procWaitNamedPipeW.Addr(), 2, uintptr(unsafe.Pointer(name)), uintptr(timeout), 0)
-	if r1 == 0 ***REMOVED***
-		if e1 != 0 ***REMOVED***
+	if r1 == 0 {
+		if e1 != 0 {
 			err = errnoErr(e1)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			err = syscall.EINVAL
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}
 
-func getNamedPipeInfo(pipe syscall.Handle, flags *uint32, outSize *uint32, inSize *uint32, maxInstances *uint32) (err error) ***REMOVED***
+func getNamedPipeInfo(pipe syscall.Handle, flags *uint32, outSize *uint32, inSize *uint32, maxInstances *uint32) (err error) {
 	r1, _, e1 := syscall.Syscall6(procGetNamedPipeInfo.Addr(), 5, uintptr(pipe), uintptr(unsafe.Pointer(flags)), uintptr(unsafe.Pointer(outSize)), uintptr(unsafe.Pointer(inSize)), uintptr(unsafe.Pointer(maxInstances)), 0)
-	if r1 == 0 ***REMOVED***
-		if e1 != 0 ***REMOVED***
+	if r1 == 0 {
+		if e1 != 0 {
 			err = errnoErr(e1)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			err = syscall.EINVAL
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}
 
-func getNamedPipeHandleState(pipe syscall.Handle, state *uint32, curInstances *uint32, maxCollectionCount *uint32, collectDataTimeout *uint32, userName *uint16, maxUserNameSize uint32) (err error) ***REMOVED***
+func getNamedPipeHandleState(pipe syscall.Handle, state *uint32, curInstances *uint32, maxCollectionCount *uint32, collectDataTimeout *uint32, userName *uint16, maxUserNameSize uint32) (err error) {
 	r1, _, e1 := syscall.Syscall9(procGetNamedPipeHandleStateW.Addr(), 7, uintptr(pipe), uintptr(unsafe.Pointer(state)), uintptr(unsafe.Pointer(curInstances)), uintptr(unsafe.Pointer(maxCollectionCount)), uintptr(unsafe.Pointer(collectDataTimeout)), uintptr(unsafe.Pointer(userName)), uintptr(maxUserNameSize), 0, 0)
-	if r1 == 0 ***REMOVED***
-		if e1 != 0 ***REMOVED***
+	if r1 == 0 {
+		if e1 != 0 {
 			err = errnoErr(e1)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			err = syscall.EINVAL
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}
 
-func localAlloc(uFlags uint32, length uint32) (ptr uintptr) ***REMOVED***
+func localAlloc(uFlags uint32, length uint32) (ptr uintptr) {
 	r0, _, _ := syscall.Syscall(procLocalAlloc.Addr(), 2, uintptr(uFlags), uintptr(length), 0)
 	ptr = uintptr(r0)
 	return
-***REMOVED***
+}
 
-func lookupAccountName(systemName *uint16, accountName string, sid *byte, sidSize *uint32, refDomain *uint16, refDomainSize *uint32, sidNameUse *uint32) (err error) ***REMOVED***
+func lookupAccountName(systemName *uint16, accountName string, sid *byte, sidSize *uint32, refDomain *uint16, refDomainSize *uint32, sidNameUse *uint32) (err error) {
 	var _p0 *uint16
 	_p0, err = syscall.UTF16PtrFromString(accountName)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	return _lookupAccountName(systemName, _p0, sid, sidSize, refDomain, refDomainSize, sidNameUse)
-***REMOVED***
+}
 
-func _lookupAccountName(systemName *uint16, accountName *uint16, sid *byte, sidSize *uint32, refDomain *uint16, refDomainSize *uint32, sidNameUse *uint32) (err error) ***REMOVED***
+func _lookupAccountName(systemName *uint16, accountName *uint16, sid *byte, sidSize *uint32, refDomain *uint16, refDomainSize *uint32, sidNameUse *uint32) (err error) {
 	r1, _, e1 := syscall.Syscall9(procLookupAccountNameW.Addr(), 7, uintptr(unsafe.Pointer(systemName)), uintptr(unsafe.Pointer(accountName)), uintptr(unsafe.Pointer(sid)), uintptr(unsafe.Pointer(sidSize)), uintptr(unsafe.Pointer(refDomain)), uintptr(unsafe.Pointer(refDomainSize)), uintptr(unsafe.Pointer(sidNameUse)), 0, 0)
-	if r1 == 0 ***REMOVED***
-		if e1 != 0 ***REMOVED***
+	if r1 == 0 {
+		if e1 != 0 {
 			err = errnoErr(e1)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			err = syscall.EINVAL
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}
 
-func convertSidToStringSid(sid *byte, str **uint16) (err error) ***REMOVED***
+func convertSidToStringSid(sid *byte, str **uint16) (err error) {
 	r1, _, e1 := syscall.Syscall(procConvertSidToStringSidW.Addr(), 2, uintptr(unsafe.Pointer(sid)), uintptr(unsafe.Pointer(str)), 0)
-	if r1 == 0 ***REMOVED***
-		if e1 != 0 ***REMOVED***
+	if r1 == 0 {
+		if e1 != 0 {
 			err = errnoErr(e1)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			err = syscall.EINVAL
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}
 
-func convertStringSecurityDescriptorToSecurityDescriptor(str string, revision uint32, sd *uintptr, size *uint32) (err error) ***REMOVED***
+func convertStringSecurityDescriptorToSecurityDescriptor(str string, revision uint32, sd *uintptr, size *uint32) (err error) {
 	var _p0 *uint16
 	_p0, err = syscall.UTF16PtrFromString(str)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	return _convertStringSecurityDescriptorToSecurityDescriptor(_p0, revision, sd, size)
-***REMOVED***
+}
 
-func _convertStringSecurityDescriptorToSecurityDescriptor(str *uint16, revision uint32, sd *uintptr, size *uint32) (err error) ***REMOVED***
+func _convertStringSecurityDescriptorToSecurityDescriptor(str *uint16, revision uint32, sd *uintptr, size *uint32) (err error) {
 	r1, _, e1 := syscall.Syscall6(procConvertStringSecurityDescriptorToSecurityDescriptorW.Addr(), 4, uintptr(unsafe.Pointer(str)), uintptr(revision), uintptr(unsafe.Pointer(sd)), uintptr(unsafe.Pointer(size)), 0, 0)
-	if r1 == 0 ***REMOVED***
-		if e1 != 0 ***REMOVED***
+	if r1 == 0 {
+		if e1 != 0 {
 			err = errnoErr(e1)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			err = syscall.EINVAL
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}
 
-func convertSecurityDescriptorToStringSecurityDescriptor(sd *byte, revision uint32, secInfo uint32, sddl **uint16, sddlSize *uint32) (err error) ***REMOVED***
+func convertSecurityDescriptorToStringSecurityDescriptor(sd *byte, revision uint32, secInfo uint32, sddl **uint16, sddlSize *uint32) (err error) {
 	r1, _, e1 := syscall.Syscall6(procConvertSecurityDescriptorToStringSecurityDescriptorW.Addr(), 5, uintptr(unsafe.Pointer(sd)), uintptr(revision), uintptr(secInfo), uintptr(unsafe.Pointer(sddl)), uintptr(unsafe.Pointer(sddlSize)), 0)
-	if r1 == 0 ***REMOVED***
-		if e1 != 0 ***REMOVED***
+	if r1 == 0 {
+		if e1 != 0 {
 			err = errnoErr(e1)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			err = syscall.EINVAL
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}
 
-func localFree(mem uintptr) ***REMOVED***
+func localFree(mem uintptr) {
 	syscall.Syscall(procLocalFree.Addr(), 1, uintptr(mem), 0, 0)
 	return
-***REMOVED***
+}
 
-func getSecurityDescriptorLength(sd uintptr) (len uint32) ***REMOVED***
+func getSecurityDescriptorLength(sd uintptr) (len uint32) {
 	r0, _, _ := syscall.Syscall(procGetSecurityDescriptorLength.Addr(), 1, uintptr(sd), 0, 0)
 	len = uint32(r0)
 	return
-***REMOVED***
+}
 
-func getFileInformationByHandleEx(h syscall.Handle, class uint32, buffer *byte, size uint32) (err error) ***REMOVED***
+func getFileInformationByHandleEx(h syscall.Handle, class uint32, buffer *byte, size uint32) (err error) {
 	r1, _, e1 := syscall.Syscall6(procGetFileInformationByHandleEx.Addr(), 4, uintptr(h), uintptr(class), uintptr(unsafe.Pointer(buffer)), uintptr(size), 0, 0)
-	if r1 == 0 ***REMOVED***
-		if e1 != 0 ***REMOVED***
+	if r1 == 0 {
+		if e1 != 0 {
 			err = errnoErr(e1)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			err = syscall.EINVAL
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}
 
-func setFileInformationByHandle(h syscall.Handle, class uint32, buffer *byte, size uint32) (err error) ***REMOVED***
+func setFileInformationByHandle(h syscall.Handle, class uint32, buffer *byte, size uint32) (err error) {
 	r1, _, e1 := syscall.Syscall6(procSetFileInformationByHandle.Addr(), 4, uintptr(h), uintptr(class), uintptr(unsafe.Pointer(buffer)), uintptr(size), 0, 0)
-	if r1 == 0 ***REMOVED***
-		if e1 != 0 ***REMOVED***
+	if r1 == 0 {
+		if e1 != 0 {
 			err = errnoErr(e1)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			err = syscall.EINVAL
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}
 
-func adjustTokenPrivileges(token windows.Token, releaseAll bool, input *byte, outputSize uint32, output *byte, requiredSize *uint32) (success bool, err error) ***REMOVED***
+func adjustTokenPrivileges(token windows.Token, releaseAll bool, input *byte, outputSize uint32, output *byte, requiredSize *uint32) (success bool, err error) {
 	var _p0 uint32
-	if releaseAll ***REMOVED***
+	if releaseAll {
 		_p0 = 1
-	***REMOVED*** else ***REMOVED***
+	} else {
 		_p0 = 0
-	***REMOVED***
+	}
 	r0, _, e1 := syscall.Syscall6(procAdjustTokenPrivileges.Addr(), 6, uintptr(token), uintptr(_p0), uintptr(unsafe.Pointer(input)), uintptr(outputSize), uintptr(unsafe.Pointer(output)), uintptr(unsafe.Pointer(requiredSize)))
 	success = r0 != 0
-	if true ***REMOVED***
-		if e1 != 0 ***REMOVED***
+	if true {
+		if e1 != 0 {
 			err = errnoErr(e1)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			err = syscall.EINVAL
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}
 
-func impersonateSelf(level uint32) (err error) ***REMOVED***
+func impersonateSelf(level uint32) (err error) {
 	r1, _, e1 := syscall.Syscall(procImpersonateSelf.Addr(), 1, uintptr(level), 0, 0)
-	if r1 == 0 ***REMOVED***
-		if e1 != 0 ***REMOVED***
+	if r1 == 0 {
+		if e1 != 0 {
 			err = errnoErr(e1)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			err = syscall.EINVAL
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}
 
-func revertToSelf() (err error) ***REMOVED***
+func revertToSelf() (err error) {
 	r1, _, e1 := syscall.Syscall(procRevertToSelf.Addr(), 0, 0, 0, 0)
-	if r1 == 0 ***REMOVED***
-		if e1 != 0 ***REMOVED***
+	if r1 == 0 {
+		if e1 != 0 {
 			err = errnoErr(e1)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			err = syscall.EINVAL
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}
 
-func openThreadToken(thread syscall.Handle, accessMask uint32, openAsSelf bool, token *windows.Token) (err error) ***REMOVED***
+func openThreadToken(thread syscall.Handle, accessMask uint32, openAsSelf bool, token *windows.Token) (err error) {
 	var _p0 uint32
-	if openAsSelf ***REMOVED***
+	if openAsSelf {
 		_p0 = 1
-	***REMOVED*** else ***REMOVED***
+	} else {
 		_p0 = 0
-	***REMOVED***
+	}
 	r1, _, e1 := syscall.Syscall6(procOpenThreadToken.Addr(), 4, uintptr(thread), uintptr(accessMask), uintptr(_p0), uintptr(unsafe.Pointer(token)), 0, 0)
-	if r1 == 0 ***REMOVED***
-		if e1 != 0 ***REMOVED***
+	if r1 == 0 {
+		if e1 != 0 {
 			err = errnoErr(e1)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			err = syscall.EINVAL
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}
 
-func getCurrentThread() (h syscall.Handle) ***REMOVED***
+func getCurrentThread() (h syscall.Handle) {
 	r0, _, _ := syscall.Syscall(procGetCurrentThread.Addr(), 0, 0, 0, 0)
 	h = syscall.Handle(r0)
 	return
-***REMOVED***
+}
 
-func lookupPrivilegeValue(systemName string, name string, luid *uint64) (err error) ***REMOVED***
+func lookupPrivilegeValue(systemName string, name string, luid *uint64) (err error) {
 	var _p0 *uint16
 	_p0, err = syscall.UTF16PtrFromString(systemName)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	var _p1 *uint16
 	_p1, err = syscall.UTF16PtrFromString(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	return _lookupPrivilegeValue(_p0, _p1, luid)
-***REMOVED***
+}
 
-func _lookupPrivilegeValue(systemName *uint16, name *uint16, luid *uint64) (err error) ***REMOVED***
+func _lookupPrivilegeValue(systemName *uint16, name *uint16, luid *uint64) (err error) {
 	r1, _, e1 := syscall.Syscall(procLookupPrivilegeValueW.Addr(), 3, uintptr(unsafe.Pointer(systemName)), uintptr(unsafe.Pointer(name)), uintptr(unsafe.Pointer(luid)))
-	if r1 == 0 ***REMOVED***
-		if e1 != 0 ***REMOVED***
+	if r1 == 0 {
+		if e1 != 0 {
 			err = errnoErr(e1)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			err = syscall.EINVAL
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}
 
-func lookupPrivilegeName(systemName string, luid *uint64, buffer *uint16, size *uint32) (err error) ***REMOVED***
+func lookupPrivilegeName(systemName string, luid *uint64, buffer *uint16, size *uint32) (err error) {
 	var _p0 *uint16
 	_p0, err = syscall.UTF16PtrFromString(systemName)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	return _lookupPrivilegeName(_p0, luid, buffer, size)
-***REMOVED***
+}
 
-func _lookupPrivilegeName(systemName *uint16, luid *uint64, buffer *uint16, size *uint32) (err error) ***REMOVED***
+func _lookupPrivilegeName(systemName *uint16, luid *uint64, buffer *uint16, size *uint32) (err error) {
 	r1, _, e1 := syscall.Syscall6(procLookupPrivilegeNameW.Addr(), 4, uintptr(unsafe.Pointer(systemName)), uintptr(unsafe.Pointer(luid)), uintptr(unsafe.Pointer(buffer)), uintptr(unsafe.Pointer(size)), 0, 0)
-	if r1 == 0 ***REMOVED***
-		if e1 != 0 ***REMOVED***
+	if r1 == 0 {
+		if e1 != 0 {
 			err = errnoErr(e1)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			err = syscall.EINVAL
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}
 
-func lookupPrivilegeDisplayName(systemName string, name *uint16, buffer *uint16, size *uint32, languageId *uint32) (err error) ***REMOVED***
+func lookupPrivilegeDisplayName(systemName string, name *uint16, buffer *uint16, size *uint32, languageId *uint32) (err error) {
 	var _p0 *uint16
 	_p0, err = syscall.UTF16PtrFromString(systemName)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	return _lookupPrivilegeDisplayName(_p0, name, buffer, size, languageId)
-***REMOVED***
+}
 
-func _lookupPrivilegeDisplayName(systemName *uint16, name *uint16, buffer *uint16, size *uint32, languageId *uint32) (err error) ***REMOVED***
+func _lookupPrivilegeDisplayName(systemName *uint16, name *uint16, buffer *uint16, size *uint32, languageId *uint32) (err error) {
 	r1, _, e1 := syscall.Syscall6(procLookupPrivilegeDisplayNameW.Addr(), 5, uintptr(unsafe.Pointer(systemName)), uintptr(unsafe.Pointer(name)), uintptr(unsafe.Pointer(buffer)), uintptr(unsafe.Pointer(size)), uintptr(unsafe.Pointer(languageId)), 0)
-	if r1 == 0 ***REMOVED***
-		if e1 != 0 ***REMOVED***
+	if r1 == 0 {
+		if e1 != 0 {
 			err = errnoErr(e1)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			err = syscall.EINVAL
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}
 
-func backupRead(h syscall.Handle, b []byte, bytesRead *uint32, abort bool, processSecurity bool, context *uintptr) (err error) ***REMOVED***
+func backupRead(h syscall.Handle, b []byte, bytesRead *uint32, abort bool, processSecurity bool, context *uintptr) (err error) {
 	var _p0 *byte
-	if len(b) > 0 ***REMOVED***
+	if len(b) > 0 {
 		_p0 = &b[0]
-	***REMOVED***
+	}
 	var _p1 uint32
-	if abort ***REMOVED***
+	if abort {
 		_p1 = 1
-	***REMOVED*** else ***REMOVED***
+	} else {
 		_p1 = 0
-	***REMOVED***
+	}
 	var _p2 uint32
-	if processSecurity ***REMOVED***
+	if processSecurity {
 		_p2 = 1
-	***REMOVED*** else ***REMOVED***
+	} else {
 		_p2 = 0
-	***REMOVED***
+	}
 	r1, _, e1 := syscall.Syscall9(procBackupRead.Addr(), 7, uintptr(h), uintptr(unsafe.Pointer(_p0)), uintptr(len(b)), uintptr(unsafe.Pointer(bytesRead)), uintptr(_p1), uintptr(_p2), uintptr(unsafe.Pointer(context)), 0, 0)
-	if r1 == 0 ***REMOVED***
-		if e1 != 0 ***REMOVED***
+	if r1 == 0 {
+		if e1 != 0 {
 			err = errnoErr(e1)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			err = syscall.EINVAL
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}
 
-func backupWrite(h syscall.Handle, b []byte, bytesWritten *uint32, abort bool, processSecurity bool, context *uintptr) (err error) ***REMOVED***
+func backupWrite(h syscall.Handle, b []byte, bytesWritten *uint32, abort bool, processSecurity bool, context *uintptr) (err error) {
 	var _p0 *byte
-	if len(b) > 0 ***REMOVED***
+	if len(b) > 0 {
 		_p0 = &b[0]
-	***REMOVED***
+	}
 	var _p1 uint32
-	if abort ***REMOVED***
+	if abort {
 		_p1 = 1
-	***REMOVED*** else ***REMOVED***
+	} else {
 		_p1 = 0
-	***REMOVED***
+	}
 	var _p2 uint32
-	if processSecurity ***REMOVED***
+	if processSecurity {
 		_p2 = 1
-	***REMOVED*** else ***REMOVED***
+	} else {
 		_p2 = 0
-	***REMOVED***
+	}
 	r1, _, e1 := syscall.Syscall9(procBackupWrite.Addr(), 7, uintptr(h), uintptr(unsafe.Pointer(_p0)), uintptr(len(b)), uintptr(unsafe.Pointer(bytesWritten)), uintptr(_p1), uintptr(_p2), uintptr(unsafe.Pointer(context)), 0, 0)
-	if r1 == 0 ***REMOVED***
-		if e1 != 0 ***REMOVED***
+	if r1 == 0 {
+		if e1 != 0 {
 			err = errnoErr(e1)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			err = syscall.EINVAL
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}

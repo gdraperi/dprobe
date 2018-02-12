@@ -102,44 +102,44 @@ type oneofSizer func(Message) int
 // tagMap is an optimization over map[int]int for typical protocol buffer
 // use-cases. Encoded protocol buffers are often in tag order with small tag
 // numbers.
-type tagMap struct ***REMOVED***
+type tagMap struct {
 	fastTags []int
 	slowTags map[int]int
-***REMOVED***
+}
 
 // tagMapFastLimit is the upper bound on the tag number that will be stored in
 // the tagMap slice rather than its map.
 const tagMapFastLimit = 1024
 
-func (p *tagMap) get(t int) (int, bool) ***REMOVED***
-	if t > 0 && t < tagMapFastLimit ***REMOVED***
-		if t >= len(p.fastTags) ***REMOVED***
+func (p *tagMap) get(t int) (int, bool) {
+	if t > 0 && t < tagMapFastLimit {
+		if t >= len(p.fastTags) {
 			return 0, false
-		***REMOVED***
+		}
 		fi := p.fastTags[t]
 		return fi, fi >= 0
-	***REMOVED***
+	}
 	fi, ok := p.slowTags[t]
 	return fi, ok
-***REMOVED***
+}
 
-func (p *tagMap) put(t int, fi int) ***REMOVED***
-	if t > 0 && t < tagMapFastLimit ***REMOVED***
-		for len(p.fastTags) < t+1 ***REMOVED***
+func (p *tagMap) put(t int, fi int) {
+	if t > 0 && t < tagMapFastLimit {
+		for len(p.fastTags) < t+1 {
 			p.fastTags = append(p.fastTags, -1)
-		***REMOVED***
+		}
 		p.fastTags[t] = fi
 		return
-	***REMOVED***
-	if p.slowTags == nil ***REMOVED***
+	}
+	if p.slowTags == nil {
 		p.slowTags = make(map[int]int)
-	***REMOVED***
+	}
 	p.slowTags[t] = fi
-***REMOVED***
+}
 
 // StructProperties represents properties for all the fields of a struct.
 // decoderTags and decoderOrigNames should only be used by the decoder.
-type StructProperties struct ***REMOVED***
+type StructProperties struct {
 	Prop             []*Properties  // properties for each field
 	reqCount         int            // required count
 	decoderTags      tagMap         // map from proto tag to struct field number
@@ -156,26 +156,26 @@ type StructProperties struct ***REMOVED***
 	// OneofTypes contains information about the oneof fields in this message.
 	// It is keyed by the original name of a field.
 	OneofTypes map[string]*OneofProperties
-***REMOVED***
+}
 
 // OneofProperties represents information about a specific field in a oneof.
-type OneofProperties struct ***REMOVED***
+type OneofProperties struct {
 	Type  reflect.Type // pointer to generated struct type for this oneof field
 	Field int          // struct field number of the containing oneof in the message
 	Prop  *Properties
-***REMOVED***
+}
 
 // Implement the sorting interface so we can sort the fields in tag order, as recommended by the spec.
 // See encode.go, (*Buffer).enc_struct.
 
-func (sp *StructProperties) Len() int ***REMOVED*** return len(sp.order) ***REMOVED***
-func (sp *StructProperties) Less(i, j int) bool ***REMOVED***
+func (sp *StructProperties) Len() int { return len(sp.order) }
+func (sp *StructProperties) Less(i, j int) bool {
 	return sp.Prop[sp.order[i]].Tag < sp.Prop[sp.order[j]].Tag
-***REMOVED***
-func (sp *StructProperties) Swap(i, j int) ***REMOVED*** sp.order[i], sp.order[j] = sp.order[j], sp.order[i] ***REMOVED***
+}
+func (sp *StructProperties) Swap(i, j int) { sp.order[i], sp.order[j] = sp.order[j], sp.order[i] }
 
 // Properties represents the protocol-specific behavior of a single struct field.
-type Properties struct ***REMOVED***
+type Properties struct {
 	Name     string // name of the field, for error messages
 	OrigName string // original name before protocol compiler (always set)
 	JSONName string // name to use for JSON; determined by protoc
@@ -220,55 +220,55 @@ type Properties struct ***REMOVED***
 
 	// If this is a packable field, this will be the decoder for the packed version of the field.
 	packedDec decoder
-***REMOVED***
+}
 
 // String formats the properties in the protobuf struct field tag style.
-func (p *Properties) String() string ***REMOVED***
+func (p *Properties) String() string {
 	s := p.Wire
 	s = ","
 	s += strconv.Itoa(p.Tag)
-	if p.Required ***REMOVED***
+	if p.Required {
 		s += ",req"
-	***REMOVED***
-	if p.Optional ***REMOVED***
+	}
+	if p.Optional {
 		s += ",opt"
-	***REMOVED***
-	if p.Repeated ***REMOVED***
+	}
+	if p.Repeated {
 		s += ",rep"
-	***REMOVED***
-	if p.Packed ***REMOVED***
+	}
+	if p.Packed {
 		s += ",packed"
-	***REMOVED***
+	}
 	s += ",name=" + p.OrigName
-	if p.JSONName != p.OrigName ***REMOVED***
+	if p.JSONName != p.OrigName {
 		s += ",json=" + p.JSONName
-	***REMOVED***
-	if p.proto3 ***REMOVED***
+	}
+	if p.proto3 {
 		s += ",proto3"
-	***REMOVED***
-	if p.oneof ***REMOVED***
+	}
+	if p.oneof {
 		s += ",oneof"
-	***REMOVED***
-	if len(p.Enum) > 0 ***REMOVED***
+	}
+	if len(p.Enum) > 0 {
 		s += ",enum=" + p.Enum
-	***REMOVED***
-	if p.HasDefault ***REMOVED***
+	}
+	if p.HasDefault {
 		s += ",def=" + p.Default
-	***REMOVED***
+	}
 	return s
-***REMOVED***
+}
 
 // Parse populates p by parsing a string in the protobuf struct field tag style.
-func (p *Properties) Parse(s string) ***REMOVED***
+func (p *Properties) Parse(s string) {
 	// "bytes,49,opt,name=foo,def=hello!"
 	fields := strings.Split(s, ",") // breaks def=, but handled below.
-	if len(fields) < 2 ***REMOVED***
+	if len(fields) < 2 {
 		fmt.Fprintf(os.Stderr, "proto: tag has too few fields: %q\n", s)
 		return
-	***REMOVED***
+	}
 
 	p.Wire = fields[0]
-	switch p.Wire ***REMOVED***
+	switch p.Wire {
 	case "varint":
 		p.WireType = WireVarint
 		p.valEnc = (*Buffer).EncodeVarint
@@ -300,17 +300,17 @@ func (p *Properties) Parse(s string) ***REMOVED***
 	default:
 		fmt.Fprintf(os.Stderr, "proto: tag has unknown wire type: %q\n", s)
 		return
-	***REMOVED***
+	}
 
 	var err error
 	p.Tag, err = strconv.Atoi(fields[1])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
-	for i := 2; i < len(fields); i++ ***REMOVED***
+	for i := 2; i < len(fields); i++ {
 		f := fields[i]
-		switch ***REMOVED***
+		switch {
 		case f == "req":
 			p.Required = true
 		case f == "opt":
@@ -332,11 +332,11 @@ func (p *Properties) Parse(s string) ***REMOVED***
 		case strings.HasPrefix(f, "def="):
 			p.HasDefault = true
 			p.Default = f[4:] // rest of string
-			if i+1 < len(fields) ***REMOVED***
+			if i+1 < len(fields) {
 				// Commas aren't escaped, and def is always last.
 				p.Default += "," + strings.Join(fields[i+1:], ",")
 				break
-			***REMOVED***
+			}
 		case strings.HasPrefix(f, "embedded="):
 			p.OrigName = strings.Split(f, "=")[1]
 		case strings.HasPrefix(f, "customtype="):
@@ -345,127 +345,127 @@ func (p *Properties) Parse(s string) ***REMOVED***
 			p.StdTime = true
 		case f == "stdduration":
 			p.StdDuration = true
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func logNoSliceEnc(t1, t2 reflect.Type) ***REMOVED***
+func logNoSliceEnc(t1, t2 reflect.Type) {
 	fmt.Fprintf(os.Stderr, "proto: no slice oenc for %T = []%T\n", t1, t2)
-***REMOVED***
+}
 
 var protoMessageType = reflect.TypeOf((*Message)(nil)).Elem()
 
 // Initialize the fields for encoding and decoding.
-func (p *Properties) setEncAndDec(typ reflect.Type, f *reflect.StructField, lockGetProp bool) ***REMOVED***
+func (p *Properties) setEncAndDec(typ reflect.Type, f *reflect.StructField, lockGetProp bool) {
 	p.enc = nil
 	p.dec = nil
 	p.size = nil
 	isMap := typ.Kind() == reflect.Map
-	if len(p.CustomType) > 0 && !isMap ***REMOVED***
+	if len(p.CustomType) > 0 && !isMap {
 		p.setCustomEncAndDec(typ)
 		p.setTag(lockGetProp)
 		return
-	***REMOVED***
-	if p.StdTime && !isMap ***REMOVED***
+	}
+	if p.StdTime && !isMap {
 		p.setTimeEncAndDec(typ)
 		p.setTag(lockGetProp)
 		return
-	***REMOVED***
-	if p.StdDuration && !isMap ***REMOVED***
+	}
+	if p.StdDuration && !isMap {
 		p.setDurationEncAndDec(typ)
 		p.setTag(lockGetProp)
 		return
-	***REMOVED***
-	switch t1 := typ; t1.Kind() ***REMOVED***
+	}
+	switch t1 := typ; t1.Kind() {
 	default:
 		fmt.Fprintf(os.Stderr, "proto: no coders for %v\n", t1)
 
 	// proto3 scalar types
 
 	case reflect.Bool:
-		if p.proto3 ***REMOVED***
+		if p.proto3 {
 			p.enc = (*Buffer).enc_proto3_bool
 			p.dec = (*Buffer).dec_proto3_bool
 			p.size = size_proto3_bool
-		***REMOVED*** else ***REMOVED***
+		} else {
 			p.enc = (*Buffer).enc_ref_bool
 			p.dec = (*Buffer).dec_proto3_bool
 			p.size = size_ref_bool
-		***REMOVED***
+		}
 	case reflect.Int32:
-		if p.proto3 ***REMOVED***
+		if p.proto3 {
 			p.enc = (*Buffer).enc_proto3_int32
 			p.dec = (*Buffer).dec_proto3_int32
 			p.size = size_proto3_int32
-		***REMOVED*** else ***REMOVED***
+		} else {
 			p.enc = (*Buffer).enc_ref_int32
 			p.dec = (*Buffer).dec_proto3_int32
 			p.size = size_ref_int32
-		***REMOVED***
+		}
 	case reflect.Uint32:
-		if p.proto3 ***REMOVED***
+		if p.proto3 {
 			p.enc = (*Buffer).enc_proto3_uint32
 			p.dec = (*Buffer).dec_proto3_int32 // can reuse
 			p.size = size_proto3_uint32
-		***REMOVED*** else ***REMOVED***
+		} else {
 			p.enc = (*Buffer).enc_ref_uint32
 			p.dec = (*Buffer).dec_proto3_int32 // can reuse
 			p.size = size_ref_uint32
-		***REMOVED***
+		}
 	case reflect.Int64, reflect.Uint64:
-		if p.proto3 ***REMOVED***
+		if p.proto3 {
 			p.enc = (*Buffer).enc_proto3_int64
 			p.dec = (*Buffer).dec_proto3_int64
 			p.size = size_proto3_int64
-		***REMOVED*** else ***REMOVED***
+		} else {
 			p.enc = (*Buffer).enc_ref_int64
 			p.dec = (*Buffer).dec_proto3_int64
 			p.size = size_ref_int64
-		***REMOVED***
+		}
 	case reflect.Float32:
-		if p.proto3 ***REMOVED***
+		if p.proto3 {
 			p.enc = (*Buffer).enc_proto3_uint32 // can just treat them as bits
 			p.dec = (*Buffer).dec_proto3_int32
 			p.size = size_proto3_uint32
-		***REMOVED*** else ***REMOVED***
+		} else {
 			p.enc = (*Buffer).enc_ref_uint32 // can just treat them as bits
 			p.dec = (*Buffer).dec_proto3_int32
 			p.size = size_ref_uint32
-		***REMOVED***
+		}
 	case reflect.Float64:
-		if p.proto3 ***REMOVED***
+		if p.proto3 {
 			p.enc = (*Buffer).enc_proto3_int64 // can just treat them as bits
 			p.dec = (*Buffer).dec_proto3_int64
 			p.size = size_proto3_int64
-		***REMOVED*** else ***REMOVED***
+		} else {
 			p.enc = (*Buffer).enc_ref_int64 // can just treat them as bits
 			p.dec = (*Buffer).dec_proto3_int64
 			p.size = size_ref_int64
-		***REMOVED***
+		}
 	case reflect.String:
-		if p.proto3 ***REMOVED***
+		if p.proto3 {
 			p.enc = (*Buffer).enc_proto3_string
 			p.dec = (*Buffer).dec_proto3_string
 			p.size = size_proto3_string
-		***REMOVED*** else ***REMOVED***
+		} else {
 			p.enc = (*Buffer).enc_ref_string
 			p.dec = (*Buffer).dec_proto3_string
 			p.size = size_ref_string
-		***REMOVED***
+		}
 	case reflect.Struct:
 		p.stype = typ
 		p.isMarshaler = isMarshaler(typ)
 		p.isUnmarshaler = isUnmarshaler(typ)
-		if p.Wire == "bytes" ***REMOVED***
+		if p.Wire == "bytes" {
 			p.enc = (*Buffer).enc_ref_struct_message
 			p.dec = (*Buffer).dec_ref_struct_message
 			p.size = size_ref_struct_message
-		***REMOVED*** else ***REMOVED***
+		} else {
 			fmt.Fprintf(os.Stderr, "proto: no coders for struct %T\n", typ)
-		***REMOVED***
+		}
 
 	case reflect.Ptr:
-		switch t2 := t1.Elem(); t2.Kind() ***REMOVED***
+		switch t2 := t1.Elem(); t2.Kind() {
 		default:
 			fmt.Fprintf(os.Stderr, "proto: no encoder function for %v -> %v\n", t1, t2)
 			break
@@ -501,105 +501,105 @@ func (p *Properties) setEncAndDec(typ reflect.Type, f *reflect.StructField, lock
 			p.stype = t1.Elem()
 			p.isMarshaler = isMarshaler(t1)
 			p.isUnmarshaler = isUnmarshaler(t1)
-			if p.Wire == "bytes" ***REMOVED***
+			if p.Wire == "bytes" {
 				p.enc = (*Buffer).enc_struct_message
 				p.dec = (*Buffer).dec_struct_message
 				p.size = size_struct_message
-			***REMOVED*** else ***REMOVED***
+			} else {
 				p.enc = (*Buffer).enc_struct_group
 				p.dec = (*Buffer).dec_struct_group
 				p.size = size_struct_group
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 	case reflect.Slice:
-		switch t2 := t1.Elem(); t2.Kind() ***REMOVED***
+		switch t2 := t1.Elem(); t2.Kind() {
 		default:
 			logNoSliceEnc(t1, t2)
 			break
 		case reflect.Bool:
-			if p.Packed ***REMOVED***
+			if p.Packed {
 				p.enc = (*Buffer).enc_slice_packed_bool
 				p.size = size_slice_packed_bool
-			***REMOVED*** else ***REMOVED***
+			} else {
 				p.enc = (*Buffer).enc_slice_bool
 				p.size = size_slice_bool
-			***REMOVED***
+			}
 			p.dec = (*Buffer).dec_slice_bool
 			p.packedDec = (*Buffer).dec_slice_packed_bool
 		case reflect.Int32:
-			if p.Packed ***REMOVED***
+			if p.Packed {
 				p.enc = (*Buffer).enc_slice_packed_int32
 				p.size = size_slice_packed_int32
-			***REMOVED*** else ***REMOVED***
+			} else {
 				p.enc = (*Buffer).enc_slice_int32
 				p.size = size_slice_int32
-			***REMOVED***
+			}
 			p.dec = (*Buffer).dec_slice_int32
 			p.packedDec = (*Buffer).dec_slice_packed_int32
 		case reflect.Uint32:
-			if p.Packed ***REMOVED***
+			if p.Packed {
 				p.enc = (*Buffer).enc_slice_packed_uint32
 				p.size = size_slice_packed_uint32
-			***REMOVED*** else ***REMOVED***
+			} else {
 				p.enc = (*Buffer).enc_slice_uint32
 				p.size = size_slice_uint32
-			***REMOVED***
+			}
 			p.dec = (*Buffer).dec_slice_int32
 			p.packedDec = (*Buffer).dec_slice_packed_int32
 		case reflect.Int64, reflect.Uint64:
-			if p.Packed ***REMOVED***
+			if p.Packed {
 				p.enc = (*Buffer).enc_slice_packed_int64
 				p.size = size_slice_packed_int64
-			***REMOVED*** else ***REMOVED***
+			} else {
 				p.enc = (*Buffer).enc_slice_int64
 				p.size = size_slice_int64
-			***REMOVED***
+			}
 			p.dec = (*Buffer).dec_slice_int64
 			p.packedDec = (*Buffer).dec_slice_packed_int64
 		case reflect.Uint8:
 			p.dec = (*Buffer).dec_slice_byte
-			if p.proto3 ***REMOVED***
+			if p.proto3 {
 				p.enc = (*Buffer).enc_proto3_slice_byte
 				p.size = size_proto3_slice_byte
-			***REMOVED*** else ***REMOVED***
+			} else {
 				p.enc = (*Buffer).enc_slice_byte
 				p.size = size_slice_byte
-			***REMOVED***
+			}
 		case reflect.Float32, reflect.Float64:
-			switch t2.Bits() ***REMOVED***
+			switch t2.Bits() {
 			case 32:
 				// can just treat them as bits
-				if p.Packed ***REMOVED***
+				if p.Packed {
 					p.enc = (*Buffer).enc_slice_packed_uint32
 					p.size = size_slice_packed_uint32
-				***REMOVED*** else ***REMOVED***
+				} else {
 					p.enc = (*Buffer).enc_slice_uint32
 					p.size = size_slice_uint32
-				***REMOVED***
+				}
 				p.dec = (*Buffer).dec_slice_int32
 				p.packedDec = (*Buffer).dec_slice_packed_int32
 			case 64:
 				// can just treat them as bits
-				if p.Packed ***REMOVED***
+				if p.Packed {
 					p.enc = (*Buffer).enc_slice_packed_int64
 					p.size = size_slice_packed_int64
-				***REMOVED*** else ***REMOVED***
+				} else {
 					p.enc = (*Buffer).enc_slice_int64
 					p.size = size_slice_int64
-				***REMOVED***
+				}
 				p.dec = (*Buffer).dec_slice_int64
 				p.packedDec = (*Buffer).dec_slice_packed_int64
 			default:
 				logNoSliceEnc(t1, t2)
 				break
-			***REMOVED***
+			}
 		case reflect.String:
 			p.enc = (*Buffer).enc_slice_string
 			p.dec = (*Buffer).dec_slice_string
 			p.size = size_slice_string
 		case reflect.Ptr:
-			switch t3 := t2.Elem(); t3.Kind() ***REMOVED***
+			switch t3 := t2.Elem(); t3.Kind() {
 			default:
 				fmt.Fprintf(os.Stderr, "proto: no ptr oenc for %T -> %T -> %T\n", t1, t2, t3)
 				break
@@ -607,18 +607,18 @@ func (p *Properties) setEncAndDec(typ reflect.Type, f *reflect.StructField, lock
 				p.stype = t2.Elem()
 				p.isMarshaler = isMarshaler(t2)
 				p.isUnmarshaler = isUnmarshaler(t2)
-				if p.Wire == "bytes" ***REMOVED***
+				if p.Wire == "bytes" {
 					p.enc = (*Buffer).enc_slice_struct_message
 					p.dec = (*Buffer).dec_slice_struct_message
 					p.size = size_slice_struct_message
-				***REMOVED*** else ***REMOVED***
+				} else {
 					p.enc = (*Buffer).enc_slice_struct_group
 					p.dec = (*Buffer).dec_slice_struct_group
 					p.size = size_slice_struct_group
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case reflect.Slice:
-			switch t2.Elem().Kind() ***REMOVED***
+			switch t2.Elem().Kind() {
 			default:
 				fmt.Fprintf(os.Stderr, "proto: no slice elem oenc for %T -> %T -> %T\n", t1, t2, t2.Elem())
 				break
@@ -626,10 +626,10 @@ func (p *Properties) setEncAndDec(typ reflect.Type, f *reflect.StructField, lock
 				p.enc = (*Buffer).enc_slice_slice_byte
 				p.dec = (*Buffer).dec_slice_slice_byte
 				p.size = size_slice_slice_byte
-			***REMOVED***
+			}
 		case reflect.Struct:
 			p.setSliceOfNonPointerStructs(t1)
-		***REMOVED***
+		}
 
 	case reflect.Map:
 		p.enc = (*Buffer).enc_new_map
@@ -637,47 +637,47 @@ func (p *Properties) setEncAndDec(typ reflect.Type, f *reflect.StructField, lock
 		p.size = size_new_map
 
 		p.mtype = t1
-		p.mkeyprop = &Properties***REMOVED******REMOVED***
+		p.mkeyprop = &Properties{}
 		p.mkeyprop.init(reflect.PtrTo(p.mtype.Key()), "Key", f.Tag.Get("protobuf_key"), nil, lockGetProp)
-		p.mvalprop = &Properties***REMOVED******REMOVED***
+		p.mvalprop = &Properties{}
 		vtype := p.mtype.Elem()
-		if vtype.Kind() != reflect.Ptr && vtype.Kind() != reflect.Slice ***REMOVED***
+		if vtype.Kind() != reflect.Ptr && vtype.Kind() != reflect.Slice {
 			// The value type is not a message (*T) or bytes ([]byte),
 			// so we need encoders for the pointer to this type.
 			vtype = reflect.PtrTo(vtype)
-		***REMOVED***
+		}
 
 		p.mvalprop.CustomType = p.CustomType
 		p.mvalprop.StdDuration = p.StdDuration
 		p.mvalprop.StdTime = p.StdTime
 		p.mvalprop.init(vtype, "Value", f.Tag.Get("protobuf_val"), nil, lockGetProp)
-	***REMOVED***
+	}
 	p.setTag(lockGetProp)
-***REMOVED***
+}
 
-func (p *Properties) setTag(lockGetProp bool) ***REMOVED***
+func (p *Properties) setTag(lockGetProp bool) {
 	// precalculate tag code
 	wire := p.WireType
-	if p.Packed ***REMOVED***
+	if p.Packed {
 		wire = WireBytes
-	***REMOVED***
+	}
 	x := uint32(p.Tag)<<3 | uint32(wire)
 	i := 0
-	for i = 0; x > 127; i++ ***REMOVED***
+	for i = 0; x > 127; i++ {
 		p.tagbuf[i] = 0x80 | uint8(x&0x7F)
 		x >>= 7
-	***REMOVED***
+	}
 	p.tagbuf[i] = uint8(x)
 	p.tagcode = p.tagbuf[0 : i+1]
 
-	if p.stype != nil ***REMOVED***
-		if lockGetProp ***REMOVED***
+	if p.stype != nil {
+		if lockGetProp {
 			p.sprop = GetProperties(p.stype)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			p.sprop = getPropertiesLocked(p.stype)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 var (
 	marshalerType   = reflect.TypeOf((*Marshaler)(nil)).Elem()
@@ -685,33 +685,33 @@ var (
 )
 
 // isMarshaler reports whether type t implements Marshaler.
-func isMarshaler(t reflect.Type) bool ***REMOVED***
+func isMarshaler(t reflect.Type) bool {
 	return t.Implements(marshalerType)
-***REMOVED***
+}
 
 // isUnmarshaler reports whether type t implements Unmarshaler.
-func isUnmarshaler(t reflect.Type) bool ***REMOVED***
+func isUnmarshaler(t reflect.Type) bool {
 	return t.Implements(unmarshalerType)
-***REMOVED***
+}
 
 // Init populates the properties from a protocol buffer struct tag.
-func (p *Properties) Init(typ reflect.Type, name, tag string, f *reflect.StructField) ***REMOVED***
+func (p *Properties) Init(typ reflect.Type, name, tag string, f *reflect.StructField) {
 	p.init(typ, name, tag, f, true)
-***REMOVED***
+}
 
-func (p *Properties) init(typ reflect.Type, name, tag string, f *reflect.StructField, lockGetProp bool) ***REMOVED***
+func (p *Properties) init(typ reflect.Type, name, tag string, f *reflect.StructField, lockGetProp bool) {
 	// "bytes,49,opt,def=hello!"
 	p.Name = name
 	p.OrigName = name
-	if f != nil ***REMOVED***
+	if f != nil {
 		p.field = toField(f)
-	***REMOVED***
-	if tag == "" ***REMOVED***
+	}
+	if tag == "" {
 		return
-	***REMOVED***
+	}
 	p.Parse(tag)
 	p.setEncAndDec(typ, f, lockGetProp)
-***REMOVED***
+}
 
 var (
 	propertiesMu  sync.RWMutex
@@ -720,40 +720,40 @@ var (
 
 // GetProperties returns the list of properties for the type represented by t.
 // t must represent a generated struct type of a protocol message.
-func GetProperties(t reflect.Type) *StructProperties ***REMOVED***
-	if t.Kind() != reflect.Struct ***REMOVED***
+func GetProperties(t reflect.Type) *StructProperties {
+	if t.Kind() != reflect.Struct {
 		panic("proto: type must have kind struct")
-	***REMOVED***
+	}
 
 	// Most calls to GetProperties in a long-running program will be
 	// retrieving details for types we have seen before.
 	propertiesMu.RLock()
 	sprop, ok := propertiesMap[t]
 	propertiesMu.RUnlock()
-	if ok ***REMOVED***
-		if collectStats ***REMOVED***
+	if ok {
+		if collectStats {
 			stats.Chit++
-		***REMOVED***
+		}
 		return sprop
-	***REMOVED***
+	}
 
 	propertiesMu.Lock()
 	sprop = getPropertiesLocked(t)
 	propertiesMu.Unlock()
 	return sprop
-***REMOVED***
+}
 
 // getPropertiesLocked requires that propertiesMu is held.
-func getPropertiesLocked(t reflect.Type) *StructProperties ***REMOVED***
-	if prop, ok := propertiesMap[t]; ok ***REMOVED***
-		if collectStats ***REMOVED***
+func getPropertiesLocked(t reflect.Type) *StructProperties {
+	if prop, ok := propertiesMap[t]; ok {
+		if collectStats {
 			stats.Chit++
-		***REMOVED***
+		}
 		return prop
-	***REMOVED***
-	if collectStats ***REMOVED***
+	}
+	if collectStats {
 		stats.Cmiss++
-	***REMOVED***
+	}
 
 	prop := new(StructProperties)
 	// in case of recursive protos, fill this in now.
@@ -768,131 +768,131 @@ func getPropertiesLocked(t reflect.Type) *StructProperties ***REMOVED***
 	prop.order = make([]int, t.NumField())
 
 	isOneofMessage := false
-	for i := 0; i < t.NumField(); i++ ***REMOVED***
+	for i := 0; i < t.NumField(); i++ {
 		f := t.Field(i)
 		p := new(Properties)
 		name := f.Name
 		p.init(f.Type, name, f.Tag.Get("protobuf"), &f, false)
 
-		if f.Name == "XXX_InternalExtensions" ***REMOVED*** // special case
+		if f.Name == "XXX_InternalExtensions" { // special case
 			p.enc = (*Buffer).enc_exts
 			p.dec = nil // not needed
 			p.size = size_exts
-		***REMOVED*** else if f.Name == "XXX_extensions" ***REMOVED*** // special case
-			if len(f.Tag.Get("protobuf")) > 0 ***REMOVED***
+		} else if f.Name == "XXX_extensions" { // special case
+			if len(f.Tag.Get("protobuf")) > 0 {
 				p.enc = (*Buffer).enc_ext_slice_byte
 				p.dec = nil // not needed
 				p.size = size_ext_slice_byte
-			***REMOVED*** else ***REMOVED***
+			} else {
 				p.enc = (*Buffer).enc_map
 				p.dec = nil // not needed
 				p.size = size_map
-			***REMOVED***
-		***REMOVED*** else if f.Name == "XXX_unrecognized" ***REMOVED*** // special case
+			}
+		} else if f.Name == "XXX_unrecognized" { // special case
 			prop.unrecField = toField(&f)
-		***REMOVED***
+		}
 		oneof := f.Tag.Get("protobuf_oneof") // special case
-		if oneof != "" ***REMOVED***
+		if oneof != "" {
 			isOneofMessage = true
 			// Oneof fields don't use the traditional protobuf tag.
 			p.OrigName = oneof
-		***REMOVED***
+		}
 		prop.Prop[i] = p
 		prop.order[i] = i
-		if debug ***REMOVED***
+		if debug {
 			print(i, " ", f.Name, " ", t.String(), " ")
-			if p.Tag > 0 ***REMOVED***
+			if p.Tag > 0 {
 				print(p.String())
-			***REMOVED***
+			}
 			print("\n")
-		***REMOVED***
-		if p.enc == nil && !strings.HasPrefix(f.Name, "XXX_") && oneof == "" ***REMOVED***
+		}
+		if p.enc == nil && !strings.HasPrefix(f.Name, "XXX_") && oneof == "" {
 			fmt.Fprintln(os.Stderr, "proto: no encoder for", f.Name, f.Type.String(), "[GetProperties]")
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Re-order prop.order.
 	sort.Sort(prop)
 
-	type oneofMessage interface ***REMOVED***
-		XXX_OneofFuncs() (func(Message, *Buffer) error, func(Message, int, int, *Buffer) (bool, error), func(Message) int, []interface***REMOVED******REMOVED***)
-	***REMOVED***
-	if om, ok := reflect.Zero(reflect.PtrTo(t)).Interface().(oneofMessage); isOneofMessage && ok ***REMOVED***
-		var oots []interface***REMOVED******REMOVED***
+	type oneofMessage interface {
+		XXX_OneofFuncs() (func(Message, *Buffer) error, func(Message, int, int, *Buffer) (bool, error), func(Message) int, []interface{})
+	}
+	if om, ok := reflect.Zero(reflect.PtrTo(t)).Interface().(oneofMessage); isOneofMessage && ok {
+		var oots []interface{}
 		prop.oneofMarshaler, prop.oneofUnmarshaler, prop.oneofSizer, oots = om.XXX_OneofFuncs()
 		prop.stype = t
 
 		// Interpret oneof metadata.
 		prop.OneofTypes = make(map[string]*OneofProperties)
-		for _, oot := range oots ***REMOVED***
-			oop := &OneofProperties***REMOVED***
+		for _, oot := range oots {
+			oop := &OneofProperties{
 				Type: reflect.ValueOf(oot).Type(), // *T
 				Prop: new(Properties),
-			***REMOVED***
+			}
 			sft := oop.Type.Elem().Field(0)
 			oop.Prop.Name = sft.Name
 			oop.Prop.Parse(sft.Tag.Get("protobuf"))
 			// There will be exactly one interface field that
 			// this new value is assignable to.
-			for i := 0; i < t.NumField(); i++ ***REMOVED***
+			for i := 0; i < t.NumField(); i++ {
 				f := t.Field(i)
-				if f.Type.Kind() != reflect.Interface ***REMOVED***
+				if f.Type.Kind() != reflect.Interface {
 					continue
-				***REMOVED***
-				if !oop.Type.AssignableTo(f.Type) ***REMOVED***
+				}
+				if !oop.Type.AssignableTo(f.Type) {
 					continue
-				***REMOVED***
+				}
 				oop.Field = i
 				break
-			***REMOVED***
+			}
 			prop.OneofTypes[oop.Prop.OrigName] = oop
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// build required counts
 	// build tags
 	reqCount := 0
 	prop.decoderOrigNames = make(map[string]int)
-	for i, p := range prop.Prop ***REMOVED***
-		if strings.HasPrefix(p.Name, "XXX_") ***REMOVED***
+	for i, p := range prop.Prop {
+		if strings.HasPrefix(p.Name, "XXX_") {
 			// Internal fields should not appear in tags/origNames maps.
 			// They are handled specially when encoding and decoding.
 			continue
-		***REMOVED***
-		if p.Required ***REMOVED***
+		}
+		if p.Required {
 			reqCount++
-		***REMOVED***
+		}
 		prop.decoderTags.put(p.Tag, i)
 		prop.decoderOrigNames[p.OrigName] = i
-	***REMOVED***
+	}
 	prop.reqCount = reqCount
 
 	return prop
-***REMOVED***
+}
 
 // Return the Properties object for the x[0]'th field of the structure.
-func propByIndex(t reflect.Type, x []int) *Properties ***REMOVED***
-	if len(x) != 1 ***REMOVED***
+func propByIndex(t reflect.Type, x []int) *Properties {
+	if len(x) != 1 {
 		fmt.Fprintf(os.Stderr, "proto: field index dimension %d (not 1) for type %s\n", len(x), t)
 		return nil
-	***REMOVED***
+	}
 	prop := GetProperties(t)
 	return prop.Prop[x[0]]
-***REMOVED***
+}
 
 // Get the address and type of a pointer to a struct from an interface.
-func getbase(pb Message) (t reflect.Type, b structPointer, err error) ***REMOVED***
-	if pb == nil ***REMOVED***
+func getbase(pb Message) (t reflect.Type, b structPointer, err error) {
+	if pb == nil {
 		err = ErrNil
 		return
-	***REMOVED***
+	}
 	// get the reflect type of the pointer to the struct.
 	t = reflect.TypeOf(pb)
 	// get the address of the struct.
 	value := reflect.ValueOf(pb)
 	b = toStructPointer(value)
 	return
-***REMOVED***
+}
 
 // A global registry of enum types.
 // The generated code will register the generated maps by calling RegisterEnum.
@@ -902,22 +902,22 @@ var enumStringMaps = make(map[string]map[int32]string)
 
 // RegisterEnum is called from the generated code to install the enum descriptor
 // maps into the global table to aid parsing text format protocol buffers.
-func RegisterEnum(typeName string, unusedNameMap map[int32]string, valueMap map[string]int32) ***REMOVED***
-	if _, ok := enumValueMaps[typeName]; ok ***REMOVED***
+func RegisterEnum(typeName string, unusedNameMap map[int32]string, valueMap map[string]int32) {
+	if _, ok := enumValueMaps[typeName]; ok {
 		panic("proto: duplicate enum registered: " + typeName)
-	***REMOVED***
+	}
 	enumValueMaps[typeName] = valueMap
-	if _, ok := enumStringMaps[typeName]; ok ***REMOVED***
+	if _, ok := enumStringMaps[typeName]; ok {
 		panic("proto: duplicate enum registered: " + typeName)
-	***REMOVED***
+	}
 	enumStringMaps[typeName] = unusedNameMap
-***REMOVED***
+}
 
 // EnumValueMap returns the mapping from names to integers of the
 // enum type enumType, or a nil if not found.
-func EnumValueMap(enumType string) map[string]int32 ***REMOVED***
+func EnumValueMap(enumType string) map[string]int32 {
 	return enumValueMaps[enumType]
-***REMOVED***
+}
 
 // A registry of all linked message types.
 // The string is a fully-qualified proto name ("pkg.Message").
@@ -928,30 +928,30 @@ var (
 
 // RegisterType is called from generated code and maps from the fully qualified
 // proto name to the type (pointer to struct) of the protocol buffer.
-func RegisterType(x Message, name string) ***REMOVED***
-	if _, ok := protoTypes[name]; ok ***REMOVED***
+func RegisterType(x Message, name string) {
+	if _, ok := protoTypes[name]; ok {
 		// TODO: Some day, make this a panic.
 		log.Printf("proto: duplicate proto type registered: %s", name)
 		return
-	***REMOVED***
+	}
 	t := reflect.TypeOf(x)
 	protoTypes[name] = t
 	revProtoTypes[t] = name
-***REMOVED***
+}
 
 // MessageName returns the fully-qualified proto name for the given message type.
-func MessageName(x Message) string ***REMOVED***
-	type xname interface ***REMOVED***
+func MessageName(x Message) string {
+	type xname interface {
 		XXX_MessageName() string
-	***REMOVED***
-	if m, ok := x.(xname); ok ***REMOVED***
+	}
+	if m, ok := x.(xname); ok {
 		return m.XXX_MessageName()
-	***REMOVED***
+	}
 	return revProtoTypes[reflect.TypeOf(x)]
-***REMOVED***
+}
 
 // MessageType returns the message type (pointer to struct) for a named message.
-func MessageType(name string) reflect.Type ***REMOVED*** return protoTypes[name] ***REMOVED***
+func MessageType(name string) reflect.Type { return protoTypes[name] }
 
 // A registry of all linked proto files.
 var (
@@ -960,9 +960,9 @@ var (
 
 // RegisterFile is called from generated code and maps from the
 // full file name of a .proto file to its compressed FileDescriptorProto.
-func RegisterFile(filename string, fileDescriptor []byte) ***REMOVED***
+func RegisterFile(filename string, fileDescriptor []byte) {
 	protoFiles[filename] = fileDescriptor
-***REMOVED***
+}
 
 // FileDescriptor returns the compressed FileDescriptorProto for a .proto file.
-func FileDescriptor(filename string) []byte ***REMOVED*** return protoFiles[filename] ***REMOVED***
+func FileDescriptor(filename string) []byte { return protoFiles[filename] }

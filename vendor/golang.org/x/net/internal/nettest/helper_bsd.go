@@ -15,23 +15,23 @@ import (
 
 var darwinVersion int
 
-func init() ***REMOVED***
-	if runtime.GOOS == "darwin" ***REMOVED***
+func init() {
+	if runtime.GOOS == "darwin" {
 		// See http://support.apple.com/kb/HT1633.
 		s, err := syscall.Sysctl("kern.osrelease")
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
+		}
 		ss := strings.Split(s, ".")
-		if len(ss) == 0 ***REMOVED***
+		if len(ss) == 0 {
 			return
-		***REMOVED***
+		}
 		darwinVersion, _ = strconv.Atoi(ss[0])
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func supportsIPv6MulticastDeliveryOnLoopback() bool ***REMOVED***
-	switch runtime.GOOS ***REMOVED***
+func supportsIPv6MulticastDeliveryOnLoopback() bool {
+	switch runtime.GOOS {
 	case "freebsd":
 		// See http://www.freebsd.org/cgi/query-pr.cgi?pr=180065.
 		// Even after the fix, it looks like the latest
@@ -42,12 +42,12 @@ func supportsIPv6MulticastDeliveryOnLoopback() bool ***REMOVED***
 		return !causesIPv6Crash()
 	default:
 		return true
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func causesIPv6Crash() bool ***REMOVED***
+func causesIPv6Crash() bool {
 	// We see some kernel crash when running IPv6 with IP-level
 	// options on Darwin kernel version 12 or below.
 	// See golang.org/issues/17015.
 	return darwinVersion < 13
-***REMOVED***
+}

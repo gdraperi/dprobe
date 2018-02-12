@@ -11,19 +11,19 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func (ld *v2LayerDescriptor) open(ctx context.Context) (distribution.ReadSeekCloser, error) ***REMOVED***
+func (ld *v2LayerDescriptor) open(ctx context.Context) (distribution.ReadSeekCloser, error) {
 	blobs := ld.repo.Blobs(ctx)
 	return blobs.Open(ctx, ld.digest)
-***REMOVED***
+}
 
-func filterManifests(manifests []manifestlist.ManifestDescriptor, os string) []manifestlist.ManifestDescriptor ***REMOVED***
+func filterManifests(manifests []manifestlist.ManifestDescriptor, os string) []manifestlist.ManifestDescriptor {
 	var matches []manifestlist.ManifestDescriptor
-	for _, manifestDescriptor := range manifests ***REMOVED***
-		if manifestDescriptor.Platform.Architecture == runtime.GOARCH && manifestDescriptor.Platform.OS == os ***REMOVED***
+	for _, manifestDescriptor := range manifests {
+		if manifestDescriptor.Platform.Architecture == runtime.GOARCH && manifestDescriptor.Platform.OS == os {
 			matches = append(matches, manifestDescriptor)
 
 			logrus.Debugf("found match for %s/%s with media type %s, digest %s", os, runtime.GOARCH, manifestDescriptor.MediaType, manifestDescriptor.Digest.String())
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return matches
-***REMOVED***
+}

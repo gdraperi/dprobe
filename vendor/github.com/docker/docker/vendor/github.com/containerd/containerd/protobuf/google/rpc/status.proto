@@ -77,7 +77,7 @@ option objc_class_prefix = "RPC";
 //
 // - Logging. If some API errors are stored in logs, the message `Status` could
 //     be used directly after any stripping needed for security/privacy reasons.
-message Status ***REMOVED***
+message Status {
   // The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
   int32 code = 1;
 
@@ -89,4 +89,4 @@ message Status ***REMOVED***
   // A list of messages that carry the error details.  There is a common set of
   // message types for APIs to use.
   repeated google.protobuf.Any details = 3;
-***REMOVED***
+}

@@ -41,60 +41,60 @@ const sysIP_STRIPHDR = 0x17 // for now only darwin supports this option
 //	ListenPacket("ip4:1", "0.0.0.0")
 //	ListenPacket("ip6:ipv6-icmp", "fe80::1%en0")
 //	ListenPacket("ip6:58", "::")
-func ListenPacket(network, address string) (*PacketConn, error) ***REMOVED***
+func ListenPacket(network, address string) (*PacketConn, error) {
 	var family, proto int
-	switch network ***REMOVED***
+	switch network {
 	case "udp4":
 		family, proto = syscall.AF_INET, iana.ProtocolICMP
 	case "udp6":
 		family, proto = syscall.AF_INET6, iana.ProtocolIPv6ICMP
 	default:
 		i := last(network, ':')
-		switch network[:i] ***REMOVED***
+		switch network[:i] {
 		case "ip4":
 			proto = iana.ProtocolICMP
 		case "ip6":
 			proto = iana.ProtocolIPv6ICMP
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	var cerr error
 	var c net.PacketConn
-	switch family ***REMOVED***
+	switch family {
 	case syscall.AF_INET, syscall.AF_INET6:
 		s, err := syscall.Socket(family, syscall.SOCK_DGRAM, proto)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, os.NewSyscallError("socket", err)
-		***REMOVED***
-		if runtime.GOOS == "darwin" && family == syscall.AF_INET ***REMOVED***
-			if err := syscall.SetsockoptInt(s, iana.ProtocolIP, sysIP_STRIPHDR, 1); err != nil ***REMOVED***
+		}
+		if runtime.GOOS == "darwin" && family == syscall.AF_INET {
+			if err := syscall.SetsockoptInt(s, iana.ProtocolIP, sysIP_STRIPHDR, 1); err != nil {
 				syscall.Close(s)
 				return nil, os.NewSyscallError("setsockopt", err)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		sa, err := sockaddr(family, address)
-		if err != nil ***REMOVED***
+		if err != nil {
 			syscall.Close(s)
 			return nil, err
-		***REMOVED***
-		if err := syscall.Bind(s, sa); err != nil ***REMOVED***
+		}
+		if err := syscall.Bind(s, sa); err != nil {
 			syscall.Close(s)
 			return nil, os.NewSyscallError("bind", err)
-		***REMOVED***
+		}
 		f := os.NewFile(uintptr(s), "datagram-oriented icmp")
 		c, cerr = net.FilePacketConn(f)
 		f.Close()
 	default:
 		c, cerr = net.ListenPacket(network, address)
-	***REMOVED***
-	if cerr != nil ***REMOVED***
+	}
+	if cerr != nil {
 		return nil, cerr
-	***REMOVED***
-	switch proto ***REMOVED***
+	}
+	switch proto {
 	case iana.ProtocolICMP:
-		return &PacketConn***REMOVED***c: c, p4: ipv4.NewPacketConn(c)***REMOVED***, nil
+		return &PacketConn{c: c, p4: ipv4.NewPacketConn(c)}, nil
 	case iana.ProtocolIPv6ICMP:
-		return &PacketConn***REMOVED***c: c, p6: ipv6.NewPacketConn(c)***REMOVED***, nil
+		return &PacketConn{c: c, p6: ipv6.NewPacketConn(c)}, nil
 	default:
-		return &PacketConn***REMOVED***c: c***REMOVED***, nil
-	***REMOVED***
-***REMOVED***
+		return &PacketConn{c: c}, nil
+	}
+}

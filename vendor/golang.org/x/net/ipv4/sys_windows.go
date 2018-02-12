@@ -30,38 +30,38 @@ const (
 	sizeofIPMreqSource = 0xc
 )
 
-type inetPktinfo struct ***REMOVED***
+type inetPktinfo struct {
 	Addr    [4]byte
 	Ifindex int32
-***REMOVED***
+}
 
-type ipMreq struct ***REMOVED***
+type ipMreq struct {
 	Multiaddr [4]byte
 	Interface [4]byte
-***REMOVED***
+}
 
-type ipMreqSource struct ***REMOVED***
+type ipMreqSource struct {
 	Multiaddr  [4]byte
 	Sourceaddr [4]byte
 	Interface  [4]byte
-***REMOVED***
+}
 
 // See http://msdn.microsoft.com/en-us/library/windows/desktop/ms738586(v=vs.85).aspx
 var (
-	ctlOpts = [ctlMax]ctlOpt***REMOVED******REMOVED***
+	ctlOpts = [ctlMax]ctlOpt{}
 
-	sockOpts = map[int]*sockOpt***REMOVED***
-		ssoTOS:                ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIP, Name: sysIP_TOS, Len: 4***REMOVED******REMOVED***,
-		ssoTTL:                ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIP, Name: sysIP_TTL, Len: 4***REMOVED******REMOVED***,
-		ssoMulticastTTL:       ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIP, Name: sysIP_MULTICAST_TTL, Len: 4***REMOVED******REMOVED***,
-		ssoMulticastInterface: ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIP, Name: sysIP_MULTICAST_IF, Len: 4***REMOVED******REMOVED***,
-		ssoMulticastLoopback:  ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIP, Name: sysIP_MULTICAST_LOOP, Len: 4***REMOVED******REMOVED***,
-		ssoHeaderPrepend:      ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIP, Name: sysIP_HDRINCL, Len: 4***REMOVED******REMOVED***,
-		ssoJoinGroup:          ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIP, Name: sysIP_ADD_MEMBERSHIP, Len: sizeofIPMreq***REMOVED***, typ: ssoTypeIPMreq***REMOVED***,
-		ssoLeaveGroup:         ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIP, Name: sysIP_DROP_MEMBERSHIP, Len: sizeofIPMreq***REMOVED***, typ: ssoTypeIPMreq***REMOVED***,
-	***REMOVED***
+	sockOpts = map[int]*sockOpt{
+		ssoTOS:                {Option: socket.Option{Level: iana.ProtocolIP, Name: sysIP_TOS, Len: 4}},
+		ssoTTL:                {Option: socket.Option{Level: iana.ProtocolIP, Name: sysIP_TTL, Len: 4}},
+		ssoMulticastTTL:       {Option: socket.Option{Level: iana.ProtocolIP, Name: sysIP_MULTICAST_TTL, Len: 4}},
+		ssoMulticastInterface: {Option: socket.Option{Level: iana.ProtocolIP, Name: sysIP_MULTICAST_IF, Len: 4}},
+		ssoMulticastLoopback:  {Option: socket.Option{Level: iana.ProtocolIP, Name: sysIP_MULTICAST_LOOP, Len: 4}},
+		ssoHeaderPrepend:      {Option: socket.Option{Level: iana.ProtocolIP, Name: sysIP_HDRINCL, Len: 4}},
+		ssoJoinGroup:          {Option: socket.Option{Level: iana.ProtocolIP, Name: sysIP_ADD_MEMBERSHIP, Len: sizeofIPMreq}, typ: ssoTypeIPMreq},
+		ssoLeaveGroup:         {Option: socket.Option{Level: iana.ProtocolIP, Name: sysIP_DROP_MEMBERSHIP, Len: sizeofIPMreq}, typ: ssoTypeIPMreq},
+	}
 )
 
-func (pi *inetPktinfo) setIfindex(i int) ***REMOVED***
+func (pi *inetPktinfo) setIfindex(i int) {
 	pi.Ifindex = int32(i)
-***REMOVED***
+}

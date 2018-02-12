@@ -7,46 +7,46 @@ import (
 	"github.com/docker/swarmkit/api"
 )
 
-type dependencyManager struct ***REMOVED***
+type dependencyManager struct {
 	secrets exec.SecretsManager
 	configs exec.ConfigsManager
-***REMOVED***
+}
 
 // NewDependencyManager creates a dependency manager object that wraps
 // objects which provide access to various dependency types.
-func NewDependencyManager() exec.DependencyManager ***REMOVED***
-	return &dependencyManager***REMOVED***
+func NewDependencyManager() exec.DependencyManager {
+	return &dependencyManager{
 		secrets: secrets.NewManager(),
 		configs: configs.NewManager(),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (d *dependencyManager) Secrets() exec.SecretsManager ***REMOVED***
+func (d *dependencyManager) Secrets() exec.SecretsManager {
 	return d.secrets
-***REMOVED***
+}
 
-func (d *dependencyManager) Configs() exec.ConfigsManager ***REMOVED***
+func (d *dependencyManager) Configs() exec.ConfigsManager {
 	return d.configs
-***REMOVED***
+}
 
-type dependencyGetter struct ***REMOVED***
+type dependencyGetter struct {
 	secrets exec.SecretGetter
 	configs exec.ConfigGetter
-***REMOVED***
+}
 
-func (d *dependencyGetter) Secrets() exec.SecretGetter ***REMOVED***
+func (d *dependencyGetter) Secrets() exec.SecretGetter {
 	return d.secrets
-***REMOVED***
+}
 
-func (d *dependencyGetter) Configs() exec.ConfigGetter ***REMOVED***
+func (d *dependencyGetter) Configs() exec.ConfigGetter {
 	return d.configs
-***REMOVED***
+}
 
 // Restrict provides getters that only allows access to the dependencies
 // referenced by the task.
-func Restrict(dependencies exec.DependencyManager, t *api.Task) exec.DependencyGetter ***REMOVED***
-	return &dependencyGetter***REMOVED***
+func Restrict(dependencies exec.DependencyManager, t *api.Task) exec.DependencyGetter {
+	return &dependencyGetter{
 		secrets: secrets.Restrict(dependencies.Secrets(), t),
 		configs: configs.Restrict(dependencies.Configs(), t),
-	***REMOVED***
-***REMOVED***
+	}
+}

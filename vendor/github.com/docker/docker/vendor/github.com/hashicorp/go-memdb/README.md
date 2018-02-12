@@ -36,42 +36,42 @@ Below is a simple example of usage
 
 ```go
 // Create a sample struct
-type Person struct ***REMOVED***
+type Person struct {
     Email string
     Name  string
     Age   int
-***REMOVED***
+}
 
 // Create the DB schema
-schema := &memdb.DBSchema***REMOVED***
-    Tables: map[string]*memdb.TableSchema***REMOVED***
-        "person": &memdb.TableSchema***REMOVED***
+schema := &memdb.DBSchema{
+    Tables: map[string]*memdb.TableSchema{
+        "person": &memdb.TableSchema{
             Name: "person",
-            Indexes: map[string]*memdb.IndexSchema***REMOVED***
-                "id": &memdb.IndexSchema***REMOVED***
+            Indexes: map[string]*memdb.IndexSchema{
+                "id": &memdb.IndexSchema{
                     Name:    "id",
                     Unique:  true,
-                    Indexer: &memdb.StringFieldIndex***REMOVED***Field: "Email"***REMOVED***,
-            ***REMOVED***,
-        ***REMOVED***,
-    ***REMOVED***,
-***REMOVED***,
-***REMOVED***
+                    Indexer: &memdb.StringFieldIndex{Field: "Email"},
+                },
+            },
+        },
+    },
+}
 
 // Create a new data base
 db, err := memdb.NewMemDB(schema)
-if err != nil ***REMOVED***
+if err != nil {
     panic(err)
-***REMOVED***
+}
 
 // Create a write transaction
 txn := db.Txn(true)
 
 // Insert a new person
-p := &Person***REMOVED***"joe@aol.com", "Joe", 30***REMOVED***
-if err := txn.Insert("person", p); err != nil ***REMOVED***
+p := &Person{"joe@aol.com", "Joe", 30}
+if err := txn.Insert("person", p); err != nil {
     panic(err)
-***REMOVED***
+}
 
 // Commit the transaction
 txn.Commit()
@@ -82,9 +82,9 @@ defer txn.Abort()
 
 // Lookup by email
 raw, err := txn.First("person", "id", "joe@aol.com")
-if err != nil ***REMOVED***
+if err != nil {
     panic(err)
-***REMOVED***
+}
 
 // Say hi!
 fmt.Printf("Hello %s!", raw.(*Person).Name)

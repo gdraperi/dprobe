@@ -31,35 +31,35 @@ import (
 // distinguish between torn writes and ordinary data corruption.
 const walPageBytes = 8 * minSectorSize
 
-type encoder struct ***REMOVED***
+type encoder struct {
 	mu sync.Mutex
 	bw *ioutil.PageWriter
 
 	crc       hash.Hash32
 	buf       []byte
 	uint64buf []byte
-***REMOVED***
+}
 
-func newEncoder(w io.Writer, prevCrc uint32, pageOffset int) *encoder ***REMOVED***
-	return &encoder***REMOVED***
+func newEncoder(w io.Writer, prevCrc uint32, pageOffset int) *encoder {
+	return &encoder{
 		bw:  ioutil.NewPageWriter(w, walPageBytes, pageOffset),
 		crc: crc.New(prevCrc, crcTable),
 		// 1MB buffer
 		buf:       make([]byte, 1024*1024),
 		uint64buf: make([]byte, 8),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // newFileEncoder creates a new encoder with current file offset for the page writer.
-func newFileEncoder(f *os.File, prevCrc uint32) (*encoder, error) ***REMOVED***
+func newFileEncoder(f *os.File, prevCrc uint32) (*encoder, error) {
 	offset, err := f.Seek(0, io.SeekCurrent)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return newEncoder(f, prevCrc, int(offset)), nil
-***REMOVED***
+}
 
-func (e *encoder) encode(rec *walpb.Record) error ***REMOVED***
+func (e *encoder) encode(rec *walpb.Record) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
@@ -71,50 +71,50 @@ func (e *encoder) encode(rec *walpb.Record) error ***REMOVED***
 		n    int
 	)
 
-	if rec.Size() > len(e.buf) ***REMOVED***
+	if rec.Size() > len(e.buf) {
 		data, err = rec.Marshal()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
+		}
+	} else {
 		n, err = rec.MarshalTo(e.buf)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		data = e.buf[:n]
-	***REMOVED***
+	}
 
 	lenField, padBytes := encodeFrameSize(len(data))
-	if err = writeUint64(e.bw, lenField, e.uint64buf); err != nil ***REMOVED***
+	if err = writeUint64(e.bw, lenField, e.uint64buf); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if padBytes != 0 ***REMOVED***
+	if padBytes != 0 {
 		data = append(data, make([]byte, padBytes)...)
-	***REMOVED***
+	}
 	_, err = e.bw.Write(data)
 	return err
-***REMOVED***
+}
 
-func encodeFrameSize(dataBytes int) (lenField uint64, padBytes int) ***REMOVED***
+func encodeFrameSize(dataBytes int) (lenField uint64, padBytes int) {
 	lenField = uint64(dataBytes)
 	// force 8 byte alignment so length never gets a torn write
 	padBytes = (8 - (dataBytes % 8)) % 8
-	if padBytes != 0 ***REMOVED***
+	if padBytes != 0 {
 		lenField |= uint64(0x80|padBytes) << 56
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func (e *encoder) flush() error ***REMOVED***
+func (e *encoder) flush() error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 	return e.bw.Flush()
-***REMOVED***
+}
 
-func writeUint64(w io.Writer, n uint64, buf []byte) error ***REMOVED***
+func writeUint64(w io.Writer, n uint64, buf []byte) error {
 	// http://golang.org/src/encoding/binary/binary.go
 	binary.LittleEndian.PutUint64(buf, n)
 	_, err := w.Write(buf)
 	return err
-***REMOVED***
+}

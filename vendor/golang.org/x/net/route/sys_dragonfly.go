@@ -6,57 +6,57 @@ package route
 
 import "unsafe"
 
-func (typ RIBType) parseable() bool ***REMOVED*** return true ***REMOVED***
+func (typ RIBType) parseable() bool { return true }
 
 // RouteMetrics represents route metrics.
-type RouteMetrics struct ***REMOVED***
+type RouteMetrics struct {
 	PathMTU int // path maximum transmission unit
-***REMOVED***
+}
 
 // SysType implements the SysType method of Sys interface.
-func (rmx *RouteMetrics) SysType() SysType ***REMOVED*** return SysMetrics ***REMOVED***
+func (rmx *RouteMetrics) SysType() SysType { return SysMetrics }
 
 // Sys implements the Sys method of Message interface.
-func (m *RouteMessage) Sys() []Sys ***REMOVED***
-	return []Sys***REMOVED***
-		&RouteMetrics***REMOVED***
+func (m *RouteMessage) Sys() []Sys {
+	return []Sys{
+		&RouteMetrics{
 			PathMTU: int(nativeEndian.Uint64(m.raw[m.extOff+8 : m.extOff+16])),
-		***REMOVED***,
-	***REMOVED***
-***REMOVED***
+		},
+	}
+}
 
 // InterfaceMetrics represents interface metrics.
-type InterfaceMetrics struct ***REMOVED***
+type InterfaceMetrics struct {
 	Type int // interface type
 	MTU  int // maximum transmission unit
-***REMOVED***
+}
 
 // SysType implements the SysType method of Sys interface.
-func (imx *InterfaceMetrics) SysType() SysType ***REMOVED*** return SysMetrics ***REMOVED***
+func (imx *InterfaceMetrics) SysType() SysType { return SysMetrics }
 
 // Sys implements the Sys method of Message interface.
-func (m *InterfaceMessage) Sys() []Sys ***REMOVED***
-	return []Sys***REMOVED***
-		&InterfaceMetrics***REMOVED***
+func (m *InterfaceMessage) Sys() []Sys {
+	return []Sys{
+		&InterfaceMetrics{
 			Type: int(m.raw[m.extOff]),
 			MTU:  int(nativeEndian.Uint32(m.raw[m.extOff+8 : m.extOff+12])),
-		***REMOVED***,
-	***REMOVED***
-***REMOVED***
+		},
+	}
+}
 
-func probeRoutingStack() (int, map[int]*wireFormat) ***REMOVED***
+func probeRoutingStack() (int, map[int]*wireFormat) {
 	var p uintptr
-	rtm := &wireFormat***REMOVED***extOff: 40, bodyOff: sizeofRtMsghdrDragonFlyBSD4***REMOVED***
+	rtm := &wireFormat{extOff: 40, bodyOff: sizeofRtMsghdrDragonFlyBSD4}
 	rtm.parse = rtm.parseRouteMessage
-	ifm := &wireFormat***REMOVED***extOff: 16, bodyOff: sizeofIfMsghdrDragonFlyBSD4***REMOVED***
+	ifm := &wireFormat{extOff: 16, bodyOff: sizeofIfMsghdrDragonFlyBSD4}
 	ifm.parse = ifm.parseInterfaceMessage
-	ifam := &wireFormat***REMOVED***extOff: sizeofIfaMsghdrDragonFlyBSD4, bodyOff: sizeofIfaMsghdrDragonFlyBSD4***REMOVED***
+	ifam := &wireFormat{extOff: sizeofIfaMsghdrDragonFlyBSD4, bodyOff: sizeofIfaMsghdrDragonFlyBSD4}
 	ifam.parse = ifam.parseInterfaceAddrMessage
-	ifmam := &wireFormat***REMOVED***extOff: sizeofIfmaMsghdrDragonFlyBSD4, bodyOff: sizeofIfmaMsghdrDragonFlyBSD4***REMOVED***
+	ifmam := &wireFormat{extOff: sizeofIfmaMsghdrDragonFlyBSD4, bodyOff: sizeofIfmaMsghdrDragonFlyBSD4}
 	ifmam.parse = ifmam.parseInterfaceMulticastAddrMessage
-	ifanm := &wireFormat***REMOVED***extOff: sizeofIfAnnouncemsghdrDragonFlyBSD4, bodyOff: sizeofIfAnnouncemsghdrDragonFlyBSD4***REMOVED***
+	ifanm := &wireFormat{extOff: sizeofIfAnnouncemsghdrDragonFlyBSD4, bodyOff: sizeofIfAnnouncemsghdrDragonFlyBSD4}
 	ifanm.parse = ifanm.parseInterfaceAnnounceMessage
-	return int(unsafe.Sizeof(p)), map[int]*wireFormat***REMOVED***
+	return int(unsafe.Sizeof(p)), map[int]*wireFormat{
 		sysRTM_ADD:        rtm,
 		sysRTM_DELETE:     rtm,
 		sysRTM_CHANGE:     rtm,
@@ -72,5 +72,5 @@ func probeRoutingStack() (int, map[int]*wireFormat) ***REMOVED***
 		sysRTM_NEWMADDR:   ifmam,
 		sysRTM_DELMADDR:   ifmam,
 		sysRTM_IFANNOUNCE: ifanm,
-	***REMOVED***
-***REMOVED***
+	}
+}

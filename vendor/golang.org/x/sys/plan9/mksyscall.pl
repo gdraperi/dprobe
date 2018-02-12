@@ -31,65 +31,65 @@ my $dragonfly = 0;
 my $nacl = 0;
 my $arm = 0; # 64-bit value should use (even, odd)-pair
 
-if($ARGV[0] eq "-b32") ***REMOVED***
+if($ARGV[0] eq "-b32") {
 	$_32bit = "big-endian";
 	shift;
-***REMOVED*** elsif($ARGV[0] eq "-l32") ***REMOVED***
+} elsif($ARGV[0] eq "-l32") {
 	$_32bit = "little-endian";
 	shift;
-***REMOVED***
-if($ARGV[0] eq "-plan9") ***REMOVED***
+}
+if($ARGV[0] eq "-plan9") {
 	$plan9 = 1;
 	shift;
-***REMOVED***
-if($ARGV[0] eq "-openbsd") ***REMOVED***
+}
+if($ARGV[0] eq "-openbsd") {
 	$openbsd = 1;
 	shift;
-***REMOVED***
-if($ARGV[0] eq "-netbsd") ***REMOVED***
+}
+if($ARGV[0] eq "-netbsd") {
 	$netbsd = 1;
 	shift;
-***REMOVED***
-if($ARGV[0] eq "-dragonfly") ***REMOVED***
+}
+if($ARGV[0] eq "-dragonfly") {
 	$dragonfly = 1;
 	shift;
-***REMOVED***
-if($ARGV[0] eq "-nacl") ***REMOVED***
+}
+if($ARGV[0] eq "-nacl") {
 	$nacl = 1;
 	shift;
-***REMOVED***
-if($ARGV[0] eq "-arm") ***REMOVED***
+}
+if($ARGV[0] eq "-arm") {
 	$arm = 1;
 	shift;
-***REMOVED***
+}
 
-if($ARGV[0] =~ /^-/) ***REMOVED***
+if($ARGV[0] =~ /^-/) {
 	print STDERR "usage: mksyscall.pl [-b32 | -l32] [file ...]\n";
 	exit 1;
-***REMOVED***
+}
 
-sub parseparamlist($) ***REMOVED***
+sub parseparamlist($) {
 	my ($list) = @_;
 	$list =~ s/^\s*//;
 	$list =~ s/\s*$//;
-	if($list eq "") ***REMOVED***
+	if($list eq "") {
 		return ();
-	***REMOVED***
+	}
 	return split(/\s*,\s*/, $list);
-***REMOVED***
+}
 
-sub parseparam($) ***REMOVED***
+sub parseparam($) {
 	my ($p) = @_;
-	if($p !~ /^(\S*) (\S*)$/) ***REMOVED***
+	if($p !~ /^(\S*) (\S*)$/) {
 		print STDERR "$ARGV:$.: malformed parameter: $p\n";
 		$errors = 1;
 		return ("xx", "int");
-	***REMOVED***
+	}
 	return ($1, $2);
-***REMOVED***
+}
 
 my $text = "";
-while(<>) ***REMOVED***
+while(<>) {
 	chomp;
 	s/\s+/ /g;
 	s/^\s+//;
@@ -100,11 +100,11 @@ while(<>) ***REMOVED***
 	# Line must be of the form
 	#	func Open(path string, mode int, perm int) (fd int, errno error)
 	# Split into name, in params, out params.
-	if(!/^\/\/sys(nb)? (\w+)\(([^()]*)\)\s*(?:\(([^()]+)\))?\s*(?:=\s*((?i)SYS_[A-Z0-9_]+))?$/) ***REMOVED***
+	if(!/^\/\/sys(nb)? (\w+)\(([^()]*)\)\s*(?:\(([^()]+)\))?\s*(?:=\s*((?i)SYS_[A-Z0-9_]+))?$/) {
 		print STDERR "$ARGV:$.: malformed //sys declaration\n";
 		$errors = 1;
 		next;
-	***REMOVED***
+	}
 	my ($func, $in, $out, $sysname) = ($2, $3, $4, $5);
 
 	# Split argument lists on comma.
@@ -118,119 +118,119 @@ while(<>) ***REMOVED***
 
 	# Go function header.
 	my $out_decl = @out ? sprintf(" (%s)", join(', ', @out)) : "";
-	$text .= sprintf "func %s(%s)%s ***REMOVED***\n", $func, join(', ', @in), $out_decl;
+	$text .= sprintf "func %s(%s)%s {\n", $func, join(', ', @in), $out_decl;
 
 	# Check if err return available
 	my $errvar = "";
-	foreach my $p (@out) ***REMOVED***
+	foreach my $p (@out) {
 		my ($name, $type) = parseparam($p);
-		if($type eq "error") ***REMOVED***
+		if($type eq "error") {
 			$errvar = $name;
 			last;
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	# Prepare arguments to Syscall.
 	my @args = ();
 	my @uses = ();
 	my $n = 0;
-	foreach my $p (@in) ***REMOVED***
+	foreach my $p (@in) {
 		my ($name, $type) = parseparam($p);
-		if($type =~ /^\*/) ***REMOVED***
+		if($type =~ /^\*/) {
 			push @args, "uintptr(unsafe.Pointer($name))";
-		***REMOVED*** elsif($type eq "string" && $errvar ne "") ***REMOVED***
+		} elsif($type eq "string" && $errvar ne "") {
 			$text .= "\tvar _p$n *byte\n";
 			$text .= "\t_p$n, $errvar = BytePtrFromString($name)\n";
-			$text .= "\tif $errvar != nil ***REMOVED***\n\t\treturn\n\t***REMOVED***\n";
+			$text .= "\tif $errvar != nil {\n\t\treturn\n\t}\n";
 			push @args, "uintptr(unsafe.Pointer(_p$n))";
 			push @uses, "use(unsafe.Pointer(_p$n))";
 			$n++;
-		***REMOVED*** elsif($type eq "string") ***REMOVED***
+		} elsif($type eq "string") {
 			print STDERR "$ARGV:$.: $func uses string arguments, but has no error return\n";
 			$text .= "\tvar _p$n *byte\n";
 			$text .= "\t_p$n, _ = BytePtrFromString($name)\n";
 			push @args, "uintptr(unsafe.Pointer(_p$n))";
 			push @uses, "use(unsafe.Pointer(_p$n))";
 			$n++;
-		***REMOVED*** elsif($type =~ /^\[\](.*)/) ***REMOVED***
+		} elsif($type =~ /^\[\](.*)/) {
 			# Convert slice into pointer, length.
 			# Have to be careful not to take address of &a[0] if len == 0:
 			# pass dummy pointer in that case.
 			# Used to pass nil, but some OSes or simulators reject write(fd, nil, 0).
 			$text .= "\tvar _p$n unsafe.Pointer\n";
-			$text .= "\tif len($name) > 0 ***REMOVED***\n\t\t_p$n = unsafe.Pointer(\&$***REMOVED***name***REMOVED***[0])\n\t***REMOVED***";
-			$text .= " else ***REMOVED***\n\t\t_p$n = unsafe.Pointer(&_zero)\n\t***REMOVED***";
+			$text .= "\tif len($name) > 0 {\n\t\t_p$n = unsafe.Pointer(\&${name}[0])\n\t}";
+			$text .= " else {\n\t\t_p$n = unsafe.Pointer(&_zero)\n\t}";
 			$text .= "\n";
 			push @args, "uintptr(_p$n)", "uintptr(len($name))";
 			$n++;
-		***REMOVED*** elsif($type eq "int64" && ($openbsd || $netbsd)) ***REMOVED***
+		} elsif($type eq "int64" && ($openbsd || $netbsd)) {
 			push @args, "0";
-			if($_32bit eq "big-endian") ***REMOVED***
+			if($_32bit eq "big-endian") {
 				push @args, "uintptr($name>>32)", "uintptr($name)";
-			***REMOVED*** elsif($_32bit eq "little-endian") ***REMOVED***
+			} elsif($_32bit eq "little-endian") {
 				push @args, "uintptr($name)", "uintptr($name>>32)";
-			***REMOVED*** else ***REMOVED***
+			} else {
 				push @args, "uintptr($name)";
-			***REMOVED***
-		***REMOVED*** elsif($type eq "int64" && $dragonfly) ***REMOVED***
-			if ($func !~ /^extp(read|write)/i) ***REMOVED***
+			}
+		} elsif($type eq "int64" && $dragonfly) {
+			if ($func !~ /^extp(read|write)/i) {
 				push @args, "0";
-			***REMOVED***
-			if($_32bit eq "big-endian") ***REMOVED***
+			}
+			if($_32bit eq "big-endian") {
 				push @args, "uintptr($name>>32)", "uintptr($name)";
-			***REMOVED*** elsif($_32bit eq "little-endian") ***REMOVED***
+			} elsif($_32bit eq "little-endian") {
 				push @args, "uintptr($name)", "uintptr($name>>32)";
-			***REMOVED*** else ***REMOVED***
+			} else {
 				push @args, "uintptr($name)";
-			***REMOVED***
-		***REMOVED*** elsif($type eq "int64" && $_32bit ne "") ***REMOVED***
-			if(@args % 2 && $arm) ***REMOVED***
+			}
+		} elsif($type eq "int64" && $_32bit ne "") {
+			if(@args % 2 && $arm) {
 				# arm abi specifies 64-bit argument uses 
 				# (even, odd) pair
 				push @args, "0"
-			***REMOVED***
-			if($_32bit eq "big-endian") ***REMOVED***
+			}
+			if($_32bit eq "big-endian") {
 				push @args, "uintptr($name>>32)", "uintptr($name)";
-			***REMOVED*** else ***REMOVED***
+			} else {
 				push @args, "uintptr($name)", "uintptr($name>>32)";
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
+			}
+		} else {
 			push @args, "uintptr($name)";
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	# Determine which form to use; pad args with zeros.
 	my $asm = "Syscall";
-	if ($nonblock) ***REMOVED***
+	if ($nonblock) {
 		$asm = "RawSyscall";
-	***REMOVED***
-	if(@args <= 3) ***REMOVED***
-		while(@args < 3) ***REMOVED***
+	}
+	if(@args <= 3) {
+		while(@args < 3) {
 			push @args, "0";
-		***REMOVED***
-	***REMOVED*** elsif(@args <= 6) ***REMOVED***
+		}
+	} elsif(@args <= 6) {
 		$asm .= "6";
-		while(@args < 6) ***REMOVED***
+		while(@args < 6) {
 			push @args, "0";
-		***REMOVED***
-	***REMOVED*** elsif(@args <= 9) ***REMOVED***
+		}
+	} elsif(@args <= 9) {
 		$asm .= "9";
-		while(@args < 9) ***REMOVED***
+		while(@args < 9) {
 			push @args, "0";
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
+		}
+	} else {
 		print STDERR "$ARGV:$.: too many arguments to system call\n";
-	***REMOVED***
+	}
 
 	# System call number.
-	if($sysname eq "") ***REMOVED***
+	if($sysname eq "") {
 		$sysname = "SYS_$func";
-		$sysname =~ s/([a-z])([A-Z])/$***REMOVED***1***REMOVED***_$2/g;	# turn FooBar into Foo_Bar
+		$sysname =~ s/([a-z])([A-Z])/${1}_$2/g;	# turn FooBar into Foo_Bar
 		$sysname =~ y/a-z/A-Z/;
-		if($nacl) ***REMOVED***
+		if($nacl) {
 			$sysname =~ y/A-Z/a-z/;
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	# Actual call.
 	my $args = join(', ', @args);
@@ -240,71 +240,71 @@ while(<>) ***REMOVED***
 	my $body = "";
 	my @ret = ("_", "_", "_");
 	my $do_errno = 0;
-	for(my $i=0; $i<@out; $i++) ***REMOVED***
+	for(my $i=0; $i<@out; $i++) {
 		my $p = $out[$i];
 		my ($name, $type) = parseparam($p);
 		my $reg = "";
-		if($name eq "err" && !$plan9) ***REMOVED***
+		if($name eq "err" && !$plan9) {
 			$reg = "e1";
 			$ret[2] = $reg;
 			$do_errno = 1;
-		***REMOVED*** elsif($name eq "err" && $plan9) ***REMOVED***
+		} elsif($name eq "err" && $plan9) {
 			$ret[0] = "r0";
 			$ret[2] = "e1";
 			next;
-		***REMOVED*** else ***REMOVED***
+		} else {
 			$reg = sprintf("r%d", $i);
 			$ret[$i] = $reg;
-		***REMOVED***
-		if($type eq "bool") ***REMOVED***
+		}
+		if($type eq "bool") {
 			$reg = "$reg != 0";
-		***REMOVED***
-		if($type eq "int64" && $_32bit ne "") ***REMOVED***
+		}
+		if($type eq "int64" && $_32bit ne "") {
 			# 64-bit number in r1:r0 or r0:r1.
-			if($i+2 > @out) ***REMOVED***
+			if($i+2 > @out) {
 				print STDERR "$ARGV:$.: not enough registers for int64 return\n";
-			***REMOVED***
-			if($_32bit eq "big-endian") ***REMOVED***
+			}
+			if($_32bit eq "big-endian") {
 				$reg = sprintf("int64(r%d)<<32 | int64(r%d)", $i, $i+1);
-			***REMOVED*** else ***REMOVED***
+			} else {
 				$reg = sprintf("int64(r%d)<<32 | int64(r%d)", $i+1, $i);
-			***REMOVED***
+			}
 			$ret[$i] = sprintf("r%d", $i);
 			$ret[$i+1] = sprintf("r%d", $i+1);
-		***REMOVED***
-		if($reg ne "e1" || $plan9) ***REMOVED***
+		}
+		if($reg ne "e1" || $plan9) {
 			$body .= "\t$name = $type($reg)\n";
-		***REMOVED***
-	***REMOVED***
-	if ($ret[0] eq "_" && $ret[1] eq "_" && $ret[2] eq "_") ***REMOVED***
+		}
+	}
+	if ($ret[0] eq "_" && $ret[1] eq "_" && $ret[2] eq "_") {
 		$text .= "\t$call\n";
-	***REMOVED*** else ***REMOVED***
+	} else {
 		$text .= "\t$ret[0], $ret[1], $ret[2] := $call\n";
-	***REMOVED***
-	foreach my $use (@uses) ***REMOVED***
+	}
+	foreach my $use (@uses) {
 		$text .= "\t$use\n";
-	***REMOVED***
+	}
 	$text .= $body;
 	
-	if ($plan9 && $ret[2] eq "e1") ***REMOVED***
-		$text .= "\tif int32(r0) == -1 ***REMOVED***\n";
+	if ($plan9 && $ret[2] eq "e1") {
+		$text .= "\tif int32(r0) == -1 {\n";
 		$text .= "\t\terr = e1\n";
-		$text .= "\t***REMOVED***\n";
-	***REMOVED*** elsif ($do_errno) ***REMOVED***
-		$text .= "\tif e1 != 0 ***REMOVED***\n";
+		$text .= "\t}\n";
+	} elsif ($do_errno) {
+		$text .= "\tif e1 != 0 {\n";
 		$text .= "\t\terr = e1\n";
-		$text .= "\t***REMOVED***\n";
-	***REMOVED***
+		$text .= "\t}\n";
+	}
 	$text .= "\treturn\n";
-	$text .= "***REMOVED***\n\n";
-***REMOVED***
+	$text .= "}\n\n";
+}
 
 chomp $text;
 chomp $text;
 
-if($errors) ***REMOVED***
+if($errors) {
 	exit 1;
-***REMOVED***
+}
 
 print <<EOF;
 // $cmdline

@@ -22,40 +22,40 @@ import (
 // Also the parent relation is different, as a parent may have a different
 // script. So usually the parent of zh-Hant is und, whereas for MatchLang it is
 // zh.
-func MatchLang(t language.Tag, tags []language.Tag) int ***REMOVED***
+func MatchLang(t language.Tag, tags []language.Tag) int {
 	// Canonicalize the values, including collapsing macro languages.
 	t, _ = language.All.Canonicalize(t)
 
 	base, conf := t.Base()
 	// Estimate the base language, but only use high-confidence values.
-	if conf < language.High ***REMOVED***
+	if conf < language.High {
 		// The root locale supports "search" and "standard". We assume that any
 		// implementation will only use one of both.
 		return 0
-	***REMOVED***
+	}
 
 	// Maximize base and script and normalize the tag.
-	if _, s, r := t.Raw(); (r != language.Region***REMOVED******REMOVED***) ***REMOVED***
+	if _, s, r := t.Raw(); (r != language.Region{}) {
 		p, _ := language.Raw.Compose(base, s, r)
 		// Taking the parent forces the script to be maximized.
 		p = p.Parent()
 		// Add back region and extensions.
 		t, _ = language.Raw.Compose(p, r, t.Extensions())
-	***REMOVED*** else ***REMOVED***
+	} else {
 		// Set the maximized base language.
 		t, _ = language.Raw.Compose(base, s, t.Extensions())
-	***REMOVED***
+	}
 
 	// Find start index of the language tag.
-	start := 1 + sort.Search(len(tags)-1, func(i int) bool ***REMOVED***
+	start := 1 + sort.Search(len(tags)-1, func(i int) bool {
 		b, _, _ := tags[i+1].Raw()
 		return base.String() <= b.String()
-	***REMOVED***)
-	if start < len(tags) ***REMOVED***
-		if b, _, _ := tags[start].Raw(); b != base ***REMOVED***
+	})
+	if start < len(tags) {
+		if b, _, _ := tags[start].Raw(); b != base {
 			return 0
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Besides the base language, script and region, only the collation type and
 	// the custom variant defined in the 'u' extension are used to distinguish a
@@ -65,41 +65,41 @@ func MatchLang(t language.Tag, tags []language.Tag) int ***REMOVED***
 	tdef, _ = tdef.SetTypeForKey("va", t.TypeForKey("va"))
 
 	// First search for a specialized collation type, if present.
-	try := []language.Tag***REMOVED***tdef***REMOVED***
-	if co := t.TypeForKey("co"); co != "" ***REMOVED***
+	try := []language.Tag{tdef}
+	if co := t.TypeForKey("co"); co != "" {
 		tco, _ := tdef.SetTypeForKey("co", co)
-		try = []language.Tag***REMOVED***tco, tdef***REMOVED***
-	***REMOVED***
+		try = []language.Tag{tco, tdef}
+	}
 
-	for _, tx := range try ***REMOVED***
-		for ; tx != language.Und; tx = parent(tx) ***REMOVED***
-			for i, t := range tags[start:] ***REMOVED***
-				if b, _, _ := t.Raw(); b != base ***REMOVED***
+	for _, tx := range try {
+		for ; tx != language.Und; tx = parent(tx) {
+			for i, t := range tags[start:] {
+				if b, _, _ := t.Raw(); b != base {
 					break
-				***REMOVED***
-				if tx == t ***REMOVED***
+				}
+				if tx == t {
 					return start + i
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+				}
+			}
+		}
+	}
 	return 0
-***REMOVED***
+}
 
 // parent computes the structural parent. This means inheritance may change
 // script. So, unlike the CLDR parent, parent(zh-Hant) == zh.
-func parent(t language.Tag) language.Tag ***REMOVED***
-	if t.TypeForKey("va") != "" ***REMOVED***
+func parent(t language.Tag) language.Tag {
+	if t.TypeForKey("va") != "" {
 		t, _ = t.SetTypeForKey("va", "")
 		return t
-	***REMOVED***
+	}
 	result := language.Und
-	if b, s, r := t.Raw(); (r != language.Region***REMOVED******REMOVED***) ***REMOVED***
+	if b, s, r := t.Raw(); (r != language.Region{}) {
 		result, _ = language.Raw.Compose(b, s, t.Extensions())
-	***REMOVED*** else if (s != language.Script***REMOVED******REMOVED***) ***REMOVED***
+	} else if (s != language.Script{}) {
 		result, _ = language.Raw.Compose(b, t.Extensions())
-	***REMOVED*** else if (b != language.Base***REMOVED******REMOVED***) ***REMOVED***
+	} else if (b != language.Base{}) {
 		result, _ = language.Raw.Compose(t.Extensions())
-	***REMOVED***
+	}
 	return result
-***REMOVED***
+}

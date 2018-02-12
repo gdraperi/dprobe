@@ -6,5 +6,5 @@ import (
 )
 
 // FillPlatformInfo fills the platform related info.
-func (daemon *Daemon) FillPlatformInfo(v *types.Info, sysInfo *sysinfo.SysInfo) ***REMOVED***
-***REMOVED***
+func (daemon *Daemon) FillPlatformInfo(v *types.Info, sysInfo *sysinfo.SysInfo) {
+}

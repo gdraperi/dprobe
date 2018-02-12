@@ -17,7 +17,7 @@ import (
 )
 
 // Image describes an image used by containers
-type Image interface ***REMOVED***
+type Image interface {
 	// Name of the image
 	Name() string
 	// Target descriptor for the image content
@@ -34,70 +34,70 @@ type Image interface ***REMOVED***
 	IsUnpacked(context.Context, string) (bool, error)
 	// ContentStore provides a content store which contains image blob data
 	ContentStore() content.Store
-***REMOVED***
+}
 
-var _ = (Image)(&image***REMOVED******REMOVED***)
+var _ = (Image)(&image{})
 
-type image struct ***REMOVED***
+type image struct {
 	client *Client
 
 	i images.Image
-***REMOVED***
+}
 
-func (i *image) Name() string ***REMOVED***
+func (i *image) Name() string {
 	return i.i.Name
-***REMOVED***
+}
 
-func (i *image) Target() ocispec.Descriptor ***REMOVED***
+func (i *image) Target() ocispec.Descriptor {
 	return i.i.Target
-***REMOVED***
+}
 
-func (i *image) RootFS(ctx context.Context) ([]digest.Digest, error) ***REMOVED***
+func (i *image) RootFS(ctx context.Context) ([]digest.Digest, error) {
 	provider := i.client.ContentStore()
 	return i.i.RootFS(ctx, provider, platforms.Default())
-***REMOVED***
+}
 
-func (i *image) Size(ctx context.Context) (int64, error) ***REMOVED***
+func (i *image) Size(ctx context.Context) (int64, error) {
 	provider := i.client.ContentStore()
 	return i.i.Size(ctx, provider, platforms.Default())
-***REMOVED***
+}
 
-func (i *image) Config(ctx context.Context) (ocispec.Descriptor, error) ***REMOVED***
+func (i *image) Config(ctx context.Context) (ocispec.Descriptor, error) {
 	provider := i.client.ContentStore()
 	return i.i.Config(ctx, provider, platforms.Default())
-***REMOVED***
+}
 
-func (i *image) IsUnpacked(ctx context.Context, snapshotterName string) (bool, error) ***REMOVED***
+func (i *image) IsUnpacked(ctx context.Context, snapshotterName string) (bool, error) {
 	sn := i.client.SnapshotService(snapshotterName)
 	cs := i.client.ContentStore()
 
 	diffs, err := i.i.RootFS(ctx, cs, platforms.Default())
-	if err != nil ***REMOVED***
+	if err != nil {
 		return false, err
-	***REMOVED***
+	}
 
 	chainID := identity.ChainID(diffs)
 	_, err = sn.Stat(ctx, chainID.String())
-	if err == nil ***REMOVED***
+	if err == nil {
 		return true, nil
-	***REMOVED*** else if !errdefs.IsNotFound(err) ***REMOVED***
+	} else if !errdefs.IsNotFound(err) {
 		return false, err
-	***REMOVED***
+	}
 
 	return false, nil
-***REMOVED***
+}
 
-func (i *image) Unpack(ctx context.Context, snapshotterName string) error ***REMOVED***
+func (i *image) Unpack(ctx context.Context, snapshotterName string) error {
 	ctx, done, err := i.client.WithLease(ctx)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer done()
 
 	layers, err := i.getLayers(ctx, platforms.Default())
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	var (
 		sn = i.client.SnapshotService(snapshotterName)
@@ -107,68 +107,68 @@ func (i *image) Unpack(ctx context.Context, snapshotterName string) error ***REM
 		chain    []digest.Digest
 		unpacked bool
 	)
-	for _, layer := range layers ***REMOVED***
-		labels := map[string]string***REMOVED***
+	for _, layer := range layers {
+		labels := map[string]string{
 			"containerd.io/uncompressed": layer.Diff.Digest.String(),
-		***REMOVED***
+		}
 
 		unpacked, err = rootfs.ApplyLayer(ctx, layer, chain, sn, a, snapshots.WithLabels(labels))
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 
 		chain = append(chain, layer.Diff.Digest)
-	***REMOVED***
+	}
 
-	if unpacked ***REMOVED***
+	if unpacked {
 		desc, err := i.i.Config(ctx, cs, platforms.Default())
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 
 		rootfs := identity.ChainID(chain).String()
 
-		cinfo := content.Info***REMOVED***
+		cinfo := content.Info{
 			Digest: desc.Digest,
-			Labels: map[string]string***REMOVED***
+			Labels: map[string]string{
 				fmt.Sprintf("containerd.io/gc.ref.snapshot.%s", snapshotterName): rootfs,
-			***REMOVED***,
-		***REMOVED***
-		if _, err := cs.Update(ctx, cinfo, fmt.Sprintf("labels.containerd.io/gc.ref.snapshot.%s", snapshotterName)); err != nil ***REMOVED***
+			},
+		}
+		if _, err := cs.Update(ctx, cinfo, fmt.Sprintf("labels.containerd.io/gc.ref.snapshot.%s", snapshotterName)); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (i *image) getLayers(ctx context.Context, platform string) ([]rootfs.Layer, error) ***REMOVED***
+func (i *image) getLayers(ctx context.Context, platform string) ([]rootfs.Layer, error) {
 	cs := i.client.ContentStore()
 
 	manifest, err := images.Manifest(ctx, cs, i.i.Target, platform)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	diffIDs, err := i.i.RootFS(ctx, cs, platform)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, errors.Wrap(err, "failed to resolve rootfs")
-	***REMOVED***
-	if len(diffIDs) != len(manifest.Layers) ***REMOVED***
+	}
+	if len(diffIDs) != len(manifest.Layers) {
 		return nil, errors.Errorf("mismatched image rootfs and manifest layers")
-	***REMOVED***
+	}
 	layers := make([]rootfs.Layer, len(diffIDs))
-	for i := range diffIDs ***REMOVED***
-		layers[i].Diff = ocispec.Descriptor***REMOVED***
+	for i := range diffIDs {
+		layers[i].Diff = ocispec.Descriptor{
 			// TODO: derive media type from compressed type
 			MediaType: ocispec.MediaTypeImageLayer,
 			Digest:    diffIDs[i],
-		***REMOVED***
+		}
 		layers[i].Blob = manifest.Layers[i]
-	***REMOVED***
+	}
 	return layers, nil
-***REMOVED***
+}
 
-func (i *image) ContentStore() content.Store ***REMOVED***
+func (i *image) ContentStore() content.Store {
 	return i.client.ContentStore()
-***REMOVED***
+}

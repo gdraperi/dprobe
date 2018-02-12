@@ -7,17 +7,17 @@
 package route
 
 // A Message represents a routing message.
-type Message interface ***REMOVED***
+type Message interface {
 	// Sys returns operating system-specific information.
 	Sys() []Sys
-***REMOVED***
+}
 
 // A Sys reprensents operating system-specific information.
-type Sys interface ***REMOVED***
+type Sys interface {
 	// SysType returns a type of operating system-specific
 	// information.
 	SysType() SysType
-***REMOVED***
+}
 
 // A SysType represents a type of operating system-specific
 // information.
@@ -30,43 +30,43 @@ const (
 
 // ParseRIB parses b as a routing information base and returns a list
 // of routing messages.
-func ParseRIB(typ RIBType, b []byte) ([]Message, error) ***REMOVED***
-	if !typ.parseable() ***REMOVED***
+func ParseRIB(typ RIBType, b []byte) ([]Message, error) {
+	if !typ.parseable() {
 		return nil, errUnsupportedMessage
-	***REMOVED***
+	}
 	var msgs []Message
 	nmsgs, nskips := 0, 0
-	for len(b) > 4 ***REMOVED***
+	for len(b) > 4 {
 		nmsgs++
 		l := int(nativeEndian.Uint16(b[:2]))
-		if l == 0 ***REMOVED***
+		if l == 0 {
 			return nil, errInvalidMessage
-		***REMOVED***
-		if len(b) < l ***REMOVED***
+		}
+		if len(b) < l {
 			return nil, errMessageTooShort
-		***REMOVED***
-		if b[2] != sysRTM_VERSION ***REMOVED***
+		}
+		if b[2] != sysRTM_VERSION {
 			b = b[l:]
 			continue
-		***REMOVED***
-		if w, ok := wireFormats[int(b[3])]; !ok ***REMOVED***
+		}
+		if w, ok := wireFormats[int(b[3])]; !ok {
 			nskips++
-		***REMOVED*** else ***REMOVED***
+		} else {
 			m, err := w.parse(typ, b)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
-			if m == nil ***REMOVED***
+			}
+			if m == nil {
 				nskips++
-			***REMOVED*** else ***REMOVED***
+			} else {
 				msgs = append(msgs, m)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		b = b[l:]
-	***REMOVED***
+	}
 	// We failed to parse any of the messages - version mismatch?
-	if nmsgs != len(msgs)+nskips ***REMOVED***
+	if nmsgs != len(msgs)+nskips {
 		return nil, errMessageMismatch
-	***REMOVED***
+	}
 	return msgs, nil
-***REMOVED***
+}

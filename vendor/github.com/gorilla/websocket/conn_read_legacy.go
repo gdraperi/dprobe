@@ -8,14 +8,14 @@ package websocket
 
 import "io"
 
-func (c *Conn) read(n int) ([]byte, error) ***REMOVED***
+func (c *Conn) read(n int) ([]byte, error) {
 	p, err := c.br.Peek(n)
-	if err == io.EOF ***REMOVED***
+	if err == io.EOF {
 		err = errUnexpectedEOF
-	***REMOVED***
-	if len(p) > 0 ***REMOVED***
+	}
+	if len(p) > 0 {
 		// advance over the bytes just read
 		io.ReadFull(c.br, p)
-	***REMOVED***
+	}
 	return p, err
-***REMOVED***
+}

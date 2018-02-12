@@ -13,43 +13,43 @@ import (
 
 var supportsSeccomp = true
 
-func setSeccomp(daemon *Daemon, rs *specs.Spec, c *container.Container) error ***REMOVED***
+func setSeccomp(daemon *Daemon, rs *specs.Spec, c *container.Container) error {
 	var profile *specs.LinuxSeccomp
 	var err error
 
-	if c.HostConfig.Privileged ***REMOVED***
+	if c.HostConfig.Privileged {
 		return nil
-	***REMOVED***
+	}
 
-	if !daemon.seccompEnabled ***REMOVED***
-		if c.SeccompProfile != "" && c.SeccompProfile != "unconfined" ***REMOVED***
+	if !daemon.seccompEnabled {
+		if c.SeccompProfile != "" && c.SeccompProfile != "unconfined" {
 			return fmt.Errorf("Seccomp is not enabled in your kernel, cannot run a custom seccomp profile.")
-		***REMOVED***
+		}
 		logrus.Warn("Seccomp is not enabled in your kernel, running container without default profile.")
 		c.SeccompProfile = "unconfined"
-	***REMOVED***
-	if c.SeccompProfile == "unconfined" ***REMOVED***
+	}
+	if c.SeccompProfile == "unconfined" {
 		return nil
-	***REMOVED***
-	if c.SeccompProfile != "" ***REMOVED***
+	}
+	if c.SeccompProfile != "" {
 		profile, err = seccomp.LoadProfile(c.SeccompProfile, rs)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
-		if daemon.seccompProfile != nil ***REMOVED***
+		}
+	} else {
+		if daemon.seccompProfile != nil {
 			profile, err = seccomp.LoadProfile(string(daemon.seccompProfile), rs)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
+			}
+		} else {
 			profile, err = seccomp.GetDefaultProfile(rs)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	rs.Linux.Seccomp = profile
 	return nil
-***REMOVED***
+}

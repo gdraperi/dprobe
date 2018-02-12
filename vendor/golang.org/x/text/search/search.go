@@ -47,14 +47,14 @@ var (
 	IgnoreWidth Option = ignoreWidth
 )
 
-func ignoreDiacritics(m *Matcher) ***REMOVED*** m.ignoreDiacritics = true ***REMOVED***
-func ignoreCase(m *Matcher)       ***REMOVED*** m.ignoreCase = true ***REMOVED***
-func ignoreWidth(m *Matcher)      ***REMOVED*** m.ignoreWidth = true ***REMOVED***
-func loose(m *Matcher) ***REMOVED***
+func ignoreDiacritics(m *Matcher) { m.ignoreDiacritics = true }
+func ignoreCase(m *Matcher)       { m.ignoreCase = true }
+func ignoreWidth(m *Matcher)      { m.ignoreWidth = true }
+func loose(m *Matcher) {
 	ignoreDiacritics(m)
 	ignoreCase(m)
 	ignoreWidth(m)
-***REMOVED***
+}
 
 var (
 	// Supported lists the languages for which search differs from its parent.
@@ -63,33 +63,33 @@ var (
 	tags []language.Tag
 )
 
-func init() ***REMOVED***
+func init() {
 	ids := strings.Split(availableLocales, ",")
 	tags = make([]language.Tag, len(ids))
-	for i, s := range ids ***REMOVED***
+	for i, s := range ids {
 		tags[i] = language.Raw.MustParse(s)
-	***REMOVED***
+	}
 	Supported = language.NewCoverage(tags)
-***REMOVED***
+}
 
 // New returns a new Matcher for the given language and options.
-func New(t language.Tag, opts ...Option) *Matcher ***REMOVED***
-	m := &Matcher***REMOVED***
+func New(t language.Tag, opts ...Option) *Matcher {
+	m := &Matcher{
 		w: getTable(locales[colltab.MatchLang(t, tags)]),
-	***REMOVED***
-	for _, f := range opts ***REMOVED***
+	}
+	for _, f := range opts {
 		f(m)
-	***REMOVED***
+	}
 	return m
-***REMOVED***
+}
 
 // A Matcher implements language-specific string matching.
-type Matcher struct ***REMOVED***
+type Matcher struct {
 	w                colltab.Weighter
 	ignoreCase       bool
 	ignoreWidth      bool
 	ignoreDiacritics bool
-***REMOVED***
+}
 
 // An IndexOption specifies how the Index methods of Pattern or Matcher should
 // match the input.
@@ -108,58 +108,58 @@ const (
 
 // Index reports the start and end position of the first occurrence of pat in b
 // or -1, -1 if pat is not present.
-func (m *Matcher) Index(b, pat []byte, opts ...IndexOption) (start, end int) ***REMOVED***
+func (m *Matcher) Index(b, pat []byte, opts ...IndexOption) (start, end int) {
 	// TODO: implement optimized version that does not use a pattern.
 	return m.Compile(pat).Index(b, opts...)
-***REMOVED***
+}
 
 // IndexString reports the start and end position of the first occurrence of pat
 // in s or -1, -1 if pat is not present.
-func (m *Matcher) IndexString(s, pat string, opts ...IndexOption) (start, end int) ***REMOVED***
+func (m *Matcher) IndexString(s, pat string, opts ...IndexOption) (start, end int) {
 	// TODO: implement optimized version that does not use a pattern.
 	return m.CompileString(pat).IndexString(s, opts...)
-***REMOVED***
+}
 
 // Equal reports whether a and b are equivalent.
-func (m *Matcher) Equal(a, b []byte) bool ***REMOVED***
+func (m *Matcher) Equal(a, b []byte) bool {
 	_, end := m.Index(a, b, Anchor)
 	return end == len(a)
-***REMOVED***
+}
 
 // EqualString reports whether a and b are equivalent.
-func (m *Matcher) EqualString(a, b string) bool ***REMOVED***
+func (m *Matcher) EqualString(a, b string) bool {
 	_, end := m.IndexString(a, b, Anchor)
 	return end == len(a)
-***REMOVED***
+}
 
 // Compile compiles and returns a pattern that can be used for faster searching.
-func (m *Matcher) Compile(b []byte) *Pattern ***REMOVED***
-	p := &Pattern***REMOVED***m: m***REMOVED***
-	iter := colltab.Iter***REMOVED***Weighter: m.w***REMOVED***
-	for iter.SetInput(b); iter.Next(); ***REMOVED***
-	***REMOVED***
+func (m *Matcher) Compile(b []byte) *Pattern {
+	p := &Pattern{m: m}
+	iter := colltab.Iter{Weighter: m.w}
+	for iter.SetInput(b); iter.Next(); {
+	}
 	p.ce = iter.Elems
 	p.deleteEmptyElements()
 	return p
-***REMOVED***
+}
 
 // CompileString compiles and returns a pattern that can be used for faster
 // searching.
-func (m *Matcher) CompileString(s string) *Pattern ***REMOVED***
-	p := &Pattern***REMOVED***m: m***REMOVED***
-	iter := colltab.Iter***REMOVED***Weighter: m.w***REMOVED***
-	for iter.SetInputString(s); iter.Next(); ***REMOVED***
-	***REMOVED***
+func (m *Matcher) CompileString(s string) *Pattern {
+	p := &Pattern{m: m}
+	iter := colltab.Iter{Weighter: m.w}
+	for iter.SetInputString(s); iter.Next(); {
+	}
 	p.ce = iter.Elems
 	p.deleteEmptyElements()
 	return p
-***REMOVED***
+}
 
 // A Pattern is a compiled search string. It is safe for concurrent use.
-type Pattern struct ***REMOVED***
+type Pattern struct {
 	m  *Matcher
 	ce []colltab.Elem
-***REMOVED***
+}
 
 // Design note (TODO remove):
 // The cost of retrieving collation elements for each rune, which is used for
@@ -168,23 +168,23 @@ type Pattern struct ***REMOVED***
 
 // Index reports the start and end position of the first occurrence of p in b
 // or -1, -1 if p is not present.
-func (p *Pattern) Index(b []byte, opts ...IndexOption) (start, end int) ***REMOVED***
+func (p *Pattern) Index(b []byte, opts ...IndexOption) (start, end int) {
 	// Pick a large enough buffer such that we likely do not need to allocate
 	// and small enough to not cause too much overhead initializing.
 	var buf [8]colltab.Elem
 
-	it := &colltab.Iter***REMOVED***
+	it := &colltab.Iter{
 		Weighter: p.m.w,
 		Elems:    buf[:0],
-	***REMOVED***
+	}
 	it.SetInput(b)
 
 	var optMask IndexOption
-	for _, o := range opts ***REMOVED***
+	for _, o := range opts {
 		optMask |= o
-	***REMOVED***
+	}
 
-	switch optMask ***REMOVED***
+	switch optMask {
 	case 0:
 		return p.forwardSearch(it)
 	case Anchor:
@@ -193,28 +193,28 @@ func (p *Pattern) Index(b []byte, opts ...IndexOption) (start, end int) ***REMOV
 		panic("TODO: implement")
 	default:
 		panic("unrecognized option")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // IndexString reports the start and end position of the first occurrence of p
 // in s or -1, -1 if p is not present.
-func (p *Pattern) IndexString(s string, opts ...IndexOption) (start, end int) ***REMOVED***
+func (p *Pattern) IndexString(s string, opts ...IndexOption) (start, end int) {
 	// Pick a large enough buffer such that we likely do not need to allocate
 	// and small enough to not cause too much overhead initializing.
 	var buf [8]colltab.Elem
 
-	it := &colltab.Iter***REMOVED***
+	it := &colltab.Iter{
 		Weighter: p.m.w,
 		Elems:    buf[:0],
-	***REMOVED***
+	}
 	it.SetInputString(s)
 
 	var optMask IndexOption
-	for _, o := range opts ***REMOVED***
+	for _, o := range opts {
 		optMask |= o
-	***REMOVED***
+	}
 
-	switch optMask ***REMOVED***
+	switch optMask {
 	case 0:
 		return p.forwardSearch(it)
 	case Anchor:
@@ -223,8 +223,8 @@ func (p *Pattern) IndexString(s string, opts ...IndexOption) (start, end int) **
 		panic("TODO: implement")
 	default:
 		panic("unrecognized option")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // TODO:
 // - Maybe IndexAll methods (probably not necessary).

@@ -4,83 +4,83 @@ import (
 	"testing"
 )
 
-var identifierTests = map[string]string***REMOVED***
+var identifierTests = map[string]string{
 	"x":         "x",
 	"96":        "",
 	"-x":        "-x",
 	`r\e9 sumé`: "résumé",
 	`a\"b`:      `a"b`,
-***REMOVED***
+}
 
-func TestParseIdentifier(t *testing.T) ***REMOVED***
-	for source, want := range identifierTests ***REMOVED***
-		p := &parser***REMOVED***s: source***REMOVED***
+func TestParseIdentifier(t *testing.T) {
+	for source, want := range identifierTests {
+		p := &parser{s: source}
 		got, err := p.parseIdentifier()
 
-		if err != nil ***REMOVED***
-			if want == "" ***REMOVED***
+		if err != nil {
+			if want == "" {
 				// It was supposed to be an error.
 				continue
-			***REMOVED***
+			}
 			t.Errorf("parsing %q: got error (%s), want %q", source, err, want)
 			continue
-		***REMOVED***
+		}
 
-		if want == "" ***REMOVED***
-			if err == nil ***REMOVED***
+		if want == "" {
+			if err == nil {
 				t.Errorf("parsing %q: got %q, want error", source, got)
-			***REMOVED***
+			}
 			continue
-		***REMOVED***
+		}
 
-		if p.i < len(source) ***REMOVED***
+		if p.i < len(source) {
 			t.Errorf("parsing %q: %d bytes left over", source, len(source)-p.i)
 			continue
-		***REMOVED***
+		}
 
-		if got != want ***REMOVED***
+		if got != want {
 			t.Errorf("parsing %q: got %q, want %q", source, got, want)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-var stringTests = map[string]string***REMOVED***
+var stringTests = map[string]string{
 	`"x"`:         "x",
 	`'x'`:         "x",
 	`'x`:          "",
 	"'x\\\r\nx'":  "xx",
 	`"r\e9 sumé"`: "résumé",
 	`"a\"b"`:      `a"b`,
-***REMOVED***
+}
 
-func TestParseString(t *testing.T) ***REMOVED***
-	for source, want := range stringTests ***REMOVED***
-		p := &parser***REMOVED***s: source***REMOVED***
+func TestParseString(t *testing.T) {
+	for source, want := range stringTests {
+		p := &parser{s: source}
 		got, err := p.parseString()
 
-		if err != nil ***REMOVED***
-			if want == "" ***REMOVED***
+		if err != nil {
+			if want == "" {
 				// It was supposed to be an error.
 				continue
-			***REMOVED***
+			}
 			t.Errorf("parsing %q: got error (%s), want %q", source, err, want)
 			continue
-		***REMOVED***
+		}
 
-		if want == "" ***REMOVED***
-			if err == nil ***REMOVED***
+		if want == "" {
+			if err == nil {
 				t.Errorf("parsing %q: got %q, want error", source, got)
-			***REMOVED***
+			}
 			continue
-		***REMOVED***
+		}
 
-		if p.i < len(source) ***REMOVED***
+		if p.i < len(source) {
 			t.Errorf("parsing %q: %d bytes left over", source, len(source)-p.i)
 			continue
-		***REMOVED***
+		}
 
-		if got != want ***REMOVED***
+		if got != want {
 			t.Errorf("parsing %q: got %q, want %q", source, got, want)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

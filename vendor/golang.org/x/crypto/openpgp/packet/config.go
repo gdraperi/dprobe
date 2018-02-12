@@ -13,7 +13,7 @@ import (
 
 // Config collects a number of parameters along with sensible defaults.
 // A nil *Config is valid and results in all default values.
-type Config struct ***REMOVED***
+type Config struct {
 	// Rand provides the source of entropy.
 	// If nil, the crypto/rand Reader is used.
 	Rand io.Reader
@@ -46,46 +46,46 @@ type Config struct ***REMOVED***
 	// RSABits is the number of bits in new RSA keys made with NewEntity.
 	// If zero, then 2048 bit keys are created.
 	RSABits int
-***REMOVED***
+}
 
-func (c *Config) Random() io.Reader ***REMOVED***
-	if c == nil || c.Rand == nil ***REMOVED***
+func (c *Config) Random() io.Reader {
+	if c == nil || c.Rand == nil {
 		return rand.Reader
-	***REMOVED***
+	}
 	return c.Rand
-***REMOVED***
+}
 
-func (c *Config) Hash() crypto.Hash ***REMOVED***
-	if c == nil || uint(c.DefaultHash) == 0 ***REMOVED***
+func (c *Config) Hash() crypto.Hash {
+	if c == nil || uint(c.DefaultHash) == 0 {
 		return crypto.SHA256
-	***REMOVED***
+	}
 	return c.DefaultHash
-***REMOVED***
+}
 
-func (c *Config) Cipher() CipherFunction ***REMOVED***
-	if c == nil || uint8(c.DefaultCipher) == 0 ***REMOVED***
+func (c *Config) Cipher() CipherFunction {
+	if c == nil || uint8(c.DefaultCipher) == 0 {
 		return CipherAES128
-	***REMOVED***
+	}
 	return c.DefaultCipher
-***REMOVED***
+}
 
-func (c *Config) Now() time.Time ***REMOVED***
-	if c == nil || c.Time == nil ***REMOVED***
+func (c *Config) Now() time.Time {
+	if c == nil || c.Time == nil {
 		return time.Now()
-	***REMOVED***
+	}
 	return c.Time()
-***REMOVED***
+}
 
-func (c *Config) Compression() CompressionAlgo ***REMOVED***
-	if c == nil ***REMOVED***
+func (c *Config) Compression() CompressionAlgo {
+	if c == nil {
 		return CompressionNone
-	***REMOVED***
+	}
 	return c.DefaultCompressionAlgo
-***REMOVED***
+}
 
-func (c *Config) PasswordHashIterations() int ***REMOVED***
-	if c == nil || c.S2KCount == 0 ***REMOVED***
+func (c *Config) PasswordHashIterations() int {
+	if c == nil || c.S2KCount == 0 {
 		return 0
-	***REMOVED***
+	}
 	return c.S2KCount
-***REMOVED***
+}

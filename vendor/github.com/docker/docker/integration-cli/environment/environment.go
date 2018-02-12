@@ -13,38 +13,38 @@ var (
 	DefaultClientBinary = os.Getenv("TEST_CLIENT_BINARY")
 )
 
-func init() ***REMOVED***
-	if DefaultClientBinary == "" ***REMOVED***
+func init() {
+	if DefaultClientBinary == "" {
 		DefaultClientBinary = "docker"
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Execution contains information about the current test execution and daemon
 // under test
-type Execution struct ***REMOVED***
+type Execution struct {
 	environment.Execution
 	dockerBinary string
-***REMOVED***
+}
 
 // DockerBinary returns the docker binary for this testing environment
-func (e *Execution) DockerBinary() string ***REMOVED***
+func (e *Execution) DockerBinary() string {
 	return e.dockerBinary
-***REMOVED***
+}
 
 // New returns details about the testing environment
-func New() (*Execution, error) ***REMOVED***
+func New() (*Execution, error) {
 	env, err := environment.New()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	dockerBinary, err := exec.LookPath(DefaultClientBinary)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	return &Execution***REMOVED***
+	return &Execution{
 		Execution:    *env,
 		dockerBinary: dockerBinary,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}

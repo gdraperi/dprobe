@@ -17,8 +17,8 @@ const (
 	XFRM_PROTO_IPSEC_ANY Proto = syscall.IPPROTO_RAW
 )
 
-func (p Proto) String() string ***REMOVED***
-	switch p ***REMOVED***
+func (p Proto) String() string {
+	switch p {
 	case XFRM_PROTO_ROUTE2:
 		return "route2"
 	case XFRM_PROTO_ESP:
@@ -31,9 +31,9 @@ func (p Proto) String() string ***REMOVED***
 		return "comp"
 	case XFRM_PROTO_IPSEC_ANY:
 		return "ipsec-any"
-	***REMOVED***
+	}
 	return fmt.Sprintf("%d", p)
-***REMOVED***
+}
 
 // Mode is an enum representing an ipsec transport.
 type Mode uint8
@@ -47,8 +47,8 @@ const (
 	XFRM_MODE_MAX
 )
 
-func (m Mode) String() string ***REMOVED***
-	switch m ***REMOVED***
+func (m Mode) String() string {
+	switch m {
 	case XFRM_MODE_TRANSPORT:
 		return "transport"
 	case XFRM_MODE_TUNNEL:
@@ -59,16 +59,16 @@ func (m Mode) String() string ***REMOVED***
 		return "in_trigger"
 	case XFRM_MODE_BEET:
 		return "beet"
-	***REMOVED***
+	}
 	return fmt.Sprintf("%d", m)
-***REMOVED***
+}
 
 // XfrmMark represents the mark associated to the state or policy
-type XfrmMark struct ***REMOVED***
+type XfrmMark struct {
 	Value uint32
 	Mask  uint32
-***REMOVED***
+}
 
-func (m *XfrmMark) String() string ***REMOVED***
+func (m *XfrmMark) String() string {
 	return fmt.Sprintf("(0x%x,0x%x)", m.Value, m.Mask)
-***REMOVED***
+}

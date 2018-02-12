@@ -40,22 +40,22 @@ import (
 )
 
 // ConnTagInfo defines the relevant information needed by connection context tagger.
-type ConnTagInfo struct ***REMOVED***
+type ConnTagInfo struct {
 	// RemoteAddr is the remote address of the corresponding connection.
 	RemoteAddr net.Addr
 	// LocalAddr is the local address of the corresponding connection.
 	LocalAddr net.Addr
 	// TODO add QOS related fields.
-***REMOVED***
+}
 
 // RPCTagInfo defines the relevant information needed by RPC context tagger.
-type RPCTagInfo struct ***REMOVED***
+type RPCTagInfo struct {
 	// FullMethodName is the RPC method in the format of /package.service/method.
 	FullMethodName string
-***REMOVED***
+}
 
 // Handler defines the interface for the related stats handling (e.g., RPCs, connections).
-type Handler interface ***REMOVED***
+type Handler interface {
 	// TagRPC can attach some information to the given context.
 	// The returned context is used in the rest lifetime of the RPC.
 	TagRPC(context.Context, *RPCTagInfo) context.Context
@@ -73,4 +73,4 @@ type Handler interface ***REMOVED***
 	TagConn(context.Context, *ConnTagInfo) context.Context
 	// HandleConn processes the Conn stats.
 	HandleConn(context.Context, ConnStats)
-***REMOVED***
+}

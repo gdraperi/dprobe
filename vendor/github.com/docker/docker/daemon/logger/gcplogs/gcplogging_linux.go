@@ -14,16 +14,16 @@ import (
 // However, in static binary, os/user.Current() leads to segfault due to a glibc issue that won't be fixed
 // in a short term. (golang/go#13470, https://sourceware.org/bugzilla/show_bug.cgi?id=19341)
 // So we forcibly set HOME so as to avoid call to os/user/Current()
-func ensureHomeIfIAmStatic() error ***REMOVED***
+func ensureHomeIfIAmStatic() error {
 	// Note: dockerversion.IAmStatic and homedir.GetStatic() is only available for linux.
 	// So we need to use them in this gcplogging_linux.go rather than in gcplogging.go
-	if dockerversion.IAmStatic == "true" && os.Getenv("HOME") == "" ***REMOVED***
+	if dockerversion.IAmStatic == "true" && os.Getenv("HOME") == "" {
 		home, err := homedir.GetStatic()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		logrus.Warnf("gcplogs requires HOME to be set for static daemon binary. Forcibly setting HOME to %s.", home)
 		os.Setenv("HOME", home)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

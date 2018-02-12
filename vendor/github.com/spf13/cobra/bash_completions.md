@@ -12,10 +12,10 @@ import (
         "github.com/GoogleCloudPlatform/kubernetes/pkg/kubectl/cmd"
 )
 
-func main() ***REMOVED***
+func main() {
         kubectl := cmd.NewFactory(nil).NewKubectlCommand(os.Stdin, ioutil.Discard, ioutil.Discard)
         kubectl.GenBashCompletionFile("out.sh")
-***REMOVED***
+}
 ```
 
 `out.sh` will get you completions of subcommands and flags. Copy it to `/etc/bash_completion.d/` as described [here](https://debian-administration.org/article/316/An_introduction_to_bash_completion_part_1) and reset your terminal to use autocompletion. If you make additional annotations to your code, you can get even more intelligent and flexible behavior.
@@ -27,27 +27,27 @@ Some more actual code that works in kubernetes:
 ```bash
 const (
         bash_completion_func = `__kubectl_parse_get()
-***REMOVED***
+{
     local kubectl_output out
     if kubectl_output=$(kubectl get --no-headers "$1" 2>/dev/null); then
-        out=($(echo "$***REMOVED***kubectl_output***REMOVED***" | awk '***REMOVED***print $1***REMOVED***'))
-        COMPREPLY=( $( compgen -W "$***REMOVED***out[*]***REMOVED***" -- "$cur" ) )
+        out=($(echo "${kubectl_output}" | awk '{print $1}'))
+        COMPREPLY=( $( compgen -W "${out[*]}" -- "$cur" ) )
     fi
-***REMOVED***
+}
 
 __kubectl_get_resource()
-***REMOVED***
-    if [[ $***REMOVED***#nouns[@]***REMOVED*** -eq 0 ]]; then
+{
+    if [[ ${#nouns[@]} -eq 0 ]]; then
         return 1
     fi
-    __kubectl_parse_get $***REMOVED***nouns[$***REMOVED***#nouns[@]***REMOVED*** -1]***REMOVED***
+    __kubectl_parse_get ${nouns[${#nouns[@]} -1]}
     if [[ $? -eq 0 ]]; then
         return 0
     fi
-***REMOVED***
+}
 
-__custom_func() ***REMOVED***
-    case $***REMOVED***last_command***REMOVED*** in
+__custom_func() {
+    case ${last_command} in
         kubectl_get | kubectl_describe | kubectl_delete | kubectl_stop)
             __kubectl_get_resource
             return
@@ -55,14 +55,14 @@ __custom_func() ***REMOVED***
         *)
             ;;
     esac
-***REMOVED***
+}
 `)
 ```
 
 And then I set that in my command definition:
 
 ```go
-cmds := &cobra.Command***REMOVED***
+cmds := &cobra.Command{
 	Use:   "kubectl",
 	Short: "kubectl controls the Kubernetes cluster manager",
 	Long: `kubectl controls the Kubernetes cluster manager.
@@ -70,7 +70,7 @@ cmds := &cobra.Command***REMOVED***
 Find more information at https://github.com/GoogleCloudPlatform/kubernetes.`,
 	Run: runHelp,
 	BashCompletionFunction: bash_completion_func,
-***REMOVED***
+}
 ```
 
 The `BashCompletionFunction` option is really only valid/useful on the root command. Doing the above will cause `__custom_func()` to be called when the built in processor was unable to find a solution. In the case of kubernetes a valid command might look something like `kubectl get pod [mypod]`. If you type `kubectl get pod [tab][tab]` the `__customc_func()` will run because the cobra.Command only understood "kubectl" and "get." `__custom_func()` will see that the cobra.Command is "kubectl_get" and will thus call another helper `__kubectl_get_resource()`.  `__kubectl_get_resource` will look at the 'nouns' collected. In our example the only noun will be `pod`.  So it will call `__kubectl_parse_get pod`.  `__kubectl_parse_get` will actually call out to kubernetes and get any pods.  It will then set `COMPREPLY` to valid pods!
@@ -80,19 +80,19 @@ The `BashCompletionFunction` option is really only valid/useful on the root comm
 In the above example "pod" was assumed to already be typed. But if you want `kubectl get [tab][tab]` to show a list of valid "nouns" you have to set them. Simplified code from `kubectl get` looks like:
 
 ```go
-validArgs []string = ***REMOVED*** "pod", "node", "service", "replicationcontroller" ***REMOVED***
+validArgs []string = { "pod", "node", "service", "replicationcontroller" }
 
-cmd := &cobra.Command***REMOVED***
+cmd := &cobra.Command{
 	Use:     "get [(-o|--output=)json|yaml|template|...] (RESOURCE [NAME] | RESOURCE/NAME ...)",
 	Short:   "Display one or many resources",
 	Long:    get_long,
 	Example: get_example,
-	Run: func(cmd *cobra.Command, args []string) ***REMOVED***
+	Run: func(cmd *cobra.Command, args []string) {
 		err := RunGet(f, out, cmd, args)
 		util.CheckErr(err)
-	***REMOVED***,
+	},
 	ValidArgs: validArgs,
-***REMOVED***
+}
 ```
 
 Notice we put the "ValidArgs" on the "get" subcommand. Doing so will give results like
@@ -107,13 +107,13 @@ node                 pod                    replicationcontroller  service
 If your nouns have a number of aliases, you can define them alongside `ValidArgs` using `ArgAliases`:
 
 ```go
-argAliases []string = ***REMOVED*** "pods", "nodes", "services", "svc", "replicationcontrollers", "rc" ***REMOVED***
+argAliases []string = { "pods", "nodes", "services", "svc", "replicationcontrollers", "rc" }
 
-cmd := &cobra.Command***REMOVED***
+cmd := &cobra.Command{
     ...
 	ValidArgs:  validArgs,
 	ArgAliases: argAliases
-***REMOVED***
+}
 ```
 
 The aliases are not shown to the user on tab completion, but they are accepted as valid nouns by
@@ -148,18 +148,18 @@ and you'll get something like
 In this example we use --filename= and expect to get a json or yaml file as the argument. To make this easier we annotate the --filename flag with valid filename extensions.
 
 ```go
-	annotations := []string***REMOVED***"json", "yaml", "yml"***REMOVED***
+	annotations := []string{"json", "yaml", "yml"}
 	annotation := make(map[string][]string)
 	annotation[cobra.BashCompFilenameExt] = annotations
 
-	flag := &pflag.Flag***REMOVED***
+	flag := &pflag.Flag{
 		Name:        "filename",
 		Shorthand:   "f",
 		Usage:       usage,
 		Value:       value,
 		DefValue:    value.String(),
 		Annotations: annotation,
-	***REMOVED***
+	}
 	cmd.Flags().AddFlag(flag)
 ```
 
@@ -180,13 +180,13 @@ a custom flag completion function with cobra.BashCompCustom:
 
 ```go
 	annotation := make(map[string][]string)
-	annotation[cobra.BashCompFilenameExt] = []string***REMOVED***"__kubectl_get_namespaces"***REMOVED***
+	annotation[cobra.BashCompFilenameExt] = []string{"__kubectl_get_namespaces"}
 
-	flag := &pflag.Flag***REMOVED***
+	flag := &pflag.Flag{
 		Name:        "namespace",
 		Usage:       usage,
 		Annotations: annotation,
-	***REMOVED***
+	}
 	cmd.Flags().AddFlag(flag)
 ```
 
@@ -195,12 +195,12 @@ value, e.g.:
 
 ```bash
 __kubectl_get_namespaces()
-***REMOVED***
+{
     local template
-    template="***REMOVED******REMOVED*** range .items  ***REMOVED******REMOVED******REMOVED******REMOVED*** .metadata.name ***REMOVED******REMOVED*** ***REMOVED******REMOVED*** end ***REMOVED******REMOVED***"
+    template="{{ range .items  }}{{ .metadata.name }} {{ end }}"
     local kubectl_out
-    if kubectl_out=$(kubectl get -o template --template="$***REMOVED***template***REMOVED***" namespace 2>/dev/null); then
-        COMPREPLY=( $( compgen -W "$***REMOVED***kubectl_out***REMOVED***[*]" -- "$cur" ) )
+    if kubectl_out=$(kubectl get -o template --template="${template}" namespace 2>/dev/null); then
+        COMPREPLY=( $( compgen -W "${kubectl_out}[*]" -- "$cur" ) )
     fi
-***REMOVED***
+}
 ```

@@ -26,28 +26,28 @@ const (
 
 // messageHeader represents the fixed-length message header of 10 bytes sent
 // with every request.
-type messageHeader struct ***REMOVED***
+type messageHeader struct {
 	Length   uint32      // length excluding this header. b[:4]
 	StreamID uint32      // identifies which request stream message is a part of. b[4:8]
 	Type     messageType // message type b[8]
 	Flags    uint8       // reserved          b[9]
-***REMOVED***
+}
 
-func readMessageHeader(p []byte, r io.Reader) (messageHeader, error) ***REMOVED***
+func readMessageHeader(p []byte, r io.Reader) (messageHeader, error) {
 	_, err := io.ReadFull(r, p[:messageHeaderLength])
-	if err != nil ***REMOVED***
-		return messageHeader***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return messageHeader{}, err
+	}
 
-	return messageHeader***REMOVED***
+	return messageHeader{
 		Length:   binary.BigEndian.Uint32(p[:4]),
 		StreamID: binary.BigEndian.Uint32(p[4:8]),
 		Type:     messageType(p[8]),
 		Flags:    p[9],
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-func writeMessageHeader(w io.Writer, p []byte, mh messageHeader) error ***REMOVED***
+func writeMessageHeader(w io.Writer, p []byte, mh messageHeader) error {
 	binary.BigEndian.PutUint32(p[:4], mh.Length)
 	binary.BigEndian.PutUint32(p[4:8], mh.StreamID)
 	p[8] = byte(mh.Type)
@@ -55,23 +55,23 @@ func writeMessageHeader(w io.Writer, p []byte, mh messageHeader) error ***REMOVE
 
 	_, err := w.Write(p[:])
 	return err
-***REMOVED***
+}
 
 var buffers sync.Pool
 
-type channel struct ***REMOVED***
+type channel struct {
 	bw    *bufio.Writer
 	br    *bufio.Reader
 	hrbuf [messageHeaderLength]byte // avoid alloc when reading header
 	hwbuf [messageHeaderLength]byte
-***REMOVED***
+}
 
-func newChannel(w io.Writer, r io.Reader) *channel ***REMOVED***
-	return &channel***REMOVED***
+func newChannel(w io.Writer, r io.Reader) *channel {
+	return &channel{
 		bw: bufio.NewWriter(w),
 		br: bufio.NewReader(r),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // recv a message from the channel. The returned buffer contains the message.
 //
@@ -79,57 +79,57 @@ func newChannel(w io.Writer, r io.Reader) *channel ***REMOVED***
 // returned will be valid and caller should send that along to
 // the correct consumer. The bytes on the underlying channel
 // will be discarded.
-func (ch *channel) recv(ctx context.Context) (messageHeader, []byte, error) ***REMOVED***
+func (ch *channel) recv(ctx context.Context) (messageHeader, []byte, error) {
 	mh, err := readMessageHeader(ch.hrbuf[:], ch.br)
-	if err != nil ***REMOVED***
-		return messageHeader***REMOVED******REMOVED***, nil, err
-	***REMOVED***
+	if err != nil {
+		return messageHeader{}, nil, err
+	}
 
-	if mh.Length > uint32(messageLengthMax) ***REMOVED***
-		if _, err := ch.br.Discard(int(mh.Length)); err != nil ***REMOVED***
+	if mh.Length > uint32(messageLengthMax) {
+		if _, err := ch.br.Discard(int(mh.Length)); err != nil {
 			return mh, nil, errors.Wrapf(err, "failed to discard after receiving oversized message")
-		***REMOVED***
+		}
 
 		return mh, nil, status.Errorf(codes.ResourceExhausted, "message length %v exceed maximum message size of %v", mh.Length, messageLengthMax)
-	***REMOVED***
+	}
 
 	p := ch.getmbuf(int(mh.Length))
-	if _, err := io.ReadFull(ch.br, p); err != nil ***REMOVED***
-		return messageHeader***REMOVED******REMOVED***, nil, errors.Wrapf(err, "failed reading message")
-	***REMOVED***
+	if _, err := io.ReadFull(ch.br, p); err != nil {
+		return messageHeader{}, nil, errors.Wrapf(err, "failed reading message")
+	}
 
 	return mh, p, nil
-***REMOVED***
+}
 
-func (ch *channel) send(ctx context.Context, streamID uint32, t messageType, p []byte) error ***REMOVED***
-	if err := writeMessageHeader(ch.bw, ch.hwbuf[:], messageHeader***REMOVED***Length: uint32(len(p)), StreamID: streamID, Type: t***REMOVED***); err != nil ***REMOVED***
+func (ch *channel) send(ctx context.Context, streamID uint32, t messageType, p []byte) error {
+	if err := writeMessageHeader(ch.bw, ch.hwbuf[:], messageHeader{Length: uint32(len(p)), StreamID: streamID, Type: t}); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	_, err := ch.bw.Write(p)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	return ch.bw.Flush()
-***REMOVED***
+}
 
-func (ch *channel) getmbuf(size int) []byte ***REMOVED***
+func (ch *channel) getmbuf(size int) []byte {
 	// we can't use the standard New method on pool because we want to allocate
 	// based on size.
 	b, ok := buffers.Get().(*[]byte)
-	if !ok || cap(*b) < size ***REMOVED***
+	if !ok || cap(*b) < size {
 		// TODO(stevvooe): It may be better to allocate these in fixed length
 		// buckets to reduce fragmentation but its not clear that would help
 		// with performance. An ilogb approach or similar would work well.
 		bb := make([]byte, size)
 		b = &bb
-	***REMOVED*** else ***REMOVED***
+	} else {
 		*b = (*b)[:size]
-	***REMOVED***
+	}
 	return *b
-***REMOVED***
+}
 
-func (ch *channel) putmbuf(p []byte) ***REMOVED***
+func (ch *channel) putmbuf(p []byte) {
 	buffers.Put(&p)
-***REMOVED***
+}

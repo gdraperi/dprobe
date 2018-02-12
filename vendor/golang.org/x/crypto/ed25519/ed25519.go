@@ -40,38 +40,38 @@ type PublicKey []byte
 type PrivateKey []byte
 
 // Public returns the PublicKey corresponding to priv.
-func (priv PrivateKey) Public() crypto.PublicKey ***REMOVED***
+func (priv PrivateKey) Public() crypto.PublicKey {
 	publicKey := make([]byte, PublicKeySize)
 	copy(publicKey, priv[32:])
 	return PublicKey(publicKey)
-***REMOVED***
+}
 
 // Sign signs the given message with priv.
 // Ed25519 performs two passes over messages to be signed and therefore cannot
 // handle pre-hashed messages. Thus opts.HashFunc() must return zero to
 // indicate the message hasn't been hashed. This can be achieved by passing
 // crypto.Hash(0) as the value for opts.
-func (priv PrivateKey) Sign(rand io.Reader, message []byte, opts crypto.SignerOpts) (signature []byte, err error) ***REMOVED***
-	if opts.HashFunc() != crypto.Hash(0) ***REMOVED***
+func (priv PrivateKey) Sign(rand io.Reader, message []byte, opts crypto.SignerOpts) (signature []byte, err error) {
+	if opts.HashFunc() != crypto.Hash(0) {
 		return nil, errors.New("ed25519: cannot sign hashed message")
-	***REMOVED***
+	}
 
 	return Sign(priv, message), nil
-***REMOVED***
+}
 
 // GenerateKey generates a public/private key pair using entropy from rand.
 // If rand is nil, crypto/rand.Reader will be used.
-func GenerateKey(rand io.Reader) (publicKey PublicKey, privateKey PrivateKey, err error) ***REMOVED***
-	if rand == nil ***REMOVED***
+func GenerateKey(rand io.Reader) (publicKey PublicKey, privateKey PrivateKey, err error) {
+	if rand == nil {
 		rand = cryptorand.Reader
-	***REMOVED***
+	}
 
 	privateKey = make([]byte, PrivateKeySize)
 	publicKey = make([]byte, PublicKeySize)
 	_, err = io.ReadFull(rand, privateKey[:32])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 
 	digest := sha512.Sum512(privateKey[:32])
 	digest[0] &= 248
@@ -89,14 +89,14 @@ func GenerateKey(rand io.Reader) (publicKey PublicKey, privateKey PrivateKey, er
 	copy(publicKey, publicKeyBytes[:])
 
 	return publicKey, privateKey, nil
-***REMOVED***
+}
 
 // Sign signs the message with privateKey and returns a signature. It will
 // panic if len(privateKey) is not PrivateKeySize.
-func Sign(privateKey PrivateKey, message []byte) []byte ***REMOVED***
-	if l := len(privateKey); l != PrivateKeySize ***REMOVED***
+func Sign(privateKey PrivateKey, message []byte) []byte {
+	if l := len(privateKey); l != PrivateKeySize {
 		panic("ed25519: bad private key length: " + strconv.Itoa(l))
-	***REMOVED***
+	}
 
 	h := sha512.New()
 	h.Write(privateKey[:32])
@@ -138,25 +138,25 @@ func Sign(privateKey PrivateKey, message []byte) []byte ***REMOVED***
 	copy(signature[32:], s[:])
 
 	return signature
-***REMOVED***
+}
 
 // Verify reports whether sig is a valid signature of message by publicKey. It
 // will panic if len(publicKey) is not PublicKeySize.
-func Verify(publicKey PublicKey, message, sig []byte) bool ***REMOVED***
-	if l := len(publicKey); l != PublicKeySize ***REMOVED***
+func Verify(publicKey PublicKey, message, sig []byte) bool {
+	if l := len(publicKey); l != PublicKeySize {
 		panic("ed25519: bad public key length: " + strconv.Itoa(l))
-	***REMOVED***
+	}
 
-	if len(sig) != SignatureSize || sig[63]&224 != 0 ***REMOVED***
+	if len(sig) != SignatureSize || sig[63]&224 != 0 {
 		return false
-	***REMOVED***
+	}
 
 	var A edwards25519.ExtendedGroupElement
 	var publicKeyBytes [32]byte
 	copy(publicKeyBytes[:], publicKey)
-	if !A.FromBytes(&publicKeyBytes) ***REMOVED***
+	if !A.FromBytes(&publicKeyBytes) {
 		return false
-	***REMOVED***
+	}
 	edwards25519.FeNeg(&A.X, &A.X)
 	edwards25519.FeNeg(&A.T, &A.T)
 
@@ -178,4 +178,4 @@ func Verify(publicKey PublicKey, message, sig []byte) bool ***REMOVED***
 	var checkR [32]byte
 	R.ToBytes(&checkR)
 	return bytes.Equal(sig[:32], checkR[:])
-***REMOVED***
+}

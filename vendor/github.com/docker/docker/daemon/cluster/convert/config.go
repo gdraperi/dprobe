@@ -7,14 +7,14 @@ import (
 )
 
 // ConfigFromGRPC converts a grpc Config to a Config.
-func ConfigFromGRPC(s *swarmapi.Config) swarmtypes.Config ***REMOVED***
-	config := swarmtypes.Config***REMOVED***
+func ConfigFromGRPC(s *swarmapi.Config) swarmtypes.Config {
+	config := swarmtypes.Config{
 		ID: s.ID,
-		Spec: swarmtypes.ConfigSpec***REMOVED***
+		Spec: swarmtypes.ConfigSpec{
 			Annotations: annotationsFromGRPC(s.Spec.Annotations),
 			Data:        s.Spec.Data,
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
 	config.Version.Index = s.Meta.Version.Index
 	// Meta
@@ -22,40 +22,40 @@ func ConfigFromGRPC(s *swarmapi.Config) swarmtypes.Config ***REMOVED***
 	config.UpdatedAt, _ = gogotypes.TimestampFromProto(s.Meta.UpdatedAt)
 
 	return config
-***REMOVED***
+}
 
 // ConfigSpecToGRPC converts Config to a grpc Config.
-func ConfigSpecToGRPC(s swarmtypes.ConfigSpec) swarmapi.ConfigSpec ***REMOVED***
-	return swarmapi.ConfigSpec***REMOVED***
-		Annotations: swarmapi.Annotations***REMOVED***
+func ConfigSpecToGRPC(s swarmtypes.ConfigSpec) swarmapi.ConfigSpec {
+	return swarmapi.ConfigSpec{
+		Annotations: swarmapi.Annotations{
 			Name:   s.Name,
 			Labels: s.Labels,
-		***REMOVED***,
+		},
 		Data: s.Data,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // ConfigReferencesFromGRPC converts a slice of grpc ConfigReference to ConfigReference
-func ConfigReferencesFromGRPC(s []*swarmapi.ConfigReference) []*swarmtypes.ConfigReference ***REMOVED***
-	refs := []*swarmtypes.ConfigReference***REMOVED******REMOVED***
+func ConfigReferencesFromGRPC(s []*swarmapi.ConfigReference) []*swarmtypes.ConfigReference {
+	refs := []*swarmtypes.ConfigReference{}
 
-	for _, r := range s ***REMOVED***
-		ref := &swarmtypes.ConfigReference***REMOVED***
+	for _, r := range s {
+		ref := &swarmtypes.ConfigReference{
 			ConfigID:   r.ConfigID,
 			ConfigName: r.ConfigName,
-		***REMOVED***
+		}
 
-		if t, ok := r.Target.(*swarmapi.ConfigReference_File); ok ***REMOVED***
-			ref.File = &swarmtypes.ConfigReferenceFileTarget***REMOVED***
+		if t, ok := r.Target.(*swarmapi.ConfigReference_File); ok {
+			ref.File = &swarmtypes.ConfigReferenceFileTarget{
 				Name: t.File.Name,
 				UID:  t.File.UID,
 				GID:  t.File.GID,
 				Mode: t.File.Mode,
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		refs = append(refs, ref)
-	***REMOVED***
+	}
 
 	return refs
-***REMOVED***
+}

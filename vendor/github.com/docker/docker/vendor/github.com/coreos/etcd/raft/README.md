@@ -11,7 +11,7 @@ Most Raft implementations have a monolithic design, including storage handling, 
 
 To keep the codebase small as well as provide flexibility, the library only implements the Raft algorithm; both network and disk IO are left to the user. Library users must implement their own transportation layer for message passing between Raft peers over the wire. Similarly, users must implement their own storage layer to persist the Raft log and state.
 
-In order to easily test the Raft library, its behavior should be deterministic. To achieve this determinism, the library models Raft as a state machine.  The state machine takes a `Message` as input. A message can either be a local timer update or a network message sent from a remote peer. The state machine's output is a 3-tuple `***REMOVED***[]Messages, []LogEntries, NextState***REMOVED***` consisting of an array of `Messages`, `log entries`, and `Raft state changes`. For state machines with the same state, the same state machine input should always generate the same state machine output.
+In order to easily test the Raft library, its behavior should be deterministic. To achieve this determinism, the library models Raft as a state machine.  The state machine takes a `Message` as input. A message can either be a local timer update or a network message sent from a remote peer. The state machine's output is a 3-tuple `{[]Messages, []LogEntries, NextState}` consisting of an array of `Messages`, `log entries`, and `Raft state changes`. For state machines with the same state, the same state machine input should always generate the same state machine output.
 
 A simple example application, _raftexample_, is also available to help illustrate how to use this package in practice: https://github.com/coreos/etcd/tree/master/contrib/raftexample
 
@@ -58,24 +58,24 @@ The primary object in raft is a Node. Either start a Node from scratch using raf
 To start a three-node cluster
 ```go
   storage := raft.NewMemoryStorage()
-  c := &Config***REMOVED***
+  c := &Config{
     ID:              0x01,
     ElectionTick:    10,
     HeartbeatTick:   1,
     Storage:         storage,
     MaxSizePerMsg:   4096,
     MaxInflightMsgs: 256,
-  ***REMOVED***
+  }
   // Set peer list to the other nodes in the cluster.
   // Note that they need to be started separately as well.
-  n := raft.StartNode(c, []raft.Peer***REMOVED******REMOVED***ID: 0x02***REMOVED***, ***REMOVED***ID: 0x03***REMOVED******REMOVED***)
+  n := raft.StartNode(c, []raft.Peer{{ID: 0x02}, {ID: 0x03}})
 ```
 
 Start a single node cluster, like so:
 ```go
   // Create storage and config as shown above.
   // Set peer list to itself, so this node can become the leader of this single-node cluster.
-  peers := []raft.Peer***REMOVED******REMOVED***ID: 0x01***REMOVED******REMOVED***
+  peers := []raft.Peer{{ID: 0x01}}
   n := raft.StartNode(c, peers)
 ```
 
@@ -94,14 +94,14 @@ To restart a node from previous state:
   storage.SetHardState(state)
   storage.Append(entries)
 
-  c := &Config***REMOVED***
+  c := &Config{
     ID:              0x01,
     ElectionTick:    10,
     HeartbeatTick:   1,
     Storage:         storage,
     MaxSizePerMsg:   4096,
     MaxInflightMsgs: 256,
-  ***REMOVED***
+  }
 
   // Restart raft without peer information.
   // Peer information is already included in the storage.
@@ -125,9 +125,9 @@ Second, all persisted log entries must be made available via an implementation o
 Third, after receiving a message from another node, pass it to Node.Step:
 
 ```go
-	func recvRaftRPC(ctx context.Context, m raftpb.Message) ***REMOVED***
+	func recvRaftRPC(ctx context.Context, m raftpb.Message) {
 		n.Step(ctx, m)
-	***REMOVED***
+	}
 ```
 
 Finally, call `Node.Tick()` at regular intervals (probably via a `time.Ticker`). Raft has two important timeouts: heartbeat and the election timeout. However, internally to the raft package time is represented by an abstract "tick".
@@ -135,29 +135,29 @@ Finally, call `Node.Tick()` at regular intervals (probably via a `time.Ticker`).
 The total state machine handling loop will look something like this:
 
 ```go
-  for ***REMOVED***
-    select ***REMOVED***
+  for {
+    select {
     case <-s.Ticker:
       n.Tick()
     case rd := <-s.Node.Ready():
       saveToStorage(rd.State, rd.Entries, rd.Snapshot)
       send(rd.Messages)
-      if !raft.IsEmptySnap(rd.Snapshot) ***REMOVED***
+      if !raft.IsEmptySnap(rd.Snapshot) {
         processSnapshot(rd.Snapshot)
-  ***REMOVED***
-      for _, entry := range rd.CommittedEntries ***REMOVED***
+      }
+      for _, entry := range rd.CommittedEntries {
         process(entry)
-        if entry.Type == raftpb.EntryConfChange ***REMOVED***
+        if entry.Type == raftpb.EntryConfChange {
           var cc raftpb.ConfChange
           cc.Unmarshal(entry.Data)
           s.Node.ApplyConfChange(cc)
-    ***REMOVED***
-  ***REMOVED***
+        }
+      }
       s.Node.Advance()
     case <-s.done:
       return
-***REMOVED***
-  ***REMOVED***
+    }
+  }
 ```
 
 To propose changes to the state machine from the node to take application data, serialize it into a byte slice and call:

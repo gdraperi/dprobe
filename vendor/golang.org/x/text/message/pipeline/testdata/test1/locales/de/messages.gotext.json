@@ -1,123 +1,123 @@
-***REMOVED***
+{
     "language": "de",
     "messages": [
-        ***REMOVED***
+        {
             "id": "Hello world!",
             "key": "Hello world!\n",
             "message": "Hello world!",
             "translation": "Hallo Welt!"
-    ***REMOVED***,
-        ***REMOVED***
-            "id": "Hello ***REMOVED***City***REMOVED***!",
+        },
+        {
+            "id": "Hello {City}!",
             "key": "Hello %s!\n",
-            "message": "Hello ***REMOVED***City***REMOVED***!",
-            "translation": "Hallo ***REMOVED***City***REMOVED***!",
+            "message": "Hello {City}!",
+            "translation": "Hallo {City}!",
             "placeholders": [
-                ***REMOVED***
+                {
                     "id": "City",
                     "string": "%[1]s"
-            ***REMOVED***
+                }
             ]
-    ***REMOVED***,
-        ***REMOVED***
-            "id": "***REMOVED***Person***REMOVED*** is visiting ***REMOVED***Place***REMOVED***!",
+        },
+        {
+            "id": "{Person} is visiting {Place}!",
             "key": "%s is visiting %s!\n",
-            "message": "***REMOVED***Person***REMOVED*** is visiting ***REMOVED***Place***REMOVED***!",
-            "translation": "***REMOVED***Person***REMOVED*** besucht ***REMOVED***Place***REMOVED***!",
+            "message": "{Person} is visiting {Place}!",
+            "translation": "{Person} besucht {Place}!",
             "placeholders": [
-                ***REMOVED***
+                {
                     "id": "Person",
                     "string": "%[1]s"
-            ***REMOVED***,
-                ***REMOVED***
+                },
+                {
                     "id": "Place",
                     "string": "%[2]s"
-            ***REMOVED***
+                }
             ]
-    ***REMOVED***,
-        ***REMOVED***
-            "id": "***REMOVED***Person***REMOVED*** is visiting ***REMOVED***Place***REMOVED***!",
+        },
+        {
+            "id": "{Person} is visiting {Place}!",
             "key": "%[1]s is visiting %[3]s!\n",
-            "message": "***REMOVED***Person***REMOVED*** is visiting ***REMOVED***Place***REMOVED***!",
-            "translation": "***REMOVED***Person***REMOVED*** besucht ***REMOVED***Place***REMOVED***!",
+            "message": "{Person} is visiting {Place}!",
+            "translation": "{Person} besucht {Place}!",
             "placeholders": [
-                ***REMOVED***
+                {
                     "id": "Person",
                     "string": "%[1]s"
-            ***REMOVED***,
-                ***REMOVED***
+                },
+                {
                     "id": "Place",
                     "string": "%[3]s"
-            ***REMOVED***,
-                ***REMOVED***
+                },
+                {
                     "id": "Extra",
                     "string": "%[2]v"
-            ***REMOVED***
+                }
             ]
-    ***REMOVED***,
-        ***REMOVED***
-            "id": "***REMOVED***2***REMOVED*** files remaining!",
+        },
+        {
+            "id": "{2} files remaining!",
             "key": "%d files remaining!",
-            "message": "***REMOVED***N***REMOVED*** files remaining!",
+            "message": "{N} files remaining!",
             "translation": "Noch zwei Bestände zu gehen!",
             "placeholders": [
-                ***REMOVED***
+                {
                     "id": "2",
                     "string": "%[1]d"
-            ***REMOVED***
+                }
             ]
-    ***REMOVED***,
-        ***REMOVED***
-            "id": "***REMOVED***N***REMOVED*** more files remaining!",
+        },
+        {
+            "id": "{N} more files remaining!",
             "key": "%d more files remaining!",
-            "message": "***REMOVED***N***REMOVED*** more files remaining!",
-            "translation": "Noch ***REMOVED***N***REMOVED*** Bestände zu gehen!",
+            "message": "{N} more files remaining!",
+            "translation": "Noch {N} Bestände zu gehen!",
             "placeholders": [
-                ***REMOVED***
+                {
                     "id": "N",
                     "string": "%[1]d"
-            ***REMOVED***
+                }
             ]
-    ***REMOVED***,
-        ***REMOVED***
-            "id": "Use the following code for your discount: ***REMOVED***ReferralCode***REMOVED***",
+        },
+        {
+            "id": "Use the following code for your discount: {ReferralCode}",
             "key": "Use the following code for your discount: %d\n",
-            "message": "Use the following code for your discount: ***REMOVED***ReferralCode***REMOVED***",
+            "message": "Use the following code for your discount: {ReferralCode}",
             "translation": "",
             "placeholders": [
-                ***REMOVED***
+                {
                     "id": "ReferralCode",
                     "string": "%[1]d"
-            ***REMOVED***
+                }
             ]
-    ***REMOVED***,
-        ***REMOVED***
-            "id": [ "msgOutOfOrder", "***REMOVED***Device***REMOVED*** is out of order!" ],
+        },
+        {
+            "id": [ "msgOutOfOrder", "{Device} is out of order!" ],
             "key": "%s is out of order!",
-            "message": "***REMOVED***Device***REMOVED*** is out of order!",
+            "message": "{Device} is out of order!",
             "translation": "",
             "placeholders": [
-                ***REMOVED***
+                {
                     "id": "Device",
                     "string": "%[1]s"
-            ***REMOVED***
+                }
             ]
-    ***REMOVED***,
-        ***REMOVED***
-            "id": "***REMOVED***Miles***REMOVED*** miles traveled (***REMOVED***Miles_1***REMOVED***)",
+        },
+        {
+            "id": "{Miles} miles traveled ({Miles_1})",
             "key": "%.2[1]f miles traveled (%[1]f)",
-            "message": "***REMOVED***Miles***REMOVED*** miles traveled (***REMOVED***Miles_1***REMOVED***)",
+            "message": "{Miles} miles traveled ({Miles_1})",
             "translation": "",
             "placeholders": [
-                ***REMOVED***
+                {
                     "id": "Miles",
                     "string": "%.2[1]f"
-            ***REMOVED***,
-                ***REMOVED***
+                },
+                {
                     "id": "Miles_1",
                     "string": "%[1]f"
-            ***REMOVED***
+                }
             ]
-    ***REMOVED***
+        }
     ]
-***REMOVED***
+}

@@ -1,11 +1,11 @@
 package main
 
-func main() ***REMOVED***
+func main() {
 	var c chan int
-	select ***REMOVED***
+	select {
 	case c := <-c:
 		_ = c
 		
 	default:
-	***REMOVED***
-***REMOVED***
+	}
+}

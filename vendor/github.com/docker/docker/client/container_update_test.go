@@ -13,46 +13,46 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestContainerUpdateError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestContainerUpdateError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
-	***REMOVED***
-	_, err := client.ContainerUpdate(context.Background(), "nothing", container.UpdateConfig***REMOVED******REMOVED***)
-	if err == nil || err.Error() != "Error response from daemon: Server error" ***REMOVED***
+	}
+	_, err := client.ContainerUpdate(context.Background(), "nothing", container.UpdateConfig{})
+	if err == nil || err.Error() != "Error response from daemon: Server error" {
 		t.Fatalf("expected a Server Error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestContainerUpdate(t *testing.T) ***REMOVED***
+func TestContainerUpdate(t *testing.T) {
 	expectedURL := "/containers/container_id/update"
 
-	client := &Client***REMOVED***
-		client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-			if !strings.HasPrefix(req.URL.Path, expectedURL) ***REMOVED***
+	client := &Client{
+		client: newMockClient(func(req *http.Request) (*http.Response, error) {
+			if !strings.HasPrefix(req.URL.Path, expectedURL) {
 				return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, req.URL)
-			***REMOVED***
+			}
 
-			b, err := json.Marshal(container.ContainerUpdateOKBody***REMOVED******REMOVED***)
-			if err != nil ***REMOVED***
+			b, err := json.Marshal(container.ContainerUpdateOKBody{})
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 
-			return &http.Response***REMOVED***
+			return &http.Response{
 				StatusCode: http.StatusOK,
 				Body:       ioutil.NopCloser(bytes.NewReader(b)),
-			***REMOVED***, nil
-		***REMOVED***),
-	***REMOVED***
+			}, nil
+		}),
+	}
 
-	_, err := client.ContainerUpdate(context.Background(), "container_id", container.UpdateConfig***REMOVED***
-		Resources: container.Resources***REMOVED***
+	_, err := client.ContainerUpdate(context.Background(), "container_id", container.UpdateConfig{
+		Resources: container.Resources{
 			CPUPeriod: 1,
-		***REMOVED***,
-		RestartPolicy: container.RestartPolicy***REMOVED***
+		},
+		RestartPolicy: container.RestartPolicy{
 			Name: "always",
-		***REMOVED***,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+		},
+	})
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}

@@ -13,10 +13,10 @@ func poly1305(out *[16]byte, m *byte, mlen uint64, key *[32]byte)
 // Sum generates an authenticator for m using a one-time key and puts the
 // 16-byte result into out. Authenticating two different messages with the same
 // key allows an attacker to forge messages at will.
-func Sum(out *[16]byte, m []byte, key *[32]byte) ***REMOVED***
+func Sum(out *[16]byte, m []byte, key *[32]byte) {
 	var mPtr *byte
-	if len(m) > 0 ***REMOVED***
+	if len(m) > 0 {
 		mPtr = &m[0]
-	***REMOVED***
+	}
 	poly1305(out, mPtr, uint64(len(m)), key)
-***REMOVED***
+}

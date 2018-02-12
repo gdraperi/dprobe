@@ -7,16 +7,16 @@ import "google/protobuf/timestamp.proto";
 import "github.com/docker/swarmkit/protobuf/plugin/plugin.proto";
 
 // LogStream defines the stream from which the log message came.
-enum LogStream ***REMOVED***
+enum LogStream {
 	option (gogoproto.goproto_enum_prefix) = false;
 	option (gogoproto.enum_customname) = "LogStream";
 
 	LOG_STREAM_UNKNOWN = 0 [(gogoproto.enumvalue_customname) = "LogStreamUnknown"];
 	LOG_STREAM_STDOUT = 1 [(gogoproto.enumvalue_customname) = "LogStreamStdout"];
 	LOG_STREAM_STDERR = 2 [(gogoproto.enumvalue_customname) = "LogStreamStderr"];
-***REMOVED***
+}
 
-message LogSubscriptionOptions ***REMOVED***
+message LogSubscriptionOptions {
 	// Streams defines which log streams should be sent from the task source.
 	// Empty means send all the messages.
 	repeated LogStream streams = 1 [packed=false];
@@ -46,34 +46,34 @@ message LogSubscriptionOptions ***REMOVED***
 	// should be sent.
 	// Note: can't use stdtime because this field is nullable.
 	google.protobuf.Timestamp since = 4;
-***REMOVED***
+}
 
 // LogSelector will match logs from ANY of the defined parameters.
 //
 // For the best effect, the client should use the least specific parameter
 // possible. For example, if they want to listen to all the tasks of a service,
 // they should use the service id, rather than specifying the individual tasks.
-message LogSelector ***REMOVED***
+message LogSelector {
 	repeated string service_ids = 1;
 	repeated string node_ids = 2;
 	repeated string task_ids = 3;
-***REMOVED***
+}
 
 // LogContext marks the context from which a log message was generated.
-message LogContext ***REMOVED***
+message LogContext {
 	string service_id = 1;
 	string node_id = 2;
 	string task_id = 3;
-***REMOVED***
+}
 
 // LogAttr is an extra key/value pair that may be have been set by users
-message LogAttr ***REMOVED***
+message LogAttr {
 	string key = 1;
 	string value = 2;
-***REMOVED***
+}
 
 // LogMessage
-message LogMessage ***REMOVED***
+message LogMessage {
 	// Context identifies the source of the log message.
 	LogContext context = 1 [(gogoproto.nullable) = false];
 
@@ -90,31 +90,31 @@ message LogMessage ***REMOVED***
 	// Attrs is a list of key value pairs representing additional log details
 	// that may have been returned from the logger
 	repeated LogAttr attrs = 5 [(gogoproto.nullable) = false];
-***REMOVED***
+}
 
 // Logs defines the methods for retrieving task logs messages from a cluster.
-service Logs ***REMOVED***
+service Logs {
 	// SubscribeLogs starts a subscription with the specified selector and options.
 	//
 	// The subscription will be distributed to relevant nodes and messages will
 	// be collected and sent via the returned stream.
 	//
 	// The subscription will end with an EOF.
-	rpc SubscribeLogs(SubscribeLogsRequest) returns (stream SubscribeLogsMessage) ***REMOVED***
-		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED*** roles: "swarm-manager" ***REMOVED***;
-	***REMOVED***
-***REMOVED***
+	rpc SubscribeLogs(SubscribeLogsRequest) returns (stream SubscribeLogsMessage) {
+		option (docker.protobuf.plugin.tls_authorization) = { roles: "swarm-manager" };
+	}
+}
 
-message SubscribeLogsRequest ***REMOVED***
+message SubscribeLogsRequest {
 	// LogSelector describes the logs to which the subscriber is
 	LogSelector selector = 1;
 
 	LogSubscriptionOptions options = 2;
-***REMOVED***
+}
 
-message SubscribeLogsMessage ***REMOVED***
+message SubscribeLogsMessage {
 	repeated LogMessage messages = 1 [(gogoproto.nullable) = false];
-***REMOVED***
+}
 
 // LogBroker defines the API used by the worker to send task logs back to a
 // manager. A client listens for subscriptions then optimistically retrieves
@@ -124,38 +124,38 @@ message SubscribeLogsMessage ***REMOVED***
 // The structure of ListenSubscriptions is similar to the Dispatcher API but
 // decoupled to allow log distribution to work outside of the regular task
 // flow.
-service LogBroker ***REMOVED***
+service LogBroker {
 	// ListenSubscriptions starts a subscription stream for the node. For each
 	// message received, the node should attempt to satisfy the subscription.
 	//
 	// Log messages that match the provided subscription should be sent via
 	// PublishLogs.
-	rpc ListenSubscriptions(ListenSubscriptionsRequest) returns (stream SubscriptionMessage) ***REMOVED***
-		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED***
+	rpc ListenSubscriptions(ListenSubscriptionsRequest) returns (stream SubscriptionMessage) {
+		option (docker.protobuf.plugin.tls_authorization) = {
 			roles: "swarm-worker"
 			roles: "swarm-manager"
-		***REMOVED***;
-	***REMOVED***
+		};
+	}
 
 	// PublishLogs receives sets of log messages destined for a single
 	// subscription identifier.
-	rpc PublishLogs(stream PublishLogsMessage) returns (PublishLogsResponse) ***REMOVED***
-		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED***
+	rpc PublishLogs(stream PublishLogsMessage) returns (PublishLogsResponse) {
+		option (docker.protobuf.plugin.tls_authorization) = {
 			roles: "swarm-worker"
 			roles: "swarm-manager"
-		***REMOVED***;
-	***REMOVED***
-***REMOVED***
+		};
+	}
+}
 
 // ListenSubscriptionsRequest is a placeholder to begin listening for
 // subscriptions.
-message ListenSubscriptionsRequest ***REMOVED*** ***REMOVED***
+message ListenSubscriptionsRequest { }
 
 // SubscriptionMessage instructs the listener to start publishing messages for
 // the stream or end a subscription.
 //
 // If Options.Follow == false, the worker should end the subscription on its own.
-message SubscriptionMessage ***REMOVED***
+message SubscriptionMessage {
 	// ID identifies the subscription.
 	string id = 1;
 
@@ -168,9 +168,9 @@ message SubscriptionMessage ***REMOVED***
 	// Close will be true if the node should shutdown the subscription with the
 	// provided identifier.
 	bool close = 4;
-***REMOVED***
+}
 
-message PublishLogsMessage ***REMOVED***
+message PublishLogsMessage {
 	// SubscriptionID identifies which subscription the set of messages should
 	// be sent to. We can think of this as a "mail box" for the subscription.
 	string subscription_id = 1;
@@ -183,6 +183,6 @@ message PublishLogsMessage ***REMOVED***
 	// Any further logs from this subscription are an error condition. Any
 	// messages included when close is set can be discarded
 	bool close = 3;
-***REMOVED***
+}
 
-message PublishLogsResponse ***REMOVED*** ***REMOVED***
+message PublishLogsResponse { }

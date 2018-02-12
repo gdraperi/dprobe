@@ -13,102 +13,102 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const sampleImageJSON = `***REMOVED***
+const sampleImageJSON = `{
 	"architecture": "amd64",
 	"os": "linux",
-	"config": ***REMOVED******REMOVED***,
-	"rootfs": ***REMOVED***
+	"config": {},
+	"rootfs": {
 		"type": "layers",
 		"diff_ids": []
-	***REMOVED***
-***REMOVED***`
+	}
+}`
 
-func TestNewFromJSON(t *testing.T) ***REMOVED***
+func TestNewFromJSON(t *testing.T) {
 	img, err := NewFromJSON([]byte(sampleImageJSON))
 	require.NoError(t, err)
 	assert.Equal(t, sampleImageJSON, string(img.RawJSON()))
-***REMOVED***
+}
 
-func TestNewFromJSONWithInvalidJSON(t *testing.T) ***REMOVED***
-	_, err := NewFromJSON([]byte("***REMOVED******REMOVED***"))
+func TestNewFromJSONWithInvalidJSON(t *testing.T) {
+	_, err := NewFromJSON([]byte("{}"))
 	assert.EqualError(t, err, "invalid image JSON, no RootFS key")
-***REMOVED***
+}
 
-func TestMarshalKeyOrder(t *testing.T) ***REMOVED***
-	b, err := json.Marshal(&Image***REMOVED***
-		V1Image: V1Image***REMOVED***
+func TestMarshalKeyOrder(t *testing.T) {
+	b, err := json.Marshal(&Image{
+		V1Image: V1Image{
 			Comment:      "a",
 			Author:       "b",
 			Architecture: "c",
-		***REMOVED***,
-	***REMOVED***)
+		},
+	})
 	assert.NoError(t, err)
 
-	expectedOrder := []string***REMOVED***"architecture", "author", "comment"***REMOVED***
+	expectedOrder := []string{"architecture", "author", "comment"}
 	var indexes []int
-	for _, k := range expectedOrder ***REMOVED***
+	for _, k := range expectedOrder {
 		indexes = append(indexes, strings.Index(string(b), k))
-	***REMOVED***
+	}
 
-	if !sort.IntsAreSorted(indexes) ***REMOVED***
+	if !sort.IntsAreSorted(indexes) {
 		t.Fatal("invalid key order in JSON: ", string(b))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestImage(t *testing.T) ***REMOVED***
+func TestImage(t *testing.T) {
 	cid := "50a16564e727"
-	config := &container.Config***REMOVED***
+	config := &container.Config{
 		Hostname:   "hostname",
 		Domainname: "domain",
 		User:       "root",
-	***REMOVED***
+	}
 	os := runtime.GOOS
 
-	img := &Image***REMOVED***
-		V1Image: V1Image***REMOVED***
+	img := &Image{
+		V1Image: V1Image{
 			Config: config,
-		***REMOVED***,
+		},
 		computedID: ID(cid),
-	***REMOVED***
+	}
 
 	assert.Equal(t, cid, img.ImageID())
 	assert.Equal(t, cid, img.ID().String())
 	assert.Equal(t, os, img.OperatingSystem())
 	assert.Equal(t, config, img.RunConfig())
-***REMOVED***
+}
 
-func TestImageOSNotEmpty(t *testing.T) ***REMOVED***
+func TestImageOSNotEmpty(t *testing.T) {
 	os := "os"
-	img := &Image***REMOVED***
-		V1Image: V1Image***REMOVED***
+	img := &Image{
+		V1Image: V1Image{
 			OS: os,
-		***REMOVED***,
+		},
 		OSVersion: "osversion",
-	***REMOVED***
+	}
 	assert.Equal(t, os, img.OperatingSystem())
-***REMOVED***
+}
 
-func TestNewChildImageFromImageWithRootFS(t *testing.T) ***REMOVED***
+func TestNewChildImageFromImageWithRootFS(t *testing.T) {
 	rootFS := NewRootFS()
 	rootFS.Append(layer.DiffID("ba5e"))
-	parent := &Image***REMOVED***
+	parent := &Image{
 		RootFS: rootFS,
-		History: []History***REMOVED***
+		History: []History{
 			NewHistory("a", "c", "r", false),
-		***REMOVED***,
-	***REMOVED***
-	childConfig := ChildConfig***REMOVED***
+		},
+	}
+	childConfig := ChildConfig{
 		DiffID:  layer.DiffID("abcdef"),
 		Author:  "author",
 		Comment: "comment",
-		ContainerConfig: &container.Config***REMOVED***
-			Cmd: []string***REMOVED***"echo", "foo"***REMOVED***,
-		***REMOVED***,
-		Config: &container.Config***REMOVED******REMOVED***,
-	***REMOVED***
+		ContainerConfig: &container.Config{
+			Cmd: []string{"echo", "foo"},
+		},
+		Config: &container.Config{},
+	}
 
 	newImage := NewChildImage(parent, childConfig, "platform")
-	expectedDiffIDs := []layer.DiffID***REMOVED***layer.DiffID("ba5e"), layer.DiffID("abcdef")***REMOVED***
+	expectedDiffIDs := []layer.DiffID{layer.DiffID("ba5e"), layer.DiffID("abcdef")}
 	assert.Equal(t, expectedDiffIDs, newImage.RootFS.DiffIDs)
 	assert.Equal(t, childConfig.Author, newImage.Author)
 	assert.Equal(t, childConfig.Config, newImage.Config)
@@ -121,4 +121,4 @@ func TestNewChildImageFromImageWithRootFS(t *testing.T) ***REMOVED***
 
 	// RootFS should be copied not mutated
 	assert.NotEqual(t, parent.RootFS.DiffIDs, newImage.RootFS.DiffIDs)
-***REMOVED***
+}

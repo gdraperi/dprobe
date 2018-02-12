@@ -15,11 +15,11 @@ if ! command -v jq &> /dev/null; then
 	exit 1
 fi
 
-usage() ***REMOVED***
+usage() {
 	echo "usage: $0 dir image[:tag][@digest] ..."
 	echo "       $0 /tmp/old-hello-world hello-world:latest@sha256:8be990ef2aeb16dbcb9271ddfe2610fa6658d13f6dfb8bc72074cc1ca36966a7"
 	[ -z "$1" ] || exit "$1"
-***REMOVED***
+}
 
 dir="$1" # dir for building tar in
 shift || usage 1 >&2
@@ -37,7 +37,7 @@ doNotGenerateManifestJson=
 # bash v4 on Windows CI requires CRLF separator
 newlineIFS=$'\n'
 if [ "$(go env GOHOSTOS)" = 'windows' ]; then
-	major=$(echo $***REMOVED***BASH_VERSION%%[^0.9]***REMOVED*** | cut -d. -f1)
+	major=$(echo ${BASH_VERSION%%[^0.9]} | cut -d. -f1)
 	if [ "$major" -ge 4 ]; then
 		newlineIFS=$'\r\n'
 	fi
@@ -48,7 +48,7 @@ authBase='https://auth.docker.io'
 authService='registry.docker.io'
 
 # https://github.com/moby/moby/issues/33700
-fetch_blob() ***REMOVED***
+fetch_blob() {
 	local token="$1"; shift
 	local image="$1"; shift
 	local digest="$1"; shift
@@ -56,7 +56,7 @@ fetch_blob() ***REMOVED***
 	local curlArgs=( "$@" )
 
 	local curlHeaders="$(
-		curl -S "$***REMOVED***curlArgs[@]***REMOVED***" \
+		curl -S "${curlArgs[@]}" \
 			-H "Authorization: Bearer $token" \
 			"$registryBase/v2/$image/blobs/$digest" \
 			-o "$targetFile" \
@@ -66,25 +66,25 @@ fetch_blob() ***REMOVED***
 	if grep -qE "^HTTP/[0-9].[0-9] 3" <<<"$curlHeaders"; then
 		rm -f "$targetFile"
 
-		local blobRedirect="$(echo "$curlHeaders" | awk -F ': ' 'tolower($1) == "location" ***REMOVED*** print $2; exit ***REMOVED***')"
+		local blobRedirect="$(echo "$curlHeaders" | awk -F ': ' 'tolower($1) == "location" { print $2; exit }')"
 		if [ -z "$blobRedirect" ]; then
 			echo >&2 "error: failed fetching '$image' blob '$digest'"
 			echo "$curlHeaders" | head -1 >&2
 			return 1
 		fi
 
-		curl -fSL "$***REMOVED***curlArgs[@]***REMOVED***" \
+		curl -fSL "${curlArgs[@]}" \
 			"$blobRedirect" \
 			-o "$targetFile"
 	fi
-***REMOVED***
+}
 
 # handle 'application/vnd.docker.distribution.manifest.v2+json' manifest
-handle_single_manifest_v2() ***REMOVED***
+handle_single_manifest_v2() {
 	local manifestJson="$1"; shift
 
 	local configDigest="$(echo "$manifestJson" | jq --raw-output '.config.digest')"
-	local imageId="$***REMOVED***configDigest#*:***REMOVED***" # strip off "sha256:"
+	local imageId="${configDigest#*:}" # strip off "sha256:"
 
 	local configFile="$imageId.json"
 	fetch_blob "$token" "$image" "$configDigest" "$dir/$configFile" -s
@@ -94,11 +94,11 @@ handle_single_manifest_v2() ***REMOVED***
 	local layers=( $layersFs )
 	unset IFS
 
-	echo "Downloading '$imageIdentifier' ($***REMOVED***#layers[@]***REMOVED*** layers)..."
+	echo "Downloading '$imageIdentifier' (${#layers[@]} layers)..."
 	local layerId=
 	local layerFiles=()
-	for i in "$***REMOVED***!layers[@]***REMOVED***"; do
-		local layerMeta="$***REMOVED***layers[$i]***REMOVED***"
+	for i in "${!layers[@]}"; do
+		local layerMeta="${layers[$i]}"
 
 		local layerMediaType="$(echo "$layerMeta" | jq --raw-output '.mediaType')"
 		local layerDigest="$(echo "$layerMeta" | jq --raw-output '.digest')"
@@ -114,12 +114,12 @@ handle_single_manifest_v2() ***REMOVED***
 
 		if [ ! -s "$dir/$layerId/json" ]; then
 			local parentJson="$(printf ', parent: "%s"' "$parentId")"
-			local addJson="$(printf '***REMOVED*** id: "%s"%s ***REMOVED***' "$layerId" "$***REMOVED***parentId:+$parentJson***REMOVED***")"
+			local addJson="$(printf '{ id: "%s"%s }' "$layerId" "${parentId:+$parentJson}")"
 			# this starter JSON is taken directly from Docker's own "docker save" output for unimportant layers
 			jq "$addJson + ." > "$dir/$layerId/json" <<-'EOJSON'
-				***REMOVED***
+				{
 					"created": "0001-01-01T00:00:00Z",
-					"container_config": ***REMOVED***
+					"container_config": {
 						"Hostname": "",
 						"Domainname": "",
 						"User": "",
@@ -137,21 +137,21 @@ handle_single_manifest_v2() ***REMOVED***
 						"Entrypoint": null,
 						"OnBuild": null,
 						"Labels": null
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 			EOJSON
 		fi
 
 		case "$layerMediaType" in
 			application/vnd.docker.image.rootfs.diff.tar.gzip)
 				local layerTar="$layerId/layer.tar"
-				layerFiles=( "$***REMOVED***layerFiles[@]***REMOVED***" "$layerTar" )
+				layerFiles=( "${layerFiles[@]}" "$layerTar" )
 				# TODO figure out why "-C -" doesn't work here
 				# "curl: (33) HTTP server doesn't seem to support byte ranges. Cannot resume."
 				# "HTTP/1.1 416 Requested Range Not Satisfiable"
 				if [ -f "$dir/$layerTar" ]; then
 					# TODO hackpatch for no -C support :'(
-					echo "skipping existing $***REMOVED***layerId:0:12***REMOVED***"
+					echo "skipping existing ${layerId:0:12}"
 					continue
 				fi
 				local token="$(curl -fsSL "$authBase/token?service=$authService&scope=repository:$image:pull" | jq --raw-output '.token')"
@@ -169,33 +169,33 @@ handle_single_manifest_v2() ***REMOVED***
 	imageId="$layerId"
 
 	# munge the top layer image manifest to have the appropriate image configuration for older daemons
-	local imageOldConfig="$(jq --raw-output --compact-output '***REMOVED*** id: .id ***REMOVED*** + if .parent then ***REMOVED*** parent: .parent ***REMOVED*** else ***REMOVED******REMOVED*** end' "$dir/$imageId/json")"
+	local imageOldConfig="$(jq --raw-output --compact-output '{ id: .id } + if .parent then { parent: .parent } else {} end' "$dir/$imageId/json")"
 	jq --raw-output "$imageOldConfig + del(.history, .rootfs)" "$dir/$configFile" > "$dir/$imageId/json"
 
 	local manifestJsonEntry="$(
-		echo '***REMOVED******REMOVED***' | jq --raw-output '. + ***REMOVED***
+		echo '{}' | jq --raw-output '. + {
 			Config: "'"$configFile"'",
-			RepoTags: ["'"$***REMOVED***image#library\/***REMOVED***:$tag"'"],
-			Layers: '"$(echo '[]' | jq --raw-output ".$(for layerFile in "$***REMOVED***layerFiles[@]***REMOVED***"; do echo " + [ \"$layerFile\" ]"; done)")"'
-		***REMOVED***'
+			RepoTags: ["'"${image#library\/}:$tag"'"],
+			Layers: '"$(echo '[]' | jq --raw-output ".$(for layerFile in "${layerFiles[@]}"; do echo " + [ \"$layerFile\" ]"; done)")"'
+		}'
 	)"
-	manifestJsonEntries=( "$***REMOVED***manifestJsonEntries[@]***REMOVED***" "$manifestJsonEntry" )
-***REMOVED***
+	manifestJsonEntries=( "${manifestJsonEntries[@]}" "$manifestJsonEntry" )
+}
 
 while [ $# -gt 0 ]; do
 	imageTag="$1"
 	shift
-	image="$***REMOVED***imageTag%%[:@]****REMOVED***"
-	imageTag="$***REMOVED***imageTag#*:***REMOVED***"
-	digest="$***REMOVED***imageTag##*@***REMOVED***"
-	tag="$***REMOVED***imageTag%%@****REMOVED***"
+	image="${imageTag%%[:@]*}"
+	imageTag="${imageTag#*:}"
+	digest="${imageTag##*@}"
+	tag="${imageTag%%@*}"
 
 	# add prefix library if passed official image
 	if [[ "$image" != *"/"* ]]; then
 		image="library/$image"
 	fi
 
-	imageFile="$***REMOVED***image//\//_***REMOVED***" # "/" can't be in filenames :)
+	imageFile="${image//\//_}" # "/" can't be in filenames :)
 
 	token="$(curl -fsSL "$authBase/token?service=$authService&scope=repository:$image:pull" | jq --raw-output '.token')"
 
@@ -207,7 +207,7 @@ while [ $# -gt 0 ]; do
 			-H 'Accept: application/vnd.docker.distribution.manifest.v1+json' \
 			"$registryBase/v2/$image/manifests/$digest"
 	)"
-	if [ "$***REMOVED***manifestJson:0:1***REMOVED***" != '***REMOVED***' ]; then
+	if [ "${manifestJson:0:1}" != '{' ]; then
 		echo >&2 "error: /v2/$image/manifests/$digest returned something unexpected:"
 		echo >&2 "  $manifestJson"
 		exit 1
@@ -232,8 +232,8 @@ while [ $# -gt 0 ]; do
 
 					found=""
 					# parse first level multi-arch manifest
-					for i in "$***REMOVED***!layers[@]***REMOVED***"; do
-						layerMeta="$***REMOVED***layers[$i]***REMOVED***"
+					for i in "${!layers[@]}"; do
+						layerMeta="${layers[$i]}"
 						maniArch="$(echo "$layerMeta" | jq --raw-output '.platform.architecture')"
 						if [ "$maniArch" = "$(go env GOARCH)" ]; then
 							digest="$(echo "$layerMeta" | jq --raw-output '.digest')"
@@ -279,11 +279,11 @@ while [ $# -gt 0 ]; do
 			history="$(echo "$manifestJson" | jq '.history | [.[] | .v1Compatibility]')"
 			imageId="$(echo "$history" | jq --raw-output '.[0]' | jq --raw-output '.id')"
 
-			echo "Downloading '$imageIdentifier' ($***REMOVED***#layers[@]***REMOVED*** layers)..."
-			for i in "$***REMOVED***!layers[@]***REMOVED***"; do
-				imageJson="$(echo "$history" | jq --raw-output ".[$***REMOVED***i***REMOVED***]")"
+			echo "Downloading '$imageIdentifier' (${#layers[@]} layers)..."
+			for i in "${!layers[@]}"; do
+				imageJson="$(echo "$history" | jq --raw-output ".[${i}]")"
 				layerId="$(echo "$imageJson" | jq --raw-output '.id')"
-				imageLayer="$***REMOVED***layers[$i]***REMOVED***"
+				imageLayer="${layers[$i]}"
 
 				mkdir -p "$dir/$layerId"
 				echo '1.0' > "$dir/$layerId/VERSION"
@@ -295,7 +295,7 @@ while [ $# -gt 0 ]; do
 				# "HTTP/1.1 416 Requested Range Not Satisfiable"
 				if [ -f "$dir/$layerId/layer.tar" ]; then
 					# TODO hackpatch for no -C support :'(
-					echo "skipping existing $***REMOVED***layerId:0:12***REMOVED***"
+					echo "skipping existing ${layerId:0:12}"
 					continue
 				fi
 				token="$(curl -fsSL "$authBase/token?service=$authService&scope=repository:$image:pull" | jq --raw-output '.token')"
@@ -314,28 +314,28 @@ while [ $# -gt 0 ]; do
 	if [ -s "$dir/tags-$imageFile.tmp" ]; then
 		echo -n ', ' >> "$dir/tags-$imageFile.tmp"
 	else
-		images=( "$***REMOVED***images[@]***REMOVED***" "$image" )
+		images=( "${images[@]}" "$image" )
 	fi
 	echo -n '"'"$tag"'": "'"$imageId"'"' >> "$dir/tags-$imageFile.tmp"
 done
 
-echo -n '***REMOVED***' > "$dir/repositories"
+echo -n '{' > "$dir/repositories"
 firstImage=1
-for image in "$***REMOVED***images[@]***REMOVED***"; do
-	imageFile="$***REMOVED***image//\//_***REMOVED***" # "/" can't be in filenames :)
-	image="$***REMOVED***image#library\/***REMOVED***"
+for image in "${images[@]}"; do
+	imageFile="${image//\//_}" # "/" can't be in filenames :)
+	image="${image#library\/}"
 
 	[ "$firstImage" ] || echo -n ',' >> "$dir/repositories"
 	firstImage=
 	echo -n $'\n\t' >> "$dir/repositories"
-	echo -n '"'"$image"'": ***REMOVED*** '"$(cat "$dir/tags-$imageFile.tmp")"' ***REMOVED***' >> "$dir/repositories"
+	echo -n '"'"$image"'": { '"$(cat "$dir/tags-$imageFile.tmp")"' }' >> "$dir/repositories"
 done
-echo -n $'\n***REMOVED***\n' >> "$dir/repositories"
+echo -n $'\n}\n' >> "$dir/repositories"
 
 rm -f "$dir"/tags-*.tmp
 
-if [ -z "$doNotGenerateManifestJson" ] && [ "$***REMOVED***#manifestJsonEntries[@]***REMOVED***" -gt 0 ]; then
-	echo '[]' | jq --raw-output ".$(for entry in "$***REMOVED***manifestJsonEntries[@]***REMOVED***"; do echo " + [ $entry ]"; done)" > "$dir/manifest.json"
+if [ -z "$doNotGenerateManifestJson" ] && [ "${#manifestJsonEntries[@]}" -gt 0 ]; then
+	echo '[]' | jq --raw-output ".$(for entry in "${manifestJsonEntries[@]}"; do echo " + [ $entry ]"; done)" > "$dir/manifest.json"
 else
 	rm -f "$dir/manifest.json"
 fi

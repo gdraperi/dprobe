@@ -65,7 +65,7 @@ const (
 
 var (
 	clientPreface   = []byte(http2.ClientPreface)
-	http2ErrConvTab = map[http2.ErrCode]codes.Code***REMOVED***
+	http2ErrConvTab = map[http2.ErrCode]codes.Code{
 		http2.ErrCodeNo:                 codes.Internal,
 		http2.ErrCodeProtocol:           codes.Internal,
 		http2.ErrCodeInternal:           codes.Internal,
@@ -80,19 +80,19 @@ var (
 		http2.ErrCodeEnhanceYourCalm:    codes.ResourceExhausted,
 		http2.ErrCodeInadequateSecurity: codes.PermissionDenied,
 		http2.ErrCodeHTTP11Required:     codes.FailedPrecondition,
-	***REMOVED***
-	statusCodeConvTab = map[codes.Code]http2.ErrCode***REMOVED***
+	}
+	statusCodeConvTab = map[codes.Code]http2.ErrCode{
 		codes.Internal:          http2.ErrCodeInternal,
 		codes.Canceled:          http2.ErrCodeCancel,
 		codes.Unavailable:       http2.ErrCodeRefusedStream,
 		codes.ResourceExhausted: http2.ErrCodeEnhanceYourCalm,
 		codes.PermissionDenied:  http2.ErrCodeInadequateSecurity,
-	***REMOVED***
+	}
 )
 
 // Records the states during HPACK decoding. Must be reset once the
 // decoding of the entire headers are finished.
-type decodeState struct ***REMOVED***
+type decodeState struct {
 	encoding string
 	// statusGen caches the stream status received from the trailer the server
 	// sent.  Client side only.  Do not access directly.  After all trailers are
@@ -108,16 +108,16 @@ type decodeState struct ***REMOVED***
 	method     string
 	// key-value metadata map from the peer.
 	mdata map[string][]string
-***REMOVED***
+}
 
 // isReservedHeader checks whether hdr belongs to HTTP2 headers
 // reserved by gRPC protocol. Any other headers are classified as the
 // user-specified metadata.
-func isReservedHeader(hdr string) bool ***REMOVED***
-	if hdr != "" && hdr[0] == ':' ***REMOVED***
+func isReservedHeader(hdr string) bool {
+	if hdr != "" && hdr[0] == ':' {
 		return true
-	***REMOVED***
-	switch hdr ***REMOVED***
+	}
+	switch hdr {
 	case "content-type",
 		"grpc-message-type",
 		"grpc-encoding",
@@ -129,119 +129,119 @@ func isReservedHeader(hdr string) bool ***REMOVED***
 		return true
 	default:
 		return false
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // isWhitelistedPseudoHeader checks whether hdr belongs to HTTP2 pseudoheaders
 // that should be propagated into metadata visible to users.
-func isWhitelistedPseudoHeader(hdr string) bool ***REMOVED***
-	switch hdr ***REMOVED***
+func isWhitelistedPseudoHeader(hdr string) bool {
+	switch hdr {
 	case ":authority":
 		return true
 	default:
 		return false
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func validContentType(t string) bool ***REMOVED***
+func validContentType(t string) bool {
 	e := "application/grpc"
-	if !strings.HasPrefix(t, e) ***REMOVED***
+	if !strings.HasPrefix(t, e) {
 		return false
-	***REMOVED***
+	}
 	// Support variations on the content-type
 	// (e.g. "application/grpc+blah", "application/grpc;blah").
-	if len(t) > len(e) && t[len(e)] != '+' && t[len(e)] != ';' ***REMOVED***
+	if len(t) > len(e) && t[len(e)] != '+' && t[len(e)] != ';' {
 		return false
-	***REMOVED***
+	}
 	return true
-***REMOVED***
+}
 
-func (d *decodeState) status() *status.Status ***REMOVED***
-	if d.statusGen == nil ***REMOVED***
+func (d *decodeState) status() *status.Status {
+	if d.statusGen == nil {
 		// No status-details were provided; generate status using code/msg.
 		d.statusGen = status.New(codes.Code(d.rawStatusCode), d.rawStatusMsg)
-	***REMOVED***
+	}
 	return d.statusGen
-***REMOVED***
+}
 
 const binHdrSuffix = "-bin"
 
-func encodeBinHeader(v []byte) string ***REMOVED***
+func encodeBinHeader(v []byte) string {
 	return base64.RawStdEncoding.EncodeToString(v)
-***REMOVED***
+}
 
-func decodeBinHeader(v string) ([]byte, error) ***REMOVED***
-	if len(v)%4 == 0 ***REMOVED***
+func decodeBinHeader(v string) ([]byte, error) {
+	if len(v)%4 == 0 {
 		// Input was padded, or padding was not necessary.
 		return base64.StdEncoding.DecodeString(v)
-	***REMOVED***
+	}
 	return base64.RawStdEncoding.DecodeString(v)
-***REMOVED***
+}
 
-func encodeMetadataHeader(k, v string) string ***REMOVED***
-	if strings.HasSuffix(k, binHdrSuffix) ***REMOVED***
+func encodeMetadataHeader(k, v string) string {
+	if strings.HasSuffix(k, binHdrSuffix) {
 		return encodeBinHeader(([]byte)(v))
-	***REMOVED***
+	}
 	return v
-***REMOVED***
+}
 
-func decodeMetadataHeader(k, v string) (string, error) ***REMOVED***
-	if strings.HasSuffix(k, binHdrSuffix) ***REMOVED***
+func decodeMetadataHeader(k, v string) (string, error) {
+	if strings.HasSuffix(k, binHdrSuffix) {
 		b, err := decodeBinHeader(v)
 		return string(b), err
-	***REMOVED***
+	}
 	return v, nil
-***REMOVED***
+}
 
-func (d *decodeState) processHeaderField(f hpack.HeaderField) error ***REMOVED***
-	switch f.Name ***REMOVED***
+func (d *decodeState) processHeaderField(f hpack.HeaderField) error {
+	switch f.Name {
 	case "content-type":
-		if !validContentType(f.Value) ***REMOVED***
+		if !validContentType(f.Value) {
 			return streamErrorf(codes.FailedPrecondition, "transport: received the unexpected content-type %q", f.Value)
-		***REMOVED***
+		}
 	case "grpc-encoding":
 		d.encoding = f.Value
 	case "grpc-status":
 		code, err := strconv.Atoi(f.Value)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return streamErrorf(codes.Internal, "transport: malformed grpc-status: %v", err)
-		***REMOVED***
+		}
 		d.rawStatusCode = int32(code)
 	case "grpc-message":
 		d.rawStatusMsg = decodeGrpcMessage(f.Value)
 	case "grpc-status-details-bin":
 		v, err := decodeBinHeader(f.Value)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return streamErrorf(codes.Internal, "transport: malformed grpc-status-details-bin: %v", err)
-		***REMOVED***
-		s := &spb.Status***REMOVED******REMOVED***
-		if err := proto.Unmarshal(v, s); err != nil ***REMOVED***
+		}
+		s := &spb.Status{}
+		if err := proto.Unmarshal(v, s); err != nil {
 			return streamErrorf(codes.Internal, "transport: malformed grpc-status-details-bin: %v", err)
-		***REMOVED***
+		}
 		d.statusGen = status.FromProto(s)
 	case "grpc-timeout":
 		d.timeoutSet = true
 		var err error
-		if d.timeout, err = decodeTimeout(f.Value); err != nil ***REMOVED***
+		if d.timeout, err = decodeTimeout(f.Value); err != nil {
 			return streamErrorf(codes.Internal, "transport: malformed time-out: %v", err)
-		***REMOVED***
+		}
 	case ":path":
 		d.method = f.Value
 	default:
-		if !isReservedHeader(f.Name) || isWhitelistedPseudoHeader(f.Name) ***REMOVED***
-			if d.mdata == nil ***REMOVED***
+		if !isReservedHeader(f.Name) || isWhitelistedPseudoHeader(f.Name) {
+			if d.mdata == nil {
 				d.mdata = make(map[string][]string)
-			***REMOVED***
+			}
 			v, err := decodeMetadataHeader(f.Name, f.Value)
-			if err != nil ***REMOVED***
+			if err != nil {
 				grpclog.Printf("Failed to decode (%q, %q): %v", f.Name, f.Value, err)
 				return nil
-			***REMOVED***
+			}
 			d.mdata[f.Name] = append(d.mdata[f.Name], v)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
 type timeoutUnit uint8
 
@@ -254,8 +254,8 @@ const (
 	nanosecond  timeoutUnit = 'n'
 )
 
-func timeoutUnitToDuration(u timeoutUnit) (d time.Duration, ok bool) ***REMOVED***
-	switch u ***REMOVED***
+func timeoutUnitToDuration(u timeoutUnit) (d time.Duration, ok bool) {
+	switch u {
 	case hour:
 		return time.Hour, true
 	case minute:
@@ -269,61 +269,61 @@ func timeoutUnitToDuration(u timeoutUnit) (d time.Duration, ok bool) ***REMOVED*
 	case nanosecond:
 		return time.Nanosecond, true
 	default:
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 const maxTimeoutValue int64 = 100000000 - 1
 
 // div does integer division and round-up the result. Note that this is
 // equivalent to (d+r-1)/r but has less chance to overflow.
-func div(d, r time.Duration) int64 ***REMOVED***
-	if m := d % r; m > 0 ***REMOVED***
+func div(d, r time.Duration) int64 {
+	if m := d % r; m > 0 {
 		return int64(d/r + 1)
-	***REMOVED***
+	}
 	return int64(d / r)
-***REMOVED***
+}
 
 // TODO(zhaoq): It is the simplistic and not bandwidth efficient. Improve it.
-func encodeTimeout(t time.Duration) string ***REMOVED***
-	if t <= 0 ***REMOVED***
+func encodeTimeout(t time.Duration) string {
+	if t <= 0 {
 		return "0n"
-	***REMOVED***
-	if d := div(t, time.Nanosecond); d <= maxTimeoutValue ***REMOVED***
+	}
+	if d := div(t, time.Nanosecond); d <= maxTimeoutValue {
 		return strconv.FormatInt(d, 10) + "n"
-	***REMOVED***
-	if d := div(t, time.Microsecond); d <= maxTimeoutValue ***REMOVED***
+	}
+	if d := div(t, time.Microsecond); d <= maxTimeoutValue {
 		return strconv.FormatInt(d, 10) + "u"
-	***REMOVED***
-	if d := div(t, time.Millisecond); d <= maxTimeoutValue ***REMOVED***
+	}
+	if d := div(t, time.Millisecond); d <= maxTimeoutValue {
 		return strconv.FormatInt(d, 10) + "m"
-	***REMOVED***
-	if d := div(t, time.Second); d <= maxTimeoutValue ***REMOVED***
+	}
+	if d := div(t, time.Second); d <= maxTimeoutValue {
 		return strconv.FormatInt(d, 10) + "S"
-	***REMOVED***
-	if d := div(t, time.Minute); d <= maxTimeoutValue ***REMOVED***
+	}
+	if d := div(t, time.Minute); d <= maxTimeoutValue {
 		return strconv.FormatInt(d, 10) + "M"
-	***REMOVED***
+	}
 	// Note that maxTimeoutValue * time.Hour > MaxInt64.
 	return strconv.FormatInt(div(t, time.Hour), 10) + "H"
-***REMOVED***
+}
 
-func decodeTimeout(s string) (time.Duration, error) ***REMOVED***
+func decodeTimeout(s string) (time.Duration, error) {
 	size := len(s)
-	if size < 2 ***REMOVED***
+	if size < 2 {
 		return 0, fmt.Errorf("transport: timeout string is too short: %q", s)
-	***REMOVED***
+	}
 	unit := timeoutUnit(s[size-1])
 	d, ok := timeoutUnitToDuration(unit)
-	if !ok ***REMOVED***
+	if !ok {
 		return 0, fmt.Errorf("transport: timeout unit is not recognized: %q", s)
-	***REMOVED***
+	}
 	t, err := strconv.ParseInt(s[:size-1], 10, 64)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	return d * time.Duration(t), nil
-***REMOVED***
+}
 
 const (
 	spaceByte   = ' '
@@ -337,213 +337,213 @@ const (
 // allowable byte, and then either percent encoding or passing it through.
 // When percent encoding, the byte is converted into hexadecimal notation
 // with a '%' prepended.
-func encodeGrpcMessage(msg string) string ***REMOVED***
-	if msg == "" ***REMOVED***
+func encodeGrpcMessage(msg string) string {
+	if msg == "" {
 		return ""
-	***REMOVED***
+	}
 	lenMsg := len(msg)
-	for i := 0; i < lenMsg; i++ ***REMOVED***
+	for i := 0; i < lenMsg; i++ {
 		c := msg[i]
-		if !(c >= spaceByte && c < tildaByte && c != percentByte) ***REMOVED***
+		if !(c >= spaceByte && c < tildaByte && c != percentByte) {
 			return encodeGrpcMessageUnchecked(msg)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return msg
-***REMOVED***
+}
 
-func encodeGrpcMessageUnchecked(msg string) string ***REMOVED***
+func encodeGrpcMessageUnchecked(msg string) string {
 	var buf bytes.Buffer
 	lenMsg := len(msg)
-	for i := 0; i < lenMsg; i++ ***REMOVED***
+	for i := 0; i < lenMsg; i++ {
 		c := msg[i]
-		if c >= spaceByte && c < tildaByte && c != percentByte ***REMOVED***
+		if c >= spaceByte && c < tildaByte && c != percentByte {
 			buf.WriteByte(c)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			buf.WriteString(fmt.Sprintf("%%%02X", c))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return buf.String()
-***REMOVED***
+}
 
 // decodeGrpcMessage decodes the msg encoded by encodeGrpcMessage.
-func decodeGrpcMessage(msg string) string ***REMOVED***
-	if msg == "" ***REMOVED***
+func decodeGrpcMessage(msg string) string {
+	if msg == "" {
 		return ""
-	***REMOVED***
+	}
 	lenMsg := len(msg)
-	for i := 0; i < lenMsg; i++ ***REMOVED***
-		if msg[i] == percentByte && i+2 < lenMsg ***REMOVED***
+	for i := 0; i < lenMsg; i++ {
+		if msg[i] == percentByte && i+2 < lenMsg {
 			return decodeGrpcMessageUnchecked(msg)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return msg
-***REMOVED***
+}
 
-func decodeGrpcMessageUnchecked(msg string) string ***REMOVED***
+func decodeGrpcMessageUnchecked(msg string) string {
 	var buf bytes.Buffer
 	lenMsg := len(msg)
-	for i := 0; i < lenMsg; i++ ***REMOVED***
+	for i := 0; i < lenMsg; i++ {
 		c := msg[i]
-		if c == percentByte && i+2 < lenMsg ***REMOVED***
+		if c == percentByte && i+2 < lenMsg {
 			parsed, err := strconv.ParseUint(msg[i+1:i+3], 16, 8)
-			if err != nil ***REMOVED***
+			if err != nil {
 				buf.WriteByte(c)
-			***REMOVED*** else ***REMOVED***
+			} else {
 				buf.WriteByte(byte(parsed))
 				i += 2
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
+			}
+		} else {
 			buf.WriteByte(c)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return buf.String()
-***REMOVED***
+}
 
-type framer struct ***REMOVED***
+type framer struct {
 	numWriters int32
 	reader     io.Reader
 	writer     *bufio.Writer
 	fr         *http2.Framer
-***REMOVED***
+}
 
-func newFramer(conn net.Conn) *framer ***REMOVED***
-	f := &framer***REMOVED***
+func newFramer(conn net.Conn) *framer {
+	f := &framer{
 		reader: bufio.NewReaderSize(conn, http2IOBufSize),
 		writer: bufio.NewWriterSize(conn, http2IOBufSize),
-	***REMOVED***
+	}
 	f.fr = http2.NewFramer(f.writer, f.reader)
 	// Opt-in to Frame reuse API on framer to reduce garbage.
 	// Frames aren't safe to read from after a subsequent call to ReadFrame.
 	f.fr.SetReuseFrames()
 	f.fr.ReadMetaHeaders = hpack.NewDecoder(http2InitHeaderTableSize, nil)
 	return f
-***REMOVED***
+}
 
-func (f *framer) adjustNumWriters(i int32) int32 ***REMOVED***
+func (f *framer) adjustNumWriters(i int32) int32 {
 	return atomic.AddInt32(&f.numWriters, i)
-***REMOVED***
+}
 
 // The following writeXXX functions can only be called when the caller gets
 // unblocked from writableChan channel (i.e., owns the privilege to write).
 
-func (f *framer) writeContinuation(forceFlush bool, streamID uint32, endHeaders bool, headerBlockFragment []byte) error ***REMOVED***
-	if err := f.fr.WriteContinuation(streamID, endHeaders, headerBlockFragment); err != nil ***REMOVED***
+func (f *framer) writeContinuation(forceFlush bool, streamID uint32, endHeaders bool, headerBlockFragment []byte) error {
+	if err := f.fr.WriteContinuation(streamID, endHeaders, headerBlockFragment); err != nil {
 		return err
-	***REMOVED***
-	if forceFlush ***REMOVED***
+	}
+	if forceFlush {
 		return f.writer.Flush()
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (f *framer) writeData(forceFlush bool, streamID uint32, endStream bool, data []byte) error ***REMOVED***
-	if err := f.fr.WriteData(streamID, endStream, data); err != nil ***REMOVED***
+func (f *framer) writeData(forceFlush bool, streamID uint32, endStream bool, data []byte) error {
+	if err := f.fr.WriteData(streamID, endStream, data); err != nil {
 		return err
-	***REMOVED***
-	if forceFlush ***REMOVED***
+	}
+	if forceFlush {
 		return f.writer.Flush()
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (f *framer) writeGoAway(forceFlush bool, maxStreamID uint32, code http2.ErrCode, debugData []byte) error ***REMOVED***
-	if err := f.fr.WriteGoAway(maxStreamID, code, debugData); err != nil ***REMOVED***
+func (f *framer) writeGoAway(forceFlush bool, maxStreamID uint32, code http2.ErrCode, debugData []byte) error {
+	if err := f.fr.WriteGoAway(maxStreamID, code, debugData); err != nil {
 		return err
-	***REMOVED***
-	if forceFlush ***REMOVED***
+	}
+	if forceFlush {
 		return f.writer.Flush()
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (f *framer) writeHeaders(forceFlush bool, p http2.HeadersFrameParam) error ***REMOVED***
-	if err := f.fr.WriteHeaders(p); err != nil ***REMOVED***
+func (f *framer) writeHeaders(forceFlush bool, p http2.HeadersFrameParam) error {
+	if err := f.fr.WriteHeaders(p); err != nil {
 		return err
-	***REMOVED***
-	if forceFlush ***REMOVED***
+	}
+	if forceFlush {
 		return f.writer.Flush()
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (f *framer) writePing(forceFlush, ack bool, data [8]byte) error ***REMOVED***
-	if err := f.fr.WritePing(ack, data); err != nil ***REMOVED***
+func (f *framer) writePing(forceFlush, ack bool, data [8]byte) error {
+	if err := f.fr.WritePing(ack, data); err != nil {
 		return err
-	***REMOVED***
-	if forceFlush ***REMOVED***
+	}
+	if forceFlush {
 		return f.writer.Flush()
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (f *framer) writePriority(forceFlush bool, streamID uint32, p http2.PriorityParam) error ***REMOVED***
-	if err := f.fr.WritePriority(streamID, p); err != nil ***REMOVED***
+func (f *framer) writePriority(forceFlush bool, streamID uint32, p http2.PriorityParam) error {
+	if err := f.fr.WritePriority(streamID, p); err != nil {
 		return err
-	***REMOVED***
-	if forceFlush ***REMOVED***
+	}
+	if forceFlush {
 		return f.writer.Flush()
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (f *framer) writePushPromise(forceFlush bool, p http2.PushPromiseParam) error ***REMOVED***
-	if err := f.fr.WritePushPromise(p); err != nil ***REMOVED***
+func (f *framer) writePushPromise(forceFlush bool, p http2.PushPromiseParam) error {
+	if err := f.fr.WritePushPromise(p); err != nil {
 		return err
-	***REMOVED***
-	if forceFlush ***REMOVED***
+	}
+	if forceFlush {
 		return f.writer.Flush()
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (f *framer) writeRSTStream(forceFlush bool, streamID uint32, code http2.ErrCode) error ***REMOVED***
-	if err := f.fr.WriteRSTStream(streamID, code); err != nil ***REMOVED***
+func (f *framer) writeRSTStream(forceFlush bool, streamID uint32, code http2.ErrCode) error {
+	if err := f.fr.WriteRSTStream(streamID, code); err != nil {
 		return err
-	***REMOVED***
-	if forceFlush ***REMOVED***
+	}
+	if forceFlush {
 		return f.writer.Flush()
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (f *framer) writeSettings(forceFlush bool, settings ...http2.Setting) error ***REMOVED***
-	if err := f.fr.WriteSettings(settings...); err != nil ***REMOVED***
+func (f *framer) writeSettings(forceFlush bool, settings ...http2.Setting) error {
+	if err := f.fr.WriteSettings(settings...); err != nil {
 		return err
-	***REMOVED***
-	if forceFlush ***REMOVED***
+	}
+	if forceFlush {
 		return f.writer.Flush()
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (f *framer) writeSettingsAck(forceFlush bool) error ***REMOVED***
-	if err := f.fr.WriteSettingsAck(); err != nil ***REMOVED***
+func (f *framer) writeSettingsAck(forceFlush bool) error {
+	if err := f.fr.WriteSettingsAck(); err != nil {
 		return err
-	***REMOVED***
-	if forceFlush ***REMOVED***
+	}
+	if forceFlush {
 		return f.writer.Flush()
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (f *framer) writeWindowUpdate(forceFlush bool, streamID, incr uint32) error ***REMOVED***
-	if err := f.fr.WriteWindowUpdate(streamID, incr); err != nil ***REMOVED***
+func (f *framer) writeWindowUpdate(forceFlush bool, streamID, incr uint32) error {
+	if err := f.fr.WriteWindowUpdate(streamID, incr); err != nil {
 		return err
-	***REMOVED***
-	if forceFlush ***REMOVED***
+	}
+	if forceFlush {
 		return f.writer.Flush()
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (f *framer) flushWrite() error ***REMOVED***
+func (f *framer) flushWrite() error {
 	return f.writer.Flush()
-***REMOVED***
+}
 
-func (f *framer) readFrame() (http2.Frame, error) ***REMOVED***
+func (f *framer) readFrame() (http2.Frame, error) {
 	return f.fr.ReadFrame()
-***REMOVED***
+}
 
-func (f *framer) errorDetail() error ***REMOVED***
+func (f *framer) errorDetail() error {
 	return f.fr.ErrorDetail()
-***REMOVED***
+}

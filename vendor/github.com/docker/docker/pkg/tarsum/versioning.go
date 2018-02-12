@@ -23,63 +23,63 @@ const (
 )
 
 // WriteV1Header writes a tar header to a writer in V1 tarsum format.
-func WriteV1Header(h *tar.Header, w io.Writer) ***REMOVED***
-	for _, elem := range v1TarHeaderSelect(h) ***REMOVED***
+func WriteV1Header(h *tar.Header, w io.Writer) {
+	for _, elem := range v1TarHeaderSelect(h) {
 		w.Write([]byte(elem[0] + elem[1]))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // VersionLabelForChecksum returns the label for the given tarsum
 // checksum, i.e., everything before the first `+` character in
 // the string or an empty string if no label separator is found.
-func VersionLabelForChecksum(checksum string) string ***REMOVED***
-	// Checksums are in the form: ***REMOVED***versionLabel***REMOVED***+***REMOVED***hashID***REMOVED***:***REMOVED***hex***REMOVED***
+func VersionLabelForChecksum(checksum string) string {
+	// Checksums are in the form: {versionLabel}+{hashID}:{hex}
 	sepIndex := strings.Index(checksum, "+")
-	if sepIndex < 0 ***REMOVED***
+	if sepIndex < 0 {
 		return ""
-	***REMOVED***
+	}
 	return checksum[:sepIndex]
-***REMOVED***
+}
 
 // GetVersions gets a list of all known tarsum versions.
-func GetVersions() []Version ***REMOVED***
-	v := []Version***REMOVED******REMOVED***
-	for k := range tarSumVersions ***REMOVED***
+func GetVersions() []Version {
+	v := []Version{}
+	for k := range tarSumVersions {
 		v = append(v, k)
-	***REMOVED***
+	}
 	return v
-***REMOVED***
+}
 
 var (
-	tarSumVersions = map[Version]string***REMOVED***
+	tarSumVersions = map[Version]string{
 		Version0:   "tarsum",
 		Version1:   "tarsum.v1",
 		VersionDev: "tarsum.dev",
-	***REMOVED***
-	tarSumVersionsByName = map[string]Version***REMOVED***
+	}
+	tarSumVersionsByName = map[string]Version{
 		"tarsum":     Version0,
 		"tarsum.v1":  Version1,
 		"tarsum.dev": VersionDev,
-	***REMOVED***
+	}
 )
 
-func (tsv Version) String() string ***REMOVED***
+func (tsv Version) String() string {
 	return tarSumVersions[tsv]
-***REMOVED***
+}
 
 // GetVersionFromTarsum returns the Version from the provided string.
-func GetVersionFromTarsum(tarsum string) (Version, error) ***REMOVED***
+func GetVersionFromTarsum(tarsum string) (Version, error) {
 	tsv := tarsum
-	if strings.Contains(tarsum, "+") ***REMOVED***
+	if strings.Contains(tarsum, "+") {
 		tsv = strings.SplitN(tarsum, "+", 2)[0]
-	***REMOVED***
-	for v, s := range tarSumVersions ***REMOVED***
-		if s == tsv ***REMOVED***
+	}
+	for v, s := range tarSumVersions {
+		if s == tsv {
 			return v, nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return -1, ErrNotVersion
-***REMOVED***
+}
 
 // Errors that may be returned by functions in this package
 var (
@@ -90,39 +90,39 @@ var (
 // tarHeaderSelector is the interface which different versions
 // of tarsum should use for selecting and ordering tar headers
 // for each item in the archive.
-type tarHeaderSelector interface ***REMOVED***
+type tarHeaderSelector interface {
 	selectHeaders(h *tar.Header) (orderedHeaders [][2]string)
-***REMOVED***
+}
 
 type tarHeaderSelectFunc func(h *tar.Header) (orderedHeaders [][2]string)
 
-func (f tarHeaderSelectFunc) selectHeaders(h *tar.Header) (orderedHeaders [][2]string) ***REMOVED***
+func (f tarHeaderSelectFunc) selectHeaders(h *tar.Header) (orderedHeaders [][2]string) {
 	return f(h)
-***REMOVED***
+}
 
-func v0TarHeaderSelect(h *tar.Header) (orderedHeaders [][2]string) ***REMOVED***
-	return [][2]string***REMOVED***
-		***REMOVED***"name", h.Name***REMOVED***,
-		***REMOVED***"mode", strconv.FormatInt(h.Mode, 10)***REMOVED***,
-		***REMOVED***"uid", strconv.Itoa(h.Uid)***REMOVED***,
-		***REMOVED***"gid", strconv.Itoa(h.Gid)***REMOVED***,
-		***REMOVED***"size", strconv.FormatInt(h.Size, 10)***REMOVED***,
-		***REMOVED***"mtime", strconv.FormatInt(h.ModTime.UTC().Unix(), 10)***REMOVED***,
-		***REMOVED***"typeflag", string([]byte***REMOVED***h.Typeflag***REMOVED***)***REMOVED***,
-		***REMOVED***"linkname", h.Linkname***REMOVED***,
-		***REMOVED***"uname", h.Uname***REMOVED***,
-		***REMOVED***"gname", h.Gname***REMOVED***,
-		***REMOVED***"devmajor", strconv.FormatInt(h.Devmajor, 10)***REMOVED***,
-		***REMOVED***"devminor", strconv.FormatInt(h.Devminor, 10)***REMOVED***,
-	***REMOVED***
-***REMOVED***
+func v0TarHeaderSelect(h *tar.Header) (orderedHeaders [][2]string) {
+	return [][2]string{
+		{"name", h.Name},
+		{"mode", strconv.FormatInt(h.Mode, 10)},
+		{"uid", strconv.Itoa(h.Uid)},
+		{"gid", strconv.Itoa(h.Gid)},
+		{"size", strconv.FormatInt(h.Size, 10)},
+		{"mtime", strconv.FormatInt(h.ModTime.UTC().Unix(), 10)},
+		{"typeflag", string([]byte{h.Typeflag})},
+		{"linkname", h.Linkname},
+		{"uname", h.Uname},
+		{"gname", h.Gname},
+		{"devmajor", strconv.FormatInt(h.Devmajor, 10)},
+		{"devminor", strconv.FormatInt(h.Devminor, 10)},
+	}
+}
 
-func v1TarHeaderSelect(h *tar.Header) (orderedHeaders [][2]string) ***REMOVED***
+func v1TarHeaderSelect(h *tar.Header) (orderedHeaders [][2]string) {
 	// Get extended attributes.
 	xAttrKeys := make([]string, len(h.Xattrs))
-	for k := range h.Xattrs ***REMOVED***
+	for k := range h.Xattrs {
 		xAttrKeys = append(xAttrKeys, k)
-	***REMOVED***
+	}
 	sort.Strings(xAttrKeys)
 
 	// Make the slice with enough capacity to hold the 11 basic headers
@@ -135,24 +135,24 @@ func v1TarHeaderSelect(h *tar.Header) (orderedHeaders [][2]string) ***REMOVED***
 	orderedHeaders = append(orderedHeaders, v0headers[6:]...)
 
 	// Finally, append the sorted xattrs.
-	for _, k := range xAttrKeys ***REMOVED***
-		orderedHeaders = append(orderedHeaders, [2]string***REMOVED***k, h.Xattrs[k]***REMOVED***)
-	***REMOVED***
+	for _, k := range xAttrKeys {
+		orderedHeaders = append(orderedHeaders, [2]string{k, h.Xattrs[k]})
+	}
 
 	return
-***REMOVED***
+}
 
-var registeredHeaderSelectors = map[Version]tarHeaderSelectFunc***REMOVED***
+var registeredHeaderSelectors = map[Version]tarHeaderSelectFunc{
 	Version0:   v0TarHeaderSelect,
 	Version1:   v1TarHeaderSelect,
 	VersionDev: v1TarHeaderSelect,
-***REMOVED***
+}
 
-func getTarHeaderSelector(v Version) (tarHeaderSelector, error) ***REMOVED***
+func getTarHeaderSelector(v Version) (tarHeaderSelector, error) {
 	headerSelector, ok := registeredHeaderSelectors[v]
-	if !ok ***REMOVED***
+	if !ok {
 		return nil, ErrVersionNotImplemented
-	***REMOVED***
+	}
 
 	return headerSelector, nil
-***REMOVED***
+}

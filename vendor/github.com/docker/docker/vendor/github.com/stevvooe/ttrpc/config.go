@@ -2,9 +2,9 @@ package ttrpc
 
 import "github.com/pkg/errors"
 
-type serverConfig struct ***REMOVED***
+type serverConfig struct {
 	handshaker Handshaker
-***REMOVED***
+}
 
 type ServerOpt func(*serverConfig) error
 
@@ -12,12 +12,12 @@ type ServerOpt func(*serverConfig) error
 // handshaker is called before every connection attempt.
 //
 // Only one handshaker is allowed per server.
-func WithServerHandshaker(handshaker Handshaker) ServerOpt ***REMOVED***
-	return func(c *serverConfig) error ***REMOVED***
-		if c.handshaker != nil ***REMOVED***
+func WithServerHandshaker(handshaker Handshaker) ServerOpt {
+	return func(c *serverConfig) error {
+		if c.handshaker != nil {
 			return errors.New("only one handshaker allowed per server")
-		***REMOVED***
+		}
 		c.handshaker = handshaker
 		return nil
-	***REMOVED***
-***REMOVED***
+	}
+}

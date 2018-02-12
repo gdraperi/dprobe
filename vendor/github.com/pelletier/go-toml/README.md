@@ -48,20 +48,20 @@ password := postgresConfig.Get("password").(string)
 Or use Unmarshal:
 
 ```go
-type Postgres struct ***REMOVED***
+type Postgres struct {
     User     string
     Password string
-***REMOVED***
-type Config struct ***REMOVED***
+}
+type Config struct {
     Postgres Postgres
-***REMOVED***
+}
 
 doc := []byte(`
 [Postgres]
 User = "pelletier"
 Password = "mypassword"`)
 
-config := Config***REMOVED******REMOVED***
+config := Config{}
 toml.Unmarshal(doc, &config)
 fmt.Println("user=", config.Postgres.User)
 ```
@@ -72,9 +72,9 @@ Or use a query:
 // use a query to gather elements without walking the tree
 q, _ := query.Compile("$..[user,password]")
 results := q.Execute(config)
-for ii, item := range results.Values() ***REMOVED***
+for ii, item := range results.Values() {
     fmt.Println("Query result %d: %v", ii, item)
-***REMOVED***
+}
 ```
 
 ## Documentation

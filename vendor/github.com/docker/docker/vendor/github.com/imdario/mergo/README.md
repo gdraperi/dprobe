@@ -58,17 +58,17 @@ If you were using Mergo **before** April 6th 2015, please check your project wor
 
 You can only merge same-type structs with exported fields initialized as zero value of their type and same-types maps. Mergo won't merge unexported (private) fields but will do recursively any exported one. Also maps will be merged recursively except for structs inside maps (because they are not addressable using Go reflection).
 
-    if err := mergo.Merge(&dst, src); err != nil ***REMOVED***
+    if err := mergo.Merge(&dst, src); err != nil {
         // ...
-***REMOVED***
+    }
 
-Additionally, you can map a map[string]interface***REMOVED******REMOVED*** to a struct (and otherwise, from struct to map), following the same restrictions as in Merge(). Keys are capitalized to find each corresponding exported field.
+Additionally, you can map a map[string]interface{} to a struct (and otherwise, from struct to map), following the same restrictions as in Merge(). Keys are capitalized to find each corresponding exported field.
 
-    if err := mergo.Map(&dst, srcMap); err != nil ***REMOVED***
+    if err := mergo.Map(&dst, srcMap); err != nil {
         // ...
-***REMOVED***
+    }
 
-Warning: if you map a struct to map, it won't do it recursively. Don't expect Mergo to map struct members of your struct as map[string]interface***REMOVED******REMOVED***. They will be just assigned as values.
+Warning: if you map a struct to map, it won't do it recursively. Don't expect Mergo to map struct members of your struct as map[string]interface{}. They will be just assigned as values.
 
 More information and examples in [godoc documentation](http://godoc.org/github.com/imdario/mergo).
 
@@ -82,27 +82,27 @@ import (
 	"github.com/imdario/mergo"
 )
 
-type Foo struct ***REMOVED***
+type Foo struct {
 	A string
 	B int64
-***REMOVED***
+}
 
-func main() ***REMOVED***
-	src := Foo***REMOVED***
+func main() {
+	src := Foo{
 		A: "one",
-	***REMOVED***
+	}
 
-	dest := Foo***REMOVED***
+	dest := Foo{
 		A: "two",
 		B: 2,
-	***REMOVED***
+	}
 
 	mergo.Merge(&dest, src)
 
 	fmt.Println(dest)
 	// Will print
-	// ***REMOVED***two 2***REMOVED***
-***REMOVED***
+	// {two 2}
+}
 ```
 
 Note: if test are failing due missing package, please execute:

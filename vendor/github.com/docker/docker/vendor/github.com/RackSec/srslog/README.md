@@ -58,13 +58,13 @@ And if you need more control over your TLS configuration :
 ```
 pool := x509.NewCertPool()
 serverCert, err := ioutil.ReadFile("/path/to/servercert.pem")
-if err != nil ***REMOVED***
+if err != nil {
     return nil, err
-***REMOVED***
+}
 pool.AppendCertsFromPEM(serverCert)
-config := tls.Config***REMOVED***
+config := tls.Config{
     RootCAs: pool,
-***REMOVED***
+}
 
 w, err := DialWithTLSConfig(network, raddr, priority, tag, &config)
 ```
@@ -75,9 +75,9 @@ remote syslog server has the keypair and the client has only the public key.)
 And then to write log messages, continue like so:
 
 ```
-if err != nil ***REMOVED***
+if err != nil {
     log.Fatal("failed to connect to syslog:", err)
-***REMOVED***
+}
 defer w.Close()
 
 w.Alert("this is an alert")

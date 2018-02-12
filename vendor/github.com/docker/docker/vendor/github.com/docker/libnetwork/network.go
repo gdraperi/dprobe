@@ -25,7 +25,7 @@ import (
 
 // A Network represents a logical connectivity zone that containers may
 // join using the Link method. A Network is managed by a specific driver.
-type Network interface ***REMOVED***
+type Network interface {
 	// A user chosen name for this network.
 	Name() string
 
@@ -56,10 +56,10 @@ type Network interface ***REMOVED***
 
 	// Return certain operational data belonging to this network
 	Info() NetworkInfo
-***REMOVED***
+}
 
 // NetworkInfo returns some configuration and operational information about the network
-type NetworkInfo interface ***REMOVED***
+type NetworkInfo interface {
 	IpamConfig() (string, map[string]string, []*IpamConf, []*IpamConf)
 	IpamInfo() ([]*IpamInfo, []*IpamInfo)
 	DriverOptions() map[string]string
@@ -81,7 +81,7 @@ type NetworkInfo interface ***REMOVED***
 	//Services returns a map of services keyed by the service name with the details
 	//of all the tasks that belong to the service. Applicable only in swarm mode.
 	Services() map[string]ServiceInfo
-***REMOVED***
+}
 
 // EndpointWalker is a client provided function which will be used to walk the Endpoints.
 // When the function returns true, the walk will stop.
@@ -90,46 +90,46 @@ type EndpointWalker func(ep Endpoint) bool
 // ipInfo is the reverse mapping from IP to service name to serve the PTR query.
 // extResolver is set if an externl server resolves a service name to this IP.
 // Its an indication to defer PTR queries also to that external server.
-type ipInfo struct ***REMOVED***
+type ipInfo struct {
 	name        string
 	serviceID   string
 	extResolver bool
-***REMOVED***
+}
 
 // svcMapEntry is the body of the element into the svcMap
 // The ip is a string because the SetMatrix does not accept non hashable values
-type svcMapEntry struct ***REMOVED***
+type svcMapEntry struct {
 	ip        string
 	serviceID string
-***REMOVED***
+}
 
-type svcInfo struct ***REMOVED***
+type svcInfo struct {
 	svcMap     common.SetMatrix
 	svcIPv6Map common.SetMatrix
 	ipMap      common.SetMatrix
 	service    map[string][]servicePorts
-***REMOVED***
+}
 
 // backing container or host's info
-type serviceTarget struct ***REMOVED***
+type serviceTarget struct {
 	name string
 	ip   net.IP
 	port uint16
-***REMOVED***
+}
 
-type servicePorts struct ***REMOVED***
+type servicePorts struct {
 	portName string
 	proto    string
 	target   []serviceTarget
-***REMOVED***
+}
 
-type networkDBTable struct ***REMOVED***
+type networkDBTable struct {
 	name    string
 	objType driverapi.ObjectType
-***REMOVED***
+}
 
 // IpamConf contains all the ipam related configurations for a network
-type IpamConf struct ***REMOVED***
+type IpamConf struct {
 	// The master address pool for containers and network interfaces
 	PreferredPool string
 	// A subset of the master pool. If specified,
@@ -140,65 +140,65 @@ type IpamConf struct ***REMOVED***
 	// Auxiliary addresses for network driver. Must be within the master pool.
 	// libnetwork will reserve them if they fall into the container pool
 	AuxAddresses map[string]string
-***REMOVED***
+}
 
 // Validate checks whether the configuration is valid
-func (c *IpamConf) Validate() error ***REMOVED***
-	if c.Gateway != "" && nil == net.ParseIP(c.Gateway) ***REMOVED***
+func (c *IpamConf) Validate() error {
+	if c.Gateway != "" && nil == net.ParseIP(c.Gateway) {
 		return types.BadRequestErrorf("invalid gateway address %s in Ipam configuration", c.Gateway)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // IpamInfo contains all the ipam related operational info for a network
-type IpamInfo struct ***REMOVED***
+type IpamInfo struct {
 	PoolID string
 	Meta   map[string]string
 	driverapi.IPAMData
-***REMOVED***
+}
 
 // MarshalJSON encodes IpamInfo into json message
-func (i *IpamInfo) MarshalJSON() ([]byte, error) ***REMOVED***
-	m := map[string]interface***REMOVED******REMOVED******REMOVED***
+func (i *IpamInfo) MarshalJSON() ([]byte, error) {
+	m := map[string]interface{}{
 		"PoolID": i.PoolID,
-	***REMOVED***
+	}
 	v, err := json.Marshal(&i.IPAMData)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	m["IPAMData"] = string(v)
 
-	if i.Meta != nil ***REMOVED***
+	if i.Meta != nil {
 		m["Meta"] = i.Meta
-	***REMOVED***
+	}
 	return json.Marshal(m)
-***REMOVED***
+}
 
 // UnmarshalJSON decodes json message into PoolData
-func (i *IpamInfo) UnmarshalJSON(data []byte) error ***REMOVED***
+func (i *IpamInfo) UnmarshalJSON(data []byte) error {
 	var (
-		m   map[string]interface***REMOVED******REMOVED***
+		m   map[string]interface{}
 		err error
 	)
-	if err = json.Unmarshal(data, &m); err != nil ***REMOVED***
+	if err = json.Unmarshal(data, &m); err != nil {
 		return err
-	***REMOVED***
+	}
 	i.PoolID = m["PoolID"].(string)
-	if v, ok := m["Meta"]; ok ***REMOVED***
+	if v, ok := m["Meta"]; ok {
 		b, _ := json.Marshal(v)
-		if err = json.Unmarshal(b, &i.Meta); err != nil ***REMOVED***
+		if err = json.Unmarshal(b, &i.Meta); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
-	if v, ok := m["IPAMData"]; ok ***REMOVED***
-		if err = json.Unmarshal([]byte(v.(string)), &i.IPAMData); err != nil ***REMOVED***
+		}
+	}
+	if v, ok := m["IPAMData"]; ok {
+		if err = json.Unmarshal([]byte(v.(string)), &i.IPAMData); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-type network struct ***REMOVED***
+type network struct {
 	ctrlr          *controller
 	name           string
 	networkType    string
@@ -220,7 +220,7 @@ type network struct ***REMOVED***
 	dbIndex        uint64
 	dbExists       bool
 	persist        bool
-	stopWatchCh    chan struct***REMOVED******REMOVED***
+	stopWatchCh    chan struct{}
 	drvOnce        *sync.Once
 	resolverOnce   sync.Once
 	resolver       []Resolver
@@ -234,223 +234,223 @@ type network struct ***REMOVED***
 	configFrom     string
 	loadBalancerIP net.IP
 	sync.Mutex
-***REMOVED***
+}
 
-func (n *network) Name() string ***REMOVED***
+func (n *network) Name() string {
 	n.Lock()
 	defer n.Unlock()
 
 	return n.name
-***REMOVED***
+}
 
-func (n *network) ID() string ***REMOVED***
+func (n *network) ID() string {
 	n.Lock()
 	defer n.Unlock()
 
 	return n.id
-***REMOVED***
+}
 
-func (n *network) Created() time.Time ***REMOVED***
+func (n *network) Created() time.Time {
 	n.Lock()
 	defer n.Unlock()
 
 	return n.created
-***REMOVED***
+}
 
-func (n *network) Type() string ***REMOVED***
+func (n *network) Type() string {
 	n.Lock()
 	defer n.Unlock()
 
 	return n.networkType
-***REMOVED***
+}
 
-func (n *network) Key() []string ***REMOVED***
+func (n *network) Key() []string {
 	n.Lock()
 	defer n.Unlock()
-	return []string***REMOVED***datastore.NetworkKeyPrefix, n.id***REMOVED***
-***REMOVED***
+	return []string{datastore.NetworkKeyPrefix, n.id}
+}
 
-func (n *network) KeyPrefix() []string ***REMOVED***
-	return []string***REMOVED***datastore.NetworkKeyPrefix***REMOVED***
-***REMOVED***
+func (n *network) KeyPrefix() []string {
+	return []string{datastore.NetworkKeyPrefix}
+}
 
-func (n *network) Value() []byte ***REMOVED***
+func (n *network) Value() []byte {
 	n.Lock()
 	defer n.Unlock()
 	b, err := json.Marshal(n)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil
-	***REMOVED***
+	}
 	return b
-***REMOVED***
+}
 
-func (n *network) SetValue(value []byte) error ***REMOVED***
+func (n *network) SetValue(value []byte) error {
 	return json.Unmarshal(value, n)
-***REMOVED***
+}
 
-func (n *network) Index() uint64 ***REMOVED***
+func (n *network) Index() uint64 {
 	n.Lock()
 	defer n.Unlock()
 	return n.dbIndex
-***REMOVED***
+}
 
-func (n *network) SetIndex(index uint64) ***REMOVED***
+func (n *network) SetIndex(index uint64) {
 	n.Lock()
 	n.dbIndex = index
 	n.dbExists = true
 	n.Unlock()
-***REMOVED***
+}
 
-func (n *network) Exists() bool ***REMOVED***
+func (n *network) Exists() bool {
 	n.Lock()
 	defer n.Unlock()
 	return n.dbExists
-***REMOVED***
+}
 
-func (n *network) Skip() bool ***REMOVED***
+func (n *network) Skip() bool {
 	n.Lock()
 	defer n.Unlock()
 	return !n.persist
-***REMOVED***
+}
 
-func (n *network) New() datastore.KVObject ***REMOVED***
+func (n *network) New() datastore.KVObject {
 	n.Lock()
 	defer n.Unlock()
 
-	return &network***REMOVED***
+	return &network{
 		ctrlr:   n.ctrlr,
-		drvOnce: &sync.Once***REMOVED******REMOVED***,
+		drvOnce: &sync.Once{},
 		scope:   n.scope,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // CopyTo deep copies to the destination IpamConfig
-func (c *IpamConf) CopyTo(dstC *IpamConf) error ***REMOVED***
+func (c *IpamConf) CopyTo(dstC *IpamConf) error {
 	dstC.PreferredPool = c.PreferredPool
 	dstC.SubPool = c.SubPool
 	dstC.Gateway = c.Gateway
-	if c.AuxAddresses != nil ***REMOVED***
+	if c.AuxAddresses != nil {
 		dstC.AuxAddresses = make(map[string]string, len(c.AuxAddresses))
-		for k, v := range c.AuxAddresses ***REMOVED***
+		for k, v := range c.AuxAddresses {
 			dstC.AuxAddresses[k] = v
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
 // CopyTo deep copies to the destination IpamInfo
-func (i *IpamInfo) CopyTo(dstI *IpamInfo) error ***REMOVED***
+func (i *IpamInfo) CopyTo(dstI *IpamInfo) error {
 	dstI.PoolID = i.PoolID
-	if i.Meta != nil ***REMOVED***
+	if i.Meta != nil {
 		dstI.Meta = make(map[string]string)
-		for k, v := range i.Meta ***REMOVED***
+		for k, v := range i.Meta {
 			dstI.Meta[k] = v
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	dstI.AddressSpace = i.AddressSpace
 	dstI.Pool = types.GetIPNetCopy(i.Pool)
 	dstI.Gateway = types.GetIPNetCopy(i.Gateway)
 
-	if i.AuxAddresses != nil ***REMOVED***
+	if i.AuxAddresses != nil {
 		dstI.AuxAddresses = make(map[string]*net.IPNet)
-		for k, v := range i.AuxAddresses ***REMOVED***
+		for k, v := range i.AuxAddresses {
 			dstI.AuxAddresses[k] = types.GetIPNetCopy(v)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (n *network) validateConfiguration() error ***REMOVED***
-	if n.configOnly ***REMOVED***
+func (n *network) validateConfiguration() error {
+	if n.configOnly {
 		// Only supports network specific configurations.
 		// Network operator configurations are not supported.
-		if n.ingress || n.internal || n.attachable || n.scope != "" ***REMOVED***
+		if n.ingress || n.internal || n.attachable || n.scope != "" {
 			return types.ForbiddenErrorf("configuration network can only contain network " +
 				"specific fields. Network operator fields like " +
 				"[ ingress | internal | attachable | scope ] are not supported.")
-		***REMOVED***
-	***REMOVED***
-	if n.configFrom != "" ***REMOVED***
-		if n.configOnly ***REMOVED***
+		}
+	}
+	if n.configFrom != "" {
+		if n.configOnly {
 			return types.ForbiddenErrorf("a configuration network cannot depend on another configuration network")
-		***REMOVED***
+		}
 		if n.ipamType != "" &&
 			n.ipamType != defaultIpamForNetworkType(n.networkType) ||
 			n.enableIPv6 ||
 			len(n.labels) > 0 || len(n.ipamOptions) > 0 ||
-			len(n.ipamV4Config) > 0 || len(n.ipamV6Config) > 0 ***REMOVED***
+			len(n.ipamV4Config) > 0 || len(n.ipamV6Config) > 0 {
 			return types.ForbiddenErrorf("user specified configurations are not supported if the network depends on a configuration network")
-		***REMOVED***
-		if len(n.generic) > 0 ***REMOVED***
-			if data, ok := n.generic[netlabel.GenericData]; ok ***REMOVED***
+		}
+		if len(n.generic) > 0 {
+			if data, ok := n.generic[netlabel.GenericData]; ok {
 				var (
 					driverOptions map[string]string
-					opts          interface***REMOVED******REMOVED***
+					opts          interface{}
 				)
-				switch data.(type) ***REMOVED***
-				case map[string]interface***REMOVED******REMOVED***:
-					opts = data.(map[string]interface***REMOVED******REMOVED***)
+				switch data.(type) {
+				case map[string]interface{}:
+					opts = data.(map[string]interface{})
 				case map[string]string:
 					opts = data.(map[string]string)
-				***REMOVED***
+				}
 				ba, err := json.Marshal(opts)
-				if err != nil ***REMOVED***
+				if err != nil {
 					return fmt.Errorf("failed to validate network configuration: %v", err)
-				***REMOVED***
-				if err := json.Unmarshal(ba, &driverOptions); err != nil ***REMOVED***
+				}
+				if err := json.Unmarshal(ba, &driverOptions); err != nil {
 					return fmt.Errorf("failed to validate network configuration: %v", err)
-				***REMOVED***
-				if len(driverOptions) > 0 ***REMOVED***
+				}
+				if len(driverOptions) > 0 {
 					return types.ForbiddenErrorf("network driver options are not supported if the network depends on a configuration network")
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+				}
+			}
+		}
+	}
 	return nil
-***REMOVED***
+}
 
 // Applies network specific configurations
-func (n *network) applyConfigurationTo(to *network) error ***REMOVED***
+func (n *network) applyConfigurationTo(to *network) error {
 	to.enableIPv6 = n.enableIPv6
-	if len(n.labels) > 0 ***REMOVED***
+	if len(n.labels) > 0 {
 		to.labels = make(map[string]string, len(n.labels))
-		for k, v := range n.labels ***REMOVED***
-			if _, ok := to.labels[k]; !ok ***REMOVED***
+		for k, v := range n.labels {
+			if _, ok := to.labels[k]; !ok {
 				to.labels[k] = v
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-	if len(n.ipamType) != 0 ***REMOVED***
+			}
+		}
+	}
+	if len(n.ipamType) != 0 {
 		to.ipamType = n.ipamType
-	***REMOVED***
-	if len(n.ipamOptions) > 0 ***REMOVED***
+	}
+	if len(n.ipamOptions) > 0 {
 		to.ipamOptions = make(map[string]string, len(n.ipamOptions))
-		for k, v := range n.ipamOptions ***REMOVED***
-			if _, ok := to.ipamOptions[k]; !ok ***REMOVED***
+		for k, v := range n.ipamOptions {
+			if _, ok := to.ipamOptions[k]; !ok {
 				to.ipamOptions[k] = v
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-	if len(n.ipamV4Config) > 0 ***REMOVED***
+			}
+		}
+	}
+	if len(n.ipamV4Config) > 0 {
 		to.ipamV4Config = make([]*IpamConf, 0, len(n.ipamV4Config))
 		to.ipamV4Config = append(to.ipamV4Config, n.ipamV4Config...)
-	***REMOVED***
-	if len(n.ipamV6Config) > 0 ***REMOVED***
+	}
+	if len(n.ipamV6Config) > 0 {
 		to.ipamV6Config = make([]*IpamConf, 0, len(n.ipamV6Config))
 		to.ipamV6Config = append(to.ipamV6Config, n.ipamV6Config...)
-	***REMOVED***
-	if len(n.generic) > 0 ***REMOVED***
-		to.generic = options.Generic***REMOVED******REMOVED***
-		for k, v := range n.generic ***REMOVED***
+	}
+	if len(n.generic) > 0 {
+		to.generic = options.Generic{}
+		for k, v := range n.generic {
 			to.generic[k] = v
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func (n *network) CopyTo(o datastore.KVObject) error ***REMOVED***
+func (n *network) CopyTo(o datastore.KVObject) error {
 	n.Lock()
 	defer n.Unlock()
 
@@ -477,71 +477,71 @@ func (n *network) CopyTo(o datastore.KVObject) error ***REMOVED***
 	dstN.loadBalancerIP = n.loadBalancerIP
 
 	// copy labels
-	if dstN.labels == nil ***REMOVED***
+	if dstN.labels == nil {
 		dstN.labels = make(map[string]string, len(n.labels))
-	***REMOVED***
-	for k, v := range n.labels ***REMOVED***
+	}
+	for k, v := range n.labels {
 		dstN.labels[k] = v
-	***REMOVED***
+	}
 
-	if n.ipamOptions != nil ***REMOVED***
+	if n.ipamOptions != nil {
 		dstN.ipamOptions = make(map[string]string, len(n.ipamOptions))
-		for k, v := range n.ipamOptions ***REMOVED***
+		for k, v := range n.ipamOptions {
 			dstN.ipamOptions[k] = v
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	for _, v4conf := range n.ipamV4Config ***REMOVED***
-		dstV4Conf := &IpamConf***REMOVED******REMOVED***
+	for _, v4conf := range n.ipamV4Config {
+		dstV4Conf := &IpamConf{}
 		v4conf.CopyTo(dstV4Conf)
 		dstN.ipamV4Config = append(dstN.ipamV4Config, dstV4Conf)
-	***REMOVED***
+	}
 
-	for _, v4info := range n.ipamV4Info ***REMOVED***
-		dstV4Info := &IpamInfo***REMOVED******REMOVED***
+	for _, v4info := range n.ipamV4Info {
+		dstV4Info := &IpamInfo{}
 		v4info.CopyTo(dstV4Info)
 		dstN.ipamV4Info = append(dstN.ipamV4Info, dstV4Info)
-	***REMOVED***
+	}
 
-	for _, v6conf := range n.ipamV6Config ***REMOVED***
-		dstV6Conf := &IpamConf***REMOVED******REMOVED***
+	for _, v6conf := range n.ipamV6Config {
+		dstV6Conf := &IpamConf{}
 		v6conf.CopyTo(dstV6Conf)
 		dstN.ipamV6Config = append(dstN.ipamV6Config, dstV6Conf)
-	***REMOVED***
+	}
 
-	for _, v6info := range n.ipamV6Info ***REMOVED***
-		dstV6Info := &IpamInfo***REMOVED******REMOVED***
+	for _, v6info := range n.ipamV6Info {
+		dstV6Info := &IpamInfo{}
 		v6info.CopyTo(dstV6Info)
 		dstN.ipamV6Info = append(dstN.ipamV6Info, dstV6Info)
-	***REMOVED***
+	}
 
-	dstN.generic = options.Generic***REMOVED******REMOVED***
-	for k, v := range n.generic ***REMOVED***
+	dstN.generic = options.Generic{}
+	for k, v := range n.generic {
 		dstN.generic[k] = v
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (n *network) DataScope() string ***REMOVED***
+func (n *network) DataScope() string {
 	s := n.Scope()
 	// All swarm scope networks have local datascope
-	if s == datastore.SwarmScope ***REMOVED***
+	if s == datastore.SwarmScope {
 		s = datastore.LocalScope
-	***REMOVED***
+	}
 	return s
-***REMOVED***
+}
 
-func (n *network) getEpCnt() *endpointCnt ***REMOVED***
+func (n *network) getEpCnt() *endpointCnt {
 	n.Lock()
 	defer n.Unlock()
 
 	return n.epCnt
-***REMOVED***
+}
 
 // TODO : Can be made much more generic with the help of reflection (but has some golang limitations)
-func (n *network) MarshalJSON() ([]byte, error) ***REMOVED***
-	netMap := make(map[string]interface***REMOVED******REMOVED***)
+func (n *network) MarshalJSON() ([]byte, error) {
+	netMap := make(map[string]interface{})
 	netMap["name"] = n.name
 	netMap["id"] = n.id
 	netMap["created"] = n.created
@@ -552,39 +552,39 @@ func (n *network) MarshalJSON() ([]byte, error) ***REMOVED***
 	netMap["ipamOptions"] = n.ipamOptions
 	netMap["addrSpace"] = n.addrSpace
 	netMap["enableIPv6"] = n.enableIPv6
-	if n.generic != nil ***REMOVED***
+	if n.generic != nil {
 		netMap["generic"] = n.generic
-	***REMOVED***
+	}
 	netMap["persist"] = n.persist
 	netMap["postIPv6"] = n.postIPv6
-	if len(n.ipamV4Config) > 0 ***REMOVED***
+	if len(n.ipamV4Config) > 0 {
 		ics, err := json.Marshal(n.ipamV4Config)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		netMap["ipamV4Config"] = string(ics)
-	***REMOVED***
-	if len(n.ipamV4Info) > 0 ***REMOVED***
+	}
+	if len(n.ipamV4Info) > 0 {
 		iis, err := json.Marshal(n.ipamV4Info)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		netMap["ipamV4Info"] = string(iis)
-	***REMOVED***
-	if len(n.ipamV6Config) > 0 ***REMOVED***
+	}
+	if len(n.ipamV6Config) > 0 {
 		ics, err := json.Marshal(n.ipamV6Config)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		netMap["ipamV6Config"] = string(ics)
-	***REMOVED***
-	if len(n.ipamV6Info) > 0 ***REMOVED***
+	}
+	if len(n.ipamV6Info) > 0 {
 		iis, err := json.Marshal(n.ipamV6Info)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		netMap["ipamV6Info"] = string(iis)
-	***REMOVED***
+	}
 	netMap["internal"] = n.internal
 	netMap["attachable"] = n.attachable
 	netMap["inDelete"] = n.inDelete
@@ -593,124 +593,124 @@ func (n *network) MarshalJSON() ([]byte, error) ***REMOVED***
 	netMap["configFrom"] = n.configFrom
 	netMap["loadBalancerIP"] = n.loadBalancerIP
 	return json.Marshal(netMap)
-***REMOVED***
+}
 
 // TODO : Can be made much more generic with the help of reflection (but has some golang limitations)
-func (n *network) UnmarshalJSON(b []byte) (err error) ***REMOVED***
-	var netMap map[string]interface***REMOVED******REMOVED***
-	if err := json.Unmarshal(b, &netMap); err != nil ***REMOVED***
+func (n *network) UnmarshalJSON(b []byte) (err error) {
+	var netMap map[string]interface{}
+	if err := json.Unmarshal(b, &netMap); err != nil {
 		return err
-	***REMOVED***
+	}
 	n.name = netMap["name"].(string)
 	n.id = netMap["id"].(string)
 	// "created" is not available in older versions
-	if v, ok := netMap["created"]; ok ***REMOVED***
+	if v, ok := netMap["created"]; ok {
 		// n.created is time.Time but marshalled as string
-		if err = n.created.UnmarshalText([]byte(v.(string))); err != nil ***REMOVED***
+		if err = n.created.UnmarshalText([]byte(v.(string))); err != nil {
 			logrus.Warnf("failed to unmarshal creation time %v: %v", v, err)
-			n.created = time.Time***REMOVED******REMOVED***
-		***REMOVED***
-	***REMOVED***
+			n.created = time.Time{}
+		}
+	}
 	n.networkType = netMap["networkType"].(string)
 	n.enableIPv6 = netMap["enableIPv6"].(bool)
 
 	// if we weren't unmarshaling to netMap we could simply set n.labels
-	// unfortunately, we can't because map[string]interface***REMOVED******REMOVED*** != map[string]string
-	if labels, ok := netMap["labels"].(map[string]interface***REMOVED******REMOVED***); ok ***REMOVED***
+	// unfortunately, we can't because map[string]interface{} != map[string]string
+	if labels, ok := netMap["labels"].(map[string]interface{}); ok {
 		n.labels = make(map[string]string, len(labels))
-		for label, value := range labels ***REMOVED***
+		for label, value := range labels {
 			n.labels[label] = value.(string)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if v, ok := netMap["ipamOptions"]; ok ***REMOVED***
-		if iOpts, ok := v.(map[string]interface***REMOVED******REMOVED***); ok ***REMOVED***
+	if v, ok := netMap["ipamOptions"]; ok {
+		if iOpts, ok := v.(map[string]interface{}); ok {
 			n.ipamOptions = make(map[string]string, len(iOpts))
-			for k, v := range iOpts ***REMOVED***
+			for k, v := range iOpts {
 				n.ipamOptions[k] = v.(string)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
-	if v, ok := netMap["generic"]; ok ***REMOVED***
-		n.generic = v.(map[string]interface***REMOVED******REMOVED***)
+	if v, ok := netMap["generic"]; ok {
+		n.generic = v.(map[string]interface{})
 		// Restore opts in their map[string]string form
-		if v, ok := n.generic[netlabel.GenericData]; ok ***REMOVED***
+		if v, ok := n.generic[netlabel.GenericData]; ok {
 			var lmap map[string]string
 			ba, err := json.Marshal(v)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if err := json.Unmarshal(ba, &lmap); err != nil ***REMOVED***
+			}
+			if err := json.Unmarshal(ba, &lmap); err != nil {
 				return err
-			***REMOVED***
+			}
 			n.generic[netlabel.GenericData] = lmap
-		***REMOVED***
-	***REMOVED***
-	if v, ok := netMap["persist"]; ok ***REMOVED***
+		}
+	}
+	if v, ok := netMap["persist"]; ok {
 		n.persist = v.(bool)
-	***REMOVED***
-	if v, ok := netMap["postIPv6"]; ok ***REMOVED***
+	}
+	if v, ok := netMap["postIPv6"]; ok {
 		n.postIPv6 = v.(bool)
-	***REMOVED***
-	if v, ok := netMap["ipamType"]; ok ***REMOVED***
+	}
+	if v, ok := netMap["ipamType"]; ok {
 		n.ipamType = v.(string)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		n.ipamType = ipamapi.DefaultIPAM
-	***REMOVED***
-	if v, ok := netMap["addrSpace"]; ok ***REMOVED***
+	}
+	if v, ok := netMap["addrSpace"]; ok {
 		n.addrSpace = v.(string)
-	***REMOVED***
-	if v, ok := netMap["ipamV4Config"]; ok ***REMOVED***
-		if err := json.Unmarshal([]byte(v.(string)), &n.ipamV4Config); err != nil ***REMOVED***
+	}
+	if v, ok := netMap["ipamV4Config"]; ok {
+		if err := json.Unmarshal([]byte(v.(string)), &n.ipamV4Config); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
-	if v, ok := netMap["ipamV4Info"]; ok ***REMOVED***
-		if err := json.Unmarshal([]byte(v.(string)), &n.ipamV4Info); err != nil ***REMOVED***
+		}
+	}
+	if v, ok := netMap["ipamV4Info"]; ok {
+		if err := json.Unmarshal([]byte(v.(string)), &n.ipamV4Info); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
-	if v, ok := netMap["ipamV6Config"]; ok ***REMOVED***
-		if err := json.Unmarshal([]byte(v.(string)), &n.ipamV6Config); err != nil ***REMOVED***
+		}
+	}
+	if v, ok := netMap["ipamV6Config"]; ok {
+		if err := json.Unmarshal([]byte(v.(string)), &n.ipamV6Config); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
-	if v, ok := netMap["ipamV6Info"]; ok ***REMOVED***
-		if err := json.Unmarshal([]byte(v.(string)), &n.ipamV6Info); err != nil ***REMOVED***
+		}
+	}
+	if v, ok := netMap["ipamV6Info"]; ok {
+		if err := json.Unmarshal([]byte(v.(string)), &n.ipamV6Info); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
-	if v, ok := netMap["internal"]; ok ***REMOVED***
+		}
+	}
+	if v, ok := netMap["internal"]; ok {
 		n.internal = v.(bool)
-	***REMOVED***
-	if v, ok := netMap["attachable"]; ok ***REMOVED***
+	}
+	if v, ok := netMap["attachable"]; ok {
 		n.attachable = v.(bool)
-	***REMOVED***
-	if s, ok := netMap["scope"]; ok ***REMOVED***
+	}
+	if s, ok := netMap["scope"]; ok {
 		n.scope = s.(string)
-	***REMOVED***
-	if v, ok := netMap["inDelete"]; ok ***REMOVED***
+	}
+	if v, ok := netMap["inDelete"]; ok {
 		n.inDelete = v.(bool)
-	***REMOVED***
-	if v, ok := netMap["ingress"]; ok ***REMOVED***
+	}
+	if v, ok := netMap["ingress"]; ok {
 		n.ingress = v.(bool)
-	***REMOVED***
-	if v, ok := netMap["configOnly"]; ok ***REMOVED***
+	}
+	if v, ok := netMap["configOnly"]; ok {
 		n.configOnly = v.(bool)
-	***REMOVED***
-	if v, ok := netMap["configFrom"]; ok ***REMOVED***
+	}
+	if v, ok := netMap["configFrom"]; ok {
 		n.configFrom = v.(string)
-	***REMOVED***
-	if v, ok := netMap["loadBalancerIP"]; ok ***REMOVED***
+	}
+	if v, ok := netMap["loadBalancerIP"]; ok {
 		n.loadBalancerIP = net.ParseIP(v.(string))
-	***REMOVED***
+	}
 	// Reconcile old networks with the recently added `--ipv6` flag
-	if !n.enableIPv6 ***REMOVED***
+	if !n.enableIPv6 {
 		n.enableIPv6 = len(n.ipamV6Info) > 0
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // NetworkOption is an option setter function type used to pass various options to
 // NewNetwork method. The various setter functions of type NetworkOption are
@@ -719,230 +719,230 @@ type NetworkOption func(n *network)
 
 // NetworkOptionGeneric function returns an option setter for a Generic option defined
 // in a Dictionary of Key-Value pair
-func NetworkOptionGeneric(generic map[string]interface***REMOVED******REMOVED***) NetworkOption ***REMOVED***
-	return func(n *network) ***REMOVED***
-		if n.generic == nil ***REMOVED***
-			n.generic = make(map[string]interface***REMOVED******REMOVED***)
-		***REMOVED***
-		if val, ok := generic[netlabel.EnableIPv6]; ok ***REMOVED***
+func NetworkOptionGeneric(generic map[string]interface{}) NetworkOption {
+	return func(n *network) {
+		if n.generic == nil {
+			n.generic = make(map[string]interface{})
+		}
+		if val, ok := generic[netlabel.EnableIPv6]; ok {
 			n.enableIPv6 = val.(bool)
-		***REMOVED***
-		if val, ok := generic[netlabel.Internal]; ok ***REMOVED***
+		}
+		if val, ok := generic[netlabel.Internal]; ok {
 			n.internal = val.(bool)
-		***REMOVED***
-		for k, v := range generic ***REMOVED***
+		}
+		for k, v := range generic {
 			n.generic[k] = v
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // NetworkOptionIngress returns an option setter to indicate if a network is
 // an ingress network.
-func NetworkOptionIngress(ingress bool) NetworkOption ***REMOVED***
-	return func(n *network) ***REMOVED***
+func NetworkOptionIngress(ingress bool) NetworkOption {
+	return func(n *network) {
 		n.ingress = ingress
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // NetworkOptionPersist returns an option setter to set persistence policy for a network
-func NetworkOptionPersist(persist bool) NetworkOption ***REMOVED***
-	return func(n *network) ***REMOVED***
+func NetworkOptionPersist(persist bool) NetworkOption {
+	return func(n *network) {
 		n.persist = persist
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // NetworkOptionEnableIPv6 returns an option setter to explicitly configure IPv6
-func NetworkOptionEnableIPv6(enableIPv6 bool) NetworkOption ***REMOVED***
-	return func(n *network) ***REMOVED***
-		if n.generic == nil ***REMOVED***
-			n.generic = make(map[string]interface***REMOVED******REMOVED***)
-		***REMOVED***
+func NetworkOptionEnableIPv6(enableIPv6 bool) NetworkOption {
+	return func(n *network) {
+		if n.generic == nil {
+			n.generic = make(map[string]interface{})
+		}
 		n.enableIPv6 = enableIPv6
 		n.generic[netlabel.EnableIPv6] = enableIPv6
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // NetworkOptionInternalNetwork returns an option setter to config the network
 // to be internal which disables default gateway service
-func NetworkOptionInternalNetwork() NetworkOption ***REMOVED***
-	return func(n *network) ***REMOVED***
-		if n.generic == nil ***REMOVED***
-			n.generic = make(map[string]interface***REMOVED******REMOVED***)
-		***REMOVED***
+func NetworkOptionInternalNetwork() NetworkOption {
+	return func(n *network) {
+		if n.generic == nil {
+			n.generic = make(map[string]interface{})
+		}
 		n.internal = true
 		n.generic[netlabel.Internal] = true
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // NetworkOptionAttachable returns an option setter to set attachable for a network
-func NetworkOptionAttachable(attachable bool) NetworkOption ***REMOVED***
-	return func(n *network) ***REMOVED***
+func NetworkOptionAttachable(attachable bool) NetworkOption {
+	return func(n *network) {
 		n.attachable = attachable
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // NetworkOptionScope returns an option setter to overwrite the network's scope.
 // By default the network's scope is set to the network driver's datascope.
-func NetworkOptionScope(scope string) NetworkOption ***REMOVED***
-	return func(n *network) ***REMOVED***
+func NetworkOptionScope(scope string) NetworkOption {
+	return func(n *network) {
 		n.scope = scope
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // NetworkOptionIpam function returns an option setter for the ipam configuration for this network
-func NetworkOptionIpam(ipamDriver string, addrSpace string, ipV4 []*IpamConf, ipV6 []*IpamConf, opts map[string]string) NetworkOption ***REMOVED***
-	return func(n *network) ***REMOVED***
-		if ipamDriver != "" ***REMOVED***
+func NetworkOptionIpam(ipamDriver string, addrSpace string, ipV4 []*IpamConf, ipV6 []*IpamConf, opts map[string]string) NetworkOption {
+	return func(n *network) {
+		if ipamDriver != "" {
 			n.ipamType = ipamDriver
-			if ipamDriver == ipamapi.DefaultIPAM ***REMOVED***
+			if ipamDriver == ipamapi.DefaultIPAM {
 				n.ipamType = defaultIpamForNetworkType(n.Type())
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		n.ipamOptions = opts
 		n.addrSpace = addrSpace
 		n.ipamV4Config = ipV4
 		n.ipamV6Config = ipV6
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // NetworkOptionLBEndpoint function returns an option setter for the configuration of the load balancer endpoint for this network
-func NetworkOptionLBEndpoint(ip net.IP) NetworkOption ***REMOVED***
-	return func(n *network) ***REMOVED***
+func NetworkOptionLBEndpoint(ip net.IP) NetworkOption {
+	return func(n *network) {
 		n.loadBalancerIP = ip
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // NetworkOptionDriverOpts function returns an option setter for any driver parameter described by a map
-func NetworkOptionDriverOpts(opts map[string]string) NetworkOption ***REMOVED***
-	return func(n *network) ***REMOVED***
-		if n.generic == nil ***REMOVED***
-			n.generic = make(map[string]interface***REMOVED******REMOVED***)
-		***REMOVED***
-		if opts == nil ***REMOVED***
+func NetworkOptionDriverOpts(opts map[string]string) NetworkOption {
+	return func(n *network) {
+		if n.generic == nil {
+			n.generic = make(map[string]interface{})
+		}
+		if opts == nil {
 			opts = make(map[string]string)
-		***REMOVED***
+		}
 		// Store the options
 		n.generic[netlabel.GenericData] = opts
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // NetworkOptionLabels function returns an option setter for labels specific to a network
-func NetworkOptionLabels(labels map[string]string) NetworkOption ***REMOVED***
-	return func(n *network) ***REMOVED***
+func NetworkOptionLabels(labels map[string]string) NetworkOption {
+	return func(n *network) {
 		n.labels = labels
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // NetworkOptionDynamic function returns an option setter for dynamic option for a network
-func NetworkOptionDynamic() NetworkOption ***REMOVED***
-	return func(n *network) ***REMOVED***
+func NetworkOptionDynamic() NetworkOption {
+	return func(n *network) {
 		n.dynamic = true
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // NetworkOptionDeferIPv6Alloc instructs the network to defer the IPV6 address allocation until after the endpoint has been created
 // It is being provided to support the specific docker daemon flags where user can deterministically assign an IPv6 address
 // to a container as combination of fixed-cidr-v6 + mac-address
 // TODO: Remove this option setter once we support endpoint ipam options
-func NetworkOptionDeferIPv6Alloc(enable bool) NetworkOption ***REMOVED***
-	return func(n *network) ***REMOVED***
+func NetworkOptionDeferIPv6Alloc(enable bool) NetworkOption {
+	return func(n *network) {
 		n.postIPv6 = enable
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // NetworkOptionConfigOnly tells controller this network is
 // a configuration only network. It serves as a configuration
 // for other networks.
-func NetworkOptionConfigOnly() NetworkOption ***REMOVED***
-	return func(n *network) ***REMOVED***
+func NetworkOptionConfigOnly() NetworkOption {
+	return func(n *network) {
 		n.configOnly = true
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // NetworkOptionConfigFrom tells controller to pick the
 // network configuration from a configuration only network
-func NetworkOptionConfigFrom(name string) NetworkOption ***REMOVED***
-	return func(n *network) ***REMOVED***
+func NetworkOptionConfigFrom(name string) NetworkOption {
+	return func(n *network) {
 		n.configFrom = name
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (n *network) processOptions(options ...NetworkOption) ***REMOVED***
-	for _, opt := range options ***REMOVED***
-		if opt != nil ***REMOVED***
+func (n *network) processOptions(options ...NetworkOption) {
+	for _, opt := range options {
+		if opt != nil {
 			opt(n)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (n *network) resolveDriver(name string, load bool) (driverapi.Driver, *driverapi.Capability, error) ***REMOVED***
+func (n *network) resolveDriver(name string, load bool) (driverapi.Driver, *driverapi.Capability, error) {
 	c := n.getController()
 
 	// Check if a driver for the specified network type is available
 	d, cap := c.drvRegistry.Driver(name)
-	if d == nil ***REMOVED***
-		if load ***REMOVED***
+	if d == nil {
+		if load {
 			err := c.loadDriver(name)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, nil, err
-			***REMOVED***
+			}
 
 			d, cap = c.drvRegistry.Driver(name)
-			if d == nil ***REMOVED***
+			if d == nil {
 				return nil, nil, fmt.Errorf("could not resolve driver %s in registry", name)
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
+			}
+		} else {
 			// don't fail if driver loading is not required
 			return nil, nil, nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return d, cap, nil
-***REMOVED***
+}
 
-func (n *network) driverScope() string ***REMOVED***
+func (n *network) driverScope() string {
 	_, cap, err := n.resolveDriver(n.networkType, true)
-	if err != nil ***REMOVED***
+	if err != nil {
 		// If driver could not be resolved simply return an empty string
 		return ""
-	***REMOVED***
+	}
 
 	return cap.DataScope
-***REMOVED***
+}
 
-func (n *network) driverIsMultihost() bool ***REMOVED***
+func (n *network) driverIsMultihost() bool {
 	_, cap, err := n.resolveDriver(n.networkType, true)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return false
-	***REMOVED***
+	}
 	return cap.ConnectivityScope == datastore.GlobalScope
-***REMOVED***
+}
 
-func (n *network) driver(load bool) (driverapi.Driver, error) ***REMOVED***
+func (n *network) driver(load bool) (driverapi.Driver, error) {
 	d, cap, err := n.resolveDriver(n.networkType, load)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	n.Lock()
 	// If load is not required, driver, cap and err may all be nil
-	if n.scope == "" && cap != nil ***REMOVED***
+	if n.scope == "" && cap != nil {
 		n.scope = cap.DataScope
-	***REMOVED***
-	if n.dynamic ***REMOVED***
+	}
+	if n.dynamic {
 		// If the network is dynamic, then it is swarm
 		// scoped regardless of the backing driver.
 		n.scope = datastore.SwarmScope
-	***REMOVED***
+	}
 	n.Unlock()
 	return d, nil
-***REMOVED***
+}
 
-func (n *network) Delete() error ***REMOVED***
+func (n *network) Delete() error {
 	return n.delete(false)
-***REMOVED***
+}
 
-func (n *network) delete(force bool) error ***REMOVED***
+func (n *network) delete(force bool) error {
 	n.Lock()
 	c := n.ctrlr
 	name := n.name
@@ -953,61 +953,61 @@ func (n *network) delete(force bool) error ***REMOVED***
 	defer c.networkLocker.Unlock(id)
 
 	n, err := c.getNetworkFromStore(id)
-	if err != nil ***REMOVED***
-		return &UnknownNetworkError***REMOVED***name: name, id: id***REMOVED***
-	***REMOVED***
+	if err != nil {
+		return &UnknownNetworkError{name: name, id: id}
+	}
 
-	if len(n.loadBalancerIP) != 0 ***REMOVED***
+	if len(n.loadBalancerIP) != 0 {
 		endpoints := n.Endpoints()
-		if force || len(endpoints) == 1 ***REMOVED***
+		if force || len(endpoints) == 1 {
 			n.deleteLoadBalancerSandbox()
-		***REMOVED***
+		}
 		//Reload the network from the store to update the epcnt.
 		n, err = c.getNetworkFromStore(id)
-		if err != nil ***REMOVED***
-			return &UnknownNetworkError***REMOVED***name: name, id: id***REMOVED***
-		***REMOVED***
-	***REMOVED***
+		if err != nil {
+			return &UnknownNetworkError{name: name, id: id}
+		}
+	}
 
-	if !force && n.getEpCnt().EndpointCnt() != 0 ***REMOVED***
-		if n.configOnly ***REMOVED***
+	if !force && n.getEpCnt().EndpointCnt() != 0 {
+		if n.configOnly {
 			return types.ForbiddenErrorf("configuration network %q is in use", n.Name())
-		***REMOVED***
-		return &ActiveEndpointsError***REMOVED***name: n.name, id: n.id***REMOVED***
-	***REMOVED***
+		}
+		return &ActiveEndpointsError{name: n.name, id: n.id}
+	}
 
 	// Mark the network for deletion
 	n.inDelete = true
-	if err = c.updateToStore(n); err != nil ***REMOVED***
+	if err = c.updateToStore(n); err != nil {
 		return fmt.Errorf("error marking network %s (%s) for deletion: %v", n.Name(), n.ID(), err)
-	***REMOVED***
+	}
 
-	if n.ConfigFrom() != "" ***REMOVED***
-		if t, err := c.getConfigNetwork(n.ConfigFrom()); err == nil ***REMOVED***
-			if err := t.getEpCnt().DecEndpointCnt(); err != nil ***REMOVED***
+	if n.ConfigFrom() != "" {
+		if t, err := c.getConfigNetwork(n.ConfigFrom()); err == nil {
+			if err := t.getEpCnt().DecEndpointCnt(); err != nil {
 				logrus.Warnf("Failed to update reference count for configuration network %q on removal of network %q: %v",
 					t.Name(), n.Name(), err)
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
+			}
+		} else {
 			logrus.Warnf("Could not find configuration network %q during removal of network %q", n.configOnly, n.Name())
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if n.configOnly ***REMOVED***
+	if n.configOnly {
 		goto removeFromStore
-	***REMOVED***
+	}
 
-	if err = n.deleteNetwork(); err != nil ***REMOVED***
-		if !force ***REMOVED***
+	if err = n.deleteNetwork(); err != nil {
+		if !force {
 			return err
-		***REMOVED***
+		}
 		logrus.Debugf("driver failed to delete stale network %s (%s): %v", n.Name(), n.ID(), err)
-	***REMOVED***
+	}
 
 	n.ipamRelease()
-	if err = c.updateToStore(n); err != nil ***REMOVED***
+	if err = c.updateToStore(n); err != nil {
 		logrus.Warnf("Failed to update store after ipam release for network %s (%s): %v", n.Name(), n.ID(), err)
-	***REMOVED***
+	}
 
 	// We are about to delete the network. Leave the gossip
 	// cluster for the network to stop all incoming network
@@ -1016,9 +1016,9 @@ func (n *network) delete(force bool) error ***REMOVED***
 	// before deleting the network from the store since service
 	// bindings cleanup requires the network in the store.
 	n.cancelDriverWatches()
-	if err = n.leaveCluster(); err != nil ***REMOVED***
+	if err = n.leaveCluster(); err != nil {
 		logrus.Errorf("Failed leaving network %s from the agent cluster: %v", n.Name(), err)
-	***REMOVED***
+	}
 
 	// Cleanup the service discovery for this network
 	c.cleanupServiceDiscovery(n.ID())
@@ -1030,83 +1030,83 @@ removeFromStore:
 	// deleteFromStore performs an atomic delete operation and the
 	// network.epCnt will help prevent any possible
 	// race between endpoint join and network delete
-	if err = c.deleteFromStore(n.getEpCnt()); err != nil ***REMOVED***
-		if !force ***REMOVED***
+	if err = c.deleteFromStore(n.getEpCnt()); err != nil {
+		if !force {
 			return fmt.Errorf("error deleting network endpoint count from store: %v", err)
-		***REMOVED***
+		}
 		logrus.Debugf("Error deleting endpoint count from store for stale network %s (%s) for deletion: %v", n.Name(), n.ID(), err)
-	***REMOVED***
+	}
 
-	if err = c.deleteFromStore(n); err != nil ***REMOVED***
+	if err = c.deleteFromStore(n); err != nil {
 		return fmt.Errorf("error deleting network from store: %v", err)
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (n *network) deleteNetwork() error ***REMOVED***
+func (n *network) deleteNetwork() error {
 	d, err := n.driver(true)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("failed deleting network: %v", err)
-	***REMOVED***
+	}
 
-	if err := d.DeleteNetwork(n.ID()); err != nil ***REMOVED***
+	if err := d.DeleteNetwork(n.ID()); err != nil {
 		// Forbidden Errors should be honored
-		if _, ok := err.(types.ForbiddenError); ok ***REMOVED***
+		if _, ok := err.(types.ForbiddenError); ok {
 			return err
-		***REMOVED***
+		}
 
-		if _, ok := err.(types.MaskableError); !ok ***REMOVED***
+		if _, ok := err.(types.MaskableError); !ok {
 			logrus.Warnf("driver error deleting network %s : %v", n.name, err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	for _, resolver := range n.resolver ***REMOVED***
+	for _, resolver := range n.resolver {
 		resolver.Stop()
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (n *network) addEndpoint(ep *endpoint) error ***REMOVED***
+func (n *network) addEndpoint(ep *endpoint) error {
 	d, err := n.driver(true)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("failed to add endpoint: %v", err)
-	***REMOVED***
+	}
 
 	err = d.CreateEndpoint(n.id, ep.id, ep.Interface(), ep.generic)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return types.InternalErrorf("failed to create endpoint %s on network %s: %v",
 			ep.Name(), n.Name(), err)
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (n *network) CreateEndpoint(name string, options ...EndpointOption) (Endpoint, error) ***REMOVED***
+func (n *network) CreateEndpoint(name string, options ...EndpointOption) (Endpoint, error) {
 	var err error
-	if !config.IsValidName(name) ***REMOVED***
+	if !config.IsValidName(name) {
 		return nil, ErrInvalidName(name)
-	***REMOVED***
+	}
 
-	if n.ConfigOnly() ***REMOVED***
+	if n.ConfigOnly() {
 		return nil, types.ForbiddenErrorf("cannot create endpoint on configuration-only network")
-	***REMOVED***
+	}
 
-	if _, err = n.EndpointByName(name); err == nil ***REMOVED***
+	if _, err = n.EndpointByName(name); err == nil {
 		return nil, types.ForbiddenErrorf("endpoint with name %s already exists in network %s", name, n.Name())
-	***REMOVED***
+	}
 
 	n.ctrlr.networkLocker.Lock(n.id)
 	defer n.ctrlr.networkLocker.Unlock(n.id)
 
 	return n.createEndpoint(name, options...)
 
-***REMOVED***
+}
 
-func (n *network) createEndpoint(name string, options ...EndpointOption) (Endpoint, error) ***REMOVED***
+func (n *network) createEndpoint(name string, options ...EndpointOption) (Endpoint, error) {
 	var err error
 
-	ep := &endpoint***REMOVED***name: name, generic: make(map[string]interface***REMOVED******REMOVED***), iface: &endpointInterface***REMOVED******REMOVED******REMOVED***
+	ep := &endpoint{name: name, generic: make(map[string]interface{}), iface: &endpointInterface{}}
 	ep.id = stringid.GenerateRandomID()
 
 	// Initialize ep.network with a possibly stale copy of n. We need this to get network from
@@ -1114,229 +1114,229 @@ func (n *network) createEndpoint(name string, options ...EndpointOption) (Endpoi
 	ep.network = n
 	ep.locator = n.getController().clusterHostID()
 	ep.network, err = ep.getNetworkFromStore()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("failed to get network during CreateEndpoint: %v", err)
-	***REMOVED***
+	}
 	n = ep.network
 
 	ep.processOptions(options...)
 
-	for _, llIPNet := range ep.Iface().LinkLocalAddresses() ***REMOVED***
-		if !llIPNet.IP.IsLinkLocalUnicast() ***REMOVED***
+	for _, llIPNet := range ep.Iface().LinkLocalAddresses() {
+		if !llIPNet.IP.IsLinkLocalUnicast() {
 			return nil, types.BadRequestErrorf("invalid link local IP address: %v", llIPNet.IP)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if opt, ok := ep.generic[netlabel.MacAddress]; ok ***REMOVED***
-		if mac, ok := opt.(net.HardwareAddr); ok ***REMOVED***
+	if opt, ok := ep.generic[netlabel.MacAddress]; ok {
+		if mac, ok := opt.(net.HardwareAddr); ok {
 			ep.iface.mac = mac
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	ipam, cap, err := n.getController().getIPAMDriver(n.ipamType)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	if cap.RequiresMACAddress ***REMOVED***
-		if ep.iface.mac == nil ***REMOVED***
+	if cap.RequiresMACAddress {
+		if ep.iface.mac == nil {
 			ep.iface.mac = netutils.GenerateRandomMAC()
-		***REMOVED***
-		if ep.ipamOptions == nil ***REMOVED***
+		}
+		if ep.ipamOptions == nil {
 			ep.ipamOptions = make(map[string]string)
-		***REMOVED***
+		}
 		ep.ipamOptions[netlabel.MacAddress] = ep.iface.mac.String()
-	***REMOVED***
+	}
 
-	if err = ep.assignAddress(ipam, true, n.enableIPv6 && !n.postIPv6); err != nil ***REMOVED***
+	if err = ep.assignAddress(ipam, true, n.enableIPv6 && !n.postIPv6); err != nil {
 		return nil, err
-	***REMOVED***
-	defer func() ***REMOVED***
-		if err != nil ***REMOVED***
+	}
+	defer func() {
+		if err != nil {
 			ep.releaseAddress()
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 	// Moving updateToSTore before calling addEndpoint so that we shall clean up VETH interfaces in case
 	// DockerD get killed between addEndpoint and updateSTore call
-	if err = n.getController().updateToStore(ep); err != nil ***REMOVED***
+	if err = n.getController().updateToStore(ep); err != nil {
 		return nil, err
-	***REMOVED***
-	defer func() ***REMOVED***
-		if err != nil ***REMOVED***
-			if e := n.getController().deleteFromStore(ep); e != nil ***REMOVED***
+	}
+	defer func() {
+		if err != nil {
+			if e := n.getController().deleteFromStore(ep); e != nil {
 				logrus.Warnf("error rolling back endpoint %s from store: %v", name, e)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***()
+			}
+		}
+	}()
 
-	if err = n.addEndpoint(ep); err != nil ***REMOVED***
+	if err = n.addEndpoint(ep); err != nil {
 		return nil, err
-	***REMOVED***
-	defer func() ***REMOVED***
-		if err != nil ***REMOVED***
-			if e := ep.deleteEndpoint(false); e != nil ***REMOVED***
+	}
+	defer func() {
+		if err != nil {
+			if e := ep.deleteEndpoint(false); e != nil {
 				logrus.Warnf("cleaning up endpoint failed %s : %v", name, e)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***()
+			}
+		}
+	}()
 
-	if err = ep.assignAddress(ipam, false, n.enableIPv6 && n.postIPv6); err != nil ***REMOVED***
+	if err = ep.assignAddress(ipam, false, n.enableIPv6 && n.postIPv6); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// Watch for service records
 	n.getController().watchSvcRecord(ep)
-	defer func() ***REMOVED***
-		if err != nil ***REMOVED***
+	defer func() {
+		if err != nil {
 			n.getController().unWatchSvcRecord(ep)
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
 	// Increment endpoint count to indicate completion of endpoint addition
-	if err = n.getEpCnt().IncEndpointCnt(); err != nil ***REMOVED***
+	if err = n.getEpCnt().IncEndpointCnt(); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	return ep, nil
-***REMOVED***
+}
 
-func (n *network) Endpoints() []Endpoint ***REMOVED***
+func (n *network) Endpoints() []Endpoint {
 	var list []Endpoint
 
 	endpoints, err := n.getEndpointsFromStore()
-	if err != nil ***REMOVED***
+	if err != nil {
 		logrus.Error(err)
-	***REMOVED***
+	}
 
-	for _, ep := range endpoints ***REMOVED***
+	for _, ep := range endpoints {
 		list = append(list, ep)
-	***REMOVED***
+	}
 
 	return list
-***REMOVED***
+}
 
-func (n *network) WalkEndpoints(walker EndpointWalker) ***REMOVED***
-	for _, e := range n.Endpoints() ***REMOVED***
-		if walker(e) ***REMOVED***
+func (n *network) WalkEndpoints(walker EndpointWalker) {
+	for _, e := range n.Endpoints() {
+		if walker(e) {
 			return
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (n *network) EndpointByName(name string) (Endpoint, error) ***REMOVED***
-	if name == "" ***REMOVED***
+func (n *network) EndpointByName(name string) (Endpoint, error) {
+	if name == "" {
 		return nil, ErrInvalidName(name)
-	***REMOVED***
+	}
 	var e Endpoint
 
-	s := func(current Endpoint) bool ***REMOVED***
-		if current.Name() == name ***REMOVED***
+	s := func(current Endpoint) bool {
+		if current.Name() == name {
 			e = current
 			return true
-		***REMOVED***
+		}
 		return false
-	***REMOVED***
+	}
 
 	n.WalkEndpoints(s)
 
-	if e == nil ***REMOVED***
+	if e == nil {
 		return nil, ErrNoSuchEndpoint(name)
-	***REMOVED***
+	}
 
 	return e, nil
-***REMOVED***
+}
 
-func (n *network) EndpointByID(id string) (Endpoint, error) ***REMOVED***
-	if id == "" ***REMOVED***
+func (n *network) EndpointByID(id string) (Endpoint, error) {
+	if id == "" {
 		return nil, ErrInvalidID(id)
-	***REMOVED***
+	}
 
 	ep, err := n.getEndpointFromStore(id)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, ErrNoSuchEndpoint(id)
-	***REMOVED***
+	}
 
 	return ep, nil
-***REMOVED***
+}
 
-func (n *network) updateSvcRecord(ep *endpoint, localEps []*endpoint, isAdd bool) ***REMOVED***
+func (n *network) updateSvcRecord(ep *endpoint, localEps []*endpoint, isAdd bool) {
 	var ipv6 net.IP
 	epName := ep.Name()
-	if iface := ep.Iface(); iface.Address() != nil ***REMOVED***
+	if iface := ep.Iface(); iface.Address() != nil {
 		myAliases := ep.MyAliases()
-		if iface.AddressIPv6() != nil ***REMOVED***
+		if iface.AddressIPv6() != nil {
 			ipv6 = iface.AddressIPv6().IP
-		***REMOVED***
+		}
 
 		serviceID := ep.svcID
-		if serviceID == "" ***REMOVED***
+		if serviceID == "" {
 			serviceID = ep.ID()
-		***REMOVED***
-		if isAdd ***REMOVED***
+		}
+		if isAdd {
 			// If anonymous endpoint has an alias use the first alias
 			// for ip->name mapping. Not having the reverse mapping
 			// breaks some apps
-			if ep.isAnonymous() ***REMOVED***
-				if len(myAliases) > 0 ***REMOVED***
+			if ep.isAnonymous() {
+				if len(myAliases) > 0 {
 					n.addSvcRecords(ep.ID(), myAliases[0], serviceID, iface.Address().IP, ipv6, true, "updateSvcRecord")
-				***REMOVED***
-			***REMOVED*** else ***REMOVED***
+				}
+			} else {
 				n.addSvcRecords(ep.ID(), epName, serviceID, iface.Address().IP, ipv6, true, "updateSvcRecord")
-			***REMOVED***
-			for _, alias := range myAliases ***REMOVED***
+			}
+			for _, alias := range myAliases {
 				n.addSvcRecords(ep.ID(), alias, serviceID, iface.Address().IP, ipv6, false, "updateSvcRecord")
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
-			if ep.isAnonymous() ***REMOVED***
-				if len(myAliases) > 0 ***REMOVED***
+			}
+		} else {
+			if ep.isAnonymous() {
+				if len(myAliases) > 0 {
 					n.deleteSvcRecords(ep.ID(), myAliases[0], serviceID, iface.Address().IP, ipv6, true, "updateSvcRecord")
-				***REMOVED***
-			***REMOVED*** else ***REMOVED***
+				}
+			} else {
 				n.deleteSvcRecords(ep.ID(), epName, serviceID, iface.Address().IP, ipv6, true, "updateSvcRecord")
-			***REMOVED***
-			for _, alias := range myAliases ***REMOVED***
+			}
+			for _, alias := range myAliases {
 				n.deleteSvcRecords(ep.ID(), alias, serviceID, iface.Address().IP, ipv6, false, "updateSvcRecord")
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}
 
-func addIPToName(ipMap common.SetMatrix, name, serviceID string, ip net.IP) ***REMOVED***
+func addIPToName(ipMap common.SetMatrix, name, serviceID string, ip net.IP) {
 	reverseIP := netutils.ReverseIP(ip.String())
-	ipMap.Insert(reverseIP, ipInfo***REMOVED***
+	ipMap.Insert(reverseIP, ipInfo{
 		name:      name,
 		serviceID: serviceID,
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func delIPToName(ipMap common.SetMatrix, name, serviceID string, ip net.IP) ***REMOVED***
+func delIPToName(ipMap common.SetMatrix, name, serviceID string, ip net.IP) {
 	reverseIP := netutils.ReverseIP(ip.String())
-	ipMap.Remove(reverseIP, ipInfo***REMOVED***
+	ipMap.Remove(reverseIP, ipInfo{
 		name:      name,
 		serviceID: serviceID,
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func addNameToIP(svcMap common.SetMatrix, name, serviceID string, epIP net.IP) ***REMOVED***
-	svcMap.Insert(name, svcMapEntry***REMOVED***
+func addNameToIP(svcMap common.SetMatrix, name, serviceID string, epIP net.IP) {
+	svcMap.Insert(name, svcMapEntry{
 		ip:        epIP.String(),
 		serviceID: serviceID,
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func delNameToIP(svcMap common.SetMatrix, name, serviceID string, epIP net.IP) ***REMOVED***
-	svcMap.Remove(name, svcMapEntry***REMOVED***
+func delNameToIP(svcMap common.SetMatrix, name, serviceID string, epIP net.IP) {
+	svcMap.Remove(name, svcMapEntry{
 		ip:        epIP.String(),
 		serviceID: serviceID,
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func (n *network) addSvcRecords(eID, name, serviceID string, epIP, epIPv6 net.IP, ipMapUpdate bool, method string) ***REMOVED***
+func (n *network) addSvcRecords(eID, name, serviceID string, epIP, epIPv6 net.IP, ipMapUpdate bool, method string) {
 	// Do not add service names for ingress network as this is a
 	// routing only network
-	if n.ingress ***REMOVED***
+	if n.ingress {
 		return
-	***REMOVED***
+	}
 
 	logrus.Debugf("%s (%s).addSvcRecords(%s, %s, %s, %t) %s sid:%s", eID, n.ID()[0:7], name, epIP, epIPv6, ipMapUpdate, method, serviceID)
 
@@ -1345,34 +1345,34 @@ func (n *network) addSvcRecords(eID, name, serviceID string, epIP, epIPv6 net.IP
 	defer c.Unlock()
 
 	sr, ok := c.svcRecords[n.ID()]
-	if !ok ***REMOVED***
-		sr = svcInfo***REMOVED***
+	if !ok {
+		sr = svcInfo{
 			svcMap:     common.NewSetMatrix(),
 			svcIPv6Map: common.NewSetMatrix(),
 			ipMap:      common.NewSetMatrix(),
-		***REMOVED***
+		}
 		c.svcRecords[n.ID()] = sr
-	***REMOVED***
+	}
 
-	if ipMapUpdate ***REMOVED***
+	if ipMapUpdate {
 		addIPToName(sr.ipMap, name, serviceID, epIP)
-		if epIPv6 != nil ***REMOVED***
+		if epIPv6 != nil {
 			addIPToName(sr.ipMap, name, serviceID, epIPv6)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	addNameToIP(sr.svcMap, name, serviceID, epIP)
-	if epIPv6 != nil ***REMOVED***
+	if epIPv6 != nil {
 		addNameToIP(sr.svcIPv6Map, name, serviceID, epIPv6)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (n *network) deleteSvcRecords(eID, name, serviceID string, epIP net.IP, epIPv6 net.IP, ipMapUpdate bool, method string) ***REMOVED***
+func (n *network) deleteSvcRecords(eID, name, serviceID string, epIP net.IP, epIPv6 net.IP, ipMapUpdate bool, method string) {
 	// Do not delete service names from ingress network as this is a
 	// routing only network
-	if n.ingress ***REMOVED***
+	if n.ingress {
 		return
-	***REMOVED***
+	}
 
 	logrus.Debugf("%s (%s).deleteSvcRecords(%s, %s, %s, %t) %s sid:%s ", eID, n.ID()[0:7], name, epIP, epIPv6, ipMapUpdate, method, serviceID)
 
@@ -1381,32 +1381,32 @@ func (n *network) deleteSvcRecords(eID, name, serviceID string, epIP net.IP, epI
 	defer c.Unlock()
 
 	sr, ok := c.svcRecords[n.ID()]
-	if !ok ***REMOVED***
+	if !ok {
 		return
-	***REMOVED***
+	}
 
-	if ipMapUpdate ***REMOVED***
+	if ipMapUpdate {
 		delIPToName(sr.ipMap, name, serviceID, epIP)
 
-		if epIPv6 != nil ***REMOVED***
+		if epIPv6 != nil {
 			delIPToName(sr.ipMap, name, serviceID, epIPv6)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	delNameToIP(sr.svcMap, name, serviceID, epIP)
 
-	if epIPv6 != nil ***REMOVED***
+	if epIPv6 != nil {
 		delNameToIP(sr.svcIPv6Map, name, serviceID, epIPv6)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (n *network) getSvcRecords(ep *endpoint) []etchosts.Record ***REMOVED***
+func (n *network) getSvcRecords(ep *endpoint) []etchosts.Record {
 	n.Lock()
 	defer n.Unlock()
 
-	if ep == nil ***REMOVED***
+	if ep == nil {
 		return nil
-	***REMOVED***
+	}
 
 	var recs []etchosts.Record
 
@@ -1415,94 +1415,94 @@ func (n *network) getSvcRecords(ep *endpoint) []etchosts.Record ***REMOVED***
 	n.ctrlr.Lock()
 	defer n.ctrlr.Unlock()
 	sr, ok := n.ctrlr.svcRecords[n.id]
-	if !ok || sr.svcMap == nil ***REMOVED***
+	if !ok || sr.svcMap == nil {
 		return nil
-	***REMOVED***
+	}
 
 	svcMapKeys := sr.svcMap.Keys()
 	// Loop on service names on this network
-	for _, k := range svcMapKeys ***REMOVED***
-		if strings.Split(k, ".")[0] == epName ***REMOVED***
+	for _, k := range svcMapKeys {
+		if strings.Split(k, ".")[0] == epName {
 			continue
-		***REMOVED***
+		}
 		// Get all the IPs associated to this service
 		mapEntryList, ok := sr.svcMap.Get(k)
-		if !ok ***REMOVED***
+		if !ok {
 			// The key got deleted
 			continue
-		***REMOVED***
-		if len(mapEntryList) == 0 ***REMOVED***
+		}
+		if len(mapEntryList) == 0 {
 			logrus.Warnf("Found empty list of IP addresses for service %s on network %s (%s)", k, n.name, n.id)
 			continue
-		***REMOVED***
+		}
 
-		recs = append(recs, etchosts.Record***REMOVED***
+		recs = append(recs, etchosts.Record{
 			Hosts: k,
 			IP:    mapEntryList[0].(svcMapEntry).ip,
-		***REMOVED***)
-	***REMOVED***
+		})
+	}
 
 	return recs
-***REMOVED***
+}
 
-func (n *network) getController() *controller ***REMOVED***
+func (n *network) getController() *controller {
 	n.Lock()
 	defer n.Unlock()
 	return n.ctrlr
-***REMOVED***
+}
 
-func (n *network) ipamAllocate() error ***REMOVED***
-	if n.hasSpecialDriver() ***REMOVED***
+func (n *network) ipamAllocate() error {
+	if n.hasSpecialDriver() {
 		return nil
-	***REMOVED***
+	}
 
 	ipam, _, err := n.getController().getIPAMDriver(n.ipamType)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if n.addrSpace == "" ***REMOVED***
-		if n.addrSpace, err = n.deriveAddressSpace(); err != nil ***REMOVED***
+	if n.addrSpace == "" {
+		if n.addrSpace, err = n.deriveAddressSpace(); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	err = n.ipamAllocateVersion(4, ipam)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	defer func() ***REMOVED***
-		if err != nil ***REMOVED***
+	defer func() {
+		if err != nil {
 			n.ipamReleaseVersion(4, ipam)
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
-	if !n.enableIPv6 ***REMOVED***
+	if !n.enableIPv6 {
 		return nil
-	***REMOVED***
+	}
 
 	err = n.ipamAllocateVersion(6, ipam)
 	return err
-***REMOVED***
+}
 
-func (n *network) requestPoolHelper(ipam ipamapi.Ipam, addressSpace, preferredPool, subPool string, options map[string]string, v6 bool) (string, *net.IPNet, map[string]string, error) ***REMOVED***
-	for ***REMOVED***
+func (n *network) requestPoolHelper(ipam ipamapi.Ipam, addressSpace, preferredPool, subPool string, options map[string]string, v6 bool) (string, *net.IPNet, map[string]string, error) {
+	for {
 		poolID, pool, meta, err := ipam.RequestPool(addressSpace, preferredPool, subPool, options, v6)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return "", nil, nil, err
-		***REMOVED***
+		}
 
 		// If the network belongs to global scope or the pool was
 		// explicitly chosen or it is invalid, do not perform the overlap check.
-		if n.Scope() == datastore.GlobalScope || preferredPool != "" || !types.IsIPNetValid(pool) ***REMOVED***
+		if n.Scope() == datastore.GlobalScope || preferredPool != "" || !types.IsIPNetValid(pool) {
 			return poolID, pool, meta, nil
-		***REMOVED***
+		}
 
 		// Check for overlap and if none found, we have found the right pool.
-		if _, err := netutils.FindAvailableNetwork([]*net.IPNet***REMOVED***pool***REMOVED***); err == nil ***REMOVED***
+		if _, err := netutils.FindAvailableNetwork([]*net.IPNet{pool}); err == nil {
 			return poolID, pool, meta, nil
-		***REMOVED***
+		}
 
 		// Pool obtained in this iteration is
 		// overlapping. Hold onto the pool and don't release
@@ -1511,30 +1511,30 @@ func (n *network) requestPoolHelper(ipam ipamapi.Ipam, addressSpace, preferredPo
 		// a deferred release when we have either obtained a
 		// non-overlapping pool or ran out of pre-defined
 		// pools.
-		defer func() ***REMOVED***
-			if err := ipam.ReleasePool(poolID); err != nil ***REMOVED***
+		defer func() {
+			if err := ipam.ReleasePool(poolID); err != nil {
 				logrus.Warnf("Failed to release overlapping pool %s while returning from pool request helper for network %s", pool, n.Name())
-			***REMOVED***
-		***REMOVED***()
+			}
+		}()
 
 		// If this is a preferred pool request and the network
 		// is local scope and there is an overlap, we fail the
 		// network creation right here. The pool will be
 		// released in the defer.
-		if preferredPool != "" ***REMOVED***
+		if preferredPool != "" {
 			return "", nil, nil, fmt.Errorf("requested subnet %s overlaps in the host", preferredPool)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (n *network) ipamAllocateVersion(ipVer int, ipam ipamapi.Ipam) error ***REMOVED***
+func (n *network) ipamAllocateVersion(ipVer int, ipam ipamapi.Ipam) error {
 	var (
 		cfgList  *[]*IpamConf
 		infoList *[]*IpamInfo
 		err      error
 	)
 
-	switch ipVer ***REMOVED***
+	switch ipVer {
 	case 4:
 		cfgList = &n.ipamV4Config
 		infoList = &n.ipamV4Info
@@ -1543,95 +1543,95 @@ func (n *network) ipamAllocateVersion(ipVer int, ipam ipamapi.Ipam) error ***REM
 		infoList = &n.ipamV6Info
 	default:
 		return types.InternalErrorf("incorrect ip version passed to ipam allocate: %d", ipVer)
-	***REMOVED***
+	}
 
-	if len(*cfgList) == 0 ***REMOVED***
-		*cfgList = []*IpamConf***REMOVED******REMOVED******REMOVED******REMOVED***
-	***REMOVED***
+	if len(*cfgList) == 0 {
+		*cfgList = []*IpamConf{{}}
+	}
 
 	*infoList = make([]*IpamInfo, len(*cfgList))
 
 	logrus.Debugf("Allocating IPv%d pools for network %s (%s)", ipVer, n.Name(), n.ID())
 
-	for i, cfg := range *cfgList ***REMOVED***
-		if err = cfg.Validate(); err != nil ***REMOVED***
+	for i, cfg := range *cfgList {
+		if err = cfg.Validate(); err != nil {
 			return err
-		***REMOVED***
-		d := &IpamInfo***REMOVED******REMOVED***
+		}
+		d := &IpamInfo{}
 		(*infoList)[i] = d
 
 		d.AddressSpace = n.addrSpace
 		d.PoolID, d.Pool, d.Meta, err = n.requestPoolHelper(ipam, n.addrSpace, cfg.PreferredPool, cfg.SubPool, n.ipamOptions, ipVer == 6)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 
-		defer func() ***REMOVED***
-			if err != nil ***REMOVED***
-				if err := ipam.ReleasePool(d.PoolID); err != nil ***REMOVED***
+		defer func() {
+			if err != nil {
+				if err := ipam.ReleasePool(d.PoolID); err != nil {
 					logrus.Warnf("Failed to release address pool %s after failure to create network %s (%s)", d.PoolID, n.Name(), n.ID())
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***()
+				}
+			}
+		}()
 
-		if gws, ok := d.Meta[netlabel.Gateway]; ok ***REMOVED***
-			if d.Gateway, err = types.ParseCIDR(gws); err != nil ***REMOVED***
+		if gws, ok := d.Meta[netlabel.Gateway]; ok {
+			if d.Gateway, err = types.ParseCIDR(gws); err != nil {
 				return types.BadRequestErrorf("failed to parse gateway address (%v) returned by ipam driver: %v", gws, err)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		// If user requested a specific gateway, libnetwork will allocate it
 		// irrespective of whether ipam driver returned a gateway already.
 		// If none of the above is true, libnetwork will allocate one.
-		if cfg.Gateway != "" || d.Gateway == nil ***REMOVED***
-			var gatewayOpts = map[string]string***REMOVED***
+		if cfg.Gateway != "" || d.Gateway == nil {
+			var gatewayOpts = map[string]string{
 				ipamapi.RequestAddressType: netlabel.Gateway,
-			***REMOVED***
-			if d.Gateway, _, err = ipam.RequestAddress(d.PoolID, net.ParseIP(cfg.Gateway), gatewayOpts); err != nil ***REMOVED***
+			}
+			if d.Gateway, _, err = ipam.RequestAddress(d.PoolID, net.ParseIP(cfg.Gateway), gatewayOpts); err != nil {
 				return types.InternalErrorf("failed to allocate gateway (%v): %v", cfg.Gateway, err)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		// Auxiliary addresses must be part of the master address pool
 		// If they fall into the container addressable pool, libnetwork will reserve them
-		if cfg.AuxAddresses != nil ***REMOVED***
+		if cfg.AuxAddresses != nil {
 			var ip net.IP
 			d.IPAMData.AuxAddresses = make(map[string]*net.IPNet, len(cfg.AuxAddresses))
-			for k, v := range cfg.AuxAddresses ***REMOVED***
-				if ip = net.ParseIP(v); ip == nil ***REMOVED***
+			for k, v := range cfg.AuxAddresses {
+				if ip = net.ParseIP(v); ip == nil {
 					return types.BadRequestErrorf("non parsable secondary ip address (%s:%s) passed for network %s", k, v, n.Name())
-				***REMOVED***
-				if !d.Pool.Contains(ip) ***REMOVED***
+				}
+				if !d.Pool.Contains(ip) {
 					return types.ForbiddenErrorf("auxilairy address: (%s:%s) must belong to the master pool: %s", k, v, d.Pool)
-				***REMOVED***
+				}
 				// Attempt reservation in the container addressable pool, silent the error if address does not belong to that pool
-				if d.IPAMData.AuxAddresses[k], _, err = ipam.RequestAddress(d.PoolID, ip, nil); err != nil && err != ipamapi.ErrIPOutOfRange ***REMOVED***
+				if d.IPAMData.AuxAddresses[k], _, err = ipam.RequestAddress(d.PoolID, ip, nil); err != nil && err != ipamapi.ErrIPOutOfRange {
 					return types.InternalErrorf("failed to allocate secondary ip address (%s:%s): %v", k, v, err)
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+				}
+			}
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (n *network) ipamRelease() ***REMOVED***
-	if n.hasSpecialDriver() ***REMOVED***
+func (n *network) ipamRelease() {
+	if n.hasSpecialDriver() {
 		return
-	***REMOVED***
+	}
 	ipam, _, err := n.getController().getIPAMDriver(n.ipamType)
-	if err != nil ***REMOVED***
+	if err != nil {
 		logrus.Warnf("Failed to retrieve ipam driver to release address pool(s) on delete of network %s (%s): %v", n.Name(), n.ID(), err)
 		return
-	***REMOVED***
+	}
 	n.ipamReleaseVersion(4, ipam)
 	n.ipamReleaseVersion(6, ipam)
-***REMOVED***
+}
 
-func (n *network) ipamReleaseVersion(ipVer int, ipam ipamapi.Ipam) ***REMOVED***
+func (n *network) ipamReleaseVersion(ipVer int, ipam ipamapi.Ipam) {
 	var infoList *[]*IpamInfo
 
-	switch ipVer ***REMOVED***
+	switch ipVer {
 	case 4:
 		infoList = &n.ipamV4Info
 	case 6:
@@ -1639,244 +1639,244 @@ func (n *network) ipamReleaseVersion(ipVer int, ipam ipamapi.Ipam) ***REMOVED***
 	default:
 		logrus.Warnf("incorrect ip version passed to ipam release: %d", ipVer)
 		return
-	***REMOVED***
+	}
 
-	if len(*infoList) == 0 ***REMOVED***
+	if len(*infoList) == 0 {
 		return
-	***REMOVED***
+	}
 
 	logrus.Debugf("releasing IPv%d pools from network %s (%s)", ipVer, n.Name(), n.ID())
 
-	for _, d := range *infoList ***REMOVED***
-		if d.Gateway != nil ***REMOVED***
-			if err := ipam.ReleaseAddress(d.PoolID, d.Gateway.IP); err != nil ***REMOVED***
+	for _, d := range *infoList {
+		if d.Gateway != nil {
+			if err := ipam.ReleaseAddress(d.PoolID, d.Gateway.IP); err != nil {
 				logrus.Warnf("Failed to release gateway ip address %s on delete of network %s (%s): %v", d.Gateway.IP, n.Name(), n.ID(), err)
-			***REMOVED***
-		***REMOVED***
-		if d.IPAMData.AuxAddresses != nil ***REMOVED***
-			for k, nw := range d.IPAMData.AuxAddresses ***REMOVED***
-				if d.Pool.Contains(nw.IP) ***REMOVED***
-					if err := ipam.ReleaseAddress(d.PoolID, nw.IP); err != nil && err != ipamapi.ErrIPOutOfRange ***REMOVED***
+			}
+		}
+		if d.IPAMData.AuxAddresses != nil {
+			for k, nw := range d.IPAMData.AuxAddresses {
+				if d.Pool.Contains(nw.IP) {
+					if err := ipam.ReleaseAddress(d.PoolID, nw.IP); err != nil && err != ipamapi.ErrIPOutOfRange {
 						logrus.Warnf("Failed to release secondary ip address %s (%v) on delete of network %s (%s): %v", k, nw.IP, n.Name(), n.ID(), err)
-					***REMOVED***
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-		if err := ipam.ReleasePool(d.PoolID); err != nil ***REMOVED***
+					}
+				}
+			}
+		}
+		if err := ipam.ReleasePool(d.PoolID); err != nil {
 			logrus.Warnf("Failed to release address pool %s on delete of network %s (%s): %v", d.PoolID, n.Name(), n.ID(), err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	*infoList = nil
-***REMOVED***
+}
 
-func (n *network) getIPInfo(ipVer int) []*IpamInfo ***REMOVED***
+func (n *network) getIPInfo(ipVer int) []*IpamInfo {
 	var info []*IpamInfo
-	switch ipVer ***REMOVED***
+	switch ipVer {
 	case 4:
 		info = n.ipamV4Info
 	case 6:
 		info = n.ipamV6Info
 	default:
 		return nil
-	***REMOVED***
+	}
 	l := make([]*IpamInfo, 0, len(info))
 	n.Lock()
 	l = append(l, info...)
 	n.Unlock()
 	return l
-***REMOVED***
+}
 
-func (n *network) getIPData(ipVer int) []driverapi.IPAMData ***REMOVED***
+func (n *network) getIPData(ipVer int) []driverapi.IPAMData {
 	var info []*IpamInfo
-	switch ipVer ***REMOVED***
+	switch ipVer {
 	case 4:
 		info = n.ipamV4Info
 	case 6:
 		info = n.ipamV6Info
 	default:
 		return nil
-	***REMOVED***
+	}
 	l := make([]driverapi.IPAMData, 0, len(info))
 	n.Lock()
-	for _, d := range info ***REMOVED***
+	for _, d := range info {
 		l = append(l, d.IPAMData)
-	***REMOVED***
+	}
 	n.Unlock()
 	return l
-***REMOVED***
+}
 
-func (n *network) deriveAddressSpace() (string, error) ***REMOVED***
+func (n *network) deriveAddressSpace() (string, error) {
 	local, global, err := n.getController().drvRegistry.IPAMDefaultAddressSpaces(n.ipamType)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", types.NotFoundErrorf("failed to get default address space: %v", err)
-	***REMOVED***
-	if n.DataScope() == datastore.GlobalScope ***REMOVED***
+	}
+	if n.DataScope() == datastore.GlobalScope {
 		return global, nil
-	***REMOVED***
+	}
 	return local, nil
-***REMOVED***
+}
 
-func (n *network) Info() NetworkInfo ***REMOVED***
+func (n *network) Info() NetworkInfo {
 	return n
-***REMOVED***
+}
 
-func (n *network) Peers() []networkdb.PeerInfo ***REMOVED***
-	if !n.Dynamic() ***REMOVED***
-		return []networkdb.PeerInfo***REMOVED******REMOVED***
-	***REMOVED***
+func (n *network) Peers() []networkdb.PeerInfo {
+	if !n.Dynamic() {
+		return []networkdb.PeerInfo{}
+	}
 
 	agent := n.getController().getAgent()
-	if agent == nil ***REMOVED***
-		return []networkdb.PeerInfo***REMOVED******REMOVED***
-	***REMOVED***
+	if agent == nil {
+		return []networkdb.PeerInfo{}
+	}
 
 	return agent.networkDB.Peers(n.ID())
-***REMOVED***
+}
 
-func (n *network) DriverOptions() map[string]string ***REMOVED***
+func (n *network) DriverOptions() map[string]string {
 	n.Lock()
 	defer n.Unlock()
-	if n.generic != nil ***REMOVED***
-		if m, ok := n.generic[netlabel.GenericData]; ok ***REMOVED***
+	if n.generic != nil {
+		if m, ok := n.generic[netlabel.GenericData]; ok {
 			return m.(map[string]string)
-		***REMOVED***
-	***REMOVED***
-	return map[string]string***REMOVED******REMOVED***
-***REMOVED***
+		}
+	}
+	return map[string]string{}
+}
 
-func (n *network) Scope() string ***REMOVED***
+func (n *network) Scope() string {
 	n.Lock()
 	defer n.Unlock()
 	return n.scope
-***REMOVED***
+}
 
-func (n *network) IpamConfig() (string, map[string]string, []*IpamConf, []*IpamConf) ***REMOVED***
+func (n *network) IpamConfig() (string, map[string]string, []*IpamConf, []*IpamConf) {
 	n.Lock()
 	defer n.Unlock()
 
 	v4L := make([]*IpamConf, len(n.ipamV4Config))
 	v6L := make([]*IpamConf, len(n.ipamV6Config))
 
-	for i, c := range n.ipamV4Config ***REMOVED***
-		cc := &IpamConf***REMOVED******REMOVED***
+	for i, c := range n.ipamV4Config {
+		cc := &IpamConf{}
 		c.CopyTo(cc)
 		v4L[i] = cc
-	***REMOVED***
+	}
 
-	for i, c := range n.ipamV6Config ***REMOVED***
-		cc := &IpamConf***REMOVED******REMOVED***
+	for i, c := range n.ipamV6Config {
+		cc := &IpamConf{}
 		c.CopyTo(cc)
 		v6L[i] = cc
-	***REMOVED***
+	}
 
 	return n.ipamType, n.ipamOptions, v4L, v6L
-***REMOVED***
+}
 
-func (n *network) IpamInfo() ([]*IpamInfo, []*IpamInfo) ***REMOVED***
+func (n *network) IpamInfo() ([]*IpamInfo, []*IpamInfo) {
 	n.Lock()
 	defer n.Unlock()
 
 	v4Info := make([]*IpamInfo, len(n.ipamV4Info))
 	v6Info := make([]*IpamInfo, len(n.ipamV6Info))
 
-	for i, info := range n.ipamV4Info ***REMOVED***
-		ic := &IpamInfo***REMOVED******REMOVED***
+	for i, info := range n.ipamV4Info {
+		ic := &IpamInfo{}
 		info.CopyTo(ic)
 		v4Info[i] = ic
-	***REMOVED***
+	}
 
-	for i, info := range n.ipamV6Info ***REMOVED***
-		ic := &IpamInfo***REMOVED******REMOVED***
+	for i, info := range n.ipamV6Info {
+		ic := &IpamInfo{}
 		info.CopyTo(ic)
 		v6Info[i] = ic
-	***REMOVED***
+	}
 
 	return v4Info, v6Info
-***REMOVED***
+}
 
-func (n *network) Internal() bool ***REMOVED***
+func (n *network) Internal() bool {
 	n.Lock()
 	defer n.Unlock()
 
 	return n.internal
-***REMOVED***
+}
 
-func (n *network) Attachable() bool ***REMOVED***
+func (n *network) Attachable() bool {
 	n.Lock()
 	defer n.Unlock()
 
 	return n.attachable
-***REMOVED***
+}
 
-func (n *network) Ingress() bool ***REMOVED***
+func (n *network) Ingress() bool {
 	n.Lock()
 	defer n.Unlock()
 
 	return n.ingress
-***REMOVED***
+}
 
-func (n *network) Dynamic() bool ***REMOVED***
+func (n *network) Dynamic() bool {
 	n.Lock()
 	defer n.Unlock()
 
 	return n.dynamic
-***REMOVED***
+}
 
-func (n *network) IPv6Enabled() bool ***REMOVED***
+func (n *network) IPv6Enabled() bool {
 	n.Lock()
 	defer n.Unlock()
 
 	return n.enableIPv6
-***REMOVED***
+}
 
-func (n *network) ConfigFrom() string ***REMOVED***
+func (n *network) ConfigFrom() string {
 	n.Lock()
 	defer n.Unlock()
 
 	return n.configFrom
-***REMOVED***
+}
 
-func (n *network) ConfigOnly() bool ***REMOVED***
+func (n *network) ConfigOnly() bool {
 	n.Lock()
 	defer n.Unlock()
 
 	return n.configOnly
-***REMOVED***
+}
 
-func (n *network) Labels() map[string]string ***REMOVED***
+func (n *network) Labels() map[string]string {
 	n.Lock()
 	defer n.Unlock()
 
 	var lbls = make(map[string]string, len(n.labels))
-	for k, v := range n.labels ***REMOVED***
+	for k, v := range n.labels {
 		lbls[k] = v
-	***REMOVED***
+	}
 
 	return lbls
-***REMOVED***
+}
 
-func (n *network) TableEventRegister(tableName string, objType driverapi.ObjectType) error ***REMOVED***
-	if !driverapi.IsValidType(objType) ***REMOVED***
+func (n *network) TableEventRegister(tableName string, objType driverapi.ObjectType) error {
+	if !driverapi.IsValidType(objType) {
 		return fmt.Errorf("invalid object type %v in registering table, %s", objType, tableName)
-	***REMOVED***
+	}
 
-	t := networkDBTable***REMOVED***
+	t := networkDBTable{
 		name:    tableName,
 		objType: objType,
-	***REMOVED***
+	}
 	n.Lock()
 	defer n.Unlock()
 	n.driverTables = append(n.driverTables, t)
 	return nil
-***REMOVED***
+}
 
 // Special drivers are ones which do not need to perform any network plumbing
-func (n *network) hasSpecialDriver() bool ***REMOVED***
+func (n *network) hasSpecialDriver() bool {
 	return n.Type() == "host" || n.Type() == "null"
-***REMOVED***
+}
 
-func (n *network) ResolveName(req string, ipType int) ([]net.IP, bool) ***REMOVED***
+func (n *network) ResolveName(req string, ipType int) ([]net.IP, bool) {
 	var ipv6Miss bool
 
 	c := n.getController()
@@ -1884,99 +1884,99 @@ func (n *network) ResolveName(req string, ipType int) ([]net.IP, bool) ***REMOVE
 	defer c.Unlock()
 	sr, ok := c.svcRecords[n.ID()]
 
-	if !ok ***REMOVED***
+	if !ok {
 		return nil, false
-	***REMOVED***
+	}
 
 	req = strings.TrimSuffix(req, ".")
 	ipSet, ok := sr.svcMap.Get(req)
 
-	if ipType == types.IPv6 ***REMOVED***
+	if ipType == types.IPv6 {
 		// If the name resolved to v4 address then its a valid name in
 		// the docker network domain. If the network is not v6 enabled
 		// set ipv6Miss to filter the DNS query from going to external
 		// resolvers.
-		if ok && !n.enableIPv6 ***REMOVED***
+		if ok && !n.enableIPv6 {
 			ipv6Miss = true
-		***REMOVED***
+		}
 		ipSet, ok = sr.svcIPv6Map.Get(req)
-	***REMOVED***
+	}
 
-	if ok && len(ipSet) > 0 ***REMOVED***
+	if ok && len(ipSet) > 0 {
 		// this map is to avoid IP duplicates, this can happen during a transition period where 2 services are using the same IP
 		noDup := make(map[string]bool)
 		var ipLocal []net.IP
-		for _, ip := range ipSet ***REMOVED***
-			if _, dup := noDup[ip.(svcMapEntry).ip]; !dup ***REMOVED***
+		for _, ip := range ipSet {
+			if _, dup := noDup[ip.(svcMapEntry).ip]; !dup {
 				noDup[ip.(svcMapEntry).ip] = true
 				ipLocal = append(ipLocal, net.ParseIP(ip.(svcMapEntry).ip))
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		return ipLocal, ok
-	***REMOVED***
+	}
 
 	return nil, ipv6Miss
-***REMOVED***
+}
 
-func (n *network) HandleQueryResp(name string, ip net.IP) ***REMOVED***
+func (n *network) HandleQueryResp(name string, ip net.IP) {
 	c := n.getController()
 	c.Lock()
 	defer c.Unlock()
 	sr, ok := c.svcRecords[n.ID()]
 
-	if !ok ***REMOVED***
+	if !ok {
 		return
-	***REMOVED***
+	}
 
 	ipStr := netutils.ReverseIP(ip.String())
 	// If an object with extResolver == true is already in the set this call will fail
 	// but anyway it means that has already been inserted before
-	if ok, _ := sr.ipMap.Contains(ipStr, ipInfo***REMOVED***name: name***REMOVED***); ok ***REMOVED***
-		sr.ipMap.Remove(ipStr, ipInfo***REMOVED***name: name***REMOVED***)
-		sr.ipMap.Insert(ipStr, ipInfo***REMOVED***name: name, extResolver: true***REMOVED***)
-	***REMOVED***
-***REMOVED***
+	if ok, _ := sr.ipMap.Contains(ipStr, ipInfo{name: name}); ok {
+		sr.ipMap.Remove(ipStr, ipInfo{name: name})
+		sr.ipMap.Insert(ipStr, ipInfo{name: name, extResolver: true})
+	}
+}
 
-func (n *network) ResolveIP(ip string) string ***REMOVED***
+func (n *network) ResolveIP(ip string) string {
 	c := n.getController()
 	c.Lock()
 	defer c.Unlock()
 	sr, ok := c.svcRecords[n.ID()]
 
-	if !ok ***REMOVED***
+	if !ok {
 		return ""
-	***REMOVED***
+	}
 
 	nwName := n.Name()
 
 	elemSet, ok := sr.ipMap.Get(ip)
-	if !ok || len(elemSet) == 0 ***REMOVED***
+	if !ok || len(elemSet) == 0 {
 		return ""
-	***REMOVED***
+	}
 	// NOTE it is possible to have more than one element in the Set, this will happen
 	// because of interleave of different events from different sources (local container create vs
 	// network db notifications)
 	// In such cases the resolution will be based on the first element of the set, and can vary
 	// during the system stabilitation
 	elem, ok := elemSet[0].(ipInfo)
-	if !ok ***REMOVED***
+	if !ok {
 		setStr, b := sr.ipMap.String(ip)
 		logrus.Errorf("expected set of ipInfo type for key %s set:%t %s", ip, b, setStr)
 		return ""
-	***REMOVED***
+	}
 
-	if elem.extResolver ***REMOVED***
+	if elem.extResolver {
 		return ""
-	***REMOVED***
+	}
 
 	return elem.name + "." + nwName
-***REMOVED***
+}
 
-func (n *network) ResolveService(name string) ([]*net.SRV, []net.IP) ***REMOVED***
+func (n *network) ResolveService(name string) ([]*net.SRV, []net.IP) {
 	c := n.getController()
 
-	srv := []*net.SRV***REMOVED******REMOVED***
-	ip := []net.IP***REMOVED******REMOVED***
+	srv := []*net.SRV{}
+	ip := []net.IP{}
 
 	logrus.Debugf("Service name To resolve: %v", name)
 
@@ -1984,9 +1984,9 @@ func (n *network) ResolveService(name string) ([]*net.SRV, []net.IP) ***REMOVED*
 	// the format defined by RFC 2782. Hence specific validations checks are
 	// not done
 	parts := strings.Split(name, ".")
-	if len(parts) < 3 ***REMOVED***
+	if len(parts) < 3 {
 		return nil, nil
-	***REMOVED***
+	}
 
 	portName := parts[0]
 	proto := parts[1]
@@ -1996,107 +1996,107 @@ func (n *network) ResolveService(name string) ([]*net.SRV, []net.IP) ***REMOVED*
 	defer c.Unlock()
 	sr, ok := c.svcRecords[n.ID()]
 
-	if !ok ***REMOVED***
+	if !ok {
 		return nil, nil
-	***REMOVED***
+	}
 
 	svcs, ok := sr.service[svcName]
-	if !ok ***REMOVED***
+	if !ok {
 		return nil, nil
-	***REMOVED***
+	}
 
-	for _, svc := range svcs ***REMOVED***
-		if svc.portName != portName ***REMOVED***
+	for _, svc := range svcs {
+		if svc.portName != portName {
 			continue
-		***REMOVED***
-		if svc.proto != proto ***REMOVED***
+		}
+		if svc.proto != proto {
 			continue
-		***REMOVED***
-		for _, t := range svc.target ***REMOVED***
+		}
+		for _, t := range svc.target {
 			srv = append(srv,
-				&net.SRV***REMOVED***
+				&net.SRV{
 					Target: t.name,
 					Port:   t.port,
-				***REMOVED***)
+				})
 
 			ip = append(ip, t.ip)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return srv, ip
-***REMOVED***
+}
 
-func (n *network) ExecFunc(f func()) error ***REMOVED***
+func (n *network) ExecFunc(f func()) error {
 	return types.NotImplementedErrorf("ExecFunc not supported by network")
-***REMOVED***
+}
 
-func (n *network) NdotsSet() bool ***REMOVED***
+func (n *network) NdotsSet() bool {
 	return false
-***REMOVED***
+}
 
 // config-only network is looked up by name
-func (c *controller) getConfigNetwork(name string) (*network, error) ***REMOVED***
+func (c *controller) getConfigNetwork(name string) (*network, error) {
 	var n Network
 
-	s := func(current Network) bool ***REMOVED***
-		if current.Info().ConfigOnly() && current.Name() == name ***REMOVED***
+	s := func(current Network) bool {
+		if current.Info().ConfigOnly() && current.Name() == name {
 			n = current
 			return true
-		***REMOVED***
+		}
 		return false
-	***REMOVED***
+	}
 
 	c.WalkNetworks(s)
 
-	if n == nil ***REMOVED***
+	if n == nil {
 		return nil, types.NotFoundErrorf("configuration network %q not found", name)
-	***REMOVED***
+	}
 
 	return n.(*network), nil
-***REMOVED***
+}
 
-func (n *network) createLoadBalancerSandbox() error ***REMOVED***
+func (n *network) createLoadBalancerSandbox() error {
 	sandboxName := n.name + "-sbox"
-	sbOptions := []SandboxOption***REMOVED******REMOVED***
-	if n.ingress ***REMOVED***
+	sbOptions := []SandboxOption{}
+	if n.ingress {
 		sbOptions = append(sbOptions, OptionIngress())
-	***REMOVED***
+	}
 	sb, err := n.ctrlr.NewSandbox(sandboxName, sbOptions...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	defer func() ***REMOVED***
-		if err != nil ***REMOVED***
-			if e := n.ctrlr.SandboxDestroy(sandboxName); e != nil ***REMOVED***
+	}
+	defer func() {
+		if err != nil {
+			if e := n.ctrlr.SandboxDestroy(sandboxName); e != nil {
 				logrus.Warnf("could not delete sandbox %s on failure on failure (%v): %v", sandboxName, err, e)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***()
+			}
+		}
+	}()
 
 	endpointName := n.name + "-endpoint"
-	epOptions := []EndpointOption***REMOVED***
+	epOptions := []EndpointOption{
 		CreateOptionIpam(n.loadBalancerIP, nil, nil, nil),
 		CreateOptionLoadBalancer(),
-	***REMOVED***
+	}
 	ep, err := n.createEndpoint(endpointName, epOptions...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	defer func() ***REMOVED***
-		if err != nil ***REMOVED***
-			if e := ep.Delete(true); e != nil ***REMOVED***
+	}
+	defer func() {
+		if err != nil {
+			if e := ep.Delete(true); e != nil {
 				logrus.Warnf("could not delete endpoint %s on failure on failure (%v): %v", endpointName, err, e)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***()
+			}
+		}
+	}()
 
-	if err := ep.Join(sb, nil); err != nil ***REMOVED***
+	if err := ep.Join(sb, nil); err != nil {
 		return err
-	***REMOVED***
+	}
 	return sb.EnableService()
-***REMOVED***
+}
 
-func (n *network) deleteLoadBalancerSandbox() ***REMOVED***
+func (n *network) deleteLoadBalancerSandbox() {
 	n.Lock()
 	c := n.ctrlr
 	name := n.name
@@ -2106,28 +2106,28 @@ func (n *network) deleteLoadBalancerSandbox() ***REMOVED***
 	sandboxName := name + "-sbox"
 
 	endpoint, err := n.EndpointByName(endpointName)
-	if err != nil ***REMOVED***
+	if err != nil {
 		logrus.Warnf("Failed to find load balancer endpoint %s on network %s: %v", endpointName, name, err)
-	***REMOVED*** else ***REMOVED***
+	} else {
 
 		info := endpoint.Info()
-		if info != nil ***REMOVED***
+		if info != nil {
 			sb := info.Sandbox()
-			if sb != nil ***REMOVED***
-				if err := sb.DisableService(); err != nil ***REMOVED***
+			if sb != nil {
+				if err := sb.DisableService(); err != nil {
 					logrus.Warnf("Failed to disable service on sandbox %s: %v", sandboxName, err)
 					//Ignore error and attempt to delete the load balancer endpoint
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
+				}
+			}
+		}
 
-		if err := endpoint.Delete(true); err != nil ***REMOVED***
+		if err := endpoint.Delete(true); err != nil {
 			logrus.Warnf("Failed to delete endpoint %s (%s) in %s: %v", endpoint.Name(), endpoint.ID(), sandboxName, err)
 			//Ignore error and attempt to delete the sandbox.
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if err := c.SandboxDestroy(sandboxName); err != nil ***REMOVED***
+	if err := c.SandboxDestroy(sandboxName); err != nil {
 		logrus.Warnf("Failed to delete %s sandbox: %v", sandboxName, err)
-	***REMOVED***
-***REMOVED***
+	}
+}

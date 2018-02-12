@@ -11,25 +11,25 @@ import (
 )
 
 // Hook up gocheck into the "go test" runner.
-func Test(t *testing.T) ***REMOVED*** check.TestingT(t) ***REMOVED***
+func Test(t *testing.T) { check.TestingT(t) }
 
-type DiscoverySuite struct***REMOVED******REMOVED***
+type DiscoverySuite struct{}
 
-var _ = check.Suite(&DiscoverySuite***REMOVED******REMOVED***)
+var _ = check.Suite(&DiscoverySuite{})
 
-func (s *DiscoverySuite) TestInitialize(c *check.C) ***REMOVED***
-	d := &Discovery***REMOVED******REMOVED***
+func (s *DiscoverySuite) TestInitialize(c *check.C) {
+	d := &Discovery{}
 	d.Initialize("/path/to/file", 1000, 0, nil)
 	c.Assert(d.path, check.Equals, "/path/to/file")
-***REMOVED***
+}
 
-func (s *DiscoverySuite) TestNew(c *check.C) ***REMOVED***
+func (s *DiscoverySuite) TestNew(c *check.C) {
 	d, err := discovery.New("file:///path/to/file", 0, 0, nil)
 	c.Assert(err, check.IsNil)
 	c.Assert(d.(*Discovery).path, check.Equals, "/path/to/file")
-***REMOVED***
+}
 
-func (s *DiscoverySuite) TestContent(c *check.C) ***REMOVED***
+func (s *DiscoverySuite) TestContent(c *check.C) {
 	data := `
 1.1.1.[1:2]:1111
 2.2.2.[2:4]:2222
@@ -41,14 +41,14 @@ func (s *DiscoverySuite) TestContent(c *check.C) ***REMOVED***
 	c.Assert(ips[2], check.Equals, "2.2.2.2:2222")
 	c.Assert(ips[3], check.Equals, "2.2.2.3:2222")
 	c.Assert(ips[4], check.Equals, "2.2.2.4:2222")
-***REMOVED***
+}
 
-func (s *DiscoverySuite) TestRegister(c *check.C) ***REMOVED***
-	discovery := &Discovery***REMOVED***path: "/path/to/file"***REMOVED***
+func (s *DiscoverySuite) TestRegister(c *check.C) {
+	discovery := &Discovery{path: "/path/to/file"}
 	c.Assert(discovery.Register("0.0.0.0"), check.NotNil)
-***REMOVED***
+}
 
-func (s *DiscoverySuite) TestParsingContentsWithComments(c *check.C) ***REMOVED***
+func (s *DiscoverySuite) TestParsingContentsWithComments(c *check.C) {
 	data := `
 ### test ###
 1.1.1.1:1111 # inline comment
@@ -61,17 +61,17 @@ func (s *DiscoverySuite) TestParsingContentsWithComments(c *check.C) ***REMOVED*
 	c.Assert(ips, check.HasLen, 2)
 	c.Assert("1.1.1.1:1111", check.Equals, ips[0])
 	c.Assert("3.3.3.3:3333", check.Equals, ips[1])
-***REMOVED***
+}
 
-func (s *DiscoverySuite) TestWatch(c *check.C) ***REMOVED***
+func (s *DiscoverySuite) TestWatch(c *check.C) {
 	data := `
 1.1.1.1:1111
 2.2.2.2:2222
 `
-	expected := discovery.Entries***REMOVED***
-		&discovery.Entry***REMOVED***Host: "1.1.1.1", Port: "1111"***REMOVED***,
-		&discovery.Entry***REMOVED***Host: "2.2.2.2", Port: "2222"***REMOVED***,
-	***REMOVED***
+	expected := discovery.Entries{
+		&discovery.Entry{Host: "1.1.1.1", Port: "1111"},
+		&discovery.Entry{Host: "2.2.2.2", Port: "2222"},
+	}
 
 	// Create a temporary file and remove it.
 	tmp, err := ioutil.TempFile(os.TempDir(), "discovery-file-test")
@@ -80,25 +80,25 @@ func (s *DiscoverySuite) TestWatch(c *check.C) ***REMOVED***
 	c.Assert(os.Remove(tmp.Name()), check.IsNil)
 
 	// Set up file discovery.
-	d := &Discovery***REMOVED******REMOVED***
+	d := &Discovery{}
 	d.Initialize(tmp.Name(), 1000, 0, nil)
-	stopCh := make(chan struct***REMOVED******REMOVED***)
+	stopCh := make(chan struct{})
 	ch, errCh := d.Watch(stopCh)
 
 	// Make sure it fires errors since the file doesn't exist.
 	c.Assert(<-errCh, check.NotNil)
 	// We have to drain the error channel otherwise Watch will get stuck.
-	go func() ***REMOVED***
-		for range errCh ***REMOVED***
-		***REMOVED***
-	***REMOVED***()
+	go func() {
+		for range errCh {
+		}
+	}()
 
 	// Write the file and make sure we get the expected value back.
 	c.Assert(ioutil.WriteFile(tmp.Name(), []byte(data), 0600), check.IsNil)
 	c.Assert(<-ch, check.DeepEquals, expected)
 
 	// Add a new entry and look it up.
-	expected = append(expected, &discovery.Entry***REMOVED***Host: "3.3.3.3", Port: "3333"***REMOVED***)
+	expected = append(expected, &discovery.Entry{Host: "3.3.3.3", Port: "3333"})
 	f, err := os.OpenFile(tmp.Name(), os.O_APPEND|os.O_WRONLY, 0600)
 	c.Assert(err, check.IsNil)
 	c.Assert(f, check.NotNil)
@@ -111,4 +111,4 @@ func (s *DiscoverySuite) TestWatch(c *check.C) ***REMOVED***
 	close(stopCh)
 	c.Assert(<-ch, check.IsNil)
 	c.Assert(<-errCh, check.IsNil)
-***REMOVED***
+}

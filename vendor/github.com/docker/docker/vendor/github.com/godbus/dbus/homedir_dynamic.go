@@ -6,10 +6,10 @@ import (
 	"os/user"
 )
 
-func lookupHomeDir() string ***REMOVED***
+func lookupHomeDir() string {
 	u, err := user.Current()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "/"
-	***REMOVED***
+	}
 	return u.HomeDir
-***REMOVED***
+}

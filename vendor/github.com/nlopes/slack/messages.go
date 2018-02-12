@@ -1,23 +1,23 @@
 package slack
 
 // OutgoingMessage is used for the realtime API, and seems incomplete.
-type OutgoingMessage struct ***REMOVED***
+type OutgoingMessage struct {
 	ID int `json:"id"`
 	// channel ID
 	Channel         string `json:"channel,omitempty"`
 	Text            string `json:"text,omitempty"`
 	Type            string `json:"type,omitempty"`
 	ThreadTimestamp string `json:"thread_ts,omitempty"`
-***REMOVED***
+}
 
 // Message is an auxiliary type to allow us to have a message containing sub messages
-type Message struct ***REMOVED***
+type Message struct {
 	Msg
 	SubMessage *Msg `json:"message,omitempty"`
-***REMOVED***
+}
 
 // Msg contains information about a slack message
-type Msg struct ***REMOVED***
+type Msg struct {
 	// Basic Message
 	Type            string       `json:"type,omitempty"`
 	Channel         string       `json:"channel,omitempty"`
@@ -89,64 +89,64 @@ type Msg struct ***REMOVED***
 	// slash commands and interactive messages
 	ResponseType    string `json:"response_type,omitempty"`
 	ReplaceOriginal bool   `json:"replace_original,omitempty"`
-***REMOVED***
+}
 
 // Icon is used for bot messages
-type Icon struct ***REMOVED***
+type Icon struct {
 	IconURL   string `json:"icon_url,omitempty"`
 	IconEmoji string `json:"icon_emoji,omitempty"`
-***REMOVED***
+}
 
 // Edited indicates that a message has been edited.
-type Edited struct ***REMOVED***
+type Edited struct {
 	User      string `json:"user,omitempty"`
 	Timestamp string `json:"ts,omitempty"`
-***REMOVED***
+}
 
 // Reply contains information about a reply for a thread
-type Reply struct ***REMOVED***
+type Reply struct {
 	User      string `json:"user,omitempty"`
 	Timestamp string `json:"ts,omitempty"`
-***REMOVED***
+}
 
 // Event contains the event type
-type Event struct ***REMOVED***
+type Event struct {
 	Type string `json:"type,omitempty"`
-***REMOVED***
+}
 
 // Ping contains information about a Ping Event
-type Ping struct ***REMOVED***
+type Ping struct {
 	ID   int    `json:"id"`
 	Type string `json:"type"`
-***REMOVED***
+}
 
 // Pong contains information about a Pong Event
-type Pong struct ***REMOVED***
+type Pong struct {
 	Type    string `json:"type"`
 	ReplyTo int    `json:"reply_to"`
-***REMOVED***
+}
 
 // NewOutgoingMessage prepares an OutgoingMessage that the user can
 // use to send a message. Use this function to properly set the
 // messageID.
-func (rtm *RTM) NewOutgoingMessage(text string, channelID string) *OutgoingMessage ***REMOVED***
+func (rtm *RTM) NewOutgoingMessage(text string, channelID string) *OutgoingMessage {
 	id := rtm.idGen.Next()
-	return &OutgoingMessage***REMOVED***
+	return &OutgoingMessage{
 		ID:      id,
 		Type:    "message",
 		Channel: channelID,
 		Text:    text,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // NewTypingMessage prepares an OutgoingMessage that the user can
 // use to send as a typing indicator. Use this function to properly set the
 // messageID.
-func (rtm *RTM) NewTypingMessage(channelID string) *OutgoingMessage ***REMOVED***
+func (rtm *RTM) NewTypingMessage(channelID string) *OutgoingMessage {
 	id := rtm.idGen.Next()
-	return &OutgoingMessage***REMOVED***
+	return &OutgoingMessage{
 		ID:      id,
 		Type:    "typing",
 		Channel: channelID,
-	***REMOVED***
-***REMOVED***
+	}
+}

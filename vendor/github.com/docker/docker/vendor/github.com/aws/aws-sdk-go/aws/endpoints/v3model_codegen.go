@@ -13,136 +13,136 @@ import (
 
 // A CodeGenOptions are the options for code generating the endpoints into
 // Go code from the endpoints model definition.
-type CodeGenOptions struct ***REMOVED***
+type CodeGenOptions struct {
 	// Options for how the model will be decoded.
 	DecodeModelOptions DecodeModelOptions
-***REMOVED***
+}
 
 // Set combines all of the option functions together
-func (d *CodeGenOptions) Set(optFns ...func(*CodeGenOptions)) ***REMOVED***
-	for _, fn := range optFns ***REMOVED***
+func (d *CodeGenOptions) Set(optFns ...func(*CodeGenOptions)) {
+	for _, fn := range optFns {
 		fn(d)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // CodeGenModel given a endpoints model file will decode it and attempt to
 // generate Go code from the model definition. Error will be returned if
 // the code is unable to be generated, or decoded.
-func CodeGenModel(modelFile io.Reader, outFile io.Writer, optFns ...func(*CodeGenOptions)) error ***REMOVED***
+func CodeGenModel(modelFile io.Reader, outFile io.Writer, optFns ...func(*CodeGenOptions)) error {
 	var opts CodeGenOptions
 	opts.Set(optFns...)
 
-	resolver, err := DecodeModel(modelFile, func(d *DecodeModelOptions) ***REMOVED***
+	resolver, err := DecodeModel(modelFile, func(d *DecodeModelOptions) {
 		*d = opts.DecodeModelOptions
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	tmpl := template.Must(template.New("tmpl").Funcs(funcMap).Parse(v3Tmpl))
-	if err := tmpl.ExecuteTemplate(outFile, "defaults", resolver); err != nil ***REMOVED***
+	if err := tmpl.ExecuteTemplate(outFile, "defaults", resolver); err != nil {
 		return fmt.Errorf("failed to execute template, %v", err)
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func toSymbol(v string) string ***REMOVED***
-	out := []rune***REMOVED******REMOVED***
-	for _, c := range strings.Title(v) ***REMOVED***
-		if !(unicode.IsNumber(c) || unicode.IsLetter(c)) ***REMOVED***
+func toSymbol(v string) string {
+	out := []rune{}
+	for _, c := range strings.Title(v) {
+		if !(unicode.IsNumber(c) || unicode.IsLetter(c)) {
 			continue
-		***REMOVED***
+		}
 
 		out = append(out, c)
-	***REMOVED***
+	}
 
 	return string(out)
-***REMOVED***
+}
 
-func quoteString(v string) string ***REMOVED***
+func quoteString(v string) string {
 	return fmt.Sprintf("%q", v)
-***REMOVED***
+}
 
-func regionConstName(p, r string) string ***REMOVED***
+func regionConstName(p, r string) string {
 	return toSymbol(p) + toSymbol(r)
-***REMOVED***
+}
 
-func partitionGetter(id string) string ***REMOVED***
+func partitionGetter(id string) string {
 	return fmt.Sprintf("%sPartition", toSymbol(id))
-***REMOVED***
+}
 
-func partitionVarName(id string) string ***REMOVED***
+func partitionVarName(id string) string {
 	return fmt.Sprintf("%sPartition", strings.ToLower(toSymbol(id)))
-***REMOVED***
+}
 
-func listPartitionNames(ps partitions) string ***REMOVED***
-	names := []string***REMOVED******REMOVED***
-	switch len(ps) ***REMOVED***
+func listPartitionNames(ps partitions) string {
+	names := []string{}
+	switch len(ps) {
 	case 1:
 		return ps[0].Name
 	case 2:
 		return fmt.Sprintf("%s and %s", ps[0].Name, ps[1].Name)
 	default:
-		for i, p := range ps ***REMOVED***
-			if i == len(ps)-1 ***REMOVED***
+		for i, p := range ps {
+			if i == len(ps)-1 {
 				names = append(names, "and "+p.Name)
-			***REMOVED*** else ***REMOVED***
+			} else {
 				names = append(names, p.Name)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		return strings.Join(names, ", ")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func boxedBoolIfSet(msg string, v boxedBool) string ***REMOVED***
-	switch v ***REMOVED***
+func boxedBoolIfSet(msg string, v boxedBool) string {
+	switch v {
 	case boxedTrue:
 		return fmt.Sprintf(msg, "boxedTrue")
 	case boxedFalse:
 		return fmt.Sprintf(msg, "boxedFalse")
 	default:
 		return ""
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func stringIfSet(msg, v string) string ***REMOVED***
-	if len(v) == 0 ***REMOVED***
+func stringIfSet(msg, v string) string {
+	if len(v) == 0 {
 		return ""
-	***REMOVED***
+	}
 
 	return fmt.Sprintf(msg, v)
-***REMOVED***
+}
 
-func stringSliceIfSet(msg string, vs []string) string ***REMOVED***
-	if len(vs) == 0 ***REMOVED***
+func stringSliceIfSet(msg string, vs []string) string {
+	if len(vs) == 0 {
 		return ""
-	***REMOVED***
+	}
 
-	names := []string***REMOVED******REMOVED***
-	for _, v := range vs ***REMOVED***
+	names := []string{}
+	for _, v := range vs {
 		names = append(names, `"`+v+`"`)
-	***REMOVED***
+	}
 
 	return fmt.Sprintf(msg, strings.Join(names, ","))
-***REMOVED***
+}
 
-func endpointIsSet(v endpoint) bool ***REMOVED***
-	return !reflect.DeepEqual(v, endpoint***REMOVED******REMOVED***)
-***REMOVED***
+func endpointIsSet(v endpoint) bool {
+	return !reflect.DeepEqual(v, endpoint{})
+}
 
-func serviceSet(ps partitions) map[string]struct***REMOVED******REMOVED*** ***REMOVED***
-	set := map[string]struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	for _, p := range ps ***REMOVED***
-		for id := range p.Services ***REMOVED***
-			set[id] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-		***REMOVED***
-	***REMOVED***
+func serviceSet(ps partitions) map[string]struct{} {
+	set := map[string]struct{}{}
+	for _, p := range ps {
+		for id := range p.Services {
+			set[id] = struct{}{}
+		}
+	}
 
 	return set
-***REMOVED***
+}
 
-var funcMap = template.FuncMap***REMOVED***
+var funcMap = template.FuncMap{
 	"ToSymbol":           toSymbol,
 	"QuoteString":        quoteString,
 	"RegionConst":        regionConstName,
@@ -154,10 +154,10 @@ var funcMap = template.FuncMap***REMOVED***
 	"StringSliceIfSet":   stringSliceIfSet,
 	"EndpointIsSet":      endpointIsSet,
 	"ServicesSet":        serviceSet,
-***REMOVED***
+}
 
 const v3Tmpl = `
-***REMOVED******REMOVED*** define "defaults" -***REMOVED******REMOVED***
+{{ define "defaults" -}}
 // Code generated by aws/endpoints/v3model_codegen.go. DO NOT EDIT.
 
 package endpoints
@@ -166,172 +166,172 @@ import (
 	"regexp"
 )
 
-	***REMOVED******REMOVED*** template "partition consts" . ***REMOVED******REMOVED***
+	{{ template "partition consts" . }}
 
-	***REMOVED******REMOVED*** range $_, $partition := . ***REMOVED******REMOVED***
-		***REMOVED******REMOVED*** template "partition region consts" $partition ***REMOVED******REMOVED***
-	***REMOVED******REMOVED*** end ***REMOVED******REMOVED***
+	{{ range $_, $partition := . }}
+		{{ template "partition region consts" $partition }}
+	{{ end }}
 
-	***REMOVED******REMOVED*** template "service consts" . ***REMOVED******REMOVED***
+	{{ template "service consts" . }}
 	
-	***REMOVED******REMOVED*** template "endpoint resolvers" . ***REMOVED******REMOVED***
-***REMOVED******REMOVED***- end ***REMOVED******REMOVED***
+	{{ template "endpoint resolvers" . }}
+{{- end }}
 
-***REMOVED******REMOVED*** define "partition consts" ***REMOVED******REMOVED***
+{{ define "partition consts" }}
 	// Partition identifiers
 	const (
-		***REMOVED******REMOVED*** range $_, $p := . -***REMOVED******REMOVED***
-			***REMOVED******REMOVED*** ToSymbol $p.ID ***REMOVED******REMOVED***PartitionID = ***REMOVED******REMOVED*** QuoteString $p.ID ***REMOVED******REMOVED*** // ***REMOVED******REMOVED*** $p.Name ***REMOVED******REMOVED*** partition.
-		***REMOVED******REMOVED*** end -***REMOVED******REMOVED***
+		{{ range $_, $p := . -}}
+			{{ ToSymbol $p.ID }}PartitionID = {{ QuoteString $p.ID }} // {{ $p.Name }} partition.
+		{{ end -}}
 	)
-***REMOVED******REMOVED***- end ***REMOVED******REMOVED***
+{{- end }}
 
-***REMOVED******REMOVED*** define "partition region consts" ***REMOVED******REMOVED***
-	// ***REMOVED******REMOVED*** .Name ***REMOVED******REMOVED*** partition's regions.
+{{ define "partition region consts" }}
+	// {{ .Name }} partition's regions.
 	const (
-		***REMOVED******REMOVED*** range $id, $region := .Regions -***REMOVED******REMOVED***
-			***REMOVED******REMOVED*** ToSymbol $id ***REMOVED******REMOVED***RegionID = ***REMOVED******REMOVED*** QuoteString $id ***REMOVED******REMOVED*** // ***REMOVED******REMOVED*** $region.Description ***REMOVED******REMOVED***.
-		***REMOVED******REMOVED*** end -***REMOVED******REMOVED***
+		{{ range $id, $region := .Regions -}}
+			{{ ToSymbol $id }}RegionID = {{ QuoteString $id }} // {{ $region.Description }}.
+		{{ end -}}
 	)
-***REMOVED******REMOVED***- end ***REMOVED******REMOVED***
+{{- end }}
 
-***REMOVED******REMOVED*** define "service consts" ***REMOVED******REMOVED***
+{{ define "service consts" }}
 	// Service identifiers
 	const (
-		***REMOVED******REMOVED*** $serviceSet := ServicesSet . -***REMOVED******REMOVED***
-		***REMOVED******REMOVED*** range $id, $_ := $serviceSet -***REMOVED******REMOVED***
-			***REMOVED******REMOVED*** ToSymbol $id ***REMOVED******REMOVED***ServiceID = ***REMOVED******REMOVED*** QuoteString $id ***REMOVED******REMOVED*** // ***REMOVED******REMOVED*** ToSymbol $id ***REMOVED******REMOVED***.
-		***REMOVED******REMOVED*** end -***REMOVED******REMOVED***
+		{{ $serviceSet := ServicesSet . -}}
+		{{ range $id, $_ := $serviceSet -}}
+			{{ ToSymbol $id }}ServiceID = {{ QuoteString $id }} // {{ ToSymbol $id }}.
+		{{ end -}}
 	)
-***REMOVED******REMOVED***- end ***REMOVED******REMOVED***
+{{- end }}
 
-***REMOVED******REMOVED*** define "endpoint resolvers" ***REMOVED******REMOVED***
+{{ define "endpoint resolvers" }}
 	// DefaultResolver returns an Endpoint resolver that will be able
-	// to resolve endpoints for: ***REMOVED******REMOVED*** ListPartitionNames . ***REMOVED******REMOVED***.
+	// to resolve endpoints for: {{ ListPartitionNames . }}.
 	//
 	// Use DefaultPartitions() to get the list of the default partitions.
-	func DefaultResolver() Resolver ***REMOVED***
+	func DefaultResolver() Resolver {
 		return defaultPartitions
-	***REMOVED***
+	}
 
 	// DefaultPartitions returns a list of the partitions the SDK is bundled
-	// with. The available partitions are: ***REMOVED******REMOVED*** ListPartitionNames . ***REMOVED******REMOVED***.
+	// with. The available partitions are: {{ ListPartitionNames . }}.
 	//
 	//    partitions := endpoints.DefaultPartitions
-	//    for _, p := range partitions ***REMOVED***
+	//    for _, p := range partitions {
 	//        // ... inspect partitions
-	//***REMOVED***
-	func DefaultPartitions() []Partition ***REMOVED***
+	//    }
+	func DefaultPartitions() []Partition {
 		return defaultPartitions.Partitions()
-	***REMOVED***
+	}
 
-	var defaultPartitions = partitions***REMOVED***
-		***REMOVED******REMOVED*** range $_, $partition := . -***REMOVED******REMOVED***
-			***REMOVED******REMOVED*** PartitionVarName $partition.ID ***REMOVED******REMOVED***,
-		***REMOVED******REMOVED*** end ***REMOVED******REMOVED***
-	***REMOVED***
+	var defaultPartitions = partitions{
+		{{ range $_, $partition := . -}}
+			{{ PartitionVarName $partition.ID }},
+		{{ end }}
+	}
 	
-	***REMOVED******REMOVED*** range $_, $partition := . -***REMOVED******REMOVED***
-		***REMOVED******REMOVED*** $name := PartitionGetter $partition.ID -***REMOVED******REMOVED***
-		// ***REMOVED******REMOVED*** $name ***REMOVED******REMOVED*** returns the Resolver for ***REMOVED******REMOVED*** $partition.Name ***REMOVED******REMOVED***.
-		func ***REMOVED******REMOVED*** $name ***REMOVED******REMOVED***() Partition ***REMOVED***
-			return  ***REMOVED******REMOVED*** PartitionVarName $partition.ID ***REMOVED******REMOVED***.Partition()
-		***REMOVED***
-		var ***REMOVED******REMOVED*** PartitionVarName $partition.ID ***REMOVED******REMOVED*** = ***REMOVED******REMOVED*** template "gocode Partition" $partition ***REMOVED******REMOVED***
-	***REMOVED******REMOVED*** end ***REMOVED******REMOVED***
-***REMOVED******REMOVED*** end ***REMOVED******REMOVED***
+	{{ range $_, $partition := . -}}
+		{{ $name := PartitionGetter $partition.ID -}}
+		// {{ $name }} returns the Resolver for {{ $partition.Name }}.
+		func {{ $name }}() Partition {
+			return  {{ PartitionVarName $partition.ID }}.Partition()
+		}
+		var {{ PartitionVarName $partition.ID }} = {{ template "gocode Partition" $partition }}
+	{{ end }}
+{{ end }}
 
-***REMOVED******REMOVED*** define "default partitions" ***REMOVED******REMOVED***
-	func DefaultPartitions() []Partition ***REMOVED***
-		return []partition***REMOVED***
-			***REMOVED******REMOVED*** range $_, $partition := . -***REMOVED******REMOVED***
-			// ***REMOVED******REMOVED*** ToSymbol $partition.ID***REMOVED******REMOVED***Partition(),
-			***REMOVED******REMOVED*** end ***REMOVED******REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED******REMOVED*** end ***REMOVED******REMOVED***
+{{ define "default partitions" }}
+	func DefaultPartitions() []Partition {
+		return []partition{
+			{{ range $_, $partition := . -}}
+			// {{ ToSymbol $partition.ID}}Partition(),
+			{{ end }}
+		}
+	}
+{{ end }}
 
-***REMOVED******REMOVED*** define "gocode Partition" -***REMOVED******REMOVED***
-partition***REMOVED***
-	***REMOVED******REMOVED*** StringIfSet "ID: %q,\n" .ID -***REMOVED******REMOVED***
-	***REMOVED******REMOVED*** StringIfSet "Name: %q,\n" .Name -***REMOVED******REMOVED***
-	***REMOVED******REMOVED*** StringIfSet "DNSSuffix: %q,\n" .DNSSuffix -***REMOVED******REMOVED***
-	RegionRegex: ***REMOVED******REMOVED*** template "gocode RegionRegex" .RegionRegex ***REMOVED******REMOVED***,
-	***REMOVED******REMOVED*** if EndpointIsSet .Defaults -***REMOVED******REMOVED***
-		Defaults: ***REMOVED******REMOVED*** template "gocode Endpoint" .Defaults ***REMOVED******REMOVED***,
-	***REMOVED******REMOVED***- end ***REMOVED******REMOVED***
-	Regions:  ***REMOVED******REMOVED*** template "gocode Regions" .Regions ***REMOVED******REMOVED***,
-	Services: ***REMOVED******REMOVED*** template "gocode Services" .Services ***REMOVED******REMOVED***,
-***REMOVED***
-***REMOVED******REMOVED***- end ***REMOVED******REMOVED***
+{{ define "gocode Partition" -}}
+partition{
+	{{ StringIfSet "ID: %q,\n" .ID -}}
+	{{ StringIfSet "Name: %q,\n" .Name -}}
+	{{ StringIfSet "DNSSuffix: %q,\n" .DNSSuffix -}}
+	RegionRegex: {{ template "gocode RegionRegex" .RegionRegex }},
+	{{ if EndpointIsSet .Defaults -}}
+		Defaults: {{ template "gocode Endpoint" .Defaults }},
+	{{- end }}
+	Regions:  {{ template "gocode Regions" .Regions }},
+	Services: {{ template "gocode Services" .Services }},
+}
+{{- end }}
 
-***REMOVED******REMOVED*** define "gocode RegionRegex" -***REMOVED******REMOVED***
-regionRegex***REMOVED***
-	Regexp: func() *regexp.Regexp***REMOVED***
-		reg, _ := regexp.Compile(***REMOVED******REMOVED*** QuoteString .Regexp.String ***REMOVED******REMOVED***)
+{{ define "gocode RegionRegex" -}}
+regionRegex{
+	Regexp: func() *regexp.Regexp{
+		reg, _ := regexp.Compile({{ QuoteString .Regexp.String }})
 		return reg
-	***REMOVED***(),
-***REMOVED***
-***REMOVED******REMOVED***- end ***REMOVED******REMOVED***
+	}(),
+}
+{{- end }}
 
-***REMOVED******REMOVED*** define "gocode Regions" -***REMOVED******REMOVED***
-regions***REMOVED***
-	***REMOVED******REMOVED*** range $id, $region := . -***REMOVED******REMOVED***
-		"***REMOVED******REMOVED*** $id ***REMOVED******REMOVED***": ***REMOVED******REMOVED*** template "gocode Region" $region ***REMOVED******REMOVED***,
-	***REMOVED******REMOVED*** end -***REMOVED******REMOVED***
-***REMOVED***
-***REMOVED******REMOVED***- end ***REMOVED******REMOVED***
+{{ define "gocode Regions" -}}
+regions{
+	{{ range $id, $region := . -}}
+		"{{ $id }}": {{ template "gocode Region" $region }},
+	{{ end -}}
+}
+{{- end }}
 
-***REMOVED******REMOVED*** define "gocode Region" -***REMOVED******REMOVED***
-region***REMOVED***
-	***REMOVED******REMOVED*** StringIfSet "Description: %q,\n" .Description -***REMOVED******REMOVED***
-***REMOVED***
-***REMOVED******REMOVED***- end ***REMOVED******REMOVED***
+{{ define "gocode Region" -}}
+region{
+	{{ StringIfSet "Description: %q,\n" .Description -}}
+}
+{{- end }}
 
-***REMOVED******REMOVED*** define "gocode Services" -***REMOVED******REMOVED***
-services***REMOVED***
-	***REMOVED******REMOVED*** range $id, $service := . -***REMOVED******REMOVED***
-	"***REMOVED******REMOVED*** $id ***REMOVED******REMOVED***": ***REMOVED******REMOVED*** template "gocode Service" $service ***REMOVED******REMOVED***,
-	***REMOVED******REMOVED*** end ***REMOVED******REMOVED***
-***REMOVED***
-***REMOVED******REMOVED***- end ***REMOVED******REMOVED***
+{{ define "gocode Services" -}}
+services{
+	{{ range $id, $service := . -}}
+	"{{ $id }}": {{ template "gocode Service" $service }},
+	{{ end }}
+}
+{{- end }}
 
-***REMOVED******REMOVED*** define "gocode Service" -***REMOVED******REMOVED***
-service***REMOVED***
-	***REMOVED******REMOVED*** StringIfSet "PartitionEndpoint: %q,\n" .PartitionEndpoint -***REMOVED******REMOVED***
-	***REMOVED******REMOVED*** BoxedBoolIfSet "IsRegionalized: %s,\n" .IsRegionalized -***REMOVED******REMOVED***
-	***REMOVED******REMOVED*** if EndpointIsSet .Defaults -***REMOVED******REMOVED***
-		Defaults: ***REMOVED******REMOVED*** template "gocode Endpoint" .Defaults -***REMOVED******REMOVED***,
-	***REMOVED******REMOVED***- end ***REMOVED******REMOVED***
-	***REMOVED******REMOVED*** if .Endpoints -***REMOVED******REMOVED***
-		Endpoints: ***REMOVED******REMOVED*** template "gocode Endpoints" .Endpoints ***REMOVED******REMOVED***,
-	***REMOVED******REMOVED***- end ***REMOVED******REMOVED***
-***REMOVED***
-***REMOVED******REMOVED***- end ***REMOVED******REMOVED***
+{{ define "gocode Service" -}}
+service{
+	{{ StringIfSet "PartitionEndpoint: %q,\n" .PartitionEndpoint -}}
+	{{ BoxedBoolIfSet "IsRegionalized: %s,\n" .IsRegionalized -}}
+	{{ if EndpointIsSet .Defaults -}}
+		Defaults: {{ template "gocode Endpoint" .Defaults -}},
+	{{- end }}
+	{{ if .Endpoints -}}
+		Endpoints: {{ template "gocode Endpoints" .Endpoints }},
+	{{- end }}
+}
+{{- end }}
 
-***REMOVED******REMOVED*** define "gocode Endpoints" -***REMOVED******REMOVED***
-endpoints***REMOVED***
-	***REMOVED******REMOVED*** range $id, $endpoint := . -***REMOVED******REMOVED***
-	"***REMOVED******REMOVED*** $id ***REMOVED******REMOVED***": ***REMOVED******REMOVED*** template "gocode Endpoint" $endpoint ***REMOVED******REMOVED***,
-	***REMOVED******REMOVED*** end ***REMOVED******REMOVED***
-***REMOVED***
-***REMOVED******REMOVED***- end ***REMOVED******REMOVED***
+{{ define "gocode Endpoints" -}}
+endpoints{
+	{{ range $id, $endpoint := . -}}
+	"{{ $id }}": {{ template "gocode Endpoint" $endpoint }},
+	{{ end }}
+}
+{{- end }}
 
-***REMOVED******REMOVED*** define "gocode Endpoint" -***REMOVED******REMOVED***
-endpoint***REMOVED***
-	***REMOVED******REMOVED*** StringIfSet "Hostname: %q,\n" .Hostname -***REMOVED******REMOVED***
-	***REMOVED******REMOVED*** StringIfSet "SSLCommonName: %q,\n" .SSLCommonName -***REMOVED******REMOVED***
-	***REMOVED******REMOVED*** StringSliceIfSet "Protocols: []string***REMOVED***%s***REMOVED***,\n" .Protocols -***REMOVED******REMOVED***
-	***REMOVED******REMOVED*** StringSliceIfSet "SignatureVersions: []string***REMOVED***%s***REMOVED***,\n" .SignatureVersions -***REMOVED******REMOVED***
-	***REMOVED******REMOVED*** if or .CredentialScope.Region .CredentialScope.Service -***REMOVED******REMOVED***
-	CredentialScope: credentialScope***REMOVED***
-		***REMOVED******REMOVED*** StringIfSet "Region: %q,\n" .CredentialScope.Region -***REMOVED******REMOVED***
-		***REMOVED******REMOVED*** StringIfSet "Service: %q,\n" .CredentialScope.Service -***REMOVED******REMOVED***
-	***REMOVED***,
-	***REMOVED******REMOVED***- end ***REMOVED******REMOVED***
-	***REMOVED******REMOVED*** BoxedBoolIfSet "HasDualStack: %s,\n" .HasDualStack -***REMOVED******REMOVED***
-	***REMOVED******REMOVED*** StringIfSet "DualStackHostname: %q,\n" .DualStackHostname -***REMOVED******REMOVED***
+{{ define "gocode Endpoint" -}}
+endpoint{
+	{{ StringIfSet "Hostname: %q,\n" .Hostname -}}
+	{{ StringIfSet "SSLCommonName: %q,\n" .SSLCommonName -}}
+	{{ StringSliceIfSet "Protocols: []string{%s},\n" .Protocols -}}
+	{{ StringSliceIfSet "SignatureVersions: []string{%s},\n" .SignatureVersions -}}
+	{{ if or .CredentialScope.Region .CredentialScope.Service -}}
+	CredentialScope: credentialScope{
+		{{ StringIfSet "Region: %q,\n" .CredentialScope.Region -}}
+		{{ StringIfSet "Service: %q,\n" .CredentialScope.Service -}}
+	},
+	{{- end }}
+	{{ BoxedBoolIfSet "HasDualStack: %s,\n" .HasDualStack -}}
+	{{ StringIfSet "DualStackHostname: %q,\n" .DualStackHostname -}}
 
-***REMOVED***
-***REMOVED******REMOVED***- end ***REMOVED******REMOVED***
+}
+{{- end }}
 `

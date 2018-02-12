@@ -12,16 +12,16 @@ type modelDefinition map[string]json.RawMessage
 
 // A DecodeModelOptions are the options for how the endpoints model definition
 // are decoded.
-type DecodeModelOptions struct ***REMOVED***
+type DecodeModelOptions struct {
 	SkipCustomizations bool
-***REMOVED***
+}
 
 // Set combines all of the option functions together.
-func (d *DecodeModelOptions) Set(optFns ...func(*DecodeModelOptions)) ***REMOVED***
-	for _, fn := range optFns ***REMOVED***
+func (d *DecodeModelOptions) Set(optFns ...func(*DecodeModelOptions)) {
+	for _, fn := range optFns {
 		fn(d)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // DecodeModel unmarshals a Regions and Endpoint model definition file into
 // a endpoint Resolver. If the file format is not supported, or an error occurs
@@ -34,100 +34,100 @@ func (d *DecodeModelOptions) Set(optFns ...func(*DecodeModelOptions)) ***REMOVED
 //    resolver, err := endpoints.DecodeModel(reader)
 //
 //    partitions := resolver.(endpoints.EnumPartitions).Partitions()
-//    for _, p := range partitions ***REMOVED***
+//    for _, p := range partitions {
 //        // ... inspect partitions
-//***REMOVED***
-func DecodeModel(r io.Reader, optFns ...func(*DecodeModelOptions)) (Resolver, error) ***REMOVED***
+//    }
+func DecodeModel(r io.Reader, optFns ...func(*DecodeModelOptions)) (Resolver, error) {
 	var opts DecodeModelOptions
 	opts.Set(optFns...)
 
 	// Get the version of the partition file to determine what
 	// unmarshaling model to use.
-	modelDef := modelDefinition***REMOVED******REMOVED***
-	if err := json.NewDecoder(r).Decode(&modelDef); err != nil ***REMOVED***
+	modelDef := modelDefinition{}
+	if err := json.NewDecoder(r).Decode(&modelDef); err != nil {
 		return nil, newDecodeModelError("failed to decode endpoints model", err)
-	***REMOVED***
+	}
 
 	var version string
-	if b, ok := modelDef["version"]; ok ***REMOVED***
+	if b, ok := modelDef["version"]; ok {
 		version = string(b)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		return nil, newDecodeModelError("endpoints version not found in model", nil)
-	***REMOVED***
+	}
 
-	if version == "3" ***REMOVED***
+	if version == "3" {
 		return decodeV3Endpoints(modelDef, opts)
-	***REMOVED***
+	}
 
 	return nil, newDecodeModelError(
 		fmt.Sprintf("endpoints version %s, not supported", version), nil)
-***REMOVED***
+}
 
-func decodeV3Endpoints(modelDef modelDefinition, opts DecodeModelOptions) (Resolver, error) ***REMOVED***
+func decodeV3Endpoints(modelDef modelDefinition, opts DecodeModelOptions) (Resolver, error) {
 	b, ok := modelDef["partitions"]
-	if !ok ***REMOVED***
+	if !ok {
 		return nil, newDecodeModelError("endpoints model missing partitions", nil)
-	***REMOVED***
+	}
 
-	ps := partitions***REMOVED******REMOVED***
-	if err := json.Unmarshal(b, &ps); err != nil ***REMOVED***
+	ps := partitions{}
+	if err := json.Unmarshal(b, &ps); err != nil {
 		return nil, newDecodeModelError("failed to decode endpoints model", err)
-	***REMOVED***
+	}
 
-	if opts.SkipCustomizations ***REMOVED***
+	if opts.SkipCustomizations {
 		return ps, nil
-	***REMOVED***
+	}
 
 	// Customization
-	for i := 0; i < len(ps); i++ ***REMOVED***
+	for i := 0; i < len(ps); i++ {
 		p := &ps[i]
 		custAddEC2Metadata(p)
 		custAddS3DualStack(p)
 		custRmIotDataService(p)
-	***REMOVED***
+	}
 
 	return ps, nil
-***REMOVED***
+}
 
-func custAddS3DualStack(p *partition) ***REMOVED***
-	if p.ID != "aws" ***REMOVED***
+func custAddS3DualStack(p *partition) {
+	if p.ID != "aws" {
 		return
-	***REMOVED***
+	}
 
 	s, ok := p.Services["s3"]
-	if !ok ***REMOVED***
+	if !ok {
 		return
-	***REMOVED***
+	}
 
 	s.Defaults.HasDualStack = boxedTrue
-	s.Defaults.DualStackHostname = "***REMOVED***service***REMOVED***.dualstack.***REMOVED***region***REMOVED***.***REMOVED***dnsSuffix***REMOVED***"
+	s.Defaults.DualStackHostname = "{service}.dualstack.{region}.{dnsSuffix}"
 
 	p.Services["s3"] = s
-***REMOVED***
+}
 
-func custAddEC2Metadata(p *partition) ***REMOVED***
-	p.Services["ec2metadata"] = service***REMOVED***
+func custAddEC2Metadata(p *partition) {
+	p.Services["ec2metadata"] = service{
 		IsRegionalized:    boxedFalse,
 		PartitionEndpoint: "aws-global",
-		Endpoints: endpoints***REMOVED***
-			"aws-global": endpoint***REMOVED***
+		Endpoints: endpoints{
+			"aws-global": endpoint{
 				Hostname:  "169.254.169.254/latest",
-				Protocols: []string***REMOVED***"http"***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
-***REMOVED***
+				Protocols: []string{"http"},
+			},
+		},
+	}
+}
 
-func custRmIotDataService(p *partition) ***REMOVED***
+func custRmIotDataService(p *partition) {
 	delete(p.Services, "data.iot")
-***REMOVED***
+}
 
-type decodeModelError struct ***REMOVED***
+type decodeModelError struct {
 	awsError
-***REMOVED***
+}
 
-func newDecodeModelError(msg string, err error) decodeModelError ***REMOVED***
-	return decodeModelError***REMOVED***
+func newDecodeModelError(msg string, err error) decodeModelError {
+	return decodeModelError{
 		awsError: awserr.New("DecodeEndpointsModelError", msg, err),
-	***REMOVED***
-***REMOVED***
+	}
+}

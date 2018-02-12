@@ -23,15 +23,15 @@ package main
 
 import "github.com/bsphere/le_go"
 
-func main() ***REMOVED***
+func main() {
 	le, err := le_go.Connect("XXXX-XXXX-XXXX-XXXX") // replace with token
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 
 	defer le.Close()
 
 	le.Println("another test message")
-***REMOVED***
+}
 ```
 

@@ -2,8 +2,8 @@ package layer
 
 import "github.com/docker/distribution"
 
-var _ distribution.Describable = &roLayer***REMOVED******REMOVED***
+var _ distribution.Describable = &roLayer{}
 
-func (rl *roLayer) Descriptor() distribution.Descriptor ***REMOVED***
+func (rl *roLayer) Descriptor() distribution.Descriptor {
 	return rl.descriptor
-***REMOVED***
+}

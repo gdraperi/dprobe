@@ -12,7 +12,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-func (s *DockerSuite) TestInfoAPI(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestInfoAPI(c *check.C) {
 	cli, err := client.NewEnvClient()
 	c.Assert(err, checker.IsNil)
 	defer cli.Close()
@@ -21,7 +21,7 @@ func (s *DockerSuite) TestInfoAPI(c *check.C) ***REMOVED***
 	c.Assert(err, checker.IsNil)
 
 	// always shown fields
-	stringsToCheck := []string***REMOVED***
+	stringsToCheck := []string{
 		"ID",
 		"Containers",
 		"ContainersRunning",
@@ -37,15 +37,15 @@ func (s *DockerSuite) TestInfoAPI(c *check.C) ***REMOVED***
 		"KernelVersion",
 		"Driver",
 		"ServerVersion",
-		"SecurityOptions"***REMOVED***
+		"SecurityOptions"}
 
 	out := fmt.Sprintf("%+v", info)
-	for _, linePrefix := range stringsToCheck ***REMOVED***
+	for _, linePrefix := range stringsToCheck {
 		c.Assert(out, checker.Contains, linePrefix)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *DockerSuite) TestInfoAPIVersioned(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestInfoAPIVersioned(c *check.C) {
 	testRequires(c, DaemonIsLinux) // Windows only supports 1.25 or later
 
 	res, body, err := request.Get("/v1.20/info")
@@ -58,4 +58,4 @@ func (s *DockerSuite) TestInfoAPIVersioned(c *check.C) ***REMOVED***
 	out := string(b)
 	c.Assert(out, checker.Contains, "ExecutionDriver")
 	c.Assert(out, checker.Contains, "not supported")
-***REMOVED***
+}

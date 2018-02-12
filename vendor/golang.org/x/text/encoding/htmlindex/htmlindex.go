@@ -44,43 +44,43 @@ var (
 
 // LanguageDefault returns the canonical name of the default encoding for a
 // given language.
-func LanguageDefault(tag language.Tag) string ***REMOVED***
-	matcherOnce.Do(func() ***REMOVED***
-		tags := []language.Tag***REMOVED******REMOVED***
-		for _, t := range strings.Split(locales, " ") ***REMOVED***
+func LanguageDefault(tag language.Tag) string {
+	matcherOnce.Do(func() {
+		tags := []language.Tag{}
+		for _, t := range strings.Split(locales, " ") {
 			tags = append(tags, language.MustParse(t))
-		***REMOVED***
+		}
 		matcher = language.NewMatcher(tags, language.PreferSameScript(true))
-	***REMOVED***)
+	})
 	_, i, _ := matcher.Match(tag)
 	return canonical[localeMap[i]] // Default is Windows-1252.
-***REMOVED***
+}
 
 // Get returns an Encoding for one of the names listed in
 // http://www.w3.org/TR/encoding using the Default Index. Matching is case-
 // insensitive.
-func Get(name string) (encoding.Encoding, error) ***REMOVED***
+func Get(name string) (encoding.Encoding, error) {
 	x, ok := nameMap[strings.ToLower(strings.TrimSpace(name))]
-	if !ok ***REMOVED***
+	if !ok {
 		return nil, errInvalidName
-	***REMOVED***
+	}
 	return encodings[x], nil
-***REMOVED***
+}
 
 // Name reports the canonical name of the given Encoding. It will return
 // an error if e is not associated with a supported encoding scheme.
-func Name(e encoding.Encoding) (string, error) ***REMOVED***
+func Name(e encoding.Encoding) (string, error) {
 	id, ok := e.(identifier.Interface)
-	if !ok ***REMOVED***
+	if !ok {
 		return "", errUnknown
-	***REMOVED***
+	}
 	mib, _ := id.ID()
-	if mib == 0 ***REMOVED***
+	if mib == 0 {
 		return "", errUnknown
-	***REMOVED***
+	}
 	v, ok := mibMap[mib]
-	if !ok ***REMOVED***
+	if !ok {
 		return "", errUnsupported
-	***REMOVED***
+	}
 	return canonical[v], nil
-***REMOVED***
+}

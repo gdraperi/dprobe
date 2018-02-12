@@ -28,58 +28,58 @@ var (
 // filepath stdlib packages) ends with a trailing `/.` or `/`. If the cleaned
 // path already ends in a `.` path segment, then another is not added. If the
 // clean path already ends in the separator, then another is not added.
-func PreserveTrailingDotOrSeparator(cleanedPath string, originalPath string, sep byte) string ***REMOVED***
+func PreserveTrailingDotOrSeparator(cleanedPath string, originalPath string, sep byte) string {
 	// Ensure paths are in platform semantics
 	cleanedPath = strings.Replace(cleanedPath, "/", string(sep), -1)
 	originalPath = strings.Replace(originalPath, "/", string(sep), -1)
 
-	if !specifiesCurrentDir(cleanedPath) && specifiesCurrentDir(originalPath) ***REMOVED***
-		if !hasTrailingPathSeparator(cleanedPath, sep) ***REMOVED***
+	if !specifiesCurrentDir(cleanedPath) && specifiesCurrentDir(originalPath) {
+		if !hasTrailingPathSeparator(cleanedPath, sep) {
 			// Add a separator if it doesn't already end with one (a cleaned
 			// path would only end in a separator if it is the root).
 			cleanedPath += string(sep)
-		***REMOVED***
+		}
 		cleanedPath += "."
-	***REMOVED***
+	}
 
-	if !hasTrailingPathSeparator(cleanedPath, sep) && hasTrailingPathSeparator(originalPath, sep) ***REMOVED***
+	if !hasTrailingPathSeparator(cleanedPath, sep) && hasTrailingPathSeparator(originalPath, sep) {
 		cleanedPath += string(sep)
-	***REMOVED***
+	}
 
 	return cleanedPath
-***REMOVED***
+}
 
 // assertsDirectory returns whether the given path is
 // asserted to be a directory, i.e., the path ends with
 // a trailing '/' or `/.`, assuming a path separator of `/`.
-func assertsDirectory(path string, sep byte) bool ***REMOVED***
+func assertsDirectory(path string, sep byte) bool {
 	return hasTrailingPathSeparator(path, sep) || specifiesCurrentDir(path)
-***REMOVED***
+}
 
 // hasTrailingPathSeparator returns whether the given
 // path ends with the system's path separator character.
-func hasTrailingPathSeparator(path string, sep byte) bool ***REMOVED***
+func hasTrailingPathSeparator(path string, sep byte) bool {
 	return len(path) > 0 && path[len(path)-1] == sep
-***REMOVED***
+}
 
 // specifiesCurrentDir returns whether the given path specifies
 // a "current directory", i.e., the last path segment is `.`.
-func specifiesCurrentDir(path string) bool ***REMOVED***
+func specifiesCurrentDir(path string) bool {
 	return filepath.Base(path) == "."
-***REMOVED***
+}
 
 // SplitPathDirEntry splits the given path between its directory name and its
 // basename by first cleaning the path but preserves a trailing "." if the
 // original path specified the current directory.
-func SplitPathDirEntry(path string) (dir, base string) ***REMOVED***
+func SplitPathDirEntry(path string) (dir, base string) {
 	cleanedPath := filepath.Clean(filepath.FromSlash(path))
 
-	if specifiesCurrentDir(path) ***REMOVED***
+	if specifiesCurrentDir(path) {
 		cleanedPath += string(os.PathSeparator) + "."
-	***REMOVED***
+	}
 
 	return filepath.Dir(cleanedPath), filepath.Base(cleanedPath)
-***REMOVED***
+}
 
 // TarResource archives the resource described by the given CopyInfo to a Tar
 // archive. A non-nil error is returned if sourcePath does not exist or is
@@ -88,20 +88,20 @@ func SplitPathDirEntry(path string) (dir, base string) ***REMOVED***
 // This function acts as a convenient wrapper around TarWithOptions, which
 // requires a directory as the source path. TarResource accepts either a
 // directory or a file path and correctly sets the Tar options.
-func TarResource(sourceInfo CopyInfo) (content io.ReadCloser, err error) ***REMOVED***
+func TarResource(sourceInfo CopyInfo) (content io.ReadCloser, err error) {
 	return TarResourceRebase(sourceInfo.Path, sourceInfo.RebaseName)
-***REMOVED***
+}
 
 // TarResourceRebase is like TarResource but renames the first path element of
 // items in the resulting tar archive to match the given rebaseName if not "".
-func TarResourceRebase(sourcePath, rebaseName string) (content io.ReadCloser, err error) ***REMOVED***
+func TarResourceRebase(sourcePath, rebaseName string) (content io.ReadCloser, err error) {
 	sourcePath = normalizePath(sourcePath)
-	if _, err = os.Lstat(sourcePath); err != nil ***REMOVED***
+	if _, err = os.Lstat(sourcePath); err != nil {
 		// Catches the case where the source does not exist or is not a
 		// directory if asserted to be a directory, as this also causes an
 		// error.
 		return
-	***REMOVED***
+	}
 
 	// Separate the source path between its directory and
 	// the entry in that directory which we are archiving.
@@ -110,85 +110,85 @@ func TarResourceRebase(sourcePath, rebaseName string) (content io.ReadCloser, er
 
 	logrus.Debugf("copying %q from %q", sourceBase, sourceDir)
 	return TarWithOptions(sourceDir, opts)
-***REMOVED***
+}
 
 // TarResourceRebaseOpts does not preform the Tar, but instead just creates the rebase
 // parameters to be sent to TarWithOptions (the TarOptions struct)
-func TarResourceRebaseOpts(sourceBase string, rebaseName string) *TarOptions ***REMOVED***
-	filter := []string***REMOVED***sourceBase***REMOVED***
-	return &TarOptions***REMOVED***
+func TarResourceRebaseOpts(sourceBase string, rebaseName string) *TarOptions {
+	filter := []string{sourceBase}
+	return &TarOptions{
 		Compression:      Uncompressed,
 		IncludeFiles:     filter,
 		IncludeSourceDir: true,
-		RebaseNames: map[string]string***REMOVED***
+		RebaseNames: map[string]string{
 			sourceBase: rebaseName,
-		***REMOVED***,
-	***REMOVED***
-***REMOVED***
+		},
+	}
+}
 
 // CopyInfo holds basic info about the source
 // or destination path of a copy operation.
-type CopyInfo struct ***REMOVED***
+type CopyInfo struct {
 	Path       string
 	Exists     bool
 	IsDir      bool
 	RebaseName string
-***REMOVED***
+}
 
 // CopyInfoSourcePath stats the given path to create a CopyInfo
 // struct representing that resource for the source of an archive copy
 // operation. The given path should be an absolute local path. A source path
 // has all symlinks evaluated that appear before the last path separator ("/"
 // on Unix). As it is to be a copy source, the path must exist.
-func CopyInfoSourcePath(path string, followLink bool) (CopyInfo, error) ***REMOVED***
+func CopyInfoSourcePath(path string, followLink bool) (CopyInfo, error) {
 	// normalize the file path and then evaluate the symbol link
 	// we will use the target file instead of the symbol link if
 	// followLink is set
 	path = normalizePath(path)
 
 	resolvedPath, rebaseName, err := ResolveHostSourcePath(path, followLink)
-	if err != nil ***REMOVED***
-		return CopyInfo***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return CopyInfo{}, err
+	}
 
 	stat, err := os.Lstat(resolvedPath)
-	if err != nil ***REMOVED***
-		return CopyInfo***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return CopyInfo{}, err
+	}
 
-	return CopyInfo***REMOVED***
+	return CopyInfo{
 		Path:       resolvedPath,
 		Exists:     true,
 		IsDir:      stat.IsDir(),
 		RebaseName: rebaseName,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // CopyInfoDestinationPath stats the given path to create a CopyInfo
 // struct representing that resource for the destination of an archive copy
 // operation. The given path should be an absolute local path.
-func CopyInfoDestinationPath(path string) (info CopyInfo, err error) ***REMOVED***
+func CopyInfoDestinationPath(path string) (info CopyInfo, err error) {
 	maxSymlinkIter := 10 // filepath.EvalSymlinks uses 255, but 10 already seems like a lot.
 	path = normalizePath(path)
 	originalPath := path
 
 	stat, err := os.Lstat(path)
 
-	if err == nil && stat.Mode()&os.ModeSymlink == 0 ***REMOVED***
+	if err == nil && stat.Mode()&os.ModeSymlink == 0 {
 		// The path exists and is not a symlink.
-		return CopyInfo***REMOVED***
+		return CopyInfo{
 			Path:   path,
 			Exists: true,
 			IsDir:  stat.IsDir(),
-		***REMOVED***, nil
-	***REMOVED***
+		}, nil
+	}
 
 	// While the path is a symlink.
-	for n := 0; err == nil && stat.Mode()&os.ModeSymlink != 0; n++ ***REMOVED***
-		if n > maxSymlinkIter ***REMOVED***
+	for n := 0; err == nil && stat.Mode()&os.ModeSymlink != 0; n++ {
+		if n > maxSymlinkIter {
 			// Don't follow symlinks more than this arbitrary number of times.
-			return CopyInfo***REMOVED******REMOVED***, errors.New("too many symlinks in " + originalPath)
-		***REMOVED***
+			return CopyInfo{}, errors.New("too many symlinks in " + originalPath)
+		}
 
 		// The path is a symbolic link. We need to evaluate it so that the
 		// destination of the copy operation is the link target and not the
@@ -199,54 +199,54 @@ func CopyInfoDestinationPath(path string) (info CopyInfo, err error) ***REMOVED*
 		var linkTarget string
 
 		linkTarget, err = os.Readlink(path)
-		if err != nil ***REMOVED***
-			return CopyInfo***REMOVED******REMOVED***, err
-		***REMOVED***
+		if err != nil {
+			return CopyInfo{}, err
+		}
 
-		if !system.IsAbs(linkTarget) ***REMOVED***
+		if !system.IsAbs(linkTarget) {
 			// Join with the parent directory.
 			dstParent, _ := SplitPathDirEntry(path)
 			linkTarget = filepath.Join(dstParent, linkTarget)
-		***REMOVED***
+		}
 
 		path = linkTarget
 		stat, err = os.Lstat(path)
-	***REMOVED***
+	}
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		// It's okay if the destination path doesn't exist. We can still
 		// continue the copy operation if the parent directory exists.
-		if !os.IsNotExist(err) ***REMOVED***
-			return CopyInfo***REMOVED******REMOVED***, err
-		***REMOVED***
+		if !os.IsNotExist(err) {
+			return CopyInfo{}, err
+		}
 
 		// Ensure destination parent dir exists.
 		dstParent, _ := SplitPathDirEntry(path)
 
 		parentDirStat, err := os.Stat(dstParent)
-		if err != nil ***REMOVED***
-			return CopyInfo***REMOVED******REMOVED***, err
-		***REMOVED***
-		if !parentDirStat.IsDir() ***REMOVED***
-			return CopyInfo***REMOVED******REMOVED***, ErrNotDirectory
-		***REMOVED***
+		if err != nil {
+			return CopyInfo{}, err
+		}
+		if !parentDirStat.IsDir() {
+			return CopyInfo{}, ErrNotDirectory
+		}
 
-		return CopyInfo***REMOVED***Path: path***REMOVED***, nil
-	***REMOVED***
+		return CopyInfo{Path: path}, nil
+	}
 
 	// The path exists after resolving symlinks.
-	return CopyInfo***REMOVED***
+	return CopyInfo{
 		Path:   path,
 		Exists: true,
 		IsDir:  stat.IsDir(),
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // PrepareArchiveCopy prepares the given srcContent archive, which should
 // contain the archived resource described by srcInfo, to the destination
 // described by dstInfo. Returns the possibly modified content archive along
 // with the path to the destination directory which it should be extracted to.
-func PrepareArchiveCopy(srcContent io.Reader, srcInfo, dstInfo CopyInfo) (dstDir string, content io.ReadCloser, err error) ***REMOVED***
+func PrepareArchiveCopy(srcContent io.Reader, srcInfo, dstInfo CopyInfo) (dstDir string, content io.ReadCloser, err error) {
 	// Ensure in platform semantics
 	srcInfo.Path = normalizePath(srcInfo.Path)
 	dstInfo.Path = normalizePath(dstInfo.Path)
@@ -256,7 +256,7 @@ func PrepareArchiveCopy(srcContent io.Reader, srcInfo, dstInfo CopyInfo) (dstDir
 	dstDir, dstBase := SplitPathDirEntry(dstInfo.Path)
 	_, srcBase := SplitPathDirEntry(srcInfo.Path)
 
-	switch ***REMOVED***
+	switch {
 	case dstInfo.Exists && dstInfo.IsDir:
 		// The destination exists as a directory. No alteration
 		// to srcContent is needed as its contents can be
@@ -271,9 +271,9 @@ func PrepareArchiveCopy(srcContent io.Reader, srcInfo, dstInfo CopyInfo) (dstDir
 		// The destination exists as some type of file and the source content
 		// is also a file. The source content entry will have to be renamed to
 		// have a basename which matches the destination path's basename.
-		if len(srcInfo.RebaseName) != 0 ***REMOVED***
+		if len(srcInfo.RebaseName) != 0 {
 			srcBase = srcInfo.RebaseName
-		***REMOVED***
+		}
 		return dstDir, RebaseArchiveEntries(srcContent, srcBase, dstBase), nil
 	case srcInfo.IsDir:
 		// The destination does not exist and the source content is an archive
@@ -282,9 +282,9 @@ func PrepareArchiveCopy(srcContent io.Reader, srcInfo, dstInfo CopyInfo) (dstDir
 		// created as a result should take the name of the destination path.
 		// The source content entries will have to be renamed to have a
 		// basename which matches the destination path's basename.
-		if len(srcInfo.RebaseName) != 0 ***REMOVED***
+		if len(srcInfo.RebaseName) != 0 {
 			srcBase = srcInfo.RebaseName
-		***REMOVED***
+		}
 		return dstDir, RebaseArchiveEntries(srcContent, srcBase, dstBase), nil
 	case assertsDirectory(dstInfo.Path, os.PathSeparator):
 		// The destination does not exist and is asserted to be created as a
@@ -299,62 +299,62 @@ func PrepareArchiveCopy(srcContent io.Reader, srcInfo, dstInfo CopyInfo) (dstDir
 		// to be created when the archive is extracted and the source content
 		// entry will have to be renamed to have a basename which matches the
 		// destination path's basename.
-		if len(srcInfo.RebaseName) != 0 ***REMOVED***
+		if len(srcInfo.RebaseName) != 0 {
 			srcBase = srcInfo.RebaseName
-		***REMOVED***
+		}
 		return dstDir, RebaseArchiveEntries(srcContent, srcBase, dstBase), nil
-	***REMOVED***
+	}
 
-***REMOVED***
+}
 
 // RebaseArchiveEntries rewrites the given srcContent archive replacing
 // an occurrence of oldBase with newBase at the beginning of entry names.
-func RebaseArchiveEntries(srcContent io.Reader, oldBase, newBase string) io.ReadCloser ***REMOVED***
-	if oldBase == string(os.PathSeparator) ***REMOVED***
+func RebaseArchiveEntries(srcContent io.Reader, oldBase, newBase string) io.ReadCloser {
+	if oldBase == string(os.PathSeparator) {
 		// If oldBase specifies the root directory, use an empty string as
 		// oldBase instead so that newBase doesn't replace the path separator
 		// that all paths will start with.
 		oldBase = ""
-	***REMOVED***
+	}
 
 	rebased, w := io.Pipe()
 
-	go func() ***REMOVED***
+	go func() {
 		srcTar := tar.NewReader(srcContent)
 		rebasedTar := tar.NewWriter(w)
 
-		for ***REMOVED***
+		for {
 			hdr, err := srcTar.Next()
-			if err == io.EOF ***REMOVED***
+			if err == io.EOF {
 				// Signals end of archive.
 				rebasedTar.Close()
 				w.Close()
 				return
-			***REMOVED***
-			if err != nil ***REMOVED***
+			}
+			if err != nil {
 				w.CloseWithError(err)
 				return
-			***REMOVED***
+			}
 
 			hdr.Name = strings.Replace(hdr.Name, oldBase, newBase, 1)
-			if hdr.Typeflag == tar.TypeLink ***REMOVED***
+			if hdr.Typeflag == tar.TypeLink {
 				hdr.Linkname = strings.Replace(hdr.Linkname, oldBase, newBase, 1)
-			***REMOVED***
+			}
 
-			if err = rebasedTar.WriteHeader(hdr); err != nil ***REMOVED***
+			if err = rebasedTar.WriteHeader(hdr); err != nil {
 				w.CloseWithError(err)
 				return
-			***REMOVED***
+			}
 
-			if _, err = io.Copy(rebasedTar, srcTar); err != nil ***REMOVED***
+			if _, err = io.Copy(rebasedTar, srcTar); err != nil {
 				w.CloseWithError(err)
 				return
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***()
+			}
+		}
+	}()
 
 	return rebased
-***REMOVED***
+}
 
 // TODO @gupta-ak. These might have to be changed in the future to be
 // continuity driver aware as well to support LCOW.
@@ -362,7 +362,7 @@ func RebaseArchiveEntries(srcContent io.Reader, oldBase, newBase string) io.Read
 // CopyResource performs an archive copy from the given source path to the
 // given destination path. The source path MUST exist and the destination
 // path's parent directory must exist.
-func CopyResource(srcPath, dstPath string, followLink bool) error ***REMOVED***
+func CopyResource(srcPath, dstPath string, followLink bool) error {
 	var (
 		srcInfo CopyInfo
 		err     error
@@ -376,97 +376,97 @@ func CopyResource(srcPath, dstPath string, followLink bool) error ***REMOVED***
 	srcPath = PreserveTrailingDotOrSeparator(filepath.Clean(srcPath), srcPath, os.PathSeparator)
 	dstPath = PreserveTrailingDotOrSeparator(filepath.Clean(dstPath), dstPath, os.PathSeparator)
 
-	if srcInfo, err = CopyInfoSourcePath(srcPath, followLink); err != nil ***REMOVED***
+	if srcInfo, err = CopyInfoSourcePath(srcPath, followLink); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	content, err := TarResource(srcInfo)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer content.Close()
 
 	return CopyTo(content, srcInfo, dstPath)
-***REMOVED***
+}
 
 // CopyTo handles extracting the given content whose
 // entries should be sourced from srcInfo to dstPath.
-func CopyTo(content io.Reader, srcInfo CopyInfo, dstPath string) error ***REMOVED***
+func CopyTo(content io.Reader, srcInfo CopyInfo, dstPath string) error {
 	// The destination path need not exist, but CopyInfoDestinationPath will
 	// ensure that at least the parent directory exists.
 	dstInfo, err := CopyInfoDestinationPath(normalizePath(dstPath))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	dstDir, copyArchive, err := PrepareArchiveCopy(content, srcInfo, dstInfo)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer copyArchive.Close()
 
-	options := &TarOptions***REMOVED***
+	options := &TarOptions{
 		NoLchown:             true,
 		NoOverwriteDirNonDir: true,
-	***REMOVED***
+	}
 
 	return Untar(copyArchive, dstDir, options)
-***REMOVED***
+}
 
 // ResolveHostSourcePath decides real path need to be copied with parameters such as
 // whether to follow symbol link or not, if followLink is true, resolvedPath will return
 // link target of any symbol link file, else it will only resolve symlink of directory
 // but return symbol link file itself without resolving.
-func ResolveHostSourcePath(path string, followLink bool) (resolvedPath, rebaseName string, err error) ***REMOVED***
-	if followLink ***REMOVED***
+func ResolveHostSourcePath(path string, followLink bool) (resolvedPath, rebaseName string, err error) {
+	if followLink {
 		resolvedPath, err = filepath.EvalSymlinks(path)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
+		}
 
 		resolvedPath, rebaseName = GetRebaseName(path, resolvedPath)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		dirPath, basePath := filepath.Split(path)
 
 		// if not follow symbol link, then resolve symbol link of parent dir
 		var resolvedDirPath string
 		resolvedDirPath, err = filepath.EvalSymlinks(dirPath)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
+		}
 		// resolvedDirPath will have been cleaned (no trailing path separators) so
 		// we can manually join it with the base path element.
 		resolvedPath = resolvedDirPath + string(filepath.Separator) + basePath
 		if hasTrailingPathSeparator(path, os.PathSeparator) &&
-			filepath.Base(path) != filepath.Base(resolvedPath) ***REMOVED***
+			filepath.Base(path) != filepath.Base(resolvedPath) {
 			rebaseName = filepath.Base(path)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return resolvedPath, rebaseName, nil
-***REMOVED***
+}
 
 // GetRebaseName normalizes and compares path and resolvedPath,
 // return completed resolved path and rebased file name
-func GetRebaseName(path, resolvedPath string) (string, string) ***REMOVED***
+func GetRebaseName(path, resolvedPath string) (string, string) {
 	// linkTarget will have been cleaned (no trailing path separators and dot) so
 	// we can manually join it with them
 	var rebaseName string
 	if specifiesCurrentDir(path) &&
-		!specifiesCurrentDir(resolvedPath) ***REMOVED***
+		!specifiesCurrentDir(resolvedPath) {
 		resolvedPath += string(filepath.Separator) + "."
-	***REMOVED***
+	}
 
 	if hasTrailingPathSeparator(path, os.PathSeparator) &&
-		!hasTrailingPathSeparator(resolvedPath, os.PathSeparator) ***REMOVED***
+		!hasTrailingPathSeparator(resolvedPath, os.PathSeparator) {
 		resolvedPath += string(filepath.Separator)
-	***REMOVED***
+	}
 
-	if filepath.Base(path) != filepath.Base(resolvedPath) ***REMOVED***
+	if filepath.Base(path) != filepath.Base(resolvedPath) {
 		// In the case where the path had a trailing separator and a symlink
 		// evaluation has changed the last path component, we will need to
 		// rebase the name in the archive that is being copied to match the
 		// originally requested name.
 		rebaseName = filepath.Base(path)
-	***REMOVED***
+	}
 	return resolvedPath, rebaseName
-***REMOVED***
+}

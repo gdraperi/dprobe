@@ -18,33 +18,33 @@ var (
 )
 
 // InitNetworks initializes the pre-defined networks used by the built-in IP allocator
-func InitNetworks() ***REMOVED***
-	initNetworksOnce.Do(func() ***REMOVED***
+func InitNetworks() {
+	initNetworksOnce.Do(func() {
 		PredefinedBroadNetworks = initBroadPredefinedNetworks()
 		PredefinedGranularNetworks = initGranularPredefinedNetworks()
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func initBroadPredefinedNetworks() []*net.IPNet ***REMOVED***
+func initBroadPredefinedNetworks() []*net.IPNet {
 	pl := make([]*net.IPNet, 0, 31)
-	mask := []byte***REMOVED***255, 255, 0, 0***REMOVED***
-	for i := 17; i < 32; i++ ***REMOVED***
-		pl = append(pl, &net.IPNet***REMOVED***IP: []byte***REMOVED***172, byte(i), 0, 0***REMOVED***, Mask: mask***REMOVED***)
-	***REMOVED***
-	mask20 := []byte***REMOVED***255, 255, 240, 0***REMOVED***
-	for i := 0; i < 16; i++ ***REMOVED***
-		pl = append(pl, &net.IPNet***REMOVED***IP: []byte***REMOVED***192, 168, byte(i << 4), 0***REMOVED***, Mask: mask20***REMOVED***)
-	***REMOVED***
+	mask := []byte{255, 255, 0, 0}
+	for i := 17; i < 32; i++ {
+		pl = append(pl, &net.IPNet{IP: []byte{172, byte(i), 0, 0}, Mask: mask})
+	}
+	mask20 := []byte{255, 255, 240, 0}
+	for i := 0; i < 16; i++ {
+		pl = append(pl, &net.IPNet{IP: []byte{192, 168, byte(i << 4), 0}, Mask: mask20})
+	}
 	return pl
-***REMOVED***
+}
 
-func initGranularPredefinedNetworks() []*net.IPNet ***REMOVED***
+func initGranularPredefinedNetworks() []*net.IPNet {
 	pl := make([]*net.IPNet, 0, 256*256)
-	mask := []byte***REMOVED***255, 255, 255, 0***REMOVED***
-	for i := 0; i < 256; i++ ***REMOVED***
-		for j := 0; j < 256; j++ ***REMOVED***
-			pl = append(pl, &net.IPNet***REMOVED***IP: []byte***REMOVED***10, byte(i), byte(j), 0***REMOVED***, Mask: mask***REMOVED***)
-		***REMOVED***
-	***REMOVED***
+	mask := []byte{255, 255, 255, 0}
+	for i := 0; i < 256; i++ {
+		for j := 0; j < 256; j++ {
+			pl = append(pl, &net.IPNet{IP: []byte{10, byte(i), byte(j), 0}, Mask: mask})
+		}
+	}
 	return pl
-***REMOVED***
+}

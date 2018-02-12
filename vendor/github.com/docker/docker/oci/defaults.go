@@ -7,12 +7,12 @@ import (
 	"github.com/opencontainers/runtime-spec/specs-go"
 )
 
-func iPtr(i int64) *int64        ***REMOVED*** return &i ***REMOVED***
-func u32Ptr(i int64) *uint32     ***REMOVED*** u := uint32(i); return &u ***REMOVED***
-func fmPtr(i int64) *os.FileMode ***REMOVED*** fm := os.FileMode(i); return &fm ***REMOVED***
+func iPtr(i int64) *int64        { return &i }
+func u32Ptr(i int64) *uint32     { u := uint32(i); return &u }
+func fmPtr(i int64) *os.FileMode { fm := os.FileMode(i); return &fm }
 
-func defaultCapabilities() []string ***REMOVED***
-	return []string***REMOVED***
+func defaultCapabilities() []string {
+	return []string{
 		"CAP_CHOWN",
 		"CAP_DAC_OVERRIDE",
 		"CAP_FSETID",
@@ -27,93 +27,93 @@ func defaultCapabilities() []string ***REMOVED***
 		"CAP_SYS_CHROOT",
 		"CAP_KILL",
 		"CAP_AUDIT_WRITE",
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // DefaultSpec returns the default spec used by docker for the current Platform
-func DefaultSpec() specs.Spec ***REMOVED***
+func DefaultSpec() specs.Spec {
 	return DefaultOSSpec(runtime.GOOS)
-***REMOVED***
+}
 
 // DefaultOSSpec returns the spec for a given OS
-func DefaultOSSpec(osName string) specs.Spec ***REMOVED***
-	if osName == "windows" ***REMOVED***
+func DefaultOSSpec(osName string) specs.Spec {
+	if osName == "windows" {
 		return DefaultWindowsSpec()
-	***REMOVED***
+	}
 	return DefaultLinuxSpec()
-***REMOVED***
+}
 
 // DefaultWindowsSpec create a default spec for running Windows containers
-func DefaultWindowsSpec() specs.Spec ***REMOVED***
-	return specs.Spec***REMOVED***
+func DefaultWindowsSpec() specs.Spec {
+	return specs.Spec{
 		Version: specs.Version,
-		Windows: &specs.Windows***REMOVED******REMOVED***,
-		Process: &specs.Process***REMOVED******REMOVED***,
-		Root:    &specs.Root***REMOVED******REMOVED***,
-	***REMOVED***
-***REMOVED***
+		Windows: &specs.Windows{},
+		Process: &specs.Process{},
+		Root:    &specs.Root{},
+	}
+}
 
 // DefaultLinuxSpec create a default spec for running Linux containers
-func DefaultLinuxSpec() specs.Spec ***REMOVED***
-	s := specs.Spec***REMOVED***
+func DefaultLinuxSpec() specs.Spec {
+	s := specs.Spec{
 		Version: specs.Version,
-		Process: &specs.Process***REMOVED***
-			Capabilities: &specs.LinuxCapabilities***REMOVED***
+		Process: &specs.Process{
+			Capabilities: &specs.LinuxCapabilities{
 				Bounding:    defaultCapabilities(),
 				Permitted:   defaultCapabilities(),
 				Inheritable: defaultCapabilities(),
 				Effective:   defaultCapabilities(),
-			***REMOVED***,
-		***REMOVED***,
-		Root: &specs.Root***REMOVED******REMOVED***,
-	***REMOVED***
-	s.Mounts = []specs.Mount***REMOVED***
-		***REMOVED***
+			},
+		},
+		Root: &specs.Root{},
+	}
+	s.Mounts = []specs.Mount{
+		{
 			Destination: "/proc",
 			Type:        "proc",
 			Source:      "proc",
-			Options:     []string***REMOVED***"nosuid", "noexec", "nodev"***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			Options:     []string{"nosuid", "noexec", "nodev"},
+		},
+		{
 			Destination: "/dev",
 			Type:        "tmpfs",
 			Source:      "tmpfs",
-			Options:     []string***REMOVED***"nosuid", "strictatime", "mode=755", "size=65536k"***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			Options:     []string{"nosuid", "strictatime", "mode=755", "size=65536k"},
+		},
+		{
 			Destination: "/dev/pts",
 			Type:        "devpts",
 			Source:      "devpts",
-			Options:     []string***REMOVED***"nosuid", "noexec", "newinstance", "ptmxmode=0666", "mode=0620", "gid=5"***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			Options:     []string{"nosuid", "noexec", "newinstance", "ptmxmode=0666", "mode=0620", "gid=5"},
+		},
+		{
 			Destination: "/sys",
 			Type:        "sysfs",
 			Source:      "sysfs",
-			Options:     []string***REMOVED***"nosuid", "noexec", "nodev", "ro"***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			Options:     []string{"nosuid", "noexec", "nodev", "ro"},
+		},
+		{
 			Destination: "/sys/fs/cgroup",
 			Type:        "cgroup",
 			Source:      "cgroup",
-			Options:     []string***REMOVED***"ro", "nosuid", "noexec", "nodev"***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			Options:     []string{"ro", "nosuid", "noexec", "nodev"},
+		},
+		{
 			Destination: "/dev/mqueue",
 			Type:        "mqueue",
 			Source:      "mqueue",
-			Options:     []string***REMOVED***"nosuid", "noexec", "nodev"***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			Options:     []string{"nosuid", "noexec", "nodev"},
+		},
+		{
 			Destination: "/dev/shm",
 			Type:        "tmpfs",
 			Source:      "shm",
-			Options:     []string***REMOVED***"nosuid", "noexec", "nodev", "mode=1777"***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+			Options:     []string{"nosuid", "noexec", "nodev", "mode=1777"},
+		},
+	}
 
-	s.Linux = &specs.Linux***REMOVED***
-		MaskedPaths: []string***REMOVED***
+	s.Linux = &specs.Linux{
+		MaskedPaths: []string{
 			"/proc/kcore",
 			"/proc/latency_stats",
 			"/proc/timer_list",
@@ -121,90 +121,90 @@ func DefaultLinuxSpec() specs.Spec ***REMOVED***
 			"/proc/sched_debug",
 			"/proc/scsi",
 			"/sys/firmware",
-		***REMOVED***,
-		ReadonlyPaths: []string***REMOVED***
+		},
+		ReadonlyPaths: []string{
 			"/proc/asound",
 			"/proc/bus",
 			"/proc/fs",
 			"/proc/irq",
 			"/proc/sys",
 			"/proc/sysrq-trigger",
-		***REMOVED***,
-		Namespaces: []specs.LinuxNamespace***REMOVED***
-			***REMOVED***Type: "mount"***REMOVED***,
-			***REMOVED***Type: "network"***REMOVED***,
-			***REMOVED***Type: "uts"***REMOVED***,
-			***REMOVED***Type: "pid"***REMOVED***,
-			***REMOVED***Type: "ipc"***REMOVED***,
-		***REMOVED***,
+		},
+		Namespaces: []specs.LinuxNamespace{
+			{Type: "mount"},
+			{Type: "network"},
+			{Type: "uts"},
+			{Type: "pid"},
+			{Type: "ipc"},
+		},
 		// Devices implicitly contains the following devices:
 		// null, zero, full, random, urandom, tty, console, and ptmx.
 		// ptmx is a bind mount or symlink of the container's ptmx.
 		// See also: https://github.com/opencontainers/runtime-spec/blob/master/config-linux.md#default-devices
-		Devices: []specs.LinuxDevice***REMOVED******REMOVED***,
-		Resources: &specs.LinuxResources***REMOVED***
-			Devices: []specs.LinuxDeviceCgroup***REMOVED***
-				***REMOVED***
+		Devices: []specs.LinuxDevice{},
+		Resources: &specs.LinuxResources{
+			Devices: []specs.LinuxDeviceCgroup{
+				{
 					Allow:  false,
 					Access: "rwm",
-				***REMOVED***,
-				***REMOVED***
+				},
+				{
 					Allow:  true,
 					Type:   "c",
 					Major:  iPtr(1),
 					Minor:  iPtr(5),
 					Access: "rwm",
-				***REMOVED***,
-				***REMOVED***
+				},
+				{
 					Allow:  true,
 					Type:   "c",
 					Major:  iPtr(1),
 					Minor:  iPtr(3),
 					Access: "rwm",
-				***REMOVED***,
-				***REMOVED***
+				},
+				{
 					Allow:  true,
 					Type:   "c",
 					Major:  iPtr(1),
 					Minor:  iPtr(9),
 					Access: "rwm",
-				***REMOVED***,
-				***REMOVED***
+				},
+				{
 					Allow:  true,
 					Type:   "c",
 					Major:  iPtr(1),
 					Minor:  iPtr(8),
 					Access: "rwm",
-				***REMOVED***,
-				***REMOVED***
+				},
+				{
 					Allow:  true,
 					Type:   "c",
 					Major:  iPtr(5),
 					Minor:  iPtr(0),
 					Access: "rwm",
-				***REMOVED***,
-				***REMOVED***
+				},
+				{
 					Allow:  true,
 					Type:   "c",
 					Major:  iPtr(5),
 					Minor:  iPtr(1),
 					Access: "rwm",
-				***REMOVED***,
-				***REMOVED***
+				},
+				{
 					Allow:  false,
 					Type:   "c",
 					Major:  iPtr(10),
 					Minor:  iPtr(229),
 					Access: "rwm",
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+				},
+			},
+		},
+	}
 
 	// For LCOW support, populate a blank Windows spec
-	if runtime.GOOS == "windows" ***REMOVED***
-		s.Windows = &specs.Windows***REMOVED******REMOVED***
-	***REMOVED***
+	if runtime.GOOS == "windows" {
+		s.Windows = &specs.Windows{}
+	}
 
 	return s
-***REMOVED***
+}

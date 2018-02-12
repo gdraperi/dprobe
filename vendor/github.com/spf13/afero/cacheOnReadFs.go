@@ -19,15 +19,15 @@ import (
 // system first. To prevent writing to the base Fs, wrap it in a read-only
 // filter - Note: this will also make the overlay read-only, for writing files
 // in the overlay, use the overlay Fs directly, not via the union Fs.
-type CacheOnReadFs struct ***REMOVED***
+type CacheOnReadFs struct {
 	base      Fs
 	layer     Fs
 	cacheTime time.Duration
-***REMOVED***
+}
 
-func NewCacheOnReadFs(base Fs, layer Fs, cacheTime time.Duration) Fs ***REMOVED***
-	return &CacheOnReadFs***REMOVED***base: base, layer: layer, cacheTime: cacheTime***REMOVED***
-***REMOVED***
+func NewCacheOnReadFs(base Fs, layer Fs, cacheTime time.Duration) Fs {
+	return &CacheOnReadFs{base: base, layer: layer, cacheTime: cacheTime}
+}
 
 type cacheState int
 
@@ -45,246 +45,246 @@ const (
 	cacheLocal
 )
 
-func (u *CacheOnReadFs) cacheStatus(name string) (state cacheState, fi os.FileInfo, err error) ***REMOVED***
+func (u *CacheOnReadFs) cacheStatus(name string) (state cacheState, fi os.FileInfo, err error) {
 	var lfi, bfi os.FileInfo
 	lfi, err = u.layer.Stat(name)
-	if err == nil ***REMOVED***
-		if u.cacheTime == 0 ***REMOVED***
+	if err == nil {
+		if u.cacheTime == 0 {
 			return cacheHit, lfi, nil
-		***REMOVED***
-		if lfi.ModTime().Add(u.cacheTime).Before(time.Now()) ***REMOVED***
+		}
+		if lfi.ModTime().Add(u.cacheTime).Before(time.Now()) {
 			bfi, err = u.base.Stat(name)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return cacheLocal, lfi, nil
-			***REMOVED***
-			if bfi.ModTime().After(lfi.ModTime()) ***REMOVED***
+			}
+			if bfi.ModTime().After(lfi.ModTime()) {
 				return cacheStale, bfi, nil
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		return cacheHit, lfi, nil
-	***REMOVED***
+	}
 
-	if err == syscall.ENOENT || os.IsNotExist(err) ***REMOVED***
+	if err == syscall.ENOENT || os.IsNotExist(err) {
 		return cacheMiss, nil, nil
-	***REMOVED***
+	}
 
 	return cacheMiss, nil, err
-***REMOVED***
+}
 
-func (u *CacheOnReadFs) copyToLayer(name string) error ***REMOVED***
+func (u *CacheOnReadFs) copyToLayer(name string) error {
 	return copyToLayer(u.base, u.layer, name)
-***REMOVED***
+}
 
-func (u *CacheOnReadFs) Chtimes(name string, atime, mtime time.Time) error ***REMOVED***
+func (u *CacheOnReadFs) Chtimes(name string, atime, mtime time.Time) error {
 	st, _, err := u.cacheStatus(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	switch st ***REMOVED***
+	}
+	switch st {
 	case cacheLocal:
 	case cacheHit:
 		err = u.base.Chtimes(name, atime, mtime)
 	case cacheStale, cacheMiss:
-		if err := u.copyToLayer(name); err != nil ***REMOVED***
+		if err := u.copyToLayer(name); err != nil {
 			return err
-		***REMOVED***
+		}
 		err = u.base.Chtimes(name, atime, mtime)
-	***REMOVED***
-	if err != nil ***REMOVED***
+	}
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return u.layer.Chtimes(name, atime, mtime)
-***REMOVED***
+}
 
-func (u *CacheOnReadFs) Chmod(name string, mode os.FileMode) error ***REMOVED***
+func (u *CacheOnReadFs) Chmod(name string, mode os.FileMode) error {
 	st, _, err := u.cacheStatus(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	switch st ***REMOVED***
+	}
+	switch st {
 	case cacheLocal:
 	case cacheHit:
 		err = u.base.Chmod(name, mode)
 	case cacheStale, cacheMiss:
-		if err := u.copyToLayer(name); err != nil ***REMOVED***
+		if err := u.copyToLayer(name); err != nil {
 			return err
-		***REMOVED***
+		}
 		err = u.base.Chmod(name, mode)
-	***REMOVED***
-	if err != nil ***REMOVED***
+	}
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return u.layer.Chmod(name, mode)
-***REMOVED***
+}
 
-func (u *CacheOnReadFs) Stat(name string) (os.FileInfo, error) ***REMOVED***
+func (u *CacheOnReadFs) Stat(name string) (os.FileInfo, error) {
 	st, fi, err := u.cacheStatus(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	switch st ***REMOVED***
+	}
+	switch st {
 	case cacheMiss:
 		return u.base.Stat(name)
 	default: // cacheStale has base, cacheHit and cacheLocal the layer os.FileInfo
 		return fi, nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (u *CacheOnReadFs) Rename(oldname, newname string) error ***REMOVED***
+func (u *CacheOnReadFs) Rename(oldname, newname string) error {
 	st, _, err := u.cacheStatus(oldname)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	switch st ***REMOVED***
+	}
+	switch st {
 	case cacheLocal:
 	case cacheHit:
 		err = u.base.Rename(oldname, newname)
 	case cacheStale, cacheMiss:
-		if err := u.copyToLayer(oldname); err != nil ***REMOVED***
+		if err := u.copyToLayer(oldname); err != nil {
 			return err
-		***REMOVED***
+		}
 		err = u.base.Rename(oldname, newname)
-	***REMOVED***
-	if err != nil ***REMOVED***
+	}
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return u.layer.Rename(oldname, newname)
-***REMOVED***
+}
 
-func (u *CacheOnReadFs) Remove(name string) error ***REMOVED***
+func (u *CacheOnReadFs) Remove(name string) error {
 	st, _, err := u.cacheStatus(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	switch st ***REMOVED***
+	}
+	switch st {
 	case cacheLocal:
 	case cacheHit, cacheStale, cacheMiss:
 		err = u.base.Remove(name)
-	***REMOVED***
-	if err != nil ***REMOVED***
+	}
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return u.layer.Remove(name)
-***REMOVED***
+}
 
-func (u *CacheOnReadFs) RemoveAll(name string) error ***REMOVED***
+func (u *CacheOnReadFs) RemoveAll(name string) error {
 	st, _, err := u.cacheStatus(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	switch st ***REMOVED***
+	}
+	switch st {
 	case cacheLocal:
 	case cacheHit, cacheStale, cacheMiss:
 		err = u.base.RemoveAll(name)
-	***REMOVED***
-	if err != nil ***REMOVED***
+	}
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return u.layer.RemoveAll(name)
-***REMOVED***
+}
 
-func (u *CacheOnReadFs) OpenFile(name string, flag int, perm os.FileMode) (File, error) ***REMOVED***
+func (u *CacheOnReadFs) OpenFile(name string, flag int, perm os.FileMode) (File, error) {
 	st, _, err := u.cacheStatus(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	switch st ***REMOVED***
+	}
+	switch st {
 	case cacheLocal, cacheHit:
 	default:
-		if err := u.copyToLayer(name); err != nil ***REMOVED***
+		if err := u.copyToLayer(name); err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
-	if flag&(os.O_WRONLY|syscall.O_RDWR|os.O_APPEND|os.O_CREATE|os.O_TRUNC) != 0 ***REMOVED***
+		}
+	}
+	if flag&(os.O_WRONLY|syscall.O_RDWR|os.O_APPEND|os.O_CREATE|os.O_TRUNC) != 0 {
 		bfi, err := u.base.OpenFile(name, flag, perm)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		lfi, err := u.layer.OpenFile(name, flag, perm)
-		if err != nil ***REMOVED***
+		if err != nil {
 			bfi.Close() // oops, what if O_TRUNC was set and file opening in the layer failed...?
 			return nil, err
-		***REMOVED***
-		return &UnionFile***REMOVED***base: bfi, layer: lfi***REMOVED***, nil
-	***REMOVED***
+		}
+		return &UnionFile{base: bfi, layer: lfi}, nil
+	}
 	return u.layer.OpenFile(name, flag, perm)
-***REMOVED***
+}
 
-func (u *CacheOnReadFs) Open(name string) (File, error) ***REMOVED***
+func (u *CacheOnReadFs) Open(name string) (File, error) {
 	st, fi, err := u.cacheStatus(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	switch st ***REMOVED***
+	switch st {
 	case cacheLocal:
 		return u.layer.Open(name)
 
 	case cacheMiss:
 		bfi, err := u.base.Stat(name)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-		if bfi.IsDir() ***REMOVED***
+		}
+		if bfi.IsDir() {
 			return u.base.Open(name)
-		***REMOVED***
-		if err := u.copyToLayer(name); err != nil ***REMOVED***
+		}
+		if err := u.copyToLayer(name); err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		return u.layer.Open(name)
 
 	case cacheStale:
-		if !fi.IsDir() ***REMOVED***
-			if err := u.copyToLayer(name); err != nil ***REMOVED***
+		if !fi.IsDir() {
+			if err := u.copyToLayer(name); err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			return u.layer.Open(name)
-		***REMOVED***
+		}
 	case cacheHit:
-		if !fi.IsDir() ***REMOVED***
+		if !fi.IsDir() {
 			return u.layer.Open(name)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	// the dirs from cacheHit, cacheStale fall down here:
 	bfile, _ := u.base.Open(name)
 	lfile, err := u.layer.Open(name)
-	if err != nil && bfile == nil ***REMOVED***
+	if err != nil && bfile == nil {
 		return nil, err
-	***REMOVED***
-	return &UnionFile***REMOVED***base: bfile, layer: lfile***REMOVED***, nil
-***REMOVED***
+	}
+	return &UnionFile{base: bfile, layer: lfile}, nil
+}
 
-func (u *CacheOnReadFs) Mkdir(name string, perm os.FileMode) error ***REMOVED***
+func (u *CacheOnReadFs) Mkdir(name string, perm os.FileMode) error {
 	err := u.base.Mkdir(name, perm)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return u.layer.MkdirAll(name, perm) // yes, MkdirAll... we cannot assume it exists in the cache
-***REMOVED***
+}
 
-func (u *CacheOnReadFs) Name() string ***REMOVED***
+func (u *CacheOnReadFs) Name() string {
 	return "CacheOnReadFs"
-***REMOVED***
+}
 
-func (u *CacheOnReadFs) MkdirAll(name string, perm os.FileMode) error ***REMOVED***
+func (u *CacheOnReadFs) MkdirAll(name string, perm os.FileMode) error {
 	err := u.base.MkdirAll(name, perm)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return u.layer.MkdirAll(name, perm)
-***REMOVED***
+}
 
-func (u *CacheOnReadFs) Create(name string) (File, error) ***REMOVED***
+func (u *CacheOnReadFs) Create(name string) (File, error) {
 	bfh, err := u.base.Create(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	lfh, err := u.layer.Create(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		// oops, see comment about OS_TRUNC above, should we remove? then we have to
 		// remember if the file did not exist before
 		bfh.Close()
 		return nil, err
-	***REMOVED***
-	return &UnionFile***REMOVED***base: bfh, layer: lfh***REMOVED***, nil
-***REMOVED***
+	}
+	return &UnionFile{base: bfh, layer: lfh}, nil
+}

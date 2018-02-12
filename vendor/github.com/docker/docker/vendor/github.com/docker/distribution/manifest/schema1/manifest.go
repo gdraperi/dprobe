@@ -23,55 +23,55 @@ const (
 var (
 	// SchemaVersion provides a pre-initialized version structure for this
 	// packages version of the manifest.
-	SchemaVersion = manifest.Versioned***REMOVED***
+	SchemaVersion = manifest.Versioned{
 		SchemaVersion: 1,
-	***REMOVED***
+	}
 )
 
-func init() ***REMOVED***
-	schema1Func := func(b []byte) (distribution.Manifest, distribution.Descriptor, error) ***REMOVED***
+func init() {
+	schema1Func := func(b []byte) (distribution.Manifest, distribution.Descriptor, error) {
 		sm := new(SignedManifest)
 		err := sm.UnmarshalJSON(b)
-		if err != nil ***REMOVED***
-			return nil, distribution.Descriptor***REMOVED******REMOVED***, err
-		***REMOVED***
+		if err != nil {
+			return nil, distribution.Descriptor{}, err
+		}
 
-		desc := distribution.Descriptor***REMOVED***
+		desc := distribution.Descriptor{
 			Digest:    digest.FromBytes(sm.Canonical),
 			Size:      int64(len(sm.Canonical)),
 			MediaType: MediaTypeSignedManifest,
-		***REMOVED***
+		}
 		return sm, desc, err
-	***REMOVED***
+	}
 	err := distribution.RegisterManifestSchema(MediaTypeSignedManifest, schema1Func)
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(fmt.Sprintf("Unable to register manifest: %s", err))
-	***REMOVED***
+	}
 	err = distribution.RegisterManifestSchema("", schema1Func)
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(fmt.Sprintf("Unable to register manifest: %s", err))
-	***REMOVED***
+	}
 	err = distribution.RegisterManifestSchema("application/json", schema1Func)
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(fmt.Sprintf("Unable to register manifest: %s", err))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // FSLayer is a container struct for BlobSums defined in an image manifest
-type FSLayer struct ***REMOVED***
+type FSLayer struct {
 	// BlobSum is the tarsum of the referenced filesystem image layer
 	BlobSum digest.Digest `json:"blobSum"`
-***REMOVED***
+}
 
 // History stores unstructured v1 compatibility information
-type History struct ***REMOVED***
+type History struct {
 	// V1Compatibility is the raw v1 compatibility information
 	V1Compatibility string `json:"v1Compatibility"`
-***REMOVED***
+}
 
 // Manifest provides the base accessible fields for working with V2 image
 // format in the registry.
-type Manifest struct ***REMOVED***
+type Manifest struct {
 	manifest.Versioned
 
 	// Name is the name of the image's repository
@@ -89,11 +89,11 @@ type Manifest struct ***REMOVED***
 
 	// History is a list of unstructured historical data for v1 compatibility
 	History []History `json:"history"`
-***REMOVED***
+}
 
 // SignedManifest provides an envelope for a signed image manifest, including
 // the format sensitive raw bytes.
-type SignedManifest struct ***REMOVED***
+type SignedManifest struct {
 	Manifest
 
 	// Canonical is the canonical byte representation of the ImageManifest,
@@ -104,24 +104,24 @@ type SignedManifest struct ***REMOVED***
 	// all contains the byte representation of the Manifest including signatures
 	// and is returned by Payload()
 	all []byte
-***REMOVED***
+}
 
 // UnmarshalJSON populates a new SignedManifest struct from JSON data.
-func (sm *SignedManifest) UnmarshalJSON(b []byte) error ***REMOVED***
+func (sm *SignedManifest) UnmarshalJSON(b []byte) error {
 	sm.all = make([]byte, len(b), len(b))
 	// store manifest and signatures in all
 	copy(sm.all, b)
 
 	jsig, err := libtrust.ParsePrettySignature(b, "signatures")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	// Resolve the payload in the manifest.
 	bytes, err := jsig.Payload()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	// sm.Canonical stores the canonical manifest JSON
 	sm.Canonical = make([]byte, len(bytes), len(bytes))
@@ -129,56 +129,56 @@ func (sm *SignedManifest) UnmarshalJSON(b []byte) error ***REMOVED***
 
 	// Unmarshal canonical JSON into Manifest object
 	var manifest Manifest
-	if err := json.Unmarshal(sm.Canonical, &manifest); err != nil ***REMOVED***
+	if err := json.Unmarshal(sm.Canonical, &manifest); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	sm.Manifest = manifest
 
 	return nil
-***REMOVED***
+}
 
 // References returnes the descriptors of this manifests references
-func (sm SignedManifest) References() []distribution.Descriptor ***REMOVED***
+func (sm SignedManifest) References() []distribution.Descriptor {
 	dependencies := make([]distribution.Descriptor, len(sm.FSLayers))
-	for i, fsLayer := range sm.FSLayers ***REMOVED***
-		dependencies[i] = distribution.Descriptor***REMOVED***
+	for i, fsLayer := range sm.FSLayers {
+		dependencies[i] = distribution.Descriptor{
 			MediaType: "application/vnd.docker.container.image.rootfs.diff+x-gtar",
 			Digest:    fsLayer.BlobSum,
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return dependencies
 
-***REMOVED***
+}
 
 // MarshalJSON returns the contents of raw. If Raw is nil, marshals the inner
 // contents. Applications requiring a marshaled signed manifest should simply
 // use Raw directly, since the the content produced by json.Marshal will be
 // compacted and will fail signature checks.
-func (sm *SignedManifest) MarshalJSON() ([]byte, error) ***REMOVED***
-	if len(sm.all) > 0 ***REMOVED***
+func (sm *SignedManifest) MarshalJSON() ([]byte, error) {
+	if len(sm.all) > 0 {
 		return sm.all, nil
-	***REMOVED***
+	}
 
 	// If the raw data is not available, just dump the inner content.
 	return json.Marshal(&sm.Manifest)
-***REMOVED***
+}
 
 // Payload returns the signed content of the signed manifest.
-func (sm SignedManifest) Payload() (string, []byte, error) ***REMOVED***
+func (sm SignedManifest) Payload() (string, []byte, error) {
 	return MediaTypeSignedManifest, sm.all, nil
-***REMOVED***
+}
 
 // Signatures returns the signatures as provided by
 // (*libtrust.JSONSignature).Signatures. The byte slices are opaque jws
 // signatures.
-func (sm *SignedManifest) Signatures() ([][]byte, error) ***REMOVED***
+func (sm *SignedManifest) Signatures() ([][]byte, error) {
 	jsig, err := libtrust.ParsePrettySignature(sm.all, "signatures")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// Resolve the payload in the manifest.
 	return jsig.Signatures()
-***REMOVED***
+}

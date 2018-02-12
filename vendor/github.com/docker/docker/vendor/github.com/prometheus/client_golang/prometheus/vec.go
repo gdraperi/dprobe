@@ -23,29 +23,29 @@ import (
 // building block for implementations of vectors of a given metric
 // type. GaugeVec, CounterVec, SummaryVec, and UntypedVec are examples already
 // provided in this package.
-type MetricVec struct ***REMOVED***
+type MetricVec struct {
 	mtx      sync.RWMutex // Protects the children.
 	children map[uint64]Metric
 	desc     *Desc
 
 	newMetric func(labelValues ...string) Metric
-***REMOVED***
+}
 
 // Describe implements Collector. The length of the returned slice
 // is always one.
-func (m *MetricVec) Describe(ch chan<- *Desc) ***REMOVED***
+func (m *MetricVec) Describe(ch chan<- *Desc) {
 	ch <- m.desc
-***REMOVED***
+}
 
 // Collect implements Collector.
-func (m *MetricVec) Collect(ch chan<- Metric) ***REMOVED***
+func (m *MetricVec) Collect(ch chan<- Metric) {
 	m.mtx.RLock()
 	defer m.mtx.RUnlock()
 
-	for _, metric := range m.children ***REMOVED***
+	for _, metric := range m.children {
 		ch <- metric
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // GetMetricWithLabelValues returns the Metric for the given slice of label
 // values (same order as the VariableLabels in Desc). If that combination of
@@ -71,23 +71,23 @@ func (m *MetricVec) Collect(ch chan<- Metric) ***REMOVED***
 // latter has a much more readable (albeit more verbose) syntax, but it comes
 // with a performance overhead (for creating and processing the Labels map).
 // See also the GaugeVec example.
-func (m *MetricVec) GetMetricWithLabelValues(lvs ...string) (Metric, error) ***REMOVED***
+func (m *MetricVec) GetMetricWithLabelValues(lvs ...string) (Metric, error) {
 	h, err := m.hashLabelValues(lvs)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	m.mtx.RLock()
 	metric, ok := m.children[h]
 	m.mtx.RUnlock()
-	if ok ***REMOVED***
+	if ok {
 		return metric, nil
-	***REMOVED***
+	}
 
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 	return m.getOrCreateMetric(h, lvs...), nil
-***REMOVED***
+}
 
 // GetMetricWith returns the Metric for the given Labels map (the label names
 // must match those of the VariableLabels in Desc). If that label map is
@@ -101,49 +101,49 @@ func (m *MetricVec) GetMetricWithLabelValues(lvs ...string) (Metric, error) ***R
 // This method is used for the same purpose as
 // GetMetricWithLabelValues(...string). See there for pros and cons of the two
 // methods.
-func (m *MetricVec) GetMetricWith(labels Labels) (Metric, error) ***REMOVED***
+func (m *MetricVec) GetMetricWith(labels Labels) (Metric, error) {
 	h, err := m.hashLabels(labels)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	m.mtx.RLock()
 	metric, ok := m.children[h]
 	m.mtx.RUnlock()
-	if ok ***REMOVED***
+	if ok {
 		return metric, nil
-	***REMOVED***
+	}
 
 	lvs := make([]string, len(labels))
-	for i, label := range m.desc.variableLabels ***REMOVED***
+	for i, label := range m.desc.variableLabels {
 		lvs[i] = labels[label]
-	***REMOVED***
+	}
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 	return m.getOrCreateMetric(h, lvs...), nil
-***REMOVED***
+}
 
 // WithLabelValues works as GetMetricWithLabelValues, but panics if an error
 // occurs. The method allows neat syntax like:
 //     httpReqs.WithLabelValues("404", "POST").Inc()
-func (m *MetricVec) WithLabelValues(lvs ...string) Metric ***REMOVED***
+func (m *MetricVec) WithLabelValues(lvs ...string) Metric {
 	metric, err := m.GetMetricWithLabelValues(lvs...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 	return metric
-***REMOVED***
+}
 
 // With works as GetMetricWith, but panics if an error occurs. The method allows
 // neat syntax like:
-//     httpReqs.With(Labels***REMOVED***"status":"404", "method":"POST"***REMOVED***).Inc()
-func (m *MetricVec) With(labels Labels) Metric ***REMOVED***
+//     httpReqs.With(Labels{"status":"404", "method":"POST"}).Inc()
+func (m *MetricVec) With(labels Labels) Metric {
 	metric, err := m.GetMetricWith(labels)
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 	return metric
-***REMOVED***
+}
 
 // DeleteLabelValues removes the metric where the variable labels are the same
 // as those passed in as labels (same order as the VariableLabels in Desc). It
@@ -160,20 +160,20 @@ func (m *MetricVec) With(labels Labels) Metric ***REMOVED***
 // latter has a much more readable (albeit more verbose) syntax, but it comes
 // with a performance overhead (for creating and processing the Labels map).
 // See also the CounterVec example.
-func (m *MetricVec) DeleteLabelValues(lvs ...string) bool ***REMOVED***
+func (m *MetricVec) DeleteLabelValues(lvs ...string) bool {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 
 	h, err := m.hashLabelValues(lvs)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return false
-	***REMOVED***
-	if _, ok := m.children[h]; !ok ***REMOVED***
+	}
+	if _, ok := m.children[h]; !ok {
 		return false
-	***REMOVED***
+	}
 	delete(m.children, h)
 	return true
-***REMOVED***
+}
 
 // Delete deletes the metric where the variable labels are the same as those
 // passed in as labels. It returns true if a metric was deleted.
@@ -185,65 +185,65 @@ func (m *MetricVec) DeleteLabelValues(lvs ...string) bool ***REMOVED***
 //
 // This method is used for the same purpose as DeleteLabelValues(...string). See
 // there for pros and cons of the two methods.
-func (m *MetricVec) Delete(labels Labels) bool ***REMOVED***
+func (m *MetricVec) Delete(labels Labels) bool {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 
 	h, err := m.hashLabels(labels)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return false
-	***REMOVED***
-	if _, ok := m.children[h]; !ok ***REMOVED***
+	}
+	if _, ok := m.children[h]; !ok {
 		return false
-	***REMOVED***
+	}
 	delete(m.children, h)
 	return true
-***REMOVED***
+}
 
 // Reset deletes all metrics in this vector.
-func (m *MetricVec) Reset() ***REMOVED***
+func (m *MetricVec) Reset() {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 
-	for h := range m.children ***REMOVED***
+	for h := range m.children {
 		delete(m.children, h)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (m *MetricVec) hashLabelValues(vals []string) (uint64, error) ***REMOVED***
-	if len(vals) != len(m.desc.variableLabels) ***REMOVED***
+func (m *MetricVec) hashLabelValues(vals []string) (uint64, error) {
+	if len(vals) != len(m.desc.variableLabels) {
 		return 0, errInconsistentCardinality
-	***REMOVED***
+	}
 	h := hashNew()
-	for _, val := range vals ***REMOVED***
+	for _, val := range vals {
 		h = hashAdd(h, val)
-	***REMOVED***
+	}
 	return h, nil
-***REMOVED***
+}
 
-func (m *MetricVec) hashLabels(labels Labels) (uint64, error) ***REMOVED***
-	if len(labels) != len(m.desc.variableLabels) ***REMOVED***
+func (m *MetricVec) hashLabels(labels Labels) (uint64, error) {
+	if len(labels) != len(m.desc.variableLabels) {
 		return 0, errInconsistentCardinality
-	***REMOVED***
+	}
 	h := hashNew()
-	for _, label := range m.desc.variableLabels ***REMOVED***
+	for _, label := range m.desc.variableLabels {
 		val, ok := labels[label]
-		if !ok ***REMOVED***
+		if !ok {
 			return 0, fmt.Errorf("label name %q missing in label map", label)
-		***REMOVED***
+		}
 		h = hashAdd(h, val)
-	***REMOVED***
+	}
 	return h, nil
-***REMOVED***
+}
 
-func (m *MetricVec) getOrCreateMetric(hash uint64, labelValues ...string) Metric ***REMOVED***
+func (m *MetricVec) getOrCreateMetric(hash uint64, labelValues ...string) Metric {
 	metric, ok := m.children[hash]
-	if !ok ***REMOVED***
+	if !ok {
 		// Copy labelValues. Otherwise, they would be allocated even if we don't go
 		// down this code path.
 		copiedLabelValues := append(make([]string, 0, len(labelValues)), labelValues...)
 		metric = m.newMetric(copiedLabelValues...)
 		m.children[hash] = metric
-	***REMOVED***
+	}
 	return metric
-***REMOVED***
+}

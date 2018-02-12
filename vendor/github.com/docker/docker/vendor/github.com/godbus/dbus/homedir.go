@@ -10,19 +10,19 @@ var (
 	homeDirLock sync.Mutex
 )
 
-func getHomeDir() string ***REMOVED***
+func getHomeDir() string {
 	homeDirLock.Lock()
 	defer homeDirLock.Unlock()
 
-	if homeDir != "" ***REMOVED***
+	if homeDir != "" {
 		return homeDir
-	***REMOVED***
+	}
 
 	homeDir = os.Getenv("HOME")
-	if homeDir != "" ***REMOVED***
+	if homeDir != "" {
 		return homeDir
-	***REMOVED***
+	}
 
 	homeDir = lookupHomeDir()
 	return homeDir
-***REMOVED***
+}

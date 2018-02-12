@@ -12,7 +12,7 @@ const (
 )
 
 // SignalMap is a map of Linux signals.
-var SignalMap = map[string]syscall.Signal***REMOVED***
+var SignalMap = map[string]syscall.Signal{
 	"ABRT":     unix.SIGABRT,
 	"ALRM":     unix.SIGALRM,
 	"BUS":      unix.SIGBUS,
@@ -78,4 +78,4 @@ var SignalMap = map[string]syscall.Signal***REMOVED***
 	"RTMAX-2":  sigrtmax - 2,
 	"RTMAX-1":  sigrtmax - 1,
 	"RTMAX":    sigrtmax,
-***REMOVED***
+}

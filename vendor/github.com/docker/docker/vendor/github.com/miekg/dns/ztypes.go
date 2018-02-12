@@ -9,79 +9,79 @@ import (
 )
 
 // TypeToRR is a map of constructors for each RR type.
-var TypeToRR = map[uint16]func() RR***REMOVED***
-	TypeA:          func() RR ***REMOVED*** return new(A) ***REMOVED***,
-	TypeAAAA:       func() RR ***REMOVED*** return new(AAAA) ***REMOVED***,
-	TypeAFSDB:      func() RR ***REMOVED*** return new(AFSDB) ***REMOVED***,
-	TypeANY:        func() RR ***REMOVED*** return new(ANY) ***REMOVED***,
-	TypeCAA:        func() RR ***REMOVED*** return new(CAA) ***REMOVED***,
-	TypeCDNSKEY:    func() RR ***REMOVED*** return new(CDNSKEY) ***REMOVED***,
-	TypeCDS:        func() RR ***REMOVED*** return new(CDS) ***REMOVED***,
-	TypeCERT:       func() RR ***REMOVED*** return new(CERT) ***REMOVED***,
-	TypeCNAME:      func() RR ***REMOVED*** return new(CNAME) ***REMOVED***,
-	TypeDHCID:      func() RR ***REMOVED*** return new(DHCID) ***REMOVED***,
-	TypeDLV:        func() RR ***REMOVED*** return new(DLV) ***REMOVED***,
-	TypeDNAME:      func() RR ***REMOVED*** return new(DNAME) ***REMOVED***,
-	TypeDNSKEY:     func() RR ***REMOVED*** return new(DNSKEY) ***REMOVED***,
-	TypeDS:         func() RR ***REMOVED*** return new(DS) ***REMOVED***,
-	TypeEID:        func() RR ***REMOVED*** return new(EID) ***REMOVED***,
-	TypeEUI48:      func() RR ***REMOVED*** return new(EUI48) ***REMOVED***,
-	TypeEUI64:      func() RR ***REMOVED*** return new(EUI64) ***REMOVED***,
-	TypeGID:        func() RR ***REMOVED*** return new(GID) ***REMOVED***,
-	TypeGPOS:       func() RR ***REMOVED*** return new(GPOS) ***REMOVED***,
-	TypeHINFO:      func() RR ***REMOVED*** return new(HINFO) ***REMOVED***,
-	TypeHIP:        func() RR ***REMOVED*** return new(HIP) ***REMOVED***,
-	TypeIPSECKEY:   func() RR ***REMOVED*** return new(IPSECKEY) ***REMOVED***,
-	TypeKEY:        func() RR ***REMOVED*** return new(KEY) ***REMOVED***,
-	TypeKX:         func() RR ***REMOVED*** return new(KX) ***REMOVED***,
-	TypeL32:        func() RR ***REMOVED*** return new(L32) ***REMOVED***,
-	TypeL64:        func() RR ***REMOVED*** return new(L64) ***REMOVED***,
-	TypeLOC:        func() RR ***REMOVED*** return new(LOC) ***REMOVED***,
-	TypeLP:         func() RR ***REMOVED*** return new(LP) ***REMOVED***,
-	TypeMB:         func() RR ***REMOVED*** return new(MB) ***REMOVED***,
-	TypeMD:         func() RR ***REMOVED*** return new(MD) ***REMOVED***,
-	TypeMF:         func() RR ***REMOVED*** return new(MF) ***REMOVED***,
-	TypeMG:         func() RR ***REMOVED*** return new(MG) ***REMOVED***,
-	TypeMINFO:      func() RR ***REMOVED*** return new(MINFO) ***REMOVED***,
-	TypeMR:         func() RR ***REMOVED*** return new(MR) ***REMOVED***,
-	TypeMX:         func() RR ***REMOVED*** return new(MX) ***REMOVED***,
-	TypeNAPTR:      func() RR ***REMOVED*** return new(NAPTR) ***REMOVED***,
-	TypeNID:        func() RR ***REMOVED*** return new(NID) ***REMOVED***,
-	TypeNIMLOC:     func() RR ***REMOVED*** return new(NIMLOC) ***REMOVED***,
-	TypeNINFO:      func() RR ***REMOVED*** return new(NINFO) ***REMOVED***,
-	TypeNS:         func() RR ***REMOVED*** return new(NS) ***REMOVED***,
-	TypeNSAPPTR:    func() RR ***REMOVED*** return new(NSAPPTR) ***REMOVED***,
-	TypeNSEC:       func() RR ***REMOVED*** return new(NSEC) ***REMOVED***,
-	TypeNSEC3:      func() RR ***REMOVED*** return new(NSEC3) ***REMOVED***,
-	TypeNSEC3PARAM: func() RR ***REMOVED*** return new(NSEC3PARAM) ***REMOVED***,
-	TypeOPENPGPKEY: func() RR ***REMOVED*** return new(OPENPGPKEY) ***REMOVED***,
-	TypeOPT:        func() RR ***REMOVED*** return new(OPT) ***REMOVED***,
-	TypePTR:        func() RR ***REMOVED*** return new(PTR) ***REMOVED***,
-	TypePX:         func() RR ***REMOVED*** return new(PX) ***REMOVED***,
-	TypeRKEY:       func() RR ***REMOVED*** return new(RKEY) ***REMOVED***,
-	TypeRP:         func() RR ***REMOVED*** return new(RP) ***REMOVED***,
-	TypeRRSIG:      func() RR ***REMOVED*** return new(RRSIG) ***REMOVED***,
-	TypeRT:         func() RR ***REMOVED*** return new(RT) ***REMOVED***,
-	TypeSIG:        func() RR ***REMOVED*** return new(SIG) ***REMOVED***,
-	TypeSOA:        func() RR ***REMOVED*** return new(SOA) ***REMOVED***,
-	TypeSPF:        func() RR ***REMOVED*** return new(SPF) ***REMOVED***,
-	TypeSRV:        func() RR ***REMOVED*** return new(SRV) ***REMOVED***,
-	TypeSSHFP:      func() RR ***REMOVED*** return new(SSHFP) ***REMOVED***,
-	TypeTA:         func() RR ***REMOVED*** return new(TA) ***REMOVED***,
-	TypeTALINK:     func() RR ***REMOVED*** return new(TALINK) ***REMOVED***,
-	TypeTKEY:       func() RR ***REMOVED*** return new(TKEY) ***REMOVED***,
-	TypeTLSA:       func() RR ***REMOVED*** return new(TLSA) ***REMOVED***,
-	TypeTSIG:       func() RR ***REMOVED*** return new(TSIG) ***REMOVED***,
-	TypeTXT:        func() RR ***REMOVED*** return new(TXT) ***REMOVED***,
-	TypeUID:        func() RR ***REMOVED*** return new(UID) ***REMOVED***,
-	TypeUINFO:      func() RR ***REMOVED*** return new(UINFO) ***REMOVED***,
-	TypeURI:        func() RR ***REMOVED*** return new(URI) ***REMOVED***,
-	TypeWKS:        func() RR ***REMOVED*** return new(WKS) ***REMOVED***,
-	TypeX25:        func() RR ***REMOVED*** return new(X25) ***REMOVED***,
-***REMOVED***
+var TypeToRR = map[uint16]func() RR{
+	TypeA:          func() RR { return new(A) },
+	TypeAAAA:       func() RR { return new(AAAA) },
+	TypeAFSDB:      func() RR { return new(AFSDB) },
+	TypeANY:        func() RR { return new(ANY) },
+	TypeCAA:        func() RR { return new(CAA) },
+	TypeCDNSKEY:    func() RR { return new(CDNSKEY) },
+	TypeCDS:        func() RR { return new(CDS) },
+	TypeCERT:       func() RR { return new(CERT) },
+	TypeCNAME:      func() RR { return new(CNAME) },
+	TypeDHCID:      func() RR { return new(DHCID) },
+	TypeDLV:        func() RR { return new(DLV) },
+	TypeDNAME:      func() RR { return new(DNAME) },
+	TypeDNSKEY:     func() RR { return new(DNSKEY) },
+	TypeDS:         func() RR { return new(DS) },
+	TypeEID:        func() RR { return new(EID) },
+	TypeEUI48:      func() RR { return new(EUI48) },
+	TypeEUI64:      func() RR { return new(EUI64) },
+	TypeGID:        func() RR { return new(GID) },
+	TypeGPOS:       func() RR { return new(GPOS) },
+	TypeHINFO:      func() RR { return new(HINFO) },
+	TypeHIP:        func() RR { return new(HIP) },
+	TypeIPSECKEY:   func() RR { return new(IPSECKEY) },
+	TypeKEY:        func() RR { return new(KEY) },
+	TypeKX:         func() RR { return new(KX) },
+	TypeL32:        func() RR { return new(L32) },
+	TypeL64:        func() RR { return new(L64) },
+	TypeLOC:        func() RR { return new(LOC) },
+	TypeLP:         func() RR { return new(LP) },
+	TypeMB:         func() RR { return new(MB) },
+	TypeMD:         func() RR { return new(MD) },
+	TypeMF:         func() RR { return new(MF) },
+	TypeMG:         func() RR { return new(MG) },
+	TypeMINFO:      func() RR { return new(MINFO) },
+	TypeMR:         func() RR { return new(MR) },
+	TypeMX:         func() RR { return new(MX) },
+	TypeNAPTR:      func() RR { return new(NAPTR) },
+	TypeNID:        func() RR { return new(NID) },
+	TypeNIMLOC:     func() RR { return new(NIMLOC) },
+	TypeNINFO:      func() RR { return new(NINFO) },
+	TypeNS:         func() RR { return new(NS) },
+	TypeNSAPPTR:    func() RR { return new(NSAPPTR) },
+	TypeNSEC:       func() RR { return new(NSEC) },
+	TypeNSEC3:      func() RR { return new(NSEC3) },
+	TypeNSEC3PARAM: func() RR { return new(NSEC3PARAM) },
+	TypeOPENPGPKEY: func() RR { return new(OPENPGPKEY) },
+	TypeOPT:        func() RR { return new(OPT) },
+	TypePTR:        func() RR { return new(PTR) },
+	TypePX:         func() RR { return new(PX) },
+	TypeRKEY:       func() RR { return new(RKEY) },
+	TypeRP:         func() RR { return new(RP) },
+	TypeRRSIG:      func() RR { return new(RRSIG) },
+	TypeRT:         func() RR { return new(RT) },
+	TypeSIG:        func() RR { return new(SIG) },
+	TypeSOA:        func() RR { return new(SOA) },
+	TypeSPF:        func() RR { return new(SPF) },
+	TypeSRV:        func() RR { return new(SRV) },
+	TypeSSHFP:      func() RR { return new(SSHFP) },
+	TypeTA:         func() RR { return new(TA) },
+	TypeTALINK:     func() RR { return new(TALINK) },
+	TypeTKEY:       func() RR { return new(TKEY) },
+	TypeTLSA:       func() RR { return new(TLSA) },
+	TypeTSIG:       func() RR { return new(TSIG) },
+	TypeTXT:        func() RR { return new(TXT) },
+	TypeUID:        func() RR { return new(UID) },
+	TypeUINFO:      func() RR { return new(UINFO) },
+	TypeURI:        func() RR { return new(URI) },
+	TypeWKS:        func() RR { return new(WKS) },
+	TypeX25:        func() RR { return new(X25) },
+}
 
 // TypeToString is a map of strings for each RR type.
-var TypeToString = map[uint16]string***REMOVED***
+var TypeToString = map[uint16]string{
 	TypeA:          "A",
 	TypeAAAA:       "AAAA",
 	TypeAFSDB:      "AFSDB",
@@ -161,210 +161,210 @@ var TypeToString = map[uint16]string***REMOVED***
 	TypeWKS:        "WKS",
 	TypeX25:        "X25",
 	TypeNSAPPTR:    "NSAP-PTR",
-***REMOVED***
+}
 
 // Header() functions
-func (rr *A) Header() *RR_Header          ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *AAAA) Header() *RR_Header       ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *AFSDB) Header() *RR_Header      ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *ANY) Header() *RR_Header        ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *CAA) Header() *RR_Header        ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *CDNSKEY) Header() *RR_Header    ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *CDS) Header() *RR_Header        ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *CERT) Header() *RR_Header       ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *CNAME) Header() *RR_Header      ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *DHCID) Header() *RR_Header      ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *DLV) Header() *RR_Header        ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *DNAME) Header() *RR_Header      ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *DNSKEY) Header() *RR_Header     ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *DS) Header() *RR_Header         ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *EID) Header() *RR_Header        ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *EUI48) Header() *RR_Header      ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *EUI64) Header() *RR_Header      ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *GID) Header() *RR_Header        ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *GPOS) Header() *RR_Header       ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *HINFO) Header() *RR_Header      ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *HIP) Header() *RR_Header        ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *IPSECKEY) Header() *RR_Header   ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *KEY) Header() *RR_Header        ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *KX) Header() *RR_Header         ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *L32) Header() *RR_Header        ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *L64) Header() *RR_Header        ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *LOC) Header() *RR_Header        ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *LP) Header() *RR_Header         ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *MB) Header() *RR_Header         ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *MD) Header() *RR_Header         ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *MF) Header() *RR_Header         ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *MG) Header() *RR_Header         ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *MINFO) Header() *RR_Header      ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *MR) Header() *RR_Header         ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *MX) Header() *RR_Header         ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *NAPTR) Header() *RR_Header      ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *NID) Header() *RR_Header        ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *NIMLOC) Header() *RR_Header     ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *NINFO) Header() *RR_Header      ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *NS) Header() *RR_Header         ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *NSAPPTR) Header() *RR_Header    ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *NSEC) Header() *RR_Header       ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *NSEC3) Header() *RR_Header      ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *NSEC3PARAM) Header() *RR_Header ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *OPENPGPKEY) Header() *RR_Header ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *OPT) Header() *RR_Header        ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *PTR) Header() *RR_Header        ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *PX) Header() *RR_Header         ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *RFC3597) Header() *RR_Header    ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *RKEY) Header() *RR_Header       ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *RP) Header() *RR_Header         ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *RRSIG) Header() *RR_Header      ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *RT) Header() *RR_Header         ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *SIG) Header() *RR_Header        ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *SOA) Header() *RR_Header        ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *SPF) Header() *RR_Header        ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *SRV) Header() *RR_Header        ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *SSHFP) Header() *RR_Header      ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *TA) Header() *RR_Header         ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *TALINK) Header() *RR_Header     ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *TKEY) Header() *RR_Header       ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *TLSA) Header() *RR_Header       ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *TSIG) Header() *RR_Header       ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *TXT) Header() *RR_Header        ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *UID) Header() *RR_Header        ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *UINFO) Header() *RR_Header      ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *URI) Header() *RR_Header        ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *WKS) Header() *RR_Header        ***REMOVED*** return &rr.Hdr ***REMOVED***
-func (rr *X25) Header() *RR_Header        ***REMOVED*** return &rr.Hdr ***REMOVED***
+func (rr *A) Header() *RR_Header          { return &rr.Hdr }
+func (rr *AAAA) Header() *RR_Header       { return &rr.Hdr }
+func (rr *AFSDB) Header() *RR_Header      { return &rr.Hdr }
+func (rr *ANY) Header() *RR_Header        { return &rr.Hdr }
+func (rr *CAA) Header() *RR_Header        { return &rr.Hdr }
+func (rr *CDNSKEY) Header() *RR_Header    { return &rr.Hdr }
+func (rr *CDS) Header() *RR_Header        { return &rr.Hdr }
+func (rr *CERT) Header() *RR_Header       { return &rr.Hdr }
+func (rr *CNAME) Header() *RR_Header      { return &rr.Hdr }
+func (rr *DHCID) Header() *RR_Header      { return &rr.Hdr }
+func (rr *DLV) Header() *RR_Header        { return &rr.Hdr }
+func (rr *DNAME) Header() *RR_Header      { return &rr.Hdr }
+func (rr *DNSKEY) Header() *RR_Header     { return &rr.Hdr }
+func (rr *DS) Header() *RR_Header         { return &rr.Hdr }
+func (rr *EID) Header() *RR_Header        { return &rr.Hdr }
+func (rr *EUI48) Header() *RR_Header      { return &rr.Hdr }
+func (rr *EUI64) Header() *RR_Header      { return &rr.Hdr }
+func (rr *GID) Header() *RR_Header        { return &rr.Hdr }
+func (rr *GPOS) Header() *RR_Header       { return &rr.Hdr }
+func (rr *HINFO) Header() *RR_Header      { return &rr.Hdr }
+func (rr *HIP) Header() *RR_Header        { return &rr.Hdr }
+func (rr *IPSECKEY) Header() *RR_Header   { return &rr.Hdr }
+func (rr *KEY) Header() *RR_Header        { return &rr.Hdr }
+func (rr *KX) Header() *RR_Header         { return &rr.Hdr }
+func (rr *L32) Header() *RR_Header        { return &rr.Hdr }
+func (rr *L64) Header() *RR_Header        { return &rr.Hdr }
+func (rr *LOC) Header() *RR_Header        { return &rr.Hdr }
+func (rr *LP) Header() *RR_Header         { return &rr.Hdr }
+func (rr *MB) Header() *RR_Header         { return &rr.Hdr }
+func (rr *MD) Header() *RR_Header         { return &rr.Hdr }
+func (rr *MF) Header() *RR_Header         { return &rr.Hdr }
+func (rr *MG) Header() *RR_Header         { return &rr.Hdr }
+func (rr *MINFO) Header() *RR_Header      { return &rr.Hdr }
+func (rr *MR) Header() *RR_Header         { return &rr.Hdr }
+func (rr *MX) Header() *RR_Header         { return &rr.Hdr }
+func (rr *NAPTR) Header() *RR_Header      { return &rr.Hdr }
+func (rr *NID) Header() *RR_Header        { return &rr.Hdr }
+func (rr *NIMLOC) Header() *RR_Header     { return &rr.Hdr }
+func (rr *NINFO) Header() *RR_Header      { return &rr.Hdr }
+func (rr *NS) Header() *RR_Header         { return &rr.Hdr }
+func (rr *NSAPPTR) Header() *RR_Header    { return &rr.Hdr }
+func (rr *NSEC) Header() *RR_Header       { return &rr.Hdr }
+func (rr *NSEC3) Header() *RR_Header      { return &rr.Hdr }
+func (rr *NSEC3PARAM) Header() *RR_Header { return &rr.Hdr }
+func (rr *OPENPGPKEY) Header() *RR_Header { return &rr.Hdr }
+func (rr *OPT) Header() *RR_Header        { return &rr.Hdr }
+func (rr *PTR) Header() *RR_Header        { return &rr.Hdr }
+func (rr *PX) Header() *RR_Header         { return &rr.Hdr }
+func (rr *RFC3597) Header() *RR_Header    { return &rr.Hdr }
+func (rr *RKEY) Header() *RR_Header       { return &rr.Hdr }
+func (rr *RP) Header() *RR_Header         { return &rr.Hdr }
+func (rr *RRSIG) Header() *RR_Header      { return &rr.Hdr }
+func (rr *RT) Header() *RR_Header         { return &rr.Hdr }
+func (rr *SIG) Header() *RR_Header        { return &rr.Hdr }
+func (rr *SOA) Header() *RR_Header        { return &rr.Hdr }
+func (rr *SPF) Header() *RR_Header        { return &rr.Hdr }
+func (rr *SRV) Header() *RR_Header        { return &rr.Hdr }
+func (rr *SSHFP) Header() *RR_Header      { return &rr.Hdr }
+func (rr *TA) Header() *RR_Header         { return &rr.Hdr }
+func (rr *TALINK) Header() *RR_Header     { return &rr.Hdr }
+func (rr *TKEY) Header() *RR_Header       { return &rr.Hdr }
+func (rr *TLSA) Header() *RR_Header       { return &rr.Hdr }
+func (rr *TSIG) Header() *RR_Header       { return &rr.Hdr }
+func (rr *TXT) Header() *RR_Header        { return &rr.Hdr }
+func (rr *UID) Header() *RR_Header        { return &rr.Hdr }
+func (rr *UINFO) Header() *RR_Header      { return &rr.Hdr }
+func (rr *URI) Header() *RR_Header        { return &rr.Hdr }
+func (rr *WKS) Header() *RR_Header        { return &rr.Hdr }
+func (rr *X25) Header() *RR_Header        { return &rr.Hdr }
 
 // len() functions
-func (rr *A) len() int ***REMOVED***
+func (rr *A) len() int {
 	l := rr.Hdr.len()
 	l += net.IPv4len // A
 	return l
-***REMOVED***
-func (rr *AAAA) len() int ***REMOVED***
+}
+func (rr *AAAA) len() int {
 	l := rr.Hdr.len()
 	l += net.IPv6len // AAAA
 	return l
-***REMOVED***
-func (rr *AFSDB) len() int ***REMOVED***
+}
+func (rr *AFSDB) len() int {
 	l := rr.Hdr.len()
 	l += 2 // Subtype
 	l += len(rr.Hostname) + 1
 	return l
-***REMOVED***
-func (rr *ANY) len() int ***REMOVED***
+}
+func (rr *ANY) len() int {
 	l := rr.Hdr.len()
 	return l
-***REMOVED***
-func (rr *CAA) len() int ***REMOVED***
+}
+func (rr *CAA) len() int {
 	l := rr.Hdr.len()
 	l += 1 // Flag
 	l += len(rr.Tag) + 1
 	l += len(rr.Value)
 	return l
-***REMOVED***
-func (rr *CERT) len() int ***REMOVED***
+}
+func (rr *CERT) len() int {
 	l := rr.Hdr.len()
 	l += 2 // Type
 	l += 2 // KeyTag
 	l += 1 // Algorithm
 	l += base64.StdEncoding.DecodedLen(len(rr.Certificate))
 	return l
-***REMOVED***
-func (rr *CNAME) len() int ***REMOVED***
+}
+func (rr *CNAME) len() int {
 	l := rr.Hdr.len()
 	l += len(rr.Target) + 1
 	return l
-***REMOVED***
-func (rr *DHCID) len() int ***REMOVED***
+}
+func (rr *DHCID) len() int {
 	l := rr.Hdr.len()
 	l += base64.StdEncoding.DecodedLen(len(rr.Digest))
 	return l
-***REMOVED***
-func (rr *DNAME) len() int ***REMOVED***
+}
+func (rr *DNAME) len() int {
 	l := rr.Hdr.len()
 	l += len(rr.Target) + 1
 	return l
-***REMOVED***
-func (rr *DNSKEY) len() int ***REMOVED***
+}
+func (rr *DNSKEY) len() int {
 	l := rr.Hdr.len()
 	l += 2 // Flags
 	l += 1 // Protocol
 	l += 1 // Algorithm
 	l += base64.StdEncoding.DecodedLen(len(rr.PublicKey))
 	return l
-***REMOVED***
-func (rr *DS) len() int ***REMOVED***
+}
+func (rr *DS) len() int {
 	l := rr.Hdr.len()
 	l += 2 // KeyTag
 	l += 1 // Algorithm
 	l += 1 // DigestType
 	l += len(rr.Digest)/2 + 1
 	return l
-***REMOVED***
-func (rr *EID) len() int ***REMOVED***
+}
+func (rr *EID) len() int {
 	l := rr.Hdr.len()
 	l += len(rr.Endpoint)/2 + 1
 	return l
-***REMOVED***
-func (rr *EUI48) len() int ***REMOVED***
+}
+func (rr *EUI48) len() int {
 	l := rr.Hdr.len()
 	l += 6 // Address
 	return l
-***REMOVED***
-func (rr *EUI64) len() int ***REMOVED***
+}
+func (rr *EUI64) len() int {
 	l := rr.Hdr.len()
 	l += 8 // Address
 	return l
-***REMOVED***
-func (rr *GID) len() int ***REMOVED***
+}
+func (rr *GID) len() int {
 	l := rr.Hdr.len()
 	l += 4 // Gid
 	return l
-***REMOVED***
-func (rr *GPOS) len() int ***REMOVED***
+}
+func (rr *GPOS) len() int {
 	l := rr.Hdr.len()
 	l += len(rr.Longitude) + 1
 	l += len(rr.Latitude) + 1
 	l += len(rr.Altitude) + 1
 	return l
-***REMOVED***
-func (rr *HINFO) len() int ***REMOVED***
+}
+func (rr *HINFO) len() int {
 	l := rr.Hdr.len()
 	l += len(rr.Cpu) + 1
 	l += len(rr.Os) + 1
 	return l
-***REMOVED***
-func (rr *HIP) len() int ***REMOVED***
+}
+func (rr *HIP) len() int {
 	l := rr.Hdr.len()
 	l += 1 // HitLength
 	l += 1 // PublicKeyAlgorithm
 	l += 2 // PublicKeyLength
 	l += len(rr.Hit)/2 + 1
 	l += base64.StdEncoding.DecodedLen(len(rr.PublicKey))
-	for _, x := range rr.RendezvousServers ***REMOVED***
+	for _, x := range rr.RendezvousServers {
 		l += len(x) + 1
-	***REMOVED***
+	}
 	return l
-***REMOVED***
-func (rr *KX) len() int ***REMOVED***
+}
+func (rr *KX) len() int {
 	l := rr.Hdr.len()
 	l += 2 // Preference
 	l += len(rr.Exchanger) + 1
 	return l
-***REMOVED***
-func (rr *L32) len() int ***REMOVED***
+}
+func (rr *L32) len() int {
 	l := rr.Hdr.len()
 	l += 2           // Preference
 	l += net.IPv4len // Locator32
 	return l
-***REMOVED***
-func (rr *L64) len() int ***REMOVED***
+}
+func (rr *L64) len() int {
 	l := rr.Hdr.len()
 	l += 2 // Preference
 	l += 8 // Locator64
 	return l
-***REMOVED***
-func (rr *LOC) len() int ***REMOVED***
+}
+func (rr *LOC) len() int {
 	l := rr.Hdr.len()
 	l += 1 // Version
 	l += 1 // Size
@@ -374,51 +374,51 @@ func (rr *LOC) len() int ***REMOVED***
 	l += 4 // Longitude
 	l += 4 // Altitude
 	return l
-***REMOVED***
-func (rr *LP) len() int ***REMOVED***
+}
+func (rr *LP) len() int {
 	l := rr.Hdr.len()
 	l += 2 // Preference
 	l += len(rr.Fqdn) + 1
 	return l
-***REMOVED***
-func (rr *MB) len() int ***REMOVED***
+}
+func (rr *MB) len() int {
 	l := rr.Hdr.len()
 	l += len(rr.Mb) + 1
 	return l
-***REMOVED***
-func (rr *MD) len() int ***REMOVED***
+}
+func (rr *MD) len() int {
 	l := rr.Hdr.len()
 	l += len(rr.Md) + 1
 	return l
-***REMOVED***
-func (rr *MF) len() int ***REMOVED***
+}
+func (rr *MF) len() int {
 	l := rr.Hdr.len()
 	l += len(rr.Mf) + 1
 	return l
-***REMOVED***
-func (rr *MG) len() int ***REMOVED***
+}
+func (rr *MG) len() int {
 	l := rr.Hdr.len()
 	l += len(rr.Mg) + 1
 	return l
-***REMOVED***
-func (rr *MINFO) len() int ***REMOVED***
+}
+func (rr *MINFO) len() int {
 	l := rr.Hdr.len()
 	l += len(rr.Rmail) + 1
 	l += len(rr.Email) + 1
 	return l
-***REMOVED***
-func (rr *MR) len() int ***REMOVED***
+}
+func (rr *MR) len() int {
 	l := rr.Hdr.len()
 	l += len(rr.Mr) + 1
 	return l
-***REMOVED***
-func (rr *MX) len() int ***REMOVED***
+}
+func (rr *MX) len() int {
 	l := rr.Hdr.len()
 	l += 2 // Preference
 	l += len(rr.Mx) + 1
 	return l
-***REMOVED***
-func (rr *NAPTR) len() int ***REMOVED***
+}
+func (rr *NAPTR) len() int {
 	l := rr.Hdr.len()
 	l += 2 // Order
 	l += 2 // Preference
@@ -427,36 +427,36 @@ func (rr *NAPTR) len() int ***REMOVED***
 	l += len(rr.Regexp) + 1
 	l += len(rr.Replacement) + 1
 	return l
-***REMOVED***
-func (rr *NID) len() int ***REMOVED***
+}
+func (rr *NID) len() int {
 	l := rr.Hdr.len()
 	l += 2 // Preference
 	l += 8 // NodeID
 	return l
-***REMOVED***
-func (rr *NIMLOC) len() int ***REMOVED***
+}
+func (rr *NIMLOC) len() int {
 	l := rr.Hdr.len()
 	l += len(rr.Locator)/2 + 1
 	return l
-***REMOVED***
-func (rr *NINFO) len() int ***REMOVED***
+}
+func (rr *NINFO) len() int {
 	l := rr.Hdr.len()
-	for _, x := range rr.ZSData ***REMOVED***
+	for _, x := range rr.ZSData {
 		l += len(x) + 1
-	***REMOVED***
+	}
 	return l
-***REMOVED***
-func (rr *NS) len() int ***REMOVED***
+}
+func (rr *NS) len() int {
 	l := rr.Hdr.len()
 	l += len(rr.Ns) + 1
 	return l
-***REMOVED***
-func (rr *NSAPPTR) len() int ***REMOVED***
+}
+func (rr *NSAPPTR) len() int {
 	l := rr.Hdr.len()
 	l += len(rr.Ptr) + 1
 	return l
-***REMOVED***
-func (rr *NSEC3PARAM) len() int ***REMOVED***
+}
+func (rr *NSEC3PARAM) len() int {
 	l := rr.Hdr.len()
 	l += 1 // Hash
 	l += 1 // Flags
@@ -464,44 +464,44 @@ func (rr *NSEC3PARAM) len() int ***REMOVED***
 	l += 1 // SaltLength
 	l += len(rr.Salt)/2 + 1
 	return l
-***REMOVED***
-func (rr *OPENPGPKEY) len() int ***REMOVED***
+}
+func (rr *OPENPGPKEY) len() int {
 	l := rr.Hdr.len()
 	l += base64.StdEncoding.DecodedLen(len(rr.PublicKey))
 	return l
-***REMOVED***
-func (rr *PTR) len() int ***REMOVED***
+}
+func (rr *PTR) len() int {
 	l := rr.Hdr.len()
 	l += len(rr.Ptr) + 1
 	return l
-***REMOVED***
-func (rr *PX) len() int ***REMOVED***
+}
+func (rr *PX) len() int {
 	l := rr.Hdr.len()
 	l += 2 // Preference
 	l += len(rr.Map822) + 1
 	l += len(rr.Mapx400) + 1
 	return l
-***REMOVED***
-func (rr *RFC3597) len() int ***REMOVED***
+}
+func (rr *RFC3597) len() int {
 	l := rr.Hdr.len()
 	l += len(rr.Rdata)/2 + 1
 	return l
-***REMOVED***
-func (rr *RKEY) len() int ***REMOVED***
+}
+func (rr *RKEY) len() int {
 	l := rr.Hdr.len()
 	l += 2 // Flags
 	l += 1 // Protocol
 	l += 1 // Algorithm
 	l += base64.StdEncoding.DecodedLen(len(rr.PublicKey))
 	return l
-***REMOVED***
-func (rr *RP) len() int ***REMOVED***
+}
+func (rr *RP) len() int {
 	l := rr.Hdr.len()
 	l += len(rr.Mbox) + 1
 	l += len(rr.Txt) + 1
 	return l
-***REMOVED***
-func (rr *RRSIG) len() int ***REMOVED***
+}
+func (rr *RRSIG) len() int {
 	l := rr.Hdr.len()
 	l += 2 // TypeCovered
 	l += 1 // Algorithm
@@ -513,14 +513,14 @@ func (rr *RRSIG) len() int ***REMOVED***
 	l += len(rr.SignerName) + 1
 	l += base64.StdEncoding.DecodedLen(len(rr.Signature))
 	return l
-***REMOVED***
-func (rr *RT) len() int ***REMOVED***
+}
+func (rr *RT) len() int {
 	l := rr.Hdr.len()
 	l += 2 // Preference
 	l += len(rr.Host) + 1
 	return l
-***REMOVED***
-func (rr *SOA) len() int ***REMOVED***
+}
+func (rr *SOA) len() int {
 	l := rr.Hdr.len()
 	l += len(rr.Ns) + 1
 	l += len(rr.Mbox) + 1
@@ -530,44 +530,44 @@ func (rr *SOA) len() int ***REMOVED***
 	l += 4 // Expire
 	l += 4 // Minttl
 	return l
-***REMOVED***
-func (rr *SPF) len() int ***REMOVED***
+}
+func (rr *SPF) len() int {
 	l := rr.Hdr.len()
-	for _, x := range rr.Txt ***REMOVED***
+	for _, x := range rr.Txt {
 		l += len(x) + 1
-	***REMOVED***
+	}
 	return l
-***REMOVED***
-func (rr *SRV) len() int ***REMOVED***
+}
+func (rr *SRV) len() int {
 	l := rr.Hdr.len()
 	l += 2 // Priority
 	l += 2 // Weight
 	l += 2 // Port
 	l += len(rr.Target) + 1
 	return l
-***REMOVED***
-func (rr *SSHFP) len() int ***REMOVED***
+}
+func (rr *SSHFP) len() int {
 	l := rr.Hdr.len()
 	l += 1 // Algorithm
 	l += 1 // Type
 	l += len(rr.FingerPrint)/2 + 1
 	return l
-***REMOVED***
-func (rr *TA) len() int ***REMOVED***
+}
+func (rr *TA) len() int {
 	l := rr.Hdr.len()
 	l += 2 // KeyTag
 	l += 1 // Algorithm
 	l += 1 // DigestType
 	l += len(rr.Digest)/2 + 1
 	return l
-***REMOVED***
-func (rr *TALINK) len() int ***REMOVED***
+}
+func (rr *TALINK) len() int {
 	l := rr.Hdr.len()
 	l += len(rr.PreviousName) + 1
 	l += len(rr.NextName) + 1
 	return l
-***REMOVED***
-func (rr *TKEY) len() int ***REMOVED***
+}
+func (rr *TKEY) len() int {
 	l := rr.Hdr.len()
 	l += len(rr.Algorithm) + 1
 	l += 4 // Inception
@@ -579,16 +579,16 @@ func (rr *TKEY) len() int ***REMOVED***
 	l += 2 // OtherLen
 	l += len(rr.OtherData) + 1
 	return l
-***REMOVED***
-func (rr *TLSA) len() int ***REMOVED***
+}
+func (rr *TLSA) len() int {
 	l := rr.Hdr.len()
 	l += 1 // Usage
 	l += 1 // Selector
 	l += 1 // MatchingType
 	l += len(rr.Certificate)/2 + 1
 	return l
-***REMOVED***
-func (rr *TSIG) len() int ***REMOVED***
+}
+func (rr *TSIG) len() int {
 	l := rr.Hdr.len()
 	l += len(rr.Algorithm) + 1
 	l += 6 // TimeSigned
@@ -600,243 +600,243 @@ func (rr *TSIG) len() int ***REMOVED***
 	l += 2 // OtherLen
 	l += len(rr.OtherData)/2 + 1
 	return l
-***REMOVED***
-func (rr *TXT) len() int ***REMOVED***
+}
+func (rr *TXT) len() int {
 	l := rr.Hdr.len()
-	for _, x := range rr.Txt ***REMOVED***
+	for _, x := range rr.Txt {
 		l += len(x) + 1
-	***REMOVED***
+	}
 	return l
-***REMOVED***
-func (rr *UID) len() int ***REMOVED***
+}
+func (rr *UID) len() int {
 	l := rr.Hdr.len()
 	l += 4 // Uid
 	return l
-***REMOVED***
-func (rr *UINFO) len() int ***REMOVED***
+}
+func (rr *UINFO) len() int {
 	l := rr.Hdr.len()
 	l += len(rr.Uinfo) + 1
 	return l
-***REMOVED***
-func (rr *URI) len() int ***REMOVED***
+}
+func (rr *URI) len() int {
 	l := rr.Hdr.len()
 	l += 2 // Priority
 	l += 2 // Weight
 	l += len(rr.Target)
 	return l
-***REMOVED***
-func (rr *X25) len() int ***REMOVED***
+}
+func (rr *X25) len() int {
 	l := rr.Hdr.len()
 	l += len(rr.PSDNAddress) + 1
 	return l
-***REMOVED***
+}
 
 // copy() functions
-func (rr *A) copy() RR ***REMOVED***
-	return &A***REMOVED****rr.Hdr.copyHeader(), copyIP(rr.A)***REMOVED***
-***REMOVED***
-func (rr *AAAA) copy() RR ***REMOVED***
-	return &AAAA***REMOVED****rr.Hdr.copyHeader(), copyIP(rr.AAAA)***REMOVED***
-***REMOVED***
-func (rr *AFSDB) copy() RR ***REMOVED***
-	return &AFSDB***REMOVED****rr.Hdr.copyHeader(), rr.Subtype, rr.Hostname***REMOVED***
-***REMOVED***
-func (rr *ANY) copy() RR ***REMOVED***
-	return &ANY***REMOVED****rr.Hdr.copyHeader()***REMOVED***
-***REMOVED***
-func (rr *CAA) copy() RR ***REMOVED***
-	return &CAA***REMOVED****rr.Hdr.copyHeader(), rr.Flag, rr.Tag, rr.Value***REMOVED***
-***REMOVED***
-func (rr *CERT) copy() RR ***REMOVED***
-	return &CERT***REMOVED****rr.Hdr.copyHeader(), rr.Type, rr.KeyTag, rr.Algorithm, rr.Certificate***REMOVED***
-***REMOVED***
-func (rr *CNAME) copy() RR ***REMOVED***
-	return &CNAME***REMOVED****rr.Hdr.copyHeader(), rr.Target***REMOVED***
-***REMOVED***
-func (rr *DHCID) copy() RR ***REMOVED***
-	return &DHCID***REMOVED****rr.Hdr.copyHeader(), rr.Digest***REMOVED***
-***REMOVED***
-func (rr *DNAME) copy() RR ***REMOVED***
-	return &DNAME***REMOVED****rr.Hdr.copyHeader(), rr.Target***REMOVED***
-***REMOVED***
-func (rr *DNSKEY) copy() RR ***REMOVED***
-	return &DNSKEY***REMOVED****rr.Hdr.copyHeader(), rr.Flags, rr.Protocol, rr.Algorithm, rr.PublicKey***REMOVED***
-***REMOVED***
-func (rr *DS) copy() RR ***REMOVED***
-	return &DS***REMOVED****rr.Hdr.copyHeader(), rr.KeyTag, rr.Algorithm, rr.DigestType, rr.Digest***REMOVED***
-***REMOVED***
-func (rr *EID) copy() RR ***REMOVED***
-	return &EID***REMOVED****rr.Hdr.copyHeader(), rr.Endpoint***REMOVED***
-***REMOVED***
-func (rr *EUI48) copy() RR ***REMOVED***
-	return &EUI48***REMOVED****rr.Hdr.copyHeader(), rr.Address***REMOVED***
-***REMOVED***
-func (rr *EUI64) copy() RR ***REMOVED***
-	return &EUI64***REMOVED****rr.Hdr.copyHeader(), rr.Address***REMOVED***
-***REMOVED***
-func (rr *GID) copy() RR ***REMOVED***
-	return &GID***REMOVED****rr.Hdr.copyHeader(), rr.Gid***REMOVED***
-***REMOVED***
-func (rr *GPOS) copy() RR ***REMOVED***
-	return &GPOS***REMOVED****rr.Hdr.copyHeader(), rr.Longitude, rr.Latitude, rr.Altitude***REMOVED***
-***REMOVED***
-func (rr *HINFO) copy() RR ***REMOVED***
-	return &HINFO***REMOVED****rr.Hdr.copyHeader(), rr.Cpu, rr.Os***REMOVED***
-***REMOVED***
-func (rr *HIP) copy() RR ***REMOVED***
+func (rr *A) copy() RR {
+	return &A{*rr.Hdr.copyHeader(), copyIP(rr.A)}
+}
+func (rr *AAAA) copy() RR {
+	return &AAAA{*rr.Hdr.copyHeader(), copyIP(rr.AAAA)}
+}
+func (rr *AFSDB) copy() RR {
+	return &AFSDB{*rr.Hdr.copyHeader(), rr.Subtype, rr.Hostname}
+}
+func (rr *ANY) copy() RR {
+	return &ANY{*rr.Hdr.copyHeader()}
+}
+func (rr *CAA) copy() RR {
+	return &CAA{*rr.Hdr.copyHeader(), rr.Flag, rr.Tag, rr.Value}
+}
+func (rr *CERT) copy() RR {
+	return &CERT{*rr.Hdr.copyHeader(), rr.Type, rr.KeyTag, rr.Algorithm, rr.Certificate}
+}
+func (rr *CNAME) copy() RR {
+	return &CNAME{*rr.Hdr.copyHeader(), rr.Target}
+}
+func (rr *DHCID) copy() RR {
+	return &DHCID{*rr.Hdr.copyHeader(), rr.Digest}
+}
+func (rr *DNAME) copy() RR {
+	return &DNAME{*rr.Hdr.copyHeader(), rr.Target}
+}
+func (rr *DNSKEY) copy() RR {
+	return &DNSKEY{*rr.Hdr.copyHeader(), rr.Flags, rr.Protocol, rr.Algorithm, rr.PublicKey}
+}
+func (rr *DS) copy() RR {
+	return &DS{*rr.Hdr.copyHeader(), rr.KeyTag, rr.Algorithm, rr.DigestType, rr.Digest}
+}
+func (rr *EID) copy() RR {
+	return &EID{*rr.Hdr.copyHeader(), rr.Endpoint}
+}
+func (rr *EUI48) copy() RR {
+	return &EUI48{*rr.Hdr.copyHeader(), rr.Address}
+}
+func (rr *EUI64) copy() RR {
+	return &EUI64{*rr.Hdr.copyHeader(), rr.Address}
+}
+func (rr *GID) copy() RR {
+	return &GID{*rr.Hdr.copyHeader(), rr.Gid}
+}
+func (rr *GPOS) copy() RR {
+	return &GPOS{*rr.Hdr.copyHeader(), rr.Longitude, rr.Latitude, rr.Altitude}
+}
+func (rr *HINFO) copy() RR {
+	return &HINFO{*rr.Hdr.copyHeader(), rr.Cpu, rr.Os}
+}
+func (rr *HIP) copy() RR {
 	RendezvousServers := make([]string, len(rr.RendezvousServers))
 	copy(RendezvousServers, rr.RendezvousServers)
-	return &HIP***REMOVED****rr.Hdr.copyHeader(), rr.HitLength, rr.PublicKeyAlgorithm, rr.PublicKeyLength, rr.Hit, rr.PublicKey, RendezvousServers***REMOVED***
-***REMOVED***
-func (rr *IPSECKEY) copy() RR ***REMOVED***
-	return &IPSECKEY***REMOVED****rr.Hdr.copyHeader(), rr.Precedence, rr.GatewayType, rr.Algorithm, copyIP(rr.GatewayA), copyIP(rr.GatewayAAAA), rr.GatewayName, rr.PublicKey***REMOVED***
-***REMOVED***
-func (rr *KX) copy() RR ***REMOVED***
-	return &KX***REMOVED****rr.Hdr.copyHeader(), rr.Preference, rr.Exchanger***REMOVED***
-***REMOVED***
-func (rr *L32) copy() RR ***REMOVED***
-	return &L32***REMOVED****rr.Hdr.copyHeader(), rr.Preference, copyIP(rr.Locator32)***REMOVED***
-***REMOVED***
-func (rr *L64) copy() RR ***REMOVED***
-	return &L64***REMOVED****rr.Hdr.copyHeader(), rr.Preference, rr.Locator64***REMOVED***
-***REMOVED***
-func (rr *LOC) copy() RR ***REMOVED***
-	return &LOC***REMOVED****rr.Hdr.copyHeader(), rr.Version, rr.Size, rr.HorizPre, rr.VertPre, rr.Latitude, rr.Longitude, rr.Altitude***REMOVED***
-***REMOVED***
-func (rr *LP) copy() RR ***REMOVED***
-	return &LP***REMOVED****rr.Hdr.copyHeader(), rr.Preference, rr.Fqdn***REMOVED***
-***REMOVED***
-func (rr *MB) copy() RR ***REMOVED***
-	return &MB***REMOVED****rr.Hdr.copyHeader(), rr.Mb***REMOVED***
-***REMOVED***
-func (rr *MD) copy() RR ***REMOVED***
-	return &MD***REMOVED****rr.Hdr.copyHeader(), rr.Md***REMOVED***
-***REMOVED***
-func (rr *MF) copy() RR ***REMOVED***
-	return &MF***REMOVED****rr.Hdr.copyHeader(), rr.Mf***REMOVED***
-***REMOVED***
-func (rr *MG) copy() RR ***REMOVED***
-	return &MG***REMOVED****rr.Hdr.copyHeader(), rr.Mg***REMOVED***
-***REMOVED***
-func (rr *MINFO) copy() RR ***REMOVED***
-	return &MINFO***REMOVED****rr.Hdr.copyHeader(), rr.Rmail, rr.Email***REMOVED***
-***REMOVED***
-func (rr *MR) copy() RR ***REMOVED***
-	return &MR***REMOVED****rr.Hdr.copyHeader(), rr.Mr***REMOVED***
-***REMOVED***
-func (rr *MX) copy() RR ***REMOVED***
-	return &MX***REMOVED****rr.Hdr.copyHeader(), rr.Preference, rr.Mx***REMOVED***
-***REMOVED***
-func (rr *NAPTR) copy() RR ***REMOVED***
-	return &NAPTR***REMOVED****rr.Hdr.copyHeader(), rr.Order, rr.Preference, rr.Flags, rr.Service, rr.Regexp, rr.Replacement***REMOVED***
-***REMOVED***
-func (rr *NID) copy() RR ***REMOVED***
-	return &NID***REMOVED****rr.Hdr.copyHeader(), rr.Preference, rr.NodeID***REMOVED***
-***REMOVED***
-func (rr *NIMLOC) copy() RR ***REMOVED***
-	return &NIMLOC***REMOVED****rr.Hdr.copyHeader(), rr.Locator***REMOVED***
-***REMOVED***
-func (rr *NINFO) copy() RR ***REMOVED***
+	return &HIP{*rr.Hdr.copyHeader(), rr.HitLength, rr.PublicKeyAlgorithm, rr.PublicKeyLength, rr.Hit, rr.PublicKey, RendezvousServers}
+}
+func (rr *IPSECKEY) copy() RR {
+	return &IPSECKEY{*rr.Hdr.copyHeader(), rr.Precedence, rr.GatewayType, rr.Algorithm, copyIP(rr.GatewayA), copyIP(rr.GatewayAAAA), rr.GatewayName, rr.PublicKey}
+}
+func (rr *KX) copy() RR {
+	return &KX{*rr.Hdr.copyHeader(), rr.Preference, rr.Exchanger}
+}
+func (rr *L32) copy() RR {
+	return &L32{*rr.Hdr.copyHeader(), rr.Preference, copyIP(rr.Locator32)}
+}
+func (rr *L64) copy() RR {
+	return &L64{*rr.Hdr.copyHeader(), rr.Preference, rr.Locator64}
+}
+func (rr *LOC) copy() RR {
+	return &LOC{*rr.Hdr.copyHeader(), rr.Version, rr.Size, rr.HorizPre, rr.VertPre, rr.Latitude, rr.Longitude, rr.Altitude}
+}
+func (rr *LP) copy() RR {
+	return &LP{*rr.Hdr.copyHeader(), rr.Preference, rr.Fqdn}
+}
+func (rr *MB) copy() RR {
+	return &MB{*rr.Hdr.copyHeader(), rr.Mb}
+}
+func (rr *MD) copy() RR {
+	return &MD{*rr.Hdr.copyHeader(), rr.Md}
+}
+func (rr *MF) copy() RR {
+	return &MF{*rr.Hdr.copyHeader(), rr.Mf}
+}
+func (rr *MG) copy() RR {
+	return &MG{*rr.Hdr.copyHeader(), rr.Mg}
+}
+func (rr *MINFO) copy() RR {
+	return &MINFO{*rr.Hdr.copyHeader(), rr.Rmail, rr.Email}
+}
+func (rr *MR) copy() RR {
+	return &MR{*rr.Hdr.copyHeader(), rr.Mr}
+}
+func (rr *MX) copy() RR {
+	return &MX{*rr.Hdr.copyHeader(), rr.Preference, rr.Mx}
+}
+func (rr *NAPTR) copy() RR {
+	return &NAPTR{*rr.Hdr.copyHeader(), rr.Order, rr.Preference, rr.Flags, rr.Service, rr.Regexp, rr.Replacement}
+}
+func (rr *NID) copy() RR {
+	return &NID{*rr.Hdr.copyHeader(), rr.Preference, rr.NodeID}
+}
+func (rr *NIMLOC) copy() RR {
+	return &NIMLOC{*rr.Hdr.copyHeader(), rr.Locator}
+}
+func (rr *NINFO) copy() RR {
 	ZSData := make([]string, len(rr.ZSData))
 	copy(ZSData, rr.ZSData)
-	return &NINFO***REMOVED****rr.Hdr.copyHeader(), ZSData***REMOVED***
-***REMOVED***
-func (rr *NS) copy() RR ***REMOVED***
-	return &NS***REMOVED****rr.Hdr.copyHeader(), rr.Ns***REMOVED***
-***REMOVED***
-func (rr *NSAPPTR) copy() RR ***REMOVED***
-	return &NSAPPTR***REMOVED****rr.Hdr.copyHeader(), rr.Ptr***REMOVED***
-***REMOVED***
-func (rr *NSEC) copy() RR ***REMOVED***
+	return &NINFO{*rr.Hdr.copyHeader(), ZSData}
+}
+func (rr *NS) copy() RR {
+	return &NS{*rr.Hdr.copyHeader(), rr.Ns}
+}
+func (rr *NSAPPTR) copy() RR {
+	return &NSAPPTR{*rr.Hdr.copyHeader(), rr.Ptr}
+}
+func (rr *NSEC) copy() RR {
 	TypeBitMap := make([]uint16, len(rr.TypeBitMap))
 	copy(TypeBitMap, rr.TypeBitMap)
-	return &NSEC***REMOVED****rr.Hdr.copyHeader(), rr.NextDomain, TypeBitMap***REMOVED***
-***REMOVED***
-func (rr *NSEC3) copy() RR ***REMOVED***
+	return &NSEC{*rr.Hdr.copyHeader(), rr.NextDomain, TypeBitMap}
+}
+func (rr *NSEC3) copy() RR {
 	TypeBitMap := make([]uint16, len(rr.TypeBitMap))
 	copy(TypeBitMap, rr.TypeBitMap)
-	return &NSEC3***REMOVED****rr.Hdr.copyHeader(), rr.Hash, rr.Flags, rr.Iterations, rr.SaltLength, rr.Salt, rr.HashLength, rr.NextDomain, TypeBitMap***REMOVED***
-***REMOVED***
-func (rr *NSEC3PARAM) copy() RR ***REMOVED***
-	return &NSEC3PARAM***REMOVED****rr.Hdr.copyHeader(), rr.Hash, rr.Flags, rr.Iterations, rr.SaltLength, rr.Salt***REMOVED***
-***REMOVED***
-func (rr *OPENPGPKEY) copy() RR ***REMOVED***
-	return &OPENPGPKEY***REMOVED****rr.Hdr.copyHeader(), rr.PublicKey***REMOVED***
-***REMOVED***
-func (rr *OPT) copy() RR ***REMOVED***
+	return &NSEC3{*rr.Hdr.copyHeader(), rr.Hash, rr.Flags, rr.Iterations, rr.SaltLength, rr.Salt, rr.HashLength, rr.NextDomain, TypeBitMap}
+}
+func (rr *NSEC3PARAM) copy() RR {
+	return &NSEC3PARAM{*rr.Hdr.copyHeader(), rr.Hash, rr.Flags, rr.Iterations, rr.SaltLength, rr.Salt}
+}
+func (rr *OPENPGPKEY) copy() RR {
+	return &OPENPGPKEY{*rr.Hdr.copyHeader(), rr.PublicKey}
+}
+func (rr *OPT) copy() RR {
 	Option := make([]EDNS0, len(rr.Option))
 	copy(Option, rr.Option)
-	return &OPT***REMOVED****rr.Hdr.copyHeader(), Option***REMOVED***
-***REMOVED***
-func (rr *PTR) copy() RR ***REMOVED***
-	return &PTR***REMOVED****rr.Hdr.copyHeader(), rr.Ptr***REMOVED***
-***REMOVED***
-func (rr *PX) copy() RR ***REMOVED***
-	return &PX***REMOVED****rr.Hdr.copyHeader(), rr.Preference, rr.Map822, rr.Mapx400***REMOVED***
-***REMOVED***
-func (rr *RFC3597) copy() RR ***REMOVED***
-	return &RFC3597***REMOVED****rr.Hdr.copyHeader(), rr.Rdata***REMOVED***
-***REMOVED***
-func (rr *RKEY) copy() RR ***REMOVED***
-	return &RKEY***REMOVED****rr.Hdr.copyHeader(), rr.Flags, rr.Protocol, rr.Algorithm, rr.PublicKey***REMOVED***
-***REMOVED***
-func (rr *RP) copy() RR ***REMOVED***
-	return &RP***REMOVED****rr.Hdr.copyHeader(), rr.Mbox, rr.Txt***REMOVED***
-***REMOVED***
-func (rr *RRSIG) copy() RR ***REMOVED***
-	return &RRSIG***REMOVED****rr.Hdr.copyHeader(), rr.TypeCovered, rr.Algorithm, rr.Labels, rr.OrigTtl, rr.Expiration, rr.Inception, rr.KeyTag, rr.SignerName, rr.Signature***REMOVED***
-***REMOVED***
-func (rr *RT) copy() RR ***REMOVED***
-	return &RT***REMOVED****rr.Hdr.copyHeader(), rr.Preference, rr.Host***REMOVED***
-***REMOVED***
-func (rr *SOA) copy() RR ***REMOVED***
-	return &SOA***REMOVED****rr.Hdr.copyHeader(), rr.Ns, rr.Mbox, rr.Serial, rr.Refresh, rr.Retry, rr.Expire, rr.Minttl***REMOVED***
-***REMOVED***
-func (rr *SPF) copy() RR ***REMOVED***
+	return &OPT{*rr.Hdr.copyHeader(), Option}
+}
+func (rr *PTR) copy() RR {
+	return &PTR{*rr.Hdr.copyHeader(), rr.Ptr}
+}
+func (rr *PX) copy() RR {
+	return &PX{*rr.Hdr.copyHeader(), rr.Preference, rr.Map822, rr.Mapx400}
+}
+func (rr *RFC3597) copy() RR {
+	return &RFC3597{*rr.Hdr.copyHeader(), rr.Rdata}
+}
+func (rr *RKEY) copy() RR {
+	return &RKEY{*rr.Hdr.copyHeader(), rr.Flags, rr.Protocol, rr.Algorithm, rr.PublicKey}
+}
+func (rr *RP) copy() RR {
+	return &RP{*rr.Hdr.copyHeader(), rr.Mbox, rr.Txt}
+}
+func (rr *RRSIG) copy() RR {
+	return &RRSIG{*rr.Hdr.copyHeader(), rr.TypeCovered, rr.Algorithm, rr.Labels, rr.OrigTtl, rr.Expiration, rr.Inception, rr.KeyTag, rr.SignerName, rr.Signature}
+}
+func (rr *RT) copy() RR {
+	return &RT{*rr.Hdr.copyHeader(), rr.Preference, rr.Host}
+}
+func (rr *SOA) copy() RR {
+	return &SOA{*rr.Hdr.copyHeader(), rr.Ns, rr.Mbox, rr.Serial, rr.Refresh, rr.Retry, rr.Expire, rr.Minttl}
+}
+func (rr *SPF) copy() RR {
 	Txt := make([]string, len(rr.Txt))
 	copy(Txt, rr.Txt)
-	return &SPF***REMOVED****rr.Hdr.copyHeader(), Txt***REMOVED***
-***REMOVED***
-func (rr *SRV) copy() RR ***REMOVED***
-	return &SRV***REMOVED****rr.Hdr.copyHeader(), rr.Priority, rr.Weight, rr.Port, rr.Target***REMOVED***
-***REMOVED***
-func (rr *SSHFP) copy() RR ***REMOVED***
-	return &SSHFP***REMOVED****rr.Hdr.copyHeader(), rr.Algorithm, rr.Type, rr.FingerPrint***REMOVED***
-***REMOVED***
-func (rr *TA) copy() RR ***REMOVED***
-	return &TA***REMOVED****rr.Hdr.copyHeader(), rr.KeyTag, rr.Algorithm, rr.DigestType, rr.Digest***REMOVED***
-***REMOVED***
-func (rr *TALINK) copy() RR ***REMOVED***
-	return &TALINK***REMOVED****rr.Hdr.copyHeader(), rr.PreviousName, rr.NextName***REMOVED***
-***REMOVED***
-func (rr *TKEY) copy() RR ***REMOVED***
-	return &TKEY***REMOVED****rr.Hdr.copyHeader(), rr.Algorithm, rr.Inception, rr.Expiration, rr.Mode, rr.Error, rr.KeySize, rr.Key, rr.OtherLen, rr.OtherData***REMOVED***
-***REMOVED***
-func (rr *TLSA) copy() RR ***REMOVED***
-	return &TLSA***REMOVED****rr.Hdr.copyHeader(), rr.Usage, rr.Selector, rr.MatchingType, rr.Certificate***REMOVED***
-***REMOVED***
-func (rr *TSIG) copy() RR ***REMOVED***
-	return &TSIG***REMOVED****rr.Hdr.copyHeader(), rr.Algorithm, rr.TimeSigned, rr.Fudge, rr.MACSize, rr.MAC, rr.OrigId, rr.Error, rr.OtherLen, rr.OtherData***REMOVED***
-***REMOVED***
-func (rr *TXT) copy() RR ***REMOVED***
+	return &SPF{*rr.Hdr.copyHeader(), Txt}
+}
+func (rr *SRV) copy() RR {
+	return &SRV{*rr.Hdr.copyHeader(), rr.Priority, rr.Weight, rr.Port, rr.Target}
+}
+func (rr *SSHFP) copy() RR {
+	return &SSHFP{*rr.Hdr.copyHeader(), rr.Algorithm, rr.Type, rr.FingerPrint}
+}
+func (rr *TA) copy() RR {
+	return &TA{*rr.Hdr.copyHeader(), rr.KeyTag, rr.Algorithm, rr.DigestType, rr.Digest}
+}
+func (rr *TALINK) copy() RR {
+	return &TALINK{*rr.Hdr.copyHeader(), rr.PreviousName, rr.NextName}
+}
+func (rr *TKEY) copy() RR {
+	return &TKEY{*rr.Hdr.copyHeader(), rr.Algorithm, rr.Inception, rr.Expiration, rr.Mode, rr.Error, rr.KeySize, rr.Key, rr.OtherLen, rr.OtherData}
+}
+func (rr *TLSA) copy() RR {
+	return &TLSA{*rr.Hdr.copyHeader(), rr.Usage, rr.Selector, rr.MatchingType, rr.Certificate}
+}
+func (rr *TSIG) copy() RR {
+	return &TSIG{*rr.Hdr.copyHeader(), rr.Algorithm, rr.TimeSigned, rr.Fudge, rr.MACSize, rr.MAC, rr.OrigId, rr.Error, rr.OtherLen, rr.OtherData}
+}
+func (rr *TXT) copy() RR {
 	Txt := make([]string, len(rr.Txt))
 	copy(Txt, rr.Txt)
-	return &TXT***REMOVED****rr.Hdr.copyHeader(), Txt***REMOVED***
-***REMOVED***
-func (rr *UID) copy() RR ***REMOVED***
-	return &UID***REMOVED****rr.Hdr.copyHeader(), rr.Uid***REMOVED***
-***REMOVED***
-func (rr *UINFO) copy() RR ***REMOVED***
-	return &UINFO***REMOVED****rr.Hdr.copyHeader(), rr.Uinfo***REMOVED***
-***REMOVED***
-func (rr *URI) copy() RR ***REMOVED***
-	return &URI***REMOVED****rr.Hdr.copyHeader(), rr.Priority, rr.Weight, rr.Target***REMOVED***
-***REMOVED***
-func (rr *WKS) copy() RR ***REMOVED***
+	return &TXT{*rr.Hdr.copyHeader(), Txt}
+}
+func (rr *UID) copy() RR {
+	return &UID{*rr.Hdr.copyHeader(), rr.Uid}
+}
+func (rr *UINFO) copy() RR {
+	return &UINFO{*rr.Hdr.copyHeader(), rr.Uinfo}
+}
+func (rr *URI) copy() RR {
+	return &URI{*rr.Hdr.copyHeader(), rr.Priority, rr.Weight, rr.Target}
+}
+func (rr *WKS) copy() RR {
 	BitMap := make([]uint16, len(rr.BitMap))
 	copy(BitMap, rr.BitMap)
-	return &WKS***REMOVED****rr.Hdr.copyHeader(), copyIP(rr.Address), rr.Protocol, BitMap***REMOVED***
-***REMOVED***
-func (rr *X25) copy() RR ***REMOVED***
-	return &X25***REMOVED****rr.Hdr.copyHeader(), rr.PSDNAddress***REMOVED***
-***REMOVED***
+	return &WKS{*rr.Hdr.copyHeader(), copyIP(rr.Address), rr.Protocol, BitMap}
+}
+func (rr *X25) copy() RR {
+	return &X25{*rr.Hdr.copyHeader(), rr.PSDNAddress}
+}

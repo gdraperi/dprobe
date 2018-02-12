@@ -27,16 +27,16 @@ const (
 	masterPortEnd = 65535
 )
 
-type portAllocator struct ***REMOVED***
+type portAllocator struct {
 	// portspace definition per protocol
 	portSpaces map[api.PortConfig_Protocol]*portSpace
-***REMOVED***
+}
 
-type portSpace struct ***REMOVED***
+type portSpace struct {
 	protocol         api.PortConfig_Protocol
 	masterPortSpace  *idm.Idm
 	dynamicPortSpace *idm.Idm
-***REMOVED***
+}
 
 type allocatedPorts map[api.PortConfig]map[uint32]*api.PortConfig
 
@@ -44,13 +44,13 @@ type allocatedPorts map[api.PortConfig]map[uint32]*api.PortConfig
 // `allocatedPorts` is a map of portKey:publishedPort:portState.
 // In case the value of the portKey is missing, the map
 // publishedPort:portState is created automatically
-func (ps allocatedPorts) addState(p *api.PortConfig) ***REMOVED***
+func (ps allocatedPorts) addState(p *api.PortConfig) {
 	portKey := getPortConfigKey(p)
-	if _, ok := ps[portKey]; !ok ***REMOVED***
+	if _, ok := ps[portKey]; !ok {
 		ps[portKey] = make(map[uint32]*api.PortConfig)
-	***REMOVED***
+	}
 	ps[portKey][p.PublishedPort] = p
-***REMOVED***
+}
 
 // delState delete the state of an allocated port from the collection.
 // `allocatedPorts` is a map of portKey:publishedPort:portState.
@@ -68,18 +68,18 @@ func (ps allocatedPorts) addState(p *api.PortConfig) ***REMOVED***
 // Note because of the potential co-existence of user-defined and dynamically
 // allocated ports, delState has to be called for user-defined port first.
 // dynamically allocated ports should be removed later.
-func (ps allocatedPorts) delState(p *api.PortConfig) *api.PortConfig ***REMOVED***
+func (ps allocatedPorts) delState(p *api.PortConfig) *api.PortConfig {
 	portKey := getPortConfigKey(p)
 
 	portStateMap, ok := ps[portKey]
 
 	// If name, port, protocol values don't match then we
 	// are not allocated.
-	if !ok ***REMOVED***
+	if !ok {
 		return nil
-	***REMOVED***
+	}
 
-	if p.PublishedPort != 0 ***REMOVED***
+	if p.PublishedPort != 0 {
 		// If SwarmPort was user defined but the port state
 		// SwarmPort doesn't match we are not allocated.
 		v := portStateMap[p.PublishedPort]
@@ -88,90 +88,90 @@ func (ps allocatedPorts) delState(p *api.PortConfig) *api.PortConfig ***REMOVED*
 		delete(portStateMap, p.PublishedPort)
 
 		return v
-	***REMOVED***
+	}
 
 	// If PublishedPort == 0 and we don't have non-zero port
 	// then we are not allocated
-	for publishedPort, v := range portStateMap ***REMOVED***
-		if publishedPort != 0 ***REMOVED***
+	for publishedPort, v := range portStateMap {
+		if publishedPort != 0 {
 			// Delete state from allocatedPorts
 			delete(portStateMap, publishedPort)
 			return v
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
-func newPortAllocator() (*portAllocator, error) ***REMOVED***
+func newPortAllocator() (*portAllocator, error) {
 	portSpaces := make(map[api.PortConfig_Protocol]*portSpace)
-	for _, protocol := range []api.PortConfig_Protocol***REMOVED***api.ProtocolTCP, api.ProtocolUDP***REMOVED*** ***REMOVED***
+	for _, protocol := range []api.PortConfig_Protocol{api.ProtocolTCP, api.ProtocolUDP} {
 		ps, err := newPortSpace(protocol)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 
 		portSpaces[protocol] = ps
-	***REMOVED***
+	}
 
-	return &portAllocator***REMOVED***portSpaces: portSpaces***REMOVED***, nil
-***REMOVED***
+	return &portAllocator{portSpaces: portSpaces}, nil
+}
 
-func newPortSpace(protocol api.PortConfig_Protocol) (*portSpace, error) ***REMOVED***
+func newPortSpace(protocol api.PortConfig_Protocol) (*portSpace, error) {
 	masterName := fmt.Sprintf("%s-master-ports", protocol)
 	dynamicName := fmt.Sprintf("%s-dynamic-ports", protocol)
 
 	master, err := idm.New(nil, masterName, masterPortStart, masterPortEnd)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	dynamic, err := idm.New(nil, dynamicName, dynamicPortStart, dynamicPortEnd)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	return &portSpace***REMOVED***
+	return &portSpace{
 		protocol:         protocol,
 		masterPortSpace:  master,
 		dynamicPortSpace: dynamic,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // getPortConfigKey returns a map key for doing set operations with
 // ports. The key consists of name, protocol and target port which
 // uniquely identifies a port within a single Endpoint.
-func getPortConfigKey(p *api.PortConfig) api.PortConfig ***REMOVED***
-	return api.PortConfig***REMOVED***
+func getPortConfigKey(p *api.PortConfig) api.PortConfig {
+	return api.PortConfig{
 		Name:       p.Name,
 		Protocol:   p.Protocol,
 		TargetPort: p.TargetPort,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func reconcilePortConfigs(s *api.Service) []*api.PortConfig ***REMOVED***
+func reconcilePortConfigs(s *api.Service) []*api.PortConfig {
 	// If runtime state hasn't been created or if port config has
 	// changed from port state return the port config from Spec.
-	if s.Endpoint == nil || len(s.Spec.Endpoint.Ports) != len(s.Endpoint.Ports) ***REMOVED***
+	if s.Endpoint == nil || len(s.Spec.Endpoint.Ports) != len(s.Endpoint.Ports) {
 		return s.Spec.Endpoint.Ports
-	***REMOVED***
+	}
 
-	portStates := allocatedPorts***REMOVED******REMOVED***
-	for _, portState := range s.Endpoint.Ports ***REMOVED***
-		if portState.PublishMode == api.PublishModeIngress ***REMOVED***
+	portStates := allocatedPorts{}
+	for _, portState := range s.Endpoint.Ports {
+		if portState.PublishMode == api.PublishModeIngress {
 			portStates.addState(portState)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	var portConfigs []*api.PortConfig
 
 	// Process the portConfig with portConfig.PublishMode != api.PublishModeIngress
 	// and PublishedPort != 0 (high priority)
-	for _, portConfig := range s.Spec.Endpoint.Ports ***REMOVED***
-		if portConfig.PublishMode != api.PublishModeIngress ***REMOVED***
+	for _, portConfig := range s.Spec.Endpoint.Ports {
+		if portConfig.PublishMode != api.PublishModeIngress {
 			// If the PublishMode is not Ingress simply pick up the port config.
 			portConfigs = append(portConfigs, portConfig)
-		***REMOVED*** else if portConfig.PublishedPort != 0 ***REMOVED***
+		} else if portConfig.PublishedPort != 0 {
 			// Otherwise we only process PublishedPort != 0 in this round
 
 			// Remove record from portState
@@ -179,39 +179,39 @@ func reconcilePortConfigs(s *api.Service) []*api.PortConfig ***REMOVED***
 
 			// For PublishedPort != 0 prefer the portConfig
 			portConfigs = append(portConfigs, portConfig)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Iterate portConfigs with PublishedPort == 0 (low priority)
-	for _, portConfig := range s.Spec.Endpoint.Ports ***REMOVED***
+	for _, portConfig := range s.Spec.Endpoint.Ports {
 		// Ignore ports which are not PublishModeIngress (already processed)
 		// And we only process PublishedPort == 0 in this round
 		// So the following:
 		//  `portConfig.PublishMode == api.PublishModeIngress && portConfig.PublishedPort == 0`
-		if portConfig.PublishMode == api.PublishModeIngress && portConfig.PublishedPort == 0 ***REMOVED***
+		if portConfig.PublishMode == api.PublishModeIngress && portConfig.PublishedPort == 0 {
 			// If the portConfig is exactly the same as portState
 			// except if SwarmPort is not user-define then prefer
 			// portState to ensure sticky allocation of the same
 			// port that was allocated before.
 
 			// Remove record from portState
-			if portState := portStates.delState(portConfig); portState != nil ***REMOVED***
+			if portState := portStates.delState(portConfig); portState != nil {
 				portConfigs = append(portConfigs, portState)
 				continue
-			***REMOVED***
+			}
 
 			// For all other cases prefer the portConfig
 			portConfigs = append(portConfigs, portConfig)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return portConfigs
-***REMOVED***
+}
 
-func (pa *portAllocator) serviceAllocatePorts(s *api.Service) (err error) ***REMOVED***
-	if s.Spec.Endpoint == nil ***REMOVED***
+func (pa *portAllocator) serviceAllocatePorts(s *api.Service) (err error) {
+	if s.Spec.Endpoint == nil {
 		return nil
-	***REMOVED***
+	}
 
 	// We might have previous allocations which we want to stick
 	// to if possible. So instead of strictly going by port
@@ -222,111 +222,111 @@ func (pa *portAllocator) serviceAllocatePorts(s *api.Service) (err error) ***REM
 	// Port configuration might have changed. Cleanup all old allocations first.
 	pa.serviceDeallocatePorts(s)
 
-	defer func() ***REMOVED***
-		if err != nil ***REMOVED***
+	defer func() {
+		if err != nil {
 			// Free all the ports allocated so far which
 			// should be present in s.Endpoints.ExposedPorts
 			pa.serviceDeallocatePorts(s)
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
-	for _, portConfig := range portConfigs ***REMOVED***
+	for _, portConfig := range portConfigs {
 		// Make a copy of port config to create runtime state
 		portState := portConfig.Copy()
 
 		// Do an actual allocation only if the PublishMode is Ingress
-		if portConfig.PublishMode == api.PublishModeIngress ***REMOVED***
-			if err = pa.portSpaces[portState.Protocol].allocate(portState); err != nil ***REMOVED***
+		if portConfig.PublishMode == api.PublishModeIngress {
+			if err = pa.portSpaces[portState.Protocol].allocate(portState); err != nil {
 				return
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
-		if s.Endpoint == nil ***REMOVED***
-			s.Endpoint = &api.Endpoint***REMOVED******REMOVED***
-		***REMOVED***
+		if s.Endpoint == nil {
+			s.Endpoint = &api.Endpoint{}
+		}
 
 		s.Endpoint.Ports = append(s.Endpoint.Ports, portState)
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (pa *portAllocator) serviceDeallocatePorts(s *api.Service) ***REMOVED***
-	if s.Endpoint == nil ***REMOVED***
+func (pa *portAllocator) serviceDeallocatePorts(s *api.Service) {
+	if s.Endpoint == nil {
 		return
-	***REMOVED***
+	}
 
-	for _, portState := range s.Endpoint.Ports ***REMOVED***
+	for _, portState := range s.Endpoint.Ports {
 		// Do an actual free only if the PublishMode is
 		// Ingress
-		if portState.PublishMode != api.PublishModeIngress ***REMOVED***
+		if portState.PublishMode != api.PublishModeIngress {
 			continue
-		***REMOVED***
+		}
 
 		pa.portSpaces[portState.Protocol].free(portState)
-	***REMOVED***
+	}
 
 	s.Endpoint.Ports = nil
-***REMOVED***
+}
 
-func (pa *portAllocator) hostPublishPortsNeedUpdate(s *api.Service) bool ***REMOVED***
-	if s.Endpoint == nil && s.Spec.Endpoint == nil ***REMOVED***
+func (pa *portAllocator) hostPublishPortsNeedUpdate(s *api.Service) bool {
+	if s.Endpoint == nil && s.Spec.Endpoint == nil {
 		return false
-	***REMOVED***
+	}
 
-	portStates := allocatedPorts***REMOVED******REMOVED***
-	if s.Endpoint != nil ***REMOVED***
-		for _, portState := range s.Endpoint.Ports ***REMOVED***
-			if portState.PublishMode == api.PublishModeHost ***REMOVED***
+	portStates := allocatedPorts{}
+	if s.Endpoint != nil {
+		for _, portState := range s.Endpoint.Ports {
+			if portState.PublishMode == api.PublishModeHost {
 				portStates.addState(portState)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
-	if s.Spec.Endpoint != nil ***REMOVED***
-		for _, portConfig := range s.Spec.Endpoint.Ports ***REMOVED***
+	if s.Spec.Endpoint != nil {
+		for _, portConfig := range s.Spec.Endpoint.Ports {
 			if portConfig.PublishMode == api.PublishModeHost &&
-				portConfig.PublishedPort != 0 ***REMOVED***
-				if portStates.delState(portConfig) == nil ***REMOVED***
+				portConfig.PublishedPort != 0 {
+				if portStates.delState(portConfig) == nil {
 					return true
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+				}
+			}
+		}
+	}
 
 	return false
-***REMOVED***
+}
 
-func (pa *portAllocator) isPortsAllocated(s *api.Service) bool ***REMOVED***
+func (pa *portAllocator) isPortsAllocated(s *api.Service) bool {
 	return pa.isPortsAllocatedOnInit(s, false)
-***REMOVED***
+}
 
-func (pa *portAllocator) isPortsAllocatedOnInit(s *api.Service, onInit bool) bool ***REMOVED***
+func (pa *portAllocator) isPortsAllocatedOnInit(s *api.Service, onInit bool) bool {
 	// If service has no user-defined endpoint and allocated endpoint,
 	// we assume it is allocated and return true.
-	if s.Endpoint == nil && s.Spec.Endpoint == nil ***REMOVED***
+	if s.Endpoint == nil && s.Spec.Endpoint == nil {
 		return true
-	***REMOVED***
+	}
 
 	// If service has allocated endpoint while has no user-defined endpoint,
 	// we assume allocated endpoints are redundant, and they need deallocated.
 	// If service has no allocated endpoint while has user-defined endpoint,
 	// we assume it is not allocated.
 	if (s.Endpoint != nil && s.Spec.Endpoint == nil) ||
-		(s.Endpoint == nil && s.Spec.Endpoint != nil) ***REMOVED***
+		(s.Endpoint == nil && s.Spec.Endpoint != nil) {
 		return false
-	***REMOVED***
+	}
 
 	// If we don't have same number of port states as port configs
 	// we assume it is not allocated.
-	if len(s.Spec.Endpoint.Ports) != len(s.Endpoint.Ports) ***REMOVED***
+	if len(s.Spec.Endpoint.Ports) != len(s.Endpoint.Ports) {
 		return false
-	***REMOVED***
+	}
 
-	portStates := allocatedPorts***REMOVED******REMOVED***
-	hostTargetPorts := map[uint32]struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	for _, portState := range s.Endpoint.Ports ***REMOVED***
-		switch portState.PublishMode ***REMOVED***
+	portStates := allocatedPorts{}
+	hostTargetPorts := map[uint32]struct{}{}
+	for _, portState := range s.Endpoint.Ports {
+		switch portState.PublishMode {
 		case api.PublishModeIngress:
 			portStates.addState(portState)
 		case api.PublishModeHost:
@@ -335,95 +335,95 @@ func (pa *portAllocator) isPortsAllocatedOnInit(s *api.Service, onInit bool) boo
 			// allocation. if we get the same target port but something else
 			// has changed, then HostPublishPortsNeedUpdate will cover that
 			// case. see docker/swarmkit#2376
-			hostTargetPorts[portState.TargetPort] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-		***REMOVED***
-	***REMOVED***
+			hostTargetPorts[portState.TargetPort] = struct{}{}
+		}
+	}
 
 	// Iterate portConfigs with PublishedPort != 0 (high priority)
-	for _, portConfig := range s.Spec.Endpoint.Ports ***REMOVED***
+	for _, portConfig := range s.Spec.Endpoint.Ports {
 		// Ignore ports which are not PublishModeIngress
-		if portConfig.PublishMode != api.PublishModeIngress ***REMOVED***
+		if portConfig.PublishMode != api.PublishModeIngress {
 			continue
-		***REMOVED***
-		if portConfig.PublishedPort != 0 && portStates.delState(portConfig) == nil ***REMOVED***
+		}
+		if portConfig.PublishedPort != 0 && portStates.delState(portConfig) == nil {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Iterate portConfigs with PublishedPort == 0 (low priority)
-	for _, portConfig := range s.Spec.Endpoint.Ports ***REMOVED***
+	for _, portConfig := range s.Spec.Endpoint.Ports {
 		// Ignore ports which are not PublishModeIngress
-		switch portConfig.PublishMode ***REMOVED***
+		switch portConfig.PublishMode {
 		case api.PublishModeIngress:
-			if portConfig.PublishedPort == 0 && portStates.delState(portConfig) == nil ***REMOVED***
+			if portConfig.PublishedPort == 0 && portStates.delState(portConfig) == nil {
 				return false
-			***REMOVED***
+			}
 
 			// If SwarmPort was not defined by user and the func
 			// is called during allocator initialization state then
 			// we are not allocated.
-			if portConfig.PublishedPort == 0 && onInit ***REMOVED***
+			if portConfig.PublishedPort == 0 && onInit {
 				return false
-			***REMOVED***
+			}
 		case api.PublishModeHost:
 			// check if the target port is already in the port config. if it
 			// isn't, then it's our problem.
-			if _, ok := hostTargetPorts[portConfig.TargetPort]; !ok ***REMOVED***
+			if _, ok := hostTargetPorts[portConfig.TargetPort]; !ok {
 				return false
-			***REMOVED***
+			}
 			// NOTE(dperny) there could be a further case where we check if
 			// there are host ports in the config that aren't in the spec, but
 			// that's only possible if there's a mismatch in the number of
 			// ports, which is handled by a length check earlier in the code
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return true
-***REMOVED***
+}
 
-func (ps *portSpace) allocate(p *api.PortConfig) (err error) ***REMOVED***
-	if p.PublishedPort != 0 ***REMOVED***
+func (ps *portSpace) allocate(p *api.PortConfig) (err error) {
+	if p.PublishedPort != 0 {
 		// If it falls in the dynamic port range check out
 		// from dynamic port space first.
-		if p.PublishedPort >= dynamicPortStart && p.PublishedPort <= dynamicPortEnd ***REMOVED***
-			if err = ps.dynamicPortSpace.GetSpecificID(uint64(p.PublishedPort)); err != nil ***REMOVED***
+		if p.PublishedPort >= dynamicPortStart && p.PublishedPort <= dynamicPortEnd {
+			if err = ps.dynamicPortSpace.GetSpecificID(uint64(p.PublishedPort)); err != nil {
 				return err
-			***REMOVED***
+			}
 
-			defer func() ***REMOVED***
-				if err != nil ***REMOVED***
+			defer func() {
+				if err != nil {
 					ps.dynamicPortSpace.Release(uint64(p.PublishedPort))
-				***REMOVED***
-			***REMOVED***()
-		***REMOVED***
+				}
+			}()
+		}
 
 		return ps.masterPortSpace.GetSpecificID(uint64(p.PublishedPort))
-	***REMOVED***
+	}
 
 	// Check out an arbitrary port from dynamic port space.
 	swarmPort, err := ps.dynamicPortSpace.GetID(true)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
-	defer func() ***REMOVED***
-		if err != nil ***REMOVED***
+	}
+	defer func() {
+		if err != nil {
 			ps.dynamicPortSpace.Release(uint64(swarmPort))
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
 	// Make sure we allocate the same port from the master space.
-	if err = ps.masterPortSpace.GetSpecificID(uint64(swarmPort)); err != nil ***REMOVED***
+	if err = ps.masterPortSpace.GetSpecificID(uint64(swarmPort)); err != nil {
 		return
-	***REMOVED***
+	}
 
 	p.PublishedPort = uint32(swarmPort)
 	return nil
-***REMOVED***
+}
 
-func (ps *portSpace) free(p *api.PortConfig) ***REMOVED***
-	if p.PublishedPort >= dynamicPortStart && p.PublishedPort <= dynamicPortEnd ***REMOVED***
+func (ps *portSpace) free(p *api.PortConfig) {
+	if p.PublishedPort >= dynamicPortStart && p.PublishedPort <= dynamicPortEnd {
 		ps.dynamicPortSpace.Release(uint64(p.PublishedPort))
-	***REMOVED***
+	}
 
 	ps.masterPortSpace.Release(uint64(p.PublishedPort))
-***REMOVED***
+}

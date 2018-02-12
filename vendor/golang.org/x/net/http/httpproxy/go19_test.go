@@ -8,6 +8,6 @@ package httpproxy_test
 
 import "testing"
 
-func init() ***REMOVED***
-	setHelper = func(t *testing.T) ***REMOVED*** t.Helper() ***REMOVED***
-***REMOVED***
+func init() {
+	setHelper = func(t *testing.T) { t.Helper() }
+}

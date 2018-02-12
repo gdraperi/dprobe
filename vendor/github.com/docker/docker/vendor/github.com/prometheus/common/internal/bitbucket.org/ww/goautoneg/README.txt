@@ -54,11 +54,11 @@ of clauses
 
 TYPES
 
-type Accept struct ***REMOVED***
+type Accept struct {
     Type, SubType string
     Q             float32
     Params        map[string]string
-***REMOVED***
+}
 Structure to represent a clause in an HTTP Accept Header
 
 

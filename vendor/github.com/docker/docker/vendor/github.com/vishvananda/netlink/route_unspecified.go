@@ -2,10 +2,10 @@
 
 package netlink
 
-func (r *Route) ListFlags() []string ***REMOVED***
-	return []string***REMOVED******REMOVED***
-***REMOVED***
+func (r *Route) ListFlags() []string {
+	return []string{}
+}
 
-func (n *NexthopInfo) ListFlags() []string ***REMOVED***
-	return []string***REMOVED******REMOVED***
-***REMOVED***
+func (n *NexthopInfo) ListFlags() []string {
+	return []string{}
+}

@@ -15,48 +15,48 @@ import (
 )
 
 // A Conn represents a raw connection.
-type Conn struct ***REMOVED***
+type Conn struct {
 	c net.Conn
-***REMOVED***
+}
 
 // NewConn returns a new raw connection.
-func NewConn(c net.Conn) (*Conn, error) ***REMOVED***
-	return &Conn***REMOVED***c: c***REMOVED***, nil
-***REMOVED***
+func NewConn(c net.Conn) (*Conn, error) {
+	return &Conn{c: c}, nil
+}
 
-func (o *Option) get(c *Conn, b []byte) (int, error) ***REMOVED***
+func (o *Option) get(c *Conn, b []byte) (int, error) {
 	s, err := socketOf(c.c)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	n, err := getsockopt(s, o.Level, o.Name, b)
 	return n, os.NewSyscallError("getsockopt", err)
-***REMOVED***
+}
 
-func (o *Option) set(c *Conn, b []byte) error ***REMOVED***
+func (o *Option) set(c *Conn, b []byte) error {
 	s, err := socketOf(c.c)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return os.NewSyscallError("setsockopt", setsockopt(s, o.Level, o.Name, b))
-***REMOVED***
+}
 
-func socketOf(c net.Conn) (uintptr, error) ***REMOVED***
-	switch c.(type) ***REMOVED***
+func socketOf(c net.Conn) (uintptr, error) {
+	switch c.(type) {
 	case *net.TCPConn, *net.UDPConn, *net.IPConn:
 		v := reflect.ValueOf(c)
-		switch e := v.Elem(); e.Kind() ***REMOVED***
+		switch e := v.Elem(); e.Kind() {
 		case reflect.Struct:
 			fd := e.FieldByName("conn").FieldByName("fd")
-			switch e := fd.Elem(); e.Kind() ***REMOVED***
+			switch e := fd.Elem(); e.Kind() {
 			case reflect.Struct:
 				sysfd := e.FieldByName("sysfd")
-				if runtime.GOOS == "windows" ***REMOVED***
+				if runtime.GOOS == "windows" {
 					return uintptr(sysfd.Uint()), nil
-				***REMOVED***
+				}
 				return uintptr(sysfd.Int()), nil
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return 0, errors.New("invalid type")
-***REMOVED***
+}

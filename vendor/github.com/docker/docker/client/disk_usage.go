@@ -9,18 +9,18 @@ import (
 )
 
 // DiskUsage requests the current data usage from the daemon
-func (cli *Client) DiskUsage(ctx context.Context) (types.DiskUsage, error) ***REMOVED***
+func (cli *Client) DiskUsage(ctx context.Context) (types.DiskUsage, error) {
 	var du types.DiskUsage
 
 	serverResp, err := cli.get(ctx, "/system/df", nil, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return du, err
-	***REMOVED***
+	}
 	defer ensureReaderClosed(serverResp)
 
-	if err := json.NewDecoder(serverResp.body).Decode(&du); err != nil ***REMOVED***
+	if err := json.NewDecoder(serverResp.body).Decode(&du); err != nil {
 		return du, fmt.Errorf("Error retrieving disk usage: %v", err)
-	***REMOVED***
+	}
 
 	return du, nil
-***REMOVED***
+}

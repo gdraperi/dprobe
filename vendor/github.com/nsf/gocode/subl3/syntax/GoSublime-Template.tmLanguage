@@ -3,16 +3,16 @@
 <plist version="1.0">
 <dict>
 	<key>foldingStartMarker</key>
-	<string>\***REMOVED***\***REMOVED***\s*(?:if|with|range)\b</string>
+	<string>\{\{\s*(?:if|with|range)\b</string>
 	<key>foldingStopMarker</key>
-	<string>\***REMOVED***\***REMOVED***\s*(?:else|end)\b</string>
+	<string>\{\{\s*(?:else|end)\b</string>
 	<key>name</key>
 	<string>GoSublime: Template</string>
 	<key>patterns</key>
 	<array>
 		<dict>
 			<key>begin</key>
-			<string>\***REMOVED***\***REMOVED***</string>
+			<string>\{\{</string>
 			<key>beginCaptures</key>
 			<dict>
 				<key>0</key>
@@ -22,7 +22,7 @@
 				</dict>
 			</dict>
 			<key>end</key>
-			<string>\***REMOVED***\***REMOVED***</string>
+			<string>\}\}</string>
 			<key>endCaptures</key>
 			<dict>
 				<key>0</key>
@@ -148,7 +148,7 @@
 			<array>
 				<dict>
 					<key>match</key>
-					<string>\\(\\|[abfnrtv'"]|x[0-9a-fA-F]***REMOVED***2***REMOVED***|u[0-9a-fA-F]***REMOVED***4***REMOVED***|U[0-9a-fA-F]***REMOVED***8***REMOVED***|[0-7]***REMOVED***3***REMOVED***)</string>
+					<string>\\(\\|[abfnrtv'"]|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8}|[0-7]{3})</string>
 					<key>name</key>
 					<string>constant.character.escape.gotemplate</string>
 				</dict>

@@ -5,25 +5,25 @@ import (
 )
 
 // just a dummy example
-type Dog struct ***REMOVED***
+type Dog struct {
 	Legs int
-***REMOVED***
+}
 
-func (d *Dog) Bark() ***REMOVED***
+func (d *Dog) Bark() {
 	fmt.Printf("Bark!\n")
-***REMOVED***
+}
 
 // another one
-type Test struct ***REMOVED***
+type Test struct {
 	// map of slices of pointer to a *Dog
 	MoreTests map[string][]**Dog
-***REMOVED***
+}
 
-func (t *Test) GetMe() *Test ***REMOVED***
+func (t *Test) GetMe() *Test {
 	return t
-***REMOVED***
+}
 
-func main() ***REMOVED***
+func main() {
 	t := new(Test)
 	(*t.GetMe().MoreTests["blabla"][10]).
-***REMOVED***
+}

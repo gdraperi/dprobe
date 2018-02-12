@@ -11,22 +11,22 @@ var (
 	networkOrder = binary.BigEndian
 )
 
-func htonl(val uint32) []byte ***REMOVED***
+func htonl(val uint32) []byte {
 	bytes := make([]byte, 4)
 	binary.BigEndian.PutUint32(bytes, val)
 	return bytes
-***REMOVED***
+}
 
-func htons(val uint16) []byte ***REMOVED***
+func htons(val uint16) []byte {
 	bytes := make([]byte, 2)
 	binary.BigEndian.PutUint16(bytes, val)
 	return bytes
-***REMOVED***
+}
 
-func ntohl(buf []byte) uint32 ***REMOVED***
+func ntohl(buf []byte) uint32 {
 	return binary.BigEndian.Uint32(buf)
-***REMOVED***
+}
 
-func ntohs(buf []byte) uint16 ***REMOVED***
+func ntohs(buf []byte) uint16 {
 	return binary.BigEndian.Uint16(buf)
-***REMOVED***
+}

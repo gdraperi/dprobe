@@ -47,47 +47,47 @@ import (
 var logger Logger = log.New(os.Stderr, "", log.LstdFlags)
 
 // Logger mimics golang's standard Logger as an interface.
-type Logger interface ***REMOVED***
-	Fatal(args ...interface***REMOVED******REMOVED***)
-	Fatalf(format string, args ...interface***REMOVED******REMOVED***)
-	Fatalln(args ...interface***REMOVED******REMOVED***)
-	Print(args ...interface***REMOVED******REMOVED***)
-	Printf(format string, args ...interface***REMOVED******REMOVED***)
-	Println(args ...interface***REMOVED******REMOVED***)
-***REMOVED***
+type Logger interface {
+	Fatal(args ...interface{})
+	Fatalf(format string, args ...interface{})
+	Fatalln(args ...interface{})
+	Print(args ...interface{})
+	Printf(format string, args ...interface{})
+	Println(args ...interface{})
+}
 
 // SetLogger sets the logger that is used in grpc. Call only from
 // init() functions.
-func SetLogger(l Logger) ***REMOVED***
+func SetLogger(l Logger) {
 	logger = l
-***REMOVED***
+}
 
 // Fatal is equivalent to Print() followed by a call to os.Exit() with a non-zero exit code.
-func Fatal(args ...interface***REMOVED******REMOVED***) ***REMOVED***
+func Fatal(args ...interface{}) {
 	logger.Fatal(args...)
-***REMOVED***
+}
 
 // Fatalf is equivalent to Printf() followed by a call to os.Exit() with a non-zero exit code.
-func Fatalf(format string, args ...interface***REMOVED******REMOVED***) ***REMOVED***
+func Fatalf(format string, args ...interface{}) {
 	logger.Fatalf(format, args...)
-***REMOVED***
+}
 
 // Fatalln is equivalent to Println() followed by a call to os.Exit()) with a non-zero exit code.
-func Fatalln(args ...interface***REMOVED******REMOVED***) ***REMOVED***
+func Fatalln(args ...interface{}) {
 	logger.Fatalln(args...)
-***REMOVED***
+}
 
 // Print prints to the logger. Arguments are handled in the manner of fmt.Print.
-func Print(args ...interface***REMOVED******REMOVED***) ***REMOVED***
+func Print(args ...interface{}) {
 	logger.Print(args...)
-***REMOVED***
+}
 
 // Printf prints to the logger. Arguments are handled in the manner of fmt.Printf.
-func Printf(format string, args ...interface***REMOVED******REMOVED***) ***REMOVED***
+func Printf(format string, args ...interface{}) {
 	logger.Printf(format, args...)
-***REMOVED***
+}
 
 // Println prints to the logger. Arguments are handled in the manner of fmt.Println.
-func Println(args ...interface***REMOVED******REMOVED***) ***REMOVED***
+func Println(args ...interface{}) {
 	logger.Println(args...)
-***REMOVED***
+}

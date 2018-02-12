@@ -15,45 +15,45 @@ const (
 	hiSurrogate = 0xDFFF
 )
 
-func TestTables(t *testing.T) ***REMOVED***
+func TestTables(t *testing.T) {
 	testtext.SkipIfNotLong(t)
 
-	runes := map[rune]Kind***REMOVED******REMOVED***
-	getWidthData(func(r rune, tag elem, _ rune) ***REMOVED***
+	runes := map[rune]Kind{}
+	getWidthData(func(r rune, tag elem, _ rune) {
 		runes[r] = tag.kind()
-	***REMOVED***)
-	for r := rune(0); r < 0x10FFFF; r++ ***REMOVED***
-		if loSurrogate <= r && r <= hiSurrogate ***REMOVED***
+	})
+	for r := rune(0); r < 0x10FFFF; r++ {
+		if loSurrogate <= r && r <= hiSurrogate {
 			continue
-		***REMOVED***
+		}
 		p := LookupRune(r)
-		if got, want := p.Kind(), runes[r]; got != want ***REMOVED***
+		if got, want := p.Kind(), runes[r]; got != want {
 			t.Errorf("Kind of %U was %s; want %s.", r, got, want)
-		***REMOVED***
+		}
 		want, mapped := foldRune(r)
-		if got := p.Folded(); (got == 0) == mapped || got != 0 && got != want ***REMOVED***
+		if got := p.Folded(); (got == 0) == mapped || got != 0 && got != want {
 			t.Errorf("Folded(%U) = %U; want %U", r, got, want)
-		***REMOVED***
+		}
 		want, mapped = widenRune(r)
-		if got := p.Wide(); (got == 0) == mapped || got != 0 && got != want ***REMOVED***
+		if got := p.Wide(); (got == 0) == mapped || got != 0 && got != want {
 			t.Errorf("Wide(%U) = %U; want %U", r, got, want)
-		***REMOVED***
+		}
 		want, mapped = narrowRune(r)
-		if got := p.Narrow(); (got == 0) == mapped || got != 0 && got != want ***REMOVED***
+		if got := p.Narrow(); (got == 0) == mapped || got != 0 && got != want {
 			t.Errorf("Narrow(%U) = %U; want %U", r, got, want)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // TestAmbiguous verifies that that ambiguous runes with a mapping always map to
 // a halfwidth rune.
-func TestAmbiguous(t *testing.T) ***REMOVED***
-	for r, m := range mapRunes ***REMOVED***
-		if m.e != tagAmbiguous ***REMOVED***
+func TestAmbiguous(t *testing.T) {
+	for r, m := range mapRunes {
+		if m.e != tagAmbiguous {
 			continue
-		***REMOVED***
-		if k := mapRunes[m.r].e.kind(); k != EastAsianHalfwidth ***REMOVED***
+		}
+		if k := mapRunes[m.r].e.kind(); k != EastAsianHalfwidth {
 			t.Errorf("Rune %U is ambiguous and maps to a rune of type %v", r, k)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

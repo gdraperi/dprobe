@@ -8,19 +8,19 @@ package route
 
 import "runtime"
 
-func (w *wireFormat) parseInterfaceMessage(_ RIBType, b []byte) (Message, error) ***REMOVED***
-	if len(b) < w.bodyOff ***REMOVED***
+func (w *wireFormat) parseInterfaceMessage(_ RIBType, b []byte) (Message, error) {
+	if len(b) < w.bodyOff {
 		return nil, errMessageTooShort
-	***REMOVED***
+	}
 	l := int(nativeEndian.Uint16(b[:2]))
-	if len(b) < l ***REMOVED***
+	if len(b) < l {
 		return nil, errInvalidMessage
-	***REMOVED***
+	}
 	attrs := uint(nativeEndian.Uint32(b[4:8]))
-	if attrs&sysRTA_IFP == 0 ***REMOVED***
+	if attrs&sysRTA_IFP == 0 {
 		return nil, nil
-	***REMOVED***
-	m := &InterfaceMessage***REMOVED***
+	}
+	m := &InterfaceMessage{
 		Version: int(b[2]),
 		Type:    int(b[3]),
 		Addrs:   make([]Addr, sysRTAX_MAX),
@@ -28,39 +28,39 @@ func (w *wireFormat) parseInterfaceMessage(_ RIBType, b []byte) (Message, error)
 		Index:   int(nativeEndian.Uint16(b[12:14])),
 		extOff:  w.extOff,
 		raw:     b[:l],
-	***REMOVED***
+	}
 	a, err := parseLinkAddr(b[w.bodyOff:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	m.Addrs[sysRTAX_IFP] = a
 	m.Name = a.(*LinkAddr).Name
 	return m, nil
-***REMOVED***
+}
 
-func (w *wireFormat) parseInterfaceAddrMessage(_ RIBType, b []byte) (Message, error) ***REMOVED***
-	if len(b) < w.bodyOff ***REMOVED***
+func (w *wireFormat) parseInterfaceAddrMessage(_ RIBType, b []byte) (Message, error) {
+	if len(b) < w.bodyOff {
 		return nil, errMessageTooShort
-	***REMOVED***
+	}
 	l := int(nativeEndian.Uint16(b[:2]))
-	if len(b) < l ***REMOVED***
+	if len(b) < l {
 		return nil, errInvalidMessage
-	***REMOVED***
-	m := &InterfaceAddrMessage***REMOVED***
+	}
+	m := &InterfaceAddrMessage{
 		Version: int(b[2]),
 		Type:    int(b[3]),
 		Flags:   int(nativeEndian.Uint32(b[8:12])),
 		raw:     b[:l],
-	***REMOVED***
-	if runtime.GOOS == "netbsd" ***REMOVED***
+	}
+	if runtime.GOOS == "netbsd" {
 		m.Index = int(nativeEndian.Uint16(b[16:18]))
-	***REMOVED*** else ***REMOVED***
+	} else {
 		m.Index = int(nativeEndian.Uint16(b[12:14]))
-	***REMOVED***
+	}
 	var err error
 	m.Addrs, err = parseAddrs(uint(nativeEndian.Uint32(b[4:8])), parseKernelInetAddr, b[w.bodyOff:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return m, nil
-***REMOVED***
+}

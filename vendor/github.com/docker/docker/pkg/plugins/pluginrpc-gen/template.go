@@ -5,52 +5,52 @@ import (
 	"text/template"
 )
 
-func printArgs(args []arg) string ***REMOVED***
+func printArgs(args []arg) string {
 	var argStr []string
-	for _, arg := range args ***REMOVED***
+	for _, arg := range args {
 		argStr = append(argStr, arg.String())
-	***REMOVED***
+	}
 	return strings.Join(argStr, ", ")
-***REMOVED***
+}
 
-func buildImports(specs []importSpec) string ***REMOVED***
-	if len(specs) == 0 ***REMOVED***
+func buildImports(specs []importSpec) string {
+	if len(specs) == 0 {
 		return `import "errors"`
-	***REMOVED***
+	}
 	imports := "import(\n"
 	imports += "\t\"errors\"\n"
-	for _, i := range specs ***REMOVED***
+	for _, i := range specs {
 		imports += "\t" + i.String() + "\n"
-	***REMOVED***
+	}
 	imports += ")"
 	return imports
-***REMOVED***
+}
 
-func marshalType(t string) string ***REMOVED***
-	switch t ***REMOVED***
+func marshalType(t string) string {
+	switch t {
 	case "error":
 		// convert error types to plain strings to ensure the values are encoded/decoded properly
 		return "string"
 	default:
 		return t
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func isErr(t string) bool ***REMOVED***
-	switch t ***REMOVED***
+func isErr(t string) bool {
+	switch t {
 	case "error":
 		return true
 	default:
 		return false
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Need to use this helper due to issues with go-vet
-func buildTag(s string) string ***REMOVED***
+func buildTag(s string) string {
 	return "+build " + s
-***REMOVED***
+}
 
-var templFuncs = template.FuncMap***REMOVED***
+var templFuncs = template.FuncMap{
 	"printArgs":   printArgs,
 	"marshalType": marshalType,
 	"isErr":       isErr,
@@ -58,61 +58,61 @@ var templFuncs = template.FuncMap***REMOVED***
 	"title":       title,
 	"tag":         buildTag,
 	"imports":     buildImports,
-***REMOVED***
+}
 
-func title(s string) string ***REMOVED***
-	if strings.ToLower(s) == "id" ***REMOVED***
+func title(s string) string {
+	if strings.ToLower(s) == "id" {
 		return "ID"
-	***REMOVED***
+	}
 	return strings.Title(s)
-***REMOVED***
+}
 
 var generatedTempl = template.Must(template.New("rpc_cient").Funcs(templFuncs).Parse(`
 // generated code - DO NOT EDIT
-***REMOVED******REMOVED*** range $k, $v := .BuildTags ***REMOVED******REMOVED***
-	// ***REMOVED******REMOVED*** tag $k ***REMOVED******REMOVED*** ***REMOVED******REMOVED*** end ***REMOVED******REMOVED***
+{{ range $k, $v := .BuildTags }}
+	// {{ tag $k }} {{ end }}
 
-package ***REMOVED******REMOVED*** .Name ***REMOVED******REMOVED***
+package {{ .Name }}
 
-***REMOVED******REMOVED*** imports .Imports ***REMOVED******REMOVED***
+{{ imports .Imports }}
 
-type client interface***REMOVED***
-	Call(string, interface***REMOVED******REMOVED***, interface***REMOVED******REMOVED***) error
-***REMOVED***
+type client interface{
+	Call(string, interface{}, interface{}) error
+}
 
-type ***REMOVED******REMOVED*** .InterfaceType ***REMOVED******REMOVED***Proxy struct ***REMOVED***
+type {{ .InterfaceType }}Proxy struct {
 	client
-***REMOVED***
+}
 
-***REMOVED******REMOVED*** range .Functions ***REMOVED******REMOVED***
-	type ***REMOVED******REMOVED*** $.InterfaceType ***REMOVED******REMOVED***Proxy***REMOVED******REMOVED*** .Name ***REMOVED******REMOVED***Request struct***REMOVED***
-		***REMOVED******REMOVED*** range .Args ***REMOVED******REMOVED***
-			***REMOVED******REMOVED*** title .Name ***REMOVED******REMOVED*** ***REMOVED******REMOVED*** .ArgType ***REMOVED******REMOVED*** ***REMOVED******REMOVED*** end ***REMOVED******REMOVED***
-	***REMOVED***
+{{ range .Functions }}
+	type {{ $.InterfaceType }}Proxy{{ .Name }}Request struct{
+		{{ range .Args }}
+			{{ title .Name }} {{ .ArgType }} {{ end }}
+	}
 
-	type ***REMOVED******REMOVED*** $.InterfaceType ***REMOVED******REMOVED***Proxy***REMOVED******REMOVED*** .Name ***REMOVED******REMOVED***Response struct***REMOVED***
-		***REMOVED******REMOVED*** range .Returns ***REMOVED******REMOVED***
-			***REMOVED******REMOVED*** title .Name ***REMOVED******REMOVED*** ***REMOVED******REMOVED*** marshalType .ArgType ***REMOVED******REMOVED*** ***REMOVED******REMOVED*** end ***REMOVED******REMOVED***
-	***REMOVED***
+	type {{ $.InterfaceType }}Proxy{{ .Name }}Response struct{
+		{{ range .Returns }}
+			{{ title .Name }} {{ marshalType .ArgType }} {{ end }}
+	}
 
-	func (pp ****REMOVED******REMOVED*** $.InterfaceType ***REMOVED******REMOVED***Proxy) ***REMOVED******REMOVED*** .Name ***REMOVED******REMOVED***(***REMOVED******REMOVED*** printArgs .Args ***REMOVED******REMOVED***) (***REMOVED******REMOVED*** printArgs .Returns ***REMOVED******REMOVED***) ***REMOVED***
+	func (pp *{{ $.InterfaceType }}Proxy) {{ .Name }}({{ printArgs .Args }}) ({{ printArgs .Returns }}) {
 		var(
-			req ***REMOVED******REMOVED*** $.InterfaceType ***REMOVED******REMOVED***Proxy***REMOVED******REMOVED*** .Name ***REMOVED******REMOVED***Request
-			ret ***REMOVED******REMOVED*** $.InterfaceType ***REMOVED******REMOVED***Proxy***REMOVED******REMOVED*** .Name ***REMOVED******REMOVED***Response
+			req {{ $.InterfaceType }}Proxy{{ .Name }}Request
+			ret {{ $.InterfaceType }}Proxy{{ .Name }}Response
 		)
-		***REMOVED******REMOVED*** range .Args ***REMOVED******REMOVED***
-			req.***REMOVED******REMOVED*** title .Name ***REMOVED******REMOVED*** = ***REMOVED******REMOVED*** lower .Name ***REMOVED******REMOVED*** ***REMOVED******REMOVED*** end ***REMOVED******REMOVED***
-		if err = pp.Call("***REMOVED******REMOVED*** $.RPCName ***REMOVED******REMOVED***.***REMOVED******REMOVED*** .Name ***REMOVED******REMOVED***", req, &ret); err != nil ***REMOVED***
+		{{ range .Args }}
+			req.{{ title .Name }} = {{ lower .Name }} {{ end }}
+		if err = pp.Call("{{ $.RPCName }}.{{ .Name }}", req, &ret); err != nil {
 			return
-		***REMOVED***
-		***REMOVED******REMOVED*** range $r := .Returns ***REMOVED******REMOVED***
-			***REMOVED******REMOVED*** if isErr .ArgType ***REMOVED******REMOVED***
-				if ret.***REMOVED******REMOVED*** title .Name ***REMOVED******REMOVED*** != "" ***REMOVED***
-					***REMOVED******REMOVED*** lower .Name ***REMOVED******REMOVED*** = errors.New(ret.***REMOVED******REMOVED*** title .Name ***REMOVED******REMOVED***)
-				***REMOVED*** ***REMOVED******REMOVED*** end ***REMOVED******REMOVED***
-			***REMOVED******REMOVED*** if isErr .ArgType | not ***REMOVED******REMOVED*** ***REMOVED******REMOVED*** lower .Name ***REMOVED******REMOVED*** = ret.***REMOVED******REMOVED*** title .Name ***REMOVED******REMOVED*** ***REMOVED******REMOVED*** end ***REMOVED******REMOVED*** ***REMOVED******REMOVED*** end ***REMOVED******REMOVED***
+		}
+		{{ range $r := .Returns }}
+			{{ if isErr .ArgType }}
+				if ret.{{ title .Name }} != "" {
+					{{ lower .Name }} = errors.New(ret.{{ title .Name }})
+				} {{ end }}
+			{{ if isErr .ArgType | not }} {{ lower .Name }} = ret.{{ title .Name }} {{ end }} {{ end }}
 
 		return
-	***REMOVED***
-***REMOVED******REMOVED*** end ***REMOVED******REMOVED***
+	}
+{{ end }}
 `))

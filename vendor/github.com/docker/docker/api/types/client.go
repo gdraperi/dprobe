@@ -11,54 +11,54 @@ import (
 )
 
 // CheckpointCreateOptions holds parameters to create a checkpoint from a container
-type CheckpointCreateOptions struct ***REMOVED***
+type CheckpointCreateOptions struct {
 	CheckpointID  string
 	CheckpointDir string
 	Exit          bool
-***REMOVED***
+}
 
 // CheckpointListOptions holds parameters to list checkpoints for a container
-type CheckpointListOptions struct ***REMOVED***
+type CheckpointListOptions struct {
 	CheckpointDir string
-***REMOVED***
+}
 
 // CheckpointDeleteOptions holds parameters to delete a checkpoint from a container
-type CheckpointDeleteOptions struct ***REMOVED***
+type CheckpointDeleteOptions struct {
 	CheckpointID  string
 	CheckpointDir string
-***REMOVED***
+}
 
 // ContainerAttachOptions holds parameters to attach to a container.
-type ContainerAttachOptions struct ***REMOVED***
+type ContainerAttachOptions struct {
 	Stream     bool
 	Stdin      bool
 	Stdout     bool
 	Stderr     bool
 	DetachKeys string
 	Logs       bool
-***REMOVED***
+}
 
 // ContainerCommitOptions holds parameters to commit changes into a container.
-type ContainerCommitOptions struct ***REMOVED***
+type ContainerCommitOptions struct {
 	Reference string
 	Comment   string
 	Author    string
 	Changes   []string
 	Pause     bool
 	Config    *container.Config
-***REMOVED***
+}
 
 // ContainerExecInspect holds information returned by exec inspect.
-type ContainerExecInspect struct ***REMOVED***
+type ContainerExecInspect struct {
 	ExecID      string
 	ContainerID string
 	Running     bool
 	ExitCode    int
 	Pid         int
-***REMOVED***
+}
 
 // ContainerListOptions holds parameters to list containers with.
-type ContainerListOptions struct ***REMOVED***
+type ContainerListOptions struct {
 	Quiet   bool
 	Size    bool
 	All     bool
@@ -67,10 +67,10 @@ type ContainerListOptions struct ***REMOVED***
 	Before  string
 	Limit   int
 	Filters filters.Args
-***REMOVED***
+}
 
 // ContainerLogsOptions holds parameters to filter logs with.
-type ContainerLogsOptions struct ***REMOVED***
+type ContainerLogsOptions struct {
 	ShowStdout bool
 	ShowStderr bool
 	Since      string
@@ -79,68 +79,68 @@ type ContainerLogsOptions struct ***REMOVED***
 	Follow     bool
 	Tail       string
 	Details    bool
-***REMOVED***
+}
 
 // ContainerRemoveOptions holds parameters to remove containers.
-type ContainerRemoveOptions struct ***REMOVED***
+type ContainerRemoveOptions struct {
 	RemoveVolumes bool
 	RemoveLinks   bool
 	Force         bool
-***REMOVED***
+}
 
 // ContainerStartOptions holds parameters to start containers.
-type ContainerStartOptions struct ***REMOVED***
+type ContainerStartOptions struct {
 	CheckpointID  string
 	CheckpointDir string
-***REMOVED***
+}
 
 // CopyToContainerOptions holds information
 // about files to copy into a container
-type CopyToContainerOptions struct ***REMOVED***
+type CopyToContainerOptions struct {
 	AllowOverwriteDirWithFile bool
 	CopyUIDGID                bool
-***REMOVED***
+}
 
 // EventsOptions holds parameters to filter events with.
-type EventsOptions struct ***REMOVED***
+type EventsOptions struct {
 	Since   string
 	Until   string
 	Filters filters.Args
-***REMOVED***
+}
 
 // NetworkListOptions holds parameters to filter the list of networks with.
-type NetworkListOptions struct ***REMOVED***
+type NetworkListOptions struct {
 	Filters filters.Args
-***REMOVED***
+}
 
 // HijackedResponse holds connection information for a hijacked request.
-type HijackedResponse struct ***REMOVED***
+type HijackedResponse struct {
 	Conn   net.Conn
 	Reader *bufio.Reader
-***REMOVED***
+}
 
 // Close closes the hijacked connection and reader.
-func (h *HijackedResponse) Close() ***REMOVED***
+func (h *HijackedResponse) Close() {
 	h.Conn.Close()
-***REMOVED***
+}
 
 // CloseWriter is an interface that implements structs
 // that close input streams to prevent from writing.
-type CloseWriter interface ***REMOVED***
+type CloseWriter interface {
 	CloseWrite() error
-***REMOVED***
+}
 
 // CloseWrite closes a readWriter for writing.
-func (h *HijackedResponse) CloseWrite() error ***REMOVED***
-	if conn, ok := h.Conn.(CloseWriter); ok ***REMOVED***
+func (h *HijackedResponse) CloseWrite() error {
+	if conn, ok := h.Conn.(CloseWriter); ok {
 		return conn.CloseWrite()
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // ImageBuildOptions holds the information
 // necessary to build images.
-type ImageBuildOptions struct ***REMOVED***
+type ImageBuildOptions struct {
 	Tags           []string
 	SuppressOutput bool
 	RemoteContext  string
@@ -181,56 +181,56 @@ type ImageBuildOptions struct ***REMOVED***
 	Target      string
 	SessionID   string
 	Platform    string
-***REMOVED***
+}
 
 // ImageBuildResponse holds information
 // returned by a server after building
 // an image.
-type ImageBuildResponse struct ***REMOVED***
+type ImageBuildResponse struct {
 	Body   io.ReadCloser
 	OSType string
-***REMOVED***
+}
 
 // ImageCreateOptions holds information to create images.
-type ImageCreateOptions struct ***REMOVED***
+type ImageCreateOptions struct {
 	RegistryAuth string // RegistryAuth is the base64 encoded credentials for the registry.
 	Platform     string // Platform is the target platform of the image if it needs to be pulled from the registry.
-***REMOVED***
+}
 
 // ImageImportSource holds source information for ImageImport
-type ImageImportSource struct ***REMOVED***
+type ImageImportSource struct {
 	Source     io.Reader // Source is the data to send to the server to create this image from. You must set SourceName to "-" to leverage this.
 	SourceName string    // SourceName is the name of the image to pull. Set to "-" to leverage the Source attribute.
-***REMOVED***
+}
 
 // ImageImportOptions holds information to import images from the client host.
-type ImageImportOptions struct ***REMOVED***
+type ImageImportOptions struct {
 	Tag      string   // Tag is the name to tag this image with. This attribute is deprecated.
 	Message  string   // Message is the message to tag the image with
 	Changes  []string // Changes are the raw changes to apply to this image
 	Platform string   // Platform is the target platform of the image
-***REMOVED***
+}
 
 // ImageListOptions holds parameters to filter the list of images with.
-type ImageListOptions struct ***REMOVED***
+type ImageListOptions struct {
 	All     bool
 	Filters filters.Args
-***REMOVED***
+}
 
 // ImageLoadResponse returns information to the client about a load process.
-type ImageLoadResponse struct ***REMOVED***
+type ImageLoadResponse struct {
 	// Body must be closed to avoid a resource leak
 	Body io.ReadCloser
 	JSON bool
-***REMOVED***
+}
 
 // ImagePullOptions holds information to pull images.
-type ImagePullOptions struct ***REMOVED***
+type ImagePullOptions struct {
 	All           bool
 	RegistryAuth  string // RegistryAuth is the base64 encoded credentials for the registry
 	PrivilegeFunc RequestPrivilegeFunc
 	Platform      string
-***REMOVED***
+}
 
 // RequestPrivilegeFunc is a function interface that
 // clients can supply to retry operations after
@@ -244,39 +244,39 @@ type RequestPrivilegeFunc func() (string, error)
 type ImagePushOptions ImagePullOptions
 
 // ImageRemoveOptions holds parameters to remove images.
-type ImageRemoveOptions struct ***REMOVED***
+type ImageRemoveOptions struct {
 	Force         bool
 	PruneChildren bool
-***REMOVED***
+}
 
 // ImageSearchOptions holds parameters to search images with.
-type ImageSearchOptions struct ***REMOVED***
+type ImageSearchOptions struct {
 	RegistryAuth  string
 	PrivilegeFunc RequestPrivilegeFunc
 	Filters       filters.Args
 	Limit         int
-***REMOVED***
+}
 
 // ResizeOptions holds parameters to resize a tty.
 // It can be used to resize container ttys and
 // exec process ttys too.
-type ResizeOptions struct ***REMOVED***
+type ResizeOptions struct {
 	Height uint
 	Width  uint
-***REMOVED***
+}
 
 // NodeListOptions holds parameters to list nodes with.
-type NodeListOptions struct ***REMOVED***
+type NodeListOptions struct {
 	Filters filters.Args
-***REMOVED***
+}
 
 // NodeRemoveOptions holds parameters to remove nodes with.
-type NodeRemoveOptions struct ***REMOVED***
+type NodeRemoveOptions struct {
 	Force bool
-***REMOVED***
+}
 
 // ServiceCreateOptions contains the options to use when creating a service.
-type ServiceCreateOptions struct ***REMOVED***
+type ServiceCreateOptions struct {
 	// EncodedRegistryAuth is the encoded registry authorization credentials to
 	// use when updating the service.
 	//
@@ -288,16 +288,16 @@ type ServiceCreateOptions struct ***REMOVED***
 	// the image digest and manifest, which in turn can be used to update
 	// platform or other information about the service.
 	QueryRegistry bool
-***REMOVED***
+}
 
 // ServiceCreateResponse contains the information returned to a client
 // on the creation of a new service.
-type ServiceCreateResponse struct ***REMOVED***
+type ServiceCreateResponse struct {
 	// ID is the ID of the created service.
 	ID string
 	// Warnings is a set of non-fatal warning messages to pass on to the user.
 	Warnings []string `json:",omitempty"`
-***REMOVED***
+}
 
 // Values for RegistryAuthFrom in ServiceUpdateOptions
 const (
@@ -306,7 +306,7 @@ const (
 )
 
 // ServiceUpdateOptions contains the options to be used for updating services.
-type ServiceUpdateOptions struct ***REMOVED***
+type ServiceUpdateOptions struct {
 	// EncodedRegistryAuth is the encoded registry authorization credentials to
 	// use when updating the service.
 	//
@@ -333,41 +333,41 @@ type ServiceUpdateOptions struct ***REMOVED***
 	// the image digest and manifest, which in turn can be used to update
 	// platform or other information about the service.
 	QueryRegistry bool
-***REMOVED***
+}
 
 // ServiceListOptions holds parameters to list services with.
-type ServiceListOptions struct ***REMOVED***
+type ServiceListOptions struct {
 	Filters filters.Args
-***REMOVED***
+}
 
 // ServiceInspectOptions holds parameters related to the "service inspect"
 // operation.
-type ServiceInspectOptions struct ***REMOVED***
+type ServiceInspectOptions struct {
 	InsertDefaults bool
-***REMOVED***
+}
 
 // TaskListOptions holds parameters to list tasks with.
-type TaskListOptions struct ***REMOVED***
+type TaskListOptions struct {
 	Filters filters.Args
-***REMOVED***
+}
 
 // PluginRemoveOptions holds parameters to remove plugins.
-type PluginRemoveOptions struct ***REMOVED***
+type PluginRemoveOptions struct {
 	Force bool
-***REMOVED***
+}
 
 // PluginEnableOptions holds parameters to enable plugins.
-type PluginEnableOptions struct ***REMOVED***
+type PluginEnableOptions struct {
 	Timeout int
-***REMOVED***
+}
 
 // PluginDisableOptions holds parameters to disable plugins.
-type PluginDisableOptions struct ***REMOVED***
+type PluginDisableOptions struct {
 	Force bool
-***REMOVED***
+}
 
 // PluginInstallOptions holds parameters to install a plugin.
-type PluginInstallOptions struct ***REMOVED***
+type PluginInstallOptions struct {
 	Disabled              bool
 	AcceptAllPermissions  bool
 	RegistryAuth          string // RegistryAuth is the base64 encoded credentials for the registry
@@ -375,16 +375,16 @@ type PluginInstallOptions struct ***REMOVED***
 	PrivilegeFunc         RequestPrivilegeFunc
 	AcceptPermissionsFunc func(PluginPrivileges) (bool, error)
 	Args                  []string
-***REMOVED***
+}
 
 // SwarmUnlockKeyResponse contains the response for Engine API:
 // GET /swarm/unlockkey
-type SwarmUnlockKeyResponse struct ***REMOVED***
+type SwarmUnlockKeyResponse struct {
 	// UnlockKey is the unlock key in ASCII-armored format.
 	UnlockKey string
-***REMOVED***
+}
 
 // PluginCreateOptions hold all options to plugin create.
-type PluginCreateOptions struct ***REMOVED***
+type PluginCreateOptions struct {
 	RepoName string
-***REMOVED***
+}

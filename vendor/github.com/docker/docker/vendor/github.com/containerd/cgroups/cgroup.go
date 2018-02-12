@@ -14,386 +14,386 @@ import (
 )
 
 // New returns a new control via the cgroup cgroups interface
-func New(hierarchy Hierarchy, path Path, resources *specs.LinuxResources) (Cgroup, error) ***REMOVED***
+func New(hierarchy Hierarchy, path Path, resources *specs.LinuxResources) (Cgroup, error) {
 	subsystems, err := hierarchy()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	for _, s := range subsystems ***REMOVED***
-		if err := initializeSubsystem(s, path, resources); err != nil ***REMOVED***
+	}
+	for _, s := range subsystems {
+		if err := initializeSubsystem(s, path, resources); err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
-	return &cgroup***REMOVED***
+		}
+	}
+	return &cgroup{
 		path:       path,
 		subsystems: subsystems,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // Load will load an existing cgroup and allow it to be controlled
-func Load(hierarchy Hierarchy, path Path) (Cgroup, error) ***REMOVED***
+func Load(hierarchy Hierarchy, path Path) (Cgroup, error) {
 	subsystems, err := hierarchy()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	// check the the subsystems still exist
-	for _, s := range pathers(subsystems) ***REMOVED***
+	for _, s := range pathers(subsystems) {
 		p, err := path(s.Name())
-		if err != nil ***REMOVED***
-			if os.IsNotExist(errors.Cause(err)) ***REMOVED***
+		if err != nil {
+			if os.IsNotExist(errors.Cause(err)) {
 				return nil, ErrCgroupDeleted
-			***REMOVED***
+			}
 			return nil, err
-		***REMOVED***
-		if _, err := os.Lstat(s.Path(p)); err != nil ***REMOVED***
-			if os.IsNotExist(err) ***REMOVED***
+		}
+		if _, err := os.Lstat(s.Path(p)); err != nil {
+			if os.IsNotExist(err) {
 				return nil, ErrCgroupDeleted
-			***REMOVED***
+			}
 			return nil, err
-		***REMOVED***
-	***REMOVED***
-	return &cgroup***REMOVED***
+		}
+	}
+	return &cgroup{
 		path:       path,
 		subsystems: subsystems,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-type cgroup struct ***REMOVED***
+type cgroup struct {
 	path Path
 
 	subsystems []Subsystem
 	mu         sync.Mutex
 	err        error
-***REMOVED***
+}
 
 // New returns a new sub cgroup
-func (c *cgroup) New(name string, resources *specs.LinuxResources) (Cgroup, error) ***REMOVED***
+func (c *cgroup) New(name string, resources *specs.LinuxResources) (Cgroup, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	if c.err != nil ***REMOVED***
+	if c.err != nil {
 		return nil, c.err
-	***REMOVED***
+	}
 	path := subPath(c.path, name)
-	for _, s := range c.subsystems ***REMOVED***
-		if err := initializeSubsystem(s, path, resources); err != nil ***REMOVED***
+	for _, s := range c.subsystems {
+		if err := initializeSubsystem(s, path, resources); err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
-	return &cgroup***REMOVED***
+		}
+	}
+	return &cgroup{
 		path:       path,
 		subsystems: c.subsystems,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // Subsystems returns all the subsystems that are currently being
 // consumed by the group
-func (c *cgroup) Subsystems() []Subsystem ***REMOVED***
+func (c *cgroup) Subsystems() []Subsystem {
 	return c.subsystems
-***REMOVED***
+}
 
 // Add moves the provided process into the new cgroup
-func (c *cgroup) Add(process Process) error ***REMOVED***
-	if process.Pid <= 0 ***REMOVED***
+func (c *cgroup) Add(process Process) error {
+	if process.Pid <= 0 {
 		return ErrInvalidPid
-	***REMOVED***
+	}
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	if c.err != nil ***REMOVED***
+	if c.err != nil {
 		return c.err
-	***REMOVED***
+	}
 	return c.add(process)
-***REMOVED***
+}
 
-func (c *cgroup) add(process Process) error ***REMOVED***
-	for _, s := range pathers(c.subsystems) ***REMOVED***
+func (c *cgroup) add(process Process) error {
+	for _, s := range pathers(c.subsystems) {
 		p, err := c.path(s.Name())
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		if err := ioutil.WriteFile(
 			filepath.Join(s.Path(p), cgroupProcs),
 			[]byte(strconv.Itoa(process.Pid)),
 			defaultFilePerm,
-		); err != nil ***REMOVED***
+		); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
 // Delete will remove the control group from each of the subsystems registered
-func (c *cgroup) Delete() error ***REMOVED***
+func (c *cgroup) Delete() error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	if c.err != nil ***REMOVED***
+	if c.err != nil {
 		return c.err
-	***REMOVED***
+	}
 	var errors []string
-	for _, s := range c.subsystems ***REMOVED***
-		if d, ok := s.(deleter); ok ***REMOVED***
+	for _, s := range c.subsystems {
+		if d, ok := s.(deleter); ok {
 			sp, err := c.path(s.Name())
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if err := d.Delete(sp); err != nil ***REMOVED***
+			}
+			if err := d.Delete(sp); err != nil {
 				errors = append(errors, string(s.Name()))
-			***REMOVED***
+			}
 			continue
-		***REMOVED***
-		if p, ok := s.(pather); ok ***REMOVED***
+		}
+		if p, ok := s.(pather); ok {
 			sp, err := c.path(s.Name())
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
+			}
 			path := p.Path(sp)
-			if err := remove(path); err != nil ***REMOVED***
+			if err := remove(path); err != nil {
 				errors = append(errors, path)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-	if len(errors) > 0 ***REMOVED***
+			}
+		}
+	}
+	if len(errors) > 0 {
 		return fmt.Errorf("cgroups: unable to remove paths %s", strings.Join(errors, ", "))
-	***REMOVED***
+	}
 	c.err = ErrCgroupDeleted
 	return nil
-***REMOVED***
+}
 
 // Stat returns the current metrics for the cgroup
-func (c *cgroup) Stat(handlers ...ErrorHandler) (*Metrics, error) ***REMOVED***
+func (c *cgroup) Stat(handlers ...ErrorHandler) (*Metrics, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	if c.err != nil ***REMOVED***
+	if c.err != nil {
 		return nil, c.err
-	***REMOVED***
-	if len(handlers) == 0 ***REMOVED***
+	}
+	if len(handlers) == 0 {
 		handlers = append(handlers, errPassthrough)
-	***REMOVED***
+	}
 	var (
-		stats = &Metrics***REMOVED***
-			CPU: &CPUStat***REMOVED***
-				Throttling: &Throttle***REMOVED******REMOVED***,
-				Usage:      &CPUUsage***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***
-		wg   = &sync.WaitGroup***REMOVED******REMOVED***
+		stats = &Metrics{
+			CPU: &CPUStat{
+				Throttling: &Throttle{},
+				Usage:      &CPUUsage{},
+			},
+		}
+		wg   = &sync.WaitGroup{}
 		errs = make(chan error, len(c.subsystems))
 	)
-	for _, s := range c.subsystems ***REMOVED***
-		if ss, ok := s.(stater); ok ***REMOVED***
+	for _, s := range c.subsystems {
+		if ss, ok := s.(stater); ok {
 			sp, err := c.path(s.Name())
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			wg.Add(1)
-			go func() ***REMOVED***
+			go func() {
 				defer wg.Done()
-				if err := ss.Stat(sp, stats); err != nil ***REMOVED***
-					for _, eh := range handlers ***REMOVED***
-						if herr := eh(err); herr != nil ***REMOVED***
+				if err := ss.Stat(sp, stats); err != nil {
+					for _, eh := range handlers {
+						if herr := eh(err); herr != nil {
 							errs <- herr
-						***REMOVED***
-					***REMOVED***
-				***REMOVED***
-			***REMOVED***()
-		***REMOVED***
-	***REMOVED***
+						}
+					}
+				}
+			}()
+		}
+	}
 	wg.Wait()
 	close(errs)
-	for err := range errs ***REMOVED***
+	for err := range errs {
 		return nil, err
-	***REMOVED***
+	}
 	return stats, nil
-***REMOVED***
+}
 
 // Update updates the cgroup with the new resource values provided
 //
 // Be prepared to handle EBUSY when trying to update a cgroup with
 // live processes and other operations like Stats being performed at the
 // same time
-func (c *cgroup) Update(resources *specs.LinuxResources) error ***REMOVED***
+func (c *cgroup) Update(resources *specs.LinuxResources) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	if c.err != nil ***REMOVED***
+	if c.err != nil {
 		return c.err
-	***REMOVED***
-	for _, s := range c.subsystems ***REMOVED***
-		if u, ok := s.(updater); ok ***REMOVED***
+	}
+	for _, s := range c.subsystems {
+		if u, ok := s.(updater); ok {
 			sp, err := c.path(s.Name())
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if err := u.Update(sp, resources); err != nil ***REMOVED***
+			}
+			if err := u.Update(sp, resources); err != nil {
 				return err
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return nil
-***REMOVED***
+}
 
 // Processes returns the processes running inside the cgroup along
 // with the subsystem used, pid, and path
-func (c *cgroup) Processes(subsystem Name, recursive bool) ([]Process, error) ***REMOVED***
+func (c *cgroup) Processes(subsystem Name, recursive bool) ([]Process, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	if c.err != nil ***REMOVED***
+	if c.err != nil {
 		return nil, c.err
-	***REMOVED***
+	}
 	return c.processes(subsystem, recursive)
-***REMOVED***
+}
 
-func (c *cgroup) processes(subsystem Name, recursive bool) ([]Process, error) ***REMOVED***
+func (c *cgroup) processes(subsystem Name, recursive bool) ([]Process, error) {
 	s := c.getSubsystem(subsystem)
 	sp, err := c.path(subsystem)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	path := s.(pather).Path(sp)
 	var processes []Process
-	err = filepath.Walk(path, func(p string, info os.FileInfo, err error) error ***REMOVED***
-		if err != nil ***REMOVED***
+	err = filepath.Walk(path, func(p string, info os.FileInfo, err error) error {
+		if err != nil {
 			return err
-		***REMOVED***
-		if !recursive && info.IsDir() ***REMOVED***
-			if p == path ***REMOVED***
+		}
+		if !recursive && info.IsDir() {
+			if p == path {
 				return nil
-			***REMOVED***
+			}
 			return filepath.SkipDir
-		***REMOVED***
+		}
 		dir, name := filepath.Split(p)
-		if name != cgroupProcs ***REMOVED***
+		if name != cgroupProcs {
 			return nil
-		***REMOVED***
+		}
 		procs, err := readPids(dir, subsystem)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		processes = append(processes, procs...)
 		return nil
-	***REMOVED***)
+	})
 	return processes, err
-***REMOVED***
+}
 
 // Freeze freezes the entire cgroup and all the processes inside it
-func (c *cgroup) Freeze() error ***REMOVED***
+func (c *cgroup) Freeze() error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	if c.err != nil ***REMOVED***
+	if c.err != nil {
 		return c.err
-	***REMOVED***
+	}
 	s := c.getSubsystem(Freezer)
-	if s == nil ***REMOVED***
+	if s == nil {
 		return ErrFreezerNotSupported
-	***REMOVED***
+	}
 	sp, err := c.path(Freezer)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return s.(*freezerController).Freeze(sp)
-***REMOVED***
+}
 
 // Thaw thaws out the cgroup and all the processes inside it
-func (c *cgroup) Thaw() error ***REMOVED***
+func (c *cgroup) Thaw() error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	if c.err != nil ***REMOVED***
+	if c.err != nil {
 		return c.err
-	***REMOVED***
+	}
 	s := c.getSubsystem(Freezer)
-	if s == nil ***REMOVED***
+	if s == nil {
 		return ErrFreezerNotSupported
-	***REMOVED***
+	}
 	sp, err := c.path(Freezer)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return s.(*freezerController).Thaw(sp)
-***REMOVED***
+}
 
 // OOMEventFD returns the memory cgroup's out of memory event fd that triggers
 // when processes inside the cgroup receive an oom event. Returns
 // ErrMemoryNotSupported if memory cgroups is not supported.
-func (c *cgroup) OOMEventFD() (uintptr, error) ***REMOVED***
+func (c *cgroup) OOMEventFD() (uintptr, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	if c.err != nil ***REMOVED***
+	if c.err != nil {
 		return 0, c.err
-	***REMOVED***
+	}
 	s := c.getSubsystem(Memory)
-	if s == nil ***REMOVED***
+	if s == nil {
 		return 0, ErrMemoryNotSupported
-	***REMOVED***
+	}
 	sp, err := c.path(Memory)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	return s.(*memoryController).OOMEventFD(sp)
-***REMOVED***
+}
 
 // State returns the state of the cgroup and its processes
-func (c *cgroup) State() State ***REMOVED***
+func (c *cgroup) State() State {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.checkExists()
-	if c.err != nil && c.err == ErrCgroupDeleted ***REMOVED***
+	if c.err != nil && c.err == ErrCgroupDeleted {
 		return Deleted
-	***REMOVED***
+	}
 	s := c.getSubsystem(Freezer)
-	if s == nil ***REMOVED***
+	if s == nil {
 		return Thawed
-	***REMOVED***
+	}
 	sp, err := c.path(Freezer)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return Unknown
-	***REMOVED***
+	}
 	state, err := s.(*freezerController).state(sp)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return Unknown
-	***REMOVED***
+	}
 	return state
-***REMOVED***
+}
 
 // MoveTo does a recursive move subsystem by subsystem of all the processes
 // inside the group
-func (c *cgroup) MoveTo(destination Cgroup) error ***REMOVED***
+func (c *cgroup) MoveTo(destination Cgroup) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	if c.err != nil ***REMOVED***
+	if c.err != nil {
 		return c.err
-	***REMOVED***
-	for _, s := range c.subsystems ***REMOVED***
+	}
+	for _, s := range c.subsystems {
 		processes, err := c.processes(s.Name(), true)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-		for _, p := range processes ***REMOVED***
-			if err := destination.Add(p); err != nil ***REMOVED***
+		}
+		for _, p := range processes {
+			if err := destination.Add(p); err != nil {
 				return err
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func (c *cgroup) getSubsystem(n Name) Subsystem ***REMOVED***
-	for _, s := range c.subsystems ***REMOVED***
-		if s.Name() == n ***REMOVED***
+func (c *cgroup) getSubsystem(n Name) Subsystem {
+	for _, s := range c.subsystems {
+		if s.Name() == n {
 			return s
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func (c *cgroup) checkExists() ***REMOVED***
-	for _, s := range pathers(c.subsystems) ***REMOVED***
+func (c *cgroup) checkExists() {
+	for _, s := range pathers(c.subsystems) {
 		p, err := c.path(s.Name())
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
-		if _, err := os.Lstat(s.Path(p)); err != nil ***REMOVED***
-			if os.IsNotExist(err) ***REMOVED***
+		}
+		if _, err := os.Lstat(s.Path(p)); err != nil {
+			if os.IsNotExist(err) {
 				c.err = ErrCgroupDeleted
 				return
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}

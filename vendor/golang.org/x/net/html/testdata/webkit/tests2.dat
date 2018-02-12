@@ -559,7 +559,7 @@ test"
 
 #data
 <!DOCTYPE html><body><title>X</title><meta name=z><link rel=foo><style>
-x ***REMOVED*** content:"</style" ***REMOVED*** </style>
+x { content:"</style" } </style>
 #errors
 #document
 | <!DOCTYPE html>
@@ -574,7 +574,7 @@ x ***REMOVED*** content:"</style" ***REMOVED*** </style>
 |       rel="foo"
 |     <style>
 |       "
-x ***REMOVED*** content:"</style" ***REMOVED*** "
+x { content:"</style" } "
 
 #data
 <!DOCTYPE html><select><optgroup></optgroup></select>

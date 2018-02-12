@@ -35,41 +35,41 @@ var errInvalidVarint = errors.New("invalid varint32 encountered")
 // an error if a message has been read and decoded correctly, even if the end
 // of the stream has been reached in doing so.  In that case, any subsequent
 // calls return (0, io.EOF).
-func ReadDelimited(r io.Reader, m proto.Message) (n int, err error) ***REMOVED***
+func ReadDelimited(r io.Reader, m proto.Message) (n int, err error) {
 	// Per AbstractParser#parsePartialDelimitedFrom with
 	// CodedInputStream#readRawVarint32.
 	var headerBuf [binary.MaxVarintLen32]byte
 	var bytesRead, varIntBytes int
 	var messageLength uint64
-	for varIntBytes == 0 ***REMOVED*** // i.e. no varint has been decoded yet.
-		if bytesRead >= len(headerBuf) ***REMOVED***
+	for varIntBytes == 0 { // i.e. no varint has been decoded yet.
+		if bytesRead >= len(headerBuf) {
 			return bytesRead, errInvalidVarint
-		***REMOVED***
+		}
 		// We have to read byte by byte here to avoid reading more bytes
 		// than required. Each read byte is appended to what we have
 		// read before.
 		newBytesRead, err := r.Read(headerBuf[bytesRead : bytesRead+1])
-		if newBytesRead == 0 ***REMOVED***
-			if err != nil ***REMOVED***
+		if newBytesRead == 0 {
+			if err != nil {
 				return bytesRead, err
-			***REMOVED***
+			}
 			// A Reader should not return (0, nil), but if it does,
 			// it should be treated as no-op (according to the
 			// Reader contract). So let's go on...
 			continue
-		***REMOVED***
+		}
 		bytesRead += newBytesRead
 		// Now present everything read so far to the varint decoder and
 		// see if a varint can be decoded already.
 		messageLength, varIntBytes = proto.DecodeVarint(headerBuf[:bytesRead])
-	***REMOVED***
+	}
 
 	messageBuf := make([]byte, messageLength)
 	newBytesRead, err := io.ReadFull(r, messageBuf)
 	bytesRead += newBytesRead
-	if err != nil ***REMOVED***
+	if err != nil {
 		return bytesRead, err
-	***REMOVED***
+	}
 
 	return bytesRead, proto.Unmarshal(messageBuf, m)
-***REMOVED***
+}

@@ -16,89 +16,89 @@ const (
 )
 
 // SecretDriver provides secrets from different stores
-type SecretDriver struct ***REMOVED***
+type SecretDriver struct {
 	plugin plugingetter.CompatPlugin
-***REMOVED***
+}
 
 // NewSecretDriver creates a new driver that provides third party secrets
-func NewSecretDriver(plugin plugingetter.CompatPlugin) *SecretDriver ***REMOVED***
-	return &SecretDriver***REMOVED***plugin: plugin***REMOVED***
-***REMOVED***
+func NewSecretDriver(plugin plugingetter.CompatPlugin) *SecretDriver {
+	return &SecretDriver{plugin: plugin}
+}
 
 // Get gets a secret from the secret provider
-func (d *SecretDriver) Get(spec *api.SecretSpec, task *api.Task) ([]byte, error) ***REMOVED***
-	if spec == nil ***REMOVED***
+func (d *SecretDriver) Get(spec *api.SecretSpec, task *api.Task) ([]byte, error) {
+	if spec == nil {
 		return nil, fmt.Errorf("secret spec is nil")
-	***REMOVED***
-	if task == nil ***REMOVED***
+	}
+	if task == nil {
 		return nil, fmt.Errorf("task is nil")
-	***REMOVED***
+	}
 
 	var secretResp SecretsProviderResponse
-	secretReq := &SecretsProviderRequest***REMOVED***
+	secretReq := &SecretsProviderRequest{
 		SecretName:    spec.Annotations.Name,
 		ServiceName:   task.ServiceAnnotations.Name,
 		ServiceLabels: task.ServiceAnnotations.Labels,
-	***REMOVED***
+	}
 	container := task.Spec.GetContainer()
-	if container != nil ***REMOVED***
+	if container != nil {
 		secretReq.ServiceHostname = container.Hostname
-	***REMOVED***
+	}
 
-	if task.Endpoint != nil && task.Endpoint.Spec != nil ***REMOVED***
-		secretReq.ServiceEndpointSpec = &EndpointSpec***REMOVED***
+	if task.Endpoint != nil && task.Endpoint.Spec != nil {
+		secretReq.ServiceEndpointSpec = &EndpointSpec{
 			Mode: int32(task.Endpoint.Spec.Mode),
-		***REMOVED***
-		for _, p := range task.Endpoint.Spec.Ports ***REMOVED***
-			if p == nil ***REMOVED***
+		}
+		for _, p := range task.Endpoint.Spec.Ports {
+			if p == nil {
 				continue
-			***REMOVED***
+			}
 			secretReq.ServiceEndpointSpec.Ports =
 				append(secretReq.ServiceEndpointSpec.Ports,
-					PortConfig***REMOVED***
+					PortConfig{
 						Name:          p.Name,
 						Protocol:      int32(p.Protocol),
 						PublishedPort: p.PublishedPort,
 						TargetPort:    p.TargetPort,
 						PublishMode:   int32(p.PublishMode),
-					***REMOVED***)
-		***REMOVED***
-	***REMOVED***
+					})
+		}
+	}
 
 	err := d.plugin.Client().Call(SecretsProviderAPI, secretReq, &secretResp)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if secretResp.Err != "" ***REMOVED***
+	}
+	if secretResp.Err != "" {
 		return nil, fmt.Errorf(secretResp.Err)
-	***REMOVED***
+	}
 	// Assign the secret value
 	return secretResp.Value, nil
-***REMOVED***
+}
 
 // SecretsProviderRequest is the secrets provider request.
-type SecretsProviderRequest struct ***REMOVED***
+type SecretsProviderRequest struct {
 	SecretName          string            `json:",omitempty"` // SecretName is the name of the secret to request from the plugin
 	ServiceHostname     string            `json:",omitempty"` // ServiceHostname is the hostname of the service, can be used for x509 certificate
 	ServiceName         string            `json:",omitempty"` // ServiceName is the name of the service that requested the secret
 	ServiceLabels       map[string]string `json:",omitempty"` // ServiceLabels capture environment names and other metadata
 	ServiceEndpointSpec *EndpointSpec     `json:",omitempty"` // ServiceEndpointSpec holds the specification for endpoints
-***REMOVED***
+}
 
 // SecretsProviderResponse is the secrets provider response.
-type SecretsProviderResponse struct ***REMOVED***
+type SecretsProviderResponse struct {
 	Value []byte `json:",omitempty"` // Value is the value of the secret
 	Err   string `json:",omitempty"` // Err is the error response of the plugin
-***REMOVED***
+}
 
 // EndpointSpec represents the spec of an endpoint.
-type EndpointSpec struct ***REMOVED***
+type EndpointSpec struct {
 	Mode  int32        `json:",omitempty"`
 	Ports []PortConfig `json:",omitempty"`
-***REMOVED***
+}
 
 // PortConfig represents the config of a port.
-type PortConfig struct ***REMOVED***
+type PortConfig struct {
 	Name     string `json:",omitempty"`
 	Protocol int32  `json:",omitempty"`
 	// TargetPort is the port inside the container
@@ -107,4 +107,4 @@ type PortConfig struct ***REMOVED***
 	PublishedPort uint32 `json:",omitempty"`
 	// PublishMode is the mode in which port is published
 	PublishMode int32 `json:",omitempty"`
-***REMOVED***
+}

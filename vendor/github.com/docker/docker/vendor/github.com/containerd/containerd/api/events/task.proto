@@ -10,66 +10,66 @@ import weak "github.com/containerd/containerd/protobuf/plugin/fieldpath.proto";
 option go_package = "github.com/containerd/containerd/api/events;events";
 option (containerd.plugin.fieldpath_all) = true;
 
-message TaskCreate ***REMOVED***
+message TaskCreate {
 	string container_id = 1;
 	string bundle = 2;
 	repeated containerd.types.Mount rootfs = 3;
 	TaskIO io = 4 [(gogoproto.customname) = "IO"];
 	string checkpoint = 5;
 	uint32 pid = 6;
-***REMOVED***
+}
 
-message TaskStart ***REMOVED***
+message TaskStart {
 	string container_id = 1;
 	uint32 pid = 2;
-***REMOVED***
+}
 
-message TaskDelete ***REMOVED***
+message TaskDelete {
 	string container_id = 1;
 	uint32 pid = 2;
 	uint32 exit_status = 3;
 	google.protobuf.Timestamp exited_at = 4 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
-***REMOVED***
+}
 
-message TaskIO ***REMOVED***
+message TaskIO {
 	string stdin = 1;
 	string stdout = 2;
 	string stderr = 3;
 	bool terminal = 4;
-***REMOVED***
+}
 
-message TaskExit ***REMOVED***
+message TaskExit {
 	string container_id = 1;
 	string id = 2;
 	uint32 pid = 3;
 	uint32 exit_status = 4;
 	google.protobuf.Timestamp exited_at = 5 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
-***REMOVED***
+}
 
-message TaskOOM ***REMOVED***
+message TaskOOM {
 	string container_id = 1;
-***REMOVED***
+}
 
-message TaskExecAdded ***REMOVED***
+message TaskExecAdded {
 	string container_id = 1;
 	string exec_id = 2;
-***REMOVED***
+}
 
-message TaskExecStarted ***REMOVED***
+message TaskExecStarted {
 	string container_id = 1;
 	string exec_id = 2;
 	uint32 pid = 3;
-***REMOVED***
+}
 
-message TaskPaused ***REMOVED***
+message TaskPaused {
 	string container_id = 1;
-***REMOVED***
+}
 
-message TaskResumed ***REMOVED***
+message TaskResumed {
 	string container_id = 1;
-***REMOVED***
+}
 
-message TaskCheckpointed ***REMOVED***
+message TaskCheckpointed {
 	string container_id = 1;
 	string checkpoint = 2;
-***REMOVED***
+}

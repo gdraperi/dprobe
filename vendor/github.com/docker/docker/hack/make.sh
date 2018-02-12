@@ -24,9 +24,9 @@ set -e
 set -o pipefail
 
 export DOCKER_PKG='github.com/docker/docker'
-export SCRIPTDIR="$( cd "$( dirname "$***REMOVED***BASH_SOURCE[0]***REMOVED***" )" && pwd )"
+export SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export MAKEDIR="$SCRIPTDIR/make"
-export PKG_CONFIG=$***REMOVED***PKG_CONFIG:-pkg-config***REMOVED***
+export PKG_CONFIG=${PKG_CONFIG:-pkg-config}
 
 # We're a nice, sexy, little shell script, and people might try to run us;
 # but really, they shouldn't. We want to be in a container!
@@ -42,14 +42,14 @@ else
 fi
 
 if [ -z "$inContainer" ]; then
-	***REMOVED***
+	{
 		echo "# WARNING! I don't seem to be running in a Docker container."
 		echo "# The result of this command might be an incorrect build, and will not be"
 		echo "# officially supported."
 		echo "#"
 		echo "# Try this instead: make all"
 		echo "#"
-	***REMOVED*** >&2
+	} >&2
 fi
 
 echo
@@ -65,8 +65,8 @@ DEFAULT_BUNDLES=(
 	cross
 )
 
-VERSION=$***REMOVED***VERSION:-dev***REMOVED***
-! BUILDTIME=$(date -u -d "@$***REMOVED***SOURCE_DATE_EPOCH:-$(date +%s)***REMOVED***" --rfc-3339 ns 2> /dev/null | sed -e 's/ /T/')
+VERSION=${VERSION:-dev}
+! BUILDTIME=$(date -u -d "@${SOURCE_DATE_EPOCH:-$(date +%s)}" --rfc-3339 ns 2> /dev/null | sed -e 's/ /T/')
 if [ "$DOCKER_GITCOMMIT" ]; then
 	GITCOMMIT="$DOCKER_GITCOMMIT"
 elif command -v git &> /dev/null && [ -e .git ] && git rev-parse &> /dev/null; then
@@ -92,9 +92,9 @@ fi
 
 if [ "$AUTO_GOPATH" ]; then
 	rm -rf .gopath
-	mkdir -p .gopath/src/"$(dirname "$***REMOVED***DOCKER_PKG***REMOVED***")"
-	ln -sf ../../../.. .gopath/src/"$***REMOVED***DOCKER_PKG***REMOVED***"
-	export GOPATH="$***REMOVED***PWD***REMOVED***/.gopath"
+	mkdir -p .gopath/src/"$(dirname "${DOCKER_PKG}")"
+	ln -sf ../../../.. .gopath/src/"${DOCKER_PKG}"
+	export GOPATH="${PWD}/.gopath"
 fi
 
 if [ ! "$GOPATH" ]; then
@@ -103,9 +103,9 @@ if [ ! "$GOPATH" ]; then
 	exit 1
 fi
 
-if $***REMOVED***PKG_CONFIG***REMOVED*** 'libsystemd >= 209' 2> /dev/null ; then
+if ${PKG_CONFIG} 'libsystemd >= 209' 2> /dev/null ; then
 	DOCKER_BUILDTAGS+=" journald"
-elif $***REMOVED***PKG_CONFIG***REMOVED*** 'libsystemd-journal' 2> /dev/null ; then
+elif ${PKG_CONFIG} 'libsystemd-journal' 2> /dev/null ; then
 	DOCKER_BUILDTAGS+=" journald journald_compat"
 fi
 
@@ -121,7 +121,7 @@ fi
 # functionality.
 if \
 	command -v gcc &> /dev/null \
-	&& ! ( echo -e  '#include <libdevmapper.h>\nint main() ***REMOVED*** dm_task_deferred_remove(NULL); ***REMOVED***'| gcc -xc - -o /dev/null $(pkg-config --libs devmapper) &> /dev/null ) \
+	&& ! ( echo -e  '#include <libdevmapper.h>\nint main() { dm_task_deferred_remove(NULL); }'| gcc -xc - -o /dev/null $(pkg-config --libs devmapper) &> /dev/null ) \
 ; then
 	DOCKER_BUILDTAGS+=' libdm_no_deferred_remove'
 fi
@@ -148,15 +148,15 @@ if [ "$DOCKER_INCREMENTAL_BINARY" == "1" ] || [ "$DOCKER_INCREMENTAL_BINARY" == 
 fi
 ORIG_BUILDFLAGS+=( $REBUILD_FLAG )
 
-BUILDFLAGS=( $BUILDFLAGS "$***REMOVED***ORIG_BUILDFLAGS[@]***REMOVED***" )
+BUILDFLAGS=( $BUILDFLAGS "${ORIG_BUILDFLAGS[@]}" )
 
 # Test timeout.
-if [ "$***REMOVED***DOCKER_ENGINE_GOARCH***REMOVED***" == "arm" ]; then
-	: $***REMOVED***TIMEOUT:=10m***REMOVED***
-elif [ "$***REMOVED***DOCKER_ENGINE_GOARCH***REMOVED***" == "windows" ]; then
-	: $***REMOVED***TIMEOUT:=8m***REMOVED***
+if [ "${DOCKER_ENGINE_GOARCH}" == "arm" ]; then
+	: ${TIMEOUT:=10m}
+elif [ "${DOCKER_ENGINE_GOARCH}" == "windows" ]; then
+	: ${TIMEOUT:=8m}
 else
-	: $***REMOVED***TIMEOUT:=5m***REMOVED***
+	: ${TIMEOUT:=5m}
 fi
 
 LDFLAGS_STATIC_DOCKER="
@@ -174,14 +174,14 @@ if [ "$(uname -s)" = 'FreeBSD' ]; then
 	LDFLAGS="$LDFLAGS -extld clang"
 fi
 
-bundle() ***REMOVED***
+bundle() {
 	local bundle="$1"; shift
 	echo "---> Making bundle: $(basename "$bundle") (in $DEST)"
 	source "$SCRIPTDIR/make/$bundle" "$@"
-***REMOVED***
+}
 
-main() ***REMOVED***
-	if [ -z "$***REMOVED***KEEPBUNDLE-***REMOVED***" ]; then
+main() {
+	if [ -z "${KEEPBUNDLE-}" ]; then
 		echo "Removing bundles/"
 		rm -rf "bundles/*"
 		echo
@@ -196,11 +196,11 @@ main() ***REMOVED***
 	fi
 
 	if [ $# -lt 1 ]; then
-		bundles=($***REMOVED***DEFAULT_BUNDLES[@]***REMOVED***)
+		bundles=(${DEFAULT_BUNDLES[@]})
 	else
 		bundles=($@)
 	fi
-	for bundle in $***REMOVED***bundles[@]***REMOVED***; do
+	for bundle in ${bundles[@]}; do
 		export DEST="bundles/$(basename "$bundle")"
 		# Cygdrive paths don't play well with go build -o.
 		if [[ "$(uname -s)" == CYGWIN* ]]; then
@@ -211,6 +211,6 @@ main() ***REMOVED***
 		bundle "$bundle"
 		echo
 	done
-***REMOVED***
+}
 
 main "$@"

@@ -10,85 +10,85 @@ import "gogoproto/gogo.proto";
 // considered first-class within the cluster object-model.
 
 // Version tracks the last time an object in the store was updated.
-message Version ***REMOVED***
+message Version {
 	uint64 index = 1;
-***REMOVED***
+}
 
-message IndexEntry ***REMOVED***
+message IndexEntry {
 	string key = 1;
 	string val = 2;
-***REMOVED***
+}
 
 // Annotations provide useful information to identify API objects. They are
 // common to all API specs.
-message Annotations ***REMOVED***
+message Annotations {
 	string name = 1;
 	map<string, string> labels = 2;
 
 	// Indices provides keys and values for indexing this object.
 	// A single key may have multiple values.
 	repeated IndexEntry indices = 4 [(gogoproto.nullable) = false];
-***REMOVED***
+}
 
 // NamedGenericResource represents a "user defined" resource which is defined
 // as a string.
 // "Kind" is used to describe the Kind of a resource (e.g: "GPU", "FPGA", "SSD", ...)
 // Value is used to identify the resource (GPU="UUID-1", FPGA="/dev/sdb5", ...)
-message NamedGenericResource ***REMOVED***
+message NamedGenericResource {
 	string kind = 1;
 	string value = 2;
-***REMOVED***
+}
 
 // DiscreteGenericResource represents a "user defined" resource which is defined
 // as an integer
 // "Kind" is used to describe the Kind of a resource (e.g: "GPU", "FPGA", "SSD", ...)
 // Value is used to count the resource (SSD=5, HDD=3, ...)
-message DiscreteGenericResource ***REMOVED***
+message DiscreteGenericResource {
 	string kind = 1;
 	int64 value = 2;
-***REMOVED***
+}
 
 // GenericResource represents a "user defined" resource which can
 // be either an integer (e.g: SSD=3) or a string (e.g: SSD=sda1)
-message GenericResource ***REMOVED***
-	oneof resource ***REMOVED***
+message GenericResource {
+	oneof resource {
 		NamedGenericResource named_resource_spec = 1;
 		DiscreteGenericResource discrete_resource_spec = 2;
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-enum ResourceType ***REMOVED***
+enum ResourceType {
 	TASK = 0;
 	SECRET = 1;
 	CONFIG = 2;
-***REMOVED***
+}
 
-message Resources ***REMOVED***
+message Resources {
 	// Amount of CPUs (e.g. 2000000000 = 2 CPU cores)
 	int64 nano_cpus = 1 [(gogoproto.customname) = "NanoCPUs"];
 
 	// Amount of memory in bytes.
 	int64 memory_bytes = 2;
 
-	// User specified resource (e.g: bananas=2;apple=***REMOVED***red,yellow,green***REMOVED***)
+	// User specified resource (e.g: bananas=2;apple={red,yellow,green})
 	repeated GenericResource generic = 3;
-***REMOVED***
+}
 
-message ResourceRequirements ***REMOVED***
+message ResourceRequirements {
 	Resources limits = 1;
 	Resources reservations = 2;
-***REMOVED***
+}
 
-message Platform ***REMOVED***
+message Platform {
 	// Architecture (e.g. x86_64)
 	string architecture = 1;
 
 	// Operating System (e.g. linux)
 	string os = 2 [(gogoproto.customname) = "OS"];
-***REMOVED***
+}
 
 // PluginDescription describes an engine plugin.
-message PluginDescription ***REMOVED***
+message PluginDescription {
 	// Type of plugin. Canonical values for existing types are
 	// Volume, Network, and Authorization. More types could be
 	// supported in the future.
@@ -96,9 +96,9 @@ message PluginDescription ***REMOVED***
 
 	// Name of the plugin
 	string name = 2;
-***REMOVED***
+}
 
-message EngineDescription ***REMOVED***
+message EngineDescription {
 	// Docker daemon version running on the node.
 	string engine_version = 1;
 
@@ -107,9 +107,9 @@ message EngineDescription ***REMOVED***
 
 	// Volume, Network, and Auth plugins
 	repeated PluginDescription plugins = 3 [(gogoproto.nullable) = false];
-***REMOVED***
+}
 
-message NodeDescription ***REMOVED***
+message NodeDescription {
 	// Hostname of the node as reported by the agent.
 	// This is different from spec.meta.name which is user-defined.
 	string hostname = 1;
@@ -125,21 +125,21 @@ message NodeDescription ***REMOVED***
 
 	// Information on the node's TLS setup
 	NodeTLSInfo tls_info = 5 [(gogoproto.customname) = "TLSInfo"];
-***REMOVED***
+}
 
-message NodeTLSInfo ***REMOVED***
+message NodeTLSInfo {
 	// Information about which root certs the node trusts
 	bytes trust_root = 1;
 
 	// Information about the node's current TLS certificate
 	bytes cert_issuer_subject = 2;
 	bytes cert_issuer_public_key = 3;
-***REMOVED***
+}
 
-message RaftMemberStatus ***REMOVED***
+message RaftMemberStatus {
 	bool leader = 1;
 
-	enum Reachability ***REMOVED***
+	enum Reachability {
 		// Unknown indicates that the manager state cannot be resolved
 		UNKNOWN = 0;
 
@@ -150,15 +150,15 @@ message RaftMemberStatus ***REMOVED***
 		// Reachable indicates that the node is healthy and reachable
 		// by other members.
 		REACHABLE = 2;
-	***REMOVED***
+	}
 
 	Reachability reachability = 2;
 	string message = 3;
-***REMOVED***
+}
 
-message NodeStatus ***REMOVED***
+message NodeStatus {
 	// TODO(aluzzardi) These should be using `gogoproto.enumvalue_customname`.
-	enum State ***REMOVED***
+	enum State {
 		// Unknown indicates the node state cannot be resolved.
 		UNKNOWN = 0;
 
@@ -170,20 +170,20 @@ message NodeStatus ***REMOVED***
 
 		// Disconnected indicates the node is currently trying to find new manager.
 		DISCONNECTED = 3;
-	***REMOVED***
+	}
 
 	State state = 1;
 	string message = 2;
 	// Addr is the node's IP address as observed by the manager
 	string addr = 3;
-***REMOVED***
+}
 
-message Image ***REMOVED***
+message Image {
 	// reference is a docker image reference. This can include a rpository, tag
 	// or be fully qualified witha digest. The format is specified in the
 	// distribution/reference package.
 	string reference = 1;
-***REMOVED***
+}
 
 // Mount describes volume mounts for a container.
 //
@@ -191,15 +191,15 @@ message Image ***REMOVED***
 // source, target. Top-level flags, such as writable, are common to all kinds
 // of mounts, where we also provide options that are specific to a type of
 // mount. This corresponds to flags and data, respectively, in the syscall.
-message Mount ***REMOVED***
-	enum Type ***REMOVED***
+message Mount {
+	enum Type {
 		option (gogoproto.goproto_enum_prefix) = false;
 		option (gogoproto.enum_customname) = "MountType";
 
 		BIND = 0 [(gogoproto.enumvalue_customname) = "MountTypeBind"]; // Bind mount host dir
 		VOLUME = 1 [(gogoproto.enumvalue_customname) = "MountTypeVolume"];  // Remote storage volumes
 		TMPFS = 2 [(gogoproto.enumvalue_customname) = "MountTypeTmpfs"]; // Mount a tmpfs
-	***REMOVED***
+	}
 
 	// Type defines the nature of the mount.
 	Type type = 1;
@@ -215,7 +215,7 @@ message Mount ***REMOVED***
 	bool readonly = 4 [(gogoproto.customname) = "ReadOnly"];
 
 	// Consistency indicates the tolerable level of file system consistency
-	enum Consistency ***REMOVED***
+	enum Consistency {
 		option (gogoproto.goproto_enum_prefix) = false;
 		option (gogoproto.enum_customname) = "MountConsistency";
 
@@ -223,12 +223,12 @@ message Mount ***REMOVED***
 		CONSISTENT = 1 [(gogoproto.enumvalue_customname) = "MountConsistencyFull"];
 		CACHED = 2 [(gogoproto.enumvalue_customname) = "MountConsistencyCached"];
 		DELEGATED = 3 [(gogoproto.enumvalue_customname) = "MountConsistencyDelegated"];
-	***REMOVED***
+	}
 	Consistency consistency = 8;
 
 	// BindOptions specifies options that are specific to a bind mount.
-	message BindOptions ***REMOVED***
-		enum Propagation ***REMOVED***
+	message BindOptions {
+		enum Propagation {
 			option (gogoproto.goproto_enum_prefix) = false;
 			option (gogoproto.enum_customname) = "MountPropagation";
 
@@ -238,14 +238,14 @@ message Mount ***REMOVED***
 			SHARED = 3 [(gogoproto.enumvalue_customname) = "MountPropagationShared"];
 			RSLAVE = 4 [(gogoproto.enumvalue_customname) = "MountPropagationRSlave"];
 			SLAVE = 5 [(gogoproto.enumvalue_customname) = "MountPropagationSlave"];
-		***REMOVED***
+		}
 
 		// Propagation mode of mount.
 		Propagation propagation = 1;
-	***REMOVED***
+	}
 
 	// VolumeOptions contains parameters for mounting the volume.
-	message VolumeOptions ***REMOVED***
+	message VolumeOptions {
 		// nocopy prevents automatic copying of data to the volume with data from target
 		bool nocopy = 1 [(gogoproto.customname) = "NoCopy"];
 
@@ -257,9 +257,9 @@ message Mount ***REMOVED***
 		//
 		// If this is empty, no volume will be created if the volume is missing.
 		Driver driver_config = 3;
-	***REMOVED***
+	}
 
-	message TmpfsOptions ***REMOVED***
+	message TmpfsOptions {
 		// Size sets the size of the tmpfs, in bytes.
 		//
 		// This will be converted to an operating system specific value
@@ -278,7 +278,7 @@ message Mount ***REMOVED***
 		//
 		// From docker/docker/pkg/mount/flags.go:
 		//
-		// var validFlags = map[string]bool***REMOVED***
+		// var validFlags = map[string]bool{
 		// 	"":          true,
 		// 	"size":      true, X
 		// 	"mode":      true, X
@@ -287,11 +287,11 @@ message Mount ***REMOVED***
 		// 	"nr_inodes": true,
 		// 	"nr_blocks": true,
 		// 	"mpol":      true,
-		// ***REMOVED***
+		// }
 		//
 		// Some of these may be straightforward to add, but others, such as
 		// uid/gid have implications in a clustered system.
-	***REMOVED***
+	}
 
 	// Depending on type, one of bind_options or volumes_options will be set.
 
@@ -314,16 +314,16 @@ message Mount ***REMOVED***
 	// TODO(stevvooe): It be better to use a oneof field above, although the
 	// type is enough to make the decision, while being primary to the
 	// datastructure.
-***REMOVED***
+}
 
-message RestartPolicy ***REMOVED***
-	enum RestartCondition ***REMOVED***
+message RestartPolicy {
+	enum RestartCondition {
 		option (gogoproto.goproto_enum_prefix) = false;
 		option (gogoproto.enum_customname) = "RestartCondition";
 		NONE = 0 [(gogoproto.enumvalue_customname) = "RestartOnNone"];
 		ON_FAILURE = 1 [(gogoproto.enumvalue_customname) = "RestartOnFailure"];
 		ANY = 2 [(gogoproto.enumvalue_customname) = "RestartOnAny"];
-	***REMOVED***
+	}
 
 	RestartCondition condition = 1;
 
@@ -339,11 +339,11 @@ message RestartPolicy ***REMOVED***
 	// The time window is unbounded if this is 0.
 	// Note: can't use stdduration because this field needs to be nullable.
 	google.protobuf.Duration window = 4;
-***REMOVED***
+}
 
 // UpdateConfig specifies the rate and policy of updates.
 // TODO(aluzzardi): Consider making this a oneof with RollingStrategy and LockstepStrategy.
-message UpdateConfig ***REMOVED***
+message UpdateConfig {
 	// Maximum number of tasks to be updated in one iteration.
 	// 0 means unlimited parallelism.
 	uint64 parallelism = 1;
@@ -351,11 +351,11 @@ message UpdateConfig ***REMOVED***
 	// Amount of time between updates.
 	google.protobuf.Duration delay = 2 [(gogoproto.stdduration) = true, (gogoproto.nullable) = false];
 
-	enum FailureAction ***REMOVED***
+	enum FailureAction {
 		PAUSE = 0;
 		CONTINUE = 1;
 		ROLLBACK = 2;
-	***REMOVED***
+	}
 
 	// FailureAction is the action to take when an update failures.
 	FailureAction failure_action = 3;
@@ -389,17 +389,17 @@ message UpdateConfig ***REMOVED***
 	// updated task. Either the old task is shut down before the new task
 	// is started, or the new task is started before the old task is shut
 	// down.
-	enum UpdateOrder ***REMOVED***
+	enum UpdateOrder {
 		STOP_FIRST = 0;
 		START_FIRST = 1;
-	***REMOVED***
+	}
 
 	UpdateOrder order = 6;
-***REMOVED***
+}
 
 // UpdateStatus is the status of an update in progress.
-message UpdateStatus ***REMOVED***
-	enum UpdateState ***REMOVED***
+message UpdateStatus {
+	enum UpdateState {
 		UNKNOWN = 0;
 		UPDATING = 1;
 		PAUSED = 2;
@@ -407,7 +407,7 @@ message UpdateStatus ***REMOVED***
 		ROLLBACK_STARTED = 4;
 		ROLLBACK_PAUSED = 5; // if a rollback fails
 		ROLLBACK_COMPLETED = 6;
-	***REMOVED***
+	}
 
 	// State is the state of this update. It indicates whether the
 	// update is in progress, completed, paused, rolling back, or
@@ -435,12 +435,12 @@ message UpdateStatus ***REMOVED***
 	// the update from proceeding (typically the failure of a task to start up
 	// when OnFailure is PAUSE).
 	string message = 4;
-***REMOVED***
+}
 
 // TaskState enumerates the states that a task progresses through within an
 // agent. States are designed to be monotonically increasing, such that if two
 // states are seen by a task, the greater of the new represents the true state.
-enum TaskState ***REMOVED***
+enum TaskState {
 	// TODO(aluzzardi): Move it back into `TaskStatus` because of the naming
 	// collisions of enums.
 
@@ -484,23 +484,23 @@ enum TaskState ***REMOVED***
 	// another state.
 	//
 	// Remove this message when the states are deemed perfect.
-***REMOVED***
+}
 
 // Container specific status.
-message ContainerStatus ***REMOVED***
+message ContainerStatus {
 	string container_id = 1;
 
 	int32 pid = 2 [(gogoproto.customname) = "PID"];
 	int32 exit_code = 3;
-***REMOVED***
+}
 
 // PortStatus specifies the actual allocated runtime state of a list
 // of port configs.
-message PortStatus ***REMOVED***
+message PortStatus {
 	repeated PortConfig ports = 1;
-***REMOVED***
+}
 
-message TaskStatus ***REMOVED***
+message TaskStatus {
 	// Note: can't use stdtime because this field is nullable.
 	google.protobuf.Timestamp timestamp = 1;
 
@@ -533,9 +533,9 @@ message TaskStatus ***REMOVED***
 	string err = 4;
 
 	// Container status contains container specific status information.
-	oneof runtime_status ***REMOVED***
+	oneof runtime_status {
 		ContainerStatus container = 5;
-	***REMOVED***
+	}
 
 	// HostPorts provides a list of ports allocated at the host
 	// level.
@@ -549,14 +549,14 @@ message TaskStatus ***REMOVED***
 	// the Task object.
 	// Note: can't use stdtime because this field is nullable.
 	google.protobuf.Timestamp applied_at = 8;
-***REMOVED***
+}
 
 // NetworkAttachmentConfig specifies how a service should be attached to a particular network.
 //
 // For now, this is a simple struct, but this can include future information
 // instructing Swarm on how this service should work on the particular
 // network.
-message NetworkAttachmentConfig ***REMOVED***
+message NetworkAttachmentConfig {
 	// Target specifies the target network for attachment. This value must be a
 	// network ID.
 	string target = 1;
@@ -568,10 +568,10 @@ message NetworkAttachmentConfig ***REMOVED***
 	repeated string addresses = 3;
 	// DriverAttachmentOpts is a map of driver attachment options for the network target
 	map<string, string> driver_attachment_opts = 4;
-***REMOVED***
+}
 
 // IPAMConfig specifies parameters for IP Address Management.
-message IPAMConfig ***REMOVED***
+message IPAMConfig {
 	// TODO(stevvooe): It may make more sense to manage IPAM and network
 	// definitions separately. This will allow multiple networks to share IPAM
 	// instances. For now, we will follow the conventions of libnetwork and
@@ -579,11 +579,11 @@ message IPAMConfig ***REMOVED***
 
 	// AddressFamily specifies the network address family that
 	// this IPAMConfig belongs to.
-	enum AddressFamily ***REMOVED***
+	enum AddressFamily {
 		UNKNOWN = 0; // satisfy proto3
 		IPV4 = 4;
 		IPV6 = 6;
-	***REMOVED***
+	}
 
 	AddressFamily family = 1;
 
@@ -602,7 +602,7 @@ message IPAMConfig ***REMOVED***
 	// allocated. These addresses may have already been allocated or may be
 	// reserved for another allocation manager.
 	map<string, string> reserved = 5;
-***REMOVED***
+}
 
 // PortConfig specifies an exposed port which can be
 // addressed using the given name. This can be later queried
@@ -610,16 +610,16 @@ message IPAMConfig ***REMOVED***
 // port specifies a port that can be used to address this
 // service external to the cluster by sending a connection
 // request to this port to any node on the cluster.
-message PortConfig ***REMOVED***
-	enum Protocol ***REMOVED***
+message PortConfig {
+	enum Protocol {
 		option (gogoproto.goproto_enum_prefix) = false;
 
 		TCP = 0 [(gogoproto.enumvalue_customname) = "ProtocolTCP"];
 		UDP = 1 [(gogoproto.enumvalue_customname) = "ProtocolUDP"];
-	***REMOVED***
+	}
 
 	// PublishMode controls how ports are published on the swarm.
-	enum PublishMode ***REMOVED***
+	enum PublishMode {
 		option (gogoproto.enum_customname) = "PublishMode";
 		option (gogoproto.goproto_enum_prefix) = false;
 
@@ -631,7 +631,7 @@ message PortConfig ***REMOVED***
 		// the published port is defined, the node will attempt to allocate it,
 		// erroring the task if it fails.
 		HOST = 1 [(gogoproto.enumvalue_customname) = "PublishModeHost"];
-	***REMOVED***
+	}
 
 	// Name for the port. If provided the port information can
 	// be queried using the name as in a DNS SRV query.
@@ -650,38 +650,38 @@ message PortConfig ***REMOVED***
 
 	// PublishMode controls how the port is published.
 	PublishMode publish_mode = 5;
-***REMOVED***
+}
 
 // Driver is a generic driver type to be used throughout the API. For now, a
 // driver is simply a name and set of options. The field contents depend on the
 // target use case and driver application. For example, a network driver may
 // have different rules than a volume driver.
-message Driver ***REMOVED***
+message Driver {
 	string name = 1;
 	map <string, string> options = 2;
-***REMOVED***
+}
 
-message IPAMOptions ***REMOVED***
+message IPAMOptions {
 	Driver driver = 1;
 	repeated IPAMConfig configs = 3;
-***REMOVED***
+}
 
 // Peer should be used anywhere where we are describing a remote peer.
-message Peer ***REMOVED***
+message Peer {
 	string node_id = 1;
 	string addr = 2;
-***REMOVED***
+}
 
 // WeightedPeer should be used anywhere where we are describing a remote peer
 // with a weight.
-message WeightedPeer ***REMOVED***
+message WeightedPeer {
 	Peer peer = 1;
 	int64 weight = 2;
-***REMOVED***
+}
 
 
-message IssuanceStatus ***REMOVED***
-	enum State ***REMOVED***
+message IssuanceStatus {
+	enum State {
 		option (gogoproto.goproto_enum_prefix) = false;
 
 		UNKNOWN = 0 [(gogoproto.enumvalue_customname) = "IssuanceStateUnknown"];
@@ -696,23 +696,23 @@ message IssuanceStatus ***REMOVED***
 		// Signals workers to renew their certificate. From the CA's perspective
 		// this is equivalent to IssuanceStateIssued: a noop.
 		ROTATE = 5 [(gogoproto.enumvalue_customname)="IssuanceStateRotate"];
-	***REMOVED***
+	}
 	State state = 1;
 
 	// Err is set if the Certificate Issuance is in an error state.
 	// The following states should report a companion error:
 	//	FAILED
 	string err = 2;
-***REMOVED***
+}
 
-message AcceptancePolicy ***REMOVED***
-	message RoleAdmissionPolicy ***REMOVED***
-		message Secret ***REMOVED***
+message AcceptancePolicy {
+	message RoleAdmissionPolicy {
+		message Secret {
 			// The actual content (possibly hashed)
 			bytes data = 1;
 			// The type of hash we are using, or "plaintext"
 			string alg = 2;
-		***REMOVED***
+		}
 
 		NodeRole role = 1;
 		// Autoaccept controls which roles' certificates are automatically
@@ -721,15 +721,15 @@ message AcceptancePolicy ***REMOVED***
 		// Secret represents a user-provided string that is necessary for new
 		// nodes to join the cluster
 		Secret secret = 3;
-	***REMOVED***
+	}
 
 	repeated RoleAdmissionPolicy policies = 1;
-***REMOVED***
+}
 
-message ExternalCA ***REMOVED***
-	enum CAProtocol ***REMOVED***
+message ExternalCA {
+	enum CAProtocol {
 		CFSSL = 0 [(gogoproto.enumvalue_customname) = "CAProtocolCFSSL"];
-	***REMOVED***
+	}
 
 	// Protocol is the protocol used by this external CA.
 	CAProtocol protocol = 1;
@@ -743,9 +743,9 @@ message ExternalCA ***REMOVED***
 
 	// CACert specifies which root CA is used by this external CA
 	bytes ca_cert = 4 [(gogoproto.customname) = "CACert"];
-***REMOVED***
+}
 
-message CAConfig ***REMOVED***
+message CAConfig {
 	// NodeCertExpiry is the duration certificates should be issued for
 	// Note: can't use stdduration because this field needs to be nullable.
 	google.protobuf.Duration node_cert_expiry = 1;
@@ -768,36 +768,36 @@ message CAConfig ***REMOVED***
 	// parameters have been in the spec. This will force the manager to generate a new
 	// certificate and key, if none have been provided.
 	uint64 force_rotate = 5;
-***REMOVED***
+}
 
 // OrchestrationConfig defines cluster-level orchestration settings.
-message OrchestrationConfig ***REMOVED***
+message OrchestrationConfig {
 	// TaskHistoryRetentionLimit is the number of historic tasks to keep per instance or
 	// node. If negative, never remove completed or failed tasks.
 	int64 task_history_retention_limit = 1;
 
-***REMOVED***
+}
 
 // TaskDefaults specifies default values for task creation.
-message TaskDefaults ***REMOVED***
+message TaskDefaults {
 	// LogDriver specifies the log driver to use for the cluster if not
 	// specified for each task.
 	//
 	// If this is changed, only new tasks will pick up the new log driver.
 	// Existing tasks will continue to use the previous default until rescheduled.
 	Driver log_driver = 1;
-***REMOVED***
+}
 
 // DispatcherConfig defines cluster-level dispatcher settings.
-message DispatcherConfig ***REMOVED***
+message DispatcherConfig {
 	// HeartbeatPeriod defines how often agent should send heartbeats to
 	// dispatcher.
 	// Note: can't use stdduration because this field needs to be nullable.
 	google.protobuf.Duration heartbeat_period = 1;
-***REMOVED***
+}
 
 // RaftConfig defines raft settings for the cluster.
-message RaftConfig ***REMOVED***
+message RaftConfig {
 	// SnapshotInterval is the number of log entries between snapshots.
 	uint64 snapshot_interval = 1;
 	// KeepOldSnapshots is the number of snapshots to keep beyond the
@@ -812,31 +812,31 @@ message RaftConfig ***REMOVED***
 	// ElectionTick defines the amount of ticks (in seconds) needed
 	// without a leader to trigger a new election.
 	uint32 election_tick = 5;
-***REMOVED***
+}
 
-message EncryptionConfig ***REMOVED***
+message EncryptionConfig {
 	// AutoLockManagers specifies whether or not managers TLS keys and raft data
 	// should be encrypted at rest in such a way that they must be unlocked
 	// before the manager node starts up again.
 	bool auto_lock_managers = 1;
-***REMOVED***
+}
 
-message SpreadOver ***REMOVED***
+message SpreadOver {
 	string spread_descriptor = 1; // label descriptor, such as engine.labels.az
 	// TODO: support node information beyond engine and node labels
 
 	// TODO: in the future, add a map that provides weights for weighted
 	// spreading.
-***REMOVED***
+}
 
-message PlacementPreference ***REMOVED***
-	oneof Preference ***REMOVED***
+message PlacementPreference {
+	oneof Preference {
 		SpreadOver spread = 1;
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Placement specifies task distribution constraints.
-message Placement ***REMOVED***
+message Placement {
 	// Constraints specifies a set of requirements a node should meet for a task.
 	repeated string constraints = 1;
 
@@ -849,18 +849,18 @@ message Placement ***REMOVED***
 	// This field is used in the platform filter for scheduling. If empty,
 	// then the platform filter is off, meaning there are no scheduling restrictions.
 	repeated Platform platforms = 3;
-***REMOVED***
+}
 
 // JoinToken contains the join tokens for workers and managers.
-message JoinTokens ***REMOVED***
+message JoinTokens {
 	// Worker is the join token workers may use to join the swarm.
 	string worker = 1;
 
 	// Manager is the join token workers may use to join the swarm.
 	string manager = 2;
-***REMOVED***
+}
 
-message RootCA ***REMOVED***
+message RootCA {
 	// CAKey is the root CA private key.
 	bytes ca_key = 1 [(gogoproto.customname) = "CAKey"];
 
@@ -880,18 +880,18 @@ message RootCA ***REMOVED***
 	// LastForcedRotation matches the Cluster Spec's CAConfig's ForceRotation counter.
 	// It indicates when the current CA cert and key were generated (or updated).
 	uint64 last_forced_rotation = 6;
-***REMOVED***
+}
 
 
-enum NodeRole ***REMOVED***
+enum NodeRole {
 	option (gogoproto.enum_customname) = "NodeRole";
 	option (gogoproto.goproto_enum_prefix) = false;
 
 	WORKER = 0 [(gogoproto.enumvalue_customname) = "NodeRoleWorker"];
 	MANAGER = 1 [(gogoproto.enumvalue_customname) = "NodeRoleManager"];
-***REMOVED***
+}
 
-message Certificate ***REMOVED***
+message Certificate {
 	NodeRole role = 1;
 
 	bytes csr = 2 [(gogoproto.customname) = "CSR"];
@@ -902,21 +902,21 @@ message Certificate ***REMOVED***
 
 	// CN represents the node ID.
 	string cn = 5 [(gogoproto.customname) = "CN"];
-***REMOVED***
+}
 
 
 // Symmetric keys to encrypt inter-agent communication.
-message EncryptionKey ***REMOVED***
+message EncryptionKey {
 	// Agent subsystem the key is intended for. Example:
 	// networking:gossip
 	string subsystem = 1;
 
 	// Encryption algorithm that can implemented using this key
-	enum Algorithm ***REMOVED***
+	enum Algorithm {
 		option (gogoproto.goproto_enum_prefix) = false;
 
 		AES_128_GCM = 0;
-	***REMOVED***
+	}
 
 	Algorithm algorithm = 2;
 
@@ -925,10 +925,10 @@ message EncryptionKey ***REMOVED***
 	// Time stamp from the lamport clock of the key allocator to
 	// identify the relative age of the key.
 	uint64 lamport_time = 4;
-***REMOVED***
+}
 
 // ManagerStatus provides informations about the state of a manager in the cluster.
-message ManagerStatus ***REMOVED***
+message ManagerStatus {
 	// RaftID specifies the internal ID used by the manager in a raft context, it can never be modified
 	// and is used only for information purposes
 	uint64 raft_id = 1;
@@ -941,10 +941,10 @@ message ManagerStatus ***REMOVED***
 
 	// Reachability specifies whether this node is reachable.
 	RaftMemberStatus.Reachability reachability = 4;
-***REMOVED***
+}
 
 // FileTarget represents a specific target that is backed by a file
-message FileTarget ***REMOVED***
+message FileTarget {
 	// Name represents the final filename in the filesystem
 	string name = 1;
 
@@ -956,10 +956,10 @@ message FileTarget ***REMOVED***
 
 	// Mode represents the FileMode of the file
 	uint32 mode = 4 [(gogoproto.customtype) = "os.FileMode", (gogoproto.nullable) = false];
-***REMOVED***
+}
 
 // SecretReference is the linkage between a service and a secret that it uses.
-message SecretReference ***REMOVED***
+message SecretReference {
 	// SecretID represents the ID of the specific Secret that we're
 	// referencing. This identifier exists so that SecretReferences don't leak
 	// any information about the secret contents.
@@ -970,13 +970,13 @@ message SecretReference ***REMOVED***
 	string secret_name = 2;
 
 	// Target specifies how this secret should be exposed to the task.
-	oneof target ***REMOVED***
+	oneof target {
 		FileTarget file = 3;
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // ConfigReference is the linkage between a service and a config that it uses.
-message ConfigReference ***REMOVED***
+message ConfigReference {
 	// ConfigID represents the ID of the specific Config that we're
 	// referencing.
 	string config_id = 1;
@@ -986,29 +986,29 @@ message ConfigReference ***REMOVED***
 	string config_name = 2;
 
 	// Target specifies how this secret should be exposed to the task.
-	oneof target ***REMOVED***
+	oneof target {
 		FileTarget file = 3;
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // BlacklistedCertificate is a record for a blacklisted certificate. It does not
 // contain the certificate's CN, because these records are indexed by CN.
-message BlacklistedCertificate ***REMOVED***
+message BlacklistedCertificate {
 	// Expiry is the latest known expiration time of a certificate that
 	// was issued for the given CN.
 	// Note: can't use stdtime because this field is nullable.
 	google.protobuf.Timestamp expiry = 1;
-***REMOVED***
+}
 
 // HealthConfig holds configuration settings for the HEALTHCHECK feature.
-message HealthConfig ***REMOVED***
+message HealthConfig {
 	// Test is the test to perform to check that the container is healthy.
 	// An empty slice means to inherit the default.
 	// The options are:
-	// ***REMOVED******REMOVED*** : inherit healthcheck
-	// ***REMOVED***"NONE"***REMOVED*** : disable healthcheck
-	// ***REMOVED***"CMD", args...***REMOVED*** : exec arguments directly
-	// ***REMOVED***"CMD-SHELL", command***REMOVED*** : run command with system's default shell
+	// {} : inherit healthcheck
+	// {"NONE"} : disable healthcheck
+	// {"CMD", args...} : exec arguments directly
+	// {"CMD-SHELL", command} : run command with system's default shell
 	repeated string test = 1;
 
 	// Interval is the time to wait between checks. Zero means inherit.
@@ -1028,46 +1028,46 @@ message HealthConfig ***REMOVED***
 	// which health check failures will note count towards the maximum
 	// number of retries.
 	google.protobuf.Duration start_period = 5;
-***REMOVED***
+}
 
-message MaybeEncryptedRecord ***REMOVED***
-	enum Algorithm ***REMOVED***
+message MaybeEncryptedRecord {
+	enum Algorithm {
 		NONE = 0 [(gogoproto.enumvalue_customname) = "NotEncrypted"];
 		SECRETBOX_SALSA20_POLY1305 = 1 [(gogoproto.enumvalue_customname) = "NACLSecretboxSalsa20Poly1305"];
-	***REMOVED***
+	}
 
 	Algorithm algorithm = 1;
 	bytes data = 2;
 	bytes nonce = 3;
-***REMOVED***
+}
 
 
-message RootRotation ***REMOVED***
+message RootRotation {
 	bytes ca_cert = 1 [(gogoproto.customname) = "CACert"];
 	bytes ca_key = 2 [(gogoproto.customname) = "CAKey"];
 	// cross-signed CA cert is the CACert that has been cross-signed by the previous root
 	bytes cross_signed_ca_cert = 3 [(gogoproto.customname) = "CrossSignedCACert"];
-***REMOVED***
+}
 
 // Privileges specifies security configuration/permissions.
-message Privileges ***REMOVED***
+message Privileges {
 	// CredentialSpec for managed service account (Windows only).
-	message CredentialSpec ***REMOVED***
-		oneof source ***REMOVED***
+	message CredentialSpec {
+		oneof source {
 			string file = 1;
 			string registry = 2;
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	CredentialSpec credential_spec = 1;
 
 	// SELinuxContext contains the SELinux labels for the container.
-	message SELinuxContext ***REMOVED***
+	message SELinuxContext {
 		bool disable = 1;
 
 		string user = 2;
 		string role = 3;
 		string type = 4;
 		string level = 5;
-	***REMOVED***
+	}
 	SELinuxContext selinux_context = 2 [(gogoproto.customname) = "SELinuxContext"];
-***REMOVED***
+}

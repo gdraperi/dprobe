@@ -77,7 +77,7 @@ Examples:
 ```go
 viper.SetDefault("ContentDir", "content")
 viper.SetDefault("LayoutDir", "layouts")
-viper.SetDefault("Taxonomies", map[string]string***REMOVED***"tag": "tags", "category": "categories"***REMOVED***)
+viper.SetDefault("Taxonomies", map[string]string{"tag": "tags", "category": "categories"})
 ```
 
 ### Reading Config Files
@@ -98,9 +98,9 @@ viper.AddConfigPath("/etc/appname/")   // path to look for the config file in
 viper.AddConfigPath("$HOME/.appname")  // call multiple times to add many search paths
 viper.AddConfigPath(".")               // optionally look for config in the working directory
 err := viper.ReadInConfig() // Find and read the config file
-if err != nil ***REMOVED*** // Handle errors reading the config file
+if err != nil { // Handle errors reading the config file
 	panic(fmt.Errorf("Fatal error config file: %s \n", err))
-***REMOVED***
+}
 ```
 
 ### Watching and re-reading config files
@@ -118,9 +118,9 @@ Optionally you can provide a function for Viper to run each time a change occurs
 
 ```go
 viper.WatchConfig()
-viper.OnConfigChange(func(e fsnotify.Event) ***REMOVED***
+viper.OnConfigChange(func(e fsnotify.Event) {
 	fmt.Println("Config file changed:", e.Name)
-***REMOVED***)
+})
 ```
 
 ### Reading Config from io.Reader
@@ -276,7 +276,7 @@ import (
 	"github.com/spf13/pflag"
 )
 
-func main() ***REMOVED***
+func main() {
 
 	// using standard library "flag" package
 	flag.Int("flagname", 1234, "help message for flagname")
@@ -288,7 +288,7 @@ func main() ***REMOVED***
 	i := viper.GetInt("flagname") // retrieve value from viper
 
 	...
-***REMOVED***
+}
 ```
 
 #### Flag interfaces
@@ -298,39 +298,39 @@ Viper provides two Go interfaces to bind other flag systems if you don’t use `
 `FlagValue` represents a single flag. This is a very simple example on how to implement this interface:
 
 ```go
-type myFlag struct ***REMOVED******REMOVED***
-func (f myFlag) HasChanged() bool ***REMOVED*** return false ***REMOVED***
-func (f myFlag) Name() string ***REMOVED*** return "my-flag-name" ***REMOVED***
-func (f myFlag) ValueString() string ***REMOVED*** return "my-flag-value" ***REMOVED***
-func (f myFlag) ValueType() string ***REMOVED*** return "string" ***REMOVED***
+type myFlag struct {}
+func (f myFlag) HasChanged() bool { return false }
+func (f myFlag) Name() string { return "my-flag-name" }
+func (f myFlag) ValueString() string { return "my-flag-value" }
+func (f myFlag) ValueType() string { return "string" }
 ```
 
 Once your flag implements this interface, you can simply tell Viper to bind it:
 
 ```go
-viper.BindFlagValue("my-flag-name", myFlag***REMOVED******REMOVED***)
+viper.BindFlagValue("my-flag-name", myFlag{})
 ```
 
 `FlagValueSet` represents a group of flags. This is a very simple example on how to implement this interface:
 
 ```go
-type myFlagSet struct ***REMOVED***
+type myFlagSet struct {
 	flags []myFlag
-***REMOVED***
+}
 
-func (f myFlagSet) VisitAll(fn func(FlagValue)) ***REMOVED***
-	for _, flag := range flags ***REMOVED***
+func (f myFlagSet) VisitAll(fn func(FlagValue)) {
+	for _, flag := range flags {
 		fn(flag)
-	***REMOVED***
-***REMOVED***
+	}
+}
 ```
 
 Once your flag set implements this interface, you can simply tell Viper to bind it:
 
 ```go
-fSet := myFlagSet***REMOVED***
-	flags: []myFlag***REMOVED***myFlag***REMOVED******REMOVED***, myFlag***REMOVED******REMOVED******REMOVED***,
-***REMOVED***
+fSet := myFlagSet{
+	flags: []myFlag{myFlag{}, myFlag{}},
+}
 viper.BindFlagValues("my-flags", fSet)
 ```
 
@@ -403,22 +403,22 @@ err := runtime_viper.ReadRemoteConfig()
 runtime_viper.Unmarshal(&runtime_conf)
 
 // open a goroutine to watch remote changes forever
-go func()***REMOVED***
-	for ***REMOVED***
+go func(){
+	for {
 	    time.Sleep(time.Second * 5) // delay after each request
 
 	    // currently, only tested with etcd support
 	    err := runtime_viper.WatchRemoteConfig()
-	    if err != nil ***REMOVED***
+	    if err != nil {
 	        log.Errorf("unable to read remote config: %v", err)
 	        continue
-	***REMOVED***
+	    }
 
 	    // unmarshal new config into our runtime config struct. you can also use channel
 	    // to implement a signal to notify the system of the changes
 	    runtime_viper.Unmarshal(&runtime_conf)
-	***REMOVED***
-***REMOVED***()
+	}
+}()
 ```
 
 ## Getting Values From Viper
@@ -426,12 +426,12 @@ go func()***REMOVED***
 In Viper, there are a few ways to get a value depending on the value’s type.
 The following functions and methods exist:
 
- * `Get(key string) : interface***REMOVED******REMOVED***`
+ * `Get(key string) : interface{}`
  * `GetBool(key string) : bool`
  * `GetFloat64(key string) : float64`
  * `GetInt(key string) : int`
  * `GetString(key string) : string`
- * `GetStringMap(key string) : map[string]interface***REMOVED******REMOVED***`
+ * `GetStringMap(key string) : map[string]interface{}`
  * `GetStringMapString(key string) : map[string]string`
  * `GetStringSlice(key string) : []string`
  * `GetTime(key string) : time.Time`
@@ -445,9 +445,9 @@ has been provided.
 Example:
 ```go
 viper.GetString("logfile") // case-insensitive Setting & Getting
-if viper.GetBool("verbose") ***REMOVED***
+if viper.GetBool("verbose") {
     fmt.Println("verbose enabled")
-***REMOVED***
+}
 ```
 ### Accessing nested keys
 
@@ -455,22 +455,22 @@ The accessor methods also accept formatted paths to deeply nested keys. For
 example, if the following JSON file is loaded:
 
 ```json
-***REMOVED***
-    "host": ***REMOVED***
+{
+    "host": {
         "address": "localhost",
         "port": 5799
-***REMOVED***,
-    "datastore": ***REMOVED***
-        "metric": ***REMOVED***
+    },
+    "datastore": {
+        "metric": {
             "host": "127.0.0.1",
             "port": 3099
-    ***REMOVED***,
-        "warehouse": ***REMOVED***
+        },
+        "warehouse": {
             "host": "198.0.0.1",
             "port": 2112
-    ***REMOVED***
-***REMOVED***
-***REMOVED***
+        }
+    }
+}
 
 ```
 
@@ -496,23 +496,23 @@ Lastly, if there exists a key that matches the delimited key path, its value
 will be returned instead. E.g.
 
 ```json
-***REMOVED***
+{
     "datastore.metric.host": "0.0.0.0",
-    "host": ***REMOVED***
+    "host": {
         "address": "localhost",
         "port": 5799
-***REMOVED***,
-    "datastore": ***REMOVED***
-        "metric": ***REMOVED***
+    },
+    "datastore": {
+        "metric": {
             "host": "127.0.0.1",
             "port": 3099
-    ***REMOVED***,
-        "warehouse": ***REMOVED***
+        },
+        "warehouse": {
             "host": "198.0.0.1",
             "port": 2112
-    ***REMOVED***
-***REMOVED***
-***REMOVED***
+        }
+    }
+}
 
 GetString("datastore.metric.host") // returns "0.0.0.0"
 ```
@@ -549,7 +549,7 @@ item-size: 64
 Suppose we have:
 
 ```go
-func NewCache(cfg *Viper) *Cache ***REMOVED***...***REMOVED***
+func NewCache(cfg *Viper) *Cache {...}
 ```
 
 which creates a cache based on config information formatted as `subv`.
@@ -570,24 +570,24 @@ etc.
 
 There are two methods to do this:
 
- * `Unmarshal(rawVal interface***REMOVED******REMOVED***) : error`
- * `UnmarshalKey(key string, rawVal interface***REMOVED******REMOVED***) : error`
+ * `Unmarshal(rawVal interface{}) : error`
+ * `UnmarshalKey(key string, rawVal interface{}) : error`
 
 Example:
 
 ```go
-type config struct ***REMOVED***
+type config struct {
 	Port int
 	Name string
 	PathMap string `mapstructure:"path_map"`
-***REMOVED***
+}
 
 var C config
 
 err := Unmarshal(&C)
-if err != nil ***REMOVED***
+if err != nil {
 	t.Fatalf("unable to decode into struct, %v", err)
-***REMOVED***
+}
 ```
 
 ## Viper or Vipers?

@@ -20,7 +20,7 @@ const (
 	maxRate = 168
 )
 
-type state struct ***REMOVED***
+type state struct {
 	// Generic sponge components.
 	a    [25]uint64 // main state of the hash
 	buf  []byte     // points into storage
@@ -44,40 +44,40 @@ type state struct ***REMOVED***
 	// Specific to SHA-3 and SHAKE.
 	outputLen int             // the default output size in bytes
 	state     spongeDirection // whether the sponge is absorbing or squeezing
-***REMOVED***
+}
 
 // BlockSize returns the rate of sponge underlying this hash function.
-func (d *state) BlockSize() int ***REMOVED*** return d.rate ***REMOVED***
+func (d *state) BlockSize() int { return d.rate }
 
 // Size returns the output size of the hash function in bytes.
-func (d *state) Size() int ***REMOVED*** return d.outputLen ***REMOVED***
+func (d *state) Size() int { return d.outputLen }
 
 // Reset clears the internal state by zeroing the sponge state and
 // the byte buffer, and setting Sponge.state to absorbing.
-func (d *state) Reset() ***REMOVED***
+func (d *state) Reset() {
 	// Zero the permutation's state.
-	for i := range d.a ***REMOVED***
+	for i := range d.a {
 		d.a[i] = 0
-	***REMOVED***
+	}
 	d.state = spongeAbsorbing
 	d.buf = d.storage[:0]
-***REMOVED***
+}
 
-func (d *state) clone() *state ***REMOVED***
+func (d *state) clone() *state {
 	ret := *d
-	if ret.state == spongeAbsorbing ***REMOVED***
+	if ret.state == spongeAbsorbing {
 		ret.buf = ret.storage[:len(ret.buf)]
-	***REMOVED*** else ***REMOVED***
+	} else {
 		ret.buf = ret.storage[d.rate-cap(d.buf) : d.rate]
-	***REMOVED***
+	}
 
 	return &ret
-***REMOVED***
+}
 
 // permute applies the KeccakF-1600 permutation. It handles
 // any input-output buffering.
-func (d *state) permute() ***REMOVED***
-	switch d.state ***REMOVED***
+func (d *state) permute() {
+	switch d.state {
 	case spongeAbsorbing:
 		// If we're absorbing, we need to xor the input into the state
 		// before applying the permutation.
@@ -90,15 +90,15 @@ func (d *state) permute() ***REMOVED***
 		keccakF1600(&d.a)
 		d.buf = d.storage[:d.rate]
 		copyOut(d, d.buf)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // pads appends the domain separation bits in dsbyte, applies
 // the multi-bitrate 10..1 padding rule, and permutes the state.
-func (d *state) padAndPermute(dsbyte byte) ***REMOVED***
-	if d.buf == nil ***REMOVED***
+func (d *state) padAndPermute(dsbyte byte) {
+	if d.buf == nil {
 		d.buf = d.storage[:0]
-	***REMOVED***
+	}
 	// Pad with this instance's domain-separator bits. We know that there's
 	// at least one byte of space in d.buf because, if it were full,
 	// permute would have been called to empty it. dsbyte also contains the
@@ -106,9 +106,9 @@ func (d *state) padAndPermute(dsbyte byte) ***REMOVED***
 	d.buf = append(d.buf, dsbyte)
 	zerosStart := len(d.buf)
 	d.buf = d.storage[:d.rate]
-	for i := zerosStart; i < d.rate; i++ ***REMOVED***
+	for i := zerosStart; i < d.rate; i++ {
 		d.buf[i] = 0
-	***REMOVED***
+	}
 	// This adds the final one bit for the padding. Because of the way that
 	// bits are numbered from the LSB upwards, the final bit is the MSB of
 	// the last byte.
@@ -118,75 +118,75 @@ func (d *state) padAndPermute(dsbyte byte) ***REMOVED***
 	d.state = spongeSqueezing
 	d.buf = d.storage[:d.rate]
 	copyOut(d, d.buf)
-***REMOVED***
+}
 
 // Write absorbs more data into the hash's state. It produces an error
 // if more data is written to the ShakeHash after writing
-func (d *state) Write(p []byte) (written int, err error) ***REMOVED***
-	if d.state != spongeAbsorbing ***REMOVED***
+func (d *state) Write(p []byte) (written int, err error) {
+	if d.state != spongeAbsorbing {
 		panic("sha3: write to sponge after read")
-	***REMOVED***
-	if d.buf == nil ***REMOVED***
+	}
+	if d.buf == nil {
 		d.buf = d.storage[:0]
-	***REMOVED***
+	}
 	written = len(p)
 
-	for len(p) > 0 ***REMOVED***
-		if len(d.buf) == 0 && len(p) >= d.rate ***REMOVED***
+	for len(p) > 0 {
+		if len(d.buf) == 0 && len(p) >= d.rate {
 			// The fast path; absorb a full "rate" bytes of input and apply the permutation.
 			xorIn(d, p[:d.rate])
 			p = p[d.rate:]
 			keccakF1600(&d.a)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			// The slow path; buffer the input until we can fill the sponge, and then xor it in.
 			todo := d.rate - len(d.buf)
-			if todo > len(p) ***REMOVED***
+			if todo > len(p) {
 				todo = len(p)
-			***REMOVED***
+			}
 			d.buf = append(d.buf, p[:todo]...)
 			p = p[todo:]
 
 			// If the sponge is full, apply the permutation.
-			if len(d.buf) == d.rate ***REMOVED***
+			if len(d.buf) == d.rate {
 				d.permute()
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	return
-***REMOVED***
+}
 
 // Read squeezes an arbitrary number of bytes from the sponge.
-func (d *state) Read(out []byte) (n int, err error) ***REMOVED***
+func (d *state) Read(out []byte) (n int, err error) {
 	// If we're still absorbing, pad and apply the permutation.
-	if d.state == spongeAbsorbing ***REMOVED***
+	if d.state == spongeAbsorbing {
 		d.padAndPermute(d.dsbyte)
-	***REMOVED***
+	}
 
 	n = len(out)
 
 	// Now, do the squeezing.
-	for len(out) > 0 ***REMOVED***
+	for len(out) > 0 {
 		n := copy(out, d.buf)
 		d.buf = d.buf[n:]
 		out = out[n:]
 
 		// Apply the permutation if we've squeezed the sponge dry.
-		if len(d.buf) == 0 ***REMOVED***
+		if len(d.buf) == 0 {
 			d.permute()
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return
-***REMOVED***
+}
 
 // Sum applies padding to the hash state and then squeezes out the desired
 // number of output bytes.
-func (d *state) Sum(in []byte) []byte ***REMOVED***
+func (d *state) Sum(in []byte) []byte {
 	// Make a copy of the original hash so that caller can keep writing
 	// and summing.
 	dup := d.clone()
 	hash := make([]byte, dup.outputLen)
 	dup.Read(hash)
 	return append(in, hash...)
-***REMOVED***
+}

@@ -42,23 +42,23 @@ import (
     "github.com/vishvananda/netlink"
 )
 
-func main() ***REMOVED***
+func main() {
     la := netlink.NewLinkAttrs()
     la.Name = "foo"
-    mybridge := &netlink.Bridge***REMOVED***LinkAttrs: la***REMOVED***
+    mybridge := &netlink.Bridge{LinkAttrs: la}
     err := netlink.LinkAdd(mybridge)
-    if err != nil  ***REMOVED***
+    if err != nil  {
         fmt.Printf("could not add %s: %v\n", la.Name, err)
-***REMOVED***
+    }
     eth1, _ := netlink.LinkByName("eth1")
     netlink.LinkSetMaster(eth1, mybridge)
-***REMOVED***
+}
 
 ```
 Note `NewLinkAttrs` constructor, it sets default values in structure. For now
 it sets only `TxQLen` to `-1`, so kernel will set default by itself. If you're
-using simple initialization(`LinkAttrs***REMOVED***Name: "foo"***REMOVED***`) `TxQLen` will be set to
-`0` unless you specify it like `LinkAttrs***REMOVED***Name: "foo", TxQLen: 1000***REMOVED***`.
+using simple initialization(`LinkAttrs{Name: "foo"}`) `TxQLen` will be set to
+`0` unless you specify it like `LinkAttrs{Name: "foo", TxQLen: 1000}`.
 
 Add a new ip address to loopback:
 
@@ -69,11 +69,11 @@ import (
     "github.com/vishvananda/netlink"
 )
 
-func main() ***REMOVED***
+func main() {
     lo, _ := netlink.LinkByName("lo")
     addr, _ := netlink.ParseAddr("169.254.169.254/32")
     netlink.AddrAdd(lo, addr)
-***REMOVED***
+}
 
 ```
 

@@ -9,4 +9,4 @@ import (
 )
 
 // All is a list of all defined encodings in this package.
-var All = []encoding.Encoding***REMOVED***GB18030, GBK, HZGB2312***REMOVED***
+var All = []encoding.Encoding{GB18030, GBK, HZGB2312}

@@ -5,7 +5,7 @@
 // for setting quota limits on a newly created directory.
 // It currently supports the legacy XFS specific ioctls.
 //
-// TODO: use generic quota control ioctl FS_IOC_FS***REMOVED***GET,SET***REMOVED***XATTR
+// TODO: use generic quota control ioctl FS_IOC_FS{GET,SET}XATTR
 //       for both xfs/ext4 for kernel version >= v4.5
 //
 
@@ -19,13 +19,13 @@ package quota
 #include <linux/dqblk_xfs.h>
 
 #ifndef FS_XFLAG_PROJINHERIT
-struct fsxattr ***REMOVED***
+struct fsxattr {
 	__u32		fsx_xflags;
 	__u32		fsx_extsize;
 	__u32		fsx_nextents;
 	__u32		fsx_projid;
 	unsigned char	fsx_pad[12];
-***REMOVED***;
+};
 #define FS_XFLAG_PROJINHERIT	0x00000200
 #endif
 #ifndef FS_IOC_FSGETXATTR
@@ -64,17 +64,17 @@ import (
 )
 
 // Quota limit params - currently we only control blocks hard limit
-type Quota struct ***REMOVED***
+type Quota struct {
 	Size uint64
-***REMOVED***
+}
 
 // Control - Context to be used by storage driver (e.g. overlay)
 // who wants to apply project quotas to container dirs
-type Control struct ***REMOVED***
+type Control struct {
 	backingFsBlockDev string
 	nextProjectID     uint32
 	quotas            map[string]uint32
-***REMOVED***
+}
 
 // NewControl - initialize project quota support.
 // Test to make sure that quota can be set on a test dir and find
@@ -98,100 +98,100 @@ type Control struct ***REMOVED***
 // on it. If that works, continue to scan existing containers to map allocated
 // project ids.
 //
-func NewControl(basePath string) (*Control, error) ***REMOVED***
+func NewControl(basePath string) (*Control, error) {
 	//
 	// If we are running in a user namespace quota won't be supported for
 	// now since makeBackingFsDev() will try to mknod().
 	//
-	if rsystem.RunningInUserNS() ***REMOVED***
+	if rsystem.RunningInUserNS() {
 		return nil, ErrQuotaNotSupported
-	***REMOVED***
+	}
 
 	//
 	// create backing filesystem device node
 	//
 	backingFsBlockDev, err := makeBackingFsDev(basePath)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// check if we can call quotactl with project quotas
 	// as a mechanism to determine (early) if we have support
 	hasQuotaSupport, err := hasQuotaSupport(backingFsBlockDev)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if !hasQuotaSupport ***REMOVED***
+	}
+	if !hasQuotaSupport {
 		return nil, ErrQuotaNotSupported
-	***REMOVED***
+	}
 
 	//
 	// Get project id of parent dir as minimal id to be used by driver
 	//
 	minProjectID, err := getProjectID(basePath)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	minProjectID++
 
 	//
 	// Test if filesystem supports project quotas by trying to set
 	// a quota on the first available project id
 	//
-	quota := Quota***REMOVED***
+	quota := Quota{
 		Size: 0,
-	***REMOVED***
-	if err := setProjectQuota(backingFsBlockDev, minProjectID, quota); err != nil ***REMOVED***
+	}
+	if err := setProjectQuota(backingFsBlockDev, minProjectID, quota); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	q := Control***REMOVED***
+	q := Control{
 		backingFsBlockDev: backingFsBlockDev,
 		nextProjectID:     minProjectID + 1,
 		quotas:            make(map[string]uint32),
-	***REMOVED***
+	}
 
 	//
 	// get first project id to be used for next container
 	//
 	err = q.findNextProjectID(basePath)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	logrus.Debugf("NewControl(%s): nextProjectID = %d", basePath, q.nextProjectID)
 	return &q, nil
-***REMOVED***
+}
 
 // SetQuota - assign a unique project id to directory and set the quota limits
 // for that project id
-func (q *Control) SetQuota(targetPath string, quota Quota) error ***REMOVED***
+func (q *Control) SetQuota(targetPath string, quota Quota) error {
 
 	projectID, ok := q.quotas[targetPath]
-	if !ok ***REMOVED***
+	if !ok {
 		projectID = q.nextProjectID
 
 		//
 		// assign project id to new container directory
 		//
 		err := setProjectID(targetPath, projectID)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 
 		q.quotas[targetPath] = projectID
 		q.nextProjectID++
-	***REMOVED***
+	}
 
 	//
 	// set the quota limit for the container's project id
 	//
 	logrus.Debugf("SetQuota(%s, %d): projectID=%d", targetPath, quota.Size, projectID)
 	return setProjectQuota(q.backingFsBlockDev, projectID, quota)
-***REMOVED***
+}
 
 // setProjectQuota - set the quota for project id on xfs block device
-func setProjectQuota(backingFsBlockDev string, projectID uint32, quota Quota) error ***REMOVED***
+func setProjectQuota(backingFsBlockDev string, projectID uint32, quota Quota) error {
 	var d C.fs_disk_quota_t
 	d.d_version = C.FS_DQUOT_VERSION
 	d.d_id = C.__u32(projectID)
@@ -207,21 +207,21 @@ func setProjectQuota(backingFsBlockDev string, projectID uint32, quota Quota) er
 	_, _, errno := unix.Syscall6(unix.SYS_QUOTACTL, C.Q_XSETPQLIM,
 		uintptr(unsafe.Pointer(cs)), uintptr(d.d_id),
 		uintptr(unsafe.Pointer(&d)), 0, 0)
-	if errno != 0 ***REMOVED***
+	if errno != 0 {
 		return fmt.Errorf("Failed to set quota limit for projid %d on %s: %v",
 			projectID, backingFsBlockDev, errno.Error())
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // GetQuota - get the quota limits of a directory that was configured with SetQuota
-func (q *Control) GetQuota(targetPath string, quota *Quota) error ***REMOVED***
+func (q *Control) GetQuota(targetPath string, quota *Quota) error {
 
 	projectID, ok := q.quotas[targetPath]
-	if !ok ***REMOVED***
+	if !ok {
 		return fmt.Errorf("quota not found for path : %s", targetPath)
-	***REMOVED***
+	}
 
 	//
 	// get the quota limit for the container's project id
@@ -234,124 +234,124 @@ func (q *Control) GetQuota(targetPath string, quota *Quota) error ***REMOVED***
 	_, _, errno := unix.Syscall6(unix.SYS_QUOTACTL, C.Q_XGETPQUOTA,
 		uintptr(unsafe.Pointer(cs)), uintptr(C.__u32(projectID)),
 		uintptr(unsafe.Pointer(&d)), 0, 0)
-	if errno != 0 ***REMOVED***
+	if errno != 0 {
 		return fmt.Errorf("Failed to get quota limit for projid %d on %s: %v",
 			projectID, q.backingFsBlockDev, errno.Error())
-	***REMOVED***
+	}
 	quota.Size = uint64(d.d_blk_hardlimit) * 512
 
 	return nil
-***REMOVED***
+}
 
 // getProjectID - get the project id of path on xfs
-func getProjectID(targetPath string) (uint32, error) ***REMOVED***
+func getProjectID(targetPath string) (uint32, error) {
 	dir, err := openDir(targetPath)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	defer closeDir(dir)
 
 	var fsx C.struct_fsxattr
 	_, _, errno := unix.Syscall(unix.SYS_IOCTL, getDirFd(dir), C.FS_IOC_FSGETXATTR,
 		uintptr(unsafe.Pointer(&fsx)))
-	if errno != 0 ***REMOVED***
+	if errno != 0 {
 		return 0, fmt.Errorf("Failed to get projid for %s: %v", targetPath, errno.Error())
-	***REMOVED***
+	}
 
 	return uint32(fsx.fsx_projid), nil
-***REMOVED***
+}
 
 // setProjectID - set the project id of path on xfs
-func setProjectID(targetPath string, projectID uint32) error ***REMOVED***
+func setProjectID(targetPath string, projectID uint32) error {
 	dir, err := openDir(targetPath)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer closeDir(dir)
 
 	var fsx C.struct_fsxattr
 	_, _, errno := unix.Syscall(unix.SYS_IOCTL, getDirFd(dir), C.FS_IOC_FSGETXATTR,
 		uintptr(unsafe.Pointer(&fsx)))
-	if errno != 0 ***REMOVED***
+	if errno != 0 {
 		return fmt.Errorf("Failed to get projid for %s: %v", targetPath, errno.Error())
-	***REMOVED***
+	}
 	fsx.fsx_projid = C.__u32(projectID)
 	fsx.fsx_xflags |= C.FS_XFLAG_PROJINHERIT
 	_, _, errno = unix.Syscall(unix.SYS_IOCTL, getDirFd(dir), C.FS_IOC_FSSETXATTR,
 		uintptr(unsafe.Pointer(&fsx)))
-	if errno != 0 ***REMOVED***
+	if errno != 0 {
 		return fmt.Errorf("Failed to set projid for %s: %v", targetPath, errno.Error())
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // findNextProjectID - find the next project id to be used for containers
 // by scanning driver home directory to find used project ids
-func (q *Control) findNextProjectID(home string) error ***REMOVED***
+func (q *Control) findNextProjectID(home string) error {
 	files, err := ioutil.ReadDir(home)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("read directory failed : %s", home)
-	***REMOVED***
-	for _, file := range files ***REMOVED***
-		if !file.IsDir() ***REMOVED***
+	}
+	for _, file := range files {
+		if !file.IsDir() {
 			continue
-		***REMOVED***
+		}
 		path := filepath.Join(home, file.Name())
 		projid, err := getProjectID(path)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-		if projid > 0 ***REMOVED***
+		}
+		if projid > 0 {
 			q.quotas[path] = projid
-		***REMOVED***
-		if q.nextProjectID <= projid ***REMOVED***
+		}
+		if q.nextProjectID <= projid {
 			q.nextProjectID = projid + 1
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
-func free(p *C.char) ***REMOVED***
+func free(p *C.char) {
 	C.free(unsafe.Pointer(p))
-***REMOVED***
+}
 
-func openDir(path string) (*C.DIR, error) ***REMOVED***
+func openDir(path string) (*C.DIR, error) {
 	Cpath := C.CString(path)
 	defer free(Cpath)
 
 	dir := C.opendir(Cpath)
-	if dir == nil ***REMOVED***
+	if dir == nil {
 		return nil, fmt.Errorf("Can't open dir")
-	***REMOVED***
+	}
 	return dir, nil
-***REMOVED***
+}
 
-func closeDir(dir *C.DIR) ***REMOVED***
-	if dir != nil ***REMOVED***
+func closeDir(dir *C.DIR) {
+	if dir != nil {
 		C.closedir(dir)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func getDirFd(dir *C.DIR) uintptr ***REMOVED***
+func getDirFd(dir *C.DIR) uintptr {
 	return uintptr(C.dirfd(dir))
-***REMOVED***
+}
 
 // Get the backing block device of the driver home directory
 // and create a block device node under the home directory
 // to be used by quotactl commands
-func makeBackingFsDev(home string) (string, error) ***REMOVED***
+func makeBackingFsDev(home string) (string, error) {
 	var stat unix.Stat_t
-	if err := unix.Stat(home, &stat); err != nil ***REMOVED***
+	if err := unix.Stat(home, &stat); err != nil {
 		return "", err
-	***REMOVED***
+	}
 
 	backingFsBlockDev := path.Join(home, "backingFsBlockDev")
 	// Re-create just in case someone copied the home directory over to a new device
 	unix.Unlink(backingFsBlockDev)
 	err := unix.Mknod(backingFsBlockDev, unix.S_IFBLK|0600, int(stat.Dev))
-	switch err ***REMOVED***
+	switch err {
 	case nil:
 		return backingFsBlockDev, nil
 
@@ -360,25 +360,25 @@ func makeBackingFsDev(home string) (string, error) ***REMOVED***
 
 	default:
 		return "", fmt.Errorf("Failed to mknod %s: %v", backingFsBlockDev, err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func hasQuotaSupport(backingFsBlockDev string) (bool, error) ***REMOVED***
+func hasQuotaSupport(backingFsBlockDev string) (bool, error) {
 	var cs = C.CString(backingFsBlockDev)
 	defer free(cs)
 	var qstat C.fs_quota_stat_t
 
 	_, _, errno := unix.Syscall6(unix.SYS_QUOTACTL, uintptr(C.Q_XGETQSTAT_PRJQUOTA), uintptr(unsafe.Pointer(cs)), 0, uintptr(unsafe.Pointer(&qstat)), 0, 0)
-	if errno == 0 && qstat.qs_flags&C.FS_QUOTA_PDQ_ENFD > 0 && qstat.qs_flags&C.FS_QUOTA_PDQ_ACCT > 0 ***REMOVED***
+	if errno == 0 && qstat.qs_flags&C.FS_QUOTA_PDQ_ENFD > 0 && qstat.qs_flags&C.FS_QUOTA_PDQ_ACCT > 0 {
 		return true, nil
-	***REMOVED***
+	}
 
-	switch errno ***REMOVED***
+	switch errno {
 	// These are the known fatal errors, consider all other errors (ENOTTY, etc.. not supporting quota)
 	case unix.EFAULT, unix.ENOENT, unix.ENOTBLK, unix.EPERM:
 	default:
 		return false, nil
-	***REMOVED***
+	}
 
 	return false, errno
-***REMOVED***
+}

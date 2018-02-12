@@ -12,27 +12,27 @@ import (
 	"golang.org/x/text/language"
 )
 
-func TestUnique(t *testing.T) ***REMOVED***
-	testCases := []struct ***REMOVED***
+func TestUnique(t *testing.T) {
+	testCases := []struct {
 		in, want string
-	***REMOVED******REMOVED***
-		***REMOVED***"", "[]"***REMOVED***,
-		***REMOVED***"en", "[en]"***REMOVED***,
-		***REMOVED***"en en", "[en]"***REMOVED***,
-		***REMOVED***"en en en", "[en]"***REMOVED***,
-		***REMOVED***"en-u-cu-eur en", "[en en-u-cu-eur]"***REMOVED***,
-		***REMOVED***"nl en", "[en nl]"***REMOVED***,
-		***REMOVED***"pt-Pt pt", "[pt pt-PT]"***REMOVED***,
-	***REMOVED***
-	for _, tc := range testCases ***REMOVED***
-		tags := []language.Tag***REMOVED******REMOVED***
-		for _, s := range strings.Split(tc.in, " ") ***REMOVED***
-			if s != "" ***REMOVED***
+	}{
+		{"", "[]"},
+		{"en", "[en]"},
+		{"en en", "[en]"},
+		{"en en en", "[en]"},
+		{"en-u-cu-eur en", "[en en-u-cu-eur]"},
+		{"nl en", "[en nl]"},
+		{"pt-Pt pt", "[pt pt-PT]"},
+	}
+	for _, tc := range testCases {
+		tags := []language.Tag{}
+		for _, s := range strings.Split(tc.in, " ") {
+			if s != "" {
 				tags = append(tags, language.MustParse(s))
-			***REMOVED***
-		***REMOVED***
-		if got := fmt.Sprint(UniqueTags(tags)); got != tc.want ***REMOVED***
+			}
+		}
+		if got := fmt.Sprint(UniqueTags(tags)); got != tc.want {
 			t.Errorf("Unique(%s) = %s; want %s", tc.in, got, tc.want)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

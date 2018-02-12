@@ -12,40 +12,40 @@ import (
 
 // reloadPlatform updates configuration with platform specific options
 // and updates the passed attributes
-func (daemon *Daemon) reloadPlatform(conf *config.Config, attributes map[string]string) error ***REMOVED***
-	if err := conf.ValidatePlatformConfig(); err != nil ***REMOVED***
+func (daemon *Daemon) reloadPlatform(conf *config.Config, attributes map[string]string) error {
+	if err := conf.ValidatePlatformConfig(); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if conf.IsValueSet("runtimes") ***REMOVED***
+	if conf.IsValueSet("runtimes") {
 		// Always set the default one
-		conf.Runtimes[config.StockRuntimeName] = types.Runtime***REMOVED***Path: DefaultRuntimeBinary***REMOVED***
-		if err := daemon.initRuntimes(conf.Runtimes); err != nil ***REMOVED***
+		conf.Runtimes[config.StockRuntimeName] = types.Runtime{Path: DefaultRuntimeBinary}
+		if err := daemon.initRuntimes(conf.Runtimes); err != nil {
 			return err
-		***REMOVED***
+		}
 		daemon.configStore.Runtimes = conf.Runtimes
-	***REMOVED***
+	}
 
-	if conf.DefaultRuntime != "" ***REMOVED***
+	if conf.DefaultRuntime != "" {
 		daemon.configStore.DefaultRuntime = conf.DefaultRuntime
-	***REMOVED***
+	}
 
-	if conf.IsValueSet("default-shm-size") ***REMOVED***
+	if conf.IsValueSet("default-shm-size") {
 		daemon.configStore.ShmSize = conf.ShmSize
-	***REMOVED***
+	}
 
-	if conf.IpcMode != "" ***REMOVED***
+	if conf.IpcMode != "" {
 		daemon.configStore.IpcMode = conf.IpcMode
-	***REMOVED***
+	}
 
 	// Update attributes
 	var runtimeList bytes.Buffer
-	for name, rt := range daemon.configStore.Runtimes ***REMOVED***
-		if runtimeList.Len() > 0 ***REMOVED***
+	for name, rt := range daemon.configStore.Runtimes {
+		if runtimeList.Len() > 0 {
 			runtimeList.WriteRune(' ')
-		***REMOVED***
+		}
 		runtimeList.WriteString(fmt.Sprintf("%s:%s", name, rt))
-	***REMOVED***
+	}
 
 	attributes["runtimes"] = runtimeList.String()
 	attributes["default-runtime"] = daemon.configStore.DefaultRuntime
@@ -53,4 +53,4 @@ func (daemon *Daemon) reloadPlatform(conf *config.Config, attributes map[string]
 	attributes["default-ipc-mode"] = daemon.configStore.IpcMode
 
 	return nil
-***REMOVED***
+}

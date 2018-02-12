@@ -13,8 +13,8 @@ import (
 
 type addrFamily int
 
-func (af addrFamily) String() string ***REMOVED***
-	switch af ***REMOVED***
+func (af addrFamily) String() string {
+	switch af {
 	case sysAF_UNSPEC:
 		return "unspec"
 	case sysAF_INET:
@@ -23,101 +23,101 @@ func (af addrFamily) String() string ***REMOVED***
 		return "inet6"
 	default:
 		return fmt.Sprintf("%d", af)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 const hexDigit = "0123456789abcdef"
 
 type llAddr []byte
 
-func (a llAddr) String() string ***REMOVED***
-	if len(a) == 0 ***REMOVED***
+func (a llAddr) String() string {
+	if len(a) == 0 {
 		return ""
-	***REMOVED***
+	}
 	buf := make([]byte, 0, len(a)*3-1)
-	for i, b := range a ***REMOVED***
-		if i > 0 ***REMOVED***
+	for i, b := range a {
+		if i > 0 {
 			buf = append(buf, ':')
-		***REMOVED***
+		}
 		buf = append(buf, hexDigit[b>>4])
 		buf = append(buf, hexDigit[b&0xF])
-	***REMOVED***
+	}
 	return string(buf)
-***REMOVED***
+}
 
 type ipAddr []byte
 
-func (a ipAddr) String() string ***REMOVED***
-	if len(a) == 0 ***REMOVED***
+func (a ipAddr) String() string {
+	if len(a) == 0 {
 		return "<nil>"
-	***REMOVED***
-	if len(a) == 4 ***REMOVED***
+	}
+	if len(a) == 4 {
 		return fmt.Sprintf("%d.%d.%d.%d", a[0], a[1], a[2], a[3])
-	***REMOVED***
-	if len(a) == 16 ***REMOVED***
+	}
+	if len(a) == 16 {
 		return fmt.Sprintf("%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x", a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9], a[10], a[11], a[12], a[13], a[14], a[15])
-	***REMOVED***
+	}
 	s := make([]byte, len(a)*2)
-	for i, tn := range a ***REMOVED***
+	for i, tn := range a {
 		s[i*2], s[i*2+1] = hexDigit[tn>>4], hexDigit[tn&0xf]
-	***REMOVED***
+	}
 	return string(s)
-***REMOVED***
+}
 
-func (a *Inet4Addr) String() string ***REMOVED***
+func (a *Inet4Addr) String() string {
 	return fmt.Sprintf("(%s %s %d)", addrFamily(a.Family()), ipAddr(a.IP[:]), a.PrefixLen)
-***REMOVED***
+}
 
-func (a *Inet6Addr) String() string ***REMOVED***
+func (a *Inet6Addr) String() string {
 	return fmt.Sprintf("(%s %s %d %d)", addrFamily(a.Family()), ipAddr(a.IP[:]), a.PrefixLen, a.ZoneID)
-***REMOVED***
+}
 
-type addrPack struct ***REMOVED***
+type addrPack struct {
 	af int
 	as []Addr
-***REMOVED***
+}
 
-func addrPacks() ([]addrPack, error) ***REMOVED***
+func addrPacks() ([]addrPack, error) {
 	var lastErr error
 	var aps []addrPack
-	for _, af := range [...]int***REMOVED***sysAF_UNSPEC, sysAF_INET, sysAF_INET6***REMOVED*** ***REMOVED***
+	for _, af := range [...]int{sysAF_UNSPEC, sysAF_INET, sysAF_INET6} {
 		as, err := Addrs(af, "")
-		if err != nil ***REMOVED***
+		if err != nil {
 			lastErr = err
 			continue
-		***REMOVED***
-		aps = append(aps, addrPack***REMOVED***af: af, as: as***REMOVED***)
-	***REMOVED***
+		}
+		aps = append(aps, addrPack{af: af, as: as})
+	}
 	return aps, lastErr
-***REMOVED***
+}
 
-func TestAddrs(t *testing.T) ***REMOVED***
+func TestAddrs(t *testing.T) {
 	aps, err := addrPacks()
-	if len(aps) == 0 && err != nil ***REMOVED***
+	if len(aps) == 0 && err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	lps, err := linkPacks()
-	if len(lps) == 0 && err != nil ***REMOVED***
+	if len(lps) == 0 && err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	for _, lp := range lps ***REMOVED***
+	}
+	for _, lp := range lps {
 		n := 0
-		for _, ll := range lp.lls ***REMOVED***
+		for _, ll := range lp.lls {
 			as, err := Addrs(lp.af, ll.Name)
-			if err != nil ***REMOVED***
+			if err != nil {
 				t.Fatal(lp.af, ll.Name, err)
-			***REMOVED***
+			}
 			t.Logf("af=%s name=%s %v", addrFamily(lp.af), ll.Name, as)
 			n += len(as)
-		***REMOVED***
-		for _, ap := range aps ***REMOVED***
-			if ap.af != lp.af ***REMOVED***
+		}
+		for _, ap := range aps {
+			if ap.af != lp.af {
 				continue
-			***REMOVED***
-			if n != len(ap.as) ***REMOVED***
+			}
+			if n != len(ap.as) {
 				t.Errorf("af=%s got %d; want %d", addrFamily(lp.af), n, len(ap.as))
 				continue
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}

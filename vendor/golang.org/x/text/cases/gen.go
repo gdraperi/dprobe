@@ -28,16 +28,16 @@ import (
 	"golang.org/x/text/unicode/norm"
 )
 
-func main() ***REMOVED***
+func main() {
 	gen.Init()
 	genTables()
 	genTablesTest()
 	gen.Repackage("gen_trieval.go", "trieval.go", "cases")
-***REMOVED***
+}
 
 // runeInfo contains all information for a rune that we care about for casing
 // operations.
-type runeInfo struct ***REMOVED***
+type runeInfo struct {
 	Rune rune
 
 	entry info // trie value for this rune.
@@ -69,7 +69,7 @@ type runeInfo struct ***REMOVED***
 
 	// We care mostly about 0, Above, and IotaSubscript.
 	CCC byte
-***REMOVED***
+}
 
 type breakCategory int
 
@@ -80,51 +80,51 @@ const (
 )
 
 // mapping returns the case mapping for the given case type.
-func (r *runeInfo) mapping(c info) string ***REMOVED***
-	if r.HasSpecial ***REMOVED***
+func (r *runeInfo) mapping(c info) string {
+	if r.HasSpecial {
 		return string(r.Special[c])
-	***REMOVED***
-	if len(r.Simple[c]) != 0 ***REMOVED***
+	}
+	if len(r.Simple[c]) != 0 {
 		return string(r.Simple[c])
-	***REMOVED***
+	}
 	return string(r.Rune)
-***REMOVED***
+}
 
-func parse(file string, f func(p *ucd.Parser)) ***REMOVED***
+func parse(file string, f func(p *ucd.Parser)) {
 	ucd.Parse(gen.OpenUCDFile(file), f)
-***REMOVED***
+}
 
-func parseUCD() []runeInfo ***REMOVED***
+func parseUCD() []runeInfo {
 	chars := make([]runeInfo, unicode.MaxRune)
 
-	get := func(r rune) *runeInfo ***REMOVED***
+	get := func(r rune) *runeInfo {
 		c := &chars[r]
 		c.Rune = r
 		return c
-	***REMOVED***
+	}
 
-	parse("UnicodeData.txt", func(p *ucd.Parser) ***REMOVED***
+	parse("UnicodeData.txt", func(p *ucd.Parser) {
 		ri := get(p.Rune(0))
 		ri.CCC = byte(p.Int(ucd.CanonicalCombiningClass))
 		ri.Simple[cLower] = p.Runes(ucd.SimpleLowercaseMapping)
 		ri.Simple[cUpper] = p.Runes(ucd.SimpleUppercaseMapping)
 		ri.Simple[cTitle] = p.Runes(ucd.SimpleTitlecaseMapping)
-		if p.String(ucd.GeneralCategory) == "Lt" ***REMOVED***
+		if p.String(ucd.GeneralCategory) == "Lt" {
 			ri.CaseMode = cTitle
-		***REMOVED***
-	***REMOVED***)
+		}
+	})
 
 	// <code>; <property>
-	parse("PropList.txt", func(p *ucd.Parser) ***REMOVED***
-		if p.String(1) == "Soft_Dotted" ***REMOVED***
+	parse("PropList.txt", func(p *ucd.Parser) {
+		if p.String(1) == "Soft_Dotted" {
 			chars[p.Rune(0)].SoftDotted = true
-		***REMOVED***
-	***REMOVED***)
+		}
+	})
 
 	// <code>; <word break type>
-	parse("DerivedCoreProperties.txt", func(p *ucd.Parser) ***REMOVED***
+	parse("DerivedCoreProperties.txt", func(p *ucd.Parser) {
 		ri := get(p.Rune(0))
-		switch p.String(1) ***REMOVED***
+		switch p.String(1) {
 		case "Case_Ignorable":
 			ri.CaseIgnorable = true
 		case "Cased":
@@ -133,51 +133,51 @@ func parseUCD() []runeInfo ***REMOVED***
 			ri.CaseMode = cLower
 		case "Uppercase":
 			ri.CaseMode = cUpper
-		***REMOVED***
-	***REMOVED***)
+		}
+	})
 
 	// <code>; <lower> ; <title> ; <upper> ; (<condition_list> ;)?
-	parse("SpecialCasing.txt", func(p *ucd.Parser) ***REMOVED***
+	parse("SpecialCasing.txt", func(p *ucd.Parser) {
 		// We drop all conditional special casing and deal with them manually in
 		// the language-specific case mappers. Rune 0x03A3 is the only one with
 		// a conditional formatting that is not language-specific. However,
 		// dealing with this letter is tricky, especially in a streaming
 		// context, so we deal with it in the Caser for Greek specifically.
 		ri := get(p.Rune(0))
-		if p.String(4) == "" ***REMOVED***
+		if p.String(4) == "" {
 			ri.HasSpecial = true
 			ri.Special[cLower] = p.Runes(1)
 			ri.Special[cTitle] = p.Runes(2)
 			ri.Special[cUpper] = p.Runes(3)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			ri.Conditional = true
-		***REMOVED***
-	***REMOVED***)
+		}
+	})
 
 	// TODO: Use text breaking according to UAX #29.
 	// <code>; <word break type>
-	parse("auxiliary/WordBreakProperty.txt", func(p *ucd.Parser) ***REMOVED***
+	parse("auxiliary/WordBreakProperty.txt", func(p *ucd.Parser) {
 		ri := get(p.Rune(0))
 		ri.BreakType = p.String(1)
 
 		// We collapse the word breaking properties onto the categories we need.
-		switch p.String(1) ***REMOVED*** // TODO: officially we need to canonicalize.
+		switch p.String(1) { // TODO: officially we need to canonicalize.
 		case "MidLetter", "MidNumLet", "Single_Quote":
 			ri.BreakCat = breakMid
-			if !ri.CaseIgnorable ***REMOVED***
+			if !ri.CaseIgnorable {
 				// finalSigma relies on the fact that all breakMid runes are
 				// also a Case_Ignorable. Revisit this code when this changes.
 				log.Fatalf("Rune %U, which has a break category mid, is not a case ignorable", ri)
-			***REMOVED***
+			}
 		case "ALetter", "Hebrew_Letter", "Numeric", "Extend", "ExtendNumLet", "Format", "ZWJ":
 			ri.BreakCat = breakLetter
-		***REMOVED***
-	***REMOVED***)
+		}
+	})
 
 	// <code>; <type>; <mapping>
-	parse("CaseFolding.txt", func(p *ucd.Parser) ***REMOVED***
+	parse("CaseFolding.txt", func(p *ucd.Parser) {
 		ri := get(p.Rune(0))
-		switch p.String(1) ***REMOVED***
+		switch p.String(1) {
 		case "C":
 			ri.FoldSimple = p.Rune(2)
 			ri.FoldFull = p.Runes(2)
@@ -189,22 +189,22 @@ func parseUCD() []runeInfo ***REMOVED***
 			ri.FoldFull = p.Runes(2)
 		default:
 			log.Fatalf("%U: unknown type: %s", p.Rune(0), p.String(1))
-		***REMOVED***
-	***REMOVED***)
+		}
+	})
 
 	return chars
-***REMOVED***
+}
 
-func genTables() ***REMOVED***
+func genTables() {
 	chars := parseUCD()
 	verifyProperties(chars)
 
 	t := triegen.NewTrie("case")
-	for i := range chars ***REMOVED***
+	for i := range chars {
 		c := &chars[i]
 		makeEntry(c)
 		t.Insert(rune(i), uint64(c.entry))
-	***REMOVED***
+	}
 
 	w := gen.NewCodeWriter()
 	defer w.WriteVersionedGoFile("tables.go", "cases")
@@ -218,125 +218,125 @@ func genTables() ***REMOVED***
 	w.WriteVar("xorData", string(xorData))
 	w.WriteVar("exceptions", string(exceptionData))
 
-	sz, err := t.Gen(w, triegen.Compact(&sparseCompacter***REMOVED******REMOVED***))
-	if err != nil ***REMOVED***
+	sz, err := t.Gen(w, triegen.Compact(&sparseCompacter{}))
+	if err != nil {
 		log.Fatal(err)
-	***REMOVED***
+	}
 	w.Size += sz
-***REMOVED***
+}
 
-func makeEntry(ri *runeInfo) ***REMOVED***
-	if ri.CaseIgnorable ***REMOVED***
-		if ri.Cased ***REMOVED***
+func makeEntry(ri *runeInfo) {
+	if ri.CaseIgnorable {
+		if ri.Cased {
 			ri.entry = cIgnorableCased
-		***REMOVED*** else ***REMOVED***
+		} else {
 			ri.entry = cIgnorableUncased
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
+		}
+	} else {
 		ri.entry = ri.CaseMode
-	***REMOVED***
+	}
 
 	// TODO: handle soft-dotted.
 
 	ccc := cccOther
-	switch ri.CCC ***REMOVED***
+	switch ri.CCC {
 	case 0: // Not_Reordered
 		ccc = cccZero
 	case above: // Above
 		ccc = cccAbove
-	***REMOVED***
-	switch ri.BreakCat ***REMOVED***
+	}
+	switch ri.BreakCat {
 	case breakBreak:
 		ccc = cccBreak
 	case breakMid:
 		ri.entry |= isMidBit
-	***REMOVED***
+	}
 
 	ri.entry |= ccc
 
-	if ri.CaseMode == cUncased ***REMOVED***
+	if ri.CaseMode == cUncased {
 		return
-	***REMOVED***
+	}
 
 	// Need to do something special.
-	if ri.CaseMode == cTitle || ri.HasSpecial || ri.mapping(cTitle) != ri.mapping(cUpper) ***REMOVED***
+	if ri.CaseMode == cTitle || ri.HasSpecial || ri.mapping(cTitle) != ri.mapping(cUpper) {
 		makeException(ri)
 		return
-	***REMOVED***
-	if f := string(ri.FoldFull); len(f) > 0 && f != ri.mapping(cUpper) && f != ri.mapping(cLower) ***REMOVED***
+	}
+	if f := string(ri.FoldFull); len(f) > 0 && f != ri.mapping(cUpper) && f != ri.mapping(cLower) {
 		makeException(ri)
 		return
-	***REMOVED***
+	}
 
 	// Rune is either lowercase or uppercase.
 
 	orig := string(ri.Rune)
 	mapped := ""
-	if ri.CaseMode == cUpper ***REMOVED***
+	if ri.CaseMode == cUpper {
 		mapped = ri.mapping(cLower)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		mapped = ri.mapping(cUpper)
-	***REMOVED***
+	}
 
-	if len(orig) != len(mapped) ***REMOVED***
+	if len(orig) != len(mapped) {
 		makeException(ri)
 		return
-	***REMOVED***
+	}
 
-	if string(ri.FoldFull) == ri.mapping(cUpper) ***REMOVED***
+	if string(ri.FoldFull) == ri.mapping(cUpper) {
 		ri.entry |= inverseFoldBit
-	***REMOVED***
+	}
 
 	n := len(orig)
 
 	// Create per-byte XOR mask.
 	var b []byte
-	for i := 0; i < n; i++ ***REMOVED***
+	for i := 0; i < n; i++ {
 		b = append(b, orig[i]^mapped[i])
-	***REMOVED***
+	}
 
 	// Remove leading 0 bytes, but keep at least one byte.
-	for ; len(b) > 1 && b[0] == 0; b = b[1:] ***REMOVED***
-	***REMOVED***
+	for ; len(b) > 1 && b[0] == 0; b = b[1:] {
+	}
 
-	if len(b) == 1 && b[0]&0xc0 == 0 ***REMOVED***
+	if len(b) == 1 && b[0]&0xc0 == 0 {
 		ri.entry |= info(b[0]) << xorShift
 		return
-	***REMOVED***
+	}
 
 	key := string(b)
 	x, ok := xorCache[key]
-	if !ok ***REMOVED***
+	if !ok {
 		xorData = append(xorData, 0) // for detecting start of sequence
 		xorData = append(xorData, b...)
 
 		x = len(xorData) - 1
 		xorCache[key] = x
-	***REMOVED***
+	}
 	ri.entry |= info(x<<xorShift) | xorIndexBit
-***REMOVED***
+}
 
-var xorCache = map[string]int***REMOVED******REMOVED***
+var xorCache = map[string]int{}
 
 // xorData contains byte-wise XOR data for the least significant bytes of a
 // UTF-8 encoded rune. An index points to the last byte. The sequence starts
 // with a zero terminator.
-var xorData = []byte***REMOVED******REMOVED***
+var xorData = []byte{}
 
 // See the comments in gen_trieval.go re "the exceptions slice".
-var exceptionData = []byte***REMOVED***0***REMOVED***
+var exceptionData = []byte{0}
 
 // makeException encodes case mappings that cannot be expressed in a simple
 // XOR diff.
-func makeException(ri *runeInfo) ***REMOVED***
+func makeException(ri *runeInfo) {
 	ccc := ri.entry & cccMask
 	// Set exception bit and retain case type.
 	ri.entry &= 0x0007
 	ri.entry |= exceptionBit
 
-	if len(exceptionData) >= 1<<numExceptionBits ***REMOVED***
+	if len(exceptionData) >= 1<<numExceptionBits {
 		log.Fatalf("%U:exceptionData too large %x > %d bits", ri.Rune, len(exceptionData), numExceptionBits)
-	***REMOVED***
+	}
 
 	// Set the offset in the exceptionData array.
 	ri.entry |= info(len(exceptionData) << exceptionShift)
@@ -348,22 +348,22 @@ func makeException(ri *runeInfo) ***REMOVED***
 	ff := string(ri.FoldFull)
 
 	// addString sets the length of a string and adds it to the expansions array.
-	addString := func(s string, b *byte) ***REMOVED***
-		if len(s) == 0 ***REMOVED***
+	addString := func(s string, b *byte) {
+		if len(s) == 0 {
 			// Zero-length mappings exist, but only for conditional casing,
 			// which we are representing outside of this table.
 			log.Fatalf("%U: has zero-length mapping.", ri.Rune)
-		***REMOVED***
+		}
 		*b <<= 3
-		if s != orig ***REMOVED***
+		if s != orig {
 			n := len(s)
-			if n > 7 ***REMOVED***
+			if n > 7 {
 				log.Fatalf("%U: mapping larger than 7 (%d)", ri.Rune, n)
-			***REMOVED***
+			}
 			*b |= byte(n)
 			exceptionData = append(exceptionData, s...)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// byte 0:
 	exceptionData = append(exceptionData, byte(ccc)|byte(len(ff)))
@@ -372,268 +372,268 @@ func makeException(ri *runeInfo) ***REMOVED***
 	p := len(exceptionData)
 	exceptionData = append(exceptionData, 0)
 
-	if len(ff) > 7 ***REMOVED*** // May be zero-length.
+	if len(ff) > 7 { // May be zero-length.
 		log.Fatalf("%U: fold string larger than 7 (%d)", ri.Rune, len(ff))
-	***REMOVED***
+	}
 	exceptionData = append(exceptionData, ff...)
 	ct := ri.CaseMode
-	if ct != cLower ***REMOVED***
+	if ct != cLower {
 		addString(lc, &exceptionData[p])
-	***REMOVED***
-	if ct != cUpper ***REMOVED***
+	}
+	if ct != cUpper {
 		addString(uc, &exceptionData[p])
-	***REMOVED***
-	if ct != cTitle ***REMOVED***
+	}
+	if ct != cTitle {
 		// If title is the same as upper, we set it to the original string so
 		// that it will be marked as not present. This implies title case is
 		// the same as upper case.
-		if tc == uc ***REMOVED***
+		if tc == uc {
 			tc = orig
-		***REMOVED***
+		}
 		addString(tc, &exceptionData[p])
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // sparseCompacter is a trie value block Compacter. There are many cases where
 // successive runes alternate between lower- and upper-case. This Compacter
 // exploits this by adding a special case type where the case value is obtained
 // from or-ing it with the least-significant bit of the rune, creating large
 // ranges of equal case values that compress well.
-type sparseCompacter struct ***REMOVED***
+type sparseCompacter struct {
 	sparseBlocks  [][]uint16
 	sparseOffsets []uint16
 	sparseCount   int
-***REMOVED***
+}
 
 // makeSparse returns the number of elements that compact block would contain
 // as well as the modified values.
-func makeSparse(vals []uint64) ([]uint16, int) ***REMOVED***
+func makeSparse(vals []uint64) ([]uint16, int) {
 	// Copy the values.
 	values := make([]uint16, len(vals))
-	for i, v := range vals ***REMOVED***
+	for i, v := range vals {
 		values[i] = uint16(v)
-	***REMOVED***
+	}
 
-	alt := func(i int, v uint16) uint16 ***REMOVED***
-		if cm := info(v & fullCasedMask); cm == cUpper || cm == cLower ***REMOVED***
+	alt := func(i int, v uint16) uint16 {
+		if cm := info(v & fullCasedMask); cm == cUpper || cm == cLower {
 			// Convert cLower or cUpper to cXORCase value, which has the form 11x.
 			xor := v
 			xor &^= 1
 			xor |= uint16(i&1) ^ (v & 1)
 			xor |= 0x4
 			return xor
-		***REMOVED***
+		}
 		return v
-	***REMOVED***
+	}
 
 	var count int
 	var previous uint16
-	for i, v := range values ***REMOVED***
-		if v != 0 ***REMOVED***
+	for i, v := range values {
+		if v != 0 {
 			// Try if the unmodified value is equal to the previous.
-			if v == previous ***REMOVED***
+			if v == previous {
 				continue
-			***REMOVED***
+			}
 
 			// Try if the xor-ed value is equal to the previous value.
 			a := alt(i, v)
-			if a == previous ***REMOVED***
+			if a == previous {
 				values[i] = a
 				continue
-			***REMOVED***
+			}
 
 			// This is a new value.
 			count++
 
 			// Use the xor-ed value if it will be identical to the next value.
-			if p := i + 1; p < len(values) && alt(p, values[p]) == a ***REMOVED***
+			if p := i + 1; p < len(values) && alt(p, values[p]) == a {
 				values[i] = a
 				v = a
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		previous = v
-	***REMOVED***
+	}
 	return values, count
-***REMOVED***
+}
 
-func (s *sparseCompacter) Size(v []uint64) (int, bool) ***REMOVED***
+func (s *sparseCompacter) Size(v []uint64) (int, bool) {
 	_, n := makeSparse(v)
 
 	// We limit using this method to having 16 entries.
-	if n > 16 ***REMOVED***
+	if n > 16 {
 		return 0, false
-	***REMOVED***
+	}
 
-	return 2 + int(reflect.TypeOf(valueRange***REMOVED******REMOVED***).Size())*n, true
-***REMOVED***
+	return 2 + int(reflect.TypeOf(valueRange{}).Size())*n, true
+}
 
-func (s *sparseCompacter) Store(v []uint64) uint32 ***REMOVED***
+func (s *sparseCompacter) Store(v []uint64) uint32 {
 	h := uint32(len(s.sparseOffsets))
 	values, sz := makeSparse(v)
 	s.sparseBlocks = append(s.sparseBlocks, values)
 	s.sparseOffsets = append(s.sparseOffsets, uint16(s.sparseCount))
 	s.sparseCount += sz
 	return h
-***REMOVED***
+}
 
-func (s *sparseCompacter) Handler() string ***REMOVED***
+func (s *sparseCompacter) Handler() string {
 	// The sparse global variable and its lookup method is defined in gen_trieval.go.
 	return "sparse.lookup"
-***REMOVED***
+}
 
-func (s *sparseCompacter) Print(w io.Writer) (retErr error) ***REMOVED***
-	p := func(format string, args ...interface***REMOVED******REMOVED***) ***REMOVED***
+func (s *sparseCompacter) Print(w io.Writer) (retErr error) {
+	p := func(format string, args ...interface{}) {
 		_, err := fmt.Fprintf(w, format, args...)
-		if retErr == nil && err != nil ***REMOVED***
+		if retErr == nil && err != nil {
 			retErr = err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	ls := len(s.sparseBlocks)
-	if ls == len(s.sparseOffsets) ***REMOVED***
+	if ls == len(s.sparseOffsets) {
 		s.sparseOffsets = append(s.sparseOffsets, uint16(s.sparseCount))
-	***REMOVED***
+	}
 	p("// sparseOffsets: %d entries, %d bytes\n", ls+1, (ls+1)*2)
 	p("var sparseOffsets = %#v\n\n", s.sparseOffsets)
 
 	ns := s.sparseCount
 	p("// sparseValues: %d entries, %d bytes\n", ns, ns*4)
-	p("var sparseValues = [%d]valueRange ***REMOVED***", ns)
-	for i, values := range s.sparseBlocks ***REMOVED***
+	p("var sparseValues = [%d]valueRange {", ns)
+	for i, values := range s.sparseBlocks {
 		p("\n// Block %#x, offset %#x", i, s.sparseOffsets[i])
 		var v uint16
-		for i, nv := range values ***REMOVED***
-			if nv != v ***REMOVED***
-				if v != 0 ***REMOVED***
-					p(",hi:%#02x***REMOVED***,", 0x80+i-1)
-				***REMOVED***
-				if nv != 0 ***REMOVED***
-					p("\n***REMOVED***value:%#04x,lo:%#02x", nv, 0x80+i)
-				***REMOVED***
-			***REMOVED***
+		for i, nv := range values {
+			if nv != v {
+				if v != 0 {
+					p(",hi:%#02x},", 0x80+i-1)
+				}
+				if nv != 0 {
+					p("\n{value:%#04x,lo:%#02x", nv, 0x80+i)
+				}
+			}
 			v = nv
-		***REMOVED***
-		if v != 0 ***REMOVED***
-			p(",hi:%#02x***REMOVED***,", 0x80+len(values)-1)
-		***REMOVED***
-	***REMOVED***
-	p("\n***REMOVED***\n\n")
+		}
+		if v != 0 {
+			p(",hi:%#02x},", 0x80+len(values)-1)
+		}
+	}
+	p("\n}\n\n")
 	return
-***REMOVED***
+}
 
 // verifyProperties that properties of the runes that are relied upon in the
 // implementation. Each property is marked with an identifier that is referred
 // to in the places where it is used.
-func verifyProperties(chars []runeInfo) ***REMOVED***
-	for i, c := range chars ***REMOVED***
+func verifyProperties(chars []runeInfo) {
+	for i, c := range chars {
 		r := rune(i)
 
 		// Rune properties.
 
 		// A.1: modifier never changes on lowercase. [ltLower]
-		if c.CCC > 0 && unicode.ToLower(r) != r ***REMOVED***
+		if c.CCC > 0 && unicode.ToLower(r) != r {
 			log.Fatalf("%U: non-starter changes when lowercased", r)
-		***REMOVED***
+		}
 
 		// A.2: properties of decompositions starting with I or J. [ltLower]
 		d := norm.NFD.PropertiesString(string(r)).Decomposition()
-		if len(d) > 0 ***REMOVED***
-			if d[0] == 'I' || d[0] == 'J' ***REMOVED***
+		if len(d) > 0 {
+			if d[0] == 'I' || d[0] == 'J' {
 				// A.2.1: we expect at least an ASCII character and a modifier.
-				if len(d) < 3 ***REMOVED***
+				if len(d) < 3 {
 					log.Fatalf("%U: length of decomposition was %d; want >= 3", r, len(d))
-				***REMOVED***
+				}
 
 				// All subsequent runes are modifiers and all have the same CCC.
 				runes := []rune(string(d[1:]))
 				ccc := chars[runes[0]].CCC
 
-				for _, mr := range runes[1:] ***REMOVED***
+				for _, mr := range runes[1:] {
 					mc := chars[mr]
 
 					// A.2.2: all modifiers have a CCC of Above or less.
-					if ccc == 0 || ccc > above ***REMOVED***
+					if ccc == 0 || ccc > above {
 						log.Fatalf("%U: CCC of successive rune (%U) was %d; want (0,230]", r, mr, ccc)
-					***REMOVED***
+					}
 
 					// A.2.3: a sequence of modifiers all have the same CCC.
-					if mc.CCC != ccc ***REMOVED***
+					if mc.CCC != ccc {
 						log.Fatalf("%U: CCC of follow-up modifier (%U) was %d; want %d", r, mr, mc.CCC, ccc)
-					***REMOVED***
+					}
 
 					// A.2.4: for each trailing r, r in [0x300, 0x311] <=> CCC == Above.
-					if (ccc == above) != (0x300 <= mr && mr <= 0x311) ***REMOVED***
+					if (ccc == above) != (0x300 <= mr && mr <= 0x311) {
 						log.Fatalf("%U: modifier %U in [U+0300, U+0311] != ccc(%U) == 230", r, mr, mr)
-					***REMOVED***
+					}
 
-					if i += len(string(mr)); i >= len(d) ***REMOVED***
+					if i += len(string(mr)); i >= len(d) {
 						break
-					***REMOVED***
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
+					}
+				}
+			}
+		}
 
 		// A.3: no U+0307 in decomposition of Soft-Dotted rune. [ltUpper]
-		if unicode.Is(unicode.Soft_Dotted, r) && strings.Contains(string(d), "\u0307") ***REMOVED***
+		if unicode.Is(unicode.Soft_Dotted, r) && strings.Contains(string(d), "\u0307") {
 			log.Fatalf("%U: decomposition of soft-dotted rune may not contain U+0307", r)
-		***REMOVED***
+		}
 
 		// A.4: only rune U+0345 may be of CCC Iota_Subscript. [elUpper]
-		if c.CCC == iotaSubscript && r != 0x0345 ***REMOVED***
+		if c.CCC == iotaSubscript && r != 0x0345 {
 			log.Fatalf("%U: only rune U+0345 may have CCC Iota_Subscript", r)
-		***REMOVED***
+		}
 
 		// A.5: soft-dotted runes do not have exceptions.
-		if c.SoftDotted && c.entry&exceptionBit != 0 ***REMOVED***
+		if c.SoftDotted && c.entry&exceptionBit != 0 {
 			log.Fatalf("%U: soft-dotted has exception", r)
-		***REMOVED***
+		}
 
 		// A.6: Greek decomposition. [elUpper]
-		if unicode.Is(unicode.Greek, r) ***REMOVED***
-			if b := norm.NFD.PropertiesString(string(r)).Decomposition(); b != nil ***REMOVED***
+		if unicode.Is(unicode.Greek, r) {
+			if b := norm.NFD.PropertiesString(string(r)).Decomposition(); b != nil {
 				runes := []rune(string(b))
 				// A.6.1: If a Greek rune decomposes and the first rune of the
 				// decomposition is greater than U+00FF, the rune is always
 				// great and not a modifier.
-				if f := runes[0]; unicode.IsMark(f) || f > 0xFF && !unicode.Is(unicode.Greek, f) ***REMOVED***
+				if f := runes[0]; unicode.IsMark(f) || f > 0xFF && !unicode.Is(unicode.Greek, f) {
 					log.Fatalf("%U: expected first rune of Greek decomposition to be letter, found %U", r, f)
-				***REMOVED***
+				}
 				// A.6.2: Any follow-up rune in a Greek decomposition is a
 				// modifier of which the first should be gobbled in
 				// decomposition.
-				for _, m := range runes[1:] ***REMOVED***
-					switch m ***REMOVED***
+				for _, m := range runes[1:] {
+					switch m {
 					case 0x0313, 0x0314, 0x0301, 0x0300, 0x0306, 0x0342, 0x0308, 0x0304, 0x345:
 					default:
 						log.Fatalf("%U: modifier %U is outside of expected Greek modifier set", r, m)
-					***REMOVED***
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
+					}
+				}
+			}
+		}
 
 		// Breaking properties.
 
 		// B.1: all runes with CCC > 0 are of break type Extend.
-		if c.CCC > 0 && c.BreakType != "Extend" ***REMOVED***
+		if c.CCC > 0 && c.BreakType != "Extend" {
 			log.Fatalf("%U: CCC == %d, but got break type %s; want Extend", r, c.CCC, c.BreakType)
-		***REMOVED***
+		}
 
 		// B.2: all cased runes with c.CCC == 0 are of break type ALetter.
-		if c.CCC == 0 && c.Cased && c.BreakType != "ALetter" ***REMOVED***
+		if c.CCC == 0 && c.Cased && c.BreakType != "ALetter" {
 			log.Fatalf("%U: cased, but got break type %s; want ALetter", r, c.BreakType)
-		***REMOVED***
+		}
 
 		// B.3: letter category.
-		if c.CCC == 0 && c.BreakCat != breakBreak && !c.CaseIgnorable ***REMOVED***
-			if c.BreakCat != breakLetter ***REMOVED***
+		if c.CCC == 0 && c.BreakCat != breakBreak && !c.CaseIgnorable {
+			if c.BreakCat != breakLetter {
 				log.Fatalf("%U: check for letter break type gave %d; want %d", r, c.BreakCat, breakLetter)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}
 
-func genTablesTest() ***REMOVED***
-	w := &bytes.Buffer***REMOVED******REMOVED***
+func genTablesTest() {
+	w := &bytes.Buffer{}
 
 	fmt.Fprintln(w, "var (")
 	printProperties(w, "DerivedCoreProperties.txt", "Case_Ignorable", verifyIgnore)
@@ -643,34 +643,34 @@ func genTablesTest() ***REMOVED***
 	n := printProperties(ioutil.Discard, "DerivedCoreProperties.txt", "Cased", verifyCased)
 	n += printProperties(ioutil.Discard, "DerivedCoreProperties.txt", "Lowercase", verifyLower)
 	n += printProperties(ioutil.Discard, "DerivedCoreProperties.txt", "Uppercase", verifyUpper)
-	if n > 0 ***REMOVED***
+	if n > 0 {
 		log.Fatalf("One of the discarded properties does not have a perfect filter.")
-	***REMOVED***
+	}
 
 	// <code>; <lower> ; <title> ; <upper> ; (<condition_list> ;)?
-	fmt.Fprintln(w, "\tspecial = map[rune]struct***REMOVED*** toLower, toTitle, toUpper string ***REMOVED******REMOVED***")
-	parse("SpecialCasing.txt", func(p *ucd.Parser) ***REMOVED***
+	fmt.Fprintln(w, "\tspecial = map[rune]struct{ toLower, toTitle, toUpper string }{")
+	parse("SpecialCasing.txt", func(p *ucd.Parser) {
 		// Skip conditional entries.
-		if p.String(4) != "" ***REMOVED***
+		if p.String(4) != "" {
 			return
-		***REMOVED***
+		}
 		r := p.Rune(0)
-		fmt.Fprintf(w, "\t\t0x%04x: ***REMOVED***%q, %q, %q***REMOVED***,\n",
+		fmt.Fprintf(w, "\t\t0x%04x: {%q, %q, %q},\n",
 			r, string(p.Runes(1)), string(p.Runes(2)), string(p.Runes(3)))
-	***REMOVED***)
-	fmt.Fprint(w, "\t***REMOVED***\n\n")
+	})
+	fmt.Fprint(w, "\t}\n\n")
 
 	// <code>; <type>; <runes>
-	table := map[rune]struct***REMOVED*** simple, full, special string ***REMOVED******REMOVED******REMOVED***
-	parse("CaseFolding.txt", func(p *ucd.Parser) ***REMOVED***
+	table := map[rune]struct{ simple, full, special string }{}
+	parse("CaseFolding.txt", func(p *ucd.Parser) {
 		r := p.Rune(0)
 		t := p.String(1)
 		v := string(p.Runes(2))
-		if t != "T" && v == string(unicode.ToLower(r)) ***REMOVED***
+		if t != "T" && v == string(unicode.ToLower(r)) {
 			return
-		***REMOVED***
+		}
 		x := table[r]
-		switch t ***REMOVED***
+		switch t {
 		case "C":
 			x.full = v
 			x.simple = v
@@ -680,158 +680,158 @@ func genTablesTest() ***REMOVED***
 			x.full = v
 		case "T":
 			x.special = v
-		***REMOVED***
+		}
 		table[r] = x
-	***REMOVED***)
-	fmt.Fprintln(w, "\tfoldMap = map[rune]struct***REMOVED*** simple, full, special string ***REMOVED******REMOVED***")
-	for r := rune(0); r < 0x10FFFF; r++ ***REMOVED***
+	})
+	fmt.Fprintln(w, "\tfoldMap = map[rune]struct{ simple, full, special string }{")
+	for r := rune(0); r < 0x10FFFF; r++ {
 		x, ok := table[r]
-		if !ok ***REMOVED***
+		if !ok {
 			continue
-		***REMOVED***
-		fmt.Fprintf(w, "\t\t0x%04x: ***REMOVED***%q, %q, %q***REMOVED***,\n", r, x.simple, x.full, x.special)
-	***REMOVED***
-	fmt.Fprint(w, "\t***REMOVED***\n\n")
+		}
+		fmt.Fprintf(w, "\t\t0x%04x: {%q, %q, %q},\n", r, x.simple, x.full, x.special)
+	}
+	fmt.Fprint(w, "\t}\n\n")
 
 	// Break property
-	notBreak := map[rune]bool***REMOVED******REMOVED***
-	parse("auxiliary/WordBreakProperty.txt", func(p *ucd.Parser) ***REMOVED***
-		switch p.String(1) ***REMOVED***
+	notBreak := map[rune]bool{}
+	parse("auxiliary/WordBreakProperty.txt", func(p *ucd.Parser) {
+		switch p.String(1) {
 		case "Extend", "Format", "MidLetter", "MidNumLet", "Single_Quote",
 			"ALetter", "Hebrew_Letter", "Numeric", "ExtendNumLet", "ZWJ":
 			notBreak[p.Rune(0)] = true
-		***REMOVED***
-	***REMOVED***)
+		}
+	})
 
-	fmt.Fprintln(w, "\tbreakProp = []struct***REMOVED*** lo, hi rune ***REMOVED******REMOVED***")
+	fmt.Fprintln(w, "\tbreakProp = []struct{ lo, hi rune }{")
 	inBreak := false
-	for r := rune(0); r <= lastRuneForTesting; r++ ***REMOVED***
-		if isBreak := !notBreak[r]; isBreak != inBreak ***REMOVED***
-			if isBreak ***REMOVED***
-				fmt.Fprintf(w, "\t\t***REMOVED***0x%x, ", r)
-			***REMOVED*** else ***REMOVED***
-				fmt.Fprintf(w, "0x%x***REMOVED***,\n", r-1)
-			***REMOVED***
+	for r := rune(0); r <= lastRuneForTesting; r++ {
+		if isBreak := !notBreak[r]; isBreak != inBreak {
+			if isBreak {
+				fmt.Fprintf(w, "\t\t{0x%x, ", r)
+			} else {
+				fmt.Fprintf(w, "0x%x},\n", r-1)
+			}
 			inBreak = isBreak
-		***REMOVED***
-	***REMOVED***
-	if inBreak ***REMOVED***
-		fmt.Fprintf(w, "0x%x***REMOVED***,\n", lastRuneForTesting)
-	***REMOVED***
-	fmt.Fprint(w, "\t***REMOVED***\n\n")
+		}
+	}
+	if inBreak {
+		fmt.Fprintf(w, "0x%x},\n", lastRuneForTesting)
+	}
+	fmt.Fprint(w, "\t}\n\n")
 
 	// Word break test
 	// Filter out all samples that do not contain cased characters.
-	cased := map[rune]bool***REMOVED******REMOVED***
-	parse("DerivedCoreProperties.txt", func(p *ucd.Parser) ***REMOVED***
-		if p.String(1) == "Cased" ***REMOVED***
+	cased := map[rune]bool{}
+	parse("DerivedCoreProperties.txt", func(p *ucd.Parser) {
+		if p.String(1) == "Cased" {
 			cased[p.Rune(0)] = true
-		***REMOVED***
-	***REMOVED***)
+		}
+	})
 
-	fmt.Fprintln(w, "\tbreakTest = []string***REMOVED***")
-	parse("auxiliary/WordBreakTest.txt", func(p *ucd.Parser) ***REMOVED***
+	fmt.Fprintln(w, "\tbreakTest = []string{")
+	parse("auxiliary/WordBreakTest.txt", func(p *ucd.Parser) {
 		c := strings.Split(p.String(0), " ")
 
 		const sep = '|'
 		numCased := 0
 		test := ""
-		for ; len(c) >= 2; c = c[2:] ***REMOVED***
-			if c[0] == "÷" && test != "" ***REMOVED***
+		for ; len(c) >= 2; c = c[2:] {
+			if c[0] == "÷" && test != "" {
 				test += string(sep)
-			***REMOVED***
+			}
 			i, err := strconv.ParseUint(c[1], 16, 32)
 			r := rune(i)
-			if err != nil ***REMOVED***
+			if err != nil {
 				log.Fatalf("Invalid rune %q.", c[1])
-			***REMOVED***
-			if r == sep ***REMOVED***
+			}
+			if r == sep {
 				log.Fatalf("Separator %q not allowed in test data. Pick another one.", sep)
-			***REMOVED***
-			if cased[r] ***REMOVED***
+			}
+			if cased[r] {
 				numCased++
-			***REMOVED***
+			}
 			test += string(r)
-		***REMOVED***
-		if numCased > 1 ***REMOVED***
+		}
+		if numCased > 1 {
 			fmt.Fprintf(w, "\t\t%q,\n", test)
-		***REMOVED***
-	***REMOVED***)
-	fmt.Fprintln(w, "\t***REMOVED***")
+		}
+	})
+	fmt.Fprintln(w, "\t}")
 
 	fmt.Fprintln(w, ")")
 
 	gen.WriteVersionedGoFile("tables_test.go", "cases", w.Bytes())
-***REMOVED***
+}
 
 // These functions are just used for verification that their definition have not
 // changed in the Unicode Standard.
 
-func verifyCased(r rune) bool ***REMOVED***
+func verifyCased(r rune) bool {
 	return verifyLower(r) || verifyUpper(r) || unicode.IsTitle(r)
-***REMOVED***
+}
 
-func verifyLower(r rune) bool ***REMOVED***
+func verifyLower(r rune) bool {
 	return unicode.IsLower(r) || unicode.Is(unicode.Other_Lowercase, r)
-***REMOVED***
+}
 
-func verifyUpper(r rune) bool ***REMOVED***
+func verifyUpper(r rune) bool {
 	return unicode.IsUpper(r) || unicode.Is(unicode.Other_Uppercase, r)
-***REMOVED***
+}
 
 // verifyIgnore is an approximation of the Case_Ignorable property using the
 // core unicode package. It is used to reduce the size of the test data.
-func verifyIgnore(r rune) bool ***REMOVED***
-	props := []*unicode.RangeTable***REMOVED***
+func verifyIgnore(r rune) bool {
+	props := []*unicode.RangeTable{
 		unicode.Mn,
 		unicode.Me,
 		unicode.Cf,
 		unicode.Lm,
 		unicode.Sk,
-	***REMOVED***
-	for _, p := range props ***REMOVED***
-		if unicode.Is(p, r) ***REMOVED***
+	}
+	for _, p := range props {
+		if unicode.Is(p, r) {
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false
-***REMOVED***
+}
 
 // printProperties prints tables of rune properties from the given UCD file.
 // A filter func f can be given to exclude certain values. A rune r will have
 // the indicated property if it is in the generated table or if f(r).
-func printProperties(w io.Writer, file, property string, f func(r rune) bool) int ***REMOVED***
-	verify := map[rune]bool***REMOVED******REMOVED***
+func printProperties(w io.Writer, file, property string, f func(r rune) bool) int {
+	verify := map[rune]bool{}
 	n := 0
 	varNameParts := strings.Split(property, "_")
 	varNameParts[0] = strings.ToLower(varNameParts[0])
-	fmt.Fprintf(w, "\t%s = map[rune]bool***REMOVED***\n", strings.Join(varNameParts, ""))
-	parse(file, func(p *ucd.Parser) ***REMOVED***
-		if p.String(1) == property ***REMOVED***
+	fmt.Fprintf(w, "\t%s = map[rune]bool{\n", strings.Join(varNameParts, ""))
+	parse(file, func(p *ucd.Parser) {
+		if p.String(1) == property {
 			r := p.Rune(0)
 			verify[r] = true
-			if !f(r) ***REMOVED***
+			if !f(r) {
 				n++
 				fmt.Fprintf(w, "\t\t0x%.4x: true,\n", r)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***)
-	fmt.Fprint(w, "\t***REMOVED***\n\n")
+			}
+		}
+	})
+	fmt.Fprint(w, "\t}\n\n")
 
 	// Verify that f is correct, that is, it represents a subset of the property.
-	for r := rune(0); r <= lastRuneForTesting; r++ ***REMOVED***
-		if !verify[r] && f(r) ***REMOVED***
+	for r := rune(0); r <= lastRuneForTesting; r++ {
+		if !verify[r] && f(r) {
 			log.Fatalf("Incorrect filter func for property %q.", property)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
+}
 
 // The newCaseTrie, sparseValues and sparseOffsets definitions below are
 // placeholders referred to by gen_trieval.go. The real definitions are
 // generated by this program and written to tables.go.
 
-func newCaseTrie(int) int ***REMOVED*** return 0 ***REMOVED***
+func newCaseTrie(int) int { return 0 }
 
 var (
 	sparseValues  [0]valueRange

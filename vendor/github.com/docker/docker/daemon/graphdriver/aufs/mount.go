@@ -10,9 +10,9 @@ import (
 )
 
 // Unmount the target specified.
-func Unmount(target string) error ***REMOVED***
-	if err := exec.Command("auplink", target, "flush").Run(); err != nil ***REMOVED***
+func Unmount(target string) error {
+	if err := exec.Command("auplink", target, "flush").Run(); err != nil {
 		logrus.Warnf("Couldn't run auplink before unmount %s: %s", target, err)
-	***REMOVED***
+	}
 	return unix.Unmount(target, 0)
-***REMOVED***
+}

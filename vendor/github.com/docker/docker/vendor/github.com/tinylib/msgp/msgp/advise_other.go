@@ -8,10 +8,10 @@ import (
 
 // TODO: darwin, BSD support
 
-func adviseRead(mem []byte) ***REMOVED******REMOVED***
+func adviseRead(mem []byte) {}
 
-func adviseWrite(mem []byte) ***REMOVED******REMOVED***
+func adviseWrite(mem []byte) {}
 
-func fallocate(f *os.File, sz int64) error ***REMOVED***
+func fallocate(f *os.File, sz int64) error {
 	return f.Truncate(sz)
-***REMOVED***
+}

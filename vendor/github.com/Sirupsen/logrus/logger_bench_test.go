@@ -6,56 +6,56 @@ import (
 )
 
 // smallFields is a small size data set for benchmarking
-var loggerFields = Fields***REMOVED***
+var loggerFields = Fields{
 	"foo":   "bar",
 	"baz":   "qux",
 	"one":   "two",
 	"three": "four",
-***REMOVED***
+}
 
-func BenchmarkDummyLogger(b *testing.B) ***REMOVED***
+func BenchmarkDummyLogger(b *testing.B) {
 	nullf, err := os.OpenFile("/dev/null", os.O_WRONLY, 0666)
-	if err != nil ***REMOVED***
+	if err != nil {
 		b.Fatalf("%v", err)
-	***REMOVED***
+	}
 	defer nullf.Close()
-	doLoggerBenchmark(b, nullf, &TextFormatter***REMOVED***DisableColors: true***REMOVED***, smallFields)
-***REMOVED***
+	doLoggerBenchmark(b, nullf, &TextFormatter{DisableColors: true}, smallFields)
+}
 
-func BenchmarkDummyLoggerNoLock(b *testing.B) ***REMOVED***
+func BenchmarkDummyLoggerNoLock(b *testing.B) {
 	nullf, err := os.OpenFile("/dev/null", os.O_WRONLY|os.O_APPEND, 0666)
-	if err != nil ***REMOVED***
+	if err != nil {
 		b.Fatalf("%v", err)
-	***REMOVED***
+	}
 	defer nullf.Close()
-	doLoggerBenchmarkNoLock(b, nullf, &TextFormatter***REMOVED***DisableColors: true***REMOVED***, smallFields)
-***REMOVED***
+	doLoggerBenchmarkNoLock(b, nullf, &TextFormatter{DisableColors: true}, smallFields)
+}
 
-func doLoggerBenchmark(b *testing.B, out *os.File, formatter Formatter, fields Fields) ***REMOVED***
-	logger := Logger***REMOVED***
+func doLoggerBenchmark(b *testing.B, out *os.File, formatter Formatter, fields Fields) {
+	logger := Logger{
 		Out:       out,
 		Level:     InfoLevel,
 		Formatter: formatter,
-	***REMOVED***
+	}
 	entry := logger.WithFields(fields)
-	b.RunParallel(func(pb *testing.PB) ***REMOVED***
-		for pb.Next() ***REMOVED***
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
 			entry.Info("aaa")
-		***REMOVED***
-	***REMOVED***)
-***REMOVED***
+		}
+	})
+}
 
-func doLoggerBenchmarkNoLock(b *testing.B, out *os.File, formatter Formatter, fields Fields) ***REMOVED***
-	logger := Logger***REMOVED***
+func doLoggerBenchmarkNoLock(b *testing.B, out *os.File, formatter Formatter, fields Fields) {
+	logger := Logger{
 		Out:       out,
 		Level:     InfoLevel,
 		Formatter: formatter,
-	***REMOVED***
+	}
 	logger.SetNoLock()
 	entry := logger.WithFields(fields)
-	b.RunParallel(func(pb *testing.PB) ***REMOVED***
-		for pb.Next() ***REMOVED***
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
 			entry.Info("aaa")
-		***REMOVED***
-	***REMOVED***)
-***REMOVED***
+		}
+	})
+}

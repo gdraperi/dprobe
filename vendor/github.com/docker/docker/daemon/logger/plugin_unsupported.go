@@ -7,6 +7,6 @@ import (
 	"io"
 )
 
-func openPluginStream(a *pluginAdapter) (io.WriteCloser, error) ***REMOVED***
+func openPluginStream(a *pluginAdapter) (io.WriteCloser, error) {
 	return nil, errors.New("log plugin not supported")
-***REMOVED***
+}

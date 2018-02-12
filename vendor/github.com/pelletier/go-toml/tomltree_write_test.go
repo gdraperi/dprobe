@@ -10,48 +10,48 @@ import (
 	"time"
 )
 
-type failingWriter struct ***REMOVED***
+type failingWriter struct {
 	failAt  int
 	written int
 	buffer  bytes.Buffer
-***REMOVED***
+}
 
-func (f *failingWriter) Write(p []byte) (n int, err error) ***REMOVED***
+func (f *failingWriter) Write(p []byte) (n int, err error) {
 	count := len(p)
 	toWrite := f.failAt - (count + f.written)
-	if toWrite < 0 ***REMOVED***
+	if toWrite < 0 {
 		toWrite = 0
-	***REMOVED***
-	if toWrite > count ***REMOVED***
+	}
+	if toWrite > count {
 		f.written += count
 		f.buffer.Write(p)
 		return count, nil
-	***REMOVED***
+	}
 
 	f.buffer.Write(p[:toWrite])
 	f.written = f.failAt
 	return toWrite, fmt.Errorf("failingWriter failed after writing %d bytes", f.written)
-***REMOVED***
+}
 
-func assertErrorString(t *testing.T, expected string, err error) ***REMOVED***
+func assertErrorString(t *testing.T, expected string, err error) {
 	expectedErr := errors.New(expected)
-	if err == nil || err.Error() != expectedErr.Error() ***REMOVED***
+	if err == nil || err.Error() != expectedErr.Error() {
 		t.Errorf("expecting error %s, but got %s instead", expected, err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestTreeWriteToEmptyTable(t *testing.T) ***REMOVED***
+func TestTreeWriteToEmptyTable(t *testing.T) {
 	doc := `[[empty-tables]]
 [[empty-tables]]`
 
 	toml, err := Load(doc)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal("Unexpected Load error:", err)
-	***REMOVED***
+	}
 	tomlString, err := toml.ToTomlString()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal("Unexpected ToTomlString error:", err)
-	***REMOVED***
+	}
 
 	expected := `
 [[empty-tables]]
@@ -59,52 +59,52 @@ func TestTreeWriteToEmptyTable(t *testing.T) ***REMOVED***
 [[empty-tables]]
 `
 
-	if tomlString != expected ***REMOVED***
+	if tomlString != expected {
 		t.Fatalf("Expected:\n%s\nGot:\n%s", expected, tomlString)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestTreeWriteToTomlString(t *testing.T) ***REMOVED***
-	toml, err := Load(`name = ***REMOVED*** first = "Tom", last = "Preston-Werner" ***REMOVED***
-points = ***REMOVED*** x = 1, y = 2 ***REMOVED***`)
+func TestTreeWriteToTomlString(t *testing.T) {
+	toml, err := Load(`name = { first = "Tom", last = "Preston-Werner" }
+points = { x = 1, y = 2 }`)
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal("Unexpected error:", err)
-	***REMOVED***
+	}
 
 	tomlString, _ := toml.ToTomlString()
 	reparsedTree, err := Load(tomlString)
 
-	assertTree(t, reparsedTree, err, map[string]interface***REMOVED******REMOVED******REMOVED***
-		"name": map[string]interface***REMOVED******REMOVED******REMOVED***
+	assertTree(t, reparsedTree, err, map[string]interface{}{
+		"name": map[string]interface{}{
 			"first": "Tom",
 			"last":  "Preston-Werner",
-		***REMOVED***,
-		"points": map[string]interface***REMOVED******REMOVED******REMOVED***
+		},
+		"points": map[string]interface{}{
 			"x": int64(1),
 			"y": int64(2),
-		***REMOVED***,
-	***REMOVED***)
-***REMOVED***
+		},
+	})
+}
 
-func TestTreeWriteToTomlStringSimple(t *testing.T) ***REMOVED***
+func TestTreeWriteToTomlStringSimple(t *testing.T) {
 	tree, err := Load("[foo]\n\n[[foo.bar]]\na = 42\n\n[[foo.bar]]\na = 69\n")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("Test failed to parse: %v", err)
 		return
-	***REMOVED***
+	}
 	result, err := tree.ToTomlString()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("Unexpected error: %s", err)
-	***REMOVED***
+	}
 	expected := "\n[foo]\n\n  [[foo.bar]]\n    a = 42\n\n  [[foo.bar]]\n    a = 69\n"
-	if result != expected ***REMOVED***
+	if result != expected {
 		t.Errorf("Expected got '%s', expected '%s'", result, expected)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestTreeWriteToTomlStringKeysOrders(t *testing.T) ***REMOVED***
-	for i := 0; i < 100; i++ ***REMOVED***
+func TestTreeWriteToTomlStringKeysOrders(t *testing.T) {
+	for i := 0; i < 100; i++ {
 		tree, _ := Load(`
 		foobar = true
 		bar = "baz"
@@ -121,127 +121,127 @@ func TestTreeWriteToTomlStringKeysOrders(t *testing.T) ***REMOVED***
 		r := strings.NewReader(stringRepr)
 		toml, err := LoadReader(r)
 
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatal("Unexpected error:", err)
-		***REMOVED***
+		}
 
-		assertTree(t, toml, err, map[string]interface***REMOVED******REMOVED******REMOVED***
+		assertTree(t, toml, err, map[string]interface{}{
 			"foobar": true,
 			"bar":    "baz",
 			"foo":    1,
-			"qux": map[string]interface***REMOVED******REMOVED******REMOVED***
+			"qux": map[string]interface{}{
 				"foo": 1,
 				"bar": "baz2",
-			***REMOVED***,
-		***REMOVED***)
-	***REMOVED***
-***REMOVED***
+			},
+		})
+	}
+}
 
-func testMaps(t *testing.T, actual, expected map[string]interface***REMOVED******REMOVED***) ***REMOVED***
-	if !reflect.DeepEqual(actual, expected) ***REMOVED***
+func testMaps(t *testing.T, actual, expected map[string]interface{}) {
+	if !reflect.DeepEqual(actual, expected) {
 		t.Fatal("trees aren't equal.\n", "Expected:\n", expected, "\nActual:\n", actual)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestTreeWriteToMapSimple(t *testing.T) ***REMOVED***
+func TestTreeWriteToMapSimple(t *testing.T) {
 	tree, _ := Load("a = 42\nb = 17")
 
-	expected := map[string]interface***REMOVED******REMOVED******REMOVED***
+	expected := map[string]interface{}{
 		"a": int64(42),
 		"b": int64(17),
-	***REMOVED***
+	}
 
 	testMaps(t, tree.ToMap(), expected)
-***REMOVED***
+}
 
-func TestTreeWriteToInvalidTreeSimpleValue(t *testing.T) ***REMOVED***
-	tree := Tree***REMOVED***values: map[string]interface***REMOVED******REMOVED******REMOVED***"foo": int8(1)***REMOVED******REMOVED***
+func TestTreeWriteToInvalidTreeSimpleValue(t *testing.T) {
+	tree := Tree{values: map[string]interface{}{"foo": int8(1)}}
 	_, err := tree.ToTomlString()
 	assertErrorString(t, "invalid value type at foo: int8", err)
-***REMOVED***
+}
 
-func TestTreeWriteToInvalidTreeTomlValue(t *testing.T) ***REMOVED***
-	tree := Tree***REMOVED***values: map[string]interface***REMOVED******REMOVED******REMOVED***"foo": &tomlValue***REMOVED***value: int8(1), comment: "", position: Position***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***
+func TestTreeWriteToInvalidTreeTomlValue(t *testing.T) {
+	tree := Tree{values: map[string]interface{}{"foo": &tomlValue{value: int8(1), comment: "", position: Position{}}}}
 	_, err := tree.ToTomlString()
 	assertErrorString(t, "unsupported value type int8: 1", err)
-***REMOVED***
+}
 
-func TestTreeWriteToInvalidTreeTomlValueArray(t *testing.T) ***REMOVED***
-	tree := Tree***REMOVED***values: map[string]interface***REMOVED******REMOVED******REMOVED***"foo": &tomlValue***REMOVED***value: int8(1), comment: "", position: Position***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***
+func TestTreeWriteToInvalidTreeTomlValueArray(t *testing.T) {
+	tree := Tree{values: map[string]interface{}{"foo": &tomlValue{value: int8(1), comment: "", position: Position{}}}}
 	_, err := tree.ToTomlString()
 	assertErrorString(t, "unsupported value type int8: 1", err)
-***REMOVED***
+}
 
-func TestTreeWriteToFailingWriterInSimpleValue(t *testing.T) ***REMOVED***
+func TestTreeWriteToFailingWriterInSimpleValue(t *testing.T) {
 	toml, _ := Load(`a = 2`)
-	writer := failingWriter***REMOVED***failAt: 0, written: 0***REMOVED***
+	writer := failingWriter{failAt: 0, written: 0}
 	_, err := toml.WriteTo(&writer)
 	assertErrorString(t, "failingWriter failed after writing 0 bytes", err)
-***REMOVED***
+}
 
-func TestTreeWriteToFailingWriterInTable(t *testing.T) ***REMOVED***
+func TestTreeWriteToFailingWriterInTable(t *testing.T) {
 	toml, _ := Load(`
 [b]
 a = 2`)
-	writer := failingWriter***REMOVED***failAt: 2, written: 0***REMOVED***
+	writer := failingWriter{failAt: 2, written: 0}
 	_, err := toml.WriteTo(&writer)
 	assertErrorString(t, "failingWriter failed after writing 2 bytes", err)
 
-	writer = failingWriter***REMOVED***failAt: 13, written: 0***REMOVED***
+	writer = failingWriter{failAt: 13, written: 0}
 	_, err = toml.WriteTo(&writer)
 	assertErrorString(t, "failingWriter failed after writing 13 bytes", err)
-***REMOVED***
+}
 
-func TestTreeWriteToFailingWriterInArray(t *testing.T) ***REMOVED***
+func TestTreeWriteToFailingWriterInArray(t *testing.T) {
 	toml, _ := Load(`
 [[b]]
 a = 2`)
-	writer := failingWriter***REMOVED***failAt: 2, written: 0***REMOVED***
+	writer := failingWriter{failAt: 2, written: 0}
 	_, err := toml.WriteTo(&writer)
 	assertErrorString(t, "failingWriter failed after writing 2 bytes", err)
 
-	writer = failingWriter***REMOVED***failAt: 15, written: 0***REMOVED***
+	writer = failingWriter{failAt: 15, written: 0}
 	_, err = toml.WriteTo(&writer)
 	assertErrorString(t, "failingWriter failed after writing 15 bytes", err)
-***REMOVED***
+}
 
-func TestTreeWriteToMapExampleFile(t *testing.T) ***REMOVED***
+func TestTreeWriteToMapExampleFile(t *testing.T) {
 	tree, _ := LoadFile("example.toml")
-	expected := map[string]interface***REMOVED******REMOVED******REMOVED***
+	expected := map[string]interface{}{
 		"title": "TOML Example",
-		"owner": map[string]interface***REMOVED******REMOVED******REMOVED***
+		"owner": map[string]interface{}{
 			"name":         "Tom Preston-Werner",
 			"organization": "GitHub",
 			"bio":          "GitHub Cofounder & CEO\nLikes tater tots and beer.",
 			"dob":          time.Date(1979, time.May, 27, 7, 32, 0, 0, time.UTC),
-		***REMOVED***,
-		"database": map[string]interface***REMOVED******REMOVED******REMOVED***
+		},
+		"database": map[string]interface{}{
 			"server":         "192.168.1.1",
-			"ports":          []interface***REMOVED******REMOVED******REMOVED***int64(8001), int64(8001), int64(8002)***REMOVED***,
+			"ports":          []interface{}{int64(8001), int64(8001), int64(8002)},
 			"connection_max": int64(5000),
 			"enabled":        true,
-		***REMOVED***,
-		"servers": map[string]interface***REMOVED******REMOVED******REMOVED***
-			"alpha": map[string]interface***REMOVED******REMOVED******REMOVED***
+		},
+		"servers": map[string]interface{}{
+			"alpha": map[string]interface{}{
 				"ip": "10.0.0.1",
 				"dc": "eqdc10",
-			***REMOVED***,
-			"beta": map[string]interface***REMOVED******REMOVED******REMOVED***
+			},
+			"beta": map[string]interface{}{
 				"ip": "10.0.0.2",
 				"dc": "eqdc10",
-			***REMOVED***,
-		***REMOVED***,
-		"clients": map[string]interface***REMOVED******REMOVED******REMOVED***
-			"data": []interface***REMOVED******REMOVED******REMOVED***
-				[]interface***REMOVED******REMOVED******REMOVED***"gamma", "delta"***REMOVED***,
-				[]interface***REMOVED******REMOVED******REMOVED***int64(1), int64(2)***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+			},
+		},
+		"clients": map[string]interface{}{
+			"data": []interface{}{
+				[]interface{}{"gamma", "delta"},
+				[]interface{}{int64(1), int64(2)},
+			},
+		},
+	}
 	testMaps(t, tree.ToMap(), expected)
-***REMOVED***
+}
 
-func TestTreeWriteToMapWithTablesInMultipleChunks(t *testing.T) ***REMOVED***
+func TestTreeWriteToMapWithTablesInMultipleChunks(t *testing.T) {
 	tree, _ := Load(`
 	[[menu.main]]
         a = "menu 1"
@@ -249,97 +249,97 @@ func TestTreeWriteToMapWithTablesInMultipleChunks(t *testing.T) ***REMOVED***
         [[menu.main]]
         c = "menu 3"
         d = "menu 4"`)
-	expected := map[string]interface***REMOVED******REMOVED******REMOVED***
-		"menu": map[string]interface***REMOVED******REMOVED******REMOVED***
-			"main": []interface***REMOVED******REMOVED******REMOVED***
-				map[string]interface***REMOVED******REMOVED******REMOVED***"a": "menu 1", "b": "menu 2"***REMOVED***,
-				map[string]interface***REMOVED******REMOVED******REMOVED***"c": "menu 3", "d": "menu 4"***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+	expected := map[string]interface{}{
+		"menu": map[string]interface{}{
+			"main": []interface{}{
+				map[string]interface{}{"a": "menu 1", "b": "menu 2"},
+				map[string]interface{}{"c": "menu 3", "d": "menu 4"},
+			},
+		},
+	}
 	treeMap := tree.ToMap()
 
 	testMaps(t, treeMap, expected)
-***REMOVED***
+}
 
-func TestTreeWriteToMapWithArrayOfInlineTables(t *testing.T) ***REMOVED***
+func TestTreeWriteToMapWithArrayOfInlineTables(t *testing.T) {
 	tree, _ := Load(`
     	[params]
 	language_tabs = [
-    		***REMOVED*** key = "shell", name = "Shell" ***REMOVED***,
-    		***REMOVED*** key = "ruby", name = "Ruby" ***REMOVED***,
-    		***REMOVED*** key = "python", name = "Python" ***REMOVED***
+    		{ key = "shell", name = "Shell" },
+    		{ key = "ruby", name = "Ruby" },
+    		{ key = "python", name = "Python" }
 	]`)
 
-	expected := map[string]interface***REMOVED******REMOVED******REMOVED***
-		"params": map[string]interface***REMOVED******REMOVED******REMOVED***
-			"language_tabs": []interface***REMOVED******REMOVED******REMOVED***
-				map[string]interface***REMOVED******REMOVED******REMOVED***
+	expected := map[string]interface{}{
+		"params": map[string]interface{}{
+			"language_tabs": []interface{}{
+				map[string]interface{}{
 					"key":  "shell",
 					"name": "Shell",
-				***REMOVED***,
-				map[string]interface***REMOVED******REMOVED******REMOVED***
+				},
+				map[string]interface{}{
 					"key":  "ruby",
 					"name": "Ruby",
-				***REMOVED***,
-				map[string]interface***REMOVED******REMOVED******REMOVED***
+				},
+				map[string]interface{}{
 					"key":  "python",
 					"name": "Python",
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+				},
+			},
+		},
+	}
 
 	treeMap := tree.ToMap()
 	testMaps(t, treeMap, expected)
-***REMOVED***
+}
 
-func TestTreeWriteToFloat(t *testing.T) ***REMOVED***
+func TestTreeWriteToFloat(t *testing.T) {
 	tree, err := Load(`a = 3.0`)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	str, err := tree.ToTomlString()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	expected := `a = 3.0`
-	if strings.TrimSpace(str) != strings.TrimSpace(expected) ***REMOVED***
+	if strings.TrimSpace(str) != strings.TrimSpace(expected) {
 		t.Fatalf("Expected:\n%s\nGot:\n%s", expected, str)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestTreeWriteToSpecialFloat(t *testing.T) ***REMOVED***
+func TestTreeWriteToSpecialFloat(t *testing.T) {
 	expected := `a = +inf
 b = -inf
 c = nan`
 
 	tree, err := Load(expected)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	str, err := tree.ToTomlString()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if strings.TrimSpace(str) != strings.TrimSpace(expected) ***REMOVED***
+	}
+	if strings.TrimSpace(str) != strings.TrimSpace(expected) {
 		t.Fatalf("Expected:\n%s\nGot:\n%s", expected, str)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func BenchmarkTreeToTomlString(b *testing.B) ***REMOVED***
+func BenchmarkTreeToTomlString(b *testing.B) {
 	toml, err := Load(sampleHard)
-	if err != nil ***REMOVED***
+	if err != nil {
 		b.Fatal("Unexpected error:", err)
-	***REMOVED***
+	}
 
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		_, err := toml.ToTomlString()
-		if err != nil ***REMOVED***
+		if err != nil {
 			b.Fatal(err)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 var sampleHard = `# Test file for TOML
 # Only this one tries to emulate a TOML file written by a user of the kind of parser writers probably hate

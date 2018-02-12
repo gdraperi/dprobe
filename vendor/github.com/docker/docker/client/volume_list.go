@@ -10,23 +10,23 @@ import (
 )
 
 // VolumeList returns the volumes configured in the docker host.
-func (cli *Client) VolumeList(ctx context.Context, filter filters.Args) (volumetypes.VolumesListOKBody, error) ***REMOVED***
+func (cli *Client) VolumeList(ctx context.Context, filter filters.Args) (volumetypes.VolumesListOKBody, error) {
 	var volumes volumetypes.VolumesListOKBody
-	query := url.Values***REMOVED******REMOVED***
+	query := url.Values{}
 
-	if filter.Len() > 0 ***REMOVED***
+	if filter.Len() > 0 {
 		filterJSON, err := filters.ToParamWithVersion(cli.version, filter)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return volumes, err
-		***REMOVED***
+		}
 		query.Set("filters", filterJSON)
-	***REMOVED***
+	}
 	resp, err := cli.get(ctx, "/volumes", query, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return volumes, err
-	***REMOVED***
+	}
 
 	err = json.NewDecoder(resp.body).Decode(&volumes)
 	ensureReaderClosed(resp)
 	return volumes, err
-***REMOVED***
+}

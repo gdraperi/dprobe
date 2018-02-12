@@ -1,8 +1,8 @@
 package volume
 
-func (p *windowsParser) HasResource(m *MountPoint, absolutePath string) bool ***REMOVED***
+func (p *windowsParser) HasResource(m *MountPoint, absolutePath string) bool {
 	return false
-***REMOVED***
-func (p *linuxParser) HasResource(m *MountPoint, absolutePath string) bool ***REMOVED***
+}
+func (p *linuxParser) HasResource(m *MountPoint, absolutePath string) bool {
 	return false
-***REMOVED***
+}

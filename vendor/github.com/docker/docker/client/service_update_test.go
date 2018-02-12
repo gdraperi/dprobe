@@ -14,64 +14,64 @@ import (
 	"github.com/docker/docker/api/types/swarm"
 )
 
-func TestServiceUpdateError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestServiceUpdateError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
-	***REMOVED***
+	}
 
-	_, err := client.ServiceUpdate(context.Background(), "service_id", swarm.Version***REMOVED******REMOVED***, swarm.ServiceSpec***REMOVED******REMOVED***, types.ServiceUpdateOptions***REMOVED******REMOVED***)
-	if err == nil || err.Error() != "Error response from daemon: Server error" ***REMOVED***
+	_, err := client.ServiceUpdate(context.Background(), "service_id", swarm.Version{}, swarm.ServiceSpec{}, types.ServiceUpdateOptions{})
+	if err == nil || err.Error() != "Error response from daemon: Server error" {
 		t.Fatalf("expected a Server Error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestServiceUpdate(t *testing.T) ***REMOVED***
+func TestServiceUpdate(t *testing.T) {
 	expectedURL := "/services/service_id/update"
 
-	updateCases := []struct ***REMOVED***
+	updateCases := []struct {
 		swarmVersion    swarm.Version
 		expectedVersion string
-	***REMOVED******REMOVED***
-		***REMOVED***
+	}{
+		{
 			expectedVersion: "0",
-		***REMOVED***,
-		***REMOVED***
-			swarmVersion: swarm.Version***REMOVED***
+		},
+		{
+			swarmVersion: swarm.Version{
 				Index: 0,
-			***REMOVED***,
+			},
 			expectedVersion: "0",
-		***REMOVED***,
-		***REMOVED***
-			swarmVersion: swarm.Version***REMOVED***
+		},
+		{
+			swarmVersion: swarm.Version{
 				Index: 10,
-			***REMOVED***,
+			},
 			expectedVersion: "10",
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
-	for _, updateCase := range updateCases ***REMOVED***
-		client := &Client***REMOVED***
-			client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-				if !strings.HasPrefix(req.URL.Path, expectedURL) ***REMOVED***
+	for _, updateCase := range updateCases {
+		client := &Client{
+			client: newMockClient(func(req *http.Request) (*http.Response, error) {
+				if !strings.HasPrefix(req.URL.Path, expectedURL) {
 					return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, req.URL)
-				***REMOVED***
-				if req.Method != "POST" ***REMOVED***
+				}
+				if req.Method != "POST" {
 					return nil, fmt.Errorf("expected POST method, got %s", req.Method)
-				***REMOVED***
+				}
 				version := req.URL.Query().Get("version")
-				if version != updateCase.expectedVersion ***REMOVED***
+				if version != updateCase.expectedVersion {
 					return nil, fmt.Errorf("version not set in URL query properly, expected '%s', got %s", updateCase.expectedVersion, version)
-				***REMOVED***
-				return &http.Response***REMOVED***
+				}
+				return &http.Response{
 					StatusCode: http.StatusOK,
-					Body:       ioutil.NopCloser(bytes.NewReader([]byte("***REMOVED******REMOVED***"))),
-				***REMOVED***, nil
-			***REMOVED***),
-		***REMOVED***
+					Body:       ioutil.NopCloser(bytes.NewReader([]byte("{}"))),
+				}, nil
+			}),
+		}
 
-		_, err := client.ServiceUpdate(context.Background(), "service_id", updateCase.swarmVersion, swarm.ServiceSpec***REMOVED******REMOVED***, types.ServiceUpdateOptions***REMOVED******REMOVED***)
-		if err != nil ***REMOVED***
+		_, err := client.ServiceUpdate(context.Background(), "service_id", updateCase.swarmVersion, swarm.ServiceSpec{}, types.ServiceUpdateOptions{})
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

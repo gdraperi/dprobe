@@ -2,19 +2,19 @@ package bridge
 
 import "github.com/docker/libnetwork/iptables"
 
-func (n *bridgeNetwork) setupFirewalld(config *networkConfiguration, i *bridgeInterface) error ***REMOVED***
+func (n *bridgeNetwork) setupFirewalld(config *networkConfiguration, i *bridgeInterface) error {
 	d := n.driver
 	d.Lock()
 	driverConfig := d.config
 	d.Unlock()
 
 	// Sanity check.
-	if !driverConfig.EnableIPTables ***REMOVED***
+	if !driverConfig.EnableIPTables {
 		return IPTableCfgError(config.BridgeName)
-	***REMOVED***
+	}
 
-	iptables.OnReloaded(func() ***REMOVED*** n.setupIPTables(config, i) ***REMOVED***)
+	iptables.OnReloaded(func() { n.setupIPTables(config, i) })
 	iptables.OnReloaded(n.portMapper.ReMapAll)
 
 	return nil
-***REMOVED***
+}

@@ -6,7 +6,7 @@ set -x
 
 RM_GOPATH=0
 
-TMP_GOPATH=$***REMOVED***TMP_GOPATH:-""***REMOVED***
+TMP_GOPATH=${TMP_GOPATH:-""}
 
 if [ -z "$TMP_GOPATH" ]; then
 	export GOPATH="$(mktemp -d)"
@@ -16,18 +16,18 @@ else
 fi
 
 # Do not build with ambient capabilities support
-RUNC_BUILDTAGS="$***REMOVED***RUNC_BUILDTAGS:-"seccomp apparmor selinux"***REMOVED***"
+RUNC_BUILDTAGS="${RUNC_BUILDTAGS:-"seccomp apparmor selinux"}"
 
-install_runc() ***REMOVED***
+install_runc() {
 	echo "Install runc version $RUNC_COMMIT"
 	git clone https://github.com/opencontainers/runc.git "$GOPATH/src/github.com/opencontainers/runc"
 	cd "$GOPATH/src/github.com/opencontainers/runc"
 	git checkout -q "$RUNC_COMMIT"
 	make BUILDTAGS="$RUNC_BUILDTAGS" $1
 	cp runc /usr/local/bin/docker-runc
-***REMOVED***
+}
 
-install_containerd() ***REMOVED***
+install_containerd() {
 	echo "Install containerd version $CONTAINERD_COMMIT"
 	git clone https://github.com/containerd/containerd.git "$GOPATH/src/github.com/containerd/containerd"
 	cd "$GOPATH/src/github.com/containerd/containerd"
@@ -39,9 +39,9 @@ install_containerd() ***REMOVED***
 	cp bin/containerd /usr/local/bin/docker-containerd
 	cp bin/containerd-shim /usr/local/bin/docker-containerd-shim
 	cp bin/ctr /usr/local/bin/docker-containerd-ctr
-***REMOVED***
+}
 
-install_containerd_static() ***REMOVED***
+install_containerd_static() {
 	echo "Install containerd version $CONTAINERD_COMMIT"
 	git clone https://github.com/containerd/containerd.git "$GOPATH/src/github.com/containerd/containerd"
 	cd "$GOPATH/src/github.com/containerd/containerd"
@@ -53,19 +53,19 @@ install_containerd_static() ***REMOVED***
 	cp bin/containerd /usr/local/bin/docker-containerd
 	cp bin/containerd-shim /usr/local/bin/docker-containerd-shim
 	cp bin/ctr /usr/local/bin/docker-containerd-ctr
-***REMOVED***
+}
 
-install_proxy() ***REMOVED***
+install_proxy() {
 	echo "Install docker-proxy version $LIBNETWORK_COMMIT"
 	git clone https://github.com/docker/libnetwork.git "$GOPATH/src/github.com/docker/libnetwork"
 	cd "$GOPATH/src/github.com/docker/libnetwork"
 	git checkout -q "$LIBNETWORK_COMMIT"
 	go build -ldflags="$PROXY_LDFLAGS" -o /usr/local/bin/docker-proxy github.com/docker/libnetwork/cmd/proxy
-***REMOVED***
+}
 
-install_dockercli() ***REMOVED***
-	DOCKERCLI_CHANNEL=$***REMOVED***DOCKERCLI_CHANNEL:-edge***REMOVED***
-	DOCKERCLI_VERSION=$***REMOVED***DOCKERCLI_VERSION:-17.06.0-ce***REMOVED***
+install_dockercli() {
+	DOCKERCLI_CHANNEL=${DOCKERCLI_CHANNEL:-edge}
+	DOCKERCLI_VERSION=${DOCKERCLI_VERSION:-17.06.0-ce}
 	echo "Install docker/cli version $DOCKERCLI_VERSION from $DOCKERCLI_CHANNEL"
 
 	arch=$(uname -m)
@@ -80,26 +80,26 @@ install_dockercli() ***REMOVED***
 	tar -xz docker/docker
 	mv docker/docker /usr/local/bin/
 	rmdir docker
-***REMOVED***
+}
 
-build_dockercli() ***REMOVED***
-	DOCKERCLI_VERSION=$***REMOVED***DOCKERCLI_VERSION:-17.06.0-ce***REMOVED***
+build_dockercli() {
+	DOCKERCLI_VERSION=${DOCKERCLI_VERSION:-17.06.0-ce}
 	git clone https://github.com/docker/docker-ce "$GOPATH/tmp/docker-ce"
 	cd "$GOPATH/tmp/docker-ce"
 	git checkout -q "v$DOCKERCLI_VERSION"
 	mkdir -p "$GOPATH/src/github.com/docker"
 	mv components/cli "$GOPATH/src/github.com/docker/cli"
 	go build -o /usr/local/bin/docker github.com/docker/cli/cmd/docker
-***REMOVED***
+}
 
-install_gometalinter() ***REMOVED***
+install_gometalinter() {
 	echo "Installing gometalinter version $GOMETALINTER_COMMIT"
 	go get -d github.com/alecthomas/gometalinter
 	cd "$GOPATH/src/github.com/alecthomas/gometalinter"
 	git checkout -q "$GOMETALINTER_COMMIT"
 	go build -o /usr/local/bin/gometalinter github.com/alecthomas/gometalinter
 	GOBIN=/usr/local/bin gometalinter --install
-***REMOVED***
+}
 
 for prog in "$@"
 do

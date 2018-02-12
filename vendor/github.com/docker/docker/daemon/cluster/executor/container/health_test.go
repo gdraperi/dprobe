@@ -14,81 +14,81 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestHealthStates(t *testing.T) ***REMOVED***
+func TestHealthStates(t *testing.T) {
 
 	// set up environment: events, task, container ....
 	e := events.New()
 	_, l, _ := e.Subscribe()
 	defer e.Evict(l)
 
-	task := &api.Task***REMOVED***
+	task := &api.Task{
 		ID:        "id",
 		ServiceID: "sid",
-		Spec: api.TaskSpec***REMOVED***
-			Runtime: &api.TaskSpec_Container***REMOVED***
-				Container: &api.ContainerSpec***REMOVED***
+		Spec: api.TaskSpec{
+			Runtime: &api.TaskSpec_Container{
+				Container: &api.ContainerSpec{
 					Image: "image_name",
-					Labels: map[string]string***REMOVED***
+					Labels: map[string]string{
 						"com.docker.swarm.task.id": "id",
-					***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		Annotations: api.Annotations***REMOVED***Name: "name"***REMOVED***,
-	***REMOVED***
+					},
+				},
+			},
+		},
+		Annotations: api.Annotations{Name: "name"},
+	}
 
-	c := &container.Container***REMOVED***
+	c := &container.Container{
 		ID:   "id",
 		Name: "name",
-		Config: &containertypes.Config***REMOVED***
+		Config: &containertypes.Config{
 			Image: "image_name",
-			Labels: map[string]string***REMOVED***
+			Labels: map[string]string{
 				"com.docker.swarm.task.id": "id",
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+			},
+		},
+	}
 
-	daemon := &daemon.Daemon***REMOVED***
+	daemon := &daemon.Daemon{
 		EventsService: e,
-	***REMOVED***
+	}
 
 	controller, err := newController(daemon, task, nil, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("create controller fail %v", err)
-	***REMOVED***
+	}
 
 	errChan := make(chan error, 1)
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	// fire checkHealth
-	go func() ***REMOVED***
+	go func() {
 		err := controller.checkHealth(ctx)
-		select ***REMOVED***
+		select {
 		case errChan <- err:
 		case <-ctx.Done():
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
 	// send an event and expect to get expectedErr
 	// if expectedErr is nil, shouldn't get any error
-	logAndExpect := func(msg string, expectedErr error) ***REMOVED***
+	logAndExpect := func(msg string, expectedErr error) {
 		daemon.LogContainerEvent(c, msg)
 
 		timer := time.NewTimer(1 * time.Second)
 		defer timer.Stop()
 
-		select ***REMOVED***
+		select {
 		case err := <-errChan:
-			if err != expectedErr ***REMOVED***
+			if err != expectedErr {
 				t.Fatalf("expect error %v, but get %v", expectedErr, err)
-			***REMOVED***
+			}
 		case <-timer.C:
-			if expectedErr != nil ***REMOVED***
+			if expectedErr != nil {
 				t.Fatal("time limit exceeded, didn't get expected error")
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	// events that are ignored by checkHealth
 	logAndExpect("health_status: running", nil)
@@ -97,4 +97,4 @@ func TestHealthStates(t *testing.T) ***REMOVED***
 
 	// unhealthy event will be caught by checkHealth
 	logAndExpect("health_status: unhealthy", ErrContainerUnhealthy)
-***REMOVED***
+}

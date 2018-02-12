@@ -26,7 +26,7 @@ import (
 	"unicode"
 )
 
-var templateFuncs = template.FuncMap***REMOVED***
+var templateFuncs = template.FuncMap{
 	"trim":                    strings.TrimSpace,
 	"trimRightSpace":          trimRightSpace,
 	"trimTrailingWhitespaces": trimRightSpace,
@@ -34,7 +34,7 @@ var templateFuncs = template.FuncMap***REMOVED***
 	"rpad":                    rpad,
 	"gt":                      Gt,
 	"eq":                      Eq,
-***REMOVED***
+}
 
 var initializers []func()
 
@@ -58,143 +58,143 @@ You need to open cmd.exe and run it from there.
 
 // AddTemplateFunc adds a template function that's available to Usage and Help
 // template generation.
-func AddTemplateFunc(name string, tmplFunc interface***REMOVED******REMOVED***) ***REMOVED***
+func AddTemplateFunc(name string, tmplFunc interface{}) {
 	templateFuncs[name] = tmplFunc
-***REMOVED***
+}
 
 // AddTemplateFuncs adds multiple template functions that are available to Usage and
 // Help template generation.
-func AddTemplateFuncs(tmplFuncs template.FuncMap) ***REMOVED***
-	for k, v := range tmplFuncs ***REMOVED***
+func AddTemplateFuncs(tmplFuncs template.FuncMap) {
+	for k, v := range tmplFuncs {
 		templateFuncs[k] = v
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // OnInitialize sets the passed functions to be run when each command's
 // Execute method is called.
-func OnInitialize(y ...func()) ***REMOVED***
+func OnInitialize(y ...func()) {
 	initializers = append(initializers, y...)
-***REMOVED***
+}
 
 // FIXME Gt is unused by cobra and should be removed in a version 2. It exists only for compatibility with users of cobra.
 
 // Gt takes two types and checks whether the first type is greater than the second. In case of types Arrays, Chans,
 // Maps and Slices, Gt will compare their lengths. Ints are compared directly while strings are first parsed as
 // ints and then compared.
-func Gt(a interface***REMOVED******REMOVED***, b interface***REMOVED******REMOVED***) bool ***REMOVED***
+func Gt(a interface{}, b interface{}) bool {
 	var left, right int64
 	av := reflect.ValueOf(a)
 
-	switch av.Kind() ***REMOVED***
+	switch av.Kind() {
 	case reflect.Array, reflect.Chan, reflect.Map, reflect.Slice:
 		left = int64(av.Len())
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		left = av.Int()
 	case reflect.String:
 		left, _ = strconv.ParseInt(av.String(), 10, 64)
-	***REMOVED***
+	}
 
 	bv := reflect.ValueOf(b)
 
-	switch bv.Kind() ***REMOVED***
+	switch bv.Kind() {
 	case reflect.Array, reflect.Chan, reflect.Map, reflect.Slice:
 		right = int64(bv.Len())
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		right = bv.Int()
 	case reflect.String:
 		right, _ = strconv.ParseInt(bv.String(), 10, 64)
-	***REMOVED***
+	}
 
 	return left > right
-***REMOVED***
+}
 
 // FIXME Eq is unused by cobra and should be removed in a version 2. It exists only for compatibility with users of cobra.
 
 // Eq takes two types and checks whether they are equal. Supported types are int and string. Unsupported types will panic.
-func Eq(a interface***REMOVED******REMOVED***, b interface***REMOVED******REMOVED***) bool ***REMOVED***
+func Eq(a interface{}, b interface{}) bool {
 	av := reflect.ValueOf(a)
 	bv := reflect.ValueOf(b)
 
-	switch av.Kind() ***REMOVED***
+	switch av.Kind() {
 	case reflect.Array, reflect.Chan, reflect.Map, reflect.Slice:
 		panic("Eq called on unsupported type")
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		return av.Int() == bv.Int()
 	case reflect.String:
 		return av.String() == bv.String()
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
-func trimRightSpace(s string) string ***REMOVED***
+func trimRightSpace(s string) string {
 	return strings.TrimRightFunc(s, unicode.IsSpace)
-***REMOVED***
+}
 
 // FIXME appendIfNotPresent is unused by cobra and should be removed in a version 2. It exists only for compatibility with users of cobra.
 
 // appendIfNotPresent will append stringToAppend to the end of s, but only if it's not yet present in s.
-func appendIfNotPresent(s, stringToAppend string) string ***REMOVED***
-	if strings.Contains(s, stringToAppend) ***REMOVED***
+func appendIfNotPresent(s, stringToAppend string) string {
+	if strings.Contains(s, stringToAppend) {
 		return s
-	***REMOVED***
+	}
 	return s + " " + stringToAppend
-***REMOVED***
+}
 
 // rpad adds padding to the right of a string.
-func rpad(s string, padding int) string ***REMOVED***
+func rpad(s string, padding int) string {
 	template := fmt.Sprintf("%%-%ds", padding)
 	return fmt.Sprintf(template, s)
-***REMOVED***
+}
 
 // tmpl executes the given template text on data, writing the result to w.
-func tmpl(w io.Writer, text string, data interface***REMOVED******REMOVED***) error ***REMOVED***
+func tmpl(w io.Writer, text string, data interface{}) error {
 	t := template.New("top")
 	t.Funcs(templateFuncs)
 	template.Must(t.Parse(text))
 	return t.Execute(w, data)
-***REMOVED***
+}
 
 // ld compares two strings and returns the levenshtein distance between them.
-func ld(s, t string, ignoreCase bool) int ***REMOVED***
-	if ignoreCase ***REMOVED***
+func ld(s, t string, ignoreCase bool) int {
+	if ignoreCase {
 		s = strings.ToLower(s)
 		t = strings.ToLower(t)
-	***REMOVED***
+	}
 	d := make([][]int, len(s)+1)
-	for i := range d ***REMOVED***
+	for i := range d {
 		d[i] = make([]int, len(t)+1)
-	***REMOVED***
-	for i := range d ***REMOVED***
+	}
+	for i := range d {
 		d[i][0] = i
-	***REMOVED***
-	for j := range d[0] ***REMOVED***
+	}
+	for j := range d[0] {
 		d[0][j] = j
-	***REMOVED***
-	for j := 1; j <= len(t); j++ ***REMOVED***
-		for i := 1; i <= len(s); i++ ***REMOVED***
-			if s[i-1] == t[j-1] ***REMOVED***
+	}
+	for j := 1; j <= len(t); j++ {
+		for i := 1; i <= len(s); i++ {
+			if s[i-1] == t[j-1] {
 				d[i][j] = d[i-1][j-1]
-			***REMOVED*** else ***REMOVED***
+			} else {
 				min := d[i-1][j]
-				if d[i][j-1] < min ***REMOVED***
+				if d[i][j-1] < min {
 					min = d[i][j-1]
-				***REMOVED***
-				if d[i-1][j-1] < min ***REMOVED***
+				}
+				if d[i-1][j-1] < min {
 					min = d[i-1][j-1]
-				***REMOVED***
+				}
 				d[i][j] = min + 1
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
-	***REMOVED***
+	}
 	return d[len(s)][len(t)]
-***REMOVED***
+}
 
-func stringInSlice(a string, list []string) bool ***REMOVED***
-	for _, b := range list ***REMOVED***
-		if b == a ***REMOVED***
+func stringInSlice(a string, list []string) bool {
+	for _, b := range list {
+		if b == a {
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false
-***REMOVED***
+}

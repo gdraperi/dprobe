@@ -10,9 +10,9 @@ import (
 
 var dummy uintptr
 
-func init() ***REMOVED***
+func init() {
 	// Ensure that this import is not removed by the linker. This is used to
 	// ensure that shell32.dll is loaded by the system loader, preventing
 	// go#15286 from triggering on Nano Server TP5.
 	atomic.LoadUintptr(&dummy)
-***REMOVED***
+}

@@ -14,10 +14,10 @@ import (
 )
 
 // Ensure we don't regress on CVE-2017-14992.
-func TestImportExtremelyLargeImageWorks(t *testing.T) ***REMOVED***
-	if runtime.GOARCH == "arm64" ***REMOVED***
+func TestImportExtremelyLargeImageWorks(t *testing.T) {
+	if runtime.GOARCH == "arm64" {
 		t.Skip("effective test will be time out")
-	***REMOVED***
+	}
 
 	client := request.NewAPIClient(t)
 
@@ -27,16 +27,16 @@ func TestImportExtremelyLargeImageWorks(t *testing.T) ***REMOVED***
 	var tarBuffer bytes.Buffer
 
 	tw := tar.NewWriter(&tarBuffer)
-	if err := tw.Close(); err != nil ***REMOVED***
+	if err := tw.Close(); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	imageRdr := io.MultiReader(&tarBuffer, io.LimitReader(testutil.DevZero, 8*1024*1024*1024))
 
 	_, err := client.ImageImport(context.Background(),
-		types.ImageImportSource***REMOVED***Source: imageRdr, SourceName: "-"***REMOVED***,
+		types.ImageImportSource{Source: imageRdr, SourceName: "-"},
 		"test1234:v42",
-		types.ImageImportOptions***REMOVED******REMOVED***)
-	if err != nil ***REMOVED***
+		types.ImageImportOptions{})
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}

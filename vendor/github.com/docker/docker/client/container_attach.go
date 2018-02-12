@@ -22,7 +22,7 @@ import (
 // multiplexed.
 // The format of the multiplexed stream is as follows:
 //
-//    [8]byte***REMOVED***STREAM_TYPE, 0, 0, 0, SIZE1, SIZE2, SIZE3, SIZE4***REMOVED***[]byte***REMOVED***OUTPUT***REMOVED***
+//    [8]byte{STREAM_TYPE, 0, 0, 0, SIZE1, SIZE2, SIZE3, SIZE4}[]byte{OUTPUT}
 //
 // STREAM_TYPE can be 1 for stdout and 2 for stderr
 //
@@ -31,27 +31,27 @@ import (
 //
 // You can use github.com/docker/docker/pkg/stdcopy.StdCopy to demultiplex this
 // stream.
-func (cli *Client) ContainerAttach(ctx context.Context, container string, options types.ContainerAttachOptions) (types.HijackedResponse, error) ***REMOVED***
-	query := url.Values***REMOVED******REMOVED***
-	if options.Stream ***REMOVED***
+func (cli *Client) ContainerAttach(ctx context.Context, container string, options types.ContainerAttachOptions) (types.HijackedResponse, error) {
+	query := url.Values{}
+	if options.Stream {
 		query.Set("stream", "1")
-	***REMOVED***
-	if options.Stdin ***REMOVED***
+	}
+	if options.Stdin {
 		query.Set("stdin", "1")
-	***REMOVED***
-	if options.Stdout ***REMOVED***
+	}
+	if options.Stdout {
 		query.Set("stdout", "1")
-	***REMOVED***
-	if options.Stderr ***REMOVED***
+	}
+	if options.Stderr {
 		query.Set("stderr", "1")
-	***REMOVED***
-	if options.DetachKeys != "" ***REMOVED***
+	}
+	if options.DetachKeys != "" {
 		query.Set("detachKeys", options.DetachKeys)
-	***REMOVED***
-	if options.Logs ***REMOVED***
+	}
+	if options.Logs {
 		query.Set("logs", "1")
-	***REMOVED***
+	}
 
-	headers := map[string][]string***REMOVED***"Content-Type": ***REMOVED***"text/plain"***REMOVED******REMOVED***
+	headers := map[string][]string{"Content-Type": {"text/plain"}}
 	return cli.postHijacked(ctx, "/containers/"+container+"/attach", query, nil, headers)
-***REMOVED***
+}

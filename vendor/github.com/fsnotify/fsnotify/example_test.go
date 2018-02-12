@@ -12,31 +12,31 @@ import (
 	"github.com/fsnotify/fsnotify"
 )
 
-func ExampleNewWatcher() ***REMOVED***
+func ExampleNewWatcher() {
 	watcher, err := fsnotify.NewWatcher()
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatal(err)
-	***REMOVED***
+	}
 	defer watcher.Close()
 
 	done := make(chan bool)
-	go func() ***REMOVED***
-		for ***REMOVED***
-			select ***REMOVED***
+	go func() {
+		for {
+			select {
 			case event := <-watcher.Events:
 				log.Println("event:", event)
-				if event.Op&fsnotify.Write == fsnotify.Write ***REMOVED***
+				if event.Op&fsnotify.Write == fsnotify.Write {
 					log.Println("modified file:", event.Name)
-				***REMOVED***
+				}
 			case err := <-watcher.Errors:
 				log.Println("error:", err)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***()
+			}
+		}
+	}()
 
 	err = watcher.Add("/tmp/foo")
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatal(err)
-	***REMOVED***
+	}
 	<-done
-***REMOVED***
+}

@@ -5,6 +5,6 @@ import (
 	"time"
 )
 
-func getATime(fi os.FileInfo) time.Time ***REMOVED***
+func getATime(fi os.FileInfo) time.Time {
 	return fi.ModTime()
-***REMOVED***
+}

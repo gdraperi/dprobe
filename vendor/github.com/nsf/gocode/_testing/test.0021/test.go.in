@@ -2,7 +2,7 @@ package main
 
 import "go/ast"
 
-func main() ***REMOVED***
+func main() {
 	var test *ast.ImportSpec
 	test.Name.
-***REMOVED***
+}

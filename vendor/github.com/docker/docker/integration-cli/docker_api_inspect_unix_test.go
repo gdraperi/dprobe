@@ -12,7 +12,7 @@ import (
 )
 
 // #16665
-func (s *DockerSuite) TestInspectAPICpusetInConfigPre120(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestInspectAPICpusetInConfigPre120(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	testRequires(c, cgroupCpuset)
 
@@ -24,13 +24,13 @@ func (s *DockerSuite) TestInspectAPICpusetInConfigPre120(c *check.C) ***REMOVED*
 	_, body, err := cli.ContainerInspectWithRaw(context.Background(), name, false)
 	c.Assert(err, check.IsNil)
 
-	var inspectJSON map[string]interface***REMOVED******REMOVED***
+	var inspectJSON map[string]interface{}
 	err = json.Unmarshal(body, &inspectJSON)
 	c.Assert(err, checker.IsNil, check.Commentf("unable to unmarshal body for version 1.19"))
 
 	config, ok := inspectJSON["Config"]
 	c.Assert(ok, checker.True, check.Commentf("Unable to find 'Config'"))
-	cfg := config.(map[string]interface***REMOVED******REMOVED***)
+	cfg := config.(map[string]interface{})
 	_, ok = cfg["Cpuset"]
 	c.Assert(ok, checker.True, check.Commentf("API version 1.19 expected to include Cpuset in 'Config'"))
-***REMOVED***
+}

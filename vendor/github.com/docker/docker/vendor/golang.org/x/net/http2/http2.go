@@ -39,17 +39,17 @@ var (
 	inTests        bool
 )
 
-func init() ***REMOVED***
+func init() {
 	e := os.Getenv("GODEBUG")
-	if strings.Contains(e, "http2debug=1") ***REMOVED***
+	if strings.Contains(e, "http2debug=1") {
 		VerboseLogs = true
-	***REMOVED***
-	if strings.Contains(e, "http2debug=2") ***REMOVED***
+	}
+	if strings.Contains(e, "http2debug=2") {
 		VerboseLogs = true
 		logFrameWrites = true
 		logFrameReads = true
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 const (
 	// ClientPreface is the string that must be sent by new
@@ -98,51 +98,51 @@ const (
 	stateClosed
 )
 
-var stateName = [...]string***REMOVED***
+var stateName = [...]string{
 	stateIdle:             "Idle",
 	stateOpen:             "Open",
 	stateHalfClosedLocal:  "HalfClosedLocal",
 	stateHalfClosedRemote: "HalfClosedRemote",
 	stateClosed:           "Closed",
-***REMOVED***
+}
 
-func (st streamState) String() string ***REMOVED***
+func (st streamState) String() string {
 	return stateName[st]
-***REMOVED***
+}
 
 // Setting is a setting parameter: which setting it is, and its value.
-type Setting struct ***REMOVED***
+type Setting struct {
 	// ID is which setting is being set.
 	// See http://http2.github.io/http2-spec/#SettingValues
 	ID SettingID
 
 	// Val is the value.
 	Val uint32
-***REMOVED***
+}
 
-func (s Setting) String() string ***REMOVED***
+func (s Setting) String() string {
 	return fmt.Sprintf("[%v = %d]", s.ID, s.Val)
-***REMOVED***
+}
 
 // Valid reports whether the setting is valid.
-func (s Setting) Valid() error ***REMOVED***
+func (s Setting) Valid() error {
 	// Limits and error codes from 6.5.2 Defined SETTINGS Parameters
-	switch s.ID ***REMOVED***
+	switch s.ID {
 	case SettingEnablePush:
-		if s.Val != 1 && s.Val != 0 ***REMOVED***
+		if s.Val != 1 && s.Val != 0 {
 			return ConnectionError(ErrCodeProtocol)
-		***REMOVED***
+		}
 	case SettingInitialWindowSize:
-		if s.Val > 1<<31-1 ***REMOVED***
+		if s.Val > 1<<31-1 {
 			return ConnectionError(ErrCodeFlowControl)
-		***REMOVED***
+		}
 	case SettingMaxFrameSize:
-		if s.Val < 16384 || s.Val > 1<<24-1 ***REMOVED***
+		if s.Val < 16384 || s.Val > 1<<24-1 {
 			return ConnectionError(ErrCodeProtocol)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
 // A SettingID is an HTTP/2 setting as defined in
 // http://http2.github.io/http2-spec/#iana-settings
@@ -157,21 +157,21 @@ const (
 	SettingMaxHeaderListSize    SettingID = 0x6
 )
 
-var settingName = map[SettingID]string***REMOVED***
+var settingName = map[SettingID]string{
 	SettingHeaderTableSize:      "HEADER_TABLE_SIZE",
 	SettingEnablePush:           "ENABLE_PUSH",
 	SettingMaxConcurrentStreams: "MAX_CONCURRENT_STREAMS",
 	SettingInitialWindowSize:    "INITIAL_WINDOW_SIZE",
 	SettingMaxFrameSize:         "MAX_FRAME_SIZE",
 	SettingMaxHeaderListSize:    "MAX_HEADER_LIST_SIZE",
-***REMOVED***
+}
 
-func (s SettingID) String() string ***REMOVED***
-	if v, ok := settingName[s]; ok ***REMOVED***
+func (s SettingID) String() string {
+	if v, ok := settingName[s]; ok {
 		return v
-	***REMOVED***
+	}
 	return fmt.Sprintf("UNKNOWN_SETTING_%d", uint16(s))
-***REMOVED***
+}
 
 var (
 	errInvalidHeaderFieldName  = errors.New("http2: invalid header field name")
@@ -186,81 +186,81 @@ var (
 //   characters that are compared in a case-insensitive
 //   fashion. However, header field names MUST be converted to
 //   lowercase prior to their encoding in HTTP/2. "
-func validWireHeaderFieldName(v string) bool ***REMOVED***
-	if len(v) == 0 ***REMOVED***
+func validWireHeaderFieldName(v string) bool {
+	if len(v) == 0 {
 		return false
-	***REMOVED***
-	for _, r := range v ***REMOVED***
-		if !httplex.IsTokenRune(r) ***REMOVED***
+	}
+	for _, r := range v {
+		if !httplex.IsTokenRune(r) {
 			return false
-		***REMOVED***
-		if 'A' <= r && r <= 'Z' ***REMOVED***
+		}
+		if 'A' <= r && r <= 'Z' {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}
 
-var httpCodeStringCommon = map[int]string***REMOVED******REMOVED*** // n -> strconv.Itoa(n)
+var httpCodeStringCommon = map[int]string{} // n -> strconv.Itoa(n)
 
-func init() ***REMOVED***
-	for i := 100; i <= 999; i++ ***REMOVED***
-		if v := http.StatusText(i); v != "" ***REMOVED***
+func init() {
+	for i := 100; i <= 999; i++ {
+		if v := http.StatusText(i); v != "" {
 			httpCodeStringCommon[i] = strconv.Itoa(i)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func httpCodeString(code int) string ***REMOVED***
-	if s, ok := httpCodeStringCommon[code]; ok ***REMOVED***
+func httpCodeString(code int) string {
+	if s, ok := httpCodeStringCommon[code]; ok {
 		return s
-	***REMOVED***
+	}
 	return strconv.Itoa(code)
-***REMOVED***
+}
 
 // from pkg io
-type stringWriter interface ***REMOVED***
+type stringWriter interface {
 	WriteString(s string) (n int, err error)
-***REMOVED***
+}
 
 // A gate lets two goroutines coordinate their activities.
-type gate chan struct***REMOVED******REMOVED***
+type gate chan struct{}
 
-func (g gate) Done() ***REMOVED*** g <- struct***REMOVED******REMOVED******REMOVED******REMOVED*** ***REMOVED***
-func (g gate) Wait() ***REMOVED*** <-g ***REMOVED***
+func (g gate) Done() { g <- struct{}{} }
+func (g gate) Wait() { <-g }
 
 // A closeWaiter is like a sync.WaitGroup but only goes 1 to 0 (open to closed).
-type closeWaiter chan struct***REMOVED******REMOVED***
+type closeWaiter chan struct{}
 
 // Init makes a closeWaiter usable.
 // It exists because so a closeWaiter value can be placed inside a
 // larger struct and have the Mutex and Cond's memory in the same
 // allocation.
-func (cw *closeWaiter) Init() ***REMOVED***
-	*cw = make(chan struct***REMOVED******REMOVED***)
-***REMOVED***
+func (cw *closeWaiter) Init() {
+	*cw = make(chan struct{})
+}
 
 // Close marks the closeWaiter as closed and unblocks any waiters.
-func (cw closeWaiter) Close() ***REMOVED***
+func (cw closeWaiter) Close() {
 	close(cw)
-***REMOVED***
+}
 
 // Wait waits for the closeWaiter to become closed.
-func (cw closeWaiter) Wait() ***REMOVED***
+func (cw closeWaiter) Wait() {
 	<-cw
-***REMOVED***
+}
 
 // bufferedWriter is a buffered writer that writes to w.
 // Its buffered writer is lazily allocated as needed, to minimize
 // idle memory usage with many connections.
-type bufferedWriter struct ***REMOVED***
+type bufferedWriter struct {
 	w  io.Writer     // immutable
 	bw *bufio.Writer // non-nil when data is buffered
-***REMOVED***
+}
 
-func newBufferedWriter(w io.Writer) *bufferedWriter ***REMOVED***
-	return &bufferedWriter***REMOVED***w: w***REMOVED***
-***REMOVED***
+func newBufferedWriter(w io.Writer) *bufferedWriter {
+	return &bufferedWriter{w: w}
+}
 
 // bufWriterPoolBufferSize is the size of bufio.Writer's
 // buffers created using bufWriterPool.
@@ -270,108 +270,108 @@ func newBufferedWriter(w io.Writer) *bufferedWriter ***REMOVED***
 // not much thought went into it.
 const bufWriterPoolBufferSize = 4 << 10
 
-var bufWriterPool = sync.Pool***REMOVED***
-	New: func() interface***REMOVED******REMOVED*** ***REMOVED***
+var bufWriterPool = sync.Pool{
+	New: func() interface{} {
 		return bufio.NewWriterSize(nil, bufWriterPoolBufferSize)
-	***REMOVED***,
-***REMOVED***
+	},
+}
 
-func (w *bufferedWriter) Available() int ***REMOVED***
-	if w.bw == nil ***REMOVED***
+func (w *bufferedWriter) Available() int {
+	if w.bw == nil {
 		return bufWriterPoolBufferSize
-	***REMOVED***
+	}
 	return w.bw.Available()
-***REMOVED***
+}
 
-func (w *bufferedWriter) Write(p []byte) (n int, err error) ***REMOVED***
-	if w.bw == nil ***REMOVED***
+func (w *bufferedWriter) Write(p []byte) (n int, err error) {
+	if w.bw == nil {
 		bw := bufWriterPool.Get().(*bufio.Writer)
 		bw.Reset(w.w)
 		w.bw = bw
-	***REMOVED***
+	}
 	return w.bw.Write(p)
-***REMOVED***
+}
 
-func (w *bufferedWriter) Flush() error ***REMOVED***
+func (w *bufferedWriter) Flush() error {
 	bw := w.bw
-	if bw == nil ***REMOVED***
+	if bw == nil {
 		return nil
-	***REMOVED***
+	}
 	err := bw.Flush()
 	bw.Reset(nil)
 	bufWriterPool.Put(bw)
 	w.bw = nil
 	return err
-***REMOVED***
+}
 
-func mustUint31(v int32) uint32 ***REMOVED***
-	if v < 0 || v > 2147483647 ***REMOVED***
+func mustUint31(v int32) uint32 {
+	if v < 0 || v > 2147483647 {
 		panic("out of range")
-	***REMOVED***
+	}
 	return uint32(v)
-***REMOVED***
+}
 
 // bodyAllowedForStatus reports whether a given response status code
 // permits a body. See RFC 2616, section 4.4.
-func bodyAllowedForStatus(status int) bool ***REMOVED***
-	switch ***REMOVED***
+func bodyAllowedForStatus(status int) bool {
+	switch {
 	case status >= 100 && status <= 199:
 		return false
 	case status == 204:
 		return false
 	case status == 304:
 		return false
-	***REMOVED***
+	}
 	return true
-***REMOVED***
+}
 
-type httpError struct ***REMOVED***
+type httpError struct {
 	msg     string
 	timeout bool
-***REMOVED***
+}
 
-func (e *httpError) Error() string   ***REMOVED*** return e.msg ***REMOVED***
-func (e *httpError) Timeout() bool   ***REMOVED*** return e.timeout ***REMOVED***
-func (e *httpError) Temporary() bool ***REMOVED*** return true ***REMOVED***
+func (e *httpError) Error() string   { return e.msg }
+func (e *httpError) Timeout() bool   { return e.timeout }
+func (e *httpError) Temporary() bool { return true }
 
-var errTimeout error = &httpError***REMOVED***msg: "http2: timeout awaiting response headers", timeout: true***REMOVED***
+var errTimeout error = &httpError{msg: "http2: timeout awaiting response headers", timeout: true}
 
-type connectionStater interface ***REMOVED***
+type connectionStater interface {
 	ConnectionState() tls.ConnectionState
-***REMOVED***
+}
 
-var sorterPool = sync.Pool***REMOVED***New: func() interface***REMOVED******REMOVED*** ***REMOVED*** return new(sorter) ***REMOVED******REMOVED***
+var sorterPool = sync.Pool{New: func() interface{} { return new(sorter) }}
 
-type sorter struct ***REMOVED***
+type sorter struct {
 	v []string // owned by sorter
-***REMOVED***
+}
 
-func (s *sorter) Len() int           ***REMOVED*** return len(s.v) ***REMOVED***
-func (s *sorter) Swap(i, j int)      ***REMOVED*** s.v[i], s.v[j] = s.v[j], s.v[i] ***REMOVED***
-func (s *sorter) Less(i, j int) bool ***REMOVED*** return s.v[i] < s.v[j] ***REMOVED***
+func (s *sorter) Len() int           { return len(s.v) }
+func (s *sorter) Swap(i, j int)      { s.v[i], s.v[j] = s.v[j], s.v[i] }
+func (s *sorter) Less(i, j int) bool { return s.v[i] < s.v[j] }
 
 // Keys returns the sorted keys of h.
 //
 // The returned slice is only valid until s used again or returned to
 // its pool.
-func (s *sorter) Keys(h http.Header) []string ***REMOVED***
+func (s *sorter) Keys(h http.Header) []string {
 	keys := s.v[:0]
-	for k := range h ***REMOVED***
+	for k := range h {
 		keys = append(keys, k)
-	***REMOVED***
+	}
 	s.v = keys
 	sort.Sort(s)
 	return keys
-***REMOVED***
+}
 
-func (s *sorter) SortStrings(ss []string) ***REMOVED***
+func (s *sorter) SortStrings(ss []string) {
 	// Our sorter works on s.v, which sorter owns, so
 	// stash it away while we sort the user's buffer.
 	save := s.v
 	s.v = ss
 	sort.Sort(s)
 	s.v = save
-***REMOVED***
+}
 
 // validPseudoPath reports whether v is a valid :path pseudo-header
 // value. It must be either:
@@ -382,6 +382,6 @@ func (s *sorter) SortStrings(ss []string) ***REMOVED***
 // For now this is only used a quick check for deciding when to clean
 // up Opaque URLs before sending requests from the Transport.
 // See golang.org/issue/16847
-func validPseudoPath(v string) bool ***REMOVED***
+func validPseudoPath(v string) bool {
 	return (len(v) > 0 && v[0] == '/' && (len(v) == 1 || v[1] != '/')) || v == "*"
-***REMOVED***
+}

@@ -9,18 +9,18 @@ import (
 )
 
 // SignalDaemonDump sends a signal to the daemon to write a dump file
-func SignalDaemonDump(pid int) ***REMOVED***
+func SignalDaemonDump(pid int) {
 	ev, _ := windows.UTF16PtrFromString("Global\\docker-daemon-" + strconv.Itoa(pid))
 	h2, err := windows.OpenEvent(0x0002, false, ev)
-	if h2 == 0 || err != nil ***REMOVED***
+	if h2 == 0 || err != nil {
 		return
-	***REMOVED***
+	}
 	windows.PulseEvent(h2)
-***REMOVED***
+}
 
-func signalDaemonReload(pid int) error ***REMOVED***
+func signalDaemonReload(pid int) error {
 	return fmt.Errorf("daemon reload not supported")
-***REMOVED***
+}
 
-func cleanupExecRoot(c *check.C, execRoot string) ***REMOVED***
-***REMOVED***
+func cleanupExecRoot(c *check.C, execRoot string) {
+}

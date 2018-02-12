@@ -44,7 +44,7 @@ const (
 )
 
 // First is information about the first byte in a UTF-8 sequence.
-var First = [256]uint8***REMOVED***
+var First = [256]uint8{
 	//   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
 	as, as, as, as, as, as, as, as, as, as, as, as, as, as, as, as, // 0x00-0x0F
 	as, as, as, as, as, as, as, as, as, as, as, as, as, as, as, as, // 0x10-0x1F
@@ -63,14 +63,14 @@ var First = [256]uint8***REMOVED***
 	s1, s1, s1, s1, s1, s1, s1, s1, s1, s1, s1, s1, s1, s1, s1, s1, // 0xD0-0xDF
 	s2, s3, s3, s3, s3, s3, s3, s3, s3, s3, s3, s3, s3, s4, s3, s3, // 0xE0-0xEF
 	s5, s6, s6, s6, s7, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, xx, // 0xF0-0xFF
-***REMOVED***
+}
 
 // AcceptRange gives the range of valid values for the second byte in a UTF-8
 // sequence for any value for First that is not ASCII or FirstInvalid.
-type AcceptRange struct ***REMOVED***
+type AcceptRange struct {
 	Lo uint8 // lowest value for second byte.
 	Hi uint8 // highest value for second byte.
-***REMOVED***
+}
 
 // AcceptRanges is a slice of AcceptRange values. For a given byte sequence b
 //
@@ -78,10 +78,10 @@ type AcceptRange struct ***REMOVED***
 //
 // will give the value of AcceptRange for the multi-byte UTF-8 sequence starting
 // at b[0].
-var AcceptRanges = [...]AcceptRange***REMOVED***
-	0: ***REMOVED***LoCB, HiCB***REMOVED***,
-	1: ***REMOVED***0xA0, HiCB***REMOVED***,
-	2: ***REMOVED***LoCB, 0x9F***REMOVED***,
-	3: ***REMOVED***0x90, HiCB***REMOVED***,
-	4: ***REMOVED***LoCB, 0x8F***REMOVED***,
-***REMOVED***
+var AcceptRanges = [...]AcceptRange{
+	0: {LoCB, HiCB},
+	1: {0xA0, HiCB},
+	2: {LoCB, 0x9F},
+	3: {0x90, HiCB},
+	4: {LoCB, 0x8F},
+}

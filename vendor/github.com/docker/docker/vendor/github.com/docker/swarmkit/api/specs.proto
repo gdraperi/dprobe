@@ -18,17 +18,17 @@ import "google/protobuf/wrappers.proto";
 // particular component, API objects will either contain a copy of the spec
 // component or a different representation to reflect allocation or resolution.
 
-message NodeSpec ***REMOVED***
+message NodeSpec {
 	Annotations annotations = 1 [(gogoproto.nullable) = false];
 
-	enum Membership ***REMOVED***
+	enum Membership {
 		option (gogoproto.goproto_enum_prefix) = false;
 
 		PENDING = 0 [(gogoproto.enumvalue_customname) = "NodeMembershipPending"];
 		ACCEPTED = 1 [(gogoproto.enumvalue_customname) = "NodeMembershipAccepted"];
-	***REMOVED***
+	}
 
-	enum Availability ***REMOVED***
+	enum Availability {
 		option (gogoproto.goproto_enum_prefix) = false;
 
 		// Active nodes.
@@ -41,7 +41,7 @@ message NodeSpec ***REMOVED***
 		// Drained nodes are paused and any task already running on them will
 		// be evicted.
 		DRAIN = 2 [(gogoproto.enumvalue_customname) = "NodeAvailabilityDrain"];
-	***REMOVED***
+	}
 
 	// DesiredRole defines the role the node should have.
 	NodeRole desired_role = 2;
@@ -52,7 +52,7 @@ message NodeSpec ***REMOVED***
 	// Availability allows a user to control the current scheduling status of a
 	// node.
 	Availability availability = 4;
-***REMOVED***
+}
 
 // ServiceSpec defines the properties of a service.
 //
@@ -60,16 +60,16 @@ message NodeSpec ***REMOVED***
 // template, implemented as tasks. Based on the number of instances, scheduling
 // strategy and restart policy, a number of application-level behaviors can be
 // defined.
-message ServiceSpec ***REMOVED***
+message ServiceSpec {
 	Annotations annotations = 1 [(gogoproto.nullable) = false];
 
 	// Task defines the task template this service will spawn.
 	TaskSpec task = 2 [(gogoproto.nullable) = false];
 
-	oneof mode ***REMOVED***
+	oneof mode {
 		ReplicatedService replicated = 3;
 		GlobalService global = 4;
-	***REMOVED***
+	}
 
 	// Update contains settings which affect updates.
 	UpdateConfig update = 6;
@@ -87,24 +87,24 @@ message ServiceSpec ***REMOVED***
 	// Service endpoint specifies the user provided configuration
 	// to properly discover and load balance a service.
 	EndpointSpec endpoint = 8;
-***REMOVED***
+}
 
 // ReplicatedService sets the reconciliation target to certain number of replicas.
-message ReplicatedService ***REMOVED***
+message ReplicatedService {
 	uint64 replicas = 1;
-***REMOVED***
+}
 
 // GlobalService represents global service.
-message GlobalService ***REMOVED***
+message GlobalService {
 	// Empty message for now.
-***REMOVED***
+}
 
-message TaskSpec ***REMOVED***
-	oneof runtime ***REMOVED***
+message TaskSpec {
+	oneof runtime {
 		NetworkAttachmentSpec attachment = 8;
 		ContainerSpec container = 1;
 		GenericRuntimeSpec generic = 10;
-	***REMOVED***
+	}
 
 	// Resource requirements for the container.
 	ResourceRequirements resources = 2;
@@ -139,29 +139,29 @@ message TaskSpec ***REMOVED***
 	//
 	// ResourceReferences is a list of ResourceReferences used by the task.
 	repeated ResourceReference resource_references = 11 [(gogoproto.nullable) = false];
-***REMOVED***
+}
 
-message ResourceReference ***REMOVED***
+message ResourceReference {
 	string resource_id = 1;
 	ResourceType resource_type = 2;
-***REMOVED***
+}
 
-message GenericRuntimeSpec ***REMOVED***
+message GenericRuntimeSpec {
 	string kind = 1;
 	google.protobuf.Any payload = 2;
-***REMOVED***
+}
 
 // NetworkAttachmentSpec specifies runtime parameters required to attach
 // a container to a network.
-message NetworkAttachmentSpec ***REMOVED***
+message NetworkAttachmentSpec {
 	// ContainerID specifies a unique ID of the container for which
 	// this attachment is for.
 	string container_id = 1;
-***REMOVED***
+}
 
 
 // Container specifies runtime parameters for a container.
-message ContainerSpec ***REMOVED***
+message ContainerSpec {
 	// image defines the image reference, as specified in the
 	// distribution/reference package. This may include a registry host, name,
 	// tag or digest.
@@ -243,13 +243,13 @@ message ContainerSpec ***REMOVED***
 	google.protobuf.Duration stop_grace_period = 9;
 
 	// PullOptions allows one to parameterize an image pull.
-	message PullOptions ***REMOVED***
+	message PullOptions {
 		// RegistryAuth is the registry auth token obtained from the client, required
 		// to pull private images. This is the unmodified JSON used as part of
 		// the `X-Registry-Auth` header.
 		// TODO(nishanttotla): This field will later be deprecated
 		string registry_auth = 64;
-	***REMOVED***
+	}
 
 	// PullOptions parameterize the behavior of image pulls.
 	PullOptions pull_options = 10;
@@ -278,7 +278,7 @@ message ContainerSpec ***REMOVED***
 	// Detailed documentation is available in:
 	// http://man7.org/linux/man-pages/man5/resolv.conf.5.html
 	// TODO: domain is not supported yet
-	message DNSConfig ***REMOVED***
+	message DNSConfig {
 		// Nameservers specifies the IP addresses of the name servers
 		repeated string nameservers = 1;
 
@@ -287,7 +287,7 @@ message ContainerSpec ***REMOVED***
 
 		// Options allows certain internal resolver variables to be modified
 		repeated string options = 3;
-	***REMOVED***
+	}
 
 	// DNSConfig allows one to specify DNS related configuration in resolv.conf
 	DNSConfig dns_config = 15 [(gogoproto.customname) = "DNSConfig"];
@@ -298,7 +298,7 @@ message ContainerSpec ***REMOVED***
 	// is considered unhealthy after `Retries` number of consecutive failures.
 	HealthConfig healthcheck = 16;
 
-	enum Isolation ***REMOVED***
+	enum Isolation {
 		option (gogoproto.goproto_enum_prefix) = false;
 
 		// ISOLATION_DEFAULT uses whatever default value from the container runtime
@@ -309,7 +309,7 @@ message ContainerSpec ***REMOVED***
 
 		// ISOLATION_HYPERV forces Hyper-V isolation
 		ISOLATION_HYPERV = 2 [(gogoproto.enumvalue_customname) = "ContainerIsolationHyperV"];
-	***REMOVED***
+	}
 
 	// Isolation defines the isolation level for windows containers (default, process, hyperv).
 	// Runtimes that don't support it ignore that field
@@ -318,15 +318,15 @@ message ContainerSpec ***REMOVED***
 	// PidsLimit prevents from OS resource damage by applications inside the container 
 	// using fork bomb attack.
 	int64 pidsLimit = 25;
-***REMOVED***
+}
 
 // EndpointSpec defines the properties that can be configured to
 // access and loadbalance the service.
-message EndpointSpec ***REMOVED***
+message EndpointSpec {
 	// ResolutionMode specifies the mode of resolution to use for
 	// internal loadbalancing between tasks which are all within
 	// the cluster. This is sometimes calls east-west data path.
-	enum ResolutionMode ***REMOVED***
+	enum ResolutionMode {
 		option (gogoproto.goproto_enum_prefix) = false;
 
 		// VIP resolution mode specifies that the
@@ -342,17 +342,17 @@ message EndpointSpec ***REMOVED***
 		// that the client does not cache the DNS responses
 		// when the DNS response TTL is 0.
 		DNSRR = 1 [(gogoproto.enumvalue_customname) = "ResolutionModeDNSRoundRobin"];
-	***REMOVED***
+	}
 
 	ResolutionMode mode = 1;
 
 	// List of exposed ports that this service is accessible from
 	// external to the cluster.
 	repeated PortConfig ports = 2;
-***REMOVED***
+}
 
 // NetworkSpec specifies user defined network parameters.
-message NetworkSpec ***REMOVED***
+message NetworkSpec {
 	Annotations annotations = 1 [(gogoproto.nullable) = false];
 
 	// DriverConfig specific configuration consumed by the network driver.
@@ -383,17 +383,17 @@ message NetworkSpec ***REMOVED***
 	bool ingress = 7;
 
 	// ConfigFrom is the source of the configuration for this network.
-	oneof config_from ***REMOVED***
+	oneof config_from {
 		// Network is the name of a network that provides the network
 		// specific configuration for this network, locally on the node
 		// where this network is being plumbed.
 		string network = 8;
-	***REMOVED***
+	}
 
-***REMOVED***
+}
 
 // ClusterSpec specifies global cluster settings.
-message ClusterSpec ***REMOVED***
+message ClusterSpec {
 	Annotations annotations = 1 [(gogoproto.nullable) = false];
 
 	// DEPRECATED: AcceptancePolicy defines the certificate issuance policy.
@@ -418,10 +418,10 @@ message ClusterSpec ***REMOVED***
 
 	// EncryptionConfig defines the cluster's encryption settings.
 	EncryptionConfig encryption_config = 8 [(gogoproto.nullable) = false];
-***REMOVED***
+}
 
 // SecretSpec specifies a user-provided secret.
-message SecretSpec ***REMOVED***
+message SecretSpec {
 	Annotations annotations = 1 [(gogoproto.nullable) = false];
 
 	// Data is the secret payload - the maximum size is 500KB (that is, 500*1024 bytes)
@@ -436,10 +436,10 @@ message SecretSpec ***REMOVED***
 
 	// Driver is the the secret driver that is used to store the specified secret
 	Driver driver = 4;
-***REMOVED***
+}
 
 // ConfigSpec specifies user-provided configuration files.
-message ConfigSpec ***REMOVED***
+message ConfigSpec {
 	Annotations annotations = 1 [(gogoproto.nullable) = false];
 
 	// Data is the config payload - the maximum size is 500KB (that is, 500*1024 bytes)
@@ -453,4 +453,4 @@ message ConfigSpec ***REMOVED***
 	// The currently recognized values are:
 	// - golang: Go templating
 	Driver templating = 3;
-***REMOVED***
+}

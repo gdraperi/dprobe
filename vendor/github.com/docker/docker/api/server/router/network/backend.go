@@ -11,7 +11,7 @@ import (
 
 // Backend is all the methods that need to be implemented
 // to provide network specific functionality.
-type Backend interface ***REMOVED***
+type Backend interface {
 	FindNetwork(idName string) (libnetwork.Network, error)
 	GetNetworks() []libnetwork.Network
 	CreateNetwork(nc types.NetworkCreateRequest) (*types.NetworkCreateResponse, error)
@@ -19,4 +19,4 @@ type Backend interface ***REMOVED***
 	DisconnectContainerFromNetwork(containerName string, networkName string, force bool) error
 	DeleteNetwork(networkID string) error
 	NetworksPrune(ctx context.Context, pruneFilters filters.Args) (*types.NetworksPruneReport, error)
-***REMOVED***
+}

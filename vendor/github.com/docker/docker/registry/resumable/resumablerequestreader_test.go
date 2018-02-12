@@ -14,104 +14,104 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestResumableRequestHeaderSimpleErrors(t *testing.T) ***REMOVED***
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) ***REMOVED***
+func TestResumableRequestHeaderSimpleErrors(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "Hello, world !")
-	***REMOVED***))
+	}))
 	defer ts.Close()
 
-	client := &http.Client***REMOVED******REMOVED***
+	client := &http.Client{}
 
 	var req *http.Request
 	req, err := http.NewRequest("GET", ts.URL, nil)
 	require.NoError(t, err)
 
-	resreq := &requestReader***REMOVED******REMOVED***
-	_, err = resreq.Read([]byte***REMOVED******REMOVED***)
+	resreq := &requestReader{}
+	_, err = resreq.Read([]byte{})
 	assert.EqualError(t, err, "client and request can't be nil")
 
-	resreq = &requestReader***REMOVED***
+	resreq = &requestReader{
 		client:    client,
 		request:   req,
 		totalSize: -1,
-	***REMOVED***
-	_, err = resreq.Read([]byte***REMOVED******REMOVED***)
+	}
+	_, err = resreq.Read([]byte{})
 	assert.EqualError(t, err, "failed to auto detect content length")
-***REMOVED***
+}
 
 // Not too much failures, bails out after some wait
-func TestResumableRequestHeaderNotTooMuchFailures(t *testing.T) ***REMOVED***
-	client := &http.Client***REMOVED******REMOVED***
+func TestResumableRequestHeaderNotTooMuchFailures(t *testing.T) {
+	client := &http.Client{}
 
 	var badReq *http.Request
 	badReq, err := http.NewRequest("GET", "I'm not an url", nil)
 	require.NoError(t, err)
 
-	resreq := &requestReader***REMOVED***
+	resreq := &requestReader{
 		client:       client,
 		request:      badReq,
 		failures:     0,
 		maxFailures:  2,
 		waitDuration: 10 * time.Millisecond,
-	***REMOVED***
-	read, err := resreq.Read([]byte***REMOVED******REMOVED***)
+	}
+	read, err := resreq.Read([]byte{})
 	require.NoError(t, err)
 	assert.Equal(t, 0, read)
-***REMOVED***
+}
 
 // Too much failures, returns the error
-func TestResumableRequestHeaderTooMuchFailures(t *testing.T) ***REMOVED***
-	client := &http.Client***REMOVED******REMOVED***
+func TestResumableRequestHeaderTooMuchFailures(t *testing.T) {
+	client := &http.Client{}
 
 	var badReq *http.Request
 	badReq, err := http.NewRequest("GET", "I'm not an url", nil)
 	require.NoError(t, err)
 
-	resreq := &requestReader***REMOVED***
+	resreq := &requestReader{
 		client:      client,
 		request:     badReq,
 		failures:    0,
 		maxFailures: 1,
-	***REMOVED***
+	}
 	defer resreq.Close()
 
 	expectedError := `Get I%27m%20not%20an%20url: unsupported protocol scheme ""`
-	read, err := resreq.Read([]byte***REMOVED******REMOVED***)
+	read, err := resreq.Read([]byte{})
 	assert.EqualError(t, err, expectedError)
 	assert.Equal(t, 0, read)
-***REMOVED***
+}
 
-type errorReaderCloser struct***REMOVED******REMOVED***
+type errorReaderCloser struct{}
 
-func (errorReaderCloser) Close() error ***REMOVED*** return nil ***REMOVED***
+func (errorReaderCloser) Close() error { return nil }
 
-func (errorReaderCloser) Read(p []byte) (n int, err error) ***REMOVED***
+func (errorReaderCloser) Read(p []byte) (n int, err error) {
 	return 0, fmt.Errorf("An error occurred")
-***REMOVED***
+}
 
 // If an unknown error is encountered, return 0, nil and log it
-func TestResumableRequestReaderWithReadError(t *testing.T) ***REMOVED***
+func TestResumableRequestReaderWithReadError(t *testing.T) {
 	var req *http.Request
 	req, err := http.NewRequest("GET", "", nil)
 	require.NoError(t, err)
 
-	client := &http.Client***REMOVED******REMOVED***
+	client := &http.Client{}
 
-	response := &http.Response***REMOVED***
+	response := &http.Response{
 		Status:        "500 Internal Server",
 		StatusCode:    500,
 		ContentLength: 0,
 		Close:         true,
-		Body:          errorReaderCloser***REMOVED******REMOVED***,
-	***REMOVED***
+		Body:          errorReaderCloser{},
+	}
 
-	resreq := &requestReader***REMOVED***
+	resreq := &requestReader{
 		client:          client,
 		request:         req,
 		currentResponse: response,
 		lastRange:       1,
 		totalSize:       1,
-	***REMOVED***
+	}
 	defer resreq.Close()
 
 	buf := make([]byte, 1)
@@ -119,76 +119,76 @@ func TestResumableRequestReaderWithReadError(t *testing.T) ***REMOVED***
 	require.NoError(t, err)
 
 	assert.Equal(t, 0, read)
-***REMOVED***
+}
 
-func TestResumableRequestReaderWithEOFWith416Response(t *testing.T) ***REMOVED***
+func TestResumableRequestReaderWithEOFWith416Response(t *testing.T) {
 	var req *http.Request
 	req, err := http.NewRequest("GET", "", nil)
 	require.NoError(t, err)
 
-	client := &http.Client***REMOVED******REMOVED***
+	client := &http.Client{}
 
-	response := &http.Response***REMOVED***
+	response := &http.Response{
 		Status:        "416 Requested Range Not Satisfiable",
 		StatusCode:    416,
 		ContentLength: 0,
 		Close:         true,
 		Body:          ioutil.NopCloser(strings.NewReader("")),
-	***REMOVED***
+	}
 
-	resreq := &requestReader***REMOVED***
+	resreq := &requestReader{
 		client:          client,
 		request:         req,
 		currentResponse: response,
 		lastRange:       1,
 		totalSize:       1,
-	***REMOVED***
+	}
 	defer resreq.Close()
 
 	buf := make([]byte, 1)
 	_, err = resreq.Read(buf)
 	assert.EqualError(t, err, io.EOF.Error())
-***REMOVED***
+}
 
-func TestResumableRequestReaderWithServerDoesntSupportByteRanges(t *testing.T) ***REMOVED***
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) ***REMOVED***
-		if r.Header.Get("Range") == "" ***REMOVED***
+func TestResumableRequestReaderWithServerDoesntSupportByteRanges(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("Range") == "" {
 			t.Fatalf("Expected a Range HTTP header, got nothing")
-		***REMOVED***
-	***REMOVED***))
+		}
+	}))
 	defer ts.Close()
 
 	var req *http.Request
 	req, err := http.NewRequest("GET", ts.URL, nil)
 	require.NoError(t, err)
 
-	client := &http.Client***REMOVED******REMOVED***
+	client := &http.Client{}
 
-	resreq := &requestReader***REMOVED***
+	resreq := &requestReader{
 		client:    client,
 		request:   req,
 		lastRange: 1,
-	***REMOVED***
+	}
 	defer resreq.Close()
 
 	buf := make([]byte, 2)
 	_, err = resreq.Read(buf)
 	assert.EqualError(t, err, "the server doesn't support byte ranges")
-***REMOVED***
+}
 
-func TestResumableRequestReaderWithZeroTotalSize(t *testing.T) ***REMOVED***
+func TestResumableRequestReaderWithZeroTotalSize(t *testing.T) {
 	srvtxt := "some response text data"
 
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) ***REMOVED***
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, srvtxt)
-	***REMOVED***))
+	}))
 	defer ts.Close()
 
 	var req *http.Request
 	req, err := http.NewRequest("GET", ts.URL, nil)
 	require.NoError(t, err)
 
-	client := &http.Client***REMOVED******REMOVED***
+	client := &http.Client{}
 	retries := uint32(5)
 
 	resreq := NewRequestReader(client, req, retries, 0)
@@ -199,21 +199,21 @@ func TestResumableRequestReaderWithZeroTotalSize(t *testing.T) ***REMOVED***
 
 	resstr := strings.TrimSuffix(string(data), "\n")
 	assert.Equal(t, srvtxt, resstr)
-***REMOVED***
+}
 
-func TestResumableRequestReader(t *testing.T) ***REMOVED***
+func TestResumableRequestReader(t *testing.T) {
 	srvtxt := "some response text data"
 
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) ***REMOVED***
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, srvtxt)
-	***REMOVED***))
+	}))
 	defer ts.Close()
 
 	var req *http.Request
 	req, err := http.NewRequest("GET", ts.URL, nil)
 	require.NoError(t, err)
 
-	client := &http.Client***REMOVED******REMOVED***
+	client := &http.Client{}
 	retries := uint32(5)
 	imgSize := int64(len(srvtxt))
 
@@ -225,21 +225,21 @@ func TestResumableRequestReader(t *testing.T) ***REMOVED***
 
 	resstr := strings.TrimSuffix(string(data), "\n")
 	assert.Equal(t, srvtxt, resstr)
-***REMOVED***
+}
 
-func TestResumableRequestReaderWithInitialResponse(t *testing.T) ***REMOVED***
+func TestResumableRequestReaderWithInitialResponse(t *testing.T) {
 	srvtxt := "some response text data"
 
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) ***REMOVED***
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, srvtxt)
-	***REMOVED***))
+	}))
 	defer ts.Close()
 
 	var req *http.Request
 	req, err := http.NewRequest("GET", ts.URL, nil)
 	require.NoError(t, err)
 
-	client := &http.Client***REMOVED******REMOVED***
+	client := &http.Client{}
 	retries := uint32(5)
 	imgSize := int64(len(srvtxt))
 
@@ -254,4 +254,4 @@ func TestResumableRequestReaderWithInitialResponse(t *testing.T) ***REMOVED***
 
 	resstr := strings.TrimSuffix(string(data), "\n")
 	assert.Equal(t, srvtxt, resstr)
-***REMOVED***
+}

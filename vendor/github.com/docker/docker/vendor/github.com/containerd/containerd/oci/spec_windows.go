@@ -6,22 +6,22 @@ import (
 	specs "github.com/opencontainers/runtime-spec/specs-go"
 )
 
-func createDefaultSpec(ctx context.Context, id string) (*specs.Spec, error) ***REMOVED***
-	return &specs.Spec***REMOVED***
+func createDefaultSpec(ctx context.Context, id string) (*specs.Spec, error) {
+	return &specs.Spec{
 		Version: specs.Version,
-		Root:    &specs.Root***REMOVED******REMOVED***,
-		Process: &specs.Process***REMOVED***
+		Root:    &specs.Root{},
+		Process: &specs.Process{
 			Cwd: `C:\`,
-			ConsoleSize: &specs.Box***REMOVED***
+			ConsoleSize: &specs.Box{
 				Width:  80,
 				Height: 20,
-			***REMOVED***,
-		***REMOVED***,
-		Windows: &specs.Windows***REMOVED***
+			},
+		},
+		Windows: &specs.Windows{
 			IgnoreFlushesDuringBoot: true,
-			Network: &specs.WindowsNetwork***REMOVED***
+			Network: &specs.WindowsNetwork{
 				AllowUnqualifiedDNSQuery: true,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***, nil
-***REMOVED***
+			},
+		},
+	}, nil
+}

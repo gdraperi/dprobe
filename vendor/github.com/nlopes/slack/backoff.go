@@ -12,7 +12,7 @@ import (
 // call to Duration() it is multiplied by Factor.  It is capped at
 // Max. It returns to Min on every call to Reset().  Used in
 // conjunction with the time package.
-type backoff struct ***REMOVED***
+type backoff struct {
 	attempts int
 	//Factor is the multiplying factor for each increment step
 	Factor float64
@@ -20,38 +20,38 @@ type backoff struct ***REMOVED***
 	Jitter bool
 	//Min and Max are the minimum and maximum values of the counter
 	Min, Max time.Duration
-***REMOVED***
+}
 
 // Returns the current value of the counter and then multiplies it
 // Factor
-func (b *backoff) Duration() time.Duration ***REMOVED***
+func (b *backoff) Duration() time.Duration {
 	//Zero-values are nonsensical, so we use
 	//them to apply defaults
-	if b.Min == 0 ***REMOVED***
+	if b.Min == 0 {
 		b.Min = 100 * time.Millisecond
-	***REMOVED***
-	if b.Max == 0 ***REMOVED***
+	}
+	if b.Max == 0 {
 		b.Max = 10 * time.Second
-	***REMOVED***
-	if b.Factor == 0 ***REMOVED***
+	}
+	if b.Factor == 0 {
 		b.Factor = 2
-	***REMOVED***
+	}
 	//calculate this duration
 	dur := float64(b.Min) * math.Pow(b.Factor, float64(b.attempts))
-	if b.Jitter == true ***REMOVED***
+	if b.Jitter == true {
 		dur = rand.Float64()*(dur-float64(b.Min)) + float64(b.Min)
-	***REMOVED***
+	}
 	//cap!
-	if dur > float64(b.Max) ***REMOVED***
+	if dur > float64(b.Max) {
 		return b.Max
-	***REMOVED***
+	}
 	//bump attempts count
 	b.attempts++
 	//return as a time.Duration
 	return time.Duration(dur)
-***REMOVED***
+}
 
 //Resets the current value of the counter back to Min
-func (b *backoff) Reset() ***REMOVED***
+func (b *backoff) Reset() {
 	b.attempts = 0
-***REMOVED***
+}

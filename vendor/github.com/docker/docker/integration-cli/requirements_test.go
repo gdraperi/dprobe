@@ -16,191 +16,191 @@ import (
 	"github.com/docker/docker/integration-cli/requirement"
 )
 
-func ArchitectureIsNot(arch string) bool ***REMOVED***
+func ArchitectureIsNot(arch string) bool {
 	return os.Getenv("DOCKER_ENGINE_GOARCH") != arch
-***REMOVED***
+}
 
-func DaemonIsWindows() bool ***REMOVED***
+func DaemonIsWindows() bool {
 	return testEnv.OSType == "windows"
-***REMOVED***
+}
 
-func DaemonIsWindowsAtLeastBuild(buildNumber int) func() bool ***REMOVED***
-	return func() bool ***REMOVED***
-		if testEnv.OSType != "windows" ***REMOVED***
+func DaemonIsWindowsAtLeastBuild(buildNumber int) func() bool {
+	return func() bool {
+		if testEnv.OSType != "windows" {
 			return false
-		***REMOVED***
+		}
 		version := testEnv.DaemonInfo.KernelVersion
 		numVersion, _ := strconv.Atoi(strings.Split(version, " ")[1])
 		return numVersion >= buildNumber
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func DaemonIsLinux() bool ***REMOVED***
+func DaemonIsLinux() bool {
 	return testEnv.OSType == "linux"
-***REMOVED***
+}
 
-func OnlyDefaultNetworks() bool ***REMOVED***
+func OnlyDefaultNetworks() bool {
 	cli, err := client.NewEnvClient()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return false
-	***REMOVED***
-	networks, err := cli.NetworkList(context.TODO(), types.NetworkListOptions***REMOVED******REMOVED***)
-	if err != nil || len(networks) > 0 ***REMOVED***
+	}
+	networks, err := cli.NetworkList(context.TODO(), types.NetworkListOptions{})
+	if err != nil || len(networks) > 0 {
 		return false
-	***REMOVED***
+	}
 	return true
-***REMOVED***
+}
 
 // Deprecated: use skip.IfCondition(t, !testEnv.DaemonInfo.ExperimentalBuild)
-func ExperimentalDaemon() bool ***REMOVED***
+func ExperimentalDaemon() bool {
 	return testEnv.DaemonInfo.ExperimentalBuild
-***REMOVED***
+}
 
-func IsAmd64() bool ***REMOVED***
+func IsAmd64() bool {
 	return os.Getenv("DOCKER_ENGINE_GOARCH") == "amd64"
-***REMOVED***
+}
 
-func NotArm() bool ***REMOVED***
+func NotArm() bool {
 	return ArchitectureIsNot("arm")
-***REMOVED***
+}
 
-func NotArm64() bool ***REMOVED***
+func NotArm64() bool {
 	return ArchitectureIsNot("arm64")
-***REMOVED***
+}
 
-func NotPpc64le() bool ***REMOVED***
+func NotPpc64le() bool {
 	return ArchitectureIsNot("ppc64le")
-***REMOVED***
+}
 
-func NotS390X() bool ***REMOVED***
+func NotS390X() bool {
 	return ArchitectureIsNot("s390x")
-***REMOVED***
+}
 
-func SameHostDaemon() bool ***REMOVED***
+func SameHostDaemon() bool {
 	return testEnv.IsLocalDaemon()
-***REMOVED***
+}
 
-func UnixCli() bool ***REMOVED***
+func UnixCli() bool {
 	return isUnixCli
-***REMOVED***
+}
 
-func ExecSupport() bool ***REMOVED***
+func ExecSupport() bool {
 	return supportsExec
-***REMOVED***
+}
 
-func Network() bool ***REMOVED***
+func Network() bool {
 	// Set a timeout on the GET at 15s
 	var timeout = time.Duration(15 * time.Second)
 	var url = "https://hub.docker.com"
 
-	client := http.Client***REMOVED***
+	client := http.Client{
 		Timeout: timeout,
-	***REMOVED***
+	}
 
 	resp, err := client.Get(url)
-	if err != nil && strings.Contains(err.Error(), "use of closed network connection") ***REMOVED***
+	if err != nil && strings.Contains(err.Error(), "use of closed network connection") {
 		panic(fmt.Sprintf("Timeout for GET request on %s", url))
-	***REMOVED***
-	if resp != nil ***REMOVED***
+	}
+	if resp != nil {
 		resp.Body.Close()
-	***REMOVED***
+	}
 	return err == nil
-***REMOVED***
+}
 
-func Apparmor() bool ***REMOVED***
+func Apparmor() bool {
 	buf, err := ioutil.ReadFile("/sys/module/apparmor/parameters/enabled")
 	return err == nil && len(buf) > 1 && buf[0] == 'Y'
-***REMOVED***
+}
 
-func NotaryHosting() bool ***REMOVED***
+func NotaryHosting() bool {
 	// for now notary binary is built only if we're running inside
 	// container through `make test`. Figure that out by testing if
 	// notary-server binary is in PATH.
 	_, err := exec.LookPath(notaryServerBinary)
 	return err == nil
-***REMOVED***
+}
 
-func NotaryServerHosting() bool ***REMOVED***
+func NotaryServerHosting() bool {
 	// for now notary-server binary is built only if we're running inside
 	// container through `make test`. Figure that out by testing if
 	// notary-server binary is in PATH.
 	_, err := exec.LookPath(notaryServerBinary)
 	return err == nil
-***REMOVED***
+}
 
-func Devicemapper() bool ***REMOVED***
+func Devicemapper() bool {
 	return strings.HasPrefix(testEnv.DaemonInfo.Driver, "devicemapper")
-***REMOVED***
+}
 
-func IPv6() bool ***REMOVED***
+func IPv6() bool {
 	cmd := exec.Command("test", "-f", "/proc/net/if_inet6")
 	return cmd.Run() != nil
-***REMOVED***
+}
 
-func UserNamespaceROMount() bool ***REMOVED***
+func UserNamespaceROMount() bool {
 	// quick case--userns not enabled in this test run
-	if os.Getenv("DOCKER_REMAP_ROOT") == "" ***REMOVED***
+	if os.Getenv("DOCKER_REMAP_ROOT") == "" {
 		return true
-	***REMOVED***
-	if _, _, err := dockerCmdWithError("run", "--rm", "--read-only", "busybox", "date"); err != nil ***REMOVED***
+	}
+	if _, _, err := dockerCmdWithError("run", "--rm", "--read-only", "busybox", "date"); err != nil {
 		return false
-	***REMOVED***
+	}
 	return true
-***REMOVED***
+}
 
-func NotUserNamespace() bool ***REMOVED***
+func NotUserNamespace() bool {
 	root := os.Getenv("DOCKER_REMAP_ROOT")
 	return root == ""
-***REMOVED***
+}
 
-func UserNamespaceInKernel() bool ***REMOVED***
-	if _, err := os.Stat("/proc/self/uid_map"); os.IsNotExist(err) ***REMOVED***
+func UserNamespaceInKernel() bool {
+	if _, err := os.Stat("/proc/self/uid_map"); os.IsNotExist(err) {
 		/*
 		 * This kernel-provided file only exists if user namespaces are
 		 * supported
 		 */
 		return false
-	***REMOVED***
+	}
 
 	// We need extra check on redhat based distributions
-	if f, err := os.Open("/sys/module/user_namespace/parameters/enable"); err == nil ***REMOVED***
+	if f, err := os.Open("/sys/module/user_namespace/parameters/enable"); err == nil {
 		defer f.Close()
 		b := make([]byte, 1)
 		_, _ = f.Read(b)
 		return string(b) != "N"
-	***REMOVED***
+	}
 
 	return true
-***REMOVED***
+}
 
-func IsPausable() bool ***REMOVED***
-	if testEnv.OSType == "windows" ***REMOVED***
+func IsPausable() bool {
+	if testEnv.OSType == "windows" {
 		return testEnv.DaemonInfo.Isolation == "hyperv"
-	***REMOVED***
+	}
 	return true
-***REMOVED***
+}
 
-func NotPausable() bool ***REMOVED***
-	if testEnv.OSType == "windows" ***REMOVED***
+func NotPausable() bool {
+	if testEnv.OSType == "windows" {
 		return testEnv.DaemonInfo.Isolation == "process"
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
-func IsolationIs(expectedIsolation string) bool ***REMOVED***
+func IsolationIs(expectedIsolation string) bool {
 	return testEnv.OSType == "windows" && string(testEnv.DaemonInfo.Isolation) == expectedIsolation
-***REMOVED***
+}
 
-func IsolationIsHyperv() bool ***REMOVED***
+func IsolationIsHyperv() bool {
 	return IsolationIs("hyperv")
-***REMOVED***
+}
 
-func IsolationIsProcess() bool ***REMOVED***
+func IsolationIsProcess() bool {
 	return IsolationIs("process")
-***REMOVED***
+}
 
 // testRequires checks if the environment satisfies the requirements
 // for the test to run or skips the tests.
-func testRequires(c requirement.SkipT, requirements ...requirement.Test) ***REMOVED***
+func testRequires(c requirement.SkipT, requirements ...requirement.Test) {
 	requirement.Is(c, requirements...)
-***REMOVED***
+}

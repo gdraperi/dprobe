@@ -16,42 +16,42 @@ const (
 )
 
 // isremount returns true if either device name or flags identify a remount request, false otherwise.
-func isremount(device string, flags uintptr) bool ***REMOVED***
-	switch ***REMOVED***
+func isremount(device string, flags uintptr) bool {
+	switch {
 	// We treat device "" and "none" as a remount request to provide compatibility with
 	// requests that don't explicitly set MS_REMOUNT such as those manipulating bind mounts.
 	case flags&unix.MS_REMOUNT != 0, device == "", device == "none":
 		return true
 	default:
 		return false
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func mount(device, target, mType string, flags uintptr, data string) error ***REMOVED***
+func mount(device, target, mType string, flags uintptr, data string) error {
 	oflags := flags &^ ptypes
-	if !isremount(device, flags) || data != "" ***REMOVED***
+	if !isremount(device, flags) || data != "" {
 		// Initial call applying all non-propagation flags for mount
 		// or remount with changed data
-		if err := unix.Mount(device, target, mType, oflags, data); err != nil ***REMOVED***
+		if err := unix.Mount(device, target, mType, oflags, data); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if flags&ptypes != 0 ***REMOVED***
+	if flags&ptypes != 0 {
 		// Change the propagation type.
-		if err := unix.Mount("", target, "", flags&pflags, ""); err != nil ***REMOVED***
+		if err := unix.Mount("", target, "", flags&pflags, ""); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if oflags&broflags == broflags ***REMOVED***
+	if oflags&broflags == broflags {
 		// Remount the bind to apply read only.
 		return unix.Mount("", target, "", oflags|unix.MS_REMOUNT, "")
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func unmount(target string, flag int) error ***REMOVED***
+func unmount(target string, flag int) error {
 	return unix.Unmount(target, flag)
-***REMOVED***
+}

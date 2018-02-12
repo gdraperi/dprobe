@@ -2,24 +2,24 @@ package reference
 
 type notFoundError string
 
-func (e notFoundError) Error() string ***REMOVED***
+func (e notFoundError) Error() string {
 	return string(e)
-***REMOVED***
+}
 
-func (notFoundError) NotFound() ***REMOVED******REMOVED***
+func (notFoundError) NotFound() {}
 
 type invalidTagError string
 
-func (e invalidTagError) Error() string ***REMOVED***
+func (e invalidTagError) Error() string {
 	return string(e)
-***REMOVED***
+}
 
-func (invalidTagError) InvalidParameter() ***REMOVED******REMOVED***
+func (invalidTagError) InvalidParameter() {}
 
 type conflictingTagError string
 
-func (e conflictingTagError) Error() string ***REMOVED***
+func (e conflictingTagError) Error() string {
 	return string(e)
-***REMOVED***
+}
 
-func (conflictingTagError) Conflict() ***REMOVED******REMOVED***
+func (conflictingTagError) Conflict() {}

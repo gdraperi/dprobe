@@ -9,43 +9,43 @@ import (
 )
 
 // Status of a content operation
-type Status struct ***REMOVED***
+type Status struct {
 	content.Status
 
 	// UploadUUID is used by the Docker registry to reference blob uploads
 	UploadUUID string
-***REMOVED***
+}
 
 // StatusTracker to track status of operations
-type StatusTracker interface ***REMOVED***
+type StatusTracker interface {
 	GetStatus(string) (Status, error)
 	SetStatus(string, Status)
-***REMOVED***
+}
 
-type memoryStatusTracker struct ***REMOVED***
+type memoryStatusTracker struct {
 	statuses map[string]Status
 	m        sync.Mutex
-***REMOVED***
+}
 
 // NewInMemoryTracker returns a StatusTracker that tracks content status in-memory
-func NewInMemoryTracker() StatusTracker ***REMOVED***
-	return &memoryStatusTracker***REMOVED***
-		statuses: map[string]Status***REMOVED******REMOVED***,
-	***REMOVED***
-***REMOVED***
+func NewInMemoryTracker() StatusTracker {
+	return &memoryStatusTracker{
+		statuses: map[string]Status{},
+	}
+}
 
-func (t *memoryStatusTracker) GetStatus(ref string) (Status, error) ***REMOVED***
+func (t *memoryStatusTracker) GetStatus(ref string) (Status, error) {
 	t.m.Lock()
 	defer t.m.Unlock()
 	status, ok := t.statuses[ref]
-	if !ok ***REMOVED***
-		return Status***REMOVED******REMOVED***, errors.Wrapf(errdefs.ErrNotFound, "status for ref %v", ref)
-	***REMOVED***
+	if !ok {
+		return Status{}, errors.Wrapf(errdefs.ErrNotFound, "status for ref %v", ref)
+	}
 	return status, nil
-***REMOVED***
+}
 
-func (t *memoryStatusTracker) SetStatus(ref string, status Status) ***REMOVED***
+func (t *memoryStatusTracker) SetStatus(ref string, status Status) {
 	t.m.Lock()
 	t.statuses[ref] = status
 	t.m.Unlock()
-***REMOVED***
+}

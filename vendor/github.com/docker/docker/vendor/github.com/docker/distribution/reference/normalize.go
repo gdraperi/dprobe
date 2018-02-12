@@ -21,59 +21,59 @@ var (
 // is what is used in Docker UI. An example normalized
 // name is "docker.io/library/ubuntu" and corresponding
 // familiar name of "ubuntu".
-type normalizedNamed interface ***REMOVED***
+type normalizedNamed interface {
 	Named
 	Familiar() Named
-***REMOVED***
+}
 
 // ParseNormalizedNamed parses a string into a named reference
 // transforming a familiar name from Docker UI to a fully
 // qualified reference. If the value may be an identifier
 // use ParseAnyReference.
-func ParseNormalizedNamed(s string) (Named, error) ***REMOVED***
-	if ok := anchoredIdentifierRegexp.MatchString(s); ok ***REMOVED***
+func ParseNormalizedNamed(s string) (Named, error) {
+	if ok := anchoredIdentifierRegexp.MatchString(s); ok {
 		return nil, fmt.Errorf("invalid repository name (%s), cannot specify 64-byte hexadecimal strings", s)
-	***REMOVED***
+	}
 	domain, remainder := splitDockerDomain(s)
 	var remoteName string
-	if tagSep := strings.IndexRune(remainder, ':'); tagSep > -1 ***REMOVED***
+	if tagSep := strings.IndexRune(remainder, ':'); tagSep > -1 {
 		remoteName = remainder[:tagSep]
-	***REMOVED*** else ***REMOVED***
+	} else {
 		remoteName = remainder
-	***REMOVED***
-	if strings.ToLower(remoteName) != remoteName ***REMOVED***
+	}
+	if strings.ToLower(remoteName) != remoteName {
 		return nil, errors.New("invalid reference format: repository name must be lowercase")
-	***REMOVED***
+	}
 
 	ref, err := Parse(domain + "/" + remainder)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	named, isNamed := ref.(Named)
-	if !isNamed ***REMOVED***
+	if !isNamed {
 		return nil, fmt.Errorf("reference %s has no name", ref.String())
-	***REMOVED***
+	}
 	return named, nil
-***REMOVED***
+}
 
 // splitDockerDomain splits a repository name to domain and remotename string.
 // If no valid domain is found, the default domain is used. Repository name
 // needs to be already validated before.
-func splitDockerDomain(name string) (domain, remainder string) ***REMOVED***
+func splitDockerDomain(name string) (domain, remainder string) {
 	i := strings.IndexRune(name, '/')
-	if i == -1 || (!strings.ContainsAny(name[:i], ".:") && name[:i] != "localhost") ***REMOVED***
+	if i == -1 || (!strings.ContainsAny(name[:i], ".:") && name[:i] != "localhost") {
 		domain, remainder = defaultDomain, name
-	***REMOVED*** else ***REMOVED***
+	} else {
 		domain, remainder = name[:i], name[i+1:]
-	***REMOVED***
-	if domain == legacyDefaultDomain ***REMOVED***
+	}
+	if domain == legacyDefaultDomain {
 		domain = defaultDomain
-	***REMOVED***
-	if domain == defaultDomain && !strings.ContainsRune(remainder, '/') ***REMOVED***
+	}
+	if domain == defaultDomain && !strings.ContainsRune(remainder, '/') {
 		remainder = officialRepoName + "/" + remainder
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // familiarizeName returns a shortened version of the name familiar
 // to to the Docker UI. Familiar names have the default domain
@@ -81,90 +81,90 @@ func splitDockerDomain(name string) (domain, remainder string) ***REMOVED***
 // For example, "docker.io/library/redis" will have the familiar
 // name "redis" and "docker.io/dmcgowan/myapp" will be "dmcgowan/myapp".
 // Returns a familiarized named only reference.
-func familiarizeName(named namedRepository) repository ***REMOVED***
-	repo := repository***REMOVED***
+func familiarizeName(named namedRepository) repository {
+	repo := repository{
 		domain: named.Domain(),
 		path:   named.Path(),
-	***REMOVED***
+	}
 
-	if repo.domain == defaultDomain ***REMOVED***
+	if repo.domain == defaultDomain {
 		repo.domain = ""
 		// Handle official repositories which have the pattern "library/<official repo name>"
-		if split := strings.Split(repo.path, "/"); len(split) == 2 && split[0] == officialRepoName ***REMOVED***
+		if split := strings.Split(repo.path, "/"); len(split) == 2 && split[0] == officialRepoName {
 			repo.path = split[1]
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return repo
-***REMOVED***
+}
 
-func (r reference) Familiar() Named ***REMOVED***
-	return reference***REMOVED***
+func (r reference) Familiar() Named {
+	return reference{
 		namedRepository: familiarizeName(r.namedRepository),
 		tag:             r.tag,
 		digest:          r.digest,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (r repository) Familiar() Named ***REMOVED***
+func (r repository) Familiar() Named {
 	return familiarizeName(r)
-***REMOVED***
+}
 
-func (t taggedReference) Familiar() Named ***REMOVED***
-	return taggedReference***REMOVED***
+func (t taggedReference) Familiar() Named {
+	return taggedReference{
 		namedRepository: familiarizeName(t.namedRepository),
 		tag:             t.tag,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (c canonicalReference) Familiar() Named ***REMOVED***
-	return canonicalReference***REMOVED***
+func (c canonicalReference) Familiar() Named {
+	return canonicalReference{
 		namedRepository: familiarizeName(c.namedRepository),
 		digest:          c.digest,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // TagNameOnly adds the default tag "latest" to a reference if it only has
 // a repo name.
-func TagNameOnly(ref Named) Named ***REMOVED***
-	if IsNameOnly(ref) ***REMOVED***
+func TagNameOnly(ref Named) Named {
+	if IsNameOnly(ref) {
 		namedTagged, err := WithTag(ref, defaultTag)
-		if err != nil ***REMOVED***
+		if err != nil {
 			// Default tag must be valid, to create a NamedTagged
 			// type with non-validated input the WithTag function
 			// should be used instead
 			panic(err)
-		***REMOVED***
+		}
 		return namedTagged
-	***REMOVED***
+	}
 	return ref
-***REMOVED***
+}
 
 // ParseAnyReference parses a reference string as a possible identifier,
 // full digest, or familiar name.
-func ParseAnyReference(ref string) (Reference, error) ***REMOVED***
-	if ok := anchoredIdentifierRegexp.MatchString(ref); ok ***REMOVED***
+func ParseAnyReference(ref string) (Reference, error) {
+	if ok := anchoredIdentifierRegexp.MatchString(ref); ok {
 		return digestReference("sha256:" + ref), nil
-	***REMOVED***
-	if dgst, err := digest.Parse(ref); err == nil ***REMOVED***
+	}
+	if dgst, err := digest.Parse(ref); err == nil {
 		return digestReference(dgst), nil
-	***REMOVED***
+	}
 
 	return ParseNormalizedNamed(ref)
-***REMOVED***
+}
 
 // ParseAnyReferenceWithSet parses a reference string as a possible short
 // identifier to be matched in a digest set, a full digest, or familiar name.
-func ParseAnyReferenceWithSet(ref string, ds *digestset.Set) (Reference, error) ***REMOVED***
-	if ok := anchoredShortIdentifierRegexp.MatchString(ref); ok ***REMOVED***
+func ParseAnyReferenceWithSet(ref string, ds *digestset.Set) (Reference, error) {
+	if ok := anchoredShortIdentifierRegexp.MatchString(ref); ok {
 		dgst, err := ds.Lookup(ref)
-		if err == nil ***REMOVED***
+		if err == nil {
 			return digestReference(dgst), nil
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
-		if dgst, err := digest.Parse(ref); err == nil ***REMOVED***
+		}
+	} else {
+		if dgst, err := digest.Parse(ref); err == nil {
 			return digestReference(dgst), nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return ParseNormalizedNamed(ref)
-***REMOVED***
+}

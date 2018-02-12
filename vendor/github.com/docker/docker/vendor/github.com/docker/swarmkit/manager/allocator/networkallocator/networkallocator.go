@@ -12,24 +12,24 @@ const (
 
 // PredefinedNetworkData contains the minimum set of data needed
 // to create the correspondent predefined network object in the store.
-type PredefinedNetworkData struct ***REMOVED***
+type PredefinedNetworkData struct {
 	Name   string
 	Driver string
-***REMOVED***
+}
 
 // ServiceAllocationOpts is struct used for functional options in
 // IsServiceAllocated
-type ServiceAllocationOpts struct ***REMOVED***
+type ServiceAllocationOpts struct {
 	OnInit bool
-***REMOVED***
+}
 
 // OnInit is called for allocator initialization stage
-func OnInit(options *ServiceAllocationOpts) ***REMOVED***
+func OnInit(options *ServiceAllocationOpts) {
 	options.OnInit = true
-***REMOVED***
+}
 
 // NetworkAllocator provides network model specific allocation functionality.
-type NetworkAllocator interface ***REMOVED***
+type NetworkAllocator interface {
 	//
 	// Network Allocation
 	//
@@ -89,37 +89,37 @@ type NetworkAllocator interface ***REMOVED***
 
 	// IsAttachmentAllocated If lb endpoint is allocated on the node
 	IsAttachmentAllocated(node *api.Node, networkAttachment *api.NetworkAttachment) bool
-***REMOVED***
+}
 
 // IsIngressNetwork check if the network is an ingress network
-func IsIngressNetwork(nw *api.Network) bool ***REMOVED***
-	if nw.Spec.Ingress ***REMOVED***
+func IsIngressNetwork(nw *api.Network) bool {
+	if nw.Spec.Ingress {
 		return true
-	***REMOVED***
+	}
 	// Check if legacy defined ingress network
 	_, ok := nw.Spec.Annotations.Labels["com.docker.swarm.internal"]
 	return ok && nw.Spec.Annotations.Name == "ingress"
-***REMOVED***
+}
 
 // IsIngressNetworkNeeded checks whether the service requires the routing-mesh
-func IsIngressNetworkNeeded(s *api.Service) bool ***REMOVED***
-	if s == nil ***REMOVED***
+func IsIngressNetworkNeeded(s *api.Service) bool {
+	if s == nil {
 		return false
-	***REMOVED***
+	}
 
-	if s.Spec.Endpoint == nil ***REMOVED***
+	if s.Spec.Endpoint == nil {
 		return false
-	***REMOVED***
+	}
 
-	for _, p := range s.Spec.Endpoint.Ports ***REMOVED***
+	for _, p := range s.Spec.Endpoint.Ports {
 		// The service to which this task belongs is trying to
 		// expose ports with PublishMode as Ingress to the
 		// external world. Automatically attach the task to
 		// the ingress network.
-		if p.PublishMode == api.PublishModeIngress ***REMOVED***
+		if p.PublishMode == api.PublishModeIngress {
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return false
-***REMOVED***
+}

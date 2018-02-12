@@ -42,10 +42,10 @@ that on any platform that supports Docker, all the files using the new build
 system can be generated at once, and generated files will not change based on
 what the person running the scripts has installed on their computer.
 
-The OS specific files for the new build system are located in the `$***REMOVED***GOOS***REMOVED***`
-directory, and the build is coordinated by the `$***REMOVED***GOOS***REMOVED***/mkall.go` program. When
+The OS specific files for the new build system are located in the `${GOOS}`
+directory, and the build is coordinated by the `${GOOS}/mkall.go` program. When
 the kernel or system library updates, modify the Dockerfile at
-`$***REMOVED***GOOS***REMOVED***/Dockerfile` to checkout the new release of the source.
+`${GOOS}/Dockerfile` to checkout the new release of the source.
 
 To build all the files under the new build system, you must be on an amd64/Linux
 system and have your GOOS and GOARCH set accordingly. Running `mkall.sh` will
@@ -64,7 +64,7 @@ They must be called from within the docker container.
 
 ### asm files
 
-The hand-written assembly file at `asm_$***REMOVED***GOOS***REMOVED***_$***REMOVED***GOARCH***REMOVED***.s` implements system
+The hand-written assembly file at `asm_${GOOS}_${GOARCH}.s` implements system
 call dispatch. There are three entry points:
 ```
   func Syscall(trap, a1, a2, a3 uintptr) (r1, r2, err uintptr)
@@ -81,10 +81,10 @@ each GOOS/GOARCH pair.
 
 ### mksysnum
 
-Mksysnum is a script located at `$***REMOVED***GOOS***REMOVED***/mksysnum.pl` (or `mksysnum_$***REMOVED***GOOS***REMOVED***.pl`
+Mksysnum is a script located at `${GOOS}/mksysnum.pl` (or `mksysnum_${GOOS}.pl`
 for the old system). This script takes in a list of header files containing the
 syscall number declarations and parses them to produce the corresponding list of
-Go numeric constants. See `zsysnum_$***REMOVED***GOOS***REMOVED***_$***REMOVED***GOARCH***REMOVED***.go` for the generated
+Go numeric constants. See `zsysnum_${GOOS}_${GOARCH}.go` for the generated
 constants.
 
 Adding new syscall numbers is mostly done by running the build on a sufficiently
@@ -94,31 +94,31 @@ parsing in mksysnum.
 
 ### mksyscall.pl
 
-The `syscall.go`, `syscall_$***REMOVED***GOOS***REMOVED***.go`, `syscall_$***REMOVED***GOOS***REMOVED***_$***REMOVED***GOARCH***REMOVED***.go` are
+The `syscall.go`, `syscall_${GOOS}.go`, `syscall_${GOOS}_${GOARCH}.go` are
 hand-written Go files which implement system calls (for unix, the specific OS,
 or the specific OS/Architecture pair respectively) that need special handling
 and list `//sys` comments giving prototypes for ones that can be generated.
 
 The mksyscall.pl script takes the `//sys` and `//sysnb` comments and converts
 them into syscalls. This requires the name of the prototype in the comment to
-match a syscall number in the `zsysnum_$***REMOVED***GOOS***REMOVED***_$***REMOVED***GOARCH***REMOVED***.go` file. The function
+match a syscall number in the `zsysnum_${GOOS}_${GOARCH}.go` file. The function
 prototype can be exported (capitalized) or not.
 
 Adding a new syscall often just requires adding a new `//sys` function prototype
 with the desired arguments and a capitalized name so it is exported. However, if
 you want the interface to the syscall to be different, often one will make an
 unexported `//sys` prototype, an then write a custom wrapper in
-`syscall_$***REMOVED***GOOS***REMOVED***.go`.
+`syscall_${GOOS}.go`.
 
 ### types files
 
-For each OS, there is a hand-written Go file at `$***REMOVED***GOOS***REMOVED***/types.go` (or
-`types_$***REMOVED***GOOS***REMOVED***.go` on the old system). This file includes standard C headers and
+For each OS, there is a hand-written Go file at `${GOOS}/types.go` (or
+`types_${GOOS}.go` on the old system). This file includes standard C headers and
 creates Go type aliases to the corresponding C types. The file is then fed
 through godef to get the Go compatible definitions. Finally, the generated code
 is fed though mkpost.go to format the code correctly and remove any hidden or
 private identifiers. This cleaned-up code is written to
-`ztypes_$***REMOVED***GOOS***REMOVED***_$***REMOVED***GOARCH***REMOVED***.go`.
+`ztypes_${GOOS}_${GOARCH}.go`.
 
 The hardest part about preparing this file is figuring out which headers to
 include and which symbols need to be `#define`d to get the actual data
@@ -138,11 +138,11 @@ some `#if/#elif` macros in your include statements.
 This script is used to generate the system's various constants. This doesn't
 just include the error numbers and error strings, but also the signal numbers
 an a wide variety of miscellaneous constants. The constants come from the list
-of include files in the `includes_$***REMOVED***uname***REMOVED***` variable. A regex then picks out
+of include files in the `includes_${uname}` variable. A regex then picks out
 the desired `#define` statements, and generates the corresponding Go constants.
 The error numbers and strings are generated from `#include <errno.h>`, and the
 signal numbers and strings are generated from `#include <signal.h>`. All of
-these constants are written to `zerrors_$***REMOVED***GOOS***REMOVED***_$***REMOVED***GOARCH***REMOVED***.go` via a C program,
+these constants are written to `zerrors_${GOOS}_${GOARCH}.go` via a C program,
 `_errors.c`, which prints out all the constants.
 
 To add a constant, add the header that includes it to the appropriate variable.
@@ -152,22 +152,22 @@ the regex too broad to avoid matching unintended constants.
 
 ## Generated files
 
-### `zerror_$***REMOVED***GOOS***REMOVED***_$***REMOVED***GOARCH***REMOVED***.go`
+### `zerror_${GOOS}_${GOARCH}.go`
 
 A file containing all of the system's generated error numbers, error strings,
 signal numbers, and constants. Generated by `mkerrors.sh` (see above).
 
-### `zsyscall_$***REMOVED***GOOS***REMOVED***_$***REMOVED***GOARCH***REMOVED***.go`
+### `zsyscall_${GOOS}_${GOARCH}.go`
 
 A file containing all the generated syscalls for a specific GOOS and GOARCH.
 Generated by `mksyscall.pl` (see above).
 
-### `zsysnum_$***REMOVED***GOOS***REMOVED***_$***REMOVED***GOARCH***REMOVED***.go`
+### `zsysnum_${GOOS}_${GOARCH}.go`
 
 A list of numeric constants for all the syscall number of the specific GOOS
 and GOARCH. Generated by mksysnum (see above).
 
-### `ztypes_$***REMOVED***GOOS***REMOVED***_$***REMOVED***GOARCH***REMOVED***.go`
+### `ztypes_${GOOS}_${GOARCH}.go`
 
 A file containing Go types for passing into (or returning from) syscalls.
 Generated by godefs and the types file (see above).

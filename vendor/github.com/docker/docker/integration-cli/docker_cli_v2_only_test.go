@@ -10,32 +10,32 @@ import (
 	"github.com/go-check/check"
 )
 
-func makefile(path string, contents string) (string, error) ***REMOVED***
+func makefile(path string, contents string) (string, error) {
 	f, err := ioutil.TempFile(path, "tmp")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	err = ioutil.WriteFile(f.Name(), []byte(contents), os.ModePerm)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	return f.Name(), nil
-***REMOVED***
+}
 
 // TestV2Only ensures that a daemon does not
 // attempt to contact any v1 registry endpoints.
-func (s *DockerRegistrySuite) TestV2Only(c *check.C) ***REMOVED***
+func (s *DockerRegistrySuite) TestV2Only(c *check.C) {
 	reg, err := registry.NewMock(c)
 	defer reg.Close()
 	c.Assert(err, check.IsNil)
 
-	reg.RegisterHandler("/v2/", func(w http.ResponseWriter, r *http.Request) ***REMOVED***
+	reg.RegisterHandler("/v2/", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(404)
-	***REMOVED***)
+	})
 
-	reg.RegisterHandler("/v1/.*", func(w http.ResponseWriter, r *http.Request) ***REMOVED***
+	reg.RegisterHandler("/v1/.*", func(w http.ResponseWriter, r *http.Request) {
 		c.Fatal("V1 registry contacted")
-	***REMOVED***)
+	})
 
 	repoName := fmt.Sprintf("%s/busybox", reg.URL())
 
@@ -55,4 +55,4 @@ func (s *DockerRegistrySuite) TestV2Only(c *check.C) ***REMOVED***
 	s.d.Cmd("tag", "busybox", repoName)
 	s.d.Cmd("push", repoName)
 	s.d.Cmd("pull", repoName)
-***REMOVED***
+}

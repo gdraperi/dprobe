@@ -12,235 +12,235 @@ import (
 	"golang.org/x/net/ipv4"
 )
 
-func TestVMLoadAbsoluteOffsetOutOfBounds(t *testing.T) ***REMOVED***
-	vm, done, err := testVM(t, []bpf.Instruction***REMOVED***
-		bpf.LoadAbsolute***REMOVED***
+func TestVMLoadAbsoluteOffsetOutOfBounds(t *testing.T) {
+	vm, done, err := testVM(t, []bpf.Instruction{
+		bpf.LoadAbsolute{
 			Off:  100,
 			Size: 2,
-		***REMOVED***,
-		bpf.RetA***REMOVED******REMOVED***,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+		},
+		bpf.RetA{},
+	})
+	if err != nil {
 		t.Fatalf("failed to load BPF program: %v", err)
-	***REMOVED***
+	}
 	defer done()
 
-	out, err := vm.Run([]byte***REMOVED***
+	out, err := vm.Run([]byte{
 		0xff, 0xff, 0xff, 0xff,
 		0xff, 0xff, 0xff, 0xff,
 		0, 1, 2, 3,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		t.Fatalf("unexpected error while running program: %v", err)
-	***REMOVED***
-	if want, got := 0, out; want != got ***REMOVED***
+	}
+	if want, got := 0, out; want != got {
 		t.Fatalf("unexpected number of output bytes:\n- want: %d\n-  got: %d",
 			want, got)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestVMLoadAbsoluteOffsetPlusSizeOutOfBounds(t *testing.T) ***REMOVED***
-	vm, done, err := testVM(t, []bpf.Instruction***REMOVED***
-		bpf.LoadAbsolute***REMOVED***
+func TestVMLoadAbsoluteOffsetPlusSizeOutOfBounds(t *testing.T) {
+	vm, done, err := testVM(t, []bpf.Instruction{
+		bpf.LoadAbsolute{
 			Off:  8,
 			Size: 2,
-		***REMOVED***,
-		bpf.RetA***REMOVED******REMOVED***,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+		},
+		bpf.RetA{},
+	})
+	if err != nil {
 		t.Fatalf("failed to load BPF program: %v", err)
-	***REMOVED***
+	}
 	defer done()
 
-	out, err := vm.Run([]byte***REMOVED***
+	out, err := vm.Run([]byte{
 		0xff, 0xff, 0xff, 0xff,
 		0xff, 0xff, 0xff, 0xff,
 		0,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		t.Fatalf("unexpected error while running program: %v", err)
-	***REMOVED***
-	if want, got := 0, out; want != got ***REMOVED***
+	}
+	if want, got := 0, out; want != got {
 		t.Fatalf("unexpected number of output bytes:\n- want: %d\n-  got: %d",
 			want, got)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestVMLoadAbsoluteBadInstructionSize(t *testing.T) ***REMOVED***
-	_, _, err := testVM(t, []bpf.Instruction***REMOVED***
-		bpf.LoadAbsolute***REMOVED***
+func TestVMLoadAbsoluteBadInstructionSize(t *testing.T) {
+	_, _, err := testVM(t, []bpf.Instruction{
+		bpf.LoadAbsolute{
 			Size: 5,
-		***REMOVED***,
-		bpf.RetA***REMOVED******REMOVED***,
-	***REMOVED***)
-	if errStr(err) != "assembling instruction 1: invalid load byte length 0" ***REMOVED***
+		},
+		bpf.RetA{},
+	})
+	if errStr(err) != "assembling instruction 1: invalid load byte length 0" {
 		t.Fatalf("unexpected error: %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestVMLoadConstantOK(t *testing.T) ***REMOVED***
-	vm, done, err := testVM(t, []bpf.Instruction***REMOVED***
-		bpf.LoadConstant***REMOVED***
+func TestVMLoadConstantOK(t *testing.T) {
+	vm, done, err := testVM(t, []bpf.Instruction{
+		bpf.LoadConstant{
 			Dst: bpf.RegX,
 			Val: 9,
-		***REMOVED***,
-		bpf.TXA***REMOVED******REMOVED***,
-		bpf.RetA***REMOVED******REMOVED***,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+		},
+		bpf.TXA{},
+		bpf.RetA{},
+	})
+	if err != nil {
 		t.Fatalf("failed to load BPF program: %v", err)
-	***REMOVED***
+	}
 	defer done()
 
-	out, err := vm.Run([]byte***REMOVED***
+	out, err := vm.Run([]byte{
 		0xff, 0xff, 0xff, 0xff,
 		0xff, 0xff, 0xff, 0xff,
 		0,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		t.Fatalf("unexpected error while running program: %v", err)
-	***REMOVED***
-	if want, got := 1, out; want != got ***REMOVED***
+	}
+	if want, got := 1, out; want != got {
 		t.Fatalf("unexpected number of output bytes:\n- want: %d\n-  got: %d",
 			want, got)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestVMLoadIndirectOutOfBounds(t *testing.T) ***REMOVED***
-	vm, done, err := testVM(t, []bpf.Instruction***REMOVED***
-		bpf.LoadIndirect***REMOVED***
+func TestVMLoadIndirectOutOfBounds(t *testing.T) {
+	vm, done, err := testVM(t, []bpf.Instruction{
+		bpf.LoadIndirect{
 			Off:  100,
 			Size: 1,
-		***REMOVED***,
-		bpf.RetA***REMOVED******REMOVED***,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+		},
+		bpf.RetA{},
+	})
+	if err != nil {
 		t.Fatalf("failed to load BPF program: %v", err)
-	***REMOVED***
+	}
 	defer done()
 
-	out, err := vm.Run([]byte***REMOVED***
+	out, err := vm.Run([]byte{
 		0xff, 0xff, 0xff, 0xff,
 		0xff, 0xff, 0xff, 0xff,
 		0,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		t.Fatalf("unexpected error while running program: %v", err)
-	***REMOVED***
-	if want, got := 0, out; want != got ***REMOVED***
+	}
+	if want, got := 0, out; want != got {
 		t.Fatalf("unexpected number of output bytes:\n- want: %d\n-  got: %d",
 			want, got)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestVMLoadMemShiftOutOfBounds(t *testing.T) ***REMOVED***
-	vm, done, err := testVM(t, []bpf.Instruction***REMOVED***
-		bpf.LoadMemShift***REMOVED***
+func TestVMLoadMemShiftOutOfBounds(t *testing.T) {
+	vm, done, err := testVM(t, []bpf.Instruction{
+		bpf.LoadMemShift{
 			Off: 100,
-		***REMOVED***,
-		bpf.RetA***REMOVED******REMOVED***,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+		},
+		bpf.RetA{},
+	})
+	if err != nil {
 		t.Fatalf("failed to load BPF program: %v", err)
-	***REMOVED***
+	}
 	defer done()
 
-	out, err := vm.Run([]byte***REMOVED***
+	out, err := vm.Run([]byte{
 		0xff, 0xff, 0xff, 0xff,
 		0xff, 0xff, 0xff, 0xff,
 		0,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		t.Fatalf("unexpected error while running program: %v", err)
-	***REMOVED***
-	if want, got := 0, out; want != got ***REMOVED***
+	}
+	if want, got := 0, out; want != got {
 		t.Fatalf("unexpected number of output bytes:\n- want: %d\n-  got: %d",
 			want, got)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 const (
 	dhcp4Port = 53
 )
 
-func TestVMLoadMemShiftLoadIndirectNoResult(t *testing.T) ***REMOVED***
+func TestVMLoadMemShiftLoadIndirectNoResult(t *testing.T) {
 	vm, in, done := testDHCPv4(t)
 	defer done()
 
 	// Append mostly empty UDP header with incorrect DHCPv4 port
-	in = append(in, []byte***REMOVED***
+	in = append(in, []byte{
 		0, 0,
 		0, dhcp4Port + 1,
 		0, 0,
 		0, 0,
-	***REMOVED***...)
+	}...)
 
 	out, err := vm.Run(in)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("unexpected error while running program: %v", err)
-	***REMOVED***
-	if want, got := 0, out; want != got ***REMOVED***
+	}
+	if want, got := 0, out; want != got {
 		t.Fatalf("unexpected number of output bytes:\n- want: %d\n-  got: %d",
 			want, got)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestVMLoadMemShiftLoadIndirectOK(t *testing.T) ***REMOVED***
+func TestVMLoadMemShiftLoadIndirectOK(t *testing.T) {
 	vm, in, done := testDHCPv4(t)
 	defer done()
 
 	// Append mostly empty UDP header with correct DHCPv4 port
-	in = append(in, []byte***REMOVED***
+	in = append(in, []byte{
 		0, 0,
 		0, dhcp4Port,
 		0, 0,
 		0, 0,
-	***REMOVED***...)
+	}...)
 
 	out, err := vm.Run(in)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("unexpected error while running program: %v", err)
-	***REMOVED***
-	if want, got := len(in)-8, out; want != got ***REMOVED***
+	}
+	if want, got := len(in)-8, out; want != got {
 		t.Fatalf("unexpected number of output bytes:\n- want: %d\n-  got: %d",
 			want, got)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func testDHCPv4(t *testing.T) (virtualMachine, []byte, func()) ***REMOVED***
+func testDHCPv4(t *testing.T) (virtualMachine, []byte, func()) {
 	// DHCPv4 test data courtesy of David Anderson:
 	// https://github.com/google/netboot/blob/master/dhcp4/conn_linux.go#L59-L70
-	vm, done, err := testVM(t, []bpf.Instruction***REMOVED***
+	vm, done, err := testVM(t, []bpf.Instruction{
 		// Load IPv4 packet length
-		bpf.LoadMemShift***REMOVED***Off: 8***REMOVED***,
+		bpf.LoadMemShift{Off: 8},
 		// Get UDP dport
-		bpf.LoadIndirect***REMOVED***Off: 8 + 2, Size: 2***REMOVED***,
+		bpf.LoadIndirect{Off: 8 + 2, Size: 2},
 		// Correct dport?
-		bpf.JumpIf***REMOVED***Cond: bpf.JumpEqual, Val: dhcp4Port, SkipFalse: 1***REMOVED***,
+		bpf.JumpIf{Cond: bpf.JumpEqual, Val: dhcp4Port, SkipFalse: 1},
 		// Accept
-		bpf.RetConstant***REMOVED***Val: 1500***REMOVED***,
+		bpf.RetConstant{Val: 1500},
 		// Ignore
-		bpf.RetConstant***REMOVED***Val: 0***REMOVED***,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+		bpf.RetConstant{Val: 0},
+	})
+	if err != nil {
 		t.Fatalf("failed to load BPF program: %v", err)
-	***REMOVED***
+	}
 
 	// Minimal requirements to make a valid IPv4 header
-	h := &ipv4.Header***REMOVED***
+	h := &ipv4.Header{
 		Len: ipv4.HeaderLen,
 		Src: net.IPv4(192, 168, 1, 1),
 		Dst: net.IPv4(192, 168, 1, 2),
-	***REMOVED***
+	}
 	hb, err := h.Marshal()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("failed to marshal IPv4 header: %v", err)
-	***REMOVED***
+	}
 
-	hb = append([]byte***REMOVED***
+	hb = append([]byte{
 		0xff, 0xff, 0xff, 0xff,
 		0xff, 0xff, 0xff, 0xff,
-	***REMOVED***, hb...)
+	}, hb...)
 
 	return vm, hb, done
-***REMOVED***
+}

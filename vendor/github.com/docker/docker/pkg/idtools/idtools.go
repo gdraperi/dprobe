@@ -12,22 +12,22 @@ import (
 // IDMap contains a single entry for user namespace range remapping. An array
 // of IDMap entries represents the structure that will be provided to the Linux
 // kernel for creating a user namespace.
-type IDMap struct ***REMOVED***
+type IDMap struct {
 	ContainerID int `json:"container_id"`
 	HostID      int `json:"host_id"`
 	Size        int `json:"size"`
-***REMOVED***
+}
 
-type subIDRange struct ***REMOVED***
+type subIDRange struct {
 	Start  int
 	Length int
-***REMOVED***
+}
 
 type ranges []subIDRange
 
-func (e ranges) Len() int           ***REMOVED*** return len(e) ***REMOVED***
-func (e ranges) Swap(i, j int)      ***REMOVED*** e[i], e[j] = e[j], e[i] ***REMOVED***
-func (e ranges) Less(i, j int) bool ***REMOVED*** return e[i].Start < e[j].Start ***REMOVED***
+func (e ranges) Len() int           { return len(e) }
+func (e ranges) Swap(i, j int)      { e[i], e[j] = e[j], e[i] }
+func (e ranges) Less(i, j int) bool { return e[i].Start < e[j].Start }
 
 const (
 	subuidFileName string = "/etc/subuid"
@@ -37,230 +37,230 @@ const (
 // MkdirAllAndChown creates a directory (include any along the path) and then modifies
 // ownership to the requested uid/gid.  If the directory already exists, this
 // function will still change ownership to the requested uid/gid pair.
-func MkdirAllAndChown(path string, mode os.FileMode, owner IDPair) error ***REMOVED***
+func MkdirAllAndChown(path string, mode os.FileMode, owner IDPair) error {
 	return mkdirAs(path, mode, owner.UID, owner.GID, true, true)
-***REMOVED***
+}
 
 // MkdirAndChown creates a directory and then modifies ownership to the requested uid/gid.
 // If the directory already exists, this function still changes ownership.
 // Note that unlike os.Mkdir(), this function does not return IsExist error
 // in case path already exists.
-func MkdirAndChown(path string, mode os.FileMode, owner IDPair) error ***REMOVED***
+func MkdirAndChown(path string, mode os.FileMode, owner IDPair) error {
 	return mkdirAs(path, mode, owner.UID, owner.GID, false, true)
-***REMOVED***
+}
 
 // MkdirAllAndChownNew creates a directory (include any along the path) and then modifies
 // ownership ONLY of newly created directories to the requested uid/gid. If the
 // directories along the path exist, no change of ownership will be performed
-func MkdirAllAndChownNew(path string, mode os.FileMode, owner IDPair) error ***REMOVED***
+func MkdirAllAndChownNew(path string, mode os.FileMode, owner IDPair) error {
 	return mkdirAs(path, mode, owner.UID, owner.GID, true, false)
-***REMOVED***
+}
 
 // GetRootUIDGID retrieves the remapped root uid/gid pair from the set of maps.
 // If the maps are empty, then the root uid/gid will default to "real" 0/0
-func GetRootUIDGID(uidMap, gidMap []IDMap) (int, int, error) ***REMOVED***
+func GetRootUIDGID(uidMap, gidMap []IDMap) (int, int, error) {
 	uid, err := toHost(0, uidMap)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return -1, -1, err
-	***REMOVED***
+	}
 	gid, err := toHost(0, gidMap)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return -1, -1, err
-	***REMOVED***
+	}
 	return uid, gid, nil
-***REMOVED***
+}
 
 // toContainer takes an id mapping, and uses it to translate a
 // host ID to the remapped ID. If no map is provided, then the translation
 // assumes a 1-to-1 mapping and returns the passed in id
-func toContainer(hostID int, idMap []IDMap) (int, error) ***REMOVED***
-	if idMap == nil ***REMOVED***
+func toContainer(hostID int, idMap []IDMap) (int, error) {
+	if idMap == nil {
 		return hostID, nil
-	***REMOVED***
-	for _, m := range idMap ***REMOVED***
-		if (hostID >= m.HostID) && (hostID <= (m.HostID + m.Size - 1)) ***REMOVED***
+	}
+	for _, m := range idMap {
+		if (hostID >= m.HostID) && (hostID <= (m.HostID + m.Size - 1)) {
 			contID := m.ContainerID + (hostID - m.HostID)
 			return contID, nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return -1, fmt.Errorf("Host ID %d cannot be mapped to a container ID", hostID)
-***REMOVED***
+}
 
 // toHost takes an id mapping and a remapped ID, and translates the
 // ID to the mapped host ID. If no map is provided, then the translation
 // assumes a 1-to-1 mapping and returns the passed in id #
-func toHost(contID int, idMap []IDMap) (int, error) ***REMOVED***
-	if idMap == nil ***REMOVED***
+func toHost(contID int, idMap []IDMap) (int, error) {
+	if idMap == nil {
 		return contID, nil
-	***REMOVED***
-	for _, m := range idMap ***REMOVED***
-		if (contID >= m.ContainerID) && (contID <= (m.ContainerID + m.Size - 1)) ***REMOVED***
+	}
+	for _, m := range idMap {
+		if (contID >= m.ContainerID) && (contID <= (m.ContainerID + m.Size - 1)) {
 			hostID := m.HostID + (contID - m.ContainerID)
 			return hostID, nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return -1, fmt.Errorf("Container ID %d cannot be mapped to a host ID", contID)
-***REMOVED***
+}
 
 // IDPair is a UID and GID pair
-type IDPair struct ***REMOVED***
+type IDPair struct {
 	UID int
 	GID int
-***REMOVED***
+}
 
 // IDMappings contains a mappings of UIDs and GIDs
-type IDMappings struct ***REMOVED***
+type IDMappings struct {
 	uids []IDMap
 	gids []IDMap
-***REMOVED***
+}
 
 // NewIDMappings takes a requested user and group name and
-// using the data from /etc/sub***REMOVED***uid,gid***REMOVED*** ranges, creates the
+// using the data from /etc/sub{uid,gid} ranges, creates the
 // proper uid and gid remapping ranges for that user/group pair
-func NewIDMappings(username, groupname string) (*IDMappings, error) ***REMOVED***
+func NewIDMappings(username, groupname string) (*IDMappings, error) {
 	subuidRanges, err := parseSubuid(username)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	subgidRanges, err := parseSubgid(groupname)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if len(subuidRanges) == 0 ***REMOVED***
+	}
+	if len(subuidRanges) == 0 {
 		return nil, fmt.Errorf("No subuid ranges found for user %q", username)
-	***REMOVED***
-	if len(subgidRanges) == 0 ***REMOVED***
+	}
+	if len(subgidRanges) == 0 {
 		return nil, fmt.Errorf("No subgid ranges found for group %q", groupname)
-	***REMOVED***
+	}
 
-	return &IDMappings***REMOVED***
+	return &IDMappings{
 		uids: createIDMap(subuidRanges),
 		gids: createIDMap(subgidRanges),
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // NewIDMappingsFromMaps creates a new mapping from two slices
 // Deprecated: this is a temporary shim while transitioning to IDMapping
-func NewIDMappingsFromMaps(uids []IDMap, gids []IDMap) *IDMappings ***REMOVED***
-	return &IDMappings***REMOVED***uids: uids, gids: gids***REMOVED***
-***REMOVED***
+func NewIDMappingsFromMaps(uids []IDMap, gids []IDMap) *IDMappings {
+	return &IDMappings{uids: uids, gids: gids}
+}
 
 // RootPair returns a uid and gid pair for the root user. The error is ignored
 // because a root user always exists, and the defaults are correct when the uid
 // and gid maps are empty.
-func (i *IDMappings) RootPair() IDPair ***REMOVED***
+func (i *IDMappings) RootPair() IDPair {
 	uid, gid, _ := GetRootUIDGID(i.uids, i.gids)
-	return IDPair***REMOVED***UID: uid, GID: gid***REMOVED***
-***REMOVED***
+	return IDPair{UID: uid, GID: gid}
+}
 
 // ToHost returns the host UID and GID for the container uid, gid.
 // Remapping is only performed if the ids aren't already the remapped root ids
-func (i *IDMappings) ToHost(pair IDPair) (IDPair, error) ***REMOVED***
+func (i *IDMappings) ToHost(pair IDPair) (IDPair, error) {
 	var err error
 	target := i.RootPair()
 
-	if pair.UID != target.UID ***REMOVED***
+	if pair.UID != target.UID {
 		target.UID, err = toHost(pair.UID, i.uids)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return target, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if pair.GID != target.GID ***REMOVED***
+	if pair.GID != target.GID {
 		target.GID, err = toHost(pair.GID, i.gids)
-	***REMOVED***
+	}
 	return target, err
-***REMOVED***
+}
 
 // ToContainer returns the container UID and GID for the host uid and gid
-func (i *IDMappings) ToContainer(pair IDPair) (int, int, error) ***REMOVED***
+func (i *IDMappings) ToContainer(pair IDPair) (int, int, error) {
 	uid, err := toContainer(pair.UID, i.uids)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return -1, -1, err
-	***REMOVED***
+	}
 	gid, err := toContainer(pair.GID, i.gids)
 	return uid, gid, err
-***REMOVED***
+}
 
 // Empty returns true if there are no id mappings
-func (i *IDMappings) Empty() bool ***REMOVED***
+func (i *IDMappings) Empty() bool {
 	return len(i.uids) == 0 && len(i.gids) == 0
-***REMOVED***
+}
 
 // UIDs return the UID mapping
 // TODO: remove this once everything has been refactored to use pairs
-func (i *IDMappings) UIDs() []IDMap ***REMOVED***
+func (i *IDMappings) UIDs() []IDMap {
 	return i.uids
-***REMOVED***
+}
 
 // GIDs return the UID mapping
 // TODO: remove this once everything has been refactored to use pairs
-func (i *IDMappings) GIDs() []IDMap ***REMOVED***
+func (i *IDMappings) GIDs() []IDMap {
 	return i.gids
-***REMOVED***
+}
 
-func createIDMap(subidRanges ranges) []IDMap ***REMOVED***
-	idMap := []IDMap***REMOVED******REMOVED***
+func createIDMap(subidRanges ranges) []IDMap {
+	idMap := []IDMap{}
 
 	// sort the ranges by lowest ID first
 	sort.Sort(subidRanges)
 	containerID := 0
-	for _, idrange := range subidRanges ***REMOVED***
-		idMap = append(idMap, IDMap***REMOVED***
+	for _, idrange := range subidRanges {
+		idMap = append(idMap, IDMap{
 			ContainerID: containerID,
 			HostID:      idrange.Start,
 			Size:        idrange.Length,
-		***REMOVED***)
+		})
 		containerID = containerID + idrange.Length
-	***REMOVED***
+	}
 	return idMap
-***REMOVED***
+}
 
-func parseSubuid(username string) (ranges, error) ***REMOVED***
+func parseSubuid(username string) (ranges, error) {
 	return parseSubidFile(subuidFileName, username)
-***REMOVED***
+}
 
-func parseSubgid(username string) (ranges, error) ***REMOVED***
+func parseSubgid(username string) (ranges, error) {
 	return parseSubidFile(subgidFileName, username)
-***REMOVED***
+}
 
 // parseSubidFile will read the appropriate file (/etc/subuid or /etc/subgid)
 // and return all found ranges for a specified username. If the special value
 // "ALL" is supplied for username, then all ranges in the file will be returned
-func parseSubidFile(path, username string) (ranges, error) ***REMOVED***
+func parseSubidFile(path, username string) (ranges, error) {
 	var rangeList ranges
 
 	subidFile, err := os.Open(path)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return rangeList, err
-	***REMOVED***
+	}
 	defer subidFile.Close()
 
 	s := bufio.NewScanner(subidFile)
-	for s.Scan() ***REMOVED***
-		if err := s.Err(); err != nil ***REMOVED***
+	for s.Scan() {
+		if err := s.Err(); err != nil {
 			return rangeList, err
-		***REMOVED***
+		}
 
 		text := strings.TrimSpace(s.Text())
-		if text == "" || strings.HasPrefix(text, "#") ***REMOVED***
+		if text == "" || strings.HasPrefix(text, "#") {
 			continue
-		***REMOVED***
+		}
 		parts := strings.Split(text, ":")
-		if len(parts) != 3 ***REMOVED***
+		if len(parts) != 3 {
 			return rangeList, fmt.Errorf("Cannot parse subuid/gid information: Format not correct for %s file", path)
-		***REMOVED***
-		if parts[0] == username || username == "ALL" ***REMOVED***
+		}
+		if parts[0] == username || username == "ALL" {
 			startid, err := strconv.Atoi(parts[1])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return rangeList, fmt.Errorf("String to int conversion failed during subuid/gid parsing of %s: %v", path, err)
-			***REMOVED***
+			}
 			length, err := strconv.Atoi(parts[2])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return rangeList, fmt.Errorf("String to int conversion failed during subuid/gid parsing of %s: %v", path, err)
-			***REMOVED***
-			rangeList = append(rangeList, subIDRange***REMOVED***startid, length***REMOVED***)
-		***REMOVED***
-	***REMOVED***
+			}
+			rangeList = append(rangeList, subIDRange{startid, length})
+		}
+	}
 	return rangeList, nil
-***REMOVED***
+}

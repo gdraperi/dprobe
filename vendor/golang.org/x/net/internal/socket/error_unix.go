@@ -16,8 +16,8 @@ var (
 
 // errnoErr returns common boxed Errno values, to prevent allocations
 // at runtime.
-func errnoErr(errno syscall.Errno) error ***REMOVED***
-	switch errno ***REMOVED***
+func errnoErr(errno syscall.Errno) error {
+	switch errno {
 	case 0:
 		return nil
 	case syscall.EAGAIN:
@@ -26,6 +26,6 @@ func errnoErr(errno syscall.Errno) error ***REMOVED***
 		return errEINVAL
 	case syscall.ENOENT:
 		return errENOENT
-	***REMOVED***
+	}
 	return errno
-***REMOVED***
+}

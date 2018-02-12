@@ -33,68 +33,68 @@ import (
 	"time"
 )
 
-func NewPopulatedDuration(r interface ***REMOVED***
+func NewPopulatedDuration(r interface {
 	Int63() int64
-***REMOVED***, easy bool) *Duration ***REMOVED***
-	this := &Duration***REMOVED******REMOVED***
+}, easy bool) *Duration {
+	this := &Duration{}
 	maxSecs := time.Hour.Nanoseconds() / 1e9
 	max := 2 * maxSecs
 	s := int64(r.Int63()) % max
 	s -= maxSecs
 	neg := int64(1)
-	if s < 0 ***REMOVED***
+	if s < 0 {
 		neg = -1
-	***REMOVED***
+	}
 	this.Seconds = s
 	this.Nanos = int32(neg * (r.Int63() % 1e9))
 	return this
-***REMOVED***
+}
 
-func (d *Duration) String() string ***REMOVED***
+func (d *Duration) String() string {
 	td, err := DurationFromProto(d)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Sprintf("(%v)", err)
-	***REMOVED***
+	}
 	return td.String()
-***REMOVED***
+}
 
-func NewPopulatedStdDuration(r interface ***REMOVED***
+func NewPopulatedStdDuration(r interface {
 	Int63() int64
-***REMOVED***, easy bool) *time.Duration ***REMOVED***
+}, easy bool) *time.Duration {
 	dur := NewPopulatedDuration(r, easy)
 	d, err := DurationFromProto(dur)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil
-	***REMOVED***
+	}
 	return &d
-***REMOVED***
+}
 
-func SizeOfStdDuration(d time.Duration) int ***REMOVED***
+func SizeOfStdDuration(d time.Duration) int {
 	dur := DurationProto(d)
 	return dur.Size()
-***REMOVED***
+}
 
-func StdDurationMarshal(d time.Duration) ([]byte, error) ***REMOVED***
+func StdDurationMarshal(d time.Duration) ([]byte, error) {
 	size := SizeOfStdDuration(d)
 	buf := make([]byte, size)
 	_, err := StdDurationMarshalTo(d, buf)
 	return buf, err
-***REMOVED***
+}
 
-func StdDurationMarshalTo(d time.Duration, data []byte) (int, error) ***REMOVED***
+func StdDurationMarshalTo(d time.Duration, data []byte) (int, error) {
 	dur := DurationProto(d)
 	return dur.MarshalTo(data)
-***REMOVED***
+}
 
-func StdDurationUnmarshal(d *time.Duration, data []byte) error ***REMOVED***
-	dur := &Duration***REMOVED******REMOVED***
-	if err := dur.Unmarshal(data); err != nil ***REMOVED***
+func StdDurationUnmarshal(d *time.Duration, data []byte) error {
+	dur := &Duration{}
+	if err := dur.Unmarshal(data); err != nil {
 		return err
-	***REMOVED***
+	}
 	dd, err := DurationFromProto(dur)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	*d = dd
 	return nil
-***REMOVED***
+}

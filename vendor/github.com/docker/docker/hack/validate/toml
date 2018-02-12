@@ -1,31 +1,31 @@
 #!/usr/bin/env bash
 
-export SCRIPTDIR="$( cd "$( dirname "$***REMOVED***BASH_SOURCE[0]***REMOVED***" )" && pwd )"
-source "$***REMOVED***SCRIPTDIR***REMOVED***/.validate"
+export SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source "${SCRIPTDIR}/.validate"
 
 IFS=$'\n'
 files=( $(validate_diff --diff-filter=ACMR --name-only -- 'MAINTAINERS' || true) )
 unset IFS
 
 badFiles=()
-for f in "$***REMOVED***files[@]***REMOVED***"; do
+for f in "${files[@]}"; do
 	# we use "git show" here to validate that what's committed has valid toml syntax
 	if ! git show "$VALIDATE_HEAD:$f" | tomlv /proc/self/fd/0 ; then
 		badFiles+=( "$f" )
 	fi
 done
 
-if [ $***REMOVED***#badFiles[@]***REMOVED*** -eq 0 ]; then
+if [ ${#badFiles[@]} -eq 0 ]; then
 	echo 'Congratulations!  All toml source files changed here have valid syntax.'
 else
-	***REMOVED***
+	{
 		echo "These files are not valid toml:"
-		for f in "$***REMOVED***badFiles[@]***REMOVED***"; do
+		for f in "${badFiles[@]}"; do
 			echo " - $f"
 		done
 		echo
 		echo 'Please reformat the above files as valid toml'
 		echo
-	***REMOVED*** >&2
+	} >&2
 	false
 fi

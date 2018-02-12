@@ -12,31 +12,31 @@ Usage
 
 From my own work-in-progress project:
 
-	type networkConfig struct ***REMOVED***
+	type networkConfig struct {
 		Protocol string
 		Address string
 		ServerType string `json: "server_type"`
 		Port uint16
-	***REMOVED***
+	}
 
-	type FssnConfig struct ***REMOVED***
+	type FssnConfig struct {
 		Network networkConfig
-	***REMOVED***
+	}
 
-	var fssnDefault = FssnConfig ***REMOVED***
-		networkConfig ***REMOVED***
+	var fssnDefault = FssnConfig {
+		networkConfig {
 			"tcp",
 			"127.0.0.1",
 			"http",
 			31560,
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
 	// Inside a function [...]
 
-	if err := mergo.Merge(&config, fssnDefault); err != nil ***REMOVED***
+	if err := mergo.Merge(&config, fssnDefault); err != nil {
 		log.Fatal(err)
-	***REMOVED***
+	}
 
 	// More code [...]
 

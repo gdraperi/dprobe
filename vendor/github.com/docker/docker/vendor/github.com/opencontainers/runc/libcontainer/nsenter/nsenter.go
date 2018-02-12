@@ -5,8 +5,8 @@ package nsenter
 /*
 #cgo CFLAGS: -Wall
 extern void nsexec();
-void __attribute__((constructor)) init(void) ***REMOVED***
+void __attribute__((constructor)) init(void) {
 	nsexec();
-***REMOVED***
+}
 */
 import "C"

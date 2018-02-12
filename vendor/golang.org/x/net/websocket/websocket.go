@@ -43,27 +43,27 @@ const (
 )
 
 // ProtocolError represents WebSocket protocol errors.
-type ProtocolError struct ***REMOVED***
+type ProtocolError struct {
 	ErrorString string
-***REMOVED***
+}
 
-func (err *ProtocolError) Error() string ***REMOVED*** return err.ErrorString ***REMOVED***
+func (err *ProtocolError) Error() string { return err.ErrorString }
 
 var (
-	ErrBadProtocolVersion   = &ProtocolError***REMOVED***"bad protocol version"***REMOVED***
-	ErrBadScheme            = &ProtocolError***REMOVED***"bad scheme"***REMOVED***
-	ErrBadStatus            = &ProtocolError***REMOVED***"bad status"***REMOVED***
-	ErrBadUpgrade           = &ProtocolError***REMOVED***"missing or bad upgrade"***REMOVED***
-	ErrBadWebSocketOrigin   = &ProtocolError***REMOVED***"missing or bad WebSocket-Origin"***REMOVED***
-	ErrBadWebSocketLocation = &ProtocolError***REMOVED***"missing or bad WebSocket-Location"***REMOVED***
-	ErrBadWebSocketProtocol = &ProtocolError***REMOVED***"missing or bad WebSocket-Protocol"***REMOVED***
-	ErrBadWebSocketVersion  = &ProtocolError***REMOVED***"missing or bad WebSocket Version"***REMOVED***
-	ErrChallengeResponse    = &ProtocolError***REMOVED***"mismatch challenge/response"***REMOVED***
-	ErrBadFrame             = &ProtocolError***REMOVED***"bad frame"***REMOVED***
-	ErrBadFrameBoundary     = &ProtocolError***REMOVED***"not on frame boundary"***REMOVED***
-	ErrNotWebSocket         = &ProtocolError***REMOVED***"not websocket protocol"***REMOVED***
-	ErrBadRequestMethod     = &ProtocolError***REMOVED***"bad method"***REMOVED***
-	ErrNotSupported         = &ProtocolError***REMOVED***"not supported"***REMOVED***
+	ErrBadProtocolVersion   = &ProtocolError{"bad protocol version"}
+	ErrBadScheme            = &ProtocolError{"bad scheme"}
+	ErrBadStatus            = &ProtocolError{"bad status"}
+	ErrBadUpgrade           = &ProtocolError{"missing or bad upgrade"}
+	ErrBadWebSocketOrigin   = &ProtocolError{"missing or bad WebSocket-Origin"}
+	ErrBadWebSocketLocation = &ProtocolError{"missing or bad WebSocket-Location"}
+	ErrBadWebSocketProtocol = &ProtocolError{"missing or bad WebSocket-Protocol"}
+	ErrBadWebSocketVersion  = &ProtocolError{"missing or bad WebSocket Version"}
+	ErrChallengeResponse    = &ProtocolError{"mismatch challenge/response"}
+	ErrBadFrame             = &ProtocolError{"bad frame"}
+	ErrBadFrameBoundary     = &ProtocolError{"not on frame boundary"}
+	ErrNotWebSocket         = &ProtocolError{"not websocket protocol"}
+	ErrBadRequestMethod     = &ProtocolError{"bad method"}
+	ErrNotSupported         = &ProtocolError{"not supported"}
 )
 
 // ErrFrameTooLarge is returned by Codec's Receive method if payload size
@@ -71,15 +71,15 @@ var (
 var ErrFrameTooLarge = errors.New("websocket: frame payload size exceeds limit")
 
 // Addr is an implementation of net.Addr for WebSocket.
-type Addr struct ***REMOVED***
+type Addr struct {
 	*url.URL
-***REMOVED***
+}
 
 // Network returns the network type for a WebSocket, "websocket".
-func (addr *Addr) Network() string ***REMOVED*** return "websocket" ***REMOVED***
+func (addr *Addr) Network() string { return "websocket" }
 
 // Config is a WebSocket configuration
-type Config struct ***REMOVED***
+type Config struct {
 	// A WebSocket server address.
 	Location *url.URL
 
@@ -102,10 +102,10 @@ type Config struct ***REMOVED***
 	Dialer *net.Dialer
 
 	handshakeData map[string]string
-***REMOVED***
+}
 
 // serverHandshaker is an interface to handle WebSocket server side handshake.
-type serverHandshaker interface ***REMOVED***
+type serverHandshaker interface {
 	// ReadHandshake reads handshake request message from client.
 	// Returns http response code and error if any.
 	ReadHandshake(buf *bufio.Reader, req *http.Request) (code int, err error)
@@ -116,10 +116,10 @@ type serverHandshaker interface ***REMOVED***
 
 	// NewServerConn creates a new WebSocket connection.
 	NewServerConn(buf *bufio.ReadWriter, rwc io.ReadWriteCloser, request *http.Request) (conn *Conn)
-***REMOVED***
+}
 
 // frameReader is an interface to read a WebSocket frame.
-type frameReader interface ***REMOVED***
+type frameReader interface {
 	// Reader is to read payload of the frame.
 	io.Reader
 
@@ -135,33 +135,33 @@ type frameReader interface ***REMOVED***
 
 	// Len returns total length of the frame, including header and trailer.
 	Len() int
-***REMOVED***
+}
 
 // frameReaderFactory is an interface to creates new frame reader.
-type frameReaderFactory interface ***REMOVED***
+type frameReaderFactory interface {
 	NewFrameReader() (r frameReader, err error)
-***REMOVED***
+}
 
 // frameWriter is an interface to write a WebSocket frame.
-type frameWriter interface ***REMOVED***
+type frameWriter interface {
 	// Writer is to write payload of the frame.
 	io.WriteCloser
-***REMOVED***
+}
 
 // frameWriterFactory is an interface to create new frame writer.
-type frameWriterFactory interface ***REMOVED***
+type frameWriterFactory interface {
 	NewFrameWriter(payloadType byte) (w frameWriter, err error)
-***REMOVED***
+}
 
-type frameHandler interface ***REMOVED***
+type frameHandler interface {
 	HandleFrame(frame frameReader) (r frameReader, err error)
 	WriteClose(status int) (err error)
-***REMOVED***
+}
 
 // Conn represents a WebSocket connection.
 //
 // Multiple goroutines may invoke methods on a Conn simultaneously.
-type Conn struct ***REMOVED***
+type Conn struct {
 	config  *Config
 	request *http.Request
 
@@ -182,141 +182,141 @@ type Conn struct ***REMOVED***
 	// MaxPayloadBytes limits the size of frame payload received over Conn
 	// by Codec's Receive method. If zero, DefaultMaxPayloadBytes is used.
 	MaxPayloadBytes int
-***REMOVED***
+}
 
 // Read implements the io.Reader interface:
 // it reads data of a frame from the WebSocket connection.
 // if msg is not large enough for the frame data, it fills the msg and next Read
 // will read the rest of the frame data.
 // it reads Text frame or Binary frame.
-func (ws *Conn) Read(msg []byte) (n int, err error) ***REMOVED***
+func (ws *Conn) Read(msg []byte) (n int, err error) {
 	ws.rio.Lock()
 	defer ws.rio.Unlock()
 again:
-	if ws.frameReader == nil ***REMOVED***
+	if ws.frameReader == nil {
 		frame, err := ws.frameReaderFactory.NewFrameReader()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		ws.frameReader, err = ws.frameHandler.HandleFrame(frame)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
-		if ws.frameReader == nil ***REMOVED***
+		}
+		if ws.frameReader == nil {
 			goto again
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	n, err = ws.frameReader.Read(msg)
-	if err == io.EOF ***REMOVED***
-		if trailer := ws.frameReader.TrailerReader(); trailer != nil ***REMOVED***
+	if err == io.EOF {
+		if trailer := ws.frameReader.TrailerReader(); trailer != nil {
 			io.Copy(ioutil.Discard, trailer)
-		***REMOVED***
+		}
 		ws.frameReader = nil
 		goto again
-	***REMOVED***
+	}
 	return n, err
-***REMOVED***
+}
 
 // Write implements the io.Writer interface:
 // it writes data as a frame to the WebSocket connection.
-func (ws *Conn) Write(msg []byte) (n int, err error) ***REMOVED***
+func (ws *Conn) Write(msg []byte) (n int, err error) {
 	ws.wio.Lock()
 	defer ws.wio.Unlock()
 	w, err := ws.frameWriterFactory.NewFrameWriter(ws.PayloadType)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	n, err = w.Write(msg)
 	w.Close()
 	return n, err
-***REMOVED***
+}
 
 // Close implements the io.Closer interface.
-func (ws *Conn) Close() error ***REMOVED***
+func (ws *Conn) Close() error {
 	err := ws.frameHandler.WriteClose(ws.defaultCloseStatus)
 	err1 := ws.rwc.Close()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return err1
-***REMOVED***
+}
 
-func (ws *Conn) IsClientConn() bool ***REMOVED*** return ws.request == nil ***REMOVED***
-func (ws *Conn) IsServerConn() bool ***REMOVED*** return ws.request != nil ***REMOVED***
+func (ws *Conn) IsClientConn() bool { return ws.request == nil }
+func (ws *Conn) IsServerConn() bool { return ws.request != nil }
 
 // LocalAddr returns the WebSocket Origin for the connection for client, or
 // the WebSocket location for server.
-func (ws *Conn) LocalAddr() net.Addr ***REMOVED***
-	if ws.IsClientConn() ***REMOVED***
-		return &Addr***REMOVED***ws.config.Origin***REMOVED***
-	***REMOVED***
-	return &Addr***REMOVED***ws.config.Location***REMOVED***
-***REMOVED***
+func (ws *Conn) LocalAddr() net.Addr {
+	if ws.IsClientConn() {
+		return &Addr{ws.config.Origin}
+	}
+	return &Addr{ws.config.Location}
+}
 
 // RemoteAddr returns the WebSocket location for the connection for client, or
 // the Websocket Origin for server.
-func (ws *Conn) RemoteAddr() net.Addr ***REMOVED***
-	if ws.IsClientConn() ***REMOVED***
-		return &Addr***REMOVED***ws.config.Location***REMOVED***
-	***REMOVED***
-	return &Addr***REMOVED***ws.config.Origin***REMOVED***
-***REMOVED***
+func (ws *Conn) RemoteAddr() net.Addr {
+	if ws.IsClientConn() {
+		return &Addr{ws.config.Location}
+	}
+	return &Addr{ws.config.Origin}
+}
 
 var errSetDeadline = errors.New("websocket: cannot set deadline: not using a net.Conn")
 
 // SetDeadline sets the connection's network read & write deadlines.
-func (ws *Conn) SetDeadline(t time.Time) error ***REMOVED***
-	if conn, ok := ws.rwc.(net.Conn); ok ***REMOVED***
+func (ws *Conn) SetDeadline(t time.Time) error {
+	if conn, ok := ws.rwc.(net.Conn); ok {
 		return conn.SetDeadline(t)
-	***REMOVED***
+	}
 	return errSetDeadline
-***REMOVED***
+}
 
 // SetReadDeadline sets the connection's network read deadline.
-func (ws *Conn) SetReadDeadline(t time.Time) error ***REMOVED***
-	if conn, ok := ws.rwc.(net.Conn); ok ***REMOVED***
+func (ws *Conn) SetReadDeadline(t time.Time) error {
+	if conn, ok := ws.rwc.(net.Conn); ok {
 		return conn.SetReadDeadline(t)
-	***REMOVED***
+	}
 	return errSetDeadline
-***REMOVED***
+}
 
 // SetWriteDeadline sets the connection's network write deadline.
-func (ws *Conn) SetWriteDeadline(t time.Time) error ***REMOVED***
-	if conn, ok := ws.rwc.(net.Conn); ok ***REMOVED***
+func (ws *Conn) SetWriteDeadline(t time.Time) error {
+	if conn, ok := ws.rwc.(net.Conn); ok {
 		return conn.SetWriteDeadline(t)
-	***REMOVED***
+	}
 	return errSetDeadline
-***REMOVED***
+}
 
 // Config returns the WebSocket config.
-func (ws *Conn) Config() *Config ***REMOVED*** return ws.config ***REMOVED***
+func (ws *Conn) Config() *Config { return ws.config }
 
 // Request returns the http request upgraded to the WebSocket.
 // It is nil for client side.
-func (ws *Conn) Request() *http.Request ***REMOVED*** return ws.request ***REMOVED***
+func (ws *Conn) Request() *http.Request { return ws.request }
 
 // Codec represents a symmetric pair of functions that implement a codec.
-type Codec struct ***REMOVED***
-	Marshal   func(v interface***REMOVED******REMOVED***) (data []byte, payloadType byte, err error)
-	Unmarshal func(data []byte, payloadType byte, v interface***REMOVED******REMOVED***) (err error)
-***REMOVED***
+type Codec struct {
+	Marshal   func(v interface{}) (data []byte, payloadType byte, err error)
+	Unmarshal func(data []byte, payloadType byte, v interface{}) (err error)
+}
 
 // Send sends v marshaled by cd.Marshal as single frame to ws.
-func (cd Codec) Send(ws *Conn, v interface***REMOVED******REMOVED***) (err error) ***REMOVED***
+func (cd Codec) Send(ws *Conn, v interface{}) (err error) {
 	data, payloadType, err := cd.Marshal(v)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	ws.wio.Lock()
 	defer ws.wio.Unlock()
 	w, err := ws.frameWriterFactory.NewFrameWriter(payloadType)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	_, err = w.Write(data)
 	w.Close()
 	return err
-***REMOVED***
+}
 
 // Receive receives single frame from ws, unmarshaled by cd.Unmarshal and stores
 // in v. The whole frame payload is read to an in-memory buffer; max size of
@@ -324,33 +324,33 @@ func (cd Codec) Send(ws *Conn, v interface***REMOVED******REMOVED***) (err error
 // limit, ErrFrameTooLarge is returned; in this case frame is not read off wire
 // completely. The next call to Receive would read and discard leftover data of
 // previous oversized frame before processing next frame.
-func (cd Codec) Receive(ws *Conn, v interface***REMOVED******REMOVED***) (err error) ***REMOVED***
+func (cd Codec) Receive(ws *Conn, v interface{}) (err error) {
 	ws.rio.Lock()
 	defer ws.rio.Unlock()
-	if ws.frameReader != nil ***REMOVED***
+	if ws.frameReader != nil {
 		_, err = io.Copy(ioutil.Discard, ws.frameReader)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		ws.frameReader = nil
-	***REMOVED***
+	}
 again:
 	frame, err := ws.frameReaderFactory.NewFrameReader()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	frame, err = ws.frameHandler.HandleFrame(frame)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	if frame == nil ***REMOVED***
+	}
+	if frame == nil {
 		goto again
-	***REMOVED***
+	}
 	maxPayloadBytes := ws.MaxPayloadBytes
-	if maxPayloadBytes == 0 ***REMOVED***
+	if maxPayloadBytes == 0 {
 		maxPayloadBytes = DefaultMaxPayloadBytes
-	***REMOVED***
-	if hf, ok := frame.(*hybiFrameReader); ok && hf.header.Length > int64(maxPayloadBytes) ***REMOVED***
+	}
+	if hf, ok := frame.(*hybiFrameReader); ok && hf.header.Length > int64(maxPayloadBytes) {
 		// payload size exceeds limit, no need to call Unmarshal
 		//
 		// set frameReader to current oversized frame so that
@@ -358,36 +358,36 @@ again:
 		// data before processing the next frame
 		ws.frameReader = frame
 		return ErrFrameTooLarge
-	***REMOVED***
+	}
 	payloadType := frame.PayloadType()
 	data, err := ioutil.ReadAll(frame)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return cd.Unmarshal(data, payloadType, v)
-***REMOVED***
+}
 
-func marshal(v interface***REMOVED******REMOVED***) (msg []byte, payloadType byte, err error) ***REMOVED***
-	switch data := v.(type) ***REMOVED***
+func marshal(v interface{}) (msg []byte, payloadType byte, err error) {
+	switch data := v.(type) {
 	case string:
 		return []byte(data), TextFrame, nil
 	case []byte:
 		return data, BinaryFrame, nil
-	***REMOVED***
+	}
 	return nil, UnknownFrame, ErrNotSupported
-***REMOVED***
+}
 
-func unmarshal(msg []byte, payloadType byte, v interface***REMOVED******REMOVED***) (err error) ***REMOVED***
-	switch data := v.(type) ***REMOVED***
+func unmarshal(msg []byte, payloadType byte, v interface{}) (err error) {
+	switch data := v.(type) {
 	case *string:
 		*data = string(msg)
 		return nil
 	case *[]byte:
 		*data = msg
 		return nil
-	***REMOVED***
+	}
 	return ErrNotSupported
-***REMOVED***
+}
 
 /*
 Message is a codec to send/receive text/binary data in a frame on WebSocket connection.
@@ -411,20 +411,20 @@ Trivial usage:
 	websocket.Message.Receive(ws, &data)
 
 	// send binary frame
-	data = []byte***REMOVED***0, 1, 2***REMOVED***
+	data = []byte{0, 1, 2}
 	websocket.Message.Send(ws, data)
 
 */
-var Message = Codec***REMOVED***marshal, unmarshal***REMOVED***
+var Message = Codec{marshal, unmarshal}
 
-func jsonMarshal(v interface***REMOVED******REMOVED***) (msg []byte, payloadType byte, err error) ***REMOVED***
+func jsonMarshal(v interface{}) (msg []byte, payloadType byte, err error) {
 	msg, err = json.Marshal(v)
 	return msg, TextFrame, err
-***REMOVED***
+}
 
-func jsonUnmarshal(msg []byte, payloadType byte, v interface***REMOVED******REMOVED***) (err error) ***REMOVED***
+func jsonUnmarshal(msg []byte, payloadType byte, v interface{}) (err error) {
 	return json.Unmarshal(msg, v)
-***REMOVED***
+}
 
 /*
 JSON is a codec to send/receive JSON data in a frame from a WebSocket connection.
@@ -433,10 +433,10 @@ Trivial usage:
 
 	import "websocket"
 
-	type T struct ***REMOVED***
+	type T struct {
 		Msg string
 		Count int
-	***REMOVED***
+	}
 
 	// receive JSON type T
 	var data T
@@ -445,4 +445,4 @@ Trivial usage:
 	// send JSON type T
 	websocket.JSON.Send(ws, data)
 */
-var JSON = Codec***REMOVED***jsonMarshal, jsonUnmarshal***REMOVED***
+var JSON = Codec{jsonMarshal, jsonUnmarshal}

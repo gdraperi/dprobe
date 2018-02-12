@@ -10,106 +10,106 @@ import (
 	"golang.org/x/net/bpf"
 )
 
-func TestVMRetA(t *testing.T) ***REMOVED***
-	vm, done, err := testVM(t, []bpf.Instruction***REMOVED***
-		bpf.LoadAbsolute***REMOVED***
+func TestVMRetA(t *testing.T) {
+	vm, done, err := testVM(t, []bpf.Instruction{
+		bpf.LoadAbsolute{
 			Off:  8,
 			Size: 1,
-		***REMOVED***,
-		bpf.RetA***REMOVED******REMOVED***,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+		},
+		bpf.RetA{},
+	})
+	if err != nil {
 		t.Fatalf("failed to load BPF program: %v", err)
-	***REMOVED***
+	}
 	defer done()
 
-	out, err := vm.Run([]byte***REMOVED***
+	out, err := vm.Run([]byte{
 		0xff, 0xff, 0xff, 0xff,
 		0xff, 0xff, 0xff, 0xff,
 		9,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		t.Fatalf("unexpected error while running program: %v", err)
-	***REMOVED***
-	if want, got := 1, out; want != got ***REMOVED***
+	}
+	if want, got := 1, out; want != got {
 		t.Fatalf("unexpected number of output bytes:\n- want: %d\n-  got: %d",
 			want, got)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestVMRetALargerThanInput(t *testing.T) ***REMOVED***
-	vm, done, err := testVM(t, []bpf.Instruction***REMOVED***
-		bpf.LoadAbsolute***REMOVED***
+func TestVMRetALargerThanInput(t *testing.T) {
+	vm, done, err := testVM(t, []bpf.Instruction{
+		bpf.LoadAbsolute{
 			Off:  8,
 			Size: 2,
-		***REMOVED***,
-		bpf.RetA***REMOVED******REMOVED***,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+		},
+		bpf.RetA{},
+	})
+	if err != nil {
 		t.Fatalf("failed to load BPF program: %v", err)
-	***REMOVED***
+	}
 	defer done()
 
-	out, err := vm.Run([]byte***REMOVED***
+	out, err := vm.Run([]byte{
 		0xff, 0xff, 0xff, 0xff,
 		0xff, 0xff, 0xff, 0xff,
 		0, 255,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		t.Fatalf("unexpected error while running program: %v", err)
-	***REMOVED***
-	if want, got := 2, out; want != got ***REMOVED***
+	}
+	if want, got := 2, out; want != got {
 		t.Fatalf("unexpected number of output bytes:\n- want: %d\n-  got: %d",
 			want, got)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestVMRetConstant(t *testing.T) ***REMOVED***
-	vm, done, err := testVM(t, []bpf.Instruction***REMOVED***
-		bpf.RetConstant***REMOVED***
+func TestVMRetConstant(t *testing.T) {
+	vm, done, err := testVM(t, []bpf.Instruction{
+		bpf.RetConstant{
 			Val: 9,
-		***REMOVED***,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+		},
+	})
+	if err != nil {
 		t.Fatalf("failed to load BPF program: %v", err)
-	***REMOVED***
+	}
 	defer done()
 
-	out, err := vm.Run([]byte***REMOVED***
+	out, err := vm.Run([]byte{
 		0xff, 0xff, 0xff, 0xff,
 		0xff, 0xff, 0xff, 0xff,
 		0, 1,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		t.Fatalf("unexpected error while running program: %v", err)
-	***REMOVED***
-	if want, got := 1, out; want != got ***REMOVED***
+	}
+	if want, got := 1, out; want != got {
 		t.Fatalf("unexpected number of output bytes:\n- want: %d\n-  got: %d",
 			want, got)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestVMRetConstantLargerThanInput(t *testing.T) ***REMOVED***
-	vm, done, err := testVM(t, []bpf.Instruction***REMOVED***
-		bpf.RetConstant***REMOVED***
+func TestVMRetConstantLargerThanInput(t *testing.T) {
+	vm, done, err := testVM(t, []bpf.Instruction{
+		bpf.RetConstant{
 			Val: 16,
-		***REMOVED***,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+		},
+	})
+	if err != nil {
 		t.Fatalf("failed to load BPF program: %v", err)
-	***REMOVED***
+	}
 	defer done()
 
-	out, err := vm.Run([]byte***REMOVED***
+	out, err := vm.Run([]byte{
 		0xff, 0xff, 0xff, 0xff,
 		0xff, 0xff, 0xff, 0xff,
 		0, 1,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		t.Fatalf("unexpected error while running program: %v", err)
-	***REMOVED***
-	if want, got := 2, out; want != got ***REMOVED***
+	}
+	if want, got := 2, out; want != got {
 		t.Fatalf("unexpected number of output bytes:\n- want: %d\n-  got: %d",
 			want, got)
-	***REMOVED***
-***REMOVED***
+	}
+}

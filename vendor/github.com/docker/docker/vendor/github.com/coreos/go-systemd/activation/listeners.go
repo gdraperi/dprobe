@@ -24,37 +24,37 @@ import (
 //
 // The order of the file descriptors is preserved in the returned slice.
 // Nil values are used to fill any gaps. For example if systemd were to return file descriptors
-// corresponding with "udp, tcp, tcp", then the slice would contain ***REMOVED***nil, net.Listener, net.Listener***REMOVED***
-func Listeners(unsetEnv bool) ([]net.Listener, error) ***REMOVED***
+// corresponding with "udp, tcp, tcp", then the slice would contain {nil, net.Listener, net.Listener}
+func Listeners(unsetEnv bool) ([]net.Listener, error) {
 	files := Files(unsetEnv)
 	listeners := make([]net.Listener, len(files))
 
-	for i, f := range files ***REMOVED***
-		if pc, err := net.FileListener(f); err == nil ***REMOVED***
+	for i, f := range files {
+		if pc, err := net.FileListener(f); err == nil {
 			listeners[i] = pc
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return listeners, nil
-***REMOVED***
+}
 
 // TLSListeners returns a slice containing a net.listener for each matching TCP socket type
 // passed to this process.
 // It uses default Listeners func and forces TCP sockets handlers to use TLS based on tlsConfig.
-func TLSListeners(unsetEnv bool, tlsConfig *tls.Config) ([]net.Listener, error) ***REMOVED***
+func TLSListeners(unsetEnv bool, tlsConfig *tls.Config) ([]net.Listener, error) {
 	listeners, err := Listeners(unsetEnv)
 
-	if listeners == nil || err != nil ***REMOVED***
+	if listeners == nil || err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	if tlsConfig != nil && err == nil ***REMOVED***
-		for i, l := range listeners ***REMOVED***
+	if tlsConfig != nil && err == nil {
+		for i, l := range listeners {
 			// Activate TLS only for TCP sockets
-			if l.Addr().Network() == "tcp" ***REMOVED***
+			if l.Addr().Network() == "tcp" {
 				listeners[i] = tls.NewListener(l, tlsConfig)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	return listeners, err
-***REMOVED***
+}

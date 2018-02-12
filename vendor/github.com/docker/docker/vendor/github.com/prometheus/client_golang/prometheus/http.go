@@ -23,31 +23,31 @@ import (
 	"time"
 )
 
-var instLabels = []string***REMOVED***"method", "code"***REMOVED***
+var instLabels = []string{"method", "code"}
 
-type nower interface ***REMOVED***
+type nower interface {
 	Now() time.Time
-***REMOVED***
+}
 
 type nowFunc func() time.Time
 
-func (n nowFunc) Now() time.Time ***REMOVED***
+func (n nowFunc) Now() time.Time {
 	return n()
-***REMOVED***
+}
 
-var now nower = nowFunc(func() time.Time ***REMOVED***
+var now nower = nowFunc(func() time.Time {
 	return time.Now()
-***REMOVED***)
+})
 
-func nowSeries(t ...time.Time) nower ***REMOVED***
-	return nowFunc(func() time.Time ***REMOVED***
-		defer func() ***REMOVED***
+func nowSeries(t ...time.Time) nower {
+	return nowFunc(func() time.Time {
+		defer func() {
 			t = t[1:]
-		***REMOVED***()
+		}()
 
 		return t[0]
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
 // InstrumentHandler wraps the given HTTP handler for instrumentation. It
 // registers four metric collectors (if not already done) and reports HTTP
@@ -75,22 +75,22 @@ func nowSeries(t ...time.Time) nower ***REMOVED***
 // Upcoming versions of this package will provide ways of instrumenting HTTP
 // handlers that are more flexible and have fewer issues. Consider this function
 // DEPRECATED and prefer direct instrumentation in the meantime.
-func InstrumentHandler(handlerName string, handler http.Handler) http.HandlerFunc ***REMOVED***
+func InstrumentHandler(handlerName string, handler http.Handler) http.HandlerFunc {
 	return InstrumentHandlerFunc(handlerName, handler.ServeHTTP)
-***REMOVED***
+}
 
 // InstrumentHandlerFunc wraps the given function for instrumentation. It
 // otherwise works in the same way as InstrumentHandler (and shares the same
 // issues).
-func InstrumentHandlerFunc(handlerName string, handlerFunc func(http.ResponseWriter, *http.Request)) http.HandlerFunc ***REMOVED***
+func InstrumentHandlerFunc(handlerName string, handlerFunc func(http.ResponseWriter, *http.Request)) http.HandlerFunc {
 	return InstrumentHandlerFuncWithOpts(
-		SummaryOpts***REMOVED***
+		SummaryOpts{
 			Subsystem:   "http",
-			ConstLabels: Labels***REMOVED***"handler": handlerName***REMOVED***,
-		***REMOVED***,
+			ConstLabels: Labels{"handler": handlerName},
+		},
 		handlerFunc,
 	)
-***REMOVED***
+}
 
 // InstrumentHandlerWithOpts works like InstrumentHandler (and shares the same
 // issues) but provides more flexibility (at the cost of a more complex call
@@ -106,10 +106,10 @@ func InstrumentHandlerFunc(handlerName string, handlerFunc func(http.ResponseWri
 // behavior of InstrumentHandler:
 //
 //     prometheus.InstrumentHandlerWithOpts(
-//         prometheus.SummaryOpts***REMOVED***
+//         prometheus.SummaryOpts{
 //              Subsystem:   "http",
-//              ConstLabels: prometheus.Labels***REMOVED***"handler": handlerName***REMOVED***,
-//     ***REMOVED***,
+//              ConstLabels: prometheus.Labels{"handler": handlerName},
+//         },
 //         handler,
 //     )
 //
@@ -117,23 +117,23 @@ func InstrumentHandlerFunc(handlerName string, handlerFunc func(http.ResponseWri
 // cannot use SummaryOpts. Instead, a CounterOpts struct is created internally,
 // and all its fields are set to the equally named fields in the provided
 // SummaryOpts.
-func InstrumentHandlerWithOpts(opts SummaryOpts, handler http.Handler) http.HandlerFunc ***REMOVED***
+func InstrumentHandlerWithOpts(opts SummaryOpts, handler http.Handler) http.HandlerFunc {
 	return InstrumentHandlerFuncWithOpts(opts, handler.ServeHTTP)
-***REMOVED***
+}
 
 // InstrumentHandlerFuncWithOpts works like InstrumentHandlerFunc (and shares
 // the same issues) but provides more flexibility (at the cost of a more complex
 // call syntax). See InstrumentHandlerWithOpts for details how the provided
 // SummaryOpts are used.
-func InstrumentHandlerFuncWithOpts(opts SummaryOpts, handlerFunc func(http.ResponseWriter, *http.Request)) http.HandlerFunc ***REMOVED***
+func InstrumentHandlerFuncWithOpts(opts SummaryOpts, handlerFunc func(http.ResponseWriter, *http.Request)) http.HandlerFunc {
 	reqCnt := NewCounterVec(
-		CounterOpts***REMOVED***
+		CounterOpts{
 			Namespace:   opts.Namespace,
 			Subsystem:   opts.Subsystem,
 			Name:        "requests_total",
 			Help:        "Total number of HTTP requests made.",
 			ConstLabels: opts.ConstLabels,
-		***REMOVED***,
+		},
 		instLabels,
 	)
 
@@ -154,15 +154,15 @@ func InstrumentHandlerFuncWithOpts(opts SummaryOpts, handlerFunc func(http.Respo
 	regReqSz := MustRegisterOrGet(reqSz).(Summary)
 	regResSz := MustRegisterOrGet(resSz).(Summary)
 
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) ***REMOVED***
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		now := time.Now()
 
-		delegate := &responseWriterDelegator***REMOVED***ResponseWriter: w***REMOVED***
+		delegate := &responseWriterDelegator{ResponseWriter: w}
 		out := make(chan int)
 		urlLen := 0
-		if r.URL != nil ***REMOVED***
+		if r.URL != nil {
 			urlLen = len(r.URL.String())
-		***REMOVED***
+		}
 		go computeApproximateRequestSize(r, out, urlLen)
 
 		_, cn := w.(http.CloseNotifier)
@@ -170,11 +170,11 @@ func InstrumentHandlerFuncWithOpts(opts SummaryOpts, handlerFunc func(http.Respo
 		_, hj := w.(http.Hijacker)
 		_, rf := w.(io.ReaderFrom)
 		var rw http.ResponseWriter
-		if cn && fl && hj && rf ***REMOVED***
-			rw = &fancyResponseWriterDelegator***REMOVED***delegate***REMOVED***
-		***REMOVED*** else ***REMOVED***
+		if cn && fl && hj && rf {
+			rw = &fancyResponseWriterDelegator{delegate}
+		} else {
 			rw = delegate
-		***REMOVED***
+		}
 		handlerFunc(rw, r)
 
 		elapsed := float64(time.Since(now)) / float64(time.Microsecond)
@@ -185,79 +185,79 @@ func InstrumentHandlerFuncWithOpts(opts SummaryOpts, handlerFunc func(http.Respo
 		regReqDur.Observe(elapsed)
 		regResSz.Observe(float64(delegate.written))
 		regReqSz.Observe(float64(<-out))
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func computeApproximateRequestSize(r *http.Request, out chan int, s int) ***REMOVED***
+func computeApproximateRequestSize(r *http.Request, out chan int, s int) {
 	s += len(r.Method)
 	s += len(r.Proto)
-	for name, values := range r.Header ***REMOVED***
+	for name, values := range r.Header {
 		s += len(name)
-		for _, value := range values ***REMOVED***
+		for _, value := range values {
 			s += len(value)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	s += len(r.Host)
 
 	// N.B. r.Form and r.MultipartForm are assumed to be included in r.URL.
 
-	if r.ContentLength != -1 ***REMOVED***
+	if r.ContentLength != -1 {
 		s += int(r.ContentLength)
-	***REMOVED***
+	}
 	out <- s
-***REMOVED***
+}
 
-type responseWriterDelegator struct ***REMOVED***
+type responseWriterDelegator struct {
 	http.ResponseWriter
 
 	handler, method string
 	status          int
 	written         int64
 	wroteHeader     bool
-***REMOVED***
+}
 
-func (r *responseWriterDelegator) WriteHeader(code int) ***REMOVED***
+func (r *responseWriterDelegator) WriteHeader(code int) {
 	r.status = code
 	r.wroteHeader = true
 	r.ResponseWriter.WriteHeader(code)
-***REMOVED***
+}
 
-func (r *responseWriterDelegator) Write(b []byte) (int, error) ***REMOVED***
-	if !r.wroteHeader ***REMOVED***
+func (r *responseWriterDelegator) Write(b []byte) (int, error) {
+	if !r.wroteHeader {
 		r.WriteHeader(http.StatusOK)
-	***REMOVED***
+	}
 	n, err := r.ResponseWriter.Write(b)
 	r.written += int64(n)
 	return n, err
-***REMOVED***
+}
 
-type fancyResponseWriterDelegator struct ***REMOVED***
+type fancyResponseWriterDelegator struct {
 	*responseWriterDelegator
-***REMOVED***
+}
 
-func (f *fancyResponseWriterDelegator) CloseNotify() <-chan bool ***REMOVED***
+func (f *fancyResponseWriterDelegator) CloseNotify() <-chan bool {
 	return f.ResponseWriter.(http.CloseNotifier).CloseNotify()
-***REMOVED***
+}
 
-func (f *fancyResponseWriterDelegator) Flush() ***REMOVED***
+func (f *fancyResponseWriterDelegator) Flush() {
 	f.ResponseWriter.(http.Flusher).Flush()
-***REMOVED***
+}
 
-func (f *fancyResponseWriterDelegator) Hijack() (net.Conn, *bufio.ReadWriter, error) ***REMOVED***
+func (f *fancyResponseWriterDelegator) Hijack() (net.Conn, *bufio.ReadWriter, error) {
 	return f.ResponseWriter.(http.Hijacker).Hijack()
-***REMOVED***
+}
 
-func (f *fancyResponseWriterDelegator) ReadFrom(r io.Reader) (int64, error) ***REMOVED***
-	if !f.wroteHeader ***REMOVED***
+func (f *fancyResponseWriterDelegator) ReadFrom(r io.Reader) (int64, error) {
+	if !f.wroteHeader {
 		f.WriteHeader(http.StatusOK)
-	***REMOVED***
+	}
 	n, err := f.ResponseWriter.(io.ReaderFrom).ReadFrom(r)
 	f.written += n
 	return n, err
-***REMOVED***
+}
 
-func sanitizeMethod(m string) string ***REMOVED***
-	switch m ***REMOVED***
+func sanitizeMethod(m string) string {
+	switch m {
 	case "GET", "get":
 		return "get"
 	case "PUT", "put":
@@ -276,11 +276,11 @@ func sanitizeMethod(m string) string ***REMOVED***
 		return "notify"
 	default:
 		return strings.ToLower(m)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func sanitizeCode(s int) string ***REMOVED***
-	switch s ***REMOVED***
+func sanitizeCode(s int) string {
+	switch s {
 	case 100:
 		return "100"
 	case 101:
@@ -377,5 +377,5 @@ func sanitizeCode(s int) string ***REMOVED***
 
 	default:
 		return strconv.Itoa(s)
-	***REMOVED***
-***REMOVED***
+	}
+}

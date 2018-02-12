@@ -11,22 +11,22 @@ import (
 	"runtime"
 )
 
-func maxOpenFiles() int ***REMOVED***
+func maxOpenFiles() int {
 	return defaultMaxOpenFiles
-***REMOVED***
+}
 
-func supportsRawIPSocket() (string, bool) ***REMOVED***
+func supportsRawIPSocket() (string, bool) {
 	return fmt.Sprintf("not supported on %s", runtime.GOOS), false
-***REMOVED***
+}
 
-func supportsIPv6MulticastDeliveryOnLoopback() bool ***REMOVED***
+func supportsIPv6MulticastDeliveryOnLoopback() bool {
 	return false
-***REMOVED***
+}
 
-func causesIPv6Crash() bool ***REMOVED***
+func causesIPv6Crash() bool {
 	return false
-***REMOVED***
+}
 
-func protocolNotSupported(err error) bool ***REMOVED***
+func protocolNotSupported(err error) bool {
 	return false
-***REMOVED***
+}

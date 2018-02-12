@@ -11,41 +11,41 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestPluginPushError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestPluginPushError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
-	***REMOVED***
+	}
 
 	_, err := client.PluginPush(context.Background(), "plugin_name", "")
-	if err == nil || err.Error() != "Error response from daemon: Server error" ***REMOVED***
+	if err == nil || err.Error() != "Error response from daemon: Server error" {
 		t.Fatalf("expected a Server Error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestPluginPush(t *testing.T) ***REMOVED***
+func TestPluginPush(t *testing.T) {
 	expectedURL := "/plugins/plugin_name"
 
-	client := &Client***REMOVED***
-		client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-			if !strings.HasPrefix(req.URL.Path, expectedURL) ***REMOVED***
+	client := &Client{
+		client: newMockClient(func(req *http.Request) (*http.Response, error) {
+			if !strings.HasPrefix(req.URL.Path, expectedURL) {
 				return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, req.URL)
-			***REMOVED***
-			if req.Method != "POST" ***REMOVED***
+			}
+			if req.Method != "POST" {
 				return nil, fmt.Errorf("expected POST method, got %s", req.Method)
-			***REMOVED***
+			}
 			auth := req.Header.Get("X-Registry-Auth")
-			if auth != "authtoken" ***REMOVED***
+			if auth != "authtoken" {
 				return nil, fmt.Errorf("Invalid auth header : expected 'authtoken', got %s", auth)
-			***REMOVED***
-			return &http.Response***REMOVED***
+			}
+			return &http.Response{
 				StatusCode: http.StatusOK,
 				Body:       ioutil.NopCloser(bytes.NewReader([]byte(""))),
-			***REMOVED***, nil
-		***REMOVED***),
-	***REMOVED***
+			}, nil
+		}),
+	}
 
 	_, err := client.PluginPush(context.Background(), "plugin_name", "authtoken")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}

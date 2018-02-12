@@ -35,7 +35,7 @@ const (
 )
 
 // Properties provides access to normalization properties of a rune.
-type Properties struct ***REMOVED***
+type Properties struct {
 	pos   uint8  // start position in reorderBuffer; used in composition.go
 	size  uint8  // length of UTF-8 encoding of this rune
 	ccc   uint8  // leading canonical combining class (ccc if not decomposition)
@@ -43,44 +43,44 @@ type Properties struct ***REMOVED***
 	nLead uint8  // number of leading non-starters.
 	flags qcInfo // quick check flags
 	index uint16
-***REMOVED***
+}
 
 // functions dispatchable per form
 type lookupFunc func(b input, i int) Properties
 
 // formInfo holds Form-specific functions and tables.
-type formInfo struct ***REMOVED***
+type formInfo struct {
 	form                     Form
 	composing, compatibility bool // form type
 	info                     lookupFunc
 	nextMain                 iterFunc
-***REMOVED***
+}
 
-var formTable = []*formInfo***REMOVED******REMOVED***
+var formTable = []*formInfo{{
 	form:          NFC,
 	composing:     true,
 	compatibility: false,
 	info:          lookupInfoNFC,
 	nextMain:      nextComposed,
-***REMOVED***, ***REMOVED***
+}, {
 	form:          NFD,
 	composing:     false,
 	compatibility: false,
 	info:          lookupInfoNFC,
 	nextMain:      nextDecomposed,
-***REMOVED***, ***REMOVED***
+}, {
 	form:          NFKC,
 	composing:     true,
 	compatibility: true,
 	info:          lookupInfoNFKC,
 	nextMain:      nextComposed,
-***REMOVED***, ***REMOVED***
+}, {
 	form:          NFKD,
 	composing:     false,
 	compatibility: true,
 	info:          lookupInfoNFKC,
 	nextMain:      nextDecomposed,
-***REMOVED******REMOVED***
+}}
 
 // We do not distinguish between boundaries for NFC, NFD, etc. to avoid
 // unexpected behavior for the user.  For example, in NFD, there is a boundary
@@ -90,22 +90,22 @@ var formTable = []*formInfo***REMOVED******REMOVED***
 
 // BoundaryBefore returns true if this rune starts a new segment and
 // cannot combine with any rune on the left.
-func (p Properties) BoundaryBefore() bool ***REMOVED***
-	if p.ccc == 0 && !p.combinesBackward() ***REMOVED***
+func (p Properties) BoundaryBefore() bool {
+	if p.ccc == 0 && !p.combinesBackward() {
 		return true
-	***REMOVED***
+	}
 	// We assume that the CCC of the first character in a decomposition
 	// is always non-zero if different from info.ccc and that we can return
 	// false at this point. This is verified by maketables.
 	return false
-***REMOVED***
+}
 
 // BoundaryAfter returns true if runes cannot combine with or otherwise
 // interact with this or previous runes.
-func (p Properties) BoundaryAfter() bool ***REMOVED***
+func (p Properties) BoundaryAfter() bool {
 	// TODO: loosen these conditions.
 	return p.isInert()
-***REMOVED***
+}
 
 // We pack quick check data in 4 bits:
 //   5:    Combines forward  (0 == false, 1 == true)
@@ -117,66 +117,66 @@ func (p Properties) BoundaryAfter() bool ***REMOVED***
 // influenced by normalization.
 type qcInfo uint8
 
-func (p Properties) isYesC() bool ***REMOVED*** return p.flags&0x10 == 0 ***REMOVED***
-func (p Properties) isYesD() bool ***REMOVED*** return p.flags&0x4 == 0 ***REMOVED***
+func (p Properties) isYesC() bool { return p.flags&0x10 == 0 }
+func (p Properties) isYesD() bool { return p.flags&0x4 == 0 }
 
-func (p Properties) combinesForward() bool  ***REMOVED*** return p.flags&0x20 != 0 ***REMOVED***
-func (p Properties) combinesBackward() bool ***REMOVED*** return p.flags&0x8 != 0 ***REMOVED*** // == isMaybe
-func (p Properties) hasDecomposition() bool ***REMOVED*** return p.flags&0x4 != 0 ***REMOVED*** // == isNoD
+func (p Properties) combinesForward() bool  { return p.flags&0x20 != 0 }
+func (p Properties) combinesBackward() bool { return p.flags&0x8 != 0 } // == isMaybe
+func (p Properties) hasDecomposition() bool { return p.flags&0x4 != 0 } // == isNoD
 
-func (p Properties) isInert() bool ***REMOVED***
+func (p Properties) isInert() bool {
 	return p.flags&qcInfoMask == 0 && p.ccc == 0
-***REMOVED***
+}
 
-func (p Properties) multiSegment() bool ***REMOVED***
+func (p Properties) multiSegment() bool {
 	return p.index >= firstMulti && p.index < endMulti
-***REMOVED***
+}
 
-func (p Properties) nLeadingNonStarters() uint8 ***REMOVED***
+func (p Properties) nLeadingNonStarters() uint8 {
 	return p.nLead
-***REMOVED***
+}
 
-func (p Properties) nTrailingNonStarters() uint8 ***REMOVED***
+func (p Properties) nTrailingNonStarters() uint8 {
 	return uint8(p.flags & 0x03)
-***REMOVED***
+}
 
 // Decomposition returns the decomposition for the underlying rune
 // or nil if there is none.
-func (p Properties) Decomposition() []byte ***REMOVED***
+func (p Properties) Decomposition() []byte {
 	// TODO: create the decomposition for Hangul?
-	if p.index == 0 ***REMOVED***
+	if p.index == 0 {
 		return nil
-	***REMOVED***
+	}
 	i := p.index
 	n := decomps[i] & headerLenMask
 	i++
 	return decomps[i : i+uint16(n)]
-***REMOVED***
+}
 
 // Size returns the length of UTF-8 encoding of the rune.
-func (p Properties) Size() int ***REMOVED***
+func (p Properties) Size() int {
 	return int(p.size)
-***REMOVED***
+}
 
 // CCC returns the canonical combining class of the underlying rune.
-func (p Properties) CCC() uint8 ***REMOVED***
-	if p.index >= firstCCCZeroExcept ***REMOVED***
+func (p Properties) CCC() uint8 {
+	if p.index >= firstCCCZeroExcept {
 		return 0
-	***REMOVED***
+	}
 	return ccc[p.ccc]
-***REMOVED***
+}
 
 // LeadCCC returns the CCC of the first rune in the decomposition.
 // If there is no decomposition, LeadCCC equals CCC.
-func (p Properties) LeadCCC() uint8 ***REMOVED***
+func (p Properties) LeadCCC() uint8 {
 	return ccc[p.ccc]
-***REMOVED***
+}
 
 // TrailCCC returns the CCC of the last rune in the decomposition.
 // If there is no decomposition, TrailCCC equals CCC.
-func (p Properties) TrailCCC() uint8 ***REMOVED***
+func (p Properties) TrailCCC() uint8 {
 	return ccc[p.tccc]
-***REMOVED***
+}
 
 // Recomposition
 // We use 32-bit keys instead of 64-bit for the two codepoint keys.
@@ -186,74 +186,74 @@ func (p Properties) TrailCCC() uint8 ***REMOVED***
 // Note that the recomposition map for NFC and NFKC are identical.
 
 // combine returns the combined rune or 0 if it doesn't exist.
-func combine(a, b rune) rune ***REMOVED***
+func combine(a, b rune) rune {
 	key := uint32(uint16(a))<<16 + uint32(uint16(b))
 	return recompMap[key]
-***REMOVED***
+}
 
-func lookupInfoNFC(b input, i int) Properties ***REMOVED***
+func lookupInfoNFC(b input, i int) Properties {
 	v, sz := b.charinfoNFC(i)
 	return compInfo(v, sz)
-***REMOVED***
+}
 
-func lookupInfoNFKC(b input, i int) Properties ***REMOVED***
+func lookupInfoNFKC(b input, i int) Properties {
 	v, sz := b.charinfoNFKC(i)
 	return compInfo(v, sz)
-***REMOVED***
+}
 
 // Properties returns properties for the first rune in s.
-func (f Form) Properties(s []byte) Properties ***REMOVED***
-	if f == NFC || f == NFD ***REMOVED***
+func (f Form) Properties(s []byte) Properties {
+	if f == NFC || f == NFD {
 		return compInfo(nfcData.lookup(s))
-	***REMOVED***
+	}
 	return compInfo(nfkcData.lookup(s))
-***REMOVED***
+}
 
 // PropertiesString returns properties for the first rune in s.
-func (f Form) PropertiesString(s string) Properties ***REMOVED***
-	if f == NFC || f == NFD ***REMOVED***
+func (f Form) PropertiesString(s string) Properties {
+	if f == NFC || f == NFD {
 		return compInfo(nfcData.lookupString(s))
-	***REMOVED***
+	}
 	return compInfo(nfkcData.lookupString(s))
-***REMOVED***
+}
 
 // compInfo converts the information contained in v and sz
 // to a Properties.  See the comment at the top of the file
 // for more information on the format.
-func compInfo(v uint16, sz int) Properties ***REMOVED***
-	if v == 0 ***REMOVED***
-		return Properties***REMOVED***size: uint8(sz)***REMOVED***
-	***REMOVED*** else if v >= 0x8000 ***REMOVED***
-		p := Properties***REMOVED***
+func compInfo(v uint16, sz int) Properties {
+	if v == 0 {
+		return Properties{size: uint8(sz)}
+	} else if v >= 0x8000 {
+		p := Properties{
 			size:  uint8(sz),
 			ccc:   uint8(v),
 			tccc:  uint8(v),
 			flags: qcInfo(v >> 8),
-		***REMOVED***
-		if p.ccc > 0 || p.combinesBackward() ***REMOVED***
+		}
+		if p.ccc > 0 || p.combinesBackward() {
 			p.nLead = uint8(p.flags & 0x3)
-		***REMOVED***
+		}
 		return p
-	***REMOVED***
+	}
 	// has decomposition
 	h := decomps[v]
 	f := (qcInfo(h&headerFlagsMask) >> 2) | 0x4
-	p := Properties***REMOVED***size: uint8(sz), flags: f, index: v***REMOVED***
-	if v >= firstCCC ***REMOVED***
+	p := Properties{size: uint8(sz), flags: f, index: v}
+	if v >= firstCCC {
 		v += uint16(h&headerLenMask) + 1
 		c := decomps[v]
 		p.tccc = c >> 2
 		p.flags |= qcInfo(c & 0x3)
-		if v >= firstLeadingCCC ***REMOVED***
+		if v >= firstLeadingCCC {
 			p.nLead = c & 0x3
-			if v >= firstStarterWithNLead ***REMOVED***
+			if v >= firstStarterWithNLead {
 				// We were tricked. Remove the decomposition.
 				p.flags &= 0x03
 				p.index = 0
 				return p
-			***REMOVED***
+			}
 			p.ccc = decomps[v+1]
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return p
-***REMOVED***
+}

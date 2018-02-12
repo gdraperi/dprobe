@@ -5,18 +5,18 @@ import (
 	"net"
 )
 
-func LogAddress(addr net.Addr) string ***REMOVED***
-	if addr == nil ***REMOVED***
+func LogAddress(addr net.Addr) string {
+	if addr == nil {
 		return "from=<unknown address>"
-	***REMOVED***
+	}
 
 	return fmt.Sprintf("from=%s", addr.String())
-***REMOVED***
+}
 
-func LogConn(conn net.Conn) string ***REMOVED***
-	if conn == nil ***REMOVED***
+func LogConn(conn net.Conn) string {
+	if conn == nil {
 		return LogAddress(nil)
-	***REMOVED***
+	}
 
 	return LogAddress(conn.RemoteAddr())
-***REMOVED***
+}

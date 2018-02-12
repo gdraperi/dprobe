@@ -5,16 +5,16 @@ import (
 )
 
 // The version directive data.
-type yaml_version_directive_t struct ***REMOVED***
+type yaml_version_directive_t struct {
 	major int8 // The major version number.
 	minor int8 // The minor version number.
-***REMOVED***
+}
 
 // The tag directive data.
-type yaml_tag_directive_t struct ***REMOVED***
+type yaml_tag_directive_t struct {
 	handle []byte // The tag handle.
 	prefix []byte // The tag prefix.
-***REMOVED***
+}
 
 type yaml_encoding_t int
 
@@ -57,11 +57,11 @@ const (
 )
 
 // The pointer position.
-type yaml_mark_t struct ***REMOVED***
+type yaml_mark_t struct {
 	index  int // The position index.
 	line   int // The position line.
 	column int // The position column.
-***REMOVED***
+}
 
 // Node Styles
 
@@ -140,8 +140,8 @@ const (
 	yaml_SCALAR_TOKEN // A SCALAR token.
 )
 
-func (tt yaml_token_type_t) String() string ***REMOVED***
-	switch tt ***REMOVED***
+func (tt yaml_token_type_t) String() string {
+	switch tt {
 	case yaml_NO_TOKEN:
 		return "yaml_NO_TOKEN"
 	case yaml_STREAM_START_TOKEN:
@@ -186,12 +186,12 @@ func (tt yaml_token_type_t) String() string ***REMOVED***
 		return "yaml_TAG_TOKEN"
 	case yaml_SCALAR_TOKEN:
 		return "yaml_SCALAR_TOKEN"
-	***REMOVED***
+	}
 	return "<unknown token>"
-***REMOVED***
+}
 
 // The token structure.
-type yaml_token_t struct ***REMOVED***
+type yaml_token_t struct {
 	// The token type.
 	typ yaml_token_type_t
 
@@ -216,7 +216,7 @@ type yaml_token_t struct ***REMOVED***
 
 	// The version directive major/minor (for yaml_VERSION_DIRECTIVE_TOKEN).
 	major, minor int8
-***REMOVED***
+}
 
 // Events
 
@@ -240,7 +240,7 @@ const (
 )
 
 // The event structure.
-type yaml_event_t struct ***REMOVED***
+type yaml_event_t struct {
 
 	// The event type.
 	typ yaml_event_type_t
@@ -275,11 +275,11 @@ type yaml_event_t struct ***REMOVED***
 
 	// The style (for yaml_SCALAR_EVENT, yaml_SEQUENCE_START_EVENT, yaml_MAPPING_START_EVENT).
 	style yaml_style_t
-***REMOVED***
+}
 
-func (e *yaml_event_t) scalar_style() yaml_scalar_style_t     ***REMOVED*** return yaml_scalar_style_t(e.style) ***REMOVED***
-func (e *yaml_event_t) sequence_style() yaml_sequence_style_t ***REMOVED*** return yaml_sequence_style_t(e.style) ***REMOVED***
-func (e *yaml_event_t) mapping_style() yaml_mapping_style_t   ***REMOVED*** return yaml_mapping_style_t(e.style) ***REMOVED***
+func (e *yaml_event_t) scalar_style() yaml_scalar_style_t     { return yaml_scalar_style_t(e.style) }
+func (e *yaml_event_t) sequence_style() yaml_sequence_style_t { return yaml_sequence_style_t(e.style) }
+func (e *yaml_event_t) mapping_style() yaml_mapping_style_t   { return yaml_mapping_style_t(e.style) }
 
 // Nodes
 
@@ -319,47 +319,47 @@ const (
 type yaml_node_item_t int
 
 // An element of a mapping node.
-type yaml_node_pair_t struct ***REMOVED***
+type yaml_node_pair_t struct {
 	key   int // The key of the element.
 	value int // The value of the element.
-***REMOVED***
+}
 
 // The node structure.
-type yaml_node_t struct ***REMOVED***
+type yaml_node_t struct {
 	typ yaml_node_type_t // The node type.
 	tag []byte           // The node tag.
 
 	// The node data.
 
 	// The scalar parameters (for yaml_SCALAR_NODE).
-	scalar struct ***REMOVED***
+	scalar struct {
 		value  []byte              // The scalar value.
 		length int                 // The length of the scalar value.
 		style  yaml_scalar_style_t // The scalar style.
-	***REMOVED***
+	}
 
 	// The sequence parameters (for YAML_SEQUENCE_NODE).
-	sequence struct ***REMOVED***
+	sequence struct {
 		items_data []yaml_node_item_t    // The stack of sequence items.
 		style      yaml_sequence_style_t // The sequence style.
-	***REMOVED***
+	}
 
 	// The mapping parameters (for yaml_MAPPING_NODE).
-	mapping struct ***REMOVED***
+	mapping struct {
 		pairs_data  []yaml_node_pair_t   // The stack of mapping pairs (key, value).
 		pairs_start *yaml_node_pair_t    // The beginning of the stack.
 		pairs_end   *yaml_node_pair_t    // The end of the stack.
 		pairs_top   *yaml_node_pair_t    // The top of the stack.
 		style       yaml_mapping_style_t // The mapping style.
-	***REMOVED***
+	}
 
 	start_mark yaml_mark_t // The beginning of the node.
 	end_mark   yaml_mark_t // The end of the node.
 
-***REMOVED***
+}
 
 // The document structure.
-type yaml_document_t struct ***REMOVED***
+type yaml_document_t struct {
 
 	// The document nodes.
 	nodes []yaml_node_t
@@ -377,7 +377,7 @@ type yaml_document_t struct ***REMOVED***
 
 	// The start/end of the document.
 	start_mark, end_mark yaml_mark_t
-***REMOVED***
+}
 
 // The prototype of a read handler.
 //
@@ -397,12 +397,12 @@ type yaml_document_t struct ***REMOVED***
 type yaml_read_handler_t func(parser *yaml_parser_t, buffer []byte) (n int, err error)
 
 // This structure holds information about a potential simple key.
-type yaml_simple_key_t struct ***REMOVED***
+type yaml_simple_key_t struct {
 	possible     bool        // Is a simple key possible?
 	required     bool        // Is a simple key required?
 	token_number int         // The number of the token.
 	mark         yaml_mark_t // The position mark.
-***REMOVED***
+}
 
 // The states of the parser.
 type yaml_parser_state_t int
@@ -435,8 +435,8 @@ const (
 	yaml_PARSE_END_STATE                               // Expect nothing.
 )
 
-func (ps yaml_parser_state_t) String() string ***REMOVED***
-	switch ps ***REMOVED***
+func (ps yaml_parser_state_t) String() string {
+	switch ps {
 	case yaml_PARSE_STREAM_START_STATE:
 		return "yaml_PARSE_STREAM_START_STATE"
 	case yaml_PARSE_IMPLICIT_DOCUMENT_START_STATE:
@@ -485,22 +485,22 @@ func (ps yaml_parser_state_t) String() string ***REMOVED***
 		return "yaml_PARSE_FLOW_MAPPING_EMPTY_VALUE_STATE"
 	case yaml_PARSE_END_STATE:
 		return "yaml_PARSE_END_STATE"
-	***REMOVED***
+	}
 	return "<unknown parser state>"
-***REMOVED***
+}
 
 // This structure holds aliases data.
-type yaml_alias_data_t struct ***REMOVED***
+type yaml_alias_data_t struct {
 	anchor []byte      // The anchor.
 	index  int         // The node id.
 	mark   yaml_mark_t // The anchor mark.
-***REMOVED***
+}
 
 // The parser structure.
 //
 // All members are internal. Manage the structure using the
 // yaml_parser_ family of functions.
-type yaml_parser_t struct ***REMOVED***
+type yaml_parser_t struct {
 
 	// Error handling
 
@@ -545,7 +545,7 @@ type yaml_parser_t struct ***REMOVED***
 	stream_start_produced bool // Have we started to scan the input stream?
 	stream_end_produced   bool // Have we reached the end of the input stream?
 
-	flow_level int // The number of unclosed '[' and '***REMOVED***' indicators.
+	flow_level int // The number of unclosed '[' and '{' indicators.
 
 	tokens          []yaml_token_t // The tokens queue.
 	tokens_head     int            // The head of the tokens queue.
@@ -570,7 +570,7 @@ type yaml_parser_t struct ***REMOVED***
 	aliases []yaml_alias_data_t // The alias data.
 
 	document *yaml_document_t // The currently parsed document.
-***REMOVED***
+}
 
 // Emitter Definitions
 
@@ -620,7 +620,7 @@ const (
 //
 // All members are internal.  Manage the structure using the @c yaml_emitter_
 // family of functions.
-type yaml_emitter_t struct ***REMOVED***
+type yaml_emitter_t struct {
 
 	// Error handling
 
@@ -676,19 +676,19 @@ type yaml_emitter_t struct ***REMOVED***
 	open_ended bool // If an explicit document end is required?
 
 	// Anchor analysis.
-	anchor_data struct ***REMOVED***
+	anchor_data struct {
 		anchor []byte // The anchor value.
 		alias  bool   // Is it an alias?
-	***REMOVED***
+	}
 
 	// Tag analysis.
-	tag_data struct ***REMOVED***
+	tag_data struct {
 		handle []byte // The tag handle.
 		suffix []byte // The tag suffix.
-	***REMOVED***
+	}
 
 	// Scalar analysis.
-	scalar_data struct ***REMOVED***
+	scalar_data struct {
 		value                 []byte              // The scalar value.
 		multiline             bool                // Does the scalar contain line breaks?
 		flow_plain_allowed    bool                // Can the scalar be expessed in the flow plain style?
@@ -696,7 +696,7 @@ type yaml_emitter_t struct ***REMOVED***
 		single_quoted_allowed bool                // Can the scalar be expressed in the single quoted style?
 		block_allowed         bool                // Can the scalar be expressed in the literal or folded styles?
 		style                 yaml_scalar_style_t // The output style.
-	***REMOVED***
+	}
 
 	// Dumper stuff
 
@@ -704,13 +704,13 @@ type yaml_emitter_t struct ***REMOVED***
 	closed bool // If the stream was already closed?
 
 	// The information associated with the document nodes.
-	anchors *struct ***REMOVED***
+	anchors *struct {
 		references int  // The number of references.
 		anchor     int  // The anchor id.
 		serialized bool // If the node has been emitted?
-	***REMOVED***
+	}
 
 	last_anchor_id int // The last assigned anchor id.
 
 	document *yaml_document_t // The currently emitted document.
-***REMOVED***
+}

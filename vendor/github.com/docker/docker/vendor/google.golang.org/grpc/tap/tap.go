@@ -40,12 +40,12 @@ import (
 )
 
 // Info defines the relevant information needed by the handles.
-type Info struct ***REMOVED***
+type Info struct {
 	// FullMethodName is the string of grpc method (in the format of
 	// /package.service/method).
 	FullMethodName string
 	// TODO: More to be added.
-***REMOVED***
+}
 
 // ServerInHandle defines the function which runs when a new stream is created
 // on the server side. Note that it is executed in the per-connection I/O goroutine(s) instead

@@ -15,15 +15,15 @@ var (
 )
 
 // Watcher provides watching over a cluster for nodes joining and leaving.
-type Watcher interface ***REMOVED***
+type Watcher interface {
 	// Watch the discovery for entry changes.
 	// Returns a channel that will receive changes or an error.
 	// Providing a non-nil stopCh can be used to stop watching.
-	Watch(stopCh <-chan struct***REMOVED******REMOVED***) (<-chan Entries, <-chan error)
-***REMOVED***
+	Watch(stopCh <-chan struct{}) (<-chan Entries, <-chan error)
+}
 
 // Backend is implemented by discovery backends which manage cluster entries.
-type Backend interface ***REMOVED***
+type Backend interface {
 	// Watcher must be provided by every backend.
 	Watcher
 
@@ -32,4 +32,4 @@ type Backend interface ***REMOVED***
 
 	// Register to the discovery.
 	Register(string) error
-***REMOVED***
+}

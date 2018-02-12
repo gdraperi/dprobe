@@ -21,222 +21,222 @@ const (
 	defaultTimeOut = 30
 )
 
-func newTransport(addr string, tlsConfig *tlsconfig.Options) (transport.Transport, error) ***REMOVED***
-	tr := &http.Transport***REMOVED******REMOVED***
+func newTransport(addr string, tlsConfig *tlsconfig.Options) (transport.Transport, error) {
+	tr := &http.Transport{}
 
-	if tlsConfig != nil ***REMOVED***
+	if tlsConfig != nil {
 		c, err := tlsconfig.Client(*tlsConfig)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		tr.TLSClientConfig = c
-	***REMOVED***
+	}
 
 	u, err := url.Parse(addr)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	socket := u.Host
-	if socket == "" ***REMOVED***
+	if socket == "" {
 		// valid local socket addresses have the host empty.
 		socket = u.Path
-	***REMOVED***
-	if err := sockets.ConfigureTransport(tr, u.Scheme, socket); err != nil ***REMOVED***
+	}
+	if err := sockets.ConfigureTransport(tr, u.Scheme, socket); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	scheme := httpScheme(u)
 
 	return transport.NewHTTPTransport(tr, scheme, socket), nil
-***REMOVED***
+}
 
 // NewClient creates a new plugin client (http).
-func NewClient(addr string, tlsConfig *tlsconfig.Options) (*Client, error) ***REMOVED***
+func NewClient(addr string, tlsConfig *tlsconfig.Options) (*Client, error) {
 	clientTransport, err := newTransport(addr, tlsConfig)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return newClientWithTransport(clientTransport, 0), nil
-***REMOVED***
+}
 
 // NewClientWithTimeout creates a new plugin client (http).
-func NewClientWithTimeout(addr string, tlsConfig *tlsconfig.Options, timeout time.Duration) (*Client, error) ***REMOVED***
+func NewClientWithTimeout(addr string, tlsConfig *tlsconfig.Options, timeout time.Duration) (*Client, error) {
 	clientTransport, err := newTransport(addr, tlsConfig)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return newClientWithTransport(clientTransport, timeout), nil
-***REMOVED***
+}
 
 // newClientWithTransport creates a new plugin client with a given transport.
-func newClientWithTransport(tr transport.Transport, timeout time.Duration) *Client ***REMOVED***
-	return &Client***REMOVED***
-		http: &http.Client***REMOVED***
+func newClientWithTransport(tr transport.Transport, timeout time.Duration) *Client {
+	return &Client{
+		http: &http.Client{
 			Transport: tr,
 			Timeout:   timeout,
-		***REMOVED***,
+		},
 		requestFactory: tr,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Client represents a plugin client.
-type Client struct ***REMOVED***
+type Client struct {
 	http           *http.Client // http client to use
 	requestFactory transport.RequestFactory
-***REMOVED***
+}
 
 // RequestOpts is the set of options that can be passed into a request
-type RequestOpts struct ***REMOVED***
+type RequestOpts struct {
 	Timeout time.Duration
-***REMOVED***
+}
 
 // WithRequestTimeout sets a timeout duration for plugin requests
-func WithRequestTimeout(t time.Duration) func(*RequestOpts) ***REMOVED***
-	return func(o *RequestOpts) ***REMOVED***
+func WithRequestTimeout(t time.Duration) func(*RequestOpts) {
+	return func(o *RequestOpts) {
 		o.Timeout = t
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Call calls the specified method with the specified arguments for the plugin.
 // It will retry for 30 seconds if a failure occurs when calling.
-func (c *Client) Call(serviceMethod string, args, ret interface***REMOVED******REMOVED***) error ***REMOVED***
+func (c *Client) Call(serviceMethod string, args, ret interface{}) error {
 	return c.CallWithOptions(serviceMethod, args, ret)
-***REMOVED***
+}
 
 // CallWithOptions is just like call except it takes options
-func (c *Client) CallWithOptions(serviceMethod string, args interface***REMOVED******REMOVED***, ret interface***REMOVED******REMOVED***, opts ...func(*RequestOpts)) error ***REMOVED***
+func (c *Client) CallWithOptions(serviceMethod string, args interface{}, ret interface{}, opts ...func(*RequestOpts)) error {
 	var buf bytes.Buffer
-	if args != nil ***REMOVED***
-		if err := json.NewEncoder(&buf).Encode(args); err != nil ***REMOVED***
+	if args != nil {
+		if err := json.NewEncoder(&buf).Encode(args); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	body, err := c.callWithRetry(serviceMethod, &buf, true, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer body.Close()
-	if ret != nil ***REMOVED***
-		if err := json.NewDecoder(body).Decode(&ret); err != nil ***REMOVED***
+	if ret != nil {
+		if err := json.NewDecoder(body).Decode(&ret); err != nil {
 			logrus.Errorf("%s: error reading plugin resp: %v", serviceMethod, err)
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
 // Stream calls the specified method with the specified arguments for the plugin and returns the response body
-func (c *Client) Stream(serviceMethod string, args interface***REMOVED******REMOVED***) (io.ReadCloser, error) ***REMOVED***
+func (c *Client) Stream(serviceMethod string, args interface{}) (io.ReadCloser, error) {
 	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(args); err != nil ***REMOVED***
+	if err := json.NewEncoder(&buf).Encode(args); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return c.callWithRetry(serviceMethod, &buf, true)
-***REMOVED***
+}
 
 // SendFile calls the specified method, and passes through the IO stream
-func (c *Client) SendFile(serviceMethod string, data io.Reader, ret interface***REMOVED******REMOVED***) error ***REMOVED***
+func (c *Client) SendFile(serviceMethod string, data io.Reader, ret interface{}) error {
 	body, err := c.callWithRetry(serviceMethod, data, true)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer body.Close()
-	if err := json.NewDecoder(body).Decode(&ret); err != nil ***REMOVED***
+	if err := json.NewDecoder(body).Decode(&ret); err != nil {
 		logrus.Errorf("%s: error reading plugin resp: %v", serviceMethod, err)
 		return err
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (c *Client) callWithRetry(serviceMethod string, data io.Reader, retry bool, reqOpts ...func(*RequestOpts)) (io.ReadCloser, error) ***REMOVED***
+func (c *Client) callWithRetry(serviceMethod string, data io.Reader, retry bool, reqOpts ...func(*RequestOpts)) (io.ReadCloser, error) {
 	var retries int
 	start := time.Now()
 
 	var opts RequestOpts
-	for _, o := range reqOpts ***REMOVED***
+	for _, o := range reqOpts {
 		o(&opts)
-	***REMOVED***
+	}
 
-	for ***REMOVED***
+	for {
 		req, err := c.requestFactory.NewRequest(serviceMethod, data)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 
-		cancelRequest := func() ***REMOVED******REMOVED***
-		if opts.Timeout > 0 ***REMOVED***
+		cancelRequest := func() {}
+		if opts.Timeout > 0 {
 			var ctx context.Context
 			ctx, cancelRequest = context.WithTimeout(req.Context(), opts.Timeout)
 			req = req.WithContext(ctx)
-		***REMOVED***
+		}
 
 		resp, err := c.http.Do(req)
-		if err != nil ***REMOVED***
+		if err != nil {
 			cancelRequest()
-			if !retry ***REMOVED***
+			if !retry {
 				return nil, err
-			***REMOVED***
+			}
 
 			timeOff := backoff(retries)
-			if abort(start, timeOff) ***REMOVED***
+			if abort(start, timeOff) {
 				return nil, err
-			***REMOVED***
+			}
 			retries++
 			logrus.Warnf("Unable to connect to plugin: %s%s: %v, retrying in %v", req.URL.Host, req.URL.Path, err, timeOff)
 			time.Sleep(timeOff)
 			continue
-		***REMOVED***
+		}
 
-		if resp.StatusCode != http.StatusOK ***REMOVED***
+		if resp.StatusCode != http.StatusOK {
 			b, err := ioutil.ReadAll(resp.Body)
 			resp.Body.Close()
 			cancelRequest()
-			if err != nil ***REMOVED***
-				return nil, &statusError***REMOVED***resp.StatusCode, serviceMethod, err.Error()***REMOVED***
-			***REMOVED***
+			if err != nil {
+				return nil, &statusError{resp.StatusCode, serviceMethod, err.Error()}
+			}
 
 			// Plugins' Response(s) should have an Err field indicating what went
 			// wrong. Try to unmarshal into ResponseErr. Otherwise fallback to just
 			// return the string(body)
-			type responseErr struct ***REMOVED***
+			type responseErr struct {
 				Err string
-			***REMOVED***
-			remoteErr := responseErr***REMOVED******REMOVED***
-			if err := json.Unmarshal(b, &remoteErr); err == nil ***REMOVED***
-				if remoteErr.Err != "" ***REMOVED***
-					return nil, &statusError***REMOVED***resp.StatusCode, serviceMethod, remoteErr.Err***REMOVED***
-				***REMOVED***
-			***REMOVED***
+			}
+			remoteErr := responseErr{}
+			if err := json.Unmarshal(b, &remoteErr); err == nil {
+				if remoteErr.Err != "" {
+					return nil, &statusError{resp.StatusCode, serviceMethod, remoteErr.Err}
+				}
+			}
 			// old way...
-			return nil, &statusError***REMOVED***resp.StatusCode, serviceMethod, string(b)***REMOVED***
-		***REMOVED***
-		return ioutils.NewReadCloserWrapper(resp.Body, func() error ***REMOVED***
+			return nil, &statusError{resp.StatusCode, serviceMethod, string(b)}
+		}
+		return ioutils.NewReadCloserWrapper(resp.Body, func() error {
 			err := resp.Body.Close()
 			cancelRequest()
 			return err
-		***REMOVED***), nil
-	***REMOVED***
-***REMOVED***
+		}), nil
+	}
+}
 
-func backoff(retries int) time.Duration ***REMOVED***
+func backoff(retries int) time.Duration {
 	b, max := 1, defaultTimeOut
-	for b < max && retries > 0 ***REMOVED***
+	for b < max && retries > 0 {
 		b *= 2
 		retries--
-	***REMOVED***
-	if b > max ***REMOVED***
+	}
+	if b > max {
 		b = max
-	***REMOVED***
+	}
 	return time.Duration(b) * time.Second
-***REMOVED***
+}
 
-func abort(start time.Time, timeOff time.Duration) bool ***REMOVED***
+func abort(start time.Time, timeOff time.Duration) bool {
 	return timeOff+time.Since(start) >= time.Duration(defaultTimeOut)*time.Second
-***REMOVED***
+}
 
-func httpScheme(u *url.URL) string ***REMOVED***
+func httpScheme(u *url.URL) string {
 	scheme := u.Scheme
-	if scheme != "https" ***REMOVED***
+	if scheme != "https" {
 		scheme = "http"
-	***REMOVED***
+	}
 	return scheme
-***REMOVED***
+}

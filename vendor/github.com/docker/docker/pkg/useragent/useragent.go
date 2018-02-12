@@ -7,23 +7,23 @@ import (
 )
 
 // VersionInfo is used to model UserAgent versions.
-type VersionInfo struct ***REMOVED***
+type VersionInfo struct {
 	Name    string
 	Version string
-***REMOVED***
+}
 
-func (vi *VersionInfo) isValid() bool ***REMOVED***
+func (vi *VersionInfo) isValid() bool {
 	const stopChars = " \t\r\n/"
 	name := vi.Name
 	vers := vi.Version
-	if len(name) == 0 || strings.ContainsAny(name, stopChars) ***REMOVED***
+	if len(name) == 0 || strings.ContainsAny(name, stopChars) {
 		return false
-	***REMOVED***
-	if len(vers) == 0 || strings.ContainsAny(vers, stopChars) ***REMOVED***
+	}
+	if len(vers) == 0 || strings.ContainsAny(vers, stopChars) {
 		return false
-	***REMOVED***
+	}
 	return true
-***REMOVED***
+}
 
 // AppendVersions converts versions to a string and appends the string to the string base.
 //
@@ -33,23 +33,23 @@ func (vi *VersionInfo) isValid() bool ***REMOVED***
 // will be concatenated and separated by space.
 //
 // Example:
-// AppendVersions("base", VersionInfo***REMOVED***"foo", "1.0"***REMOVED***, VersionInfo***REMOVED***"bar", "2.0"***REMOVED***)
+// AppendVersions("base", VersionInfo{"foo", "1.0"}, VersionInfo{"bar", "2.0"})
 // results in "base foo/1.0 bar/2.0".
-func AppendVersions(base string, versions ...VersionInfo) string ***REMOVED***
-	if len(versions) == 0 ***REMOVED***
+func AppendVersions(base string, versions ...VersionInfo) string {
+	if len(versions) == 0 {
 		return base
-	***REMOVED***
+	}
 
 	verstrs := make([]string, 0, 1+len(versions))
-	if len(base) > 0 ***REMOVED***
+	if len(base) > 0 {
 		verstrs = append(verstrs, base)
-	***REMOVED***
+	}
 
-	for _, v := range versions ***REMOVED***
-		if !v.isValid() ***REMOVED***
+	for _, v := range versions {
+		if !v.isValid() {
 			continue
-		***REMOVED***
+		}
 		verstrs = append(verstrs, v.Name+"/"+v.Version)
-	***REMOVED***
+	}
 	return strings.Join(verstrs, " ")
-***REMOVED***
+}

@@ -11,7 +11,7 @@ import (
 const NetworkPluginEndpointType = "NetworkDriver"
 
 // Driver is an interface that every plugin driver needs to implement.
-type Driver interface ***REMOVED***
+type Driver interface {
 	discoverapi.Discover
 
 	// NetworkAllocate invokes the driver method to allocate network
@@ -32,7 +32,7 @@ type Driver interface ***REMOVED***
 	// notification when a CRUD operation is performed on any
 	// entry in that table. This will be ignored for local scope
 	// drivers.
-	CreateNetwork(nid string, options map[string]interface***REMOVED******REMOVED***, nInfo NetworkInfo, ipV4Data, ipV6Data []IPAMData) error
+	CreateNetwork(nid string, options map[string]interface{}, nInfo NetworkInfo, ipV4Data, ipV6Data []IPAMData) error
 
 	// DeleteNetwork invokes the driver method to delete network passing
 	// the network id.
@@ -43,24 +43,24 @@ type Driver interface ***REMOVED***
 	// specific config. The endpoint information can be either consumed by
 	// the driver or populated by the driver. The config mechanism will
 	// eventually be replaced with labels which are yet to be introduced.
-	CreateEndpoint(nid, eid string, ifInfo InterfaceInfo, options map[string]interface***REMOVED******REMOVED***) error
+	CreateEndpoint(nid, eid string, ifInfo InterfaceInfo, options map[string]interface{}) error
 
 	// DeleteEndpoint invokes the driver method to delete an endpoint
 	// passing the network id and endpoint id.
 	DeleteEndpoint(nid, eid string) error
 
 	// EndpointOperInfo retrieves from the driver the operational data related to the specified endpoint
-	EndpointOperInfo(nid, eid string) (map[string]interface***REMOVED******REMOVED***, error)
+	EndpointOperInfo(nid, eid string) (map[string]interface{}, error)
 
 	// Join method is invoked when a Sandbox is attached to an endpoint.
-	Join(nid, eid string, sboxKey string, jinfo JoinInfo, options map[string]interface***REMOVED******REMOVED***) error
+	Join(nid, eid string, sboxKey string, jinfo JoinInfo, options map[string]interface{}) error
 
 	// Leave method is invoked when a Sandbox detaches from an endpoint.
 	Leave(nid, eid string) error
 
 	// ProgramExternalConnectivity invokes the driver method which does the necessary
 	// programming to allow the external connectivity dictated by the passed options
-	ProgramExternalConnectivity(nid, eid string, options map[string]interface***REMOVED******REMOVED***) error
+	ProgramExternalConnectivity(nid, eid string, options map[string]interface{}) error
 
 	// RevokeExternalConnectivity asks the driver to remove any external connectivity
 	// programming that was done so far
@@ -73,7 +73,7 @@ type Driver interface ***REMOVED***
 	EventNotify(event EventType, nid string, tableName string, key string, value []byte)
 
 	// DecodeTableEntry passes the driver a key, value pair from table it registered
-	// with libnetwork. Driver should return ***REMOVED***object ID, map[string]string***REMOVED*** tuple.
+	// with libnetwork. Driver should return {object ID, map[string]string} tuple.
 	// If DecodeTableEntry is called for a table associated with NetworkObject or
 	// EndpointObject the return object ID should be the network id or endppoint id
 	// associated with that entry. map should have information about the object that
@@ -87,19 +87,19 @@ type Driver interface ***REMOVED***
 
 	// IsBuiltIn returns true if it is a built-in driver
 	IsBuiltIn() bool
-***REMOVED***
+}
 
 // NetworkInfo provides a go interface for drivers to provide network
 // specific information to libnetwork.
-type NetworkInfo interface ***REMOVED***
+type NetworkInfo interface {
 	// TableEventRegister registers driver interest in a given
 	// table name.
 	TableEventRegister(tableName string, objType ObjectType) error
-***REMOVED***
+}
 
 // InterfaceInfo provides a go interface for drivers to retrive
 // network information to interface resources.
-type InterfaceInfo interface ***REMOVED***
+type InterfaceInfo interface {
 	// SetMacAddress allows the driver to set the mac address to the endpoint interface
 	// during the call to CreateEndpoint, if the mac address is not already set.
 	SetMacAddress(mac net.HardwareAddr) error
@@ -117,18 +117,18 @@ type InterfaceInfo interface ***REMOVED***
 
 	// AddressIPv6 returns the IPv6 address.
 	AddressIPv6() *net.IPNet
-***REMOVED***
+}
 
 // InterfaceNameInfo provides a go interface for the drivers to assign names
 // to interfaces.
-type InterfaceNameInfo interface ***REMOVED***
+type InterfaceNameInfo interface {
 	// SetNames method assigns the srcName and dstPrefix for the interface.
 	SetNames(srcName, dstPrefix string) error
-***REMOVED***
+}
 
 // JoinInfo represents a set of resources that the driver has the ability to provide during
 // join time.
-type JoinInfo interface ***REMOVED***
+type JoinInfo interface {
 	// InterfaceName returns an InterfaceNameInfo go interface to facilitate
 	// setting the names for the interface.
 	InterfaceName() InterfaceNameInfo
@@ -149,31 +149,31 @@ type JoinInfo interface ***REMOVED***
 	// AddTableEntry adds a table entry to the gossip layer
 	// passing the table name, key and an opaque value.
 	AddTableEntry(tableName string, key string, value []byte) error
-***REMOVED***
+}
 
 // DriverCallback provides a Callback interface for Drivers into LibNetwork
-type DriverCallback interface ***REMOVED***
+type DriverCallback interface {
 	// GetPluginGetter returns the pluginv2 getter.
 	GetPluginGetter() plugingetter.PluginGetter
 	// RegisterDriver provides a way for Remote drivers to dynamically register new NetworkType and associate with a driver instance
 	RegisterDriver(name string, driver Driver, capability Capability) error
-***REMOVED***
+}
 
 // Capability represents the high level capabilities of the drivers which libnetwork can make use of
-type Capability struct ***REMOVED***
+type Capability struct {
 	DataScope         string
 	ConnectivityScope string
-***REMOVED***
+}
 
 // IPAMData represents the per-network ip related
 // operational information libnetwork will send
 // to the network driver during CreateNetwork()
-type IPAMData struct ***REMOVED***
+type IPAMData struct {
 	AddressSpace string
 	Pool         *net.IPNet
 	Gateway      *net.IPNet
 	AuxAddresses map[string]*net.IPNet
-***REMOVED***
+}
 
 // EventType defines a type for the CRUD event
 type EventType uint8
@@ -200,14 +200,14 @@ const (
 )
 
 // IsValidType validates the passed in type against the valid object types
-func IsValidType(objType ObjectType) bool ***REMOVED***
-	switch objType ***REMOVED***
+func IsValidType(objType ObjectType) bool {
+	switch objType {
 	case EndpointObject:
 		fallthrough
 	case NetworkObject:
 		fallthrough
 	case OpaqueObject:
 		return true
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}

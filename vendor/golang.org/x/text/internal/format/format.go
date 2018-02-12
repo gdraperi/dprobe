@@ -18,7 +18,7 @@ import (
 // State represents the printer state passed to custom formatters. It provides
 // access to the fmt.State interface and the sentence and language-related
 // context.
-type State interface ***REMOVED***
+type State interface {
 	fmt.State
 
 	// Language reports the requested language in which to render a message.
@@ -33,9 +33,9 @@ type State interface ***REMOVED***
 
 	// TODO: more info:
 	// - sentence context such as linguistic features passed by the translator.
-***REMOVED***
+}
 
 // Formatter is analogous to fmt.Formatter.
-type Formatter interface ***REMOVED***
+type Formatter interface {
 	Format(state State, verb rune)
-***REMOVED***
+}

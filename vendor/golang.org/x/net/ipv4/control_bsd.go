@@ -15,26 +15,26 @@ import (
 	"golang.org/x/net/internal/socket"
 )
 
-func marshalDst(b []byte, cm *ControlMessage) []byte ***REMOVED***
+func marshalDst(b []byte, cm *ControlMessage) []byte {
 	m := socket.ControlMessage(b)
 	m.MarshalHeader(iana.ProtocolIP, sysIP_RECVDSTADDR, net.IPv4len)
 	return m.Next(net.IPv4len)
-***REMOVED***
+}
 
-func parseDst(cm *ControlMessage, b []byte) ***REMOVED***
-	if len(cm.Dst) < net.IPv4len ***REMOVED***
+func parseDst(cm *ControlMessage, b []byte) {
+	if len(cm.Dst) < net.IPv4len {
 		cm.Dst = make(net.IP, net.IPv4len)
-	***REMOVED***
+	}
 	copy(cm.Dst, b[:net.IPv4len])
-***REMOVED***
+}
 
-func marshalInterface(b []byte, cm *ControlMessage) []byte ***REMOVED***
+func marshalInterface(b []byte, cm *ControlMessage) []byte {
 	m := socket.ControlMessage(b)
 	m.MarshalHeader(iana.ProtocolIP, sysIP_RECVIF, syscall.SizeofSockaddrDatalink)
 	return m.Next(syscall.SizeofSockaddrDatalink)
-***REMOVED***
+}
 
-func parseInterface(cm *ControlMessage, b []byte) ***REMOVED***
+func parseInterface(cm *ControlMessage, b []byte) {
 	sadl := (*syscall.SockaddrDatalink)(unsafe.Pointer(&b[0]))
 	cm.IfIndex = int(sadl.Index)
-***REMOVED***
+}

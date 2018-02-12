@@ -15,36 +15,36 @@ package windows
 // - every double quote (") is escaped by back slash (\);
 // - finally, s is wrapped with double quotes (arg -> "arg"),
 //   but only if there is space or tab inside s.
-func EscapeArg(s string) string ***REMOVED***
-	if len(s) == 0 ***REMOVED***
+func EscapeArg(s string) string {
+	if len(s) == 0 {
 		return "\"\""
-	***REMOVED***
+	}
 	n := len(s)
 	hasSpace := false
-	for i := 0; i < len(s); i++ ***REMOVED***
-		switch s[i] ***REMOVED***
+	for i := 0; i < len(s); i++ {
+		switch s[i] {
 		case '"', '\\':
 			n++
 		case ' ', '\t':
 			hasSpace = true
-		***REMOVED***
-	***REMOVED***
-	if hasSpace ***REMOVED***
+		}
+	}
+	if hasSpace {
 		n += 2
-	***REMOVED***
-	if n == len(s) ***REMOVED***
+	}
+	if n == len(s) {
 		return s
-	***REMOVED***
+	}
 
 	qs := make([]byte, n)
 	j := 0
-	if hasSpace ***REMOVED***
+	if hasSpace {
 		qs[j] = '"'
 		j++
-	***REMOVED***
+	}
 	slashes := 0
-	for i := 0; i < len(s); i++ ***REMOVED***
-		switch s[i] ***REMOVED***
+	for i := 0; i < len(s); i++ {
+		switch s[i] {
 		default:
 			slashes = 0
 			qs[j] = s[i]
@@ -52,46 +52,46 @@ func EscapeArg(s string) string ***REMOVED***
 			slashes++
 			qs[j] = s[i]
 		case '"':
-			for ; slashes > 0; slashes-- ***REMOVED***
+			for ; slashes > 0; slashes-- {
 				qs[j] = '\\'
 				j++
-			***REMOVED***
+			}
 			qs[j] = '\\'
 			j++
 			qs[j] = s[i]
-		***REMOVED***
+		}
 		j++
-	***REMOVED***
-	if hasSpace ***REMOVED***
-		for ; slashes > 0; slashes-- ***REMOVED***
+	}
+	if hasSpace {
+		for ; slashes > 0; slashes-- {
 			qs[j] = '\\'
 			j++
-		***REMOVED***
+		}
 		qs[j] = '"'
 		j++
-	***REMOVED***
+	}
 	return string(qs[:j])
-***REMOVED***
+}
 
-func CloseOnExec(fd Handle) ***REMOVED***
+func CloseOnExec(fd Handle) {
 	SetHandleInformation(Handle(fd), HANDLE_FLAG_INHERIT, 0)
-***REMOVED***
+}
 
 // FullPath retrieves the full path of the specified file.
-func FullPath(name string) (path string, err error) ***REMOVED***
+func FullPath(name string) (path string, err error) {
 	p, err := UTF16PtrFromString(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	n := uint32(100)
-	for ***REMOVED***
+	for {
 		buf := make([]uint16, n)
 		n, err = GetFullPathName(p, uint32(len(buf)), &buf[0], nil)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return "", err
-		***REMOVED***
-		if n <= uint32(len(buf)) ***REMOVED***
+		}
+		if n <= uint32(len(buf)) {
 			return UTF16ToString(buf[:n]), nil
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

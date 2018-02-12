@@ -54,92 +54,92 @@ import (
 // and a nil statusError should never be returned by this package.
 type statusError spb.Status
 
-func (se *statusError) Error() string ***REMOVED***
+func (se *statusError) Error() string {
 	p := (*spb.Status)(se)
 	return fmt.Sprintf("rpc error: code = %s desc = %s", codes.Code(p.GetCode()), p.GetMessage())
-***REMOVED***
+}
 
-func (se *statusError) status() *Status ***REMOVED***
-	return &Status***REMOVED***s: (*spb.Status)(se)***REMOVED***
-***REMOVED***
+func (se *statusError) status() *Status {
+	return &Status{s: (*spb.Status)(se)}
+}
 
 // Status represents an RPC status code, message, and details.  It is immutable
 // and should be created with New, Newf, or FromProto.
-type Status struct ***REMOVED***
+type Status struct {
 	s *spb.Status
-***REMOVED***
+}
 
 // Code returns the status code contained in s.
-func (s *Status) Code() codes.Code ***REMOVED***
-	if s == nil || s.s == nil ***REMOVED***
+func (s *Status) Code() codes.Code {
+	if s == nil || s.s == nil {
 		return codes.OK
-	***REMOVED***
+	}
 	return codes.Code(s.s.Code)
-***REMOVED***
+}
 
 // Message returns the message contained in s.
-func (s *Status) Message() string ***REMOVED***
-	if s == nil || s.s == nil ***REMOVED***
+func (s *Status) Message() string {
+	if s == nil || s.s == nil {
 		return ""
-	***REMOVED***
+	}
 	return s.s.Message
-***REMOVED***
+}
 
 // Proto returns s's status as an spb.Status proto message.
-func (s *Status) Proto() *spb.Status ***REMOVED***
-	if s == nil ***REMOVED***
+func (s *Status) Proto() *spb.Status {
+	if s == nil {
 		return nil
-	***REMOVED***
+	}
 	return proto.Clone(s.s).(*spb.Status)
-***REMOVED***
+}
 
 // Err returns an immutable error representing s; returns nil if s.Code() is
 // OK.
-func (s *Status) Err() error ***REMOVED***
-	if s.Code() == codes.OK ***REMOVED***
+func (s *Status) Err() error {
+	if s.Code() == codes.OK {
 		return nil
-	***REMOVED***
+	}
 	return (*statusError)(s.s)
-***REMOVED***
+}
 
 // New returns a Status representing c and msg.
-func New(c codes.Code, msg string) *Status ***REMOVED***
-	return &Status***REMOVED***s: &spb.Status***REMOVED***Code: int32(c), Message: msg***REMOVED******REMOVED***
-***REMOVED***
+func New(c codes.Code, msg string) *Status {
+	return &Status{s: &spb.Status{Code: int32(c), Message: msg}}
+}
 
 // Newf returns New(c, fmt.Sprintf(format, a...)).
-func Newf(c codes.Code, format string, a ...interface***REMOVED******REMOVED***) *Status ***REMOVED***
+func Newf(c codes.Code, format string, a ...interface{}) *Status {
 	return New(c, fmt.Sprintf(format, a...))
-***REMOVED***
+}
 
 // Error returns an error representing c and msg.  If c is OK, returns nil.
-func Error(c codes.Code, msg string) error ***REMOVED***
+func Error(c codes.Code, msg string) error {
 	return New(c, msg).Err()
-***REMOVED***
+}
 
 // Errorf returns Error(c, fmt.Sprintf(format, a...)).
-func Errorf(c codes.Code, format string, a ...interface***REMOVED******REMOVED***) error ***REMOVED***
+func Errorf(c codes.Code, format string, a ...interface{}) error {
 	return Error(c, fmt.Sprintf(format, a...))
-***REMOVED***
+}
 
 // ErrorProto returns an error representing s.  If s.Code is OK, returns nil.
-func ErrorProto(s *spb.Status) error ***REMOVED***
+func ErrorProto(s *spb.Status) error {
 	return FromProto(s).Err()
-***REMOVED***
+}
 
 // FromProto returns a Status representing s.
-func FromProto(s *spb.Status) *Status ***REMOVED***
-	return &Status***REMOVED***s: proto.Clone(s).(*spb.Status)***REMOVED***
-***REMOVED***
+func FromProto(s *spb.Status) *Status {
+	return &Status{s: proto.Clone(s).(*spb.Status)}
+}
 
 // FromError returns a Status representing err if it was produced from this
 // package, otherwise it returns nil, false.
-func FromError(err error) (s *Status, ok bool) ***REMOVED***
-	if err == nil ***REMOVED***
-		return &Status***REMOVED***s: &spb.Status***REMOVED***Code: int32(codes.OK)***REMOVED******REMOVED***, true
-	***REMOVED***
-	if s, ok := err.(*statusError); ok ***REMOVED***
+func FromError(err error) (s *Status, ok bool) {
+	if err == nil {
+		return &Status{s: &spb.Status{Code: int32(codes.OK)}}, true
+	}
+	if s, ok := err.(*statusError); ok {
 		return s.status(), true
-	***REMOVED***
+	}
 	return nil, false
-***REMOVED***
+}

@@ -7,7 +7,7 @@
 package ipv4
 
 var (
-	ctlOpts = [ctlMax]ctlOpt***REMOVED******REMOVED***
+	ctlOpts = [ctlMax]ctlOpt{}
 
-	sockOpts = map[int]*sockOpt***REMOVED******REMOVED***
+	sockOpts = map[int]*sockOpt{}
 )

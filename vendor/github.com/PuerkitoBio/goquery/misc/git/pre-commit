@@ -3,7 +3,7 @@
 echo ">>> golint"
 for dir in $(go list ./... | grep -v /vendor/)
 do
-    golint "$***REMOVED***dir***REMOVED***"
+    golint "${dir}"
 done
 echo "<<< golint"
 echo

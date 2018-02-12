@@ -9,7 +9,7 @@ package volume
 
 // VolumesCreateBody volumes create body
 // swagger:model VolumesCreateBody
-type VolumesCreateBody struct ***REMOVED***
+type VolumesCreateBody struct {
 
 	// Name of the volume driver to use.
 	// Required: true
@@ -26,4 +26,4 @@ type VolumesCreateBody struct ***REMOVED***
 	// The new volume's name. If not specified, Docker generates a name.
 	// Required: true
 	Name string `json:"Name"`
-***REMOVED***
+}

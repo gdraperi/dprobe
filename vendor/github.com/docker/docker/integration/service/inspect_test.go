@@ -19,7 +19,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestInspect(t *testing.T) ***REMOVED***
+func TestInspect(t *testing.T) {
 	skip.IfCondition(t, !testEnv.IsLocalDaemon())
 	defer setupTest(t)()
 	d := newSwarm(t)
@@ -32,119 +32,119 @@ func TestInspect(t *testing.T) ***REMOVED***
 	serviceSpec := fullSwarmServiceSpec("test-service-inspect", instances)
 
 	ctx := context.Background()
-	resp, err := client.ServiceCreate(ctx, serviceSpec, types.ServiceCreateOptions***REMOVED***
+	resp, err := client.ServiceCreate(ctx, serviceSpec, types.ServiceCreateOptions{
 		QueryRegistry: false,
-	***REMOVED***)
+	})
 	require.NoError(t, err)
 
 	id := resp.ID
 	poll.WaitOn(t, serviceContainerCount(client, id, instances))
 
-	service, _, err := client.ServiceInspectWithRaw(ctx, id, types.ServiceInspectOptions***REMOVED******REMOVED***)
+	service, _, err := client.ServiceInspectWithRaw(ctx, id, types.ServiceInspectOptions{})
 	require.NoError(t, err)
 	assert.Equal(t, serviceSpec, service.Spec)
 	assert.Equal(t, uint64(11), service.Meta.Version.Index)
 	assert.Equal(t, id, service.ID)
 	assert.WithinDuration(t, before, service.CreatedAt, 30*time.Second)
 	assert.WithinDuration(t, before, service.UpdatedAt, 30*time.Second)
-***REMOVED***
+}
 
-func fullSwarmServiceSpec(name string, replicas uint64) swarm.ServiceSpec ***REMOVED***
+func fullSwarmServiceSpec(name string, replicas uint64) swarm.ServiceSpec {
 	restartDelay := 100 * time.Millisecond
 	maxAttempts := uint64(4)
 
-	return swarm.ServiceSpec***REMOVED***
-		Annotations: swarm.Annotations***REMOVED***
+	return swarm.ServiceSpec{
+		Annotations: swarm.Annotations{
 			Name: name,
-			Labels: map[string]string***REMOVED***
+			Labels: map[string]string{
 				"service-label": "service-label-value",
-			***REMOVED***,
-		***REMOVED***,
-		TaskTemplate: swarm.TaskSpec***REMOVED***
-			ContainerSpec: &swarm.ContainerSpec***REMOVED***
+			},
+		},
+		TaskTemplate: swarm.TaskSpec{
+			ContainerSpec: &swarm.ContainerSpec{
 				Image:           "busybox:latest",
-				Labels:          map[string]string***REMOVED***"container-label": "container-value"***REMOVED***,
-				Command:         []string***REMOVED***"/bin/top"***REMOVED***,
-				Args:            []string***REMOVED***"-u", "root"***REMOVED***,
+				Labels:          map[string]string{"container-label": "container-value"},
+				Command:         []string{"/bin/top"},
+				Args:            []string{"-u", "root"},
 				Hostname:        "hostname",
-				Env:             []string***REMOVED***"envvar=envvalue"***REMOVED***,
+				Env:             []string{"envvar=envvalue"},
 				Dir:             "/work",
 				User:            "root",
 				StopSignal:      "SIGINT",
 				StopGracePeriod: &restartDelay,
-				Hosts:           []string***REMOVED***"8.8.8.8  google"***REMOVED***,
-				DNSConfig: &swarm.DNSConfig***REMOVED***
-					Nameservers: []string***REMOVED***"8.8.8.8"***REMOVED***,
-					Search:      []string***REMOVED***"somedomain"***REMOVED***,
-				***REMOVED***,
+				Hosts:           []string{"8.8.8.8  google"},
+				DNSConfig: &swarm.DNSConfig{
+					Nameservers: []string{"8.8.8.8"},
+					Search:      []string{"somedomain"},
+				},
 				Isolation: container.IsolationDefault,
-			***REMOVED***,
-			RestartPolicy: &swarm.RestartPolicy***REMOVED***
+			},
+			RestartPolicy: &swarm.RestartPolicy{
 				Delay:       &restartDelay,
 				Condition:   swarm.RestartPolicyConditionOnFailure,
 				MaxAttempts: &maxAttempts,
-			***REMOVED***,
+			},
 			Runtime: swarm.RuntimeContainer,
-		***REMOVED***,
-		Mode: swarm.ServiceMode***REMOVED***
-			Replicated: &swarm.ReplicatedService***REMOVED***
+		},
+		Mode: swarm.ServiceMode{
+			Replicated: &swarm.ReplicatedService{
 				Replicas: &replicas,
-			***REMOVED***,
-		***REMOVED***,
-		UpdateConfig: &swarm.UpdateConfig***REMOVED***
+			},
+		},
+		UpdateConfig: &swarm.UpdateConfig{
 			Parallelism:     2,
 			Delay:           200 * time.Second,
 			FailureAction:   swarm.UpdateFailureActionContinue,
 			Monitor:         2 * time.Second,
 			MaxFailureRatio: 0.2,
 			Order:           swarm.UpdateOrderStopFirst,
-		***REMOVED***,
-		RollbackConfig: &swarm.UpdateConfig***REMOVED***
+		},
+		RollbackConfig: &swarm.UpdateConfig{
 			Parallelism:     3,
 			Delay:           300 * time.Second,
 			FailureAction:   swarm.UpdateFailureActionPause,
 			Monitor:         3 * time.Second,
 			MaxFailureRatio: 0.3,
 			Order:           swarm.UpdateOrderStartFirst,
-		***REMOVED***,
-	***REMOVED***
-***REMOVED***
+		},
+	}
+}
 
 const defaultSwarmPort = 2477
 
-func newSwarm(t *testing.T) *daemon.Swarm ***REMOVED***
-	d := &daemon.Swarm***REMOVED***
-		Daemon: daemon.New(t, "", dockerdBinary, daemon.Config***REMOVED***
+func newSwarm(t *testing.T) *daemon.Swarm {
+	d := &daemon.Swarm{
+		Daemon: daemon.New(t, "", dockerdBinary, daemon.Config{
 			Experimental: testEnv.DaemonInfo.ExperimentalBuild,
-		***REMOVED***),
+		}),
 		// TODO: better method of finding an unused port
 		Port: defaultSwarmPort,
-	***REMOVED***
+	}
 	// TODO: move to a NewSwarm constructor
 	d.ListenAddr = fmt.Sprintf("0.0.0.0:%d", d.Port)
 
 	// avoid networking conflicts
-	args := []string***REMOVED***"--iptables=false", "--swarm-default-advertise-addr=lo"***REMOVED***
+	args := []string{"--iptables=false", "--swarm-default-advertise-addr=lo"}
 	d.StartWithBusybox(t, args...)
 
-	require.NoError(t, d.Init(swarm.InitRequest***REMOVED******REMOVED***))
+	require.NoError(t, d.Init(swarm.InitRequest{}))
 	return d
-***REMOVED***
+}
 
-func serviceContainerCount(client client.ServiceAPIClient, id string, count uint64) func(log poll.LogT) poll.Result ***REMOVED***
-	return func(log poll.LogT) poll.Result ***REMOVED***
+func serviceContainerCount(client client.ServiceAPIClient, id string, count uint64) func(log poll.LogT) poll.Result {
+	return func(log poll.LogT) poll.Result {
 		filter := filters.NewArgs()
 		filter.Add("service", id)
-		tasks, err := client.TaskList(context.Background(), types.TaskListOptions***REMOVED***
+		tasks, err := client.TaskList(context.Background(), types.TaskListOptions{
 			Filters: filter,
-		***REMOVED***)
-		switch ***REMOVED***
+		})
+		switch {
 		case err != nil:
 			return poll.Error(err)
 		case len(tasks) == int(count):
 			return poll.Success()
 		default:
 			return poll.Continue("task count at %d waiting for %d", len(tasks), count)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

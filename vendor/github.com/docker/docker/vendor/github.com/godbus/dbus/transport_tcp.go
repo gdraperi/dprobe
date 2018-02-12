@@ -7,12 +7,12 @@ import (
 	"net"
 )
 
-func init() ***REMOVED***
+func init() {
 	transports["tcp"] = newTcpTransport
-***REMOVED***
+}
 
-func tcpFamily(keys string) (string, error) ***REMOVED***
-	switch getKey(keys, "family") ***REMOVED***
+func tcpFamily(keys string) (string, error) {
+	switch getKey(keys, "family") {
 	case "":
 		return "tcp", nil
 	case "ipv4":
@@ -21,23 +21,23 @@ func tcpFamily(keys string) (string, error) ***REMOVED***
 		return "tcp6", nil
 	default:
 		return "", errors.New("dbus: invalid tcp family (must be ipv4 or ipv6)")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func newTcpTransport(keys string) (transport, error) ***REMOVED***
+func newTcpTransport(keys string) (transport, error) {
 	host := getKey(keys, "host")
 	port := getKey(keys, "port")
-	if host == "" || port == "" ***REMOVED***
+	if host == "" || port == "" {
 		return nil, errors.New("dbus: unsupported address (must set host and port)")
-	***REMOVED***
+	}
 
 	protocol, err := tcpFamily(keys)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	socket, err := net.Dial(protocol, net.JoinHostPort(host, port))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return NewConn(socket)
-***REMOVED***
+}

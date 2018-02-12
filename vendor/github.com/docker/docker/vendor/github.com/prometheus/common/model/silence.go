@@ -21,47 +21,47 @@ import (
 )
 
 // Matcher describes a matches the value of a given label.
-type Matcher struct ***REMOVED***
+type Matcher struct {
 	Name    LabelName `json:"name"`
 	Value   string    `json:"value"`
 	IsRegex bool      `json:"isRegex"`
-***REMOVED***
+}
 
-func (m *Matcher) UnmarshalJSON(b []byte) error ***REMOVED***
+func (m *Matcher) UnmarshalJSON(b []byte) error {
 	type plain Matcher
-	if err := json.Unmarshal(b, (*plain)(m)); err != nil ***REMOVED***
+	if err := json.Unmarshal(b, (*plain)(m)); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if len(m.Name) == 0 ***REMOVED***
+	if len(m.Name) == 0 {
 		return fmt.Errorf("label name in matcher must not be empty")
-	***REMOVED***
-	if m.IsRegex ***REMOVED***
-		if _, err := regexp.Compile(m.Value); err != nil ***REMOVED***
+	}
+	if m.IsRegex {
+		if _, err := regexp.Compile(m.Value); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
 // Validate returns true iff all fields of the matcher have valid values.
-func (m *Matcher) Validate() error ***REMOVED***
-	if !m.Name.IsValid() ***REMOVED***
+func (m *Matcher) Validate() error {
+	if !m.Name.IsValid() {
 		return fmt.Errorf("invalid name %q", m.Name)
-	***REMOVED***
-	if m.IsRegex ***REMOVED***
-		if _, err := regexp.Compile(m.Value); err != nil ***REMOVED***
+	}
+	if m.IsRegex {
+		if _, err := regexp.Compile(m.Value); err != nil {
 			return fmt.Errorf("invalid regular expression %q", m.Value)
-		***REMOVED***
-	***REMOVED*** else if !LabelValue(m.Value).IsValid() || len(m.Value) == 0 ***REMOVED***
+		}
+	} else if !LabelValue(m.Value).IsValid() || len(m.Value) == 0 {
 		return fmt.Errorf("invalid value %q", m.Value)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // Silence defines the representation of a silence definiton
 // in the Prometheus eco-system.
-type Silence struct ***REMOVED***
+type Silence struct {
 	ID uint64 `json:"id,omitempty"`
 
 	Matchers []*Matcher `json:"matchers"`
@@ -72,35 +72,35 @@ type Silence struct ***REMOVED***
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 	CreatedBy string    `json:"createdBy"`
 	Comment   string    `json:"comment,omitempty"`
-***REMOVED***
+}
 
 // Validate returns true iff all fields of the silence have valid values.
-func (s *Silence) Validate() error ***REMOVED***
-	if len(s.Matchers) == 0 ***REMOVED***
+func (s *Silence) Validate() error {
+	if len(s.Matchers) == 0 {
 		return fmt.Errorf("at least one matcher required")
-	***REMOVED***
-	for _, m := range s.Matchers ***REMOVED***
-		if err := m.Validate(); err != nil ***REMOVED***
+	}
+	for _, m := range s.Matchers {
+		if err := m.Validate(); err != nil {
 			return fmt.Errorf("invalid matcher: %s", err)
-		***REMOVED***
-	***REMOVED***
-	if s.StartsAt.IsZero() ***REMOVED***
+		}
+	}
+	if s.StartsAt.IsZero() {
 		return fmt.Errorf("start time missing")
-	***REMOVED***
-	if s.EndsAt.IsZero() ***REMOVED***
+	}
+	if s.EndsAt.IsZero() {
 		return fmt.Errorf("end time missing")
-	***REMOVED***
-	if s.EndsAt.Before(s.StartsAt) ***REMOVED***
+	}
+	if s.EndsAt.Before(s.StartsAt) {
 		return fmt.Errorf("start time must be before end time")
-	***REMOVED***
-	if s.CreatedBy == "" ***REMOVED***
+	}
+	if s.CreatedBy == "" {
 		return fmt.Errorf("creator information missing")
-	***REMOVED***
-	if s.Comment == "" ***REMOVED***
+	}
+	if s.Comment == "" {
 		return fmt.Errorf("comment missing")
-	***REMOVED***
-	if s.CreatedAt.IsZero() ***REMOVED***
+	}
+	if s.CreatedAt.IsZero() {
 		return fmt.Errorf("creation timestamp missing")
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

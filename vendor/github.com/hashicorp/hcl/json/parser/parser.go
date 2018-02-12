@@ -10,7 +10,7 @@ import (
 	"github.com/hashicorp/hcl/json/token"
 )
 
-type Parser struct ***REMOVED***
+type Parser struct {
 	sc *scanner.Scanner
 
 	// Last read token
@@ -20,38 +20,38 @@ type Parser struct ***REMOVED***
 	enableTrace bool
 	indent      int
 	n           int // buffer size (max = 1)
-***REMOVED***
+}
 
-func newParser(src []byte) *Parser ***REMOVED***
-	return &Parser***REMOVED***
+func newParser(src []byte) *Parser {
+	return &Parser{
 		sc: scanner.New(src),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Parse returns the fully parsed source and returns the abstract syntax tree.
-func Parse(src []byte) (*ast.File, error) ***REMOVED***
+func Parse(src []byte) (*ast.File, error) {
 	p := newParser(src)
 	return p.Parse()
-***REMOVED***
+}
 
 var errEofToken = errors.New("EOF token found")
 
 // Parse returns the fully parsed source and returns the abstract syntax tree.
-func (p *Parser) Parse() (*ast.File, error) ***REMOVED***
-	f := &ast.File***REMOVED******REMOVED***
+func (p *Parser) Parse() (*ast.File, error) {
+	f := &ast.File{}
 	var err, scerr error
-	p.sc.Error = func(pos token.Pos, msg string) ***REMOVED***
+	p.sc.Error = func(pos token.Pos, msg string) {
 		scerr = fmt.Errorf("%s: %s", pos, msg)
-	***REMOVED***
+	}
 
 	// The root must be an object in JSON
 	object, err := p.object()
-	if scerr != nil ***REMOVED***
+	if scerr != nil {
 		return nil, scerr
-	***REMOVED***
-	if err != nil ***REMOVED***
+	}
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// We make our final node an object list so it is more HCL compatible
 	f.Node = object.List
@@ -61,88 +61,88 @@ func (p *Parser) Parse() (*ast.File, error) ***REMOVED***
 	flattenObjects(f.Node)
 
 	return f, nil
-***REMOVED***
+}
 
-func (p *Parser) objectList() (*ast.ObjectList, error) ***REMOVED***
+func (p *Parser) objectList() (*ast.ObjectList, error) {
 	defer un(trace(p, "ParseObjectList"))
-	node := &ast.ObjectList***REMOVED******REMOVED***
+	node := &ast.ObjectList{}
 
-	for ***REMOVED***
+	for {
 		n, err := p.objectItem()
-		if err == errEofToken ***REMOVED***
+		if err == errEofToken {
 			break // we are finished
-		***REMOVED***
+		}
 
 		// we don't return a nil node, because might want to use already
 		// collected items.
-		if err != nil ***REMOVED***
+		if err != nil {
 			return node, err
-		***REMOVED***
+		}
 
 		node.Add(n)
 
 		// Check for a followup comma. If it isn't a comma, then we're done
-		if tok := p.scan(); tok.Type != token.COMMA ***REMOVED***
+		if tok := p.scan(); tok.Type != token.COMMA {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return node, nil
-***REMOVED***
+}
 
 // objectItem parses a single object item
-func (p *Parser) objectItem() (*ast.ObjectItem, error) ***REMOVED***
+func (p *Parser) objectItem() (*ast.ObjectItem, error) {
 	defer un(trace(p, "ParseObjectItem"))
 
 	keys, err := p.objectKey()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	o := &ast.ObjectItem***REMOVED***
+	o := &ast.ObjectItem{
 		Keys: keys,
-	***REMOVED***
+	}
 
-	switch p.tok.Type ***REMOVED***
+	switch p.tok.Type {
 	case token.COLON:
 		pos := p.tok.Pos
-		o.Assign = hcltoken.Pos***REMOVED***
+		o.Assign = hcltoken.Pos{
 			Filename: pos.Filename,
 			Offset:   pos.Offset,
 			Line:     pos.Line,
 			Column:   pos.Column,
-		***REMOVED***
+		}
 
 		o.Val, err = p.objectValue()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return o, nil
-***REMOVED***
+}
 
 // objectKey parses an object key and returns a ObjectKey AST
-func (p *Parser) objectKey() ([]*ast.ObjectKey, error) ***REMOVED***
+func (p *Parser) objectKey() ([]*ast.ObjectKey, error) {
 	keyCount := 0
 	keys := make([]*ast.ObjectKey, 0)
 
-	for ***REMOVED***
+	for {
 		tok := p.scan()
-		switch tok.Type ***REMOVED***
+		switch tok.Type {
 		case token.EOF:
 			return nil, errEofToken
 		case token.STRING:
 			keyCount++
-			keys = append(keys, &ast.ObjectKey***REMOVED***
+			keys = append(keys, &ast.ObjectKey{
 				Token: p.tok.HCLToken(),
-			***REMOVED***)
+			})
 		case token.COLON:
 			// If we have a zero keycount it means that we never got
-			// an object key, i.e. `***REMOVED*** :`. This is a syntax error.
-			if keyCount == 0 ***REMOVED***
+			// an object key, i.e. `{ :`. This is a syntax error.
+			if keyCount == 0 {
 				return nil, fmt.Errorf("expected: STRING got: %s", p.tok.Type)
-			***REMOVED***
+			}
 
 			// Done
 			return keys, nil
@@ -150,17 +150,17 @@ func (p *Parser) objectKey() ([]*ast.ObjectKey, error) ***REMOVED***
 			return nil, errors.New("illegal")
 		default:
 			return nil, fmt.Errorf("expected: STRING got: %s", p.tok.Type)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // object parses any type of object, such as number, bool, string, object or
 // list.
-func (p *Parser) objectValue() (ast.Node, error) ***REMOVED***
+func (p *Parser) objectValue() (ast.Node, error) {
 	defer un(trace(p, "ParseObjectValue"))
 	tok := p.scan()
 
-	switch tok.Type ***REMOVED***
+	switch tok.Type {
 	case token.NUMBER, token.FLOAT, token.BOOL, token.NULL, token.STRING:
 		return p.literalType()
 	case token.LBRACE:
@@ -169,70 +169,70 @@ func (p *Parser) objectValue() (ast.Node, error) ***REMOVED***
 		return p.listType()
 	case token.EOF:
 		return nil, errEofToken
-	***REMOVED***
+	}
 
 	return nil, fmt.Errorf("Expected object value, got unknown token: %+v", tok)
-***REMOVED***
+}
 
 // object parses any type of object, such as number, bool, string, object or
 // list.
-func (p *Parser) object() (*ast.ObjectType, error) ***REMOVED***
+func (p *Parser) object() (*ast.ObjectType, error) {
 	defer un(trace(p, "ParseType"))
 	tok := p.scan()
 
-	switch tok.Type ***REMOVED***
+	switch tok.Type {
 	case token.LBRACE:
 		return p.objectType()
 	case token.EOF:
 		return nil, errEofToken
-	***REMOVED***
+	}
 
 	return nil, fmt.Errorf("Expected object, got unknown token: %+v", tok)
-***REMOVED***
+}
 
 // objectType parses an object type and returns a ObjectType AST
-func (p *Parser) objectType() (*ast.ObjectType, error) ***REMOVED***
+func (p *Parser) objectType() (*ast.ObjectType, error) {
 	defer un(trace(p, "ParseObjectType"))
 
 	// we assume that the currently scanned token is a LBRACE
-	o := &ast.ObjectType***REMOVED******REMOVED***
+	o := &ast.ObjectType{}
 
 	l, err := p.objectList()
 
 	// if we hit RBRACE, we are good to go (means we parsed all Items), if it's
 	// not a RBRACE, it's an syntax error and we just return it.
-	if err != nil && p.tok.Type != token.RBRACE ***REMOVED***
+	if err != nil && p.tok.Type != token.RBRACE {
 		return nil, err
-	***REMOVED***
+	}
 
 	o.List = l
 	return o, nil
-***REMOVED***
+}
 
 // listType parses a list type and returns a ListType AST
-func (p *Parser) listType() (*ast.ListType, error) ***REMOVED***
+func (p *Parser) listType() (*ast.ListType, error) {
 	defer un(trace(p, "ParseListType"))
 
 	// we assume that the currently scanned token is a LBRACK
-	l := &ast.ListType***REMOVED******REMOVED***
+	l := &ast.ListType{}
 
-	for ***REMOVED***
+	for {
 		tok := p.scan()
-		switch tok.Type ***REMOVED***
+		switch tok.Type {
 		case token.NUMBER, token.FLOAT, token.STRING:
 			node, err := p.literalType()
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 
 			l.Add(node)
 		case token.COMMA:
 			continue
 		case token.LBRACE:
 			node, err := p.objectType()
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 
 			l.Add(node)
 		case token.BOOL:
@@ -246,68 +246,68 @@ func (p *Parser) listType() (*ast.ListType, error) ***REMOVED***
 			return l, nil
 		default:
 			return nil, fmt.Errorf("unexpected token while parsing list: %s", tok.Type)
-		***REMOVED***
+		}
 
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // literalType parses a literal type and returns a LiteralType AST
-func (p *Parser) literalType() (*ast.LiteralType, error) ***REMOVED***
+func (p *Parser) literalType() (*ast.LiteralType, error) {
 	defer un(trace(p, "ParseLiteral"))
 
-	return &ast.LiteralType***REMOVED***
+	return &ast.LiteralType{
 		Token: p.tok.HCLToken(),
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // scan returns the next token from the underlying scanner. If a token has
 // been unscanned then read that instead.
-func (p *Parser) scan() token.Token ***REMOVED***
+func (p *Parser) scan() token.Token {
 	// If we have a token on the buffer, then return it.
-	if p.n != 0 ***REMOVED***
+	if p.n != 0 {
 		p.n = 0
 		return p.tok
-	***REMOVED***
+	}
 
 	p.tok = p.sc.Scan()
 	return p.tok
-***REMOVED***
+}
 
 // unscan pushes the previously read token back onto the buffer.
-func (p *Parser) unscan() ***REMOVED***
+func (p *Parser) unscan() {
 	p.n = 1
-***REMOVED***
+}
 
 // ----------------------------------------------------------------------------
 // Parsing support
 
-func (p *Parser) printTrace(a ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if !p.enableTrace ***REMOVED***
+func (p *Parser) printTrace(a ...interface{}) {
+	if !p.enableTrace {
 		return
-	***REMOVED***
+	}
 
 	const dots = ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . "
 	const n = len(dots)
 	fmt.Printf("%5d:%3d: ", p.tok.Pos.Line, p.tok.Pos.Column)
 
 	i := 2 * p.indent
-	for i > n ***REMOVED***
+	for i > n {
 		fmt.Print(dots)
 		i -= n
-	***REMOVED***
+	}
 	// i <= n
 	fmt.Print(dots[0:i])
 	fmt.Println(a...)
-***REMOVED***
+}
 
-func trace(p *Parser, msg string) *Parser ***REMOVED***
+func trace(p *Parser, msg string) *Parser {
 	p.printTrace(msg, "(")
 	p.indent++
 	return p
-***REMOVED***
+}
 
 // Usage pattern: defer un(trace(p, "..."))
-func un(p *Parser) ***REMOVED***
+func un(p *Parser) {
 	p.indent--
 	p.printTrace(")")
-***REMOVED***
+}

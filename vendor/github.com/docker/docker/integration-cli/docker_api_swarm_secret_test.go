@@ -11,24 +11,24 @@ import (
 	"golang.org/x/net/context"
 )
 
-func (s *DockerSwarmSuite) TestAPISwarmSecretsEmptyList(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestAPISwarmSecretsEmptyList(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 
 	secrets := d.ListSecrets(c)
 	c.Assert(secrets, checker.NotNil)
 	c.Assert(len(secrets), checker.Equals, 0, check.Commentf("secrets: %#v", secrets))
-***REMOVED***
+}
 
-func (s *DockerSwarmSuite) TestAPISwarmSecretsCreate(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestAPISwarmSecretsCreate(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 
 	testName := "test_secret"
-	secretSpec := swarm.SecretSpec***REMOVED***
-		Annotations: swarm.Annotations***REMOVED***
+	secretSpec := swarm.SecretSpec{
+		Annotations: swarm.Annotations{
 			Name: testName,
-		***REMOVED***,
+		},
 		Data: []byte("TESTINGDATA"),
-	***REMOVED***
+	}
 
 	id := d.CreateSecret(c, secretSpec)
 	c.Assert(id, checker.Not(checker.Equals), "", check.Commentf("secrets: %s", id))
@@ -42,17 +42,17 @@ func (s *DockerSwarmSuite) TestAPISwarmSecretsCreate(c *check.C) ***REMOVED***
 	status, out, err := d.SockRequest("POST", "/secrets/create", secretSpec)
 	c.Assert(err, checker.IsNil)
 	c.Assert(status, checker.Equals, http.StatusConflict, check.Commentf("secret create: %s", string(out)))
-***REMOVED***
+}
 
-func (s *DockerSwarmSuite) TestAPISwarmSecretsDelete(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestAPISwarmSecretsDelete(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 
 	testName := "test_secret"
-	id := d.CreateSecret(c, swarm.SecretSpec***REMOVED***Annotations: swarm.Annotations***REMOVED***
+	id := d.CreateSecret(c, swarm.SecretSpec{Annotations: swarm.Annotations{
 		Name: testName,
-	***REMOVED***,
+	},
 		Data: []byte("TESTINGDATA"),
-	***REMOVED***)
+	})
 	c.Assert(id, checker.Not(checker.Equals), "", check.Commentf("secrets: %s", id))
 
 	secret := d.GetSecret(c, id)
@@ -70,52 +70,52 @@ func (s *DockerSwarmSuite) TestAPISwarmSecretsDelete(c *check.C) ***REMOVED***
 	id = "non-existing"
 	err = cli.SecretRemove(context.Background(), id)
 	c.Assert(err.Error(), checker.Contains, "No such secret: non-existing")
-***REMOVED***
+}
 
-func (s *DockerSwarmSuite) TestAPISwarmSecretsUpdate(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestAPISwarmSecretsUpdate(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 
 	testName := "test_secret"
-	id := d.CreateSecret(c, swarm.SecretSpec***REMOVED***
-		Annotations: swarm.Annotations***REMOVED***
+	id := d.CreateSecret(c, swarm.SecretSpec{
+		Annotations: swarm.Annotations{
 			Name: testName,
-			Labels: map[string]string***REMOVED***
+			Labels: map[string]string{
 				"test": "test1",
-			***REMOVED***,
-		***REMOVED***,
+			},
+		},
 		Data: []byte("TESTINGDATA"),
-	***REMOVED***)
+	})
 	c.Assert(id, checker.Not(checker.Equals), "", check.Commentf("secrets: %s", id))
 
 	secret := d.GetSecret(c, id)
 	c.Assert(secret.ID, checker.Equals, id, check.Commentf("secret: %v", secret))
 
 	// test UpdateSecret with full ID
-	d.UpdateSecret(c, id, func(s *swarm.Secret) ***REMOVED***
-		s.Spec.Labels = map[string]string***REMOVED***
+	d.UpdateSecret(c, id, func(s *swarm.Secret) {
+		s.Spec.Labels = map[string]string{
 			"test": "test1",
-		***REMOVED***
-	***REMOVED***)
+		}
+	})
 
 	secret = d.GetSecret(c, id)
 	c.Assert(secret.Spec.Labels["test"], checker.Equals, "test1", check.Commentf("secret: %v", secret))
 
 	// test UpdateSecret with full name
-	d.UpdateSecret(c, secret.Spec.Name, func(s *swarm.Secret) ***REMOVED***
-		s.Spec.Labels = map[string]string***REMOVED***
+	d.UpdateSecret(c, secret.Spec.Name, func(s *swarm.Secret) {
+		s.Spec.Labels = map[string]string{
 			"test": "test2",
-		***REMOVED***
-	***REMOVED***)
+		}
+	})
 
 	secret = d.GetSecret(c, id)
 	c.Assert(secret.Spec.Labels["test"], checker.Equals, "test2", check.Commentf("secret: %v", secret))
 
 	// test UpdateSecret with prefix ID
-	d.UpdateSecret(c, id[:1], func(s *swarm.Secret) ***REMOVED***
-		s.Spec.Labels = map[string]string***REMOVED***
+	d.UpdateSecret(c, id[:1], func(s *swarm.Secret) {
+		s.Spec.Labels = map[string]string{
 			"test": "test3",
-		***REMOVED***
-	***REMOVED***)
+		}
+	})
 
 	secret = d.GetSecret(c, id)
 	c.Assert(secret.Spec.Labels["test"], checker.Equals, "test3", check.Commentf("secret: %v", secret))
@@ -133,4 +133,4 @@ func (s *DockerSwarmSuite) TestAPISwarmSecretsUpdate(c *check.C) ***REMOVED***
 
 	err = cli.SecretUpdate(context.Background(), secret.ID, secret.Version, secret.Spec)
 	c.Assert(err.Error(), checker.Contains, expected)
-***REMOVED***
+}

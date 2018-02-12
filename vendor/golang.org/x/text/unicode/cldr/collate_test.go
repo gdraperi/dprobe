@@ -12,54 +12,54 @@ import (
 
 // A recorder implements the RuleProcessor interface, whereby its methods
 // simply record the invocations.
-type recorder struct ***REMOVED***
+type recorder struct {
 	calls []string
-***REMOVED***
+}
 
-func (r *recorder) Reset(anchor string, before int) error ***REMOVED***
-	if before > 5 ***REMOVED***
+func (r *recorder) Reset(anchor string, before int) error {
+	if before > 5 {
 		return fmt.Errorf("before %d > 5", before)
-	***REMOVED***
+	}
 	r.calls = append(r.calls, fmt.Sprintf("R:%s-%d", anchor, before))
 	return nil
-***REMOVED***
+}
 
-func (r *recorder) Insert(level int, str, context, extend string) error ***REMOVED***
+func (r *recorder) Insert(level int, str, context, extend string) error {
 	s := fmt.Sprintf("O:%d:%s", level, str)
-	if context != "" ***REMOVED***
+	if context != "" {
 		s += "|" + context
-	***REMOVED***
-	if extend != "" ***REMOVED***
+	}
+	if extend != "" {
 		s += "/" + extend
-	***REMOVED***
+	}
 	r.calls = append(r.calls, s)
 	return nil
-***REMOVED***
+}
 
-func (r *recorder) Index(id string) ***REMOVED***
+func (r *recorder) Index(id string) {
 	r.calls = append(r.calls, fmt.Sprintf("I:%s", id))
-***REMOVED***
+}
 
-func (r *recorder) Error(err error) ***REMOVED***
+func (r *recorder) Error(err error) {
 	r.calls = append(r.calls, fmt.Sprintf("E:%v", err))
-***REMOVED***
+}
 
-func TestRuleProcessor(t *testing.T) ***REMOVED***
-	for _, tt := range []struct ***REMOVED***
+func TestRuleProcessor(t *testing.T) {
+	for _, tt := range []struct {
 		desc string
 		in   string
 		out  string
-	***REMOVED******REMOVED***
-		***REMOVED***desc: "empty"***REMOVED***,
-		***REMOVED***desc: "whitespace and comments only",
+	}{
+		{desc: "empty"},
+		{desc: "whitespace and comments only",
 			in: `
 
 
 		  		# adsfads
 # adfadf
 		`,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			desc: "reset anchor",
 			in: `
 			& a
@@ -82,8 +82,8 @@ func TestRuleProcessor(t *testing.T) ***REMOVED***
 			R:hhhh-0
 			R:i-0
 			`,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			desc: "ordering",
 			in: `
 			& 0
@@ -105,13 +105,13 @@ func TestRuleProcessor(t *testing.T) ***REMOVED***
 			O:4:7/z
 			O:2:8'|s/ch
 			`,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			desc: "index",
 			in:   "< '\ufdd0'A",
 			out:  "I:A",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			desc: "sequence",
 			in: `
 			& 0
@@ -133,8 +133,8 @@ func TestRuleProcessor(t *testing.T) ***REMOVED***
 			O:1:f
 			O:5:q
 			`,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			desc: "compact",
 			in:   "&B<t<<<T<s<<<S<e<<<E",
 			out: `
@@ -146,13 +146,13 @@ func TestRuleProcessor(t *testing.T) ***REMOVED***
 			O:1:e
 			O:3:E
 			`,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			desc: "err operator",
 			in:   "a",
 			out:  "E:1: illegal operator 'a'",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			desc: "err line number",
 			in: `& a
 			<< b
@@ -161,115 +161,115 @@ func TestRuleProcessor(t *testing.T) ***REMOVED***
 			R:a-0
 			O:2:b
 			E:3: illegal operator 'a'`,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			desc: "err empty anchor",
 			in: " &			",
 			out: "E:1: missing string",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			desc: "err anchor invalid special 1",
 			in: " &	[ foo ",
 			out: "E:1: unmatched bracket",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			desc: "err anchor invalid special 2",
 			in:   "&[",
 			out:  "E:1: unmatched bracket",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			desc: "err anchor invalid before 1",
 			in:   "&[before a]",
 			out:  `E:1: strconv.ParseUint: parsing "a": invalid syntax`,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			desc: "err anchor invalid before 2",
 			in:   "&[before 12]",
 			out:  `E:1: strconv.ParseUint: parsing "12": value out of range`,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			desc: "err anchor invalid before 3",
 			in:   "&[before 2]",
 			out:  "E:1: missing string",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			desc: "err anchor invalid before 4",
 			in:   "&[before 6] a",
 			out:  "E:1: before 6 > 5",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			desc: "err empty order",
 			in:   " < ",
 			out:  "E:1: missing string",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			desc: "err empty identity",
 			in:   " = ",
 			out:  "E:1: missing string",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			desc: "err empty context",
 			in:   " < a |  ",
 			out:  "E:1: missing string after context",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			desc: "err empty extend",
 			in:   " < a /  ",
 			out:  "E:1: missing string after extension",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			desc: "err empty sequence",
 			in:   " <* ",
 			out:  "E:1: empty sequence",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			desc: "err sequence 1",
 			in:   " <* -a",
 			out:  "E:1: range without starter value",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			desc: "err sequence 3",
 			in:   " <* a-a-b",
 			out: `O:1:a
 			E:1: range without starter value
 			`,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			desc: "err sequence 3",
 			in:   " <* b-a",
 			out: `O:1:b
 			E:1: invalid range 'b'-'a'
 			`,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			desc: "err unmatched quote",
 			in:   " < 'b",
 			out: ` E:1: unmatched single quote
 			`,
-		***REMOVED***,
-	***REMOVED*** ***REMOVED***
-		rec := &recorder***REMOVED******REMOVED***
-		err := Collation***REMOVED***
-			Cr: []*Common***REMOVED***
-				***REMOVED***hidden: hidden***REMOVED***CharData: tt.in***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***.Process(rec)
-		if err != nil ***REMOVED***
+		},
+	} {
+		rec := &recorder{}
+		err := Collation{
+			Cr: []*Common{
+				{hidden: hidden{CharData: tt.in}},
+			},
+		}.Process(rec)
+		if err != nil {
 			rec.Error(err)
-		***REMOVED***
+		}
 		got := rec.calls
 		want := strings.Split(strings.TrimSpace(tt.out), "\n")
-		if tt.out == "" ***REMOVED***
+		if tt.out == "" {
 			want = nil
-		***REMOVED***
-		if len(got) != len(want) ***REMOVED***
+		}
+		if len(got) != len(want) {
 			t.Errorf("%s: nResults: got %d; want %d", tt.desc, len(got), len(want))
 			continue
-		***REMOVED***
-		for i, g := range got ***REMOVED***
-			if want := strings.TrimSpace(want[i]); g != want ***REMOVED***
+		}
+		for i, g := range got {
+			if want := strings.TrimSpace(want[i]); g != want {
 				t.Errorf("%s:%d: got %q; want %q", tt.desc, i, g, want)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}

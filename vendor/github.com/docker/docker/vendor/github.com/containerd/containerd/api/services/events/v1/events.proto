@@ -10,7 +10,7 @@ import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/containerd/containerd/api/services/events/v1;events";
 
-service Events ***REMOVED***
+service Events {
 	// Publish an event to a topic.
 	//
 	// The event will be packed into a timestamp envelope with the namespace
@@ -32,25 +32,25 @@ service Events ***REMOVED***
 	// a filter can be provided in the format 'namespace==<namespace>' to
 	// restrict the received events.
 	rpc Subscribe(SubscribeRequest) returns (stream Envelope);
-***REMOVED***
+}
 
-message PublishRequest ***REMOVED***
+message PublishRequest {
 	string topic = 1;
 	google.protobuf.Any event = 2;
-***REMOVED***
+}
 
-message ForwardRequest ***REMOVED***
+message ForwardRequest {
 	Envelope envelope = 1;
-***REMOVED***
+}
 
-message SubscribeRequest ***REMOVED***
+message SubscribeRequest {
 	repeated string filters = 1;
-***REMOVED***
+}
 
-message Envelope ***REMOVED***
+message Envelope {
 	option (containerd.plugin.fieldpath) = true;
 	google.protobuf.Timestamp timestamp = 1 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
 	string namespace = 2;
 	string topic = 3;
 	google.protobuf.Any event = 4;
-***REMOVED***
+}

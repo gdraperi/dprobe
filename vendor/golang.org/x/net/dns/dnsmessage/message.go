@@ -113,21 +113,21 @@ const (
 	headerLen = 6 * uint16Len
 )
 
-type nestedError struct ***REMOVED***
+type nestedError struct {
 	// s is the current level's error message.
 	s string
 
 	// err is the nested error.
 	err error
-***REMOVED***
+}
 
 // nestedError implements error.Error.
-func (e *nestedError) Error() string ***REMOVED***
+func (e *nestedError) Error() string {
 	return e.s + ": " + e.err.Error()
-***REMOVED***
+}
 
 // Header is a representation of a DNS message header.
-type Header struct ***REMOVED***
+type Header struct {
 	ID                 uint16
 	Response           bool
 	OpCode             OpCode
@@ -136,37 +136,37 @@ type Header struct ***REMOVED***
 	RecursionDesired   bool
 	RecursionAvailable bool
 	RCode              RCode
-***REMOVED***
+}
 
-func (m *Header) pack() (id uint16, bits uint16) ***REMOVED***
+func (m *Header) pack() (id uint16, bits uint16) {
 	id = m.ID
 	bits = uint16(m.OpCode)<<11 | uint16(m.RCode)
-	if m.RecursionAvailable ***REMOVED***
+	if m.RecursionAvailable {
 		bits |= headerBitRA
-	***REMOVED***
-	if m.RecursionDesired ***REMOVED***
+	}
+	if m.RecursionDesired {
 		bits |= headerBitRD
-	***REMOVED***
-	if m.Truncated ***REMOVED***
+	}
+	if m.Truncated {
 		bits |= headerBitTC
-	***REMOVED***
-	if m.Authoritative ***REMOVED***
+	}
+	if m.Authoritative {
 		bits |= headerBitAA
-	***REMOVED***
-	if m.Response ***REMOVED***
+	}
+	if m.Response {
 		bits |= headerBitQR
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // Message is a representation of a DNS message.
-type Message struct ***REMOVED***
+type Message struct {
 	Header
 	Questions   []Question
 	Answers     []Resource
 	Authorities []Resource
 	Additionals []Resource
-***REMOVED***
+}
 
 type section uint8
 
@@ -186,26 +186,26 @@ const (
 	headerBitRA = 1 << 7  // recursion available
 )
 
-var sectionNames = map[section]string***REMOVED***
+var sectionNames = map[section]string{
 	sectionHeader:      "header",
 	sectionQuestions:   "Question",
 	sectionAnswers:     "Answer",
 	sectionAuthorities: "Authority",
 	sectionAdditionals: "Additional",
-***REMOVED***
+}
 
 // header is the wire format for a DNS message header.
-type header struct ***REMOVED***
+type header struct {
 	id          uint16
 	bits        uint16
 	questions   uint16
 	answers     uint16
 	authorities uint16
 	additionals uint16
-***REMOVED***
+}
 
-func (h *header) count(sec section) uint16 ***REMOVED***
-	switch sec ***REMOVED***
+func (h *header) count(sec section) uint16 {
+	switch sec {
 	case sectionQuestions:
 		return h.questions
 	case sectionAnswers:
@@ -214,45 +214,45 @@ func (h *header) count(sec section) uint16 ***REMOVED***
 		return h.authorities
 	case sectionAdditionals:
 		return h.additionals
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (h *header) pack(msg []byte) []byte ***REMOVED***
+func (h *header) pack(msg []byte) []byte {
 	msg = packUint16(msg, h.id)
 	msg = packUint16(msg, h.bits)
 	msg = packUint16(msg, h.questions)
 	msg = packUint16(msg, h.answers)
 	msg = packUint16(msg, h.authorities)
 	return packUint16(msg, h.additionals)
-***REMOVED***
+}
 
-func (h *header) unpack(msg []byte, off int) (int, error) ***REMOVED***
+func (h *header) unpack(msg []byte, off int) (int, error) {
 	newOff := off
 	var err error
-	if h.id, newOff, err = unpackUint16(msg, newOff); err != nil ***REMOVED***
-		return off, &nestedError***REMOVED***"id", err***REMOVED***
-	***REMOVED***
-	if h.bits, newOff, err = unpackUint16(msg, newOff); err != nil ***REMOVED***
-		return off, &nestedError***REMOVED***"bits", err***REMOVED***
-	***REMOVED***
-	if h.questions, newOff, err = unpackUint16(msg, newOff); err != nil ***REMOVED***
-		return off, &nestedError***REMOVED***"questions", err***REMOVED***
-	***REMOVED***
-	if h.answers, newOff, err = unpackUint16(msg, newOff); err != nil ***REMOVED***
-		return off, &nestedError***REMOVED***"answers", err***REMOVED***
-	***REMOVED***
-	if h.authorities, newOff, err = unpackUint16(msg, newOff); err != nil ***REMOVED***
-		return off, &nestedError***REMOVED***"authorities", err***REMOVED***
-	***REMOVED***
-	if h.additionals, newOff, err = unpackUint16(msg, newOff); err != nil ***REMOVED***
-		return off, &nestedError***REMOVED***"additionals", err***REMOVED***
-	***REMOVED***
+	if h.id, newOff, err = unpackUint16(msg, newOff); err != nil {
+		return off, &nestedError{"id", err}
+	}
+	if h.bits, newOff, err = unpackUint16(msg, newOff); err != nil {
+		return off, &nestedError{"bits", err}
+	}
+	if h.questions, newOff, err = unpackUint16(msg, newOff); err != nil {
+		return off, &nestedError{"questions", err}
+	}
+	if h.answers, newOff, err = unpackUint16(msg, newOff); err != nil {
+		return off, &nestedError{"answers", err}
+	}
+	if h.authorities, newOff, err = unpackUint16(msg, newOff); err != nil {
+		return off, &nestedError{"authorities", err}
+	}
+	if h.additionals, newOff, err = unpackUint16(msg, newOff); err != nil {
+		return off, &nestedError{"additionals", err}
+	}
 	return newOff, nil
-***REMOVED***
+}
 
-func (h *header) header() Header ***REMOVED***
-	return Header***REMOVED***
+func (h *header) header() Header {
+	return Header{
 		ID:                 h.id,
 		Response:           (h.bits & headerBitQR) != 0,
 		OpCode:             OpCode(h.bits>>11) & 0xF,
@@ -261,45 +261,45 @@ func (h *header) header() Header ***REMOVED***
 		RecursionDesired:   (h.bits & headerBitRD) != 0,
 		RecursionAvailable: (h.bits & headerBitRA) != 0,
 		RCode:              RCode(h.bits & 0xF),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // A Resource is a DNS resource record.
-type Resource struct ***REMOVED***
+type Resource struct {
 	Header ResourceHeader
 	Body   ResourceBody
-***REMOVED***
+}
 
 // A ResourceBody is a DNS resource record minus the header.
-type ResourceBody interface ***REMOVED***
+type ResourceBody interface {
 	// pack packs a Resource except for its header.
 	pack(msg []byte, compression map[string]int) ([]byte, error)
 
 	// realType returns the actual type of the Resource. This is used to
 	// fill in the header Type field.
 	realType() Type
-***REMOVED***
+}
 
-func (r *Resource) pack(msg []byte, compression map[string]int) ([]byte, error) ***REMOVED***
-	if r.Body == nil ***REMOVED***
+func (r *Resource) pack(msg []byte, compression map[string]int) ([]byte, error) {
+	if r.Body == nil {
 		return msg, errNilResouceBody
-	***REMOVED***
+	}
 	oldMsg := msg
 	r.Header.Type = r.Body.realType()
 	msg, length, err := r.Header.pack(msg, compression)
-	if err != nil ***REMOVED***
-		return msg, &nestedError***REMOVED***"ResourceHeader", err***REMOVED***
-	***REMOVED***
+	if err != nil {
+		return msg, &nestedError{"ResourceHeader", err}
+	}
 	preLen := len(msg)
 	msg, err = r.Body.pack(msg, compression)
-	if err != nil ***REMOVED***
-		return msg, &nestedError***REMOVED***"content", err***REMOVED***
-	***REMOVED***
-	if err := r.Header.fixLen(msg, length, preLen); err != nil ***REMOVED***
+	if err != nil {
+		return msg, &nestedError{"content", err}
+	}
+	if err := r.Header.fixLen(msg, length, preLen); err != nil {
 		return oldMsg, err
-	***REMOVED***
+	}
 	return msg, nil
-***REMOVED***
+}
 
 // A Parser allows incrementally parsing a DNS message.
 //
@@ -313,7 +313,7 @@ func (r *Resource) pack(msg []byte, compression map[string]int) ([]byte, error) 
 // proceeding to the next type of Resource.
 //
 // Note that there is no requirement to fully skip or parse the message.
-type Parser struct ***REMOVED***
+type Parser struct {
 	msg    []byte
 	header header
 
@@ -322,494 +322,494 @@ type Parser struct ***REMOVED***
 	index          int
 	resHeaderValid bool
 	resHeader      ResourceHeader
-***REMOVED***
+}
 
 // Start parses the header and enables the parsing of Questions.
-func (p *Parser) Start(msg []byte) (Header, error) ***REMOVED***
-	if p.msg != nil ***REMOVED***
-		*p = Parser***REMOVED******REMOVED***
-	***REMOVED***
+func (p *Parser) Start(msg []byte) (Header, error) {
+	if p.msg != nil {
+		*p = Parser{}
+	}
 	p.msg = msg
 	var err error
-	if p.off, err = p.header.unpack(msg, 0); err != nil ***REMOVED***
-		return Header***REMOVED******REMOVED***, &nestedError***REMOVED***"unpacking header", err***REMOVED***
-	***REMOVED***
+	if p.off, err = p.header.unpack(msg, 0); err != nil {
+		return Header{}, &nestedError{"unpacking header", err}
+	}
 	p.section = sectionQuestions
 	return p.header.header(), nil
-***REMOVED***
+}
 
-func (p *Parser) checkAdvance(sec section) error ***REMOVED***
-	if p.section < sec ***REMOVED***
+func (p *Parser) checkAdvance(sec section) error {
+	if p.section < sec {
 		return ErrNotStarted
-	***REMOVED***
-	if p.section > sec ***REMOVED***
+	}
+	if p.section > sec {
 		return ErrSectionDone
-	***REMOVED***
+	}
 	p.resHeaderValid = false
-	if p.index == int(p.header.count(sec)) ***REMOVED***
+	if p.index == int(p.header.count(sec)) {
 		p.index = 0
 		p.section++
 		return ErrSectionDone
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (p *Parser) resource(sec section) (Resource, error) ***REMOVED***
+func (p *Parser) resource(sec section) (Resource, error) {
 	var r Resource
 	var err error
 	r.Header, err = p.resourceHeader(sec)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return r, err
-	***REMOVED***
+	}
 	p.resHeaderValid = false
 	r.Body, p.off, err = unpackResourceBody(p.msg, p.off, r.Header)
-	if err != nil ***REMOVED***
-		return Resource***REMOVED******REMOVED***, &nestedError***REMOVED***"unpacking " + sectionNames[sec], err***REMOVED***
-	***REMOVED***
+	if err != nil {
+		return Resource{}, &nestedError{"unpacking " + sectionNames[sec], err}
+	}
 	p.index++
 	return r, nil
-***REMOVED***
+}
 
-func (p *Parser) resourceHeader(sec section) (ResourceHeader, error) ***REMOVED***
-	if p.resHeaderValid ***REMOVED***
+func (p *Parser) resourceHeader(sec section) (ResourceHeader, error) {
+	if p.resHeaderValid {
 		return p.resHeader, nil
-	***REMOVED***
-	if err := p.checkAdvance(sec); err != nil ***REMOVED***
-		return ResourceHeader***REMOVED******REMOVED***, err
-	***REMOVED***
+	}
+	if err := p.checkAdvance(sec); err != nil {
+		return ResourceHeader{}, err
+	}
 	var hdr ResourceHeader
 	off, err := hdr.unpack(p.msg, p.off)
-	if err != nil ***REMOVED***
-		return ResourceHeader***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return ResourceHeader{}, err
+	}
 	p.resHeaderValid = true
 	p.resHeader = hdr
 	p.off = off
 	return hdr, nil
-***REMOVED***
+}
 
-func (p *Parser) skipResource(sec section) error ***REMOVED***
-	if p.resHeaderValid ***REMOVED***
+func (p *Parser) skipResource(sec section) error {
+	if p.resHeaderValid {
 		newOff := p.off + int(p.resHeader.Length)
-		if newOff > len(p.msg) ***REMOVED***
+		if newOff > len(p.msg) {
 			return errResourceLen
-		***REMOVED***
+		}
 		p.off = newOff
 		p.resHeaderValid = false
 		p.index++
 		return nil
-	***REMOVED***
-	if err := p.checkAdvance(sec); err != nil ***REMOVED***
+	}
+	if err := p.checkAdvance(sec); err != nil {
 		return err
-	***REMOVED***
+	}
 	var err error
 	p.off, err = skipResource(p.msg, p.off)
-	if err != nil ***REMOVED***
-		return &nestedError***REMOVED***"skipping: " + sectionNames[sec], err***REMOVED***
-	***REMOVED***
+	if err != nil {
+		return &nestedError{"skipping: " + sectionNames[sec], err}
+	}
 	p.index++
 	return nil
-***REMOVED***
+}
 
 // Question parses a single Question.
-func (p *Parser) Question() (Question, error) ***REMOVED***
-	if err := p.checkAdvance(sectionQuestions); err != nil ***REMOVED***
-		return Question***REMOVED******REMOVED***, err
-	***REMOVED***
+func (p *Parser) Question() (Question, error) {
+	if err := p.checkAdvance(sectionQuestions); err != nil {
+		return Question{}, err
+	}
 	var name Name
 	off, err := name.unpack(p.msg, p.off)
-	if err != nil ***REMOVED***
-		return Question***REMOVED******REMOVED***, &nestedError***REMOVED***"unpacking Question.Name", err***REMOVED***
-	***REMOVED***
+	if err != nil {
+		return Question{}, &nestedError{"unpacking Question.Name", err}
+	}
 	typ, off, err := unpackType(p.msg, off)
-	if err != nil ***REMOVED***
-		return Question***REMOVED******REMOVED***, &nestedError***REMOVED***"unpacking Question.Type", err***REMOVED***
-	***REMOVED***
+	if err != nil {
+		return Question{}, &nestedError{"unpacking Question.Type", err}
+	}
 	class, off, err := unpackClass(p.msg, off)
-	if err != nil ***REMOVED***
-		return Question***REMOVED******REMOVED***, &nestedError***REMOVED***"unpacking Question.Class", err***REMOVED***
-	***REMOVED***
+	if err != nil {
+		return Question{}, &nestedError{"unpacking Question.Class", err}
+	}
 	p.off = off
 	p.index++
-	return Question***REMOVED***name, typ, class***REMOVED***, nil
-***REMOVED***
+	return Question{name, typ, class}, nil
+}
 
 // AllQuestions parses all Questions.
-func (p *Parser) AllQuestions() ([]Question, error) ***REMOVED***
+func (p *Parser) AllQuestions() ([]Question, error) {
 	qs := make([]Question, 0, p.header.questions)
-	for ***REMOVED***
+	for {
 		q, err := p.Question()
-		if err == ErrSectionDone ***REMOVED***
+		if err == ErrSectionDone {
 			return qs, nil
-		***REMOVED***
-		if err != nil ***REMOVED***
+		}
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		qs = append(qs, q)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // SkipQuestion skips a single Question.
-func (p *Parser) SkipQuestion() error ***REMOVED***
-	if err := p.checkAdvance(sectionQuestions); err != nil ***REMOVED***
+func (p *Parser) SkipQuestion() error {
+	if err := p.checkAdvance(sectionQuestions); err != nil {
 		return err
-	***REMOVED***
+	}
 	off, err := skipName(p.msg, p.off)
-	if err != nil ***REMOVED***
-		return &nestedError***REMOVED***"skipping Question Name", err***REMOVED***
-	***REMOVED***
-	if off, err = skipType(p.msg, off); err != nil ***REMOVED***
-		return &nestedError***REMOVED***"skipping Question Type", err***REMOVED***
-	***REMOVED***
-	if off, err = skipClass(p.msg, off); err != nil ***REMOVED***
-		return &nestedError***REMOVED***"skipping Question Class", err***REMOVED***
-	***REMOVED***
+	if err != nil {
+		return &nestedError{"skipping Question Name", err}
+	}
+	if off, err = skipType(p.msg, off); err != nil {
+		return &nestedError{"skipping Question Type", err}
+	}
+	if off, err = skipClass(p.msg, off); err != nil {
+		return &nestedError{"skipping Question Class", err}
+	}
 	p.off = off
 	p.index++
 	return nil
-***REMOVED***
+}
 
 // SkipAllQuestions skips all Questions.
-func (p *Parser) SkipAllQuestions() error ***REMOVED***
-	for ***REMOVED***
-		if err := p.SkipQuestion(); err == ErrSectionDone ***REMOVED***
+func (p *Parser) SkipAllQuestions() error {
+	for {
+		if err := p.SkipQuestion(); err == ErrSectionDone {
 			return nil
-		***REMOVED*** else if err != nil ***REMOVED***
+		} else if err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // AnswerHeader parses a single Answer ResourceHeader.
-func (p *Parser) AnswerHeader() (ResourceHeader, error) ***REMOVED***
+func (p *Parser) AnswerHeader() (ResourceHeader, error) {
 	return p.resourceHeader(sectionAnswers)
-***REMOVED***
+}
 
 // Answer parses a single Answer Resource.
-func (p *Parser) Answer() (Resource, error) ***REMOVED***
+func (p *Parser) Answer() (Resource, error) {
 	return p.resource(sectionAnswers)
-***REMOVED***
+}
 
 // AllAnswers parses all Answer Resources.
-func (p *Parser) AllAnswers() ([]Resource, error) ***REMOVED***
+func (p *Parser) AllAnswers() ([]Resource, error) {
 	as := make([]Resource, 0, p.header.answers)
-	for ***REMOVED***
+	for {
 		a, err := p.Answer()
-		if err == ErrSectionDone ***REMOVED***
+		if err == ErrSectionDone {
 			return as, nil
-		***REMOVED***
-		if err != nil ***REMOVED***
+		}
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		as = append(as, a)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // SkipAnswer skips a single Answer Resource.
-func (p *Parser) SkipAnswer() error ***REMOVED***
+func (p *Parser) SkipAnswer() error {
 	return p.skipResource(sectionAnswers)
-***REMOVED***
+}
 
 // SkipAllAnswers skips all Answer Resources.
-func (p *Parser) SkipAllAnswers() error ***REMOVED***
-	for ***REMOVED***
-		if err := p.SkipAnswer(); err == ErrSectionDone ***REMOVED***
+func (p *Parser) SkipAllAnswers() error {
+	for {
+		if err := p.SkipAnswer(); err == ErrSectionDone {
 			return nil
-		***REMOVED*** else if err != nil ***REMOVED***
+		} else if err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // AuthorityHeader parses a single Authority ResourceHeader.
-func (p *Parser) AuthorityHeader() (ResourceHeader, error) ***REMOVED***
+func (p *Parser) AuthorityHeader() (ResourceHeader, error) {
 	return p.resourceHeader(sectionAuthorities)
-***REMOVED***
+}
 
 // Authority parses a single Authority Resource.
-func (p *Parser) Authority() (Resource, error) ***REMOVED***
+func (p *Parser) Authority() (Resource, error) {
 	return p.resource(sectionAuthorities)
-***REMOVED***
+}
 
 // AllAuthorities parses all Authority Resources.
-func (p *Parser) AllAuthorities() ([]Resource, error) ***REMOVED***
+func (p *Parser) AllAuthorities() ([]Resource, error) {
 	as := make([]Resource, 0, p.header.authorities)
-	for ***REMOVED***
+	for {
 		a, err := p.Authority()
-		if err == ErrSectionDone ***REMOVED***
+		if err == ErrSectionDone {
 			return as, nil
-		***REMOVED***
-		if err != nil ***REMOVED***
+		}
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		as = append(as, a)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // SkipAuthority skips a single Authority Resource.
-func (p *Parser) SkipAuthority() error ***REMOVED***
+func (p *Parser) SkipAuthority() error {
 	return p.skipResource(sectionAuthorities)
-***REMOVED***
+}
 
 // SkipAllAuthorities skips all Authority Resources.
-func (p *Parser) SkipAllAuthorities() error ***REMOVED***
-	for ***REMOVED***
-		if err := p.SkipAuthority(); err == ErrSectionDone ***REMOVED***
+func (p *Parser) SkipAllAuthorities() error {
+	for {
+		if err := p.SkipAuthority(); err == ErrSectionDone {
 			return nil
-		***REMOVED*** else if err != nil ***REMOVED***
+		} else if err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // AdditionalHeader parses a single Additional ResourceHeader.
-func (p *Parser) AdditionalHeader() (ResourceHeader, error) ***REMOVED***
+func (p *Parser) AdditionalHeader() (ResourceHeader, error) {
 	return p.resourceHeader(sectionAdditionals)
-***REMOVED***
+}
 
 // Additional parses a single Additional Resource.
-func (p *Parser) Additional() (Resource, error) ***REMOVED***
+func (p *Parser) Additional() (Resource, error) {
 	return p.resource(sectionAdditionals)
-***REMOVED***
+}
 
 // AllAdditionals parses all Additional Resources.
-func (p *Parser) AllAdditionals() ([]Resource, error) ***REMOVED***
+func (p *Parser) AllAdditionals() ([]Resource, error) {
 	as := make([]Resource, 0, p.header.additionals)
-	for ***REMOVED***
+	for {
 		a, err := p.Additional()
-		if err == ErrSectionDone ***REMOVED***
+		if err == ErrSectionDone {
 			return as, nil
-		***REMOVED***
-		if err != nil ***REMOVED***
+		}
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		as = append(as, a)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // SkipAdditional skips a single Additional Resource.
-func (p *Parser) SkipAdditional() error ***REMOVED***
+func (p *Parser) SkipAdditional() error {
 	return p.skipResource(sectionAdditionals)
-***REMOVED***
+}
 
 // SkipAllAdditionals skips all Additional Resources.
-func (p *Parser) SkipAllAdditionals() error ***REMOVED***
-	for ***REMOVED***
-		if err := p.SkipAdditional(); err == ErrSectionDone ***REMOVED***
+func (p *Parser) SkipAllAdditionals() error {
+	for {
+		if err := p.SkipAdditional(); err == ErrSectionDone {
 			return nil
-		***REMOVED*** else if err != nil ***REMOVED***
+		} else if err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // CNAMEResource parses a single CNAMEResource.
 //
 // One of the XXXHeader methods must have been called before calling this
 // method.
-func (p *Parser) CNAMEResource() (CNAMEResource, error) ***REMOVED***
-	if !p.resHeaderValid || p.resHeader.Type != TypeCNAME ***REMOVED***
-		return CNAMEResource***REMOVED******REMOVED***, ErrNotStarted
-	***REMOVED***
+func (p *Parser) CNAMEResource() (CNAMEResource, error) {
+	if !p.resHeaderValid || p.resHeader.Type != TypeCNAME {
+		return CNAMEResource{}, ErrNotStarted
+	}
 	r, err := unpackCNAMEResource(p.msg, p.off)
-	if err != nil ***REMOVED***
-		return CNAMEResource***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return CNAMEResource{}, err
+	}
 	p.off += int(p.resHeader.Length)
 	p.resHeaderValid = false
 	p.index++
 	return r, nil
-***REMOVED***
+}
 
 // MXResource parses a single MXResource.
 //
 // One of the XXXHeader methods must have been called before calling this
 // method.
-func (p *Parser) MXResource() (MXResource, error) ***REMOVED***
-	if !p.resHeaderValid || p.resHeader.Type != TypeMX ***REMOVED***
-		return MXResource***REMOVED******REMOVED***, ErrNotStarted
-	***REMOVED***
+func (p *Parser) MXResource() (MXResource, error) {
+	if !p.resHeaderValid || p.resHeader.Type != TypeMX {
+		return MXResource{}, ErrNotStarted
+	}
 	r, err := unpackMXResource(p.msg, p.off)
-	if err != nil ***REMOVED***
-		return MXResource***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return MXResource{}, err
+	}
 	p.off += int(p.resHeader.Length)
 	p.resHeaderValid = false
 	p.index++
 	return r, nil
-***REMOVED***
+}
 
 // NSResource parses a single NSResource.
 //
 // One of the XXXHeader methods must have been called before calling this
 // method.
-func (p *Parser) NSResource() (NSResource, error) ***REMOVED***
-	if !p.resHeaderValid || p.resHeader.Type != TypeNS ***REMOVED***
-		return NSResource***REMOVED******REMOVED***, ErrNotStarted
-	***REMOVED***
+func (p *Parser) NSResource() (NSResource, error) {
+	if !p.resHeaderValid || p.resHeader.Type != TypeNS {
+		return NSResource{}, ErrNotStarted
+	}
 	r, err := unpackNSResource(p.msg, p.off)
-	if err != nil ***REMOVED***
-		return NSResource***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return NSResource{}, err
+	}
 	p.off += int(p.resHeader.Length)
 	p.resHeaderValid = false
 	p.index++
 	return r, nil
-***REMOVED***
+}
 
 // PTRResource parses a single PTRResource.
 //
 // One of the XXXHeader methods must have been called before calling this
 // method.
-func (p *Parser) PTRResource() (PTRResource, error) ***REMOVED***
-	if !p.resHeaderValid || p.resHeader.Type != TypePTR ***REMOVED***
-		return PTRResource***REMOVED******REMOVED***, ErrNotStarted
-	***REMOVED***
+func (p *Parser) PTRResource() (PTRResource, error) {
+	if !p.resHeaderValid || p.resHeader.Type != TypePTR {
+		return PTRResource{}, ErrNotStarted
+	}
 	r, err := unpackPTRResource(p.msg, p.off)
-	if err != nil ***REMOVED***
-		return PTRResource***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return PTRResource{}, err
+	}
 	p.off += int(p.resHeader.Length)
 	p.resHeaderValid = false
 	p.index++
 	return r, nil
-***REMOVED***
+}
 
 // SOAResource parses a single SOAResource.
 //
 // One of the XXXHeader methods must have been called before calling this
 // method.
-func (p *Parser) SOAResource() (SOAResource, error) ***REMOVED***
-	if !p.resHeaderValid || p.resHeader.Type != TypeSOA ***REMOVED***
-		return SOAResource***REMOVED******REMOVED***, ErrNotStarted
-	***REMOVED***
+func (p *Parser) SOAResource() (SOAResource, error) {
+	if !p.resHeaderValid || p.resHeader.Type != TypeSOA {
+		return SOAResource{}, ErrNotStarted
+	}
 	r, err := unpackSOAResource(p.msg, p.off)
-	if err != nil ***REMOVED***
-		return SOAResource***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return SOAResource{}, err
+	}
 	p.off += int(p.resHeader.Length)
 	p.resHeaderValid = false
 	p.index++
 	return r, nil
-***REMOVED***
+}
 
 // TXTResource parses a single TXTResource.
 //
 // One of the XXXHeader methods must have been called before calling this
 // method.
-func (p *Parser) TXTResource() (TXTResource, error) ***REMOVED***
-	if !p.resHeaderValid || p.resHeader.Type != TypeTXT ***REMOVED***
-		return TXTResource***REMOVED******REMOVED***, ErrNotStarted
-	***REMOVED***
+func (p *Parser) TXTResource() (TXTResource, error) {
+	if !p.resHeaderValid || p.resHeader.Type != TypeTXT {
+		return TXTResource{}, ErrNotStarted
+	}
 	r, err := unpackTXTResource(p.msg, p.off, p.resHeader.Length)
-	if err != nil ***REMOVED***
-		return TXTResource***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return TXTResource{}, err
+	}
 	p.off += int(p.resHeader.Length)
 	p.resHeaderValid = false
 	p.index++
 	return r, nil
-***REMOVED***
+}
 
 // SRVResource parses a single SRVResource.
 //
 // One of the XXXHeader methods must have been called before calling this
 // method.
-func (p *Parser) SRVResource() (SRVResource, error) ***REMOVED***
-	if !p.resHeaderValid || p.resHeader.Type != TypeSRV ***REMOVED***
-		return SRVResource***REMOVED******REMOVED***, ErrNotStarted
-	***REMOVED***
+func (p *Parser) SRVResource() (SRVResource, error) {
+	if !p.resHeaderValid || p.resHeader.Type != TypeSRV {
+		return SRVResource{}, ErrNotStarted
+	}
 	r, err := unpackSRVResource(p.msg, p.off)
-	if err != nil ***REMOVED***
-		return SRVResource***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return SRVResource{}, err
+	}
 	p.off += int(p.resHeader.Length)
 	p.resHeaderValid = false
 	p.index++
 	return r, nil
-***REMOVED***
+}
 
 // AResource parses a single AResource.
 //
 // One of the XXXHeader methods must have been called before calling this
 // method.
-func (p *Parser) AResource() (AResource, error) ***REMOVED***
-	if !p.resHeaderValid || p.resHeader.Type != TypeA ***REMOVED***
-		return AResource***REMOVED******REMOVED***, ErrNotStarted
-	***REMOVED***
+func (p *Parser) AResource() (AResource, error) {
+	if !p.resHeaderValid || p.resHeader.Type != TypeA {
+		return AResource{}, ErrNotStarted
+	}
 	r, err := unpackAResource(p.msg, p.off)
-	if err != nil ***REMOVED***
-		return AResource***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return AResource{}, err
+	}
 	p.off += int(p.resHeader.Length)
 	p.resHeaderValid = false
 	p.index++
 	return r, nil
-***REMOVED***
+}
 
 // AAAAResource parses a single AAAAResource.
 //
 // One of the XXXHeader methods must have been called before calling this
 // method.
-func (p *Parser) AAAAResource() (AAAAResource, error) ***REMOVED***
-	if !p.resHeaderValid || p.resHeader.Type != TypeAAAA ***REMOVED***
-		return AAAAResource***REMOVED******REMOVED***, ErrNotStarted
-	***REMOVED***
+func (p *Parser) AAAAResource() (AAAAResource, error) {
+	if !p.resHeaderValid || p.resHeader.Type != TypeAAAA {
+		return AAAAResource{}, ErrNotStarted
+	}
 	r, err := unpackAAAAResource(p.msg, p.off)
-	if err != nil ***REMOVED***
-		return AAAAResource***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return AAAAResource{}, err
+	}
 	p.off += int(p.resHeader.Length)
 	p.resHeaderValid = false
 	p.index++
 	return r, nil
-***REMOVED***
+}
 
 // Unpack parses a full Message.
-func (m *Message) Unpack(msg []byte) error ***REMOVED***
+func (m *Message) Unpack(msg []byte) error {
 	var p Parser
 	var err error
-	if m.Header, err = p.Start(msg); err != nil ***REMOVED***
+	if m.Header, err = p.Start(msg); err != nil {
 		return err
-	***REMOVED***
-	if m.Questions, err = p.AllQuestions(); err != nil ***REMOVED***
+	}
+	if m.Questions, err = p.AllQuestions(); err != nil {
 		return err
-	***REMOVED***
-	if m.Answers, err = p.AllAnswers(); err != nil ***REMOVED***
+	}
+	if m.Answers, err = p.AllAnswers(); err != nil {
 		return err
-	***REMOVED***
-	if m.Authorities, err = p.AllAuthorities(); err != nil ***REMOVED***
+	}
+	if m.Authorities, err = p.AllAuthorities(); err != nil {
 		return err
-	***REMOVED***
-	if m.Additionals, err = p.AllAdditionals(); err != nil ***REMOVED***
+	}
+	if m.Additionals, err = p.AllAdditionals(); err != nil {
 		return err
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // Pack packs a full Message.
-func (m *Message) Pack() ([]byte, error) ***REMOVED***
+func (m *Message) Pack() ([]byte, error) {
 	return m.AppendPack(make([]byte, 0, packStartingCap))
-***REMOVED***
+}
 
 // AppendPack is like Pack but appends the full Message to b and returns the
 // extended buffer.
-func (m *Message) AppendPack(b []byte) ([]byte, error) ***REMOVED***
+func (m *Message) AppendPack(b []byte) ([]byte, error) {
 	// Validate the lengths. It is very unlikely that anyone will try to
 	// pack more than 65535 of any particular type, but it is possible and
 	// we should fail gracefully.
-	if len(m.Questions) > int(^uint16(0)) ***REMOVED***
+	if len(m.Questions) > int(^uint16(0)) {
 		return nil, errTooManyQuestions
-	***REMOVED***
-	if len(m.Answers) > int(^uint16(0)) ***REMOVED***
+	}
+	if len(m.Answers) > int(^uint16(0)) {
 		return nil, errTooManyAnswers
-	***REMOVED***
-	if len(m.Authorities) > int(^uint16(0)) ***REMOVED***
+	}
+	if len(m.Authorities) > int(^uint16(0)) {
 		return nil, errTooManyAuthorities
-	***REMOVED***
-	if len(m.Additionals) > int(^uint16(0)) ***REMOVED***
+	}
+	if len(m.Additionals) > int(^uint16(0)) {
 		return nil, errTooManyAdditionals
-	***REMOVED***
+	}
 
 	var h header
 	h.id, h.bits = m.Header.pack()
@@ -829,51 +829,51 @@ func (m *Message) AppendPack(b []byte) ([]byte, error) ***REMOVED***
 	// DNS messages can be a maximum of 512 bytes long. Without compression,
 	// many DNS response messages are over this limit, so enabling
 	// compression will help ensure compliance.
-	compression := map[string]int***REMOVED******REMOVED***
+	compression := map[string]int{}
 
-	for i := range m.Questions ***REMOVED***
+	for i := range m.Questions {
 		var err error
-		if msg, err = m.Questions[i].pack(msg, compression); err != nil ***REMOVED***
-			return nil, &nestedError***REMOVED***"packing Question", err***REMOVED***
-		***REMOVED***
-	***REMOVED***
-	for i := range m.Answers ***REMOVED***
+		if msg, err = m.Questions[i].pack(msg, compression); err != nil {
+			return nil, &nestedError{"packing Question", err}
+		}
+	}
+	for i := range m.Answers {
 		var err error
-		if msg, err = m.Answers[i].pack(msg, compression); err != nil ***REMOVED***
-			return nil, &nestedError***REMOVED***"packing Answer", err***REMOVED***
-		***REMOVED***
-	***REMOVED***
-	for i := range m.Authorities ***REMOVED***
+		if msg, err = m.Answers[i].pack(msg, compression); err != nil {
+			return nil, &nestedError{"packing Answer", err}
+		}
+	}
+	for i := range m.Authorities {
 		var err error
-		if msg, err = m.Authorities[i].pack(msg, compression); err != nil ***REMOVED***
-			return nil, &nestedError***REMOVED***"packing Authority", err***REMOVED***
-		***REMOVED***
-	***REMOVED***
-	for i := range m.Additionals ***REMOVED***
+		if msg, err = m.Authorities[i].pack(msg, compression); err != nil {
+			return nil, &nestedError{"packing Authority", err}
+		}
+	}
+	for i := range m.Additionals {
 		var err error
-		if msg, err = m.Additionals[i].pack(msg, compression); err != nil ***REMOVED***
-			return nil, &nestedError***REMOVED***"packing Additional", err***REMOVED***
-		***REMOVED***
-	***REMOVED***
+		if msg, err = m.Additionals[i].pack(msg, compression); err != nil {
+			return nil, &nestedError{"packing Additional", err}
+		}
+	}
 
 	return msg, nil
-***REMOVED***
+}
 
 // A Builder allows incrementally packing a DNS message.
-type Builder struct ***REMOVED***
+type Builder struct {
 	msg         []byte
 	header      header
 	section     section
 	compression map[string]int
-***REMOVED***
+}
 
 // Start initializes the builder.
 //
 // buf is optional (nil is fine), but if provided, Start takes ownership of buf.
-func (b *Builder) Start(buf []byte, h Header) ***REMOVED***
+func (b *Builder) Start(buf []byte, h Header) {
 	b.StartWithoutCompression(buf, h)
-	b.compression = map[string]int***REMOVED******REMOVED***
-***REMOVED***
+	b.compression = map[string]int{}
+}
 
 // StartWithoutCompression initializes the builder with compression disabled.
 //
@@ -882,66 +882,66 @@ func (b *Builder) Start(buf []byte, h Header) ***REMOVED***
 // size limit.
 //
 // buf is optional (nil is fine), but if provided, Start takes ownership of buf.
-func (b *Builder) StartWithoutCompression(buf []byte, h Header) ***REMOVED***
-	*b = Builder***REMOVED***msg: buf***REMOVED***
+func (b *Builder) StartWithoutCompression(buf []byte, h Header) {
+	*b = Builder{msg: buf}
 	b.header.id, b.header.bits = h.pack()
-	if cap(b.msg) < headerLen ***REMOVED***
+	if cap(b.msg) < headerLen {
 		b.msg = make([]byte, 0, packStartingCap)
-	***REMOVED***
+	}
 	b.msg = b.msg[:headerLen]
 	b.section = sectionHeader
-***REMOVED***
+}
 
-func (b *Builder) startCheck(s section) error ***REMOVED***
-	if b.section <= sectionNotStarted ***REMOVED***
+func (b *Builder) startCheck(s section) error {
+	if b.section <= sectionNotStarted {
 		return ErrNotStarted
-	***REMOVED***
-	if b.section > s ***REMOVED***
+	}
+	if b.section > s {
 		return ErrSectionDone
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // StartQuestions prepares the builder for packing Questions.
-func (b *Builder) StartQuestions() error ***REMOVED***
-	if err := b.startCheck(sectionQuestions); err != nil ***REMOVED***
+func (b *Builder) StartQuestions() error {
+	if err := b.startCheck(sectionQuestions); err != nil {
 		return err
-	***REMOVED***
+	}
 	b.section = sectionQuestions
 	return nil
-***REMOVED***
+}
 
 // StartAnswers prepares the builder for packing Answers.
-func (b *Builder) StartAnswers() error ***REMOVED***
-	if err := b.startCheck(sectionAnswers); err != nil ***REMOVED***
+func (b *Builder) StartAnswers() error {
+	if err := b.startCheck(sectionAnswers); err != nil {
 		return err
-	***REMOVED***
+	}
 	b.section = sectionAnswers
 	return nil
-***REMOVED***
+}
 
 // StartAuthorities prepares the builder for packing Authorities.
-func (b *Builder) StartAuthorities() error ***REMOVED***
-	if err := b.startCheck(sectionAuthorities); err != nil ***REMOVED***
+func (b *Builder) StartAuthorities() error {
+	if err := b.startCheck(sectionAuthorities); err != nil {
 		return err
-	***REMOVED***
+	}
 	b.section = sectionAuthorities
 	return nil
-***REMOVED***
+}
 
 // StartAdditionals prepares the builder for packing Additionals.
-func (b *Builder) StartAdditionals() error ***REMOVED***
-	if err := b.startCheck(sectionAdditionals); err != nil ***REMOVED***
+func (b *Builder) StartAdditionals() error {
+	if err := b.startCheck(sectionAdditionals); err != nil {
 		return err
-	***REMOVED***
+	}
 	b.section = sectionAdditionals
 	return nil
-***REMOVED***
+}
 
-func (b *Builder) incrementSectionCount() error ***REMOVED***
+func (b *Builder) incrementSectionCount() error {
 	var count *uint16
 	var err error
-	switch b.section ***REMOVED***
+	switch b.section {
 	case sectionQuestions:
 		count = &b.header.questions
 		err = errTooManyQuestions
@@ -954,272 +954,272 @@ func (b *Builder) incrementSectionCount() error ***REMOVED***
 	case sectionAdditionals:
 		count = &b.header.additionals
 		err = errTooManyAdditionals
-	***REMOVED***
-	if *count == ^uint16(0) ***REMOVED***
+	}
+	if *count == ^uint16(0) {
 		return err
-	***REMOVED***
+	}
 	*count++
 	return nil
-***REMOVED***
+}
 
 // Question adds a single Question.
-func (b *Builder) Question(q Question) error ***REMOVED***
-	if b.section < sectionQuestions ***REMOVED***
+func (b *Builder) Question(q Question) error {
+	if b.section < sectionQuestions {
 		return ErrNotStarted
-	***REMOVED***
-	if b.section > sectionQuestions ***REMOVED***
+	}
+	if b.section > sectionQuestions {
 		return ErrSectionDone
-	***REMOVED***
+	}
 	msg, err := q.pack(b.msg, b.compression)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	if err := b.incrementSectionCount(); err != nil ***REMOVED***
+	}
+	if err := b.incrementSectionCount(); err != nil {
 		return err
-	***REMOVED***
+	}
 	b.msg = msg
 	return nil
-***REMOVED***
+}
 
-func (b *Builder) checkResourceSection() error ***REMOVED***
-	if b.section < sectionAnswers ***REMOVED***
+func (b *Builder) checkResourceSection() error {
+	if b.section < sectionAnswers {
 		return ErrNotStarted
-	***REMOVED***
-	if b.section > sectionAdditionals ***REMOVED***
+	}
+	if b.section > sectionAdditionals {
 		return ErrSectionDone
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // CNAMEResource adds a single CNAMEResource.
-func (b *Builder) CNAMEResource(h ResourceHeader, r CNAMEResource) error ***REMOVED***
-	if err := b.checkResourceSection(); err != nil ***REMOVED***
+func (b *Builder) CNAMEResource(h ResourceHeader, r CNAMEResource) error {
+	if err := b.checkResourceSection(); err != nil {
 		return err
-	***REMOVED***
+	}
 	h.Type = r.realType()
 	msg, length, err := h.pack(b.msg, b.compression)
-	if err != nil ***REMOVED***
-		return &nestedError***REMOVED***"ResourceHeader", err***REMOVED***
-	***REMOVED***
+	if err != nil {
+		return &nestedError{"ResourceHeader", err}
+	}
 	preLen := len(msg)
-	if msg, err = r.pack(msg, b.compression); err != nil ***REMOVED***
-		return &nestedError***REMOVED***"CNAMEResource body", err***REMOVED***
-	***REMOVED***
-	if err := h.fixLen(msg, length, preLen); err != nil ***REMOVED***
+	if msg, err = r.pack(msg, b.compression); err != nil {
+		return &nestedError{"CNAMEResource body", err}
+	}
+	if err := h.fixLen(msg, length, preLen); err != nil {
 		return err
-	***REMOVED***
-	if err := b.incrementSectionCount(); err != nil ***REMOVED***
+	}
+	if err := b.incrementSectionCount(); err != nil {
 		return err
-	***REMOVED***
+	}
 	b.msg = msg
 	return nil
-***REMOVED***
+}
 
 // MXResource adds a single MXResource.
-func (b *Builder) MXResource(h ResourceHeader, r MXResource) error ***REMOVED***
-	if err := b.checkResourceSection(); err != nil ***REMOVED***
+func (b *Builder) MXResource(h ResourceHeader, r MXResource) error {
+	if err := b.checkResourceSection(); err != nil {
 		return err
-	***REMOVED***
+	}
 	h.Type = r.realType()
 	msg, length, err := h.pack(b.msg, b.compression)
-	if err != nil ***REMOVED***
-		return &nestedError***REMOVED***"ResourceHeader", err***REMOVED***
-	***REMOVED***
+	if err != nil {
+		return &nestedError{"ResourceHeader", err}
+	}
 	preLen := len(msg)
-	if msg, err = r.pack(msg, b.compression); err != nil ***REMOVED***
-		return &nestedError***REMOVED***"MXResource body", err***REMOVED***
-	***REMOVED***
-	if err := h.fixLen(msg, length, preLen); err != nil ***REMOVED***
+	if msg, err = r.pack(msg, b.compression); err != nil {
+		return &nestedError{"MXResource body", err}
+	}
+	if err := h.fixLen(msg, length, preLen); err != nil {
 		return err
-	***REMOVED***
-	if err := b.incrementSectionCount(); err != nil ***REMOVED***
+	}
+	if err := b.incrementSectionCount(); err != nil {
 		return err
-	***REMOVED***
+	}
 	b.msg = msg
 	return nil
-***REMOVED***
+}
 
 // NSResource adds a single NSResource.
-func (b *Builder) NSResource(h ResourceHeader, r NSResource) error ***REMOVED***
-	if err := b.checkResourceSection(); err != nil ***REMOVED***
+func (b *Builder) NSResource(h ResourceHeader, r NSResource) error {
+	if err := b.checkResourceSection(); err != nil {
 		return err
-	***REMOVED***
+	}
 	h.Type = r.realType()
 	msg, length, err := h.pack(b.msg, b.compression)
-	if err != nil ***REMOVED***
-		return &nestedError***REMOVED***"ResourceHeader", err***REMOVED***
-	***REMOVED***
+	if err != nil {
+		return &nestedError{"ResourceHeader", err}
+	}
 	preLen := len(msg)
-	if msg, err = r.pack(msg, b.compression); err != nil ***REMOVED***
-		return &nestedError***REMOVED***"NSResource body", err***REMOVED***
-	***REMOVED***
-	if err := h.fixLen(msg, length, preLen); err != nil ***REMOVED***
+	if msg, err = r.pack(msg, b.compression); err != nil {
+		return &nestedError{"NSResource body", err}
+	}
+	if err := h.fixLen(msg, length, preLen); err != nil {
 		return err
-	***REMOVED***
-	if err := b.incrementSectionCount(); err != nil ***REMOVED***
+	}
+	if err := b.incrementSectionCount(); err != nil {
 		return err
-	***REMOVED***
+	}
 	b.msg = msg
 	return nil
-***REMOVED***
+}
 
 // PTRResource adds a single PTRResource.
-func (b *Builder) PTRResource(h ResourceHeader, r PTRResource) error ***REMOVED***
-	if err := b.checkResourceSection(); err != nil ***REMOVED***
+func (b *Builder) PTRResource(h ResourceHeader, r PTRResource) error {
+	if err := b.checkResourceSection(); err != nil {
 		return err
-	***REMOVED***
+	}
 	h.Type = r.realType()
 	msg, length, err := h.pack(b.msg, b.compression)
-	if err != nil ***REMOVED***
-		return &nestedError***REMOVED***"ResourceHeader", err***REMOVED***
-	***REMOVED***
+	if err != nil {
+		return &nestedError{"ResourceHeader", err}
+	}
 	preLen := len(msg)
-	if msg, err = r.pack(msg, b.compression); err != nil ***REMOVED***
-		return &nestedError***REMOVED***"PTRResource body", err***REMOVED***
-	***REMOVED***
-	if err := h.fixLen(msg, length, preLen); err != nil ***REMOVED***
+	if msg, err = r.pack(msg, b.compression); err != nil {
+		return &nestedError{"PTRResource body", err}
+	}
+	if err := h.fixLen(msg, length, preLen); err != nil {
 		return err
-	***REMOVED***
-	if err := b.incrementSectionCount(); err != nil ***REMOVED***
+	}
+	if err := b.incrementSectionCount(); err != nil {
 		return err
-	***REMOVED***
+	}
 	b.msg = msg
 	return nil
-***REMOVED***
+}
 
 // SOAResource adds a single SOAResource.
-func (b *Builder) SOAResource(h ResourceHeader, r SOAResource) error ***REMOVED***
-	if err := b.checkResourceSection(); err != nil ***REMOVED***
+func (b *Builder) SOAResource(h ResourceHeader, r SOAResource) error {
+	if err := b.checkResourceSection(); err != nil {
 		return err
-	***REMOVED***
+	}
 	h.Type = r.realType()
 	msg, length, err := h.pack(b.msg, b.compression)
-	if err != nil ***REMOVED***
-		return &nestedError***REMOVED***"ResourceHeader", err***REMOVED***
-	***REMOVED***
+	if err != nil {
+		return &nestedError{"ResourceHeader", err}
+	}
 	preLen := len(msg)
-	if msg, err = r.pack(msg, b.compression); err != nil ***REMOVED***
-		return &nestedError***REMOVED***"SOAResource body", err***REMOVED***
-	***REMOVED***
-	if err := h.fixLen(msg, length, preLen); err != nil ***REMOVED***
+	if msg, err = r.pack(msg, b.compression); err != nil {
+		return &nestedError{"SOAResource body", err}
+	}
+	if err := h.fixLen(msg, length, preLen); err != nil {
 		return err
-	***REMOVED***
-	if err := b.incrementSectionCount(); err != nil ***REMOVED***
+	}
+	if err := b.incrementSectionCount(); err != nil {
 		return err
-	***REMOVED***
+	}
 	b.msg = msg
 	return nil
-***REMOVED***
+}
 
 // TXTResource adds a single TXTResource.
-func (b *Builder) TXTResource(h ResourceHeader, r TXTResource) error ***REMOVED***
-	if err := b.checkResourceSection(); err != nil ***REMOVED***
+func (b *Builder) TXTResource(h ResourceHeader, r TXTResource) error {
+	if err := b.checkResourceSection(); err != nil {
 		return err
-	***REMOVED***
+	}
 	h.Type = r.realType()
 	msg, length, err := h.pack(b.msg, b.compression)
-	if err != nil ***REMOVED***
-		return &nestedError***REMOVED***"ResourceHeader", err***REMOVED***
-	***REMOVED***
+	if err != nil {
+		return &nestedError{"ResourceHeader", err}
+	}
 	preLen := len(msg)
-	if msg, err = r.pack(msg, b.compression); err != nil ***REMOVED***
-		return &nestedError***REMOVED***"TXTResource body", err***REMOVED***
-	***REMOVED***
-	if err := h.fixLen(msg, length, preLen); err != nil ***REMOVED***
+	if msg, err = r.pack(msg, b.compression); err != nil {
+		return &nestedError{"TXTResource body", err}
+	}
+	if err := h.fixLen(msg, length, preLen); err != nil {
 		return err
-	***REMOVED***
-	if err := b.incrementSectionCount(); err != nil ***REMOVED***
+	}
+	if err := b.incrementSectionCount(); err != nil {
 		return err
-	***REMOVED***
+	}
 	b.msg = msg
 	return nil
-***REMOVED***
+}
 
 // SRVResource adds a single SRVResource.
-func (b *Builder) SRVResource(h ResourceHeader, r SRVResource) error ***REMOVED***
-	if err := b.checkResourceSection(); err != nil ***REMOVED***
+func (b *Builder) SRVResource(h ResourceHeader, r SRVResource) error {
+	if err := b.checkResourceSection(); err != nil {
 		return err
-	***REMOVED***
+	}
 	h.Type = r.realType()
 	msg, length, err := h.pack(b.msg, b.compression)
-	if err != nil ***REMOVED***
-		return &nestedError***REMOVED***"ResourceHeader", err***REMOVED***
-	***REMOVED***
+	if err != nil {
+		return &nestedError{"ResourceHeader", err}
+	}
 	preLen := len(msg)
-	if msg, err = r.pack(msg, b.compression); err != nil ***REMOVED***
-		return &nestedError***REMOVED***"SRVResource body", err***REMOVED***
-	***REMOVED***
-	if err := h.fixLen(msg, length, preLen); err != nil ***REMOVED***
+	if msg, err = r.pack(msg, b.compression); err != nil {
+		return &nestedError{"SRVResource body", err}
+	}
+	if err := h.fixLen(msg, length, preLen); err != nil {
 		return err
-	***REMOVED***
-	if err := b.incrementSectionCount(); err != nil ***REMOVED***
+	}
+	if err := b.incrementSectionCount(); err != nil {
 		return err
-	***REMOVED***
+	}
 	b.msg = msg
 	return nil
-***REMOVED***
+}
 
 // AResource adds a single AResource.
-func (b *Builder) AResource(h ResourceHeader, r AResource) error ***REMOVED***
-	if err := b.checkResourceSection(); err != nil ***REMOVED***
+func (b *Builder) AResource(h ResourceHeader, r AResource) error {
+	if err := b.checkResourceSection(); err != nil {
 		return err
-	***REMOVED***
+	}
 	h.Type = r.realType()
 	msg, length, err := h.pack(b.msg, b.compression)
-	if err != nil ***REMOVED***
-		return &nestedError***REMOVED***"ResourceHeader", err***REMOVED***
-	***REMOVED***
+	if err != nil {
+		return &nestedError{"ResourceHeader", err}
+	}
 	preLen := len(msg)
-	if msg, err = r.pack(msg, b.compression); err != nil ***REMOVED***
-		return &nestedError***REMOVED***"AResource body", err***REMOVED***
-	***REMOVED***
-	if err := h.fixLen(msg, length, preLen); err != nil ***REMOVED***
+	if msg, err = r.pack(msg, b.compression); err != nil {
+		return &nestedError{"AResource body", err}
+	}
+	if err := h.fixLen(msg, length, preLen); err != nil {
 		return err
-	***REMOVED***
-	if err := b.incrementSectionCount(); err != nil ***REMOVED***
+	}
+	if err := b.incrementSectionCount(); err != nil {
 		return err
-	***REMOVED***
+	}
 	b.msg = msg
 	return nil
-***REMOVED***
+}
 
 // AAAAResource adds a single AAAAResource.
-func (b *Builder) AAAAResource(h ResourceHeader, r AAAAResource) error ***REMOVED***
-	if err := b.checkResourceSection(); err != nil ***REMOVED***
+func (b *Builder) AAAAResource(h ResourceHeader, r AAAAResource) error {
+	if err := b.checkResourceSection(); err != nil {
 		return err
-	***REMOVED***
+	}
 	h.Type = r.realType()
 	msg, length, err := h.pack(b.msg, b.compression)
-	if err != nil ***REMOVED***
-		return &nestedError***REMOVED***"ResourceHeader", err***REMOVED***
-	***REMOVED***
+	if err != nil {
+		return &nestedError{"ResourceHeader", err}
+	}
 	preLen := len(msg)
-	if msg, err = r.pack(msg, b.compression); err != nil ***REMOVED***
-		return &nestedError***REMOVED***"AAAAResource body", err***REMOVED***
-	***REMOVED***
-	if err := h.fixLen(msg, length, preLen); err != nil ***REMOVED***
+	if msg, err = r.pack(msg, b.compression); err != nil {
+		return &nestedError{"AAAAResource body", err}
+	}
+	if err := h.fixLen(msg, length, preLen); err != nil {
 		return err
-	***REMOVED***
-	if err := b.incrementSectionCount(); err != nil ***REMOVED***
+	}
+	if err := b.incrementSectionCount(); err != nil {
 		return err
-	***REMOVED***
+	}
 	b.msg = msg
 	return nil
-***REMOVED***
+}
 
 // Finish ends message building and generates a binary message.
-func (b *Builder) Finish() ([]byte, error) ***REMOVED***
-	if b.section < sectionHeader ***REMOVED***
+func (b *Builder) Finish() ([]byte, error) {
+	if b.section < sectionHeader {
 		return nil, ErrNotStarted
-	***REMOVED***
+	}
 	b.section = sectionDone
 	b.header.pack(b.msg[:0])
 	return b.msg, nil
-***REMOVED***
+}
 
 // A ResourceHeader is the header of a DNS resource record. There are
 // many types of DNS resource records, but they all share the same header.
-type ResourceHeader struct ***REMOVED***
+type ResourceHeader struct {
 	// Name is the domain name for which this resource record pertains.
 	Name Name
 
@@ -1241,127 +1241,127 @@ type ResourceHeader struct ***REMOVED***
 	//
 	// This field will be set automatically during packing.
 	Length uint16
-***REMOVED***
+}
 
 // pack packs all of the fields in a ResourceHeader except for the length. The
 // length bytes are returned as a slice so they can be filled in after the rest
 // of the Resource has been packed.
-func (h *ResourceHeader) pack(oldMsg []byte, compression map[string]int) (msg []byte, length []byte, err error) ***REMOVED***
+func (h *ResourceHeader) pack(oldMsg []byte, compression map[string]int) (msg []byte, length []byte, err error) {
 	msg = oldMsg
-	if msg, err = h.Name.pack(msg, compression); err != nil ***REMOVED***
-		return oldMsg, nil, &nestedError***REMOVED***"Name", err***REMOVED***
-	***REMOVED***
+	if msg, err = h.Name.pack(msg, compression); err != nil {
+		return oldMsg, nil, &nestedError{"Name", err}
+	}
 	msg = packType(msg, h.Type)
 	msg = packClass(msg, h.Class)
 	msg = packUint32(msg, h.TTL)
 	lenBegin := len(msg)
 	msg = packUint16(msg, h.Length)
 	return msg, msg[lenBegin : lenBegin+uint16Len], nil
-***REMOVED***
+}
 
-func (h *ResourceHeader) unpack(msg []byte, off int) (int, error) ***REMOVED***
+func (h *ResourceHeader) unpack(msg []byte, off int) (int, error) {
 	newOff := off
 	var err error
-	if newOff, err = h.Name.unpack(msg, newOff); err != nil ***REMOVED***
-		return off, &nestedError***REMOVED***"Name", err***REMOVED***
-	***REMOVED***
-	if h.Type, newOff, err = unpackType(msg, newOff); err != nil ***REMOVED***
-		return off, &nestedError***REMOVED***"Type", err***REMOVED***
-	***REMOVED***
-	if h.Class, newOff, err = unpackClass(msg, newOff); err != nil ***REMOVED***
-		return off, &nestedError***REMOVED***"Class", err***REMOVED***
-	***REMOVED***
-	if h.TTL, newOff, err = unpackUint32(msg, newOff); err != nil ***REMOVED***
-		return off, &nestedError***REMOVED***"TTL", err***REMOVED***
-	***REMOVED***
-	if h.Length, newOff, err = unpackUint16(msg, newOff); err != nil ***REMOVED***
-		return off, &nestedError***REMOVED***"Length", err***REMOVED***
-	***REMOVED***
+	if newOff, err = h.Name.unpack(msg, newOff); err != nil {
+		return off, &nestedError{"Name", err}
+	}
+	if h.Type, newOff, err = unpackType(msg, newOff); err != nil {
+		return off, &nestedError{"Type", err}
+	}
+	if h.Class, newOff, err = unpackClass(msg, newOff); err != nil {
+		return off, &nestedError{"Class", err}
+	}
+	if h.TTL, newOff, err = unpackUint32(msg, newOff); err != nil {
+		return off, &nestedError{"TTL", err}
+	}
+	if h.Length, newOff, err = unpackUint16(msg, newOff); err != nil {
+		return off, &nestedError{"Length", err}
+	}
 	return newOff, nil
-***REMOVED***
+}
 
-func (h *ResourceHeader) fixLen(msg []byte, length []byte, preLen int) error ***REMOVED***
+func (h *ResourceHeader) fixLen(msg []byte, length []byte, preLen int) error {
 	conLen := len(msg) - preLen
-	if conLen > int(^uint16(0)) ***REMOVED***
+	if conLen > int(^uint16(0)) {
 		return errResTooLong
-	***REMOVED***
+	}
 
 	// Fill in the length now that we know how long the content is.
 	packUint16(length[:0], uint16(conLen))
 	h.Length = uint16(conLen)
 
 	return nil
-***REMOVED***
+}
 
-func skipResource(msg []byte, off int) (int, error) ***REMOVED***
+func skipResource(msg []byte, off int) (int, error) {
 	newOff, err := skipName(msg, off)
-	if err != nil ***REMOVED***
-		return off, &nestedError***REMOVED***"Name", err***REMOVED***
-	***REMOVED***
-	if newOff, err = skipType(msg, newOff); err != nil ***REMOVED***
-		return off, &nestedError***REMOVED***"Type", err***REMOVED***
-	***REMOVED***
-	if newOff, err = skipClass(msg, newOff); err != nil ***REMOVED***
-		return off, &nestedError***REMOVED***"Class", err***REMOVED***
-	***REMOVED***
-	if newOff, err = skipUint32(msg, newOff); err != nil ***REMOVED***
-		return off, &nestedError***REMOVED***"TTL", err***REMOVED***
-	***REMOVED***
+	if err != nil {
+		return off, &nestedError{"Name", err}
+	}
+	if newOff, err = skipType(msg, newOff); err != nil {
+		return off, &nestedError{"Type", err}
+	}
+	if newOff, err = skipClass(msg, newOff); err != nil {
+		return off, &nestedError{"Class", err}
+	}
+	if newOff, err = skipUint32(msg, newOff); err != nil {
+		return off, &nestedError{"TTL", err}
+	}
 	length, newOff, err := unpackUint16(msg, newOff)
-	if err != nil ***REMOVED***
-		return off, &nestedError***REMOVED***"Length", err***REMOVED***
-	***REMOVED***
-	if newOff += int(length); newOff > len(msg) ***REMOVED***
+	if err != nil {
+		return off, &nestedError{"Length", err}
+	}
+	if newOff += int(length); newOff > len(msg) {
 		return off, errResourceLen
-	***REMOVED***
+	}
 	return newOff, nil
-***REMOVED***
+}
 
-func packUint16(msg []byte, field uint16) []byte ***REMOVED***
+func packUint16(msg []byte, field uint16) []byte {
 	return append(msg, byte(field>>8), byte(field))
-***REMOVED***
+}
 
-func unpackUint16(msg []byte, off int) (uint16, int, error) ***REMOVED***
-	if off+uint16Len > len(msg) ***REMOVED***
+func unpackUint16(msg []byte, off int) (uint16, int, error) {
+	if off+uint16Len > len(msg) {
 		return 0, off, errBaseLen
-	***REMOVED***
+	}
 	return uint16(msg[off])<<8 | uint16(msg[off+1]), off + uint16Len, nil
-***REMOVED***
+}
 
-func skipUint16(msg []byte, off int) (int, error) ***REMOVED***
-	if off+uint16Len > len(msg) ***REMOVED***
+func skipUint16(msg []byte, off int) (int, error) {
+	if off+uint16Len > len(msg) {
 		return off, errBaseLen
-	***REMOVED***
+	}
 	return off + uint16Len, nil
-***REMOVED***
+}
 
-func packType(msg []byte, field Type) []byte ***REMOVED***
+func packType(msg []byte, field Type) []byte {
 	return packUint16(msg, uint16(field))
-***REMOVED***
+}
 
-func unpackType(msg []byte, off int) (Type, int, error) ***REMOVED***
+func unpackType(msg []byte, off int) (Type, int, error) {
 	t, o, err := unpackUint16(msg, off)
 	return Type(t), o, err
-***REMOVED***
+}
 
-func skipType(msg []byte, off int) (int, error) ***REMOVED***
+func skipType(msg []byte, off int) (int, error) {
 	return skipUint16(msg, off)
-***REMOVED***
+}
 
-func packClass(msg []byte, field Class) []byte ***REMOVED***
+func packClass(msg []byte, field Class) []byte {
 	return packUint16(msg, uint16(field))
-***REMOVED***
+}
 
-func unpackClass(msg []byte, off int) (Class, int, error) ***REMOVED***
+func unpackClass(msg []byte, off int) (Class, int, error) {
 	c, o, err := unpackUint16(msg, off)
 	return Class(c), o, err
-***REMOVED***
+}
 
-func skipClass(msg []byte, off int) (int, error) ***REMOVED***
+func skipClass(msg []byte, off int) (int, error) {
 	return skipUint16(msg, off)
-***REMOVED***
+}
 
-func packUint32(msg []byte, field uint32) []byte ***REMOVED***
+func packUint32(msg []byte, field uint32) []byte {
 	return append(
 		msg,
 		byte(field>>24),
@@ -1369,102 +1369,102 @@ func packUint32(msg []byte, field uint32) []byte ***REMOVED***
 		byte(field>>8),
 		byte(field),
 	)
-***REMOVED***
+}
 
-func unpackUint32(msg []byte, off int) (uint32, int, error) ***REMOVED***
-	if off+uint32Len > len(msg) ***REMOVED***
+func unpackUint32(msg []byte, off int) (uint32, int, error) {
+	if off+uint32Len > len(msg) {
 		return 0, off, errBaseLen
-	***REMOVED***
+	}
 	v := uint32(msg[off])<<24 | uint32(msg[off+1])<<16 | uint32(msg[off+2])<<8 | uint32(msg[off+3])
 	return v, off + uint32Len, nil
-***REMOVED***
+}
 
-func skipUint32(msg []byte, off int) (int, error) ***REMOVED***
-	if off+uint32Len > len(msg) ***REMOVED***
+func skipUint32(msg []byte, off int) (int, error) {
+	if off+uint32Len > len(msg) {
 		return off, errBaseLen
-	***REMOVED***
+	}
 	return off + uint32Len, nil
-***REMOVED***
+}
 
-func packText(msg []byte, field string) []byte ***REMOVED***
-	for len(field) > 0 ***REMOVED***
+func packText(msg []byte, field string) []byte {
+	for len(field) > 0 {
 		l := len(field)
-		if l > 255 ***REMOVED***
+		if l > 255 {
 			l = 255
-		***REMOVED***
+		}
 		msg = append(msg, byte(l))
 		msg = append(msg, field[:l]...)
 		field = field[l:]
-	***REMOVED***
+	}
 	return msg
-***REMOVED***
+}
 
-func unpackText(msg []byte, off int) (string, int, error) ***REMOVED***
-	if off >= len(msg) ***REMOVED***
+func unpackText(msg []byte, off int) (string, int, error) {
+	if off >= len(msg) {
 		return "", off, errBaseLen
-	***REMOVED***
+	}
 	beginOff := off + 1
 	endOff := beginOff + int(msg[off])
-	if endOff > len(msg) ***REMOVED***
+	if endOff > len(msg) {
 		return "", off, errCalcLen
-	***REMOVED***
+	}
 	return string(msg[beginOff:endOff]), endOff, nil
-***REMOVED***
+}
 
-func skipText(msg []byte, off int) (int, error) ***REMOVED***
-	if off >= len(msg) ***REMOVED***
+func skipText(msg []byte, off int) (int, error) {
+	if off >= len(msg) {
 		return off, errBaseLen
-	***REMOVED***
+	}
 	endOff := off + 1 + int(msg[off])
-	if endOff > len(msg) ***REMOVED***
+	if endOff > len(msg) {
 		return off, errCalcLen
-	***REMOVED***
+	}
 	return endOff, nil
-***REMOVED***
+}
 
-func packBytes(msg []byte, field []byte) []byte ***REMOVED***
+func packBytes(msg []byte, field []byte) []byte {
 	return append(msg, field...)
-***REMOVED***
+}
 
-func unpackBytes(msg []byte, off int, field []byte) (int, error) ***REMOVED***
+func unpackBytes(msg []byte, off int, field []byte) (int, error) {
 	newOff := off + len(field)
-	if newOff > len(msg) ***REMOVED***
+	if newOff > len(msg) {
 		return off, errBaseLen
-	***REMOVED***
+	}
 	copy(field, msg[off:newOff])
 	return newOff, nil
-***REMOVED***
+}
 
-func skipBytes(msg []byte, off int, field []byte) (int, error) ***REMOVED***
+func skipBytes(msg []byte, off int, field []byte) (int, error) {
 	newOff := off + len(field)
-	if newOff > len(msg) ***REMOVED***
+	if newOff > len(msg) {
 		return off, errBaseLen
-	***REMOVED***
+	}
 	return newOff, nil
-***REMOVED***
+}
 
 const nameLen = 255
 
 // A Name is a non-encoded domain name. It is used instead of strings to avoid
 // allocations.
-type Name struct ***REMOVED***
+type Name struct {
 	Data   [nameLen]byte
 	Length uint8
-***REMOVED***
+}
 
 // NewName creates a new Name from a string.
-func NewName(name string) (Name, error) ***REMOVED***
-	if len([]byte(name)) > nameLen ***REMOVED***
-		return Name***REMOVED******REMOVED***, errCalcLen
-	***REMOVED***
-	n := Name***REMOVED***Length: uint8(len(name))***REMOVED***
+func NewName(name string) (Name, error) {
+	if len([]byte(name)) > nameLen {
+		return Name{}, errCalcLen
+	}
+	n := Name{Length: uint8(len(name))}
 	copy(n.Data[:], []byte(name))
 	return n, nil
-***REMOVED***
+}
 
-func (n Name) String() string ***REMOVED***
+func (n Name) String() string {
 	return string(n.Data[:n.Length])
-***REMOVED***
+}
 
 // pack packs a domain name.
 //
@@ -1473,67 +1473,67 @@ func (n Name) String() string ***REMOVED***
 //
 // The compression map will be updated with new domain suffixes. If compression
 // is nil, compression will not be used.
-func (n *Name) pack(msg []byte, compression map[string]int) ([]byte, error) ***REMOVED***
+func (n *Name) pack(msg []byte, compression map[string]int) ([]byte, error) {
 	oldMsg := msg
 
 	// Add a trailing dot to canonicalize name.
-	if n.Length == 0 || n.Data[n.Length-1] != '.' ***REMOVED***
+	if n.Length == 0 || n.Data[n.Length-1] != '.' {
 		return oldMsg, errNonCanonicalName
-	***REMOVED***
+	}
 
 	// Allow root domain.
-	if n.Data[0] == '.' && n.Length == 1 ***REMOVED***
+	if n.Data[0] == '.' && n.Length == 1 {
 		return append(msg, 0), nil
-	***REMOVED***
+	}
 
 	// Emit sequence of counted strings, chopping at dots.
-	for i, begin := 0, 0; i < int(n.Length); i++ ***REMOVED***
+	for i, begin := 0, 0; i < int(n.Length); i++ {
 		// Check for the end of the segment.
-		if n.Data[i] == '.' ***REMOVED***
+		if n.Data[i] == '.' {
 			// The two most significant bits have special meaning.
 			// It isn't allowed for segments to be long enough to
 			// need them.
-			if i-begin >= 1<<6 ***REMOVED***
+			if i-begin >= 1<<6 {
 				return oldMsg, errSegTooLong
-			***REMOVED***
+			}
 
 			// Segments must have a non-zero length.
-			if i-begin == 0 ***REMOVED***
+			if i-begin == 0 {
 				return oldMsg, errZeroSegLen
-			***REMOVED***
+			}
 
 			msg = append(msg, byte(i-begin))
 
-			for j := begin; j < i; j++ ***REMOVED***
+			for j := begin; j < i; j++ {
 				msg = append(msg, n.Data[j])
-			***REMOVED***
+			}
 
 			begin = i + 1
 			continue
-		***REMOVED***
+		}
 
 		// We can only compress domain suffixes starting with a new
 		// segment. A pointer is two bytes with the two most significant
 		// bits set to 1 to indicate that it is a pointer.
-		if (i == 0 || n.Data[i-1] == '.') && compression != nil ***REMOVED***
-			if ptr, ok := compression[string(n.Data[i:])]; ok ***REMOVED***
+		if (i == 0 || n.Data[i-1] == '.') && compression != nil {
+			if ptr, ok := compression[string(n.Data[i:])]; ok {
 				// Hit. Emit a pointer instead of the rest of
 				// the domain.
 				return append(msg, byte(ptr>>8|0xC0), byte(ptr)), nil
-			***REMOVED***
+			}
 
 			// Miss. Add the suffix to the compression table if the
 			// offset can be stored in the available 14 bytes.
-			if len(msg) <= int(^uint16(0)>>2) ***REMOVED***
+			if len(msg) <= int(^uint16(0)>>2) {
 				compression[string(n.Data[i:])] = len(msg)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return append(msg, 0), nil
-***REMOVED***
+}
 
 // unpack unpacks a domain name.
-func (n *Name) unpack(msg []byte, off int) (int, error) ***REMOVED***
+func (n *Name) unpack(msg []byte, off int) (int, error) {
 	// currOff is the current working offset.
 	currOff := off
 
@@ -1549,81 +1549,81 @@ func (n *Name) unpack(msg []byte, off int) (int, error) ***REMOVED***
 	name := n.Data[:0]
 
 Loop:
-	for ***REMOVED***
-		if currOff >= len(msg) ***REMOVED***
+	for {
+		if currOff >= len(msg) {
 			return off, errBaseLen
-		***REMOVED***
+		}
 		c := int(msg[currOff])
 		currOff++
-		switch c & 0xC0 ***REMOVED***
+		switch c & 0xC0 {
 		case 0x00: // String segment
-			if c == 0x00 ***REMOVED***
+			if c == 0x00 {
 				// A zero length signals the end of the name.
 				break Loop
-			***REMOVED***
+			}
 			endOff := currOff + c
-			if endOff > len(msg) ***REMOVED***
+			if endOff > len(msg) {
 				return off, errCalcLen
-			***REMOVED***
+			}
 			name = append(name, msg[currOff:endOff]...)
 			name = append(name, '.')
 			currOff = endOff
 		case 0xC0: // Pointer
-			if currOff >= len(msg) ***REMOVED***
+			if currOff >= len(msg) {
 				return off, errInvalidPtr
-			***REMOVED***
+			}
 			c1 := msg[currOff]
 			currOff++
-			if ptr == 0 ***REMOVED***
+			if ptr == 0 {
 				newOff = currOff
-			***REMOVED***
+			}
 			// Don't follow too many pointers, maybe there's a loop.
-			if ptr++; ptr > 10 ***REMOVED***
+			if ptr++; ptr > 10 {
 				return off, errTooManyPtr
-			***REMOVED***
+			}
 			currOff = (c^0xC0)<<8 | int(c1)
 		default:
 			// Prefixes 0x80 and 0x40 are reserved.
 			return off, errReserved
-		***REMOVED***
-	***REMOVED***
-	if len(name) == 0 ***REMOVED***
+		}
+	}
+	if len(name) == 0 {
 		name = append(name, '.')
-	***REMOVED***
-	if len(name) > len(n.Data) ***REMOVED***
+	}
+	if len(name) > len(n.Data) {
 		return off, errCalcLen
-	***REMOVED***
+	}
 	n.Length = uint8(len(name))
-	if ptr == 0 ***REMOVED***
+	if ptr == 0 {
 		newOff = currOff
-	***REMOVED***
+	}
 	return newOff, nil
-***REMOVED***
+}
 
-func skipName(msg []byte, off int) (int, error) ***REMOVED***
+func skipName(msg []byte, off int) (int, error) {
 	// newOff is the offset where the next record will start. Pointers lead
 	// to data that belongs to other names and thus doesn't count towards to
 	// the usage of this name.
 	newOff := off
 
 Loop:
-	for ***REMOVED***
-		if newOff >= len(msg) ***REMOVED***
+	for {
+		if newOff >= len(msg) {
 			return off, errBaseLen
-		***REMOVED***
+		}
 		c := int(msg[newOff])
 		newOff++
-		switch c & 0xC0 ***REMOVED***
+		switch c & 0xC0 {
 		case 0x00:
-			if c == 0x00 ***REMOVED***
+			if c == 0x00 {
 				// A zero length signals the end of the name.
 				break Loop
-			***REMOVED***
+			}
 			// literal string
 			newOff += c
-			if newOff > len(msg) ***REMOVED***
+			if newOff > len(msg) {
 				return off, errCalcLen
-			***REMOVED***
+			}
 		case 0xC0:
 			// Pointer to somewhere else in msg.
 
@@ -1635,35 +1635,35 @@ Loop:
 		default:
 			// Prefixes 0x80 and 0x40 are reserved.
 			return off, errReserved
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return newOff, nil
-***REMOVED***
+}
 
 // A Question is a DNS query.
-type Question struct ***REMOVED***
+type Question struct {
 	Name  Name
 	Type  Type
 	Class Class
-***REMOVED***
+}
 
-func (q *Question) pack(msg []byte, compression map[string]int) ([]byte, error) ***REMOVED***
+func (q *Question) pack(msg []byte, compression map[string]int) ([]byte, error) {
 	msg, err := q.Name.pack(msg, compression)
-	if err != nil ***REMOVED***
-		return msg, &nestedError***REMOVED***"Name", err***REMOVED***
-	***REMOVED***
+	if err != nil {
+		return msg, &nestedError{"Name", err}
+	}
 	msg = packType(msg, q.Type)
 	return packClass(msg, q.Class), nil
-***REMOVED***
+}
 
-func unpackResourceBody(msg []byte, off int, hdr ResourceHeader) (ResourceBody, int, error) ***REMOVED***
+func unpackResourceBody(msg []byte, off int, hdr ResourceHeader) (ResourceBody, int, error) {
 	var (
 		r    ResourceBody
 		err  error
 		name string
 	)
-	switch hdr.Type ***REMOVED***
+	switch hdr.Type {
 	case TypeA:
 		var rb AResource
 		rb, err = unpackAResource(msg, off)
@@ -1709,113 +1709,113 @@ func unpackResourceBody(msg []byte, off int, hdr ResourceHeader) (ResourceBody, 
 		rb, err = unpackSRVResource(msg, off)
 		r = &rb
 		name = "SRV"
-	***REMOVED***
-	if err != nil ***REMOVED***
-		return nil, off, &nestedError***REMOVED***name + " record", err***REMOVED***
-	***REMOVED***
-	if r == nil ***REMOVED***
+	}
+	if err != nil {
+		return nil, off, &nestedError{name + " record", err}
+	}
+	if r == nil {
 		return nil, off, errors.New("invalid resource type: " + string(hdr.Type+'0'))
-	***REMOVED***
+	}
 	return r, off + int(hdr.Length), nil
-***REMOVED***
+}
 
 // A CNAMEResource is a CNAME Resource record.
-type CNAMEResource struct ***REMOVED***
+type CNAMEResource struct {
 	CNAME Name
-***REMOVED***
+}
 
-func (r *CNAMEResource) realType() Type ***REMOVED***
+func (r *CNAMEResource) realType() Type {
 	return TypeCNAME
-***REMOVED***
+}
 
-func (r *CNAMEResource) pack(msg []byte, compression map[string]int) ([]byte, error) ***REMOVED***
+func (r *CNAMEResource) pack(msg []byte, compression map[string]int) ([]byte, error) {
 	return r.CNAME.pack(msg, compression)
-***REMOVED***
+}
 
-func unpackCNAMEResource(msg []byte, off int) (CNAMEResource, error) ***REMOVED***
+func unpackCNAMEResource(msg []byte, off int) (CNAMEResource, error) {
 	var cname Name
-	if _, err := cname.unpack(msg, off); err != nil ***REMOVED***
-		return CNAMEResource***REMOVED******REMOVED***, err
-	***REMOVED***
-	return CNAMEResource***REMOVED***cname***REMOVED***, nil
-***REMOVED***
+	if _, err := cname.unpack(msg, off); err != nil {
+		return CNAMEResource{}, err
+	}
+	return CNAMEResource{cname}, nil
+}
 
 // An MXResource is an MX Resource record.
-type MXResource struct ***REMOVED***
+type MXResource struct {
 	Pref uint16
 	MX   Name
-***REMOVED***
+}
 
-func (r *MXResource) realType() Type ***REMOVED***
+func (r *MXResource) realType() Type {
 	return TypeMX
-***REMOVED***
+}
 
-func (r *MXResource) pack(msg []byte, compression map[string]int) ([]byte, error) ***REMOVED***
+func (r *MXResource) pack(msg []byte, compression map[string]int) ([]byte, error) {
 	oldMsg := msg
 	msg = packUint16(msg, r.Pref)
 	msg, err := r.MX.pack(msg, compression)
-	if err != nil ***REMOVED***
-		return oldMsg, &nestedError***REMOVED***"MXResource.MX", err***REMOVED***
-	***REMOVED***
+	if err != nil {
+		return oldMsg, &nestedError{"MXResource.MX", err}
+	}
 	return msg, nil
-***REMOVED***
+}
 
-func unpackMXResource(msg []byte, off int) (MXResource, error) ***REMOVED***
+func unpackMXResource(msg []byte, off int) (MXResource, error) {
 	pref, off, err := unpackUint16(msg, off)
-	if err != nil ***REMOVED***
-		return MXResource***REMOVED******REMOVED***, &nestedError***REMOVED***"Pref", err***REMOVED***
-	***REMOVED***
+	if err != nil {
+		return MXResource{}, &nestedError{"Pref", err}
+	}
 	var mx Name
-	if _, err := mx.unpack(msg, off); err != nil ***REMOVED***
-		return MXResource***REMOVED******REMOVED***, &nestedError***REMOVED***"MX", err***REMOVED***
-	***REMOVED***
-	return MXResource***REMOVED***pref, mx***REMOVED***, nil
-***REMOVED***
+	if _, err := mx.unpack(msg, off); err != nil {
+		return MXResource{}, &nestedError{"MX", err}
+	}
+	return MXResource{pref, mx}, nil
+}
 
 // An NSResource is an NS Resource record.
-type NSResource struct ***REMOVED***
+type NSResource struct {
 	NS Name
-***REMOVED***
+}
 
-func (r *NSResource) realType() Type ***REMOVED***
+func (r *NSResource) realType() Type {
 	return TypeNS
-***REMOVED***
+}
 
-func (r *NSResource) pack(msg []byte, compression map[string]int) ([]byte, error) ***REMOVED***
+func (r *NSResource) pack(msg []byte, compression map[string]int) ([]byte, error) {
 	return r.NS.pack(msg, compression)
-***REMOVED***
+}
 
-func unpackNSResource(msg []byte, off int) (NSResource, error) ***REMOVED***
+func unpackNSResource(msg []byte, off int) (NSResource, error) {
 	var ns Name
-	if _, err := ns.unpack(msg, off); err != nil ***REMOVED***
-		return NSResource***REMOVED******REMOVED***, err
-	***REMOVED***
-	return NSResource***REMOVED***ns***REMOVED***, nil
-***REMOVED***
+	if _, err := ns.unpack(msg, off); err != nil {
+		return NSResource{}, err
+	}
+	return NSResource{ns}, nil
+}
 
 // A PTRResource is a PTR Resource record.
-type PTRResource struct ***REMOVED***
+type PTRResource struct {
 	PTR Name
-***REMOVED***
+}
 
-func (r *PTRResource) realType() Type ***REMOVED***
+func (r *PTRResource) realType() Type {
 	return TypePTR
-***REMOVED***
+}
 
-func (r *PTRResource) pack(msg []byte, compression map[string]int) ([]byte, error) ***REMOVED***
+func (r *PTRResource) pack(msg []byte, compression map[string]int) ([]byte, error) {
 	return r.PTR.pack(msg, compression)
-***REMOVED***
+}
 
-func unpackPTRResource(msg []byte, off int) (PTRResource, error) ***REMOVED***
+func unpackPTRResource(msg []byte, off int) (PTRResource, error) {
 	var ptr Name
-	if _, err := ptr.unpack(msg, off); err != nil ***REMOVED***
-		return PTRResource***REMOVED******REMOVED***, err
-	***REMOVED***
-	return PTRResource***REMOVED***ptr***REMOVED***, nil
-***REMOVED***
+	if _, err := ptr.unpack(msg, off); err != nil {
+		return PTRResource{}, err
+	}
+	return PTRResource{ptr}, nil
+}
 
 // An SOAResource is an SOA Resource record.
-type SOAResource struct ***REMOVED***
+type SOAResource struct {
 	NS      Name
 	MBox    Name
 	Serial  uint32
@@ -1827,175 +1827,175 @@ type SOAResource struct ***REMOVED***
 	// contain a TTL value and the TTL of negative responses. (RFC 2308
 	// Section 4)
 	MinTTL uint32
-***REMOVED***
+}
 
-func (r *SOAResource) realType() Type ***REMOVED***
+func (r *SOAResource) realType() Type {
 	return TypeSOA
-***REMOVED***
+}
 
-func (r *SOAResource) pack(msg []byte, compression map[string]int) ([]byte, error) ***REMOVED***
+func (r *SOAResource) pack(msg []byte, compression map[string]int) ([]byte, error) {
 	oldMsg := msg
 	msg, err := r.NS.pack(msg, compression)
-	if err != nil ***REMOVED***
-		return oldMsg, &nestedError***REMOVED***"SOAResource.NS", err***REMOVED***
-	***REMOVED***
+	if err != nil {
+		return oldMsg, &nestedError{"SOAResource.NS", err}
+	}
 	msg, err = r.MBox.pack(msg, compression)
-	if err != nil ***REMOVED***
-		return oldMsg, &nestedError***REMOVED***"SOAResource.MBox", err***REMOVED***
-	***REMOVED***
+	if err != nil {
+		return oldMsg, &nestedError{"SOAResource.MBox", err}
+	}
 	msg = packUint32(msg, r.Serial)
 	msg = packUint32(msg, r.Refresh)
 	msg = packUint32(msg, r.Retry)
 	msg = packUint32(msg, r.Expire)
 	return packUint32(msg, r.MinTTL), nil
-***REMOVED***
+}
 
-func unpackSOAResource(msg []byte, off int) (SOAResource, error) ***REMOVED***
+func unpackSOAResource(msg []byte, off int) (SOAResource, error) {
 	var ns Name
 	off, err := ns.unpack(msg, off)
-	if err != nil ***REMOVED***
-		return SOAResource***REMOVED******REMOVED***, &nestedError***REMOVED***"NS", err***REMOVED***
-	***REMOVED***
+	if err != nil {
+		return SOAResource{}, &nestedError{"NS", err}
+	}
 	var mbox Name
-	if off, err = mbox.unpack(msg, off); err != nil ***REMOVED***
-		return SOAResource***REMOVED******REMOVED***, &nestedError***REMOVED***"MBox", err***REMOVED***
-	***REMOVED***
+	if off, err = mbox.unpack(msg, off); err != nil {
+		return SOAResource{}, &nestedError{"MBox", err}
+	}
 	serial, off, err := unpackUint32(msg, off)
-	if err != nil ***REMOVED***
-		return SOAResource***REMOVED******REMOVED***, &nestedError***REMOVED***"Serial", err***REMOVED***
-	***REMOVED***
+	if err != nil {
+		return SOAResource{}, &nestedError{"Serial", err}
+	}
 	refresh, off, err := unpackUint32(msg, off)
-	if err != nil ***REMOVED***
-		return SOAResource***REMOVED******REMOVED***, &nestedError***REMOVED***"Refresh", err***REMOVED***
-	***REMOVED***
+	if err != nil {
+		return SOAResource{}, &nestedError{"Refresh", err}
+	}
 	retry, off, err := unpackUint32(msg, off)
-	if err != nil ***REMOVED***
-		return SOAResource***REMOVED******REMOVED***, &nestedError***REMOVED***"Retry", err***REMOVED***
-	***REMOVED***
+	if err != nil {
+		return SOAResource{}, &nestedError{"Retry", err}
+	}
 	expire, off, err := unpackUint32(msg, off)
-	if err != nil ***REMOVED***
-		return SOAResource***REMOVED******REMOVED***, &nestedError***REMOVED***"Expire", err***REMOVED***
-	***REMOVED***
+	if err != nil {
+		return SOAResource{}, &nestedError{"Expire", err}
+	}
 	minTTL, _, err := unpackUint32(msg, off)
-	if err != nil ***REMOVED***
-		return SOAResource***REMOVED******REMOVED***, &nestedError***REMOVED***"MinTTL", err***REMOVED***
-	***REMOVED***
-	return SOAResource***REMOVED***ns, mbox, serial, refresh, retry, expire, minTTL***REMOVED***, nil
-***REMOVED***
+	if err != nil {
+		return SOAResource{}, &nestedError{"MinTTL", err}
+	}
+	return SOAResource{ns, mbox, serial, refresh, retry, expire, minTTL}, nil
+}
 
 // A TXTResource is a TXT Resource record.
-type TXTResource struct ***REMOVED***
+type TXTResource struct {
 	Txt string // Not a domain name.
-***REMOVED***
+}
 
-func (r *TXTResource) realType() Type ***REMOVED***
+func (r *TXTResource) realType() Type {
 	return TypeTXT
-***REMOVED***
+}
 
-func (r *TXTResource) pack(msg []byte, compression map[string]int) ([]byte, error) ***REMOVED***
+func (r *TXTResource) pack(msg []byte, compression map[string]int) ([]byte, error) {
 	return packText(msg, r.Txt), nil
-***REMOVED***
+}
 
-func unpackTXTResource(msg []byte, off int, length uint16) (TXTResource, error) ***REMOVED***
+func unpackTXTResource(msg []byte, off int, length uint16) (TXTResource, error) {
 	var txt string
-	for n := uint16(0); n < length; ***REMOVED***
+	for n := uint16(0); n < length; {
 		var t string
 		var err error
-		if t, off, err = unpackText(msg, off); err != nil ***REMOVED***
-			return TXTResource***REMOVED******REMOVED***, &nestedError***REMOVED***"text", err***REMOVED***
-		***REMOVED***
+		if t, off, err = unpackText(msg, off); err != nil {
+			return TXTResource{}, &nestedError{"text", err}
+		}
 		// Check if we got too many bytes.
-		if length-n < uint16(len(t))+1 ***REMOVED***
-			return TXTResource***REMOVED******REMOVED***, errCalcLen
-		***REMOVED***
+		if length-n < uint16(len(t))+1 {
+			return TXTResource{}, errCalcLen
+		}
 		n += uint16(len(t)) + 1
 		txt += t
-	***REMOVED***
-	return TXTResource***REMOVED***txt***REMOVED***, nil
-***REMOVED***
+	}
+	return TXTResource{txt}, nil
+}
 
 // An SRVResource is an SRV Resource record.
-type SRVResource struct ***REMOVED***
+type SRVResource struct {
 	Priority uint16
 	Weight   uint16
 	Port     uint16
 	Target   Name // Not compressed as per RFC 2782.
-***REMOVED***
+}
 
-func (r *SRVResource) realType() Type ***REMOVED***
+func (r *SRVResource) realType() Type {
 	return TypeSRV
-***REMOVED***
+}
 
-func (r *SRVResource) pack(msg []byte, compression map[string]int) ([]byte, error) ***REMOVED***
+func (r *SRVResource) pack(msg []byte, compression map[string]int) ([]byte, error) {
 	oldMsg := msg
 	msg = packUint16(msg, r.Priority)
 	msg = packUint16(msg, r.Weight)
 	msg = packUint16(msg, r.Port)
 	msg, err := r.Target.pack(msg, nil)
-	if err != nil ***REMOVED***
-		return oldMsg, &nestedError***REMOVED***"SRVResource.Target", err***REMOVED***
-	***REMOVED***
+	if err != nil {
+		return oldMsg, &nestedError{"SRVResource.Target", err}
+	}
 	return msg, nil
-***REMOVED***
+}
 
-func unpackSRVResource(msg []byte, off int) (SRVResource, error) ***REMOVED***
+func unpackSRVResource(msg []byte, off int) (SRVResource, error) {
 	priority, off, err := unpackUint16(msg, off)
-	if err != nil ***REMOVED***
-		return SRVResource***REMOVED******REMOVED***, &nestedError***REMOVED***"Priority", err***REMOVED***
-	***REMOVED***
+	if err != nil {
+		return SRVResource{}, &nestedError{"Priority", err}
+	}
 	weight, off, err := unpackUint16(msg, off)
-	if err != nil ***REMOVED***
-		return SRVResource***REMOVED******REMOVED***, &nestedError***REMOVED***"Weight", err***REMOVED***
-	***REMOVED***
+	if err != nil {
+		return SRVResource{}, &nestedError{"Weight", err}
+	}
 	port, off, err := unpackUint16(msg, off)
-	if err != nil ***REMOVED***
-		return SRVResource***REMOVED******REMOVED***, &nestedError***REMOVED***"Port", err***REMOVED***
-	***REMOVED***
+	if err != nil {
+		return SRVResource{}, &nestedError{"Port", err}
+	}
 	var target Name
-	if _, err := target.unpack(msg, off); err != nil ***REMOVED***
-		return SRVResource***REMOVED******REMOVED***, &nestedError***REMOVED***"Target", err***REMOVED***
-	***REMOVED***
-	return SRVResource***REMOVED***priority, weight, port, target***REMOVED***, nil
-***REMOVED***
+	if _, err := target.unpack(msg, off); err != nil {
+		return SRVResource{}, &nestedError{"Target", err}
+	}
+	return SRVResource{priority, weight, port, target}, nil
+}
 
 // An AResource is an A Resource record.
-type AResource struct ***REMOVED***
+type AResource struct {
 	A [4]byte
-***REMOVED***
+}
 
-func (r *AResource) realType() Type ***REMOVED***
+func (r *AResource) realType() Type {
 	return TypeA
-***REMOVED***
+}
 
-func (r *AResource) pack(msg []byte, compression map[string]int) ([]byte, error) ***REMOVED***
+func (r *AResource) pack(msg []byte, compression map[string]int) ([]byte, error) {
 	return packBytes(msg, r.A[:]), nil
-***REMOVED***
+}
 
-func unpackAResource(msg []byte, off int) (AResource, error) ***REMOVED***
+func unpackAResource(msg []byte, off int) (AResource, error) {
 	var a [4]byte
-	if _, err := unpackBytes(msg, off, a[:]); err != nil ***REMOVED***
-		return AResource***REMOVED******REMOVED***, err
-	***REMOVED***
-	return AResource***REMOVED***a***REMOVED***, nil
-***REMOVED***
+	if _, err := unpackBytes(msg, off, a[:]); err != nil {
+		return AResource{}, err
+	}
+	return AResource{a}, nil
+}
 
 // An AAAAResource is an AAAA Resource record.
-type AAAAResource struct ***REMOVED***
+type AAAAResource struct {
 	AAAA [16]byte
-***REMOVED***
+}
 
-func (r *AAAAResource) realType() Type ***REMOVED***
+func (r *AAAAResource) realType() Type {
 	return TypeAAAA
-***REMOVED***
+}
 
-func (r *AAAAResource) pack(msg []byte, compression map[string]int) ([]byte, error) ***REMOVED***
+func (r *AAAAResource) pack(msg []byte, compression map[string]int) ([]byte, error) {
 	return packBytes(msg, r.AAAA[:]), nil
-***REMOVED***
+}
 
-func unpackAAAAResource(msg []byte, off int) (AAAAResource, error) ***REMOVED***
+func unpackAAAAResource(msg []byte, off int) (AAAAResource, error) {
 	var aaaa [16]byte
-	if _, err := unpackBytes(msg, off, aaaa[:]); err != nil ***REMOVED***
-		return AAAAResource***REMOVED******REMOVED***, err
-	***REMOVED***
-	return AAAAResource***REMOVED***aaaa***REMOVED***, nil
-***REMOVED***
+	if _, err := unpackBytes(msg, off, aaaa[:]); err != nil {
+		return AAAAResource{}, err
+	}
+	return AAAAResource{aaaa}, nil
+}

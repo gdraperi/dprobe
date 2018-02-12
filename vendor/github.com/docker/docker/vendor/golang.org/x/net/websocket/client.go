@@ -13,94 +13,94 @@ import (
 )
 
 // DialError is an error that occurs while dialling a websocket server.
-type DialError struct ***REMOVED***
+type DialError struct {
 	*Config
 	Err error
-***REMOVED***
+}
 
-func (e *DialError) Error() string ***REMOVED***
+func (e *DialError) Error() string {
 	return "websocket.Dial " + e.Config.Location.String() + ": " + e.Err.Error()
-***REMOVED***
+}
 
 // NewConfig creates a new WebSocket config for client connection.
-func NewConfig(server, origin string) (config *Config, err error) ***REMOVED***
+func NewConfig(server, origin string) (config *Config, err error) {
 	config = new(Config)
 	config.Version = ProtocolVersionHybi13
 	config.Location, err = url.ParseRequestURI(server)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	config.Origin, err = url.ParseRequestURI(origin)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	config.Header = http.Header(make(map[string][]string))
 	return
-***REMOVED***
+}
 
 // NewClient creates a new WebSocket client connection over rwc.
-func NewClient(config *Config, rwc io.ReadWriteCloser) (ws *Conn, err error) ***REMOVED***
+func NewClient(config *Config, rwc io.ReadWriteCloser) (ws *Conn, err error) {
 	br := bufio.NewReader(rwc)
 	bw := bufio.NewWriter(rwc)
 	err = hybiClientHandshake(config, br, bw)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	buf := bufio.NewReadWriter(br, bw)
 	ws = newHybiClientConn(config, buf, rwc)
 	return
-***REMOVED***
+}
 
 // Dial opens a new client connection to a WebSocket.
-func Dial(url_, protocol, origin string) (ws *Conn, err error) ***REMOVED***
+func Dial(url_, protocol, origin string) (ws *Conn, err error) {
 	config, err := NewConfig(url_, origin)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if protocol != "" ***REMOVED***
-		config.Protocol = []string***REMOVED***protocol***REMOVED***
-	***REMOVED***
+	}
+	if protocol != "" {
+		config.Protocol = []string{protocol}
+	}
 	return DialConfig(config)
-***REMOVED***
+}
 
-var portMap = map[string]string***REMOVED***
+var portMap = map[string]string{
 	"ws":  "80",
 	"wss": "443",
-***REMOVED***
+}
 
-func parseAuthority(location *url.URL) string ***REMOVED***
-	if _, ok := portMap[location.Scheme]; ok ***REMOVED***
-		if _, _, err := net.SplitHostPort(location.Host); err != nil ***REMOVED***
+func parseAuthority(location *url.URL) string {
+	if _, ok := portMap[location.Scheme]; ok {
+		if _, _, err := net.SplitHostPort(location.Host); err != nil {
 			return net.JoinHostPort(location.Host, portMap[location.Scheme])
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return location.Host
-***REMOVED***
+}
 
 // DialConfig opens a new client connection to a WebSocket with a config.
-func DialConfig(config *Config) (ws *Conn, err error) ***REMOVED***
+func DialConfig(config *Config) (ws *Conn, err error) {
 	var client net.Conn
-	if config.Location == nil ***REMOVED***
-		return nil, &DialError***REMOVED***config, ErrBadWebSocketLocation***REMOVED***
-	***REMOVED***
-	if config.Origin == nil ***REMOVED***
-		return nil, &DialError***REMOVED***config, ErrBadWebSocketOrigin***REMOVED***
-	***REMOVED***
+	if config.Location == nil {
+		return nil, &DialError{config, ErrBadWebSocketLocation}
+	}
+	if config.Origin == nil {
+		return nil, &DialError{config, ErrBadWebSocketOrigin}
+	}
 	dialer := config.Dialer
-	if dialer == nil ***REMOVED***
-		dialer = &net.Dialer***REMOVED******REMOVED***
-	***REMOVED***
+	if dialer == nil {
+		dialer = &net.Dialer{}
+	}
 	client, err = dialWithDialer(dialer, config)
-	if err != nil ***REMOVED***
+	if err != nil {
 		goto Error
-	***REMOVED***
+	}
 	ws, err = NewClient(config, client)
-	if err != nil ***REMOVED***
+	if err != nil {
 		client.Close()
 		goto Error
-	***REMOVED***
+	}
 	return
 
 Error:
-	return nil, &DialError***REMOVED***config, err***REMOVED***
-***REMOVED***
+	return nil, &DialError{config, err}
+}

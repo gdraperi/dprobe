@@ -21,7 +21,7 @@ import (
 // be gone we can just retry the remove operation.
 //
 // This should not return a `os.ErrNotExist` kind of error under any circumstances
-func EnsureRemoveAll(dir string) error ***REMOVED***
+func EnsureRemoveAll(dir string) error {
 	notExistErr := make(map[string]bool)
 
 	// track retries
@@ -31,21 +31,21 @@ func EnsureRemoveAll(dir string) error ***REMOVED***
 	// Attempt to unmount anything beneath this dir first
 	mount.RecursiveUnmount(dir)
 
-	for ***REMOVED***
+	for {
 		err := os.RemoveAll(dir)
-		if err == nil ***REMOVED***
+		if err == nil {
 			return err
-		***REMOVED***
+		}
 
 		pe, ok := err.(*os.PathError)
-		if !ok ***REMOVED***
+		if !ok {
 			return err
-		***REMOVED***
+		}
 
-		if os.IsNotExist(err) ***REMOVED***
-			if notExistErr[pe.Path] ***REMOVED***
+		if os.IsNotExist(err) {
+			if notExistErr[pe.Path] {
 				return err
-			***REMOVED***
+			}
 			notExistErr[pe.Path] = true
 
 			// There is a race where some subdir can be removed but after the parent
@@ -53,28 +53,28 @@ func EnsureRemoveAll(dir string) error ***REMOVED***
 			// So the path could be from `os.Remove(subdir)`
 			// If the reported non-existent path is not the passed in `dir` we
 			// should just retry, but otherwise return with no error.
-			if pe.Path == dir ***REMOVED***
+			if pe.Path == dir {
 				return nil
-			***REMOVED***
+			}
 			continue
-		***REMOVED***
+		}
 
-		if pe.Err != syscall.EBUSY ***REMOVED***
+		if pe.Err != syscall.EBUSY {
 			return err
-		***REMOVED***
+		}
 
-		if mounted, _ := mount.Mounted(pe.Path); mounted ***REMOVED***
-			if e := mount.Unmount(pe.Path); e != nil ***REMOVED***
-				if mounted, _ := mount.Mounted(pe.Path); mounted ***REMOVED***
+		if mounted, _ := mount.Mounted(pe.Path); mounted {
+			if e := mount.Unmount(pe.Path); e != nil {
+				if mounted, _ := mount.Mounted(pe.Path); mounted {
 					return errors.Wrapf(e, "error while removing %s", dir)
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
+				}
+			}
+		}
 
-		if exitOnErr[pe.Path] == maxRetry ***REMOVED***
+		if exitOnErr[pe.Path] == maxRetry {
 			return err
-		***REMOVED***
+		}
 		exitOnErr[pe.Path]++
 		time.Sleep(100 * time.Millisecond)
-	***REMOVED***
-***REMOVED***
+	}
+}

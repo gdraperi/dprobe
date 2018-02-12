@@ -12,39 +12,39 @@ import (
 // http://man7.org/linux/man-pages/man5/resolv.conf.5.html
 // `nameserver`, `search`, `options` have been supported.
 // TODO: `domain` is not supported yet.
-type DNSConfig struct ***REMOVED***
+type DNSConfig struct {
 	// Nameservers specifies the IP addresses of the name servers
 	Nameservers []string `json:",omitempty"`
 	// Search specifies the search list for host-name lookup
 	Search []string `json:",omitempty"`
 	// Options allows certain internal resolver variables to be modified
 	Options []string `json:",omitempty"`
-***REMOVED***
+}
 
 // SELinuxContext contains the SELinux labels of the container.
-type SELinuxContext struct ***REMOVED***
+type SELinuxContext struct {
 	Disable bool
 
 	User  string
 	Role  string
 	Type  string
 	Level string
-***REMOVED***
+}
 
 // CredentialSpec for managed service account (Windows only)
-type CredentialSpec struct ***REMOVED***
+type CredentialSpec struct {
 	File     string
 	Registry string
-***REMOVED***
+}
 
 // Privileges defines the security options for the container.
-type Privileges struct ***REMOVED***
+type Privileges struct {
 	CredentialSpec *CredentialSpec
 	SELinuxContext *SELinuxContext
-***REMOVED***
+}
 
 // ContainerSpec represents the spec of a container.
-type ContainerSpec struct ***REMOVED***
+type ContainerSpec struct {
 	Image           string                  `json:",omitempty"`
 	Labels          map[string]string       `json:",omitempty"`
 	Command         []string                `json:",omitempty"`
@@ -70,4 +70,4 @@ type ContainerSpec struct ***REMOVED***
 	Secrets   []*SecretReference  `json:",omitempty"`
 	Configs   []*ConfigReference  `json:",omitempty"`
 	Isolation container.Isolation `json:",omitempty"`
-***REMOVED***
+}

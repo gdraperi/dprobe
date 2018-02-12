@@ -31,7 +31,7 @@ var (
 )
 
 // Network context information which is used throughout the network allocation code.
-type networkContext struct ***REMOVED***
+type networkContext struct {
 	ingressNetwork *api.Network
 	// Instance of the low-level network allocator which performs
 	// the actual network allocation.
@@ -65,237 +65,237 @@ type networkContext struct ***REMOVED***
 	// allocations (in we are experiencing IP exhaustion and an IP was
 	// released).
 	somethingWasDeallocated bool
-***REMOVED***
+}
 
-func (a *Allocator) doNetworkInit(ctx context.Context) (err error) ***REMOVED***
+func (a *Allocator) doNetworkInit(ctx context.Context) (err error) {
 	na, err := cnmallocator.New(a.pluginGetter)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	nc := &networkContext***REMOVED***
+	nc := &networkContext{
 		nwkAllocator:        na,
 		pendingTasks:        make(map[string]*api.Task),
 		unallocatedTasks:    make(map[string]*api.Task),
 		unallocatedServices: make(map[string]*api.Service),
 		unallocatedNetworks: make(map[string]*api.Network),
 		lastRetry:           time.Now(),
-	***REMOVED***
+	}
 	a.netCtx = nc
-	defer func() ***REMOVED***
+	defer func() {
 		// Clear a.netCtx if initialization was unsuccessful.
-		if err != nil ***REMOVED***
+		if err != nil {
 			a.netCtx = nil
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
 	// Ingress network is now created at cluster's first time creation.
 	// Check if we have the ingress network. If found, make sure it is
 	// allocated, before reading all network objects for allocation.
 	// If not found, it means it was removed by user, nothing to do here.
 	ingressNetwork, err := GetIngressNetwork(a.store)
-	switch err ***REMOVED***
+	switch err {
 	case nil:
 		// Try to complete ingress network allocation before anything else so
 		// that the we can get the preferred subnet for ingress network.
 		nc.ingressNetwork = ingressNetwork
-		if !na.IsAllocated(nc.ingressNetwork) ***REMOVED***
-			if err := a.allocateNetwork(ctx, nc.ingressNetwork); err != nil ***REMOVED***
+		if !na.IsAllocated(nc.ingressNetwork) {
+			if err := a.allocateNetwork(ctx, nc.ingressNetwork); err != nil {
 				log.G(ctx).WithError(err).Error("failed allocating ingress network during init")
-			***REMOVED*** else if err := a.store.Batch(func(batch *store.Batch) error ***REMOVED***
-				if err := a.commitAllocatedNetwork(ctx, batch, nc.ingressNetwork); err != nil ***REMOVED***
+			} else if err := a.store.Batch(func(batch *store.Batch) error {
+				if err := a.commitAllocatedNetwork(ctx, batch, nc.ingressNetwork); err != nil {
 					log.G(ctx).WithError(err).Error("failed committing allocation of ingress network during init")
-				***REMOVED***
+				}
 				return nil
-			***REMOVED***); err != nil ***REMOVED***
+			}); err != nil {
 				log.G(ctx).WithError(err).Error("failed committing allocation of ingress network during init")
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 	case ErrNoIngress:
 		// Ingress network is not present in store, It means user removed it
 		// and did not create a new one.
 	default:
 		return errors.Wrap(err, "failure while looking for ingress network during init")
-	***REMOVED***
+	}
 
 	// Allocate networks in the store so far before we started
 	// watching.
 	var networks []*api.Network
-	a.store.View(func(tx store.ReadTx) ***REMOVED***
+	a.store.View(func(tx store.ReadTx) {
 		networks, err = store.FindNetworks(tx, store.All)
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		return errors.Wrap(err, "error listing all networks in store while trying to allocate during init")
-	***REMOVED***
+	}
 
 	var allocatedNetworks []*api.Network
-	for _, n := range networks ***REMOVED***
-		if na.IsAllocated(n) ***REMOVED***
+	for _, n := range networks {
+		if na.IsAllocated(n) {
 			continue
-		***REMOVED***
+		}
 
-		if err := a.allocateNetwork(ctx, n); err != nil ***REMOVED***
+		if err := a.allocateNetwork(ctx, n); err != nil {
 			log.G(ctx).WithError(err).Errorf("failed allocating network %s during init", n.ID)
 			continue
-		***REMOVED***
+		}
 		allocatedNetworks = append(allocatedNetworks, n)
-	***REMOVED***
+	}
 
-	if err := a.store.Batch(func(batch *store.Batch) error ***REMOVED***
-		for _, n := range allocatedNetworks ***REMOVED***
-			if err := a.commitAllocatedNetwork(ctx, batch, n); err != nil ***REMOVED***
+	if err := a.store.Batch(func(batch *store.Batch) error {
+		for _, n := range allocatedNetworks {
+			if err := a.commitAllocatedNetwork(ctx, batch, n); err != nil {
 				log.G(ctx).WithError(err).Errorf("failed committing allocation of network %s during init", n.ID)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		return nil
-	***REMOVED***); err != nil ***REMOVED***
+	}); err != nil {
 		log.G(ctx).WithError(err).Error("failed committing allocation of networks during init")
-	***REMOVED***
+	}
 
 	// First, allocate objects that already have addresses associated with
 	// them, to reserve these IP addresses in internal state.
-	if err := a.allocateNodes(ctx, true); err != nil ***REMOVED***
+	if err := a.allocateNodes(ctx, true); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if err := a.allocateServices(ctx, true); err != nil ***REMOVED***
+	if err := a.allocateServices(ctx, true); err != nil {
 		return err
-	***REMOVED***
-	if err := a.allocateTasks(ctx, true); err != nil ***REMOVED***
+	}
+	if err := a.allocateTasks(ctx, true); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if err := a.allocateNodes(ctx, false); err != nil ***REMOVED***
+	if err := a.allocateNodes(ctx, false); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if err := a.allocateServices(ctx, false); err != nil ***REMOVED***
+	if err := a.allocateServices(ctx, false); err != nil {
 		return err
-	***REMOVED***
+	}
 	return a.allocateTasks(ctx, false)
-***REMOVED***
+}
 
-func (a *Allocator) doNetworkAlloc(ctx context.Context, ev events.Event) ***REMOVED***
+func (a *Allocator) doNetworkAlloc(ctx context.Context, ev events.Event) {
 	nc := a.netCtx
 
-	switch v := ev.(type) ***REMOVED***
+	switch v := ev.(type) {
 	case api.EventCreateNetwork:
 		n := v.Network.Copy()
-		if nc.nwkAllocator.IsAllocated(n) ***REMOVED***
+		if nc.nwkAllocator.IsAllocated(n) {
 			break
-		***REMOVED***
+		}
 
-		if IsIngressNetwork(n) && nc.ingressNetwork != nil ***REMOVED***
+		if IsIngressNetwork(n) && nc.ingressNetwork != nil {
 			log.G(ctx).Errorf("Cannot allocate ingress network %s (%s) because another ingress network is already present: %s (%s)",
 				n.ID, n.Spec.Annotations.Name, nc.ingressNetwork.ID, nc.ingressNetwork.Spec.Annotations)
 			break
-		***REMOVED***
+		}
 
-		if err := a.allocateNetwork(ctx, n); err != nil ***REMOVED***
+		if err := a.allocateNetwork(ctx, n); err != nil {
 			log.G(ctx).WithError(err).Errorf("Failed allocation for network %s", n.ID)
 			break
-		***REMOVED***
+		}
 
-		if err := a.store.Batch(func(batch *store.Batch) error ***REMOVED***
+		if err := a.store.Batch(func(batch *store.Batch) error {
 			return a.commitAllocatedNetwork(ctx, batch, n)
-		***REMOVED***); err != nil ***REMOVED***
+		}); err != nil {
 			log.G(ctx).WithError(err).Errorf("Failed to commit allocation for network %s", n.ID)
-		***REMOVED***
-		if IsIngressNetwork(n) ***REMOVED***
+		}
+		if IsIngressNetwork(n) {
 			nc.ingressNetwork = n
-		***REMOVED***
+		}
 		err := a.allocateNodes(ctx, false)
-		if err != nil ***REMOVED***
+		if err != nil {
 			log.G(ctx).WithError(err).Error(err)
-		***REMOVED***
+		}
 	case api.EventDeleteNetwork:
 		n := v.Network.Copy()
 
-		if IsIngressNetwork(n) && nc.ingressNetwork != nil && nc.ingressNetwork.ID == n.ID ***REMOVED***
+		if IsIngressNetwork(n) && nc.ingressNetwork != nil && nc.ingressNetwork.ID == n.ID {
 			nc.ingressNetwork = nil
-		***REMOVED***
+		}
 
-		if err := a.deallocateNodeAttachments(ctx, n.ID); err != nil ***REMOVED***
+		if err := a.deallocateNodeAttachments(ctx, n.ID); err != nil {
 			log.G(ctx).WithError(err).Error(err)
-		***REMOVED***
+		}
 
 		// The assumption here is that all dependent objects
 		// have been cleaned up when we are here so the only
 		// thing that needs to happen is free the network
 		// resources.
-		if err := nc.nwkAllocator.Deallocate(n); err != nil ***REMOVED***
+		if err := nc.nwkAllocator.Deallocate(n); err != nil {
 			log.G(ctx).WithError(err).Errorf("Failed during network free for network %s", n.ID)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			nc.somethingWasDeallocated = true
-		***REMOVED***
+		}
 
 		delete(nc.unallocatedNetworks, n.ID)
 	case api.EventCreateService:
 		var s *api.Service
-		a.store.View(func(tx store.ReadTx) ***REMOVED***
+		a.store.View(func(tx store.ReadTx) {
 			s = store.GetService(tx, v.Service.ID)
-		***REMOVED***)
+		})
 
-		if s == nil ***REMOVED***
+		if s == nil {
 			break
-		***REMOVED***
+		}
 
-		if nc.nwkAllocator.IsServiceAllocated(s) ***REMOVED***
+		if nc.nwkAllocator.IsServiceAllocated(s) {
 			break
-		***REMOVED***
+		}
 
-		if err := a.allocateService(ctx, s); err != nil ***REMOVED***
+		if err := a.allocateService(ctx, s); err != nil {
 			log.G(ctx).WithError(err).Errorf("Failed allocation for service %s", s.ID)
 			break
-		***REMOVED***
+		}
 
-		if err := a.store.Batch(func(batch *store.Batch) error ***REMOVED***
+		if err := a.store.Batch(func(batch *store.Batch) error {
 			return a.commitAllocatedService(ctx, batch, s)
-		***REMOVED***); err != nil ***REMOVED***
+		}); err != nil {
 			log.G(ctx).WithError(err).Errorf("Failed to commit allocation for service %s", s.ID)
-		***REMOVED***
+		}
 	case api.EventUpdateService:
 		// We may have already allocated this service. If a create or
 		// update event is older than the current version in the store,
 		// we run the risk of allocating the service a second time.
 		// Only operate on the latest version of the service.
 		var s *api.Service
-		a.store.View(func(tx store.ReadTx) ***REMOVED***
+		a.store.View(func(tx store.ReadTx) {
 			s = store.GetService(tx, v.Service.ID)
-		***REMOVED***)
+		})
 
-		if s == nil ***REMOVED***
+		if s == nil {
 			break
-		***REMOVED***
+		}
 
-		if nc.nwkAllocator.IsServiceAllocated(s) ***REMOVED***
-			if !nc.nwkAllocator.HostPublishPortsNeedUpdate(s) ***REMOVED***
+		if nc.nwkAllocator.IsServiceAllocated(s) {
+			if !nc.nwkAllocator.HostPublishPortsNeedUpdate(s) {
 				break
-			***REMOVED***
+			}
 			updatePortsInHostPublishMode(s)
-		***REMOVED*** else ***REMOVED***
-			if err := a.allocateService(ctx, s); err != nil ***REMOVED***
+		} else {
+			if err := a.allocateService(ctx, s); err != nil {
 				log.G(ctx).WithError(err).Errorf("Failed allocation during update of service %s", s.ID)
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
-		if err := a.store.Batch(func(batch *store.Batch) error ***REMOVED***
+		if err := a.store.Batch(func(batch *store.Batch) error {
 			return a.commitAllocatedService(ctx, batch, s)
-		***REMOVED***); err != nil ***REMOVED***
+		}); err != nil {
 			log.G(ctx).WithError(err).Errorf("Failed to commit allocation during update for service %s", s.ID)
 			nc.unallocatedServices[s.ID] = s
-		***REMOVED*** else ***REMOVED***
+		} else {
 			delete(nc.unallocatedServices, s.ID)
-		***REMOVED***
+		}
 	case api.EventDeleteService:
 		s := v.Service.Copy()
 
-		if err := nc.nwkAllocator.DeallocateService(s); err != nil ***REMOVED***
+		if err := nc.nwkAllocator.DeallocateService(s); err != nil {
 			log.G(ctx).WithError(err).Errorf("Failed deallocation during delete of service %s", s.ID)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			nc.somethingWasDeallocated = true
-		***REMOVED***
+		}
 
 		// Remove it from unallocatedServices just in case
 		// it's still there.
@@ -307,23 +307,23 @@ func (a *Allocator) doNetworkAlloc(ctx context.Context, ev events.Event) ***REMO
 	case state.EventCommit:
 		a.procTasksNetwork(ctx, false)
 
-		if time.Since(nc.lastRetry) > retryInterval || nc.somethingWasDeallocated ***REMOVED***
+		if time.Since(nc.lastRetry) > retryInterval || nc.somethingWasDeallocated {
 			a.procUnallocatedNetworks(ctx)
 			a.procUnallocatedServices(ctx)
 			a.procTasksNetwork(ctx, true)
 			nc.lastRetry = time.Now()
 			nc.somethingWasDeallocated = false
-		***REMOVED***
+		}
 
 		// Any left over tasks are moved to the unallocated set
-		for _, t := range nc.pendingTasks ***REMOVED***
+		for _, t := range nc.pendingTasks {
 			nc.unallocatedTasks[t.ID] = t
-		***REMOVED***
+		}
 		nc.pendingTasks = make(map[string]*api.Task)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (a *Allocator) doNodeAlloc(ctx context.Context, ev events.Event) ***REMOVED***
+func (a *Allocator) doNodeAlloc(ctx context.Context, ev events.Event) {
 	var (
 		isDelete bool
 		node     *api.Node
@@ -333,63 +333,63 @@ func (a *Allocator) doNodeAlloc(ctx context.Context, ev events.Event) ***REMOVED
 	// event is older than the current version in the store, we run the
 	// risk of allocating the node a second time. Only operate on the
 	// latest version of the node.
-	switch v := ev.(type) ***REMOVED***
+	switch v := ev.(type) {
 	case api.EventCreateNode:
-		a.store.View(func(tx store.ReadTx) ***REMOVED***
+		a.store.View(func(tx store.ReadTx) {
 			node = store.GetNode(tx, v.Node.ID)
-		***REMOVED***)
+		})
 	case api.EventUpdateNode:
-		a.store.View(func(tx store.ReadTx) ***REMOVED***
+		a.store.View(func(tx store.ReadTx) {
 			node = store.GetNode(tx, v.Node.ID)
-		***REMOVED***)
+		})
 	case api.EventDeleteNode:
 		isDelete = true
 		node = v.Node.Copy()
-	***REMOVED***
+	}
 
-	if node == nil ***REMOVED***
+	if node == nil {
 		return
-	***REMOVED***
+	}
 
 	nc := a.netCtx
 
-	if isDelete ***REMOVED***
-		if err := a.deallocateNode(node); err != nil ***REMOVED***
+	if isDelete {
+		if err := a.deallocateNode(node); err != nil {
 			log.G(ctx).WithError(err).Errorf("Failed freeing network resources for node %s", node.ID)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			nc.somethingWasDeallocated = true
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
+		}
+	} else {
 		allocatedNetworks, err := a.getAllocatedNetworks()
-		if err != nil ***REMOVED***
+		if err != nil {
 			log.G(ctx).WithError(err).Errorf("Error listing allocated networks in network %s", node.ID)
-		***REMOVED***
+		}
 
 		isAllocated := a.allocateNode(ctx, node, false, allocatedNetworks)
 
-		if isAllocated ***REMOVED***
-			if err := a.store.Batch(func(batch *store.Batch) error ***REMOVED***
+		if isAllocated {
+			if err := a.store.Batch(func(batch *store.Batch) error {
 				return a.commitAllocatedNode(ctx, batch, node)
-			***REMOVED***); err != nil ***REMOVED***
+			}); err != nil {
 				log.G(ctx).WithError(err).Errorf("Failed to commit allocation of network resources for node %s", node.ID)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}
 
-func isOverlayNetwork(n *api.Network) bool ***REMOVED***
-	if n.DriverState != nil && n.DriverState.Name == "overlay" ***REMOVED***
+func isOverlayNetwork(n *api.Network) bool {
+	if n.DriverState != nil && n.DriverState.Name == "overlay" {
 		return true
-	***REMOVED***
+	}
 
-	if n.Spec.DriverConfig != nil && n.Spec.DriverConfig.Name == "overlay" ***REMOVED***
+	if n.Spec.DriverConfig != nil && n.Spec.DriverConfig.Name == "overlay" {
 		return true
-	***REMOVED***
+	}
 
 	return false
-***REMOVED***
+}
 
-func (a *Allocator) getAllocatedNetworks() ([]*api.Network, error) ***REMOVED***
+func (a *Allocator) getAllocatedNetworks() ([]*api.Network, error) {
 	var (
 		err               error
 		nc                = a.netCtx
@@ -399,25 +399,25 @@ func (a *Allocator) getAllocatedNetworks() ([]*api.Network, error) ***REMOVED***
 
 	// Find allocated networks
 	var networks []*api.Network
-	a.store.View(func(tx store.ReadTx) ***REMOVED***
+	a.store.View(func(tx store.ReadTx) {
 		networks, err = store.FindNetworks(tx, store.All)
-	***REMOVED***)
+	})
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, errors.Wrap(err, "error listing all networks in store while trying to allocate during init")
-	***REMOVED***
+	}
 
-	for _, n := range networks ***REMOVED***
+	for _, n := range networks {
 
-		if isOverlayNetwork(n) && na.IsAllocated(n) ***REMOVED***
+		if isOverlayNetwork(n) && na.IsAllocated(n) {
 			allocatedNetworks = append(allocatedNetworks, n)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return allocatedNetworks, nil
-***REMOVED***
+}
 
-func (a *Allocator) allocateNodes(ctx context.Context, existingAddressesOnly bool) error ***REMOVED***
+func (a *Allocator) allocateNodes(ctx context.Context, existingAddressesOnly bool) error {
 	// Allocate nodes in the store so far before we process watched events.
 	var (
 		allocatedNodes []*api.Node
@@ -425,276 +425,276 @@ func (a *Allocator) allocateNodes(ctx context.Context, existingAddressesOnly boo
 		err            error
 	)
 
-	a.store.View(func(tx store.ReadTx) ***REMOVED***
+	a.store.View(func(tx store.ReadTx) {
 		nodes, err = store.FindNodes(tx, store.All)
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		return errors.Wrap(err, "error listing all nodes in store while trying to allocate network resources")
-	***REMOVED***
+	}
 
 	allocatedNetworks, err := a.getAllocatedNetworks()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return errors.Wrap(err, "error listing all nodes in store while trying to allocate network resources")
-	***REMOVED***
+	}
 
-	for _, node := range nodes ***REMOVED***
+	for _, node := range nodes {
 		isAllocated := a.allocateNode(ctx, node, existingAddressesOnly, allocatedNetworks)
-		if isAllocated ***REMOVED***
+		if isAllocated {
 			allocatedNodes = append(allocatedNodes, node)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if err := a.store.Batch(func(batch *store.Batch) error ***REMOVED***
-		for _, node := range allocatedNodes ***REMOVED***
-			if err := a.commitAllocatedNode(ctx, batch, node); err != nil ***REMOVED***
+	if err := a.store.Batch(func(batch *store.Batch) error {
+		for _, node := range allocatedNodes {
+			if err := a.commitAllocatedNode(ctx, batch, node); err != nil {
 				log.G(ctx).WithError(err).Errorf("Failed to commit allocation of network resources for node %s", node.ID)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		return nil
-	***REMOVED***); err != nil ***REMOVED***
+	}); err != nil {
 		log.G(ctx).WithError(err).Error("Failed to commit allocation of network resources for nodes")
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (a *Allocator) deallocateNodes(ctx context.Context) error ***REMOVED***
+func (a *Allocator) deallocateNodes(ctx context.Context) error {
 	var (
 		nodes []*api.Node
 		nc    = a.netCtx
 		err   error
 	)
 
-	a.store.View(func(tx store.ReadTx) ***REMOVED***
+	a.store.View(func(tx store.ReadTx) {
 		nodes, err = store.FindNodes(tx, store.All)
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		return fmt.Errorf("error listing all nodes in store while trying to free network resources")
-	***REMOVED***
+	}
 
-	for _, node := range nodes ***REMOVED***
-		if err := a.deallocateNode(node); err != nil ***REMOVED***
+	for _, node := range nodes {
+		if err := a.deallocateNode(node); err != nil {
 			log.G(ctx).WithError(err).Errorf("Failed freeing network resources for node %s", node.ID)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			nc.somethingWasDeallocated = true
-		***REMOVED***
-		if err := a.store.Batch(func(batch *store.Batch) error ***REMOVED***
+		}
+		if err := a.store.Batch(func(batch *store.Batch) error {
 			return a.commitAllocatedNode(ctx, batch, node)
-		***REMOVED***); err != nil ***REMOVED***
+		}); err != nil {
 			log.G(ctx).WithError(err).Errorf("Failed to commit deallocation of network resources for node %s", node.ID)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (a *Allocator) deallocateNodeAttachments(ctx context.Context, nid string) error ***REMOVED***
+func (a *Allocator) deallocateNodeAttachments(ctx context.Context, nid string) error {
 	var (
 		nodes []*api.Node
 		nc    = a.netCtx
 		err   error
 	)
 
-	a.store.View(func(tx store.ReadTx) ***REMOVED***
+	a.store.View(func(tx store.ReadTx) {
 		nodes, err = store.FindNodes(tx, store.All)
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		return fmt.Errorf("error listing all nodes in store while trying to free network resources")
-	***REMOVED***
+	}
 
-	for _, node := range nodes ***REMOVED***
+	for _, node := range nodes {
 
 		var networkAttachment *api.NetworkAttachment
 		var naIndex int
-		for index, na := range node.Attachments ***REMOVED***
-			if na.Network.ID == nid ***REMOVED***
+		for index, na := range node.Attachments {
+			if na.Network.ID == nid {
 				networkAttachment = na
 				naIndex = index
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
-		if networkAttachment == nil ***REMOVED***
+		if networkAttachment == nil {
 			log.G(ctx).Errorf("Failed to find network %s on node %s", nid, node.ID)
 			continue
-		***REMOVED***
+		}
 
-		if nc.nwkAllocator.IsAttachmentAllocated(node, networkAttachment) ***REMOVED***
-			if err := nc.nwkAllocator.DeallocateAttachment(node, networkAttachment); err != nil ***REMOVED***
+		if nc.nwkAllocator.IsAttachmentAllocated(node, networkAttachment) {
+			if err := nc.nwkAllocator.DeallocateAttachment(node, networkAttachment); err != nil {
 				log.G(ctx).WithError(err).Errorf("Failed to commit deallocation of network resources for node %s", node.ID)
-			***REMOVED*** else ***REMOVED***
+			} else {
 
 				// Delete the lbattachment
 				node.Attachments[naIndex] = node.Attachments[len(node.Attachments)-1]
 				node.Attachments[len(node.Attachments)-1] = nil
 				node.Attachments = node.Attachments[:len(node.Attachments)-1]
 
-				if err := a.store.Batch(func(batch *store.Batch) error ***REMOVED***
+				if err := a.store.Batch(func(batch *store.Batch) error {
 					return a.commitAllocatedNode(ctx, batch, node)
-				***REMOVED***); err != nil ***REMOVED***
+				}); err != nil {
 					log.G(ctx).WithError(err).Errorf("Failed to commit deallocation of network resources for node %s", node.ID)
-				***REMOVED***
+				}
 
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (a *Allocator) deallocateNode(node *api.Node) error ***REMOVED***
+func (a *Allocator) deallocateNode(node *api.Node) error {
 	var (
 		nc = a.netCtx
 	)
 
-	for _, na := range node.Attachments ***REMOVED***
-		if nc.nwkAllocator.IsAttachmentAllocated(node, na) ***REMOVED***
-			if err := nc.nwkAllocator.DeallocateAttachment(node, na); err != nil ***REMOVED***
+	for _, na := range node.Attachments {
+		if nc.nwkAllocator.IsAttachmentAllocated(node, na) {
+			if err := nc.nwkAllocator.DeallocateAttachment(node, na); err != nil {
 				return err
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	node.Attachments = nil
 
 	return nil
-***REMOVED***
+}
 
 // allocateServices allocates services in the store so far before we process
 // watched events.
-func (a *Allocator) allocateServices(ctx context.Context, existingAddressesOnly bool) error ***REMOVED***
+func (a *Allocator) allocateServices(ctx context.Context, existingAddressesOnly bool) error {
 	var (
 		nc       = a.netCtx
 		services []*api.Service
 		err      error
 	)
-	a.store.View(func(tx store.ReadTx) ***REMOVED***
+	a.store.View(func(tx store.ReadTx) {
 		services, err = store.FindServices(tx, store.All)
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		return errors.Wrap(err, "error listing all services in store while trying to allocate during init")
-	***REMOVED***
+	}
 
 	var allocatedServices []*api.Service
-	for _, s := range services ***REMOVED***
-		if nc.nwkAllocator.IsServiceAllocated(s, networkallocator.OnInit) ***REMOVED***
+	for _, s := range services {
+		if nc.nwkAllocator.IsServiceAllocated(s, networkallocator.OnInit) {
 			continue
-		***REMOVED***
+		}
 
 		if existingAddressesOnly &&
 			(s.Endpoint == nil ||
-				len(s.Endpoint.VirtualIPs) == 0) ***REMOVED***
+				len(s.Endpoint.VirtualIPs) == 0) {
 			continue
-		***REMOVED***
+		}
 
-		if err := a.allocateService(ctx, s); err != nil ***REMOVED***
+		if err := a.allocateService(ctx, s); err != nil {
 			log.G(ctx).WithError(err).Errorf("failed allocating service %s during init", s.ID)
 			continue
-		***REMOVED***
+		}
 		allocatedServices = append(allocatedServices, s)
-	***REMOVED***
+	}
 
-	if err := a.store.Batch(func(batch *store.Batch) error ***REMOVED***
-		for _, s := range allocatedServices ***REMOVED***
-			if err := a.commitAllocatedService(ctx, batch, s); err != nil ***REMOVED***
+	if err := a.store.Batch(func(batch *store.Batch) error {
+		for _, s := range allocatedServices {
+			if err := a.commitAllocatedService(ctx, batch, s); err != nil {
 				log.G(ctx).WithError(err).Errorf("failed committing allocation of service %s during init", s.ID)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		return nil
-	***REMOVED***); err != nil ***REMOVED***
+	}); err != nil {
 		log.G(ctx).WithError(err).Error("failed committing allocation of services during init")
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // allocateTasks allocates tasks in the store so far before we started watching.
-func (a *Allocator) allocateTasks(ctx context.Context, existingAddressesOnly bool) error ***REMOVED***
+func (a *Allocator) allocateTasks(ctx context.Context, existingAddressesOnly bool) error {
 	var (
 		nc             = a.netCtx
 		tasks          []*api.Task
 		allocatedTasks []*api.Task
 		err            error
 	)
-	a.store.View(func(tx store.ReadTx) ***REMOVED***
+	a.store.View(func(tx store.ReadTx) {
 		tasks, err = store.FindTasks(tx, store.All)
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		return errors.Wrap(err, "error listing all tasks in store while trying to allocate during init")
-	***REMOVED***
+	}
 
-	for _, t := range tasks ***REMOVED***
-		if t.Status.State > api.TaskStateRunning ***REMOVED***
+	for _, t := range tasks {
+		if t.Status.State > api.TaskStateRunning {
 			continue
-		***REMOVED***
+		}
 
-		if existingAddressesOnly ***REMOVED***
+		if existingAddressesOnly {
 			hasAddresses := false
-			for _, nAttach := range t.Networks ***REMOVED***
-				if len(nAttach.Addresses) != 0 ***REMOVED***
+			for _, nAttach := range t.Networks {
+				if len(nAttach.Addresses) != 0 {
 					hasAddresses = true
 					break
-				***REMOVED***
-			***REMOVED***
-			if !hasAddresses ***REMOVED***
+				}
+			}
+			if !hasAddresses {
 				continue
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		var s *api.Service
-		if t.ServiceID != "" ***REMOVED***
-			a.store.View(func(tx store.ReadTx) ***REMOVED***
+		if t.ServiceID != "" {
+			a.store.View(func(tx store.ReadTx) {
 				s = store.GetService(tx, t.ServiceID)
-			***REMOVED***)
-		***REMOVED***
+			})
+		}
 
 		// Populate network attachments in the task
 		// based on service spec.
 		a.taskCreateNetworkAttachments(t, s)
 
-		if taskReadyForNetworkVote(t, s, nc) ***REMOVED***
-			if t.Status.State >= api.TaskStatePending ***REMOVED***
+		if taskReadyForNetworkVote(t, s, nc) {
+			if t.Status.State >= api.TaskStatePending {
 				continue
-			***REMOVED***
+			}
 
-			if a.taskAllocateVote(networkVoter, t.ID) ***REMOVED***
+			if a.taskAllocateVote(networkVoter, t.ID) {
 				// If the task is not attached to any network, network
 				// allocators job is done. Immediately cast a vote so
 				// that the task can be moved to the PENDING state as
 				// soon as possible.
 				updateTaskStatus(t, api.TaskStatePending, allocatedStatusMessage)
 				allocatedTasks = append(allocatedTasks, t)
-			***REMOVED***
+			}
 			continue
-		***REMOVED***
+		}
 
 		err := a.allocateTask(ctx, t)
-		if err == nil ***REMOVED***
+		if err == nil {
 			allocatedTasks = append(allocatedTasks, t)
-		***REMOVED*** else if err != errNoChanges ***REMOVED***
+		} else if err != errNoChanges {
 			log.G(ctx).WithError(err).Errorf("failed allocating task %s during init", t.ID)
 			nc.unallocatedTasks[t.ID] = t
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if err := a.store.Batch(func(batch *store.Batch) error ***REMOVED***
-		for _, t := range allocatedTasks ***REMOVED***
-			if err := a.commitAllocatedTask(ctx, batch, t); err != nil ***REMOVED***
+	if err := a.store.Batch(func(batch *store.Batch) error {
+		for _, t := range allocatedTasks {
+			if err := a.commitAllocatedTask(ctx, batch, t); err != nil {
 				log.G(ctx).WithError(err).Errorf("failed committing allocation of task %s during init", t.ID)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		return nil
-	***REMOVED***); err != nil ***REMOVED***
+	}); err != nil {
 		log.G(ctx).WithError(err).Error("failed committing allocation of tasks during init")
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // taskReadyForNetworkVote checks if the task is ready for a network
 // vote to move it to PENDING state.
-func taskReadyForNetworkVote(t *api.Task, s *api.Service, nc *networkContext) bool ***REMOVED***
+func taskReadyForNetworkVote(t *api.Task, s *api.Service, nc *networkContext) bool {
 	// Task is ready for vote if the following is true:
 	//
 	// Task has no network attached or networks attached but all
@@ -703,63 +703,63 @@ func taskReadyForNetworkVote(t *api.Task, s *api.Service, nc *networkContext) bo
 	// allocated.
 	return (len(t.Networks) == 0 || nc.nwkAllocator.IsTaskAllocated(t)) &&
 		(s == nil || nc.nwkAllocator.IsServiceAllocated(s))
-***REMOVED***
+}
 
-func taskUpdateNetworks(t *api.Task, networks []*api.NetworkAttachment) ***REMOVED***
+func taskUpdateNetworks(t *api.Task, networks []*api.NetworkAttachment) {
 	networksCopy := make([]*api.NetworkAttachment, 0, len(networks))
-	for _, n := range networks ***REMOVED***
+	for _, n := range networks {
 		networksCopy = append(networksCopy, n.Copy())
-	***REMOVED***
+	}
 
 	t.Networks = networksCopy
-***REMOVED***
+}
 
-func taskUpdateEndpoint(t *api.Task, endpoint *api.Endpoint) ***REMOVED***
+func taskUpdateEndpoint(t *api.Task, endpoint *api.Endpoint) {
 	t.Endpoint = endpoint.Copy()
-***REMOVED***
+}
 
 // IsIngressNetworkNeeded checks whether the service requires the routing-mesh
-func IsIngressNetworkNeeded(s *api.Service) bool ***REMOVED***
+func IsIngressNetworkNeeded(s *api.Service) bool {
 	return networkallocator.IsIngressNetworkNeeded(s)
-***REMOVED***
+}
 
-func (a *Allocator) taskCreateNetworkAttachments(t *api.Task, s *api.Service) ***REMOVED***
+func (a *Allocator) taskCreateNetworkAttachments(t *api.Task, s *api.Service) {
 	// If task network attachments have already been filled in no
 	// need to do anything else.
-	if len(t.Networks) != 0 ***REMOVED***
+	if len(t.Networks) != 0 {
 		return
-	***REMOVED***
+	}
 
 	var networks []*api.NetworkAttachment
-	if IsIngressNetworkNeeded(s) && a.netCtx.ingressNetwork != nil ***REMOVED***
-		networks = append(networks, &api.NetworkAttachment***REMOVED***Network: a.netCtx.ingressNetwork***REMOVED***)
-	***REMOVED***
+	if IsIngressNetworkNeeded(s) && a.netCtx.ingressNetwork != nil {
+		networks = append(networks, &api.NetworkAttachment{Network: a.netCtx.ingressNetwork})
+	}
 
-	a.store.View(func(tx store.ReadTx) ***REMOVED***
+	a.store.View(func(tx store.ReadTx) {
 		// Always prefer NetworkAttachmentConfig in the TaskSpec
 		specNetworks := t.Spec.Networks
-		if len(specNetworks) == 0 && s != nil && len(s.Spec.Networks) != 0 ***REMOVED***
+		if len(specNetworks) == 0 && s != nil && len(s.Spec.Networks) != 0 {
 			specNetworks = s.Spec.Networks
-		***REMOVED***
+		}
 
-		for _, na := range specNetworks ***REMOVED***
+		for _, na := range specNetworks {
 			n := store.GetNetwork(tx, na.Target)
-			if n == nil ***REMOVED***
+			if n == nil {
 				continue
-			***REMOVED***
+			}
 
-			attachment := api.NetworkAttachment***REMOVED***Network: n***REMOVED***
+			attachment := api.NetworkAttachment{Network: n}
 			attachment.Aliases = append(attachment.Aliases, na.Aliases...)
 			attachment.Addresses = append(attachment.Addresses, na.Addresses...)
 			attachment.DriverAttachmentOpts = na.DriverAttachmentOpts
 			networks = append(networks, &attachment)
-		***REMOVED***
-	***REMOVED***)
+		}
+	})
 
 	taskUpdateNetworks(t, networks)
-***REMOVED***
+}
 
-func (a *Allocator) doTaskAlloc(ctx context.Context, ev events.Event) ***REMOVED***
+func (a *Allocator) doTaskAlloc(ctx context.Context, ev events.Event) {
 	var (
 		isDelete bool
 		t        *api.Task
@@ -769,58 +769,58 @@ func (a *Allocator) doTaskAlloc(ctx context.Context, ev events.Event) ***REMOVED
 	// event is older than the current version in the store, we run the
 	// risk of allocating the task a second time. Only operate on the
 	// latest version of the task.
-	switch v := ev.(type) ***REMOVED***
+	switch v := ev.(type) {
 	case api.EventCreateTask:
-		a.store.View(func(tx store.ReadTx) ***REMOVED***
+		a.store.View(func(tx store.ReadTx) {
 			t = store.GetTask(tx, v.Task.ID)
-		***REMOVED***)
+		})
 	case api.EventUpdateTask:
-		a.store.View(func(tx store.ReadTx) ***REMOVED***
+		a.store.View(func(tx store.ReadTx) {
 			t = store.GetTask(tx, v.Task.ID)
-		***REMOVED***)
+		})
 	case api.EventDeleteTask:
 		isDelete = true
 		t = v.Task.Copy()
-	***REMOVED***
+	}
 
-	if t == nil ***REMOVED***
+	if t == nil {
 		return
-	***REMOVED***
+	}
 
 	nc := a.netCtx
 
 	// If the task has stopped running then we should free the network
 	// resources associated with the task right away.
-	if t.Status.State > api.TaskStateRunning || isDelete ***REMOVED***
-		if nc.nwkAllocator.IsTaskAllocated(t) ***REMOVED***
-			if err := nc.nwkAllocator.DeallocateTask(t); err != nil ***REMOVED***
+	if t.Status.State > api.TaskStateRunning || isDelete {
+		if nc.nwkAllocator.IsTaskAllocated(t) {
+			if err := nc.nwkAllocator.DeallocateTask(t); err != nil {
 				log.G(ctx).WithError(err).Errorf("Failed freeing network resources for task %s", t.ID)
-			***REMOVED*** else ***REMOVED***
+			} else {
 				nc.somethingWasDeallocated = true
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		// Cleanup any task references that might exist
 		delete(nc.pendingTasks, t.ID)
 		delete(nc.unallocatedTasks, t.ID)
 
 		return
-	***REMOVED***
+	}
 
 	// If we are already in allocated state, there is
 	// absolutely nothing else to do.
-	if t.Status.State >= api.TaskStatePending ***REMOVED***
+	if t.Status.State >= api.TaskStatePending {
 		delete(nc.pendingTasks, t.ID)
 		delete(nc.unallocatedTasks, t.ID)
 		return
-	***REMOVED***
+	}
 
 	var s *api.Service
-	if t.ServiceID != "" ***REMOVED***
-		a.store.View(func(tx store.ReadTx) ***REMOVED***
+	if t.ServiceID != "" {
+		a.store.View(func(tx store.ReadTx) {
 			s = store.GetService(tx, t.ServiceID)
-		***REMOVED***)
-		if s == nil ***REMOVED***
+		})
+		if s == nil {
 			// If the task is running it is not normal to
 			// not be able to find the associated
 			// service. If the task is not running (task
@@ -829,232 +829,232 @@ func (a *Allocator) doTaskAlloc(ctx context.Context, ev events.Event) ***REMOVED
 			// available in store. But we still need to
 			// cleanup network resources associated with
 			// the task.
-			if t.Status.State <= api.TaskStateRunning && !isDelete ***REMOVED***
+			if t.Status.State <= api.TaskStateRunning && !isDelete {
 				log.G(ctx).Errorf("Event %T: Failed to get service %s for task %s state %s: could not find service %s", ev, t.ServiceID, t.ID, t.Status.State, t.ServiceID)
 				return
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	// Populate network attachments in the task
 	// based on service spec.
 	a.taskCreateNetworkAttachments(t, s)
 
 	nc.pendingTasks[t.ID] = t
-***REMOVED***
+}
 
-func (a *Allocator) allocateNode(ctx context.Context, node *api.Node, existingAddressesOnly bool, networks []*api.Network) bool ***REMOVED***
+func (a *Allocator) allocateNode(ctx context.Context, node *api.Node, existingAddressesOnly bool, networks []*api.Network) bool {
 	var allocated bool
 
 	nc := a.netCtx
 
-	for _, network := range networks ***REMOVED***
+	for _, network := range networks {
 
 		var lbAttachment *api.NetworkAttachment
-		for _, na := range node.Attachments ***REMOVED***
-			if na.Network != nil && na.Network.ID == network.ID ***REMOVED***
+		for _, na := range node.Attachments {
+			if na.Network != nil && na.Network.ID == network.ID {
 				lbAttachment = na
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
-		if lbAttachment != nil ***REMOVED***
-			if nc.nwkAllocator.IsAttachmentAllocated(node, lbAttachment) ***REMOVED***
+		if lbAttachment != nil {
+			if nc.nwkAllocator.IsAttachmentAllocated(node, lbAttachment) {
 				continue
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
-		if lbAttachment == nil ***REMOVED***
-			lbAttachment = &api.NetworkAttachment***REMOVED******REMOVED***
+		if lbAttachment == nil {
+			lbAttachment = &api.NetworkAttachment{}
 			node.Attachments = append(node.Attachments, lbAttachment)
-		***REMOVED***
+		}
 
-		if existingAddressesOnly && len(lbAttachment.Addresses) == 0 ***REMOVED***
+		if existingAddressesOnly && len(lbAttachment.Addresses) == 0 {
 			continue
-		***REMOVED***
+		}
 
 		lbAttachment.Network = network.Copy()
-		if err := a.netCtx.nwkAllocator.AllocateAttachment(node, lbAttachment); err != nil ***REMOVED***
+		if err := a.netCtx.nwkAllocator.AllocateAttachment(node, lbAttachment); err != nil {
 			log.G(ctx).WithError(err).Errorf("Failed to allocate network resources for node %s", node.ID)
 			// TODO: Should we add a unallocatedNode and retry allocating resources like we do for network, tasks, services?
 			// right now, we will only retry allocating network resources for the node when the node is updated.
 			continue
-		***REMOVED***
+		}
 
 		allocated = true
-	***REMOVED***
+	}
 	return allocated
 
-***REMOVED***
+}
 
-func (a *Allocator) commitAllocatedNode(ctx context.Context, batch *store.Batch, node *api.Node) error ***REMOVED***
-	if err := batch.Update(func(tx store.Tx) error ***REMOVED***
+func (a *Allocator) commitAllocatedNode(ctx context.Context, batch *store.Batch, node *api.Node) error {
+	if err := batch.Update(func(tx store.Tx) error {
 		err := store.UpdateNode(tx, node)
 
-		if err == store.ErrSequenceConflict ***REMOVED***
+		if err == store.ErrSequenceConflict {
 			storeNode := store.GetNode(tx, node.ID)
 			storeNode.Attachments = node.Attachments
 			err = store.UpdateNode(tx, storeNode)
-		***REMOVED***
+		}
 
 		return errors.Wrapf(err, "failed updating state in store transaction for node %s", node.ID)
-	***REMOVED***); err != nil ***REMOVED***
-		if err := a.deallocateNode(node); err != nil ***REMOVED***
+	}); err != nil {
+		if err := a.deallocateNode(node); err != nil {
 			log.G(ctx).WithError(err).Errorf("failed rolling back allocation of node %s", node.ID)
-		***REMOVED***
+		}
 
 		return err
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // This function prepares the service object for being updated when the change regards
 // the published ports in host mode: It resets the runtime state ports (s.Endpoint.Ports)
 // to the current ingress mode runtime state ports plus the newly configured publish mode ports,
 // so that the service allocation invoked on this new service object will trigger the deallocation
 // of any old publish mode port and allocation of any new one.
-func updatePortsInHostPublishMode(s *api.Service) ***REMOVED***
+func updatePortsInHostPublishMode(s *api.Service) {
 	// First, remove all host-mode ports from s.Endpoint.Ports
-	if s.Endpoint != nil ***REMOVED***
+	if s.Endpoint != nil {
 		var portConfigs []*api.PortConfig
-		for _, portConfig := range s.Endpoint.Ports ***REMOVED***
-			if portConfig.PublishMode != api.PublishModeHost ***REMOVED***
+		for _, portConfig := range s.Endpoint.Ports {
+			if portConfig.PublishMode != api.PublishModeHost {
 				portConfigs = append(portConfigs, portConfig)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		s.Endpoint.Ports = portConfigs
-	***REMOVED***
+	}
 
 	// Add back all host-mode ports
-	if s.Spec.Endpoint != nil ***REMOVED***
-		if s.Endpoint == nil ***REMOVED***
-			s.Endpoint = &api.Endpoint***REMOVED******REMOVED***
-		***REMOVED***
-		for _, portConfig := range s.Spec.Endpoint.Ports ***REMOVED***
-			if portConfig.PublishMode == api.PublishModeHost ***REMOVED***
+	if s.Spec.Endpoint != nil {
+		if s.Endpoint == nil {
+			s.Endpoint = &api.Endpoint{}
+		}
+		for _, portConfig := range s.Spec.Endpoint.Ports {
+			if portConfig.PublishMode == api.PublishModeHost {
 				s.Endpoint.Ports = append(s.Endpoint.Ports, portConfig.Copy())
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	s.Endpoint.Spec = s.Spec.Endpoint.Copy()
-***REMOVED***
+}
 
-func (a *Allocator) allocateService(ctx context.Context, s *api.Service) error ***REMOVED***
+func (a *Allocator) allocateService(ctx context.Context, s *api.Service) error {
 	nc := a.netCtx
 
-	if s.Spec.Endpoint != nil ***REMOVED***
+	if s.Spec.Endpoint != nil {
 		// service has user-defined endpoint
-		if s.Endpoint == nil ***REMOVED***
+		if s.Endpoint == nil {
 			// service currently has no allocated endpoint, need allocated.
-			s.Endpoint = &api.Endpoint***REMOVED***
+			s.Endpoint = &api.Endpoint{
 				Spec: s.Spec.Endpoint.Copy(),
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		// The service is trying to expose ports to the external
 		// world. Automatically attach the service to the ingress
 		// network only if it is not already done.
-		if IsIngressNetworkNeeded(s) ***REMOVED***
-			if nc.ingressNetwork == nil ***REMOVED***
+		if IsIngressNetworkNeeded(s) {
+			if nc.ingressNetwork == nil {
 				return fmt.Errorf("ingress network is missing")
-			***REMOVED***
+			}
 			var found bool
-			for _, vip := range s.Endpoint.VirtualIPs ***REMOVED***
-				if vip.NetworkID == nc.ingressNetwork.ID ***REMOVED***
+			for _, vip := range s.Endpoint.VirtualIPs {
+				if vip.NetworkID == nc.ingressNetwork.ID {
 					found = true
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 
-			if !found ***REMOVED***
+			if !found {
 				s.Endpoint.VirtualIPs = append(s.Endpoint.VirtualIPs,
-					&api.Endpoint_VirtualIP***REMOVED***NetworkID: nc.ingressNetwork.ID***REMOVED***)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED*** else if s.Endpoint != nil ***REMOVED***
+					&api.Endpoint_VirtualIP{NetworkID: nc.ingressNetwork.ID})
+			}
+		}
+	} else if s.Endpoint != nil {
 		// service has no user-defined endpoints while has already allocated network resources,
 		// need deallocated.
-		if err := nc.nwkAllocator.DeallocateService(s); err != nil ***REMOVED***
+		if err := nc.nwkAllocator.DeallocateService(s); err != nil {
 			return err
-		***REMOVED***
+		}
 		nc.somethingWasDeallocated = true
-	***REMOVED***
+	}
 
-	if err := nc.nwkAllocator.AllocateService(s); err != nil ***REMOVED***
+	if err := nc.nwkAllocator.AllocateService(s); err != nil {
 		nc.unallocatedServices[s.ID] = s
 		return err
-	***REMOVED***
+	}
 
 	// If the service doesn't expose ports any more and if we have
 	// any lingering virtual IP references for ingress network
 	// clean them up here.
-	if !IsIngressNetworkNeeded(s) && nc.ingressNetwork != nil ***REMOVED***
-		if s.Endpoint != nil ***REMOVED***
-			for i, vip := range s.Endpoint.VirtualIPs ***REMOVED***
-				if vip.NetworkID == nc.ingressNetwork.ID ***REMOVED***
+	if !IsIngressNetworkNeeded(s) && nc.ingressNetwork != nil {
+		if s.Endpoint != nil {
+			for i, vip := range s.Endpoint.VirtualIPs {
+				if vip.NetworkID == nc.ingressNetwork.ID {
 					n := len(s.Endpoint.VirtualIPs)
 					s.Endpoint.VirtualIPs[i], s.Endpoint.VirtualIPs[n-1] = s.Endpoint.VirtualIPs[n-1], nil
 					s.Endpoint.VirtualIPs = s.Endpoint.VirtualIPs[:n-1]
 					break
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+				}
+			}
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func (a *Allocator) commitAllocatedService(ctx context.Context, batch *store.Batch, s *api.Service) error ***REMOVED***
-	if err := batch.Update(func(tx store.Tx) error ***REMOVED***
+func (a *Allocator) commitAllocatedService(ctx context.Context, batch *store.Batch, s *api.Service) error {
+	if err := batch.Update(func(tx store.Tx) error {
 		err := store.UpdateService(tx, s)
 
-		if err == store.ErrSequenceConflict ***REMOVED***
+		if err == store.ErrSequenceConflict {
 			storeService := store.GetService(tx, s.ID)
 			storeService.Endpoint = s.Endpoint
 			err = store.UpdateService(tx, storeService)
-		***REMOVED***
+		}
 
 		return errors.Wrapf(err, "failed updating state in store transaction for service %s", s.ID)
-	***REMOVED***); err != nil ***REMOVED***
-		if err := a.netCtx.nwkAllocator.DeallocateService(s); err != nil ***REMOVED***
+	}); err != nil {
+		if err := a.netCtx.nwkAllocator.DeallocateService(s); err != nil {
 			log.G(ctx).WithError(err).Errorf("failed rolling back allocation of service %s", s.ID)
-		***REMOVED***
+		}
 
 		return err
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (a *Allocator) allocateNetwork(ctx context.Context, n *api.Network) error ***REMOVED***
+func (a *Allocator) allocateNetwork(ctx context.Context, n *api.Network) error {
 	nc := a.netCtx
 
-	if err := nc.nwkAllocator.Allocate(n); err != nil ***REMOVED***
+	if err := nc.nwkAllocator.Allocate(n); err != nil {
 		nc.unallocatedNetworks[n.ID] = n
 		return err
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (a *Allocator) commitAllocatedNetwork(ctx context.Context, batch *store.Batch, n *api.Network) error ***REMOVED***
-	if err := batch.Update(func(tx store.Tx) error ***REMOVED***
-		if err := store.UpdateNetwork(tx, n); err != nil ***REMOVED***
+func (a *Allocator) commitAllocatedNetwork(ctx context.Context, batch *store.Batch, n *api.Network) error {
+	if err := batch.Update(func(tx store.Tx) error {
+		if err := store.UpdateNetwork(tx, n); err != nil {
 			return errors.Wrapf(err, "failed updating state in store transaction for network %s", n.ID)
-		***REMOVED***
+		}
 		return nil
-	***REMOVED***); err != nil ***REMOVED***
-		if err := a.netCtx.nwkAllocator.Deallocate(n); err != nil ***REMOVED***
+	}); err != nil {
+		if err := a.netCtx.nwkAllocator.Deallocate(n); err != nil {
 			log.G(ctx).WithError(err).Errorf("failed rolling back allocation of network %s", n.ID)
-		***REMOVED***
+		}
 
 		return err
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (a *Allocator) allocateTask(ctx context.Context, t *api.Task) (err error) ***REMOVED***
+func (a *Allocator) allocateTask(ctx context.Context, t *api.Task) (err error) {
 	taskUpdated := false
 	nc := a.netCtx
 
@@ -1062,259 +1062,259 @@ func (a *Allocator) allocateTask(ctx context.Context, t *api.Task) (err error) *
 	// happened but wasn't successfully committed to store. In such
 	// cases skip allocation and go straight ahead to updating the
 	// store.
-	if !nc.nwkAllocator.IsTaskAllocated(t) ***REMOVED***
-		a.store.View(func(tx store.ReadTx) ***REMOVED***
-			if t.ServiceID != "" ***REMOVED***
+	if !nc.nwkAllocator.IsTaskAllocated(t) {
+		a.store.View(func(tx store.ReadTx) {
+			if t.ServiceID != "" {
 				s := store.GetService(tx, t.ServiceID)
-				if s == nil ***REMOVED***
+				if s == nil {
 					err = fmt.Errorf("could not find service %s", t.ServiceID)
 					return
-				***REMOVED***
+				}
 
-				if !nc.nwkAllocator.IsServiceAllocated(s) ***REMOVED***
+				if !nc.nwkAllocator.IsServiceAllocated(s) {
 					err = fmt.Errorf("service %s to which this task %s belongs has pending allocations", s.ID, t.ID)
 					return
-				***REMOVED***
+				}
 
-				if s.Endpoint != nil ***REMOVED***
+				if s.Endpoint != nil {
 					taskUpdateEndpoint(t, s.Endpoint)
 					taskUpdated = true
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 
-			for _, na := range t.Networks ***REMOVED***
+			for _, na := range t.Networks {
 				n := store.GetNetwork(tx, na.Network.ID)
-				if n == nil ***REMOVED***
+				if n == nil {
 					err = fmt.Errorf("failed to retrieve network %s while allocating task %s", na.Network.ID, t.ID)
 					return
-				***REMOVED***
+				}
 
-				if !nc.nwkAllocator.IsAllocated(n) ***REMOVED***
+				if !nc.nwkAllocator.IsAllocated(n) {
 					err = fmt.Errorf("network %s attached to task %s not allocated yet", n.ID, t.ID)
 					return
-				***REMOVED***
+				}
 
 				na.Network = n
-			***REMOVED***
+			}
 
-			if err = nc.nwkAllocator.AllocateTask(t); err != nil ***REMOVED***
+			if err = nc.nwkAllocator.AllocateTask(t); err != nil {
 				return
-			***REMOVED***
-			if nc.nwkAllocator.IsTaskAllocated(t) ***REMOVED***
+			}
+			if nc.nwkAllocator.IsTaskAllocated(t) {
 				taskUpdated = true
-			***REMOVED***
-		***REMOVED***)
+			}
+		})
 
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Update the network allocations and moving to
 	// PENDING state on top of the latest store state.
-	if a.taskAllocateVote(networkVoter, t.ID) ***REMOVED***
-		if t.Status.State < api.TaskStatePending ***REMOVED***
+	if a.taskAllocateVote(networkVoter, t.ID) {
+		if t.Status.State < api.TaskStatePending {
 			updateTaskStatus(t, api.TaskStatePending, allocatedStatusMessage)
 			taskUpdated = true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if !taskUpdated ***REMOVED***
+	if !taskUpdated {
 		return errNoChanges
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (a *Allocator) commitAllocatedTask(ctx context.Context, batch *store.Batch, t *api.Task) error ***REMOVED***
-	return batch.Update(func(tx store.Tx) error ***REMOVED***
+func (a *Allocator) commitAllocatedTask(ctx context.Context, batch *store.Batch, t *api.Task) error {
+	return batch.Update(func(tx store.Tx) error {
 		err := store.UpdateTask(tx, t)
 
-		if err == store.ErrSequenceConflict ***REMOVED***
+		if err == store.ErrSequenceConflict {
 			storeTask := store.GetTask(tx, t.ID)
 			taskUpdateNetworks(storeTask, t.Networks)
 			taskUpdateEndpoint(storeTask, t.Endpoint)
-			if storeTask.Status.State < api.TaskStatePending ***REMOVED***
+			if storeTask.Status.State < api.TaskStatePending {
 				storeTask.Status = t.Status
-			***REMOVED***
+			}
 			err = store.UpdateTask(tx, storeTask)
-		***REMOVED***
+		}
 
 		return errors.Wrapf(err, "failed updating state in store transaction for task %s", t.ID)
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func (a *Allocator) procUnallocatedNetworks(ctx context.Context) ***REMOVED***
+func (a *Allocator) procUnallocatedNetworks(ctx context.Context) {
 	nc := a.netCtx
 	var allocatedNetworks []*api.Network
-	for _, n := range nc.unallocatedNetworks ***REMOVED***
-		if !nc.nwkAllocator.IsAllocated(n) ***REMOVED***
-			if err := a.allocateNetwork(ctx, n); err != nil ***REMOVED***
+	for _, n := range nc.unallocatedNetworks {
+		if !nc.nwkAllocator.IsAllocated(n) {
+			if err := a.allocateNetwork(ctx, n); err != nil {
 				log.G(ctx).WithError(err).Debugf("Failed allocation of unallocated network %s", n.ID)
 				continue
-			***REMOVED***
+			}
 			allocatedNetworks = append(allocatedNetworks, n)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if len(allocatedNetworks) == 0 ***REMOVED***
+	if len(allocatedNetworks) == 0 {
 		return
-	***REMOVED***
+	}
 
-	err := a.store.Batch(func(batch *store.Batch) error ***REMOVED***
-		for _, n := range allocatedNetworks ***REMOVED***
-			if err := a.commitAllocatedNetwork(ctx, batch, n); err != nil ***REMOVED***
+	err := a.store.Batch(func(batch *store.Batch) error {
+		for _, n := range allocatedNetworks {
+			if err := a.commitAllocatedNetwork(ctx, batch, n); err != nil {
 				log.G(ctx).WithError(err).Debugf("Failed to commit allocation of unallocated network %s", n.ID)
 				continue
-			***REMOVED***
+			}
 			delete(nc.unallocatedNetworks, n.ID)
-		***REMOVED***
+		}
 		return nil
-	***REMOVED***)
+	})
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.G(ctx).WithError(err).Error("Failed to commit allocation of unallocated networks")
 		// We optimistically removed these from nc.unallocatedNetworks
 		// above in anticipation of successfully committing the batch,
 		// but since the transaction has failed, we requeue them here.
-		for _, n := range allocatedNetworks ***REMOVED***
+		for _, n := range allocatedNetworks {
 			nc.unallocatedNetworks[n.ID] = n
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (a *Allocator) procUnallocatedServices(ctx context.Context) ***REMOVED***
+func (a *Allocator) procUnallocatedServices(ctx context.Context) {
 	nc := a.netCtx
 	var allocatedServices []*api.Service
-	for _, s := range nc.unallocatedServices ***REMOVED***
-		if !nc.nwkAllocator.IsServiceAllocated(s) ***REMOVED***
-			if err := a.allocateService(ctx, s); err != nil ***REMOVED***
+	for _, s := range nc.unallocatedServices {
+		if !nc.nwkAllocator.IsServiceAllocated(s) {
+			if err := a.allocateService(ctx, s); err != nil {
 				log.G(ctx).WithError(err).Debugf("Failed allocation of unallocated service %s", s.ID)
 				continue
-			***REMOVED***
+			}
 			allocatedServices = append(allocatedServices, s)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if len(allocatedServices) == 0 ***REMOVED***
+	if len(allocatedServices) == 0 {
 		return
-	***REMOVED***
+	}
 
-	err := a.store.Batch(func(batch *store.Batch) error ***REMOVED***
-		for _, s := range allocatedServices ***REMOVED***
-			if err := a.commitAllocatedService(ctx, batch, s); err != nil ***REMOVED***
+	err := a.store.Batch(func(batch *store.Batch) error {
+		for _, s := range allocatedServices {
+			if err := a.commitAllocatedService(ctx, batch, s); err != nil {
 				log.G(ctx).WithError(err).Debugf("Failed to commit allocation of unallocated service %s", s.ID)
 				continue
-			***REMOVED***
+			}
 			delete(nc.unallocatedServices, s.ID)
-		***REMOVED***
+		}
 		return nil
-	***REMOVED***)
+	})
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.G(ctx).WithError(err).Error("Failed to commit allocation of unallocated services")
 		// We optimistically removed these from nc.unallocatedServices
 		// above in anticipation of successfully committing the batch,
 		// but since the transaction has failed, we requeue them here.
-		for _, s := range allocatedServices ***REMOVED***
+		for _, s := range allocatedServices {
 			nc.unallocatedServices[s.ID] = s
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (a *Allocator) procTasksNetwork(ctx context.Context, onRetry bool) ***REMOVED***
+func (a *Allocator) procTasksNetwork(ctx context.Context, onRetry bool) {
 	nc := a.netCtx
 	quiet := false
 	toAllocate := nc.pendingTasks
-	if onRetry ***REMOVED***
+	if onRetry {
 		toAllocate = nc.unallocatedTasks
 		quiet = true
-	***REMOVED***
+	}
 	allocatedTasks := make([]*api.Task, 0, len(toAllocate))
 
-	for _, t := range toAllocate ***REMOVED***
-		if err := a.allocateTask(ctx, t); err == nil ***REMOVED***
+	for _, t := range toAllocate {
+		if err := a.allocateTask(ctx, t); err == nil {
 			allocatedTasks = append(allocatedTasks, t)
-		***REMOVED*** else if err != errNoChanges ***REMOVED***
-			if quiet ***REMOVED***
+		} else if err != errNoChanges {
+			if quiet {
 				log.G(ctx).WithError(err).Debug("task allocation failure")
-			***REMOVED*** else ***REMOVED***
+			} else {
 				log.G(ctx).WithError(err).Error("task allocation failure")
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
-	if len(allocatedTasks) == 0 ***REMOVED***
+	if len(allocatedTasks) == 0 {
 		return
-	***REMOVED***
+	}
 
-	err := a.store.Batch(func(batch *store.Batch) error ***REMOVED***
-		for _, t := range allocatedTasks ***REMOVED***
+	err := a.store.Batch(func(batch *store.Batch) error {
+		for _, t := range allocatedTasks {
 			err := a.commitAllocatedTask(ctx, batch, t)
-			if err != nil ***REMOVED***
+			if err != nil {
 				log.G(ctx).WithError(err).Error("task allocation commit failure")
 				continue
-			***REMOVED***
+			}
 			delete(toAllocate, t.ID)
-		***REMOVED***
+		}
 
 		return nil
-	***REMOVED***)
+	})
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.G(ctx).WithError(err).Error("failed a store batch operation while processing tasks")
 		// We optimistically removed these from toAllocate above in
 		// anticipation of successfully committing the batch, but since
 		// the transaction has failed, we requeue them here.
-		for _, t := range allocatedTasks ***REMOVED***
+		for _, t := range allocatedTasks {
 			toAllocate[t.ID] = t
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // IsBuiltInNetworkDriver returns whether the passed driver is an internal network driver
-func IsBuiltInNetworkDriver(name string) bool ***REMOVED***
+func IsBuiltInNetworkDriver(name string) bool {
 	return cnmallocator.IsBuiltInDriver(name)
-***REMOVED***
+}
 
 // PredefinedNetworks returns the list of predefined network structures for a given network model
-func PredefinedNetworks() []networkallocator.PredefinedNetworkData ***REMOVED***
+func PredefinedNetworks() []networkallocator.PredefinedNetworkData {
 	return cnmallocator.PredefinedNetworks()
-***REMOVED***
+}
 
 // updateTaskStatus sets TaskStatus and updates timestamp.
-func updateTaskStatus(t *api.Task, newStatus api.TaskState, message string) ***REMOVED***
-	t.Status = api.TaskStatus***REMOVED***
+func updateTaskStatus(t *api.Task, newStatus api.TaskState, message string) {
+	t.Status = api.TaskStatus{
 		State:     newStatus,
 		Message:   message,
 		Timestamp: ptypes.MustTimestampProto(time.Now()),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // IsIngressNetwork returns whether the passed network is an ingress network.
-func IsIngressNetwork(nw *api.Network) bool ***REMOVED***
+func IsIngressNetwork(nw *api.Network) bool {
 	return networkallocator.IsIngressNetwork(nw)
-***REMOVED***
+}
 
 // GetIngressNetwork fetches the ingress network from store.
 // ErrNoIngress will be returned if the ingress network is not present,
 // nil otherwise. In case of any other failure in accessing the store,
 // the respective error will be reported as is.
-func GetIngressNetwork(s *store.MemoryStore) (*api.Network, error) ***REMOVED***
+func GetIngressNetwork(s *store.MemoryStore) (*api.Network, error) {
 	var (
 		networks []*api.Network
 		err      error
 	)
-	s.View(func(tx store.ReadTx) ***REMOVED***
+	s.View(func(tx store.ReadTx) {
 		networks, err = store.FindNetworks(tx, store.All)
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	for _, n := range networks ***REMOVED***
-		if IsIngressNetwork(n) ***REMOVED***
+	}
+	for _, n := range networks {
+		if IsIngressNetwork(n) {
 			return n, nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil, ErrNoIngress
-***REMOVED***
+}

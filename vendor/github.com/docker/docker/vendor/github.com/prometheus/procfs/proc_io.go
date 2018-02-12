@@ -7,7 +7,7 @@ import (
 )
 
 // ProcIO models the content of /proc/<pid>/io.
-type ProcIO struct ***REMOVED***
+type ProcIO struct {
 	// Chars read.
 	RChar uint64
 	// Chars written.
@@ -24,22 +24,22 @@ type ProcIO struct ***REMOVED***
 	// Documentation/filesystems/proc.txt in the kernel sources for
 	// detailed explanation.
 	CancelledWriteBytes int64
-***REMOVED***
+}
 
 // NewIO creates a new ProcIO instance from a given Proc instance.
-func (p Proc) NewIO() (ProcIO, error) ***REMOVED***
-	pio := ProcIO***REMOVED******REMOVED***
+func (p Proc) NewIO() (ProcIO, error) {
+	pio := ProcIO{}
 
 	f, err := os.Open(p.path("io"))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return pio, err
-	***REMOVED***
+	}
 	defer f.Close()
 
 	data, err := ioutil.ReadAll(f)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return pio, err
-	***REMOVED***
+	}
 
 	ioFormat := "rchar: %d\nwchar: %d\nsyscr: %d\nsyscw: %d\n" +
 		"read_bytes: %d\nwrite_bytes: %d\n" +
@@ -47,9 +47,9 @@ func (p Proc) NewIO() (ProcIO, error) ***REMOVED***
 
 	_, err = fmt.Sscanf(string(data), ioFormat, &pio.RChar, &pio.WChar, &pio.SyscR,
 		&pio.SyscW, &pio.ReadBytes, &pio.WriteBytes, &pio.CancelledWriteBytes)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return pio, err
-	***REMOVED***
+	}
 
 	return pio, nil
-***REMOVED***
+}

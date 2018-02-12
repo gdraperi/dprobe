@@ -9,23 +9,23 @@ import weak "github.com/containerd/containerd/protobuf/plugin/fieldpath.proto";
 option go_package = "github.com/containerd/containerd/api/events;events";
 option (containerd.plugin.fieldpath_all) = true;
 
-message ContainerCreate ***REMOVED***
+message ContainerCreate {
 	string id = 1;
 	string image = 2;
-	message Runtime ***REMOVED***
+	message Runtime {
 		string name = 1;
 		google.protobuf.Any options = 2;
-	***REMOVED***
+	}
 	Runtime runtime = 3;
-***REMOVED***
+}
 
-message ContainerUpdate ***REMOVED***
+message ContainerUpdate {
 	string id = 1;
 	string image = 2;
 	map<string, string> labels  = 3;
 	string snapshot_key = 4;
-***REMOVED***
+}
 
-message ContainerDelete ***REMOVED***
+message ContainerDelete {
 	string id = 1;
-***REMOVED***
+}

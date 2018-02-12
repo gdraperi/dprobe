@@ -9,28 +9,28 @@ package socket
 
 import "unsafe"
 
-func (h *msghdr) pack(vs []iovec, bs [][]byte, oob []byte, sa []byte) ***REMOVED***
-	for i := range vs ***REMOVED***
+func (h *msghdr) pack(vs []iovec, bs [][]byte, oob []byte, sa []byte) {
+	for i := range vs {
 		vs[i].set(bs[i])
-	***REMOVED***
-	if len(vs) > 0 ***REMOVED***
+	}
+	if len(vs) > 0 {
 		h.Iov = &vs[0]
 		h.Iovlen = int32(len(vs))
-	***REMOVED***
-	if len(oob) > 0 ***REMOVED***
+	}
+	if len(oob) > 0 {
 		h.Accrights = (*int8)(unsafe.Pointer(&oob[0]))
 		h.Accrightslen = int32(len(oob))
-	***REMOVED***
-	if sa != nil ***REMOVED***
+	}
+	if sa != nil {
 		h.Name = (*byte)(unsafe.Pointer(&sa[0]))
 		h.Namelen = uint32(len(sa))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (h *msghdr) controllen() int ***REMOVED***
+func (h *msghdr) controllen() int {
 	return int(h.Accrightslen)
-***REMOVED***
+}
 
-func (h *msghdr) flags() int ***REMOVED***
+func (h *msghdr) flags() int {
 	return int(NativeEndian.Uint32(h.Pad_cgo_2[:]))
-***REMOVED***
+}

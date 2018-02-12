@@ -12,42 +12,42 @@ import (
 
 // NewRouter creates a new debug router
 // The debug router holds endpoints for debug the daemon, such as those for pprof.
-func NewRouter() router.Router ***REMOVED***
-	r := &debugRouter***REMOVED******REMOVED***
+func NewRouter() router.Router {
+	r := &debugRouter{}
 	r.initRoutes()
 	return r
-***REMOVED***
+}
 
-type debugRouter struct ***REMOVED***
+type debugRouter struct {
 	routes []router.Route
-***REMOVED***
+}
 
-func (r *debugRouter) initRoutes() ***REMOVED***
-	r.routes = []router.Route***REMOVED***
+func (r *debugRouter) initRoutes() {
+	r.routes = []router.Route{
 		router.NewGetRoute("/vars", frameworkAdaptHandler(expvar.Handler())),
 		router.NewGetRoute("/pprof/", frameworkAdaptHandlerFunc(pprof.Index)),
 		router.NewGetRoute("/pprof/cmdline", frameworkAdaptHandlerFunc(pprof.Cmdline)),
 		router.NewGetRoute("/pprof/profile", frameworkAdaptHandlerFunc(pprof.Profile)),
 		router.NewGetRoute("/pprof/symbol", frameworkAdaptHandlerFunc(pprof.Symbol)),
 		router.NewGetRoute("/pprof/trace", frameworkAdaptHandlerFunc(pprof.Trace)),
-		router.NewGetRoute("/pprof/***REMOVED***name***REMOVED***", handlePprof),
-	***REMOVED***
-***REMOVED***
+		router.NewGetRoute("/pprof/{name}", handlePprof),
+	}
+}
 
-func (r *debugRouter) Routes() []router.Route ***REMOVED***
+func (r *debugRouter) Routes() []router.Route {
 	return r.routes
-***REMOVED***
+}
 
-func frameworkAdaptHandler(handler http.Handler) httputils.APIFunc ***REMOVED***
-	return func(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error ***REMOVED***
+func frameworkAdaptHandler(handler http.Handler) httputils.APIFunc {
+	return func(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error {
 		handler.ServeHTTP(w, r)
 		return nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func frameworkAdaptHandlerFunc(handler http.HandlerFunc) httputils.APIFunc ***REMOVED***
-	return func(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error ***REMOVED***
+func frameworkAdaptHandlerFunc(handler http.HandlerFunc) httputils.APIFunc {
+	return func(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error {
 		handler(w, r)
 		return nil
-	***REMOVED***
-***REMOVED***
+	}
+}

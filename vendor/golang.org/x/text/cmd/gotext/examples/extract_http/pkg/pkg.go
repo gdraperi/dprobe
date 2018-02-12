@@ -13,7 +13,7 @@ import (
 
 var matcher = language.NewMatcher(message.DefaultCatalog.Languages())
 
-func Generize(w http.ResponseWriter, r *http.Request) ***REMOVED***
+func Generize(w http.ResponseWriter, r *http.Request) {
 	lang, _ := r.Cookie("lang")
 	accept := r.Header.Get("Accept-Language")
 	tag := message.MatchLanguage(lang.String(), accept)
@@ -22,4 +22,4 @@ func Generize(w http.ResponseWriter, r *http.Request) ***REMOVED***
 	p.Fprintf(w, "Hello %s!\n", r.Header.Get("From"))
 
 	p.Fprintf(w, "Do you like your browser (%s)?\n", r.Header.Get("User-Agent"))
-***REMOVED***
+}

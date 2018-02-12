@@ -23,52 +23,52 @@ import (
 // Note that this is not a standard OAuth flow, but rather an
 // optimization supported by a few Google services.
 // Unless you know otherwise, you should use JWTConfigFromJSON instead.
-func JWTAccessTokenSourceFromJSON(jsonKey []byte, audience string) (oauth2.TokenSource, error) ***REMOVED***
+func JWTAccessTokenSourceFromJSON(jsonKey []byte, audience string) (oauth2.TokenSource, error) {
 	cfg, err := JWTConfigFromJSON(jsonKey)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("google: could not parse JSON key: %v", err)
-	***REMOVED***
+	}
 	pk, err := internal.ParseKey(cfg.PrivateKey)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("google: could not parse key: %v", err)
-	***REMOVED***
-	ts := &jwtAccessTokenSource***REMOVED***
+	}
+	ts := &jwtAccessTokenSource{
 		email:    cfg.Email,
 		audience: audience,
 		pk:       pk,
 		pkID:     cfg.PrivateKeyID,
-	***REMOVED***
+	}
 	tok, err := ts.Token()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return oauth2.ReuseTokenSource(tok, ts), nil
-***REMOVED***
+}
 
-type jwtAccessTokenSource struct ***REMOVED***
+type jwtAccessTokenSource struct {
 	email, audience string
 	pk              *rsa.PrivateKey
 	pkID            string
-***REMOVED***
+}
 
-func (ts *jwtAccessTokenSource) Token() (*oauth2.Token, error) ***REMOVED***
+func (ts *jwtAccessTokenSource) Token() (*oauth2.Token, error) {
 	iat := time.Now()
 	exp := iat.Add(time.Hour)
-	cs := &jws.ClaimSet***REMOVED***
+	cs := &jws.ClaimSet{
 		Iss: ts.email,
 		Sub: ts.email,
 		Aud: ts.audience,
 		Iat: iat.Unix(),
 		Exp: exp.Unix(),
-	***REMOVED***
-	hdr := &jws.Header***REMOVED***
+	}
+	hdr := &jws.Header{
 		Algorithm: "RS256",
 		Typ:       "JWT",
 		KeyID:     string(ts.pkID),
-	***REMOVED***
+	}
 	msg, err := jws.Encode(hdr, cs, ts.pk)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("google: could not encode JWT: %v", err)
-	***REMOVED***
-	return &oauth2.Token***REMOVED***AccessToken: msg, TokenType: "Bearer", Expiry: exp***REMOVED***, nil
-***REMOVED***
+	}
+	return &oauth2.Token{AccessToken: msg, TokenType: "Bearer", Expiry: exp}, nil
+}

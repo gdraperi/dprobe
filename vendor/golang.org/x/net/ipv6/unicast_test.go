@@ -18,167 +18,167 @@ import (
 	"golang.org/x/net/ipv6"
 )
 
-func TestPacketConnReadWriteUnicastUDP(t *testing.T) ***REMOVED***
-	switch runtime.GOOS ***REMOVED***
+func TestPacketConnReadWriteUnicastUDP(t *testing.T) {
+	switch runtime.GOOS {
 	case "nacl", "plan9", "windows":
 		t.Skipf("not supported on %s", runtime.GOOS)
-	***REMOVED***
-	if !supportsIPv6 ***REMOVED***
+	}
+	if !supportsIPv6 {
 		t.Skip("ipv6 is not supported")
-	***REMOVED***
+	}
 
 	c, err := nettest.NewLocalPacketListener("udp6")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	defer c.Close()
 	p := ipv6.NewPacketConn(c)
 	defer p.Close()
 
 	dst := c.LocalAddr()
-	cm := ipv6.ControlMessage***REMOVED***
+	cm := ipv6.ControlMessage{
 		TrafficClass: iana.DiffServAF11 | iana.CongestionExperienced,
 		Src:          net.IPv6loopback,
-	***REMOVED***
+	}
 	cf := ipv6.FlagTrafficClass | ipv6.FlagHopLimit | ipv6.FlagSrc | ipv6.FlagDst | ipv6.FlagInterface | ipv6.FlagPathMTU
 	ifi := nettest.RoutedInterface("ip6", net.FlagUp|net.FlagLoopback)
-	if ifi != nil ***REMOVED***
+	if ifi != nil {
 		cm.IfIndex = ifi.Index
-	***REMOVED***
+	}
 	wb := []byte("HELLO-R-U-THERE")
 
-	for i, toggle := range []bool***REMOVED***true, false, true***REMOVED*** ***REMOVED***
-		if err := p.SetControlMessage(cf, toggle); err != nil ***REMOVED***
-			if nettest.ProtocolNotSupported(err) ***REMOVED***
+	for i, toggle := range []bool{true, false, true} {
+		if err := p.SetControlMessage(cf, toggle); err != nil {
+			if nettest.ProtocolNotSupported(err) {
 				t.Logf("not supported on %s", runtime.GOOS)
 				continue
-			***REMOVED***
+			}
 			t.Fatal(err)
-		***REMOVED***
+		}
 		cm.HopLimit = i + 1
-		if err := p.SetWriteDeadline(time.Now().Add(100 * time.Millisecond)); err != nil ***REMOVED***
+		if err := p.SetWriteDeadline(time.Now().Add(100 * time.Millisecond)); err != nil {
 			t.Fatal(err)
-		***REMOVED***
-		if n, err := p.WriteTo(wb, &cm, dst); err != nil ***REMOVED***
+		}
+		if n, err := p.WriteTo(wb, &cm, dst); err != nil {
 			t.Fatal(err)
-		***REMOVED*** else if n != len(wb) ***REMOVED***
+		} else if n != len(wb) {
 			t.Fatalf("got %v; want %v", n, len(wb))
-		***REMOVED***
+		}
 		rb := make([]byte, 128)
-		if err := p.SetReadDeadline(time.Now().Add(100 * time.Millisecond)); err != nil ***REMOVED***
+		if err := p.SetReadDeadline(time.Now().Add(100 * time.Millisecond)); err != nil {
 			t.Fatal(err)
-		***REMOVED***
-		if n, _, _, err := p.ReadFrom(rb); err != nil ***REMOVED***
+		}
+		if n, _, _, err := p.ReadFrom(rb); err != nil {
 			t.Fatal(err)
-		***REMOVED*** else if !bytes.Equal(rb[:n], wb) ***REMOVED***
+		} else if !bytes.Equal(rb[:n], wb) {
 			t.Fatalf("got %v; want %v", rb[:n], wb)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestPacketConnReadWriteUnicastICMP(t *testing.T) ***REMOVED***
-	switch runtime.GOOS ***REMOVED***
+func TestPacketConnReadWriteUnicastICMP(t *testing.T) {
+	switch runtime.GOOS {
 	case "nacl", "plan9", "windows":
 		t.Skipf("not supported on %s", runtime.GOOS)
-	***REMOVED***
-	if !supportsIPv6 ***REMOVED***
+	}
+	if !supportsIPv6 {
 		t.Skip("ipv6 is not supported")
-	***REMOVED***
-	if m, ok := nettest.SupportsRawIPSocket(); !ok ***REMOVED***
+	}
+	if m, ok := nettest.SupportsRawIPSocket(); !ok {
 		t.Skip(m)
-	***REMOVED***
+	}
 
 	c, err := net.ListenPacket("ip6:ipv6-icmp", "::1")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	defer c.Close()
 	p := ipv6.NewPacketConn(c)
 	defer p.Close()
 
 	dst, err := net.ResolveIPAddr("ip6", "::1")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	pshicmp := icmp.IPv6PseudoHeader(c.LocalAddr().(*net.IPAddr).IP, dst.IP)
-	cm := ipv6.ControlMessage***REMOVED***
+	cm := ipv6.ControlMessage{
 		TrafficClass: iana.DiffServAF11 | iana.CongestionExperienced,
 		Src:          net.IPv6loopback,
-	***REMOVED***
+	}
 	cf := ipv6.FlagTrafficClass | ipv6.FlagHopLimit | ipv6.FlagSrc | ipv6.FlagDst | ipv6.FlagInterface | ipv6.FlagPathMTU
 	ifi := nettest.RoutedInterface("ip6", net.FlagUp|net.FlagLoopback)
-	if ifi != nil ***REMOVED***
+	if ifi != nil {
 		cm.IfIndex = ifi.Index
-	***REMOVED***
+	}
 
 	var f ipv6.ICMPFilter
 	f.SetAll(true)
 	f.Accept(ipv6.ICMPTypeEchoReply)
-	if err := p.SetICMPFilter(&f); err != nil ***REMOVED***
+	if err := p.SetICMPFilter(&f); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	var psh []byte
-	for i, toggle := range []bool***REMOVED***true, false, true***REMOVED*** ***REMOVED***
-		if toggle ***REMOVED***
+	for i, toggle := range []bool{true, false, true} {
+		if toggle {
 			psh = nil
-			if err := p.SetChecksum(true, 2); err != nil ***REMOVED***
+			if err := p.SetChecksum(true, 2); err != nil {
 				// Solaris never allows to modify
 				// ICMP properties.
-				if runtime.GOOS != "solaris" ***REMOVED***
+				if runtime.GOOS != "solaris" {
 					t.Fatal(err)
-				***REMOVED***
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
+				}
+			}
+		} else {
 			psh = pshicmp
 			// Some platforms never allow to disable the
 			// kernel checksum processing.
 			p.SetChecksum(false, -1)
-		***REMOVED***
-		wb, err := (&icmp.Message***REMOVED***
+		}
+		wb, err := (&icmp.Message{
 			Type: ipv6.ICMPTypeEchoRequest, Code: 0,
-			Body: &icmp.Echo***REMOVED***
+			Body: &icmp.Echo{
 				ID: os.Getpid() & 0xffff, Seq: i + 1,
 				Data: []byte("HELLO-R-U-THERE"),
-			***REMOVED***,
-		***REMOVED***).Marshal(psh)
-		if err != nil ***REMOVED***
+			},
+		}).Marshal(psh)
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
-		if err := p.SetControlMessage(cf, toggle); err != nil ***REMOVED***
-			if nettest.ProtocolNotSupported(err) ***REMOVED***
+		}
+		if err := p.SetControlMessage(cf, toggle); err != nil {
+			if nettest.ProtocolNotSupported(err) {
 				t.Logf("not supported on %s", runtime.GOOS)
 				continue
-			***REMOVED***
+			}
 			t.Fatal(err)
-		***REMOVED***
+		}
 		cm.HopLimit = i + 1
-		if err := p.SetWriteDeadline(time.Now().Add(100 * time.Millisecond)); err != nil ***REMOVED***
+		if err := p.SetWriteDeadline(time.Now().Add(100 * time.Millisecond)); err != nil {
 			t.Fatal(err)
-		***REMOVED***
-		if n, err := p.WriteTo(wb, &cm, dst); err != nil ***REMOVED***
+		}
+		if n, err := p.WriteTo(wb, &cm, dst); err != nil {
 			t.Fatal(err)
-		***REMOVED*** else if n != len(wb) ***REMOVED***
+		} else if n != len(wb) {
 			t.Fatalf("got %v; want %v", n, len(wb))
-		***REMOVED***
+		}
 		rb := make([]byte, 128)
-		if err := p.SetReadDeadline(time.Now().Add(100 * time.Millisecond)); err != nil ***REMOVED***
+		if err := p.SetReadDeadline(time.Now().Add(100 * time.Millisecond)); err != nil {
 			t.Fatal(err)
-		***REMOVED***
-		if n, _, _, err := p.ReadFrom(rb); err != nil ***REMOVED***
-			switch runtime.GOOS ***REMOVED***
+		}
+		if n, _, _, err := p.ReadFrom(rb); err != nil {
+			switch runtime.GOOS {
 			case "darwin": // older darwin kernels have some limitation on receiving icmp packet through raw socket
 				t.Logf("not supported on %s", runtime.GOOS)
 				continue
-			***REMOVED***
+			}
 			t.Fatal(err)
-		***REMOVED*** else ***REMOVED***
-			if m, err := icmp.ParseMessage(iana.ProtocolIPv6ICMP, rb[:n]); err != nil ***REMOVED***
+		} else {
+			if m, err := icmp.ParseMessage(iana.ProtocolIPv6ICMP, rb[:n]); err != nil {
 				t.Fatal(err)
-			***REMOVED*** else if m.Type != ipv6.ICMPTypeEchoReply || m.Code != 0 ***REMOVED***
+			} else if m.Type != ipv6.ICMPTypeEchoReply || m.Code != 0 {
 				t.Fatalf("got type=%v, code=%v; want type=%v, code=%v", m.Type, m.Code, ipv6.ICMPTypeEchoReply, 0)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}

@@ -13,25 +13,25 @@ import (
 )
 
 // ClientConnPool manages a pool of HTTP/2 client connections.
-type ClientConnPool interface ***REMOVED***
+type ClientConnPool interface {
 	GetClientConn(req *http.Request, addr string) (*ClientConn, error)
 	MarkDead(*ClientConn)
-***REMOVED***
+}
 
 // clientConnPoolIdleCloser is the interface implemented by ClientConnPool
 // implementations which can close their idle connections.
-type clientConnPoolIdleCloser interface ***REMOVED***
+type clientConnPoolIdleCloser interface {
 	ClientConnPool
 	closeIdleConnections()
-***REMOVED***
+}
 
 var (
 	_ clientConnPoolIdleCloser = (*clientConnPool)(nil)
-	_ clientConnPoolIdleCloser = noDialClientConnPool***REMOVED******REMOVED***
+	_ clientConnPoolIdleCloser = noDialClientConnPool{}
 )
 
 // TODO: use singleflight for dialing and addConnCalls?
-type clientConnPool struct ***REMOVED***
+type clientConnPool struct {
 	t *Transport
 
 	mu sync.Mutex // TODO: maybe switch to RWMutex
@@ -41,80 +41,80 @@ type clientConnPool struct ***REMOVED***
 	dialing      map[string]*dialCall     // currently in-flight dials
 	keys         map[*ClientConn][]string
 	addConnCalls map[string]*addConnCall // in-flight addConnIfNeede calls
-***REMOVED***
+}
 
-func (p *clientConnPool) GetClientConn(req *http.Request, addr string) (*ClientConn, error) ***REMOVED***
+func (p *clientConnPool) GetClientConn(req *http.Request, addr string) (*ClientConn, error) {
 	return p.getClientConn(req, addr, dialOnMiss)
-***REMOVED***
+}
 
 const (
 	dialOnMiss   = true
 	noDialOnMiss = false
 )
 
-func (p *clientConnPool) getClientConn(req *http.Request, addr string, dialOnMiss bool) (*ClientConn, error) ***REMOVED***
-	if isConnectionCloseRequest(req) && dialOnMiss ***REMOVED***
+func (p *clientConnPool) getClientConn(req *http.Request, addr string, dialOnMiss bool) (*ClientConn, error) {
+	if isConnectionCloseRequest(req) && dialOnMiss {
 		// It gets its own connection.
 		const singleUse = true
 		cc, err := p.t.dialClientConn(addr, singleUse)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		return cc, nil
-	***REMOVED***
+	}
 	p.mu.Lock()
-	for _, cc := range p.conns[addr] ***REMOVED***
-		if cc.CanTakeNewRequest() ***REMOVED***
+	for _, cc := range p.conns[addr] {
+		if cc.CanTakeNewRequest() {
 			p.mu.Unlock()
 			return cc, nil
-		***REMOVED***
-	***REMOVED***
-	if !dialOnMiss ***REMOVED***
+		}
+	}
+	if !dialOnMiss {
 		p.mu.Unlock()
 		return nil, ErrNoCachedConn
-	***REMOVED***
+	}
 	call := p.getStartDialLocked(addr)
 	p.mu.Unlock()
 	<-call.done
 	return call.res, call.err
-***REMOVED***
+}
 
 // dialCall is an in-flight Transport dial call to a host.
-type dialCall struct ***REMOVED***
+type dialCall struct {
 	p    *clientConnPool
-	done chan struct***REMOVED******REMOVED*** // closed when done
+	done chan struct{} // closed when done
 	res  *ClientConn   // valid after done is closed
 	err  error         // valid after done is closed
-***REMOVED***
+}
 
 // requires p.mu is held.
-func (p *clientConnPool) getStartDialLocked(addr string) *dialCall ***REMOVED***
-	if call, ok := p.dialing[addr]; ok ***REMOVED***
+func (p *clientConnPool) getStartDialLocked(addr string) *dialCall {
+	if call, ok := p.dialing[addr]; ok {
 		// A dial is already in-flight. Don't start another.
 		return call
-	***REMOVED***
-	call := &dialCall***REMOVED***p: p, done: make(chan struct***REMOVED******REMOVED***)***REMOVED***
-	if p.dialing == nil ***REMOVED***
+	}
+	call := &dialCall{p: p, done: make(chan struct{})}
+	if p.dialing == nil {
 		p.dialing = make(map[string]*dialCall)
-	***REMOVED***
+	}
 	p.dialing[addr] = call
 	go call.dial(addr)
 	return call
-***REMOVED***
+}
 
 // run in its own goroutine.
-func (c *dialCall) dial(addr string) ***REMOVED***
+func (c *dialCall) dial(addr string) {
 	const singleUse = false // shared conn
 	c.res, c.err = c.p.t.dialClientConn(addr, singleUse)
 	close(c.done)
 
 	c.p.mu.Lock()
 	delete(c.p.dialing, addr)
-	if c.err == nil ***REMOVED***
+	if c.err == nil {
 		c.p.addConnLocked(addr, c.res)
-	***REMOVED***
+	}
 	c.p.mu.Unlock()
-***REMOVED***
+}
 
 // addConnIfNeeded makes a NewClientConn out of c if a connection for key doesn't
 // already exist. It coalesces concurrent calls with the same key.
@@ -124,98 +124,98 @@ func (c *dialCall) dial(addr string) ***REMOVED***
 // This code decides which ones live or die.
 // The return value used is whether c was used.
 // c is never closed.
-func (p *clientConnPool) addConnIfNeeded(key string, t *Transport, c *tls.Conn) (used bool, err error) ***REMOVED***
+func (p *clientConnPool) addConnIfNeeded(key string, t *Transport, c *tls.Conn) (used bool, err error) {
 	p.mu.Lock()
-	for _, cc := range p.conns[key] ***REMOVED***
-		if cc.CanTakeNewRequest() ***REMOVED***
+	for _, cc := range p.conns[key] {
+		if cc.CanTakeNewRequest() {
 			p.mu.Unlock()
 			return false, nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	call, dup := p.addConnCalls[key]
-	if !dup ***REMOVED***
-		if p.addConnCalls == nil ***REMOVED***
+	if !dup {
+		if p.addConnCalls == nil {
 			p.addConnCalls = make(map[string]*addConnCall)
-		***REMOVED***
-		call = &addConnCall***REMOVED***
+		}
+		call = &addConnCall{
 			p:    p,
-			done: make(chan struct***REMOVED******REMOVED***),
-		***REMOVED***
+			done: make(chan struct{}),
+		}
 		p.addConnCalls[key] = call
 		go call.run(t, key, c)
-	***REMOVED***
+	}
 	p.mu.Unlock()
 
 	<-call.done
-	if call.err != nil ***REMOVED***
+	if call.err != nil {
 		return false, call.err
-	***REMOVED***
+	}
 	return !dup, nil
-***REMOVED***
+}
 
-type addConnCall struct ***REMOVED***
+type addConnCall struct {
 	p    *clientConnPool
-	done chan struct***REMOVED******REMOVED*** // closed when done
+	done chan struct{} // closed when done
 	err  error
-***REMOVED***
+}
 
-func (c *addConnCall) run(t *Transport, key string, tc *tls.Conn) ***REMOVED***
+func (c *addConnCall) run(t *Transport, key string, tc *tls.Conn) {
 	cc, err := t.NewClientConn(tc)
 
 	p := c.p
 	p.mu.Lock()
-	if err != nil ***REMOVED***
+	if err != nil {
 		c.err = err
-	***REMOVED*** else ***REMOVED***
+	} else {
 		p.addConnLocked(key, cc)
-	***REMOVED***
+	}
 	delete(p.addConnCalls, key)
 	p.mu.Unlock()
 	close(c.done)
-***REMOVED***
+}
 
-func (p *clientConnPool) addConn(key string, cc *ClientConn) ***REMOVED***
+func (p *clientConnPool) addConn(key string, cc *ClientConn) {
 	p.mu.Lock()
 	p.addConnLocked(key, cc)
 	p.mu.Unlock()
-***REMOVED***
+}
 
 // p.mu must be held
-func (p *clientConnPool) addConnLocked(key string, cc *ClientConn) ***REMOVED***
-	for _, v := range p.conns[key] ***REMOVED***
-		if v == cc ***REMOVED***
+func (p *clientConnPool) addConnLocked(key string, cc *ClientConn) {
+	for _, v := range p.conns[key] {
+		if v == cc {
 			return
-		***REMOVED***
-	***REMOVED***
-	if p.conns == nil ***REMOVED***
+		}
+	}
+	if p.conns == nil {
 		p.conns = make(map[string][]*ClientConn)
-	***REMOVED***
-	if p.keys == nil ***REMOVED***
+	}
+	if p.keys == nil {
 		p.keys = make(map[*ClientConn][]string)
-	***REMOVED***
+	}
 	p.conns[key] = append(p.conns[key], cc)
 	p.keys[cc] = append(p.keys[cc], key)
-***REMOVED***
+}
 
-func (p *clientConnPool) MarkDead(cc *ClientConn) ***REMOVED***
+func (p *clientConnPool) MarkDead(cc *ClientConn) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
-	for _, key := range p.keys[cc] ***REMOVED***
+	for _, key := range p.keys[cc] {
 		vv, ok := p.conns[key]
-		if !ok ***REMOVED***
+		if !ok {
 			continue
-		***REMOVED***
+		}
 		newList := filterOutClientConn(vv, cc)
-		if len(newList) > 0 ***REMOVED***
+		if len(newList) > 0 {
 			p.conns[key] = newList
-		***REMOVED*** else ***REMOVED***
+		} else {
 			delete(p.conns, key)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	delete(p.keys, cc)
-***REMOVED***
+}
 
-func (p *clientConnPool) closeIdleConnections() ***REMOVED***
+func (p *clientConnPool) closeIdleConnections() {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	// TODO: don't close a cc if it was just added to the pool
@@ -224,33 +224,33 @@ func (p *clientConnPool) closeIdleConnections() ***REMOVED***
 	// where it can add an idle conn just before using it, and
 	// somebody else can concurrently call CloseIdleConns and
 	// break some caller's RoundTrip.
-	for _, vv := range p.conns ***REMOVED***
-		for _, cc := range vv ***REMOVED***
+	for _, vv := range p.conns {
+		for _, cc := range vv {
 			cc.closeIfIdle()
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func filterOutClientConn(in []*ClientConn, exclude *ClientConn) []*ClientConn ***REMOVED***
+func filterOutClientConn(in []*ClientConn, exclude *ClientConn) []*ClientConn {
 	out := in[:0]
-	for _, v := range in ***REMOVED***
-		if v != exclude ***REMOVED***
+	for _, v := range in {
+		if v != exclude {
 			out = append(out, v)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	// If we filtered it out, zero out the last item to prevent
 	// the GC from seeing it.
-	if len(in) != len(out) ***REMOVED***
+	if len(in) != len(out) {
 		in[len(in)-1] = nil
-	***REMOVED***
+	}
 	return out
-***REMOVED***
+}
 
 // noDialClientConnPool is an implementation of http2.ClientConnPool
 // which never dials. We let the HTTP/1.1 client dial and use its TLS
 // connection instead.
-type noDialClientConnPool struct***REMOVED*** *clientConnPool ***REMOVED***
+type noDialClientConnPool struct{ *clientConnPool }
 
-func (p noDialClientConnPool) GetClientConn(req *http.Request, addr string) (*ClientConn, error) ***REMOVED***
+func (p noDialClientConnPool) GetClientConn(req *http.Request, addr string) (*ClientConn, error) {
 	return p.getClientConn(req, addr, noDialOnMiss)
-***REMOVED***
+}

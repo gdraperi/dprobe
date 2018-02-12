@@ -18,18 +18,18 @@ const (
 // this is set to a non 0 value in the test code
 var defaultFilePerm = os.FileMode(0)
 
-type Process struct ***REMOVED***
+type Process struct {
 	// Subsystem is the name of the subsystem that the process is in
 	Subsystem Name
 	// Pid is the process id of the process
 	Pid int
 	// Path is the full path of the subsystem and location that the process is in
 	Path string
-***REMOVED***
+}
 
 // Cgroup handles interactions with the individual groups to perform
 // actions on them as them main interface to this cgroup package
-type Cgroup interface ***REMOVED***
+type Cgroup interface {
 	// New creates a new cgroup under the calling cgroup
 	New(string, *specs.LinuxResources) (Cgroup, error)
 	// Add adds a process to the cgroup
@@ -55,4 +55,4 @@ type Cgroup interface ***REMOVED***
 	State() State
 	// Subsystems returns all the subsystems in the cgroup
 	Subsystems() []Subsystem
-***REMOVED***
+}

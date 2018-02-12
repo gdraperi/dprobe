@@ -9,30 +9,30 @@ import "encoding/binary"
 // the precomputed values for BLAKE2b
 // there are 12 16-byte arrays - one for each round
 // the entries are calculated from the sigma constants.
-var precomputed = [12][16]byte***REMOVED***
-	***REMOVED***0, 2, 4, 6, 1, 3, 5, 7, 8, 10, 12, 14, 9, 11, 13, 15***REMOVED***,
-	***REMOVED***14, 4, 9, 13, 10, 8, 15, 6, 1, 0, 11, 5, 12, 2, 7, 3***REMOVED***,
-	***REMOVED***11, 12, 5, 15, 8, 0, 2, 13, 10, 3, 7, 9, 14, 6, 1, 4***REMOVED***,
-	***REMOVED***7, 3, 13, 11, 9, 1, 12, 14, 2, 5, 4, 15, 6, 10, 0, 8***REMOVED***,
-	***REMOVED***9, 5, 2, 10, 0, 7, 4, 15, 14, 11, 6, 3, 1, 12, 8, 13***REMOVED***,
-	***REMOVED***2, 6, 0, 8, 12, 10, 11, 3, 4, 7, 15, 1, 13, 5, 14, 9***REMOVED***,
-	***REMOVED***12, 1, 14, 4, 5, 15, 13, 10, 0, 6, 9, 8, 7, 3, 2, 11***REMOVED***,
-	***REMOVED***13, 7, 12, 3, 11, 14, 1, 9, 5, 15, 8, 2, 0, 4, 6, 10***REMOVED***,
-	***REMOVED***6, 14, 11, 0, 15, 9, 3, 8, 12, 13, 1, 10, 2, 7, 4, 5***REMOVED***,
-	***REMOVED***10, 8, 7, 1, 2, 4, 6, 5, 15, 9, 3, 13, 11, 14, 12, 0***REMOVED***,
-	***REMOVED***0, 2, 4, 6, 1, 3, 5, 7, 8, 10, 12, 14, 9, 11, 13, 15***REMOVED***, // equal to the first
-	***REMOVED***14, 4, 9, 13, 10, 8, 15, 6, 1, 0, 11, 5, 12, 2, 7, 3***REMOVED***, // equal to the second
-***REMOVED***
+var precomputed = [12][16]byte{
+	{0, 2, 4, 6, 1, 3, 5, 7, 8, 10, 12, 14, 9, 11, 13, 15},
+	{14, 4, 9, 13, 10, 8, 15, 6, 1, 0, 11, 5, 12, 2, 7, 3},
+	{11, 12, 5, 15, 8, 0, 2, 13, 10, 3, 7, 9, 14, 6, 1, 4},
+	{7, 3, 13, 11, 9, 1, 12, 14, 2, 5, 4, 15, 6, 10, 0, 8},
+	{9, 5, 2, 10, 0, 7, 4, 15, 14, 11, 6, 3, 1, 12, 8, 13},
+	{2, 6, 0, 8, 12, 10, 11, 3, 4, 7, 15, 1, 13, 5, 14, 9},
+	{12, 1, 14, 4, 5, 15, 13, 10, 0, 6, 9, 8, 7, 3, 2, 11},
+	{13, 7, 12, 3, 11, 14, 1, 9, 5, 15, 8, 2, 0, 4, 6, 10},
+	{6, 14, 11, 0, 15, 9, 3, 8, 12, 13, 1, 10, 2, 7, 4, 5},
+	{10, 8, 7, 1, 2, 4, 6, 5, 15, 9, 3, 13, 11, 14, 12, 0},
+	{0, 2, 4, 6, 1, 3, 5, 7, 8, 10, 12, 14, 9, 11, 13, 15}, // equal to the first
+	{14, 4, 9, 13, 10, 8, 15, 6, 1, 0, 11, 5, 12, 2, 7, 3}, // equal to the second
+}
 
-func hashBlocksGeneric(h *[8]uint64, c *[2]uint64, flag uint64, blocks []byte) ***REMOVED***
+func hashBlocksGeneric(h *[8]uint64, c *[2]uint64, flag uint64, blocks []byte) {
 	var m [16]uint64
 	c0, c1 := c[0], c[1]
 
-	for i := 0; i < len(blocks); ***REMOVED***
+	for i := 0; i < len(blocks); {
 		c0 += BlockSize
-		if c0 < BlockSize ***REMOVED***
+		if c0 < BlockSize {
 			c1++
-		***REMOVED***
+		}
 
 		v0, v1, v2, v3, v4, v5, v6, v7 := h[0], h[1], h[2], h[3], h[4], h[5], h[6], h[7]
 		v8, v9, v10, v11, v12, v13, v14, v15 := iv[0], iv[1], iv[2], iv[3], iv[4], iv[5], iv[6], iv[7]
@@ -40,12 +40,12 @@ func hashBlocksGeneric(h *[8]uint64, c *[2]uint64, flag uint64, blocks []byte) *
 		v13 ^= c1
 		v14 ^= flag
 
-		for j := range m ***REMOVED***
+		for j := range m {
 			m[j] = binary.LittleEndian.Uint64(blocks[i:])
 			i += 8
-		***REMOVED***
+		}
 
-		for j := range precomputed ***REMOVED***
+		for j := range precomputed {
 			s := &(precomputed[j])
 
 			v0 += m[s[0]]
@@ -164,7 +164,7 @@ func hashBlocksGeneric(h *[8]uint64, c *[2]uint64, flag uint64, blocks []byte) *
 			v4 ^= v9
 			v4 = v4<<(64-63) | v4>>63
 
-		***REMOVED***
+		}
 
 		h[0] ^= v0 ^ v8
 		h[1] ^= v1 ^ v9
@@ -174,6 +174,6 @@ func hashBlocksGeneric(h *[8]uint64, c *[2]uint64, flag uint64, blocks []byte) *
 		h[5] ^= v5 ^ v13
 		h[6] ^= v6 ^ v14
 		h[7] ^= v7 ^ v15
-	***REMOVED***
+	}
 	c[0], c[1] = c0, c1
-***REMOVED***
+}

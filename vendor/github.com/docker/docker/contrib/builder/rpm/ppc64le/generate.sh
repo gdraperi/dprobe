@@ -12,15 +12,15 @@ set -e
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
 versions=( "$@" )
-if [ $***REMOVED***#versions[@]***REMOVED*** -eq 0 ]; then
+if [ ${#versions[@]} -eq 0 ]; then
 	versions=( */ )
 fi
-versions=( "$***REMOVED***versions[@]%/***REMOVED***" )
+versions=( "${versions[@]%/}" )
 
-for version in "$***REMOVED***versions[@]***REMOVED***"; do
-	distro="$***REMOVED***version%-****REMOVED***"
-	suite="$***REMOVED***version##*-***REMOVED***"
-	from="ppc64le/$***REMOVED***distro***REMOVED***:$***REMOVED***suite***REMOVED***"
+for version in "${versions[@]}"; do
+	distro="${version%-*}"
+	suite="${version##*-}"
+	from="ppc64le/${distro}:${suite}"
 	installer=yum
 
 	if [[ "$distro" == "fedora" ]]; then
@@ -44,7 +44,7 @@ for version in "$***REMOVED***versions[@]***REMOVED***"; do
 
 	case "$from" in
 		ppc64le/fedora:*)
-			echo "RUN $***REMOVED***installer***REMOVED*** -y upgrade" >> "$version/Dockerfile"
+			echo "RUN ${installer} -y upgrade" >> "$version/Dockerfile"
 			;;
 		*) ;;
 	esac
@@ -61,12 +61,12 @@ for version in "$***REMOVED***versions[@]***REMOVED***"; do
 		ppc64le/opensuse:*)
 			# Add the ppc64le repo (hopefully the image is updated soon)
 			# get rpm-build and curl packages and dependencies
-			echo "RUN zypper addrepo -n ppc64le-oss -f https://download.opensuse.org/ports/ppc/distribution/leap/$***REMOVED***suite***REMOVED***/repo/oss/ ppc64le-oss"  >> "$version/Dockerfile"
-			echo "RUN zypper addrepo -n ppc64le-updates -f https://download.opensuse.org/ports/update/$***REMOVED***suite***REMOVED***/ ppc64le-updates" >> "$version/Dockerfile"
+			echo "RUN zypper addrepo -n ppc64le-oss -f https://download.opensuse.org/ports/ppc/distribution/leap/${suite}/repo/oss/ ppc64le-oss"  >> "$version/Dockerfile"
+			echo "RUN zypper addrepo -n ppc64le-updates -f https://download.opensuse.org/ports/update/${suite}/ ppc64le-updates" >> "$version/Dockerfile"
 			echo 'RUN zypper --non-interactive install ca-certificates* curl gzip rpm-build' >> "$version/Dockerfile"
 			;;
 		*)
-			echo "RUN $***REMOVED***installer***REMOVED*** install -y @development-tools fedora-packager" >> "$version/Dockerfile"
+			echo "RUN ${installer} install -y @development-tools fedora-packager" >> "$version/Dockerfile"
 			;;
 	esac
 
@@ -90,7 +90,7 @@ for version in "$***REMOVED***versions[@]***REMOVED***"; do
 	# opensuse does not have the right libseccomp libs
 	case "$from" in
 		ppc64le/opensuse:*)
-			packages=( "$***REMOVED***packages[@]/libseccomp-devel***REMOVED***" )
+			packages=( "${packages[@]/libseccomp-devel}" )
 			runcBuildTags="selinux"
 			;;
 		*)
@@ -101,26 +101,26 @@ for version in "$***REMOVED***versions[@]***REMOVED***"; do
 
 	case "$from" in
 		ppc64le/opensuse:*)
-			packages=( "$***REMOVED***packages[@]/btrfs-progs-devel/libbtrfs-devel***REMOVED***" )
-			packages=( "$***REMOVED***packages[@]/pkgconfig/pkg-config***REMOVED***" )
-			packages=( "$***REMOVED***packages[@]/vim-common/vim***REMOVED***" )
+			packages=( "${packages[@]/btrfs-progs-devel/libbtrfs-devel}" )
+			packages=( "${packages[@]/pkgconfig/pkg-config}" )
+			packages=( "${packages[@]/vim-common/vim}" )
 			if [[ "$from" == "ppc64le/opensuse:13."* ]]; then
 				packages+=( systemd-rpm-macros )
 			fi
 
 			# use zypper
-			echo "RUN zypper --non-interactive install $***REMOVED***packages[*]***REMOVED***" >> "$version/Dockerfile"
+			echo "RUN zypper --non-interactive install ${packages[*]}" >> "$version/Dockerfile"
 			;;
 		*)
-			echo "RUN $***REMOVED***installer***REMOVED*** install -y $***REMOVED***packages[*]***REMOVED***" >> "$version/Dockerfile"
+			echo "RUN ${installer} install -y ${packages[*]}" >> "$version/Dockerfile"
 			;;
 	esac
 
 	echo >> "$version/Dockerfile"
 
 
-	awk '$1 == "ENV" && $2 == "GO_VERSION" ***REMOVED*** print; exit ***REMOVED***' ../../../../Dockerfile.ppc64le >> "$version/Dockerfile"
-	echo 'RUN curl -fsSL "https://golang.org/dl/go$***REMOVED***GO_VERSION***REMOVED***.linux-ppc64le.tar.gz" | tar xzC /usr/local' >> "$version/Dockerfile"
+	awk '$1 == "ENV" && $2 == "GO_VERSION" { print; exit }' ../../../../Dockerfile.ppc64le >> "$version/Dockerfile"
+	echo 'RUN curl -fsSL "https://golang.org/dl/go${GO_VERSION}.linux-ppc64le.tar.gz" | tar xzC /usr/local' >> "$version/Dockerfile"
 	echo 'ENV PATH $PATH:/usr/local/go/bin' >> "$version/Dockerfile"
 
 	echo >> "$version/Dockerfile"

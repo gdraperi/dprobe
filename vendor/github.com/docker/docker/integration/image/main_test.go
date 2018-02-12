@@ -10,24 +10,24 @@ import (
 
 var testEnv *environment.Execution
 
-func TestMain(m *testing.M) ***REMOVED***
+func TestMain(m *testing.M) {
 	var err error
 	testEnv, err = environment.New()
-	if err != nil ***REMOVED***
+	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
-	***REMOVED***
+	}
 	err = environment.EnsureFrozenImagesLinux(testEnv)
-	if err != nil ***REMOVED***
+	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
-	***REMOVED***
+	}
 
 	testEnv.Print()
 	os.Exit(m.Run())
-***REMOVED***
+}
 
-func setupTest(t *testing.T) func() ***REMOVED***
+func setupTest(t *testing.T) func() {
 	environment.ProtectAll(t, testEnv)
-	return func() ***REMOVED*** testEnv.Clean(t) ***REMOVED***
-***REMOVED***
+	return func() { testEnv.Clean(t) }
+}

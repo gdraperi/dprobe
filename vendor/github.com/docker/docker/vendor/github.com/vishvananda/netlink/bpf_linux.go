@@ -8,18 +8,18 @@ package netlink
 #include <stdint.h>
 #include <unistd.h>
 
-static int load_simple_bpf(int prog_type, int ret) ***REMOVED***
+static int load_simple_bpf(int prog_type, int ret) {
 #ifdef __NR_bpf
-	// ***REMOVED*** return ret; ***REMOVED***
-	__u64 __attribute__((aligned(8))) insns[] = ***REMOVED***
+	// { return ret; }
+	__u64 __attribute__((aligned(8))) insns[] = {
 		0x00000000000000b7ull | ((__u64)ret<<32),
 		0x0000000000000095ull,
-	***REMOVED***;
+	};
 	__u8 __attribute__((aligned(8))) license[] = "ASL2";
 	// Copied from a header file since libc is notoriously slow to update.
 	// The call will succeed or fail and that will be our indication on
 	// whether or not it is supported.
-	struct ***REMOVED***
+	struct {
 		__u32 prog_type;
 		__u32 insn_cnt;
 		__u64 insns;
@@ -28,18 +28,18 @@ static int load_simple_bpf(int prog_type, int ret) ***REMOVED***
 		__u32 log_size;
 		__u64 log_buf;
 		__u32 kern_version;
-	***REMOVED*** __attribute__((aligned(8))) attr = ***REMOVED***
+	} __attribute__((aligned(8))) attr = {
 		.prog_type = prog_type,
 		.insn_cnt = 2,
 		.insns = (uintptr_t)&insns,
 		.license = (uintptr_t)&license,
-	***REMOVED***;
+	};
 	return syscall(__NR_bpf, 5, &attr, sizeof(attr));
 #else
 	errno = EINVAL;
 	return -1;
 #endif
-***REMOVED***
+}
 */
 import "C"
 
@@ -56,7 +56,7 @@ const (
 )
 
 // loadSimpleBpf loads a trivial bpf program for testing purposes
-func loadSimpleBpf(progType BpfProgType, ret int) (int, error) ***REMOVED***
+func loadSimpleBpf(progType BpfProgType, ret int) (int, error) {
 	fd, err := C.load_simple_bpf(C.int(progType), C.int(ret))
 	return int(fd), err
-***REMOVED***
+}

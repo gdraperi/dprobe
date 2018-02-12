@@ -44,30 +44,30 @@ var (
 
 // Consul is the receiver type for the
 // Store interface
-type Consul struct ***REMOVED***
+type Consul struct {
 	sync.Mutex
 	config *api.Config
 	client *api.Client
-***REMOVED***
+}
 
-type consulLock struct ***REMOVED***
+type consulLock struct {
 	lock    *api.Lock
-	renewCh chan struct***REMOVED******REMOVED***
-***REMOVED***
+	renewCh chan struct{}
+}
 
 // Register registers consul to libkv
-func Register() ***REMOVED***
+func Register() {
 	libkv.AddStore(store.CONSUL, New)
-***REMOVED***
+}
 
 // New creates a new Consul client given a list
 // of endpoints and optional tls config
-func New(endpoints []string, options *store.Config) (store.Store, error) ***REMOVED***
-	if len(endpoints) > 1 ***REMOVED***
+func New(endpoints []string, options *store.Config) (store.Store, error) {
+	if len(endpoints) > 1 {
 		return nil, ErrMultipleEndpointsUnsupported
-	***REMOVED***
+	}
 
-	s := &Consul***REMOVED******REMOVED***
+	s := &Consul{}
 
 	// Create Consul client
 	config := api.DefaultConfig()
@@ -77,356 +77,356 @@ func New(endpoints []string, options *store.Config) (store.Store, error) ***REMO
 	config.Scheme = "http"
 
 	// Set options
-	if options != nil ***REMOVED***
-		if options.TLS != nil ***REMOVED***
+	if options != nil {
+		if options.TLS != nil {
 			s.setTLS(options.TLS)
-		***REMOVED***
-		if options.ConnectionTimeout != 0 ***REMOVED***
+		}
+		if options.ConnectionTimeout != 0 {
 			s.setTimeout(options.ConnectionTimeout)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Creates a new client
 	client, err := api.NewClient(config)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	s.client = client
 
 	return s, nil
-***REMOVED***
+}
 
 // SetTLS sets Consul TLS options
-func (s *Consul) setTLS(tls *tls.Config) ***REMOVED***
-	s.config.HttpClient.Transport = &http.Transport***REMOVED***
+func (s *Consul) setTLS(tls *tls.Config) {
+	s.config.HttpClient.Transport = &http.Transport{
 		TLSClientConfig: tls,
-	***REMOVED***
+	}
 	s.config.Scheme = "https"
-***REMOVED***
+}
 
 // SetTimeout sets the timeout for connecting to Consul
-func (s *Consul) setTimeout(time time.Duration) ***REMOVED***
+func (s *Consul) setTimeout(time time.Duration) {
 	s.config.WaitTime = time
-***REMOVED***
+}
 
 // Normalize the key for usage in Consul
-func (s *Consul) normalize(key string) string ***REMOVED***
+func (s *Consul) normalize(key string) string {
 	key = store.Normalize(key)
 	return strings.TrimPrefix(key, "/")
-***REMOVED***
+}
 
-func (s *Consul) renewSession(pair *api.KVPair, ttl time.Duration) error ***REMOVED***
+func (s *Consul) renewSession(pair *api.KVPair, ttl time.Duration) error {
 	// Check if there is any previous session with an active TTL
 	session, err := s.getActiveSession(pair.Key)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if session == "" ***REMOVED***
-		entry := &api.SessionEntry***REMOVED***
+	if session == "" {
+		entry := &api.SessionEntry{
 			Behavior:  api.SessionBehaviorDelete, // Delete the key when the session expires
 			TTL:       (ttl / 2).String(),        // Consul multiplies the TTL by 2x
 			LockDelay: 1 * time.Millisecond,      // Virtually disable lock delay
-		***REMOVED***
+		}
 
 		// Create the key session
 		session, _, err = s.client.Session().Create(entry, nil)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 
-		lockOpts := &api.LockOptions***REMOVED***
+		lockOpts := &api.LockOptions{
 			Key:     pair.Key,
 			Session: session,
-		***REMOVED***
+		}
 
 		// Lock and ignore if lock is held
 		// It's just a placeholder for the
 		// ephemeral behavior
 		lock, _ := s.client.LockOpts(lockOpts)
-		if lock != nil ***REMOVED***
+		if lock != nil {
 			lock.Lock(nil)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	_, _, err = s.client.Session().Renew(session, nil)
 	return err
-***REMOVED***
+}
 
 // getActiveSession checks if the key already has
 // a session attached
-func (s *Consul) getActiveSession(key string) (string, error) ***REMOVED***
+func (s *Consul) getActiveSession(key string) (string, error) {
 	pair, _, err := s.client.KV().Get(key, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
-	if pair != nil && pair.Session != "" ***REMOVED***
+	}
+	if pair != nil && pair.Session != "" {
 		return pair.Session, nil
-	***REMOVED***
+	}
 	return "", nil
-***REMOVED***
+}
 
 // Get the value at "key", returns the last modified index
 // to use in conjunction to CAS calls
-func (s *Consul) Get(key string) (*store.KVPair, error) ***REMOVED***
-	options := &api.QueryOptions***REMOVED***
+func (s *Consul) Get(key string) (*store.KVPair, error) {
+	options := &api.QueryOptions{
 		AllowStale:        false,
 		RequireConsistent: true,
-	***REMOVED***
+	}
 
 	pair, meta, err := s.client.KV().Get(s.normalize(key), options)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// If pair is nil then the key does not exist
-	if pair == nil ***REMOVED***
+	if pair == nil {
 		return nil, store.ErrKeyNotFound
-	***REMOVED***
+	}
 
-	return &store.KVPair***REMOVED***Key: pair.Key, Value: pair.Value, LastIndex: meta.LastIndex***REMOVED***, nil
-***REMOVED***
+	return &store.KVPair{Key: pair.Key, Value: pair.Value, LastIndex: meta.LastIndex}, nil
+}
 
 // Put a value at "key"
-func (s *Consul) Put(key string, value []byte, opts *store.WriteOptions) error ***REMOVED***
+func (s *Consul) Put(key string, value []byte, opts *store.WriteOptions) error {
 	key = s.normalize(key)
 
-	p := &api.KVPair***REMOVED***
+	p := &api.KVPair{
 		Key:   key,
 		Value: value,
 		Flags: api.LockFlagValue,
-	***REMOVED***
+	}
 
-	if opts != nil && opts.TTL > 0 ***REMOVED***
+	if opts != nil && opts.TTL > 0 {
 		// Create or renew a session holding a TTL. Operations on sessions
 		// are not deterministic: creating or renewing a session can fail
-		for retry := 1; retry <= RenewSessionRetryMax; retry++ ***REMOVED***
+		for retry := 1; retry <= RenewSessionRetryMax; retry++ {
 			err := s.renewSession(p, opts.TTL)
-			if err == nil ***REMOVED***
+			if err == nil {
 				break
-			***REMOVED***
-			if retry == RenewSessionRetryMax ***REMOVED***
+			}
+			if retry == RenewSessionRetryMax {
 				return ErrSessionRenew
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	_, err := s.client.KV().Put(p, nil)
 	return err
-***REMOVED***
+}
 
 // Delete a value at "key"
-func (s *Consul) Delete(key string) error ***REMOVED***
-	if _, err := s.Get(key); err != nil ***REMOVED***
+func (s *Consul) Delete(key string) error {
+	if _, err := s.Get(key); err != nil {
 		return err
-	***REMOVED***
+	}
 	_, err := s.client.KV().Delete(s.normalize(key), nil)
 	return err
-***REMOVED***
+}
 
 // Exists checks that the key exists inside the store
-func (s *Consul) Exists(key string) (bool, error) ***REMOVED***
+func (s *Consul) Exists(key string) (bool, error) {
 	_, err := s.Get(key)
-	if err != nil ***REMOVED***
-		if err == store.ErrKeyNotFound ***REMOVED***
+	if err != nil {
+		if err == store.ErrKeyNotFound {
 			return false, nil
-		***REMOVED***
+		}
 		return false, err
-	***REMOVED***
+	}
 	return true, nil
-***REMOVED***
+}
 
 // List child nodes of a given directory
-func (s *Consul) List(directory string) ([]*store.KVPair, error) ***REMOVED***
+func (s *Consul) List(directory string) ([]*store.KVPair, error) {
 	pairs, _, err := s.client.KV().List(s.normalize(directory), nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if len(pairs) == 0 ***REMOVED***
+	}
+	if len(pairs) == 0 {
 		return nil, store.ErrKeyNotFound
-	***REMOVED***
+	}
 
-	kv := []*store.KVPair***REMOVED******REMOVED***
+	kv := []*store.KVPair{}
 
-	for _, pair := range pairs ***REMOVED***
-		if pair.Key == directory ***REMOVED***
+	for _, pair := range pairs {
+		if pair.Key == directory {
 			continue
-		***REMOVED***
-		kv = append(kv, &store.KVPair***REMOVED***
+		}
+		kv = append(kv, &store.KVPair{
 			Key:       pair.Key,
 			Value:     pair.Value,
 			LastIndex: pair.ModifyIndex,
-		***REMOVED***)
-	***REMOVED***
+		})
+	}
 
 	return kv, nil
-***REMOVED***
+}
 
 // DeleteTree deletes a range of keys under a given directory
-func (s *Consul) DeleteTree(directory string) error ***REMOVED***
-	if _, err := s.List(directory); err != nil ***REMOVED***
+func (s *Consul) DeleteTree(directory string) error {
+	if _, err := s.List(directory); err != nil {
 		return err
-	***REMOVED***
+	}
 	_, err := s.client.KV().DeleteTree(s.normalize(directory), nil)
 	return err
-***REMOVED***
+}
 
 // Watch for changes on a "key"
 // It returns a channel that will receive changes or pass
 // on errors. Upon creation, the current value will first
 // be sent to the channel. Providing a non-nil stopCh can
 // be used to stop watching.
-func (s *Consul) Watch(key string, stopCh <-chan struct***REMOVED******REMOVED***) (<-chan *store.KVPair, error) ***REMOVED***
+func (s *Consul) Watch(key string, stopCh <-chan struct{}) (<-chan *store.KVPair, error) {
 	kv := s.client.KV()
 	watchCh := make(chan *store.KVPair)
 
-	go func() ***REMOVED***
+	go func() {
 		defer close(watchCh)
 
 		// Use a wait time in order to check if we should quit
 		// from time to time.
-		opts := &api.QueryOptions***REMOVED***WaitTime: DefaultWatchWaitTime***REMOVED***
+		opts := &api.QueryOptions{WaitTime: DefaultWatchWaitTime}
 
-		for ***REMOVED***
+		for {
 			// Check if we should quit
-			select ***REMOVED***
+			select {
 			case <-stopCh:
 				return
 			default:
-			***REMOVED***
+			}
 
 			// Get the key
 			pair, meta, err := kv.Get(key, opts)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return
-			***REMOVED***
+			}
 
 			// If LastIndex didn't change then it means `Get` returned
 			// because of the WaitTime and the key didn't changed.
-			if opts.WaitIndex == meta.LastIndex ***REMOVED***
+			if opts.WaitIndex == meta.LastIndex {
 				continue
-			***REMOVED***
+			}
 			opts.WaitIndex = meta.LastIndex
 
 			// Return the value to the channel
 			// FIXME: What happens when a key is deleted?
-			if pair != nil ***REMOVED***
-				watchCh <- &store.KVPair***REMOVED***
+			if pair != nil {
+				watchCh <- &store.KVPair{
 					Key:       pair.Key,
 					Value:     pair.Value,
 					LastIndex: pair.ModifyIndex,
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***()
+				}
+			}
+		}
+	}()
 
 	return watchCh, nil
-***REMOVED***
+}
 
 // WatchTree watches for changes on a "directory"
 // It returns a channel that will receive changes or pass
 // on errors. Upon creating a watch, the current childs values
 // will be sent to the channel .Providing a non-nil stopCh can
 // be used to stop watching.
-func (s *Consul) WatchTree(directory string, stopCh <-chan struct***REMOVED******REMOVED***) (<-chan []*store.KVPair, error) ***REMOVED***
+func (s *Consul) WatchTree(directory string, stopCh <-chan struct{}) (<-chan []*store.KVPair, error) {
 	kv := s.client.KV()
 	watchCh := make(chan []*store.KVPair)
 
-	go func() ***REMOVED***
+	go func() {
 		defer close(watchCh)
 
 		// Use a wait time in order to check if we should quit
 		// from time to time.
-		opts := &api.QueryOptions***REMOVED***WaitTime: DefaultWatchWaitTime***REMOVED***
-		for ***REMOVED***
+		opts := &api.QueryOptions{WaitTime: DefaultWatchWaitTime}
+		for {
 			// Check if we should quit
-			select ***REMOVED***
+			select {
 			case <-stopCh:
 				return
 			default:
-			***REMOVED***
+			}
 
 			// Get all the childrens
 			pairs, meta, err := kv.List(directory, opts)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return
-			***REMOVED***
+			}
 
 			// If LastIndex didn't change then it means `Get` returned
 			// because of the WaitTime and the child keys didn't change.
-			if opts.WaitIndex == meta.LastIndex ***REMOVED***
+			if opts.WaitIndex == meta.LastIndex {
 				continue
-			***REMOVED***
+			}
 			opts.WaitIndex = meta.LastIndex
 
 			// Return children KV pairs to the channel
-			kvpairs := []*store.KVPair***REMOVED******REMOVED***
-			for _, pair := range pairs ***REMOVED***
-				if pair.Key == directory ***REMOVED***
+			kvpairs := []*store.KVPair{}
+			for _, pair := range pairs {
+				if pair.Key == directory {
 					continue
-				***REMOVED***
-				kvpairs = append(kvpairs, &store.KVPair***REMOVED***
+				}
+				kvpairs = append(kvpairs, &store.KVPair{
 					Key:       pair.Key,
 					Value:     pair.Value,
 					LastIndex: pair.ModifyIndex,
-				***REMOVED***)
-			***REMOVED***
+				})
+			}
 			watchCh <- kvpairs
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
 	return watchCh, nil
-***REMOVED***
+}
 
 // NewLock returns a handle to a lock struct which can
 // be used to provide mutual exclusion on a key
-func (s *Consul) NewLock(key string, options *store.LockOptions) (store.Locker, error) ***REMOVED***
-	lockOpts := &api.LockOptions***REMOVED***
+func (s *Consul) NewLock(key string, options *store.LockOptions) (store.Locker, error) {
+	lockOpts := &api.LockOptions{
 		Key: s.normalize(key),
-	***REMOVED***
+	}
 
-	lock := &consulLock***REMOVED******REMOVED***
+	lock := &consulLock{}
 
 	ttl := defaultLockTTL
 
-	if options != nil ***REMOVED***
+	if options != nil {
 		// Set optional TTL on Lock
-		if options.TTL != 0 ***REMOVED***
+		if options.TTL != 0 {
 			ttl = options.TTL
-		***REMOVED***
+		}
 		// Set optional value on Lock
-		if options.Value != nil ***REMOVED***
+		if options.Value != nil {
 			lockOpts.Value = options.Value
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	entry := &api.SessionEntry***REMOVED***
+	entry := &api.SessionEntry{
 		Behavior:  api.SessionBehaviorRelease, // Release the lock when the session expires
 		TTL:       (ttl / 2).String(),         // Consul multiplies the TTL by 2x
 		LockDelay: 1 * time.Millisecond,       // Virtually disable lock delay
-	***REMOVED***
+	}
 
 	// Create the key session
 	session, _, err := s.client.Session().Create(entry, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// Place the session and renew chan on lock
 	lockOpts.Session = session
 	lock.renewCh = options.RenewLock
 
 	l, err := s.client.LockOpts(lockOpts)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// Renew the session ttl lock periodically
 	s.renewLockSession(entry.TTL, session, options.RenewLock)
 
 	lock.lock = l
 	return lock, nil
-***REMOVED***
+}
 
 // renewLockSession is used to renew a session Lock, it takes
 // a stopRenew chan which is used to explicitely stop the session
@@ -436,26 +436,26 @@ func (s *Consul) NewLock(key string, options *store.LockOptions) (store.Locker, 
 // session periodically until it can contact the store, this ensures
 // that the lock is not maintained indefinitely which ensures liveness
 // over safety for the lock when the store becomes unavailable.
-func (s *Consul) renewLockSession(initialTTL string, id string, stopRenew chan struct***REMOVED******REMOVED***) ***REMOVED***
+func (s *Consul) renewLockSession(initialTTL string, id string, stopRenew chan struct{}) {
 	sessionDestroyAttempts := 0
 	ttl, err := time.ParseDuration(initialTTL)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
-	go func() ***REMOVED***
-		for ***REMOVED***
-			select ***REMOVED***
+	}
+	go func() {
+		for {
+			select {
 			case <-time.After(ttl / 2):
 				entry, _, err := s.client.Session().Renew(id, nil)
-				if err != nil ***REMOVED***
+				if err != nil {
 					// If an error occurs, continue until the
 					// session gets destroyed explicitely or
 					// the session ttl times out
 					continue
-				***REMOVED***
-				if entry == nil ***REMOVED***
+				}
+				if entry == nil {
 					return
-				***REMOVED***
+				}
 
 				// Handle the server updating the TTL
 				ttl, _ = time.ParseDuration(entry.TTL)
@@ -463,96 +463,96 @@ func (s *Consul) renewLockSession(initialTTL string, id string, stopRenew chan s
 			case <-stopRenew:
 				// Attempt a session destroy
 				_, err := s.client.Session().Destroy(id, nil)
-				if err == nil ***REMOVED***
+				if err == nil {
 					return
-				***REMOVED***
+				}
 
-				if sessionDestroyAttempts >= MaxSessionDestroyAttempts ***REMOVED***
+				if sessionDestroyAttempts >= MaxSessionDestroyAttempts {
 					return
-				***REMOVED***
+				}
 
 				// We can't destroy the session because the store
 				// is unavailable, wait for the session renew period
 				sessionDestroyAttempts++
 				time.Sleep(ttl / 2)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***()
-***REMOVED***
+			}
+		}
+	}()
+}
 
 // Lock attempts to acquire the lock and blocks while
 // doing so. It returns a channel that is closed if our
 // lock is lost or if an error occurs
-func (l *consulLock) Lock(stopChan chan struct***REMOVED******REMOVED***) (<-chan struct***REMOVED******REMOVED***, error) ***REMOVED***
+func (l *consulLock) Lock(stopChan chan struct{}) (<-chan struct{}, error) {
 	return l.lock.Lock(stopChan)
-***REMOVED***
+}
 
 // Unlock the "key". Calling unlock while
 // not holding the lock will throw an error
-func (l *consulLock) Unlock() error ***REMOVED***
-	if l.renewCh != nil ***REMOVED***
+func (l *consulLock) Unlock() error {
+	if l.renewCh != nil {
 		close(l.renewCh)
-	***REMOVED***
+	}
 	return l.lock.Unlock()
-***REMOVED***
+}
 
 // AtomicPut put a value at "key" if the key has not been
 // modified in the meantime, throws an error if this is the case
-func (s *Consul) AtomicPut(key string, value []byte, previous *store.KVPair, options *store.WriteOptions) (bool, *store.KVPair, error) ***REMOVED***
+func (s *Consul) AtomicPut(key string, value []byte, previous *store.KVPair, options *store.WriteOptions) (bool, *store.KVPair, error) {
 
-	p := &api.KVPair***REMOVED***Key: s.normalize(key), Value: value, Flags: api.LockFlagValue***REMOVED***
+	p := &api.KVPair{Key: s.normalize(key), Value: value, Flags: api.LockFlagValue}
 
-	if previous == nil ***REMOVED***
+	if previous == nil {
 		// Consul interprets ModifyIndex = 0 as new key.
 		p.ModifyIndex = 0
-	***REMOVED*** else ***REMOVED***
+	} else {
 		p.ModifyIndex = previous.LastIndex
-	***REMOVED***
+	}
 
 	ok, _, err := s.client.KV().CAS(p, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return false, nil, err
-	***REMOVED***
-	if !ok ***REMOVED***
-		if previous == nil ***REMOVED***
+	}
+	if !ok {
+		if previous == nil {
 			return false, nil, store.ErrKeyExists
-		***REMOVED***
+		}
 		return false, nil, store.ErrKeyModified
-	***REMOVED***
+	}
 
 	pair, err := s.Get(key)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return false, nil, err
-	***REMOVED***
+	}
 
 	return true, pair, nil
-***REMOVED***
+}
 
 // AtomicDelete deletes a value at "key" if the key has not
 // been modified in the meantime, throws an error if this is the case
-func (s *Consul) AtomicDelete(key string, previous *store.KVPair) (bool, error) ***REMOVED***
-	if previous == nil ***REMOVED***
+func (s *Consul) AtomicDelete(key string, previous *store.KVPair) (bool, error) {
+	if previous == nil {
 		return false, store.ErrPreviousNotSpecified
-	***REMOVED***
+	}
 
-	p := &api.KVPair***REMOVED***Key: s.normalize(key), ModifyIndex: previous.LastIndex, Flags: api.LockFlagValue***REMOVED***
+	p := &api.KVPair{Key: s.normalize(key), ModifyIndex: previous.LastIndex, Flags: api.LockFlagValue}
 
 	// Extra Get operation to check on the key
 	_, err := s.Get(key)
-	if err != nil && err == store.ErrKeyNotFound ***REMOVED***
+	if err != nil && err == store.ErrKeyNotFound {
 		return false, err
-	***REMOVED***
+	}
 
-	if work, _, err := s.client.KV().DeleteCAS(p, nil); err != nil ***REMOVED***
+	if work, _, err := s.client.KV().DeleteCAS(p, nil); err != nil {
 		return false, err
-	***REMOVED*** else if !work ***REMOVED***
+	} else if !work {
 		return false, store.ErrKeyModified
-	***REMOVED***
+	}
 
 	return true, nil
-***REMOVED***
+}
 
 // Close closes the client connection
-func (s *Consul) Close() ***REMOVED***
+func (s *Consul) Close() {
 	return
-***REMOVED***
+}

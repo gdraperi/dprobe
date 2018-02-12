@@ -7,7 +7,7 @@ import (
 	"github.com/go-check/check"
 )
 
-func (s *DockerSuite) TestInspectOomKilledTrue(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestInspectOomKilledTrue(c *check.C) {
 	testRequires(c, DaemonIsLinux, memoryLimitSupport, swapMemorySupport)
 
 	name := "testoomkilled"
@@ -17,9 +17,9 @@ func (s *DockerSuite) TestInspectOomKilledTrue(c *check.C) ***REMOVED***
 
 	oomKilled := inspectField(c, name, "State.OOMKilled")
 	c.Assert(oomKilled, checker.Equals, "true")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestInspectOomKilledFalse(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestInspectOomKilledFalse(c *check.C) {
 	testRequires(c, DaemonIsLinux, memoryLimitSupport, swapMemorySupport)
 
 	name := "testoomkilled"
@@ -27,4 +27,4 @@ func (s *DockerSuite) TestInspectOomKilledFalse(c *check.C) ***REMOVED***
 
 	oomKilled := inspectField(c, name, "State.OOMKilled")
 	c.Assert(oomKilled, checker.Equals, "false")
-***REMOVED***
+}

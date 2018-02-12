@@ -24,69 +24,69 @@ import (
 // readDirNames reads the directory named by dirname and returns
 // a sorted list of directory entries.
 // adapted from https://golang.org/src/path/filepath/path.go
-func readDirNames(fs Fs, dirname string) ([]string, error) ***REMOVED***
+func readDirNames(fs Fs, dirname string) ([]string, error) {
 	f, err := fs.Open(dirname)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	names, err := f.Readdirnames(-1)
 	f.Close()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	sort.Strings(names)
 	return names, nil
-***REMOVED***
+}
 
 // walk recursively descends path, calling walkFn
 // adapted from https://golang.org/src/path/filepath/path.go
-func walk(fs Fs, path string, info os.FileInfo, walkFn filepath.WalkFunc) error ***REMOVED***
+func walk(fs Fs, path string, info os.FileInfo, walkFn filepath.WalkFunc) error {
 	err := walkFn(path, info, nil)
-	if err != nil ***REMOVED***
-		if info.IsDir() && err == filepath.SkipDir ***REMOVED***
+	if err != nil {
+		if info.IsDir() && err == filepath.SkipDir {
 			return nil
-		***REMOVED***
+		}
 		return err
-	***REMOVED***
+	}
 
-	if !info.IsDir() ***REMOVED***
+	if !info.IsDir() {
 		return nil
-	***REMOVED***
+	}
 
 	names, err := readDirNames(fs, path)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return walkFn(path, info, err)
-	***REMOVED***
+	}
 
-	for _, name := range names ***REMOVED***
+	for _, name := range names {
 		filename := filepath.Join(path, name)
 		fileInfo, err := lstatIfOs(fs, filename)
-		if err != nil ***REMOVED***
-			if err := walkFn(filename, fileInfo, err); err != nil && err != filepath.SkipDir ***REMOVED***
+		if err != nil {
+			if err := walkFn(filename, fileInfo, err); err != nil && err != filepath.SkipDir {
 				return err
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
+			}
+		} else {
 			err = walk(fs, filename, fileInfo, walkFn)
-			if err != nil ***REMOVED***
-				if !fileInfo.IsDir() || err != filepath.SkipDir ***REMOVED***
+			if err != nil {
+				if !fileInfo.IsDir() || err != filepath.SkipDir {
 					return err
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+				}
+			}
+		}
+	}
 	return nil
-***REMOVED***
+}
 
 // if the filesystem is OsFs use Lstat, else use fs.Stat
-func lstatIfOs(fs Fs, path string) (info os.FileInfo, err error) ***REMOVED***
+func lstatIfOs(fs Fs, path string) (info os.FileInfo, err error) {
 	_, ok := fs.(*OsFs)
-	if ok ***REMOVED***
+	if ok {
 		info, err = os.Lstat(path)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		info, err = fs.Stat(path)
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // Walk walks the file tree rooted at root, calling walkFn for each file or
 // directory in the tree, including root. All errors that arise visiting files
@@ -95,14 +95,14 @@ func lstatIfOs(fs Fs, path string) (info os.FileInfo, err error) ***REMOVED***
 // large directories Walk can be inefficient.
 // Walk does not follow symbolic links.
 
-func (a Afero) Walk(root string, walkFn filepath.WalkFunc) error ***REMOVED***
+func (a Afero) Walk(root string, walkFn filepath.WalkFunc) error {
 	return Walk(a.Fs, root, walkFn)
-***REMOVED***
+}
 
-func Walk(fs Fs, root string, walkFn filepath.WalkFunc) error ***REMOVED***
+func Walk(fs Fs, root string, walkFn filepath.WalkFunc) error {
 	info, err := lstatIfOs(fs, root)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return walkFn(root, nil, err)
-	***REMOVED***
+	}
 	return walk(fs, root, info, walkFn)
-***REMOVED***
+}

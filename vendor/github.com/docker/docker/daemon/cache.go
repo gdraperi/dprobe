@@ -7,21 +7,21 @@ import (
 )
 
 // MakeImageCache creates a stateful image cache.
-func (daemon *Daemon) MakeImageCache(sourceRefs []string) builder.ImageCache ***REMOVED***
-	if len(sourceRefs) == 0 ***REMOVED***
+func (daemon *Daemon) MakeImageCache(sourceRefs []string) builder.ImageCache {
+	if len(sourceRefs) == 0 {
 		return cache.NewLocal(daemon.imageStore)
-	***REMOVED***
+	}
 
 	cache := cache.New(daemon.imageStore)
 
-	for _, ref := range sourceRefs ***REMOVED***
+	for _, ref := range sourceRefs {
 		img, err := daemon.GetImage(ref)
-		if err != nil ***REMOVED***
+		if err != nil {
 			logrus.Warnf("Could not look up %s for cache resolution, skipping: %+v", ref, err)
 			continue
-		***REMOVED***
+		}
 		cache.Populate(img)
-	***REMOVED***
+	}
 
 	return cache
-***REMOVED***
+}

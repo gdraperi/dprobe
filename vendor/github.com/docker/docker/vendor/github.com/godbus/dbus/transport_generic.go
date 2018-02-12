@@ -6,30 +6,30 @@ import (
 	"io"
 )
 
-type genericTransport struct ***REMOVED***
+type genericTransport struct {
 	io.ReadWriteCloser
-***REMOVED***
+}
 
-func (t genericTransport) SendNullByte() error ***REMOVED***
-	_, err := t.Write([]byte***REMOVED***0***REMOVED***)
+func (t genericTransport) SendNullByte() error {
+	_, err := t.Write([]byte{0})
 	return err
-***REMOVED***
+}
 
-func (t genericTransport) SupportsUnixFDs() bool ***REMOVED***
+func (t genericTransport) SupportsUnixFDs() bool {
 	return false
-***REMOVED***
+}
 
-func (t genericTransport) EnableUnixFDs() ***REMOVED******REMOVED***
+func (t genericTransport) EnableUnixFDs() {}
 
-func (t genericTransport) ReadMessage() (*Message, error) ***REMOVED***
+func (t genericTransport) ReadMessage() (*Message, error) {
 	return DecodeMessage(t)
-***REMOVED***
+}
 
-func (t genericTransport) SendMessage(msg *Message) error ***REMOVED***
-	for _, v := range msg.Body ***REMOVED***
-		if _, ok := v.(UnixFD); ok ***REMOVED***
+func (t genericTransport) SendMessage(msg *Message) error {
+	for _, v := range msg.Body {
+		if _, ok := v.(UnixFD); ok {
 			return errors.New("dbus: unix fd passing not enabled")
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return msg.EncodeTo(t, binary.LittleEndian)
-***REMOVED***
+}

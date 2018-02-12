@@ -9,37 +9,37 @@ import (
 	"strings"
 )
 
-func lookupHomeDir() string ***REMOVED***
+func lookupHomeDir() string {
 	myUid := os.Getuid()
 
 	f, err := os.Open("/etc/passwd")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "/"
-	***REMOVED***
+	}
 	defer f.Close()
 
 	s := bufio.NewScanner(f)
 
-	for s.Scan() ***REMOVED***
-		if err := s.Err(); err != nil ***REMOVED***
+	for s.Scan() {
+		if err := s.Err(); err != nil {
 			break
-		***REMOVED***
+		}
 
 		line := strings.TrimSpace(s.Text())
-		if line == "" ***REMOVED***
+		if line == "" {
 			continue
-		***REMOVED***
+		}
 
 		parts := strings.Split(line, ":")
 
-		if len(parts) >= 6 ***REMOVED***
+		if len(parts) >= 6 {
 			uid, err := strconv.Atoi(parts[2])
-			if err == nil && uid == myUid ***REMOVED***
+			if err == nil && uid == myUid {
 				return parts[5]
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	// Default to / if we can't get a better value
 	return "/"
-***REMOVED***
+}

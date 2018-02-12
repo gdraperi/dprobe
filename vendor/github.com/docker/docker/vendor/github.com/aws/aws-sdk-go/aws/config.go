@@ -15,22 +15,22 @@ const UseServiceDefaultRetries = -1
 
 // RequestRetryer is an alias for a type that implements the request.Retryer
 // interface.
-type RequestRetryer interface***REMOVED******REMOVED***
+type RequestRetryer interface{}
 
 // A Config provides service configuration for service clients. By default,
 // all clients will use the defaults.DefaultConfig tructure.
 //
 //     // Create Session with MaxRetry configuration to be shared by multiple
 //     // service clients.
-//     sess := session.Must(session.NewSession(&aws.Config***REMOVED***
+//     sess := session.Must(session.NewSession(&aws.Config{
 //         MaxRetries: aws.Int(3),
-// ***REMOVED***))
+//     }))
 //
 //     // Create S3 service client with a specific Region.
-//     svc := s3.New(sess, &aws.Config***REMOVED***
+//     svc := s3.New(sess, &aws.Config{
 //         Region: aws.String("us-west-2"),
-// ***REMOVED***)
-type Config struct ***REMOVED***
+//     })
+type Config struct {
 	// Enables verbose error printing of all credential chain errors.
 	// Should be used when wanting to see all errors while attempting to
 	// retrieve credentials.
@@ -184,9 +184,9 @@ type Config struct ***REMOVED***
 	//
 	//     sess := session.Must(session.NewSession())
 	//
-	//     svc := s3.New(sess, &aws.Config***REMOVED***
+	//     svc := s3.New(sess, &aws.Config{
 	//         UseDualStack: aws.Bool(true),
-	// ***REMOVED***)
+	//     })
 	UseDualStack *bool
 
 	// SleepDelay is an override for the func the SDK will call when sleeping
@@ -204,17 +204,17 @@ type Config struct ***REMOVED***
 	// Will default to false. This would only be used for empty directory names in s3 requests.
 	//
 	// Example:
-	//    sess := session.Must(session.NewSession(&aws.Config***REMOVED***
+	//    sess := session.Must(session.NewSession(&aws.Config{
 	//         DisableRestProtocolURICleaning: aws.Bool(true),
-	//***REMOVED***))
+	//    }))
 	//
 	//    svc := s3.New(sess)
-	//    out, err := svc.GetObject(&s3.GetObjectInput ***REMOVED***
+	//    out, err := svc.GetObject(&s3.GetObjectInput {
 	//    	Bucket: aws.String("bucketname"),
 	//    	Key: aws.String("//foo//bar//moo"),
-	//***REMOVED***)
+	//    })
 	DisableRestProtocolURICleaning *bool
-***REMOVED***
+}
 
 // NewConfig returns a new Config pointer that can be chained with builder
 // methods to set multiple configuration values inline without using pointers.
@@ -229,242 +229,242 @@ type Config struct ***REMOVED***
 //     svc := s3.New(sess, aws.NewConfig().
 //         WithRegion("us-west-2"),
 //     )
-func NewConfig() *Config ***REMOVED***
-	return &Config***REMOVED******REMOVED***
-***REMOVED***
+func NewConfig() *Config {
+	return &Config{}
+}
 
 // WithCredentialsChainVerboseErrors sets a config verbose errors boolean and returning
 // a Config pointer.
-func (c *Config) WithCredentialsChainVerboseErrors(verboseErrs bool) *Config ***REMOVED***
+func (c *Config) WithCredentialsChainVerboseErrors(verboseErrs bool) *Config {
 	c.CredentialsChainVerboseErrors = &verboseErrs
 	return c
-***REMOVED***
+}
 
 // WithCredentials sets a config Credentials value returning a Config pointer
 // for chaining.
-func (c *Config) WithCredentials(creds *credentials.Credentials) *Config ***REMOVED***
+func (c *Config) WithCredentials(creds *credentials.Credentials) *Config {
 	c.Credentials = creds
 	return c
-***REMOVED***
+}
 
 // WithEndpoint sets a config Endpoint value returning a Config pointer for
 // chaining.
-func (c *Config) WithEndpoint(endpoint string) *Config ***REMOVED***
+func (c *Config) WithEndpoint(endpoint string) *Config {
 	c.Endpoint = &endpoint
 	return c
-***REMOVED***
+}
 
 // WithEndpointResolver sets a config EndpointResolver value returning a
 // Config pointer for chaining.
-func (c *Config) WithEndpointResolver(resolver endpoints.Resolver) *Config ***REMOVED***
+func (c *Config) WithEndpointResolver(resolver endpoints.Resolver) *Config {
 	c.EndpointResolver = resolver
 	return c
-***REMOVED***
+}
 
 // WithRegion sets a config Region value returning a Config pointer for
 // chaining.
-func (c *Config) WithRegion(region string) *Config ***REMOVED***
+func (c *Config) WithRegion(region string) *Config {
 	c.Region = &region
 	return c
-***REMOVED***
+}
 
 // WithDisableSSL sets a config DisableSSL value returning a Config pointer
 // for chaining.
-func (c *Config) WithDisableSSL(disable bool) *Config ***REMOVED***
+func (c *Config) WithDisableSSL(disable bool) *Config {
 	c.DisableSSL = &disable
 	return c
-***REMOVED***
+}
 
 // WithHTTPClient sets a config HTTPClient value returning a Config pointer
 // for chaining.
-func (c *Config) WithHTTPClient(client *http.Client) *Config ***REMOVED***
+func (c *Config) WithHTTPClient(client *http.Client) *Config {
 	c.HTTPClient = client
 	return c
-***REMOVED***
+}
 
 // WithMaxRetries sets a config MaxRetries value returning a Config pointer
 // for chaining.
-func (c *Config) WithMaxRetries(max int) *Config ***REMOVED***
+func (c *Config) WithMaxRetries(max int) *Config {
 	c.MaxRetries = &max
 	return c
-***REMOVED***
+}
 
 // WithDisableParamValidation sets a config DisableParamValidation value
 // returning a Config pointer for chaining.
-func (c *Config) WithDisableParamValidation(disable bool) *Config ***REMOVED***
+func (c *Config) WithDisableParamValidation(disable bool) *Config {
 	c.DisableParamValidation = &disable
 	return c
-***REMOVED***
+}
 
 // WithDisableComputeChecksums sets a config DisableComputeChecksums value
 // returning a Config pointer for chaining.
-func (c *Config) WithDisableComputeChecksums(disable bool) *Config ***REMOVED***
+func (c *Config) WithDisableComputeChecksums(disable bool) *Config {
 	c.DisableComputeChecksums = &disable
 	return c
-***REMOVED***
+}
 
 // WithLogLevel sets a config LogLevel value returning a Config pointer for
 // chaining.
-func (c *Config) WithLogLevel(level LogLevelType) *Config ***REMOVED***
+func (c *Config) WithLogLevel(level LogLevelType) *Config {
 	c.LogLevel = &level
 	return c
-***REMOVED***
+}
 
 // WithLogger sets a config Logger value returning a Config pointer for
 // chaining.
-func (c *Config) WithLogger(logger Logger) *Config ***REMOVED***
+func (c *Config) WithLogger(logger Logger) *Config {
 	c.Logger = logger
 	return c
-***REMOVED***
+}
 
 // WithS3ForcePathStyle sets a config S3ForcePathStyle value returning a Config
 // pointer for chaining.
-func (c *Config) WithS3ForcePathStyle(force bool) *Config ***REMOVED***
+func (c *Config) WithS3ForcePathStyle(force bool) *Config {
 	c.S3ForcePathStyle = &force
 	return c
-***REMOVED***
+}
 
 // WithS3Disable100Continue sets a config S3Disable100Continue value returning
 // a Config pointer for chaining.
-func (c *Config) WithS3Disable100Continue(disable bool) *Config ***REMOVED***
+func (c *Config) WithS3Disable100Continue(disable bool) *Config {
 	c.S3Disable100Continue = &disable
 	return c
-***REMOVED***
+}
 
 // WithS3UseAccelerate sets a config S3UseAccelerate value returning a Config
 // pointer for chaining.
-func (c *Config) WithS3UseAccelerate(enable bool) *Config ***REMOVED***
+func (c *Config) WithS3UseAccelerate(enable bool) *Config {
 	c.S3UseAccelerate = &enable
 	return c
-***REMOVED***
+}
 
 // WithUseDualStack sets a config UseDualStack value returning a Config
 // pointer for chaining.
-func (c *Config) WithUseDualStack(enable bool) *Config ***REMOVED***
+func (c *Config) WithUseDualStack(enable bool) *Config {
 	c.UseDualStack = &enable
 	return c
-***REMOVED***
+}
 
 // WithEC2MetadataDisableTimeoutOverride sets a config EC2MetadataDisableTimeoutOverride value
 // returning a Config pointer for chaining.
-func (c *Config) WithEC2MetadataDisableTimeoutOverride(enable bool) *Config ***REMOVED***
+func (c *Config) WithEC2MetadataDisableTimeoutOverride(enable bool) *Config {
 	c.EC2MetadataDisableTimeoutOverride = &enable
 	return c
-***REMOVED***
+}
 
 // WithSleepDelay overrides the function used to sleep while waiting for the
 // next retry. Defaults to time.Sleep.
-func (c *Config) WithSleepDelay(fn func(time.Duration)) *Config ***REMOVED***
+func (c *Config) WithSleepDelay(fn func(time.Duration)) *Config {
 	c.SleepDelay = fn
 	return c
-***REMOVED***
+}
 
 // MergeIn merges the passed in configs into the existing config object.
-func (c *Config) MergeIn(cfgs ...*Config) ***REMOVED***
-	for _, other := range cfgs ***REMOVED***
+func (c *Config) MergeIn(cfgs ...*Config) {
+	for _, other := range cfgs {
 		mergeInConfig(c, other)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func mergeInConfig(dst *Config, other *Config) ***REMOVED***
-	if other == nil ***REMOVED***
+func mergeInConfig(dst *Config, other *Config) {
+	if other == nil {
 		return
-	***REMOVED***
+	}
 
-	if other.CredentialsChainVerboseErrors != nil ***REMOVED***
+	if other.CredentialsChainVerboseErrors != nil {
 		dst.CredentialsChainVerboseErrors = other.CredentialsChainVerboseErrors
-	***REMOVED***
+	}
 
-	if other.Credentials != nil ***REMOVED***
+	if other.Credentials != nil {
 		dst.Credentials = other.Credentials
-	***REMOVED***
+	}
 
-	if other.Endpoint != nil ***REMOVED***
+	if other.Endpoint != nil {
 		dst.Endpoint = other.Endpoint
-	***REMOVED***
+	}
 
-	if other.EndpointResolver != nil ***REMOVED***
+	if other.EndpointResolver != nil {
 		dst.EndpointResolver = other.EndpointResolver
-	***REMOVED***
+	}
 
-	if other.Region != nil ***REMOVED***
+	if other.Region != nil {
 		dst.Region = other.Region
-	***REMOVED***
+	}
 
-	if other.DisableSSL != nil ***REMOVED***
+	if other.DisableSSL != nil {
 		dst.DisableSSL = other.DisableSSL
-	***REMOVED***
+	}
 
-	if other.HTTPClient != nil ***REMOVED***
+	if other.HTTPClient != nil {
 		dst.HTTPClient = other.HTTPClient
-	***REMOVED***
+	}
 
-	if other.LogLevel != nil ***REMOVED***
+	if other.LogLevel != nil {
 		dst.LogLevel = other.LogLevel
-	***REMOVED***
+	}
 
-	if other.Logger != nil ***REMOVED***
+	if other.Logger != nil {
 		dst.Logger = other.Logger
-	***REMOVED***
+	}
 
-	if other.MaxRetries != nil ***REMOVED***
+	if other.MaxRetries != nil {
 		dst.MaxRetries = other.MaxRetries
-	***REMOVED***
+	}
 
-	if other.Retryer != nil ***REMOVED***
+	if other.Retryer != nil {
 		dst.Retryer = other.Retryer
-	***REMOVED***
+	}
 
-	if other.DisableParamValidation != nil ***REMOVED***
+	if other.DisableParamValidation != nil {
 		dst.DisableParamValidation = other.DisableParamValidation
-	***REMOVED***
+	}
 
-	if other.DisableComputeChecksums != nil ***REMOVED***
+	if other.DisableComputeChecksums != nil {
 		dst.DisableComputeChecksums = other.DisableComputeChecksums
-	***REMOVED***
+	}
 
-	if other.S3ForcePathStyle != nil ***REMOVED***
+	if other.S3ForcePathStyle != nil {
 		dst.S3ForcePathStyle = other.S3ForcePathStyle
-	***REMOVED***
+	}
 
-	if other.S3Disable100Continue != nil ***REMOVED***
+	if other.S3Disable100Continue != nil {
 		dst.S3Disable100Continue = other.S3Disable100Continue
-	***REMOVED***
+	}
 
-	if other.S3UseAccelerate != nil ***REMOVED***
+	if other.S3UseAccelerate != nil {
 		dst.S3UseAccelerate = other.S3UseAccelerate
-	***REMOVED***
+	}
 
-	if other.UseDualStack != nil ***REMOVED***
+	if other.UseDualStack != nil {
 		dst.UseDualStack = other.UseDualStack
-	***REMOVED***
+	}
 
-	if other.EC2MetadataDisableTimeoutOverride != nil ***REMOVED***
+	if other.EC2MetadataDisableTimeoutOverride != nil {
 		dst.EC2MetadataDisableTimeoutOverride = other.EC2MetadataDisableTimeoutOverride
-	***REMOVED***
+	}
 
-	if other.SleepDelay != nil ***REMOVED***
+	if other.SleepDelay != nil {
 		dst.SleepDelay = other.SleepDelay
-	***REMOVED***
+	}
 
-	if other.DisableRestProtocolURICleaning != nil ***REMOVED***
+	if other.DisableRestProtocolURICleaning != nil {
 		dst.DisableRestProtocolURICleaning = other.DisableRestProtocolURICleaning
-	***REMOVED***
+	}
 
-	if other.EnforceShouldRetryCheck != nil ***REMOVED***
+	if other.EnforceShouldRetryCheck != nil {
 		dst.EnforceShouldRetryCheck = other.EnforceShouldRetryCheck
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Copy will return a shallow copy of the Config object. If any additional
 // configurations are provided they will be merged into the new config returned.
-func (c *Config) Copy(cfgs ...*Config) *Config ***REMOVED***
-	dst := &Config***REMOVED******REMOVED***
+func (c *Config) Copy(cfgs ...*Config) *Config {
+	dst := &Config{}
 	dst.MergeIn(c)
 
-	for _, cfg := range cfgs ***REMOVED***
+	for _, cfg := range cfgs {
 		dst.MergeIn(cfg)
-	***REMOVED***
+	}
 
 	return dst
-***REMOVED***
+}

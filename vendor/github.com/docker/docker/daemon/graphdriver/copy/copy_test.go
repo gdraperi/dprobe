@@ -19,7 +19,7 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-func TestIsCopyFileRangeSyscallAvailable(t *testing.T) ***REMOVED***
+func TestIsCopyFileRangeSyscallAvailable(t *testing.T) {
 	// Verifies:
 	// 1. That copyFileRangeEnabled is being set to true when copy_file_range syscall is available
 	// 2. That isCopyFileRangeSyscallAvailable() works on "new" kernels
@@ -30,27 +30,27 @@ func TestIsCopyFileRangeSyscallAvailable(t *testing.T) ***REMOVED***
 	copyWithFileClone := false
 	doCopyTest(t, &copyWithFileRange, &copyWithFileClone)
 
-	if kernel.CompareKernelVersion(*v, kernel.VersionInfo***REMOVED***Kernel: 4, Major: 5, Minor: 0***REMOVED***) < 0 ***REMOVED***
+	if kernel.CompareKernelVersion(*v, kernel.VersionInfo{Kernel: 4, Major: 5, Minor: 0}) < 0 {
 		assert.False(t, copyWithFileRange)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		assert.True(t, copyWithFileRange)
-	***REMOVED***
+	}
 
-***REMOVED***
+}
 
-func TestCopy(t *testing.T) ***REMOVED***
+func TestCopy(t *testing.T) {
 	copyWithFileRange := true
 	copyWithFileClone := true
 	doCopyTest(t, &copyWithFileRange, &copyWithFileClone)
-***REMOVED***
+}
 
-func TestCopyWithoutRange(t *testing.T) ***REMOVED***
+func TestCopyWithoutRange(t *testing.T) {
 	copyWithFileRange := false
 	copyWithFileClone := false
 	doCopyTest(t, &copyWithFileRange, &copyWithFileClone)
-***REMOVED***
+}
 
-func TestCopyDir(t *testing.T) ***REMOVED***
+func TestCopyDir(t *testing.T) {
 	srcDir, err := ioutil.TempDir("", "srcDir")
 	require.NoError(t, err)
 	populateSrcDir(t, srcDir, 3)
@@ -60,17 +60,17 @@ func TestCopyDir(t *testing.T) ***REMOVED***
 	defer os.RemoveAll(dstDir)
 
 	assert.NoError(t, DirCopy(srcDir, dstDir, Content, false))
-	require.NoError(t, filepath.Walk(srcDir, func(srcPath string, f os.FileInfo, err error) error ***REMOVED***
-		if err != nil ***REMOVED***
+	require.NoError(t, filepath.Walk(srcDir, func(srcPath string, f os.FileInfo, err error) error {
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 
 		// Rebase path
 		relPath, err := filepath.Rel(srcDir, srcPath)
 		require.NoError(t, err)
-		if relPath == "." ***REMOVED***
+		if relPath == "." {
 			return nil
-		***REMOVED***
+		}
 
 		dstPath := filepath.Join(dstDir, relPath)
 		require.NoError(t, err)
@@ -84,9 +84,9 @@ func TestCopyDir(t *testing.T) ***REMOVED***
 		dstFileSys := dstFileInfo.Sys().(*syscall.Stat_t)
 
 		t.Log(relPath)
-		if srcFileSys.Dev == dstFileSys.Dev ***REMOVED***
+		if srcFileSys.Dev == dstFileSys.Dev {
 			assert.NotEqual(t, srcFileSys.Ino, dstFileSys.Ino)
-		***REMOVED***
+		}
 		// Todo: check size, and ctim is not equal
 		/// on filesystems that have granular ctimes
 		assert.Equal(t, srcFileSys.Mode, dstFileSys.Mode)
@@ -95,40 +95,40 @@ func TestCopyDir(t *testing.T) ***REMOVED***
 		assert.Equal(t, srcFileSys.Mtim, dstFileSys.Mtim)
 
 		return nil
-	***REMOVED***))
-***REMOVED***
+	}))
+}
 
-func randomMode(baseMode int) os.FileMode ***REMOVED***
-	for i := 0; i < 7; i++ ***REMOVED***
+func randomMode(baseMode int) os.FileMode {
+	for i := 0; i < 7; i++ {
 		baseMode = baseMode | (1&rand.Intn(2))<<uint(i)
-	***REMOVED***
+	}
 	return os.FileMode(baseMode)
-***REMOVED***
+}
 
-func populateSrcDir(t *testing.T, srcDir string, remainingDepth int) ***REMOVED***
-	if remainingDepth == 0 ***REMOVED***
+func populateSrcDir(t *testing.T, srcDir string, remainingDepth int) {
+	if remainingDepth == 0 {
 		return
-	***REMOVED***
+	}
 	aTime := time.Unix(rand.Int63(), 0)
 	mTime := time.Unix(rand.Int63(), 0)
 
-	for i := 0; i < 10; i++ ***REMOVED***
+	for i := 0; i < 10; i++ {
 		dirName := filepath.Join(srcDir, fmt.Sprintf("srcdir-%d", i))
 		// Owner all bits set
 		require.NoError(t, os.Mkdir(dirName, randomMode(0700)))
 		populateSrcDir(t, dirName, remainingDepth-1)
 		require.NoError(t, system.Chtimes(dirName, aTime, mTime))
-	***REMOVED***
+	}
 
-	for i := 0; i < 10; i++ ***REMOVED***
+	for i := 0; i < 10; i++ {
 		fileName := filepath.Join(srcDir, fmt.Sprintf("srcfile-%d", i))
 		// Owner read bit set
-		require.NoError(t, ioutil.WriteFile(fileName, []byte***REMOVED******REMOVED***, randomMode(0400)))
+		require.NoError(t, ioutil.WriteFile(fileName, []byte{}, randomMode(0400)))
 		require.NoError(t, system.Chtimes(fileName, aTime, mTime))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func doCopyTest(t *testing.T, copyWithFileRange, copyWithFileClone *bool) ***REMOVED***
+func doCopyTest(t *testing.T, copyWithFileRange, copyWithFileClone *bool) {
 	dir, err := ioutil.TempDir("", "docker-copy-check")
 	require.NoError(t, err)
 	defer os.RemoveAll(dir)
@@ -147,9 +147,9 @@ func doCopyTest(t *testing.T, copyWithFileRange, copyWithFileClone *bool) ***REM
 	readBuf, err := ioutil.ReadFile(dstFilename)
 	require.NoError(t, err)
 	assert.Equal(t, buf, readBuf)
-***REMOVED***
+}
 
-func TestCopyHardlink(t *testing.T) ***REMOVED***
+func TestCopyHardlink(t *testing.T) {
 	var srcFile1FileInfo, srcFile2FileInfo, dstFile1FileInfo, dstFile2FileInfo unix.Stat_t
 
 	srcDir, err := ioutil.TempDir("", "srcDir")
@@ -164,7 +164,7 @@ func TestCopyHardlink(t *testing.T) ***REMOVED***
 	srcFile2 := filepath.Join(srcDir, "file2")
 	dstFile1 := filepath.Join(dstDir, "file1")
 	dstFile2 := filepath.Join(dstDir, "file2")
-	require.NoError(t, ioutil.WriteFile(srcFile1, []byte***REMOVED******REMOVED***, 0777))
+	require.NoError(t, ioutil.WriteFile(srcFile1, []byte{}, 0777))
 	require.NoError(t, os.Link(srcFile1, srcFile2))
 
 	assert.NoError(t, DirCopy(srcDir, dstDir, Content, false))
@@ -176,4 +176,4 @@ func TestCopyHardlink(t *testing.T) ***REMOVED***
 	require.NoError(t, unix.Stat(dstFile1, &dstFile1FileInfo))
 	require.NoError(t, unix.Stat(dstFile2, &dstFile2FileInfo))
 	assert.Equal(t, dstFile1FileInfo.Ino, dstFile2FileInfo.Ino)
-***REMOVED***
+}

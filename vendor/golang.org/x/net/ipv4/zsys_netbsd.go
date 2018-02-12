@@ -24,7 +24,7 @@ const (
 	sizeofIPMreq = 0x8
 )
 
-type ipMreq struct ***REMOVED***
+type ipMreq struct {
 	Multiaddr [4]byte /* in_addr */
 	Interface [4]byte /* in_addr */
-***REMOVED***
+}

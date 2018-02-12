@@ -10,7 +10,7 @@
 <meta name='flags' content='http'>
 <meta name="assert" content="The character encoding of a page can be set using the HTTP header charset declaration.">
 <style type='text/css'>
-.test div ***REMOVED*** width: 50px; ***REMOVED***</style>
+.test div { width: 50px; }</style>
 <link rel="stylesheet" type="text/css" href="the-input-byte-stream/support/encodingtests-15.css">
 </head>
 <body>
@@ -37,9 +37,9 @@
 				<li>The test is read from a server that supports HTTP.</li></ul></div>
 </div>
 <script>
-test(function() ***REMOVED***
+test(function() {
 assert_equals(document.getElementById('box').offsetWidth, 100);
-***REMOVED***, " ");
+}, " ");
 </script>
 
 </body>

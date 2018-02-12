@@ -12,18 +12,18 @@ import (
 	"golang.org/x/net/context"
 )
 
-func (s *DockerSuite) TestAPIUpdateContainer(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestAPIUpdateContainer(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	testRequires(c, memoryLimitSupport)
 	testRequires(c, swapMemorySupport)
 
 	name := "apiUpdateContainer"
-	updateConfig := container.UpdateConfig***REMOVED***
-		Resources: container.Resources***REMOVED***
+	updateConfig := container.UpdateConfig{
+		Resources: container.Resources{
 			Memory:     314572800,
 			MemorySwap: 524288000,
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 	dockerCmd(c, "run", "-d", "--name", name, "-m", "200M", "busybox", "top")
 	cli, err := client.NewEnvClient()
 	c.Assert(err, check.IsNil)
@@ -42,4 +42,4 @@ func (s *DockerSuite) TestAPIUpdateContainer(c *check.C) ***REMOVED***
 	file = "/sys/fs/cgroup/memory/memory.memsw.limit_in_bytes"
 	out, _ = dockerCmd(c, "exec", name, "cat", file)
 	c.Assert(strings.TrimSpace(out), checker.Equals, "524288000")
-***REMOVED***
+}

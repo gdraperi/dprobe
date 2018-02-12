@@ -12,54 +12,54 @@ import (
 
 // This avoids creating a new driver for each test if all tests are run
 // Make sure to put new tests between TestBtrfsSetup and TestBtrfsTeardown
-func TestBtrfsSetup(t *testing.T) ***REMOVED***
+func TestBtrfsSetup(t *testing.T) {
 	graphtest.GetDriver(t, "btrfs")
-***REMOVED***
+}
 
-func TestBtrfsCreateEmpty(t *testing.T) ***REMOVED***
+func TestBtrfsCreateEmpty(t *testing.T) {
 	graphtest.DriverTestCreateEmpty(t, "btrfs")
-***REMOVED***
+}
 
-func TestBtrfsCreateBase(t *testing.T) ***REMOVED***
+func TestBtrfsCreateBase(t *testing.T) {
 	graphtest.DriverTestCreateBase(t, "btrfs")
-***REMOVED***
+}
 
-func TestBtrfsCreateSnap(t *testing.T) ***REMOVED***
+func TestBtrfsCreateSnap(t *testing.T) {
 	graphtest.DriverTestCreateSnap(t, "btrfs")
-***REMOVED***
+}
 
-func TestBtrfsSubvolDelete(t *testing.T) ***REMOVED***
+func TestBtrfsSubvolDelete(t *testing.T) {
 	d := graphtest.GetDriver(t, "btrfs")
-	if err := d.CreateReadWrite("test", "", nil); err != nil ***REMOVED***
+	if err := d.CreateReadWrite("test", "", nil); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	defer graphtest.PutDriver(t)
 
 	dirFS, err := d.Get("test", "")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	defer d.Put("test")
 
 	dir := dirFS.Path()
 
-	if err := subvolCreate(dir, "subvoltest"); err != nil ***REMOVED***
+	if err := subvolCreate(dir, "subvoltest"); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if _, err := os.Stat(path.Join(dir, "subvoltest")); err != nil ***REMOVED***
+	if _, err := os.Stat(path.Join(dir, "subvoltest")); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if err := d.Remove("test"); err != nil ***REMOVED***
+	if err := d.Remove("test"); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if _, err := os.Stat(path.Join(dir, "subvoltest")); !os.IsNotExist(err) ***REMOVED***
+	if _, err := os.Stat(path.Join(dir, "subvoltest")); !os.IsNotExist(err) {
 		t.Fatalf("expected not exist error on nested subvol, got: %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestBtrfsTeardown(t *testing.T) ***REMOVED***
+func TestBtrfsTeardown(t *testing.T) {
 	graphtest.PutDriver(t)
-***REMOVED***
+}

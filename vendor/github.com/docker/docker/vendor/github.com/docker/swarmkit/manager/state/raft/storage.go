@@ -21,79 +21,79 @@ var (
 	snapshotLatencyTimer metrics.Timer
 )
 
-func init() ***REMOVED***
+func init() {
 	ns := metrics.NewNamespace("swarm", "raft", nil)
 	snapshotLatencyTimer = ns.NewTimer("snapshot_latency",
 		"Raft snapshot create latency.")
 	metrics.Register(ns)
-***REMOVED***
+}
 
-func (n *Node) readFromDisk(ctx context.Context) (*raftpb.Snapshot, storage.WALData, error) ***REMOVED***
+func (n *Node) readFromDisk(ctx context.Context) (*raftpb.Snapshot, storage.WALData, error) {
 	keys := n.keyRotator.GetKeys()
 
-	n.raftLogger = &storage.EncryptedRaftLogger***REMOVED***
+	n.raftLogger = &storage.EncryptedRaftLogger{
 		StateDir:      n.opts.StateDir,
 		EncryptionKey: keys.CurrentDEK,
-	***REMOVED***
-	if keys.PendingDEK != nil ***REMOVED***
+	}
+	if keys.PendingDEK != nil {
 		n.raftLogger.EncryptionKey = keys.PendingDEK
-	***REMOVED***
+	}
 
 	snap, walData, err := n.raftLogger.BootstrapFromDisk(ctx)
 
-	if keys.PendingDEK != nil ***REMOVED***
-		switch errors.Cause(err).(type) ***REMOVED***
+	if keys.PendingDEK != nil {
+		switch errors.Cause(err).(type) {
 		case nil:
-			if err = n.keyRotator.UpdateKeys(EncryptionKeys***REMOVED***CurrentDEK: keys.PendingDEK***REMOVED***); err != nil ***REMOVED***
+			if err = n.keyRotator.UpdateKeys(EncryptionKeys{CurrentDEK: keys.PendingDEK}); err != nil {
 				err = errors.Wrap(err, "previous key rotation was successful, but unable mark rotation as complete")
-			***REMOVED***
+			}
 		case encryption.ErrCannotDecrypt:
 			snap, walData, err = n.raftLogger.BootstrapFromDisk(ctx, keys.CurrentDEK)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if err != nil ***REMOVED***
-		return nil, storage.WALData***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return nil, storage.WALData{}, err
+	}
 	return snap, walData, nil
-***REMOVED***
+}
 
 // bootstraps a node's raft store from the raft logs and snapshots on disk
-func (n *Node) loadAndStart(ctx context.Context, forceNewCluster bool) error ***REMOVED***
+func (n *Node) loadAndStart(ctx context.Context, forceNewCluster bool) error {
 	snapshot, waldata, err := n.readFromDisk(ctx)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	// Read logs to fully catch up store
 	var raftNode api.RaftMember
-	if err := raftNode.Unmarshal(waldata.Metadata); err != nil ***REMOVED***
+	if err := raftNode.Unmarshal(waldata.Metadata); err != nil {
 		return errors.Wrap(err, "failed to unmarshal WAL metadata")
-	***REMOVED***
+	}
 	n.Config.ID = raftNode.RaftID
 
-	if snapshot != nil ***REMOVED***
+	if snapshot != nil {
 		snapCluster, err := n.clusterSnapshot(snapshot.Data)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		var bootstrapMembers []*api.RaftMember
-		if forceNewCluster ***REMOVED***
-			for _, m := range snapCluster.Members ***REMOVED***
-				if m.RaftID != n.Config.ID ***REMOVED***
+		if forceNewCluster {
+			for _, m := range snapCluster.Members {
+				if m.RaftID != n.Config.ID {
 					n.cluster.RemoveMember(m.RaftID)
 					continue
-				***REMOVED***
+				}
 				bootstrapMembers = append(bootstrapMembers, m)
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
+			}
+		} else {
 			bootstrapMembers = snapCluster.Members
-		***REMOVED***
+		}
 		n.bootstrapMembers = bootstrapMembers
-		for _, removedMember := range snapCluster.Removed ***REMOVED***
+		for _, removedMember := range snapCluster.Removed {
 			n.cluster.RemoveMember(removedMember)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	ents, st := waldata.Entries, waldata.HardState
 
@@ -101,27 +101,27 @@ func (n *Node) loadAndStart(ctx context.Context, forceNewCluster bool) error ***
 	// the removed list right away, so that we don't try to connect to them
 	// before processing the configuration change entries, which could make
 	// us get stuck.
-	for _, ent := range ents ***REMOVED***
-		if ent.Index <= st.Commit && ent.Type == raftpb.EntryConfChange ***REMOVED***
+	for _, ent := range ents {
+		if ent.Index <= st.Commit && ent.Type == raftpb.EntryConfChange {
 			var cc raftpb.ConfChange
-			if err := cc.Unmarshal(ent.Data); err != nil ***REMOVED***
+			if err := cc.Unmarshal(ent.Data); err != nil {
 				return errors.Wrap(err, "failed to unmarshal config change")
-			***REMOVED***
-			if cc.Type == raftpb.ConfChangeRemoveNode ***REMOVED***
+			}
+			if cc.Type == raftpb.ConfChangeRemoveNode {
 				n.cluster.RemoveMember(cc.NodeID)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
-	if forceNewCluster ***REMOVED***
+	if forceNewCluster {
 		// discard the previously uncommitted entries
-		for i, ent := range ents ***REMOVED***
-			if ent.Index > st.Commit ***REMOVED***
+		for i, ent := range ents {
+			if ent.Index > st.Commit {
 				log.G(ctx).Infof("discarding %d uncommitted WAL entries", len(ents)-i)
 				ents = ents[:i]
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		// force append the configuration change entries
 		toAppEnts := createConfigChangeEnts(getIDs(snapshot, ents), n.Config.ID, st.Term, st.Commit)
@@ -131,134 +131,134 @@ func (n *Node) loadAndStart(ctx context.Context, forceNewCluster bool) error ***
 		// removed list right away, so that we don't try to
 		// connect to them before processing the configuration
 		// change entries, which could make us get stuck.
-		for _, ccEnt := range toAppEnts ***REMOVED***
-			if ccEnt.Type == raftpb.EntryConfChange ***REMOVED***
+		for _, ccEnt := range toAppEnts {
+			if ccEnt.Type == raftpb.EntryConfChange {
 				var cc raftpb.ConfChange
-				if err := cc.Unmarshal(ccEnt.Data); err != nil ***REMOVED***
+				if err := cc.Unmarshal(ccEnt.Data); err != nil {
 					return errors.Wrap(err, "error unmarshalling force-new-cluster config change")
-				***REMOVED***
-				if cc.Type == raftpb.ConfChangeRemoveNode ***REMOVED***
+				}
+				if cc.Type == raftpb.ConfChangeRemoveNode {
 					n.cluster.RemoveMember(cc.NodeID)
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
+				}
+			}
+		}
 		ents = append(ents, toAppEnts...)
 
 		// force commit newly appended entries
 		err := n.raftLogger.SaveEntries(st, toAppEnts)
-		if err != nil ***REMOVED***
+		if err != nil {
 			log.G(ctx).WithError(err).Fatal("failed to save WAL while forcing new cluster")
-		***REMOVED***
-		if len(toAppEnts) != 0 ***REMOVED***
+		}
+		if len(toAppEnts) != 0 {
 			st.Commit = toAppEnts[len(toAppEnts)-1].Index
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if snapshot != nil ***REMOVED***
-		if err := n.raftStore.ApplySnapshot(*snapshot); err != nil ***REMOVED***
+	if snapshot != nil {
+		if err := n.raftStore.ApplySnapshot(*snapshot); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
-	if err := n.raftStore.SetHardState(st); err != nil ***REMOVED***
+		}
+	}
+	if err := n.raftStore.SetHardState(st); err != nil {
 		return err
-	***REMOVED***
+	}
 	return n.raftStore.Append(ents)
-***REMOVED***
+}
 
-func (n *Node) newRaftLogs(nodeID string) (raft.Peer, error) ***REMOVED***
-	raftNode := &api.RaftMember***REMOVED***
+func (n *Node) newRaftLogs(nodeID string) (raft.Peer, error) {
+	raftNode := &api.RaftMember{
 		RaftID: n.Config.ID,
 		NodeID: nodeID,
 		Addr:   n.opts.Addr,
-	***REMOVED***
+	}
 	metadata, err := raftNode.Marshal()
-	if err != nil ***REMOVED***
-		return raft.Peer***REMOVED******REMOVED***, errors.Wrap(err, "error marshalling raft node")
-	***REMOVED***
-	if err := n.raftLogger.BootstrapNew(metadata); err != nil ***REMOVED***
-		return raft.Peer***REMOVED******REMOVED***, err
-	***REMOVED***
-	n.cluster.AddMember(&membership.Member***REMOVED***RaftMember: raftNode***REMOVED***)
-	return raft.Peer***REMOVED***ID: n.Config.ID, Context: metadata***REMOVED***, nil
-***REMOVED***
+	if err != nil {
+		return raft.Peer{}, errors.Wrap(err, "error marshalling raft node")
+	}
+	if err := n.raftLogger.BootstrapNew(metadata); err != nil {
+		return raft.Peer{}, err
+	}
+	n.cluster.AddMember(&membership.Member{RaftMember: raftNode})
+	return raft.Peer{ID: n.Config.ID, Context: metadata}, nil
+}
 
-func (n *Node) triggerSnapshot(ctx context.Context, raftConfig api.RaftConfig) ***REMOVED***
-	snapshot := api.Snapshot***REMOVED***Version: api.Snapshot_V0***REMOVED***
-	for _, member := range n.cluster.Members() ***REMOVED***
+func (n *Node) triggerSnapshot(ctx context.Context, raftConfig api.RaftConfig) {
+	snapshot := api.Snapshot{Version: api.Snapshot_V0}
+	for _, member := range n.cluster.Members() {
 		snapshot.Membership.Members = append(snapshot.Membership.Members,
-			&api.RaftMember***REMOVED***
+			&api.RaftMember{
 				NodeID: member.NodeID,
 				RaftID: member.RaftID,
 				Addr:   member.Addr,
-			***REMOVED***)
-	***REMOVED***
+			})
+	}
 	snapshot.Membership.Removed = n.cluster.Removed()
 
-	viewStarted := make(chan struct***REMOVED******REMOVED***)
+	viewStarted := make(chan struct{})
 	n.asyncTasks.Add(1)
 	n.snapshotInProgress = make(chan raftpb.SnapshotMetadata, 1) // buffered in case Shutdown is called during the snapshot
-	go func(appliedIndex uint64, snapshotMeta raftpb.SnapshotMetadata) ***REMOVED***
+	go func(appliedIndex uint64, snapshotMeta raftpb.SnapshotMetadata) {
 		// Deferred latency capture.
 		defer metrics.StartTimer(snapshotLatencyTimer)()
 
-		defer func() ***REMOVED***
+		defer func() {
 			n.asyncTasks.Done()
 			n.snapshotInProgress <- snapshotMeta
-		***REMOVED***()
+		}()
 		var err error
-		n.memoryStore.View(func(tx store.ReadTx) ***REMOVED***
+		n.memoryStore.View(func(tx store.ReadTx) {
 			close(viewStarted)
 
 			var storeSnapshot *api.StoreSnapshot
 			storeSnapshot, err = n.memoryStore.Save(tx)
 			snapshot.Store = *storeSnapshot
-		***REMOVED***)
-		if err != nil ***REMOVED***
+		})
+		if err != nil {
 			log.G(ctx).WithError(err).Error("failed to read snapshot from store")
 			return
-		***REMOVED***
+		}
 
 		d, err := snapshot.Marshal()
-		if err != nil ***REMOVED***
+		if err != nil {
 			log.G(ctx).WithError(err).Error("failed to marshal snapshot")
 			return
-		***REMOVED***
+		}
 		snap, err := n.raftStore.CreateSnapshot(appliedIndex, &n.confState, d)
-		if err == nil ***REMOVED***
-			if err := n.raftLogger.SaveSnapshot(snap); err != nil ***REMOVED***
+		if err == nil {
+			if err := n.raftLogger.SaveSnapshot(snap); err != nil {
 				log.G(ctx).WithError(err).Error("failed to save snapshot")
 				return
-			***REMOVED***
+			}
 			snapshotMeta = snap.Metadata
 
-			if appliedIndex > raftConfig.LogEntriesForSlowFollowers ***REMOVED***
+			if appliedIndex > raftConfig.LogEntriesForSlowFollowers {
 				err := n.raftStore.Compact(appliedIndex - raftConfig.LogEntriesForSlowFollowers)
-				if err != nil && err != raft.ErrCompacted ***REMOVED***
+				if err != nil && err != raft.ErrCompacted {
 					log.G(ctx).WithError(err).Error("failed to compact snapshot")
-				***REMOVED***
-			***REMOVED***
-		***REMOVED*** else if err != raft.ErrSnapOutOfDate ***REMOVED***
+				}
+			}
+		} else if err != raft.ErrSnapOutOfDate {
 			log.G(ctx).WithError(err).Error("failed to create snapshot")
-		***REMOVED***
-	***REMOVED***(n.appliedIndex, n.snapshotMeta)
+		}
+	}(n.appliedIndex, n.snapshotMeta)
 
 	// Wait for the goroutine to establish a read transaction, to make
 	// sure it sees the state as of this moment.
 	<-viewStarted
-***REMOVED***
+}
 
-func (n *Node) clusterSnapshot(data []byte) (api.ClusterSnapshot, error) ***REMOVED***
+func (n *Node) clusterSnapshot(data []byte) (api.ClusterSnapshot, error) {
 	var snapshot api.Snapshot
-	if err := snapshot.Unmarshal(data); err != nil ***REMOVED***
+	if err := snapshot.Unmarshal(data); err != nil {
 		return snapshot.Membership, err
-	***REMOVED***
-	if snapshot.Version != api.Snapshot_V0 ***REMOVED***
+	}
+	if snapshot.Version != api.Snapshot_V0 {
 		return snapshot.Membership, fmt.Errorf("unrecognized snapshot version %d", snapshot.Version)
-	***REMOVED***
+	}
 
-	if err := n.memoryStore.Restore(&snapshot.Store); err != nil ***REMOVED***
+	if err := n.memoryStore.Restore(&snapshot.Store); err != nil {
 		return snapshot.Membership, err
-	***REMOVED***
+	}
 
 	return snapshot.Membership, nil
-***REMOVED***
+}

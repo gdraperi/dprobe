@@ -10,7 +10,7 @@ Homepage: https://github.com/nsf/gocode
 
 Package: gocode
 Architecture: any
-Depends: $***REMOVED***shlibs:Depends***REMOVED***, $***REMOVED***misc:Depends***REMOVED***, golang
+Depends: ${shlibs:Depends}, ${misc:Depends}, golang
 Description: An autocompletion daemon for the Go programming language
  Gocode is a helper tool which is intended to be integraded with your source
  code editor, like vim and emacs. It provides several advanced capabilities,

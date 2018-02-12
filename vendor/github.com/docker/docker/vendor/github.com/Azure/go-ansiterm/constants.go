@@ -115,14 +115,14 @@ const (
 	FILL_CHARACTER = ' '
 )
 
-func getByteRange(start byte, end byte) []byte ***REMOVED***
+func getByteRange(start byte, end byte) []byte {
 	bytes := make([]byte, 0, 32)
-	for i := start; i <= end; i++ ***REMOVED***
+	for i := start; i <= end; i++ {
 		bytes = append(bytes, byte(i))
-	***REMOVED***
+	}
 
 	return bytes
-***REMOVED***
+}
 
 var toGroundBytes = getToGroundBytes()
 var executors = getExecuteBytes()
@@ -140,7 +140,7 @@ var csiCollectables = append(getByteRange(0x30, 0x39), getByteRange(0x3B, 0x3F).
 // Uppercase	  40-5F hex  @ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_
 var upperCase = getByteRange(0x40, 0x5F)
 
-// Lowercase	  60-7E hex  `abcdefghijlkmnopqrstuvwxyz***REMOVED***|***REMOVED***~
+// Lowercase	  60-7E hex  `abcdefghijlkmnopqrstuvwxyz{|}~
 var lowerCase = getByteRange(0x60, 0x7E)
 
 // Alphabetics	  40-7E hex  (all of upper and lower case)
@@ -154,7 +154,7 @@ var escapeToGroundBytes = getEscapeToGroundBytes()
 // See http://www.vt100.net/emu/vt500_parser.png for description of the complex
 // byte ranges below
 
-func getEscapeToGroundBytes() []byte ***REMOVED***
+func getEscapeToGroundBytes() []byte {
 	escapeToGroundBytes := getByteRange(0x30, 0x4F)
 	escapeToGroundBytes = append(escapeToGroundBytes, getByteRange(0x51, 0x57)...)
 	escapeToGroundBytes = append(escapeToGroundBytes, 0x59)
@@ -162,17 +162,17 @@ func getEscapeToGroundBytes() []byte ***REMOVED***
 	escapeToGroundBytes = append(escapeToGroundBytes, 0x5C)
 	escapeToGroundBytes = append(escapeToGroundBytes, getByteRange(0x60, 0x7E)...)
 	return escapeToGroundBytes
-***REMOVED***
+}
 
-func getExecuteBytes() []byte ***REMOVED***
+func getExecuteBytes() []byte {
 	executeBytes := getByteRange(0x00, 0x17)
 	executeBytes = append(executeBytes, 0x19)
 	executeBytes = append(executeBytes, getByteRange(0x1C, 0x1F)...)
 	return executeBytes
-***REMOVED***
+}
 
-func getToGroundBytes() []byte ***REMOVED***
-	groundBytes := []byte***REMOVED***0x18***REMOVED***
+func getToGroundBytes() []byte {
+	groundBytes := []byte{0x18}
 	groundBytes = append(groundBytes, 0x1A)
 	groundBytes = append(groundBytes, getByteRange(0x80, 0x8F)...)
 	groundBytes = append(groundBytes, getByteRange(0x91, 0x97)...)
@@ -180,7 +180,7 @@ func getToGroundBytes() []byte ***REMOVED***
 	groundBytes = append(groundBytes, 0x9A)
 	groundBytes = append(groundBytes, 0x9C)
 	return groundBytes
-***REMOVED***
+}
 
 // Delete		     7F hex  Always and everywhere ignored
 // C1 Control	  80-9F hex  32 additional control characters

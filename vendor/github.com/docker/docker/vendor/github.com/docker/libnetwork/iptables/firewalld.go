@@ -25,11 +25,11 @@ const (
 )
 
 // Conn is a connection to firewalld dbus endpoint.
-type Conn struct ***REMOVED***
+type Conn struct {
 	sysconn *dbus.Conn
 	sysobj  dbus.BusObject
 	signal  chan *dbus.Signal
-***REMOVED***
+}
 
 var (
 	connection       *Conn
@@ -38,42 +38,42 @@ var (
 )
 
 // FirewalldInit initializes firewalld management code.
-func FirewalldInit() error ***REMOVED***
+func FirewalldInit() error {
 	var err error
 
-	if connection, err = newConnection(); err != nil ***REMOVED***
+	if connection, err = newConnection(); err != nil {
 		return fmt.Errorf("Failed to connect to D-Bus system bus: %v", err)
-	***REMOVED***
+	}
 	firewalldRunning = checkRunning()
-	if !firewalldRunning ***REMOVED***
+	if !firewalldRunning {
 		connection.sysconn.Close()
 		connection = nil
-	***REMOVED***
-	if connection != nil ***REMOVED***
+	}
+	if connection != nil {
 		go signalHandler()
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // New() establishes a connection to the system bus.
-func newConnection() (*Conn, error) ***REMOVED***
+func newConnection() (*Conn, error) {
 	c := new(Conn)
-	if err := c.initConnection(); err != nil ***REMOVED***
+	if err := c.initConnection(); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	return c, nil
-***REMOVED***
+}
 
 // Innitialize D-Bus connection.
-func (c *Conn) initConnection() error ***REMOVED***
+func (c *Conn) initConnection() error {
 	var err error
 
 	c.sysconn, err = dbus.SystemBus()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	// This never fails, even if the service is not running atm.
 	c.sysobj = c.sysconn.Object(dbusInterface, dbus.ObjectPath(dbusPath))
@@ -90,78 +90,78 @@ func (c *Conn) initConnection() error ***REMOVED***
 	c.sysconn.Signal(c.signal)
 
 	return nil
-***REMOVED***
+}
 
-func signalHandler() ***REMOVED***
-	for signal := range connection.signal ***REMOVED***
-		if strings.Contains(signal.Name, "NameOwnerChanged") ***REMOVED***
+func signalHandler() {
+	for signal := range connection.signal {
+		if strings.Contains(signal.Name, "NameOwnerChanged") {
 			firewalldRunning = checkRunning()
 			dbusConnectionChanged(signal.Body)
-		***REMOVED*** else if strings.Contains(signal.Name, "Reloaded") ***REMOVED***
+		} else if strings.Contains(signal.Name, "Reloaded") {
 			reloaded()
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func dbusConnectionChanged(args []interface***REMOVED******REMOVED***) ***REMOVED***
+func dbusConnectionChanged(args []interface{}) {
 	name := args[0].(string)
 	oldOwner := args[1].(string)
 	newOwner := args[2].(string)
 
-	if name != dbusInterface ***REMOVED***
+	if name != dbusInterface {
 		return
-	***REMOVED***
+	}
 
-	if len(newOwner) > 0 ***REMOVED***
+	if len(newOwner) > 0 {
 		connectionEstablished()
-	***REMOVED*** else if len(oldOwner) > 0 ***REMOVED***
+	} else if len(oldOwner) > 0 {
 		connectionLost()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func connectionEstablished() ***REMOVED***
+func connectionEstablished() {
 	reloaded()
-***REMOVED***
+}
 
-func connectionLost() ***REMOVED***
+func connectionLost() {
 	// Doesn't do anything for now. Libvirt also doesn't react to this.
-***REMOVED***
+}
 
 // call all callbacks
-func reloaded() ***REMOVED***
-	for _, pf := range onReloaded ***REMOVED***
+func reloaded() {
+	for _, pf := range onReloaded {
 		(*pf)()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // OnReloaded add callback
-func OnReloaded(callback func()) ***REMOVED***
-	for _, pf := range onReloaded ***REMOVED***
-		if pf == &callback ***REMOVED***
+func OnReloaded(callback func()) {
+	for _, pf := range onReloaded {
+		if pf == &callback {
 			return
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	onReloaded = append(onReloaded, &callback)
-***REMOVED***
+}
 
 // Call some remote method to see whether the service is actually running.
-func checkRunning() bool ***REMOVED***
+func checkRunning() bool {
 	var zone string
 	var err error
 
-	if connection != nil ***REMOVED***
+	if connection != nil {
 		err = connection.sysobj.Call(dbusInterface+".getDefaultZone", 0).Store(&zone)
 		return err == nil
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
 // Passthrough method simply passes args through to iptables/ip6tables
-func Passthrough(ipv IPV, args ...string) ([]byte, error) ***REMOVED***
+func Passthrough(ipv IPV, args ...string) ([]byte, error) {
 	var output string
 	logrus.Debugf("Firewalld passthrough: %s, %s", ipv, args)
-	if err := connection.sysobj.Call(dbusInterface+".direct.passthrough", 0, ipv, args).Store(&output); err != nil ***REMOVED***
+	if err := connection.sysobj.Call(dbusInterface+".direct.passthrough", 0, ipv, args).Store(&output); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return []byte(output), nil
-***REMOVED***
+}

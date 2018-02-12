@@ -16,44 +16,44 @@ var pattern = regexp.MustCompile(`^[a-zA-Z]:\.$`)
 
 // normalizeWorkdir normalizes a user requested working directory in a
 // platform semantically consistent way.
-func normalizeWorkdir(platform string, current string, requested string) (string, error) ***REMOVED***
-	if platform == "" ***REMOVED***
+func normalizeWorkdir(platform string, current string, requested string) (string, error) {
+	if platform == "" {
 		platform = "windows"
-	***REMOVED***
-	if platform == "windows" ***REMOVED***
+	}
+	if platform == "windows" {
 		return normalizeWorkdirWindows(current, requested)
-	***REMOVED***
+	}
 	return normalizeWorkdirUnix(current, requested)
-***REMOVED***
+}
 
 // normalizeWorkdirUnix normalizes a user requested working directory in a
 // platform semantically consistent way.
-func normalizeWorkdirUnix(current string, requested string) (string, error) ***REMOVED***
-	if requested == "" ***REMOVED***
+func normalizeWorkdirUnix(current string, requested string) (string, error) {
+	if requested == "" {
 		return "", errors.New("cannot normalize nothing")
-	***REMOVED***
+	}
 	current = strings.Replace(current, string(os.PathSeparator), "/", -1)
 	requested = strings.Replace(requested, string(os.PathSeparator), "/", -1)
-	if !path.IsAbs(requested) ***REMOVED***
+	if !path.IsAbs(requested) {
 		return path.Join(`/`, current, requested), nil
-	***REMOVED***
+	}
 	return requested, nil
-***REMOVED***
+}
 
 // normalizeWorkdirWindows normalizes a user requested working directory in a
 // platform semantically consistent way.
-func normalizeWorkdirWindows(current string, requested string) (string, error) ***REMOVED***
-	if requested == "" ***REMOVED***
+func normalizeWorkdirWindows(current string, requested string) (string, error) {
+	if requested == "" {
 		return "", errors.New("cannot normalize nothing")
-	***REMOVED***
+	}
 
 	// `filepath.Clean` will replace "" with "." so skip in that case
-	if current != "" ***REMOVED***
+	if current != "" {
 		current = filepath.Clean(current)
-	***REMOVED***
-	if requested != "" ***REMOVED***
+	}
+	if requested != "" {
 		requested = filepath.Clean(requested)
-	***REMOVED***
+	}
 
 	// If either current or requested in Windows is:
 	// C:
@@ -62,12 +62,12 @@ func normalizeWorkdirWindows(current string, requested string) (string, error) *
 	// refers to `current directory on drive C:`
 	// Since filepath.Clean() will automatically normalize the above
 	// to `C:.`, we only need to check the last format
-	if pattern.MatchString(current) ***REMOVED***
+	if pattern.MatchString(current) {
 		return "", fmt.Errorf("%s is not a directory. If you are specifying a drive letter, please add a trailing '\\'", current)
-	***REMOVED***
-	if pattern.MatchString(requested) ***REMOVED***
+	}
+	if pattern.MatchString(requested) {
 		return "", fmt.Errorf("%s is not a directory. If you are specifying a drive letter, please add a trailing '\\'", requested)
-	***REMOVED***
+	}
 
 	// Target semantics is C:\somefolder, specifically in the format:
 	// UPPERCASEDriveLetter-Colon-Backslash-FolderName. We are already
@@ -81,21 +81,21 @@ func normalizeWorkdirWindows(current string, requested string) (string, error) *
 	//	WORKDIR C:/foo \ WORKDIR bar    --> C:\foo --> C:\foo\bar
 	//	WORKDIR C:/foo \ WORKDIR \\bar  --> C:\foo --> C:\bar
 	//	WORKDIR /foo \ WORKDIR c:/bar   --> C:\foo --> C:\bar
-	if len(current) == 0 || system.IsAbs(requested) ***REMOVED***
+	if len(current) == 0 || system.IsAbs(requested) {
 		if (requested[0] == os.PathSeparator) ||
 			(len(requested) > 1 && string(requested[1]) != ":") ||
-			(len(requested) == 1) ***REMOVED***
+			(len(requested) == 1) {
 			requested = filepath.Join(`C:\`, requested)
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
+		}
+	} else {
 		requested = filepath.Join(current, requested)
-	***REMOVED***
+	}
 	// Upper-case drive letter
 	return (strings.ToUpper(string(requested[0])) + requested[1:]), nil
-***REMOVED***
+}
 
 // equalEnvKeys compare two strings and returns true if they are equal. On
 // Windows this comparison is case insensitive.
-func equalEnvKeys(from, to string) bool ***REMOVED***
+func equalEnvKeys(from, to string) bool {
 	return strings.ToUpper(from) == strings.ToUpper(to)
-***REMOVED***
+}

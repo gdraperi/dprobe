@@ -2,7 +2,7 @@ package main
 
 type MyPtrInt *int
 
-func main() ***REMOVED***
+func main() {
 	var megaptr **int
 	a := *megaptr
 	b := *a
@@ -15,4 +15,4 @@ func main() ***REMOVED***
 	aa := *typeptr
 	bb := &typeptr
 	
-***REMOVED***
+}

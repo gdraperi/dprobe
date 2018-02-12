@@ -17,41 +17,41 @@ var (
 	errNoSuchInterface = errors.New("no such interface")
 )
 
-func boolint(b bool) int ***REMOVED***
-	if b ***REMOVED***
+func boolint(b bool) int {
+	if b {
 		return 1
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func netAddrToIP16(a net.Addr) net.IP ***REMOVED***
-	switch v := a.(type) ***REMOVED***
+func netAddrToIP16(a net.Addr) net.IP {
+	switch v := a.(type) {
 	case *net.UDPAddr:
-		if ip := v.IP.To16(); ip != nil && ip.To4() == nil ***REMOVED***
+		if ip := v.IP.To16(); ip != nil && ip.To4() == nil {
 			return ip
-		***REMOVED***
+		}
 	case *net.IPAddr:
-		if ip := v.IP.To16(); ip != nil && ip.To4() == nil ***REMOVED***
+		if ip := v.IP.To16(); ip != nil && ip.To4() == nil {
 			return ip
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func opAddr(a net.Addr) net.Addr ***REMOVED***
-	switch a.(type) ***REMOVED***
+func opAddr(a net.Addr) net.Addr {
+	switch a.(type) {
 	case *net.TCPAddr:
-		if a == nil ***REMOVED***
+		if a == nil {
 			return nil
-		***REMOVED***
+		}
 	case *net.UDPAddr:
-		if a == nil ***REMOVED***
+		if a == nil {
 			return nil
-		***REMOVED***
+		}
 	case *net.IPAddr:
-		if a == nil ***REMOVED***
+		if a == nil {
 			return nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return a
-***REMOVED***
+}

@@ -15,21 +15,21 @@
 // Call syscall from C code because the gccgo support for calling from
 // Go to C does not support varargs functions.
 
-struct ret ***REMOVED***
+struct ret {
 	uintptr_t r;
 	uintptr_t err;
-***REMOVED***;
+};
 
 struct ret
 gccgoRealSyscall(uintptr_t trap, uintptr_t a1, uintptr_t a2, uintptr_t a3, uintptr_t a4, uintptr_t a5, uintptr_t a6, uintptr_t a7, uintptr_t a8, uintptr_t a9)
-***REMOVED***
+{
 	struct ret r;
 
 	errno = 0;
 	r.r = syscall(trap, a1, a2, a3, a4, a5, a6, a7, a8, a9);
 	r.err = errno;
 	return r;
-***REMOVED***
+}
 
 // Define the use function in C so that it is not inlined.
 
@@ -37,5 +37,5 @@ extern void use(void *) __asm__ (GOSYM_PREFIX GOPKGPATH ".use") __attribute__((n
 
 void
 use(void *p __attribute__ ((unused)))
-***REMOVED***
-***REMOVED***
+{
+}

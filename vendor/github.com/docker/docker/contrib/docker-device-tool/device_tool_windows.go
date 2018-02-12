@@ -1,4 +1,4 @@
 package main
 
-func main() ***REMOVED***
-***REMOVED***
+func main() {
+}

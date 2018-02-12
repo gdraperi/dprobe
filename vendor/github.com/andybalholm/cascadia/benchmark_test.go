@@ -7,13 +7,13 @@ import (
 	"golang.org/x/net/html"
 )
 
-func MustParseHTML(doc string) *html.Node ***REMOVED***
+func MustParseHTML(doc string) *html.Node {
 	dom, err := html.Parse(strings.NewReader(doc))
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 	return dom
-***REMOVED***
+}
 
 var selector = MustCompile(`div.matched`)
 var doc = `<!DOCTYPE html>
@@ -44,10 +44,10 @@ var doc = `<!DOCTYPE html>
 `
 var dom = MustParseHTML(doc)
 
-func BenchmarkMatchAll(b *testing.B) ***REMOVED***
+func BenchmarkMatchAll(b *testing.B) {
 	var matches []*html.Node
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		matches = selector.MatchAll(dom)
-	***REMOVED***
+	}
 	_ = matches
-***REMOVED***
+}

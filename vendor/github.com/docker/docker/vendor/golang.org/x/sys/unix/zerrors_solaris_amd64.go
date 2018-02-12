@@ -1319,7 +1319,7 @@ const (
 )
 
 // Error table
-var errors = [...]string***REMOVED***
+var errors = [...]string{
 	1:   "not owner",
 	2:   "no such file or directory",
 	3:   "no such process",
@@ -1441,10 +1441,10 @@ var errors = [...]string***REMOVED***
 	149: "operation already in progress",
 	150: "operation now in progress",
 	151: "stale NFS file handle",
-***REMOVED***
+}
 
 // Signal table
-var signals = [...]string***REMOVED***
+var signals = [...]string{
 	1:  "hangup",
 	2:  "interrupt",
 	3:  "quit",
@@ -1486,4 +1486,4 @@ var signals = [...]string***REMOVED***
 	39: "reserved for JVM 1",
 	40: "reserved for JVM 2",
 	41: "information Request",
-***REMOVED***
+}

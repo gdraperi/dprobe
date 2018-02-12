@@ -20,106 +20,106 @@ var draft = flag.String("draft",
 	"contributed",
 	`Minimal draft requirements (approved, contributed, provisional, unconfirmed).`)
 
-func TestNumberSystems(t *testing.T) ***REMOVED***
+func TestNumberSystems(t *testing.T) {
 	testtext.SkipIfNotLong(t)
 
 	r := gen.OpenCLDRCoreZip()
 	defer r.Close()
 
-	d := &cldr.Decoder***REMOVED******REMOVED***
+	d := &cldr.Decoder{}
 	d.SetDirFilter("supplemental")
 	d.SetSectionFilter("numberingSystem")
 	data, err := d.DecodeZip(r)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("DecodeZip: %v", err)
-	***REMOVED***
+	}
 
-	for _, ns := range data.Supplemental().NumberingSystems.NumberingSystem ***REMOVED***
+	for _, ns := range data.Supplemental().NumberingSystems.NumberingSystem {
 		n := systemMap[ns.Id]
-		if int(n) >= len(numSysData) ***REMOVED***
+		if int(n) >= len(numSysData) {
 			continue
-		***REMOVED***
+		}
 		info := InfoFromLangID(0, ns.Id)
 		val := '0'
-		for _, rWant := range ns.Digits ***REMOVED***
-			if rGot := info.Digit(val); rGot != rWant ***REMOVED***
+		for _, rWant := range ns.Digits {
+			if rGot := info.Digit(val); rGot != rWant {
 				t.Errorf("%s:%d: got %U; want %U", ns.Id, val, rGot, rWant)
-			***REMOVED***
+			}
 			val++
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestSymbols(t *testing.T) ***REMOVED***
+func TestSymbols(t *testing.T) {
 	testtext.SkipIfNotLong(t)
 
 	draft, err := cldr.ParseDraft(*draft)
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatalf("invalid draft level: %v", err)
-	***REMOVED***
+	}
 
 	r := gen.OpenCLDRCoreZip()
 	defer r.Close()
 
-	d := &cldr.Decoder***REMOVED******REMOVED***
+	d := &cldr.Decoder{}
 	d.SetDirFilter("main")
 	d.SetSectionFilter("numbers")
 	data, err := d.DecodeZip(r)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("DecodeZip: %v", err)
-	***REMOVED***
+	}
 
-	for _, lang := range data.Locales() ***REMOVED***
+	for _, lang := range data.Locales() {
 		ldml := data.RawLDML(lang)
-		if ldml.Numbers == nil ***REMOVED***
+		if ldml.Numbers == nil {
 			continue
-		***REMOVED***
+		}
 		langIndex, ok := language.CompactIndex(language.MustParse(lang))
-		if !ok ***REMOVED***
+		if !ok {
 			t.Fatalf("No compact index for language %s", lang)
-		***REMOVED***
+		}
 
 		syms := cldr.MakeSlice(&ldml.Numbers.Symbols)
 		syms.SelectDraft(draft)
 
-		for _, sym := range ldml.Numbers.Symbols ***REMOVED***
-			if sym.NumberSystem == "" ***REMOVED***
+		for _, sym := range ldml.Numbers.Symbols {
+			if sym.NumberSystem == "" {
 				continue
-			***REMOVED***
-			testCases := []struct ***REMOVED***
+			}
+			testCases := []struct {
 				name string
 				st   SymbolType
-				x    interface***REMOVED******REMOVED***
-			***REMOVED******REMOVED***
-				***REMOVED***"Decimal", SymDecimal, sym.Decimal***REMOVED***,
-				***REMOVED***"Group", SymGroup, sym.Group***REMOVED***,
-				***REMOVED***"List", SymList, sym.List***REMOVED***,
-				***REMOVED***"PercentSign", SymPercentSign, sym.PercentSign***REMOVED***,
-				***REMOVED***"PlusSign", SymPlusSign, sym.PlusSign***REMOVED***,
-				***REMOVED***"MinusSign", SymMinusSign, sym.MinusSign***REMOVED***,
-				***REMOVED***"Exponential", SymExponential, sym.Exponential***REMOVED***,
-				***REMOVED***"SuperscriptingExponent", SymSuperscriptingExponent, sym.SuperscriptingExponent***REMOVED***,
-				***REMOVED***"PerMille", SymPerMille, sym.PerMille***REMOVED***,
-				***REMOVED***"Infinity", SymInfinity, sym.Infinity***REMOVED***,
-				***REMOVED***"NaN", SymNan, sym.Nan***REMOVED***,
-				***REMOVED***"TimeSeparator", SymTimeSeparator, sym.TimeSeparator***REMOVED***,
-			***REMOVED***
+				x    interface{}
+			}{
+				{"Decimal", SymDecimal, sym.Decimal},
+				{"Group", SymGroup, sym.Group},
+				{"List", SymList, sym.List},
+				{"PercentSign", SymPercentSign, sym.PercentSign},
+				{"PlusSign", SymPlusSign, sym.PlusSign},
+				{"MinusSign", SymMinusSign, sym.MinusSign},
+				{"Exponential", SymExponential, sym.Exponential},
+				{"SuperscriptingExponent", SymSuperscriptingExponent, sym.SuperscriptingExponent},
+				{"PerMille", SymPerMille, sym.PerMille},
+				{"Infinity", SymInfinity, sym.Infinity},
+				{"NaN", SymNan, sym.Nan},
+				{"TimeSeparator", SymTimeSeparator, sym.TimeSeparator},
+			}
 			info := InfoFromLangID(langIndex, sym.NumberSystem)
-			for _, tc := range testCases ***REMOVED***
+			for _, tc := range testCases {
 				// Extract the wanted value.
 				v := reflect.ValueOf(tc.x)
-				if v.Len() == 0 ***REMOVED***
+				if v.Len() == 0 {
 					return
-				***REMOVED***
-				if v.Len() > 1 ***REMOVED***
+				}
+				if v.Len() > 1 {
 					t.Fatalf("Multiple values of %q within single symbol not supported.", tc.name)
-				***REMOVED***
+				}
 				want := v.Index(0).MethodByName("Data").Call(nil)[0].String()
 				got := info.Symbol(tc.st)
-				if got != want ***REMOVED***
+				if got != want {
 					t.Errorf("%s:%s:%s: got %q; want %q", lang, sym.NumberSystem, tc.name, got, want)
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+				}
+			}
+		}
+	}
+}

@@ -22,84 +22,84 @@ const (
 	requestBody     = "ok"
 )
 
-func okHandler(w http.ResponseWriter, r *http.Request) ***REMOVED***
+func okHandler(w http.ResponseWriter, r *http.Request) {
 	time.Sleep(requestDuration)
 	io.WriteString(w, requestBody)
-***REMOVED***
+}
 
-func TestNoTimeout(t *testing.T) ***REMOVED***
+func TestNoTimeout(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(okHandler))
 	defer ts.Close()
 
 	ctx := context.Background()
 	res, err := Get(ctx, nil, ts.URL)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	defer res.Body.Close()
 	slurp, err := ioutil.ReadAll(res.Body)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if string(slurp) != requestBody ***REMOVED***
+	}
+	if string(slurp) != requestBody {
 		t.Errorf("body = %q; want %q", slurp, requestBody)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestCancelBeforeHeaders(t *testing.T) ***REMOVED***
+func TestCancelBeforeHeaders(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 
-	blockServer := make(chan struct***REMOVED******REMOVED***)
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) ***REMOVED***
+	blockServer := make(chan struct{})
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		cancel()
 		<-blockServer
 		io.WriteString(w, requestBody)
-	***REMOVED***))
+	}))
 	defer ts.Close()
 	defer close(blockServer)
 
 	res, err := Get(ctx, nil, ts.URL)
-	if err == nil ***REMOVED***
+	if err == nil {
 		res.Body.Close()
 		t.Fatal("Get returned unexpected nil error")
-	***REMOVED***
-	if err != context.Canceled ***REMOVED***
+	}
+	if err != context.Canceled {
 		t.Errorf("err = %v; want %v", err, context.Canceled)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestCancelAfterHangingRequest(t *testing.T) ***REMOVED***
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) ***REMOVED***
+func TestCancelAfterHangingRequest(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.(http.Flusher).Flush()
 		<-w.(http.CloseNotifier).CloseNotify()
-	***REMOVED***))
+	}))
 	defer ts.Close()
 
 	ctx, cancel := context.WithCancel(context.Background())
 	resp, err := Get(ctx, nil, ts.URL)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("unexpected error in Get: %v", err)
-	***REMOVED***
+	}
 
 	// Cancel befer reading the body.
 	// Reading Request.Body should fail, since the request was
 	// canceled before anything was written.
 	cancel()
 
-	done := make(chan struct***REMOVED******REMOVED***)
+	done := make(chan struct{})
 
-	go func() ***REMOVED***
+	go func() {
 		b, err := ioutil.ReadAll(resp.Body)
-		if len(b) != 0 || err == nil ***REMOVED***
+		if len(b) != 0 || err == nil {
 			t.Errorf(`Read got (%q, %v); want ("", error)`, b, err)
-		***REMOVED***
+		}
 		close(done)
-	***REMOVED***()
+	}()
 
-	select ***REMOVED***
+	select {
 	case <-time.After(1 * time.Second):
 		t.Errorf("Test timed out")
 	case <-done:
-	***REMOVED***
-***REMOVED***
+	}
+}

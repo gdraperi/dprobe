@@ -10,24 +10,24 @@ import (
 // all the errors that happened during the loop.
 type Errors []error
 
-func (errList Errors) Error() string ***REMOVED***
-	if len(errList) < 1 ***REMOVED***
+func (errList Errors) Error() string {
+	if len(errList) < 1 {
 		return ""
-	***REMOVED***
+	}
 
 	out := make([]string, len(errList))
-	for i := range errList ***REMOVED***
+	for i := range errList {
 		out[i] = errList[i].Error()
-	***REMOVED***
+	}
 	return strings.Join(out, ", ")
-***REMOVED***
+}
 
 // StatusError reports an unsuccessful exit by a command.
-type StatusError struct ***REMOVED***
+type StatusError struct {
 	Status     string
 	StatusCode int
-***REMOVED***
+}
 
-func (e StatusError) Error() string ***REMOVED***
+func (e StatusError) Error() string {
 	return fmt.Sprintf("Status: %s, Code: %d", e.Status, e.StatusCode)
-***REMOVED***
+}

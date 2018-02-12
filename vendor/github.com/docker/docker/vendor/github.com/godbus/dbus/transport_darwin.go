@@ -1,6 +1,6 @@
 package dbus
 
-func (t *unixTransport) SendNullByte() error ***REMOVED***
-	_, err := t.Write([]byte***REMOVED***0***REMOVED***)
+func (t *unixTransport) SendNullByte() error {
+	_, err := t.Write([]byte{0})
 	return err
-***REMOVED***
+}

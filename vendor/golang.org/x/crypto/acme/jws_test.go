@@ -88,7 +88,7 @@ GGnm6rb+NnWR9DIopM0nKNkToWoF/hzopxu4Ae/GsQ==
 	testKeyEC512PubX = "AdQ0pvHsnALsfqlraxXS0RFaEeEHcmZb44_pJSAxavK8gpqOXHvd5Lbh3LhA8atY738AGwMWpxFKQ1VNeci_r7SY"
 	testKeyEC512PubY = "AXbmSeogEiDlDwz0Gc670YYByFzC3c7tEMeap7CckkOtuN0Yaebqtv42dZH0MiikzSco2ROhagX-HOinG7gB78ax"
 
-	// echo -n '***REMOVED***"crv":"P-256","kty":"EC","x":"<testKeyECPubX>","y":"<testKeyECPubY>"***REMOVED***' | \
+	// echo -n '{"crv":"P-256","kty":"EC","x":"<testKeyECPubX>","y":"<testKeyECPubY>"}' | \
 	// openssl dgst -binary -sha256 | base64 | tr -d '=' | tr '/+' '_-'
 	testKeyECThumbprint = "zedj-Bd1Zshp8KLePv2MB-lJ_Hagp7wAwdkA0NUTniU"
 )
@@ -100,45 +100,45 @@ var (
 	testKeyEC512 *ecdsa.PrivateKey
 )
 
-func init() ***REMOVED***
+func init() {
 	testKey = parseRSA(testKeyPEM, "testKeyPEM")
 	testKeyEC = parseEC(testKeyECPEM, "testKeyECPEM")
 	testKeyEC384 = parseEC(testKeyEC384PEM, "testKeyEC384PEM")
 	testKeyEC512 = parseEC(testKeyEC512PEM, "testKeyEC512PEM")
-***REMOVED***
+}
 
-func decodePEM(s, name string) []byte ***REMOVED***
+func decodePEM(s, name string) []byte {
 	d, _ := pem.Decode([]byte(s))
-	if d == nil ***REMOVED***
+	if d == nil {
 		panic("no block found in " + name)
-	***REMOVED***
+	}
 	return d.Bytes
-***REMOVED***
+}
 
-func parseRSA(s, name string) *rsa.PrivateKey ***REMOVED***
+func parseRSA(s, name string) *rsa.PrivateKey {
 	b := decodePEM(s, name)
 	k, err := x509.ParsePKCS1PrivateKey(b)
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(fmt.Sprintf("%s: %v", name, err))
-	***REMOVED***
+	}
 	return k
-***REMOVED***
+}
 
-func parseEC(s, name string) *ecdsa.PrivateKey ***REMOVED***
+func parseEC(s, name string) *ecdsa.PrivateKey {
 	b := decodePEM(s, name)
 	k, err := x509.ParseECPrivateKey(b)
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(fmt.Sprintf("%s: %v", name, err))
-	***REMOVED***
+	}
 	return k
-***REMOVED***
+}
 
-func TestJWSEncodeJSON(t *testing.T) ***REMOVED***
-	claims := struct***REMOVED*** Msg string ***REMOVED******REMOVED***"Hello JWS"***REMOVED***
+func TestJWSEncodeJSON(t *testing.T) {
+	claims := struct{ Msg string }{"Hello JWS"}
 	// JWS signed with testKey and "nonce" as the nonce value
 	// JSON-serialized JWS fields are split for easier testing
 	const (
-		// ***REMOVED***"alg":"RS256","jwk":***REMOVED***"e":"AQAB","kty":"RSA","n":"..."***REMOVED***,"nonce":"nonce"***REMOVED***
+		// {"alg":"RS256","jwk":{"e":"AQAB","kty":"RSA","n":"..."},"nonce":"nonce"}
 		protected = "eyJhbGciOiJSUzI1NiIsImp3ayI6eyJlIjoiQVFBQiIsImt0eSI6" +
 			"IlJTQSIsIm4iOiI0eGdaM2VSUGt3b1J2eTdxZVJVYm1NRGUwVi14" +
 			"SDllV0xkdTBpaGVlTGxybUQybXFXWGZQOUllU0tBcGJuMzRnOFR1" +
@@ -150,7 +150,7 @@ func TestJWSEncodeJSON(t *testing.T) ***REMOVED***
 			"ajk4Xzk3bWszaWhPWTRBZ1ZkQ0RqMXpfR0NvWmtHNVJxN25iQ0d5" +
 			"b3N5S1d5RFgwMFpzLW5OcVZob0xlSXZYQzRubldkSk1aNnJvZ3h5" +
 			"UVEifSwibm9uY2UiOiJub25jZSJ9"
-		// ***REMOVED***"Msg":"Hello JWS"***REMOVED***
+		// {"Msg":"Hello JWS"}
 		payload   = "eyJNc2ciOiJIZWxsbyBKV1MifQ"
 		signature = "eAGUikStX_UxyiFhxSLMyuyBcIB80GeBkFROCpap2sW3EmkU_ggF" +
 			"knaQzxrTfItICSAXsCLIquZ5BbrSWA_4vdEYrwWtdUj7NqFKjHRa" +
@@ -162,86 +162,86 @@ func TestJWSEncodeJSON(t *testing.T) ***REMOVED***
 	)
 
 	b, err := jwsEncodeJSON(claims, testKey, "nonce")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	var jws struct***REMOVED*** Protected, Payload, Signature string ***REMOVED***
-	if err := json.Unmarshal(b, &jws); err != nil ***REMOVED***
+	}
+	var jws struct{ Protected, Payload, Signature string }
+	if err := json.Unmarshal(b, &jws); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if jws.Protected != protected ***REMOVED***
+	}
+	if jws.Protected != protected {
 		t.Errorf("protected:\n%s\nwant:\n%s", jws.Protected, protected)
-	***REMOVED***
-	if jws.Payload != payload ***REMOVED***
+	}
+	if jws.Payload != payload {
 		t.Errorf("payload:\n%s\nwant:\n%s", jws.Payload, payload)
-	***REMOVED***
-	if jws.Signature != signature ***REMOVED***
+	}
+	if jws.Signature != signature {
 		t.Errorf("signature:\n%s\nwant:\n%s", jws.Signature, signature)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestJWSEncodeJSONEC(t *testing.T) ***REMOVED***
-	tt := []struct ***REMOVED***
+func TestJWSEncodeJSONEC(t *testing.T) {
+	tt := []struct {
 		key      *ecdsa.PrivateKey
 		x, y     string
 		alg, crv string
-	***REMOVED******REMOVED***
-		***REMOVED***testKeyEC, testKeyECPubX, testKeyECPubY, "ES256", "P-256"***REMOVED***,
-		***REMOVED***testKeyEC384, testKeyEC384PubX, testKeyEC384PubY, "ES384", "P-384"***REMOVED***,
-		***REMOVED***testKeyEC512, testKeyEC512PubX, testKeyEC512PubY, "ES512", "P-521"***REMOVED***,
-	***REMOVED***
-	for i, test := range tt ***REMOVED***
-		claims := struct***REMOVED*** Msg string ***REMOVED******REMOVED***"Hello JWS"***REMOVED***
+	}{
+		{testKeyEC, testKeyECPubX, testKeyECPubY, "ES256", "P-256"},
+		{testKeyEC384, testKeyEC384PubX, testKeyEC384PubY, "ES384", "P-384"},
+		{testKeyEC512, testKeyEC512PubX, testKeyEC512PubY, "ES512", "P-521"},
+	}
+	for i, test := range tt {
+		claims := struct{ Msg string }{"Hello JWS"}
 		b, err := jwsEncodeJSON(claims, test.key, "nonce")
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Errorf("%d: %v", i, err)
 			continue
-		***REMOVED***
-		var jws struct***REMOVED*** Protected, Payload, Signature string ***REMOVED***
-		if err := json.Unmarshal(b, &jws); err != nil ***REMOVED***
+		}
+		var jws struct{ Protected, Payload, Signature string }
+		if err := json.Unmarshal(b, &jws); err != nil {
 			t.Errorf("%d: %v", i, err)
 			continue
-		***REMOVED***
+		}
 
 		b, err = base64.RawURLEncoding.DecodeString(jws.Protected)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Errorf("%d: jws.Protected: %v", i, err)
-		***REMOVED***
-		var head struct ***REMOVED***
+		}
+		var head struct {
 			Alg   string
 			Nonce string
-			JWK   struct ***REMOVED***
+			JWK   struct {
 				Crv string
 				Kty string
 				X   string
 				Y   string
-			***REMOVED*** `json:"jwk"`
-		***REMOVED***
-		if err := json.Unmarshal(b, &head); err != nil ***REMOVED***
+			} `json:"jwk"`
+		}
+		if err := json.Unmarshal(b, &head); err != nil {
 			t.Errorf("%d: jws.Protected: %v", i, err)
-		***REMOVED***
-		if head.Alg != test.alg ***REMOVED***
+		}
+		if head.Alg != test.alg {
 			t.Errorf("%d: head.Alg = %q; want %q", i, head.Alg, test.alg)
-		***REMOVED***
-		if head.Nonce != "nonce" ***REMOVED***
+		}
+		if head.Nonce != "nonce" {
 			t.Errorf("%d: head.Nonce = %q; want nonce", i, head.Nonce)
-		***REMOVED***
-		if head.JWK.Crv != test.crv ***REMOVED***
+		}
+		if head.JWK.Crv != test.crv {
 			t.Errorf("%d: head.JWK.Crv = %q; want %q", i, head.JWK.Crv, test.crv)
-		***REMOVED***
-		if head.JWK.Kty != "EC" ***REMOVED***
+		}
+		if head.JWK.Kty != "EC" {
 			t.Errorf("%d: head.JWK.Kty = %q; want EC", i, head.JWK.Kty)
-		***REMOVED***
-		if head.JWK.X != test.x ***REMOVED***
+		}
+		if head.JWK.X != test.x {
 			t.Errorf("%d: head.JWK.X = %q; want %q", i, head.JWK.X, test.x)
-		***REMOVED***
-		if head.JWK.Y != test.y ***REMOVED***
+		}
+		if head.JWK.Y != test.y {
 			t.Errorf("%d: head.JWK.Y = %q; want %q", i, head.JWK.Y, test.y)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestJWKThumbprintRSA(t *testing.T) ***REMOVED***
+func TestJWKThumbprintRSA(t *testing.T) {
 	// Key example from RFC 7638
 	const base64N = "0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx4cbbfAAt" +
 		"VT86zwu1RK7aPFFxuhDR1L6tSoc_BJECPebWKRXjBZCiFV4n3oknjhMstn6" +
@@ -253,31 +253,31 @@ func TestJWKThumbprintRSA(t *testing.T) ***REMOVED***
 	const expected = "NzbLsXh8uDCcd-6MNwXF4W_7noWXFZAfHkxZsRGC9Xs"
 
 	b, err := base64.RawURLEncoding.DecodeString(base64N)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("Error parsing example key N: %v", err)
-	***REMOVED***
+	}
 	n := new(big.Int).SetBytes(b)
 
 	b, err = base64.RawURLEncoding.DecodeString(base64E)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("Error parsing example key E: %v", err)
-	***REMOVED***
+	}
 	e := new(big.Int).SetBytes(b)
 
-	pub := &rsa.PublicKey***REMOVED***N: n, E: int(e.Uint64())***REMOVED***
+	pub := &rsa.PublicKey{N: n, E: int(e.Uint64())}
 	th, err := JWKThumbprint(pub)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Error(err)
-	***REMOVED***
-	if th != expected ***REMOVED***
+	}
+	if th != expected {
 		t.Errorf("thumbprint = %q; want %q", th, expected)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestJWKThumbprintEC(t *testing.T) ***REMOVED***
+func TestJWKThumbprintEC(t *testing.T) {
 	// Key example from RFC 7520
 	// expected was computed with
-	// echo -n '***REMOVED***"crv":"P-521","kty":"EC","x":"<base64X>","y":"<base64Y>"***REMOVED***' | \
+	// echo -n '{"crv":"P-521","kty":"EC","x":"<base64X>","y":"<base64Y>"}' | \
 	// openssl dgst -binary -sha256 | \
 	// base64 | \
 	// tr -d '=' | tr '/+' '_-'
@@ -290,30 +290,30 @@ func TestJWKThumbprintEC(t *testing.T) ***REMOVED***
 	)
 
 	b, err := base64.RawURLEncoding.DecodeString(base64X)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("Error parsing example key X: %v", err)
-	***REMOVED***
+	}
 	x := new(big.Int).SetBytes(b)
 
 	b, err = base64.RawURLEncoding.DecodeString(base64Y)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("Error parsing example key Y: %v", err)
-	***REMOVED***
+	}
 	y := new(big.Int).SetBytes(b)
 
-	pub := &ecdsa.PublicKey***REMOVED***Curve: elliptic.P521(), X: x, Y: y***REMOVED***
+	pub := &ecdsa.PublicKey{Curve: elliptic.P521(), X: x, Y: y}
 	th, err := JWKThumbprint(pub)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Error(err)
-	***REMOVED***
-	if th != expected ***REMOVED***
+	}
+	if th != expected {
 		t.Errorf("thumbprint = %q; want %q", th, expected)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestJWKThumbprintErrUnsupportedKey(t *testing.T) ***REMOVED***
-	_, err := JWKThumbprint(struct***REMOVED******REMOVED******REMOVED******REMOVED***)
-	if err != ErrUnsupportedKey ***REMOVED***
+func TestJWKThumbprintErrUnsupportedKey(t *testing.T) {
+	_, err := JWKThumbprint(struct{}{})
+	if err != ErrUnsupportedKey {
 		t.Errorf("err = %q; want %q", err, ErrUnsupportedKey)
-	***REMOVED***
-***REMOVED***
+	}
+}

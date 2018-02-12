@@ -11,40 +11,40 @@ import (
 
 // An Orchestrator runs a reconciliation loop to create and destroy
 // tasks as necessary for the replicated services.
-type Orchestrator struct ***REMOVED***
+type Orchestrator struct {
 	store *store.MemoryStore
 
 	reconcileServices map[string]*api.Service
-	restartTasks      map[string]struct***REMOVED******REMOVED***
+	restartTasks      map[string]struct{}
 
 	// stopChan signals to the state machine to stop running.
-	stopChan chan struct***REMOVED******REMOVED***
+	stopChan chan struct{}
 	// doneChan is closed when the state machine terminates.
-	doneChan chan struct***REMOVED******REMOVED***
+	doneChan chan struct{}
 
 	updater  *update.Supervisor
 	restarts *restart.Supervisor
 
 	cluster *api.Cluster // local cluster instance
-***REMOVED***
+}
 
 // NewReplicatedOrchestrator creates a new replicated Orchestrator.
-func NewReplicatedOrchestrator(store *store.MemoryStore) *Orchestrator ***REMOVED***
+func NewReplicatedOrchestrator(store *store.MemoryStore) *Orchestrator {
 	restartSupervisor := restart.NewSupervisor(store)
 	updater := update.NewSupervisor(store, restartSupervisor)
-	return &Orchestrator***REMOVED***
+	return &Orchestrator{
 		store:             store,
-		stopChan:          make(chan struct***REMOVED******REMOVED***),
-		doneChan:          make(chan struct***REMOVED******REMOVED***),
+		stopChan:          make(chan struct{}),
+		doneChan:          make(chan struct{}),
 		reconcileServices: make(map[string]*api.Service),
-		restartTasks:      make(map[string]struct***REMOVED******REMOVED***),
+		restartTasks:      make(map[string]struct{}),
 		updater:           updater,
 		restarts:          restartSupervisor,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Run contains the orchestrator event loop. It runs until Stop is called.
-func (r *Orchestrator) Run(ctx context.Context) error ***REMOVED***
+func (r *Orchestrator) Run(ctx context.Context) error {
 	defer close(r.doneChan)
 
 	// Watch changes to services and tasks
@@ -55,54 +55,54 @@ func (r *Orchestrator) Run(ctx context.Context) error ***REMOVED***
 	// Balance existing services and drain initial tasks attached to invalid
 	// nodes
 	var err error
-	r.store.View(func(readTx store.ReadTx) ***REMOVED***
-		if err = r.initTasks(ctx, readTx); err != nil ***REMOVED***
+	r.store.View(func(readTx store.ReadTx) {
+		if err = r.initTasks(ctx, readTx); err != nil {
 			return
-		***REMOVED***
+		}
 
-		if err = r.initServices(readTx); err != nil ***REMOVED***
+		if err = r.initServices(readTx); err != nil {
 			return
-		***REMOVED***
+		}
 
-		if err = r.initCluster(readTx); err != nil ***REMOVED***
+		if err = r.initCluster(readTx); err != nil {
 			return
-		***REMOVED***
-	***REMOVED***)
-	if err != nil ***REMOVED***
+		}
+	})
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	r.tick(ctx)
 
-	for ***REMOVED***
-		select ***REMOVED***
+	for {
+		select {
 		case event := <-watcher:
 			// TODO(stevvooe): Use ctx to limit running time of operation.
 			r.handleTaskEvent(ctx, event)
 			r.handleServiceEvent(ctx, event)
-			switch v := event.(type) ***REMOVED***
+			switch v := event.(type) {
 			case state.EventCommit:
 				r.tick(ctx)
 			case api.EventUpdateCluster:
 				r.cluster = v.Cluster
-			***REMOVED***
+			}
 		case <-r.stopChan:
 			return nil
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // Stop stops the orchestrator.
-func (r *Orchestrator) Stop() ***REMOVED***
+func (r *Orchestrator) Stop() {
 	close(r.stopChan)
 	<-r.doneChan
 	r.updater.CancelAll()
 	r.restarts.CancelAll()
-***REMOVED***
+}
 
-func (r *Orchestrator) tick(ctx context.Context) ***REMOVED***
+func (r *Orchestrator) tick(ctx context.Context) {
 	// tickTasks must be called first, so we respond to task-level changes
 	// before performing service reconciliation.
 	r.tickTasks(ctx)
 	r.tickServices(ctx)
-***REMOVED***
+}

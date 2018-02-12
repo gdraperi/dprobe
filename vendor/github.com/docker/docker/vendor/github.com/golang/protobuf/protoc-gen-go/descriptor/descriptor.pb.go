@@ -80,7 +80,7 @@ const (
 	FieldDescriptorProto_TYPE_SINT64   FieldDescriptorProto_Type = 18
 )
 
-var FieldDescriptorProto_Type_name = map[int32]string***REMOVED***
+var FieldDescriptorProto_Type_name = map[int32]string{
 	1:  "TYPE_DOUBLE",
 	2:  "TYPE_FLOAT",
 	3:  "TYPE_INT64",
@@ -99,8 +99,8 @@ var FieldDescriptorProto_Type_name = map[int32]string***REMOVED***
 	16: "TYPE_SFIXED64",
 	17: "TYPE_SINT32",
 	18: "TYPE_SINT64",
-***REMOVED***
-var FieldDescriptorProto_Type_value = map[string]int32***REMOVED***
+}
+var FieldDescriptorProto_Type_value = map[string]int32{
 	"TYPE_DOUBLE":   1,
 	"TYPE_FLOAT":    2,
 	"TYPE_INT64":    3,
@@ -119,25 +119,25 @@ var FieldDescriptorProto_Type_value = map[string]int32***REMOVED***
 	"TYPE_SFIXED64": 16,
 	"TYPE_SINT32":   17,
 	"TYPE_SINT64":   18,
-***REMOVED***
+}
 
-func (x FieldDescriptorProto_Type) Enum() *FieldDescriptorProto_Type ***REMOVED***
+func (x FieldDescriptorProto_Type) Enum() *FieldDescriptorProto_Type {
 	p := new(FieldDescriptorProto_Type)
 	*p = x
 	return p
-***REMOVED***
-func (x FieldDescriptorProto_Type) String() string ***REMOVED***
+}
+func (x FieldDescriptorProto_Type) String() string {
 	return proto.EnumName(FieldDescriptorProto_Type_name, int32(x))
-***REMOVED***
-func (x *FieldDescriptorProto_Type) UnmarshalJSON(data []byte) error ***REMOVED***
+}
+func (x *FieldDescriptorProto_Type) UnmarshalJSON(data []byte) error {
 	value, err := proto.UnmarshalJSONEnum(FieldDescriptorProto_Type_value, data, "FieldDescriptorProto_Type")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	*x = FieldDescriptorProto_Type(value)
 	return nil
-***REMOVED***
-func (FieldDescriptorProto_Type) EnumDescriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***3, 0***REMOVED*** ***REMOVED***
+}
+func (FieldDescriptorProto_Type) EnumDescriptor() ([]byte, []int) { return fileDescriptor0, []int{3, 0} }
 
 type FieldDescriptorProto_Label int32
 
@@ -148,36 +148,36 @@ const (
 	FieldDescriptorProto_LABEL_REPEATED FieldDescriptorProto_Label = 3
 )
 
-var FieldDescriptorProto_Label_name = map[int32]string***REMOVED***
+var FieldDescriptorProto_Label_name = map[int32]string{
 	1: "LABEL_OPTIONAL",
 	2: "LABEL_REQUIRED",
 	3: "LABEL_REPEATED",
-***REMOVED***
-var FieldDescriptorProto_Label_value = map[string]int32***REMOVED***
+}
+var FieldDescriptorProto_Label_value = map[string]int32{
 	"LABEL_OPTIONAL": 1,
 	"LABEL_REQUIRED": 2,
 	"LABEL_REPEATED": 3,
-***REMOVED***
+}
 
-func (x FieldDescriptorProto_Label) Enum() *FieldDescriptorProto_Label ***REMOVED***
+func (x FieldDescriptorProto_Label) Enum() *FieldDescriptorProto_Label {
 	p := new(FieldDescriptorProto_Label)
 	*p = x
 	return p
-***REMOVED***
-func (x FieldDescriptorProto_Label) String() string ***REMOVED***
+}
+func (x FieldDescriptorProto_Label) String() string {
 	return proto.EnumName(FieldDescriptorProto_Label_name, int32(x))
-***REMOVED***
-func (x *FieldDescriptorProto_Label) UnmarshalJSON(data []byte) error ***REMOVED***
+}
+func (x *FieldDescriptorProto_Label) UnmarshalJSON(data []byte) error {
 	value, err := proto.UnmarshalJSONEnum(FieldDescriptorProto_Label_value, data, "FieldDescriptorProto_Label")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	*x = FieldDescriptorProto_Label(value)
 	return nil
-***REMOVED***
-func (FieldDescriptorProto_Label) EnumDescriptor() ([]byte, []int) ***REMOVED***
-	return fileDescriptor0, []int***REMOVED***3, 1***REMOVED***
-***REMOVED***
+}
+func (FieldDescriptorProto_Label) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor0, []int{3, 1}
+}
 
 // Generated classes can be optimized for speed or code size.
 type FileOptions_OptimizeMode int32
@@ -189,34 +189,34 @@ const (
 	FileOptions_LITE_RUNTIME FileOptions_OptimizeMode = 3
 )
 
-var FileOptions_OptimizeMode_name = map[int32]string***REMOVED***
+var FileOptions_OptimizeMode_name = map[int32]string{
 	1: "SPEED",
 	2: "CODE_SIZE",
 	3: "LITE_RUNTIME",
-***REMOVED***
-var FileOptions_OptimizeMode_value = map[string]int32***REMOVED***
+}
+var FileOptions_OptimizeMode_value = map[string]int32{
 	"SPEED":        1,
 	"CODE_SIZE":    2,
 	"LITE_RUNTIME": 3,
-***REMOVED***
+}
 
-func (x FileOptions_OptimizeMode) Enum() *FileOptions_OptimizeMode ***REMOVED***
+func (x FileOptions_OptimizeMode) Enum() *FileOptions_OptimizeMode {
 	p := new(FileOptions_OptimizeMode)
 	*p = x
 	return p
-***REMOVED***
-func (x FileOptions_OptimizeMode) String() string ***REMOVED***
+}
+func (x FileOptions_OptimizeMode) String() string {
 	return proto.EnumName(FileOptions_OptimizeMode_name, int32(x))
-***REMOVED***
-func (x *FileOptions_OptimizeMode) UnmarshalJSON(data []byte) error ***REMOVED***
+}
+func (x *FileOptions_OptimizeMode) UnmarshalJSON(data []byte) error {
 	value, err := proto.UnmarshalJSONEnum(FileOptions_OptimizeMode_value, data, "FileOptions_OptimizeMode")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	*x = FileOptions_OptimizeMode(value)
 	return nil
-***REMOVED***
-func (FileOptions_OptimizeMode) EnumDescriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***9, 0***REMOVED*** ***REMOVED***
+}
+func (FileOptions_OptimizeMode) EnumDescriptor() ([]byte, []int) { return fileDescriptor0, []int{9, 0} }
 
 type FieldOptions_CType int32
 
@@ -227,34 +227,34 @@ const (
 	FieldOptions_STRING_PIECE FieldOptions_CType = 2
 )
 
-var FieldOptions_CType_name = map[int32]string***REMOVED***
+var FieldOptions_CType_name = map[int32]string{
 	0: "STRING",
 	1: "CORD",
 	2: "STRING_PIECE",
-***REMOVED***
-var FieldOptions_CType_value = map[string]int32***REMOVED***
+}
+var FieldOptions_CType_value = map[string]int32{
 	"STRING":       0,
 	"CORD":         1,
 	"STRING_PIECE": 2,
-***REMOVED***
+}
 
-func (x FieldOptions_CType) Enum() *FieldOptions_CType ***REMOVED***
+func (x FieldOptions_CType) Enum() *FieldOptions_CType {
 	p := new(FieldOptions_CType)
 	*p = x
 	return p
-***REMOVED***
-func (x FieldOptions_CType) String() string ***REMOVED***
+}
+func (x FieldOptions_CType) String() string {
 	return proto.EnumName(FieldOptions_CType_name, int32(x))
-***REMOVED***
-func (x *FieldOptions_CType) UnmarshalJSON(data []byte) error ***REMOVED***
+}
+func (x *FieldOptions_CType) UnmarshalJSON(data []byte) error {
 	value, err := proto.UnmarshalJSONEnum(FieldOptions_CType_value, data, "FieldOptions_CType")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	*x = FieldOptions_CType(value)
 	return nil
-***REMOVED***
-func (FieldOptions_CType) EnumDescriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***11, 0***REMOVED*** ***REMOVED***
+}
+func (FieldOptions_CType) EnumDescriptor() ([]byte, []int) { return fileDescriptor0, []int{11, 0} }
 
 type FieldOptions_JSType int32
 
@@ -267,34 +267,34 @@ const (
 	FieldOptions_JS_NUMBER FieldOptions_JSType = 2
 )
 
-var FieldOptions_JSType_name = map[int32]string***REMOVED***
+var FieldOptions_JSType_name = map[int32]string{
 	0: "JS_NORMAL",
 	1: "JS_STRING",
 	2: "JS_NUMBER",
-***REMOVED***
-var FieldOptions_JSType_value = map[string]int32***REMOVED***
+}
+var FieldOptions_JSType_value = map[string]int32{
 	"JS_NORMAL": 0,
 	"JS_STRING": 1,
 	"JS_NUMBER": 2,
-***REMOVED***
+}
 
-func (x FieldOptions_JSType) Enum() *FieldOptions_JSType ***REMOVED***
+func (x FieldOptions_JSType) Enum() *FieldOptions_JSType {
 	p := new(FieldOptions_JSType)
 	*p = x
 	return p
-***REMOVED***
-func (x FieldOptions_JSType) String() string ***REMOVED***
+}
+func (x FieldOptions_JSType) String() string {
 	return proto.EnumName(FieldOptions_JSType_name, int32(x))
-***REMOVED***
-func (x *FieldOptions_JSType) UnmarshalJSON(data []byte) error ***REMOVED***
+}
+func (x *FieldOptions_JSType) UnmarshalJSON(data []byte) error {
 	value, err := proto.UnmarshalJSONEnum(FieldOptions_JSType_value, data, "FieldOptions_JSType")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	*x = FieldOptions_JSType(value)
 	return nil
-***REMOVED***
-func (FieldOptions_JSType) EnumDescriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***11, 1***REMOVED*** ***REMOVED***
+}
+func (FieldOptions_JSType) EnumDescriptor() ([]byte, []int) { return fileDescriptor0, []int{11, 1} }
 
 // Is this method side-effect-free (or safe in HTTP parlance), or idempotent,
 // or neither? HTTP based RPC implementation may choose GET verb for safe
@@ -307,58 +307,58 @@ const (
 	MethodOptions_IDEMPOTENT          MethodOptions_IdempotencyLevel = 2
 )
 
-var MethodOptions_IdempotencyLevel_name = map[int32]string***REMOVED***
+var MethodOptions_IdempotencyLevel_name = map[int32]string{
 	0: "IDEMPOTENCY_UNKNOWN",
 	1: "NO_SIDE_EFFECTS",
 	2: "IDEMPOTENT",
-***REMOVED***
-var MethodOptions_IdempotencyLevel_value = map[string]int32***REMOVED***
+}
+var MethodOptions_IdempotencyLevel_value = map[string]int32{
 	"IDEMPOTENCY_UNKNOWN": 0,
 	"NO_SIDE_EFFECTS":     1,
 	"IDEMPOTENT":          2,
-***REMOVED***
+}
 
-func (x MethodOptions_IdempotencyLevel) Enum() *MethodOptions_IdempotencyLevel ***REMOVED***
+func (x MethodOptions_IdempotencyLevel) Enum() *MethodOptions_IdempotencyLevel {
 	p := new(MethodOptions_IdempotencyLevel)
 	*p = x
 	return p
-***REMOVED***
-func (x MethodOptions_IdempotencyLevel) String() string ***REMOVED***
+}
+func (x MethodOptions_IdempotencyLevel) String() string {
 	return proto.EnumName(MethodOptions_IdempotencyLevel_name, int32(x))
-***REMOVED***
-func (x *MethodOptions_IdempotencyLevel) UnmarshalJSON(data []byte) error ***REMOVED***
+}
+func (x *MethodOptions_IdempotencyLevel) UnmarshalJSON(data []byte) error {
 	value, err := proto.UnmarshalJSONEnum(MethodOptions_IdempotencyLevel_value, data, "MethodOptions_IdempotencyLevel")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	*x = MethodOptions_IdempotencyLevel(value)
 	return nil
-***REMOVED***
-func (MethodOptions_IdempotencyLevel) EnumDescriptor() ([]byte, []int) ***REMOVED***
-	return fileDescriptor0, []int***REMOVED***16, 0***REMOVED***
-***REMOVED***
+}
+func (MethodOptions_IdempotencyLevel) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor0, []int{16, 0}
+}
 
 // The protocol compiler can output a FileDescriptorSet containing the .proto
 // files it parses.
-type FileDescriptorSet struct ***REMOVED***
+type FileDescriptorSet struct {
 	File             []*FileDescriptorProto `protobuf:"bytes,1,rep,name=file" json:"file,omitempty"`
 	XXX_unrecognized []byte                 `json:"-"`
-***REMOVED***
+}
 
-func (m *FileDescriptorSet) Reset()                    ***REMOVED*** *m = FileDescriptorSet***REMOVED******REMOVED*** ***REMOVED***
-func (m *FileDescriptorSet) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*FileDescriptorSet) ProtoMessage()               ***REMOVED******REMOVED***
-func (*FileDescriptorSet) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***0***REMOVED*** ***REMOVED***
+func (m *FileDescriptorSet) Reset()                    { *m = FileDescriptorSet{} }
+func (m *FileDescriptorSet) String() string            { return proto.CompactTextString(m) }
+func (*FileDescriptorSet) ProtoMessage()               {}
+func (*FileDescriptorSet) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
-func (m *FileDescriptorSet) GetFile() []*FileDescriptorProto ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *FileDescriptorSet) GetFile() []*FileDescriptorProto {
+	if m != nil {
 		return m.File
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // Describes a complete .proto file.
-type FileDescriptorProto struct ***REMOVED***
+type FileDescriptorProto struct {
 	Name    *string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
 	Package *string `protobuf:"bytes,2,opt,name=package" json:"package,omitempty"`
 	// Names of files imported by this file.
@@ -383,99 +383,99 @@ type FileDescriptorProto struct ***REMOVED***
 	// The supported values are "proto2" and "proto3".
 	Syntax           *string `protobuf:"bytes,12,opt,name=syntax" json:"syntax,omitempty"`
 	XXX_unrecognized []byte  `json:"-"`
-***REMOVED***
+}
 
-func (m *FileDescriptorProto) Reset()                    ***REMOVED*** *m = FileDescriptorProto***REMOVED******REMOVED*** ***REMOVED***
-func (m *FileDescriptorProto) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*FileDescriptorProto) ProtoMessage()               ***REMOVED******REMOVED***
-func (*FileDescriptorProto) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***1***REMOVED*** ***REMOVED***
+func (m *FileDescriptorProto) Reset()                    { *m = FileDescriptorProto{} }
+func (m *FileDescriptorProto) String() string            { return proto.CompactTextString(m) }
+func (*FileDescriptorProto) ProtoMessage()               {}
+func (*FileDescriptorProto) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
 
-func (m *FileDescriptorProto) GetName() string ***REMOVED***
-	if m != nil && m.Name != nil ***REMOVED***
+func (m *FileDescriptorProto) GetName() string {
+	if m != nil && m.Name != nil {
 		return *m.Name
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *FileDescriptorProto) GetPackage() string ***REMOVED***
-	if m != nil && m.Package != nil ***REMOVED***
+func (m *FileDescriptorProto) GetPackage() string {
+	if m != nil && m.Package != nil {
 		return *m.Package
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *FileDescriptorProto) GetDependency() []string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *FileDescriptorProto) GetDependency() []string {
+	if m != nil {
 		return m.Dependency
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *FileDescriptorProto) GetPublicDependency() []int32 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *FileDescriptorProto) GetPublicDependency() []int32 {
+	if m != nil {
 		return m.PublicDependency
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *FileDescriptorProto) GetWeakDependency() []int32 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *FileDescriptorProto) GetWeakDependency() []int32 {
+	if m != nil {
 		return m.WeakDependency
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *FileDescriptorProto) GetMessageType() []*DescriptorProto ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *FileDescriptorProto) GetMessageType() []*DescriptorProto {
+	if m != nil {
 		return m.MessageType
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *FileDescriptorProto) GetEnumType() []*EnumDescriptorProto ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *FileDescriptorProto) GetEnumType() []*EnumDescriptorProto {
+	if m != nil {
 		return m.EnumType
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *FileDescriptorProto) GetService() []*ServiceDescriptorProto ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *FileDescriptorProto) GetService() []*ServiceDescriptorProto {
+	if m != nil {
 		return m.Service
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *FileDescriptorProto) GetExtension() []*FieldDescriptorProto ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *FileDescriptorProto) GetExtension() []*FieldDescriptorProto {
+	if m != nil {
 		return m.Extension
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *FileDescriptorProto) GetOptions() *FileOptions ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *FileDescriptorProto) GetOptions() *FileOptions {
+	if m != nil {
 		return m.Options
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *FileDescriptorProto) GetSourceCodeInfo() *SourceCodeInfo ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *FileDescriptorProto) GetSourceCodeInfo() *SourceCodeInfo {
+	if m != nil {
 		return m.SourceCodeInfo
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *FileDescriptorProto) GetSyntax() string ***REMOVED***
-	if m != nil && m.Syntax != nil ***REMOVED***
+func (m *FileDescriptorProto) GetSyntax() string {
+	if m != nil && m.Syntax != nil {
 		return *m.Syntax
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
 // Describes a message type.
-type DescriptorProto struct ***REMOVED***
+type DescriptorProto struct {
 	Name           *string                           `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
 	Field          []*FieldDescriptorProto           `protobuf:"bytes,2,rep,name=field" json:"field,omitempty"`
 	Extension      []*FieldDescriptorProto           `protobuf:"bytes,6,rep,name=extension" json:"extension,omitempty"`
@@ -489,142 +489,142 @@ type DescriptorProto struct ***REMOVED***
 	// A given name may only be reserved once.
 	ReservedName     []string `protobuf:"bytes,10,rep,name=reserved_name,json=reservedName" json:"reserved_name,omitempty"`
 	XXX_unrecognized []byte   `json:"-"`
-***REMOVED***
+}
 
-func (m *DescriptorProto) Reset()                    ***REMOVED*** *m = DescriptorProto***REMOVED******REMOVED*** ***REMOVED***
-func (m *DescriptorProto) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*DescriptorProto) ProtoMessage()               ***REMOVED******REMOVED***
-func (*DescriptorProto) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***2***REMOVED*** ***REMOVED***
+func (m *DescriptorProto) Reset()                    { *m = DescriptorProto{} }
+func (m *DescriptorProto) String() string            { return proto.CompactTextString(m) }
+func (*DescriptorProto) ProtoMessage()               {}
+func (*DescriptorProto) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
 
-func (m *DescriptorProto) GetName() string ***REMOVED***
-	if m != nil && m.Name != nil ***REMOVED***
+func (m *DescriptorProto) GetName() string {
+	if m != nil && m.Name != nil {
 		return *m.Name
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *DescriptorProto) GetField() []*FieldDescriptorProto ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *DescriptorProto) GetField() []*FieldDescriptorProto {
+	if m != nil {
 		return m.Field
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *DescriptorProto) GetExtension() []*FieldDescriptorProto ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *DescriptorProto) GetExtension() []*FieldDescriptorProto {
+	if m != nil {
 		return m.Extension
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *DescriptorProto) GetNestedType() []*DescriptorProto ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *DescriptorProto) GetNestedType() []*DescriptorProto {
+	if m != nil {
 		return m.NestedType
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *DescriptorProto) GetEnumType() []*EnumDescriptorProto ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *DescriptorProto) GetEnumType() []*EnumDescriptorProto {
+	if m != nil {
 		return m.EnumType
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *DescriptorProto) GetExtensionRange() []*DescriptorProto_ExtensionRange ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *DescriptorProto) GetExtensionRange() []*DescriptorProto_ExtensionRange {
+	if m != nil {
 		return m.ExtensionRange
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *DescriptorProto) GetOneofDecl() []*OneofDescriptorProto ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *DescriptorProto) GetOneofDecl() []*OneofDescriptorProto {
+	if m != nil {
 		return m.OneofDecl
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *DescriptorProto) GetOptions() *MessageOptions ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *DescriptorProto) GetOptions() *MessageOptions {
+	if m != nil {
 		return m.Options
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *DescriptorProto) GetReservedRange() []*DescriptorProto_ReservedRange ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *DescriptorProto) GetReservedRange() []*DescriptorProto_ReservedRange {
+	if m != nil {
 		return m.ReservedRange
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *DescriptorProto) GetReservedName() []string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *DescriptorProto) GetReservedName() []string {
+	if m != nil {
 		return m.ReservedName
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-type DescriptorProto_ExtensionRange struct ***REMOVED***
+type DescriptorProto_ExtensionRange struct {
 	Start            *int32 `protobuf:"varint,1,opt,name=start" json:"start,omitempty"`
 	End              *int32 `protobuf:"varint,2,opt,name=end" json:"end,omitempty"`
 	XXX_unrecognized []byte `json:"-"`
-***REMOVED***
+}
 
-func (m *DescriptorProto_ExtensionRange) Reset()         ***REMOVED*** *m = DescriptorProto_ExtensionRange***REMOVED******REMOVED*** ***REMOVED***
-func (m *DescriptorProto_ExtensionRange) String() string ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*DescriptorProto_ExtensionRange) ProtoMessage()    ***REMOVED******REMOVED***
-func (*DescriptorProto_ExtensionRange) Descriptor() ([]byte, []int) ***REMOVED***
-	return fileDescriptor0, []int***REMOVED***2, 0***REMOVED***
-***REMOVED***
+func (m *DescriptorProto_ExtensionRange) Reset()         { *m = DescriptorProto_ExtensionRange{} }
+func (m *DescriptorProto_ExtensionRange) String() string { return proto.CompactTextString(m) }
+func (*DescriptorProto_ExtensionRange) ProtoMessage()    {}
+func (*DescriptorProto_ExtensionRange) Descriptor() ([]byte, []int) {
+	return fileDescriptor0, []int{2, 0}
+}
 
-func (m *DescriptorProto_ExtensionRange) GetStart() int32 ***REMOVED***
-	if m != nil && m.Start != nil ***REMOVED***
+func (m *DescriptorProto_ExtensionRange) GetStart() int32 {
+	if m != nil && m.Start != nil {
 		return *m.Start
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *DescriptorProto_ExtensionRange) GetEnd() int32 ***REMOVED***
-	if m != nil && m.End != nil ***REMOVED***
+func (m *DescriptorProto_ExtensionRange) GetEnd() int32 {
+	if m != nil && m.End != nil {
 		return *m.End
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
 // Range of reserved tag numbers. Reserved tag numbers may not be used by
 // fields or extension ranges in the same message. Reserved ranges may
 // not overlap.
-type DescriptorProto_ReservedRange struct ***REMOVED***
+type DescriptorProto_ReservedRange struct {
 	Start            *int32 `protobuf:"varint,1,opt,name=start" json:"start,omitempty"`
 	End              *int32 `protobuf:"varint,2,opt,name=end" json:"end,omitempty"`
 	XXX_unrecognized []byte `json:"-"`
-***REMOVED***
+}
 
-func (m *DescriptorProto_ReservedRange) Reset()         ***REMOVED*** *m = DescriptorProto_ReservedRange***REMOVED******REMOVED*** ***REMOVED***
-func (m *DescriptorProto_ReservedRange) String() string ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*DescriptorProto_ReservedRange) ProtoMessage()    ***REMOVED******REMOVED***
-func (*DescriptorProto_ReservedRange) Descriptor() ([]byte, []int) ***REMOVED***
-	return fileDescriptor0, []int***REMOVED***2, 1***REMOVED***
-***REMOVED***
+func (m *DescriptorProto_ReservedRange) Reset()         { *m = DescriptorProto_ReservedRange{} }
+func (m *DescriptorProto_ReservedRange) String() string { return proto.CompactTextString(m) }
+func (*DescriptorProto_ReservedRange) ProtoMessage()    {}
+func (*DescriptorProto_ReservedRange) Descriptor() ([]byte, []int) {
+	return fileDescriptor0, []int{2, 1}
+}
 
-func (m *DescriptorProto_ReservedRange) GetStart() int32 ***REMOVED***
-	if m != nil && m.Start != nil ***REMOVED***
+func (m *DescriptorProto_ReservedRange) GetStart() int32 {
+	if m != nil && m.Start != nil {
 		return *m.Start
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *DescriptorProto_ReservedRange) GetEnd() int32 ***REMOVED***
-	if m != nil && m.End != nil ***REMOVED***
+func (m *DescriptorProto_ReservedRange) GetEnd() int32 {
+	if m != nil && m.End != nil {
 		return *m.End
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
 // Describes a field within a message.
-type FieldDescriptorProto struct ***REMOVED***
+type FieldDescriptorProto struct {
 	Name   *string                     `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
 	Number *int32                      `protobuf:"varint,3,opt,name=number" json:"number,omitempty"`
 	Label  *FieldDescriptorProto_Label `protobuf:"varint,4,opt,name=label,enum=google.protobuf.FieldDescriptorProto_Label" json:"label,omitempty"`
@@ -656,213 +656,213 @@ type FieldDescriptorProto struct ***REMOVED***
 	JsonName         *string       `protobuf:"bytes,10,opt,name=json_name,json=jsonName" json:"json_name,omitempty"`
 	Options          *FieldOptions `protobuf:"bytes,8,opt,name=options" json:"options,omitempty"`
 	XXX_unrecognized []byte        `json:"-"`
-***REMOVED***
+}
 
-func (m *FieldDescriptorProto) Reset()                    ***REMOVED*** *m = FieldDescriptorProto***REMOVED******REMOVED*** ***REMOVED***
-func (m *FieldDescriptorProto) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*FieldDescriptorProto) ProtoMessage()               ***REMOVED******REMOVED***
-func (*FieldDescriptorProto) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***3***REMOVED*** ***REMOVED***
+func (m *FieldDescriptorProto) Reset()                    { *m = FieldDescriptorProto{} }
+func (m *FieldDescriptorProto) String() string            { return proto.CompactTextString(m) }
+func (*FieldDescriptorProto) ProtoMessage()               {}
+func (*FieldDescriptorProto) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
 
-func (m *FieldDescriptorProto) GetName() string ***REMOVED***
-	if m != nil && m.Name != nil ***REMOVED***
+func (m *FieldDescriptorProto) GetName() string {
+	if m != nil && m.Name != nil {
 		return *m.Name
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *FieldDescriptorProto) GetNumber() int32 ***REMOVED***
-	if m != nil && m.Number != nil ***REMOVED***
+func (m *FieldDescriptorProto) GetNumber() int32 {
+	if m != nil && m.Number != nil {
 		return *m.Number
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *FieldDescriptorProto) GetLabel() FieldDescriptorProto_Label ***REMOVED***
-	if m != nil && m.Label != nil ***REMOVED***
+func (m *FieldDescriptorProto) GetLabel() FieldDescriptorProto_Label {
+	if m != nil && m.Label != nil {
 		return *m.Label
-	***REMOVED***
+	}
 	return FieldDescriptorProto_LABEL_OPTIONAL
-***REMOVED***
+}
 
-func (m *FieldDescriptorProto) GetType() FieldDescriptorProto_Type ***REMOVED***
-	if m != nil && m.Type != nil ***REMOVED***
+func (m *FieldDescriptorProto) GetType() FieldDescriptorProto_Type {
+	if m != nil && m.Type != nil {
 		return *m.Type
-	***REMOVED***
+	}
 	return FieldDescriptorProto_TYPE_DOUBLE
-***REMOVED***
+}
 
-func (m *FieldDescriptorProto) GetTypeName() string ***REMOVED***
-	if m != nil && m.TypeName != nil ***REMOVED***
+func (m *FieldDescriptorProto) GetTypeName() string {
+	if m != nil && m.TypeName != nil {
 		return *m.TypeName
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *FieldDescriptorProto) GetExtendee() string ***REMOVED***
-	if m != nil && m.Extendee != nil ***REMOVED***
+func (m *FieldDescriptorProto) GetExtendee() string {
+	if m != nil && m.Extendee != nil {
 		return *m.Extendee
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *FieldDescriptorProto) GetDefaultValue() string ***REMOVED***
-	if m != nil && m.DefaultValue != nil ***REMOVED***
+func (m *FieldDescriptorProto) GetDefaultValue() string {
+	if m != nil && m.DefaultValue != nil {
 		return *m.DefaultValue
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *FieldDescriptorProto) GetOneofIndex() int32 ***REMOVED***
-	if m != nil && m.OneofIndex != nil ***REMOVED***
+func (m *FieldDescriptorProto) GetOneofIndex() int32 {
+	if m != nil && m.OneofIndex != nil {
 		return *m.OneofIndex
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *FieldDescriptorProto) GetJsonName() string ***REMOVED***
-	if m != nil && m.JsonName != nil ***REMOVED***
+func (m *FieldDescriptorProto) GetJsonName() string {
+	if m != nil && m.JsonName != nil {
 		return *m.JsonName
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *FieldDescriptorProto) GetOptions() *FieldOptions ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *FieldDescriptorProto) GetOptions() *FieldOptions {
+	if m != nil {
 		return m.Options
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // Describes a oneof.
-type OneofDescriptorProto struct ***REMOVED***
+type OneofDescriptorProto struct {
 	Name             *string       `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
 	Options          *OneofOptions `protobuf:"bytes,2,opt,name=options" json:"options,omitempty"`
 	XXX_unrecognized []byte        `json:"-"`
-***REMOVED***
+}
 
-func (m *OneofDescriptorProto) Reset()                    ***REMOVED*** *m = OneofDescriptorProto***REMOVED******REMOVED*** ***REMOVED***
-func (m *OneofDescriptorProto) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*OneofDescriptorProto) ProtoMessage()               ***REMOVED******REMOVED***
-func (*OneofDescriptorProto) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***4***REMOVED*** ***REMOVED***
+func (m *OneofDescriptorProto) Reset()                    { *m = OneofDescriptorProto{} }
+func (m *OneofDescriptorProto) String() string            { return proto.CompactTextString(m) }
+func (*OneofDescriptorProto) ProtoMessage()               {}
+func (*OneofDescriptorProto) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
 
-func (m *OneofDescriptorProto) GetName() string ***REMOVED***
-	if m != nil && m.Name != nil ***REMOVED***
+func (m *OneofDescriptorProto) GetName() string {
+	if m != nil && m.Name != nil {
 		return *m.Name
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *OneofDescriptorProto) GetOptions() *OneofOptions ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *OneofDescriptorProto) GetOptions() *OneofOptions {
+	if m != nil {
 		return m.Options
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // Describes an enum type.
-type EnumDescriptorProto struct ***REMOVED***
+type EnumDescriptorProto struct {
 	Name             *string                     `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
 	Value            []*EnumValueDescriptorProto `protobuf:"bytes,2,rep,name=value" json:"value,omitempty"`
 	Options          *EnumOptions                `protobuf:"bytes,3,opt,name=options" json:"options,omitempty"`
 	XXX_unrecognized []byte                      `json:"-"`
-***REMOVED***
+}
 
-func (m *EnumDescriptorProto) Reset()                    ***REMOVED*** *m = EnumDescriptorProto***REMOVED******REMOVED*** ***REMOVED***
-func (m *EnumDescriptorProto) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*EnumDescriptorProto) ProtoMessage()               ***REMOVED******REMOVED***
-func (*EnumDescriptorProto) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***5***REMOVED*** ***REMOVED***
+func (m *EnumDescriptorProto) Reset()                    { *m = EnumDescriptorProto{} }
+func (m *EnumDescriptorProto) String() string            { return proto.CompactTextString(m) }
+func (*EnumDescriptorProto) ProtoMessage()               {}
+func (*EnumDescriptorProto) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{5} }
 
-func (m *EnumDescriptorProto) GetName() string ***REMOVED***
-	if m != nil && m.Name != nil ***REMOVED***
+func (m *EnumDescriptorProto) GetName() string {
+	if m != nil && m.Name != nil {
 		return *m.Name
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *EnumDescriptorProto) GetValue() []*EnumValueDescriptorProto ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *EnumDescriptorProto) GetValue() []*EnumValueDescriptorProto {
+	if m != nil {
 		return m.Value
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *EnumDescriptorProto) GetOptions() *EnumOptions ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *EnumDescriptorProto) GetOptions() *EnumOptions {
+	if m != nil {
 		return m.Options
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // Describes a value within an enum.
-type EnumValueDescriptorProto struct ***REMOVED***
+type EnumValueDescriptorProto struct {
 	Name             *string           `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
 	Number           *int32            `protobuf:"varint,2,opt,name=number" json:"number,omitempty"`
 	Options          *EnumValueOptions `protobuf:"bytes,3,opt,name=options" json:"options,omitempty"`
 	XXX_unrecognized []byte            `json:"-"`
-***REMOVED***
+}
 
-func (m *EnumValueDescriptorProto) Reset()                    ***REMOVED*** *m = EnumValueDescriptorProto***REMOVED******REMOVED*** ***REMOVED***
-func (m *EnumValueDescriptorProto) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*EnumValueDescriptorProto) ProtoMessage()               ***REMOVED******REMOVED***
-func (*EnumValueDescriptorProto) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***6***REMOVED*** ***REMOVED***
+func (m *EnumValueDescriptorProto) Reset()                    { *m = EnumValueDescriptorProto{} }
+func (m *EnumValueDescriptorProto) String() string            { return proto.CompactTextString(m) }
+func (*EnumValueDescriptorProto) ProtoMessage()               {}
+func (*EnumValueDescriptorProto) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{6} }
 
-func (m *EnumValueDescriptorProto) GetName() string ***REMOVED***
-	if m != nil && m.Name != nil ***REMOVED***
+func (m *EnumValueDescriptorProto) GetName() string {
+	if m != nil && m.Name != nil {
 		return *m.Name
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *EnumValueDescriptorProto) GetNumber() int32 ***REMOVED***
-	if m != nil && m.Number != nil ***REMOVED***
+func (m *EnumValueDescriptorProto) GetNumber() int32 {
+	if m != nil && m.Number != nil {
 		return *m.Number
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *EnumValueDescriptorProto) GetOptions() *EnumValueOptions ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *EnumValueDescriptorProto) GetOptions() *EnumValueOptions {
+	if m != nil {
 		return m.Options
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // Describes a service.
-type ServiceDescriptorProto struct ***REMOVED***
+type ServiceDescriptorProto struct {
 	Name             *string                  `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
 	Method           []*MethodDescriptorProto `protobuf:"bytes,2,rep,name=method" json:"method,omitempty"`
 	Options          *ServiceOptions          `protobuf:"bytes,3,opt,name=options" json:"options,omitempty"`
 	XXX_unrecognized []byte                   `json:"-"`
-***REMOVED***
+}
 
-func (m *ServiceDescriptorProto) Reset()                    ***REMOVED*** *m = ServiceDescriptorProto***REMOVED******REMOVED*** ***REMOVED***
-func (m *ServiceDescriptorProto) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*ServiceDescriptorProto) ProtoMessage()               ***REMOVED******REMOVED***
-func (*ServiceDescriptorProto) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***7***REMOVED*** ***REMOVED***
+func (m *ServiceDescriptorProto) Reset()                    { *m = ServiceDescriptorProto{} }
+func (m *ServiceDescriptorProto) String() string            { return proto.CompactTextString(m) }
+func (*ServiceDescriptorProto) ProtoMessage()               {}
+func (*ServiceDescriptorProto) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{7} }
 
-func (m *ServiceDescriptorProto) GetName() string ***REMOVED***
-	if m != nil && m.Name != nil ***REMOVED***
+func (m *ServiceDescriptorProto) GetName() string {
+	if m != nil && m.Name != nil {
 		return *m.Name
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *ServiceDescriptorProto) GetMethod() []*MethodDescriptorProto ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ServiceDescriptorProto) GetMethod() []*MethodDescriptorProto {
+	if m != nil {
 		return m.Method
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *ServiceDescriptorProto) GetOptions() *ServiceOptions ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ServiceDescriptorProto) GetOptions() *ServiceOptions {
+	if m != nil {
 		return m.Options
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // Describes a method of a service.
-type MethodDescriptorProto struct ***REMOVED***
+type MethodDescriptorProto struct {
 	Name *string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
 	// Input and output type names.  These are resolved in the same way as
 	// FieldDescriptorProto.type_name, but must refer to a message type.
@@ -874,59 +874,59 @@ type MethodDescriptorProto struct ***REMOVED***
 	// Identifies if server streams multiple server messages
 	ServerStreaming  *bool  `protobuf:"varint,6,opt,name=server_streaming,json=serverStreaming,def=0" json:"server_streaming,omitempty"`
 	XXX_unrecognized []byte `json:"-"`
-***REMOVED***
+}
 
-func (m *MethodDescriptorProto) Reset()                    ***REMOVED*** *m = MethodDescriptorProto***REMOVED******REMOVED*** ***REMOVED***
-func (m *MethodDescriptorProto) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*MethodDescriptorProto) ProtoMessage()               ***REMOVED******REMOVED***
-func (*MethodDescriptorProto) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***8***REMOVED*** ***REMOVED***
+func (m *MethodDescriptorProto) Reset()                    { *m = MethodDescriptorProto{} }
+func (m *MethodDescriptorProto) String() string            { return proto.CompactTextString(m) }
+func (*MethodDescriptorProto) ProtoMessage()               {}
+func (*MethodDescriptorProto) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{8} }
 
 const Default_MethodDescriptorProto_ClientStreaming bool = false
 const Default_MethodDescriptorProto_ServerStreaming bool = false
 
-func (m *MethodDescriptorProto) GetName() string ***REMOVED***
-	if m != nil && m.Name != nil ***REMOVED***
+func (m *MethodDescriptorProto) GetName() string {
+	if m != nil && m.Name != nil {
 		return *m.Name
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *MethodDescriptorProto) GetInputType() string ***REMOVED***
-	if m != nil && m.InputType != nil ***REMOVED***
+func (m *MethodDescriptorProto) GetInputType() string {
+	if m != nil && m.InputType != nil {
 		return *m.InputType
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *MethodDescriptorProto) GetOutputType() string ***REMOVED***
-	if m != nil && m.OutputType != nil ***REMOVED***
+func (m *MethodDescriptorProto) GetOutputType() string {
+	if m != nil && m.OutputType != nil {
 		return *m.OutputType
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *MethodDescriptorProto) GetOptions() *MethodOptions ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *MethodDescriptorProto) GetOptions() *MethodOptions {
+	if m != nil {
 		return m.Options
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *MethodDescriptorProto) GetClientStreaming() bool ***REMOVED***
-	if m != nil && m.ClientStreaming != nil ***REMOVED***
+func (m *MethodDescriptorProto) GetClientStreaming() bool {
+	if m != nil && m.ClientStreaming != nil {
 		return *m.ClientStreaming
-	***REMOVED***
+	}
 	return Default_MethodDescriptorProto_ClientStreaming
-***REMOVED***
+}
 
-func (m *MethodDescriptorProto) GetServerStreaming() bool ***REMOVED***
-	if m != nil && m.ServerStreaming != nil ***REMOVED***
+func (m *MethodDescriptorProto) GetServerStreaming() bool {
+	if m != nil && m.ServerStreaming != nil {
 		return *m.ServerStreaming
-	***REMOVED***
+	}
 	return Default_MethodDescriptorProto_ServerStreaming
-***REMOVED***
+}
 
-type FileOptions struct ***REMOVED***
+type FileOptions struct {
 	// Sets the Java package where classes generated from this .proto will be
 	// placed.  By default, the proto package is used, but this is often
 	// inappropriate because proto packages do not normally start with backwards
@@ -999,20 +999,20 @@ type FileOptions struct ***REMOVED***
 	UninterpretedOption          []*UninterpretedOption `protobuf:"bytes,999,rep,name=uninterpreted_option,json=uninterpretedOption" json:"uninterpreted_option,omitempty"`
 	proto.XXX_InternalExtensions `json:"-"`
 	XXX_unrecognized             []byte `json:"-"`
-***REMOVED***
+}
 
-func (m *FileOptions) Reset()                    ***REMOVED*** *m = FileOptions***REMOVED******REMOVED*** ***REMOVED***
-func (m *FileOptions) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*FileOptions) ProtoMessage()               ***REMOVED******REMOVED***
-func (*FileOptions) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***9***REMOVED*** ***REMOVED***
+func (m *FileOptions) Reset()                    { *m = FileOptions{} }
+func (m *FileOptions) String() string            { return proto.CompactTextString(m) }
+func (*FileOptions) ProtoMessage()               {}
+func (*FileOptions) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{9} }
 
-var extRange_FileOptions = []proto.ExtensionRange***REMOVED***
-	***REMOVED***1000, 536870911***REMOVED***,
-***REMOVED***
+var extRange_FileOptions = []proto.ExtensionRange{
+	{1000, 536870911},
+}
 
-func (*FileOptions) ExtensionRangeArray() []proto.ExtensionRange ***REMOVED***
+func (*FileOptions) ExtensionRangeArray() []proto.ExtensionRange {
 	return extRange_FileOptions
-***REMOVED***
+}
 
 const Default_FileOptions_JavaMultipleFiles bool = false
 const Default_FileOptions_JavaStringCheckUtf8 bool = false
@@ -1023,136 +1023,136 @@ const Default_FileOptions_PyGenericServices bool = false
 const Default_FileOptions_Deprecated bool = false
 const Default_FileOptions_CcEnableArenas bool = false
 
-func (m *FileOptions) GetJavaPackage() string ***REMOVED***
-	if m != nil && m.JavaPackage != nil ***REMOVED***
+func (m *FileOptions) GetJavaPackage() string {
+	if m != nil && m.JavaPackage != nil {
 		return *m.JavaPackage
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *FileOptions) GetJavaOuterClassname() string ***REMOVED***
-	if m != nil && m.JavaOuterClassname != nil ***REMOVED***
+func (m *FileOptions) GetJavaOuterClassname() string {
+	if m != nil && m.JavaOuterClassname != nil {
 		return *m.JavaOuterClassname
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *FileOptions) GetJavaMultipleFiles() bool ***REMOVED***
-	if m != nil && m.JavaMultipleFiles != nil ***REMOVED***
+func (m *FileOptions) GetJavaMultipleFiles() bool {
+	if m != nil && m.JavaMultipleFiles != nil {
 		return *m.JavaMultipleFiles
-	***REMOVED***
+	}
 	return Default_FileOptions_JavaMultipleFiles
-***REMOVED***
+}
 
-func (m *FileOptions) GetJavaGenerateEqualsAndHash() bool ***REMOVED***
-	if m != nil && m.JavaGenerateEqualsAndHash != nil ***REMOVED***
+func (m *FileOptions) GetJavaGenerateEqualsAndHash() bool {
+	if m != nil && m.JavaGenerateEqualsAndHash != nil {
 		return *m.JavaGenerateEqualsAndHash
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
-func (m *FileOptions) GetJavaStringCheckUtf8() bool ***REMOVED***
-	if m != nil && m.JavaStringCheckUtf8 != nil ***REMOVED***
+func (m *FileOptions) GetJavaStringCheckUtf8() bool {
+	if m != nil && m.JavaStringCheckUtf8 != nil {
 		return *m.JavaStringCheckUtf8
-	***REMOVED***
+	}
 	return Default_FileOptions_JavaStringCheckUtf8
-***REMOVED***
+}
 
-func (m *FileOptions) GetOptimizeFor() FileOptions_OptimizeMode ***REMOVED***
-	if m != nil && m.OptimizeFor != nil ***REMOVED***
+func (m *FileOptions) GetOptimizeFor() FileOptions_OptimizeMode {
+	if m != nil && m.OptimizeFor != nil {
 		return *m.OptimizeFor
-	***REMOVED***
+	}
 	return Default_FileOptions_OptimizeFor
-***REMOVED***
+}
 
-func (m *FileOptions) GetGoPackage() string ***REMOVED***
-	if m != nil && m.GoPackage != nil ***REMOVED***
+func (m *FileOptions) GetGoPackage() string {
+	if m != nil && m.GoPackage != nil {
 		return *m.GoPackage
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *FileOptions) GetCcGenericServices() bool ***REMOVED***
-	if m != nil && m.CcGenericServices != nil ***REMOVED***
+func (m *FileOptions) GetCcGenericServices() bool {
+	if m != nil && m.CcGenericServices != nil {
 		return *m.CcGenericServices
-	***REMOVED***
+	}
 	return Default_FileOptions_CcGenericServices
-***REMOVED***
+}
 
-func (m *FileOptions) GetJavaGenericServices() bool ***REMOVED***
-	if m != nil && m.JavaGenericServices != nil ***REMOVED***
+func (m *FileOptions) GetJavaGenericServices() bool {
+	if m != nil && m.JavaGenericServices != nil {
 		return *m.JavaGenericServices
-	***REMOVED***
+	}
 	return Default_FileOptions_JavaGenericServices
-***REMOVED***
+}
 
-func (m *FileOptions) GetPyGenericServices() bool ***REMOVED***
-	if m != nil && m.PyGenericServices != nil ***REMOVED***
+func (m *FileOptions) GetPyGenericServices() bool {
+	if m != nil && m.PyGenericServices != nil {
 		return *m.PyGenericServices
-	***REMOVED***
+	}
 	return Default_FileOptions_PyGenericServices
-***REMOVED***
+}
 
-func (m *FileOptions) GetDeprecated() bool ***REMOVED***
-	if m != nil && m.Deprecated != nil ***REMOVED***
+func (m *FileOptions) GetDeprecated() bool {
+	if m != nil && m.Deprecated != nil {
 		return *m.Deprecated
-	***REMOVED***
+	}
 	return Default_FileOptions_Deprecated
-***REMOVED***
+}
 
-func (m *FileOptions) GetCcEnableArenas() bool ***REMOVED***
-	if m != nil && m.CcEnableArenas != nil ***REMOVED***
+func (m *FileOptions) GetCcEnableArenas() bool {
+	if m != nil && m.CcEnableArenas != nil {
 		return *m.CcEnableArenas
-	***REMOVED***
+	}
 	return Default_FileOptions_CcEnableArenas
-***REMOVED***
+}
 
-func (m *FileOptions) GetObjcClassPrefix() string ***REMOVED***
-	if m != nil && m.ObjcClassPrefix != nil ***REMOVED***
+func (m *FileOptions) GetObjcClassPrefix() string {
+	if m != nil && m.ObjcClassPrefix != nil {
 		return *m.ObjcClassPrefix
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *FileOptions) GetCsharpNamespace() string ***REMOVED***
-	if m != nil && m.CsharpNamespace != nil ***REMOVED***
+func (m *FileOptions) GetCsharpNamespace() string {
+	if m != nil && m.CsharpNamespace != nil {
 		return *m.CsharpNamespace
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *FileOptions) GetSwiftPrefix() string ***REMOVED***
-	if m != nil && m.SwiftPrefix != nil ***REMOVED***
+func (m *FileOptions) GetSwiftPrefix() string {
+	if m != nil && m.SwiftPrefix != nil {
 		return *m.SwiftPrefix
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *FileOptions) GetPhpClassPrefix() string ***REMOVED***
-	if m != nil && m.PhpClassPrefix != nil ***REMOVED***
+func (m *FileOptions) GetPhpClassPrefix() string {
+	if m != nil && m.PhpClassPrefix != nil {
 		return *m.PhpClassPrefix
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *FileOptions) GetUninterpretedOption() []*UninterpretedOption ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *FileOptions) GetUninterpretedOption() []*UninterpretedOption {
+	if m != nil {
 		return m.UninterpretedOption
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-type MessageOptions struct ***REMOVED***
+type MessageOptions struct {
 	// Set true to use the old proto1 MessageSet wire format for extensions.
 	// This is provided for backwards-compatibility with the MessageSet wire
 	// format.  You should not use this for any other reason:  It's less
 	// efficient, has fewer features, and is more complicated.
 	//
 	// The message must be defined exactly as follows:
-	//   message Foo ***REMOVED***
+	//   message Foo {
 	//     option message_set_wire_format = true;
 	//     extensions 4 to max;
-	//   ***REMOVED***
+	//   }
 	// Note that the message cannot have any defined fields; MessageSets only
 	// have extensions.
 	//
@@ -1177,11 +1177,11 @@ type MessageOptions struct ***REMOVED***
 	// For maps fields:
 	//     map<KeyType, ValueType> map_field = 1;
 	// The parsed descriptor looks like:
-	//     message MapFieldEntry ***REMOVED***
+	//     message MapFieldEntry {
 	//         option map_entry = true;
 	//         optional KeyType key = 1;
 	//         optional ValueType value = 2;
-	// ***REMOVED***
+	//     }
 	//     repeated MapFieldEntry map_field = 1;
 	//
 	// Implementations may choose not to generate the map_entry=true message, but
@@ -1197,61 +1197,61 @@ type MessageOptions struct ***REMOVED***
 	UninterpretedOption          []*UninterpretedOption `protobuf:"bytes,999,rep,name=uninterpreted_option,json=uninterpretedOption" json:"uninterpreted_option,omitempty"`
 	proto.XXX_InternalExtensions `json:"-"`
 	XXX_unrecognized             []byte `json:"-"`
-***REMOVED***
+}
 
-func (m *MessageOptions) Reset()                    ***REMOVED*** *m = MessageOptions***REMOVED******REMOVED*** ***REMOVED***
-func (m *MessageOptions) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*MessageOptions) ProtoMessage()               ***REMOVED******REMOVED***
-func (*MessageOptions) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***10***REMOVED*** ***REMOVED***
+func (m *MessageOptions) Reset()                    { *m = MessageOptions{} }
+func (m *MessageOptions) String() string            { return proto.CompactTextString(m) }
+func (*MessageOptions) ProtoMessage()               {}
+func (*MessageOptions) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{10} }
 
-var extRange_MessageOptions = []proto.ExtensionRange***REMOVED***
-	***REMOVED***1000, 536870911***REMOVED***,
-***REMOVED***
+var extRange_MessageOptions = []proto.ExtensionRange{
+	{1000, 536870911},
+}
 
-func (*MessageOptions) ExtensionRangeArray() []proto.ExtensionRange ***REMOVED***
+func (*MessageOptions) ExtensionRangeArray() []proto.ExtensionRange {
 	return extRange_MessageOptions
-***REMOVED***
+}
 
 const Default_MessageOptions_MessageSetWireFormat bool = false
 const Default_MessageOptions_NoStandardDescriptorAccessor bool = false
 const Default_MessageOptions_Deprecated bool = false
 
-func (m *MessageOptions) GetMessageSetWireFormat() bool ***REMOVED***
-	if m != nil && m.MessageSetWireFormat != nil ***REMOVED***
+func (m *MessageOptions) GetMessageSetWireFormat() bool {
+	if m != nil && m.MessageSetWireFormat != nil {
 		return *m.MessageSetWireFormat
-	***REMOVED***
+	}
 	return Default_MessageOptions_MessageSetWireFormat
-***REMOVED***
+}
 
-func (m *MessageOptions) GetNoStandardDescriptorAccessor() bool ***REMOVED***
-	if m != nil && m.NoStandardDescriptorAccessor != nil ***REMOVED***
+func (m *MessageOptions) GetNoStandardDescriptorAccessor() bool {
+	if m != nil && m.NoStandardDescriptorAccessor != nil {
 		return *m.NoStandardDescriptorAccessor
-	***REMOVED***
+	}
 	return Default_MessageOptions_NoStandardDescriptorAccessor
-***REMOVED***
+}
 
-func (m *MessageOptions) GetDeprecated() bool ***REMOVED***
-	if m != nil && m.Deprecated != nil ***REMOVED***
+func (m *MessageOptions) GetDeprecated() bool {
+	if m != nil && m.Deprecated != nil {
 		return *m.Deprecated
-	***REMOVED***
+	}
 	return Default_MessageOptions_Deprecated
-***REMOVED***
+}
 
-func (m *MessageOptions) GetMapEntry() bool ***REMOVED***
-	if m != nil && m.MapEntry != nil ***REMOVED***
+func (m *MessageOptions) GetMapEntry() bool {
+	if m != nil && m.MapEntry != nil {
 		return *m.MapEntry
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
-func (m *MessageOptions) GetUninterpretedOption() []*UninterpretedOption ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *MessageOptions) GetUninterpretedOption() []*UninterpretedOption {
+	if m != nil {
 		return m.UninterpretedOption
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-type FieldOptions struct ***REMOVED***
+type FieldOptions struct {
 	// The ctype option instructs the C++ code generator to use a different
 	// representation of the field than it normally would.  See the specific
 	// options below.  This option is not yet implemented in the open source
@@ -1313,20 +1313,20 @@ type FieldOptions struct ***REMOVED***
 	UninterpretedOption          []*UninterpretedOption `protobuf:"bytes,999,rep,name=uninterpreted_option,json=uninterpretedOption" json:"uninterpreted_option,omitempty"`
 	proto.XXX_InternalExtensions `json:"-"`
 	XXX_unrecognized             []byte `json:"-"`
-***REMOVED***
+}
 
-func (m *FieldOptions) Reset()                    ***REMOVED*** *m = FieldOptions***REMOVED******REMOVED*** ***REMOVED***
-func (m *FieldOptions) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*FieldOptions) ProtoMessage()               ***REMOVED******REMOVED***
-func (*FieldOptions) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***11***REMOVED*** ***REMOVED***
+func (m *FieldOptions) Reset()                    { *m = FieldOptions{} }
+func (m *FieldOptions) String() string            { return proto.CompactTextString(m) }
+func (*FieldOptions) ProtoMessage()               {}
+func (*FieldOptions) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{11} }
 
-var extRange_FieldOptions = []proto.ExtensionRange***REMOVED***
-	***REMOVED***1000, 536870911***REMOVED***,
-***REMOVED***
+var extRange_FieldOptions = []proto.ExtensionRange{
+	{1000, 536870911},
+}
 
-func (*FieldOptions) ExtensionRangeArray() []proto.ExtensionRange ***REMOVED***
+func (*FieldOptions) ExtensionRangeArray() []proto.ExtensionRange {
 	return extRange_FieldOptions
-***REMOVED***
+}
 
 const Default_FieldOptions_Ctype FieldOptions_CType = FieldOptions_STRING
 const Default_FieldOptions_Jstype FieldOptions_JSType = FieldOptions_JS_NORMAL
@@ -1334,83 +1334,83 @@ const Default_FieldOptions_Lazy bool = false
 const Default_FieldOptions_Deprecated bool = false
 const Default_FieldOptions_Weak bool = false
 
-func (m *FieldOptions) GetCtype() FieldOptions_CType ***REMOVED***
-	if m != nil && m.Ctype != nil ***REMOVED***
+func (m *FieldOptions) GetCtype() FieldOptions_CType {
+	if m != nil && m.Ctype != nil {
 		return *m.Ctype
-	***REMOVED***
+	}
 	return Default_FieldOptions_Ctype
-***REMOVED***
+}
 
-func (m *FieldOptions) GetPacked() bool ***REMOVED***
-	if m != nil && m.Packed != nil ***REMOVED***
+func (m *FieldOptions) GetPacked() bool {
+	if m != nil && m.Packed != nil {
 		return *m.Packed
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
-func (m *FieldOptions) GetJstype() FieldOptions_JSType ***REMOVED***
-	if m != nil && m.Jstype != nil ***REMOVED***
+func (m *FieldOptions) GetJstype() FieldOptions_JSType {
+	if m != nil && m.Jstype != nil {
 		return *m.Jstype
-	***REMOVED***
+	}
 	return Default_FieldOptions_Jstype
-***REMOVED***
+}
 
-func (m *FieldOptions) GetLazy() bool ***REMOVED***
-	if m != nil && m.Lazy != nil ***REMOVED***
+func (m *FieldOptions) GetLazy() bool {
+	if m != nil && m.Lazy != nil {
 		return *m.Lazy
-	***REMOVED***
+	}
 	return Default_FieldOptions_Lazy
-***REMOVED***
+}
 
-func (m *FieldOptions) GetDeprecated() bool ***REMOVED***
-	if m != nil && m.Deprecated != nil ***REMOVED***
+func (m *FieldOptions) GetDeprecated() bool {
+	if m != nil && m.Deprecated != nil {
 		return *m.Deprecated
-	***REMOVED***
+	}
 	return Default_FieldOptions_Deprecated
-***REMOVED***
+}
 
-func (m *FieldOptions) GetWeak() bool ***REMOVED***
-	if m != nil && m.Weak != nil ***REMOVED***
+func (m *FieldOptions) GetWeak() bool {
+	if m != nil && m.Weak != nil {
 		return *m.Weak
-	***REMOVED***
+	}
 	return Default_FieldOptions_Weak
-***REMOVED***
+}
 
-func (m *FieldOptions) GetUninterpretedOption() []*UninterpretedOption ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *FieldOptions) GetUninterpretedOption() []*UninterpretedOption {
+	if m != nil {
 		return m.UninterpretedOption
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-type OneofOptions struct ***REMOVED***
+type OneofOptions struct {
 	// The parser stores options it doesn't recognize here. See above.
 	UninterpretedOption          []*UninterpretedOption `protobuf:"bytes,999,rep,name=uninterpreted_option,json=uninterpretedOption" json:"uninterpreted_option,omitempty"`
 	proto.XXX_InternalExtensions `json:"-"`
 	XXX_unrecognized             []byte `json:"-"`
-***REMOVED***
+}
 
-func (m *OneofOptions) Reset()                    ***REMOVED*** *m = OneofOptions***REMOVED******REMOVED*** ***REMOVED***
-func (m *OneofOptions) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*OneofOptions) ProtoMessage()               ***REMOVED******REMOVED***
-func (*OneofOptions) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***12***REMOVED*** ***REMOVED***
+func (m *OneofOptions) Reset()                    { *m = OneofOptions{} }
+func (m *OneofOptions) String() string            { return proto.CompactTextString(m) }
+func (*OneofOptions) ProtoMessage()               {}
+func (*OneofOptions) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{12} }
 
-var extRange_OneofOptions = []proto.ExtensionRange***REMOVED***
-	***REMOVED***1000, 536870911***REMOVED***,
-***REMOVED***
+var extRange_OneofOptions = []proto.ExtensionRange{
+	{1000, 536870911},
+}
 
-func (*OneofOptions) ExtensionRangeArray() []proto.ExtensionRange ***REMOVED***
+func (*OneofOptions) ExtensionRangeArray() []proto.ExtensionRange {
 	return extRange_OneofOptions
-***REMOVED***
+}
 
-func (m *OneofOptions) GetUninterpretedOption() []*UninterpretedOption ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *OneofOptions) GetUninterpretedOption() []*UninterpretedOption {
+	if m != nil {
 		return m.UninterpretedOption
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-type EnumOptions struct ***REMOVED***
+type EnumOptions struct {
 	// Set this option to true to allow mapping different tag names to the same
 	// value.
 	AllowAlias *bool `protobuf:"varint,2,opt,name=allow_alias,json=allowAlias" json:"allow_alias,omitempty"`
@@ -1423,45 +1423,45 @@ type EnumOptions struct ***REMOVED***
 	UninterpretedOption          []*UninterpretedOption `protobuf:"bytes,999,rep,name=uninterpreted_option,json=uninterpretedOption" json:"uninterpreted_option,omitempty"`
 	proto.XXX_InternalExtensions `json:"-"`
 	XXX_unrecognized             []byte `json:"-"`
-***REMOVED***
+}
 
-func (m *EnumOptions) Reset()                    ***REMOVED*** *m = EnumOptions***REMOVED******REMOVED*** ***REMOVED***
-func (m *EnumOptions) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*EnumOptions) ProtoMessage()               ***REMOVED******REMOVED***
-func (*EnumOptions) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***13***REMOVED*** ***REMOVED***
+func (m *EnumOptions) Reset()                    { *m = EnumOptions{} }
+func (m *EnumOptions) String() string            { return proto.CompactTextString(m) }
+func (*EnumOptions) ProtoMessage()               {}
+func (*EnumOptions) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{13} }
 
-var extRange_EnumOptions = []proto.ExtensionRange***REMOVED***
-	***REMOVED***1000, 536870911***REMOVED***,
-***REMOVED***
+var extRange_EnumOptions = []proto.ExtensionRange{
+	{1000, 536870911},
+}
 
-func (*EnumOptions) ExtensionRangeArray() []proto.ExtensionRange ***REMOVED***
+func (*EnumOptions) ExtensionRangeArray() []proto.ExtensionRange {
 	return extRange_EnumOptions
-***REMOVED***
+}
 
 const Default_EnumOptions_Deprecated bool = false
 
-func (m *EnumOptions) GetAllowAlias() bool ***REMOVED***
-	if m != nil && m.AllowAlias != nil ***REMOVED***
+func (m *EnumOptions) GetAllowAlias() bool {
+	if m != nil && m.AllowAlias != nil {
 		return *m.AllowAlias
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
-func (m *EnumOptions) GetDeprecated() bool ***REMOVED***
-	if m != nil && m.Deprecated != nil ***REMOVED***
+func (m *EnumOptions) GetDeprecated() bool {
+	if m != nil && m.Deprecated != nil {
 		return *m.Deprecated
-	***REMOVED***
+	}
 	return Default_EnumOptions_Deprecated
-***REMOVED***
+}
 
-func (m *EnumOptions) GetUninterpretedOption() []*UninterpretedOption ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *EnumOptions) GetUninterpretedOption() []*UninterpretedOption {
+	if m != nil {
 		return m.UninterpretedOption
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-type EnumValueOptions struct ***REMOVED***
+type EnumValueOptions struct {
 	// Is this enum value deprecated?
 	// Depending on the target platform, this can emit Deprecated annotations
 	// for the enum value, or it will be completely ignored; in the very least,
@@ -1471,38 +1471,38 @@ type EnumValueOptions struct ***REMOVED***
 	UninterpretedOption          []*UninterpretedOption `protobuf:"bytes,999,rep,name=uninterpreted_option,json=uninterpretedOption" json:"uninterpreted_option,omitempty"`
 	proto.XXX_InternalExtensions `json:"-"`
 	XXX_unrecognized             []byte `json:"-"`
-***REMOVED***
+}
 
-func (m *EnumValueOptions) Reset()                    ***REMOVED*** *m = EnumValueOptions***REMOVED******REMOVED*** ***REMOVED***
-func (m *EnumValueOptions) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*EnumValueOptions) ProtoMessage()               ***REMOVED******REMOVED***
-func (*EnumValueOptions) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***14***REMOVED*** ***REMOVED***
+func (m *EnumValueOptions) Reset()                    { *m = EnumValueOptions{} }
+func (m *EnumValueOptions) String() string            { return proto.CompactTextString(m) }
+func (*EnumValueOptions) ProtoMessage()               {}
+func (*EnumValueOptions) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{14} }
 
-var extRange_EnumValueOptions = []proto.ExtensionRange***REMOVED***
-	***REMOVED***1000, 536870911***REMOVED***,
-***REMOVED***
+var extRange_EnumValueOptions = []proto.ExtensionRange{
+	{1000, 536870911},
+}
 
-func (*EnumValueOptions) ExtensionRangeArray() []proto.ExtensionRange ***REMOVED***
+func (*EnumValueOptions) ExtensionRangeArray() []proto.ExtensionRange {
 	return extRange_EnumValueOptions
-***REMOVED***
+}
 
 const Default_EnumValueOptions_Deprecated bool = false
 
-func (m *EnumValueOptions) GetDeprecated() bool ***REMOVED***
-	if m != nil && m.Deprecated != nil ***REMOVED***
+func (m *EnumValueOptions) GetDeprecated() bool {
+	if m != nil && m.Deprecated != nil {
 		return *m.Deprecated
-	***REMOVED***
+	}
 	return Default_EnumValueOptions_Deprecated
-***REMOVED***
+}
 
-func (m *EnumValueOptions) GetUninterpretedOption() []*UninterpretedOption ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *EnumValueOptions) GetUninterpretedOption() []*UninterpretedOption {
+	if m != nil {
 		return m.UninterpretedOption
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-type ServiceOptions struct ***REMOVED***
+type ServiceOptions struct {
 	// Is this service deprecated?
 	// Depending on the target platform, this can emit Deprecated annotations
 	// for the service, or it will be completely ignored; in the very least,
@@ -1512,38 +1512,38 @@ type ServiceOptions struct ***REMOVED***
 	UninterpretedOption          []*UninterpretedOption `protobuf:"bytes,999,rep,name=uninterpreted_option,json=uninterpretedOption" json:"uninterpreted_option,omitempty"`
 	proto.XXX_InternalExtensions `json:"-"`
 	XXX_unrecognized             []byte `json:"-"`
-***REMOVED***
+}
 
-func (m *ServiceOptions) Reset()                    ***REMOVED*** *m = ServiceOptions***REMOVED******REMOVED*** ***REMOVED***
-func (m *ServiceOptions) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*ServiceOptions) ProtoMessage()               ***REMOVED******REMOVED***
-func (*ServiceOptions) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***15***REMOVED*** ***REMOVED***
+func (m *ServiceOptions) Reset()                    { *m = ServiceOptions{} }
+func (m *ServiceOptions) String() string            { return proto.CompactTextString(m) }
+func (*ServiceOptions) ProtoMessage()               {}
+func (*ServiceOptions) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{15} }
 
-var extRange_ServiceOptions = []proto.ExtensionRange***REMOVED***
-	***REMOVED***1000, 536870911***REMOVED***,
-***REMOVED***
+var extRange_ServiceOptions = []proto.ExtensionRange{
+	{1000, 536870911},
+}
 
-func (*ServiceOptions) ExtensionRangeArray() []proto.ExtensionRange ***REMOVED***
+func (*ServiceOptions) ExtensionRangeArray() []proto.ExtensionRange {
 	return extRange_ServiceOptions
-***REMOVED***
+}
 
 const Default_ServiceOptions_Deprecated bool = false
 
-func (m *ServiceOptions) GetDeprecated() bool ***REMOVED***
-	if m != nil && m.Deprecated != nil ***REMOVED***
+func (m *ServiceOptions) GetDeprecated() bool {
+	if m != nil && m.Deprecated != nil {
 		return *m.Deprecated
-	***REMOVED***
+	}
 	return Default_ServiceOptions_Deprecated
-***REMOVED***
+}
 
-func (m *ServiceOptions) GetUninterpretedOption() []*UninterpretedOption ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ServiceOptions) GetUninterpretedOption() []*UninterpretedOption {
+	if m != nil {
 		return m.UninterpretedOption
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-type MethodOptions struct ***REMOVED***
+type MethodOptions struct {
 	// Is this method deprecated?
 	// Depending on the target platform, this can emit Deprecated annotations
 	// for the method, or it will be completely ignored; in the very least,
@@ -1554,44 +1554,44 @@ type MethodOptions struct ***REMOVED***
 	UninterpretedOption          []*UninterpretedOption `protobuf:"bytes,999,rep,name=uninterpreted_option,json=uninterpretedOption" json:"uninterpreted_option,omitempty"`
 	proto.XXX_InternalExtensions `json:"-"`
 	XXX_unrecognized             []byte `json:"-"`
-***REMOVED***
+}
 
-func (m *MethodOptions) Reset()                    ***REMOVED*** *m = MethodOptions***REMOVED******REMOVED*** ***REMOVED***
-func (m *MethodOptions) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*MethodOptions) ProtoMessage()               ***REMOVED******REMOVED***
-func (*MethodOptions) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***16***REMOVED*** ***REMOVED***
+func (m *MethodOptions) Reset()                    { *m = MethodOptions{} }
+func (m *MethodOptions) String() string            { return proto.CompactTextString(m) }
+func (*MethodOptions) ProtoMessage()               {}
+func (*MethodOptions) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{16} }
 
-var extRange_MethodOptions = []proto.ExtensionRange***REMOVED***
-	***REMOVED***1000, 536870911***REMOVED***,
-***REMOVED***
+var extRange_MethodOptions = []proto.ExtensionRange{
+	{1000, 536870911},
+}
 
-func (*MethodOptions) ExtensionRangeArray() []proto.ExtensionRange ***REMOVED***
+func (*MethodOptions) ExtensionRangeArray() []proto.ExtensionRange {
 	return extRange_MethodOptions
-***REMOVED***
+}
 
 const Default_MethodOptions_Deprecated bool = false
 const Default_MethodOptions_IdempotencyLevel MethodOptions_IdempotencyLevel = MethodOptions_IDEMPOTENCY_UNKNOWN
 
-func (m *MethodOptions) GetDeprecated() bool ***REMOVED***
-	if m != nil && m.Deprecated != nil ***REMOVED***
+func (m *MethodOptions) GetDeprecated() bool {
+	if m != nil && m.Deprecated != nil {
 		return *m.Deprecated
-	***REMOVED***
+	}
 	return Default_MethodOptions_Deprecated
-***REMOVED***
+}
 
-func (m *MethodOptions) GetIdempotencyLevel() MethodOptions_IdempotencyLevel ***REMOVED***
-	if m != nil && m.IdempotencyLevel != nil ***REMOVED***
+func (m *MethodOptions) GetIdempotencyLevel() MethodOptions_IdempotencyLevel {
+	if m != nil && m.IdempotencyLevel != nil {
 		return *m.IdempotencyLevel
-	***REMOVED***
+	}
 	return Default_MethodOptions_IdempotencyLevel
-***REMOVED***
+}
 
-func (m *MethodOptions) GetUninterpretedOption() []*UninterpretedOption ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *MethodOptions) GetUninterpretedOption() []*UninterpretedOption {
+	if m != nil {
 		return m.UninterpretedOption
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // A message representing a option the parser does not recognize. This only
 // appears in options protos created by the compiler::Parser class.
@@ -1599,7 +1599,7 @@ func (m *MethodOptions) GetUninterpretedOption() []*UninterpretedOption ***REMOV
 // options protos in descriptor objects (e.g. returned by Descriptor::options(),
 // or produced by Descriptor::CopyTo()) will never have UninterpretedOptions
 // in them.
-type UninterpretedOption struct ***REMOVED***
+type UninterpretedOption struct {
 	Name []*UninterpretedOption_NamePart `protobuf:"bytes,2,rep,name=name" json:"name,omitempty"`
 	// The value of the uninterpreted option, in whatever type the tokenizer
 	// identified it as during parsing. Exactly one of these should be set.
@@ -1610,106 +1610,106 @@ type UninterpretedOption struct ***REMOVED***
 	StringValue      []byte   `protobuf:"bytes,7,opt,name=string_value,json=stringValue" json:"string_value,omitempty"`
 	AggregateValue   *string  `protobuf:"bytes,8,opt,name=aggregate_value,json=aggregateValue" json:"aggregate_value,omitempty"`
 	XXX_unrecognized []byte   `json:"-"`
-***REMOVED***
+}
 
-func (m *UninterpretedOption) Reset()                    ***REMOVED*** *m = UninterpretedOption***REMOVED******REMOVED*** ***REMOVED***
-func (m *UninterpretedOption) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*UninterpretedOption) ProtoMessage()               ***REMOVED******REMOVED***
-func (*UninterpretedOption) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***17***REMOVED*** ***REMOVED***
+func (m *UninterpretedOption) Reset()                    { *m = UninterpretedOption{} }
+func (m *UninterpretedOption) String() string            { return proto.CompactTextString(m) }
+func (*UninterpretedOption) ProtoMessage()               {}
+func (*UninterpretedOption) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{17} }
 
-func (m *UninterpretedOption) GetName() []*UninterpretedOption_NamePart ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *UninterpretedOption) GetName() []*UninterpretedOption_NamePart {
+	if m != nil {
 		return m.Name
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *UninterpretedOption) GetIdentifierValue() string ***REMOVED***
-	if m != nil && m.IdentifierValue != nil ***REMOVED***
+func (m *UninterpretedOption) GetIdentifierValue() string {
+	if m != nil && m.IdentifierValue != nil {
 		return *m.IdentifierValue
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *UninterpretedOption) GetPositiveIntValue() uint64 ***REMOVED***
-	if m != nil && m.PositiveIntValue != nil ***REMOVED***
+func (m *UninterpretedOption) GetPositiveIntValue() uint64 {
+	if m != nil && m.PositiveIntValue != nil {
 		return *m.PositiveIntValue
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *UninterpretedOption) GetNegativeIntValue() int64 ***REMOVED***
-	if m != nil && m.NegativeIntValue != nil ***REMOVED***
+func (m *UninterpretedOption) GetNegativeIntValue() int64 {
+	if m != nil && m.NegativeIntValue != nil {
 		return *m.NegativeIntValue
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *UninterpretedOption) GetDoubleValue() float64 ***REMOVED***
-	if m != nil && m.DoubleValue != nil ***REMOVED***
+func (m *UninterpretedOption) GetDoubleValue() float64 {
+	if m != nil && m.DoubleValue != nil {
 		return *m.DoubleValue
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *UninterpretedOption) GetStringValue() []byte ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *UninterpretedOption) GetStringValue() []byte {
+	if m != nil {
 		return m.StringValue
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *UninterpretedOption) GetAggregateValue() string ***REMOVED***
-	if m != nil && m.AggregateValue != nil ***REMOVED***
+func (m *UninterpretedOption) GetAggregateValue() string {
+	if m != nil && m.AggregateValue != nil {
 		return *m.AggregateValue
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
 // The name of the uninterpreted option.  Each string represents a segment in
 // a dot-separated name.  is_extension is true iff a segment represents an
 // extension (denoted with parentheses in options specs in .proto files).
-// E.g.,***REMOVED*** ["foo", false], ["bar.baz", true], ["qux", false] ***REMOVED*** represents
+// E.g.,{ ["foo", false], ["bar.baz", true], ["qux", false] } represents
 // "foo.(bar.baz).qux".
-type UninterpretedOption_NamePart struct ***REMOVED***
+type UninterpretedOption_NamePart struct {
 	NamePart         *string `protobuf:"bytes,1,req,name=name_part,json=namePart" json:"name_part,omitempty"`
 	IsExtension      *bool   `protobuf:"varint,2,req,name=is_extension,json=isExtension" json:"is_extension,omitempty"`
 	XXX_unrecognized []byte  `json:"-"`
-***REMOVED***
+}
 
-func (m *UninterpretedOption_NamePart) Reset()         ***REMOVED*** *m = UninterpretedOption_NamePart***REMOVED******REMOVED*** ***REMOVED***
-func (m *UninterpretedOption_NamePart) String() string ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*UninterpretedOption_NamePart) ProtoMessage()    ***REMOVED******REMOVED***
-func (*UninterpretedOption_NamePart) Descriptor() ([]byte, []int) ***REMOVED***
-	return fileDescriptor0, []int***REMOVED***17, 0***REMOVED***
-***REMOVED***
+func (m *UninterpretedOption_NamePart) Reset()         { *m = UninterpretedOption_NamePart{} }
+func (m *UninterpretedOption_NamePart) String() string { return proto.CompactTextString(m) }
+func (*UninterpretedOption_NamePart) ProtoMessage()    {}
+func (*UninterpretedOption_NamePart) Descriptor() ([]byte, []int) {
+	return fileDescriptor0, []int{17, 0}
+}
 
-func (m *UninterpretedOption_NamePart) GetNamePart() string ***REMOVED***
-	if m != nil && m.NamePart != nil ***REMOVED***
+func (m *UninterpretedOption_NamePart) GetNamePart() string {
+	if m != nil && m.NamePart != nil {
 		return *m.NamePart
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *UninterpretedOption_NamePart) GetIsExtension() bool ***REMOVED***
-	if m != nil && m.IsExtension != nil ***REMOVED***
+func (m *UninterpretedOption_NamePart) GetIsExtension() bool {
+	if m != nil && m.IsExtension != nil {
 		return *m.IsExtension
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
 // Encapsulates information about the original source file from which a
 // FileDescriptorProto was generated.
-type SourceCodeInfo struct ***REMOVED***
+type SourceCodeInfo struct {
 	// A Location identifies a piece of source code in a .proto file which
 	// corresponds to a particular definition.  This information is intended
 	// to be useful to IDEs, code indexers, documentation generators, and similar
 	// tools.
 	//
 	// For example, say we have a file like:
-	//   message Foo ***REMOVED***
+	//   message Foo {
 	//     optional string foo = 1;
-	//   ***REMOVED***
+	//   }
 	// Let's look at just the field definition:
 	//   optional string foo = 1;
 	//   ^       ^^     ^^  ^  ^^^
@@ -1746,21 +1746,21 @@ type SourceCodeInfo struct ***REMOVED***
 	//   be recorded in the future.
 	Location         []*SourceCodeInfo_Location `protobuf:"bytes,1,rep,name=location" json:"location,omitempty"`
 	XXX_unrecognized []byte                     `json:"-"`
-***REMOVED***
+}
 
-func (m *SourceCodeInfo) Reset()                    ***REMOVED*** *m = SourceCodeInfo***REMOVED******REMOVED*** ***REMOVED***
-func (m *SourceCodeInfo) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*SourceCodeInfo) ProtoMessage()               ***REMOVED******REMOVED***
-func (*SourceCodeInfo) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***18***REMOVED*** ***REMOVED***
+func (m *SourceCodeInfo) Reset()                    { *m = SourceCodeInfo{} }
+func (m *SourceCodeInfo) String() string            { return proto.CompactTextString(m) }
+func (*SourceCodeInfo) ProtoMessage()               {}
+func (*SourceCodeInfo) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{18} }
 
-func (m *SourceCodeInfo) GetLocation() []*SourceCodeInfo_Location ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *SourceCodeInfo) GetLocation() []*SourceCodeInfo_Location {
+	if m != nil {
 		return m.Location
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-type SourceCodeInfo_Location struct ***REMOVED***
+type SourceCodeInfo_Location struct {
 	// Identifies which part of the FileDescriptorProto was defined at this
 	// location.
 	//
@@ -1842,71 +1842,71 @@ type SourceCodeInfo_Location struct ***REMOVED***
 	TrailingComments        *string  `protobuf:"bytes,4,opt,name=trailing_comments,json=trailingComments" json:"trailing_comments,omitempty"`
 	LeadingDetachedComments []string `protobuf:"bytes,6,rep,name=leading_detached_comments,json=leadingDetachedComments" json:"leading_detached_comments,omitempty"`
 	XXX_unrecognized        []byte   `json:"-"`
-***REMOVED***
+}
 
-func (m *SourceCodeInfo_Location) Reset()                    ***REMOVED*** *m = SourceCodeInfo_Location***REMOVED******REMOVED*** ***REMOVED***
-func (m *SourceCodeInfo_Location) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*SourceCodeInfo_Location) ProtoMessage()               ***REMOVED******REMOVED***
-func (*SourceCodeInfo_Location) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***18, 0***REMOVED*** ***REMOVED***
+func (m *SourceCodeInfo_Location) Reset()                    { *m = SourceCodeInfo_Location{} }
+func (m *SourceCodeInfo_Location) String() string            { return proto.CompactTextString(m) }
+func (*SourceCodeInfo_Location) ProtoMessage()               {}
+func (*SourceCodeInfo_Location) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{18, 0} }
 
-func (m *SourceCodeInfo_Location) GetPath() []int32 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *SourceCodeInfo_Location) GetPath() []int32 {
+	if m != nil {
 		return m.Path
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *SourceCodeInfo_Location) GetSpan() []int32 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *SourceCodeInfo_Location) GetSpan() []int32 {
+	if m != nil {
 		return m.Span
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *SourceCodeInfo_Location) GetLeadingComments() string ***REMOVED***
-	if m != nil && m.LeadingComments != nil ***REMOVED***
+func (m *SourceCodeInfo_Location) GetLeadingComments() string {
+	if m != nil && m.LeadingComments != nil {
 		return *m.LeadingComments
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *SourceCodeInfo_Location) GetTrailingComments() string ***REMOVED***
-	if m != nil && m.TrailingComments != nil ***REMOVED***
+func (m *SourceCodeInfo_Location) GetTrailingComments() string {
+	if m != nil && m.TrailingComments != nil {
 		return *m.TrailingComments
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *SourceCodeInfo_Location) GetLeadingDetachedComments() []string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *SourceCodeInfo_Location) GetLeadingDetachedComments() []string {
+	if m != nil {
 		return m.LeadingDetachedComments
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // Describes the relationship between generated code and its original source
 // file. A GeneratedCodeInfo message is associated with only one generated
 // source file, but may contain references to different source .proto files.
-type GeneratedCodeInfo struct ***REMOVED***
+type GeneratedCodeInfo struct {
 	// An Annotation connects some span of text in generated code to an element
 	// of its generating .proto file.
 	Annotation       []*GeneratedCodeInfo_Annotation `protobuf:"bytes,1,rep,name=annotation" json:"annotation,omitempty"`
 	XXX_unrecognized []byte                          `json:"-"`
-***REMOVED***
+}
 
-func (m *GeneratedCodeInfo) Reset()                    ***REMOVED*** *m = GeneratedCodeInfo***REMOVED******REMOVED*** ***REMOVED***
-func (m *GeneratedCodeInfo) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*GeneratedCodeInfo) ProtoMessage()               ***REMOVED******REMOVED***
-func (*GeneratedCodeInfo) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***19***REMOVED*** ***REMOVED***
+func (m *GeneratedCodeInfo) Reset()                    { *m = GeneratedCodeInfo{} }
+func (m *GeneratedCodeInfo) String() string            { return proto.CompactTextString(m) }
+func (*GeneratedCodeInfo) ProtoMessage()               {}
+func (*GeneratedCodeInfo) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{19} }
 
-func (m *GeneratedCodeInfo) GetAnnotation() []*GeneratedCodeInfo_Annotation ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *GeneratedCodeInfo) GetAnnotation() []*GeneratedCodeInfo_Annotation {
+	if m != nil {
 		return m.Annotation
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-type GeneratedCodeInfo_Annotation struct ***REMOVED***
+type GeneratedCodeInfo_Annotation struct {
 	// Identifies the element in the original source .proto file. This field
 	// is formatted the same as SourceCodeInfo.Location.path.
 	Path []int32 `protobuf:"varint,1,rep,packed,name=path" json:"path,omitempty"`
@@ -1920,44 +1920,44 @@ type GeneratedCodeInfo_Annotation struct ***REMOVED***
 	// the last relevant byte (so the length of the text = end - begin).
 	End              *int32 `protobuf:"varint,4,opt,name=end" json:"end,omitempty"`
 	XXX_unrecognized []byte `json:"-"`
-***REMOVED***
+}
 
-func (m *GeneratedCodeInfo_Annotation) Reset()         ***REMOVED*** *m = GeneratedCodeInfo_Annotation***REMOVED******REMOVED*** ***REMOVED***
-func (m *GeneratedCodeInfo_Annotation) String() string ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*GeneratedCodeInfo_Annotation) ProtoMessage()    ***REMOVED******REMOVED***
-func (*GeneratedCodeInfo_Annotation) Descriptor() ([]byte, []int) ***REMOVED***
-	return fileDescriptor0, []int***REMOVED***19, 0***REMOVED***
-***REMOVED***
+func (m *GeneratedCodeInfo_Annotation) Reset()         { *m = GeneratedCodeInfo_Annotation{} }
+func (m *GeneratedCodeInfo_Annotation) String() string { return proto.CompactTextString(m) }
+func (*GeneratedCodeInfo_Annotation) ProtoMessage()    {}
+func (*GeneratedCodeInfo_Annotation) Descriptor() ([]byte, []int) {
+	return fileDescriptor0, []int{19, 0}
+}
 
-func (m *GeneratedCodeInfo_Annotation) GetPath() []int32 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *GeneratedCodeInfo_Annotation) GetPath() []int32 {
+	if m != nil {
 		return m.Path
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *GeneratedCodeInfo_Annotation) GetSourceFile() string ***REMOVED***
-	if m != nil && m.SourceFile != nil ***REMOVED***
+func (m *GeneratedCodeInfo_Annotation) GetSourceFile() string {
+	if m != nil && m.SourceFile != nil {
 		return *m.SourceFile
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *GeneratedCodeInfo_Annotation) GetBegin() int32 ***REMOVED***
-	if m != nil && m.Begin != nil ***REMOVED***
+func (m *GeneratedCodeInfo_Annotation) GetBegin() int32 {
+	if m != nil && m.Begin != nil {
 		return *m.Begin
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *GeneratedCodeInfo_Annotation) GetEnd() int32 ***REMOVED***
-	if m != nil && m.End != nil ***REMOVED***
+func (m *GeneratedCodeInfo_Annotation) GetEnd() int32 {
+	if m != nil && m.End != nil {
 		return *m.End
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*FileDescriptorSet)(nil), "google.protobuf.FileDescriptorSet")
 	proto.RegisterType((*FileDescriptorProto)(nil), "google.protobuf.FileDescriptorProto")
 	proto.RegisterType((*DescriptorProto)(nil), "google.protobuf.DescriptorProto")
@@ -1989,11 +1989,11 @@ func init() ***REMOVED***
 	proto.RegisterEnum("google.protobuf.FieldOptions_CType", FieldOptions_CType_name, FieldOptions_CType_value)
 	proto.RegisterEnum("google.protobuf.FieldOptions_JSType", FieldOptions_JSType_name, FieldOptions_JSType_value)
 	proto.RegisterEnum("google.protobuf.MethodOptions_IdempotencyLevel", MethodOptions_IdempotencyLevel_name, MethodOptions_IdempotencyLevel_value)
-***REMOVED***
+}
 
-func init() ***REMOVED*** proto.RegisterFile("google/protobuf/descriptor.proto", fileDescriptor0) ***REMOVED***
+func init() { proto.RegisterFile("google/protobuf/descriptor.proto", fileDescriptor0) }
 
-var fileDescriptor0 = []byte***REMOVED***
+var fileDescriptor0 = []byte{
 	// 2460 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x59, 0x5b, 0x6f, 0xdb, 0xc8,
 	0x15, 0x5e, 0x5d, 0x2d, 0x1d, 0xc9, 0xf2, 0x78, 0xec, 0x4d, 0x18, 0xef, 0x25, 0x8e, 0xf6, 0x12,
@@ -2149,4 +2149,4 @@ var fileDescriptor0 = []byte***REMOVED***
 	0x46, 0x76, 0xec, 0x57, 0xb1, 0x7b, 0xd3, 0x7f, 0xbf, 0x4d, 0x67, 0x0e, 0x7b, 0x07, 0x7f, 0x4e,
 	0x6f, 0x1d, 0x8a, 0x6f, 0xf5, 0xc2, 0xdc, 0x28, 0x74, 0x68, 0x52, 0x8d, 0xcd, 0xf7, 0x7f, 0x01,
 	0x00, 0x00, 0xff, 0xff, 0x8e, 0x54, 0xe7, 0xef, 0x60, 0x1b, 0x00, 0x00,
-***REMOVED***
+}

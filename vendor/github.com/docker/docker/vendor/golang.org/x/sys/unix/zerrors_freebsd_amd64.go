@@ -1613,7 +1613,7 @@ const (
 )
 
 // Error table
-var errors = [...]string***REMOVED***
+var errors = [...]string{
 	1:  "operation not permitted",
 	2:  "no such file or directory",
 	3:  "no such process",
@@ -1710,10 +1710,10 @@ var errors = [...]string***REMOVED***
 	94: "not permitted in capability mode",
 	95: "state not recoverable",
 	96: "previous owner died",
-***REMOVED***
+}
 
 // Signal table
-var signals = [...]string***REMOVED***
+var signals = [...]string{
 	1:  "hangup",
 	2:  "interrupt",
 	3:  "quit",
@@ -1747,4 +1747,4 @@ var signals = [...]string***REMOVED***
 	31: "user defined signal 2",
 	32: "unknown signal",
 	33: "unknown signal",
-***REMOVED***
+}

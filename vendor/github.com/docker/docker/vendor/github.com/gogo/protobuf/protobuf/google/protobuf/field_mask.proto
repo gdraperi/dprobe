@@ -59,14 +59,14 @@ option java_generate_equals_and_hash = true;
 // specified in the mask. For example, if the mask in the previous
 // example is applied to a response message as follows:
 //
-//     f ***REMOVED***
+//     f {
 //       a : 22
-//       b ***REMOVED***
+//       b {
 //         d : 1
 //         x : 2
-//   ***REMOVED***
+//       }
 //       y : 13
-// ***REMOVED***
+//     }
 //     z: 8
 //
 // The result will not contain specific values for fields x,y and z
@@ -74,12 +74,12 @@ option java_generate_equals_and_hash = true;
 // output):
 //
 //
-//     f ***REMOVED***
+//     f {
 //       a : 22
-//       b ***REMOVED***
+//       b {
 //         d : 1
-//   ***REMOVED***
-// ***REMOVED***
+//       }
+//     }
 //
 // A repeated field is not allowed except at the last position of a
 // field mask.
@@ -116,21 +116,21 @@ option java_generate_equals_and_hash = true;
 // update operation, then the existing sub-message in the target resource is
 // overwritten. Given the target message:
 //
-//     f ***REMOVED***
-//       b ***REMOVED***
+//     f {
+//       b {
 //         d : 1
 //         x : 2
-//   ***REMOVED***
+//       }
 //       c : 1
-// ***REMOVED***
+//     }
 //
 // And an update message:
 //
-//     f ***REMOVED***
-//       b ***REMOVED***
+//     f {
+//       b {
 //         d : 10
-//   ***REMOVED***
-// ***REMOVED***
+//       }
+//     }
 //
 // then if the field mask is:
 //
@@ -138,12 +138,12 @@ option java_generate_equals_and_hash = true;
 //
 // then the result will be:
 //
-//     f ***REMOVED***
-//       b ***REMOVED***
+//     f {
+//       b {
 //         d : 10
-//   ***REMOVED***
+//       }
 //       c : 1
-// ***REMOVED***
+//     }
 //
 // However, if the update mask was:
 //
@@ -151,13 +151,13 @@ option java_generate_equals_and_hash = true;
 //
 // then the result would be:
 //
-//     f ***REMOVED***
-//       b ***REMOVED***
+//     f {
+//       b {
 //         d : 10
 //         x : 2
-//   ***REMOVED***
+//       }
 //       c : 1
-// ***REMOVED***
+//     }
 //
 // In order to reset a field's value to the default, the field must
 // be in the mask and set to the default value in the provided resource.
@@ -192,55 +192,55 @@ option java_generate_equals_and_hash = true;
 //
 // As an example, consider the following message declarations:
 //
-//     message Profile ***REMOVED***
+//     message Profile {
 //       User user = 1;
 //       Photo photo = 2;
-// ***REMOVED***
-//     message User ***REMOVED***
+//     }
+//     message User {
 //       string display_name = 1;
 //       string address = 2;
-// ***REMOVED***
+//     }
 //
 // In proto a field mask for `Profile` may look as such:
 //
-//     mask ***REMOVED***
+//     mask {
 //       paths: "user.display_name"
 //       paths: "photo"
-// ***REMOVED***
+//     }
 //
 // In JSON, the same mask is represented as below:
 //
-//     ***REMOVED***
+//     {
 //       mask: "user.displayName,photo"
-// ***REMOVED***
+//     }
 //
 // # Field Masks and Oneof Fields
 //
 // Field masks treat fields in oneofs just as regular fields. Consider the
 // following message:
 //
-//     message SampleMessage ***REMOVED***
-//       oneof test_oneof ***REMOVED***
+//     message SampleMessage {
+//       oneof test_oneof {
 //         string name = 4;
 //         SubMessage sub_message = 9;
-//   ***REMOVED***
-// ***REMOVED***
+//       }
+//     }
 //
 // The field mask can be:
 //
-//     mask ***REMOVED***
+//     mask {
 //       paths: "name"
-// ***REMOVED***
+//     }
 //
 // Or:
 //
-//     mask ***REMOVED***
+//     mask {
 //       paths: "sub_message"
-// ***REMOVED***
+//     }
 //
 // Note that oneof type names ("test_oneof" in this case) cannot be used in
 // paths.
-message FieldMask ***REMOVED***
+message FieldMask {
   // The set of field mask paths.
   repeated string paths = 1;
-***REMOVED***
+}

@@ -16,18 +16,18 @@ import (
 var logger *logrus.Logger
 var initOnce sync.Once
 
-func initLogger() ***REMOVED***
-	initOnce.Do(func() ***REMOVED***
+func initLogger() {
+	initOnce.Do(func() {
 		logFile := ioutil.Discard
 
-		if isDebugEnv := os.Getenv(ansiterm.LogEnv); isDebugEnv == "1" ***REMOVED***
+		if isDebugEnv := os.Getenv(ansiterm.LogEnv); isDebugEnv == "1" {
 			logFile, _ = os.Create("ansiReaderWriter.log")
-		***REMOVED***
+		}
 
-		logger = &logrus.Logger***REMOVED***
+		logger = &logrus.Logger{
 			Out:       logFile,
 			Formatter: new(logrus.TextFormatter),
 			Level:     logrus.DebugLevel,
-		***REMOVED***
-	***REMOVED***)
-***REMOVED***
+		}
+	})
+}

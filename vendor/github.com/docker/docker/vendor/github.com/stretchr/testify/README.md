@@ -41,7 +41,7 @@ import (
   "github.com/stretchr/testify/assert"
 )
 
-func TestSomething(t *testing.T) ***REMOVED***
+func TestSomething(t *testing.T) {
 
   // assert equality
   assert.Equal(t, 123, 123, "they should be equal")
@@ -53,15 +53,15 @@ func TestSomething(t *testing.T) ***REMOVED***
   assert.Nil(t, object)
 
   // assert for not nil (good when you expect something)
-  if assert.NotNil(t, object) ***REMOVED***
+  if assert.NotNil(t, object) {
 
     // now we know that object isn't nil, we are safe to make
     // further assertions without causing any errors
     assert.Equal(t, "Something", object.Value)
 
-  ***REMOVED***
+  }
 
-***REMOVED***
+}
 ```
 
   * Every assert func takes the `testing.T` object as the first argument.  This is how it writes the errors out through the normal `go test` capabilities.
@@ -77,7 +77,7 @@ import (
   "github.com/stretchr/testify/assert"
 )
 
-func TestSomething(t *testing.T) ***REMOVED***
+func TestSomething(t *testing.T) {
   assert := assert.New(t)
 
   // assert equality
@@ -90,13 +90,13 @@ func TestSomething(t *testing.T) ***REMOVED***
   assert.Nil(object)
 
   // assert for not nil (good when you expect something)
-  if assert.NotNil(object) ***REMOVED***
+  if assert.NotNil(object) {
 
     // now we know that object isn't nil, we are safe to make
     // further assertions without causing any errors
     assert.Equal("Something", object.Value)
-  ***REMOVED***
-***REMOVED***
+  }
+}
 ```
 
 [`require`](http://godoc.org/github.com/stretchr/testify/require "API documentation") package
@@ -135,9 +135,9 @@ import (
 
 // MyMockedObject is a mocked object that implements an interface
 // that describes an object that the code I am testing relies on.
-type MyMockedObject struct***REMOVED***
+type MyMockedObject struct{
   mock.Mock
-***REMOVED***
+}
 
 // DoSomething is a method on MyMockedObject that implements some interface
 // and just records the activity, and returns what the Mock object tells it to.
@@ -146,12 +146,12 @@ type MyMockedObject struct***REMOVED***
 // is a mocked object - we're just going to stub it out.
 //
 // NOTE: This method is not being tested here, code that uses this object is.
-func (m *MyMockedObject) DoSomething(number int) (bool, error) ***REMOVED***
+func (m *MyMockedObject) DoSomething(number int) (bool, error) {
 
   args := m.Called(number)
   return args.Bool(0), args.Error(1)
 
-***REMOVED***
+}
 
 /*
   Actual test functions
@@ -159,7 +159,7 @@ func (m *MyMockedObject) DoSomething(number int) (bool, error) ***REMOVED***
 
 // TestSomething is an example of how to use our test object to
 // make assertions about some target code we are testing.
-func TestSomething(t *testing.T) ***REMOVED***
+func TestSomething(t *testing.T) {
 
   // create an instance of our test object
   testObj := new(MyMockedObject)
@@ -173,7 +173,7 @@ func TestSomething(t *testing.T) ***REMOVED***
   // assert that the expectations were met
   testObj.AssertExpectations(t)
 
-***REMOVED***
+}
 ```
 
 For more information on how to write mock code, check out the [API documentation for the `mock` package](http://godoc.org/github.com/stretchr/testify/mock).
@@ -198,28 +198,28 @@ import (
 // Define the suite, and absorb the built-in basic suite
 // functionality from testify - including a T() method which
 // returns the current testing context
-type ExampleTestSuite struct ***REMOVED***
+type ExampleTestSuite struct {
     suite.Suite
     VariableThatShouldStartAtFive int
-***REMOVED***
+}
 
 // Make sure that VariableThatShouldStartAtFive is set to five
 // before each test
-func (suite *ExampleTestSuite) SetupTest() ***REMOVED***
+func (suite *ExampleTestSuite) SetupTest() {
     suite.VariableThatShouldStartAtFive = 5
-***REMOVED***
+}
 
 // All methods that begin with "Test" are run as tests within a
 // suite.
-func (suite *ExampleTestSuite) TestExample() ***REMOVED***
+func (suite *ExampleTestSuite) TestExample() {
     assert.Equal(suite.T(), 5, suite.VariableThatShouldStartAtFive)
-***REMOVED***
+}
 
 // In order for 'go test' to run this suite, we need to create
 // a normal test function and pass our suite to suite.Run
-func TestExampleTestSuite(t *testing.T) ***REMOVED***
+func TestExampleTestSuite(t *testing.T) {
     suite.Run(t, new(ExampleTestSuite))
-***REMOVED***
+}
 ```
 
 For a more complete example, using all of the functionality provided by the suite package, look at our [example testing suite](https://github.com/stretchr/testify/blob/master/suite/suite_test.go)
@@ -237,28 +237,28 @@ import (
 
 // Define the suite, and absorb the built-in basic suite
 // functionality from testify - including assertion methods.
-type ExampleTestSuite struct ***REMOVED***
+type ExampleTestSuite struct {
     suite.Suite
     VariableThatShouldStartAtFive int
-***REMOVED***
+}
 
 // Make sure that VariableThatShouldStartAtFive is set to five
 // before each test
-func (suite *ExampleTestSuite) SetupTest() ***REMOVED***
+func (suite *ExampleTestSuite) SetupTest() {
     suite.VariableThatShouldStartAtFive = 5
-***REMOVED***
+}
 
 // All methods that begin with "Test" are run as tests within a
 // suite.
-func (suite *ExampleTestSuite) TestExample() ***REMOVED***
+func (suite *ExampleTestSuite) TestExample() {
     suite.Equal(suite.VariableThatShouldStartAtFive, 5)
-***REMOVED***
+}
 
 // In order for 'go test' to run this suite, we need to create
 // a normal test function and pass our suite to suite.Run
-func TestExampleTestSuite(t *testing.T) ***REMOVED***
+func TestExampleTestSuite(t *testing.T) {
     suite.Run(t, new(ExampleTestSuite))
-***REMOVED***
+}
 ```
 
 ------
@@ -287,11 +287,11 @@ import (
   "github.com/stretchr/testify/assert"
 )
 
-func TestSomething(t *testing.T) ***REMOVED***
+func TestSomething(t *testing.T) {
 
   assert.True(t, true, "True is true!")
 
-***REMOVED***
+}
 ```
 
 ------

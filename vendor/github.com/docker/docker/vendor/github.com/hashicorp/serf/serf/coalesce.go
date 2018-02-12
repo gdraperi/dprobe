@@ -6,7 +6,7 @@ import (
 
 // coalescer is a simple interface that must be implemented to be
 // used inside of a coalesceLoop
-type coalescer interface ***REMOVED***
+type coalescer interface {
 	// Can the coalescer handle this event, if not it is
 	// directly passed through to the destination channel
 	Handle(Event) bool
@@ -16,21 +16,21 @@ type coalescer interface ***REMOVED***
 
 	// Invoked to flush the coalesced events
 	Flush(outChan chan<- Event)
-***REMOVED***
+}
 
 // coalescedEventCh returns an event channel where the events are coalesced
 // using the given coalescer.
-func coalescedEventCh(outCh chan<- Event, shutdownCh <-chan struct***REMOVED******REMOVED***,
-	cPeriod time.Duration, qPeriod time.Duration, c coalescer) chan<- Event ***REMOVED***
+func coalescedEventCh(outCh chan<- Event, shutdownCh <-chan struct{},
+	cPeriod time.Duration, qPeriod time.Duration, c coalescer) chan<- Event {
 	inCh := make(chan Event, 1024)
 	go coalesceLoop(inCh, outCh, shutdownCh, cPeriod, qPeriod, c)
 	return inCh
-***REMOVED***
+}
 
 // coalesceLoop is a simple long-running routine that manages the high-level
 // flow of coalescing based on quiescence and a maximum quantum period.
-func coalesceLoop(inCh <-chan Event, outCh chan<- Event, shutdownCh <-chan struct***REMOVED******REMOVED***,
-	coalescePeriod time.Duration, quiescentPeriod time.Duration, c coalescer) ***REMOVED***
+func coalesceLoop(inCh <-chan Event, outCh chan<- Event, shutdownCh <-chan struct{},
+	coalescePeriod time.Duration, quiescentPeriod time.Duration, c coalescer) {
 	var quiescent <-chan time.Time
 	var quantum <-chan time.Time
 	shutdown := false
@@ -40,20 +40,20 @@ INGEST:
 	quantum = nil
 	quiescent = nil
 
-	for ***REMOVED***
-		select ***REMOVED***
+	for {
+		select {
 		case e := <-inCh:
 			// Ignore any non handled events
-			if !c.Handle(e) ***REMOVED***
+			if !c.Handle(e) {
 				outCh <- e
 				continue
-			***REMOVED***
+			}
 
 			// Start a new quantum if we need to
 			// and restart the quiescent timer
-			if quantum == nil ***REMOVED***
+			if quantum == nil {
 				quantum = time.After(coalescePeriod)
-			***REMOVED***
+			}
 			quiescent = time.After(quiescentPeriod)
 
 			// Coalesce the event
@@ -66,15 +66,15 @@ INGEST:
 		case <-shutdownCh:
 			shutdown = true
 			goto FLUSH
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 FLUSH:
 	// Flush the coalesced events
 	c.Flush(outCh)
 
 	// Restart ingestion if we are not done
-	if !shutdown ***REMOVED***
+	if !shutdown {
 		goto INGEST
-	***REMOVED***
-***REMOVED***
+	}
+}

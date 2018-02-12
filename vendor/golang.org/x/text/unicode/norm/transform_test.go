@@ -11,91 +11,91 @@ import (
 	"golang.org/x/text/transform"
 )
 
-func TestTransform(t *testing.T) ***REMOVED***
-	tests := []struct ***REMOVED***
+func TestTransform(t *testing.T) {
+	tests := []struct {
 		f       Form
 		in, out string
 		eof     bool
 		dstSize int
 		err     error
-	***REMOVED******REMOVED***
-		***REMOVED***NFC, "ab", "ab", true, 2, nil***REMOVED***,
-		***REMOVED***NFC, "qx", "qx", true, 2, nil***REMOVED***,
-		***REMOVED***NFD, "qx", "qx", true, 2, nil***REMOVED***,
-		***REMOVED***NFC, "", "", true, 1, nil***REMOVED***,
-		***REMOVED***NFD, "", "", true, 1, nil***REMOVED***,
-		***REMOVED***NFC, "", "", false, 1, nil***REMOVED***,
-		***REMOVED***NFD, "", "", false, 1, nil***REMOVED***,
+	}{
+		{NFC, "ab", "ab", true, 2, nil},
+		{NFC, "qx", "qx", true, 2, nil},
+		{NFD, "qx", "qx", true, 2, nil},
+		{NFC, "", "", true, 1, nil},
+		{NFD, "", "", true, 1, nil},
+		{NFC, "", "", false, 1, nil},
+		{NFD, "", "", false, 1, nil},
 
 		// Normalized segment does not fit in destination.
-		***REMOVED***NFD, "ö", "", true, 1, transform.ErrShortDst***REMOVED***,
-		***REMOVED***NFD, "ö", "", true, 2, transform.ErrShortDst***REMOVED***,
+		{NFD, "ö", "", true, 1, transform.ErrShortDst},
+		{NFD, "ö", "", true, 2, transform.ErrShortDst},
 
 		// As an artifact of the algorithm, only full segments are written.
 		// This is not strictly required, and some bytes could be written.
 		// In practice, for Transform to not block, the destination buffer
 		// should be at least MaxSegmentSize to work anyway and these edge
 		// conditions will be relatively rare.
-		***REMOVED***NFC, "ab", "", true, 1, transform.ErrShortDst***REMOVED***,
+		{NFC, "ab", "", true, 1, transform.ErrShortDst},
 		// This is even true for inert runes.
-		***REMOVED***NFC, "qx", "", true, 1, transform.ErrShortDst***REMOVED***,
-		***REMOVED***NFC, "a\u0300abc", "\u00e0a", true, 4, transform.ErrShortDst***REMOVED***,
+		{NFC, "qx", "", true, 1, transform.ErrShortDst},
+		{NFC, "a\u0300abc", "\u00e0a", true, 4, transform.ErrShortDst},
 
 		// We cannot write a segment if successive runes could still change the result.
-		***REMOVED***NFD, "ö", "", false, 3, transform.ErrShortSrc***REMOVED***,
-		***REMOVED***NFC, "a\u0300", "", false, 4, transform.ErrShortSrc***REMOVED***,
-		***REMOVED***NFD, "a\u0300", "", false, 4, transform.ErrShortSrc***REMOVED***,
-		***REMOVED***NFC, "ö", "", false, 3, transform.ErrShortSrc***REMOVED***,
+		{NFD, "ö", "", false, 3, transform.ErrShortSrc},
+		{NFC, "a\u0300", "", false, 4, transform.ErrShortSrc},
+		{NFD, "a\u0300", "", false, 4, transform.ErrShortSrc},
+		{NFC, "ö", "", false, 3, transform.ErrShortSrc},
 
-		***REMOVED***NFC, "a\u0300", "", true, 1, transform.ErrShortDst***REMOVED***,
+		{NFC, "a\u0300", "", true, 1, transform.ErrShortDst},
 		// Theoretically could fit, but won't due to simplified checks.
-		***REMOVED***NFC, "a\u0300", "", true, 2, transform.ErrShortDst***REMOVED***,
-		***REMOVED***NFC, "a\u0300", "", true, 3, transform.ErrShortDst***REMOVED***,
-		***REMOVED***NFC, "a\u0300", "\u00e0", true, 4, nil***REMOVED***,
+		{NFC, "a\u0300", "", true, 2, transform.ErrShortDst},
+		{NFC, "a\u0300", "", true, 3, transform.ErrShortDst},
+		{NFC, "a\u0300", "\u00e0", true, 4, nil},
 
-		***REMOVED***NFD, "öa\u0300", "o\u0308", false, 8, transform.ErrShortSrc***REMOVED***,
-		***REMOVED***NFD, "öa\u0300ö", "o\u0308a\u0300", true, 8, transform.ErrShortDst***REMOVED***,
-		***REMOVED***NFD, "öa\u0300ö", "o\u0308a\u0300", false, 12, transform.ErrShortSrc***REMOVED***,
+		{NFD, "öa\u0300", "o\u0308", false, 8, transform.ErrShortSrc},
+		{NFD, "öa\u0300ö", "o\u0308a\u0300", true, 8, transform.ErrShortDst},
+		{NFD, "öa\u0300ö", "o\u0308a\u0300", false, 12, transform.ErrShortSrc},
 
 		// Illegal input is copied verbatim.
-		***REMOVED***NFD, "\xbd\xb2=\xbc ", "\xbd\xb2=\xbc ", true, 8, nil***REMOVED***,
-	***REMOVED***
+		{NFD, "\xbd\xb2=\xbc ", "\xbd\xb2=\xbc ", true, 8, nil},
+	}
 	b := make([]byte, 100)
-	for i, tt := range tests ***REMOVED***
+	for i, tt := range tests {
 		nDst, _, err := tt.f.Transform(b[:tt.dstSize], []byte(tt.in), tt.eof)
 		out := string(b[:nDst])
-		if out != tt.out || err != tt.err ***REMOVED***
+		if out != tt.out || err != tt.err {
 			t.Errorf("%d: was %+q (%v); want %+q (%v)", i, out, err, tt.out, tt.err)
-		***REMOVED***
-		if want := tt.f.String(tt.in)[:nDst]; want != out ***REMOVED***
+		}
+		if want := tt.f.String(tt.in)[:nDst]; want != out {
 			t.Errorf("%d: incorrect normalization: was %+q; want %+q", i, out, want)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-var transBufSizes = []int***REMOVED***
+var transBufSizes = []int{
 	MaxTransformChunkSize,
 	3 * MaxTransformChunkSize / 2,
 	2 * MaxTransformChunkSize,
 	3 * MaxTransformChunkSize,
 	100 * MaxTransformChunkSize,
-***REMOVED***
+}
 
-func doTransNorm(f Form, buf []byte, b []byte) []byte ***REMOVED***
-	acc := []byte***REMOVED******REMOVED***
-	for p := 0; p < len(b); ***REMOVED***
+func doTransNorm(f Form, buf []byte, b []byte) []byte {
+	acc := []byte{}
+	for p := 0; p < len(b); {
 		nd, ns, _ := f.Transform(buf[:], b[p:], true)
 		p += ns
 		acc = append(acc, buf[:nd]...)
-	***REMOVED***
+	}
 	return acc
-***REMOVED***
+}
 
-func TestTransformNorm(t *testing.T) ***REMOVED***
-	for _, sz := range transBufSizes ***REMOVED***
+func TestTransformNorm(t *testing.T) {
+	for _, sz := range transBufSizes {
 		buf := make([]byte, sz)
-		runNormTests(t, fmt.Sprintf("Transform:%d", sz), func(f Form, out []byte, s string) []byte ***REMOVED***
+		runNormTests(t, fmt.Sprintf("Transform:%d", sz), func(f Form, out []byte, s string) []byte {
 			return doTransNorm(f, buf, append(out, s...))
-		***REMOVED***)
-	***REMOVED***
-***REMOVED***
+		})
+	}
+}

@@ -28,113 +28,113 @@ import (
 
 var (
 	// NIST curve P-256
-	oidCurveP256 []byte = []byte***REMOVED***0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x03, 0x01, 0x07***REMOVED***
+	oidCurveP256 []byte = []byte{0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x03, 0x01, 0x07}
 	// NIST curve P-384
-	oidCurveP384 []byte = []byte***REMOVED***0x2B, 0x81, 0x04, 0x00, 0x22***REMOVED***
+	oidCurveP384 []byte = []byte{0x2B, 0x81, 0x04, 0x00, 0x22}
 	// NIST curve P-521
-	oidCurveP521 []byte = []byte***REMOVED***0x2B, 0x81, 0x04, 0x00, 0x23***REMOVED***
+	oidCurveP521 []byte = []byte{0x2B, 0x81, 0x04, 0x00, 0x23}
 )
 
 const maxOIDLength = 8
 
 // ecdsaKey stores the algorithm-specific fields for ECDSA keys.
 // as defined in RFC 6637, Section 9.
-type ecdsaKey struct ***REMOVED***
+type ecdsaKey struct {
 	// oid contains the OID byte sequence identifying the elliptic curve used
 	oid []byte
 	// p contains the elliptic curve point that represents the public key
 	p parsedMPI
-***REMOVED***
+}
 
 // parseOID reads the OID for the curve as defined in RFC 6637, Section 9.
-func parseOID(r io.Reader) (oid []byte, err error) ***REMOVED***
+func parseOID(r io.Reader) (oid []byte, err error) {
 	buf := make([]byte, maxOIDLength)
-	if _, err = readFull(r, buf[:1]); err != nil ***REMOVED***
+	if _, err = readFull(r, buf[:1]); err != nil {
 		return
-	***REMOVED***
+	}
 	oidLen := buf[0]
-	if int(oidLen) > len(buf) ***REMOVED***
+	if int(oidLen) > len(buf) {
 		err = errors.UnsupportedError("invalid oid length: " + strconv.Itoa(int(oidLen)))
 		return
-	***REMOVED***
+	}
 	oid = buf[:oidLen]
 	_, err = readFull(r, oid)
 	return
-***REMOVED***
+}
 
-func (f *ecdsaKey) parse(r io.Reader) (err error) ***REMOVED***
-	if f.oid, err = parseOID(r); err != nil ***REMOVED***
+func (f *ecdsaKey) parse(r io.Reader) (err error) {
+	if f.oid, err = parseOID(r); err != nil {
 		return err
-	***REMOVED***
+	}
 	f.p.bytes, f.p.bitLength, err = readMPI(r)
 	return
-***REMOVED***
+}
 
-func (f *ecdsaKey) serialize(w io.Writer) (err error) ***REMOVED***
+func (f *ecdsaKey) serialize(w io.Writer) (err error) {
 	buf := make([]byte, maxOIDLength+1)
 	buf[0] = byte(len(f.oid))
 	copy(buf[1:], f.oid)
-	if _, err = w.Write(buf[:len(f.oid)+1]); err != nil ***REMOVED***
+	if _, err = w.Write(buf[:len(f.oid)+1]); err != nil {
 		return
-	***REMOVED***
+	}
 	return writeMPIs(w, f.p)
-***REMOVED***
+}
 
-func (f *ecdsaKey) newECDSA() (*ecdsa.PublicKey, error) ***REMOVED***
+func (f *ecdsaKey) newECDSA() (*ecdsa.PublicKey, error) {
 	var c elliptic.Curve
-	if bytes.Equal(f.oid, oidCurveP256) ***REMOVED***
+	if bytes.Equal(f.oid, oidCurveP256) {
 		c = elliptic.P256()
-	***REMOVED*** else if bytes.Equal(f.oid, oidCurveP384) ***REMOVED***
+	} else if bytes.Equal(f.oid, oidCurveP384) {
 		c = elliptic.P384()
-	***REMOVED*** else if bytes.Equal(f.oid, oidCurveP521) ***REMOVED***
+	} else if bytes.Equal(f.oid, oidCurveP521) {
 		c = elliptic.P521()
-	***REMOVED*** else ***REMOVED***
+	} else {
 		return nil, errors.UnsupportedError(fmt.Sprintf("unsupported oid: %x", f.oid))
-	***REMOVED***
+	}
 	x, y := elliptic.Unmarshal(c, f.p.bytes)
-	if x == nil ***REMOVED***
+	if x == nil {
 		return nil, errors.UnsupportedError("failed to parse EC point")
-	***REMOVED***
-	return &ecdsa.PublicKey***REMOVED***Curve: c, X: x, Y: y***REMOVED***, nil
-***REMOVED***
+	}
+	return &ecdsa.PublicKey{Curve: c, X: x, Y: y}, nil
+}
 
-func (f *ecdsaKey) byteLen() int ***REMOVED***
+func (f *ecdsaKey) byteLen() int {
 	return 1 + len(f.oid) + 2 + len(f.p.bytes)
-***REMOVED***
+}
 
 type kdfHashFunction byte
 type kdfAlgorithm byte
 
 // ecdhKdf stores key derivation function parameters
 // used for ECDH encryption. See RFC 6637, Section 9.
-type ecdhKdf struct ***REMOVED***
+type ecdhKdf struct {
 	KdfHash kdfHashFunction
 	KdfAlgo kdfAlgorithm
-***REMOVED***
+}
 
-func (f *ecdhKdf) parse(r io.Reader) (err error) ***REMOVED***
+func (f *ecdhKdf) parse(r io.Reader) (err error) {
 	buf := make([]byte, 1)
-	if _, err = readFull(r, buf); err != nil ***REMOVED***
+	if _, err = readFull(r, buf); err != nil {
 		return
-	***REMOVED***
+	}
 	kdfLen := int(buf[0])
-	if kdfLen < 3 ***REMOVED***
+	if kdfLen < 3 {
 		return errors.UnsupportedError("Unsupported ECDH KDF length: " + strconv.Itoa(kdfLen))
-	***REMOVED***
+	}
 	buf = make([]byte, kdfLen)
-	if _, err = readFull(r, buf); err != nil ***REMOVED***
+	if _, err = readFull(r, buf); err != nil {
 		return
-	***REMOVED***
+	}
 	reserved := int(buf[0])
 	f.KdfHash = kdfHashFunction(buf[1])
 	f.KdfAlgo = kdfAlgorithm(buf[2])
-	if reserved != 0x01 ***REMOVED***
+	if reserved != 0x01 {
 		return errors.UnsupportedError("Unsupported KDF reserved field: " + strconv.Itoa(reserved))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func (f *ecdhKdf) serialize(w io.Writer) (err error) ***REMOVED***
+func (f *ecdhKdf) serialize(w io.Writer) (err error) {
 	buf := make([]byte, 4)
 	// See RFC 6637, Section 9, Algorithm-Specific Fields for ECDH keys.
 	buf[0] = byte(0x03) // Length of the following fields
@@ -143,17 +143,17 @@ func (f *ecdhKdf) serialize(w io.Writer) (err error) ***REMOVED***
 	buf[3] = byte(f.KdfAlgo)
 	_, err = w.Write(buf[:])
 	return
-***REMOVED***
+}
 
-func (f *ecdhKdf) byteLen() int ***REMOVED***
+func (f *ecdhKdf) byteLen() int {
 	return 4
-***REMOVED***
+}
 
 // PublicKey represents an OpenPGP public key. See RFC 4880, section 5.5.2.
-type PublicKey struct ***REMOVED***
+type PublicKey struct {
 	CreationTime time.Time
 	PubKeyAlgo   PublicKeyAlgorithm
-	PublicKey    interface***REMOVED******REMOVED*** // *rsa.PublicKey, *dsa.PublicKey or *ecdsa.PublicKey
+	PublicKey    interface{} // *rsa.PublicKey, *dsa.PublicKey or *ecdsa.PublicKey
 	Fingerprint  [20]byte
 	KeyId        uint64
 	IsSubkey     bool
@@ -163,39 +163,39 @@ type PublicKey struct ***REMOVED***
 	// RFC 6637 fields
 	ec   *ecdsaKey
 	ecdh *ecdhKdf
-***REMOVED***
+}
 
 // signingKey provides a convenient abstraction over signature verification
 // for v3 and v4 public keys.
-type signingKey interface ***REMOVED***
+type signingKey interface {
 	SerializeSignaturePrefix(io.Writer)
 	serializeWithoutHeaders(io.Writer) error
-***REMOVED***
+}
 
-func fromBig(n *big.Int) parsedMPI ***REMOVED***
-	return parsedMPI***REMOVED***
+func fromBig(n *big.Int) parsedMPI {
+	return parsedMPI{
 		bytes:     n.Bytes(),
 		bitLength: uint16(n.BitLen()),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // NewRSAPublicKey returns a PublicKey that wraps the given rsa.PublicKey.
-func NewRSAPublicKey(creationTime time.Time, pub *rsa.PublicKey) *PublicKey ***REMOVED***
-	pk := &PublicKey***REMOVED***
+func NewRSAPublicKey(creationTime time.Time, pub *rsa.PublicKey) *PublicKey {
+	pk := &PublicKey{
 		CreationTime: creationTime,
 		PubKeyAlgo:   PubKeyAlgoRSA,
 		PublicKey:    pub,
 		n:            fromBig(pub.N),
 		e:            fromBig(big.NewInt(int64(pub.E))),
-	***REMOVED***
+	}
 
 	pk.setFingerPrintAndKeyId()
 	return pk
-***REMOVED***
+}
 
 // NewDSAPublicKey returns a PublicKey that wraps the given dsa.PublicKey.
-func NewDSAPublicKey(creationTime time.Time, pub *dsa.PublicKey) *PublicKey ***REMOVED***
-	pk := &PublicKey***REMOVED***
+func NewDSAPublicKey(creationTime time.Time, pub *dsa.PublicKey) *PublicKey {
+	pk := &PublicKey{
 		CreationTime: creationTime,
 		PubKeyAlgo:   PubKeyAlgoDSA,
 		PublicKey:    pub,
@@ -203,36 +203,36 @@ func NewDSAPublicKey(creationTime time.Time, pub *dsa.PublicKey) *PublicKey ***R
 		q:            fromBig(pub.Q),
 		g:            fromBig(pub.G),
 		y:            fromBig(pub.Y),
-	***REMOVED***
+	}
 
 	pk.setFingerPrintAndKeyId()
 	return pk
-***REMOVED***
+}
 
 // NewElGamalPublicKey returns a PublicKey that wraps the given elgamal.PublicKey.
-func NewElGamalPublicKey(creationTime time.Time, pub *elgamal.PublicKey) *PublicKey ***REMOVED***
-	pk := &PublicKey***REMOVED***
+func NewElGamalPublicKey(creationTime time.Time, pub *elgamal.PublicKey) *PublicKey {
+	pk := &PublicKey{
 		CreationTime: creationTime,
 		PubKeyAlgo:   PubKeyAlgoElGamal,
 		PublicKey:    pub,
 		p:            fromBig(pub.P),
 		g:            fromBig(pub.G),
 		y:            fromBig(pub.Y),
-	***REMOVED***
+	}
 
 	pk.setFingerPrintAndKeyId()
 	return pk
-***REMOVED***
+}
 
-func NewECDSAPublicKey(creationTime time.Time, pub *ecdsa.PublicKey) *PublicKey ***REMOVED***
-	pk := &PublicKey***REMOVED***
+func NewECDSAPublicKey(creationTime time.Time, pub *ecdsa.PublicKey) *PublicKey {
+	pk := &PublicKey{
 		CreationTime: creationTime,
 		PubKeyAlgo:   PubKeyAlgoECDSA,
 		PublicKey:    pub,
 		ec:           new(ecdsaKey),
-	***REMOVED***
+	}
 
-	switch pub.Curve ***REMOVED***
+	switch pub.Curve {
 	case elliptic.P256():
 		pk.ec.oid = oidCurveP256
 	case elliptic.P384():
@@ -241,28 +241,28 @@ func NewECDSAPublicKey(creationTime time.Time, pub *ecdsa.PublicKey) *PublicKey 
 		pk.ec.oid = oidCurveP521
 	default:
 		panic("unknown elliptic curve")
-	***REMOVED***
+	}
 
 	pk.ec.p.bytes = elliptic.Marshal(pub.Curve, pub.X, pub.Y)
 	pk.ec.p.bitLength = uint16(8 * len(pk.ec.p.bytes))
 
 	pk.setFingerPrintAndKeyId()
 	return pk
-***REMOVED***
+}
 
-func (pk *PublicKey) parse(r io.Reader) (err error) ***REMOVED***
+func (pk *PublicKey) parse(r io.Reader) (err error) {
 	// RFC 4880, section 5.5.2
 	var buf [6]byte
 	_, err = readFull(r, buf[:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
-	if buf[0] != 4 ***REMOVED***
+	}
+	if buf[0] != 4 {
 		return errors.UnsupportedError("public key version")
-	***REMOVED***
+	}
 	pk.CreationTime = time.Unix(int64(uint32(buf[1])<<24|uint32(buf[2])<<16|uint32(buf[3])<<8|uint32(buf[4])), 0)
 	pk.PubKeyAlgo = PublicKeyAlgorithm(buf[5])
-	switch pk.PubKeyAlgo ***REMOVED***
+	switch pk.PubKeyAlgo {
 	case PubKeyAlgoRSA, PubKeyAlgoRSAEncryptOnly, PubKeyAlgoRSASignOnly:
 		err = pk.parseRSA(r)
 	case PubKeyAlgoDSA:
@@ -271,88 +271,88 @@ func (pk *PublicKey) parse(r io.Reader) (err error) ***REMOVED***
 		err = pk.parseElGamal(r)
 	case PubKeyAlgoECDSA:
 		pk.ec = new(ecdsaKey)
-		if err = pk.ec.parse(r); err != nil ***REMOVED***
+		if err = pk.ec.parse(r); err != nil {
 			return err
-		***REMOVED***
+		}
 		pk.PublicKey, err = pk.ec.newECDSA()
 	case PubKeyAlgoECDH:
 		pk.ec = new(ecdsaKey)
-		if err = pk.ec.parse(r); err != nil ***REMOVED***
+		if err = pk.ec.parse(r); err != nil {
 			return
-		***REMOVED***
+		}
 		pk.ecdh = new(ecdhKdf)
-		if err = pk.ecdh.parse(r); err != nil ***REMOVED***
+		if err = pk.ecdh.parse(r); err != nil {
 			return
-		***REMOVED***
+		}
 		// The ECDH key is stored in an ecdsa.PublicKey for convenience.
 		pk.PublicKey, err = pk.ec.newECDSA()
 	default:
 		err = errors.UnsupportedError("public key type: " + strconv.Itoa(int(pk.PubKeyAlgo)))
-	***REMOVED***
-	if err != nil ***REMOVED***
+	}
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
 	pk.setFingerPrintAndKeyId()
 	return
-***REMOVED***
+}
 
-func (pk *PublicKey) setFingerPrintAndKeyId() ***REMOVED***
+func (pk *PublicKey) setFingerPrintAndKeyId() {
 	// RFC 4880, section 12.2
 	fingerPrint := sha1.New()
 	pk.SerializeSignaturePrefix(fingerPrint)
 	pk.serializeWithoutHeaders(fingerPrint)
 	copy(pk.Fingerprint[:], fingerPrint.Sum(nil))
 	pk.KeyId = binary.BigEndian.Uint64(pk.Fingerprint[12:20])
-***REMOVED***
+}
 
 // parseRSA parses RSA public key material from the given Reader. See RFC 4880,
 // section 5.5.2.
-func (pk *PublicKey) parseRSA(r io.Reader) (err error) ***REMOVED***
+func (pk *PublicKey) parseRSA(r io.Reader) (err error) {
 	pk.n.bytes, pk.n.bitLength, err = readMPI(r)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	pk.e.bytes, pk.e.bitLength, err = readMPI(r)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
-	if len(pk.e.bytes) > 3 ***REMOVED***
+	if len(pk.e.bytes) > 3 {
 		err = errors.UnsupportedError("large public exponent")
 		return
-	***REMOVED***
-	rsa := &rsa.PublicKey***REMOVED***
+	}
+	rsa := &rsa.PublicKey{
 		N: new(big.Int).SetBytes(pk.n.bytes),
 		E: 0,
-	***REMOVED***
-	for i := 0; i < len(pk.e.bytes); i++ ***REMOVED***
+	}
+	for i := 0; i < len(pk.e.bytes); i++ {
 		rsa.E <<= 8
 		rsa.E |= int(pk.e.bytes[i])
-	***REMOVED***
+	}
 	pk.PublicKey = rsa
 	return
-***REMOVED***
+}
 
 // parseDSA parses DSA public key material from the given Reader. See RFC 4880,
 // section 5.5.2.
-func (pk *PublicKey) parseDSA(r io.Reader) (err error) ***REMOVED***
+func (pk *PublicKey) parseDSA(r io.Reader) (err error) {
 	pk.p.bytes, pk.p.bitLength, err = readMPI(r)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	pk.q.bytes, pk.q.bitLength, err = readMPI(r)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	pk.g.bytes, pk.g.bitLength, err = readMPI(r)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	pk.y.bytes, pk.y.bitLength, err = readMPI(r)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
 	dsa := new(dsa.PublicKey)
 	dsa.P = new(big.Int).SetBytes(pk.p.bytes)
@@ -361,23 +361,23 @@ func (pk *PublicKey) parseDSA(r io.Reader) (err error) ***REMOVED***
 	dsa.Y = new(big.Int).SetBytes(pk.y.bytes)
 	pk.PublicKey = dsa
 	return
-***REMOVED***
+}
 
 // parseElGamal parses ElGamal public key material from the given Reader. See
 // RFC 4880, section 5.5.2.
-func (pk *PublicKey) parseElGamal(r io.Reader) (err error) ***REMOVED***
+func (pk *PublicKey) parseElGamal(r io.Reader) (err error) {
 	pk.p.bytes, pk.p.bitLength, err = readMPI(r)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	pk.g.bytes, pk.g.bitLength, err = readMPI(r)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	pk.y.bytes, pk.y.bitLength, err = readMPI(r)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
 	elgamal := new(elgamal.PublicKey)
 	elgamal.P = new(big.Int).SetBytes(pk.p.bytes)
@@ -385,14 +385,14 @@ func (pk *PublicKey) parseElGamal(r io.Reader) (err error) ***REMOVED***
 	elgamal.Y = new(big.Int).SetBytes(pk.y.bytes)
 	pk.PublicKey = elgamal
 	return
-***REMOVED***
+}
 
 // SerializeSignaturePrefix writes the prefix for this public key to the given Writer.
 // The prefix is used when calculating a signature over this public key. See
 // RFC 4880, section 5.2.4.
-func (pk *PublicKey) SerializeSignaturePrefix(h io.Writer) ***REMOVED***
+func (pk *PublicKey) SerializeSignaturePrefix(h io.Writer) {
 	var pLength uint16
-	switch pk.PubKeyAlgo ***REMOVED***
+	switch pk.PubKeyAlgo {
 	case PubKeyAlgoRSA, PubKeyAlgoRSAEncryptOnly, PubKeyAlgoRSASignOnly:
 		pLength += 2 + uint16(len(pk.n.bytes))
 		pLength += 2 + uint16(len(pk.e.bytes))
@@ -412,16 +412,16 @@ func (pk *PublicKey) SerializeSignaturePrefix(h io.Writer) ***REMOVED***
 		pLength += uint16(pk.ecdh.byteLen())
 	default:
 		panic("unknown public key algorithm")
-	***REMOVED***
+	}
 	pLength += 6
-	h.Write([]byte***REMOVED***0x99, byte(pLength >> 8), byte(pLength)***REMOVED***)
+	h.Write([]byte{0x99, byte(pLength >> 8), byte(pLength)})
 	return
-***REMOVED***
+}
 
-func (pk *PublicKey) Serialize(w io.Writer) (err error) ***REMOVED***
+func (pk *PublicKey) Serialize(w io.Writer) (err error) {
 	length := 6 // 6 byte header
 
-	switch pk.PubKeyAlgo ***REMOVED***
+	switch pk.PubKeyAlgo {
 	case PubKeyAlgoRSA, PubKeyAlgoRSAEncryptOnly, PubKeyAlgoRSASignOnly:
 		length += 2 + len(pk.n.bytes)
 		length += 2 + len(pk.e.bytes)
@@ -441,22 +441,22 @@ func (pk *PublicKey) Serialize(w io.Writer) (err error) ***REMOVED***
 		length += pk.ecdh.byteLen()
 	default:
 		panic("unknown public key algorithm")
-	***REMOVED***
+	}
 
 	packetType := packetTypePublicKey
-	if pk.IsSubkey ***REMOVED***
+	if pk.IsSubkey {
 		packetType = packetTypePublicSubkey
-	***REMOVED***
+	}
 	err = serializeHeader(w, packetType, length)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	return pk.serializeWithoutHeaders(w)
-***REMOVED***
+}
 
 // serializeWithoutHeaders marshals the PublicKey to w in the form of an
 // OpenPGP public key packet, not including the packet header.
-func (pk *PublicKey) serializeWithoutHeaders(w io.Writer) (err error) ***REMOVED***
+func (pk *PublicKey) serializeWithoutHeaders(w io.Writer) (err error) {
 	var buf [6]byte
 	buf[0] = 4
 	t := uint32(pk.CreationTime.Unix())
@@ -467,11 +467,11 @@ func (pk *PublicKey) serializeWithoutHeaders(w io.Writer) (err error) ***REMOVED
 	buf[5] = byte(pk.PubKeyAlgo)
 
 	_, err = w.Write(buf[:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
-	switch pk.PubKeyAlgo ***REMOVED***
+	switch pk.PubKeyAlgo {
 	case PubKeyAlgoRSA, PubKeyAlgoRSAEncryptOnly, PubKeyAlgoRSASignOnly:
 		return writeMPIs(w, pk.n, pk.e)
 	case PubKeyAlgoDSA:
@@ -481,73 +481,73 @@ func (pk *PublicKey) serializeWithoutHeaders(w io.Writer) (err error) ***REMOVED
 	case PubKeyAlgoECDSA:
 		return pk.ec.serialize(w)
 	case PubKeyAlgoECDH:
-		if err = pk.ec.serialize(w); err != nil ***REMOVED***
+		if err = pk.ec.serialize(w); err != nil {
 			return
-		***REMOVED***
+		}
 		return pk.ecdh.serialize(w)
-	***REMOVED***
+	}
 	return errors.InvalidArgumentError("bad public-key algorithm")
-***REMOVED***
+}
 
 // CanSign returns true iff this public key can generate signatures
-func (pk *PublicKey) CanSign() bool ***REMOVED***
+func (pk *PublicKey) CanSign() bool {
 	return pk.PubKeyAlgo != PubKeyAlgoRSAEncryptOnly && pk.PubKeyAlgo != PubKeyAlgoElGamal
-***REMOVED***
+}
 
 // VerifySignature returns nil iff sig is a valid signature, made by this
 // public key, of the data hashed into signed. signed is mutated by this call.
-func (pk *PublicKey) VerifySignature(signed hash.Hash, sig *Signature) (err error) ***REMOVED***
-	if !pk.CanSign() ***REMOVED***
+func (pk *PublicKey) VerifySignature(signed hash.Hash, sig *Signature) (err error) {
+	if !pk.CanSign() {
 		return errors.InvalidArgumentError("public key cannot generate signatures")
-	***REMOVED***
+	}
 
 	signed.Write(sig.HashSuffix)
 	hashBytes := signed.Sum(nil)
 
-	if hashBytes[0] != sig.HashTag[0] || hashBytes[1] != sig.HashTag[1] ***REMOVED***
+	if hashBytes[0] != sig.HashTag[0] || hashBytes[1] != sig.HashTag[1] {
 		return errors.SignatureError("hash tag doesn't match")
-	***REMOVED***
+	}
 
-	if pk.PubKeyAlgo != sig.PubKeyAlgo ***REMOVED***
+	if pk.PubKeyAlgo != sig.PubKeyAlgo {
 		return errors.InvalidArgumentError("public key and signature use different algorithms")
-	***REMOVED***
+	}
 
-	switch pk.PubKeyAlgo ***REMOVED***
+	switch pk.PubKeyAlgo {
 	case PubKeyAlgoRSA, PubKeyAlgoRSASignOnly:
 		rsaPublicKey, _ := pk.PublicKey.(*rsa.PublicKey)
 		err = rsa.VerifyPKCS1v15(rsaPublicKey, sig.Hash, hashBytes, sig.RSASignature.bytes)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return errors.SignatureError("RSA verification failure")
-		***REMOVED***
+		}
 		return nil
 	case PubKeyAlgoDSA:
 		dsaPublicKey, _ := pk.PublicKey.(*dsa.PublicKey)
 		// Need to truncate hashBytes to match FIPS 186-3 section 4.6.
 		subgroupSize := (dsaPublicKey.Q.BitLen() + 7) / 8
-		if len(hashBytes) > subgroupSize ***REMOVED***
+		if len(hashBytes) > subgroupSize {
 			hashBytes = hashBytes[:subgroupSize]
-		***REMOVED***
-		if !dsa.Verify(dsaPublicKey, hashBytes, new(big.Int).SetBytes(sig.DSASigR.bytes), new(big.Int).SetBytes(sig.DSASigS.bytes)) ***REMOVED***
+		}
+		if !dsa.Verify(dsaPublicKey, hashBytes, new(big.Int).SetBytes(sig.DSASigR.bytes), new(big.Int).SetBytes(sig.DSASigS.bytes)) {
 			return errors.SignatureError("DSA verification failure")
-		***REMOVED***
+		}
 		return nil
 	case PubKeyAlgoECDSA:
 		ecdsaPublicKey := pk.PublicKey.(*ecdsa.PublicKey)
-		if !ecdsa.Verify(ecdsaPublicKey, hashBytes, new(big.Int).SetBytes(sig.ECDSASigR.bytes), new(big.Int).SetBytes(sig.ECDSASigS.bytes)) ***REMOVED***
+		if !ecdsa.Verify(ecdsaPublicKey, hashBytes, new(big.Int).SetBytes(sig.ECDSASigR.bytes), new(big.Int).SetBytes(sig.ECDSASigS.bytes)) {
 			return errors.SignatureError("ECDSA verification failure")
-		***REMOVED***
+		}
 		return nil
 	default:
 		return errors.SignatureError("Unsupported public key algorithm used in signature")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // VerifySignatureV3 returns nil iff sig is a valid signature, made by this
 // public key, of the data hashed into signed. signed is mutated by this call.
-func (pk *PublicKey) VerifySignatureV3(signed hash.Hash, sig *SignatureV3) (err error) ***REMOVED***
-	if !pk.CanSign() ***REMOVED***
+func (pk *PublicKey) VerifySignatureV3(signed hash.Hash, sig *SignatureV3) (err error) {
+	if !pk.CanSign() {
 		return errors.InvalidArgumentError("public key cannot generate signatures")
-	***REMOVED***
+	}
 
 	suffix := make([]byte, 5)
 	suffix[0] = byte(sig.SigType)
@@ -555,43 +555,43 @@ func (pk *PublicKey) VerifySignatureV3(signed hash.Hash, sig *SignatureV3) (err 
 	signed.Write(suffix)
 	hashBytes := signed.Sum(nil)
 
-	if hashBytes[0] != sig.HashTag[0] || hashBytes[1] != sig.HashTag[1] ***REMOVED***
+	if hashBytes[0] != sig.HashTag[0] || hashBytes[1] != sig.HashTag[1] {
 		return errors.SignatureError("hash tag doesn't match")
-	***REMOVED***
+	}
 
-	if pk.PubKeyAlgo != sig.PubKeyAlgo ***REMOVED***
+	if pk.PubKeyAlgo != sig.PubKeyAlgo {
 		return errors.InvalidArgumentError("public key and signature use different algorithms")
-	***REMOVED***
+	}
 
-	switch pk.PubKeyAlgo ***REMOVED***
+	switch pk.PubKeyAlgo {
 	case PubKeyAlgoRSA, PubKeyAlgoRSASignOnly:
 		rsaPublicKey := pk.PublicKey.(*rsa.PublicKey)
-		if err = rsa.VerifyPKCS1v15(rsaPublicKey, sig.Hash, hashBytes, sig.RSASignature.bytes); err != nil ***REMOVED***
+		if err = rsa.VerifyPKCS1v15(rsaPublicKey, sig.Hash, hashBytes, sig.RSASignature.bytes); err != nil {
 			return errors.SignatureError("RSA verification failure")
-		***REMOVED***
+		}
 		return
 	case PubKeyAlgoDSA:
 		dsaPublicKey := pk.PublicKey.(*dsa.PublicKey)
 		// Need to truncate hashBytes to match FIPS 186-3 section 4.6.
 		subgroupSize := (dsaPublicKey.Q.BitLen() + 7) / 8
-		if len(hashBytes) > subgroupSize ***REMOVED***
+		if len(hashBytes) > subgroupSize {
 			hashBytes = hashBytes[:subgroupSize]
-		***REMOVED***
-		if !dsa.Verify(dsaPublicKey, hashBytes, new(big.Int).SetBytes(sig.DSASigR.bytes), new(big.Int).SetBytes(sig.DSASigS.bytes)) ***REMOVED***
+		}
+		if !dsa.Verify(dsaPublicKey, hashBytes, new(big.Int).SetBytes(sig.DSASigR.bytes), new(big.Int).SetBytes(sig.DSASigS.bytes)) {
 			return errors.SignatureError("DSA verification failure")
-		***REMOVED***
+		}
 		return nil
 	default:
 		panic("shouldn't happen")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // keySignatureHash returns a Hash of the message that needs to be signed for
 // pk to assert a subkey relationship to signed.
-func keySignatureHash(pk, signed signingKey, hashFunc crypto.Hash) (h hash.Hash, err error) ***REMOVED***
-	if !hashFunc.Available() ***REMOVED***
+func keySignatureHash(pk, signed signingKey, hashFunc crypto.Hash) (h hash.Hash, err error) {
+	if !hashFunc.Available() {
 		return nil, errors.UnsupportedError("hash function")
-	***REMOVED***
+	}
 	h = hashFunc.New()
 
 	// RFC 4880, section 5.2.4
@@ -600,43 +600,43 @@ func keySignatureHash(pk, signed signingKey, hashFunc crypto.Hash) (h hash.Hash,
 	signed.SerializeSignaturePrefix(h)
 	signed.serializeWithoutHeaders(h)
 	return
-***REMOVED***
+}
 
 // VerifyKeySignature returns nil iff sig is a valid signature, made by this
 // public key, of signed.
-func (pk *PublicKey) VerifyKeySignature(signed *PublicKey, sig *Signature) error ***REMOVED***
+func (pk *PublicKey) VerifyKeySignature(signed *PublicKey, sig *Signature) error {
 	h, err := keySignatureHash(pk, signed, sig.Hash)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	if err = pk.VerifySignature(h, sig); err != nil ***REMOVED***
+	}
+	if err = pk.VerifySignature(h, sig); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if sig.FlagSign ***REMOVED***
+	if sig.FlagSign {
 		// Signing subkeys must be cross-signed. See
 		// https://www.gnupg.org/faq/subkey-cross-certify.html.
-		if sig.EmbeddedSignature == nil ***REMOVED***
+		if sig.EmbeddedSignature == nil {
 			return errors.StructuralError("signing subkey is missing cross-signature")
-		***REMOVED***
+		}
 		// Verify the cross-signature. This is calculated over the same
 		// data as the main signature, so we cannot just recursively
 		// call signed.VerifyKeySignature(...)
-		if h, err = keySignatureHash(pk, signed, sig.EmbeddedSignature.Hash); err != nil ***REMOVED***
+		if h, err = keySignatureHash(pk, signed, sig.EmbeddedSignature.Hash); err != nil {
 			return errors.StructuralError("error while hashing for cross-signature: " + err.Error())
-		***REMOVED***
-		if err := signed.VerifySignature(h, sig.EmbeddedSignature); err != nil ***REMOVED***
+		}
+		if err := signed.VerifySignature(h, sig.EmbeddedSignature); err != nil {
 			return errors.StructuralError("error while verifying cross-signature: " + err.Error())
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
-func keyRevocationHash(pk signingKey, hashFunc crypto.Hash) (h hash.Hash, err error) ***REMOVED***
-	if !hashFunc.Available() ***REMOVED***
+func keyRevocationHash(pk signingKey, hashFunc crypto.Hash) (h hash.Hash, err error) {
+	if !hashFunc.Available() {
 		return nil, errors.UnsupportedError("hash function")
-	***REMOVED***
+	}
 	h = hashFunc.New()
 
 	// RFC 4880, section 5.2.4
@@ -644,24 +644,24 @@ func keyRevocationHash(pk signingKey, hashFunc crypto.Hash) (h hash.Hash, err er
 	pk.serializeWithoutHeaders(h)
 
 	return
-***REMOVED***
+}
 
 // VerifyRevocationSignature returns nil iff sig is a valid signature, made by this
 // public key.
-func (pk *PublicKey) VerifyRevocationSignature(sig *Signature) (err error) ***REMOVED***
+func (pk *PublicKey) VerifyRevocationSignature(sig *Signature) (err error) {
 	h, err := keyRevocationHash(pk, sig.Hash)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return pk.VerifySignature(h, sig)
-***REMOVED***
+}
 
 // userIdSignatureHash returns a Hash of the message that needs to be signed
 // to assert that pk is a valid key for id.
-func userIdSignatureHash(id string, pk *PublicKey, hashFunc crypto.Hash) (h hash.Hash, err error) ***REMOVED***
-	if !hashFunc.Available() ***REMOVED***
+func userIdSignatureHash(id string, pk *PublicKey, hashFunc crypto.Hash) (h hash.Hash, err error) {
+	if !hashFunc.Available() {
 		return nil, errors.UnsupportedError("hash function")
-	***REMOVED***
+	}
 	h = hashFunc.New()
 
 	// RFC 4880, section 5.2.4
@@ -678,63 +678,63 @@ func userIdSignatureHash(id string, pk *PublicKey, hashFunc crypto.Hash) (h hash
 	h.Write([]byte(id))
 
 	return
-***REMOVED***
+}
 
 // VerifyUserIdSignature returns nil iff sig is a valid signature, made by this
 // public key, that id is the identity of pub.
-func (pk *PublicKey) VerifyUserIdSignature(id string, pub *PublicKey, sig *Signature) (err error) ***REMOVED***
+func (pk *PublicKey) VerifyUserIdSignature(id string, pub *PublicKey, sig *Signature) (err error) {
 	h, err := userIdSignatureHash(id, pub, sig.Hash)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return pk.VerifySignature(h, sig)
-***REMOVED***
+}
 
 // VerifyUserIdSignatureV3 returns nil iff sig is a valid signature, made by this
 // public key, that id is the identity of pub.
-func (pk *PublicKey) VerifyUserIdSignatureV3(id string, pub *PublicKey, sig *SignatureV3) (err error) ***REMOVED***
+func (pk *PublicKey) VerifyUserIdSignatureV3(id string, pub *PublicKey, sig *SignatureV3) (err error) {
 	h, err := userIdSignatureV3Hash(id, pub, sig.Hash)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return pk.VerifySignatureV3(h, sig)
-***REMOVED***
+}
 
 // KeyIdString returns the public key's fingerprint in capital hex
 // (e.g. "6C7EE1B8621CC013").
-func (pk *PublicKey) KeyIdString() string ***REMOVED***
+func (pk *PublicKey) KeyIdString() string {
 	return fmt.Sprintf("%X", pk.Fingerprint[12:20])
-***REMOVED***
+}
 
 // KeyIdShortString returns the short form of public key's fingerprint
 // in capital hex, as shown by gpg --list-keys (e.g. "621CC013").
-func (pk *PublicKey) KeyIdShortString() string ***REMOVED***
+func (pk *PublicKey) KeyIdShortString() string {
 	return fmt.Sprintf("%X", pk.Fingerprint[16:20])
-***REMOVED***
+}
 
 // A parsedMPI is used to store the contents of a big integer, along with the
 // bit length that was specified in the original input. This allows the MPI to
 // be reserialized exactly.
-type parsedMPI struct ***REMOVED***
+type parsedMPI struct {
 	bytes     []byte
 	bitLength uint16
-***REMOVED***
+}
 
 // writeMPIs is a utility function for serializing several big integers to the
 // given Writer.
-func writeMPIs(w io.Writer, mpis ...parsedMPI) (err error) ***REMOVED***
-	for _, mpi := range mpis ***REMOVED***
+func writeMPIs(w io.Writer, mpis ...parsedMPI) (err error) {
+	for _, mpi := range mpis {
 		err = writeMPI(w, mpi.bitLength, mpi.bytes)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}
 
 // BitLength returns the bit length for the given public key.
-func (pk *PublicKey) BitLength() (bitLength uint16, err error) ***REMOVED***
-	switch pk.PubKeyAlgo ***REMOVED***
+func (pk *PublicKey) BitLength() (bitLength uint16, err error) {
+	switch pk.PubKeyAlgo {
 	case PubKeyAlgoRSA, PubKeyAlgoRSAEncryptOnly, PubKeyAlgoRSASignOnly:
 		bitLength = pk.n.bitLength
 	case PubKeyAlgoDSA:
@@ -743,6 +743,6 @@ func (pk *PublicKey) BitLength() (bitLength uint16, err error) ***REMOVED***
 		bitLength = pk.p.bitLength
 	default:
 		err = errors.InvalidArgumentError("bad public-key algorithm")
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}

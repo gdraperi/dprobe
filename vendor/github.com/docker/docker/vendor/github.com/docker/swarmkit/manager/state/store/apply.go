@@ -10,9 +10,9 @@ import (
 
 // Apply takes an item from the event stream of one Store and applies it to
 // a second Store.
-func Apply(store *MemoryStore, item events.Event) (err error) ***REMOVED***
-	return store.Update(func(tx Tx) error ***REMOVED***
-		switch v := item.(type) ***REMOVED***
+func Apply(store *MemoryStore, item events.Event) (err error) {
+	return store.Update(func(tx Tx) error {
+		switch v := item.(type) {
 		case api.EventCreateTask:
 			return CreateTask(tx, v.Task)
 		case api.EventUpdateTask:
@@ -43,7 +43,7 @@ func Apply(store *MemoryStore, item events.Event) (err error) ***REMOVED***
 
 		case state.EventCommit:
 			return nil
-		***REMOVED***
+		}
 		return errors.New("unrecognized event type")
-	***REMOVED***)
-***REMOVED***
+	})
+}

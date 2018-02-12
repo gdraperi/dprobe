@@ -17,20 +17,20 @@ import (
 const maxInt = int(^uint(0) >> 1)
 
 // blockCopy copies n numbers from src into dst.
-func blockCopy(dst, src []uint32, n int) ***REMOVED***
+func blockCopy(dst, src []uint32, n int) {
 	copy(dst, src[:n])
-***REMOVED***
+}
 
 // blockXOR XORs numbers from dst with n numbers from src.
-func blockXOR(dst, src []uint32, n int) ***REMOVED***
-	for i, v := range src[:n] ***REMOVED***
+func blockXOR(dst, src []uint32, n int) {
+	for i, v := range src[:n] {
 		dst[i] ^= v
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // salsaXOR applies Salsa20/8 to the XOR of 16 numbers from tmp and in,
 // and puts the result into both both tmp and out.
-func salsaXOR(tmp *[16]uint32, in, out []uint32) ***REMOVED***
+func salsaXOR(tmp *[16]uint32, in, out []uint32) {
 	w0 := tmp[0] ^ in[0]
 	w1 := tmp[1] ^ in[1]
 	w2 := tmp[2] ^ in[2]
@@ -51,7 +51,7 @@ func salsaXOR(tmp *[16]uint32, in, out []uint32) ***REMOVED***
 	x0, x1, x2, x3, x4, x5, x6, x7, x8 := w0, w1, w2, w3, w4, w5, w6, w7, w8
 	x9, x10, x11, x12, x13, x14, x15 := w9, w10, w11, w12, w13, w14, w15
 
-	for i := 0; i < 8; i += 2 ***REMOVED***
+	for i := 0; i < 8; i += 2 {
 		u := x0 + x12
 		x4 ^= u<<7 | u>>(32-7)
 		u = x4 + x0
@@ -123,7 +123,7 @@ func salsaXOR(tmp *[16]uint32, in, out []uint32) ***REMOVED***
 		x14 ^= u<<13 | u>>(32-13)
 		u = x14 + x13
 		x15 ^= u<<18 | u>>(32-18)
-	***REMOVED***
+	}
 	x0 += w0
 	x1 += w1
 	x2 += w2
@@ -157,39 +157,39 @@ func salsaXOR(tmp *[16]uint32, in, out []uint32) ***REMOVED***
 	out[13], tmp[13] = x13, x13
 	out[14], tmp[14] = x14, x14
 	out[15], tmp[15] = x15, x15
-***REMOVED***
+}
 
-func blockMix(tmp *[16]uint32, in, out []uint32, r int) ***REMOVED***
+func blockMix(tmp *[16]uint32, in, out []uint32, r int) {
 	blockCopy(tmp[:], in[(2*r-1)*16:], 16)
-	for i := 0; i < 2*r; i += 2 ***REMOVED***
+	for i := 0; i < 2*r; i += 2 {
 		salsaXOR(tmp, in[i*16:], out[i*8:])
 		salsaXOR(tmp, in[i*16+16:], out[i*8+r*16:])
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func integer(b []uint32, r int) uint64 ***REMOVED***
+func integer(b []uint32, r int) uint64 {
 	j := (2*r - 1) * 16
 	return uint64(b[j]) | uint64(b[j+1])<<32
-***REMOVED***
+}
 
-func smix(b []byte, r, N int, v, xy []uint32) ***REMOVED***
+func smix(b []byte, r, N int, v, xy []uint32) {
 	var tmp [16]uint32
 	x := xy
 	y := xy[32*r:]
 
 	j := 0
-	for i := 0; i < 32*r; i++ ***REMOVED***
+	for i := 0; i < 32*r; i++ {
 		x[i] = uint32(b[j]) | uint32(b[j+1])<<8 | uint32(b[j+2])<<16 | uint32(b[j+3])<<24
 		j += 4
-	***REMOVED***
-	for i := 0; i < N; i += 2 ***REMOVED***
+	}
+	for i := 0; i < N; i += 2 {
 		blockCopy(v[i*(32*r):], x, 32*r)
 		blockMix(&tmp, x, y, r)
 
 		blockCopy(v[(i+1)*(32*r):], y, 32*r)
 		blockMix(&tmp, y, x, r)
-	***REMOVED***
-	for i := 0; i < N; i += 2 ***REMOVED***
+	}
+	for i := 0; i < N; i += 2 {
 		j := int(integer(x, r) & uint64(N-1))
 		blockXOR(x, v[j*(32*r):], 32*r)
 		blockMix(&tmp, x, y, r)
@@ -197,16 +197,16 @@ func smix(b []byte, r, N int, v, xy []uint32) ***REMOVED***
 		j = int(integer(y, r) & uint64(N-1))
 		blockXOR(y, v[j*(32*r):], 32*r)
 		blockMix(&tmp, y, x, r)
-	***REMOVED***
+	}
 	j = 0
-	for _, v := range x[:32*r] ***REMOVED***
+	for _, v := range x[:32*r] {
 		b[j+0] = byte(v >> 0)
 		b[j+1] = byte(v >> 8)
 		b[j+2] = byte(v >> 16)
 		b[j+3] = byte(v >> 24)
 		j += 4
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Key derives a key from the password, salt, and cost parameters, returning
 // a byte slice of length keyLen that can be used as cryptographic key.
@@ -224,21 +224,21 @@ func smix(b []byte, r, N int, v, xy []uint32) ***REMOVED***
 // and p=1. The parameters N, r, and p should be increased as memory latency and
 // CPU parallelism increases; consider setting N to the highest power of 2 you
 // can derive within 100 milliseconds. Remember to get a good random salt.
-func Key(password, salt []byte, N, r, p, keyLen int) ([]byte, error) ***REMOVED***
-	if N <= 1 || N&(N-1) != 0 ***REMOVED***
+func Key(password, salt []byte, N, r, p, keyLen int) ([]byte, error) {
+	if N <= 1 || N&(N-1) != 0 {
 		return nil, errors.New("scrypt: N must be > 1 and a power of 2")
-	***REMOVED***
-	if uint64(r)*uint64(p) >= 1<<30 || r > maxInt/128/p || r > maxInt/256 || N > maxInt/128/r ***REMOVED***
+	}
+	if uint64(r)*uint64(p) >= 1<<30 || r > maxInt/128/p || r > maxInt/256 || N > maxInt/128/r {
 		return nil, errors.New("scrypt: parameters are too large")
-	***REMOVED***
+	}
 
 	xy := make([]uint32, 64*r)
 	v := make([]uint32, 32*N*r)
 	b := pbkdf2.Key(password, salt, 1, p*128*r, sha256.New)
 
-	for i := 0; i < p; i++ ***REMOVED***
+	for i := 0; i < p; i++ {
 		smix(b[i*128*r:], r, N, v, xy)
-	***REMOVED***
+	}
 
 	return pbkdf2.Key(password, b, 1, keyLen, sha256.New), nil
-***REMOVED***
+}

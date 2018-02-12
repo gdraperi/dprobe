@@ -13,34 +13,34 @@ import (
 )
 
 // Lookup returns the mount info corresponds to the path.
-func Lookup(dir string) (Info, error) ***REMOVED***
+func Lookup(dir string) (Info, error) {
 	var dirStat syscall.Stat_t
 	dir = filepath.Clean(dir)
-	if err := syscall.Stat(dir, &dirStat); err != nil ***REMOVED***
-		return Info***REMOVED******REMOVED***, errors.Wrapf(err, "failed to access %q", dir)
-	***REMOVED***
+	if err := syscall.Stat(dir, &dirStat); err != nil {
+		return Info{}, errors.Wrapf(err, "failed to access %q", dir)
+	}
 
 	mounts, err := Self()
-	if err != nil ***REMOVED***
-		return Info***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return Info{}, err
+	}
 
 	// Sort descending order by Info.Mountpoint
-	sort.Slice(mounts, func(i, j int) bool ***REMOVED***
+	sort.Slice(mounts, func(i, j int) bool {
 		return mounts[j].Mountpoint < mounts[i].Mountpoint
-	***REMOVED***)
-	for _, m := range mounts ***REMOVED***
-		// Note that m.***REMOVED***Major, Minor***REMOVED*** are generally unreliable for our purpose here
+	})
+	for _, m := range mounts {
+		// Note that m.{Major, Minor} are generally unreliable for our purpose here
 		// https://www.spinics.net/lists/linux-btrfs/msg58908.html
 		var st syscall.Stat_t
-		if err := syscall.Stat(m.Mountpoint, &st); err != nil ***REMOVED***
+		if err := syscall.Stat(m.Mountpoint, &st); err != nil {
 			// may fail; ignore err
 			continue
-		***REMOVED***
-		if st.Dev == dirStat.Dev && strings.HasPrefix(dir, m.Mountpoint) ***REMOVED***
+		}
+		if st.Dev == dirStat.Dev && strings.HasPrefix(dir, m.Mountpoint) {
 			return m, nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	return Info***REMOVED******REMOVED***, fmt.Errorf("failed to find the mount info for %q", dir)
-***REMOVED***
+	return Info{}, fmt.Errorf("failed to find the mount info for %q", dir)
+}

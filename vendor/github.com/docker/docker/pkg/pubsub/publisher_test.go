@@ -6,137 +6,137 @@ import (
 	"time"
 )
 
-func TestSendToOneSub(t *testing.T) ***REMOVED***
+func TestSendToOneSub(t *testing.T) {
 	p := NewPublisher(100*time.Millisecond, 10)
 	c := p.Subscribe()
 
 	p.Publish("hi")
 
 	msg := <-c
-	if msg.(string) != "hi" ***REMOVED***
+	if msg.(string) != "hi" {
 		t.Fatalf("expected message hi but received %v", msg)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestSendToMultipleSubs(t *testing.T) ***REMOVED***
+func TestSendToMultipleSubs(t *testing.T) {
 	p := NewPublisher(100*time.Millisecond, 10)
-	subs := []chan interface***REMOVED******REMOVED******REMOVED******REMOVED***
+	subs := []chan interface{}{}
 	subs = append(subs, p.Subscribe(), p.Subscribe(), p.Subscribe())
 
 	p.Publish("hi")
 
-	for _, c := range subs ***REMOVED***
+	for _, c := range subs {
 		msg := <-c
-		if msg.(string) != "hi" ***REMOVED***
+		if msg.(string) != "hi" {
 			t.Fatalf("expected message hi but received %v", msg)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestEvictOneSub(t *testing.T) ***REMOVED***
+func TestEvictOneSub(t *testing.T) {
 	p := NewPublisher(100*time.Millisecond, 10)
 	s1 := p.Subscribe()
 	s2 := p.Subscribe()
 
 	p.Evict(s1)
 	p.Publish("hi")
-	if _, ok := <-s1; ok ***REMOVED***
+	if _, ok := <-s1; ok {
 		t.Fatal("expected s1 to not receive the published message")
-	***REMOVED***
+	}
 
 	msg := <-s2
-	if msg.(string) != "hi" ***REMOVED***
+	if msg.(string) != "hi" {
 		t.Fatalf("expected message hi but received %v", msg)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestClosePublisher(t *testing.T) ***REMOVED***
+func TestClosePublisher(t *testing.T) {
 	p := NewPublisher(100*time.Millisecond, 10)
-	subs := []chan interface***REMOVED******REMOVED******REMOVED******REMOVED***
+	subs := []chan interface{}{}
 	subs = append(subs, p.Subscribe(), p.Subscribe(), p.Subscribe())
 	p.Close()
 
-	for _, c := range subs ***REMOVED***
-		if _, ok := <-c; ok ***REMOVED***
+	for _, c := range subs {
+		if _, ok := <-c; ok {
 			t.Fatal("expected all subscriber channels to be closed")
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 const sampleText = "test"
 
-type testSubscriber struct ***REMOVED***
-	dataCh chan interface***REMOVED******REMOVED***
+type testSubscriber struct {
+	dataCh chan interface{}
 	ch     chan error
-***REMOVED***
+}
 
-func (s *testSubscriber) Wait() error ***REMOVED***
+func (s *testSubscriber) Wait() error {
 	return <-s.ch
-***REMOVED***
+}
 
-func newTestSubscriber(p *Publisher) *testSubscriber ***REMOVED***
-	ts := &testSubscriber***REMOVED***
+func newTestSubscriber(p *Publisher) *testSubscriber {
+	ts := &testSubscriber{
 		dataCh: p.Subscribe(),
 		ch:     make(chan error),
-	***REMOVED***
-	go func() ***REMOVED***
-		for data := range ts.dataCh ***REMOVED***
+	}
+	go func() {
+		for data := range ts.dataCh {
 			s, ok := data.(string)
-			if !ok ***REMOVED***
+			if !ok {
 				ts.ch <- fmt.Errorf("Unexpected type %T", data)
 				break
-			***REMOVED***
-			if s != sampleText ***REMOVED***
+			}
+			if s != sampleText {
 				ts.ch <- fmt.Errorf("Unexpected text %s", s)
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		close(ts.ch)
-	***REMOVED***()
+	}()
 	return ts
-***REMOVED***
+}
 
 // for testing with -race
-func TestPubSubRace(t *testing.T) ***REMOVED***
+func TestPubSubRace(t *testing.T) {
 	p := NewPublisher(0, 1024)
 	var subs [](*testSubscriber)
-	for j := 0; j < 50; j++ ***REMOVED***
+	for j := 0; j < 50; j++ {
 		subs = append(subs, newTestSubscriber(p))
-	***REMOVED***
-	for j := 0; j < 1000; j++ ***REMOVED***
+	}
+	for j := 0; j < 1000; j++ {
 		p.Publish(sampleText)
-	***REMOVED***
-	time.AfterFunc(1*time.Second, func() ***REMOVED***
-		for _, s := range subs ***REMOVED***
+	}
+	time.AfterFunc(1*time.Second, func() {
+		for _, s := range subs {
 			p.Evict(s.dataCh)
-		***REMOVED***
-	***REMOVED***)
-	for _, s := range subs ***REMOVED***
+		}
+	})
+	for _, s := range subs {
 		s.Wait()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func BenchmarkPubSub(b *testing.B) ***REMOVED***
-	for i := 0; i < b.N; i++ ***REMOVED***
+func BenchmarkPubSub(b *testing.B) {
+	for i := 0; i < b.N; i++ {
 		b.StopTimer()
 		p := NewPublisher(0, 1024)
 		var subs [](*testSubscriber)
-		for j := 0; j < 50; j++ ***REMOVED***
+		for j := 0; j < 50; j++ {
 			subs = append(subs, newTestSubscriber(p))
-		***REMOVED***
+		}
 		b.StartTimer()
-		for j := 0; j < 1000; j++ ***REMOVED***
+		for j := 0; j < 1000; j++ {
 			p.Publish(sampleText)
-		***REMOVED***
-		time.AfterFunc(1*time.Second, func() ***REMOVED***
-			for _, s := range subs ***REMOVED***
+		}
+		time.AfterFunc(1*time.Second, func() {
+			for _, s := range subs {
 				p.Evict(s.dataCh)
-			***REMOVED***
-		***REMOVED***)
-		for _, s := range subs ***REMOVED***
-			if err := s.Wait(); err != nil ***REMOVED***
+			}
+		})
+		for _, s := range subs {
+			if err := s.Wait(); err != nil {
 				b.Fatal(err)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}

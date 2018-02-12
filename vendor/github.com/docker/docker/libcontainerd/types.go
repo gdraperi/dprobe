@@ -49,22 +49,22 @@ const (
 // Remote on Linux defines the accesspoint to the containerd grpc API.
 // Remote on Windows is largely an unimplemented interface as there is
 // no remote containerd.
-type Remote interface ***REMOVED***
+type Remote interface {
 	// Client returns a new Client instance connected with given Backend.
 	NewClient(namespace string, backend Backend) (Client, error)
 	// Cleanup stops containerd if it was started by libcontainerd.
 	// Note this is not used on Windows as there is no remote containerd.
 	Cleanup()
-***REMOVED***
+}
 
 // RemoteOption allows to configure parameters of remotes.
 // This is unused on Windows.
-type RemoteOption interface ***REMOVED***
+type RemoteOption interface {
 	Apply(Remote) error
-***REMOVED***
+}
 
 // EventInfo contains the event info
-type EventInfo struct ***REMOVED***
+type EventInfo struct {
 	ContainerID string
 	ProcessID   string
 	Pid         uint32
@@ -73,20 +73,20 @@ type EventInfo struct ***REMOVED***
 	OOMKilled   bool
 	// Windows Only field
 	UpdatePending bool
-***REMOVED***
+}
 
 // Backend defines callbacks that the client of the library needs to implement.
-type Backend interface ***REMOVED***
+type Backend interface {
 	ProcessEvent(containerID string, event EventType, ei EventInfo) error
-***REMOVED***
+}
 
 // Client provides access to containerd features.
-type Client interface ***REMOVED***
+type Client interface {
 	Version(ctx context.Context) (containerd.Version, error)
 
 	Restore(ctx context.Context, containerID string, attachStdio StdioCallback) (alive bool, pid int, err error)
 
-	Create(ctx context.Context, containerID string, spec *specs.Spec, runtimeOptions interface***REMOVED******REMOVED***) error
+	Create(ctx context.Context, containerID string, spec *specs.Spec, runtimeOptions interface{}) error
 	Start(ctx context.Context, containerID, checkpointDir string, withStdin bool, attachStdio StdioCallback) (pid int, err error)
 	SignalProcess(ctx context.Context, containerID, processID string, signal int) error
 	Exec(ctx context.Context, containerID, processID string, spec *specs.Process, withStdin bool, attachStdio StdioCallback) (int, error)
@@ -103,7 +103,7 @@ type Client interface ***REMOVED***
 
 	UpdateResources(ctx context.Context, containerID string, resources *Resources) error
 	CreateCheckpoint(ctx context.Context, containerID, checkpointDir string, exit bool) error
-***REMOVED***
+}
 
 // StdioCallback is called to connect a container or process stdio.
 type StdioCallback func(io *cio.DirectIO) (cio.IO, error)

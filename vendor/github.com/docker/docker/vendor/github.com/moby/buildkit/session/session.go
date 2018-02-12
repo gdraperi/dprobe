@@ -22,97 +22,97 @@ const (
 type Dialer func(ctx context.Context, proto string, meta map[string][]string) (net.Conn, error)
 
 // Attachable defines a feature that can be expsed on a session
-type Attachable interface ***REMOVED***
+type Attachable interface {
 	Register(*grpc.Server)
-***REMOVED***
+}
 
 // Session is a long running connection between client and a daemon
-type Session struct ***REMOVED***
+type Session struct {
 	id         string
 	name       string
 	sharedKey  string
 	ctx        context.Context
 	cancelCtx  func()
-	done       chan struct***REMOVED******REMOVED***
+	done       chan struct{}
 	grpcServer *grpc.Server
-***REMOVED***
+}
 
 // NewSession returns a new long running session
-func NewSession(name, sharedKey string) (*Session, error) ***REMOVED***
+func NewSession(name, sharedKey string) (*Session, error) {
 	id := stringid.GenerateRandomID()
-	s := &Session***REMOVED***
+	s := &Session{
 		id:         id,
 		name:       name,
 		sharedKey:  sharedKey,
 		grpcServer: grpc.NewServer(),
-	***REMOVED***
+	}
 
 	grpc_health_v1.RegisterHealthServer(s.grpcServer, health.NewServer())
 
 	return s, nil
-***REMOVED***
+}
 
 // Allow enable a given service to be reachable through the grpc session
-func (s *Session) Allow(a Attachable) ***REMOVED***
+func (s *Session) Allow(a Attachable) {
 	a.Register(s.grpcServer)
-***REMOVED***
+}
 
 // ID returns unique identifier for the session
-func (s *Session) ID() string ***REMOVED***
+func (s *Session) ID() string {
 	return s.id
-***REMOVED***
+}
 
 // Run activates the session
-func (s *Session) Run(ctx context.Context, dialer Dialer) error ***REMOVED***
+func (s *Session) Run(ctx context.Context, dialer Dialer) error {
 	ctx, cancel := context.WithCancel(ctx)
 	s.cancelCtx = cancel
-	s.done = make(chan struct***REMOVED******REMOVED***)
+	s.done = make(chan struct{})
 
 	defer cancel()
 	defer close(s.done)
 
 	meta := make(map[string][]string)
-	meta[headerSessionID] = []string***REMOVED***s.id***REMOVED***
-	meta[headerSessionName] = []string***REMOVED***s.name***REMOVED***
-	meta[headerSessionSharedKey] = []string***REMOVED***s.sharedKey***REMOVED***
+	meta[headerSessionID] = []string{s.id}
+	meta[headerSessionName] = []string{s.name}
+	meta[headerSessionSharedKey] = []string{s.sharedKey}
 
-	for name, svc := range s.grpcServer.GetServiceInfo() ***REMOVED***
-		for _, method := range svc.Methods ***REMOVED***
+	for name, svc := range s.grpcServer.GetServiceInfo() {
+		for _, method := range svc.Methods {
 			meta[headerSessionMethod] = append(meta[headerSessionMethod], MethodURL(name, method.Name))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	conn, err := dialer(ctx, "h2c", meta)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return errors.Wrap(err, "failed to dial gRPC")
-	***REMOVED***
+	}
 	serve(ctx, s.grpcServer, conn)
 	return nil
-***REMOVED***
+}
 
 // Close closes the session
-func (s *Session) Close() error ***REMOVED***
-	if s.cancelCtx != nil && s.done != nil ***REMOVED***
+func (s *Session) Close() error {
+	if s.cancelCtx != nil && s.done != nil {
 		s.grpcServer.Stop()
 		s.cancelCtx()
 		<-s.done
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (s *Session) context() context.Context ***REMOVED***
+func (s *Session) context() context.Context {
 	return s.ctx
-***REMOVED***
+}
 
-func (s *Session) closed() bool ***REMOVED***
-	select ***REMOVED***
+func (s *Session) closed() bool {
+	select {
 	case <-s.context().Done():
 		return true
 	default:
 		return false
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // MethodURL returns a gRPC method URL for service and method name
-func MethodURL(s, m string) string ***REMOVED***
+func MethodURL(s, m string) string {
 	return "/" + s + "/" + m
-***REMOVED***
+}

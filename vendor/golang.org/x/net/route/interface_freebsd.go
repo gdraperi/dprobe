@@ -4,30 +4,30 @@
 
 package route
 
-func (w *wireFormat) parseInterfaceMessage(typ RIBType, b []byte) (Message, error) ***REMOVED***
+func (w *wireFormat) parseInterfaceMessage(typ RIBType, b []byte) (Message, error) {
 	var extOff, bodyOff int
-	if typ == sysNET_RT_IFLISTL ***REMOVED***
-		if len(b) < 20 ***REMOVED***
+	if typ == sysNET_RT_IFLISTL {
+		if len(b) < 20 {
 			return nil, errMessageTooShort
-		***REMOVED***
+		}
 		extOff = int(nativeEndian.Uint16(b[18:20]))
 		bodyOff = int(nativeEndian.Uint16(b[16:18]))
-	***REMOVED*** else ***REMOVED***
+	} else {
 		extOff = w.extOff
 		bodyOff = w.bodyOff
-	***REMOVED***
-	if len(b) < extOff || len(b) < bodyOff ***REMOVED***
+	}
+	if len(b) < extOff || len(b) < bodyOff {
 		return nil, errInvalidMessage
-	***REMOVED***
+	}
 	l := int(nativeEndian.Uint16(b[:2]))
-	if len(b) < l ***REMOVED***
+	if len(b) < l {
 		return nil, errInvalidMessage
-	***REMOVED***
+	}
 	attrs := uint(nativeEndian.Uint32(b[4:8]))
-	if attrs&sysRTA_IFP == 0 ***REMOVED***
+	if attrs&sysRTA_IFP == 0 {
 		return nil, nil
-	***REMOVED***
-	m := &InterfaceMessage***REMOVED***
+	}
+	m := &InterfaceMessage{
 		Version: int(b[2]),
 		Type:    int(b[3]),
 		Flags:   int(nativeEndian.Uint32(b[8:12])),
@@ -35,44 +35,44 @@ func (w *wireFormat) parseInterfaceMessage(typ RIBType, b []byte) (Message, erro
 		Addrs:   make([]Addr, sysRTAX_MAX),
 		extOff:  extOff,
 		raw:     b[:l],
-	***REMOVED***
+	}
 	a, err := parseLinkAddr(b[bodyOff:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	m.Addrs[sysRTAX_IFP] = a
 	m.Name = a.(*LinkAddr).Name
 	return m, nil
-***REMOVED***
+}
 
-func (w *wireFormat) parseInterfaceAddrMessage(typ RIBType, b []byte) (Message, error) ***REMOVED***
+func (w *wireFormat) parseInterfaceAddrMessage(typ RIBType, b []byte) (Message, error) {
 	var bodyOff int
-	if typ == sysNET_RT_IFLISTL ***REMOVED***
-		if len(b) < 24 ***REMOVED***
+	if typ == sysNET_RT_IFLISTL {
+		if len(b) < 24 {
 			return nil, errMessageTooShort
-		***REMOVED***
+		}
 		bodyOff = int(nativeEndian.Uint16(b[16:18]))
-	***REMOVED*** else ***REMOVED***
+	} else {
 		bodyOff = w.bodyOff
-	***REMOVED***
-	if len(b) < bodyOff ***REMOVED***
+	}
+	if len(b) < bodyOff {
 		return nil, errInvalidMessage
-	***REMOVED***
+	}
 	l := int(nativeEndian.Uint16(b[:2]))
-	if len(b) < l ***REMOVED***
+	if len(b) < l {
 		return nil, errInvalidMessage
-	***REMOVED***
-	m := &InterfaceAddrMessage***REMOVED***
+	}
+	m := &InterfaceAddrMessage{
 		Version: int(b[2]),
 		Type:    int(b[3]),
 		Flags:   int(nativeEndian.Uint32(b[8:12])),
 		Index:   int(nativeEndian.Uint16(b[12:14])),
 		raw:     b[:l],
-	***REMOVED***
+	}
 	var err error
 	m.Addrs, err = parseAddrs(uint(nativeEndian.Uint32(b[4:8])), parseKernelInetAddr, b[bodyOff:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return m, nil
-***REMOVED***
+}

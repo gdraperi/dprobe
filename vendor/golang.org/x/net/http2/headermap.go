@@ -10,12 +10,12 @@ import (
 )
 
 var (
-	commonLowerHeader = map[string]string***REMOVED******REMOVED*** // Go-Canonical-Case -> lower-case
-	commonCanonHeader = map[string]string***REMOVED******REMOVED*** // lower-case -> Go-Canonical-Case
+	commonLowerHeader = map[string]string{} // Go-Canonical-Case -> lower-case
+	commonCanonHeader = map[string]string{} // lower-case -> Go-Canonical-Case
 )
 
-func init() ***REMOVED***
-	for _, v := range []string***REMOVED***
+func init() {
+	for _, v := range []string{
 		"accept",
 		"accept-charset",
 		"accept-encoding",
@@ -63,16 +63,16 @@ func init() ***REMOVED***
 		"vary",
 		"via",
 		"www-authenticate",
-	***REMOVED*** ***REMOVED***
+	} {
 		chk := http.CanonicalHeaderKey(v)
 		commonLowerHeader[chk] = v
 		commonCanonHeader[v] = chk
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func lowerHeader(v string) string ***REMOVED***
-	if s, ok := commonLowerHeader[v]; ok ***REMOVED***
+func lowerHeader(v string) string {
+	if s, ok := commonLowerHeader[v]; ok {
 		return s
-	***REMOVED***
+	}
 	return strings.ToLower(v)
-***REMOVED***
+}

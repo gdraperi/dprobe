@@ -65,7 +65,7 @@ const (
 	SIGTERM = Signal(0xf)
 )
 
-var signals = [...]string***REMOVED***
+var signals = [...]string{
 	1:  "hangup",
 	2:  "interrupt",
 	3:  "quit",
@@ -81,7 +81,7 @@ var signals = [...]string***REMOVED***
 	13: "broken pipe",
 	14: "alarm clock",
 	15: "terminated",
-***REMOVED***
+}
 
 const (
 	GENERIC_READ    = 0x80000000
@@ -295,50 +295,50 @@ var (
 )
 
 // Invented values to support what package os expects.
-type Timeval struct ***REMOVED***
+type Timeval struct {
 	Sec  int32
 	Usec int32
-***REMOVED***
+}
 
-func (tv *Timeval) Nanoseconds() int64 ***REMOVED***
+func (tv *Timeval) Nanoseconds() int64 {
 	return (int64(tv.Sec)*1e6 + int64(tv.Usec)) * 1e3
-***REMOVED***
+}
 
-func NsecToTimeval(nsec int64) (tv Timeval) ***REMOVED***
+func NsecToTimeval(nsec int64) (tv Timeval) {
 	tv.Sec = int32(nsec / 1e9)
 	tv.Usec = int32(nsec % 1e9 / 1e3)
 	return
-***REMOVED***
+}
 
-type SecurityAttributes struct ***REMOVED***
+type SecurityAttributes struct {
 	Length             uint32
 	SecurityDescriptor uintptr
 	InheritHandle      uint32
-***REMOVED***
+}
 
-type Overlapped struct ***REMOVED***
+type Overlapped struct {
 	Internal     uintptr
 	InternalHigh uintptr
 	Offset       uint32
 	OffsetHigh   uint32
 	HEvent       Handle
-***REMOVED***
+}
 
-type FileNotifyInformation struct ***REMOVED***
+type FileNotifyInformation struct {
 	NextEntryOffset uint32
 	Action          uint32
 	FileNameLength  uint32
 	FileName        uint16
-***REMOVED***
+}
 
-type Filetime struct ***REMOVED***
+type Filetime struct {
 	LowDateTime  uint32
 	HighDateTime uint32
-***REMOVED***
+}
 
 // Nanoseconds returns Filetime ft in nanoseconds
 // since Epoch (00:00:00 UTC, January 1, 1970).
-func (ft *Filetime) Nanoseconds() int64 ***REMOVED***
+func (ft *Filetime) Nanoseconds() int64 {
 	// 100-nanosecond intervals since January 1, 1601
 	nsec := int64(ft.HighDateTime)<<32 + int64(ft.LowDateTime)
 	// change starting time to the Epoch (00:00:00 UTC, January 1, 1970)
@@ -346,9 +346,9 @@ func (ft *Filetime) Nanoseconds() int64 ***REMOVED***
 	// convert into nanoseconds
 	nsec *= 100
 	return nsec
-***REMOVED***
+}
 
-func NsecToFiletime(nsec int64) (ft Filetime) ***REMOVED***
+func NsecToFiletime(nsec int64) (ft Filetime) {
 	// convert into 100-nanosecond
 	nsec /= 100
 	// change starting time to January 1, 1601
@@ -357,9 +357,9 @@ func NsecToFiletime(nsec int64) (ft Filetime) ***REMOVED***
 	ft.LowDateTime = uint32(nsec & 0xffffffff)
 	ft.HighDateTime = uint32(nsec >> 32 & 0xffffffff)
 	return ft
-***REMOVED***
+}
 
-type Win32finddata struct ***REMOVED***
+type Win32finddata struct {
 	FileAttributes    uint32
 	CreationTime      Filetime
 	LastAccessTime    Filetime
@@ -370,11 +370,11 @@ type Win32finddata struct ***REMOVED***
 	Reserved1         uint32
 	FileName          [MAX_PATH - 1]uint16
 	AlternateFileName [13]uint16
-***REMOVED***
+}
 
 // This is the actual system call structure.
 // Win32finddata is what we committed to in Go 1.
-type win32finddata1 struct ***REMOVED***
+type win32finddata1 struct {
 	FileAttributes    uint32
 	CreationTime      Filetime
 	LastAccessTime    Filetime
@@ -385,9 +385,9 @@ type win32finddata1 struct ***REMOVED***
 	Reserved1         uint32
 	FileName          [MAX_PATH]uint16
 	AlternateFileName [14]uint16
-***REMOVED***
+}
 
-func copyFindData(dst *Win32finddata, src *win32finddata1) ***REMOVED***
+func copyFindData(dst *Win32finddata, src *win32finddata1) {
 	dst.FileAttributes = src.FileAttributes
 	dst.CreationTime = src.CreationTime
 	dst.LastAccessTime = src.LastAccessTime
@@ -400,9 +400,9 @@ func copyFindData(dst *Win32finddata, src *win32finddata1) ***REMOVED***
 	// The src is 1 element bigger than dst, but it must be NUL.
 	copy(dst.FileName[:], src.FileName[:])
 	copy(dst.AlternateFileName[:], src.AlternateFileName[:])
-***REMOVED***
+}
 
-type ByHandleFileInformation struct ***REMOVED***
+type ByHandleFileInformation struct {
 	FileAttributes     uint32
 	CreationTime       Filetime
 	LastAccessTime     Filetime
@@ -413,21 +413,21 @@ type ByHandleFileInformation struct ***REMOVED***
 	NumberOfLinks      uint32
 	FileIndexHigh      uint32
 	FileIndexLow       uint32
-***REMOVED***
+}
 
 const (
 	GetFileExInfoStandard = 0
 	GetFileExMaxInfoLevel = 1
 )
 
-type Win32FileAttributeData struct ***REMOVED***
+type Win32FileAttributeData struct {
 	FileAttributes uint32
 	CreationTime   Filetime
 	LastAccessTime Filetime
 	LastWriteTime  Filetime
 	FileSizeHigh   uint32
 	FileSizeLow    uint32
-***REMOVED***
+}
 
 // ShowWindow constants
 const (
@@ -448,7 +448,7 @@ const (
 	SW_FORCEMINIMIZE   = 11
 )
 
-type StartupInfo struct ***REMOVED***
+type StartupInfo struct {
 	Cb            uint32
 	_             *uint16
 	Desktop       *uint16
@@ -467,16 +467,16 @@ type StartupInfo struct ***REMOVED***
 	StdInput      Handle
 	StdOutput     Handle
 	StdErr        Handle
-***REMOVED***
+}
 
-type ProcessInformation struct ***REMOVED***
+type ProcessInformation struct {
 	Process   Handle
 	Thread    Handle
 	ProcessId uint32
 	ThreadId  uint32
-***REMOVED***
+}
 
-type ProcessEntry32 struct ***REMOVED***
+type ProcessEntry32 struct {
 	Size            uint32
 	Usage           uint32
 	ProcessID       uint32
@@ -487,9 +487,9 @@ type ProcessEntry32 struct ***REMOVED***
 	PriClassBase    int32
 	Flags           uint32
 	ExeFile         [MAX_PATH]uint16
-***REMOVED***
+}
 
-type Systemtime struct ***REMOVED***
+type Systemtime struct {
 	Year         uint16
 	Month        uint16
 	DayOfWeek    uint16
@@ -498,9 +498,9 @@ type Systemtime struct ***REMOVED***
 	Minute       uint16
 	Second       uint16
 	Milliseconds uint16
-***REMOVED***
+}
 
-type Timezoneinformation struct ***REMOVED***
+type Timezoneinformation struct {
 	Bias         int32
 	StandardName [32]uint16
 	StandardDate Systemtime
@@ -508,7 +508,7 @@ type Timezoneinformation struct ***REMOVED***
 	DaylightName [32]uint16
 	DaylightDate Systemtime
 	DaylightBias int32
-***REMOVED***
+}
 
 // Socket related.
 
@@ -579,10 +579,10 @@ const (
 	WSASYS_STATUS_LEN  = 128
 )
 
-type WSABuf struct ***REMOVED***
+type WSABuf struct {
 	Len uint32
 	Buf *byte
-***REMOVED***
+}
 
 // Invented values to support what package os expects.
 const (
@@ -611,19 +611,19 @@ const (
 	FILE_TYPE_UNKNOWN = 0x0000
 )
 
-type Hostent struct ***REMOVED***
+type Hostent struct {
 	Name     *byte
 	Aliases  **byte
 	AddrType uint16
 	Length   uint16
 	AddrList **byte
-***REMOVED***
+}
 
-type Protoent struct ***REMOVED***
+type Protoent struct {
 	Name    *byte
 	Aliases **byte
 	Proto   uint16
-***REMOVED***
+}
 
 const (
 	DNS_TYPE_A       = 0x0001
@@ -702,30 +702,30 @@ const (
 	DnsSectionAdditional = 0x0003
 )
 
-type DNSSRVData struct ***REMOVED***
+type DNSSRVData struct {
 	Target   *uint16
 	Priority uint16
 	Weight   uint16
 	Port     uint16
 	Pad      uint16
-***REMOVED***
+}
 
-type DNSPTRData struct ***REMOVED***
+type DNSPTRData struct {
 	Host *uint16
-***REMOVED***
+}
 
-type DNSMXData struct ***REMOVED***
+type DNSMXData struct {
 	NameExchange *uint16
 	Preference   uint16
 	Pad          uint16
-***REMOVED***
+}
 
-type DNSTXTData struct ***REMOVED***
+type DNSTXTData struct {
 	StringCount uint16
 	StringArray [1]*uint16
-***REMOVED***
+}
 
-type DNSRecord struct ***REMOVED***
+type DNSRecord struct {
 	Next     *DNSRecord
 	Name     *uint16
 	Type     uint16
@@ -734,7 +734,7 @@ type DNSRecord struct ***REMOVED***
 	Ttl      uint32
 	Reserved uint32
 	Data     [40]byte
-***REMOVED***
+}
 
 const (
 	TF_DISCONNECT         = 1
@@ -745,12 +745,12 @@ const (
 	TF_USE_KERNEL_APC     = 32
 )
 
-type TransmitFileBuffers struct ***REMOVED***
+type TransmitFileBuffers struct {
 	Head       uintptr
 	HeadLength uint32
 	Tail       uintptr
 	TailLength uint32
-***REMOVED***
+}
 
 const (
 	IFF_UP           = 1
@@ -767,31 +767,31 @@ const SIO_GET_INTERFACE_LIST = 0x4004747F
 
 type SockaddrGen [24]byte
 
-type InterfaceInfo struct ***REMOVED***
+type InterfaceInfo struct {
 	Flags            uint32
 	Address          SockaddrGen
 	BroadcastAddress SockaddrGen
 	Netmask          SockaddrGen
-***REMOVED***
+}
 
-type IpAddressString struct ***REMOVED***
+type IpAddressString struct {
 	String [16]byte
-***REMOVED***
+}
 
 type IpMaskString IpAddressString
 
-type IpAddrString struct ***REMOVED***
+type IpAddrString struct {
 	Next      *IpAddrString
 	IpAddress IpAddressString
 	IpMask    IpMaskString
 	Context   uint32
-***REMOVED***
+}
 
 const MAX_ADAPTER_NAME_LENGTH = 256
 const MAX_ADAPTER_DESCRIPTION_LENGTH = 128
 const MAX_ADAPTER_ADDRESS_LENGTH = 8
 
-type IpAdapterInfo struct ***REMOVED***
+type IpAdapterInfo struct {
 	Next                *IpAdapterInfo
 	ComboIndex          uint32
 	AdapterName         [MAX_ADAPTER_NAME_LENGTH + 4]byte
@@ -810,13 +810,13 @@ type IpAdapterInfo struct ***REMOVED***
 	SecondaryWinsServer IpAddrString
 	LeaseObtained       int64
 	LeaseExpires        int64
-***REMOVED***
+}
 
 const MAXLEN_PHYSADDR = 8
 const MAX_INTERFACE_NAME_LEN = 256
 const MAXLEN_IFDESCR = 256
 
-type MibIfRow struct ***REMOVED***
+type MibIfRow struct {
 	Name            [MAX_INTERFACE_NAME_LEN]uint16
 	Index           uint32
 	Type            uint32
@@ -841,17 +841,17 @@ type MibIfRow struct ***REMOVED***
 	OutQLen         uint32
 	DescrLen        uint32
 	Descr           [MAXLEN_IFDESCR]byte
-***REMOVED***
+}
 
-type CertContext struct ***REMOVED***
+type CertContext struct {
 	EncodingType uint32
 	EncodedCert  *byte
 	Length       uint32
 	CertInfo     uintptr
 	Store        Handle
-***REMOVED***
+}
 
-type CertChainContext struct ***REMOVED***
+type CertChainContext struct {
 	Size                       uint32
 	TrustStatus                CertTrustStatus
 	ChainCount                 uint32
@@ -860,9 +860,9 @@ type CertChainContext struct ***REMOVED***
 	LowerQualityChains         **CertChainContext
 	HasRevocationFreshnessTime uint32
 	RevocationFreshnessTime    uint32
-***REMOVED***
+}
 
-type CertSimpleChain struct ***REMOVED***
+type CertSimpleChain struct {
 	Size                       uint32
 	TrustStatus                CertTrustStatus
 	NumElements                uint32
@@ -870,9 +870,9 @@ type CertSimpleChain struct ***REMOVED***
 	TrustListInfo              uintptr
 	HasRevocationFreshnessTime uint32
 	RevocationFreshnessTime    uint32
-***REMOVED***
+}
 
-type CertChainElement struct ***REMOVED***
+type CertChainElement struct {
 	Size              uint32
 	CertContext       *CertContext
 	TrustStatus       CertTrustStatus
@@ -880,9 +880,9 @@ type CertChainElement struct ***REMOVED***
 	IssuanceUsage     *CertEnhKeyUsage
 	ApplicationUsage  *CertEnhKeyUsage
 	ExtendedErrorInfo *uint16
-***REMOVED***
+}
 
-type CertRevocationInfo struct ***REMOVED***
+type CertRevocationInfo struct {
 	Size             uint32
 	RevocationResult uint32
 	RevocationOid    *byte
@@ -890,24 +890,24 @@ type CertRevocationInfo struct ***REMOVED***
 	HasFreshnessTime uint32
 	FreshnessTime    uint32
 	CrlInfo          uintptr // *CertRevocationCrlInfo
-***REMOVED***
+}
 
-type CertTrustStatus struct ***REMOVED***
+type CertTrustStatus struct {
 	ErrorStatus uint32
 	InfoStatus  uint32
-***REMOVED***
+}
 
-type CertUsageMatch struct ***REMOVED***
+type CertUsageMatch struct {
 	Type  uint32
 	Usage CertEnhKeyUsage
-***REMOVED***
+}
 
-type CertEnhKeyUsage struct ***REMOVED***
+type CertEnhKeyUsage struct {
 	Length           uint32
 	UsageIdentifiers **byte
-***REMOVED***
+}
 
-type CertChainPara struct ***REMOVED***
+type CertChainPara struct {
 	Size                         uint32
 	RequestedUsage               CertUsageMatch
 	RequstedIssuancePolicy       CertUsageMatch
@@ -915,28 +915,28 @@ type CertChainPara struct ***REMOVED***
 	CheckRevocationFreshnessTime uint32
 	RevocationFreshnessTime      uint32
 	CacheResync                  *Filetime
-***REMOVED***
+}
 
-type CertChainPolicyPara struct ***REMOVED***
+type CertChainPolicyPara struct {
 	Size            uint32
 	Flags           uint32
 	ExtraPolicyPara uintptr
-***REMOVED***
+}
 
-type SSLExtraCertChainPolicyPara struct ***REMOVED***
+type SSLExtraCertChainPolicyPara struct {
 	Size       uint32
 	AuthType   uint32
 	Checks     uint32
 	ServerName *uint16
-***REMOVED***
+}
 
-type CertChainPolicyStatus struct ***REMOVED***
+type CertChainPolicyStatus struct {
 	Size              uint32
 	Error             uint32
 	ChainIndex        uint32
 	ElementIndex      uint32
 	ExtraPolicyStatus uintptr
-***REMOVED***
+}
 
 const (
 	// do not reorder
@@ -980,7 +980,7 @@ const (
 	REG_QWORD = REG_QWORD_LITTLE_ENDIAN
 )
 
-type AddrinfoW struct ***REMOVED***
+type AddrinfoW struct {
 	Flags     int32
 	Family    int32
 	Socktype  int32
@@ -989,7 +989,7 @@ type AddrinfoW struct ***REMOVED***
 	Canonname *uint16
 	Addr      uintptr
 	Next      *AddrinfoW
-***REMOVED***
+}
 
 const (
 	AI_PASSIVE     = 1
@@ -997,19 +997,19 @@ const (
 	AI_NUMERICHOST = 4
 )
 
-type GUID struct ***REMOVED***
+type GUID struct {
 	Data1 uint32
 	Data2 uint16
 	Data3 uint16
 	Data4 [8]byte
-***REMOVED***
+}
 
-var WSAID_CONNECTEX = GUID***REMOVED***
+var WSAID_CONNECTEX = GUID{
 	0x25a207b9,
 	0xddf3,
 	0x4660,
-	[8]byte***REMOVED***0x8e, 0xe9, 0x76, 0xe5, 0x8c, 0x74, 0x06, 0x3e***REMOVED***,
-***REMOVED***
+	[8]byte{0x8e, 0xe9, 0x76, 0xe5, 0x8c, 0x74, 0x06, 0x3e},
+}
 
 const (
 	FILE_SKIP_COMPLETION_PORT_ON_SUCCESS = 1
@@ -1049,7 +1049,7 @@ const (
 	PFL_NETWORKDIRECT_PROVIDER  = 0x00000010
 )
 
-type WSAProtocolInfo struct ***REMOVED***
+type WSAProtocolInfo struct {
 	ServiceFlags1     uint32
 	ServiceFlags2     uint32
 	ServiceFlags3     uint32
@@ -1070,44 +1070,44 @@ type WSAProtocolInfo struct ***REMOVED***
 	MessageSize       uint32
 	ProviderReserved  uint32
 	ProtocolName      [WSAPROTOCOL_LEN + 1]uint16
-***REMOVED***
+}
 
-type WSAProtocolChain struct ***REMOVED***
+type WSAProtocolChain struct {
 	ChainLen     int32
 	ChainEntries [MAX_PROTOCOL_CHAIN]uint32
-***REMOVED***
+}
 
-type TCPKeepalive struct ***REMOVED***
+type TCPKeepalive struct {
 	OnOff    uint32
 	Time     uint32
 	Interval uint32
-***REMOVED***
+}
 
-type symbolicLinkReparseBuffer struct ***REMOVED***
+type symbolicLinkReparseBuffer struct {
 	SubstituteNameOffset uint16
 	SubstituteNameLength uint16
 	PrintNameOffset      uint16
 	PrintNameLength      uint16
 	Flags                uint32
 	PathBuffer           [1]uint16
-***REMOVED***
+}
 
-type mountPointReparseBuffer struct ***REMOVED***
+type mountPointReparseBuffer struct {
 	SubstituteNameOffset uint16
 	SubstituteNameLength uint16
 	PrintNameOffset      uint16
 	PrintNameLength      uint16
 	PathBuffer           [1]uint16
-***REMOVED***
+}
 
-type reparseDataBuffer struct ***REMOVED***
+type reparseDataBuffer struct {
 	ReparseTag        uint32
 	ReparseDataLength uint16
 	Reserved          uint16
 
 	// GenericReparseBuffer
 	reparseBuffer byte
-***REMOVED***
+}
 
 const (
 	FSCTL_GET_REPARSE_POINT          = 0x900A8
@@ -1152,12 +1152,12 @@ const (
 	IF_TYPE_IEEE1394           = 144
 )
 
-type SocketAddress struct ***REMOVED***
+type SocketAddress struct {
 	Sockaddr       *syscall.RawSockaddrAny
 	SockaddrLength int32
-***REMOVED***
+}
 
-type IpAdapterUnicastAddress struct ***REMOVED***
+type IpAdapterUnicastAddress struct {
 	Length             uint32
 	Flags              uint32
 	Next               *IpAdapterUnicastAddress
@@ -1169,38 +1169,38 @@ type IpAdapterUnicastAddress struct ***REMOVED***
 	PreferredLifetime  uint32
 	LeaseLifetime      uint32
 	OnLinkPrefixLength uint8
-***REMOVED***
+}
 
-type IpAdapterAnycastAddress struct ***REMOVED***
+type IpAdapterAnycastAddress struct {
 	Length  uint32
 	Flags   uint32
 	Next    *IpAdapterAnycastAddress
 	Address SocketAddress
-***REMOVED***
+}
 
-type IpAdapterMulticastAddress struct ***REMOVED***
+type IpAdapterMulticastAddress struct {
 	Length  uint32
 	Flags   uint32
 	Next    *IpAdapterMulticastAddress
 	Address SocketAddress
-***REMOVED***
+}
 
-type IpAdapterDnsServerAdapter struct ***REMOVED***
+type IpAdapterDnsServerAdapter struct {
 	Length   uint32
 	Reserved uint32
 	Next     *IpAdapterDnsServerAdapter
 	Address  SocketAddress
-***REMOVED***
+}
 
-type IpAdapterPrefix struct ***REMOVED***
+type IpAdapterPrefix struct {
 	Length       uint32
 	Flags        uint32
 	Next         *IpAdapterPrefix
 	Address      SocketAddress
 	PrefixLength uint32
-***REMOVED***
+}
 
-type IpAdapterAddresses struct ***REMOVED***
+type IpAdapterAddresses struct {
 	Length                uint32
 	IfIndex               uint32
 	Next                  *IpAdapterAddresses
@@ -1222,7 +1222,7 @@ type IpAdapterAddresses struct ***REMOVED***
 	ZoneIndices           [16]uint32
 	FirstPrefix           *IpAdapterPrefix
 	/* more fields might be present here. */
-***REMOVED***
+}
 
 const (
 	IfOperStatusUp             = 1
@@ -1256,27 +1256,27 @@ const (
 	ENABLE_LVB_GRID_WORLDWIDE          = 0x10
 )
 
-type Coord struct ***REMOVED***
+type Coord struct {
 	X int16
 	Y int16
-***REMOVED***
+}
 
-type SmallRect struct ***REMOVED***
+type SmallRect struct {
 	Left   int16
 	Top    int16
 	Right  int16
 	Bottom int16
-***REMOVED***
+}
 
 // Used with GetConsoleScreenBuffer to retreive information about a console
 // screen buffer. See
 // https://docs.microsoft.com/en-us/windows/console/console-screen-buffer-info-str
 // for details.
 
-type ConsoleScreenBufferInfo struct ***REMOVED***
+type ConsoleScreenBufferInfo struct {
 	Size              Coord
 	CursorPosition    Coord
 	Attributes        uint16
 	Window            SmallRect
 	MaximumWindowSize Coord
-***REMOVED***
+}

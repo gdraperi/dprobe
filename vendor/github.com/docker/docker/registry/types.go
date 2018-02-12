@@ -6,26 +6,26 @@ import (
 )
 
 // RepositoryData tracks the image list, list of endpoints for a repository
-type RepositoryData struct ***REMOVED***
+type RepositoryData struct {
 	// ImgList is a list of images in the repository
 	ImgList map[string]*ImgData
 	// Endpoints is a list of endpoints returned in X-Docker-Endpoints
 	Endpoints []string
-***REMOVED***
+}
 
 // ImgData is used to transfer image checksums to and from the registry
-type ImgData struct ***REMOVED***
+type ImgData struct {
 	// ID is an opaque string that identifies the image
 	ID              string `json:"id"`
 	Checksum        string `json:"checksum,omitempty"`
 	ChecksumPayload string `json:"-"`
 	Tag             string `json:",omitempty"`
-***REMOVED***
+}
 
 // PingResult contains the information returned when pinging a registry. It
 // indicates the registry's version and whether the registry claims to be a
 // standalone registry.
-type PingResult struct ***REMOVED***
+type PingResult struct {
 	// Version is the registry version supplied by the registry in an HTTP
 	// header
 	Version string `json:"version"`
@@ -33,15 +33,15 @@ type PingResult struct ***REMOVED***
 	// standalone registry in the X-Docker-Registry-Standalone
 	// header
 	Standalone bool `json:"standalone"`
-***REMOVED***
+}
 
 // APIVersion is an integral representation of an API version (presently
 // either 1 or 2)
 type APIVersion int
 
-func (av APIVersion) String() string ***REMOVED***
+func (av APIVersion) String() string {
 	return apiVersions[av]
-***REMOVED***
+}
 
 // API Version identifiers.
 const (
@@ -50,13 +50,13 @@ const (
 	APIVersion2
 )
 
-var apiVersions = map[APIVersion]string***REMOVED***
+var apiVersions = map[APIVersion]string{
 	APIVersion1: "v1",
 	APIVersion2: "v2",
-***REMOVED***
+}
 
 // RepositoryInfo describes a repository
-type RepositoryInfo struct ***REMOVED***
+type RepositoryInfo struct {
 	Name reference.Named
 	// Index points to registry information
 	Index *registrytypes.IndexInfo
@@ -67,4 +67,4 @@ type RepositoryInfo struct ***REMOVED***
 	// Class represents the class of the repository, such as "plugin"
 	// or "image".
 	Class string
-***REMOVED***
+}

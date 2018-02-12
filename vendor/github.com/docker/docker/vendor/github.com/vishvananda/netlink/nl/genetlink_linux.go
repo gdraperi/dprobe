@@ -71,19 +71,19 @@ const (
 	GENL_GTP_ATTR_PAD
 )
 
-type Genlmsg struct ***REMOVED***
+type Genlmsg struct {
 	Command uint8
 	Version uint8
-***REMOVED***
+}
 
-func (msg *Genlmsg) Len() int ***REMOVED***
+func (msg *Genlmsg) Len() int {
 	return SizeofGenlmsg
-***REMOVED***
+}
 
-func DeserializeGenlmsg(b []byte) *Genlmsg ***REMOVED***
+func DeserializeGenlmsg(b []byte) *Genlmsg {
 	return (*Genlmsg)(unsafe.Pointer(&b[0:SizeofGenlmsg][0]))
-***REMOVED***
+}
 
-func (msg *Genlmsg) Serialize() []byte ***REMOVED***
+func (msg *Genlmsg) Serialize() []byte {
 	return (*(*[SizeofGenlmsg]byte)(unsafe.Pointer(msg)))[:]
-***REMOVED***
+}

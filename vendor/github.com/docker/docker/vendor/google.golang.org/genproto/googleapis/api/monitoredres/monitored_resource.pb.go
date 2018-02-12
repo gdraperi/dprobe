@@ -39,13 +39,13 @@ const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 // Different APIs can support different monitored resource types. APIs generally
 // provide a `list` method that returns the monitored resource descriptors used
 // by the API.
-type MonitoredResourceDescriptor struct ***REMOVED***
+type MonitoredResourceDescriptor struct {
 	// Optional. The resource name of the monitored resource descriptor:
-	// `"projects/***REMOVED***project_id***REMOVED***/monitoredResourceDescriptors/***REMOVED***type***REMOVED***"` where
-	// ***REMOVED***type***REMOVED*** is the value of the `type` field in this object and
-	// ***REMOVED***project_id***REMOVED*** is a project ID that provides API-specific context for
+	// `"projects/{project_id}/monitoredResourceDescriptors/{type}"` where
+	// {type} is the value of the `type` field in this object and
+	// {project_id} is a project ID that provides API-specific context for
 	// accessing the type.  APIs that do not use project information can use the
-	// resource name format `"monitoredResourceDescriptors/***REMOVED***type***REMOVED***"`.
+	// resource name format `"monitoredResourceDescriptors/{type}"`.
 	Name string `protobuf:"bytes,5,opt,name=name" json:"name,omitempty"`
 	// Required. The monitored resource type. For example, the type
 	// `"cloudsql_database"` represents databases in Google Cloud SQL.
@@ -63,47 +63,47 @@ type MonitoredResourceDescriptor struct ***REMOVED***
 	// resource type. For example, an individual Google Cloud SQL database is
 	// identified by values for the labels `"database_id"` and `"zone"`.
 	Labels []*google_api.LabelDescriptor `protobuf:"bytes,4,rep,name=labels" json:"labels,omitempty"`
-***REMOVED***
+}
 
-func (m *MonitoredResourceDescriptor) Reset()                    ***REMOVED*** *m = MonitoredResourceDescriptor***REMOVED******REMOVED*** ***REMOVED***
-func (m *MonitoredResourceDescriptor) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*MonitoredResourceDescriptor) ProtoMessage()               ***REMOVED******REMOVED***
-func (*MonitoredResourceDescriptor) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***0***REMOVED*** ***REMOVED***
+func (m *MonitoredResourceDescriptor) Reset()                    { *m = MonitoredResourceDescriptor{} }
+func (m *MonitoredResourceDescriptor) String() string            { return proto.CompactTextString(m) }
+func (*MonitoredResourceDescriptor) ProtoMessage()               {}
+func (*MonitoredResourceDescriptor) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
-func (m *MonitoredResourceDescriptor) GetName() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *MonitoredResourceDescriptor) GetName() string {
+	if m != nil {
 		return m.Name
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *MonitoredResourceDescriptor) GetType() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *MonitoredResourceDescriptor) GetType() string {
+	if m != nil {
 		return m.Type
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *MonitoredResourceDescriptor) GetDisplayName() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *MonitoredResourceDescriptor) GetDisplayName() string {
+	if m != nil {
 		return m.DisplayName
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *MonitoredResourceDescriptor) GetDescription() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *MonitoredResourceDescriptor) GetDescription() string {
+	if m != nil {
 		return m.Description
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *MonitoredResourceDescriptor) GetLabels() []*google_api.LabelDescriptor ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *MonitoredResourceDescriptor) GetLabels() []*google_api.LabelDescriptor {
+	if m != nil {
 		return m.Labels
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // An object representing a resource that can be used for monitoring, logging,
 // billing, or other purposes. Examples include virtual machine instances,
@@ -115,10 +115,10 @@ func (m *MonitoredResourceDescriptor) GetLabels() []*google_api.LabelDescriptor 
 // [MonitoredResourceDescriptor][google.api.MonitoredResourceDescriptor] for `"gce_instance"` has labels
 // `"instance_id"` and `"zone"`:
 //
-//     ***REMOVED*** "type": "gce_instance",
-//       "labels": ***REMOVED*** "instance_id": "12345678901234",
-//                   "zone": "us-central1-a" ***REMOVED******REMOVED***
-type MonitoredResource struct ***REMOVED***
+//     { "type": "gce_instance",
+//       "labels": { "instance_id": "12345678901234",
+//                   "zone": "us-central1-a" }}
+type MonitoredResource struct {
 	// Required. The monitored resource type. This field must match
 	// the `type` field of a [MonitoredResourceDescriptor][google.api.MonitoredResourceDescriptor] object. For
 	// example, the type of a Cloud SQL database is `"cloudsql_database"`.
@@ -127,35 +127,35 @@ type MonitoredResource struct ***REMOVED***
 	// resource descriptor. For example, Cloud SQL databases use the labels
 	// `"database_id"` and `"zone"`.
 	Labels map[string]string `protobuf:"bytes,2,rep,name=labels" json:"labels,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-***REMOVED***
+}
 
-func (m *MonitoredResource) Reset()                    ***REMOVED*** *m = MonitoredResource***REMOVED******REMOVED*** ***REMOVED***
-func (m *MonitoredResource) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*MonitoredResource) ProtoMessage()               ***REMOVED******REMOVED***
-func (*MonitoredResource) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***1***REMOVED*** ***REMOVED***
+func (m *MonitoredResource) Reset()                    { *m = MonitoredResource{} }
+func (m *MonitoredResource) String() string            { return proto.CompactTextString(m) }
+func (*MonitoredResource) ProtoMessage()               {}
+func (*MonitoredResource) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
 
-func (m *MonitoredResource) GetType() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *MonitoredResource) GetType() string {
+	if m != nil {
 		return m.Type
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *MonitoredResource) GetLabels() map[string]string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *MonitoredResource) GetLabels() map[string]string {
+	if m != nil {
 		return m.Labels
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*MonitoredResourceDescriptor)(nil), "google.api.MonitoredResourceDescriptor")
 	proto.RegisterType((*MonitoredResource)(nil), "google.api.MonitoredResource")
-***REMOVED***
+}
 
-func init() ***REMOVED*** proto.RegisterFile("google/api/monitored_resource.proto", fileDescriptor0) ***REMOVED***
+func init() { proto.RegisterFile("google/api/monitored_resource.proto", fileDescriptor0) }
 
-var fileDescriptor0 = []byte***REMOVED***
+var fileDescriptor0 = []byte{
 	// 321 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x6c, 0x51, 0x4b, 0x4b, 0x3b, 0x31,
 	0x10, 0x27, 0xdb, 0x07, 0xfc, 0x67, 0xff, 0x88, 0x06, 0x29, 0x4b, 0x7b, 0xa9, 0xf5, 0x52, 0x2f,
@@ -178,4 +178,4 @@ var fileDescriptor0 = []byte***REMOVED***
 	0x7d, 0x7d, 0xcd, 0xcd, 0x75, 0xfd, 0xf1, 0x45, 0xc8, 0x7b, 0xd4, 0xbc, 0x1f, 0x4f, 0x1f, 0x16,
 	0x6d, 0xa7, 0x1c, 0x7d, 0x07, 0x00, 0x00, 0xff, 0xff, 0xf8, 0xfb, 0xfb, 0x11, 0x36, 0x02, 0x00,
 	0x00,
-***REMOVED***
+}

@@ -15,8 +15,8 @@ import (
 	"github.com/pelletier/go-toml"
 )
 
-func main() ***REMOVED***
-	flag.Usage = func() ***REMOVED***
+func main() {
+	flag.Usage = func() {
 		fmt.Fprintln(os.Stderr, `tomljson can be used in two ways:
 Writing to STDIN and reading from STDOUT:
   cat file.toml | tomljson > file.json
@@ -24,49 +24,49 @@ Writing to STDIN and reading from STDOUT:
 Reading from a file name:
   tomljson file.toml
 `)
-	***REMOVED***
+	}
 	flag.Parse()
 	os.Exit(processMain(flag.Args(), os.Stdin, os.Stdout, os.Stderr))
-***REMOVED***
+}
 
-func processMain(files []string, defaultInput io.Reader, output io.Writer, errorOutput io.Writer) int ***REMOVED***
+func processMain(files []string, defaultInput io.Reader, output io.Writer, errorOutput io.Writer) int {
 	// read from stdin and print to stdout
 	inputReader := defaultInput
 
-	if len(files) > 0 ***REMOVED***
+	if len(files) > 0 {
 		var err error
 		inputReader, err = os.Open(files[0])
-		if err != nil ***REMOVED***
+		if err != nil {
 			printError(err, errorOutput)
 			return -1
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	s, err := reader(inputReader)
-	if err != nil ***REMOVED***
+	if err != nil {
 		printError(err, errorOutput)
 		return -1
-	***REMOVED***
+	}
 	io.WriteString(output, s+"\n")
 	return 0
-***REMOVED***
+}
 
-func printError(err error, output io.Writer) ***REMOVED***
+func printError(err error, output io.Writer) {
 	io.WriteString(output, err.Error()+"\n")
-***REMOVED***
+}
 
-func reader(r io.Reader) (string, error) ***REMOVED***
+func reader(r io.Reader) (string, error) {
 	tree, err := toml.LoadReader(r)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	return mapToJSON(tree)
-***REMOVED***
+}
 
-func mapToJSON(tree *toml.Tree) (string, error) ***REMOVED***
+func mapToJSON(tree *toml.Tree) (string, error) {
 	treeMap := tree.ToMap()
 	bytes, err := json.MarshalIndent(treeMap, "", "  ")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	return string(bytes[:]), nil
-***REMOVED***
+}

@@ -8,8 +8,8 @@ package capability
 
 type CapType uint
 
-func (c CapType) String() string ***REMOVED***
-	switch c ***REMOVED***
+func (c CapType) String() string {
+	switch c {
 	case EFFECTIVE:
 		return "effective"
 	case PERMITTED:
@@ -20,9 +20,9 @@ func (c CapType) String() string ***REMOVED***
 		return "bounding"
 	case CAPS:
 		return "caps"
-	***REMOVED***
+	}
 	return "unknown"
-***REMOVED***
+}
 
 const (
 	EFFECTIVE CapType = 1 << iota

@@ -41,160 +41,160 @@ const (
 
 // containerConfig converts task properties into docker container compatible
 // components.
-type containerConfig struct ***REMOVED***
+type containerConfig struct {
 	task                *api.Task
 	networksAttachments map[string]*api.NetworkAttachment
-***REMOVED***
+}
 
 // newContainerConfig returns a validated container config. No methods should
 // return an error if this function returns without error.
-func newContainerConfig(t *api.Task, node *api.NodeDescription) (*containerConfig, error) ***REMOVED***
+func newContainerConfig(t *api.Task, node *api.NodeDescription) (*containerConfig, error) {
 	var c containerConfig
 	return &c, c.setTask(t, node)
-***REMOVED***
+}
 
-func (c *containerConfig) setTask(t *api.Task, node *api.NodeDescription) error ***REMOVED***
-	if t.Spec.GetContainer() == nil && t.Spec.GetAttachment() == nil ***REMOVED***
+func (c *containerConfig) setTask(t *api.Task, node *api.NodeDescription) error {
+	if t.Spec.GetContainer() == nil && t.Spec.GetAttachment() == nil {
 		return exec.ErrRuntimeUnsupported
-	***REMOVED***
+	}
 
 	container := t.Spec.GetContainer()
-	if container != nil ***REMOVED***
-		if container.Image == "" ***REMOVED***
+	if container != nil {
+		if container.Image == "" {
 			return ErrImageRequired
-		***REMOVED***
+		}
 
-		if err := validateMounts(container.Mounts); err != nil ***REMOVED***
+		if err := validateMounts(container.Mounts); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// index the networks by name
 	c.networksAttachments = make(map[string]*api.NetworkAttachment, len(t.Networks))
-	for _, attachment := range t.Networks ***REMOVED***
+	for _, attachment := range t.Networks {
 		c.networksAttachments[attachment.Network.Spec.Annotations.Name] = attachment
-	***REMOVED***
+	}
 
 	c.task = t
 
-	if t.Spec.GetContainer() != nil ***REMOVED***
+	if t.Spec.GetContainer() != nil {
 		preparedSpec, err := template.ExpandContainerSpec(node, t)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-		c.task.Spec.Runtime = &api.TaskSpec_Container***REMOVED***
+		}
+		c.task.Spec.Runtime = &api.TaskSpec_Container{
 			Container: preparedSpec,
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (c *containerConfig) networkAttachmentContainerID() string ***REMOVED***
+func (c *containerConfig) networkAttachmentContainerID() string {
 	attachment := c.task.Spec.GetAttachment()
-	if attachment == nil ***REMOVED***
+	if attachment == nil {
 		return ""
-	***REMOVED***
+	}
 
 	return attachment.ContainerID
-***REMOVED***
+}
 
-func (c *containerConfig) taskID() string ***REMOVED***
+func (c *containerConfig) taskID() string {
 	return c.task.ID
-***REMOVED***
+}
 
-func (c *containerConfig) endpoint() *api.Endpoint ***REMOVED***
+func (c *containerConfig) endpoint() *api.Endpoint {
 	return c.task.Endpoint
-***REMOVED***
+}
 
-func (c *containerConfig) spec() *api.ContainerSpec ***REMOVED***
+func (c *containerConfig) spec() *api.ContainerSpec {
 	return c.task.Spec.GetContainer()
-***REMOVED***
+}
 
-func (c *containerConfig) nameOrID() string ***REMOVED***
-	if c.task.Spec.GetContainer() != nil ***REMOVED***
+func (c *containerConfig) nameOrID() string {
+	if c.task.Spec.GetContainer() != nil {
 		return c.name()
-	***REMOVED***
+	}
 
 	return c.networkAttachmentContainerID()
-***REMOVED***
+}
 
-func (c *containerConfig) name() string ***REMOVED***
-	if c.task.Annotations.Name != "" ***REMOVED***
+func (c *containerConfig) name() string {
+	if c.task.Annotations.Name != "" {
 		// if set, use the container Annotations.Name field, set in the orchestrator.
 		return c.task.Annotations.Name
-	***REMOVED***
+	}
 
 	slot := fmt.Sprint(c.task.Slot)
-	if slot == "" || c.task.Slot == 0 ***REMOVED***
+	if slot == "" || c.task.Slot == 0 {
 		slot = c.task.NodeID
-	***REMOVED***
+	}
 
 	// fallback to service.slot.id.
 	return fmt.Sprintf("%s.%s.%s", c.task.ServiceAnnotations.Name, slot, c.task.ID)
-***REMOVED***
+}
 
-func (c *containerConfig) image() string ***REMOVED***
+func (c *containerConfig) image() string {
 	raw := c.spec().Image
 	ref, err := reference.ParseNormalizedNamed(raw)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return raw
-	***REMOVED***
+	}
 	return reference.FamiliarString(reference.TagNameOnly(ref))
-***REMOVED***
+}
 
-func (c *containerConfig) portBindings() nat.PortMap ***REMOVED***
-	portBindings := nat.PortMap***REMOVED******REMOVED***
-	if c.task.Endpoint == nil ***REMOVED***
+func (c *containerConfig) portBindings() nat.PortMap {
+	portBindings := nat.PortMap{}
+	if c.task.Endpoint == nil {
 		return portBindings
-	***REMOVED***
+	}
 
-	for _, portConfig := range c.task.Endpoint.Ports ***REMOVED***
-		if portConfig.PublishMode != api.PublishModeHost ***REMOVED***
+	for _, portConfig := range c.task.Endpoint.Ports {
+		if portConfig.PublishMode != api.PublishModeHost {
 			continue
-		***REMOVED***
+		}
 
 		port := nat.Port(fmt.Sprintf("%d/%s", portConfig.TargetPort, strings.ToLower(portConfig.Protocol.String())))
-		binding := []nat.PortBinding***REMOVED***
-			***REMOVED******REMOVED***,
-		***REMOVED***
+		binding := []nat.PortBinding{
+			{},
+		}
 
-		if portConfig.PublishedPort != 0 ***REMOVED***
+		if portConfig.PublishedPort != 0 {
 			binding[0].HostPort = strconv.Itoa(int(portConfig.PublishedPort))
-		***REMOVED***
+		}
 		portBindings[port] = binding
-	***REMOVED***
+	}
 
 	return portBindings
-***REMOVED***
+}
 
-func (c *containerConfig) isolation() enginecontainer.Isolation ***REMOVED***
+func (c *containerConfig) isolation() enginecontainer.Isolation {
 	return convert.IsolationFromGRPC(c.spec().Isolation)
-***REMOVED***
+}
 
-func (c *containerConfig) exposedPorts() map[nat.Port]struct***REMOVED******REMOVED*** ***REMOVED***
-	exposedPorts := make(map[nat.Port]struct***REMOVED******REMOVED***)
-	if c.task.Endpoint == nil ***REMOVED***
+func (c *containerConfig) exposedPorts() map[nat.Port]struct{} {
+	exposedPorts := make(map[nat.Port]struct{})
+	if c.task.Endpoint == nil {
 		return exposedPorts
-	***REMOVED***
+	}
 
-	for _, portConfig := range c.task.Endpoint.Ports ***REMOVED***
-		if portConfig.PublishMode != api.PublishModeHost ***REMOVED***
+	for _, portConfig := range c.task.Endpoint.Ports {
+		if portConfig.PublishMode != api.PublishModeHost {
 			continue
-		***REMOVED***
+		}
 
 		port := nat.Port(fmt.Sprintf("%d/%s", portConfig.TargetPort, strings.ToLower(portConfig.Protocol.String())))
-		exposedPorts[port] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	***REMOVED***
+		exposedPorts[port] = struct{}{}
+	}
 
 	return exposedPorts
-***REMOVED***
+}
 
-func (c *containerConfig) config() *enginecontainer.Config ***REMOVED***
+func (c *containerConfig) config() *enginecontainer.Config {
 	genericEnvs := genericresource.EnvFormat(c.task.AssignedGenericResources, "DOCKER_RESOURCE")
 	env := append(c.spec().Env, genericEnvs...)
 
-	config := &enginecontainer.Config***REMOVED***
+	config := &enginecontainer.Config{
 		Labels:       c.labels(),
 		StopSignal:   c.spec().StopSignal,
 		Tty:          c.spec().TTY,
@@ -206,82 +206,82 @@ func (c *containerConfig) config() *enginecontainer.Config ***REMOVED***
 		Image:        c.image(),
 		ExposedPorts: c.exposedPorts(),
 		Healthcheck:  c.healthcheck(),
-	***REMOVED***
+	}
 
-	if len(c.spec().Command) > 0 ***REMOVED***
+	if len(c.spec().Command) > 0 {
 		// If Command is provided, we replace the whole invocation with Command
 		// by replacing Entrypoint and specifying Cmd. Args is ignored in this
 		// case.
 		config.Entrypoint = append(config.Entrypoint, c.spec().Command...)
 		config.Cmd = append(config.Cmd, c.spec().Args...)
-	***REMOVED*** else if len(c.spec().Args) > 0 ***REMOVED***
+	} else if len(c.spec().Args) > 0 {
 		// In this case, we assume the image has an Entrypoint and Args
 		// specifies the arguments for that entrypoint.
 		config.Cmd = c.spec().Args
-	***REMOVED***
+	}
 
 	return config
-***REMOVED***
+}
 
-func (c *containerConfig) labels() map[string]string ***REMOVED***
+func (c *containerConfig) labels() map[string]string {
 	var (
-		system = map[string]string***REMOVED***
+		system = map[string]string{
 			"task":         "", // mark as cluster task
 			"task.id":      c.task.ID,
 			"task.name":    c.name(),
 			"node.id":      c.task.NodeID,
 			"service.id":   c.task.ServiceID,
 			"service.name": c.task.ServiceAnnotations.Name,
-		***REMOVED***
+		}
 		labels = make(map[string]string)
 	)
 
 	// base labels are those defined in the spec.
-	for k, v := range c.spec().Labels ***REMOVED***
+	for k, v := range c.spec().Labels {
 		labels[k] = v
-	***REMOVED***
+	}
 
 	// we then apply the overrides from the task, which may be set via the
 	// orchestrator.
-	for k, v := range c.task.Annotations.Labels ***REMOVED***
+	for k, v := range c.task.Annotations.Labels {
 		labels[k] = v
-	***REMOVED***
+	}
 
 	// finally, we apply the system labels, which override all labels.
-	for k, v := range system ***REMOVED***
-		labels[strings.Join([]string***REMOVED***systemLabelPrefix, k***REMOVED***, ".")] = v
-	***REMOVED***
+	for k, v := range system {
+		labels[strings.Join([]string{systemLabelPrefix, k}, ".")] = v
+	}
 
 	return labels
-***REMOVED***
+}
 
-func (c *containerConfig) mounts() []enginemount.Mount ***REMOVED***
+func (c *containerConfig) mounts() []enginemount.Mount {
 	var r []enginemount.Mount
-	for _, mount := range c.spec().Mounts ***REMOVED***
+	for _, mount := range c.spec().Mounts {
 		r = append(r, convertMount(mount))
-	***REMOVED***
+	}
 	return r
-***REMOVED***
+}
 
-func convertMount(m api.Mount) enginemount.Mount ***REMOVED***
-	mount := enginemount.Mount***REMOVED***
+func convertMount(m api.Mount) enginemount.Mount {
+	mount := enginemount.Mount{
 		Source:   m.Source,
 		Target:   m.Target,
 		ReadOnly: m.ReadOnly,
-	***REMOVED***
+	}
 
-	switch m.Type ***REMOVED***
+	switch m.Type {
 	case api.MountTypeBind:
 		mount.Type = enginemount.TypeBind
 	case api.MountTypeVolume:
 		mount.Type = enginemount.TypeVolume
 	case api.MountTypeTmpfs:
 		mount.Type = enginemount.TypeTmpfs
-	***REMOVED***
+	}
 
-	if m.BindOptions != nil ***REMOVED***
-		mount.BindOptions = &enginemount.BindOptions***REMOVED******REMOVED***
-		switch m.BindOptions.Propagation ***REMOVED***
+	if m.BindOptions != nil {
+		mount.BindOptions = &enginemount.BindOptions{}
+		switch m.BindOptions.Propagation {
 		case api.MountPropagationRPrivate:
 			mount.BindOptions.Propagation = enginemount.PropagationRPrivate
 		case api.MountPropagationPrivate:
@@ -294,74 +294,74 @@ func convertMount(m api.Mount) enginemount.Mount ***REMOVED***
 			mount.BindOptions.Propagation = enginemount.PropagationRShared
 		case api.MountPropagationShared:
 			mount.BindOptions.Propagation = enginemount.PropagationShared
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if m.VolumeOptions != nil ***REMOVED***
-		mount.VolumeOptions = &enginemount.VolumeOptions***REMOVED***
+	if m.VolumeOptions != nil {
+		mount.VolumeOptions = &enginemount.VolumeOptions{
 			NoCopy: m.VolumeOptions.NoCopy,
-		***REMOVED***
-		if m.VolumeOptions.Labels != nil ***REMOVED***
+		}
+		if m.VolumeOptions.Labels != nil {
 			mount.VolumeOptions.Labels = make(map[string]string, len(m.VolumeOptions.Labels))
-			for k, v := range m.VolumeOptions.Labels ***REMOVED***
+			for k, v := range m.VolumeOptions.Labels {
 				mount.VolumeOptions.Labels[k] = v
-			***REMOVED***
-		***REMOVED***
-		if m.VolumeOptions.DriverConfig != nil ***REMOVED***
-			mount.VolumeOptions.DriverConfig = &enginemount.Driver***REMOVED***
+			}
+		}
+		if m.VolumeOptions.DriverConfig != nil {
+			mount.VolumeOptions.DriverConfig = &enginemount.Driver{
 				Name: m.VolumeOptions.DriverConfig.Name,
-			***REMOVED***
-			if m.VolumeOptions.DriverConfig.Options != nil ***REMOVED***
+			}
+			if m.VolumeOptions.DriverConfig.Options != nil {
 				mount.VolumeOptions.DriverConfig.Options = make(map[string]string, len(m.VolumeOptions.DriverConfig.Options))
-				for k, v := range m.VolumeOptions.DriverConfig.Options ***REMOVED***
+				for k, v := range m.VolumeOptions.DriverConfig.Options {
 					mount.VolumeOptions.DriverConfig.Options[k] = v
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+				}
+			}
+		}
+	}
 
-	if m.TmpfsOptions != nil ***REMOVED***
-		mount.TmpfsOptions = &enginemount.TmpfsOptions***REMOVED***
+	if m.TmpfsOptions != nil {
+		mount.TmpfsOptions = &enginemount.TmpfsOptions{
 			SizeBytes: m.TmpfsOptions.SizeBytes,
 			Mode:      m.TmpfsOptions.Mode,
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return mount
-***REMOVED***
+}
 
-func (c *containerConfig) healthcheck() *enginecontainer.HealthConfig ***REMOVED***
+func (c *containerConfig) healthcheck() *enginecontainer.HealthConfig {
 	hcSpec := c.spec().Healthcheck
-	if hcSpec == nil ***REMOVED***
+	if hcSpec == nil {
 		return nil
-	***REMOVED***
+	}
 	interval, _ := gogotypes.DurationFromProto(hcSpec.Interval)
 	timeout, _ := gogotypes.DurationFromProto(hcSpec.Timeout)
 	startPeriod, _ := gogotypes.DurationFromProto(hcSpec.StartPeriod)
-	return &enginecontainer.HealthConfig***REMOVED***
+	return &enginecontainer.HealthConfig{
 		Test:        hcSpec.Test,
 		Interval:    interval,
 		Timeout:     timeout,
 		Retries:     int(hcSpec.Retries),
 		StartPeriod: startPeriod,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (c *containerConfig) hostConfig() *enginecontainer.HostConfig ***REMOVED***
-	hc := &enginecontainer.HostConfig***REMOVED***
+func (c *containerConfig) hostConfig() *enginecontainer.HostConfig {
+	hc := &enginecontainer.HostConfig{
 		Resources:      c.resources(),
 		GroupAdd:       c.spec().Groups,
 		PortBindings:   c.portBindings(),
 		Mounts:         c.mounts(),
 		ReadonlyRootfs: c.spec().ReadOnly,
 		Isolation:      c.isolation(),
-	***REMOVED***
+	}
 
-	if c.spec().DNSConfig != nil ***REMOVED***
+	if c.spec().DNSConfig != nil {
 		hc.DNS = c.spec().DNSConfig.Nameservers
 		hc.DNSSearch = c.spec().DNSConfig.Search
 		hc.DNSOptions = c.spec().DNSConfig.Options
-	***REMOVED***
+	}
 
 	c.applyPrivileges(hc)
 
@@ -372,216 +372,216 @@ func (c *containerConfig) hostConfig() *enginecontainer.HostConfig ***REMOVED***
 	//    <host>:<ip>
 	// We need to do the conversion here
 	// (Alias is ignored for now)
-	for _, entry := range c.spec().Hosts ***REMOVED***
+	for _, entry := range c.spec().Hosts {
 		parts := strings.Fields(entry)
-		if len(parts) > 1 ***REMOVED***
+		if len(parts) > 1 {
 			hc.ExtraHosts = append(hc.ExtraHosts, fmt.Sprintf("%s:%s", parts[1], parts[0]))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if c.task.LogDriver != nil ***REMOVED***
-		hc.LogConfig = enginecontainer.LogConfig***REMOVED***
+	if c.task.LogDriver != nil {
+		hc.LogConfig = enginecontainer.LogConfig{
 			Type:   c.task.LogDriver.Name,
 			Config: c.task.LogDriver.Options,
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if len(c.task.Networks) > 0 ***REMOVED***
+	if len(c.task.Networks) > 0 {
 		labels := c.task.Networks[0].Network.Spec.Annotations.Labels
 		name := c.task.Networks[0].Network.Spec.Annotations.Name
-		if v, ok := labels["com.docker.swarm.predefined"]; ok && v == "true" ***REMOVED***
+		if v, ok := labels["com.docker.swarm.predefined"]; ok && v == "true" {
 			hc.NetworkMode = enginecontainer.NetworkMode(name)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return hc
-***REMOVED***
+}
 
 // This handles the case of volumes that are defined inside a service Mount
-func (c *containerConfig) volumeCreateRequest(mount *api.Mount) *volumetypes.VolumesCreateBody ***REMOVED***
+func (c *containerConfig) volumeCreateRequest(mount *api.Mount) *volumetypes.VolumesCreateBody {
 	var (
 		driverName string
 		driverOpts map[string]string
 		labels     map[string]string
 	)
 
-	if mount.VolumeOptions != nil && mount.VolumeOptions.DriverConfig != nil ***REMOVED***
+	if mount.VolumeOptions != nil && mount.VolumeOptions.DriverConfig != nil {
 		driverName = mount.VolumeOptions.DriverConfig.Name
 		driverOpts = mount.VolumeOptions.DriverConfig.Options
 		labels = mount.VolumeOptions.Labels
-	***REMOVED***
+	}
 
-	if mount.VolumeOptions != nil ***REMOVED***
-		return &volumetypes.VolumesCreateBody***REMOVED***
+	if mount.VolumeOptions != nil {
+		return &volumetypes.VolumesCreateBody{
 			Name:       mount.Source,
 			Driver:     driverName,
 			DriverOpts: driverOpts,
 			Labels:     labels,
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func (c *containerConfig) resources() enginecontainer.Resources ***REMOVED***
-	resources := enginecontainer.Resources***REMOVED******REMOVED***
+func (c *containerConfig) resources() enginecontainer.Resources {
+	resources := enginecontainer.Resources{}
 
 	// If no limits are specified let the engine use its defaults.
 	//
 	// TODO(aluzzardi): We might want to set some limits anyway otherwise
 	// "unlimited" tasks will step over the reservation of other tasks.
 	r := c.task.Spec.Resources
-	if r == nil || r.Limits == nil ***REMOVED***
+	if r == nil || r.Limits == nil {
 		return resources
-	***REMOVED***
+	}
 
-	if r.Limits.MemoryBytes > 0 ***REMOVED***
+	if r.Limits.MemoryBytes > 0 {
 		resources.Memory = r.Limits.MemoryBytes
-	***REMOVED***
+	}
 
-	if r.Limits.NanoCPUs > 0 ***REMOVED***
+	if r.Limits.NanoCPUs > 0 {
 		// CPU Period must be set in microseconds.
 		resources.CPUPeriod = int64(cpuQuotaPeriod / time.Microsecond)
 		resources.CPUQuota = r.Limits.NanoCPUs * resources.CPUPeriod / 1e9
-	***REMOVED***
+	}
 
 	return resources
-***REMOVED***
+}
 
 // Docker daemon supports just 1 network during container create.
-func (c *containerConfig) createNetworkingConfig(b executorpkg.Backend) *network.NetworkingConfig ***REMOVED***
+func (c *containerConfig) createNetworkingConfig(b executorpkg.Backend) *network.NetworkingConfig {
 	var networks []*api.NetworkAttachment
-	if c.task.Spec.GetContainer() != nil || c.task.Spec.GetAttachment() != nil ***REMOVED***
+	if c.task.Spec.GetContainer() != nil || c.task.Spec.GetAttachment() != nil {
 		networks = c.task.Networks
-	***REMOVED***
+	}
 
 	epConfig := make(map[string]*network.EndpointSettings)
-	if len(networks) > 0 ***REMOVED***
+	if len(networks) > 0 {
 		epConfig[networks[0].Network.Spec.Annotations.Name] = getEndpointConfig(networks[0], b)
-	***REMOVED***
+	}
 
-	return &network.NetworkingConfig***REMOVED***EndpointsConfig: epConfig***REMOVED***
-***REMOVED***
+	return &network.NetworkingConfig{EndpointsConfig: epConfig}
+}
 
 // TODO: Merge this function with createNetworkingConfig after daemon supports multiple networks in container create
-func (c *containerConfig) connectNetworkingConfig(b executorpkg.Backend) *network.NetworkingConfig ***REMOVED***
+func (c *containerConfig) connectNetworkingConfig(b executorpkg.Backend) *network.NetworkingConfig {
 	var networks []*api.NetworkAttachment
-	if c.task.Spec.GetContainer() != nil ***REMOVED***
+	if c.task.Spec.GetContainer() != nil {
 		networks = c.task.Networks
-	***REMOVED***
+	}
 	// First network is used during container create. Other networks are used in "docker network connect"
-	if len(networks) < 2 ***REMOVED***
+	if len(networks) < 2 {
 		return nil
-	***REMOVED***
+	}
 
 	epConfig := make(map[string]*network.EndpointSettings)
-	for _, na := range networks[1:] ***REMOVED***
+	for _, na := range networks[1:] {
 		epConfig[na.Network.Spec.Annotations.Name] = getEndpointConfig(na, b)
-	***REMOVED***
-	return &network.NetworkingConfig***REMOVED***EndpointsConfig: epConfig***REMOVED***
-***REMOVED***
+	}
+	return &network.NetworkingConfig{EndpointsConfig: epConfig}
+}
 
-func getEndpointConfig(na *api.NetworkAttachment, b executorpkg.Backend) *network.EndpointSettings ***REMOVED***
+func getEndpointConfig(na *api.NetworkAttachment, b executorpkg.Backend) *network.EndpointSettings {
 	var ipv4, ipv6 string
-	for _, addr := range na.Addresses ***REMOVED***
+	for _, addr := range na.Addresses {
 		ip, _, err := net.ParseCIDR(addr)
-		if err != nil ***REMOVED***
+		if err != nil {
 			continue
-		***REMOVED***
+		}
 
-		if ip.To4() != nil ***REMOVED***
+		if ip.To4() != nil {
 			ipv4 = ip.String()
 			continue
-		***REMOVED***
+		}
 
-		if ip.To16() != nil ***REMOVED***
+		if ip.To16() != nil {
 			ipv6 = ip.String()
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	n := &network.EndpointSettings***REMOVED***
+	n := &network.EndpointSettings{
 		NetworkID: na.Network.ID,
-		IPAMConfig: &network.EndpointIPAMConfig***REMOVED***
+		IPAMConfig: &network.EndpointIPAMConfig{
 			IPv4Address: ipv4,
 			IPv6Address: ipv6,
-		***REMOVED***,
+		},
 		DriverOpts: na.DriverAttachmentOpts,
-	***REMOVED***
-	if v, ok := na.Network.Spec.Annotations.Labels["com.docker.swarm.predefined"]; ok && v == "true" ***REMOVED***
-		if ln, err := b.FindNetwork(na.Network.Spec.Annotations.Name); err == nil ***REMOVED***
+	}
+	if v, ok := na.Network.Spec.Annotations.Labels["com.docker.swarm.predefined"]; ok && v == "true" {
+		if ln, err := b.FindNetwork(na.Network.Spec.Annotations.Name); err == nil {
 			n.NetworkID = ln.ID()
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
+}
 
-func (c *containerConfig) virtualIP(networkID string) string ***REMOVED***
-	if c.task.Endpoint == nil ***REMOVED***
+func (c *containerConfig) virtualIP(networkID string) string {
+	if c.task.Endpoint == nil {
 		return ""
-	***REMOVED***
+	}
 
-	for _, eVip := range c.task.Endpoint.VirtualIPs ***REMOVED***
+	for _, eVip := range c.task.Endpoint.VirtualIPs {
 		// We only support IPv4 VIPs for now.
-		if eVip.NetworkID == networkID ***REMOVED***
+		if eVip.NetworkID == networkID {
 			vip, _, err := net.ParseCIDR(eVip.Addr)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return ""
-			***REMOVED***
+			}
 
 			return vip.String()
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return ""
-***REMOVED***
+}
 
-func (c *containerConfig) serviceConfig() *clustertypes.ServiceConfig ***REMOVED***
-	if len(c.task.Networks) == 0 ***REMOVED***
+func (c *containerConfig) serviceConfig() *clustertypes.ServiceConfig {
+	if len(c.task.Networks) == 0 {
 		return nil
-	***REMOVED***
+	}
 
 	logrus.Debugf("Creating service config in agent for t = %+v", c.task)
-	svcCfg := &clustertypes.ServiceConfig***REMOVED***
+	svcCfg := &clustertypes.ServiceConfig{
 		Name:             c.task.ServiceAnnotations.Name,
 		Aliases:          make(map[string][]string),
 		ID:               c.task.ServiceID,
 		VirtualAddresses: make(map[string]*clustertypes.VirtualAddress),
-	***REMOVED***
+	}
 
-	for _, na := range c.task.Networks ***REMOVED***
-		svcCfg.VirtualAddresses[na.Network.ID] = &clustertypes.VirtualAddress***REMOVED***
+	for _, na := range c.task.Networks {
+		svcCfg.VirtualAddresses[na.Network.ID] = &clustertypes.VirtualAddress{
 			// We support only IPv4 virtual IP for now.
 			IPv4: c.virtualIP(na.Network.ID),
-		***REMOVED***
-		if len(na.Aliases) > 0 ***REMOVED***
+		}
+		if len(na.Aliases) > 0 {
 			svcCfg.Aliases[na.Network.ID] = na.Aliases
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if c.task.Endpoint != nil ***REMOVED***
-		for _, ePort := range c.task.Endpoint.Ports ***REMOVED***
-			if ePort.PublishMode != api.PublishModeIngress ***REMOVED***
+	if c.task.Endpoint != nil {
+		for _, ePort := range c.task.Endpoint.Ports {
+			if ePort.PublishMode != api.PublishModeIngress {
 				continue
-			***REMOVED***
+			}
 
-			svcCfg.ExposedPorts = append(svcCfg.ExposedPorts, &clustertypes.PortConfig***REMOVED***
+			svcCfg.ExposedPorts = append(svcCfg.ExposedPorts, &clustertypes.PortConfig{
 				Name:          ePort.Name,
 				Protocol:      int32(ePort.Protocol),
 				TargetPort:    ePort.TargetPort,
 				PublishedPort: ePort.PublishedPort,
-			***REMOVED***)
-		***REMOVED***
-	***REMOVED***
+			})
+		}
+	}
 
 	return svcCfg
-***REMOVED***
+}
 
-func (c *containerConfig) networkCreateRequest(name string) (clustertypes.NetworkCreateRequest, error) ***REMOVED***
+func (c *containerConfig) networkCreateRequest(name string) (clustertypes.NetworkCreateRequest, error) {
 	na, ok := c.networksAttachments[name]
-	if !ok ***REMOVED***
-		return clustertypes.NetworkCreateRequest***REMOVED******REMOVED***, errors.New("container: unknown network referenced")
-	***REMOVED***
+	if !ok {
+		return clustertypes.NetworkCreateRequest{}, errors.New("container: unknown network referenced")
+	}
 
-	options := types.NetworkCreate***REMOVED***
+	options := types.NetworkCreate{
 		// ID:     na.Network.ID,
 		Labels:         na.Network.Spec.Annotations.Labels,
 		Internal:       na.Network.Spec.Internal,
@@ -590,82 +590,82 @@ func (c *containerConfig) networkCreateRequest(name string) (clustertypes.Networ
 		EnableIPv6:     na.Network.Spec.Ipv6Enabled,
 		CheckDuplicate: true,
 		Scope:          netconst.SwarmScope,
-	***REMOVED***
+	}
 
-	if na.Network.Spec.GetNetwork() != "" ***REMOVED***
-		options.ConfigFrom = &network.ConfigReference***REMOVED***
+	if na.Network.Spec.GetNetwork() != "" {
+		options.ConfigFrom = &network.ConfigReference{
 			Network: na.Network.Spec.GetNetwork(),
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if na.Network.DriverState != nil ***REMOVED***
+	if na.Network.DriverState != nil {
 		options.Driver = na.Network.DriverState.Name
 		options.Options = na.Network.DriverState.Options
-	***REMOVED***
-	if na.Network.IPAM != nil ***REMOVED***
-		options.IPAM = &network.IPAM***REMOVED***
+	}
+	if na.Network.IPAM != nil {
+		options.IPAM = &network.IPAM{
 			Driver:  na.Network.IPAM.Driver.Name,
 			Options: na.Network.IPAM.Driver.Options,
-		***REMOVED***
-		for _, ic := range na.Network.IPAM.Configs ***REMOVED***
-			c := network.IPAMConfig***REMOVED***
+		}
+		for _, ic := range na.Network.IPAM.Configs {
+			c := network.IPAMConfig{
 				Subnet:  ic.Subnet,
 				IPRange: ic.Range,
 				Gateway: ic.Gateway,
-			***REMOVED***
+			}
 			options.IPAM.Config = append(options.IPAM.Config, c)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	return clustertypes.NetworkCreateRequest***REMOVED***
+	return clustertypes.NetworkCreateRequest{
 		ID: na.Network.ID,
-		NetworkCreateRequest: types.NetworkCreateRequest***REMOVED***
+		NetworkCreateRequest: types.NetworkCreateRequest{
 			Name:          name,
 			NetworkCreate: options,
-		***REMOVED***,
-	***REMOVED***, nil
-***REMOVED***
+		},
+	}, nil
+}
 
-func (c *containerConfig) applyPrivileges(hc *enginecontainer.HostConfig) ***REMOVED***
+func (c *containerConfig) applyPrivileges(hc *enginecontainer.HostConfig) {
 	privileges := c.spec().Privileges
-	if privileges == nil ***REMOVED***
+	if privileges == nil {
 		return
-	***REMOVED***
+	}
 
 	credentials := privileges.CredentialSpec
-	if credentials != nil ***REMOVED***
-		switch credentials.Source.(type) ***REMOVED***
+	if credentials != nil {
+		switch credentials.Source.(type) {
 		case *api.Privileges_CredentialSpec_File:
 			hc.SecurityOpt = append(hc.SecurityOpt, "credentialspec=file://"+credentials.GetFile())
 		case *api.Privileges_CredentialSpec_Registry:
 			hc.SecurityOpt = append(hc.SecurityOpt, "credentialspec=registry://"+credentials.GetRegistry())
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	selinux := privileges.SELinuxContext
-	if selinux != nil ***REMOVED***
-		if selinux.Disable ***REMOVED***
+	if selinux != nil {
+		if selinux.Disable {
 			hc.SecurityOpt = append(hc.SecurityOpt, "label=disable")
-		***REMOVED***
-		if selinux.User != "" ***REMOVED***
+		}
+		if selinux.User != "" {
 			hc.SecurityOpt = append(hc.SecurityOpt, "label=user:"+selinux.User)
-		***REMOVED***
-		if selinux.Role != "" ***REMOVED***
+		}
+		if selinux.Role != "" {
 			hc.SecurityOpt = append(hc.SecurityOpt, "label=role:"+selinux.Role)
-		***REMOVED***
-		if selinux.Level != "" ***REMOVED***
+		}
+		if selinux.Level != "" {
 			hc.SecurityOpt = append(hc.SecurityOpt, "label=level:"+selinux.Level)
-		***REMOVED***
-		if selinux.Type != "" ***REMOVED***
+		}
+		if selinux.Type != "" {
 			hc.SecurityOpt = append(hc.SecurityOpt, "label=type:"+selinux.Type)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (c containerConfig) eventFilter() filters.Args ***REMOVED***
+func (c containerConfig) eventFilter() filters.Args {
 	filter := filters.NewArgs()
 	filter.Add("type", events.ContainerEventType)
 	filter.Add("name", c.name())
 	filter.Add("label", fmt.Sprintf("%v.task.id=%v", systemLabelPrefix, c.task.ID))
 	return filter
-***REMOVED***
+}

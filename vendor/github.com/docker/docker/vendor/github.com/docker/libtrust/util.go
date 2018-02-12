@@ -21,152 +21,152 @@ import (
 )
 
 // LoadOrCreateTrustKey will load a PrivateKey from the specified path
-func LoadOrCreateTrustKey(trustKeyPath string) (PrivateKey, error) ***REMOVED***
-	if err := os.MkdirAll(filepath.Dir(trustKeyPath), 0700); err != nil ***REMOVED***
+func LoadOrCreateTrustKey(trustKeyPath string) (PrivateKey, error) {
+	if err := os.MkdirAll(filepath.Dir(trustKeyPath), 0700); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	trustKey, err := LoadKeyFile(trustKeyPath)
-	if err == ErrKeyFileDoesNotExist ***REMOVED***
+	if err == ErrKeyFileDoesNotExist {
 		trustKey, err = GenerateECP256PrivateKey()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, fmt.Errorf("error generating key: %s", err)
-		***REMOVED***
+		}
 
-		if err := SaveKey(trustKeyPath, trustKey); err != nil ***REMOVED***
+		if err := SaveKey(trustKeyPath, trustKey); err != nil {
 			return nil, fmt.Errorf("error saving key file: %s", err)
-		***REMOVED***
+		}
 
 		dir, file := filepath.Split(trustKeyPath)
-		if err := SavePublicKey(filepath.Join(dir, "public-"+file), trustKey.PublicKey()); err != nil ***REMOVED***
+		if err := SavePublicKey(filepath.Join(dir, "public-"+file), trustKey.PublicKey()); err != nil {
 			return nil, fmt.Errorf("error saving public key file: %s", err)
-		***REMOVED***
-	***REMOVED*** else if err != nil ***REMOVED***
+		}
+	} else if err != nil {
 		return nil, fmt.Errorf("error loading key file: %s", err)
-	***REMOVED***
+	}
 	return trustKey, nil
-***REMOVED***
+}
 
 // NewIdentityAuthTLSClientConfig returns a tls.Config configured to use identity
 // based authentication from the specified dockerUrl, the rootConfigPath and
 // the server name to which it is connecting.
 // If trustUnknownHosts is true it will automatically add the host to the
 // known-hosts.json in rootConfigPath.
-func NewIdentityAuthTLSClientConfig(dockerUrl string, trustUnknownHosts bool, rootConfigPath string, serverName string) (*tls.Config, error) ***REMOVED***
+func NewIdentityAuthTLSClientConfig(dockerUrl string, trustUnknownHosts bool, rootConfigPath string, serverName string) (*tls.Config, error) {
 	tlsConfig := newTLSConfig()
 
 	trustKeyPath := filepath.Join(rootConfigPath, "key.json")
 	knownHostsPath := filepath.Join(rootConfigPath, "known-hosts.json")
 
 	u, err := url.Parse(dockerUrl)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("unable to parse machine url")
-	***REMOVED***
+	}
 
-	if u.Scheme == "unix" ***REMOVED***
+	if u.Scheme == "unix" {
 		return nil, nil
-	***REMOVED***
+	}
 
 	addr := u.Host
 	proto := "tcp"
 
 	trustKey, err := LoadOrCreateTrustKey(trustKeyPath)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("unable to load trust key: %s", err)
-	***REMOVED***
+	}
 
 	knownHosts, err := LoadKeySetFile(knownHostsPath)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("could not load trusted hosts file: %s", err)
-	***REMOVED***
+	}
 
 	allowedHosts, err := FilterByHosts(knownHosts, addr, false)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("error filtering hosts: %s", err)
-	***REMOVED***
+	}
 
 	certPool, err := GenerateCACertPool(trustKey, allowedHosts)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("Could not create CA pool: %s", err)
-	***REMOVED***
+	}
 
 	tlsConfig.ServerName = serverName
 	tlsConfig.RootCAs = certPool
 
 	x509Cert, err := GenerateSelfSignedClientCert(trustKey)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("certificate generation error: %s", err)
-	***REMOVED***
+	}
 
-	tlsConfig.Certificates = []tls.Certificate***REMOVED******REMOVED***
-		Certificate: [][]byte***REMOVED***x509Cert.Raw***REMOVED***,
+	tlsConfig.Certificates = []tls.Certificate{{
+		Certificate: [][]byte{x509Cert.Raw},
 		PrivateKey:  trustKey.CryptoPrivateKey(),
 		Leaf:        x509Cert,
-	***REMOVED******REMOVED***
+	}}
 
 	tlsConfig.InsecureSkipVerify = true
 
 	testConn, err := tls.Dial(proto, addr, tlsConfig)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("tls Handshake error: %s", err)
-	***REMOVED***
+	}
 
-	opts := x509.VerifyOptions***REMOVED***
+	opts := x509.VerifyOptions{
 		Roots:         tlsConfig.RootCAs,
 		CurrentTime:   time.Now(),
 		DNSName:       tlsConfig.ServerName,
 		Intermediates: x509.NewCertPool(),
-	***REMOVED***
+	}
 
 	certs := testConn.ConnectionState().PeerCertificates
-	for i, cert := range certs ***REMOVED***
-		if i == 0 ***REMOVED***
+	for i, cert := range certs {
+		if i == 0 {
 			continue
-		***REMOVED***
+		}
 		opts.Intermediates.AddCert(cert)
-	***REMOVED***
+	}
 
-	if _, err := certs[0].Verify(opts); err != nil ***REMOVED***
-		if _, ok := err.(x509.UnknownAuthorityError); ok ***REMOVED***
-			if trustUnknownHosts ***REMOVED***
+	if _, err := certs[0].Verify(opts); err != nil {
+		if _, ok := err.(x509.UnknownAuthorityError); ok {
+			if trustUnknownHosts {
 				pubKey, err := FromCryptoPublicKey(certs[0].PublicKey)
-				if err != nil ***REMOVED***
+				if err != nil {
 					return nil, fmt.Errorf("error extracting public key from cert: %s", err)
-				***REMOVED***
+				}
 
-				pubKey.AddExtendedField("hosts", []string***REMOVED***addr***REMOVED***)
+				pubKey.AddExtendedField("hosts", []string{addr})
 
-				if err := AddKeySetFile(knownHostsPath, pubKey); err != nil ***REMOVED***
+				if err := AddKeySetFile(knownHostsPath, pubKey); err != nil {
 					return nil, fmt.Errorf("error adding machine to known hosts: %s", err)
-				***REMOVED***
-			***REMOVED*** else ***REMOVED***
+				}
+			} else {
 				return nil, fmt.Errorf("unable to connect.  unknown host: %s", addr)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	testConn.Close()
 	tlsConfig.InsecureSkipVerify = false
 
 	return tlsConfig, nil
-***REMOVED***
+}
 
 // joseBase64UrlEncode encodes the given data using the standard base64 url
 // encoding format but with all trailing '=' characters ommitted in accordance
 // with the jose specification.
 // http://tools.ietf.org/html/draft-ietf-jose-json-web-signature-31#section-2
-func joseBase64UrlEncode(b []byte) string ***REMOVED***
+func joseBase64UrlEncode(b []byte) string {
 	return strings.TrimRight(base64.URLEncoding.EncodeToString(b), "=")
-***REMOVED***
+}
 
 // joseBase64UrlDecode decodes the given string using the standard base64 url
 // decoder but first adds the appropriate number of trailing '=' characters in
 // accordance with the jose specification.
 // http://tools.ietf.org/html/draft-ietf-jose-json-web-signature-31#section-2
-func joseBase64UrlDecode(s string) ([]byte, error) ***REMOVED***
+func joseBase64UrlDecode(s string) ([]byte, error) {
 	s = strings.Replace(s, "\n", "", -1)
 	s = strings.Replace(s, " ", "", -1)
-	switch len(s) % 4 ***REMOVED***
+	switch len(s) % 4 {
 	case 0:
 	case 2:
 		s += "=="
@@ -174,72 +174,72 @@ func joseBase64UrlDecode(s string) ([]byte, error) ***REMOVED***
 		s += "="
 	default:
 		return nil, errors.New("illegal base64url string")
-	***REMOVED***
+	}
 	return base64.URLEncoding.DecodeString(s)
-***REMOVED***
+}
 
-func keyIDEncode(b []byte) string ***REMOVED***
+func keyIDEncode(b []byte) string {
 	s := strings.TrimRight(base32.StdEncoding.EncodeToString(b), "=")
 	var buf bytes.Buffer
 	var i int
-	for i = 0; i < len(s)/4-1; i++ ***REMOVED***
+	for i = 0; i < len(s)/4-1; i++ {
 		start := i * 4
 		end := start + 4
 		buf.WriteString(s[start:end] + ":")
-	***REMOVED***
+	}
 	buf.WriteString(s[i*4:])
 	return buf.String()
-***REMOVED***
+}
 
-func keyIDFromCryptoKey(pubKey PublicKey) string ***REMOVED***
+func keyIDFromCryptoKey(pubKey PublicKey) string {
 	// Generate and return a 'libtrust' fingerprint of the public key.
 	// For an RSA key this should be:
 	//   SHA256(DER encoded ASN1)
 	// Then truncated to 240 bits and encoded into 12 base32 groups like so:
 	//   ABCD:EFGH:IJKL:MNOP:QRST:UVWX:YZ23:4567:ABCD:EFGH:IJKL:MNOP
 	derBytes, err := x509.MarshalPKIXPublicKey(pubKey.CryptoPublicKey())
-	if err != nil ***REMOVED***
+	if err != nil {
 		return ""
-	***REMOVED***
+	}
 	hasher := crypto.SHA256.New()
 	hasher.Write(derBytes)
 	return keyIDEncode(hasher.Sum(nil)[:30])
-***REMOVED***
+}
 
-func stringFromMap(m map[string]interface***REMOVED******REMOVED***, key string) (string, error) ***REMOVED***
+func stringFromMap(m map[string]interface{}, key string) (string, error) {
 	val, ok := m[key]
-	if !ok ***REMOVED***
+	if !ok {
 		return "", fmt.Errorf("%q value not specified", key)
-	***REMOVED***
+	}
 
 	str, ok := val.(string)
-	if !ok ***REMOVED***
+	if !ok {
 		return "", fmt.Errorf("%q value must be a string", key)
-	***REMOVED***
+	}
 	delete(m, key)
 
 	return str, nil
-***REMOVED***
+}
 
-func parseECCoordinate(cB64Url string, curve elliptic.Curve) (*big.Int, error) ***REMOVED***
+func parseECCoordinate(cB64Url string, curve elliptic.Curve) (*big.Int, error) {
 	curveByteLen := (curve.Params().BitSize + 7) >> 3
 
 	cBytes, err := joseBase64UrlDecode(cB64Url)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("invalid base64 URL encoding: %s", err)
-	***REMOVED***
+	}
 	cByteLength := len(cBytes)
-	if cByteLength != curveByteLen ***REMOVED***
+	if cByteLength != curveByteLen {
 		return nil, fmt.Errorf("invalid number of octets: got %d, should be %d", cByteLength, curveByteLen)
-	***REMOVED***
+	}
 	return new(big.Int).SetBytes(cBytes), nil
-***REMOVED***
+}
 
-func parseECPrivateParam(dB64Url string, curve elliptic.Curve) (*big.Int, error) ***REMOVED***
+func parseECPrivateParam(dB64Url string, curve elliptic.Curve) (*big.Int, error) {
 	dBytes, err := joseBase64UrlDecode(dB64Url)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("invalid base64 URL encoding: %s", err)
-	***REMOVED***
+	}
 
 	// The length of this octet string MUST be ceiling(log-base-2(n)/8)
 	// octets (where n is the order of the curve). This is because the private
@@ -253,23 +253,23 @@ func parseECPrivateParam(dB64Url string, curve elliptic.Curve) (*big.Int, error)
 	octetLength := (new(big.Int).Sub(n, big.NewInt(1)).BitLen() + 7) >> 3
 	dByteLength := len(dBytes)
 
-	if dByteLength != octetLength ***REMOVED***
+	if dByteLength != octetLength {
 		return nil, fmt.Errorf("invalid number of octets: got %d, should be %d", dByteLength, octetLength)
-	***REMOVED***
+	}
 
 	return new(big.Int).SetBytes(dBytes), nil
-***REMOVED***
+}
 
-func parseRSAModulusParam(nB64Url string) (*big.Int, error) ***REMOVED***
+func parseRSAModulusParam(nB64Url string) (*big.Int, error) {
 	nBytes, err := joseBase64UrlDecode(nB64Url)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("invalid base64 URL encoding: %s", err)
-	***REMOVED***
+	}
 
 	return new(big.Int).SetBytes(nBytes), nil
-***REMOVED***
+}
 
-func serializeRSAPublicExponentParam(e int) []byte ***REMOVED***
+func serializeRSAPublicExponentParam(e int) []byte {
 	// We MUST use the minimum number of octets to represent E.
 	// E is supposed to be 65537 for performance and security reasons
 	// and is what golang's rsa package generates, but it might be
@@ -277,19 +277,19 @@ func serializeRSAPublicExponentParam(e int) []byte ***REMOVED***
 	buf := make([]byte, 4)
 	binary.BigEndian.PutUint32(buf, uint32(e))
 	var i int
-	for i = 0; i < 8; i++ ***REMOVED***
-		if buf[i] != 0 ***REMOVED***
+	for i = 0; i < 8; i++ {
+		if buf[i] != 0 {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return buf[i:]
-***REMOVED***
+}
 
-func parseRSAPublicExponentParam(eB64Url string) (int, error) ***REMOVED***
+func parseRSAPublicExponentParam(eB64Url string) (int, error) {
 	eBytes, err := joseBase64UrlDecode(eB64Url)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, fmt.Errorf("invalid base64 URL encoding: %s", err)
-	***REMOVED***
+	}
 	// Only the minimum number of bytes were used to represent E, but
 	// binary.BigEndian.Uint32 expects at least 4 bytes, so we need
 	// to add zero padding if necassary.
@@ -298,66 +298,66 @@ func parseRSAPublicExponentParam(eB64Url string) (int, error) ***REMOVED***
 	eBytes = append(buf, eBytes...)
 
 	return int(binary.BigEndian.Uint32(eBytes)), nil
-***REMOVED***
+}
 
-func parseRSAPrivateKeyParamFromMap(m map[string]interface***REMOVED******REMOVED***, key string) (*big.Int, error) ***REMOVED***
+func parseRSAPrivateKeyParamFromMap(m map[string]interface{}, key string) (*big.Int, error) {
 	b64Url, err := stringFromMap(m, key)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	paramBytes, err := joseBase64UrlDecode(b64Url)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("invaled base64 URL encoding: %s", err)
-	***REMOVED***
+	}
 
 	return new(big.Int).SetBytes(paramBytes), nil
-***REMOVED***
+}
 
-func createPemBlock(name string, derBytes []byte, headers map[string]interface***REMOVED******REMOVED***) (*pem.Block, error) ***REMOVED***
-	pemBlock := &pem.Block***REMOVED***Type: name, Bytes: derBytes, Headers: map[string]string***REMOVED******REMOVED******REMOVED***
-	for k, v := range headers ***REMOVED***
-		switch val := v.(type) ***REMOVED***
+func createPemBlock(name string, derBytes []byte, headers map[string]interface{}) (*pem.Block, error) {
+	pemBlock := &pem.Block{Type: name, Bytes: derBytes, Headers: map[string]string{}}
+	for k, v := range headers {
+		switch val := v.(type) {
 		case string:
 			pemBlock.Headers[k] = val
 		case []string:
-			if k == "hosts" ***REMOVED***
+			if k == "hosts" {
 				pemBlock.Headers[k] = strings.Join(val, ",")
-			***REMOVED*** else ***REMOVED***
+			} else {
 				// Return error, non-encodable type
-			***REMOVED***
+			}
 		default:
 			// Return error, non-encodable type
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return pemBlock, nil
-***REMOVED***
+}
 
-func pubKeyFromPEMBlock(pemBlock *pem.Block) (PublicKey, error) ***REMOVED***
+func pubKeyFromPEMBlock(pemBlock *pem.Block) (PublicKey, error) {
 	cryptoPublicKey, err := x509.ParsePKIXPublicKey(pemBlock.Bytes)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("unable to decode Public Key PEM data: %s", err)
-	***REMOVED***
+	}
 
 	pubKey, err := FromCryptoPublicKey(cryptoPublicKey)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	addPEMHeadersToKey(pemBlock, pubKey)
 
 	return pubKey, nil
-***REMOVED***
+}
 
-func addPEMHeadersToKey(pemBlock *pem.Block, pubKey PublicKey) ***REMOVED***
-	for key, value := range pemBlock.Headers ***REMOVED***
-		var safeVal interface***REMOVED******REMOVED***
-		if key == "hosts" ***REMOVED***
+func addPEMHeadersToKey(pemBlock *pem.Block, pubKey PublicKey) {
+	for key, value := range pemBlock.Headers {
+		var safeVal interface{}
+		if key == "hosts" {
 			safeVal = strings.Split(value, ",")
-		***REMOVED*** else ***REMOVED***
+		} else {
 			safeVal = value
-		***REMOVED***
+		}
 		pubKey.AddExtendedField(key, safeVal)
-	***REMOVED***
-***REMOVED***
+	}
+}

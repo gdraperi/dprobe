@@ -27,30 +27,30 @@ package mapset
 
 import "sync"
 
-type threadSafeSet struct ***REMOVED***
+type threadSafeSet struct {
 	s threadUnsafeSet
 	sync.RWMutex
-***REMOVED***
+}
 
-func newThreadSafeSet() threadSafeSet ***REMOVED***
-	return threadSafeSet***REMOVED***s: newThreadUnsafeSet()***REMOVED***
-***REMOVED***
+func newThreadSafeSet() threadSafeSet {
+	return threadSafeSet{s: newThreadUnsafeSet()}
+}
 
-func (set *threadSafeSet) Add(i interface***REMOVED******REMOVED***) bool ***REMOVED***
+func (set *threadSafeSet) Add(i interface{}) bool {
 	set.Lock()
 	ret := set.s.Add(i)
 	set.Unlock()
 	return ret
-***REMOVED***
+}
 
-func (set *threadSafeSet) Contains(i ...interface***REMOVED******REMOVED***) bool ***REMOVED***
+func (set *threadSafeSet) Contains(i ...interface{}) bool {
 	set.RLock()
 	ret := set.s.Contains(i...)
 	set.RUnlock()
 	return ret
-***REMOVED***
+}
 
-func (set *threadSafeSet) IsSubset(other Set) bool ***REMOVED***
+func (set *threadSafeSet) IsSubset(other Set) bool {
 	o := other.(*threadSafeSet)
 
 	set.RLock()
@@ -60,92 +60,92 @@ func (set *threadSafeSet) IsSubset(other Set) bool ***REMOVED***
 	set.RUnlock()
 	o.RUnlock()
 	return ret
-***REMOVED***
+}
 
-func (set *threadSafeSet) IsSuperset(other Set) bool ***REMOVED***
+func (set *threadSafeSet) IsSuperset(other Set) bool {
 	return other.IsSubset(set)
-***REMOVED***
+}
 
-func (set *threadSafeSet) Union(other Set) Set ***REMOVED***
+func (set *threadSafeSet) Union(other Set) Set {
 	o := other.(*threadSafeSet)
 
 	set.RLock()
 	o.RLock()
 
 	unsafeUnion := set.s.Union(&o.s).(*threadUnsafeSet)
-	ret := &threadSafeSet***REMOVED***s: *unsafeUnion***REMOVED***
+	ret := &threadSafeSet{s: *unsafeUnion}
 	set.RUnlock()
 	o.RUnlock()
 	return ret
-***REMOVED***
+}
 
-func (set *threadSafeSet) Intersect(other Set) Set ***REMOVED***
+func (set *threadSafeSet) Intersect(other Set) Set {
 	o := other.(*threadSafeSet)
 
 	set.RLock()
 	o.RLock()
 
 	unsafeIntersection := set.s.Intersect(&o.s).(*threadUnsafeSet)
-	ret := &threadSafeSet***REMOVED***s: *unsafeIntersection***REMOVED***
+	ret := &threadSafeSet{s: *unsafeIntersection}
 	set.RUnlock()
 	o.RUnlock()
 	return ret
-***REMOVED***
+}
 
-func (set *threadSafeSet) Difference(other Set) Set ***REMOVED***
+func (set *threadSafeSet) Difference(other Set) Set {
 	o := other.(*threadSafeSet)
 
 	set.RLock()
 	o.RLock()
 
 	unsafeDifference := set.s.Difference(&o.s).(*threadUnsafeSet)
-	ret := &threadSafeSet***REMOVED***s: *unsafeDifference***REMOVED***
+	ret := &threadSafeSet{s: *unsafeDifference}
 	set.RUnlock()
 	o.RUnlock()
 	return ret
-***REMOVED***
+}
 
-func (set *threadSafeSet) SymmetricDifference(other Set) Set ***REMOVED***
+func (set *threadSafeSet) SymmetricDifference(other Set) Set {
 	o := other.(*threadSafeSet)
 
 	unsafeDifference := set.s.SymmetricDifference(&o.s).(*threadUnsafeSet)
-	return &threadSafeSet***REMOVED***s: *unsafeDifference***REMOVED***
-***REMOVED***
+	return &threadSafeSet{s: *unsafeDifference}
+}
 
-func (set *threadSafeSet) Clear() ***REMOVED***
+func (set *threadSafeSet) Clear() {
 	set.Lock()
 	set.s = newThreadUnsafeSet()
 	set.Unlock()
-***REMOVED***
+}
 
-func (set *threadSafeSet) Remove(i interface***REMOVED******REMOVED***) ***REMOVED***
+func (set *threadSafeSet) Remove(i interface{}) {
 	set.Lock()
 	delete(set.s, i)
 	set.Unlock()
-***REMOVED***
+}
 
-func (set *threadSafeSet) Cardinality() int ***REMOVED***
+func (set *threadSafeSet) Cardinality() int {
 	set.RLock()
 	defer set.RUnlock()
 	return len(set.s)
-***REMOVED***
+}
 
-func (set *threadSafeSet) Iter() <-chan interface***REMOVED******REMOVED*** ***REMOVED***
-	ch := make(chan interface***REMOVED******REMOVED***)
-	go func() ***REMOVED***
+func (set *threadSafeSet) Iter() <-chan interface{} {
+	ch := make(chan interface{})
+	go func() {
 		set.RLock()
 
-		for elem := range set.s ***REMOVED***
+		for elem := range set.s {
 			ch <- elem
-		***REMOVED***
+		}
 		close(ch)
 		set.RUnlock()
-	***REMOVED***()
+	}()
 
 	return ch
-***REMOVED***
+}
 
-func (set *threadSafeSet) Equal(other Set) bool ***REMOVED***
+func (set *threadSafeSet) Equal(other Set) bool {
 	o := other.(*threadSafeSet)
 
 	set.RLock()
@@ -155,50 +155,50 @@ func (set *threadSafeSet) Equal(other Set) bool ***REMOVED***
 	set.RUnlock()
 	o.RUnlock()
 	return ret
-***REMOVED***
+}
 
-func (set *threadSafeSet) Clone() Set ***REMOVED***
+func (set *threadSafeSet) Clone() Set {
 	set.RLock()
 
 	unsafeClone := set.s.Clone().(*threadUnsafeSet)
-	ret := &threadSafeSet***REMOVED***s: *unsafeClone***REMOVED***
+	ret := &threadSafeSet{s: *unsafeClone}
 	set.RUnlock()
 	return ret
-***REMOVED***
+}
 
-func (set *threadSafeSet) String() string ***REMOVED***
+func (set *threadSafeSet) String() string {
 	set.RLock()
 	ret := set.s.String()
 	set.RUnlock()
 	return ret
-***REMOVED***
+}
 
-func (set *threadSafeSet) PowerSet() Set ***REMOVED***
+func (set *threadSafeSet) PowerSet() Set {
 	set.RLock()
 	ret := set.s.PowerSet()
 	set.RUnlock()
 	return ret
-***REMOVED***
+}
 
-func (set *threadSafeSet) CartesianProduct(other Set) Set ***REMOVED***
+func (set *threadSafeSet) CartesianProduct(other Set) Set {
 	o := other.(*threadSafeSet)
 
 	set.RLock()
 	o.RLock()
 
 	unsafeCartProduct := set.s.CartesianProduct(&o.s).(*threadUnsafeSet)
-	ret := &threadSafeSet***REMOVED***s: *unsafeCartProduct***REMOVED***
+	ret := &threadSafeSet{s: *unsafeCartProduct}
 	set.RUnlock()
 	o.RUnlock()
 	return ret
-***REMOVED***
+}
 
-func (set *threadSafeSet) ToSlice() []interface***REMOVED******REMOVED*** ***REMOVED***
+func (set *threadSafeSet) ToSlice() []interface{} {
 	set.RLock()
-	keys := make([]interface***REMOVED******REMOVED***, 0, set.Cardinality())
-	for elem := range set.s ***REMOVED***
+	keys := make([]interface{}, 0, set.Cardinality())
+	for elem := range set.s {
 		keys = append(keys, elem)
-	***REMOVED***
+	}
 	set.RUnlock()
 	return keys
-***REMOVED***
+}

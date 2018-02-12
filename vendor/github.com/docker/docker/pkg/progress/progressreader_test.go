@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestOutputOnPrematureClose(t *testing.T) ***REMOVED***
+func TestOutputOnPrematureClose(t *testing.T) {
 	content := []byte("TESTING")
 	reader := ioutil.NopCloser(bytes.NewReader(content))
 	progressChan := make(chan Progress, 10)
@@ -16,30 +16,30 @@ func TestOutputOnPrematureClose(t *testing.T) ***REMOVED***
 
 	part := make([]byte, 4)
 	_, err := io.ReadFull(pr, part)
-	if err != nil ***REMOVED***
+	if err != nil {
 		pr.Close()
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 drainLoop:
-	for ***REMOVED***
-		select ***REMOVED***
+	for {
+		select {
 		case <-progressChan:
 		default:
 			break drainLoop
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	pr.Close()
 
-	select ***REMOVED***
+	select {
 	case <-progressChan:
 	default:
 		t.Fatalf("Expected some output when closing prematurely")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestCompleteSilently(t *testing.T) ***REMOVED***
+func TestCompleteSilently(t *testing.T) {
 	content := []byte("TESTING")
 	reader := ioutil.NopCloser(bytes.NewReader(content))
 	progressChan := make(chan Progress, 10)
@@ -47,29 +47,29 @@ func TestCompleteSilently(t *testing.T) ***REMOVED***
 	pr := NewProgressReader(reader, ChanOutput(progressChan), int64(len(content)), "Test", "Read")
 
 	out, err := ioutil.ReadAll(pr)
-	if err != nil ***REMOVED***
+	if err != nil {
 		pr.Close()
 		t.Fatal(err)
-	***REMOVED***
-	if string(out) != "TESTING" ***REMOVED***
+	}
+	if string(out) != "TESTING" {
 		pr.Close()
 		t.Fatalf("Unexpected output %q from reader", string(out))
-	***REMOVED***
+	}
 
 drainLoop:
-	for ***REMOVED***
-		select ***REMOVED***
+	for {
+		select {
 		case <-progressChan:
 		default:
 			break drainLoop
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	pr.Close()
 
-	select ***REMOVED***
+	select {
 	case <-progressChan:
 		t.Fatalf("Should have closed silently when read is complete")
 	default:
-	***REMOVED***
-***REMOVED***
+	}
+}

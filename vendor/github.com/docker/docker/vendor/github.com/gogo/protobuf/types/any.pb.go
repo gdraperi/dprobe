@@ -47,18 +47,18 @@ const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 //     Any any;
 //     any.PackFrom(foo);
 //     ...
-//     if (any.UnpackTo(&foo)) ***REMOVED***
+//     if (any.UnpackTo(&foo)) {
 //       ...
-// ***REMOVED***
+//     }
 //
 // Example 2: Pack and unpack a message in Java.
 //
 //     Foo foo = ...;
 //     Any any = Any.pack(foo);
 //     ...
-//     if (any.is(Foo.class)) ***REMOVED***
+//     if (any.is(Foo.class)) {
 //       foo = any.unpack(Foo.class);
-// ***REMOVED***
+//     }
 //
 //  Example 3: Pack and unpack a message in Python.
 //
@@ -84,28 +84,28 @@ const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 // additional field `@type` which contains the type URL. Example:
 //
 //     package google.profile;
-//     message Person ***REMOVED***
+//     message Person {
 //       string first_name = 1;
 //       string last_name = 2;
-// ***REMOVED***
+//     }
 //
-//     ***REMOVED***
+//     {
 //       "@type": "type.googleapis.com/google.profile.Person",
 //       "firstName": <string>,
 //       "lastName": <string>
-// ***REMOVED***
+//     }
 //
 // If the embedded message type is well-known and has a custom JSON
 // representation, that representation will be embedded adding a field
 // `value` which holds the custom JSON in addition to the `@type`
 // field. Example (for message [google.protobuf.Duration][]):
 //
-//     ***REMOVED***
+//     {
 //       "@type": "type.googleapis.com/google.protobuf.Duration",
 //       "value": "1.212s"
-// ***REMOVED***
+//     }
 //
-type Any struct ***REMOVED***
+type Any struct {
 	// A URL/resource name whose content describes the type of the
 	// serialized protocol buffer message.
 	//
@@ -131,149 +131,149 @@ type Any struct ***REMOVED***
 	TypeUrl string `protobuf:"bytes,1,opt,name=type_url,json=typeUrl,proto3" json:"type_url,omitempty"`
 	// Must be a valid serialized protocol buffer of the above specified type.
 	Value []byte `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
-***REMOVED***
+}
 
-func (m *Any) Reset()                    ***REMOVED*** *m = Any***REMOVED******REMOVED*** ***REMOVED***
-func (*Any) ProtoMessage()               ***REMOVED******REMOVED***
-func (*Any) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorAny, []int***REMOVED***0***REMOVED*** ***REMOVED***
-func (*Any) XXX_WellKnownType() string   ***REMOVED*** return "Any" ***REMOVED***
+func (m *Any) Reset()                    { *m = Any{} }
+func (*Any) ProtoMessage()               {}
+func (*Any) Descriptor() ([]byte, []int) { return fileDescriptorAny, []int{0} }
+func (*Any) XXX_WellKnownType() string   { return "Any" }
 
-func (m *Any) GetTypeUrl() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Any) GetTypeUrl() string {
+	if m != nil {
 		return m.TypeUrl
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *Any) GetValue() []byte ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Any) GetValue() []byte {
+	if m != nil {
 		return m.Value
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*Any)(nil), "google.protobuf.Any")
-***REMOVED***
-func (this *Any) Compare(that interface***REMOVED******REMOVED***) int ***REMOVED***
-	if that == nil ***REMOVED***
-		if this == nil ***REMOVED***
+}
+func (this *Any) Compare(that interface{}) int {
+	if that == nil {
+		if this == nil {
 			return 0
-		***REMOVED***
+		}
 		return 1
-	***REMOVED***
+	}
 
 	that1, ok := that.(*Any)
-	if !ok ***REMOVED***
+	if !ok {
 		that2, ok := that.(Any)
-		if ok ***REMOVED***
+		if ok {
 			that1 = &that2
-		***REMOVED*** else ***REMOVED***
+		} else {
 			return 1
-		***REMOVED***
-	***REMOVED***
-	if that1 == nil ***REMOVED***
-		if this == nil ***REMOVED***
+		}
+	}
+	if that1 == nil {
+		if this == nil {
 			return 0
-		***REMOVED***
+		}
 		return 1
-	***REMOVED*** else if this == nil ***REMOVED***
+	} else if this == nil {
 		return -1
-	***REMOVED***
-	if this.TypeUrl != that1.TypeUrl ***REMOVED***
-		if this.TypeUrl < that1.TypeUrl ***REMOVED***
+	}
+	if this.TypeUrl != that1.TypeUrl {
+		if this.TypeUrl < that1.TypeUrl {
 			return -1
-		***REMOVED***
+		}
 		return 1
-	***REMOVED***
-	if c := bytes.Compare(this.Value, that1.Value); c != 0 ***REMOVED***
+	}
+	if c := bytes.Compare(this.Value, that1.Value); c != 0 {
 		return c
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
-func (this *Any) Equal(that interface***REMOVED******REMOVED***) bool ***REMOVED***
-	if that == nil ***REMOVED***
-		if this == nil ***REMOVED***
+}
+func (this *Any) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
 			return true
-		***REMOVED***
+		}
 		return false
-	***REMOVED***
+	}
 
 	that1, ok := that.(*Any)
-	if !ok ***REMOVED***
+	if !ok {
 		that2, ok := that.(Any)
-		if ok ***REMOVED***
+		if ok {
 			that1 = &that2
-		***REMOVED*** else ***REMOVED***
+		} else {
 			return false
-		***REMOVED***
-	***REMOVED***
-	if that1 == nil ***REMOVED***
-		if this == nil ***REMOVED***
+		}
+	}
+	if that1 == nil {
+		if this == nil {
 			return true
-		***REMOVED***
+		}
 		return false
-	***REMOVED*** else if this == nil ***REMOVED***
+	} else if this == nil {
 		return false
-	***REMOVED***
-	if this.TypeUrl != that1.TypeUrl ***REMOVED***
+	}
+	if this.TypeUrl != that1.TypeUrl {
 		return false
-	***REMOVED***
-	if !bytes.Equal(this.Value, that1.Value) ***REMOVED***
+	}
+	if !bytes.Equal(this.Value, that1.Value) {
 		return false
-	***REMOVED***
+	}
 	return true
-***REMOVED***
-func (this *Any) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Any) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 6)
-	s = append(s, "&types.Any***REMOVED***")
+	s = append(s, "&types.Any{")
 	s = append(s, "TypeUrl: "+fmt.Sprintf("%#v", this.TypeUrl)+",\n")
 	s = append(s, "Value: "+fmt.Sprintf("%#v", this.Value)+",\n")
-	s = append(s, "***REMOVED***")
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func valueToGoStringAny(v interface***REMOVED******REMOVED***, typ string) string ***REMOVED***
+}
+func valueToGoStringAny(v interface{}, typ string) string {
 	rv := reflect.ValueOf(v)
-	if rv.IsNil() ***REMOVED***
+	if rv.IsNil() {
 		return "nil"
-	***REMOVED***
+	}
 	pv := reflect.Indirect(rv).Interface()
-	return fmt.Sprintf("func(v %v) *%v ***REMOVED*** return &v ***REMOVED*** ( %#v )", typ, typ, pv)
-***REMOVED***
-func (m *Any) Marshal() (dAtA []byte, err error) ***REMOVED***
+	return fmt.Sprintf("func(v %v) *%v { return &v } ( %#v )", typ, typ, pv)
+}
+func (m *Any) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *Any) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *Any) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.TypeUrl) > 0 ***REMOVED***
+	if len(m.TypeUrl) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintAny(dAtA, i, uint64(len(m.TypeUrl)))
 		i += copy(dAtA[i:], m.TypeUrl)
-	***REMOVED***
-	if len(m.Value) > 0 ***REMOVED***
+	}
+	if len(m.Value) > 0 {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintAny(dAtA, i, uint64(len(m.Value)))
 		i += copy(dAtA[i:], m.Value)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func encodeFixed64Any(dAtA []byte, offset int, v uint64) int ***REMOVED***
+func encodeFixed64Any(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
 	dAtA[offset+2] = uint8(v >> 16)
@@ -283,83 +283,83 @@ func encodeFixed64Any(dAtA []byte, offset int, v uint64) int ***REMOVED***
 	dAtA[offset+6] = uint8(v >> 48)
 	dAtA[offset+7] = uint8(v >> 56)
 	return offset + 8
-***REMOVED***
-func encodeFixed32Any(dAtA []byte, offset int, v uint32) int ***REMOVED***
+}
+func encodeFixed32Any(dAtA []byte, offset int, v uint32) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
 	dAtA[offset+2] = uint8(v >> 16)
 	dAtA[offset+3] = uint8(v >> 24)
 	return offset + 4
-***REMOVED***
-func encodeVarintAny(dAtA []byte, offset int, v uint64) int ***REMOVED***
-	for v >= 1<<7 ***REMOVED***
+}
+func encodeVarintAny(dAtA []byte, offset int, v uint64) int {
+	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
-	***REMOVED***
+	}
 	dAtA[offset] = uint8(v)
 	return offset + 1
-***REMOVED***
-func NewPopulatedAny(r randyAny, easy bool) *Any ***REMOVED***
-	this := &Any***REMOVED******REMOVED***
+}
+func NewPopulatedAny(r randyAny, easy bool) *Any {
+	this := &Any{}
 	this.TypeUrl = string(randStringAny(r))
 	v1 := r.Intn(100)
 	this.Value = make([]byte, v1)
-	for i := 0; i < v1; i++ ***REMOVED***
+	for i := 0; i < v1; i++ {
 		this.Value[i] = byte(r.Intn(256))
-	***REMOVED***
-	if !easy && r.Intn(10) != 0 ***REMOVED***
-	***REMOVED***
+	}
+	if !easy && r.Intn(10) != 0 {
+	}
 	return this
-***REMOVED***
+}
 
-type randyAny interface ***REMOVED***
+type randyAny interface {
 	Float32() float32
 	Float64() float64
 	Int63() int64
 	Int31() int32
 	Uint32() uint32
 	Intn(n int) int
-***REMOVED***
+}
 
-func randUTF8RuneAny(r randyAny) rune ***REMOVED***
+func randUTF8RuneAny(r randyAny) rune {
 	ru := r.Intn(62)
-	if ru < 10 ***REMOVED***
+	if ru < 10 {
 		return rune(ru + 48)
-	***REMOVED*** else if ru < 36 ***REMOVED***
+	} else if ru < 36 {
 		return rune(ru + 55)
-	***REMOVED***
+	}
 	return rune(ru + 61)
-***REMOVED***
-func randStringAny(r randyAny) string ***REMOVED***
+}
+func randStringAny(r randyAny) string {
 	v2 := r.Intn(100)
 	tmps := make([]rune, v2)
-	for i := 0; i < v2; i++ ***REMOVED***
+	for i := 0; i < v2; i++ {
 		tmps[i] = randUTF8RuneAny(r)
-	***REMOVED***
+	}
 	return string(tmps)
-***REMOVED***
-func randUnrecognizedAny(r randyAny, maxFieldNumber int) (dAtA []byte) ***REMOVED***
+}
+func randUnrecognizedAny(r randyAny, maxFieldNumber int) (dAtA []byte) {
 	l := r.Intn(5)
-	for i := 0; i < l; i++ ***REMOVED***
+	for i := 0; i < l; i++ {
 		wire := r.Intn(4)
-		if wire == 3 ***REMOVED***
+		if wire == 3 {
 			wire = 5
-		***REMOVED***
+		}
 		fieldNumber := maxFieldNumber + r.Intn(100)
 		dAtA = randFieldAny(dAtA, r, fieldNumber, wire)
-	***REMOVED***
+	}
 	return dAtA
-***REMOVED***
-func randFieldAny(dAtA []byte, r randyAny, fieldNumber int, wire int) []byte ***REMOVED***
+}
+func randFieldAny(dAtA []byte, r randyAny, fieldNumber int, wire int) []byte {
 	key := uint32(fieldNumber)<<3 | uint32(wire)
-	switch wire ***REMOVED***
+	switch wire {
 	case 0:
 		dAtA = encodeVarintPopulateAny(dAtA, uint64(key))
 		v3 := r.Int63()
-		if r.Intn(2) == 0 ***REMOVED***
+		if r.Intn(2) == 0 {
 			v3 *= -1
-		***REMOVED***
+		}
 		dAtA = encodeVarintPopulateAny(dAtA, uint64(v3))
 	case 1:
 		dAtA = encodeVarintPopulateAny(dAtA, uint64(key))
@@ -368,266 +368,266 @@ func randFieldAny(dAtA []byte, r randyAny, fieldNumber int, wire int) []byte ***
 		dAtA = encodeVarintPopulateAny(dAtA, uint64(key))
 		ll := r.Intn(100)
 		dAtA = encodeVarintPopulateAny(dAtA, uint64(ll))
-		for j := 0; j < ll; j++ ***REMOVED***
+		for j := 0; j < ll; j++ {
 			dAtA = append(dAtA, byte(r.Intn(256)))
-		***REMOVED***
+		}
 	default:
 		dAtA = encodeVarintPopulateAny(dAtA, uint64(key))
 		dAtA = append(dAtA, byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)))
-	***REMOVED***
+	}
 	return dAtA
-***REMOVED***
-func encodeVarintPopulateAny(dAtA []byte, v uint64) []byte ***REMOVED***
-	for v >= 1<<7 ***REMOVED***
+}
+func encodeVarintPopulateAny(dAtA []byte, v uint64) []byte {
+	for v >= 1<<7 {
 		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
-	***REMOVED***
+	}
 	dAtA = append(dAtA, uint8(v))
 	return dAtA
-***REMOVED***
-func (m *Any) Size() (n int) ***REMOVED***
+}
+func (m *Any) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.TypeUrl)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovAny(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.Value)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovAny(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func sovAny(x uint64) (n int) ***REMOVED***
-	for ***REMOVED***
+func sovAny(x uint64) (n int) {
+	for {
 		n++
 		x >>= 7
-		if x == 0 ***REMOVED***
+		if x == 0 {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
-func sozAny(x uint64) (n int) ***REMOVED***
+}
+func sozAny(x uint64) (n int) {
 	return sovAny(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-***REMOVED***
-func (this *Any) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Any) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&Any***REMOVED***`,
+	}
+	s := strings.Join([]string{`&Any{`,
 		`TypeUrl:` + fmt.Sprintf("%v", this.TypeUrl) + `,`,
 		`Value:` + fmt.Sprintf("%v", this.Value) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func valueToStringAny(v interface***REMOVED******REMOVED***) string ***REMOVED***
+}
+func valueToStringAny(v interface{}) string {
 	rv := reflect.ValueOf(v)
-	if rv.IsNil() ***REMOVED***
+	if rv.IsNil() {
 		return "nil"
-	***REMOVED***
+	}
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
-***REMOVED***
-func (m *Any) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *Any) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowAny
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: Any: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: Any: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field TypeUrl", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowAny
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthAny
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.TypeUrl = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Value", wireType)
-			***REMOVED***
+			}
 			var byteLen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowAny
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				byteLen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if byteLen < 0 ***REMOVED***
+				}
+			}
+			if byteLen < 0 {
 				return ErrInvalidLengthAny
-			***REMOVED***
+			}
 			postIndex := iNdEx + byteLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Value = append(m.Value[:0], dAtA[iNdEx:postIndex]...)
-			if m.Value == nil ***REMOVED***
-				m.Value = []byte***REMOVED******REMOVED***
-			***REMOVED***
+			if m.Value == nil {
+				m.Value = []byte{}
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipAny(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthAny
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func skipAny(dAtA []byte) (n int, err error) ***REMOVED***
+}
+func skipAny(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return 0, ErrIntOverflowAny
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return 0, io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		wireType := int(wire & 0x7)
-		switch wireType ***REMOVED***
+		switch wireType {
 		case 0:
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowAny
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				iNdEx++
-				if dAtA[iNdEx-1] < 0x80 ***REMOVED***
+				if dAtA[iNdEx-1] < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return iNdEx, nil
 		case 1:
 			iNdEx += 8
 			return iNdEx, nil
 		case 2:
 			var length int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowAny
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				length |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			iNdEx += length
-			if length < 0 ***REMOVED***
+			if length < 0 {
 				return 0, ErrInvalidLengthAny
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 3:
-			for ***REMOVED***
+			for {
 				var innerWire uint64
 				var start int = iNdEx
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return 0, ErrIntOverflowAny
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return 0, io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					innerWire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				innerWireType := int(innerWire & 0x7)
-				if innerWireType == 4 ***REMOVED***
+				if innerWireType == 4 {
 					break
-				***REMOVED***
+				}
 				next, err := skipAny(dAtA[start:])
-				if err != nil ***REMOVED***
+				if err != nil {
 					return 0, err
-				***REMOVED***
+				}
 				iNdEx = start + next
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 4:
 			return iNdEx, nil
@@ -636,19 +636,19 @@ func skipAny(dAtA []byte) (n int, err error) ***REMOVED***
 			return iNdEx, nil
 		default:
 			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	panic("unreachable")
-***REMOVED***
+}
 
 var (
 	ErrInvalidLengthAny = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowAny   = fmt.Errorf("proto: integer overflow")
 )
 
-func init() ***REMOVED*** proto.RegisterFile("any.proto", fileDescriptorAny) ***REMOVED***
+func init() { proto.RegisterFile("any.proto", fileDescriptorAny) }
 
-var fileDescriptorAny = []byte***REMOVED***
+var fileDescriptorAny = []byte{
 	// 208 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x4c, 0xcc, 0xab, 0xd4,
 	0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0xe2, 0x4f, 0xcf, 0xcf, 0x4f, 0xcf, 0x49, 0x85, 0xf0, 0x92,
@@ -663,4 +663,4 @@ var fileDescriptorAny = []byte***REMOVED***
 	0x64, 0x5c, 0xc4, 0xc4, 0xec, 0x1e, 0xe0, 0xb4, 0x8a, 0x49, 0xce, 0x1d, 0xa2, 0x3a, 0x00, 0xaa,
 	0x5a, 0x2f, 0x3c, 0x35, 0x27, 0xc7, 0x3b, 0x2f, 0xbf, 0x3c, 0x2f, 0x04, 0xa4, 0x32, 0x89, 0x0d,
 	0x6c, 0x8c, 0x31, 0x20, 0x00, 0x00, 0xff, 0xff, 0x63, 0x5d, 0x2d, 0x27, 0xe1, 0x00, 0x00, 0x00,
-***REMOVED***
+}

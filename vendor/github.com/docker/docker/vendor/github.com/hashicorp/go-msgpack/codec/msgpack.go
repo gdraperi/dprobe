@@ -83,43 +83,43 @@ const (
 //
 // The Codec then passes it AS-IS to the rpc service (without wrapping it in an
 // array of 1 element).
-type MsgpackSpecRpcMultiArgs []interface***REMOVED******REMOVED***
+type MsgpackSpecRpcMultiArgs []interface{}
 
 // A MsgpackContainer type specifies the different types of msgpackContainers.
-type msgpackContainerType struct ***REMOVED***
+type msgpackContainerType struct {
 	fixCutoff                   int
 	bFixMin, b8, b16, b32       byte
 	hasFixMin, has8, has8Always bool
-***REMOVED***
+}
 
 var (
-	msgpackContainerStr  = msgpackContainerType***REMOVED***32, mpFixStrMin, mpStr8, mpStr16, mpStr32, true, true, false***REMOVED***
-	msgpackContainerBin  = msgpackContainerType***REMOVED***0, 0, mpBin8, mpBin16, mpBin32, false, true, true***REMOVED***
-	msgpackContainerList = msgpackContainerType***REMOVED***16, mpFixArrayMin, 0, mpArray16, mpArray32, true, false, false***REMOVED***
-	msgpackContainerMap  = msgpackContainerType***REMOVED***16, mpFixMapMin, 0, mpMap16, mpMap32, true, false, false***REMOVED***
+	msgpackContainerStr  = msgpackContainerType{32, mpFixStrMin, mpStr8, mpStr16, mpStr32, true, true, false}
+	msgpackContainerBin  = msgpackContainerType{0, 0, mpBin8, mpBin16, mpBin32, false, true, true}
+	msgpackContainerList = msgpackContainerType{16, mpFixArrayMin, 0, mpArray16, mpArray32, true, false, false}
+	msgpackContainerMap  = msgpackContainerType{16, mpFixMapMin, 0, mpMap16, mpMap32, true, false, false}
 )
 
 //---------------------------------------------
 
-type msgpackEncDriver struct ***REMOVED***
+type msgpackEncDriver struct {
 	w encWriter
 	h *MsgpackHandle
-***REMOVED***
+}
 
-func (e *msgpackEncDriver) isBuiltinType(rt uintptr) bool ***REMOVED***
+func (e *msgpackEncDriver) isBuiltinType(rt uintptr) bool {
 	//no builtin types. All encodings are based on kinds. Types supported as extensions.
 	return false
-***REMOVED***
+}
 
-func (e *msgpackEncDriver) encodeBuiltin(rt uintptr, v interface***REMOVED******REMOVED***) ***REMOVED******REMOVED***
+func (e *msgpackEncDriver) encodeBuiltin(rt uintptr, v interface{}) {}
 
-func (e *msgpackEncDriver) encodeNil() ***REMOVED***
+func (e *msgpackEncDriver) encodeNil() {
 	e.w.writen1(mpNil)
-***REMOVED***
+}
 
-func (e *msgpackEncDriver) encodeInt(i int64) ***REMOVED***
+func (e *msgpackEncDriver) encodeInt(i int64) {
 
-	switch ***REMOVED***
+	switch {
 	case i >= 0:
 		e.encodeUint(uint64(i))
 	case i >= -32:
@@ -135,11 +135,11 @@ func (e *msgpackEncDriver) encodeInt(i int64) ***REMOVED***
 	default:
 		e.w.writen1(mpInt64)
 		e.w.writeUint64(uint64(i))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (e *msgpackEncDriver) encodeUint(i uint64) ***REMOVED***
-	switch ***REMOVED***
+func (e *msgpackEncDriver) encodeUint(i uint64) {
+	switch {
 	case i <= math.MaxInt8:
 		e.w.writen1(byte(i))
 	case i <= math.MaxUint8:
@@ -153,29 +153,29 @@ func (e *msgpackEncDriver) encodeUint(i uint64) ***REMOVED***
 	default:
 		e.w.writen1(mpUint64)
 		e.w.writeUint64(uint64(i))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (e *msgpackEncDriver) encodeBool(b bool) ***REMOVED***
-	if b ***REMOVED***
+func (e *msgpackEncDriver) encodeBool(b bool) {
+	if b {
 		e.w.writen1(mpTrue)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		e.w.writen1(mpFalse)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (e *msgpackEncDriver) encodeFloat32(f float32) ***REMOVED***
+func (e *msgpackEncDriver) encodeFloat32(f float32) {
 	e.w.writen1(mpFloat)
 	e.w.writeUint32(math.Float32bits(f))
-***REMOVED***
+}
 
-func (e *msgpackEncDriver) encodeFloat64(f float64) ***REMOVED***
+func (e *msgpackEncDriver) encodeFloat64(f float64) {
 	e.w.writen1(mpDouble)
 	e.w.writeUint64(math.Float64bits(f))
-***REMOVED***
+}
 
-func (e *msgpackEncDriver) encodeExtPreamble(xtag byte, l int) ***REMOVED***
-	switch ***REMOVED***
+func (e *msgpackEncDriver) encodeExtPreamble(xtag byte, l int) {
+	switch {
 	case l == 1:
 		e.w.writen2(mpFixExt1, xtag)
 	case l == 2:
@@ -197,45 +197,45 @@ func (e *msgpackEncDriver) encodeExtPreamble(xtag byte, l int) ***REMOVED***
 		e.w.writen1(mpExt32)
 		e.w.writeUint32(uint32(l))
 		e.w.writen1(xtag)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (e *msgpackEncDriver) encodeArrayPreamble(length int) ***REMOVED***
+func (e *msgpackEncDriver) encodeArrayPreamble(length int) {
 	e.writeContainerLen(msgpackContainerList, length)
-***REMOVED***
+}
 
-func (e *msgpackEncDriver) encodeMapPreamble(length int) ***REMOVED***
+func (e *msgpackEncDriver) encodeMapPreamble(length int) {
 	e.writeContainerLen(msgpackContainerMap, length)
-***REMOVED***
+}
 
-func (e *msgpackEncDriver) encodeString(c charEncoding, s string) ***REMOVED***
-	if c == c_RAW && e.h.WriteExt ***REMOVED***
+func (e *msgpackEncDriver) encodeString(c charEncoding, s string) {
+	if c == c_RAW && e.h.WriteExt {
 		e.writeContainerLen(msgpackContainerBin, len(s))
-	***REMOVED*** else ***REMOVED***
+	} else {
 		e.writeContainerLen(msgpackContainerStr, len(s))
-	***REMOVED***
-	if len(s) > 0 ***REMOVED***
+	}
+	if len(s) > 0 {
 		e.w.writestr(s)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (e *msgpackEncDriver) encodeSymbol(v string) ***REMOVED***
+func (e *msgpackEncDriver) encodeSymbol(v string) {
 	e.encodeString(c_UTF8, v)
-***REMOVED***
+}
 
-func (e *msgpackEncDriver) encodeStringBytes(c charEncoding, bs []byte) ***REMOVED***
-	if c == c_RAW && e.h.WriteExt ***REMOVED***
+func (e *msgpackEncDriver) encodeStringBytes(c charEncoding, bs []byte) {
+	if c == c_RAW && e.h.WriteExt {
 		e.writeContainerLen(msgpackContainerBin, len(bs))
-	***REMOVED*** else ***REMOVED***
+	} else {
 		e.writeContainerLen(msgpackContainerStr, len(bs))
-	***REMOVED***
-	if len(bs) > 0 ***REMOVED***
+	}
+	if len(bs) > 0 {
 		e.w.writeb(bs)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (e *msgpackEncDriver) writeContainerLen(ct msgpackContainerType, l int) ***REMOVED***
-	switch ***REMOVED***
+func (e *msgpackEncDriver) writeContainerLen(ct msgpackContainerType, l int) {
+	switch {
 	case ct.hasFixMin && l < ct.fixCutoff:
 		e.w.writen1(ct.bFixMin | byte(l))
 	case ct.has8 && l < 256 && (ct.has8Always || e.h.WriteExt):
@@ -246,36 +246,36 @@ func (e *msgpackEncDriver) writeContainerLen(ct msgpackContainerType, l int) ***
 	default:
 		e.w.writen1(ct.b32)
 		e.w.writeUint32(uint32(l))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 //---------------------------------------------
 
-type msgpackDecDriver struct ***REMOVED***
+type msgpackDecDriver struct {
 	r      decReader
 	h      *MsgpackHandle
 	bd     byte
 	bdRead bool
 	bdType valueType
-***REMOVED***
+}
 
-func (d *msgpackDecDriver) isBuiltinType(rt uintptr) bool ***REMOVED***
+func (d *msgpackDecDriver) isBuiltinType(rt uintptr) bool {
 	//no builtin types. All encodings are based on kinds. Types supported as extensions.
 	return false
-***REMOVED***
+}
 
-func (d *msgpackDecDriver) decodeBuiltin(rt uintptr, v interface***REMOVED******REMOVED***) ***REMOVED******REMOVED***
+func (d *msgpackDecDriver) decodeBuiltin(rt uintptr, v interface{}) {}
 
 // Note: This returns either a primitive (int, bool, etc) for non-containers,
 // or a containerType, or a specific type denoting nil or extension.
-// It is called when a nil interface***REMOVED******REMOVED*** is passed, leaving it up to the DecDriver
+// It is called when a nil interface{} is passed, leaving it up to the DecDriver
 // to introspect the stream and decide how best to decode.
 // It deciphers the value by looking at the stream first.
-func (d *msgpackDecDriver) decodeNaked() (v interface***REMOVED******REMOVED***, vt valueType, decodeFurther bool) ***REMOVED***
+func (d *msgpackDecDriver) decodeNaked() (v interface{}, vt valueType, decodeFurther bool) {
 	d.initReadNext()
 	bd := d.bd
 
-	switch bd ***REMOVED***
+	switch bd {
 	case mpNil:
 		vt = valueTypeNil
 		d.bdRead = false
@@ -320,7 +320,7 @@ func (d *msgpackDecDriver) decodeNaked() (v interface***REMOVED******REMOVED***,
 		v = int64(int64(d.r.readUint64()))
 
 	default:
-		switch ***REMOVED***
+		switch {
 		case bd >= mpPosFixNumMin && bd <= mpPosFixNumMax:
 			// positive fixnum (always signed)
 			vt = valueTypeInt
@@ -330,18 +330,18 @@ func (d *msgpackDecDriver) decodeNaked() (v interface***REMOVED******REMOVED***,
 			vt = valueTypeInt
 			v = int64(int8(bd))
 		case bd == mpStr8, bd == mpStr16, bd == mpStr32, bd >= mpFixStrMin && bd <= mpFixStrMax:
-			if d.h.RawToString ***REMOVED***
+			if d.h.RawToString {
 				var rvm string
 				vt = valueTypeString
 				v = &rvm
-			***REMOVED*** else ***REMOVED***
-				var rvm = []byte***REMOVED******REMOVED***
+			} else {
+				var rvm = []byte{}
 				vt = valueTypeBytes
 				v = &rvm
-			***REMOVED***
+			}
 			decodeFurther = true
 		case bd == mpBin8, bd == mpBin16, bd == mpBin32:
-			var rvm = []byte***REMOVED******REMOVED***
+			var rvm = []byte{}
 			vt = valueTypeBytes
 			v = &rvm
 			decodeFurther = true
@@ -360,17 +360,17 @@ func (d *msgpackDecDriver) decodeNaked() (v interface***REMOVED******REMOVED***,
 			vt = valueTypeExt
 		default:
 			decErr("Nil-Deciphered DecodeValue: %s: hex: %x, dec: %d", msgBadDesc, bd, bd)
-		***REMOVED***
-	***REMOVED***
-	if !decodeFurther ***REMOVED***
+		}
+	}
+	if !decodeFurther {
 		d.bdRead = false
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // int can be decoded from msgpack type: intXXX or uintXXX
-func (d *msgpackDecDriver) decodeInt(bitsize uint8) (i int64) ***REMOVED***
-	switch d.bd ***REMOVED***
+func (d *msgpackDecDriver) decodeInt(bitsize uint8) (i int64) {
+	switch d.bd {
 	case mpUint8:
 		i = int64(uint64(d.r.readn1()))
 	case mpUint16:
@@ -388,28 +388,28 @@ func (d *msgpackDecDriver) decodeInt(bitsize uint8) (i int64) ***REMOVED***
 	case mpInt64:
 		i = int64(d.r.readUint64())
 	default:
-		switch ***REMOVED***
+		switch {
 		case d.bd >= mpPosFixNumMin && d.bd <= mpPosFixNumMax:
 			i = int64(int8(d.bd))
 		case d.bd >= mpNegFixNumMin && d.bd <= mpNegFixNumMax:
 			i = int64(int8(d.bd))
 		default:
 			decErr("Unhandled single-byte unsigned integer value: %s: %x", msgBadDesc, d.bd)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	// check overflow (logic adapted from std pkg reflect/value.go OverflowUint()
-	if bitsize > 0 ***REMOVED***
-		if trunc := (i << (64 - bitsize)) >> (64 - bitsize); i != trunc ***REMOVED***
+	if bitsize > 0 {
+		if trunc := (i << (64 - bitsize)) >> (64 - bitsize); i != trunc {
 			decErr("Overflow int value: %v", i)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	d.bdRead = false
 	return
-***REMOVED***
+}
 
 // uint can be decoded from msgpack type: intXXX or uintXXX
-func (d *msgpackDecDriver) decodeUint(bitsize uint8) (ui uint64) ***REMOVED***
-	switch d.bd ***REMOVED***
+func (d *msgpackDecDriver) decodeUint(bitsize uint8) (ui uint64) {
+	switch d.bd {
 	case mpUint8:
 		ui = uint64(d.r.readn1())
 	case mpUint16:
@@ -419,133 +419,133 @@ func (d *msgpackDecDriver) decodeUint(bitsize uint8) (ui uint64) ***REMOVED***
 	case mpUint64:
 		ui = d.r.readUint64()
 	case mpInt8:
-		if i := int64(int8(d.r.readn1())); i >= 0 ***REMOVED***
+		if i := int64(int8(d.r.readn1())); i >= 0 {
 			ui = uint64(i)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			decErr("Assigning negative signed value: %v, to unsigned type", i)
-		***REMOVED***
+		}
 	case mpInt16:
-		if i := int64(int16(d.r.readUint16())); i >= 0 ***REMOVED***
+		if i := int64(int16(d.r.readUint16())); i >= 0 {
 			ui = uint64(i)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			decErr("Assigning negative signed value: %v, to unsigned type", i)
-		***REMOVED***
+		}
 	case mpInt32:
-		if i := int64(int32(d.r.readUint32())); i >= 0 ***REMOVED***
+		if i := int64(int32(d.r.readUint32())); i >= 0 {
 			ui = uint64(i)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			decErr("Assigning negative signed value: %v, to unsigned type", i)
-		***REMOVED***
+		}
 	case mpInt64:
-		if i := int64(d.r.readUint64()); i >= 0 ***REMOVED***
+		if i := int64(d.r.readUint64()); i >= 0 {
 			ui = uint64(i)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			decErr("Assigning negative signed value: %v, to unsigned type", i)
-		***REMOVED***
+		}
 	default:
-		switch ***REMOVED***
+		switch {
 		case d.bd >= mpPosFixNumMin && d.bd <= mpPosFixNumMax:
 			ui = uint64(d.bd)
 		case d.bd >= mpNegFixNumMin && d.bd <= mpNegFixNumMax:
 			decErr("Assigning negative signed value: %v, to unsigned type", int(d.bd))
 		default:
 			decErr("Unhandled single-byte unsigned integer value: %s: %x", msgBadDesc, d.bd)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	// check overflow (logic adapted from std pkg reflect/value.go OverflowUint()
-	if bitsize > 0 ***REMOVED***
-		if trunc := (ui << (64 - bitsize)) >> (64 - bitsize); ui != trunc ***REMOVED***
+	if bitsize > 0 {
+		if trunc := (ui << (64 - bitsize)) >> (64 - bitsize); ui != trunc {
 			decErr("Overflow uint value: %v", ui)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	d.bdRead = false
 	return
-***REMOVED***
+}
 
 // float can either be decoded from msgpack type: float, double or intX
-func (d *msgpackDecDriver) decodeFloat(chkOverflow32 bool) (f float64) ***REMOVED***
-	switch d.bd ***REMOVED***
+func (d *msgpackDecDriver) decodeFloat(chkOverflow32 bool) (f float64) {
+	switch d.bd {
 	case mpFloat:
 		f = float64(math.Float32frombits(d.r.readUint32()))
 	case mpDouble:
 		f = math.Float64frombits(d.r.readUint64())
 	default:
 		f = float64(d.decodeInt(0))
-	***REMOVED***
+	}
 	checkOverflowFloat32(f, chkOverflow32)
 	d.bdRead = false
 	return
-***REMOVED***
+}
 
 // bool can be decoded from bool, fixnum 0 or 1.
-func (d *msgpackDecDriver) decodeBool() (b bool) ***REMOVED***
-	switch d.bd ***REMOVED***
+func (d *msgpackDecDriver) decodeBool() (b bool) {
+	switch d.bd {
 	case mpFalse, 0:
 		// b = false
 	case mpTrue, 1:
 		b = true
 	default:
 		decErr("Invalid single-byte value for bool: %s: %x", msgBadDesc, d.bd)
-	***REMOVED***
+	}
 	d.bdRead = false
 	return
-***REMOVED***
+}
 
-func (d *msgpackDecDriver) decodeString() (s string) ***REMOVED***
+func (d *msgpackDecDriver) decodeString() (s string) {
 	clen := d.readContainerLen(msgpackContainerStr)
-	if clen > 0 ***REMOVED***
+	if clen > 0 {
 		s = string(d.r.readn(clen))
-	***REMOVED***
+	}
 	d.bdRead = false
 	return
-***REMOVED***
+}
 
 // Callers must check if changed=true (to decide whether to replace the one they have)
-func (d *msgpackDecDriver) decodeBytes(bs []byte) (bsOut []byte, changed bool) ***REMOVED***
+func (d *msgpackDecDriver) decodeBytes(bs []byte) (bsOut []byte, changed bool) {
 	// bytes can be decoded from msgpackContainerStr or msgpackContainerBin
 	var clen int
-	switch d.bd ***REMOVED***
+	switch d.bd {
 	case mpBin8, mpBin16, mpBin32:
 		clen = d.readContainerLen(msgpackContainerBin)
 	default:
 		clen = d.readContainerLen(msgpackContainerStr)
-	***REMOVED***
-	// if clen < 0 ***REMOVED***
+	}
+	// if clen < 0 {
 	// 	changed = true
 	// 	panic("length cannot be zero. this cannot be nil.")
-	// ***REMOVED***
-	if clen > 0 ***REMOVED***
+	// }
+	if clen > 0 {
 		// if no contents in stream, don't update the passed byteslice
-		if len(bs) != clen ***REMOVED***
+		if len(bs) != clen {
 			// Return changed=true if length of passed slice diff from length of bytes in stream
-			if len(bs) > clen ***REMOVED***
+			if len(bs) > clen {
 				bs = bs[:clen]
-			***REMOVED*** else ***REMOVED***
+			} else {
 				bs = make([]byte, clen)
-			***REMOVED***
+			}
 			bsOut = bs
 			changed = true
-		***REMOVED***
+		}
 		d.r.readb(bs)
-	***REMOVED***
+	}
 	d.bdRead = false
 	return
-***REMOVED***
+}
 
 // Every top-level decode funcs (i.e. decodeValue, decode) must call this first.
-func (d *msgpackDecDriver) initReadNext() ***REMOVED***
-	if d.bdRead ***REMOVED***
+func (d *msgpackDecDriver) initReadNext() {
+	if d.bdRead {
 		return
-	***REMOVED***
+	}
 	d.bd = d.r.readn1()
 	d.bdRead = true
 	d.bdType = valueTypeUnset
-***REMOVED***
+}
 
-func (d *msgpackDecDriver) currentEncodedType() valueType ***REMOVED***
-	if d.bdType == valueTypeUnset ***REMOVED***
+func (d *msgpackDecDriver) currentEncodedType() valueType {
+	if d.bdType == valueTypeUnset {
 		bd := d.bd
-		switch bd ***REMOVED***
+		switch bd {
 		case mpNil:
 			d.bdType = valueTypeNil
 		case mpFalse, mpTrue:
@@ -557,17 +557,17 @@ func (d *msgpackDecDriver) currentEncodedType() valueType ***REMOVED***
 		case mpInt8, mpInt16, mpInt32, mpInt64:
 			d.bdType = valueTypeInt
 		default:
-			switch ***REMOVED***
+			switch {
 			case bd >= mpPosFixNumMin && bd <= mpPosFixNumMax:
 				d.bdType = valueTypeInt
 			case bd >= mpNegFixNumMin && bd <= mpNegFixNumMax:
 				d.bdType = valueTypeInt
 			case bd == mpStr8, bd == mpStr16, bd == mpStr32, bd >= mpFixStrMin && bd <= mpFixStrMax:
-				if d.h.RawToString ***REMOVED***
+				if d.h.RawToString {
 					d.bdType = valueTypeString
-				***REMOVED*** else ***REMOVED***
+				} else {
 					d.bdType = valueTypeBytes
-				***REMOVED***
+				}
 			case bd == mpBin8, bd == mpBin16, bd == mpBin32:
 				d.bdType = valueTypeBytes
 			case bd == mpArray16, bd == mpArray32, bd >= mpFixArrayMin && bd <= mpFixArrayMax:
@@ -578,23 +578,23 @@ func (d *msgpackDecDriver) currentEncodedType() valueType ***REMOVED***
 				d.bdType = valueTypeExt
 			default:
 				decErr("currentEncodedType: Undeciphered descriptor: %s: hex: %x, dec: %d", msgBadDesc, bd, bd)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return d.bdType
-***REMOVED***
+}
 
-func (d *msgpackDecDriver) tryDecodeAsNil() bool ***REMOVED***
-	if d.bd == mpNil ***REMOVED***
+func (d *msgpackDecDriver) tryDecodeAsNil() bool {
+	if d.bd == mpNil {
 		d.bdRead = false
 		return true
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
-func (d *msgpackDecDriver) readContainerLen(ct msgpackContainerType) (clen int) ***REMOVED***
+func (d *msgpackDecDriver) readContainerLen(ct msgpackContainerType) (clen int) {
 	bd := d.bd
-	switch ***REMOVED***
+	switch {
 	case bd == mpNil:
 		clen = -1 // to represent nil
 	case bd == ct.b8:
@@ -607,21 +607,21 @@ func (d *msgpackDecDriver) readContainerLen(ct msgpackContainerType) (clen int) 
 		clen = int(ct.bFixMin ^ bd)
 	default:
 		decErr("readContainerLen: %s: hex: %x, dec: %d", msgBadDesc, bd, bd)
-	***REMOVED***
+	}
 	d.bdRead = false
 	return
-***REMOVED***
+}
 
-func (d *msgpackDecDriver) readMapLen() int ***REMOVED***
+func (d *msgpackDecDriver) readMapLen() int {
 	return d.readContainerLen(msgpackContainerMap)
-***REMOVED***
+}
 
-func (d *msgpackDecDriver) readArrayLen() int ***REMOVED***
+func (d *msgpackDecDriver) readArrayLen() int {
 	return d.readContainerLen(msgpackContainerList)
-***REMOVED***
+}
 
-func (d *msgpackDecDriver) readExtLen() (clen int) ***REMOVED***
-	switch d.bd ***REMOVED***
+func (d *msgpackDecDriver) readExtLen() (clen int) {
+	switch d.bd {
 	case mpNil:
 		clen = -1 // to represent nil
 	case mpFixExt1:
@@ -642,13 +642,13 @@ func (d *msgpackDecDriver) readExtLen() (clen int) ***REMOVED***
 		clen = int(d.r.readUint32())
 	default:
 		decErr("decoding ext bytes: found unexpected byte: %x", d.bd)
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func (d *msgpackDecDriver) decodeExt(verifyTag bool, tag byte) (xtag byte, xbs []byte) ***REMOVED***
+func (d *msgpackDecDriver) decodeExt(verifyTag bool, tag byte) (xtag byte, xbs []byte) {
 	xbd := d.bd
-	switch ***REMOVED***
+	switch {
 	case xbd == mpBin8, xbd == mpBin16, xbd == mpBin32:
 		xbs, _ = d.decodeBytes(nil)
 	case xbd == mpStr8, xbd == mpStr16, xbd == mpStr32,
@@ -657,22 +657,22 @@ func (d *msgpackDecDriver) decodeExt(verifyTag bool, tag byte) (xtag byte, xbs [
 	default:
 		clen := d.readExtLen()
 		xtag = d.r.readn1()
-		if verifyTag && xtag != tag ***REMOVED***
+		if verifyTag && xtag != tag {
 			decErr("Wrong extension tag. Got %b. Expecting: %v", xtag, tag)
-		***REMOVED***
+		}
 		xbs = d.r.readn(clen)
-	***REMOVED***
+	}
 	d.bdRead = false
 	return
-***REMOVED***
+}
 
 //--------------------------------------------------
 
 //MsgpackHandle is a Handle for the Msgpack Schema-Free Encoding Format.
-type MsgpackHandle struct ***REMOVED***
+type MsgpackHandle struct {
 	BasicHandle
 
-	// RawToString controls how raw bytes are decoded into a nil interface***REMOVED******REMOVED***.
+	// RawToString controls how raw bytes are decoded into a nil interface{}.
 	RawToString bool
 	// WriteExt flag supports encoding configured extensions with extension tags.
 	// It also controls whether other elements of the new spec are encoded (ie Str8).
@@ -682,135 +682,135 @@ type MsgpackHandle struct ***REMOVED***
 	//
 	// A stream can still be decoded into a typed value, provided an appropriate value
 	// is provided, but the type cannot be inferred from the stream. If no appropriate
-	// type is provided (e.g. decoding into a nil interface***REMOVED******REMOVED***), you get back
+	// type is provided (e.g. decoding into a nil interface{}), you get back
 	// a []byte or string based on the setting of RawToString.
 	WriteExt bool
-***REMOVED***
+}
 
-func (h *MsgpackHandle) newEncDriver(w encWriter) encDriver ***REMOVED***
-	return &msgpackEncDriver***REMOVED***w: w, h: h***REMOVED***
-***REMOVED***
+func (h *MsgpackHandle) newEncDriver(w encWriter) encDriver {
+	return &msgpackEncDriver{w: w, h: h}
+}
 
-func (h *MsgpackHandle) newDecDriver(r decReader) decDriver ***REMOVED***
-	return &msgpackDecDriver***REMOVED***r: r, h: h***REMOVED***
-***REMOVED***
+func (h *MsgpackHandle) newDecDriver(r decReader) decDriver {
+	return &msgpackDecDriver{r: r, h: h}
+}
 
-func (h *MsgpackHandle) writeExt() bool ***REMOVED***
+func (h *MsgpackHandle) writeExt() bool {
 	return h.WriteExt
-***REMOVED***
+}
 
-func (h *MsgpackHandle) getBasicHandle() *BasicHandle ***REMOVED***
+func (h *MsgpackHandle) getBasicHandle() *BasicHandle {
 	return &h.BasicHandle
-***REMOVED***
+}
 
 //--------------------------------------------------
 
-type msgpackSpecRpcCodec struct ***REMOVED***
+type msgpackSpecRpcCodec struct {
 	rpcCodec
-***REMOVED***
+}
 
 // /////////////// Spec RPC Codec ///////////////////
-func (c *msgpackSpecRpcCodec) WriteRequest(r *rpc.Request, body interface***REMOVED******REMOVED***) error ***REMOVED***
+func (c *msgpackSpecRpcCodec) WriteRequest(r *rpc.Request, body interface{}) error {
 	// WriteRequest can write to both a Go service, and other services that do
 	// not abide by the 1 argument rule of a Go service.
 	// We discriminate based on if the body is a MsgpackSpecRpcMultiArgs
-	var bodyArr []interface***REMOVED******REMOVED***
-	if m, ok := body.(MsgpackSpecRpcMultiArgs); ok ***REMOVED***
-		bodyArr = ([]interface***REMOVED******REMOVED***)(m)
-	***REMOVED*** else ***REMOVED***
-		bodyArr = []interface***REMOVED******REMOVED******REMOVED***body***REMOVED***
-	***REMOVED***
-	r2 := []interface***REMOVED******REMOVED******REMOVED***0, uint32(r.Seq), r.ServiceMethod, bodyArr***REMOVED***
+	var bodyArr []interface{}
+	if m, ok := body.(MsgpackSpecRpcMultiArgs); ok {
+		bodyArr = ([]interface{})(m)
+	} else {
+		bodyArr = []interface{}{body}
+	}
+	r2 := []interface{}{0, uint32(r.Seq), r.ServiceMethod, bodyArr}
 	return c.write(r2, nil, false, true)
-***REMOVED***
+}
 
-func (c *msgpackSpecRpcCodec) WriteResponse(r *rpc.Response, body interface***REMOVED******REMOVED***) error ***REMOVED***
-	var moe interface***REMOVED******REMOVED***
-	if r.Error != "" ***REMOVED***
+func (c *msgpackSpecRpcCodec) WriteResponse(r *rpc.Response, body interface{}) error {
+	var moe interface{}
+	if r.Error != "" {
 		moe = r.Error
-	***REMOVED***
-	if moe != nil && body != nil ***REMOVED***
+	}
+	if moe != nil && body != nil {
 		body = nil
-	***REMOVED***
-	r2 := []interface***REMOVED******REMOVED******REMOVED***1, uint32(r.Seq), moe, body***REMOVED***
+	}
+	r2 := []interface{}{1, uint32(r.Seq), moe, body}
 	return c.write(r2, nil, false, true)
-***REMOVED***
+}
 
-func (c *msgpackSpecRpcCodec) ReadResponseHeader(r *rpc.Response) error ***REMOVED***
+func (c *msgpackSpecRpcCodec) ReadResponseHeader(r *rpc.Response) error {
 	return c.parseCustomHeader(1, &r.Seq, &r.Error)
-***REMOVED***
+}
 
-func (c *msgpackSpecRpcCodec) ReadRequestHeader(r *rpc.Request) error ***REMOVED***
+func (c *msgpackSpecRpcCodec) ReadRequestHeader(r *rpc.Request) error {
 	return c.parseCustomHeader(0, &r.Seq, &r.ServiceMethod)
-***REMOVED***
+}
 
-func (c *msgpackSpecRpcCodec) ReadRequestBody(body interface***REMOVED******REMOVED***) error ***REMOVED***
-	if body == nil ***REMOVED*** // read and discard
+func (c *msgpackSpecRpcCodec) ReadRequestBody(body interface{}) error {
+	if body == nil { // read and discard
 		return c.read(nil)
-	***REMOVED***
-	bodyArr := []interface***REMOVED******REMOVED******REMOVED***body***REMOVED***
+	}
+	bodyArr := []interface{}{body}
 	return c.read(&bodyArr)
-***REMOVED***
+}
 
-func (c *msgpackSpecRpcCodec) parseCustomHeader(expectTypeByte byte, msgid *uint64, methodOrError *string) (err error) ***REMOVED***
+func (c *msgpackSpecRpcCodec) parseCustomHeader(expectTypeByte byte, msgid *uint64, methodOrError *string) (err error) {
 
-	if c.cls ***REMOVED***
+	if c.cls {
 		return io.EOF
-	***REMOVED***
+	}
 
 	// We read the response header by hand
 	// so that the body can be decoded on its own from the stream at a later time.
 
 	const fia byte = 0x94 //four item array descriptor value
 	// Not sure why the panic of EOF is swallowed above.
-	// if bs1 := c.dec.r.readn1(); bs1 != fia ***REMOVED***
+	// if bs1 := c.dec.r.readn1(); bs1 != fia {
 	// 	err = fmt.Errorf("Unexpected value for array descriptor: Expecting %v. Received %v", fia, bs1)
 	// 	return
-	// ***REMOVED***
+	// }
 	var b byte
 	b, err = c.br.ReadByte()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
-	if b != fia ***REMOVED***
+	}
+	if b != fia {
 		err = fmt.Errorf("Unexpected value for array descriptor: Expecting %v. Received %v", fia, b)
 		return
-	***REMOVED***
+	}
 
-	if err = c.read(&b); err != nil ***REMOVED***
+	if err = c.read(&b); err != nil {
 		return
-	***REMOVED***
-	if b != expectTypeByte ***REMOVED***
+	}
+	if b != expectTypeByte {
 		err = fmt.Errorf("Unexpected byte descriptor in header. Expecting %v. Received %v", expectTypeByte, b)
 		return
-	***REMOVED***
-	if err = c.read(msgid); err != nil ***REMOVED***
+	}
+	if err = c.read(msgid); err != nil {
 		return
-	***REMOVED***
-	if err = c.read(methodOrError); err != nil ***REMOVED***
+	}
+	if err = c.read(methodOrError); err != nil {
 		return
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 //--------------------------------------------------
 
 // msgpackSpecRpc is the implementation of Rpc that uses custom communication protocol
 // as defined in the msgpack spec at https://github.com/msgpack-rpc/msgpack-rpc/blob/master/spec.md
-type msgpackSpecRpc struct***REMOVED******REMOVED***
+type msgpackSpecRpc struct{}
 
 // MsgpackSpecRpc implements Rpc using the communication protocol defined in
 // the msgpack spec at https://github.com/msgpack-rpc/msgpack-rpc/blob/master/spec.md .
 // Its methods (ServerCodec and ClientCodec) return values that implement RpcCodecBuffered.
 var MsgpackSpecRpc msgpackSpecRpc
 
-func (x msgpackSpecRpc) ServerCodec(conn io.ReadWriteCloser, h Handle) rpc.ServerCodec ***REMOVED***
-	return &msgpackSpecRpcCodec***REMOVED***newRPCCodec(conn, h)***REMOVED***
-***REMOVED***
+func (x msgpackSpecRpc) ServerCodec(conn io.ReadWriteCloser, h Handle) rpc.ServerCodec {
+	return &msgpackSpecRpcCodec{newRPCCodec(conn, h)}
+}
 
-func (x msgpackSpecRpc) ClientCodec(conn io.ReadWriteCloser, h Handle) rpc.ClientCodec ***REMOVED***
-	return &msgpackSpecRpcCodec***REMOVED***newRPCCodec(conn, h)***REMOVED***
-***REMOVED***
+func (x msgpackSpecRpc) ClientCodec(conn io.ReadWriteCloser, h Handle) rpc.ClientCodec {
+	return &msgpackSpecRpcCodec{newRPCCodec(conn, h)}
+}
 
 var _ decDriver = (*msgpackDecDriver)(nil)
 var _ encDriver = (*msgpackEncDriver)(nil)

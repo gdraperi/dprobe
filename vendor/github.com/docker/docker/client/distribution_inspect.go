@@ -9,27 +9,27 @@ import (
 )
 
 // DistributionInspect returns the image digest with full Manifest
-func (cli *Client) DistributionInspect(ctx context.Context, image, encodedRegistryAuth string) (registrytypes.DistributionInspect, error) ***REMOVED***
+func (cli *Client) DistributionInspect(ctx context.Context, image, encodedRegistryAuth string) (registrytypes.DistributionInspect, error) {
 	// Contact the registry to retrieve digest and platform information
 	var distributionInspect registrytypes.DistributionInspect
 
-	if err := cli.NewVersionError("1.30", "distribution inspect"); err != nil ***REMOVED***
+	if err := cli.NewVersionError("1.30", "distribution inspect"); err != nil {
 		return distributionInspect, err
-	***REMOVED***
+	}
 	var headers map[string][]string
 
-	if encodedRegistryAuth != "" ***REMOVED***
-		headers = map[string][]string***REMOVED***
-			"X-Registry-Auth": ***REMOVED***encodedRegistryAuth***REMOVED***,
-		***REMOVED***
-	***REMOVED***
+	if encodedRegistryAuth != "" {
+		headers = map[string][]string{
+			"X-Registry-Auth": {encodedRegistryAuth},
+		}
+	}
 
-	resp, err := cli.get(ctx, "/distribution/"+image+"/json", url.Values***REMOVED******REMOVED***, headers)
-	if err != nil ***REMOVED***
+	resp, err := cli.get(ctx, "/distribution/"+image+"/json", url.Values{}, headers)
+	if err != nil {
 		return distributionInspect, err
-	***REMOVED***
+	}
 
 	err = json.NewDecoder(resp.body).Decode(&distributionInspect)
 	ensureReaderClosed(resp)
 	return distributionInspect, err
-***REMOVED***
+}

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-copy_binaries() ***REMOVED***
+copy_binaries() {
 	local dir="$1"
 	local hash="$2"
 	# Add nested executables to bundle dir so we have complete set of
@@ -20,8 +20,8 @@ copy_binaries() ***REMOVED***
 			hash_files "$dir/docker-$file"
 		fi
 	done
-***REMOVED***
+}
 
 [ -z "$KEEPDEST" ] && rm -rf "$DEST"
-source "$***REMOVED***MAKEDIR***REMOVED***/.binary"
+source "${MAKEDIR}/.binary"
 copy_binaries "$DEST" 'hash'

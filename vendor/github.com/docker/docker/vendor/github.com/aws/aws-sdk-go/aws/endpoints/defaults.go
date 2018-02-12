@@ -155,2463 +155,2463 @@ const (
 // to resolve endpoints for: AWS Standard, AWS China, and AWS GovCloud (US).
 //
 // Use DefaultPartitions() to get the list of the default partitions.
-func DefaultResolver() Resolver ***REMOVED***
+func DefaultResolver() Resolver {
 	return defaultPartitions
-***REMOVED***
+}
 
 // DefaultPartitions returns a list of the partitions the SDK is bundled
 // with. The available partitions are: AWS Standard, AWS China, and AWS GovCloud (US).
 //
 //    partitions := endpoints.DefaultPartitions
-//    for _, p := range partitions ***REMOVED***
+//    for _, p := range partitions {
 //        // ... inspect partitions
-//***REMOVED***
-func DefaultPartitions() []Partition ***REMOVED***
+//    }
+func DefaultPartitions() []Partition {
 	return defaultPartitions.Partitions()
-***REMOVED***
+}
 
-var defaultPartitions = partitions***REMOVED***
+var defaultPartitions = partitions{
 	awsPartition,
 	awscnPartition,
 	awsusgovPartition,
-***REMOVED***
+}
 
 // AwsPartition returns the Resolver for AWS Standard.
-func AwsPartition() Partition ***REMOVED***
+func AwsPartition() Partition {
 	return awsPartition.Partition()
-***REMOVED***
+}
 
-var awsPartition = partition***REMOVED***
+var awsPartition = partition{
 	ID:        "aws",
 	Name:      "AWS Standard",
 	DNSSuffix: "amazonaws.com",
-	RegionRegex: regionRegex***REMOVED***
-		Regexp: func() *regexp.Regexp ***REMOVED***
+	RegionRegex: regionRegex{
+		Regexp: func() *regexp.Regexp {
 			reg, _ := regexp.Compile("^(us|eu|ap|sa|ca)\\-\\w+\\-\\d+$")
 			return reg
-		***REMOVED***(),
-	***REMOVED***,
-	Defaults: endpoint***REMOVED***
-		Hostname:          "***REMOVED***service***REMOVED***.***REMOVED***region***REMOVED***.***REMOVED***dnsSuffix***REMOVED***",
-		Protocols:         []string***REMOVED***"https"***REMOVED***,
-		SignatureVersions: []string***REMOVED***"v4"***REMOVED***,
-	***REMOVED***,
-	Regions: regions***REMOVED***
-		"ap-northeast-1": region***REMOVED***
+		}(),
+	},
+	Defaults: endpoint{
+		Hostname:          "{service}.{region}.{dnsSuffix}",
+		Protocols:         []string{"https"},
+		SignatureVersions: []string{"v4"},
+	},
+	Regions: regions{
+		"ap-northeast-1": region{
 			Description: "Asia Pacific (Tokyo)",
-		***REMOVED***,
-		"ap-northeast-2": region***REMOVED***
+		},
+		"ap-northeast-2": region{
 			Description: "Asia Pacific (Seoul)",
-		***REMOVED***,
-		"ap-south-1": region***REMOVED***
+		},
+		"ap-south-1": region{
 			Description: "Asia Pacific (Mumbai)",
-		***REMOVED***,
-		"ap-southeast-1": region***REMOVED***
+		},
+		"ap-southeast-1": region{
 			Description: "Asia Pacific (Singapore)",
-		***REMOVED***,
-		"ap-southeast-2": region***REMOVED***
+		},
+		"ap-southeast-2": region{
 			Description: "Asia Pacific (Sydney)",
-		***REMOVED***,
-		"ca-central-1": region***REMOVED***
+		},
+		"ca-central-1": region{
 			Description: "Canada (Central)",
-		***REMOVED***,
-		"eu-central-1": region***REMOVED***
+		},
+		"eu-central-1": region{
 			Description: "EU (Frankfurt)",
-		***REMOVED***,
-		"eu-west-1": region***REMOVED***
+		},
+		"eu-west-1": region{
 			Description: "EU (Ireland)",
-		***REMOVED***,
-		"eu-west-2": region***REMOVED***
+		},
+		"eu-west-2": region{
 			Description: "EU (London)",
-		***REMOVED***,
-		"eu-west-3": region***REMOVED***
+		},
+		"eu-west-3": region{
 			Description: "EU (Paris)",
-		***REMOVED***,
-		"sa-east-1": region***REMOVED***
+		},
+		"sa-east-1": region{
 			Description: "South America (Sao Paulo)",
-		***REMOVED***,
-		"us-east-1": region***REMOVED***
+		},
+		"us-east-1": region{
 			Description: "US East (N. Virginia)",
-		***REMOVED***,
-		"us-east-2": region***REMOVED***
+		},
+		"us-east-2": region{
 			Description: "US East (Ohio)",
-		***REMOVED***,
-		"us-west-1": region***REMOVED***
+		},
+		"us-west-1": region{
 			Description: "US West (N. California)",
-		***REMOVED***,
-		"us-west-2": region***REMOVED***
+		},
+		"us-west-2": region{
 			Description: "US West (Oregon)",
-		***REMOVED***,
-	***REMOVED***,
-	Services: services***REMOVED***
-		"acm": service***REMOVED***
+		},
+	},
+	Services: services{
+		"acm": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"eu-west-3":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"api.pricing": service***REMOVED***
-			Defaults: endpoint***REMOVED***
-				CredentialScope: credentialScope***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"eu-west-3":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"api.pricing": service{
+			Defaults: endpoint{
+				CredentialScope: credentialScope{
 					Service: "pricing",
-				***REMOVED***,
-			***REMOVED***,
-			Endpoints: endpoints***REMOVED***
-				"ap-south-1": endpoint***REMOVED******REMOVED***,
-				"us-east-1":  endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"apigateway": service***REMOVED***
+				},
+			},
+			Endpoints: endpoints{
+				"ap-south-1": endpoint{},
+				"us-east-1":  endpoint{},
+			},
+		},
+		"apigateway": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"eu-west-3":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"application-autoscaling": service***REMOVED***
-			Defaults: endpoint***REMOVED***
-				Hostname:  "autoscaling.***REMOVED***region***REMOVED***.amazonaws.com",
-				Protocols: []string***REMOVED***"http", "https"***REMOVED***,
-				CredentialScope: credentialScope***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"eu-west-3":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"application-autoscaling": service{
+			Defaults: endpoint{
+				Hostname:  "autoscaling.{region}.amazonaws.com",
+				Protocols: []string{"http", "https"},
+				CredentialScope: credentialScope{
 					Service: "application-autoscaling",
-				***REMOVED***,
-			***REMOVED***,
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"eu-west-3":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"appstream2": service***REMOVED***
-			Defaults: endpoint***REMOVED***
-				Protocols: []string***REMOVED***"https"***REMOVED***,
-				CredentialScope: credentialScope***REMOVED***
+				},
+			},
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"eu-west-3":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"appstream2": service{
+			Defaults: endpoint{
+				Protocols: []string{"https"},
+				CredentialScope: credentialScope{
 					Service: "appstream",
-				***REMOVED***,
-			***REMOVED***,
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"athena": service***REMOVED***
+				},
+			},
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"eu-west-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"athena": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"autoscaling": service***REMOVED***
-			Defaults: endpoint***REMOVED***
-				Protocols: []string***REMOVED***"http", "https"***REMOVED***,
-			***REMOVED***,
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"eu-west-3":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"batch": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"autoscaling": service{
+			Defaults: endpoint{
+				Protocols: []string{"http", "https"},
+			},
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"eu-west-3":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"batch": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"budgets": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"budgets": service{
 			PartitionEndpoint: "aws-global",
 			IsRegionalized:    boxedFalse,
 
-			Endpoints: endpoints***REMOVED***
-				"aws-global": endpoint***REMOVED***
+			Endpoints: endpoints{
+				"aws-global": endpoint{
 					Hostname: "budgets.amazonaws.com",
-					CredentialScope: credentialScope***REMOVED***
+					CredentialScope: credentialScope{
 						Region: "us-east-1",
-					***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"clouddirectory": service***REMOVED***
+					},
+				},
+			},
+		},
+		"clouddirectory": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"cloudformation": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"cloudformation": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"eu-west-3":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"cloudfront": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"eu-west-3":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"cloudfront": service{
 			PartitionEndpoint: "aws-global",
 			IsRegionalized:    boxedFalse,
 
-			Endpoints: endpoints***REMOVED***
-				"aws-global": endpoint***REMOVED***
+			Endpoints: endpoints{
+				"aws-global": endpoint{
 					Hostname:  "cloudfront.amazonaws.com",
-					Protocols: []string***REMOVED***"http", "https"***REMOVED***,
-					CredentialScope: credentialScope***REMOVED***
+					Protocols: []string{"http", "https"},
+					CredentialScope: credentialScope{
 						Region: "us-east-1",
-					***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"cloudhsm": service***REMOVED***
+					},
+				},
+			},
+		},
+		"cloudhsm": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"cloudhsmv2": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"cloudhsmv2": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"cloudsearch": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"cloudsearch": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"cloudtrail": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"cloudtrail": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"eu-west-3":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"codebuild": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"eu-west-3":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"codebuild": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"codecommit": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"codecommit": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"codedeploy": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"codedeploy": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"eu-west-3":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"codepipeline": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"eu-west-3":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"codepipeline": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"codestar": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"codestar": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"cognito-identity": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"cognito-identity": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"cognito-idp": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"cognito-idp": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"cognito-sync": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"cognito-sync": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"config": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"config": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"eu-west-3":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"cur": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"eu-west-3":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"cur": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-east-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"datapipeline": service***REMOVED***
+			Endpoints: endpoints{
+				"us-east-1": endpoint{},
+			},
+		},
+		"datapipeline": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"dax": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"eu-west-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"dax": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"devicefarm": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-south-1":     endpoint{},
+				"eu-west-1":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"devicefarm": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-west-2": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"directconnect": service***REMOVED***
+			Endpoints: endpoints{
+				"us-west-2": endpoint{},
+			},
+		},
+		"directconnect": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"eu-west-3":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"discovery": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"eu-west-3":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"discovery": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-west-2": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"dms": service***REMOVED***
+			Endpoints: endpoints{
+				"us-west-2": endpoint{},
+			},
+		},
+		"dms": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"eu-west-3":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"ds": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"eu-west-3":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"ds": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"dynamodb": service***REMOVED***
-			Defaults: endpoint***REMOVED***
-				Protocols: []string***REMOVED***"http", "https"***REMOVED***,
-			***REMOVED***,
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"eu-west-3":      endpoint***REMOVED******REMOVED***,
-				"local": endpoint***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"dynamodb": service{
+			Defaults: endpoint{
+				Protocols: []string{"http", "https"},
+			},
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"eu-west-3":      endpoint{},
+				"local": endpoint{
 					Hostname:  "localhost:8000",
-					Protocols: []string***REMOVED***"http"***REMOVED***,
-					CredentialScope: credentialScope***REMOVED***
+					Protocols: []string{"http"},
+					CredentialScope: credentialScope{
 						Region: "us-east-1",
-					***REMOVED***,
-				***REMOVED***,
-				"sa-east-1": endpoint***REMOVED******REMOVED***,
-				"us-east-1": endpoint***REMOVED******REMOVED***,
-				"us-east-2": endpoint***REMOVED******REMOVED***,
-				"us-west-1": endpoint***REMOVED******REMOVED***,
-				"us-west-2": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"ec2": service***REMOVED***
-			Defaults: endpoint***REMOVED***
-				Protocols: []string***REMOVED***"http", "https"***REMOVED***,
-			***REMOVED***,
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"eu-west-3":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"ec2metadata": service***REMOVED***
+					},
+				},
+				"sa-east-1": endpoint{},
+				"us-east-1": endpoint{},
+				"us-east-2": endpoint{},
+				"us-west-1": endpoint{},
+				"us-west-2": endpoint{},
+			},
+		},
+		"ec2": service{
+			Defaults: endpoint{
+				Protocols: []string{"http", "https"},
+			},
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"eu-west-3":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"ec2metadata": service{
 			PartitionEndpoint: "aws-global",
 			IsRegionalized:    boxedFalse,
 
-			Endpoints: endpoints***REMOVED***
-				"aws-global": endpoint***REMOVED***
+			Endpoints: endpoints{
+				"aws-global": endpoint{
 					Hostname:  "169.254.169.254/latest",
-					Protocols: []string***REMOVED***"http"***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"ecr": service***REMOVED***
+					Protocols: []string{"http"},
+				},
+			},
+		},
+		"ecr": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"eu-west-3":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"ecs": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"eu-west-3":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"ecs": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"eu-west-3":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"elasticache": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"eu-west-3":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"elasticache": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"eu-west-3":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"elasticbeanstalk": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"eu-west-3":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"elasticbeanstalk": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"eu-west-3":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"elasticfilesystem": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"eu-west-3":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"elasticfilesystem": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"elasticloadbalancing": service***REMOVED***
-			Defaults: endpoint***REMOVED***
-				Protocols: []string***REMOVED***"https"***REMOVED***,
-			***REMOVED***,
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"eu-west-3":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"elasticmapreduce": service***REMOVED***
-			Defaults: endpoint***REMOVED***
-				SSLCommonName: "***REMOVED***region***REMOVED***.***REMOVED***service***REMOVED***.***REMOVED***dnsSuffix***REMOVED***",
-				Protocols:     []string***REMOVED***"http", "https"***REMOVED***,
-			***REMOVED***,
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1": endpoint***REMOVED***
-					SSLCommonName: "***REMOVED***service***REMOVED***.***REMOVED***region***REMOVED***.***REMOVED***dnsSuffix***REMOVED***",
-				***REMOVED***,
-				"eu-west-1": endpoint***REMOVED******REMOVED***,
-				"eu-west-2": endpoint***REMOVED******REMOVED***,
-				"eu-west-3": endpoint***REMOVED******REMOVED***,
-				"sa-east-1": endpoint***REMOVED******REMOVED***,
-				"us-east-1": endpoint***REMOVED***
-					SSLCommonName: "***REMOVED***service***REMOVED***.***REMOVED***region***REMOVED***.***REMOVED***dnsSuffix***REMOVED***",
-				***REMOVED***,
-				"us-east-2": endpoint***REMOVED******REMOVED***,
-				"us-west-1": endpoint***REMOVED******REMOVED***,
-				"us-west-2": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"elastictranscoder": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-southeast-2": endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"elasticloadbalancing": service{
+			Defaults: endpoint{
+				Protocols: []string{"https"},
+			},
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"eu-west-3":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"elasticmapreduce": service{
+			Defaults: endpoint{
+				SSLCommonName: "{region}.{service}.{dnsSuffix}",
+				Protocols:     []string{"http", "https"},
+			},
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1": endpoint{
+					SSLCommonName: "{service}.{region}.{dnsSuffix}",
+				},
+				"eu-west-1": endpoint{},
+				"eu-west-2": endpoint{},
+				"eu-west-3": endpoint{},
+				"sa-east-1": endpoint{},
+				"us-east-1": endpoint{
+					SSLCommonName: "{service}.{region}.{dnsSuffix}",
+				},
+				"us-east-2": endpoint{},
+				"us-west-1": endpoint{},
+				"us-west-2": endpoint{},
+			},
+		},
+		"elastictranscoder": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"email": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"eu-west-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"email": service{
 
-			Endpoints: endpoints***REMOVED***
-				"eu-west-1": endpoint***REMOVED******REMOVED***,
-				"us-east-1": endpoint***REMOVED******REMOVED***,
-				"us-west-2": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"entitlement.marketplace": service***REMOVED***
-			Defaults: endpoint***REMOVED***
-				CredentialScope: credentialScope***REMOVED***
+			Endpoints: endpoints{
+				"eu-west-1": endpoint{},
+				"us-east-1": endpoint{},
+				"us-west-2": endpoint{},
+			},
+		},
+		"entitlement.marketplace": service{
+			Defaults: endpoint{
+				CredentialScope: credentialScope{
 					Service: "aws-marketplace",
-				***REMOVED***,
-			***REMOVED***,
-			Endpoints: endpoints***REMOVED***
-				"us-east-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"es": service***REMOVED***
+				},
+			},
+			Endpoints: endpoints{
+				"us-east-1": endpoint{},
+			},
+		},
+		"es": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"eu-west-3":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"events": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"eu-west-3":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"events": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"eu-west-3":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"firehose": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"eu-west-3":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"firehose": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"gamelift": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"gamelift": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"glacier": service***REMOVED***
-			Defaults: endpoint***REMOVED***
-				Protocols: []string***REMOVED***"http", "https"***REMOVED***,
-			***REMOVED***,
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"eu-west-3":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"glue": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"glacier": service{
+			Defaults: endpoint{
+				Protocols: []string{"http", "https"},
+			},
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"eu-west-3":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"glue": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"greengrass": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"eu-west-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"greengrass": service{
 			IsRegionalized: boxedTrue,
-			Defaults: endpoint***REMOVED***
-				Protocols: []string***REMOVED***"https"***REMOVED***,
-			***REMOVED***,
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"health": service***REMOVED***
+			Defaults: endpoint{
+				Protocols: []string{"https"},
+			},
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"eu-central-1":   endpoint{},
+				"us-east-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"health": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-east-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"iam": service***REMOVED***
+			Endpoints: endpoints{
+				"us-east-1": endpoint{},
+			},
+		},
+		"iam": service{
 			PartitionEndpoint: "aws-global",
 			IsRegionalized:    boxedFalse,
 
-			Endpoints: endpoints***REMOVED***
-				"aws-global": endpoint***REMOVED***
+			Endpoints: endpoints{
+				"aws-global": endpoint{
 					Hostname: "iam.amazonaws.com",
-					CredentialScope: credentialScope***REMOVED***
+					CredentialScope: credentialScope{
 						Region: "us-east-1",
-					***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"importexport": service***REMOVED***
+					},
+				},
+			},
+		},
+		"importexport": service{
 			PartitionEndpoint: "aws-global",
 			IsRegionalized:    boxedFalse,
 
-			Endpoints: endpoints***REMOVED***
-				"aws-global": endpoint***REMOVED***
+			Endpoints: endpoints{
+				"aws-global": endpoint{
 					Hostname:          "importexport.amazonaws.com",
-					SignatureVersions: []string***REMOVED***"v2", "v4"***REMOVED***,
-					CredentialScope: credentialScope***REMOVED***
+					SignatureVersions: []string{"v2", "v4"},
+					CredentialScope: credentialScope{
 						Region:  "us-east-1",
 						Service: "IngestionService",
-					***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"inspector": service***REMOVED***
+					},
+				},
+			},
+		},
+		"inspector": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"iot": service***REMOVED***
-			Defaults: endpoint***REMOVED***
-				CredentialScope: credentialScope***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-2": endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"iot": service{
+			Defaults: endpoint{
+				CredentialScope: credentialScope{
 					Service: "execute-api",
-				***REMOVED***,
-			***REMOVED***,
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"kinesis": service***REMOVED***
+				},
+			},
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"kinesis": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"eu-west-3":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"kinesisanalytics": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"eu-west-3":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"kinesisanalytics": service{
 
-			Endpoints: endpoints***REMOVED***
-				"eu-west-1": endpoint***REMOVED******REMOVED***,
-				"us-east-1": endpoint***REMOVED******REMOVED***,
-				"us-west-2": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"kms": service***REMOVED***
+			Endpoints: endpoints{
+				"eu-west-1": endpoint{},
+				"us-east-1": endpoint{},
+				"us-west-2": endpoint{},
+			},
+		},
+		"kms": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"eu-west-3":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"lambda": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"eu-west-3":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"lambda": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"eu-west-3":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"lightsail": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"eu-west-3":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"lightsail": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"logs": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"logs": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"eu-west-3":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"machinelearning": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"eu-west-3":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"machinelearning": service{
 
-			Endpoints: endpoints***REMOVED***
-				"eu-west-1": endpoint***REMOVED******REMOVED***,
-				"us-east-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"marketplacecommerceanalytics": service***REMOVED***
+			Endpoints: endpoints{
+				"eu-west-1": endpoint{},
+				"us-east-1": endpoint{},
+			},
+		},
+		"marketplacecommerceanalytics": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-east-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"metering.marketplace": service***REMOVED***
-			Defaults: endpoint***REMOVED***
-				CredentialScope: credentialScope***REMOVED***
+			Endpoints: endpoints{
+				"us-east-1": endpoint{},
+			},
+		},
+		"metering.marketplace": service{
+			Defaults: endpoint{
+				CredentialScope: credentialScope{
 					Service: "aws-marketplace",
-				***REMOVED***,
-			***REMOVED***,
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"mgh": service***REMOVED***
+				},
+			},
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"mgh": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-west-2": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"mobileanalytics": service***REMOVED***
+			Endpoints: endpoints{
+				"us-west-2": endpoint{},
+			},
+		},
+		"mobileanalytics": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-east-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"models.lex": service***REMOVED***
-			Defaults: endpoint***REMOVED***
-				CredentialScope: credentialScope***REMOVED***
+			Endpoints: endpoints{
+				"us-east-1": endpoint{},
+			},
+		},
+		"models.lex": service{
+			Defaults: endpoint{
+				CredentialScope: credentialScope{
 					Service: "lex",
-				***REMOVED***,
-			***REMOVED***,
-			Endpoints: endpoints***REMOVED***
-				"us-east-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"monitoring": service***REMOVED***
-			Defaults: endpoint***REMOVED***
-				Protocols: []string***REMOVED***"http", "https"***REMOVED***,
-			***REMOVED***,
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"eu-west-3":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"mturk-requester": service***REMOVED***
+				},
+			},
+			Endpoints: endpoints{
+				"us-east-1": endpoint{},
+			},
+		},
+		"monitoring": service{
+			Defaults: endpoint{
+				Protocols: []string{"http", "https"},
+			},
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"eu-west-3":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"mturk-requester": service{
 			IsRegionalized: boxedFalse,
 
-			Endpoints: endpoints***REMOVED***
-				"sandbox": endpoint***REMOVED***
+			Endpoints: endpoints{
+				"sandbox": endpoint{
 					Hostname: "mturk-requester-sandbox.us-east-1.amazonaws.com",
-				***REMOVED***,
-				"us-east-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"opsworks": service***REMOVED***
+				},
+				"us-east-1": endpoint{},
+			},
+		},
+		"opsworks": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"eu-west-3":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"opsworks-cm": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"eu-west-3":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"opsworks-cm": service{
 
-			Endpoints: endpoints***REMOVED***
-				"eu-west-1": endpoint***REMOVED******REMOVED***,
-				"us-east-1": endpoint***REMOVED******REMOVED***,
-				"us-west-2": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"organizations": service***REMOVED***
+			Endpoints: endpoints{
+				"eu-west-1": endpoint{},
+				"us-east-1": endpoint{},
+				"us-west-2": endpoint{},
+			},
+		},
+		"organizations": service{
 			PartitionEndpoint: "aws-global",
 			IsRegionalized:    boxedFalse,
 
-			Endpoints: endpoints***REMOVED***
-				"aws-global": endpoint***REMOVED***
+			Endpoints: endpoints{
+				"aws-global": endpoint{
 					Hostname: "organizations.us-east-1.amazonaws.com",
-					CredentialScope: credentialScope***REMOVED***
+					CredentialScope: credentialScope{
 						Region: "us-east-1",
-					***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"pinpoint": service***REMOVED***
-			Defaults: endpoint***REMOVED***
-				CredentialScope: credentialScope***REMOVED***
+					},
+				},
+			},
+		},
+		"pinpoint": service{
+			Defaults: endpoint{
+				CredentialScope: credentialScope{
 					Service: "mobiletargeting",
-				***REMOVED***,
-			***REMOVED***,
-			Endpoints: endpoints***REMOVED***
-				"us-east-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"polly": service***REMOVED***
+				},
+			},
+			Endpoints: endpoints{
+				"us-east-1": endpoint{},
+			},
+		},
+		"polly": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"eu-west-3":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"rds": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"eu-west-3":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"rds": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"eu-west-3":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1": endpoint***REMOVED***
-					SSLCommonName: "***REMOVED***service***REMOVED***.***REMOVED***dnsSuffix***REMOVED***",
-				***REMOVED***,
-				"us-east-2": endpoint***REMOVED******REMOVED***,
-				"us-west-1": endpoint***REMOVED******REMOVED***,
-				"us-west-2": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"redshift": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"eu-west-3":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1": endpoint{
+					SSLCommonName: "{service}.{dnsSuffix}",
+				},
+				"us-east-2": endpoint{},
+				"us-west-1": endpoint{},
+				"us-west-2": endpoint{},
+			},
+		},
+		"redshift": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"eu-west-3":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"rekognition": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"eu-west-3":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"rekognition": service{
 
-			Endpoints: endpoints***REMOVED***
-				"eu-west-1": endpoint***REMOVED******REMOVED***,
-				"us-east-1": endpoint***REMOVED******REMOVED***,
-				"us-east-2": endpoint***REMOVED******REMOVED***,
-				"us-west-2": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"route53": service***REMOVED***
+			Endpoints: endpoints{
+				"eu-west-1": endpoint{},
+				"us-east-1": endpoint{},
+				"us-east-2": endpoint{},
+				"us-west-2": endpoint{},
+			},
+		},
+		"route53": service{
 			PartitionEndpoint: "aws-global",
 			IsRegionalized:    boxedFalse,
 
-			Endpoints: endpoints***REMOVED***
-				"aws-global": endpoint***REMOVED***
+			Endpoints: endpoints{
+				"aws-global": endpoint{
 					Hostname: "route53.amazonaws.com",
-					CredentialScope: credentialScope***REMOVED***
+					CredentialScope: credentialScope{
 						Region: "us-east-1",
-					***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"route53domains": service***REMOVED***
+					},
+				},
+			},
+		},
+		"route53domains": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-east-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"runtime.lex": service***REMOVED***
-			Defaults: endpoint***REMOVED***
-				CredentialScope: credentialScope***REMOVED***
+			Endpoints: endpoints{
+				"us-east-1": endpoint{},
+			},
+		},
+		"runtime.lex": service{
+			Defaults: endpoint{
+				CredentialScope: credentialScope{
 					Service: "lex",
-				***REMOVED***,
-			***REMOVED***,
-			Endpoints: endpoints***REMOVED***
-				"eu-west-1": endpoint***REMOVED******REMOVED***,
-				"us-east-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"s3": service***REMOVED***
+				},
+			},
+			Endpoints: endpoints{
+				"eu-west-1": endpoint{},
+				"us-east-1": endpoint{},
+			},
+		},
+		"s3": service{
 			PartitionEndpoint: "us-east-1",
 			IsRegionalized:    boxedTrue,
-			Defaults: endpoint***REMOVED***
-				Protocols:         []string***REMOVED***"http", "https"***REMOVED***,
-				SignatureVersions: []string***REMOVED***"s3v4"***REMOVED***,
+			Defaults: endpoint{
+				Protocols:         []string{"http", "https"},
+				SignatureVersions: []string{"s3v4"},
 
 				HasDualStack:      boxedTrue,
-				DualStackHostname: "***REMOVED***service***REMOVED***.dualstack.***REMOVED***region***REMOVED***.***REMOVED***dnsSuffix***REMOVED***",
-			***REMOVED***,
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED***
+				DualStackHostname: "{service}.dualstack.{region}.{dnsSuffix}",
+			},
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{
 					Hostname:          "s3.ap-northeast-1.amazonaws.com",
-					SignatureVersions: []string***REMOVED***"s3", "s3v4"***REMOVED***,
-				***REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED***
+					SignatureVersions: []string{"s3", "s3v4"},
+				},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{
 					Hostname:          "s3.ap-southeast-1.amazonaws.com",
-					SignatureVersions: []string***REMOVED***"s3", "s3v4"***REMOVED***,
-				***REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED***
+					SignatureVersions: []string{"s3", "s3v4"},
+				},
+				"ap-southeast-2": endpoint{
 					Hostname:          "s3.ap-southeast-2.amazonaws.com",
-					SignatureVersions: []string***REMOVED***"s3", "s3v4"***REMOVED***,
-				***REMOVED***,
-				"ca-central-1": endpoint***REMOVED******REMOVED***,
-				"eu-central-1": endpoint***REMOVED******REMOVED***,
-				"eu-west-1": endpoint***REMOVED***
+					SignatureVersions: []string{"s3", "s3v4"},
+				},
+				"ca-central-1": endpoint{},
+				"eu-central-1": endpoint{},
+				"eu-west-1": endpoint{
 					Hostname:          "s3.eu-west-1.amazonaws.com",
-					SignatureVersions: []string***REMOVED***"s3", "s3v4"***REMOVED***,
-				***REMOVED***,
-				"eu-west-2": endpoint***REMOVED******REMOVED***,
-				"eu-west-3": endpoint***REMOVED******REMOVED***,
-				"s3-external-1": endpoint***REMOVED***
+					SignatureVersions: []string{"s3", "s3v4"},
+				},
+				"eu-west-2": endpoint{},
+				"eu-west-3": endpoint{},
+				"s3-external-1": endpoint{
 					Hostname:          "s3-external-1.amazonaws.com",
-					SignatureVersions: []string***REMOVED***"s3", "s3v4"***REMOVED***,
-					CredentialScope: credentialScope***REMOVED***
+					SignatureVersions: []string{"s3", "s3v4"},
+					CredentialScope: credentialScope{
 						Region: "us-east-1",
-					***REMOVED***,
-				***REMOVED***,
-				"sa-east-1": endpoint***REMOVED***
+					},
+				},
+				"sa-east-1": endpoint{
 					Hostname:          "s3.sa-east-1.amazonaws.com",
-					SignatureVersions: []string***REMOVED***"s3", "s3v4"***REMOVED***,
-				***REMOVED***,
-				"us-east-1": endpoint***REMOVED***
+					SignatureVersions: []string{"s3", "s3v4"},
+				},
+				"us-east-1": endpoint{
 					Hostname:          "s3.amazonaws.com",
-					SignatureVersions: []string***REMOVED***"s3", "s3v4"***REMOVED***,
-				***REMOVED***,
-				"us-east-2": endpoint***REMOVED******REMOVED***,
-				"us-west-1": endpoint***REMOVED***
+					SignatureVersions: []string{"s3", "s3v4"},
+				},
+				"us-east-2": endpoint{},
+				"us-west-1": endpoint{
 					Hostname:          "s3.us-west-1.amazonaws.com",
-					SignatureVersions: []string***REMOVED***"s3", "s3v4"***REMOVED***,
-				***REMOVED***,
-				"us-west-2": endpoint***REMOVED***
+					SignatureVersions: []string{"s3", "s3v4"},
+				},
+				"us-west-2": endpoint{
 					Hostname:          "s3.us-west-2.amazonaws.com",
-					SignatureVersions: []string***REMOVED***"s3", "s3v4"***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"sdb": service***REMOVED***
-			Defaults: endpoint***REMOVED***
-				Protocols:         []string***REMOVED***"http", "https"***REMOVED***,
-				SignatureVersions: []string***REMOVED***"v2"***REMOVED***,
-			***REMOVED***,
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1": endpoint***REMOVED***
+					SignatureVersions: []string{"s3", "s3v4"},
+				},
+			},
+		},
+		"sdb": service{
+			Defaults: endpoint{
+				Protocols:         []string{"http", "https"},
+				SignatureVersions: []string{"v2"},
+			},
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"eu-west-1":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1": endpoint{
 					Hostname: "sdb.amazonaws.com",
-				***REMOVED***,
-				"us-west-1": endpoint***REMOVED******REMOVED***,
-				"us-west-2": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"servicecatalog": service***REMOVED***
+				},
+				"us-west-1": endpoint{},
+				"us-west-2": endpoint{},
+			},
+		},
+		"servicecatalog": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"eu-west-3":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"shield": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"eu-west-3":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"shield": service{
 			IsRegionalized: boxedFalse,
-			Defaults: endpoint***REMOVED***
+			Defaults: endpoint{
 				SSLCommonName: "Shield.us-east-1.amazonaws.com",
-				Protocols:     []string***REMOVED***"https"***REMOVED***,
-			***REMOVED***,
-			Endpoints: endpoints***REMOVED***
-				"us-east-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"sms": service***REMOVED***
+				Protocols:     []string{"https"},
+			},
+			Endpoints: endpoints{
+				"us-east-1": endpoint{},
+			},
+		},
+		"sms": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-3":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"snowball": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-3":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"snowball": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"eu-west-3":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"sns": service***REMOVED***
-			Defaults: endpoint***REMOVED***
-				Protocols: []string***REMOVED***"http", "https"***REMOVED***,
-			***REMOVED***,
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"eu-west-3":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"sqs": service***REMOVED***
-			Defaults: endpoint***REMOVED***
-				SSLCommonName: "***REMOVED***region***REMOVED***.queue.***REMOVED***dnsSuffix***REMOVED***",
-				Protocols:     []string***REMOVED***"http", "https"***REMOVED***,
-			***REMOVED***,
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"eu-west-3":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1": endpoint***REMOVED***
-					SSLCommonName: "queue.***REMOVED***dnsSuffix***REMOVED***",
-				***REMOVED***,
-				"us-east-2": endpoint***REMOVED******REMOVED***,
-				"us-west-1": endpoint***REMOVED******REMOVED***,
-				"us-west-2": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"ssm": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-2": endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"eu-west-3":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"sns": service{
+			Defaults: endpoint{
+				Protocols: []string{"http", "https"},
+			},
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"eu-west-3":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"sqs": service{
+			Defaults: endpoint{
+				SSLCommonName: "{region}.queue.{dnsSuffix}",
+				Protocols:     []string{"http", "https"},
+			},
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"eu-west-3":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1": endpoint{
+					SSLCommonName: "queue.{dnsSuffix}",
+				},
+				"us-east-2": endpoint{},
+				"us-west-1": endpoint{},
+				"us-west-2": endpoint{},
+			},
+		},
+		"ssm": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"eu-west-3":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"states": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"eu-west-3":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"states": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"storagegateway": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"storagegateway": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"eu-west-3":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"streams.dynamodb": service***REMOVED***
-			Defaults: endpoint***REMOVED***
-				Protocols: []string***REMOVED***"http", "https"***REMOVED***,
-				CredentialScope: credentialScope***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"eu-west-3":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"streams.dynamodb": service{
+			Defaults: endpoint{
+				Protocols: []string{"http", "https"},
+				CredentialScope: credentialScope{
 					Service: "dynamodb",
-				***REMOVED***,
-			***REMOVED***,
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"eu-west-3":      endpoint***REMOVED******REMOVED***,
-				"local": endpoint***REMOVED***
+				},
+			},
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"eu-west-3":      endpoint{},
+				"local": endpoint{
 					Hostname:  "localhost:8000",
-					Protocols: []string***REMOVED***"http"***REMOVED***,
-					CredentialScope: credentialScope***REMOVED***
+					Protocols: []string{"http"},
+					CredentialScope: credentialScope{
 						Region: "us-east-1",
-					***REMOVED***,
-				***REMOVED***,
-				"sa-east-1": endpoint***REMOVED******REMOVED***,
-				"us-east-1": endpoint***REMOVED******REMOVED***,
-				"us-east-2": endpoint***REMOVED******REMOVED***,
-				"us-west-1": endpoint***REMOVED******REMOVED***,
-				"us-west-2": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"sts": service***REMOVED***
+					},
+				},
+				"sa-east-1": endpoint{},
+				"us-east-1": endpoint{},
+				"us-east-2": endpoint{},
+				"us-west-1": endpoint{},
+				"us-west-2": endpoint{},
+			},
+		},
+		"sts": service{
 			PartitionEndpoint: "aws-global",
-			Defaults: endpoint***REMOVED***
+			Defaults: endpoint{
 				Hostname: "sts.amazonaws.com",
-				CredentialScope: credentialScope***REMOVED***
+				CredentialScope: credentialScope{
 					Region: "us-east-1",
-				***REMOVED***,
-			***REMOVED***,
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED***
+				},
+			},
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{
 					Hostname: "sts.ap-northeast-2.amazonaws.com",
-					CredentialScope: credentialScope***REMOVED***
+					CredentialScope: credentialScope{
 						Region: "ap-northeast-2",
-					***REMOVED***,
-				***REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"aws-global":     endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"eu-west-3":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1-fips": endpoint***REMOVED***
+					},
+				},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"aws-global":     endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"eu-west-3":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-1-fips": endpoint{
 					Hostname: "sts-fips.us-east-1.amazonaws.com",
-					CredentialScope: credentialScope***REMOVED***
+					CredentialScope: credentialScope{
 						Region: "us-east-1",
-					***REMOVED***,
-				***REMOVED***,
-				"us-east-2": endpoint***REMOVED******REMOVED***,
-				"us-east-2-fips": endpoint***REMOVED***
+					},
+				},
+				"us-east-2": endpoint{},
+				"us-east-2-fips": endpoint{
 					Hostname: "sts-fips.us-east-2.amazonaws.com",
-					CredentialScope: credentialScope***REMOVED***
+					CredentialScope: credentialScope{
 						Region: "us-east-2",
-					***REMOVED***,
-				***REMOVED***,
-				"us-west-1": endpoint***REMOVED******REMOVED***,
-				"us-west-1-fips": endpoint***REMOVED***
+					},
+				},
+				"us-west-1": endpoint{},
+				"us-west-1-fips": endpoint{
 					Hostname: "sts-fips.us-west-1.amazonaws.com",
-					CredentialScope: credentialScope***REMOVED***
+					CredentialScope: credentialScope{
 						Region: "us-west-1",
-					***REMOVED***,
-				***REMOVED***,
-				"us-west-2": endpoint***REMOVED******REMOVED***,
-				"us-west-2-fips": endpoint***REMOVED***
+					},
+				},
+				"us-west-2": endpoint{},
+				"us-west-2-fips": endpoint{
 					Hostname: "sts-fips.us-west-2.amazonaws.com",
-					CredentialScope: credentialScope***REMOVED***
+					CredentialScope: credentialScope{
 						Region: "us-west-2",
-					***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"support": service***REMOVED***
+					},
+				},
+			},
+		},
+		"support": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-east-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"swf": service***REMOVED***
+			Endpoints: endpoints{
+				"us-east-1": endpoint{},
+			},
+		},
+		"swf": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"eu-west-3":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"tagging": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"eu-west-3":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"tagging": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"waf": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"waf": service{
 			PartitionEndpoint: "aws-global",
 			IsRegionalized:    boxedFalse,
 
-			Endpoints: endpoints***REMOVED***
-				"aws-global": endpoint***REMOVED***
+			Endpoints: endpoints{
+				"aws-global": endpoint{
 					Hostname: "waf.amazonaws.com",
-					CredentialScope: credentialScope***REMOVED***
+					CredentialScope: credentialScope{
 						Region: "us-east-1",
-					***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"waf-regional": service***REMOVED***
+					},
+				},
+			},
+		},
+		"waf-regional": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"workdocs": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"eu-west-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"workdocs": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"workspaces": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"eu-west-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"workspaces": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"xray": service***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+		"xray": service{
 
-			Endpoints: endpoints***REMOVED***
-				"ap-northeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-northeast-2": endpoint***REMOVED******REMOVED***,
-				"ap-south-1":     endpoint***REMOVED******REMOVED***,
-				"ap-southeast-1": endpoint***REMOVED******REMOVED***,
-				"ap-southeast-2": endpoint***REMOVED******REMOVED***,
-				"ca-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-central-1":   endpoint***REMOVED******REMOVED***,
-				"eu-west-1":      endpoint***REMOVED******REMOVED***,
-				"eu-west-2":      endpoint***REMOVED******REMOVED***,
-				"sa-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-1":      endpoint***REMOVED******REMOVED***,
-				"us-east-2":      endpoint***REMOVED******REMOVED***,
-				"us-west-1":      endpoint***REMOVED******REMOVED***,
-				"us-west-2":      endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***,
-***REMOVED***
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
+	},
+}
 
 // AwsCnPartition returns the Resolver for AWS China.
-func AwsCnPartition() Partition ***REMOVED***
+func AwsCnPartition() Partition {
 	return awscnPartition.Partition()
-***REMOVED***
+}
 
-var awscnPartition = partition***REMOVED***
+var awscnPartition = partition{
 	ID:        "aws-cn",
 	Name:      "AWS China",
 	DNSSuffix: "amazonaws.com.cn",
-	RegionRegex: regionRegex***REMOVED***
-		Regexp: func() *regexp.Regexp ***REMOVED***
+	RegionRegex: regionRegex{
+		Regexp: func() *regexp.Regexp {
 			reg, _ := regexp.Compile("^cn\\-\\w+\\-\\d+$")
 			return reg
-		***REMOVED***(),
-	***REMOVED***,
-	Defaults: endpoint***REMOVED***
-		Hostname:          "***REMOVED***service***REMOVED***.***REMOVED***region***REMOVED***.***REMOVED***dnsSuffix***REMOVED***",
-		Protocols:         []string***REMOVED***"https"***REMOVED***,
-		SignatureVersions: []string***REMOVED***"v4"***REMOVED***,
-	***REMOVED***,
-	Regions: regions***REMOVED***
-		"cn-north-1": region***REMOVED***
+		}(),
+	},
+	Defaults: endpoint{
+		Hostname:          "{service}.{region}.{dnsSuffix}",
+		Protocols:         []string{"https"},
+		SignatureVersions: []string{"v4"},
+	},
+	Regions: regions{
+		"cn-north-1": region{
 			Description: "China (Beijing)",
-		***REMOVED***,
-		"cn-northwest-1": region***REMOVED***
+		},
+		"cn-northwest-1": region{
 			Description: "China (Ningxia)",
-		***REMOVED***,
-	***REMOVED***,
-	Services: services***REMOVED***
-		"apigateway": service***REMOVED***
+		},
+	},
+	Services: services{
+		"apigateway": service{
 
-			Endpoints: endpoints***REMOVED***
-				"cn-north-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"application-autoscaling": service***REMOVED***
-			Defaults: endpoint***REMOVED***
-				Hostname:  "autoscaling.***REMOVED***region***REMOVED***.amazonaws.com",
-				Protocols: []string***REMOVED***"http", "https"***REMOVED***,
-				CredentialScope: credentialScope***REMOVED***
+			Endpoints: endpoints{
+				"cn-north-1": endpoint{},
+			},
+		},
+		"application-autoscaling": service{
+			Defaults: endpoint{
+				Hostname:  "autoscaling.{region}.amazonaws.com",
+				Protocols: []string{"http", "https"},
+				CredentialScope: credentialScope{
 					Service: "application-autoscaling",
-				***REMOVED***,
-			***REMOVED***,
-			Endpoints: endpoints***REMOVED***
-				"cn-north-1":     endpoint***REMOVED******REMOVED***,
-				"cn-northwest-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"autoscaling": service***REMOVED***
-			Defaults: endpoint***REMOVED***
-				Protocols: []string***REMOVED***"http", "https"***REMOVED***,
-			***REMOVED***,
-			Endpoints: endpoints***REMOVED***
-				"cn-north-1":     endpoint***REMOVED******REMOVED***,
-				"cn-northwest-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"cloudformation": service***REMOVED***
+				},
+			},
+			Endpoints: endpoints{
+				"cn-north-1":     endpoint{},
+				"cn-northwest-1": endpoint{},
+			},
+		},
+		"autoscaling": service{
+			Defaults: endpoint{
+				Protocols: []string{"http", "https"},
+			},
+			Endpoints: endpoints{
+				"cn-north-1":     endpoint{},
+				"cn-northwest-1": endpoint{},
+			},
+		},
+		"cloudformation": service{
 
-			Endpoints: endpoints***REMOVED***
-				"cn-north-1":     endpoint***REMOVED******REMOVED***,
-				"cn-northwest-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"cloudtrail": service***REMOVED***
+			Endpoints: endpoints{
+				"cn-north-1":     endpoint{},
+				"cn-northwest-1": endpoint{},
+			},
+		},
+		"cloudtrail": service{
 
-			Endpoints: endpoints***REMOVED***
-				"cn-north-1":     endpoint***REMOVED******REMOVED***,
-				"cn-northwest-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"codedeploy": service***REMOVED***
+			Endpoints: endpoints{
+				"cn-north-1":     endpoint{},
+				"cn-northwest-1": endpoint{},
+			},
+		},
+		"codedeploy": service{
 
-			Endpoints: endpoints***REMOVED***
-				"cn-north-1":     endpoint***REMOVED******REMOVED***,
-				"cn-northwest-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"cognito-identity": service***REMOVED***
+			Endpoints: endpoints{
+				"cn-north-1":     endpoint{},
+				"cn-northwest-1": endpoint{},
+			},
+		},
+		"cognito-identity": service{
 
-			Endpoints: endpoints***REMOVED***
-				"cn-north-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"config": service***REMOVED***
+			Endpoints: endpoints{
+				"cn-north-1": endpoint{},
+			},
+		},
+		"config": service{
 
-			Endpoints: endpoints***REMOVED***
-				"cn-north-1":     endpoint***REMOVED******REMOVED***,
-				"cn-northwest-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"directconnect": service***REMOVED***
+			Endpoints: endpoints{
+				"cn-north-1":     endpoint{},
+				"cn-northwest-1": endpoint{},
+			},
+		},
+		"directconnect": service{
 
-			Endpoints: endpoints***REMOVED***
-				"cn-north-1":     endpoint***REMOVED******REMOVED***,
-				"cn-northwest-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"dynamodb": service***REMOVED***
-			Defaults: endpoint***REMOVED***
-				Protocols: []string***REMOVED***"http", "https"***REMOVED***,
-			***REMOVED***,
-			Endpoints: endpoints***REMOVED***
-				"cn-north-1":     endpoint***REMOVED******REMOVED***,
-				"cn-northwest-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"ec2": service***REMOVED***
-			Defaults: endpoint***REMOVED***
-				Protocols: []string***REMOVED***"http", "https"***REMOVED***,
-			***REMOVED***,
-			Endpoints: endpoints***REMOVED***
-				"cn-north-1":     endpoint***REMOVED******REMOVED***,
-				"cn-northwest-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"ec2metadata": service***REMOVED***
+			Endpoints: endpoints{
+				"cn-north-1":     endpoint{},
+				"cn-northwest-1": endpoint{},
+			},
+		},
+		"dynamodb": service{
+			Defaults: endpoint{
+				Protocols: []string{"http", "https"},
+			},
+			Endpoints: endpoints{
+				"cn-north-1":     endpoint{},
+				"cn-northwest-1": endpoint{},
+			},
+		},
+		"ec2": service{
+			Defaults: endpoint{
+				Protocols: []string{"http", "https"},
+			},
+			Endpoints: endpoints{
+				"cn-north-1":     endpoint{},
+				"cn-northwest-1": endpoint{},
+			},
+		},
+		"ec2metadata": service{
 			PartitionEndpoint: "aws-global",
 			IsRegionalized:    boxedFalse,
 
-			Endpoints: endpoints***REMOVED***
-				"aws-global": endpoint***REMOVED***
+			Endpoints: endpoints{
+				"aws-global": endpoint{
 					Hostname:  "169.254.169.254/latest",
-					Protocols: []string***REMOVED***"http"***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"ecr": service***REMOVED***
+					Protocols: []string{"http"},
+				},
+			},
+		},
+		"ecr": service{
 
-			Endpoints: endpoints***REMOVED***
-				"cn-north-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"ecs": service***REMOVED***
+			Endpoints: endpoints{
+				"cn-north-1": endpoint{},
+			},
+		},
+		"ecs": service{
 
-			Endpoints: endpoints***REMOVED***
-				"cn-north-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"elasticache": service***REMOVED***
+			Endpoints: endpoints{
+				"cn-north-1": endpoint{},
+			},
+		},
+		"elasticache": service{
 
-			Endpoints: endpoints***REMOVED***
-				"cn-north-1":     endpoint***REMOVED******REMOVED***,
-				"cn-northwest-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"elasticbeanstalk": service***REMOVED***
+			Endpoints: endpoints{
+				"cn-north-1":     endpoint{},
+				"cn-northwest-1": endpoint{},
+			},
+		},
+		"elasticbeanstalk": service{
 
-			Endpoints: endpoints***REMOVED***
-				"cn-north-1":     endpoint***REMOVED******REMOVED***,
-				"cn-northwest-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"elasticloadbalancing": service***REMOVED***
-			Defaults: endpoint***REMOVED***
-				Protocols: []string***REMOVED***"https"***REMOVED***,
-			***REMOVED***,
-			Endpoints: endpoints***REMOVED***
-				"cn-north-1":     endpoint***REMOVED******REMOVED***,
-				"cn-northwest-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"elasticmapreduce": service***REMOVED***
-			Defaults: endpoint***REMOVED***
-				Protocols: []string***REMOVED***"http", "https"***REMOVED***,
-			***REMOVED***,
-			Endpoints: endpoints***REMOVED***
-				"cn-north-1":     endpoint***REMOVED******REMOVED***,
-				"cn-northwest-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"es": service***REMOVED***
+			Endpoints: endpoints{
+				"cn-north-1":     endpoint{},
+				"cn-northwest-1": endpoint{},
+			},
+		},
+		"elasticloadbalancing": service{
+			Defaults: endpoint{
+				Protocols: []string{"https"},
+			},
+			Endpoints: endpoints{
+				"cn-north-1":     endpoint{},
+				"cn-northwest-1": endpoint{},
+			},
+		},
+		"elasticmapreduce": service{
+			Defaults: endpoint{
+				Protocols: []string{"http", "https"},
+			},
+			Endpoints: endpoints{
+				"cn-north-1":     endpoint{},
+				"cn-northwest-1": endpoint{},
+			},
+		},
+		"es": service{
 
-			Endpoints: endpoints***REMOVED***
-				"cn-northwest-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"events": service***REMOVED***
+			Endpoints: endpoints{
+				"cn-northwest-1": endpoint{},
+			},
+		},
+		"events": service{
 
-			Endpoints: endpoints***REMOVED***
-				"cn-north-1":     endpoint***REMOVED******REMOVED***,
-				"cn-northwest-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"glacier": service***REMOVED***
-			Defaults: endpoint***REMOVED***
-				Protocols: []string***REMOVED***"http", "https"***REMOVED***,
-			***REMOVED***,
-			Endpoints: endpoints***REMOVED***
-				"cn-north-1":     endpoint***REMOVED******REMOVED***,
-				"cn-northwest-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"iam": service***REMOVED***
+			Endpoints: endpoints{
+				"cn-north-1":     endpoint{},
+				"cn-northwest-1": endpoint{},
+			},
+		},
+		"glacier": service{
+			Defaults: endpoint{
+				Protocols: []string{"http", "https"},
+			},
+			Endpoints: endpoints{
+				"cn-north-1":     endpoint{},
+				"cn-northwest-1": endpoint{},
+			},
+		},
+		"iam": service{
 			PartitionEndpoint: "aws-cn-global",
 			IsRegionalized:    boxedFalse,
 
-			Endpoints: endpoints***REMOVED***
-				"aws-cn-global": endpoint***REMOVED***
+			Endpoints: endpoints{
+				"aws-cn-global": endpoint{
 					Hostname: "iam.cn-north-1.amazonaws.com.cn",
-					CredentialScope: credentialScope***REMOVED***
+					CredentialScope: credentialScope{
 						Region: "cn-north-1",
-					***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"iot": service***REMOVED***
-			Defaults: endpoint***REMOVED***
-				CredentialScope: credentialScope***REMOVED***
+					},
+				},
+			},
+		},
+		"iot": service{
+			Defaults: endpoint{
+				CredentialScope: credentialScope{
 					Service: "execute-api",
-				***REMOVED***,
-			***REMOVED***,
-			Endpoints: endpoints***REMOVED***
-				"cn-north-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"kinesis": service***REMOVED***
+				},
+			},
+			Endpoints: endpoints{
+				"cn-north-1": endpoint{},
+			},
+		},
+		"kinesis": service{
 
-			Endpoints: endpoints***REMOVED***
-				"cn-north-1":     endpoint***REMOVED******REMOVED***,
-				"cn-northwest-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"lambda": service***REMOVED***
+			Endpoints: endpoints{
+				"cn-north-1":     endpoint{},
+				"cn-northwest-1": endpoint{},
+			},
+		},
+		"lambda": service{
 
-			Endpoints: endpoints***REMOVED***
-				"cn-north-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"logs": service***REMOVED***
+			Endpoints: endpoints{
+				"cn-north-1": endpoint{},
+			},
+		},
+		"logs": service{
 
-			Endpoints: endpoints***REMOVED***
-				"cn-north-1":     endpoint***REMOVED******REMOVED***,
-				"cn-northwest-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"monitoring": service***REMOVED***
-			Defaults: endpoint***REMOVED***
-				Protocols: []string***REMOVED***"http", "https"***REMOVED***,
-			***REMOVED***,
-			Endpoints: endpoints***REMOVED***
-				"cn-north-1":     endpoint***REMOVED******REMOVED***,
-				"cn-northwest-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"rds": service***REMOVED***
+			Endpoints: endpoints{
+				"cn-north-1":     endpoint{},
+				"cn-northwest-1": endpoint{},
+			},
+		},
+		"monitoring": service{
+			Defaults: endpoint{
+				Protocols: []string{"http", "https"},
+			},
+			Endpoints: endpoints{
+				"cn-north-1":     endpoint{},
+				"cn-northwest-1": endpoint{},
+			},
+		},
+		"rds": service{
 
-			Endpoints: endpoints***REMOVED***
-				"cn-north-1":     endpoint***REMOVED******REMOVED***,
-				"cn-northwest-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"redshift": service***REMOVED***
+			Endpoints: endpoints{
+				"cn-north-1":     endpoint{},
+				"cn-northwest-1": endpoint{},
+			},
+		},
+		"redshift": service{
 
-			Endpoints: endpoints***REMOVED***
-				"cn-north-1":     endpoint***REMOVED******REMOVED***,
-				"cn-northwest-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"s3": service***REMOVED***
-			Defaults: endpoint***REMOVED***
-				Protocols:         []string***REMOVED***"http", "https"***REMOVED***,
-				SignatureVersions: []string***REMOVED***"s3v4"***REMOVED***,
-			***REMOVED***,
-			Endpoints: endpoints***REMOVED***
-				"cn-north-1":     endpoint***REMOVED******REMOVED***,
-				"cn-northwest-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"snowball": service***REMOVED***
+			Endpoints: endpoints{
+				"cn-north-1":     endpoint{},
+				"cn-northwest-1": endpoint{},
+			},
+		},
+		"s3": service{
+			Defaults: endpoint{
+				Protocols:         []string{"http", "https"},
+				SignatureVersions: []string{"s3v4"},
+			},
+			Endpoints: endpoints{
+				"cn-north-1":     endpoint{},
+				"cn-northwest-1": endpoint{},
+			},
+		},
+		"snowball": service{
 
-			Endpoints: endpoints***REMOVED***
-				"cn-north-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"sns": service***REMOVED***
-			Defaults: endpoint***REMOVED***
-				Protocols: []string***REMOVED***"http", "https"***REMOVED***,
-			***REMOVED***,
-			Endpoints: endpoints***REMOVED***
-				"cn-north-1":     endpoint***REMOVED******REMOVED***,
-				"cn-northwest-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"sqs": service***REMOVED***
-			Defaults: endpoint***REMOVED***
-				SSLCommonName: "***REMOVED***region***REMOVED***.queue.***REMOVED***dnsSuffix***REMOVED***",
-				Protocols:     []string***REMOVED***"http", "https"***REMOVED***,
-			***REMOVED***,
-			Endpoints: endpoints***REMOVED***
-				"cn-north-1":     endpoint***REMOVED******REMOVED***,
-				"cn-northwest-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"ssm": service***REMOVED***
+			Endpoints: endpoints{
+				"cn-north-1": endpoint{},
+			},
+		},
+		"sns": service{
+			Defaults: endpoint{
+				Protocols: []string{"http", "https"},
+			},
+			Endpoints: endpoints{
+				"cn-north-1":     endpoint{},
+				"cn-northwest-1": endpoint{},
+			},
+		},
+		"sqs": service{
+			Defaults: endpoint{
+				SSLCommonName: "{region}.queue.{dnsSuffix}",
+				Protocols:     []string{"http", "https"},
+			},
+			Endpoints: endpoints{
+				"cn-north-1":     endpoint{},
+				"cn-northwest-1": endpoint{},
+			},
+		},
+		"ssm": service{
 
-			Endpoints: endpoints***REMOVED***
-				"cn-north-1":     endpoint***REMOVED******REMOVED***,
-				"cn-northwest-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"storagegateway": service***REMOVED***
+			Endpoints: endpoints{
+				"cn-north-1":     endpoint{},
+				"cn-northwest-1": endpoint{},
+			},
+		},
+		"storagegateway": service{
 
-			Endpoints: endpoints***REMOVED***
-				"cn-north-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"streams.dynamodb": service***REMOVED***
-			Defaults: endpoint***REMOVED***
-				Protocols: []string***REMOVED***"http", "https"***REMOVED***,
-				CredentialScope: credentialScope***REMOVED***
+			Endpoints: endpoints{
+				"cn-north-1": endpoint{},
+			},
+		},
+		"streams.dynamodb": service{
+			Defaults: endpoint{
+				Protocols: []string{"http", "https"},
+				CredentialScope: credentialScope{
 					Service: "dynamodb",
-				***REMOVED***,
-			***REMOVED***,
-			Endpoints: endpoints***REMOVED***
-				"cn-north-1":     endpoint***REMOVED******REMOVED***,
-				"cn-northwest-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"sts": service***REMOVED***
+				},
+			},
+			Endpoints: endpoints{
+				"cn-north-1":     endpoint{},
+				"cn-northwest-1": endpoint{},
+			},
+		},
+		"sts": service{
 
-			Endpoints: endpoints***REMOVED***
-				"cn-north-1":     endpoint***REMOVED******REMOVED***,
-				"cn-northwest-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"swf": service***REMOVED***
+			Endpoints: endpoints{
+				"cn-north-1":     endpoint{},
+				"cn-northwest-1": endpoint{},
+			},
+		},
+		"swf": service{
 
-			Endpoints: endpoints***REMOVED***
-				"cn-north-1":     endpoint***REMOVED******REMOVED***,
-				"cn-northwest-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"tagging": service***REMOVED***
+			Endpoints: endpoints{
+				"cn-north-1":     endpoint{},
+				"cn-northwest-1": endpoint{},
+			},
+		},
+		"tagging": service{
 
-			Endpoints: endpoints***REMOVED***
-				"cn-north-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***,
-***REMOVED***
+			Endpoints: endpoints{
+				"cn-north-1": endpoint{},
+			},
+		},
+	},
+}
 
 // AwsUsGovPartition returns the Resolver for AWS GovCloud (US).
-func AwsUsGovPartition() Partition ***REMOVED***
+func AwsUsGovPartition() Partition {
 	return awsusgovPartition.Partition()
-***REMOVED***
+}
 
-var awsusgovPartition = partition***REMOVED***
+var awsusgovPartition = partition{
 	ID:        "aws-us-gov",
 	Name:      "AWS GovCloud (US)",
 	DNSSuffix: "amazonaws.com",
-	RegionRegex: regionRegex***REMOVED***
-		Regexp: func() *regexp.Regexp ***REMOVED***
+	RegionRegex: regionRegex{
+		Regexp: func() *regexp.Regexp {
 			reg, _ := regexp.Compile("^us\\-gov\\-\\w+\\-\\d+$")
 			return reg
-		***REMOVED***(),
-	***REMOVED***,
-	Defaults: endpoint***REMOVED***
-		Hostname:          "***REMOVED***service***REMOVED***.***REMOVED***region***REMOVED***.***REMOVED***dnsSuffix***REMOVED***",
-		Protocols:         []string***REMOVED***"https"***REMOVED***,
-		SignatureVersions: []string***REMOVED***"v4"***REMOVED***,
-	***REMOVED***,
-	Regions: regions***REMOVED***
-		"us-gov-west-1": region***REMOVED***
+		}(),
+	},
+	Defaults: endpoint{
+		Hostname:          "{service}.{region}.{dnsSuffix}",
+		Protocols:         []string{"https"},
+		SignatureVersions: []string{"v4"},
+	},
+	Regions: regions{
+		"us-gov-west-1": region{
 			Description: "AWS GovCloud (US)",
-		***REMOVED***,
-	***REMOVED***,
-	Services: services***REMOVED***
-		"acm": service***REMOVED***
+		},
+	},
+	Services: services{
+		"acm": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-gov-west-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"apigateway": service***REMOVED***
+			Endpoints: endpoints{
+				"us-gov-west-1": endpoint{},
+			},
+		},
+		"apigateway": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-gov-west-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"autoscaling": service***REMOVED***
+			Endpoints: endpoints{
+				"us-gov-west-1": endpoint{},
+			},
+		},
+		"autoscaling": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-gov-west-1": endpoint***REMOVED***
-					Protocols: []string***REMOVED***"http", "https"***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"cloudformation": service***REMOVED***
+			Endpoints: endpoints{
+				"us-gov-west-1": endpoint{
+					Protocols: []string{"http", "https"},
+				},
+			},
+		},
+		"cloudformation": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-gov-west-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"cloudhsm": service***REMOVED***
+			Endpoints: endpoints{
+				"us-gov-west-1": endpoint{},
+			},
+		},
+		"cloudhsm": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-gov-west-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"cloudtrail": service***REMOVED***
+			Endpoints: endpoints{
+				"us-gov-west-1": endpoint{},
+			},
+		},
+		"cloudtrail": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-gov-west-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"codedeploy": service***REMOVED***
+			Endpoints: endpoints{
+				"us-gov-west-1": endpoint{},
+			},
+		},
+		"codedeploy": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-gov-west-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"config": service***REMOVED***
+			Endpoints: endpoints{
+				"us-gov-west-1": endpoint{},
+			},
+		},
+		"config": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-gov-west-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"directconnect": service***REMOVED***
+			Endpoints: endpoints{
+				"us-gov-west-1": endpoint{},
+			},
+		},
+		"directconnect": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-gov-west-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"dms": service***REMOVED***
+			Endpoints: endpoints{
+				"us-gov-west-1": endpoint{},
+			},
+		},
+		"dms": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-gov-west-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"dynamodb": service***REMOVED***
+			Endpoints: endpoints{
+				"us-gov-west-1": endpoint{},
+			},
+		},
+		"dynamodb": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-gov-west-1": endpoint***REMOVED******REMOVED***,
-				"us-gov-west-1-fips": endpoint***REMOVED***
+			Endpoints: endpoints{
+				"us-gov-west-1": endpoint{},
+				"us-gov-west-1-fips": endpoint{
 					Hostname: "dynamodb.us-gov-west-1.amazonaws.com",
-					CredentialScope: credentialScope***REMOVED***
+					CredentialScope: credentialScope{
 						Region: "us-gov-west-1",
-					***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"ec2": service***REMOVED***
+					},
+				},
+			},
+		},
+		"ec2": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-gov-west-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"ec2metadata": service***REMOVED***
+			Endpoints: endpoints{
+				"us-gov-west-1": endpoint{},
+			},
+		},
+		"ec2metadata": service{
 			PartitionEndpoint: "aws-global",
 			IsRegionalized:    boxedFalse,
 
-			Endpoints: endpoints***REMOVED***
-				"aws-global": endpoint***REMOVED***
+			Endpoints: endpoints{
+				"aws-global": endpoint{
 					Hostname:  "169.254.169.254/latest",
-					Protocols: []string***REMOVED***"http"***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"elasticache": service***REMOVED***
+					Protocols: []string{"http"},
+				},
+			},
+		},
+		"elasticache": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-gov-west-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"elasticbeanstalk": service***REMOVED***
+			Endpoints: endpoints{
+				"us-gov-west-1": endpoint{},
+			},
+		},
+		"elasticbeanstalk": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-gov-west-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"elasticloadbalancing": service***REMOVED***
+			Endpoints: endpoints{
+				"us-gov-west-1": endpoint{},
+			},
+		},
+		"elasticloadbalancing": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-gov-west-1": endpoint***REMOVED***
-					Protocols: []string***REMOVED***"http", "https"***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"elasticmapreduce": service***REMOVED***
+			Endpoints: endpoints{
+				"us-gov-west-1": endpoint{
+					Protocols: []string{"http", "https"},
+				},
+			},
+		},
+		"elasticmapreduce": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-gov-west-1": endpoint***REMOVED***
-					Protocols: []string***REMOVED***"http", "https"***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"events": service***REMOVED***
+			Endpoints: endpoints{
+				"us-gov-west-1": endpoint{
+					Protocols: []string{"http", "https"},
+				},
+			},
+		},
+		"events": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-gov-west-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"glacier": service***REMOVED***
+			Endpoints: endpoints{
+				"us-gov-west-1": endpoint{},
+			},
+		},
+		"glacier": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-gov-west-1": endpoint***REMOVED***
-					Protocols: []string***REMOVED***"http", "https"***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"iam": service***REMOVED***
+			Endpoints: endpoints{
+				"us-gov-west-1": endpoint{
+					Protocols: []string{"http", "https"},
+				},
+			},
+		},
+		"iam": service{
 			PartitionEndpoint: "aws-us-gov-global",
 			IsRegionalized:    boxedFalse,
 
-			Endpoints: endpoints***REMOVED***
-				"aws-us-gov-global": endpoint***REMOVED***
+			Endpoints: endpoints{
+				"aws-us-gov-global": endpoint{
 					Hostname: "iam.us-gov.amazonaws.com",
-					CredentialScope: credentialScope***REMOVED***
+					CredentialScope: credentialScope{
 						Region: "us-gov-west-1",
-					***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"kinesis": service***REMOVED***
+					},
+				},
+			},
+		},
+		"kinesis": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-gov-west-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"kms": service***REMOVED***
+			Endpoints: endpoints{
+				"us-gov-west-1": endpoint{},
+			},
+		},
+		"kms": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-gov-west-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"lambda": service***REMOVED***
+			Endpoints: endpoints{
+				"us-gov-west-1": endpoint{},
+			},
+		},
+		"lambda": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-gov-west-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"logs": service***REMOVED***
+			Endpoints: endpoints{
+				"us-gov-west-1": endpoint{},
+			},
+		},
+		"logs": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-gov-west-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"monitoring": service***REMOVED***
+			Endpoints: endpoints{
+				"us-gov-west-1": endpoint{},
+			},
+		},
+		"monitoring": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-gov-west-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"rds": service***REMOVED***
+			Endpoints: endpoints{
+				"us-gov-west-1": endpoint{},
+			},
+		},
+		"rds": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-gov-west-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"redshift": service***REMOVED***
+			Endpoints: endpoints{
+				"us-gov-west-1": endpoint{},
+			},
+		},
+		"redshift": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-gov-west-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"rekognition": service***REMOVED***
+			Endpoints: endpoints{
+				"us-gov-west-1": endpoint{},
+			},
+		},
+		"rekognition": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-gov-west-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"s3": service***REMOVED***
-			Defaults: endpoint***REMOVED***
-				SignatureVersions: []string***REMOVED***"s3", "s3v4"***REMOVED***,
-			***REMOVED***,
-			Endpoints: endpoints***REMOVED***
-				"fips-us-gov-west-1": endpoint***REMOVED***
+			Endpoints: endpoints{
+				"us-gov-west-1": endpoint{},
+			},
+		},
+		"s3": service{
+			Defaults: endpoint{
+				SignatureVersions: []string{"s3", "s3v4"},
+			},
+			Endpoints: endpoints{
+				"fips-us-gov-west-1": endpoint{
 					Hostname: "s3-fips-us-gov-west-1.amazonaws.com",
-					CredentialScope: credentialScope***REMOVED***
+					CredentialScope: credentialScope{
 						Region: "us-gov-west-1",
-					***REMOVED***,
-				***REMOVED***,
-				"us-gov-west-1": endpoint***REMOVED***
+					},
+				},
+				"us-gov-west-1": endpoint{
 					Hostname:  "s3.us-gov-west-1.amazonaws.com",
-					Protocols: []string***REMOVED***"http", "https"***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"sms": service***REMOVED***
+					Protocols: []string{"http", "https"},
+				},
+			},
+		},
+		"sms": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-gov-west-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"snowball": service***REMOVED***
+			Endpoints: endpoints{
+				"us-gov-west-1": endpoint{},
+			},
+		},
+		"snowball": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-gov-west-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"sns": service***REMOVED***
+			Endpoints: endpoints{
+				"us-gov-west-1": endpoint{},
+			},
+		},
+		"sns": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-gov-west-1": endpoint***REMOVED***
-					Protocols: []string***REMOVED***"http", "https"***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"sqs": service***REMOVED***
+			Endpoints: endpoints{
+				"us-gov-west-1": endpoint{
+					Protocols: []string{"http", "https"},
+				},
+			},
+		},
+		"sqs": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-gov-west-1": endpoint***REMOVED***
-					SSLCommonName: "***REMOVED***region***REMOVED***.queue.***REMOVED***dnsSuffix***REMOVED***",
-					Protocols:     []string***REMOVED***"http", "https"***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"ssm": service***REMOVED***
+			Endpoints: endpoints{
+				"us-gov-west-1": endpoint{
+					SSLCommonName: "{region}.queue.{dnsSuffix}",
+					Protocols:     []string{"http", "https"},
+				},
+			},
+		},
+		"ssm": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-gov-west-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"streams.dynamodb": service***REMOVED***
-			Defaults: endpoint***REMOVED***
-				CredentialScope: credentialScope***REMOVED***
+			Endpoints: endpoints{
+				"us-gov-west-1": endpoint{},
+			},
+		},
+		"streams.dynamodb": service{
+			Defaults: endpoint{
+				CredentialScope: credentialScope{
 					Service: "dynamodb",
-				***REMOVED***,
-			***REMOVED***,
-			Endpoints: endpoints***REMOVED***
-				"us-gov-west-1": endpoint***REMOVED******REMOVED***,
-				"us-gov-west-1-fips": endpoint***REMOVED***
+				},
+			},
+			Endpoints: endpoints{
+				"us-gov-west-1": endpoint{},
+				"us-gov-west-1-fips": endpoint{
 					Hostname: "dynamodb.us-gov-west-1.amazonaws.com",
-					CredentialScope: credentialScope***REMOVED***
+					CredentialScope: credentialScope{
 						Region: "us-gov-west-1",
-					***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"sts": service***REMOVED***
+					},
+				},
+			},
+		},
+		"sts": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-gov-west-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		"swf": service***REMOVED***
+			Endpoints: endpoints{
+				"us-gov-west-1": endpoint{},
+			},
+		},
+		"swf": service{
 
-			Endpoints: endpoints***REMOVED***
-				"us-gov-west-1": endpoint***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***,
-***REMOVED***
+			Endpoints: endpoints{
+				"us-gov-west-1": endpoint{},
+			},
+		},
+	},
+}

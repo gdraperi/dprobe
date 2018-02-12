@@ -16,6 +16,6 @@ package main
 
 import "github.com/spf13/testproject/cmd"
 
-func main() ***REMOVED***
+func main() {
 	cmd.Execute()
-***REMOVED***
+}

@@ -29,34 +29,34 @@ type LabelSet map[LabelName]LabelValue
 
 // Validate checks whether all names and values in the label set
 // are valid.
-func (ls LabelSet) Validate() error ***REMOVED***
-	for ln, lv := range ls ***REMOVED***
-		if !ln.IsValid() ***REMOVED***
+func (ls LabelSet) Validate() error {
+	for ln, lv := range ls {
+		if !ln.IsValid() {
 			return fmt.Errorf("invalid name %q", ln)
-		***REMOVED***
-		if !lv.IsValid() ***REMOVED***
+		}
+		if !lv.IsValid() {
 			return fmt.Errorf("invalid value %q", lv)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
 // Equal returns true iff both label sets have exactly the same key/value pairs.
-func (ls LabelSet) Equal(o LabelSet) bool ***REMOVED***
-	if len(ls) != len(o) ***REMOVED***
+func (ls LabelSet) Equal(o LabelSet) bool {
+	if len(ls) != len(o) {
 		return false
-	***REMOVED***
-	for ln, lv := range ls ***REMOVED***
+	}
+	for ln, lv := range ls {
 		olv, ok := o[ln]
-		if !ok ***REMOVED***
+		if !ok {
 			return false
-		***REMOVED***
-		if olv != lv ***REMOVED***
+		}
+		if olv != lv {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}
 
 // Before compares the metrics, using the following criteria:
 //
@@ -69,101 +69,101 @@ func (ls LabelSet) Equal(o LabelSet) bool ***REMOVED***
 // alphanumerically.
 //
 // If m and o are equal, the method returns false.
-func (ls LabelSet) Before(o LabelSet) bool ***REMOVED***
-	if len(ls) < len(o) ***REMOVED***
+func (ls LabelSet) Before(o LabelSet) bool {
+	if len(ls) < len(o) {
 		return true
-	***REMOVED***
-	if len(ls) > len(o) ***REMOVED***
+	}
+	if len(ls) > len(o) {
 		return false
-	***REMOVED***
+	}
 
 	lns := make(LabelNames, 0, len(ls)+len(o))
-	for ln := range ls ***REMOVED***
+	for ln := range ls {
 		lns = append(lns, ln)
-	***REMOVED***
-	for ln := range o ***REMOVED***
+	}
+	for ln := range o {
 		lns = append(lns, ln)
-	***REMOVED***
+	}
 	// It's probably not worth it to de-dup lns.
 	sort.Sort(lns)
-	for _, ln := range lns ***REMOVED***
+	for _, ln := range lns {
 		mlv, ok := ls[ln]
-		if !ok ***REMOVED***
+		if !ok {
 			return true
-		***REMOVED***
+		}
 		olv, ok := o[ln]
-		if !ok ***REMOVED***
+		if !ok {
 			return false
-		***REMOVED***
-		if mlv < olv ***REMOVED***
+		}
+		if mlv < olv {
 			return true
-		***REMOVED***
-		if mlv > olv ***REMOVED***
+		}
+		if mlv > olv {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false
-***REMOVED***
+}
 
 // Clone returns a copy of the label set.
-func (ls LabelSet) Clone() LabelSet ***REMOVED***
+func (ls LabelSet) Clone() LabelSet {
 	lsn := make(LabelSet, len(ls))
-	for ln, lv := range ls ***REMOVED***
+	for ln, lv := range ls {
 		lsn[ln] = lv
-	***REMOVED***
+	}
 	return lsn
-***REMOVED***
+}
 
 // Merge is a helper function to non-destructively merge two label sets.
-func (l LabelSet) Merge(other LabelSet) LabelSet ***REMOVED***
+func (l LabelSet) Merge(other LabelSet) LabelSet {
 	result := make(LabelSet, len(l))
 
-	for k, v := range l ***REMOVED***
+	for k, v := range l {
 		result[k] = v
-	***REMOVED***
+	}
 
-	for k, v := range other ***REMOVED***
+	for k, v := range other {
 		result[k] = v
-	***REMOVED***
+	}
 
 	return result
-***REMOVED***
+}
 
-func (l LabelSet) String() string ***REMOVED***
+func (l LabelSet) String() string {
 	lstrs := make([]string, 0, len(l))
-	for l, v := range l ***REMOVED***
+	for l, v := range l {
 		lstrs = append(lstrs, fmt.Sprintf("%s=%q", l, v))
-	***REMOVED***
+	}
 
 	sort.Strings(lstrs)
-	return fmt.Sprintf("***REMOVED***%s***REMOVED***", strings.Join(lstrs, ", "))
-***REMOVED***
+	return fmt.Sprintf("{%s}", strings.Join(lstrs, ", "))
+}
 
 // Fingerprint returns the LabelSet's fingerprint.
-func (ls LabelSet) Fingerprint() Fingerprint ***REMOVED***
+func (ls LabelSet) Fingerprint() Fingerprint {
 	return labelSetToFingerprint(ls)
-***REMOVED***
+}
 
 // FastFingerprint returns the LabelSet's Fingerprint calculated by a faster hashing
 // algorithm, which is, however, more susceptible to hash collisions.
-func (ls LabelSet) FastFingerprint() Fingerprint ***REMOVED***
+func (ls LabelSet) FastFingerprint() Fingerprint {
 	return labelSetToFastFingerprint(ls)
-***REMOVED***
+}
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
-func (l *LabelSet) UnmarshalJSON(b []byte) error ***REMOVED***
+func (l *LabelSet) UnmarshalJSON(b []byte) error {
 	var m map[LabelName]LabelValue
-	if err := json.Unmarshal(b, &m); err != nil ***REMOVED***
+	if err := json.Unmarshal(b, &m); err != nil {
 		return err
-	***REMOVED***
+	}
 	// encoding/json only unmarshals maps of the form map[string]T. It treats
 	// LabelName as a string and does not call its UnmarshalJSON method.
 	// Thus, we have to replicate the behavior here.
-	for ln := range m ***REMOVED***
-		if !LabelNameRE.MatchString(string(ln)) ***REMOVED***
+	for ln := range m {
+		if !LabelNameRE.MatchString(string(ln)) {
 			return fmt.Errorf("%q is not a valid label name", ln)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	*l = LabelSet(m)
 	return nil
-***REMOVED***
+}

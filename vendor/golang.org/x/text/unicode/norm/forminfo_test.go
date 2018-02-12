@@ -8,47 +8,47 @@ package norm
 
 import "testing"
 
-func TestProperties(t *testing.T) ***REMOVED***
+func TestProperties(t *testing.T) {
 	var d runeData
-	CK := [2]string***REMOVED***"C", "K"***REMOVED***
-	for k, r := 1, rune(0); r < 0x2ffff; r++ ***REMOVED***
-		if k < len(testData) && r == testData[k].r ***REMOVED***
+	CK := [2]string{"C", "K"}
+	for k, r := 1, rune(0); r < 0x2ffff; r++ {
+		if k < len(testData) && r == testData[k].r {
 			d = testData[k]
 			k++
-		***REMOVED***
+		}
 		s := string(r)
-		for j, p := range []Properties***REMOVED***NFC.PropertiesString(s), NFKC.PropertiesString(s)***REMOVED*** ***REMOVED***
+		for j, p := range []Properties{NFC.PropertiesString(s), NFKC.PropertiesString(s)} {
 			f := d.f[j]
-			if p.CCC() != d.ccc ***REMOVED***
+			if p.CCC() != d.ccc {
 				t.Errorf("%U: ccc(%s): was %d; want %d %X", r, CK[j], p.CCC(), d.ccc, p.index)
-			***REMOVED***
-			if p.isYesC() != (f.qc == Yes) ***REMOVED***
+			}
+			if p.isYesC() != (f.qc == Yes) {
 				t.Errorf("%U: YesC(%s): was %v; want %v", r, CK[j], p.isYesC(), f.qc == Yes)
-			***REMOVED***
-			if p.combinesBackward() != (f.qc == Maybe) ***REMOVED***
+			}
+			if p.combinesBackward() != (f.qc == Maybe) {
 				t.Errorf("%U: combines backwards(%s): was %v; want %v", r, CK[j], p.combinesBackward(), f.qc == Maybe)
-			***REMOVED***
-			if p.nLeadingNonStarters() != d.nLead ***REMOVED***
+			}
+			if p.nLeadingNonStarters() != d.nLead {
 				t.Errorf("%U: nLead(%s): was %d; want %d %#v %#v", r, CK[j], p.nLeadingNonStarters(), d.nLead, p, d)
-			***REMOVED***
-			if p.nTrailingNonStarters() != d.nTrail ***REMOVED***
+			}
+			if p.nTrailingNonStarters() != d.nTrail {
 				t.Errorf("%U: nTrail(%s): was %d; want %d %#v %#v", r, CK[j], p.nTrailingNonStarters(), d.nTrail, p, d)
-			***REMOVED***
-			if p.combinesForward() != f.combinesForward ***REMOVED***
+			}
+			if p.combinesForward() != f.combinesForward {
 				t.Errorf("%U: combines forward(%s): was %v; want %v %#v", r, CK[j], p.combinesForward(), f.combinesForward, p)
-			***REMOVED***
+			}
 			// Skip Hangul as it is algorithmically computed.
-			if r >= hangulBase && r < hangulEnd ***REMOVED***
+			if r >= hangulBase && r < hangulEnd {
 				continue
-			***REMOVED***
-			if p.hasDecomposition() ***REMOVED***
-				if has := f.decomposition != ""; !has ***REMOVED***
+			}
+			if p.hasDecomposition() {
+				if has := f.decomposition != ""; !has {
 					t.Errorf("%U: hasDecomposition(%s): was %v; want %v", r, CK[j], p.hasDecomposition(), has)
-				***REMOVED***
-				if string(p.Decomposition()) != f.decomposition ***REMOVED***
+				}
+				if string(p.Decomposition()) != f.decomposition {
 					t.Errorf("%U: decomp(%s): was %+q; want %+q", r, CK[j], p.Decomposition(), f.decomposition)
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+				}
+			}
+		}
+	}
+}

@@ -8,13 +8,13 @@ import (
 )
 
 // PluginRemove removes a plugin
-func (cli *Client) PluginRemove(ctx context.Context, name string, options types.PluginRemoveOptions) error ***REMOVED***
-	query := url.Values***REMOVED******REMOVED***
-	if options.Force ***REMOVED***
+func (cli *Client) PluginRemove(ctx context.Context, name string, options types.PluginRemoveOptions) error {
+	query := url.Values{}
+	if options.Force {
 		query.Set("force", "1")
-	***REMOVED***
+	}
 
 	resp, err := cli.delete(ctx, "/plugins/"+name, query, nil)
 	ensureReaderClosed(resp)
 	return wrapResponseError(err, resp, "plugin", name)
-***REMOVED***
+}

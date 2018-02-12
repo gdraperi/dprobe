@@ -13,7 +13,7 @@ import (
 
 // QueryIter represents a set of Units. The default set includes all Units that
 // are currently in use as legal tender in any Region.
-type QueryIter interface ***REMOVED***
+type QueryIter interface {
 	// Next returns true if there is a next element available.
 	// It must be called before any of the other methods are called.
 	Next() bool
@@ -35,118 +35,118 @@ type QueryIter interface ***REMOVED***
 	// IsTender reports whether the unit is a legal tender in the region during
 	// the specified date range.
 	IsTender() bool
-***REMOVED***
+}
 
 // Query represents a set of Units. The default set includes all Units that are
 // currently in use as legal tender in any Region.
-func Query(options ...QueryOption) QueryIter ***REMOVED***
-	it := &iter***REMOVED***
+func Query(options ...QueryOption) QueryIter {
+	it := &iter{
 		end:  len(regionData),
 		date: 0xFFFFFFFF,
-	***REMOVED***
-	for _, fn := range options ***REMOVED***
+	}
+	for _, fn := range options {
 		fn(it)
-	***REMOVED***
+	}
 	return it
-***REMOVED***
+}
 
 // NonTender returns a new query that also includes matching Units that are not
 // legal tender.
 var NonTender QueryOption = nonTender
 
-func nonTender(i *iter) ***REMOVED***
+func nonTender(i *iter) {
 	i.nonTender = true
-***REMOVED***
+}
 
 // Historical selects the units for all dates.
 var Historical QueryOption = historical
 
-func historical(i *iter) ***REMOVED***
+func historical(i *iter) {
 	i.date = hist
-***REMOVED***
+}
 
 // A QueryOption can be used to change the set of unit information returned by
 // a query.
 type QueryOption func(*iter)
 
 // Date queries the units that were in use at the given point in history.
-func Date(t time.Time) QueryOption ***REMOVED***
+func Date(t time.Time) QueryOption {
 	d := toDate(t)
-	return func(i *iter) ***REMOVED***
+	return func(i *iter) {
 		i.date = d
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Region limits the query to only return entries for the given region.
-func Region(r language.Region) QueryOption ***REMOVED***
+func Region(r language.Region) QueryOption {
 	p, end := len(regionData), len(regionData)
 	x := regionToCode(r)
-	i := sort.Search(len(regionData), func(i int) bool ***REMOVED***
+	i := sort.Search(len(regionData), func(i int) bool {
 		return regionData[i].region >= x
-	***REMOVED***)
-	if i < len(regionData) && regionData[i].region == x ***REMOVED***
+	})
+	if i < len(regionData) && regionData[i].region == x {
 		p = i
-		for i++; i < len(regionData) && regionData[i].region == x; i++ ***REMOVED***
-		***REMOVED***
+		for i++; i < len(regionData) && regionData[i].region == x; i++ {
+		}
 		end = i
-	***REMOVED***
-	return func(i *iter) ***REMOVED***
+	}
+	return func(i *iter) {
 		i.p, i.end = p, end
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 const (
 	hist = 0x00
 	now  = 0xFFFFFFFF
 )
 
-type iter struct ***REMOVED***
+type iter struct {
 	*regionInfo
 	p, end    int
 	date      uint32
 	nonTender bool
-***REMOVED***
+}
 
-func (i *iter) Next() bool ***REMOVED***
-	for ; i.p < i.end; i.p++ ***REMOVED***
+func (i *iter) Next() bool {
+	for ; i.p < i.end; i.p++ {
 		i.regionInfo = &regionData[i.p]
-		if !i.nonTender && !i.IsTender() ***REMOVED***
+		if !i.nonTender && !i.IsTender() {
 			continue
-		***REMOVED***
-		if i.date == hist || (i.from <= i.date && (i.to == 0 || i.date <= i.to)) ***REMOVED***
+		}
+		if i.date == hist || (i.from <= i.date && (i.to == 0 || i.date <= i.to)) {
 			i.p++
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false
-***REMOVED***
+}
 
-func (r *regionInfo) Region() language.Region ***REMOVED***
+func (r *regionInfo) Region() language.Region {
 	// TODO: this could be much faster.
 	var buf [2]byte
 	buf[0] = uint8(r.region >> 8)
 	buf[1] = uint8(r.region)
 	return language.MustParseRegion(string(buf[:]))
-***REMOVED***
+}
 
-func (r *regionInfo) Unit() Unit ***REMOVED***
-	return Unit***REMOVED***r.code &^ nonTenderBit***REMOVED***
-***REMOVED***
+func (r *regionInfo) Unit() Unit {
+	return Unit{r.code &^ nonTenderBit}
+}
 
-func (r *regionInfo) IsTender() bool ***REMOVED***
+func (r *regionInfo) IsTender() bool {
 	return r.code&nonTenderBit == 0
-***REMOVED***
+}
 
-func (r *regionInfo) From() (time.Time, bool) ***REMOVED***
-	if r.from == 0 ***REMOVED***
-		return time.Time***REMOVED******REMOVED***, false
-	***REMOVED***
+func (r *regionInfo) From() (time.Time, bool) {
+	if r.from == 0 {
+		return time.Time{}, false
+	}
 	return fromDate(r.from), true
-***REMOVED***
+}
 
-func (r *regionInfo) To() (time.Time, bool) ***REMOVED***
-	if r.to == 0 ***REMOVED***
-		return time.Time***REMOVED******REMOVED***, false
-	***REMOVED***
+func (r *regionInfo) To() (time.Time, bool) {
+	if r.to == 0 {
+		return time.Time{}, false
+	}
 	return fromDate(r.to), true
-***REMOVED***
+}

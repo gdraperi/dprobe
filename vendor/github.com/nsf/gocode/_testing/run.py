@@ -18,8 +18,8 @@ FAIL = RED + "FAIL!" + NC
 EXPECTED = YELLOW + "EXPECTED: " + NC
 
 # name of the test + commentary (why it is expected to fail)
-expected_to_fail = ***REMOVED***
-***REMOVED***
+expected_to_fail = {
+}
 
 def run_test(t):
 	global total, ok, fail, expected_fail

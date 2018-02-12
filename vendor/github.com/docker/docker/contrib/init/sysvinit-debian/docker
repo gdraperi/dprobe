@@ -44,22 +44,22 @@ if [ ! -x $DOCKERD ]; then
 	exit 1
 fi
 
-check_init() ***REMOVED***
+check_init() {
 	# see also init_is_upstart in /lib/lsb/init-functions (which isn't available in Ubuntu 12.04, or we'd use it directly)
 	if [ -x /sbin/initctl ] && /sbin/initctl version 2>/dev/null | grep -q upstart; then
 		log_failure_msg "$DOCKER_DESC is managed via upstart, try using service $BASE $1"
 		exit 1
 	fi
-***REMOVED***
+}
 
-fail_unless_root() ***REMOVED***
+fail_unless_root() {
 	if [ "$(id -u)" != '0' ]; then
 		log_failure_msg "$DOCKER_DESC must be run as root"
 		exit 1
 	fi
-***REMOVED***
+}
 
-cgroupfs_mount() ***REMOVED***
+cgroupfs_mount() {
 	# see also https://github.com/tianon/cgroupfs-mount/blob/master/cgroupfs-mount
 	if grep -v '^#' /etc/fstab | grep -q cgroup \
 		|| [ ! -e /proc/cgroups ] \
@@ -71,7 +71,7 @@ cgroupfs_mount() ***REMOVED***
 	fi
 	(
 		cd /sys/fs/cgroup
-		for sys in $(awk '!/^#/ ***REMOVED*** if ($4 == 1) print $1 ***REMOVED***' /proc/cgroups); do
+		for sys in $(awk '!/^#/ { if ($4 == 1) print $1 }' /proc/cgroups); do
 			mkdir -p $sys
 			if ! mountpoint -q $sys; then
 				if ! mount -n -t cgroup -o $sys cgroup $sys; then
@@ -80,7 +80,7 @@ cgroupfs_mount() ***REMOVED***
 			fi
 		done
 	)
-***REMOVED***
+}
 
 case "$1" in
 	start)
@@ -150,7 +150,7 @@ case "$1" in
 		;;
 
 	*)
-		echo "Usage: service docker ***REMOVED***start|stop|restart|status***REMOVED***"
+		echo "Usage: service docker {start|stop|restart|status}"
 		exit 1
 		;;
 esac

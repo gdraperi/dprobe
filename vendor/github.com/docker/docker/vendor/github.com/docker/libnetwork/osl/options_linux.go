@@ -2,72 +2,72 @@ package osl
 
 import "net"
 
-func (nh *neigh) processNeighOptions(options ...NeighOption) ***REMOVED***
-	for _, opt := range options ***REMOVED***
-		if opt != nil ***REMOVED***
+func (nh *neigh) processNeighOptions(options ...NeighOption) {
+	for _, opt := range options {
+		if opt != nil {
 			opt(nh)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (n *networkNamespace) LinkName(name string) NeighOption ***REMOVED***
-	return func(nh *neigh) ***REMOVED***
+func (n *networkNamespace) LinkName(name string) NeighOption {
+	return func(nh *neigh) {
 		nh.linkName = name
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (n *networkNamespace) Family(family int) NeighOption ***REMOVED***
-	return func(nh *neigh) ***REMOVED***
+func (n *networkNamespace) Family(family int) NeighOption {
+	return func(nh *neigh) {
 		nh.family = family
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (i *nwIface) processInterfaceOptions(options ...IfaceOption) ***REMOVED***
-	for _, opt := range options ***REMOVED***
-		if opt != nil ***REMOVED***
+func (i *nwIface) processInterfaceOptions(options ...IfaceOption) {
+	for _, opt := range options {
+		if opt != nil {
 			opt(i)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (n *networkNamespace) Bridge(isBridge bool) IfaceOption ***REMOVED***
-	return func(i *nwIface) ***REMOVED***
+func (n *networkNamespace) Bridge(isBridge bool) IfaceOption {
+	return func(i *nwIface) {
 		i.bridge = isBridge
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (n *networkNamespace) Master(name string) IfaceOption ***REMOVED***
-	return func(i *nwIface) ***REMOVED***
+func (n *networkNamespace) Master(name string) IfaceOption {
+	return func(i *nwIface) {
 		i.master = name
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (n *networkNamespace) MacAddress(mac net.HardwareAddr) IfaceOption ***REMOVED***
-	return func(i *nwIface) ***REMOVED***
+func (n *networkNamespace) MacAddress(mac net.HardwareAddr) IfaceOption {
+	return func(i *nwIface) {
 		i.mac = mac
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (n *networkNamespace) Address(addr *net.IPNet) IfaceOption ***REMOVED***
-	return func(i *nwIface) ***REMOVED***
+func (n *networkNamespace) Address(addr *net.IPNet) IfaceOption {
+	return func(i *nwIface) {
 		i.address = addr
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (n *networkNamespace) AddressIPv6(addr *net.IPNet) IfaceOption ***REMOVED***
-	return func(i *nwIface) ***REMOVED***
+func (n *networkNamespace) AddressIPv6(addr *net.IPNet) IfaceOption {
+	return func(i *nwIface) {
 		i.addressIPv6 = addr
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (n *networkNamespace) LinkLocalAddresses(list []*net.IPNet) IfaceOption ***REMOVED***
-	return func(i *nwIface) ***REMOVED***
+func (n *networkNamespace) LinkLocalAddresses(list []*net.IPNet) IfaceOption {
+	return func(i *nwIface) {
 		i.llAddrs = list
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (n *networkNamespace) Routes(routes []*net.IPNet) IfaceOption ***REMOVED***
-	return func(i *nwIface) ***REMOVED***
+func (n *networkNamespace) Routes(routes []*net.IPNet) IfaceOption {
+	return func(i *nwIface) {
 		i.routes = routes
-	***REMOVED***
-***REMOVED***
+	}
+}

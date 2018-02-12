@@ -11,32 +11,32 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestJSONLogsMarshalJSONBuf(t *testing.T) ***REMOVED***
-	logs := map[*JSONLogs]string***REMOVED***
-		***REMOVED***Log: []byte(`"A log line with \\"`)***REMOVED***:                  `^***REMOVED***\"log\":\"\\\"A log line with \\\\\\\\\\\"\",\"time\":`,
-		***REMOVED***Log: []byte("A log line")***REMOVED***:                            `^***REMOVED***\"log\":\"A log line\",\"time\":`,
-		***REMOVED***Log: []byte("A log line with \r")***REMOVED***:                    `^***REMOVED***\"log\":\"A log line with \\r\",\"time\":`,
-		***REMOVED***Log: []byte("A log line with & < >")***REMOVED***:                 `^***REMOVED***\"log\":\"A log line with \\u0026 \\u003c \\u003e\",\"time\":`,
-		***REMOVED***Log: []byte("A log line with utf8 : 🚀 ψ ω β")***REMOVED***:        `^***REMOVED***\"log\":\"A log line with utf8 : 🚀 ψ ω β\",\"time\":`,
-		***REMOVED***Stream: "stdout"***REMOVED***:                                     `^***REMOVED***\"stream\":\"stdout\",\"time\":`,
-		***REMOVED***Stream: "stdout", Log: []byte("A log line")***REMOVED***:          `^***REMOVED***\"log\":\"A log line\",\"stream\":\"stdout\",\"time\":`,
-		***REMOVED***Created: time.Date(2017, 9, 1, 1, 1, 1, 1, time.UTC)***REMOVED***: `^***REMOVED***\"time\":"2017-09-01T01:01:01.000000001Z"***REMOVED***$`,
+func TestJSONLogsMarshalJSONBuf(t *testing.T) {
+	logs := map[*JSONLogs]string{
+		{Log: []byte(`"A log line with \\"`)}:                  `^{\"log\":\"\\\"A log line with \\\\\\\\\\\"\",\"time\":`,
+		{Log: []byte("A log line")}:                            `^{\"log\":\"A log line\",\"time\":`,
+		{Log: []byte("A log line with \r")}:                    `^{\"log\":\"A log line with \\r\",\"time\":`,
+		{Log: []byte("A log line with & < >")}:                 `^{\"log\":\"A log line with \\u0026 \\u003c \\u003e\",\"time\":`,
+		{Log: []byte("A log line with utf8 : 🚀 ψ ω β")}:        `^{\"log\":\"A log line with utf8 : 🚀 ψ ω β\",\"time\":`,
+		{Stream: "stdout"}:                                     `^{\"stream\":\"stdout\",\"time\":`,
+		{Stream: "stdout", Log: []byte("A log line")}:          `^{\"log\":\"A log line\",\"stream\":\"stdout\",\"time\":`,
+		{Created: time.Date(2017, 9, 1, 1, 1, 1, 1, time.UTC)}: `^{\"time\":"2017-09-01T01:01:01.000000001Z"}$`,
 
-		***REMOVED******REMOVED***: `^***REMOVED***\"time\":"0001-01-01T00:00:00Z"***REMOVED***$`,
+		{}: `^{\"time\":"0001-01-01T00:00:00Z"}$`,
 		// These ones are a little weird
-		***REMOVED***Log: []byte("\u2028 \u2029")***REMOVED***: `^***REMOVED***\"log\":\"\\u2028 \\u2029\",\"time\":`,
-		***REMOVED***Log: []byte***REMOVED***0xaF***REMOVED******REMOVED***:            `^***REMOVED***\"log\":\"\\ufffd\",\"time\":`,
-		***REMOVED***Log: []byte***REMOVED***0x7F***REMOVED******REMOVED***:            `^***REMOVED***\"log\":\"\x7f\",\"time\":`,
+		{Log: []byte("\u2028 \u2029")}: `^{\"log\":\"\\u2028 \\u2029\",\"time\":`,
+		{Log: []byte{0xaF}}:            `^{\"log\":\"\\ufffd\",\"time\":`,
+		{Log: []byte{0x7F}}:            `^{\"log\":\"\x7f\",\"time\":`,
 		// with raw attributes
-		***REMOVED***Log: []byte("A log line"), RawAttrs: []byte(`***REMOVED***"hello":"world","value":1234***REMOVED***`)***REMOVED***: `^***REMOVED***\"log\":\"A log line\",\"attrs\":***REMOVED***\"hello\":\"world\",\"value\":1234***REMOVED***,\"time\":`,
+		{Log: []byte("A log line"), RawAttrs: []byte(`{"hello":"world","value":1234}`)}: `^{\"log\":\"A log line\",\"attrs\":{\"hello\":\"world\",\"value\":1234},\"time\":`,
 		// with Tag set
-		***REMOVED***Log: []byte("A log line with tag"), RawAttrs: []byte(`***REMOVED***"hello":"world","value":1234***REMOVED***`)***REMOVED***: `^***REMOVED***\"log\":\"A log line with tag\",\"attrs\":***REMOVED***\"hello\":\"world\",\"value\":1234***REMOVED***,\"time\":`,
-	***REMOVED***
-	for jsonLog, expression := range logs ***REMOVED***
+		{Log: []byte("A log line with tag"), RawAttrs: []byte(`{"hello":"world","value":1234}`)}: `^{\"log\":\"A log line with tag\",\"attrs\":{\"hello\":\"world\",\"value\":1234},\"time\":`,
+	}
+	for jsonLog, expression := range logs {
 		var buf bytes.Buffer
 		err := jsonLog.MarshalJSONBuf(&buf)
 		require.NoError(t, err)
 		assert.Regexp(t, regexp.MustCompile(expression), buf.String())
-		assert.NoError(t, json.Unmarshal(buf.Bytes(), &map[string]interface***REMOVED******REMOVED******REMOVED******REMOVED***))
-	***REMOVED***
-***REMOVED***
+		assert.NoError(t, json.Unmarshal(buf.Bytes(), &map[string]interface{}{}))
+	}
+}

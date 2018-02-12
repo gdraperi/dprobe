@@ -1,7 +1,7 @@
 package specs
 
 // State holds information about the runtime state of the container.
-type State struct ***REMOVED***
+type State struct {
 	// Version is the version of the specification that is supported.
 	Version string `json:"ociVersion"`
 	// ID is the container ID
@@ -14,4 +14,4 @@ type State struct ***REMOVED***
 	Bundle string `json:"bundle"`
 	// Annotations are key values associated with the container.
 	Annotations map[string]string `json:"annotations,omitempty"`
-***REMOVED***
+}

@@ -8,20 +8,20 @@ import (
 	"testing"
 )
 
-func BenchmarkEncrypt(b *testing.B) ***REMOVED***
-	r, _ := New([]byte***REMOVED***0, 0, 0, 0, 0, 0, 0, 0***REMOVED***, 64)
+func BenchmarkEncrypt(b *testing.B) {
+	r, _ := New([]byte{0, 0, 0, 0, 0, 0, 0, 0}, 64)
 	b.ResetTimer()
 	var src [8]byte
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		r.Encrypt(src[:], src[:])
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func BenchmarkDecrypt(b *testing.B) ***REMOVED***
-	r, _ := New([]byte***REMOVED***0, 0, 0, 0, 0, 0, 0, 0***REMOVED***, 64)
+func BenchmarkDecrypt(b *testing.B) {
+	r, _ := New([]byte{0, 0, 0, 0, 0, 0, 0, 0}, 64)
 	b.ResetTimer()
 	var src [8]byte
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		r.Decrypt(src[:], src[:])
-	***REMOVED***
-***REMOVED***
+	}
+}

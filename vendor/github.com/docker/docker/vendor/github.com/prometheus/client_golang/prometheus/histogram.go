@@ -39,13 +39,13 @@ import (
 // method of a Summary.
 //
 // To create Histogram instances, use NewHistogram.
-type Histogram interface ***REMOVED***
+type Histogram interface {
 	Metric
 	Collector
 
 	// Observe adds a single observation to the histogram.
 	Observe(float64)
-***REMOVED***
+}
 
 // bucketLabel is used for the label that defines the upper bound of a
 // bucket of a histogram ("le" -> "less or equal").
@@ -56,7 +56,7 @@ var (
 	// tailored to broadly measure the response time (in seconds) of a
 	// network service. Most likely, however, you will be required to define
 	// buckets customized to your use case.
-	DefBuckets = []float64***REMOVED***.005, .01, .025, .05, .1, .25, .5, 1, 2.5, 5, 10***REMOVED***
+	DefBuckets = []float64{.005, .01, .025, .05, .1, .25, .5, 1, 2.5, 5, 10}
 
 	errBucketLabelNotAllowed = fmt.Errorf(
 		"%q is not allowed as label name in histograms", bucketLabel,
@@ -69,17 +69,17 @@ var (
 // used for the Buckets field of HistogramOpts.
 //
 // The function panics if 'count' is zero or negative.
-func LinearBuckets(start, width float64, count int) []float64 ***REMOVED***
-	if count < 1 ***REMOVED***
+func LinearBuckets(start, width float64, count int) []float64 {
+	if count < 1 {
 		panic("LinearBuckets needs a positive count")
-	***REMOVED***
+	}
 	buckets := make([]float64, count)
-	for i := range buckets ***REMOVED***
+	for i := range buckets {
 		buckets[i] = start
 		start += width
-	***REMOVED***
+	}
 	return buckets
-***REMOVED***
+}
 
 // ExponentialBuckets creates 'count' buckets, where the lowest bucket has an
 // upper bound of 'start' and each following bucket's upper bound is 'factor'
@@ -89,28 +89,28 @@ func LinearBuckets(start, width float64, count int) []float64 ***REMOVED***
 //
 // The function panics if 'count' is 0 or negative, if 'start' is 0 or negative,
 // or if 'factor' is less than or equal 1.
-func ExponentialBuckets(start, factor float64, count int) []float64 ***REMOVED***
-	if count < 1 ***REMOVED***
+func ExponentialBuckets(start, factor float64, count int) []float64 {
+	if count < 1 {
 		panic("ExponentialBuckets needs a positive count")
-	***REMOVED***
-	if start <= 0 ***REMOVED***
+	}
+	if start <= 0 {
 		panic("ExponentialBuckets needs a positive start value")
-	***REMOVED***
-	if factor <= 1 ***REMOVED***
+	}
+	if factor <= 1 {
 		panic("ExponentialBuckets needs a factor greater than 1")
-	***REMOVED***
+	}
 	buckets := make([]float64, count)
-	for i := range buckets ***REMOVED***
+	for i := range buckets {
 		buckets[i] = start
 		start *= factor
-	***REMOVED***
+	}
 	return buckets
-***REMOVED***
+}
 
 // HistogramOpts bundles the options for creating a Histogram metric. It is
 // mandatory to set Name and Help to a non-empty string. All other fields are
 // optional and can safely be left at their zero value.
-type HistogramOpts struct ***REMOVED***
+type HistogramOpts struct {
 	// Namespace, Subsystem, and Name are components of the fully-qualified
 	// name of the Histogram (created by joining these components with
 	// "_"). Only Name is mandatory, the others merely help structuring the
@@ -151,11 +151,11 @@ type HistogramOpts struct ***REMOVED***
 	// to add a highest bucket with +Inf bound, it will be added
 	// implicitly. The default value is DefBuckets.
 	Buckets []float64
-***REMOVED***
+}
 
 // NewHistogram creates a new Histogram based on the provided HistogramOpts. It
 // panics if the buckets in HistogramOpts are not in strictly increasing order.
-func NewHistogram(opts HistogramOpts) Histogram ***REMOVED***
+func NewHistogram(opts HistogramOpts) Histogram {
 	return newHistogram(
 		NewDesc(
 			BuildFQName(opts.Namespace, opts.Subsystem, opts.Name),
@@ -165,56 +165,56 @@ func NewHistogram(opts HistogramOpts) Histogram ***REMOVED***
 		),
 		opts,
 	)
-***REMOVED***
+}
 
-func newHistogram(desc *Desc, opts HistogramOpts, labelValues ...string) Histogram ***REMOVED***
-	if len(desc.variableLabels) != len(labelValues) ***REMOVED***
+func newHistogram(desc *Desc, opts HistogramOpts, labelValues ...string) Histogram {
+	if len(desc.variableLabels) != len(labelValues) {
 		panic(errInconsistentCardinality)
-	***REMOVED***
+	}
 
-	for _, n := range desc.variableLabels ***REMOVED***
-		if n == bucketLabel ***REMOVED***
+	for _, n := range desc.variableLabels {
+		if n == bucketLabel {
 			panic(errBucketLabelNotAllowed)
-		***REMOVED***
-	***REMOVED***
-	for _, lp := range desc.constLabelPairs ***REMOVED***
-		if lp.GetName() == bucketLabel ***REMOVED***
+		}
+	}
+	for _, lp := range desc.constLabelPairs {
+		if lp.GetName() == bucketLabel {
 			panic(errBucketLabelNotAllowed)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if len(opts.Buckets) == 0 ***REMOVED***
+	if len(opts.Buckets) == 0 {
 		opts.Buckets = DefBuckets
-	***REMOVED***
+	}
 
-	h := &histogram***REMOVED***
+	h := &histogram{
 		desc:        desc,
 		upperBounds: opts.Buckets,
 		labelPairs:  makeLabelPairs(desc, labelValues),
-	***REMOVED***
-	for i, upperBound := range h.upperBounds ***REMOVED***
-		if i < len(h.upperBounds)-1 ***REMOVED***
-			if upperBound >= h.upperBounds[i+1] ***REMOVED***
+	}
+	for i, upperBound := range h.upperBounds {
+		if i < len(h.upperBounds)-1 {
+			if upperBound >= h.upperBounds[i+1] {
 				panic(fmt.Errorf(
 					"histogram buckets must be in increasing order: %f >= %f",
 					upperBound, h.upperBounds[i+1],
 				))
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
-			if math.IsInf(upperBound, +1) ***REMOVED***
+			}
+		} else {
+			if math.IsInf(upperBound, +1) {
 				// The +Inf bucket is implicit. Remove it here.
 				h.upperBounds = h.upperBounds[:i]
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	// Finally we know the final length of h.upperBounds and can make counts.
 	h.counts = make([]uint64, len(h.upperBounds))
 
 	h.Init(h) // Init self-collection.
 	return h
-***REMOVED***
+}
 
-type histogram struct ***REMOVED***
+type histogram struct {
 	// sumBits contains the bits of the float64 representing the sum of all
 	// observations. sumBits and count have to go first in the struct to
 	// guarantee alignment for atomic operations.
@@ -231,13 +231,13 @@ type histogram struct ***REMOVED***
 	counts      []uint64
 
 	labelPairs []*dto.LabelPair
-***REMOVED***
+}
 
-func (h *histogram) Desc() *Desc ***REMOVED***
+func (h *histogram) Desc() *Desc {
 	return h.desc
-***REMOVED***
+}
 
-func (h *histogram) Observe(v float64) ***REMOVED***
+func (h *histogram) Observe(v float64) {
 	// TODO(beorn7): For small numbers of buckets (<30), a linear search is
 	// slightly faster than the binary search. If we really care, we could
 	// switch from one search strategy to the other depending on the number
@@ -248,142 +248,142 @@ func (h *histogram) Observe(v float64) ***REMOVED***
 	// 100 buckets: 78.1 ns/op linear - binary 54.9 ns/op
 	// 300 buckets: 154 ns/op linear - binary 61.6 ns/op
 	i := sort.SearchFloat64s(h.upperBounds, v)
-	if i < len(h.counts) ***REMOVED***
+	if i < len(h.counts) {
 		atomic.AddUint64(&h.counts[i], 1)
-	***REMOVED***
+	}
 	atomic.AddUint64(&h.count, 1)
-	for ***REMOVED***
+	for {
 		oldBits := atomic.LoadUint64(&h.sumBits)
 		newBits := math.Float64bits(math.Float64frombits(oldBits) + v)
-		if atomic.CompareAndSwapUint64(&h.sumBits, oldBits, newBits) ***REMOVED***
+		if atomic.CompareAndSwapUint64(&h.sumBits, oldBits, newBits) {
 			break
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (h *histogram) Write(out *dto.Metric) error ***REMOVED***
-	his := &dto.Histogram***REMOVED******REMOVED***
+func (h *histogram) Write(out *dto.Metric) error {
+	his := &dto.Histogram{}
 	buckets := make([]*dto.Bucket, len(h.upperBounds))
 
 	his.SampleSum = proto.Float64(math.Float64frombits(atomic.LoadUint64(&h.sumBits)))
 	his.SampleCount = proto.Uint64(atomic.LoadUint64(&h.count))
 	var count uint64
-	for i, upperBound := range h.upperBounds ***REMOVED***
+	for i, upperBound := range h.upperBounds {
 		count += atomic.LoadUint64(&h.counts[i])
-		buckets[i] = &dto.Bucket***REMOVED***
+		buckets[i] = &dto.Bucket{
 			CumulativeCount: proto.Uint64(count),
 			UpperBound:      proto.Float64(upperBound),
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	his.Bucket = buckets
 	out.Histogram = his
 	out.Label = h.labelPairs
 	return nil
-***REMOVED***
+}
 
 // HistogramVec is a Collector that bundles a set of Histograms that all share the
 // same Desc, but have different values for their variable labels. This is used
 // if you want to count the same thing partitioned by various dimensions
 // (e.g. HTTP request latencies, partitioned by status code and method). Create
 // instances with NewHistogramVec.
-type HistogramVec struct ***REMOVED***
+type HistogramVec struct {
 	MetricVec
-***REMOVED***
+}
 
 // NewHistogramVec creates a new HistogramVec based on the provided HistogramOpts and
 // partitioned by the given label names. At least one label name must be
 // provided.
-func NewHistogramVec(opts HistogramOpts, labelNames []string) *HistogramVec ***REMOVED***
+func NewHistogramVec(opts HistogramOpts, labelNames []string) *HistogramVec {
 	desc := NewDesc(
 		BuildFQName(opts.Namespace, opts.Subsystem, opts.Name),
 		opts.Help,
 		labelNames,
 		opts.ConstLabels,
 	)
-	return &HistogramVec***REMOVED***
-		MetricVec: MetricVec***REMOVED***
-			children: map[uint64]Metric***REMOVED******REMOVED***,
+	return &HistogramVec{
+		MetricVec: MetricVec{
+			children: map[uint64]Metric{},
 			desc:     desc,
-			newMetric: func(lvs ...string) Metric ***REMOVED***
+			newMetric: func(lvs ...string) Metric {
 				return newHistogram(desc, opts, lvs...)
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
-***REMOVED***
+			},
+		},
+	}
+}
 
 // GetMetricWithLabelValues replaces the method of the same name in
 // MetricVec. The difference is that this method returns a Histogram and not a
 // Metric so that no type conversion is required.
-func (m *HistogramVec) GetMetricWithLabelValues(lvs ...string) (Histogram, error) ***REMOVED***
+func (m *HistogramVec) GetMetricWithLabelValues(lvs ...string) (Histogram, error) {
 	metric, err := m.MetricVec.GetMetricWithLabelValues(lvs...)
-	if metric != nil ***REMOVED***
+	if metric != nil {
 		return metric.(Histogram), err
-	***REMOVED***
+	}
 	return nil, err
-***REMOVED***
+}
 
 // GetMetricWith replaces the method of the same name in MetricVec. The
 // difference is that this method returns a Histogram and not a Metric so that no
 // type conversion is required.
-func (m *HistogramVec) GetMetricWith(labels Labels) (Histogram, error) ***REMOVED***
+func (m *HistogramVec) GetMetricWith(labels Labels) (Histogram, error) {
 	metric, err := m.MetricVec.GetMetricWith(labels)
-	if metric != nil ***REMOVED***
+	if metric != nil {
 		return metric.(Histogram), err
-	***REMOVED***
+	}
 	return nil, err
-***REMOVED***
+}
 
 // WithLabelValues works as GetMetricWithLabelValues, but panics where
 // GetMetricWithLabelValues would have returned an error. By not returning an
 // error, WithLabelValues allows shortcuts like
 //     myVec.WithLabelValues("404", "GET").Observe(42.21)
-func (m *HistogramVec) WithLabelValues(lvs ...string) Histogram ***REMOVED***
+func (m *HistogramVec) WithLabelValues(lvs ...string) Histogram {
 	return m.MetricVec.WithLabelValues(lvs...).(Histogram)
-***REMOVED***
+}
 
 // With works as GetMetricWith, but panics where GetMetricWithLabels would have
 // returned an error. By not returning an error, With allows shortcuts like
-//     myVec.With(Labels***REMOVED***"code": "404", "method": "GET"***REMOVED***).Observe(42.21)
-func (m *HistogramVec) With(labels Labels) Histogram ***REMOVED***
+//     myVec.With(Labels{"code": "404", "method": "GET"}).Observe(42.21)
+func (m *HistogramVec) With(labels Labels) Histogram {
 	return m.MetricVec.With(labels).(Histogram)
-***REMOVED***
+}
 
-type constHistogram struct ***REMOVED***
+type constHistogram struct {
 	desc       *Desc
 	count      uint64
 	sum        float64
 	buckets    map[float64]uint64
 	labelPairs []*dto.LabelPair
-***REMOVED***
+}
 
-func (h *constHistogram) Desc() *Desc ***REMOVED***
+func (h *constHistogram) Desc() *Desc {
 	return h.desc
-***REMOVED***
+}
 
-func (h *constHistogram) Write(out *dto.Metric) error ***REMOVED***
-	his := &dto.Histogram***REMOVED******REMOVED***
+func (h *constHistogram) Write(out *dto.Metric) error {
+	his := &dto.Histogram{}
 	buckets := make([]*dto.Bucket, 0, len(h.buckets))
 
 	his.SampleCount = proto.Uint64(h.count)
 	his.SampleSum = proto.Float64(h.sum)
 
-	for upperBound, count := range h.buckets ***REMOVED***
-		buckets = append(buckets, &dto.Bucket***REMOVED***
+	for upperBound, count := range h.buckets {
+		buckets = append(buckets, &dto.Bucket{
 			CumulativeCount: proto.Uint64(count),
 			UpperBound:      proto.Float64(upperBound),
-		***REMOVED***)
-	***REMOVED***
+		})
+	}
 
-	if len(buckets) > 0 ***REMOVED***
+	if len(buckets) > 0 {
 		sort.Sort(buckSort(buckets))
-	***REMOVED***
+	}
 	his.Bucket = buckets
 
 	out.Histogram = his
 	out.Label = h.labelPairs
 
 	return nil
-***REMOVED***
+}
 
 // NewConstHistogram returns a metric representing a Prometheus histogram with
 // fixed values for the count, sum, and bucket counts. As those parameters
@@ -404,18 +404,18 @@ func NewConstHistogram(
 	sum float64,
 	buckets map[float64]uint64,
 	labelValues ...string,
-) (Metric, error) ***REMOVED***
-	if len(desc.variableLabels) != len(labelValues) ***REMOVED***
+) (Metric, error) {
+	if len(desc.variableLabels) != len(labelValues) {
 		return nil, errInconsistentCardinality
-	***REMOVED***
-	return &constHistogram***REMOVED***
+	}
+	return &constHistogram{
 		desc:       desc,
 		count:      count,
 		sum:        sum,
 		buckets:    buckets,
 		labelPairs: makeLabelPairs(desc, labelValues),
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // MustNewConstHistogram is a version of NewConstHistogram that panics where
 // NewConstMetric would have returned an error.
@@ -425,24 +425,24 @@ func MustNewConstHistogram(
 	sum float64,
 	buckets map[float64]uint64,
 	labelValues ...string,
-) Metric ***REMOVED***
+) Metric {
 	m, err := NewConstHistogram(desc, count, sum, buckets, labelValues...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 	return m
-***REMOVED***
+}
 
 type buckSort []*dto.Bucket
 
-func (s buckSort) Len() int ***REMOVED***
+func (s buckSort) Len() int {
 	return len(s)
-***REMOVED***
+}
 
-func (s buckSort) Swap(i, j int) ***REMOVED***
+func (s buckSort) Swap(i, j int) {
 	s[i], s[j] = s[j], s[i]
-***REMOVED***
+}
 
-func (s buckSort) Less(i, j int) bool ***REMOVED***
+func (s buckSort) Less(i, j int) bool {
 	return s[i].GetUpperBound() < s[j].GetUpperBound()
-***REMOVED***
+}

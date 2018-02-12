@@ -37,7 +37,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-func (s *DockerSuite) TestContainerAPIGetAll(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPIGetAll(c *check.C) {
 	startCount := getContainerCount(c)
 	name := "getall"
 	dockerCmd(c, "run", "--name", name, "busybox", "true")
@@ -46,18 +46,18 @@ func (s *DockerSuite) TestContainerAPIGetAll(c *check.C) ***REMOVED***
 	c.Assert(err, checker.IsNil)
 	defer cli.Close()
 
-	options := types.ContainerListOptions***REMOVED***
+	options := types.ContainerListOptions{
 		All: true,
-	***REMOVED***
+	}
 	containers, err := cli.ContainerList(context.Background(), options)
 	c.Assert(err, checker.IsNil)
 	c.Assert(containers, checker.HasLen, startCount+1)
 	actual := containers[0].Names[0]
 	c.Assert(actual, checker.Equals, "/"+name)
-***REMOVED***
+}
 
 // regression test for empty json field being omitted #13691
-func (s *DockerSuite) TestContainerAPIGetJSONNoFieldsOmitted(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPIGetJSONNoFieldsOmitted(c *check.C) {
 	startCount := getContainerCount(c)
 	dockerCmd(c, "run", "busybox", "true")
 
@@ -65,9 +65,9 @@ func (s *DockerSuite) TestContainerAPIGetJSONNoFieldsOmitted(c *check.C) ***REMO
 	c.Assert(err, checker.IsNil)
 	defer cli.Close()
 
-	options := types.ContainerListOptions***REMOVED***
+	options := types.ContainerListOptions{
 		All: true,
-	***REMOVED***
+	}
 	containers, err := cli.ContainerList(context.Background(), options)
 	c.Assert(err, checker.IsNil)
 	c.Assert(containers, checker.HasLen, startCount+1)
@@ -76,7 +76,7 @@ func (s *DockerSuite) TestContainerAPIGetJSONNoFieldsOmitted(c *check.C) ***REMO
 	// empty Labels field triggered this bug, make sense to check for everything
 	// cause even Ports for instance can trigger this bug
 	// better safe than sorry..
-	fields := []string***REMOVED***
+	fields := []string{
 		"ID",
 		"Names",
 		"Image",
@@ -86,24 +86,24 @@ func (s *DockerSuite) TestContainerAPIGetJSONNoFieldsOmitted(c *check.C) ***REMO
 		"Labels",
 		"Status",
 		"NetworkSettings",
-	***REMOVED***
+	}
 
 	// decoding into types.Container do not work since it eventually unmarshal
 	// and empty field to an empty go map, so we just check for a string
-	for _, f := range fields ***REMOVED***
-		if !strings.Contains(actual, f) ***REMOVED***
+	for _, f := range fields {
+		if !strings.Contains(actual, f) {
 			c.Fatalf("Field %s is missing and it shouldn't", f)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-type containerPs struct ***REMOVED***
+type containerPs struct {
 	Names []string
 	Ports []types.Port
-***REMOVED***
+}
 
 // regression test for non-empty fields from #13901
-func (s *DockerSuite) TestContainerAPIPsOmitFields(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPIPsOmitFields(c *check.C) {
 	// Problematic for Windows porting due to networking not yet being passed back
 	testRequires(c, DaemonIsLinux)
 	name := "pstest"
@@ -114,29 +114,29 @@ func (s *DockerSuite) TestContainerAPIPsOmitFields(c *check.C) ***REMOVED***
 	c.Assert(err, checker.IsNil)
 	defer cli.Close()
 
-	options := types.ContainerListOptions***REMOVED***
+	options := types.ContainerListOptions{
 		All: true,
-	***REMOVED***
+	}
 	containers, err := cli.ContainerList(context.Background(), options)
 	c.Assert(err, checker.IsNil)
 	var foundContainer containerPs
-	for _, c := range containers ***REMOVED***
-		for _, testName := range c.Names ***REMOVED***
-			if "/"+name == testName ***REMOVED***
+	for _, c := range containers {
+		for _, testName := range c.Names {
+			if "/"+name == testName {
 				foundContainer.Names = c.Names
 				foundContainer.Ports = c.Ports
 				break
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	c.Assert(foundContainer.Ports, checker.HasLen, 1)
 	c.Assert(foundContainer.Ports[0].PrivatePort, checker.Equals, uint16(port))
 	c.Assert(foundContainer.Ports[0].PublicPort, checker.NotNil)
 	c.Assert(foundContainer.Ports[0].IP, checker.NotNil)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestContainerAPIGetExport(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPIGetExport(c *check.C) {
 	// Not supported on Windows as Windows does not support docker export
 	testRequires(c, DaemonIsLinux)
 	name := "exportcontainer"
@@ -150,20 +150,20 @@ func (s *DockerSuite) TestContainerAPIGetExport(c *check.C) ***REMOVED***
 	c.Assert(err, checker.IsNil)
 	defer body.Close()
 	found := false
-	for tarReader := tar.NewReader(body); ; ***REMOVED***
+	for tarReader := tar.NewReader(body); ; {
 		h, err := tarReader.Next()
-		if err != nil && err == io.EOF ***REMOVED***
+		if err != nil && err == io.EOF {
 			break
-		***REMOVED***
-		if h.Name == "test" ***REMOVED***
+		}
+		if h.Name == "test" {
 			found = true
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	c.Assert(found, checker.True, check.Commentf("The created test file has not been found in the exported image"))
-***REMOVED***
+}
 
-func (s *DockerSuite) TestContainerAPIGetChanges(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPIGetChanges(c *check.C) {
 	// Not supported on Windows as Windows does not support docker diff (/containers/name/changes)
 	testRequires(c, DaemonIsLinux)
 	name := "changescontainer"
@@ -178,35 +178,35 @@ func (s *DockerSuite) TestContainerAPIGetChanges(c *check.C) ***REMOVED***
 
 	// Check the changelog for removal of /etc/passwd
 	success := false
-	for _, elem := range changes ***REMOVED***
-		if elem.Path == "/etc/passwd" && elem.Kind == 2 ***REMOVED***
+	for _, elem := range changes {
+		if elem.Path == "/etc/passwd" && elem.Kind == 2 {
 			success = true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	c.Assert(success, checker.True, check.Commentf("/etc/passwd has been removed but is not present in the diff"))
-***REMOVED***
+}
 
-func (s *DockerSuite) TestGetContainerStats(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestGetContainerStats(c *check.C) {
 	var (
 		name = "statscontainer"
 	)
 	runSleepingContainer(c, "--name", name)
 
-	type b struct ***REMOVED***
+	type b struct {
 		stats types.ContainerStats
 		err   error
-	***REMOVED***
+	}
 
 	bc := make(chan b, 1)
-	go func() ***REMOVED***
+	go func() {
 		cli, err := client.NewEnvClient()
 		c.Assert(err, checker.IsNil)
 		defer cli.Close()
 
 		stats, err := cli.ContainerStats(context.Background(), name, true)
 		c.Assert(err, checker.IsNil)
-		bc <- b***REMOVED***stats, err***REMOVED***
-	***REMOVED***()
+		bc <- b{stats, err}
+	}()
 
 	// allow some time to stream the stats from the container
 	time.Sleep(4 * time.Second)
@@ -214,7 +214,7 @@ func (s *DockerSuite) TestGetContainerStats(c *check.C) ***REMOVED***
 
 	// collect the results from the stats stream or timeout and fail
 	// if the stream was not disconnected.
-	select ***REMOVED***
+	select {
 	case <-time.After(2 * time.Second):
 		c.Fatal("stream was not closed after container was removed")
 	case sr := <-bc:
@@ -223,14 +223,14 @@ func (s *DockerSuite) TestGetContainerStats(c *check.C) ***REMOVED***
 		var s *types.Stats
 		// decode only one object from the stream
 		c.Assert(dec.Decode(&s), checker.IsNil)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *DockerSuite) TestGetContainerStatsRmRunning(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestGetContainerStatsRmRunning(c *check.C) {
 	out := runSleepingContainer(c)
 	id := strings.TrimSpace(out)
 
-	buf := &ChannelBuffer***REMOVED***C: make(chan []byte, 1)***REMOVED***
+	buf := &ChannelBuffer{C: make(chan []byte, 1)}
 	defer buf.Close()
 
 	cli, err := client.NewEnvClient()
@@ -242,10 +242,10 @@ func (s *DockerSuite) TestGetContainerStatsRmRunning(c *check.C) ***REMOVED***
 	defer stats.Body.Close()
 
 	chErr := make(chan error, 1)
-	go func() ***REMOVED***
+	go func() {
 		_, err = io.Copy(buf, stats.Body)
 		chErr <- err
-	***REMOVED***()
+	}()
 
 	b := make([]byte, 32)
 	// make sure we've got some stats
@@ -260,58 +260,58 @@ func (s *DockerSuite) TestGetContainerStatsRmRunning(c *check.C) ***REMOVED***
 
 	dockerCmd(c, "rm", "-f", id)
 	c.Assert(<-chErr, checker.IsNil)
-***REMOVED***
+}
 
 // ChannelBuffer holds a chan of byte array that can be populate in a goroutine.
-type ChannelBuffer struct ***REMOVED***
+type ChannelBuffer struct {
 	C chan []byte
-***REMOVED***
+}
 
 // Write implements Writer.
-func (c *ChannelBuffer) Write(b []byte) (int, error) ***REMOVED***
+func (c *ChannelBuffer) Write(b []byte) (int, error) {
 	c.C <- b
 	return len(b), nil
-***REMOVED***
+}
 
 // Close closes the go channel.
-func (c *ChannelBuffer) Close() error ***REMOVED***
+func (c *ChannelBuffer) Close() error {
 	close(c.C)
 	return nil
-***REMOVED***
+}
 
 // ReadTimeout reads the content of the channel in the specified byte array with
 // the specified duration as timeout.
-func (c *ChannelBuffer) ReadTimeout(p []byte, n time.Duration) (int, error) ***REMOVED***
-	select ***REMOVED***
+func (c *ChannelBuffer) ReadTimeout(p []byte, n time.Duration) (int, error) {
+	select {
 	case b := <-c.C:
 		return copy(p[0:], b), nil
 	case <-time.After(n):
 		return -1, fmt.Errorf("timeout reading from channel")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // regression test for gh13421
 // previous test was just checking one stat entry so it didn't fail (stats with
 // stream false always return one stat)
-func (s *DockerSuite) TestGetContainerStatsStream(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestGetContainerStatsStream(c *check.C) {
 	name := "statscontainer"
 	runSleepingContainer(c, "--name", name)
 
-	type b struct ***REMOVED***
+	type b struct {
 		stats types.ContainerStats
 		err   error
-	***REMOVED***
+	}
 
 	bc := make(chan b, 1)
-	go func() ***REMOVED***
+	go func() {
 		cli, err := client.NewEnvClient()
 		c.Assert(err, checker.IsNil)
 		defer cli.Close()
 
 		stats, err := cli.ContainerStats(context.Background(), name, true)
 		c.Assert(err, checker.IsNil)
-		bc <- b***REMOVED***stats, err***REMOVED***
-	***REMOVED***()
+		bc <- b{stats, err}
+	}()
 
 	// allow some time to stream the stats from the container
 	time.Sleep(4 * time.Second)
@@ -319,7 +319,7 @@ func (s *DockerSuite) TestGetContainerStatsStream(c *check.C) ***REMOVED***
 
 	// collect the results from the stats stream or timeout and fail
 	// if the stream was not disconnected.
-	select ***REMOVED***
+	select {
 	case <-time.After(2 * time.Second):
 		c.Fatal("stream was not closed after container was removed")
 	case sr := <-bc:
@@ -328,32 +328,32 @@ func (s *DockerSuite) TestGetContainerStatsStream(c *check.C) ***REMOVED***
 		c.Assert(err, checker.IsNil)
 		s := string(b)
 		// count occurrences of "read" of types.Stats
-		if l := strings.Count(s, "read"); l < 2 ***REMOVED***
+		if l := strings.Count(s, "read"); l < 2 {
 			c.Fatalf("Expected more than one stat streamed, got %d", l)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (s *DockerSuite) TestGetContainerStatsNoStream(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestGetContainerStatsNoStream(c *check.C) {
 	name := "statscontainer"
 	runSleepingContainer(c, "--name", name)
 
-	type b struct ***REMOVED***
+	type b struct {
 		stats types.ContainerStats
 		err   error
-	***REMOVED***
+	}
 
 	bc := make(chan b, 1)
 
-	go func() ***REMOVED***
+	go func() {
 		cli, err := client.NewEnvClient()
 		c.Assert(err, checker.IsNil)
 		defer cli.Close()
 
 		stats, err := cli.ContainerStats(context.Background(), name, false)
 		c.Assert(err, checker.IsNil)
-		bc <- b***REMOVED***stats, err***REMOVED***
-	***REMOVED***()
+		bc <- b{stats, err}
+	}()
 
 	// allow some time to stream the stats from the container
 	time.Sleep(4 * time.Second)
@@ -361,7 +361,7 @@ func (s *DockerSuite) TestGetContainerStatsNoStream(c *check.C) ***REMOVED***
 
 	// collect the results from the stats stream or timeout and fail
 	// if the stream was not disconnected.
-	select ***REMOVED***
+	select {
 	case <-time.After(2 * time.Second):
 		c.Fatal("stream was not closed after container was removed")
 	case sr := <-bc:
@@ -371,10 +371,10 @@ func (s *DockerSuite) TestGetContainerStatsNoStream(c *check.C) ***REMOVED***
 		s := string(b)
 		// count occurrences of `"read"` of types.Stats
 		c.Assert(strings.Count(s, `"read"`), checker.Equals, 1, check.Commentf("Expected only one stat streamed, got %d", strings.Count(s, `"read"`)))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *DockerSuite) TestGetStoppedContainerStats(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestGetStoppedContainerStats(c *check.C) {
 	name := "statscontainer"
 	dockerCmd(c, "create", "--name", name, "busybox", "ps")
 
@@ -382,7 +382,7 @@ func (s *DockerSuite) TestGetStoppedContainerStats(c *check.C) ***REMOVED***
 
 	// We expect an immediate response, but if it's not immediate, the test would hang, so put it in a goroutine
 	// below we'll check this on a timeout.
-	go func() ***REMOVED***
+	go func() {
 		cli, err := client.NewEnvClient()
 		c.Assert(err, checker.IsNil)
 		defer cli.Close()
@@ -390,23 +390,23 @@ func (s *DockerSuite) TestGetStoppedContainerStats(c *check.C) ***REMOVED***
 		resp, err := cli.ContainerStats(context.Background(), name, false)
 		defer resp.Body.Close()
 		chResp <- err
-	***REMOVED***()
+	}()
 
-	select ***REMOVED***
+	select {
 	case err := <-chResp:
 		c.Assert(err, checker.IsNil)
 	case <-time.After(10 * time.Second):
 		c.Fatal("timeout waiting for stats response for stopped container")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *DockerSuite) TestContainerAPIPause(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPIPause(c *check.C) {
 	// Problematic on Windows as Windows does not support pause
 	testRequires(c, DaemonIsLinux)
 
-	getPaused := func(c *check.C) []string ***REMOVED***
+	getPaused := func(c *check.C) []string {
 		return strings.Fields(cli.DockerCmd(c, "ps", "-f", "status=paused", "-q", "-a").Combined())
-	***REMOVED***
+	}
 
 	out := cli.DockerCmd(c, "run", "-d", "busybox", "sleep", "30").Combined()
 	ContainerID := strings.TrimSpace(out)
@@ -420,18 +420,18 @@ func (s *DockerSuite) TestContainerAPIPause(c *check.C) ***REMOVED***
 
 	pausedContainers := getPaused(c)
 
-	if len(pausedContainers) != 1 || stringid.TruncateID(ContainerID) != pausedContainers[0] ***REMOVED***
+	if len(pausedContainers) != 1 || stringid.TruncateID(ContainerID) != pausedContainers[0] {
 		c.Fatalf("there should be one paused container and not %d", len(pausedContainers))
-	***REMOVED***
+	}
 
 	err = cli.ContainerUnpause(context.Background(), ContainerID)
 	c.Assert(err, checker.IsNil)
 
 	pausedContainers = getPaused(c)
 	c.Assert(pausedContainers, checker.HasLen, 0, check.Commentf("There should be no paused container."))
-***REMOVED***
+}
 
-func (s *DockerSuite) TestContainerAPITop(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPITop(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	out, _ := dockerCmd(c, "run", "-d", "busybox", "/bin/sh", "-c", "top")
 	id := strings.TrimSpace(string(out))
@@ -441,19 +441,19 @@ func (s *DockerSuite) TestContainerAPITop(c *check.C) ***REMOVED***
 	c.Assert(err, checker.IsNil)
 	defer cli.Close()
 
-	top, err := cli.ContainerTop(context.Background(), id, []string***REMOVED***"aux"***REMOVED***)
+	top, err := cli.ContainerTop(context.Background(), id, []string{"aux"})
 	c.Assert(err, checker.IsNil)
 	c.Assert(top.Titles, checker.HasLen, 11, check.Commentf("expected 11 titles, found %d: %v", len(top.Titles), top.Titles))
 
-	if top.Titles[0] != "USER" || top.Titles[10] != "COMMAND" ***REMOVED***
+	if top.Titles[0] != "USER" || top.Titles[10] != "COMMAND" {
 		c.Fatalf("expected `USER` at `Titles[0]` and `COMMAND` at Titles[10]: %v", top.Titles)
-	***REMOVED***
+	}
 	c.Assert(top.Processes, checker.HasLen, 2, check.Commentf("expected 2 processes, found %d: %v", len(top.Processes), top.Processes))
 	c.Assert(top.Processes[0][10], checker.Equals, "/bin/sh -c top")
 	c.Assert(top.Processes[1][10], checker.Equals, "top")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestContainerAPITopWindows(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPITopWindows(c *check.C) {
 	testRequires(c, DaemonIsWindows)
 	out := runSleepingContainer(c, "-d")
 	id := strings.TrimSpace(string(out))
@@ -467,24 +467,24 @@ func (s *DockerSuite) TestContainerAPITopWindows(c *check.C) ***REMOVED***
 	c.Assert(err, checker.IsNil)
 	c.Assert(top.Titles, checker.HasLen, 4, check.Commentf("expected 4 titles, found %d: %v", len(top.Titles), top.Titles))
 
-	if top.Titles[0] != "Name" || top.Titles[3] != "Private Working Set" ***REMOVED***
+	if top.Titles[0] != "Name" || top.Titles[3] != "Private Working Set" {
 		c.Fatalf("expected `Name` at `Titles[0]` and `Private Working Set` at Titles[3]: %v", top.Titles)
-	***REMOVED***
+	}
 	c.Assert(len(top.Processes), checker.GreaterOrEqualThan, 2, check.Commentf("expected at least 2 processes, found %d: %v", len(top.Processes), top.Processes))
 
 	foundProcess := false
 	expectedProcess := "busybox.exe"
-	for _, process := range top.Processes ***REMOVED***
-		if process[0] == expectedProcess ***REMOVED***
+	for _, process := range top.Processes {
+		if process[0] == expectedProcess {
 			foundProcess = true
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	c.Assert(foundProcess, checker.Equals, true, check.Commentf("expected to find %s: %v", expectedProcess, top.Processes))
-***REMOVED***
+}
 
-func (s *DockerSuite) TestContainerAPICommit(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPICommit(c *check.C) {
 	cName := "testapicommit"
 	dockerCmd(c, "run", "--name="+cName, "busybox", "/bin/sh", "-c", "touch /test")
 
@@ -492,9 +492,9 @@ func (s *DockerSuite) TestContainerAPICommit(c *check.C) ***REMOVED***
 	c.Assert(err, checker.IsNil)
 	defer cli.Close()
 
-	options := types.ContainerCommitOptions***REMOVED***
+	options := types.ContainerCommitOptions{
 		Reference: "testcontainerapicommit:testtag",
-	***REMOVED***
+	}
 
 	img, err := cli.ContainerCommit(context.Background(), cName, options)
 	c.Assert(err, checker.IsNil)
@@ -504,9 +504,9 @@ func (s *DockerSuite) TestContainerAPICommit(c *check.C) ***REMOVED***
 
 	// sanity check, make sure the image is what we think it is
 	dockerCmd(c, "run", img.ID, "ls", "/test")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestContainerAPICommitWithLabelInConfig(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPICommitWithLabelInConfig(c *check.C) {
 	cName := "testapicommitwithconfig"
 	dockerCmd(c, "run", "--name="+cName, "busybox", "/bin/sh", "-c", "touch /test")
 
@@ -514,13 +514,13 @@ func (s *DockerSuite) TestContainerAPICommitWithLabelInConfig(c *check.C) ***REM
 	c.Assert(err, checker.IsNil)
 	defer cli.Close()
 
-	config := containertypes.Config***REMOVED***
-		Labels: map[string]string***REMOVED***"key1": "value1", "key2": "value2"***REMOVED******REMOVED***
+	config := containertypes.Config{
+		Labels: map[string]string{"key1": "value1", "key2": "value2"}}
 
-	options := types.ContainerCommitOptions***REMOVED***
+	options := types.ContainerCommitOptions{
 		Reference: "testcontainerapicommitwithconfig",
 		Config:    &config,
-	***REMOVED***
+	}
 
 	img, err := cli.ContainerCommit(context.Background(), cName, options)
 	c.Assert(err, checker.IsNil)
@@ -536,105 +536,105 @@ func (s *DockerSuite) TestContainerAPICommitWithLabelInConfig(c *check.C) ***REM
 
 	// sanity check, make sure the image is what we think it is
 	dockerCmd(c, "run", img.ID, "ls", "/test")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestContainerAPIBadPort(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPIBadPort(c *check.C) {
 	// TODO Windows to Windows CI - Port this test
 	testRequires(c, DaemonIsLinux)
 
-	config := containertypes.Config***REMOVED***
+	config := containertypes.Config{
 		Image: "busybox",
-		Cmd:   []string***REMOVED***"/bin/sh", "-c", "echo test"***REMOVED***,
-	***REMOVED***
+		Cmd:   []string{"/bin/sh", "-c", "echo test"},
+	}
 
-	hostConfig := containertypes.HostConfig***REMOVED***
-		PortBindings: nat.PortMap***REMOVED***
-			"8080/tcp": []nat.PortBinding***REMOVED***
-				***REMOVED***
+	hostConfig := containertypes.HostConfig{
+		PortBindings: nat.PortMap{
+			"8080/tcp": []nat.PortBinding{
+				{
 					HostIP:   "",
-					HostPort: "aa80"***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+					HostPort: "aa80"},
+			},
+		},
+	}
 
 	cli, err := client.NewEnvClient()
 	c.Assert(err, checker.IsNil)
 	defer cli.Close()
 
-	_, err = cli.ContainerCreate(context.Background(), &config, &hostConfig, &networktypes.NetworkingConfig***REMOVED******REMOVED***, "")
+	_, err = cli.ContainerCreate(context.Background(), &config, &hostConfig, &networktypes.NetworkingConfig{}, "")
 	c.Assert(err.Error(), checker.Contains, `invalid port specification: "aa80"`)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestContainerAPICreate(c *check.C) ***REMOVED***
-	config := containertypes.Config***REMOVED***
+func (s *DockerSuite) TestContainerAPICreate(c *check.C) {
+	config := containertypes.Config{
 		Image: "busybox",
-		Cmd:   []string***REMOVED***"/bin/sh", "-c", "touch /test && ls /test"***REMOVED***,
-	***REMOVED***
+		Cmd:   []string{"/bin/sh", "-c", "touch /test && ls /test"},
+	}
 
 	cli, err := client.NewEnvClient()
 	c.Assert(err, checker.IsNil)
 	defer cli.Close()
 
-	container, err := cli.ContainerCreate(context.Background(), &config, &containertypes.HostConfig***REMOVED******REMOVED***, &networktypes.NetworkingConfig***REMOVED******REMOVED***, "")
+	container, err := cli.ContainerCreate(context.Background(), &config, &containertypes.HostConfig{}, &networktypes.NetworkingConfig{}, "")
 	c.Assert(err, checker.IsNil)
 
 	out, _ := dockerCmd(c, "start", "-a", container.ID)
 	c.Assert(strings.TrimSpace(out), checker.Equals, "/test")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestContainerAPICreateEmptyConfig(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPICreateEmptyConfig(c *check.C) {
 
 	cli, err := client.NewEnvClient()
 	c.Assert(err, checker.IsNil)
 	defer cli.Close()
 
-	_, err = cli.ContainerCreate(context.Background(), &containertypes.Config***REMOVED******REMOVED***, &containertypes.HostConfig***REMOVED******REMOVED***, &networktypes.NetworkingConfig***REMOVED******REMOVED***, "")
+	_, err = cli.ContainerCreate(context.Background(), &containertypes.Config{}, &containertypes.HostConfig{}, &networktypes.NetworkingConfig{}, "")
 
 	expected := "No command specified"
 	c.Assert(err.Error(), checker.Contains, expected)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestContainerAPICreateMultipleNetworksConfig(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPICreateMultipleNetworksConfig(c *check.C) {
 	// Container creation must fail if client specified configurations for more than one network
-	config := containertypes.Config***REMOVED***
+	config := containertypes.Config{
 		Image: "busybox",
-	***REMOVED***
+	}
 
-	networkingConfig := networktypes.NetworkingConfig***REMOVED***
-		EndpointsConfig: map[string]*networktypes.EndpointSettings***REMOVED***
-			"net1": ***REMOVED******REMOVED***,
-			"net2": ***REMOVED******REMOVED***,
-			"net3": ***REMOVED******REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+	networkingConfig := networktypes.NetworkingConfig{
+		EndpointsConfig: map[string]*networktypes.EndpointSettings{
+			"net1": {},
+			"net2": {},
+			"net3": {},
+		},
+	}
 
 	cli, err := client.NewEnvClient()
 	c.Assert(err, checker.IsNil)
 	defer cli.Close()
 
-	_, err = cli.ContainerCreate(context.Background(), &config, &containertypes.HostConfig***REMOVED******REMOVED***, &networkingConfig, "")
+	_, err = cli.ContainerCreate(context.Background(), &config, &containertypes.HostConfig{}, &networkingConfig, "")
 	msg := err.Error()
 	// network name order in error message is not deterministic
 	c.Assert(msg, checker.Contains, "Container cannot be connected to network endpoints")
 	c.Assert(msg, checker.Contains, "net1")
 	c.Assert(msg, checker.Contains, "net2")
 	c.Assert(msg, checker.Contains, "net3")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestContainerAPICreateWithHostName(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPICreateWithHostName(c *check.C) {
 	domainName := "test-domain"
 	hostName := "test-hostname"
-	config := containertypes.Config***REMOVED***
+	config := containertypes.Config{
 		Image:      "busybox",
 		Hostname:   hostName,
 		Domainname: domainName,
-	***REMOVED***
+	}
 
 	cli, err := client.NewEnvClient()
 	c.Assert(err, checker.IsNil)
 	defer cli.Close()
 
-	container, err := cli.ContainerCreate(context.Background(), &config, &containertypes.HostConfig***REMOVED******REMOVED***, &networktypes.NetworkingConfig***REMOVED******REMOVED***, "")
+	container, err := cli.ContainerCreate(context.Background(), &config, &containertypes.HostConfig{}, &networktypes.NetworkingConfig{}, "")
 	c.Assert(err, checker.IsNil)
 
 	containerJSON, err := cli.ContainerInspect(context.Background(), container.ID)
@@ -642,62 +642,62 @@ func (s *DockerSuite) TestContainerAPICreateWithHostName(c *check.C) ***REMOVED*
 
 	c.Assert(containerJSON.Config.Hostname, checker.Equals, hostName, check.Commentf("Mismatched Hostname"))
 	c.Assert(containerJSON.Config.Domainname, checker.Equals, domainName, check.Commentf("Mismatched Domainname"))
-***REMOVED***
+}
 
-func (s *DockerSuite) TestContainerAPICreateBridgeNetworkMode(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPICreateBridgeNetworkMode(c *check.C) {
 	// Windows does not support bridge
 	testRequires(c, DaemonIsLinux)
 	UtilCreateNetworkMode(c, "bridge")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestContainerAPICreateOtherNetworkModes(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPICreateOtherNetworkModes(c *check.C) {
 	// Windows does not support these network modes
 	testRequires(c, DaemonIsLinux, NotUserNamespace)
 	UtilCreateNetworkMode(c, "host")
 	UtilCreateNetworkMode(c, "container:web1")
-***REMOVED***
+}
 
-func UtilCreateNetworkMode(c *check.C, networkMode containertypes.NetworkMode) ***REMOVED***
-	config := containertypes.Config***REMOVED***
+func UtilCreateNetworkMode(c *check.C, networkMode containertypes.NetworkMode) {
+	config := containertypes.Config{
 		Image: "busybox",
-	***REMOVED***
+	}
 
-	hostConfig := containertypes.HostConfig***REMOVED***
+	hostConfig := containertypes.HostConfig{
 		NetworkMode: networkMode,
-	***REMOVED***
+	}
 
 	cli, err := client.NewEnvClient()
 	c.Assert(err, checker.IsNil)
 	defer cli.Close()
 
-	container, err := cli.ContainerCreate(context.Background(), &config, &hostConfig, &networktypes.NetworkingConfig***REMOVED******REMOVED***, "")
+	container, err := cli.ContainerCreate(context.Background(), &config, &hostConfig, &networktypes.NetworkingConfig{}, "")
 	c.Assert(err, checker.IsNil)
 
 	containerJSON, err := cli.ContainerInspect(context.Background(), container.ID)
 	c.Assert(err, checker.IsNil)
 
 	c.Assert(containerJSON.HostConfig.NetworkMode, checker.Equals, containertypes.NetworkMode(networkMode), check.Commentf("Mismatched NetworkMode"))
-***REMOVED***
+}
 
-func (s *DockerSuite) TestContainerAPICreateWithCpuSharesCpuset(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPICreateWithCpuSharesCpuset(c *check.C) {
 	// TODO Windows to Windows CI. The CpuShares part could be ported.
 	testRequires(c, DaemonIsLinux)
-	config := containertypes.Config***REMOVED***
+	config := containertypes.Config{
 		Image: "busybox",
-	***REMOVED***
+	}
 
-	hostConfig := containertypes.HostConfig***REMOVED***
-		Resources: containertypes.Resources***REMOVED***
+	hostConfig := containertypes.HostConfig{
+		Resources: containertypes.Resources{
 			CPUShares:  512,
 			CpusetCpus: "0",
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
 	cli, err := client.NewEnvClient()
 	c.Assert(err, checker.IsNil)
 	defer cli.Close()
 
-	container, err := cli.ContainerCreate(context.Background(), &config, &hostConfig, &networktypes.NetworkingConfig***REMOVED******REMOVED***, "")
+	container, err := cli.ContainerCreate(context.Background(), &config, &hostConfig, &networktypes.NetworkingConfig{}, "")
 	c.Assert(err, checker.IsNil)
 
 	containerJSON, err := cli.ContainerInspect(context.Background(), container.ID)
@@ -708,18 +708,18 @@ func (s *DockerSuite) TestContainerAPICreateWithCpuSharesCpuset(c *check.C) ***R
 
 	outCpuset := inspectField(c, containerJSON.ID, "HostConfig.CpusetCpus")
 	c.Assert(outCpuset, checker.Equals, "0")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestContainerAPIVerifyHeader(c *check.C) ***REMOVED***
-	config := map[string]interface***REMOVED******REMOVED******REMOVED***
+func (s *DockerSuite) TestContainerAPIVerifyHeader(c *check.C) {
+	config := map[string]interface{}{
 		"Image": "busybox",
-	***REMOVED***
+	}
 
-	create := func(ct string) (*http.Response, io.ReadCloser, error) ***REMOVED***
+	create := func(ct string) (*http.Response, io.ReadCloser, error) {
 		jsonData := bytes.NewBuffer(nil)
 		c.Assert(json.NewEncoder(jsonData).Encode(config), checker.IsNil)
 		return request.Post("/containers/create", request.RawContent(ioutil.NopCloser(jsonData)), request.ContentType(ct))
-	***REMOVED***
+	}
 
 	// Try with no content-type
 	res, body, err := create("")
@@ -738,21 +738,21 @@ func (s *DockerSuite) TestContainerAPIVerifyHeader(c *check.C) ***REMOVED***
 	c.Assert(err, checker.IsNil)
 	c.Assert(res.StatusCode, checker.Equals, http.StatusCreated)
 	body.Close()
-***REMOVED***
+}
 
 //Issue 14230. daemon should return 500 for invalid port syntax
-func (s *DockerSuite) TestContainerAPIInvalidPortSyntax(c *check.C) ***REMOVED***
-	config := `***REMOVED***
+func (s *DockerSuite) TestContainerAPIInvalidPortSyntax(c *check.C) {
+	config := `{
 				  "Image": "busybox",
-				  "HostConfig": ***REMOVED***
+				  "HostConfig": {
 					"NetworkMode": "default",
-					"PortBindings": ***REMOVED***
+					"PortBindings": {
 					  "19039;1230": [
-						***REMOVED******REMOVED***
+						{}
 					  ]
-					***REMOVED***
-				  ***REMOVED***
-				***REMOVED***`
+					}
+				  }
+				}`
 
 	res, body, err := request.Post("/containers/create", request.RawString(config), request.JSON)
 	c.Assert(err, checker.IsNil)
@@ -761,18 +761,18 @@ func (s *DockerSuite) TestContainerAPIInvalidPortSyntax(c *check.C) ***REMOVED**
 	b, err := request.ReadBody(body)
 	c.Assert(err, checker.IsNil)
 	c.Assert(string(b[:]), checker.Contains, "invalid port")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestContainerAPIRestartPolicyInvalidPolicyName(c *check.C) ***REMOVED***
-	config := `***REMOVED***
+func (s *DockerSuite) TestContainerAPIRestartPolicyInvalidPolicyName(c *check.C) {
+	config := `{
 		"Image": "busybox",
-		"HostConfig": ***REMOVED***
-			"RestartPolicy": ***REMOVED***
+		"HostConfig": {
+			"RestartPolicy": {
 				"Name": "something",
 				"MaximumRetryCount": 0
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***`
+			}
+		}
+	}`
 
 	res, body, err := request.Post("/containers/create", request.RawString(config), request.JSON)
 	c.Assert(err, checker.IsNil)
@@ -781,18 +781,18 @@ func (s *DockerSuite) TestContainerAPIRestartPolicyInvalidPolicyName(c *check.C)
 	b, err := request.ReadBody(body)
 	c.Assert(err, checker.IsNil)
 	c.Assert(string(b[:]), checker.Contains, "invalid restart policy")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestContainerAPIRestartPolicyRetryMismatch(c *check.C) ***REMOVED***
-	config := `***REMOVED***
+func (s *DockerSuite) TestContainerAPIRestartPolicyRetryMismatch(c *check.C) {
+	config := `{
 		"Image": "busybox",
-		"HostConfig": ***REMOVED***
-			"RestartPolicy": ***REMOVED***
+		"HostConfig": {
+			"RestartPolicy": {
 				"Name": "always",
 				"MaximumRetryCount": 2
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***`
+			}
+		}
+	}`
 
 	res, body, err := request.Post("/containers/create", request.RawString(config), request.JSON)
 	c.Assert(err, checker.IsNil)
@@ -801,18 +801,18 @@ func (s *DockerSuite) TestContainerAPIRestartPolicyRetryMismatch(c *check.C) ***
 	b, err := request.ReadBody(body)
 	c.Assert(err, checker.IsNil)
 	c.Assert(string(b[:]), checker.Contains, "maximum retry count cannot be used with restart policy")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestContainerAPIRestartPolicyNegativeRetryCount(c *check.C) ***REMOVED***
-	config := `***REMOVED***
+func (s *DockerSuite) TestContainerAPIRestartPolicyNegativeRetryCount(c *check.C) {
+	config := `{
 		"Image": "busybox",
-		"HostConfig": ***REMOVED***
-			"RestartPolicy": ***REMOVED***
+		"HostConfig": {
+			"RestartPolicy": {
 				"Name": "on-failure",
 				"MaximumRetryCount": -2
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***`
+			}
+		}
+	}`
 
 	res, body, err := request.Post("/containers/create", request.RawString(config), request.JSON)
 	c.Assert(err, checker.IsNil)
@@ -821,28 +821,28 @@ func (s *DockerSuite) TestContainerAPIRestartPolicyNegativeRetryCount(c *check.C
 	b, err := request.ReadBody(body)
 	c.Assert(err, checker.IsNil)
 	c.Assert(string(b[:]), checker.Contains, "maximum retry count cannot be negative")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestContainerAPIRestartPolicyDefaultRetryCount(c *check.C) ***REMOVED***
-	config := `***REMOVED***
+func (s *DockerSuite) TestContainerAPIRestartPolicyDefaultRetryCount(c *check.C) {
+	config := `{
 		"Image": "busybox",
-		"HostConfig": ***REMOVED***
-			"RestartPolicy": ***REMOVED***
+		"HostConfig": {
+			"RestartPolicy": {
 				"Name": "on-failure",
 				"MaximumRetryCount": 0
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***`
+			}
+		}
+	}`
 
 	res, _, err := request.Post("/containers/create", request.RawString(config), request.JSON)
 	c.Assert(err, checker.IsNil)
 	c.Assert(res.StatusCode, checker.Equals, http.StatusCreated)
-***REMOVED***
+}
 
 // Issue 7941 - test to make sure a "null" in JSON is just ignored.
 // W/o this fix a null in JSON would be parsed into a string var as "null"
-func (s *DockerSuite) TestContainerAPIPostCreateNull(c *check.C) ***REMOVED***
-	config := `***REMOVED***
+func (s *DockerSuite) TestContainerAPIPostCreateNull(c *check.C) {
+	config := `{
 		"Hostname":"",
 		"Domainname":"",
 		"Memory":0,
@@ -852,18 +852,18 @@ func (s *DockerSuite) TestContainerAPIPostCreateNull(c *check.C) ***REMOVED***
 		"AttachStdin":true,
 		"AttachStdout":true,
 		"AttachStderr":true,
-		"ExposedPorts":***REMOVED******REMOVED***,
+		"ExposedPorts":{},
 		"Tty":true,
 		"OpenStdin":true,
 		"StdinOnce":true,
 		"Env":[],
 		"Cmd":"ls",
 		"Image":"busybox",
-		"Volumes":***REMOVED******REMOVED***,
+		"Volumes":{},
 		"WorkingDir":"",
 		"Entrypoint":null,
 		"NetworkDisabled":false,
-		"OnBuild":null***REMOVED***`
+		"OnBuild":null}`
 
 	res, body, err := request.Post("/containers/create", request.RawString(config), request.JSON)
 	c.Assert(err, checker.IsNil)
@@ -871,9 +871,9 @@ func (s *DockerSuite) TestContainerAPIPostCreateNull(c *check.C) ***REMOVED***
 
 	b, err := request.ReadBody(body)
 	c.Assert(err, checker.IsNil)
-	type createResp struct ***REMOVED***
+	type createResp struct {
 		ID string
-	***REMOVED***
+	}
 	var container createResp
 	c.Assert(json.Unmarshal(b, &container), checker.IsNil)
 	out := inspectField(c, container.ID, "HostConfig.CpusetCpus")
@@ -883,18 +883,18 @@ func (s *DockerSuite) TestContainerAPIPostCreateNull(c *check.C) ***REMOVED***
 	c.Assert(outMemory, checker.Equals, "0")
 	outMemorySwap := inspectField(c, container.ID, "HostConfig.MemorySwap")
 	c.Assert(outMemorySwap, checker.Equals, "0")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestCreateWithTooLowMemoryLimit(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestCreateWithTooLowMemoryLimit(c *check.C) {
 	// TODO Windows: Port once memory is supported
 	testRequires(c, DaemonIsLinux)
-	config := `***REMOVED***
+	config := `{
 		"Image":     "busybox",
 		"Cmd":       "ls",
 		"OpenStdin": true,
 		"CpuShares": 100,
 		"Memory":    524287
-	***REMOVED***`
+	}`
 
 	res, body, err := request.Post("/containers/create", request.RawString(config), request.JSON)
 	c.Assert(err, checker.IsNil)
@@ -903,9 +903,9 @@ func (s *DockerSuite) TestCreateWithTooLowMemoryLimit(c *check.C) ***REMOVED***
 
 	c.Assert(res.StatusCode, checker.Equals, http.StatusBadRequest)
 	c.Assert(string(b), checker.Contains, "Minimum memory limit allowed is 4MB")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestContainerAPIRename(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPIRename(c *check.C) {
 	out, _ := dockerCmd(c, "run", "--name", "TestContainerAPIRename", "-d", "busybox", "sh")
 
 	containerID := strings.TrimSpace(out)
@@ -920,9 +920,9 @@ func (s *DockerSuite) TestContainerAPIRename(c *check.C) ***REMOVED***
 
 	name := inspectField(c, containerID, "Name")
 	c.Assert(name, checker.Equals, "/"+newName, check.Commentf("Failed to rename container"))
-***REMOVED***
+}
 
-func (s *DockerSuite) TestContainerAPIKill(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPIKill(c *check.C) {
 	name := "test-api-kill"
 	runSleepingContainer(c, "-i", "--name", name)
 
@@ -935,9 +935,9 @@ func (s *DockerSuite) TestContainerAPIKill(c *check.C) ***REMOVED***
 
 	state := inspectField(c, name, "State.Running")
 	c.Assert(state, checker.Equals, "false", check.Commentf("got wrong State from container %s: %q", name, state))
-***REMOVED***
+}
 
-func (s *DockerSuite) TestContainerAPIRestart(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPIRestart(c *check.C) {
 	name := "test-api-restart"
 	runSleepingContainer(c, "-di", "--name", name)
 	cli, err := client.NewEnvClient()
@@ -948,10 +948,10 @@ func (s *DockerSuite) TestContainerAPIRestart(c *check.C) ***REMOVED***
 	err = cli.ContainerRestart(context.Background(), name, &timeout)
 	c.Assert(err, checker.IsNil)
 
-	c.Assert(waitInspect(name, "***REMOVED******REMOVED*** .State.Restarting  ***REMOVED******REMOVED*** ***REMOVED******REMOVED*** .State.Running  ***REMOVED******REMOVED***", "false true", 15*time.Second), checker.IsNil)
-***REMOVED***
+	c.Assert(waitInspect(name, "{{ .State.Restarting  }} {{ .State.Running  }}", "false true", 15*time.Second), checker.IsNil)
+}
 
-func (s *DockerSuite) TestContainerAPIRestartNotimeoutParam(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPIRestartNotimeoutParam(c *check.C) {
 	name := "test-api-restart-no-timeout-param"
 	out := runSleepingContainer(c, "-di", "--name", name)
 	id := strings.TrimSpace(out)
@@ -964,36 +964,36 @@ func (s *DockerSuite) TestContainerAPIRestartNotimeoutParam(c *check.C) ***REMOV
 	err = cli.ContainerRestart(context.Background(), name, nil)
 	c.Assert(err, checker.IsNil)
 
-	c.Assert(waitInspect(name, "***REMOVED******REMOVED*** .State.Restarting  ***REMOVED******REMOVED*** ***REMOVED******REMOVED*** .State.Running  ***REMOVED******REMOVED***", "false true", 15*time.Second), checker.IsNil)
-***REMOVED***
+	c.Assert(waitInspect(name, "{{ .State.Restarting  }} {{ .State.Running  }}", "false true", 15*time.Second), checker.IsNil)
+}
 
-func (s *DockerSuite) TestContainerAPIStart(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPIStart(c *check.C) {
 	name := "testing-start"
-	config := containertypes.Config***REMOVED***
+	config := containertypes.Config{
 		Image:     "busybox",
-		Cmd:       append([]string***REMOVED***"/bin/sh", "-c"***REMOVED***, sleepCommandForDaemonPlatform()...),
+		Cmd:       append([]string{"/bin/sh", "-c"}, sleepCommandForDaemonPlatform()...),
 		OpenStdin: true,
-	***REMOVED***
+	}
 
 	cli, err := client.NewEnvClient()
 	c.Assert(err, checker.IsNil)
 	defer cli.Close()
 
-	_, err = cli.ContainerCreate(context.Background(), &config, &containertypes.HostConfig***REMOVED******REMOVED***, &networktypes.NetworkingConfig***REMOVED******REMOVED***, name)
+	_, err = cli.ContainerCreate(context.Background(), &config, &containertypes.HostConfig{}, &networktypes.NetworkingConfig{}, name)
 	c.Assert(err, checker.IsNil)
 
-	err = cli.ContainerStart(context.Background(), name, types.ContainerStartOptions***REMOVED******REMOVED***)
+	err = cli.ContainerStart(context.Background(), name, types.ContainerStartOptions{})
 	c.Assert(err, checker.IsNil)
 
 	// second call to start should give 304
 	// maybe add ContainerStartWithRaw to test it
-	err = cli.ContainerStart(context.Background(), name, types.ContainerStartOptions***REMOVED******REMOVED***)
+	err = cli.ContainerStart(context.Background(), name, types.ContainerStartOptions{})
 	c.Assert(err, checker.IsNil)
 
 	// TODO(tibor): figure out why this doesn't work on windows
-***REMOVED***
+}
 
-func (s *DockerSuite) TestContainerAPIStop(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPIStop(c *check.C) {
 	name := "test-api-stop"
 	runSleepingContainer(c, "-i", "--name", name)
 	timeout := 30 * time.Second
@@ -1004,21 +1004,21 @@ func (s *DockerSuite) TestContainerAPIStop(c *check.C) ***REMOVED***
 
 	err = cli.ContainerStop(context.Background(), name, &timeout)
 	c.Assert(err, checker.IsNil)
-	c.Assert(waitInspect(name, "***REMOVED******REMOVED*** .State.Running  ***REMOVED******REMOVED***", "false", 60*time.Second), checker.IsNil)
+	c.Assert(waitInspect(name, "{{ .State.Running  }}", "false", 60*time.Second), checker.IsNil)
 
 	// second call to start should give 304
 	// maybe add ContainerStartWithRaw to test it
 	err = cli.ContainerStop(context.Background(), name, &timeout)
 	c.Assert(err, checker.IsNil)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestContainerAPIWait(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPIWait(c *check.C) {
 	name := "test-api-wait"
 
 	sleepCmd := "/bin/sleep"
-	if testEnv.OSType == "windows" ***REMOVED***
+	if testEnv.OSType == "windows" {
 		sleepCmd = "sleep"
-	***REMOVED***
+	}
 	dockerCmd(c, "run", "--name", name, "busybox", sleepCmd, "2")
 
 	cli, err := client.NewEnvClient()
@@ -1027,65 +1027,65 @@ func (s *DockerSuite) TestContainerAPIWait(c *check.C) ***REMOVED***
 
 	waitresC, errC := cli.ContainerWait(context.Background(), name, "")
 
-	select ***REMOVED***
+	select {
 	case err = <-errC:
 		c.Assert(err, checker.IsNil)
 	case waitres := <-waitresC:
 		c.Assert(waitres.StatusCode, checker.Equals, int64(0))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *DockerSuite) TestContainerAPICopyNotExistsAnyMore(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPICopyNotExistsAnyMore(c *check.C) {
 	name := "test-container-api-copy"
 	dockerCmd(c, "run", "--name", name, "busybox", "touch", "/test.txt")
 
-	postData := types.CopyConfig***REMOVED***
+	postData := types.CopyConfig{
 		Resource: "/test.txt",
-	***REMOVED***
+	}
 	// no copy in client/
 	res, _, err := request.Post("/containers/"+name+"/copy", request.JSONBody(postData))
 	c.Assert(err, checker.IsNil)
 	c.Assert(res.StatusCode, checker.Equals, http.StatusNotFound)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestContainerAPICopyPre124(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPICopyPre124(c *check.C) {
 	testRequires(c, DaemonIsLinux) // Windows only supports 1.25 or later
 	name := "test-container-api-copy"
 	dockerCmd(c, "run", "--name", name, "busybox", "touch", "/test.txt")
 
-	postData := types.CopyConfig***REMOVED***
+	postData := types.CopyConfig{
 		Resource: "/test.txt",
-	***REMOVED***
+	}
 
 	res, body, err := request.Post("/v1.23/containers/"+name+"/copy", request.JSONBody(postData))
 	c.Assert(err, checker.IsNil)
 	c.Assert(res.StatusCode, checker.Equals, http.StatusOK)
 
 	found := false
-	for tarReader := tar.NewReader(body); ; ***REMOVED***
+	for tarReader := tar.NewReader(body); ; {
 		h, err := tarReader.Next()
-		if err != nil ***REMOVED***
-			if err == io.EOF ***REMOVED***
+		if err != nil {
+			if err == io.EOF {
 				break
-			***REMOVED***
+			}
 			c.Fatal(err)
-		***REMOVED***
-		if h.Name == "test.txt" ***REMOVED***
+		}
+		if h.Name == "test.txt" {
 			found = true
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	c.Assert(found, checker.True)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestContainerAPICopyResourcePathEmptyPre124(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPICopyResourcePathEmptyPre124(c *check.C) {
 	testRequires(c, DaemonIsLinux) // Windows only supports 1.25 or later
 	name := "test-container-api-copy-resource-empty"
 	dockerCmd(c, "run", "--name", name, "busybox", "touch", "/test.txt")
 
-	postData := types.CopyConfig***REMOVED***
+	postData := types.CopyConfig{
 		Resource: "",
-	***REMOVED***
+	}
 
 	res, body, err := request.Post("/v1.23/containers/"+name+"/copy", request.JSONBody(postData))
 	c.Assert(err, checker.IsNil)
@@ -1093,16 +1093,16 @@ func (s *DockerSuite) TestContainerAPICopyResourcePathEmptyPre124(c *check.C) **
 	b, err := request.ReadBody(body)
 	c.Assert(err, checker.IsNil)
 	c.Assert(string(b), checker.Matches, "Path cannot be empty\n")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestContainerAPICopyResourcePathNotFoundPre124(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPICopyResourcePathNotFoundPre124(c *check.C) {
 	testRequires(c, DaemonIsLinux) // Windows only supports 1.25 or later
 	name := "test-container-api-copy-resource-not-found"
 	dockerCmd(c, "run", "--name", name, "busybox")
 
-	postData := types.CopyConfig***REMOVED***
+	postData := types.CopyConfig{
 		Resource: "/notexist",
-	***REMOVED***
+	}
 
 	res, body, err := request.Post("/v1.23/containers/"+name+"/copy", request.JSONBody(postData))
 	c.Assert(err, checker.IsNil)
@@ -1111,20 +1111,20 @@ func (s *DockerSuite) TestContainerAPICopyResourcePathNotFoundPre124(c *check.C)
 	b, err := request.ReadBody(body)
 	c.Assert(err, checker.IsNil)
 	c.Assert(string(b), checker.Matches, "Could not find the file /notexist in container "+name+"\n")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestContainerAPICopyContainerNotFoundPr124(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPICopyContainerNotFoundPr124(c *check.C) {
 	testRequires(c, DaemonIsLinux) // Windows only supports 1.25 or later
-	postData := types.CopyConfig***REMOVED***
+	postData := types.CopyConfig{
 		Resource: "/something",
-	***REMOVED***
+	}
 
 	res, _, err := request.Post("/v1.23/containers/notexists/copy", request.JSONBody(postData))
 	c.Assert(err, checker.IsNil)
 	c.Assert(res.StatusCode, checker.Equals, http.StatusNotFound)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestContainerAPIDelete(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPIDelete(c *check.C) {
 	out := runSleepingContainer(c)
 
 	id := strings.TrimSpace(out)
@@ -1136,27 +1136,27 @@ func (s *DockerSuite) TestContainerAPIDelete(c *check.C) ***REMOVED***
 	c.Assert(err, checker.IsNil)
 	defer cli.Close()
 
-	err = cli.ContainerRemove(context.Background(), id, types.ContainerRemoveOptions***REMOVED******REMOVED***)
+	err = cli.ContainerRemove(context.Background(), id, types.ContainerRemoveOptions{})
 	c.Assert(err, checker.IsNil)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestContainerAPIDeleteNotExist(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPIDeleteNotExist(c *check.C) {
 	cli, err := client.NewEnvClient()
 	c.Assert(err, checker.IsNil)
 	defer cli.Close()
 
-	err = cli.ContainerRemove(context.Background(), "doesnotexist", types.ContainerRemoveOptions***REMOVED******REMOVED***)
+	err = cli.ContainerRemove(context.Background(), "doesnotexist", types.ContainerRemoveOptions{})
 	c.Assert(err.Error(), checker.Contains, "No such container: doesnotexist")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestContainerAPIDeleteForce(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPIDeleteForce(c *check.C) {
 	out := runSleepingContainer(c)
 	id := strings.TrimSpace(out)
 	c.Assert(waitRun(id), checker.IsNil)
 
-	removeOptions := types.ContainerRemoveOptions***REMOVED***
+	removeOptions := types.ContainerRemoveOptions{
 		Force: true,
-	***REMOVED***
+	}
 
 	cli, err := client.NewEnvClient()
 	c.Assert(err, checker.IsNil)
@@ -1164,9 +1164,9 @@ func (s *DockerSuite) TestContainerAPIDeleteForce(c *check.C) ***REMOVED***
 
 	err = cli.ContainerRemove(context.Background(), id, removeOptions)
 	c.Assert(err, checker.IsNil)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestContainerAPIDeleteRemoveLinks(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPIDeleteRemoveLinks(c *check.C) {
 	// Windows does not support links
 	testRequires(c, DaemonIsLinux)
 	out, _ := dockerCmd(c, "run", "-d", "--name", "tlink1", "busybox", "top")
@@ -1182,9 +1182,9 @@ func (s *DockerSuite) TestContainerAPIDeleteRemoveLinks(c *check.C) ***REMOVED**
 	links := inspectFieldJSON(c, id2, "HostConfig.Links")
 	c.Assert(links, checker.Equals, "[\"/tlink1:/tlink2/tlink1\"]", check.Commentf("expected to have links between containers"))
 
-	removeOptions := types.ContainerRemoveOptions***REMOVED***
+	removeOptions := types.ContainerRemoveOptions{
 		RemoveLinks: true,
-	***REMOVED***
+	}
 
 	cli, err := client.NewEnvClient()
 	c.Assert(err, checker.IsNil)
@@ -1195,9 +1195,9 @@ func (s *DockerSuite) TestContainerAPIDeleteRemoveLinks(c *check.C) ***REMOVED**
 
 	linksPostRm := inspectFieldJSON(c, id2, "HostConfig.Links")
 	c.Assert(linksPostRm, checker.Equals, "null", check.Commentf("call to api deleteContainer links should have removed the specified links"))
-***REMOVED***
+}
 
-func (s *DockerSuite) TestContainerAPIDeleteConflict(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPIDeleteConflict(c *check.C) {
 	out := runSleepingContainer(c)
 
 	id := strings.TrimSpace(out)
@@ -1207,18 +1207,18 @@ func (s *DockerSuite) TestContainerAPIDeleteConflict(c *check.C) ***REMOVED***
 	c.Assert(err, checker.IsNil)
 	defer cli.Close()
 
-	err = cli.ContainerRemove(context.Background(), id, types.ContainerRemoveOptions***REMOVED******REMOVED***)
+	err = cli.ContainerRemove(context.Background(), id, types.ContainerRemoveOptions{})
 	expected := "cannot remove a running container"
 	c.Assert(err.Error(), checker.Contains, expected)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestContainerAPIDeleteRemoveVolume(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPIDeleteRemoveVolume(c *check.C) {
 	testRequires(c, SameHostDaemon)
 
 	vol := "/testvolume"
-	if testEnv.OSType == "windows" ***REMOVED***
+	if testEnv.OSType == "windows" {
 		vol = `c:\testvolume`
-	***REMOVED***
+	}
 
 	out := runSleepingContainer(c, "-v", vol)
 
@@ -1229,10 +1229,10 @@ func (s *DockerSuite) TestContainerAPIDeleteRemoveVolume(c *check.C) ***REMOVED*
 	_, err = os.Stat(source)
 	c.Assert(err, checker.IsNil)
 
-	removeOptions := types.ContainerRemoveOptions***REMOVED***
+	removeOptions := types.ContainerRemoveOptions{
 		Force:         true,
 		RemoveVolumes: true,
-	***REMOVED***
+	}
 
 	cli, err := client.NewEnvClient()
 	c.Assert(err, checker.IsNil)
@@ -1243,30 +1243,30 @@ func (s *DockerSuite) TestContainerAPIDeleteRemoveVolume(c *check.C) ***REMOVED*
 
 	_, err = os.Stat(source)
 	c.Assert(os.IsNotExist(err), checker.True, check.Commentf("expected to get ErrNotExist error, got %v", err))
-***REMOVED***
+}
 
 // Regression test for https://github.com/docker/docker/issues/6231
-func (s *DockerSuite) TestContainerAPIChunkedEncoding(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPIChunkedEncoding(c *check.C) {
 
-	config := map[string]interface***REMOVED******REMOVED******REMOVED***
+	config := map[string]interface{}{
 		"Image":     "busybox",
-		"Cmd":       append([]string***REMOVED***"/bin/sh", "-c"***REMOVED***, sleepCommandForDaemonPlatform()...),
+		"Cmd":       append([]string{"/bin/sh", "-c"}, sleepCommandForDaemonPlatform()...),
 		"OpenStdin": true,
-	***REMOVED***
+	}
 
-	resp, _, err := request.Post("/containers/create", request.JSONBody(config), func(req *http.Request) error ***REMOVED***
+	resp, _, err := request.Post("/containers/create", request.JSONBody(config), func(req *http.Request) error {
 		// This is a cheat to make the http request do chunked encoding
 		// Otherwise (just setting the Content-Encoding to chunked) net/http will overwrite
 		// https://golang.org/src/pkg/net/http/request.go?s=11980:12172
 		req.ContentLength = -1
 		return nil
-	***REMOVED***)
+	})
 	c.Assert(err, checker.IsNil, check.Commentf("error creating container with chunked encoding"))
 	defer resp.Body.Close()
 	c.Assert(resp.StatusCode, checker.Equals, http.StatusCreated)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestContainerAPIPostContainerStop(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPIPostContainerStop(c *check.C) {
 	out := runSleepingContainer(c)
 
 	containerID := strings.TrimSpace(out)
@@ -1278,110 +1278,110 @@ func (s *DockerSuite) TestContainerAPIPostContainerStop(c *check.C) ***REMOVED**
 
 	err = cli.ContainerStop(context.Background(), containerID, nil)
 	c.Assert(err, checker.IsNil)
-	c.Assert(waitInspect(containerID, "***REMOVED******REMOVED*** .State.Running  ***REMOVED******REMOVED***", "false", 60*time.Second), checker.IsNil)
-***REMOVED***
+	c.Assert(waitInspect(containerID, "{{ .State.Running  }}", "false", 60*time.Second), checker.IsNil)
+}
 
 // #14170
-func (s *DockerSuite) TestPostContainerAPICreateWithStringOrSliceEntrypoint(c *check.C) ***REMOVED***
-	config := containertypes.Config***REMOVED***
+func (s *DockerSuite) TestPostContainerAPICreateWithStringOrSliceEntrypoint(c *check.C) {
+	config := containertypes.Config{
 		Image:      "busybox",
-		Entrypoint: []string***REMOVED***"echo"***REMOVED***,
-		Cmd:        []string***REMOVED***"hello", "world"***REMOVED***,
-	***REMOVED***
+		Entrypoint: []string{"echo"},
+		Cmd:        []string{"hello", "world"},
+	}
 
 	cli, err := client.NewEnvClient()
 	c.Assert(err, checker.IsNil)
 	defer cli.Close()
 
-	_, err = cli.ContainerCreate(context.Background(), &config, &containertypes.HostConfig***REMOVED******REMOVED***, &networktypes.NetworkingConfig***REMOVED******REMOVED***, "echotest")
+	_, err = cli.ContainerCreate(context.Background(), &config, &containertypes.HostConfig{}, &networktypes.NetworkingConfig{}, "echotest")
 	c.Assert(err, checker.IsNil)
 	out, _ := dockerCmd(c, "start", "-a", "echotest")
 	c.Assert(strings.TrimSpace(out), checker.Equals, "hello world")
 
-	config2 := struct ***REMOVED***
+	config2 := struct {
 		Image      string
 		Entrypoint string
 		Cmd        []string
-	***REMOVED******REMOVED***"busybox", "echo", []string***REMOVED***"hello", "world"***REMOVED******REMOVED***
+	}{"busybox", "echo", []string{"hello", "world"}}
 	_, _, err = request.Post("/containers/create?name=echotest2", request.JSONBody(config2))
 	c.Assert(err, checker.IsNil)
 	out, _ = dockerCmd(c, "start", "-a", "echotest2")
 	c.Assert(strings.TrimSpace(out), checker.Equals, "hello world")
-***REMOVED***
+}
 
 // #14170
-func (s *DockerSuite) TestPostContainersCreateWithStringOrSliceCmd(c *check.C) ***REMOVED***
-	config := containertypes.Config***REMOVED***
+func (s *DockerSuite) TestPostContainersCreateWithStringOrSliceCmd(c *check.C) {
+	config := containertypes.Config{
 		Image: "busybox",
-		Cmd:   []string***REMOVED***"echo", "hello", "world"***REMOVED***,
-	***REMOVED***
+		Cmd:   []string{"echo", "hello", "world"},
+	}
 
 	cli, err := client.NewEnvClient()
 	c.Assert(err, checker.IsNil)
 	defer cli.Close()
 
-	_, err = cli.ContainerCreate(context.Background(), &config, &containertypes.HostConfig***REMOVED******REMOVED***, &networktypes.NetworkingConfig***REMOVED******REMOVED***, "echotest")
+	_, err = cli.ContainerCreate(context.Background(), &config, &containertypes.HostConfig{}, &networktypes.NetworkingConfig{}, "echotest")
 	c.Assert(err, checker.IsNil)
 	out, _ := dockerCmd(c, "start", "-a", "echotest")
 	c.Assert(strings.TrimSpace(out), checker.Equals, "hello world")
 
-	config2 := struct ***REMOVED***
+	config2 := struct {
 		Image      string
 		Entrypoint string
 		Cmd        string
-	***REMOVED******REMOVED***"busybox", "echo", "hello world"***REMOVED***
+	}{"busybox", "echo", "hello world"}
 	_, _, err = request.Post("/containers/create?name=echotest2", request.JSONBody(config2))
 	c.Assert(err, checker.IsNil)
 	out, _ = dockerCmd(c, "start", "-a", "echotest2")
 	c.Assert(strings.TrimSpace(out), checker.Equals, "hello world")
-***REMOVED***
+}
 
 // regression #14318
-func (s *DockerSuite) TestPostContainersCreateWithStringOrSliceCapAddDrop(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestPostContainersCreateWithStringOrSliceCapAddDrop(c *check.C) {
 	// Windows doesn't support CapAdd/CapDrop
 	testRequires(c, DaemonIsLinux)
-	config := struct ***REMOVED***
+	config := struct {
 		Image   string
 		CapAdd  string
 		CapDrop string
-	***REMOVED******REMOVED***"busybox", "NET_ADMIN", "SYS_ADMIN"***REMOVED***
+	}{"busybox", "NET_ADMIN", "SYS_ADMIN"}
 	res, _, err := request.Post("/containers/create?name=capaddtest0", request.JSONBody(config))
 	c.Assert(err, checker.IsNil)
 	c.Assert(res.StatusCode, checker.Equals, http.StatusCreated)
 
-	config2 := containertypes.Config***REMOVED***
+	config2 := containertypes.Config{
 		Image: "busybox",
-	***REMOVED***
-	hostConfig := containertypes.HostConfig***REMOVED***
-		CapAdd:  []string***REMOVED***"NET_ADMIN", "SYS_ADMIN"***REMOVED***,
-		CapDrop: []string***REMOVED***"SETGID"***REMOVED***,
-	***REMOVED***
+	}
+	hostConfig := containertypes.HostConfig{
+		CapAdd:  []string{"NET_ADMIN", "SYS_ADMIN"},
+		CapDrop: []string{"SETGID"},
+	}
 
 	cli, err := client.NewEnvClient()
 	c.Assert(err, checker.IsNil)
 	defer cli.Close()
 
-	_, err = cli.ContainerCreate(context.Background(), &config2, &hostConfig, &networktypes.NetworkingConfig***REMOVED******REMOVED***, "capaddtest1")
+	_, err = cli.ContainerCreate(context.Background(), &config2, &hostConfig, &networktypes.NetworkingConfig{}, "capaddtest1")
 	c.Assert(err, checker.IsNil)
-***REMOVED***
+}
 
 // #14915
-func (s *DockerSuite) TestContainerAPICreateNoHostConfig118(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPICreateNoHostConfig118(c *check.C) {
 	testRequires(c, DaemonIsLinux) // Windows only support 1.25 or later
-	config := containertypes.Config***REMOVED***
+	config := containertypes.Config{
 		Image: "busybox",
-	***REMOVED***
+	}
 
 	cli, err := request.NewEnvClientWithVersion("v1.18")
 
-	_, err = cli.ContainerCreate(context.Background(), &config, &containertypes.HostConfig***REMOVED******REMOVED***, &networktypes.NetworkingConfig***REMOVED******REMOVED***, "")
+	_, err = cli.ContainerCreate(context.Background(), &config, &containertypes.HostConfig{}, &networktypes.NetworkingConfig{}, "")
 	c.Assert(err, checker.IsNil)
-***REMOVED***
+}
 
 // Ensure an error occurs when you have a container read-only rootfs but you
 // extract an archive to a symlink in a writable volume which points to a
 // directory outside of the volume.
-func (s *DockerSuite) TestPutContainerArchiveErrSymlinkInVolumeToReadOnlyRootfs(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestPutContainerArchiveErrSymlinkInVolumeToReadOnlyRootfs(c *check.C) {
 	// Windows does not support read-only rootfs
 	// Requires local volume mount bind.
 	// --read-only + userns has remount issues
@@ -1392,23 +1392,23 @@ func (s *DockerSuite) TestPutContainerArchiveErrSymlinkInVolumeToReadOnlyRootfs(
 
 	makeTestContentInDir(c, testVol)
 
-	cID := makeTestContainer(c, testContainerOptions***REMOVED***
+	cID := makeTestContainer(c, testContainerOptions{
 		readOnly: true,
 		volumes:  defaultVolumes(testVol), // Our bind mount is at /vol2
-	***REMOVED***)
+	})
 
 	// Attempt to extract to a symlink in the volume which points to a
 	// directory outside the volume. This should cause an error because the
 	// rootfs is read-only.
 	var httpClient *http.Client
-	cli, err := client.NewClient(daemonHost(), "v1.20", httpClient, map[string]string***REMOVED******REMOVED***)
+	cli, err := client.NewClient(daemonHost(), "v1.20", httpClient, map[string]string{})
 	c.Assert(err, checker.IsNil)
 
-	err = cli.CopyToContainer(context.Background(), cID, "/vol2/symlinkToAbsDir", nil, types.CopyToContainerOptions***REMOVED******REMOVED***)
+	err = cli.CopyToContainer(context.Background(), cID, "/vol2/symlinkToAbsDir", nil, types.CopyToContainerOptions{})
 	c.Assert(err.Error(), checker.Contains, "container rootfs is marked read-only")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestPostContainersCreateWithWrongCpusetValues(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestPostContainersCreateWithWrongCpusetValues(c *check.C) {
 	// Not supported on Windows
 	testRequires(c, DaemonIsLinux)
 
@@ -1416,63 +1416,63 @@ func (s *DockerSuite) TestPostContainersCreateWithWrongCpusetValues(c *check.C) 
 	c.Assert(err, checker.IsNil)
 	defer cli.Close()
 
-	config := containertypes.Config***REMOVED***
+	config := containertypes.Config{
 		Image: "busybox",
-	***REMOVED***
-	hostConfig1 := containertypes.HostConfig***REMOVED***
-		Resources: containertypes.Resources***REMOVED***
+	}
+	hostConfig1 := containertypes.HostConfig{
+		Resources: containertypes.Resources{
 			CpusetCpus: "1-42,,",
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 	name := "wrong-cpuset-cpus"
 
-	_, err = cli.ContainerCreate(context.Background(), &config, &hostConfig1, &networktypes.NetworkingConfig***REMOVED******REMOVED***, name)
+	_, err = cli.ContainerCreate(context.Background(), &config, &hostConfig1, &networktypes.NetworkingConfig{}, name)
 	expected := "Invalid value 1-42,, for cpuset cpus"
 	c.Assert(err.Error(), checker.Contains, expected)
 
-	hostConfig2 := containertypes.HostConfig***REMOVED***
-		Resources: containertypes.Resources***REMOVED***
+	hostConfig2 := containertypes.HostConfig{
+		Resources: containertypes.Resources{
 			CpusetMems: "42-3,1--",
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 	name = "wrong-cpuset-mems"
-	_, err = cli.ContainerCreate(context.Background(), &config, &hostConfig2, &networktypes.NetworkingConfig***REMOVED******REMOVED***, name)
+	_, err = cli.ContainerCreate(context.Background(), &config, &hostConfig2, &networktypes.NetworkingConfig{}, name)
 	expected = "Invalid value 42-3,1-- for cpuset mems"
 	c.Assert(err.Error(), checker.Contains, expected)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestPostContainersCreateShmSizeNegative(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestPostContainersCreateShmSizeNegative(c *check.C) {
 	// ShmSize is not supported on Windows
 	testRequires(c, DaemonIsLinux)
-	config := containertypes.Config***REMOVED***
+	config := containertypes.Config{
 		Image: "busybox",
-	***REMOVED***
-	hostConfig := containertypes.HostConfig***REMOVED***
+	}
+	hostConfig := containertypes.HostConfig{
 		ShmSize: -1,
-	***REMOVED***
+	}
 
 	cli, err := client.NewEnvClient()
 	c.Assert(err, checker.IsNil)
 	defer cli.Close()
 
-	_, err = cli.ContainerCreate(context.Background(), &config, &hostConfig, &networktypes.NetworkingConfig***REMOVED******REMOVED***, "")
+	_, err = cli.ContainerCreate(context.Background(), &config, &hostConfig, &networktypes.NetworkingConfig{}, "")
 	c.Assert(err.Error(), checker.Contains, "SHM size can not be less than 0")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestPostContainersCreateShmSizeHostConfigOmitted(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestPostContainersCreateShmSizeHostConfigOmitted(c *check.C) {
 	// ShmSize is not supported on Windows
 	testRequires(c, DaemonIsLinux)
 	var defaultSHMSize int64 = 67108864
-	config := containertypes.Config***REMOVED***
+	config := containertypes.Config{
 		Image: "busybox",
-		Cmd:   []string***REMOVED***"mount"***REMOVED***,
-	***REMOVED***
+		Cmd:   []string{"mount"},
+	}
 
 	cli, err := client.NewEnvClient()
 	c.Assert(err, checker.IsNil)
 	defer cli.Close()
 
-	container, err := cli.ContainerCreate(context.Background(), &config, &containertypes.HostConfig***REMOVED******REMOVED***, &networktypes.NetworkingConfig***REMOVED******REMOVED***, "")
+	container, err := cli.ContainerCreate(context.Background(), &config, &containertypes.HostConfig{}, &networktypes.NetworkingConfig{}, "")
 	c.Assert(err, check.IsNil)
 
 	containerJSON, err := cli.ContainerInspect(context.Background(), container.ID)
@@ -1482,24 +1482,24 @@ func (s *DockerSuite) TestPostContainersCreateShmSizeHostConfigOmitted(c *check.
 
 	out, _ := dockerCmd(c, "start", "-i", containerJSON.ID)
 	shmRegexp := regexp.MustCompile(`shm on /dev/shm type tmpfs(.*)size=65536k`)
-	if !shmRegexp.MatchString(out) ***REMOVED***
+	if !shmRegexp.MatchString(out) {
 		c.Fatalf("Expected shm of 64MB in mount command, got %v", out)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *DockerSuite) TestPostContainersCreateShmSizeOmitted(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestPostContainersCreateShmSizeOmitted(c *check.C) {
 	// ShmSize is not supported on Windows
 	testRequires(c, DaemonIsLinux)
-	config := containertypes.Config***REMOVED***
+	config := containertypes.Config{
 		Image: "busybox",
-		Cmd:   []string***REMOVED***"mount"***REMOVED***,
-	***REMOVED***
+		Cmd:   []string{"mount"},
+	}
 
 	cli, err := client.NewEnvClient()
 	c.Assert(err, checker.IsNil)
 	defer cli.Close()
 
-	container, err := cli.ContainerCreate(context.Background(), &config, &containertypes.HostConfig***REMOVED******REMOVED***, &networktypes.NetworkingConfig***REMOVED******REMOVED***, "")
+	container, err := cli.ContainerCreate(context.Background(), &config, &containertypes.HostConfig{}, &networktypes.NetworkingConfig{}, "")
 	c.Assert(err, check.IsNil)
 
 	containerJSON, err := cli.ContainerInspect(context.Background(), container.ID)
@@ -1509,28 +1509,28 @@ func (s *DockerSuite) TestPostContainersCreateShmSizeOmitted(c *check.C) ***REMO
 
 	out, _ := dockerCmd(c, "start", "-i", containerJSON.ID)
 	shmRegexp := regexp.MustCompile(`shm on /dev/shm type tmpfs(.*)size=65536k`)
-	if !shmRegexp.MatchString(out) ***REMOVED***
+	if !shmRegexp.MatchString(out) {
 		c.Fatalf("Expected shm of 64MB in mount command, got %v", out)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *DockerSuite) TestPostContainersCreateWithShmSize(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestPostContainersCreateWithShmSize(c *check.C) {
 	// ShmSize is not supported on Windows
 	testRequires(c, DaemonIsLinux)
-	config := containertypes.Config***REMOVED***
+	config := containertypes.Config{
 		Image: "busybox",
-		Cmd:   []string***REMOVED***"mount"***REMOVED***,
-	***REMOVED***
+		Cmd:   []string{"mount"},
+	}
 
-	hostConfig := containertypes.HostConfig***REMOVED***
+	hostConfig := containertypes.HostConfig{
 		ShmSize: 1073741824,
-	***REMOVED***
+	}
 
 	cli, err := client.NewEnvClient()
 	c.Assert(err, checker.IsNil)
 	defer cli.Close()
 
-	container, err := cli.ContainerCreate(context.Background(), &config, &hostConfig, &networktypes.NetworkingConfig***REMOVED******REMOVED***, "")
+	container, err := cli.ContainerCreate(context.Background(), &config, &hostConfig, &networktypes.NetworkingConfig{}, "")
 	c.Assert(err, check.IsNil)
 
 	containerJSON, err := cli.ContainerInspect(context.Background(), container.ID)
@@ -1540,108 +1540,108 @@ func (s *DockerSuite) TestPostContainersCreateWithShmSize(c *check.C) ***REMOVED
 
 	out, _ := dockerCmd(c, "start", "-i", containerJSON.ID)
 	shmRegex := regexp.MustCompile(`shm on /dev/shm type tmpfs(.*)size=1048576k`)
-	if !shmRegex.MatchString(out) ***REMOVED***
+	if !shmRegex.MatchString(out) {
 		c.Fatalf("Expected shm of 1GB in mount command, got %v", out)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *DockerSuite) TestPostContainersCreateMemorySwappinessHostConfigOmitted(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestPostContainersCreateMemorySwappinessHostConfigOmitted(c *check.C) {
 	// Swappiness is not supported on Windows
 	testRequires(c, DaemonIsLinux)
-	config := containertypes.Config***REMOVED***
+	config := containertypes.Config{
 		Image: "busybox",
-	***REMOVED***
+	}
 
 	cli, err := client.NewEnvClient()
 	c.Assert(err, checker.IsNil)
 	defer cli.Close()
 
-	container, err := cli.ContainerCreate(context.Background(), &config, &containertypes.HostConfig***REMOVED******REMOVED***, &networktypes.NetworkingConfig***REMOVED******REMOVED***, "")
+	container, err := cli.ContainerCreate(context.Background(), &config, &containertypes.HostConfig{}, &networktypes.NetworkingConfig{}, "")
 	c.Assert(err, check.IsNil)
 
 	containerJSON, err := cli.ContainerInspect(context.Background(), container.ID)
 	c.Assert(err, check.IsNil)
 
 	c.Assert(containerJSON.HostConfig.MemorySwappiness, check.IsNil)
-***REMOVED***
+}
 
 // check validation is done daemon side and not only in cli
-func (s *DockerSuite) TestPostContainersCreateWithOomScoreAdjInvalidRange(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestPostContainersCreateWithOomScoreAdjInvalidRange(c *check.C) {
 	// OomScoreAdj is not supported on Windows
 	testRequires(c, DaemonIsLinux)
 
-	config := containertypes.Config***REMOVED***
+	config := containertypes.Config{
 		Image: "busybox",
-	***REMOVED***
+	}
 
-	hostConfig := containertypes.HostConfig***REMOVED***
+	hostConfig := containertypes.HostConfig{
 		OomScoreAdj: 1001,
-	***REMOVED***
+	}
 
 	cli, err := client.NewEnvClient()
 	c.Assert(err, checker.IsNil)
 	defer cli.Close()
 
 	name := "oomscoreadj-over"
-	_, err = cli.ContainerCreate(context.Background(), &config, &hostConfig, &networktypes.NetworkingConfig***REMOVED******REMOVED***, name)
+	_, err = cli.ContainerCreate(context.Background(), &config, &hostConfig, &networktypes.NetworkingConfig{}, name)
 
 	expected := "Invalid value 1001, range for oom score adj is [-1000, 1000]"
 	c.Assert(err.Error(), checker.Contains, expected)
 
-	hostConfig = containertypes.HostConfig***REMOVED***
+	hostConfig = containertypes.HostConfig{
 		OomScoreAdj: -1001,
-	***REMOVED***
+	}
 
 	name = "oomscoreadj-low"
-	_, err = cli.ContainerCreate(context.Background(), &config, &hostConfig, &networktypes.NetworkingConfig***REMOVED******REMOVED***, name)
+	_, err = cli.ContainerCreate(context.Background(), &config, &hostConfig, &networktypes.NetworkingConfig{}, name)
 
 	expected = "Invalid value -1001, range for oom score adj is [-1000, 1000]"
 	c.Assert(err.Error(), checker.Contains, expected)
-***REMOVED***
+}
 
 // test case for #22210 where an empty container name caused panic.
-func (s *DockerSuite) TestContainerAPIDeleteWithEmptyName(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPIDeleteWithEmptyName(c *check.C) {
 	cli, err := client.NewEnvClient()
 	c.Assert(err, checker.IsNil)
 	defer cli.Close()
 
-	err = cli.ContainerRemove(context.Background(), "", types.ContainerRemoveOptions***REMOVED******REMOVED***)
+	err = cli.ContainerRemove(context.Background(), "", types.ContainerRemoveOptions{})
 	c.Assert(err.Error(), checker.Contains, "No such container")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestContainerAPIStatsWithNetworkDisabled(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPIStatsWithNetworkDisabled(c *check.C) {
 	// Problematic on Windows as Windows does not support stats
 	testRequires(c, DaemonIsLinux)
 
 	name := "testing-network-disabled"
 
-	config := containertypes.Config***REMOVED***
+	config := containertypes.Config{
 		Image:           "busybox",
-		Cmd:             []string***REMOVED***"top"***REMOVED***,
+		Cmd:             []string{"top"},
 		NetworkDisabled: true,
-	***REMOVED***
+	}
 
 	cli, err := client.NewEnvClient()
 	c.Assert(err, checker.IsNil)
 	defer cli.Close()
 
-	_, err = cli.ContainerCreate(context.Background(), &config, &containertypes.HostConfig***REMOVED******REMOVED***, &networktypes.NetworkingConfig***REMOVED******REMOVED***, name)
+	_, err = cli.ContainerCreate(context.Background(), &config, &containertypes.HostConfig{}, &networktypes.NetworkingConfig{}, name)
 	c.Assert(err, checker.IsNil)
 
-	err = cli.ContainerStart(context.Background(), name, types.ContainerStartOptions***REMOVED******REMOVED***)
+	err = cli.ContainerStart(context.Background(), name, types.ContainerStartOptions{})
 	c.Assert(err, checker.IsNil)
 
 	c.Assert(waitRun(name), check.IsNil)
 
-	type b struct ***REMOVED***
+	type b struct {
 		stats types.ContainerStats
 		err   error
-	***REMOVED***
+	}
 	bc := make(chan b, 1)
-	go func() ***REMOVED***
+	go func() {
 		stats, err := cli.ContainerStats(context.Background(), name, false)
-		bc <- b***REMOVED***stats, err***REMOVED***
-	***REMOVED***()
+		bc <- b{stats, err}
+	}()
 
 	// allow some time to stream the stats from the container
 	time.Sleep(4 * time.Second)
@@ -1649,210 +1649,210 @@ func (s *DockerSuite) TestContainerAPIStatsWithNetworkDisabled(c *check.C) ***RE
 
 	// collect the results from the stats stream or timeout and fail
 	// if the stream was not disconnected.
-	select ***REMOVED***
+	select {
 	case <-time.After(2 * time.Second):
 		c.Fatal("stream was not closed after container was removed")
 	case sr := <-bc:
 		c.Assert(sr.err, checker.IsNil)
 		sr.stats.Body.Close()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *DockerSuite) TestContainersAPICreateMountsValidation(c *check.C) ***REMOVED***
-	type testCase struct ***REMOVED***
+func (s *DockerSuite) TestContainersAPICreateMountsValidation(c *check.C) {
+	type testCase struct {
 		config     containertypes.Config
 		hostConfig containertypes.HostConfig
 		msg        string
-	***REMOVED***
+	}
 
 	prefix, slash := getPrefixAndSlashFromDaemonPlatform()
 	destPath := prefix + slash + "foo"
 	notExistPath := prefix + slash + "notexist"
 
-	cases := []testCase***REMOVED***
-		***REMOVED***
-			config: containertypes.Config***REMOVED***
+	cases := []testCase{
+		{
+			config: containertypes.Config{
 				Image: "busybox",
-			***REMOVED***,
-			hostConfig: containertypes.HostConfig***REMOVED***
-				Mounts: []mounttypes.Mount***REMOVED******REMOVED***
+			},
+			hostConfig: containertypes.HostConfig{
+				Mounts: []mounttypes.Mount{{
 					Type:   "notreal",
 					Target: destPath,
-				***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
+				},
+				},
+			},
 
 			msg: "mount type unknown",
-		***REMOVED***,
-		***REMOVED***
-			config: containertypes.Config***REMOVED***
+		},
+		{
+			config: containertypes.Config{
 				Image: "busybox",
-			***REMOVED***,
-			hostConfig: containertypes.HostConfig***REMOVED***
-				Mounts: []mounttypes.Mount***REMOVED******REMOVED***
-					Type: "bind"***REMOVED******REMOVED******REMOVED***,
+			},
+			hostConfig: containertypes.HostConfig{
+				Mounts: []mounttypes.Mount{{
+					Type: "bind"}}},
 			msg: "Target must not be empty",
-		***REMOVED***,
-		***REMOVED***
-			config: containertypes.Config***REMOVED***
+		},
+		{
+			config: containertypes.Config{
 				Image: "busybox",
-			***REMOVED***,
-			hostConfig: containertypes.HostConfig***REMOVED***
-				Mounts: []mounttypes.Mount***REMOVED******REMOVED***
+			},
+			hostConfig: containertypes.HostConfig{
+				Mounts: []mounttypes.Mount{{
 					Type:   "bind",
-					Target: destPath***REMOVED******REMOVED******REMOVED***,
+					Target: destPath}}},
 			msg: "Source must not be empty",
-		***REMOVED***,
-		***REMOVED***
-			config: containertypes.Config***REMOVED***
+		},
+		{
+			config: containertypes.Config{
 				Image: "busybox",
-			***REMOVED***,
-			hostConfig: containertypes.HostConfig***REMOVED***
-				Mounts: []mounttypes.Mount***REMOVED******REMOVED***
+			},
+			hostConfig: containertypes.HostConfig{
+				Mounts: []mounttypes.Mount{{
 					Type:   "bind",
 					Source: notExistPath,
-					Target: destPath***REMOVED******REMOVED******REMOVED***,
+					Target: destPath}}},
 			msg: "bind source path does not exist",
-		***REMOVED***,
-		***REMOVED***
-			config: containertypes.Config***REMOVED***
+		},
+		{
+			config: containertypes.Config{
 				Image: "busybox",
-			***REMOVED***,
-			hostConfig: containertypes.HostConfig***REMOVED***
-				Mounts: []mounttypes.Mount***REMOVED******REMOVED***
-					Type: "volume"***REMOVED******REMOVED******REMOVED***,
+			},
+			hostConfig: containertypes.HostConfig{
+				Mounts: []mounttypes.Mount{{
+					Type: "volume"}}},
 			msg: "Target must not be empty",
-		***REMOVED***,
-		***REMOVED***
-			config: containertypes.Config***REMOVED***
+		},
+		{
+			config: containertypes.Config{
 				Image: "busybox",
-			***REMOVED***,
-			hostConfig: containertypes.HostConfig***REMOVED***
-				Mounts: []mounttypes.Mount***REMOVED******REMOVED***
+			},
+			hostConfig: containertypes.HostConfig{
+				Mounts: []mounttypes.Mount{{
 					Type:   "volume",
 					Source: "hello",
-					Target: destPath***REMOVED******REMOVED******REMOVED***,
+					Target: destPath}}},
 			msg: "",
-		***REMOVED***,
-		***REMOVED***
-			config: containertypes.Config***REMOVED***
+		},
+		{
+			config: containertypes.Config{
 				Image: "busybox",
-			***REMOVED***,
-			hostConfig: containertypes.HostConfig***REMOVED***
-				Mounts: []mounttypes.Mount***REMOVED******REMOVED***
+			},
+			hostConfig: containertypes.HostConfig{
+				Mounts: []mounttypes.Mount{{
 					Type:   "volume",
 					Source: "hello2",
 					Target: destPath,
-					VolumeOptions: &mounttypes.VolumeOptions***REMOVED***
-						DriverConfig: &mounttypes.Driver***REMOVED***
-							Name: "local"***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***,
+					VolumeOptions: &mounttypes.VolumeOptions{
+						DriverConfig: &mounttypes.Driver{
+							Name: "local"}}}}},
 			msg: "",
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
-	if SameHostDaemon() ***REMOVED***
+	if SameHostDaemon() {
 		tmpDir, err := ioutils.TempDir("", "test-mounts-api")
 		c.Assert(err, checker.IsNil)
 		defer os.RemoveAll(tmpDir)
-		cases = append(cases, []testCase***REMOVED***
-			***REMOVED***
-				config: containertypes.Config***REMOVED***
+		cases = append(cases, []testCase{
+			{
+				config: containertypes.Config{
 					Image: "busybox",
-				***REMOVED***,
-				hostConfig: containertypes.HostConfig***REMOVED***
-					Mounts: []mounttypes.Mount***REMOVED******REMOVED***
+				},
+				hostConfig: containertypes.HostConfig{
+					Mounts: []mounttypes.Mount{{
 						Type:   "bind",
 						Source: tmpDir,
-						Target: destPath***REMOVED******REMOVED******REMOVED***,
+						Target: destPath}}},
 				msg: "",
-			***REMOVED***,
-			***REMOVED***
-				config: containertypes.Config***REMOVED***
+			},
+			{
+				config: containertypes.Config{
 					Image: "busybox",
-				***REMOVED***,
-				hostConfig: containertypes.HostConfig***REMOVED***
-					Mounts: []mounttypes.Mount***REMOVED******REMOVED***
+				},
+				hostConfig: containertypes.HostConfig{
+					Mounts: []mounttypes.Mount{{
 						Type:          "bind",
 						Source:        tmpDir,
 						Target:        destPath,
-						VolumeOptions: &mounttypes.VolumeOptions***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***,
+						VolumeOptions: &mounttypes.VolumeOptions{}}}},
 				msg: "VolumeOptions must not be specified",
-			***REMOVED***,
-		***REMOVED***...)
-	***REMOVED***
+			},
+		}...)
+	}
 
-	if DaemonIsLinux() ***REMOVED***
-		cases = append(cases, []testCase***REMOVED***
-			***REMOVED***
-				config: containertypes.Config***REMOVED***
+	if DaemonIsLinux() {
+		cases = append(cases, []testCase{
+			{
+				config: containertypes.Config{
 					Image: "busybox",
-				***REMOVED***,
-				hostConfig: containertypes.HostConfig***REMOVED***
-					Mounts: []mounttypes.Mount***REMOVED******REMOVED***
+				},
+				hostConfig: containertypes.HostConfig{
+					Mounts: []mounttypes.Mount{{
 						Type:   "volume",
 						Source: "hello3",
 						Target: destPath,
-						VolumeOptions: &mounttypes.VolumeOptions***REMOVED***
-							DriverConfig: &mounttypes.Driver***REMOVED***
+						VolumeOptions: &mounttypes.VolumeOptions{
+							DriverConfig: &mounttypes.Driver{
 								Name:    "local",
-								Options: map[string]string***REMOVED***"o": "size=1"***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***,
+								Options: map[string]string{"o": "size=1"}}}}}},
 				msg: "",
-			***REMOVED***,
-			***REMOVED***
-				config: containertypes.Config***REMOVED***
+			},
+			{
+				config: containertypes.Config{
 					Image: "busybox",
-				***REMOVED***,
-				hostConfig: containertypes.HostConfig***REMOVED***
-					Mounts: []mounttypes.Mount***REMOVED******REMOVED***
+				},
+				hostConfig: containertypes.HostConfig{
+					Mounts: []mounttypes.Mount{{
 						Type:   "tmpfs",
-						Target: destPath***REMOVED******REMOVED******REMOVED***,
+						Target: destPath}}},
 				msg: "",
-			***REMOVED***,
-			***REMOVED***
-				config: containertypes.Config***REMOVED***
+			},
+			{
+				config: containertypes.Config{
 					Image: "busybox",
-				***REMOVED***,
-				hostConfig: containertypes.HostConfig***REMOVED***
-					Mounts: []mounttypes.Mount***REMOVED******REMOVED***
+				},
+				hostConfig: containertypes.HostConfig{
+					Mounts: []mounttypes.Mount{{
 						Type:   "tmpfs",
 						Target: destPath,
-						TmpfsOptions: &mounttypes.TmpfsOptions***REMOVED***
+						TmpfsOptions: &mounttypes.TmpfsOptions{
 							SizeBytes: 4096 * 1024,
 							Mode:      0700,
-						***REMOVED******REMOVED******REMOVED******REMOVED***,
+						}}}},
 				msg: "",
-			***REMOVED***,
+			},
 
-			***REMOVED***
-				config: containertypes.Config***REMOVED***
+			{
+				config: containertypes.Config{
 					Image: "busybox",
-				***REMOVED***,
-				hostConfig: containertypes.HostConfig***REMOVED***
-					Mounts: []mounttypes.Mount***REMOVED******REMOVED***
+				},
+				hostConfig: containertypes.HostConfig{
+					Mounts: []mounttypes.Mount{{
 						Type:   "tmpfs",
 						Source: "/shouldnotbespecified",
-						Target: destPath***REMOVED******REMOVED******REMOVED***,
+						Target: destPath}}},
 				msg: "Source must not be specified",
-			***REMOVED***,
-		***REMOVED***...)
+			},
+		}...)
 
-	***REMOVED***
+	}
 	cli, err := client.NewEnvClient()
 	c.Assert(err, checker.IsNil)
 	defer cli.Close()
 
-	for i, x := range cases ***REMOVED***
+	for i, x := range cases {
 		c.Logf("case %d", i)
-		_, err = cli.ContainerCreate(context.Background(), &x.config, &x.hostConfig, &networktypes.NetworkingConfig***REMOVED******REMOVED***, "")
-		if len(x.msg) > 0 ***REMOVED***
+		_, err = cli.ContainerCreate(context.Background(), &x.config, &x.hostConfig, &networktypes.NetworkingConfig{}, "")
+		if len(x.msg) > 0 {
 			c.Assert(err.Error(), checker.Contains, x.msg, check.Commentf("%v", cases[i].config))
-		***REMOVED*** else ***REMOVED***
+		} else {
 			c.Assert(err, checker.IsNil)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (s *DockerSuite) TestContainerAPICreateMountsBindRead(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerAPICreateMountsBindRead(c *check.C) {
 	testRequires(c, NotUserNamespace, SameHostDaemon)
 	// also with data in the host side
 	prefix, slash := getPrefixAndSlashFromDaemonPlatform()
@@ -1862,107 +1862,107 @@ func (s *DockerSuite) TestContainerAPICreateMountsBindRead(c *check.C) ***REMOVE
 	defer os.RemoveAll(tmpDir)
 	err = ioutil.WriteFile(filepath.Join(tmpDir, "bar"), []byte("hello"), 666)
 	c.Assert(err, checker.IsNil)
-	config := containertypes.Config***REMOVED***
+	config := containertypes.Config{
 		Image: "busybox",
-		Cmd:   []string***REMOVED***"/bin/sh", "-c", "cat /foo/bar"***REMOVED***,
-	***REMOVED***
-	hostConfig := containertypes.HostConfig***REMOVED***
-		Mounts: []mounttypes.Mount***REMOVED***
-			***REMOVED***Type: "bind", Source: tmpDir, Target: destPath***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+		Cmd:   []string{"/bin/sh", "-c", "cat /foo/bar"},
+	}
+	hostConfig := containertypes.HostConfig{
+		Mounts: []mounttypes.Mount{
+			{Type: "bind", Source: tmpDir, Target: destPath},
+		},
+	}
 	cli, err := client.NewEnvClient()
 	c.Assert(err, checker.IsNil)
 	defer cli.Close()
 
-	_, err = cli.ContainerCreate(context.Background(), &config, &hostConfig, &networktypes.NetworkingConfig***REMOVED******REMOVED***, "test")
+	_, err = cli.ContainerCreate(context.Background(), &config, &hostConfig, &networktypes.NetworkingConfig{}, "test")
 	c.Assert(err, checker.IsNil)
 
 	out, _ := dockerCmd(c, "start", "-a", "test")
 	c.Assert(out, checker.Equals, "hello")
-***REMOVED***
+}
 
 // Test Mounts comes out as expected for the MountPoint
-func (s *DockerSuite) TestContainersAPICreateMountsCreate(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainersAPICreateMountsCreate(c *check.C) {
 	prefix, slash := getPrefixAndSlashFromDaemonPlatform()
 	destPath := prefix + slash + "foo"
 
 	var (
 		testImg string
 	)
-	if testEnv.OSType != "windows" ***REMOVED***
+	if testEnv.OSType != "windows" {
 		testImg = "test-mount-config"
 		buildImageSuccessfully(c, testImg, build.WithDockerfile(`
 	FROM busybox
 	RUN mkdir `+destPath+` && touch `+destPath+slash+`bar
 	CMD cat `+destPath+slash+`bar
 	`))
-	***REMOVED*** else ***REMOVED***
+	} else {
 		testImg = "busybox"
-	***REMOVED***
+	}
 
-	type testCase struct ***REMOVED***
+	type testCase struct {
 		spec     mounttypes.Mount
 		expected types.MountPoint
-	***REMOVED***
+	}
 
 	var selinuxSharedLabel string
-	if runtime.GOOS == "linux" ***REMOVED***
+	if runtime.GOOS == "linux" {
 		selinuxSharedLabel = "z"
-	***REMOVED***
+	}
 
-	cases := []testCase***REMOVED***
+	cases := []testCase{
 		// use literal strings here for `Type` instead of the defined constants in the volume package to keep this honest
 		// Validation of the actual `Mount` struct is done in another test is not needed here
-		***REMOVED***
-			spec:     mounttypes.Mount***REMOVED***Type: "volume", Target: destPath***REMOVED***,
-			expected: types.MountPoint***REMOVED***Driver: volume.DefaultDriverName, Type: "volume", RW: true, Destination: destPath, Mode: selinuxSharedLabel***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			spec:     mounttypes.Mount***REMOVED***Type: "volume", Target: destPath + slash***REMOVED***,
-			expected: types.MountPoint***REMOVED***Driver: volume.DefaultDriverName, Type: "volume", RW: true, Destination: destPath, Mode: selinuxSharedLabel***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			spec:     mounttypes.Mount***REMOVED***Type: "volume", Target: destPath, Source: "test1"***REMOVED***,
-			expected: types.MountPoint***REMOVED***Type: "volume", Name: "test1", RW: true, Destination: destPath, Mode: selinuxSharedLabel***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			spec:     mounttypes.Mount***REMOVED***Type: "volume", Target: destPath, ReadOnly: true, Source: "test2"***REMOVED***,
-			expected: types.MountPoint***REMOVED***Type: "volume", Name: "test2", RW: false, Destination: destPath, Mode: selinuxSharedLabel***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			spec:     mounttypes.Mount***REMOVED***Type: "volume", Target: destPath, Source: "test3", VolumeOptions: &mounttypes.VolumeOptions***REMOVED***DriverConfig: &mounttypes.Driver***REMOVED***Name: volume.DefaultDriverName***REMOVED******REMOVED******REMOVED***,
-			expected: types.MountPoint***REMOVED***Driver: volume.DefaultDriverName, Type: "volume", Name: "test3", RW: true, Destination: destPath, Mode: selinuxSharedLabel***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+		{
+			spec:     mounttypes.Mount{Type: "volume", Target: destPath},
+			expected: types.MountPoint{Driver: volume.DefaultDriverName, Type: "volume", RW: true, Destination: destPath, Mode: selinuxSharedLabel},
+		},
+		{
+			spec:     mounttypes.Mount{Type: "volume", Target: destPath + slash},
+			expected: types.MountPoint{Driver: volume.DefaultDriverName, Type: "volume", RW: true, Destination: destPath, Mode: selinuxSharedLabel},
+		},
+		{
+			spec:     mounttypes.Mount{Type: "volume", Target: destPath, Source: "test1"},
+			expected: types.MountPoint{Type: "volume", Name: "test1", RW: true, Destination: destPath, Mode: selinuxSharedLabel},
+		},
+		{
+			spec:     mounttypes.Mount{Type: "volume", Target: destPath, ReadOnly: true, Source: "test2"},
+			expected: types.MountPoint{Type: "volume", Name: "test2", RW: false, Destination: destPath, Mode: selinuxSharedLabel},
+		},
+		{
+			spec:     mounttypes.Mount{Type: "volume", Target: destPath, Source: "test3", VolumeOptions: &mounttypes.VolumeOptions{DriverConfig: &mounttypes.Driver{Name: volume.DefaultDriverName}}},
+			expected: types.MountPoint{Driver: volume.DefaultDriverName, Type: "volume", Name: "test3", RW: true, Destination: destPath, Mode: selinuxSharedLabel},
+		},
+	}
 
-	if SameHostDaemon() ***REMOVED***
+	if SameHostDaemon() {
 		// setup temp dir for testing binds
 		tmpDir1, err := ioutil.TempDir("", "test-mounts-api-1")
 		c.Assert(err, checker.IsNil)
 		defer os.RemoveAll(tmpDir1)
-		cases = append(cases, []testCase***REMOVED***
-			***REMOVED***
-				spec: mounttypes.Mount***REMOVED***
+		cases = append(cases, []testCase{
+			{
+				spec: mounttypes.Mount{
 					Type:   "bind",
 					Source: tmpDir1,
 					Target: destPath,
-				***REMOVED***,
-				expected: types.MountPoint***REMOVED***
+				},
+				expected: types.MountPoint{
 					Type:        "bind",
 					RW:          true,
 					Destination: destPath,
 					Source:      tmpDir1,
-				***REMOVED***,
-			***REMOVED***,
-			***REMOVED***
-				spec:     mounttypes.Mount***REMOVED***Type: "bind", Source: tmpDir1, Target: destPath, ReadOnly: true***REMOVED***,
-				expected: types.MountPoint***REMOVED***Type: "bind", RW: false, Destination: destPath, Source: tmpDir1***REMOVED***,
-			***REMOVED***,
-		***REMOVED***...)
+				},
+			},
+			{
+				spec:     mounttypes.Mount{Type: "bind", Source: tmpDir1, Target: destPath, ReadOnly: true},
+				expected: types.MountPoint{Type: "bind", RW: false, Destination: destPath, Source: tmpDir1},
+			},
+		}...)
 
 		// for modes only supported on Linux
-		if DaemonIsLinux() ***REMOVED***
+		if DaemonIsLinux() {
 			tmpDir3, err := ioutils.TempDir("", "test-mounts-api-3")
 			c.Assert(err, checker.IsNil)
 			defer os.RemoveAll(tmpDir3)
@@ -1970,61 +1970,61 @@ func (s *DockerSuite) TestContainersAPICreateMountsCreate(c *check.C) ***REMOVED
 			c.Assert(mount.Mount(tmpDir3, tmpDir3, "none", "bind,rw"), checker.IsNil)
 			c.Assert(mount.ForceMount("", tmpDir3, "none", "shared"), checker.IsNil)
 
-			cases = append(cases, []testCase***REMOVED***
-				***REMOVED***
-					spec:     mounttypes.Mount***REMOVED***Type: "bind", Source: tmpDir3, Target: destPath***REMOVED***,
-					expected: types.MountPoint***REMOVED***Type: "bind", RW: true, Destination: destPath, Source: tmpDir3***REMOVED***,
-				***REMOVED***,
-				***REMOVED***
-					spec:     mounttypes.Mount***REMOVED***Type: "bind", Source: tmpDir3, Target: destPath, ReadOnly: true***REMOVED***,
-					expected: types.MountPoint***REMOVED***Type: "bind", RW: false, Destination: destPath, Source: tmpDir3***REMOVED***,
-				***REMOVED***,
-				***REMOVED***
-					spec:     mounttypes.Mount***REMOVED***Type: "bind", Source: tmpDir3, Target: destPath, ReadOnly: true, BindOptions: &mounttypes.BindOptions***REMOVED***Propagation: "shared"***REMOVED******REMOVED***,
-					expected: types.MountPoint***REMOVED***Type: "bind", RW: false, Destination: destPath, Source: tmpDir3, Propagation: "shared"***REMOVED***,
-				***REMOVED***,
-			***REMOVED***...)
-		***REMOVED***
-	***REMOVED***
+			cases = append(cases, []testCase{
+				{
+					spec:     mounttypes.Mount{Type: "bind", Source: tmpDir3, Target: destPath},
+					expected: types.MountPoint{Type: "bind", RW: true, Destination: destPath, Source: tmpDir3},
+				},
+				{
+					spec:     mounttypes.Mount{Type: "bind", Source: tmpDir3, Target: destPath, ReadOnly: true},
+					expected: types.MountPoint{Type: "bind", RW: false, Destination: destPath, Source: tmpDir3},
+				},
+				{
+					spec:     mounttypes.Mount{Type: "bind", Source: tmpDir3, Target: destPath, ReadOnly: true, BindOptions: &mounttypes.BindOptions{Propagation: "shared"}},
+					expected: types.MountPoint{Type: "bind", RW: false, Destination: destPath, Source: tmpDir3, Propagation: "shared"},
+				},
+			}...)
+		}
+	}
 
-	if testEnv.OSType != "windows" ***REMOVED*** // Windows does not support volume populate
-		cases = append(cases, []testCase***REMOVED***
-			***REMOVED***
-				spec:     mounttypes.Mount***REMOVED***Type: "volume", Target: destPath, VolumeOptions: &mounttypes.VolumeOptions***REMOVED***NoCopy: true***REMOVED******REMOVED***,
-				expected: types.MountPoint***REMOVED***Driver: volume.DefaultDriverName, Type: "volume", RW: true, Destination: destPath, Mode: selinuxSharedLabel***REMOVED***,
-			***REMOVED***,
-			***REMOVED***
-				spec:     mounttypes.Mount***REMOVED***Type: "volume", Target: destPath + slash, VolumeOptions: &mounttypes.VolumeOptions***REMOVED***NoCopy: true***REMOVED******REMOVED***,
-				expected: types.MountPoint***REMOVED***Driver: volume.DefaultDriverName, Type: "volume", RW: true, Destination: destPath, Mode: selinuxSharedLabel***REMOVED***,
-			***REMOVED***,
-			***REMOVED***
-				spec:     mounttypes.Mount***REMOVED***Type: "volume", Target: destPath, Source: "test4", VolumeOptions: &mounttypes.VolumeOptions***REMOVED***NoCopy: true***REMOVED******REMOVED***,
-				expected: types.MountPoint***REMOVED***Type: "volume", Name: "test4", RW: true, Destination: destPath, Mode: selinuxSharedLabel***REMOVED***,
-			***REMOVED***,
-			***REMOVED***
-				spec:     mounttypes.Mount***REMOVED***Type: "volume", Target: destPath, Source: "test5", ReadOnly: true, VolumeOptions: &mounttypes.VolumeOptions***REMOVED***NoCopy: true***REMOVED******REMOVED***,
-				expected: types.MountPoint***REMOVED***Type: "volume", Name: "test5", RW: false, Destination: destPath, Mode: selinuxSharedLabel***REMOVED***,
-			***REMOVED***,
-		***REMOVED***...)
-	***REMOVED***
+	if testEnv.OSType != "windows" { // Windows does not support volume populate
+		cases = append(cases, []testCase{
+			{
+				spec:     mounttypes.Mount{Type: "volume", Target: destPath, VolumeOptions: &mounttypes.VolumeOptions{NoCopy: true}},
+				expected: types.MountPoint{Driver: volume.DefaultDriverName, Type: "volume", RW: true, Destination: destPath, Mode: selinuxSharedLabel},
+			},
+			{
+				spec:     mounttypes.Mount{Type: "volume", Target: destPath + slash, VolumeOptions: &mounttypes.VolumeOptions{NoCopy: true}},
+				expected: types.MountPoint{Driver: volume.DefaultDriverName, Type: "volume", RW: true, Destination: destPath, Mode: selinuxSharedLabel},
+			},
+			{
+				spec:     mounttypes.Mount{Type: "volume", Target: destPath, Source: "test4", VolumeOptions: &mounttypes.VolumeOptions{NoCopy: true}},
+				expected: types.MountPoint{Type: "volume", Name: "test4", RW: true, Destination: destPath, Mode: selinuxSharedLabel},
+			},
+			{
+				spec:     mounttypes.Mount{Type: "volume", Target: destPath, Source: "test5", ReadOnly: true, VolumeOptions: &mounttypes.VolumeOptions{NoCopy: true}},
+				expected: types.MountPoint{Type: "volume", Name: "test5", RW: false, Destination: destPath, Mode: selinuxSharedLabel},
+			},
+		}...)
+	}
 
-	type wrapper struct ***REMOVED***
+	type wrapper struct {
 		containertypes.Config
 		HostConfig containertypes.HostConfig
-	***REMOVED***
-	type createResp struct ***REMOVED***
+	}
+	type createResp struct {
 		ID string `json:"Id"`
-	***REMOVED***
+	}
 
 	ctx := context.Background()
 	apiclient := testEnv.APIClient()
-	for i, x := range cases ***REMOVED***
+	for i, x := range cases {
 		c.Logf("case %d - config: %v", i, x.spec)
 		container, err := apiclient.ContainerCreate(
 			ctx,
-			&containertypes.Config***REMOVED***Image: testImg***REMOVED***,
-			&containertypes.HostConfig***REMOVED***Mounts: []mounttypes.Mount***REMOVED***x.spec***REMOVED******REMOVED***,
-			&networktypes.NetworkingConfig***REMOVED******REMOVED***,
+			&containertypes.Config{Image: testImg},
+			&containertypes.HostConfig{Mounts: []mounttypes.Mount{x.spec}},
+			&networktypes.NetworkingConfig{},
 			"")
 		require.NoError(c, err)
 
@@ -2034,34 +2034,34 @@ func (s *DockerSuite) TestContainersAPICreateMountsCreate(c *check.C) ***REMOVED
 		require.Len(c, mps, 1)
 		mountPoint := mps[0]
 
-		if x.expected.Source != "" ***REMOVED***
+		if x.expected.Source != "" {
 			assert.Equal(c, x.expected.Source, mountPoint.Source)
-		***REMOVED***
-		if x.expected.Name != "" ***REMOVED***
+		}
+		if x.expected.Name != "" {
 			assert.Equal(c, x.expected.Name, mountPoint.Name)
-		***REMOVED***
-		if x.expected.Driver != "" ***REMOVED***
+		}
+		if x.expected.Driver != "" {
 			assert.Equal(c, x.expected.Driver, mountPoint.Driver)
-		***REMOVED***
-		if x.expected.Propagation != "" ***REMOVED***
+		}
+		if x.expected.Propagation != "" {
 			assert.Equal(c, x.expected.Propagation, mountPoint.Propagation)
-		***REMOVED***
+		}
 		assert.Equal(c, x.expected.RW, mountPoint.RW)
 		assert.Equal(c, x.expected.Type, mountPoint.Type)
 		assert.Equal(c, x.expected.Mode, mountPoint.Mode)
 		assert.Equal(c, x.expected.Destination, mountPoint.Destination)
 
-		err = apiclient.ContainerStart(ctx, container.ID, types.ContainerStartOptions***REMOVED******REMOVED***)
+		err = apiclient.ContainerStart(ctx, container.ID, types.ContainerStartOptions{})
 		require.NoError(c, err)
 		poll.WaitOn(c, containerExit(apiclient, container.ID), poll.WithDelay(time.Second))
 
-		err = apiclient.ContainerRemove(ctx, container.ID, types.ContainerRemoveOptions***REMOVED***
+		err = apiclient.ContainerRemove(ctx, container.ID, types.ContainerRemoveOptions{
 			RemoveVolumes: true,
 			Force:         true,
-		***REMOVED***)
+		})
 		require.NoError(c, err)
 
-		switch ***REMOVED***
+		switch {
 
 		// Named volumes still exist after the container is removed
 		case x.spec.Type == "volume" && len(x.spec.Source) > 0:
@@ -2075,75 +2075,75 @@ func (s *DockerSuite) TestContainersAPICreateMountsCreate(c *check.C) ***REMOVED
 		default:
 			_, err := apiclient.VolumeInspect(ctx, mountPoint.Name)
 			assert.True(c, client.IsErrNotFound(err))
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func containerExit(apiclient client.APIClient, name string) func(poll.LogT) poll.Result ***REMOVED***
-	return func(logT poll.LogT) poll.Result ***REMOVED***
+func containerExit(apiclient client.APIClient, name string) func(poll.LogT) poll.Result {
+	return func(logT poll.LogT) poll.Result {
 		container, err := apiclient.ContainerInspect(context.Background(), name)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return poll.Error(err)
-		***REMOVED***
-		switch container.State.Status ***REMOVED***
+		}
+		switch container.State.Status {
 		case "created", "running":
 			return poll.Continue("container %s is %s, waiting for exit", name, container.State.Status)
-		***REMOVED***
+		}
 		return poll.Success()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *DockerSuite) TestContainersAPICreateMountsTmpfs(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainersAPICreateMountsTmpfs(c *check.C) {
 	testRequires(c, DaemonIsLinux)
-	type testCase struct ***REMOVED***
+	type testCase struct {
 		cfg             mounttypes.Mount
 		expectedOptions []string
-	***REMOVED***
+	}
 	target := "/foo"
-	cases := []testCase***REMOVED***
-		***REMOVED***
-			cfg: mounttypes.Mount***REMOVED***
+	cases := []testCase{
+		{
+			cfg: mounttypes.Mount{
 				Type:   "tmpfs",
-				Target: target***REMOVED***,
-			expectedOptions: []string***REMOVED***"rw", "nosuid", "nodev", "noexec", "relatime"***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			cfg: mounttypes.Mount***REMOVED***
+				Target: target},
+			expectedOptions: []string{"rw", "nosuid", "nodev", "noexec", "relatime"},
+		},
+		{
+			cfg: mounttypes.Mount{
 				Type:   "tmpfs",
 				Target: target,
-				TmpfsOptions: &mounttypes.TmpfsOptions***REMOVED***
-					SizeBytes: 4096 * 1024, Mode: 0700***REMOVED******REMOVED***,
-			expectedOptions: []string***REMOVED***"rw", "nosuid", "nodev", "noexec", "relatime", "size=4096k", "mode=700"***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+				TmpfsOptions: &mounttypes.TmpfsOptions{
+					SizeBytes: 4096 * 1024, Mode: 0700}},
+			expectedOptions: []string{"rw", "nosuid", "nodev", "noexec", "relatime", "size=4096k", "mode=700"},
+		},
+	}
 
 	cli, err := client.NewEnvClient()
 	c.Assert(err, checker.IsNil)
 	defer cli.Close()
 
-	config := containertypes.Config***REMOVED***
+	config := containertypes.Config{
 		Image: "busybox",
-		Cmd:   []string***REMOVED***"/bin/sh", "-c", fmt.Sprintf("mount | grep 'tmpfs on %s'", target)***REMOVED***,
-	***REMOVED***
-	for i, x := range cases ***REMOVED***
+		Cmd:   []string{"/bin/sh", "-c", fmt.Sprintf("mount | grep 'tmpfs on %s'", target)},
+	}
+	for i, x := range cases {
 		cName := fmt.Sprintf("test-tmpfs-%d", i)
-		hostConfig := containertypes.HostConfig***REMOVED***
-			Mounts: []mounttypes.Mount***REMOVED***x.cfg***REMOVED***,
-		***REMOVED***
+		hostConfig := containertypes.HostConfig{
+			Mounts: []mounttypes.Mount{x.cfg},
+		}
 
-		_, err = cli.ContainerCreate(context.Background(), &config, &hostConfig, &networktypes.NetworkingConfig***REMOVED******REMOVED***, cName)
+		_, err = cli.ContainerCreate(context.Background(), &config, &hostConfig, &networktypes.NetworkingConfig{}, cName)
 		c.Assert(err, checker.IsNil)
 		out, _ := dockerCmd(c, "start", "-a", cName)
-		for _, option := range x.expectedOptions ***REMOVED***
+		for _, option := range x.expectedOptions {
 			c.Assert(out, checker.Contains, option)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // Regression test for #33334
 // Makes sure that when a container which has a custom stop signal + restart=always
 // gets killed (with SIGKILL) by the kill API, that the restart policy is cancelled.
-func (s *DockerSuite) TestContainerKillCustomStopSignal(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainerKillCustomStopSignal(c *check.C) {
 	id := strings.TrimSpace(runSleepingContainer(c, "--stop-signal=SIGTERM", "--restart=always"))
 	res, _, err := request.Post("/containers/" + id + "/kill")
 	c.Assert(err, checker.IsNil)
@@ -2151,6 +2151,6 @@ func (s *DockerSuite) TestContainerKillCustomStopSignal(c *check.C) ***REMOVED**
 
 	b, err := ioutil.ReadAll(res.Body)
 	c.Assert(res.StatusCode, checker.Equals, http.StatusNoContent, check.Commentf(string(b)))
-	err = waitInspect(id, "***REMOVED******REMOVED***.State.Running***REMOVED******REMOVED*** ***REMOVED******REMOVED***.State.Restarting***REMOVED******REMOVED***", "false false", 30*time.Second)
+	err = waitInspect(id, "{{.State.Running}} {{.State.Restarting}}", "false false", 30*time.Second)
 	c.Assert(err, checker.IsNil)
-***REMOVED***
+}

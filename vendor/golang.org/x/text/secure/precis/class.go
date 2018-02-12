@@ -16,21 +16,21 @@ import (
 // prioritized over safety such as nicknames or passwords. The identifier class
 // should be used for profiles where safety is the first priority such as
 // addressable network labels and usernames.
-type class struct ***REMOVED***
+type class struct {
 	validFrom property
-***REMOVED***
+}
 
 // Contains satisfies the runes.Set interface and returns whether the given rune
 // is a member of the class.
-func (c class) Contains(r rune) bool ***REMOVED***
+func (c class) Contains(r rune) bool {
 	b := make([]byte, 4)
 	n := utf8.EncodeRune(b, r)
 
 	trieval, _ := dpTrie.lookup(b[:n])
 	return c.validFrom <= property(trieval)
-***REMOVED***
+}
 
 var (
-	identifier = &class***REMOVED***validFrom: pValid***REMOVED***
-	freeform   = &class***REMOVED***validFrom: idDisOrFreePVal***REMOVED***
+	identifier = &class{validFrom: pValid}
+	freeform   = &class{validFrom: idDisOrFreePVal}
 )

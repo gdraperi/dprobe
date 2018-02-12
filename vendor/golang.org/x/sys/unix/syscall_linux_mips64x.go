@@ -25,10 +25,10 @@ package unix
 //sys	Pwrite(fd int, p []byte, offset int64) (n int, err error) = SYS_PWRITE64
 //sys	Seek(fd int, offset int64, whence int) (off int64, err error) = SYS_LSEEK
 
-func Select(nfd int, r *FdSet, w *FdSet, e *FdSet, timeout *Timeval) (n int, err error) ***REMOVED***
-	ts := Timespec***REMOVED***Sec: timeout.Sec, Nsec: timeout.Usec * 1000***REMOVED***
+func Select(nfd int, r *FdSet, w *FdSet, e *FdSet, timeout *Timeval) (n int, err error) {
+	ts := Timespec{Sec: timeout.Sec, Nsec: timeout.Usec * 1000}
 	return Pselect(nfd, r, w, e, &ts, nil)
-***REMOVED***
+}
 
 //sys	sendfile(outfd int, infd int, offset *int64, count int) (written int, err error)
 //sys	Setfsgid(gid int) (err error)
@@ -63,61 +63,61 @@ func Select(nfd int, r *FdSet, w *FdSet, e *FdSet, timeout *Timeval) (n int, err
 
 //sysnb	Gettimeofday(tv *Timeval) (err error)
 
-func Time(t *Time_t) (tt Time_t, err error) ***REMOVED***
+func Time(t *Time_t) (tt Time_t, err error) {
 	var tv Timeval
 	err = Gettimeofday(&tv)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
-	if t != nil ***REMOVED***
+	}
+	if t != nil {
 		*t = Time_t(tv.Sec)
-	***REMOVED***
+	}
 	return Time_t(tv.Sec), nil
-***REMOVED***
+}
 
 //sys	Utime(path string, buf *Utimbuf) (err error)
 
-func setTimespec(sec, nsec int64) Timespec ***REMOVED***
-	return Timespec***REMOVED***Sec: sec, Nsec: nsec***REMOVED***
-***REMOVED***
+func setTimespec(sec, nsec int64) Timespec {
+	return Timespec{Sec: sec, Nsec: nsec}
+}
 
-func setTimeval(sec, usec int64) Timeval ***REMOVED***
-	return Timeval***REMOVED***Sec: sec, Usec: usec***REMOVED***
-***REMOVED***
+func setTimeval(sec, usec int64) Timeval {
+	return Timeval{Sec: sec, Usec: usec}
+}
 
-func Pipe(p []int) (err error) ***REMOVED***
-	if len(p) != 2 ***REMOVED***
+func Pipe(p []int) (err error) {
+	if len(p) != 2 {
 		return EINVAL
-	***REMOVED***
+	}
 	var pp [2]_C_int
 	err = pipe2(&pp, 0)
 	p[0] = int(pp[0])
 	p[1] = int(pp[1])
 	return
-***REMOVED***
+}
 
 //sysnb pipe2(p *[2]_C_int, flags int) (err error)
 
-func Pipe2(p []int, flags int) (err error) ***REMOVED***
-	if len(p) != 2 ***REMOVED***
+func Pipe2(p []int, flags int) (err error) {
+	if len(p) != 2 {
 		return EINVAL
-	***REMOVED***
+	}
 	var pp [2]_C_int
 	err = pipe2(&pp, flags)
 	p[0] = int(pp[0])
 	p[1] = int(pp[1])
 	return
-***REMOVED***
+}
 
-func Ioperm(from int, num int, on int) (err error) ***REMOVED***
+func Ioperm(from int, num int, on int) (err error) {
 	return ENOSYS
-***REMOVED***
+}
 
-func Iopl(level int) (err error) ***REMOVED***
+func Iopl(level int) (err error) {
 	return ENOSYS
-***REMOVED***
+}
 
-type stat_t struct ***REMOVED***
+type stat_t struct {
 	Dev        uint32
 	Pad0       [3]int32
 	Ino        uint64
@@ -137,34 +137,34 @@ type stat_t struct ***REMOVED***
 	Blksize    uint32
 	Pad2       uint32
 	Blocks     int64
-***REMOVED***
+}
 
 //sys	fstat(fd int, st *stat_t) (err error)
 //sys	lstat(path string, st *stat_t) (err error)
 //sys	stat(path string, st *stat_t) (err error)
 
-func Fstat(fd int, s *Stat_t) (err error) ***REMOVED***
-	st := &stat_t***REMOVED******REMOVED***
+func Fstat(fd int, s *Stat_t) (err error) {
+	st := &stat_t{}
 	err = fstat(fd, st)
 	fillStat_t(s, st)
 	return
-***REMOVED***
+}
 
-func Lstat(path string, s *Stat_t) (err error) ***REMOVED***
-	st := &stat_t***REMOVED******REMOVED***
+func Lstat(path string, s *Stat_t) (err error) {
+	st := &stat_t{}
 	err = lstat(path, st)
 	fillStat_t(s, st)
 	return
-***REMOVED***
+}
 
-func Stat(path string, s *Stat_t) (err error) ***REMOVED***
-	st := &stat_t***REMOVED******REMOVED***
+func Stat(path string, s *Stat_t) (err error) {
+	st := &stat_t{}
 	err = stat(path, st)
 	fillStat_t(s, st)
 	return
-***REMOVED***
+}
 
-func fillStat_t(s *Stat_t, st *stat_t) ***REMOVED***
+func fillStat_t(s *Stat_t, st *stat_t) {
 	s.Dev = st.Dev
 	s.Ino = st.Ino
 	s.Mode = st.Mode
@@ -173,34 +173,34 @@ func fillStat_t(s *Stat_t, st *stat_t) ***REMOVED***
 	s.Gid = st.Gid
 	s.Rdev = st.Rdev
 	s.Size = st.Size
-	s.Atim = Timespec***REMOVED***int64(st.Atime), int64(st.Atime_nsec)***REMOVED***
-	s.Mtim = Timespec***REMOVED***int64(st.Mtime), int64(st.Mtime_nsec)***REMOVED***
-	s.Ctim = Timespec***REMOVED***int64(st.Ctime), int64(st.Ctime_nsec)***REMOVED***
+	s.Atim = Timespec{int64(st.Atime), int64(st.Atime_nsec)}
+	s.Mtim = Timespec{int64(st.Mtime), int64(st.Mtime_nsec)}
+	s.Ctim = Timespec{int64(st.Ctime), int64(st.Ctime_nsec)}
 	s.Blksize = st.Blksize
 	s.Blocks = st.Blocks
-***REMOVED***
+}
 
-func (r *PtraceRegs) PC() uint64 ***REMOVED*** return r.Epc ***REMOVED***
+func (r *PtraceRegs) PC() uint64 { return r.Epc }
 
-func (r *PtraceRegs) SetPC(pc uint64) ***REMOVED*** r.Epc = pc ***REMOVED***
+func (r *PtraceRegs) SetPC(pc uint64) { r.Epc = pc }
 
-func (iov *Iovec) SetLen(length int) ***REMOVED***
+func (iov *Iovec) SetLen(length int) {
 	iov.Len = uint64(length)
-***REMOVED***
+}
 
-func (msghdr *Msghdr) SetControllen(length int) ***REMOVED***
+func (msghdr *Msghdr) SetControllen(length int) {
 	msghdr.Controllen = uint64(length)
-***REMOVED***
+}
 
-func (cmsg *Cmsghdr) SetLen(length int) ***REMOVED***
+func (cmsg *Cmsghdr) SetLen(length int) {
 	cmsg.Len = uint64(length)
-***REMOVED***
+}
 
 //sys	poll(fds *PollFd, nfds int, timeout int) (n int, err error)
 
-func Poll(fds []PollFd, timeout int) (n int, err error) ***REMOVED***
-	if len(fds) == 0 ***REMOVED***
+func Poll(fds []PollFd, timeout int) (n int, err error) {
+	if len(fds) == 0 {
 		return poll(nil, 0, timeout)
-	***REMOVED***
+	}
 	return poll(&fds[0], len(fds), timeout)
-***REMOVED***
+}

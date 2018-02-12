@@ -11,64 +11,64 @@ import (
 	"testing"
 )
 
-func TestDecodeEncode(t *testing.T) ***REMOVED***
+func TestDecodeEncode(t *testing.T) {
 	buf := bytes.NewBuffer([]byte(armorExample1))
 	result, err := Decode(buf)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Error(err)
-	***REMOVED***
+	}
 	expectedType := "PGP SIGNATURE"
-	if result.Type != expectedType ***REMOVED***
+	if result.Type != expectedType {
 		t.Errorf("result.Type: got:%s want:%s", result.Type, expectedType)
-	***REMOVED***
-	if len(result.Header) != 1 ***REMOVED***
+	}
+	if len(result.Header) != 1 {
 		t.Errorf("len(result.Header): got:%d want:1", len(result.Header))
-	***REMOVED***
+	}
 	v, ok := result.Header["Version"]
-	if !ok || v != "GnuPG v1.4.10 (GNU/Linux)" ***REMOVED***
+	if !ok || v != "GnuPG v1.4.10 (GNU/Linux)" {
 		t.Errorf("result.Header: got:%#v", result.Header)
-	***REMOVED***
+	}
 
 	contents, err := ioutil.ReadAll(result.Body)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Error(err)
-	***REMOVED***
+	}
 
-	if adler32.Checksum(contents) != 0x27b144be ***REMOVED***
+	if adler32.Checksum(contents) != 0x27b144be {
 		t.Errorf("contents: got: %x", contents)
-	***REMOVED***
+	}
 
 	buf = bytes.NewBuffer(nil)
 	w, err := Encode(buf, result.Type, result.Header)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Error(err)
-	***REMOVED***
+	}
 	_, err = w.Write(contents)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Error(err)
-	***REMOVED***
+	}
 	w.Close()
 
-	if !bytes.Equal(buf.Bytes(), []byte(armorExample1)) ***REMOVED***
+	if !bytes.Equal(buf.Bytes(), []byte(armorExample1)) {
 		t.Errorf("got: %s\nwant: %s", string(buf.Bytes()), armorExample1)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestLongHeader(t *testing.T) ***REMOVED***
+func TestLongHeader(t *testing.T) {
 	buf := bytes.NewBuffer([]byte(armorLongLine))
 	result, err := Decode(buf)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Error(err)
 		return
-	***REMOVED***
+	}
 	value, ok := result.Header["Version"]
-	if !ok ***REMOVED***
+	if !ok {
 		t.Errorf("missing Version header")
-	***REMOVED***
-	if value != longValueExpected ***REMOVED***
+	}
+	if value != longValueExpected {
 		t.Errorf("got: %s want: %s", value, longValueExpected)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 const armorExample1 = `-----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.10 (GNU/Linux)

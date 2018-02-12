@@ -15,137 +15,137 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func (daemon *Daemon) setStateCounter(c *container.Container) ***REMOVED***
-	switch c.StateString() ***REMOVED***
+func (daemon *Daemon) setStateCounter(c *container.Container) {
+	switch c.StateString() {
 	case "paused":
 		stateCtr.set(c.ID, "paused")
 	case "running":
 		stateCtr.set(c.ID, "running")
 	default:
 		stateCtr.set(c.ID, "stopped")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // ProcessEvent is called by libcontainerd whenever an event occurs
-func (daemon *Daemon) ProcessEvent(id string, e libcontainerd.EventType, ei libcontainerd.EventInfo) error ***REMOVED***
+func (daemon *Daemon) ProcessEvent(id string, e libcontainerd.EventType, ei libcontainerd.EventInfo) error {
 	c, err := daemon.GetContainer(id)
-	if c == nil || err != nil ***REMOVED***
+	if c == nil || err != nil {
 		return fmt.Errorf("no such container: %s", id)
-	***REMOVED***
+	}
 
-	switch e ***REMOVED***
+	switch e {
 	case libcontainerd.EventOOM:
 		// StateOOM is Linux specific and should never be hit on Windows
-		if runtime.GOOS == "windows" ***REMOVED***
+		if runtime.GOOS == "windows" {
 			return errors.New("received StateOOM from libcontainerd on Windows. This should never happen")
-		***REMOVED***
+		}
 
 		c.Lock()
 		defer c.Unlock()
 		daemon.updateHealthMonitor(c)
-		if err := c.CheckpointTo(daemon.containersReplica); err != nil ***REMOVED***
+		if err := c.CheckpointTo(daemon.containersReplica); err != nil {
 			return err
-		***REMOVED***
+		}
 
 		daemon.LogContainerEvent(c, "oom")
 	case libcontainerd.EventExit:
-		if int(ei.Pid) == c.Pid ***REMOVED***
+		if int(ei.Pid) == c.Pid {
 			c.Lock()
 			_, _, err := daemon.containerd.DeleteTask(context.Background(), c.ID)
-			if err != nil ***REMOVED***
+			if err != nil {
 				logrus.WithError(err).Warnf("failed to delete container %s from containerd", c.ID)
-			***REMOVED***
+			}
 
 			c.StreamConfig.Wait()
 			c.Reset(false)
 
-			exitStatus := container.ExitStatus***REMOVED***
+			exitStatus := container.ExitStatus{
 				ExitCode:  int(ei.ExitCode),
 				ExitedAt:  ei.ExitedAt,
 				OOMKilled: ei.OOMKilled,
-			***REMOVED***
+			}
 			restart, wait, err := c.RestartManager().ShouldRestart(ei.ExitCode, daemon.IsShuttingDown() || c.HasBeenManuallyStopped, time.Since(c.StartedAt))
-			if err == nil && restart ***REMOVED***
+			if err == nil && restart {
 				c.RestartCount++
 				c.SetRestarting(&exitStatus)
-			***REMOVED*** else ***REMOVED***
+			} else {
 				c.SetStopped(&exitStatus)
 				defer daemon.autoRemove(c)
-			***REMOVED***
+			}
 			defer c.Unlock() // needs to be called before autoRemove
 
 			// cancel healthcheck here, they will be automatically
 			// restarted if/when the container is started again
 			daemon.stopHealthchecks(c)
-			attributes := map[string]string***REMOVED***
+			attributes := map[string]string{
 				"exitCode": strconv.Itoa(int(ei.ExitCode)),
-			***REMOVED***
+			}
 			daemon.LogContainerEventWithAttributes(c, "die", attributes)
 			daemon.Cleanup(c)
 
-			if err == nil && restart ***REMOVED***
-				go func() ***REMOVED***
+			if err == nil && restart {
+				go func() {
 					err := <-wait
-					if err == nil ***REMOVED***
+					if err == nil {
 						// daemon.netController is initialized when daemon is restoring containers.
 						// But containerStart will use daemon.netController segment.
 						// So to avoid panic at startup process, here must wait util daemon restore done.
 						daemon.waitForStartupDone()
-						if err = daemon.containerStart(c, "", "", false); err != nil ***REMOVED***
+						if err = daemon.containerStart(c, "", "", false); err != nil {
 							logrus.Debugf("failed to restart container: %+v", err)
-						***REMOVED***
-					***REMOVED***
-					if err != nil ***REMOVED***
+						}
+					}
+					if err != nil {
 						c.Lock()
 						c.SetStopped(&exitStatus)
 						c.Unlock()
 						defer daemon.autoRemove(c)
-						if err != restartmanager.ErrRestartCanceled ***REMOVED***
+						if err != restartmanager.ErrRestartCanceled {
 							logrus.Errorf("restartmanger wait error: %+v", err)
-						***REMOVED***
-					***REMOVED***
-				***REMOVED***()
-			***REMOVED***
+						}
+					}
+				}()
+			}
 
 			daemon.setStateCounter(c)
-			if err := c.CheckpointTo(daemon.containersReplica); err != nil ***REMOVED***
+			if err := c.CheckpointTo(daemon.containersReplica); err != nil {
 				return err
-			***REMOVED***
+			}
 			return daemon.postRunProcessing(c, ei)
-		***REMOVED***
+		}
 
-		if execConfig := c.ExecCommands.Get(ei.ProcessID); execConfig != nil ***REMOVED***
+		if execConfig := c.ExecCommands.Get(ei.ProcessID); execConfig != nil {
 			ec := int(ei.ExitCode)
 			execConfig.Lock()
 			defer execConfig.Unlock()
 			execConfig.ExitCode = &ec
 			execConfig.Running = false
 			execConfig.StreamConfig.Wait()
-			if err := execConfig.CloseStreams(); err != nil ***REMOVED***
+			if err := execConfig.CloseStreams(); err != nil {
 				logrus.Errorf("failed to cleanup exec %s streams: %s", c.ID, err)
-			***REMOVED***
+			}
 
 			// remove the exec command from the container's store only and not the
 			// daemon's store so that the exec command can be inspected.
 			c.ExecCommands.Delete(execConfig.ID, execConfig.Pid)
-			attributes := map[string]string***REMOVED***
+			attributes := map[string]string{
 				"execID":   execConfig.ID,
 				"exitCode": strconv.Itoa(ec),
-			***REMOVED***
+			}
 			daemon.LogContainerEventWithAttributes(c, "exec_die", attributes)
-		***REMOVED*** else ***REMOVED***
-			logrus.WithFields(logrus.Fields***REMOVED***
+		} else {
+			logrus.WithFields(logrus.Fields{
 				"container": c.ID,
 				"exec-id":   ei.ProcessID,
 				"exec-pid":  ei.Pid,
-			***REMOVED***).Warnf("Ignoring Exit Event, no such exec command found")
-		***REMOVED***
+			}).Warnf("Ignoring Exit Event, no such exec command found")
+		}
 	case libcontainerd.EventStart:
 		c.Lock()
 		defer c.Unlock()
 
 		// This is here to handle start not generated by docker
-		if !c.Running ***REMOVED***
+		if !c.Running {
 			c.SetRunning(int(ei.Pid), false)
 			c.HasBeenManuallyStopped = false
 			c.HasBeenStartedBefore = true
@@ -153,60 +153,60 @@ func (daemon *Daemon) ProcessEvent(id string, e libcontainerd.EventType, ei libc
 
 			daemon.initHealthMonitor(c)
 
-			if err := c.CheckpointTo(daemon.containersReplica); err != nil ***REMOVED***
+			if err := c.CheckpointTo(daemon.containersReplica); err != nil {
 				return err
-			***REMOVED***
+			}
 			daemon.LogContainerEvent(c, "start")
-		***REMOVED***
+		}
 
 	case libcontainerd.EventPaused:
 		c.Lock()
 		defer c.Unlock()
 
-		if !c.Paused ***REMOVED***
+		if !c.Paused {
 			c.Paused = true
 			daemon.setStateCounter(c)
 			daemon.updateHealthMonitor(c)
-			if err := c.CheckpointTo(daemon.containersReplica); err != nil ***REMOVED***
+			if err := c.CheckpointTo(daemon.containersReplica); err != nil {
 				return err
-			***REMOVED***
+			}
 			daemon.LogContainerEvent(c, "pause")
-		***REMOVED***
+		}
 	case libcontainerd.EventResumed:
 		c.Lock()
 		defer c.Unlock()
 
-		if c.Paused ***REMOVED***
+		if c.Paused {
 			c.Paused = false
 			daemon.setStateCounter(c)
 			daemon.updateHealthMonitor(c)
 
-			if err := c.CheckpointTo(daemon.containersReplica); err != nil ***REMOVED***
+			if err := c.CheckpointTo(daemon.containersReplica); err != nil {
 				return err
-			***REMOVED***
+			}
 			daemon.LogContainerEvent(c, "unpause")
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func (daemon *Daemon) autoRemove(c *container.Container) ***REMOVED***
+func (daemon *Daemon) autoRemove(c *container.Container) {
 	c.Lock()
 	ar := c.HostConfig.AutoRemove
 	c.Unlock()
-	if !ar ***REMOVED***
+	if !ar {
 		return
-	***REMOVED***
+	}
 
 	var err error
-	if err = daemon.ContainerRm(c.ID, &types.ContainerRmConfig***REMOVED***ForceRemove: true, RemoveVolume: true***REMOVED***); err == nil ***REMOVED***
+	if err = daemon.ContainerRm(c.ID, &types.ContainerRmConfig{ForceRemove: true, RemoveVolume: true}); err == nil {
 		return
-	***REMOVED***
-	if c := daemon.containers.Get(c.ID); c == nil ***REMOVED***
+	}
+	if c := daemon.containers.Get(c.ID); c == nil {
 		return
-	***REMOVED***
+	}
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		logrus.WithError(err).WithField("container", c.ID).Error("error removing container")
-	***REMOVED***
-***REMOVED***
+	}
+}

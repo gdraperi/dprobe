@@ -29,49 +29,49 @@ var ErrNoDBSnapshot = errors.New("snap: snapshot file doesn't exist")
 
 // SaveDBFrom saves snapshot of the database from the given reader. It
 // guarantees the save operation is atomic.
-func (s *Snapshotter) SaveDBFrom(r io.Reader, id uint64) (int64, error) ***REMOVED***
+func (s *Snapshotter) SaveDBFrom(r io.Reader, id uint64) (int64, error) {
 	f, err := ioutil.TempFile(s.dir, "tmp")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	var n int64
 	n, err = io.Copy(f, r)
-	if err == nil ***REMOVED***
+	if err == nil {
 		err = fileutil.Fsync(f)
-	***REMOVED***
+	}
 	f.Close()
-	if err != nil ***REMOVED***
+	if err != nil {
 		os.Remove(f.Name())
 		return n, err
-	***REMOVED***
+	}
 	fn := s.dbFilePath(id)
-	if fileutil.Exist(fn) ***REMOVED***
+	if fileutil.Exist(fn) {
 		os.Remove(f.Name())
 		return n, nil
-	***REMOVED***
+	}
 	err = os.Rename(f.Name(), fn)
-	if err != nil ***REMOVED***
+	if err != nil {
 		os.Remove(f.Name())
 		return n, err
-	***REMOVED***
+	}
 
 	plog.Infof("saved database snapshot to disk [total bytes: %d]", n)
 
 	return n, nil
-***REMOVED***
+}
 
 // DBFilePath returns the file path for the snapshot of the database with
 // given id. If the snapshot does not exist, it returns error.
-func (s *Snapshotter) DBFilePath(id uint64) (string, error) ***REMOVED***
-	if _, err := fileutil.ReadDir(s.dir); err != nil ***REMOVED***
+func (s *Snapshotter) DBFilePath(id uint64) (string, error) {
+	if _, err := fileutil.ReadDir(s.dir); err != nil {
 		return "", err
-	***REMOVED***
-	if fn := s.dbFilePath(id); fileutil.Exist(fn) ***REMOVED***
+	}
+	if fn := s.dbFilePath(id); fileutil.Exist(fn) {
 		return fn, nil
-	***REMOVED***
+	}
 	return "", ErrNoDBSnapshot
-***REMOVED***
+}
 
-func (s *Snapshotter) dbFilePath(id uint64) string ***REMOVED***
+func (s *Snapshotter) dbFilePath(id uint64) string {
 	return filepath.Join(s.dir, fmt.Sprintf("%016x.snap.db", id))
-***REMOVED***
+}

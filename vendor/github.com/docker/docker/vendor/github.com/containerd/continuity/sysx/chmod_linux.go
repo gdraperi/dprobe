@@ -7,6 +7,6 @@ const (
 	AtSymlinkNofollow = 0x100
 )
 
-func Fchmodat(dirfd int, path string, mode uint32, flags int) error ***REMOVED***
+func Fchmodat(dirfd int, path string, mode uint32, flags int) error {
 	return syscall.Fchmodat(dirfd, path, mode, flags)
-***REMOVED***
+}

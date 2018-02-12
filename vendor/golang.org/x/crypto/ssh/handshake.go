@@ -27,18 +27,18 @@ const chanSize = 16
 // keyingTransport is a packet based transport that supports key
 // changes. It need not be thread-safe. It should pass through
 // msgNewKeys in both directions.
-type keyingTransport interface ***REMOVED***
+type keyingTransport interface {
 	packetConn
 
 	// prepareKeyChange sets up a key change. The key change for a
 	// direction will be effected if a msgNewKeys message is sent
 	// or received.
 	prepareKeyChange(*algorithms, *kexResult) error
-***REMOVED***
+}
 
 // handshakeTransport implements rekeying on top of a keyingTransport
 // and offers a thread-safe writePacket() interface.
-type handshakeTransport struct ***REMOVED***
+type handshakeTransport struct {
 	conn   keyingTransport
 	config *Config
 
@@ -67,7 +67,7 @@ type handshakeTransport struct ***REMOVED***
 	// If the read loop wants to schedule a kex, it pings this
 	// channel, and the write loop will send out a kex
 	// message.
-	requestKex chan struct***REMOVED******REMOVED***
+	requestKex chan struct{}
 
 	// If the other side requests or confirms a kex, its kexInit
 	// packet is sent here for the write loop to find it.
@@ -94,118 +94,118 @@ type handshakeTransport struct ***REMOVED***
 
 	// The session ID or nil if first kex did not complete yet.
 	sessionID []byte
-***REMOVED***
+}
 
-type pendingKex struct ***REMOVED***
+type pendingKex struct {
 	otherInit []byte
 	done      chan error
-***REMOVED***
+}
 
-func newHandshakeTransport(conn keyingTransport, config *Config, clientVersion, serverVersion []byte) *handshakeTransport ***REMOVED***
-	t := &handshakeTransport***REMOVED***
+func newHandshakeTransport(conn keyingTransport, config *Config, clientVersion, serverVersion []byte) *handshakeTransport {
+	t := &handshakeTransport{
 		conn:          conn,
 		serverVersion: serverVersion,
 		clientVersion: clientVersion,
 		incoming:      make(chan []byte, chanSize),
-		requestKex:    make(chan struct***REMOVED******REMOVED***, 1),
+		requestKex:    make(chan struct{}, 1),
 		startKex:      make(chan *pendingKex, 1),
 
 		config: config,
-	***REMOVED***
+	}
 	t.resetReadThresholds()
 	t.resetWriteThresholds()
 
 	// We always start with a mandatory key exchange.
-	t.requestKex <- struct***REMOVED******REMOVED******REMOVED******REMOVED***
+	t.requestKex <- struct{}{}
 	return t
-***REMOVED***
+}
 
-func newClientTransport(conn keyingTransport, clientVersion, serverVersion []byte, config *ClientConfig, dialAddr string, addr net.Addr) *handshakeTransport ***REMOVED***
+func newClientTransport(conn keyingTransport, clientVersion, serverVersion []byte, config *ClientConfig, dialAddr string, addr net.Addr) *handshakeTransport {
 	t := newHandshakeTransport(conn, &config.Config, clientVersion, serverVersion)
 	t.dialAddress = dialAddr
 	t.remoteAddr = addr
 	t.hostKeyCallback = config.HostKeyCallback
 	t.bannerCallback = config.BannerCallback
-	if config.HostKeyAlgorithms != nil ***REMOVED***
+	if config.HostKeyAlgorithms != nil {
 		t.hostKeyAlgorithms = config.HostKeyAlgorithms
-	***REMOVED*** else ***REMOVED***
+	} else {
 		t.hostKeyAlgorithms = supportedHostKeyAlgos
-	***REMOVED***
+	}
 	go t.readLoop()
 	go t.kexLoop()
 	return t
-***REMOVED***
+}
 
-func newServerTransport(conn keyingTransport, clientVersion, serverVersion []byte, config *ServerConfig) *handshakeTransport ***REMOVED***
+func newServerTransport(conn keyingTransport, clientVersion, serverVersion []byte, config *ServerConfig) *handshakeTransport {
 	t := newHandshakeTransport(conn, &config.Config, clientVersion, serverVersion)
 	t.hostKeys = config.hostKeys
 	go t.readLoop()
 	go t.kexLoop()
 	return t
-***REMOVED***
+}
 
-func (t *handshakeTransport) getSessionID() []byte ***REMOVED***
+func (t *handshakeTransport) getSessionID() []byte {
 	return t.sessionID
-***REMOVED***
+}
 
 // waitSession waits for the session to be established. This should be
 // the first thing to call after instantiating handshakeTransport.
-func (t *handshakeTransport) waitSession() error ***REMOVED***
+func (t *handshakeTransport) waitSession() error {
 	p, err := t.readPacket()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	if p[0] != msgNewKeys ***REMOVED***
+	}
+	if p[0] != msgNewKeys {
 		return fmt.Errorf("ssh: first packet should be msgNewKeys")
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (t *handshakeTransport) id() string ***REMOVED***
-	if len(t.hostKeys) > 0 ***REMOVED***
+func (t *handshakeTransport) id() string {
+	if len(t.hostKeys) > 0 {
 		return "server"
-	***REMOVED***
+	}
 	return "client"
-***REMOVED***
+}
 
-func (t *handshakeTransport) printPacket(p []byte, write bool) ***REMOVED***
+func (t *handshakeTransport) printPacket(p []byte, write bool) {
 	action := "got"
-	if write ***REMOVED***
+	if write {
 		action = "sent"
-	***REMOVED***
+	}
 
-	if p[0] == msgChannelData || p[0] == msgChannelExtendedData ***REMOVED***
+	if p[0] == msgChannelData || p[0] == msgChannelExtendedData {
 		log.Printf("%s %s data (packet %d bytes)", t.id(), action, len(p))
-	***REMOVED*** else ***REMOVED***
+	} else {
 		msg, err := decode(p)
 		log.Printf("%s %s %T %v (%v)", t.id(), action, msg, msg, err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (t *handshakeTransport) readPacket() ([]byte, error) ***REMOVED***
+func (t *handshakeTransport) readPacket() ([]byte, error) {
 	p, ok := <-t.incoming
-	if !ok ***REMOVED***
+	if !ok {
 		return nil, t.readError
-	***REMOVED***
+	}
 	return p, nil
-***REMOVED***
+}
 
-func (t *handshakeTransport) readLoop() ***REMOVED***
+func (t *handshakeTransport) readLoop() {
 	first := true
-	for ***REMOVED***
+	for {
 		p, err := t.readOnePacket(first)
 		first = false
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.readError = err
 			close(t.incoming)
 			break
-		***REMOVED***
-		if p[0] == msgIgnore || p[0] == msgDebug ***REMOVED***
+		}
+		if p[0] == msgIgnore || p[0] == msgDebug {
 			continue
-		***REMOVED***
+		}
 		t.incoming <- p
-	***REMOVED***
+	}
 
 	// Stop writers too.
 	t.recordWriteError(t.readError)
@@ -214,81 +214,81 @@ func (t *handshakeTransport) readLoop() ***REMOVED***
 	close(t.startKex)
 
 	// Don't close t.requestKex; it's also written to from writePacket.
-***REMOVED***
+}
 
-func (t *handshakeTransport) pushPacket(p []byte) error ***REMOVED***
-	if debugHandshake ***REMOVED***
+func (t *handshakeTransport) pushPacket(p []byte) error {
+	if debugHandshake {
 		t.printPacket(p, true)
-	***REMOVED***
+	}
 	return t.conn.writePacket(p)
-***REMOVED***
+}
 
-func (t *handshakeTransport) getWriteError() error ***REMOVED***
+func (t *handshakeTransport) getWriteError() error {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 	return t.writeError
-***REMOVED***
+}
 
-func (t *handshakeTransport) recordWriteError(err error) ***REMOVED***
+func (t *handshakeTransport) recordWriteError(err error) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
-	if t.writeError == nil && err != nil ***REMOVED***
+	if t.writeError == nil && err != nil {
 		t.writeError = err
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (t *handshakeTransport) requestKeyExchange() ***REMOVED***
-	select ***REMOVED***
-	case t.requestKex <- struct***REMOVED******REMOVED******REMOVED******REMOVED***:
+func (t *handshakeTransport) requestKeyExchange() {
+	select {
+	case t.requestKex <- struct{}{}:
 	default:
 		// something already requested a kex, so do nothing.
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (t *handshakeTransport) resetWriteThresholds() ***REMOVED***
+func (t *handshakeTransport) resetWriteThresholds() {
 	t.writePacketsLeft = packetRekeyThreshold
-	if t.config.RekeyThreshold > 0 ***REMOVED***
+	if t.config.RekeyThreshold > 0 {
 		t.writeBytesLeft = int64(t.config.RekeyThreshold)
-	***REMOVED*** else if t.algorithms != nil ***REMOVED***
+	} else if t.algorithms != nil {
 		t.writeBytesLeft = t.algorithms.w.rekeyBytes()
-	***REMOVED*** else ***REMOVED***
+	} else {
 		t.writeBytesLeft = 1 << 30
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (t *handshakeTransport) kexLoop() ***REMOVED***
+func (t *handshakeTransport) kexLoop() {
 
 write:
-	for t.getWriteError() == nil ***REMOVED***
+	for t.getWriteError() == nil {
 		var request *pendingKex
 		var sent bool
 
-		for request == nil || !sent ***REMOVED***
+		for request == nil || !sent {
 			var ok bool
-			select ***REMOVED***
+			select {
 			case request, ok = <-t.startKex:
-				if !ok ***REMOVED***
+				if !ok {
 					break write
-				***REMOVED***
+				}
 			case <-t.requestKex:
 				break
-			***REMOVED***
+			}
 
-			if !sent ***REMOVED***
-				if err := t.sendKexInit(); err != nil ***REMOVED***
+			if !sent {
+				if err := t.sendKexInit(); err != nil {
 					t.recordWriteError(err)
 					break
-				***REMOVED***
+				}
 				sent = true
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
-		if err := t.getWriteError(); err != nil ***REMOVED***
-			if request != nil ***REMOVED***
+		if err := t.getWriteError(); err != nil {
+			if request != nil {
 				request.done <- err
-			***REMOVED***
+			}
 			break
-		***REMOVED***
+		}
 
 		// We're not servicing t.requestKex, but that is OK:
 		// we never block on sending to t.requestKex.
@@ -314,14 +314,14 @@ write:
 		// initial kex, and 2) the kex from the remote side
 		// caused another send on the requestKex channel,
 	clear:
-		for ***REMOVED***
-			select ***REMOVED***
+		for {
+			select {
 			case <-t.requestKex:
 				//
 			default:
 				break clear
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		request.done <- t.writeError
 
@@ -330,27 +330,27 @@ write:
 		// and don't increment writtenSinceKex: if we trigger
 		// another kex while we are still busy with the last
 		// one, things will become very confusing.
-		for _, p := range t.pendingPackets ***REMOVED***
+		for _, p := range t.pendingPackets {
 			t.writeError = t.pushPacket(p)
-			if t.writeError != nil ***REMOVED***
+			if t.writeError != nil {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		t.pendingPackets = t.pendingPackets[:0]
 		t.mu.Unlock()
-	***REMOVED***
+	}
 
 	// drain startKex channel. We don't service t.requestKex
 	// because nobody does blocking sends there.
-	go func() ***REMOVED***
-		for init := range t.startKex ***REMOVED***
+	go func() {
+		for init := range t.startKex {
 			init.done <- t.writeError
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
 	// Unblock reader.
 	t.conn.Close()
-***REMOVED***
+}
 
 // The protocol uses uint32 for packet counters, so we can't let them
 // reach 1<<32.  We will actually read and write more packets than
@@ -359,92 +359,92 @@ write:
 // key exchange itself.
 const packetRekeyThreshold = (1 << 31)
 
-func (t *handshakeTransport) resetReadThresholds() ***REMOVED***
+func (t *handshakeTransport) resetReadThresholds() {
 	t.readPacketsLeft = packetRekeyThreshold
-	if t.config.RekeyThreshold > 0 ***REMOVED***
+	if t.config.RekeyThreshold > 0 {
 		t.readBytesLeft = int64(t.config.RekeyThreshold)
-	***REMOVED*** else if t.algorithms != nil ***REMOVED***
+	} else if t.algorithms != nil {
 		t.readBytesLeft = t.algorithms.r.rekeyBytes()
-	***REMOVED*** else ***REMOVED***
+	} else {
 		t.readBytesLeft = 1 << 30
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (t *handshakeTransport) readOnePacket(first bool) ([]byte, error) ***REMOVED***
+func (t *handshakeTransport) readOnePacket(first bool) ([]byte, error) {
 	p, err := t.conn.readPacket()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	if t.readPacketsLeft > 0 ***REMOVED***
+	if t.readPacketsLeft > 0 {
 		t.readPacketsLeft--
-	***REMOVED*** else ***REMOVED***
+	} else {
 		t.requestKeyExchange()
-	***REMOVED***
+	}
 
-	if t.readBytesLeft > 0 ***REMOVED***
+	if t.readBytesLeft > 0 {
 		t.readBytesLeft -= int64(len(p))
-	***REMOVED*** else ***REMOVED***
+	} else {
 		t.requestKeyExchange()
-	***REMOVED***
+	}
 
-	if debugHandshake ***REMOVED***
+	if debugHandshake {
 		t.printPacket(p, false)
-	***REMOVED***
+	}
 
-	if first && p[0] != msgKexInit ***REMOVED***
+	if first && p[0] != msgKexInit {
 		return nil, fmt.Errorf("ssh: first packet should be msgKexInit")
-	***REMOVED***
+	}
 
-	if p[0] != msgKexInit ***REMOVED***
+	if p[0] != msgKexInit {
 		return p, nil
-	***REMOVED***
+	}
 
 	firstKex := t.sessionID == nil
 
-	kex := pendingKex***REMOVED***
+	kex := pendingKex{
 		done:      make(chan error, 1),
 		otherInit: p,
-	***REMOVED***
+	}
 	t.startKex <- &kex
 	err = <-kex.done
 
-	if debugHandshake ***REMOVED***
+	if debugHandshake {
 		log.Printf("%s exited key exchange (first %v), err %v", t.id(), firstKex, err)
-	***REMOVED***
+	}
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	t.resetReadThresholds()
 
 	// By default, a key exchange is hidden from higher layers by
 	// translating it into msgIgnore.
-	successPacket := []byte***REMOVED***msgIgnore***REMOVED***
-	if firstKex ***REMOVED***
+	successPacket := []byte{msgIgnore}
+	if firstKex {
 		// sendKexInit() for the first kex waits for
 		// msgNewKeys so the authentication process is
 		// guaranteed to happen over an encrypted transport.
-		successPacket = []byte***REMOVED***msgNewKeys***REMOVED***
-	***REMOVED***
+		successPacket = []byte{msgNewKeys}
+	}
 
 	return successPacket, nil
-***REMOVED***
+}
 
 // sendKexInit sends a key change message.
-func (t *handshakeTransport) sendKexInit() error ***REMOVED***
+func (t *handshakeTransport) sendKexInit() error {
 	t.mu.Lock()
 	defer t.mu.Unlock()
-	if t.sentInitMsg != nil ***REMOVED***
+	if t.sentInitMsg != nil {
 		// kexInits may be sent either in response to the other side,
 		// or because our side wants to initiate a key change, so we
 		// may have already sent a kexInit. In that case, don't send a
 		// second kexInit.
 		return nil
-	***REMOVED***
+	}
 
-	msg := &kexInitMsg***REMOVED***
+	msg := &kexInitMsg{
 		KexAlgos:                t.config.KeyExchanges,
 		CiphersClientServer:     t.config.Ciphers,
 		CiphersServerClient:     t.config.Ciphers,
@@ -452,109 +452,109 @@ func (t *handshakeTransport) sendKexInit() error ***REMOVED***
 		MACsServerClient:        t.config.MACs,
 		CompressionClientServer: supportedCompressions,
 		CompressionServerClient: supportedCompressions,
-	***REMOVED***
+	}
 	io.ReadFull(rand.Reader, msg.Cookie[:])
 
-	if len(t.hostKeys) > 0 ***REMOVED***
-		for _, k := range t.hostKeys ***REMOVED***
+	if len(t.hostKeys) > 0 {
+		for _, k := range t.hostKeys {
 			msg.ServerHostKeyAlgos = append(
 				msg.ServerHostKeyAlgos, k.PublicKey().Type())
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
+		}
+	} else {
 		msg.ServerHostKeyAlgos = t.hostKeyAlgorithms
-	***REMOVED***
+	}
 	packet := Marshal(msg)
 
 	// writePacket destroys the contents, so save a copy.
 	packetCopy := make([]byte, len(packet))
 	copy(packetCopy, packet)
 
-	if err := t.pushPacket(packetCopy); err != nil ***REMOVED***
+	if err := t.pushPacket(packetCopy); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	t.sentInitMsg = msg
 	t.sentInitPacket = packet
 
 	return nil
-***REMOVED***
+}
 
-func (t *handshakeTransport) writePacket(p []byte) error ***REMOVED***
-	switch p[0] ***REMOVED***
+func (t *handshakeTransport) writePacket(p []byte) error {
+	switch p[0] {
 	case msgKexInit:
 		return errors.New("ssh: only handshakeTransport can send kexInit")
 	case msgNewKeys:
 		return errors.New("ssh: only handshakeTransport can send newKeys")
-	***REMOVED***
+	}
 
 	t.mu.Lock()
 	defer t.mu.Unlock()
-	if t.writeError != nil ***REMOVED***
+	if t.writeError != nil {
 		return t.writeError
-	***REMOVED***
+	}
 
-	if t.sentInitMsg != nil ***REMOVED***
+	if t.sentInitMsg != nil {
 		// Copy the packet so the writer can reuse the buffer.
 		cp := make([]byte, len(p))
 		copy(cp, p)
 		t.pendingPackets = append(t.pendingPackets, cp)
 		return nil
-	***REMOVED***
+	}
 
-	if t.writeBytesLeft > 0 ***REMOVED***
+	if t.writeBytesLeft > 0 {
 		t.writeBytesLeft -= int64(len(p))
-	***REMOVED*** else ***REMOVED***
+	} else {
 		t.requestKeyExchange()
-	***REMOVED***
+	}
 
-	if t.writePacketsLeft > 0 ***REMOVED***
+	if t.writePacketsLeft > 0 {
 		t.writePacketsLeft--
-	***REMOVED*** else ***REMOVED***
+	} else {
 		t.requestKeyExchange()
-	***REMOVED***
+	}
 
-	if err := t.pushPacket(p); err != nil ***REMOVED***
+	if err := t.pushPacket(p); err != nil {
 		t.writeError = err
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (t *handshakeTransport) Close() error ***REMOVED***
+func (t *handshakeTransport) Close() error {
 	return t.conn.Close()
-***REMOVED***
+}
 
-func (t *handshakeTransport) enterKeyExchange(otherInitPacket []byte) error ***REMOVED***
-	if debugHandshake ***REMOVED***
+func (t *handshakeTransport) enterKeyExchange(otherInitPacket []byte) error {
+	if debugHandshake {
 		log.Printf("%s entered key exchange", t.id())
-	***REMOVED***
+	}
 
-	otherInit := &kexInitMsg***REMOVED******REMOVED***
-	if err := Unmarshal(otherInitPacket, otherInit); err != nil ***REMOVED***
+	otherInit := &kexInitMsg{}
+	if err := Unmarshal(otherInitPacket, otherInit); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	magics := handshakeMagics***REMOVED***
+	magics := handshakeMagics{
 		clientVersion: t.clientVersion,
 		serverVersion: t.serverVersion,
 		clientKexInit: otherInitPacket,
 		serverKexInit: t.sentInitPacket,
-	***REMOVED***
+	}
 
 	clientInit := otherInit
 	serverInit := t.sentInitMsg
-	if len(t.hostKeys) == 0 ***REMOVED***
+	if len(t.hostKeys) == 0 {
 		clientInit, serverInit = serverInit, clientInit
 
 		magics.clientKexInit = t.sentInitPacket
 		magics.serverKexInit = otherInitPacket
-	***REMOVED***
+	}
 
 	var err error
 	t.algorithms, err = findAgreedAlgorithms(clientInit, serverInit)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	// We don't send FirstKexFollows, but we handle receiving it.
 	//
@@ -566,81 +566,81 @@ func (t *handshakeTransport) enterKeyExchange(otherInitPacket []byte) error ***R
 	// algorithms cannot be agreed upon". The other algorithms have
 	// already been checked above so the kex algorithm and host key
 	// algorithm are checked here.
-	if otherInit.FirstKexFollows && (clientInit.KexAlgos[0] != serverInit.KexAlgos[0] || clientInit.ServerHostKeyAlgos[0] != serverInit.ServerHostKeyAlgos[0]) ***REMOVED***
+	if otherInit.FirstKexFollows && (clientInit.KexAlgos[0] != serverInit.KexAlgos[0] || clientInit.ServerHostKeyAlgos[0] != serverInit.ServerHostKeyAlgos[0]) {
 		// other side sent a kex message for the wrong algorithm,
 		// which we have to ignore.
-		if _, err := t.conn.readPacket(); err != nil ***REMOVED***
+		if _, err := t.conn.readPacket(); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	kex, ok := kexAlgoMap[t.algorithms.kex]
-	if !ok ***REMOVED***
+	if !ok {
 		return fmt.Errorf("ssh: unexpected key exchange algorithm %v", t.algorithms.kex)
-	***REMOVED***
+	}
 
 	var result *kexResult
-	if len(t.hostKeys) > 0 ***REMOVED***
+	if len(t.hostKeys) > 0 {
 		result, err = t.server(kex, t.algorithms, &magics)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		result, err = t.client(kex, t.algorithms, &magics)
-	***REMOVED***
+	}
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if t.sessionID == nil ***REMOVED***
+	if t.sessionID == nil {
 		t.sessionID = result.H
-	***REMOVED***
+	}
 	result.SessionID = t.sessionID
 
-	if err := t.conn.prepareKeyChange(t.algorithms, result); err != nil ***REMOVED***
+	if err := t.conn.prepareKeyChange(t.algorithms, result); err != nil {
 		return err
-	***REMOVED***
-	if err = t.conn.writePacket([]byte***REMOVED***msgNewKeys***REMOVED***); err != nil ***REMOVED***
+	}
+	if err = t.conn.writePacket([]byte{msgNewKeys}); err != nil {
 		return err
-	***REMOVED***
-	if packet, err := t.conn.readPacket(); err != nil ***REMOVED***
+	}
+	if packet, err := t.conn.readPacket(); err != nil {
 		return err
-	***REMOVED*** else if packet[0] != msgNewKeys ***REMOVED***
+	} else if packet[0] != msgNewKeys {
 		return unexpectedMessageError(msgNewKeys, packet[0])
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (t *handshakeTransport) server(kex kexAlgorithm, algs *algorithms, magics *handshakeMagics) (*kexResult, error) ***REMOVED***
+func (t *handshakeTransport) server(kex kexAlgorithm, algs *algorithms, magics *handshakeMagics) (*kexResult, error) {
 	var hostKey Signer
-	for _, k := range t.hostKeys ***REMOVED***
-		if algs.hostKey == k.PublicKey().Type() ***REMOVED***
+	for _, k := range t.hostKeys {
+		if algs.hostKey == k.PublicKey().Type() {
 			hostKey = k
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	r, err := kex.Server(t.conn, t.config.Rand, magics, hostKey)
 	return r, err
-***REMOVED***
+}
 
-func (t *handshakeTransport) client(kex kexAlgorithm, algs *algorithms, magics *handshakeMagics) (*kexResult, error) ***REMOVED***
+func (t *handshakeTransport) client(kex kexAlgorithm, algs *algorithms, magics *handshakeMagics) (*kexResult, error) {
 	result, err := kex.Client(t.conn, t.config.Rand, magics)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	hostKey, err := ParsePublicKey(result.HostKey)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	if err := verifyHostKeySignature(hostKey, result); err != nil ***REMOVED***
+	if err := verifyHostKeySignature(hostKey, result); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	err = t.hostKeyCallback(t.dialAddress, t.remoteAddr, hostKey)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	return result, nil
-***REMOVED***
+}

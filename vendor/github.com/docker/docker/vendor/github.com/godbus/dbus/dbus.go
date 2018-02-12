@@ -18,148 +18,148 @@ var (
 	uint64Type      = reflect.TypeOf(uint64(0))
 	float64Type     = reflect.TypeOf(float64(0))
 	stringType      = reflect.TypeOf("")
-	signatureType   = reflect.TypeOf(Signature***REMOVED***""***REMOVED***)
+	signatureType   = reflect.TypeOf(Signature{""})
 	objectPathType  = reflect.TypeOf(ObjectPath(""))
-	variantType     = reflect.TypeOf(Variant***REMOVED***Signature***REMOVED***""***REMOVED***, nil***REMOVED***)
-	interfacesType  = reflect.TypeOf([]interface***REMOVED******REMOVED******REMOVED******REMOVED***)
+	variantType     = reflect.TypeOf(Variant{Signature{""}, nil})
+	interfacesType  = reflect.TypeOf([]interface{}{})
 	unixFDType      = reflect.TypeOf(UnixFD(0))
 	unixFDIndexType = reflect.TypeOf(UnixFDIndex(0))
 )
 
 // An InvalidTypeError signals that a value which cannot be represented in the
 // D-Bus wire format was passed to a function.
-type InvalidTypeError struct ***REMOVED***
+type InvalidTypeError struct {
 	Type reflect.Type
-***REMOVED***
+}
 
-func (e InvalidTypeError) Error() string ***REMOVED***
+func (e InvalidTypeError) Error() string {
 	return "dbus: invalid type " + e.Type.String()
-***REMOVED***
+}
 
 // Store copies the values contained in src to dest, which must be a slice of
 // pointers. It converts slices of interfaces from src to corresponding structs
 // in dest. An error is returned if the lengths of src and dest or the types of
 // their elements don't match.
-func Store(src []interface***REMOVED******REMOVED***, dest ...interface***REMOVED******REMOVED***) error ***REMOVED***
-	if len(src) != len(dest) ***REMOVED***
+func Store(src []interface{}, dest ...interface{}) error {
+	if len(src) != len(dest) {
 		return errors.New("dbus.Store: length mismatch")
-	***REMOVED***
+	}
 
-	for i := range src ***REMOVED***
-		if err := store(src[i], dest[i]); err != nil ***REMOVED***
+	for i := range src {
+		if err := store(src[i], dest[i]); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func store(src, dest interface***REMOVED******REMOVED***) error ***REMOVED***
-	if reflect.TypeOf(dest).Elem() == reflect.TypeOf(src) ***REMOVED***
+func store(src, dest interface{}) error {
+	if reflect.TypeOf(dest).Elem() == reflect.TypeOf(src) {
 		reflect.ValueOf(dest).Elem().Set(reflect.ValueOf(src))
 		return nil
-	***REMOVED*** else if hasStruct(dest) ***REMOVED***
+	} else if hasStruct(dest) {
 		rv := reflect.ValueOf(dest).Elem()
-		switch rv.Kind() ***REMOVED***
+		switch rv.Kind() {
 		case reflect.Struct:
-			vs, ok := src.([]interface***REMOVED******REMOVED***)
-			if !ok ***REMOVED***
+			vs, ok := src.([]interface{})
+			if !ok {
 				return errors.New("dbus.Store: type mismatch")
-			***REMOVED***
+			}
 			t := rv.Type()
-			ndest := make([]interface***REMOVED******REMOVED***, 0, rv.NumField())
-			for i := 0; i < rv.NumField(); i++ ***REMOVED***
+			ndest := make([]interface{}, 0, rv.NumField())
+			for i := 0; i < rv.NumField(); i++ {
 				field := t.Field(i)
-				if field.PkgPath == "" && field.Tag.Get("dbus") != "-" ***REMOVED***
+				if field.PkgPath == "" && field.Tag.Get("dbus") != "-" {
 					ndest = append(ndest, rv.Field(i).Addr().Interface())
-				***REMOVED***
-			***REMOVED***
-			if len(vs) != len(ndest) ***REMOVED***
+				}
+			}
+			if len(vs) != len(ndest) {
 				return errors.New("dbus.Store: type mismatch")
-			***REMOVED***
+			}
 			err := Store(vs, ndest...)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return errors.New("dbus.Store: type mismatch")
-			***REMOVED***
+			}
 		case reflect.Slice:
 			sv := reflect.ValueOf(src)
-			if sv.Kind() != reflect.Slice ***REMOVED***
+			if sv.Kind() != reflect.Slice {
 				return errors.New("dbus.Store: type mismatch")
-			***REMOVED***
+			}
 			rv.Set(reflect.MakeSlice(rv.Type(), sv.Len(), sv.Len()))
-			for i := 0; i < sv.Len(); i++ ***REMOVED***
-				if err := store(sv.Index(i).Interface(), rv.Index(i).Addr().Interface()); err != nil ***REMOVED***
+			for i := 0; i < sv.Len(); i++ {
+				if err := store(sv.Index(i).Interface(), rv.Index(i).Addr().Interface()); err != nil {
 					return err
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case reflect.Map:
 			sv := reflect.ValueOf(src)
-			if sv.Kind() != reflect.Map ***REMOVED***
+			if sv.Kind() != reflect.Map {
 				return errors.New("dbus.Store: type mismatch")
-			***REMOVED***
+			}
 			keys := sv.MapKeys()
 			rv.Set(reflect.MakeMap(sv.Type()))
-			for _, key := range keys ***REMOVED***
+			for _, key := range keys {
 				v := reflect.New(sv.Type().Elem())
-				if err := store(v, sv.MapIndex(key).Interface()); err != nil ***REMOVED***
+				if err := store(v, sv.MapIndex(key).Interface()); err != nil {
 					return err
-				***REMOVED***
+				}
 				rv.SetMapIndex(key, v.Elem())
-			***REMOVED***
+			}
 		default:
 			return errors.New("dbus.Store: type mismatch")
-		***REMOVED***
+		}
 		return nil
-	***REMOVED*** else ***REMOVED***
+	} else {
 		return errors.New("dbus.Store: type mismatch")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func hasStruct(v interface***REMOVED******REMOVED***) bool ***REMOVED***
+func hasStruct(v interface{}) bool {
 	t := reflect.TypeOf(v)
-	for ***REMOVED***
-		switch t.Kind() ***REMOVED***
+	for {
+		switch t.Kind() {
 		case reflect.Struct:
 			return true
 		case reflect.Slice, reflect.Ptr, reflect.Map:
 			t = t.Elem()
 		default:
 			return false
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // An ObjectPath is an object path as defined by the D-Bus spec.
 type ObjectPath string
 
 // IsValid returns whether the object path is valid.
-func (o ObjectPath) IsValid() bool ***REMOVED***
+func (o ObjectPath) IsValid() bool {
 	s := string(o)
-	if len(s) == 0 ***REMOVED***
+	if len(s) == 0 {
 		return false
-	***REMOVED***
-	if s[0] != '/' ***REMOVED***
+	}
+	if s[0] != '/' {
 		return false
-	***REMOVED***
-	if s[len(s)-1] == '/' && len(s) != 1 ***REMOVED***
+	}
+	if s[len(s)-1] == '/' && len(s) != 1 {
 		return false
-	***REMOVED***
+	}
 	// probably not used, but technically possible
-	if s == "/" ***REMOVED***
+	if s == "/" {
 		return true
-	***REMOVED***
+	}
 	split := strings.Split(s[1:], "/")
-	for _, v := range split ***REMOVED***
-		if len(v) == 0 ***REMOVED***
+	for _, v := range split {
+		if len(v) == 0 {
 			return false
-		***REMOVED***
-		for _, c := range v ***REMOVED***
-			if !isMemberChar(c) ***REMOVED***
+		}
+		for _, c := range v {
+			if !isMemberChar(c) {
 				return false
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return true
-***REMOVED***
+}
 
 // A UnixFD is a Unix file descriptor sent over the wire. See the package-level
 // documentation for more information about Unix file descriptor passsing.
@@ -169,8 +169,8 @@ type UnixFD int32
 type UnixFDIndex uint32
 
 // alignment returns the alignment of values of type t.
-func alignment(t reflect.Type) int ***REMOVED***
-	switch t ***REMOVED***
+func alignment(t reflect.Type) int {
+	switch t {
 	case variantType:
 		return 1
 	case objectPathType:
@@ -179,8 +179,8 @@ func alignment(t reflect.Type) int ***REMOVED***
 		return 1
 	case interfacesType: // sometimes used for structs
 		return 8
-	***REMOVED***
-	switch t.Kind() ***REMOVED***
+	}
+	switch t.Kind() {
 	case reflect.Uint8:
 		return 1
 	case reflect.Uint16, reflect.Int16:
@@ -191,68 +191,68 @@ func alignment(t reflect.Type) int ***REMOVED***
 		return 8
 	case reflect.Ptr:
 		return alignment(t.Elem())
-	***REMOVED***
+	}
 	return 1
-***REMOVED***
+}
 
 // isKeyType returns whether t is a valid type for a D-Bus dict.
-func isKeyType(t reflect.Type) bool ***REMOVED***
-	switch t.Kind() ***REMOVED***
+func isKeyType(t reflect.Type) bool {
+	switch t.Kind() {
 	case reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,
 		reflect.Int16, reflect.Int32, reflect.Int64, reflect.Float64,
 		reflect.String:
 
 		return true
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
 // isValidInterface returns whether s is a valid name for an interface.
-func isValidInterface(s string) bool ***REMOVED***
-	if len(s) == 0 || len(s) > 255 || s[0] == '.' ***REMOVED***
+func isValidInterface(s string) bool {
+	if len(s) == 0 || len(s) > 255 || s[0] == '.' {
 		return false
-	***REMOVED***
+	}
 	elem := strings.Split(s, ".")
-	if len(elem) < 2 ***REMOVED***
+	if len(elem) < 2 {
 		return false
-	***REMOVED***
-	for _, v := range elem ***REMOVED***
-		if len(v) == 0 ***REMOVED***
+	}
+	for _, v := range elem {
+		if len(v) == 0 {
 			return false
-		***REMOVED***
-		if v[0] >= '0' && v[0] <= '9' ***REMOVED***
+		}
+		if v[0] >= '0' && v[0] <= '9' {
 			return false
-		***REMOVED***
-		for _, c := range v ***REMOVED***
-			if !isMemberChar(c) ***REMOVED***
+		}
+		for _, c := range v {
+			if !isMemberChar(c) {
 				return false
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return true
-***REMOVED***
+}
 
 // isValidMember returns whether s is a valid name for a member.
-func isValidMember(s string) bool ***REMOVED***
-	if len(s) == 0 || len(s) > 255 ***REMOVED***
+func isValidMember(s string) bool {
+	if len(s) == 0 || len(s) > 255 {
 		return false
-	***REMOVED***
+	}
 	i := strings.Index(s, ".")
-	if i != -1 ***REMOVED***
+	if i != -1 {
 		return false
-	***REMOVED***
-	if s[0] >= '0' && s[0] <= '9' ***REMOVED***
+	}
+	if s[0] >= '0' && s[0] <= '9' {
 		return false
-	***REMOVED***
-	for _, c := range s ***REMOVED***
-		if !isMemberChar(c) ***REMOVED***
+	}
+	for _, c := range s {
+		if !isMemberChar(c) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}
 
-func isMemberChar(c rune) bool ***REMOVED***
+func isMemberChar(c rune) bool {
 	return (c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') ||
 		(c >= 'a' && c <= 'z') || c == '_'
-***REMOVED***
+}

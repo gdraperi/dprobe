@@ -22,7 +22,7 @@ import (
 	"github.com/coreos/etcd/pkg/fileutil"
 )
 
-func (w *WAL) renameWal(tmpdirpath string) (*WAL, error) ***REMOVED***
+func (w *WAL) renameWal(tmpdirpath string) (*WAL, error) {
 	// On non-Windows platforms, hold the lock while renaming. Releasing
 	// the lock and trying to reacquire it quickly can be flaky because
 	// it's possible the process will fork to spawn a process while this is
@@ -30,15 +30,15 @@ func (w *WAL) renameWal(tmpdirpath string) (*WAL, error) ***REMOVED***
 	// but there is a window between the fork and the exec where another
 	// process holds the lock.
 
-	if err := os.RemoveAll(w.dir); err != nil ***REMOVED***
+	if err := os.RemoveAll(w.dir); err != nil {
 		return nil, err
-	***REMOVED***
-	if err := os.Rename(tmpdirpath, w.dir); err != nil ***REMOVED***
+	}
+	if err := os.Rename(tmpdirpath, w.dir); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	w.fp = newFilePipeline(w.dir, SegmentSizeBytes)
 	df, err := fileutil.OpenDir(w.dir)
 	w.dirFile = df
 	return w, err
-***REMOVED***
+}

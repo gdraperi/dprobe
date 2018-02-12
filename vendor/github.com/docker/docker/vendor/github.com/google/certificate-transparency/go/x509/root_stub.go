@@ -6,9 +6,9 @@
 
 package x509
 
-func (c *Certificate) systemVerify(opts *VerifyOptions) (chains [][]*Certificate, err error) ***REMOVED***
+func (c *Certificate) systemVerify(opts *VerifyOptions) (chains [][]*Certificate, err error) {
 	return nil, nil
-***REMOVED***
+}
 
-func initSystemRoots() ***REMOVED***
-***REMOVED***
+func initSystemRoots() {
+}

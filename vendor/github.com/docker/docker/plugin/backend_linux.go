@@ -38,423 +38,423 @@ import (
 	"golang.org/x/net/context"
 )
 
-var acceptedPluginFilterTags = map[string]bool***REMOVED***
+var acceptedPluginFilterTags = map[string]bool{
 	"enabled":    true,
 	"capability": true,
-***REMOVED***
+}
 
 // Disable deactivates a plugin. This means resources (volumes, networks) cant use them.
-func (pm *Manager) Disable(refOrID string, config *types.PluginDisableConfig) error ***REMOVED***
+func (pm *Manager) Disable(refOrID string, config *types.PluginDisableConfig) error {
 	p, err := pm.config.Store.GetV2Plugin(refOrID)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	pm.mu.RLock()
 	c := pm.cMap[p]
 	pm.mu.RUnlock()
 
-	if !config.ForceDisable && p.GetRefCount() > 0 ***REMOVED***
+	if !config.ForceDisable && p.GetRefCount() > 0 {
 		return errors.WithStack(inUseError(p.Name()))
-	***REMOVED***
+	}
 
-	for _, typ := range p.GetTypes() ***REMOVED***
-		if typ.Capability == authorization.AuthZApiImplements ***REMOVED***
+	for _, typ := range p.GetTypes() {
+		if typ.Capability == authorization.AuthZApiImplements {
 			pm.config.AuthzMiddleware.RemovePlugin(p.Name())
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if err := pm.disable(p, c); err != nil ***REMOVED***
+	if err := pm.disable(p, c); err != nil {
 		return err
-	***REMOVED***
-	pm.publisher.Publish(EventDisable***REMOVED***Plugin: p.PluginObj***REMOVED***)
+	}
+	pm.publisher.Publish(EventDisable{Plugin: p.PluginObj})
 	pm.config.LogPluginEvent(p.GetID(), refOrID, "disable")
 	return nil
-***REMOVED***
+}
 
 // Enable activates a plugin, which implies that they are ready to be used by containers.
-func (pm *Manager) Enable(refOrID string, config *types.PluginEnableConfig) error ***REMOVED***
+func (pm *Manager) Enable(refOrID string, config *types.PluginEnableConfig) error {
 	p, err := pm.config.Store.GetV2Plugin(refOrID)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	c := &controller***REMOVED***timeoutInSecs: config.Timeout***REMOVED***
-	if err := pm.enable(p, c, false); err != nil ***REMOVED***
+	c := &controller{timeoutInSecs: config.Timeout}
+	if err := pm.enable(p, c, false); err != nil {
 		return err
-	***REMOVED***
-	pm.publisher.Publish(EventEnable***REMOVED***Plugin: p.PluginObj***REMOVED***)
+	}
+	pm.publisher.Publish(EventEnable{Plugin: p.PluginObj})
 	pm.config.LogPluginEvent(p.GetID(), refOrID, "enable")
 	return nil
-***REMOVED***
+}
 
 // Inspect examines a plugin config
-func (pm *Manager) Inspect(refOrID string) (tp *types.Plugin, err error) ***REMOVED***
+func (pm *Manager) Inspect(refOrID string) (tp *types.Plugin, err error) {
 	p, err := pm.config.Store.GetV2Plugin(refOrID)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	return &p.PluginObj, nil
-***REMOVED***
+}
 
-func (pm *Manager) pull(ctx context.Context, ref reference.Named, config *distribution.ImagePullConfig, outStream io.Writer) error ***REMOVED***
-	if outStream != nil ***REMOVED***
+func (pm *Manager) pull(ctx context.Context, ref reference.Named, config *distribution.ImagePullConfig, outStream io.Writer) error {
+	if outStream != nil {
 		// Include a buffer so that slow client connections don't affect
 		// transfer performance.
 		progressChan := make(chan progress.Progress, 100)
 
-		writesDone := make(chan struct***REMOVED******REMOVED***)
+		writesDone := make(chan struct{})
 
-		defer func() ***REMOVED***
+		defer func() {
 			close(progressChan)
 			<-writesDone
-		***REMOVED***()
+		}()
 
 		var cancelFunc context.CancelFunc
 		ctx, cancelFunc = context.WithCancel(ctx)
 
-		go func() ***REMOVED***
+		go func() {
 			progressutils.WriteDistributionProgress(cancelFunc, outStream, progressChan)
 			close(writesDone)
-		***REMOVED***()
+		}()
 
 		config.ProgressOutput = progress.ChanOutput(progressChan)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		config.ProgressOutput = progress.DiscardOutput()
-	***REMOVED***
+	}
 	return distribution.Pull(ctx, ref, config)
-***REMOVED***
+}
 
-type tempConfigStore struct ***REMOVED***
+type tempConfigStore struct {
 	config       []byte
 	configDigest digest.Digest
-***REMOVED***
+}
 
-func (s *tempConfigStore) Put(c []byte) (digest.Digest, error) ***REMOVED***
+func (s *tempConfigStore) Put(c []byte) (digest.Digest, error) {
 	dgst := digest.FromBytes(c)
 
 	s.config = c
 	s.configDigest = dgst
 
 	return dgst, nil
-***REMOVED***
+}
 
-func (s *tempConfigStore) Get(d digest.Digest) ([]byte, error) ***REMOVED***
-	if d != s.configDigest ***REMOVED***
+func (s *tempConfigStore) Get(d digest.Digest) ([]byte, error) {
+	if d != s.configDigest {
 		return nil, errNotFound("digest not found")
-	***REMOVED***
+	}
 	return s.config, nil
-***REMOVED***
+}
 
-func (s *tempConfigStore) RootFSAndOSFromConfig(c []byte) (*image.RootFS, string, error) ***REMOVED***
+func (s *tempConfigStore) RootFSAndOSFromConfig(c []byte) (*image.RootFS, string, error) {
 	return configToRootFS(c)
-***REMOVED***
+}
 
-func computePrivileges(c types.PluginConfig) types.PluginPrivileges ***REMOVED***
+func computePrivileges(c types.PluginConfig) types.PluginPrivileges {
 	var privileges types.PluginPrivileges
-	if c.Network.Type != "null" && c.Network.Type != "bridge" && c.Network.Type != "" ***REMOVED***
-		privileges = append(privileges, types.PluginPrivilege***REMOVED***
+	if c.Network.Type != "null" && c.Network.Type != "bridge" && c.Network.Type != "" {
+		privileges = append(privileges, types.PluginPrivilege{
 			Name:        "network",
 			Description: "permissions to access a network",
-			Value:       []string***REMOVED***c.Network.Type***REMOVED***,
-		***REMOVED***)
-	***REMOVED***
-	if c.IpcHost ***REMOVED***
-		privileges = append(privileges, types.PluginPrivilege***REMOVED***
+			Value:       []string{c.Network.Type},
+		})
+	}
+	if c.IpcHost {
+		privileges = append(privileges, types.PluginPrivilege{
 			Name:        "host ipc namespace",
 			Description: "allow access to host ipc namespace",
-			Value:       []string***REMOVED***"true"***REMOVED***,
-		***REMOVED***)
-	***REMOVED***
-	if c.PidHost ***REMOVED***
-		privileges = append(privileges, types.PluginPrivilege***REMOVED***
+			Value:       []string{"true"},
+		})
+	}
+	if c.PidHost {
+		privileges = append(privileges, types.PluginPrivilege{
 			Name:        "host pid namespace",
 			Description: "allow access to host pid namespace",
-			Value:       []string***REMOVED***"true"***REMOVED***,
-		***REMOVED***)
-	***REMOVED***
-	for _, mount := range c.Mounts ***REMOVED***
-		if mount.Source != nil ***REMOVED***
-			privileges = append(privileges, types.PluginPrivilege***REMOVED***
+			Value:       []string{"true"},
+		})
+	}
+	for _, mount := range c.Mounts {
+		if mount.Source != nil {
+			privileges = append(privileges, types.PluginPrivilege{
 				Name:        "mount",
 				Description: "host path to mount",
-				Value:       []string***REMOVED****mount.Source***REMOVED***,
-			***REMOVED***)
-		***REMOVED***
-	***REMOVED***
-	for _, device := range c.Linux.Devices ***REMOVED***
-		if device.Path != nil ***REMOVED***
-			privileges = append(privileges, types.PluginPrivilege***REMOVED***
+				Value:       []string{*mount.Source},
+			})
+		}
+	}
+	for _, device := range c.Linux.Devices {
+		if device.Path != nil {
+			privileges = append(privileges, types.PluginPrivilege{
 				Name:        "device",
 				Description: "host device to access",
-				Value:       []string***REMOVED****device.Path***REMOVED***,
-			***REMOVED***)
-		***REMOVED***
-	***REMOVED***
-	if c.Linux.AllowAllDevices ***REMOVED***
-		privileges = append(privileges, types.PluginPrivilege***REMOVED***
+				Value:       []string{*device.Path},
+			})
+		}
+	}
+	if c.Linux.AllowAllDevices {
+		privileges = append(privileges, types.PluginPrivilege{
 			Name:        "allow-all-devices",
 			Description: "allow 'rwm' access to all devices",
-			Value:       []string***REMOVED***"true"***REMOVED***,
-		***REMOVED***)
-	***REMOVED***
-	if len(c.Linux.Capabilities) > 0 ***REMOVED***
-		privileges = append(privileges, types.PluginPrivilege***REMOVED***
+			Value:       []string{"true"},
+		})
+	}
+	if len(c.Linux.Capabilities) > 0 {
+		privileges = append(privileges, types.PluginPrivilege{
 			Name:        "capabilities",
 			Description: "list of additional capabilities required",
 			Value:       c.Linux.Capabilities,
-		***REMOVED***)
-	***REMOVED***
+		})
+	}
 
 	return privileges
-***REMOVED***
+}
 
 // Privileges pulls a plugin config and computes the privileges required to install it.
-func (pm *Manager) Privileges(ctx context.Context, ref reference.Named, metaHeader http.Header, authConfig *types.AuthConfig) (types.PluginPrivileges, error) ***REMOVED***
+func (pm *Manager) Privileges(ctx context.Context, ref reference.Named, metaHeader http.Header, authConfig *types.AuthConfig) (types.PluginPrivileges, error) {
 	// create image store instance
-	cs := &tempConfigStore***REMOVED******REMOVED***
+	cs := &tempConfigStore{}
 
 	// DownloadManager not defined because only pulling configuration.
-	pluginPullConfig := &distribution.ImagePullConfig***REMOVED***
-		Config: distribution.Config***REMOVED***
+	pluginPullConfig := &distribution.ImagePullConfig{
+		Config: distribution.Config{
 			MetaHeaders:      metaHeader,
 			AuthConfig:       authConfig,
 			RegistryService:  pm.config.RegistryService,
-			ImageEventLogger: func(string, string, string) ***REMOVED******REMOVED***,
+			ImageEventLogger: func(string, string, string) {},
 			ImageStore:       cs,
-		***REMOVED***,
+		},
 		Schema2Types: distribution.PluginTypes,
-	***REMOVED***
+	}
 
-	if err := pm.pull(ctx, ref, pluginPullConfig, nil); err != nil ***REMOVED***
+	if err := pm.pull(ctx, ref, pluginPullConfig, nil); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	if cs.config == nil ***REMOVED***
+	if cs.config == nil {
 		return nil, errors.New("no configuration pulled")
-	***REMOVED***
+	}
 	var config types.PluginConfig
-	if err := json.Unmarshal(cs.config, &config); err != nil ***REMOVED***
+	if err := json.Unmarshal(cs.config, &config); err != nil {
 		return nil, errdefs.System(err)
-	***REMOVED***
+	}
 
 	return computePrivileges(config), nil
-***REMOVED***
+}
 
 // Upgrade upgrades a plugin
-func (pm *Manager) Upgrade(ctx context.Context, ref reference.Named, name string, metaHeader http.Header, authConfig *types.AuthConfig, privileges types.PluginPrivileges, outStream io.Writer) (err error) ***REMOVED***
+func (pm *Manager) Upgrade(ctx context.Context, ref reference.Named, name string, metaHeader http.Header, authConfig *types.AuthConfig, privileges types.PluginPrivileges, outStream io.Writer) (err error) {
 	p, err := pm.config.Store.GetV2Plugin(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if p.IsEnabled() ***REMOVED***
+	if p.IsEnabled() {
 		return errors.Wrap(enabledError(p.Name()), "plugin must be disabled before upgrading")
-	***REMOVED***
+	}
 
 	pm.muGC.RLock()
 	defer pm.muGC.RUnlock()
 
 	// revalidate because Pull is public
-	if _, err := reference.ParseNormalizedNamed(name); err != nil ***REMOVED***
+	if _, err := reference.ParseNormalizedNamed(name); err != nil {
 		return errors.Wrapf(errdefs.InvalidParameter(err), "failed to parse %q", name)
-	***REMOVED***
+	}
 
 	tmpRootFSDir, err := ioutil.TempDir(pm.tmpDir(), ".rootfs")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return errors.Wrap(errdefs.System(err), "error preparing upgrade")
-	***REMOVED***
+	}
 	defer os.RemoveAll(tmpRootFSDir)
 
-	dm := &downloadManager***REMOVED***
+	dm := &downloadManager{
 		tmpDir:    tmpRootFSDir,
 		blobStore: pm.blobStore,
-	***REMOVED***
+	}
 
-	pluginPullConfig := &distribution.ImagePullConfig***REMOVED***
-		Config: distribution.Config***REMOVED***
+	pluginPullConfig := &distribution.ImagePullConfig{
+		Config: distribution.Config{
 			MetaHeaders:      metaHeader,
 			AuthConfig:       authConfig,
 			RegistryService:  pm.config.RegistryService,
 			ImageEventLogger: pm.config.LogPluginEvent,
 			ImageStore:       dm,
-		***REMOVED***,
+		},
 		DownloadManager: dm, // todo: reevaluate if possible to substitute distribution/xfer dependencies instead
 		Schema2Types:    distribution.PluginTypes,
-	***REMOVED***
+	}
 
 	err = pm.pull(ctx, ref, pluginPullConfig, outStream)
-	if err != nil ***REMOVED***
+	if err != nil {
 		go pm.GC()
 		return err
-	***REMOVED***
+	}
 
-	if err := pm.upgradePlugin(p, dm.configDigest, dm.blobs, tmpRootFSDir, &privileges); err != nil ***REMOVED***
+	if err := pm.upgradePlugin(p, dm.configDigest, dm.blobs, tmpRootFSDir, &privileges); err != nil {
 		return err
-	***REMOVED***
+	}
 	p.PluginObj.PluginReference = ref.String()
 	return nil
-***REMOVED***
+}
 
 // Pull pulls a plugin, check if the correct privileges are provided and install the plugin.
-func (pm *Manager) Pull(ctx context.Context, ref reference.Named, name string, metaHeader http.Header, authConfig *types.AuthConfig, privileges types.PluginPrivileges, outStream io.Writer, opts ...CreateOpt) (err error) ***REMOVED***
+func (pm *Manager) Pull(ctx context.Context, ref reference.Named, name string, metaHeader http.Header, authConfig *types.AuthConfig, privileges types.PluginPrivileges, outStream io.Writer, opts ...CreateOpt) (err error) {
 	pm.muGC.RLock()
 	defer pm.muGC.RUnlock()
 
 	// revalidate because Pull is public
 	nameref, err := reference.ParseNormalizedNamed(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return errors.Wrapf(errdefs.InvalidParameter(err), "failed to parse %q", name)
-	***REMOVED***
+	}
 	name = reference.FamiliarString(reference.TagNameOnly(nameref))
 
-	if err := pm.config.Store.validateName(name); err != nil ***REMOVED***
+	if err := pm.config.Store.validateName(name); err != nil {
 		return errdefs.InvalidParameter(err)
-	***REMOVED***
+	}
 
 	tmpRootFSDir, err := ioutil.TempDir(pm.tmpDir(), ".rootfs")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return errors.Wrap(errdefs.System(err), "error preparing pull")
-	***REMOVED***
+	}
 	defer os.RemoveAll(tmpRootFSDir)
 
-	dm := &downloadManager***REMOVED***
+	dm := &downloadManager{
 		tmpDir:    tmpRootFSDir,
 		blobStore: pm.blobStore,
-	***REMOVED***
+	}
 
-	pluginPullConfig := &distribution.ImagePullConfig***REMOVED***
-		Config: distribution.Config***REMOVED***
+	pluginPullConfig := &distribution.ImagePullConfig{
+		Config: distribution.Config{
 			MetaHeaders:      metaHeader,
 			AuthConfig:       authConfig,
 			RegistryService:  pm.config.RegistryService,
 			ImageEventLogger: pm.config.LogPluginEvent,
 			ImageStore:       dm,
-		***REMOVED***,
+		},
 		DownloadManager: dm, // todo: reevaluate if possible to substitute distribution/xfer dependencies instead
 		Schema2Types:    distribution.PluginTypes,
-	***REMOVED***
+	}
 
 	err = pm.pull(ctx, ref, pluginPullConfig, outStream)
-	if err != nil ***REMOVED***
+	if err != nil {
 		go pm.GC()
 		return err
-	***REMOVED***
+	}
 
-	refOpt := func(p *v2.Plugin) ***REMOVED***
+	refOpt := func(p *v2.Plugin) {
 		p.PluginObj.PluginReference = ref.String()
-	***REMOVED***
+	}
 	optsList := make([]CreateOpt, 0, len(opts)+1)
 	optsList = append(optsList, opts...)
 	optsList = append(optsList, refOpt)
 
 	p, err := pm.createPlugin(name, dm.configDigest, dm.blobs, tmpRootFSDir, &privileges, optsList...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	pm.publisher.Publish(EventCreate***REMOVED***Plugin: p.PluginObj***REMOVED***)
+	pm.publisher.Publish(EventCreate{Plugin: p.PluginObj})
 	return nil
-***REMOVED***
+}
 
 // List displays the list of plugins and associated metadata.
-func (pm *Manager) List(pluginFilters filters.Args) ([]types.Plugin, error) ***REMOVED***
-	if err := pluginFilters.Validate(acceptedPluginFilterTags); err != nil ***REMOVED***
+func (pm *Manager) List(pluginFilters filters.Args) ([]types.Plugin, error) {
+	if err := pluginFilters.Validate(acceptedPluginFilterTags); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	enabledOnly := false
 	disabledOnly := false
-	if pluginFilters.Contains("enabled") ***REMOVED***
-		if pluginFilters.ExactMatch("enabled", "true") ***REMOVED***
+	if pluginFilters.Contains("enabled") {
+		if pluginFilters.ExactMatch("enabled", "true") {
 			enabledOnly = true
-		***REMOVED*** else if pluginFilters.ExactMatch("enabled", "false") ***REMOVED***
+		} else if pluginFilters.ExactMatch("enabled", "false") {
 			disabledOnly = true
-		***REMOVED*** else ***REMOVED***
-			return nil, invalidFilter***REMOVED***"enabled", pluginFilters.Get("enabled")***REMOVED***
-		***REMOVED***
-	***REMOVED***
+		} else {
+			return nil, invalidFilter{"enabled", pluginFilters.Get("enabled")}
+		}
+	}
 
 	plugins := pm.config.Store.GetAll()
 	out := make([]types.Plugin, 0, len(plugins))
 
 next:
-	for _, p := range plugins ***REMOVED***
-		if enabledOnly && !p.PluginObj.Enabled ***REMOVED***
+	for _, p := range plugins {
+		if enabledOnly && !p.PluginObj.Enabled {
 			continue
-		***REMOVED***
-		if disabledOnly && p.PluginObj.Enabled ***REMOVED***
+		}
+		if disabledOnly && p.PluginObj.Enabled {
 			continue
-		***REMOVED***
-		if pluginFilters.Contains("capability") ***REMOVED***
-			for _, f := range p.GetTypes() ***REMOVED***
-				if !pluginFilters.Match("capability", f.Capability) ***REMOVED***
+		}
+		if pluginFilters.Contains("capability") {
+			for _, f := range p.GetTypes() {
+				if !pluginFilters.Match("capability", f.Capability) {
 					continue next
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
+				}
+			}
+		}
 		out = append(out, p.PluginObj)
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
 // Push pushes a plugin to the store.
-func (pm *Manager) Push(ctx context.Context, name string, metaHeader http.Header, authConfig *types.AuthConfig, outStream io.Writer) error ***REMOVED***
+func (pm *Manager) Push(ctx context.Context, name string, metaHeader http.Header, authConfig *types.AuthConfig, outStream io.Writer) error {
 	p, err := pm.config.Store.GetV2Plugin(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	ref, err := reference.ParseNormalizedNamed(p.Name())
-	if err != nil ***REMOVED***
+	if err != nil {
 		return errors.Wrapf(err, "plugin has invalid name %v for push", p.Name())
-	***REMOVED***
+	}
 
 	var po progress.Output
-	if outStream != nil ***REMOVED***
+	if outStream != nil {
 		// Include a buffer so that slow client connections don't affect
 		// transfer performance.
 		progressChan := make(chan progress.Progress, 100)
 
-		writesDone := make(chan struct***REMOVED******REMOVED***)
+		writesDone := make(chan struct{})
 
-		defer func() ***REMOVED***
+		defer func() {
 			close(progressChan)
 			<-writesDone
-		***REMOVED***()
+		}()
 
 		var cancelFunc context.CancelFunc
 		ctx, cancelFunc = context.WithCancel(ctx)
 
-		go func() ***REMOVED***
+		go func() {
 			progressutils.WriteDistributionProgress(cancelFunc, outStream, progressChan)
 			close(writesDone)
-		***REMOVED***()
+		}()
 
 		po = progress.ChanOutput(progressChan)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		po = progress.DiscardOutput()
-	***REMOVED***
+	}
 
 	// TODO: replace these with manager
-	is := &pluginConfigStore***REMOVED***
+	is := &pluginConfigStore{
 		pm:     pm,
 		plugin: p,
-	***REMOVED***
+	}
 	lss := make(map[string]distribution.PushLayerProvider)
-	lss[runtime.GOOS] = &pluginLayerProvider***REMOVED***
+	lss[runtime.GOOS] = &pluginLayerProvider{
 		pm:     pm,
 		plugin: p,
-	***REMOVED***
-	rs := &pluginReference***REMOVED***
+	}
+	rs := &pluginReference{
 		name:     ref,
 		pluginID: p.Config,
-	***REMOVED***
+	}
 
 	uploadManager := xfer.NewLayerUploadManager(3)
 
-	imagePushConfig := &distribution.ImagePushConfig***REMOVED***
-		Config: distribution.Config***REMOVED***
+	imagePushConfig := &distribution.ImagePushConfig{
+		Config: distribution.Config{
 			MetaHeaders:      metaHeader,
 			AuthConfig:       authConfig,
 			ProgressOutput:   po,
@@ -463,403 +463,403 @@ func (pm *Manager) Push(ctx context.Context, name string, metaHeader http.Header
 			ImageEventLogger: pm.config.LogPluginEvent,
 			ImageStore:       is,
 			RequireSchema2:   true,
-		***REMOVED***,
+		},
 		ConfigMediaType: schema2.MediaTypePluginConfig,
 		LayerStores:     lss,
 		UploadManager:   uploadManager,
-	***REMOVED***
+	}
 
 	return distribution.Push(ctx, ref, imagePushConfig)
-***REMOVED***
+}
 
-type pluginReference struct ***REMOVED***
+type pluginReference struct {
 	name     reference.Named
 	pluginID digest.Digest
-***REMOVED***
+}
 
-func (r *pluginReference) References(id digest.Digest) []reference.Named ***REMOVED***
-	if r.pluginID != id ***REMOVED***
+func (r *pluginReference) References(id digest.Digest) []reference.Named {
+	if r.pluginID != id {
 		return nil
-	***REMOVED***
-	return []reference.Named***REMOVED***r.name***REMOVED***
-***REMOVED***
+	}
+	return []reference.Named{r.name}
+}
 
-func (r *pluginReference) ReferencesByName(ref reference.Named) []refstore.Association ***REMOVED***
-	return []refstore.Association***REMOVED***
-		***REMOVED***
+func (r *pluginReference) ReferencesByName(ref reference.Named) []refstore.Association {
+	return []refstore.Association{
+		{
 			Ref: r.name,
 			ID:  r.pluginID,
-		***REMOVED***,
-	***REMOVED***
-***REMOVED***
+		},
+	}
+}
 
-func (r *pluginReference) Get(ref reference.Named) (digest.Digest, error) ***REMOVED***
-	if r.name.String() != ref.String() ***REMOVED***
+func (r *pluginReference) Get(ref reference.Named) (digest.Digest, error) {
+	if r.name.String() != ref.String() {
 		return digest.Digest(""), refstore.ErrDoesNotExist
-	***REMOVED***
+	}
 	return r.pluginID, nil
-***REMOVED***
+}
 
-func (r *pluginReference) AddTag(ref reference.Named, id digest.Digest, force bool) error ***REMOVED***
+func (r *pluginReference) AddTag(ref reference.Named, id digest.Digest, force bool) error {
 	// Read only, ignore
 	return nil
-***REMOVED***
-func (r *pluginReference) AddDigest(ref reference.Canonical, id digest.Digest, force bool) error ***REMOVED***
+}
+func (r *pluginReference) AddDigest(ref reference.Canonical, id digest.Digest, force bool) error {
 	// Read only, ignore
 	return nil
-***REMOVED***
-func (r *pluginReference) Delete(ref reference.Named) (bool, error) ***REMOVED***
+}
+func (r *pluginReference) Delete(ref reference.Named) (bool, error) {
 	// Read only, ignore
 	return false, nil
-***REMOVED***
+}
 
-type pluginConfigStore struct ***REMOVED***
+type pluginConfigStore struct {
 	pm     *Manager
 	plugin *v2.Plugin
-***REMOVED***
+}
 
-func (s *pluginConfigStore) Put([]byte) (digest.Digest, error) ***REMOVED***
+func (s *pluginConfigStore) Put([]byte) (digest.Digest, error) {
 	return digest.Digest(""), errors.New("cannot store config on push")
-***REMOVED***
+}
 
-func (s *pluginConfigStore) Get(d digest.Digest) ([]byte, error) ***REMOVED***
-	if s.plugin.Config != d ***REMOVED***
+func (s *pluginConfigStore) Get(d digest.Digest) ([]byte, error) {
+	if s.plugin.Config != d {
 		return nil, errors.New("plugin not found")
-	***REMOVED***
+	}
 	rwc, err := s.pm.blobStore.Get(d)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	defer rwc.Close()
 	return ioutil.ReadAll(rwc)
-***REMOVED***
+}
 
-func (s *pluginConfigStore) RootFSAndOSFromConfig(c []byte) (*image.RootFS, string, error) ***REMOVED***
+func (s *pluginConfigStore) RootFSAndOSFromConfig(c []byte) (*image.RootFS, string, error) {
 	return configToRootFS(c)
-***REMOVED***
+}
 
-type pluginLayerProvider struct ***REMOVED***
+type pluginLayerProvider struct {
 	pm     *Manager
 	plugin *v2.Plugin
-***REMOVED***
+}
 
-func (p *pluginLayerProvider) Get(id layer.ChainID) (distribution.PushLayer, error) ***REMOVED***
+func (p *pluginLayerProvider) Get(id layer.ChainID) (distribution.PushLayer, error) {
 	rootFS := rootFSFromPlugin(p.plugin.PluginObj.Config.Rootfs)
 	var i int
-	for i = 1; i <= len(rootFS.DiffIDs); i++ ***REMOVED***
-		if layer.CreateChainID(rootFS.DiffIDs[:i]) == id ***REMOVED***
+	for i = 1; i <= len(rootFS.DiffIDs); i++ {
+		if layer.CreateChainID(rootFS.DiffIDs[:i]) == id {
 			break
-		***REMOVED***
-	***REMOVED***
-	if i > len(rootFS.DiffIDs) ***REMOVED***
+		}
+	}
+	if i > len(rootFS.DiffIDs) {
 		return nil, errors.New("layer not found")
-	***REMOVED***
-	return &pluginLayer***REMOVED***
+	}
+	return &pluginLayer{
 		pm:      p.pm,
 		diffIDs: rootFS.DiffIDs[:i],
 		blobs:   p.plugin.Blobsums[:i],
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-type pluginLayer struct ***REMOVED***
+type pluginLayer struct {
 	pm      *Manager
 	diffIDs []layer.DiffID
 	blobs   []digest.Digest
-***REMOVED***
+}
 
-func (l *pluginLayer) ChainID() layer.ChainID ***REMOVED***
+func (l *pluginLayer) ChainID() layer.ChainID {
 	return layer.CreateChainID(l.diffIDs)
-***REMOVED***
+}
 
-func (l *pluginLayer) DiffID() layer.DiffID ***REMOVED***
+func (l *pluginLayer) DiffID() layer.DiffID {
 	return l.diffIDs[len(l.diffIDs)-1]
-***REMOVED***
+}
 
-func (l *pluginLayer) Parent() distribution.PushLayer ***REMOVED***
-	if len(l.diffIDs) == 1 ***REMOVED***
+func (l *pluginLayer) Parent() distribution.PushLayer {
+	if len(l.diffIDs) == 1 {
 		return nil
-	***REMOVED***
-	return &pluginLayer***REMOVED***
+	}
+	return &pluginLayer{
 		pm:      l.pm,
 		diffIDs: l.diffIDs[:len(l.diffIDs)-1],
 		blobs:   l.blobs[:len(l.diffIDs)-1],
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (l *pluginLayer) Open() (io.ReadCloser, error) ***REMOVED***
+func (l *pluginLayer) Open() (io.ReadCloser, error) {
 	return l.pm.blobStore.Get(l.blobs[len(l.diffIDs)-1])
-***REMOVED***
+}
 
-func (l *pluginLayer) Size() (int64, error) ***REMOVED***
+func (l *pluginLayer) Size() (int64, error) {
 	return l.pm.blobStore.Size(l.blobs[len(l.diffIDs)-1])
-***REMOVED***
+}
 
-func (l *pluginLayer) MediaType() string ***REMOVED***
+func (l *pluginLayer) MediaType() string {
 	return schema2.MediaTypeLayer
-***REMOVED***
+}
 
-func (l *pluginLayer) Release() ***REMOVED***
+func (l *pluginLayer) Release() {
 	// Nothing needs to be release, no references held
-***REMOVED***
+}
 
 // Remove deletes plugin's root directory.
-func (pm *Manager) Remove(name string, config *types.PluginRmConfig) error ***REMOVED***
+func (pm *Manager) Remove(name string, config *types.PluginRmConfig) error {
 	p, err := pm.config.Store.GetV2Plugin(name)
 	pm.mu.RLock()
 	c := pm.cMap[p]
 	pm.mu.RUnlock()
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if !config.ForceRemove ***REMOVED***
-		if p.GetRefCount() > 0 ***REMOVED***
+	if !config.ForceRemove {
+		if p.GetRefCount() > 0 {
 			return inUseError(p.Name())
-		***REMOVED***
-		if p.IsEnabled() ***REMOVED***
+		}
+		if p.IsEnabled() {
 			return enabledError(p.Name())
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if p.IsEnabled() ***REMOVED***
-		if err := pm.disable(p, c); err != nil ***REMOVED***
+	if p.IsEnabled() {
+		if err := pm.disable(p, c); err != nil {
 			logrus.Errorf("failed to disable plugin '%s': %s", p.Name(), err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	defer func() ***REMOVED***
+	defer func() {
 		go pm.GC()
-	***REMOVED***()
+	}()
 
 	id := p.GetID()
 	pluginDir := filepath.Join(pm.config.Root, id)
 
-	if err := mount.RecursiveUnmount(pluginDir); err != nil ***REMOVED***
+	if err := mount.RecursiveUnmount(pluginDir); err != nil {
 		return errors.Wrap(err, "error unmounting plugin data")
-	***REMOVED***
+	}
 
-	if err := atomicRemoveAll(pluginDir); err != nil ***REMOVED***
+	if err := atomicRemoveAll(pluginDir); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	pm.config.Store.Remove(p)
 	pm.config.LogPluginEvent(id, name, "remove")
-	pm.publisher.Publish(EventRemove***REMOVED***Plugin: p.PluginObj***REMOVED***)
+	pm.publisher.Publish(EventRemove{Plugin: p.PluginObj})
 	return nil
-***REMOVED***
+}
 
 // Set sets plugin args
-func (pm *Manager) Set(name string, args []string) error ***REMOVED***
+func (pm *Manager) Set(name string, args []string) error {
 	p, err := pm.config.Store.GetV2Plugin(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	if err := p.Set(args); err != nil ***REMOVED***
+	}
+	if err := p.Set(args); err != nil {
 		return err
-	***REMOVED***
+	}
 	return pm.save(p)
-***REMOVED***
+}
 
 // CreateFromContext creates a plugin from the given pluginDir which contains
 // both the rootfs and the config.json and a repoName with optional tag.
-func (pm *Manager) CreateFromContext(ctx context.Context, tarCtx io.ReadCloser, options *types.PluginCreateOptions) (err error) ***REMOVED***
+func (pm *Manager) CreateFromContext(ctx context.Context, tarCtx io.ReadCloser, options *types.PluginCreateOptions) (err error) {
 	pm.muGC.RLock()
 	defer pm.muGC.RUnlock()
 
 	ref, err := reference.ParseNormalizedNamed(options.RepoName)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return errors.Wrapf(err, "failed to parse reference %v", options.RepoName)
-	***REMOVED***
-	if _, ok := ref.(reference.Canonical); ok ***REMOVED***
+	}
+	if _, ok := ref.(reference.Canonical); ok {
 		return errors.Errorf("canonical references are not permitted")
-	***REMOVED***
+	}
 	name := reference.FamiliarString(reference.TagNameOnly(ref))
 
-	if err := pm.config.Store.validateName(name); err != nil ***REMOVED*** // fast check, real check is in createPlugin()
+	if err := pm.config.Store.validateName(name); err != nil { // fast check, real check is in createPlugin()
 		return err
-	***REMOVED***
+	}
 
 	tmpRootFSDir, err := ioutil.TempDir(pm.tmpDir(), ".rootfs")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return errors.Wrap(err, "failed to create temp directory")
-	***REMOVED***
+	}
 	defer os.RemoveAll(tmpRootFSDir)
 
 	var configJSON []byte
 	rootFS := splitConfigRootFSFromTar(tarCtx, &configJSON)
 
 	rootFSBlob, err := pm.blobStore.New()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer rootFSBlob.Close()
 	gzw := gzip.NewWriter(rootFSBlob)
 	layerDigester := digest.Canonical.Digester()
 	rootFSReader := io.TeeReader(rootFS, io.MultiWriter(gzw, layerDigester.Hash()))
 
-	if err := chrootarchive.Untar(rootFSReader, tmpRootFSDir, nil); err != nil ***REMOVED***
+	if err := chrootarchive.Untar(rootFSReader, tmpRootFSDir, nil); err != nil {
 		return err
-	***REMOVED***
-	if err := rootFS.Close(); err != nil ***REMOVED***
+	}
+	if err := rootFS.Close(); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if configJSON == nil ***REMOVED***
+	if configJSON == nil {
 		return errors.New("config not found")
-	***REMOVED***
+	}
 
-	if err := gzw.Close(); err != nil ***REMOVED***
+	if err := gzw.Close(); err != nil {
 		return errors.Wrap(err, "error closing gzip writer")
-	***REMOVED***
+	}
 
 	var config types.PluginConfig
-	if err := json.Unmarshal(configJSON, &config); err != nil ***REMOVED***
+	if err := json.Unmarshal(configJSON, &config); err != nil {
 		return errors.Wrap(err, "failed to parse config")
-	***REMOVED***
+	}
 
-	if err := pm.validateConfig(config); err != nil ***REMOVED***
+	if err := pm.validateConfig(config); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	pm.mu.Lock()
 	defer pm.mu.Unlock()
 
 	rootFSBlobsum, err := rootFSBlob.Commit()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	defer func() ***REMOVED***
-		if err != nil ***REMOVED***
+	}
+	defer func() {
+		if err != nil {
 			go pm.GC()
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
-	config.Rootfs = &types.PluginConfigRootfs***REMOVED***
+	config.Rootfs = &types.PluginConfigRootfs{
 		Type:    "layers",
-		DiffIds: []string***REMOVED***layerDigester.Digest().String()***REMOVED***,
-	***REMOVED***
+		DiffIds: []string{layerDigester.Digest().String()},
+	}
 
 	config.DockerVersion = dockerversion.Version
 
 	configBlob, err := pm.blobStore.New()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer configBlob.Close()
-	if err := json.NewEncoder(configBlob).Encode(config); err != nil ***REMOVED***
+	if err := json.NewEncoder(configBlob).Encode(config); err != nil {
 		return errors.Wrap(err, "error encoding json config")
-	***REMOVED***
+	}
 	configBlobsum, err := configBlob.Commit()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	p, err := pm.createPlugin(name, configBlobsum, []digest.Digest***REMOVED***rootFSBlobsum***REMOVED***, tmpRootFSDir, nil)
-	if err != nil ***REMOVED***
+	p, err := pm.createPlugin(name, configBlobsum, []digest.Digest{rootFSBlobsum}, tmpRootFSDir, nil)
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	p.PluginObj.PluginReference = name
 
-	pm.publisher.Publish(EventCreate***REMOVED***Plugin: p.PluginObj***REMOVED***)
+	pm.publisher.Publish(EventCreate{Plugin: p.PluginObj})
 	pm.config.LogPluginEvent(p.PluginObj.ID, name, "create")
 
 	return nil
-***REMOVED***
+}
 
-func (pm *Manager) validateConfig(config types.PluginConfig) error ***REMOVED***
+func (pm *Manager) validateConfig(config types.PluginConfig) error {
 	return nil // TODO:
-***REMOVED***
+}
 
-func splitConfigRootFSFromTar(in io.ReadCloser, config *[]byte) io.ReadCloser ***REMOVED***
+func splitConfigRootFSFromTar(in io.ReadCloser, config *[]byte) io.ReadCloser {
 	pr, pw := io.Pipe()
-	go func() ***REMOVED***
+	go func() {
 		tarReader := tar.NewReader(in)
 		tarWriter := tar.NewWriter(pw)
 		defer in.Close()
 
 		hasRootFS := false
 
-		for ***REMOVED***
+		for {
 			hdr, err := tarReader.Next()
-			if err == io.EOF ***REMOVED***
-				if !hasRootFS ***REMOVED***
+			if err == io.EOF {
+				if !hasRootFS {
 					pw.CloseWithError(errors.Wrap(err, "no rootfs found"))
 					return
-				***REMOVED***
+				}
 				// Signals end of archive.
 				tarWriter.Close()
 				pw.Close()
 				return
-			***REMOVED***
-			if err != nil ***REMOVED***
+			}
+			if err != nil {
 				pw.CloseWithError(errors.Wrap(err, "failed to read from tar"))
 				return
-			***REMOVED***
+			}
 
 			content := io.Reader(tarReader)
 			name := path.Clean(hdr.Name)
-			if path.IsAbs(name) ***REMOVED***
+			if path.IsAbs(name) {
 				name = name[1:]
-			***REMOVED***
-			if name == configFileName ***REMOVED***
+			}
+			if name == configFileName {
 				dt, err := ioutil.ReadAll(content)
-				if err != nil ***REMOVED***
+				if err != nil {
 					pw.CloseWithError(errors.Wrapf(err, "failed to read %s", configFileName))
 					return
-				***REMOVED***
+				}
 				*config = dt
-			***REMOVED***
-			if parts := strings.Split(name, "/"); len(parts) != 0 && parts[0] == rootFSFileName ***REMOVED***
+			}
+			if parts := strings.Split(name, "/"); len(parts) != 0 && parts[0] == rootFSFileName {
 				hdr.Name = path.Clean(path.Join(parts[1:]...))
-				if hdr.Typeflag == tar.TypeLink && strings.HasPrefix(strings.ToLower(hdr.Linkname), rootFSFileName+"/") ***REMOVED***
+				if hdr.Typeflag == tar.TypeLink && strings.HasPrefix(strings.ToLower(hdr.Linkname), rootFSFileName+"/") {
 					hdr.Linkname = hdr.Linkname[len(rootFSFileName)+1:]
-				***REMOVED***
-				if err := tarWriter.WriteHeader(hdr); err != nil ***REMOVED***
+				}
+				if err := tarWriter.WriteHeader(hdr); err != nil {
 					pw.CloseWithError(errors.Wrap(err, "error writing tar header"))
 					return
-				***REMOVED***
-				if _, err := pools.Copy(tarWriter, content); err != nil ***REMOVED***
+				}
+				if _, err := pools.Copy(tarWriter, content); err != nil {
 					pw.CloseWithError(errors.Wrap(err, "error copying tar data"))
 					return
-				***REMOVED***
+				}
 				hasRootFS = true
-			***REMOVED*** else ***REMOVED***
+			} else {
 				io.Copy(ioutil.Discard, content)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***()
+			}
+		}
+	}()
 	return pr
-***REMOVED***
+}
 
-func atomicRemoveAll(dir string) error ***REMOVED***
+func atomicRemoveAll(dir string) error {
 	renamed := dir + "-removing"
 
 	err := os.Rename(dir, renamed)
-	switch ***REMOVED***
+	switch {
 	case os.IsNotExist(err), err == nil:
 		// even if `dir` doesn't exist, we can still try and remove `renamed`
 	case os.IsExist(err):
 		// Some previous remove failed, check if the origin dir exists
-		if e := system.EnsureRemoveAll(renamed); e != nil ***REMOVED***
+		if e := system.EnsureRemoveAll(renamed); e != nil {
 			return errors.Wrap(err, "rename target already exists and could not be removed")
-		***REMOVED***
-		if _, err := os.Stat(dir); os.IsNotExist(err) ***REMOVED***
+		}
+		if _, err := os.Stat(dir); os.IsNotExist(err) {
 			// origin doesn't exist, nothing left to do
 			return nil
-		***REMOVED***
+		}
 
 		// attempt to rename again
-		if err := os.Rename(dir, renamed); err != nil ***REMOVED***
+		if err := os.Rename(dir, renamed); err != nil {
 			return errors.Wrap(err, "failed to rename dir for atomic removal")
-		***REMOVED***
+		}
 	default:
 		return errors.Wrap(err, "failed to rename dir for atomic removal")
-	***REMOVED***
+	}
 
-	if err := system.EnsureRemoveAll(renamed); err != nil ***REMOVED***
+	if err := system.EnsureRemoveAll(renamed); err != nil {
 		os.Rename(renamed, dir)
 		return err
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

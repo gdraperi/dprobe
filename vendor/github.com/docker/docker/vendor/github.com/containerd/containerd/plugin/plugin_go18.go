@@ -11,11 +11,11 @@ import (
 
 // loadPlugins loads all plugins for the OS and Arch
 // that containerd is built for inside the provided path
-func loadPlugins(path string) error ***REMOVED***
+func loadPlugins(path string) error {
 	abs, err := filepath.Abs(path)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	pattern := filepath.Join(abs, fmt.Sprintf(
 		"*-%s-%s.%s",
 		runtime.GOOS,
@@ -23,24 +23,24 @@ func loadPlugins(path string) error ***REMOVED***
 		getLibExt(),
 	))
 	libs, err := filepath.Glob(pattern)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	for _, lib := range libs ***REMOVED***
-		if _, err := plugin.Open(lib); err != nil ***REMOVED***
+	}
+	for _, lib := range libs {
+		if _, err := plugin.Open(lib); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
 // getLibExt returns a platform specific lib extension for
 // the platform that containerd is running on
-func getLibExt() string ***REMOVED***
-	switch runtime.GOOS ***REMOVED***
+func getLibExt() string {
+	switch runtime.GOOS {
 	case "windows":
 		return "dll"
 	default:
 		return "so"
-	***REMOVED***
-***REMOVED***
+	}
+}

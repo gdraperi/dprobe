@@ -4,16 +4,16 @@ import "github.com/docker/swarmkit/api"
 
 // By is an interface type passed to Find methods. Implementations must be
 // defined in this package.
-type By interface ***REMOVED***
+type By interface {
 	// isBy allows this interface to only be satisfied by certain internal
 	// types.
 	isBy()
-***REMOVED***
+}
 
-type byAll struct***REMOVED******REMOVED***
+type byAll struct{}
 
-func (a byAll) isBy() ***REMOVED***
-***REMOVED***
+func (a byAll) isBy() {
+}
 
 // All is an argument that can be passed to find to list all items in the
 // set.
@@ -21,194 +21,194 @@ var All byAll
 
 type byNamePrefix string
 
-func (b byNamePrefix) isBy() ***REMOVED***
-***REMOVED***
+func (b byNamePrefix) isBy() {
+}
 
 // ByNamePrefix creates an object to pass to Find to select by query.
-func ByNamePrefix(namePrefix string) By ***REMOVED***
+func ByNamePrefix(namePrefix string) By {
 	return byNamePrefix(namePrefix)
-***REMOVED***
+}
 
 type byIDPrefix string
 
-func (b byIDPrefix) isBy() ***REMOVED***
-***REMOVED***
+func (b byIDPrefix) isBy() {
+}
 
 // ByIDPrefix creates an object to pass to Find to select by query.
-func ByIDPrefix(idPrefix string) By ***REMOVED***
+func ByIDPrefix(idPrefix string) By {
 	return byIDPrefix(idPrefix)
-***REMOVED***
+}
 
 type byName string
 
-func (b byName) isBy() ***REMOVED***
-***REMOVED***
+func (b byName) isBy() {
+}
 
 // ByName creates an object to pass to Find to select by name.
-func ByName(name string) By ***REMOVED***
+func ByName(name string) By {
 	return byName(name)
-***REMOVED***
+}
 
 type byService string
 
-func (b byService) isBy() ***REMOVED***
-***REMOVED***
+func (b byService) isBy() {
+}
 
 type byRuntime string
 
-func (b byRuntime) isBy() ***REMOVED***
-***REMOVED***
+func (b byRuntime) isBy() {
+}
 
 // ByRuntime creates an object to pass to Find to select by runtime.
-func ByRuntime(runtime string) By ***REMOVED***
+func ByRuntime(runtime string) By {
 	return byRuntime(runtime)
-***REMOVED***
+}
 
 // ByServiceID creates an object to pass to Find to select by service.
-func ByServiceID(serviceID string) By ***REMOVED***
+func ByServiceID(serviceID string) By {
 	return byService(serviceID)
-***REMOVED***
+}
 
 type byNode string
 
-func (b byNode) isBy() ***REMOVED***
-***REMOVED***
+func (b byNode) isBy() {
+}
 
 // ByNodeID creates an object to pass to Find to select by node.
-func ByNodeID(nodeID string) By ***REMOVED***
+func ByNodeID(nodeID string) By {
 	return byNode(nodeID)
-***REMOVED***
+}
 
-type bySlot struct ***REMOVED***
+type bySlot struct {
 	serviceID string
 	slot      uint64
-***REMOVED***
+}
 
-func (b bySlot) isBy() ***REMOVED***
-***REMOVED***
+func (b bySlot) isBy() {
+}
 
 // BySlot creates an object to pass to Find to select by slot.
-func BySlot(serviceID string, slot uint64) By ***REMOVED***
-	return bySlot***REMOVED***serviceID: serviceID, slot: slot***REMOVED***
-***REMOVED***
+func BySlot(serviceID string, slot uint64) By {
+	return bySlot{serviceID: serviceID, slot: slot}
+}
 
 type byDesiredState api.TaskState
 
-func (b byDesiredState) isBy() ***REMOVED***
-***REMOVED***
+func (b byDesiredState) isBy() {
+}
 
 // ByDesiredState creates an object to pass to Find to select by desired state.
-func ByDesiredState(state api.TaskState) By ***REMOVED***
+func ByDesiredState(state api.TaskState) By {
 	return byDesiredState(state)
-***REMOVED***
+}
 
 type byTaskState api.TaskState
 
-func (b byTaskState) isBy() ***REMOVED***
-***REMOVED***
+func (b byTaskState) isBy() {
+}
 
 // ByTaskState creates an object to pass to Find to select by task state.
-func ByTaskState(state api.TaskState) By ***REMOVED***
+func ByTaskState(state api.TaskState) By {
 	return byTaskState(state)
-***REMOVED***
+}
 
 type byRole api.NodeRole
 
-func (b byRole) isBy() ***REMOVED***
-***REMOVED***
+func (b byRole) isBy() {
+}
 
 // ByRole creates an object to pass to Find to select by role.
-func ByRole(role api.NodeRole) By ***REMOVED***
+func ByRole(role api.NodeRole) By {
 	return byRole(role)
-***REMOVED***
+}
 
 type byMembership api.NodeSpec_Membership
 
-func (b byMembership) isBy() ***REMOVED***
-***REMOVED***
+func (b byMembership) isBy() {
+}
 
 // ByMembership creates an object to pass to Find to select by Membership.
-func ByMembership(membership api.NodeSpec_Membership) By ***REMOVED***
+func ByMembership(membership api.NodeSpec_Membership) By {
 	return byMembership(membership)
-***REMOVED***
+}
 
 type byReferencedNetworkID string
 
-func (b byReferencedNetworkID) isBy() ***REMOVED***
-***REMOVED***
+func (b byReferencedNetworkID) isBy() {
+}
 
 // ByReferencedNetworkID creates an object to pass to Find to search for a
 // service or task that references a network with the given ID.
-func ByReferencedNetworkID(networkID string) By ***REMOVED***
+func ByReferencedNetworkID(networkID string) By {
 	return byReferencedNetworkID(networkID)
-***REMOVED***
+}
 
 type byReferencedSecretID string
 
-func (b byReferencedSecretID) isBy() ***REMOVED***
-***REMOVED***
+func (b byReferencedSecretID) isBy() {
+}
 
 // ByReferencedSecretID creates an object to pass to Find to search for a
 // service or task that references a secret with the given ID.
-func ByReferencedSecretID(secretID string) By ***REMOVED***
+func ByReferencedSecretID(secretID string) By {
 	return byReferencedSecretID(secretID)
-***REMOVED***
+}
 
 type byReferencedConfigID string
 
-func (b byReferencedConfigID) isBy() ***REMOVED***
-***REMOVED***
+func (b byReferencedConfigID) isBy() {
+}
 
 // ByReferencedConfigID creates an object to pass to Find to search for a
 // service or task that references a config with the given ID.
-func ByReferencedConfigID(configID string) By ***REMOVED***
+func ByReferencedConfigID(configID string) By {
 	return byReferencedConfigID(configID)
-***REMOVED***
+}
 
 type byKind string
 
-func (b byKind) isBy() ***REMOVED***
-***REMOVED***
+func (b byKind) isBy() {
+}
 
 // ByKind creates an object to pass to Find to search for a Resource of a
 // particular kind.
-func ByKind(kind string) By ***REMOVED***
+func ByKind(kind string) By {
 	return byKind(kind)
-***REMOVED***
+}
 
-type byCustom struct ***REMOVED***
+type byCustom struct {
 	objType string
 	index   string
 	value   string
-***REMOVED***
+}
 
-func (b byCustom) isBy() ***REMOVED***
-***REMOVED***
+func (b byCustom) isBy() {
+}
 
 // ByCustom creates an object to pass to Find to search a custom index.
-func ByCustom(objType, index, value string) By ***REMOVED***
-	return byCustom***REMOVED***
+func ByCustom(objType, index, value string) By {
+	return byCustom{
 		objType: objType,
 		index:   index,
 		value:   value,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type byCustomPrefix struct ***REMOVED***
+type byCustomPrefix struct {
 	objType string
 	index   string
 	value   string
-***REMOVED***
+}
 
-func (b byCustomPrefix) isBy() ***REMOVED***
-***REMOVED***
+func (b byCustomPrefix) isBy() {
+}
 
 // ByCustomPrefix creates an object to pass to Find to search a custom index by
 // a value prefix.
-func ByCustomPrefix(objType, index, value string) By ***REMOVED***
-	return byCustomPrefix***REMOVED***
+func ByCustomPrefix(objType, index, value string) By {
+	return byCustomPrefix{
 		objType: objType,
 		index:   index,
 		value:   value,
-	***REMOVED***
-***REMOVED***
+	}
+}

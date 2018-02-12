@@ -11,12 +11,12 @@
 // This is roughly equivalent to:
 //
 //   next := tree.Get("foo")
-//   if next != nil ***REMOVED***
+//   if next != nil {
 //     next = next.Get("bar")
-//     if next != nil ***REMOVED***
+//     if next != nil {
 //       next = next.Get("baz")
-// ***REMOVED***
-//   ***REMOVED***
+//     }
+//   }
 //   result := next
 //
 // err is nil if any parsing exception occurs.
@@ -132,9 +132,9 @@
 //
 //   // display the results of a query
 //   results := query.CompileAndExecute("$.foo.bar.baz", tree)
-//   for idx, value := results.Values() ***REMOVED***
+//   for idx, value := results.Values() {
 //       fmt.Println("%v: %v", results.Positions()[idx], value)
-//   ***REMOVED***
+//   }
 //
 // Compiled Queries
 //
@@ -162,12 +162,12 @@
 //   query, _ := query.Compile("$[?(bazOnly)]")
 //
 //   // define the filter, and assign it to the query
-//   query.SetFilter("bazOnly", func(node interface***REMOVED******REMOVED***) bool***REMOVED***
-//       if tree, ok := node.(*Tree); ok ***REMOVED***
+//   query.SetFilter("bazOnly", func(node interface{}) bool{
+//       if tree, ok := node.(*Tree); ok {
 //           return tree.Has("baz")
-//   ***REMOVED***
+//       }
 //       return false  // reject all other node types
-//   ***REMOVED***)
+//   })
 //
 //   // run the query
 //   query.Execute(tree)

@@ -43,7 +43,7 @@ var (
 	hostHTTPS = flag.String("https_host", "", "Optional host or host:port to use for http:// links to this service. By default, this is implied from -https_addr.")
 )
 
-func homeOldHTTP(w http.ResponseWriter, r *http.Request) ***REMOVED***
+func homeOldHTTP(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, `<html>
 <body>
 <h1>Go + HTTP/2</h1>
@@ -56,13 +56,13 @@ func homeOldHTTP(w http.ResponseWriter, r *http.Request) ***REMOVED***
 <p>See code & instructions for connecting at <a href="https://github.com/golang/net/tree/master/http2">https://github.com/golang/net/tree/master/http2</a>.</p>
 
 </body></html>`)
-***REMOVED***
+}
 
-func home(w http.ResponseWriter, r *http.Request) ***REMOVED***
-	if r.URL.Path != "/" ***REMOVED***
+func home(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/" {
 		http.NotFound(w, r)
 		return
-	***REMOVED***
+	}
 	io.WriteString(w, `<html>
 <body>
 <h1>Go + HTTP/2</h1>
@@ -97,9 +97,9 @@ href="https://golang.org/s/http2bug">file a bug</a>.</p>
 </ul>
 
 </body></html>`)
-***REMOVED***
+}
 
-func reqInfoHandler(w http.ResponseWriter, r *http.Request) ***REMOVED***
+func reqInfoHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain")
 	fmt.Fprintf(w, "Method: %s\n", r.Method)
 	fmt.Fprintf(w, "Protocol: %s\n", r.Proto)
@@ -112,104 +112,104 @@ func reqInfoHandler(w http.ResponseWriter, r *http.Request) ***REMOVED***
 	fmt.Fprintf(w, "TLS: %#v\n", r.TLS)
 	fmt.Fprintf(w, "\nHeaders:\n")
 	r.Header.Write(w)
-***REMOVED***
+}
 
-func crcHandler(w http.ResponseWriter, r *http.Request) ***REMOVED***
-	if r.Method != "PUT" ***REMOVED***
+func crcHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "PUT" {
 		http.Error(w, "PUT required.", 400)
 		return
-	***REMOVED***
+	}
 	crc := crc32.NewIEEE()
 	n, err := io.Copy(crc, r.Body)
-	if err == nil ***REMOVED***
+	if err == nil {
 		w.Header().Set("Content-Type", "text/plain")
 		fmt.Fprintf(w, "bytes=%d, CRC32=%x", n, crc.Sum(nil))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type capitalizeReader struct ***REMOVED***
+type capitalizeReader struct {
 	r io.Reader
-***REMOVED***
+}
 
-func (cr capitalizeReader) Read(p []byte) (n int, err error) ***REMOVED***
+func (cr capitalizeReader) Read(p []byte) (n int, err error) {
 	n, err = cr.r.Read(p)
-	for i, b := range p[:n] ***REMOVED***
-		if b >= 'a' && b <= 'z' ***REMOVED***
+	for i, b := range p[:n] {
+		if b >= 'a' && b <= 'z' {
 			p[i] = b - ('a' - 'A')
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}
 
-type flushWriter struct ***REMOVED***
+type flushWriter struct {
 	w io.Writer
-***REMOVED***
+}
 
-func (fw flushWriter) Write(p []byte) (n int, err error) ***REMOVED***
+func (fw flushWriter) Write(p []byte) (n int, err error) {
 	n, err = fw.w.Write(p)
-	if f, ok := fw.w.(http.Flusher); ok ***REMOVED***
+	if f, ok := fw.w.(http.Flusher); ok {
 		f.Flush()
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func echoCapitalHandler(w http.ResponseWriter, r *http.Request) ***REMOVED***
-	if r.Method != "PUT" ***REMOVED***
+func echoCapitalHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "PUT" {
 		http.Error(w, "PUT required.", 400)
 		return
-	***REMOVED***
-	io.Copy(flushWriter***REMOVED***w***REMOVED***, capitalizeReader***REMOVED***r.Body***REMOVED***)
-***REMOVED***
+	}
+	io.Copy(flushWriter{w}, capitalizeReader{r.Body})
+}
 
 var (
 	fsGrp   singleflight.Group
 	fsMu    sync.Mutex // guards fsCache
-	fsCache = map[string]http.Handler***REMOVED******REMOVED***
+	fsCache = map[string]http.Handler{}
 )
 
 // fileServer returns a file-serving handler that proxies URL.
 // It lazily fetches URL on the first access and caches its contents forever.
-func fileServer(url string, latency time.Duration) http.Handler ***REMOVED***
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) ***REMOVED***
-		if latency > 0 ***REMOVED***
+func fileServer(url string, latency time.Duration) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if latency > 0 {
 			time.Sleep(latency)
-		***REMOVED***
-		hi, err := fsGrp.Do(url, func() (interface***REMOVED******REMOVED***, error) ***REMOVED***
+		}
+		hi, err := fsGrp.Do(url, func() (interface{}, error) {
 			fsMu.Lock()
-			if h, ok := fsCache[url]; ok ***REMOVED***
+			if h, ok := fsCache[url]; ok {
 				fsMu.Unlock()
 				return h, nil
-			***REMOVED***
+			}
 			fsMu.Unlock()
 
 			res, err := http.Get(url)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			defer res.Body.Close()
 			slurp, err := ioutil.ReadAll(res.Body)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 
 			modTime := time.Now()
-			var h http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) ***REMOVED***
+			var h http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				http.ServeContent(w, r, path.Base(url), modTime, bytes.NewReader(slurp))
-			***REMOVED***)
+			})
 			fsMu.Lock()
 			fsCache[url] = h
 			fsMu.Unlock()
 			return h, nil
-		***REMOVED***)
-		if err != nil ***REMOVED***
+		})
+		if err != nil {
 			http.Error(w, err.Error(), 500)
 			return
-		***REMOVED***
+		}
 		hi.(http.Handler).ServeHTTP(w, r)
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func clockStreamHandler(w http.ResponseWriter, r *http.Request) ***REMOVED***
+func clockStreamHandler(w http.ResponseWriter, r *http.Request) {
 	clientGone := w.(http.CloseNotifier).CloseNotify()
 	w.Header().Set("Content-Type", "text/plain")
 	ticker := time.NewTicker(1 * time.Second)
@@ -217,25 +217,25 @@ func clockStreamHandler(w http.ResponseWriter, r *http.Request) ***REMOVED***
 	fmt.Fprintf(w, "# ~1KB of junk to force browsers to start rendering immediately: \n")
 	io.WriteString(w, strings.Repeat("# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n", 13))
 
-	for ***REMOVED***
+	for {
 		fmt.Fprintf(w, "%v\n", time.Now())
 		w.(http.Flusher).Flush()
-		select ***REMOVED***
+		select {
 		case <-ticker.C:
 		case <-clientGone:
 			log.Printf("Client %v disconnected from the clock", r.RemoteAddr)
 			return
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func registerHandlers() ***REMOVED***
+func registerHandlers() {
 	tiles := newGopherTilesHandler()
 	push := newPushHandler()
 
 	mux2 := http.NewServeMux()
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) ***REMOVED***
-		switch ***REMOVED***
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		switch {
 		case r.URL.Path == "/gophertiles":
 			tiles.ServeHTTP(w, r) // allow HTTP/2 + HTTP/1.x
 			return
@@ -245,17 +245,17 @@ func registerHandlers() ***REMOVED***
 		case r.TLS == nil: // do not allow HTTP/1.x for anything else
 			http.Redirect(w, r, "https://"+httpsHost()+"/", http.StatusFound)
 			return
-		***REMOVED***
-		if r.ProtoMajor == 1 ***REMOVED***
-			if r.URL.Path == "/reqinfo" ***REMOVED***
+		}
+		if r.ProtoMajor == 1 {
+			if r.URL.Path == "/reqinfo" {
 				reqInfoHandler(w, r)
 				return
-			***REMOVED***
+			}
 			homeOldHTTP(w, r)
 			return
-		***REMOVED***
+		}
 		mux2.ServeHTTP(w, r)
-	***REMOVED***)
+	})
 	mux2.HandleFunc("/", home)
 	mux2.Handle("/file/gopher.png", fileServer("https://golang.org/doc/gopher/frontpage.png", 0))
 	mux2.Handle("/file/go.src.tar.gz", fileServer("https://storage.googleapis.com/golang/go1.4.1.src.tar.gz", 0))
@@ -264,248 +264,248 @@ func registerHandlers() ***REMOVED***
 	mux2.HandleFunc("/ECHO", echoCapitalHandler)
 	mux2.HandleFunc("/clockstream", clockStreamHandler)
 	mux2.Handle("/gophertiles", tiles)
-	mux2.HandleFunc("/redirect", func(w http.ResponseWriter, r *http.Request) ***REMOVED***
+	mux2.HandleFunc("/redirect", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusFound)
-	***REMOVED***)
+	})
 	stripHomedir := regexp.MustCompile(`/(Users|home)/\w+`)
-	mux2.HandleFunc("/goroutines", func(w http.ResponseWriter, r *http.Request) ***REMOVED***
+	mux2.HandleFunc("/goroutines", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 		buf := make([]byte, 2<<20)
 		w.Write(stripHomedir.ReplaceAll(buf[:runtime.Stack(buf, true)], nil))
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-var pushResources = map[string]http.Handler***REMOVED***
+var pushResources = map[string]http.Handler{
 	"/serverpush/static/jquery.min.js": fileServer("https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js", 100*time.Millisecond),
 	"/serverpush/static/godocs.js":     fileServer("https://golang.org/lib/godoc/godocs.js", 100*time.Millisecond),
 	"/serverpush/static/playground.js": fileServer("https://golang.org/lib/godoc/playground.js", 100*time.Millisecond),
 	"/serverpush/static/style.css":     fileServer("https://golang.org/lib/godoc/style.css", 100*time.Millisecond),
-***REMOVED***
+}
 
-func newPushHandler() http.Handler ***REMOVED***
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) ***REMOVED***
-		for path, handler := range pushResources ***REMOVED***
-			if r.URL.Path == path ***REMOVED***
+func newPushHandler() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		for path, handler := range pushResources {
+			if r.URL.Path == path {
 				handler.ServeHTTP(w, r)
 				return
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		cacheBust := time.Now().UnixNano()
-		if pusher, ok := w.(http.Pusher); ok ***REMOVED***
-			for path := range pushResources ***REMOVED***
+		if pusher, ok := w.(http.Pusher); ok {
+			for path := range pushResources {
 				url := fmt.Sprintf("%s?%d", path, cacheBust)
-				if err := pusher.Push(url, nil); err != nil ***REMOVED***
+				if err := pusher.Push(url, nil); err != nil {
 					log.Printf("Failed to push %v: %v", path, err)
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
+				}
+			}
+		}
 		time.Sleep(100 * time.Millisecond) // fake network latency + parsing time
-		if err := pushTmpl.Execute(w, struct ***REMOVED***
+		if err := pushTmpl.Execute(w, struct {
 			CacheBust int64
 			HTTPSHost string
 			HTTPHost  string
-		***REMOVED******REMOVED***
+		}{
 			CacheBust: cacheBust,
 			HTTPSHost: httpsHost(),
 			HTTPHost:  httpHost(),
-		***REMOVED***); err != nil ***REMOVED***
+		}); err != nil {
 			log.Printf("Executing server push template: %v", err)
-		***REMOVED***
-	***REMOVED***)
-***REMOVED***
+		}
+	})
+}
 
-func newGopherTilesHandler() http.Handler ***REMOVED***
+func newGopherTilesHandler() http.Handler {
 	const gopherURL = "https://blog.golang.org/go-programming-language-turns-two_gophers.jpg"
 	res, err := http.Get(gopherURL)
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatal(err)
-	***REMOVED***
-	if res.StatusCode != 200 ***REMOVED***
+	}
+	if res.StatusCode != 200 {
 		log.Fatalf("Error fetching %s: %v", gopherURL, res.Status)
-	***REMOVED***
+	}
 	slurp, err := ioutil.ReadAll(res.Body)
 	res.Body.Close()
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatal(err)
-	***REMOVED***
+	}
 	im, err := jpeg.Decode(bytes.NewReader(slurp))
-	if err != nil ***REMOVED***
-		if len(slurp) > 1024 ***REMOVED***
+	if err != nil {
+		if len(slurp) > 1024 {
 			slurp = slurp[:1024]
-		***REMOVED***
+		}
 		log.Fatalf("Failed to decode gopher image: %v (got %q)", err, slurp)
-	***REMOVED***
+	}
 
-	type subImager interface ***REMOVED***
+	type subImager interface {
 		SubImage(image.Rectangle) image.Image
-	***REMOVED***
+	}
 	const tileSize = 32
 	xt := im.Bounds().Max.X / tileSize
 	yt := im.Bounds().Max.Y / tileSize
 	var tile [][][]byte // y -> x -> jpeg bytes
-	for yi := 0; yi < yt; yi++ ***REMOVED***
+	for yi := 0; yi < yt; yi++ {
 		var row [][]byte
-		for xi := 0; xi < xt; xi++ ***REMOVED***
-			si := im.(subImager).SubImage(image.Rectangle***REMOVED***
-				Min: image.Point***REMOVED***xi * tileSize, yi * tileSize***REMOVED***,
-				Max: image.Point***REMOVED***(xi + 1) * tileSize, (yi + 1) * tileSize***REMOVED***,
-			***REMOVED***)
+		for xi := 0; xi < xt; xi++ {
+			si := im.(subImager).SubImage(image.Rectangle{
+				Min: image.Point{xi * tileSize, yi * tileSize},
+				Max: image.Point{(xi + 1) * tileSize, (yi + 1) * tileSize},
+			})
 			buf := new(bytes.Buffer)
-			if err := jpeg.Encode(buf, si, &jpeg.Options***REMOVED***Quality: 90***REMOVED***); err != nil ***REMOVED***
+			if err := jpeg.Encode(buf, si, &jpeg.Options{Quality: 90}); err != nil {
 				log.Fatal(err)
-			***REMOVED***
+			}
 			row = append(row, buf.Bytes())
-		***REMOVED***
+		}
 		tile = append(tile, row)
-	***REMOVED***
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) ***REMOVED***
+	}
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ms, _ := strconv.Atoi(r.FormValue("latency"))
 		const nanosPerMilli = 1e6
-		if r.FormValue("x") != "" ***REMOVED***
+		if r.FormValue("x") != "" {
 			x, _ := strconv.Atoi(r.FormValue("x"))
 			y, _ := strconv.Atoi(r.FormValue("y"))
-			if ms <= 1000 ***REMOVED***
+			if ms <= 1000 {
 				time.Sleep(time.Duration(ms) * nanosPerMilli)
-			***REMOVED***
-			if x >= 0 && x < xt && y >= 0 && y < yt ***REMOVED***
-				http.ServeContent(w, r, "", time.Time***REMOVED******REMOVED***, bytes.NewReader(tile[y][x]))
+			}
+			if x >= 0 && x < xt && y >= 0 && y < yt {
+				http.ServeContent(w, r, "", time.Time{}, bytes.NewReader(tile[y][x]))
 				return
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		io.WriteString(w, "<html><body onload='showtimes()'>")
 		fmt.Fprintf(w, "A grid of %d tiled images is below. Compare:<p>", xt*yt)
-		for _, ms := range []int***REMOVED***0, 30, 200, 1000***REMOVED*** ***REMOVED***
+		for _, ms := range []int{0, 30, 200, 1000} {
 			d := time.Duration(ms) * nanosPerMilli
 			fmt.Fprintf(w, "[<a href='https://%s/gophertiles?latency=%d'>HTTP/2, %v latency</a>] [<a href='http://%s/gophertiles?latency=%d'>HTTP/1, %v latency</a>]<br>\n",
 				httpsHost(), ms, d,
 				httpHost(), ms, d,
 			)
-		***REMOVED***
+		}
 		io.WriteString(w, "<p>\n")
 		cacheBust := time.Now().UnixNano()
-		for y := 0; y < yt; y++ ***REMOVED***
-			for x := 0; x < xt; x++ ***REMOVED***
+		for y := 0; y < yt; y++ {
+			for x := 0; x < xt; x++ {
 				fmt.Fprintf(w, "<img width=%d height=%d src='/gophertiles?x=%d&y=%d&cachebust=%d&latency=%d'>",
 					tileSize, tileSize, x, y, cacheBust, ms)
-			***REMOVED***
+			}
 			io.WriteString(w, "<br/>\n")
-		***REMOVED***
+		}
 		io.WriteString(w, `<p><div id='loadtimes'></div></p>
 <script>
-function showtimes() ***REMOVED***
+function showtimes() {
 	var times = 'Times from connection start:<br>'
 	times += 'DOM loaded: ' + (window.performance.timing.domContentLoadedEventEnd - window.performance.timing.connectStart) + 'ms<br>'
 	times += 'DOM complete (images loaded): ' + (window.performance.timing.domComplete - window.performance.timing.connectStart) + 'ms<br>'
 	document.getElementById('loadtimes').innerHTML = times
-***REMOVED***
+}
 </script>
 <hr><a href='/'>&lt;&lt Back to Go HTTP/2 demo server</a></body></html>`)
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func httpsHost() string ***REMOVED***
-	if *hostHTTPS != "" ***REMOVED***
+func httpsHost() string {
+	if *hostHTTPS != "" {
 		return *hostHTTPS
-	***REMOVED***
-	if v := *httpsAddr; strings.HasPrefix(v, ":") ***REMOVED***
+	}
+	if v := *httpsAddr; strings.HasPrefix(v, ":") {
 		return "localhost" + v
-	***REMOVED*** else ***REMOVED***
+	} else {
 		return v
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func httpHost() string ***REMOVED***
-	if *hostHTTP != "" ***REMOVED***
+func httpHost() string {
+	if *hostHTTP != "" {
 		return *hostHTTP
-	***REMOVED***
-	if v := *httpAddr; strings.HasPrefix(v, ":") ***REMOVED***
+	}
+	if v := *httpAddr; strings.HasPrefix(v, ":") {
 		return "localhost" + v
-	***REMOVED*** else ***REMOVED***
+	} else {
 		return v
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func serveProdTLS() error ***REMOVED***
+func serveProdTLS() error {
 	const cacheDir = "/var/cache/autocert"
-	if err := os.MkdirAll(cacheDir, 0700); err != nil ***REMOVED***
+	if err := os.MkdirAll(cacheDir, 0700); err != nil {
 		return err
-	***REMOVED***
-	m := autocert.Manager***REMOVED***
+	}
+	m := autocert.Manager{
 		Cache:      autocert.DirCache(cacheDir),
 		Prompt:     autocert.AcceptTOS,
 		HostPolicy: autocert.HostWhitelist("http2.golang.org"),
-	***REMOVED***
-	srv := &http.Server***REMOVED***
-		TLSConfig: &tls.Config***REMOVED***
+	}
+	srv := &http.Server{
+		TLSConfig: &tls.Config{
 			GetCertificate: m.GetCertificate,
-		***REMOVED***,
-	***REMOVED***
-	http2.ConfigureServer(srv, &http2.Server***REMOVED***
-		NewWriteScheduler: func() http2.WriteScheduler ***REMOVED***
+		},
+	}
+	http2.ConfigureServer(srv, &http2.Server{
+		NewWriteScheduler: func() http2.WriteScheduler {
 			return http2.NewPriorityWriteScheduler(nil)
-		***REMOVED***,
-	***REMOVED***)
+		},
+	})
 	ln, err := net.Listen("tcp", ":443")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	return srv.Serve(tls.NewListener(tcpKeepAliveListener***REMOVED***ln.(*net.TCPListener)***REMOVED***, srv.TLSConfig))
-***REMOVED***
+	}
+	return srv.Serve(tls.NewListener(tcpKeepAliveListener{ln.(*net.TCPListener)}, srv.TLSConfig))
+}
 
-type tcpKeepAliveListener struct ***REMOVED***
+type tcpKeepAliveListener struct {
 	*net.TCPListener
-***REMOVED***
+}
 
-func (ln tcpKeepAliveListener) Accept() (c net.Conn, err error) ***REMOVED***
+func (ln tcpKeepAliveListener) Accept() (c net.Conn, err error) {
 	tc, err := ln.AcceptTCP()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	tc.SetKeepAlive(true)
 	tc.SetKeepAlivePeriod(3 * time.Minute)
 	return tc, nil
-***REMOVED***
+}
 
-func serveProd() error ***REMOVED***
+func serveProd() error {
 	errc := make(chan error, 2)
-	go func() ***REMOVED*** errc <- http.ListenAndServe(":80", nil) ***REMOVED***()
-	go func() ***REMOVED*** errc <- serveProdTLS() ***REMOVED***()
+	go func() { errc <- http.ListenAndServe(":80", nil) }()
+	go func() { errc <- serveProdTLS() }()
 	return <-errc
-***REMOVED***
+}
 
 const idleTimeout = 5 * time.Minute
 const activeTimeout = 10 * time.Minute
 
 // TODO: put this into the standard library and actually send
 // PING frames and GOAWAY, etc: golang.org/issue/14204
-func idleTimeoutHook() func(net.Conn, http.ConnState) ***REMOVED***
+func idleTimeoutHook() func(net.Conn, http.ConnState) {
 	var mu sync.Mutex
-	m := map[net.Conn]*time.Timer***REMOVED******REMOVED***
-	return func(c net.Conn, cs http.ConnState) ***REMOVED***
+	m := map[net.Conn]*time.Timer{}
+	return func(c net.Conn, cs http.ConnState) {
 		mu.Lock()
 		defer mu.Unlock()
-		if t, ok := m[c]; ok ***REMOVED***
+		if t, ok := m[c]; ok {
 			delete(m, c)
 			t.Stop()
-		***REMOVED***
+		}
 		var d time.Duration
-		switch cs ***REMOVED***
+		switch cs {
 		case http.StateNew, http.StateIdle:
 			d = idleTimeout
 		case http.StateActive:
 			d = activeTimeout
 		default:
 			return
-		***REMOVED***
-		m[c] = time.AfterFunc(d, func() ***REMOVED***
+		}
+		m[c] = time.AfterFunc(d, func() {
 			log.Printf("closing idle conn %v after %v", c.RemoteAddr(), d)
 			go c.Close()
-		***REMOVED***)
-	***REMOVED***
-***REMOVED***
+		})
+	}
+}
 
-func main() ***REMOVED***
+func main() {
 	var srv http.Server
 	flag.BoolVar(&http2.VerboseLogs, "verbose", false, "Verbose HTTP/2 debugging.")
 	flag.Parse()
@@ -514,25 +514,25 @@ func main() ***REMOVED***
 
 	registerHandlers()
 
-	if *prod ***REMOVED***
+	if *prod {
 		*hostHTTP = "http2.golang.org"
 		*hostHTTPS = "http2.golang.org"
 		log.Fatal(serveProd())
-	***REMOVED***
+	}
 
 	url := "https://" + httpsHost() + "/"
 	log.Printf("Listening on " + url)
-	http2.ConfigureServer(&srv, &http2.Server***REMOVED******REMOVED***)
+	http2.ConfigureServer(&srv, &http2.Server{})
 
-	if *httpAddr != "" ***REMOVED***
-		go func() ***REMOVED***
+	if *httpAddr != "" {
+		go func() {
 			log.Printf("Listening on http://" + httpHost() + "/ (for unencrypted HTTP/1)")
 			log.Fatal(http.ListenAndServe(*httpAddr, nil))
-		***REMOVED***()
-	***REMOVED***
+		}()
+	}
 
-	go func() ***REMOVED***
+	go func() {
 		log.Fatal(srv.ListenAndServeTLS("server.crt", "server.key"))
-	***REMOVED***()
-	select ***REMOVED******REMOVED***
-***REMOVED***
+	}()
+	select {}
+}

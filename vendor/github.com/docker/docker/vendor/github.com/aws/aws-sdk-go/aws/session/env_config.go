@@ -14,7 +14,7 @@ const EnvProviderName = "EnvConfigCredentials"
 // setup config from. All environment values are optional. But some values
 // such as credentials require multiple values to be complete or the values
 // will be ignored.
-type envConfig struct ***REMOVED***
+type envConfig struct {
 	// Environment configuration values. If set both Access Key ID and Secret Access
 	// Key must be provided. Session Token and optionally also be provided, but is
 	// not required.
@@ -95,35 +95,35 @@ type envConfig struct ***REMOVED***
 	//
 	//  AWS_CA_BUNDLE=$HOME/my_custom_ca_bundle
 	CustomCABundle string
-***REMOVED***
+}
 
 var (
-	credAccessEnvKey = []string***REMOVED***
+	credAccessEnvKey = []string{
 		"AWS_ACCESS_KEY_ID",
 		"AWS_ACCESS_KEY",
-	***REMOVED***
-	credSecretEnvKey = []string***REMOVED***
+	}
+	credSecretEnvKey = []string{
 		"AWS_SECRET_ACCESS_KEY",
 		"AWS_SECRET_KEY",
-	***REMOVED***
-	credSessionEnvKey = []string***REMOVED***
+	}
+	credSessionEnvKey = []string{
 		"AWS_SESSION_TOKEN",
-	***REMOVED***
+	}
 
-	regionEnvKeys = []string***REMOVED***
+	regionEnvKeys = []string{
 		"AWS_REGION",
 		"AWS_DEFAULT_REGION", // Only read if AWS_SDK_LOAD_CONFIG is also set
-	***REMOVED***
-	profileEnvKeys = []string***REMOVED***
+	}
+	profileEnvKeys = []string{
 		"AWS_PROFILE",
 		"AWS_DEFAULT_PROFILE", // Only read if AWS_SDK_LOAD_CONFIG is also set
-	***REMOVED***
-	sharedCredsFileEnvKey = []string***REMOVED***
+	}
+	sharedCredsFileEnvKey = []string{
 		"AWS_SHARED_CREDENTIALS_FILE",
-	***REMOVED***
-	sharedConfigFileEnvKey = []string***REMOVED***
+	}
+	sharedConfigFileEnvKey = []string{
 		"AWS_CONFIG_FILE",
-	***REMOVED***
+	}
 )
 
 // loadEnvConfig retrieves the SDK's environment configuration.
@@ -132,10 +132,10 @@ var (
 // If the environment variable `AWS_SDK_LOAD_CONFIG` is set to a truthy value
 // the shared SDK config will be loaded in addition to the SDK's specific
 // configuration values.
-func loadEnvConfig() envConfig ***REMOVED***
+func loadEnvConfig() envConfig {
 	enableSharedConfig, _ := strconv.ParseBool(os.Getenv("AWS_SDK_LOAD_CONFIG"))
 	return envConfigLoad(enableSharedConfig)
-***REMOVED***
+}
 
 // loadEnvSharedConfig retrieves the SDK's environment configuration, and the
 // SDK shared config. See `envConfig` for the values that will be retrieved.
@@ -143,12 +143,12 @@ func loadEnvConfig() envConfig ***REMOVED***
 // Loads the shared configuration in addition to the SDK's specific configuration.
 // This will load the same values as `loadEnvConfig` if the `AWS_SDK_LOAD_CONFIG`
 // environment variable is set.
-func loadSharedEnvConfig() envConfig ***REMOVED***
+func loadSharedEnvConfig() envConfig {
 	return envConfigLoad(true)
-***REMOVED***
+}
 
-func envConfigLoad(enableSharedConfig bool) envConfig ***REMOVED***
-	cfg := envConfig***REMOVED******REMOVED***
+func envConfigLoad(enableSharedConfig bool) envConfig {
+	cfg := envConfig{}
 
 	cfg.EnableSharedConfig = enableSharedConfig
 
@@ -157,18 +157,18 @@ func envConfigLoad(enableSharedConfig bool) envConfig ***REMOVED***
 	setFromEnvVal(&cfg.Creds.SessionToken, credSessionEnvKey)
 
 	// Require logical grouping of credentials
-	if len(cfg.Creds.AccessKeyID) == 0 || len(cfg.Creds.SecretAccessKey) == 0 ***REMOVED***
-		cfg.Creds = credentials.Value***REMOVED******REMOVED***
-	***REMOVED*** else ***REMOVED***
+	if len(cfg.Creds.AccessKeyID) == 0 || len(cfg.Creds.SecretAccessKey) == 0 {
+		cfg.Creds = credentials.Value{}
+	} else {
 		cfg.Creds.ProviderName = EnvProviderName
-	***REMOVED***
+	}
 
 	regionKeys := regionEnvKeys
 	profileKeys := profileEnvKeys
-	if !cfg.EnableSharedConfig ***REMOVED***
+	if !cfg.EnableSharedConfig {
 		regionKeys = regionKeys[:1]
 		profileKeys = profileKeys[:1]
-	***REMOVED***
+	}
 
 	setFromEnvVal(&cfg.Region, regionKeys)
 	setFromEnvVal(&cfg.Profile, profileKeys)
@@ -179,13 +179,13 @@ func envConfigLoad(enableSharedConfig bool) envConfig ***REMOVED***
 	cfg.CustomCABundle = os.Getenv("AWS_CA_BUNDLE")
 
 	return cfg
-***REMOVED***
+}
 
-func setFromEnvVal(dst *string, keys []string) ***REMOVED***
-	for _, k := range keys ***REMOVED***
-		if v := os.Getenv(k); len(v) > 0 ***REMOVED***
+func setFromEnvVal(dst *string, keys []string) {
+	for _, k := range keys {
+		if v := os.Getenv(k); len(v) > 0 {
 			*dst = v
 			break
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

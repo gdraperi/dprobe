@@ -11,6 +11,6 @@ import (
 	"net/http"
 )
 
-func getContext(r *http.Request) context.Context ***REMOVED***
+func getContext(r *http.Request) context.Context {
 	return r.Context()
-***REMOVED***
+}

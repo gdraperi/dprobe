@@ -9,18 +9,18 @@ var (
 	// ErrShortBytes is returned when the
 	// slice being decoded is too short to
 	// contain the contents of the message
-	ErrShortBytes error = errShort***REMOVED******REMOVED***
+	ErrShortBytes error = errShort{}
 
 	// this error is only returned
 	// if we reach code that should
 	// be unreachable
-	fatal error = errFatal***REMOVED******REMOVED***
+	fatal error = errFatal{}
 )
 
 // Error is the interface satisfied
 // by all of the errors that originate
 // from this package.
-type Error interface ***REMOVED***
+type Error interface {
 	error
 
 	// Resumable returns whether
@@ -28,92 +28,92 @@ type Error interface ***REMOVED***
 	// the stream of data is malformed
 	// and  the information is unrecoverable.
 	Resumable() bool
-***REMOVED***
+}
 
-type errShort struct***REMOVED******REMOVED***
+type errShort struct{}
 
-func (e errShort) Error() string   ***REMOVED*** return "msgp: too few bytes left to read object" ***REMOVED***
-func (e errShort) Resumable() bool ***REMOVED*** return false ***REMOVED***
+func (e errShort) Error() string   { return "msgp: too few bytes left to read object" }
+func (e errShort) Resumable() bool { return false }
 
-type errFatal struct***REMOVED******REMOVED***
+type errFatal struct{}
 
-func (f errFatal) Error() string   ***REMOVED*** return "msgp: fatal decoding error (unreachable code)" ***REMOVED***
-func (f errFatal) Resumable() bool ***REMOVED*** return false ***REMOVED***
+func (f errFatal) Error() string   { return "msgp: fatal decoding error (unreachable code)" }
+func (f errFatal) Resumable() bool { return false }
 
 // ArrayError is an error returned
 // when decoding a fix-sized array
 // of the wrong size
-type ArrayError struct ***REMOVED***
+type ArrayError struct {
 	Wanted uint32
 	Got    uint32
-***REMOVED***
+}
 
 // Error implements the error interface
-func (a ArrayError) Error() string ***REMOVED***
+func (a ArrayError) Error() string {
 	return fmt.Sprintf("msgp: wanted array of size %d; got %d", a.Wanted, a.Got)
-***REMOVED***
+}
 
 // Resumable is always 'true' for ArrayErrors
-func (a ArrayError) Resumable() bool ***REMOVED*** return true ***REMOVED***
+func (a ArrayError) Resumable() bool { return true }
 
 // IntOverflow is returned when a call
 // would downcast an integer to a type
 // with too few bits to hold its value.
-type IntOverflow struct ***REMOVED***
+type IntOverflow struct {
 	Value         int64 // the value of the integer
 	FailedBitsize int   // the bit size that the int64 could not fit into
-***REMOVED***
+}
 
 // Error implements the error interface
-func (i IntOverflow) Error() string ***REMOVED***
+func (i IntOverflow) Error() string {
 	return fmt.Sprintf("msgp: %d overflows int%d", i.Value, i.FailedBitsize)
-***REMOVED***
+}
 
 // Resumable is always 'true' for overflows
-func (i IntOverflow) Resumable() bool ***REMOVED*** return true ***REMOVED***
+func (i IntOverflow) Resumable() bool { return true }
 
 // UintOverflow is returned when a call
 // would downcast an unsigned integer to a type
 // with too few bits to hold its value
-type UintOverflow struct ***REMOVED***
+type UintOverflow struct {
 	Value         uint64 // value of the uint
 	FailedBitsize int    // the bit size that couldn't fit the value
-***REMOVED***
+}
 
 // Error implements the error interface
-func (u UintOverflow) Error() string ***REMOVED***
+func (u UintOverflow) Error() string {
 	return fmt.Sprintf("msgp: %d overflows uint%d", u.Value, u.FailedBitsize)
-***REMOVED***
+}
 
 // Resumable is always 'true' for overflows
-func (u UintOverflow) Resumable() bool ***REMOVED*** return true ***REMOVED***
+func (u UintOverflow) Resumable() bool { return true }
 
 // A TypeError is returned when a particular
 // decoding method is unsuitable for decoding
 // a particular MessagePack value.
-type TypeError struct ***REMOVED***
+type TypeError struct {
 	Method  Type // Type expected by method
 	Encoded Type // Type actually encoded
-***REMOVED***
+}
 
 // Error implements the error interface
-func (t TypeError) Error() string ***REMOVED***
+func (t TypeError) Error() string {
 	return fmt.Sprintf("msgp: attempted to decode type %q with method for %q", t.Encoded, t.Method)
-***REMOVED***
+}
 
 // Resumable returns 'true' for TypeErrors
-func (t TypeError) Resumable() bool ***REMOVED*** return true ***REMOVED***
+func (t TypeError) Resumable() bool { return true }
 
 // returns either InvalidPrefixError or
 // TypeError depending on whether or not
 // the prefix is recognized
-func badPrefix(want Type, lead byte) error ***REMOVED***
+func badPrefix(want Type, lead byte) error {
 	t := sizes[lead].typ
-	if t == InvalidType ***REMOVED***
+	if t == InvalidType {
 		return InvalidPrefixError(lead)
-	***REMOVED***
-	return TypeError***REMOVED***Method: want, Encoded: t***REMOVED***
-***REMOVED***
+	}
+	return TypeError{Method: want, Encoded: t}
+}
 
 // InvalidPrefixError is returned when a bad encoding
 // uses a prefix that is not recognized in the MessagePack standard.
@@ -121,22 +121,22 @@ func badPrefix(want Type, lead byte) error ***REMOVED***
 type InvalidPrefixError byte
 
 // Error implements the error interface
-func (i InvalidPrefixError) Error() string ***REMOVED***
+func (i InvalidPrefixError) Error() string {
 	return fmt.Sprintf("msgp: unrecognized type prefix 0x%x", byte(i))
-***REMOVED***
+}
 
 // Resumable returns 'false' for InvalidPrefixErrors
-func (i InvalidPrefixError) Resumable() bool ***REMOVED*** return false ***REMOVED***
+func (i InvalidPrefixError) Resumable() bool { return false }
 
 // ErrUnsupportedType is returned
 // when a bad argument is supplied
-// to a function that takes `interface***REMOVED******REMOVED***`.
-type ErrUnsupportedType struct ***REMOVED***
+// to a function that takes `interface{}`.
+type ErrUnsupportedType struct {
 	T reflect.Type
-***REMOVED***
+}
 
 // Error implements error
-func (e *ErrUnsupportedType) Error() string ***REMOVED*** return fmt.Sprintf("msgp: type %q not supported", e.T) ***REMOVED***
+func (e *ErrUnsupportedType) Error() string { return fmt.Sprintf("msgp: type %q not supported", e.T) }
 
 // Resumable returns 'true' for ErrUnsupportedType
-func (e *ErrUnsupportedType) Resumable() bool ***REMOVED*** return true ***REMOVED***
+func (e *ErrUnsupportedType) Resumable() bool { return true }

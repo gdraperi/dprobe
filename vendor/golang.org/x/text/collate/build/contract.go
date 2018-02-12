@@ -56,151 +56,151 @@ const (
 // entry might still resemble a completed suffix.
 // Examples:
 // The suffix strings "ab" and "ac" can be represented as:
-// []ctEntry***REMOVED***
-//     ***REMOVED***'a', 1, 1, noIndex***REMOVED***,  // 'a' by itself does not match, so i is 0xFF.
-//     ***REMOVED***'b', 'c', 0, 1***REMOVED***,   // "ab" -> 1, "ac" -> 2
-// ***REMOVED***
+// []ctEntry{
+//     {'a', 1, 1, noIndex},  // 'a' by itself does not match, so i is 0xFF.
+//     {'b', 'c', 0, 1},   // "ab" -> 1, "ac" -> 2
+// }
 //
 // The suffix strings "ab", "abc", "abd", and "abcd" can be represented as:
-// []ctEntry***REMOVED***
-//     ***REMOVED***'a', 1, 1, noIndex***REMOVED***, // 'a' must be followed by 'b'.
-//     ***REMOVED***'b', 1, 2, 1***REMOVED***,    // "ab" -> 1, may be followed by 'c' or 'd'.
-//     ***REMOVED***'d', 'd', final, 3***REMOVED***,  // "abd" -> 3
-//     ***REMOVED***'c', 4, 1, 2***REMOVED***,    // "abc" -> 2, may be followed by 'd'.
-//     ***REMOVED***'d', 'd', final, 4***REMOVED***,  // "abcd" -> 4
-// ***REMOVED***
+// []ctEntry{
+//     {'a', 1, 1, noIndex}, // 'a' must be followed by 'b'.
+//     {'b', 1, 2, 1},    // "ab" -> 1, may be followed by 'c' or 'd'.
+//     {'d', 'd', final, 3},  // "abd" -> 3
+//     {'c', 4, 1, 2},    // "abc" -> 2, may be followed by 'd'.
+//     {'d', 'd', final, 4},  // "abcd" -> 4
+// }
 // See genStateTests in contract_test.go for more examples.
-type ctEntry struct ***REMOVED***
+type ctEntry struct {
 	L uint8 // non-final: byte value to match; final: lowest match in range.
 	H uint8 // non-final: relative index to next block; final: highest match in range.
 	N uint8 // non-final: length of next block; final: final
 	I uint8 // result offset. Will be noIndex if more bytes are needed to complete.
-***REMOVED***
+}
 
 // contractTrieSet holds a set of contraction tries. The tries are stored
 // consecutively in the entry field.
-type contractTrieSet []struct***REMOVED*** l, h, n, i uint8 ***REMOVED***
+type contractTrieSet []struct{ l, h, n, i uint8 }
 
 // ctHandle is used to identify a trie in the trie set, consisting in an offset
 // in the array and the size of the first node.
-type ctHandle struct ***REMOVED***
+type ctHandle struct {
 	index, n int
-***REMOVED***
+}
 
 // appendTrie adds a new trie for the given suffixes to the trie set and returns
 // a handle to it.  The handle will be invalid on error.
-func appendTrie(ct *colltab.ContractTrieSet, suffixes []string) (ctHandle, error) ***REMOVED***
+func appendTrie(ct *colltab.ContractTrieSet, suffixes []string) (ctHandle, error) {
 	es := make([]stridx, len(suffixes))
-	for i, s := range suffixes ***REMOVED***
+	for i, s := range suffixes {
 		es[i].str = s
-	***REMOVED***
+	}
 	sort.Sort(offsetSort(es))
-	for i := range es ***REMOVED***
+	for i := range es {
 		es[i].index = i + 1
-	***REMOVED***
+	}
 	sort.Sort(genidxSort(es))
 	i := len(*ct)
 	n, err := genStates(ct, es)
-	if err != nil ***REMOVED***
+	if err != nil {
 		*ct = (*ct)[:i]
-		return ctHandle***REMOVED******REMOVED***, err
-	***REMOVED***
-	return ctHandle***REMOVED***i, n***REMOVED***, nil
-***REMOVED***
+		return ctHandle{}, err
+	}
+	return ctHandle{i, n}, nil
+}
 
 // genStates generates ctEntries for a given suffix set and returns
 // the number of entries for the first node.
-func genStates(ct *colltab.ContractTrieSet, sis []stridx) (int, error) ***REMOVED***
-	if len(sis) == 0 ***REMOVED***
+func genStates(ct *colltab.ContractTrieSet, sis []stridx) (int, error) {
+	if len(sis) == 0 {
 		return 0, fmt.Errorf("genStates: list of suffices must be non-empty")
-	***REMOVED***
+	}
 	start := len(*ct)
 	// create entries for differing first bytes.
-	for _, si := range sis ***REMOVED***
+	for _, si := range sis {
 		s := si.str
-		if len(s) == 0 ***REMOVED***
+		if len(s) == 0 {
 			continue
-		***REMOVED***
+		}
 		added := false
 		c := s[0]
-		if len(s) > 1 ***REMOVED***
-			for j := len(*ct) - 1; j >= start; j-- ***REMOVED***
-				if (*ct)[j].L == c ***REMOVED***
+		if len(s) > 1 {
+			for j := len(*ct) - 1; j >= start; j-- {
+				if (*ct)[j].L == c {
 					added = true
 					break
-				***REMOVED***
-			***REMOVED***
-			if !added ***REMOVED***
-				*ct = append(*ct, ctEntry***REMOVED***L: c, I: noIndex***REMOVED***)
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
-			for j := len(*ct) - 1; j >= start; j-- ***REMOVED***
+				}
+			}
+			if !added {
+				*ct = append(*ct, ctEntry{L: c, I: noIndex})
+			}
+		} else {
+			for j := len(*ct) - 1; j >= start; j-- {
 				// Update the offset for longer suffixes with the same byte.
-				if (*ct)[j].L == c ***REMOVED***
+				if (*ct)[j].L == c {
 					(*ct)[j].I = uint8(si.index)
 					added = true
-				***REMOVED***
+				}
 				// Extend range of final ctEntry, if possible.
-				if (*ct)[j].H+1 == c ***REMOVED***
+				if (*ct)[j].H+1 == c {
 					(*ct)[j].H = c
 					added = true
-				***REMOVED***
-			***REMOVED***
-			if !added ***REMOVED***
-				*ct = append(*ct, ctEntry***REMOVED***L: c, H: c, N: final, I: uint8(si.index)***REMOVED***)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+				}
+			}
+			if !added {
+				*ct = append(*ct, ctEntry{L: c, H: c, N: final, I: uint8(si.index)})
+			}
+		}
+	}
 	n := len(*ct) - start
 	// Append nodes for the remainder of the suffixes for each ctEntry.
 	sp := 0
-	for i, end := start, len(*ct); i < end; i++ ***REMOVED***
+	for i, end := start, len(*ct); i < end; i++ {
 		fe := (*ct)[i]
-		if fe.H == 0 ***REMOVED*** // uninitialized non-final
+		if fe.H == 0 { // uninitialized non-final
 			ln := len(*ct) - start - n
-			if ln > 0xFF ***REMOVED***
+			if ln > 0xFF {
 				return 0, fmt.Errorf("genStates: relative block offset too large: %d > 255", ln)
-			***REMOVED***
+			}
 			fe.H = uint8(ln)
 			// Find first non-final strings with same byte as current entry.
-			for ; sis[sp].str[0] != fe.L; sp++ ***REMOVED***
-			***REMOVED***
+			for ; sis[sp].str[0] != fe.L; sp++ {
+			}
 			se := sp + 1
-			for ; se < len(sis) && len(sis[se].str) > 1 && sis[se].str[0] == fe.L; se++ ***REMOVED***
-			***REMOVED***
+			for ; se < len(sis) && len(sis[se].str) > 1 && sis[se].str[0] == fe.L; se++ {
+			}
 			sl := sis[sp:se]
 			sp = se
-			for i, si := range sl ***REMOVED***
+			for i, si := range sl {
 				sl[i].str = si.str[1:]
-			***REMOVED***
+			}
 			nn, err := genStates(ct, sl)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			fe.N = uint8(nn)
 			(*ct)[i] = fe
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	sort.Sort(entrySort((*ct)[start : start+n]))
 	return n, nil
-***REMOVED***
+}
 
 // There may be both a final and non-final entry for a byte if the byte
 // is implied in a range of matches in the final entry.
 // We need to ensure that the non-final entry comes first in that case.
 type entrySort colltab.ContractTrieSet
 
-func (fe entrySort) Len() int      ***REMOVED*** return len(fe) ***REMOVED***
-func (fe entrySort) Swap(i, j int) ***REMOVED*** fe[i], fe[j] = fe[j], fe[i] ***REMOVED***
-func (fe entrySort) Less(i, j int) bool ***REMOVED***
+func (fe entrySort) Len() int      { return len(fe) }
+func (fe entrySort) Swap(i, j int) { fe[i], fe[j] = fe[j], fe[i] }
+func (fe entrySort) Less(i, j int) bool {
 	return fe[i].L > fe[j].L
-***REMOVED***
+}
 
 // stridx is used for sorting suffixes and their associated offsets.
-type stridx struct ***REMOVED***
+type stridx struct {
 	str   string
 	index int
-***REMOVED***
+}
 
 // For computing the offsets, we first sort by size, and then by string.
 // This ensures that strings that only differ in the last byte by 1
@@ -208,102 +208,102 @@ type stridx struct ***REMOVED***
 // be packed as a range in a final ctEntry.
 type offsetSort []stridx
 
-func (si offsetSort) Len() int      ***REMOVED*** return len(si) ***REMOVED***
-func (si offsetSort) Swap(i, j int) ***REMOVED*** si[i], si[j] = si[j], si[i] ***REMOVED***
-func (si offsetSort) Less(i, j int) bool ***REMOVED***
-	if len(si[i].str) != len(si[j].str) ***REMOVED***
+func (si offsetSort) Len() int      { return len(si) }
+func (si offsetSort) Swap(i, j int) { si[i], si[j] = si[j], si[i] }
+func (si offsetSort) Less(i, j int) bool {
+	if len(si[i].str) != len(si[j].str) {
 		return len(si[i].str) > len(si[j].str)
-	***REMOVED***
+	}
 	return si[i].str < si[j].str
-***REMOVED***
+}
 
 // For indexing, we want to ensure that strings are sorted in string order, where
 // for strings with the same prefix, we put longer strings before shorter ones.
 type genidxSort []stridx
 
-func (si genidxSort) Len() int      ***REMOVED*** return len(si) ***REMOVED***
-func (si genidxSort) Swap(i, j int) ***REMOVED*** si[i], si[j] = si[j], si[i] ***REMOVED***
-func (si genidxSort) Less(i, j int) bool ***REMOVED***
-	if strings.HasPrefix(si[j].str, si[i].str) ***REMOVED***
+func (si genidxSort) Len() int      { return len(si) }
+func (si genidxSort) Swap(i, j int) { si[i], si[j] = si[j], si[i] }
+func (si genidxSort) Less(i, j int) bool {
+	if strings.HasPrefix(si[j].str, si[i].str) {
 		return false
-	***REMOVED***
-	if strings.HasPrefix(si[i].str, si[j].str) ***REMOVED***
+	}
+	if strings.HasPrefix(si[i].str, si[j].str) {
 		return true
-	***REMOVED***
+	}
 	return si[i].str < si[j].str
-***REMOVED***
+}
 
 // lookup matches the longest suffix in str and returns the associated offset
 // and the number of bytes consumed.
-func lookup(ct *colltab.ContractTrieSet, h ctHandle, str []byte) (index, ns int) ***REMOVED***
+func lookup(ct *colltab.ContractTrieSet, h ctHandle, str []byte) (index, ns int) {
 	states := (*ct)[h.index:]
 	p := 0
 	n := h.n
-	for i := 0; i < n && p < len(str); ***REMOVED***
+	for i := 0; i < n && p < len(str); {
 		e := states[i]
 		c := str[p]
-		if c >= e.L ***REMOVED***
-			if e.L == c ***REMOVED***
+		if c >= e.L {
+			if e.L == c {
 				p++
-				if e.I != noIndex ***REMOVED***
+				if e.I != noIndex {
 					index, ns = int(e.I), p
-				***REMOVED***
-				if e.N != final ***REMOVED***
+				}
+				if e.N != final {
 					// set to new state
 					i, states, n = 0, states[int(e.H)+n:], int(e.N)
-				***REMOVED*** else ***REMOVED***
+				} else {
 					return
-				***REMOVED***
+				}
 				continue
-			***REMOVED*** else if e.N == final && c <= e.H ***REMOVED***
+			} else if e.N == final && c <= e.H {
 				p++
 				return int(c-e.L) + int(e.I), p
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		i++
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // print writes the contractTrieSet t as compilable Go code to w. It returns
 // the total number of bytes written and the size of the resulting data structure in bytes.
-func print(t *colltab.ContractTrieSet, w io.Writer, name string) (n, size int, err error) ***REMOVED***
-	update3 := func(nn, sz int, e error) ***REMOVED***
+func print(t *colltab.ContractTrieSet, w io.Writer, name string) (n, size int, err error) {
+	update3 := func(nn, sz int, e error) {
 		n += nn
-		if err == nil ***REMOVED***
+		if err == nil {
 			err = e
-		***REMOVED***
+		}
 		size += sz
-	***REMOVED***
-	update2 := func(nn int, e error) ***REMOVED*** update3(nn, 0, e) ***REMOVED***
+	}
+	update2 := func(nn int, e error) { update3(nn, 0, e) }
 
 	update3(printArray(*t, w, name))
 	update2(fmt.Fprintf(w, "var %sContractTrieSet = ", name))
 	update3(printStruct(*t, w, name))
 	update2(fmt.Fprintln(w))
 	return
-***REMOVED***
+}
 
-func printArray(ct colltab.ContractTrieSet, w io.Writer, name string) (n, size int, err error) ***REMOVED***
-	p := func(f string, a ...interface***REMOVED******REMOVED***) ***REMOVED***
+func printArray(ct colltab.ContractTrieSet, w io.Writer, name string) (n, size int, err error) {
+	p := func(f string, a ...interface{}) {
 		nn, e := fmt.Fprintf(w, f, a...)
 		n += nn
-		if err == nil ***REMOVED***
+		if err == nil {
 			err = e
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	size = len(ct) * 4
 	p("// %sCTEntries: %d entries, %d bytes\n", name, len(ct), size)
-	p("var %sCTEntries = [%d]struct***REMOVED***L,H,N,I uint8***REMOVED******REMOVED***\n", name, len(ct))
-	for _, fe := range ct ***REMOVED***
-		p("\t***REMOVED***0x%X, 0x%X, %d, %d***REMOVED***,\n", fe.L, fe.H, fe.N, fe.I)
-	***REMOVED***
-	p("***REMOVED***\n")
+	p("var %sCTEntries = [%d]struct{L,H,N,I uint8}{\n", name, len(ct))
+	for _, fe := range ct {
+		p("\t{0x%X, 0x%X, %d, %d},\n", fe.L, fe.H, fe.N, fe.I)
+	}
+	p("}\n")
 	return
-***REMOVED***
+}
 
-func printStruct(ct colltab.ContractTrieSet, w io.Writer, name string) (n, size int, err error) ***REMOVED***
+func printStruct(ct colltab.ContractTrieSet, w io.Writer, name string) (n, size int, err error) {
 	n, err = fmt.Fprintf(w, "colltab.ContractTrieSet( %sCTEntries[:] )", name)
 	size = int(reflect.TypeOf(ct).Size())
 	return
-***REMOVED***
+}

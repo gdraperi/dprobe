@@ -6,24 +6,24 @@ import (
 	"testing"
 )
 
-func TestPositionString(t *testing.T) ***REMOVED***
-	p := Position***REMOVED***123, 456***REMOVED***
+func TestPositionString(t *testing.T) {
+	p := Position{123, 456}
 	expected := "(123, 456)"
 	value := p.String()
 
-	if value != expected ***REMOVED***
+	if value != expected {
 		t.Errorf("Expected %v, got %v instead", expected, value)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestInvalid(t *testing.T) ***REMOVED***
-	for i, v := range []Position***REMOVED***
-		***REMOVED***0, 1234***REMOVED***,
-		***REMOVED***1234, 0***REMOVED***,
-		***REMOVED***0, 0***REMOVED***,
-	***REMOVED*** ***REMOVED***
-		if !v.Invalid() ***REMOVED***
+func TestInvalid(t *testing.T) {
+	for i, v := range []Position{
+		{0, 1234},
+		{1234, 0},
+		{0, 0},
+	} {
+		if !v.Invalid() {
 			t.Errorf("Position at %v is valid: %v", i, v)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

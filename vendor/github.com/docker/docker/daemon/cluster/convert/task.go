@@ -9,30 +9,30 @@ import (
 )
 
 // TaskFromGRPC converts a grpc Task to a Task.
-func TaskFromGRPC(t swarmapi.Task) (types.Task, error) ***REMOVED***
-	if t.Spec.GetAttachment() != nil ***REMOVED***
-		return types.Task***REMOVED******REMOVED***, nil
-	***REMOVED***
+func TaskFromGRPC(t swarmapi.Task) (types.Task, error) {
+	if t.Spec.GetAttachment() != nil {
+		return types.Task{}, nil
+	}
 	containerStatus := t.Status.GetContainer()
 	taskSpec, err := taskSpecFromGRPC(t.Spec)
-	if err != nil ***REMOVED***
-		return types.Task***REMOVED******REMOVED***, err
-	***REMOVED***
-	task := types.Task***REMOVED***
+	if err != nil {
+		return types.Task{}, err
+	}
+	task := types.Task{
 		ID:          t.ID,
 		Annotations: annotationsFromGRPC(t.Annotations),
 		ServiceID:   t.ServiceID,
 		Slot:        int(t.Slot),
 		NodeID:      t.NodeID,
 		Spec:        taskSpec,
-		Status: types.TaskStatus***REMOVED***
+		Status: types.TaskStatus{
 			State:   types.TaskState(strings.ToLower(t.Status.State.String())),
 			Message: t.Status.Message,
 			Err:     t.Status.Err,
-		***REMOVED***,
+		},
 		DesiredState:     types.TaskState(strings.ToLower(t.DesiredState.String())),
 		GenericResources: GenericResourcesFromGRPC(t.AssignedGenericResources),
-	***REMOVED***
+	}
 
 	// Meta
 	task.Version.Index = t.Meta.Version.Index
@@ -41,30 +41,30 @@ func TaskFromGRPC(t swarmapi.Task) (types.Task, error) ***REMOVED***
 
 	task.Status.Timestamp, _ = gogotypes.TimestampFromProto(t.Status.Timestamp)
 
-	if containerStatus != nil ***REMOVED***
+	if containerStatus != nil {
 		task.Status.ContainerStatus.ContainerID = containerStatus.ContainerID
 		task.Status.ContainerStatus.PID = int(containerStatus.PID)
 		task.Status.ContainerStatus.ExitCode = int(containerStatus.ExitCode)
-	***REMOVED***
+	}
 
 	// NetworksAttachments
-	for _, na := range t.Networks ***REMOVED***
+	for _, na := range t.Networks {
 		task.NetworksAttachments = append(task.NetworksAttachments, networkAttachmentFromGRPC(na))
-	***REMOVED***
+	}
 
-	if t.Status.PortStatus == nil ***REMOVED***
+	if t.Status.PortStatus == nil {
 		return task, nil
-	***REMOVED***
+	}
 
-	for _, p := range t.Status.PortStatus.Ports ***REMOVED***
-		task.Status.PortStatus.Ports = append(task.Status.PortStatus.Ports, types.PortConfig***REMOVED***
+	for _, p := range t.Status.PortStatus.Ports {
+		task.Status.PortStatus.Ports = append(task.Status.PortStatus.Ports, types.PortConfig{
 			Name:          p.Name,
 			Protocol:      types.PortConfigProtocol(strings.ToLower(swarmapi.PortConfig_Protocol_name[int32(p.Protocol)])),
 			PublishMode:   types.PortConfigPublishMode(strings.ToLower(swarmapi.PortConfig_PublishMode_name[int32(p.PublishMode)])),
 			TargetPort:    p.TargetPort,
 			PublishedPort: p.PublishedPort,
-		***REMOVED***)
-	***REMOVED***
+		})
+	}
 
 	return task, nil
-***REMOVED***
+}

@@ -16,19 +16,19 @@ type Isolation string
 
 // IsDefault indicates the default isolation technology of a container. On Linux this
 // is the native driver. On Windows, this is a Windows Server Container.
-func (i Isolation) IsDefault() bool ***REMOVED***
+func (i Isolation) IsDefault() bool {
 	return strings.ToLower(string(i)) == "default" || string(i) == ""
-***REMOVED***
+}
 
 // IsHyperV indicates the use of a Hyper-V partition for isolation
-func (i Isolation) IsHyperV() bool ***REMOVED***
+func (i Isolation) IsHyperV() bool {
 	return strings.ToLower(string(i)) == "hyperv"
-***REMOVED***
+}
 
 // IsProcess indicates the use of process isolation
-func (i Isolation) IsProcess() bool ***REMOVED***
+func (i Isolation) IsProcess() bool {
 	return strings.ToLower(string(i)) == "process"
-***REMOVED***
+}
 
 const (
 	// IsolationEmpty is unspecified (same behavior as default)
@@ -45,247 +45,247 @@ const (
 type IpcMode string
 
 // IsPrivate indicates whether the container uses its own private ipc namespace which can not be shared.
-func (n IpcMode) IsPrivate() bool ***REMOVED***
+func (n IpcMode) IsPrivate() bool {
 	return n == "private"
-***REMOVED***
+}
 
 // IsHost indicates whether the container shares the host's ipc namespace.
-func (n IpcMode) IsHost() bool ***REMOVED***
+func (n IpcMode) IsHost() bool {
 	return n == "host"
-***REMOVED***
+}
 
 // IsShareable indicates whether the container's ipc namespace can be shared with another container.
-func (n IpcMode) IsShareable() bool ***REMOVED***
+func (n IpcMode) IsShareable() bool {
 	return n == "shareable"
-***REMOVED***
+}
 
 // IsContainer indicates whether the container uses another container's ipc namespace.
-func (n IpcMode) IsContainer() bool ***REMOVED***
+func (n IpcMode) IsContainer() bool {
 	parts := strings.SplitN(string(n), ":", 2)
 	return len(parts) > 1 && parts[0] == "container"
-***REMOVED***
+}
 
 // IsNone indicates whether container IpcMode is set to "none".
-func (n IpcMode) IsNone() bool ***REMOVED***
+func (n IpcMode) IsNone() bool {
 	return n == "none"
-***REMOVED***
+}
 
 // IsEmpty indicates whether container IpcMode is empty
-func (n IpcMode) IsEmpty() bool ***REMOVED***
+func (n IpcMode) IsEmpty() bool {
 	return n == ""
-***REMOVED***
+}
 
 // Valid indicates whether the ipc mode is valid.
-func (n IpcMode) Valid() bool ***REMOVED***
+func (n IpcMode) Valid() bool {
 	return n.IsEmpty() || n.IsNone() || n.IsPrivate() || n.IsHost() || n.IsShareable() || n.IsContainer()
-***REMOVED***
+}
 
 // Container returns the name of the container ipc stack is going to be used.
-func (n IpcMode) Container() string ***REMOVED***
+func (n IpcMode) Container() string {
 	parts := strings.SplitN(string(n), ":", 2)
-	if len(parts) > 1 && parts[0] == "container" ***REMOVED***
+	if len(parts) > 1 && parts[0] == "container" {
 		return parts[1]
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
 // NetworkMode represents the container network stack.
 type NetworkMode string
 
 // IsNone indicates whether container isn't using a network stack.
-func (n NetworkMode) IsNone() bool ***REMOVED***
+func (n NetworkMode) IsNone() bool {
 	return n == "none"
-***REMOVED***
+}
 
 // IsDefault indicates whether container uses the default network stack.
-func (n NetworkMode) IsDefault() bool ***REMOVED***
+func (n NetworkMode) IsDefault() bool {
 	return n == "default"
-***REMOVED***
+}
 
 // IsPrivate indicates whether container uses its private network stack.
-func (n NetworkMode) IsPrivate() bool ***REMOVED***
+func (n NetworkMode) IsPrivate() bool {
 	return !(n.IsHost() || n.IsContainer())
-***REMOVED***
+}
 
 // IsContainer indicates whether container uses a container network stack.
-func (n NetworkMode) IsContainer() bool ***REMOVED***
+func (n NetworkMode) IsContainer() bool {
 	parts := strings.SplitN(string(n), ":", 2)
 	return len(parts) > 1 && parts[0] == "container"
-***REMOVED***
+}
 
 // ConnectedContainer is the id of the container which network this container is connected to.
-func (n NetworkMode) ConnectedContainer() string ***REMOVED***
+func (n NetworkMode) ConnectedContainer() string {
 	parts := strings.SplitN(string(n), ":", 2)
-	if len(parts) > 1 ***REMOVED***
+	if len(parts) > 1 {
 		return parts[1]
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
 //UserDefined indicates user-created network
-func (n NetworkMode) UserDefined() string ***REMOVED***
-	if n.IsUserDefined() ***REMOVED***
+func (n NetworkMode) UserDefined() string {
+	if n.IsUserDefined() {
 		return string(n)
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
 // UsernsMode represents userns mode in the container.
 type UsernsMode string
 
 // IsHost indicates whether the container uses the host's userns.
-func (n UsernsMode) IsHost() bool ***REMOVED***
+func (n UsernsMode) IsHost() bool {
 	return n == "host"
-***REMOVED***
+}
 
 // IsPrivate indicates whether the container uses the a private userns.
-func (n UsernsMode) IsPrivate() bool ***REMOVED***
+func (n UsernsMode) IsPrivate() bool {
 	return !(n.IsHost())
-***REMOVED***
+}
 
 // Valid indicates whether the userns is valid.
-func (n UsernsMode) Valid() bool ***REMOVED***
+func (n UsernsMode) Valid() bool {
 	parts := strings.Split(string(n), ":")
-	switch mode := parts[0]; mode ***REMOVED***
+	switch mode := parts[0]; mode {
 	case "", "host":
 	default:
 		return false
-	***REMOVED***
+	}
 	return true
-***REMOVED***
+}
 
 // CgroupSpec represents the cgroup to use for the container.
 type CgroupSpec string
 
 // IsContainer indicates whether the container is using another container cgroup
-func (c CgroupSpec) IsContainer() bool ***REMOVED***
+func (c CgroupSpec) IsContainer() bool {
 	parts := strings.SplitN(string(c), ":", 2)
 	return len(parts) > 1 && parts[0] == "container"
-***REMOVED***
+}
 
 // Valid indicates whether the cgroup spec is valid.
-func (c CgroupSpec) Valid() bool ***REMOVED***
+func (c CgroupSpec) Valid() bool {
 	return c.IsContainer() || c == ""
-***REMOVED***
+}
 
 // Container returns the name of the container whose cgroup will be used.
-func (c CgroupSpec) Container() string ***REMOVED***
+func (c CgroupSpec) Container() string {
 	parts := strings.SplitN(string(c), ":", 2)
-	if len(parts) > 1 ***REMOVED***
+	if len(parts) > 1 {
 		return parts[1]
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
 // UTSMode represents the UTS namespace of the container.
 type UTSMode string
 
 // IsPrivate indicates whether the container uses its private UTS namespace.
-func (n UTSMode) IsPrivate() bool ***REMOVED***
+func (n UTSMode) IsPrivate() bool {
 	return !(n.IsHost())
-***REMOVED***
+}
 
 // IsHost indicates whether the container uses the host's UTS namespace.
-func (n UTSMode) IsHost() bool ***REMOVED***
+func (n UTSMode) IsHost() bool {
 	return n == "host"
-***REMOVED***
+}
 
 // Valid indicates whether the UTS namespace is valid.
-func (n UTSMode) Valid() bool ***REMOVED***
+func (n UTSMode) Valid() bool {
 	parts := strings.Split(string(n), ":")
-	switch mode := parts[0]; mode ***REMOVED***
+	switch mode := parts[0]; mode {
 	case "", "host":
 	default:
 		return false
-	***REMOVED***
+	}
 	return true
-***REMOVED***
+}
 
 // PidMode represents the pid namespace of the container.
 type PidMode string
 
 // IsPrivate indicates whether the container uses its own new pid namespace.
-func (n PidMode) IsPrivate() bool ***REMOVED***
+func (n PidMode) IsPrivate() bool {
 	return !(n.IsHost() || n.IsContainer())
-***REMOVED***
+}
 
 // IsHost indicates whether the container uses the host's pid namespace.
-func (n PidMode) IsHost() bool ***REMOVED***
+func (n PidMode) IsHost() bool {
 	return n == "host"
-***REMOVED***
+}
 
 // IsContainer indicates whether the container uses a container's pid namespace.
-func (n PidMode) IsContainer() bool ***REMOVED***
+func (n PidMode) IsContainer() bool {
 	parts := strings.SplitN(string(n), ":", 2)
 	return len(parts) > 1 && parts[0] == "container"
-***REMOVED***
+}
 
 // Valid indicates whether the pid namespace is valid.
-func (n PidMode) Valid() bool ***REMOVED***
+func (n PidMode) Valid() bool {
 	parts := strings.Split(string(n), ":")
-	switch mode := parts[0]; mode ***REMOVED***
+	switch mode := parts[0]; mode {
 	case "", "host":
 	case "container":
-		if len(parts) != 2 || parts[1] == "" ***REMOVED***
+		if len(parts) != 2 || parts[1] == "" {
 			return false
-		***REMOVED***
+		}
 	default:
 		return false
-	***REMOVED***
+	}
 	return true
-***REMOVED***
+}
 
 // Container returns the name of the container whose pid namespace is going to be used.
-func (n PidMode) Container() string ***REMOVED***
+func (n PidMode) Container() string {
 	parts := strings.SplitN(string(n), ":", 2)
-	if len(parts) > 1 ***REMOVED***
+	if len(parts) > 1 {
 		return parts[1]
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
 // DeviceMapping represents the device mapping between the host and the container.
-type DeviceMapping struct ***REMOVED***
+type DeviceMapping struct {
 	PathOnHost        string
 	PathInContainer   string
 	CgroupPermissions string
-***REMOVED***
+}
 
 // RestartPolicy represents the restart policies of the container.
-type RestartPolicy struct ***REMOVED***
+type RestartPolicy struct {
 	Name              string
 	MaximumRetryCount int
-***REMOVED***
+}
 
 // IsNone indicates whether the container has the "no" restart policy.
 // This means the container will not automatically restart when exiting.
-func (rp *RestartPolicy) IsNone() bool ***REMOVED***
+func (rp *RestartPolicy) IsNone() bool {
 	return rp.Name == "no" || rp.Name == ""
-***REMOVED***
+}
 
 // IsAlways indicates whether the container has the "always" restart policy.
 // This means the container will automatically restart regardless of the exit status.
-func (rp *RestartPolicy) IsAlways() bool ***REMOVED***
+func (rp *RestartPolicy) IsAlways() bool {
 	return rp.Name == "always"
-***REMOVED***
+}
 
 // IsOnFailure indicates whether the container has the "on-failure" restart policy.
 // This means the container will automatically restart of exiting with a non-zero exit status.
-func (rp *RestartPolicy) IsOnFailure() bool ***REMOVED***
+func (rp *RestartPolicy) IsOnFailure() bool {
 	return rp.Name == "on-failure"
-***REMOVED***
+}
 
 // IsUnlessStopped indicates whether the container has the
 // "unless-stopped" restart policy. This means the container will
 // automatically restart unless user has put it to stopped state.
-func (rp *RestartPolicy) IsUnlessStopped() bool ***REMOVED***
+func (rp *RestartPolicy) IsUnlessStopped() bool {
 	return rp.Name == "unless-stopped"
-***REMOVED***
+}
 
 // IsSame compares two RestartPolicy to see if they are the same
-func (rp *RestartPolicy) IsSame(tp *RestartPolicy) bool ***REMOVED***
+func (rp *RestartPolicy) IsSame(tp *RestartPolicy) bool {
 	return rp.Name == tp.Name && rp.MaximumRetryCount == tp.MaximumRetryCount
-***REMOVED***
+}
 
 // LogMode is a type to define the available modes for logging
 // These modes affect how logs are handled when log messages start piling up.
@@ -299,13 +299,13 @@ const (
 )
 
 // LogConfig represents the logging configuration of the container.
-type LogConfig struct ***REMOVED***
+type LogConfig struct {
 	Type   string
 	Config map[string]string
-***REMOVED***
+}
 
 // Resources contains container's resources (cgroups config, ulimits...)
-type Resources struct ***REMOVED***
+type Resources struct {
 	// Applicable to all platforms
 	CPUShares int64 `json:"CpuShares"` // CPU shares (relative weight vs. other containers)
 	Memory    int64 // Memory limit (in bytes)
@@ -341,20 +341,20 @@ type Resources struct ***REMOVED***
 	CPUPercent         int64  `json:"CpuPercent"` // CPU percent
 	IOMaximumIOps      uint64 // Maximum IOps for the container system drive
 	IOMaximumBandwidth uint64 // Maximum IO in bytes per second for the container system drive
-***REMOVED***
+}
 
 // UpdateConfig holds the mutable attributes of a Container.
 // Those attributes can be updated at runtime.
-type UpdateConfig struct ***REMOVED***
+type UpdateConfig struct {
 	// Contains container's resources (cgroups, ulimits)
 	Resources
 	RestartPolicy RestartPolicy
-***REMOVED***
+}
 
 // HostConfig the non-portable Config structure of a container.
 // Here, "non-portable" means "dependent of the host we are running on".
 // Portable information *should* appear in Config.
-type HostConfig struct ***REMOVED***
+type HostConfig struct {
 	// Applicable to all platforms
 	Binds           []string      // List of volume bindings for this container
 	ContainerIDFile string        // File (path) where the containerId is written
@@ -403,4 +403,4 @@ type HostConfig struct ***REMOVED***
 
 	// Run a custom init inside the container, if null, use the daemon's configured settings
 	Init *bool `json:",omitempty"`
-***REMOVED***
+}

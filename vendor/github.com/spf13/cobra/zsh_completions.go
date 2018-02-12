@@ -9,18 +9,18 @@ import (
 )
 
 // GenZshCompletionFile generates zsh completion file.
-func (c *Command) GenZshCompletionFile(filename string) error ***REMOVED***
+func (c *Command) GenZshCompletionFile(filename string) error {
 	outFile, err := os.Create(filename)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer outFile.Close()
 
 	return c.GenZshCompletion(outFile)
-***REMOVED***
+}
 
 // GenZshCompletion generates a zsh completion file and writes to the passed writer.
-func (c *Command) GenZshCompletion(w io.Writer) error ***REMOVED***
+func (c *Command) GenZshCompletion(w io.Writer) error {
 	buf := new(bytes.Buffer)
 
 	writeHeader(buf, c)
@@ -30,97 +30,97 @@ func (c *Command) GenZshCompletion(w io.Writer) error ***REMOVED***
 
 	_, err := buf.WriteTo(w)
 	return err
-***REMOVED***
+}
 
-func writeHeader(w io.Writer, cmd *Command) ***REMOVED***
+func writeHeader(w io.Writer, cmd *Command) {
 	fmt.Fprintf(w, "#compdef %s\n\n", cmd.Name())
-***REMOVED***
+}
 
-func maxDepth(c *Command) int ***REMOVED***
-	if len(c.Commands()) == 0 ***REMOVED***
+func maxDepth(c *Command) int {
+	if len(c.Commands()) == 0 {
 		return 0
-	***REMOVED***
+	}
 	maxDepthSub := 0
-	for _, s := range c.Commands() ***REMOVED***
+	for _, s := range c.Commands() {
 		subDepth := maxDepth(s)
-		if subDepth > maxDepthSub ***REMOVED***
+		if subDepth > maxDepthSub {
 			maxDepthSub = subDepth
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return 1 + maxDepthSub
-***REMOVED***
+}
 
-func writeLevelMapping(w io.Writer, numLevels int) ***REMOVED***
+func writeLevelMapping(w io.Writer, numLevels int) {
 	fmt.Fprintln(w, `_arguments \`)
-	for i := 1; i <= numLevels; i++ ***REMOVED***
+	for i := 1; i <= numLevels; i++ {
 		fmt.Fprintf(w, `  '%d: :->level%d' \`, i, i)
 		fmt.Fprintln(w)
-	***REMOVED***
+	}
 	fmt.Fprintf(w, `  '%d: :%s'`, numLevels+1, "_files")
 	fmt.Fprintln(w)
-***REMOVED***
+}
 
-func writeLevelCases(w io.Writer, maxDepth int, root *Command) ***REMOVED***
+func writeLevelCases(w io.Writer, maxDepth int, root *Command) {
 	fmt.Fprintln(w, "case $state in")
 	defer fmt.Fprintln(w, "esac")
 
-	for i := 1; i <= maxDepth; i++ ***REMOVED***
+	for i := 1; i <= maxDepth; i++ {
 		fmt.Fprintf(w, "  level%d)\n", i)
 		writeLevel(w, root, i)
 		fmt.Fprintln(w, "  ;;")
-	***REMOVED***
+	}
 	fmt.Fprintln(w, "  *)")
 	fmt.Fprintln(w, "    _arguments '*: :_files'")
 	fmt.Fprintln(w, "  ;;")
-***REMOVED***
+}
 
-func writeLevel(w io.Writer, root *Command, i int) ***REMOVED***
+func writeLevel(w io.Writer, root *Command, i int) {
 	fmt.Fprintf(w, "    case $words[%d] in\n", i)
 	defer fmt.Fprintln(w, "    esac")
 
 	commands := filterByLevel(root, i)
 	byParent := groupByParent(commands)
 
-	for p, c := range byParent ***REMOVED***
+	for p, c := range byParent {
 		names := names(c)
 		fmt.Fprintf(w, "      %s)\n", p)
 		fmt.Fprintf(w, "        _arguments '%d: :(%s)'\n", i, strings.Join(names, " "))
 		fmt.Fprintln(w, "      ;;")
-	***REMOVED***
+	}
 	fmt.Fprintln(w, "      *)")
 	fmt.Fprintln(w, "        _arguments '*: :_files'")
 	fmt.Fprintln(w, "      ;;")
 
-***REMOVED***
+}
 
-func filterByLevel(c *Command, l int) []*Command ***REMOVED***
+func filterByLevel(c *Command, l int) []*Command {
 	cs := make([]*Command, 0)
-	if l == 0 ***REMOVED***
+	if l == 0 {
 		cs = append(cs, c)
 		return cs
-	***REMOVED***
-	for _, s := range c.Commands() ***REMOVED***
+	}
+	for _, s := range c.Commands() {
 		cs = append(cs, filterByLevel(s, l-1)...)
-	***REMOVED***
+	}
 	return cs
-***REMOVED***
+}
 
-func groupByParent(commands []*Command) map[string][]*Command ***REMOVED***
+func groupByParent(commands []*Command) map[string][]*Command {
 	m := make(map[string][]*Command)
-	for _, c := range commands ***REMOVED***
+	for _, c := range commands {
 		parent := c.Parent()
-		if parent == nil ***REMOVED***
+		if parent == nil {
 			continue
-		***REMOVED***
+		}
 		m[parent.Name()] = append(m[parent.Name()], c)
-	***REMOVED***
+	}
 	return m
-***REMOVED***
+}
 
-func names(commands []*Command) []string ***REMOVED***
+func names(commands []*Command) []string {
 	ns := make([]string, len(commands))
-	for i, c := range commands ***REMOVED***
+	for i, c := range commands {
 		ns[i] = c.Name()
-	***REMOVED***
+	}
 	return ns
-***REMOVED***
+}

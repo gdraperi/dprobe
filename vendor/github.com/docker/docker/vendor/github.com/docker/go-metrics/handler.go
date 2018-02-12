@@ -8,6 +8,6 @@ import (
 
 // Handler returns the global http.Handler that provides the prometheus
 // metrics format on GET requests
-func Handler() http.Handler ***REMOVED***
+func Handler() http.Handler {
 	return prometheus.Handler()
-***REMOVED***
+}

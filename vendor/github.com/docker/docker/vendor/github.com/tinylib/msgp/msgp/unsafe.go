@@ -23,19 +23,19 @@ const (
 // THIS SHOULD ONLY BE USED BY THE CODE GENERATOR.
 // THIS IS EVIL CODE.
 // YOU HAVE BEEN WARNED.
-func UnsafeString(b []byte) string ***REMOVED***
+func UnsafeString(b []byte) string {
 	sh := (*reflect.SliceHeader)(unsafe.Pointer(&b))
-	return *(*string)(unsafe.Pointer(&reflect.StringHeader***REMOVED***Data: sh.Data, Len: sh.Len***REMOVED***))
-***REMOVED***
+	return *(*string)(unsafe.Pointer(&reflect.StringHeader{Data: sh.Data, Len: sh.Len}))
+}
 
 // UnsafeBytes returns the string as a byte slice
 // THIS SHOULD ONLY BE USED BY THE CODE GENERATOR.
 // THIS IS EVIL CODE.
 // YOU HAVE BEEN WARNED.
-func UnsafeBytes(s string) []byte ***REMOVED***
-	return *(*[]byte)(unsafe.Pointer(&reflect.SliceHeader***REMOVED***
+func UnsafeBytes(s string) []byte {
+	return *(*[]byte)(unsafe.Pointer(&reflect.SliceHeader{
 		Len:  len(s),
 		Cap:  len(s),
 		Data: (*(*reflect.StringHeader)(unsafe.Pointer(&s))).Data,
-	***REMOVED***))
-***REMOVED***
+	}))
+}

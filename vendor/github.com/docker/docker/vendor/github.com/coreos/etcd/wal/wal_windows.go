@@ -20,22 +20,22 @@ import (
 	"github.com/coreos/etcd/wal/walpb"
 )
 
-func (w *WAL) renameWal(tmpdirpath string) (*WAL, error) ***REMOVED***
+func (w *WAL) renameWal(tmpdirpath string) (*WAL, error) {
 	// rename of directory with locked files doesn't work on
 	// windows; close the WAL to release the locks so the directory
 	// can be renamed
 	w.Close()
-	if err := os.Rename(tmpdirpath, w.dir); err != nil ***REMOVED***
+	if err := os.Rename(tmpdirpath, w.dir); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	// reopen and relock
-	newWAL, oerr := Open(w.dir, walpb.Snapshot***REMOVED******REMOVED***)
-	if oerr != nil ***REMOVED***
+	newWAL, oerr := Open(w.dir, walpb.Snapshot{})
+	if oerr != nil {
 		return nil, oerr
-	***REMOVED***
-	if _, _, _, err := newWAL.ReadAll(); err != nil ***REMOVED***
+	}
+	if _, _, _, err := newWAL.ReadAll(); err != nil {
 		newWAL.Close()
 		return nil, err
-	***REMOVED***
+	}
 	return newWAL, nil
-***REMOVED***
+}

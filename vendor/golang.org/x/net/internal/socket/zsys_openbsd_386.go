@@ -11,12 +11,12 @@ const (
 	sysSOCK_RAW = 0x3
 )
 
-type iovec struct ***REMOVED***
+type iovec struct {
 	Base *byte
 	Len  uint32
-***REMOVED***
+}
 
-type msghdr struct ***REMOVED***
+type msghdr struct {
 	Name       *byte
 	Namelen    uint32
 	Iov        *iovec
@@ -24,30 +24,30 @@ type msghdr struct ***REMOVED***
 	Control    *byte
 	Controllen uint32
 	Flags      int32
-***REMOVED***
+}
 
-type cmsghdr struct ***REMOVED***
+type cmsghdr struct {
 	Len   uint32
 	Level int32
 	Type  int32
-***REMOVED***
+}
 
-type sockaddrInet struct ***REMOVED***
+type sockaddrInet struct {
 	Len    uint8
 	Family uint8
 	Port   uint16
 	Addr   [4]byte /* in_addr */
 	Zero   [8]int8
-***REMOVED***
+}
 
-type sockaddrInet6 struct ***REMOVED***
+type sockaddrInet6 struct {
 	Len      uint8
 	Family   uint8
 	Port     uint16
 	Flowinfo uint32
 	Addr     [16]byte /* in6_addr */
 	Scope_id uint32
-***REMOVED***
+}
 
 const (
 	sizeofIovec   = 0x8

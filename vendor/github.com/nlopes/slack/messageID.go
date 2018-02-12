@@ -3,28 +3,28 @@ package slack
 import "sync"
 
 // IDGenerator provides an interface for generating integer ID values.
-type IDGenerator interface ***REMOVED***
+type IDGenerator interface {
 	Next() int
-***REMOVED***
+}
 
 // NewSafeID returns a new instance of an IDGenerator which is safe for
 // concurrent use by multiple goroutines.
-func NewSafeID(startID int) IDGenerator ***REMOVED***
-	return &safeID***REMOVED***
+func NewSafeID(startID int) IDGenerator {
+	return &safeID{
 		nextID: startID,
-		mutex:  &sync.Mutex***REMOVED******REMOVED***,
-	***REMOVED***
-***REMOVED***
+		mutex:  &sync.Mutex{},
+	}
+}
 
-type safeID struct ***REMOVED***
+type safeID struct {
 	nextID int
 	mutex  *sync.Mutex
-***REMOVED***
+}
 
-func (s *safeID) Next() int ***REMOVED***
+func (s *safeID) Next() int {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 	id := s.nextID
 	s.nextID++
 	return id
-***REMOVED***
+}

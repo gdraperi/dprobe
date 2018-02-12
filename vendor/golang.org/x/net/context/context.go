@@ -21,9 +21,9 @@
 // explicitly to each function that needs it. The Context should be the first
 // parameter, typically named ctx:
 //
-// 	func DoSomething(ctx context.Context, arg Arg) error ***REMOVED***
+// 	func DoSomething(ctx context.Context, arg Arg) error {
 // 		// ... use ctx ...
-// 	***REMOVED***
+// 	}
 //
 // Do not pass a nil Context, even if a function permits it. Pass context.TODO
 // if you are unsure about which Context to use.
@@ -42,15 +42,15 @@ package context // import "golang.org/x/net/context"
 // values, and has no deadline. It is typically used by the main function,
 // initialization, and tests, and as the top-level Context for incoming
 // requests.
-func Background() Context ***REMOVED***
+func Background() Context {
 	return background
-***REMOVED***
+}
 
 // TODO returns a non-nil, empty Context. Code should use context.TODO when
 // it's unclear which Context to use or it is not yet available (because the
 // surrounding function has not yet been extended to accept a Context
 // parameter).  TODO is recognized by static analysis tools that determine
 // whether Contexts are propagated correctly in a program.
-func TODO() Context ***REMOVED***
+func TODO() Context {
 	return todo
-***REMOVED***
+}

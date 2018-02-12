@@ -1,39 +1,39 @@
-***REMOVED***
+{
     "language": "de",
     "messages": [
-        ***REMOVED***
-            "id": "Hello ***REMOVED***From***REMOVED***!",
+        {
+            "id": "Hello {From}!",
             "key": "Hello %s!\n",
-            "message": "Hello ***REMOVED***From***REMOVED***!",
+            "message": "Hello {From}!",
             "translation": "",
             "placeholders": [
-                ***REMOVED***
+                {
                     "id": "From",
                     "string": "%[1]s",
                     "type": "string",
                     "underlyingType": "string",
                     "argNum": 1,
                     "expr": "r.Header.Get(\"From\")"
-            ***REMOVED***
+                }
             ],
             "position": "golang.org/x/text/cmd/gotext/examples/extract_http/pkg/pkg.go:22:11"
-    ***REMOVED***,
-        ***REMOVED***
-            "id": "Do you like your browser (***REMOVED***User_Agent***REMOVED***)?",
+        },
+        {
+            "id": "Do you like your browser ({User_Agent})?",
             "key": "Do you like your browser (%s)?\n",
-            "message": "Do you like your browser (***REMOVED***User_Agent***REMOVED***)?",
+            "message": "Do you like your browser ({User_Agent})?",
             "translation": "",
             "placeholders": [
-                ***REMOVED***
+                {
                     "id": "User_Agent",
                     "string": "%[1]s",
                     "type": "string",
                     "underlyingType": "string",
                     "argNum": 1,
                     "expr": "r.Header.Get(\"User-Agent\")"
-            ***REMOVED***
+                }
             ],
             "position": "golang.org/x/text/cmd/gotext/examples/extract_http/pkg/pkg.go:24:11"
-    ***REMOVED***
+        }
     ]
-***REMOVED***
+}

@@ -25,22 +25,22 @@ var (
 // only expected close message from the client has the code
 // websocket.CloseGoingAway. All other other close messages are likely the
 // result of an application or protocol error and are logged to aid debugging.
-func ExampleIsUnexpectedCloseError() ***REMOVED***
+func ExampleIsUnexpectedCloseError() {
 
-	for ***REMOVED***
+	for {
 		messageType, p, err := c.ReadMessage()
-		if err != nil ***REMOVED***
-			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway) ***REMOVED***
+		if err != nil {
+			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway) {
 				log.Printf("error: %v, user-agent: %v", err, req.Header.Get("User-Agent"))
-			***REMOVED***
+			}
 			return
-		***REMOVED***
+		}
 		processMesage(messageType, p)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func processMesage(mt int, p []byte) ***REMOVED******REMOVED***
+func processMesage(mt int, p []byte) {}
 
 // TestX prevents godoc from showing this entire file in the example. Remove
 // this function when a second example is added.
-func TestX(t *testing.T) ***REMOVED******REMOVED***
+func TestX(t *testing.T) {}

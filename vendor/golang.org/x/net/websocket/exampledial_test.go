@@ -12,20 +12,20 @@ import (
 )
 
 // This example demonstrates a trivial client.
-func ExampleDial() ***REMOVED***
+func ExampleDial() {
 	origin := "http://localhost/"
 	url := "ws://localhost:12345/ws"
 	ws, err := websocket.Dial(url, "", origin)
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatal(err)
-	***REMOVED***
-	if _, err := ws.Write([]byte("hello, world!\n")); err != nil ***REMOVED***
+	}
+	if _, err := ws.Write([]byte("hello, world!\n")); err != nil {
 		log.Fatal(err)
-	***REMOVED***
+	}
 	var msg = make([]byte, 512)
 	var n int
-	if n, err = ws.Read(msg); err != nil ***REMOVED***
+	if n, err = ws.Read(msg); err != nil {
 		log.Fatal(err)
-	***REMOVED***
+	}
 	fmt.Printf("Received: %s.\n", msg[:n])
-***REMOVED***
+}

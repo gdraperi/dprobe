@@ -7,26 +7,26 @@ package precis
 import "golang.org/x/text/transform"
 
 // Transformer implements the transform.Transformer interface.
-type Transformer struct ***REMOVED***
+type Transformer struct {
 	t transform.Transformer
-***REMOVED***
+}
 
 // Reset implements the transform.Transformer interface.
-func (t Transformer) Reset() ***REMOVED*** t.t.Reset() ***REMOVED***
+func (t Transformer) Reset() { t.t.Reset() }
 
 // Transform implements the transform.Transformer interface.
-func (t Transformer) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) ***REMOVED***
+func (t Transformer) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) {
 	return t.t.Transform(dst, src, atEOF)
-***REMOVED***
+}
 
 // Bytes returns a new byte slice with the result of applying t to b.
-func (t Transformer) Bytes(b []byte) []byte ***REMOVED***
+func (t Transformer) Bytes(b []byte) []byte {
 	b, _, _ = transform.Bytes(t, b)
 	return b
-***REMOVED***
+}
 
 // String returns a string with the result of applying t to s.
-func (t Transformer) String(s string) string ***REMOVED***
+func (t Transformer) String(s string) string {
 	s, _, _ = transform.String(t, s)
 	return s
-***REMOVED***
+}

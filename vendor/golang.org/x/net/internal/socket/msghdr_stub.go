@@ -6,9 +6,9 @@
 
 package socket
 
-type msghdr struct***REMOVED******REMOVED***
+type msghdr struct{}
 
-func (h *msghdr) pack(vs []iovec, bs [][]byte, oob []byte, sa []byte) ***REMOVED******REMOVED***
-func (h *msghdr) name() []byte                                        ***REMOVED*** return nil ***REMOVED***
-func (h *msghdr) controllen() int                                     ***REMOVED*** return 0 ***REMOVED***
-func (h *msghdr) flags() int                                          ***REMOVED*** return 0 ***REMOVED***
+func (h *msghdr) pack(vs []iovec, bs [][]byte, oob []byte, sa []byte) {}
+func (h *msghdr) name() []byte                                        { return nil }
+func (h *msghdr) controllen() int                                     { return 0 }
+func (h *msghdr) flags() int                                          { return 0 }

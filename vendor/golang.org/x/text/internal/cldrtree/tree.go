@@ -18,11 +18,11 @@ const (
 )
 
 // Tree holds a tree of CLDR data.
-type Tree struct ***REMOVED***
+type Tree struct {
 	Locales []uint32
 	Indices []uint16
 	Buckets []string
-***REMOVED***
+}
 
 // Lookup looks up CLDR data for the given path. The lookup adheres to the alias
 // and locale inheritance rules as defined in CLDR.
@@ -30,152 +30,152 @@ type Tree struct ***REMOVED***
 // Each subsequent element in path indicates which subtree to select data from.
 // The last element of the path must select a leaf node. All other elements
 // of the path select a subindex.
-func (t *Tree) Lookup(tag int, path ...uint16) string ***REMOVED***
+func (t *Tree) Lookup(tag int, path ...uint16) string {
 	return t.lookup(tag, false, path...)
-***REMOVED***
+}
 
 // LookupFeature is like Lookup, but will first check whether a value of "other"
 // as a fallback before traversing the inheritance chain.
-func (t *Tree) LookupFeature(tag int, path ...uint16) string ***REMOVED***
+func (t *Tree) LookupFeature(tag int, path ...uint16) string {
 	return t.lookup(tag, true, path...)
-***REMOVED***
+}
 
-func (t *Tree) lookup(tag int, isFeature bool, path ...uint16) string ***REMOVED***
+func (t *Tree) lookup(tag int, isFeature bool, path ...uint16) string {
 	origLang := tag
 outer:
-	for ***REMOVED***
+	for {
 		index := t.Indices[t.Locales[tag]:]
 
 		k := uint16(0)
-		for i := range path ***REMOVED***
+		for i := range path {
 			max := index[k]
-			if i < len(path)-1 ***REMOVED***
+			if i < len(path)-1 {
 				// index (non-leaf)
-				if path[i] >= max ***REMOVED***
+				if path[i] >= max {
 					break
-				***REMOVED***
+				}
 				k = index[k+1+path[i]]
-				if k == 0 ***REMOVED***
+				if k == 0 {
 					break
-				***REMOVED***
-				if v := k &^ inheritMask; k != v ***REMOVED***
+				}
+				if v := k &^ inheritMask; k != v {
 					offset := v >> inheritOffsetShift
 					value := v & inheritValueMask
 					path[uint16(i)-offset] = value
 					tag = origLang
 					continue outer
-				***REMOVED***
-			***REMOVED*** else ***REMOVED***
+				}
+			} else {
 				// leaf value
 				offset := missingValue
-				if path[i] < max ***REMOVED***
+				if path[i] < max {
 					offset = index[k+2+path[i]]
-				***REMOVED***
-				if offset == missingValue ***REMOVED***
-					if !isFeature ***REMOVED***
+				}
+				if offset == missingValue {
+					if !isFeature {
 						break
-					***REMOVED***
+					}
 					// "other" feature must exist
 					offset = index[k+2]
-				***REMOVED***
+				}
 				data := t.Buckets[index[k+1]]
 				n := uint16(data[offset])
 				return data[offset+1 : offset+n+1]
-			***REMOVED***
-		***REMOVED***
-		if tag == 0 ***REMOVED***
+			}
+		}
+		if tag == 0 {
 			break
-		***REMOVED***
+		}
 		tag = int(internal.Parent[tag])
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func build(b *Builder) (*Tree, error) ***REMOVED***
+func build(b *Builder) (*Tree, error) {
 	var t Tree
 
 	t.Locales = make([]uint32, language.NumCompactTags)
 
-	for _, loc := range b.locales ***REMOVED***
+	for _, loc := range b.locales {
 		tag, _ := language.CompactIndex(loc.tag)
 		t.Locales[tag] = uint32(len(t.Indices))
 		var x indexBuilder
 		x.add(loc.root)
 		t.Indices = append(t.Indices, x.index...)
-	***REMOVED***
+	}
 	// Set locales for which we don't have data to the parent's data.
-	for i, v := range t.Locales ***REMOVED***
+	for i, v := range t.Locales {
 		p := uint16(i)
-		for v == 0 && p != 0 ***REMOVED***
+		for v == 0 && p != 0 {
 			p = internal.Parent[p]
 			v = t.Locales[p]
-		***REMOVED***
+		}
 		t.Locales[i] = v
-	***REMOVED***
+	}
 
-	for _, b := range b.buckets ***REMOVED***
+	for _, b := range b.buckets {
 		t.Buckets = append(t.Buckets, string(b))
-	***REMOVED***
-	if b.err != nil ***REMOVED***
+	}
+	if b.err != nil {
 		return nil, b.err
-	***REMOVED***
+	}
 	return &t, nil
-***REMOVED***
+}
 
-type indexBuilder struct ***REMOVED***
+type indexBuilder struct {
 	index []uint16
-***REMOVED***
+}
 
-func (b *indexBuilder) add(i *Index) uint16 ***REMOVED***
+func (b *indexBuilder) add(i *Index) uint16 {
 	offset := len(b.index)
 
 	max := enumIndex(0)
-	switch ***REMOVED***
+	switch {
 	case len(i.values) > 0:
-		for _, v := range i.values ***REMOVED***
-			if v.key > max ***REMOVED***
+		for _, v := range i.values {
+			if v.key > max {
 				max = v.key
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		b.index = append(b.index, make([]uint16, max+3)...)
 
 		b.index[offset] = uint16(max) + 1
 
 		b.index[offset+1] = i.values[0].value.bucket
-		for i := offset + 2; i < len(b.index); i++ ***REMOVED***
+		for i := offset + 2; i < len(b.index); i++ {
 			b.index[i] = missingValue
-		***REMOVED***
-		for _, v := range i.values ***REMOVED***
+		}
+		for _, v := range i.values {
 			b.index[offset+2+int(v.key)] = v.value.bucketPos
-		***REMOVED***
+		}
 		return uint16(offset)
 
 	case len(i.subIndex) > 0:
-		for _, s := range i.subIndex ***REMOVED***
-			if s.meta.index > max ***REMOVED***
+		for _, s := range i.subIndex {
+			if s.meta.index > max {
 				max = s.meta.index
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		b.index = append(b.index, make([]uint16, max+2)...)
 
 		b.index[offset] = uint16(max) + 1
 
-		for _, s := range i.subIndex ***REMOVED***
+		for _, s := range i.subIndex {
 			x := b.add(s)
 			b.index[offset+int(s.meta.index)+1] = x
-		***REMOVED***
+		}
 		return uint16(offset)
 
 	case i.meta.inheritOffset < 0:
 		v := uint16(-(i.meta.inheritOffset + 1)) << inheritOffsetShift
 		p := i.meta
-		for k := i.meta.inheritOffset; k < 0; k++ ***REMOVED***
+		for k := i.meta.inheritOffset; k < 0; k++ {
 			p = p.parent
-		***REMOVED***
+		}
 		v += uint16(p.typeInfo.enum.lookup(i.meta.inheritIndex))
 		v |= inheritMask
 		return v
-	***REMOVED***
+	}
 
 	return 0
-***REMOVED***
+}

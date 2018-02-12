@@ -9,14 +9,14 @@ import (
 )
 
 // randomBits completely fills slice b with random data.
-func randomBits(b []byte) ***REMOVED***
-	if _, err := io.ReadFull(rander, b); err != nil ***REMOVED***
+func randomBits(b []byte) {
+	if _, err := io.ReadFull(rander, b); err != nil {
 		panic(err.Error()) // rand should never fail
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // xvalues returns the value of a byte as a hexadecimal digit or 255.
-var xvalues = [256]byte***REMOVED***
+var xvalues = [256]byte{
 	255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
 	255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
 	255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
@@ -33,11 +33,11 @@ var xvalues = [256]byte***REMOVED***
 	255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
 	255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
 	255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
-***REMOVED***
+}
 
 // xtob converts the the first two hex bytes of x into a byte.
-func xtob(x string) (byte, bool) ***REMOVED***
+func xtob(x string) (byte, bool) {
 	b1 := xvalues[x[0]]
 	b2 := xvalues[x[1]]
 	return (b1 << 4) | b2, b1 != 255 && b2 != 255
-***REMOVED***
+}

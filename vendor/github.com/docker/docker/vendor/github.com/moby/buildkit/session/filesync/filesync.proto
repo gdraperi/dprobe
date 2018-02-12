@@ -4,17 +4,17 @@ package moby.filesync.v1;
 
 option go_package = "filesync";
 
-service FileSync***REMOVED***
+service FileSync{
   rpc DiffCopy(stream BytesMessage) returns (stream BytesMessage);
   rpc TarStream(stream BytesMessage) returns (stream BytesMessage);
-***REMOVED***
+}
 
-service FileSend***REMOVED***
+service FileSend{
   rpc DiffCopy(stream BytesMessage) returns (stream BytesMessage);
-***REMOVED***
+}
 
 
 // BytesMessage contains a chunk of byte data
-message BytesMessage***REMOVED***
+message BytesMessage{
 	bytes data = 1;
-***REMOVED***
+}

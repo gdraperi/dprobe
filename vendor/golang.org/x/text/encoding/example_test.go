@@ -16,27 +16,27 @@ import (
 	"golang.org/x/text/transform"
 )
 
-func ExampleDecodeWindows1252() ***REMOVED***
+func ExampleDecodeWindows1252() {
 	sr := strings.NewReader("Gar\xe7on !")
 	tr := charmap.Windows1252.NewDecoder().Reader(sr)
 	io.Copy(os.Stdout, tr)
 	// Output: Garçon !
-***REMOVED***
+}
 
-func ExampleUTF8Validator() ***REMOVED***
-	for i := 0; i < 2; i++ ***REMOVED***
+func ExampleUTF8Validator() {
+	for i := 0; i < 2; i++ {
 		var transformer transform.Transformer
 		transformer = unicode.UTF16(unicode.BigEndian, unicode.IgnoreBOM).NewEncoder()
-		if i == 1 ***REMOVED***
+		if i == 1 {
 			transformer = transform.Chain(encoding.UTF8Validator, transformer)
-		***REMOVED***
+		}
 		dst := make([]byte, 256)
 		src := []byte("abc\xffxyz") // src is invalid UTF-8.
 		nDst, nSrc, err := transformer.Transform(dst, src, true)
 		fmt.Printf("i=%d: produced %q, consumed %q, error %v\n",
 			i, dst[:nDst], src[:nSrc], err)
-	***REMOVED***
+	}
 	// Output:
 	// i=0: produced "\x00a\x00b\x00c\xff\xfd\x00x\x00y\x00z", consumed "abc\xffxyz", error <nil>
 	// i=1: produced "\x00a\x00b\x00c", consumed "abc", error encoding: invalid UTF-8
-***REMOVED***
+}

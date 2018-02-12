@@ -27,20 +27,20 @@ import (
 // encoded messages of the same type together in a file.  It returns the total
 // number of bytes written and any applicable error.  This is roughly
 // equivalent to the companion Java API's MessageLite#writeDelimitedTo.
-func WriteDelimited(w io.Writer, m proto.Message) (n int, err error) ***REMOVED***
+func WriteDelimited(w io.Writer, m proto.Message) (n int, err error) {
 	buffer, err := proto.Marshal(m)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 
 	var buf [binary.MaxVarintLen32]byte
 	encodedLength := binary.PutUvarint(buf[:], uint64(len(buffer)))
 
 	sync, err := w.Write(buf[:encodedLength])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return sync, err
-	***REMOVED***
+	}
 
 	n, err = w.Write(buffer)
 	return n + sync, err
-***REMOVED***
+}

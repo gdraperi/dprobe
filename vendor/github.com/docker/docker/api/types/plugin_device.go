@@ -5,7 +5,7 @@ package types
 
 // PluginDevice plugin device
 // swagger:model PluginDevice
-type PluginDevice struct ***REMOVED***
+type PluginDevice struct {
 
 	// description
 	// Required: true
@@ -22,4 +22,4 @@ type PluginDevice struct ***REMOVED***
 	// settable
 	// Required: true
 	Settable []string `json:"Settable"`
-***REMOVED***
+}

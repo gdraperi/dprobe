@@ -10,7 +10,7 @@ import (
 )
 
 // export an image and try to import it into a new one
-func (s *DockerSuite) TestExportContainerAndImportImage(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestExportContainerAndImportImage(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	containerID := "testexportcontainerandimportimage"
 
@@ -18,18 +18,18 @@ func (s *DockerSuite) TestExportContainerAndImportImage(c *check.C) ***REMOVED**
 
 	out, _ := dockerCmd(c, "export", containerID)
 
-	result := icmd.RunCmd(icmd.Cmd***REMOVED***
-		Command: []string***REMOVED***dockerBinary, "import", "-", "repo/testexp:v1"***REMOVED***,
+	result := icmd.RunCmd(icmd.Cmd{
+		Command: []string{dockerBinary, "import", "-", "repo/testexp:v1"},
 		Stdin:   strings.NewReader(out),
-	***REMOVED***)
+	})
 	result.Assert(c, icmd.Success)
 
 	cleanedImageID := strings.TrimSpace(result.Combined())
 	c.Assert(cleanedImageID, checker.Not(checker.Equals), "", check.Commentf("output should have been an image id"))
-***REMOVED***
+}
 
 // Used to test output flag in the export command
-func (s *DockerSuite) TestExportContainerWithOutputAndImportImage(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestExportContainerWithOutputAndImportImage(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	containerID := "testexportcontainerwithoutputandimportimage"
 
@@ -40,12 +40,12 @@ func (s *DockerSuite) TestExportContainerWithOutputAndImportImage(c *check.C) **
 	resultCat := icmd.RunCommand("cat", "testexp.tar")
 	resultCat.Assert(c, icmd.Success)
 
-	result := icmd.RunCmd(icmd.Cmd***REMOVED***
-		Command: []string***REMOVED***dockerBinary, "import", "-", "repo/testexp:v1"***REMOVED***,
+	result := icmd.RunCmd(icmd.Cmd{
+		Command: []string{dockerBinary, "import", "-", "repo/testexp:v1"},
 		Stdin:   strings.NewReader(resultCat.Combined()),
-	***REMOVED***)
+	})
 	result.Assert(c, icmd.Success)
 
 	cleanedImageID := strings.TrimSpace(result.Combined())
 	c.Assert(cleanedImageID, checker.Not(checker.Equals), "", check.Commentf("output should have been an image id"))
-***REMOVED***
+}

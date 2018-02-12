@@ -180,7 +180,7 @@ sorted by the keys.
 
 The ordered headers are written to the hash in the format of
 
-	"***REMOVED***.key***REMOVED******REMOVED***.value***REMOVED***"
+	"{.key}{.value}"
 
 with no newline.
 

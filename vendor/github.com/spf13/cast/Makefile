@@ -35,4 +35,4 @@ test-cover-html: ## Generate test coverage report
 	go tool cover -func=coverage.out
 
 help:
-	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN ***REMOVED***FS = ":.*?## "***REMOVED***; ***REMOVED***printf "\033[36m%-30s\033[0m %s\n", $$1, $$2***REMOVED***'
+	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'

@@ -1,13 +1,13 @@
 #!/bin/bash
 
-ROOT=$(dirname "$***REMOVED***BASH_SOURCE***REMOVED***")/..
-GOLINT=$***REMOVED***GOLINT:-"golint"***REMOVED***
+ROOT=$(dirname "${BASH_SOURCE}")/..
+GOLINT=${GOLINT:-"golint"}
 
-pushd "$***REMOVED***ROOT***REMOVED***" > /dev/null
+pushd "${ROOT}" > /dev/null
   bad_files=$($GOLINT -min_confidence=0.9 ./...)
-  if [[ -n "$***REMOVED***bad_files***REMOVED***" ]]; then
+  if [[ -n "${bad_files}" ]]; then
     echo "!!! '$GOLINT' problems: "
-    echo "$***REMOVED***bad_files***REMOVED***"
+    echo "${bad_files}"
     exit 1
   fi
 popd > /dev/null

@@ -14,12 +14,12 @@ var (
 
 // Dir returns the path to the configuration directory as specified by the DOCKER_CONFIG environment variable.
 // TODO: this was copied from cli/config/configfile and should be removed once cmd/dockerd moves
-func Dir() string ***REMOVED***
+func Dir() string {
 	return configDir
-***REMOVED***
+}
 
-func init() ***REMOVED***
-	if configDir == "" ***REMOVED***
+func init() {
+	if configDir == "" {
 		configDir = filepath.Join(homedir.Get(), configFileDir)
-	***REMOVED***
-***REMOVED***
+	}
+}

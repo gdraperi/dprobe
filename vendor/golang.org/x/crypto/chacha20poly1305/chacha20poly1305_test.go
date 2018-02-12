@@ -12,63 +12,63 @@ import (
 	"testing"
 )
 
-func TestVectors(t *testing.T) ***REMOVED***
-	for i, test := range chacha20Poly1305Tests ***REMOVED***
+func TestVectors(t *testing.T) {
+	for i, test := range chacha20Poly1305Tests {
 		key, _ := hex.DecodeString(test.key)
 		nonce, _ := hex.DecodeString(test.nonce)
 		ad, _ := hex.DecodeString(test.aad)
 		plaintext, _ := hex.DecodeString(test.plaintext)
 
 		aead, err := New(key)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
+		}
 
 		ct := aead.Seal(nil, nonce, plaintext, ad)
-		if ctHex := hex.EncodeToString(ct); ctHex != test.out ***REMOVED***
+		if ctHex := hex.EncodeToString(ct); ctHex != test.out {
 			t.Errorf("#%d: got %s, want %s", i, ctHex, test.out)
 			continue
-		***REMOVED***
+		}
 
 		plaintext2, err := aead.Open(nil, nonce, ct, ad)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Errorf("#%d: Open failed", i)
 			continue
-		***REMOVED***
+		}
 
-		if !bytes.Equal(plaintext, plaintext2) ***REMOVED***
+		if !bytes.Equal(plaintext, plaintext2) {
 			t.Errorf("#%d: plaintext's don't match: got %x vs %x", i, plaintext2, plaintext)
 			continue
-		***REMOVED***
+		}
 
-		if len(ad) > 0 ***REMOVED***
+		if len(ad) > 0 {
 			alterAdIdx := mr.Intn(len(ad))
 			ad[alterAdIdx] ^= 0x80
-			if _, err := aead.Open(nil, nonce, ct, ad); err == nil ***REMOVED***
+			if _, err := aead.Open(nil, nonce, ct, ad); err == nil {
 				t.Errorf("#%d: Open was successful after altering additional data", i)
-			***REMOVED***
+			}
 			ad[alterAdIdx] ^= 0x80
-		***REMOVED***
+		}
 
 		alterNonceIdx := mr.Intn(aead.NonceSize())
 		nonce[alterNonceIdx] ^= 0x80
-		if _, err := aead.Open(nil, nonce, ct, ad); err == nil ***REMOVED***
+		if _, err := aead.Open(nil, nonce, ct, ad); err == nil {
 			t.Errorf("#%d: Open was successful after altering nonce", i)
-		***REMOVED***
+		}
 		nonce[alterNonceIdx] ^= 0x80
 
 		alterCtIdx := mr.Intn(len(ct))
 		ct[alterCtIdx] ^= 0x80
-		if _, err := aead.Open(nil, nonce, ct, ad); err == nil ***REMOVED***
+		if _, err := aead.Open(nil, nonce, ct, ad); err == nil {
 			t.Errorf("#%d: Open was successful after altering ciphertext", i)
-		***REMOVED***
+		}
 		ct[alterCtIdx] ^= 0x80
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestRandom(t *testing.T) ***REMOVED***
+func TestRandom(t *testing.T) {
 	// Some random tests to verify Open(Seal) == Plaintext
-	for i := 0; i < 256; i++ ***REMOVED***
+	for i := 0; i < 256; i++ {
 		var nonce [12]byte
 		var key [32]byte
 
@@ -82,49 +82,49 @@ func TestRandom(t *testing.T) ***REMOVED***
 		cr.Read(plaintext)
 
 		aead, err := New(key[:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
+		}
 
 		ct := aead.Seal(nil, nonce[:], plaintext, ad)
 
 		plaintext2, err := aead.Open(nil, nonce[:], ct, ad)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Errorf("Random #%d: Open failed", i)
 			continue
-		***REMOVED***
+		}
 
-		if !bytes.Equal(plaintext, plaintext2) ***REMOVED***
+		if !bytes.Equal(plaintext, plaintext2) {
 			t.Errorf("Random #%d: plaintext's don't match: got %x vs %x", i, plaintext2, plaintext)
 			continue
-		***REMOVED***
+		}
 
-		if len(ad) > 0 ***REMOVED***
+		if len(ad) > 0 {
 			alterAdIdx := mr.Intn(len(ad))
 			ad[alterAdIdx] ^= 0x80
-			if _, err := aead.Open(nil, nonce[:], ct, ad); err == nil ***REMOVED***
+			if _, err := aead.Open(nil, nonce[:], ct, ad); err == nil {
 				t.Errorf("Random #%d: Open was successful after altering additional data", i)
-			***REMOVED***
+			}
 			ad[alterAdIdx] ^= 0x80
-		***REMOVED***
+		}
 
 		alterNonceIdx := mr.Intn(aead.NonceSize())
 		nonce[alterNonceIdx] ^= 0x80
-		if _, err := aead.Open(nil, nonce[:], ct, ad); err == nil ***REMOVED***
+		if _, err := aead.Open(nil, nonce[:], ct, ad); err == nil {
 			t.Errorf("Random #%d: Open was successful after altering nonce", i)
-		***REMOVED***
+		}
 		nonce[alterNonceIdx] ^= 0x80
 
 		alterCtIdx := mr.Intn(len(ct))
 		ct[alterCtIdx] ^= 0x80
-		if _, err := aead.Open(nil, nonce[:], ct, ad); err == nil ***REMOVED***
+		if _, err := aead.Open(nil, nonce[:], ct, ad); err == nil {
 			t.Errorf("Random #%d: Open was successful after altering ciphertext", i)
-		***REMOVED***
+		}
 		ct[alterCtIdx] ^= 0x80
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func benchamarkChaCha20Poly1305Seal(b *testing.B, buf []byte) ***REMOVED***
+func benchamarkChaCha20Poly1305Seal(b *testing.B, buf []byte) {
 	b.SetBytes(int64(len(buf)))
 
 	var key [32]byte
@@ -134,12 +134,12 @@ func benchamarkChaCha20Poly1305Seal(b *testing.B, buf []byte) ***REMOVED***
 
 	aead, _ := New(key[:])
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		out = aead.Seal(out[:0], nonce[:], buf[:], ad[:])
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func benchamarkChaCha20Poly1305Open(b *testing.B, buf []byte) ***REMOVED***
+func benchamarkChaCha20Poly1305Open(b *testing.B, buf []byte) {
 	b.SetBytes(int64(len(buf)))
 
 	var key [32]byte
@@ -152,31 +152,31 @@ func benchamarkChaCha20Poly1305Open(b *testing.B, buf []byte) ***REMOVED***
 	ct = aead.Seal(ct[:0], nonce[:], buf[:], ad[:])
 
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		out, _ = aead.Open(out[:0], nonce[:], ct[:], ad[:])
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func BenchmarkChacha20Poly1305Open_64(b *testing.B) ***REMOVED***
+func BenchmarkChacha20Poly1305Open_64(b *testing.B) {
 	benchamarkChaCha20Poly1305Open(b, make([]byte, 64))
-***REMOVED***
+}
 
-func BenchmarkChacha20Poly1305Seal_64(b *testing.B) ***REMOVED***
+func BenchmarkChacha20Poly1305Seal_64(b *testing.B) {
 	benchamarkChaCha20Poly1305Seal(b, make([]byte, 64))
-***REMOVED***
+}
 
-func BenchmarkChacha20Poly1305Open_1350(b *testing.B) ***REMOVED***
+func BenchmarkChacha20Poly1305Open_1350(b *testing.B) {
 	benchamarkChaCha20Poly1305Open(b, make([]byte, 1350))
-***REMOVED***
+}
 
-func BenchmarkChacha20Poly1305Seal_1350(b *testing.B) ***REMOVED***
+func BenchmarkChacha20Poly1305Seal_1350(b *testing.B) {
 	benchamarkChaCha20Poly1305Seal(b, make([]byte, 1350))
-***REMOVED***
+}
 
-func BenchmarkChacha20Poly1305Open_8K(b *testing.B) ***REMOVED***
+func BenchmarkChacha20Poly1305Open_8K(b *testing.B) {
 	benchamarkChaCha20Poly1305Open(b, make([]byte, 8*1024))
-***REMOVED***
+}
 
-func BenchmarkChacha20Poly1305Seal_8K(b *testing.B) ***REMOVED***
+func BenchmarkChacha20Poly1305Seal_8K(b *testing.B) {
 	benchamarkChaCha20Poly1305Seal(b, make([]byte, 8*1024))
-***REMOVED***
+}

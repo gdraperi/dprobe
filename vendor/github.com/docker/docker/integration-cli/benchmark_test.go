@@ -12,84 +12,84 @@ import (
 	"github.com/go-check/check"
 )
 
-func (s *DockerSuite) BenchmarkConcurrentContainerActions(c *check.C) ***REMOVED***
+func (s *DockerSuite) BenchmarkConcurrentContainerActions(c *check.C) {
 	maxConcurrency := runtime.GOMAXPROCS(0)
 	numIterations := c.N
-	outerGroup := &sync.WaitGroup***REMOVED******REMOVED***
+	outerGroup := &sync.WaitGroup{}
 	outerGroup.Add(maxConcurrency)
 	chErr := make(chan error, numIterations*2*maxConcurrency)
 
-	for i := 0; i < maxConcurrency; i++ ***REMOVED***
-		go func() ***REMOVED***
+	for i := 0; i < maxConcurrency; i++ {
+		go func() {
 			defer outerGroup.Done()
-			innerGroup := &sync.WaitGroup***REMOVED******REMOVED***
+			innerGroup := &sync.WaitGroup{}
 			innerGroup.Add(2)
 
-			go func() ***REMOVED***
+			go func() {
 				defer innerGroup.Done()
-				for i := 0; i < numIterations; i++ ***REMOVED***
-					args := []string***REMOVED***"run", "-d", defaultSleepImage***REMOVED***
+				for i := 0; i < numIterations; i++ {
+					args := []string{"run", "-d", defaultSleepImage}
 					args = append(args, sleepCommandForDaemonPlatform()...)
 					out, _, err := dockerCmdWithError(args...)
-					if err != nil ***REMOVED***
+					if err != nil {
 						chErr <- fmt.Errorf(out)
 						return
-					***REMOVED***
+					}
 
 					id := strings.TrimSpace(out)
 					tmpDir, err := ioutil.TempDir("", "docker-concurrent-test-"+id)
-					if err != nil ***REMOVED***
+					if err != nil {
 						chErr <- err
 						return
-					***REMOVED***
+					}
 					defer os.RemoveAll(tmpDir)
 					out, _, err = dockerCmdWithError("cp", id+":/tmp", tmpDir)
-					if err != nil ***REMOVED***
+					if err != nil {
 						chErr <- fmt.Errorf(out)
 						return
-					***REMOVED***
+					}
 
 					out, _, err = dockerCmdWithError("kill", id)
-					if err != nil ***REMOVED***
+					if err != nil {
 						chErr <- fmt.Errorf(out)
-					***REMOVED***
+					}
 
 					out, _, err = dockerCmdWithError("start", id)
-					if err != nil ***REMOVED***
+					if err != nil {
 						chErr <- fmt.Errorf(out)
-					***REMOVED***
+					}
 
 					out, _, err = dockerCmdWithError("kill", id)
-					if err != nil ***REMOVED***
+					if err != nil {
 						chErr <- fmt.Errorf(out)
-					***REMOVED***
+					}
 
 					// don't do an rm -f here since it can potentially ignore errors from the graphdriver
 					out, _, err = dockerCmdWithError("rm", id)
-					if err != nil ***REMOVED***
+					if err != nil {
 						chErr <- fmt.Errorf(out)
-					***REMOVED***
-				***REMOVED***
-			***REMOVED***()
+					}
+				}
+			}()
 
-			go func() ***REMOVED***
+			go func() {
 				defer innerGroup.Done()
-				for i := 0; i < numIterations; i++ ***REMOVED***
+				for i := 0; i < numIterations; i++ {
 					out, _, err := dockerCmdWithError("ps")
-					if err != nil ***REMOVED***
+					if err != nil {
 						chErr <- fmt.Errorf(out)
-					***REMOVED***
-				***REMOVED***
-			***REMOVED***()
+					}
+				}
+			}()
 
 			innerGroup.Wait()
-		***REMOVED***()
-	***REMOVED***
+		}()
+	}
 
 	outerGroup.Wait()
 	close(chErr)
 
-	for err := range chErr ***REMOVED***
+	for err := range chErr {
 		c.Assert(err, checker.IsNil)
-	***REMOVED***
-***REMOVED***
+	}
+}

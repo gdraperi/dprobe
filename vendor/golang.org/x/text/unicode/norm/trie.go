@@ -4,25 +4,25 @@
 
 package norm
 
-type valueRange struct ***REMOVED***
+type valueRange struct {
 	value  uint16 // header: value:stride
 	lo, hi byte   // header: lo:n
-***REMOVED***
+}
 
-type sparseBlocks struct ***REMOVED***
+type sparseBlocks struct {
 	values []valueRange
 	offset []uint16
-***REMOVED***
+}
 
-var nfcSparse = sparseBlocks***REMOVED***
+var nfcSparse = sparseBlocks{
 	values: nfcSparseValues[:],
 	offset: nfcSparseOffset[:],
-***REMOVED***
+}
 
-var nfkcSparse = sparseBlocks***REMOVED***
+var nfkcSparse = sparseBlocks{
 	values: nfkcSparseValues[:],
 	offset: nfkcSparseOffset[:],
-***REMOVED***
+}
 
 var (
 	nfcData  = newNfcTrie(0)
@@ -33,22 +33,22 @@ var (
 // For n < t.cutoff, the block is a simple lookup table. Otherwise, the block
 // is a list of ranges with an accompanying value. Given a matching range r,
 // the value for b is by r.value + (b - r.lo) * stride.
-func (t *sparseBlocks) lookup(n uint32, b byte) uint16 ***REMOVED***
+func (t *sparseBlocks) lookup(n uint32, b byte) uint16 {
 	offset := t.offset[n]
 	header := t.values[offset]
 	lo := offset + 1
 	hi := lo + uint16(header.lo)
-	for lo < hi ***REMOVED***
+	for lo < hi {
 		m := lo + (hi-lo)/2
 		r := t.values[m]
-		if r.lo <= b && b <= r.hi ***REMOVED***
+		if r.lo <= b && b <= r.hi {
 			return r.value + uint16(b-r.lo)*header.value
-		***REMOVED***
-		if b < r.lo ***REMOVED***
+		}
+		if b < r.lo {
 			hi = m
-		***REMOVED*** else ***REMOVED***
+		} else {
 			lo = m + 1
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return 0
-***REMOVED***
+}

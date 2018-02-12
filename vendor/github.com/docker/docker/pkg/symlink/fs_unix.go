@@ -6,10 +6,10 @@ import (
 	"path/filepath"
 )
 
-func evalSymlinks(path string) (string, error) ***REMOVED***
+func evalSymlinks(path string) (string, error) {
 	return filepath.EvalSymlinks(path)
-***REMOVED***
+}
 
-func isDriveOrRoot(p string) bool ***REMOVED***
+func isDriveOrRoot(p string) bool {
 	return p == string(filepath.Separator)
-***REMOVED***
+}

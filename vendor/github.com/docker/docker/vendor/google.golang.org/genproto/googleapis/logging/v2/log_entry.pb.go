@@ -65,7 +65,7 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
 // An individual entry in a log.
-type LogEntry struct ***REMOVED***
+type LogEntry struct {
 	// Required. The resource name of the log to which this log entry belongs:
 	//
 	//     "projects/[PROJECT_ID]/logs/[LOG_ID]"
@@ -132,204 +132,204 @@ type LogEntry struct ***REMOVED***
 	// Optional. Source code location information associated with the log entry,
 	// if any.
 	SourceLocation *LogEntrySourceLocation `protobuf:"bytes,23,opt,name=source_location,json=sourceLocation" json:"source_location,omitempty"`
-***REMOVED***
+}
 
-func (m *LogEntry) Reset()                    ***REMOVED*** *m = LogEntry***REMOVED******REMOVED*** ***REMOVED***
-func (m *LogEntry) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*LogEntry) ProtoMessage()               ***REMOVED******REMOVED***
-func (*LogEntry) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***0***REMOVED*** ***REMOVED***
+func (m *LogEntry) Reset()                    { *m = LogEntry{} }
+func (m *LogEntry) String() string            { return proto.CompactTextString(m) }
+func (*LogEntry) ProtoMessage()               {}
+func (*LogEntry) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
-type isLogEntry_Payload interface ***REMOVED***
+type isLogEntry_Payload interface {
 	isLogEntry_Payload()
-***REMOVED***
+}
 
-type LogEntry_ProtoPayload struct ***REMOVED***
+type LogEntry_ProtoPayload struct {
 	ProtoPayload *google_protobuf2.Any `protobuf:"bytes,2,opt,name=proto_payload,json=protoPayload,oneof"`
-***REMOVED***
-type LogEntry_TextPayload struct ***REMOVED***
+}
+type LogEntry_TextPayload struct {
 	TextPayload string `protobuf:"bytes,3,opt,name=text_payload,json=textPayload,oneof"`
-***REMOVED***
-type LogEntry_JsonPayload struct ***REMOVED***
+}
+type LogEntry_JsonPayload struct {
 	JsonPayload *google_protobuf3.Struct `protobuf:"bytes,6,opt,name=json_payload,json=jsonPayload,oneof"`
-***REMOVED***
+}
 
-func (*LogEntry_ProtoPayload) isLogEntry_Payload() ***REMOVED******REMOVED***
-func (*LogEntry_TextPayload) isLogEntry_Payload()  ***REMOVED******REMOVED***
-func (*LogEntry_JsonPayload) isLogEntry_Payload()  ***REMOVED******REMOVED***
+func (*LogEntry_ProtoPayload) isLogEntry_Payload() {}
+func (*LogEntry_TextPayload) isLogEntry_Payload()  {}
+func (*LogEntry_JsonPayload) isLogEntry_Payload()  {}
 
-func (m *LogEntry) GetPayload() isLogEntry_Payload ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *LogEntry) GetPayload() isLogEntry_Payload {
+	if m != nil {
 		return m.Payload
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *LogEntry) GetLogName() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *LogEntry) GetLogName() string {
+	if m != nil {
 		return m.LogName
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *LogEntry) GetResource() *google_api3.MonitoredResource ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *LogEntry) GetResource() *google_api3.MonitoredResource {
+	if m != nil {
 		return m.Resource
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *LogEntry) GetProtoPayload() *google_protobuf2.Any ***REMOVED***
-	if x, ok := m.GetPayload().(*LogEntry_ProtoPayload); ok ***REMOVED***
+func (m *LogEntry) GetProtoPayload() *google_protobuf2.Any {
+	if x, ok := m.GetPayload().(*LogEntry_ProtoPayload); ok {
 		return x.ProtoPayload
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *LogEntry) GetTextPayload() string ***REMOVED***
-	if x, ok := m.GetPayload().(*LogEntry_TextPayload); ok ***REMOVED***
+func (m *LogEntry) GetTextPayload() string {
+	if x, ok := m.GetPayload().(*LogEntry_TextPayload); ok {
 		return x.TextPayload
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *LogEntry) GetJsonPayload() *google_protobuf3.Struct ***REMOVED***
-	if x, ok := m.GetPayload().(*LogEntry_JsonPayload); ok ***REMOVED***
+func (m *LogEntry) GetJsonPayload() *google_protobuf3.Struct {
+	if x, ok := m.GetPayload().(*LogEntry_JsonPayload); ok {
 		return x.JsonPayload
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *LogEntry) GetTimestamp() *google_protobuf4.Timestamp ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *LogEntry) GetTimestamp() *google_protobuf4.Timestamp {
+	if m != nil {
 		return m.Timestamp
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *LogEntry) GetReceiveTimestamp() *google_protobuf4.Timestamp ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *LogEntry) GetReceiveTimestamp() *google_protobuf4.Timestamp {
+	if m != nil {
 		return m.ReceiveTimestamp
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *LogEntry) GetSeverity() google_logging_type1.LogSeverity ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *LogEntry) GetSeverity() google_logging_type1.LogSeverity {
+	if m != nil {
 		return m.Severity
-	***REMOVED***
+	}
 	return google_logging_type1.LogSeverity_DEFAULT
-***REMOVED***
+}
 
-func (m *LogEntry) GetInsertId() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *LogEntry) GetInsertId() string {
+	if m != nil {
 		return m.InsertId
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *LogEntry) GetHttpRequest() *google_logging_type.HttpRequest ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *LogEntry) GetHttpRequest() *google_logging_type.HttpRequest {
+	if m != nil {
 		return m.HttpRequest
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *LogEntry) GetLabels() map[string]string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *LogEntry) GetLabels() map[string]string {
+	if m != nil {
 		return m.Labels
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *LogEntry) GetOperation() *LogEntryOperation ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *LogEntry) GetOperation() *LogEntryOperation {
+	if m != nil {
 		return m.Operation
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *LogEntry) GetTrace() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *LogEntry) GetTrace() string {
+	if m != nil {
 		return m.Trace
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *LogEntry) GetSourceLocation() *LogEntrySourceLocation ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *LogEntry) GetSourceLocation() *LogEntrySourceLocation {
+	if m != nil {
 		return m.SourceLocation
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // XXX_OneofFuncs is for the internal use of the proto package.
-func (*LogEntry) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface***REMOVED******REMOVED***) ***REMOVED***
-	return _LogEntry_OneofMarshaler, _LogEntry_OneofUnmarshaler, _LogEntry_OneofSizer, []interface***REMOVED******REMOVED******REMOVED***
+func (*LogEntry) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
+	return _LogEntry_OneofMarshaler, _LogEntry_OneofUnmarshaler, _LogEntry_OneofSizer, []interface{}{
 		(*LogEntry_ProtoPayload)(nil),
 		(*LogEntry_TextPayload)(nil),
 		(*LogEntry_JsonPayload)(nil),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func _LogEntry_OneofMarshaler(msg proto.Message, b *proto.Buffer) error ***REMOVED***
+func _LogEntry_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
 	m := msg.(*LogEntry)
 	// payload
-	switch x := m.Payload.(type) ***REMOVED***
+	switch x := m.Payload.(type) {
 	case *LogEntry_ProtoPayload:
 		b.EncodeVarint(2<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.ProtoPayload); err != nil ***REMOVED***
+		if err := b.EncodeMessage(x.ProtoPayload); err != nil {
 			return err
-		***REMOVED***
+		}
 	case *LogEntry_TextPayload:
 		b.EncodeVarint(3<<3 | proto.WireBytes)
 		b.EncodeStringBytes(x.TextPayload)
 	case *LogEntry_JsonPayload:
 		b.EncodeVarint(6<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.JsonPayload); err != nil ***REMOVED***
+		if err := b.EncodeMessage(x.JsonPayload); err != nil {
 			return err
-		***REMOVED***
+		}
 	case nil:
 	default:
 		return fmt.Errorf("LogEntry.Payload has unexpected type %T", x)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func _LogEntry_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) ***REMOVED***
+func _LogEntry_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
 	m := msg.(*LogEntry)
-	switch tag ***REMOVED***
+	switch tag {
 	case 2: // payload.proto_payload
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		msg := new(google_protobuf2.Any)
 		err := b.DecodeMessage(msg)
-		m.Payload = &LogEntry_ProtoPayload***REMOVED***msg***REMOVED***
+		m.Payload = &LogEntry_ProtoPayload{msg}
 		return true, err
 	case 3: // payload.text_payload
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		x, err := b.DecodeStringBytes()
-		m.Payload = &LogEntry_TextPayload***REMOVED***x***REMOVED***
+		m.Payload = &LogEntry_TextPayload{x}
 		return true, err
 	case 6: // payload.json_payload
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		msg := new(google_protobuf3.Struct)
 		err := b.DecodeMessage(msg)
-		m.Payload = &LogEntry_JsonPayload***REMOVED***msg***REMOVED***
+		m.Payload = &LogEntry_JsonPayload{msg}
 		return true, err
 	default:
 		return false, nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func _LogEntry_OneofSizer(msg proto.Message) (n int) ***REMOVED***
+func _LogEntry_OneofSizer(msg proto.Message) (n int) {
 	m := msg.(*LogEntry)
 	// payload
-	switch x := m.Payload.(type) ***REMOVED***
+	switch x := m.Payload.(type) {
 	case *LogEntry_ProtoPayload:
 		s := proto.Size(x.ProtoPayload)
 		n += proto.SizeVarint(2<<3 | proto.WireBytes)
@@ -347,13 +347,13 @@ func _LogEntry_OneofSizer(msg proto.Message) (n int) ***REMOVED***
 	case nil:
 	default:
 		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
 // Additional information about a potentially long-running operation with which
 // a log entry is associated.
-type LogEntryOperation struct ***REMOVED***
+type LogEntryOperation struct {
 	// Optional. An arbitrary operation identifier. Log entries with the
 	// same identifier are assumed to be part of the same operation.
 	Id string `protobuf:"bytes,1,opt,name=id" json:"id,omitempty"`
@@ -365,44 +365,44 @@ type LogEntryOperation struct ***REMOVED***
 	First bool `protobuf:"varint,3,opt,name=first" json:"first,omitempty"`
 	// Optional. Set this to True if this is the last log entry in the operation.
 	Last bool `protobuf:"varint,4,opt,name=last" json:"last,omitempty"`
-***REMOVED***
+}
 
-func (m *LogEntryOperation) Reset()                    ***REMOVED*** *m = LogEntryOperation***REMOVED******REMOVED*** ***REMOVED***
-func (m *LogEntryOperation) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*LogEntryOperation) ProtoMessage()               ***REMOVED******REMOVED***
-func (*LogEntryOperation) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***1***REMOVED*** ***REMOVED***
+func (m *LogEntryOperation) Reset()                    { *m = LogEntryOperation{} }
+func (m *LogEntryOperation) String() string            { return proto.CompactTextString(m) }
+func (*LogEntryOperation) ProtoMessage()               {}
+func (*LogEntryOperation) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
 
-func (m *LogEntryOperation) GetId() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *LogEntryOperation) GetId() string {
+	if m != nil {
 		return m.Id
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *LogEntryOperation) GetProducer() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *LogEntryOperation) GetProducer() string {
+	if m != nil {
 		return m.Producer
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *LogEntryOperation) GetFirst() bool ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *LogEntryOperation) GetFirst() bool {
+	if m != nil {
 		return m.First
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
-func (m *LogEntryOperation) GetLast() bool ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *LogEntryOperation) GetLast() bool {
+	if m != nil {
 		return m.Last
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
 // Additional information about the source code location that produced the log
 // entry.
-type LogEntrySourceLocation struct ***REMOVED***
+type LogEntrySourceLocation struct {
 	// Optional. Source file name. Depending on the runtime environment, this
 	// might be a simple name or a fully-qualified name.
 	File string `protobuf:"bytes,1,opt,name=file" json:"file,omitempty"`
@@ -416,43 +416,43 @@ type LogEntrySourceLocation struct ***REMOVED***
 	// `qual.if.ied.Class.method` (Java), `dir/package.func` (Go), `function`
 	// (Python).
 	Function string `protobuf:"bytes,3,opt,name=function" json:"function,omitempty"`
-***REMOVED***
+}
 
-func (m *LogEntrySourceLocation) Reset()                    ***REMOVED*** *m = LogEntrySourceLocation***REMOVED******REMOVED*** ***REMOVED***
-func (m *LogEntrySourceLocation) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*LogEntrySourceLocation) ProtoMessage()               ***REMOVED******REMOVED***
-func (*LogEntrySourceLocation) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***2***REMOVED*** ***REMOVED***
+func (m *LogEntrySourceLocation) Reset()                    { *m = LogEntrySourceLocation{} }
+func (m *LogEntrySourceLocation) String() string            { return proto.CompactTextString(m) }
+func (*LogEntrySourceLocation) ProtoMessage()               {}
+func (*LogEntrySourceLocation) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
 
-func (m *LogEntrySourceLocation) GetFile() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *LogEntrySourceLocation) GetFile() string {
+	if m != nil {
 		return m.File
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *LogEntrySourceLocation) GetLine() int64 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *LogEntrySourceLocation) GetLine() int64 {
+	if m != nil {
 		return m.Line
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *LogEntrySourceLocation) GetFunction() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *LogEntrySourceLocation) GetFunction() string {
+	if m != nil {
 		return m.Function
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*LogEntry)(nil), "google.logging.v2.LogEntry")
 	proto.RegisterType((*LogEntryOperation)(nil), "google.logging.v2.LogEntryOperation")
 	proto.RegisterType((*LogEntrySourceLocation)(nil), "google.logging.v2.LogEntrySourceLocation")
-***REMOVED***
+}
 
-func init() ***REMOVED*** proto.RegisterFile("google/logging/v2/log_entry.proto", fileDescriptor0) ***REMOVED***
+func init() { proto.RegisterFile("google/logging/v2/log_entry.proto", fileDescriptor0) }
 
-var fileDescriptor0 = []byte***REMOVED***
+var fileDescriptor0 = []byte{
 	// 699 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x54, 0x5f, 0x6f, 0xdb, 0x36,
 	0x10, 0x8f, 0xec, 0xcc, 0x91, 0x69, 0xe7, 0x1f, 0x91, 0x25, 0x8a, 0x97, 0x61, 0x5e, 0x32, 0x6c,
@@ -498,4 +498,4 @@ var fileDescriptor0 = []byte***REMOVED***
 	0xc6, 0xf3, 0x85, 0xff, 0xf1, 0xb9, 0x0b, 0xbf, 0x79, 0xde, 0x97, 0xca, 0xc1, 0x95, 0x65, 0x5f,
 	0xa6, 0xb2, 0x88, 0xcd, 0x5d, 0x81, 0xcf, 0x9b, 0xde, 0x5d, 0x0d, 0x14, 0xfe, 0xfb, 0x1e, 0x00,
 	0x00, 0xff, 0xff, 0xa9, 0x61, 0x44, 0xa8, 0xd0, 0x05, 0x00, 0x00,
-***REMOVED***
+}

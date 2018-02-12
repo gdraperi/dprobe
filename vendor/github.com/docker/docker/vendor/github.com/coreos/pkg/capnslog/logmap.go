@@ -41,8 +41,8 @@ const (
 )
 
 // Char returns a single-character representation of the log level.
-func (l LogLevel) Char() string ***REMOVED***
-	switch l ***REMOVED***
+func (l LogLevel) Char() string {
+	switch l {
 	case CRITICAL:
 		return "C"
 	case ERROR:
@@ -59,12 +59,12 @@ func (l LogLevel) Char() string ***REMOVED***
 		return "T"
 	default:
 		panic("Unhandled loglevel")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // String returns a multi-character representation of the log level.
-func (l LogLevel) String() string ***REMOVED***
-	switch l ***REMOVED***
+func (l LogLevel) String() string {
+	switch l {
 	case CRITICAL:
 		return "CRITICAL"
 	case ERROR:
@@ -81,23 +81,23 @@ func (l LogLevel) String() string ***REMOVED***
 		return "TRACE"
 	default:
 		panic("Unhandled loglevel")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Update using the given string value. Fulfills the flag.Value interface.
-func (l *LogLevel) Set(s string) error ***REMOVED***
+func (l *LogLevel) Set(s string) error {
 	value, err := ParseLevel(s)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	*l = value
 	return nil
-***REMOVED***
+}
 
 // ParseLevel translates some potential loglevel strings into their corresponding levels.
-func ParseLevel(s string) (LogLevel, error) ***REMOVED***
-	switch s ***REMOVED***
+func ParseLevel(s string) (LogLevel, error) {
+	switch s {
 	case "CRITICAL", "C":
 		return CRITICAL, nil
 	case "ERROR", "0", "E":
@@ -112,129 +112,129 @@ func ParseLevel(s string) (LogLevel, error) ***REMOVED***
 		return DEBUG, nil
 	case "TRACE", "5", "T":
 		return TRACE, nil
-	***REMOVED***
+	}
 	return CRITICAL, errors.New("couldn't parse log level " + s)
-***REMOVED***
+}
 
 type RepoLogger map[string]*PackageLogger
 
-type loggerStruct struct ***REMOVED***
+type loggerStruct struct {
 	sync.Mutex
 	repoMap   map[string]RepoLogger
 	formatter Formatter
-***REMOVED***
+}
 
 // logger is the global logger
 var logger = new(loggerStruct)
 
 // SetGlobalLogLevel sets the log level for all packages in all repositories
 // registered with capnslog.
-func SetGlobalLogLevel(l LogLevel) ***REMOVED***
+func SetGlobalLogLevel(l LogLevel) {
 	logger.Lock()
 	defer logger.Unlock()
-	for _, r := range logger.repoMap ***REMOVED***
+	for _, r := range logger.repoMap {
 		r.setRepoLogLevelInternal(l)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // GetRepoLogger may return the handle to the repository's set of packages' loggers.
-func GetRepoLogger(repo string) (RepoLogger, error) ***REMOVED***
+func GetRepoLogger(repo string) (RepoLogger, error) {
 	logger.Lock()
 	defer logger.Unlock()
 	r, ok := logger.repoMap[repo]
-	if !ok ***REMOVED***
+	if !ok {
 		return nil, errors.New("no packages registered for repo " + repo)
-	***REMOVED***
+	}
 	return r, nil
-***REMOVED***
+}
 
 // MustRepoLogger returns the handle to the repository's packages' loggers.
-func MustRepoLogger(repo string) RepoLogger ***REMOVED***
+func MustRepoLogger(repo string) RepoLogger {
 	r, err := GetRepoLogger(repo)
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 	return r
-***REMOVED***
+}
 
 // SetRepoLogLevel sets the log level for all packages in the repository.
-func (r RepoLogger) SetRepoLogLevel(l LogLevel) ***REMOVED***
+func (r RepoLogger) SetRepoLogLevel(l LogLevel) {
 	logger.Lock()
 	defer logger.Unlock()
 	r.setRepoLogLevelInternal(l)
-***REMOVED***
+}
 
-func (r RepoLogger) setRepoLogLevelInternal(l LogLevel) ***REMOVED***
-	for _, v := range r ***REMOVED***
+func (r RepoLogger) setRepoLogLevelInternal(l LogLevel) {
+	for _, v := range r {
 		v.level = l
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // ParseLogLevelConfig parses a comma-separated string of "package=loglevel", in
 // order, and returns a map of the results, for use in SetLogLevel.
-func (r RepoLogger) ParseLogLevelConfig(conf string) (map[string]LogLevel, error) ***REMOVED***
+func (r RepoLogger) ParseLogLevelConfig(conf string) (map[string]LogLevel, error) {
 	setlist := strings.Split(conf, ",")
 	out := make(map[string]LogLevel)
-	for _, setstring := range setlist ***REMOVED***
+	for _, setstring := range setlist {
 		setting := strings.Split(setstring, "=")
-		if len(setting) != 2 ***REMOVED***
+		if len(setting) != 2 {
 			return nil, errors.New("oddly structured `pkg=level` option: " + setstring)
-		***REMOVED***
+		}
 		l, err := ParseLevel(setting[1])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		out[setting[0]] = l
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
 // SetLogLevel takes a map of package names within a repository to their desired
 // loglevel, and sets the levels appropriately. Unknown packages are ignored.
 // "*" is a special package name that corresponds to all packages, and will be
 // processed first.
-func (r RepoLogger) SetLogLevel(m map[string]LogLevel) ***REMOVED***
+func (r RepoLogger) SetLogLevel(m map[string]LogLevel) {
 	logger.Lock()
 	defer logger.Unlock()
-	if l, ok := m["*"]; ok ***REMOVED***
+	if l, ok := m["*"]; ok {
 		r.setRepoLogLevelInternal(l)
-	***REMOVED***
-	for k, v := range m ***REMOVED***
+	}
+	for k, v := range m {
 		l, ok := r[k]
-		if !ok ***REMOVED***
+		if !ok {
 			continue
-		***REMOVED***
+		}
 		l.level = v
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // SetFormatter sets the formatting function for all logs.
-func SetFormatter(f Formatter) ***REMOVED***
+func SetFormatter(f Formatter) {
 	logger.Lock()
 	defer logger.Unlock()
 	logger.formatter = f
-***REMOVED***
+}
 
 // NewPackageLogger creates a package logger object.
 // This should be defined as a global var in your package, referencing your repo.
-func NewPackageLogger(repo string, pkg string) (p *PackageLogger) ***REMOVED***
+func NewPackageLogger(repo string, pkg string) (p *PackageLogger) {
 	logger.Lock()
 	defer logger.Unlock()
-	if logger.repoMap == nil ***REMOVED***
+	if logger.repoMap == nil {
 		logger.repoMap = make(map[string]RepoLogger)
-	***REMOVED***
+	}
 	r, rok := logger.repoMap[repo]
-	if !rok ***REMOVED***
+	if !rok {
 		logger.repoMap[repo] = make(RepoLogger)
 		r = logger.repoMap[repo]
-	***REMOVED***
+	}
 	p, pok := r[pkg]
-	if !pok ***REMOVED***
-		r[pkg] = &PackageLogger***REMOVED***
+	if !pok {
+		r[pkg] = &PackageLogger{
 			pkg:   pkg,
 			level: INFO,
-		***REMOVED***
+		}
 		p = r[pkg]
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}

@@ -18,24 +18,24 @@ import "github.com/prometheus/client_golang/prometheus"
 
 var (
 	// TODO: save_fsync latency?
-	saveDurations = prometheus.NewHistogram(prometheus.HistogramOpts***REMOVED***
+	saveDurations = prometheus.NewHistogram(prometheus.HistogramOpts{
 		Namespace: "etcd_debugging",
 		Subsystem: "snap",
 		Name:      "save_total_duration_seconds",
 		Help:      "The total latency distributions of save called by snapshot.",
 		Buckets:   prometheus.ExponentialBuckets(0.001, 2, 14),
-	***REMOVED***)
+	})
 
-	marshallingDurations = prometheus.NewHistogram(prometheus.HistogramOpts***REMOVED***
+	marshallingDurations = prometheus.NewHistogram(prometheus.HistogramOpts{
 		Namespace: "etcd_debugging",
 		Subsystem: "snap",
 		Name:      "save_marshalling_duration_seconds",
 		Help:      "The marshalling cost distributions of save called by snapshot.",
 		Buckets:   prometheus.ExponentialBuckets(0.001, 2, 14),
-	***REMOVED***)
+	})
 )
 
-func init() ***REMOVED***
+func init() {
 	prometheus.MustRegister(saveDurations)
 	prometheus.MustRegister(marshallingDurations)
-***REMOVED***
+}

@@ -10,20 +10,20 @@ import (
 )
 
 // NodeInspectWithRaw returns the node information.
-func (cli *Client) NodeInspectWithRaw(ctx context.Context, nodeID string) (swarm.Node, []byte, error) ***REMOVED***
+func (cli *Client) NodeInspectWithRaw(ctx context.Context, nodeID string) (swarm.Node, []byte, error) {
 	serverResp, err := cli.get(ctx, "/nodes/"+nodeID, nil, nil)
-	if err != nil ***REMOVED***
-		return swarm.Node***REMOVED******REMOVED***, nil, wrapResponseError(err, serverResp, "node", nodeID)
-	***REMOVED***
+	if err != nil {
+		return swarm.Node{}, nil, wrapResponseError(err, serverResp, "node", nodeID)
+	}
 	defer ensureReaderClosed(serverResp)
 
 	body, err := ioutil.ReadAll(serverResp.body)
-	if err != nil ***REMOVED***
-		return swarm.Node***REMOVED******REMOVED***, nil, err
-	***REMOVED***
+	if err != nil {
+		return swarm.Node{}, nil, err
+	}
 
 	var response swarm.Node
 	rdr := bytes.NewReader(body)
 	err = json.NewDecoder(rdr).Decode(&response)
 	return response, body, err
-***REMOVED***
+}

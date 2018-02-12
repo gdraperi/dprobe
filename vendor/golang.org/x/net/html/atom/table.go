@@ -376,7 +376,7 @@ const hash0 = 0x81cdf10e
 
 const maxAtomLen = 25
 
-var table = [1 << 9]Atom***REMOVED***
+var table = [1 << 9]Atom{
 	0x1:   0x8e0a,  // mediagroup
 	0x2:   0x2cc04, // lang
 	0x4:   0x2c09,  // accesskey
@@ -742,7 +742,7 @@ var table = [1 << 9]Atom***REMOVED***
 	0x1fd: 0x20006, // script
 	0x1fe: 0x16206, // dialog
 	0x1ff: 0x1c707, // command
-***REMOVED***
+}
 
 const atomText = "abbradiogrouparamainavalueaccept-charsetbodyaccesskeygenobro" +
 	"wspanoembedetailsampatternoframesetdfnomoduleallowpaymentreq" +

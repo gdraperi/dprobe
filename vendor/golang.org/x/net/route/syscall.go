@@ -13,16 +13,16 @@ import (
 
 var zero uintptr
 
-func sysctl(mib []int32, old *byte, oldlen *uintptr, new *byte, newlen uintptr) error ***REMOVED***
+func sysctl(mib []int32, old *byte, oldlen *uintptr, new *byte, newlen uintptr) error {
 	var p unsafe.Pointer
-	if len(mib) > 0 ***REMOVED***
+	if len(mib) > 0 {
 		p = unsafe.Pointer(&mib[0])
-	***REMOVED*** else ***REMOVED***
+	} else {
 		p = unsafe.Pointer(&zero)
-	***REMOVED***
+	}
 	_, _, errno := syscall.Syscall6(syscall.SYS___SYSCTL, uintptr(p), uintptr(len(mib)), uintptr(unsafe.Pointer(old)), uintptr(unsafe.Pointer(oldlen)), uintptr(unsafe.Pointer(new)), uintptr(newlen))
-	if errno != 0 ***REMOVED***
+	if errno != 0 {
 		return error(errno)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

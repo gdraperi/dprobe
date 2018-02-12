@@ -6,8 +6,8 @@ import (
 	"testing"
 )
 
-func TestContainerTopValidatePSArgs(t *testing.T) ***REMOVED***
-	tests := map[string]bool***REMOVED***
+func TestContainerTopValidatePSArgs(t *testing.T) {
+	tests := map[string]bool{
 		"ae -o uid=PID":             true,
 		"ae -o \"uid= PID\"":        true,  // ascii space (0x20)
 		"ae -o \"uid= PID\"":        false, // unicode space (U+2003, 0xe2 0x80 0x83)
@@ -20,60 +20,60 @@ func TestContainerTopValidatePSArgs(t *testing.T) ***REMOVED***
 		"aeo pid=PID":               false,
 		"ae":                        false,
 		"":                          false,
-	***REMOVED***
-	for psArgs, errExpected := range tests ***REMOVED***
+	}
+	for psArgs, errExpected := range tests {
 		err := validatePSArgs(psArgs)
 		t.Logf("tested %q, got err=%v", psArgs, err)
-		if errExpected && err == nil ***REMOVED***
+		if errExpected && err == nil {
 			t.Fatalf("expected error, got %v (%q)", err, psArgs)
-		***REMOVED***
-		if !errExpected && err != nil ***REMOVED***
+		}
+		if !errExpected && err != nil {
 			t.Fatalf("expected nil, got %v (%q)", err, psArgs)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestContainerTopParsePSOutput(t *testing.T) ***REMOVED***
-	tests := []struct ***REMOVED***
+func TestContainerTopParsePSOutput(t *testing.T) {
+	tests := []struct {
 		output      []byte
 		pids        []uint32
 		errExpected bool
-	***REMOVED******REMOVED***
-		***REMOVED***[]byte(`  PID COMMAND
+	}{
+		{[]byte(`  PID COMMAND
    42 foo
    43 bar
 		- -
   100 baz
-`), []uint32***REMOVED***42, 43***REMOVED***, false***REMOVED***,
-		***REMOVED***[]byte(`  UID COMMAND
+`), []uint32{42, 43}, false},
+		{[]byte(`  UID COMMAND
    42 foo
    43 bar
 		- -
   100 baz
-`), []uint32***REMOVED***42, 43***REMOVED***, true***REMOVED***,
+`), []uint32{42, 43}, true},
 		// unicode space (U+2003, 0xe2 0x80 0x83)
-		***REMOVED***[]byte(` PID COMMAND
+		{[]byte(` PID COMMAND
    42 foo
    43 bar
 		- -
   100 baz
-`), []uint32***REMOVED***42, 43***REMOVED***, true***REMOVED***,
+`), []uint32{42, 43}, true},
 		// the first space is U+2003, the second one is ascii.
-		***REMOVED***[]byte(` PID COMMAND
+		{[]byte(` PID COMMAND
    42 foo
    43 bar
   100 baz
-`), []uint32***REMOVED***42, 43***REMOVED***, true***REMOVED***,
-	***REMOVED***
+`), []uint32{42, 43}, true},
+	}
 
-	for _, f := range tests ***REMOVED***
+	for _, f := range tests {
 		_, err := parsePSOutput(f.output, f.pids)
 		t.Logf("tested %q, got err=%v", string(f.output), err)
-		if f.errExpected && err == nil ***REMOVED***
+		if f.errExpected && err == nil {
 			t.Fatalf("expected error, got %v (%q)", err, string(f.output))
-		***REMOVED***
-		if !f.errExpected && err != nil ***REMOVED***
+		}
+		if !f.errExpected && err != nil {
 			t.Fatalf("expected nil, got %v (%q)", err, string(f.output))
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

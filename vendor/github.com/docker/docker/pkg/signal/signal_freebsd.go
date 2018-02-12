@@ -5,7 +5,7 @@ import (
 )
 
 // SignalMap is a map of FreeBSD signals.
-var SignalMap = map[string]syscall.Signal***REMOVED***
+var SignalMap = map[string]syscall.Signal{
 	"ABRT":   syscall.SIGABRT,
 	"ALRM":   syscall.SIGALRM,
 	"BUF":    syscall.SIGBUS,
@@ -40,4 +40,4 @@ var SignalMap = map[string]syscall.Signal***REMOVED***
 	"WINCH":  syscall.SIGWINCH,
 	"XCPU":   syscall.SIGXCPU,
 	"XFSZ":   syscall.SIGXFSZ,
-***REMOVED***
+}

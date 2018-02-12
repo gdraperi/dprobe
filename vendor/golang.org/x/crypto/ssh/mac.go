@@ -13,49 +13,49 @@ import (
 	"hash"
 )
 
-type macMode struct ***REMOVED***
+type macMode struct {
 	keySize int
 	etm     bool
 	new     func(key []byte) hash.Hash
-***REMOVED***
+}
 
 // truncatingMAC wraps around a hash.Hash and truncates the output digest to
 // a given size.
-type truncatingMAC struct ***REMOVED***
+type truncatingMAC struct {
 	length int
 	hmac   hash.Hash
-***REMOVED***
+}
 
-func (t truncatingMAC) Write(data []byte) (int, error) ***REMOVED***
+func (t truncatingMAC) Write(data []byte) (int, error) {
 	return t.hmac.Write(data)
-***REMOVED***
+}
 
-func (t truncatingMAC) Sum(in []byte) []byte ***REMOVED***
+func (t truncatingMAC) Sum(in []byte) []byte {
 	out := t.hmac.Sum(in)
 	return out[:len(in)+t.length]
-***REMOVED***
+}
 
-func (t truncatingMAC) Reset() ***REMOVED***
+func (t truncatingMAC) Reset() {
 	t.hmac.Reset()
-***REMOVED***
+}
 
-func (t truncatingMAC) Size() int ***REMOVED***
+func (t truncatingMAC) Size() int {
 	return t.length
-***REMOVED***
+}
 
-func (t truncatingMAC) BlockSize() int ***REMOVED*** return t.hmac.BlockSize() ***REMOVED***
+func (t truncatingMAC) BlockSize() int { return t.hmac.BlockSize() }
 
-var macModes = map[string]*macMode***REMOVED***
-	"hmac-sha2-256-etm@openssh.com": ***REMOVED***32, true, func(key []byte) hash.Hash ***REMOVED***
+var macModes = map[string]*macMode{
+	"hmac-sha2-256-etm@openssh.com": {32, true, func(key []byte) hash.Hash {
 		return hmac.New(sha256.New, key)
-	***REMOVED******REMOVED***,
-	"hmac-sha2-256": ***REMOVED***32, false, func(key []byte) hash.Hash ***REMOVED***
+	}},
+	"hmac-sha2-256": {32, false, func(key []byte) hash.Hash {
 		return hmac.New(sha256.New, key)
-	***REMOVED******REMOVED***,
-	"hmac-sha1": ***REMOVED***20, false, func(key []byte) hash.Hash ***REMOVED***
+	}},
+	"hmac-sha1": {20, false, func(key []byte) hash.Hash {
 		return hmac.New(sha1.New, key)
-	***REMOVED******REMOVED***,
-	"hmac-sha1-96": ***REMOVED***20, false, func(key []byte) hash.Hash ***REMOVED***
-		return truncatingMAC***REMOVED***12, hmac.New(sha1.New, key)***REMOVED***
-	***REMOVED******REMOVED***,
-***REMOVED***
+	}},
+	"hmac-sha1-96": {20, false, func(key []byte) hash.Hash {
+		return truncatingMAC{12, hmac.New(sha1.New, key)}
+	}},
+}

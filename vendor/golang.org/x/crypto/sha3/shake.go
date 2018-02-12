@@ -14,7 +14,7 @@ import (
 
 // ShakeHash defines the interface to hash functions that
 // support arbitrary-length output.
-type ShakeHash interface ***REMOVED***
+type ShakeHash interface {
 	// Write absorbs more data into the hash's state. It panics if input is
 	// written to it after output has been read from it.
 	io.Writer
@@ -29,32 +29,32 @@ type ShakeHash interface ***REMOVED***
 
 	// Reset resets the ShakeHash to its initial state.
 	Reset()
-***REMOVED***
+}
 
-func (d *state) Clone() ShakeHash ***REMOVED***
+func (d *state) Clone() ShakeHash {
 	return d.clone()
-***REMOVED***
+}
 
 // NewShake128 creates a new SHAKE128 variable-output-length ShakeHash.
 // Its generic security strength is 128 bits against all attacks if at
 // least 32 bytes of its output are used.
-func NewShake128() ShakeHash ***REMOVED*** return &state***REMOVED***rate: 168, dsbyte: 0x1f***REMOVED*** ***REMOVED***
+func NewShake128() ShakeHash { return &state{rate: 168, dsbyte: 0x1f} }
 
 // NewShake256 creates a new SHAKE128 variable-output-length ShakeHash.
 // Its generic security strength is 256 bits against all attacks if
 // at least 64 bytes of its output are used.
-func NewShake256() ShakeHash ***REMOVED*** return &state***REMOVED***rate: 136, dsbyte: 0x1f***REMOVED*** ***REMOVED***
+func NewShake256() ShakeHash { return &state{rate: 136, dsbyte: 0x1f} }
 
 // ShakeSum128 writes an arbitrary-length digest of data into hash.
-func ShakeSum128(hash, data []byte) ***REMOVED***
+func ShakeSum128(hash, data []byte) {
 	h := NewShake128()
 	h.Write(data)
 	h.Read(hash)
-***REMOVED***
+}
 
 // ShakeSum256 writes an arbitrary-length digest of data into hash.
-func ShakeSum256(hash, data []byte) ***REMOVED***
+func ShakeSum256(hash, data []byte) {
 	h := NewShake256()
 	h.Write(data)
 	h.Read(hash)
-***REMOVED***
+}

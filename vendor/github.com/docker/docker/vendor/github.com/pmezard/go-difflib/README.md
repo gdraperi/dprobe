@@ -26,13 +26,13 @@ Diffs are configured with Unified (or ContextDiff) structures, and can
 be output to an io.Writer or returned as a string.
 
 ```Go
-diff := UnifiedDiff***REMOVED***
+diff := UnifiedDiff{
     A:        difflib.SplitLines("foo\nbar\n"),
     B:        difflib.SplitLines("foo\nbaz\n"),
     FromFile: "Original",
     ToFile:   "Current",
     Context:  3,
-***REMOVED***
+}
 text, _ := GetUnifiedDiffString(diff)
 fmt.Printf(text)
 ```

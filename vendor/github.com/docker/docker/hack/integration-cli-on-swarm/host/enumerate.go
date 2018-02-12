@@ -9,20 +9,20 @@ import (
 
 var testFuncRegexp *regexp.Regexp
 
-func init() ***REMOVED***
+func init() {
 	testFuncRegexp = regexp.MustCompile(`(?m)^\s*func\s+\(\w*\s*\*(\w+Suite)\)\s+(Test\w+)`)
-***REMOVED***
+}
 
-func enumerateTestsForBytes(b []byte) ([]string, error) ***REMOVED***
+func enumerateTestsForBytes(b []byte) ([]string, error) {
 	var tests []string
 	submatches := testFuncRegexp.FindAllSubmatch(b, -1)
-	for _, submatch := range submatches ***REMOVED***
-		if len(submatch) == 3 ***REMOVED***
+	for _, submatch := range submatches {
+		if len(submatch) == 3 {
 			tests = append(tests, fmt.Sprintf("%s.%s$", submatch[1], submatch[2]))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return tests, nil
-***REMOVED***
+}
 
 // enumerateTests enumerates valid `-check.f` strings for all the test functions.
 // Note that we use regexp rather than parsing Go files for performance reason.
@@ -34,22 +34,22 @@ func enumerateTestsForBytes(b []byte) ([]string, error) ***REMOVED***
 //  "DockerAuthzSuite.TestAuthZPluginAllowEventStream$"
 //  ...
 //  "DockerTrustedSwarmSuite.TestTrustedServiceUpdate$"
-func enumerateTests(wd string) ([]string, error) ***REMOVED***
+func enumerateTests(wd string) ([]string, error) {
 	testGoFiles, err := filepath.Glob(filepath.Join(wd, "integration-cli", "*_test.go"))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	var allTests []string
-	for _, testGoFile := range testGoFiles ***REMOVED***
+	for _, testGoFile := range testGoFiles {
 		b, err := ioutil.ReadFile(testGoFile)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		tests, err := enumerateTestsForBytes(b)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		allTests = append(allTests, tests...)
-	***REMOVED***
+	}
 	return allTests, nil
-***REMOVED***
+}

@@ -6,7 +6,7 @@ import (
 
 // CertificateRecord encodes a certificate and its metadata
 // that will be recorded in a database.
-type CertificateRecord struct ***REMOVED***
+type CertificateRecord struct {
 	Serial    string    `db:"serial_number"`
 	AKI       string    `db:"authority_key_identifier"`
 	CALabel   string    `db:"ca_label"`
@@ -15,19 +15,19 @@ type CertificateRecord struct ***REMOVED***
 	Expiry    time.Time `db:"expiry"`
 	RevokedAt time.Time `db:"revoked_at"`
 	PEM       string    `db:"pem"`
-***REMOVED***
+}
 
 // OCSPRecord encodes a OCSP response body and its metadata
 // that will be recorded in a database.
-type OCSPRecord struct ***REMOVED***
+type OCSPRecord struct {
 	Serial string    `db:"serial_number"`
 	AKI    string    `db:"authority_key_identifier"`
 	Body   string    `db:"body"`
 	Expiry time.Time `db:"expiry"`
-***REMOVED***
+}
 
 // Accessor abstracts the CRUD of certdb objects from a DB.
-type Accessor interface ***REMOVED***
+type Accessor interface {
 	InsertCertificate(cr CertificateRecord) error
 	GetCertificate(serial, aki string) ([]CertificateRecord, error)
 	GetUnexpiredCertificates() ([]CertificateRecord, error)
@@ -37,4 +37,4 @@ type Accessor interface ***REMOVED***
 	GetUnexpiredOCSPs() ([]OCSPRecord, error)
 	UpdateOCSP(serial, aki, body string, expiry time.Time) error
 	UpsertOCSP(serial, aki, body string, expiry time.Time) error
-***REMOVED***
+}

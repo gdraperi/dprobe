@@ -14,10 +14,10 @@ import (
 )
 
 // Event represents a single file system notification.
-type Event struct ***REMOVED***
+type Event struct {
 	Name string // Relative path to the file or directory.
 	Op   Op     // File operation that triggered the event.
-***REMOVED***
+}
 
 // Op describes a set of file operations.
 type Op uint32
@@ -31,36 +31,36 @@ const (
 	Chmod
 )
 
-func (op Op) String() string ***REMOVED***
+func (op Op) String() string {
 	// Use a buffer for efficient string concatenation
 	var buffer bytes.Buffer
 
-	if op&Create == Create ***REMOVED***
+	if op&Create == Create {
 		buffer.WriteString("|CREATE")
-	***REMOVED***
-	if op&Remove == Remove ***REMOVED***
+	}
+	if op&Remove == Remove {
 		buffer.WriteString("|REMOVE")
-	***REMOVED***
-	if op&Write == Write ***REMOVED***
+	}
+	if op&Write == Write {
 		buffer.WriteString("|WRITE")
-	***REMOVED***
-	if op&Rename == Rename ***REMOVED***
+	}
+	if op&Rename == Rename {
 		buffer.WriteString("|RENAME")
-	***REMOVED***
-	if op&Chmod == Chmod ***REMOVED***
+	}
+	if op&Chmod == Chmod {
 		buffer.WriteString("|CHMOD")
-	***REMOVED***
-	if buffer.Len() == 0 ***REMOVED***
+	}
+	if buffer.Len() == 0 {
 		return ""
-	***REMOVED***
+	}
 	return buffer.String()[1:] // Strip leading pipe
-***REMOVED***
+}
 
 // String returns a string representation of the event in the form
 // "file: REMOVE|WRITE|..."
-func (e Event) String() string ***REMOVED***
+func (e Event) String() string {
 	return fmt.Sprintf("%q: %s", e.Name, e.Op.String())
-***REMOVED***
+}
 
 // Common errors that can be reported by a watcher
 var ErrEventOverflow = errors.New("fsnotify queue overflow")

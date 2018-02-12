@@ -10,60 +10,60 @@ import (
 	"testing"
 )
 
-var subprotocolTests = []struct ***REMOVED***
+var subprotocolTests = []struct {
 	h         string
 	protocols []string
-***REMOVED******REMOVED***
-	***REMOVED***"", nil***REMOVED***,
-	***REMOVED***"foo", []string***REMOVED***"foo"***REMOVED******REMOVED***,
-	***REMOVED***"foo,bar", []string***REMOVED***"foo", "bar"***REMOVED******REMOVED***,
-	***REMOVED***"foo, bar", []string***REMOVED***"foo", "bar"***REMOVED******REMOVED***,
-	***REMOVED***" foo, bar", []string***REMOVED***"foo", "bar"***REMOVED******REMOVED***,
-	***REMOVED***" foo, bar ", []string***REMOVED***"foo", "bar"***REMOVED******REMOVED***,
-***REMOVED***
+}{
+	{"", nil},
+	{"foo", []string{"foo"}},
+	{"foo,bar", []string{"foo", "bar"}},
+	{"foo, bar", []string{"foo", "bar"}},
+	{" foo, bar", []string{"foo", "bar"}},
+	{" foo, bar ", []string{"foo", "bar"}},
+}
 
-func TestSubprotocols(t *testing.T) ***REMOVED***
-	for _, st := range subprotocolTests ***REMOVED***
-		r := http.Request***REMOVED***Header: http.Header***REMOVED***"Sec-Websocket-Protocol": ***REMOVED***st.h***REMOVED******REMOVED******REMOVED***
+func TestSubprotocols(t *testing.T) {
+	for _, st := range subprotocolTests {
+		r := http.Request{Header: http.Header{"Sec-Websocket-Protocol": {st.h}}}
 		protocols := Subprotocols(&r)
-		if !reflect.DeepEqual(st.protocols, protocols) ***REMOVED***
+		if !reflect.DeepEqual(st.protocols, protocols) {
 			t.Errorf("SubProtocols(%q) returned %#v, want %#v", st.h, protocols, st.protocols)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-var isWebSocketUpgradeTests = []struct ***REMOVED***
+var isWebSocketUpgradeTests = []struct {
 	ok bool
 	h  http.Header
-***REMOVED******REMOVED***
-	***REMOVED***false, http.Header***REMOVED***"Upgrade": ***REMOVED***"websocket"***REMOVED******REMOVED******REMOVED***,
-	***REMOVED***false, http.Header***REMOVED***"Connection": ***REMOVED***"upgrade"***REMOVED******REMOVED******REMOVED***,
-	***REMOVED***true, http.Header***REMOVED***"Connection": ***REMOVED***"upgRade"***REMOVED***, "Upgrade": ***REMOVED***"WebSocket"***REMOVED******REMOVED******REMOVED***,
-***REMOVED***
+}{
+	{false, http.Header{"Upgrade": {"websocket"}}},
+	{false, http.Header{"Connection": {"upgrade"}}},
+	{true, http.Header{"Connection": {"upgRade"}, "Upgrade": {"WebSocket"}}},
+}
 
-func TestIsWebSocketUpgrade(t *testing.T) ***REMOVED***
-	for _, tt := range isWebSocketUpgradeTests ***REMOVED***
-		ok := IsWebSocketUpgrade(&http.Request***REMOVED***Header: tt.h***REMOVED***)
-		if tt.ok != ok ***REMOVED***
+func TestIsWebSocketUpgrade(t *testing.T) {
+	for _, tt := range isWebSocketUpgradeTests {
+		ok := IsWebSocketUpgrade(&http.Request{Header: tt.h})
+		if tt.ok != ok {
 			t.Errorf("IsWebSocketUpgrade(%v) returned %v, want %v", tt.h, ok, tt.ok)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-var checkSameOriginTests = []struct ***REMOVED***
+var checkSameOriginTests = []struct {
 	ok bool
 	r  *http.Request
-***REMOVED******REMOVED***
-	***REMOVED***false, &http.Request***REMOVED***Host: "example.org", Header: map[string][]string***REMOVED***"Origin": []string***REMOVED***"https://other.org"***REMOVED******REMOVED******REMOVED******REMOVED***,
-	***REMOVED***true, &http.Request***REMOVED***Host: "example.org", Header: map[string][]string***REMOVED***"Origin": []string***REMOVED***"https://example.org"***REMOVED******REMOVED******REMOVED******REMOVED***,
-	***REMOVED***true, &http.Request***REMOVED***Host: "Example.org", Header: map[string][]string***REMOVED***"Origin": []string***REMOVED***"https://example.org"***REMOVED******REMOVED******REMOVED******REMOVED***,
-***REMOVED***
+}{
+	{false, &http.Request{Host: "example.org", Header: map[string][]string{"Origin": []string{"https://other.org"}}}},
+	{true, &http.Request{Host: "example.org", Header: map[string][]string{"Origin": []string{"https://example.org"}}}},
+	{true, &http.Request{Host: "Example.org", Header: map[string][]string{"Origin": []string{"https://example.org"}}}},
+}
 
-func TestCheckSameOrigin(t *testing.T) ***REMOVED***
-	for _, tt := range checkSameOriginTests ***REMOVED***
+func TestCheckSameOrigin(t *testing.T) {
+	for _, tt := range checkSameOriginTests {
 		ok := checkSameOrigin(tt.r)
-		if tt.ok != ok ***REMOVED***
+		if tt.ok != ok {
 			t.Errorf("checkSameOrigin(%+v) returned %v, want %v", tt.r, ok, tt.ok)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

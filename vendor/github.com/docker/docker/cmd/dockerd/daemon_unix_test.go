@@ -11,8 +11,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestLoadDaemonCliConfigWithDaemonFlags(t *testing.T) ***REMOVED***
-	content := `***REMOVED***"log-opts": ***REMOVED***"max-size": "1k"***REMOVED******REMOVED***`
+func TestLoadDaemonCliConfigWithDaemonFlags(t *testing.T) {
+	content := `{"log-opts": {"max-size": "1k"}}`
 	tempFile := fs.NewFile(t, "config", fs.WithContent(content))
 	defer tempFile.Remove()
 
@@ -30,10 +30,10 @@ func TestLoadDaemonCliConfigWithDaemonFlags(t *testing.T) ***REMOVED***
 	assert.True(t, loadedConfig.EnableSelinuxSupport)
 	assert.Equal(t, "json-file", loadedConfig.LogConfig.Type)
 	assert.Equal(t, "1k", loadedConfig.LogConfig.Config["max-size"])
-***REMOVED***
+}
 
-func TestLoadDaemonConfigWithNetwork(t *testing.T) ***REMOVED***
-	content := `***REMOVED***"bip": "127.0.0.2", "ip": "127.0.0.1"***REMOVED***`
+func TestLoadDaemonConfigWithNetwork(t *testing.T) {
+	content := `{"bip": "127.0.0.2", "ip": "127.0.0.1"}`
 	tempFile := fs.NewFile(t, "config", fs.WithContent(content))
 	defer tempFile.Remove()
 
@@ -44,13 +44,13 @@ func TestLoadDaemonConfigWithNetwork(t *testing.T) ***REMOVED***
 
 	assert.Equal(t, "127.0.0.2", loadedConfig.IP)
 	assert.Equal(t, "127.0.0.1", loadedConfig.DefaultIP.String())
-***REMOVED***
+}
 
-func TestLoadDaemonConfigWithMapOptions(t *testing.T) ***REMOVED***
-	content := `***REMOVED***
-		"cluster-store-opts": ***REMOVED***"kv.cacertfile": "/var/lib/docker/discovery_certs/ca.pem"***REMOVED***,
-		"log-opts": ***REMOVED***"tag": "test"***REMOVED***
-***REMOVED***`
+func TestLoadDaemonConfigWithMapOptions(t *testing.T) {
+	content := `{
+		"cluster-store-opts": {"kv.cacertfile": "/var/lib/docker/discovery_certs/ca.pem"},
+		"log-opts": {"tag": "test"}
+}`
 	tempFile := fs.NewFile(t, "config", fs.WithContent(content))
 	defer tempFile.Remove()
 
@@ -64,10 +64,10 @@ func TestLoadDaemonConfigWithMapOptions(t *testing.T) ***REMOVED***
 	assert.Equal(t, expectedPath, loadedConfig.ClusterOpts["kv.cacertfile"])
 	assert.NotNil(t, loadedConfig.LogConfig.Config)
 	assert.Equal(t, "test", loadedConfig.LogConfig.Config["tag"])
-***REMOVED***
+}
 
-func TestLoadDaemonConfigWithTrueDefaultValues(t *testing.T) ***REMOVED***
-	content := `***REMOVED*** "userland-proxy": false ***REMOVED***`
+func TestLoadDaemonConfigWithTrueDefaultValues(t *testing.T) {
+	content := `{ "userland-proxy": false }`
 	tempFile := fs.NewFile(t, "config", fs.WithContent(content))
 	defer tempFile.Remove()
 
@@ -80,14 +80,14 @@ func TestLoadDaemonConfigWithTrueDefaultValues(t *testing.T) ***REMOVED***
 
 	// make sure reloading doesn't generate configuration
 	// conflicts after normalizing boolean values.
-	reload := func(reloadedConfig *config.Config) ***REMOVED***
+	reload := func(reloadedConfig *config.Config) {
 		assert.False(t, reloadedConfig.EnableUserlandProxy)
-	***REMOVED***
+	}
 	assert.NoError(t, config.Reload(opts.configFile, opts.flags, reload))
-***REMOVED***
+}
 
-func TestLoadDaemonConfigWithTrueDefaultValuesLeaveDefaults(t *testing.T) ***REMOVED***
-	tempFile := fs.NewFile(t, "config", fs.WithContent(`***REMOVED******REMOVED***`))
+func TestLoadDaemonConfigWithTrueDefaultValuesLeaveDefaults(t *testing.T) {
+	tempFile := fs.NewFile(t, "config", fs.WithContent(`{}`))
 	defer tempFile.Remove()
 
 	opts := defaultOptions(tempFile.Path())
@@ -96,4 +96,4 @@ func TestLoadDaemonConfigWithTrueDefaultValuesLeaveDefaults(t *testing.T) ***REM
 	require.NotNil(t, loadedConfig)
 
 	assert.True(t, loadedConfig.EnableUserlandProxy)
-***REMOVED***
+}

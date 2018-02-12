@@ -88,7 +88,7 @@ Example programs can be found in the `github.com/miekg/exdns` repository.
 
 *all of them*
 
-* 103***REMOVED***4,5***REMOVED*** - DNS standard
+* 103{4,5} - DNS standard
 * 1348 - NSAP record (removed the record)
 * 1982 - Serial Arithmetic
 * 1876 - LOC record
@@ -105,11 +105,11 @@ Example programs can be found in the `github.com/miekg/exdns` repository.
 * 2929 - DNS IANA Considerations
 * 3110 - RSASHA1 DNS keys
 * 3225 - DO bit (DNSSEC OK)
-* 340***REMOVED***1,2,3***REMOVED*** - NAPTR record
+* 340{1,2,3} - NAPTR record
 * 3445 - Limiting the scope of (DNS)KEY
 * 3597 - Unknown RRs
 * 4025 - IPSECKEY
-* 403***REMOVED***3,4,5***REMOVED*** - DNSSEC + validation functions
+* 403{3,4,5} - DNSSEC + validation functions
 * 4255 - SSHFP record
 * 4343 - Case insensitivity
 * 4408 - SPF record

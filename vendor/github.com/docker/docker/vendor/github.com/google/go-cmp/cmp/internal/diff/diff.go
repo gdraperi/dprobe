@@ -32,10 +32,10 @@ type EditScript []EditType
 // String returns a human-readable string representing the edit-script where
 // Identity, UniqueX, UniqueY, and Modified are represented by the
 // '.', 'X', 'Y', and 'M' characters, respectively.
-func (es EditScript) String() string ***REMOVED***
+func (es EditScript) String() string {
 	b := make([]byte, len(es))
-	for i, e := range es ***REMOVED***
-		switch e ***REMOVED***
+	for i, e := range es {
+		switch e {
 		case Identity:
 			b[i] = '.'
 		case UniqueX:
@@ -46,15 +46,15 @@ func (es EditScript) String() string ***REMOVED***
 			b[i] = 'M'
 		default:
 			panic("invalid edit-type")
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return string(b)
-***REMOVED***
+}
 
 // stats returns a histogram of the number of each type of edit operation.
-func (es EditScript) stats() (s struct***REMOVED*** NI, NX, NY, NM int ***REMOVED***) ***REMOVED***
-	for _, e := range es ***REMOVED***
-		switch e ***REMOVED***
+func (es EditScript) stats() (s struct{ NI, NX, NY, NM int }) {
+	for _, e := range es {
+		switch e {
 		case Identity:
 			s.NI++
 		case UniqueX:
@@ -65,20 +65,20 @@ func (es EditScript) stats() (s struct***REMOVED*** NI, NX, NY, NM int ***REMOVE
 			s.NM++
 		default:
 			panic("invalid edit-type")
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}
 
 // Dist is the Levenshtein distance and is guaranteed to be 0 if and only if
 // lists X and Y are equal.
-func (es EditScript) Dist() int ***REMOVED*** return len(es) - es.stats().NI ***REMOVED***
+func (es EditScript) Dist() int { return len(es) - es.stats().NI }
 
 // LenX is the length of the X list.
-func (es EditScript) LenX() int ***REMOVED*** return len(es) - es.stats().NY ***REMOVED***
+func (es EditScript) LenX() int { return len(es) - es.stats().NY }
 
 // LenY is the length of the Y list.
-func (es EditScript) LenY() int ***REMOVED*** return len(es) - es.stats().NX ***REMOVED***
+func (es EditScript) LenY() int { return len(es) - es.stats().NX }
 
 // EqualFunc reports whether the symbols at indexes ix and iy are equal.
 // When called by Difference, the index is guaranteed to be within nx and ny.
@@ -87,21 +87,21 @@ type EqualFunc func(ix int, iy int) Result
 // Result is the result of comparison.
 // NSame is the number of sub-elements that are equal.
 // NDiff is the number of sub-elements that are not equal.
-type Result struct***REMOVED*** NSame, NDiff int ***REMOVED***
+type Result struct{ NSame, NDiff int }
 
 // Equal indicates whether the symbols are equal. Two symbols are equal
 // if and only if NDiff == 0. If Equal, then they are also Similar.
-func (r Result) Equal() bool ***REMOVED*** return r.NDiff == 0 ***REMOVED***
+func (r Result) Equal() bool { return r.NDiff == 0 }
 
 // Similar indicates whether two symbols are similar and may be represented
 // by using the Modified type. As a special case, we consider binary comparisons
-// (i.e., those that return Result***REMOVED***1, 0***REMOVED*** or Result***REMOVED***0, 1***REMOVED***) to be similar.
+// (i.e., those that return Result{1, 0} or Result{0, 1}) to be similar.
 //
 // The exact ratio of NSame to NDiff to determine similarity may change.
-func (r Result) Similar() bool ***REMOVED***
+func (r Result) Similar() bool {
 	// Use NSame+1 to offset NSame so that binary comparisons are similar.
 	return r.NSame+1 >= r.NDiff
-***REMOVED***
+}
 
 // Difference reports whether two lists of lengths nx and ny are equal
 // given the definition of equality provided as f.
@@ -117,17 +117,17 @@ func (r Result) Similar() bool ***REMOVED***
 // produces an edit-script with a minimal Levenshtein distance). This algorithm
 // favors performance over optimality. The exact output is not guaranteed to
 // be stable and may change over time.
-func Difference(nx, ny int, f EqualFunc) (eq bool, es EditScript) ***REMOVED***
+func Difference(nx, ny int, f EqualFunc) (eq bool, es EditScript) {
 	es = searchGraph(nx, ny, f)
 	st := es.stats()
 	eq = len(es) == st.NI
-	if !eq && st.NI < (nx+ny)/4 ***REMOVED***
+	if !eq && st.NI < (nx+ny)/4 {
 		return eq, nil // Edit-script more distracting than helpful
-	***REMOVED***
+	}
 	return eq, es
-***REMOVED***
+}
 
-func searchGraph(nx, ny int, f EqualFunc) EditScript ***REMOVED***
+func searchGraph(nx, ny int, f EqualFunc) EditScript {
 	// This algorithm is based on traversing what is known as an "edit-graph".
 	// See Figure 1 from "An O(ND) Difference Algorithm and Its Variations"
 	// by Eugene W. Myers. Since D can be as large as N itself, this is
@@ -168,8 +168,8 @@ func searchGraph(nx, ny int, f EqualFunc) EditScript ***REMOVED***
 	//	• fwdFrontier.X < revFrontier.X
 	//	• fwdFrontier.Y < revFrontier.Y
 	// Unless, it is time for the algorithm to terminate.
-	fwdPath := path***REMOVED***+1, point***REMOVED***0, 0***REMOVED***, make(EditScript, 0, (nx+ny)/2)***REMOVED***
-	revPath := path***REMOVED***-1, point***REMOVED***nx, ny***REMOVED***, make(EditScript, 0)***REMOVED***
+	fwdPath := path{+1, point{0, 0}, make(EditScript, 0, (nx+ny)/2)}
+	revPath := path{-1, point{nx, ny}, make(EditScript, 0)}
 	fwdFrontier := fwdPath.point // Forward search frontier
 	revFrontier := revPath.point // Reverse search frontier
 
@@ -205,16 +205,16 @@ func searchGraph(nx, ny int, f EqualFunc) EditScript ***REMOVED***
 	// the algorithm running in real-time. This is educational for understanding
 	// how the algorithm works. See debug_enable.go.
 	f = debug.Begin(nx, ny, f, &fwdPath.es, &revPath.es)
-	for ***REMOVED***
+	for {
 		// Forward search from the beginning.
-		if fwdFrontier.X >= revFrontier.X || fwdFrontier.Y >= revFrontier.Y || searchBudget == 0 ***REMOVED***
+		if fwdFrontier.X >= revFrontier.X || fwdFrontier.Y >= revFrontier.Y || searchBudget == 0 {
 			break
-		***REMOVED***
-		for stop1, stop2, i := false, false, 0; !(stop1 && stop2) && searchBudget > 0; i++ ***REMOVED***
+		}
+		for stop1, stop2, i := false, false, 0; !(stop1 && stop2) && searchBudget > 0; i++ {
 			// Search in a diagonal pattern for a match.
 			z := zigzag(i)
-			p := point***REMOVED***fwdFrontier.X + z, fwdFrontier.Y - z***REMOVED***
-			switch ***REMOVED***
+			p := point{fwdFrontier.X + z, fwdFrontier.Y - z}
+			switch {
 			case p.X >= revPath.X || p.Y < fwdPath.Y:
 				stop1 = true // Hit top-right corner
 			case p.Y >= revPath.Y || p.X < fwdPath.X:
@@ -224,35 +224,35 @@ func searchGraph(nx, ny int, f EqualFunc) EditScript ***REMOVED***
 				fwdPath.connect(p, f)
 				fwdPath.append(Identity)
 				// Follow sequence of matches as far as possible.
-				for fwdPath.X < revPath.X && fwdPath.Y < revPath.Y ***REMOVED***
-					if !f(fwdPath.X, fwdPath.Y).Equal() ***REMOVED***
+				for fwdPath.X < revPath.X && fwdPath.Y < revPath.Y {
+					if !f(fwdPath.X, fwdPath.Y).Equal() {
 						break
-					***REMOVED***
+					}
 					fwdPath.append(Identity)
-				***REMOVED***
+				}
 				fwdFrontier = fwdPath.point
 				stop1, stop2 = true, true
 			default:
 				searchBudget-- // Match not found
-			***REMOVED***
+			}
 			debug.Update()
-		***REMOVED***
+		}
 		// Advance the frontier towards reverse point.
-		if revPath.X-fwdFrontier.X >= revPath.Y-fwdFrontier.Y ***REMOVED***
+		if revPath.X-fwdFrontier.X >= revPath.Y-fwdFrontier.Y {
 			fwdFrontier.X++
-		***REMOVED*** else ***REMOVED***
+		} else {
 			fwdFrontier.Y++
-		***REMOVED***
+		}
 
 		// Reverse search from the end.
-		if fwdFrontier.X >= revFrontier.X || fwdFrontier.Y >= revFrontier.Y || searchBudget == 0 ***REMOVED***
+		if fwdFrontier.X >= revFrontier.X || fwdFrontier.Y >= revFrontier.Y || searchBudget == 0 {
 			break
-		***REMOVED***
-		for stop1, stop2, i := false, false, 0; !(stop1 && stop2) && searchBudget > 0; i++ ***REMOVED***
+		}
+		for stop1, stop2, i := false, false, 0; !(stop1 && stop2) && searchBudget > 0; i++ {
 			// Search in a diagonal pattern for a match.
 			z := zigzag(i)
-			p := point***REMOVED***revFrontier.X - z, revFrontier.Y + z***REMOVED***
-			switch ***REMOVED***
+			p := point{revFrontier.X - z, revFrontier.Y + z}
+			switch {
 			case fwdPath.X >= p.X || revPath.Y < p.Y:
 				stop1 = true // Hit bottom-left corner
 			case fwdPath.Y >= p.Y || revPath.X < p.X:
@@ -262,51 +262,51 @@ func searchGraph(nx, ny int, f EqualFunc) EditScript ***REMOVED***
 				revPath.connect(p, f)
 				revPath.append(Identity)
 				// Follow sequence of matches as far as possible.
-				for fwdPath.X < revPath.X && fwdPath.Y < revPath.Y ***REMOVED***
-					if !f(revPath.X-1, revPath.Y-1).Equal() ***REMOVED***
+				for fwdPath.X < revPath.X && fwdPath.Y < revPath.Y {
+					if !f(revPath.X-1, revPath.Y-1).Equal() {
 						break
-					***REMOVED***
+					}
 					revPath.append(Identity)
-				***REMOVED***
+				}
 				revFrontier = revPath.point
 				stop1, stop2 = true, true
 			default:
 				searchBudget-- // Match not found
-			***REMOVED***
+			}
 			debug.Update()
-		***REMOVED***
+		}
 		// Advance the frontier towards forward point.
-		if revFrontier.X-fwdPath.X >= revFrontier.Y-fwdPath.Y ***REMOVED***
+		if revFrontier.X-fwdPath.X >= revFrontier.Y-fwdPath.Y {
 			revFrontier.X--
-		***REMOVED*** else ***REMOVED***
+		} else {
 			revFrontier.Y--
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Join the forward and reverse paths and then append the reverse path.
 	fwdPath.connect(revPath.point, f)
-	for i := len(revPath.es) - 1; i >= 0; i-- ***REMOVED***
+	for i := len(revPath.es) - 1; i >= 0; i-- {
 		t := revPath.es[i]
 		revPath.es = revPath.es[:i]
 		fwdPath.append(t)
-	***REMOVED***
+	}
 	debug.Finish()
 	return fwdPath.es
-***REMOVED***
+}
 
-type path struct ***REMOVED***
+type path struct {
 	dir   int // +1 if forward, -1 if reverse
 	point     // Leading point of the EditScript path
 	es    EditScript
-***REMOVED***
+}
 
 // connect appends any necessary Identity, Modified, UniqueX, or UniqueY types
 // to the edit-script to connect p.point to dst.
-func (p *path) connect(dst point, f EqualFunc) ***REMOVED***
-	if p.dir > 0 ***REMOVED***
+func (p *path) connect(dst point, f EqualFunc) {
+	if p.dir > 0 {
 		// Connect in forward direction.
-		for dst.X > p.X && dst.Y > p.Y ***REMOVED***
-			switch r := f(p.X, p.Y); ***REMOVED***
+		for dst.X > p.X && dst.Y > p.Y {
+			switch r := f(p.X, p.Y); {
 			case r.Equal():
 				p.append(Identity)
 			case r.Similar():
@@ -315,18 +315,18 @@ func (p *path) connect(dst point, f EqualFunc) ***REMOVED***
 				p.append(UniqueX)
 			default:
 				p.append(UniqueY)
-			***REMOVED***
-		***REMOVED***
-		for dst.X > p.X ***REMOVED***
+			}
+		}
+		for dst.X > p.X {
 			p.append(UniqueX)
-		***REMOVED***
-		for dst.Y > p.Y ***REMOVED***
+		}
+		for dst.Y > p.Y {
 			p.append(UniqueY)
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
+		}
+	} else {
 		// Connect in reverse direction.
-		for p.X > dst.X && p.Y > dst.Y ***REMOVED***
-			switch r := f(p.X-1, p.Y-1); ***REMOVED***
+		for p.X > dst.X && p.Y > dst.Y {
+			switch r := f(p.X-1, p.Y-1); {
 			case r.Equal():
 				p.append(Identity)
 			case r.Similar():
@@ -335,39 +335,39 @@ func (p *path) connect(dst point, f EqualFunc) ***REMOVED***
 				p.append(UniqueY)
 			default:
 				p.append(UniqueX)
-			***REMOVED***
-		***REMOVED***
-		for p.X > dst.X ***REMOVED***
+			}
+		}
+		for p.X > dst.X {
 			p.append(UniqueX)
-		***REMOVED***
-		for p.Y > dst.Y ***REMOVED***
+		}
+		for p.Y > dst.Y {
 			p.append(UniqueY)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (p *path) append(t EditType) ***REMOVED***
+func (p *path) append(t EditType) {
 	p.es = append(p.es, t)
-	switch t ***REMOVED***
+	switch t {
 	case Identity, Modified:
 		p.add(p.dir, p.dir)
 	case UniqueX:
 		p.add(p.dir, 0)
 	case UniqueY:
 		p.add(0, p.dir)
-	***REMOVED***
+	}
 	debug.Update()
-***REMOVED***
+}
 
-type point struct***REMOVED*** X, Y int ***REMOVED***
+type point struct{ X, Y int }
 
-func (p *point) add(dx, dy int) ***REMOVED*** p.X += dx; p.Y += dy ***REMOVED***
+func (p *point) add(dx, dy int) { p.X += dx; p.Y += dy }
 
 // zigzag maps a consecutive sequence of integers to a zig-zag sequence.
 //	[0 1 2 3 4 5 ...] => [0 -1 +1 -2 +2 ...]
-func zigzag(x int) int ***REMOVED***
-	if x&1 != 0 ***REMOVED***
+func zigzag(x int) int {
+	if x&1 != 0 {
 		x = ^x
-	***REMOVED***
+	}
 	return x >> 1
-***REMOVED***
+}

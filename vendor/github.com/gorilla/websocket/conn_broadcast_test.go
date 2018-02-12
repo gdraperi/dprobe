@@ -18,117 +18,117 @@ import (
 // message into every connection and wait for all writes complete. This emulates
 // an application where many connections listen to the same data - i.e. PUB/SUB
 // scenarios with many subscribers in one channel.
-type broadcastBench struct ***REMOVED***
+type broadcastBench struct {
 	w           io.Writer
 	message     *broadcastMessage
-	closeCh     chan struct***REMOVED******REMOVED***
-	doneCh      chan struct***REMOVED******REMOVED***
+	closeCh     chan struct{}
+	doneCh      chan struct{}
 	count       int32
 	conns       []*broadcastConn
 	compression bool
 	usePrepared bool
-***REMOVED***
+}
 
-type broadcastMessage struct ***REMOVED***
+type broadcastMessage struct {
 	payload  []byte
 	prepared *PreparedMessage
-***REMOVED***
+}
 
-type broadcastConn struct ***REMOVED***
+type broadcastConn struct {
 	conn  *Conn
 	msgCh chan *broadcastMessage
-***REMOVED***
+}
 
-func newBroadcastConn(c *Conn) *broadcastConn ***REMOVED***
-	return &broadcastConn***REMOVED***
+func newBroadcastConn(c *Conn) *broadcastConn {
+	return &broadcastConn{
 		conn:  c,
 		msgCh: make(chan *broadcastMessage, 1),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func newBroadcastBench(usePrepared, compression bool) *broadcastBench ***REMOVED***
-	bench := &broadcastBench***REMOVED***
+func newBroadcastBench(usePrepared, compression bool) *broadcastBench {
+	bench := &broadcastBench{
 		w:           ioutil.Discard,
-		doneCh:      make(chan struct***REMOVED******REMOVED***),
-		closeCh:     make(chan struct***REMOVED******REMOVED***),
+		doneCh:      make(chan struct{}),
+		closeCh:     make(chan struct{}),
 		usePrepared: usePrepared,
 		compression: compression,
-	***REMOVED***
-	msg := &broadcastMessage***REMOVED***
+	}
+	msg := &broadcastMessage{
 		payload: textMessages(1)[0],
-	***REMOVED***
-	if usePrepared ***REMOVED***
+	}
+	if usePrepared {
 		pm, _ := NewPreparedMessage(TextMessage, msg.payload)
 		msg.prepared = pm
-	***REMOVED***
+	}
 	bench.message = msg
 	bench.makeConns(10000)
 	return bench
-***REMOVED***
+}
 
-func (b *broadcastBench) makeConns(numConns int) ***REMOVED***
+func (b *broadcastBench) makeConns(numConns int) {
 	conns := make([]*broadcastConn, numConns)
 
-	for i := 0; i < numConns; i++ ***REMOVED***
-		c := newConn(fakeNetConn***REMOVED***Reader: nil, Writer: b.w***REMOVED***, true, 1024, 1024)
-		if b.compression ***REMOVED***
+	for i := 0; i < numConns; i++ {
+		c := newConn(fakeNetConn{Reader: nil, Writer: b.w}, true, 1024, 1024)
+		if b.compression {
 			c.enableWriteCompression = true
 			c.newCompressionWriter = compressNoContextTakeover
-		***REMOVED***
+		}
 		conns[i] = newBroadcastConn(c)
-		go func(c *broadcastConn) ***REMOVED***
-			for ***REMOVED***
-				select ***REMOVED***
+		go func(c *broadcastConn) {
+			for {
+				select {
 				case msg := <-c.msgCh:
-					if b.usePrepared ***REMOVED***
+					if b.usePrepared {
 						c.conn.WritePreparedMessage(msg.prepared)
-					***REMOVED*** else ***REMOVED***
+					} else {
 						c.conn.WriteMessage(TextMessage, msg.payload)
-					***REMOVED***
+					}
 					val := atomic.AddInt32(&b.count, 1)
-					if val%int32(numConns) == 0 ***REMOVED***
-						b.doneCh <- struct***REMOVED******REMOVED******REMOVED******REMOVED***
-					***REMOVED***
+					if val%int32(numConns) == 0 {
+						b.doneCh <- struct{}{}
+					}
 				case <-b.closeCh:
 					return
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***(conns[i])
-	***REMOVED***
+				}
+			}
+		}(conns[i])
+	}
 	b.conns = conns
-***REMOVED***
+}
 
-func (b *broadcastBench) close() ***REMOVED***
+func (b *broadcastBench) close() {
 	close(b.closeCh)
-***REMOVED***
+}
 
-func (b *broadcastBench) runOnce() ***REMOVED***
-	for _, c := range b.conns ***REMOVED***
+func (b *broadcastBench) runOnce() {
+	for _, c := range b.conns {
 		c.msgCh <- b.message
-	***REMOVED***
+	}
 	<-b.doneCh
-***REMOVED***
+}
 
-func BenchmarkBroadcast(b *testing.B) ***REMOVED***
-	benchmarks := []struct ***REMOVED***
+func BenchmarkBroadcast(b *testing.B) {
+	benchmarks := []struct {
 		name        string
 		usePrepared bool
 		compression bool
-	***REMOVED******REMOVED***
-		***REMOVED***"NoCompression", false, false***REMOVED***,
-		***REMOVED***"WithCompression", false, true***REMOVED***,
-		***REMOVED***"NoCompressionPrepared", true, false***REMOVED***,
-		***REMOVED***"WithCompressionPrepared", true, true***REMOVED***,
-	***REMOVED***
-	for _, bm := range benchmarks ***REMOVED***
-		b.Run(bm.name, func(b *testing.B) ***REMOVED***
+	}{
+		{"NoCompression", false, false},
+		{"WithCompression", false, true},
+		{"NoCompressionPrepared", true, false},
+		{"WithCompressionPrepared", true, true},
+	}
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
 			bench := newBroadcastBench(bm.usePrepared, bm.compression)
 			defer bench.close()
 			b.ResetTimer()
-			for i := 0; i < b.N; i++ ***REMOVED***
+			for i := 0; i < b.N; i++ {
 				bench.runOnce()
-			***REMOVED***
+			}
 			b.ReportAllocs()
-		***REMOVED***)
-	***REMOVED***
-***REMOVED***
+		})
+	}
+}

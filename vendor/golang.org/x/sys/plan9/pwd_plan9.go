@@ -6,18 +6,18 @@
 
 package plan9
 
-func fixwd() ***REMOVED***
-***REMOVED***
+func fixwd() {
+}
 
-func Getwd() (wd string, err error) ***REMOVED***
+func Getwd() (wd string, err error) {
 	fd, err := open(".", O_RDONLY)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	defer Close(fd)
 	return Fd2path(fd)
-***REMOVED***
+}
 
-func Chdir(path string) error ***REMOVED***
+func Chdir(path string) error {
 	return chdir(path)
-***REMOVED***
+}

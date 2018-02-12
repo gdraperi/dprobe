@@ -13,52 +13,52 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestNetworkDisconnectError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestNetworkDisconnectError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
-	***REMOVED***
+	}
 
 	err := client.NetworkDisconnect(context.Background(), "network_id", "container_id", false)
-	if err == nil || err.Error() != "Error response from daemon: Server error" ***REMOVED***
+	if err == nil || err.Error() != "Error response from daemon: Server error" {
 		t.Fatalf("expected a Server Error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestNetworkDisconnect(t *testing.T) ***REMOVED***
+func TestNetworkDisconnect(t *testing.T) {
 	expectedURL := "/networks/network_id/disconnect"
 
-	client := &Client***REMOVED***
-		client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-			if !strings.HasPrefix(req.URL.Path, expectedURL) ***REMOVED***
+	client := &Client{
+		client: newMockClient(func(req *http.Request) (*http.Response, error) {
+			if !strings.HasPrefix(req.URL.Path, expectedURL) {
 				return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, req.URL)
-			***REMOVED***
+			}
 
-			if req.Method != "POST" ***REMOVED***
+			if req.Method != "POST" {
 				return nil, fmt.Errorf("expected POST method, got %s", req.Method)
-			***REMOVED***
+			}
 
 			var disconnect types.NetworkDisconnect
-			if err := json.NewDecoder(req.Body).Decode(&disconnect); err != nil ***REMOVED***
+			if err := json.NewDecoder(req.Body).Decode(&disconnect); err != nil {
 				return nil, err
-			***REMOVED***
+			}
 
-			if disconnect.Container != "container_id" ***REMOVED***
+			if disconnect.Container != "container_id" {
 				return nil, fmt.Errorf("expected 'container_id', got %s", disconnect.Container)
-			***REMOVED***
+			}
 
-			if !disconnect.Force ***REMOVED***
+			if !disconnect.Force {
 				return nil, fmt.Errorf("expected Force to be true, got %v", disconnect.Force)
-			***REMOVED***
+			}
 
-			return &http.Response***REMOVED***
+			return &http.Response{
 				StatusCode: http.StatusOK,
 				Body:       ioutil.NopCloser(bytes.NewReader([]byte(""))),
-			***REMOVED***, nil
-		***REMOVED***),
-	***REMOVED***
+			}, nil
+		}),
+	}
 
 	err := client.NetworkDisconnect(context.Background(), "network_id", "container_id", true)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}

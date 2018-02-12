@@ -22,19 +22,19 @@ var (
 
 type networkTable map[string]*network
 
-type subnet struct ***REMOVED***
+type subnet struct {
 	vni      uint32
 	subnetIP *net.IPNet
 	gwIP     *net.IP
-***REMOVED***
+}
 
-type subnetJSON struct ***REMOVED***
+type subnetJSON struct {
 	SubnetIP string
 	GwIP     string
 	Vni      uint32
-***REMOVED***
+}
 
-type network struct ***REMOVED***
+type network struct {
 	id              string
 	name            string
 	hnsID           string
@@ -47,62 +47,62 @@ type network struct ***REMOVED***
 	subnets         []*subnet
 	secure          bool
 	sync.Mutex
-***REMOVED***
+}
 
-func (d *driver) NetworkAllocate(id string, option map[string]string, ipV4Data, ipV6Data []driverapi.IPAMData) (map[string]string, error) ***REMOVED***
+func (d *driver) NetworkAllocate(id string, option map[string]string, ipV4Data, ipV6Data []driverapi.IPAMData) (map[string]string, error) {
 	return nil, types.NotImplementedErrorf("not implemented")
-***REMOVED***
+}
 
-func (d *driver) NetworkFree(id string) error ***REMOVED***
+func (d *driver) NetworkFree(id string) error {
 	return types.NotImplementedErrorf("not implemented")
-***REMOVED***
+}
 
-func (d *driver) CreateNetwork(id string, option map[string]interface***REMOVED******REMOVED***, nInfo driverapi.NetworkInfo, ipV4Data, ipV6Data []driverapi.IPAMData) error ***REMOVED***
+func (d *driver) CreateNetwork(id string, option map[string]interface{}, nInfo driverapi.NetworkInfo, ipV4Data, ipV6Data []driverapi.IPAMData) error {
 	var (
 		networkName   string
 		interfaceName string
 		staleNetworks []string
 	)
 
-	if id == "" ***REMOVED***
+	if id == "" {
 		return fmt.Errorf("invalid network id")
-	***REMOVED***
+	}
 
-	if nInfo == nil ***REMOVED***
+	if nInfo == nil {
 		return fmt.Errorf("invalid network info structure")
-	***REMOVED***
+	}
 
-	if len(ipV4Data) == 0 || ipV4Data[0].Pool.String() == "0.0.0.0/0" ***REMOVED***
+	if len(ipV4Data) == 0 || ipV4Data[0].Pool.String() == "0.0.0.0/0" {
 		return types.BadRequestErrorf("ipv4 pool is empty")
-	***REMOVED***
+	}
 
 	staleNetworks = make([]string, 0)
 	vnis := make([]uint32, 0, len(ipV4Data))
 
 	existingNetwork := d.network(id)
-	if existingNetwork != nil ***REMOVED***
+	if existingNetwork != nil {
 		logrus.Debugf("Network preexists. Deleting %s", id)
 		err := d.DeleteNetwork(id)
-		if err != nil ***REMOVED***
+		if err != nil {
 			logrus.Errorf("Error deleting stale network %s", err.Error())
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	n := &network***REMOVED***
+	n := &network{
 		id:        id,
 		driver:    d,
-		endpoints: endpointTable***REMOVED******REMOVED***,
-		subnets:   []*subnet***REMOVED******REMOVED***,
-	***REMOVED***
+		endpoints: endpointTable{},
+		subnets:   []*subnet{},
+	}
 
 	genData, ok := option[netlabel.GenericData].(map[string]string)
 
-	if !ok ***REMOVED***
+	if !ok {
 		return fmt.Errorf("Unknown generic data option")
-	***REMOVED***
+	}
 
-	for label, value := range genData ***REMOVED***
-		switch label ***REMOVED***
+	for label, value := range genData {
+		switch label {
 		case "com.docker.network.windowsshim.networkname":
 			networkName = value
 		case "com.docker.network.windowsshim.interface":
@@ -111,271 +111,271 @@ func (d *driver) CreateNetwork(id string, option map[string]interface***REMOVED*
 			n.hnsID = value
 		case netlabel.OverlayVxlanIDList:
 			vniStrings := strings.Split(value, ",")
-			for _, vniStr := range vniStrings ***REMOVED***
+			for _, vniStr := range vniStrings {
 				vni, err := strconv.Atoi(vniStr)
-				if err != nil ***REMOVED***
+				if err != nil {
 					return fmt.Errorf("invalid vxlan id value %q passed", vniStr)
-				***REMOVED***
+				}
 
 				vnis = append(vnis, uint32(vni))
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	// If we are getting vnis from libnetwork, either we get for
 	// all subnets or none.
-	if len(vnis) < len(ipV4Data) ***REMOVED***
+	if len(vnis) < len(ipV4Data) {
 		return fmt.Errorf("insufficient vnis(%d) passed to overlay. Windows driver requires VNIs to be prepopulated", len(vnis))
-	***REMOVED***
+	}
 
-	for i, ipd := range ipV4Data ***REMOVED***
-		s := &subnet***REMOVED***
+	for i, ipd := range ipV4Data {
+		s := &subnet{
 			subnetIP: ipd.Pool,
 			gwIP:     &ipd.Gateway.IP,
-		***REMOVED***
+		}
 
-		if len(vnis) != 0 ***REMOVED***
+		if len(vnis) != 0 {
 			s.vni = vnis[i]
-		***REMOVED***
+		}
 
 		d.Lock()
-		for _, network := range d.networks ***REMOVED***
+		for _, network := range d.networks {
 			found := false
-			for _, sub := range network.subnets ***REMOVED***
-				if sub.vni == s.vni ***REMOVED***
+			for _, sub := range network.subnets {
+				if sub.vni == s.vni {
 					staleNetworks = append(staleNetworks, network.id)
 					found = true
 					break
-				***REMOVED***
-			***REMOVED***
-			if found ***REMOVED***
+				}
+			}
+			if found {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		d.Unlock()
 
 		n.subnets = append(n.subnets, s)
-	***REMOVED***
+	}
 
-	for _, staleNetwork := range staleNetworks ***REMOVED***
+	for _, staleNetwork := range staleNetworks {
 		d.DeleteNetwork(staleNetwork)
-	***REMOVED***
+	}
 
 	n.name = networkName
-	if n.name == "" ***REMOVED***
+	if n.name == "" {
 		n.name = id
-	***REMOVED***
+	}
 
 	n.interfaceName = interfaceName
 
-	if nInfo != nil ***REMOVED***
-		if err := nInfo.TableEventRegister(ovPeerTable, driverapi.EndpointObject); err != nil ***REMOVED***
+	if nInfo != nil {
+		if err := nInfo.TableEventRegister(ovPeerTable, driverapi.EndpointObject); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	d.addNetwork(n)
 
 	err := d.createHnsNetwork(n)
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		d.deleteNetwork(id)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		genData["com.docker.network.windowsshim.hnsid"] = n.hnsID
-	***REMOVED***
+	}
 
 	return err
-***REMOVED***
+}
 
-func (d *driver) DeleteNetwork(nid string) error ***REMOVED***
-	if nid == "" ***REMOVED***
+func (d *driver) DeleteNetwork(nid string) error {
+	if nid == "" {
 		return fmt.Errorf("invalid network id")
-	***REMOVED***
+	}
 
 	n := d.network(nid)
-	if n == nil ***REMOVED***
+	if n == nil {
 		return types.ForbiddenErrorf("could not find network with id %s", nid)
-	***REMOVED***
+	}
 
 	_, err := hcsshim.HNSNetworkRequest("DELETE", n.hnsID, "")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return types.ForbiddenErrorf(err.Error())
-	***REMOVED***
+	}
 
 	d.deleteNetwork(nid)
 
 	return nil
-***REMOVED***
+}
 
-func (d *driver) ProgramExternalConnectivity(nid, eid string, options map[string]interface***REMOVED******REMOVED***) error ***REMOVED***
+func (d *driver) ProgramExternalConnectivity(nid, eid string, options map[string]interface{}) error {
 	return nil
-***REMOVED***
+}
 
-func (d *driver) RevokeExternalConnectivity(nid, eid string) error ***REMOVED***
+func (d *driver) RevokeExternalConnectivity(nid, eid string) error {
 	return nil
-***REMOVED***
+}
 
-func (d *driver) addNetwork(n *network) ***REMOVED***
+func (d *driver) addNetwork(n *network) {
 	d.Lock()
 	d.networks[n.id] = n
 	d.Unlock()
-***REMOVED***
+}
 
-func (d *driver) deleteNetwork(nid string) ***REMOVED***
+func (d *driver) deleteNetwork(nid string) {
 	d.Lock()
 	delete(d.networks, nid)
 	d.Unlock()
-***REMOVED***
+}
 
-func (d *driver) network(nid string) *network ***REMOVED***
+func (d *driver) network(nid string) *network {
 	d.Lock()
 	defer d.Unlock()
 	return d.networks[nid]
-***REMOVED***
+}
 
-// func (n *network) restoreNetworkEndpoints() error ***REMOVED***
+// func (n *network) restoreNetworkEndpoints() error {
 // 	logrus.Infof("Restoring endpoints for overlay network: %s", n.id)
 
 // 	hnsresponse, err := hcsshim.HNSListEndpointRequest("GET", "", "")
-// 	if err != nil ***REMOVED***
+// 	if err != nil {
 // 		return err
-// 	***REMOVED***
+// 	}
 
-// 	for _, endpoint := range hnsresponse ***REMOVED***
-// 		if endpoint.VirtualNetwork != n.hnsID ***REMOVED***
+// 	for _, endpoint := range hnsresponse {
+// 		if endpoint.VirtualNetwork != n.hnsID {
 // 			continue
-// 		***REMOVED***
+// 		}
 
 // 		ep := n.convertToOverlayEndpoint(&endpoint)
 
-// 		if ep != nil ***REMOVED***
+// 		if ep != nil {
 // 			logrus.Debugf("Restored endpoint:%s Remote:%t", ep.id, ep.remote)
 // 			n.addEndpoint(ep)
-// 		***REMOVED***
-// 	***REMOVED***
+// 		}
+// 	}
 
 // 	return nil
-// ***REMOVED***
+// }
 
-func (n *network) convertToOverlayEndpoint(v *hcsshim.HNSEndpoint) *endpoint ***REMOVED***
-	ep := &endpoint***REMOVED***
+func (n *network) convertToOverlayEndpoint(v *hcsshim.HNSEndpoint) *endpoint {
+	ep := &endpoint{
 		id:        v.Name,
 		profileID: v.Id,
 		nid:       n.id,
 		remote:    v.IsRemoteEndpoint,
-	***REMOVED***
+	}
 
 	mac, err := net.ParseMAC(v.MacAddress)
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil
-	***REMOVED***
+	}
 
 	ep.mac = mac
-	ep.addr = &net.IPNet***REMOVED***
+	ep.addr = &net.IPNet{
 		IP:   v.IPAddress,
 		Mask: net.CIDRMask(32, 32),
-	***REMOVED***
+	}
 
 	return ep
-***REMOVED***
+}
 
-func (d *driver) createHnsNetwork(n *network) error ***REMOVED***
+func (d *driver) createHnsNetwork(n *network) error {
 
-	subnets := []hcsshim.Subnet***REMOVED******REMOVED***
+	subnets := []hcsshim.Subnet{}
 
-	for _, s := range n.subnets ***REMOVED***
-		subnet := hcsshim.Subnet***REMOVED***
+	for _, s := range n.subnets {
+		subnet := hcsshim.Subnet{
 			AddressPrefix: s.subnetIP.String(),
-		***REMOVED***
+		}
 
-		if s.gwIP != nil ***REMOVED***
+		if s.gwIP != nil {
 			subnet.GatewayAddress = s.gwIP.String()
-		***REMOVED***
+		}
 
-		vsidPolicy, err := json.Marshal(hcsshim.VsidPolicy***REMOVED***
+		vsidPolicy, err := json.Marshal(hcsshim.VsidPolicy{
 			Type: "VSID",
 			VSID: uint(s.vni),
-		***REMOVED***)
+		})
 
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 
 		subnet.Policies = append(subnet.Policies, vsidPolicy)
 		subnets = append(subnets, subnet)
-	***REMOVED***
+	}
 
-	network := &hcsshim.HNSNetwork***REMOVED***
+	network := &hcsshim.HNSNetwork{
 		Name:               n.name,
 		Type:               d.Type(),
 		Subnets:            subnets,
 		NetworkAdapterName: n.interfaceName,
 		AutomaticDNS:       true,
-	***REMOVED***
+	}
 
 	configurationb, err := json.Marshal(network)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	configuration := string(configurationb)
 	logrus.Infof("HNSNetwork Request =%v", configuration)
 
 	hnsresponse, err := hcsshim.HNSNetworkRequest("POST", "", configuration)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	n.hnsID = hnsresponse.Id
 	n.providerAddress = hnsresponse.ManagementIP
 
 	return nil
-***REMOVED***
+}
 
 // contains return true if the passed ip belongs to one the network's
 // subnets
-func (n *network) contains(ip net.IP) bool ***REMOVED***
-	for _, s := range n.subnets ***REMOVED***
-		if s.subnetIP.Contains(ip) ***REMOVED***
+func (n *network) contains(ip net.IP) bool {
+	for _, s := range n.subnets {
+		if s.subnetIP.Contains(ip) {
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return false
-***REMOVED***
+}
 
 // getSubnetforIP returns the subnet to which the given IP belongs
-func (n *network) getSubnetforIP(ip *net.IPNet) *subnet ***REMOVED***
-	for _, s := range n.subnets ***REMOVED***
+func (n *network) getSubnetforIP(ip *net.IPNet) *subnet {
+	for _, s := range n.subnets {
 		// first check if the mask lengths are the same
 		i, _ := s.subnetIP.Mask.Size()
 		j, _ := ip.Mask.Size()
-		if i != j ***REMOVED***
+		if i != j {
 			continue
-		***REMOVED***
-		if s.subnetIP.Contains(ip.IP) ***REMOVED***
+		}
+		if s.subnetIP.Contains(ip.IP) {
 			return s
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
 // getMatchingSubnet return the network's subnet that matches the input
-func (n *network) getMatchingSubnet(ip *net.IPNet) *subnet ***REMOVED***
-	if ip == nil ***REMOVED***
+func (n *network) getMatchingSubnet(ip *net.IPNet) *subnet {
+	if ip == nil {
 		return nil
-	***REMOVED***
-	for _, s := range n.subnets ***REMOVED***
+	}
+	for _, s := range n.subnets {
 		// first check if the mask lengths are the same
 		i, _ := s.subnetIP.Mask.Size()
 		j, _ := ip.Mask.Size()
-		if i != j ***REMOVED***
+		if i != j {
 			continue
-		***REMOVED***
-		if s.subnetIP.IP.Equal(ip.IP) ***REMOVED***
+		}
+		if s.subnetIP.IP.Equal(ip.IP) {
 			return s
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}

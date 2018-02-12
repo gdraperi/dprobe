@@ -58,85 +58,85 @@ package unix
 //sys	sendmsg(s int, msg *Msghdr, flags int) (n int, err error)
 //sys	mmap(addr uintptr, length uintptr, prot int, flags int, fd int, offset int64) (xaddr uintptr, err error)
 
-func Ioperm(from int, num int, on int) (err error) ***REMOVED***
+func Ioperm(from int, num int, on int) (err error) {
 	return ENOSYS
-***REMOVED***
+}
 
-func Iopl(level int) (err error) ***REMOVED***
+func Iopl(level int) (err error) {
 	return ENOSYS
-***REMOVED***
+}
 
 //sysnb	Gettimeofday(tv *Timeval) (err error)
 
-func Time(t *Time_t) (tt Time_t, err error) ***REMOVED***
+func Time(t *Time_t) (tt Time_t, err error) {
 	var tv Timeval
 	err = Gettimeofday(&tv)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
-	if t != nil ***REMOVED***
+	}
+	if t != nil {
 		*t = Time_t(tv.Sec)
-	***REMOVED***
+	}
 	return Time_t(tv.Sec), nil
-***REMOVED***
+}
 
 //sys	Utime(path string, buf *Utimbuf) (err error)
 
-func setTimespec(sec, nsec int64) Timespec ***REMOVED***
-	return Timespec***REMOVED***Sec: sec, Nsec: nsec***REMOVED***
-***REMOVED***
+func setTimespec(sec, nsec int64) Timespec {
+	return Timespec{Sec: sec, Nsec: nsec}
+}
 
-func setTimeval(sec, usec int64) Timeval ***REMOVED***
-	return Timeval***REMOVED***Sec: sec, Usec: int32(usec)***REMOVED***
-***REMOVED***
+func setTimeval(sec, usec int64) Timeval {
+	return Timeval{Sec: sec, Usec: int32(usec)}
+}
 
-func (r *PtraceRegs) PC() uint64 ***REMOVED*** return r.Tpc ***REMOVED***
+func (r *PtraceRegs) PC() uint64 { return r.Tpc }
 
-func (r *PtraceRegs) SetPC(pc uint64) ***REMOVED*** r.Tpc = pc ***REMOVED***
+func (r *PtraceRegs) SetPC(pc uint64) { r.Tpc = pc }
 
-func (iov *Iovec) SetLen(length int) ***REMOVED***
+func (iov *Iovec) SetLen(length int) {
 	iov.Len = uint64(length)
-***REMOVED***
+}
 
-func (msghdr *Msghdr) SetControllen(length int) ***REMOVED***
+func (msghdr *Msghdr) SetControllen(length int) {
 	msghdr.Controllen = uint64(length)
-***REMOVED***
+}
 
-func (cmsg *Cmsghdr) SetLen(length int) ***REMOVED***
+func (cmsg *Cmsghdr) SetLen(length int) {
 	cmsg.Len = uint64(length)
-***REMOVED***
+}
 
 //sysnb pipe(p *[2]_C_int) (err error)
 
-func Pipe(p []int) (err error) ***REMOVED***
-	if len(p) != 2 ***REMOVED***
+func Pipe(p []int) (err error) {
+	if len(p) != 2 {
 		return EINVAL
-	***REMOVED***
+	}
 	var pp [2]_C_int
 	err = pipe(&pp)
 	p[0] = int(pp[0])
 	p[1] = int(pp[1])
 	return
-***REMOVED***
+}
 
 //sysnb pipe2(p *[2]_C_int, flags int) (err error)
 
-func Pipe2(p []int, flags int) (err error) ***REMOVED***
-	if len(p) != 2 ***REMOVED***
+func Pipe2(p []int, flags int) (err error) {
+	if len(p) != 2 {
 		return EINVAL
-	***REMOVED***
+	}
 	var pp [2]_C_int
 	err = pipe2(&pp, flags)
 	p[0] = int(pp[0])
 	p[1] = int(pp[1])
 	return
-***REMOVED***
+}
 
 //sys	poll(fds *PollFd, nfds int, timeout int) (n int, err error)
 
-func Poll(fds []PollFd, timeout int) (n int, err error) ***REMOVED***
-	if len(fds) == 0 ***REMOVED***
+func Poll(fds []PollFd, timeout int) (n int, err error) {
+	if len(fds) == 0 {
 		return poll(nil, 0, timeout)
-	***REMOVED***
+	}
 	return poll(&fds[0], len(fds), timeout)
-***REMOVED***
+}

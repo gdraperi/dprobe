@@ -29,35 +29,35 @@ import (
 // (false, nil) - notification not supported (i.e. NOTIFY_SOCKET is unset)
 // (false, err) - notification supported, but failure happened (e.g. error connecting to NOTIFY_SOCKET or while sending data)
 // (true, nil) - notification supported, data has been sent
-func SdNotify(unsetEnvironment bool, state string) (sent bool, err error) ***REMOVED***
-	socketAddr := &net.UnixAddr***REMOVED***
+func SdNotify(unsetEnvironment bool, state string) (sent bool, err error) {
+	socketAddr := &net.UnixAddr{
 		Name: os.Getenv("NOTIFY_SOCKET"),
 		Net:  "unixgram",
-	***REMOVED***
+	}
 
 	// NOTIFY_SOCKET not set
-	if socketAddr.Name == "" ***REMOVED***
+	if socketAddr.Name == "" {
 		return false, nil
-	***REMOVED***
+	}
 
-	if unsetEnvironment ***REMOVED***
+	if unsetEnvironment {
 		err = os.Unsetenv("NOTIFY_SOCKET")
-	***REMOVED***
-	if err != nil ***REMOVED***
+	}
+	if err != nil {
 		return false, err
-	***REMOVED***
+	}
 
 	conn, err := net.DialUnix(socketAddr.Net, nil, socketAddr)
 	// Error connecting to NOTIFY_SOCKET
-	if err != nil ***REMOVED***
+	if err != nil {
 		return false, err
-	***REMOVED***
+	}
 	defer conn.Close()
 
 	_, err = conn.Write([]byte(state))
 	// Error sending the message
-	if err != nil ***REMOVED***
+	if err != nil {
 		return false, err
-	***REMOVED***
+	}
 	return true, nil
-***REMOVED***
+}

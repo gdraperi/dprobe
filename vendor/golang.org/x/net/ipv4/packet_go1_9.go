@@ -12,56 +12,56 @@ import (
 	"golang.org/x/net/internal/socket"
 )
 
-func (c *packetHandler) readFrom(b []byte) (h *Header, p []byte, cm *ControlMessage, err error) ***REMOVED***
+func (c *packetHandler) readFrom(b []byte) (h *Header, p []byte, cm *ControlMessage, err error) {
 	c.rawOpt.RLock()
-	m := socket.Message***REMOVED***
-		Buffers: [][]byte***REMOVED***b***REMOVED***,
+	m := socket.Message{
+		Buffers: [][]byte{b},
 		OOB:     NewControlMessage(c.rawOpt.cflags),
-	***REMOVED***
+	}
 	c.rawOpt.RUnlock()
-	if err := c.RecvMsg(&m, 0); err != nil ***REMOVED***
-		return nil, nil, nil, &net.OpError***REMOVED***Op: "read", Net: c.IPConn.LocalAddr().Network(), Source: c.IPConn.LocalAddr(), Err: err***REMOVED***
-	***REMOVED***
+	if err := c.RecvMsg(&m, 0); err != nil {
+		return nil, nil, nil, &net.OpError{Op: "read", Net: c.IPConn.LocalAddr().Network(), Source: c.IPConn.LocalAddr(), Err: err}
+	}
 	var hs []byte
-	if hs, p, err = slicePacket(b[:m.N]); err != nil ***REMOVED***
-		return nil, nil, nil, &net.OpError***REMOVED***Op: "read", Net: c.IPConn.LocalAddr().Network(), Source: c.IPConn.LocalAddr(), Err: err***REMOVED***
-	***REMOVED***
-	if h, err = ParseHeader(hs); err != nil ***REMOVED***
-		return nil, nil, nil, &net.OpError***REMOVED***Op: "read", Net: c.IPConn.LocalAddr().Network(), Source: c.IPConn.LocalAddr(), Err: err***REMOVED***
-	***REMOVED***
-	if m.NN > 0 ***REMOVED***
+	if hs, p, err = slicePacket(b[:m.N]); err != nil {
+		return nil, nil, nil, &net.OpError{Op: "read", Net: c.IPConn.LocalAddr().Network(), Source: c.IPConn.LocalAddr(), Err: err}
+	}
+	if h, err = ParseHeader(hs); err != nil {
+		return nil, nil, nil, &net.OpError{Op: "read", Net: c.IPConn.LocalAddr().Network(), Source: c.IPConn.LocalAddr(), Err: err}
+	}
+	if m.NN > 0 {
 		cm = new(ControlMessage)
-		if err := cm.Parse(m.OOB[:m.NN]); err != nil ***REMOVED***
-			return nil, nil, nil, &net.OpError***REMOVED***Op: "read", Net: c.IPConn.LocalAddr().Network(), Source: c.IPConn.LocalAddr(), Err: err***REMOVED***
-		***REMOVED***
-	***REMOVED***
-	if src, ok := m.Addr.(*net.IPAddr); ok && cm != nil ***REMOVED***
+		if err := cm.Parse(m.OOB[:m.NN]); err != nil {
+			return nil, nil, nil, &net.OpError{Op: "read", Net: c.IPConn.LocalAddr().Network(), Source: c.IPConn.LocalAddr(), Err: err}
+		}
+	}
+	if src, ok := m.Addr.(*net.IPAddr); ok && cm != nil {
 		cm.Src = src.IP
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func (c *packetHandler) writeTo(h *Header, p []byte, cm *ControlMessage) error ***REMOVED***
-	m := socket.Message***REMOVED***
+func (c *packetHandler) writeTo(h *Header, p []byte, cm *ControlMessage) error {
+	m := socket.Message{
 		OOB: cm.Marshal(),
-	***REMOVED***
+	}
 	wh, err := h.Marshal()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	m.Buffers = [][]byte***REMOVED***wh, p***REMOVED***
+	}
+	m.Buffers = [][]byte{wh, p}
 	dst := new(net.IPAddr)
-	if cm != nil ***REMOVED***
-		if ip := cm.Dst.To4(); ip != nil ***REMOVED***
+	if cm != nil {
+		if ip := cm.Dst.To4(); ip != nil {
 			dst.IP = ip
-		***REMOVED***
-	***REMOVED***
-	if dst.IP == nil ***REMOVED***
+		}
+	}
+	if dst.IP == nil {
 		dst.IP = h.Dst
-	***REMOVED***
+	}
 	m.Addr = dst
-	if err := c.SendMsg(&m, 0); err != nil ***REMOVED***
-		return &net.OpError***REMOVED***Op: "write", Net: c.IPConn.LocalAddr().Network(), Source: c.IPConn.LocalAddr(), Addr: opAddr(dst), Err: err***REMOVED***
-	***REMOVED***
+	if err := c.SendMsg(&m, 0); err != nil {
+		return &net.OpError{Op: "write", Net: c.IPConn.LocalAddr().Network(), Source: c.IPConn.LocalAddr(), Addr: opAddr(dst), Err: err}
+	}
 	return nil
-***REMOVED***
+}

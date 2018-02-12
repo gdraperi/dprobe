@@ -12,16 +12,16 @@ import (
 	"github.com/spf13/cobra/doc"
 )
 
-func main() ***REMOVED***
-	cmd := &cobra.Command***REMOVED***
+func main() {
+	cmd := &cobra.Command{
 		Use:   "test",
 		Short: "my test program",
-	***REMOVED***
+	}
 	err := doc.GenReSTTree(cmd, "/tmp")
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 ```
 
 That will get you a ReST document `/tmp/test.rst`
@@ -44,13 +44,13 @@ import (
 	"github.com/spf13/cobra/doc"
 )
 
-func main() ***REMOVED***
+func main() {
 	kubectl := cmd.NewKubectlCommand(cmdutil.NewFactory(nil), os.Stdin, ioutil.Discard, ioutil.Discard)
 	err := doc.GenReSTTree(kubectl, "./")
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 ```
 
 This will generate a whole series of files, one for each command in the tree, in the directory specified (in this case "./")
@@ -62,9 +62,9 @@ You may wish to have more control over the output, or only generate for a single
 ```go
 	out := new(bytes.Buffer)
 	err := doc.GenReST(cmd, out)
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatal(err)
-	***REMOVED***
+	}
 ```
 
 This will write the ReST doc for ONLY "cmd" into the out, buffer.
@@ -74,15 +74,15 @@ This will write the ReST doc for ONLY "cmd" into the out, buffer.
 Both `GenReST` and `GenReSTTree` have alternate versions with callbacks to get some control of the output:
 
 ```go
-func GenReSTTreeCustom(cmd *Command, dir string, filePrepender func(string) string, linkHandler func(string, string) string) error ***REMOVED***
+func GenReSTTreeCustom(cmd *Command, dir string, filePrepender func(string) string, linkHandler func(string, string) string) error {
 	//...
-***REMOVED***
+}
 ```
 
 ```go
-func GenReSTCustom(cmd *Command, out *bytes.Buffer, linkHandler func(string, string) string) error ***REMOVED***
+func GenReSTCustom(cmd *Command, out *bytes.Buffer, linkHandler func(string, string) string) error {
 	//...
-***REMOVED***
+}
 ```
 
 The `filePrepender` will prepend the return value given the full filepath to the rendered ReST file. A common use case is to add front matter to use the generated documentation with [Hugo](http://gohugo.io/):
@@ -95,20 +95,20 @@ slug: %s
 url: %s
 ---
 `
-filePrepender := func(filename string) string ***REMOVED***
+filePrepender := func(filename string) string {
 	now := time.Now().Format(time.RFC3339)
 	name := filepath.Base(filename)
 	base := strings.TrimSuffix(name, path.Ext(name))
 	url := "/commands/" + strings.ToLower(base) + "/"
 	return fmt.Sprintf(fmTemplate, now, strings.Replace(base, "_", " ", -1), base, url)
-***REMOVED***
+}
 ```
 
 The `linkHandler` can be used to customize the rendered links to the commands, given a command name and reference. This is useful while converting rst to html or while generating documentation with tools like Sphinx where `:ref:` is used:
 
 ```go
 // Sphinx cross-referencing format
-linkHandler := func(name, ref string) string ***REMOVED***
+linkHandler := func(name, ref string) string {
     return fmt.Sprintf(":ref:`%s <%s>`", name, ref)
-***REMOVED***
+}
 ```

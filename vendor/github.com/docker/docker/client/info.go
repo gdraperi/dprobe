@@ -10,17 +10,17 @@ import (
 )
 
 // Info returns information about the docker server.
-func (cli *Client) Info(ctx context.Context) (types.Info, error) ***REMOVED***
+func (cli *Client) Info(ctx context.Context) (types.Info, error) {
 	var info types.Info
-	serverResp, err := cli.get(ctx, "/info", url.Values***REMOVED******REMOVED***, nil)
-	if err != nil ***REMOVED***
+	serverResp, err := cli.get(ctx, "/info", url.Values{}, nil)
+	if err != nil {
 		return info, err
-	***REMOVED***
+	}
 	defer ensureReaderClosed(serverResp)
 
-	if err := json.NewDecoder(serverResp.body).Decode(&info); err != nil ***REMOVED***
+	if err := json.NewDecoder(serverResp.body).Decode(&info); err != nil {
 		return info, fmt.Errorf("Error reading remote info: %v", err)
-	***REMOVED***
+	}
 
 	return info, nil
-***REMOVED***
+}

@@ -6,83 +6,83 @@ import (
 	"golang.org/x/net/html"
 )
 
-func TestEach(t *testing.T) ***REMOVED***
+func TestEach(t *testing.T) {
 	var cnt int
 
-	sel := Doc().Find(".hero-unit .row-fluid").Each(func(i int, n *Selection) ***REMOVED***
+	sel := Doc().Find(".hero-unit .row-fluid").Each(func(i int, n *Selection) {
 		cnt++
 		t.Logf("At index %v, node %v", i, n.Nodes[0].Data)
-	***REMOVED***).Find("a")
+	}).Find("a")
 
-	if cnt != 4 ***REMOVED***
+	if cnt != 4 {
 		t.Errorf("Expected Each() to call function 4 times, got %v times.", cnt)
-	***REMOVED***
+	}
 	assertLength(t, sel.Nodes, 6)
-***REMOVED***
+}
 
-func TestEachWithBreak(t *testing.T) ***REMOVED***
+func TestEachWithBreak(t *testing.T) {
 	var cnt int
 
-	sel := Doc().Find(".hero-unit .row-fluid").EachWithBreak(func(i int, n *Selection) bool ***REMOVED***
+	sel := Doc().Find(".hero-unit .row-fluid").EachWithBreak(func(i int, n *Selection) bool {
 		cnt++
 		t.Logf("At index %v, node %v", i, n.Nodes[0].Data)
 		return false
-	***REMOVED***).Find("a")
+	}).Find("a")
 
-	if cnt != 1 ***REMOVED***
+	if cnt != 1 {
 		t.Errorf("Expected Each() to call function 1 time, got %v times.", cnt)
-	***REMOVED***
+	}
 	assertLength(t, sel.Nodes, 6)
-***REMOVED***
+}
 
-func TestEachEmptySelection(t *testing.T) ***REMOVED***
+func TestEachEmptySelection(t *testing.T) {
 	var cnt int
 
 	sel := Doc().Find("zzzz")
-	sel.Each(func(i int, n *Selection) ***REMOVED***
+	sel.Each(func(i int, n *Selection) {
 		cnt++
-	***REMOVED***)
-	if cnt > 0 ***REMOVED***
+	})
+	if cnt > 0 {
 		t.Error("Expected Each() to not be called on empty Selection.")
-	***REMOVED***
+	}
 	sel2 := sel.Find("div")
 	assertLength(t, sel2.Nodes, 0)
-***REMOVED***
+}
 
-func TestMap(t *testing.T) ***REMOVED***
+func TestMap(t *testing.T) {
 	sel := Doc().Find(".pvk-content")
-	vals := sel.Map(func(i int, s *Selection) string ***REMOVED***
+	vals := sel.Map(func(i int, s *Selection) string {
 		n := s.Get(0)
-		if n.Type == html.ElementNode ***REMOVED***
+		if n.Type == html.ElementNode {
 			return n.Data
-		***REMOVED***
+		}
 		return ""
-	***REMOVED***)
-	for _, v := range vals ***REMOVED***
-		if v != "div" ***REMOVED***
+	})
+	for _, v := range vals {
+		if v != "div" {
 			t.Error("Expected Map array result to be all 'div's.")
-		***REMOVED***
-	***REMOVED***
-	if len(vals) != 3 ***REMOVED***
+		}
+	}
+	if len(vals) != 3 {
 		t.Errorf("Expected Map array result to have a length of 3, found %v.", len(vals))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestForRange(t *testing.T) ***REMOVED***
+func TestForRange(t *testing.T) {
 	sel := Doc().Find(".pvk-content")
 	initLen := sel.Length()
-	for i := range sel.Nodes ***REMOVED***
+	for i := range sel.Nodes {
 		single := sel.Eq(i)
 		//h, err := single.Html()
-		//if err != nil ***REMOVED***
+		//if err != nil {
 		//	t.Fatal(err)
-		//***REMOVED***
+		//}
 		//fmt.Println(i, h)
-		if single.Length() != 1 ***REMOVED***
+		if single.Length() != 1 {
 			t.Errorf("%d: expected length of 1, got %d", i, single.Length())
-		***REMOVED***
-	***REMOVED***
-	if sel.Length() != initLen ***REMOVED***
+		}
+	}
+	if sel.Length() != initLen {
 		t.Errorf("expected initial selection to still have length %d, got %d", initLen, sel.Length())
-	***REMOVED***
-***REMOVED***
+	}
+}

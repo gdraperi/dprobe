@@ -5,7 +5,7 @@
 package icmp
 
 // A MessageBody represents an ICMP message body.
-type MessageBody interface ***REMOVED***
+type MessageBody interface {
 	// Len returns the length of ICMP message body.
 	// Proto must be either the ICMPv4 or ICMPv6 protocol number.
 	Len(proto int) int
@@ -13,29 +13,29 @@ type MessageBody interface ***REMOVED***
 	// Marshal returns the binary encoding of ICMP message body.
 	// Proto must be either the ICMPv4 or ICMPv6 protocol number.
 	Marshal(proto int) ([]byte, error)
-***REMOVED***
+}
 
 // A DefaultMessageBody represents the default message body.
-type DefaultMessageBody struct ***REMOVED***
+type DefaultMessageBody struct {
 	Data []byte // data
-***REMOVED***
+}
 
 // Len implements the Len method of MessageBody interface.
-func (p *DefaultMessageBody) Len(proto int) int ***REMOVED***
-	if p == nil ***REMOVED***
+func (p *DefaultMessageBody) Len(proto int) int {
+	if p == nil {
 		return 0
-	***REMOVED***
+	}
 	return len(p.Data)
-***REMOVED***
+}
 
 // Marshal implements the Marshal method of MessageBody interface.
-func (p *DefaultMessageBody) Marshal(proto int) ([]byte, error) ***REMOVED***
+func (p *DefaultMessageBody) Marshal(proto int) ([]byte, error) {
 	return p.Data, nil
-***REMOVED***
+}
 
 // parseDefaultMessageBody parses b as an ICMP message body.
-func parseDefaultMessageBody(proto int, b []byte) (MessageBody, error) ***REMOVED***
-	p := &DefaultMessageBody***REMOVED***Data: make([]byte, len(b))***REMOVED***
+func parseDefaultMessageBody(proto int, b []byte) (MessageBody, error) {
+	p := &DefaultMessageBody{Data: make([]byte, len(b))}
 	copy(p.Data, b)
 	return p, nil
-***REMOVED***
+}

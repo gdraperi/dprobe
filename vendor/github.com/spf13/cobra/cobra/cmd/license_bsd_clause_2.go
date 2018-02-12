@@ -15,11 +15,11 @@
 
 package cmd
 
-func initBsdClause2() ***REMOVED***
-	Licenses["freebsd"] = License***REMOVED***
+func initBsdClause2() {
+	Licenses["freebsd"] = License{
 		Name: "Simplified BSD License",
-		PossibleMatches: []string***REMOVED***"freebsd", "simpbsd", "simple bsd", "2-clause bsd",
-			"2 clause bsd", "simplified bsd license"***REMOVED***,
+		PossibleMatches: []string{"freebsd", "simpbsd", "simple bsd", "2-clause bsd",
+			"2 clause bsd", "simplified bsd license"},
 		Header: `All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -43,7 +43,7 @@ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
 CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.`,
-		Text: `***REMOVED******REMOVED*** .copyright ***REMOVED******REMOVED***
+		Text: `{{ .copyright }}
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -67,5 +67,5 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 `,
-	***REMOVED***
-***REMOVED***
+	}
+}

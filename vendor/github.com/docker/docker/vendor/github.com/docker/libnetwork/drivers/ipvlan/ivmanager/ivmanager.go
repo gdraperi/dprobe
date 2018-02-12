@@ -9,80 +9,80 @@ import (
 
 const networkType = "ipvlan"
 
-type driver struct***REMOVED******REMOVED***
+type driver struct{}
 
 // Init registers a new instance of ipvlan manager driver
-func Init(dc driverapi.DriverCallback, config map[string]interface***REMOVED******REMOVED***) error ***REMOVED***
-	c := driverapi.Capability***REMOVED***
+func Init(dc driverapi.DriverCallback, config map[string]interface{}) error {
+	c := driverapi.Capability{
 		DataScope:         datastore.LocalScope,
 		ConnectivityScope: datastore.GlobalScope,
-	***REMOVED***
-	return dc.RegisterDriver(networkType, &driver***REMOVED******REMOVED***, c)
-***REMOVED***
+	}
+	return dc.RegisterDriver(networkType, &driver{}, c)
+}
 
-func (d *driver) NetworkAllocate(id string, option map[string]string, ipV4Data, ipV6Data []driverapi.IPAMData) (map[string]string, error) ***REMOVED***
+func (d *driver) NetworkAllocate(id string, option map[string]string, ipV4Data, ipV6Data []driverapi.IPAMData) (map[string]string, error) {
 	return nil, types.NotImplementedErrorf("not implemented")
-***REMOVED***
+}
 
-func (d *driver) NetworkFree(id string) error ***REMOVED***
+func (d *driver) NetworkFree(id string) error {
 	return types.NotImplementedErrorf("not implemented")
-***REMOVED***
+}
 
-func (d *driver) CreateNetwork(id string, option map[string]interface***REMOVED******REMOVED***, nInfo driverapi.NetworkInfo, ipV4Data, ipV6Data []driverapi.IPAMData) error ***REMOVED***
+func (d *driver) CreateNetwork(id string, option map[string]interface{}, nInfo driverapi.NetworkInfo, ipV4Data, ipV6Data []driverapi.IPAMData) error {
 	return types.NotImplementedErrorf("not implemented")
-***REMOVED***
+}
 
-func (d *driver) EventNotify(etype driverapi.EventType, nid, tableName, key string, value []byte) ***REMOVED***
-***REMOVED***
+func (d *driver) EventNotify(etype driverapi.EventType, nid, tableName, key string, value []byte) {
+}
 
-func (d *driver) DecodeTableEntry(tablename string, key string, value []byte) (string, map[string]string) ***REMOVED***
+func (d *driver) DecodeTableEntry(tablename string, key string, value []byte) (string, map[string]string) {
 	return "", nil
-***REMOVED***
+}
 
-func (d *driver) DeleteNetwork(nid string) error ***REMOVED***
+func (d *driver) DeleteNetwork(nid string) error {
 	return types.NotImplementedErrorf("not implemented")
-***REMOVED***
+}
 
-func (d *driver) CreateEndpoint(nid, eid string, ifInfo driverapi.InterfaceInfo, epOptions map[string]interface***REMOVED******REMOVED***) error ***REMOVED***
+func (d *driver) CreateEndpoint(nid, eid string, ifInfo driverapi.InterfaceInfo, epOptions map[string]interface{}) error {
 	return types.NotImplementedErrorf("not implemented")
-***REMOVED***
+}
 
-func (d *driver) DeleteEndpoint(nid, eid string) error ***REMOVED***
+func (d *driver) DeleteEndpoint(nid, eid string) error {
 	return types.NotImplementedErrorf("not implemented")
-***REMOVED***
+}
 
-func (d *driver) EndpointOperInfo(nid, eid string) (map[string]interface***REMOVED******REMOVED***, error) ***REMOVED***
+func (d *driver) EndpointOperInfo(nid, eid string) (map[string]interface{}, error) {
 	return nil, types.NotImplementedErrorf("not implemented")
-***REMOVED***
+}
 
-func (d *driver) Join(nid, eid string, sboxKey string, jinfo driverapi.JoinInfo, options map[string]interface***REMOVED******REMOVED***) error ***REMOVED***
+func (d *driver) Join(nid, eid string, sboxKey string, jinfo driverapi.JoinInfo, options map[string]interface{}) error {
 	return types.NotImplementedErrorf("not implemented")
-***REMOVED***
+}
 
-func (d *driver) Leave(nid, eid string) error ***REMOVED***
+func (d *driver) Leave(nid, eid string) error {
 	return types.NotImplementedErrorf("not implemented")
-***REMOVED***
+}
 
-func (d *driver) Type() string ***REMOVED***
+func (d *driver) Type() string {
 	return networkType
-***REMOVED***
+}
 
-func (d *driver) IsBuiltIn() bool ***REMOVED***
+func (d *driver) IsBuiltIn() bool {
 	return true
-***REMOVED***
+}
 
-func (d *driver) DiscoverNew(dType discoverapi.DiscoveryType, data interface***REMOVED******REMOVED***) error ***REMOVED***
+func (d *driver) DiscoverNew(dType discoverapi.DiscoveryType, data interface{}) error {
 	return types.NotImplementedErrorf("not implemented")
-***REMOVED***
+}
 
-func (d *driver) DiscoverDelete(dType discoverapi.DiscoveryType, data interface***REMOVED******REMOVED***) error ***REMOVED***
+func (d *driver) DiscoverDelete(dType discoverapi.DiscoveryType, data interface{}) error {
 	return types.NotImplementedErrorf("not implemented")
-***REMOVED***
+}
 
-func (d *driver) ProgramExternalConnectivity(nid, eid string, options map[string]interface***REMOVED******REMOVED***) error ***REMOVED***
+func (d *driver) ProgramExternalConnectivity(nid, eid string, options map[string]interface{}) error {
 	return types.NotImplementedErrorf("not implemented")
-***REMOVED***
+}
 
-func (d *driver) RevokeExternalConnectivity(nid, eid string) error ***REMOVED***
+func (d *driver) RevokeExternalConnectivity(nid, eid string) error {
 	return types.NotImplementedErrorf("not implemented")
-***REMOVED***
+}

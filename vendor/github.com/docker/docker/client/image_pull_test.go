@@ -13,187 +13,187 @@ import (
 	"github.com/docker/docker/api/types"
 )
 
-func TestImagePullReferenceParseError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
-		client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
+func TestImagePullReferenceParseError(t *testing.T) {
+	client := &Client{
+		client: newMockClient(func(req *http.Request) (*http.Response, error) {
 			return nil, nil
-		***REMOVED***),
-	***REMOVED***
+		}),
+	}
 	// An empty reference is an invalid reference
-	_, err := client.ImagePull(context.Background(), "", types.ImagePullOptions***REMOVED******REMOVED***)
-	if err == nil || !strings.Contains(err.Error(), "invalid reference format") ***REMOVED***
+	_, err := client.ImagePull(context.Background(), "", types.ImagePullOptions{})
+	if err == nil || !strings.Contains(err.Error(), "invalid reference format") {
 		t.Fatalf("expected an error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestImagePullAnyError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestImagePullAnyError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
-	***REMOVED***
-	_, err := client.ImagePull(context.Background(), "myimage", types.ImagePullOptions***REMOVED******REMOVED***)
-	if err == nil || err.Error() != "Error response from daemon: Server error" ***REMOVED***
+	}
+	_, err := client.ImagePull(context.Background(), "myimage", types.ImagePullOptions{})
+	if err == nil || err.Error() != "Error response from daemon: Server error" {
 		t.Fatalf("expected a Server Error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestImagePullStatusUnauthorizedError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestImagePullStatusUnauthorizedError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusUnauthorized, "Unauthorized error")),
-	***REMOVED***
-	_, err := client.ImagePull(context.Background(), "myimage", types.ImagePullOptions***REMOVED******REMOVED***)
-	if err == nil || err.Error() != "Error response from daemon: Unauthorized error" ***REMOVED***
+	}
+	_, err := client.ImagePull(context.Background(), "myimage", types.ImagePullOptions{})
+	if err == nil || err.Error() != "Error response from daemon: Unauthorized error" {
 		t.Fatalf("expected an Unauthorized Error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestImagePullWithUnauthorizedErrorAndPrivilegeFuncError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestImagePullWithUnauthorizedErrorAndPrivilegeFuncError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusUnauthorized, "Unauthorized error")),
-	***REMOVED***
-	privilegeFunc := func() (string, error) ***REMOVED***
+	}
+	privilegeFunc := func() (string, error) {
 		return "", fmt.Errorf("Error requesting privilege")
-	***REMOVED***
-	_, err := client.ImagePull(context.Background(), "myimage", types.ImagePullOptions***REMOVED***
+	}
+	_, err := client.ImagePull(context.Background(), "myimage", types.ImagePullOptions{
 		PrivilegeFunc: privilegeFunc,
-	***REMOVED***)
-	if err == nil || err.Error() != "Error requesting privilege" ***REMOVED***
+	})
+	if err == nil || err.Error() != "Error requesting privilege" {
 		t.Fatalf("expected an error requesting privilege, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestImagePullWithUnauthorizedErrorAndAnotherUnauthorizedError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestImagePullWithUnauthorizedErrorAndAnotherUnauthorizedError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusUnauthorized, "Unauthorized error")),
-	***REMOVED***
-	privilegeFunc := func() (string, error) ***REMOVED***
+	}
+	privilegeFunc := func() (string, error) {
 		return "a-auth-header", nil
-	***REMOVED***
-	_, err := client.ImagePull(context.Background(), "myimage", types.ImagePullOptions***REMOVED***
+	}
+	_, err := client.ImagePull(context.Background(), "myimage", types.ImagePullOptions{
 		PrivilegeFunc: privilegeFunc,
-	***REMOVED***)
-	if err == nil || err.Error() != "Error response from daemon: Unauthorized error" ***REMOVED***
+	})
+	if err == nil || err.Error() != "Error response from daemon: Unauthorized error" {
 		t.Fatalf("expected an Unauthorized Error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestImagePullWithPrivilegedFuncNoError(t *testing.T) ***REMOVED***
+func TestImagePullWithPrivilegedFuncNoError(t *testing.T) {
 	expectedURL := "/images/create"
-	client := &Client***REMOVED***
-		client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-			if !strings.HasPrefix(req.URL.Path, expectedURL) ***REMOVED***
+	client := &Client{
+		client: newMockClient(func(req *http.Request) (*http.Response, error) {
+			if !strings.HasPrefix(req.URL.Path, expectedURL) {
 				return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, req.URL)
-			***REMOVED***
+			}
 			auth := req.Header.Get("X-Registry-Auth")
-			if auth == "NotValid" ***REMOVED***
-				return &http.Response***REMOVED***
+			if auth == "NotValid" {
+				return &http.Response{
 					StatusCode: http.StatusUnauthorized,
 					Body:       ioutil.NopCloser(bytes.NewReader([]byte("Invalid credentials"))),
-				***REMOVED***, nil
-			***REMOVED***
-			if auth != "IAmValid" ***REMOVED***
+				}, nil
+			}
+			if auth != "IAmValid" {
 				return nil, fmt.Errorf("Invalid auth header : expected %s, got %s", "IAmValid", auth)
-			***REMOVED***
+			}
 			query := req.URL.Query()
 			fromImage := query.Get("fromImage")
-			if fromImage != "myimage" ***REMOVED***
+			if fromImage != "myimage" {
 				return nil, fmt.Errorf("fromimage not set in URL query properly. Expected '%s', got %s", "myimage", fromImage)
-			***REMOVED***
+			}
 			tag := query.Get("tag")
-			if tag != "latest" ***REMOVED***
+			if tag != "latest" {
 				return nil, fmt.Errorf("tag not set in URL query properly. Expected '%s', got %s", "latest", tag)
-			***REMOVED***
-			return &http.Response***REMOVED***
+			}
+			return &http.Response{
 				StatusCode: http.StatusOK,
 				Body:       ioutil.NopCloser(bytes.NewReader([]byte("hello world"))),
-			***REMOVED***, nil
-		***REMOVED***),
-	***REMOVED***
-	privilegeFunc := func() (string, error) ***REMOVED***
+			}, nil
+		}),
+	}
+	privilegeFunc := func() (string, error) {
 		return "IAmValid", nil
-	***REMOVED***
-	resp, err := client.ImagePull(context.Background(), "myimage", types.ImagePullOptions***REMOVED***
+	}
+	resp, err := client.ImagePull(context.Background(), "myimage", types.ImagePullOptions{
 		RegistryAuth:  "NotValid",
 		PrivilegeFunc: privilegeFunc,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	body, err := ioutil.ReadAll(resp)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if string(body) != "hello world" ***REMOVED***
+	}
+	if string(body) != "hello world" {
 		t.Fatalf("expected 'hello world', got %s", string(body))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestImagePullWithoutErrors(t *testing.T) ***REMOVED***
+func TestImagePullWithoutErrors(t *testing.T) {
 	expectedURL := "/images/create"
 	expectedOutput := "hello world"
-	pullCases := []struct ***REMOVED***
+	pullCases := []struct {
 		all           bool
 		reference     string
 		expectedImage string
 		expectedTag   string
-	***REMOVED******REMOVED***
-		***REMOVED***
+	}{
+		{
 			all:           false,
 			reference:     "myimage",
 			expectedImage: "myimage",
 			expectedTag:   "latest",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			all:           false,
 			reference:     "myimage:tag",
 			expectedImage: "myimage",
 			expectedTag:   "tag",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			all:           true,
 			reference:     "myimage",
 			expectedImage: "myimage",
 			expectedTag:   "",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			all:           true,
 			reference:     "myimage:anything",
 			expectedImage: "myimage",
 			expectedTag:   "",
-		***REMOVED***,
-	***REMOVED***
-	for _, pullCase := range pullCases ***REMOVED***
-		client := &Client***REMOVED***
-			client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-				if !strings.HasPrefix(req.URL.Path, expectedURL) ***REMOVED***
+		},
+	}
+	for _, pullCase := range pullCases {
+		client := &Client{
+			client: newMockClient(func(req *http.Request) (*http.Response, error) {
+				if !strings.HasPrefix(req.URL.Path, expectedURL) {
 					return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, req.URL)
-				***REMOVED***
+				}
 				query := req.URL.Query()
 				fromImage := query.Get("fromImage")
-				if fromImage != pullCase.expectedImage ***REMOVED***
+				if fromImage != pullCase.expectedImage {
 					return nil, fmt.Errorf("fromimage not set in URL query properly. Expected '%s', got %s", pullCase.expectedImage, fromImage)
-				***REMOVED***
+				}
 				tag := query.Get("tag")
-				if tag != pullCase.expectedTag ***REMOVED***
+				if tag != pullCase.expectedTag {
 					return nil, fmt.Errorf("tag not set in URL query properly. Expected '%s', got %s", pullCase.expectedTag, tag)
-				***REMOVED***
-				return &http.Response***REMOVED***
+				}
+				return &http.Response{
 					StatusCode: http.StatusOK,
 					Body:       ioutil.NopCloser(bytes.NewReader([]byte(expectedOutput))),
-				***REMOVED***, nil
-			***REMOVED***),
-		***REMOVED***
-		resp, err := client.ImagePull(context.Background(), pullCase.reference, types.ImagePullOptions***REMOVED***
+				}, nil
+			}),
+		}
+		resp, err := client.ImagePull(context.Background(), pullCase.reference, types.ImagePullOptions{
 			All: pullCase.all,
-		***REMOVED***)
-		if err != nil ***REMOVED***
+		})
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
+		}
 		body, err := ioutil.ReadAll(resp)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
-		if string(body) != expectedOutput ***REMOVED***
+		}
+		if string(body) != expectedOutput {
 			t.Fatalf("expected '%s', got %s", expectedOutput, string(body))
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

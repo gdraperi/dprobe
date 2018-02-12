@@ -22,112 +22,112 @@ import (
 
 var (
 	// acceptedNetworkFilters is a list of acceptable filters
-	acceptedNetworkFilters = map[string]bool***REMOVED***
+	acceptedNetworkFilters = map[string]bool{
 		"driver": true,
 		"type":   true,
 		"name":   true,
 		"id":     true,
 		"label":  true,
 		"scope":  true,
-	***REMOVED***
+	}
 )
 
-func (n *networkRouter) getNetworksList(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error ***REMOVED***
-	if err := httputils.ParseForm(r); err != nil ***REMOVED***
+func (n *networkRouter) getNetworksList(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error {
+	if err := httputils.ParseForm(r); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	filter := r.Form.Get("filters")
 	netFilters, err := filters.FromJSON(filter)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if err := netFilters.Validate(acceptedNetworkFilters); err != nil ***REMOVED***
+	if err := netFilters.Validate(acceptedNetworkFilters); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	list := []types.NetworkResource***REMOVED******REMOVED***
+	list := []types.NetworkResource{}
 
-	if nr, err := n.cluster.GetNetworks(); err == nil ***REMOVED***
+	if nr, err := n.cluster.GetNetworks(); err == nil {
 		list = append(list, nr...)
-	***REMOVED***
+	}
 
 	// Combine the network list returned by Docker daemon if it is not already
 	// returned by the cluster manager
 SKIP:
-	for _, nw := range n.backend.GetNetworks() ***REMOVED***
-		for _, nl := range list ***REMOVED***
-			if nl.ID == nw.ID() ***REMOVED***
+	for _, nw := range n.backend.GetNetworks() {
+		for _, nl := range list {
+			if nl.ID == nw.ID() {
 				continue SKIP
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		var nr *types.NetworkResource
 		// Versions < 1.28 fetches all the containers attached to a network
 		// in a network list api call. It is a heavy weight operation when
 		// run across all the networks. Starting API version 1.28, this detailed
 		// info is available for network specific GET API (equivalent to inspect)
-		if versions.LessThan(httputils.VersionFromContext(ctx), "1.28") ***REMOVED***
+		if versions.LessThan(httputils.VersionFromContext(ctx), "1.28") {
 			nr = n.buildDetailedNetworkResources(nw, false)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			nr = n.buildNetworkResource(nw)
-		***REMOVED***
+		}
 		list = append(list, *nr)
-	***REMOVED***
+	}
 
 	list, err = filterNetworks(list, netFilters)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return httputils.WriteJSON(w, http.StatusOK, list)
-***REMOVED***
+}
 
-type invalidRequestError struct ***REMOVED***
+type invalidRequestError struct {
 	cause error
-***REMOVED***
+}
 
-func (e invalidRequestError) Error() string ***REMOVED***
+func (e invalidRequestError) Error() string {
 	return e.cause.Error()
-***REMOVED***
+}
 
-func (e invalidRequestError) InvalidParameter() ***REMOVED******REMOVED***
+func (e invalidRequestError) InvalidParameter() {}
 
 type ambigousResultsError string
 
-func (e ambigousResultsError) Error() string ***REMOVED***
+func (e ambigousResultsError) Error() string {
 	return "network " + string(e) + " is ambiguous"
-***REMOVED***
+}
 
-func (ambigousResultsError) InvalidParameter() ***REMOVED******REMOVED***
+func (ambigousResultsError) InvalidParameter() {}
 
-func nameConflict(name string) error ***REMOVED***
+func nameConflict(name string) error {
 	return errdefs.Conflict(libnetwork.NetworkNameError(name))
-***REMOVED***
+}
 
-func (n *networkRouter) getNetwork(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error ***REMOVED***
-	if err := httputils.ParseForm(r); err != nil ***REMOVED***
+func (n *networkRouter) getNetwork(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error {
+	if err := httputils.ParseForm(r); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	term := vars["id"]
 	var (
 		verbose bool
 		err     error
 	)
-	if v := r.URL.Query().Get("verbose"); v != "" ***REMOVED***
-		if verbose, err = strconv.ParseBool(v); err != nil ***REMOVED***
-			return errors.Wrapf(invalidRequestError***REMOVED***err***REMOVED***, "invalid value for verbose: %s", v)
-		***REMOVED***
-	***REMOVED***
+	if v := r.URL.Query().Get("verbose"); v != "" {
+		if verbose, err = strconv.ParseBool(v); err != nil {
+			return errors.Wrapf(invalidRequestError{err}, "invalid value for verbose: %s", v)
+		}
+	}
 	scope := r.URL.Query().Get("scope")
 
-	isMatchingScope := func(scope, term string) bool ***REMOVED***
-		if term != "" ***REMOVED***
+	isMatchingScope := func(scope, term string) bool {
+		if term != "" {
 			return scope == term
-		***REMOVED***
+		}
 		return true
-	***REMOVED***
+	}
 
 	// In case multiple networks have duplicate names, return error.
 	// TODO (yongtang): should we wrap with version here for backward compatibility?
@@ -137,202 +137,202 @@ func (n *networkRouter) getNetwork(ctx context.Context, w http.ResponseWriter, r
 
 	// For full name and partial ID, save the result first, and process later
 	// in case multiple records was found based on the same term
-	listByFullName := map[string]types.NetworkResource***REMOVED******REMOVED***
-	listByPartialID := map[string]types.NetworkResource***REMOVED******REMOVED***
+	listByFullName := map[string]types.NetworkResource{}
+	listByPartialID := map[string]types.NetworkResource{}
 
 	nw := n.backend.GetNetworks()
-	for _, network := range nw ***REMOVED***
-		if network.ID() == term && isMatchingScope(network.Info().Scope(), scope) ***REMOVED***
+	for _, network := range nw {
+		if network.ID() == term && isMatchingScope(network.Info().Scope(), scope) {
 			return httputils.WriteJSON(w, http.StatusOK, *n.buildDetailedNetworkResources(network, verbose))
-		***REMOVED***
-		if network.Name() == term && isMatchingScope(network.Info().Scope(), scope) ***REMOVED***
+		}
+		if network.Name() == term && isMatchingScope(network.Info().Scope(), scope) {
 			// No need to check the ID collision here as we are still in
 			// local scope and the network ID is unique in this scope.
 			listByFullName[network.ID()] = *n.buildDetailedNetworkResources(network, verbose)
-		***REMOVED***
-		if strings.HasPrefix(network.ID(), term) && isMatchingScope(network.Info().Scope(), scope) ***REMOVED***
+		}
+		if strings.HasPrefix(network.ID(), term) && isMatchingScope(network.Info().Scope(), scope) {
 			// No need to check the ID collision here as we are still in
 			// local scope and the network ID is unique in this scope.
 			listByPartialID[network.ID()] = *n.buildDetailedNetworkResources(network, verbose)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	nwk, err := n.cluster.GetNetwork(term)
-	if err == nil ***REMOVED***
+	if err == nil {
 		// If the get network is passed with a specific network ID / partial network ID
 		// or if the get network was passed with a network name and scope as swarm
 		// return the network. Skipped using isMatchingScope because it is true if the scope
 		// is not set which would be case if the client API v1.30
-		if strings.HasPrefix(nwk.ID, term) || (netconst.SwarmScope == scope) ***REMOVED***
+		if strings.HasPrefix(nwk.ID, term) || (netconst.SwarmScope == scope) {
 			// If we have a previous match "backend", return it, we need verbose when enabled
 			// ex: overlay/partial_ID or name/swarm_scope
-			if nwv, ok := listByPartialID[nwk.ID]; ok ***REMOVED***
+			if nwv, ok := listByPartialID[nwk.ID]; ok {
 				nwk = nwv
-			***REMOVED*** else if nwv, ok := listByFullName[nwk.ID]; ok ***REMOVED***
+			} else if nwv, ok := listByFullName[nwk.ID]; ok {
 				nwk = nwv
-			***REMOVED***
+			}
 			return httputils.WriteJSON(w, http.StatusOK, nwk)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	nr, _ := n.cluster.GetNetworks()
-	for _, network := range nr ***REMOVED***
-		if network.ID == term && isMatchingScope(network.Scope, scope) ***REMOVED***
+	for _, network := range nr {
+		if network.ID == term && isMatchingScope(network.Scope, scope) {
 			return httputils.WriteJSON(w, http.StatusOK, network)
-		***REMOVED***
-		if network.Name == term && isMatchingScope(network.Scope, scope) ***REMOVED***
+		}
+		if network.Name == term && isMatchingScope(network.Scope, scope) {
 			// Check the ID collision as we are in swarm scope here, and
 			// the map (of the listByFullName) may have already had a
 			// network with the same ID (from local scope previously)
-			if _, ok := listByFullName[network.ID]; !ok ***REMOVED***
+			if _, ok := listByFullName[network.ID]; !ok {
 				listByFullName[network.ID] = network
-			***REMOVED***
-		***REMOVED***
-		if strings.HasPrefix(network.ID, term) && isMatchingScope(network.Scope, scope) ***REMOVED***
+			}
+		}
+		if strings.HasPrefix(network.ID, term) && isMatchingScope(network.Scope, scope) {
 			// Check the ID collision as we are in swarm scope here, and
 			// the map (of the listByPartialID) may have already had a
 			// network with the same ID (from local scope previously)
-			if _, ok := listByPartialID[network.ID]; !ok ***REMOVED***
+			if _, ok := listByPartialID[network.ID]; !ok {
 				listByPartialID[network.ID] = network
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	// Find based on full name, returns true only if no duplicates
-	if len(listByFullName) == 1 ***REMOVED***
-		for _, v := range listByFullName ***REMOVED***
+	if len(listByFullName) == 1 {
+		for _, v := range listByFullName {
 			return httputils.WriteJSON(w, http.StatusOK, v)
-		***REMOVED***
-	***REMOVED***
-	if len(listByFullName) > 1 ***REMOVED***
+		}
+	}
+	if len(listByFullName) > 1 {
 		return errors.Wrapf(ambigousResultsError(term), "%d matches found based on name", len(listByFullName))
-	***REMOVED***
+	}
 
 	// Find based on partial ID, returns true only if no duplicates
-	if len(listByPartialID) == 1 ***REMOVED***
-		for _, v := range listByPartialID ***REMOVED***
+	if len(listByPartialID) == 1 {
+		for _, v := range listByPartialID {
 			return httputils.WriteJSON(w, http.StatusOK, v)
-		***REMOVED***
-	***REMOVED***
-	if len(listByPartialID) > 1 ***REMOVED***
+		}
+	}
+	if len(listByPartialID) > 1 {
 		return errors.Wrapf(ambigousResultsError(term), "%d matches found based on ID prefix", len(listByPartialID))
-	***REMOVED***
+	}
 
 	return libnetwork.ErrNoSuchNetwork(term)
-***REMOVED***
+}
 
-func (n *networkRouter) postNetworkCreate(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error ***REMOVED***
+func (n *networkRouter) postNetworkCreate(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error {
 	var create types.NetworkCreateRequest
 
-	if err := httputils.ParseForm(r); err != nil ***REMOVED***
+	if err := httputils.ParseForm(r); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if err := httputils.CheckForJSON(r); err != nil ***REMOVED***
+	if err := httputils.CheckForJSON(r); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if err := json.NewDecoder(r.Body).Decode(&create); err != nil ***REMOVED***
+	if err := json.NewDecoder(r.Body).Decode(&create); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if nws, err := n.cluster.GetNetworksByName(create.Name); err == nil && len(nws) > 0 ***REMOVED***
+	if nws, err := n.cluster.GetNetworksByName(create.Name); err == nil && len(nws) > 0 {
 		return nameConflict(create.Name)
-	***REMOVED***
+	}
 
 	nw, err := n.backend.CreateNetwork(create)
-	if err != nil ***REMOVED***
+	if err != nil {
 		var warning string
-		if _, ok := err.(libnetwork.NetworkNameError); ok ***REMOVED***
+		if _, ok := err.(libnetwork.NetworkNameError); ok {
 			// check if user defined CheckDuplicate, if set true, return err
 			// otherwise prepare a warning message
-			if create.CheckDuplicate ***REMOVED***
+			if create.CheckDuplicate {
 				return nameConflict(create.Name)
-			***REMOVED***
+			}
 			warning = libnetwork.NetworkNameError(create.Name).Error()
-		***REMOVED***
+		}
 
-		if _, ok := err.(libnetwork.ManagerRedirectError); !ok ***REMOVED***
+		if _, ok := err.(libnetwork.ManagerRedirectError); !ok {
 			return err
-		***REMOVED***
+		}
 		id, err := n.cluster.CreateNetwork(create)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-		nw = &types.NetworkCreateResponse***REMOVED***
+		}
+		nw = &types.NetworkCreateResponse{
 			ID:      id,
 			Warning: warning,
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return httputils.WriteJSON(w, http.StatusCreated, nw)
-***REMOVED***
+}
 
-func (n *networkRouter) postNetworkConnect(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error ***REMOVED***
+func (n *networkRouter) postNetworkConnect(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error {
 	var connect types.NetworkConnect
-	if err := httputils.ParseForm(r); err != nil ***REMOVED***
+	if err := httputils.ParseForm(r); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if err := httputils.CheckForJSON(r); err != nil ***REMOVED***
+	if err := httputils.CheckForJSON(r); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if err := json.NewDecoder(r.Body).Decode(&connect); err != nil ***REMOVED***
+	if err := json.NewDecoder(r.Body).Decode(&connect); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	// Unlike other operations, we does not check ambiguity of the name/ID here.
 	// The reason is that, In case of attachable network in swarm scope, the actual local network
 	// may not be available at the time. At the same time, inside daemon `ConnectContainerToNetwork`
 	// does the ambiguity check anyway. Therefore, passing the name to daemon would be enough.
 	return n.backend.ConnectContainerToNetwork(connect.Container, vars["id"], connect.EndpointConfig)
-***REMOVED***
+}
 
-func (n *networkRouter) postNetworkDisconnect(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error ***REMOVED***
+func (n *networkRouter) postNetworkDisconnect(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error {
 	var disconnect types.NetworkDisconnect
-	if err := httputils.ParseForm(r); err != nil ***REMOVED***
+	if err := httputils.ParseForm(r); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if err := httputils.CheckForJSON(r); err != nil ***REMOVED***
+	if err := httputils.CheckForJSON(r); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if err := json.NewDecoder(r.Body).Decode(&disconnect); err != nil ***REMOVED***
+	if err := json.NewDecoder(r.Body).Decode(&disconnect); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	return n.backend.DisconnectContainerFromNetwork(disconnect.Container, vars["id"], disconnect.Force)
-***REMOVED***
+}
 
-func (n *networkRouter) deleteNetwork(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error ***REMOVED***
-	if err := httputils.ParseForm(r); err != nil ***REMOVED***
+func (n *networkRouter) deleteNetwork(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error {
+	if err := httputils.ParseForm(r); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	nw, err := n.findUniqueNetwork(vars["id"])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	if nw.Scope == "swarm" ***REMOVED***
-		if err = n.cluster.RemoveNetwork(nw.ID); err != nil ***REMOVED***
+	}
+	if nw.Scope == "swarm" {
+		if err = n.cluster.RemoveNetwork(nw.ID); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
-		if err := n.backend.DeleteNetwork(nw.ID); err != nil ***REMOVED***
+		}
+	} else {
+		if err := n.backend.DeleteNetwork(nw.ID); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	w.WriteHeader(http.StatusNoContent)
 	return nil
-***REMOVED***
+}
 
-func (n *networkRouter) buildNetworkResource(nw libnetwork.Network) *types.NetworkResource ***REMOVED***
-	r := &types.NetworkResource***REMOVED******REMOVED***
-	if nw == nil ***REMOVED***
+func (n *networkRouter) buildNetworkResource(nw libnetwork.Network) *types.NetworkResource {
+	r := &types.NetworkResource{}
+	if nw == nil {
 		return r
-	***REMOVED***
+	}
 
 	info := nw.Info()
 	r.Name = nw.Name()
@@ -350,76 +350,76 @@ func (n *networkRouter) buildNetworkResource(nw libnetwork.Network) *types.Netwo
 	r.Labels = info.Labels()
 	r.ConfigOnly = info.ConfigOnly()
 
-	if cn := info.ConfigFrom(); cn != "" ***REMOVED***
-		r.ConfigFrom = network.ConfigReference***REMOVED***Network: cn***REMOVED***
-	***REMOVED***
+	if cn := info.ConfigFrom(); cn != "" {
+		r.ConfigFrom = network.ConfigReference{Network: cn}
+	}
 
 	peers := info.Peers()
-	if len(peers) != 0 ***REMOVED***
+	if len(peers) != 0 {
 		r.Peers = buildPeerInfoResources(peers)
-	***REMOVED***
+	}
 
 	return r
-***REMOVED***
+}
 
-func (n *networkRouter) buildDetailedNetworkResources(nw libnetwork.Network, verbose bool) *types.NetworkResource ***REMOVED***
-	if nw == nil ***REMOVED***
-		return &types.NetworkResource***REMOVED******REMOVED***
-	***REMOVED***
+func (n *networkRouter) buildDetailedNetworkResources(nw libnetwork.Network, verbose bool) *types.NetworkResource {
+	if nw == nil {
+		return &types.NetworkResource{}
+	}
 
 	r := n.buildNetworkResource(nw)
 	epl := nw.Endpoints()
-	for _, e := range epl ***REMOVED***
+	for _, e := range epl {
 		ei := e.Info()
-		if ei == nil ***REMOVED***
+		if ei == nil {
 			continue
-		***REMOVED***
+		}
 		sb := ei.Sandbox()
 		tmpID := e.ID()
 		key := "ep-" + tmpID
-		if sb != nil ***REMOVED***
+		if sb != nil {
 			key = sb.ContainerID()
-		***REMOVED***
+		}
 
 		r.Containers[key] = buildEndpointResource(tmpID, e.Name(), ei)
-	***REMOVED***
-	if !verbose ***REMOVED***
+	}
+	if !verbose {
 		return r
-	***REMOVED***
+	}
 	services := nw.Info().Services()
 	r.Services = make(map[string]network.ServiceInfo)
-	for name, service := range services ***REMOVED***
-		tasks := []network.Task***REMOVED******REMOVED***
-		for _, t := range service.Tasks ***REMOVED***
-			tasks = append(tasks, network.Task***REMOVED***
+	for name, service := range services {
+		tasks := []network.Task{}
+		for _, t := range service.Tasks {
+			tasks = append(tasks, network.Task{
 				Name:       t.Name,
 				EndpointID: t.EndpointID,
 				EndpointIP: t.EndpointIP,
 				Info:       t.Info,
-			***REMOVED***)
-		***REMOVED***
-		r.Services[name] = network.ServiceInfo***REMOVED***
+			})
+		}
+		r.Services[name] = network.ServiceInfo{
 			VIP:          service.VIP,
 			Ports:        service.Ports,
 			Tasks:        tasks,
 			LocalLBIndex: service.LocalLBIndex,
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return r
-***REMOVED***
+}
 
-func buildPeerInfoResources(peers []networkdb.PeerInfo) []network.PeerInfo ***REMOVED***
+func buildPeerInfoResources(peers []networkdb.PeerInfo) []network.PeerInfo {
 	peerInfo := make([]network.PeerInfo, 0, len(peers))
-	for _, peer := range peers ***REMOVED***
-		peerInfo = append(peerInfo, network.PeerInfo***REMOVED***
+	for _, peer := range peers {
+		peerInfo = append(peerInfo, network.PeerInfo{
 			Name: peer.Name,
 			IP:   peer.IP,
-		***REMOVED***)
-	***REMOVED***
+		})
+	}
 	return peerInfo
-***REMOVED***
+}
 
-func buildIpamResources(r *types.NetworkResource, nwInfo libnetwork.NetworkInfo) ***REMOVED***
+func buildIpamResources(r *types.NetworkResource, nwInfo libnetwork.NetworkInfo) {
 	id, opts, ipv4conf, ipv6conf := nwInfo.IpamConfig()
 
 	ipv4Info, ipv6Info := nwInfo.IpamInfo()
@@ -428,98 +428,98 @@ func buildIpamResources(r *types.NetworkResource, nwInfo libnetwork.NetworkInfo)
 
 	r.IPAM.Options = opts
 
-	r.IPAM.Config = []network.IPAMConfig***REMOVED******REMOVED***
-	for _, ip4 := range ipv4conf ***REMOVED***
-		if ip4.PreferredPool == "" ***REMOVED***
+	r.IPAM.Config = []network.IPAMConfig{}
+	for _, ip4 := range ipv4conf {
+		if ip4.PreferredPool == "" {
 			continue
-		***REMOVED***
-		iData := network.IPAMConfig***REMOVED******REMOVED***
+		}
+		iData := network.IPAMConfig{}
 		iData.Subnet = ip4.PreferredPool
 		iData.IPRange = ip4.SubPool
 		iData.Gateway = ip4.Gateway
 		iData.AuxAddress = ip4.AuxAddresses
 		r.IPAM.Config = append(r.IPAM.Config, iData)
-	***REMOVED***
+	}
 
-	if len(r.IPAM.Config) == 0 ***REMOVED***
-		for _, ip4Info := range ipv4Info ***REMOVED***
-			iData := network.IPAMConfig***REMOVED******REMOVED***
+	if len(r.IPAM.Config) == 0 {
+		for _, ip4Info := range ipv4Info {
+			iData := network.IPAMConfig{}
 			iData.Subnet = ip4Info.IPAMData.Pool.String()
-			if ip4Info.IPAMData.Gateway != nil ***REMOVED***
+			if ip4Info.IPAMData.Gateway != nil {
 				iData.Gateway = ip4Info.IPAMData.Gateway.IP.String()
-			***REMOVED***
+			}
 			r.IPAM.Config = append(r.IPAM.Config, iData)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	hasIpv6Conf := false
-	for _, ip6 := range ipv6conf ***REMOVED***
-		if ip6.PreferredPool == "" ***REMOVED***
+	for _, ip6 := range ipv6conf {
+		if ip6.PreferredPool == "" {
 			continue
-		***REMOVED***
+		}
 		hasIpv6Conf = true
-		iData := network.IPAMConfig***REMOVED******REMOVED***
+		iData := network.IPAMConfig{}
 		iData.Subnet = ip6.PreferredPool
 		iData.IPRange = ip6.SubPool
 		iData.Gateway = ip6.Gateway
 		iData.AuxAddress = ip6.AuxAddresses
 		r.IPAM.Config = append(r.IPAM.Config, iData)
-	***REMOVED***
+	}
 
-	if !hasIpv6Conf ***REMOVED***
-		for _, ip6Info := range ipv6Info ***REMOVED***
-			if ip6Info.IPAMData.Pool == nil ***REMOVED***
+	if !hasIpv6Conf {
+		for _, ip6Info := range ipv6Info {
+			if ip6Info.IPAMData.Pool == nil {
 				continue
-			***REMOVED***
-			iData := network.IPAMConfig***REMOVED******REMOVED***
+			}
+			iData := network.IPAMConfig{}
 			iData.Subnet = ip6Info.IPAMData.Pool.String()
 			iData.Gateway = ip6Info.IPAMData.Gateway.String()
 			r.IPAM.Config = append(r.IPAM.Config, iData)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func buildEndpointResource(id string, name string, info libnetwork.EndpointInfo) types.EndpointResource ***REMOVED***
-	er := types.EndpointResource***REMOVED******REMOVED***
+func buildEndpointResource(id string, name string, info libnetwork.EndpointInfo) types.EndpointResource {
+	er := types.EndpointResource{}
 
 	er.EndpointID = id
 	er.Name = name
 	ei := info
-	if ei == nil ***REMOVED***
+	if ei == nil {
 		return er
-	***REMOVED***
+	}
 
-	if iface := ei.Iface(); iface != nil ***REMOVED***
-		if mac := iface.MacAddress(); mac != nil ***REMOVED***
+	if iface := ei.Iface(); iface != nil {
+		if mac := iface.MacAddress(); mac != nil {
 			er.MacAddress = mac.String()
-		***REMOVED***
-		if ip := iface.Address(); ip != nil && len(ip.IP) > 0 ***REMOVED***
+		}
+		if ip := iface.Address(); ip != nil && len(ip.IP) > 0 {
 			er.IPv4Address = ip.String()
-		***REMOVED***
+		}
 
-		if ipv6 := iface.AddressIPv6(); ipv6 != nil && len(ipv6.IP) > 0 ***REMOVED***
+		if ipv6 := iface.AddressIPv6(); ipv6 != nil && len(ipv6.IP) > 0 {
 			er.IPv6Address = ipv6.String()
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return er
-***REMOVED***
+}
 
-func (n *networkRouter) postNetworksPrune(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error ***REMOVED***
-	if err := httputils.ParseForm(r); err != nil ***REMOVED***
+func (n *networkRouter) postNetworksPrune(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error {
+	if err := httputils.ParseForm(r); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	pruneFilters, err := filters.FromJSON(r.Form.Get("filters"))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	pruneReport, err := n.backend.NetworksPrune(ctx, pruneFilters)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return httputils.WriteJSON(w, http.StatusOK, pruneReport)
-***REMOVED***
+}
 
 // findUniqueNetwork will search network across different scopes (both local and swarm).
 // NOTE: This findUniqueNetwork is different from FindNetwork in the daemon.
@@ -529,70 +529,70 @@ func (n *networkRouter) postNetworksPrune(ctx context.Context, w http.ResponseWr
 // For full name and partial ID, save the result first, and process later
 // in case multiple records was found based on the same term
 // TODO (yongtang): should we wrap with version here for backward compatibility?
-func (n *networkRouter) findUniqueNetwork(term string) (types.NetworkResource, error) ***REMOVED***
-	listByFullName := map[string]types.NetworkResource***REMOVED******REMOVED***
-	listByPartialID := map[string]types.NetworkResource***REMOVED******REMOVED***
+func (n *networkRouter) findUniqueNetwork(term string) (types.NetworkResource, error) {
+	listByFullName := map[string]types.NetworkResource{}
+	listByPartialID := map[string]types.NetworkResource{}
 
 	nw := n.backend.GetNetworks()
-	for _, network := range nw ***REMOVED***
-		if network.ID() == term ***REMOVED***
+	for _, network := range nw {
+		if network.ID() == term {
 			return *n.buildDetailedNetworkResources(network, false), nil
 
-		***REMOVED***
-		if network.Name() == term && !network.Info().Ingress() ***REMOVED***
+		}
+		if network.Name() == term && !network.Info().Ingress() {
 			// No need to check the ID collision here as we are still in
 			// local scope and the network ID is unique in this scope.
 			listByFullName[network.ID()] = *n.buildDetailedNetworkResources(network, false)
-		***REMOVED***
-		if strings.HasPrefix(network.ID(), term) ***REMOVED***
+		}
+		if strings.HasPrefix(network.ID(), term) {
 			// No need to check the ID collision here as we are still in
 			// local scope and the network ID is unique in this scope.
 			listByPartialID[network.ID()] = *n.buildDetailedNetworkResources(network, false)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	nr, _ := n.cluster.GetNetworks()
-	for _, network := range nr ***REMOVED***
-		if network.ID == term ***REMOVED***
+	for _, network := range nr {
+		if network.ID == term {
 			return network, nil
-		***REMOVED***
-		if network.Name == term ***REMOVED***
+		}
+		if network.Name == term {
 			// Check the ID collision as we are in swarm scope here, and
 			// the map (of the listByFullName) may have already had a
 			// network with the same ID (from local scope previously)
-			if _, ok := listByFullName[network.ID]; !ok ***REMOVED***
+			if _, ok := listByFullName[network.ID]; !ok {
 				listByFullName[network.ID] = network
-			***REMOVED***
-		***REMOVED***
-		if strings.HasPrefix(network.ID, term) ***REMOVED***
+			}
+		}
+		if strings.HasPrefix(network.ID, term) {
 			// Check the ID collision as we are in swarm scope here, and
 			// the map (of the listByPartialID) may have already had a
 			// network with the same ID (from local scope previously)
-			if _, ok := listByPartialID[network.ID]; !ok ***REMOVED***
+			if _, ok := listByPartialID[network.ID]; !ok {
 				listByPartialID[network.ID] = network
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	// Find based on full name, returns true only if no duplicates
-	if len(listByFullName) == 1 ***REMOVED***
-		for _, v := range listByFullName ***REMOVED***
+	if len(listByFullName) == 1 {
+		for _, v := range listByFullName {
 			return v, nil
-		***REMOVED***
-	***REMOVED***
-	if len(listByFullName) > 1 ***REMOVED***
-		return types.NetworkResource***REMOVED******REMOVED***, errdefs.InvalidParameter(errors.Errorf("network %s is ambiguous (%d matches found based on name)", term, len(listByFullName)))
-	***REMOVED***
+		}
+	}
+	if len(listByFullName) > 1 {
+		return types.NetworkResource{}, errdefs.InvalidParameter(errors.Errorf("network %s is ambiguous (%d matches found based on name)", term, len(listByFullName)))
+	}
 
 	// Find based on partial ID, returns true only if no duplicates
-	if len(listByPartialID) == 1 ***REMOVED***
-		for _, v := range listByPartialID ***REMOVED***
+	if len(listByPartialID) == 1 {
+		for _, v := range listByPartialID {
 			return v, nil
-		***REMOVED***
-	***REMOVED***
-	if len(listByPartialID) > 1 ***REMOVED***
-		return types.NetworkResource***REMOVED******REMOVED***, errdefs.InvalidParameter(errors.Errorf("network %s is ambiguous (%d matches found based on ID prefix)", term, len(listByPartialID)))
-	***REMOVED***
+		}
+	}
+	if len(listByPartialID) > 1 {
+		return types.NetworkResource{}, errdefs.InvalidParameter(errors.Errorf("network %s is ambiguous (%d matches found based on ID prefix)", term, len(listByPartialID)))
+	}
 
-	return types.NetworkResource***REMOVED******REMOVED***, errdefs.NotFound(libnetwork.ErrNoSuchNetwork(term))
-***REMOVED***
+	return types.NetworkResource{}, errdefs.NotFound(libnetwork.ErrNoSuchNetwork(term))
+}

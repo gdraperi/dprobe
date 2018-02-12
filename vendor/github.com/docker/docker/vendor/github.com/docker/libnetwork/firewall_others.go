@@ -2,5 +2,5 @@
 
 package libnetwork
 
-func (c *controller) arrangeUserFilterRule() ***REMOVED***
-***REMOVED***
+func (c *controller) arrangeUserFilterRule() {
+}

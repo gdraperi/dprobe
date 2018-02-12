@@ -31,8 +31,8 @@ import (
 )
 
 // #6509
-func (s *DockerSuite) TestRunRedirectStdout(c *check.C) ***REMOVED***
-	checkRedirect := func(command string) ***REMOVED***
+func (s *DockerSuite) TestRunRedirectStdout(c *check.C) {
+	checkRedirect := func(command string) {
 		_, tty, err := pty.Open()
 		c.Assert(err, checker.IsNil, check.Commentf("Could not open pty"))
 		cmd := exec.Command("sh", "-c", command)
@@ -41,25 +41,25 @@ func (s *DockerSuite) TestRunRedirectStdout(c *check.C) ***REMOVED***
 		cmd.Stderr = tty
 		c.Assert(cmd.Start(), checker.IsNil)
 		ch := make(chan error)
-		go func() ***REMOVED***
+		go func() {
 			ch <- cmd.Wait()
 			close(ch)
-		***REMOVED***()
+		}()
 
-		select ***REMOVED***
+		select {
 		case <-time.After(10 * time.Second):
 			c.Fatal("command timeout")
 		case err := <-ch:
 			c.Assert(err, checker.IsNil, check.Commentf("wait err"))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	checkRedirect(dockerBinary + " run -i busybox cat /etc/passwd | grep -q root")
 	checkRedirect(dockerBinary + " run busybox cat /etc/passwd | grep -q root")
-***REMOVED***
+}
 
 // Test recursive bind mount works by default
-func (s *DockerSuite) TestRunWithVolumesIsRecursive(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunWithVolumesIsRecursive(c *check.C) {
 	// /tmp gets permission denied
 	testRequires(c, NotUserNamespace, SameHostDaemon)
 	tmpDir, err := ioutil.TempDir("", "docker_recursive_mount_test")
@@ -78,23 +78,23 @@ func (s *DockerSuite) TestRunWithVolumesIsRecursive(c *check.C) ***REMOVED***
 
 	out, _ := dockerCmd(c, "run", "--name", "test-data", "--volume", fmt.Sprintf("%s:/tmp:ro", tmpDir), "busybox:latest", "ls", "/tmp/tmpfs")
 	c.Assert(out, checker.Contains, filepath.Base(f.Name()), check.Commentf("Recursive bind mount test failed. Expected file not found"))
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRunDeviceDirectory(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunDeviceDirectory(c *check.C) {
 	testRequires(c, DaemonIsLinux, NotUserNamespace, NotArm)
-	if _, err := os.Stat("/dev/snd"); err != nil ***REMOVED***
+	if _, err := os.Stat("/dev/snd"); err != nil {
 		c.Skip("Host does not have /dev/snd")
-	***REMOVED***
+	}
 
 	out, _ := dockerCmd(c, "run", "--device", "/dev/snd:/dev/snd", "busybox", "sh", "-c", "ls /dev/snd/")
 	c.Assert(strings.Trim(out, "\r\n"), checker.Contains, "timer", check.Commentf("expected output /dev/snd/timer"))
 
 	out, _ = dockerCmd(c, "run", "--device", "/dev/snd:/dev/othersnd", "busybox", "sh", "-c", "ls /dev/othersnd/")
 	c.Assert(strings.Trim(out, "\r\n"), checker.Contains, "seq", check.Commentf("expected output /dev/othersnd/seq"))
-***REMOVED***
+}
 
 // TestRunAttachDetach checks attaching and detaching with the default escape sequence.
-func (s *DockerSuite) TestRunAttachDetach(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunAttachDetach(c *check.C) {
 	name := "attach-detach"
 
 	dockerCmd(c, "run", "--name", name, "-itd", "busybox", "cat")
@@ -117,23 +117,23 @@ func (s *DockerSuite) TestRunAttachDetach(c *check.C) ***REMOVED***
 	c.Assert(strings.TrimSpace(out), checker.Equals, "hello")
 
 	// escape sequence
-	_, err = cpty.Write([]byte***REMOVED***16***REMOVED***)
+	_, err = cpty.Write([]byte{16})
 	c.Assert(err, checker.IsNil)
 	time.Sleep(100 * time.Millisecond)
-	_, err = cpty.Write([]byte***REMOVED***17***REMOVED***)
+	_, err = cpty.Write([]byte{17})
 	c.Assert(err, checker.IsNil)
 
-	ch := make(chan struct***REMOVED******REMOVED***)
-	go func() ***REMOVED***
+	ch := make(chan struct{})
+	go func() {
 		cmd.Wait()
-		ch <- struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	***REMOVED***()
+		ch <- struct{}{}
+	}()
 
-	select ***REMOVED***
+	select {
 	case <-ch:
 	case <-time.After(10 * time.Second):
 		c.Fatal("timed out waiting for container to exit")
-	***REMOVED***
+	}
 
 	running := inspectField(c, name, "State.Running")
 	c.Assert(running, checker.Equals, "true", check.Commentf("expected container to still be running"))
@@ -142,71 +142,71 @@ func (s *DockerSuite) TestRunAttachDetach(c *check.C) ***REMOVED***
 	// attach and detach event should be monitored
 	c.Assert(out, checker.Contains, "attach")
 	c.Assert(out, checker.Contains, "detach")
-***REMOVED***
+}
 
 // TestRunAttachDetachFromFlag checks attaching and detaching with the escape sequence specified via flags.
-func (s *DockerSuite) TestRunAttachDetachFromFlag(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunAttachDetachFromFlag(c *check.C) {
 	name := "attach-detach"
-	keyCtrlA := []byte***REMOVED***1***REMOVED***
-	keyA := []byte***REMOVED***97***REMOVED***
+	keyCtrlA := []byte{1}
+	keyA := []byte{97}
 
 	dockerCmd(c, "run", "--name", name, "-itd", "busybox", "cat")
 
 	cmd := exec.Command(dockerBinary, "attach", "--detach-keys=ctrl-a,a", name)
 	stdout, err := cmd.StdoutPipe()
-	if err != nil ***REMOVED***
+	if err != nil {
 		c.Fatal(err)
-	***REMOVED***
+	}
 	cpty, tty, err := pty.Open()
-	if err != nil ***REMOVED***
+	if err != nil {
 		c.Fatal(err)
-	***REMOVED***
+	}
 	defer cpty.Close()
 	cmd.Stdin = tty
-	if err := cmd.Start(); err != nil ***REMOVED***
+	if err := cmd.Start(); err != nil {
 		c.Fatal(err)
-	***REMOVED***
+	}
 	c.Assert(waitRun(name), check.IsNil)
 
-	if _, err := cpty.Write([]byte("hello\n")); err != nil ***REMOVED***
+	if _, err := cpty.Write([]byte("hello\n")); err != nil {
 		c.Fatal(err)
-	***REMOVED***
+	}
 
 	out, err := bufio.NewReader(stdout).ReadString('\n')
-	if err != nil ***REMOVED***
+	if err != nil {
 		c.Fatal(err)
-	***REMOVED***
-	if strings.TrimSpace(out) != "hello" ***REMOVED***
+	}
+	if strings.TrimSpace(out) != "hello" {
 		c.Fatalf("expected 'hello', got %q", out)
-	***REMOVED***
+	}
 
 	// escape sequence
-	if _, err := cpty.Write(keyCtrlA); err != nil ***REMOVED***
+	if _, err := cpty.Write(keyCtrlA); err != nil {
 		c.Fatal(err)
-	***REMOVED***
+	}
 	time.Sleep(100 * time.Millisecond)
-	if _, err := cpty.Write(keyA); err != nil ***REMOVED***
+	if _, err := cpty.Write(keyA); err != nil {
 		c.Fatal(err)
-	***REMOVED***
+	}
 
-	ch := make(chan struct***REMOVED******REMOVED***)
-	go func() ***REMOVED***
+	ch := make(chan struct{})
+	go func() {
 		cmd.Wait()
-		ch <- struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	***REMOVED***()
+		ch <- struct{}{}
+	}()
 
-	select ***REMOVED***
+	select {
 	case <-ch:
 	case <-time.After(10 * time.Second):
 		c.Fatal("timed out waiting for container to exit")
-	***REMOVED***
+	}
 
 	running := inspectField(c, name, "State.Running")
 	c.Assert(running, checker.Equals, "true", check.Commentf("expected container to still be running"))
-***REMOVED***
+}
 
 // TestRunAttachDetachFromInvalidFlag checks attaching and detaching with the escape sequence specified via flags.
-func (s *DockerSuite) TestRunAttachDetachFromInvalidFlag(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunAttachDetachFromInvalidFlag(c *check.C) {
 	name := "attach-detach"
 	dockerCmd(c, "run", "--name", name, "-itd", "busybox", "top")
 	c.Assert(waitRun(name), check.IsNil)
@@ -214,34 +214,34 @@ func (s *DockerSuite) TestRunAttachDetachFromInvalidFlag(c *check.C) ***REMOVED*
 	// specify an invalid detach key, container will ignore it and use default
 	cmd := exec.Command(dockerBinary, "attach", "--detach-keys=ctrl-A,a", name)
 	stdout, err := cmd.StdoutPipe()
-	if err != nil ***REMOVED***
+	if err != nil {
 		c.Fatal(err)
-	***REMOVED***
+	}
 	cpty, tty, err := pty.Open()
-	if err != nil ***REMOVED***
+	if err != nil {
 		c.Fatal(err)
-	***REMOVED***
+	}
 	defer cpty.Close()
 	cmd.Stdin = tty
-	if err := cmd.Start(); err != nil ***REMOVED***
+	if err := cmd.Start(); err != nil {
 		c.Fatal(err)
-	***REMOVED***
+	}
 	go cmd.Wait()
 
 	bufReader := bufio.NewReader(stdout)
 	out, err := bufReader.ReadString('\n')
-	if err != nil ***REMOVED***
+	if err != nil {
 		c.Fatal(err)
-	***REMOVED***
+	}
 	// it should print a warning to indicate the detach key flag is invalid
 	errStr := "Invalid detach keys (ctrl-A,a) provided"
 	c.Assert(strings.TrimSpace(out), checker.Equals, errStr)
-***REMOVED***
+}
 
 // TestRunAttachDetachFromConfig checks attaching and detaching with the escape sequence specified via config file.
-func (s *DockerSuite) TestRunAttachDetachFromConfig(c *check.C) ***REMOVED***
-	keyCtrlA := []byte***REMOVED***1***REMOVED***
-	keyA := []byte***REMOVED***97***REMOVED***
+func (s *DockerSuite) TestRunAttachDetachFromConfig(c *check.C) {
+	keyCtrlA := []byte{1}
+	keyA := []byte{97}
 
 	// Setup config
 	homeKey := homedir.Key()
@@ -254,12 +254,12 @@ func (s *DockerSuite) TestRunAttachDetachFromConfig(c *check.C) ***REMOVED***
 	os.Mkdir(dotDocker, 0600)
 	tmpCfg := filepath.Join(dotDocker, "config.json")
 
-	defer func() ***REMOVED*** os.Setenv(homeKey, homeVal) ***REMOVED***()
+	defer func() { os.Setenv(homeKey, homeVal) }()
 	os.Setenv(homeKey, tmpDir)
 
-	data := `***REMOVED***
+	data := `{
 		"detachKeys": "ctrl-a,a"
-	***REMOVED***`
+	}`
 
 	err = ioutil.WriteFile(tmpCfg, []byte(data), 0600)
 	c.Assert(err, checker.IsNil)
@@ -270,61 +270,61 @@ func (s *DockerSuite) TestRunAttachDetachFromConfig(c *check.C) ***REMOVED***
 
 	cmd := exec.Command(dockerBinary, "attach", name)
 	stdout, err := cmd.StdoutPipe()
-	if err != nil ***REMOVED***
+	if err != nil {
 		c.Fatal(err)
-	***REMOVED***
+	}
 	cpty, tty, err := pty.Open()
-	if err != nil ***REMOVED***
+	if err != nil {
 		c.Fatal(err)
-	***REMOVED***
+	}
 	defer cpty.Close()
 	cmd.Stdin = tty
-	if err := cmd.Start(); err != nil ***REMOVED***
+	if err := cmd.Start(); err != nil {
 		c.Fatal(err)
-	***REMOVED***
+	}
 	c.Assert(waitRun(name), check.IsNil)
 
-	if _, err := cpty.Write([]byte("hello\n")); err != nil ***REMOVED***
+	if _, err := cpty.Write([]byte("hello\n")); err != nil {
 		c.Fatal(err)
-	***REMOVED***
+	}
 
 	out, err := bufio.NewReader(stdout).ReadString('\n')
-	if err != nil ***REMOVED***
+	if err != nil {
 		c.Fatal(err)
-	***REMOVED***
-	if strings.TrimSpace(out) != "hello" ***REMOVED***
+	}
+	if strings.TrimSpace(out) != "hello" {
 		c.Fatalf("expected 'hello', got %q", out)
-	***REMOVED***
+	}
 
 	// escape sequence
-	if _, err := cpty.Write(keyCtrlA); err != nil ***REMOVED***
+	if _, err := cpty.Write(keyCtrlA); err != nil {
 		c.Fatal(err)
-	***REMOVED***
+	}
 	time.Sleep(100 * time.Millisecond)
-	if _, err := cpty.Write(keyA); err != nil ***REMOVED***
+	if _, err := cpty.Write(keyA); err != nil {
 		c.Fatal(err)
-	***REMOVED***
+	}
 
-	ch := make(chan struct***REMOVED******REMOVED***)
-	go func() ***REMOVED***
+	ch := make(chan struct{})
+	go func() {
 		cmd.Wait()
-		ch <- struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	***REMOVED***()
+		ch <- struct{}{}
+	}()
 
-	select ***REMOVED***
+	select {
 	case <-ch:
 	case <-time.After(10 * time.Second):
 		c.Fatal("timed out waiting for container to exit")
-	***REMOVED***
+	}
 
 	running := inspectField(c, name, "State.Running")
 	c.Assert(running, checker.Equals, "true", check.Commentf("expected container to still be running"))
-***REMOVED***
+}
 
 // TestRunAttachDetachKeysOverrideConfig checks attaching and detaching with the detach flags, making sure it overrides config file
-func (s *DockerSuite) TestRunAttachDetachKeysOverrideConfig(c *check.C) ***REMOVED***
-	keyCtrlA := []byte***REMOVED***1***REMOVED***
-	keyA := []byte***REMOVED***97***REMOVED***
+func (s *DockerSuite) TestRunAttachDetachKeysOverrideConfig(c *check.C) {
+	keyCtrlA := []byte{1}
+	keyA := []byte{97}
 
 	// Setup config
 	homeKey := homedir.Key()
@@ -337,12 +337,12 @@ func (s *DockerSuite) TestRunAttachDetachKeysOverrideConfig(c *check.C) ***REMOV
 	os.Mkdir(dotDocker, 0600)
 	tmpCfg := filepath.Join(dotDocker, "config.json")
 
-	defer func() ***REMOVED*** os.Setenv(homeKey, homeVal) ***REMOVED***()
+	defer func() { os.Setenv(homeKey, homeVal) }()
 	os.Setenv(homeKey, tmpDir)
 
-	data := `***REMOVED***
+	data := `{
 		"detachKeys": "ctrl-e,e"
-	***REMOVED***`
+	}`
 
 	err = ioutil.WriteFile(tmpCfg, []byte(data), 0600)
 	c.Assert(err, checker.IsNil)
@@ -353,109 +353,109 @@ func (s *DockerSuite) TestRunAttachDetachKeysOverrideConfig(c *check.C) ***REMOV
 
 	cmd := exec.Command(dockerBinary, "attach", "--detach-keys=ctrl-a,a", name)
 	stdout, err := cmd.StdoutPipe()
-	if err != nil ***REMOVED***
+	if err != nil {
 		c.Fatal(err)
-	***REMOVED***
+	}
 	cpty, tty, err := pty.Open()
-	if err != nil ***REMOVED***
+	if err != nil {
 		c.Fatal(err)
-	***REMOVED***
+	}
 	defer cpty.Close()
 	cmd.Stdin = tty
-	if err := cmd.Start(); err != nil ***REMOVED***
+	if err := cmd.Start(); err != nil {
 		c.Fatal(err)
-	***REMOVED***
+	}
 	c.Assert(waitRun(name), check.IsNil)
 
-	if _, err := cpty.Write([]byte("hello\n")); err != nil ***REMOVED***
+	if _, err := cpty.Write([]byte("hello\n")); err != nil {
 		c.Fatal(err)
-	***REMOVED***
+	}
 
 	out, err := bufio.NewReader(stdout).ReadString('\n')
-	if err != nil ***REMOVED***
+	if err != nil {
 		c.Fatal(err)
-	***REMOVED***
-	if strings.TrimSpace(out) != "hello" ***REMOVED***
+	}
+	if strings.TrimSpace(out) != "hello" {
 		c.Fatalf("expected 'hello', got %q", out)
-	***REMOVED***
+	}
 
 	// escape sequence
-	if _, err := cpty.Write(keyCtrlA); err != nil ***REMOVED***
+	if _, err := cpty.Write(keyCtrlA); err != nil {
 		c.Fatal(err)
-	***REMOVED***
+	}
 	time.Sleep(100 * time.Millisecond)
-	if _, err := cpty.Write(keyA); err != nil ***REMOVED***
+	if _, err := cpty.Write(keyA); err != nil {
 		c.Fatal(err)
-	***REMOVED***
+	}
 
-	ch := make(chan struct***REMOVED******REMOVED***)
-	go func() ***REMOVED***
+	ch := make(chan struct{})
+	go func() {
 		cmd.Wait()
-		ch <- struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	***REMOVED***()
+		ch <- struct{}{}
+	}()
 
-	select ***REMOVED***
+	select {
 	case <-ch:
 	case <-time.After(10 * time.Second):
 		c.Fatal("timed out waiting for container to exit")
-	***REMOVED***
+	}
 
 	running := inspectField(c, name, "State.Running")
 	c.Assert(running, checker.Equals, "true", check.Commentf("expected container to still be running"))
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRunAttachInvalidDetachKeySequencePreserved(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunAttachInvalidDetachKeySequencePreserved(c *check.C) {
 	name := "attach-detach"
-	keyA := []byte***REMOVED***97***REMOVED***
-	keyB := []byte***REMOVED***98***REMOVED***
+	keyA := []byte{97}
+	keyB := []byte{98}
 
 	dockerCmd(c, "run", "--name", name, "-itd", "busybox", "cat")
 
 	cmd := exec.Command(dockerBinary, "attach", "--detach-keys=a,b,c", name)
 	stdout, err := cmd.StdoutPipe()
-	if err != nil ***REMOVED***
+	if err != nil {
 		c.Fatal(err)
-	***REMOVED***
+	}
 	cpty, tty, err := pty.Open()
-	if err != nil ***REMOVED***
+	if err != nil {
 		c.Fatal(err)
-	***REMOVED***
+	}
 	defer cpty.Close()
 	cmd.Stdin = tty
-	if err := cmd.Start(); err != nil ***REMOVED***
+	if err := cmd.Start(); err != nil {
 		c.Fatal(err)
-	***REMOVED***
+	}
 	go cmd.Wait()
 	c.Assert(waitRun(name), check.IsNil)
 
 	// Invalid escape sequence aba, should print aba in output
-	if _, err := cpty.Write(keyA); err != nil ***REMOVED***
+	if _, err := cpty.Write(keyA); err != nil {
 		c.Fatal(err)
-	***REMOVED***
+	}
 	time.Sleep(100 * time.Millisecond)
-	if _, err := cpty.Write(keyB); err != nil ***REMOVED***
+	if _, err := cpty.Write(keyB); err != nil {
 		c.Fatal(err)
-	***REMOVED***
+	}
 	time.Sleep(100 * time.Millisecond)
-	if _, err := cpty.Write(keyA); err != nil ***REMOVED***
+	if _, err := cpty.Write(keyA); err != nil {
 		c.Fatal(err)
-	***REMOVED***
+	}
 	time.Sleep(100 * time.Millisecond)
-	if _, err := cpty.Write([]byte("\n")); err != nil ***REMOVED***
+	if _, err := cpty.Write([]byte("\n")); err != nil {
 		c.Fatal(err)
-	***REMOVED***
+	}
 
 	out, err := bufio.NewReader(stdout).ReadString('\n')
-	if err != nil ***REMOVED***
+	if err != nil {
 		c.Fatal(err)
-	***REMOVED***
-	if strings.TrimSpace(out) != "aba" ***REMOVED***
+	}
+	if strings.TrimSpace(out) != "aba" {
 		c.Fatalf("expected 'aba', got %q", out)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // "test" should be printed
-func (s *DockerSuite) TestRunWithCPUQuota(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunWithCPUQuota(c *check.C) {
 	testRequires(c, cpuCfsQuota)
 
 	file := "/sys/fs/cgroup/cpu/cpu.cfs_quota_us"
@@ -464,9 +464,9 @@ func (s *DockerSuite) TestRunWithCPUQuota(c *check.C) ***REMOVED***
 
 	out = inspectField(c, "test", "HostConfig.CpuQuota")
 	c.Assert(out, checker.Equals, "8000", check.Commentf("setting the CPU CFS quota failed"))
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRunWithCpuPeriod(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunWithCpuPeriod(c *check.C) {
 	testRequires(c, cpuCfsPeriod)
 
 	file := "/sys/fs/cgroup/cpu/cpu.cfs_period_us"
@@ -478,9 +478,9 @@ func (s *DockerSuite) TestRunWithCpuPeriod(c *check.C) ***REMOVED***
 
 	out = inspectField(c, "test", "HostConfig.CpuPeriod")
 	c.Assert(out, checker.Equals, "50000", check.Commentf("setting the CPU CFS period failed"))
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRunWithInvalidCpuPeriod(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunWithInvalidCpuPeriod(c *check.C) {
 	testRequires(c, cpuCfsPeriod)
 	out, _, err := dockerCmdWithError("run", "--cpu-period", "900", "busybox", "true")
 	c.Assert(err, check.NotNil)
@@ -494,22 +494,22 @@ func (s *DockerSuite) TestRunWithInvalidCpuPeriod(c *check.C) ***REMOVED***
 	out, _, err = dockerCmdWithError("run", "--cpu-period", "-3", "busybox", "true")
 	c.Assert(err, check.NotNil)
 	c.Assert(out, checker.Contains, expected)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRunWithKernelMemory(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunWithKernelMemory(c *check.C) {
 	testRequires(c, kernelMemorySupport)
 
 	file := "/sys/fs/cgroup/memory/memory.kmem.limit_in_bytes"
-	cli.DockerCmd(c, "run", "--kernel-memory", "50M", "--name", "test1", "busybox", "cat", file).Assert(c, icmd.Expected***REMOVED***
+	cli.DockerCmd(c, "run", "--kernel-memory", "50M", "--name", "test1", "busybox", "cat", file).Assert(c, icmd.Expected{
 		Out: "52428800",
-	***REMOVED***)
+	})
 
-	cli.InspectCmd(c, "test1", cli.Format(".HostConfig.KernelMemory")).Assert(c, icmd.Expected***REMOVED***
+	cli.InspectCmd(c, "test1", cli.Format(".HostConfig.KernelMemory")).Assert(c, icmd.Expected{
 		Out: "52428800",
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func (s *DockerSuite) TestRunWithInvalidKernelMemory(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunWithInvalidKernelMemory(c *check.C) {
 	testRequires(c, kernelMemorySupport)
 
 	out, _, err := dockerCmdWithError("run", "--kernel-memory", "2M", "busybox", "true")
@@ -521,9 +521,9 @@ func (s *DockerSuite) TestRunWithInvalidKernelMemory(c *check.C) ***REMOVED***
 	c.Assert(err, check.NotNil)
 	expected = "invalid size"
 	c.Assert(out, checker.Contains, expected)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRunWithCPUShares(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunWithCPUShares(c *check.C) {
 	testRequires(c, cpuShare)
 
 	file := "/sys/fs/cgroup/cpu/cpu.shares"
@@ -532,18 +532,18 @@ func (s *DockerSuite) TestRunWithCPUShares(c *check.C) ***REMOVED***
 
 	out = inspectField(c, "test", "HostConfig.CPUShares")
 	c.Assert(out, check.Equals, "1000")
-***REMOVED***
+}
 
 // "test" should be printed
-func (s *DockerSuite) TestRunEchoStdoutWithCPUSharesAndMemoryLimit(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunEchoStdoutWithCPUSharesAndMemoryLimit(c *check.C) {
 	testRequires(c, cpuShare)
 	testRequires(c, memoryLimitSupport)
-	cli.DockerCmd(c, "run", "--cpu-shares", "1000", "-m", "32m", "busybox", "echo", "test").Assert(c, icmd.Expected***REMOVED***
+	cli.DockerCmd(c, "run", "--cpu-shares", "1000", "-m", "32m", "busybox", "echo", "test").Assert(c, icmd.Expected{
 		Out: "test\n",
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func (s *DockerSuite) TestRunWithCpusetCpus(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunWithCpusetCpus(c *check.C) {
 	testRequires(c, cgroupCpuset)
 
 	file := "/sys/fs/cgroup/cpuset/cpuset.cpus"
@@ -552,9 +552,9 @@ func (s *DockerSuite) TestRunWithCpusetCpus(c *check.C) ***REMOVED***
 
 	out = inspectField(c, "test", "HostConfig.CpusetCpus")
 	c.Assert(out, check.Equals, "0")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRunWithCpusetMems(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunWithCpusetMems(c *check.C) {
 	testRequires(c, cgroupCpuset)
 
 	file := "/sys/fs/cgroup/cpuset/cpuset.mems"
@@ -563,9 +563,9 @@ func (s *DockerSuite) TestRunWithCpusetMems(c *check.C) ***REMOVED***
 
 	out = inspectField(c, "test", "HostConfig.CpusetMems")
 	c.Assert(out, check.Equals, "0")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRunWithBlkioWeight(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunWithBlkioWeight(c *check.C) {
 	testRequires(c, blkioWeight)
 
 	file := "/sys/fs/cgroup/blkio/blkio.weight"
@@ -574,89 +574,89 @@ func (s *DockerSuite) TestRunWithBlkioWeight(c *check.C) ***REMOVED***
 
 	out = inspectField(c, "test", "HostConfig.BlkioWeight")
 	c.Assert(out, check.Equals, "300")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRunWithInvalidBlkioWeight(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunWithInvalidBlkioWeight(c *check.C) {
 	testRequires(c, blkioWeight)
 	out, _, err := dockerCmdWithError("run", "--blkio-weight", "5", "busybox", "true")
 	c.Assert(err, check.NotNil, check.Commentf(out))
 	expected := "Range of blkio weight is from 10 to 1000"
 	c.Assert(out, checker.Contains, expected)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRunWithInvalidPathforBlkioWeightDevice(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunWithInvalidPathforBlkioWeightDevice(c *check.C) {
 	testRequires(c, blkioWeight)
 	out, _, err := dockerCmdWithError("run", "--blkio-weight-device", "/dev/sdX:100", "busybox", "true")
 	c.Assert(err, check.NotNil, check.Commentf(out))
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRunWithInvalidPathforBlkioDeviceReadBps(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunWithInvalidPathforBlkioDeviceReadBps(c *check.C) {
 	testRequires(c, blkioWeight)
 	out, _, err := dockerCmdWithError("run", "--device-read-bps", "/dev/sdX:500", "busybox", "true")
 	c.Assert(err, check.NotNil, check.Commentf(out))
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRunWithInvalidPathforBlkioDeviceWriteBps(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunWithInvalidPathforBlkioDeviceWriteBps(c *check.C) {
 	testRequires(c, blkioWeight)
 	out, _, err := dockerCmdWithError("run", "--device-write-bps", "/dev/sdX:500", "busybox", "true")
 	c.Assert(err, check.NotNil, check.Commentf(out))
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRunWithInvalidPathforBlkioDeviceReadIOps(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunWithInvalidPathforBlkioDeviceReadIOps(c *check.C) {
 	testRequires(c, blkioWeight)
 	out, _, err := dockerCmdWithError("run", "--device-read-iops", "/dev/sdX:500", "busybox", "true")
 	c.Assert(err, check.NotNil, check.Commentf(out))
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRunWithInvalidPathforBlkioDeviceWriteIOps(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunWithInvalidPathforBlkioDeviceWriteIOps(c *check.C) {
 	testRequires(c, blkioWeight)
 	out, _, err := dockerCmdWithError("run", "--device-write-iops", "/dev/sdX:500", "busybox", "true")
 	c.Assert(err, check.NotNil, check.Commentf(out))
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRunOOMExitCode(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunOOMExitCode(c *check.C) {
 	testRequires(c, memoryLimitSupport, swapMemorySupport)
 	errChan := make(chan error)
-	go func() ***REMOVED***
+	go func() {
 		defer close(errChan)
 		out, exitCode, _ := dockerCmdWithError("run", "-m", "4MB", "busybox", "sh", "-c", "x=a; while true; do x=$x$x$x$x; done")
-		if expected := 137; exitCode != expected ***REMOVED***
+		if expected := 137; exitCode != expected {
 			errChan <- fmt.Errorf("wrong exit code for OOM container: expected %d, got %d (output: %q)", expected, exitCode, out)
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
-	select ***REMOVED***
+	select {
 	case err := <-errChan:
 		c.Assert(err, check.IsNil)
 	case <-time.After(600 * time.Second):
 		c.Fatal("Timeout waiting for container to die on OOM")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *DockerSuite) TestRunWithMemoryLimit(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunWithMemoryLimit(c *check.C) {
 	testRequires(c, memoryLimitSupport)
 
 	file := "/sys/fs/cgroup/memory/memory.limit_in_bytes"
-	cli.DockerCmd(c, "run", "-m", "32M", "--name", "test", "busybox", "cat", file).Assert(c, icmd.Expected***REMOVED***
+	cli.DockerCmd(c, "run", "-m", "32M", "--name", "test", "busybox", "cat", file).Assert(c, icmd.Expected{
 		Out: "33554432",
-	***REMOVED***)
-	cli.InspectCmd(c, "test", cli.Format(".HostConfig.Memory")).Assert(c, icmd.Expected***REMOVED***
+	})
+	cli.InspectCmd(c, "test", cli.Format(".HostConfig.Memory")).Assert(c, icmd.Expected{
 		Out: "33554432",
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
 // TestRunWithoutMemoryswapLimit sets memory limit and disables swap
 // memory limit, this means the processes in the container can use
 // 16M memory and as much swap memory as they need (if the host
 // supports swap memory).
-func (s *DockerSuite) TestRunWithoutMemoryswapLimit(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunWithoutMemoryswapLimit(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	testRequires(c, memoryLimitSupport)
 	testRequires(c, swapMemorySupport)
 	dockerCmd(c, "run", "-m", "32m", "--memory-swap", "-1", "busybox", "true")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRunWithSwappiness(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunWithSwappiness(c *check.C) {
 	testRequires(c, memorySwappinessSupport)
 	file := "/sys/fs/cgroup/memory/memory.swappiness"
 	out, _ := dockerCmd(c, "run", "--memory-swappiness", "0", "--name", "test", "busybox", "cat", file)
@@ -664,9 +664,9 @@ func (s *DockerSuite) TestRunWithSwappiness(c *check.C) ***REMOVED***
 
 	out = inspectField(c, "test", "HostConfig.MemorySwappiness")
 	c.Assert(out, check.Equals, "0")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRunWithSwappinessInvalid(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunWithSwappinessInvalid(c *check.C) {
 	testRequires(c, memorySwappinessSupport)
 	out, _, err := dockerCmdWithError("run", "--memory-swappiness", "101", "busybox", "true")
 	c.Assert(err, check.NotNil)
@@ -676,9 +676,9 @@ func (s *DockerSuite) TestRunWithSwappinessInvalid(c *check.C) ***REMOVED***
 	out, _, err = dockerCmdWithError("run", "--memory-swappiness", "-10", "busybox", "true")
 	c.Assert(err, check.NotNil)
 	c.Assert(out, checker.Contains, expected, check.Commentf("Expected output to contain %q, not %q", out, expected))
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRunWithMemoryReservation(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunWithMemoryReservation(c *check.C) {
 	testRequires(c, SameHostDaemon, memoryReservationSupport)
 
 	file := "/sys/fs/cgroup/memory/memory.soft_limit_in_bytes"
@@ -687,9 +687,9 @@ func (s *DockerSuite) TestRunWithMemoryReservation(c *check.C) ***REMOVED***
 
 	out = inspectField(c, "test", "HostConfig.MemoryReservation")
 	c.Assert(out, check.Equals, "209715200")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRunWithMemoryReservationInvalid(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunWithMemoryReservationInvalid(c *check.C) {
 	testRequires(c, memoryLimitSupport)
 	testRequires(c, SameHostDaemon, memoryReservationSupport)
 	out, _, err := dockerCmdWithError("run", "-m", "500M", "--memory-reservation", "800M", "busybox", "true")
@@ -701,9 +701,9 @@ func (s *DockerSuite) TestRunWithMemoryReservationInvalid(c *check.C) ***REMOVED
 	c.Assert(err, check.NotNil)
 	expected = "Minimum memory reservation allowed is 4MB"
 	c.Assert(strings.TrimSpace(out), checker.Contains, expected, check.Commentf("run container should fail with invalid memory reservation"))
-***REMOVED***
+}
 
-func (s *DockerSuite) TestStopContainerSignal(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestStopContainerSignal(c *check.C) {
 	out, _ := dockerCmd(c, "run", "--stop-signal", "SIGUSR1", "-d", "busybox", "/bin/sh", "-c", `trap 'echo "exit trapped"; exit 0' USR1; while true; do sleep 1; done`)
 	containerID := strings.TrimSpace(out)
 
@@ -713,9 +713,9 @@ func (s *DockerSuite) TestStopContainerSignal(c *check.C) ***REMOVED***
 	out, _ = dockerCmd(c, "logs", containerID)
 
 	c.Assert(out, checker.Contains, "exit trapped", check.Commentf("Expected `exit trapped` in the log"))
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRunSwapLessThanMemoryLimit(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunSwapLessThanMemoryLimit(c *check.C) {
 	testRequires(c, memoryLimitSupport)
 	testRequires(c, swapMemorySupport)
 	out, _, err := dockerCmdWithError("run", "-m", "16m", "--memory-swap", "15m", "busybox", "echo", "test")
@@ -723,47 +723,47 @@ func (s *DockerSuite) TestRunSwapLessThanMemoryLimit(c *check.C) ***REMOVED***
 	c.Assert(err, check.NotNil)
 
 	c.Assert(out, checker.Contains, expected)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRunInvalidCpusetCpusFlagValue(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunInvalidCpusetCpusFlagValue(c *check.C) {
 	testRequires(c, cgroupCpuset, SameHostDaemon)
 
 	sysInfo := sysinfo.New(true)
 	cpus, err := parsers.ParseUintList(sysInfo.Cpus)
 	c.Assert(err, check.IsNil)
 	var invalid int
-	for i := 0; i <= len(cpus)+1; i++ ***REMOVED***
-		if !cpus[i] ***REMOVED***
+	for i := 0; i <= len(cpus)+1; i++ {
+		if !cpus[i] {
 			invalid = i
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	out, _, err := dockerCmdWithError("run", "--cpuset-cpus", strconv.Itoa(invalid), "busybox", "true")
 	c.Assert(err, check.NotNil)
 	expected := fmt.Sprintf("Error response from daemon: Requested CPUs are not available - requested %s, available: %s", strconv.Itoa(invalid), sysInfo.Cpus)
 	c.Assert(out, checker.Contains, expected)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRunInvalidCpusetMemsFlagValue(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunInvalidCpusetMemsFlagValue(c *check.C) {
 	testRequires(c, cgroupCpuset)
 
 	sysInfo := sysinfo.New(true)
 	mems, err := parsers.ParseUintList(sysInfo.Mems)
 	c.Assert(err, check.IsNil)
 	var invalid int
-	for i := 0; i <= len(mems)+1; i++ ***REMOVED***
-		if !mems[i] ***REMOVED***
+	for i := 0; i <= len(mems)+1; i++ {
+		if !mems[i] {
 			invalid = i
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	out, _, err := dockerCmdWithError("run", "--cpuset-mems", strconv.Itoa(invalid), "busybox", "true")
 	c.Assert(err, check.NotNil)
 	expected := fmt.Sprintf("Error response from daemon: Requested memory nodes are not available - requested %s, available: %s", strconv.Itoa(invalid), sysInfo.Mems)
 	c.Assert(out, checker.Contains, expected)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRunInvalidCPUShares(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunInvalidCPUShares(c *check.C) {
 	testRequires(c, cpuShare, DaemonIsLinux)
 	out, _, err := dockerCmdWithError("run", "--cpu-shares", "1", "busybox", "echo", "test")
 	c.Assert(err, check.NotNil, check.Commentf(out))
@@ -779,64 +779,64 @@ func (s *DockerSuite) TestRunInvalidCPUShares(c *check.C) ***REMOVED***
 	c.Assert(err, check.NotNil, check.Commentf(out))
 	expected = "The maximum allowed cpu-shares is"
 	c.Assert(out, checker.Contains, expected)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRunWithDefaultShmSize(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunWithDefaultShmSize(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 
 	name := "shm-default"
 	out, _ := dockerCmd(c, "run", "--name", name, "busybox", "mount")
 	shmRegex := regexp.MustCompile(`shm on /dev/shm type tmpfs(.*)size=65536k`)
-	if !shmRegex.MatchString(out) ***REMOVED***
+	if !shmRegex.MatchString(out) {
 		c.Fatalf("Expected shm of 64MB in mount command, got %v", out)
-	***REMOVED***
+	}
 	shmSize := inspectField(c, name, "HostConfig.ShmSize")
 	c.Assert(shmSize, check.Equals, "67108864")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRunWithShmSize(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunWithShmSize(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 
 	name := "shm"
 	out, _ := dockerCmd(c, "run", "--name", name, "--shm-size=1G", "busybox", "mount")
 	shmRegex := regexp.MustCompile(`shm on /dev/shm type tmpfs(.*)size=1048576k`)
-	if !shmRegex.MatchString(out) ***REMOVED***
+	if !shmRegex.MatchString(out) {
 		c.Fatalf("Expected shm of 1GB in mount command, got %v", out)
-	***REMOVED***
+	}
 	shmSize := inspectField(c, name, "HostConfig.ShmSize")
 	c.Assert(shmSize, check.Equals, "1073741824")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRunTmpfsMountsEnsureOrdered(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunTmpfsMountsEnsureOrdered(c *check.C) {
 	tmpFile, err := ioutil.TempFile("", "test")
 	c.Assert(err, check.IsNil)
 	defer tmpFile.Close()
 	out, _ := dockerCmd(c, "run", "--tmpfs", "/run", "-v", tmpFile.Name()+":/run/test", "busybox", "ls", "/run")
 	c.Assert(out, checker.Contains, "test")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRunTmpfsMounts(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunTmpfsMounts(c *check.C) {
 	// TODO Windows (Post TP5): This test cannot run on a Windows daemon as
 	// Windows does not support tmpfs mounts.
 	testRequires(c, DaemonIsLinux)
-	if out, _, err := dockerCmdWithError("run", "--tmpfs", "/run", "busybox", "touch", "/run/somefile"); err != nil ***REMOVED***
+	if out, _, err := dockerCmdWithError("run", "--tmpfs", "/run", "busybox", "touch", "/run/somefile"); err != nil {
 		c.Fatalf("/run directory not mounted on tmpfs %q %s", err, out)
-	***REMOVED***
-	if out, _, err := dockerCmdWithError("run", "--tmpfs", "/run:noexec", "busybox", "touch", "/run/somefile"); err != nil ***REMOVED***
+	}
+	if out, _, err := dockerCmdWithError("run", "--tmpfs", "/run:noexec", "busybox", "touch", "/run/somefile"); err != nil {
 		c.Fatalf("/run directory not mounted on tmpfs %q %s", err, out)
-	***REMOVED***
-	if out, _, err := dockerCmdWithError("run", "--tmpfs", "/run:noexec,nosuid,rw,size=5k,mode=700", "busybox", "touch", "/run/somefile"); err != nil ***REMOVED***
+	}
+	if out, _, err := dockerCmdWithError("run", "--tmpfs", "/run:noexec,nosuid,rw,size=5k,mode=700", "busybox", "touch", "/run/somefile"); err != nil {
 		c.Fatalf("/run failed to mount on tmpfs with valid options %q %s", err, out)
-	***REMOVED***
-	if _, _, err := dockerCmdWithError("run", "--tmpfs", "/run:foobar", "busybox", "touch", "/run/somefile"); err == nil ***REMOVED***
+	}
+	if _, _, err := dockerCmdWithError("run", "--tmpfs", "/run:foobar", "busybox", "touch", "/run/somefile"); err == nil {
 		c.Fatalf("/run mounted on tmpfs when it should have vailed within invalid mount option")
-	***REMOVED***
-	if _, _, err := dockerCmdWithError("run", "--tmpfs", "/run", "-v", "/run:/run", "busybox", "touch", "/run/somefile"); err == nil ***REMOVED***
+	}
+	if _, _, err := dockerCmdWithError("run", "--tmpfs", "/run", "-v", "/run:/run", "busybox", "touch", "/run/somefile"); err == nil {
 		c.Fatalf("Should have generated an error saying Duplicate mount  points")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *DockerSuite) TestRunTmpfsMountsOverrideImageVolumes(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunTmpfsMountsOverrideImageVolumes(c *check.C) {
 	name := "img-with-volumes"
 	buildImageSuccessfully(c, name, build.WithDockerfile(`
     FROM busybox
@@ -845,50 +845,50 @@ func (s *DockerSuite) TestRunTmpfsMountsOverrideImageVolumes(c *check.C) ***REMO
     `))
 	out, _ := dockerCmd(c, "run", "--tmpfs", "/run", name, "ls", "/run")
 	c.Assert(out, checker.Not(checker.Contains), "stuff")
-***REMOVED***
+}
 
 // Test case for #22420
-func (s *DockerSuite) TestRunTmpfsMountsWithOptions(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunTmpfsMountsWithOptions(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 
-	expectedOptions := []string***REMOVED***"rw", "nosuid", "nodev", "noexec", "relatime"***REMOVED***
+	expectedOptions := []string{"rw", "nosuid", "nodev", "noexec", "relatime"}
 	out, _ := dockerCmd(c, "run", "--tmpfs", "/tmp", "busybox", "sh", "-c", "mount | grep 'tmpfs on /tmp'")
-	for _, option := range expectedOptions ***REMOVED***
+	for _, option := range expectedOptions {
 		c.Assert(out, checker.Contains, option)
-	***REMOVED***
+	}
 	c.Assert(out, checker.Not(checker.Contains), "size=")
 
-	expectedOptions = []string***REMOVED***"rw", "nosuid", "nodev", "noexec", "relatime"***REMOVED***
+	expectedOptions = []string{"rw", "nosuid", "nodev", "noexec", "relatime"}
 	out, _ = dockerCmd(c, "run", "--tmpfs", "/tmp:rw", "busybox", "sh", "-c", "mount | grep 'tmpfs on /tmp'")
-	for _, option := range expectedOptions ***REMOVED***
+	for _, option := range expectedOptions {
 		c.Assert(out, checker.Contains, option)
-	***REMOVED***
+	}
 	c.Assert(out, checker.Not(checker.Contains), "size=")
 
-	expectedOptions = []string***REMOVED***"rw", "nosuid", "nodev", "relatime", "size=8192k"***REMOVED***
+	expectedOptions = []string{"rw", "nosuid", "nodev", "relatime", "size=8192k"}
 	out, _ = dockerCmd(c, "run", "--tmpfs", "/tmp:rw,exec,size=8192k", "busybox", "sh", "-c", "mount | grep 'tmpfs on /tmp'")
-	for _, option := range expectedOptions ***REMOVED***
+	for _, option := range expectedOptions {
 		c.Assert(out, checker.Contains, option)
-	***REMOVED***
+	}
 
-	expectedOptions = []string***REMOVED***"rw", "nosuid", "nodev", "noexec", "relatime", "size=4096k"***REMOVED***
+	expectedOptions = []string{"rw", "nosuid", "nodev", "noexec", "relatime", "size=4096k"}
 	out, _ = dockerCmd(c, "run", "--tmpfs", "/tmp:rw,size=8192k,exec,size=4096k,noexec", "busybox", "sh", "-c", "mount | grep 'tmpfs on /tmp'")
-	for _, option := range expectedOptions ***REMOVED***
+	for _, option := range expectedOptions {
 		c.Assert(out, checker.Contains, option)
-	***REMOVED***
+	}
 
 	// We use debian:jessie as there is no findmnt in busybox. Also the output will be in the format of
 	// TARGET PROPAGATION
 	// /tmp   shared
 	// so we only capture `shared` here.
-	expectedOptions = []string***REMOVED***"shared"***REMOVED***
+	expectedOptions = []string{"shared"}
 	out, _ = dockerCmd(c, "run", "--tmpfs", "/tmp:shared", "debian:jessie", "findmnt", "-o", "TARGET,PROPAGATION", "/tmp")
-	for _, option := range expectedOptions ***REMOVED***
+	for _, option := range expectedOptions {
 		c.Assert(out, checker.Contains, option)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *DockerSuite) TestRunSysctls(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunSysctls(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	var err error
 
@@ -912,398 +912,398 @@ func (s *DockerSuite) TestRunSysctls(c *check.C) ***REMOVED***
 	c.Assert(sysctls["net.ipv4.ip_forward"], check.Equals, "0")
 
 	icmd.RunCommand(dockerBinary, "run", "--sysctl", "kernel.foobar=1", "--name", "test2",
-		"busybox", "cat", "/proc/sys/kernel/foobar").Assert(c, icmd.Expected***REMOVED***
+		"busybox", "cat", "/proc/sys/kernel/foobar").Assert(c, icmd.Expected{
 		ExitCode: 125,
 		Err:      "invalid argument",
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
 // TestRunSeccompProfileDenyUnshare checks that 'docker run --security-opt seccomp=/tmp/profile.json debian:jessie unshare' exits with operation not permitted.
-func (s *DockerSuite) TestRunSeccompProfileDenyUnshare(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunSeccompProfileDenyUnshare(c *check.C) {
 	testRequires(c, SameHostDaemon, seccompEnabled, NotArm, Apparmor)
-	jsonData := `***REMOVED***
+	jsonData := `{
 	"defaultAction": "SCMP_ACT_ALLOW",
 	"syscalls": [
-		***REMOVED***
+		{
 			"name": "unshare",
 			"action": "SCMP_ACT_ERRNO"
-		***REMOVED***
+		}
 	]
-***REMOVED***`
+}`
 	tmpFile, err := ioutil.TempFile("", "profile.json")
-	if err != nil ***REMOVED***
+	if err != nil {
 		c.Fatal(err)
-	***REMOVED***
+	}
 	defer tmpFile.Close()
 
-	if _, err := tmpFile.Write([]byte(jsonData)); err != nil ***REMOVED***
+	if _, err := tmpFile.Write([]byte(jsonData)); err != nil {
 		c.Fatal(err)
-	***REMOVED***
+	}
 	icmd.RunCommand(dockerBinary, "run", "--security-opt", "apparmor=unconfined",
 		"--security-opt", "seccomp="+tmpFile.Name(),
-		"debian:jessie", "unshare", "-p", "-m", "-f", "-r", "mount", "-t", "proc", "none", "/proc").Assert(c, icmd.Expected***REMOVED***
+		"debian:jessie", "unshare", "-p", "-m", "-f", "-r", "mount", "-t", "proc", "none", "/proc").Assert(c, icmd.Expected{
 		ExitCode: 1,
 		Err:      "Operation not permitted",
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
 // TestRunSeccompProfileDenyChmod checks that 'docker run --security-opt seccomp=/tmp/profile.json busybox chmod 400 /etc/hostname' exits with operation not permitted.
-func (s *DockerSuite) TestRunSeccompProfileDenyChmod(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunSeccompProfileDenyChmod(c *check.C) {
 	testRequires(c, SameHostDaemon, seccompEnabled)
-	jsonData := `***REMOVED***
+	jsonData := `{
 	"defaultAction": "SCMP_ACT_ALLOW",
 	"syscalls": [
-		***REMOVED***
+		{
 			"name": "chmod",
 			"action": "SCMP_ACT_ERRNO"
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			"name":"fchmod",
 			"action": "SCMP_ACT_ERRNO"
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			"name": "fchmodat",
 			"action":"SCMP_ACT_ERRNO"
-		***REMOVED***
+		}
 	]
-***REMOVED***`
+}`
 	tmpFile, err := ioutil.TempFile("", "profile.json")
 	c.Assert(err, check.IsNil)
 	defer tmpFile.Close()
 
-	if _, err := tmpFile.Write([]byte(jsonData)); err != nil ***REMOVED***
+	if _, err := tmpFile.Write([]byte(jsonData)); err != nil {
 		c.Fatal(err)
-	***REMOVED***
+	}
 	icmd.RunCommand(dockerBinary, "run", "--security-opt", "seccomp="+tmpFile.Name(),
-		"busybox", "chmod", "400", "/etc/hostname").Assert(c, icmd.Expected***REMOVED***
+		"busybox", "chmod", "400", "/etc/hostname").Assert(c, icmd.Expected{
 		ExitCode: 1,
 		Err:      "Operation not permitted",
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
 // TestRunSeccompProfileDenyUnshareUserns checks that 'docker run debian:jessie unshare --map-root-user --user sh -c whoami' with a specific profile to
 // deny unshare of a userns exits with operation not permitted.
-func (s *DockerSuite) TestRunSeccompProfileDenyUnshareUserns(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunSeccompProfileDenyUnshareUserns(c *check.C) {
 	testRequires(c, SameHostDaemon, seccompEnabled, NotArm, Apparmor)
 	// from sched.h
-	jsonData := fmt.Sprintf(`***REMOVED***
+	jsonData := fmt.Sprintf(`{
 	"defaultAction": "SCMP_ACT_ALLOW",
 	"syscalls": [
-		***REMOVED***
+		{
 			"name": "unshare",
 			"action": "SCMP_ACT_ERRNO",
 			"args": [
-				***REMOVED***
+				{
 					"index": 0,
 					"value": %d,
 					"op": "SCMP_CMP_EQ"
-				***REMOVED***
+				}
 			]
-		***REMOVED***
+		}
 	]
-***REMOVED***`, uint64(0x10000000))
+}`, uint64(0x10000000))
 	tmpFile, err := ioutil.TempFile("", "profile.json")
-	if err != nil ***REMOVED***
+	if err != nil {
 		c.Fatal(err)
-	***REMOVED***
+	}
 	defer tmpFile.Close()
 
-	if _, err := tmpFile.Write([]byte(jsonData)); err != nil ***REMOVED***
+	if _, err := tmpFile.Write([]byte(jsonData)); err != nil {
 		c.Fatal(err)
-	***REMOVED***
+	}
 	icmd.RunCommand(dockerBinary, "run",
 		"--security-opt", "apparmor=unconfined", "--security-opt", "seccomp="+tmpFile.Name(),
-		"debian:jessie", "unshare", "--map-root-user", "--user", "sh", "-c", "whoami").Assert(c, icmd.Expected***REMOVED***
+		"debian:jessie", "unshare", "--map-root-user", "--user", "sh", "-c", "whoami").Assert(c, icmd.Expected{
 		ExitCode: 1,
 		Err:      "Operation not permitted",
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
 // TestRunSeccompProfileDenyCloneUserns checks that 'docker run syscall-test'
 // with a the default seccomp profile exits with operation not permitted.
-func (s *DockerSuite) TestRunSeccompProfileDenyCloneUserns(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunSeccompProfileDenyCloneUserns(c *check.C) {
 	testRequires(c, SameHostDaemon, seccompEnabled)
 	ensureSyscallTest(c)
 
-	icmd.RunCommand(dockerBinary, "run", "syscall-test", "userns-test", "id").Assert(c, icmd.Expected***REMOVED***
+	icmd.RunCommand(dockerBinary, "run", "syscall-test", "userns-test", "id").Assert(c, icmd.Expected{
 		ExitCode: 1,
 		Err:      "clone failed: Operation not permitted",
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
 // TestRunSeccompUnconfinedCloneUserns checks that
 // 'docker run --security-opt seccomp=unconfined syscall-test' allows creating a userns.
-func (s *DockerSuite) TestRunSeccompUnconfinedCloneUserns(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunSeccompUnconfinedCloneUserns(c *check.C) {
 	testRequires(c, SameHostDaemon, seccompEnabled, UserNamespaceInKernel, NotUserNamespace, unprivilegedUsernsClone)
 	ensureSyscallTest(c)
 
 	// make sure running w privileged is ok
 	icmd.RunCommand(dockerBinary, "run", "--security-opt", "seccomp=unconfined",
-		"syscall-test", "userns-test", "id").Assert(c, icmd.Expected***REMOVED***
+		"syscall-test", "userns-test", "id").Assert(c, icmd.Expected{
 		Out: "nobody",
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
 // TestRunSeccompAllowPrivCloneUserns checks that 'docker run --privileged syscall-test'
 // allows creating a userns.
-func (s *DockerSuite) TestRunSeccompAllowPrivCloneUserns(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunSeccompAllowPrivCloneUserns(c *check.C) {
 	testRequires(c, SameHostDaemon, seccompEnabled, UserNamespaceInKernel, NotUserNamespace)
 	ensureSyscallTest(c)
 
 	// make sure running w privileged is ok
-	icmd.RunCommand(dockerBinary, "run", "--privileged", "syscall-test", "userns-test", "id").Assert(c, icmd.Expected***REMOVED***
+	icmd.RunCommand(dockerBinary, "run", "--privileged", "syscall-test", "userns-test", "id").Assert(c, icmd.Expected{
 		Out: "nobody",
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
 // TestRunSeccompProfileAllow32Bit checks that 32 bit code can run on x86_64
 // with the default seccomp profile.
-func (s *DockerSuite) TestRunSeccompProfileAllow32Bit(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunSeccompProfileAllow32Bit(c *check.C) {
 	testRequires(c, SameHostDaemon, seccompEnabled, IsAmd64)
 	ensureSyscallTest(c)
 
 	icmd.RunCommand(dockerBinary, "run", "syscall-test", "exit32-test").Assert(c, icmd.Success)
-***REMOVED***
+}
 
 // TestRunSeccompAllowSetrlimit checks that 'docker run debian:jessie ulimit -v 1048510' succeeds.
-func (s *DockerSuite) TestRunSeccompAllowSetrlimit(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunSeccompAllowSetrlimit(c *check.C) {
 	testRequires(c, SameHostDaemon, seccompEnabled)
 
 	// ulimit uses setrlimit, so we want to make sure we don't break it
 	icmd.RunCommand(dockerBinary, "run", "debian:jessie", "bash", "-c", "ulimit -v 1048510").Assert(c, icmd.Success)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRunSeccompDefaultProfileAcct(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunSeccompDefaultProfileAcct(c *check.C) {
 	testRequires(c, SameHostDaemon, seccompEnabled, NotUserNamespace)
 	ensureSyscallTest(c)
 
 	out, _, err := dockerCmdWithError("run", "syscall-test", "acct-test")
-	if err == nil || !strings.Contains(out, "Operation not permitted") ***REMOVED***
+	if err == nil || !strings.Contains(out, "Operation not permitted") {
 		c.Fatalf("test 0: expected Operation not permitted, got: %s", out)
-	***REMOVED***
+	}
 
 	out, _, err = dockerCmdWithError("run", "--cap-add", "sys_admin", "syscall-test", "acct-test")
-	if err == nil || !strings.Contains(out, "Operation not permitted") ***REMOVED***
+	if err == nil || !strings.Contains(out, "Operation not permitted") {
 		c.Fatalf("test 1: expected Operation not permitted, got: %s", out)
-	***REMOVED***
+	}
 
 	out, _, err = dockerCmdWithError("run", "--cap-add", "sys_pacct", "syscall-test", "acct-test")
-	if err == nil || !strings.Contains(out, "No such file or directory") ***REMOVED***
+	if err == nil || !strings.Contains(out, "No such file or directory") {
 		c.Fatalf("test 2: expected No such file or directory, got: %s", out)
-	***REMOVED***
+	}
 
 	out, _, err = dockerCmdWithError("run", "--cap-add", "ALL", "syscall-test", "acct-test")
-	if err == nil || !strings.Contains(out, "No such file or directory") ***REMOVED***
+	if err == nil || !strings.Contains(out, "No such file or directory") {
 		c.Fatalf("test 3: expected No such file or directory, got: %s", out)
-	***REMOVED***
+	}
 
 	out, _, err = dockerCmdWithError("run", "--cap-drop", "ALL", "--cap-add", "sys_pacct", "syscall-test", "acct-test")
-	if err == nil || !strings.Contains(out, "No such file or directory") ***REMOVED***
+	if err == nil || !strings.Contains(out, "No such file or directory") {
 		c.Fatalf("test 4: expected No such file or directory, got: %s", out)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *DockerSuite) TestRunSeccompDefaultProfileNS(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunSeccompDefaultProfileNS(c *check.C) {
 	testRequires(c, SameHostDaemon, seccompEnabled, NotUserNamespace)
 	ensureSyscallTest(c)
 
 	out, _, err := dockerCmdWithError("run", "syscall-test", "ns-test", "echo", "hello0")
-	if err == nil || !strings.Contains(out, "Operation not permitted") ***REMOVED***
+	if err == nil || !strings.Contains(out, "Operation not permitted") {
 		c.Fatalf("test 0: expected Operation not permitted, got: %s", out)
-	***REMOVED***
+	}
 
 	out, _, err = dockerCmdWithError("run", "--cap-add", "sys_admin", "syscall-test", "ns-test", "echo", "hello1")
-	if err != nil || !strings.Contains(out, "hello1") ***REMOVED***
+	if err != nil || !strings.Contains(out, "hello1") {
 		c.Fatalf("test 1: expected hello1, got: %s, %v", out, err)
-	***REMOVED***
+	}
 
 	out, _, err = dockerCmdWithError("run", "--cap-drop", "all", "--cap-add", "sys_admin", "syscall-test", "ns-test", "echo", "hello2")
-	if err != nil || !strings.Contains(out, "hello2") ***REMOVED***
+	if err != nil || !strings.Contains(out, "hello2") {
 		c.Fatalf("test 2: expected hello2, got: %s, %v", out, err)
-	***REMOVED***
+	}
 
 	out, _, err = dockerCmdWithError("run", "--cap-add", "ALL", "syscall-test", "ns-test", "echo", "hello3")
-	if err != nil || !strings.Contains(out, "hello3") ***REMOVED***
+	if err != nil || !strings.Contains(out, "hello3") {
 		c.Fatalf("test 3: expected hello3, got: %s, %v", out, err)
-	***REMOVED***
+	}
 
 	out, _, err = dockerCmdWithError("run", "--cap-add", "ALL", "--security-opt", "seccomp=unconfined", "syscall-test", "acct-test")
-	if err == nil || !strings.Contains(out, "No such file or directory") ***REMOVED***
+	if err == nil || !strings.Contains(out, "No such file or directory") {
 		c.Fatalf("test 4: expected No such file or directory, got: %s", out)
-	***REMOVED***
+	}
 
 	out, _, err = dockerCmdWithError("run", "--cap-add", "ALL", "--security-opt", "seccomp=unconfined", "syscall-test", "ns-test", "echo", "hello4")
-	if err != nil || !strings.Contains(out, "hello4") ***REMOVED***
+	if err != nil || !strings.Contains(out, "hello4") {
 		c.Fatalf("test 5: expected hello4, got: %s, %v", out, err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // TestRunNoNewPrivSetuid checks that --security-opt='no-new-privileges=true' prevents
 // effective uid transtions on executing setuid binaries.
-func (s *DockerSuite) TestRunNoNewPrivSetuid(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunNoNewPrivSetuid(c *check.C) {
 	testRequires(c, DaemonIsLinux, NotUserNamespace, SameHostDaemon)
 	ensureNNPTest(c)
 
 	// test that running a setuid binary results in no effective uid transition
 	icmd.RunCommand(dockerBinary, "run", "--security-opt", "no-new-privileges=true", "--user", "1000",
-		"nnp-test", "/usr/bin/nnp-test").Assert(c, icmd.Expected***REMOVED***
+		"nnp-test", "/usr/bin/nnp-test").Assert(c, icmd.Expected{
 		Out: "EUID=1000",
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
 // TestLegacyRunNoNewPrivSetuid checks that --security-opt=no-new-privileges prevents
 // effective uid transtions on executing setuid binaries.
-func (s *DockerSuite) TestLegacyRunNoNewPrivSetuid(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestLegacyRunNoNewPrivSetuid(c *check.C) {
 	testRequires(c, DaemonIsLinux, NotUserNamespace, SameHostDaemon)
 	ensureNNPTest(c)
 
 	// test that running a setuid binary results in no effective uid transition
 	icmd.RunCommand(dockerBinary, "run", "--security-opt", "no-new-privileges", "--user", "1000",
-		"nnp-test", "/usr/bin/nnp-test").Assert(c, icmd.Expected***REMOVED***
+		"nnp-test", "/usr/bin/nnp-test").Assert(c, icmd.Expected{
 		Out: "EUID=1000",
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func (s *DockerSuite) TestUserNoEffectiveCapabilitiesChown(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestUserNoEffectiveCapabilitiesChown(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	ensureSyscallTest(c)
 
 	// test that a root user has default capability CAP_CHOWN
 	dockerCmd(c, "run", "busybox", "chown", "100", "/tmp")
 	// test that non root user does not have default capability CAP_CHOWN
-	icmd.RunCommand(dockerBinary, "run", "--user", "1000:1000", "busybox", "chown", "100", "/tmp").Assert(c, icmd.Expected***REMOVED***
+	icmd.RunCommand(dockerBinary, "run", "--user", "1000:1000", "busybox", "chown", "100", "/tmp").Assert(c, icmd.Expected{
 		ExitCode: 1,
 		Err:      "Operation not permitted",
-	***REMOVED***)
+	})
 	// test that root user can drop default capability CAP_CHOWN
-	icmd.RunCommand(dockerBinary, "run", "--cap-drop", "chown", "busybox", "chown", "100", "/tmp").Assert(c, icmd.Expected***REMOVED***
+	icmd.RunCommand(dockerBinary, "run", "--cap-drop", "chown", "busybox", "chown", "100", "/tmp").Assert(c, icmd.Expected{
 		ExitCode: 1,
 		Err:      "Operation not permitted",
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func (s *DockerSuite) TestUserNoEffectiveCapabilitiesDacOverride(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestUserNoEffectiveCapabilitiesDacOverride(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	ensureSyscallTest(c)
 
 	// test that a root user has default capability CAP_DAC_OVERRIDE
 	dockerCmd(c, "run", "busybox", "sh", "-c", "echo test > /etc/passwd")
 	// test that non root user does not have default capability CAP_DAC_OVERRIDE
-	icmd.RunCommand(dockerBinary, "run", "--user", "1000:1000", "busybox", "sh", "-c", "echo test > /etc/passwd").Assert(c, icmd.Expected***REMOVED***
+	icmd.RunCommand(dockerBinary, "run", "--user", "1000:1000", "busybox", "sh", "-c", "echo test > /etc/passwd").Assert(c, icmd.Expected{
 		ExitCode: 1,
 		Err:      "Permission denied",
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func (s *DockerSuite) TestUserNoEffectiveCapabilitiesFowner(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestUserNoEffectiveCapabilitiesFowner(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	ensureSyscallTest(c)
 
 	// test that a root user has default capability CAP_FOWNER
 	dockerCmd(c, "run", "busybox", "chmod", "777", "/etc/passwd")
 	// test that non root user does not have default capability CAP_FOWNER
-	icmd.RunCommand(dockerBinary, "run", "--user", "1000:1000", "busybox", "chmod", "777", "/etc/passwd").Assert(c, icmd.Expected***REMOVED***
+	icmd.RunCommand(dockerBinary, "run", "--user", "1000:1000", "busybox", "chmod", "777", "/etc/passwd").Assert(c, icmd.Expected{
 		ExitCode: 1,
 		Err:      "Operation not permitted",
-	***REMOVED***)
+	})
 	// TODO test that root user can drop default capability CAP_FOWNER
-***REMOVED***
+}
 
 // TODO CAP_KILL
 
-func (s *DockerSuite) TestUserNoEffectiveCapabilitiesSetuid(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestUserNoEffectiveCapabilitiesSetuid(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	ensureSyscallTest(c)
 
 	// test that a root user has default capability CAP_SETUID
 	dockerCmd(c, "run", "syscall-test", "setuid-test")
 	// test that non root user does not have default capability CAP_SETUID
-	icmd.RunCommand(dockerBinary, "run", "--user", "1000:1000", "syscall-test", "setuid-test").Assert(c, icmd.Expected***REMOVED***
+	icmd.RunCommand(dockerBinary, "run", "--user", "1000:1000", "syscall-test", "setuid-test").Assert(c, icmd.Expected{
 		ExitCode: 1,
 		Err:      "Operation not permitted",
-	***REMOVED***)
+	})
 	// test that root user can drop default capability CAP_SETUID
-	icmd.RunCommand(dockerBinary, "run", "--cap-drop", "setuid", "syscall-test", "setuid-test").Assert(c, icmd.Expected***REMOVED***
+	icmd.RunCommand(dockerBinary, "run", "--cap-drop", "setuid", "syscall-test", "setuid-test").Assert(c, icmd.Expected{
 		ExitCode: 1,
 		Err:      "Operation not permitted",
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func (s *DockerSuite) TestUserNoEffectiveCapabilitiesSetgid(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestUserNoEffectiveCapabilitiesSetgid(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	ensureSyscallTest(c)
 
 	// test that a root user has default capability CAP_SETGID
 	dockerCmd(c, "run", "syscall-test", "setgid-test")
 	// test that non root user does not have default capability CAP_SETGID
-	icmd.RunCommand(dockerBinary, "run", "--user", "1000:1000", "syscall-test", "setgid-test").Assert(c, icmd.Expected***REMOVED***
+	icmd.RunCommand(dockerBinary, "run", "--user", "1000:1000", "syscall-test", "setgid-test").Assert(c, icmd.Expected{
 		ExitCode: 1,
 		Err:      "Operation not permitted",
-	***REMOVED***)
+	})
 	// test that root user can drop default capability CAP_SETGID
-	icmd.RunCommand(dockerBinary, "run", "--cap-drop", "setgid", "syscall-test", "setgid-test").Assert(c, icmd.Expected***REMOVED***
+	icmd.RunCommand(dockerBinary, "run", "--cap-drop", "setgid", "syscall-test", "setgid-test").Assert(c, icmd.Expected{
 		ExitCode: 1,
 		Err:      "Operation not permitted",
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
 // TODO CAP_SETPCAP
 
-func (s *DockerSuite) TestUserNoEffectiveCapabilitiesNetBindService(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestUserNoEffectiveCapabilitiesNetBindService(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	ensureSyscallTest(c)
 
 	// test that a root user has default capability CAP_NET_BIND_SERVICE
 	dockerCmd(c, "run", "syscall-test", "socket-test")
 	// test that non root user does not have default capability CAP_NET_BIND_SERVICE
-	icmd.RunCommand(dockerBinary, "run", "--user", "1000:1000", "syscall-test", "socket-test").Assert(c, icmd.Expected***REMOVED***
+	icmd.RunCommand(dockerBinary, "run", "--user", "1000:1000", "syscall-test", "socket-test").Assert(c, icmd.Expected{
 		ExitCode: 1,
 		Err:      "Permission denied",
-	***REMOVED***)
+	})
 	// test that root user can drop default capability CAP_NET_BIND_SERVICE
-	icmd.RunCommand(dockerBinary, "run", "--cap-drop", "net_bind_service", "syscall-test", "socket-test").Assert(c, icmd.Expected***REMOVED***
+	icmd.RunCommand(dockerBinary, "run", "--cap-drop", "net_bind_service", "syscall-test", "socket-test").Assert(c, icmd.Expected{
 		ExitCode: 1,
 		Err:      "Permission denied",
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func (s *DockerSuite) TestUserNoEffectiveCapabilitiesNetRaw(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestUserNoEffectiveCapabilitiesNetRaw(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	ensureSyscallTest(c)
 
 	// test that a root user has default capability CAP_NET_RAW
 	dockerCmd(c, "run", "syscall-test", "raw-test")
 	// test that non root user does not have default capability CAP_NET_RAW
-	icmd.RunCommand(dockerBinary, "run", "--user", "1000:1000", "syscall-test", "raw-test").Assert(c, icmd.Expected***REMOVED***
+	icmd.RunCommand(dockerBinary, "run", "--user", "1000:1000", "syscall-test", "raw-test").Assert(c, icmd.Expected{
 		ExitCode: 1,
 		Err:      "Operation not permitted",
-	***REMOVED***)
+	})
 	// test that root user can drop default capability CAP_NET_RAW
-	icmd.RunCommand(dockerBinary, "run", "--cap-drop", "net_raw", "syscall-test", "raw-test").Assert(c, icmd.Expected***REMOVED***
+	icmd.RunCommand(dockerBinary, "run", "--cap-drop", "net_raw", "syscall-test", "raw-test").Assert(c, icmd.Expected{
 		ExitCode: 1,
 		Err:      "Operation not permitted",
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func (s *DockerSuite) TestUserNoEffectiveCapabilitiesChroot(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestUserNoEffectiveCapabilitiesChroot(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	ensureSyscallTest(c)
 
 	// test that a root user has default capability CAP_SYS_CHROOT
 	dockerCmd(c, "run", "busybox", "chroot", "/", "/bin/true")
 	// test that non root user does not have default capability CAP_SYS_CHROOT
-	icmd.RunCommand(dockerBinary, "run", "--user", "1000:1000", "busybox", "chroot", "/", "/bin/true").Assert(c, icmd.Expected***REMOVED***
+	icmd.RunCommand(dockerBinary, "run", "--user", "1000:1000", "busybox", "chroot", "/", "/bin/true").Assert(c, icmd.Expected{
 		ExitCode: 1,
 		Err:      "Operation not permitted",
-	***REMOVED***)
+	})
 	// test that root user can drop default capability CAP_SYS_CHROOT
-	icmd.RunCommand(dockerBinary, "run", "--cap-drop", "sys_chroot", "busybox", "chroot", "/", "/bin/true").Assert(c, icmd.Expected***REMOVED***
+	icmd.RunCommand(dockerBinary, "run", "--cap-drop", "sys_chroot", "busybox", "chroot", "/", "/bin/true").Assert(c, icmd.Expected{
 		ExitCode: 1,
 		Err:      "Operation not permitted",
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func (s *DockerSuite) TestUserNoEffectiveCapabilitiesMknod(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestUserNoEffectiveCapabilitiesMknod(c *check.C) {
 	testRequires(c, DaemonIsLinux, NotUserNamespace)
 	ensureSyscallTest(c)
 
@@ -1311,53 +1311,53 @@ func (s *DockerSuite) TestUserNoEffectiveCapabilitiesMknod(c *check.C) ***REMOVE
 	dockerCmd(c, "run", "busybox", "mknod", "/tmp/node", "b", "1", "2")
 	// test that non root user does not have default capability CAP_MKNOD
 	// test that root user can drop default capability CAP_SYS_CHROOT
-	icmd.RunCommand(dockerBinary, "run", "--user", "1000:1000", "busybox", "mknod", "/tmp/node", "b", "1", "2").Assert(c, icmd.Expected***REMOVED***
+	icmd.RunCommand(dockerBinary, "run", "--user", "1000:1000", "busybox", "mknod", "/tmp/node", "b", "1", "2").Assert(c, icmd.Expected{
 		ExitCode: 1,
 		Err:      "Operation not permitted",
-	***REMOVED***)
+	})
 	// test that root user can drop default capability CAP_MKNOD
-	icmd.RunCommand(dockerBinary, "run", "--cap-drop", "mknod", "busybox", "mknod", "/tmp/node", "b", "1", "2").Assert(c, icmd.Expected***REMOVED***
+	icmd.RunCommand(dockerBinary, "run", "--cap-drop", "mknod", "busybox", "mknod", "/tmp/node", "b", "1", "2").Assert(c, icmd.Expected{
 		ExitCode: 1,
 		Err:      "Operation not permitted",
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
 // TODO CAP_AUDIT_WRITE
 // TODO CAP_SETFCAP
 
-func (s *DockerSuite) TestRunApparmorProcDirectory(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunApparmorProcDirectory(c *check.C) {
 	testRequires(c, SameHostDaemon, Apparmor)
 
 	// running w seccomp unconfined tests the apparmor profile
 	result := icmd.RunCommand(dockerBinary, "run", "--security-opt", "seccomp=unconfined", "busybox", "chmod", "777", "/proc/1/cgroup")
-	result.Assert(c, icmd.Expected***REMOVED***ExitCode: 1***REMOVED***)
-	if !(strings.Contains(result.Combined(), "Permission denied") || strings.Contains(result.Combined(), "Operation not permitted")) ***REMOVED***
+	result.Assert(c, icmd.Expected{ExitCode: 1})
+	if !(strings.Contains(result.Combined(), "Permission denied") || strings.Contains(result.Combined(), "Operation not permitted")) {
 		c.Fatalf("expected chmod 777 /proc/1/cgroup to fail, got %s: %v", result.Combined(), result.Error)
-	***REMOVED***
+	}
 
 	result = icmd.RunCommand(dockerBinary, "run", "--security-opt", "seccomp=unconfined", "busybox", "chmod", "777", "/proc/1/attr/current")
-	result.Assert(c, icmd.Expected***REMOVED***ExitCode: 1***REMOVED***)
-	if !(strings.Contains(result.Combined(), "Permission denied") || strings.Contains(result.Combined(), "Operation not permitted")) ***REMOVED***
+	result.Assert(c, icmd.Expected{ExitCode: 1})
+	if !(strings.Contains(result.Combined(), "Permission denied") || strings.Contains(result.Combined(), "Operation not permitted")) {
 		c.Fatalf("expected chmod 777 /proc/1/attr/current to fail, got %s: %v", result.Combined(), result.Error)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // make sure the default profile can be successfully parsed (using unshare as it is
 // something which we know is blocked in the default profile)
-func (s *DockerSuite) TestRunSeccompWithDefaultProfile(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunSeccompWithDefaultProfile(c *check.C) {
 	testRequires(c, SameHostDaemon, seccompEnabled)
 
 	out, _, err := dockerCmdWithError("run", "--security-opt", "seccomp=../profiles/seccomp/default.json", "debian:jessie", "unshare", "--map-root-user", "--user", "sh", "-c", "whoami")
 	c.Assert(err, checker.NotNil, check.Commentf(out))
 	c.Assert(strings.TrimSpace(out), checker.Equals, "unshare: unshare failed: Operation not permitted")
-***REMOVED***
+}
 
 // TestRunDeviceSymlink checks run with device that follows symlink (#13840 and #22271)
-func (s *DockerSuite) TestRunDeviceSymlink(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunDeviceSymlink(c *check.C) {
 	testRequires(c, DaemonIsLinux, NotUserNamespace, NotArm, SameHostDaemon)
-	if _, err := os.Stat("/dev/zero"); err != nil ***REMOVED***
+	if _, err := os.Stat("/dev/zero"); err != nil {
 		c.Skip("Host does not have /dev/zero")
-	***REMOVED***
+	}
 
 	// Create a temporary directory to create symlink
 	tmpDir, err := ioutil.TempDir("", "docker_device_follow_symlink_tests")
@@ -1381,9 +1381,9 @@ func (s *DockerSuite) TestRunDeviceSymlink(c *check.C) ***REMOVED***
 
 	// Create a symbolic link to /dev/zero, this time with a relative path (#22271)
 	err = os.Symlink("zero", "/dev/symzero")
-	if err != nil ***REMOVED***
+	if err != nil {
 		c.Fatal("/dev/symzero creation failed")
-	***REMOVED***
+	}
 	// We need to remove this symbolic link here as it is created in /dev/, not temporary directory as above
 	defer os.Remove("/dev/symzero")
 
@@ -1399,10 +1399,10 @@ func (s *DockerSuite) TestRunDeviceSymlink(c *check.C) ***REMOVED***
 	// md5sum of 'dd if=/dev/zero bs=4K count=8' is bb7df04e1b0a2570657527a7e108ae23 (this time check with relative path backed, see #22271)
 	out, _ = dockerCmd(c, "run", "--device", "/dev/symzero:/dev/symzero", "busybox", "sh", "-c", "dd if=/dev/symzero bs=4K count=8 | md5sum")
 	c.Assert(strings.Trim(out, "\r\n"), checker.Contains, "bb7df04e1b0a2570657527a7e108ae23", check.Commentf("expected output bb7df04e1b0a2570657527a7e108ae23"))
-***REMOVED***
+}
 
 // TestRunPIDsLimit makes sure the pids cgroup is set with --pids-limit
-func (s *DockerSuite) TestRunPIDsLimit(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunPIDsLimit(c *check.C) {
 	testRequires(c, SameHostDaemon, pidsLimit)
 
 	file := "/sys/fs/cgroup/pids/pids.max"
@@ -1411,48 +1411,48 @@ func (s *DockerSuite) TestRunPIDsLimit(c *check.C) ***REMOVED***
 
 	out = inspectField(c, "skittles", "HostConfig.PidsLimit")
 	c.Assert(out, checker.Equals, "4", check.Commentf("setting the pids limit failed"))
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRunPrivilegedAllowedDevices(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunPrivilegedAllowedDevices(c *check.C) {
 	testRequires(c, DaemonIsLinux, NotUserNamespace)
 
 	file := "/sys/fs/cgroup/devices/devices.list"
 	out, _ := dockerCmd(c, "run", "--privileged", "busybox", "cat", file)
 	c.Logf("out: %q", out)
 	c.Assert(strings.TrimSpace(out), checker.Equals, "a *:* rwm")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRunUserDeviceAllowed(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunUserDeviceAllowed(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 
 	fi, err := os.Stat("/dev/snd/timer")
-	if err != nil ***REMOVED***
+	if err != nil {
 		c.Skip("Host does not have /dev/snd/timer")
-	***REMOVED***
+	}
 	stat, ok := fi.Sys().(*syscall.Stat_t)
-	if !ok ***REMOVED***
+	if !ok {
 		c.Skip("Could not stat /dev/snd/timer")
-	***REMOVED***
+	}
 
 	file := "/sys/fs/cgroup/devices/devices.list"
 	out, _ := dockerCmd(c, "run", "--device", "/dev/snd/timer:w", "busybox", "cat", file)
 	c.Assert(out, checker.Contains, fmt.Sprintf("c %d:%d w", stat.Rdev/256, stat.Rdev%256))
-***REMOVED***
+}
 
-func (s *DockerDaemonSuite) TestRunSeccompJSONNewFormat(c *check.C) ***REMOVED***
+func (s *DockerDaemonSuite) TestRunSeccompJSONNewFormat(c *check.C) {
 	testRequires(c, SameHostDaemon, seccompEnabled)
 
 	s.d.StartWithBusybox(c)
 
-	jsonData := `***REMOVED***
+	jsonData := `{
 	"defaultAction": "SCMP_ACT_ALLOW",
 	"syscalls": [
-		***REMOVED***
+		{
 			"names": ["chmod", "fchmod", "fchmodat"],
 			"action": "SCMP_ACT_ERRNO"
-		***REMOVED***
+		}
 	]
-***REMOVED***`
+}`
 	tmpFile, err := ioutil.TempFile("", "profile.json")
 	c.Assert(err, check.IsNil)
 	defer tmpFile.Close()
@@ -1462,23 +1462,23 @@ func (s *DockerDaemonSuite) TestRunSeccompJSONNewFormat(c *check.C) ***REMOVED**
 	out, err := s.d.Cmd("run", "--security-opt", "seccomp="+tmpFile.Name(), "busybox", "chmod", "777", ".")
 	c.Assert(err, check.NotNil)
 	c.Assert(out, checker.Contains, "Operation not permitted")
-***REMOVED***
+}
 
-func (s *DockerDaemonSuite) TestRunSeccompJSONNoNameAndNames(c *check.C) ***REMOVED***
+func (s *DockerDaemonSuite) TestRunSeccompJSONNoNameAndNames(c *check.C) {
 	testRequires(c, SameHostDaemon, seccompEnabled)
 
 	s.d.StartWithBusybox(c)
 
-	jsonData := `***REMOVED***
+	jsonData := `{
 	"defaultAction": "SCMP_ACT_ALLOW",
 	"syscalls": [
-		***REMOVED***
+		{
 			"name": "chmod",
 			"names": ["fchmod", "fchmodat"],
 			"action": "SCMP_ACT_ERRNO"
-		***REMOVED***
+		}
 	]
-***REMOVED***`
+}`
 	tmpFile, err := ioutil.TempFile("", "profile.json")
 	c.Assert(err, check.IsNil)
 	defer tmpFile.Close()
@@ -1488,34 +1488,34 @@ func (s *DockerDaemonSuite) TestRunSeccompJSONNoNameAndNames(c *check.C) ***REMO
 	out, err := s.d.Cmd("run", "--security-opt", "seccomp="+tmpFile.Name(), "busybox", "chmod", "777", ".")
 	c.Assert(err, check.NotNil)
 	c.Assert(out, checker.Contains, "'name' and 'names' were specified in the seccomp profile, use either 'name' or 'names'")
-***REMOVED***
+}
 
-func (s *DockerDaemonSuite) TestRunSeccompJSONNoArchAndArchMap(c *check.C) ***REMOVED***
+func (s *DockerDaemonSuite) TestRunSeccompJSONNoArchAndArchMap(c *check.C) {
 	testRequires(c, SameHostDaemon, seccompEnabled)
 
 	s.d.StartWithBusybox(c)
 
-	jsonData := `***REMOVED***
+	jsonData := `{
 	"archMap": [
-		***REMOVED***
+		{
 			"architecture": "SCMP_ARCH_X86_64",
 			"subArchitectures": [
 				"SCMP_ARCH_X86",
 				"SCMP_ARCH_X32"
 			]
-		***REMOVED***
+		}
 	],
 	"architectures": [
 		"SCMP_ARCH_X32"
 	],
 	"defaultAction": "SCMP_ACT_ALLOW",
 	"syscalls": [
-		***REMOVED***
+		{
 			"names": ["chmod", "fchmod", "fchmodat"],
 			"action": "SCMP_ACT_ERRNO"
-		***REMOVED***
+		}
 	]
-***REMOVED***`
+}`
 	tmpFile, err := ioutil.TempFile("", "profile.json")
 	c.Assert(err, check.IsNil)
 	defer tmpFile.Close()
@@ -1525,9 +1525,9 @@ func (s *DockerDaemonSuite) TestRunSeccompJSONNoArchAndArchMap(c *check.C) ***RE
 	out, err := s.d.Cmd("run", "--security-opt", "seccomp="+tmpFile.Name(), "busybox", "chmod", "777", ".")
 	c.Assert(err, check.NotNil)
 	c.Assert(out, checker.Contains, "'architectures' and 'archMap' were specified in the seccomp profile, use either 'architectures' or 'archMap'")
-***REMOVED***
+}
 
-func (s *DockerDaemonSuite) TestRunWithDaemonDefaultSeccompProfile(c *check.C) ***REMOVED***
+func (s *DockerDaemonSuite) TestRunWithDaemonDefaultSeccompProfile(c *check.C) {
 	testRequires(c, SameHostDaemon, seccompEnabled)
 
 	s.d.StartWithBusybox(c)
@@ -1536,15 +1536,15 @@ func (s *DockerDaemonSuite) TestRunWithDaemonDefaultSeccompProfile(c *check.C) *
 	_, err := s.d.Cmd("run", "busybox", "chmod", "777", ".")
 	c.Assert(err, check.IsNil)
 
-	jsonData := `***REMOVED***
+	jsonData := `{
 	"defaultAction": "SCMP_ACT_ALLOW",
 	"syscalls": [
-		***REMOVED***
+		{
 			"name": "chmod",
 			"action": "SCMP_ACT_ERRNO"
-		***REMOVED***
+		}
 	]
-***REMOVED***`
+}`
 	tmpFile, err := ioutil.TempFile("", "profile.json")
 	c.Assert(err, check.IsNil)
 	defer tmpFile.Close()
@@ -1557,9 +1557,9 @@ func (s *DockerDaemonSuite) TestRunWithDaemonDefaultSeccompProfile(c *check.C) *
 	out, err := s.d.Cmd("run", "busybox", "chmod", "777", ".")
 	c.Assert(err, check.NotNil)
 	c.Assert(out, checker.Contains, "Operation not permitted")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRunWithNanoCPUs(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRunWithNanoCPUs(c *check.C) {
 	testRequires(c, cpuCfsQuota, cpuCfsPeriod)
 
 	file1 := "/sys/fs/cgroup/cpu/cpu.cfs_quota_us"
@@ -1581,4 +1581,4 @@ func (s *DockerSuite) TestRunWithNanoCPUs(c *check.C) ***REMOVED***
 	out, _, err = dockerCmdWithError("run", "--cpus", "0.5", "--cpu-quota", "50000", "--cpu-period", "100000", "busybox", "sh")
 	c.Assert(err, check.NotNil)
 	c.Assert(out, checker.Contains, "Conflicting options: Nano CPUs and CPU Period cannot both be set")
-***REMOVED***
+}

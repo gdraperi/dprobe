@@ -39,11 +39,11 @@ package internal
 //
 // The provided grpcServer must be of type *grpc.Server. It is untyped
 // for circular dependency reasons.
-var TestingCloseConns func(grpcServer interface***REMOVED******REMOVED***)
+var TestingCloseConns func(grpcServer interface{})
 
 // TestingUseHandlerImpl enables the http.Handler-based server implementation.
 // It must be called before Serve and requires TLS credentials.
 //
 // The provided grpcServer must be of type *grpc.Server. It is untyped
 // for circular dependency reasons.
-var TestingUseHandlerImpl func(grpcServer interface***REMOVED******REMOVED***)
+var TestingUseHandlerImpl func(grpcServer interface{})

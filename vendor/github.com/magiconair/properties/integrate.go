@@ -12,23 +12,23 @@ import "flag"
 // It's use is recommended with command line arguments as in:
 // 	flag.Parse()
 // 	p.MustFlag(flag.CommandLine)
-func (p *Properties) MustFlag(dst *flag.FlagSet) ***REMOVED***
+func (p *Properties) MustFlag(dst *flag.FlagSet) {
 	m := make(map[string]*flag.Flag)
-	dst.VisitAll(func(f *flag.Flag) ***REMOVED***
+	dst.VisitAll(func(f *flag.Flag) {
 		m[f.Name] = f
-	***REMOVED***)
-	dst.Visit(func(f *flag.Flag) ***REMOVED***
+	})
+	dst.Visit(func(f *flag.Flag) {
 		delete(m, f.Name) // overridden
-	***REMOVED***)
+	})
 
-	for name, f := range m ***REMOVED***
+	for name, f := range m {
 		v, ok := p.Get(name)
-		if !ok ***REMOVED***
+		if !ok {
 			continue
-		***REMOVED***
+		}
 
-		if err := f.Value.Set(v); err != nil ***REMOVED***
+		if err := f.Value.Set(v); err != nil {
 			ErrorHandler(err)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

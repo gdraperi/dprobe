@@ -10,12 +10,12 @@ import "unsafe"
 
 var nativeEndian binaryByteOrder
 
-func init() ***REMOVED***
+func init() {
 	i := uint32(1)
 	b := (*[4]byte)(unsafe.Pointer(&i))
-	if b[0] == 1 ***REMOVED***
+	if b[0] == 1 {
 		nativeEndian = littleEndian
-	***REMOVED*** else ***REMOVED***
+	} else {
 		nativeEndian = bigEndian
-	***REMOVED***
-***REMOVED***
+	}
+}

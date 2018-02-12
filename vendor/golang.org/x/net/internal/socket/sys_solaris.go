@@ -11,15 +11,15 @@ import (
 	"unsafe"
 )
 
-func probeProtocolStack() int ***REMOVED***
-	switch runtime.GOARCH ***REMOVED***
+func probeProtocolStack() int {
+	switch runtime.GOARCH {
 	case "amd64":
 		return 4
 	default:
 		var p uintptr
 		return int(unsafe.Sizeof(p))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 //go:cgo_import_dynamic libc___xnet_getsockopt __xnet_getsockopt "libsocket.so"
 //go:cgo_import_dynamic libc_setsockopt setsockopt "libsocket.so"
@@ -41,31 +41,31 @@ var (
 func sysvicall6(trap, nargs, a1, a2, a3, a4, a5, a6 uintptr) (uintptr, uintptr, syscall.Errno)
 func rawSysvicall6(trap, nargs, a1, a2, a3, a4, a5, a6 uintptr) (uintptr, uintptr, syscall.Errno)
 
-func getsockopt(s uintptr, level, name int, b []byte) (int, error) ***REMOVED***
+func getsockopt(s uintptr, level, name int, b []byte) (int, error) {
 	l := uint32(len(b))
 	_, _, errno := sysvicall6(uintptr(unsafe.Pointer(&procGetsockopt)), 5, s, uintptr(level), uintptr(name), uintptr(unsafe.Pointer(&b[0])), uintptr(unsafe.Pointer(&l)), 0)
 	return int(l), errnoErr(errno)
-***REMOVED***
+}
 
-func setsockopt(s uintptr, level, name int, b []byte) error ***REMOVED***
+func setsockopt(s uintptr, level, name int, b []byte) error {
 	_, _, errno := sysvicall6(uintptr(unsafe.Pointer(&procSetsockopt)), 5, s, uintptr(level), uintptr(name), uintptr(unsafe.Pointer(&b[0])), uintptr(len(b)), 0)
 	return errnoErr(errno)
-***REMOVED***
+}
 
-func recvmsg(s uintptr, h *msghdr, flags int) (int, error) ***REMOVED***
+func recvmsg(s uintptr, h *msghdr, flags int) (int, error) {
 	n, _, errno := sysvicall6(uintptr(unsafe.Pointer(&procRecvmsg)), 3, s, uintptr(unsafe.Pointer(h)), uintptr(flags), 0, 0, 0)
 	return int(n), errnoErr(errno)
-***REMOVED***
+}
 
-func sendmsg(s uintptr, h *msghdr, flags int) (int, error) ***REMOVED***
+func sendmsg(s uintptr, h *msghdr, flags int) (int, error) {
 	n, _, errno := sysvicall6(uintptr(unsafe.Pointer(&procSendmsg)), 3, s, uintptr(unsafe.Pointer(h)), uintptr(flags), 0, 0, 0)
 	return int(n), errnoErr(errno)
-***REMOVED***
+}
 
-func recvmmsg(s uintptr, hs []mmsghdr, flags int) (int, error) ***REMOVED***
+func recvmmsg(s uintptr, hs []mmsghdr, flags int) (int, error) {
 	return 0, errors.New("not implemented")
-***REMOVED***
+}
 
-func sendmmsg(s uintptr, hs []mmsghdr, flags int) (int, error) ***REMOVED***
+func sendmmsg(s uintptr, hs []mmsghdr, flags int) (int, error) {
 	return 0, errors.New("not implemented")
-***REMOVED***
+}

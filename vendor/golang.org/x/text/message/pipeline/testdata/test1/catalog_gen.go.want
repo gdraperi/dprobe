@@ -8,35 +8,35 @@ import (
 	"golang.org/x/text/message/catalog"
 )
 
-type dictionary struct ***REMOVED***
+type dictionary struct {
 	index []uint32
 	data  string
-***REMOVED***
+}
 
-func (d *dictionary) Lookup(key string) (data string, ok bool) ***REMOVED***
+func (d *dictionary) Lookup(key string) (data string, ok bool) {
 	p := messageKeyToIndex[key]
 	start, end := d.index[p], d.index[p+1]
-	if start == end ***REMOVED***
+	if start == end {
 		return "", false
-	***REMOVED***
+	}
 	return d.data[start:end], true
-***REMOVED***
+}
 
-func init() ***REMOVED***
-	dict := map[string]catalog.Dictionary***REMOVED***
-		"de":    &dictionary***REMOVED***index: deIndex, data: deData***REMOVED***,
-		"en_US": &dictionary***REMOVED***index: en_USIndex, data: en_USData***REMOVED***,
-		"zh":    &dictionary***REMOVED***index: zhIndex, data: zhData***REMOVED***,
-	***REMOVED***
+func init() {
+	dict := map[string]catalog.Dictionary{
+		"de":    &dictionary{index: deIndex, data: deData},
+		"en_US": &dictionary{index: en_USIndex, data: en_USData},
+		"zh":    &dictionary{index: zhIndex, data: zhData},
+	}
 	fallback := language.MustParse("en-US")
 	cat, err := catalog.NewFromMap(dict, catalog.Fallback(fallback))
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 	message.DefaultCatalog = cat
-***REMOVED***
+}
 
-var messageKeyToIndex = map[string]int***REMOVED***
+var messageKeyToIndex = map[string]int{
 	"%.2[1]f miles traveled (%[1]f)":                 8,
 	"%[1]s is visiting %[3]s!\n":                     3,
 	"%d files remaining!":                            4,
@@ -46,13 +46,13 @@ var messageKeyToIndex = map[string]int***REMOVED***
 	"Hello %s!\n":                                    1,
 	"Hello world!\n":                                 0,
 	"Use the following code for your discount: %d\n": 6,
-***REMOVED***
+}
 
-var deIndex = []uint32***REMOVED*** // 10 elements
+var deIndex = []uint32{ // 10 elements
 	0x00000000, 0x00000011, 0x00000023, 0x0000003d,
 	0x00000057, 0x00000075, 0x00000094, 0x00000094,
 	0x00000094, 0x00000094,
-***REMOVED*** // Size: 64 bytes
+} // Size: 64 bytes
 
 const deData string = "" + // Size: 148 bytes
 	"\x04\x00\x01\x0a\x0c\x02Hallo Welt!\x04\x00\x01\x0a\x0d\x02Hallo %[1]s!" +
@@ -60,11 +60,11 @@ const deData string = "" + // Size: 148 bytes
 	"s besucht %[3]s!\x02Noch zwei Bestände zu gehen!\x02Noch %[1]d Bestände " +
 	"zu gehen!"
 
-var en_USIndex = []uint32***REMOVED*** // 10 elements
+var en_USIndex = []uint32{ // 10 elements
 	0x00000000, 0x00000012, 0x00000024, 0x00000042,
 	0x00000060, 0x00000077, 0x000000ba, 0x000000ef,
 	0x00000106, 0x00000125,
-***REMOVED*** // Size: 64 bytes
+} // Size: 64 bytes
 
 const en_USData string = "" + // Size: 293 bytes
 	"\x04\x00\x01\x0a\x0d\x02Hello world!\x04\x00\x01\x0a\x0d\x02Hello %[1]s!" +
@@ -74,11 +74,11 @@ const en_USData string = "" + // Size: 293 bytes
 	"ning!\x04\x00\x01\x0a0\x02Use the following code for your discount: %[1]" +
 	"d\x02%[1]s is out of order!\x02%.2[1]f miles traveled (%[1]f)"
 
-var zhIndex = []uint32***REMOVED*** // 10 elements
+var zhIndex = []uint32{ // 10 elements
 	0x00000000, 0x00000000, 0x00000000, 0x00000000,
 	0x00000000, 0x00000000, 0x00000000, 0x00000000,
 	0x00000000, 0x00000000,
-***REMOVED*** // Size: 64 bytes
+} // Size: 64 bytes
 
 const zhData string = ""
 

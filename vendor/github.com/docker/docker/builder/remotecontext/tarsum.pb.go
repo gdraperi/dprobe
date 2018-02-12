@@ -34,106 +34,106 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
-type TarsumBackup struct ***REMOVED***
+type TarsumBackup struct {
 	Hashes map[string]string `protobuf:"bytes,1,rep,name=Hashes" json:"Hashes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-***REMOVED***
+}
 
-func (m *TarsumBackup) Reset()                    ***REMOVED*** *m = TarsumBackup***REMOVED******REMOVED*** ***REMOVED***
-func (*TarsumBackup) ProtoMessage()               ***REMOVED******REMOVED***
-func (*TarsumBackup) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorTarsum, []int***REMOVED***0***REMOVED*** ***REMOVED***
+func (m *TarsumBackup) Reset()                    { *m = TarsumBackup{} }
+func (*TarsumBackup) ProtoMessage()               {}
+func (*TarsumBackup) Descriptor() ([]byte, []int) { return fileDescriptorTarsum, []int{0} }
 
-func (m *TarsumBackup) GetHashes() map[string]string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *TarsumBackup) GetHashes() map[string]string {
+	if m != nil {
 		return m.Hashes
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*TarsumBackup)(nil), "remotecontext.TarsumBackup")
-***REMOVED***
-func (this *TarsumBackup) Equal(that interface***REMOVED******REMOVED***) bool ***REMOVED***
-	if that == nil ***REMOVED***
-		if this == nil ***REMOVED***
+}
+func (this *TarsumBackup) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
 			return true
-		***REMOVED***
+		}
 		return false
-	***REMOVED***
+	}
 
 	that1, ok := that.(*TarsumBackup)
-	if !ok ***REMOVED***
+	if !ok {
 		that2, ok := that.(TarsumBackup)
-		if ok ***REMOVED***
+		if ok {
 			that1 = &that2
-		***REMOVED*** else ***REMOVED***
+		} else {
 			return false
-		***REMOVED***
-	***REMOVED***
-	if that1 == nil ***REMOVED***
-		if this == nil ***REMOVED***
+		}
+	}
+	if that1 == nil {
+		if this == nil {
 			return true
-		***REMOVED***
+		}
 		return false
-	***REMOVED*** else if this == nil ***REMOVED***
+	} else if this == nil {
 		return false
-	***REMOVED***
-	if len(this.Hashes) != len(that1.Hashes) ***REMOVED***
+	}
+	if len(this.Hashes) != len(that1.Hashes) {
 		return false
-	***REMOVED***
-	for i := range this.Hashes ***REMOVED***
-		if this.Hashes[i] != that1.Hashes[i] ***REMOVED***
+	}
+	for i := range this.Hashes {
+		if this.Hashes[i] != that1.Hashes[i] {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
-func (this *TarsumBackup) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *TarsumBackup) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 5)
-	s = append(s, "&remotecontext.TarsumBackup***REMOVED***")
+	s = append(s, "&remotecontext.TarsumBackup{")
 	keysForHashes := make([]string, 0, len(this.Hashes))
-	for k := range this.Hashes ***REMOVED***
+	for k := range this.Hashes {
 		keysForHashes = append(keysForHashes, k)
-	***REMOVED***
+	}
 	github_com_gogo_protobuf_sortkeys.Strings(keysForHashes)
-	mapStringForHashes := "map[string]string***REMOVED***"
-	for _, k := range keysForHashes ***REMOVED***
+	mapStringForHashes := "map[string]string{"
+	for _, k := range keysForHashes {
 		mapStringForHashes += fmt.Sprintf("%#v: %#v,", k, this.Hashes[k])
-	***REMOVED***
-	mapStringForHashes += "***REMOVED***"
-	if this.Hashes != nil ***REMOVED***
+	}
+	mapStringForHashes += "}"
+	if this.Hashes != nil {
 		s = append(s, "Hashes: "+mapStringForHashes+",\n")
-	***REMOVED***
-	s = append(s, "***REMOVED***")
+	}
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func valueToGoStringTarsum(v interface***REMOVED******REMOVED***, typ string) string ***REMOVED***
+}
+func valueToGoStringTarsum(v interface{}, typ string) string {
 	rv := reflect.ValueOf(v)
-	if rv.IsNil() ***REMOVED***
+	if rv.IsNil() {
 		return "nil"
-	***REMOVED***
+	}
 	pv := reflect.Indirect(rv).Interface()
-	return fmt.Sprintf("func(v %v) *%v ***REMOVED*** return &v ***REMOVED*** ( %#v )", typ, typ, pv)
-***REMOVED***
-func (m *TarsumBackup) Marshal() (dAtA []byte, err error) ***REMOVED***
+	return fmt.Sprintf("func(v %v) *%v { return &v } ( %#v )", typ, typ, pv)
+}
+func (m *TarsumBackup) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *TarsumBackup) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *TarsumBackup) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Hashes) > 0 ***REMOVED***
-		for k := range m.Hashes ***REMOVED***
+	if len(m.Hashes) > 0 {
+		for k := range m.Hashes {
 			dAtA[i] = 0xa
 			i++
 			v := m.Hashes[k]
@@ -147,12 +147,12 @@ func (m *TarsumBackup) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
 			i++
 			i = encodeVarintTarsum(dAtA, i, uint64(len(v)))
 			i += copy(dAtA[i:], v)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return i, nil
-***REMOVED***
+}
 
-func encodeFixed64Tarsum(dAtA []byte, offset int, v uint64) int ***REMOVED***
+func encodeFixed64Tarsum(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
 	dAtA[offset+2] = uint8(v >> 16)
@@ -162,331 +162,331 @@ func encodeFixed64Tarsum(dAtA []byte, offset int, v uint64) int ***REMOVED***
 	dAtA[offset+6] = uint8(v >> 48)
 	dAtA[offset+7] = uint8(v >> 56)
 	return offset + 8
-***REMOVED***
-func encodeFixed32Tarsum(dAtA []byte, offset int, v uint32) int ***REMOVED***
+}
+func encodeFixed32Tarsum(dAtA []byte, offset int, v uint32) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
 	dAtA[offset+2] = uint8(v >> 16)
 	dAtA[offset+3] = uint8(v >> 24)
 	return offset + 4
-***REMOVED***
-func encodeVarintTarsum(dAtA []byte, offset int, v uint64) int ***REMOVED***
-	for v >= 1<<7 ***REMOVED***
+}
+func encodeVarintTarsum(dAtA []byte, offset int, v uint64) int {
+	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
-	***REMOVED***
+	}
 	dAtA[offset] = uint8(v)
 	return offset + 1
-***REMOVED***
-func (m *TarsumBackup) Size() (n int) ***REMOVED***
+}
+func (m *TarsumBackup) Size() (n int) {
 	var l int
 	_ = l
-	if len(m.Hashes) > 0 ***REMOVED***
-		for k, v := range m.Hashes ***REMOVED***
+	if len(m.Hashes) > 0 {
+		for k, v := range m.Hashes {
 			_ = k
 			_ = v
 			mapEntrySize := 1 + len(k) + sovTarsum(uint64(len(k))) + 1 + len(v) + sovTarsum(uint64(len(v)))
 			n += mapEntrySize + 1 + sovTarsum(uint64(mapEntrySize))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
+}
 
-func sovTarsum(x uint64) (n int) ***REMOVED***
-	for ***REMOVED***
+func sovTarsum(x uint64) (n int) {
+	for {
 		n++
 		x >>= 7
-		if x == 0 ***REMOVED***
+		if x == 0 {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
-func sozTarsum(x uint64) (n int) ***REMOVED***
+}
+func sozTarsum(x uint64) (n int) {
 	return sovTarsum(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-***REMOVED***
-func (this *TarsumBackup) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *TarsumBackup) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	keysForHashes := make([]string, 0, len(this.Hashes))
-	for k := range this.Hashes ***REMOVED***
+	for k := range this.Hashes {
 		keysForHashes = append(keysForHashes, k)
-	***REMOVED***
+	}
 	github_com_gogo_protobuf_sortkeys.Strings(keysForHashes)
-	mapStringForHashes := "map[string]string***REMOVED***"
-	for _, k := range keysForHashes ***REMOVED***
+	mapStringForHashes := "map[string]string{"
+	for _, k := range keysForHashes {
 		mapStringForHashes += fmt.Sprintf("%v: %v,", k, this.Hashes[k])
-	***REMOVED***
-	mapStringForHashes += "***REMOVED***"
-	s := strings.Join([]string***REMOVED***`&TarsumBackup***REMOVED***`,
+	}
+	mapStringForHashes += "}"
+	s := strings.Join([]string{`&TarsumBackup{`,
 		`Hashes:` + mapStringForHashes + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func valueToStringTarsum(v interface***REMOVED******REMOVED***) string ***REMOVED***
+}
+func valueToStringTarsum(v interface{}) string {
 	rv := reflect.ValueOf(v)
-	if rv.IsNil() ***REMOVED***
+	if rv.IsNil() {
 		return "nil"
-	***REMOVED***
+	}
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
-***REMOVED***
-func (m *TarsumBackup) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *TarsumBackup) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowTarsum
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: TarsumBackup: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: TarsumBackup: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Hashes", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTarsum
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthTarsum
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			var keykey uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTarsum
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				keykey |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			var stringLenmapkey uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowTarsum
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLenmapkey |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLenmapkey := int(stringLenmapkey)
-			if intStringLenmapkey < 0 ***REMOVED***
+			if intStringLenmapkey < 0 {
 				return ErrInvalidLengthTarsum
-			***REMOVED***
+			}
 			postStringIndexmapkey := iNdEx + intStringLenmapkey
-			if postStringIndexmapkey > l ***REMOVED***
+			if postStringIndexmapkey > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			mapkey := string(dAtA[iNdEx:postStringIndexmapkey])
 			iNdEx = postStringIndexmapkey
-			if m.Hashes == nil ***REMOVED***
+			if m.Hashes == nil {
 				m.Hashes = make(map[string]string)
-			***REMOVED***
-			if iNdEx < postIndex ***REMOVED***
+			}
+			if iNdEx < postIndex {
 				var valuekey uint64
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return ErrIntOverflowTarsum
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					valuekey |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				var stringLenmapvalue uint64
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return ErrIntOverflowTarsum
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					stringLenmapvalue |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				intStringLenmapvalue := int(stringLenmapvalue)
-				if intStringLenmapvalue < 0 ***REMOVED***
+				if intStringLenmapvalue < 0 {
 					return ErrInvalidLengthTarsum
-				***REMOVED***
+				}
 				postStringIndexmapvalue := iNdEx + intStringLenmapvalue
-				if postStringIndexmapvalue > l ***REMOVED***
+				if postStringIndexmapvalue > l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				mapvalue := string(dAtA[iNdEx:postStringIndexmapvalue])
 				iNdEx = postStringIndexmapvalue
 				m.Hashes[mapkey] = mapvalue
-			***REMOVED*** else ***REMOVED***
+			} else {
 				var mapvalue string
 				m.Hashes[mapkey] = mapvalue
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTarsum(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthTarsum
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func skipTarsum(dAtA []byte) (n int, err error) ***REMOVED***
+}
+func skipTarsum(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return 0, ErrIntOverflowTarsum
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return 0, io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		wireType := int(wire & 0x7)
-		switch wireType ***REMOVED***
+		switch wireType {
 		case 0:
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowTarsum
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				iNdEx++
-				if dAtA[iNdEx-1] < 0x80 ***REMOVED***
+				if dAtA[iNdEx-1] < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return iNdEx, nil
 		case 1:
 			iNdEx += 8
 			return iNdEx, nil
 		case 2:
 			var length int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowTarsum
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				length |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			iNdEx += length
-			if length < 0 ***REMOVED***
+			if length < 0 {
 				return 0, ErrInvalidLengthTarsum
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 3:
-			for ***REMOVED***
+			for {
 				var innerWire uint64
 				var start int = iNdEx
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return 0, ErrIntOverflowTarsum
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return 0, io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					innerWire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				innerWireType := int(innerWire & 0x7)
-				if innerWireType == 4 ***REMOVED***
+				if innerWireType == 4 {
 					break
-				***REMOVED***
+				}
 				next, err := skipTarsum(dAtA[start:])
-				if err != nil ***REMOVED***
+				if err != nil {
 					return 0, err
-				***REMOVED***
+				}
 				iNdEx = start + next
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 4:
 			return iNdEx, nil
@@ -495,19 +495,19 @@ func skipTarsum(dAtA []byte) (n int, err error) ***REMOVED***
 			return iNdEx, nil
 		default:
 			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	panic("unreachable")
-***REMOVED***
+}
 
 var (
 	ErrInvalidLengthTarsum = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowTarsum   = fmt.Errorf("proto: integer overflow")
 )
 
-func init() ***REMOVED*** proto.RegisterFile("tarsum.proto", fileDescriptorTarsum) ***REMOVED***
+func init() { proto.RegisterFile("tarsum.proto", fileDescriptorTarsum) }
 
-var fileDescriptorTarsum = []byte***REMOVED***
+var fileDescriptorTarsum = []byte{
 	// 196 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xe2, 0xe2, 0x29, 0x49, 0x2c, 0x2a,
 	0x2e, 0xcd, 0xd5, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0xe2, 0x2d, 0x4a, 0xcd, 0xcd, 0x2f, 0x49,
@@ -522,4 +522,4 @@ var fileDescriptorTarsum = []byte***REMOVED***
 	0xf8, 0xe0, 0x91, 0x1c, 0xe3, 0x8b, 0x47, 0x72, 0x0c, 0x1f, 0x1e, 0xc9, 0x31, 0x4e, 0x78, 0x2c,
 	0xc7, 0x90, 0xc4, 0x06, 0xf6, 0x90, 0x31, 0x20, 0x00, 0x00, 0xff, 0xff, 0x89, 0x57, 0x7d, 0x3f,
 	0xe0, 0x00, 0x00, 0x00,
-***REMOVED***
+}

@@ -14,40 +14,40 @@ import (
 )
 
 // NewAPIClient returns a docker API client configured from environment variables
-func NewAPIClient(t *testing.T) client.APIClient ***REMOVED***
+func NewAPIClient(t *testing.T) client.APIClient {
 	clt, err := client.NewEnvClient()
 	require.NoError(t, err)
 	return clt
-***REMOVED***
+}
 
 // NewTLSAPIClient returns a docker API client configured with the
 // provided TLS settings
-func NewTLSAPIClient(t *testing.T, host, cacertPath, certPath, keyPath string) (client.APIClient, error) ***REMOVED***
-	opts := tlsconfig.Options***REMOVED***
+func NewTLSAPIClient(t *testing.T, host, cacertPath, certPath, keyPath string) (client.APIClient, error) {
+	opts := tlsconfig.Options{
 		CAFile:             cacertPath,
 		CertFile:           certPath,
 		KeyFile:            keyPath,
 		ExclusiveRootPools: true,
-	***REMOVED***
+	}
 	config, err := tlsconfig.Client(opts)
 	require.Nil(t, err)
-	tr := &http.Transport***REMOVED***
+	tr := &http.Transport{
 		TLSClientConfig: config,
-		DialContext: (&net.Dialer***REMOVED***
+		DialContext: (&net.Dialer{
 			KeepAlive: 30 * time.Second,
 			Timeout:   30 * time.Second,
-		***REMOVED***).DialContext,
-	***REMOVED***
+		}).DialContext,
+	}
 	proto, addr, _, err := client.ParseHost(host)
 	require.Nil(t, err)
 
 	sockets.ConfigureTransport(tr, proto, addr)
 
-	httpClient := &http.Client***REMOVED***
+	httpClient := &http.Client{
 		Transport:     tr,
 		CheckRedirect: client.CheckRedirect,
-	***REMOVED***
+	}
 	verStr := api.DefaultVersion
-	customHeaders := map[string]string***REMOVED******REMOVED***
+	customHeaders := map[string]string{}
 	return client.NewClient(host, verStr, httpClient, customHeaders)
-***REMOVED***
+}

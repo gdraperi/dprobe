@@ -26,265 +26,265 @@ import (
 // by the cli.
 // It will mutate the specified user configuration (userConf) with the image
 // configuration where the user configuration is incomplete.
-func merge(userConf, imageConf *containertypes.Config) error ***REMOVED***
-	if userConf.User == "" ***REMOVED***
+func merge(userConf, imageConf *containertypes.Config) error {
+	if userConf.User == "" {
 		userConf.User = imageConf.User
-	***REMOVED***
-	if len(userConf.ExposedPorts) == 0 ***REMOVED***
+	}
+	if len(userConf.ExposedPorts) == 0 {
 		userConf.ExposedPorts = imageConf.ExposedPorts
-	***REMOVED*** else if imageConf.ExposedPorts != nil ***REMOVED***
-		for port := range imageConf.ExposedPorts ***REMOVED***
-			if _, exists := userConf.ExposedPorts[port]; !exists ***REMOVED***
-				userConf.ExposedPorts[port] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+	} else if imageConf.ExposedPorts != nil {
+		for port := range imageConf.ExposedPorts {
+			if _, exists := userConf.ExposedPorts[port]; !exists {
+				userConf.ExposedPorts[port] = struct{}{}
+			}
+		}
+	}
 
-	if len(userConf.Env) == 0 ***REMOVED***
+	if len(userConf.Env) == 0 {
 		userConf.Env = imageConf.Env
-	***REMOVED*** else ***REMOVED***
-		for _, imageEnv := range imageConf.Env ***REMOVED***
+	} else {
+		for _, imageEnv := range imageConf.Env {
 			found := false
 			imageEnvKey := strings.Split(imageEnv, "=")[0]
-			for _, userEnv := range userConf.Env ***REMOVED***
+			for _, userEnv := range userConf.Env {
 				userEnvKey := strings.Split(userEnv, "=")[0]
-				if runtime.GOOS == "windows" ***REMOVED***
+				if runtime.GOOS == "windows" {
 					// Case insensitive environment variables on Windows
 					imageEnvKey = strings.ToUpper(imageEnvKey)
 					userEnvKey = strings.ToUpper(userEnvKey)
-				***REMOVED***
-				if imageEnvKey == userEnvKey ***REMOVED***
+				}
+				if imageEnvKey == userEnvKey {
 					found = true
 					break
-				***REMOVED***
-			***REMOVED***
-			if !found ***REMOVED***
+				}
+			}
+			if !found {
 				userConf.Env = append(userConf.Env, imageEnv)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
-	if userConf.Labels == nil ***REMOVED***
-		userConf.Labels = map[string]string***REMOVED******REMOVED***
-	***REMOVED***
-	for l, v := range imageConf.Labels ***REMOVED***
-		if _, ok := userConf.Labels[l]; !ok ***REMOVED***
+	if userConf.Labels == nil {
+		userConf.Labels = map[string]string{}
+	}
+	for l, v := range imageConf.Labels {
+		if _, ok := userConf.Labels[l]; !ok {
 			userConf.Labels[l] = v
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if len(userConf.Entrypoint) == 0 ***REMOVED***
-		if len(userConf.Cmd) == 0 ***REMOVED***
+	if len(userConf.Entrypoint) == 0 {
+		if len(userConf.Cmd) == 0 {
 			userConf.Cmd = imageConf.Cmd
 			userConf.ArgsEscaped = imageConf.ArgsEscaped
-		***REMOVED***
+		}
 
-		if userConf.Entrypoint == nil ***REMOVED***
+		if userConf.Entrypoint == nil {
 			userConf.Entrypoint = imageConf.Entrypoint
-		***REMOVED***
-	***REMOVED***
-	if imageConf.Healthcheck != nil ***REMOVED***
-		if userConf.Healthcheck == nil ***REMOVED***
+		}
+	}
+	if imageConf.Healthcheck != nil {
+		if userConf.Healthcheck == nil {
 			userConf.Healthcheck = imageConf.Healthcheck
-		***REMOVED*** else ***REMOVED***
-			if len(userConf.Healthcheck.Test) == 0 ***REMOVED***
+		} else {
+			if len(userConf.Healthcheck.Test) == 0 {
 				userConf.Healthcheck.Test = imageConf.Healthcheck.Test
-			***REMOVED***
-			if userConf.Healthcheck.Interval == 0 ***REMOVED***
+			}
+			if userConf.Healthcheck.Interval == 0 {
 				userConf.Healthcheck.Interval = imageConf.Healthcheck.Interval
-			***REMOVED***
-			if userConf.Healthcheck.Timeout == 0 ***REMOVED***
+			}
+			if userConf.Healthcheck.Timeout == 0 {
 				userConf.Healthcheck.Timeout = imageConf.Healthcheck.Timeout
-			***REMOVED***
-			if userConf.Healthcheck.StartPeriod == 0 ***REMOVED***
+			}
+			if userConf.Healthcheck.StartPeriod == 0 {
 				userConf.Healthcheck.StartPeriod = imageConf.Healthcheck.StartPeriod
-			***REMOVED***
-			if userConf.Healthcheck.Retries == 0 ***REMOVED***
+			}
+			if userConf.Healthcheck.Retries == 0 {
 				userConf.Healthcheck.Retries = imageConf.Healthcheck.Retries
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
-	if userConf.WorkingDir == "" ***REMOVED***
+	if userConf.WorkingDir == "" {
 		userConf.WorkingDir = imageConf.WorkingDir
-	***REMOVED***
-	if len(userConf.Volumes) == 0 ***REMOVED***
+	}
+	if len(userConf.Volumes) == 0 {
 		userConf.Volumes = imageConf.Volumes
-	***REMOVED*** else ***REMOVED***
-		for k, v := range imageConf.Volumes ***REMOVED***
+	} else {
+		for k, v := range imageConf.Volumes {
 			userConf.Volumes[k] = v
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if userConf.StopSignal == "" ***REMOVED***
+	if userConf.StopSignal == "" {
 		userConf.StopSignal = imageConf.StopSignal
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // Commit creates a new filesystem image from the current state of a container.
 // The image can optionally be tagged into a repository.
-func (daemon *Daemon) Commit(name string, c *backend.ContainerCommitConfig) (string, error) ***REMOVED***
+func (daemon *Daemon) Commit(name string, c *backend.ContainerCommitConfig) (string, error) {
 	start := time.Now()
 	container, err := daemon.GetContainer(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 
 	// It is not possible to commit a running container on Windows
-	if (runtime.GOOS == "windows") && container.IsRunning() ***REMOVED***
+	if (runtime.GOOS == "windows") && container.IsRunning() {
 		return "", errors.Errorf("%+v does not support commit of a running container", runtime.GOOS)
-	***REMOVED***
+	}
 
-	if container.IsDead() ***REMOVED***
+	if container.IsDead() {
 		err := fmt.Errorf("You cannot commit container %s which is Dead", container.ID)
 		return "", errdefs.Conflict(err)
-	***REMOVED***
+	}
 
-	if container.IsRemovalInProgress() ***REMOVED***
+	if container.IsRemovalInProgress() {
 		err := fmt.Errorf("You cannot commit container %s which is being removed", container.ID)
 		return "", errdefs.Conflict(err)
-	***REMOVED***
+	}
 
-	if c.Pause && !container.IsPaused() ***REMOVED***
+	if c.Pause && !container.IsPaused() {
 		daemon.containerPause(container)
 		defer daemon.containerUnpause(container)
-	***REMOVED***
-	if !system.IsOSSupported(container.OS) ***REMOVED***
+	}
+	if !system.IsOSSupported(container.OS) {
 		return "", system.ErrNotSupportedOperatingSystem
-	***REMOVED***
+	}
 
-	if c.MergeConfigs && c.Config == nil ***REMOVED***
+	if c.MergeConfigs && c.Config == nil {
 		c.Config = container.Config
-	***REMOVED***
+	}
 
 	newConfig, err := dockerfile.BuildFromConfig(c.Config, c.Changes, container.OS)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 
-	if c.MergeConfigs ***REMOVED***
-		if err := merge(newConfig, container.Config); err != nil ***REMOVED***
+	if c.MergeConfigs {
+		if err := merge(newConfig, container.Config); err != nil {
 			return "", err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	rwTar, err := daemon.exportContainerRw(container)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
-	defer func() ***REMOVED***
-		if rwTar != nil ***REMOVED***
+	}
+	defer func() {
+		if rwTar != nil {
 			rwTar.Close()
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
 	var parent *image.Image
-	if container.ImageID == "" ***REMOVED***
+	if container.ImageID == "" {
 		parent = new(image.Image)
 		parent.RootFS = image.NewRootFS()
-	***REMOVED*** else ***REMOVED***
+	} else {
 		parent, err = daemon.imageStore.Get(container.ImageID)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return "", err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	l, err := daemon.layerStores[container.OS].Register(rwTar, parent.RootFS.ChainID())
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	defer layer.ReleaseAndLog(daemon.layerStores[container.OS], l)
 
 	containerConfig := c.ContainerConfig
-	if containerConfig == nil ***REMOVED***
+	if containerConfig == nil {
 		containerConfig = container.Config
-	***REMOVED***
-	cc := image.ChildConfig***REMOVED***
+	}
+	cc := image.ChildConfig{
 		ContainerID:     container.ID,
 		Author:          c.Author,
 		Comment:         c.Comment,
 		ContainerConfig: containerConfig,
 		Config:          newConfig,
 		DiffID:          l.DiffID(),
-	***REMOVED***
+	}
 	config, err := json.Marshal(image.NewChildImage(parent, cc, container.OS))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 
 	id, err := daemon.imageStore.Create(config)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 
-	if container.ImageID != "" ***REMOVED***
-		if err := daemon.imageStore.SetParent(id, container.ImageID); err != nil ***REMOVED***
+	if container.ImageID != "" {
+		if err := daemon.imageStore.SetParent(id, container.ImageID); err != nil {
 			return "", err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	imageRef := ""
-	if c.Repo != "" ***REMOVED***
+	if c.Repo != "" {
 		newTag, err := reference.ParseNormalizedNamed(c.Repo) // todo: should move this to API layer
-		if err != nil ***REMOVED***
+		if err != nil {
 			return "", err
-		***REMOVED***
-		if !reference.IsNameOnly(newTag) ***REMOVED***
+		}
+		if !reference.IsNameOnly(newTag) {
 			return "", errors.Errorf("unexpected repository name: %s", c.Repo)
-		***REMOVED***
-		if c.Tag != "" ***REMOVED***
-			if newTag, err = reference.WithTag(newTag, c.Tag); err != nil ***REMOVED***
+		}
+		if c.Tag != "" {
+			if newTag, err = reference.WithTag(newTag, c.Tag); err != nil {
 				return "", err
-			***REMOVED***
-		***REMOVED***
-		if err := daemon.TagImageWithReference(id, newTag); err != nil ***REMOVED***
+			}
+		}
+		if err := daemon.TagImageWithReference(id, newTag); err != nil {
 			return "", err
-		***REMOVED***
+		}
 		imageRef = reference.FamiliarString(newTag)
-	***REMOVED***
+	}
 
-	attributes := map[string]string***REMOVED***
+	attributes := map[string]string{
 		"comment":  c.Comment,
 		"imageID":  id.String(),
 		"imageRef": imageRef,
-	***REMOVED***
+	}
 	daemon.LogContainerEventWithAttributes(container, "commit", attributes)
 	containerActions.WithValues("commit").UpdateSince(start)
 	return id.String(), nil
-***REMOVED***
+}
 
-func (daemon *Daemon) exportContainerRw(container *container.Container) (arch io.ReadCloser, err error) ***REMOVED***
+func (daemon *Daemon) exportContainerRw(container *container.Container) (arch io.ReadCloser, err error) {
 	// Note: Indexing by OS is safe as only called from `Commit` which has already performed validation
 	rwlayer, err := daemon.layerStores[container.OS].GetRWLayer(container.ID)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	defer func() ***REMOVED***
-		if err != nil ***REMOVED***
+	}
+	defer func() {
+		if err != nil {
 			daemon.layerStores[container.OS].ReleaseRWLayer(rwlayer)
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
 	// TODO: this mount call is not necessary as we assume that TarStream() should
 	// mount the layer if needed. But the Diff() function for windows requests that
 	// the layer should be mounted when calling it. So we reserve this mount call
 	// until windows driver can implement Diff() interface correctly.
 	_, err = rwlayer.Mount(container.GetMountLabel())
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	archive, err := rwlayer.TarStream()
-	if err != nil ***REMOVED***
+	if err != nil {
 		rwlayer.Unmount()
 		return nil, err
-	***REMOVED***
-	return ioutils.NewReadCloserWrapper(archive, func() error ***REMOVED***
+	}
+	return ioutils.NewReadCloserWrapper(archive, func() error {
 			archive.Close()
 			err = rwlayer.Unmount()
 			daemon.layerStores[container.OS].ReleaseRWLayer(rwlayer)
 			return err
-		***REMOVED***),
+		}),
 		nil
-***REMOVED***
+}

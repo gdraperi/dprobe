@@ -19,18 +19,18 @@ import (
 
 // ErrNoSupport is an error type used for errors indicating that an operation
 // is not supported. It encapsulates a more specific error.
-type ErrNoSupport struct***REMOVED*** Err error ***REMOVED***
+type ErrNoSupport struct{ Err error }
 
-func (e ErrNoSupport) Error() string ***REMOVED***
-	if e.Err == nil ***REMOVED***
+func (e ErrNoSupport) Error() string {
+	if e.Err == nil {
 		return "not supported"
-	***REMOVED***
+	}
 	return e.Err.Error()
-***REMOVED***
+}
 
 // fallbackError wraps an error that can possibly allow fallback to a different
 // endpoint.
-type fallbackError struct ***REMOVED***
+type fallbackError struct {
 	// err is the error being wrapped.
 	err error
 	// confirmedV2 is set to true if it was confirmed that the registry
@@ -41,33 +41,33 @@ type fallbackError struct ***REMOVED***
 	// registry. This confirms that we're using appropriate TLS settings
 	// (or lack of TLS).
 	transportOK bool
-***REMOVED***
+}
 
 // Error renders the FallbackError as a string.
-func (f fallbackError) Error() string ***REMOVED***
+func (f fallbackError) Error() string {
 	return f.Cause().Error()
-***REMOVED***
+}
 
-func (f fallbackError) Cause() error ***REMOVED***
+func (f fallbackError) Cause() error {
 	return f.err
-***REMOVED***
+}
 
 // shouldV2Fallback returns true if this error is a reason to fall back to v1.
-func shouldV2Fallback(err errcode.Error) bool ***REMOVED***
-	switch err.Code ***REMOVED***
+func shouldV2Fallback(err errcode.Error) bool {
+	switch err.Code {
 	case errcode.ErrorCodeUnauthorized, v2.ErrorCodeManifestUnknown, v2.ErrorCodeNameUnknown:
 		return true
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
-type notFoundError struct ***REMOVED***
+type notFoundError struct {
 	cause errcode.Error
 	ref   reference.Named
-***REMOVED***
+}
 
-func (e notFoundError) Error() string ***REMOVED***
-	switch e.cause.Code ***REMOVED***
+func (e notFoundError) Error() string {
+	switch e.cause.Code {
 	case errcode.ErrorCodeDenied:
 		// ErrorCodeDenied is used when access to the repository was denied
 		return fmt.Sprintf("pull access denied for %s, repository does not exist or may require 'docker login'", reference.FamiliarName(e.ref))
@@ -75,50 +75,50 @@ func (e notFoundError) Error() string ***REMOVED***
 		return fmt.Sprintf("manifest for %s not found", reference.FamiliarString(e.ref))
 	case v2.ErrorCodeNameUnknown:
 		return fmt.Sprintf("repository %s not found", reference.FamiliarName(e.ref))
-	***REMOVED***
+	}
 	// Shouldn't get here, but this is better than returning an empty string
 	return e.cause.Message
-***REMOVED***
+}
 
-func (e notFoundError) NotFound() ***REMOVED******REMOVED***
+func (e notFoundError) NotFound() {}
 
-func (e notFoundError) Cause() error ***REMOVED***
+func (e notFoundError) Cause() error {
 	return e.cause
-***REMOVED***
+}
 
 // TranslatePullError is used to convert an error from a registry pull
 // operation to an error representing the entire pull operation. Any error
 // information which is not used by the returned error gets output to
 // log at info level.
-func TranslatePullError(err error, ref reference.Named) error ***REMOVED***
-	switch v := err.(type) ***REMOVED***
+func TranslatePullError(err error, ref reference.Named) error {
+	switch v := err.(type) {
 	case errcode.Errors:
-		if len(v) != 0 ***REMOVED***
-			for _, extra := range v[1:] ***REMOVED***
+		if len(v) != 0 {
+			for _, extra := range v[1:] {
 				logrus.Infof("Ignoring extra error returned from registry: %v", extra)
-			***REMOVED***
+			}
 			return TranslatePullError(v[0], ref)
-		***REMOVED***
+		}
 	case errcode.Error:
-		switch v.Code ***REMOVED***
+		switch v.Code {
 		case errcode.ErrorCodeDenied, v2.ErrorCodeManifestUnknown, v2.ErrorCodeNameUnknown:
-			return notFoundError***REMOVED***v, ref***REMOVED***
-		***REMOVED***
+			return notFoundError{v, ref}
+		}
 	case xfer.DoNotRetry:
 		return TranslatePullError(v.Err, ref)
-	***REMOVED***
+	}
 
 	return errdefs.Unknown(err)
-***REMOVED***
+}
 
 // continueOnError returns true if we should fallback to the next endpoint
 // as a result of this error.
-func continueOnError(err error, mirrorEndpoint bool) bool ***REMOVED***
-	switch v := err.(type) ***REMOVED***
+func continueOnError(err error, mirrorEndpoint bool) bool {
+	switch v := err.(type) {
 	case errcode.Errors:
-		if len(v) == 0 ***REMOVED***
+		if len(v) == 0 {
 			return true
-		***REMOVED***
+		}
 		return continueOnError(v[0], mirrorEndpoint)
 	case ErrNoSupport:
 		return continueOnError(v.Err, mirrorEndpoint)
@@ -134,73 +134,73 @@ func continueOnError(err error, mirrorEndpoint bool) bool ***REMOVED***
 		return mirrorEndpoint
 	case error:
 		return !strings.Contains(err.Error(), strings.ToLower(syscall.ESRCH.Error()))
-	***REMOVED***
+	}
 	// let's be nice and fallback if the error is a completely
 	// unexpected one.
 	// If new errors have to be handled in some way, please
 	// add them to the switch above.
 	return true
-***REMOVED***
+}
 
 // retryOnError wraps the error in xfer.DoNotRetry if we should not retry the
 // operation after this error.
-func retryOnError(err error) error ***REMOVED***
-	switch v := err.(type) ***REMOVED***
+func retryOnError(err error) error {
+	switch v := err.(type) {
 	case errcode.Errors:
-		if len(v) != 0 ***REMOVED***
+		if len(v) != 0 {
 			return retryOnError(v[0])
-		***REMOVED***
+		}
 	case errcode.Error:
-		switch v.Code ***REMOVED***
+		switch v.Code {
 		case errcode.ErrorCodeUnauthorized, errcode.ErrorCodeUnsupported, errcode.ErrorCodeDenied, errcode.ErrorCodeTooManyRequests, v2.ErrorCodeNameUnknown:
-			return xfer.DoNotRetry***REMOVED***Err: err***REMOVED***
-		***REMOVED***
+			return xfer.DoNotRetry{Err: err}
+		}
 	case *url.Error:
-		switch v.Err ***REMOVED***
+		switch v.Err {
 		case auth.ErrNoBasicAuthCredentials, auth.ErrNoToken:
-			return xfer.DoNotRetry***REMOVED***Err: v.Err***REMOVED***
-		***REMOVED***
+			return xfer.DoNotRetry{Err: v.Err}
+		}
 		return retryOnError(v.Err)
 	case *client.UnexpectedHTTPResponseError:
-		return xfer.DoNotRetry***REMOVED***Err: err***REMOVED***
+		return xfer.DoNotRetry{Err: err}
 	case error:
-		if err == distribution.ErrBlobUnknown ***REMOVED***
-			return xfer.DoNotRetry***REMOVED***Err: err***REMOVED***
-		***REMOVED***
-		if strings.Contains(err.Error(), strings.ToLower(syscall.ENOSPC.Error())) ***REMOVED***
-			return xfer.DoNotRetry***REMOVED***Err: err***REMOVED***
-		***REMOVED***
-	***REMOVED***
+		if err == distribution.ErrBlobUnknown {
+			return xfer.DoNotRetry{Err: err}
+		}
+		if strings.Contains(err.Error(), strings.ToLower(syscall.ENOSPC.Error())) {
+			return xfer.DoNotRetry{Err: err}
+		}
+	}
 	// let's be nice and fallback if the error is a completely
 	// unexpected one.
 	// If new errors have to be handled in some way, please
 	// add them to the switch above.
 	return err
-***REMOVED***
+}
 
-type invalidManifestClassError struct ***REMOVED***
+type invalidManifestClassError struct {
 	mediaType string
 	class     string
-***REMOVED***
+}
 
-func (e invalidManifestClassError) Error() string ***REMOVED***
+func (e invalidManifestClassError) Error() string {
 	return fmt.Sprintf("Encountered remote %q(%s) when fetching", e.mediaType, e.class)
-***REMOVED***
+}
 
-func (e invalidManifestClassError) InvalidParameter() ***REMOVED******REMOVED***
+func (e invalidManifestClassError) InvalidParameter() {}
 
-type invalidManifestFormatError struct***REMOVED******REMOVED***
+type invalidManifestFormatError struct{}
 
-func (invalidManifestFormatError) Error() string ***REMOVED***
+func (invalidManifestFormatError) Error() string {
 	return "unsupported manifest format"
-***REMOVED***
+}
 
-func (invalidManifestFormatError) InvalidParameter() ***REMOVED******REMOVED***
+func (invalidManifestFormatError) InvalidParameter() {}
 
 type reservedNameError string
 
-func (e reservedNameError) Error() string ***REMOVED***
+func (e reservedNameError) Error() string {
 	return "'" + string(e) + "' is a reserved name"
-***REMOVED***
+}
 
-func (e reservedNameError) Forbidden() ***REMOVED******REMOVED***
+func (e reservedNameError) Forbidden() {}

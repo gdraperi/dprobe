@@ -36,22 +36,22 @@ var ErrHashTooShort = errors.New("crypto/bcrypt: hashedSecret too short to be a 
 // a bcrypt algorithm newer than this implementation.
 type HashVersionTooNewError byte
 
-func (hv HashVersionTooNewError) Error() string ***REMOVED***
+func (hv HashVersionTooNewError) Error() string {
 	return fmt.Sprintf("crypto/bcrypt: bcrypt algorithm version '%c' requested is newer than current version '%c'", byte(hv), majorVersion)
-***REMOVED***
+}
 
 // The error returned from CompareHashAndPassword when a hash starts with something other than '$'
 type InvalidHashPrefixError byte
 
-func (ih InvalidHashPrefixError) Error() string ***REMOVED***
+func (ih InvalidHashPrefixError) Error() string {
 	return fmt.Sprintf("crypto/bcrypt: bcrypt hashes must start with '$', but hashedSecret started with '%c'", byte(ih))
-***REMOVED***
+}
 
 type InvalidCostError int
 
-func (ic InvalidCostError) Error() string ***REMOVED***
+func (ic InvalidCostError) Error() string {
 	return fmt.Sprintf("crypto/bcrypt: cost %d is outside allowed range (%d,%d)", int(ic), int(MinCost), int(MaxCost))
-***REMOVED***
+}
 
 const (
 	majorVersion       = '2'
@@ -65,111 +65,111 @@ const (
 
 // magicCipherData is an IV for the 64 Blowfish encryption calls in
 // bcrypt(). It's the string "OrpheanBeholderScryDoubt" in big-endian bytes.
-var magicCipherData = []byte***REMOVED***
+var magicCipherData = []byte{
 	0x4f, 0x72, 0x70, 0x68,
 	0x65, 0x61, 0x6e, 0x42,
 	0x65, 0x68, 0x6f, 0x6c,
 	0x64, 0x65, 0x72, 0x53,
 	0x63, 0x72, 0x79, 0x44,
 	0x6f, 0x75, 0x62, 0x74,
-***REMOVED***
+}
 
-type hashed struct ***REMOVED***
+type hashed struct {
 	hash  []byte
 	salt  []byte
 	cost  int // allowed range is MinCost to MaxCost
 	major byte
 	minor byte
-***REMOVED***
+}
 
 // GenerateFromPassword returns the bcrypt hash of the password at the given
 // cost. If the cost given is less than MinCost, the cost will be set to
 // DefaultCost, instead. Use CompareHashAndPassword, as defined in this package,
 // to compare the returned hashed password with its cleartext version.
-func GenerateFromPassword(password []byte, cost int) ([]byte, error) ***REMOVED***
+func GenerateFromPassword(password []byte, cost int) ([]byte, error) {
 	p, err := newFromPassword(password, cost)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return p.Hash(), nil
-***REMOVED***
+}
 
 // CompareHashAndPassword compares a bcrypt hashed password with its possible
 // plaintext equivalent. Returns nil on success, or an error on failure.
-func CompareHashAndPassword(hashedPassword, password []byte) error ***REMOVED***
+func CompareHashAndPassword(hashedPassword, password []byte) error {
 	p, err := newFromHash(hashedPassword)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	otherHash, err := bcrypt(password, p.cost, p.salt)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	otherP := &hashed***REMOVED***otherHash, p.salt, p.cost, p.major, p.minor***REMOVED***
-	if subtle.ConstantTimeCompare(p.Hash(), otherP.Hash()) == 1 ***REMOVED***
+	otherP := &hashed{otherHash, p.salt, p.cost, p.major, p.minor}
+	if subtle.ConstantTimeCompare(p.Hash(), otherP.Hash()) == 1 {
 		return nil
-	***REMOVED***
+	}
 
 	return ErrMismatchedHashAndPassword
-***REMOVED***
+}
 
 // Cost returns the hashing cost used to create the given hashed
 // password. When, in the future, the hashing cost of a password system needs
 // to be increased in order to adjust for greater computational power, this
 // function allows one to establish which passwords need to be updated.
-func Cost(hashedPassword []byte) (int, error) ***REMOVED***
+func Cost(hashedPassword []byte) (int, error) {
 	p, err := newFromHash(hashedPassword)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	return p.cost, nil
-***REMOVED***
+}
 
-func newFromPassword(password []byte, cost int) (*hashed, error) ***REMOVED***
-	if cost < MinCost ***REMOVED***
+func newFromPassword(password []byte, cost int) (*hashed, error) {
+	if cost < MinCost {
 		cost = DefaultCost
-	***REMOVED***
+	}
 	p := new(hashed)
 	p.major = majorVersion
 	p.minor = minorVersion
 
 	err := checkCost(cost)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	p.cost = cost
 
 	unencodedSalt := make([]byte, maxSaltSize)
 	_, err = io.ReadFull(rand.Reader, unencodedSalt)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	p.salt = base64Encode(unencodedSalt)
 	hash, err := bcrypt(password, p.cost, p.salt)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	p.hash = hash
 	return p, err
-***REMOVED***
+}
 
-func newFromHash(hashedSecret []byte) (*hashed, error) ***REMOVED***
-	if len(hashedSecret) < minHashSize ***REMOVED***
+func newFromHash(hashedSecret []byte) (*hashed, error) {
+	if len(hashedSecret) < minHashSize {
 		return nil, ErrHashTooShort
-	***REMOVED***
+	}
 	p := new(hashed)
 	n, err := p.decodeVersion(hashedSecret)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	hashedSecret = hashedSecret[n:]
 	n, err = p.decodeCost(hashedSecret)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	hashedSecret = hashedSecret[n:]
 
 	// The "+2" is here because we'll have to append at most 2 '=' to the salt
@@ -182,34 +182,34 @@ func newFromHash(hashedSecret []byte) (*hashed, error) ***REMOVED***
 	copy(p.hash, hashedSecret)
 
 	return p, nil
-***REMOVED***
+}
 
-func bcrypt(password []byte, cost int, salt []byte) ([]byte, error) ***REMOVED***
+func bcrypt(password []byte, cost int, salt []byte) ([]byte, error) {
 	cipherData := make([]byte, len(magicCipherData))
 	copy(cipherData, magicCipherData)
 
 	c, err := expensiveBlowfishSetup(password, uint32(cost), salt)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	for i := 0; i < 24; i += 8 ***REMOVED***
-		for j := 0; j < 64; j++ ***REMOVED***
+	for i := 0; i < 24; i += 8 {
+		for j := 0; j < 64; j++ {
 			c.Encrypt(cipherData[i:i+8], cipherData[i:i+8])
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Bug compatibility with C bcrypt implementations. We only encode 23 of
 	// the 24 bytes encrypted.
 	hsh := base64Encode(cipherData[:maxCryptedHashSize])
 	return hsh, nil
-***REMOVED***
+}
 
-func expensiveBlowfishSetup(key []byte, cost uint32, salt []byte) (*blowfish.Cipher, error) ***REMOVED***
+func expensiveBlowfishSetup(key []byte, cost uint32, salt []byte) (*blowfish.Cipher, error) {
 	csalt, err := base64Decode(salt)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// Bug compatibility with C bcrypt implementations. They use the trailing
 	// NULL in the key string during expansion.
@@ -217,29 +217,29 @@ func expensiveBlowfishSetup(key []byte, cost uint32, salt []byte) (*blowfish.Cip
 	ckey := append(key[:len(key):len(key)], 0)
 
 	c, err := blowfish.NewSaltedCipher(ckey, csalt)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	var i, rounds uint64
 	rounds = 1 << cost
-	for i = 0; i < rounds; i++ ***REMOVED***
+	for i = 0; i < rounds; i++ {
 		blowfish.ExpandKey(ckey, c)
 		blowfish.ExpandKey(csalt, c)
-	***REMOVED***
+	}
 
 	return c, nil
-***REMOVED***
+}
 
-func (p *hashed) Hash() []byte ***REMOVED***
+func (p *hashed) Hash() []byte {
 	arr := make([]byte, 60)
 	arr[0] = '$'
 	arr[1] = p.major
 	n := 2
-	if p.minor != 0 ***REMOVED***
+	if p.minor != 0 {
 		arr[2] = p.minor
 		n = 3
-	***REMOVED***
+	}
 	arr[n] = '$'
 	n++
 	copy(arr[n:], []byte(fmt.Sprintf("%02d", p.cost)))
@@ -251,45 +251,45 @@ func (p *hashed) Hash() []byte ***REMOVED***
 	copy(arr[n:], p.hash)
 	n += encodedHashSize
 	return arr[:n]
-***REMOVED***
+}
 
-func (p *hashed) decodeVersion(sbytes []byte) (int, error) ***REMOVED***
-	if sbytes[0] != '$' ***REMOVED***
+func (p *hashed) decodeVersion(sbytes []byte) (int, error) {
+	if sbytes[0] != '$' {
 		return -1, InvalidHashPrefixError(sbytes[0])
-	***REMOVED***
-	if sbytes[1] > majorVersion ***REMOVED***
+	}
+	if sbytes[1] > majorVersion {
 		return -1, HashVersionTooNewError(sbytes[1])
-	***REMOVED***
+	}
 	p.major = sbytes[1]
 	n := 3
-	if sbytes[2] != '$' ***REMOVED***
+	if sbytes[2] != '$' {
 		p.minor = sbytes[2]
 		n++
-	***REMOVED***
+	}
 	return n, nil
-***REMOVED***
+}
 
 // sbytes should begin where decodeVersion left off.
-func (p *hashed) decodeCost(sbytes []byte) (int, error) ***REMOVED***
+func (p *hashed) decodeCost(sbytes []byte) (int, error) {
 	cost, err := strconv.Atoi(string(sbytes[0:2]))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return -1, err
-	***REMOVED***
+	}
 	err = checkCost(cost)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return -1, err
-	***REMOVED***
+	}
 	p.cost = cost
 	return 3, nil
-***REMOVED***
+}
 
-func (p *hashed) String() string ***REMOVED***
-	return fmt.Sprintf("&***REMOVED***hash: %#v, salt: %#v, cost: %d, major: %c, minor: %c***REMOVED***", string(p.hash), p.salt, p.cost, p.major, p.minor)
-***REMOVED***
+func (p *hashed) String() string {
+	return fmt.Sprintf("&{hash: %#v, salt: %#v, cost: %d, major: %c, minor: %c}", string(p.hash), p.salt, p.cost, p.major, p.minor)
+}
 
-func checkCost(cost int) error ***REMOVED***
-	if cost < MinCost || cost > MaxCost ***REMOVED***
+func checkCost(cost int) error {
+	if cost < MinCost || cost > MaxCost {
 		return InvalidCostError(cost)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

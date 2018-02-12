@@ -135,7 +135,7 @@ make_struct_arg_cmp(
                     uint64_t a,
                     uint64_t b
                    )
-***REMOVED***
+{
 	struct scmp_arg_cmp *s = malloc(sizeof(struct scmp_arg_cmp));
 
 	s->arg = arg;
@@ -144,7 +144,7 @@ make_struct_arg_cmp(
 	s->datum_b = b;
 
 	return s;
-***REMOVED***
+}
 */
 import "C"
 
@@ -186,170 +186,170 @@ var (
 // Nonexported functions
 
 // Check if library version is greater than or equal to the given one
-func checkVersionAbove(major, minor, micro int) bool ***REMOVED***
+func checkVersionAbove(major, minor, micro int) bool {
 	return (verMajor > major) ||
 		(verMajor == major && verMinor > minor) ||
 		(verMajor == major && verMinor == minor && verMicro >= micro)
-***REMOVED***
+}
 
 // Init function: Verify library version is appropriate
-func init() ***REMOVED***
-	if !checkVersionAbove(2, 1, 0) ***REMOVED***
+func init() {
+	if !checkVersionAbove(2, 1, 0) {
 		fmt.Fprintf(os.Stderr, "Libseccomp version too low: minimum supported is 2.1.0, detected %d.%d.%d", C.C_VERSION_MAJOR, C.C_VERSION_MINOR, C.C_VERSION_MICRO)
 		os.Exit(-1)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Filter helpers
 
 // Filter finalizer - ensure that kernel context for filters is freed
-func filterFinalizer(f *ScmpFilter) ***REMOVED***
+func filterFinalizer(f *ScmpFilter) {
 	f.Release()
-***REMOVED***
+}
 
 // Get a raw filter attribute
-func (f *ScmpFilter) getFilterAttr(attr scmpFilterAttr) (C.uint32_t, error) ***REMOVED***
+func (f *ScmpFilter) getFilterAttr(attr scmpFilterAttr) (C.uint32_t, error) {
 	f.lock.Lock()
 	defer f.lock.Unlock()
 
-	if !f.valid ***REMOVED***
+	if !f.valid {
 		return 0x0, errBadFilter
-	***REMOVED***
+	}
 
-	if !checkVersionAbove(2, 2, 0) && attr == filterAttrTsync ***REMOVED***
+	if !checkVersionAbove(2, 2, 0) && attr == filterAttrTsync {
 		return 0x0, fmt.Errorf("the thread synchronization attribute is not supported in this version of the library")
-	***REMOVED***
+	}
 
 	var attribute C.uint32_t
 
 	retCode := C.seccomp_attr_get(f.filterCtx, attr.toNative(), &attribute)
-	if retCode != 0 ***REMOVED***
+	if retCode != 0 {
 		return 0x0, syscall.Errno(-1 * retCode)
-	***REMOVED***
+	}
 
 	return attribute, nil
-***REMOVED***
+}
 
 // Set a raw filter attribute
-func (f *ScmpFilter) setFilterAttr(attr scmpFilterAttr, value C.uint32_t) error ***REMOVED***
+func (f *ScmpFilter) setFilterAttr(attr scmpFilterAttr, value C.uint32_t) error {
 	f.lock.Lock()
 	defer f.lock.Unlock()
 
-	if !f.valid ***REMOVED***
+	if !f.valid {
 		return errBadFilter
-	***REMOVED***
+	}
 
-	if !checkVersionAbove(2, 2, 0) && attr == filterAttrTsync ***REMOVED***
+	if !checkVersionAbove(2, 2, 0) && attr == filterAttrTsync {
 		return fmt.Errorf("the thread synchronization attribute is not supported in this version of the library")
-	***REMOVED***
+	}
 
 	retCode := C.seccomp_attr_set(f.filterCtx, attr.toNative(), value)
-	if retCode != 0 ***REMOVED***
+	if retCode != 0 {
 		return syscall.Errno(-1 * retCode)
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // DOES NOT LOCK OR CHECK VALIDITY
 // Assumes caller has already done this
 // Wrapper for seccomp_rule_add_... functions
-func (f *ScmpFilter) addRuleWrapper(call ScmpSyscall, action ScmpAction, exact bool, cond C.scmp_cast_t) error ***REMOVED***
+func (f *ScmpFilter) addRuleWrapper(call ScmpSyscall, action ScmpAction, exact bool, cond C.scmp_cast_t) error {
 	var length C.uint
-	if cond != nil ***REMOVED***
+	if cond != nil {
 		length = 1
-	***REMOVED*** else ***REMOVED***
+	} else {
 		length = 0
-	***REMOVED***
+	}
 
 	var retCode C.int
-	if exact ***REMOVED***
+	if exact {
 		retCode = C.seccomp_rule_add_exact_array(f.filterCtx, action.toNative(), C.int(call), length, cond)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		retCode = C.seccomp_rule_add_array(f.filterCtx, action.toNative(), C.int(call), length, cond)
-	***REMOVED***
+	}
 
-	if syscall.Errno(-1*retCode) == syscall.EFAULT ***REMOVED***
+	if syscall.Errno(-1*retCode) == syscall.EFAULT {
 		return fmt.Errorf("unrecognized syscall")
-	***REMOVED*** else if syscall.Errno(-1*retCode) == syscall.EPERM ***REMOVED***
+	} else if syscall.Errno(-1*retCode) == syscall.EPERM {
 		return fmt.Errorf("requested action matches default action of filter")
-	***REMOVED*** else if retCode != 0 ***REMOVED***
+	} else if retCode != 0 {
 		return syscall.Errno(-1 * retCode)
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // Generic add function for filter rules
-func (f *ScmpFilter) addRuleGeneric(call ScmpSyscall, action ScmpAction, exact bool, conds []ScmpCondition) error ***REMOVED***
+func (f *ScmpFilter) addRuleGeneric(call ScmpSyscall, action ScmpAction, exact bool, conds []ScmpCondition) error {
 	f.lock.Lock()
 	defer f.lock.Unlock()
 
-	if !f.valid ***REMOVED***
+	if !f.valid {
 		return errBadFilter
-	***REMOVED***
+	}
 
-	if len(conds) == 0 ***REMOVED***
-		if err := f.addRuleWrapper(call, action, exact, nil); err != nil ***REMOVED***
+	if len(conds) == 0 {
+		if err := f.addRuleWrapper(call, action, exact, nil); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
+		}
+	} else {
 		// We don't support conditional filtering in library version v2.1
-		if !checkVersionAbove(2, 2, 1) ***REMOVED***
+		if !checkVersionAbove(2, 2, 1) {
 			return fmt.Errorf("conditional filtering requires libseccomp version >= 2.2.1")
-		***REMOVED***
+		}
 
-		for _, cond := range conds ***REMOVED***
+		for _, cond := range conds {
 			cmpStruct := C.make_struct_arg_cmp(C.uint(cond.Argument), cond.Op.toNative(), C.uint64_t(cond.Operand1), C.uint64_t(cond.Operand2))
 			defer C.free(cmpStruct)
 
-			if err := f.addRuleWrapper(call, action, exact, C.scmp_cast_t(cmpStruct)); err != nil ***REMOVED***
+			if err := f.addRuleWrapper(call, action, exact, C.scmp_cast_t(cmpStruct)); err != nil {
 				return err
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
 // Generic Helpers
 
 // Helper - Sanitize Arch token input
-func sanitizeArch(in ScmpArch) error ***REMOVED***
-	if in < archStart || in > archEnd ***REMOVED***
+func sanitizeArch(in ScmpArch) error {
+	if in < archStart || in > archEnd {
 		return fmt.Errorf("unrecognized architecture")
-	***REMOVED***
+	}
 
-	if in.toNative() == C.C_ARCH_BAD ***REMOVED***
+	if in.toNative() == C.C_ARCH_BAD {
 		return fmt.Errorf("architecture is not supported on this version of the library")
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func sanitizeAction(in ScmpAction) error ***REMOVED***
+func sanitizeAction(in ScmpAction) error {
 	inTmp := in & 0x0000FFFF
-	if inTmp < actionStart || inTmp > actionEnd ***REMOVED***
+	if inTmp < actionStart || inTmp > actionEnd {
 		return fmt.Errorf("unrecognized action")
-	***REMOVED***
+	}
 
-	if inTmp != ActTrace && inTmp != ActErrno && (in&0xFFFF0000) != 0 ***REMOVED***
+	if inTmp != ActTrace && inTmp != ActErrno && (in&0xFFFF0000) != 0 {
 		return fmt.Errorf("highest 16 bits must be zeroed except for Trace and Errno")
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func sanitizeCompareOp(in ScmpCompareOp) error ***REMOVED***
-	if in < compareOpStart || in > compareOpEnd ***REMOVED***
+func sanitizeCompareOp(in ScmpCompareOp) error {
+	if in < compareOpStart || in > compareOpEnd {
 		return fmt.Errorf("unrecognized comparison operator")
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func archFromNative(a C.uint32_t) (ScmpArch, error) ***REMOVED***
-	switch a ***REMOVED***
+func archFromNative(a C.uint32_t) (ScmpArch, error) {
+	switch a {
 	case C.C_ARCH_X86:
 		return ArchX86, nil
 	case C.C_ARCH_X86_64:
@@ -386,12 +386,12 @@ func archFromNative(a C.uint32_t) (ScmpArch, error) ***REMOVED***
 		return ArchS390X, nil
 	default:
 		return 0x0, fmt.Errorf("unrecognized architecture")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Only use with sanitized arches, no error handling
-func (a ScmpArch) toNative() C.uint32_t ***REMOVED***
-	switch a ***REMOVED***
+func (a ScmpArch) toNative() C.uint32_t {
+	switch a {
 	case ArchX86:
 		return C.C_ARCH_X86
 	case ArchAMD64:
@@ -428,12 +428,12 @@ func (a ScmpArch) toNative() C.uint32_t ***REMOVED***
 		return C.C_ARCH_NATIVE
 	default:
 		return 0x0
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Only use with sanitized ops, no error handling
-func (a ScmpCompareOp) toNative() C.int ***REMOVED***
-	switch a ***REMOVED***
+func (a ScmpCompareOp) toNative() C.int {
+	switch a {
 	case CompareNotEqual:
 		return C.C_CMP_NE
 	case CompareLess:
@@ -450,12 +450,12 @@ func (a ScmpCompareOp) toNative() C.int ***REMOVED***
 		return C.C_CMP_MASKED_EQ
 	default:
 		return 0x0
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func actionFromNative(a C.uint32_t) (ScmpAction, error) ***REMOVED***
+func actionFromNative(a C.uint32_t) (ScmpAction, error) {
 	aTmp := a & 0xFFFF
-	switch a & 0xFFFF0000 ***REMOVED***
+	switch a & 0xFFFF0000 {
 	case C.C_ACT_KILL:
 		return ActKill, nil
 	case C.C_ACT_TRAP:
@@ -468,12 +468,12 @@ func actionFromNative(a C.uint32_t) (ScmpAction, error) ***REMOVED***
 		return ActAllow, nil
 	default:
 		return 0x0, fmt.Errorf("unrecognized action")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Only use with sanitized actions, no error handling
-func (a ScmpAction) toNative() C.uint32_t ***REMOVED***
-	switch a & 0xFFFF ***REMOVED***
+func (a ScmpAction) toNative() C.uint32_t {
+	switch a & 0xFFFF {
 	case ActKill:
 		return C.C_ACT_KILL
 	case ActTrap:
@@ -486,12 +486,12 @@ func (a ScmpAction) toNative() C.uint32_t ***REMOVED***
 		return C.C_ACT_ALLOW
 	default:
 		return 0x0
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Internal only, assumes safe attribute
-func (a scmpFilterAttr) toNative() uint32 ***REMOVED***
-	switch a ***REMOVED***
+func (a scmpFilterAttr) toNative() uint32 {
+	switch a {
 	case filterAttrActDefault:
 		return uint32(C.C_ATTRIBUTE_DEFAULT)
 	case filterAttrActBadArch:
@@ -502,5 +502,5 @@ func (a scmpFilterAttr) toNative() uint32 ***REMOVED***
 		return uint32(C.C_ATTRIBUTE_TSYNC)
 	default:
 		return 0x0
-	***REMOVED***
-***REMOVED***
+	}
+}

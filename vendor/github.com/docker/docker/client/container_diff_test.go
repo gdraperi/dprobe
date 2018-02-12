@@ -13,49 +13,49 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestContainerDiffError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestContainerDiffError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
-	***REMOVED***
+	}
 	_, err := client.ContainerDiff(context.Background(), "nothing")
-	if err == nil || err.Error() != "Error response from daemon: Server error" ***REMOVED***
+	if err == nil || err.Error() != "Error response from daemon: Server error" {
 		t.Fatalf("expected a Server Error, got %v", err)
-	***REMOVED***
+	}
 
-***REMOVED***
+}
 
-func TestContainerDiff(t *testing.T) ***REMOVED***
+func TestContainerDiff(t *testing.T) {
 	expectedURL := "/containers/container_id/changes"
-	client := &Client***REMOVED***
-		client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-			if !strings.HasPrefix(req.URL.Path, expectedURL) ***REMOVED***
+	client := &Client{
+		client: newMockClient(func(req *http.Request) (*http.Response, error) {
+			if !strings.HasPrefix(req.URL.Path, expectedURL) {
 				return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, req.URL)
-			***REMOVED***
-			b, err := json.Marshal([]container.ContainerChangeResponseItem***REMOVED***
-				***REMOVED***
+			}
+			b, err := json.Marshal([]container.ContainerChangeResponseItem{
+				{
 					Kind: 0,
 					Path: "/path/1",
-				***REMOVED***,
-				***REMOVED***
+				},
+				{
 					Kind: 1,
 					Path: "/path/2",
-				***REMOVED***,
-			***REMOVED***)
-			if err != nil ***REMOVED***
+				},
+			})
+			if err != nil {
 				return nil, err
-			***REMOVED***
-			return &http.Response***REMOVED***
+			}
+			return &http.Response{
 				StatusCode: http.StatusOK,
 				Body:       ioutil.NopCloser(bytes.NewReader(b)),
-			***REMOVED***, nil
-		***REMOVED***),
-	***REMOVED***
+			}, nil
+		}),
+	}
 
 	changes, err := client.ContainerDiff(context.Background(), "container_id")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if len(changes) != 2 ***REMOVED***
+	}
+	if len(changes) != 2 {
 		t.Fatalf("expected an array of 2 changes, got %v", changes)
-	***REMOVED***
-***REMOVED***
+	}
+}

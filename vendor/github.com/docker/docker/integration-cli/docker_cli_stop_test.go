@@ -5,7 +5,7 @@ import (
 	"github.com/go-check/check"
 )
 
-func (s *DockerSuite) TestStopContainerWithRestartPolicyAlways(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestStopContainerWithRestartPolicyAlways(c *check.C) {
 	dockerCmd(c, "run", "--name", "verifyRestart1", "-d", "--restart=always", "busybox", "false")
 	dockerCmd(c, "run", "--name", "verifyRestart2", "-d", "--restart=always", "busybox", "false")
 
@@ -14,4 +14,4 @@ func (s *DockerSuite) TestStopContainerWithRestartPolicyAlways(c *check.C) ***RE
 
 	dockerCmd(c, "stop", "verifyRestart1")
 	dockerCmd(c, "stop", "verifyRestart2")
-***REMOVED***
+}

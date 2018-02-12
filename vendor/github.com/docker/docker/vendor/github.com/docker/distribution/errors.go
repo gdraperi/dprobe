@@ -21,95 +21,95 @@ var ErrManifestNotModified = errors.New("manifest not modified")
 var ErrUnsupported = errors.New("operation unsupported")
 
 // ErrTagUnknown is returned if the given tag is not known by the tag service
-type ErrTagUnknown struct ***REMOVED***
+type ErrTagUnknown struct {
 	Tag string
-***REMOVED***
+}
 
-func (err ErrTagUnknown) Error() string ***REMOVED***
+func (err ErrTagUnknown) Error() string {
 	return fmt.Sprintf("unknown tag=%s", err.Tag)
-***REMOVED***
+}
 
 // ErrRepositoryUnknown is returned if the named repository is not known by
 // the registry.
-type ErrRepositoryUnknown struct ***REMOVED***
+type ErrRepositoryUnknown struct {
 	Name string
-***REMOVED***
+}
 
-func (err ErrRepositoryUnknown) Error() string ***REMOVED***
+func (err ErrRepositoryUnknown) Error() string {
 	return fmt.Sprintf("unknown repository name=%s", err.Name)
-***REMOVED***
+}
 
 // ErrRepositoryNameInvalid should be used to denote an invalid repository
 // name. Reason may set, indicating the cause of invalidity.
-type ErrRepositoryNameInvalid struct ***REMOVED***
+type ErrRepositoryNameInvalid struct {
 	Name   string
 	Reason error
-***REMOVED***
+}
 
-func (err ErrRepositoryNameInvalid) Error() string ***REMOVED***
+func (err ErrRepositoryNameInvalid) Error() string {
 	return fmt.Sprintf("repository name %q invalid: %v", err.Name, err.Reason)
-***REMOVED***
+}
 
 // ErrManifestUnknown is returned if the manifest is not known by the
 // registry.
-type ErrManifestUnknown struct ***REMOVED***
+type ErrManifestUnknown struct {
 	Name string
 	Tag  string
-***REMOVED***
+}
 
-func (err ErrManifestUnknown) Error() string ***REMOVED***
+func (err ErrManifestUnknown) Error() string {
 	return fmt.Sprintf("unknown manifest name=%s tag=%s", err.Name, err.Tag)
-***REMOVED***
+}
 
 // ErrManifestUnknownRevision is returned when a manifest cannot be found by
 // revision within a repository.
-type ErrManifestUnknownRevision struct ***REMOVED***
+type ErrManifestUnknownRevision struct {
 	Name     string
 	Revision digest.Digest
-***REMOVED***
+}
 
-func (err ErrManifestUnknownRevision) Error() string ***REMOVED***
+func (err ErrManifestUnknownRevision) Error() string {
 	return fmt.Sprintf("unknown manifest name=%s revision=%s", err.Name, err.Revision)
-***REMOVED***
+}
 
 // ErrManifestUnverified is returned when the registry is unable to verify
 // the manifest.
-type ErrManifestUnverified struct***REMOVED******REMOVED***
+type ErrManifestUnverified struct{}
 
-func (ErrManifestUnverified) Error() string ***REMOVED***
+func (ErrManifestUnverified) Error() string {
 	return "unverified manifest"
-***REMOVED***
+}
 
 // ErrManifestVerification provides a type to collect errors encountered
 // during manifest verification. Currently, it accepts errors of all types,
 // but it may be narrowed to those involving manifest verification.
 type ErrManifestVerification []error
 
-func (errs ErrManifestVerification) Error() string ***REMOVED***
+func (errs ErrManifestVerification) Error() string {
 	var parts []string
-	for _, err := range errs ***REMOVED***
+	for _, err := range errs {
 		parts = append(parts, err.Error())
-	***REMOVED***
+	}
 
 	return fmt.Sprintf("errors verifying manifest: %v", strings.Join(parts, ","))
-***REMOVED***
+}
 
 // ErrManifestBlobUnknown returned when a referenced blob cannot be found.
-type ErrManifestBlobUnknown struct ***REMOVED***
+type ErrManifestBlobUnknown struct {
 	Digest digest.Digest
-***REMOVED***
+}
 
-func (err ErrManifestBlobUnknown) Error() string ***REMOVED***
+func (err ErrManifestBlobUnknown) Error() string {
 	return fmt.Sprintf("unknown blob %v on manifest", err.Digest)
-***REMOVED***
+}
 
 // ErrManifestNameInvalid should be used to denote an invalid manifest
 // name. Reason may set, indicating the cause of invalidity.
-type ErrManifestNameInvalid struct ***REMOVED***
+type ErrManifestNameInvalid struct {
 	Name   string
 	Reason error
-***REMOVED***
+}
 
-func (err ErrManifestNameInvalid) Error() string ***REMOVED***
+func (err ErrManifestNameInvalid) Error() string {
 	return fmt.Sprintf("manifest name %q invalid: %v", err.Name, err.Reason)
-***REMOVED***
+}

@@ -10,10 +10,10 @@ import (
 // It contains a 4-digit error code where the most significant digit
 // describes the category where the error occurred and the rest 3 digits
 // describe the specific error reason.
-type Error struct ***REMOVED***
+type Error struct {
 	ErrorCode int    `json:"code"`
 	Message   string `json:"message"`
-***REMOVED***
+}
 
 // Category is the most significant digit of the error code.
 type Category int
@@ -203,33 +203,33 @@ const (
 )
 
 // The error interface implementation, which formats to a JSON object string.
-func (e *Error) Error() string ***REMOVED***
+func (e *Error) Error() string {
 	marshaled, err := json.Marshal(e)
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 	return string(marshaled)
 
-***REMOVED***
+}
 
 // New returns an error that contains  an error code and message derived from
 // the given category, reason. Currently, to avoid confusion, it is not
 // allowed to create an error of category Success
-func New(category Category, reason Reason) *Error ***REMOVED***
+func New(category Category, reason Reason) *Error {
 	errorCode := int(category) + int(reason)
 	var msg string
-	switch category ***REMOVED***
+	switch category {
 	case OCSPError:
-		switch reason ***REMOVED***
+		switch reason {
 		case ReadFailed:
 			msg = "No certificate provided"
 		case IssuerMismatch:
 			msg = "Certificate not issued by this issuer"
 		case InvalidStatus:
 			msg = "Invalid revocation status"
-		***REMOVED***
+		}
 	case CertificateError:
-		switch reason ***REMOVED***
+		switch reason {
 		case Unknown:
 			msg = "Unknown certificate error"
 		case ReadFailed:
@@ -250,9 +250,9 @@ func New(category Category, reason Reason) *Error ***REMOVED***
 			panic(fmt.Sprintf("Unsupported CFSSL error reason %d under category CertificateError.",
 				reason))
 
-		***REMOVED***
+		}
 	case PrivateKeyError:
-		switch reason ***REMOVED***
+		switch reason {
 		case Unknown:
 			msg = "Unknown private key error"
 		case ReadFailed:
@@ -274,9 +274,9 @@ func New(category Category, reason Reason) *Error ***REMOVED***
 		default:
 			panic(fmt.Sprintf("Unsupported CFSSL error reason %d under category PrivateKeyError.",
 				reason))
-		***REMOVED***
+		}
 	case IntermediatesError:
-		switch reason ***REMOVED***
+		switch reason {
 		case Unknown:
 			msg = "Unknown intermediate certificate error"
 		case ReadFailed:
@@ -288,9 +288,9 @@ func New(category Category, reason Reason) *Error ***REMOVED***
 		default:
 			panic(fmt.Sprintf("Unsupported CFSSL error reason %d under category IntermediatesError.",
 				reason))
-		***REMOVED***
+		}
 	case RootError:
-		switch reason ***REMOVED***
+		switch reason {
 		case Unknown:
 			msg = "Unknown root certificate error"
 		case ReadFailed:
@@ -302,9 +302,9 @@ func New(category Category, reason Reason) *Error ***REMOVED***
 		default:
 			panic(fmt.Sprintf("Unsupported CFSSL error reason %d under category RootError.",
 				reason))
-		***REMOVED***
+		}
 	case PolicyError:
-		switch reason ***REMOVED***
+		switch reason {
 		case Unknown:
 			msg = "Unknown policy error"
 		case NoKeyUsages:
@@ -320,17 +320,17 @@ func New(category Category, reason Reason) *Error ***REMOVED***
 		default:
 			panic(fmt.Sprintf("Unsupported CFSSL error reason %d under category PolicyError.",
 				reason))
-		***REMOVED***
+		}
 	case DialError:
-		switch reason ***REMOVED***
+		switch reason {
 		case Unknown:
 			msg = "Failed to dial remote server"
 		default:
 			panic(fmt.Sprintf("Unsupported CFSSL error reason %d under category DialError.",
 				reason))
-		***REMOVED***
+		}
 	case APIClientError:
-		switch reason ***REMOVED***
+		switch reason {
 		case AuthenticationFailure:
 			msg = "API client authentication failure"
 		case JSONError:
@@ -344,9 +344,9 @@ func New(category Category, reason Reason) *Error ***REMOVED***
 		default:
 			panic(fmt.Sprintf("Unsupported CFSSL error reason %d under category APIClientError.",
 				reason))
-		***REMOVED***
+		}
 	case CSRError:
-		switch reason ***REMOVED***
+		switch reason {
 		case Unknown:
 			msg = "CSR parsing failed due to unknown error"
 		case ReadFailed:
@@ -359,66 +359,66 @@ func New(category Category, reason Reason) *Error ***REMOVED***
 			msg = "CSR Bad request"
 		default:
 			panic(fmt.Sprintf("Unsupported CF-SSL error reason %d under category APIClientError.", reason))
-		***REMOVED***
+		}
 	case CTError:
-		switch reason ***REMOVED***
+		switch reason {
 		case Unknown:
 			msg = "Certificate transparency parsing failed due to unknown error"
 		case PrecertSubmissionFailed:
 			msg = "Certificate transparency precertificate submission failed"
 		default:
 			panic(fmt.Sprintf("Unsupported CF-SSL error reason %d under category CTError.", reason))
-		***REMOVED***
+		}
 	case CertStoreError:
-		switch reason ***REMOVED***
+		switch reason {
 		case Unknown:
 			msg = "Certificate store action failed due to unknown error"
 		default:
 			panic(fmt.Sprintf("Unsupported CF-SSL error reason %d under category CertStoreError.", reason))
-		***REMOVED***
+		}
 
 	default:
 		panic(fmt.Sprintf("Unsupported CFSSL error type: %d.",
 			category))
-	***REMOVED***
-	return &Error***REMOVED***ErrorCode: errorCode, Message: msg***REMOVED***
-***REMOVED***
+	}
+	return &Error{ErrorCode: errorCode, Message: msg}
+}
 
 // Wrap returns an error that contains the given error and an error code derived from
 // the given category, reason and the error. Currently, to avoid confusion, it is not
 // allowed to create an error of category Success
-func Wrap(category Category, reason Reason, err error) *Error ***REMOVED***
+func Wrap(category Category, reason Reason, err error) *Error {
 	errorCode := int(category) + int(reason)
-	if err == nil ***REMOVED***
+	if err == nil {
 		panic("Wrap needs a supplied error to initialize.")
-	***REMOVED***
+	}
 
 	// do not double wrap a error
-	switch err.(type) ***REMOVED***
+	switch err.(type) {
 	case *Error:
 		panic("Unable to wrap a wrapped error.")
-	***REMOVED***
+	}
 
-	switch category ***REMOVED***
+	switch category {
 	case CertificateError:
 		// given VerifyFailed , report the status with more detailed status code
 		// for some certificate errors we care.
-		if reason == VerifyFailed ***REMOVED***
-			switch errorType := err.(type) ***REMOVED***
+		if reason == VerifyFailed {
+			switch errorType := err.(type) {
 			case x509.CertificateInvalidError:
 				errorCode += certificateInvalid + int(errorType.Reason)
 			case x509.UnknownAuthorityError:
 				errorCode += unknownAuthority
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 	case PrivateKeyError, IntermediatesError, RootError, PolicyError, DialError,
 		APIClientError, CSRError, CTError, CertStoreError:
 	// no-op, just use the error
 	default:
 		panic(fmt.Sprintf("Unsupported CFSSL error type: %d.",
 			category))
-	***REMOVED***
+	}
 
-	return &Error***REMOVED***ErrorCode: errorCode, Message: err.Error()***REMOVED***
+	return &Error{ErrorCode: errorCode, Message: err.Error()}
 
-***REMOVED***
+}

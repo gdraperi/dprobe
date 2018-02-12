@@ -10,37 +10,37 @@ import "sync"
 import "time"
 
 // call is an in-flight or completed singleflight.Do call
-type call struct ***REMOVED***
+type call struct {
 	wg   sync.WaitGroup
 	val  *Msg
 	rtt  time.Duration
 	err  error
 	dups int
-***REMOVED***
+}
 
 // singleflight represents a class of work and forms a namespace in
 // which units of work can be executed with duplicate suppression.
-type singleflight struct ***REMOVED***
+type singleflight struct {
 	sync.Mutex                  // protects m
 	m          map[string]*call // lazily initialized
-***REMOVED***
+}
 
 // Do executes and returns the results of the given function, making
 // sure that only one execution is in-flight for a given key at a
 // time. If a duplicate comes in, the duplicate caller waits for the
 // original to complete and receives the same results.
 // The return value shared indicates whether v was given to multiple callers.
-func (g *singleflight) Do(key string, fn func() (*Msg, time.Duration, error)) (v *Msg, rtt time.Duration, err error, shared bool) ***REMOVED***
+func (g *singleflight) Do(key string, fn func() (*Msg, time.Duration, error)) (v *Msg, rtt time.Duration, err error, shared bool) {
 	g.Lock()
-	if g.m == nil ***REMOVED***
+	if g.m == nil {
 		g.m = make(map[string]*call)
-	***REMOVED***
-	if c, ok := g.m[key]; ok ***REMOVED***
+	}
+	if c, ok := g.m[key]; ok {
 		c.dups++
 		g.Unlock()
 		c.wg.Wait()
 		return c.val, c.rtt, c.err, true
-	***REMOVED***
+	}
 	c := new(call)
 	c.wg.Add(1)
 	g.m[key] = c
@@ -54,4 +54,4 @@ func (g *singleflight) Do(key string, fn func() (*Msg, time.Duration, error)) (v
 	g.Unlock()
 
 	return c.val, c.rtt, c.err, c.dups > 0
-***REMOVED***
+}

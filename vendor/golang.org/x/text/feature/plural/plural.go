@@ -21,12 +21,12 @@ import (
 //
 //
 // This package is UNDER CONSTRUCTION and its API may change.
-type Rules struct ***REMOVED***
+type Rules struct {
 	rules          []pluralCheck
 	index          []byte
 	langToIndex    []byte
 	inclusionMasks []uint64
-***REMOVED***
+}
 
 var (
 	// Cardinal defines the plural rules for numbers indicating quantities.
@@ -36,19 +36,19 @@ var (
 	// (first, second, etc.).
 	Ordinal *Rules = ordinal
 
-	ordinal = &Rules***REMOVED***
+	ordinal = &Rules{
 		ordinalRules,
 		ordinalIndex,
 		ordinalLangToIndex,
 		ordinalInclusionMasks[:],
-	***REMOVED***
+	}
 
-	cardinal = &Rules***REMOVED***
+	cardinal = &Rules{
 		cardinalRules,
 		cardinalIndex,
 		cardinalLangToIndex,
 		cardinalInclusionMasks[:],
-	***REMOVED***
+	}
 )
 
 // getIntApprox converts the digits in slice digits[start:end] to an integer
@@ -58,7 +58,7 @@ var (
 //	- Result n is big if i / 10^nMod > 1.
 //	- Otherwise the result is i % 10^nMod.
 //
-// For example, if digits is ***REMOVED***1, 2, 3***REMOVED*** and start:end is 0:5, then the result
+// For example, if digits is {1, 2, 3} and start:end is 0:5, then the result
 // for various values of nMod is:
 //	- when nMod == 2, n == big
 //	- when nMod == 3, n == big
@@ -66,37 +66,37 @@ var (
 //	- when nMod == 5, n == 12300
 //	- when nMod == 6, n == 12300
 //	- when nMod == 7, n == 12300
-func getIntApprox(digits []byte, start, end, nMod, big int) (n int) ***REMOVED***
+func getIntApprox(digits []byte, start, end, nMod, big int) (n int) {
 	// Leading 0 digits just result in 0.
 	p := start
-	if p < 0 ***REMOVED***
+	if p < 0 {
 		p = 0
-	***REMOVED***
+	}
 	// Range only over the part for which we have digits.
 	mid := end
-	if mid >= len(digits) ***REMOVED***
+	if mid >= len(digits) {
 		mid = len(digits)
-	***REMOVED***
+	}
 	// Check digits more significant that nMod.
-	if q := end - nMod; q > 0 ***REMOVED***
-		if q > mid ***REMOVED***
+	if q := end - nMod; q > 0 {
+		if q > mid {
 			q = mid
-		***REMOVED***
-		for ; p < q; p++ ***REMOVED***
-			if digits[p] != 0 ***REMOVED***
+		}
+		for ; p < q; p++ {
+			if digits[p] != 0 {
 				return big
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-	for ; p < mid; p++ ***REMOVED***
+			}
+		}
+	}
+	for ; p < mid; p++ {
 		n = 10*n + int(digits[p])
-	***REMOVED***
+	}
 	// Multiply for trailing zeros.
-	for ; p < end; p++ ***REMOVED***
+	for ; p < end; p++ {
 		n *= 10
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
 // MatchDigits computes the plural form for the given language and the given
 // decimal floating point digits. The digits are stored in big-endian order and
@@ -107,12 +107,12 @@ func getIntApprox(digits []byte, start, end, nMod, big int) (n int) ***REMOVED**
 // The following table contains examples of possible arguments to represent
 // the given numbers.
 //      decimal    digits              exp    scale
-//      123        []byte***REMOVED***1, 2, 3***REMOVED***     3      0
-//      123.4      []byte***REMOVED***1, 2, 3, 4***REMOVED***  3      1
-//      123.40     []byte***REMOVED***1, 2, 3, 4***REMOVED***  3      2
-//      100000     []byte***REMOVED***1***REMOVED***           6      0
-//      100000.00  []byte***REMOVED***1***REMOVED***           6      3
-func (p *Rules) MatchDigits(t language.Tag, digits []byte, exp, scale int) Form ***REMOVED***
+//      123        []byte{1, 2, 3}     3      0
+//      123.4      []byte{1, 2, 3, 4}  3      1
+//      123.40     []byte{1, 2, 3, 4}  3      2
+//      100000     []byte{1}           6      0
+//      100000.00  []byte{1}           6      3
+func (p *Rules) MatchDigits(t language.Tag, digits []byte, exp, scale int) Form {
 	index, _ := language.CompactIndex(t)
 
 	// Differentiate up to including mod 1000000 for the integer part.
@@ -122,33 +122,33 @@ func (p *Rules) MatchDigits(t language.Tag, digits []byte, exp, scale int) Form 
 	f := getIntApprox(digits, exp, exp+scale, 2, 100)
 
 	return matchPlural(p, index, n, f, scale)
-***REMOVED***
+}
 
-func (p *Rules) matchDisplayDigits(t language.Tag, d *number.Digits) (Form, int) ***REMOVED***
+func (p *Rules) matchDisplayDigits(t language.Tag, d *number.Digits) (Form, int) {
 	n := getIntApprox(d.Digits, 0, int(d.Exp), 6, 1000000)
 	return p.MatchDigits(t, d.Digits, int(d.Exp), d.NumFracDigits()), n
-***REMOVED***
+}
 
-func validForms(p *Rules, t language.Tag) (forms []Form) ***REMOVED***
+func validForms(p *Rules, t language.Tag) (forms []Form) {
 	index, _ := language.CompactIndex(t)
 	offset := p.langToIndex[index]
 	rules := p.rules[p.index[offset]:p.index[offset+1]]
 
 	forms = append(forms, Other)
 	last := Other
-	for _, r := range rules ***REMOVED***
-		if cat := Form(r.cat & formMask); cat != andNext && last != cat ***REMOVED***
+	for _, r := range rules {
+		if cat := Form(r.cat & formMask); cat != andNext && last != cat {
 			forms = append(forms, cat)
 			last = cat
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return forms
-***REMOVED***
+}
 
-func (p *Rules) matchComponents(t language.Tag, n, f, scale int) Form ***REMOVED***
+func (p *Rules) matchComponents(t language.Tag, n, f, scale int) Form {
 	index, _ := language.CompactIndex(t)
 	return matchPlural(p, index, n, f, scale)
-***REMOVED***
+}
 
 // MatchPlural returns the plural form for the given language and plural
 // operands (as defined in
@@ -164,12 +164,12 @@ func (p *Rules) matchComponents(t language.Tag, n, f, scale int) Form ***REMOVED
 //
 // If any of the operand values is too large to fit in an int, it is okay to
 // pass the value modulo 10,000,000.
-func (p *Rules) MatchPlural(lang language.Tag, i, v, w, f, t int) Form ***REMOVED***
+func (p *Rules) MatchPlural(lang language.Tag, i, v, w, f, t int) Form {
 	index, _ := language.CompactIndex(lang)
 	return matchPlural(p, index, i, f, v)
-***REMOVED***
+}
 
-func matchPlural(p *Rules, index int, n, f, v int) Form ***REMOVED***
+func matchPlural(p *Rules, index int, n, f, v int) Form {
 	nMask := p.inclusionMasks[n%maxMod]
 	// Compute the fMask inline in the rules below, as it is relatively rare.
 	// fMask := p.inclusionMasks[f%maxMod]
@@ -178,11 +178,11 @@ func matchPlural(p *Rules, index int, n, f, v int) Form ***REMOVED***
 	// Do the matching
 	offset := p.langToIndex[index]
 	rules := p.rules[p.index[offset]:p.index[offset+1]]
-	for i := 0; i < len(rules); i++ ***REMOVED***
+	for i := 0; i < len(rules); i++ {
 		rule := rules[i]
 		setBit := uint64(1 << rule.setID)
 		var skip bool
-		switch op := opID(rule.cat >> opShift); op ***REMOVED***
+		switch op := opID(rule.cat >> opShift); op {
 		case opI: // i = x
 			skip = n >= numN || nMask&setBit == 0
 
@@ -242,17 +242,17 @@ func matchPlural(p *Rules, index int, n, f, v int) Form ***REMOVED***
 
 		case opItalian800:
 			skip = (f != 0 || n >= numN || nMask&setBit == 0) && n != 800
-		***REMOVED***
-		if skip ***REMOVED***
+		}
+		if skip {
 			// advance over AND entries.
-			for ; i < len(rules) && rules[i].cat&formMask == andNext; i++ ***REMOVED***
-			***REMOVED***
+			for ; i < len(rules) && rules[i].cat&formMask == andNext; i++ {
+			}
 			continue
-		***REMOVED***
+		}
 		// return if we have a final entry.
-		if cat := rule.cat & formMask; cat != andNext ***REMOVED***
+		if cat := rule.cat & formMask; cat != andNext {
 			return Form(cat)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return Other
-***REMOVED***
+}

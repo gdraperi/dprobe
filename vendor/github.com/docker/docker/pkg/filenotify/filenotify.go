@@ -6,35 +6,35 @@ package filenotify
 import "github.com/fsnotify/fsnotify"
 
 // FileWatcher is an interface for implementing file notification watchers
-type FileWatcher interface ***REMOVED***
+type FileWatcher interface {
 	Events() <-chan fsnotify.Event
 	Errors() <-chan error
 	Add(name string) error
 	Remove(name string) error
 	Close() error
-***REMOVED***
+}
 
 // New tries to use an fs-event watcher, and falls back to the poller if there is an error
-func New() (FileWatcher, error) ***REMOVED***
-	if watcher, err := NewEventWatcher(); err == nil ***REMOVED***
+func New() (FileWatcher, error) {
+	if watcher, err := NewEventWatcher(); err == nil {
 		return watcher, nil
-	***REMOVED***
+	}
 	return NewPollingWatcher(), nil
-***REMOVED***
+}
 
 // NewPollingWatcher returns a poll-based file watcher
-func NewPollingWatcher() FileWatcher ***REMOVED***
-	return &filePoller***REMOVED***
+func NewPollingWatcher() FileWatcher {
+	return &filePoller{
 		events: make(chan fsnotify.Event),
 		errors: make(chan error),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // NewEventWatcher returns an fs-event based file watcher
-func NewEventWatcher() (FileWatcher, error) ***REMOVED***
+func NewEventWatcher() (FileWatcher, error) {
 	watcher, err := fsnotify.NewWatcher()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	return &fsNotifyWatcher***REMOVED***watcher***REMOVED***, nil
-***REMOVED***
+	}
+	return &fsNotifyWatcher{watcher}, nil
+}

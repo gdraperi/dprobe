@@ -8,7 +8,7 @@ import (
 
 // Message represents the contents of the GELF message.  It is gzipped
 // before sending.
-type Message struct ***REMOVED***
+type Message struct {
 	Version  string                 `json:"version"`
 	Host     string                 `json:"host"`
 	Short    string                 `json:"short_message"`
@@ -16,9 +16,9 @@ type Message struct ***REMOVED***
 	TimeUnix float64                `json:"timestamp"`
 	Level    int32                  `json:"level,omitempty"`
 	Facility string                 `json:"facility,omitempty"`
-	Extra    map[string]interface***REMOVED******REMOVED*** `json:"-"`
+	Extra    map[string]interface{} `json:"-"`
 	RawExtra json.RawMessage        `json:"-"`
-***REMOVED***
+}
 
 // Syslog severity levels
 const (
@@ -32,59 +32,59 @@ const (
 	LOG_DEBUG   = 7
 )
 
-func (m *Message) MarshalJSONBuf(buf *bytes.Buffer) error ***REMOVED***
+func (m *Message) MarshalJSONBuf(buf *bytes.Buffer) error {
 	b, err := json.Marshal(m)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	// write up until the final ***REMOVED***
-	if _, err = buf.Write(b[:len(b)-1]); err != nil ***REMOVED***
+	}
+	// write up until the final }
+	if _, err = buf.Write(b[:len(b)-1]); err != nil {
 		return err
-	***REMOVED***
-	if len(m.Extra) > 0 ***REMOVED***
+	}
+	if len(m.Extra) > 0 {
 		eb, err := json.Marshal(m.Extra)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		// merge serialized message + serialized extra map
-		if err = buf.WriteByte(','); err != nil ***REMOVED***
+		if err = buf.WriteByte(','); err != nil {
 			return err
-		***REMOVED***
+		}
 		// write serialized extra bytes, without enclosing quotes
-		if _, err = buf.Write(eb[1 : len(eb)-1]); err != nil ***REMOVED***
+		if _, err = buf.Write(eb[1 : len(eb)-1]); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if len(m.RawExtra) > 0 ***REMOVED***
-		if err := buf.WriteByte(','); err != nil ***REMOVED***
+	if len(m.RawExtra) > 0 {
+		if err := buf.WriteByte(','); err != nil {
 			return err
-		***REMOVED***
+		}
 
 		// write serialized extra bytes, without enclosing quotes
-		if _, err = buf.Write(m.RawExtra[1 : len(m.RawExtra)-1]); err != nil ***REMOVED***
+		if _, err = buf.Write(m.RawExtra[1 : len(m.RawExtra)-1]); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// write final closing quotes
-	return buf.WriteByte('***REMOVED***')
-***REMOVED***
+	return buf.WriteByte('}')
+}
 
-func (m *Message) UnmarshalJSON(data []byte) error ***REMOVED***
-	i := make(map[string]interface***REMOVED******REMOVED***, 16)
-	if err := json.Unmarshal(data, &i); err != nil ***REMOVED***
+func (m *Message) UnmarshalJSON(data []byte) error {
+	i := make(map[string]interface{}, 16)
+	if err := json.Unmarshal(data, &i); err != nil {
 		return err
-	***REMOVED***
-	for k, v := range i ***REMOVED***
-		if k[0] == '_' ***REMOVED***
-			if m.Extra == nil ***REMOVED***
-				m.Extra = make(map[string]interface***REMOVED******REMOVED***, 1)
-			***REMOVED***
+	}
+	for k, v := range i {
+		if k[0] == '_' {
+			if m.Extra == nil {
+				m.Extra = make(map[string]interface{}, 1)
+			}
 			m.Extra[k] = v
 			continue
-		***REMOVED***
-		switch k ***REMOVED***
+		}
+		switch k {
 		case "version":
 			m.Version = v.(string)
 		case "host":
@@ -99,22 +99,22 @@ func (m *Message) UnmarshalJSON(data []byte) error ***REMOVED***
 			m.Level = int32(v.(float64))
 		case "facility":
 			m.Facility = v.(string)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *Message) toBytes() (messageBytes []byte, err error) ***REMOVED***
+func (m *Message) toBytes() (messageBytes []byte, err error) {
 	buf := newBuffer()
 	defer bufPool.Put(buf)
-	if err = m.MarshalJSONBuf(buf); err != nil ***REMOVED***
+	if err = m.MarshalJSONBuf(buf); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	messageBytes = buf.Bytes()
 	return messageBytes, nil
-***REMOVED***
+}
 
-func constructMessage(p []byte, hostname string, facility string, file string, line int) (m *Message) ***REMOVED***
+func constructMessage(p []byte, hostname string, facility string, file string, line int) (m *Message) {
 	// remove trailing and leading whitespace
 	p = bytes.TrimSpace(p)
 
@@ -124,12 +124,12 @@ func constructMessage(p []byte, hostname string, facility string, file string, l
 	// whole thing in Short.
 	short := p
 	full := []byte("")
-	if i := bytes.IndexRune(p, '\n'); i > 0 ***REMOVED***
+	if i := bytes.IndexRune(p, '\n'); i > 0 {
 		short = p[:i]
 		full = p
-	***REMOVED***
+	}
 
-	m = &Message***REMOVED***
+	m = &Message{
 		Version:  "1.1",
 		Host:     hostname,
 		Short:    string(short),
@@ -137,11 +137,11 @@ func constructMessage(p []byte, hostname string, facility string, file string, l
 		TimeUnix: float64(time.Now().Unix()),
 		Level:    6, // info
 		Facility: facility,
-		Extra: map[string]interface***REMOVED******REMOVED******REMOVED***
+		Extra: map[string]interface{}{
 			"_file": file,
 			"_line": line,
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
 	return m
-***REMOVED***
+}

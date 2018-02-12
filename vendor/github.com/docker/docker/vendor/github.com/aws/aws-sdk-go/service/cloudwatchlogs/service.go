@@ -17,9 +17,9 @@ import (
 //
 // CloudWatchLogs methods are safe to use concurrently. It is not safe to
 // modify mutate any of the struct's properties though.
-type CloudWatchLogs struct ***REMOVED***
+type CloudWatchLogs struct {
 	*client.Client
-***REMOVED***
+}
 
 // Used for custom client initialization logic
 var initClient func(*client.Client)
@@ -43,17 +43,17 @@ const (
 //
 //     // Create a CloudWatchLogs client with additional configuration
 //     svc := cloudwatchlogs.New(mySession, aws.NewConfig().WithRegion("us-west-2"))
-func New(p client.ConfigProvider, cfgs ...*aws.Config) *CloudWatchLogs ***REMOVED***
+func New(p client.ConfigProvider, cfgs ...*aws.Config) *CloudWatchLogs {
 	c := p.ClientConfig(EndpointsID, cfgs...)
 	return newClient(*c.Config, c.Handlers, c.Endpoint, c.SigningRegion, c.SigningName)
-***REMOVED***
+}
 
 // newClient creates, initializes and returns a new service client instance.
-func newClient(cfg aws.Config, handlers request.Handlers, endpoint, signingRegion, signingName string) *CloudWatchLogs ***REMOVED***
-	svc := &CloudWatchLogs***REMOVED***
+func newClient(cfg aws.Config, handlers request.Handlers, endpoint, signingRegion, signingName string) *CloudWatchLogs {
+	svc := &CloudWatchLogs{
 		Client: client.New(
 			cfg,
-			metadata.ClientInfo***REMOVED***
+			metadata.ClientInfo{
 				ServiceName:   ServiceName,
 				SigningName:   signingName,
 				SigningRegion: signingRegion,
@@ -61,10 +61,10 @@ func newClient(cfg aws.Config, handlers request.Handlers, endpoint, signingRegio
 				APIVersion:    "2014-03-28",
 				JSONVersion:   "1.1",
 				TargetPrefix:  "Logs_20140328",
-			***REMOVED***,
+			},
 			handlers,
 		),
-	***REMOVED***
+	}
 
 	// Handlers
 	svc.Handlers.Sign.PushBackNamed(v4.SignRequestHandler)
@@ -74,22 +74,22 @@ func newClient(cfg aws.Config, handlers request.Handlers, endpoint, signingRegio
 	svc.Handlers.UnmarshalError.PushBackNamed(jsonrpc.UnmarshalErrorHandler)
 
 	// Run custom client initialization if present
-	if initClient != nil ***REMOVED***
+	if initClient != nil {
 		initClient(svc.Client)
-	***REMOVED***
+	}
 
 	return svc
-***REMOVED***
+}
 
 // newRequest creates a new request for a CloudWatchLogs operation and runs any
 // custom request initialization.
-func (c *CloudWatchLogs) newRequest(op *request.Operation, params, data interface***REMOVED******REMOVED***) *request.Request ***REMOVED***
+func (c *CloudWatchLogs) newRequest(op *request.Operation, params, data interface{}) *request.Request {
 	req := c.NewRequest(op, params, data)
 
 	// Run custom request initialization if present
-	if initRequest != nil ***REMOVED***
+	if initRequest != nil {
 		initRequest(req)
-	***REMOVED***
+	}
 
 	return req
-***REMOVED***
+}

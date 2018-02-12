@@ -23,124 +23,124 @@ import (
 // by the container's active process. The output (and error) are actually
 // copied and delivered to all StdoutPipe and StderrPipe consumers, using
 // a kind of "broadcaster".
-type Config struct ***REMOVED***
+type Config struct {
 	sync.WaitGroup
 	stdout    *broadcaster.Unbuffered
 	stderr    *broadcaster.Unbuffered
 	stdin     io.ReadCloser
 	stdinPipe io.WriteCloser
-***REMOVED***
+}
 
 // NewConfig creates a stream config and initializes
 // the standard err and standard out to new unbuffered broadcasters.
-func NewConfig() *Config ***REMOVED***
-	return &Config***REMOVED***
+func NewConfig() *Config {
+	return &Config{
 		stderr: new(broadcaster.Unbuffered),
 		stdout: new(broadcaster.Unbuffered),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Stdout returns the standard output in the configuration.
-func (c *Config) Stdout() *broadcaster.Unbuffered ***REMOVED***
+func (c *Config) Stdout() *broadcaster.Unbuffered {
 	return c.stdout
-***REMOVED***
+}
 
 // Stderr returns the standard error in the configuration.
-func (c *Config) Stderr() *broadcaster.Unbuffered ***REMOVED***
+func (c *Config) Stderr() *broadcaster.Unbuffered {
 	return c.stderr
-***REMOVED***
+}
 
 // Stdin returns the standard input in the configuration.
-func (c *Config) Stdin() io.ReadCloser ***REMOVED***
+func (c *Config) Stdin() io.ReadCloser {
 	return c.stdin
-***REMOVED***
+}
 
 // StdinPipe returns an input writer pipe as an io.WriteCloser.
-func (c *Config) StdinPipe() io.WriteCloser ***REMOVED***
+func (c *Config) StdinPipe() io.WriteCloser {
 	return c.stdinPipe
-***REMOVED***
+}
 
 // StdoutPipe creates a new io.ReadCloser with an empty bytes pipe.
 // It adds this new out pipe to the Stdout broadcaster.
 // This will block stdout if unconsumed.
-func (c *Config) StdoutPipe() io.ReadCloser ***REMOVED***
+func (c *Config) StdoutPipe() io.ReadCloser {
 	bytesPipe := ioutils.NewBytesPipe()
 	c.stdout.Add(bytesPipe)
 	return bytesPipe
-***REMOVED***
+}
 
 // StderrPipe creates a new io.ReadCloser with an empty bytes pipe.
 // It adds this new err pipe to the Stderr broadcaster.
 // This will block stderr if unconsumed.
-func (c *Config) StderrPipe() io.ReadCloser ***REMOVED***
+func (c *Config) StderrPipe() io.ReadCloser {
 	bytesPipe := ioutils.NewBytesPipe()
 	c.stderr.Add(bytesPipe)
 	return bytesPipe
-***REMOVED***
+}
 
 // NewInputPipes creates new pipes for both standard inputs, Stdin and StdinPipe.
-func (c *Config) NewInputPipes() ***REMOVED***
+func (c *Config) NewInputPipes() {
 	c.stdin, c.stdinPipe = io.Pipe()
-***REMOVED***
+}
 
 // NewNopInputPipe creates a new input pipe that will silently drop all messages in the input.
-func (c *Config) NewNopInputPipe() ***REMOVED***
+func (c *Config) NewNopInputPipe() {
 	c.stdinPipe = ioutils.NopWriteCloser(ioutil.Discard)
-***REMOVED***
+}
 
 // CloseStreams ensures that the configured streams are properly closed.
-func (c *Config) CloseStreams() error ***REMOVED***
+func (c *Config) CloseStreams() error {
 	var errors []string
 
-	if c.stdin != nil ***REMOVED***
-		if err := c.stdin.Close(); err != nil ***REMOVED***
+	if c.stdin != nil {
+		if err := c.stdin.Close(); err != nil {
 			errors = append(errors, fmt.Sprintf("error close stdin: %s", err))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if err := c.stdout.Clean(); err != nil ***REMOVED***
+	if err := c.stdout.Clean(); err != nil {
 		errors = append(errors, fmt.Sprintf("error close stdout: %s", err))
-	***REMOVED***
+	}
 
-	if err := c.stderr.Clean(); err != nil ***REMOVED***
+	if err := c.stderr.Clean(); err != nil {
 		errors = append(errors, fmt.Sprintf("error close stderr: %s", err))
-	***REMOVED***
+	}
 
-	if len(errors) > 0 ***REMOVED***
+	if len(errors) > 0 {
 		return fmt.Errorf(strings.Join(errors, "\n"))
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // CopyToPipe connects streamconfig with a libcontainerd.IOPipe
-func (c *Config) CopyToPipe(iop *cio.DirectIO) ***REMOVED***
-	copyFunc := func(w io.Writer, r io.ReadCloser) ***REMOVED***
+func (c *Config) CopyToPipe(iop *cio.DirectIO) {
+	copyFunc := func(w io.Writer, r io.ReadCloser) {
 		c.Add(1)
-		go func() ***REMOVED***
-			if _, err := pools.Copy(w, r); err != nil ***REMOVED***
+		go func() {
+			if _, err := pools.Copy(w, r); err != nil {
 				logrus.Errorf("stream copy error: %v", err)
-			***REMOVED***
+			}
 			r.Close()
 			c.Done()
-		***REMOVED***()
-	***REMOVED***
+		}()
+	}
 
-	if iop.Stdout != nil ***REMOVED***
+	if iop.Stdout != nil {
 		copyFunc(c.Stdout(), iop.Stdout)
-	***REMOVED***
-	if iop.Stderr != nil ***REMOVED***
+	}
+	if iop.Stderr != nil {
 		copyFunc(c.Stderr(), iop.Stderr)
-	***REMOVED***
+	}
 
-	if stdin := c.Stdin(); stdin != nil ***REMOVED***
-		if iop.Stdin != nil ***REMOVED***
-			go func() ***REMOVED***
+	if stdin := c.Stdin(); stdin != nil {
+		if iop.Stdin != nil {
+			go func() {
 				pools.Copy(iop.Stdin, stdin)
-				if err := iop.Stdin.Close(); err != nil ***REMOVED***
+				if err := iop.Stdin.Close(); err != nil {
 					logrus.Warnf("failed to close stdin: %v", err)
-				***REMOVED***
-			***REMOVED***()
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+				}
+			}()
+		}
+	}
+}

@@ -16,34 +16,34 @@ possibleConfigs=(
 if [ $# -gt 0 ]; then
 	CONFIG="$1"
 else
-	: $***REMOVED***CONFIG:="$***REMOVED***possibleConfigs[0]***REMOVED***"***REMOVED***
+	: ${CONFIG:="${possibleConfigs[0]}"}
 fi
 
 if ! command -v zgrep &> /dev/null; then
-	zgrep() ***REMOVED***
+	zgrep() {
 		zcat "$2" | grep "$1"
-	***REMOVED***
+	}
 fi
 
 kernelVersion="$(uname -r)"
-kernelMajor="$***REMOVED***kernelVersion%%.****REMOVED***"
-kernelMinor="$***REMOVED***kernelVersion#$kernelMajor.***REMOVED***"
-kernelMinor="$***REMOVED***kernelMinor%%.****REMOVED***"
+kernelMajor="${kernelVersion%%.*}"
+kernelMinor="${kernelVersion#$kernelMajor.}"
+kernelMinor="${kernelMinor%%.*}"
 
-is_set() ***REMOVED***
+is_set() {
 	zgrep "CONFIG_$1=[y|m]" "$CONFIG" > /dev/null
-***REMOVED***
-is_set_in_kernel() ***REMOVED***
+}
+is_set_in_kernel() {
 	zgrep "CONFIG_$1=y" "$CONFIG" > /dev/null
-***REMOVED***
-is_set_as_module() ***REMOVED***
+}
+is_set_as_module() {
 	zgrep "CONFIG_$1=m" "$CONFIG" > /dev/null
-***REMOVED***
+}
 
-color() ***REMOVED***
+color() {
 	local codes=()
 	if [ "$1" = 'bold' ]; then
-		codes=( "$***REMOVED***codes[@]***REMOVED***" '1' )
+		codes=( "${codes[@]}" '1' )
 		shift
 	fi
 	if [ "$#" -gt 0 ]; then
@@ -60,32 +60,32 @@ color() ***REMOVED***
 			white) code=37 ;;
 		esac
 		if [ "$code" ]; then
-			codes=( "$***REMOVED***codes[@]***REMOVED***" "$code" )
+			codes=( "${codes[@]}" "$code" )
 		fi
 	fi
 	local IFS=';'
-	echo -en '\033['"$***REMOVED***codes[*]***REMOVED***"'m'
-***REMOVED***
-wrap_color() ***REMOVED***
+	echo -en '\033['"${codes[*]}"'m'
+}
+wrap_color() {
 	text="$1"
 	shift
 	color "$@"
 	echo -n "$text"
 	color reset
 	echo
-***REMOVED***
+}
 
-wrap_good() ***REMOVED***
+wrap_good() {
 	echo "$(wrap_color "$1" white): $(wrap_color "$2" green)"
-***REMOVED***
-wrap_bad() ***REMOVED***
+}
+wrap_bad() {
 	echo "$(wrap_color "$1" bold): $(wrap_color "$2" bold red)"
-***REMOVED***
-wrap_warning() ***REMOVED***
+}
+wrap_warning() {
 	wrap_color >&2 "$*" red
-***REMOVED***
+}
 
-check_flag() ***REMOVED***
+check_flag() {
 	if is_set_in_kernel "$1"; then
 		wrap_good "CONFIG_$1" 'enabled'
 	elif is_set_as_module "$1"; then
@@ -94,47 +94,47 @@ check_flag() ***REMOVED***
 		wrap_bad "CONFIG_$1" 'missing'
 		EXITCODE=1
 	fi
-***REMOVED***
+}
 
-check_flags() ***REMOVED***
+check_flags() {
 	for flag in "$@"; do
 		echo -n "- "; check_flag "$flag"
 	done
-***REMOVED***
+}
 
-check_command() ***REMOVED***
+check_command() {
 	if command -v "$1" >/dev/null 2>&1; then
 		wrap_good "$1 command" 'available'
 	else
 		wrap_bad "$1 command" 'missing'
 		EXITCODE=1
 	fi
-***REMOVED***
+}
 
-check_device() ***REMOVED***
+check_device() {
 	if [ -c "$1" ]; then
 		wrap_good "$1" 'present'
 	else
 		wrap_bad "$1" 'missing'
 		EXITCODE=1
 	fi
-***REMOVED***
+}
 
-check_distro_userns() ***REMOVED***
+check_distro_userns() {
 	source /etc/os-release 2>/dev/null || /bin/true
-	if [[ "$***REMOVED***ID***REMOVED***" =~ ^(centos|rhel)$ && "$***REMOVED***VERSION_ID***REMOVED***" =~ ^7 ]]; then
+	if [[ "${ID}" =~ ^(centos|rhel)$ && "${VERSION_ID}" =~ ^7 ]]; then
 		# this is a CentOS7 or RHEL7 system
-		grep -q "user_namespace.enable=1" /proc/cmdline || ***REMOVED***
+		grep -q "user_namespace.enable=1" /proc/cmdline || {
 			# no user namespace support enabled
 			wrap_bad "  (RHEL7/CentOS7" "User namespaces disabled; add 'user_namespace.enable=1' to boot command line)"
 			EXITCODE=1
-		***REMOVED***
+		}
 	fi
-***REMOVED***
+}
 
 if [ ! -e "$CONFIG" ]; then
 	wrap_warning "warning: $CONFIG does not exist, searching other paths for kernel config ..."
-	for tryConfig in "$***REMOVED***possibleConfigs[@]***REMOVED***"; do
+	for tryConfig in "${possibleConfigs[@]}"; do
 		if [ -e "$tryConfig" ]; then
 			CONFIG="$tryConfig"
 			break
@@ -154,7 +154,7 @@ echo
 echo 'Generally Necessary:'
 
 echo -n '- '
-cgroupSubsystemDir="$(awk '/[, ](cpu|cpuacct|cpuset|devices|freezer|memory)[, ]/ && $3 == "cgroup" ***REMOVED*** print $2 ***REMOVED***' /proc/mounts | head -n1)"
+cgroupSubsystemDir="$(awk '/[, ](cpu|cpuacct|cpuset|devices|freezer|memory)[, ]/ && $3 == "cgroup" { print $2 }' /proc/mounts | head -n1)"
 cgroupDir="$(dirname "$cgroupSubsystemDir")"
 if [ -d "$cgroupDir/cpu" -o -d "$cgroupDir/cpuacct" -o -d "$cgroupDir/cpuset" -o -d "$cgroupDir/devices" -o -d "$cgroupDir/freezer" -o -d "$cgroupDir/memory" ]; then
 	echo "$(wrap_good 'cgroup hierarchy' 'properly mounted') [$cgroupDir]"
@@ -187,18 +187,18 @@ if [ "$(cat /sys/module/apparmor/parameters/enabled 2>/dev/null)" = 'Y' ]; then
 fi
 
 flags=(
-	NAMESPACES ***REMOVED***NET,PID,IPC,UTS***REMOVED***_NS
+	NAMESPACES {NET,PID,IPC,UTS}_NS
 	CGROUPS CGROUP_CPUACCT CGROUP_DEVICE CGROUP_FREEZER CGROUP_SCHED CPUSETS MEMCG
 	KEYS
 	VETH BRIDGE BRIDGE_NETFILTER
 	NF_NAT_IPV4 IP_NF_FILTER IP_NF_TARGET_MASQUERADE
-	NETFILTER_XT_MATCH_***REMOVED***ADDRTYPE,CONNTRACK,IPVS***REMOVED***
+	NETFILTER_XT_MATCH_{ADDRTYPE,CONNTRACK,IPVS}
 	IP_NF_NAT NF_NAT NF_NAT_NEEDED
 
 	# required for bind-mounting /dev/mqueue into containers
 	POSIX_MQUEUE
 )
-check_flags "$***REMOVED***flags[@]***REMOVED***"
+check_flags "${flags[@]}"
 if [ "$kernelMajor" -lt 4 ] || [ "$kernelMajor" -eq 4 -a "$kernelMinor" -lt 8 ]; then
         check_flags DEVPTS_MULTIPLE_INSTANCES
 fi
@@ -206,27 +206,27 @@ fi
 echo
 
 echo 'Optional Features:'
-***REMOVED***
+{
 	check_flags USER_NS
 	check_distro_userns
-***REMOVED***
-***REMOVED***
+}
+{
 	check_flags SECCOMP
-***REMOVED***
-***REMOVED***
+}
+{
 	check_flags CGROUP_PIDS
-***REMOVED***
-***REMOVED***
-	CODE=$***REMOVED***EXITCODE***REMOVED***
+}
+{
+	CODE=${EXITCODE}
 	check_flags MEMCG_SWAP MEMCG_SWAP_ENABLED
 	if [ -e /sys/fs/cgroup/memory/memory.memsw.limit_in_bytes ]; then
 		echo "    $(wrap_color '(cgroup swap accounting is currently enabled)' bold black)"
-		EXITCODE=$***REMOVED***CODE***REMOVED***
+		EXITCODE=${CODE}
 	elif is_set MEMCG_SWAP && ! is_set MEMCG_SWAP_ENABLED; then
 		echo "    $(wrap_color '(cgroup swap accounting is currently not enabled, you can enable it by setting boot option "swapaccount=1")' bold black)"
 	fi
-***REMOVED***
-***REMOVED***
+}
+{
 	if is_set LEGACY_VSYSCALL_NATIVE; then
 		echo -n "- "; wrap_bad "CONFIG_LEGACY_VSYSCALL_NATIVE" 'enabled'
 		echo "    $(wrap_color '(dangerous, provides an ASLR-bypassing target with usable ROP gadgets.)' bold black)"
@@ -243,7 +243,7 @@ echo 'Optional Features:'
 	#      LEGACY_VSYSCALL_EMULATE. Even older kernels are presumably
 	#      effectively LEGACY_VSYSCALL_NATIVE.
 	fi
-***REMOVED***
+}
 
 if [ "$kernelMajor" -lt 4 ] || [ "$kernelMajor" -eq 4 -a "$kernelMinor" -le 5 ]; then
 	check_flags MEMCG_KMEM
@@ -269,7 +269,7 @@ flags=(
 	IP_VS_NFCT
  	IP_VS_RR
 )
-check_flags "$***REMOVED***flags[@]***REMOVED***"
+check_flags "${flags[@]}"
 
 if ! is_set EXT4_USE_FOR_EXT2; then
 	check_flags EXT3_FS EXT3_FS_XATTR EXT3_FS_POSIX_ACL EXT3_FS_SECURITY
@@ -301,7 +301,7 @@ echo '  - "'$(wrap_color 'ftp,tftp client in container' blue)'":'
 check_flags NF_NAT_FTP NF_CONNTRACK_FTP NF_NAT_TFTP NF_CONNTRACK_TFTP | sed 's/^/    /'
 
 # only fail if no storage drivers available
-CODE=$***REMOVED***EXITCODE***REMOVED***
+CODE=${EXITCODE}
 EXITCODE=0
 STORAGE=1
 
@@ -343,7 +343,7 @@ EXITCODE=$CODE
 echo
 
 check_limit_over()
-***REMOVED***
+{
 	if [ $(cat "$1") -le "$2" ]; then
 		wrap_bad "- $1" "$(cat $1)"
 		wrap_color "    This should be set to at least $2, for example set: sysctl -w kernel/keys/root_maxkeys=1000000" bold black
@@ -351,7 +351,7 @@ check_limit_over()
 	else
 		wrap_good "- $1" "$(cat $1)"
 	fi
-***REMOVED***
+}
 
 echo 'Limits:'
 check_limit_over /proc/sys/kernel/keys/root_maxkeys 10000

@@ -4,65 +4,65 @@ import (
 	"testing"
 )
 
-func BenchmarkEach(b *testing.B) ***REMOVED***
+func BenchmarkEach(b *testing.B) {
 	var tmp, n int
 
 	b.StopTimer()
 	sel := DocW().Find("td")
-	f := func(i int, s *Selection) ***REMOVED***
+	f := func(i int, s *Selection) {
 		tmp++
-	***REMOVED***
+	}
 	b.StartTimer()
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		sel.Each(f)
-		if n == 0 ***REMOVED***
+		if n == 0 {
 			n = tmp
-		***REMOVED***
-	***REMOVED***
-	if n != 59 ***REMOVED***
+		}
+	}
+	if n != 59 {
 		b.Fatalf("want 59, got %d", n)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func BenchmarkMap(b *testing.B) ***REMOVED***
+func BenchmarkMap(b *testing.B) {
 	var tmp, n int
 
 	b.StopTimer()
 	sel := DocW().Find("td")
-	f := func(i int, s *Selection) string ***REMOVED***
+	f := func(i int, s *Selection) string {
 		tmp++
 		return string(tmp)
-	***REMOVED***
+	}
 	b.StartTimer()
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		sel.Map(f)
-		if n == 0 ***REMOVED***
+		if n == 0 {
 			n = tmp
-		***REMOVED***
-	***REMOVED***
-	if n != 59 ***REMOVED***
+		}
+	}
+	if n != 59 {
 		b.Fatalf("want 59, got %d", n)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func BenchmarkEachWithBreak(b *testing.B) ***REMOVED***
+func BenchmarkEachWithBreak(b *testing.B) {
 	var tmp, n int
 
 	b.StopTimer()
 	sel := DocW().Find("td")
-	f := func(i int, s *Selection) bool ***REMOVED***
+	f := func(i int, s *Selection) bool {
 		tmp++
 		return tmp < 10
-	***REMOVED***
+	}
 	b.StartTimer()
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		tmp = 0
 		sel.EachWithBreak(f)
-		if n == 0 ***REMOVED***
+		if n == 0 {
 			n = tmp
-		***REMOVED***
-	***REMOVED***
-	if n != 10 ***REMOVED***
+		}
+	}
+	if n != 10 {
 		b.Fatalf("want 10, got %d", n)
-	***REMOVED***
-***REMOVED***
+	}
+}

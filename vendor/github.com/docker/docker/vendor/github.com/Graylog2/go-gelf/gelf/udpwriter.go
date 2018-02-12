@@ -18,11 +18,11 @@ import (
 	"sync"
 )
 
-type UDPWriter struct ***REMOVED***
+type UDPWriter struct {
 	GelfWriter
 	CompressionLevel int // one of the consts from compress/flate
 	CompressionType  CompressType
-***REMOVED***
+}
 
 // What compression type the writer should use when sending messages
 // to the graylog2 server
@@ -45,40 +45,40 @@ const (
 )
 
 var (
-	magicChunked = []byte***REMOVED***0x1e, 0x0f***REMOVED***
-	magicZlib    = []byte***REMOVED***0x78***REMOVED***
-	magicGzip    = []byte***REMOVED***0x1f, 0x8b***REMOVED***
+	magicChunked = []byte{0x1e, 0x0f}
+	magicZlib    = []byte{0x78}
+	magicGzip    = []byte{0x1f, 0x8b}
 )
 
 // numChunks returns the number of GELF chunks necessary to transmit
 // the given compressed buffer.
-func numChunks(b []byte) int ***REMOVED***
+func numChunks(b []byte) int {
 	lenB := len(b)
-	if lenB <= ChunkSize ***REMOVED***
+	if lenB <= ChunkSize {
 		return 1
-	***REMOVED***
+	}
 	return len(b)/chunkedDataLen + 1
-***REMOVED***
+}
 
 // New returns a new GELF Writer.  This writer can be used to send the
 // output of the standard Go log functions to a central GELF server by
 // passing it to log.SetOutput()
-func NewUDPWriter(addr string) (*UDPWriter, error) ***REMOVED***
+func NewUDPWriter(addr string) (*UDPWriter, error) {
 	var err error
 	w := new(UDPWriter)
 	w.CompressionLevel = flate.BestSpeed
 
-	if w.conn, err = net.Dial("udp", addr); err != nil ***REMOVED***
+	if w.conn, err = net.Dial("udp", addr); err != nil {
 		return nil, err
-	***REMOVED***
-	if w.hostname, err = os.Hostname(); err != nil ***REMOVED***
+	}
+	if w.hostname, err = os.Hostname(); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	w.Facility = path.Base(os.Args[0])
 
 	return w, nil
-***REMOVED***
+}
 
 // writes the gzip compressed byte array to the connection as a series
 // of GELF chunked messages.  The format is documented at
@@ -86,23 +86,23 @@ func NewUDPWriter(addr string) (*UDPWriter, error) ***REMOVED***
 //
 //     2-byte magic (0x1e 0x0f), 8 byte id, 1 byte sequence id, 1 byte
 //     total, chunk-data
-func (w *GelfWriter) writeChunked(zBytes []byte) (err error) ***REMOVED***
+func (w *GelfWriter) writeChunked(zBytes []byte) (err error) {
 	b := make([]byte, 0, ChunkSize)
 	buf := bytes.NewBuffer(b)
 	nChunksI := numChunks(zBytes)
-	if nChunksI > 128 ***REMOVED***
+	if nChunksI > 128 {
 		return fmt.Errorf("msg too large, would need %d chunks", nChunksI)
-	***REMOVED***
+	}
 	nChunks := uint8(nChunksI)
 	// use urandom to get a unique message id
 	msgId := make([]byte, 8)
 	n, err := io.ReadFull(rand.Reader, msgId)
-	if err != nil || n != 8 ***REMOVED***
+	if err != nil || n != 8 {
 		return fmt.Errorf("rand.Reader: %d/%s", n, err)
-	***REMOVED***
+	}
 
 	bytesLeft := len(zBytes)
-	for i := uint8(0); i < nChunks; i++ ***REMOVED***
+	for i := uint8(0); i < nChunks; i++ {
 		buf.Reset()
 		// manually write header.  Don't care about
 		// host/network byte order, because the spec only
@@ -113,59 +113,59 @@ func (w *GelfWriter) writeChunked(zBytes []byte) (err error) ***REMOVED***
 		buf.WriteByte(nChunks)
 		// slice out our chunk from zBytes
 		chunkLen := chunkedDataLen
-		if chunkLen > bytesLeft ***REMOVED***
+		if chunkLen > bytesLeft {
 			chunkLen = bytesLeft
-		***REMOVED***
+		}
 		off := int(i) * chunkedDataLen
 		chunk := zBytes[off : off+chunkLen]
 		buf.Write(chunk)
 
 		// write this chunk, and make sure the write was good
 		n, err := w.conn.Write(buf.Bytes())
-		if err != nil ***REMOVED***
+		if err != nil {
 			return fmt.Errorf("Write (chunk %d/%d): %s", i,
 				nChunks, err)
-		***REMOVED***
-		if n != len(buf.Bytes()) ***REMOVED***
+		}
+		if n != len(buf.Bytes()) {
 			return fmt.Errorf("Write len: (chunk %d/%d) (%d/%d)",
 				i, nChunks, n, len(buf.Bytes()))
-		***REMOVED***
+		}
 
 		bytesLeft -= chunkLen
-	***REMOVED***
+	}
 
-	if bytesLeft != 0 ***REMOVED***
+	if bytesLeft != 0 {
 		return fmt.Errorf("error: %d bytes left after sending", bytesLeft)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // 1k bytes buffer by default
-var bufPool = sync.Pool***REMOVED***
-	New: func() interface***REMOVED******REMOVED*** ***REMOVED***
+var bufPool = sync.Pool{
+	New: func() interface{} {
 		return bytes.NewBuffer(make([]byte, 0, 1024))
-	***REMOVED***,
-***REMOVED***
+	},
+}
 
-func newBuffer() *bytes.Buffer ***REMOVED***
+func newBuffer() *bytes.Buffer {
 	b := bufPool.Get().(*bytes.Buffer)
-	if b != nil ***REMOVED***
+	if b != nil {
 		b.Reset()
 		return b
-	***REMOVED***
+	}
 	return bytes.NewBuffer(nil)
-***REMOVED***
+}
 
 // WriteMessage sends the specified message to the GELF server
 // specified in the call to New().  It assumes all the fields are
 // filled out appropriately.  In general, clients will want to use
 // Write, rather than WriteMessage.
-func (w *UDPWriter) WriteMessage(m *Message) (err error) ***REMOVED***
+func (w *UDPWriter) WriteMessage(m *Message) (err error) {
 	mBuf := newBuffer()
 	defer bufPool.Put(mBuf)
-	if err = m.MarshalJSONBuf(mBuf); err != nil ***REMOVED***
+	if err = m.MarshalJSONBuf(mBuf); err != nil {
 		return err
-	***REMOVED***
+	}
 	mBytes := mBuf.Bytes()
 
 	var (
@@ -174,7 +174,7 @@ func (w *UDPWriter) WriteMessage(m *Message) (err error) ***REMOVED***
 	)
 
 	var zw io.WriteCloser
-	switch w.CompressionType ***REMOVED***
+	switch w.CompressionType {
 	case CompressGzip:
 		zBuf = newBuffer()
 		defer bufPool.Put(zBuf)
@@ -188,44 +188,44 @@ func (w *UDPWriter) WriteMessage(m *Message) (err error) ***REMOVED***
 	default:
 		panic(fmt.Sprintf("unknown compression type %d",
 			w.CompressionType))
-	***REMOVED***
-	if zw != nil ***REMOVED***
-		if err != nil ***REMOVED***
+	}
+	if zw != nil {
+		if err != nil {
 			return
-		***REMOVED***
-		if _, err = zw.Write(mBytes); err != nil ***REMOVED***
+		}
+		if _, err = zw.Write(mBytes); err != nil {
 			zw.Close()
 			return
-		***REMOVED***
+		}
 		zw.Close()
 		zBytes = zBuf.Bytes()
-	***REMOVED***
+	}
 
-	if numChunks(zBytes) > 1 ***REMOVED***
+	if numChunks(zBytes) > 1 {
 		return w.writeChunked(zBytes)
-	***REMOVED***
+	}
 	n, err := w.conn.Write(zBytes)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
-	if n != len(zBytes) ***REMOVED***
+	}
+	if n != len(zBytes) {
 		return fmt.Errorf("bad write (%d/%d)", n, len(zBytes))
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // Write encodes the given string in a GELF message and sends it to
 // the server specified in New().
-func (w *UDPWriter) Write(p []byte) (n int, err error) ***REMOVED***
+func (w *UDPWriter) Write(p []byte) (n int, err error) {
 	// 1 for the function that called us.
 	file, line := getCallerIgnoringLogMulti(1)
 
 	m := constructMessage(p, w.hostname, w.Facility, file, line)
 
-	if err = w.WriteMessage(m); err != nil ***REMOVED***
+	if err = w.WriteMessage(m); err != nil {
 		return 0, err
-	***REMOVED***
+	}
 
 	return len(p), nil
-***REMOVED***
+}

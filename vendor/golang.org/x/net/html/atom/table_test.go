@@ -4,7 +4,7 @@
 
 package atom
 
-var testAtomList = []string***REMOVED***
+var testAtomList = []string{
 	"a",
 	"abbr",
 	"accept",
@@ -370,4 +370,4 @@ var testAtomList = []string***REMOVED***
 	"workertype",
 	"wrap",
 	"xmp",
-***REMOVED***
+}

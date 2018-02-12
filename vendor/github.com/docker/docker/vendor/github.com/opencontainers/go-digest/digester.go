@@ -5,21 +5,21 @@ import "hash"
 // Digester calculates the digest of written data. Writes should go directly
 // to the return value of Hash, while calling Digest will return the current
 // value of the digest.
-type Digester interface ***REMOVED***
+type Digester interface {
 	Hash() hash.Hash // provides direct access to underlying hash instance.
 	Digest() Digest
-***REMOVED***
+}
 
 // digester provides a simple digester definition that embeds a hasher.
-type digester struct ***REMOVED***
+type digester struct {
 	alg  Algorithm
 	hash hash.Hash
-***REMOVED***
+}
 
-func (d *digester) Hash() hash.Hash ***REMOVED***
+func (d *digester) Hash() hash.Hash {
 	return d.hash
-***REMOVED***
+}
 
-func (d *digester) Digest() Digest ***REMOVED***
+func (d *digester) Digest() Digest {
 	return NewDigest(d.alg, d.hash)
-***REMOVED***
+}

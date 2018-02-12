@@ -23,7 +23,7 @@ import (
 
 // Tests that below functions, structures and constants are consistent
 // on all Unix-like systems.
-func _() ***REMOVED***
+func _() {
 	// program scheduling priority functions and constants
 	var (
 		_ func(int, int, int) error   = unix.Setpriority
@@ -44,39 +44,39 @@ func _() ***REMOVED***
 
 	// fcntl file locking structure and constants
 	var (
-		_ = unix.Flock_t***REMOVED***
+		_ = unix.Flock_t{
 			Type:   int16(0),
 			Whence: int16(0),
 			Start:  int64(0),
 			Len:    int64(0),
 			Pid:    int32(0),
-		***REMOVED***
+		}
 	)
 	const (
 		_ = unix.F_GETLK
 		_ = unix.F_SETLK
 		_ = unix.F_SETLKW
 	)
-***REMOVED***
+}
 
 // TestFcntlFlock tests whether the file locking structure matches
 // the calling convention of each kernel.
-func TestFcntlFlock(t *testing.T) ***REMOVED***
+func TestFcntlFlock(t *testing.T) {
 	name := filepath.Join(os.TempDir(), "TestFcntlFlock")
 	fd, err := unix.Open(name, unix.O_CREAT|unix.O_RDWR|unix.O_CLOEXEC, 0)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("Open failed: %v", err)
-	***REMOVED***
+	}
 	defer unix.Unlink(name)
 	defer unix.Close(fd)
-	flock := unix.Flock_t***REMOVED***
+	flock := unix.Flock_t{
 		Type:  unix.F_RDLCK,
 		Start: 0, Len: 0, Whence: 1,
-	***REMOVED***
-	if err := unix.FcntlFlock(uintptr(fd), unix.F_GETLK, &flock); err != nil ***REMOVED***
+	}
+	if err := unix.FcntlFlock(uintptr(fd), unix.F_GETLK, &flock); err != nil {
 		t.Fatalf("FcntlFlock failed: %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // TestPassFD tests passing a file descriptor over a Unix socket.
 //
@@ -85,22 +85,22 @@ func TestFcntlFlock(t *testing.T) ***REMOVED***
 // runs the child process by running the current test binary with args
 // "-test.run=^TestPassFD$" and an environment variable used to signal
 // that the test should become the child process instead.
-func TestPassFD(t *testing.T) ***REMOVED***
-	if os.Getenv("GO_WANT_HELPER_PROCESS") == "1" ***REMOVED***
+func TestPassFD(t *testing.T) {
+	if os.Getenv("GO_WANT_HELPER_PROCESS") == "1" {
 		passFDChild()
 		return
-	***REMOVED***
+	}
 
 	tempDir, err := ioutil.TempDir("", "TestPassFD")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	defer os.RemoveAll(tempDir)
 
 	fds, err := unix.Socketpair(unix.AF_LOCAL, unix.SOCK_STREAM, 0)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("Socketpair: %v", err)
-	***REMOVED***
+	}
 	defer unix.Close(fds[0])
 	defer unix.Close(fds[1])
 	writeFile := os.NewFile(uintptr(fds[0]), "child-writes")
@@ -109,96 +109,96 @@ func TestPassFD(t *testing.T) ***REMOVED***
 	defer readFile.Close()
 
 	cmd := exec.Command(os.Args[0], "-test.run=^TestPassFD$", "--", tempDir)
-	cmd.Env = []string***REMOVED***"GO_WANT_HELPER_PROCESS=1"***REMOVED***
-	if lp := os.Getenv("LD_LIBRARY_PATH"); lp != "" ***REMOVED***
+	cmd.Env = []string{"GO_WANT_HELPER_PROCESS=1"}
+	if lp := os.Getenv("LD_LIBRARY_PATH"); lp != "" {
 		cmd.Env = append(cmd.Env, "LD_LIBRARY_PATH="+lp)
-	***REMOVED***
-	cmd.ExtraFiles = []*os.File***REMOVED***writeFile***REMOVED***
+	}
+	cmd.ExtraFiles = []*os.File{writeFile}
 
 	out, err := cmd.CombinedOutput()
-	if len(out) > 0 || err != nil ***REMOVED***
+	if len(out) > 0 || err != nil {
 		t.Fatalf("child process: %q, %v", out, err)
-	***REMOVED***
+	}
 
 	c, err := net.FileConn(readFile)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("FileConn: %v", err)
-	***REMOVED***
+	}
 	defer c.Close()
 
 	uc, ok := c.(*net.UnixConn)
-	if !ok ***REMOVED***
+	if !ok {
 		t.Fatalf("unexpected FileConn type; expected UnixConn, got %T", c)
-	***REMOVED***
+	}
 
 	buf := make([]byte, 32) // expect 1 byte
 	oob := make([]byte, 32) // expect 24 bytes
-	closeUnix := time.AfterFunc(5*time.Second, func() ***REMOVED***
+	closeUnix := time.AfterFunc(5*time.Second, func() {
 		t.Logf("timeout reading from unix socket")
 		uc.Close()
-	***REMOVED***)
+	})
 	_, oobn, _, _, err := uc.ReadMsgUnix(buf, oob)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("ReadMsgUnix: %v", err)
-	***REMOVED***
+	}
 	closeUnix.Stop()
 
 	scms, err := unix.ParseSocketControlMessage(oob[:oobn])
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("ParseSocketControlMessage: %v", err)
-	***REMOVED***
-	if len(scms) != 1 ***REMOVED***
+	}
+	if len(scms) != 1 {
 		t.Fatalf("expected 1 SocketControlMessage; got scms = %#v", scms)
-	***REMOVED***
+	}
 	scm := scms[0]
 	gotFds, err := unix.ParseUnixRights(&scm)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("unix.ParseUnixRights: %v", err)
-	***REMOVED***
-	if len(gotFds) != 1 ***REMOVED***
+	}
+	if len(gotFds) != 1 {
 		t.Fatalf("wanted 1 fd; got %#v", gotFds)
-	***REMOVED***
+	}
 
 	f := os.NewFile(uintptr(gotFds[0]), "fd-from-child")
 	defer f.Close()
 
 	got, err := ioutil.ReadAll(f)
 	want := "Hello from child process!\n"
-	if string(got) != want ***REMOVED***
+	if string(got) != want {
 		t.Errorf("child process ReadAll: %q, %v; want %q", got, err, want)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // passFDChild is the child process used by TestPassFD.
-func passFDChild() ***REMOVED***
+func passFDChild() {
 	defer os.Exit(0)
 
 	// Look for our fd. It should be fd 3, but we work around an fd leak
 	// bug here (http://golang.org/issue/2603) to let it be elsewhere.
 	var uc *net.UnixConn
-	for fd := uintptr(3); fd <= 10; fd++ ***REMOVED***
+	for fd := uintptr(3); fd <= 10; fd++ {
 		f := os.NewFile(fd, "unix-conn")
 		var ok bool
 		netc, _ := net.FileConn(f)
 		uc, ok = netc.(*net.UnixConn)
-		if ok ***REMOVED***
+		if ok {
 			break
-		***REMOVED***
-	***REMOVED***
-	if uc == nil ***REMOVED***
+		}
+	}
+	if uc == nil {
 		fmt.Println("failed to find unix fd")
 		return
-	***REMOVED***
+	}
 
 	// Make a file f to send to our parent process on uc.
 	// We make it in tempDir, which our parent will clean up.
 	flag.Parse()
 	tempDir := flag.Arg(0)
 	f, err := ioutil.TempFile(tempDir, "")
-	if err != nil ***REMOVED***
+	if err != nil {
 		fmt.Printf("TempFile: %v", err)
 		return
-	***REMOVED***
+	}
 
 	f.Write([]byte("Hello from child process!\n"))
 	f.Seek(0, 0)
@@ -206,241 +206,241 @@ func passFDChild() ***REMOVED***
 	rights := unix.UnixRights(int(f.Fd()))
 	dummyByte := []byte("x")
 	n, oobn, err := uc.WriteMsgUnix(dummyByte, rights, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		fmt.Printf("WriteMsgUnix: %v", err)
 		return
-	***REMOVED***
-	if n != 1 || oobn != len(rights) ***REMOVED***
+	}
+	if n != 1 || oobn != len(rights) {
 		fmt.Printf("WriteMsgUnix = %d, %d; want 1, %d", n, oobn, len(rights))
 		return
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // TestUnixRightsRoundtrip tests that UnixRights, ParseSocketControlMessage,
 // and ParseUnixRights are able to successfully round-trip lists of file descriptors.
-func TestUnixRightsRoundtrip(t *testing.T) ***REMOVED***
-	testCases := [...][][]int***REMOVED***
-		***REMOVED******REMOVED***42***REMOVED******REMOVED***,
-		***REMOVED******REMOVED***1, 2***REMOVED******REMOVED***,
-		***REMOVED******REMOVED***3, 4, 5***REMOVED******REMOVED***,
-		***REMOVED******REMOVED******REMOVED******REMOVED***,
-		***REMOVED******REMOVED***1, 2***REMOVED***, ***REMOVED***3, 4, 5***REMOVED***, ***REMOVED******REMOVED***, ***REMOVED***7***REMOVED******REMOVED***,
-	***REMOVED***
-	for _, testCase := range testCases ***REMOVED***
-		b := []byte***REMOVED******REMOVED***
+func TestUnixRightsRoundtrip(t *testing.T) {
+	testCases := [...][][]int{
+		{{42}},
+		{{1, 2}},
+		{{3, 4, 5}},
+		{{}},
+		{{1, 2}, {3, 4, 5}, {}, {7}},
+	}
+	for _, testCase := range testCases {
+		b := []byte{}
 		var n int
-		for _, fds := range testCase ***REMOVED***
+		for _, fds := range testCase {
 			// Last assignment to n wins
 			n = len(b) + unix.CmsgLen(4*len(fds))
 			b = append(b, unix.UnixRights(fds...)...)
-		***REMOVED***
+		}
 		// Truncate b
 		b = b[:n]
 
 		scms, err := unix.ParseSocketControlMessage(b)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("ParseSocketControlMessage: %v", err)
-		***REMOVED***
-		if len(scms) != len(testCase) ***REMOVED***
+		}
+		if len(scms) != len(testCase) {
 			t.Fatalf("expected %v SocketControlMessage; got scms = %#v", len(testCase), scms)
-		***REMOVED***
-		for i, scm := range scms ***REMOVED***
+		}
+		for i, scm := range scms {
 			gotFds, err := unix.ParseUnixRights(&scm)
-			if err != nil ***REMOVED***
+			if err != nil {
 				t.Fatalf("ParseUnixRights: %v", err)
-			***REMOVED***
+			}
 			wantFds := testCase[i]
-			if len(gotFds) != len(wantFds) ***REMOVED***
+			if len(gotFds) != len(wantFds) {
 				t.Fatalf("expected %v fds, got %#v", len(wantFds), gotFds)
-			***REMOVED***
-			for j, fd := range gotFds ***REMOVED***
-				if fd != wantFds[j] ***REMOVED***
+			}
+			for j, fd := range gotFds {
+				if fd != wantFds[j] {
 					t.Fatalf("expected fd %v, got %v", wantFds[j], fd)
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+				}
+			}
+		}
+	}
+}
 
-func TestRlimit(t *testing.T) ***REMOVED***
+func TestRlimit(t *testing.T) {
 	var rlimit, zero unix.Rlimit
 	err := unix.Getrlimit(unix.RLIMIT_NOFILE, &rlimit)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("Getrlimit: save failed: %v", err)
-	***REMOVED***
-	if zero == rlimit ***REMOVED***
+	}
+	if zero == rlimit {
 		t.Fatalf("Getrlimit: save failed: got zero value %#v", rlimit)
-	***REMOVED***
+	}
 	set := rlimit
 	set.Cur = set.Max - 1
 	err = unix.Setrlimit(unix.RLIMIT_NOFILE, &set)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("Setrlimit: set failed: %#v %v", set, err)
-	***REMOVED***
+	}
 	var get unix.Rlimit
 	err = unix.Getrlimit(unix.RLIMIT_NOFILE, &get)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("Getrlimit: get failed: %v", err)
-	***REMOVED***
+	}
 	set = rlimit
 	set.Cur = set.Max - 1
-	if set != get ***REMOVED***
+	if set != get {
 		// Seems like Darwin requires some privilege to
 		// increase the soft limit of rlimit sandbox, though
 		// Setrlimit never reports an error.
-		switch runtime.GOOS ***REMOVED***
+		switch runtime.GOOS {
 		case "darwin":
 		default:
 			t.Fatalf("Rlimit: change failed: wanted %#v got %#v", set, get)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	err = unix.Setrlimit(unix.RLIMIT_NOFILE, &rlimit)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("Setrlimit: restore failed: %#v %v", rlimit, err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestSeekFailure(t *testing.T) ***REMOVED***
+func TestSeekFailure(t *testing.T) {
 	_, err := unix.Seek(-1, 0, 0)
-	if err == nil ***REMOVED***
+	if err == nil {
 		t.Fatalf("Seek(-1, 0, 0) did not fail")
-	***REMOVED***
+	}
 	str := err.Error() // used to crash on Linux
 	t.Logf("Seek: %v", str)
-	if str == "" ***REMOVED***
+	if str == "" {
 		t.Fatalf("Seek(-1, 0, 0) return error with empty message")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestDup(t *testing.T) ***REMOVED***
+func TestDup(t *testing.T) {
 	file, err := ioutil.TempFile("", "TestDup")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("Tempfile failed: %v", err)
-	***REMOVED***
+	}
 	defer os.Remove(file.Name())
 	defer file.Close()
 	f := int(file.Fd())
 
 	newFd, err := unix.Dup(f)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("Dup: %v", err)
-	***REMOVED***
+	}
 
 	err = unix.Dup2(newFd, newFd+1)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("Dup2: %v", err)
-	***REMOVED***
+	}
 
 	b1 := []byte("Test123")
 	b2 := make([]byte, 7)
 	_, err = unix.Write(newFd+1, b1)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("Write to dup2 fd failed: %v", err)
-	***REMOVED***
+	}
 	_, err = unix.Seek(f, 0, 0)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("Seek failed: %v", err)
-	***REMOVED***
+	}
 	_, err = unix.Read(f, b2)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("Read back failed: %v", err)
-	***REMOVED***
-	if string(b1) != string(b2) ***REMOVED***
+	}
+	if string(b1) != string(b2) {
 		t.Errorf("Dup: stdout write not in file, expected %v, got %v", string(b1), string(b2))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestPoll(t *testing.T) ***REMOVED***
+func TestPoll(t *testing.T) {
 	f, cleanup := mktmpfifo(t)
 	defer cleanup()
 
 	const timeout = 100
 
 	ok := make(chan bool, 1)
-	go func() ***REMOVED***
-		select ***REMOVED***
+	go func() {
+		select {
 		case <-time.After(10 * timeout * time.Millisecond):
 			t.Errorf("Poll: failed to timeout after %d milliseconds", 10*timeout)
 		case <-ok:
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
-	fds := []unix.PollFd***REMOVED******REMOVED***Fd: int32(f.Fd()), Events: unix.POLLIN***REMOVED******REMOVED***
+	fds := []unix.PollFd{{Fd: int32(f.Fd()), Events: unix.POLLIN}}
 	n, err := unix.Poll(fds, timeout)
 	ok <- true
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("Poll: unexpected error: %v", err)
 		return
-	***REMOVED***
-	if n != 0 ***REMOVED***
+	}
+	if n != 0 {
 		t.Errorf("Poll: wrong number of events: got %v, expected %v", n, 0)
 		return
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestGetwd(t *testing.T) ***REMOVED***
+func TestGetwd(t *testing.T) {
 	fd, err := os.Open(".")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("Open .: %s", err)
-	***REMOVED***
+	}
 	defer fd.Close()
 	// These are chosen carefully not to be symlinks on a Mac
 	// (unlike, say, /var, /etc)
-	dirs := []string***REMOVED***"/", "/usr/bin"***REMOVED***
-	if runtime.GOOS == "darwin" ***REMOVED***
-		switch runtime.GOARCH ***REMOVED***
+	dirs := []string{"/", "/usr/bin"}
+	if runtime.GOOS == "darwin" {
+		switch runtime.GOARCH {
 		case "arm", "arm64":
 			d1, err := ioutil.TempDir("", "d1")
-			if err != nil ***REMOVED***
+			if err != nil {
 				t.Fatalf("TempDir: %v", err)
-			***REMOVED***
+			}
 			d2, err := ioutil.TempDir("", "d2")
-			if err != nil ***REMOVED***
+			if err != nil {
 				t.Fatalf("TempDir: %v", err)
-			***REMOVED***
-			dirs = []string***REMOVED***d1, d2***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+			dirs = []string{d1, d2}
+		}
+	}
 	oldwd := os.Getenv("PWD")
-	for _, d := range dirs ***REMOVED***
+	for _, d := range dirs {
 		err = os.Chdir(d)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("Chdir: %v", err)
-		***REMOVED***
+		}
 		pwd, err := unix.Getwd()
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("Getwd in %s: %s", d, err)
-		***REMOVED***
+		}
 		os.Setenv("PWD", oldwd)
 		err = fd.Chdir()
-		if err != nil ***REMOVED***
+		if err != nil {
 			// We changed the current directory and cannot go back.
 			// Don't let the tests continue; they'll scribble
 			// all over some other directory.
 			fmt.Fprintf(os.Stderr, "fchdir back to dot failed: %s\n", err)
 			os.Exit(1)
-		***REMOVED***
-		if pwd != d ***REMOVED***
+		}
+		if pwd != d {
 			t.Fatalf("Getwd returned %q want %q", pwd, d)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // mktmpfifo creates a temporary FIFO and provides a cleanup function.
-func mktmpfifo(t *testing.T) (*os.File, func()) ***REMOVED***
+func mktmpfifo(t *testing.T) (*os.File, func()) {
 	err := unix.Mkfifo("fifo", 0666)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("mktmpfifo: failed to create FIFO: %v", err)
-	***REMOVED***
+	}
 
 	f, err := os.OpenFile("fifo", os.O_RDWR, 0666)
-	if err != nil ***REMOVED***
+	if err != nil {
 		os.Remove("fifo")
 		t.Fatalf("mktmpfifo: failed to open FIFO: %v", err)
-	***REMOVED***
+	}
 
-	return f, func() ***REMOVED***
+	return f, func() {
 		f.Close()
 		os.Remove("fifo")
-	***REMOVED***
-***REMOVED***
+	}
+}

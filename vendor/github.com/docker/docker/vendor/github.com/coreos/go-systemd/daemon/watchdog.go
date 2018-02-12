@@ -31,42 +31,42 @@ import (
 // (0, err) - an error happened (e.g. error converting time).
 // (time, nil) - watchdog is enabled and we can send ping.
 //   time is delay before inactive service will be killed.
-func SdWatchdogEnabled(unsetEnvironment bool) (time.Duration, error) ***REMOVED***
+func SdWatchdogEnabled(unsetEnvironment bool) (time.Duration, error) {
 	wusec := os.Getenv("WATCHDOG_USEC")
 	wpid := os.Getenv("WATCHDOG_PID")
-	if unsetEnvironment ***REMOVED***
+	if unsetEnvironment {
 		wusecErr := os.Unsetenv("WATCHDOG_USEC")
 		wpidErr := os.Unsetenv("WATCHDOG_PID")
-		if wusecErr != nil ***REMOVED***
+		if wusecErr != nil {
 			return 0, wusecErr
-		***REMOVED***
-		if wpidErr != nil ***REMOVED***
+		}
+		if wpidErr != nil {
 			return 0, wpidErr
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if wusec == "" ***REMOVED***
+	if wusec == "" {
 		return 0, nil
-	***REMOVED***
+	}
 	s, err := strconv.Atoi(wusec)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, fmt.Errorf("error converting WATCHDOG_USEC: %s", err)
-	***REMOVED***
-	if s <= 0 ***REMOVED***
+	}
+	if s <= 0 {
 		return 0, fmt.Errorf("error WATCHDOG_USEC must be a positive number")
-	***REMOVED***
+	}
 	interval := time.Duration(s) * time.Microsecond
 
-	if wpid == "" ***REMOVED***
+	if wpid == "" {
 		return interval, nil
-	***REMOVED***
+	}
 	p, err := strconv.Atoi(wpid)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, fmt.Errorf("error converting WATCHDOG_PID: %s", err)
-	***REMOVED***
-	if os.Getpid() != p ***REMOVED***
+	}
+	if os.Getpid() != p {
 		return 0, nil
-	***REMOVED***
+	}
 
 	return interval, nil
-***REMOVED***
+}

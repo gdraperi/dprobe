@@ -8,7 +8,7 @@ package nettest
 
 import "testing"
 
-func testConn(t *testing.T, mp MakePipe) ***REMOVED***
+func testConn(t *testing.T, mp MakePipe) {
 	// Avoid using subtests on Go 1.6 and below.
 	timeoutWrapper(t, mp, testBasicIO)
 	timeoutWrapper(t, mp, testPingPong)
@@ -21,4 +21,4 @@ func testConn(t *testing.T, mp MakePipe) ***REMOVED***
 	timeoutWrapper(t, mp, testFutureTimeout)
 	timeoutWrapper(t, mp, testCloseTimeout)
 	timeoutWrapper(t, mp, testConcurrentMethods)
-***REMOVED***
+}

@@ -10,40 +10,40 @@ import (
 	"golang.org/x/net/bpf"
 )
 
-func TestVMLoadExtensionNotImplemented(t *testing.T) ***REMOVED***
-	_, _, err := testVM(t, []bpf.Instruction***REMOVED***
-		bpf.LoadExtension***REMOVED***
+func TestVMLoadExtensionNotImplemented(t *testing.T) {
+	_, _, err := testVM(t, []bpf.Instruction{
+		bpf.LoadExtension{
 			Num: 100,
-		***REMOVED***,
-		bpf.RetA***REMOVED******REMOVED***,
-	***REMOVED***)
-	if errStr(err) != "extension 100 not implemented" ***REMOVED***
+		},
+		bpf.RetA{},
+	})
+	if errStr(err) != "extension 100 not implemented" {
 		t.Fatalf("unexpected error: %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestVMLoadExtensionExtLen(t *testing.T) ***REMOVED***
-	vm, done, err := testVM(t, []bpf.Instruction***REMOVED***
-		bpf.LoadExtension***REMOVED***
+func TestVMLoadExtensionExtLen(t *testing.T) {
+	vm, done, err := testVM(t, []bpf.Instruction{
+		bpf.LoadExtension{
 			Num: bpf.ExtLen,
-		***REMOVED***,
-		bpf.RetA***REMOVED******REMOVED***,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+		},
+		bpf.RetA{},
+	})
+	if err != nil {
 		t.Fatalf("failed to load BPF program: %v", err)
-	***REMOVED***
+	}
 	defer done()
 
-	out, err := vm.Run([]byte***REMOVED***
+	out, err := vm.Run([]byte{
 		0xff, 0xff, 0xff, 0xff,
 		0xff, 0xff, 0xff, 0xff,
 		0, 1, 2, 3,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		t.Fatalf("unexpected error while running program: %v", err)
-	***REMOVED***
-	if want, got := 4, out; want != got ***REMOVED***
+	}
+	if want, got := 4, out; want != got {
 		t.Fatalf("unexpected number of output bytes:\n- want: %d\n-  got: %d",
 			want, got)
-	***REMOVED***
-***REMOVED***
+	}
+}

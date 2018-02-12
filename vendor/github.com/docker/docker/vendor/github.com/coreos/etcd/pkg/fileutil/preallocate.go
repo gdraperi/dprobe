@@ -24,31 +24,31 @@ import (
 // few filesystems (btrfs, ext4, etc.).
 // If the operation is unsupported, no error will be returned.
 // Otherwise, the error encountered will be returned.
-func Preallocate(f *os.File, sizeInBytes int64, extendFile bool) error ***REMOVED***
-	if sizeInBytes == 0 ***REMOVED***
+func Preallocate(f *os.File, sizeInBytes int64, extendFile bool) error {
+	if sizeInBytes == 0 {
 		// fallocate will return EINVAL if length is 0; skip
 		return nil
-	***REMOVED***
-	if extendFile ***REMOVED***
+	}
+	if extendFile {
 		return preallocExtend(f, sizeInBytes)
-	***REMOVED***
+	}
 	return preallocFixed(f, sizeInBytes)
-***REMOVED***
+}
 
-func preallocExtendTrunc(f *os.File, sizeInBytes int64) error ***REMOVED***
+func preallocExtendTrunc(f *os.File, sizeInBytes int64) error {
 	curOff, err := f.Seek(0, io.SeekCurrent)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	size, err := f.Seek(sizeInBytes, io.SeekEnd)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	if _, err = f.Seek(curOff, io.SeekStart); err != nil ***REMOVED***
+	}
+	if _, err = f.Seek(curOff, io.SeekStart); err != nil {
 		return err
-	***REMOVED***
-	if sizeInBytes > size ***REMOVED***
+	}
+	if sizeInBytes > size {
 		return nil
-	***REMOVED***
+	}
 	return f.Truncate(sizeInBytes)
-***REMOVED***
+}

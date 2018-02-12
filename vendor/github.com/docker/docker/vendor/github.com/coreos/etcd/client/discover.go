@@ -19,22 +19,22 @@ import (
 )
 
 // Discoverer is an interface that wraps the Discover method.
-type Discoverer interface ***REMOVED***
+type Discoverer interface {
 	// Discover looks up the etcd servers for the domain.
 	Discover(domain string) ([]string, error)
-***REMOVED***
+}
 
-type srvDiscover struct***REMOVED******REMOVED***
+type srvDiscover struct{}
 
 // NewSRVDiscover constructs a new Discoverer that uses the stdlib to lookup SRV records.
-func NewSRVDiscover() Discoverer ***REMOVED***
-	return &srvDiscover***REMOVED******REMOVED***
-***REMOVED***
+func NewSRVDiscover() Discoverer {
+	return &srvDiscover{}
+}
 
-func (d *srvDiscover) Discover(domain string) ([]string, error) ***REMOVED***
+func (d *srvDiscover) Discover(domain string) ([]string, error) {
 	srvs, err := srv.GetClient("etcd-client", domain)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return srvs.Endpoints, nil
-***REMOVED***
+}

@@ -16,28 +16,28 @@ import (
 	"github.com/go-check/check"
 )
 
-func pruneNetworkAndVerify(c *check.C, d *daemon.Swarm, kept, pruned []string) ***REMOVED***
+func pruneNetworkAndVerify(c *check.C, d *daemon.Swarm, kept, pruned []string) {
 	_, err := d.Cmd("network", "prune", "--force")
 	c.Assert(err, checker.IsNil)
 
-	for _, s := range kept ***REMOVED***
-		waitAndAssert(c, defaultReconciliationTimeout, func(*check.C) (interface***REMOVED******REMOVED***, check.CommentInterface) ***REMOVED***
-			out, err := d.Cmd("network", "ls", "--format", "***REMOVED******REMOVED***.Name***REMOVED******REMOVED***")
+	for _, s := range kept {
+		waitAndAssert(c, defaultReconciliationTimeout, func(*check.C) (interface{}, check.CommentInterface) {
+			out, err := d.Cmd("network", "ls", "--format", "{{.Name}}")
 			c.Assert(err, checker.IsNil)
 			return out, nil
-		***REMOVED***, checker.Contains, s)
-	***REMOVED***
+		}, checker.Contains, s)
+	}
 
-	for _, s := range pruned ***REMOVED***
-		waitAndAssert(c, defaultReconciliationTimeout, func(*check.C) (interface***REMOVED******REMOVED***, check.CommentInterface) ***REMOVED***
-			out, err := d.Cmd("network", "ls", "--format", "***REMOVED******REMOVED***.Name***REMOVED******REMOVED***")
+	for _, s := range pruned {
+		waitAndAssert(c, defaultReconciliationTimeout, func(*check.C) (interface{}, check.CommentInterface) {
+			out, err := d.Cmd("network", "ls", "--format", "{{.Name}}")
 			c.Assert(err, checker.IsNil)
 			return out, nil
-		***REMOVED***, checker.Not(checker.Contains), s)
-	***REMOVED***
-***REMOVED***
+		}, checker.Not(checker.Contains), s)
+	}
+}
 
-func (s *DockerSwarmSuite) TestPruneNetwork(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestPruneNetwork(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 	_, err := d.Cmd("network", "create", "n1") // used by container (testprune)
 	c.Assert(err, checker.IsNil)
@@ -64,7 +64,7 @@ func (s *DockerSwarmSuite) TestPruneNetwork(c *check.C) ***REMOVED***
 	waitAndAssert(c, defaultReconciliationTimeout, d.CheckActiveContainerCount, checker.Equals, replicas+1)
 
 	// prune and verify
-	pruneNetworkAndVerify(c, d, []string***REMOVED***"n1", "n3"***REMOVED***, []string***REMOVED***"n2", "n4"***REMOVED***)
+	pruneNetworkAndVerify(c, d, []string{"n1", "n3"}, []string{"n2", "n4"})
 
 	// remove containers, then prune and verify again
 	_, err = d.Cmd("rm", "-f", cName)
@@ -73,10 +73,10 @@ func (s *DockerSwarmSuite) TestPruneNetwork(c *check.C) ***REMOVED***
 	c.Assert(err, checker.IsNil)
 	waitAndAssert(c, defaultReconciliationTimeout, d.CheckActiveContainerCount, checker.Equals, 0)
 
-	pruneNetworkAndVerify(c, d, []string***REMOVED******REMOVED***, []string***REMOVED***"n1", "n3"***REMOVED***)
-***REMOVED***
+	pruneNetworkAndVerify(c, d, []string{}, []string{"n1", "n3"})
+}
 
-func (s *DockerDaemonSuite) TestPruneImageDangling(c *check.C) ***REMOVED***
+func (s *DockerDaemonSuite) TestPruneImageDangling(c *check.C) {
 	s.d.StartWithBusybox(c)
 
 	out, _, err := s.d.BuildImageWithOut("test",
@@ -104,9 +104,9 @@ func (s *DockerDaemonSuite) TestPruneImageDangling(c *check.C) ***REMOVED***
 	out, err = s.d.Cmd("images", "-q", "--no-trunc")
 	c.Assert(err, checker.IsNil)
 	c.Assert(strings.TrimSpace(out), checker.Not(checker.Contains), id)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestPruneContainerUntil(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestPruneContainerUntil(c *check.C) {
 	out := cli.DockerCmd(c, "run", "-d", "busybox").Combined()
 	id1 := strings.TrimSpace(out)
 	cli.WaitExited(c, id1, 5*time.Second)
@@ -124,9 +124,9 @@ func (s *DockerSuite) TestPruneContainerUntil(c *check.C) ***REMOVED***
 	out = cli.DockerCmd(c, "ps", "-a", "-q", "--no-trunc").Combined()
 	c.Assert(strings.TrimSpace(out), checker.Not(checker.Contains), id1)
 	c.Assert(strings.TrimSpace(out), checker.Contains, id2)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestPruneContainerLabel(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestPruneContainerLabel(c *check.C) {
 	out := cli.DockerCmd(c, "run", "-d", "--label", "foo", "busybox").Combined()
 	id1 := strings.TrimSpace(out)
 	cli.WaitExited(c, id1, 5*time.Second)
@@ -144,7 +144,7 @@ func (s *DockerSuite) TestPruneContainerLabel(c *check.C) ***REMOVED***
 	cli.WaitExited(c, id4, 5*time.Second)
 
 	// Add a config file of label=foobar, that will have no impact if cli is label!=foobar
-	config := `***REMOVED***"pruneFilters": ["label=foobar"]***REMOVED***`
+	config := `{"pruneFilters": ["label=foobar"]}`
 	d, err := ioutil.TempDir("", "integration-cli-")
 	c.Assert(err, checker.IsNil)
 	defer os.RemoveAll(d)
@@ -182,9 +182,9 @@ func (s *DockerSuite) TestPruneContainerLabel(c *check.C) ***REMOVED***
 
 	out = cli.DockerCmd(c, "ps", "-a", "-q", "--no-trunc").Combined()
 	c.Assert(strings.TrimSpace(out), checker.Not(checker.Contains), id2)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestPruneVolumeLabel(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestPruneVolumeLabel(c *check.C) {
 	out, _ := dockerCmd(c, "volume", "create", "--label", "foo")
 	id1 := strings.TrimSpace(out)
 	c.Assert(id1, checker.Not(checker.Equals), "")
@@ -202,7 +202,7 @@ func (s *DockerSuite) TestPruneVolumeLabel(c *check.C) ***REMOVED***
 	c.Assert(id4, checker.Not(checker.Equals), "")
 
 	// Add a config file of label=foobar, that will have no impact if cli is label!=foobar
-	config := `***REMOVED***"pruneFilters": ["label=foobar"]***REMOVED***`
+	config := `{"pruneFilters": ["label=foobar"]}`
 	d, err := ioutil.TempDir("", "integration-cli-")
 	c.Assert(err, checker.IsNil)
 	defer os.RemoveAll(d)
@@ -221,7 +221,7 @@ func (s *DockerSuite) TestPruneVolumeLabel(c *check.C) ***REMOVED***
 	c.Assert(strings.TrimSpace(out), checker.Not(checker.Contains), id2)
 	c.Assert(strings.TrimSpace(out), checker.Not(checker.Contains), id3)
 
-	out, _ = dockerCmd(c, "volume", "ls", "--format", "***REMOVED******REMOVED***.Name***REMOVED******REMOVED***")
+	out, _ = dockerCmd(c, "volume", "ls", "--format", "{{.Name}}")
 	c.Assert(strings.TrimSpace(out), checker.Not(checker.Contains), id1)
 	c.Assert(strings.TrimSpace(out), checker.Contains, id2)
 	c.Assert(strings.TrimSpace(out), checker.Contains, id3)
@@ -230,7 +230,7 @@ func (s *DockerSuite) TestPruneVolumeLabel(c *check.C) ***REMOVED***
 	c.Assert(strings.TrimSpace(out), checker.Not(checker.Contains), id2)
 	c.Assert(strings.TrimSpace(out), checker.Contains, id3)
 
-	out, _ = dockerCmd(c, "volume", "ls", "--format", "***REMOVED******REMOVED***.Name***REMOVED******REMOVED***")
+	out, _ = dockerCmd(c, "volume", "ls", "--format", "{{.Name}}")
 	c.Assert(strings.TrimSpace(out), checker.Contains, id2)
 	c.Assert(strings.TrimSpace(out), checker.Not(checker.Contains), id3)
 
@@ -238,11 +238,11 @@ func (s *DockerSuite) TestPruneVolumeLabel(c *check.C) ***REMOVED***
 	out, _ = dockerCmd(c, "--config", d, "volume", "prune", "--force", "--filter", "label!=foobar")
 	c.Assert(strings.TrimSpace(out), checker.Contains, id2)
 
-	out, _ = dockerCmd(c, "volume", "ls", "--format", "***REMOVED******REMOVED***.Name***REMOVED******REMOVED***")
+	out, _ = dockerCmd(c, "volume", "ls", "--format", "{{.Name}}")
 	c.Assert(strings.TrimSpace(out), checker.Not(checker.Contains), id2)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestPruneNetworkLabel(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestPruneNetworkLabel(c *check.C) {
 	dockerCmd(c, "network", "create", "--label", "foo", "n1")
 	dockerCmd(c, "network", "create", "--label", "bar", "n2")
 	dockerCmd(c, "network", "create", "n3")
@@ -261,9 +261,9 @@ func (s *DockerSuite) TestPruneNetworkLabel(c *check.C) ***REMOVED***
 	c.Assert(strings.TrimSpace(out), checker.Not(checker.Contains), "n1")
 	c.Assert(strings.TrimSpace(out), checker.Contains, "n2")
 	c.Assert(strings.TrimSpace(out), checker.Not(checker.Contains), "n3")
-***REMOVED***
+}
 
-func (s *DockerDaemonSuite) TestPruneImageLabel(c *check.C) ***REMOVED***
+func (s *DockerDaemonSuite) TestPruneImageLabel(c *check.C) {
 	s.d.StartWithBusybox(c)
 
 	out, _, err := s.d.BuildImageWithOut("test1",
@@ -298,4 +298,4 @@ func (s *DockerDaemonSuite) TestPruneImageLabel(c *check.C) ***REMOVED***
 	c.Assert(err, checker.IsNil)
 	c.Assert(strings.TrimSpace(out), checker.Not(checker.Contains), id1)
 	c.Assert(strings.TrimSpace(out), checker.Contains, id2)
-***REMOVED***
+}

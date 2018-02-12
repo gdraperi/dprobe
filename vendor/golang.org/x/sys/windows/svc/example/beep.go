@@ -17,6 +17,6 @@ var (
 	beepFunc = syscall.MustLoadDLL("user32.dll").MustFindProc("MessageBeep")
 )
 
-func beep() ***REMOVED***
+func beep() {
 	beepFunc.Call(0xffffffff)
-***REMOVED***
+}

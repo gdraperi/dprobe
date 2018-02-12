@@ -9,10 +9,10 @@ import (
 
 // Heavily inspired by the lexer from text/template.
 
-type varToken struct ***REMOVED***
+type varToken struct {
 	typ varTokenType
 	val string
-***REMOVED***
+}
 
 type varTokenType byte
 
@@ -34,79 +34,79 @@ const (
 	tokByteString
 )
 
-type varLexer struct ***REMOVED***
+type varLexer struct {
 	input  string
 	start  int
 	pos    int
 	width  int
 	tokens []varToken
-***REMOVED***
+}
 
 type lexState func(*varLexer) lexState
 
-func varLex(s string) []varToken ***REMOVED***
-	l := &varLexer***REMOVED***input: s***REMOVED***
+func varLex(s string) []varToken {
+	l := &varLexer{input: s}
 	l.run()
 	return l.tokens
-***REMOVED***
+}
 
-func (l *varLexer) accept(valid string) bool ***REMOVED***
-	if strings.IndexRune(valid, l.next()) >= 0 ***REMOVED***
+func (l *varLexer) accept(valid string) bool {
+	if strings.IndexRune(valid, l.next()) >= 0 {
 		return true
-	***REMOVED***
+	}
 	l.backup()
 	return false
-***REMOVED***
+}
 
-func (l *varLexer) backup() ***REMOVED***
+func (l *varLexer) backup() {
 	l.pos -= l.width
-***REMOVED***
+}
 
-func (l *varLexer) emit(t varTokenType) ***REMOVED***
-	l.tokens = append(l.tokens, varToken***REMOVED***t, l.input[l.start:l.pos]***REMOVED***)
+func (l *varLexer) emit(t varTokenType) {
+	l.tokens = append(l.tokens, varToken{t, l.input[l.start:l.pos]})
 	l.start = l.pos
-***REMOVED***
+}
 
-func (l *varLexer) errorf(format string, v ...interface***REMOVED******REMOVED***) lexState ***REMOVED***
-	l.tokens = append(l.tokens, varToken***REMOVED***
+func (l *varLexer) errorf(format string, v ...interface{}) lexState {
+	l.tokens = append(l.tokens, varToken{
 		tokError,
 		fmt.Sprintf(format, v...),
-	***REMOVED***)
+	})
 	return nil
-***REMOVED***
+}
 
-func (l *varLexer) ignore() ***REMOVED***
+func (l *varLexer) ignore() {
 	l.start = l.pos
-***REMOVED***
+}
 
-func (l *varLexer) next() rune ***REMOVED***
+func (l *varLexer) next() rune {
 	var r rune
 
-	if l.pos >= len(l.input) ***REMOVED***
+	if l.pos >= len(l.input) {
 		l.width = 0
 		return -1
-	***REMOVED***
+	}
 	r, l.width = utf8.DecodeRuneInString(l.input[l.pos:])
 	l.pos += l.width
 	return r
-***REMOVED***
+}
 
-func (l *varLexer) run() ***REMOVED***
-	for state := varLexNormal; state != nil; ***REMOVED***
+func (l *varLexer) run() {
+	for state := varLexNormal; state != nil; {
 		state = state(l)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (l *varLexer) peek() rune ***REMOVED***
+func (l *varLexer) peek() rune {
 	r := l.next()
 	l.backup()
 	return r
-***REMOVED***
+}
 
-func varLexNormal(l *varLexer) lexState ***REMOVED***
-	for ***REMOVED***
+func varLexNormal(l *varLexer) lexState {
+	for {
 		r := l.next()
-		switch ***REMOVED***
+		switch {
 		case r == -1:
 			l.emit(tokEOF)
 			return nil
@@ -114,9 +114,9 @@ func varLexNormal(l *varLexer) lexState ***REMOVED***
 			l.emit(tokArrayStart)
 		case r == ']':
 			l.emit(tokArrayEnd)
-		case r == '***REMOVED***':
+		case r == '{':
 			l.emit(tokDictStart)
-		case r == '***REMOVED***':
+		case r == '}':
 			l.emit(tokDictEnd)
 		case r == '<':
 			l.emit(tokVariantStart)
@@ -139,9 +139,9 @@ func varLexNormal(l *varLexer) lexState ***REMOVED***
 			return varLexNumber
 		case r == 'b':
 			pos := l.start
-			if n := l.peek(); n == '"' || n == '\'' ***REMOVED***
+			if n := l.peek(); n == '"' || n == '\'' {
 				return varLexByteString
-			***REMOVED***
+			}
 			// not a byte string; try to parse it as a type or bool below
 			l.pos = pos + 1
 			l.width = 1
@@ -149,27 +149,27 @@ func varLexNormal(l *varLexer) lexState ***REMOVED***
 		default:
 			// either a bool or a type. Try bools first.
 			l.backup()
-			if l.pos+4 <= len(l.input) ***REMOVED***
-				if l.input[l.pos:l.pos+4] == "true" ***REMOVED***
+			if l.pos+4 <= len(l.input) {
+				if l.input[l.pos:l.pos+4] == "true" {
 					l.pos += 4
 					l.emit(tokBool)
 					continue
-				***REMOVED***
-			***REMOVED***
-			if l.pos+5 <= len(l.input) ***REMOVED***
-				if l.input[l.pos:l.pos+5] == "false" ***REMOVED***
+				}
+			}
+			if l.pos+5 <= len(l.input) {
+				if l.input[l.pos:l.pos+5] == "false" {
 					l.pos += 5
 					l.emit(tokBool)
 					continue
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			// must be a type.
 			return varLexType
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-var varTypeMap = map[string]string***REMOVED***
+var varTypeMap = map[string]string{
 	"boolean":    "b",
 	"byte":       "y",
 	"int16":      "n",
@@ -182,103 +182,103 @@ var varTypeMap = map[string]string***REMOVED***
 	"string":     "s",
 	"objectpath": "o",
 	"signature":  "g",
-***REMOVED***
+}
 
-func varLexByteString(l *varLexer) lexState ***REMOVED***
+func varLexByteString(l *varLexer) lexState {
 	q := l.next()
 Loop:
-	for ***REMOVED***
-		switch l.next() ***REMOVED***
+	for {
+		switch l.next() {
 		case '\\':
-			if r := l.next(); r != -1 ***REMOVED***
+			if r := l.next(); r != -1 {
 				break
-			***REMOVED***
+			}
 			fallthrough
 		case -1:
 			return l.errorf("unterminated bytestring")
 		case q:
 			break Loop
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	l.emit(tokByteString)
 	return varLexNormal
-***REMOVED***
+}
 
-func varLexNumber(l *varLexer) lexState ***REMOVED***
+func varLexNumber(l *varLexer) lexState {
 	l.accept("+-")
 	digits := "0123456789"
-	if l.accept("0") ***REMOVED***
-		if l.accept("x") ***REMOVED***
+	if l.accept("0") {
+		if l.accept("x") {
 			digits = "0123456789abcdefABCDEF"
-		***REMOVED*** else ***REMOVED***
+		} else {
 			digits = "01234567"
-		***REMOVED***
-	***REMOVED***
-	for strings.IndexRune(digits, l.next()) >= 0 ***REMOVED***
-	***REMOVED***
+		}
+	}
+	for strings.IndexRune(digits, l.next()) >= 0 {
+	}
 	l.backup()
-	if l.accept(".") ***REMOVED***
-		for strings.IndexRune(digits, l.next()) >= 0 ***REMOVED***
-		***REMOVED***
+	if l.accept(".") {
+		for strings.IndexRune(digits, l.next()) >= 0 {
+		}
 		l.backup()
-	***REMOVED***
-	if l.accept("eE") ***REMOVED***
+	}
+	if l.accept("eE") {
 		l.accept("+-")
-		for strings.IndexRune("0123456789", l.next()) >= 0 ***REMOVED***
-		***REMOVED***
+		for strings.IndexRune("0123456789", l.next()) >= 0 {
+		}
 		l.backup()
-	***REMOVED***
-	if r := l.peek(); unicode.IsLetter(r) ***REMOVED***
+	}
+	if r := l.peek(); unicode.IsLetter(r) {
 		l.next()
 		return l.errorf("bad number syntax: %q", l.input[l.start:l.pos])
-	***REMOVED***
+	}
 	l.emit(tokNumber)
 	return varLexNormal
-***REMOVED***
+}
 
-func varLexString(l *varLexer) lexState ***REMOVED***
+func varLexString(l *varLexer) lexState {
 	q := l.next()
 Loop:
-	for ***REMOVED***
-		switch l.next() ***REMOVED***
+	for {
+		switch l.next() {
 		case '\\':
-			if r := l.next(); r != -1 ***REMOVED***
+			if r := l.next(); r != -1 {
 				break
-			***REMOVED***
+			}
 			fallthrough
 		case -1:
 			return l.errorf("unterminated string")
 		case q:
 			break Loop
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	l.emit(tokString)
 	return varLexNormal
-***REMOVED***
+}
 
-func varLexType(l *varLexer) lexState ***REMOVED***
+func varLexType(l *varLexer) lexState {
 	at := l.accept("@")
-	for ***REMOVED***
+	for {
 		r := l.next()
-		if r == -1 ***REMOVED***
+		if r == -1 {
 			break
-		***REMOVED***
-		if unicode.IsSpace(r) ***REMOVED***
+		}
+		if unicode.IsSpace(r) {
 			l.backup()
 			break
-		***REMOVED***
-	***REMOVED***
-	if at ***REMOVED***
-		if _, err := ParseSignature(l.input[l.start+1 : l.pos]); err != nil ***REMOVED***
+		}
+	}
+	if at {
+		if _, err := ParseSignature(l.input[l.start+1 : l.pos]); err != nil {
 			return l.errorf("%s", err)
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
-		if _, ok := varTypeMap[l.input[l.start:l.pos]]; ok ***REMOVED***
+		}
+	} else {
+		if _, ok := varTypeMap[l.input[l.start:l.pos]]; ok {
 			l.emit(tokType)
 			return varLexNormal
-		***REMOVED***
+		}
 		return l.errorf("unrecognized type %q", l.input[l.start:l.pos])
-	***REMOVED***
+	}
 	l.emit(tokType)
 	return varLexNormal
-***REMOVED***
+}

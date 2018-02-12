@@ -57,19 +57,19 @@ var (
 	maxLo         uint32
 )
 
-func max(a, b int) int ***REMOVED***
-	if a < b ***REMOVED***
+func max(a, b int) int {
+	if a < b {
 		return b
-	***REMOVED***
+	}
 	return a
-***REMOVED***
+}
 
-func u32max(a, b uint32) uint32 ***REMOVED***
-	if a < b ***REMOVED***
+func u32max(a, b uint32) uint32 {
+	if a < b {
 		return b
-	***REMOVED***
+	}
 	return a
-***REMOVED***
+}
 
 const (
 	nodeTypeNormal     = 0
@@ -78,17 +78,17 @@ const (
 	numNodeType        = 3
 )
 
-func nodeTypeStr(n int) string ***REMOVED***
-	switch n ***REMOVED***
+func nodeTypeStr(n int) string {
+	switch n {
 	case nodeTypeNormal:
 		return "+"
 	case nodeTypeException:
 		return "!"
 	case nodeTypeParentOnly:
 		return "o"
-	***REMOVED***
+	}
 	panic("unreachable")
-***REMOVED***
+}
 
 const (
 	defaultURL   = "https://publicsuffix.org/list/effective_tld_names.dat"
@@ -96,10 +96,10 @@ const (
 )
 
 var (
-	labelEncoding = map[string]uint32***REMOVED******REMOVED***
-	labelsList    = []string***REMOVED******REMOVED***
-	labelsMap     = map[string]bool***REMOVED******REMOVED***
-	rules         = []string***REMOVED******REMOVED***
+	labelEncoding = map[string]uint32{}
+	labelsList    = []string{}
+	labelsMap     = map[string]bool{}
+	rules         = []string{}
 
 	// validSuffixRE is used to check that the entries in the public suffix
 	// list are in canonical form (after Punycode encoding). Specifically,
@@ -107,7 +107,7 @@ var (
 	validSuffixRE = regexp.MustCompile(`^[a-z0-9_\!\*\-\.]+$`)
 
 	shaRE  = regexp.MustCompile(`"sha":"([^"]+)"`)
-	dateRE = regexp.MustCompile(`"committer":***REMOVED***[^***REMOVED***]+"date":"([^"]+)"`)
+	dateRE = regexp.MustCompile(`"committer":{[^{]+"date":"([^"]+)"`)
 
 	comments = flag.Bool("comments", false, "generate table.go comments, for debugging")
 	subset   = flag.Bool("subset", false, "generate only a subset of the full table, for debugging")
@@ -116,77 +116,77 @@ var (
 	version  = flag.String("version", "", "the effective_tld_names.dat version")
 )
 
-func main() ***REMOVED***
-	if err := main1(); err != nil ***REMOVED***
+func main() {
+	if err := main1(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func main1() error ***REMOVED***
+func main1() error {
 	flag.Parse()
-	if nodesBitsTextLength+nodesBitsTextOffset+nodesBitsICANN+nodesBitsChildren > 32 ***REMOVED***
+	if nodesBitsTextLength+nodesBitsTextOffset+nodesBitsICANN+nodesBitsChildren > 32 {
 		return fmt.Errorf("not enough bits to encode the nodes table")
-	***REMOVED***
-	if childrenBitsLo+childrenBitsHi+childrenBitsNodeType+childrenBitsWildcard > 32 ***REMOVED***
+	}
+	if childrenBitsLo+childrenBitsHi+childrenBitsNodeType+childrenBitsWildcard > 32 {
 		return fmt.Errorf("not enough bits to encode the children table")
-	***REMOVED***
-	if *version == "" ***REMOVED***
-		if *url != defaultURL ***REMOVED***
+	}
+	if *version == "" {
+		if *url != defaultURL {
 			return fmt.Errorf("-version was not specified, and the -url is not the default one")
-		***REMOVED***
+		}
 		sha, date, err := gitCommit()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		*version = fmt.Sprintf("publicsuffix.org's public_suffix_list.dat, git revision %s (%s)", sha, date)
-	***REMOVED***
+	}
 	var r io.Reader = os.Stdin
-	if *url != "" ***REMOVED***
+	if *url != "" {
 		res, err := http.Get(*url)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-		if res.StatusCode != http.StatusOK ***REMOVED***
+		}
+		if res.StatusCode != http.StatusOK {
 			return fmt.Errorf("bad GET status for %s: %d", *url, res.Status)
-		***REMOVED***
+		}
 		r = res.Body
 		defer res.Body.Close()
-	***REMOVED***
+	}
 
 	var root node
 	icann := false
 	br := bufio.NewReader(r)
-	for ***REMOVED***
+	for {
 		s, err := br.ReadString('\n')
-		if err != nil ***REMOVED***
-			if err == io.EOF ***REMOVED***
+		if err != nil {
+			if err == io.EOF {
 				break
-			***REMOVED***
+			}
 			return err
-		***REMOVED***
+		}
 		s = strings.TrimSpace(s)
-		if strings.Contains(s, "BEGIN ICANN DOMAINS") ***REMOVED***
+		if strings.Contains(s, "BEGIN ICANN DOMAINS") {
 			icann = true
 			continue
-		***REMOVED***
-		if strings.Contains(s, "END ICANN DOMAINS") ***REMOVED***
+		}
+		if strings.Contains(s, "END ICANN DOMAINS") {
 			icann = false
 			continue
-		***REMOVED***
-		if s == "" || strings.HasPrefix(s, "//") ***REMOVED***
+		}
+		if s == "" || strings.HasPrefix(s, "//") {
 			continue
-		***REMOVED***
+		}
 		s, err = idna.ToASCII(s)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-		if !validSuffixRE.MatchString(s) ***REMOVED***
+		}
+		if !validSuffixRE.MatchString(s) {
 			return fmt.Errorf("bad publicsuffix.org list data: %q", s)
-		***REMOVED***
+		}
 
-		if *subset ***REMOVED***
-			switch ***REMOVED***
+		if *subset {
+			switch {
 			case s == "ac.jp" || strings.HasSuffix(s, ".ac.jp"):
 			case s == "ak.us" || strings.HasSuffix(s, ".ak.us"):
 			case s == "ao" || strings.HasSuffix(s, ".ao"):
@@ -206,100 +206,100 @@ func main1() error ***REMOVED***
 				// xn--p1ai is Russian-Cyrillic "рф".
 			default:
 				continue
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		rules = append(rules, s)
 
 		nt, wildcard := nodeTypeNormal, false
-		switch ***REMOVED***
+		switch {
 		case strings.HasPrefix(s, "*."):
 			s, nt = s[2:], nodeTypeParentOnly
 			wildcard = true
 		case strings.HasPrefix(s, "!"):
 			s, nt = s[1:], nodeTypeException
-		***REMOVED***
+		}
 		labels := strings.Split(s, ".")
-		for n, i := &root, len(labels)-1; i >= 0; i-- ***REMOVED***
+		for n, i := &root, len(labels)-1; i >= 0; i-- {
 			label := labels[i]
 			n = n.child(label)
-			if i == 0 ***REMOVED***
-				if nt != nodeTypeParentOnly && n.nodeType == nodeTypeParentOnly ***REMOVED***
+			if i == 0 {
+				if nt != nodeTypeParentOnly && n.nodeType == nodeTypeParentOnly {
 					n.nodeType = nt
-				***REMOVED***
+				}
 				n.icann = n.icann && icann
 				n.wildcard = n.wildcard || wildcard
-			***REMOVED***
+			}
 			labelsMap[label] = true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	labelsList = make([]string, 0, len(labelsMap))
-	for label := range labelsMap ***REMOVED***
+	for label := range labelsMap {
 		labelsList = append(labelsList, label)
-	***REMOVED***
+	}
 	sort.Strings(labelsList)
 
-	if err := generate(printReal, &root, "table.go"); err != nil ***REMOVED***
+	if err := generate(printReal, &root, "table.go"); err != nil {
 		return err
-	***REMOVED***
-	if err := generate(printTest, &root, "table_test.go"); err != nil ***REMOVED***
+	}
+	if err := generate(printTest, &root, "table_test.go"); err != nil {
 		return err
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func generate(p func(io.Writer, *node) error, root *node, filename string) error ***REMOVED***
+func generate(p func(io.Writer, *node) error, root *node, filename string) error {
 	buf := new(bytes.Buffer)
-	if err := p(buf, root); err != nil ***REMOVED***
+	if err := p(buf, root); err != nil {
 		return err
-	***REMOVED***
+	}
 	b, err := format.Source(buf.Bytes())
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return ioutil.WriteFile(filename, b, 0644)
-***REMOVED***
+}
 
-func gitCommit() (sha, date string, retErr error) ***REMOVED***
+func gitCommit() (sha, date string, retErr error) {
 	res, err := http.Get(gitCommitURL)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", "", err
-	***REMOVED***
-	if res.StatusCode != http.StatusOK ***REMOVED***
+	}
+	if res.StatusCode != http.StatusOK {
 		return "", "", fmt.Errorf("bad GET status for %s: %d", gitCommitURL, res.Status)
-	***REMOVED***
+	}
 	defer res.Body.Close()
 	b, err := ioutil.ReadAll(res.Body)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", "", err
-	***REMOVED***
-	if m := shaRE.FindSubmatch(b); m != nil ***REMOVED***
+	}
+	if m := shaRE.FindSubmatch(b); m != nil {
 		sha = string(m[1])
-	***REMOVED***
-	if m := dateRE.FindSubmatch(b); m != nil ***REMOVED***
+	}
+	if m := dateRE.FindSubmatch(b); m != nil {
 		date = string(m[1])
-	***REMOVED***
-	if sha == "" || date == "" ***REMOVED***
+	}
+	if sha == "" || date == "" {
 		retErr = fmt.Errorf("could not find commit SHA and date in %s", gitCommitURL)
-	***REMOVED***
+	}
 	return sha, date, retErr
-***REMOVED***
+}
 
-func printTest(w io.Writer, n *node) error ***REMOVED***
+func printTest(w io.Writer, n *node) error {
 	fmt.Fprintf(w, "// generated by go run gen.go; DO NOT EDIT\n\n")
-	fmt.Fprintf(w, "package publicsuffix\n\nvar rules = [...]string***REMOVED***\n")
-	for _, rule := range rules ***REMOVED***
+	fmt.Fprintf(w, "package publicsuffix\n\nvar rules = [...]string{\n")
+	for _, rule := range rules {
 		fmt.Fprintf(w, "%q,\n", rule)
-	***REMOVED***
-	fmt.Fprintf(w, "***REMOVED***\n\nvar nodeLabels = [...]string***REMOVED***\n")
-	if err := n.walk(w, printNodeLabel); err != nil ***REMOVED***
+	}
+	fmt.Fprintf(w, "}\n\nvar nodeLabels = [...]string{\n")
+	if err := n.walk(w, printNodeLabel); err != nil {
 		return err
-	***REMOVED***
-	fmt.Fprintf(w, "***REMOVED***\n")
+	}
+	fmt.Fprintf(w, "}\n")
 	return nil
-***REMOVED***
+}
 
-func printReal(w io.Writer, n *node) error ***REMOVED***
+func printReal(w io.Writer, n *node) error {
 	const header = `// generated by go run gen.go; DO NOT EDIT
 
 package publicsuffix
@@ -334,36 +334,36 @@ const numTLD = %d
 		nodeTypeNormal, nodeTypeException, nodeTypeParentOnly, len(n.children))
 
 	text := combineText(labelsList)
-	if text == "" ***REMOVED***
+	if text == "" {
 		return fmt.Errorf("internal error: makeText returned no text")
-	***REMOVED***
-	for _, label := range labelsList ***REMOVED***
+	}
+	for _, label := range labelsList {
 		offset, length := strings.Index(text, label), len(label)
-		if offset < 0 ***REMOVED***
+		if offset < 0 {
 			return fmt.Errorf("internal error: could not find %q in text %q", label, text)
-		***REMOVED***
+		}
 		maxTextOffset, maxTextLength = max(maxTextOffset, offset), max(maxTextLength, length)
-		if offset >= 1<<nodesBitsTextOffset ***REMOVED***
+		if offset >= 1<<nodesBitsTextOffset {
 			return fmt.Errorf("text offset %d is too large, or nodeBitsTextOffset is too small", offset)
-		***REMOVED***
-		if length >= 1<<nodesBitsTextLength ***REMOVED***
+		}
+		if length >= 1<<nodesBitsTextLength {
 			return fmt.Errorf("text length %d is too large, or nodeBitsTextLength is too small", length)
-		***REMOVED***
+		}
 		labelEncoding[label] = uint32(offset)<<nodesBitsTextLength | uint32(length)
-	***REMOVED***
+	}
 	fmt.Fprintf(w, "// Text is the combined text of all labels.\nconst text = ")
-	for len(text) > 0 ***REMOVED***
+	for len(text) > 0 {
 		n, plus := len(text), ""
-		if n > 64 ***REMOVED***
+		if n > 64 {
 			n, plus = 64, " +"
-		***REMOVED***
+		}
 		fmt.Fprintf(w, "%q%s\n", text[:n], plus)
 		text = text[n:]
-	***REMOVED***
+	}
 
-	if err := n.walk(w, assignIndexes); err != nil ***REMOVED***
+	if err := n.walk(w, assignIndexes); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	fmt.Fprintf(w, `
 
@@ -384,14 +384,14 @@ const numTLD = %d
 //	[%2d bits] ICANN bit
 //	[%2d bits] text index
 //	[%2d bits] text length
-var nodes = [...]uint32***REMOVED***
+var nodes = [...]uint32{
 `,
 		32-nodesBitsChildren-nodesBitsICANN-nodesBitsTextOffset-nodesBitsTextLength,
 		nodesBitsChildren, nodesBitsICANN, nodesBitsTextOffset, nodesBitsTextLength)
-	if err := n.walk(w, printNode); err != nil ***REMOVED***
+	if err := n.walk(w, printNode); err != nil {
 		return err
-	***REMOVED***
-	fmt.Fprintf(w, `***REMOVED***
+	}
+	fmt.Fprintf(w, `}
 
 // children is the list of nodes' children, the parent's wildcard bit and the
 // parent's node type. If a node has no children then their children index
@@ -403,36 +403,36 @@ var nodes = [...]uint32***REMOVED***
 //	[%2d bits] node type
 //	[%2d bits] high nodes index (exclusive) of children
 //	[%2d bits] low nodes index (inclusive) of children
-var children=[...]uint32***REMOVED***
+var children=[...]uint32{
 `,
 		32-childrenBitsWildcard-childrenBitsNodeType-childrenBitsHi-childrenBitsLo,
 		childrenBitsWildcard, childrenBitsNodeType, childrenBitsHi, childrenBitsLo)
-	for i, c := range childrenEncoding ***REMOVED***
+	for i, c := range childrenEncoding {
 		s := "---------------"
 		lo := c & (1<<childrenBitsLo - 1)
 		hi := (c >> childrenBitsLo) & (1<<childrenBitsHi - 1)
-		if lo != hi ***REMOVED***
+		if lo != hi {
 			s = fmt.Sprintf("n0x%04x-n0x%04x", lo, hi)
-		***REMOVED***
+		}
 		nodeType := int(c>>(childrenBitsLo+childrenBitsHi)) & (1<<childrenBitsNodeType - 1)
 		wildcard := c>>(childrenBitsLo+childrenBitsHi+childrenBitsNodeType) != 0
-		if *comments ***REMOVED***
+		if *comments {
 			fmt.Fprintf(w, "0x%08x, // c0x%04x (%s)%s %s\n",
 				c, i, s, wildcardStr(wildcard), nodeTypeStr(nodeType))
-		***REMOVED*** else ***REMOVED***
+		} else {
 			fmt.Fprintf(w, "0x%x,\n", c)
-		***REMOVED***
-	***REMOVED***
-	fmt.Fprintf(w, "***REMOVED***\n\n")
+		}
+	}
+	fmt.Fprintf(w, "}\n\n")
 	fmt.Fprintf(w, "// max children %d (capacity %d)\n", maxChildren, 1<<nodesBitsChildren-1)
 	fmt.Fprintf(w, "// max text offset %d (capacity %d)\n", maxTextOffset, 1<<nodesBitsTextOffset-1)
 	fmt.Fprintf(w, "// max text length %d (capacity %d)\n", maxTextLength, 1<<nodesBitsTextLength-1)
 	fmt.Fprintf(w, "// max hi %d (capacity %d)\n", maxHi, 1<<childrenBitsHi-1)
 	fmt.Fprintf(w, "// max lo %d (capacity %d)\n", maxLo, 1<<childrenBitsLo-1)
 	return nil
-***REMOVED***
+}
 
-type node struct ***REMOVED***
+type node struct {
 	label    string
 	nodeType int
 	icann    bool
@@ -445,236 +445,236 @@ type node struct ***REMOVED***
 	firstChild int
 	// children are the node's children, in strictly increasing node label order.
 	children []*node
-***REMOVED***
+}
 
-func (n *node) walk(w io.Writer, f func(w1 io.Writer, n1 *node) error) error ***REMOVED***
-	if err := f(w, n); err != nil ***REMOVED***
+func (n *node) walk(w io.Writer, f func(w1 io.Writer, n1 *node) error) error {
+	if err := f(w, n); err != nil {
 		return err
-	***REMOVED***
-	for _, c := range n.children ***REMOVED***
-		if err := c.walk(w, f); err != nil ***REMOVED***
+	}
+	for _, c := range n.children {
+		if err := c.walk(w, f); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
 // child returns the child of n with the given label. The child is created if
 // it did not exist beforehand.
-func (n *node) child(label string) *node ***REMOVED***
-	for _, c := range n.children ***REMOVED***
-		if c.label == label ***REMOVED***
+func (n *node) child(label string) *node {
+	for _, c := range n.children {
+		if c.label == label {
 			return c
-		***REMOVED***
-	***REMOVED***
-	c := &node***REMOVED***
+		}
+	}
+	c := &node{
 		label:    label,
 		nodeType: nodeTypeParentOnly,
 		icann:    true,
-	***REMOVED***
+	}
 	n.children = append(n.children, c)
 	sort.Sort(byLabel(n.children))
 	return c
-***REMOVED***
+}
 
 type byLabel []*node
 
-func (b byLabel) Len() int           ***REMOVED*** return len(b) ***REMOVED***
-func (b byLabel) Swap(i, j int)      ***REMOVED*** b[i], b[j] = b[j], b[i] ***REMOVED***
-func (b byLabel) Less(i, j int) bool ***REMOVED*** return b[i].label < b[j].label ***REMOVED***
+func (b byLabel) Len() int           { return len(b) }
+func (b byLabel) Swap(i, j int)      { b[i], b[j] = b[j], b[i] }
+func (b byLabel) Less(i, j int) bool { return b[i].label < b[j].label }
 
 var nextNodesIndex int
 
 // childrenEncoding are the encoded entries in the generated children array.
 // All these pre-defined entries have no children.
-var childrenEncoding = []uint32***REMOVED***
+var childrenEncoding = []uint32{
 	0 << (childrenBitsLo + childrenBitsHi), // Without wildcard bit, nodeTypeNormal.
 	1 << (childrenBitsLo + childrenBitsHi), // Without wildcard bit, nodeTypeException.
 	2 << (childrenBitsLo + childrenBitsHi), // Without wildcard bit, nodeTypeParentOnly.
 	4 << (childrenBitsLo + childrenBitsHi), // With wildcard bit, nodeTypeNormal.
 	5 << (childrenBitsLo + childrenBitsHi), // With wildcard bit, nodeTypeException.
 	6 << (childrenBitsLo + childrenBitsHi), // With wildcard bit, nodeTypeParentOnly.
-***REMOVED***
+}
 
 var firstCallToAssignIndexes = true
 
-func assignIndexes(w io.Writer, n *node) error ***REMOVED***
-	if len(n.children) != 0 ***REMOVED***
+func assignIndexes(w io.Writer, n *node) error {
+	if len(n.children) != 0 {
 		// Assign nodesIndex.
 		n.firstChild = nextNodesIndex
-		for _, c := range n.children ***REMOVED***
+		for _, c := range n.children {
 			c.nodesIndex = nextNodesIndex
 			nextNodesIndex++
-		***REMOVED***
+		}
 
 		// The root node's children is implicit.
-		if firstCallToAssignIndexes ***REMOVED***
+		if firstCallToAssignIndexes {
 			firstCallToAssignIndexes = false
 			return nil
-		***REMOVED***
+		}
 
 		// Assign childrenIndex.
 		maxChildren = max(maxChildren, len(childrenEncoding))
-		if len(childrenEncoding) >= 1<<nodesBitsChildren ***REMOVED***
+		if len(childrenEncoding) >= 1<<nodesBitsChildren {
 			return fmt.Errorf("children table size %d is too large, or nodeBitsChildren is too small", len(childrenEncoding))
-		***REMOVED***
+		}
 		n.childrenIndex = len(childrenEncoding)
 		lo := uint32(n.firstChild)
 		hi := lo + uint32(len(n.children))
 		maxLo, maxHi = u32max(maxLo, lo), u32max(maxHi, hi)
-		if lo >= 1<<childrenBitsLo ***REMOVED***
+		if lo >= 1<<childrenBitsLo {
 			return fmt.Errorf("children lo %d is too large, or childrenBitsLo is too small", lo)
-		***REMOVED***
-		if hi >= 1<<childrenBitsHi ***REMOVED***
+		}
+		if hi >= 1<<childrenBitsHi {
 			return fmt.Errorf("children hi %d is too large, or childrenBitsHi is too small", hi)
-		***REMOVED***
+		}
 		enc := hi<<childrenBitsLo | lo
 		enc |= uint32(n.nodeType) << (childrenBitsLo + childrenBitsHi)
-		if n.wildcard ***REMOVED***
+		if n.wildcard {
 			enc |= 1 << (childrenBitsLo + childrenBitsHi + childrenBitsNodeType)
-		***REMOVED***
+		}
 		childrenEncoding = append(childrenEncoding, enc)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		n.childrenIndex = n.nodeType
-		if n.wildcard ***REMOVED***
+		if n.wildcard {
 			n.childrenIndex += numNodeType
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func printNode(w io.Writer, n *node) error ***REMOVED***
-	for _, c := range n.children ***REMOVED***
+func printNode(w io.Writer, n *node) error {
+	for _, c := range n.children {
 		s := "---------------"
-		if len(c.children) != 0 ***REMOVED***
+		if len(c.children) != 0 {
 			s = fmt.Sprintf("n0x%04x-n0x%04x", c.firstChild, c.firstChild+len(c.children))
-		***REMOVED***
+		}
 		encoding := labelEncoding[c.label]
-		if c.icann ***REMOVED***
+		if c.icann {
 			encoding |= 1 << (nodesBitsTextLength + nodesBitsTextOffset)
-		***REMOVED***
+		}
 		encoding |= uint32(c.childrenIndex) << (nodesBitsTextLength + nodesBitsTextOffset + nodesBitsICANN)
-		if *comments ***REMOVED***
+		if *comments {
 			fmt.Fprintf(w, "0x%08x, // n0x%04x c0x%04x (%s)%s %s %s %s\n",
 				encoding, c.nodesIndex, c.childrenIndex, s, wildcardStr(c.wildcard),
 				nodeTypeStr(c.nodeType), icannStr(c.icann), c.label,
 			)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			fmt.Fprintf(w, "0x%x,\n", encoding)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func printNodeLabel(w io.Writer, n *node) error ***REMOVED***
-	for _, c := range n.children ***REMOVED***
+func printNodeLabel(w io.Writer, n *node) error {
+	for _, c := range n.children {
 		fmt.Fprintf(w, "%q,\n", c.label)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func icannStr(icann bool) string ***REMOVED***
-	if icann ***REMOVED***
+func icannStr(icann bool) string {
+	if icann {
 		return "I"
-	***REMOVED***
+	}
 	return " "
-***REMOVED***
+}
 
-func wildcardStr(wildcard bool) string ***REMOVED***
-	if wildcard ***REMOVED***
+func wildcardStr(wildcard bool) string {
+	if wildcard {
 		return "*"
-	***REMOVED***
+	}
 	return " "
-***REMOVED***
+}
 
 // combineText combines all the strings in labelsList to form one giant string.
 // Overlapping strings will be merged: "arpa" and "parliament" could yield
 // "arparliament".
-func combineText(labelsList []string) string ***REMOVED***
+func combineText(labelsList []string) string {
 	beforeLength := 0
-	for _, s := range labelsList ***REMOVED***
+	for _, s := range labelsList {
 		beforeLength += len(s)
-	***REMOVED***
+	}
 
 	text := crush(removeSubstrings(labelsList))
-	if *v ***REMOVED***
+	if *v {
 		fmt.Fprintf(os.Stderr, "crushed %d bytes to become %d bytes\n", beforeLength, len(text))
-	***REMOVED***
+	}
 	return text
-***REMOVED***
+}
 
 type byLength []string
 
-func (s byLength) Len() int           ***REMOVED*** return len(s) ***REMOVED***
-func (s byLength) Swap(i, j int)      ***REMOVED*** s[i], s[j] = s[j], s[i] ***REMOVED***
-func (s byLength) Less(i, j int) bool ***REMOVED*** return len(s[i]) < len(s[j]) ***REMOVED***
+func (s byLength) Len() int           { return len(s) }
+func (s byLength) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
+func (s byLength) Less(i, j int) bool { return len(s[i]) < len(s[j]) }
 
 // removeSubstrings returns a copy of its input with any strings removed
 // that are substrings of other provided strings.
-func removeSubstrings(input []string) []string ***REMOVED***
+func removeSubstrings(input []string) []string {
 	// Make a copy of input.
 	ss := append(make([]string, 0, len(input)), input...)
 	sort.Sort(byLength(ss))
 
-	for i, shortString := range ss ***REMOVED***
+	for i, shortString := range ss {
 		// For each string, only consider strings higher than it in sort order, i.e.
 		// of equal length or greater.
-		for _, longString := range ss[i+1:] ***REMOVED***
-			if strings.Contains(longString, shortString) ***REMOVED***
+		for _, longString := range ss[i+1:] {
+			if strings.Contains(longString, shortString) {
 				ss[i] = ""
 				break
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	// Remove the empty strings.
 	sort.Strings(ss)
-	for len(ss) > 0 && ss[0] == "" ***REMOVED***
+	for len(ss) > 0 && ss[0] == "" {
 		ss = ss[1:]
-	***REMOVED***
+	}
 	return ss
-***REMOVED***
+}
 
 // crush combines a list of strings, taking advantage of overlaps. It returns a
 // single string that contains each input string as a substring.
-func crush(ss []string) string ***REMOVED***
+func crush(ss []string) string {
 	maxLabelLen := 0
-	for _, s := range ss ***REMOVED***
-		if maxLabelLen < len(s) ***REMOVED***
+	for _, s := range ss {
+		if maxLabelLen < len(s) {
 			maxLabelLen = len(s)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	for prefixLen := maxLabelLen; prefixLen > 0; prefixLen-- ***REMOVED***
+	for prefixLen := maxLabelLen; prefixLen > 0; prefixLen-- {
 		prefixes := makePrefixMap(ss, prefixLen)
-		for i, s := range ss ***REMOVED***
-			if len(s) <= prefixLen ***REMOVED***
+		for i, s := range ss {
+			if len(s) <= prefixLen {
 				continue
-			***REMOVED***
+			}
 			mergeLabel(ss, i, prefixLen, prefixes)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return strings.Join(ss, "")
-***REMOVED***
+}
 
 // mergeLabel merges the label at ss[i] with the first available matching label
 // in prefixMap, where the last "prefixLen" characters in ss[i] match the first
 // "prefixLen" characters in the matching label.
 // It will merge ss[i] repeatedly until no more matches are available.
 // All matching labels merged into ss[i] are replaced by "".
-func mergeLabel(ss []string, i, prefixLen int, prefixes prefixMap) ***REMOVED***
+func mergeLabel(ss []string, i, prefixLen int, prefixes prefixMap) {
 	s := ss[i]
 	suffix := s[len(s)-prefixLen:]
-	for _, j := range prefixes[suffix] ***REMOVED***
+	for _, j := range prefixes[suffix] {
 		// Empty strings mean "already used." Also avoid merging with self.
-		if ss[j] == "" || i == j ***REMOVED***
+		if ss[j] == "" || i == j {
 			continue
-		***REMOVED***
-		if *v ***REMOVED***
+		}
+		if *v {
 			fmt.Fprintf(os.Stderr, "%d-length overlap at (%4d,%4d): %q and %q share %q\n",
 				prefixLen, i, j, ss[i], ss[j], suffix)
-		***REMOVED***
+		}
 		ss[i] += ss[j][prefixLen:]
 		ss[j] = ""
 		// ss[i] has a new suffix, so merge again if possible.
@@ -688,8 +688,8 @@ func mergeLabel(ss []string, i, prefixLen int, prefixes prefixMap) ***REMOVED***
 		// practice "cde" would already have been elimintated by removeSubstrings.
 		mergeLabel(ss, i, prefixLen, prefixes)
 		return
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // prefixMap maps from a prefix to a list of strings containing that prefix. The
 // list of strings is represented as indexes into a slice of strings stored
@@ -697,17 +697,17 @@ func mergeLabel(ss []string, i, prefixLen int, prefixes prefixMap) ***REMOVED***
 type prefixMap map[string][]int
 
 // makePrefixMap constructs a prefixMap from a slice of strings.
-func makePrefixMap(ss []string, prefixLen int) prefixMap ***REMOVED***
+func makePrefixMap(ss []string, prefixLen int) prefixMap {
 	prefixes := make(prefixMap)
-	for i, s := range ss ***REMOVED***
+	for i, s := range ss {
 		// We use < rather than <= because if a label matches on a prefix equal to
 		// its full length, that's actually a substring match handled by
 		// removeSubstrings.
-		if prefixLen < len(s) ***REMOVED***
+		if prefixLen < len(s) {
 			prefix := s[:prefixLen]
 			prefixes[prefix] = append(prefixes[prefix], i)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return prefixes
-***REMOVED***
+}

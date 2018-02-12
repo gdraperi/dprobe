@@ -9,6 +9,6 @@ package testtext
 import "testing"
 
 // AllocsPerRun wraps testing.AllocsPerRun.
-func AllocsPerRun(runs int, f func()) (avg float64) ***REMOVED***
+func AllocsPerRun(runs int, f func()) (avg float64) {
 	return testing.AllocsPerRun(runs, f)
-***REMOVED***
+}

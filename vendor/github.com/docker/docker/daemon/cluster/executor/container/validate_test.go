@@ -11,132 +11,132 @@ import (
 	"github.com/docker/swarmkit/api"
 )
 
-func newTestControllerWithMount(m api.Mount) (*controller, error) ***REMOVED***
-	return newController(&daemon.Daemon***REMOVED******REMOVED***, &api.Task***REMOVED***
+func newTestControllerWithMount(m api.Mount) (*controller, error) {
+	return newController(&daemon.Daemon{}, &api.Task{
 		ID:        stringid.GenerateRandomID(),
 		ServiceID: stringid.GenerateRandomID(),
-		Spec: api.TaskSpec***REMOVED***
-			Runtime: &api.TaskSpec_Container***REMOVED***
-				Container: &api.ContainerSpec***REMOVED***
+		Spec: api.TaskSpec{
+			Runtime: &api.TaskSpec_Container{
+				Container: &api.ContainerSpec{
 					Image: "image_name",
-					Labels: map[string]string***REMOVED***
+					Labels: map[string]string{
 						"com.docker.swarm.task.id": "id",
-					***REMOVED***,
-					Mounts: []api.Mount***REMOVED***m***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***, nil,
+					},
+					Mounts: []api.Mount{m},
+				},
+			},
+		},
+	}, nil,
 		nil)
-***REMOVED***
+}
 
-func TestControllerValidateMountBind(t *testing.T) ***REMOVED***
+func TestControllerValidateMountBind(t *testing.T) {
 	// with improper source
-	if _, err := newTestControllerWithMount(api.Mount***REMOVED***
+	if _, err := newTestControllerWithMount(api.Mount{
 		Type:   api.MountTypeBind,
 		Source: "foo",
 		Target: testAbsPath,
-	***REMOVED***); err == nil || !strings.Contains(err.Error(), "invalid bind mount source") ***REMOVED***
+	}); err == nil || !strings.Contains(err.Error(), "invalid bind mount source") {
 		t.Fatalf("expected  error, got: %v", err)
-	***REMOVED***
+	}
 
 	// with non-existing source
-	if _, err := newTestControllerWithMount(api.Mount***REMOVED***
+	if _, err := newTestControllerWithMount(api.Mount{
 		Type:   api.MountTypeBind,
 		Source: testAbsNonExistent,
 		Target: testAbsPath,
-	***REMOVED***); err != nil ***REMOVED***
+	}); err != nil {
 		t.Fatalf("controller should not error at creation: %v", err)
-	***REMOVED***
+	}
 
 	// with proper source
 	tmpdir, err := ioutil.TempDir("", "TestControllerValidateMountBind")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("failed to create temp dir: %v", err)
-	***REMOVED***
+	}
 	defer os.Remove(tmpdir)
 
-	if _, err := newTestControllerWithMount(api.Mount***REMOVED***
+	if _, err := newTestControllerWithMount(api.Mount{
 		Type:   api.MountTypeBind,
 		Source: tmpdir,
 		Target: testAbsPath,
-	***REMOVED***); err != nil ***REMOVED***
+	}); err != nil {
 		t.Fatalf("expected  error, got: %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestControllerValidateMountVolume(t *testing.T) ***REMOVED***
+func TestControllerValidateMountVolume(t *testing.T) {
 	// with improper source
-	if _, err := newTestControllerWithMount(api.Mount***REMOVED***
+	if _, err := newTestControllerWithMount(api.Mount{
 		Type:   api.MountTypeVolume,
 		Source: testAbsPath,
 		Target: testAbsPath,
-	***REMOVED***); err == nil || !strings.Contains(err.Error(), "invalid volume mount source") ***REMOVED***
+	}); err == nil || !strings.Contains(err.Error(), "invalid volume mount source") {
 		t.Fatalf("expected error, got: %v", err)
-	***REMOVED***
+	}
 
 	// with proper source
-	if _, err := newTestControllerWithMount(api.Mount***REMOVED***
+	if _, err := newTestControllerWithMount(api.Mount{
 		Type:   api.MountTypeVolume,
 		Source: "foo",
 		Target: testAbsPath,
-	***REMOVED***); err != nil ***REMOVED***
+	}); err != nil {
 		t.Fatalf("expected error, got: %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestControllerValidateMountTarget(t *testing.T) ***REMOVED***
+func TestControllerValidateMountTarget(t *testing.T) {
 	tmpdir, err := ioutil.TempDir("", "TestControllerValidateMountTarget")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("failed to create temp dir: %v", err)
-	***REMOVED***
+	}
 	defer os.Remove(tmpdir)
 
 	// with improper target
-	if _, err := newTestControllerWithMount(api.Mount***REMOVED***
+	if _, err := newTestControllerWithMount(api.Mount{
 		Type:   api.MountTypeBind,
 		Source: testAbsPath,
 		Target: "foo",
-	***REMOVED***); err == nil || !strings.Contains(err.Error(), "invalid mount target") ***REMOVED***
+	}); err == nil || !strings.Contains(err.Error(), "invalid mount target") {
 		t.Fatalf("expected error, got: %v", err)
-	***REMOVED***
+	}
 
 	// with proper target
-	if _, err := newTestControllerWithMount(api.Mount***REMOVED***
+	if _, err := newTestControllerWithMount(api.Mount{
 		Type:   api.MountTypeBind,
 		Source: tmpdir,
 		Target: testAbsPath,
-	***REMOVED***); err != nil ***REMOVED***
+	}); err != nil {
 		t.Fatalf("expected no error, got: %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestControllerValidateMountTmpfs(t *testing.T) ***REMOVED***
+func TestControllerValidateMountTmpfs(t *testing.T) {
 	// with improper target
-	if _, err := newTestControllerWithMount(api.Mount***REMOVED***
+	if _, err := newTestControllerWithMount(api.Mount{
 		Type:   api.MountTypeTmpfs,
 		Source: "foo",
 		Target: testAbsPath,
-	***REMOVED***); err == nil || !strings.Contains(err.Error(), "invalid tmpfs source") ***REMOVED***
+	}); err == nil || !strings.Contains(err.Error(), "invalid tmpfs source") {
 		t.Fatalf("expected error, got: %v", err)
-	***REMOVED***
+	}
 
 	// with proper target
-	if _, err := newTestControllerWithMount(api.Mount***REMOVED***
+	if _, err := newTestControllerWithMount(api.Mount{
 		Type:   api.MountTypeTmpfs,
 		Target: testAbsPath,
-	***REMOVED***); err != nil ***REMOVED***
+	}); err != nil {
 		t.Fatalf("expected no error, got: %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestControllerValidateMountInvalidType(t *testing.T) ***REMOVED***
+func TestControllerValidateMountInvalidType(t *testing.T) {
 	// with improper target
-	if _, err := newTestControllerWithMount(api.Mount***REMOVED***
+	if _, err := newTestControllerWithMount(api.Mount{
 		Type:   api.Mount_MountType(9999),
 		Source: "foo",
 		Target: testAbsPath,
-	***REMOVED***); err == nil || !strings.Contains(err.Error(), "invalid mount type") ***REMOVED***
+	}); err == nil || !strings.Contains(err.Error(), "invalid mount type") {
 		t.Fatalf("expected error, got: %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}

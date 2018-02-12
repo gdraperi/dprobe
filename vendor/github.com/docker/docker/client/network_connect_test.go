@@ -15,97 +15,97 @@ import (
 	"github.com/docker/docker/api/types/network"
 )
 
-func TestNetworkConnectError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestNetworkConnectError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
-	***REMOVED***
+	}
 
 	err := client.NetworkConnect(context.Background(), "network_id", "container_id", nil)
-	if err == nil || err.Error() != "Error response from daemon: Server error" ***REMOVED***
+	if err == nil || err.Error() != "Error response from daemon: Server error" {
 		t.Fatalf("expected a Server Error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestNetworkConnectEmptyNilEndpointSettings(t *testing.T) ***REMOVED***
+func TestNetworkConnectEmptyNilEndpointSettings(t *testing.T) {
 	expectedURL := "/networks/network_id/connect"
 
-	client := &Client***REMOVED***
-		client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-			if !strings.HasPrefix(req.URL.Path, expectedURL) ***REMOVED***
+	client := &Client{
+		client: newMockClient(func(req *http.Request) (*http.Response, error) {
+			if !strings.HasPrefix(req.URL.Path, expectedURL) {
 				return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, req.URL)
-			***REMOVED***
+			}
 
-			if req.Method != "POST" ***REMOVED***
+			if req.Method != "POST" {
 				return nil, fmt.Errorf("expected POST method, got %s", req.Method)
-			***REMOVED***
+			}
 
 			var connect types.NetworkConnect
-			if err := json.NewDecoder(req.Body).Decode(&connect); err != nil ***REMOVED***
+			if err := json.NewDecoder(req.Body).Decode(&connect); err != nil {
 				return nil, err
-			***REMOVED***
+			}
 
-			if connect.Container != "container_id" ***REMOVED***
+			if connect.Container != "container_id" {
 				return nil, fmt.Errorf("expected 'container_id', got %s", connect.Container)
-			***REMOVED***
+			}
 
-			if connect.EndpointConfig != nil ***REMOVED***
+			if connect.EndpointConfig != nil {
 				return nil, fmt.Errorf("expected connect.EndpointConfig to be nil, got %v", connect.EndpointConfig)
-			***REMOVED***
+			}
 
-			return &http.Response***REMOVED***
+			return &http.Response{
 				StatusCode: http.StatusOK,
 				Body:       ioutil.NopCloser(bytes.NewReader([]byte(""))),
-			***REMOVED***, nil
-		***REMOVED***),
-	***REMOVED***
+			}, nil
+		}),
+	}
 
 	err := client.NetworkConnect(context.Background(), "network_id", "container_id", nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestNetworkConnect(t *testing.T) ***REMOVED***
+func TestNetworkConnect(t *testing.T) {
 	expectedURL := "/networks/network_id/connect"
 
-	client := &Client***REMOVED***
-		client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-			if !strings.HasPrefix(req.URL.Path, expectedURL) ***REMOVED***
+	client := &Client{
+		client: newMockClient(func(req *http.Request) (*http.Response, error) {
+			if !strings.HasPrefix(req.URL.Path, expectedURL) {
 				return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, req.URL)
-			***REMOVED***
+			}
 
-			if req.Method != "POST" ***REMOVED***
+			if req.Method != "POST" {
 				return nil, fmt.Errorf("expected POST method, got %s", req.Method)
-			***REMOVED***
+			}
 
 			var connect types.NetworkConnect
-			if err := json.NewDecoder(req.Body).Decode(&connect); err != nil ***REMOVED***
+			if err := json.NewDecoder(req.Body).Decode(&connect); err != nil {
 				return nil, err
-			***REMOVED***
+			}
 
-			if connect.Container != "container_id" ***REMOVED***
+			if connect.Container != "container_id" {
 				return nil, fmt.Errorf("expected 'container_id', got %s", connect.Container)
-			***REMOVED***
+			}
 
-			if connect.EndpointConfig == nil ***REMOVED***
+			if connect.EndpointConfig == nil {
 				return nil, fmt.Errorf("expected connect.EndpointConfig to be not nil, got %v", connect.EndpointConfig)
-			***REMOVED***
+			}
 
-			if connect.EndpointConfig.NetworkID != "NetworkID" ***REMOVED***
+			if connect.EndpointConfig.NetworkID != "NetworkID" {
 				return nil, fmt.Errorf("expected 'NetworkID', got %s", connect.EndpointConfig.NetworkID)
-			***REMOVED***
+			}
 
-			return &http.Response***REMOVED***
+			return &http.Response{
 				StatusCode: http.StatusOK,
 				Body:       ioutil.NopCloser(bytes.NewReader([]byte(""))),
-			***REMOVED***, nil
-		***REMOVED***),
-	***REMOVED***
+			}, nil
+		}),
+	}
 
-	err := client.NetworkConnect(context.Background(), "network_id", "container_id", &network.EndpointSettings***REMOVED***
+	err := client.NetworkConnect(context.Background(), "network_id", "container_id", &network.EndpointSettings{
 		NetworkID: "NetworkID",
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}

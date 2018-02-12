@@ -51,18 +51,18 @@ option objc_class_prefix = "GPB";
 //     Any any;
 //     any.PackFrom(foo);
 //     ...
-//     if (any.UnpackTo(&foo)) ***REMOVED***
+//     if (any.UnpackTo(&foo)) {
 //       ...
-// ***REMOVED***
+//     }
 //
 // Example 2: Pack and unpack a message in Java.
 //
 //     Foo foo = ...;
 //     Any any = Any.pack(foo);
 //     ...
-//     if (any.is(Foo.class)) ***REMOVED***
+//     if (any.is(Foo.class)) {
 //       foo = any.unpack(Foo.class);
-// ***REMOVED***
+//     }
 //
 //  Example 3: Pack and unpack a message in Python.
 //
@@ -88,28 +88,28 @@ option objc_class_prefix = "GPB";
 // additional field `@type` which contains the type URL. Example:
 //
 //     package google.profile;
-//     message Person ***REMOVED***
+//     message Person {
 //       string first_name = 1;
 //       string last_name = 2;
-// ***REMOVED***
+//     }
 //
-//     ***REMOVED***
+//     {
 //       "@type": "type.googleapis.com/google.profile.Person",
 //       "firstName": <string>,
 //       "lastName": <string>
-// ***REMOVED***
+//     }
 //
 // If the embedded message type is well-known and has a custom JSON
 // representation, that representation will be embedded adding a field
 // `value` which holds the custom JSON in addition to the `@type`
 // field. Example (for message [google.protobuf.Duration][]):
 //
-//     ***REMOVED***
+//     {
 //       "@type": "type.googleapis.com/google.protobuf.Duration",
 //       "value": "1.212s"
-// ***REMOVED***
+//     }
 //
-message Any ***REMOVED***
+message Any {
   // A URL/resource name whose content describes the type of the
   // serialized protocol buffer message.
   //
@@ -136,4 +136,4 @@ message Any ***REMOVED***
 
   // Must be a valid serialized protocol buffer of the above specified type.
   bytes value = 2;
-***REMOVED***
+}

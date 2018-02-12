@@ -13,56 +13,56 @@ import (
 	"time"
 )
 
-func (m *RouteMessage) String() string ***REMOVED***
+func (m *RouteMessage) String() string {
 	return fmt.Sprintf("%s", addrAttrs(nativeEndian.Uint32(m.raw[12:16])))
-***REMOVED***
+}
 
-func (m *InterfaceMessage) String() string ***REMOVED***
+func (m *InterfaceMessage) String() string {
 	var attrs addrAttrs
-	if runtime.GOOS == "openbsd" ***REMOVED***
+	if runtime.GOOS == "openbsd" {
 		attrs = addrAttrs(nativeEndian.Uint32(m.raw[12:16]))
-	***REMOVED*** else ***REMOVED***
+	} else {
 		attrs = addrAttrs(nativeEndian.Uint32(m.raw[4:8]))
-	***REMOVED***
+	}
 	return fmt.Sprintf("%s", attrs)
-***REMOVED***
+}
 
-func (m *InterfaceAddrMessage) String() string ***REMOVED***
+func (m *InterfaceAddrMessage) String() string {
 	var attrs addrAttrs
-	if runtime.GOOS == "openbsd" ***REMOVED***
+	if runtime.GOOS == "openbsd" {
 		attrs = addrAttrs(nativeEndian.Uint32(m.raw[12:16]))
-	***REMOVED*** else ***REMOVED***
+	} else {
 		attrs = addrAttrs(nativeEndian.Uint32(m.raw[4:8]))
-	***REMOVED***
+	}
 	return fmt.Sprintf("%s", attrs)
-***REMOVED***
+}
 
-func (m *InterfaceMulticastAddrMessage) String() string ***REMOVED***
+func (m *InterfaceMulticastAddrMessage) String() string {
 	return fmt.Sprintf("%s", addrAttrs(nativeEndian.Uint32(m.raw[4:8])))
-***REMOVED***
+}
 
-func (m *InterfaceAnnounceMessage) String() string ***REMOVED***
+func (m *InterfaceAnnounceMessage) String() string {
 	what := "<nil>"
-	switch m.What ***REMOVED***
+	switch m.What {
 	case 0:
 		what = "arrival"
 	case 1:
 		what = "departure"
-	***REMOVED***
+	}
 	return fmt.Sprintf("(%d %s %s)", m.Index, m.Name, what)
-***REMOVED***
+}
 
-func (m *InterfaceMetrics) String() string ***REMOVED***
+func (m *InterfaceMetrics) String() string {
 	return fmt.Sprintf("(type=%d mtu=%d)", m.Type, m.MTU)
-***REMOVED***
+}
 
-func (m *RouteMetrics) String() string ***REMOVED***
+func (m *RouteMetrics) String() string {
 	return fmt.Sprintf("(pmtu=%d)", m.PathMTU)
-***REMOVED***
+}
 
 type addrAttrs uint
 
-var addrAttrNames = [...]string***REMOVED***
+var addrAttrNames = [...]string{
 	"dst",
 	"gateway",
 	"netmask",
@@ -78,104 +78,104 @@ var addrAttrNames = [...]string***REMOVED***
 	"o:dns",                // dns for openbsd
 	"o:static",             // static for openbsd
 	"o:search",             // search for openbsd
-***REMOVED***
+}
 
-func (attrs addrAttrs) String() string ***REMOVED***
+func (attrs addrAttrs) String() string {
 	var s string
-	for i, name := range addrAttrNames ***REMOVED***
-		if attrs&(1<<uint(i)) != 0 ***REMOVED***
-			if s != "" ***REMOVED***
+	for i, name := range addrAttrNames {
+		if attrs&(1<<uint(i)) != 0 {
+			if s != "" {
 				s += "|"
-			***REMOVED***
+			}
 			s += name
-		***REMOVED***
-	***REMOVED***
-	if s == "" ***REMOVED***
+		}
+	}
+	if s == "" {
 		return "<nil>"
-	***REMOVED***
+	}
 	return s
-***REMOVED***
+}
 
 type msgs []Message
 
-func (ms msgs) validate() ([]string, error) ***REMOVED***
+func (ms msgs) validate() ([]string, error) {
 	var ss []string
-	for _, m := range ms ***REMOVED***
-		switch m := m.(type) ***REMOVED***
+	for _, m := range ms {
+		switch m := m.(type) {
 		case *RouteMessage:
-			if err := addrs(m.Addrs).match(addrAttrs(nativeEndian.Uint32(m.raw[12:16]))); err != nil ***REMOVED***
+			if err := addrs(m.Addrs).match(addrAttrs(nativeEndian.Uint32(m.raw[12:16]))); err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			sys := m.Sys()
-			if sys == nil ***REMOVED***
+			if sys == nil {
 				return nil, fmt.Errorf("no sys for %s", m.String())
-			***REMOVED***
+			}
 			ss = append(ss, m.String()+" "+syss(sys).String()+" "+addrs(m.Addrs).String())
 		case *InterfaceMessage:
 			var attrs addrAttrs
-			if runtime.GOOS == "openbsd" ***REMOVED***
+			if runtime.GOOS == "openbsd" {
 				attrs = addrAttrs(nativeEndian.Uint32(m.raw[12:16]))
-			***REMOVED*** else ***REMOVED***
+			} else {
 				attrs = addrAttrs(nativeEndian.Uint32(m.raw[4:8]))
-			***REMOVED***
-			if err := addrs(m.Addrs).match(attrs); err != nil ***REMOVED***
+			}
+			if err := addrs(m.Addrs).match(attrs); err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			sys := m.Sys()
-			if sys == nil ***REMOVED***
+			if sys == nil {
 				return nil, fmt.Errorf("no sys for %s", m.String())
-			***REMOVED***
+			}
 			ss = append(ss, m.String()+" "+syss(sys).String()+" "+addrs(m.Addrs).String())
 		case *InterfaceAddrMessage:
 			var attrs addrAttrs
-			if runtime.GOOS == "openbsd" ***REMOVED***
+			if runtime.GOOS == "openbsd" {
 				attrs = addrAttrs(nativeEndian.Uint32(m.raw[12:16]))
-			***REMOVED*** else ***REMOVED***
+			} else {
 				attrs = addrAttrs(nativeEndian.Uint32(m.raw[4:8]))
-			***REMOVED***
-			if err := addrs(m.Addrs).match(attrs); err != nil ***REMOVED***
+			}
+			if err := addrs(m.Addrs).match(attrs); err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			ss = append(ss, m.String()+" "+addrs(m.Addrs).String())
 		case *InterfaceMulticastAddrMessage:
-			if err := addrs(m.Addrs).match(addrAttrs(nativeEndian.Uint32(m.raw[4:8]))); err != nil ***REMOVED***
+			if err := addrs(m.Addrs).match(addrAttrs(nativeEndian.Uint32(m.raw[4:8]))); err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			ss = append(ss, m.String()+" "+addrs(m.Addrs).String())
 		case *InterfaceAnnounceMessage:
 			ss = append(ss, m.String())
 		default:
 			ss = append(ss, fmt.Sprintf("%+v", m))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return ss, nil
-***REMOVED***
+}
 
 type syss []Sys
 
-func (sys syss) String() string ***REMOVED***
+func (sys syss) String() string {
 	var s string
-	for _, sy := range sys ***REMOVED***
-		switch sy := sy.(type) ***REMOVED***
+	for _, sy := range sys {
+		switch sy := sy.(type) {
 		case *InterfaceMetrics:
-			if len(s) > 0 ***REMOVED***
+			if len(s) > 0 {
 				s += " "
-			***REMOVED***
+			}
 			s += sy.String()
 		case *RouteMetrics:
-			if len(s) > 0 ***REMOVED***
+			if len(s) > 0 {
 				s += " "
-			***REMOVED***
+			}
 			s += sy.String()
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return s
-***REMOVED***
+}
 
 type addrFamily int
 
-func (af addrFamily) String() string ***REMOVED***
-	switch af ***REMOVED***
+func (af addrFamily) String() string {
+	switch af {
 	case sysAF_UNSPEC:
 		return "unspec"
 	case sysAF_LINK:
@@ -186,83 +186,83 @@ func (af addrFamily) String() string ***REMOVED***
 		return "inet6"
 	default:
 		return fmt.Sprintf("%d", af)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 const hexDigit = "0123456789abcdef"
 
 type llAddr []byte
 
-func (a llAddr) String() string ***REMOVED***
-	if len(a) == 0 ***REMOVED***
+func (a llAddr) String() string {
+	if len(a) == 0 {
 		return ""
-	***REMOVED***
+	}
 	buf := make([]byte, 0, len(a)*3-1)
-	for i, b := range a ***REMOVED***
-		if i > 0 ***REMOVED***
+	for i, b := range a {
+		if i > 0 {
 			buf = append(buf, ':')
-		***REMOVED***
+		}
 		buf = append(buf, hexDigit[b>>4])
 		buf = append(buf, hexDigit[b&0xF])
-	***REMOVED***
+	}
 	return string(buf)
-***REMOVED***
+}
 
 type ipAddr []byte
 
-func (a ipAddr) String() string ***REMOVED***
-	if len(a) == 0 ***REMOVED***
+func (a ipAddr) String() string {
+	if len(a) == 0 {
 		return "<nil>"
-	***REMOVED***
-	if len(a) == 4 ***REMOVED***
+	}
+	if len(a) == 4 {
 		return fmt.Sprintf("%d.%d.%d.%d", a[0], a[1], a[2], a[3])
-	***REMOVED***
-	if len(a) == 16 ***REMOVED***
+	}
+	if len(a) == 16 {
 		return fmt.Sprintf("%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x", a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9], a[10], a[11], a[12], a[13], a[14], a[15])
-	***REMOVED***
+	}
 	s := make([]byte, len(a)*2)
-	for i, tn := range a ***REMOVED***
+	for i, tn := range a {
 		s[i*2], s[i*2+1] = hexDigit[tn>>4], hexDigit[tn&0xf]
-	***REMOVED***
+	}
 	return string(s)
-***REMOVED***
+}
 
-func (a *LinkAddr) String() string ***REMOVED***
+func (a *LinkAddr) String() string {
 	name := a.Name
-	if name == "" ***REMOVED***
+	if name == "" {
 		name = "<nil>"
-	***REMOVED***
+	}
 	lla := llAddr(a.Addr).String()
-	if lla == "" ***REMOVED***
+	if lla == "" {
 		lla = "<nil>"
-	***REMOVED***
+	}
 	return fmt.Sprintf("(%v %d %s %s)", addrFamily(a.Family()), a.Index, name, lla)
-***REMOVED***
+}
 
-func (a *Inet4Addr) String() string ***REMOVED***
+func (a *Inet4Addr) String() string {
 	return fmt.Sprintf("(%v %v)", addrFamily(a.Family()), ipAddr(a.IP[:]))
-***REMOVED***
+}
 
-func (a *Inet6Addr) String() string ***REMOVED***
+func (a *Inet6Addr) String() string {
 	return fmt.Sprintf("(%v %v %d)", addrFamily(a.Family()), ipAddr(a.IP[:]), a.ZoneID)
-***REMOVED***
+}
 
-func (a *DefaultAddr) String() string ***REMOVED***
+func (a *DefaultAddr) String() string {
 	return fmt.Sprintf("(%v %s)", addrFamily(a.Family()), ipAddr(a.Raw[2:]).String())
-***REMOVED***
+}
 
 type addrs []Addr
 
-func (as addrs) String() string ***REMOVED***
+func (as addrs) String() string {
 	var s string
-	for _, a := range as ***REMOVED***
-		if a == nil ***REMOVED***
+	for _, a := range as {
+		if a == nil {
 			continue
-		***REMOVED***
-		if len(s) > 0 ***REMOVED***
+		}
+		if len(s) > 0 {
 			s += " "
-		***REMOVED***
-		switch a := a.(type) ***REMOVED***
+		}
+		switch a := a.(type) {
 		case *LinkAddr:
 			s += a.String()
 		case *Inet4Addr:
@@ -271,120 +271,120 @@ func (as addrs) String() string ***REMOVED***
 			s += a.String()
 		case *DefaultAddr:
 			s += a.String()
-		***REMOVED***
-	***REMOVED***
-	if s == "" ***REMOVED***
+		}
+	}
+	if s == "" {
 		return "<nil>"
-	***REMOVED***
+	}
 	return s
-***REMOVED***
+}
 
-func (as addrs) match(attrs addrAttrs) error ***REMOVED***
+func (as addrs) match(attrs addrAttrs) error {
 	var ts addrAttrs
 	af := sysAF_UNSPEC
-	for i := range as ***REMOVED***
-		if as[i] != nil ***REMOVED***
+	for i := range as {
+		if as[i] != nil {
 			ts |= 1 << uint(i)
-		***REMOVED***
-		switch as[i].(type) ***REMOVED***
+		}
+		switch as[i].(type) {
 		case *Inet4Addr:
-			if af == sysAF_UNSPEC ***REMOVED***
+			if af == sysAF_UNSPEC {
 				af = sysAF_INET
-			***REMOVED***
-			if af != sysAF_INET ***REMOVED***
+			}
+			if af != sysAF_INET {
 				return fmt.Errorf("got %v; want %v", addrs(as), addrFamily(af))
-			***REMOVED***
+			}
 		case *Inet6Addr:
-			if af == sysAF_UNSPEC ***REMOVED***
+			if af == sysAF_UNSPEC {
 				af = sysAF_INET6
-			***REMOVED***
-			if af != sysAF_INET6 ***REMOVED***
+			}
+			if af != sysAF_INET6 {
 				return fmt.Errorf("got %v; want %v", addrs(as), addrFamily(af))
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-	if ts != attrs && ts > attrs ***REMOVED***
+			}
+		}
+	}
+	if ts != attrs && ts > attrs {
 		return fmt.Errorf("%v not included in %v", ts, attrs)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func fetchAndParseRIB(af int, typ RIBType) ([]Message, error) ***REMOVED***
+func fetchAndParseRIB(af int, typ RIBType) ([]Message, error) {
 	var err error
 	var b []byte
-	for i := 0; i < 3; i++ ***REMOVED***
-		if b, err = FetchRIB(af, typ, 0); err != nil ***REMOVED***
+	for i := 0; i < 3; i++ {
+		if b, err = FetchRIB(af, typ, 0); err != nil {
 			time.Sleep(10 * time.Millisecond)
 			continue
-		***REMOVED***
+		}
 		break
-	***REMOVED***
-	if err != nil ***REMOVED***
+	}
+	if err != nil {
 		return nil, fmt.Errorf("%v %d %v", addrFamily(af), typ, err)
-	***REMOVED***
+	}
 	ms, err := ParseRIB(typ, b)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("%v %d %v", addrFamily(af), typ, err)
-	***REMOVED***
+	}
 	return ms, nil
-***REMOVED***
+}
 
 // propVirtual is a proprietary virtual network interface.
-type propVirtual struct ***REMOVED***
+type propVirtual struct {
 	name         string
 	addr, mask   string
 	setupCmds    []*exec.Cmd
 	teardownCmds []*exec.Cmd
-***REMOVED***
+}
 
-func (pv *propVirtual) setup() error ***REMOVED***
-	for _, cmd := range pv.setupCmds ***REMOVED***
-		if err := cmd.Run(); err != nil ***REMOVED***
+func (pv *propVirtual) setup() error {
+	for _, cmd := range pv.setupCmds {
+		if err := cmd.Run(); err != nil {
 			pv.teardown()
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func (pv *propVirtual) teardown() error ***REMOVED***
-	for _, cmd := range pv.teardownCmds ***REMOVED***
-		if err := cmd.Run(); err != nil ***REMOVED***
+func (pv *propVirtual) teardown() error {
+	for _, cmd := range pv.teardownCmds {
+		if err := cmd.Run(); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func (pv *propVirtual) configure(suffix int) error ***REMOVED***
-	if runtime.GOOS == "openbsd" ***REMOVED***
+func (pv *propVirtual) configure(suffix int) error {
+	if runtime.GOOS == "openbsd" {
 		pv.name = fmt.Sprintf("vether%d", suffix)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		pv.name = fmt.Sprintf("vlan%d", suffix)
-	***REMOVED***
+	}
 	xname, err := exec.LookPath("ifconfig")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	pv.setupCmds = append(pv.setupCmds, &exec.Cmd***REMOVED***
+	}
+	pv.setupCmds = append(pv.setupCmds, &exec.Cmd{
 		Path: xname,
-		Args: []string***REMOVED***"ifconfig", pv.name, "create"***REMOVED***,
-	***REMOVED***)
-	if runtime.GOOS == "netbsd" ***REMOVED***
+		Args: []string{"ifconfig", pv.name, "create"},
+	})
+	if runtime.GOOS == "netbsd" {
 		// NetBSD requires an underlying dot1Q-capable network
 		// interface.
-		pv.setupCmds = append(pv.setupCmds, &exec.Cmd***REMOVED***
+		pv.setupCmds = append(pv.setupCmds, &exec.Cmd{
 			Path: xname,
-			Args: []string***REMOVED***"ifconfig", pv.name, "vlan", fmt.Sprintf("%d", suffix&0xfff), "vlanif", "wm0"***REMOVED***,
-		***REMOVED***)
-	***REMOVED***
-	pv.setupCmds = append(pv.setupCmds, &exec.Cmd***REMOVED***
+			Args: []string{"ifconfig", pv.name, "vlan", fmt.Sprintf("%d", suffix&0xfff), "vlanif", "wm0"},
+		})
+	}
+	pv.setupCmds = append(pv.setupCmds, &exec.Cmd{
 		Path: xname,
-		Args: []string***REMOVED***"ifconfig", pv.name, "inet", pv.addr, "netmask", pv.mask***REMOVED***,
-	***REMOVED***)
-	pv.teardownCmds = append(pv.teardownCmds, &exec.Cmd***REMOVED***
+		Args: []string{"ifconfig", pv.name, "inet", pv.addr, "netmask", pv.mask},
+	})
+	pv.teardownCmds = append(pv.teardownCmds, &exec.Cmd{
 		Path: xname,
-		Args: []string***REMOVED***"ifconfig", pv.name, "destroy"***REMOVED***,
-	***REMOVED***)
+		Args: []string{"ifconfig", pv.name, "destroy"},
+	})
 	return nil
-***REMOVED***
+}

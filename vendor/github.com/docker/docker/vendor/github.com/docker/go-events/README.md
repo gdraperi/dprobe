@@ -25,24 +25,24 @@ notifications. As a rule, it should send a single http request and return an
 error if it fails:
 
 ```go
-func (h *httpSink) Write(event Event) error ***REMOVED***
+func (h *httpSink) Write(event Event) error {
 	p, err := json.Marshal(event)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	body := bytes.NewReader(p)
 	resp, err := h.client.Post(h.url, "application/json", body)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer resp.Body.Close()
 	
-	if resp.Status != 200 ***REMOVED***
+	if resp.Status != 200 {
 		return errors.New("unexpected status")
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // implement (*httpSink).Close()
 ```
@@ -100,10 +100,10 @@ behavior and semantics of the sink can be completely dependent on the
 application requirements. The interface is provided below for reference:
 
 ```go
-type Sink ***REMOVED***
+type Sink {
 	Write(Event) error
 	Close() error
-***REMOVED***
+}
 ```
 
 Application behavior can be controlled by how `Write` behaves. The examples

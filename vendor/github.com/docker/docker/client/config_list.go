@@ -11,28 +11,28 @@ import (
 )
 
 // ConfigList returns the list of configs.
-func (cli *Client) ConfigList(ctx context.Context, options types.ConfigListOptions) ([]swarm.Config, error) ***REMOVED***
-	if err := cli.NewVersionError("1.30", "config list"); err != nil ***REMOVED***
+func (cli *Client) ConfigList(ctx context.Context, options types.ConfigListOptions) ([]swarm.Config, error) {
+	if err := cli.NewVersionError("1.30", "config list"); err != nil {
 		return nil, err
-	***REMOVED***
-	query := url.Values***REMOVED******REMOVED***
+	}
+	query := url.Values{}
 
-	if options.Filters.Len() > 0 ***REMOVED***
+	if options.Filters.Len() > 0 {
 		filterJSON, err := filters.ToJSON(options.Filters)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 
 		query.Set("filters", filterJSON)
-	***REMOVED***
+	}
 
 	resp, err := cli.get(ctx, "/configs", query, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	var configs []swarm.Config
 	err = json.NewDecoder(resp.body).Decode(&configs)
 	ensureReaderClosed(resp)
 	return configs, err
-***REMOVED***
+}

@@ -27,14 +27,14 @@ func hashBlocksSSSE3(h *[8]uint32, c *[2]uint32, flag uint32, blocks []byte)
 //go:noescape
 func hashBlocksSSE4(h *[8]uint32, c *[2]uint32, flag uint32, blocks []byte)
 
-func hashBlocks(h *[8]uint32, c *[2]uint32, flag uint32, blocks []byte) ***REMOVED***
-	if useSSE4 ***REMOVED***
+func hashBlocks(h *[8]uint32, c *[2]uint32, flag uint32, blocks []byte) {
+	if useSSE4 {
 		hashBlocksSSE4(h, c, flag, blocks)
-	***REMOVED*** else if useSSSE3 ***REMOVED***
+	} else if useSSSE3 {
 		hashBlocksSSSE3(h, c, flag, blocks)
-	***REMOVED*** else if useSSE2 ***REMOVED***
+	} else if useSSE2 {
 		hashBlocksSSE2(h, c, flag, blocks)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		hashBlocksGeneric(h, c, flag, blocks)
-	***REMOVED***
-***REMOVED***
+	}
+}

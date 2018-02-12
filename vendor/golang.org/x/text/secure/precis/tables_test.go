@@ -13,13 +13,13 @@ import (
 	"golang.org/x/text/unicode/rangetable"
 )
 
-type tableTest struct ***REMOVED***
+type tableTest struct {
 	rangeTable *unicode.RangeTable
 	prop       property
-***REMOVED***
+}
 
-var exceptions = runes.Predicate(func(r rune) bool ***REMOVED***
-	switch uint32(r) ***REMOVED***
+var exceptions = runes.Predicate(func(r rune) bool {
+	switch uint32(r) {
 	case 0x00DF, 0x03C2, 0x06FD, 0x06FE, 0x0F0B, 0x3007, 0x00B7, 0x0375, 0x05F3,
 		0x05F4, 0x30FB, 0x0660, 0x0661, 0x0662, 0x0663, 0x0664, 0x0665, 0x0666,
 		0x0667, 0x0668, 0x0669, 0x06F0, 0x06F1, 0x06F2, 0x06F3, 0x06F4, 0x06F5,
@@ -28,13 +28,13 @@ var exceptions = runes.Predicate(func(r rune) bool ***REMOVED***
 		return true
 	default:
 		return false
-	***REMOVED***
-***REMOVED***)
+	}
+})
 
 // Ensure that certain properties were generated correctly.
-func TestTable(t *testing.T) ***REMOVED***
-	tests := []tableTest***REMOVED***
-		tableTest***REMOVED***
+func TestTable(t *testing.T) {
+	tests := []tableTest{
+		tableTest{
 			rangetable.Merge(
 				unicode.Lt, unicode.Nl, unicode.No, // Other letter digits
 				unicode.Me,             // Modifiers
@@ -43,27 +43,27 @@ func TestTable(t *testing.T) ***REMOVED***
 				unicode.Pi, unicode.Pf, // Punctuation
 			),
 			idDisOrFreePVal,
-		***REMOVED***,
-		tableTest***REMOVED***
+		},
+		tableTest{
 			rangetable.New(0x30000, 0x30101, 0xDFFFF),
 			unassigned,
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
 	assigned := rangetable.Assigned(UnicodeVersion)
 
-	for _, test := range tests ***REMOVED***
-		rangetable.Visit(test.rangeTable, func(r rune) ***REMOVED***
-			if !unicode.In(r, assigned) ***REMOVED***
+	for _, test := range tests {
+		rangetable.Visit(test.rangeTable, func(r rune) {
+			if !unicode.In(r, assigned) {
 				return
-			***REMOVED***
+			}
 			b := make([]byte, 4)
 			n := utf8.EncodeRune(b, r)
 			trieval, _ := dpTrie.lookup(b[:n])
 			p := entry(trieval).property()
-			if p != test.prop && !exceptions.Contains(r) ***REMOVED***
+			if p != test.prop && !exceptions.Contains(r) {
 				t.Errorf("%U: got %+x; want %+x", r, test.prop, p)
-			***REMOVED***
-		***REMOVED***)
-	***REMOVED***
-***REMOVED***
+			}
+		})
+	}
+}

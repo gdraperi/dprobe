@@ -29,77 +29,77 @@ var (
 	capLastCap Cap
 )
 
-func init() ***REMOVED***
+func init() {
 	var hdr capHeader
 	capget(&hdr, nil)
 	capVers = hdr.version
 
-	if initLastCap() == nil ***REMOVED***
+	if initLastCap() == nil {
 		CAP_LAST_CAP = capLastCap
-		if capLastCap > 31 ***REMOVED***
+		if capLastCap > 31 {
 			capUpperMask = (uint32(1) << (uint(capLastCap) - 31)) - 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			capUpperMask = 0
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func initLastCap() error ***REMOVED***
-	if capLastCap != 0 ***REMOVED***
+func initLastCap() error {
+	if capLastCap != 0 {
 		return nil
-	***REMOVED***
+	}
 
 	f, err := os.Open("/proc/sys/kernel/cap_last_cap")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer f.Close()
 
 	var b []byte = make([]byte, 11)
 	_, err = f.Read(b)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	fmt.Sscanf(string(b), "%d", &capLastCap)
 
 	return nil
-***REMOVED***
+}
 
-func mkStringCap(c Capabilities, which CapType) (ret string) ***REMOVED***
-	for i, first := Cap(0), true; i <= CAP_LAST_CAP; i++ ***REMOVED***
-		if !c.Get(which, i) ***REMOVED***
+func mkStringCap(c Capabilities, which CapType) (ret string) {
+	for i, first := Cap(0), true; i <= CAP_LAST_CAP; i++ {
+		if !c.Get(which, i) {
 			continue
-		***REMOVED***
-		if first ***REMOVED***
+		}
+		if first {
 			first = false
-		***REMOVED*** else ***REMOVED***
+		} else {
 			ret += ", "
-		***REMOVED***
+		}
 		ret += i.String()
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func mkString(c Capabilities, max CapType) (ret string) ***REMOVED***
-	ret = "***REMOVED***"
-	for i := CapType(1); i <= max; i <<= 1 ***REMOVED***
+func mkString(c Capabilities, max CapType) (ret string) {
+	ret = "{"
+	for i := CapType(1); i <= max; i <<= 1 {
 		ret += " " + i.String() + "=\""
-		if c.Empty(i) ***REMOVED***
+		if c.Empty(i) {
 			ret += "empty"
-		***REMOVED*** else if c.Full(i) ***REMOVED***
+		} else if c.Full(i) {
 			ret += "full"
-		***REMOVED*** else ***REMOVED***
+		} else {
 			ret += c.StringCap(i)
-		***REMOVED***
+		}
 		ret += "\""
-	***REMOVED***
-	ret += " ***REMOVED***"
+	}
+	ret += " }"
 	return
-***REMOVED***
+}
 
-func newPid(pid int) (c Capabilities, err error) ***REMOVED***
-	switch capVers ***REMOVED***
+func newPid(pid int) (c Capabilities, err error) {
+	switch capVers {
 	case linuxCapVer1:
 		p := new(capsV1)
 		p.hdr.version = capVers
@@ -113,141 +113,141 @@ func newPid(pid int) (c Capabilities, err error) ***REMOVED***
 	default:
 		err = errUnknownVers
 		return
-	***REMOVED***
+	}
 	err = c.Load()
-	if err != nil ***REMOVED***
+	if err != nil {
 		c = nil
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-type capsV1 struct ***REMOVED***
+type capsV1 struct {
 	hdr  capHeader
 	data capData
-***REMOVED***
+}
 
-func (c *capsV1) Get(which CapType, what Cap) bool ***REMOVED***
-	if what > 32 ***REMOVED***
+func (c *capsV1) Get(which CapType, what Cap) bool {
+	if what > 32 {
 		return false
-	***REMOVED***
+	}
 
-	switch which ***REMOVED***
+	switch which {
 	case EFFECTIVE:
 		return (1<<uint(what))&c.data.effective != 0
 	case PERMITTED:
 		return (1<<uint(what))&c.data.permitted != 0
 	case INHERITABLE:
 		return (1<<uint(what))&c.data.inheritable != 0
-	***REMOVED***
+	}
 
 	return false
-***REMOVED***
+}
 
-func (c *capsV1) getData(which CapType) (ret uint32) ***REMOVED***
-	switch which ***REMOVED***
+func (c *capsV1) getData(which CapType) (ret uint32) {
+	switch which {
 	case EFFECTIVE:
 		ret = c.data.effective
 	case PERMITTED:
 		ret = c.data.permitted
 	case INHERITABLE:
 		ret = c.data.inheritable
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func (c *capsV1) Empty(which CapType) bool ***REMOVED***
+func (c *capsV1) Empty(which CapType) bool {
 	return c.getData(which) == 0
-***REMOVED***
+}
 
-func (c *capsV1) Full(which CapType) bool ***REMOVED***
+func (c *capsV1) Full(which CapType) bool {
 	return (c.getData(which) & 0x7fffffff) == 0x7fffffff
-***REMOVED***
+}
 
-func (c *capsV1) Set(which CapType, caps ...Cap) ***REMOVED***
-	for _, what := range caps ***REMOVED***
-		if what > 32 ***REMOVED***
+func (c *capsV1) Set(which CapType, caps ...Cap) {
+	for _, what := range caps {
+		if what > 32 {
 			continue
-		***REMOVED***
+		}
 
-		if which&EFFECTIVE != 0 ***REMOVED***
+		if which&EFFECTIVE != 0 {
 			c.data.effective |= 1 << uint(what)
-		***REMOVED***
-		if which&PERMITTED != 0 ***REMOVED***
+		}
+		if which&PERMITTED != 0 {
 			c.data.permitted |= 1 << uint(what)
-		***REMOVED***
-		if which&INHERITABLE != 0 ***REMOVED***
+		}
+		if which&INHERITABLE != 0 {
 			c.data.inheritable |= 1 << uint(what)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (c *capsV1) Unset(which CapType, caps ...Cap) ***REMOVED***
-	for _, what := range caps ***REMOVED***
-		if what > 32 ***REMOVED***
+func (c *capsV1) Unset(which CapType, caps ...Cap) {
+	for _, what := range caps {
+		if what > 32 {
 			continue
-		***REMOVED***
+		}
 
-		if which&EFFECTIVE != 0 ***REMOVED***
+		if which&EFFECTIVE != 0 {
 			c.data.effective &= ^(1 << uint(what))
-		***REMOVED***
-		if which&PERMITTED != 0 ***REMOVED***
+		}
+		if which&PERMITTED != 0 {
 			c.data.permitted &= ^(1 << uint(what))
-		***REMOVED***
-		if which&INHERITABLE != 0 ***REMOVED***
+		}
+		if which&INHERITABLE != 0 {
 			c.data.inheritable &= ^(1 << uint(what))
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (c *capsV1) Fill(kind CapType) ***REMOVED***
-	if kind&CAPS == CAPS ***REMOVED***
+func (c *capsV1) Fill(kind CapType) {
+	if kind&CAPS == CAPS {
 		c.data.effective = 0x7fffffff
 		c.data.permitted = 0x7fffffff
 		c.data.inheritable = 0
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (c *capsV1) Clear(kind CapType) ***REMOVED***
-	if kind&CAPS == CAPS ***REMOVED***
+func (c *capsV1) Clear(kind CapType) {
+	if kind&CAPS == CAPS {
 		c.data.effective = 0
 		c.data.permitted = 0
 		c.data.inheritable = 0
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (c *capsV1) StringCap(which CapType) (ret string) ***REMOVED***
+func (c *capsV1) StringCap(which CapType) (ret string) {
 	return mkStringCap(c, which)
-***REMOVED***
+}
 
-func (c *capsV1) String() (ret string) ***REMOVED***
+func (c *capsV1) String() (ret string) {
 	return mkString(c, BOUNDING)
-***REMOVED***
+}
 
-func (c *capsV1) Load() (err error) ***REMOVED***
+func (c *capsV1) Load() (err error) {
 	return capget(&c.hdr, &c.data)
-***REMOVED***
+}
 
-func (c *capsV1) Apply(kind CapType) error ***REMOVED***
-	if kind&CAPS == CAPS ***REMOVED***
+func (c *capsV1) Apply(kind CapType) error {
+	if kind&CAPS == CAPS {
 		return capset(&c.hdr, &c.data)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-type capsV3 struct ***REMOVED***
+type capsV3 struct {
 	hdr    capHeader
 	data   [2]capData
 	bounds [2]uint32
-***REMOVED***
+}
 
-func (c *capsV3) Get(which CapType, what Cap) bool ***REMOVED***
+func (c *capsV3) Get(which CapType, what Cap) bool {
 	var i uint
-	if what > 31 ***REMOVED***
+	if what > 31 {
 		i = uint(what) >> 5
 		what %= 32
-	***REMOVED***
+	}
 
-	switch which ***REMOVED***
+	switch which {
 	case EFFECTIVE:
 		return (1<<uint(what))&c.data[i].effective != 0
 	case PERMITTED:
@@ -256,13 +256,13 @@ func (c *capsV3) Get(which CapType, what Cap) bool ***REMOVED***
 		return (1<<uint(what))&c.data[i].inheritable != 0
 	case BOUNDING:
 		return (1<<uint(what))&c.bounds[i] != 0
-	***REMOVED***
+	}
 
 	return false
-***REMOVED***
+}
 
-func (c *capsV3) getData(which CapType, dest []uint32) ***REMOVED***
-	switch which ***REMOVED***
+func (c *capsV3) getData(which CapType, dest []uint32) {
+	switch which {
 	case EFFECTIVE:
 		dest[0] = c.data[0].effective
 		dest[1] = c.data[1].effective
@@ -275,217 +275,217 @@ func (c *capsV3) getData(which CapType, dest []uint32) ***REMOVED***
 	case BOUNDING:
 		dest[0] = c.bounds[0]
 		dest[1] = c.bounds[1]
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (c *capsV3) Empty(which CapType) bool ***REMOVED***
+func (c *capsV3) Empty(which CapType) bool {
 	var data [2]uint32
 	c.getData(which, data[:])
 	return data[0] == 0 && data[1] == 0
-***REMOVED***
+}
 
-func (c *capsV3) Full(which CapType) bool ***REMOVED***
+func (c *capsV3) Full(which CapType) bool {
 	var data [2]uint32
 	c.getData(which, data[:])
-	if (data[0] & 0xffffffff) != 0xffffffff ***REMOVED***
+	if (data[0] & 0xffffffff) != 0xffffffff {
 		return false
-	***REMOVED***
+	}
 	return (data[1] & capUpperMask) == capUpperMask
-***REMOVED***
+}
 
-func (c *capsV3) Set(which CapType, caps ...Cap) ***REMOVED***
-	for _, what := range caps ***REMOVED***
+func (c *capsV3) Set(which CapType, caps ...Cap) {
+	for _, what := range caps {
 		var i uint
-		if what > 31 ***REMOVED***
+		if what > 31 {
 			i = uint(what) >> 5
 			what %= 32
-		***REMOVED***
+		}
 
-		if which&EFFECTIVE != 0 ***REMOVED***
+		if which&EFFECTIVE != 0 {
 			c.data[i].effective |= 1 << uint(what)
-		***REMOVED***
-		if which&PERMITTED != 0 ***REMOVED***
+		}
+		if which&PERMITTED != 0 {
 			c.data[i].permitted |= 1 << uint(what)
-		***REMOVED***
-		if which&INHERITABLE != 0 ***REMOVED***
+		}
+		if which&INHERITABLE != 0 {
 			c.data[i].inheritable |= 1 << uint(what)
-		***REMOVED***
-		if which&BOUNDING != 0 ***REMOVED***
+		}
+		if which&BOUNDING != 0 {
 			c.bounds[i] |= 1 << uint(what)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (c *capsV3) Unset(which CapType, caps ...Cap) ***REMOVED***
-	for _, what := range caps ***REMOVED***
+func (c *capsV3) Unset(which CapType, caps ...Cap) {
+	for _, what := range caps {
 		var i uint
-		if what > 31 ***REMOVED***
+		if what > 31 {
 			i = uint(what) >> 5
 			what %= 32
-		***REMOVED***
+		}
 
-		if which&EFFECTIVE != 0 ***REMOVED***
+		if which&EFFECTIVE != 0 {
 			c.data[i].effective &= ^(1 << uint(what))
-		***REMOVED***
-		if which&PERMITTED != 0 ***REMOVED***
+		}
+		if which&PERMITTED != 0 {
 			c.data[i].permitted &= ^(1 << uint(what))
-		***REMOVED***
-		if which&INHERITABLE != 0 ***REMOVED***
+		}
+		if which&INHERITABLE != 0 {
 			c.data[i].inheritable &= ^(1 << uint(what))
-		***REMOVED***
-		if which&BOUNDING != 0 ***REMOVED***
+		}
+		if which&BOUNDING != 0 {
 			c.bounds[i] &= ^(1 << uint(what))
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (c *capsV3) Fill(kind CapType) ***REMOVED***
-	if kind&CAPS == CAPS ***REMOVED***
+func (c *capsV3) Fill(kind CapType) {
+	if kind&CAPS == CAPS {
 		c.data[0].effective = 0xffffffff
 		c.data[0].permitted = 0xffffffff
 		c.data[0].inheritable = 0
 		c.data[1].effective = 0xffffffff
 		c.data[1].permitted = 0xffffffff
 		c.data[1].inheritable = 0
-	***REMOVED***
+	}
 
-	if kind&BOUNDS == BOUNDS ***REMOVED***
+	if kind&BOUNDS == BOUNDS {
 		c.bounds[0] = 0xffffffff
 		c.bounds[1] = 0xffffffff
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (c *capsV3) Clear(kind CapType) ***REMOVED***
-	if kind&CAPS == CAPS ***REMOVED***
+func (c *capsV3) Clear(kind CapType) {
+	if kind&CAPS == CAPS {
 		c.data[0].effective = 0
 		c.data[0].permitted = 0
 		c.data[0].inheritable = 0
 		c.data[1].effective = 0
 		c.data[1].permitted = 0
 		c.data[1].inheritable = 0
-	***REMOVED***
+	}
 
-	if kind&BOUNDS == BOUNDS ***REMOVED***
+	if kind&BOUNDS == BOUNDS {
 		c.bounds[0] = 0
 		c.bounds[1] = 0
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (c *capsV3) StringCap(which CapType) (ret string) ***REMOVED***
+func (c *capsV3) StringCap(which CapType) (ret string) {
 	return mkStringCap(c, which)
-***REMOVED***
+}
 
-func (c *capsV3) String() (ret string) ***REMOVED***
+func (c *capsV3) String() (ret string) {
 	return mkString(c, BOUNDING)
-***REMOVED***
+}
 
-func (c *capsV3) Load() (err error) ***REMOVED***
+func (c *capsV3) Load() (err error) {
 	err = capget(&c.hdr, &c.data[0])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
 	var status_path string
 
-	if c.hdr.pid == 0 ***REMOVED***
+	if c.hdr.pid == 0 {
 		status_path = fmt.Sprintf("/proc/self/status")
-	***REMOVED*** else ***REMOVED***
+	} else {
 		status_path = fmt.Sprintf("/proc/%d/status", c.hdr.pid)
-	***REMOVED***
+	}
 
 	f, err := os.Open(status_path)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	b := bufio.NewReader(f)
-	for ***REMOVED***
+	for {
 		line, e := b.ReadString('\n')
-		if e != nil ***REMOVED***
-			if e != io.EOF ***REMOVED***
+		if e != nil {
+			if e != io.EOF {
 				err = e
-			***REMOVED***
+			}
 			break
-		***REMOVED***
-		if strings.HasPrefix(line, "CapB") ***REMOVED***
+		}
+		if strings.HasPrefix(line, "CapB") {
 			fmt.Sscanf(line[4:], "nd:  %08x%08x", &c.bounds[1], &c.bounds[0])
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	f.Close()
 
 	return
-***REMOVED***
+}
 
-func (c *capsV3) Apply(kind CapType) (err error) ***REMOVED***
-	if kind&BOUNDS == BOUNDS ***REMOVED***
+func (c *capsV3) Apply(kind CapType) (err error) {
+	if kind&BOUNDS == BOUNDS {
 		var data [2]capData
 		err = capget(&c.hdr, &data[0])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
-		if (1<<uint(CAP_SETPCAP))&data[0].effective != 0 ***REMOVED***
-			for i := Cap(0); i <= CAP_LAST_CAP; i++ ***REMOVED***
-				if c.Get(BOUNDING, i) ***REMOVED***
+		}
+		if (1<<uint(CAP_SETPCAP))&data[0].effective != 0 {
+			for i := Cap(0); i <= CAP_LAST_CAP; i++ {
+				if c.Get(BOUNDING, i) {
 					continue
-				***REMOVED***
+				}
 				err = prctl(syscall.PR_CAPBSET_DROP, uintptr(i), 0, 0, 0)
-				if err != nil ***REMOVED***
+				if err != nil {
 					// Ignore EINVAL since the capability may not be supported in this system.
-					if errno, ok := err.(syscall.Errno); ok && errno == syscall.EINVAL ***REMOVED***
+					if errno, ok := err.(syscall.Errno); ok && errno == syscall.EINVAL {
 						err = nil
 						continue
-					***REMOVED***
+					}
 					return
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+				}
+			}
+		}
+	}
 
-	if kind&CAPS == CAPS ***REMOVED***
+	if kind&CAPS == CAPS {
 		return capset(&c.hdr, &c.data[0])
-	***REMOVED***
+	}
 
 	return
-***REMOVED***
+}
 
-func newFile(path string) (c Capabilities, err error) ***REMOVED***
-	c = &capsFile***REMOVED***path: path***REMOVED***
+func newFile(path string) (c Capabilities, err error) {
+	c = &capsFile{path: path}
 	err = c.Load()
-	if err != nil ***REMOVED***
+	if err != nil {
 		c = nil
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-type capsFile struct ***REMOVED***
+type capsFile struct {
 	path string
 	data vfscapData
-***REMOVED***
+}
 
-func (c *capsFile) Get(which CapType, what Cap) bool ***REMOVED***
+func (c *capsFile) Get(which CapType, what Cap) bool {
 	var i uint
-	if what > 31 ***REMOVED***
-		if c.data.version == 1 ***REMOVED***
+	if what > 31 {
+		if c.data.version == 1 {
 			return false
-		***REMOVED***
+		}
 		i = uint(what) >> 5
 		what %= 32
-	***REMOVED***
+	}
 
-	switch which ***REMOVED***
+	switch which {
 	case EFFECTIVE:
 		return (1<<uint(what))&c.data.effective[i] != 0
 	case PERMITTED:
 		return (1<<uint(what))&c.data.data[i].permitted != 0
 	case INHERITABLE:
 		return (1<<uint(what))&c.data.data[i].inheritable != 0
-	***REMOVED***
+	}
 
 	return false
-***REMOVED***
+}
 
-func (c *capsFile) getData(which CapType, dest []uint32) ***REMOVED***
-	switch which ***REMOVED***
+func (c *capsFile) getData(which CapType, dest []uint32) {
+	switch which {
 	case EFFECTIVE:
 		dest[0] = c.data.effective[0]
 		dest[1] = c.data.effective[1]
@@ -495,114 +495,114 @@ func (c *capsFile) getData(which CapType, dest []uint32) ***REMOVED***
 	case INHERITABLE:
 		dest[0] = c.data.data[0].inheritable
 		dest[1] = c.data.data[1].inheritable
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (c *capsFile) Empty(which CapType) bool ***REMOVED***
+func (c *capsFile) Empty(which CapType) bool {
 	var data [2]uint32
 	c.getData(which, data[:])
 	return data[0] == 0 && data[1] == 0
-***REMOVED***
+}
 
-func (c *capsFile) Full(which CapType) bool ***REMOVED***
+func (c *capsFile) Full(which CapType) bool {
 	var data [2]uint32
 	c.getData(which, data[:])
-	if c.data.version == 0 ***REMOVED***
+	if c.data.version == 0 {
 		return (data[0] & 0x7fffffff) == 0x7fffffff
-	***REMOVED***
-	if (data[0] & 0xffffffff) != 0xffffffff ***REMOVED***
+	}
+	if (data[0] & 0xffffffff) != 0xffffffff {
 		return false
-	***REMOVED***
+	}
 	return (data[1] & capUpperMask) == capUpperMask
-***REMOVED***
+}
 
-func (c *capsFile) Set(which CapType, caps ...Cap) ***REMOVED***
-	for _, what := range caps ***REMOVED***
+func (c *capsFile) Set(which CapType, caps ...Cap) {
+	for _, what := range caps {
 		var i uint
-		if what > 31 ***REMOVED***
-			if c.data.version == 1 ***REMOVED***
+		if what > 31 {
+			if c.data.version == 1 {
 				continue
-			***REMOVED***
+			}
 			i = uint(what) >> 5
 			what %= 32
-		***REMOVED***
+		}
 
-		if which&EFFECTIVE != 0 ***REMOVED***
+		if which&EFFECTIVE != 0 {
 			c.data.effective[i] |= 1 << uint(what)
-		***REMOVED***
-		if which&PERMITTED != 0 ***REMOVED***
+		}
+		if which&PERMITTED != 0 {
 			c.data.data[i].permitted |= 1 << uint(what)
-		***REMOVED***
-		if which&INHERITABLE != 0 ***REMOVED***
+		}
+		if which&INHERITABLE != 0 {
 			c.data.data[i].inheritable |= 1 << uint(what)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (c *capsFile) Unset(which CapType, caps ...Cap) ***REMOVED***
-	for _, what := range caps ***REMOVED***
+func (c *capsFile) Unset(which CapType, caps ...Cap) {
+	for _, what := range caps {
 		var i uint
-		if what > 31 ***REMOVED***
-			if c.data.version == 1 ***REMOVED***
+		if what > 31 {
+			if c.data.version == 1 {
 				continue
-			***REMOVED***
+			}
 			i = uint(what) >> 5
 			what %= 32
-		***REMOVED***
+		}
 
-		if which&EFFECTIVE != 0 ***REMOVED***
+		if which&EFFECTIVE != 0 {
 			c.data.effective[i] &= ^(1 << uint(what))
-		***REMOVED***
-		if which&PERMITTED != 0 ***REMOVED***
+		}
+		if which&PERMITTED != 0 {
 			c.data.data[i].permitted &= ^(1 << uint(what))
-		***REMOVED***
-		if which&INHERITABLE != 0 ***REMOVED***
+		}
+		if which&INHERITABLE != 0 {
 			c.data.data[i].inheritable &= ^(1 << uint(what))
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (c *capsFile) Fill(kind CapType) ***REMOVED***
-	if kind&CAPS == CAPS ***REMOVED***
+func (c *capsFile) Fill(kind CapType) {
+	if kind&CAPS == CAPS {
 		c.data.effective[0] = 0xffffffff
 		c.data.data[0].permitted = 0xffffffff
 		c.data.data[0].inheritable = 0
-		if c.data.version == 2 ***REMOVED***
+		if c.data.version == 2 {
 			c.data.effective[1] = 0xffffffff
 			c.data.data[1].permitted = 0xffffffff
 			c.data.data[1].inheritable = 0
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (c *capsFile) Clear(kind CapType) ***REMOVED***
-	if kind&CAPS == CAPS ***REMOVED***
+func (c *capsFile) Clear(kind CapType) {
+	if kind&CAPS == CAPS {
 		c.data.effective[0] = 0
 		c.data.data[0].permitted = 0
 		c.data.data[0].inheritable = 0
-		if c.data.version == 2 ***REMOVED***
+		if c.data.version == 2 {
 			c.data.effective[1] = 0
 			c.data.data[1].permitted = 0
 			c.data.data[1].inheritable = 0
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (c *capsFile) StringCap(which CapType) (ret string) ***REMOVED***
+func (c *capsFile) StringCap(which CapType) (ret string) {
 	return mkStringCap(c, which)
-***REMOVED***
+}
 
-func (c *capsFile) String() (ret string) ***REMOVED***
+func (c *capsFile) String() (ret string) {
 	return mkString(c, INHERITABLE)
-***REMOVED***
+}
 
-func (c *capsFile) Load() (err error) ***REMOVED***
+func (c *capsFile) Load() (err error) {
 	return getVfsCap(c.path, &c.data)
-***REMOVED***
+}
 
-func (c *capsFile) Apply(kind CapType) (err error) ***REMOVED***
-	if kind&CAPS == CAPS ***REMOVED***
+func (c *capsFile) Apply(kind CapType) (err error) {
+	if kind&CAPS == CAPS {
 		return setVfsCap(c.path, &c.data)
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}

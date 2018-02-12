@@ -1,5 +1,5 @@
 #!/bin/sh
-cd "$***REMOVED***0%/****REMOVED***"
+cd "${0%/*}"
 ROOTDIR=`pwd`
 mkdir -p "$HOME/.vim/autoload"
 mkdir -p "$HOME/.vim/ftplugin/go"

@@ -7,60 +7,60 @@ import (
 	"time"
 )
 
-func NewFreezer(root string) *freezerController ***REMOVED***
-	return &freezerController***REMOVED***
+func NewFreezer(root string) *freezerController {
+	return &freezerController{
 		root: filepath.Join(root, string(Freezer)),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type freezerController struct ***REMOVED***
+type freezerController struct {
 	root string
-***REMOVED***
+}
 
-func (f *freezerController) Name() Name ***REMOVED***
+func (f *freezerController) Name() Name {
 	return Freezer
-***REMOVED***
+}
 
-func (f *freezerController) Path(path string) string ***REMOVED***
+func (f *freezerController) Path(path string) string {
 	return filepath.Join(f.root, path)
-***REMOVED***
+}
 
-func (f *freezerController) Freeze(path string) error ***REMOVED***
+func (f *freezerController) Freeze(path string) error {
 	return f.waitState(path, Frozen)
-***REMOVED***
+}
 
-func (f *freezerController) Thaw(path string) error ***REMOVED***
+func (f *freezerController) Thaw(path string) error {
 	return f.waitState(path, Thawed)
-***REMOVED***
+}
 
-func (f *freezerController) changeState(path string, state State) error ***REMOVED***
+func (f *freezerController) changeState(path string, state State) error {
 	return ioutil.WriteFile(
 		filepath.Join(f.root, path, "freezer.state"),
 		[]byte(strings.ToUpper(string(state))),
 		defaultFilePerm,
 	)
-***REMOVED***
+}
 
-func (f *freezerController) state(path string) (State, error) ***REMOVED***
+func (f *freezerController) state(path string) (State, error) {
 	current, err := ioutil.ReadFile(filepath.Join(f.root, path, "freezer.state"))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	return State(strings.ToLower(strings.TrimSpace(string(current)))), nil
-***REMOVED***
+}
 
-func (f *freezerController) waitState(path string, state State) error ***REMOVED***
-	for ***REMOVED***
-		if err := f.changeState(path, state); err != nil ***REMOVED***
+func (f *freezerController) waitState(path string, state State) error {
+	for {
+		if err := f.changeState(path, state); err != nil {
 			return err
-		***REMOVED***
+		}
 		current, err := f.state(path)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-		if current == state ***REMOVED***
+		}
+		if current == state {
 			return nil
-		***REMOVED***
+		}
 		time.Sleep(1 * time.Millisecond)
-	***REMOVED***
-***REMOVED***
+	}
+}

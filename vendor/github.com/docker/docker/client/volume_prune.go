@@ -10,27 +10,27 @@ import (
 )
 
 // VolumesPrune requests the daemon to delete unused data
-func (cli *Client) VolumesPrune(ctx context.Context, pruneFilters filters.Args) (types.VolumesPruneReport, error) ***REMOVED***
+func (cli *Client) VolumesPrune(ctx context.Context, pruneFilters filters.Args) (types.VolumesPruneReport, error) {
 	var report types.VolumesPruneReport
 
-	if err := cli.NewVersionError("1.25", "volume prune"); err != nil ***REMOVED***
+	if err := cli.NewVersionError("1.25", "volume prune"); err != nil {
 		return report, err
-	***REMOVED***
+	}
 
 	query, err := getFiltersQuery(pruneFilters)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return report, err
-	***REMOVED***
+	}
 
 	serverResp, err := cli.post(ctx, "/volumes/prune", query, nil, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return report, err
-	***REMOVED***
+	}
 	defer ensureReaderClosed(serverResp)
 
-	if err := json.NewDecoder(serverResp.body).Decode(&report); err != nil ***REMOVED***
+	if err := json.NewDecoder(serverResp.body).Decode(&report); err != nil {
 		return report, fmt.Errorf("Error retrieving volume prune report: %v", err)
-	***REMOVED***
+	}
 
 	return report, nil
-***REMOVED***
+}

@@ -2,6 +2,6 @@
 
 package journald
 
-func (s *journald) Close() error ***REMOVED***
+func (s *journald) Close() error {
 	return nil
-***REMOVED***
+}

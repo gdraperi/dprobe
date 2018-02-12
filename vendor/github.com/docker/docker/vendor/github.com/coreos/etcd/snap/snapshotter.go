@@ -48,157 +48,157 @@ var (
 	crcTable         = crc32.MakeTable(crc32.Castagnoli)
 
 	// A map of valid files that can be present in the snap folder.
-	validFiles = map[string]bool***REMOVED***
+	validFiles = map[string]bool{
 		"db": true,
-	***REMOVED***
+	}
 )
 
-type Snapshotter struct ***REMOVED***
+type Snapshotter struct {
 	dir string
-***REMOVED***
+}
 
-func New(dir string) *Snapshotter ***REMOVED***
-	return &Snapshotter***REMOVED***
+func New(dir string) *Snapshotter {
+	return &Snapshotter{
 		dir: dir,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *Snapshotter) SaveSnap(snapshot raftpb.Snapshot) error ***REMOVED***
-	if raft.IsEmptySnap(snapshot) ***REMOVED***
+func (s *Snapshotter) SaveSnap(snapshot raftpb.Snapshot) error {
+	if raft.IsEmptySnap(snapshot) {
 		return nil
-	***REMOVED***
+	}
 	return s.save(&snapshot)
-***REMOVED***
+}
 
-func (s *Snapshotter) save(snapshot *raftpb.Snapshot) error ***REMOVED***
+func (s *Snapshotter) save(snapshot *raftpb.Snapshot) error {
 	start := time.Now()
 
 	fname := fmt.Sprintf("%016x-%016x%s", snapshot.Metadata.Term, snapshot.Metadata.Index, snapSuffix)
 	b := pbutil.MustMarshal(snapshot)
 	crc := crc32.Update(0, crcTable, b)
-	snap := snappb.Snapshot***REMOVED***Crc: crc, Data: b***REMOVED***
+	snap := snappb.Snapshot{Crc: crc, Data: b}
 	d, err := snap.Marshal()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED*** else ***REMOVED***
+	} else {
 		marshallingDurations.Observe(float64(time.Since(start)) / float64(time.Second))
-	***REMOVED***
+	}
 
 	err = pioutil.WriteAndSyncFile(filepath.Join(s.dir, fname), d, 0666)
-	if err == nil ***REMOVED***
+	if err == nil {
 		saveDurations.Observe(float64(time.Since(start)) / float64(time.Second))
-	***REMOVED*** else ***REMOVED***
+	} else {
 		err1 := os.Remove(filepath.Join(s.dir, fname))
-		if err1 != nil ***REMOVED***
+		if err1 != nil {
 			plog.Errorf("failed to remove broken snapshot file %s", filepath.Join(s.dir, fname))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return err
-***REMOVED***
+}
 
-func (s *Snapshotter) Load() (*raftpb.Snapshot, error) ***REMOVED***
+func (s *Snapshotter) Load() (*raftpb.Snapshot, error) {
 	names, err := s.snapNames()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	var snap *raftpb.Snapshot
-	for _, name := range names ***REMOVED***
-		if snap, err = loadSnap(s.dir, name); err == nil ***REMOVED***
+	for _, name := range names {
+		if snap, err = loadSnap(s.dir, name); err == nil {
 			break
-		***REMOVED***
-	***REMOVED***
-	if err != nil ***REMOVED***
+		}
+	}
+	if err != nil {
 		return nil, ErrNoSnapshot
-	***REMOVED***
+	}
 	return snap, nil
-***REMOVED***
+}
 
-func loadSnap(dir, name string) (*raftpb.Snapshot, error) ***REMOVED***
+func loadSnap(dir, name string) (*raftpb.Snapshot, error) {
 	fpath := filepath.Join(dir, name)
 	snap, err := Read(fpath)
-	if err != nil ***REMOVED***
+	if err != nil {
 		renameBroken(fpath)
-	***REMOVED***
+	}
 	return snap, err
-***REMOVED***
+}
 
 // Read reads the snapshot named by snapname and returns the snapshot.
-func Read(snapname string) (*raftpb.Snapshot, error) ***REMOVED***
+func Read(snapname string) (*raftpb.Snapshot, error) {
 	b, err := ioutil.ReadFile(snapname)
-	if err != nil ***REMOVED***
+	if err != nil {
 		plog.Errorf("cannot read file %v: %v", snapname, err)
 		return nil, err
-	***REMOVED***
+	}
 
-	if len(b) == 0 ***REMOVED***
+	if len(b) == 0 {
 		plog.Errorf("unexpected empty snapshot")
 		return nil, ErrEmptySnapshot
-	***REMOVED***
+	}
 
 	var serializedSnap snappb.Snapshot
-	if err = serializedSnap.Unmarshal(b); err != nil ***REMOVED***
+	if err = serializedSnap.Unmarshal(b); err != nil {
 		plog.Errorf("corrupted snapshot file %v: %v", snapname, err)
 		return nil, err
-	***REMOVED***
+	}
 
-	if len(serializedSnap.Data) == 0 || serializedSnap.Crc == 0 ***REMOVED***
+	if len(serializedSnap.Data) == 0 || serializedSnap.Crc == 0 {
 		plog.Errorf("unexpected empty snapshot")
 		return nil, ErrEmptySnapshot
-	***REMOVED***
+	}
 
 	crc := crc32.Update(0, crcTable, serializedSnap.Data)
-	if crc != serializedSnap.Crc ***REMOVED***
+	if crc != serializedSnap.Crc {
 		plog.Errorf("corrupted snapshot file %v: crc mismatch", snapname)
 		return nil, ErrCRCMismatch
-	***REMOVED***
+	}
 
 	var snap raftpb.Snapshot
-	if err = snap.Unmarshal(serializedSnap.Data); err != nil ***REMOVED***
+	if err = snap.Unmarshal(serializedSnap.Data); err != nil {
 		plog.Errorf("corrupted snapshot file %v: %v", snapname, err)
 		return nil, err
-	***REMOVED***
+	}
 	return &snap, nil
-***REMOVED***
+}
 
 // snapNames returns the filename of the snapshots in logical time order (from newest to oldest).
 // If there is no available snapshots, an ErrNoSnapshot will be returned.
-func (s *Snapshotter) snapNames() ([]string, error) ***REMOVED***
+func (s *Snapshotter) snapNames() ([]string, error) {
 	dir, err := os.Open(s.dir)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	defer dir.Close()
 	names, err := dir.Readdirnames(-1)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	snaps := checkSuffix(names)
-	if len(snaps) == 0 ***REMOVED***
+	if len(snaps) == 0 {
 		return nil, ErrNoSnapshot
-	***REMOVED***
+	}
 	sort.Sort(sort.Reverse(sort.StringSlice(snaps)))
 	return snaps, nil
-***REMOVED***
+}
 
-func checkSuffix(names []string) []string ***REMOVED***
-	snaps := []string***REMOVED******REMOVED***
-	for i := range names ***REMOVED***
-		if strings.HasSuffix(names[i], snapSuffix) ***REMOVED***
+func checkSuffix(names []string) []string {
+	snaps := []string{}
+	for i := range names {
+		if strings.HasSuffix(names[i], snapSuffix) {
 			snaps = append(snaps, names[i])
-		***REMOVED*** else ***REMOVED***
+		} else {
 			// If we find a file which is not a snapshot then check if it's
 			// a vaild file. If not throw out a warning.
-			if _, ok := validFiles[names[i]]; !ok ***REMOVED***
+			if _, ok := validFiles[names[i]]; !ok {
 				plog.Warningf("skipped unexpected non snapshot file %v", names[i])
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return snaps
-***REMOVED***
+}
 
-func renameBroken(path string) ***REMOVED***
+func renameBroken(path string) {
 	brokenPath := path + ".broken"
-	if err := os.Rename(path, brokenPath); err != nil ***REMOVED***
+	if err := os.Rename(path, brokenPath); err != nil {
 		plog.Warningf("cannot rename broken snapshot file %v to %v: %v", path, brokenPath, err)
-	***REMOVED***
-***REMOVED***
+	}
+}

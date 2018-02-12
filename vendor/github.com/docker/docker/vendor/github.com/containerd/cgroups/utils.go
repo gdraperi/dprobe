@@ -19,19 +19,19 @@ var isUserNS = runningInUserNS()
 
 // runningInUserNS detects whether we are currently running in a user namespace.
 // Copied from github.com/lxc/lxd/shared/util.go
-func runningInUserNS() bool ***REMOVED***
+func runningInUserNS() bool {
 	file, err := os.Open("/proc/self/uid_map")
-	if err != nil ***REMOVED***
+	if err != nil {
 		// This kernel-provided file only exists if user namespaces are supported
 		return false
-	***REMOVED***
+	}
 	defer file.Close()
 
 	buf := bufio.NewReader(file)
 	l, _, err := buf.ReadLine()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return false
-	***REMOVED***
+	}
 
 	line := string(l)
 	var a, b, c int64
@@ -40,19 +40,19 @@ func runningInUserNS() bool ***REMOVED***
 	 * We assume we are in the initial user namespace if we have a full
 	 * range - 4294967295 uids starting at uid 0.
 	 */
-	if a == 0 && b == 0 && c == 4294967295 ***REMOVED***
+	if a == 0 && b == 0 && c == 4294967295 {
 		return false
-	***REMOVED***
+	}
 	return true
-***REMOVED***
+}
 
 // defaults returns all known groups
-func defaults(root string) ([]Subsystem, error) ***REMOVED***
+func defaults(root string) ([]Subsystem, error) {
 	h, err := NewHugetlb(root)
-	if err != nil && !os.IsNotExist(err) ***REMOVED***
+	if err != nil && !os.IsNotExist(err) {
 		return nil, err
-	***REMOVED***
-	s := []Subsystem***REMOVED***
+	}
+	s := []Subsystem{
 		NewNamed(root, "systemd"),
 		NewFreezer(root),
 		NewPids(root),
@@ -64,217 +64,217 @@ func defaults(root string) ([]Subsystem, error) ***REMOVED***
 		NewCpuacct(root),
 		NewMemory(root),
 		NewBlkio(root),
-	***REMOVED***
+	}
 	// only add the devices cgroup if we are not in a user namespace
 	// because modifications are not allowed
-	if !isUserNS ***REMOVED***
+	if !isUserNS {
 		s = append(s, NewDevices(root))
-	***REMOVED***
+	}
 	// add the hugetlb cgroup if error wasn't due to missing hugetlb
 	// cgroup support on the host
-	if err == nil ***REMOVED***
+	if err == nil {
 		s = append(s, h)
-	***REMOVED***
+	}
 	return s, nil
-***REMOVED***
+}
 
 // remove will remove a cgroup path handling EAGAIN and EBUSY errors and
 // retrying the remove after a exp timeout
-func remove(path string) error ***REMOVED***
+func remove(path string) error {
 	delay := 10 * time.Millisecond
-	for i := 0; i < 5; i++ ***REMOVED***
-		if i != 0 ***REMOVED***
+	for i := 0; i < 5; i++ {
+		if i != 0 {
 			time.Sleep(delay)
 			delay *= 2
-		***REMOVED***
-		if err := os.RemoveAll(path); err == nil ***REMOVED***
+		}
+		if err := os.RemoveAll(path); err == nil {
 			return nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return fmt.Errorf("cgroups: unable to remove path %q", path)
-***REMOVED***
+}
 
 // readPids will read all the pids in a cgroup by the provided path
-func readPids(path string, subsystem Name) ([]Process, error) ***REMOVED***
+func readPids(path string, subsystem Name) ([]Process, error) {
 	f, err := os.Open(filepath.Join(path, cgroupProcs))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	defer f.Close()
 	var (
 		out []Process
 		s   = bufio.NewScanner(f)
 	)
-	for s.Scan() ***REMOVED***
-		if t := s.Text(); t != "" ***REMOVED***
+	for s.Scan() {
+		if t := s.Text(); t != "" {
 			pid, err := strconv.Atoi(t)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
-			out = append(out, Process***REMOVED***
+			}
+			out = append(out, Process{
 				Pid:       pid,
 				Subsystem: subsystem,
 				Path:      path,
-			***REMOVED***)
-		***REMOVED***
-	***REMOVED***
+			})
+		}
+	}
 	return out, nil
-***REMOVED***
+}
 
-func hugePageSizes() ([]string, error) ***REMOVED***
+func hugePageSizes() ([]string, error) {
 	var (
 		pageSizes []string
-		sizeList  = []string***REMOVED***"B", "kB", "MB", "GB", "TB", "PB"***REMOVED***
+		sizeList  = []string{"B", "kB", "MB", "GB", "TB", "PB"}
 	)
 	files, err := ioutil.ReadDir("/sys/kernel/mm/hugepages")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	for _, st := range files ***REMOVED***
+	}
+	for _, st := range files {
 		nameArray := strings.Split(st.Name(), "-")
 		pageSize, err := units.RAMInBytes(nameArray[1])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		pageSizes = append(pageSizes, units.CustomSize("%g%s", float64(pageSize), 1024.0, sizeList))
-	***REMOVED***
+	}
 	return pageSizes, nil
-***REMOVED***
+}
 
-func readUint(path string) (uint64, error) ***REMOVED***
+func readUint(path string) (uint64, error) {
 	v, err := ioutil.ReadFile(path)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	return parseUint(strings.TrimSpace(string(v)), 10, 64)
-***REMOVED***
+}
 
-func parseUint(s string, base, bitSize int) (uint64, error) ***REMOVED***
+func parseUint(s string, base, bitSize int) (uint64, error) {
 	v, err := strconv.ParseUint(s, base, bitSize)
-	if err != nil ***REMOVED***
+	if err != nil {
 		intValue, intErr := strconv.ParseInt(s, base, bitSize)
 		// 1. Handle negative values greater than MinInt64 (and)
 		// 2. Handle negative values lesser than MinInt64
-		if intErr == nil && intValue < 0 ***REMOVED***
+		if intErr == nil && intValue < 0 {
 			return 0, nil
-		***REMOVED*** else if intErr != nil &&
+		} else if intErr != nil &&
 			intErr.(*strconv.NumError).Err == strconv.ErrRange &&
-			intValue < 0 ***REMOVED***
+			intValue < 0 {
 			return 0, nil
-		***REMOVED***
+		}
 		return 0, err
-	***REMOVED***
+	}
 	return v, nil
-***REMOVED***
+}
 
-func parseKV(raw string) (string, uint64, error) ***REMOVED***
+func parseKV(raw string) (string, uint64, error) {
 	parts := strings.Fields(raw)
-	switch len(parts) ***REMOVED***
+	switch len(parts) {
 	case 2:
 		v, err := parseUint(parts[1], 10, 64)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return "", 0, err
-		***REMOVED***
+		}
 		return parts[0], v, nil
 	default:
 		return "", 0, ErrInvalidFormat
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func parseCgroupFile(path string) (map[string]string, error) ***REMOVED***
+func parseCgroupFile(path string) (map[string]string, error) {
 	f, err := os.Open(path)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	defer f.Close()
 	return parseCgroupFromReader(f)
-***REMOVED***
+}
 
-func parseCgroupFromReader(r io.Reader) (map[string]string, error) ***REMOVED***
+func parseCgroupFromReader(r io.Reader) (map[string]string, error) {
 	var (
 		cgroups = make(map[string]string)
 		s       = bufio.NewScanner(r)
 	)
-	for s.Scan() ***REMOVED***
-		if err := s.Err(); err != nil ***REMOVED***
+	for s.Scan() {
+		if err := s.Err(); err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		var (
 			text  = s.Text()
 			parts = strings.SplitN(text, ":", 3)
 		)
-		if len(parts) < 3 ***REMOVED***
+		if len(parts) < 3 {
 			return nil, fmt.Errorf("invalid cgroup entry: %q", text)
-		***REMOVED***
-		for _, subs := range strings.Split(parts[1], ",") ***REMOVED***
-			if subs != "" ***REMOVED***
+		}
+		for _, subs := range strings.Split(parts[1], ",") {
+			if subs != "" {
 				cgroups[subs] = parts[2]
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return cgroups, nil
-***REMOVED***
+}
 
-func getCgroupDestination(subsystem string) (string, error) ***REMOVED***
+func getCgroupDestination(subsystem string) (string, error) {
 	f, err := os.Open("/proc/self/mountinfo")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	defer f.Close()
 	s := bufio.NewScanner(f)
-	for s.Scan() ***REMOVED***
-		if err := s.Err(); err != nil ***REMOVED***
+	for s.Scan() {
+		if err := s.Err(); err != nil {
 			return "", err
-		***REMOVED***
+		}
 		fields := strings.Fields(s.Text())
-		for _, opt := range strings.Split(fields[len(fields)-1], ",") ***REMOVED***
-			if opt == subsystem ***REMOVED***
+		for _, opt := range strings.Split(fields[len(fields)-1], ",") {
+			if opt == subsystem {
 				return fields[3], nil
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return "", ErrNoCgroupMountDestination
-***REMOVED***
+}
 
-func pathers(subystems []Subsystem) []pather ***REMOVED***
+func pathers(subystems []Subsystem) []pather {
 	var out []pather
-	for _, s := range subystems ***REMOVED***
-		if p, ok := s.(pather); ok ***REMOVED***
+	for _, s := range subystems {
+		if p, ok := s.(pather); ok {
 			out = append(out, p)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return out
-***REMOVED***
+}
 
-func initializeSubsystem(s Subsystem, path Path, resources *specs.LinuxResources) error ***REMOVED***
-	if c, ok := s.(creator); ok ***REMOVED***
+func initializeSubsystem(s Subsystem, path Path, resources *specs.LinuxResources) error {
+	if c, ok := s.(creator); ok {
 		p, err := path(s.Name())
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-		if err := c.Create(p, resources); err != nil ***REMOVED***
+		}
+		if err := c.Create(p, resources); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED*** else if c, ok := s.(pather); ok ***REMOVED***
+		}
+	} else if c, ok := s.(pather); ok {
 		p, err := path(s.Name())
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		// do the default create if the group does not have a custom one
-		if err := os.MkdirAll(c.Path(p), defaultDirPerm); err != nil ***REMOVED***
+		if err := os.MkdirAll(c.Path(p), defaultDirPerm); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func cleanPath(path string) string ***REMOVED***
-	if path == "" ***REMOVED***
+func cleanPath(path string) string {
+	if path == "" {
 		return ""
-	***REMOVED***
+	}
 	path = filepath.Clean(path)
-	if !filepath.IsAbs(path) ***REMOVED***
+	if !filepath.IsAbs(path) {
 		path, _ = filepath.Rel(string(os.PathSeparator), filepath.Clean(string(os.PathSeparator)+path))
-	***REMOVED***
+	}
 	return filepath.Clean(path)
-***REMOVED***
+}

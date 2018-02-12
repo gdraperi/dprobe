@@ -12,36 +12,36 @@ import (
 	"time"
 )
 
-type testingT interface ***REMOVED***
-	Fatalf(string, ...interface***REMOVED******REMOVED***)
-***REMOVED***
+type testingT interface {
+	Fatalf(string, ...interface{})
+}
 
-type helperT interface ***REMOVED***
+type helperT interface {
 	Helper()
-***REMOVED***
+}
 
 // None is a token to inform Result.Assert that the output should be empty
 const None = "[NOTHING]"
 
-type lockedBuffer struct ***REMOVED***
+type lockedBuffer struct {
 	m   sync.RWMutex
 	buf bytes.Buffer
-***REMOVED***
+}
 
-func (buf *lockedBuffer) Write(b []byte) (int, error) ***REMOVED***
+func (buf *lockedBuffer) Write(b []byte) (int, error) {
 	buf.m.Lock()
 	defer buf.m.Unlock()
 	return buf.buf.Write(b)
-***REMOVED***
+}
 
-func (buf *lockedBuffer) String() string ***REMOVED***
+func (buf *lockedBuffer) String() string {
 	buf.m.RLock()
 	defer buf.m.RUnlock()
 	return buf.buf.String()
-***REMOVED***
+}
 
 // Result stores the result of running a command
-type Result struct ***REMOVED***
+type Result struct {
 	Cmd      *exec.Cmd
 	ExitCode int
 	Error    error
@@ -49,49 +49,49 @@ type Result struct ***REMOVED***
 	Timeout   bool
 	outBuffer *lockedBuffer
 	errBuffer *lockedBuffer
-***REMOVED***
+}
 
 // Assert compares the Result against the Expected struct, and fails the test if
 // any of the expectations are not met.
 // TODO: deprecate and replace with assert.CompareFunc
-func (r *Result) Assert(t testingT, exp Expected) *Result ***REMOVED***
-	if ht, ok := t.(helperT); ok ***REMOVED***
+func (r *Result) Assert(t testingT, exp Expected) *Result {
+	if ht, ok := t.(helperT); ok {
 		ht.Helper()
-	***REMOVED***
+	}
 	err := r.Compare(exp)
-	if err == nil ***REMOVED***
+	if err == nil {
 		return r
-	***REMOVED***
+	}
 	t.Fatalf(err.Error() + "\n")
 	return nil
-***REMOVED***
+}
 
 // Compare returns a formatted error with the command, stdout, stderr, exit
 // code, and any failed expectations
 // nolint: gocyclo
-func (r *Result) Compare(exp Expected) error ***REMOVED***
-	errors := []string***REMOVED******REMOVED***
-	add := func(format string, args ...interface***REMOVED******REMOVED***) ***REMOVED***
+func (r *Result) Compare(exp Expected) error {
+	errors := []string{}
+	add := func(format string, args ...interface{}) {
 		errors = append(errors, fmt.Sprintf(format, args...))
-	***REMOVED***
+	}
 
-	if exp.ExitCode != r.ExitCode ***REMOVED***
+	if exp.ExitCode != r.ExitCode {
 		add("ExitCode was %d expected %d", r.ExitCode, exp.ExitCode)
-	***REMOVED***
-	if exp.Timeout != r.Timeout ***REMOVED***
-		if exp.Timeout ***REMOVED***
+	}
+	if exp.Timeout != r.Timeout {
+		if exp.Timeout {
 			add("Expected command to timeout")
-		***REMOVED*** else ***REMOVED***
+		} else {
 			add("Expected command to finish, but it hit the timeout")
-		***REMOVED***
-	***REMOVED***
-	if !matchOutput(exp.Out, r.Stdout()) ***REMOVED***
+		}
+	}
+	if !matchOutput(exp.Out, r.Stdout()) {
 		add("Expected stdout to contain %q", exp.Out)
-	***REMOVED***
-	if !matchOutput(exp.Err, r.Stderr()) ***REMOVED***
+	}
+	if !matchOutput(exp.Err, r.Stderr()) {
 		add("Expected stderr to contain %q", exp.Err)
-	***REMOVED***
-	switch ***REMOVED***
+	}
+	switch {
 	// If a non-zero exit code is expected there is going to be an error.
 	// Don't require an error message as well as an exit code because the
 	// error message is going to be "exit status <code> which is not useful
@@ -102,28 +102,28 @@ func (r *Result) Compare(exp Expected) error ***REMOVED***
 		add("Expected error to contain %q, but there was no error", exp.Error)
 	case exp.Error != "" && !strings.Contains(r.Error.Error(), exp.Error):
 		add("Expected error to contain %q", exp.Error)
-	***REMOVED***
+	}
 
-	if len(errors) == 0 ***REMOVED***
+	if len(errors) == 0 {
 		return nil
-	***REMOVED***
+	}
 	return fmt.Errorf("%s\nFailures:\n%s", r, strings.Join(errors, "\n"))
-***REMOVED***
+}
 
-func matchOutput(expected string, actual string) bool ***REMOVED***
-	switch expected ***REMOVED***
+func matchOutput(expected string, actual string) bool {
+	switch expected {
 	case None:
 		return actual == ""
 	default:
 		return strings.Contains(actual, expected)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (r *Result) String() string ***REMOVED***
+func (r *Result) String() string {
 	var timeout string
-	if r.Timeout ***REMOVED***
+	if r.Timeout {
 		timeout = " (timeout)"
-	***REMOVED***
+	}
 
 	return fmt.Sprintf(`
 Command:  %s
@@ -138,138 +138,138 @@ Stderr:   %v
 		r.Error,
 		r.Stdout(),
 		r.Stderr())
-***REMOVED***
+}
 
 // Expected is the expected output from a Command. This struct is compared to a
 // Result struct by Result.Assert().
-type Expected struct ***REMOVED***
+type Expected struct {
 	ExitCode int
 	Timeout  bool
 	Error    string
 	Out      string
 	Err      string
-***REMOVED***
+}
 
 // Success is the default expected result. A Success result is one with a 0
 // ExitCode.
-var Success = Expected***REMOVED******REMOVED***
+var Success = Expected{}
 
 // Stdout returns the stdout of the process as a string
-func (r *Result) Stdout() string ***REMOVED***
+func (r *Result) Stdout() string {
 	return r.outBuffer.String()
-***REMOVED***
+}
 
 // Stderr returns the stderr of the process as a string
-func (r *Result) Stderr() string ***REMOVED***
+func (r *Result) Stderr() string {
 	return r.errBuffer.String()
-***REMOVED***
+}
 
 // Combined returns the stdout and stderr combined into a single string
-func (r *Result) Combined() string ***REMOVED***
+func (r *Result) Combined() string {
 	return r.outBuffer.String() + r.errBuffer.String()
-***REMOVED***
+}
 
-func (r *Result) setExitError(err error) ***REMOVED***
-	if err == nil ***REMOVED***
+func (r *Result) setExitError(err error) {
+	if err == nil {
 		return
-	***REMOVED***
+	}
 	r.Error = err
 	r.ExitCode = processExitCode(err)
-***REMOVED***
+}
 
 // Cmd contains the arguments and options for a process to run as part of a test
 // suite.
-type Cmd struct ***REMOVED***
+type Cmd struct {
 	Command []string
 	Timeout time.Duration
 	Stdin   io.Reader
 	Stdout  io.Writer
 	Dir     string
 	Env     []string
-***REMOVED***
+}
 
 // Command create a simple Cmd with the specified command and arguments
-func Command(command string, args ...string) Cmd ***REMOVED***
-	return Cmd***REMOVED***Command: append([]string***REMOVED***command***REMOVED***, args...)***REMOVED***
-***REMOVED***
+func Command(command string, args ...string) Cmd {
+	return Cmd{Command: append([]string{command}, args...)}
+}
 
 // RunCmd runs a command and returns a Result
-func RunCmd(cmd Cmd, cmdOperators ...CmdOp) *Result ***REMOVED***
-	for _, op := range cmdOperators ***REMOVED***
+func RunCmd(cmd Cmd, cmdOperators ...CmdOp) *Result {
+	for _, op := range cmdOperators {
 		op(&cmd)
-	***REMOVED***
+	}
 	result := StartCmd(cmd)
-	if result.Error != nil ***REMOVED***
+	if result.Error != nil {
 		return result
-	***REMOVED***
+	}
 	return WaitOnCmd(cmd.Timeout, result)
-***REMOVED***
+}
 
 // RunCommand runs a command with default options, and returns a result
-func RunCommand(command string, args ...string) *Result ***REMOVED***
+func RunCommand(command string, args ...string) *Result {
 	return RunCmd(Command(command, args...))
-***REMOVED***
+}
 
 // StartCmd starts a command, but doesn't wait for it to finish
-func StartCmd(cmd Cmd) *Result ***REMOVED***
+func StartCmd(cmd Cmd) *Result {
 	result := buildCmd(cmd)
-	if result.Error != nil ***REMOVED***
+	if result.Error != nil {
 		return result
-	***REMOVED***
+	}
 	result.setExitError(result.Cmd.Start())
 	return result
-***REMOVED***
+}
 
-func buildCmd(cmd Cmd) *Result ***REMOVED***
+func buildCmd(cmd Cmd) *Result {
 	var execCmd *exec.Cmd
-	switch len(cmd.Command) ***REMOVED***
+	switch len(cmd.Command) {
 	case 1:
 		execCmd = exec.Command(cmd.Command[0])
 	default:
 		execCmd = exec.Command(cmd.Command[0], cmd.Command[1:]...)
-	***REMOVED***
+	}
 	outBuffer := new(lockedBuffer)
 	errBuffer := new(lockedBuffer)
 
 	execCmd.Stdin = cmd.Stdin
 	execCmd.Dir = cmd.Dir
 	execCmd.Env = cmd.Env
-	if cmd.Stdout != nil ***REMOVED***
+	if cmd.Stdout != nil {
 		execCmd.Stdout = io.MultiWriter(outBuffer, cmd.Stdout)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		execCmd.Stdout = outBuffer
-	***REMOVED***
+	}
 	execCmd.Stderr = errBuffer
-	return &Result***REMOVED***
+	return &Result{
 		Cmd:       execCmd,
 		outBuffer: outBuffer,
 		errBuffer: errBuffer,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // WaitOnCmd waits for a command to complete. If timeout is non-nil then
 // only wait until the timeout.
-func WaitOnCmd(timeout time.Duration, result *Result) *Result ***REMOVED***
-	if timeout == time.Duration(0) ***REMOVED***
+func WaitOnCmd(timeout time.Duration, result *Result) *Result {
+	if timeout == time.Duration(0) {
 		result.setExitError(result.Cmd.Wait())
 		return result
-	***REMOVED***
+	}
 
 	done := make(chan error, 1)
 	// Wait for command to exit in a goroutine
-	go func() ***REMOVED***
+	go func() {
 		done <- result.Cmd.Wait()
-	***REMOVED***()
+	}()
 
-	select ***REMOVED***
+	select {
 	case <-time.After(timeout):
 		killErr := result.Cmd.Process.Kill()
-		if killErr != nil ***REMOVED***
+		if killErr != nil {
 			fmt.Printf("failed to kill (pid=%d): %v\n", result.Cmd.Process.Pid, killErr)
-		***REMOVED***
+		}
 		result.Timeout = true
 	case err := <-done:
 		result.setExitError(err)
-	***REMOVED***
+	}
 	return result
-***REMOVED***
+}

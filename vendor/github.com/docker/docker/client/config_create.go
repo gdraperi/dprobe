@@ -9,17 +9,17 @@ import (
 )
 
 // ConfigCreate creates a new Config.
-func (cli *Client) ConfigCreate(ctx context.Context, config swarm.ConfigSpec) (types.ConfigCreateResponse, error) ***REMOVED***
+func (cli *Client) ConfigCreate(ctx context.Context, config swarm.ConfigSpec) (types.ConfigCreateResponse, error) {
 	var response types.ConfigCreateResponse
-	if err := cli.NewVersionError("1.30", "config create"); err != nil ***REMOVED***
+	if err := cli.NewVersionError("1.30", "config create"); err != nil {
 		return response, err
-	***REMOVED***
+	}
 	resp, err := cli.post(ctx, "/configs/create", nil, config, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return response, err
-	***REMOVED***
+	}
 
 	err = json.NewDecoder(resp.body).Decode(&response)
 	ensureReaderClosed(resp)
 	return response, err
-***REMOVED***
+}

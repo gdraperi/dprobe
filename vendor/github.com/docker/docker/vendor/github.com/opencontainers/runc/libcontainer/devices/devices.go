@@ -22,32 +22,32 @@ var (
 )
 
 // Given the path to a device and its cgroup_permissions(which cannot be easily queried) look up the information about a linux device and return that information as a Device struct.
-func DeviceFromPath(path, permissions string) (*configs.Device, error) ***REMOVED***
+func DeviceFromPath(path, permissions string) (*configs.Device, error) {
 	var stat unix.Stat_t
 	err := unixLstat(path, &stat)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	var (
 		devNumber = stat.Rdev
 		major     = unix.Major(devNumber)
 	)
-	if major == 0 ***REMOVED***
+	if major == 0 {
 		return nil, ErrNotADevice
-	***REMOVED***
+	}
 
 	var (
 		devType rune
 		mode    = stat.Mode
 	)
-	switch ***REMOVED***
+	switch {
 	case mode&unix.S_IFBLK == unix.S_IFBLK:
 		devType = 'b'
 	case mode&unix.S_IFCHR == unix.S_IFCHR:
 		devType = 'c'
-	***REMOVED***
-	return &configs.Device***REMOVED***
+	}
+	return &configs.Device{
 		Type:        devType,
 		Path:        path,
 		Major:       int64(major),
@@ -56,49 +56,49 @@ func DeviceFromPath(path, permissions string) (*configs.Device, error) ***REMOVE
 		FileMode:    os.FileMode(mode),
 		Uid:         stat.Uid,
 		Gid:         stat.Gid,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-func HostDevices() ([]*configs.Device, error) ***REMOVED***
+func HostDevices() ([]*configs.Device, error) {
 	return getDevices("/dev")
-***REMOVED***
+}
 
-func getDevices(path string) ([]*configs.Device, error) ***REMOVED***
+func getDevices(path string) ([]*configs.Device, error) {
 	files, err := ioutilReadDir(path)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	out := []*configs.Device***REMOVED******REMOVED***
-	for _, f := range files ***REMOVED***
-		switch ***REMOVED***
+	}
+	out := []*configs.Device{}
+	for _, f := range files {
+		switch {
 		case f.IsDir():
-			switch f.Name() ***REMOVED***
+			switch f.Name() {
 			// ".lxc" & ".lxd-mounts" added to address https://github.com/lxc/lxd/issues/2825
 			case "pts", "shm", "fd", "mqueue", ".lxc", ".lxd-mounts":
 				continue
 			default:
 				sub, err := getDevices(filepath.Join(path, f.Name()))
-				if err != nil ***REMOVED***
+				if err != nil {
 					return nil, err
-				***REMOVED***
+				}
 
 				out = append(out, sub...)
 				continue
-			***REMOVED***
+			}
 		case f.Name() == "console":
 			continue
-		***REMOVED***
+		}
 		device, err := DeviceFromPath(filepath.Join(path, f.Name()), "rwm")
-		if err != nil ***REMOVED***
-			if err == ErrNotADevice ***REMOVED***
+		if err != nil {
+			if err == ErrNotADevice {
 				continue
-			***REMOVED***
-			if os.IsNotExist(err) ***REMOVED***
+			}
+			if os.IsNotExist(err) {
 				continue
-			***REMOVED***
+			}
 			return nil, err
-		***REMOVED***
+		}
 		out = append(out, device)
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}

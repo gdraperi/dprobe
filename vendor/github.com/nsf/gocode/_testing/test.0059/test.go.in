@@ -3,6 +3,6 @@ package main
 import myio "io"
 import "compress/bzip2"
 
-func main() ***REMOVED***
+func main() {
 	bzip2.NewR
-***REMOVED***
+}

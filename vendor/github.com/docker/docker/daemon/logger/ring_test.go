@@ -7,293 +7,293 @@ import (
 	"time"
 )
 
-type mockLogger struct***REMOVED*** c chan *Message ***REMOVED***
+type mockLogger struct{ c chan *Message }
 
-func (l *mockLogger) Log(msg *Message) error ***REMOVED***
+func (l *mockLogger) Log(msg *Message) error {
 	l.c <- msg
 	return nil
-***REMOVED***
+}
 
-func (l *mockLogger) Name() string ***REMOVED***
+func (l *mockLogger) Name() string {
 	return "mock"
-***REMOVED***
+}
 
-func (l *mockLogger) Close() error ***REMOVED***
+func (l *mockLogger) Close() error {
 	return nil
-***REMOVED***
+}
 
-func TestRingLogger(t *testing.T) ***REMOVED***
-	mockLog := &mockLogger***REMOVED***make(chan *Message)***REMOVED*** // no buffer on this channel
-	ring := newRingLogger(mockLog, Info***REMOVED******REMOVED***, 1)
+func TestRingLogger(t *testing.T) {
+	mockLog := &mockLogger{make(chan *Message)} // no buffer on this channel
+	ring := newRingLogger(mockLog, Info{}, 1)
 	defer ring.setClosed()
 
 	// this should never block
-	ring.Log(&Message***REMOVED***Line: []byte("1")***REMOVED***)
-	ring.Log(&Message***REMOVED***Line: []byte("2")***REMOVED***)
-	ring.Log(&Message***REMOVED***Line: []byte("3")***REMOVED***)
+	ring.Log(&Message{Line: []byte("1")})
+	ring.Log(&Message{Line: []byte("2")})
+	ring.Log(&Message{Line: []byte("3")})
 
-	select ***REMOVED***
+	select {
 	case msg := <-mockLog.c:
-		if string(msg.Line) != "1" ***REMOVED***
+		if string(msg.Line) != "1" {
 			t.Fatalf("got unexpected msg: %q", string(msg.Line))
-		***REMOVED***
+		}
 	case <-time.After(100 * time.Millisecond):
 		t.Fatal("timeout reading log message")
-	***REMOVED***
+	}
 
-	select ***REMOVED***
+	select {
 	case msg := <-mockLog.c:
 		t.Fatalf("expected no more messages in the queue, got: %q", string(msg.Line))
 	default:
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestRingCap(t *testing.T) ***REMOVED***
+func TestRingCap(t *testing.T) {
 	r := newRing(5)
-	for i := 0; i < 10; i++ ***REMOVED***
+	for i := 0; i < 10; i++ {
 		// queue messages with "0" to "10"
 		// the "5" to "10" messages should be dropped since we only allow 5 bytes in the buffer
-		if err := r.Enqueue(&Message***REMOVED***Line: []byte(strconv.Itoa(i))***REMOVED***); err != nil ***REMOVED***
+		if err := r.Enqueue(&Message{Line: []byte(strconv.Itoa(i))}); err != nil {
 			t.Fatal(err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// should have messages in the queue for "5" to "10"
-	for i := 0; i < 5; i++ ***REMOVED***
+	for i := 0; i < 5; i++ {
 		m, err := r.Dequeue()
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
-		if string(m.Line) != strconv.Itoa(i) ***REMOVED***
+		}
+		if string(m.Line) != strconv.Itoa(i) {
 			t.Fatalf("got unexpected message for iter %d: %s", i, string(m.Line))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// queue a message that's bigger than the buffer cap
-	if err := r.Enqueue(&Message***REMOVED***Line: []byte("hello world")***REMOVED***); err != nil ***REMOVED***
+	if err := r.Enqueue(&Message{Line: []byte("hello world")}); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	// queue another message that's bigger than the buffer cap
-	if err := r.Enqueue(&Message***REMOVED***Line: []byte("eat a banana")***REMOVED***); err != nil ***REMOVED***
+	if err := r.Enqueue(&Message{Line: []byte("eat a banana")}); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	m, err := r.Dequeue()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if string(m.Line) != "hello world" ***REMOVED***
+	}
+	if string(m.Line) != "hello world" {
 		t.Fatalf("got unexpected message: %s", string(m.Line))
-	***REMOVED***
-	if len(r.queue) != 0 ***REMOVED***
+	}
+	if len(r.queue) != 0 {
 		t.Fatalf("expected queue to be empty, got: %d", len(r.queue))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestRingClose(t *testing.T) ***REMOVED***
+func TestRingClose(t *testing.T) {
 	r := newRing(1)
-	if err := r.Enqueue(&Message***REMOVED***Line: []byte("hello")***REMOVED***); err != nil ***REMOVED***
+	if err := r.Enqueue(&Message{Line: []byte("hello")}); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	r.Close()
-	if err := r.Enqueue(&Message***REMOVED******REMOVED***); err != errClosed ***REMOVED***
+	if err := r.Enqueue(&Message{}); err != errClosed {
 		t.Fatalf("expected errClosed, got: %v", err)
-	***REMOVED***
-	if len(r.queue) != 1 ***REMOVED***
+	}
+	if len(r.queue) != 1 {
 		t.Fatal("expected empty queue")
-	***REMOVED***
-	if m, err := r.Dequeue(); err == nil || m != nil ***REMOVED***
+	}
+	if m, err := r.Dequeue(); err == nil || m != nil {
 		t.Fatal("expected err on Dequeue after close")
-	***REMOVED***
+	}
 
 	ls := r.Drain()
-	if len(ls) != 1 ***REMOVED***
+	if len(ls) != 1 {
 		t.Fatalf("expected one message: %v", ls)
-	***REMOVED***
-	if string(ls[0].Line) != "hello" ***REMOVED***
+	}
+	if string(ls[0].Line) != "hello" {
 		t.Fatalf("got unexpected message: %s", string(ls[0].Line))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestRingDrain(t *testing.T) ***REMOVED***
+func TestRingDrain(t *testing.T) {
 	r := newRing(5)
-	for i := 0; i < 5; i++ ***REMOVED***
-		if err := r.Enqueue(&Message***REMOVED***Line: []byte(strconv.Itoa(i))***REMOVED***); err != nil ***REMOVED***
+	for i := 0; i < 5; i++ {
+		if err := r.Enqueue(&Message{Line: []byte(strconv.Itoa(i))}); err != nil {
 			t.Fatal(err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	ls := r.Drain()
-	if len(ls) != 5 ***REMOVED***
+	if len(ls) != 5 {
 		t.Fatal("got unexpected length after drain")
-	***REMOVED***
+	}
 
-	for i := 0; i < 5; i++ ***REMOVED***
-		if string(ls[i].Line) != strconv.Itoa(i) ***REMOVED***
+	for i := 0; i < 5; i++ {
+		if string(ls[i].Line) != strconv.Itoa(i) {
 			t.Fatalf("got unexpected message at position %d: %s", i, string(ls[i].Line))
-		***REMOVED***
-	***REMOVED***
-	if r.sizeBytes != 0 ***REMOVED***
+		}
+	}
+	if r.sizeBytes != 0 {
 		t.Fatalf("expected buffer size to be 0 after drain, got: %d", r.sizeBytes)
-	***REMOVED***
+	}
 
 	ls = r.Drain()
-	if len(ls) != 0 ***REMOVED***
+	if len(ls) != 0 {
 		t.Fatalf("expected 0 messages on 2nd drain: %v", ls)
-	***REMOVED***
+	}
 
-***REMOVED***
+}
 
-type nopLogger struct***REMOVED******REMOVED***
+type nopLogger struct{}
 
-func (nopLogger) Name() string       ***REMOVED*** return "nopLogger" ***REMOVED***
-func (nopLogger) Close() error       ***REMOVED*** return nil ***REMOVED***
-func (nopLogger) Log(*Message) error ***REMOVED*** return nil ***REMOVED***
+func (nopLogger) Name() string       { return "nopLogger" }
+func (nopLogger) Close() error       { return nil }
+func (nopLogger) Log(*Message) error { return nil }
 
-func BenchmarkRingLoggerThroughputNoReceiver(b *testing.B) ***REMOVED***
-	mockLog := &mockLogger***REMOVED***make(chan *Message)***REMOVED***
+func BenchmarkRingLoggerThroughputNoReceiver(b *testing.B) {
+	mockLog := &mockLogger{make(chan *Message)}
 	defer mockLog.Close()
-	l := NewRingLogger(mockLog, Info***REMOVED******REMOVED***, -1)
-	msg := &Message***REMOVED***Line: []byte("hello humans and everyone else!")***REMOVED***
+	l := NewRingLogger(mockLog, Info{}, -1)
+	msg := &Message{Line: []byte("hello humans and everyone else!")}
 	b.SetBytes(int64(len(msg.Line)))
 
-	for i := 0; i < b.N; i++ ***REMOVED***
-		if err := l.Log(msg); err != nil ***REMOVED***
+	for i := 0; i < b.N; i++ {
+		if err := l.Log(msg); err != nil {
 			b.Fatal(err)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func BenchmarkRingLoggerThroughputWithReceiverDelay0(b *testing.B) ***REMOVED***
-	l := NewRingLogger(nopLogger***REMOVED******REMOVED***, Info***REMOVED******REMOVED***, -1)
-	msg := &Message***REMOVED***Line: []byte("hello humans and everyone else!")***REMOVED***
+func BenchmarkRingLoggerThroughputWithReceiverDelay0(b *testing.B) {
+	l := NewRingLogger(nopLogger{}, Info{}, -1)
+	msg := &Message{Line: []byte("hello humans and everyone else!")}
 	b.SetBytes(int64(len(msg.Line)))
 
-	for i := 0; i < b.N; i++ ***REMOVED***
-		if err := l.Log(msg); err != nil ***REMOVED***
+	for i := 0; i < b.N; i++ {
+		if err := l.Log(msg); err != nil {
 			b.Fatal(err)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func consumeWithDelay(delay time.Duration, c <-chan *Message) (cancel func()) ***REMOVED***
-	started := make(chan struct***REMOVED******REMOVED***)
+func consumeWithDelay(delay time.Duration, c <-chan *Message) (cancel func()) {
+	started := make(chan struct{})
 	ctx, cancel := context.WithCancel(context.Background())
-	go func() ***REMOVED***
+	go func() {
 		close(started)
 		ticker := time.NewTicker(delay)
-		for range ticker.C ***REMOVED***
-			select ***REMOVED***
+		for range ticker.C {
+			select {
 			case <-ctx.Done():
 				ticker.Stop()
 				return
 			case <-c:
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***()
+			}
+		}
+	}()
 	<-started
 	return cancel
-***REMOVED***
+}
 
-func BenchmarkRingLoggerThroughputConsumeDelay1(b *testing.B) ***REMOVED***
-	mockLog := &mockLogger***REMOVED***make(chan *Message)***REMOVED***
+func BenchmarkRingLoggerThroughputConsumeDelay1(b *testing.B) {
+	mockLog := &mockLogger{make(chan *Message)}
 	defer mockLog.Close()
-	l := NewRingLogger(mockLog, Info***REMOVED******REMOVED***, -1)
-	msg := &Message***REMOVED***Line: []byte("hello humans and everyone else!")***REMOVED***
+	l := NewRingLogger(mockLog, Info{}, -1)
+	msg := &Message{Line: []byte("hello humans and everyone else!")}
 	b.SetBytes(int64(len(msg.Line)))
 
 	cancel := consumeWithDelay(1*time.Millisecond, mockLog.c)
 	defer cancel()
 
-	for i := 0; i < b.N; i++ ***REMOVED***
-		if err := l.Log(msg); err != nil ***REMOVED***
+	for i := 0; i < b.N; i++ {
+		if err := l.Log(msg); err != nil {
 			b.Fatal(err)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func BenchmarkRingLoggerThroughputConsumeDelay10(b *testing.B) ***REMOVED***
-	mockLog := &mockLogger***REMOVED***make(chan *Message)***REMOVED***
+func BenchmarkRingLoggerThroughputConsumeDelay10(b *testing.B) {
+	mockLog := &mockLogger{make(chan *Message)}
 	defer mockLog.Close()
-	l := NewRingLogger(mockLog, Info***REMOVED******REMOVED***, -1)
-	msg := &Message***REMOVED***Line: []byte("hello humans and everyone else!")***REMOVED***
+	l := NewRingLogger(mockLog, Info{}, -1)
+	msg := &Message{Line: []byte("hello humans and everyone else!")}
 	b.SetBytes(int64(len(msg.Line)))
 
 	cancel := consumeWithDelay(10*time.Millisecond, mockLog.c)
 	defer cancel()
 
-	for i := 0; i < b.N; i++ ***REMOVED***
-		if err := l.Log(msg); err != nil ***REMOVED***
+	for i := 0; i < b.N; i++ {
+		if err := l.Log(msg); err != nil {
 			b.Fatal(err)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func BenchmarkRingLoggerThroughputConsumeDelay50(b *testing.B) ***REMOVED***
-	mockLog := &mockLogger***REMOVED***make(chan *Message)***REMOVED***
+func BenchmarkRingLoggerThroughputConsumeDelay50(b *testing.B) {
+	mockLog := &mockLogger{make(chan *Message)}
 	defer mockLog.Close()
-	l := NewRingLogger(mockLog, Info***REMOVED******REMOVED***, -1)
-	msg := &Message***REMOVED***Line: []byte("hello humans and everyone else!")***REMOVED***
+	l := NewRingLogger(mockLog, Info{}, -1)
+	msg := &Message{Line: []byte("hello humans and everyone else!")}
 	b.SetBytes(int64(len(msg.Line)))
 
 	cancel := consumeWithDelay(50*time.Millisecond, mockLog.c)
 	defer cancel()
 
-	for i := 0; i < b.N; i++ ***REMOVED***
-		if err := l.Log(msg); err != nil ***REMOVED***
+	for i := 0; i < b.N; i++ {
+		if err := l.Log(msg); err != nil {
 			b.Fatal(err)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func BenchmarkRingLoggerThroughputConsumeDelay100(b *testing.B) ***REMOVED***
-	mockLog := &mockLogger***REMOVED***make(chan *Message)***REMOVED***
+func BenchmarkRingLoggerThroughputConsumeDelay100(b *testing.B) {
+	mockLog := &mockLogger{make(chan *Message)}
 	defer mockLog.Close()
-	l := NewRingLogger(mockLog, Info***REMOVED******REMOVED***, -1)
-	msg := &Message***REMOVED***Line: []byte("hello humans and everyone else!")***REMOVED***
+	l := NewRingLogger(mockLog, Info{}, -1)
+	msg := &Message{Line: []byte("hello humans and everyone else!")}
 	b.SetBytes(int64(len(msg.Line)))
 
 	cancel := consumeWithDelay(100*time.Millisecond, mockLog.c)
 	defer cancel()
 
-	for i := 0; i < b.N; i++ ***REMOVED***
-		if err := l.Log(msg); err != nil ***REMOVED***
+	for i := 0; i < b.N; i++ {
+		if err := l.Log(msg); err != nil {
 			b.Fatal(err)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func BenchmarkRingLoggerThroughputConsumeDelay300(b *testing.B) ***REMOVED***
-	mockLog := &mockLogger***REMOVED***make(chan *Message)***REMOVED***
+func BenchmarkRingLoggerThroughputConsumeDelay300(b *testing.B) {
+	mockLog := &mockLogger{make(chan *Message)}
 	defer mockLog.Close()
-	l := NewRingLogger(mockLog, Info***REMOVED******REMOVED***, -1)
-	msg := &Message***REMOVED***Line: []byte("hello humans and everyone else!")***REMOVED***
+	l := NewRingLogger(mockLog, Info{}, -1)
+	msg := &Message{Line: []byte("hello humans and everyone else!")}
 	b.SetBytes(int64(len(msg.Line)))
 
 	cancel := consumeWithDelay(300*time.Millisecond, mockLog.c)
 	defer cancel()
 
-	for i := 0; i < b.N; i++ ***REMOVED***
-		if err := l.Log(msg); err != nil ***REMOVED***
+	for i := 0; i < b.N; i++ {
+		if err := l.Log(msg); err != nil {
 			b.Fatal(err)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func BenchmarkRingLoggerThroughputConsumeDelay500(b *testing.B) ***REMOVED***
-	mockLog := &mockLogger***REMOVED***make(chan *Message)***REMOVED***
+func BenchmarkRingLoggerThroughputConsumeDelay500(b *testing.B) {
+	mockLog := &mockLogger{make(chan *Message)}
 	defer mockLog.Close()
-	l := NewRingLogger(mockLog, Info***REMOVED******REMOVED***, -1)
-	msg := &Message***REMOVED***Line: []byte("hello humans and everyone else!")***REMOVED***
+	l := NewRingLogger(mockLog, Info{}, -1)
+	msg := &Message{Line: []byte("hello humans and everyone else!")}
 	b.SetBytes(int64(len(msg.Line)))
 
 	cancel := consumeWithDelay(500*time.Millisecond, mockLog.c)
 	defer cancel()
 
-	for i := 0; i < b.N; i++ ***REMOVED***
-		if err := l.Log(msg); err != nil ***REMOVED***
+	for i := 0; i < b.N; i++ {
+		if err := l.Log(msg); err != nil {
 			b.Fatal(err)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

@@ -4,11 +4,11 @@
 
 package socket
 
-func (h *msghdr) setIov(vs []iovec) ***REMOVED***
+func (h *msghdr) setIov(vs []iovec) {
 	l := len(vs)
-	if l == 0 ***REMOVED***
+	if l == 0 {
 		return
-	***REMOVED***
+	}
 	h.Iov = &vs[0]
 	h.Iovlen = uint32(l)
-***REMOVED***
+}

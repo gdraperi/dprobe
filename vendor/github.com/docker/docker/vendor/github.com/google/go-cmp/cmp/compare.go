@@ -41,7 +41,7 @@ import (
 //
 // See https://golang.org/issue/11104 for more details.
 
-var nothing = reflect.Value***REMOVED******REMOVED***
+var nothing = reflect.Value{}
 
 // Equal reports whether x and y are equal by recursively applying the
 // following rules in the given order to x and y and all of their sub-values:
@@ -81,11 +81,11 @@ var nothing = reflect.Value***REMOVED******REMOVED***
 // To equate empty slices and maps, consider using cmpopts.EquateEmpty.
 // Map keys are equal according to the == operator.
 // To use custom comparisons for map keys, consider using cmpopts.SortMaps.
-func Equal(x, y interface***REMOVED******REMOVED***, opts ...Option) bool ***REMOVED***
+func Equal(x, y interface{}, opts ...Option) bool {
 	s := newState(opts)
 	s.compareAny(reflect.ValueOf(x), reflect.ValueOf(y))
 	return s.result.Equal()
-***REMOVED***
+}
 
 // Diff returns a human-readable report of the differences between two values.
 // It returns an empty string if and only if Equal returns true for the same
@@ -94,18 +94,18 @@ func Equal(x, y interface***REMOVED******REMOVED***, opts ...Option) bool ***REM
 // added to y.
 //
 // Do not depend on this output being stable.
-func Diff(x, y interface***REMOVED******REMOVED***, opts ...Option) string ***REMOVED***
+func Diff(x, y interface{}, opts ...Option) string {
 	r := new(defaultReporter)
-	opts = Options***REMOVED***Options(opts), r***REMOVED***
+	opts = Options{Options(opts), r}
 	eq := Equal(x, y, opts...)
 	d := r.String()
-	if (d == "") != eq ***REMOVED***
+	if (d == "") != eq {
 		panic("inconsistent difference and equality results")
-	***REMOVED***
+	}
 	return d
-***REMOVED***
+}
 
-type state struct ***REMOVED***
+type state struct {
 	// These fields represent the "comparison state".
 	// Calling statelessCompare must not result in observable changes to these.
 	result   diff.Result // The current result of comparison
@@ -119,97 +119,97 @@ type state struct ***REMOVED***
 	// These fields, once set by processOption, will not change.
 	exporters map[reflect.Type]bool // Set of structs with unexported field visibility
 	opts      Options               // List of all fundamental and filter options
-***REMOVED***
+}
 
-func newState(opts []Option) *state ***REMOVED***
+func newState(opts []Option) *state {
 	s := new(state)
-	for _, opt := range opts ***REMOVED***
+	for _, opt := range opts {
 		s.processOption(opt)
-	***REMOVED***
+	}
 	return s
-***REMOVED***
+}
 
-func (s *state) processOption(opt Option) ***REMOVED***
-	switch opt := opt.(type) ***REMOVED***
+func (s *state) processOption(opt Option) {
+	switch opt := opt.(type) {
 	case nil:
 	case Options:
-		for _, o := range opt ***REMOVED***
+		for _, o := range opt {
 			s.processOption(o)
-		***REMOVED***
+		}
 	case coreOption:
-		type filtered interface ***REMOVED***
+		type filtered interface {
 			isFiltered() bool
-		***REMOVED***
-		if fopt, ok := opt.(filtered); ok && !fopt.isFiltered() ***REMOVED***
+		}
+		if fopt, ok := opt.(filtered); ok && !fopt.isFiltered() {
 			panic(fmt.Sprintf("cannot use an unfiltered option: %v", opt))
-		***REMOVED***
+		}
 		s.opts = append(s.opts, opt)
 	case visibleStructs:
-		if s.exporters == nil ***REMOVED***
+		if s.exporters == nil {
 			s.exporters = make(map[reflect.Type]bool)
-		***REMOVED***
-		for t := range opt ***REMOVED***
+		}
+		for t := range opt {
 			s.exporters[t] = true
-		***REMOVED***
+		}
 	case reporter:
-		if s.reporter != nil ***REMOVED***
+		if s.reporter != nil {
 			panic("difference reporter already registered")
-		***REMOVED***
+		}
 		s.reporter = opt
 	default:
 		panic(fmt.Sprintf("unknown option %T", opt))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // statelessCompare compares two values and returns the result.
 // This function is stateless in that it does not alter the current result,
 // or output to any registered reporters.
-func (s *state) statelessCompare(vx, vy reflect.Value) diff.Result ***REMOVED***
+func (s *state) statelessCompare(vx, vy reflect.Value) diff.Result {
 	// We do not save and restore the curPath because all of the compareX
 	// methods should properly push and pop from the path.
 	// It is an implementation bug if the contents of curPath differs from
 	// when calling this function to when returning from it.
 
 	oldResult, oldReporter := s.result, s.reporter
-	s.result = diff.Result***REMOVED******REMOVED*** // Reset result
+	s.result = diff.Result{} // Reset result
 	s.reporter = nil         // Remove reporter to avoid spurious printouts
 	s.compareAny(vx, vy)
 	res := s.result
 	s.result, s.reporter = oldResult, oldReporter
 	return res
-***REMOVED***
+}
 
-func (s *state) compareAny(vx, vy reflect.Value) ***REMOVED***
+func (s *state) compareAny(vx, vy reflect.Value) {
 	// TODO: Support cyclic data structures.
 
 	// Rule 0: Differing types are never equal.
-	if !vx.IsValid() || !vy.IsValid() ***REMOVED***
+	if !vx.IsValid() || !vy.IsValid() {
 		s.report(vx.IsValid() == vy.IsValid(), vx, vy)
 		return
-	***REMOVED***
-	if vx.Type() != vy.Type() ***REMOVED***
+	}
+	if vx.Type() != vy.Type() {
 		s.report(false, vx, vy) // Possible for path to be empty
 		return
-	***REMOVED***
+	}
 	t := vx.Type()
-	if len(s.curPath) == 0 ***REMOVED***
-		s.curPath.push(&pathStep***REMOVED***typ: t***REMOVED***)
+	if len(s.curPath) == 0 {
+		s.curPath.push(&pathStep{typ: t})
 		defer s.curPath.pop()
-	***REMOVED***
+	}
 	vx, vy = s.tryExporting(vx, vy)
 
 	// Rule 1: Check whether an option applies on this node in the value tree.
-	if s.tryOptions(vx, vy, t) ***REMOVED***
+	if s.tryOptions(vx, vy, t) {
 		return
-	***REMOVED***
+	}
 
 	// Rule 2: Check whether the type has a valid Equal method.
-	if s.tryMethod(vx, vy, t) ***REMOVED***
+	if s.tryMethod(vx, vy, t) {
 		return
-	***REMOVED***
+	}
 
 	// Rule 3: Recursively descend into each value's underlying kind.
-	switch t.Kind() ***REMOVED***
+	switch t.Kind() {
 	case reflect.Bool:
 		s.report(vx.Bool() == vy.Bool(), vx, vy)
 		return
@@ -235,32 +235,32 @@ func (s *state) compareAny(vx, vy reflect.Value) ***REMOVED***
 		s.report(vx.IsNil() && vy.IsNil(), vx, vy)
 		return
 	case reflect.Ptr:
-		if vx.IsNil() || vy.IsNil() ***REMOVED***
+		if vx.IsNil() || vy.IsNil() {
 			s.report(vx.IsNil() && vy.IsNil(), vx, vy)
 			return
-		***REMOVED***
-		s.curPath.push(&indirect***REMOVED***pathStep***REMOVED***t.Elem()***REMOVED******REMOVED***)
+		}
+		s.curPath.push(&indirect{pathStep{t.Elem()}})
 		defer s.curPath.pop()
 		s.compareAny(vx.Elem(), vy.Elem())
 		return
 	case reflect.Interface:
-		if vx.IsNil() || vy.IsNil() ***REMOVED***
+		if vx.IsNil() || vy.IsNil() {
 			s.report(vx.IsNil() && vy.IsNil(), vx, vy)
 			return
-		***REMOVED***
-		if vx.Elem().Type() != vy.Elem().Type() ***REMOVED***
+		}
+		if vx.Elem().Type() != vy.Elem().Type() {
 			s.report(false, vx.Elem(), vy.Elem())
 			return
-		***REMOVED***
-		s.curPath.push(&typeAssertion***REMOVED***pathStep***REMOVED***vx.Elem().Type()***REMOVED******REMOVED***)
+		}
+		s.curPath.push(&typeAssertion{pathStep{vx.Elem().Type()}})
 		defer s.curPath.pop()
 		s.compareAny(vx.Elem(), vy.Elem())
 		return
 	case reflect.Slice:
-		if vx.IsNil() || vy.IsNil() ***REMOVED***
+		if vx.IsNil() || vy.IsNil() {
 			s.report(vx.IsNil() && vy.IsNil(), vx, vy)
 			return
-		***REMOVED***
+		}
 		fallthrough
 	case reflect.Array:
 		s.compareArray(vx, vy, t)
@@ -273,81 +273,81 @@ func (s *state) compareAny(vx, vy reflect.Value) ***REMOVED***
 		return
 	default:
 		panic(fmt.Sprintf("%v kind not handled", t.Kind()))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *state) tryExporting(vx, vy reflect.Value) (reflect.Value, reflect.Value) ***REMOVED***
-	if sf, ok := s.curPath[len(s.curPath)-1].(*structField); ok && sf.unexported ***REMOVED***
-		if sf.force ***REMOVED***
+func (s *state) tryExporting(vx, vy reflect.Value) (reflect.Value, reflect.Value) {
+	if sf, ok := s.curPath[len(s.curPath)-1].(*structField); ok && sf.unexported {
+		if sf.force {
 			// Use unsafe pointer arithmetic to get read-write access to an
 			// unexported field in the struct.
 			vx = unsafeRetrieveField(sf.pvx, sf.field)
 			vy = unsafeRetrieveField(sf.pvy, sf.field)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			// We are not allowed to export the value, so invalidate them
 			// so that tryOptions can panic later if not explicitly ignored.
 			vx = nothing
 			vy = nothing
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return vx, vy
-***REMOVED***
+}
 
-func (s *state) tryOptions(vx, vy reflect.Value, t reflect.Type) bool ***REMOVED***
+func (s *state) tryOptions(vx, vy reflect.Value, t reflect.Type) bool {
 	// If there were no FilterValues, we will not detect invalid inputs,
 	// so manually check for them and append invalid if necessary.
 	// We still evaluate the options since an ignore can override invalid.
 	opts := s.opts
-	if !vx.IsValid() || !vy.IsValid() ***REMOVED***
-		opts = Options***REMOVED***opts, invalid***REMOVED******REMOVED******REMOVED***
-	***REMOVED***
+	if !vx.IsValid() || !vy.IsValid() {
+		opts = Options{opts, invalid{}}
+	}
 
 	// Evaluate all filters and apply the remaining options.
-	if opt := opts.filter(s, vx, vy, t); opt != nil ***REMOVED***
+	if opt := opts.filter(s, vx, vy, t); opt != nil {
 		return opt.apply(s, vx, vy)
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
-func (s *state) tryMethod(vx, vy reflect.Value, t reflect.Type) bool ***REMOVED***
+func (s *state) tryMethod(vx, vy reflect.Value, t reflect.Type) bool {
 	// Check if this type even has an Equal method.
 	m, ok := t.MethodByName("Equal")
-	if !ok || !function.IsType(m.Type, function.EqualAssignable) ***REMOVED***
+	if !ok || !function.IsType(m.Type, function.EqualAssignable) {
 		return false
-	***REMOVED***
+	}
 
 	eq := s.callTTBFunc(m.Func, vx, vy)
 	s.report(eq, vx, vy)
 	return true
-***REMOVED***
+}
 
-func (s *state) callTRFunc(f, v reflect.Value) reflect.Value ***REMOVED***
-	if !s.dynChecker.Next() ***REMOVED***
-		return f.Call([]reflect.Value***REMOVED***v***REMOVED***)[0]
-	***REMOVED***
+func (s *state) callTRFunc(f, v reflect.Value) reflect.Value {
+	if !s.dynChecker.Next() {
+		return f.Call([]reflect.Value{v})[0]
+	}
 
 	// Run the function twice and ensure that we get the same results back.
 	// We run in goroutines so that the race detector (if enabled) can detect
 	// unsafe mutations to the input.
 	c := make(chan reflect.Value)
 	go detectRaces(c, f, v)
-	want := f.Call([]reflect.Value***REMOVED***v***REMOVED***)[0]
-	if got := <-c; !s.statelessCompare(got, want).Equal() ***REMOVED***
+	want := f.Call([]reflect.Value{v})[0]
+	if got := <-c; !s.statelessCompare(got, want).Equal() {
 		// To avoid false-positives with non-reflexive equality operations,
 		// we sanity check whether a value is equal to itself.
-		if !s.statelessCompare(want, want).Equal() ***REMOVED***
+		if !s.statelessCompare(want, want).Equal() {
 			return want
-		***REMOVED***
+		}
 		fn := getFuncName(f.Pointer())
 		panic(fmt.Sprintf("non-deterministic function detected: %s", fn))
-	***REMOVED***
+	}
 	return want
-***REMOVED***
+}
 
-func (s *state) callTTBFunc(f, x, y reflect.Value) bool ***REMOVED***
-	if !s.dynChecker.Next() ***REMOVED***
-		return f.Call([]reflect.Value***REMOVED***x, y***REMOVED***)[0].Bool()
-	***REMOVED***
+func (s *state) callTTBFunc(f, x, y reflect.Value) bool {
+	if !s.dynChecker.Next() {
+		return f.Call([]reflect.Value{x, y})[0].Bool()
+	}
 
 	// Swapping the input arguments is sufficient to check that
 	// f is symmetric and deterministic.
@@ -355,44 +355,44 @@ func (s *state) callTTBFunc(f, x, y reflect.Value) bool ***REMOVED***
 	// unsafe mutations to the input.
 	c := make(chan reflect.Value)
 	go detectRaces(c, f, y, x)
-	want := f.Call([]reflect.Value***REMOVED***x, y***REMOVED***)[0].Bool()
-	if got := <-c; !got.IsValid() || got.Bool() != want ***REMOVED***
+	want := f.Call([]reflect.Value{x, y})[0].Bool()
+	if got := <-c; !got.IsValid() || got.Bool() != want {
 		fn := getFuncName(f.Pointer())
 		panic(fmt.Sprintf("non-deterministic or non-symmetric function detected: %s", fn))
-	***REMOVED***
+	}
 	return want
-***REMOVED***
+}
 
-func detectRaces(c chan<- reflect.Value, f reflect.Value, vs ...reflect.Value) ***REMOVED***
+func detectRaces(c chan<- reflect.Value, f reflect.Value, vs ...reflect.Value) {
 	var ret reflect.Value
-	defer func() ***REMOVED***
+	defer func() {
 		recover() // Ignore panics, let the other call to f panic instead
 		c <- ret
-	***REMOVED***()
+	}()
 	ret = f.Call(vs)[0]
-***REMOVED***
+}
 
-func (s *state) compareArray(vx, vy reflect.Value, t reflect.Type) ***REMOVED***
-	step := &sliceIndex***REMOVED***pathStep***REMOVED***t.Elem()***REMOVED***, 0, 0***REMOVED***
+func (s *state) compareArray(vx, vy reflect.Value, t reflect.Type) {
+	step := &sliceIndex{pathStep{t.Elem()}, 0, 0}
 	s.curPath.push(step)
 
 	// Compute an edit-script for slices vx and vy.
-	eq, es := diff.Difference(vx.Len(), vy.Len(), func(ix, iy int) diff.Result ***REMOVED***
+	eq, es := diff.Difference(vx.Len(), vy.Len(), func(ix, iy int) diff.Result {
 		step.xkey, step.ykey = ix, iy
 		return s.statelessCompare(vx.Index(ix), vy.Index(iy))
-	***REMOVED***)
+	})
 
 	// Equal or no edit-script, so report entire slices as is.
-	if eq || es == nil ***REMOVED***
+	if eq || es == nil {
 		s.curPath.pop() // Pop first since we are reporting the whole slice
 		s.report(eq, vx, vy)
 		return
-	***REMOVED***
+	}
 
 	// Replay the edit-script.
 	var ix, iy int
-	for _, e := range es ***REMOVED***
-		switch e ***REMOVED***
+	for _, e := range es {
+		switch e {
 		case diff.UniqueX:
 			step.xkey, step.ykey = ix, -1
 			s.report(false, vx.Index(ix), nothing)
@@ -403,35 +403,35 @@ func (s *state) compareArray(vx, vy reflect.Value, t reflect.Type) ***REMOVED***
 			iy++
 		default:
 			step.xkey, step.ykey = ix, iy
-			if e == diff.Identity ***REMOVED***
+			if e == diff.Identity {
 				s.report(true, vx.Index(ix), vy.Index(iy))
-			***REMOVED*** else ***REMOVED***
+			} else {
 				s.compareAny(vx.Index(ix), vy.Index(iy))
-			***REMOVED***
+			}
 			ix++
 			iy++
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	s.curPath.pop()
 	return
-***REMOVED***
+}
 
-func (s *state) compareMap(vx, vy reflect.Value, t reflect.Type) ***REMOVED***
-	if vx.IsNil() || vy.IsNil() ***REMOVED***
+func (s *state) compareMap(vx, vy reflect.Value, t reflect.Type) {
+	if vx.IsNil() || vy.IsNil() {
 		s.report(vx.IsNil() && vy.IsNil(), vx, vy)
 		return
-	***REMOVED***
+	}
 
 	// We combine and sort the two map keys so that we can perform the
 	// comparisons in a deterministic order.
-	step := &mapIndex***REMOVED***pathStep: pathStep***REMOVED***t.Elem()***REMOVED******REMOVED***
+	step := &mapIndex{pathStep: pathStep{t.Elem()}}
 	s.curPath.push(step)
 	defer s.curPath.pop()
-	for _, k := range value.SortKeys(append(vx.MapKeys(), vy.MapKeys()...)) ***REMOVED***
+	for _, k := range value.SortKeys(append(vx.MapKeys(), vy.MapKeys()...)) {
 		step.key = k
 		vvx := vx.MapIndex(k)
 		vvy := vy.MapIndex(k)
-		switch ***REMOVED***
+		switch {
 		case vvx.IsValid() && vvy.IsValid():
 			s.compareAny(vvx, vvy)
 		case vvx.IsValid() && !vvy.IsValid():
@@ -444,59 +444,59 @@ func (s *state) compareMap(vx, vy reflect.Value, t reflect.Type) ***REMOVED***
 			// reflection to be able to retrieve these values.
 			// See https://golang.org/issue/11104
 			panic(fmt.Sprintf("%#v has map key with NaNs", s.curPath))
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (s *state) compareStruct(vx, vy reflect.Value, t reflect.Type) ***REMOVED***
+func (s *state) compareStruct(vx, vy reflect.Value, t reflect.Type) {
 	var vax, vay reflect.Value // Addressable versions of vx and vy
 
-	step := &structField***REMOVED******REMOVED***
+	step := &structField{}
 	s.curPath.push(step)
 	defer s.curPath.pop()
-	for i := 0; i < t.NumField(); i++ ***REMOVED***
+	for i := 0; i < t.NumField(); i++ {
 		vvx := vx.Field(i)
 		vvy := vy.Field(i)
 		step.typ = t.Field(i).Type
 		step.name = t.Field(i).Name
 		step.idx = i
 		step.unexported = !isExported(step.name)
-		if step.unexported ***REMOVED***
+		if step.unexported {
 			// Defer checking of unexported fields until later to give an
 			// Ignore a chance to ignore the field.
-			if !vax.IsValid() || !vay.IsValid() ***REMOVED***
+			if !vax.IsValid() || !vay.IsValid() {
 				// For unsafeRetrieveField to work, the parent struct must
 				// be addressable. Create a new copy of the values if
 				// necessary to make them addressable.
 				vax = makeAddressable(vx)
 				vay = makeAddressable(vy)
-			***REMOVED***
+			}
 			step.force = s.exporters[t]
 			step.pvx = vax
 			step.pvy = vay
 			step.field = t.Field(i)
-		***REMOVED***
+		}
 		s.compareAny(vvx, vvy)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // report records the result of a single comparison.
 // It also calls Report if any reporter is registered.
-func (s *state) report(eq bool, vx, vy reflect.Value) ***REMOVED***
-	if eq ***REMOVED***
+func (s *state) report(eq bool, vx, vy reflect.Value) {
+	if eq {
 		s.result.NSame++
-	***REMOVED*** else ***REMOVED***
+	} else {
 		s.result.NDiff++
-	***REMOVED***
-	if s.reporter != nil ***REMOVED***
+	}
+	if s.reporter != nil {
 		s.reporter.Report(vx, vy, eq, s.curPath)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // dynChecker tracks the state needed to periodically perform checks that
 // user provided functions are symmetric and deterministic.
 // The zero value is safe for immediate use.
-type dynChecker struct***REMOVED*** curr, next int ***REMOVED***
+type dynChecker struct{ curr, next int }
 
 // Next increments the state and reports whether a check should be performed.
 //
@@ -506,24 +506,24 @@ type dynChecker struct***REMOVED*** curr, next int ***REMOVED***
 //
 // This sequence ensures that the cost of checks drops significantly as
 // the number of functions calls grows larger.
-func (dc *dynChecker) Next() bool ***REMOVED***
+func (dc *dynChecker) Next() bool {
 	ok := dc.curr == dc.next
-	if ok ***REMOVED***
+	if ok {
 		dc.curr = 0
 		dc.next++
-	***REMOVED***
+	}
 	dc.curr++
 	return ok
-***REMOVED***
+}
 
 // makeAddressable returns a value that is always addressable.
 // It returns the input verbatim if it is already addressable,
 // otherwise it creates a new value and returns an addressable copy.
-func makeAddressable(v reflect.Value) reflect.Value ***REMOVED***
-	if v.CanAddr() ***REMOVED***
+func makeAddressable(v reflect.Value) reflect.Value {
+	if v.CanAddr() {
 		return v
-	***REMOVED***
+	}
 	vc := reflect.New(v.Type()).Elem()
 	vc.Set(v)
 	return vc
-***REMOVED***
+}

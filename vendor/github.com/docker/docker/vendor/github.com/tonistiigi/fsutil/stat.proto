@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package fsutil;
 
-message Stat ***REMOVED***
+message Stat {
   string path = 1;
   uint32 mode = 2;
   uint32 uid = 3;
@@ -14,4 +14,4 @@ message Stat ***REMOVED***
   int64 devmajor = 8;
   int64 devminor = 9;
   map<string, bytes> xattrs = 10;
-***REMOVED***
+}

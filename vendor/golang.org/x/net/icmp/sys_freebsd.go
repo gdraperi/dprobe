@@ -6,6 +6,6 @@ package icmp
 
 import "syscall"
 
-func init() ***REMOVED***
+func init() {
 	freebsdVersion, _ = syscall.SysctlUint32("kern.osreldate")
-***REMOVED***
+}

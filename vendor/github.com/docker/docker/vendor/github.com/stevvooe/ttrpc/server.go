@@ -19,39 +19,39 @@ var (
 	ErrServerClosed = errors.New("ttrpc: server close")
 )
 
-type Server struct ***REMOVED***
+type Server struct {
 	config   *serverConfig
 	services *serviceSet
 	codec    codec
 
 	mu          sync.Mutex
-	listeners   map[net.Listener]struct***REMOVED******REMOVED***
-	connections map[*serverConn]struct***REMOVED******REMOVED*** // all connections to current state
-	done        chan struct***REMOVED******REMOVED***            // marks point at which we stop serving requests
-***REMOVED***
+	listeners   map[net.Listener]struct{}
+	connections map[*serverConn]struct{} // all connections to current state
+	done        chan struct{}            // marks point at which we stop serving requests
+}
 
-func NewServer(opts ...ServerOpt) (*Server, error) ***REMOVED***
-	config := &serverConfig***REMOVED******REMOVED***
-	for _, opt := range opts ***REMOVED***
-		if err := opt(config); err != nil ***REMOVED***
+func NewServer(opts ...ServerOpt) (*Server, error) {
+	config := &serverConfig{}
+	for _, opt := range opts {
+		if err := opt(config); err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	return &Server***REMOVED***
+	return &Server{
 		config:      config,
 		services:    newServiceSet(),
-		done:        make(chan struct***REMOVED******REMOVED***),
-		listeners:   make(map[net.Listener]struct***REMOVED******REMOVED***),
-		connections: make(map[*serverConn]struct***REMOVED******REMOVED***),
-	***REMOVED***, nil
-***REMOVED***
+		done:        make(chan struct{}),
+		listeners:   make(map[net.Listener]struct{}),
+		connections: make(map[*serverConn]struct{}),
+	}, nil
+}
 
-func (s *Server) Register(name string, methods map[string]Method) ***REMOVED***
+func (s *Server) Register(name string, methods map[string]Method) {
 	s.services.register(name, methods)
-***REMOVED***
+}
 
-func (s *Server) Serve(l net.Listener) error ***REMOVED***
+func (s *Server) Serve(l net.Listener) error {
 	s.addListener(l)
 	defer s.closeListener(l)
 
@@ -61,151 +61,151 @@ func (s *Server) Serve(l net.Listener) error ***REMOVED***
 		handshaker = s.config.handshaker
 	)
 
-	if handshaker == nil ***REMOVED***
+	if handshaker == nil {
 		handshaker = handshakerFunc(noopHandshake)
-	***REMOVED***
+	}
 
-	for ***REMOVED***
+	for {
 		conn, err := l.Accept()
-		if err != nil ***REMOVED***
-			select ***REMOVED***
+		if err != nil {
+			select {
 			case <-s.done:
 				return ErrServerClosed
 			default:
-			***REMOVED***
+			}
 
-			if terr, ok := err.(interface ***REMOVED***
+			if terr, ok := err.(interface {
 				Temporary() bool
-			***REMOVED***); ok && terr.Temporary() ***REMOVED***
-				if backoff == 0 ***REMOVED***
+			}); ok && terr.Temporary() {
+				if backoff == 0 {
 					backoff = time.Millisecond
-				***REMOVED*** else ***REMOVED***
+				} else {
 					backoff *= 2
-				***REMOVED***
+				}
 
-				if max := time.Second; backoff > max ***REMOVED***
+				if max := time.Second; backoff > max {
 					backoff = max
-				***REMOVED***
+				}
 
 				sleep := time.Duration(rand.Int63n(int64(backoff)))
 				log.L.WithError(err).Errorf("ttrpc: failed accept; backoff %v", sleep)
 				time.Sleep(sleep)
 				continue
-			***REMOVED***
+			}
 
 			return err
-		***REMOVED***
+		}
 
 		backoff = 0
 
 		approved, handshake, err := handshaker.Handshake(ctx, conn)
-		if err != nil ***REMOVED***
+		if err != nil {
 			log.L.WithError(err).Errorf("ttrpc: refusing connection after handshake")
 			conn.Close()
 			continue
-		***REMOVED***
+		}
 
 		sc := s.newConn(approved, handshake)
 		go sc.run(ctx)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *Server) Shutdown(ctx context.Context) error ***REMOVED***
+func (s *Server) Shutdown(ctx context.Context) error {
 	s.mu.Lock()
 	lnerr := s.closeListeners()
-	select ***REMOVED***
+	select {
 	case <-s.done:
 	default:
 		// protected by mutex
 		close(s.done)
-	***REMOVED***
+	}
 	s.mu.Unlock()
 
 	ticker := time.NewTicker(200 * time.Millisecond)
 	defer ticker.Stop()
-	for ***REMOVED***
-		if s.closeIdleConns() ***REMOVED***
+	for {
+		if s.closeIdleConns() {
 			return lnerr
-		***REMOVED***
-		select ***REMOVED***
+		}
+		select {
 		case <-ctx.Done():
 			return ctx.Err()
 		case <-ticker.C:
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // Close the server without waiting for active connections.
-func (s *Server) Close() error ***REMOVED***
+func (s *Server) Close() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	select ***REMOVED***
+	select {
 	case <-s.done:
 	default:
 		// protected by mutex
 		close(s.done)
-	***REMOVED***
+	}
 
 	err := s.closeListeners()
-	for c := range s.connections ***REMOVED***
+	for c := range s.connections {
 		c.close()
 		delete(s.connections, c)
-	***REMOVED***
+	}
 
 	return err
-***REMOVED***
+}
 
-func (s *Server) addListener(l net.Listener) ***REMOVED***
+func (s *Server) addListener(l net.Listener) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	s.listeners[l] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-***REMOVED***
+	s.listeners[l] = struct{}{}
+}
 
-func (s *Server) closeListener(l net.Listener) error ***REMOVED***
+func (s *Server) closeListener(l net.Listener) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	return s.closeListenerLocked(l)
-***REMOVED***
+}
 
-func (s *Server) closeListenerLocked(l net.Listener) error ***REMOVED***
+func (s *Server) closeListenerLocked(l net.Listener) error {
 	defer delete(s.listeners, l)
 	return l.Close()
-***REMOVED***
+}
 
-func (s *Server) closeListeners() error ***REMOVED***
+func (s *Server) closeListeners() error {
 	var err error
-	for l := range s.listeners ***REMOVED***
-		if cerr := s.closeListenerLocked(l); cerr != nil && err == nil ***REMOVED***
+	for l := range s.listeners {
+		if cerr := s.closeListenerLocked(l); cerr != nil && err == nil {
 			err = cerr
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return err
-***REMOVED***
+}
 
-func (s *Server) addConnection(c *serverConn) ***REMOVED***
+func (s *Server) addConnection(c *serverConn) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	s.connections[c] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-***REMOVED***
+	s.connections[c] = struct{}{}
+}
 
-func (s *Server) closeIdleConns() bool ***REMOVED***
+func (s *Server) closeIdleConns() bool {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	quiescent := true
-	for c := range s.connections ***REMOVED***
+	for c := range s.connections {
 		st, ok := c.getState()
-		if !ok || st != connStateIdle ***REMOVED***
+		if !ok || st != connStateIdle {
 			quiescent = false
 			continue
-		***REMOVED***
+		}
 		c.close()
 		delete(s.connections, c)
-	***REMOVED***
+	}
 	return quiescent
-***REMOVED***
+}
 
 type connState int
 
@@ -215,8 +215,8 @@ const (
 	connStateClosed            // closed connection
 )
 
-func (cs connState) String() string ***REMOVED***
-	switch cs ***REMOVED***
+func (cs connState) String() string {
+	switch cs {
 	case connStateActive:
 		return "active"
 	case connStateIdle:
@@ -225,59 +225,59 @@ func (cs connState) String() string ***REMOVED***
 		return "closed"
 	default:
 		return "unknown"
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *Server) newConn(conn net.Conn, handshake interface***REMOVED******REMOVED***) *serverConn ***REMOVED***
-	c := &serverConn***REMOVED***
+func (s *Server) newConn(conn net.Conn, handshake interface{}) *serverConn {
+	c := &serverConn{
 		server:    s,
 		conn:      conn,
 		handshake: handshake,
-		shutdown:  make(chan struct***REMOVED******REMOVED***),
-	***REMOVED***
+		shutdown:  make(chan struct{}),
+	}
 	c.setState(connStateIdle)
 	s.addConnection(c)
 	return c
-***REMOVED***
+}
 
-type serverConn struct ***REMOVED***
+type serverConn struct {
 	server    *Server
 	conn      net.Conn
-	handshake interface***REMOVED******REMOVED*** // data from handshake, not used for now
+	handshake interface{} // data from handshake, not used for now
 	state     atomic.Value
 
 	shutdownOnce sync.Once
-	shutdown     chan struct***REMOVED******REMOVED*** // forced shutdown, used by close
-***REMOVED***
+	shutdown     chan struct{} // forced shutdown, used by close
+}
 
-func (c *serverConn) getState() (connState, bool) ***REMOVED***
+func (c *serverConn) getState() (connState, bool) {
 	cs, ok := c.state.Load().(connState)
 	return cs, ok
-***REMOVED***
+}
 
-func (c *serverConn) setState(newstate connState) ***REMOVED***
+func (c *serverConn) setState(newstate connState) {
 	c.state.Store(newstate)
-***REMOVED***
+}
 
-func (c *serverConn) close() error ***REMOVED***
-	c.shutdownOnce.Do(func() ***REMOVED***
+func (c *serverConn) close() error {
+	c.shutdownOnce.Do(func() {
 		close(c.shutdown)
-	***REMOVED***)
+	})
 
 	return nil
-***REMOVED***
+}
 
-func (c *serverConn) run(sctx context.Context) ***REMOVED***
+func (c *serverConn) run(sctx context.Context) {
 	type (
-		request struct ***REMOVED***
+		request struct {
 			id  uint32
 			req *Request
-		***REMOVED***
+		}
 
-		response struct ***REMOVED***
+		response struct {
 			id   uint32
 			resp *Response
-		***REMOVED***
+		}
 	)
 
 	var (
@@ -289,141 +289,141 @@ func (c *serverConn) run(sctx context.Context) ***REMOVED***
 		requests              = make(chan request)
 		recvErr               = make(chan error, 1)
 		shutdown              = c.shutdown
-		done                  = make(chan struct***REMOVED******REMOVED***)
+		done                  = make(chan struct{})
 	)
 
 	defer c.conn.Close()
 	defer cancel()
 	defer close(done)
 
-	go func(recvErr chan error) ***REMOVED***
+	go func(recvErr chan error) {
 		defer close(recvErr)
-		sendImmediate := func(id uint32, st *status.Status) bool ***REMOVED***
-			select ***REMOVED***
-			case responses <- response***REMOVED***
+		sendImmediate := func(id uint32, st *status.Status) bool {
+			select {
+			case responses <- response{
 				// even though we've had an invalid stream id, we send it
 				// back on the same stream id so the client knows which
 				// stream id was bad.
 				id: id,
-				resp: &Response***REMOVED***
+				resp: &Response{
 					Status: st.Proto(),
-				***REMOVED***,
-			***REMOVED***:
+				},
+			}:
 				return true
 			case <-c.shutdown:
 				return false
 			case <-done:
 				return false
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
-		for ***REMOVED***
-			select ***REMOVED***
+		for {
+			select {
 			case <-c.shutdown:
 				return
 			case <-done:
 				return
 			default: // proceed
-			***REMOVED***
+			}
 
 			mh, p, err := ch.recv(ctx)
-			if err != nil ***REMOVED***
+			if err != nil {
 				status, ok := status.FromError(err)
-				if !ok ***REMOVED***
+				if !ok {
 					recvErr <- err
 					return
-				***REMOVED***
+				}
 
 				// in this case, we send an error for that particular message
 				// when the status is defined.
-				if !sendImmediate(mh.StreamID, status) ***REMOVED***
+				if !sendImmediate(mh.StreamID, status) {
 					return
-				***REMOVED***
+				}
 
 				continue
-			***REMOVED***
+			}
 
-			if mh.Type != messageTypeRequest ***REMOVED***
+			if mh.Type != messageTypeRequest {
 				// we must ignore this for future compat.
 				continue
-			***REMOVED***
+			}
 
 			var req Request
-			if err := c.server.codec.Unmarshal(p, &req); err != nil ***REMOVED***
+			if err := c.server.codec.Unmarshal(p, &req); err != nil {
 				ch.putmbuf(p)
-				if !sendImmediate(mh.StreamID, status.Newf(codes.InvalidArgument, "unmarshal request error: %v", err)) ***REMOVED***
+				if !sendImmediate(mh.StreamID, status.Newf(codes.InvalidArgument, "unmarshal request error: %v", err)) {
 					return
-				***REMOVED***
+				}
 				continue
-			***REMOVED***
+			}
 			ch.putmbuf(p)
 
-			if mh.StreamID%2 != 1 ***REMOVED***
+			if mh.StreamID%2 != 1 {
 				// enforce odd client initiated identifiers.
-				if !sendImmediate(mh.StreamID, status.Newf(codes.InvalidArgument, "StreamID must be odd for client initiated streams")) ***REMOVED***
+				if !sendImmediate(mh.StreamID, status.Newf(codes.InvalidArgument, "StreamID must be odd for client initiated streams")) {
 					return
-				***REMOVED***
+				}
 				continue
-			***REMOVED***
+			}
 
 			// Forward the request to the main loop. We don't wait on s.done
 			// because we have already accepted the client request.
-			select ***REMOVED***
-			case requests <- request***REMOVED***
+			select {
+			case requests <- request{
 				id:  mh.StreamID,
 				req: &req,
-			***REMOVED***:
+			}:
 			case <-done:
 				return
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***(recvErr)
+			}
+		}
+	}(recvErr)
 
-	for ***REMOVED***
+	for {
 		newstate := state
-		switch ***REMOVED***
+		switch {
 		case active > 0:
 			newstate = connStateActive
 			shutdown = nil
 		case active == 0:
 			newstate = connStateIdle
 			shutdown = c.shutdown // only enable this branch in idle mode
-		***REMOVED***
+		}
 
-		if newstate != state ***REMOVED***
+		if newstate != state {
 			c.setState(newstate)
 			state = newstate
-		***REMOVED***
+		}
 
-		select ***REMOVED***
+		select {
 		case request := <-requests:
 			active++
-			go func(id uint32) ***REMOVED***
+			go func(id uint32) {
 				p, status := c.server.services.call(ctx, request.req.Service, request.req.Method, request.req.Payload)
-				resp := &Response***REMOVED***
+				resp := &Response{
 					Status:  status.Proto(),
 					Payload: p,
-				***REMOVED***
+				}
 
-				select ***REMOVED***
-				case responses <- response***REMOVED***
+				select {
+				case responses <- response{
 					id:   id,
 					resp: resp,
-				***REMOVED***:
+				}:
 				case <-done:
-				***REMOVED***
-			***REMOVED***(request.id)
+				}
+			}(request.id)
 		case response := <-responses:
 			p, err := c.server.codec.Marshal(response.resp)
-			if err != nil ***REMOVED***
+			if err != nil {
 				log.L.WithError(err).Error("failed marshaling response")
 				return
-			***REMOVED***
+			}
 
-			if err := ch.send(ctx, response.id, messageTypeResponse, p); err != nil ***REMOVED***
+			if err := ch.send(ctx, response.id, messageTypeResponse, p); err != nil {
 				log.L.WithError(err).Error("failed sending message on channel")
 				return
-			***REMOVED***
+			}
 
 			active--
 		case err := <-recvErr:
@@ -431,11 +431,11 @@ func (c *serverConn) run(sctx context.Context) ***REMOVED***
 			// branch. Basically, it means that we are no longer receiving
 			// requests due to a terminal error.
 			recvErr = nil // connection is now "closing"
-			if err != nil && err != io.EOF ***REMOVED***
+			if err != nil && err != io.EOF {
 				log.L.WithError(err).Error("error receiving message")
-			***REMOVED***
+			}
 		case <-shutdown:
 			return
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

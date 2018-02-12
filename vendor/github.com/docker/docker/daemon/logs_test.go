@@ -6,10 +6,10 @@ import (
 	containertypes "github.com/docker/docker/api/types/container"
 )
 
-func TestMergeAndVerifyLogConfigNilConfig(t *testing.T) ***REMOVED***
-	d := &Daemon***REMOVED***defaultLogConfig: containertypes.LogConfig***REMOVED***Type: "json-file", Config: map[string]string***REMOVED***"max-file": "1"***REMOVED******REMOVED******REMOVED***
-	cfg := containertypes.LogConfig***REMOVED***Type: d.defaultLogConfig.Type***REMOVED***
-	if err := d.mergeAndVerifyLogConfig(&cfg); err != nil ***REMOVED***
+func TestMergeAndVerifyLogConfigNilConfig(t *testing.T) {
+	d := &Daemon{defaultLogConfig: containertypes.LogConfig{Type: "json-file", Config: map[string]string{"max-file": "1"}}}
+	cfg := containertypes.LogConfig{Type: d.defaultLogConfig.Type}
+	if err := d.mergeAndVerifyLogConfig(&cfg); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}

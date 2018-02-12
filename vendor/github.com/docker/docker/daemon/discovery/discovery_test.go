@@ -9,88 +9,88 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestDiscoveryOptsErrors(t *testing.T) ***REMOVED***
-	var testcases = []struct ***REMOVED***
+func TestDiscoveryOptsErrors(t *testing.T) {
+	var testcases = []struct {
 		doc  string
 		opts map[string]string
-	***REMOVED******REMOVED***
-		***REMOVED***
+	}{
+		{
 			doc:  "discovery.ttl < discovery.heartbeat",
-			opts: map[string]string***REMOVED***"discovery.heartbeat": "10", "discovery.ttl": "5"***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			opts: map[string]string{"discovery.heartbeat": "10", "discovery.ttl": "5"},
+		},
+		{
 			doc:  "discovery.ttl == discovery.heartbeat",
-			opts: map[string]string***REMOVED***"discovery.heartbeat": "10", "discovery.ttl": "10"***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			opts: map[string]string{"discovery.heartbeat": "10", "discovery.ttl": "10"},
+		},
+		{
 			doc:  "negative discovery.heartbeat",
-			opts: map[string]string***REMOVED***"discovery.heartbeat": "-10", "discovery.ttl": "10"***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			opts: map[string]string{"discovery.heartbeat": "-10", "discovery.ttl": "10"},
+		},
+		{
 			doc:  "negative discovery.ttl",
-			opts: map[string]string***REMOVED***"discovery.heartbeat": "10", "discovery.ttl": "-10"***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			opts: map[string]string{"discovery.heartbeat": "10", "discovery.ttl": "-10"},
+		},
+		{
 			doc:  "invalid discovery.heartbeat",
-			opts: map[string]string***REMOVED***"discovery.heartbeat": "invalid"***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			opts: map[string]string{"discovery.heartbeat": "invalid"},
+		},
+		{
 			doc:  "invalid discovery.ttl",
-			opts: map[string]string***REMOVED***"discovery.ttl": "invalid"***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+			opts: map[string]string{"discovery.ttl": "invalid"},
+		},
+	}
 
-	for _, testcase := range testcases ***REMOVED***
+	for _, testcase := range testcases {
 		_, _, err := discoveryOpts(testcase.opts)
 		assert.Error(t, err, testcase.doc)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestDiscoveryOpts(t *testing.T) ***REMOVED***
-	clusterOpts := map[string]string***REMOVED***"discovery.heartbeat": "10", "discovery.ttl": "20"***REMOVED***
+func TestDiscoveryOpts(t *testing.T) {
+	clusterOpts := map[string]string{"discovery.heartbeat": "10", "discovery.ttl": "20"}
 	heartbeat, ttl, err := discoveryOpts(clusterOpts)
 	require.NoError(t, err)
 	assert.Equal(t, 10*time.Second, heartbeat)
 	assert.Equal(t, 20*time.Second, ttl)
 
-	clusterOpts = map[string]string***REMOVED***"discovery.heartbeat": "10"***REMOVED***
+	clusterOpts = map[string]string{"discovery.heartbeat": "10"}
 	heartbeat, ttl, err = discoveryOpts(clusterOpts)
 	require.NoError(t, err)
 	assert.Equal(t, 10*time.Second, heartbeat)
 	assert.Equal(t, 10*defaultDiscoveryTTLFactor*time.Second, ttl)
 
-	clusterOpts = map[string]string***REMOVED***"discovery.ttl": "30"***REMOVED***
+	clusterOpts = map[string]string{"discovery.ttl": "30"}
 	heartbeat, ttl, err = discoveryOpts(clusterOpts)
 	require.NoError(t, err)
 
-	if ttl != 30*time.Second ***REMOVED***
+	if ttl != 30*time.Second {
 		t.Fatalf("TTL - Expected : %v, Actual : %v", 30*time.Second, ttl)
-	***REMOVED***
+	}
 
 	expected := 30 * time.Second / defaultDiscoveryTTLFactor
-	if heartbeat != expected ***REMOVED***
+	if heartbeat != expected {
 		t.Fatalf("Heartbeat - Expected : %v, Actual : %v", expected, heartbeat)
-	***REMOVED***
+	}
 
 	discoveryTTL := fmt.Sprintf("%d", defaultDiscoveryTTLFactor-1)
-	clusterOpts = map[string]string***REMOVED***"discovery.ttl": discoveryTTL***REMOVED***
+	clusterOpts = map[string]string{"discovery.ttl": discoveryTTL}
 	heartbeat, _, err = discoveryOpts(clusterOpts)
-	if err == nil && heartbeat == 0 ***REMOVED***
+	if err == nil && heartbeat == 0 {
 		t.Fatal("discovery.heartbeat must be positive")
-	***REMOVED***
+	}
 
-	clusterOpts = map[string]string***REMOVED******REMOVED***
+	clusterOpts = map[string]string{}
 	heartbeat, ttl, err = discoveryOpts(clusterOpts)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if heartbeat != defaultDiscoveryHeartbeat ***REMOVED***
+	if heartbeat != defaultDiscoveryHeartbeat {
 		t.Fatalf("Heartbeat - Expected : %v, Actual : %v", defaultDiscoveryHeartbeat, heartbeat)
-	***REMOVED***
+	}
 
 	expected = defaultDiscoveryHeartbeat * defaultDiscoveryTTLFactor
-	if ttl != expected ***REMOVED***
+	if ttl != expected {
 		t.Fatalf("TTL - Expected : %v, Actual : %v", expected, ttl)
-	***REMOVED***
-***REMOVED***
+	}
+}

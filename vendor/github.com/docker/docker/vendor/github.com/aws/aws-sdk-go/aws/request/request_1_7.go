@@ -10,15 +10,15 @@ import "io"
 // An alternative, however, is to simply set Request.Body to nil.
 //
 // Copy of Go 1.8 NoBody type from net/http/http.go
-type noBody struct***REMOVED******REMOVED***
+type noBody struct{}
 
-func (noBody) Read([]byte) (int, error)         ***REMOVED*** return 0, io.EOF ***REMOVED***
-func (noBody) Close() error                     ***REMOVED*** return nil ***REMOVED***
-func (noBody) WriteTo(io.Writer) (int64, error) ***REMOVED*** return 0, nil ***REMOVED***
+func (noBody) Read([]byte) (int, error)         { return 0, io.EOF }
+func (noBody) Close() error                     { return nil }
+func (noBody) WriteTo(io.Writer) (int64, error) { return 0, nil }
 
 // NoBody is an empty reader that will trigger the Go HTTP client to not include
 // and body in the HTTP request.
-var NoBody = noBody***REMOVED******REMOVED***
+var NoBody = noBody{}
 
 // ResetBody rewinds the request body back to its starting position, and
 // set's the HTTP Request body reference. When the body is read prior
@@ -28,12 +28,12 @@ var NoBody = noBody***REMOVED******REMOVED***
 // the request is being used directly ResetBody must be called before the request
 // is Sent.  SetStringBody, SetBufferBody, and SetReaderBody will automatically
 // call ResetBody.
-func (r *Request) ResetBody() ***REMOVED***
+func (r *Request) ResetBody() {
 	body, err := r.getNextRequestBody()
-	if err != nil ***REMOVED***
+	if err != nil {
 		r.Error = err
 		return
-	***REMOVED***
+	}
 
 	r.HTTPRequest.Body = body
-***REMOVED***
+}

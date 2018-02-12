@@ -23,65 +23,65 @@ var (
 )
 
 // Handler handles image manifests
-type Handler interface ***REMOVED***
+type Handler interface {
 	Handle(ctx context.Context, desc ocispec.Descriptor) (subdescs []ocispec.Descriptor, err error)
-***REMOVED***
+}
 
 // HandlerFunc function implementing the Handler interface
 type HandlerFunc func(ctx context.Context, desc ocispec.Descriptor) (subdescs []ocispec.Descriptor, err error)
 
 // Handle image manifests
-func (fn HandlerFunc) Handle(ctx context.Context, desc ocispec.Descriptor) (subdescs []ocispec.Descriptor, err error) ***REMOVED***
+func (fn HandlerFunc) Handle(ctx context.Context, desc ocispec.Descriptor) (subdescs []ocispec.Descriptor, err error) {
 	return fn(ctx, desc)
-***REMOVED***
+}
 
 // Handlers returns a handler that will run the handlers in sequence.
 //
 // A handler may return `ErrStopHandler` to stop calling additional handlers
-func Handlers(handlers ...Handler) HandlerFunc ***REMOVED***
-	return func(ctx context.Context, desc ocispec.Descriptor) (subdescs []ocispec.Descriptor, err error) ***REMOVED***
+func Handlers(handlers ...Handler) HandlerFunc {
+	return func(ctx context.Context, desc ocispec.Descriptor) (subdescs []ocispec.Descriptor, err error) {
 		var children []ocispec.Descriptor
-		for _, handler := range handlers ***REMOVED***
+		for _, handler := range handlers {
 			ch, err := handler.Handle(ctx, desc)
-			if err != nil ***REMOVED***
-				if errors.Cause(err) == ErrStopHandler ***REMOVED***
+			if err != nil {
+				if errors.Cause(err) == ErrStopHandler {
 					break
-				***REMOVED***
+				}
 				return nil, err
-			***REMOVED***
+			}
 
 			children = append(children, ch...)
-		***REMOVED***
+		}
 
 		return children, nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Walk the resources of an image and call the handler for each. If the handler
 // decodes the sub-resources for each image,
 //
 // This differs from dispatch in that each sibling resource is considered
 // synchronously.
-func Walk(ctx context.Context, handler Handler, descs ...ocispec.Descriptor) error ***REMOVED***
-	for _, desc := range descs ***REMOVED***
+func Walk(ctx context.Context, handler Handler, descs ...ocispec.Descriptor) error {
+	for _, desc := range descs {
 
 		children, err := handler.Handle(ctx, desc)
-		if err != nil ***REMOVED***
-			if errors.Cause(err) == ErrSkipDesc ***REMOVED***
+		if err != nil {
+			if errors.Cause(err) == ErrSkipDesc {
 				continue // don't traverse the children.
-			***REMOVED***
+			}
 			return err
-		***REMOVED***
+		}
 
-		if len(children) > 0 ***REMOVED***
-			if err := Walk(ctx, handler, children...); err != nil ***REMOVED***
+		if len(children) > 0 {
+			if err := Walk(ctx, handler, children...); err != nil {
 				return err
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
 // Dispatch runs the provided handler for content specified by the descriptors.
 // If the handler decode subresources, they will be visited, as well.
@@ -94,32 +94,32 @@ func Walk(ctx context.Context, handler Handler, descs ...ocispec.Descriptor) err
 // with other handlers.
 //
 // If any handler returns an error, the dispatch session will be canceled.
-func Dispatch(ctx context.Context, handler Handler, descs ...ocispec.Descriptor) error ***REMOVED***
+func Dispatch(ctx context.Context, handler Handler, descs ...ocispec.Descriptor) error {
 	eg, ctx := errgroup.WithContext(ctx)
-	for _, desc := range descs ***REMOVED***
+	for _, desc := range descs {
 		desc := desc
 
-		eg.Go(func() error ***REMOVED***
+		eg.Go(func() error {
 			desc := desc
 
 			children, err := handler.Handle(ctx, desc)
-			if err != nil ***REMOVED***
-				if errors.Cause(err) == ErrSkipDesc ***REMOVED***
+			if err != nil {
+				if errors.Cause(err) == ErrSkipDesc {
 					return nil // don't traverse the children.
-				***REMOVED***
+				}
 				return err
-			***REMOVED***
+			}
 
-			if len(children) > 0 ***REMOVED***
+			if len(children) > 0 {
 				return Dispatch(ctx, handler, children...)
-			***REMOVED***
+			}
 
 			return nil
-		***REMOVED***)
-	***REMOVED***
+		})
+	}
 
 	return eg.Wait()
-***REMOVED***
+}
 
 // ChildrenHandler decodes well-known manifest types and returns their children.
 //
@@ -128,8 +128,8 @@ func Dispatch(ctx context.Context, handler Handler, descs ...ocispec.Descriptor)
 //
 // One can also replace this with another implementation to allow descending of
 // arbitrary types.
-func ChildrenHandler(provider content.Provider, platform string) HandlerFunc ***REMOVED***
-	return func(ctx context.Context, desc ocispec.Descriptor) ([]ocispec.Descriptor, error) ***REMOVED***
+func ChildrenHandler(provider content.Provider, platform string) HandlerFunc {
+	return func(ctx context.Context, desc ocispec.Descriptor) ([]ocispec.Descriptor, error) {
 		return Children(ctx, provider, desc, platform)
-	***REMOVED***
-***REMOVED***
+	}
+}

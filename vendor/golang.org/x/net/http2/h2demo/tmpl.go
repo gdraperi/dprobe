@@ -19,18 +19,18 @@ var pushTmpl = template.Must(template.New("serverpush").Parse(`
 
   <title>HTTP/2 Server Push Demo</title>
 
-<link type="text/css" rel="stylesheet" href="/serverpush/static/style.css?***REMOVED******REMOVED***.CacheBust***REMOVED******REMOVED***">
+<link type="text/css" rel="stylesheet" href="/serverpush/static/style.css?{{.CacheBust}}">
 <script>
 window.initFuncs = [];
 </script>
 
 <script>
-function showtimes() ***REMOVED***
+function showtimes() {
 	var times = 'DOM loaded: ' + (window.performance.timing.domContentLoadedEventEnd - window.performance.timing.navigationStart) + 'ms, '
 	times += 'DOM complete (all loaded): ' + (window.performance.timing.domComplete - window.performance.timing.navigationStart) + 'ms, '
 	times += 'Load event fired: ' + (window.performance.timing.loadEventStart - window.performance.timing.navigationStart) + 'ms'
 	document.getElementById('loadtimes').innerHTML = times
-***REMOVED***
+}
 </script>
 
 </head>
@@ -43,7 +43,7 @@ Note: This page exists for demonstration purposes. For the actual cmd/go docs, g
 <div style="padding:20px">
 
 
-<a href="https://***REMOVED******REMOVED***.HTTPSHost***REMOVED******REMOVED***/serverpush">HTTP/2 with Server Push</a> | <a href="http://***REMOVED******REMOVED***.HTTPHost***REMOVED******REMOVED***/serverpush">HTTP only</a>
+<a href="https://{{.HTTPSHost}}/serverpush">HTTP/2 with Server Push</a> | <a href="http://{{.HTTPHost}}/serverpush">HTTP only</a>
 <div id="loadtimes"></div>
 
 </div>
@@ -78,9 +78,9 @@ Note: This page exists for demonstration purposes. For the actual cmd/go docs, g
 
 import "fmt"
 
-func main() ***REMOVED***
+func main() {
 	fmt.Println("Hello, 世界")
-***REMOVED***</textarea></div>
+}</textarea></div>
 	<div class="output"></div>
 	<div class="buttons">
 		<a class="run" title="Run this code [shift-enter]">Run</a>
@@ -771,7 +771,7 @@ The -f flag specifies an alternate format for the list, using the
 syntax of package template.  The default output is equivalent to -f
 &#39;&#39;. The struct being passed to the template is:
 </p>
-<pre>type Package struct ***REMOVED***
+<pre>type Package struct {
     Dir           string // directory containing package sources
     ImportPath    string // import path of package in dir
     ImportComment string // path in import comment on package statement
@@ -821,7 +821,7 @@ syntax of package template.  The default output is equivalent to -f
     Incomplete bool            // this package or a dependency has an error
     Error      *PackageError   // error loading package
     DepsErrors []*PackageError // errors loading dependencies
-***REMOVED***
+}
 </pre>
 <p>
 Packages stored in vendor directories report an ImportPath that includes the
@@ -833,11 +833,11 @@ expanded imports paths. See golang.org/s/go15vendor for more about vendoring.
 <p>
 The error information, if any, is
 </p>
-<pre>type PackageError struct ***REMOVED***
+<pre>type PackageError struct {
     ImportStack   []string // shortest path from package named on command line to this one
     Pos           string   // position of error (if present, file:line:col)
     Err           string   // the error itself
-***REMOVED***
+}
 </pre>
 <p>
 The template function &#34;join&#34; calls strings.Join.
@@ -845,7 +845,7 @@ The template function &#34;join&#34; calls strings.Join.
 <p>
 The template function &#34;context&#34; returns the build context, defined as:
 </p>
-<pre>type Context struct ***REMOVED***
+<pre>type Context struct {
 	GOARCH        string   // target architecture
 	GOOS          string   // target operating system
 	GOROOT        string   // Go root
@@ -856,7 +856,7 @@ The template function &#34;context&#34; returns the build context, defined as:
 	BuildTags     []string // build constraints to match in +build lines
 	ReleaseTags   []string // releases the current release is compatible with
 	InstallSuffix string   // suffix to use in the name of the install dir
-***REMOVED***
+}
 </pre>
 <p>
 For more information about the meaning of these fields see the documentation
@@ -1911,12 +1911,12 @@ in the &#34;*_test.go&#34; files corresponding to the package under test.
 A test function is one named TestXXX (where XXX is any alphanumeric string
 not starting with a lower case letter) and should have the signature,
 </p>
-<pre>func TestXXX(t *testing.T) ***REMOVED*** ... ***REMOVED***
+<pre>func TestXXX(t *testing.T) { ... }
 </pre>
 <p>
 A benchmark function is one named BenchmarkXXX and should have the signature,
 </p>
-<pre>func BenchmarkXXX(b *testing.B) ***REMOVED*** ... ***REMOVED***
+<pre>func BenchmarkXXX(b *testing.B) { ... }
 </pre>
 <p>
 An example function is similar to a test function but, instead of using
@@ -1938,26 +1938,26 @@ where xxx is a suffix not beginning with an upper case letter.
 <p>
 Here is an example of an example:
 </p>
-<pre>func ExamplePrintln() ***REMOVED***
+<pre>func ExamplePrintln() {
 	Println(&#34;The output of\nthis example.&#34;)
 	// Output: The output of
 	// this example.
-***REMOVED***
+}
 </pre>
 <p>
 Here is another example where the ordering of the output is ignored:
 </p>
-<pre>func ExamplePerm() ***REMOVED***
-	for _, value := range Perm(4) ***REMOVED***
+<pre>func ExamplePerm() {
+	for _, value := range Perm(4) {
 		fmt.Println(value)
-	***REMOVED***
+	}
 
 	// Unordered output: 4
 	// 2
 	// 1
 	// 3
 	// 0
-***REMOVED***
+}
 </pre>
 <p>
 The entire test file is presented as the example when it contains a single
@@ -1982,10 +1982,10 @@ and code is licensed under a <a href="/LICENSE">BSD license</a>.<br>
 </div><!-- #page -->
 
 <!-- TODO(adonovan): load these from <head> using "defer" attribute? -->
-<script type="text/javascript" src="/serverpush/static/jquery.min.js?***REMOVED******REMOVED***.CacheBust***REMOVED******REMOVED***"></script>
-<script type="text/javascript" src="/serverpush/static/playground.js?***REMOVED******REMOVED***.CacheBust***REMOVED******REMOVED***"></script>
+<script type="text/javascript" src="/serverpush/static/jquery.min.js?{{.CacheBust}}"></script>
+<script type="text/javascript" src="/serverpush/static/playground.js?{{.CacheBust}}"></script>
 <script>var goVersion = "go1.8";</script>
-<script type="text/javascript" src="/serverpush/static/godocs.js?***REMOVED******REMOVED***.CacheBust***REMOVED******REMOVED***"></script>
+<script type="text/javascript" src="/serverpush/static/godocs.js?{{.CacheBust}}"></script>
 </body>
 </html>
 `))

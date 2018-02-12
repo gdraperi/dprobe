@@ -26,7 +26,7 @@ const separatorByte byte = 255
 // Untyped, and Summary. Users can implement their own Metric types, but that
 // should be rarely needed. See the example for SelfCollector, which is also an
 // example for a user-implemented Metric.
-type Metric interface ***REMOVED***
+type Metric interface {
 	// Desc returns the descriptor for the Metric. This method idempotently
 	// returns the same descriptor throughout the lifetime of the
 	// Metric. The returned descriptor is immutable by contract. A Metric
@@ -51,7 +51,7 @@ type Metric interface ***REMOVED***
 	// While populating dto.Metric, labels must be sorted lexicographically.
 	// (Implementers may find LabelPairSorter useful for that.)
 	Write(*dto.Metric) error
-***REMOVED***
+}
 
 // Opts bundles the options for creating most Metric types. Each metric
 // implementation XXX has its own XXXOpts type, but in most cases, it is just be
@@ -59,7 +59,7 @@ type Metric interface ***REMOVED***
 //
 // It is mandatory to set Name and Help to a non-empty string. All other fields
 // are optional and can safely be left at their zero value.
-type Opts struct ***REMOVED***
+type Opts struct {
 	// Namespace, Subsystem, and Name are components of the fully-qualified
 	// name of the Metric (created by joining these components with
 	// "_"). Only Name is mandatory, the others merely help structuring the
@@ -94,7 +94,7 @@ type Opts struct ***REMOVED***
 	// that label most likely should not be a label at all (but part of the
 	// metric name).
 	ConstLabels Labels
-***REMOVED***
+}
 
 // BuildFQName joins the given three name components by "_". Empty name
 // components are ignored. If the name parameter itself is empty, an empty
@@ -103,64 +103,64 @@ type Opts struct ***REMOVED***
 // name from the name component in their Opts. Users of the library will only
 // need this function if they implement their own Metric or instantiate a Desc
 // (with NewDesc) directly.
-func BuildFQName(namespace, subsystem, name string) string ***REMOVED***
-	if name == "" ***REMOVED***
+func BuildFQName(namespace, subsystem, name string) string {
+	if name == "" {
 		return ""
-	***REMOVED***
-	switch ***REMOVED***
+	}
+	switch {
 	case namespace != "" && subsystem != "":
-		return strings.Join([]string***REMOVED***namespace, subsystem, name***REMOVED***, "_")
+		return strings.Join([]string{namespace, subsystem, name}, "_")
 	case namespace != "":
-		return strings.Join([]string***REMOVED***namespace, name***REMOVED***, "_")
+		return strings.Join([]string{namespace, name}, "_")
 	case subsystem != "":
-		return strings.Join([]string***REMOVED***subsystem, name***REMOVED***, "_")
-	***REMOVED***
+		return strings.Join([]string{subsystem, name}, "_")
+	}
 	return name
-***REMOVED***
+}
 
 // LabelPairSorter implements sort.Interface. It is used to sort a slice of
 // dto.LabelPair pointers. This is useful for implementing the Write method of
 // custom metrics.
 type LabelPairSorter []*dto.LabelPair
 
-func (s LabelPairSorter) Len() int ***REMOVED***
+func (s LabelPairSorter) Len() int {
 	return len(s)
-***REMOVED***
+}
 
-func (s LabelPairSorter) Swap(i, j int) ***REMOVED***
+func (s LabelPairSorter) Swap(i, j int) {
 	s[i], s[j] = s[j], s[i]
-***REMOVED***
+}
 
-func (s LabelPairSorter) Less(i, j int) bool ***REMOVED***
+func (s LabelPairSorter) Less(i, j int) bool {
 	return s[i].GetName() < s[j].GetName()
-***REMOVED***
+}
 
 type hashSorter []uint64
 
-func (s hashSorter) Len() int ***REMOVED***
+func (s hashSorter) Len() int {
 	return len(s)
-***REMOVED***
+}
 
-func (s hashSorter) Swap(i, j int) ***REMOVED***
+func (s hashSorter) Swap(i, j int) {
 	s[i], s[j] = s[j], s[i]
-***REMOVED***
+}
 
-func (s hashSorter) Less(i, j int) bool ***REMOVED***
+func (s hashSorter) Less(i, j int) bool {
 	return s[i] < s[j]
-***REMOVED***
+}
 
-type invalidMetric struct ***REMOVED***
+type invalidMetric struct {
 	desc *Desc
 	err  error
-***REMOVED***
+}
 
 // NewInvalidMetric returns a metric whose Write method always returns the
 // provided error. It is useful if a Collector finds itself unable to collect
 // a metric and wishes to report an error to the registry.
-func NewInvalidMetric(desc *Desc, err error) Metric ***REMOVED***
-	return &invalidMetric***REMOVED***desc, err***REMOVED***
-***REMOVED***
+func NewInvalidMetric(desc *Desc, err error) Metric {
+	return &invalidMetric{desc, err}
+}
 
-func (m *invalidMetric) Desc() *Desc ***REMOVED*** return m.desc ***REMOVED***
+func (m *invalidMetric) Desc() *Desc { return m.desc }
 
-func (m *invalidMetric) Write(*dto.Metric) error ***REMOVED*** return m.err ***REMOVED***
+func (m *invalidMetric) Write(*dto.Metric) error { return m.err }

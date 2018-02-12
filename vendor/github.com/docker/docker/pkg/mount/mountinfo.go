@@ -2,7 +2,7 @@ package mount
 
 // Info reveals information about a particular mounted filesystem. This
 // struct is populated from the content in the /proc/<pid>/mountinfo file.
-type Info struct ***REMOVED***
+type Info struct {
 	// ID is a unique identifier of the mount (may be reused after umount).
 	ID int
 
@@ -37,18 +37,18 @@ type Info struct ***REMOVED***
 
 	// VfsOpts represents per super block options.
 	VfsOpts string
-***REMOVED***
+}
 
 type byMountpoint []*Info
 
-func (by byMountpoint) Len() int ***REMOVED***
+func (by byMountpoint) Len() int {
 	return len(by)
-***REMOVED***
+}
 
-func (by byMountpoint) Less(i, j int) bool ***REMOVED***
+func (by byMountpoint) Less(i, j int) bool {
 	return by[i].Mountpoint < by[j].Mountpoint
-***REMOVED***
+}
 
-func (by byMountpoint) Swap(i, j int) ***REMOVED***
+func (by byMountpoint) Swap(i, j int) {
 	by[i], by[j] = by[j], by[i]
-***REMOVED***
+}

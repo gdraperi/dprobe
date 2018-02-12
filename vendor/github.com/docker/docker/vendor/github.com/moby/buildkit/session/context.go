@@ -6,17 +6,17 @@ type contextKeyT string
 
 var contextKey = contextKeyT("buildkit/session-id")
 
-func NewContext(ctx context.Context, id string) context.Context ***REMOVED***
-	if id != "" ***REMOVED***
+func NewContext(ctx context.Context, id string) context.Context {
+	if id != "" {
 		return context.WithValue(ctx, contextKey, id)
-	***REMOVED***
+	}
 	return ctx
-***REMOVED***
+}
 
-func FromContext(ctx context.Context) string ***REMOVED***
+func FromContext(ctx context.Context) string {
 	v := ctx.Value(contextKey)
-	if v == nil ***REMOVED***
+	if v == nil {
 		return ""
-	***REMOVED***
+	}
 	return v.(string)
-***REMOVED***
+}

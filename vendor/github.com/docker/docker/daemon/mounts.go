@@ -9,31 +9,31 @@ import (
 	volumestore "github.com/docker/docker/volume/store"
 )
 
-func (daemon *Daemon) prepareMountPoints(container *container.Container) error ***REMOVED***
-	for _, config := range container.MountPoints ***REMOVED***
-		if err := daemon.lazyInitializeVolume(container.ID, config); err != nil ***REMOVED***
+func (daemon *Daemon) prepareMountPoints(container *container.Container) error {
+	for _, config := range container.MountPoints {
+		if err := daemon.lazyInitializeVolume(container.ID, config); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func (daemon *Daemon) removeMountPoints(container *container.Container, rm bool) error ***REMOVED***
+func (daemon *Daemon) removeMountPoints(container *container.Container, rm bool) error {
 	var rmErrors []string
-	for _, m := range container.MountPoints ***REMOVED***
-		if m.Type != mounttypes.TypeVolume || m.Volume == nil ***REMOVED***
+	for _, m := range container.MountPoints {
+		if m.Type != mounttypes.TypeVolume || m.Volume == nil {
 			continue
-		***REMOVED***
+		}
 		daemon.volumes.Dereference(m.Volume, container.ID)
-		if !rm ***REMOVED***
+		if !rm {
 			continue
-		***REMOVED***
+		}
 
 		// Do not remove named mountpoints
 		// these are mountpoints specified like `docker run -v <name>:/foo`
-		if m.Spec.Source != "" ***REMOVED***
+		if m.Spec.Source != "" {
 			continue
-		***REMOVED***
+		}
 
 		err := daemon.volumes.Remove(m.Volume)
 		// Ignore volume in use errors because having this
@@ -41,13 +41,13 @@ func (daemon *Daemon) removeMountPoints(container *container.Container, rm bool)
 		// not an error, but an implementation detail.
 		// This prevents docker from logging "ERROR: Volume in use"
 		// where there is another container using the volume.
-		if err != nil && !volumestore.IsInUse(err) ***REMOVED***
+		if err != nil && !volumestore.IsInUse(err) {
 			rmErrors = append(rmErrors, err.Error())
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if len(rmErrors) > 0 ***REMOVED***
+	if len(rmErrors) > 0 {
 		return fmt.Errorf("Error removing volumes:\n%v", strings.Join(rmErrors, "\n"))
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

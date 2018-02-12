@@ -3,10 +3,10 @@ layout:
   models:
     - name: definition
       source: asset:model
-      target: "***REMOVED******REMOVED*** joinFilePath .Target .ModelPackage ***REMOVED******REMOVED***"
-      file_name: "***REMOVED******REMOVED*** (snakize (pascalize .Name)) ***REMOVED******REMOVED***.go"
+      target: "{{ joinFilePath .Target .ModelPackage }}"
+      file_name: "{{ (snakize (pascalize .Name)) }}.go"
   operations:
     - name: handler
       source: asset:serverOperation
-      target: "***REMOVED******REMOVED*** joinFilePath .Target .APIPackage .Package ***REMOVED******REMOVED***"
-      file_name: "***REMOVED******REMOVED*** (snakize (pascalize .Name)) ***REMOVED******REMOVED***.go"
+      target: "{{ joinFilePath .Target .APIPackage .Package }}"
+      file_name: "{{ (snakize (pascalize .Name)) }}.go"

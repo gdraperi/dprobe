@@ -15,17 +15,17 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func defaultFSStoreBackend(t *testing.T) (StoreBackend, func()) ***REMOVED***
+func defaultFSStoreBackend(t *testing.T) (StoreBackend, func()) {
 	tmpdir, err := ioutil.TempDir("", "images-fs-store")
 	assert.NoError(t, err)
 
 	fsBackend, err := NewFSStoreBackend(tmpdir)
 	assert.NoError(t, err)
 
-	return fsBackend, func() ***REMOVED*** os.RemoveAll(tmpdir) ***REMOVED***
-***REMOVED***
+	return fsBackend, func() { os.RemoveAll(tmpdir) }
+}
 
-func TestFSGetInvalidData(t *testing.T) ***REMOVED***
+func TestFSGetInvalidData(t *testing.T) {
 	store, cleanup := defaultFSStoreBackend(t)
 	defer cleanup()
 
@@ -39,9 +39,9 @@ func TestFSGetInvalidData(t *testing.T) ***REMOVED***
 
 	_, err = store.Get(id)
 	testutil.ErrorContains(t, err, "failed to verify")
-***REMOVED***
+}
 
-func TestFSInvalidSet(t *testing.T) ***REMOVED***
+func TestFSInvalidSet(t *testing.T) {
 	store, cleanup := defaultFSStoreBackend(t)
 	defer cleanup()
 
@@ -51,22 +51,22 @@ func TestFSInvalidSet(t *testing.T) ***REMOVED***
 
 	_, err = store.Set([]byte("foobar"))
 	testutil.ErrorContains(t, err, "failed to write digest data")
-***REMOVED***
+}
 
-func TestFSInvalidRoot(t *testing.T) ***REMOVED***
+func TestFSInvalidRoot(t *testing.T) {
 	tmpdir, err := ioutil.TempDir("", "images-fs-store")
 	assert.NoError(t, err)
 	defer os.RemoveAll(tmpdir)
 
-	tcases := []struct ***REMOVED***
+	tcases := []struct {
 		root, invalidFile string
-	***REMOVED******REMOVED***
-		***REMOVED***"root", "root"***REMOVED***,
-		***REMOVED***"root", "root/content"***REMOVED***,
-		***REMOVED***"root", "root/metadata"***REMOVED***,
-	***REMOVED***
+	}{
+		{"root", "root"},
+		{"root", "root/content"},
+		{"root", "root/metadata"},
+	}
 
-	for _, tc := range tcases ***REMOVED***
+	for _, tc := range tcases {
 		root := filepath.Join(tmpdir, tc.root)
 		filePath := filepath.Join(tmpdir, tc.invalidFile)
 		err := os.MkdirAll(filepath.Dir(filePath), 0700)
@@ -80,11 +80,11 @@ func TestFSInvalidRoot(t *testing.T) ***REMOVED***
 		testutil.ErrorContains(t, err, "failed to create storage backend")
 
 		os.RemoveAll(root)
-	***REMOVED***
+	}
 
-***REMOVED***
+}
 
-func TestFSMetadataGetSet(t *testing.T) ***REMOVED***
+func TestFSMetadataGetSet(t *testing.T) {
 	store, cleanup := defaultFSStoreBackend(t)
 	defer cleanup()
 
@@ -94,17 +94,17 @@ func TestFSMetadataGetSet(t *testing.T) ***REMOVED***
 	id2, err := store.Set([]byte("bar"))
 	assert.NoError(t, err)
 
-	tcases := []struct ***REMOVED***
+	tcases := []struct {
 		id    digest.Digest
 		key   string
 		value []byte
-	***REMOVED******REMOVED***
-		***REMOVED***id, "tkey", []byte("tval1")***REMOVED***,
-		***REMOVED***id, "tkey2", []byte("tval2")***REMOVED***,
-		***REMOVED***id2, "tkey", []byte("tval3")***REMOVED***,
-	***REMOVED***
+	}{
+		{id, "tkey", []byte("tval1")},
+		{id, "tkey2", []byte("tval2")},
+		{id2, "tkey", []byte("tval3")},
+	}
 
-	for _, tc := range tcases ***REMOVED***
+	for _, tc := range tcases {
 		err = store.SetMetadata(tc.id, tc.key, tc.value)
 		assert.NoError(t, err)
 
@@ -112,7 +112,7 @@ func TestFSMetadataGetSet(t *testing.T) ***REMOVED***
 		assert.NoError(t, err)
 
 		assert.Equal(t, tc.value, actual)
-	***REMOVED***
+	}
 
 	_, err = store.GetMetadata(id2, "tkey2")
 	testutil.ErrorContains(t, err, "failed to read metadata")
@@ -123,9 +123,9 @@ func TestFSMetadataGetSet(t *testing.T) ***REMOVED***
 
 	_, err = store.GetMetadata(id3, "tkey")
 	testutil.ErrorContains(t, err, "failed to get digest")
-***REMOVED***
+}
 
-func TestFSInvalidWalker(t *testing.T) ***REMOVED***
+func TestFSInvalidWalker(t *testing.T) {
 	store, cleanup := defaultFSStoreBackend(t)
 	defer cleanup()
 
@@ -136,26 +136,26 @@ func TestFSInvalidWalker(t *testing.T) ***REMOVED***
 	assert.NoError(t, err)
 
 	n := 0
-	err = store.Walk(func(id digest.Digest) error ***REMOVED***
+	err = store.Walk(func(id digest.Digest) error {
 		assert.Equal(t, fooID, id)
 		n++
 		return nil
-	***REMOVED***)
+	})
 	assert.NoError(t, err)
 	assert.Equal(t, 1, n)
-***REMOVED***
+}
 
-func TestFSGetSet(t *testing.T) ***REMOVED***
+func TestFSGetSet(t *testing.T) {
 	store, cleanup := defaultFSStoreBackend(t)
 	defer cleanup()
 
-	type tcase struct ***REMOVED***
+	type tcase struct {
 		input    []byte
 		expected digest.Digest
-	***REMOVED***
-	tcases := []tcase***REMOVED***
-		***REMOVED***[]byte("foobar"), digest.Digest("sha256:c3ab8ff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f2")***REMOVED***,
-	***REMOVED***
+	}
+	tcases := []tcase{
+		{[]byte("foobar"), digest.Digest("sha256:c3ab8ff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f2")},
+	}
 
 	randomInput := make([]byte, 8*1024)
 	_, err := rand.Read(randomInput)
@@ -166,45 +166,45 @@ func TestFSGetSet(t *testing.T) ***REMOVED***
 	_, err = h.Write(randomInput)
 	assert.NoError(t, err)
 
-	tcases = append(tcases, tcase***REMOVED***
+	tcases = append(tcases, tcase{
 		input:    randomInput,
 		expected: digest.Digest("sha256:" + hex.EncodeToString(h.Sum(nil))),
-	***REMOVED***)
+	})
 
-	for _, tc := range tcases ***REMOVED***
+	for _, tc := range tcases {
 		id, err := store.Set([]byte(tc.input))
 		assert.NoError(t, err)
 		assert.Equal(t, tc.expected, id)
-	***REMOVED***
+	}
 
-	for _, tc := range tcases ***REMOVED***
+	for _, tc := range tcases {
 		data, err := store.Get(tc.expected)
 		assert.NoError(t, err)
 		assert.Equal(t, tc.input, data)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestFSGetUnsetKey(t *testing.T) ***REMOVED***
+func TestFSGetUnsetKey(t *testing.T) {
 	store, cleanup := defaultFSStoreBackend(t)
 	defer cleanup()
 
-	for _, key := range []digest.Digest***REMOVED***"foobar:abc", "sha256:abc", "sha256:c3ab8ff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f2a"***REMOVED*** ***REMOVED***
+	for _, key := range []digest.Digest{"foobar:abc", "sha256:abc", "sha256:c3ab8ff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f2a"} {
 		_, err := store.Get(key)
 		testutil.ErrorContains(t, err, "failed to get digest")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestFSGetEmptyData(t *testing.T) ***REMOVED***
+func TestFSGetEmptyData(t *testing.T) {
 	store, cleanup := defaultFSStoreBackend(t)
 	defer cleanup()
 
-	for _, emptyData := range [][]byte***REMOVED***nil, ***REMOVED******REMOVED******REMOVED*** ***REMOVED***
+	for _, emptyData := range [][]byte{nil, {}} {
 		_, err := store.Set(emptyData)
 		testutil.ErrorContains(t, err, "invalid empty data")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestFSDelete(t *testing.T) ***REMOVED***
+func TestFSDelete(t *testing.T) {
 	store, cleanup := defaultFSStoreBackend(t)
 	defer cleanup()
 
@@ -228,9 +228,9 @@ func TestFSDelete(t *testing.T) ***REMOVED***
 
 	_, err = store.Get(id2)
 	testutil.ErrorContains(t, err, "failed to get digest")
-***REMOVED***
+}
 
-func TestFSWalker(t *testing.T) ***REMOVED***
+func TestFSWalker(t *testing.T) {
 	store, cleanup := defaultFSStoreBackend(t)
 	defer cleanup()
 
@@ -240,31 +240,31 @@ func TestFSWalker(t *testing.T) ***REMOVED***
 	id2, err := store.Set([]byte("bar"))
 	assert.NoError(t, err)
 
-	tcases := make(map[digest.Digest]struct***REMOVED******REMOVED***)
-	tcases[id] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	tcases[id2] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
+	tcases := make(map[digest.Digest]struct{})
+	tcases[id] = struct{}{}
+	tcases[id2] = struct{}{}
 	n := 0
-	err = store.Walk(func(id digest.Digest) error ***REMOVED***
+	err = store.Walk(func(id digest.Digest) error {
 		delete(tcases, id)
 		n++
 		return nil
-	***REMOVED***)
+	})
 	assert.NoError(t, err)
 	assert.Equal(t, 2, n)
 	assert.Len(t, tcases, 0)
-***REMOVED***
+}
 
-func TestFSWalkerStopOnError(t *testing.T) ***REMOVED***
+func TestFSWalkerStopOnError(t *testing.T) {
 	store, cleanup := defaultFSStoreBackend(t)
 	defer cleanup()
 
 	id, err := store.Set([]byte("foo"))
 	assert.NoError(t, err)
 
-	tcases := make(map[digest.Digest]struct***REMOVED******REMOVED***)
-	tcases[id] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	err = store.Walk(func(id digest.Digest) error ***REMOVED***
+	tcases := make(map[digest.Digest]struct{})
+	tcases[id] = struct{}{}
+	err = store.Walk(func(id digest.Digest) error {
 		return errors.New("what")
-	***REMOVED***)
+	})
 	testutil.ErrorContains(t, err, "what")
-***REMOVED***
+}

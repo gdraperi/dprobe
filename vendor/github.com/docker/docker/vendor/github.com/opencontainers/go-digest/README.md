@@ -26,9 +26,9 @@ another.
 An identifying digest can be verified, as follows:
 
 ```go
-if id != digest.FromBytes([]byte("my content")) ***REMOVED***
+if id != digest.FromBytes([]byte("my content")) {
   return errors.New("the content has changed!")
-***REMOVED***
+}
 ```
 
 A `Verifier` type can be used to handle cases where an `io.Reader`
@@ -39,9 +39,9 @@ rd := getContent()
 verifier := id.Verifier()
 io.Copy(verifier, rd)
 
-if !verifier.Verified() ***REMOVED***
+if !verifier.Verified() {
   return errors.New("the content has changed!")
-***REMOVED***
+}
 ```
 
 Using [Merkle DAGs](https://en.wikipedia.org/wiki/Merkle_tree), this

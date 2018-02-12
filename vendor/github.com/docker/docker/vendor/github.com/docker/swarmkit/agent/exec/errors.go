@@ -32,51 +32,51 @@ var (
 )
 
 // ExitCoder is implemented by errors that have an exit code.
-type ExitCoder interface ***REMOVED***
+type ExitCoder interface {
 	// ExitCode returns the exit code.
 	ExitCode() int
-***REMOVED***
+}
 
 // Temporary indicates whether or not the error condition is temporary.
 //
 // If this is encountered in the controller, the failing operation will be
 // retried when this returns true. Otherwise, the operation is considered
 // fatal.
-type Temporary interface ***REMOVED***
+type Temporary interface {
 	Temporary() bool
-***REMOVED***
+}
 
 // MakeTemporary makes the error temporary.
-func MakeTemporary(err error) error ***REMOVED***
-	if IsTemporary(err) ***REMOVED***
+func MakeTemporary(err error) error {
+	if IsTemporary(err) {
 		return err
-	***REMOVED***
+	}
 
-	return temporary***REMOVED***err***REMOVED***
-***REMOVED***
+	return temporary{err}
+}
 
-type temporary struct ***REMOVED***
+type temporary struct {
 	error
-***REMOVED***
+}
 
-func (t temporary) Cause() error    ***REMOVED*** return t.error ***REMOVED***
-func (t temporary) Temporary() bool ***REMOVED*** return true ***REMOVED***
+func (t temporary) Cause() error    { return t.error }
+func (t temporary) Temporary() bool { return true }
 
 // IsTemporary returns true if the error or a recursive cause returns true for
 // temporary.
-func IsTemporary(err error) bool ***REMOVED***
-	for err != nil ***REMOVED***
-		if tmp, ok := err.(Temporary); ok && tmp.Temporary() ***REMOVED***
+func IsTemporary(err error) bool {
+	for err != nil {
+		if tmp, ok := err.(Temporary); ok && tmp.Temporary() {
 			return true
-		***REMOVED***
+		}
 
 		cause := errors.Cause(err)
-		if cause == err ***REMOVED***
+		if cause == err {
 			break
-		***REMOVED***
+		}
 
 		err = cause
-	***REMOVED***
+	}
 
 	return false
-***REMOVED***
+}

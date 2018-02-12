@@ -13,15 +13,15 @@ import (
 	"golang.org/x/crypto/nacl/secretbox"
 )
 
-func Example() ***REMOVED***
+func Example() {
 	// Load your secret key from a safe place and reuse it across multiple
 	// Seal calls. (Obviously don't use this example key for anything
 	// real.) If you want to convert a passphrase to a key, use a suitable
 	// package like bcrypt or scrypt.
 	secretKeyBytes, err := hex.DecodeString("6368616e676520746869732070617373776f726420746f206120736563726574")
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 
 	var secretKey [32]byte
 	copy(secretKey[:], secretKeyBytes)
@@ -30,9 +30,9 @@ func Example() ***REMOVED***
 	// same key. Since the nonce here is 192 bits long, a random value
 	// provides a sufficiently small probability of repeats.
 	var nonce [24]byte
-	if _, err := io.ReadFull(rand.Reader, nonce[:]); err != nil ***REMOVED***
+	if _, err := io.ReadFull(rand.Reader, nonce[:]); err != nil {
 		panic(err)
-	***REMOVED***
+	}
 
 	// This encrypts "hello world" and appends the result to the nonce.
 	encrypted := secretbox.Seal(nonce[:], []byte("hello world"), &nonce, &secretKey)
@@ -44,10 +44,10 @@ func Example() ***REMOVED***
 	var decryptNonce [24]byte
 	copy(decryptNonce[:], encrypted[:24])
 	decrypted, ok := secretbox.Open(nil, encrypted[24:], &decryptNonce, &secretKey)
-	if !ok ***REMOVED***
+	if !ok {
 		panic("decryption error")
-	***REMOVED***
+	}
 
 	fmt.Println(string(decrypted))
 	// Output: hello world
-***REMOVED***
+}

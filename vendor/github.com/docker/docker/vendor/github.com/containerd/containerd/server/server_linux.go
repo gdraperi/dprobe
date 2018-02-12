@@ -11,34 +11,34 @@ import (
 )
 
 // apply sets config settings on the server process
-func apply(ctx context.Context, config *Config) error ***REMOVED***
-	if !config.NoSubreaper ***REMOVED***
+func apply(ctx context.Context, config *Config) error {
+	if !config.NoSubreaper {
 		log.G(ctx).Info("setting subreaper...")
-		if err := sys.SetSubreaper(1); err != nil ***REMOVED***
+		if err := sys.SetSubreaper(1); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
-	if config.OOMScore != 0 ***REMOVED***
+		}
+	}
+	if config.OOMScore != 0 {
 		log.G(ctx).Debugf("changing OOM score to %d", config.OOMScore)
-		if err := sys.SetOOMScore(os.Getpid(), config.OOMScore); err != nil ***REMOVED***
+		if err := sys.SetOOMScore(os.Getpid(), config.OOMScore); err != nil {
 			log.G(ctx).WithError(err).Errorf("failed to change OOM score to %d", config.OOMScore)
-		***REMOVED***
-	***REMOVED***
-	if config.Cgroup.Path != "" ***REMOVED***
+		}
+	}
+	if config.Cgroup.Path != "" {
 		cg, err := cgroups.Load(cgroups.V1, cgroups.StaticPath(config.Cgroup.Path))
-		if err != nil ***REMOVED***
-			if err != cgroups.ErrCgroupDeleted ***REMOVED***
+		if err != nil {
+			if err != cgroups.ErrCgroupDeleted {
 				return err
-			***REMOVED***
-			if cg, err = cgroups.New(cgroups.V1, cgroups.StaticPath(config.Cgroup.Path), &specs.LinuxResources***REMOVED******REMOVED***); err != nil ***REMOVED***
+			}
+			if cg, err = cgroups.New(cgroups.V1, cgroups.StaticPath(config.Cgroup.Path), &specs.LinuxResources{}); err != nil {
 				return err
-			***REMOVED***
-		***REMOVED***
-		if err := cg.Add(cgroups.Process***REMOVED***
+			}
+		}
+		if err := cg.Add(cgroups.Process{
 			Pid: os.Getpid(),
-		***REMOVED***); err != nil ***REMOVED***
+		}); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}

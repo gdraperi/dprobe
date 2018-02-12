@@ -22,39 +22,39 @@ const (
 )
 
 // Decimal formats a number as a floating point decimal.
-func Decimal(x interface***REMOVED******REMOVED***, opts ...Option) Formatter ***REMOVED***
+func Decimal(x interface{}, opts ...Option) Formatter {
 	return newFormatter(decimalOptions, opts, x)
-***REMOVED***
+}
 
 var decimalOptions = newOptions(decimalVerbs, (*number.Formatter).InitDecimal)
 
 // Scientific formats a number in scientific format.
-func Scientific(x interface***REMOVED******REMOVED***, opts ...Option) Formatter ***REMOVED***
+func Scientific(x interface{}, opts ...Option) Formatter {
 	return newFormatter(scientificOptions, opts, x)
-***REMOVED***
+}
 
 var scientificOptions = newOptions(scientificVerbs, (*number.Formatter).InitScientific)
 
 // Engineering formats a number using engineering notation, which is like
 // scientific notation, but with the exponent normalized to multiples of 3.
-func Engineering(x interface***REMOVED******REMOVED***, opts ...Option) Formatter ***REMOVED***
+func Engineering(x interface{}, opts ...Option) Formatter {
 	return newFormatter(engineeringOptions, opts, x)
-***REMOVED***
+}
 
 var engineeringOptions = newOptions(scientificVerbs, (*number.Formatter).InitEngineering)
 
 // Percent formats a number as a percentage. A value of 1.0 means 100%.
-func Percent(x interface***REMOVED******REMOVED***, opts ...Option) Formatter ***REMOVED***
+func Percent(x interface{}, opts ...Option) Formatter {
 	return newFormatter(percentOptions, opts, x)
-***REMOVED***
+}
 
 var percentOptions = newOptions(decimalVerbs, (*number.Formatter).InitPercent)
 
 // PerMille formats a number as a per mille indication. A value of 1.0 means
 // 1000‰.
-func PerMille(x interface***REMOVED******REMOVED***, opts ...Option) Formatter ***REMOVED***
+func PerMille(x interface{}, opts ...Option) Formatter {
 	return newFormatter(perMilleOptions, opts, x)
-***REMOVED***
+}
 
 var perMilleOptions = newOptions(decimalVerbs, (*number.Formatter).InitPerMille)
 

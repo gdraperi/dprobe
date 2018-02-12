@@ -12,10 +12,10 @@ var (
 )
 
 // Mounted checks if the given path is mounted as the fs type
-func Mounted(fsType FsMagic, mountPath string) (bool, error) ***REMOVED***
+func Mounted(fsType FsMagic, mountPath string) (bool, error) {
 	var buf unix.Statfs_t
-	if err := syscall.Statfs(mountPath, &buf); err != nil ***REMOVED***
+	if err := syscall.Statfs(mountPath, &buf); err != nil {
 		return false, err
-	***REMOVED***
+	}
 	return FsMagic(buf.Type) == fsType, nil
-***REMOVED***
+}

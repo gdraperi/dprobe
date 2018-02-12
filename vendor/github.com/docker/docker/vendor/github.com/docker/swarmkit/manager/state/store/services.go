@@ -10,229 +10,229 @@ import (
 
 const tableService = "service"
 
-func init() ***REMOVED***
-	register(ObjectStoreConfig***REMOVED***
-		Table: &memdb.TableSchema***REMOVED***
+func init() {
+	register(ObjectStoreConfig{
+		Table: &memdb.TableSchema{
 			Name: tableService,
-			Indexes: map[string]*memdb.IndexSchema***REMOVED***
-				indexID: ***REMOVED***
+			Indexes: map[string]*memdb.IndexSchema{
+				indexID: {
 					Name:    indexID,
 					Unique:  true,
-					Indexer: api.ServiceIndexerByID***REMOVED******REMOVED***,
-				***REMOVED***,
-				indexName: ***REMOVED***
+					Indexer: api.ServiceIndexerByID{},
+				},
+				indexName: {
 					Name:    indexName,
 					Unique:  true,
-					Indexer: api.ServiceIndexerByName***REMOVED******REMOVED***,
-				***REMOVED***,
-				indexRuntime: ***REMOVED***
+					Indexer: api.ServiceIndexerByName{},
+				},
+				indexRuntime: {
 					Name:         indexRuntime,
 					AllowMissing: true,
-					Indexer:      serviceIndexerByRuntime***REMOVED******REMOVED***,
-				***REMOVED***,
-				indexNetwork: ***REMOVED***
+					Indexer:      serviceIndexerByRuntime{},
+				},
+				indexNetwork: {
 					Name:         indexNetwork,
 					AllowMissing: true,
-					Indexer:      serviceIndexerByNetwork***REMOVED******REMOVED***,
-				***REMOVED***,
-				indexSecret: ***REMOVED***
+					Indexer:      serviceIndexerByNetwork{},
+				},
+				indexSecret: {
 					Name:         indexSecret,
 					AllowMissing: true,
-					Indexer:      serviceIndexerBySecret***REMOVED******REMOVED***,
-				***REMOVED***,
-				indexConfig: ***REMOVED***
+					Indexer:      serviceIndexerBySecret{},
+				},
+				indexConfig: {
 					Name:         indexConfig,
 					AllowMissing: true,
-					Indexer:      serviceIndexerByConfig***REMOVED******REMOVED***,
-				***REMOVED***,
-				indexCustom: ***REMOVED***
+					Indexer:      serviceIndexerByConfig{},
+				},
+				indexCustom: {
 					Name:         indexCustom,
-					Indexer:      api.ServiceCustomIndexer***REMOVED******REMOVED***,
+					Indexer:      api.ServiceCustomIndexer{},
 					AllowMissing: true,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		Save: func(tx ReadTx, snapshot *api.StoreSnapshot) error ***REMOVED***
+				},
+			},
+		},
+		Save: func(tx ReadTx, snapshot *api.StoreSnapshot) error {
 			var err error
 			snapshot.Services, err = FindServices(tx, All)
 			return err
-		***REMOVED***,
-		Restore: func(tx Tx, snapshot *api.StoreSnapshot) error ***REMOVED***
+		},
+		Restore: func(tx Tx, snapshot *api.StoreSnapshot) error {
 			toStoreObj := make([]api.StoreObject, len(snapshot.Services))
-			for i, x := range snapshot.Services ***REMOVED***
+			for i, x := range snapshot.Services {
 				toStoreObj[i] = x
-			***REMOVED***
+			}
 			return RestoreTable(tx, tableService, toStoreObj)
-		***REMOVED***,
-		ApplyStoreAction: func(tx Tx, sa api.StoreAction) error ***REMOVED***
-			switch v := sa.Target.(type) ***REMOVED***
+		},
+		ApplyStoreAction: func(tx Tx, sa api.StoreAction) error {
+			switch v := sa.Target.(type) {
 			case *api.StoreAction_Service:
 				obj := v.Service
-				switch sa.Action ***REMOVED***
+				switch sa.Action {
 				case api.StoreActionKindCreate:
 					return CreateService(tx, obj)
 				case api.StoreActionKindUpdate:
 					return UpdateService(tx, obj)
 				case api.StoreActionKindRemove:
 					return DeleteService(tx, obj.ID)
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return errUnknownStoreAction
-		***REMOVED***,
-	***REMOVED***)
-***REMOVED***
+		},
+	})
+}
 
 // CreateService adds a new service to the store.
 // Returns ErrExist if the ID is already taken.
-func CreateService(tx Tx, s *api.Service) error ***REMOVED***
+func CreateService(tx Tx, s *api.Service) error {
 	// Ensure the name is not already in use.
-	if tx.lookup(tableService, indexName, strings.ToLower(s.Spec.Annotations.Name)) != nil ***REMOVED***
+	if tx.lookup(tableService, indexName, strings.ToLower(s.Spec.Annotations.Name)) != nil {
 		return ErrNameConflict
-	***REMOVED***
+	}
 
 	return tx.create(tableService, s)
-***REMOVED***
+}
 
 // UpdateService updates an existing service in the store.
 // Returns ErrNotExist if the service doesn't exist.
-func UpdateService(tx Tx, s *api.Service) error ***REMOVED***
+func UpdateService(tx Tx, s *api.Service) error {
 	// Ensure the name is either not in use or already used by this same Service.
-	if existing := tx.lookup(tableService, indexName, strings.ToLower(s.Spec.Annotations.Name)); existing != nil ***REMOVED***
-		if existing.GetID() != s.ID ***REMOVED***
+	if existing := tx.lookup(tableService, indexName, strings.ToLower(s.Spec.Annotations.Name)); existing != nil {
+		if existing.GetID() != s.ID {
 			return ErrNameConflict
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return tx.update(tableService, s)
-***REMOVED***
+}
 
 // DeleteService removes a service from the store.
 // Returns ErrNotExist if the service doesn't exist.
-func DeleteService(tx Tx, id string) error ***REMOVED***
+func DeleteService(tx Tx, id string) error {
 	return tx.delete(tableService, id)
-***REMOVED***
+}
 
 // GetService looks up a service by ID.
 // Returns nil if the service doesn't exist.
-func GetService(tx ReadTx, id string) *api.Service ***REMOVED***
+func GetService(tx ReadTx, id string) *api.Service {
 	s := tx.get(tableService, id)
-	if s == nil ***REMOVED***
+	if s == nil {
 		return nil
-	***REMOVED***
+	}
 	return s.(*api.Service)
-***REMOVED***
+}
 
 // FindServices selects a set of services and returns them.
-func FindServices(tx ReadTx, by By) ([]*api.Service, error) ***REMOVED***
-	checkType := func(by By) error ***REMOVED***
-		switch by.(type) ***REMOVED***
+func FindServices(tx ReadTx, by By) ([]*api.Service, error) {
+	checkType := func(by By) error {
+		switch by.(type) {
 		case byName, byNamePrefix, byIDPrefix, byRuntime, byReferencedNetworkID, byReferencedSecretID, byReferencedConfigID, byCustom, byCustomPrefix:
 			return nil
 		default:
 			return ErrInvalidFindBy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	serviceList := []*api.Service***REMOVED******REMOVED***
-	appendResult := func(o api.StoreObject) ***REMOVED***
+	serviceList := []*api.Service{}
+	appendResult := func(o api.StoreObject) {
 		serviceList = append(serviceList, o.(*api.Service))
-	***REMOVED***
+	}
 
 	err := tx.find(tableService, by, checkType, appendResult)
 	return serviceList, err
-***REMOVED***
+}
 
-type serviceIndexerByRuntime struct***REMOVED******REMOVED***
+type serviceIndexerByRuntime struct{}
 
-func (si serviceIndexerByRuntime) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (si serviceIndexerByRuntime) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
+}
 
-func (si serviceIndexerByRuntime) FromObject(obj interface***REMOVED******REMOVED***) (bool, []byte, error) ***REMOVED***
+func (si serviceIndexerByRuntime) FromObject(obj interface{}) (bool, []byte, error) {
 	s := obj.(*api.Service)
 	r, err := naming.Runtime(s.Spec.Task)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return false, nil, nil
-	***REMOVED***
+	}
 	return true, []byte(r + "\x00"), nil
-***REMOVED***
+}
 
-func (si serviceIndexerByRuntime) PrefixFromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (si serviceIndexerByRuntime) PrefixFromArgs(args ...interface{}) ([]byte, error) {
 	return prefixFromArgs(args...)
-***REMOVED***
+}
 
-type serviceIndexerByNetwork struct***REMOVED******REMOVED***
+type serviceIndexerByNetwork struct{}
 
-func (si serviceIndexerByNetwork) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (si serviceIndexerByNetwork) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
+}
 
-func (si serviceIndexerByNetwork) FromObject(obj interface***REMOVED******REMOVED***) (bool, [][]byte, error) ***REMOVED***
+func (si serviceIndexerByNetwork) FromObject(obj interface{}) (bool, [][]byte, error) {
 	s := obj.(*api.Service)
 
 	var networkIDs [][]byte
 
 	specNetworks := s.Spec.Task.Networks
 
-	if len(specNetworks) == 0 ***REMOVED***
+	if len(specNetworks) == 0 {
 		specNetworks = s.Spec.Networks
-	***REMOVED***
+	}
 
-	for _, na := range specNetworks ***REMOVED***
+	for _, na := range specNetworks {
 		// Add the null character as a terminator
 		networkIDs = append(networkIDs, []byte(na.Target+"\x00"))
-	***REMOVED***
+	}
 
 	return len(networkIDs) != 0, networkIDs, nil
-***REMOVED***
+}
 
-type serviceIndexerBySecret struct***REMOVED******REMOVED***
+type serviceIndexerBySecret struct{}
 
-func (si serviceIndexerBySecret) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (si serviceIndexerBySecret) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
+}
 
-func (si serviceIndexerBySecret) FromObject(obj interface***REMOVED******REMOVED***) (bool, [][]byte, error) ***REMOVED***
+func (si serviceIndexerBySecret) FromObject(obj interface{}) (bool, [][]byte, error) {
 	s := obj.(*api.Service)
 
 	container := s.Spec.Task.GetContainer()
-	if container == nil ***REMOVED***
+	if container == nil {
 		return false, nil, nil
-	***REMOVED***
+	}
 
 	var secretIDs [][]byte
 
-	for _, secretRef := range container.Secrets ***REMOVED***
+	for _, secretRef := range container.Secrets {
 		// Add the null character as a terminator
 		secretIDs = append(secretIDs, []byte(secretRef.SecretID+"\x00"))
-	***REMOVED***
+	}
 
 	return len(secretIDs) != 0, secretIDs, nil
-***REMOVED***
+}
 
-type serviceIndexerByConfig struct***REMOVED******REMOVED***
+type serviceIndexerByConfig struct{}
 
-func (si serviceIndexerByConfig) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (si serviceIndexerByConfig) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
+}
 
-func (si serviceIndexerByConfig) FromObject(obj interface***REMOVED******REMOVED***) (bool, [][]byte, error) ***REMOVED***
+func (si serviceIndexerByConfig) FromObject(obj interface{}) (bool, [][]byte, error) {
 	s, ok := obj.(*api.Service)
-	if !ok ***REMOVED***
+	if !ok {
 		panic("unexpected type passed to FromObject")
-	***REMOVED***
+	}
 
 	container := s.Spec.Task.GetContainer()
-	if container == nil ***REMOVED***
+	if container == nil {
 		return false, nil, nil
-	***REMOVED***
+	}
 
 	var configIDs [][]byte
 
-	for _, configRef := range container.Configs ***REMOVED***
+	for _, configRef := range container.Configs {
 		// Add the null character as a terminator
 		configIDs = append(configIDs, []byte(configRef.ConfigID+"\x00"))
-	***REMOVED***
+	}
 
 	return len(configIDs) != 0, configIDs, nil
-***REMOVED***
+}

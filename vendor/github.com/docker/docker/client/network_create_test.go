@@ -13,60 +13,60 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestNetworkCreateError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestNetworkCreateError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
-	***REMOVED***
+	}
 
-	_, err := client.NetworkCreate(context.Background(), "mynetwork", types.NetworkCreate***REMOVED******REMOVED***)
-	if err == nil || err.Error() != "Error response from daemon: Server error" ***REMOVED***
+	_, err := client.NetworkCreate(context.Background(), "mynetwork", types.NetworkCreate{})
+	if err == nil || err.Error() != "Error response from daemon: Server error" {
 		t.Fatalf("expected a Server Error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestNetworkCreate(t *testing.T) ***REMOVED***
+func TestNetworkCreate(t *testing.T) {
 	expectedURL := "/networks/create"
 
-	client := &Client***REMOVED***
-		client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-			if !strings.HasPrefix(req.URL.Path, expectedURL) ***REMOVED***
+	client := &Client{
+		client: newMockClient(func(req *http.Request) (*http.Response, error) {
+			if !strings.HasPrefix(req.URL.Path, expectedURL) {
 				return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, req.URL)
-			***REMOVED***
+			}
 
-			if req.Method != "POST" ***REMOVED***
+			if req.Method != "POST" {
 				return nil, fmt.Errorf("expected POST method, got %s", req.Method)
-			***REMOVED***
+			}
 
-			content, err := json.Marshal(types.NetworkCreateResponse***REMOVED***
+			content, err := json.Marshal(types.NetworkCreateResponse{
 				ID:      "network_id",
 				Warning: "warning",
-			***REMOVED***)
-			if err != nil ***REMOVED***
+			})
+			if err != nil {
 				return nil, err
-			***REMOVED***
-			return &http.Response***REMOVED***
+			}
+			return &http.Response{
 				StatusCode: http.StatusOK,
 				Body:       ioutil.NopCloser(bytes.NewReader(content)),
-			***REMOVED***, nil
-		***REMOVED***),
-	***REMOVED***
+			}, nil
+		}),
+	}
 
-	networkResponse, err := client.NetworkCreate(context.Background(), "mynetwork", types.NetworkCreate***REMOVED***
+	networkResponse, err := client.NetworkCreate(context.Background(), "mynetwork", types.NetworkCreate{
 		CheckDuplicate: true,
 		Driver:         "mydriver",
 		EnableIPv6:     true,
 		Internal:       true,
-		Options: map[string]string***REMOVED***
+		Options: map[string]string{
 			"opt-key": "opt-value",
-		***REMOVED***,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+		},
+	})
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if networkResponse.ID != "network_id" ***REMOVED***
+	}
+	if networkResponse.ID != "network_id" {
 		t.Fatalf("expected networkResponse.ID to be 'network_id', got %s", networkResponse.ID)
-	***REMOVED***
-	if networkResponse.Warning != "warning" ***REMOVED***
+	}
+	if networkResponse.Warning != "warning" {
 		t.Fatalf("expected networkResponse.Warning to be 'warning', got %s", networkResponse.Warning)
-	***REMOVED***
-***REMOVED***
+	}
+}

@@ -7,75 +7,75 @@ import (
 )
 
 // UlimitOpt defines a map of Ulimits
-type UlimitOpt struct ***REMOVED***
+type UlimitOpt struct {
 	values *map[string]*units.Ulimit
-***REMOVED***
+}
 
 // NewUlimitOpt creates a new UlimitOpt
-func NewUlimitOpt(ref *map[string]*units.Ulimit) *UlimitOpt ***REMOVED***
-	if ref == nil ***REMOVED***
-		ref = &map[string]*units.Ulimit***REMOVED******REMOVED***
-	***REMOVED***
-	return &UlimitOpt***REMOVED***ref***REMOVED***
-***REMOVED***
+func NewUlimitOpt(ref *map[string]*units.Ulimit) *UlimitOpt {
+	if ref == nil {
+		ref = &map[string]*units.Ulimit{}
+	}
+	return &UlimitOpt{ref}
+}
 
 // Set validates a Ulimit and sets its name as a key in UlimitOpt
-func (o *UlimitOpt) Set(val string) error ***REMOVED***
+func (o *UlimitOpt) Set(val string) error {
 	l, err := units.ParseUlimit(val)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	(*o.values)[l.Name] = l
 
 	return nil
-***REMOVED***
+}
 
 // String returns Ulimit values as a string.
-func (o *UlimitOpt) String() string ***REMOVED***
+func (o *UlimitOpt) String() string {
 	var out []string
-	for _, v := range *o.values ***REMOVED***
+	for _, v := range *o.values {
 		out = append(out, v.String())
-	***REMOVED***
+	}
 
 	return fmt.Sprintf("%v", out)
-***REMOVED***
+}
 
 // GetList returns a slice of pointers to Ulimits.
-func (o *UlimitOpt) GetList() []*units.Ulimit ***REMOVED***
+func (o *UlimitOpt) GetList() []*units.Ulimit {
 	var ulimits []*units.Ulimit
-	for _, v := range *o.values ***REMOVED***
+	for _, v := range *o.values {
 		ulimits = append(ulimits, v)
-	***REMOVED***
+	}
 
 	return ulimits
-***REMOVED***
+}
 
 // Type returns the option type
-func (o *UlimitOpt) Type() string ***REMOVED***
+func (o *UlimitOpt) Type() string {
 	return "ulimit"
-***REMOVED***
+}
 
 // NamedUlimitOpt defines a named map of Ulimits
-type NamedUlimitOpt struct ***REMOVED***
+type NamedUlimitOpt struct {
 	name string
 	UlimitOpt
-***REMOVED***
+}
 
-var _ NamedOption = &NamedUlimitOpt***REMOVED******REMOVED***
+var _ NamedOption = &NamedUlimitOpt{}
 
 // NewNamedUlimitOpt creates a new NamedUlimitOpt
-func NewNamedUlimitOpt(name string, ref *map[string]*units.Ulimit) *NamedUlimitOpt ***REMOVED***
-	if ref == nil ***REMOVED***
-		ref = &map[string]*units.Ulimit***REMOVED******REMOVED***
-	***REMOVED***
-	return &NamedUlimitOpt***REMOVED***
+func NewNamedUlimitOpt(name string, ref *map[string]*units.Ulimit) *NamedUlimitOpt {
+	if ref == nil {
+		ref = &map[string]*units.Ulimit{}
+	}
+	return &NamedUlimitOpt{
 		name:      name,
 		UlimitOpt: *NewUlimitOpt(ref),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Name returns the option name
-func (o *NamedUlimitOpt) Name() string ***REMOVED***
+func (o *NamedUlimitOpt) Name() string {
 	return o.name
-***REMOVED***
+}

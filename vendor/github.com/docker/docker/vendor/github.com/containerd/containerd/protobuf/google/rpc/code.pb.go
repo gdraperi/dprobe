@@ -186,7 +186,7 @@ const (
 	Code_DATA_LOSS Code = 15
 )
 
-var Code_name = map[int32]string***REMOVED***
+var Code_name = map[int32]string{
 	0:  "OK",
 	1:  "CANCELLED",
 	2:  "UNKNOWN",
@@ -204,8 +204,8 @@ var Code_name = map[int32]string***REMOVED***
 	13: "INTERNAL",
 	14: "UNAVAILABLE",
 	15: "DATA_LOSS",
-***REMOVED***
-var Code_value = map[string]int32***REMOVED***
+}
+var Code_value = map[string]int32{
 	"OK":                  0,
 	"CANCELLED":           1,
 	"UNKNOWN":             2,
@@ -223,22 +223,22 @@ var Code_value = map[string]int32***REMOVED***
 	"INTERNAL":            13,
 	"UNAVAILABLE":         14,
 	"DATA_LOSS":           15,
-***REMOVED***
+}
 
-func (x Code) String() string ***REMOVED***
+func (x Code) String() string {
 	return proto.EnumName(Code_name, int32(x))
-***REMOVED***
-func (Code) EnumDescriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorCode, []int***REMOVED***0***REMOVED*** ***REMOVED***
+}
+func (Code) EnumDescriptor() ([]byte, []int) { return fileDescriptorCode, []int{0} }
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterEnum("google.rpc.Code", Code_name, Code_value)
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterFile("github.com/containerd/containerd/protobuf/google/rpc/code.proto", fileDescriptorCode)
-***REMOVED***
+}
 
-var fileDescriptorCode = []byte***REMOVED***
+var fileDescriptorCode = []byte{
 	// 405 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x91, 0xbb, 0x72, 0x13, 0x31,
 	0x14, 0x86, 0xbd, 0x4e, 0x70, 0x62, 0xf9, 0x76, 0xa2, 0x70, 0xe9, 0xf6, 0x01, 0x28, 0xec, 0x82,
@@ -266,4 +266,4 @@ var fileDescriptorCode = []byte***REMOVED***
 	0x38, 0x8f, 0xe8, 0xf3, 0xe4, 0xc3, 0xeb, 0xff, 0xb9, 0xde, 0x9b, 0x66, 0x53, 0x7d, 0x6b, 0x1f,
 	0xb9, 0x3c, 0x5b, 0x74, 0x0e, 0xf6, 0xab, 0xdf, 0x01, 0x00, 0x00, 0xff, 0xff, 0xf2, 0x0a, 0x2d,
 	0x67, 0x06, 0x02, 0x00, 0x00,
-***REMOVED***
+}

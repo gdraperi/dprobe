@@ -39,7 +39,7 @@ const (
 	FrameContinuation FrameType = 0x9
 )
 
-var frameName = map[FrameType]string***REMOVED***
+var frameName = map[FrameType]string{
 	FrameData:         "DATA",
 	FrameHeaders:      "HEADERS",
 	FramePriority:     "PRIORITY",
@@ -50,23 +50,23 @@ var frameName = map[FrameType]string***REMOVED***
 	FrameGoAway:       "GOAWAY",
 	FrameWindowUpdate: "WINDOW_UPDATE",
 	FrameContinuation: "CONTINUATION",
-***REMOVED***
+}
 
-func (t FrameType) String() string ***REMOVED***
-	if s, ok := frameName[t]; ok ***REMOVED***
+func (t FrameType) String() string {
+	if s, ok := frameName[t]; ok {
 		return s
-	***REMOVED***
+	}
 	return fmt.Sprintf("UNKNOWN_FRAME_TYPE_%d", uint8(t))
-***REMOVED***
+}
 
 // Flags is a bitmask of HTTP/2 flags.
 // The meaning of flags varies depending on the frame type.
 type Flags uint8
 
 // Has reports whether f contains all (0 or more) flags in v.
-func (f Flags) Has(v Flags) bool ***REMOVED***
+func (f Flags) Has(v Flags) bool {
 	return (f & v) == v
-***REMOVED***
+}
 
 // Frame-specific FrameHeader flag bits.
 const (
@@ -93,38 +93,38 @@ const (
 	FlagPushPromisePadded     Flags = 0x8
 )
 
-var flagName = map[FrameType]map[Flags]string***REMOVED***
-	FrameData: ***REMOVED***
+var flagName = map[FrameType]map[Flags]string{
+	FrameData: {
 		FlagDataEndStream: "END_STREAM",
 		FlagDataPadded:    "PADDED",
-	***REMOVED***,
-	FrameHeaders: ***REMOVED***
+	},
+	FrameHeaders: {
 		FlagHeadersEndStream:  "END_STREAM",
 		FlagHeadersEndHeaders: "END_HEADERS",
 		FlagHeadersPadded:     "PADDED",
 		FlagHeadersPriority:   "PRIORITY",
-	***REMOVED***,
-	FrameSettings: ***REMOVED***
+	},
+	FrameSettings: {
 		FlagSettingsAck: "ACK",
-	***REMOVED***,
-	FramePing: ***REMOVED***
+	},
+	FramePing: {
 		FlagPingAck: "ACK",
-	***REMOVED***,
-	FrameContinuation: ***REMOVED***
+	},
+	FrameContinuation: {
 		FlagContinuationEndHeaders: "END_HEADERS",
-	***REMOVED***,
-	FramePushPromise: ***REMOVED***
+	},
+	FramePushPromise: {
 		FlagPushPromiseEndHeaders: "END_HEADERS",
 		FlagPushPromisePadded:     "PADDED",
-	***REMOVED***,
-***REMOVED***
+	},
+}
 
 // a frameParser parses a frame given its FrameHeader and payload
 // bytes. The length of payload will always equal fh.Length (which
 // might be 0).
 type frameParser func(fc *frameCache, fh FrameHeader, payload []byte) (Frame, error)
 
-var frameParsers = map[FrameType]frameParser***REMOVED***
+var frameParsers = map[FrameType]frameParser{
 	FrameData:         parseDataFrame,
 	FrameHeaders:      parseHeadersFrame,
 	FramePriority:     parsePriorityFrame,
@@ -135,19 +135,19 @@ var frameParsers = map[FrameType]frameParser***REMOVED***
 	FrameGoAway:       parseGoAwayFrame,
 	FrameWindowUpdate: parseWindowUpdateFrame,
 	FrameContinuation: parseContinuationFrame,
-***REMOVED***
+}
 
-func typeFrameParser(t FrameType) frameParser ***REMOVED***
-	if f := frameParsers[t]; f != nil ***REMOVED***
+func typeFrameParser(t FrameType) frameParser {
+	if f := frameParsers[t]; f != nil {
 		return f
-	***REMOVED***
+	}
 	return parseUnknownFrame
-***REMOVED***
+}
 
 // A FrameHeader is the 9 byte header of all HTTP/2 frames.
 //
 // See http://http2.github.io/http2-spec/#FrameHeader
-type FrameHeader struct ***REMOVED***
+type FrameHeader struct {
 	valid bool // caller can access []byte fields in the Frame
 
 	// Type is the 1 byte frame type. There are ten standard frame
@@ -167,102 +167,102 @@ type FrameHeader struct ***REMOVED***
 	// StreamID is which stream this frame is for. Certain frames
 	// are not stream-specific, in which case this field is 0.
 	StreamID uint32
-***REMOVED***
+}
 
 // Header returns h. It exists so FrameHeaders can be embedded in other
 // specific frame types and implement the Frame interface.
-func (h FrameHeader) Header() FrameHeader ***REMOVED*** return h ***REMOVED***
+func (h FrameHeader) Header() FrameHeader { return h }
 
-func (h FrameHeader) String() string ***REMOVED***
+func (h FrameHeader) String() string {
 	var buf bytes.Buffer
 	buf.WriteString("[FrameHeader ")
 	h.writeDebug(&buf)
 	buf.WriteByte(']')
 	return buf.String()
-***REMOVED***
+}
 
-func (h FrameHeader) writeDebug(buf *bytes.Buffer) ***REMOVED***
+func (h FrameHeader) writeDebug(buf *bytes.Buffer) {
 	buf.WriteString(h.Type.String())
-	if h.Flags != 0 ***REMOVED***
+	if h.Flags != 0 {
 		buf.WriteString(" flags=")
 		set := 0
-		for i := uint8(0); i < 8; i++ ***REMOVED***
-			if h.Flags&(1<<i) == 0 ***REMOVED***
+		for i := uint8(0); i < 8; i++ {
+			if h.Flags&(1<<i) == 0 {
 				continue
-			***REMOVED***
+			}
 			set++
-			if set > 1 ***REMOVED***
+			if set > 1 {
 				buf.WriteByte('|')
-			***REMOVED***
+			}
 			name := flagName[h.Type][Flags(1<<i)]
-			if name != "" ***REMOVED***
+			if name != "" {
 				buf.WriteString(name)
-			***REMOVED*** else ***REMOVED***
+			} else {
 				fmt.Fprintf(buf, "0x%x", 1<<i)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-	if h.StreamID != 0 ***REMOVED***
+			}
+		}
+	}
+	if h.StreamID != 0 {
 		fmt.Fprintf(buf, " stream=%d", h.StreamID)
-	***REMOVED***
+	}
 	fmt.Fprintf(buf, " len=%d", h.Length)
-***REMOVED***
+}
 
-func (h *FrameHeader) checkValid() ***REMOVED***
-	if !h.valid ***REMOVED***
+func (h *FrameHeader) checkValid() {
+	if !h.valid {
 		panic("Frame accessor called on non-owned Frame")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (h *FrameHeader) invalidate() ***REMOVED*** h.valid = false ***REMOVED***
+func (h *FrameHeader) invalidate() { h.valid = false }
 
 // frame header bytes.
 // Used only by ReadFrameHeader.
-var fhBytes = sync.Pool***REMOVED***
-	New: func() interface***REMOVED******REMOVED*** ***REMOVED***
+var fhBytes = sync.Pool{
+	New: func() interface{} {
 		buf := make([]byte, frameHeaderLen)
 		return &buf
-	***REMOVED***,
-***REMOVED***
+	},
+}
 
 // ReadFrameHeader reads 9 bytes from r and returns a FrameHeader.
 // Most users should use Framer.ReadFrame instead.
-func ReadFrameHeader(r io.Reader) (FrameHeader, error) ***REMOVED***
+func ReadFrameHeader(r io.Reader) (FrameHeader, error) {
 	bufp := fhBytes.Get().(*[]byte)
 	defer fhBytes.Put(bufp)
 	return readFrameHeader(*bufp, r)
-***REMOVED***
+}
 
-func readFrameHeader(buf []byte, r io.Reader) (FrameHeader, error) ***REMOVED***
+func readFrameHeader(buf []byte, r io.Reader) (FrameHeader, error) {
 	_, err := io.ReadFull(r, buf[:frameHeaderLen])
-	if err != nil ***REMOVED***
-		return FrameHeader***REMOVED******REMOVED***, err
-	***REMOVED***
-	return FrameHeader***REMOVED***
+	if err != nil {
+		return FrameHeader{}, err
+	}
+	return FrameHeader{
 		Length:   (uint32(buf[0])<<16 | uint32(buf[1])<<8 | uint32(buf[2])),
 		Type:     FrameType(buf[3]),
 		Flags:    Flags(buf[4]),
 		StreamID: binary.BigEndian.Uint32(buf[5:]) & (1<<31 - 1),
 		valid:    true,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // A Frame is the base interface implemented by all frame types.
 // Callers will generally type-assert the specific frame type:
 // *HeadersFrame, *SettingsFrame, *WindowUpdateFrame, etc.
 //
 // Frames are only valid until the next call to Framer.ReadFrame.
-type Frame interface ***REMOVED***
+type Frame interface {
 	Header() FrameHeader
 
 	// invalidate is called by Framer.ReadFrame to make this
 	// frame's buffers as being invalid, since the subsequent
 	// frame will reuse them.
 	invalidate()
-***REMOVED***
+}
 
 // A Framer reads and writes Frames.
-type Framer struct ***REMOVED***
+type Framer struct {
 	r         io.Reader
 	lastFrame Frame
 	errDetail error
@@ -321,20 +321,20 @@ type Framer struct ***REMOVED***
 
 	debugFramer       *Framer // only use for logging written writes
 	debugFramerBuf    *bytes.Buffer
-	debugReadLoggerf  func(string, ...interface***REMOVED******REMOVED***)
-	debugWriteLoggerf func(string, ...interface***REMOVED******REMOVED***)
+	debugReadLoggerf  func(string, ...interface{})
+	debugWriteLoggerf func(string, ...interface{})
 
 	frameCache *frameCache // nil if frames aren't reused (default)
-***REMOVED***
+}
 
-func (fr *Framer) maxHeaderListSize() uint32 ***REMOVED***
-	if fr.MaxHeaderListSize == 0 ***REMOVED***
+func (fr *Framer) maxHeaderListSize() uint32 {
+	if fr.MaxHeaderListSize == 0 {
 		return 16 << 20 // sane default, per docs
-	***REMOVED***
+	}
 	return fr.MaxHeaderListSize
-***REMOVED***
+}
 
-func (f *Framer) startWrite(ftype FrameType, flags Flags, streamID uint32) ***REMOVED***
+func (f *Framer) startWrite(ftype FrameType, flags Flags, streamID uint32) {
 	// Write the FrameHeader.
 	f.wbuf = append(f.wbuf[:0],
 		0, // 3 bytes of length, filled in in endWrite
@@ -346,54 +346,54 @@ func (f *Framer) startWrite(ftype FrameType, flags Flags, streamID uint32) ***RE
 		byte(streamID>>16),
 		byte(streamID>>8),
 		byte(streamID))
-***REMOVED***
+}
 
-func (f *Framer) endWrite() error ***REMOVED***
+func (f *Framer) endWrite() error {
 	// Now that we know the final size, fill in the FrameHeader in
 	// the space previously reserved for it. Abuse append.
 	length := len(f.wbuf) - frameHeaderLen
-	if length >= (1 << 24) ***REMOVED***
+	if length >= (1 << 24) {
 		return ErrFrameTooLarge
-	***REMOVED***
+	}
 	_ = append(f.wbuf[:0],
 		byte(length>>16),
 		byte(length>>8),
 		byte(length))
-	if f.logWrites ***REMOVED***
+	if f.logWrites {
 		f.logWrite()
-	***REMOVED***
+	}
 
 	n, err := f.w.Write(f.wbuf)
-	if err == nil && n != len(f.wbuf) ***REMOVED***
+	if err == nil && n != len(f.wbuf) {
 		err = io.ErrShortWrite
-	***REMOVED***
+	}
 	return err
-***REMOVED***
+}
 
-func (f *Framer) logWrite() ***REMOVED***
-	if f.debugFramer == nil ***REMOVED***
+func (f *Framer) logWrite() {
+	if f.debugFramer == nil {
 		f.debugFramerBuf = new(bytes.Buffer)
 		f.debugFramer = NewFramer(nil, f.debugFramerBuf)
 		f.debugFramer.logReads = false // we log it ourselves, saying "wrote" below
 		// Let us read anything, even if we accidentally wrote it
 		// in the wrong order:
 		f.debugFramer.AllowIllegalReads = true
-	***REMOVED***
+	}
 	f.debugFramerBuf.Write(f.wbuf)
 	fr, err := f.debugFramer.ReadFrame()
-	if err != nil ***REMOVED***
+	if err != nil {
 		f.debugWriteLoggerf("http2: Framer %p: failed to decode just-written frame", f)
 		return
-	***REMOVED***
+	}
 	f.debugWriteLoggerf("http2: Framer %p: wrote %v", f, summarizeFrame(fr))
-***REMOVED***
+}
 
-func (f *Framer) writeByte(v byte)     ***REMOVED*** f.wbuf = append(f.wbuf, v) ***REMOVED***
-func (f *Framer) writeBytes(v []byte)  ***REMOVED*** f.wbuf = append(f.wbuf, v...) ***REMOVED***
-func (f *Framer) writeUint16(v uint16) ***REMOVED*** f.wbuf = append(f.wbuf, byte(v>>8), byte(v)) ***REMOVED***
-func (f *Framer) writeUint32(v uint32) ***REMOVED***
+func (f *Framer) writeByte(v byte)     { f.wbuf = append(f.wbuf, v) }
+func (f *Framer) writeBytes(v []byte)  { f.wbuf = append(f.wbuf, v...) }
+func (f *Framer) writeUint16(v uint16) { f.wbuf = append(f.wbuf, byte(v>>8), byte(v)) }
+func (f *Framer) writeUint32(v uint32) {
 	f.wbuf = append(f.wbuf, byte(v>>24), byte(v>>16), byte(v>>8), byte(v))
-***REMOVED***
+}
 
 const (
 	minMaxFrameSize = 1 << 14
@@ -403,55 +403,55 @@ const (
 // SetReuseFrames allows the Framer to reuse Frames.
 // If called on a Framer, Frames returned by calls to ReadFrame are only
 // valid until the next call to ReadFrame.
-func (fr *Framer) SetReuseFrames() ***REMOVED***
-	if fr.frameCache != nil ***REMOVED***
+func (fr *Framer) SetReuseFrames() {
+	if fr.frameCache != nil {
 		return
-	***REMOVED***
-	fr.frameCache = &frameCache***REMOVED******REMOVED***
-***REMOVED***
+	}
+	fr.frameCache = &frameCache{}
+}
 
-type frameCache struct ***REMOVED***
+type frameCache struct {
 	dataFrame DataFrame
-***REMOVED***
+}
 
-func (fc *frameCache) getDataFrame() *DataFrame ***REMOVED***
-	if fc == nil ***REMOVED***
-		return &DataFrame***REMOVED******REMOVED***
-	***REMOVED***
+func (fc *frameCache) getDataFrame() *DataFrame {
+	if fc == nil {
+		return &DataFrame{}
+	}
 	return &fc.dataFrame
-***REMOVED***
+}
 
 // NewFramer returns a Framer that writes frames to w and reads them from r.
-func NewFramer(w io.Writer, r io.Reader) *Framer ***REMOVED***
-	fr := &Framer***REMOVED***
+func NewFramer(w io.Writer, r io.Reader) *Framer {
+	fr := &Framer{
 		w:                 w,
 		r:                 r,
 		logReads:          logFrameReads,
 		logWrites:         logFrameWrites,
 		debugReadLoggerf:  log.Printf,
 		debugWriteLoggerf: log.Printf,
-	***REMOVED***
-	fr.getReadBuf = func(size uint32) []byte ***REMOVED***
-		if cap(fr.readBuf) >= int(size) ***REMOVED***
+	}
+	fr.getReadBuf = func(size uint32) []byte {
+		if cap(fr.readBuf) >= int(size) {
 			return fr.readBuf[:size]
-		***REMOVED***
+		}
 		fr.readBuf = make([]byte, size)
 		return fr.readBuf
-	***REMOVED***
+	}
 	fr.SetMaxReadFrameSize(maxFrameSize)
 	return fr
-***REMOVED***
+}
 
 // SetMaxReadFrameSize sets the maximum size of a frame
 // that will be read by a subsequent call to ReadFrame.
 // It is the caller's responsibility to advertise this
 // limit with a SETTINGS frame.
-func (fr *Framer) SetMaxReadFrameSize(v uint32) ***REMOVED***
-	if v > maxFrameSize ***REMOVED***
+func (fr *Framer) SetMaxReadFrameSize(v uint32) {
+	if v > maxFrameSize {
 		v = maxFrameSize
-	***REMOVED***
+	}
 	fr.maxReadSize = v
-***REMOVED***
+}
 
 // ErrorDetail returns a more detailed error of the last error
 // returned by Framer.ReadFrame. For instance, if ReadFrame
@@ -460,9 +460,9 @@ func (fr *Framer) SetMaxReadFrameSize(v uint32) ***REMOVED***
 // to return a non-nil value and like the rest of the http2 package,
 // its return value is not protected by an API compatibility promise.
 // ErrorDetail is reset after the next call to ReadFrame.
-func (fr *Framer) ErrorDetail() error ***REMOVED***
+func (fr *Framer) ErrorDetail() error {
 	return fr.errDetail
-***REMOVED***
+}
 
 // ErrFrameTooLarge is returned from Framer.ReadFrame when the peer
 // sends a frame that is larger than declared with SetMaxReadFrameSize.
@@ -470,12 +470,12 @@ var ErrFrameTooLarge = errors.New("http2: frame too large")
 
 // terminalReadFrameError reports whether err is an unrecoverable
 // error from ReadFrame and no other frames should be read.
-func terminalReadFrameError(err error) bool ***REMOVED***
-	if _, ok := err.(StreamError); ok ***REMOVED***
+func terminalReadFrameError(err error) bool {
+	if _, ok := err.(StreamError); ok {
 		return false
-	***REMOVED***
+	}
 	return err != nil
-***REMOVED***
+}
 
 // ReadFrame reads a single frame. The returned Frame is only valid
 // until the next call to ReadFrame.
@@ -484,140 +484,140 @@ func terminalReadFrameError(err error) bool ***REMOVED***
 // returned error is ErrFrameTooLarge. Other errors may be of type
 // ConnectionError, StreamError, or anything else from the underlying
 // reader.
-func (fr *Framer) ReadFrame() (Frame, error) ***REMOVED***
+func (fr *Framer) ReadFrame() (Frame, error) {
 	fr.errDetail = nil
-	if fr.lastFrame != nil ***REMOVED***
+	if fr.lastFrame != nil {
 		fr.lastFrame.invalidate()
-	***REMOVED***
+	}
 	fh, err := readFrameHeader(fr.headerBuf[:], fr.r)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if fh.Length > fr.maxReadSize ***REMOVED***
+	}
+	if fh.Length > fr.maxReadSize {
 		return nil, ErrFrameTooLarge
-	***REMOVED***
+	}
 	payload := fr.getReadBuf(fh.Length)
-	if _, err := io.ReadFull(fr.r, payload); err != nil ***REMOVED***
+	if _, err := io.ReadFull(fr.r, payload); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	f, err := typeFrameParser(fh.Type)(fr.frameCache, fh, payload)
-	if err != nil ***REMOVED***
-		if ce, ok := err.(connError); ok ***REMOVED***
+	if err != nil {
+		if ce, ok := err.(connError); ok {
 			return nil, fr.connError(ce.Code, ce.Reason)
-		***REMOVED***
+		}
 		return nil, err
-	***REMOVED***
-	if err := fr.checkFrameOrder(f); err != nil ***REMOVED***
+	}
+	if err := fr.checkFrameOrder(f); err != nil {
 		return nil, err
-	***REMOVED***
-	if fr.logReads ***REMOVED***
+	}
+	if fr.logReads {
 		fr.debugReadLoggerf("http2: Framer %p: read %v", fr, summarizeFrame(f))
-	***REMOVED***
-	if fh.Type == FrameHeaders && fr.ReadMetaHeaders != nil ***REMOVED***
+	}
+	if fh.Type == FrameHeaders && fr.ReadMetaHeaders != nil {
 		return fr.readMetaFrame(f.(*HeadersFrame))
-	***REMOVED***
+	}
 	return f, nil
-***REMOVED***
+}
 
 // connError returns ConnectionError(code) but first
 // stashes away a public reason to the caller can optionally relay it
 // to the peer before hanging up on them. This might help others debug
 // their implementations.
-func (fr *Framer) connError(code ErrCode, reason string) error ***REMOVED***
+func (fr *Framer) connError(code ErrCode, reason string) error {
 	fr.errDetail = errors.New(reason)
 	return ConnectionError(code)
-***REMOVED***
+}
 
 // checkFrameOrder reports an error if f is an invalid frame to return
 // next from ReadFrame. Mostly it checks whether HEADERS and
 // CONTINUATION frames are contiguous.
-func (fr *Framer) checkFrameOrder(f Frame) error ***REMOVED***
+func (fr *Framer) checkFrameOrder(f Frame) error {
 	last := fr.lastFrame
 	fr.lastFrame = f
-	if fr.AllowIllegalReads ***REMOVED***
+	if fr.AllowIllegalReads {
 		return nil
-	***REMOVED***
+	}
 
 	fh := f.Header()
-	if fr.lastHeaderStream != 0 ***REMOVED***
-		if fh.Type != FrameContinuation ***REMOVED***
+	if fr.lastHeaderStream != 0 {
+		if fh.Type != FrameContinuation {
 			return fr.connError(ErrCodeProtocol,
 				fmt.Sprintf("got %s for stream %d; expected CONTINUATION following %s for stream %d",
 					fh.Type, fh.StreamID,
 					last.Header().Type, fr.lastHeaderStream))
-		***REMOVED***
-		if fh.StreamID != fr.lastHeaderStream ***REMOVED***
+		}
+		if fh.StreamID != fr.lastHeaderStream {
 			return fr.connError(ErrCodeProtocol,
 				fmt.Sprintf("got CONTINUATION for stream %d; expected stream %d",
 					fh.StreamID, fr.lastHeaderStream))
-		***REMOVED***
-	***REMOVED*** else if fh.Type == FrameContinuation ***REMOVED***
+		}
+	} else if fh.Type == FrameContinuation {
 		return fr.connError(ErrCodeProtocol, fmt.Sprintf("unexpected CONTINUATION for stream %d", fh.StreamID))
-	***REMOVED***
+	}
 
-	switch fh.Type ***REMOVED***
+	switch fh.Type {
 	case FrameHeaders, FrameContinuation:
-		if fh.Flags.Has(FlagHeadersEndHeaders) ***REMOVED***
+		if fh.Flags.Has(FlagHeadersEndHeaders) {
 			fr.lastHeaderStream = 0
-		***REMOVED*** else ***REMOVED***
+		} else {
 			fr.lastHeaderStream = fh.StreamID
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
 // A DataFrame conveys arbitrary, variable-length sequences of octets
 // associated with a stream.
 // See http://http2.github.io/http2-spec/#rfc.section.6.1
-type DataFrame struct ***REMOVED***
+type DataFrame struct {
 	FrameHeader
 	data []byte
-***REMOVED***
+}
 
-func (f *DataFrame) StreamEnded() bool ***REMOVED***
+func (f *DataFrame) StreamEnded() bool {
 	return f.FrameHeader.Flags.Has(FlagDataEndStream)
-***REMOVED***
+}
 
 // Data returns the frame's data octets, not including any padding
 // size byte or padding suffix bytes.
 // The caller must not retain the returned memory past the next
 // call to ReadFrame.
-func (f *DataFrame) Data() []byte ***REMOVED***
+func (f *DataFrame) Data() []byte {
 	f.checkValid()
 	return f.data
-***REMOVED***
+}
 
-func parseDataFrame(fc *frameCache, fh FrameHeader, payload []byte) (Frame, error) ***REMOVED***
-	if fh.StreamID == 0 ***REMOVED***
+func parseDataFrame(fc *frameCache, fh FrameHeader, payload []byte) (Frame, error) {
+	if fh.StreamID == 0 {
 		// DATA frames MUST be associated with a stream. If a
 		// DATA frame is received whose stream identifier
 		// field is 0x0, the recipient MUST respond with a
 		// connection error (Section 5.4.1) of type
 		// PROTOCOL_ERROR.
-		return nil, connError***REMOVED***ErrCodeProtocol, "DATA frame with stream ID 0"***REMOVED***
-	***REMOVED***
+		return nil, connError{ErrCodeProtocol, "DATA frame with stream ID 0"}
+	}
 	f := fc.getDataFrame()
 	f.FrameHeader = fh
 
 	var padSize byte
-	if fh.Flags.Has(FlagDataPadded) ***REMOVED***
+	if fh.Flags.Has(FlagDataPadded) {
 		var err error
 		payload, padSize, err = readByte(payload)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
-	if int(padSize) > len(payload) ***REMOVED***
+		}
+	}
+	if int(padSize) > len(payload) {
 		// If the length of the padding is greater than the
 		// length of the frame payload, the recipient MUST
 		// treat this as a connection error.
 		// Filed: https://github.com/http2/http2-spec/issues/610
-		return nil, connError***REMOVED***ErrCodeProtocol, "pad size larger than data payload"***REMOVED***
-	***REMOVED***
+		return nil, connError{ErrCodeProtocol, "pad size larger than data payload"}
+	}
 	f.data = payload[:len(payload)-int(padSize)]
 	return f, nil
-***REMOVED***
+}
 
 var (
 	errStreamID    = errors.New("invalid stream ID")
@@ -626,22 +626,22 @@ var (
 	errPadBytes    = errors.New("padding bytes must all be zeros unless AllowIllegalWrites is enabled")
 )
 
-func validStreamIDOrZero(streamID uint32) bool ***REMOVED***
+func validStreamIDOrZero(streamID uint32) bool {
 	return streamID&(1<<31) == 0
-***REMOVED***
+}
 
-func validStreamID(streamID uint32) bool ***REMOVED***
+func validStreamID(streamID uint32) bool {
 	return streamID != 0 && streamID&(1<<31) == 0
-***REMOVED***
+}
 
 // WriteData writes a DATA frame.
 //
 // It will perform exactly one Write to the underlying Writer.
 // It is the caller's responsibility not to violate the maximum frame size
 // and to not call other Write methods concurrently.
-func (f *Framer) WriteData(streamID uint32, endStream bool, data []byte) error ***REMOVED***
+func (f *Framer) WriteData(streamID uint32, endStream bool, data []byte) error {
 	return f.WriteDataPadded(streamID, endStream, data, nil)
-***REMOVED***
+}
 
 // WriteData writes a DATA frame with optional padding.
 //
@@ -652,51 +652,51 @@ func (f *Framer) WriteData(streamID uint32, endStream bool, data []byte) error *
 // It will perform exactly one Write to the underlying Writer.
 // It is the caller's responsibility not to violate the maximum frame size
 // and to not call other Write methods concurrently.
-func (f *Framer) WriteDataPadded(streamID uint32, endStream bool, data, pad []byte) error ***REMOVED***
-	if !validStreamID(streamID) && !f.AllowIllegalWrites ***REMOVED***
+func (f *Framer) WriteDataPadded(streamID uint32, endStream bool, data, pad []byte) error {
+	if !validStreamID(streamID) && !f.AllowIllegalWrites {
 		return errStreamID
-	***REMOVED***
-	if len(pad) > 0 ***REMOVED***
-		if len(pad) > 255 ***REMOVED***
+	}
+	if len(pad) > 0 {
+		if len(pad) > 255 {
 			return errPadLength
-		***REMOVED***
-		if !f.AllowIllegalWrites ***REMOVED***
-			for _, b := range pad ***REMOVED***
-				if b != 0 ***REMOVED***
+		}
+		if !f.AllowIllegalWrites {
+			for _, b := range pad {
+				if b != 0 {
 					// "Padding octets MUST be set to zero when sending."
 					return errPadBytes
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+				}
+			}
+		}
+	}
 	var flags Flags
-	if endStream ***REMOVED***
+	if endStream {
 		flags |= FlagDataEndStream
-	***REMOVED***
-	if pad != nil ***REMOVED***
+	}
+	if pad != nil {
 		flags |= FlagDataPadded
-	***REMOVED***
+	}
 	f.startWrite(FrameData, flags, streamID)
-	if pad != nil ***REMOVED***
+	if pad != nil {
 		f.wbuf = append(f.wbuf, byte(len(pad)))
-	***REMOVED***
+	}
 	f.wbuf = append(f.wbuf, data...)
 	f.wbuf = append(f.wbuf, pad...)
 	return f.endWrite()
-***REMOVED***
+}
 
 // A SettingsFrame conveys configuration parameters that affect how
 // endpoints communicate, such as preferences and constraints on peer
 // behavior.
 //
 // See http://http2.github.io/http2-spec/#SETTINGS
-type SettingsFrame struct ***REMOVED***
+type SettingsFrame struct {
 	FrameHeader
 	p []byte
-***REMOVED***
+}
 
-func parseSettingsFrame(_ *frameCache, fh FrameHeader, p []byte) (Frame, error) ***REMOVED***
-	if fh.Flags.Has(FlagSettingsAck) && fh.Length > 0 ***REMOVED***
+func parseSettingsFrame(_ *frameCache, fh FrameHeader, p []byte) (Frame, error) {
+	if fh.Flags.Has(FlagSettingsAck) && fh.Length > 0 {
 		// When this (ACK 0x1) bit is set, the payload of the
 		// SETTINGS frame MUST be empty. Receipt of a
 		// SETTINGS frame with the ACK flag set and a length
@@ -704,8 +704,8 @@ func parseSettingsFrame(_ *frameCache, fh FrameHeader, p []byte) (Frame, error) 
 		// connection error (Section 5.4.1) of type
 		// FRAME_SIZE_ERROR.
 		return nil, ConnectionError(ErrCodeFrameSize)
-	***REMOVED***
-	if fh.StreamID != 0 ***REMOVED***
+	}
+	if fh.StreamID != 0 {
 		// SETTINGS frames always apply to a connection,
 		// never a single stream. The stream identifier for a
 		// SETTINGS frame MUST be zero (0x0).  If an endpoint
@@ -714,284 +714,284 @@ func parseSettingsFrame(_ *frameCache, fh FrameHeader, p []byte) (Frame, error) 
 		// respond with a connection error (Section 5.4.1) of
 		// type PROTOCOL_ERROR.
 		return nil, ConnectionError(ErrCodeProtocol)
-	***REMOVED***
-	if len(p)%6 != 0 ***REMOVED***
+	}
+	if len(p)%6 != 0 {
 		// Expecting even number of 6 byte settings.
 		return nil, ConnectionError(ErrCodeFrameSize)
-	***REMOVED***
-	f := &SettingsFrame***REMOVED***FrameHeader: fh, p: p***REMOVED***
-	if v, ok := f.Value(SettingInitialWindowSize); ok && v > (1<<31)-1 ***REMOVED***
+	}
+	f := &SettingsFrame{FrameHeader: fh, p: p}
+	if v, ok := f.Value(SettingInitialWindowSize); ok && v > (1<<31)-1 {
 		// Values above the maximum flow control window size of 2^31 - 1 MUST
 		// be treated as a connection error (Section 5.4.1) of type
 		// FLOW_CONTROL_ERROR.
 		return nil, ConnectionError(ErrCodeFlowControl)
-	***REMOVED***
+	}
 	return f, nil
-***REMOVED***
+}
 
-func (f *SettingsFrame) IsAck() bool ***REMOVED***
+func (f *SettingsFrame) IsAck() bool {
 	return f.FrameHeader.Flags.Has(FlagSettingsAck)
-***REMOVED***
+}
 
-func (f *SettingsFrame) Value(s SettingID) (v uint32, ok bool) ***REMOVED***
+func (f *SettingsFrame) Value(s SettingID) (v uint32, ok bool) {
 	f.checkValid()
 	buf := f.p
-	for len(buf) > 0 ***REMOVED***
+	for len(buf) > 0 {
 		settingID := SettingID(binary.BigEndian.Uint16(buf[:2]))
-		if settingID == s ***REMOVED***
+		if settingID == s {
 			return binary.BigEndian.Uint32(buf[2:6]), true
-		***REMOVED***
+		}
 		buf = buf[6:]
-	***REMOVED***
+	}
 	return 0, false
-***REMOVED***
+}
 
 // ForeachSetting runs fn for each setting.
 // It stops and returns the first error.
-func (f *SettingsFrame) ForeachSetting(fn func(Setting) error) error ***REMOVED***
+func (f *SettingsFrame) ForeachSetting(fn func(Setting) error) error {
 	f.checkValid()
 	buf := f.p
-	for len(buf) > 0 ***REMOVED***
-		if err := fn(Setting***REMOVED***
+	for len(buf) > 0 {
+		if err := fn(Setting{
 			SettingID(binary.BigEndian.Uint16(buf[:2])),
 			binary.BigEndian.Uint32(buf[2:6]),
-		***REMOVED***); err != nil ***REMOVED***
+		}); err != nil {
 			return err
-		***REMOVED***
+		}
 		buf = buf[6:]
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // WriteSettings writes a SETTINGS frame with zero or more settings
 // specified and the ACK bit not set.
 //
 // It will perform exactly one Write to the underlying Writer.
 // It is the caller's responsibility to not call other Write methods concurrently.
-func (f *Framer) WriteSettings(settings ...Setting) error ***REMOVED***
+func (f *Framer) WriteSettings(settings ...Setting) error {
 	f.startWrite(FrameSettings, 0, 0)
-	for _, s := range settings ***REMOVED***
+	for _, s := range settings {
 		f.writeUint16(uint16(s.ID))
 		f.writeUint32(s.Val)
-	***REMOVED***
+	}
 	return f.endWrite()
-***REMOVED***
+}
 
 // WriteSettingsAck writes an empty SETTINGS frame with the ACK bit set.
 //
 // It will perform exactly one Write to the underlying Writer.
 // It is the caller's responsibility to not call other Write methods concurrently.
-func (f *Framer) WriteSettingsAck() error ***REMOVED***
+func (f *Framer) WriteSettingsAck() error {
 	f.startWrite(FrameSettings, FlagSettingsAck, 0)
 	return f.endWrite()
-***REMOVED***
+}
 
 // A PingFrame is a mechanism for measuring a minimal round trip time
 // from the sender, as well as determining whether an idle connection
 // is still functional.
 // See http://http2.github.io/http2-spec/#rfc.section.6.7
-type PingFrame struct ***REMOVED***
+type PingFrame struct {
 	FrameHeader
 	Data [8]byte
-***REMOVED***
+}
 
-func (f *PingFrame) IsAck() bool ***REMOVED*** return f.Flags.Has(FlagPingAck) ***REMOVED***
+func (f *PingFrame) IsAck() bool { return f.Flags.Has(FlagPingAck) }
 
-func parsePingFrame(_ *frameCache, fh FrameHeader, payload []byte) (Frame, error) ***REMOVED***
-	if len(payload) != 8 ***REMOVED***
+func parsePingFrame(_ *frameCache, fh FrameHeader, payload []byte) (Frame, error) {
+	if len(payload) != 8 {
 		return nil, ConnectionError(ErrCodeFrameSize)
-	***REMOVED***
-	if fh.StreamID != 0 ***REMOVED***
+	}
+	if fh.StreamID != 0 {
 		return nil, ConnectionError(ErrCodeProtocol)
-	***REMOVED***
-	f := &PingFrame***REMOVED***FrameHeader: fh***REMOVED***
+	}
+	f := &PingFrame{FrameHeader: fh}
 	copy(f.Data[:], payload)
 	return f, nil
-***REMOVED***
+}
 
-func (f *Framer) WritePing(ack bool, data [8]byte) error ***REMOVED***
+func (f *Framer) WritePing(ack bool, data [8]byte) error {
 	var flags Flags
-	if ack ***REMOVED***
+	if ack {
 		flags = FlagPingAck
-	***REMOVED***
+	}
 	f.startWrite(FramePing, flags, 0)
 	f.writeBytes(data[:])
 	return f.endWrite()
-***REMOVED***
+}
 
 // A GoAwayFrame informs the remote peer to stop creating streams on this connection.
 // See http://http2.github.io/http2-spec/#rfc.section.6.8
-type GoAwayFrame struct ***REMOVED***
+type GoAwayFrame struct {
 	FrameHeader
 	LastStreamID uint32
 	ErrCode      ErrCode
 	debugData    []byte
-***REMOVED***
+}
 
 // DebugData returns any debug data in the GOAWAY frame. Its contents
 // are not defined.
 // The caller must not retain the returned memory past the next
 // call to ReadFrame.
-func (f *GoAwayFrame) DebugData() []byte ***REMOVED***
+func (f *GoAwayFrame) DebugData() []byte {
 	f.checkValid()
 	return f.debugData
-***REMOVED***
+}
 
-func parseGoAwayFrame(_ *frameCache, fh FrameHeader, p []byte) (Frame, error) ***REMOVED***
-	if fh.StreamID != 0 ***REMOVED***
+func parseGoAwayFrame(_ *frameCache, fh FrameHeader, p []byte) (Frame, error) {
+	if fh.StreamID != 0 {
 		return nil, ConnectionError(ErrCodeProtocol)
-	***REMOVED***
-	if len(p) < 8 ***REMOVED***
+	}
+	if len(p) < 8 {
 		return nil, ConnectionError(ErrCodeFrameSize)
-	***REMOVED***
-	return &GoAwayFrame***REMOVED***
+	}
+	return &GoAwayFrame{
 		FrameHeader:  fh,
 		LastStreamID: binary.BigEndian.Uint32(p[:4]) & (1<<31 - 1),
 		ErrCode:      ErrCode(binary.BigEndian.Uint32(p[4:8])),
 		debugData:    p[8:],
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-func (f *Framer) WriteGoAway(maxStreamID uint32, code ErrCode, debugData []byte) error ***REMOVED***
+func (f *Framer) WriteGoAway(maxStreamID uint32, code ErrCode, debugData []byte) error {
 	f.startWrite(FrameGoAway, 0, 0)
 	f.writeUint32(maxStreamID & (1<<31 - 1))
 	f.writeUint32(uint32(code))
 	f.writeBytes(debugData)
 	return f.endWrite()
-***REMOVED***
+}
 
 // An UnknownFrame is the frame type returned when the frame type is unknown
 // or no specific frame type parser exists.
-type UnknownFrame struct ***REMOVED***
+type UnknownFrame struct {
 	FrameHeader
 	p []byte
-***REMOVED***
+}
 
 // Payload returns the frame's payload (after the header).  It is not
 // valid to call this method after a subsequent call to
 // Framer.ReadFrame, nor is it valid to retain the returned slice.
 // The memory is owned by the Framer and is invalidated when the next
 // frame is read.
-func (f *UnknownFrame) Payload() []byte ***REMOVED***
+func (f *UnknownFrame) Payload() []byte {
 	f.checkValid()
 	return f.p
-***REMOVED***
+}
 
-func parseUnknownFrame(_ *frameCache, fh FrameHeader, p []byte) (Frame, error) ***REMOVED***
-	return &UnknownFrame***REMOVED***fh, p***REMOVED***, nil
-***REMOVED***
+func parseUnknownFrame(_ *frameCache, fh FrameHeader, p []byte) (Frame, error) {
+	return &UnknownFrame{fh, p}, nil
+}
 
 // A WindowUpdateFrame is used to implement flow control.
 // See http://http2.github.io/http2-spec/#rfc.section.6.9
-type WindowUpdateFrame struct ***REMOVED***
+type WindowUpdateFrame struct {
 	FrameHeader
 	Increment uint32 // never read with high bit set
-***REMOVED***
+}
 
-func parseWindowUpdateFrame(_ *frameCache, fh FrameHeader, p []byte) (Frame, error) ***REMOVED***
-	if len(p) != 4 ***REMOVED***
+func parseWindowUpdateFrame(_ *frameCache, fh FrameHeader, p []byte) (Frame, error) {
+	if len(p) != 4 {
 		return nil, ConnectionError(ErrCodeFrameSize)
-	***REMOVED***
+	}
 	inc := binary.BigEndian.Uint32(p[:4]) & 0x7fffffff // mask off high reserved bit
-	if inc == 0 ***REMOVED***
+	if inc == 0 {
 		// A receiver MUST treat the receipt of a
 		// WINDOW_UPDATE frame with an flow control window
 		// increment of 0 as a stream error (Section 5.4.2) of
 		// type PROTOCOL_ERROR; errors on the connection flow
 		// control window MUST be treated as a connection
 		// error (Section 5.4.1).
-		if fh.StreamID == 0 ***REMOVED***
+		if fh.StreamID == 0 {
 			return nil, ConnectionError(ErrCodeProtocol)
-		***REMOVED***
+		}
 		return nil, streamError(fh.StreamID, ErrCodeProtocol)
-	***REMOVED***
-	return &WindowUpdateFrame***REMOVED***
+	}
+	return &WindowUpdateFrame{
 		FrameHeader: fh,
 		Increment:   inc,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // WriteWindowUpdate writes a WINDOW_UPDATE frame.
 // The increment value must be between 1 and 2,147,483,647, inclusive.
 // If the Stream ID is zero, the window update applies to the
 // connection as a whole.
-func (f *Framer) WriteWindowUpdate(streamID, incr uint32) error ***REMOVED***
+func (f *Framer) WriteWindowUpdate(streamID, incr uint32) error {
 	// "The legal range for the increment to the flow control window is 1 to 2^31-1 (2,147,483,647) octets."
-	if (incr < 1 || incr > 2147483647) && !f.AllowIllegalWrites ***REMOVED***
+	if (incr < 1 || incr > 2147483647) && !f.AllowIllegalWrites {
 		return errors.New("illegal window increment value")
-	***REMOVED***
+	}
 	f.startWrite(FrameWindowUpdate, 0, streamID)
 	f.writeUint32(incr)
 	return f.endWrite()
-***REMOVED***
+}
 
 // A HeadersFrame is used to open a stream and additionally carries a
 // header block fragment.
-type HeadersFrame struct ***REMOVED***
+type HeadersFrame struct {
 	FrameHeader
 
 	// Priority is set if FlagHeadersPriority is set in the FrameHeader.
 	Priority PriorityParam
 
 	headerFragBuf []byte // not owned
-***REMOVED***
+}
 
-func (f *HeadersFrame) HeaderBlockFragment() []byte ***REMOVED***
+func (f *HeadersFrame) HeaderBlockFragment() []byte {
 	f.checkValid()
 	return f.headerFragBuf
-***REMOVED***
+}
 
-func (f *HeadersFrame) HeadersEnded() bool ***REMOVED***
+func (f *HeadersFrame) HeadersEnded() bool {
 	return f.FrameHeader.Flags.Has(FlagHeadersEndHeaders)
-***REMOVED***
+}
 
-func (f *HeadersFrame) StreamEnded() bool ***REMOVED***
+func (f *HeadersFrame) StreamEnded() bool {
 	return f.FrameHeader.Flags.Has(FlagHeadersEndStream)
-***REMOVED***
+}
 
-func (f *HeadersFrame) HasPriority() bool ***REMOVED***
+func (f *HeadersFrame) HasPriority() bool {
 	return f.FrameHeader.Flags.Has(FlagHeadersPriority)
-***REMOVED***
+}
 
-func parseHeadersFrame(_ *frameCache, fh FrameHeader, p []byte) (_ Frame, err error) ***REMOVED***
-	hf := &HeadersFrame***REMOVED***
+func parseHeadersFrame(_ *frameCache, fh FrameHeader, p []byte) (_ Frame, err error) {
+	hf := &HeadersFrame{
 		FrameHeader: fh,
-	***REMOVED***
-	if fh.StreamID == 0 ***REMOVED***
+	}
+	if fh.StreamID == 0 {
 		// HEADERS frames MUST be associated with a stream. If a HEADERS frame
 		// is received whose stream identifier field is 0x0, the recipient MUST
 		// respond with a connection error (Section 5.4.1) of type
 		// PROTOCOL_ERROR.
-		return nil, connError***REMOVED***ErrCodeProtocol, "HEADERS frame with stream ID 0"***REMOVED***
-	***REMOVED***
+		return nil, connError{ErrCodeProtocol, "HEADERS frame with stream ID 0"}
+	}
 	var padLength uint8
-	if fh.Flags.Has(FlagHeadersPadded) ***REMOVED***
-		if p, padLength, err = readByte(p); err != nil ***REMOVED***
+	if fh.Flags.Has(FlagHeadersPadded) {
+		if p, padLength, err = readByte(p); err != nil {
 			return
-		***REMOVED***
-	***REMOVED***
-	if fh.Flags.Has(FlagHeadersPriority) ***REMOVED***
+		}
+	}
+	if fh.Flags.Has(FlagHeadersPriority) {
 		var v uint32
 		p, v, err = readUint32(p)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		hf.Priority.StreamDep = v & 0x7fffffff
 		hf.Priority.Exclusive = (v != hf.Priority.StreamDep) // high bit was set
 		p, hf.Priority.Weight, err = readByte(p)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
-	if len(p)-int(padLength) <= 0 ***REMOVED***
+		}
+	}
+	if len(p)-int(padLength) <= 0 {
 		return nil, streamError(fh.StreamID, ErrCodeProtocol)
-	***REMOVED***
+	}
 	hf.headerFragBuf = p[:len(p)-int(padLength)]
 	return hf, nil
-***REMOVED***
+}
 
 // HeadersFrameParam are the parameters for writing a HEADERS frame.
-type HeadersFrameParam struct ***REMOVED***
+type HeadersFrameParam struct {
 	// StreamID is the required Stream ID to initiate.
 	StreamID uint32
 	// BlockFragment is part (or all) of a Header Block.
@@ -1015,7 +1015,7 @@ type HeadersFrameParam struct ***REMOVED***
 	// Priority, if non-zero, includes stream priority information
 	// in the HEADER frame.
 	Priority PriorityParam
-***REMOVED***
+}
 
 // WriteHeaders writes a single HEADERS frame.
 //
@@ -1025,52 +1025,52 @@ type HeadersFrameParam struct ***REMOVED***
 //
 // It will perform exactly one Write to the underlying Writer.
 // It is the caller's responsibility to not call other Write methods concurrently.
-func (f *Framer) WriteHeaders(p HeadersFrameParam) error ***REMOVED***
-	if !validStreamID(p.StreamID) && !f.AllowIllegalWrites ***REMOVED***
+func (f *Framer) WriteHeaders(p HeadersFrameParam) error {
+	if !validStreamID(p.StreamID) && !f.AllowIllegalWrites {
 		return errStreamID
-	***REMOVED***
+	}
 	var flags Flags
-	if p.PadLength != 0 ***REMOVED***
+	if p.PadLength != 0 {
 		flags |= FlagHeadersPadded
-	***REMOVED***
-	if p.EndStream ***REMOVED***
+	}
+	if p.EndStream {
 		flags |= FlagHeadersEndStream
-	***REMOVED***
-	if p.EndHeaders ***REMOVED***
+	}
+	if p.EndHeaders {
 		flags |= FlagHeadersEndHeaders
-	***REMOVED***
-	if !p.Priority.IsZero() ***REMOVED***
+	}
+	if !p.Priority.IsZero() {
 		flags |= FlagHeadersPriority
-	***REMOVED***
+	}
 	f.startWrite(FrameHeaders, flags, p.StreamID)
-	if p.PadLength != 0 ***REMOVED***
+	if p.PadLength != 0 {
 		f.writeByte(p.PadLength)
-	***REMOVED***
-	if !p.Priority.IsZero() ***REMOVED***
+	}
+	if !p.Priority.IsZero() {
 		v := p.Priority.StreamDep
-		if !validStreamIDOrZero(v) && !f.AllowIllegalWrites ***REMOVED***
+		if !validStreamIDOrZero(v) && !f.AllowIllegalWrites {
 			return errDepStreamID
-		***REMOVED***
-		if p.Priority.Exclusive ***REMOVED***
+		}
+		if p.Priority.Exclusive {
 			v |= 1 << 31
-		***REMOVED***
+		}
 		f.writeUint32(v)
 		f.writeByte(p.Priority.Weight)
-	***REMOVED***
+	}
 	f.wbuf = append(f.wbuf, p.BlockFragment...)
 	f.wbuf = append(f.wbuf, padZeros[:p.PadLength]...)
 	return f.endWrite()
-***REMOVED***
+}
 
 // A PriorityFrame specifies the sender-advised priority of a stream.
 // See http://http2.github.io/http2-spec/#rfc.section.6.3
-type PriorityFrame struct ***REMOVED***
+type PriorityFrame struct {
 	FrameHeader
 	PriorityParam
-***REMOVED***
+}
 
 // PriorityParam are the stream prioritzation parameters.
-type PriorityParam struct ***REMOVED***
+type PriorityParam struct {
 	// StreamDep is a 31-bit stream identifier for the
 	// stream that this stream depends on. Zero means no
 	// dependency.
@@ -1084,144 +1084,144 @@ type PriorityParam struct ***REMOVED***
 	// the spec, "Add one to the value to obtain a weight between
 	// 1 and 256."
 	Weight uint8
-***REMOVED***
+}
 
-func (p PriorityParam) IsZero() bool ***REMOVED***
-	return p == PriorityParam***REMOVED******REMOVED***
-***REMOVED***
+func (p PriorityParam) IsZero() bool {
+	return p == PriorityParam{}
+}
 
-func parsePriorityFrame(_ *frameCache, fh FrameHeader, payload []byte) (Frame, error) ***REMOVED***
-	if fh.StreamID == 0 ***REMOVED***
-		return nil, connError***REMOVED***ErrCodeProtocol, "PRIORITY frame with stream ID 0"***REMOVED***
-	***REMOVED***
-	if len(payload) != 5 ***REMOVED***
-		return nil, connError***REMOVED***ErrCodeFrameSize, fmt.Sprintf("PRIORITY frame payload size was %d; want 5", len(payload))***REMOVED***
-	***REMOVED***
+func parsePriorityFrame(_ *frameCache, fh FrameHeader, payload []byte) (Frame, error) {
+	if fh.StreamID == 0 {
+		return nil, connError{ErrCodeProtocol, "PRIORITY frame with stream ID 0"}
+	}
+	if len(payload) != 5 {
+		return nil, connError{ErrCodeFrameSize, fmt.Sprintf("PRIORITY frame payload size was %d; want 5", len(payload))}
+	}
 	v := binary.BigEndian.Uint32(payload[:4])
 	streamID := v & 0x7fffffff // mask off high bit
-	return &PriorityFrame***REMOVED***
+	return &PriorityFrame{
 		FrameHeader: fh,
-		PriorityParam: PriorityParam***REMOVED***
+		PriorityParam: PriorityParam{
 			Weight:    payload[4],
 			StreamDep: streamID,
 			Exclusive: streamID != v, // was high bit set?
-		***REMOVED***,
-	***REMOVED***, nil
-***REMOVED***
+		},
+	}, nil
+}
 
 // WritePriority writes a PRIORITY frame.
 //
 // It will perform exactly one Write to the underlying Writer.
 // It is the caller's responsibility to not call other Write methods concurrently.
-func (f *Framer) WritePriority(streamID uint32, p PriorityParam) error ***REMOVED***
-	if !validStreamID(streamID) && !f.AllowIllegalWrites ***REMOVED***
+func (f *Framer) WritePriority(streamID uint32, p PriorityParam) error {
+	if !validStreamID(streamID) && !f.AllowIllegalWrites {
 		return errStreamID
-	***REMOVED***
-	if !validStreamIDOrZero(p.StreamDep) ***REMOVED***
+	}
+	if !validStreamIDOrZero(p.StreamDep) {
 		return errDepStreamID
-	***REMOVED***
+	}
 	f.startWrite(FramePriority, 0, streamID)
 	v := p.StreamDep
-	if p.Exclusive ***REMOVED***
+	if p.Exclusive {
 		v |= 1 << 31
-	***REMOVED***
+	}
 	f.writeUint32(v)
 	f.writeByte(p.Weight)
 	return f.endWrite()
-***REMOVED***
+}
 
 // A RSTStreamFrame allows for abnormal termination of a stream.
 // See http://http2.github.io/http2-spec/#rfc.section.6.4
-type RSTStreamFrame struct ***REMOVED***
+type RSTStreamFrame struct {
 	FrameHeader
 	ErrCode ErrCode
-***REMOVED***
+}
 
-func parseRSTStreamFrame(_ *frameCache, fh FrameHeader, p []byte) (Frame, error) ***REMOVED***
-	if len(p) != 4 ***REMOVED***
+func parseRSTStreamFrame(_ *frameCache, fh FrameHeader, p []byte) (Frame, error) {
+	if len(p) != 4 {
 		return nil, ConnectionError(ErrCodeFrameSize)
-	***REMOVED***
-	if fh.StreamID == 0 ***REMOVED***
+	}
+	if fh.StreamID == 0 {
 		return nil, ConnectionError(ErrCodeProtocol)
-	***REMOVED***
-	return &RSTStreamFrame***REMOVED***fh, ErrCode(binary.BigEndian.Uint32(p[:4]))***REMOVED***, nil
-***REMOVED***
+	}
+	return &RSTStreamFrame{fh, ErrCode(binary.BigEndian.Uint32(p[:4]))}, nil
+}
 
 // WriteRSTStream writes a RST_STREAM frame.
 //
 // It will perform exactly one Write to the underlying Writer.
 // It is the caller's responsibility to not call other Write methods concurrently.
-func (f *Framer) WriteRSTStream(streamID uint32, code ErrCode) error ***REMOVED***
-	if !validStreamID(streamID) && !f.AllowIllegalWrites ***REMOVED***
+func (f *Framer) WriteRSTStream(streamID uint32, code ErrCode) error {
+	if !validStreamID(streamID) && !f.AllowIllegalWrites {
 		return errStreamID
-	***REMOVED***
+	}
 	f.startWrite(FrameRSTStream, 0, streamID)
 	f.writeUint32(uint32(code))
 	return f.endWrite()
-***REMOVED***
+}
 
 // A ContinuationFrame is used to continue a sequence of header block fragments.
 // See http://http2.github.io/http2-spec/#rfc.section.6.10
-type ContinuationFrame struct ***REMOVED***
+type ContinuationFrame struct {
 	FrameHeader
 	headerFragBuf []byte
-***REMOVED***
+}
 
-func parseContinuationFrame(_ *frameCache, fh FrameHeader, p []byte) (Frame, error) ***REMOVED***
-	if fh.StreamID == 0 ***REMOVED***
-		return nil, connError***REMOVED***ErrCodeProtocol, "CONTINUATION frame with stream ID 0"***REMOVED***
-	***REMOVED***
-	return &ContinuationFrame***REMOVED***fh, p***REMOVED***, nil
-***REMOVED***
+func parseContinuationFrame(_ *frameCache, fh FrameHeader, p []byte) (Frame, error) {
+	if fh.StreamID == 0 {
+		return nil, connError{ErrCodeProtocol, "CONTINUATION frame with stream ID 0"}
+	}
+	return &ContinuationFrame{fh, p}, nil
+}
 
-func (f *ContinuationFrame) HeaderBlockFragment() []byte ***REMOVED***
+func (f *ContinuationFrame) HeaderBlockFragment() []byte {
 	f.checkValid()
 	return f.headerFragBuf
-***REMOVED***
+}
 
-func (f *ContinuationFrame) HeadersEnded() bool ***REMOVED***
+func (f *ContinuationFrame) HeadersEnded() bool {
 	return f.FrameHeader.Flags.Has(FlagContinuationEndHeaders)
-***REMOVED***
+}
 
 // WriteContinuation writes a CONTINUATION frame.
 //
 // It will perform exactly one Write to the underlying Writer.
 // It is the caller's responsibility to not call other Write methods concurrently.
-func (f *Framer) WriteContinuation(streamID uint32, endHeaders bool, headerBlockFragment []byte) error ***REMOVED***
-	if !validStreamID(streamID) && !f.AllowIllegalWrites ***REMOVED***
+func (f *Framer) WriteContinuation(streamID uint32, endHeaders bool, headerBlockFragment []byte) error {
+	if !validStreamID(streamID) && !f.AllowIllegalWrites {
 		return errStreamID
-	***REMOVED***
+	}
 	var flags Flags
-	if endHeaders ***REMOVED***
+	if endHeaders {
 		flags |= FlagContinuationEndHeaders
-	***REMOVED***
+	}
 	f.startWrite(FrameContinuation, flags, streamID)
 	f.wbuf = append(f.wbuf, headerBlockFragment...)
 	return f.endWrite()
-***REMOVED***
+}
 
 // A PushPromiseFrame is used to initiate a server stream.
 // See http://http2.github.io/http2-spec/#rfc.section.6.6
-type PushPromiseFrame struct ***REMOVED***
+type PushPromiseFrame struct {
 	FrameHeader
 	PromiseID     uint32
 	headerFragBuf []byte // not owned
-***REMOVED***
+}
 
-func (f *PushPromiseFrame) HeaderBlockFragment() []byte ***REMOVED***
+func (f *PushPromiseFrame) HeaderBlockFragment() []byte {
 	f.checkValid()
 	return f.headerFragBuf
-***REMOVED***
+}
 
-func (f *PushPromiseFrame) HeadersEnded() bool ***REMOVED***
+func (f *PushPromiseFrame) HeadersEnded() bool {
 	return f.FrameHeader.Flags.Has(FlagPushPromiseEndHeaders)
-***REMOVED***
+}
 
-func parsePushPromise(_ *frameCache, fh FrameHeader, p []byte) (_ Frame, err error) ***REMOVED***
-	pp := &PushPromiseFrame***REMOVED***
+func parsePushPromise(_ *frameCache, fh FrameHeader, p []byte) (_ Frame, err error) {
+	pp := &PushPromiseFrame{
 		FrameHeader: fh,
-	***REMOVED***
-	if pp.StreamID == 0 ***REMOVED***
+	}
+	if pp.StreamID == 0 {
 		// PUSH_PROMISE frames MUST be associated with an existing,
 		// peer-initiated stream. The stream identifier of a
 		// PUSH_PROMISE frame indicates the stream it is associated
@@ -1229,32 +1229,32 @@ func parsePushPromise(_ *frameCache, fh FrameHeader, p []byte) (_ Frame, err err
 		// 0x0, a recipient MUST respond with a connection error
 		// (Section 5.4.1) of type PROTOCOL_ERROR.
 		return nil, ConnectionError(ErrCodeProtocol)
-	***REMOVED***
+	}
 	// The PUSH_PROMISE frame includes optional padding.
 	// Padding fields and flags are identical to those defined for DATA frames
 	var padLength uint8
-	if fh.Flags.Has(FlagPushPromisePadded) ***REMOVED***
-		if p, padLength, err = readByte(p); err != nil ***REMOVED***
+	if fh.Flags.Has(FlagPushPromisePadded) {
+		if p, padLength, err = readByte(p); err != nil {
 			return
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	p, pp.PromiseID, err = readUint32(p)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	pp.PromiseID = pp.PromiseID & (1<<31 - 1)
 
-	if int(padLength) > len(p) ***REMOVED***
+	if int(padLength) > len(p) {
 		// like the DATA frame, error out if padding is longer than the body.
 		return nil, ConnectionError(ErrCodeProtocol)
-	***REMOVED***
+	}
 	pp.headerFragBuf = p[:len(p)-int(padLength)]
 	return pp, nil
-***REMOVED***
+}
 
 // PushPromiseParam are the parameters for writing a PUSH_PROMISE frame.
-type PushPromiseParam struct ***REMOVED***
+type PushPromiseParam struct {
 	// StreamID is the required Stream ID to initiate.
 	StreamID uint32
 
@@ -1273,7 +1273,7 @@ type PushPromiseParam struct ***REMOVED***
 	// PadLength is the optional number of bytes of zeros to add
 	// to this frame.
 	PadLength uint8
-***REMOVED***
+}
 
 // WritePushPromise writes a single PushPromise Frame.
 //
@@ -1282,64 +1282,64 @@ type PushPromiseParam struct ***REMOVED***
 //
 // It will perform exactly one Write to the underlying Writer.
 // It is the caller's responsibility to not call other Write methods concurrently.
-func (f *Framer) WritePushPromise(p PushPromiseParam) error ***REMOVED***
-	if !validStreamID(p.StreamID) && !f.AllowIllegalWrites ***REMOVED***
+func (f *Framer) WritePushPromise(p PushPromiseParam) error {
+	if !validStreamID(p.StreamID) && !f.AllowIllegalWrites {
 		return errStreamID
-	***REMOVED***
+	}
 	var flags Flags
-	if p.PadLength != 0 ***REMOVED***
+	if p.PadLength != 0 {
 		flags |= FlagPushPromisePadded
-	***REMOVED***
-	if p.EndHeaders ***REMOVED***
+	}
+	if p.EndHeaders {
 		flags |= FlagPushPromiseEndHeaders
-	***REMOVED***
+	}
 	f.startWrite(FramePushPromise, flags, p.StreamID)
-	if p.PadLength != 0 ***REMOVED***
+	if p.PadLength != 0 {
 		f.writeByte(p.PadLength)
-	***REMOVED***
-	if !validStreamID(p.PromiseID) && !f.AllowIllegalWrites ***REMOVED***
+	}
+	if !validStreamID(p.PromiseID) && !f.AllowIllegalWrites {
 		return errStreamID
-	***REMOVED***
+	}
 	f.writeUint32(p.PromiseID)
 	f.wbuf = append(f.wbuf, p.BlockFragment...)
 	f.wbuf = append(f.wbuf, padZeros[:p.PadLength]...)
 	return f.endWrite()
-***REMOVED***
+}
 
 // WriteRawFrame writes a raw frame. This can be used to write
 // extension frames unknown to this package.
-func (f *Framer) WriteRawFrame(t FrameType, flags Flags, streamID uint32, payload []byte) error ***REMOVED***
+func (f *Framer) WriteRawFrame(t FrameType, flags Flags, streamID uint32, payload []byte) error {
 	f.startWrite(t, flags, streamID)
 	f.writeBytes(payload)
 	return f.endWrite()
-***REMOVED***
+}
 
-func readByte(p []byte) (remain []byte, b byte, err error) ***REMOVED***
-	if len(p) == 0 ***REMOVED***
+func readByte(p []byte) (remain []byte, b byte, err error) {
+	if len(p) == 0 {
 		return nil, 0, io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return p[1:], p[0], nil
-***REMOVED***
+}
 
-func readUint32(p []byte) (remain []byte, v uint32, err error) ***REMOVED***
-	if len(p) < 4 ***REMOVED***
+func readUint32(p []byte) (remain []byte, v uint32, err error) {
+	if len(p) < 4 {
 		return nil, 0, io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return p[4:], binary.BigEndian.Uint32(p[:4]), nil
-***REMOVED***
+}
 
-type streamEnder interface ***REMOVED***
+type streamEnder interface {
 	StreamEnded() bool
-***REMOVED***
+}
 
-type headersEnder interface ***REMOVED***
+type headersEnder interface {
 	HeadersEnded() bool
-***REMOVED***
+}
 
-type headersOrContinuation interface ***REMOVED***
+type headersOrContinuation interface {
 	headersEnder
 	HeaderBlockFragment() []byte
-***REMOVED***
+}
 
 // A MetaHeadersFrame is the representation of one HEADERS frame and
 // zero or more contiguous CONTINUATION frames and the decoding of
@@ -1347,7 +1347,7 @@ type headersOrContinuation interface ***REMOVED***
 //
 // This type of frame does not appear on the wire and is only returned
 // by the Framer when Framer.ReadMetaHeaders is set.
-type MetaHeadersFrame struct ***REMOVED***
+type MetaHeadersFrame struct {
 	*HeadersFrame
 
 	// Fields are the fields contained in the HEADERS and
@@ -1366,91 +1366,91 @@ type MetaHeadersFrame struct ***REMOVED***
 	// and Fields is incomplete. The hpack decoder state is still
 	// valid, however.
 	Truncated bool
-***REMOVED***
+}
 
 // PseudoValue returns the given pseudo header field's value.
 // The provided pseudo field should not contain the leading colon.
-func (mh *MetaHeadersFrame) PseudoValue(pseudo string) string ***REMOVED***
-	for _, hf := range mh.Fields ***REMOVED***
-		if !hf.IsPseudo() ***REMOVED***
+func (mh *MetaHeadersFrame) PseudoValue(pseudo string) string {
+	for _, hf := range mh.Fields {
+		if !hf.IsPseudo() {
 			return ""
-		***REMOVED***
-		if hf.Name[1:] == pseudo ***REMOVED***
+		}
+		if hf.Name[1:] == pseudo {
 			return hf.Value
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return ""
-***REMOVED***
+}
 
 // RegularFields returns the regular (non-pseudo) header fields of mh.
 // The caller does not own the returned slice.
-func (mh *MetaHeadersFrame) RegularFields() []hpack.HeaderField ***REMOVED***
-	for i, hf := range mh.Fields ***REMOVED***
-		if !hf.IsPseudo() ***REMOVED***
+func (mh *MetaHeadersFrame) RegularFields() []hpack.HeaderField {
+	for i, hf := range mh.Fields {
+		if !hf.IsPseudo() {
 			return mh.Fields[i:]
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
 // PseudoFields returns the pseudo header fields of mh.
 // The caller does not own the returned slice.
-func (mh *MetaHeadersFrame) PseudoFields() []hpack.HeaderField ***REMOVED***
-	for i, hf := range mh.Fields ***REMOVED***
-		if !hf.IsPseudo() ***REMOVED***
+func (mh *MetaHeadersFrame) PseudoFields() []hpack.HeaderField {
+	for i, hf := range mh.Fields {
+		if !hf.IsPseudo() {
 			return mh.Fields[:i]
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return mh.Fields
-***REMOVED***
+}
 
-func (mh *MetaHeadersFrame) checkPseudos() error ***REMOVED***
+func (mh *MetaHeadersFrame) checkPseudos() error {
 	var isRequest, isResponse bool
 	pf := mh.PseudoFields()
-	for i, hf := range pf ***REMOVED***
-		switch hf.Name ***REMOVED***
+	for i, hf := range pf {
+		switch hf.Name {
 		case ":method", ":path", ":scheme", ":authority":
 			isRequest = true
 		case ":status":
 			isResponse = true
 		default:
 			return pseudoHeaderError(hf.Name)
-		***REMOVED***
+		}
 		// Check for duplicates.
 		// This would be a bad algorithm, but N is 4.
 		// And this doesn't allocate.
-		for _, hf2 := range pf[:i] ***REMOVED***
-			if hf.Name == hf2.Name ***REMOVED***
+		for _, hf2 := range pf[:i] {
+			if hf.Name == hf2.Name {
 				return duplicatePseudoHeaderError(hf.Name)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-	if isRequest && isResponse ***REMOVED***
+			}
+		}
+	}
+	if isRequest && isResponse {
 		return errMixPseudoHeaderTypes
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (fr *Framer) maxHeaderStringLen() int ***REMOVED***
+func (fr *Framer) maxHeaderStringLen() int {
 	v := fr.maxHeaderListSize()
-	if uint32(int(v)) == v ***REMOVED***
+	if uint32(int(v)) == v {
 		return int(v)
-	***REMOVED***
+	}
 	// They had a crazy big number for MaxHeaderBytes anyway,
 	// so give them unlimited header lengths:
 	return 0
-***REMOVED***
+}
 
 // readMetaFrame returns 0 or more CONTINUATION frames from fr and
 // merge them into into the provided hf and returns a MetaHeadersFrame
 // with the decoded hpack values.
-func (fr *Framer) readMetaFrame(hf *HeadersFrame) (*MetaHeadersFrame, error) ***REMOVED***
-	if fr.AllowIllegalReads ***REMOVED***
+func (fr *Framer) readMetaFrame(hf *HeadersFrame) (*MetaHeadersFrame, error) {
+	if fr.AllowIllegalReads {
 		return nil, errors.New("illegal use of AllowIllegalReads with ReadMetaHeaders")
-	***REMOVED***
-	mh := &MetaHeadersFrame***REMOVED***
+	}
+	mh := &MetaHeadersFrame{
 		HeadersFrame: hf,
-	***REMOVED***
+	}
 	var remainSize = fr.maxHeaderListSize()
 	var sawRegular bool
 
@@ -1458,114 +1458,114 @@ func (fr *Framer) readMetaFrame(hf *HeadersFrame) (*MetaHeadersFrame, error) ***
 	hdec := fr.ReadMetaHeaders
 	hdec.SetEmitEnabled(true)
 	hdec.SetMaxStringLength(fr.maxHeaderStringLen())
-	hdec.SetEmitFunc(func(hf hpack.HeaderField) ***REMOVED***
-		if VerboseLogs && fr.logReads ***REMOVED***
+	hdec.SetEmitFunc(func(hf hpack.HeaderField) {
+		if VerboseLogs && fr.logReads {
 			fr.debugReadLoggerf("http2: decoded hpack field %+v", hf)
-		***REMOVED***
-		if !httplex.ValidHeaderFieldValue(hf.Value) ***REMOVED***
+		}
+		if !httplex.ValidHeaderFieldValue(hf.Value) {
 			invalid = headerFieldValueError(hf.Value)
-		***REMOVED***
+		}
 		isPseudo := strings.HasPrefix(hf.Name, ":")
-		if isPseudo ***REMOVED***
-			if sawRegular ***REMOVED***
+		if isPseudo {
+			if sawRegular {
 				invalid = errPseudoAfterRegular
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
+			}
+		} else {
 			sawRegular = true
-			if !validWireHeaderFieldName(hf.Name) ***REMOVED***
+			if !validWireHeaderFieldName(hf.Name) {
 				invalid = headerFieldNameError(hf.Name)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
-		if invalid != nil ***REMOVED***
+		if invalid != nil {
 			hdec.SetEmitEnabled(false)
 			return
-		***REMOVED***
+		}
 
 		size := hf.Size()
-		if size > remainSize ***REMOVED***
+		if size > remainSize {
 			hdec.SetEmitEnabled(false)
 			mh.Truncated = true
 			return
-		***REMOVED***
+		}
 		remainSize -= size
 
 		mh.Fields = append(mh.Fields, hf)
-	***REMOVED***)
+	})
 	// Lose reference to MetaHeadersFrame:
-	defer hdec.SetEmitFunc(func(hf hpack.HeaderField) ***REMOVED******REMOVED***)
+	defer hdec.SetEmitFunc(func(hf hpack.HeaderField) {})
 
 	var hc headersOrContinuation = hf
-	for ***REMOVED***
+	for {
 		frag := hc.HeaderBlockFragment()
-		if _, err := hdec.Write(frag); err != nil ***REMOVED***
+		if _, err := hdec.Write(frag); err != nil {
 			return nil, ConnectionError(ErrCodeCompression)
-		***REMOVED***
+		}
 
-		if hc.HeadersEnded() ***REMOVED***
+		if hc.HeadersEnded() {
 			break
-		***REMOVED***
-		if f, err := fr.ReadFrame(); err != nil ***REMOVED***
+		}
+		if f, err := fr.ReadFrame(); err != nil {
 			return nil, err
-		***REMOVED*** else ***REMOVED***
+		} else {
 			hc = f.(*ContinuationFrame) // guaranteed by checkFrameOrder
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	mh.HeadersFrame.headerFragBuf = nil
 	mh.HeadersFrame.invalidate()
 
-	if err := hdec.Close(); err != nil ***REMOVED***
+	if err := hdec.Close(); err != nil {
 		return nil, ConnectionError(ErrCodeCompression)
-	***REMOVED***
-	if invalid != nil ***REMOVED***
+	}
+	if invalid != nil {
 		fr.errDetail = invalid
-		if VerboseLogs ***REMOVED***
+		if VerboseLogs {
 			log.Printf("http2: invalid header: %v", invalid)
-		***REMOVED***
-		return nil, StreamError***REMOVED***mh.StreamID, ErrCodeProtocol, invalid***REMOVED***
-	***REMOVED***
-	if err := mh.checkPseudos(); err != nil ***REMOVED***
+		}
+		return nil, StreamError{mh.StreamID, ErrCodeProtocol, invalid}
+	}
+	if err := mh.checkPseudos(); err != nil {
 		fr.errDetail = err
-		if VerboseLogs ***REMOVED***
+		if VerboseLogs {
 			log.Printf("http2: invalid pseudo headers: %v", err)
-		***REMOVED***
-		return nil, StreamError***REMOVED***mh.StreamID, ErrCodeProtocol, err***REMOVED***
-	***REMOVED***
+		}
+		return nil, StreamError{mh.StreamID, ErrCodeProtocol, err}
+	}
 	return mh, nil
-***REMOVED***
+}
 
-func summarizeFrame(f Frame) string ***REMOVED***
+func summarizeFrame(f Frame) string {
 	var buf bytes.Buffer
 	f.Header().writeDebug(&buf)
-	switch f := f.(type) ***REMOVED***
+	switch f := f.(type) {
 	case *SettingsFrame:
 		n := 0
-		f.ForeachSetting(func(s Setting) error ***REMOVED***
+		f.ForeachSetting(func(s Setting) error {
 			n++
-			if n == 1 ***REMOVED***
+			if n == 1 {
 				buf.WriteString(", settings:")
-			***REMOVED***
+			}
 			fmt.Fprintf(&buf, " %v=%v,", s.ID, s.Val)
 			return nil
-		***REMOVED***)
-		if n > 0 ***REMOVED***
+		})
+		if n > 0 {
 			buf.Truncate(buf.Len() - 1) // remove trailing comma
-		***REMOVED***
+		}
 	case *DataFrame:
 		data := f.Data()
 		const max = 256
-		if len(data) > max ***REMOVED***
+		if len(data) > max {
 			data = data[:max]
-		***REMOVED***
+		}
 		fmt.Fprintf(&buf, " data=%q", data)
-		if len(f.Data()) > max ***REMOVED***
+		if len(f.Data()) > max {
 			fmt.Fprintf(&buf, " (%d bytes omitted)", len(f.Data())-max)
-		***REMOVED***
+		}
 	case *WindowUpdateFrame:
-		if f.StreamID == 0 ***REMOVED***
+		if f.StreamID == 0 {
 			buf.WriteString(" (conn)")
-		***REMOVED***
+		}
 		fmt.Fprintf(&buf, " incr=%v", f.Increment)
 	case *PingFrame:
 		fmt.Fprintf(&buf, " ping=%q", f.Data[:])
@@ -1574,6 +1574,6 @@ func summarizeFrame(f Frame) string ***REMOVED***
 			f.LastStreamID, f.ErrCode, f.debugData)
 	case *RSTStreamFrame:
 		fmt.Fprintf(&buf, " ErrCode=%v", f.ErrCode)
-	***REMOVED***
+	}
 	return buf.String()
-***REMOVED***
+}

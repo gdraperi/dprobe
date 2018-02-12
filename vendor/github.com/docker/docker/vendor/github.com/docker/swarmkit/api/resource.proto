@@ -9,26 +9,26 @@ import "github.com/docker/swarmkit/protobuf/plugin/plugin.proto";
 // Allocator is the API provided by a manager group for agents to control the allocation of certain entities.
 //
 // API methods on this service are used only by agent nodes.
-service ResourceAllocator ***REMOVED***
-	rpc AttachNetwork(AttachNetworkRequest) returns (AttachNetworkResponse) ***REMOVED***
-		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED*** roles: "swarm-worker" roles: "swarm-manager" ***REMOVED***;
-	***REMOVED***;
-	rpc DetachNetwork(DetachNetworkRequest) returns (DetachNetworkResponse) ***REMOVED***
-		option (docker.protobuf.plugin.tls_authorization) = ***REMOVED*** roles: "swarm-worker" roles: "swarm-manager" ***REMOVED***;
-	***REMOVED***;
-***REMOVED***
+service ResourceAllocator {
+	rpc AttachNetwork(AttachNetworkRequest) returns (AttachNetworkResponse) {
+		option (docker.protobuf.plugin.tls_authorization) = { roles: "swarm-worker" roles: "swarm-manager" };
+	};
+	rpc DetachNetwork(DetachNetworkRequest) returns (DetachNetworkResponse) {
+		option (docker.protobuf.plugin.tls_authorization) = { roles: "swarm-worker" roles: "swarm-manager" };
+	};
+}
 
-message AttachNetworkRequest ***REMOVED***
+message AttachNetworkRequest {
 	NetworkAttachmentConfig config = 1;
 	string container_id = 2;
-***REMOVED***
+}
 
-message AttachNetworkResponse ***REMOVED***
+message AttachNetworkResponse {
 	string attachment_id = 1;
-***REMOVED***
+}
 
-message DetachNetworkRequest ***REMOVED***
+message DetachNetworkRequest {
 	string attachment_id = 1;
-***REMOVED***
+}
 
-message DetachNetworkResponse ***REMOVED******REMOVED***
+message DetachNetworkResponse {}

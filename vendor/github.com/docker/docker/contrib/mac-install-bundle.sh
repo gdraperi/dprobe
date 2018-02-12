@@ -2,10 +2,10 @@
 
 set -e
 
-errexit() ***REMOVED***
+errexit() {
 	echo "$1"
 	exit 1
-***REMOVED***
+}
 
 [ "$(uname -s)" == "Darwin" ] || errexit "This script can only be used on a Mac"
 

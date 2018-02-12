@@ -1,15 +1,15 @@
-key "" ***REMOVED***
+key "" {
 	policy = "read"
-***REMOVED***
+}
 
-key "foo/" ***REMOVED***
+key "foo/" {
 	policy = "write"
-***REMOVED***
+}
 
-key "foo/bar/" ***REMOVED***
+key "foo/bar/" {
 	policy = "read"
-***REMOVED***
+}
 
-key "foo/bar/baz" ***REMOVED***
+key "foo/bar/baz" {
 	policy = "deny"
-***REMOVED***
+}

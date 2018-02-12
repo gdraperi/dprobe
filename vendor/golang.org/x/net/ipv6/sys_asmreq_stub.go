@@ -12,6 +12,6 @@ import (
 	"golang.org/x/net/internal/socket"
 )
 
-func (so *sockOpt) setIPMreq(c *socket.Conn, ifi *net.Interface, grp net.IP) error ***REMOVED***
+func (so *sockOpt) setIPMreq(c *socket.Conn, ifi *net.Interface, grp net.IP) error {
 	return errOpNoSupport
-***REMOVED***
+}

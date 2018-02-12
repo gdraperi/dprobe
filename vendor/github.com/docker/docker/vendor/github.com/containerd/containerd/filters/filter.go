@@ -59,50 +59,50 @@ import (
 )
 
 // Filter matches specific resources based the provided filter
-type Filter interface ***REMOVED***
+type Filter interface {
 	Match(adaptor Adaptor) bool
-***REMOVED***
+}
 
 // FilterFunc is a function that handles matching with an adaptor
 type FilterFunc func(Adaptor) bool
 
 // Match matches the FilterFunc returning true if the object matches the filter
-func (fn FilterFunc) Match(adaptor Adaptor) bool ***REMOVED***
+func (fn FilterFunc) Match(adaptor Adaptor) bool {
 	return fn(adaptor)
-***REMOVED***
+}
 
 // Always is a filter that always returns true for any type of object
-var Always FilterFunc = func(adaptor Adaptor) bool ***REMOVED***
+var Always FilterFunc = func(adaptor Adaptor) bool {
 	return true
-***REMOVED***
+}
 
 // Any allows multiple filters to be matched aginst the object
 type Any []Filter
 
 // Match returns true if any of the provided filters are true
-func (m Any) Match(adaptor Adaptor) bool ***REMOVED***
-	for _, m := range m ***REMOVED***
-		if m.Match(adaptor) ***REMOVED***
+func (m Any) Match(adaptor Adaptor) bool {
+	for _, m := range m {
+		if m.Match(adaptor) {
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return false
-***REMOVED***
+}
 
 // All allows multiple filters to be matched aginst the object
 type All []Filter
 
 // Match only returns true if all filters match the object
-func (m All) Match(adaptor Adaptor) bool ***REMOVED***
-	for _, m := range m ***REMOVED***
-		if !m.Match(adaptor) ***REMOVED***
+func (m All) Match(adaptor Adaptor) bool {
+	for _, m := range m {
+		if !m.Match(adaptor) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return true
-***REMOVED***
+}
 
 type operator int
 
@@ -113,8 +113,8 @@ const (
 	operatorMatches
 )
 
-func (op operator) String() string ***REMOVED***
-	switch op ***REMOVED***
+func (op operator) String() string {
+	switch op {
 	case operatorPresent:
 		return "?"
 	case operatorEqual:
@@ -123,22 +123,22 @@ func (op operator) String() string ***REMOVED***
 		return "!="
 	case operatorMatches:
 		return "~="
-	***REMOVED***
+	}
 
 	return "unknown"
-***REMOVED***
+}
 
-type selector struct ***REMOVED***
+type selector struct {
 	fieldpath []string
 	operator  operator
 	value     string
 	re        *regexp.Regexp
-***REMOVED***
+}
 
-func (m selector) Match(adaptor Adaptor) bool ***REMOVED***
+func (m selector) Match(adaptor Adaptor) bool {
 	value, present := adaptor.Field(m.fieldpath)
 
-	switch m.operator ***REMOVED***
+	switch m.operator {
 	case operatorPresent:
 		return present
 	case operatorEqual:
@@ -146,18 +146,18 @@ func (m selector) Match(adaptor Adaptor) bool ***REMOVED***
 	case operatorNotEqual:
 		return value != m.value
 	case operatorMatches:
-		if m.re == nil ***REMOVED***
+		if m.re == nil {
 			r, err := regexp.Compile(m.value)
-			if err != nil ***REMOVED***
+			if err != nil {
 				log.L.Errorf("error compiling regexp %q", m.value)
 				return false
-			***REMOVED***
+			}
 
 			m.re = r
-		***REMOVED***
+		}
 
 		return m.re.MatchString(value)
 	default:
 		return false
-	***REMOVED***
-***REMOVED***
+	}
+}

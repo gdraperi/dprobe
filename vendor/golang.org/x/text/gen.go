@@ -41,12 +41,12 @@ var (
 	args []string
 )
 
-func exclude(pkg string) bool ***REMOVED***
-	if len(args) > 0 ***REMOVED***
+func exclude(pkg string) bool {
+	if len(args) > 0 {
 		return !contains(args, pkg)
-	***REMOVED***
+	}
 	return contains(strings.Split(*excludeList, ","), pkg)
-***REMOVED***
+}
 
 // TODO:
 // - Better version handling.
@@ -56,13 +56,13 @@ func exclude(pkg string) bool ***REMOVED***
 
 var vprintf = fmt.Printf
 
-func main() ***REMOVED***
+func main() {
 	gen.Init()
 	args = flag.Args()
-	if !*verbose ***REMOVED***
+	if !*verbose {
 		// Set vprintf to a no-op.
-		vprintf = func(string, ...interface***REMOVED******REMOVED***) (int, error) ***REMOVED*** return 0, nil ***REMOVED***
-	***REMOVED***
+		vprintf = func(string, ...interface{}) (int, error) { return 0, nil }
+	}
 
 	// TODO: create temporary cache directory to load files and create and set
 	// a "cache" option if the user did not specify the UNICODE_DIR environment
@@ -70,14 +70,14 @@ func main() ***REMOVED***
 	// tests, which really need to be run after each generated package.
 
 	updateCore := *doCore
-	if gen.UnicodeVersion() != unicode.Version ***REMOVED***
+	if gen.UnicodeVersion() != unicode.Version {
 		fmt.Printf("Requested Unicode version %s; core unicode version is %s.\n",
 			gen.UnicodeVersion(),
 			unicode.Version)
 		c := collate.New(language.Und, collate.Numeric)
-		if c.CompareString(gen.UnicodeVersion(), unicode.Version) < 0 && !*force ***REMOVED***
+		if c.CompareString(gen.UnicodeVersion(), unicode.Version) < 0 && !*force {
 			os.Exit(2)
-		***REMOVED***
+		}
 		updateCore = true
 		goroot := os.Getenv("GOROOT")
 		appendToFile(
@@ -92,10 +92,10 @@ pkg unicode, var <new script or property> *RangeTable
 			filepath.Join(goroot, "api", "next.txt"),
 			fmt.Sprintf(lines, gen.UnicodeVersion()),
 		)
-	***REMOVED***
+	}
 
-	var unicode = &dependency***REMOVED******REMOVED***
-	if updateCore ***REMOVED***
+	var unicode = &dependency{}
+	if updateCore {
 		fmt.Printf("Updating core to version %s...\n", gen.UnicodeVersion())
 		unicode = generate("unicode")
 
@@ -105,7 +105,7 @@ pkg unicode, var <new script or property> *RangeTable
 		generate("strconv", unicode) // mimics Unicode table
 		generate("strings", unicode)
 		generate("testing", unicode) // mimics Unicode table
-	***REMOVED***
+	}
 
 	var (
 		cldr       = generate("./unicode/cldr", unicode)
@@ -134,130 +134,130 @@ pkg unicode, var <new script or property> *RangeTable
 	// Copy exported packages to the destination golang.org repo.
 	copyExported("golang.org/x/net/idna")
 
-	if updateCore ***REMOVED***
+	if updateCore {
 		copyVendored()
-	***REMOVED***
+	}
 
-	if hasErrors ***REMOVED***
+	if hasErrors {
 		fmt.Println("FAIL")
 		os.Exit(1)
-	***REMOVED***
+	}
 	vprintf("SUCCESS\n")
-***REMOVED***
+}
 
-func appendToFile(file, text string) ***REMOVED***
+func appendToFile(file, text string) {
 	fmt.Println("Augmenting", file)
 	w, err := os.OpenFile(file, os.O_APPEND|os.O_WRONLY, 0600)
-	if err != nil ***REMOVED***
+	if err != nil {
 		fmt.Println("Failed to open file:", err)
 		os.Exit(1)
-	***REMOVED***
+	}
 	defer w.Close()
-	if _, err := w.WriteString(text); err != nil ***REMOVED***
+	if _, err := w.WriteString(text); err != nil {
 		fmt.Println("Failed to write to file:", err)
 		os.Exit(1)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 var (
 	all       sync.WaitGroup
 	hasErrors bool
 )
 
-type dependency struct ***REMOVED***
+type dependency struct {
 	sync.WaitGroup
 	hasErrors bool
-***REMOVED***
+}
 
-func generate(pkg string, deps ...*dependency) *dependency ***REMOVED***
+func generate(pkg string, deps ...*dependency) *dependency {
 	var wg dependency
-	if exclude(pkg) ***REMOVED***
+	if exclude(pkg) {
 		return &wg
-	***REMOVED***
+	}
 	wg.Add(1)
 	all.Add(1)
-	go func() ***REMOVED***
+	go func() {
 		defer wg.Done()
 		defer all.Done()
 		// Wait for dependencies to finish.
-		for _, d := range deps ***REMOVED***
+		for _, d := range deps {
 			d.Wait()
-			if d.hasErrors && !*force ***REMOVED***
+			if d.hasErrors && !*force {
 				fmt.Printf("--- ABORT: %s\n", pkg)
 				wg.hasErrors = true
 				return
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		vprintf("=== GENERATE %s\n", pkg)
-		args := []string***REMOVED***"generate"***REMOVED***
-		if *verbose ***REMOVED***
+		args := []string{"generate"}
+		if *verbose {
 			args = append(args, "-v")
-		***REMOVED***
+		}
 		args = append(args, pkg)
 		cmd := exec.Command(filepath.Join(runtime.GOROOT(), "bin", "go"), args...)
-		w := &bytes.Buffer***REMOVED******REMOVED***
+		w := &bytes.Buffer{}
 		cmd.Stderr = w
 		cmd.Stdout = w
-		if err := cmd.Run(); err != nil ***REMOVED***
+		if err := cmd.Run(); err != nil {
 			fmt.Printf("--- FAIL: %s:\n\t%v\n\tError: %v\n", pkg, indent(w), err)
 			hasErrors = true
 			wg.hasErrors = true
 			return
-		***REMOVED***
+		}
 
 		vprintf("=== TEST %s\n", pkg)
 		args[0] = "test"
 		cmd = exec.Command(filepath.Join(runtime.GOROOT(), "bin", "go"), args...)
-		wt := &bytes.Buffer***REMOVED******REMOVED***
+		wt := &bytes.Buffer{}
 		cmd.Stderr = wt
 		cmd.Stdout = wt
-		if err := cmd.Run(); err != nil ***REMOVED***
+		if err := cmd.Run(); err != nil {
 			fmt.Printf("--- FAIL: %s:\n\t%v\n\tError: %v\n", pkg, indent(wt), err)
 			hasErrors = true
 			wg.hasErrors = true
 			return
-		***REMOVED***
+		}
 		vprintf("--- SUCCESS: %s\n\t%v\n", pkg, indent(w))
 		fmt.Print(wt.String())
-	***REMOVED***()
+	}()
 	return &wg
-***REMOVED***
+}
 
 // copyExported copies a package in x/text/internal/export to the
 // destination repository.
-func copyExported(p string) ***REMOVED***
+func copyExported(p string) {
 	copyPackage(
 		filepath.Join("internal", "export", path.Base(p)),
 		filepath.Join("..", filepath.FromSlash(p[len("golang.org/x"):])),
 		"golang.org/x/text/internal/export/"+path.Base(p),
 		p)
-***REMOVED***
+}
 
 // copyVendored copies packages used by Go core into the vendored directory.
-func copyVendored() ***REMOVED***
+func copyVendored() {
 	root := filepath.Join(build.Default.GOROOT, filepath.FromSlash("src/vendor/golang_org/x"))
 
-	err := filepath.Walk(root, func(dir string, info os.FileInfo, err error) error ***REMOVED***
-		if err != nil || !info.IsDir() || root == dir ***REMOVED***
+	err := filepath.Walk(root, func(dir string, info os.FileInfo, err error) error {
+		if err != nil || !info.IsDir() || root == dir {
 			return err
-		***REMOVED***
+		}
 		src := dir[len(root)+1:]
 		const slash = string(filepath.Separator)
-		if c := strings.Split(src, slash); c[0] == "text" ***REMOVED***
+		if c := strings.Split(src, slash); c[0] == "text" {
 			// Copy a text repo package from its normal location.
 			src = strings.Join(c[1:], slash)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			// Copy the vendored package if it exists in the export directory.
 			src = filepath.Join("internal", "export", filepath.Base(src))
-		***REMOVED***
+		}
 		copyPackage(src, dir, "golang.org", "golang_org")
 		return nil
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		fmt.Printf("Seeding directory %s has failed %v:", root, err)
 		os.Exit(1)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // goGenRE is used to remove go:generate lines.
 var goGenRE = regexp.MustCompile("//go:generate[^\n]*\n")
@@ -266,54 +266,54 @@ var goGenRE = regexp.MustCompile("//go:generate[^\n]*\n")
 // destination package directory. The destination package is assumed to have
 // the same name. For each copied file go:generate lines are removed and
 // and package comments are rewritten to the new path.
-func copyPackage(dirSrc, dirDst, search, replace string) ***REMOVED***
-	err := filepath.Walk(dirSrc, func(file string, info os.FileInfo, err error) error ***REMOVED***
+func copyPackage(dirSrc, dirDst, search, replace string) {
+	err := filepath.Walk(dirSrc, func(file string, info os.FileInfo, err error) error {
 		base := filepath.Base(file)
 		if err != nil || info.IsDir() ||
 			!strings.HasSuffix(base, ".go") ||
 			strings.HasSuffix(base, "_test.go") ||
 			// Don't process subdirectories.
-			filepath.Dir(file) != dirSrc ***REMOVED***
+			filepath.Dir(file) != dirSrc {
 			return nil
-		***REMOVED***
+		}
 		b, err := ioutil.ReadFile(file)
-		if err != nil || bytes.Contains(b, []byte("\n// +build ignore")) ***REMOVED***
+		if err != nil || bytes.Contains(b, []byte("\n// +build ignore")) {
 			return err
-		***REMOVED***
+		}
 		// Fix paths.
 		b = bytes.Replace(b, []byte(search), []byte(replace), -1)
 		// Remove go:generate lines.
 		b = goGenRE.ReplaceAllLiteral(b, nil)
 		comment := "// Code generated by running \"go generate\" in golang.org/x/text. DO NOT EDIT.\n\n"
-		if *doCore ***REMOVED***
+		if *doCore {
 			comment = "// Code generated by running \"go run gen.go -core\" in golang.org/x/text. DO NOT EDIT.\n\n"
-		***REMOVED***
-		if !bytes.HasPrefix(b, []byte(comment)) ***REMOVED***
+		}
+		if !bytes.HasPrefix(b, []byte(comment)) {
 			b = append([]byte(comment), b...)
-		***REMOVED***
-		if b, err = format.Source(b); err != nil ***REMOVED***
+		}
+		if b, err = format.Source(b); err != nil {
 			fmt.Println("Failed to format file:", err)
 			os.Exit(1)
-		***REMOVED***
+		}
 		file = filepath.Join(dirDst, base)
 		vprintf("=== COPY %s\n", file)
 		return ioutil.WriteFile(file, b, 0666)
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		fmt.Println("Copying exported files failed:", err)
 		os.Exit(1)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func contains(a []string, s string) bool ***REMOVED***
-	for _, e := range a ***REMOVED***
-		if s == e ***REMOVED***
+func contains(a []string, s string) bool {
+	for _, e := range a {
+		if s == e {
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false
-***REMOVED***
+}
 
-func indent(b *bytes.Buffer) string ***REMOVED***
+func indent(b *bytes.Buffer) string {
 	return strings.Replace(strings.TrimSpace(b.String()), "\n", "\n\t", -1)
-***REMOVED***
+}

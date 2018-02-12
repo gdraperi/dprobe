@@ -23,194 +23,194 @@ var (
 // InitDB prepares a database for writing task data.
 //
 // Proper buckets will be created if they don't already exist.
-func InitDB(db *bolt.DB) error ***REMOVED***
-	return db.Update(func(tx *bolt.Tx) error ***REMOVED***
+func InitDB(db *bolt.DB) error {
+	return db.Update(func(tx *bolt.Tx) error {
 		_, err := createBucketIfNotExists(tx, bucketKeyStorageVersion, bucketKeyTasks)
 		return err
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
 // GetTask retrieves the task with id from the datastore.
-func GetTask(tx *bolt.Tx, id string) (*api.Task, error) ***REMOVED***
+func GetTask(tx *bolt.Tx, id string) (*api.Task, error) {
 	var t api.Task
 
-	if err := withTaskBucket(tx, id, func(bkt *bolt.Bucket) error ***REMOVED***
+	if err := withTaskBucket(tx, id, func(bkt *bolt.Bucket) error {
 		p := bkt.Get(bucketKeyData)
-		if p == nil ***REMOVED***
+		if p == nil {
 			return errTaskUnknown
-		***REMOVED***
+		}
 
 		return proto.Unmarshal(p, &t)
-	***REMOVED***); err != nil ***REMOVED***
+	}); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	return &t, nil
-***REMOVED***
+}
 
 // WalkTasks walks all tasks in the datastore.
-func WalkTasks(tx *bolt.Tx, fn func(task *api.Task) error) error ***REMOVED***
+func WalkTasks(tx *bolt.Tx, fn func(task *api.Task) error) error {
 	bkt := getTasksBucket(tx)
-	if bkt == nil ***REMOVED***
+	if bkt == nil {
 		return nil
-	***REMOVED***
+	}
 
-	return bkt.ForEach(func(k, v []byte) error ***REMOVED***
+	return bkt.ForEach(func(k, v []byte) error {
 		tbkt := bkt.Bucket(k)
 
 		p := tbkt.Get(bucketKeyData)
 		var t api.Task
-		if err := proto.Unmarshal(p, &t); err != nil ***REMOVED***
+		if err := proto.Unmarshal(p, &t); err != nil {
 			return err
-		***REMOVED***
+		}
 
 		return fn(&t)
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
 // TaskAssigned returns true if the task is assigned to the node.
-func TaskAssigned(tx *bolt.Tx, id string) bool ***REMOVED***
+func TaskAssigned(tx *bolt.Tx, id string) bool {
 	bkt := getTaskBucket(tx, id)
-	if bkt == nil ***REMOVED***
+	if bkt == nil {
 		return false
-	***REMOVED***
+	}
 
 	return len(bkt.Get(bucketKeyAssigned)) > 0
-***REMOVED***
+}
 
 // GetTaskStatus returns the current status for the task.
-func GetTaskStatus(tx *bolt.Tx, id string) (*api.TaskStatus, error) ***REMOVED***
+func GetTaskStatus(tx *bolt.Tx, id string) (*api.TaskStatus, error) {
 	var ts api.TaskStatus
-	if err := withTaskBucket(tx, id, func(bkt *bolt.Bucket) error ***REMOVED***
+	if err := withTaskBucket(tx, id, func(bkt *bolt.Bucket) error {
 		p := bkt.Get(bucketKeyStatus)
-		if p == nil ***REMOVED***
+		if p == nil {
 			return errTaskUnknown
-		***REMOVED***
+		}
 
 		return proto.Unmarshal(p, &ts)
-	***REMOVED***); err != nil ***REMOVED***
+	}); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	return &ts, nil
-***REMOVED***
+}
 
 // WalkTaskStatus calls fn for the status of each task.
-func WalkTaskStatus(tx *bolt.Tx, fn func(id string, status *api.TaskStatus) error) error ***REMOVED***
+func WalkTaskStatus(tx *bolt.Tx, fn func(id string, status *api.TaskStatus) error) error {
 	bkt := getTasksBucket(tx)
-	if bkt == nil ***REMOVED***
+	if bkt == nil {
 		return nil
-	***REMOVED***
+	}
 
-	return bkt.ForEach(func(k, v []byte) error ***REMOVED***
+	return bkt.ForEach(func(k, v []byte) error {
 		tbkt := bkt.Bucket(k)
 
 		p := tbkt.Get(bucketKeyStatus)
 		var ts api.TaskStatus
-		if err := proto.Unmarshal(p, &ts); err != nil ***REMOVED***
+		if err := proto.Unmarshal(p, &ts); err != nil {
 			return err
-		***REMOVED***
+		}
 
 		return fn(string(k), &ts)
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
 // PutTask places the task into the database.
-func PutTask(tx *bolt.Tx, task *api.Task) error ***REMOVED***
-	return withCreateTaskBucketIfNotExists(tx, task.ID, func(bkt *bolt.Bucket) error ***REMOVED***
+func PutTask(tx *bolt.Tx, task *api.Task) error {
+	return withCreateTaskBucketIfNotExists(tx, task.ID, func(bkt *bolt.Bucket) error {
 		taskCopy := *task
-		taskCopy.Status = api.TaskStatus***REMOVED******REMOVED*** // blank out the status.
+		taskCopy.Status = api.TaskStatus{} // blank out the status.
 
 		p, err := proto.Marshal(&taskCopy)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		return bkt.Put(bucketKeyData, p)
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
 // PutTaskStatus updates the status for the task with id.
-func PutTaskStatus(tx *bolt.Tx, id string, status *api.TaskStatus) error ***REMOVED***
-	return withCreateTaskBucketIfNotExists(tx, id, func(bkt *bolt.Bucket) error ***REMOVED***
+func PutTaskStatus(tx *bolt.Tx, id string, status *api.TaskStatus) error {
+	return withCreateTaskBucketIfNotExists(tx, id, func(bkt *bolt.Bucket) error {
 		p, err := proto.Marshal(status)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		return bkt.Put(bucketKeyStatus, p)
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
 // DeleteTask completely removes the task from the database.
-func DeleteTask(tx *bolt.Tx, id string) error ***REMOVED***
+func DeleteTask(tx *bolt.Tx, id string) error {
 	bkt := getTasksBucket(tx)
-	if bkt == nil ***REMOVED***
+	if bkt == nil {
 		return nil
-	***REMOVED***
+	}
 
 	return bkt.DeleteBucket([]byte(id))
-***REMOVED***
+}
 
 // SetTaskAssignment sets the current assignment state.
-func SetTaskAssignment(tx *bolt.Tx, id string, assigned bool) error ***REMOVED***
-	return withTaskBucket(tx, id, func(bkt *bolt.Bucket) error ***REMOVED***
-		if assigned ***REMOVED***
-			return bkt.Put(bucketKeyAssigned, []byte***REMOVED***0xFF***REMOVED***)
-		***REMOVED***
+func SetTaskAssignment(tx *bolt.Tx, id string, assigned bool) error {
+	return withTaskBucket(tx, id, func(bkt *bolt.Bucket) error {
+		if assigned {
+			return bkt.Put(bucketKeyAssigned, []byte{0xFF})
+		}
 		return bkt.Delete(bucketKeyAssigned)
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func createBucketIfNotExists(tx *bolt.Tx, keys ...[]byte) (*bolt.Bucket, error) ***REMOVED***
+func createBucketIfNotExists(tx *bolt.Tx, keys ...[]byte) (*bolt.Bucket, error) {
 	bkt, err := tx.CreateBucketIfNotExists(keys[0])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	for _, key := range keys[1:] ***REMOVED***
+	for _, key := range keys[1:] {
 		bkt, err = bkt.CreateBucketIfNotExists(key)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return bkt, nil
-***REMOVED***
+}
 
-func withCreateTaskBucketIfNotExists(tx *bolt.Tx, id string, fn func(bkt *bolt.Bucket) error) error ***REMOVED***
+func withCreateTaskBucketIfNotExists(tx *bolt.Tx, id string, fn func(bkt *bolt.Bucket) error) error {
 	bkt, err := createBucketIfNotExists(tx, bucketKeyStorageVersion, bucketKeyTasks, []byte(id))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	return fn(bkt)
-***REMOVED***
+}
 
-func withTaskBucket(tx *bolt.Tx, id string, fn func(bkt *bolt.Bucket) error) error ***REMOVED***
+func withTaskBucket(tx *bolt.Tx, id string, fn func(bkt *bolt.Bucket) error) error {
 	bkt := getTaskBucket(tx, id)
-	if bkt == nil ***REMOVED***
+	if bkt == nil {
 		return errTaskUnknown
-	***REMOVED***
+	}
 
 	return fn(bkt)
-***REMOVED***
+}
 
-func getTaskBucket(tx *bolt.Tx, id string) *bolt.Bucket ***REMOVED***
+func getTaskBucket(tx *bolt.Tx, id string) *bolt.Bucket {
 	return getBucket(tx, bucketKeyStorageVersion, bucketKeyTasks, []byte(id))
-***REMOVED***
+}
 
-func getTasksBucket(tx *bolt.Tx) *bolt.Bucket ***REMOVED***
+func getTasksBucket(tx *bolt.Tx) *bolt.Bucket {
 	return getBucket(tx, bucketKeyStorageVersion, bucketKeyTasks)
-***REMOVED***
+}
 
-func getBucket(tx *bolt.Tx, keys ...[]byte) *bolt.Bucket ***REMOVED***
+func getBucket(tx *bolt.Tx, keys ...[]byte) *bolt.Bucket {
 	bkt := tx.Bucket(keys[0])
 
-	for _, key := range keys[1:] ***REMOVED***
-		if bkt == nil ***REMOVED***
+	for _, key := range keys[1:] {
+		if bkt == nil {
 			break
-		***REMOVED***
+		}
 		bkt = bkt.Bucket(key)
-	***REMOVED***
+	}
 
 	return bkt
-***REMOVED***
+}

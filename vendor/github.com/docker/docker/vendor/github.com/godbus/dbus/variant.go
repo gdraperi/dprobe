@@ -9,44 +9,44 @@ import (
 )
 
 // Variant represents the D-Bus variant type.
-type Variant struct ***REMOVED***
+type Variant struct {
 	sig   Signature
-	value interface***REMOVED******REMOVED***
-***REMOVED***
+	value interface{}
+}
 
 // MakeVariant converts the given value to a Variant. It panics if v cannot be
 // represented as a D-Bus type.
-func MakeVariant(v interface***REMOVED******REMOVED***) Variant ***REMOVED***
-	return Variant***REMOVED***SignatureOf(v), v***REMOVED***
-***REMOVED***
+func MakeVariant(v interface{}) Variant {
+	return Variant{SignatureOf(v), v}
+}
 
 // ParseVariant parses the given string as a variant as described at
 // https://developer.gnome.org/glib/unstable/gvariant-text.html. If sig is not
 // empty, it is taken to be the expected signature for the variant.
-func ParseVariant(s string, sig Signature) (Variant, error) ***REMOVED***
+func ParseVariant(s string, sig Signature) (Variant, error) {
 	tokens := varLex(s)
-	p := &varParser***REMOVED***tokens: tokens***REMOVED***
+	p := &varParser{tokens: tokens}
 	n, err := varMakeNode(p)
-	if err != nil ***REMOVED***
-		return Variant***REMOVED******REMOVED***, err
-	***REMOVED***
-	if sig.str == "" ***REMOVED***
+	if err != nil {
+		return Variant{}, err
+	}
+	if sig.str == "" {
 		sig, err = varInfer(n)
-		if err != nil ***REMOVED***
-			return Variant***REMOVED******REMOVED***, err
-		***REMOVED***
-	***REMOVED***
+		if err != nil {
+			return Variant{}, err
+		}
+	}
 	v, err := n.Value(sig)
-	if err != nil ***REMOVED***
-		return Variant***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return Variant{}, err
+	}
 	return MakeVariant(v), nil
-***REMOVED***
+}
 
 // format returns a formatted version of v and whether this string can be parsed
 // unambigously.
-func (v Variant) format() (string, bool) ***REMOVED***
-	switch v.sig.str[0] ***REMOVED***
+func (v Variant) format() (string, bool) {
+	switch v.sig.str[0] {
 	case 'b', 'i':
 		return fmt.Sprint(v.value), true
 	case 'n', 'q', 'u', 'x', 't', 'd', 'h':
@@ -59,40 +59,40 @@ func (v Variant) format() (string, bool) ***REMOVED***
 		return strconv.Quote(v.value.(Signature).str), false
 	case 'v':
 		s, unamb := v.value.(Variant).format()
-		if !unamb ***REMOVED***
+		if !unamb {
 			return "<@" + v.value.(Variant).sig.str + " " + s + ">", true
-		***REMOVED***
+		}
 		return "<" + s + ">", true
 	case 'y':
 		return fmt.Sprintf("%#x", v.value.(byte)), false
-	***REMOVED***
+	}
 	rv := reflect.ValueOf(v.value)
-	switch rv.Kind() ***REMOVED***
+	switch rv.Kind() {
 	case reflect.Slice:
-		if rv.Len() == 0 ***REMOVED***
+		if rv.Len() == 0 {
 			return "[]", false
-		***REMOVED***
+		}
 		unamb := true
 		buf := bytes.NewBuffer([]byte("["))
-		for i := 0; i < rv.Len(); i++ ***REMOVED***
+		for i := 0; i < rv.Len(); i++ {
 			// TODO: slooow
 			s, b := MakeVariant(rv.Index(i).Interface()).format()
 			unamb = unamb && b
 			buf.WriteString(s)
-			if i != rv.Len()-1 ***REMOVED***
+			if i != rv.Len()-1 {
 				buf.WriteString(", ")
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		buf.WriteByte(']')
 		return buf.String(), unamb
 	case reflect.Map:
-		if rv.Len() == 0 ***REMOVED***
-			return "***REMOVED******REMOVED***", false
-		***REMOVED***
+		if rv.Len() == 0 {
+			return "{}", false
+		}
 		unamb := true
 		var buf bytes.Buffer
 		kvs := make([]string, rv.Len())
-		for i, k := range rv.MapKeys() ***REMOVED***
+		for i, k := range rv.MapKeys() {
 			s, b := MakeVariant(k.Interface()).format()
 			unamb = unamb && b
 			buf.Reset()
@@ -102,38 +102,38 @@ func (v Variant) format() (string, bool) ***REMOVED***
 			unamb = unamb && b
 			buf.WriteString(s)
 			kvs[i] = buf.String()
-		***REMOVED***
+		}
 		buf.Reset()
-		buf.WriteByte('***REMOVED***')
+		buf.WriteByte('{')
 		sort.Strings(kvs)
-		for i, kv := range kvs ***REMOVED***
-			if i > 0 ***REMOVED***
+		for i, kv := range kvs {
+			if i > 0 {
 				buf.WriteString(", ")
-			***REMOVED***
+			}
 			buf.WriteString(kv)
-		***REMOVED***
-		buf.WriteByte('***REMOVED***')
+		}
+		buf.WriteByte('}')
 		return buf.String(), unamb
-	***REMOVED***
+	}
 	return `"INVALID"`, true
-***REMOVED***
+}
 
 // Signature returns the D-Bus signature of the underlying value of v.
-func (v Variant) Signature() Signature ***REMOVED***
+func (v Variant) Signature() Signature {
 	return v.sig
-***REMOVED***
+}
 
 // String returns the string representation of the underlying value of v as
 // described at https://developer.gnome.org/glib/unstable/gvariant-text.html.
-func (v Variant) String() string ***REMOVED***
+func (v Variant) String() string {
 	s, unamb := v.format()
-	if !unamb ***REMOVED***
+	if !unamb {
 		return "@" + v.sig.str + " " + s
-	***REMOVED***
+	}
 	return s
-***REMOVED***
+}
 
 // Value returns the underlying value of v.
-func (v Variant) Value() interface***REMOVED******REMOVED*** ***REMOVED***
+func (v Variant) Value() interface{} {
 	return v.value
-***REMOVED***
+}

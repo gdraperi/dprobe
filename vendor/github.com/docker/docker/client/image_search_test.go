@@ -15,150 +15,150 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestImageSearchAnyError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestImageSearchAnyError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
-	***REMOVED***
-	_, err := client.ImageSearch(context.Background(), "some-image", types.ImageSearchOptions***REMOVED******REMOVED***)
-	if err == nil || err.Error() != "Error response from daemon: Server error" ***REMOVED***
+	}
+	_, err := client.ImageSearch(context.Background(), "some-image", types.ImageSearchOptions{})
+	if err == nil || err.Error() != "Error response from daemon: Server error" {
 		t.Fatalf("expected a Server Error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestImageSearchStatusUnauthorizedError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestImageSearchStatusUnauthorizedError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusUnauthorized, "Unauthorized error")),
-	***REMOVED***
-	_, err := client.ImageSearch(context.Background(), "some-image", types.ImageSearchOptions***REMOVED******REMOVED***)
-	if err == nil || err.Error() != "Error response from daemon: Unauthorized error" ***REMOVED***
+	}
+	_, err := client.ImageSearch(context.Background(), "some-image", types.ImageSearchOptions{})
+	if err == nil || err.Error() != "Error response from daemon: Unauthorized error" {
 		t.Fatalf("expected an Unauthorized Error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestImageSearchWithUnauthorizedErrorAndPrivilegeFuncError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestImageSearchWithUnauthorizedErrorAndPrivilegeFuncError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusUnauthorized, "Unauthorized error")),
-	***REMOVED***
-	privilegeFunc := func() (string, error) ***REMOVED***
+	}
+	privilegeFunc := func() (string, error) {
 		return "", fmt.Errorf("Error requesting privilege")
-	***REMOVED***
-	_, err := client.ImageSearch(context.Background(), "some-image", types.ImageSearchOptions***REMOVED***
+	}
+	_, err := client.ImageSearch(context.Background(), "some-image", types.ImageSearchOptions{
 		PrivilegeFunc: privilegeFunc,
-	***REMOVED***)
-	if err == nil || err.Error() != "Error requesting privilege" ***REMOVED***
+	})
+	if err == nil || err.Error() != "Error requesting privilege" {
 		t.Fatalf("expected an error requesting privilege, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestImageSearchWithUnauthorizedErrorAndAnotherUnauthorizedError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestImageSearchWithUnauthorizedErrorAndAnotherUnauthorizedError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusUnauthorized, "Unauthorized error")),
-	***REMOVED***
-	privilegeFunc := func() (string, error) ***REMOVED***
+	}
+	privilegeFunc := func() (string, error) {
 		return "a-auth-header", nil
-	***REMOVED***
-	_, err := client.ImageSearch(context.Background(), "some-image", types.ImageSearchOptions***REMOVED***
+	}
+	_, err := client.ImageSearch(context.Background(), "some-image", types.ImageSearchOptions{
 		PrivilegeFunc: privilegeFunc,
-	***REMOVED***)
-	if err == nil || err.Error() != "Error response from daemon: Unauthorized error" ***REMOVED***
+	})
+	if err == nil || err.Error() != "Error response from daemon: Unauthorized error" {
 		t.Fatalf("expected an Unauthorized Error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestImageSearchWithPrivilegedFuncNoError(t *testing.T) ***REMOVED***
+func TestImageSearchWithPrivilegedFuncNoError(t *testing.T) {
 	expectedURL := "/images/search"
-	client := &Client***REMOVED***
-		client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-			if !strings.HasPrefix(req.URL.Path, expectedURL) ***REMOVED***
+	client := &Client{
+		client: newMockClient(func(req *http.Request) (*http.Response, error) {
+			if !strings.HasPrefix(req.URL.Path, expectedURL) {
 				return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, req.URL)
-			***REMOVED***
+			}
 			auth := req.Header.Get("X-Registry-Auth")
-			if auth == "NotValid" ***REMOVED***
-				return &http.Response***REMOVED***
+			if auth == "NotValid" {
+				return &http.Response{
 					StatusCode: http.StatusUnauthorized,
 					Body:       ioutil.NopCloser(bytes.NewReader([]byte("Invalid credentials"))),
-				***REMOVED***, nil
-			***REMOVED***
-			if auth != "IAmValid" ***REMOVED***
+				}, nil
+			}
+			if auth != "IAmValid" {
 				return nil, fmt.Errorf("Invalid auth header : expected 'IAmValid', got %s", auth)
-			***REMOVED***
+			}
 			query := req.URL.Query()
 			term := query.Get("term")
-			if term != "some-image" ***REMOVED***
+			if term != "some-image" {
 				return nil, fmt.Errorf("term not set in URL query properly. Expected 'some-image', got %s", term)
-			***REMOVED***
-			content, err := json.Marshal([]registry.SearchResult***REMOVED***
-				***REMOVED***
+			}
+			content, err := json.Marshal([]registry.SearchResult{
+				{
 					Name: "anything",
-				***REMOVED***,
-			***REMOVED***)
-			if err != nil ***REMOVED***
+				},
+			})
+			if err != nil {
 				return nil, err
-			***REMOVED***
-			return &http.Response***REMOVED***
+			}
+			return &http.Response{
 				StatusCode: http.StatusOK,
 				Body:       ioutil.NopCloser(bytes.NewReader(content)),
-			***REMOVED***, nil
-		***REMOVED***),
-	***REMOVED***
-	privilegeFunc := func() (string, error) ***REMOVED***
+			}, nil
+		}),
+	}
+	privilegeFunc := func() (string, error) {
 		return "IAmValid", nil
-	***REMOVED***
-	results, err := client.ImageSearch(context.Background(), "some-image", types.ImageSearchOptions***REMOVED***
+	}
+	results, err := client.ImageSearch(context.Background(), "some-image", types.ImageSearchOptions{
 		RegistryAuth:  "NotValid",
 		PrivilegeFunc: privilegeFunc,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if len(results) != 1 ***REMOVED***
+	}
+	if len(results) != 1 {
 		t.Fatalf("expected 1 result, got %v", results)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestImageSearchWithoutErrors(t *testing.T) ***REMOVED***
+func TestImageSearchWithoutErrors(t *testing.T) {
 	expectedURL := "/images/search"
 	filterArgs := filters.NewArgs()
 	filterArgs.Add("is-automated", "true")
 	filterArgs.Add("stars", "3")
 
-	expectedFilters := `***REMOVED***"is-automated":***REMOVED***"true":true***REMOVED***,"stars":***REMOVED***"3":true***REMOVED******REMOVED***`
+	expectedFilters := `{"is-automated":{"true":true},"stars":{"3":true}}`
 
-	client := &Client***REMOVED***
-		client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-			if !strings.HasPrefix(req.URL.Path, expectedURL) ***REMOVED***
+	client := &Client{
+		client: newMockClient(func(req *http.Request) (*http.Response, error) {
+			if !strings.HasPrefix(req.URL.Path, expectedURL) {
 				return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, req.URL)
-			***REMOVED***
+			}
 			query := req.URL.Query()
 			term := query.Get("term")
-			if term != "some-image" ***REMOVED***
+			if term != "some-image" {
 				return nil, fmt.Errorf("term not set in URL query properly. Expected 'some-image', got %s", term)
-			***REMOVED***
+			}
 			filters := query.Get("filters")
-			if filters != expectedFilters ***REMOVED***
+			if filters != expectedFilters {
 				return nil, fmt.Errorf("filters not set in URL query properly. Expected '%s', got %s", expectedFilters, filters)
-			***REMOVED***
-			content, err := json.Marshal([]registry.SearchResult***REMOVED***
-				***REMOVED***
+			}
+			content, err := json.Marshal([]registry.SearchResult{
+				{
 					Name: "anything",
-				***REMOVED***,
-			***REMOVED***)
-			if err != nil ***REMOVED***
+				},
+			})
+			if err != nil {
 				return nil, err
-			***REMOVED***
-			return &http.Response***REMOVED***
+			}
+			return &http.Response{
 				StatusCode: http.StatusOK,
 				Body:       ioutil.NopCloser(bytes.NewReader(content)),
-			***REMOVED***, nil
-		***REMOVED***),
-	***REMOVED***
-	results, err := client.ImageSearch(context.Background(), "some-image", types.ImageSearchOptions***REMOVED***
+			}, nil
+		}),
+	}
+	results, err := client.ImageSearch(context.Background(), "some-image", types.ImageSearchOptions{
 		Filters: filterArgs,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if len(results) != 1 ***REMOVED***
+	}
+	if len(results) != 1 {
 		t.Fatalf("expected a result, got %v", results)
-	***REMOVED***
-***REMOVED***
+	}
+}

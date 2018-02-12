@@ -18,15 +18,15 @@ const printerType = "golang.org/x/text/message.Printer"
 // - handle features (gender, plural)
 // - message rewriting
 
-func init() ***REMOVED***
+func init() {
 	overwrite = cmdRewrite.Flag.Bool("w", false, "write files in place")
-***REMOVED***
+}
 
 var (
 	overwrite *bool
 )
 
-var cmdRewrite = &Command***REMOVED***
+var cmdRewrite = &Command{
 	Run:       runRewrite,
 	UsageLine: "rewrite <package>",
 	Short:     "rewrites fmt functions to use a message Printer",
@@ -36,20 +36,20 @@ fmt to use x/text's message package whenever a message.Printer is in scope.
 It rewrites Print and Println calls with constant strings to the equivalent
 using Printf to allow translators to reorder arguments.
 `,
-***REMOVED***
+}
 
-func runRewrite(cmd *Command, _ *pipeline.Config, args []string) error ***REMOVED***
+func runRewrite(cmd *Command, _ *pipeline.Config, args []string) error {
 	w := os.Stdout
-	if *overwrite ***REMOVED***
+	if *overwrite {
 		w = nil
-	***REMOVED***
+	}
 	pkg := "."
-	switch len(args) ***REMOVED***
+	switch len(args) {
 	case 0:
 	case 1:
 		pkg = args[0]
 	default:
 		return errorf("can only specify at most one package")
-	***REMOVED***
+	}
 	return pipeline.Rewrite(w, pkg)
-***REMOVED***
+}

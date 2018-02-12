@@ -11,155 +11,155 @@ import (
 	"github.com/docker/docker/pkg/stringid"
 )
 
-type linuxParser struct ***REMOVED***
-***REMOVED***
+type linuxParser struct {
+}
 
-func linuxSplitRawSpec(raw string) ([]string, error) ***REMOVED***
-	if strings.Count(raw, ":") > 2 ***REMOVED***
+func linuxSplitRawSpec(raw string) ([]string, error) {
+	if strings.Count(raw, ":") > 2 {
 		return nil, errInvalidSpec(raw)
-	***REMOVED***
+	}
 
 	arr := strings.SplitN(raw, ":", 3)
-	if arr[0] == "" ***REMOVED***
+	if arr[0] == "" {
 		return nil, errInvalidSpec(raw)
-	***REMOVED***
+	}
 	return arr, nil
-***REMOVED***
+}
 
-func linuxValidateNotRoot(p string) error ***REMOVED***
+func linuxValidateNotRoot(p string) error {
 	p = path.Clean(strings.Replace(p, `\`, `/`, -1))
-	if p == "/" ***REMOVED***
+	if p == "/" {
 		return ErrVolumeTargetIsRoot
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func linuxValidateAbsolute(p string) error ***REMOVED***
+}
+func linuxValidateAbsolute(p string) error {
 	p = strings.Replace(p, `\`, `/`, -1)
-	if path.IsAbs(p) ***REMOVED***
+	if path.IsAbs(p) {
 		return nil
-	***REMOVED***
+	}
 	return fmt.Errorf("invalid mount path: '%s' mount path must be absolute", p)
-***REMOVED***
-func (p *linuxParser) ValidateMountConfig(mnt *mount.Mount) error ***REMOVED***
+}
+func (p *linuxParser) ValidateMountConfig(mnt *mount.Mount) error {
 	// there was something looking like a bug in existing codebase:
 	// - validateMountConfig on linux was called with options skipping bind source existence when calling ParseMountRaw
 	// - but not when calling ParseMountSpec directly... nor when the unit test called it directly
 	return p.validateMountConfigImpl(mnt, true)
-***REMOVED***
-func (p *linuxParser) validateMountConfigImpl(mnt *mount.Mount, validateBindSourceExists bool) error ***REMOVED***
-	if len(mnt.Target) == 0 ***REMOVED***
-		return &errMountConfig***REMOVED***mnt, errMissingField("Target")***REMOVED***
-	***REMOVED***
+}
+func (p *linuxParser) validateMountConfigImpl(mnt *mount.Mount, validateBindSourceExists bool) error {
+	if len(mnt.Target) == 0 {
+		return &errMountConfig{mnt, errMissingField("Target")}
+	}
 
-	if err := linuxValidateNotRoot(mnt.Target); err != nil ***REMOVED***
-		return &errMountConfig***REMOVED***mnt, err***REMOVED***
-	***REMOVED***
+	if err := linuxValidateNotRoot(mnt.Target); err != nil {
+		return &errMountConfig{mnt, err}
+	}
 
-	if err := linuxValidateAbsolute(mnt.Target); err != nil ***REMOVED***
-		return &errMountConfig***REMOVED***mnt, err***REMOVED***
-	***REMOVED***
+	if err := linuxValidateAbsolute(mnt.Target); err != nil {
+		return &errMountConfig{mnt, err}
+	}
 
-	switch mnt.Type ***REMOVED***
+	switch mnt.Type {
 	case mount.TypeBind:
-		if len(mnt.Source) == 0 ***REMOVED***
-			return &errMountConfig***REMOVED***mnt, errMissingField("Source")***REMOVED***
-		***REMOVED***
+		if len(mnt.Source) == 0 {
+			return &errMountConfig{mnt, errMissingField("Source")}
+		}
 		// Don't error out just because the propagation mode is not supported on the platform
-		if opts := mnt.BindOptions; opts != nil ***REMOVED***
-			if len(opts.Propagation) > 0 && len(linuxPropagationModes) > 0 ***REMOVED***
-				if _, ok := linuxPropagationModes[opts.Propagation]; !ok ***REMOVED***
-					return &errMountConfig***REMOVED***mnt, fmt.Errorf("invalid propagation mode: %s", opts.Propagation)***REMOVED***
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-		if mnt.VolumeOptions != nil ***REMOVED***
-			return &errMountConfig***REMOVED***mnt, errExtraField("VolumeOptions")***REMOVED***
-		***REMOVED***
+		if opts := mnt.BindOptions; opts != nil {
+			if len(opts.Propagation) > 0 && len(linuxPropagationModes) > 0 {
+				if _, ok := linuxPropagationModes[opts.Propagation]; !ok {
+					return &errMountConfig{mnt, fmt.Errorf("invalid propagation mode: %s", opts.Propagation)}
+				}
+			}
+		}
+		if mnt.VolumeOptions != nil {
+			return &errMountConfig{mnt, errExtraField("VolumeOptions")}
+		}
 
-		if err := linuxValidateAbsolute(mnt.Source); err != nil ***REMOVED***
-			return &errMountConfig***REMOVED***mnt, err***REMOVED***
-		***REMOVED***
+		if err := linuxValidateAbsolute(mnt.Source); err != nil {
+			return &errMountConfig{mnt, err}
+		}
 
-		if validateBindSourceExists ***REMOVED***
+		if validateBindSourceExists {
 			exists, _, _ := currentFileInfoProvider.fileInfo(mnt.Source)
-			if !exists ***REMOVED***
-				return &errMountConfig***REMOVED***mnt, errBindNotExist***REMOVED***
-			***REMOVED***
-		***REMOVED***
+			if !exists {
+				return &errMountConfig{mnt, errBindNotExist}
+			}
+		}
 
 	case mount.TypeVolume:
-		if mnt.BindOptions != nil ***REMOVED***
-			return &errMountConfig***REMOVED***mnt, errExtraField("BindOptions")***REMOVED***
-		***REMOVED***
+		if mnt.BindOptions != nil {
+			return &errMountConfig{mnt, errExtraField("BindOptions")}
+		}
 
-		if len(mnt.Source) == 0 && mnt.ReadOnly ***REMOVED***
-			return &errMountConfig***REMOVED***mnt, fmt.Errorf("must not set ReadOnly mode when using anonymous volumes")***REMOVED***
-		***REMOVED***
+		if len(mnt.Source) == 0 && mnt.ReadOnly {
+			return &errMountConfig{mnt, fmt.Errorf("must not set ReadOnly mode when using anonymous volumes")}
+		}
 	case mount.TypeTmpfs:
-		if len(mnt.Source) != 0 ***REMOVED***
-			return &errMountConfig***REMOVED***mnt, errExtraField("Source")***REMOVED***
-		***REMOVED***
-		if _, err := p.ConvertTmpfsOptions(mnt.TmpfsOptions, mnt.ReadOnly); err != nil ***REMOVED***
-			return &errMountConfig***REMOVED***mnt, err***REMOVED***
-		***REMOVED***
+		if len(mnt.Source) != 0 {
+			return &errMountConfig{mnt, errExtraField("Source")}
+		}
+		if _, err := p.ConvertTmpfsOptions(mnt.TmpfsOptions, mnt.ReadOnly); err != nil {
+			return &errMountConfig{mnt, err}
+		}
 	default:
-		return &errMountConfig***REMOVED***mnt, errors.New("mount type unknown")***REMOVED***
-	***REMOVED***
+		return &errMountConfig{mnt, errors.New("mount type unknown")}
+	}
 	return nil
-***REMOVED***
+}
 
 // read-write modes
-var rwModes = map[string]bool***REMOVED***
+var rwModes = map[string]bool{
 	"rw": true,
 	"ro": true,
-***REMOVED***
+}
 
 // label modes
-var linuxLabelModes = map[string]bool***REMOVED***
+var linuxLabelModes = map[string]bool{
 	"Z": true,
 	"z": true,
-***REMOVED***
+}
 
 // consistency modes
-var linuxConsistencyModes = map[mount.Consistency]bool***REMOVED***
+var linuxConsistencyModes = map[mount.Consistency]bool{
 	mount.ConsistencyFull:      true,
 	mount.ConsistencyCached:    true,
 	mount.ConsistencyDelegated: true,
-***REMOVED***
-var linuxPropagationModes = map[mount.Propagation]bool***REMOVED***
+}
+var linuxPropagationModes = map[mount.Propagation]bool{
 	mount.PropagationPrivate:  true,
 	mount.PropagationRPrivate: true,
 	mount.PropagationSlave:    true,
 	mount.PropagationRSlave:   true,
 	mount.PropagationShared:   true,
 	mount.PropagationRShared:  true,
-***REMOVED***
+}
 
 const linuxDefaultPropagationMode = mount.PropagationRPrivate
 
-func linuxGetPropagation(mode string) mount.Propagation ***REMOVED***
-	for _, o := range strings.Split(mode, ",") ***REMOVED***
+func linuxGetPropagation(mode string) mount.Propagation {
+	for _, o := range strings.Split(mode, ",") {
 		prop := mount.Propagation(o)
-		if linuxPropagationModes[prop] ***REMOVED***
+		if linuxPropagationModes[prop] {
 			return prop
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return linuxDefaultPropagationMode
-***REMOVED***
+}
 
-func linuxHasPropagation(mode string) bool ***REMOVED***
-	for _, o := range strings.Split(mode, ",") ***REMOVED***
-		if linuxPropagationModes[mount.Propagation(o)] ***REMOVED***
+func linuxHasPropagation(mode string) bool {
+	for _, o := range strings.Split(mode, ",") {
+		if linuxPropagationModes[mount.Propagation(o)] {
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false
-***REMOVED***
+}
 
-func linuxValidMountMode(mode string) bool ***REMOVED***
-	if mode == "" ***REMOVED***
+func linuxValidMountMode(mode string) bool {
+	if mode == "" {
 		return true
-	***REMOVED***
+	}
 
 	rwModeCount := 0
 	labelModeCount := 0
@@ -167,8 +167,8 @@ func linuxValidMountMode(mode string) bool ***REMOVED***
 	copyModeCount := 0
 	consistencyModeCount := 0
 
-	for _, o := range strings.Split(mode, ",") ***REMOVED***
-		switch ***REMOVED***
+	for _, o := range strings.Split(mode, ",") {
+		switch {
 		case rwModes[o]:
 			rwModeCount++
 		case linuxLabelModes[o]:
@@ -181,47 +181,47 @@ func linuxValidMountMode(mode string) bool ***REMOVED***
 			consistencyModeCount++
 		default:
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Only one string for each mode is allowed.
-	if rwModeCount > 1 || labelModeCount > 1 || propagationModeCount > 1 || copyModeCount > 1 || consistencyModeCount > 1 ***REMOVED***
+	if rwModeCount > 1 || labelModeCount > 1 || propagationModeCount > 1 || copyModeCount > 1 || consistencyModeCount > 1 {
 		return false
-	***REMOVED***
+	}
 	return true
-***REMOVED***
+}
 
-func (p *linuxParser) ReadWrite(mode string) bool ***REMOVED***
-	if !linuxValidMountMode(mode) ***REMOVED***
+func (p *linuxParser) ReadWrite(mode string) bool {
+	if !linuxValidMountMode(mode) {
 		return false
-	***REMOVED***
+	}
 
-	for _, o := range strings.Split(mode, ",") ***REMOVED***
-		if o == "ro" ***REMOVED***
+	for _, o := range strings.Split(mode, ",") {
+		if o == "ro" {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}
 
-func (p *linuxParser) ParseMountRaw(raw, volumeDriver string) (*MountPoint, error) ***REMOVED***
+func (p *linuxParser) ParseMountRaw(raw, volumeDriver string) (*MountPoint, error) {
 	arr, err := linuxSplitRawSpec(raw)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	var spec mount.Mount
 	var mode string
-	switch len(arr) ***REMOVED***
+	switch len(arr) {
 	case 1:
 		// Just a destination path in the container
 		spec.Target = arr[0]
 	case 2:
-		if linuxValidMountMode(arr[1]) ***REMOVED***
+		if linuxValidMountMode(arr[1]) {
 			// Destination + Mode is not a valid volume - volumes
 			// cannot include a mode. e.g. /foo:rw
 			return nil, errInvalidSpec(raw)
-		***REMOVED***
+		}
 		// Host Source Path or Name + Destination
 		spec.Source = arr[0]
 		spec.Target = arr[1]
@@ -232,138 +232,138 @@ func (p *linuxParser) ParseMountRaw(raw, volumeDriver string) (*MountPoint, erro
 		mode = arr[2]
 	default:
 		return nil, errInvalidSpec(raw)
-	***REMOVED***
+	}
 
-	if !linuxValidMountMode(mode) ***REMOVED***
+	if !linuxValidMountMode(mode) {
 		return nil, errInvalidMode(mode)
-	***REMOVED***
+	}
 
-	if path.IsAbs(spec.Source) ***REMOVED***
+	if path.IsAbs(spec.Source) {
 		spec.Type = mount.TypeBind
-	***REMOVED*** else ***REMOVED***
+	} else {
 		spec.Type = mount.TypeVolume
-	***REMOVED***
+	}
 
 	spec.ReadOnly = !p.ReadWrite(mode)
 
 	// cannot assume that if a volume driver is passed in that we should set it
-	if volumeDriver != "" && spec.Type == mount.TypeVolume ***REMOVED***
-		spec.VolumeOptions = &mount.VolumeOptions***REMOVED***
-			DriverConfig: &mount.Driver***REMOVED***Name: volumeDriver***REMOVED***,
-		***REMOVED***
-	***REMOVED***
+	if volumeDriver != "" && spec.Type == mount.TypeVolume {
+		spec.VolumeOptions = &mount.VolumeOptions{
+			DriverConfig: &mount.Driver{Name: volumeDriver},
+		}
+	}
 
-	if copyData, isSet := getCopyMode(mode, p.DefaultCopyMode()); isSet ***REMOVED***
-		if spec.VolumeOptions == nil ***REMOVED***
-			spec.VolumeOptions = &mount.VolumeOptions***REMOVED******REMOVED***
-		***REMOVED***
+	if copyData, isSet := getCopyMode(mode, p.DefaultCopyMode()); isSet {
+		if spec.VolumeOptions == nil {
+			spec.VolumeOptions = &mount.VolumeOptions{}
+		}
 		spec.VolumeOptions.NoCopy = !copyData
-	***REMOVED***
-	if linuxHasPropagation(mode) ***REMOVED***
-		spec.BindOptions = &mount.BindOptions***REMOVED***
+	}
+	if linuxHasPropagation(mode) {
+		spec.BindOptions = &mount.BindOptions{
 			Propagation: linuxGetPropagation(mode),
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	mp, err := p.parseMountSpec(spec, false)
-	if mp != nil ***REMOVED***
+	if mp != nil {
 		mp.Mode = mode
-	***REMOVED***
-	if err != nil ***REMOVED***
+	}
+	if err != nil {
 		err = fmt.Errorf("%v: %v", errInvalidSpec(raw), err)
-	***REMOVED***
+	}
 	return mp, err
-***REMOVED***
-func (p *linuxParser) ParseMountSpec(cfg mount.Mount) (*MountPoint, error) ***REMOVED***
+}
+func (p *linuxParser) ParseMountSpec(cfg mount.Mount) (*MountPoint, error) {
 	return p.parseMountSpec(cfg, true)
-***REMOVED***
-func (p *linuxParser) parseMountSpec(cfg mount.Mount, validateBindSourceExists bool) (*MountPoint, error) ***REMOVED***
-	if err := p.validateMountConfigImpl(&cfg, validateBindSourceExists); err != nil ***REMOVED***
+}
+func (p *linuxParser) parseMountSpec(cfg mount.Mount, validateBindSourceExists bool) (*MountPoint, error) {
+	if err := p.validateMountConfigImpl(&cfg, validateBindSourceExists); err != nil {
 		return nil, err
-	***REMOVED***
-	mp := &MountPoint***REMOVED***
+	}
+	mp := &MountPoint{
 		RW:          !cfg.ReadOnly,
 		Destination: path.Clean(filepath.ToSlash(cfg.Target)),
 		Type:        cfg.Type,
 		Spec:        cfg,
-	***REMOVED***
+	}
 
-	switch cfg.Type ***REMOVED***
+	switch cfg.Type {
 	case mount.TypeVolume:
-		if cfg.Source == "" ***REMOVED***
+		if cfg.Source == "" {
 			mp.Name = stringid.GenerateNonCryptoID()
-		***REMOVED*** else ***REMOVED***
+		} else {
 			mp.Name = cfg.Source
-		***REMOVED***
+		}
 		mp.CopyData = p.DefaultCopyMode()
 
-		if cfg.VolumeOptions != nil ***REMOVED***
-			if cfg.VolumeOptions.DriverConfig != nil ***REMOVED***
+		if cfg.VolumeOptions != nil {
+			if cfg.VolumeOptions.DriverConfig != nil {
 				mp.Driver = cfg.VolumeOptions.DriverConfig.Name
-			***REMOVED***
-			if cfg.VolumeOptions.NoCopy ***REMOVED***
+			}
+			if cfg.VolumeOptions.NoCopy {
 				mp.CopyData = false
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 	case mount.TypeBind:
 		mp.Source = path.Clean(filepath.ToSlash(cfg.Source))
-		if cfg.BindOptions != nil && len(cfg.BindOptions.Propagation) > 0 ***REMOVED***
+		if cfg.BindOptions != nil && len(cfg.BindOptions.Propagation) > 0 {
 			mp.Propagation = cfg.BindOptions.Propagation
-		***REMOVED*** else ***REMOVED***
+		} else {
 			// If user did not specify a propagation mode, get
 			// default propagation mode.
 			mp.Propagation = linuxDefaultPropagationMode
-		***REMOVED***
+		}
 	case mount.TypeTmpfs:
 		// NOP
-	***REMOVED***
+	}
 	return mp, nil
-***REMOVED***
+}
 
-func (p *linuxParser) ParseVolumesFrom(spec string) (string, string, error) ***REMOVED***
-	if len(spec) == 0 ***REMOVED***
+func (p *linuxParser) ParseVolumesFrom(spec string) (string, string, error) {
+	if len(spec) == 0 {
 		return "", "", fmt.Errorf("volumes-from specification cannot be an empty string")
-	***REMOVED***
+	}
 
 	specParts := strings.SplitN(spec, ":", 2)
 	id := specParts[0]
 	mode := "rw"
 
-	if len(specParts) == 2 ***REMOVED***
+	if len(specParts) == 2 {
 		mode = specParts[1]
-		if !linuxValidMountMode(mode) ***REMOVED***
+		if !linuxValidMountMode(mode) {
 			return "", "", errInvalidMode(mode)
-		***REMOVED***
+		}
 		// For now don't allow propagation properties while importing
 		// volumes from data container. These volumes will inherit
 		// the same propagation property as of the original volume
 		// in data container. This probably can be relaxed in future.
-		if linuxHasPropagation(mode) ***REMOVED***
+		if linuxHasPropagation(mode) {
 			return "", "", errInvalidMode(mode)
-		***REMOVED***
+		}
 		// Do not allow copy modes on volumes-from
-		if _, isSet := getCopyMode(mode, p.DefaultCopyMode()); isSet ***REMOVED***
+		if _, isSet := getCopyMode(mode, p.DefaultCopyMode()); isSet {
 			return "", "", errInvalidMode(mode)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return id, mode, nil
-***REMOVED***
+}
 
-func (p *linuxParser) DefaultPropagationMode() mount.Propagation ***REMOVED***
+func (p *linuxParser) DefaultPropagationMode() mount.Propagation {
 	return linuxDefaultPropagationMode
-***REMOVED***
+}
 
-func (p *linuxParser) ConvertTmpfsOptions(opt *mount.TmpfsOptions, readOnly bool) (string, error) ***REMOVED***
+func (p *linuxParser) ConvertTmpfsOptions(opt *mount.TmpfsOptions, readOnly bool) (string, error) {
 	var rawOpts []string
-	if readOnly ***REMOVED***
+	if readOnly {
 		rawOpts = append(rawOpts, "ro")
-	***REMOVED***
+	}
 
-	if opt != nil && opt.Mode != 0 ***REMOVED***
+	if opt != nil && opt.Mode != 0 {
 		rawOpts = append(rawOpts, fmt.Sprintf("mode=%o", opt.Mode))
-	***REMOVED***
+	}
 
-	if opt != nil && opt.SizeBytes != 0 ***REMOVED***
+	if opt != nil && opt.SizeBytes != 0 {
 		// calculate suffix here, making this linux specific, but that is
 		// okay, since API is that way anyways.
 
@@ -377,40 +377,40 @@ func (p *linuxParser) ConvertTmpfsOptions(opt *mount.TmpfsOptions, readOnly bool
 			size   = opt.SizeBytes
 			suffix string
 		)
-		for _, r := range []struct ***REMOVED***
+		for _, r := range []struct {
 			suffix  string
 			divisor int64
-		***REMOVED******REMOVED***
-			***REMOVED***"g", 1 << 30***REMOVED***,
-			***REMOVED***"m", 1 << 20***REMOVED***,
-			***REMOVED***"k", 1 << 10***REMOVED***,
-		***REMOVED*** ***REMOVED***
-			if size%r.divisor == 0 ***REMOVED***
+		}{
+			{"g", 1 << 30},
+			{"m", 1 << 20},
+			{"k", 1 << 10},
+		} {
+			if size%r.divisor == 0 {
 				size = size / r.divisor
 				suffix = r.suffix
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		rawOpts = append(rawOpts, fmt.Sprintf("size=%d%s", size, suffix))
-	***REMOVED***
+	}
 	return strings.Join(rawOpts, ","), nil
-***REMOVED***
+}
 
-func (p *linuxParser) DefaultCopyMode() bool ***REMOVED***
+func (p *linuxParser) DefaultCopyMode() bool {
 	return true
-***REMOVED***
-func (p *linuxParser) ValidateVolumeName(name string) error ***REMOVED***
+}
+func (p *linuxParser) ValidateVolumeName(name string) error {
 	return nil
-***REMOVED***
+}
 
-func (p *linuxParser) IsBackwardCompatible(m *MountPoint) bool ***REMOVED***
+func (p *linuxParser) IsBackwardCompatible(m *MountPoint) bool {
 	return len(m.Source) > 0 || m.Driver == DefaultDriverName
-***REMOVED***
+}
 
-func (p *linuxParser) ValidateTmpfsMountDestination(dest string) error ***REMOVED***
-	if err := linuxValidateNotRoot(dest); err != nil ***REMOVED***
+func (p *linuxParser) ValidateTmpfsMountDestination(dest string) error {
+	if err := linuxValidateNotRoot(dest); err != nil {
 		return err
-	***REMOVED***
+	}
 	return linuxValidateAbsolute(dest)
-***REMOVED***
+}

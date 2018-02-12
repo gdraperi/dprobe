@@ -20,20 +20,20 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type fluentd struct ***REMOVED***
+type fluentd struct {
 	tag           string
 	containerID   string
 	containerName string
 	writer        *fluent.Fluent
 	extra         map[string]string
-***REMOVED***
+}
 
-type location struct ***REMOVED***
+type location struct {
 	protocol string
 	host     string
 	port     int
 	path     string
-***REMOVED***
+}
 
 const (
 	name = "fluentd"
@@ -56,76 +56,76 @@ const (
 	subSecondPrecisionKey = "fluentd-sub-second-precision"
 )
 
-func init() ***REMOVED***
-	if err := logger.RegisterLogDriver(name, New); err != nil ***REMOVED***
+func init() {
+	if err := logger.RegisterLogDriver(name, New); err != nil {
 		logrus.Fatal(err)
-	***REMOVED***
-	if err := logger.RegisterLogOptValidator(name, ValidateLogOpt); err != nil ***REMOVED***
+	}
+	if err := logger.RegisterLogOptValidator(name, ValidateLogOpt); err != nil {
 		logrus.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // New creates a fluentd logger using the configuration passed in on
 // the context. The supported context configuration variable is
 // fluentd-address.
-func New(info logger.Info) (logger.Logger, error) ***REMOVED***
+func New(info logger.Info) (logger.Logger, error) {
 	loc, err := parseAddress(info.Config[addressKey])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	tag, err := loggerutils.ParseLogTag(info, loggerutils.DefaultTemplate)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	extra, err := info.ExtraAttributes(nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	bufferLimit := defaultBufferLimit
-	if info.Config[bufferLimitKey] != "" ***REMOVED***
+	if info.Config[bufferLimitKey] != "" {
 		bl64, err := units.RAMInBytes(info.Config[bufferLimitKey])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		bufferLimit = int(bl64)
-	***REMOVED***
+	}
 
 	retryWait := defaultRetryWait
-	if info.Config[retryWaitKey] != "" ***REMOVED***
+	if info.Config[retryWaitKey] != "" {
 		rwd, err := time.ParseDuration(info.Config[retryWaitKey])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		retryWait = int(rwd.Seconds() * 1000)
-	***REMOVED***
+	}
 
 	maxRetries := defaultMaxRetries
-	if info.Config[maxRetriesKey] != "" ***REMOVED***
+	if info.Config[maxRetriesKey] != "" {
 		mr64, err := strconv.ParseUint(info.Config[maxRetriesKey], 10, strconv.IntSize)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		maxRetries = int(mr64)
-	***REMOVED***
+	}
 
 	asyncConnect := false
-	if info.Config[asyncConnectKey] != "" ***REMOVED***
-		if asyncConnect, err = strconv.ParseBool(info.Config[asyncConnectKey]); err != nil ***REMOVED***
+	if info.Config[asyncConnectKey] != "" {
+		if asyncConnect, err = strconv.ParseBool(info.Config[asyncConnectKey]); err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	subSecondPrecision := false
-	if info.Config[subSecondPrecisionKey] != "" ***REMOVED***
-		if subSecondPrecision, err = strconv.ParseBool(info.Config[subSecondPrecisionKey]); err != nil ***REMOVED***
+	if info.Config[subSecondPrecisionKey] != "" {
+		if subSecondPrecision, err = strconv.ParseBool(info.Config[subSecondPrecisionKey]); err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	fluentConfig := fluent.Config***REMOVED***
+	fluentConfig := fluent.Config{
 		FluentPort:         loc.port,
 		FluentHost:         loc.host,
 		FluentNetwork:      loc.protocol,
@@ -135,54 +135,54 @@ func New(info logger.Info) (logger.Logger, error) ***REMOVED***
 		MaxRetry:           maxRetries,
 		AsyncConnect:       asyncConnect,
 		SubSecondPrecision: subSecondPrecision,
-	***REMOVED***
+	}
 
 	logrus.WithField("container", info.ContainerID).WithField("config", fluentConfig).
 		Debug("logging driver fluentd configured")
 
 	log, err := fluent.New(fluentConfig)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	return &fluentd***REMOVED***
+	}
+	return &fluentd{
 		tag:           tag,
 		containerID:   info.ContainerID,
 		containerName: info.ContainerName,
 		writer:        log,
 		extra:         extra,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-func (f *fluentd) Log(msg *logger.Message) error ***REMOVED***
-	data := map[string]string***REMOVED***
+func (f *fluentd) Log(msg *logger.Message) error {
+	data := map[string]string{
 		"container_id":   f.containerID,
 		"container_name": f.containerName,
 		"source":         msg.Source,
 		"log":            string(msg.Line),
-	***REMOVED***
-	for k, v := range f.extra ***REMOVED***
+	}
+	for k, v := range f.extra {
 		data[k] = v
-	***REMOVED***
+	}
 
 	ts := msg.Timestamp
 	logger.PutMessage(msg)
 	// fluent-logger-golang buffers logs from failures and disconnections,
 	// and these are transferred again automatically.
 	return f.writer.PostWithTime(f.tag, ts, data)
-***REMOVED***
+}
 
-func (f *fluentd) Close() error ***REMOVED***
+func (f *fluentd) Close() error {
 	return f.writer.Close()
-***REMOVED***
+}
 
-func (f *fluentd) Name() string ***REMOVED***
+func (f *fluentd) Name() string {
 	return name
-***REMOVED***
+}
 
 // ValidateLogOpt looks for fluentd specific log option fluentd-address.
-func ValidateLogOpt(cfg map[string]string) error ***REMOVED***
-	for key := range cfg ***REMOVED***
-		switch key ***REMOVED***
+func ValidateLogOpt(cfg map[string]string) error {
+	for key := range cfg {
+		switch key {
 		case "env":
 		case "env-regex":
 		case "labels":
@@ -196,65 +196,65 @@ func ValidateLogOpt(cfg map[string]string) error ***REMOVED***
 			// Accepted
 		default:
 			return fmt.Errorf("unknown log opt '%s' for fluentd log driver", key)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	_, err := parseAddress(cfg[addressKey])
 	return err
-***REMOVED***
+}
 
-func parseAddress(address string) (*location, error) ***REMOVED***
-	if address == "" ***REMOVED***
-		return &location***REMOVED***
+func parseAddress(address string) (*location, error) {
+	if address == "" {
+		return &location{
 			protocol: defaultProtocol,
 			host:     defaultHost,
 			port:     defaultPort,
 			path:     "",
-		***REMOVED***, nil
-	***REMOVED***
+		}, nil
+	}
 
 	protocol := defaultProtocol
 	givenAddress := address
-	if urlutil.IsTransportURL(address) ***REMOVED***
+	if urlutil.IsTransportURL(address) {
 		url, err := url.Parse(address)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, errors.Wrapf(err, "invalid fluentd-address %s", givenAddress)
-		***REMOVED***
+		}
 		// unix and unixgram socket
-		if url.Scheme == "unix" || url.Scheme == "unixgram" ***REMOVED***
-			return &location***REMOVED***
+		if url.Scheme == "unix" || url.Scheme == "unixgram" {
+			return &location{
 				protocol: url.Scheme,
 				host:     "",
 				port:     0,
 				path:     url.Path,
-			***REMOVED***, nil
-		***REMOVED***
+			}, nil
+		}
 		// tcp|udp
 		protocol = url.Scheme
 		address = url.Host
-	***REMOVED***
+	}
 
 	host, port, err := net.SplitHostPort(address)
-	if err != nil ***REMOVED***
-		if !strings.Contains(err.Error(), "missing port in address") ***REMOVED***
+	if err != nil {
+		if !strings.Contains(err.Error(), "missing port in address") {
 			return nil, errors.Wrapf(err, "invalid fluentd-address %s", givenAddress)
-		***REMOVED***
-		return &location***REMOVED***
+		}
+		return &location{
 			protocol: protocol,
 			host:     host,
 			port:     defaultPort,
 			path:     "",
-		***REMOVED***, nil
-	***REMOVED***
+		}, nil
+	}
 
 	portnum, err := strconv.Atoi(port)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, errors.Wrapf(err, "invalid fluentd-address %s", givenAddress)
-	***REMOVED***
-	return &location***REMOVED***
+	}
+	return &location{
 		protocol: protocol,
 		host:     host,
 		port:     portnum,
 		path:     "",
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}

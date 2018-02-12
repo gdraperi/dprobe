@@ -265,7 +265,7 @@ const (
 	numIANA
 )
 
-var ianaToMIB = []identifier.MIB***REMOVED*** // 257 elements
+var ianaToMIB = []identifier.MIB{ // 257 elements
 	// Entry 0 - 3F
 	0x0003, 0x0004, 0x0005, 0x0006, 0x0007, 0x0008, 0x0009, 0x000a,
 	0x000b, 0x000c, 0x000d, 0x000e, 0x000f, 0x0010, 0x0011, 0x0012,
@@ -304,9 +304,9 @@ var ianaToMIB = []identifier.MIB***REMOVED*** // 257 elements
 	0x08cc, 0x08cd, 0x08ce, 0x08cf, 0x08d0, 0x08d1, 0x08d2, 0x08d3,
 	// Entry 100 - 13F
 	0x08d4,
-***REMOVED*** // Size: 538 bytes
+} // Size: 538 bytes
 
-var ianaNames = []string***REMOVED*** // 257 elements
+var ianaNames = []string{ // 257 elements
 	"US-ASCII",
 	"\vISO-8859-1ISO_8859-1:1987",
 	"\vISO-8859-2ISO_8859-2:1987",
@@ -564,9 +564,9 @@ var ianaNames = []string***REMOVED*** // 257 elements
 	"windows-1258",
 	"TIS-620",
 	"CP50220",
-***REMOVED*** // Size: 7088 bytes
+} // Size: 7088 bytes
 
-var mibNames = []string***REMOVED*** // 257 elements
+var mibNames = []string{ // 257 elements
 	"ASCII",
 	"ISOLatin1",
 	"ISOLatin2",
@@ -824,12 +824,12 @@ var mibNames = []string***REMOVED*** // 257 elements
 	"windows1258",
 	"TIS620",
 	"CP50220",
-***REMOVED*** // Size: 6776 bytes
+} // Size: 6776 bytes
 
 // TODO: Instead of using a map, we could use binary search strings doing
 // on-the fly lower-casing per character. This allows to always avoid
 // allocation and will be considerably more compact.
-var ianaAliases = map[string]int***REMOVED***
+var ianaAliases = map[string]int{
 	"US-ASCII":                                      enc3,
 	"us-ascii":                                      enc3,
 	"iso-ir-6":                                      enc3,
@@ -2343,6 +2343,6 @@ var ianaAliases = map[string]int***REMOVED***
 	"cp50220":                       enc2260,
 	"csCP50220":                     enc2260,
 	"cscp50220":                     enc2260,
-***REMOVED***
+}
 
 // Total table size 14402 bytes (14KiB); checksum: CEBAA10C

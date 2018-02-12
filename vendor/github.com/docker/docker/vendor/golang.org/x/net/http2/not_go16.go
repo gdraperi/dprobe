@@ -11,11 +11,11 @@ import (
 	"time"
 )
 
-func configureTransport(t1 *http.Transport) (*Transport, error) ***REMOVED***
+func configureTransport(t1 *http.Transport) (*Transport, error) {
 	return nil, errTransportVersion
-***REMOVED***
+}
 
-func transportExpectContinueTimeout(t1 *http.Transport) time.Duration ***REMOVED***
+func transportExpectContinueTimeout(t1 *http.Transport) time.Duration {
 	return 0
 
-***REMOVED***
+}

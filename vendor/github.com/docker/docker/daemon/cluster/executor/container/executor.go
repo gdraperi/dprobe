@@ -23,109 +23,109 @@ import (
 	"golang.org/x/net/context"
 )
 
-type executor struct ***REMOVED***
+type executor struct {
 	backend       executorpkg.Backend
 	pluginBackend plugin.Backend
 	dependencies  exec.DependencyManager
 	mutex         sync.Mutex // This mutex protects the following node field
 	node          *api.NodeDescription
-***REMOVED***
+}
 
 // NewExecutor returns an executor from the docker client.
-func NewExecutor(b executorpkg.Backend, p plugin.Backend) exec.Executor ***REMOVED***
-	return &executor***REMOVED***
+func NewExecutor(b executorpkg.Backend, p plugin.Backend) exec.Executor {
+	return &executor{
 		backend:       b,
 		pluginBackend: p,
 		dependencies:  agent.NewDependencyManager(),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Describe returns the underlying node description from the docker client.
-func (e *executor) Describe(ctx context.Context) (*api.NodeDescription, error) ***REMOVED***
+func (e *executor) Describe(ctx context.Context) (*api.NodeDescription, error) {
 	info, err := e.backend.SystemInfo()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	plugins := map[api.PluginDescription]struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	addPlugins := func(typ string, names []string) ***REMOVED***
-		for _, name := range names ***REMOVED***
-			plugins[api.PluginDescription***REMOVED***
+	plugins := map[api.PluginDescription]struct{}{}
+	addPlugins := func(typ string, names []string) {
+		for _, name := range names {
+			plugins[api.PluginDescription{
 				Type: typ,
 				Name: name,
-			***REMOVED***] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}] = struct{}{}
+		}
+	}
 
 	// add v1 plugins
 	addPlugins("Volume", info.Plugins.Volume)
 	// Add builtin driver "overlay" (the only builtin multi-host driver) to
 	// the plugin list by default.
-	addPlugins("Network", append([]string***REMOVED***"overlay"***REMOVED***, info.Plugins.Network...))
+	addPlugins("Network", append([]string{"overlay"}, info.Plugins.Network...))
 	addPlugins("Authorization", info.Plugins.Authorization)
 	addPlugins("Log", info.Plugins.Log)
 
 	// add v2 plugins
 	v2Plugins, err := e.backend.PluginManager().List(filters.NewArgs())
-	if err == nil ***REMOVED***
-		for _, plgn := range v2Plugins ***REMOVED***
-			for _, typ := range plgn.Config.Interface.Types ***REMOVED***
-				if typ.Prefix != "docker" || !plgn.Enabled ***REMOVED***
+	if err == nil {
+		for _, plgn := range v2Plugins {
+			for _, typ := range plgn.Config.Interface.Types {
+				if typ.Prefix != "docker" || !plgn.Enabled {
 					continue
-				***REMOVED***
+				}
 				plgnTyp := typ.Capability
-				switch typ.Capability ***REMOVED***
+				switch typ.Capability {
 				case "volumedriver":
 					plgnTyp = "Volume"
 				case "networkdriver":
 					plgnTyp = "Network"
 				case "logdriver":
 					plgnTyp = "Log"
-				***REMOVED***
+				}
 
-				plugins[api.PluginDescription***REMOVED***
+				plugins[api.PluginDescription{
 					Type: plgnTyp,
 					Name: plgn.Name,
-				***REMOVED***] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+				}] = struct{}{}
+			}
+		}
+	}
 
 	pluginFields := make([]api.PluginDescription, 0, len(plugins))
-	for k := range plugins ***REMOVED***
+	for k := range plugins {
 		pluginFields = append(pluginFields, k)
-	***REMOVED***
+	}
 
 	sort.Sort(sortedPlugins(pluginFields))
 
 	// parse []string labels into a map[string]string
-	labels := map[string]string***REMOVED******REMOVED***
-	for _, l := range info.Labels ***REMOVED***
+	labels := map[string]string{}
+	for _, l := range info.Labels {
 		stringSlice := strings.SplitN(l, "=", 2)
 		// this will take the last value in the list for a given key
 		// ideally, one shouldn't assign multiple values to the same key
-		if len(stringSlice) > 1 ***REMOVED***
+		if len(stringSlice) > 1 {
 			labels[stringSlice[0]] = stringSlice[1]
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	description := &api.NodeDescription***REMOVED***
+	description := &api.NodeDescription{
 		Hostname: info.Name,
-		Platform: &api.Platform***REMOVED***
+		Platform: &api.Platform{
 			Architecture: info.Architecture,
 			OS:           info.OSType,
-		***REMOVED***,
-		Engine: &api.EngineDescription***REMOVED***
+		},
+		Engine: &api.EngineDescription{
 			EngineVersion: info.ServerVersion,
 			Labels:        labels,
 			Plugins:       pluginFields,
-		***REMOVED***,
-		Resources: &api.Resources***REMOVED***
+		},
+		Resources: &api.Resources{
 			NanoCPUs:    int64(info.NCPU) * 1e9,
 			MemoryBytes: info.MemTotal,
 			Generic:     convert.GenericResourcesToGRPC(info.GenericResources),
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
 	// Save the node information in the executor field
 	e.mutex.Lock()
@@ -133,64 +133,64 @@ func (e *executor) Describe(ctx context.Context) (*api.NodeDescription, error) *
 	e.mutex.Unlock()
 
 	return description, nil
-***REMOVED***
+}
 
-func (e *executor) Configure(ctx context.Context, node *api.Node) error ***REMOVED***
+func (e *executor) Configure(ctx context.Context, node *api.Node) error {
 	var ingressNA *api.NetworkAttachment
 	attachments := make(map[string]string)
 
-	for _, na := range node.Attachments ***REMOVED***
-		if na.Network.Spec.Ingress ***REMOVED***
+	for _, na := range node.Attachments {
+		if na.Network.Spec.Ingress {
 			ingressNA = na
-		***REMOVED***
+		}
 		attachments[na.Network.ID] = na.Addresses[0]
-	***REMOVED***
+	}
 
-	if (ingressNA == nil) && (node.Attachment != nil) ***REMOVED***
+	if (ingressNA == nil) && (node.Attachment != nil) {
 		ingressNA = node.Attachment
 		attachments[ingressNA.Network.ID] = ingressNA.Addresses[0]
-	***REMOVED***
+	}
 
-	if ingressNA == nil ***REMOVED***
+	if ingressNA == nil {
 		e.backend.ReleaseIngress()
 		return e.backend.GetAttachmentStore().ResetAttachments(attachments)
-	***REMOVED***
+	}
 
-	options := types.NetworkCreate***REMOVED***
+	options := types.NetworkCreate{
 		Driver: ingressNA.Network.DriverState.Name,
-		IPAM: &network.IPAM***REMOVED***
+		IPAM: &network.IPAM{
 			Driver: ingressNA.Network.IPAM.Driver.Name,
-		***REMOVED***,
+		},
 		Options:        ingressNA.Network.DriverState.Options,
 		Ingress:        true,
 		CheckDuplicate: true,
-	***REMOVED***
+	}
 
-	for _, ic := range ingressNA.Network.IPAM.Configs ***REMOVED***
-		c := network.IPAMConfig***REMOVED***
+	for _, ic := range ingressNA.Network.IPAM.Configs {
+		c := network.IPAMConfig{
 			Subnet:  ic.Subnet,
 			IPRange: ic.Range,
 			Gateway: ic.Gateway,
-		***REMOVED***
+		}
 		options.IPAM.Config = append(options.IPAM.Config, c)
-	***REMOVED***
+	}
 
-	_, err := e.backend.SetupIngress(clustertypes.NetworkCreateRequest***REMOVED***
+	_, err := e.backend.SetupIngress(clustertypes.NetworkCreateRequest{
 		ID: ingressNA.Network.ID,
-		NetworkCreateRequest: types.NetworkCreateRequest***REMOVED***
+		NetworkCreateRequest: types.NetworkCreateRequest{
 			Name:          ingressNA.Network.Spec.Annotations.Name,
 			NetworkCreate: options,
-		***REMOVED***,
-	***REMOVED***, ingressNA.Addresses[0])
-	if err != nil ***REMOVED***
+		},
+	}, ingressNA.Addresses[0])
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	return e.backend.GetAttachmentStore().ResetAttachments(attachments)
-***REMOVED***
+}
 
 // Controller returns a docker container runner.
-func (e *executor) Controller(t *api.Task) (exec.Controller, error) ***REMOVED***
+func (e *executor) Controller(t *api.Task) (exec.Controller, error) {
 	dependencyGetter := agent.Restrict(e.dependencies, t)
 
 	// Get the node description from the executor field
@@ -198,82 +198,82 @@ func (e *executor) Controller(t *api.Task) (exec.Controller, error) ***REMOVED**
 	nodeDescription := e.node
 	e.mutex.Unlock()
 
-	if t.Spec.GetAttachment() != nil ***REMOVED***
+	if t.Spec.GetAttachment() != nil {
 		return newNetworkAttacherController(e.backend, t, nodeDescription, dependencyGetter)
-	***REMOVED***
+	}
 
 	var ctlr exec.Controller
-	switch r := t.Spec.GetRuntime().(type) ***REMOVED***
+	switch r := t.Spec.GetRuntime().(type) {
 	case *api.TaskSpec_Generic:
-		logrus.WithFields(logrus.Fields***REMOVED***
+		logrus.WithFields(logrus.Fields{
 			"kind":     r.Generic.Kind,
 			"type_url": r.Generic.Payload.TypeUrl,
-		***REMOVED***).Debug("custom runtime requested")
+		}).Debug("custom runtime requested")
 		runtimeKind, err := naming.Runtime(t.Spec)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return ctlr, err
-		***REMOVED***
-		switch runtimeKind ***REMOVED***
+		}
+		switch runtimeKind {
 		case string(swarmtypes.RuntimePlugin):
 			info, _ := e.backend.SystemInfo()
-			if !info.ExperimentalBuild ***REMOVED***
+			if !info.ExperimentalBuild {
 				return ctlr, fmt.Errorf("runtime type %q only supported in experimental", swarmtypes.RuntimePlugin)
-			***REMOVED***
+			}
 			c, err := plugin.NewController(e.pluginBackend, t)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return ctlr, err
-			***REMOVED***
+			}
 			ctlr = c
 		default:
 			return ctlr, fmt.Errorf("unsupported runtime type: %q", runtimeKind)
-		***REMOVED***
+		}
 	case *api.TaskSpec_Container:
 		c, err := newController(e.backend, t, nodeDescription, dependencyGetter)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return ctlr, err
-		***REMOVED***
+		}
 		ctlr = c
 	default:
 		return ctlr, fmt.Errorf("unsupported runtime: %q", r)
-	***REMOVED***
+	}
 
 	return ctlr, nil
-***REMOVED***
+}
 
-func (e *executor) SetNetworkBootstrapKeys(keys []*api.EncryptionKey) error ***REMOVED***
-	nwKeys := []*networktypes.EncryptionKey***REMOVED******REMOVED***
-	for _, key := range keys ***REMOVED***
-		nwKey := &networktypes.EncryptionKey***REMOVED***
+func (e *executor) SetNetworkBootstrapKeys(keys []*api.EncryptionKey) error {
+	nwKeys := []*networktypes.EncryptionKey{}
+	for _, key := range keys {
+		nwKey := &networktypes.EncryptionKey{
 			Subsystem:   key.Subsystem,
 			Algorithm:   int32(key.Algorithm),
 			Key:         make([]byte, len(key.Key)),
 			LamportTime: key.LamportTime,
-		***REMOVED***
+		}
 		copy(nwKey.Key, key.Key)
 		nwKeys = append(nwKeys, nwKey)
-	***REMOVED***
+	}
 	e.backend.SetNetworkBootstrapKeys(nwKeys)
 
 	return nil
-***REMOVED***
+}
 
-func (e *executor) Secrets() exec.SecretsManager ***REMOVED***
+func (e *executor) Secrets() exec.SecretsManager {
 	return e.dependencies.Secrets()
-***REMOVED***
+}
 
-func (e *executor) Configs() exec.ConfigsManager ***REMOVED***
+func (e *executor) Configs() exec.ConfigsManager {
 	return e.dependencies.Configs()
-***REMOVED***
+}
 
 type sortedPlugins []api.PluginDescription
 
-func (sp sortedPlugins) Len() int ***REMOVED*** return len(sp) ***REMOVED***
+func (sp sortedPlugins) Len() int { return len(sp) }
 
-func (sp sortedPlugins) Swap(i, j int) ***REMOVED*** sp[i], sp[j] = sp[j], sp[i] ***REMOVED***
+func (sp sortedPlugins) Swap(i, j int) { sp[i], sp[j] = sp[j], sp[i] }
 
-func (sp sortedPlugins) Less(i, j int) bool ***REMOVED***
-	if sp[i].Type != sp[j].Type ***REMOVED***
+func (sp sortedPlugins) Less(i, j int) bool {
+	if sp[i].Type != sp[j].Type {
 		return sp[i].Type < sp[j].Type
-	***REMOVED***
+	}
 	return sp[i].Name < sp[j].Name
-***REMOVED***
+}

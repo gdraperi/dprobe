@@ -12,23 +12,23 @@ import (
 
 // RequiresRoot skips tests that require root, unless the test.root flag has
 // been set
-func RequiresRoot(t *testing.T) ***REMOVED***
-	if os.Getuid() != 0 ***REMOVED***
+func RequiresRoot(t *testing.T) {
+	if os.Getuid() != 0 {
 		t.Skip("skipping test that requires root")
 		return
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func newTtyForTest(t *testing.T) (*os.File, error) ***REMOVED***
+func newTtyForTest(t *testing.T) (*os.File, error) {
 	RequiresRoot(t)
 	return os.OpenFile("/dev/tty", os.O_RDWR, os.ModeDevice)
-***REMOVED***
+}
 
-func newTempFile() (*os.File, error) ***REMOVED***
+func newTempFile() (*os.File, error) {
 	return ioutil.TempFile(os.TempDir(), "temp")
-***REMOVED***
+}
 
-func TestGetWinsize(t *testing.T) ***REMOVED***
+func TestGetWinsize(t *testing.T) {
 	tty, err := newTtyForTest(t)
 	defer tty.Close()
 	require.NoError(t, err)
@@ -37,30 +37,30 @@ func TestGetWinsize(t *testing.T) ***REMOVED***
 	require.NotNil(t, winSize)
 	require.NotNil(t, winSize.Height)
 	require.NotNil(t, winSize.Width)
-	newSize := Winsize***REMOVED***Width: 200, Height: 200, x: winSize.x, y: winSize.y***REMOVED***
+	newSize := Winsize{Width: 200, Height: 200, x: winSize.x, y: winSize.y}
 	err = SetWinsize(tty.Fd(), &newSize)
 	require.NoError(t, err)
 	winSize, err = GetWinsize(tty.Fd())
 	require.NoError(t, err)
 	require.Equal(t, *winSize, newSize)
-***REMOVED***
+}
 
-func TestSetWinsize(t *testing.T) ***REMOVED***
+func TestSetWinsize(t *testing.T) {
 	tty, err := newTtyForTest(t)
 	defer tty.Close()
 	require.NoError(t, err)
 	winSize, err := GetWinsize(tty.Fd())
 	require.NoError(t, err)
 	require.NotNil(t, winSize)
-	newSize := Winsize***REMOVED***Width: 200, Height: 200, x: winSize.x, y: winSize.y***REMOVED***
+	newSize := Winsize{Width: 200, Height: 200, x: winSize.x, y: winSize.y}
 	err = SetWinsize(tty.Fd(), &newSize)
 	require.NoError(t, err)
 	winSize, err = GetWinsize(tty.Fd())
 	require.NoError(t, err)
 	require.Equal(t, *winSize, newSize)
-***REMOVED***
+}
 
-func TestGetFdInfo(t *testing.T) ***REMOVED***
+func TestGetFdInfo(t *testing.T) {
 	tty, err := newTtyForTest(t)
 	defer tty.Close()
 	require.NoError(t, err)
@@ -73,9 +73,9 @@ func TestGetFdInfo(t *testing.T) ***REMOVED***
 	inFd, isTerminal = GetFdInfo(tmpFile)
 	require.Equal(t, inFd, tmpFile.Fd())
 	require.Equal(t, isTerminal, false)
-***REMOVED***
+}
 
-func TestIsTerminal(t *testing.T) ***REMOVED***
+func TestIsTerminal(t *testing.T) {
 	tty, err := newTtyForTest(t)
 	defer tty.Close()
 	require.NoError(t, err)
@@ -86,9 +86,9 @@ func TestIsTerminal(t *testing.T) ***REMOVED***
 	defer tmpFile.Close()
 	isTerminal = IsTerminal(tmpFile.Fd())
 	require.Equal(t, isTerminal, false)
-***REMOVED***
+}
 
-func TestSaveState(t *testing.T) ***REMOVED***
+func TestSaveState(t *testing.T) {
 	tty, err := newTtyForTest(t)
 	defer tty.Close()
 	require.NoError(t, err)
@@ -100,9 +100,9 @@ func TestSaveState(t *testing.T) ***REMOVED***
 	defer tty.Close()
 	err = RestoreTerminal(tty.Fd(), state)
 	require.NoError(t, err)
-***REMOVED***
+}
 
-func TestDisableEcho(t *testing.T) ***REMOVED***
+func TestDisableEcho(t *testing.T) {
 	tty, err := newTtyForTest(t)
 	defer tty.Close()
 	require.NoError(t, err)
@@ -112,4 +112,4 @@ func TestDisableEcho(t *testing.T) ***REMOVED***
 	require.NotNil(t, state)
 	err = DisableEcho(tty.Fd(), state)
 	require.NoError(t, err)
-***REMOVED***
+}

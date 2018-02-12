@@ -19,11 +19,11 @@ type Termios unix.Termios
 // MakeRaw put the terminal connected to the given file descriptor into raw
 // mode and returns the previous state of the terminal so that it can be
 // restored.
-func MakeRaw(fd uintptr) (*State, error) ***REMOVED***
+func MakeRaw(fd uintptr) (*State, error) {
 	var oldState State
-	if _, _, err := unix.Syscall(unix.SYS_IOCTL, fd, getTermios, uintptr(unsafe.Pointer(&oldState.termios))); err != 0 ***REMOVED***
+	if _, _, err := unix.Syscall(unix.SYS_IOCTL, fd, getTermios, uintptr(unsafe.Pointer(&oldState.termios))); err != 0 {
 		return nil, err
-	***REMOVED***
+	}
 
 	newState := oldState.termios
 	newState.Iflag &^= (unix.IGNBRK | unix.BRKINT | unix.PARMRK | unix.ISTRIP | unix.INLCR | unix.IGNCR | unix.ICRNL | unix.IXON)
@@ -34,9 +34,9 @@ func MakeRaw(fd uintptr) (*State, error) ***REMOVED***
 	newState.Cc[unix.VMIN] = 1
 	newState.Cc[unix.VTIME] = 0
 
-	if _, _, err := unix.Syscall(unix.SYS_IOCTL, fd, setTermios, uintptr(unsafe.Pointer(&newState))); err != 0 ***REMOVED***
+	if _, _, err := unix.Syscall(unix.SYS_IOCTL, fd, setTermios, uintptr(unsafe.Pointer(&newState))); err != 0 {
 		return nil, err
-	***REMOVED***
+	}
 
 	return &oldState, nil
-***REMOVED***
+}

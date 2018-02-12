@@ -7,7 +7,7 @@ import (
 	"github.com/docker/docker/pkg/containerfs"
 )
 
-type mountedLayer struct ***REMOVED***
+type mountedLayer struct {
 	name       string
 	mountID    string
 	initID     string
@@ -16,85 +16,85 @@ type mountedLayer struct ***REMOVED***
 	layerStore *layerStore
 
 	references map[RWLayer]*referencedRWLayer
-***REMOVED***
+}
 
-func (ml *mountedLayer) cacheParent() string ***REMOVED***
-	if ml.initID != "" ***REMOVED***
+func (ml *mountedLayer) cacheParent() string {
+	if ml.initID != "" {
 		return ml.initID
-	***REMOVED***
-	if ml.parent != nil ***REMOVED***
+	}
+	if ml.parent != nil {
 		return ml.parent.cacheID
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (ml *mountedLayer) TarStream() (io.ReadCloser, error) ***REMOVED***
+func (ml *mountedLayer) TarStream() (io.ReadCloser, error) {
 	return ml.layerStore.driver.Diff(ml.mountID, ml.cacheParent())
-***REMOVED***
+}
 
-func (ml *mountedLayer) Name() string ***REMOVED***
+func (ml *mountedLayer) Name() string {
 	return ml.name
-***REMOVED***
+}
 
-func (ml *mountedLayer) Parent() Layer ***REMOVED***
-	if ml.parent != nil ***REMOVED***
+func (ml *mountedLayer) Parent() Layer {
+	if ml.parent != nil {
 		return ml.parent
-	***REMOVED***
+	}
 
 	// Return a nil interface instead of an interface wrapping a nil
 	// pointer.
 	return nil
-***REMOVED***
+}
 
-func (ml *mountedLayer) Size() (int64, error) ***REMOVED***
+func (ml *mountedLayer) Size() (int64, error) {
 	return ml.layerStore.driver.DiffSize(ml.mountID, ml.cacheParent())
-***REMOVED***
+}
 
-func (ml *mountedLayer) Changes() ([]archive.Change, error) ***REMOVED***
+func (ml *mountedLayer) Changes() ([]archive.Change, error) {
 	return ml.layerStore.driver.Changes(ml.mountID, ml.cacheParent())
-***REMOVED***
+}
 
-func (ml *mountedLayer) Metadata() (map[string]string, error) ***REMOVED***
+func (ml *mountedLayer) Metadata() (map[string]string, error) {
 	return ml.layerStore.driver.GetMetadata(ml.mountID)
-***REMOVED***
+}
 
-func (ml *mountedLayer) getReference() RWLayer ***REMOVED***
-	ref := &referencedRWLayer***REMOVED***
+func (ml *mountedLayer) getReference() RWLayer {
+	ref := &referencedRWLayer{
 		mountedLayer: ml,
-	***REMOVED***
+	}
 	ml.references[ref] = ref
 
 	return ref
-***REMOVED***
+}
 
-func (ml *mountedLayer) hasReferences() bool ***REMOVED***
+func (ml *mountedLayer) hasReferences() bool {
 	return len(ml.references) > 0
-***REMOVED***
+}
 
-func (ml *mountedLayer) deleteReference(ref RWLayer) error ***REMOVED***
-	if _, ok := ml.references[ref]; !ok ***REMOVED***
+func (ml *mountedLayer) deleteReference(ref RWLayer) error {
+	if _, ok := ml.references[ref]; !ok {
 		return ErrLayerNotRetained
-	***REMOVED***
+	}
 	delete(ml.references, ref)
 	return nil
-***REMOVED***
+}
 
-func (ml *mountedLayer) retakeReference(r RWLayer) ***REMOVED***
-	if ref, ok := r.(*referencedRWLayer); ok ***REMOVED***
+func (ml *mountedLayer) retakeReference(r RWLayer) {
+	if ref, ok := r.(*referencedRWLayer); ok {
 		ml.references[ref] = ref
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type referencedRWLayer struct ***REMOVED***
+type referencedRWLayer struct {
 	*mountedLayer
-***REMOVED***
+}
 
-func (rl *referencedRWLayer) Mount(mountLabel string) (containerfs.ContainerFS, error) ***REMOVED***
+func (rl *referencedRWLayer) Mount(mountLabel string) (containerfs.ContainerFS, error) {
 	return rl.layerStore.driver.Get(rl.mountedLayer.mountID, mountLabel)
-***REMOVED***
+}
 
 // Unmount decrements the activity count and unmounts the underlying layer
 // Callers should only call `Unmount` once per call to `Mount`, even on error.
-func (rl *referencedRWLayer) Unmount() error ***REMOVED***
+func (rl *referencedRWLayer) Unmount() error {
 	return rl.layerStore.driver.Put(rl.mountedLayer.mountID)
-***REMOVED***
+}

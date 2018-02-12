@@ -13,11 +13,11 @@ import (
 	"golang.org/x/net/internal/socket"
 )
 
-func (so *sockOpt) setAttachFilter(c *socket.Conn, f []bpf.RawInstruction) error ***REMOVED***
-	prog := sockFProg***REMOVED***
+func (so *sockOpt) setAttachFilter(c *socket.Conn, f []bpf.RawInstruction) error {
+	prog := sockFProg{
 		Len:    uint16(len(f)),
 		Filter: (*sockFilter)(unsafe.Pointer(&f[0])),
-	***REMOVED***
+	}
 	b := (*[sizeofSockFprog]byte)(unsafe.Pointer(&prog))[:sizeofSockFprog]
 	return so.Set(c, b)
-***REMOVED***
+}

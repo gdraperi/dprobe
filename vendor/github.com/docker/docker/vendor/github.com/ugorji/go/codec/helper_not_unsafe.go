@@ -8,13 +8,13 @@ package codec
 // stringView returns a view of the []byte as a string.
 // In unsafe mode, it doesn't incur allocation and copying caused by conversion.
 // In regular safe mode, it is an allocation and copy.
-func stringView(v []byte) string ***REMOVED***
+func stringView(v []byte) string {
 	return string(v)
-***REMOVED***
+}
 
 // bytesView returns a view of the string as a []byte.
 // In unsafe mode, it doesn't incur allocation and copying caused by conversion.
 // In regular safe mode, it is an allocation and copy.
-func bytesView(v string) []byte ***REMOVED***
+func bytesView(v string) []byte {
 	return []byte(v)
-***REMOVED***
+}

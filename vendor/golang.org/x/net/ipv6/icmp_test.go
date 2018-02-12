@@ -14,67 +14,67 @@ import (
 	"golang.org/x/net/ipv6"
 )
 
-var icmpStringTests = []struct ***REMOVED***
+var icmpStringTests = []struct {
 	in  ipv6.ICMPType
 	out string
-***REMOVED******REMOVED***
-	***REMOVED***ipv6.ICMPTypeDestinationUnreachable, "destination unreachable"***REMOVED***,
+}{
+	{ipv6.ICMPTypeDestinationUnreachable, "destination unreachable"},
 
-	***REMOVED***256, "<nil>"***REMOVED***,
-***REMOVED***
+	{256, "<nil>"},
+}
 
-func TestICMPString(t *testing.T) ***REMOVED***
-	for _, tt := range icmpStringTests ***REMOVED***
+func TestICMPString(t *testing.T) {
+	for _, tt := range icmpStringTests {
 		s := tt.in.String()
-		if s != tt.out ***REMOVED***
+		if s != tt.out {
 			t.Errorf("got %s; want %s", s, tt.out)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestICMPFilter(t *testing.T) ***REMOVED***
-	switch runtime.GOOS ***REMOVED***
+func TestICMPFilter(t *testing.T) {
+	switch runtime.GOOS {
 	case "nacl", "plan9", "windows":
 		t.Skipf("not supported on %s", runtime.GOOS)
-	***REMOVED***
+	}
 
 	var f ipv6.ICMPFilter
-	for _, toggle := range []bool***REMOVED***false, true***REMOVED*** ***REMOVED***
+	for _, toggle := range []bool{false, true} {
 		f.SetAll(toggle)
-		for _, typ := range []ipv6.ICMPType***REMOVED***
+		for _, typ := range []ipv6.ICMPType{
 			ipv6.ICMPTypeDestinationUnreachable,
 			ipv6.ICMPTypeEchoReply,
 			ipv6.ICMPTypeNeighborSolicitation,
 			ipv6.ICMPTypeDuplicateAddressConfirmation,
-		***REMOVED*** ***REMOVED***
+		} {
 			f.Accept(typ)
-			if f.WillBlock(typ) ***REMOVED***
+			if f.WillBlock(typ) {
 				t.Errorf("ipv6.ICMPFilter.Set(%v, false) failed", typ)
-			***REMOVED***
+			}
 			f.Block(typ)
-			if !f.WillBlock(typ) ***REMOVED***
+			if !f.WillBlock(typ) {
 				t.Errorf("ipv6.ICMPFilter.Set(%v, true) failed", typ)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}
 
-func TestSetICMPFilter(t *testing.T) ***REMOVED***
-	switch runtime.GOOS ***REMOVED***
+func TestSetICMPFilter(t *testing.T) {
+	switch runtime.GOOS {
 	case "nacl", "plan9", "windows":
 		t.Skipf("not supported on %s", runtime.GOOS)
-	***REMOVED***
-	if !supportsIPv6 ***REMOVED***
+	}
+	if !supportsIPv6 {
 		t.Skip("ipv6 is not supported")
-	***REMOVED***
-	if m, ok := nettest.SupportsRawIPSocket(); !ok ***REMOVED***
+	}
+	if m, ok := nettest.SupportsRawIPSocket(); !ok {
 		t.Skip(m)
-	***REMOVED***
+	}
 
 	c, err := net.ListenPacket("ip6:ipv6-icmp", "::1")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	defer c.Close()
 
 	p := ipv6.NewPacketConn(c)
@@ -83,14 +83,14 @@ func TestSetICMPFilter(t *testing.T) ***REMOVED***
 	f.SetAll(true)
 	f.Accept(ipv6.ICMPTypeEchoRequest)
 	f.Accept(ipv6.ICMPTypeEchoReply)
-	if err := p.SetICMPFilter(&f); err != nil ***REMOVED***
+	if err := p.SetICMPFilter(&f); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	kf, err := p.ICMPFilter()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if !reflect.DeepEqual(kf, &f) ***REMOVED***
+	}
+	if !reflect.DeepEqual(kf, &f) {
 		t.Fatalf("got %#v; want %#v", kf, f)
-	***REMOVED***
-***REMOVED***
+	}
+}

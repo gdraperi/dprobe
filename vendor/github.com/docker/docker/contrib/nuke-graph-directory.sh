@@ -4,13 +4,13 @@ set -e
 dir="$1"
 
 if [ -z "$dir" ]; then
-	***REMOVED***
+	{
 		echo 'This script is for destroying old /var/lib/docker directories more safely than'
 		echo '  "rm -rf", which can cause data loss or other serious issues.'
 		echo
 		echo "usage: $0 directory"
 		echo "   ie: $0 /var/lib/docker"
-	***REMOVED*** >&2
+	} >&2
 	exit 1
 fi
 
@@ -34,15 +34,15 @@ echo
 ( set -x; sleep 10 )
 echo
 
-dir_in_dir() ***REMOVED***
+dir_in_dir() {
 	inner="$1"
 	outer="$2"
-	[ "$***REMOVED***inner#$outer***REMOVED***" != "$inner" ]
-***REMOVED***
+	[ "${inner#$outer}" != "$inner" ]
+}
 
 # let's start by unmounting any submounts in $dir
 #   (like -v /home:... for example - DON'T DELETE MY HOME DIRECTORY BRU!)
-for mount in $(awk '***REMOVED*** print $5 ***REMOVED***' /proc/self/mountinfo); do
+for mount in $(awk '{ print $5 }' /proc/self/mountinfo); do
 	mount="$(readlink -f "$mount" || true)"
 	if [ "$dir" != "$mount" ] && dir_in_dir "$mount" "$dir"; then
 		( set -x; umount -f "$mount" )

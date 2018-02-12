@@ -13,21 +13,21 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func translate(in string) string ***REMOVED***
+func translate(in string) string {
 	return strings.Replace(in, "-", "\\-", -1)
-***REMOVED***
+}
 
-func TestGenManDoc(t *testing.T) ***REMOVED***
-	header := &GenManHeader***REMOVED***
+func TestGenManDoc(t *testing.T) {
+	header := &GenManHeader{
 		Title:   "Project",
 		Section: "2",
-	***REMOVED***
+	}
 
 	// We generate on a subcommand so we have both subcommands and parents
 	buf := new(bytes.Buffer)
-	if err := GenMan(echoCmd, header, buf); err != nil ***REMOVED***
+	if err := GenMan(echoCmd, header, buf); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	output := buf.String()
 
 	// Make sure parent has - in CommandPath() in SEE ALSO:
@@ -45,55 +45,55 @@ func TestGenManDoc(t *testing.T) ***REMOVED***
 	checkStringContains(t, output, translate(echoSubCmd.Name()))
 	checkStringOmits(t, output, translate(deprecatedCmd.Name()))
 	checkStringContains(t, output, translate("Auto generated"))
-***REMOVED***
+}
 
-func TestGenManNoGenTag(t *testing.T) ***REMOVED***
+func TestGenManNoGenTag(t *testing.T) {
 	echoCmd.DisableAutoGenTag = true
-	defer func() ***REMOVED*** echoCmd.DisableAutoGenTag = false ***REMOVED***()
+	defer func() { echoCmd.DisableAutoGenTag = false }()
 
-	header := &GenManHeader***REMOVED***
+	header := &GenManHeader{
 		Title:   "Project",
 		Section: "2",
-	***REMOVED***
+	}
 
 	// We generate on a subcommand so we have both subcommands and parents
 	buf := new(bytes.Buffer)
-	if err := GenMan(echoCmd, header, buf); err != nil ***REMOVED***
+	if err := GenMan(echoCmd, header, buf); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	output := buf.String()
 
 	unexpected := translate("#HISTORY")
 	checkStringOmits(t, output, unexpected)
-***REMOVED***
+}
 
-func TestGenManSeeAlso(t *testing.T) ***REMOVED***
-	rootCmd := &cobra.Command***REMOVED***Use: "root", Run: emptyRun***REMOVED***
-	aCmd := &cobra.Command***REMOVED***Use: "aaa", Run: emptyRun, Hidden: true***REMOVED*** // #229
-	bCmd := &cobra.Command***REMOVED***Use: "bbb", Run: emptyRun***REMOVED***
-	cCmd := &cobra.Command***REMOVED***Use: "ccc", Run: emptyRun***REMOVED***
+func TestGenManSeeAlso(t *testing.T) {
+	rootCmd := &cobra.Command{Use: "root", Run: emptyRun}
+	aCmd := &cobra.Command{Use: "aaa", Run: emptyRun, Hidden: true} // #229
+	bCmd := &cobra.Command{Use: "bbb", Run: emptyRun}
+	cCmd := &cobra.Command{Use: "ccc", Run: emptyRun}
 	rootCmd.AddCommand(aCmd, bCmd, cCmd)
 
 	buf := new(bytes.Buffer)
-	header := &GenManHeader***REMOVED******REMOVED***
-	if err := GenMan(rootCmd, header, buf); err != nil ***REMOVED***
+	header := &GenManHeader{}
+	if err := GenMan(rootCmd, header, buf); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	scanner := bufio.NewScanner(buf)
 
-	if err := assertLineFound(scanner, ".SH SEE ALSO"); err != nil ***REMOVED***
+	if err := assertLineFound(scanner, ".SH SEE ALSO"); err != nil {
 		t.Fatalf("Couldn't find SEE ALSO section header: %v", err)
-	***REMOVED***
-	if err := assertNextLineEquals(scanner, ".PP"); err != nil ***REMOVED***
+	}
+	if err := assertNextLineEquals(scanner, ".PP"); err != nil {
 		t.Fatalf("First line after SEE ALSO wasn't break-indent: %v", err)
-	***REMOVED***
-	if err := assertNextLineEquals(scanner, `\fBroot\-bbb(1)\fP, \fBroot\-ccc(1)\fP`); err != nil ***REMOVED***
+	}
+	if err := assertNextLineEquals(scanner, `\fBroot\-bbb(1)\fP, \fBroot\-ccc(1)\fP`); err != nil {
 		t.Fatalf("Second line after SEE ALSO wasn't correct: %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestManPrintFlagsHidesShortDeperecated(t *testing.T) ***REMOVED***
-	c := &cobra.Command***REMOVED******REMOVED***
+func TestManPrintFlagsHidesShortDeperecated(t *testing.T) {
+	c := &cobra.Command{}
 	c.Flags().StringP("foo", "f", "default", "Foo flag")
 	c.Flags().MarkShorthandDeprecated("foo", "don't use it no more")
 
@@ -102,76 +102,76 @@ func TestManPrintFlagsHidesShortDeperecated(t *testing.T) ***REMOVED***
 
 	got := buf.String()
 	expected := "**--foo**=\"default\"\n\tFoo flag\n\n"
-	if got != expected ***REMOVED***
+	if got != expected {
 		t.Errorf("Expected %v, got %v", expected, got)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestGenManTree(t *testing.T) ***REMOVED***
-	c := &cobra.Command***REMOVED***Use: "do [OPTIONS] arg1 arg2"***REMOVED***
-	header := &GenManHeader***REMOVED***Section: "2"***REMOVED***
+func TestGenManTree(t *testing.T) {
+	c := &cobra.Command{Use: "do [OPTIONS] arg1 arg2"}
+	header := &GenManHeader{Section: "2"}
 	tmpdir, err := ioutil.TempDir("", "test-gen-man-tree")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("Failed to create tmpdir: %s", err.Error())
-	***REMOVED***
+	}
 	defer os.RemoveAll(tmpdir)
 
-	if err := GenManTree(c, header, tmpdir); err != nil ***REMOVED***
+	if err := GenManTree(c, header, tmpdir); err != nil {
 		t.Fatalf("GenManTree failed: %s", err.Error())
-	***REMOVED***
+	}
 
-	if _, err := os.Stat(filepath.Join(tmpdir, "do.2")); err != nil ***REMOVED***
+	if _, err := os.Stat(filepath.Join(tmpdir, "do.2")); err != nil {
 		t.Fatalf("Expected file 'do.2' to exist")
-	***REMOVED***
+	}
 
-	if header.Title != "" ***REMOVED***
+	if header.Title != "" {
 		t.Fatalf("Expected header.Title to be unmodified")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func assertLineFound(scanner *bufio.Scanner, expectedLine string) error ***REMOVED***
-	for scanner.Scan() ***REMOVED***
+func assertLineFound(scanner *bufio.Scanner, expectedLine string) error {
+	for scanner.Scan() {
 		line := scanner.Text()
-		if line == expectedLine ***REMOVED***
+		if line == expectedLine {
 			return nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if err := scanner.Err(); err != nil ***REMOVED***
+	if err := scanner.Err(); err != nil {
 		return fmt.Errorf("scan failed: %s", err)
-	***REMOVED***
+	}
 
 	return fmt.Errorf("hit EOF before finding %v", expectedLine)
-***REMOVED***
+}
 
-func assertNextLineEquals(scanner *bufio.Scanner, expectedLine string) error ***REMOVED***
-	if scanner.Scan() ***REMOVED***
+func assertNextLineEquals(scanner *bufio.Scanner, expectedLine string) error {
+	if scanner.Scan() {
 		line := scanner.Text()
-		if line == expectedLine ***REMOVED***
+		if line == expectedLine {
 			return nil
-		***REMOVED***
+		}
 		return fmt.Errorf("got %v, not %v", line, expectedLine)
-	***REMOVED***
+	}
 
-	if err := scanner.Err(); err != nil ***REMOVED***
+	if err := scanner.Err(); err != nil {
 		return fmt.Errorf("scan failed: %v", err)
-	***REMOVED***
+	}
 
 	return fmt.Errorf("hit EOF before finding %v", expectedLine)
-***REMOVED***
+}
 
-func BenchmarkGenManToFile(b *testing.B) ***REMOVED***
+func BenchmarkGenManToFile(b *testing.B) {
 	file, err := ioutil.TempFile("", "")
-	if err != nil ***REMOVED***
+	if err != nil {
 		b.Fatal(err)
-	***REMOVED***
+	}
 	defer os.Remove(file.Name())
 	defer file.Close()
 
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ ***REMOVED***
-		if err := GenMan(rootCmd, nil, file); err != nil ***REMOVED***
+	for i := 0; i < b.N; i++ {
+		if err := GenMan(rootCmd, nil, file); err != nil {
 			b.Fatal(err)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

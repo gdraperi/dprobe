@@ -14,7 +14,7 @@ import (
 )
 
 // Route stores information to match a request and build URLs.
-type Route struct ***REMOVED***
+type Route struct {
 	// Parent where the route was registered (a Router).
 	parent parentRoute
 	// Request handler for the route.
@@ -34,163 +34,163 @@ type Route struct ***REMOVED***
 	err error
 
 	buildVarsFunc BuildVarsFunc
-***REMOVED***
+}
 
 // Match matches the route against the request.
-func (r *Route) Match(req *http.Request, match *RouteMatch) bool ***REMOVED***
-	if r.buildOnly || r.err != nil ***REMOVED***
+func (r *Route) Match(req *http.Request, match *RouteMatch) bool {
+	if r.buildOnly || r.err != nil {
 		return false
-	***REMOVED***
+	}
 	// Match everything.
-	for _, m := range r.matchers ***REMOVED***
-		if matched := m.Match(req, match); !matched ***REMOVED***
+	for _, m := range r.matchers {
+		if matched := m.Match(req, match); !matched {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	// Yay, we have a match. Let's collect some info about it.
-	if match.Route == nil ***REMOVED***
+	if match.Route == nil {
 		match.Route = r
-	***REMOVED***
-	if match.Handler == nil ***REMOVED***
+	}
+	if match.Handler == nil {
 		match.Handler = r.handler
-	***REMOVED***
-	if match.Vars == nil ***REMOVED***
+	}
+	if match.Vars == nil {
 		match.Vars = make(map[string]string)
-	***REMOVED***
+	}
 	// Set variables.
-	if r.regexp != nil ***REMOVED***
+	if r.regexp != nil {
 		r.regexp.setMatch(req, match, r)
-	***REMOVED***
+	}
 	return true
-***REMOVED***
+}
 
 // ----------------------------------------------------------------------------
 // Route attributes
 // ----------------------------------------------------------------------------
 
 // GetError returns an error resulted from building the route, if any.
-func (r *Route) GetError() error ***REMOVED***
+func (r *Route) GetError() error {
 	return r.err
-***REMOVED***
+}
 
 // BuildOnly sets the route to never match: it is only used to build URLs.
-func (r *Route) BuildOnly() *Route ***REMOVED***
+func (r *Route) BuildOnly() *Route {
 	r.buildOnly = true
 	return r
-***REMOVED***
+}
 
 // Handler --------------------------------------------------------------------
 
 // Handler sets a handler for the route.
-func (r *Route) Handler(handler http.Handler) *Route ***REMOVED***
-	if r.err == nil ***REMOVED***
+func (r *Route) Handler(handler http.Handler) *Route {
+	if r.err == nil {
 		r.handler = handler
-	***REMOVED***
+	}
 	return r
-***REMOVED***
+}
 
 // HandlerFunc sets a handler function for the route.
-func (r *Route) HandlerFunc(f func(http.ResponseWriter, *http.Request)) *Route ***REMOVED***
+func (r *Route) HandlerFunc(f func(http.ResponseWriter, *http.Request)) *Route {
 	return r.Handler(http.HandlerFunc(f))
-***REMOVED***
+}
 
 // GetHandler returns the handler for the route, if any.
-func (r *Route) GetHandler() http.Handler ***REMOVED***
+func (r *Route) GetHandler() http.Handler {
 	return r.handler
-***REMOVED***
+}
 
 // Name -----------------------------------------------------------------------
 
 // Name sets the name for the route, used to build URLs.
 // If the name was registered already it will be overwritten.
-func (r *Route) Name(name string) *Route ***REMOVED***
-	if r.name != "" ***REMOVED***
+func (r *Route) Name(name string) *Route {
+	if r.name != "" {
 		r.err = fmt.Errorf("mux: route already has name %q, can't set %q",
 			r.name, name)
-	***REMOVED***
-	if r.err == nil ***REMOVED***
+	}
+	if r.err == nil {
 		r.name = name
 		r.getNamedRoutes()[name] = r
-	***REMOVED***
+	}
 	return r
-***REMOVED***
+}
 
 // GetName returns the name for the route, if any.
-func (r *Route) GetName() string ***REMOVED***
+func (r *Route) GetName() string {
 	return r.name
-***REMOVED***
+}
 
 // ----------------------------------------------------------------------------
 // Matchers
 // ----------------------------------------------------------------------------
 
 // matcher types try to match a request.
-type matcher interface ***REMOVED***
+type matcher interface {
 	Match(*http.Request, *RouteMatch) bool
-***REMOVED***
+}
 
 // addMatcher adds a matcher to the route.
-func (r *Route) addMatcher(m matcher) *Route ***REMOVED***
-	if r.err == nil ***REMOVED***
+func (r *Route) addMatcher(m matcher) *Route {
+	if r.err == nil {
 		r.matchers = append(r.matchers, m)
-	***REMOVED***
+	}
 	return r
-***REMOVED***
+}
 
 // addRegexpMatcher adds a host or path matcher and builder to a route.
-func (r *Route) addRegexpMatcher(tpl string, matchHost, matchPrefix, matchQuery bool) error ***REMOVED***
-	if r.err != nil ***REMOVED***
+func (r *Route) addRegexpMatcher(tpl string, matchHost, matchPrefix, matchQuery bool) error {
+	if r.err != nil {
 		return r.err
-	***REMOVED***
+	}
 	r.regexp = r.getRegexpGroup()
-	if !matchHost && !matchQuery ***REMOVED***
-		if len(tpl) == 0 || tpl[0] != '/' ***REMOVED***
+	if !matchHost && !matchQuery {
+		if len(tpl) == 0 || tpl[0] != '/' {
 			return fmt.Errorf("mux: path must start with a slash, got %q", tpl)
-		***REMOVED***
-		if r.regexp.path != nil ***REMOVED***
+		}
+		if r.regexp.path != nil {
 			tpl = strings.TrimRight(r.regexp.path.template, "/") + tpl
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	rr, err := newRouteRegexp(tpl, matchHost, matchPrefix, matchQuery, r.strictSlash)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	for _, q := range r.regexp.queries ***REMOVED***
-		if err = uniqueVars(rr.varsN, q.varsN); err != nil ***REMOVED***
+	}
+	for _, q := range r.regexp.queries {
+		if err = uniqueVars(rr.varsN, q.varsN); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
-	if matchHost ***REMOVED***
-		if r.regexp.path != nil ***REMOVED***
-			if err = uniqueVars(rr.varsN, r.regexp.path.varsN); err != nil ***REMOVED***
+		}
+	}
+	if matchHost {
+		if r.regexp.path != nil {
+			if err = uniqueVars(rr.varsN, r.regexp.path.varsN); err != nil {
 				return err
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		r.regexp.host = rr
-	***REMOVED*** else ***REMOVED***
-		if r.regexp.host != nil ***REMOVED***
-			if err = uniqueVars(rr.varsN, r.regexp.host.varsN); err != nil ***REMOVED***
+	} else {
+		if r.regexp.host != nil {
+			if err = uniqueVars(rr.varsN, r.regexp.host.varsN); err != nil {
 				return err
-			***REMOVED***
-		***REMOVED***
-		if matchQuery ***REMOVED***
+			}
+		}
+		if matchQuery {
 			r.regexp.queries = append(r.regexp.queries, rr)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			r.regexp.path = rr
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	r.addMatcher(rr)
 	return nil
-***REMOVED***
+}
 
 // Headers --------------------------------------------------------------------
 
 // headerMatcher matches the request against header values.
 type headerMatcher map[string]string
 
-func (m headerMatcher) Match(r *http.Request, match *RouteMatch) bool ***REMOVED***
+func (m headerMatcher) Match(r *http.Request, match *RouteMatch) bool {
 	return matchMapWithString(m, r.Header, true)
-***REMOVED***
+}
 
 // Headers adds a matcher for request header values.
 // It accepts a sequence of key/value pairs to be matched. For example:
@@ -201,21 +201,21 @@ func (m headerMatcher) Match(r *http.Request, match *RouteMatch) bool ***REMOVED
 //
 // The above route will only match if both request header values match.
 // If the value is an empty string, it will match any value if the key is set.
-func (r *Route) Headers(pairs ...string) *Route ***REMOVED***
-	if r.err == nil ***REMOVED***
+func (r *Route) Headers(pairs ...string) *Route {
+	if r.err == nil {
 		var headers map[string]string
 		headers, r.err = mapFromPairsToString(pairs...)
 		return r.addMatcher(headerMatcher(headers))
-	***REMOVED***
+	}
 	return r
-***REMOVED***
+}
 
 // headerRegexMatcher matches the request against the route given a regex for the header
 type headerRegexMatcher map[string]*regexp.Regexp
 
-func (m headerRegexMatcher) Match(r *http.Request, match *RouteMatch) bool ***REMOVED***
+func (m headerRegexMatcher) Match(r *http.Request, match *RouteMatch) bool {
 	return matchMapWithRegex(m, r.Header, true)
-***REMOVED***
+}
 
 // HeadersRegexp accepts a sequence of key/value pairs, where the value has regex
 // support. For example:
@@ -226,38 +226,38 @@ func (m headerRegexMatcher) Match(r *http.Request, match *RouteMatch) bool ***RE
 //
 // The above route will only match if both the request header matches both regular expressions.
 // It the value is an empty string, it will match any value if the key is set.
-func (r *Route) HeadersRegexp(pairs ...string) *Route ***REMOVED***
-	if r.err == nil ***REMOVED***
+func (r *Route) HeadersRegexp(pairs ...string) *Route {
+	if r.err == nil {
 		var headers map[string]*regexp.Regexp
 		headers, r.err = mapFromPairsToRegex(pairs...)
 		return r.addMatcher(headerRegexMatcher(headers))
-	***REMOVED***
+	}
 	return r
-***REMOVED***
+}
 
 // Host -----------------------------------------------------------------------
 
 // Host adds a matcher for the URL host.
-// It accepts a template with zero or more URL variables enclosed by ***REMOVED******REMOVED***.
+// It accepts a template with zero or more URL variables enclosed by {}.
 // Variables can define an optional regexp pattern to be matched:
 //
-// - ***REMOVED***name***REMOVED*** matches anything until the next dot.
+// - {name} matches anything until the next dot.
 //
-// - ***REMOVED***name:pattern***REMOVED*** matches the given regexp pattern.
+// - {name:pattern} matches the given regexp pattern.
 //
 // For example:
 //
 //     r := mux.NewRouter()
 //     r.Host("www.example.com")
-//     r.Host("***REMOVED***subdomain***REMOVED***.domain.com")
-//     r.Host("***REMOVED***subdomain:[a-z]+***REMOVED***.domain.com")
+//     r.Host("{subdomain}.domain.com")
+//     r.Host("{subdomain:[a-z]+}.domain.com")
 //
 // Variable names must be unique in a given route. They can be retrieved
 // calling mux.Vars(request).
-func (r *Route) Host(tpl string) *Route ***REMOVED***
+func (r *Route) Host(tpl string) *Route {
 	r.err = r.addRegexpMatcher(tpl, true, false, false)
 	return r
-***REMOVED***
+}
 
 // MatcherFunc ----------------------------------------------------------------
 
@@ -265,59 +265,59 @@ func (r *Route) Host(tpl string) *Route ***REMOVED***
 type MatcherFunc func(*http.Request, *RouteMatch) bool
 
 // Match returns the match for a given request.
-func (m MatcherFunc) Match(r *http.Request, match *RouteMatch) bool ***REMOVED***
+func (m MatcherFunc) Match(r *http.Request, match *RouteMatch) bool {
 	return m(r, match)
-***REMOVED***
+}
 
 // MatcherFunc adds a custom function to be used as request matcher.
-func (r *Route) MatcherFunc(f MatcherFunc) *Route ***REMOVED***
+func (r *Route) MatcherFunc(f MatcherFunc) *Route {
 	return r.addMatcher(f)
-***REMOVED***
+}
 
 // Methods --------------------------------------------------------------------
 
 // methodMatcher matches the request against HTTP methods.
 type methodMatcher []string
 
-func (m methodMatcher) Match(r *http.Request, match *RouteMatch) bool ***REMOVED***
+func (m methodMatcher) Match(r *http.Request, match *RouteMatch) bool {
 	return matchInArray(m, r.Method)
-***REMOVED***
+}
 
 // Methods adds a matcher for HTTP methods.
 // It accepts a sequence of one or more methods to be matched, e.g.:
 // "GET", "POST", "PUT".
-func (r *Route) Methods(methods ...string) *Route ***REMOVED***
-	for k, v := range methods ***REMOVED***
+func (r *Route) Methods(methods ...string) *Route {
+	for k, v := range methods {
 		methods[k] = strings.ToUpper(v)
-	***REMOVED***
+	}
 	return r.addMatcher(methodMatcher(methods))
-***REMOVED***
+}
 
 // Path -----------------------------------------------------------------------
 
 // Path adds a matcher for the URL path.
-// It accepts a template with zero or more URL variables enclosed by ***REMOVED******REMOVED***. The
+// It accepts a template with zero or more URL variables enclosed by {}. The
 // template must start with a "/".
 // Variables can define an optional regexp pattern to be matched:
 //
-// - ***REMOVED***name***REMOVED*** matches anything until the next slash.
+// - {name} matches anything until the next slash.
 //
-// - ***REMOVED***name:pattern***REMOVED*** matches the given regexp pattern.
+// - {name:pattern} matches the given regexp pattern.
 //
 // For example:
 //
 //     r := mux.NewRouter()
 //     r.Path("/products/").Handler(ProductsHandler)
-//     r.Path("/products/***REMOVED***key***REMOVED***").Handler(ProductsHandler)
-//     r.Path("/articles/***REMOVED***category***REMOVED***/***REMOVED***id:[0-9]+***REMOVED***").
+//     r.Path("/products/{key}").Handler(ProductsHandler)
+//     r.Path("/articles/{category}/{id:[0-9]+}").
 //       Handler(ArticleHandler)
 //
 // Variable names must be unique in a given route. They can be retrieved
 // calling mux.Vars(request).
-func (r *Route) Path(tpl string) *Route ***REMOVED***
+func (r *Route) Path(tpl string) *Route {
 	r.err = r.addRegexpMatcher(tpl, false, false, false)
 	return r
-***REMOVED***
+}
 
 // PathPrefix -----------------------------------------------------------------
 
@@ -330,10 +330,10 @@ func (r *Route) Path(tpl string) *Route ***REMOVED***
 //
 // Also note that the setting of Router.StrictSlash() has no effect on routes
 // with a PathPrefix matcher.
-func (r *Route) PathPrefix(tpl string) *Route ***REMOVED***
+func (r *Route) PathPrefix(tpl string) *Route {
 	r.err = r.addRegexpMatcher(tpl, false, true, false)
 	return r
-***REMOVED***
+}
 
 // Query ----------------------------------------------------------------------
 
@@ -342,7 +342,7 @@ func (r *Route) PathPrefix(tpl string) *Route ***REMOVED***
 // For example:
 //
 //     r := mux.NewRouter()
-//     r.Queries("foo", "bar", "id", "***REMOVED***id:[0-9]+***REMOVED***")
+//     r.Queries("foo", "bar", "id", "{id:[0-9]+}")
 //
 // The above route will only match if the URL contains the defined queries
 // values, e.g.: ?foo=bar&id=42.
@@ -351,42 +351,42 @@ func (r *Route) PathPrefix(tpl string) *Route ***REMOVED***
 //
 // Variables can define an optional regexp pattern to be matched:
 //
-// - ***REMOVED***name***REMOVED*** matches anything until the next slash.
+// - {name} matches anything until the next slash.
 //
-// - ***REMOVED***name:pattern***REMOVED*** matches the given regexp pattern.
-func (r *Route) Queries(pairs ...string) *Route ***REMOVED***
+// - {name:pattern} matches the given regexp pattern.
+func (r *Route) Queries(pairs ...string) *Route {
 	length := len(pairs)
-	if length%2 != 0 ***REMOVED***
+	if length%2 != 0 {
 		r.err = fmt.Errorf(
 			"mux: number of parameters must be multiple of 2, got %v", pairs)
 		return nil
-	***REMOVED***
-	for i := 0; i < length; i += 2 ***REMOVED***
-		if r.err = r.addRegexpMatcher(pairs[i]+"="+pairs[i+1], false, false, true); r.err != nil ***REMOVED***
+	}
+	for i := 0; i < length; i += 2 {
+		if r.err = r.addRegexpMatcher(pairs[i]+"="+pairs[i+1], false, false, true); r.err != nil {
 			return r
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return r
-***REMOVED***
+}
 
 // Schemes --------------------------------------------------------------------
 
 // schemeMatcher matches the request against URL schemes.
 type schemeMatcher []string
 
-func (m schemeMatcher) Match(r *http.Request, match *RouteMatch) bool ***REMOVED***
+func (m schemeMatcher) Match(r *http.Request, match *RouteMatch) bool {
 	return matchInArray(m, r.URL.Scheme)
-***REMOVED***
+}
 
 // Schemes adds a matcher for URL schemes.
 // It accepts a sequence of schemes to be matched, e.g.: "http", "https".
-func (r *Route) Schemes(schemes ...string) *Route ***REMOVED***
-	for k, v := range schemes ***REMOVED***
+func (r *Route) Schemes(schemes ...string) *Route {
+	for k, v := range schemes {
 		schemes[k] = strings.ToLower(v)
-	***REMOVED***
+	}
 	return r.addMatcher(schemeMatcher(schemes))
-***REMOVED***
+}
 
 // BuildVarsFunc --------------------------------------------------------------
 
@@ -396,10 +396,10 @@ type BuildVarsFunc func(map[string]string) map[string]string
 
 // BuildVarsFunc adds a custom function to be used to modify build variables
 // before a route's URL is built.
-func (r *Route) BuildVarsFunc(f BuildVarsFunc) *Route ***REMOVED***
+func (r *Route) BuildVarsFunc(f BuildVarsFunc) *Route {
 	r.buildVarsFunc = f
 	return r
-***REMOVED***
+}
 
 // Subrouter ------------------------------------------------------------------
 
@@ -410,16 +410,16 @@ func (r *Route) BuildVarsFunc(f BuildVarsFunc) *Route ***REMOVED***
 //     r := mux.NewRouter()
 //     s := r.Host("www.example.com").Subrouter()
 //     s.HandleFunc("/products/", ProductsHandler)
-//     s.HandleFunc("/products/***REMOVED***key***REMOVED***", ProductHandler)
-//     s.HandleFunc("/articles/***REMOVED***category***REMOVED***/***REMOVED***id:[0-9]+***REMOVED***"), ArticleHandler)
+//     s.HandleFunc("/products/{key}", ProductHandler)
+//     s.HandleFunc("/articles/{category}/{id:[0-9]+}"), ArticleHandler)
 //
 // Here, the routes registered in the subrouter won't be tested if the host
 // doesn't match.
-func (r *Route) Subrouter() *Router ***REMOVED***
-	router := &Router***REMOVED***parent: r, strictSlash: r.strictSlash***REMOVED***
+func (r *Route) Subrouter() *Router {
+	router := &Router{parent: r, strictSlash: r.strictSlash}
 	r.addMatcher(router)
 	return router
-***REMOVED***
+}
 
 // ----------------------------------------------------------------------------
 // URL building
@@ -431,7 +431,7 @@ func (r *Route) Subrouter() *Router ***REMOVED***
 // example, given this route:
 //
 //     r := mux.NewRouter()
-//     r.HandleFunc("/articles/***REMOVED***category***REMOVED***/***REMOVED***id:[0-9]+***REMOVED***", ArticleHandler).
+//     r.HandleFunc("/articles/{category}/{id:[0-9]+}", ArticleHandler).
 //       Name("article")
 //
 // ...a URL for it can be built using:
@@ -445,8 +445,8 @@ func (r *Route) Subrouter() *Router ***REMOVED***
 // This also works for host variables:
 //
 //     r := mux.NewRouter()
-//     r.Host("***REMOVED***subdomain***REMOVED***.domain.com").
-//       HandleFunc("/articles/***REMOVED***category***REMOVED***/***REMOVED***id:[0-9]+***REMOVED***", ArticleHandler).
+//     r.Host("{subdomain}.domain.com").
+//       HandleFunc("/articles/{category}/{id:[0-9]+}", ArticleHandler).
 //       Name("article")
 //
 //     // url.String() will be "http://news.domain.com/articles/technology/42"
@@ -456,172 +456,172 @@ func (r *Route) Subrouter() *Router ***REMOVED***
 //
 // All variables defined in the route are required, and their values must
 // conform to the corresponding patterns.
-func (r *Route) URL(pairs ...string) (*url.URL, error) ***REMOVED***
-	if r.err != nil ***REMOVED***
+func (r *Route) URL(pairs ...string) (*url.URL, error) {
+	if r.err != nil {
 		return nil, r.err
-	***REMOVED***
-	if r.regexp == nil ***REMOVED***
+	}
+	if r.regexp == nil {
 		return nil, errors.New("mux: route doesn't have a host or path")
-	***REMOVED***
+	}
 	values, err := r.prepareVars(pairs...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	var scheme, host, path string
-	if r.regexp.host != nil ***REMOVED***
+	if r.regexp.host != nil {
 		// Set a default scheme.
 		scheme = "http"
-		if host, err = r.regexp.host.url(values); err != nil ***REMOVED***
+		if host, err = r.regexp.host.url(values); err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
-	if r.regexp.path != nil ***REMOVED***
-		if path, err = r.regexp.path.url(values); err != nil ***REMOVED***
+		}
+	}
+	if r.regexp.path != nil {
+		if path, err = r.regexp.path.url(values); err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
-	return &url.URL***REMOVED***
+		}
+	}
+	return &url.URL{
 		Scheme: scheme,
 		Host:   host,
 		Path:   path,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // URLHost builds the host part of the URL for a route. See Route.URL().
 //
 // The route must have a host defined.
-func (r *Route) URLHost(pairs ...string) (*url.URL, error) ***REMOVED***
-	if r.err != nil ***REMOVED***
+func (r *Route) URLHost(pairs ...string) (*url.URL, error) {
+	if r.err != nil {
 		return nil, r.err
-	***REMOVED***
-	if r.regexp == nil || r.regexp.host == nil ***REMOVED***
+	}
+	if r.regexp == nil || r.regexp.host == nil {
 		return nil, errors.New("mux: route doesn't have a host")
-	***REMOVED***
+	}
 	values, err := r.prepareVars(pairs...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	host, err := r.regexp.host.url(values)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	return &url.URL***REMOVED***
+	}
+	return &url.URL{
 		Scheme: "http",
 		Host:   host,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // URLPath builds the path part of the URL for a route. See Route.URL().
 //
 // The route must have a path defined.
-func (r *Route) URLPath(pairs ...string) (*url.URL, error) ***REMOVED***
-	if r.err != nil ***REMOVED***
+func (r *Route) URLPath(pairs ...string) (*url.URL, error) {
+	if r.err != nil {
 		return nil, r.err
-	***REMOVED***
-	if r.regexp == nil || r.regexp.path == nil ***REMOVED***
+	}
+	if r.regexp == nil || r.regexp.path == nil {
 		return nil, errors.New("mux: route doesn't have a path")
-	***REMOVED***
+	}
 	values, err := r.prepareVars(pairs...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	path, err := r.regexp.path.url(values)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	return &url.URL***REMOVED***
+	}
+	return &url.URL{
 		Path: path,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // GetPathTemplate returns the template used to build the
 // route match.
 // This is useful for building simple REST API documentation and for instrumentation
 // against third-party services.
 // An error will be returned if the route does not define a path.
-func (r *Route) GetPathTemplate() (string, error) ***REMOVED***
-	if r.err != nil ***REMOVED***
+func (r *Route) GetPathTemplate() (string, error) {
+	if r.err != nil {
 		return "", r.err
-	***REMOVED***
-	if r.regexp == nil || r.regexp.path == nil ***REMOVED***
+	}
+	if r.regexp == nil || r.regexp.path == nil {
 		return "", errors.New("mux: route doesn't have a path")
-	***REMOVED***
+	}
 	return r.regexp.path.template, nil
-***REMOVED***
+}
 
 // GetHostTemplate returns the template used to build the
 // route match.
 // This is useful for building simple REST API documentation and for instrumentation
 // against third-party services.
 // An error will be returned if the route does not define a host.
-func (r *Route) GetHostTemplate() (string, error) ***REMOVED***
-	if r.err != nil ***REMOVED***
+func (r *Route) GetHostTemplate() (string, error) {
+	if r.err != nil {
 		return "", r.err
-	***REMOVED***
-	if r.regexp == nil || r.regexp.host == nil ***REMOVED***
+	}
+	if r.regexp == nil || r.regexp.host == nil {
 		return "", errors.New("mux: route doesn't have a host")
-	***REMOVED***
+	}
 	return r.regexp.host.template, nil
-***REMOVED***
+}
 
 // prepareVars converts the route variable pairs into a map. If the route has a
 // BuildVarsFunc, it is invoked.
-func (r *Route) prepareVars(pairs ...string) (map[string]string, error) ***REMOVED***
+func (r *Route) prepareVars(pairs ...string) (map[string]string, error) {
 	m, err := mapFromPairsToString(pairs...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return r.buildVars(m), nil
-***REMOVED***
+}
 
-func (r *Route) buildVars(m map[string]string) map[string]string ***REMOVED***
-	if r.parent != nil ***REMOVED***
+func (r *Route) buildVars(m map[string]string) map[string]string {
+	if r.parent != nil {
 		m = r.parent.buildVars(m)
-	***REMOVED***
-	if r.buildVarsFunc != nil ***REMOVED***
+	}
+	if r.buildVarsFunc != nil {
 		m = r.buildVarsFunc(m)
-	***REMOVED***
+	}
 	return m
-***REMOVED***
+}
 
 // ----------------------------------------------------------------------------
 // parentRoute
 // ----------------------------------------------------------------------------
 
 // parentRoute allows routes to know about parent host and path definitions.
-type parentRoute interface ***REMOVED***
+type parentRoute interface {
 	getNamedRoutes() map[string]*Route
 	getRegexpGroup() *routeRegexpGroup
 	buildVars(map[string]string) map[string]string
-***REMOVED***
+}
 
 // getNamedRoutes returns the map where named routes are registered.
-func (r *Route) getNamedRoutes() map[string]*Route ***REMOVED***
-	if r.parent == nil ***REMOVED***
+func (r *Route) getNamedRoutes() map[string]*Route {
+	if r.parent == nil {
 		// During tests router is not always set.
 		r.parent = NewRouter()
-	***REMOVED***
+	}
 	return r.parent.getNamedRoutes()
-***REMOVED***
+}
 
 // getRegexpGroup returns regexp definitions from this route.
-func (r *Route) getRegexpGroup() *routeRegexpGroup ***REMOVED***
-	if r.regexp == nil ***REMOVED***
-		if r.parent == nil ***REMOVED***
+func (r *Route) getRegexpGroup() *routeRegexpGroup {
+	if r.regexp == nil {
+		if r.parent == nil {
 			// During tests router is not always set.
 			r.parent = NewRouter()
-		***REMOVED***
+		}
 		regexp := r.parent.getRegexpGroup()
-		if regexp == nil ***REMOVED***
+		if regexp == nil {
 			r.regexp = new(routeRegexpGroup)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			// Copy.
-			r.regexp = &routeRegexpGroup***REMOVED***
+			r.regexp = &routeRegexpGroup{
 				host:    regexp.host,
 				path:    regexp.path,
 				queries: regexp.queries,
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return r.regexp
-***REMOVED***
+}

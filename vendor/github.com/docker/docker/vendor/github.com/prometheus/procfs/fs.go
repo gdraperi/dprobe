@@ -15,19 +15,19 @@ const DefaultMountPoint = "/proc"
 
 // NewFS returns a new FS mounted under the given mountPoint. It will error
 // if the mount point can't be read.
-func NewFS(mountPoint string) (FS, error) ***REMOVED***
+func NewFS(mountPoint string) (FS, error) {
 	info, err := os.Stat(mountPoint)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", fmt.Errorf("could not read %s: %s", mountPoint, err)
-	***REMOVED***
-	if !info.IsDir() ***REMOVED***
+	}
+	if !info.IsDir() {
 		return "", fmt.Errorf("mount point %s is not a directory", mountPoint)
-	***REMOVED***
+	}
 
 	return FS(mountPoint), nil
-***REMOVED***
+}
 
 // Path returns the path of the given subsystem relative to the procfs root.
-func (fs FS) Path(p ...string) string ***REMOVED***
-	return path.Join(append([]string***REMOVED***string(fs)***REMOVED***, p...)...)
-***REMOVED***
+func (fs FS) Path(p ...string) string {
+	return path.Join(append([]string{string(fs)}, p...)...)
+}

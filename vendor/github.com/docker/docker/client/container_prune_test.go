@@ -15,19 +15,19 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestContainersPruneError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestContainersPruneError(t *testing.T) {
+	client := &Client{
 		client:  newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
 		version: "1.25",
-	***REMOVED***
+	}
 
 	filters := filters.NewArgs()
 
 	_, err := client.ContainersPrune(context.Background(), filters)
 	assert.EqualError(t, err, "Error response from daemon: Server error")
-***REMOVED***
+}
 
-func TestContainersPrune(t *testing.T) ***REMOVED***
+func TestContainersPrune(t *testing.T) {
 	expectedURL := "/v1.25/containers/prune"
 
 	danglingFilters := filters.NewArgs()
@@ -45,80 +45,80 @@ func TestContainersPrune(t *testing.T) ***REMOVED***
 	labelFilters.Add("label", "label1=foo")
 	labelFilters.Add("label", "label2!=bar")
 
-	listCases := []struct ***REMOVED***
+	listCases := []struct {
 		filters             filters.Args
 		expectedQueryParams map[string]string
-	***REMOVED******REMOVED***
-		***REMOVED***
-			filters: filters.Args***REMOVED******REMOVED***,
-			expectedQueryParams: map[string]string***REMOVED***
+	}{
+		{
+			filters: filters.Args{},
+			expectedQueryParams: map[string]string{
 				"until":   "",
 				"filter":  "",
 				"filters": "",
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			},
+		},
+		{
 			filters: danglingFilters,
-			expectedQueryParams: map[string]string***REMOVED***
+			expectedQueryParams: map[string]string{
 				"until":   "",
 				"filter":  "",
-				"filters": `***REMOVED***"dangling":***REMOVED***"true":true***REMOVED******REMOVED***`,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+				"filters": `{"dangling":{"true":true}}`,
+			},
+		},
+		{
 			filters: danglingUntilFilters,
-			expectedQueryParams: map[string]string***REMOVED***
+			expectedQueryParams: map[string]string{
 				"until":   "",
 				"filter":  "",
-				"filters": `***REMOVED***"dangling":***REMOVED***"true":true***REMOVED***,"until":***REMOVED***"2016-12-15T14:00":true***REMOVED******REMOVED***`,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+				"filters": `{"dangling":{"true":true},"until":{"2016-12-15T14:00":true}}`,
+			},
+		},
+		{
 			filters: noDanglingFilters,
-			expectedQueryParams: map[string]string***REMOVED***
+			expectedQueryParams: map[string]string{
 				"until":   "",
 				"filter":  "",
-				"filters": `***REMOVED***"dangling":***REMOVED***"false":true***REMOVED******REMOVED***`,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+				"filters": `{"dangling":{"false":true}}`,
+			},
+		},
+		{
 			filters: labelFilters,
-			expectedQueryParams: map[string]string***REMOVED***
+			expectedQueryParams: map[string]string{
 				"until":   "",
 				"filter":  "",
-				"filters": `***REMOVED***"dangling":***REMOVED***"true":true***REMOVED***,"label":***REMOVED***"label1=foo":true,"label2!=bar":true***REMOVED******REMOVED***`,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
-	for _, listCase := range listCases ***REMOVED***
-		client := &Client***REMOVED***
-			client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-				if !strings.HasPrefix(req.URL.Path, expectedURL) ***REMOVED***
+				"filters": `{"dangling":{"true":true},"label":{"label1=foo":true,"label2!=bar":true}}`,
+			},
+		},
+	}
+	for _, listCase := range listCases {
+		client := &Client{
+			client: newMockClient(func(req *http.Request) (*http.Response, error) {
+				if !strings.HasPrefix(req.URL.Path, expectedURL) {
 					return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, req.URL)
-				***REMOVED***
+				}
 				query := req.URL.Query()
-				for key, expected := range listCase.expectedQueryParams ***REMOVED***
+				for key, expected := range listCase.expectedQueryParams {
 					actual := query.Get(key)
 					assert.Equal(t, expected, actual)
-				***REMOVED***
-				content, err := json.Marshal(types.ContainersPruneReport***REMOVED***
-					ContainersDeleted: []string***REMOVED***"container_id1", "container_id2"***REMOVED***,
+				}
+				content, err := json.Marshal(types.ContainersPruneReport{
+					ContainersDeleted: []string{"container_id1", "container_id2"},
 					SpaceReclaimed:    9999,
-				***REMOVED***)
-				if err != nil ***REMOVED***
+				})
+				if err != nil {
 					return nil, err
-				***REMOVED***
-				return &http.Response***REMOVED***
+				}
+				return &http.Response{
 					StatusCode: http.StatusOK,
 					Body:       ioutil.NopCloser(bytes.NewReader(content)),
-				***REMOVED***, nil
-			***REMOVED***),
+				}, nil
+			}),
 			version: "1.25",
-		***REMOVED***
+		}
 
 		report, err := client.ContainersPrune(context.Background(), listCase.filters)
 		assert.NoError(t, err)
 		assert.Len(t, report.ContainersDeleted, 2)
 		assert.Equal(t, uint64(9999), report.SpaceReclaimed)
-	***REMOVED***
-***REMOVED***
+	}
+}

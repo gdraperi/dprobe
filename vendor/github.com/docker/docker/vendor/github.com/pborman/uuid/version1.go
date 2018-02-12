@@ -14,15 +14,15 @@ import (
 // be set NewUUID returns nil.  If clock sequence has not been set by
 // SetClockSequence then it will be set automatically.  If GetTime fails to
 // return the current NewUUID returns nil.
-func NewUUID() UUID ***REMOVED***
-	if nodeID == nil ***REMOVED***
+func NewUUID() UUID {
+	if nodeID == nil {
 		SetNodeInterface("")
-	***REMOVED***
+	}
 
 	now, seq, err := GetTime()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil
-	***REMOVED***
+	}
 
 	uuid := make([]byte, 16)
 
@@ -38,4 +38,4 @@ func NewUUID() UUID ***REMOVED***
 	copy(uuid[10:], nodeID)
 
 	return uuid
-***REMOVED***
+}

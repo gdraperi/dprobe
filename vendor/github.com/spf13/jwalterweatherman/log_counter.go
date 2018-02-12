@@ -9,47 +9,47 @@ import (
 	"sync/atomic"
 )
 
-type logCounter struct ***REMOVED***
+type logCounter struct {
 	counter uint64
-***REMOVED***
+}
 
-func (c *logCounter) incr() ***REMOVED***
+func (c *logCounter) incr() {
 	atomic.AddUint64(&c.counter, 1)
-***REMOVED***
+}
 
-func (c *logCounter) resetCounter() ***REMOVED***
+func (c *logCounter) resetCounter() {
 	atomic.StoreUint64(&c.counter, 0)
-***REMOVED***
+}
 
-func (c *logCounter) getCount() uint64 ***REMOVED***
+func (c *logCounter) getCount() uint64 {
 	return atomic.LoadUint64(&c.counter)
-***REMOVED***
+}
 
-func (c *logCounter) Write(p []byte) (n int, err error) ***REMOVED***
+func (c *logCounter) Write(p []byte) (n int, err error) {
 	c.incr()
 	return len(p), nil
-***REMOVED***
+}
 
 // LogCountForLevel returns the number of log invocations for a given threshold.
-func (n *Notepad) LogCountForLevel(l Threshold) uint64 ***REMOVED***
+func (n *Notepad) LogCountForLevel(l Threshold) uint64 {
 	return n.logCounters[l].getCount()
-***REMOVED***
+}
 
 // LogCountForLevelsGreaterThanorEqualTo returns the number of log invocations
 // greater than or equal to a given threshold.
-func (n *Notepad) LogCountForLevelsGreaterThanorEqualTo(threshold Threshold) uint64 ***REMOVED***
+func (n *Notepad) LogCountForLevelsGreaterThanorEqualTo(threshold Threshold) uint64 {
 	var cnt uint64
 
-	for i := int(threshold); i < len(n.logCounters); i++ ***REMOVED***
+	for i := int(threshold); i < len(n.logCounters); i++ {
 		cnt += n.LogCountForLevel(Threshold(i))
-	***REMOVED***
+	}
 
 	return cnt
-***REMOVED***
+}
 
 // ResetLogCounters resets the invocation counters for all levels.
-func (n *Notepad) ResetLogCounters() ***REMOVED***
-	for _, np := range n.logCounters ***REMOVED***
+func (n *Notepad) ResetLogCounters() {
+	for _, np := range n.logCounters {
 		np.resetCounter()
-	***REMOVED***
-***REMOVED***
+	}
+}

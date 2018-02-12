@@ -14,53 +14,53 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestServiceInspectError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestServiceInspectError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
-	***REMOVED***
+	}
 
-	_, _, err := client.ServiceInspectWithRaw(context.Background(), "nothing", types.ServiceInspectOptions***REMOVED******REMOVED***)
-	if err == nil || err.Error() != "Error response from daemon: Server error" ***REMOVED***
+	_, _, err := client.ServiceInspectWithRaw(context.Background(), "nothing", types.ServiceInspectOptions{})
+	if err == nil || err.Error() != "Error response from daemon: Server error" {
 		t.Fatalf("expected a Server Error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestServiceInspectServiceNotFound(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestServiceInspectServiceNotFound(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusNotFound, "Server error")),
-	***REMOVED***
+	}
 
-	_, _, err := client.ServiceInspectWithRaw(context.Background(), "unknown", types.ServiceInspectOptions***REMOVED******REMOVED***)
-	if err == nil || !IsErrNotFound(err) ***REMOVED***
+	_, _, err := client.ServiceInspectWithRaw(context.Background(), "unknown", types.ServiceInspectOptions{})
+	if err == nil || !IsErrNotFound(err) {
 		t.Fatalf("expected a serviceNotFoundError error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestServiceInspect(t *testing.T) ***REMOVED***
+func TestServiceInspect(t *testing.T) {
 	expectedURL := "/services/service_id"
-	client := &Client***REMOVED***
-		client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-			if !strings.HasPrefix(req.URL.Path, expectedURL) ***REMOVED***
+	client := &Client{
+		client: newMockClient(func(req *http.Request) (*http.Response, error) {
+			if !strings.HasPrefix(req.URL.Path, expectedURL) {
 				return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, req.URL)
-			***REMOVED***
-			content, err := json.Marshal(swarm.Service***REMOVED***
+			}
+			content, err := json.Marshal(swarm.Service{
 				ID: "service_id",
-			***REMOVED***)
-			if err != nil ***REMOVED***
+			})
+			if err != nil {
 				return nil, err
-			***REMOVED***
-			return &http.Response***REMOVED***
+			}
+			return &http.Response{
 				StatusCode: http.StatusOK,
 				Body:       ioutil.NopCloser(bytes.NewReader(content)),
-			***REMOVED***, nil
-		***REMOVED***),
-	***REMOVED***
+			}, nil
+		}),
+	}
 
-	serviceInspect, _, err := client.ServiceInspectWithRaw(context.Background(), "service_id", types.ServiceInspectOptions***REMOVED******REMOVED***)
-	if err != nil ***REMOVED***
+	serviceInspect, _, err := client.ServiceInspectWithRaw(context.Background(), "service_id", types.ServiceInspectOptions{})
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if serviceInspect.ID != "service_id" ***REMOVED***
+	}
+	if serviceInspect.ID != "service_id" {
 		t.Fatalf("expected `service_id`, got %s", serviceInspect.ID)
-	***REMOVED***
-***REMOVED***
+	}
+}

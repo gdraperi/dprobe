@@ -30,25 +30,25 @@ import (
 // XORKeyStream crypts bytes from in to out using the given key and nonce.
 // In and out must overlap entirely or not at all. Nonce must
 // be either 8 or 24 bytes long.
-func XORKeyStream(out, in []byte, nonce []byte, key *[32]byte) ***REMOVED***
-	if len(out) < len(in) ***REMOVED***
+func XORKeyStream(out, in []byte, nonce []byte, key *[32]byte) {
+	if len(out) < len(in) {
 		in = in[:len(out)]
-	***REMOVED***
+	}
 
 	var subNonce [16]byte
 
-	if len(nonce) == 24 ***REMOVED***
+	if len(nonce) == 24 {
 		var subKey [32]byte
 		var hNonce [16]byte
 		copy(hNonce[:], nonce[:16])
 		salsa.HSalsa20(&subKey, &hNonce, key, &salsa.Sigma)
 		copy(subNonce[:], nonce[16:])
 		key = &subKey
-	***REMOVED*** else if len(nonce) == 8 ***REMOVED***
+	} else if len(nonce) == 8 {
 		copy(subNonce[:], nonce[:])
-	***REMOVED*** else ***REMOVED***
+	} else {
 		panic("salsa20: nonce must be 8 or 24 bytes")
-	***REMOVED***
+	}
 
 	salsa.XORKeyStream(out, in, &subNonce, key)
-***REMOVED***
+}

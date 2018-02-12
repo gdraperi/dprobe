@@ -34,7 +34,7 @@ const (
 	tokenDotDot
 )
 
-var tokenTypeNames = []string***REMOVED***
+var tokenTypeNames = []string{
 	"Error",
 	"EOF",
 	"Key",
@@ -52,55 +52,55 @@ var tokenTypeNames = []string***REMOVED***
 	"?",
 	".",
 	"..",
-***REMOVED***
+}
 
-type token struct ***REMOVED***
+type token struct {
 	toml.Position
 	typ tokenType
 	val string
-***REMOVED***
+}
 
-func (tt tokenType) String() string ***REMOVED***
+func (tt tokenType) String() string {
 	idx := int(tt)
-	if idx < len(tokenTypeNames) ***REMOVED***
+	if idx < len(tokenTypeNames) {
 		return tokenTypeNames[idx]
-	***REMOVED***
+	}
 	return "Unknown"
-***REMOVED***
+}
 
-func (t token) Int() int ***REMOVED***
-	if result, err := strconv.Atoi(t.val); err != nil ***REMOVED***
+func (t token) Int() int {
+	if result, err := strconv.Atoi(t.val); err != nil {
 		panic(err)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		return result
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (t token) String() string ***REMOVED***
-	switch t.typ ***REMOVED***
+func (t token) String() string {
+	switch t.typ {
 	case tokenEOF:
 		return "EOF"
 	case tokenError:
 		return t.val
-	***REMOVED***
+	}
 
 	return fmt.Sprintf("%q", t.val)
-***REMOVED***
+}
 
-func isSpace(r rune) bool ***REMOVED***
+func isSpace(r rune) bool {
 	return r == ' ' || r == '\t'
-***REMOVED***
+}
 
-func isAlphanumeric(r rune) bool ***REMOVED***
+func isAlphanumeric(r rune) bool {
 	return unicode.IsLetter(r) || r == '_'
-***REMOVED***
+}
 
-func isDigit(r rune) bool ***REMOVED***
+func isDigit(r rune) bool {
 	return unicode.IsNumber(r)
-***REMOVED***
+}
 
-func isHexDigit(r rune) bool ***REMOVED***
+func isHexDigit(r rune) bool {
 	return isDigit(r) ||
 		(r >= 'a' && r <= 'f') ||
 		(r >= 'A' && r <= 'F')
-***REMOVED***
+}

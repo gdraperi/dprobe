@@ -12,49 +12,49 @@ import (
 // repositoryScope returns a repository scope string such as "repository:foo/bar:pull"
 // for "host/foo/bar:baz".
 // When push is true, both pull and push are added to the scope.
-func repositoryScope(refspec reference.Spec, push bool) (string, error) ***REMOVED***
+func repositoryScope(refspec reference.Spec, push bool) (string, error) {
 	u, err := url.Parse("dummy://" + refspec.Locator)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	s := "repository:" + strings.TrimPrefix(u.Path, "/") + ":pull"
-	if push ***REMOVED***
+	if push {
 		s += ",push"
-	***REMOVED***
+	}
 	return s, nil
-***REMOVED***
+}
 
 // tokenScopesKey is used for the key for context.WithValue().
-// value: []string (e.g. ***REMOVED***"registry:foo/bar:pull"***REMOVED***)
-type tokenScopesKey struct***REMOVED******REMOVED***
+// value: []string (e.g. {"registry:foo/bar:pull"})
+type tokenScopesKey struct{}
 
-// contextWithRepositoryScope returns a context with tokenScopesKey***REMOVED******REMOVED*** and the repository scope value.
-func contextWithRepositoryScope(ctx context.Context, refspec reference.Spec, push bool) (context.Context, error) ***REMOVED***
+// contextWithRepositoryScope returns a context with tokenScopesKey{} and the repository scope value.
+func contextWithRepositoryScope(ctx context.Context, refspec reference.Spec, push bool) (context.Context, error) {
 	s, err := repositoryScope(refspec, push)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	return context.WithValue(ctx, tokenScopesKey***REMOVED******REMOVED***, []string***REMOVED***s***REMOVED***), nil
-***REMOVED***
+	}
+	return context.WithValue(ctx, tokenScopesKey{}, []string{s}), nil
+}
 
-// getTokenScopes returns deduplicated and sorted scopes from ctx.Value(tokenScopesKey***REMOVED******REMOVED***) and params["scope"].
-func getTokenScopes(ctx context.Context, params map[string]string) []string ***REMOVED***
+// getTokenScopes returns deduplicated and sorted scopes from ctx.Value(tokenScopesKey{}) and params["scope"].
+func getTokenScopes(ctx context.Context, params map[string]string) []string {
 	var scopes []string
-	if x := ctx.Value(tokenScopesKey***REMOVED******REMOVED***); x != nil ***REMOVED***
+	if x := ctx.Value(tokenScopesKey{}); x != nil {
 		scopes = append(scopes, x.([]string)...)
-	***REMOVED***
-	if scope, ok := params["scope"]; ok ***REMOVED***
-		for _, s := range scopes ***REMOVED***
+	}
+	if scope, ok := params["scope"]; ok {
+		for _, s := range scopes {
 			// Note: this comparison is unaware of the scope grammar (https://docs.docker.com/registry/spec/auth/scope/)
 			// So, "repository:foo/bar:pull,push" != "repository:foo/bar:push,pull", although semantically they are equal.
-			if s == scope ***REMOVED***
+			if s == scope {
 				// already appended
 				goto Sort
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		scopes = append(scopes, scope)
-	***REMOVED***
+	}
 Sort:
 	sort.Strings(scopes)
 	return scopes
-***REMOVED***
+}

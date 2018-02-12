@@ -8,23 +8,23 @@ import (
 )
 
 // This example scrapes the reviews shown on the home page of metalsucks.net.
-func Example() ***REMOVED***
+func Example() {
 	// Load the HTML document
 	doc, err := goquery.NewDocument("http://metalsucks.net")
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatal(err)
-	***REMOVED***
+	}
 
 	// Find the review items
-	doc.Find(".sidebar-reviews article .content-block").Each(func(i int, s *goquery.Selection) ***REMOVED***
+	doc.Find(".sidebar-reviews article .content-block").Each(func(i int, s *goquery.Selection) {
 		// For each item found, get the band and title
 		band := s.Find("a").Text()
 		title := s.Find("i").Text()
 		fmt.Printf("Review %d: %s - %s\n", i, band, title)
-	***REMOVED***)
+	})
 	// To see the output of the Example while running the test suite (go test), simply
 	// remove the leading "x" before Output on the next line. This will cause the
 	// example to fail (all the "real" tests should pass).
 
 	// xOutput: voluntarily fail the Example output.
-***REMOVED***
+}

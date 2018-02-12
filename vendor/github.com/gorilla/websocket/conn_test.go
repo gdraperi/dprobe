@@ -20,17 +20,17 @@ import (
 
 var _ net.Error = errWriteTimeout
 
-type fakeNetConn struct ***REMOVED***
+type fakeNetConn struct {
 	io.Reader
 	io.Writer
-***REMOVED***
+}
 
-func (c fakeNetConn) Close() error                       ***REMOVED*** return nil ***REMOVED***
-func (c fakeNetConn) LocalAddr() net.Addr                ***REMOVED*** return localAddr ***REMOVED***
-func (c fakeNetConn) RemoteAddr() net.Addr               ***REMOVED*** return remoteAddr ***REMOVED***
-func (c fakeNetConn) SetDeadline(t time.Time) error      ***REMOVED*** return nil ***REMOVED***
-func (c fakeNetConn) SetReadDeadline(t time.Time) error  ***REMOVED*** return nil ***REMOVED***
-func (c fakeNetConn) SetWriteDeadline(t time.Time) error ***REMOVED*** return nil ***REMOVED***
+func (c fakeNetConn) Close() error                       { return nil }
+func (c fakeNetConn) LocalAddr() net.Addr                { return localAddr }
+func (c fakeNetConn) RemoteAddr() net.Addr               { return remoteAddr }
+func (c fakeNetConn) SetDeadline(t time.Time) error      { return nil }
+func (c fakeNetConn) SetReadDeadline(t time.Time) error  { return nil }
+func (c fakeNetConn) SetWriteDeadline(t time.Time) error { return nil }
 
 type fakeAddr int
 
@@ -39,148 +39,148 @@ var (
 	remoteAddr = fakeAddr(2)
 )
 
-func (a fakeAddr) Network() string ***REMOVED***
+func (a fakeAddr) Network() string {
 	return "net"
-***REMOVED***
+}
 
-func (a fakeAddr) String() string ***REMOVED***
+func (a fakeAddr) String() string {
 	return "str"
-***REMOVED***
+}
 
-func TestFraming(t *testing.T) ***REMOVED***
-	frameSizes := []int***REMOVED***0, 1, 2, 124, 125, 126, 127, 128, 129, 65534, 65535, 65536, 65537***REMOVED***
-	var readChunkers = []struct ***REMOVED***
+func TestFraming(t *testing.T) {
+	frameSizes := []int{0, 1, 2, 124, 125, 126, 127, 128, 129, 65534, 65535, 65536, 65537}
+	var readChunkers = []struct {
 		name string
 		f    func(io.Reader) io.Reader
-	***REMOVED******REMOVED***
-		***REMOVED***"half", iotest.HalfReader***REMOVED***,
-		***REMOVED***"one", iotest.OneByteReader***REMOVED***,
-		***REMOVED***"asis", func(r io.Reader) io.Reader ***REMOVED*** return r ***REMOVED******REMOVED***,
-	***REMOVED***
+	}{
+		{"half", iotest.HalfReader},
+		{"one", iotest.OneByteReader},
+		{"asis", func(r io.Reader) io.Reader { return r }},
+	}
 	writeBuf := make([]byte, 65537)
-	for i := range writeBuf ***REMOVED***
+	for i := range writeBuf {
 		writeBuf[i] = byte(i)
-	***REMOVED***
-	var writers = []struct ***REMOVED***
+	}
+	var writers = []struct {
 		name string
 		f    func(w io.Writer, n int) (int, error)
-	***REMOVED******REMOVED***
-		***REMOVED***"iocopy", func(w io.Writer, n int) (int, error) ***REMOVED***
+	}{
+		{"iocopy", func(w io.Writer, n int) (int, error) {
 			nn, err := io.Copy(w, bytes.NewReader(writeBuf[:n]))
 			return int(nn), err
-		***REMOVED******REMOVED***,
-		***REMOVED***"write", func(w io.Writer, n int) (int, error) ***REMOVED***
+		}},
+		{"write", func(w io.Writer, n int) (int, error) {
 			return w.Write(writeBuf[:n])
-		***REMOVED******REMOVED***,
-		***REMOVED***"string", func(w io.Writer, n int) (int, error) ***REMOVED***
+		}},
+		{"string", func(w io.Writer, n int) (int, error) {
 			return io.WriteString(w, string(writeBuf[:n]))
-		***REMOVED******REMOVED***,
-	***REMOVED***
+		}},
+	}
 
-	for _, compress := range []bool***REMOVED***false, true***REMOVED*** ***REMOVED***
-		for _, isServer := range []bool***REMOVED***true, false***REMOVED*** ***REMOVED***
-			for _, chunker := range readChunkers ***REMOVED***
+	for _, compress := range []bool{false, true} {
+		for _, isServer := range []bool{true, false} {
+			for _, chunker := range readChunkers {
 
 				var connBuf bytes.Buffer
-				wc := newConn(fakeNetConn***REMOVED***Reader: nil, Writer: &connBuf***REMOVED***, isServer, 1024, 1024)
-				rc := newConn(fakeNetConn***REMOVED***Reader: chunker.f(&connBuf), Writer: nil***REMOVED***, !isServer, 1024, 1024)
-				if compress ***REMOVED***
+				wc := newConn(fakeNetConn{Reader: nil, Writer: &connBuf}, isServer, 1024, 1024)
+				rc := newConn(fakeNetConn{Reader: chunker.f(&connBuf), Writer: nil}, !isServer, 1024, 1024)
+				if compress {
 					wc.newCompressionWriter = compressNoContextTakeover
 					rc.newDecompressionReader = decompressNoContextTakeover
-				***REMOVED***
-				for _, n := range frameSizes ***REMOVED***
-					for _, writer := range writers ***REMOVED***
+				}
+				for _, n := range frameSizes {
+					for _, writer := range writers {
 						name := fmt.Sprintf("z:%v, s:%v, r:%s, n:%d w:%s", compress, isServer, chunker.name, n, writer.name)
 
 						w, err := wc.NextWriter(TextMessage)
-						if err != nil ***REMOVED***
+						if err != nil {
 							t.Errorf("%s: wc.NextWriter() returned %v", name, err)
 							continue
-						***REMOVED***
+						}
 						nn, err := writer.f(w, n)
-						if err != nil || nn != n ***REMOVED***
+						if err != nil || nn != n {
 							t.Errorf("%s: w.Write(writeBuf[:n]) returned %d, %v", name, nn, err)
 							continue
-						***REMOVED***
+						}
 						err = w.Close()
-						if err != nil ***REMOVED***
+						if err != nil {
 							t.Errorf("%s: w.Close() returned %v", name, err)
 							continue
-						***REMOVED***
+						}
 
 						opCode, r, err := rc.NextReader()
-						if err != nil || opCode != TextMessage ***REMOVED***
+						if err != nil || opCode != TextMessage {
 							t.Errorf("%s: NextReader() returned %d, r, %v", name, opCode, err)
 							continue
-						***REMOVED***
+						}
 						rbuf, err := ioutil.ReadAll(r)
-						if err != nil ***REMOVED***
+						if err != nil {
 							t.Errorf("%s: ReadFull() returned rbuf, %v", name, err)
 							continue
-						***REMOVED***
+						}
 
-						if len(rbuf) != n ***REMOVED***
+						if len(rbuf) != n {
 							t.Errorf("%s: len(rbuf) is %d, want %d", name, len(rbuf), n)
 							continue
-						***REMOVED***
+						}
 
-						for i, b := range rbuf ***REMOVED***
-							if byte(i) != b ***REMOVED***
+						for i, b := range rbuf {
+							if byte(i) != b {
 								t.Errorf("%s: bad byte at offset %d", name, i)
 								break
-							***REMOVED***
-						***REMOVED***
-					***REMOVED***
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
 
-func TestControl(t *testing.T) ***REMOVED***
+func TestControl(t *testing.T) {
 	const message = "this is a ping/pong messsage"
-	for _, isServer := range []bool***REMOVED***true, false***REMOVED*** ***REMOVED***
-		for _, isWriteControl := range []bool***REMOVED***true, false***REMOVED*** ***REMOVED***
+	for _, isServer := range []bool{true, false} {
+		for _, isWriteControl := range []bool{true, false} {
 			name := fmt.Sprintf("s:%v, wc:%v", isServer, isWriteControl)
 			var connBuf bytes.Buffer
-			wc := newConn(fakeNetConn***REMOVED***Reader: nil, Writer: &connBuf***REMOVED***, isServer, 1024, 1024)
-			rc := newConn(fakeNetConn***REMOVED***Reader: &connBuf, Writer: nil***REMOVED***, !isServer, 1024, 1024)
-			if isWriteControl ***REMOVED***
+			wc := newConn(fakeNetConn{Reader: nil, Writer: &connBuf}, isServer, 1024, 1024)
+			rc := newConn(fakeNetConn{Reader: &connBuf, Writer: nil}, !isServer, 1024, 1024)
+			if isWriteControl {
 				wc.WriteControl(PongMessage, []byte(message), time.Now().Add(time.Second))
-			***REMOVED*** else ***REMOVED***
+			} else {
 				w, err := wc.NextWriter(PongMessage)
-				if err != nil ***REMOVED***
+				if err != nil {
 					t.Errorf("%s: wc.NextWriter() returned %v", name, err)
 					continue
-				***REMOVED***
-				if _, err := w.Write([]byte(message)); err != nil ***REMOVED***
+				}
+				if _, err := w.Write([]byte(message)); err != nil {
 					t.Errorf("%s: w.Write() returned %v", name, err)
 					continue
-				***REMOVED***
-				if err := w.Close(); err != nil ***REMOVED***
+				}
+				if err := w.Close(); err != nil {
 					t.Errorf("%s: w.Close() returned %v", name, err)
 					continue
-				***REMOVED***
+				}
 				var actualMessage string
-				rc.SetPongHandler(func(s string) error ***REMOVED*** actualMessage = s; return nil ***REMOVED***)
+				rc.SetPongHandler(func(s string) error { actualMessage = s; return nil })
 				rc.NextReader()
-				if actualMessage != message ***REMOVED***
+				if actualMessage != message {
 					t.Errorf("%s: pong=%q, want %q", name, actualMessage, message)
 					continue
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+				}
+			}
+		}
+	}
+}
 
-func TestCloseFrameBeforeFinalMessageFrame(t *testing.T) ***REMOVED***
+func TestCloseFrameBeforeFinalMessageFrame(t *testing.T) {
 	const bufSize = 512
 
-	expectedErr := &CloseError***REMOVED***Code: CloseNormalClosure, Text: "hello"***REMOVED***
+	expectedErr := &CloseError{Code: CloseNormalClosure, Text: "hello"}
 
 	var b1, b2 bytes.Buffer
-	wc := newConn(fakeNetConn***REMOVED***Reader: nil, Writer: &b1***REMOVED***, false, 1024, bufSize)
-	rc := newConn(fakeNetConn***REMOVED***Reader: &b1, Writer: &b2***REMOVED***, true, 1024, 1024)
+	wc := newConn(fakeNetConn{Reader: nil, Writer: &b1}, false, 1024, bufSize)
+	rc := newConn(fakeNetConn{Reader: &b1, Writer: &b2}, true, 1024, 1024)
 
 	w, _ := wc.NextWriter(BinaryMessage)
 	w.Write(make([]byte, bufSize+bufSize/2))
@@ -188,112 +188,112 @@ func TestCloseFrameBeforeFinalMessageFrame(t *testing.T) ***REMOVED***
 	w.Close()
 
 	op, r, err := rc.NextReader()
-	if op != BinaryMessage || err != nil ***REMOVED***
+	if op != BinaryMessage || err != nil {
 		t.Fatalf("NextReader() returned %d, %v", op, err)
-	***REMOVED***
+	}
 	_, err = io.Copy(ioutil.Discard, r)
-	if !reflect.DeepEqual(err, expectedErr) ***REMOVED***
+	if !reflect.DeepEqual(err, expectedErr) {
 		t.Fatalf("io.Copy() returned %v, want %v", err, expectedErr)
-	***REMOVED***
+	}
 	_, _, err = rc.NextReader()
-	if !reflect.DeepEqual(err, expectedErr) ***REMOVED***
+	if !reflect.DeepEqual(err, expectedErr) {
 		t.Fatalf("NextReader() returned %v, want %v", err, expectedErr)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestEOFWithinFrame(t *testing.T) ***REMOVED***
+func TestEOFWithinFrame(t *testing.T) {
 	const bufSize = 64
 
-	for n := 0; ; n++ ***REMOVED***
+	for n := 0; ; n++ {
 		var b bytes.Buffer
-		wc := newConn(fakeNetConn***REMOVED***Reader: nil, Writer: &b***REMOVED***, false, 1024, 1024)
-		rc := newConn(fakeNetConn***REMOVED***Reader: &b, Writer: nil***REMOVED***, true, 1024, 1024)
+		wc := newConn(fakeNetConn{Reader: nil, Writer: &b}, false, 1024, 1024)
+		rc := newConn(fakeNetConn{Reader: &b, Writer: nil}, true, 1024, 1024)
 
 		w, _ := wc.NextWriter(BinaryMessage)
 		w.Write(make([]byte, bufSize))
 		w.Close()
 
-		if n >= b.Len() ***REMOVED***
+		if n >= b.Len() {
 			break
-		***REMOVED***
+		}
 		b.Truncate(n)
 
 		op, r, err := rc.NextReader()
-		if err == errUnexpectedEOF ***REMOVED***
+		if err == errUnexpectedEOF {
 			continue
-		***REMOVED***
-		if op != BinaryMessage || err != nil ***REMOVED***
+		}
+		if op != BinaryMessage || err != nil {
 			t.Fatalf("%d: NextReader() returned %d, %v", n, op, err)
-		***REMOVED***
+		}
 		_, err = io.Copy(ioutil.Discard, r)
-		if err != errUnexpectedEOF ***REMOVED***
+		if err != errUnexpectedEOF {
 			t.Fatalf("%d: io.Copy() returned %v, want %v", n, err, errUnexpectedEOF)
-		***REMOVED***
+		}
 		_, _, err = rc.NextReader()
-		if err != errUnexpectedEOF ***REMOVED***
+		if err != errUnexpectedEOF {
 			t.Fatalf("%d: NextReader() returned %v, want %v", n, err, errUnexpectedEOF)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestEOFBeforeFinalFrame(t *testing.T) ***REMOVED***
+func TestEOFBeforeFinalFrame(t *testing.T) {
 	const bufSize = 512
 
 	var b1, b2 bytes.Buffer
-	wc := newConn(fakeNetConn***REMOVED***Reader: nil, Writer: &b1***REMOVED***, false, 1024, bufSize)
-	rc := newConn(fakeNetConn***REMOVED***Reader: &b1, Writer: &b2***REMOVED***, true, 1024, 1024)
+	wc := newConn(fakeNetConn{Reader: nil, Writer: &b1}, false, 1024, bufSize)
+	rc := newConn(fakeNetConn{Reader: &b1, Writer: &b2}, true, 1024, 1024)
 
 	w, _ := wc.NextWriter(BinaryMessage)
 	w.Write(make([]byte, bufSize+bufSize/2))
 
 	op, r, err := rc.NextReader()
-	if op != BinaryMessage || err != nil ***REMOVED***
+	if op != BinaryMessage || err != nil {
 		t.Fatalf("NextReader() returned %d, %v", op, err)
-	***REMOVED***
+	}
 	_, err = io.Copy(ioutil.Discard, r)
-	if err != errUnexpectedEOF ***REMOVED***
+	if err != errUnexpectedEOF {
 		t.Fatalf("io.Copy() returned %v, want %v", err, errUnexpectedEOF)
-	***REMOVED***
+	}
 	_, _, err = rc.NextReader()
-	if err != errUnexpectedEOF ***REMOVED***
+	if err != errUnexpectedEOF {
 		t.Fatalf("NextReader() returned %v, want %v", err, errUnexpectedEOF)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestWriteAfterMessageWriterClose(t *testing.T) ***REMOVED***
-	wc := newConn(fakeNetConn***REMOVED***Reader: nil, Writer: &bytes.Buffer***REMOVED******REMOVED******REMOVED***, false, 1024, 1024)
+func TestWriteAfterMessageWriterClose(t *testing.T) {
+	wc := newConn(fakeNetConn{Reader: nil, Writer: &bytes.Buffer{}}, false, 1024, 1024)
 	w, _ := wc.NextWriter(BinaryMessage)
 	io.WriteString(w, "hello")
-	if err := w.Close(); err != nil ***REMOVED***
+	if err := w.Close(); err != nil {
 		t.Fatalf("unxpected error closing message writer, %v", err)
-	***REMOVED***
+	}
 
-	if _, err := io.WriteString(w, "world"); err == nil ***REMOVED***
+	if _, err := io.WriteString(w, "world"); err == nil {
 		t.Fatalf("no error writing after close")
-	***REMOVED***
+	}
 
 	w, _ = wc.NextWriter(BinaryMessage)
 	io.WriteString(w, "hello")
 
 	// close w by getting next writer
 	_, err := wc.NextWriter(BinaryMessage)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("unexpected error getting next writer, %v", err)
-	***REMOVED***
+	}
 
-	if _, err := io.WriteString(w, "world"); err == nil ***REMOVED***
+	if _, err := io.WriteString(w, "world"); err == nil {
 		t.Fatalf("no error writing after close")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestReadLimit(t *testing.T) ***REMOVED***
+func TestReadLimit(t *testing.T) {
 
 	const readLimit = 512
 	message := make([]byte, readLimit+1)
 
 	var b1, b2 bytes.Buffer
-	wc := newConn(fakeNetConn***REMOVED***Reader: nil, Writer: &b1***REMOVED***, false, 1024, readLimit-2)
-	rc := newConn(fakeNetConn***REMOVED***Reader: &b1, Writer: &b2***REMOVED***, true, 1024, 1024)
+	wc := newConn(fakeNetConn{Reader: nil, Writer: &b1}, false, 1024, readLimit-2)
+	rc := newConn(fakeNetConn{Reader: &b1, Writer: &b2}, true, 1024, 1024)
 	rc.SetReadLimit(readLimit)
 
 	// Send message at the limit with interleaved pong.
@@ -307,190 +307,190 @@ func TestReadLimit(t *testing.T) ***REMOVED***
 	wc.WriteMessage(BinaryMessage, message[:readLimit+1])
 
 	op, _, err := rc.NextReader()
-	if op != BinaryMessage || err != nil ***REMOVED***
+	if op != BinaryMessage || err != nil {
 		t.Fatalf("1: NextReader() returned %d, %v", op, err)
-	***REMOVED***
+	}
 	op, r, err := rc.NextReader()
-	if op != BinaryMessage || err != nil ***REMOVED***
+	if op != BinaryMessage || err != nil {
 		t.Fatalf("2: NextReader() returned %d, %v", op, err)
-	***REMOVED***
+	}
 	_, err = io.Copy(ioutil.Discard, r)
-	if err != ErrReadLimit ***REMOVED***
+	if err != ErrReadLimit {
 		t.Fatalf("io.Copy() returned %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestAddrs(t *testing.T) ***REMOVED***
-	c := newConn(&fakeNetConn***REMOVED******REMOVED***, true, 1024, 1024)
-	if c.LocalAddr() != localAddr ***REMOVED***
+func TestAddrs(t *testing.T) {
+	c := newConn(&fakeNetConn{}, true, 1024, 1024)
+	if c.LocalAddr() != localAddr {
 		t.Errorf("LocalAddr = %v, want %v", c.LocalAddr(), localAddr)
-	***REMOVED***
-	if c.RemoteAddr() != remoteAddr ***REMOVED***
+	}
+	if c.RemoteAddr() != remoteAddr {
 		t.Errorf("RemoteAddr = %v, want %v", c.RemoteAddr(), remoteAddr)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestUnderlyingConn(t *testing.T) ***REMOVED***
+func TestUnderlyingConn(t *testing.T) {
 	var b1, b2 bytes.Buffer
-	fc := fakeNetConn***REMOVED***Reader: &b1, Writer: &b2***REMOVED***
+	fc := fakeNetConn{Reader: &b1, Writer: &b2}
 	c := newConn(fc, true, 1024, 1024)
 	ul := c.UnderlyingConn()
-	if ul != fc ***REMOVED***
+	if ul != fc {
 		t.Fatalf("Underlying conn is not what it should be.")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestBufioReadBytes(t *testing.T) ***REMOVED***
+func TestBufioReadBytes(t *testing.T) {
 	// Test calling bufio.ReadBytes for value longer than read buffer size.
 
 	m := make([]byte, 512)
 	m[len(m)-1] = '\n'
 
 	var b1, b2 bytes.Buffer
-	wc := newConn(fakeNetConn***REMOVED***Reader: nil, Writer: &b1***REMOVED***, false, len(m)+64, len(m)+64)
-	rc := newConn(fakeNetConn***REMOVED***Reader: &b1, Writer: &b2***REMOVED***, true, len(m)-64, len(m)-64)
+	wc := newConn(fakeNetConn{Reader: nil, Writer: &b1}, false, len(m)+64, len(m)+64)
+	rc := newConn(fakeNetConn{Reader: &b1, Writer: &b2}, true, len(m)-64, len(m)-64)
 
 	w, _ := wc.NextWriter(BinaryMessage)
 	w.Write(m)
 	w.Close()
 
 	op, r, err := rc.NextReader()
-	if op != BinaryMessage || err != nil ***REMOVED***
+	if op != BinaryMessage || err != nil {
 		t.Fatalf("NextReader() returned %d, %v", op, err)
-	***REMOVED***
+	}
 
 	br := bufio.NewReader(r)
 	p, err := br.ReadBytes('\n')
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("ReadBytes() returned %v", err)
-	***REMOVED***
-	if len(p) != len(m) ***REMOVED***
+	}
+	if len(p) != len(m) {
 		t.Fatalf("read returned %d bytes, want %d bytes", len(p), len(m))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-var closeErrorTests = []struct ***REMOVED***
+var closeErrorTests = []struct {
 	err   error
 	codes []int
 	ok    bool
-***REMOVED******REMOVED***
-	***REMOVED***&CloseError***REMOVED***Code: CloseNormalClosure***REMOVED***, []int***REMOVED***CloseNormalClosure***REMOVED***, true***REMOVED***,
-	***REMOVED***&CloseError***REMOVED***Code: CloseNormalClosure***REMOVED***, []int***REMOVED***CloseNoStatusReceived***REMOVED***, false***REMOVED***,
-	***REMOVED***&CloseError***REMOVED***Code: CloseNormalClosure***REMOVED***, []int***REMOVED***CloseNoStatusReceived, CloseNormalClosure***REMOVED***, true***REMOVED***,
-	***REMOVED***errors.New("hello"), []int***REMOVED***CloseNormalClosure***REMOVED***, false***REMOVED***,
-***REMOVED***
+}{
+	{&CloseError{Code: CloseNormalClosure}, []int{CloseNormalClosure}, true},
+	{&CloseError{Code: CloseNormalClosure}, []int{CloseNoStatusReceived}, false},
+	{&CloseError{Code: CloseNormalClosure}, []int{CloseNoStatusReceived, CloseNormalClosure}, true},
+	{errors.New("hello"), []int{CloseNormalClosure}, false},
+}
 
-func TestCloseError(t *testing.T) ***REMOVED***
-	for _, tt := range closeErrorTests ***REMOVED***
+func TestCloseError(t *testing.T) {
+	for _, tt := range closeErrorTests {
 		ok := IsCloseError(tt.err, tt.codes...)
-		if ok != tt.ok ***REMOVED***
+		if ok != tt.ok {
 			t.Errorf("IsCloseError(%#v, %#v) returned %v, want %v", tt.err, tt.codes, ok, tt.ok)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-var unexpectedCloseErrorTests = []struct ***REMOVED***
+var unexpectedCloseErrorTests = []struct {
 	err   error
 	codes []int
 	ok    bool
-***REMOVED******REMOVED***
-	***REMOVED***&CloseError***REMOVED***Code: CloseNormalClosure***REMOVED***, []int***REMOVED***CloseNormalClosure***REMOVED***, false***REMOVED***,
-	***REMOVED***&CloseError***REMOVED***Code: CloseNormalClosure***REMOVED***, []int***REMOVED***CloseNoStatusReceived***REMOVED***, true***REMOVED***,
-	***REMOVED***&CloseError***REMOVED***Code: CloseNormalClosure***REMOVED***, []int***REMOVED***CloseNoStatusReceived, CloseNormalClosure***REMOVED***, false***REMOVED***,
-	***REMOVED***errors.New("hello"), []int***REMOVED***CloseNormalClosure***REMOVED***, false***REMOVED***,
-***REMOVED***
+}{
+	{&CloseError{Code: CloseNormalClosure}, []int{CloseNormalClosure}, false},
+	{&CloseError{Code: CloseNormalClosure}, []int{CloseNoStatusReceived}, true},
+	{&CloseError{Code: CloseNormalClosure}, []int{CloseNoStatusReceived, CloseNormalClosure}, false},
+	{errors.New("hello"), []int{CloseNormalClosure}, false},
+}
 
-func TestUnexpectedCloseErrors(t *testing.T) ***REMOVED***
-	for _, tt := range unexpectedCloseErrorTests ***REMOVED***
+func TestUnexpectedCloseErrors(t *testing.T) {
+	for _, tt := range unexpectedCloseErrorTests {
 		ok := IsUnexpectedCloseError(tt.err, tt.codes...)
-		if ok != tt.ok ***REMOVED***
+		if ok != tt.ok {
 			t.Errorf("IsUnexpectedCloseError(%#v, %#v) returned %v, want %v", tt.err, tt.codes, ok, tt.ok)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-type blockingWriter struct ***REMOVED***
-	c1, c2 chan struct***REMOVED******REMOVED***
-***REMOVED***
+type blockingWriter struct {
+	c1, c2 chan struct{}
+}
 
-func (w blockingWriter) Write(p []byte) (int, error) ***REMOVED***
+func (w blockingWriter) Write(p []byte) (int, error) {
 	// Allow main to continue
 	close(w.c1)
 	// Wait for panic in main
 	<-w.c2
 	return len(p), nil
-***REMOVED***
+}
 
-func TestConcurrentWritePanic(t *testing.T) ***REMOVED***
-	w := blockingWriter***REMOVED***make(chan struct***REMOVED******REMOVED***), make(chan struct***REMOVED******REMOVED***)***REMOVED***
-	c := newConn(fakeNetConn***REMOVED***Reader: nil, Writer: w***REMOVED***, false, 1024, 1024)
-	go func() ***REMOVED***
-		c.WriteMessage(TextMessage, []byte***REMOVED******REMOVED***)
-	***REMOVED***()
+func TestConcurrentWritePanic(t *testing.T) {
+	w := blockingWriter{make(chan struct{}), make(chan struct{})}
+	c := newConn(fakeNetConn{Reader: nil, Writer: w}, false, 1024, 1024)
+	go func() {
+		c.WriteMessage(TextMessage, []byte{})
+	}()
 
 	// wait for goroutine to block in write.
 	<-w.c1
 
-	defer func() ***REMOVED***
+	defer func() {
 		close(w.c2)
-		if v := recover(); v != nil ***REMOVED***
+		if v := recover(); v != nil {
 			return
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
-	c.WriteMessage(TextMessage, []byte***REMOVED******REMOVED***)
+	c.WriteMessage(TextMessage, []byte{})
 	t.Fatal("should not get here")
-***REMOVED***
+}
 
-type failingReader struct***REMOVED******REMOVED***
+type failingReader struct{}
 
-func (r failingReader) Read(p []byte) (int, error) ***REMOVED***
+func (r failingReader) Read(p []byte) (int, error) {
 	return 0, io.EOF
-***REMOVED***
+}
 
-func TestFailedConnectionReadPanic(t *testing.T) ***REMOVED***
-	c := newConn(fakeNetConn***REMOVED***Reader: failingReader***REMOVED******REMOVED***, Writer: nil***REMOVED***, false, 1024, 1024)
+func TestFailedConnectionReadPanic(t *testing.T) {
+	c := newConn(fakeNetConn{Reader: failingReader{}, Writer: nil}, false, 1024, 1024)
 
-	defer func() ***REMOVED***
-		if v := recover(); v != nil ***REMOVED***
+	defer func() {
+		if v := recover(); v != nil {
 			return
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
-	for i := 0; i < 20000; i++ ***REMOVED***
+	for i := 0; i < 20000; i++ {
 		c.ReadMessage()
-	***REMOVED***
+	}
 	t.Fatal("should not get here")
-***REMOVED***
+}
 
-func TestBufioReuse(t *testing.T) ***REMOVED***
+func TestBufioReuse(t *testing.T) {
 	brw := bufio.NewReadWriter(bufio.NewReader(nil), bufio.NewWriter(nil))
 	c := newConnBRW(nil, false, 0, 0, brw)
 
-	if c.br != brw.Reader ***REMOVED***
+	if c.br != brw.Reader {
 		t.Error("connection did not reuse bufio.Reader")
-	***REMOVED***
+	}
 
 	var wh writeHook
 	brw.Writer.Reset(&wh)
 	brw.WriteByte(0)
 	brw.Flush()
-	if &c.writeBuf[0] != &wh.p[0] ***REMOVED***
+	if &c.writeBuf[0] != &wh.p[0] {
 		t.Error("connection did not reuse bufio.Writer")
-	***REMOVED***
+	}
 
 	brw = bufio.NewReadWriter(bufio.NewReaderSize(nil, 0), bufio.NewWriterSize(nil, 0))
 	c = newConnBRW(nil, false, 0, 0, brw)
 
-	if c.br == brw.Reader ***REMOVED***
+	if c.br == brw.Reader {
 		t.Error("connection used bufio.Reader with small size")
-	***REMOVED***
+	}
 
 	brw.Writer.Reset(&wh)
 	brw.WriteByte(0)
 	brw.Flush()
-	if &c.writeBuf[0] != &wh.p[0] ***REMOVED***
+	if &c.writeBuf[0] != &wh.p[0] {
 		t.Error("connection used bufio.Writer with small size")
-	***REMOVED***
+	}
 
-***REMOVED***
+}

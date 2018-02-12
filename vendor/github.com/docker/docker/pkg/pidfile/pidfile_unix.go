@@ -8,9 +8,9 @@ import (
 	"strconv"
 )
 
-func processExists(pid int) bool ***REMOVED***
-	if _, err := os.Stat(filepath.Join("/proc", strconv.Itoa(pid))); err == nil ***REMOVED***
+func processExists(pid int) bool {
+	if _, err := os.Stat(filepath.Join("/proc", strconv.Itoa(pid))); err == nil {
 		return true
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}

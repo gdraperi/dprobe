@@ -27,7 +27,7 @@ import (
 //
 // TODO(@cpuguy83): registry auth is intentionally not supported until we work out
 // the right way to pass registry crednetials via secrets.
-type Controller struct ***REMOVED***
+type Controller struct {
 	backend Backend
 	spec    runtime.PluginSpec
 	logger  *logrus.Entry
@@ -38,224 +38,224 @@ type Controller struct ***REMOVED***
 
 	// hook used to signal tests that `Wait()` is actually ready and waiting
 	signalWaitReady func()
-***REMOVED***
+}
 
 // Backend is the interface for interacting with the plugin manager
 // Controller actions are passed to the configured backend to do the real work.
-type Backend interface ***REMOVED***
+type Backend interface {
 	Disable(name string, config *enginetypes.PluginDisableConfig) error
 	Enable(name string, config *enginetypes.PluginEnableConfig) error
 	Remove(name string, config *enginetypes.PluginRmConfig) error
 	Pull(ctx context.Context, ref reference.Named, name string, metaHeaders http.Header, authConfig *enginetypes.AuthConfig, privileges enginetypes.PluginPrivileges, outStream io.Writer, opts ...plugin.CreateOpt) error
 	Upgrade(ctx context.Context, ref reference.Named, name string, metaHeaders http.Header, authConfig *enginetypes.AuthConfig, privileges enginetypes.PluginPrivileges, outStream io.Writer) error
 	Get(name string) (*v2.Plugin, error)
-	SubscribeEvents(buffer int, events ...plugin.Event) (eventCh <-chan interface***REMOVED******REMOVED***, cancel func())
-***REMOVED***
+	SubscribeEvents(buffer int, events ...plugin.Event) (eventCh <-chan interface{}, cancel func())
+}
 
 // NewController returns a new cluster plugin controller
-func NewController(backend Backend, t *api.Task) (*Controller, error) ***REMOVED***
+func NewController(backend Backend, t *api.Task) (*Controller, error) {
 	spec, err := readSpec(t)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	return &Controller***REMOVED***
+	}
+	return &Controller{
 		backend:   backend,
 		spec:      spec,
 		serviceID: t.ServiceID,
-		logger: logrus.WithFields(logrus.Fields***REMOVED***
+		logger: logrus.WithFields(logrus.Fields{
 			"controller": "plugin",
 			"task":       t.ID,
 			"plugin":     spec.Name,
-		***REMOVED***)***REMOVED***, nil
-***REMOVED***
+		})}, nil
+}
 
-func readSpec(t *api.Task) (runtime.PluginSpec, error) ***REMOVED***
+func readSpec(t *api.Task) (runtime.PluginSpec, error) {
 	var cfg runtime.PluginSpec
 
 	generic := t.Spec.GetGeneric()
-	if err := proto.Unmarshal(generic.Payload.Value, &cfg); err != nil ***REMOVED***
+	if err := proto.Unmarshal(generic.Payload.Value, &cfg); err != nil {
 		return cfg, errors.Wrap(err, "error reading plugin spec")
-	***REMOVED***
+	}
 	return cfg, nil
-***REMOVED***
+}
 
 // Update is the update phase from swarmkit
-func (p *Controller) Update(ctx context.Context, t *api.Task) error ***REMOVED***
+func (p *Controller) Update(ctx context.Context, t *api.Task) error {
 	p.logger.Debug("Update")
 	return nil
-***REMOVED***
+}
 
 // Prepare is the prepare phase from swarmkit
-func (p *Controller) Prepare(ctx context.Context) (err error) ***REMOVED***
+func (p *Controller) Prepare(ctx context.Context) (err error) {
 	p.logger.Debug("Prepare")
 
 	remote, err := reference.ParseNormalizedNamed(p.spec.Remote)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return errors.Wrapf(err, "error parsing remote reference %q", p.spec.Remote)
-	***REMOVED***
+	}
 
-	if p.spec.Name == "" ***REMOVED***
+	if p.spec.Name == "" {
 		p.spec.Name = remote.String()
-	***REMOVED***
+	}
 
 	var authConfig enginetypes.AuthConfig
 	privs := convertPrivileges(p.spec.Privileges)
 
 	pl, err := p.backend.Get(p.spec.Name)
 
-	defer func() ***REMOVED***
-		if pl != nil && err == nil ***REMOVED***
+	defer func() {
+		if pl != nil && err == nil {
 			pl.Acquire()
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
-	if err == nil && pl != nil ***REMOVED***
-		if pl.SwarmServiceID != p.serviceID ***REMOVED***
+	if err == nil && pl != nil {
+		if pl.SwarmServiceID != p.serviceID {
 			return errors.Errorf("plugin already exists: %s", p.spec.Name)
-		***REMOVED***
-		if pl.IsEnabled() ***REMOVED***
-			if err := p.backend.Disable(pl.GetID(), &enginetypes.PluginDisableConfig***REMOVED***ForceDisable: true***REMOVED***); err != nil ***REMOVED***
+		}
+		if pl.IsEnabled() {
+			if err := p.backend.Disable(pl.GetID(), &enginetypes.PluginDisableConfig{ForceDisable: true}); err != nil {
 				p.logger.WithError(err).Debug("could not disable plugin before running upgrade")
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		p.pluginID = pl.GetID()
 		return p.backend.Upgrade(ctx, remote, p.spec.Name, nil, &authConfig, privs, ioutil.Discard)
-	***REMOVED***
+	}
 
-	if err := p.backend.Pull(ctx, remote, p.spec.Name, nil, &authConfig, privs, ioutil.Discard, plugin.WithSwarmService(p.serviceID)); err != nil ***REMOVED***
+	if err := p.backend.Pull(ctx, remote, p.spec.Name, nil, &authConfig, privs, ioutil.Discard, plugin.WithSwarmService(p.serviceID)); err != nil {
 		return err
-	***REMOVED***
+	}
 	pl, err = p.backend.Get(p.spec.Name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	p.pluginID = pl.GetID()
 
 	return nil
-***REMOVED***
+}
 
 // Start is the start phase from swarmkit
-func (p *Controller) Start(ctx context.Context) error ***REMOVED***
+func (p *Controller) Start(ctx context.Context) error {
 	p.logger.Debug("Start")
 
 	pl, err := p.backend.Get(p.pluginID)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if p.spec.Disabled ***REMOVED***
-		if pl.IsEnabled() ***REMOVED***
-			return p.backend.Disable(p.pluginID, &enginetypes.PluginDisableConfig***REMOVED***ForceDisable: false***REMOVED***)
-		***REMOVED***
+	if p.spec.Disabled {
+		if pl.IsEnabled() {
+			return p.backend.Disable(p.pluginID, &enginetypes.PluginDisableConfig{ForceDisable: false})
+		}
 		return nil
-	***REMOVED***
-	if !pl.IsEnabled() ***REMOVED***
-		return p.backend.Enable(p.pluginID, &enginetypes.PluginEnableConfig***REMOVED***Timeout: 30***REMOVED***)
-	***REMOVED***
+	}
+	if !pl.IsEnabled() {
+		return p.backend.Enable(p.pluginID, &enginetypes.PluginEnableConfig{Timeout: 30})
+	}
 	return nil
-***REMOVED***
+}
 
 // Wait causes the task to wait until returned
-func (p *Controller) Wait(ctx context.Context) error ***REMOVED***
+func (p *Controller) Wait(ctx context.Context) error {
 	p.logger.Debug("Wait")
 
 	pl, err := p.backend.Get(p.pluginID)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	events, cancel := p.backend.SubscribeEvents(1, plugin.EventDisable***REMOVED***Plugin: pl.PluginObj***REMOVED***, plugin.EventRemove***REMOVED***Plugin: pl.PluginObj***REMOVED***, plugin.EventEnable***REMOVED***Plugin: pl.PluginObj***REMOVED***)
+	events, cancel := p.backend.SubscribeEvents(1, plugin.EventDisable{Plugin: pl.PluginObj}, plugin.EventRemove{Plugin: pl.PluginObj}, plugin.EventEnable{Plugin: pl.PluginObj})
 	defer cancel()
 
-	if p.signalWaitReady != nil ***REMOVED***
+	if p.signalWaitReady != nil {
 		p.signalWaitReady()
-	***REMOVED***
+	}
 
-	if !p.spec.Disabled != pl.IsEnabled() ***REMOVED***
+	if !p.spec.Disabled != pl.IsEnabled() {
 		return errors.New("mismatched plugin state")
-	***REMOVED***
+	}
 
-	for ***REMOVED***
-		select ***REMOVED***
+	for {
+		select {
 		case <-ctx.Done():
 			return ctx.Err()
 		case e := <-events:
 			p.logger.Debugf("got event %#T", e)
 
-			switch e.(type) ***REMOVED***
+			switch e.(type) {
 			case plugin.EventEnable:
-				if p.spec.Disabled ***REMOVED***
+				if p.spec.Disabled {
 					return errors.New("plugin enabled")
-				***REMOVED***
+				}
 			case plugin.EventRemove:
 				return errors.New("plugin removed")
 			case plugin.EventDisable:
-				if !p.spec.Disabled ***REMOVED***
+				if !p.spec.Disabled {
 					return errors.New("plugin disabled")
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+				}
+			}
+		}
+	}
+}
 
-func isNotFound(err error) bool ***REMOVED***
+func isNotFound(err error) bool {
 	return errdefs.IsNotFound(err)
-***REMOVED***
+}
 
 // Shutdown is the shutdown phase from swarmkit
-func (p *Controller) Shutdown(ctx context.Context) error ***REMOVED***
+func (p *Controller) Shutdown(ctx context.Context) error {
 	p.logger.Debug("Shutdown")
 	return nil
-***REMOVED***
+}
 
 // Terminate is the terminate phase from swarmkit
-func (p *Controller) Terminate(ctx context.Context) error ***REMOVED***
+func (p *Controller) Terminate(ctx context.Context) error {
 	p.logger.Debug("Terminate")
 	return nil
-***REMOVED***
+}
 
 // Remove is the remove phase from swarmkit
-func (p *Controller) Remove(ctx context.Context) error ***REMOVED***
+func (p *Controller) Remove(ctx context.Context) error {
 	p.logger.Debug("Remove")
 
 	pl, err := p.backend.Get(p.pluginID)
-	if err != nil ***REMOVED***
-		if isNotFound(err) ***REMOVED***
+	if err != nil {
+		if isNotFound(err) {
 			return nil
-		***REMOVED***
+		}
 		return err
-	***REMOVED***
+	}
 
 	pl.Release()
-	if pl.GetRefCount() > 0 ***REMOVED***
+	if pl.GetRefCount() > 0 {
 		p.logger.Debug("skipping remove due to ref count")
 		return nil
-	***REMOVED***
+	}
 
 	// This may error because we have exactly 1 plugin, but potentially multiple
 	// tasks which are calling remove.
-	err = p.backend.Remove(p.pluginID, &enginetypes.PluginRmConfig***REMOVED***ForceRemove: true***REMOVED***)
-	if isNotFound(err) ***REMOVED***
+	err = p.backend.Remove(p.pluginID, &enginetypes.PluginRmConfig{ForceRemove: true})
+	if isNotFound(err) {
 		return nil
-	***REMOVED***
+	}
 	return err
-***REMOVED***
+}
 
 // Close is the close phase from swarmkit
-func (p *Controller) Close() error ***REMOVED***
+func (p *Controller) Close() error {
 	p.logger.Debug("Close")
 	return nil
-***REMOVED***
+}
 
-func convertPrivileges(ls []*runtime.PluginPrivilege) enginetypes.PluginPrivileges ***REMOVED***
+func convertPrivileges(ls []*runtime.PluginPrivilege) enginetypes.PluginPrivileges {
 	var out enginetypes.PluginPrivileges
-	for _, p := range ls ***REMOVED***
-		pp := enginetypes.PluginPrivilege***REMOVED***
+	for _, p := range ls {
+		pp := enginetypes.PluginPrivilege{
 			Name:        p.Name,
 			Description: p.Description,
 			Value:       p.Value,
-		***REMOVED***
+		}
 		out = append(out, pp)
-	***REMOVED***
+	}
 	return out
-***REMOVED***
+}

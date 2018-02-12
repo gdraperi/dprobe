@@ -4,17 +4,17 @@ package vfs
 
 import "github.com/docker/docker/daemon/graphdriver/quota"
 
-type driverQuota struct ***REMOVED***
-***REMOVED***
+type driverQuota struct {
+}
 
-func setupDriverQuota(driver *Driver) error ***REMOVED***
+func setupDriverQuota(driver *Driver) error {
 	return nil
-***REMOVED***
+}
 
-func (d *Driver) setupQuota(dir string, size uint64) error ***REMOVED***
+func (d *Driver) setupQuota(dir string, size uint64) error {
 	return quota.ErrQuotaNotSupported
-***REMOVED***
+}
 
-func (d *Driver) quotaSupported() bool ***REMOVED***
+func (d *Driver) quotaSupported() bool {
 	return false
-***REMOVED***
+}

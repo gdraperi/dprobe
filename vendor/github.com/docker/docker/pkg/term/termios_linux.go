@@ -15,11 +15,11 @@ type Termios unix.Termios
 // MakeRaw put the terminal connected to the given file descriptor into raw
 // mode and returns the previous state of the terminal so that it can be
 // restored.
-func MakeRaw(fd uintptr) (*State, error) ***REMOVED***
+func MakeRaw(fd uintptr) (*State, error) {
 	termios, err := unix.IoctlGetTermios(int(fd), getTermios)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	var oldState State
 	oldState.termios = Termios(*termios)
@@ -32,8 +32,8 @@ func MakeRaw(fd uintptr) (*State, error) ***REMOVED***
 	termios.Cc[unix.VMIN] = 1
 	termios.Cc[unix.VTIME] = 0
 
-	if err := unix.IoctlSetTermios(int(fd), setTermios, termios); err != nil ***REMOVED***
+	if err := unix.IoctlSetTermios(int(fd), setTermios, termios); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return &oldState, nil
-***REMOVED***
+}

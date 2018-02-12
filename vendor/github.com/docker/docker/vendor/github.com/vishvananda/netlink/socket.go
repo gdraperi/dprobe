@@ -3,17 +3,17 @@ package netlink
 import "net"
 
 // SocketID identifies a single socket.
-type SocketID struct ***REMOVED***
+type SocketID struct {
 	SourcePort      uint16
 	DestinationPort uint16
 	Source          net.IP
 	Destination     net.IP
 	Interface       uint32
 	Cookie          [2]uint32
-***REMOVED***
+}
 
 // Socket represents a netlink socket.
-type Socket struct ***REMOVED***
+type Socket struct {
 	Family  uint8
 	State   uint8
 	Timer   uint8
@@ -24,4 +24,4 @@ type Socket struct ***REMOVED***
 	WQueue  uint32
 	UID     uint32
 	INode   uint32
-***REMOVED***
+}

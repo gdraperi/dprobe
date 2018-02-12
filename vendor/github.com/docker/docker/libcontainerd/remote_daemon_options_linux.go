@@ -3,32 +3,32 @@ package libcontainerd
 import "fmt"
 
 // WithOOMScore defines the oom_score_adj to set for the containerd process.
-func WithOOMScore(score int) RemoteOption ***REMOVED***
+func WithOOMScore(score int) RemoteOption {
 	return oomScore(score)
-***REMOVED***
+}
 
 type oomScore int
 
-func (o oomScore) Apply(r Remote) error ***REMOVED***
-	if remote, ok := r.(*remote); ok ***REMOVED***
+func (o oomScore) Apply(r Remote) error {
+	if remote, ok := r.(*remote); ok {
 		remote.OOMScore = int(o)
 		return nil
-	***REMOVED***
+	}
 	return fmt.Errorf("WithOOMScore option not supported for this remote")
-***REMOVED***
+}
 
 // WithSubreaper sets whether containerd should register itself as a
 // subreaper
-func WithSubreaper(reap bool) RemoteOption ***REMOVED***
+func WithSubreaper(reap bool) RemoteOption {
 	return subreaper(reap)
-***REMOVED***
+}
 
 type subreaper bool
 
-func (s subreaper) Apply(r Remote) error ***REMOVED***
-	if remote, ok := r.(*remote); ok ***REMOVED***
+func (s subreaper) Apply(r Remote) error {
+	if remote, ok := r.(*remote); ok {
 		remote.NoSubreaper = !bool(s)
 		return nil
-	***REMOVED***
+	}
 	return fmt.Errorf("WithSubreaper option not supported for this remote")
-***REMOVED***
+}

@@ -10,77 +10,77 @@ import (
 )
 
 // GetTasks returns a list of tasks matching the filter options.
-func (c *Cluster) GetTasks(options apitypes.TaskListOptions) ([]types.Task, error) ***REMOVED***
+func (c *Cluster) GetTasks(options apitypes.TaskListOptions) ([]types.Task, error) {
 	var r *swarmapi.ListTasksResponse
 
-	if err := c.lockedManagerAction(func(ctx context.Context, state nodeState) error ***REMOVED***
-		filterTransform := func(filter filters.Args) error ***REMOVED***
-			if filter.Contains("service") ***REMOVED***
+	if err := c.lockedManagerAction(func(ctx context.Context, state nodeState) error {
+		filterTransform := func(filter filters.Args) error {
+			if filter.Contains("service") {
 				serviceFilters := filter.Get("service")
-				for _, serviceFilter := range serviceFilters ***REMOVED***
+				for _, serviceFilter := range serviceFilters {
 					service, err := getService(ctx, state.controlClient, serviceFilter, false)
-					if err != nil ***REMOVED***
+					if err != nil {
 						return err
-					***REMOVED***
+					}
 					filter.Del("service", serviceFilter)
 					filter.Add("service", service.ID)
-				***REMOVED***
-			***REMOVED***
-			if filter.Contains("node") ***REMOVED***
+				}
+			}
+			if filter.Contains("node") {
 				nodeFilters := filter.Get("node")
-				for _, nodeFilter := range nodeFilters ***REMOVED***
+				for _, nodeFilter := range nodeFilters {
 					node, err := getNode(ctx, state.controlClient, nodeFilter)
-					if err != nil ***REMOVED***
+					if err != nil {
 						return err
-					***REMOVED***
+					}
 					filter.Del("node", nodeFilter)
 					filter.Add("node", node.ID)
-				***REMOVED***
-			***REMOVED***
-			if !filter.Contains("runtime") ***REMOVED***
+				}
+			}
+			if !filter.Contains("runtime") {
 				// default to only showing container tasks
 				filter.Add("runtime", "container")
 				filter.Add("runtime", "")
-			***REMOVED***
+			}
 			return nil
-		***REMOVED***
+		}
 
 		filters, err := newListTasksFilters(options.Filters, filterTransform)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 
 		r, err = state.controlClient.ListTasks(
 			ctx,
-			&swarmapi.ListTasksRequest***REMOVED***Filters: filters***REMOVED***)
+			&swarmapi.ListTasksRequest{Filters: filters})
 		return err
-	***REMOVED***); err != nil ***REMOVED***
+	}); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	tasks := make([]types.Task, 0, len(r.Tasks))
-	for _, task := range r.Tasks ***REMOVED***
+	for _, task := range r.Tasks {
 		t, err := convert.TaskFromGRPC(*task)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		tasks = append(tasks, t)
-	***REMOVED***
+	}
 	return tasks, nil
-***REMOVED***
+}
 
 // GetTask returns a task by an ID.
-func (c *Cluster) GetTask(input string) (types.Task, error) ***REMOVED***
+func (c *Cluster) GetTask(input string) (types.Task, error) {
 	var task *swarmapi.Task
-	if err := c.lockedManagerAction(func(ctx context.Context, state nodeState) error ***REMOVED***
+	if err := c.lockedManagerAction(func(ctx context.Context, state nodeState) error {
 		t, err := getTask(ctx, state.controlClient, input)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		task = t
 		return nil
-	***REMOVED***); err != nil ***REMOVED***
-		return types.Task***REMOVED******REMOVED***, err
-	***REMOVED***
+	}); err != nil {
+		return types.Task{}, err
+	}
 	return convert.TaskFromGRPC(*task)
-***REMOVED***
+}

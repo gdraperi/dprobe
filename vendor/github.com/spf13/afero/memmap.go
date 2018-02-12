@@ -25,29 +25,29 @@ import (
 	"github.com/spf13/afero/mem"
 )
 
-type MemMapFs struct ***REMOVED***
+type MemMapFs struct {
 	mu   sync.RWMutex
 	data map[string]*mem.FileData
 	init sync.Once
-***REMOVED***
+}
 
-func NewMemMapFs() Fs ***REMOVED***
-	return &MemMapFs***REMOVED******REMOVED***
-***REMOVED***
+func NewMemMapFs() Fs {
+	return &MemMapFs{}
+}
 
-func (m *MemMapFs) getData() map[string]*mem.FileData ***REMOVED***
-	m.init.Do(func() ***REMOVED***
+func (m *MemMapFs) getData() map[string]*mem.FileData {
+	m.init.Do(func() {
 		m.data = make(map[string]*mem.FileData)
 		// Root should always exist, right?
 		// TODO: what about windows?
 		m.data[FilePathSeparator] = mem.CreateDir(FilePathSeparator)
-	***REMOVED***)
+	})
 	return m.data
-***REMOVED***
+}
 
-func (*MemMapFs) Name() string ***REMOVED*** return "MemMapFS" ***REMOVED***
+func (*MemMapFs) Name() string { return "MemMapFS" }
 
-func (m *MemMapFs) Create(name string) (File, error) ***REMOVED***
+func (m *MemMapFs) Create(name string) (File, error) {
 	name = normalizePath(name)
 	m.mu.Lock()
 	file := mem.CreateFile(name)
@@ -55,85 +55,85 @@ func (m *MemMapFs) Create(name string) (File, error) ***REMOVED***
 	m.registerWithParent(file)
 	m.mu.Unlock()
 	return mem.NewFileHandle(file), nil
-***REMOVED***
+}
 
-func (m *MemMapFs) unRegisterWithParent(fileName string) error ***REMOVED***
+func (m *MemMapFs) unRegisterWithParent(fileName string) error {
 	f, err := m.lockfreeOpen(fileName)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	parent := m.findParent(f)
-	if parent == nil ***REMOVED***
+	if parent == nil {
 		log.Panic("parent of ", f.Name(), " is nil")
-	***REMOVED***
+	}
 
 	parent.Lock()
 	mem.RemoveFromMemDir(parent, f)
 	parent.Unlock()
 	return nil
-***REMOVED***
+}
 
-func (m *MemMapFs) findParent(f *mem.FileData) *mem.FileData ***REMOVED***
+func (m *MemMapFs) findParent(f *mem.FileData) *mem.FileData {
 	pdir, _ := filepath.Split(f.Name())
 	pdir = filepath.Clean(pdir)
 	pfile, err := m.lockfreeOpen(pdir)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil
-	***REMOVED***
+	}
 	return pfile
-***REMOVED***
+}
 
-func (m *MemMapFs) registerWithParent(f *mem.FileData) ***REMOVED***
-	if f == nil ***REMOVED***
+func (m *MemMapFs) registerWithParent(f *mem.FileData) {
+	if f == nil {
 		return
-	***REMOVED***
+	}
 	parent := m.findParent(f)
-	if parent == nil ***REMOVED***
+	if parent == nil {
 		pdir := filepath.Dir(filepath.Clean(f.Name()))
 		err := m.lockfreeMkdir(pdir, 0777)
-		if err != nil ***REMOVED***
+		if err != nil {
 			//log.Println("Mkdir error:", err)
 			return
-		***REMOVED***
+		}
 		parent, err = m.lockfreeOpen(pdir)
-		if err != nil ***REMOVED***
+		if err != nil {
 			//log.Println("Open after Mkdir error:", err)
 			return
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	parent.Lock()
 	mem.InitializeDir(parent)
 	mem.AddToMemDir(parent, f)
 	parent.Unlock()
-***REMOVED***
+}
 
-func (m *MemMapFs) lockfreeMkdir(name string, perm os.FileMode) error ***REMOVED***
+func (m *MemMapFs) lockfreeMkdir(name string, perm os.FileMode) error {
 	name = normalizePath(name)
 	x, ok := m.getData()[name]
-	if ok ***REMOVED***
+	if ok {
 		// Only return ErrFileExists if it's a file, not a directory.
-		i := mem.FileInfo***REMOVED***FileData: x***REMOVED***
-		if !i.IsDir() ***REMOVED***
+		i := mem.FileInfo{FileData: x}
+		if !i.IsDir() {
 			return ErrFileExists
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
+		}
+	} else {
 		item := mem.CreateDir(name)
 		m.getData()[name] = item
 		m.registerWithParent(item)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *MemMapFs) Mkdir(name string, perm os.FileMode) error ***REMOVED***
+func (m *MemMapFs) Mkdir(name string, perm os.FileMode) error {
 	name = normalizePath(name)
 
 	m.mu.RLock()
 	_, ok := m.getData()[name]
 	m.mu.RUnlock()
-	if ok ***REMOVED***
-		return &os.PathError***REMOVED***Op: "mkdir", Path: name, Err: ErrFileExists***REMOVED***
-	***REMOVED***
+	if ok {
+		return &os.PathError{Op: "mkdir", Path: name, Err: ErrFileExists}
+	}
 
 	m.mu.Lock()
 	item := mem.CreateDir(name)
@@ -144,123 +144,123 @@ func (m *MemMapFs) Mkdir(name string, perm os.FileMode) error ***REMOVED***
 	m.Chmod(name, perm|os.ModeDir)
 
 	return nil
-***REMOVED***
+}
 
-func (m *MemMapFs) MkdirAll(path string, perm os.FileMode) error ***REMOVED***
+func (m *MemMapFs) MkdirAll(path string, perm os.FileMode) error {
 	err := m.Mkdir(path, perm)
-	if err != nil ***REMOVED***
-		if err.(*os.PathError).Err == ErrFileExists ***REMOVED***
+	if err != nil {
+		if err.(*os.PathError).Err == ErrFileExists {
 			return nil
-		***REMOVED***
+		}
 		return err
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // Handle some relative paths
-func normalizePath(path string) string ***REMOVED***
+func normalizePath(path string) string {
 	path = filepath.Clean(path)
 
-	switch path ***REMOVED***
+	switch path {
 	case ".":
 		return FilePathSeparator
 	case "..":
 		return FilePathSeparator
 	default:
 		return path
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (m *MemMapFs) Open(name string) (File, error) ***REMOVED***
+func (m *MemMapFs) Open(name string) (File, error) {
 	f, err := m.open(name)
-	if f != nil ***REMOVED***
+	if f != nil {
 		return mem.NewReadOnlyFileHandle(f), err
-	***REMOVED***
+	}
 	return nil, err
-***REMOVED***
+}
 
-func (m *MemMapFs) openWrite(name string) (File, error) ***REMOVED***
+func (m *MemMapFs) openWrite(name string) (File, error) {
 	f, err := m.open(name)
-	if f != nil ***REMOVED***
+	if f != nil {
 		return mem.NewFileHandle(f), err
-	***REMOVED***
+	}
 	return nil, err
-***REMOVED***
+}
 
-func (m *MemMapFs) open(name string) (*mem.FileData, error) ***REMOVED***
+func (m *MemMapFs) open(name string) (*mem.FileData, error) {
 	name = normalizePath(name)
 
 	m.mu.RLock()
 	f, ok := m.getData()[name]
 	m.mu.RUnlock()
-	if !ok ***REMOVED***
-		return nil, &os.PathError***REMOVED***Op: "open", Path: name, Err: ErrFileNotFound***REMOVED***
-	***REMOVED***
+	if !ok {
+		return nil, &os.PathError{Op: "open", Path: name, Err: ErrFileNotFound}
+	}
 	return f, nil
-***REMOVED***
+}
 
-func (m *MemMapFs) lockfreeOpen(name string) (*mem.FileData, error) ***REMOVED***
+func (m *MemMapFs) lockfreeOpen(name string) (*mem.FileData, error) {
 	name = normalizePath(name)
 	f, ok := m.getData()[name]
-	if ok ***REMOVED***
+	if ok {
 		return f, nil
-	***REMOVED*** else ***REMOVED***
+	} else {
 		return nil, ErrFileNotFound
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (m *MemMapFs) OpenFile(name string, flag int, perm os.FileMode) (File, error) ***REMOVED***
+func (m *MemMapFs) OpenFile(name string, flag int, perm os.FileMode) (File, error) {
 	chmod := false
 	file, err := m.openWrite(name)
-	if os.IsNotExist(err) && (flag&os.O_CREATE > 0) ***REMOVED***
+	if os.IsNotExist(err) && (flag&os.O_CREATE > 0) {
 		file, err = m.Create(name)
 		chmod = true
-	***REMOVED***
-	if err != nil ***REMOVED***
+	}
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if flag == os.O_RDONLY ***REMOVED***
+	}
+	if flag == os.O_RDONLY {
 		file = mem.NewReadOnlyFileHandle(file.(*mem.File).Data())
-	***REMOVED***
-	if flag&os.O_APPEND > 0 ***REMOVED***
+	}
+	if flag&os.O_APPEND > 0 {
 		_, err = file.Seek(0, os.SEEK_END)
-		if err != nil ***REMOVED***
+		if err != nil {
 			file.Close()
 			return nil, err
-		***REMOVED***
-	***REMOVED***
-	if flag&os.O_TRUNC > 0 && flag&(os.O_RDWR|os.O_WRONLY) > 0 ***REMOVED***
+		}
+	}
+	if flag&os.O_TRUNC > 0 && flag&(os.O_RDWR|os.O_WRONLY) > 0 {
 		err = file.Truncate(0)
-		if err != nil ***REMOVED***
+		if err != nil {
 			file.Close()
 			return nil, err
-		***REMOVED***
-	***REMOVED***
-	if chmod ***REMOVED***
+		}
+	}
+	if chmod {
 		m.Chmod(name, perm)
-	***REMOVED***
+	}
 	return file, nil
-***REMOVED***
+}
 
-func (m *MemMapFs) Remove(name string) error ***REMOVED***
+func (m *MemMapFs) Remove(name string) error {
 	name = normalizePath(name)
 
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	if _, ok := m.getData()[name]; ok ***REMOVED***
+	if _, ok := m.getData()[name]; ok {
 		err := m.unRegisterWithParent(name)
-		if err != nil ***REMOVED***
-			return &os.PathError***REMOVED***Op: "remove", Path: name, Err: err***REMOVED***
-		***REMOVED***
+		if err != nil {
+			return &os.PathError{Op: "remove", Path: name, Err: err}
+		}
 		delete(m.getData(), name)
-	***REMOVED*** else ***REMOVED***
-		return &os.PathError***REMOVED***Op: "remove", Path: name, Err: os.ErrNotExist***REMOVED***
-	***REMOVED***
+	} else {
+		return &os.PathError{Op: "remove", Path: name, Err: os.ErrNotExist}
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *MemMapFs) RemoveAll(path string) error ***REMOVED***
+func (m *MemMapFs) RemoveAll(path string) error {
 	path = normalizePath(path)
 	m.mu.Lock()
 	m.unRegisterWithParent(path)
@@ -269,29 +269,29 @@ func (m *MemMapFs) RemoveAll(path string) error ***REMOVED***
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 
-	for p, _ := range m.getData() ***REMOVED***
-		if strings.HasPrefix(p, path) ***REMOVED***
+	for p, _ := range m.getData() {
+		if strings.HasPrefix(p, path) {
 			m.mu.RUnlock()
 			m.mu.Lock()
 			delete(m.getData(), p)
 			m.mu.Unlock()
 			m.mu.RLock()
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *MemMapFs) Rename(oldname, newname string) error ***REMOVED***
+func (m *MemMapFs) Rename(oldname, newname string) error {
 	oldname = normalizePath(oldname)
 	newname = normalizePath(newname)
 
-	if oldname == newname ***REMOVED***
+	if oldname == newname {
 		return nil
-	***REMOVED***
+	}
 
 	m.mu.RLock()
 	defer m.mu.RUnlock()
-	if _, ok := m.getData()[oldname]; ok ***REMOVED***
+	if _, ok := m.getData()[oldname]; ok {
 		m.mu.RUnlock()
 		m.mu.Lock()
 		m.unRegisterWithParent(oldname)
@@ -302,64 +302,64 @@ func (m *MemMapFs) Rename(oldname, newname string) error ***REMOVED***
 		m.registerWithParent(fileData)
 		m.mu.Unlock()
 		m.mu.RLock()
-	***REMOVED*** else ***REMOVED***
-		return &os.PathError***REMOVED***Op: "rename", Path: oldname, Err: ErrFileNotFound***REMOVED***
-	***REMOVED***
+	} else {
+		return &os.PathError{Op: "rename", Path: oldname, Err: ErrFileNotFound}
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *MemMapFs) Stat(name string) (os.FileInfo, error) ***REMOVED***
+func (m *MemMapFs) Stat(name string) (os.FileInfo, error) {
 	f, err := m.Open(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	fi := mem.GetFileInfo(f.(*mem.File).Data())
 	return fi, nil
-***REMOVED***
+}
 
-func (m *MemMapFs) Chmod(name string, mode os.FileMode) error ***REMOVED***
+func (m *MemMapFs) Chmod(name string, mode os.FileMode) error {
 	name = normalizePath(name)
 
 	m.mu.RLock()
 	f, ok := m.getData()[name]
 	m.mu.RUnlock()
-	if !ok ***REMOVED***
-		return &os.PathError***REMOVED***Op: "chmod", Path: name, Err: ErrFileNotFound***REMOVED***
-	***REMOVED***
+	if !ok {
+		return &os.PathError{Op: "chmod", Path: name, Err: ErrFileNotFound}
+	}
 
 	m.mu.Lock()
 	mem.SetMode(f, mode)
 	m.mu.Unlock()
 
 	return nil
-***REMOVED***
+}
 
-func (m *MemMapFs) Chtimes(name string, atime time.Time, mtime time.Time) error ***REMOVED***
+func (m *MemMapFs) Chtimes(name string, atime time.Time, mtime time.Time) error {
 	name = normalizePath(name)
 
 	m.mu.RLock()
 	f, ok := m.getData()[name]
 	m.mu.RUnlock()
-	if !ok ***REMOVED***
-		return &os.PathError***REMOVED***Op: "chtimes", Path: name, Err: ErrFileNotFound***REMOVED***
-	***REMOVED***
+	if !ok {
+		return &os.PathError{Op: "chtimes", Path: name, Err: ErrFileNotFound}
+	}
 
 	m.mu.Lock()
 	mem.SetModTime(f, mtime)
 	m.mu.Unlock()
 
 	return nil
-***REMOVED***
+}
 
-func (m *MemMapFs) List() ***REMOVED***
-	for _, x := range m.data ***REMOVED***
-		y := mem.FileInfo***REMOVED***FileData: x***REMOVED***
+func (m *MemMapFs) List() {
+	for _, x := range m.data {
+		y := mem.FileInfo{FileData: x}
 		fmt.Println(x.Name(), y.Size())
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-// func debugMemMapList(fs Fs) ***REMOVED***
-// 	if x, ok := fs.(*MemMapFs); ok ***REMOVED***
+// func debugMemMapList(fs Fs) {
+// 	if x, ok := fs.(*MemMapFs); ok {
 // 		x.List()
-// 	***REMOVED***
-// ***REMOVED***
+// 	}
+// }

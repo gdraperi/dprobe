@@ -23,18 +23,18 @@ var (
 
 // errnoErr returns common boxed Errno values, to prevent
 // allocations at runtime.
-func errnoErr(e syscall.Errno) error ***REMOVED***
-	switch e ***REMOVED***
+func errnoErr(e syscall.Errno) error {
+	switch e {
 	case 0:
 		return nil
 	case errnoERROR_IO_PENDING:
 		return errERROR_IO_PENDING
-	***REMOVED***
+	}
 	// TODO: add more here, after collecting data on the common
 	// error values see on Windows. (perhaps when running
 	// all.bat?)
 	return e
-***REMOVED***
+}
 
 var (
 	modVirtDisk = windows.NewLazySystemDLL("VirtDisk.dll")
@@ -42,23 +42,23 @@ var (
 	procCreateVirtualDisk = modVirtDisk.NewProc("CreateVirtualDisk")
 )
 
-func createVirtualDisk(virtualStorageType *virtualStorageType, path string, virtualDiskAccessMask uint32, securityDescriptor *uintptr, flags uint32, providerSpecificFlags uint32, parameters *createVirtualDiskParameters, o *syscall.Overlapped, handle *syscall.Handle) (err error) ***REMOVED***
+func createVirtualDisk(virtualStorageType *virtualStorageType, path string, virtualDiskAccessMask uint32, securityDescriptor *uintptr, flags uint32, providerSpecificFlags uint32, parameters *createVirtualDiskParameters, o *syscall.Overlapped, handle *syscall.Handle) (err error) {
 	var _p0 *uint16
 	_p0, err = syscall.UTF16PtrFromString(path)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	return _createVirtualDisk(virtualStorageType, _p0, virtualDiskAccessMask, securityDescriptor, flags, providerSpecificFlags, parameters, o, handle)
-***REMOVED***
+}
 
-func _createVirtualDisk(virtualStorageType *virtualStorageType, path *uint16, virtualDiskAccessMask uint32, securityDescriptor *uintptr, flags uint32, providerSpecificFlags uint32, parameters *createVirtualDiskParameters, o *syscall.Overlapped, handle *syscall.Handle) (err error) ***REMOVED***
+func _createVirtualDisk(virtualStorageType *virtualStorageType, path *uint16, virtualDiskAccessMask uint32, securityDescriptor *uintptr, flags uint32, providerSpecificFlags uint32, parameters *createVirtualDiskParameters, o *syscall.Overlapped, handle *syscall.Handle) (err error) {
 	r1, _, e1 := syscall.Syscall9(procCreateVirtualDisk.Addr(), 9, uintptr(unsafe.Pointer(virtualStorageType)), uintptr(unsafe.Pointer(path)), uintptr(virtualDiskAccessMask), uintptr(unsafe.Pointer(securityDescriptor)), uintptr(flags), uintptr(providerSpecificFlags), uintptr(unsafe.Pointer(parameters)), uintptr(unsafe.Pointer(o)), uintptr(unsafe.Pointer(handle)))
-	if r1 != 0 ***REMOVED***
-		if e1 != 0 ***REMOVED***
+	if r1 != 0 {
+		if e1 != 0 {
 			err = errnoErr(e1)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			err = syscall.EINVAL
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}

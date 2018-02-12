@@ -15,10 +15,10 @@ The following are a few Docker specific rules that will help you name and work w
 This package provides you with a namespace type that allows you to specify the same namespace and subsystem for your metrics.
 
 ```go
-ns := metrics.NewNamespace("engine", "daemon", metrics.Labels***REMOVED***
+ns := metrics.NewNamespace("engine", "daemon", metrics.Labels{
         "version": dockerversion.Version,
         "commit":  dockerversion.GitCommit,
-***REMOVED***)
+})
 ```
 
 In the example above we are creating metrics for the Docker engine's daemon package.

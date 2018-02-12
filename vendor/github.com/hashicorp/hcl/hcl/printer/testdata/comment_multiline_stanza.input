@@ -5,6 +5,6 @@
 #
 # Do not delete this comment
 
-resource "aws_instance" "web" ***REMOVED***
+resource "aws_instance" "web" {
 ami_id = "ami-abcd1234"
-***REMOVED***
+}

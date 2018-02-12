@@ -13,13 +13,13 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestMiddlewares(t *testing.T) ***REMOVED***
-	cfg := &Config***REMOVED***
+func TestMiddlewares(t *testing.T) {
+	cfg := &Config{
 		Version: "0.1omega2",
-	***REMOVED***
-	srv := &Server***REMOVED***
+	}
+	srv := &Server{
 		cfg: cfg,
-	***REMOVED***
+	}
 
 	srv.UseMiddleware(middleware.NewVersionMiddleware("0.1omega2", api.DefaultVersion, api.MinVersion))
 
@@ -27,20 +27,20 @@ func TestMiddlewares(t *testing.T) ***REMOVED***
 	resp := httptest.NewRecorder()
 	ctx := context.Background()
 
-	localHandler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error ***REMOVED***
-		if httputils.VersionFromContext(ctx) == "" ***REMOVED***
+	localHandler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error {
+		if httputils.VersionFromContext(ctx) == "" {
 			t.Fatal("Expected version, got empty string")
-		***REMOVED***
+		}
 
-		if sv := w.Header().Get("Server"); !strings.Contains(sv, "Docker/0.1omega2") ***REMOVED***
+		if sv := w.Header().Get("Server"); !strings.Contains(sv, "Docker/0.1omega2") {
 			t.Fatalf("Expected server version in the header `Docker/0.1omega2`, got %s", sv)
-		***REMOVED***
+		}
 
 		return nil
-	***REMOVED***
+	}
 
 	handlerFunc := srv.handlerWithGlobalMiddlewares(localHandler)
-	if err := handlerFunc(ctx, resp, req, map[string]string***REMOVED******REMOVED***); err != nil ***REMOVED***
+	if err := handlerFunc(ctx, resp, req, map[string]string{}); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}

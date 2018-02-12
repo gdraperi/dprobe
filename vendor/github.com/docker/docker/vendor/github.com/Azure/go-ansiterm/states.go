@@ -2,30 +2,30 @@ package ansiterm
 
 type stateID int
 
-type state interface ***REMOVED***
+type state interface {
 	Enter() error
 	Exit() error
 	Handle(byte) (state, error)
 	Name() string
 	Transition(state) error
-***REMOVED***
+}
 
-type baseState struct ***REMOVED***
+type baseState struct {
 	name   string
 	parser *AnsiParser
-***REMOVED***
+}
 
-func (base baseState) Enter() error ***REMOVED***
+func (base baseState) Enter() error {
 	return nil
-***REMOVED***
+}
 
-func (base baseState) Exit() error ***REMOVED***
+func (base baseState) Exit() error {
 	return nil
-***REMOVED***
+}
 
-func (base baseState) Handle(b byte) (s state, e error) ***REMOVED***
+func (base baseState) Handle(b byte) (s state, e error) {
 
-	switch ***REMOVED***
+	switch {
 	case b == CSI_ENTRY:
 		return base.parser.csiEntry, nil
 	case b == DCS_ENTRY:
@@ -36,36 +36,36 @@ func (base baseState) Handle(b byte) (s state, e error) ***REMOVED***
 		return base.parser.oscString, nil
 	case sliceContains(toGroundBytes, b):
 		return base.parser.ground, nil
-	***REMOVED***
+	}
 
 	return nil, nil
-***REMOVED***
+}
 
-func (base baseState) Name() string ***REMOVED***
+func (base baseState) Name() string {
 	return base.name
-***REMOVED***
+}
 
-func (base baseState) Transition(s state) error ***REMOVED***
-	if s == base.parser.ground ***REMOVED***
-		execBytes := []byte***REMOVED***0x18***REMOVED***
+func (base baseState) Transition(s state) error {
+	if s == base.parser.ground {
+		execBytes := []byte{0x18}
 		execBytes = append(execBytes, 0x1A)
 		execBytes = append(execBytes, getByteRange(0x80, 0x8F)...)
 		execBytes = append(execBytes, getByteRange(0x91, 0x97)...)
 		execBytes = append(execBytes, 0x99)
 		execBytes = append(execBytes, 0x9A)
 
-		if sliceContains(execBytes, base.parser.context.currentChar) ***REMOVED***
+		if sliceContains(execBytes, base.parser.context.currentChar) {
 			return base.parser.execute()
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
-type dcsEntryState struct ***REMOVED***
+type dcsEntryState struct {
 	baseState
-***REMOVED***
+}
 
-type errorState struct ***REMOVED***
+type errorState struct {
 	baseState
-***REMOVED***
+}

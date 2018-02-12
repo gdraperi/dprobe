@@ -494,7 +494,7 @@ const text = "bifukagawalterbihorologyukuhashimoichinosekigaharaxastronomy-gat" 
 //	[ 1 bits] ICANN bit
 //	[15 bits] text index
 //	[ 6 bits] text length
-var nodes = [...]uint32***REMOVED***
+var nodes = [...]uint32{
 	0x31fe83,
 	0x28e944,
 	0x2ed8c6,
@@ -8902,7 +8902,7 @@ var nodes = [...]uint32***REMOVED***
 	0x323043,
 	0x28cac3,
 	0x201a03,
-***REMOVED***
+}
 
 // children is the list of nodes' children, the parent's wildcard bit and the
 // parent's node type. If a node has no children then their children index
@@ -8914,7 +8914,7 @@ var nodes = [...]uint32***REMOVED***
 //	[ 2 bits] node type
 //	[14 bits] high nodes index (exclusive) of children
 //	[14 bits] low nodes index (inclusive) of children
-var children = [...]uint32***REMOVED***
+var children = [...]uint32{
 	0x0,
 	0x10000000,
 	0x20000000,
@@ -9410,7 +9410,7 @@ var children = [...]uint32***REMOVED***
 	0x83420c5,
 	0x834a0d0,
 	0x835e0d2,
-***REMOVED***
+}
 
 // max children 494 (capacity 1023)
 // max text offset 28750 (capacity 32767)

@@ -9,10 +9,10 @@ import (
 )
 
 // runtimeArchitecture gets the name of the current architecture (x86, x86_64, …)
-func runtimeArchitecture() (string, error) ***REMOVED***
-	utsname := &unix.Utsname***REMOVED******REMOVED***
-	if err := unix.Uname(utsname); err != nil ***REMOVED***
+func runtimeArchitecture() (string, error) {
+	utsname := &unix.Utsname{}
+	if err := unix.Uname(utsname); err != nil {
 		return "", err
-	***REMOVED***
+	}
 	return string(utsname.Machine[:bytes.IndexByte(utsname.Machine[:], 0)]), nil
-***REMOVED***
+}

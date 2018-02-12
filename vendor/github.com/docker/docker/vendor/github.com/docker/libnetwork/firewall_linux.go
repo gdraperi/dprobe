@@ -7,34 +7,34 @@ import (
 
 const userChain = "DOCKER-USER"
 
-func (c *controller) arrangeUserFilterRule() ***REMOVED***
+func (c *controller) arrangeUserFilterRule() {
 	c.Lock()
 	arrangeUserFilterRule()
 	c.Unlock()
-	iptables.OnReloaded(func() ***REMOVED***
+	iptables.OnReloaded(func() {
 		c.Lock()
 		arrangeUserFilterRule()
 		c.Unlock()
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
 // This chain allow users to configure firewall policies in a way that persists
 // docker operations/restarts. Docker will not delete or modify any pre-existing
 // rules from the DOCKER-USER filter chain.
-func arrangeUserFilterRule() ***REMOVED***
+func arrangeUserFilterRule() {
 	_, err := iptables.NewChain(userChain, iptables.Filter, false)
-	if err != nil ***REMOVED***
+	if err != nil {
 		logrus.Warnf("Failed to create %s chain: %v", userChain, err)
 		return
-	***REMOVED***
+	}
 
-	if err = iptables.AddReturnRule(userChain); err != nil ***REMOVED***
+	if err = iptables.AddReturnRule(userChain); err != nil {
 		logrus.Warnf("Failed to add the RETURN rule for %s: %v", userChain, err)
 		return
-	***REMOVED***
+	}
 
 	err = iptables.EnsureJumpRule("FORWARD", userChain)
-	if err != nil ***REMOVED***
+	if err != nil {
 		logrus.Warnf("Failed to ensure the jump rule for %s: %v", userChain, err)
-	***REMOVED***
-***REMOVED***
+	}
+}

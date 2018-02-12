@@ -14,39 +14,39 @@ import (
 	"golang.org/x/text/unicode/cldr"
 )
 
-func main() ***REMOVED***
+func main() {
 	r := gen.OpenCLDRCoreZip()
 	defer r.Close()
 
-	d := &cldr.Decoder***REMOVED******REMOVED***
+	d := &cldr.Decoder{}
 	data, err := d.DecodeZip(r)
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatalf("DecodeZip: %v", err)
-	***REMOVED***
+	}
 
 	w := gen.NewCodeWriter()
 	defer w.WriteGoFile("tables.go", "internal")
 
 	// Create parents table.
 	parents := make([]uint16, language.NumCompactTags)
-	for _, loc := range data.Locales() ***REMOVED***
+	for _, loc := range data.Locales() {
 		tag := language.MustParse(loc)
 		index, ok := language.CompactIndex(tag)
-		if !ok ***REMOVED***
+		if !ok {
 			continue
-		***REMOVED***
+		}
 		parentIndex := 0 // und
-		for p := tag.Parent(); p != language.Und; p = p.Parent() ***REMOVED***
-			if x, ok := language.CompactIndex(p); ok ***REMOVED***
+		for p := tag.Parent(); p != language.Und; p = p.Parent() {
+			if x, ok := language.CompactIndex(p); ok {
 				parentIndex = x
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		parents[index] = uint16(parentIndex)
-	***REMOVED***
+	}
 
 	w.WriteComment(`
 	Parent maps a compact index of a tag to the compact index of the parent of
 	this tag.`)
 	w.WriteVar("Parent", parents)
-***REMOVED***
+}

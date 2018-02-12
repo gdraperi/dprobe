@@ -44,7 +44,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
-type Plugin struct ***REMOVED***
+type Plugin struct {
 	// Type defines the type of plugin.
 	//
 	// See package plugin for a list of possible values. Non core plugins may
@@ -82,13 +82,13 @@ type Plugin struct ***REMOVED***
 	//
 	// Plugins that have this value set cannot be used.
 	InitErr *google_rpc.Status `protobuf:"bytes,7,opt,name=init_err,json=initErr" json:"init_err,omitempty"`
-***REMOVED***
+}
 
-func (m *Plugin) Reset()                    ***REMOVED*** *m = Plugin***REMOVED******REMOVED*** ***REMOVED***
-func (*Plugin) ProtoMessage()               ***REMOVED******REMOVED***
-func (*Plugin) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorIntrospection, []int***REMOVED***0***REMOVED*** ***REMOVED***
+func (m *Plugin) Reset()                    { *m = Plugin{} }
+func (*Plugin) ProtoMessage()               {}
+func (*Plugin) Descriptor() ([]byte, []int) { return fileDescriptorIntrospection, []int{0} }
 
-type PluginsRequest struct ***REMOVED***
+type PluginsRequest struct {
 	// Filters contains one or more filters using the syntax defined in the
 	// containerd filter package.
 	//
@@ -100,25 +100,25 @@ type PluginsRequest struct ***REMOVED***
 	//
 	// If filters is zero-length or nil, all items will be returned.
 	Filters []string `protobuf:"bytes,1,rep,name=filters" json:"filters,omitempty"`
-***REMOVED***
+}
 
-func (m *PluginsRequest) Reset()                    ***REMOVED*** *m = PluginsRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*PluginsRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*PluginsRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorIntrospection, []int***REMOVED***1***REMOVED*** ***REMOVED***
+func (m *PluginsRequest) Reset()                    { *m = PluginsRequest{} }
+func (*PluginsRequest) ProtoMessage()               {}
+func (*PluginsRequest) Descriptor() ([]byte, []int) { return fileDescriptorIntrospection, []int{1} }
 
-type PluginsResponse struct ***REMOVED***
+type PluginsResponse struct {
 	Plugins []Plugin `protobuf:"bytes,1,rep,name=plugins" json:"plugins"`
-***REMOVED***
+}
 
-func (m *PluginsResponse) Reset()                    ***REMOVED*** *m = PluginsResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*PluginsResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*PluginsResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorIntrospection, []int***REMOVED***2***REMOVED*** ***REMOVED***
+func (m *PluginsResponse) Reset()                    { *m = PluginsResponse{} }
+func (*PluginsResponse) ProtoMessage()               {}
+func (*PluginsResponse) Descriptor() ([]byte, []int) { return fileDescriptorIntrospection, []int{2} }
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*Plugin)(nil), "containerd.services.introspection.v1.Plugin")
 	proto.RegisterType((*PluginsRequest)(nil), "containerd.services.introspection.v1.PluginsRequest")
 	proto.RegisterType((*PluginsResponse)(nil), "containerd.services.introspection.v1.PluginsResponse")
-***REMOVED***
+}
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
@@ -130,132 +130,132 @@ const _ = grpc.SupportPackageIsVersion4
 
 // Client API for Introspection service
 
-type IntrospectionClient interface ***REMOVED***
+type IntrospectionClient interface {
 	// Plugins returns a list of plugins in containerd.
 	//
 	// Clients can use this to detect features and capabilities when using
 	// containerd.
 	Plugins(ctx context.Context, in *PluginsRequest, opts ...grpc.CallOption) (*PluginsResponse, error)
-***REMOVED***
+}
 
-type introspectionClient struct ***REMOVED***
+type introspectionClient struct {
 	cc *grpc.ClientConn
-***REMOVED***
+}
 
-func NewIntrospectionClient(cc *grpc.ClientConn) IntrospectionClient ***REMOVED***
-	return &introspectionClient***REMOVED***cc***REMOVED***
-***REMOVED***
+func NewIntrospectionClient(cc *grpc.ClientConn) IntrospectionClient {
+	return &introspectionClient{cc}
+}
 
-func (c *introspectionClient) Plugins(ctx context.Context, in *PluginsRequest, opts ...grpc.CallOption) (*PluginsResponse, error) ***REMOVED***
+func (c *introspectionClient) Plugins(ctx context.Context, in *PluginsRequest, opts ...grpc.CallOption) (*PluginsResponse, error) {
 	out := new(PluginsResponse)
 	err := grpc.Invoke(ctx, "/containerd.services.introspection.v1.Introspection/Plugins", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
 // Server API for Introspection service
 
-type IntrospectionServer interface ***REMOVED***
+type IntrospectionServer interface {
 	// Plugins returns a list of plugins in containerd.
 	//
 	// Clients can use this to detect features and capabilities when using
 	// containerd.
 	Plugins(context.Context, *PluginsRequest) (*PluginsResponse, error)
-***REMOVED***
+}
 
-func RegisterIntrospectionServer(s *grpc.Server, srv IntrospectionServer) ***REMOVED***
+func RegisterIntrospectionServer(s *grpc.Server, srv IntrospectionServer) {
 	s.RegisterService(&_Introspection_serviceDesc, srv)
-***REMOVED***
+}
 
-func _Introspection_Plugins_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _Introspection_Plugins_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(PluginsRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(IntrospectionServer).Plugins(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/containerd.services.introspection.v1.Introspection/Plugins",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(IntrospectionServer).Plugins(ctx, req.(*PluginsRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-var _Introspection_serviceDesc = grpc.ServiceDesc***REMOVED***
+var _Introspection_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "containerd.services.introspection.v1.Introspection",
 	HandlerType: (*IntrospectionServer)(nil),
-	Methods: []grpc.MethodDesc***REMOVED***
-		***REMOVED***
+	Methods: []grpc.MethodDesc{
+		{
 			MethodName: "Plugins",
 			Handler:    _Introspection_Plugins_Handler,
-		***REMOVED***,
-	***REMOVED***,
-	Streams:  []grpc.StreamDesc***REMOVED******REMOVED***,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
 	Metadata: "github.com/containerd/containerd/api/services/introspection/v1/introspection.proto",
-***REMOVED***
+}
 
-func (m *Plugin) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *Plugin) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *Plugin) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *Plugin) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Type) > 0 ***REMOVED***
+	if len(m.Type) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintIntrospection(dAtA, i, uint64(len(m.Type)))
 		i += copy(dAtA[i:], m.Type)
-	***REMOVED***
-	if len(m.ID) > 0 ***REMOVED***
+	}
+	if len(m.ID) > 0 {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintIntrospection(dAtA, i, uint64(len(m.ID)))
 		i += copy(dAtA[i:], m.ID)
-	***REMOVED***
-	if len(m.Requires) > 0 ***REMOVED***
-		for _, s := range m.Requires ***REMOVED***
+	}
+	if len(m.Requires) > 0 {
+		for _, s := range m.Requires {
 			dAtA[i] = 0x1a
 			i++
 			l = len(s)
-			for l >= 1<<7 ***REMOVED***
+			for l >= 1<<7 {
 				dAtA[i] = uint8(uint64(l)&0x7f | 0x80)
 				l >>= 7
 				i++
-			***REMOVED***
+			}
 			dAtA[i] = uint8(l)
 			i++
 			i += copy(dAtA[i:], s)
-		***REMOVED***
-	***REMOVED***
-	if len(m.Platforms) > 0 ***REMOVED***
-		for _, msg := range m.Platforms ***REMOVED***
+		}
+	}
+	if len(m.Platforms) > 0 {
+		for _, msg := range m.Platforms {
 			dAtA[i] = 0x22
 			i++
 			i = encodeVarintIntrospection(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			i += n
-		***REMOVED***
-	***REMOVED***
-	if len(m.Exports) > 0 ***REMOVED***
-		for k, _ := range m.Exports ***REMOVED***
+		}
+	}
+	if len(m.Exports) > 0 {
+		for k, _ := range m.Exports {
 			dAtA[i] = 0x2a
 			i++
 			v := m.Exports[k]
@@ -269,204 +269,204 @@ func (m *Plugin) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
 			i++
 			i = encodeVarintIntrospection(dAtA, i, uint64(len(v)))
 			i += copy(dAtA[i:], v)
-		***REMOVED***
-	***REMOVED***
-	if len(m.Capabilities) > 0 ***REMOVED***
-		for _, s := range m.Capabilities ***REMOVED***
+		}
+	}
+	if len(m.Capabilities) > 0 {
+		for _, s := range m.Capabilities {
 			dAtA[i] = 0x32
 			i++
 			l = len(s)
-			for l >= 1<<7 ***REMOVED***
+			for l >= 1<<7 {
 				dAtA[i] = uint8(uint64(l)&0x7f | 0x80)
 				l >>= 7
 				i++
-			***REMOVED***
+			}
 			dAtA[i] = uint8(l)
 			i++
 			i += copy(dAtA[i:], s)
-		***REMOVED***
-	***REMOVED***
-	if m.InitErr != nil ***REMOVED***
+		}
+	}
+	if m.InitErr != nil {
 		dAtA[i] = 0x3a
 		i++
 		i = encodeVarintIntrospection(dAtA, i, uint64(m.InitErr.Size()))
 		n1, err := m.InitErr.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n1
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *PluginsRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *PluginsRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *PluginsRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *PluginsRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Filters) > 0 ***REMOVED***
-		for _, s := range m.Filters ***REMOVED***
+	if len(m.Filters) > 0 {
+		for _, s := range m.Filters {
 			dAtA[i] = 0xa
 			i++
 			l = len(s)
-			for l >= 1<<7 ***REMOVED***
+			for l >= 1<<7 {
 				dAtA[i] = uint8(uint64(l)&0x7f | 0x80)
 				l >>= 7
 				i++
-			***REMOVED***
+			}
 			dAtA[i] = uint8(l)
 			i++
 			i += copy(dAtA[i:], s)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *PluginsResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *PluginsResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *PluginsResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *PluginsResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Plugins) > 0 ***REMOVED***
-		for _, msg := range m.Plugins ***REMOVED***
+	if len(m.Plugins) > 0 {
+		for _, msg := range m.Plugins {
 			dAtA[i] = 0xa
 			i++
 			i = encodeVarintIntrospection(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			i += n
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return i, nil
-***REMOVED***
+}
 
-func encodeVarintIntrospection(dAtA []byte, offset int, v uint64) int ***REMOVED***
-	for v >= 1<<7 ***REMOVED***
+func encodeVarintIntrospection(dAtA []byte, offset int, v uint64) int {
+	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
-	***REMOVED***
+	}
 	dAtA[offset] = uint8(v)
 	return offset + 1
-***REMOVED***
-func (m *Plugin) Size() (n int) ***REMOVED***
+}
+func (m *Plugin) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.Type)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovIntrospection(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.ID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovIntrospection(uint64(l))
-	***REMOVED***
-	if len(m.Requires) > 0 ***REMOVED***
-		for _, s := range m.Requires ***REMOVED***
+	}
+	if len(m.Requires) > 0 {
+		for _, s := range m.Requires {
 			l = len(s)
 			n += 1 + l + sovIntrospection(uint64(l))
-		***REMOVED***
-	***REMOVED***
-	if len(m.Platforms) > 0 ***REMOVED***
-		for _, e := range m.Platforms ***REMOVED***
+		}
+	}
+	if len(m.Platforms) > 0 {
+		for _, e := range m.Platforms {
 			l = e.Size()
 			n += 1 + l + sovIntrospection(uint64(l))
-		***REMOVED***
-	***REMOVED***
-	if len(m.Exports) > 0 ***REMOVED***
-		for k, v := range m.Exports ***REMOVED***
+		}
+	}
+	if len(m.Exports) > 0 {
+		for k, v := range m.Exports {
 			_ = k
 			_ = v
 			mapEntrySize := 1 + len(k) + sovIntrospection(uint64(len(k))) + 1 + len(v) + sovIntrospection(uint64(len(v)))
 			n += mapEntrySize + 1 + sovIntrospection(uint64(mapEntrySize))
-		***REMOVED***
-	***REMOVED***
-	if len(m.Capabilities) > 0 ***REMOVED***
-		for _, s := range m.Capabilities ***REMOVED***
+		}
+	}
+	if len(m.Capabilities) > 0 {
+		for _, s := range m.Capabilities {
 			l = len(s)
 			n += 1 + l + sovIntrospection(uint64(l))
-		***REMOVED***
-	***REMOVED***
-	if m.InitErr != nil ***REMOVED***
+		}
+	}
+	if m.InitErr != nil {
 		l = m.InitErr.Size()
 		n += 1 + l + sovIntrospection(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *PluginsRequest) Size() (n int) ***REMOVED***
+func (m *PluginsRequest) Size() (n int) {
 	var l int
 	_ = l
-	if len(m.Filters) > 0 ***REMOVED***
-		for _, s := range m.Filters ***REMOVED***
+	if len(m.Filters) > 0 {
+		for _, s := range m.Filters {
 			l = len(s)
 			n += 1 + l + sovIntrospection(uint64(l))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
+}
 
-func (m *PluginsResponse) Size() (n int) ***REMOVED***
+func (m *PluginsResponse) Size() (n int) {
 	var l int
 	_ = l
-	if len(m.Plugins) > 0 ***REMOVED***
-		for _, e := range m.Plugins ***REMOVED***
+	if len(m.Plugins) > 0 {
+		for _, e := range m.Plugins {
 			l = e.Size()
 			n += 1 + l + sovIntrospection(uint64(l))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
+}
 
-func sovIntrospection(x uint64) (n int) ***REMOVED***
-	for ***REMOVED***
+func sovIntrospection(x uint64) (n int) {
+	for {
 		n++
 		x >>= 7
-		if x == 0 ***REMOVED***
+		if x == 0 {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
-func sozIntrospection(x uint64) (n int) ***REMOVED***
+}
+func sozIntrospection(x uint64) (n int) {
 	return sovIntrospection(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-***REMOVED***
-func (this *Plugin) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Plugin) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	keysForExports := make([]string, 0, len(this.Exports))
-	for k, _ := range this.Exports ***REMOVED***
+	for k, _ := range this.Exports {
 		keysForExports = append(keysForExports, k)
-	***REMOVED***
+	}
 	github_com_gogo_protobuf_sortkeys.Strings(keysForExports)
-	mapStringForExports := "map[string]string***REMOVED***"
-	for _, k := range keysForExports ***REMOVED***
+	mapStringForExports := "map[string]string{"
+	for _, k := range keysForExports {
 		mapStringForExports += fmt.Sprintf("%v: %v,", k, this.Exports[k])
-	***REMOVED***
-	mapStringForExports += "***REMOVED***"
-	s := strings.Join([]string***REMOVED***`&Plugin***REMOVED***`,
+	}
+	mapStringForExports += "}"
+	s := strings.Join([]string{`&Plugin{`,
 		`Type:` + fmt.Sprintf("%v", this.Type) + `,`,
 		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
 		`Requires:` + fmt.Sprintf("%v", this.Requires) + `,`,
@@ -474,633 +474,633 @@ func (this *Plugin) String() string ***REMOVED***
 		`Exports:` + mapStringForExports + `,`,
 		`Capabilities:` + fmt.Sprintf("%v", this.Capabilities) + `,`,
 		`InitErr:` + strings.Replace(fmt.Sprintf("%v", this.InitErr), "Status", "google_rpc.Status", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *PluginsRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *PluginsRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&PluginsRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&PluginsRequest{`,
 		`Filters:` + fmt.Sprintf("%v", this.Filters) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *PluginsResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *PluginsResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&PluginsResponse***REMOVED***`,
+	}
+	s := strings.Join([]string{`&PluginsResponse{`,
 		`Plugins:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Plugins), "Plugin", "Plugin", 1), `&`, ``, 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func valueToStringIntrospection(v interface***REMOVED******REMOVED***) string ***REMOVED***
+}
+func valueToStringIntrospection(v interface{}) string {
 	rv := reflect.ValueOf(v)
-	if rv.IsNil() ***REMOVED***
+	if rv.IsNil() {
 		return "nil"
-	***REMOVED***
+	}
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
-***REMOVED***
-func (m *Plugin) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *Plugin) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowIntrospection
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: Plugin: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: Plugin: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowIntrospection
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthIntrospection
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Type = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowIntrospection
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthIntrospection
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Requires", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowIntrospection
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthIntrospection
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Requires = append(m.Requires, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		case 4:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Platforms", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowIntrospection
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthIntrospection
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.Platforms = append(m.Platforms, containerd_types.Platform***REMOVED******REMOVED***)
-			if err := m.Platforms[len(m.Platforms)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			m.Platforms = append(m.Platforms, containerd_types.Platform{})
+			if err := m.Platforms[len(m.Platforms)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 5:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Exports", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowIntrospection
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthIntrospection
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Exports == nil ***REMOVED***
+			}
+			if m.Exports == nil {
 				m.Exports = make(map[string]string)
-			***REMOVED***
+			}
 			var mapkey string
 			var mapvalue string
-			for iNdEx < postIndex ***REMOVED***
+			for iNdEx < postIndex {
 				entryPreIndex := iNdEx
 				var wire uint64
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return ErrIntOverflowIntrospection
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					wire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				fieldNum := int32(wire >> 3)
-				if fieldNum == 1 ***REMOVED***
+				if fieldNum == 1 {
 					var stringLenmapkey uint64
-					for shift := uint(0); ; shift += 7 ***REMOVED***
-						if shift >= 64 ***REMOVED***
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
 							return ErrIntOverflowIntrospection
-						***REMOVED***
-						if iNdEx >= l ***REMOVED***
+						}
+						if iNdEx >= l {
 							return io.ErrUnexpectedEOF
-						***REMOVED***
+						}
 						b := dAtA[iNdEx]
 						iNdEx++
 						stringLenmapkey |= (uint64(b) & 0x7F) << shift
-						if b < 0x80 ***REMOVED***
+						if b < 0x80 {
 							break
-						***REMOVED***
-					***REMOVED***
+						}
+					}
 					intStringLenmapkey := int(stringLenmapkey)
-					if intStringLenmapkey < 0 ***REMOVED***
+					if intStringLenmapkey < 0 {
 						return ErrInvalidLengthIntrospection
-					***REMOVED***
+					}
 					postStringIndexmapkey := iNdEx + intStringLenmapkey
-					if postStringIndexmapkey > l ***REMOVED***
+					if postStringIndexmapkey > l {
 						return io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
 					iNdEx = postStringIndexmapkey
-				***REMOVED*** else if fieldNum == 2 ***REMOVED***
+				} else if fieldNum == 2 {
 					var stringLenmapvalue uint64
-					for shift := uint(0); ; shift += 7 ***REMOVED***
-						if shift >= 64 ***REMOVED***
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
 							return ErrIntOverflowIntrospection
-						***REMOVED***
-						if iNdEx >= l ***REMOVED***
+						}
+						if iNdEx >= l {
 							return io.ErrUnexpectedEOF
-						***REMOVED***
+						}
 						b := dAtA[iNdEx]
 						iNdEx++
 						stringLenmapvalue |= (uint64(b) & 0x7F) << shift
-						if b < 0x80 ***REMOVED***
+						if b < 0x80 {
 							break
-						***REMOVED***
-					***REMOVED***
+						}
+					}
 					intStringLenmapvalue := int(stringLenmapvalue)
-					if intStringLenmapvalue < 0 ***REMOVED***
+					if intStringLenmapvalue < 0 {
 						return ErrInvalidLengthIntrospection
-					***REMOVED***
+					}
 					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
-					if postStringIndexmapvalue > l ***REMOVED***
+					if postStringIndexmapvalue > l {
 						return io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					mapvalue = string(dAtA[iNdEx:postStringIndexmapvalue])
 					iNdEx = postStringIndexmapvalue
-				***REMOVED*** else ***REMOVED***
+				} else {
 					iNdEx = entryPreIndex
 					skippy, err := skipIntrospection(dAtA[iNdEx:])
-					if err != nil ***REMOVED***
+					if err != nil {
 						return err
-					***REMOVED***
-					if skippy < 0 ***REMOVED***
+					}
+					if skippy < 0 {
 						return ErrInvalidLengthIntrospection
-					***REMOVED***
-					if (iNdEx + skippy) > postIndex ***REMOVED***
+					}
+					if (iNdEx + skippy) > postIndex {
 						return io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					iNdEx += skippy
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			m.Exports[mapkey] = mapvalue
 			iNdEx = postIndex
 		case 6:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Capabilities", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowIntrospection
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthIntrospection
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Capabilities = append(m.Capabilities, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		case 7:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field InitErr", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowIntrospection
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthIntrospection
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.InitErr == nil ***REMOVED***
-				m.InitErr = &google_rpc.Status***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.InitErr.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.InitErr == nil {
+				m.InitErr = &google_rpc.Status{}
+			}
+			if err := m.InitErr.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipIntrospection(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthIntrospection
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *PluginsRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *PluginsRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowIntrospection
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: PluginsRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: PluginsRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Filters", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowIntrospection
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthIntrospection
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Filters = append(m.Filters, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipIntrospection(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthIntrospection
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *PluginsResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *PluginsResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowIntrospection
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: PluginsResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: PluginsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Plugins", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowIntrospection
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthIntrospection
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.Plugins = append(m.Plugins, Plugin***REMOVED******REMOVED***)
-			if err := m.Plugins[len(m.Plugins)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			m.Plugins = append(m.Plugins, Plugin{})
+			if err := m.Plugins[len(m.Plugins)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipIntrospection(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthIntrospection
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func skipIntrospection(dAtA []byte) (n int, err error) ***REMOVED***
+}
+func skipIntrospection(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return 0, ErrIntOverflowIntrospection
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return 0, io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		wireType := int(wire & 0x7)
-		switch wireType ***REMOVED***
+		switch wireType {
 		case 0:
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowIntrospection
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				iNdEx++
-				if dAtA[iNdEx-1] < 0x80 ***REMOVED***
+				if dAtA[iNdEx-1] < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return iNdEx, nil
 		case 1:
 			iNdEx += 8
 			return iNdEx, nil
 		case 2:
 			var length int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowIntrospection
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				length |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			iNdEx += length
-			if length < 0 ***REMOVED***
+			if length < 0 {
 				return 0, ErrInvalidLengthIntrospection
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 3:
-			for ***REMOVED***
+			for {
 				var innerWire uint64
 				var start int = iNdEx
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return 0, ErrIntOverflowIntrospection
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return 0, io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					innerWire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				innerWireType := int(innerWire & 0x7)
-				if innerWireType == 4 ***REMOVED***
+				if innerWireType == 4 {
 					break
-				***REMOVED***
+				}
 				next, err := skipIntrospection(dAtA[start:])
-				if err != nil ***REMOVED***
+				if err != nil {
 					return 0, err
-				***REMOVED***
+				}
 				iNdEx = start + next
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 4:
 			return iNdEx, nil
@@ -1109,21 +1109,21 @@ func skipIntrospection(dAtA []byte) (n int, err error) ***REMOVED***
 			return iNdEx, nil
 		default:
 			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	panic("unreachable")
-***REMOVED***
+}
 
 var (
 	ErrInvalidLengthIntrospection = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowIntrospection   = fmt.Errorf("proto: integer overflow")
 )
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterFile("github.com/containerd/containerd/api/services/introspection/v1/introspection.proto", fileDescriptorIntrospection)
-***REMOVED***
+}
 
-var fileDescriptorIntrospection = []byte***REMOVED***
+var fileDescriptorIntrospection = []byte{
 	// 487 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x53, 0x4d, 0x6f, 0xd3, 0x40,
 	0x10, 0xcd, 0x3a, 0x69, 0xdc, 0x4c, 0xca, 0x87, 0x56, 0x15, 0x58, 0x3e, 0xb8, 0x51, 0xc4, 0x21,
@@ -1156,4 +1156,4 @@ var fileDescriptorIntrospection = []byte***REMOVED***
 	0x68, 0x55, 0x78, 0xe8, 0x57, 0xe1, 0xa1, 0x3f, 0x85, 0x87, 0xbe, 0x9c, 0xff, 0xdf, 0x5b, 0xfc,
 	0xb0, 0x01, 0x7c, 0xb6, 0x66, 0xdd, 0xea, 0xf7, 0x7f, 0xf3, 0x2f, 0x00, 0x00, 0xff, 0xff, 0xe6,
 	0x72, 0xde, 0x35, 0xe4, 0x03, 0x00, 0x00,
-***REMOVED***
+}

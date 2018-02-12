@@ -42,19 +42,19 @@ var (
 
 	// oneShotCtxValue is set on a context using WithValue(&oneShotValue) so
 	// that Do() will not retry a request
-	oneShotCtxValue interface***REMOVED******REMOVED***
+	oneShotCtxValue interface{}
 )
 
 var DefaultRequestTimeout = 5 * time.Second
 
-var DefaultTransport CancelableTransport = &http.Transport***REMOVED***
+var DefaultTransport CancelableTransport = &http.Transport{
 	Proxy: http.ProxyFromEnvironment,
-	Dial: (&net.Dialer***REMOVED***
+	Dial: (&net.Dialer{
 		Timeout:   30 * time.Second,
 		KeepAlive: 30 * time.Second,
-	***REMOVED***).Dial,
+	}).Dial,
 	TLSHandshakeTimeout: 10 * time.Second,
-***REMOVED***
+}
 
 type EndpointSelectionMode int
 
@@ -79,16 +79,16 @@ const (
 	EndpointSelectionPrioritizeLeader
 )
 
-type Config struct ***REMOVED***
+type Config struct {
 	// Endpoints defines a set of URLs (schemes, hosts and ports only)
 	// that can be used to communicate with a logical etcd cluster. For
 	// example, a three-node cluster could be provided like so:
 	//
-	// 	Endpoints: []string***REMOVED***
+	// 	Endpoints: []string{
 	//		"http://node1.example.com:2379",
 	//		"http://node2.example.com:2379",
 	//		"http://node3.example.com:2379",
-	//	***REMOVED***
+	//	}
 	//
 	// If multiple endpoints are provided, the Client will attempt to
 	// use them all in the event that one or more of them are unusable.
@@ -141,40 +141,40 @@ type Config struct ***REMOVED***
 	// SelectionMode is an EndpointSelectionMode enum that specifies the
 	// policy for choosing the etcd cluster node to which requests are sent.
 	SelectionMode EndpointSelectionMode
-***REMOVED***
+}
 
-func (cfg *Config) transport() CancelableTransport ***REMOVED***
-	if cfg.Transport == nil ***REMOVED***
+func (cfg *Config) transport() CancelableTransport {
+	if cfg.Transport == nil {
 		return DefaultTransport
-	***REMOVED***
+	}
 	return cfg.Transport
-***REMOVED***
+}
 
-func (cfg *Config) checkRedirect() CheckRedirectFunc ***REMOVED***
-	if cfg.CheckRedirect == nil ***REMOVED***
+func (cfg *Config) checkRedirect() CheckRedirectFunc {
+	if cfg.CheckRedirect == nil {
 		return DefaultCheckRedirect
-	***REMOVED***
+	}
 	return cfg.CheckRedirect
-***REMOVED***
+}
 
 // CancelableTransport mimics net/http.Transport, but requires that
 // the object also support request cancellation.
-type CancelableTransport interface ***REMOVED***
+type CancelableTransport interface {
 	http.RoundTripper
 	CancelRequest(req *http.Request)
-***REMOVED***
+}
 
 type CheckRedirectFunc func(via int) error
 
 // DefaultCheckRedirect follows up to 10 redirects, but no more.
-var DefaultCheckRedirect CheckRedirectFunc = func(via int) error ***REMOVED***
-	if via > 10 ***REMOVED***
+var DefaultCheckRedirect CheckRedirectFunc = func(via int) error {
+	if via > 10 {
 		return ErrTooManyRedirects
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-type Client interface ***REMOVED***
+type Client interface {
 	// Sync updates the internal cache of the etcd cluster's membership.
 	Sync(context.Context) error
 
@@ -185,13 +185,13 @@ type Client interface ***REMOVED***
 	//
 	// The example to use it:
 	//
-	//  for ***REMOVED***
+	//  for {
 	//      err := client.AutoSync(ctx, 10*time.Second)
-	//      if err == context.DeadlineExceeded || err == context.Canceled ***REMOVED***
+	//      if err == context.DeadlineExceeded || err == context.Canceled {
 	//          break
-	//  ***REMOVED***
+	//      }
 	//      log.Print(err)
-	//  ***REMOVED***
+	//  }
 	AutoSync(context.Context, time.Duration) error
 
 	// Endpoints returns a copy of the current set of API endpoints used
@@ -208,55 +208,55 @@ type Client interface ***REMOVED***
 	GetVersion(ctx context.Context) (*version.Versions, error)
 
 	httpClient
-***REMOVED***
+}
 
-func New(cfg Config) (Client, error) ***REMOVED***
-	c := &httpClusterClient***REMOVED***
+func New(cfg Config) (Client, error) {
+	c := &httpClusterClient{
 		clientFactory: newHTTPClientFactory(cfg.transport(), cfg.checkRedirect(), cfg.HeaderTimeoutPerRequest),
 		rand:          rand.New(rand.NewSource(int64(time.Now().Nanosecond()))),
 		selectionMode: cfg.SelectionMode,
-	***REMOVED***
-	if cfg.Username != "" ***REMOVED***
-		c.credentials = &credentials***REMOVED***
+	}
+	if cfg.Username != "" {
+		c.credentials = &credentials{
 			username: cfg.Username,
 			password: cfg.Password,
-		***REMOVED***
-	***REMOVED***
-	if err := c.SetEndpoints(cfg.Endpoints); err != nil ***REMOVED***
+		}
+	}
+	if err := c.SetEndpoints(cfg.Endpoints); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return c, nil
-***REMOVED***
+}
 
-type httpClient interface ***REMOVED***
+type httpClient interface {
 	Do(context.Context, httpAction) (*http.Response, []byte, error)
-***REMOVED***
+}
 
-func newHTTPClientFactory(tr CancelableTransport, cr CheckRedirectFunc, headerTimeout time.Duration) httpClientFactory ***REMOVED***
-	return func(ep url.URL) httpClient ***REMOVED***
-		return &redirectFollowingHTTPClient***REMOVED***
+func newHTTPClientFactory(tr CancelableTransport, cr CheckRedirectFunc, headerTimeout time.Duration) httpClientFactory {
+	return func(ep url.URL) httpClient {
+		return &redirectFollowingHTTPClient{
 			checkRedirect: cr,
-			client: &simpleHTTPClient***REMOVED***
+			client: &simpleHTTPClient{
 				transport:     tr,
 				endpoint:      ep,
 				headerTimeout: headerTimeout,
-			***REMOVED***,
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			},
+		}
+	}
+}
 
-type credentials struct ***REMOVED***
+type credentials struct {
 	username string
 	password string
-***REMOVED***
+}
 
 type httpClientFactory func(url.URL) httpClient
 
-type httpAction interface ***REMOVED***
+type httpAction interface {
 	HTTPRequest(url.URL) *http.Request
-***REMOVED***
+}
 
-type httpClusterClient struct ***REMOVED***
+type httpClusterClient struct {
 	clientFactory httpClientFactory
 	endpoints     []url.URL
 	pinned        int
@@ -264,56 +264,56 @@ type httpClusterClient struct ***REMOVED***
 	sync.RWMutex
 	rand          *rand.Rand
 	selectionMode EndpointSelectionMode
-***REMOVED***
+}
 
-func (c *httpClusterClient) getLeaderEndpoint(ctx context.Context, eps []url.URL) (string, error) ***REMOVED***
+func (c *httpClusterClient) getLeaderEndpoint(ctx context.Context, eps []url.URL) (string, error) {
 	ceps := make([]url.URL, len(eps))
 	copy(ceps, eps)
 
 	// To perform a lookup on the new endpoint list without using the current
 	// client, we'll copy it
-	clientCopy := &httpClusterClient***REMOVED***
+	clientCopy := &httpClusterClient{
 		clientFactory: c.clientFactory,
 		credentials:   c.credentials,
 		rand:          c.rand,
 
 		pinned:    0,
 		endpoints: ceps,
-	***REMOVED***
+	}
 
 	mAPI := NewMembersAPI(clientCopy)
 	leader, err := mAPI.Leader(ctx)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
-	if len(leader.ClientURLs) == 0 ***REMOVED***
+	}
+	if len(leader.ClientURLs) == 0 {
 		return "", ErrNoLeaderEndpoint
-	***REMOVED***
+	}
 
 	return leader.ClientURLs[0], nil // TODO: how to handle multiple client URLs?
-***REMOVED***
+}
 
-func (c *httpClusterClient) parseEndpoints(eps []string) ([]url.URL, error) ***REMOVED***
-	if len(eps) == 0 ***REMOVED***
-		return []url.URL***REMOVED******REMOVED***, ErrNoEndpoints
-	***REMOVED***
+func (c *httpClusterClient) parseEndpoints(eps []string) ([]url.URL, error) {
+	if len(eps) == 0 {
+		return []url.URL{}, ErrNoEndpoints
+	}
 
 	neps := make([]url.URL, len(eps))
-	for i, ep := range eps ***REMOVED***
+	for i, ep := range eps {
 		u, err := url.Parse(ep)
-		if err != nil ***REMOVED***
-			return []url.URL***REMOVED******REMOVED***, err
-		***REMOVED***
+		if err != nil {
+			return []url.URL{}, err
+		}
 		neps[i] = *u
-	***REMOVED***
+	}
 	return neps, nil
-***REMOVED***
+}
 
-func (c *httpClusterClient) SetEndpoints(eps []string) error ***REMOVED***
+func (c *httpClusterClient) SetEndpoints(eps []string) error {
 	neps, err := c.parseEndpoints(eps)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	c.Lock()
 	defer c.Unlock()
@@ -328,9 +328,9 @@ func (c *httpClusterClient) SetEndpoints(eps []string) error ***REMOVED***
 	c.pinned = 0
 
 	return nil
-***REMOVED***
+}
 
-func (c *httpClusterClient) Do(ctx context.Context, act httpAction) (*http.Response, []byte, error) ***REMOVED***
+func (c *httpClusterClient) Do(ctx context.Context, act httpAction) (*http.Response, []byte, error) {
 	action := act
 	c.RLock()
 	leps := len(c.endpoints)
@@ -338,126 +338,126 @@ func (c *httpClusterClient) Do(ctx context.Context, act httpAction) (*http.Respo
 	n := copy(eps, c.endpoints)
 	pinned := c.pinned
 
-	if c.credentials != nil ***REMOVED***
-		action = &authedAction***REMOVED***
+	if c.credentials != nil {
+		action = &authedAction{
 			act:         act,
 			credentials: *c.credentials,
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	c.RUnlock()
 
-	if leps == 0 ***REMOVED***
+	if leps == 0 {
 		return nil, nil, ErrNoEndpoints
-	***REMOVED***
+	}
 
-	if leps != n ***REMOVED***
+	if leps != n {
 		return nil, nil, errors.New("unable to pick endpoint: copy failed")
-	***REMOVED***
+	}
 
 	var resp *http.Response
 	var body []byte
 	var err error
-	cerr := &ClusterError***REMOVED******REMOVED***
+	cerr := &ClusterError{}
 	isOneShot := ctx.Value(&oneShotCtxValue) != nil
 
-	for i := pinned; i < leps+pinned; i++ ***REMOVED***
+	for i := pinned; i < leps+pinned; i++ {
 		k := i % leps
 		hc := c.clientFactory(eps[k])
 		resp, body, err = hc.Do(ctx, action)
-		if err != nil ***REMOVED***
+		if err != nil {
 			cerr.Errors = append(cerr.Errors, err)
-			if err == ctx.Err() ***REMOVED***
+			if err == ctx.Err() {
 				return nil, nil, ctx.Err()
-			***REMOVED***
-			if err == context.Canceled || err == context.DeadlineExceeded ***REMOVED***
+			}
+			if err == context.Canceled || err == context.DeadlineExceeded {
 				return nil, nil, err
-			***REMOVED***
-			if isOneShot ***REMOVED***
+			}
+			if isOneShot {
 				return nil, nil, err
-			***REMOVED***
+			}
 			continue
-		***REMOVED***
-		if resp.StatusCode/100 == 5 ***REMOVED***
-			switch resp.StatusCode ***REMOVED***
+		}
+		if resp.StatusCode/100 == 5 {
+			switch resp.StatusCode {
 			case http.StatusInternalServerError, http.StatusServiceUnavailable:
 				// TODO: make sure this is a no leader response
 				cerr.Errors = append(cerr.Errors, fmt.Errorf("client: etcd member %s has no leader", eps[k].String()))
 			default:
 				cerr.Errors = append(cerr.Errors, fmt.Errorf("client: etcd member %s returns server error [%s]", eps[k].String(), http.StatusText(resp.StatusCode)))
-			***REMOVED***
-			if isOneShot ***REMOVED***
+			}
+			if isOneShot {
 				return nil, nil, cerr.Errors[0]
-			***REMOVED***
+			}
 			continue
-		***REMOVED***
-		if k != pinned ***REMOVED***
+		}
+		if k != pinned {
 			c.Lock()
 			c.pinned = k
 			c.Unlock()
-		***REMOVED***
+		}
 		return resp, body, nil
-	***REMOVED***
+	}
 
 	return nil, nil, cerr
-***REMOVED***
+}
 
-func (c *httpClusterClient) Endpoints() []string ***REMOVED***
+func (c *httpClusterClient) Endpoints() []string {
 	c.RLock()
 	defer c.RUnlock()
 
 	eps := make([]string, len(c.endpoints))
-	for i, ep := range c.endpoints ***REMOVED***
+	for i, ep := range c.endpoints {
 		eps[i] = ep.String()
-	***REMOVED***
+	}
 
 	return eps
-***REMOVED***
+}
 
-func (c *httpClusterClient) Sync(ctx context.Context) error ***REMOVED***
+func (c *httpClusterClient) Sync(ctx context.Context) error {
 	mAPI := NewMembersAPI(c)
 	ms, err := mAPI.List(ctx)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	var eps []string
-	for _, m := range ms ***REMOVED***
+	for _, m := range ms {
 		eps = append(eps, m.ClientURLs...)
-	***REMOVED***
+	}
 
 	neps, err := c.parseEndpoints(eps)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	npin := 0
 
-	switch c.selectionMode ***REMOVED***
+	switch c.selectionMode {
 	case EndpointSelectionRandom:
 		c.RLock()
 		eq := endpointsEqual(c.endpoints, neps)
 		c.RUnlock()
 
-		if eq ***REMOVED***
+		if eq {
 			return nil
-		***REMOVED***
+		}
 		// When items in the endpoint list changes, we choose a new pin
 		neps = shuffleEndpoints(c.rand, neps)
 	case EndpointSelectionPrioritizeLeader:
 		nle, err := c.getLeaderEndpoint(ctx, neps)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return ErrNoLeaderEndpoint
-		***REMOVED***
+		}
 
-		for i, n := range neps ***REMOVED***
-			if n.String() == nle ***REMOVED***
+		for i, n := range neps {
+			if n.String() == nle {
 				npin = i
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 	default:
 		return fmt.Errorf("invalid endpoint selection mode: %d", c.selectionMode)
-	***REMOVED***
+	}
 
 	c.Lock()
 	defer c.Unlock()
@@ -465,103 +465,103 @@ func (c *httpClusterClient) Sync(ctx context.Context) error ***REMOVED***
 	c.pinned = npin
 
 	return nil
-***REMOVED***
+}
 
-func (c *httpClusterClient) AutoSync(ctx context.Context, interval time.Duration) error ***REMOVED***
+func (c *httpClusterClient) AutoSync(ctx context.Context, interval time.Duration) error {
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
-	for ***REMOVED***
+	for {
 		err := c.Sync(ctx)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-		select ***REMOVED***
+		}
+		select {
 		case <-ctx.Done():
 			return ctx.Err()
 		case <-ticker.C:
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (c *httpClusterClient) GetVersion(ctx context.Context) (*version.Versions, error) ***REMOVED***
-	act := &getAction***REMOVED***Prefix: "/version"***REMOVED***
+func (c *httpClusterClient) GetVersion(ctx context.Context) (*version.Versions, error) {
+	act := &getAction{Prefix: "/version"}
 
 	resp, body, err := c.Do(ctx, act)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	switch resp.StatusCode ***REMOVED***
+	switch resp.StatusCode {
 	case http.StatusOK:
-		if len(body) == 0 ***REMOVED***
+		if len(body) == 0 {
 			return nil, ErrEmptyBody
-		***REMOVED***
+		}
 		var vresp version.Versions
-		if err := json.Unmarshal(body, &vresp); err != nil ***REMOVED***
+		if err := json.Unmarshal(body, &vresp); err != nil {
 			return nil, ErrInvalidJSON
-		***REMOVED***
+		}
 		return &vresp, nil
 	default:
 		var etcdErr Error
-		if err := json.Unmarshal(body, &etcdErr); err != nil ***REMOVED***
+		if err := json.Unmarshal(body, &etcdErr); err != nil {
 			return nil, ErrInvalidJSON
-		***REMOVED***
+		}
 		return nil, etcdErr
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type roundTripResponse struct ***REMOVED***
+type roundTripResponse struct {
 	resp *http.Response
 	err  error
-***REMOVED***
+}
 
-type simpleHTTPClient struct ***REMOVED***
+type simpleHTTPClient struct {
 	transport     CancelableTransport
 	endpoint      url.URL
 	headerTimeout time.Duration
-***REMOVED***
+}
 
-func (c *simpleHTTPClient) Do(ctx context.Context, act httpAction) (*http.Response, []byte, error) ***REMOVED***
+func (c *simpleHTTPClient) Do(ctx context.Context, act httpAction) (*http.Response, []byte, error) {
 	req := act.HTTPRequest(c.endpoint)
 
-	if err := printcURL(req); err != nil ***REMOVED***
+	if err := printcURL(req); err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 
 	isWait := false
-	if req != nil && req.URL != nil ***REMOVED***
+	if req != nil && req.URL != nil {
 		ws := req.URL.Query().Get("wait")
-		if len(ws) != 0 ***REMOVED***
+		if len(ws) != 0 {
 			var err error
 			isWait, err = strconv.ParseBool(ws)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, nil, fmt.Errorf("wrong wait value %s (%v for %+v)", ws, err, req)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	var hctx context.Context
 	var hcancel context.CancelFunc
-	if !isWait && c.headerTimeout > 0 ***REMOVED***
+	if !isWait && c.headerTimeout > 0 {
 		hctx, hcancel = context.WithTimeout(ctx, c.headerTimeout)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		hctx, hcancel = context.WithCancel(ctx)
-	***REMOVED***
+	}
 	defer hcancel()
 
 	reqcancel := requestCanceler(c.transport, req)
 
 	rtchan := make(chan roundTripResponse, 1)
-	go func() ***REMOVED***
+	go func() {
 		resp, err := c.transport.RoundTrip(req)
-		rtchan <- roundTripResponse***REMOVED***resp: resp, err: err***REMOVED***
+		rtchan <- roundTripResponse{resp: resp, err: err}
 		close(rtchan)
-	***REMOVED***()
+	}()
 
 	var resp *http.Response
 	var err error
 
-	select ***REMOVED***
+	select {
 	case rtresp := <-rtchan:
 		resp, err = rtresp.resp, rtresp.err
 	case <-hctx.Done():
@@ -569,135 +569,135 @@ func (c *simpleHTTPClient) Do(ctx context.Context, act httpAction) (*http.Respon
 		reqcancel()
 		rtresp := <-rtchan
 		resp = rtresp.resp
-		switch ***REMOVED***
+		switch {
 		case ctx.Err() != nil:
 			err = ctx.Err()
 		case hctx.Err() != nil:
 			err = fmt.Errorf("client: endpoint %s exceeded header timeout", c.endpoint.String())
 		default:
 			panic("failed to get error from context")
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// always check for resp nil-ness to deal with possible
 	// race conditions between channels above
-	defer func() ***REMOVED***
-		if resp != nil ***REMOVED***
+	defer func() {
+		if resp != nil {
 			resp.Body.Close()
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 
 	var body []byte
-	done := make(chan struct***REMOVED******REMOVED***)
-	go func() ***REMOVED***
+	done := make(chan struct{})
+	go func() {
 		body, err = ioutil.ReadAll(resp.Body)
-		done <- struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	***REMOVED***()
+		done <- struct{}{}
+	}()
 
-	select ***REMOVED***
+	select {
 	case <-ctx.Done():
 		resp.Body.Close()
 		<-done
 		return nil, nil, ctx.Err()
 	case <-done:
-	***REMOVED***
+	}
 
 	return resp, body, err
-***REMOVED***
+}
 
-type authedAction struct ***REMOVED***
+type authedAction struct {
 	act         httpAction
 	credentials credentials
-***REMOVED***
+}
 
-func (a *authedAction) HTTPRequest(url url.URL) *http.Request ***REMOVED***
+func (a *authedAction) HTTPRequest(url url.URL) *http.Request {
 	r := a.act.HTTPRequest(url)
 	r.SetBasicAuth(a.credentials.username, a.credentials.password)
 	return r
-***REMOVED***
+}
 
-type redirectFollowingHTTPClient struct ***REMOVED***
+type redirectFollowingHTTPClient struct {
 	client        httpClient
 	checkRedirect CheckRedirectFunc
-***REMOVED***
+}
 
-func (r *redirectFollowingHTTPClient) Do(ctx context.Context, act httpAction) (*http.Response, []byte, error) ***REMOVED***
+func (r *redirectFollowingHTTPClient) Do(ctx context.Context, act httpAction) (*http.Response, []byte, error) {
 	next := act
-	for i := 0; i < 100; i++ ***REMOVED***
-		if i > 0 ***REMOVED***
-			if err := r.checkRedirect(i); err != nil ***REMOVED***
+	for i := 0; i < 100; i++ {
+		if i > 0 {
+			if err := r.checkRedirect(i); err != nil {
 				return nil, nil, err
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		resp, body, err := r.client.Do(ctx, next)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, nil, err
-		***REMOVED***
-		if resp.StatusCode/100 == 3 ***REMOVED***
+		}
+		if resp.StatusCode/100 == 3 {
 			hdr := resp.Header.Get("Location")
-			if hdr == "" ***REMOVED***
+			if hdr == "" {
 				return nil, nil, fmt.Errorf("Location header not set")
-			***REMOVED***
+			}
 			loc, err := url.Parse(hdr)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, nil, fmt.Errorf("Location header not valid URL: %s", hdr)
-			***REMOVED***
-			next = &redirectedHTTPAction***REMOVED***
+			}
+			next = &redirectedHTTPAction{
 				action:   act,
 				location: *loc,
-			***REMOVED***
+			}
 			continue
-		***REMOVED***
+		}
 		return resp, body, nil
-	***REMOVED***
+	}
 
 	return nil, nil, errTooManyRedirectChecks
-***REMOVED***
+}
 
-type redirectedHTTPAction struct ***REMOVED***
+type redirectedHTTPAction struct {
 	action   httpAction
 	location url.URL
-***REMOVED***
+}
 
-func (r *redirectedHTTPAction) HTTPRequest(ep url.URL) *http.Request ***REMOVED***
+func (r *redirectedHTTPAction) HTTPRequest(ep url.URL) *http.Request {
 	orig := r.action.HTTPRequest(ep)
 	orig.URL = &r.location
 	return orig
-***REMOVED***
+}
 
-func shuffleEndpoints(r *rand.Rand, eps []url.URL) []url.URL ***REMOVED***
+func shuffleEndpoints(r *rand.Rand, eps []url.URL) []url.URL {
 	p := r.Perm(len(eps))
 	neps := make([]url.URL, len(eps))
-	for i, k := range p ***REMOVED***
+	for i, k := range p {
 		neps[i] = eps[k]
-	***REMOVED***
+	}
 	return neps
-***REMOVED***
+}
 
-func endpointsEqual(left, right []url.URL) bool ***REMOVED***
-	if len(left) != len(right) ***REMOVED***
+func endpointsEqual(left, right []url.URL) bool {
+	if len(left) != len(right) {
 		return false
-	***REMOVED***
+	}
 
 	sLeft := make([]string, len(left))
 	sRight := make([]string, len(right))
-	for i, l := range left ***REMOVED***
+	for i, l := range left {
 		sLeft[i] = l.String()
-	***REMOVED***
-	for i, r := range right ***REMOVED***
+	}
+	for i, r := range right {
 		sRight[i] = r.String()
-	***REMOVED***
+	}
 
 	sort.Strings(sLeft)
 	sort.Strings(sRight)
-	for i := range sLeft ***REMOVED***
-		if sLeft[i] != sRight[i] ***REMOVED***
+	for i := range sLeft {
+		if sLeft[i] != sRight[i] {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}

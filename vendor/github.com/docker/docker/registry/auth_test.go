@@ -7,114 +7,114 @@ import (
 	registrytypes "github.com/docker/docker/api/types/registry"
 )
 
-func buildAuthConfigs() map[string]types.AuthConfig ***REMOVED***
-	authConfigs := map[string]types.AuthConfig***REMOVED******REMOVED***
+func buildAuthConfigs() map[string]types.AuthConfig {
+	authConfigs := map[string]types.AuthConfig{}
 
-	for _, registry := range []string***REMOVED***"testIndex", IndexServer***REMOVED*** ***REMOVED***
-		authConfigs[registry] = types.AuthConfig***REMOVED***
+	for _, registry := range []string{"testIndex", IndexServer} {
+		authConfigs[registry] = types.AuthConfig{
 			Username: "docker-user",
 			Password: "docker-pass",
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return authConfigs
-***REMOVED***
+}
 
-func TestSameAuthDataPostSave(t *testing.T) ***REMOVED***
+func TestSameAuthDataPostSave(t *testing.T) {
 	authConfigs := buildAuthConfigs()
 	authConfig := authConfigs["testIndex"]
-	if authConfig.Username != "docker-user" ***REMOVED***
+	if authConfig.Username != "docker-user" {
 		t.Fail()
-	***REMOVED***
-	if authConfig.Password != "docker-pass" ***REMOVED***
+	}
+	if authConfig.Password != "docker-pass" {
 		t.Fail()
-	***REMOVED***
-	if authConfig.Auth != "" ***REMOVED***
+	}
+	if authConfig.Auth != "" {
 		t.Fail()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestResolveAuthConfigIndexServer(t *testing.T) ***REMOVED***
+func TestResolveAuthConfigIndexServer(t *testing.T) {
 	authConfigs := buildAuthConfigs()
 	indexConfig := authConfigs[IndexServer]
 
-	officialIndex := &registrytypes.IndexInfo***REMOVED***
+	officialIndex := &registrytypes.IndexInfo{
 		Official: true,
-	***REMOVED***
-	privateIndex := &registrytypes.IndexInfo***REMOVED***
+	}
+	privateIndex := &registrytypes.IndexInfo{
 		Official: false,
-	***REMOVED***
+	}
 
 	resolved := ResolveAuthConfig(authConfigs, officialIndex)
 	assertEqual(t, resolved, indexConfig, "Expected ResolveAuthConfig to return IndexServer")
 
 	resolved = ResolveAuthConfig(authConfigs, privateIndex)
 	assertNotEqual(t, resolved, indexConfig, "Expected ResolveAuthConfig to not return IndexServer")
-***REMOVED***
+}
 
-func TestResolveAuthConfigFullURL(t *testing.T) ***REMOVED***
+func TestResolveAuthConfigFullURL(t *testing.T) {
 	authConfigs := buildAuthConfigs()
 
-	registryAuth := types.AuthConfig***REMOVED***
+	registryAuth := types.AuthConfig{
 		Username: "foo-user",
 		Password: "foo-pass",
-	***REMOVED***
-	localAuth := types.AuthConfig***REMOVED***
+	}
+	localAuth := types.AuthConfig{
 		Username: "bar-user",
 		Password: "bar-pass",
-	***REMOVED***
-	officialAuth := types.AuthConfig***REMOVED***
+	}
+	officialAuth := types.AuthConfig{
 		Username: "baz-user",
 		Password: "baz-pass",
-	***REMOVED***
+	}
 	authConfigs[IndexServer] = officialAuth
 
-	expectedAuths := map[string]types.AuthConfig***REMOVED***
+	expectedAuths := map[string]types.AuthConfig{
 		"registry.example.com": registryAuth,
 		"localhost:8000":       localAuth,
 		"registry.com":         localAuth,
-	***REMOVED***
+	}
 
-	validRegistries := map[string][]string***REMOVED***
-		"registry.example.com": ***REMOVED***
+	validRegistries := map[string][]string{
+		"registry.example.com": {
 			"https://registry.example.com/v1/",
 			"http://registry.example.com/v1/",
 			"registry.example.com",
 			"registry.example.com/v1/",
-		***REMOVED***,
-		"localhost:8000": ***REMOVED***
+		},
+		"localhost:8000": {
 			"https://localhost:8000/v1/",
 			"http://localhost:8000/v1/",
 			"localhost:8000",
 			"localhost:8000/v1/",
-		***REMOVED***,
-		"registry.com": ***REMOVED***
+		},
+		"registry.com": {
 			"https://registry.com/v1/",
 			"http://registry.com/v1/",
 			"registry.com",
 			"registry.com/v1/",
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
-	for configKey, registries := range validRegistries ***REMOVED***
+	for configKey, registries := range validRegistries {
 		configured, ok := expectedAuths[configKey]
-		if !ok ***REMOVED***
+		if !ok {
 			t.Fail()
-		***REMOVED***
-		index := &registrytypes.IndexInfo***REMOVED***
+		}
+		index := &registrytypes.IndexInfo{
 			Name: configKey,
-		***REMOVED***
-		for _, registry := range registries ***REMOVED***
+		}
+		for _, registry := range registries {
 			authConfigs[registry] = configured
 			resolved := ResolveAuthConfig(authConfigs, index)
-			if resolved.Username != configured.Username || resolved.Password != configured.Password ***REMOVED***
+			if resolved.Username != configured.Username || resolved.Password != configured.Password {
 				t.Errorf("%s -> %v != %v\n", registry, resolved, configured)
-			***REMOVED***
+			}
 			delete(authConfigs, registry)
 			resolved = ResolveAuthConfig(authConfigs, index)
-			if resolved.Username == configured.Username || resolved.Password == configured.Password ***REMOVED***
+			if resolved.Username == configured.Username || resolved.Password == configured.Password {
 				t.Errorf("%s -> %v == %v\n", registry, resolved, configured)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}

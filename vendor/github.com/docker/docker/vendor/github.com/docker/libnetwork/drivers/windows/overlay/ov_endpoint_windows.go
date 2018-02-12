@@ -18,7 +18,7 @@ type endpointTable map[string]*endpoint
 
 const overlayEndpointPrefix = "overlay/endpoint"
 
-type endpoint struct ***REMOVED***
+type endpoint struct {
 	id             string
 	nid            string
 	profileID      string
@@ -27,239 +27,239 @@ type endpoint struct ***REMOVED***
 	addr           *net.IPNet
 	disablegateway bool
 	portMapping    []types.PortBinding // Operation port bindings
-***REMOVED***
+}
 
-func validateID(nid, eid string) error ***REMOVED***
-	if nid == "" ***REMOVED***
+func validateID(nid, eid string) error {
+	if nid == "" {
 		return fmt.Errorf("invalid network id")
-	***REMOVED***
+	}
 
-	if eid == "" ***REMOVED***
+	if eid == "" {
 		return fmt.Errorf("invalid endpoint id")
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (n *network) endpoint(eid string) *endpoint ***REMOVED***
+func (n *network) endpoint(eid string) *endpoint {
 	n.Lock()
 	defer n.Unlock()
 
 	return n.endpoints[eid]
-***REMOVED***
+}
 
-func (n *network) addEndpoint(ep *endpoint) ***REMOVED***
+func (n *network) addEndpoint(ep *endpoint) {
 	n.Lock()
 	n.endpoints[ep.id] = ep
 	n.Unlock()
-***REMOVED***
+}
 
-func (n *network) deleteEndpoint(eid string) ***REMOVED***
+func (n *network) deleteEndpoint(eid string) {
 	n.Lock()
 	delete(n.endpoints, eid)
 	n.Unlock()
-***REMOVED***
+}
 
-func (n *network) removeEndpointWithAddress(addr *net.IPNet) ***REMOVED***
+func (n *network) removeEndpointWithAddress(addr *net.IPNet) {
 	var networkEndpoint *endpoint
 	n.Lock()
-	for _, ep := range n.endpoints ***REMOVED***
-		if ep.addr.IP.Equal(addr.IP) ***REMOVED***
+	for _, ep := range n.endpoints {
+		if ep.addr.IP.Equal(addr.IP) {
 			networkEndpoint = ep
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if networkEndpoint != nil ***REMOVED***
+	if networkEndpoint != nil {
 		delete(n.endpoints, networkEndpoint.id)
-	***REMOVED***
+	}
 	n.Unlock()
 
-	if networkEndpoint != nil ***REMOVED***
+	if networkEndpoint != nil {
 		logrus.Debugf("Removing stale endpoint from HNS")
 		_, err := hcsshim.HNSEndpointRequest("DELETE", networkEndpoint.profileID, "")
 
-		if err != nil ***REMOVED***
+		if err != nil {
 			logrus.Debugf("Failed to delete stale overlay endpoint (%s) from hns", networkEndpoint.id[0:7])
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 func (d *driver) CreateEndpoint(nid, eid string, ifInfo driverapi.InterfaceInfo,
-	epOptions map[string]interface***REMOVED******REMOVED***) error ***REMOVED***
+	epOptions map[string]interface{}) error {
 	var err error
-	if err = validateID(nid, eid); err != nil ***REMOVED***
+	if err = validateID(nid, eid); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	n := d.network(nid)
-	if n == nil ***REMOVED***
+	if n == nil {
 		return fmt.Errorf("network id %q not found", nid)
-	***REMOVED***
+	}
 
 	ep := n.endpoint(eid)
-	if ep != nil ***REMOVED***
+	if ep != nil {
 		logrus.Debugf("Deleting stale endpoint %s", eid)
 		n.deleteEndpoint(eid)
 
 		_, err := hcsshim.HNSEndpointRequest("DELETE", ep.profileID, "")
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	ep = &endpoint***REMOVED***
+	ep = &endpoint{
 		id:   eid,
 		nid:  n.id,
 		addr: ifInfo.Address(),
 		mac:  ifInfo.MacAddress(),
-	***REMOVED***
+	}
 
-	if ep.addr == nil ***REMOVED***
+	if ep.addr == nil {
 		return fmt.Errorf("create endpoint was not passed interface IP address")
-	***REMOVED***
+	}
 
 	s := n.getSubnetforIP(ep.addr)
-	if s == nil ***REMOVED***
+	if s == nil {
 		return fmt.Errorf("no matching subnet for IP %q in network %q", ep.addr, nid)
-	***REMOVED***
+	}
 
 	// Todo: Add port bindings and qos policies here
 
-	hnsEndpoint := &hcsshim.HNSEndpoint***REMOVED***
+	hnsEndpoint := &hcsshim.HNSEndpoint{
 		Name:              eid,
 		VirtualNetwork:    n.hnsID,
 		IPAddress:         ep.addr.IP,
 		EnableInternalDNS: true,
 		GatewayAddress:    s.gwIP.String(),
-	***REMOVED***
+	}
 
-	if ep.mac != nil ***REMOVED***
+	if ep.mac != nil {
 		hnsEndpoint.MacAddress = ep.mac.String()
-	***REMOVED***
+	}
 
-	paPolicy, err := json.Marshal(hcsshim.PaPolicy***REMOVED***
+	paPolicy, err := json.Marshal(hcsshim.PaPolicy{
 		Type: "PA",
 		PA:   n.providerAddress,
-	***REMOVED***)
+	})
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	hnsEndpoint.Policies = append(hnsEndpoint.Policies, paPolicy)
 
-	if system.GetOSVersion().Build > 16236 ***REMOVED***
-		natPolicy, err := json.Marshal(hcsshim.PaPolicy***REMOVED***
+	if system.GetOSVersion().Build > 16236 {
+		natPolicy, err := json.Marshal(hcsshim.PaPolicy{
 			Type: "OutBoundNAT",
-		***REMOVED***)
+		})
 
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 
 		hnsEndpoint.Policies = append(hnsEndpoint.Policies, natPolicy)
 
 		epConnectivity, err := windows.ParseEndpointConnectivity(epOptions)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 
 		pbPolicy, err := windows.ConvertPortBindings(epConnectivity.PortBindings)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		hnsEndpoint.Policies = append(hnsEndpoint.Policies, pbPolicy...)
 
 		ep.disablegateway = true
-	***REMOVED***
+	}
 
 	configurationb, err := json.Marshal(hnsEndpoint)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	hnsresponse, err := hcsshim.HNSEndpointRequest("POST", "", string(configurationb))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	ep.profileID = hnsresponse.Id
 
-	if ep.mac == nil ***REMOVED***
+	if ep.mac == nil {
 		ep.mac, err = net.ParseMAC(hnsresponse.MacAddress)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 
-		if err := ifInfo.SetMacAddress(ep.mac); err != nil ***REMOVED***
+		if err := ifInfo.SetMacAddress(ep.mac); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	ep.portMapping, err = windows.ParsePortBindingPolicies(hnsresponse.Policies)
-	if err != nil ***REMOVED***
+	if err != nil {
 		hcsshim.HNSEndpointRequest("DELETE", hnsresponse.Id, "")
 		return err
-	***REMOVED***
+	}
 
 	n.addEndpoint(ep)
 
 	return nil
-***REMOVED***
+}
 
-func (d *driver) DeleteEndpoint(nid, eid string) error ***REMOVED***
-	if err := validateID(nid, eid); err != nil ***REMOVED***
+func (d *driver) DeleteEndpoint(nid, eid string) error {
+	if err := validateID(nid, eid); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	n := d.network(nid)
-	if n == nil ***REMOVED***
+	if n == nil {
 		return fmt.Errorf("network id %q not found", nid)
-	***REMOVED***
+	}
 
 	ep := n.endpoint(eid)
-	if ep == nil ***REMOVED***
+	if ep == nil {
 		return fmt.Errorf("endpoint id %q not found", eid)
-	***REMOVED***
+	}
 
 	n.deleteEndpoint(eid)
 
 	_, err := hcsshim.HNSEndpointRequest("DELETE", ep.profileID, "")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (d *driver) EndpointOperInfo(nid, eid string) (map[string]interface***REMOVED******REMOVED***, error) ***REMOVED***
-	if err := validateID(nid, eid); err != nil ***REMOVED***
+func (d *driver) EndpointOperInfo(nid, eid string) (map[string]interface{}, error) {
+	if err := validateID(nid, eid); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	n := d.network(nid)
-	if n == nil ***REMOVED***
+	if n == nil {
 		return nil, fmt.Errorf("network id %q not found", nid)
-	***REMOVED***
+	}
 
 	ep := n.endpoint(eid)
-	if ep == nil ***REMOVED***
+	if ep == nil {
 		return nil, fmt.Errorf("endpoint id %q not found", eid)
-	***REMOVED***
+	}
 
-	data := make(map[string]interface***REMOVED******REMOVED***, 1)
+	data := make(map[string]interface{}, 1)
 	data["hnsid"] = ep.profileID
 	data["AllowUnqualifiedDNSQuery"] = true
 
-	if ep.portMapping != nil ***REMOVED***
+	if ep.portMapping != nil {
 		// Return a copy of the operational data
 		pmc := make([]types.PortBinding, 0, len(ep.portMapping))
-		for _, pm := range ep.portMapping ***REMOVED***
+		for _, pm := range ep.portMapping {
 			pmc = append(pmc, pm.GetCopy())
-		***REMOVED***
+		}
 		data[netlabel.PortMap] = pmc
-	***REMOVED***
+	}
 
 	return data, nil
-***REMOVED***
+}

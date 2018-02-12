@@ -1,12 +1,12 @@
 package main
 
-type Dummy struct ***REMOVED***
+type Dummy struct {
 	a, b, c int
-***REMOVED***
+}
 
-func testEllipsis(dummies ...*Dummy) ***REMOVED***
-	for i, d := range dummies ***REMOVED***
+func testEllipsis(dummies ...*Dummy) {
+	for i, d := range dummies {
 		x := dummies[0]
 		
-	***REMOVED***
-***REMOVED***
+	}
+}

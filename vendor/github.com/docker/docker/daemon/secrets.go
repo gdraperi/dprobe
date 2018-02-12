@@ -6,18 +6,18 @@ import (
 )
 
 // SetContainerSecretReferences sets the container secret references needed
-func (daemon *Daemon) SetContainerSecretReferences(name string, refs []*swarmtypes.SecretReference) error ***REMOVED***
-	if !secretsSupported() && len(refs) > 0 ***REMOVED***
+func (daemon *Daemon) SetContainerSecretReferences(name string, refs []*swarmtypes.SecretReference) error {
+	if !secretsSupported() && len(refs) > 0 {
 		logrus.Warn("secrets are not supported on this platform")
 		return nil
-	***REMOVED***
+	}
 
 	c, err := daemon.GetContainer(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	c.SecretReferences = refs
 
 	return nil
-***REMOVED***
+}

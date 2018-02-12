@@ -19,14 +19,14 @@ import (
 
 // A Message represents an IO message.
 //
-//	type Message struct ***REMOVED***
+//	type Message struct {
 //		Buffers [][]byte
 //		OOB     []byte
 //		Addr    net.Addr
 //		N       int
 //		NN      int
 //		Flags   int
-//	***REMOVED***
+//	}
 //
 // The Buffers fields represents a list of contiguous buffers, which
 // can be used for vectored IO, for example, putting a header and a
@@ -65,27 +65,27 @@ type Message = socket.Message
 //
 // On Linux, a batch read will be optimized.
 // On other platforms, this method will read only a single message.
-func (c *payloadHandler) ReadBatch(ms []Message, flags int) (int, error) ***REMOVED***
-	if !c.ok() ***REMOVED***
+func (c *payloadHandler) ReadBatch(ms []Message, flags int) (int, error) {
+	if !c.ok() {
 		return 0, syscall.EINVAL
-	***REMOVED***
-	switch runtime.GOOS ***REMOVED***
+	}
+	switch runtime.GOOS {
 	case "linux":
 		n, err := c.RecvMsgs([]socket.Message(ms), flags)
-		if err != nil ***REMOVED***
-			err = &net.OpError***REMOVED***Op: "read", Net: c.PacketConn.LocalAddr().Network(), Source: c.PacketConn.LocalAddr(), Err: err***REMOVED***
-		***REMOVED***
+		if err != nil {
+			err = &net.OpError{Op: "read", Net: c.PacketConn.LocalAddr().Network(), Source: c.PacketConn.LocalAddr(), Err: err}
+		}
 		return n, err
 	default:
 		n := 1
 		err := c.RecvMsg(&ms[0], flags)
-		if err != nil ***REMOVED***
+		if err != nil {
 			n = 0
-			err = &net.OpError***REMOVED***Op: "read", Net: c.PacketConn.LocalAddr().Network(), Source: c.PacketConn.LocalAddr(), Err: err***REMOVED***
-		***REMOVED***
+			err = &net.OpError{Op: "read", Net: c.PacketConn.LocalAddr().Network(), Source: c.PacketConn.LocalAddr(), Err: err}
+		}
 		return n, err
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // WriteBatch writes a batch of messages.
 //
@@ -96,24 +96,24 @@ func (c *payloadHandler) ReadBatch(ms []Message, flags int) (int, error) ***REMO
 //
 // On Linux, a batch write will be optimized.
 // On other platforms, this method will write only a single message.
-func (c *payloadHandler) WriteBatch(ms []Message, flags int) (int, error) ***REMOVED***
-	if !c.ok() ***REMOVED***
+func (c *payloadHandler) WriteBatch(ms []Message, flags int) (int, error) {
+	if !c.ok() {
 		return 0, syscall.EINVAL
-	***REMOVED***
-	switch runtime.GOOS ***REMOVED***
+	}
+	switch runtime.GOOS {
 	case "linux":
 		n, err := c.SendMsgs([]socket.Message(ms), flags)
-		if err != nil ***REMOVED***
-			err = &net.OpError***REMOVED***Op: "write", Net: c.PacketConn.LocalAddr().Network(), Source: c.PacketConn.LocalAddr(), Err: err***REMOVED***
-		***REMOVED***
+		if err != nil {
+			err = &net.OpError{Op: "write", Net: c.PacketConn.LocalAddr().Network(), Source: c.PacketConn.LocalAddr(), Err: err}
+		}
 		return n, err
 	default:
 		n := 1
 		err := c.SendMsg(&ms[0], flags)
-		if err != nil ***REMOVED***
+		if err != nil {
 			n = 0
-			err = &net.OpError***REMOVED***Op: "write", Net: c.PacketConn.LocalAddr().Network(), Source: c.PacketConn.LocalAddr(), Err: err***REMOVED***
-		***REMOVED***
+			err = &net.OpError{Op: "write", Net: c.PacketConn.LocalAddr().Network(), Source: c.PacketConn.LocalAddr(), Err: err}
+		}
 		return n, err
-	***REMOVED***
-***REMOVED***
+	}
+}

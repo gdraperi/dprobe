@@ -33,28 +33,28 @@
 //    )
 //
 //    var (
-//    	cpuTemp = prometheus.NewGauge(prometheus.GaugeOpts***REMOVED***
+//    	cpuTemp = prometheus.NewGauge(prometheus.GaugeOpts{
 //    		Name: "cpu_temperature_celsius",
 //    		Help: "Current temperature of the CPU.",
-//    	***REMOVED***)
-//    	hdFailures = prometheus.NewCounter(prometheus.CounterOpts***REMOVED***
+//    	})
+//    	hdFailures = prometheus.NewCounter(prometheus.CounterOpts{
 //    		Name: "hd_errors_total",
 //    		Help: "Number of hard-disk errors.",
-//    	***REMOVED***)
+//    	})
 //    )
 //
-//    func init() ***REMOVED***
+//    func init() {
 //    	prometheus.MustRegister(cpuTemp)
 //    	prometheus.MustRegister(hdFailures)
-//***REMOVED***
+//    }
 //
-//    func main() ***REMOVED***
+//    func main() {
 //    	cpuTemp.Set(65.3)
 //    	hdFailures.Inc()
 //
 //    	http.Handle("/metrics", prometheus.Handler())
 //    	http.ListenAndServe(":8080", nil)
-//***REMOVED***
+//    }
 //
 //
 // This is a complete program that exports two metrics, a Gauge and a Counter.

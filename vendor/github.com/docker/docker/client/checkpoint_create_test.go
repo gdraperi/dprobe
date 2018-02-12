@@ -13,61 +13,61 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestCheckpointCreateError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestCheckpointCreateError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
-	***REMOVED***
-	err := client.CheckpointCreate(context.Background(), "nothing", types.CheckpointCreateOptions***REMOVED***
+	}
+	err := client.CheckpointCreate(context.Background(), "nothing", types.CheckpointCreateOptions{
 		CheckpointID: "noting",
 		Exit:         true,
-	***REMOVED***)
+	})
 
-	if err == nil || err.Error() != "Error response from daemon: Server error" ***REMOVED***
+	if err == nil || err.Error() != "Error response from daemon: Server error" {
 		t.Fatalf("expected a Server Error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestCheckpointCreate(t *testing.T) ***REMOVED***
+func TestCheckpointCreate(t *testing.T) {
 	expectedContainerID := "container_id"
 	expectedCheckpointID := "checkpoint_id"
 	expectedURL := "/containers/container_id/checkpoints"
 
-	client := &Client***REMOVED***
-		client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-			if !strings.HasPrefix(req.URL.Path, expectedURL) ***REMOVED***
+	client := &Client{
+		client: newMockClient(func(req *http.Request) (*http.Response, error) {
+			if !strings.HasPrefix(req.URL.Path, expectedURL) {
 				return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, req.URL)
-			***REMOVED***
+			}
 
-			if req.Method != "POST" ***REMOVED***
+			if req.Method != "POST" {
 				return nil, fmt.Errorf("expected POST method, got %s", req.Method)
-			***REMOVED***
+			}
 
-			createOptions := &types.CheckpointCreateOptions***REMOVED******REMOVED***
-			if err := json.NewDecoder(req.Body).Decode(createOptions); err != nil ***REMOVED***
+			createOptions := &types.CheckpointCreateOptions{}
+			if err := json.NewDecoder(req.Body).Decode(createOptions); err != nil {
 				return nil, err
-			***REMOVED***
+			}
 
-			if createOptions.CheckpointID != expectedCheckpointID ***REMOVED***
+			if createOptions.CheckpointID != expectedCheckpointID {
 				return nil, fmt.Errorf("expected CheckpointID to be 'checkpoint_id', got %v", createOptions.CheckpointID)
-			***REMOVED***
+			}
 
-			if !createOptions.Exit ***REMOVED***
+			if !createOptions.Exit {
 				return nil, fmt.Errorf("expected Exit to be true")
-			***REMOVED***
+			}
 
-			return &http.Response***REMOVED***
+			return &http.Response{
 				StatusCode: http.StatusOK,
 				Body:       ioutil.NopCloser(bytes.NewReader([]byte(""))),
-			***REMOVED***, nil
-		***REMOVED***),
-	***REMOVED***
+			}, nil
+		}),
+	}
 
-	err := client.CheckpointCreate(context.Background(), expectedContainerID, types.CheckpointCreateOptions***REMOVED***
+	err := client.CheckpointCreate(context.Background(), expectedContainerID, types.CheckpointCreateOptions{
 		CheckpointID: expectedCheckpointID,
 		Exit:         true,
-	***REMOVED***)
+	})
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}

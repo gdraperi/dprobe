@@ -12,7 +12,7 @@ import (
 	"github.com/go-check/check"
 )
 
-func (s *DockerSwarmSuite) TestSwarmVolumePlugin(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestSwarmVolumePlugin(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 
 	out, err := d.Cmd("service", "create", "--detach", "--no-resolve-image", "--mount", "type=volume,source=my-volume,destination=/foo,volume-driver=customvolumedriver", "--name", "top", "busybox", "top")
@@ -38,22 +38,22 @@ func (s *DockerSwarmSuite) TestSwarmVolumePlugin(c *check.C) ***REMOVED***
 	c.Assert(err, checker.IsNil)
 	containerID := strings.TrimSpace(out)
 
-	out, err = d.Cmd("inspect", "-f", "***REMOVED******REMOVED***json .Mounts***REMOVED******REMOVED***", containerID)
+	out, err = d.Cmd("inspect", "-f", "{{json .Mounts}}", containerID)
 	c.Assert(err, checker.IsNil)
 
-	var mounts []struct ***REMOVED***
+	var mounts []struct {
 		Name   string
 		Driver string
-	***REMOVED***
+	}
 
 	c.Assert(json.NewDecoder(strings.NewReader(out)).Decode(&mounts), checker.IsNil)
 	c.Assert(len(mounts), checker.Equals, 1, check.Commentf(out))
 	c.Assert(mounts[0].Name, checker.Equals, "my-volume")
 	c.Assert(mounts[0].Driver, checker.Equals, "customvolumedriver")
-***REMOVED***
+}
 
 // Test network plugin filter in swarm
-func (s *DockerSwarmSuite) TestSwarmNetworkPluginV2(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestSwarmNetworkPluginV2(c *check.C) {
 	testRequires(c, IsAmd64)
 	d1 := s.AddDaemon(c, true, true)
 	d2 := s.AddDaemon(c, true, false)
@@ -100,5 +100,5 @@ func (s *DockerSwarmSuite) TestSwarmNetworkPluginV2(c *check.C) ***REMOVED***
 	c.Assert(err, checker.IsNil)
 
 	waitAndAssert(c, defaultReconciliationTimeout, d1.CheckRunningTaskImages, checker.DeepEquals,
-		map[string]int***REMOVED***image: 1***REMOVED***)
-***REMOVED***
+		map[string]int{image: 1})
+}

@@ -51,8 +51,8 @@ in this Software without prior written authorization of the copyright holder.
 
 /* Portable, consistent toupper (remember EBCDIC). Do not use toupper() because
    its behavior is altered by the current locale. */
-static char Curl_raw_toupper(char in) ***REMOVED***
-  switch (in) ***REMOVED***
+static char Curl_raw_toupper(char in) {
+  switch (in) {
     case 'a':
       return 'A';
     case 'b':
@@ -105,9 +105,9 @@ static char Curl_raw_toupper(char in) ***REMOVED***
       return 'Y';
     case 'z':
       return 'Z';
-  ***REMOVED***
+  }
   return in;
-***REMOVED***
+}
 
 /*
  * Curl_raw_equal() is for doing "raw" case insensitive strings. This is meant
@@ -119,34 +119,34 @@ static char Curl_raw_toupper(char in) ***REMOVED***
  * non-ascii.
  */
 
-static int Curl_raw_equal(const char *first, const char *second) ***REMOVED***
-  while (*first && *second) ***REMOVED***
+static int Curl_raw_equal(const char *first, const char *second) {
+  while (*first && *second) {
     if (Curl_raw_toupper(*first) != Curl_raw_toupper(*second))
       /* get out of the loop as soon as they don't match */
       break;
     first++;
     second++;
-  ***REMOVED***
+  }
   /* we do the comparison here (possibly again), just to make sure that if the
      loop above is skipped because one of the strings reached zero, we must not
      return this as a successful match */
   return (Curl_raw_toupper(*first) == Curl_raw_toupper(*second));
-***REMOVED***
+}
 
-static int Curl_raw_nequal(const char *first, const char *second, size_t max) ***REMOVED***
-  while (*first && *second && max) ***REMOVED***
-    if (Curl_raw_toupper(*first) != Curl_raw_toupper(*second)) ***REMOVED***
+static int Curl_raw_nequal(const char *first, const char *second, size_t max) {
+  while (*first && *second && max) {
+    if (Curl_raw_toupper(*first) != Curl_raw_toupper(*second)) {
       break;
-***REMOVED***
+    }
     max--;
     first++;
     second++;
-  ***REMOVED***
+  }
   if (0 == max)
     return 1; /* they are equal this far */
 
   return Curl_raw_toupper(*first) == Curl_raw_toupper(*second);
-***REMOVED***
+}
 
 /*
  * Match a hostname against a wildcard pattern.
@@ -157,7 +157,7 @@ static int Curl_raw_nequal(const char *first, const char *second, size_t max) **
  * http://tools.ietf.org/html/rfc6125#section-6.4.3
  */
 
-static int hostmatch(const char *hostname, const char *pattern) ***REMOVED***
+static int hostmatch(const char *hostname, const char *pattern) {
   const char *pattern_label_end, *pattern_wildcard, *hostname_label_end;
   int wildcard_enabled;
   size_t prefixlen, suffixlen;
@@ -173,9 +173,9 @@ static int hostmatch(const char *hostname, const char *pattern) ***REMOVED***
   if (pattern_label_end == NULL ||
       strchr(pattern_label_end + 1, '.') == NULL ||
       pattern_wildcard > pattern_label_end ||
-      Curl_raw_nequal(pattern, "xn--", 4)) ***REMOVED***
+      Curl_raw_nequal(pattern, "xn--", 4)) {
     wildcard_enabled = 0;
-  ***REMOVED***
+  }
   if (!wildcard_enabled)
     return Curl_raw_equal(pattern, hostname) ? CURL_HOST_MATCH
                                              : CURL_HOST_NOMATCH;
@@ -198,9 +198,9 @@ static int hostmatch(const char *hostname, const char *pattern) ***REMOVED***
                                  hostname_label_end - suffixlen, suffixlen)
              ? CURL_HOST_MATCH
              : CURL_HOST_NOMATCH;
-***REMOVED***
+}
 
-int Curl_cert_hostcheck(const char *match_pattern, const char *hostname) ***REMOVED***
+int Curl_cert_hostcheck(const char *match_pattern, const char *hostname) {
   if (!match_pattern || !*match_pattern || !hostname ||
       !*hostname) /* sanity check */
     return 0;
@@ -211,4 +211,4 @@ int Curl_cert_hostcheck(const char *match_pattern, const char *hostname) ***REMO
   if (hostmatch(hostname, match_pattern) == CURL_HOST_MATCH)
     return 1;
   return 0;
-***REMOVED***
+}

@@ -22,7 +22,7 @@ import (
 	"github.com/godbus/dbus"
 )
 
-func (c *Conn) jobComplete(signal *dbus.Signal) ***REMOVED***
+func (c *Conn) jobComplete(signal *dbus.Signal) {
 	var id uint32
 	var job dbus.ObjectPath
 	var unit string
@@ -30,34 +30,34 @@ func (c *Conn) jobComplete(signal *dbus.Signal) ***REMOVED***
 	dbus.Store(signal.Body, &id, &job, &unit, &result)
 	c.jobListener.Lock()
 	out, ok := c.jobListener.jobs[job]
-	if ok ***REMOVED***
+	if ok {
 		out <- result
 		delete(c.jobListener.jobs, job)
-	***REMOVED***
+	}
 	c.jobListener.Unlock()
-***REMOVED***
+}
 
-func (c *Conn) startJob(ch chan<- string, job string, args ...interface***REMOVED******REMOVED***) (int, error) ***REMOVED***
-	if ch != nil ***REMOVED***
+func (c *Conn) startJob(ch chan<- string, job string, args ...interface{}) (int, error) {
+	if ch != nil {
 		c.jobListener.Lock()
 		defer c.jobListener.Unlock()
-	***REMOVED***
+	}
 
 	var p dbus.ObjectPath
 	err := c.sysobj.Call(job, 0, args...).Store(&p)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 
-	if ch != nil ***REMOVED***
+	if ch != nil {
 		c.jobListener.jobs[p] = ch
-	***REMOVED***
+	}
 
 	// ignore error since 0 is fine if conversion fails
 	jobID, _ := strconv.Atoi(path.Base(string(p)))
 
 	return jobID, nil
-***REMOVED***
+}
 
 // StartUnit enqueues a start job and depending jobs, if any (unless otherwise
 // specified by the mode string).
@@ -89,127 +89,127 @@ func (c *Conn) startJob(ch chan<- string, job string, args ...interface***REMOVE
 // should not be considered authoritative.
 //
 // If an error does occur, it will be returned to the user alongside a job ID of 0.
-func (c *Conn) StartUnit(name string, mode string, ch chan<- string) (int, error) ***REMOVED***
+func (c *Conn) StartUnit(name string, mode string, ch chan<- string) (int, error) {
 	return c.startJob(ch, "org.freedesktop.systemd1.Manager.StartUnit", name, mode)
-***REMOVED***
+}
 
 // StopUnit is similar to StartUnit but stops the specified unit rather
 // than starting it.
-func (c *Conn) StopUnit(name string, mode string, ch chan<- string) (int, error) ***REMOVED***
+func (c *Conn) StopUnit(name string, mode string, ch chan<- string) (int, error) {
 	return c.startJob(ch, "org.freedesktop.systemd1.Manager.StopUnit", name, mode)
-***REMOVED***
+}
 
 // ReloadUnit reloads a unit.  Reloading is done only if the unit is already running and fails otherwise.
-func (c *Conn) ReloadUnit(name string, mode string, ch chan<- string) (int, error) ***REMOVED***
+func (c *Conn) ReloadUnit(name string, mode string, ch chan<- string) (int, error) {
 	return c.startJob(ch, "org.freedesktop.systemd1.Manager.ReloadUnit", name, mode)
-***REMOVED***
+}
 
 // RestartUnit restarts a service.  If a service is restarted that isn't
 // running it will be started.
-func (c *Conn) RestartUnit(name string, mode string, ch chan<- string) (int, error) ***REMOVED***
+func (c *Conn) RestartUnit(name string, mode string, ch chan<- string) (int, error) {
 	return c.startJob(ch, "org.freedesktop.systemd1.Manager.RestartUnit", name, mode)
-***REMOVED***
+}
 
 // TryRestartUnit is like RestartUnit, except that a service that isn't running
 // is not affected by the restart.
-func (c *Conn) TryRestartUnit(name string, mode string, ch chan<- string) (int, error) ***REMOVED***
+func (c *Conn) TryRestartUnit(name string, mode string, ch chan<- string) (int, error) {
 	return c.startJob(ch, "org.freedesktop.systemd1.Manager.TryRestartUnit", name, mode)
-***REMOVED***
+}
 
 // ReloadOrRestart attempts a reload if the unit supports it and use a restart
 // otherwise.
-func (c *Conn) ReloadOrRestartUnit(name string, mode string, ch chan<- string) (int, error) ***REMOVED***
+func (c *Conn) ReloadOrRestartUnit(name string, mode string, ch chan<- string) (int, error) {
 	return c.startJob(ch, "org.freedesktop.systemd1.Manager.ReloadOrRestartUnit", name, mode)
-***REMOVED***
+}
 
 // ReloadOrTryRestart attempts a reload if the unit supports it and use a "Try"
 // flavored restart otherwise.
-func (c *Conn) ReloadOrTryRestartUnit(name string, mode string, ch chan<- string) (int, error) ***REMOVED***
+func (c *Conn) ReloadOrTryRestartUnit(name string, mode string, ch chan<- string) (int, error) {
 	return c.startJob(ch, "org.freedesktop.systemd1.Manager.ReloadOrTryRestartUnit", name, mode)
-***REMOVED***
+}
 
 // StartTransientUnit() may be used to create and start a transient unit, which
 // will be released as soon as it is not running or referenced anymore or the
 // system is rebooted. name is the unit name including suffix, and must be
 // unique. mode is the same as in StartUnit(), properties contains properties
 // of the unit.
-func (c *Conn) StartTransientUnit(name string, mode string, properties []Property, ch chan<- string) (int, error) ***REMOVED***
+func (c *Conn) StartTransientUnit(name string, mode string, properties []Property, ch chan<- string) (int, error) {
 	return c.startJob(ch, "org.freedesktop.systemd1.Manager.StartTransientUnit", name, mode, properties, make([]PropertyCollection, 0))
-***REMOVED***
+}
 
 // KillUnit takes the unit name and a UNIX signal number to send.  All of the unit's
 // processes are killed.
-func (c *Conn) KillUnit(name string, signal int32) ***REMOVED***
+func (c *Conn) KillUnit(name string, signal int32) {
 	c.sysobj.Call("org.freedesktop.systemd1.Manager.KillUnit", 0, name, "all", signal).Store()
-***REMOVED***
+}
 
 // ResetFailedUnit resets the "failed" state of a specific unit.
-func (c *Conn) ResetFailedUnit(name string) error ***REMOVED***
+func (c *Conn) ResetFailedUnit(name string) error {
 	return c.sysobj.Call("org.freedesktop.systemd1.Manager.ResetFailedUnit", 0, name).Store()
-***REMOVED***
+}
 
 // getProperties takes the unit name and returns all of its dbus object properties, for the given dbus interface
-func (c *Conn) getProperties(unit string, dbusInterface string) (map[string]interface***REMOVED******REMOVED***, error) ***REMOVED***
+func (c *Conn) getProperties(unit string, dbusInterface string) (map[string]interface{}, error) {
 	var err error
 	var props map[string]dbus.Variant
 
 	path := unitPath(unit)
-	if !path.IsValid() ***REMOVED***
+	if !path.IsValid() {
 		return nil, errors.New("invalid unit name: " + unit)
-	***REMOVED***
+	}
 
 	obj := c.sysconn.Object("org.freedesktop.systemd1", path)
 	err = obj.Call("org.freedesktop.DBus.Properties.GetAll", 0, dbusInterface).Store(&props)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	out := make(map[string]interface***REMOVED******REMOVED***, len(props))
-	for k, v := range props ***REMOVED***
+	out := make(map[string]interface{}, len(props))
+	for k, v := range props {
 		out[k] = v.Value()
-	***REMOVED***
+	}
 
 	return out, nil
-***REMOVED***
+}
 
 // GetUnitProperties takes the unit name and returns all of its dbus object properties.
-func (c *Conn) GetUnitProperties(unit string) (map[string]interface***REMOVED******REMOVED***, error) ***REMOVED***
+func (c *Conn) GetUnitProperties(unit string) (map[string]interface{}, error) {
 	return c.getProperties(unit, "org.freedesktop.systemd1.Unit")
-***REMOVED***
+}
 
-func (c *Conn) getProperty(unit string, dbusInterface string, propertyName string) (*Property, error) ***REMOVED***
+func (c *Conn) getProperty(unit string, dbusInterface string, propertyName string) (*Property, error) {
 	var err error
 	var prop dbus.Variant
 
 	path := unitPath(unit)
-	if !path.IsValid() ***REMOVED***
+	if !path.IsValid() {
 		return nil, errors.New("invalid unit name: " + unit)
-	***REMOVED***
+	}
 
 	obj := c.sysconn.Object("org.freedesktop.systemd1", path)
 	err = obj.Call("org.freedesktop.DBus.Properties.Get", 0, dbusInterface, propertyName).Store(&prop)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	return &Property***REMOVED***Name: propertyName, Value: prop***REMOVED***, nil
-***REMOVED***
+	return &Property{Name: propertyName, Value: prop}, nil
+}
 
-func (c *Conn) GetUnitProperty(unit string, propertyName string) (*Property, error) ***REMOVED***
+func (c *Conn) GetUnitProperty(unit string, propertyName string) (*Property, error) {
 	return c.getProperty(unit, "org.freedesktop.systemd1.Unit", propertyName)
-***REMOVED***
+}
 
 // GetServiceProperty returns property for given service name and property name
-func (c *Conn) GetServiceProperty(service string, propertyName string) (*Property, error) ***REMOVED***
+func (c *Conn) GetServiceProperty(service string, propertyName string) (*Property, error) {
 	return c.getProperty(service, "org.freedesktop.systemd1.Service", propertyName)
-***REMOVED***
+}
 
 // GetUnitTypeProperties returns the extra properties for a unit, specific to the unit type.
 // Valid values for unitType: Service, Socket, Target, Device, Mount, Automount, Snapshot, Timer, Swap, Path, Slice, Scope
 // return "dbus.Error: Unknown interface" if the unitType is not the correct type of the unit
-func (c *Conn) GetUnitTypeProperties(unit string, unitType string) (map[string]interface***REMOVED******REMOVED***, error) ***REMOVED***
+func (c *Conn) GetUnitTypeProperties(unit string, unitType string) (map[string]interface{}, error) {
 	return c.getProperties(unit, "org.freedesktop.systemd1."+unitType)
-***REMOVED***
+}
 
 // SetUnitProperties() may be used to modify certain unit properties at runtime.
 // Not all properties may be changed at runtime, but many resource management
@@ -218,15 +218,15 @@ func (c *Conn) GetUnitTypeProperties(unit string, unitType string) (map[string]i
 // case the settings only apply until the next reboot. name is the name of the unit
 // to modify. properties are the settings to set, encoded as an array of property
 // name and value pairs.
-func (c *Conn) SetUnitProperties(name string, runtime bool, properties ...Property) error ***REMOVED***
+func (c *Conn) SetUnitProperties(name string, runtime bool, properties ...Property) error {
 	return c.sysobj.Call("org.freedesktop.systemd1.Manager.SetUnitProperties", 0, name, runtime, properties).Store()
-***REMOVED***
+}
 
-func (c *Conn) GetUnitTypeProperty(unit string, unitType string, propertyName string) (*Property, error) ***REMOVED***
+func (c *Conn) GetUnitTypeProperty(unit string, unitType string, propertyName string) (*Property, error) {
 	return c.getProperty(unit, "org.freedesktop.systemd1."+unitType, propertyName)
-***REMOVED***
+}
 
-type UnitStatus struct ***REMOVED***
+type UnitStatus struct {
 	Name        string          // The primary unit name as string
 	Description string          // The human readable description string
 	LoadState   string          // The load state (i.e. whether the unit file has been loaded successfully)
@@ -237,105 +237,105 @@ type UnitStatus struct ***REMOVED***
 	JobId       uint32          // If there is a job queued for the job unit the numeric job id, 0 otherwise
 	JobType     string          // The job type as string
 	JobPath     dbus.ObjectPath // The job object path
-***REMOVED***
+}
 
-type storeFunc func(retvalues ...interface***REMOVED******REMOVED***) error
+type storeFunc func(retvalues ...interface{}) error
 
-func (c *Conn) listUnitsInternal(f storeFunc) ([]UnitStatus, error) ***REMOVED***
-	result := make([][]interface***REMOVED******REMOVED***, 0)
+func (c *Conn) listUnitsInternal(f storeFunc) ([]UnitStatus, error) {
+	result := make([][]interface{}, 0)
 	err := f(&result)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	resultInterface := make([]interface***REMOVED******REMOVED***, len(result))
-	for i := range result ***REMOVED***
+	resultInterface := make([]interface{}, len(result))
+	for i := range result {
 		resultInterface[i] = result[i]
-	***REMOVED***
+	}
 
 	status := make([]UnitStatus, len(result))
-	statusInterface := make([]interface***REMOVED******REMOVED***, len(status))
-	for i := range status ***REMOVED***
+	statusInterface := make([]interface{}, len(status))
+	for i := range status {
 		statusInterface[i] = &status[i]
-	***REMOVED***
+	}
 
 	err = dbus.Store(resultInterface, statusInterface...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	return status, nil
-***REMOVED***
+}
 
 // ListUnits returns an array with all currently loaded units. Note that
 // units may be known by multiple names at the same time, and hence there might
 // be more unit names loaded than actual units behind them.
-func (c *Conn) ListUnits() ([]UnitStatus, error) ***REMOVED***
+func (c *Conn) ListUnits() ([]UnitStatus, error) {
 	return c.listUnitsInternal(c.sysobj.Call("org.freedesktop.systemd1.Manager.ListUnits", 0).Store)
-***REMOVED***
+}
 
 // ListUnitsFiltered returns an array with units filtered by state.
 // It takes a list of units' statuses to filter.
-func (c *Conn) ListUnitsFiltered(states []string) ([]UnitStatus, error) ***REMOVED***
+func (c *Conn) ListUnitsFiltered(states []string) ([]UnitStatus, error) {
 	return c.listUnitsInternal(c.sysobj.Call("org.freedesktop.systemd1.Manager.ListUnitsFiltered", 0, states).Store)
-***REMOVED***
+}
 
 // ListUnitsByPatterns returns an array with units.
 // It takes a list of units' statuses and names to filter.
 // Note that units may be known by multiple names at the same time,
 // and hence there might be more unit names loaded than actual units behind them.
-func (c *Conn) ListUnitsByPatterns(states []string, patterns []string) ([]UnitStatus, error) ***REMOVED***
+func (c *Conn) ListUnitsByPatterns(states []string, patterns []string) ([]UnitStatus, error) {
 	return c.listUnitsInternal(c.sysobj.Call("org.freedesktop.systemd1.Manager.ListUnitsByPatterns", 0, states, patterns).Store)
-***REMOVED***
+}
 
 // ListUnitsByNames returns an array with units. It takes a list of units'
 // names and returns an UnitStatus array. Comparing to ListUnitsByPatterns
 // method, this method returns statuses even for inactive or non-existing
 // units. Input array should contain exact unit names, but not patterns.
-func (c *Conn) ListUnitsByNames(units []string) ([]UnitStatus, error) ***REMOVED***
+func (c *Conn) ListUnitsByNames(units []string) ([]UnitStatus, error) {
 	return c.listUnitsInternal(c.sysobj.Call("org.freedesktop.systemd1.Manager.ListUnitsByNames", 0, units).Store)
-***REMOVED***
+}
 
-type UnitFile struct ***REMOVED***
+type UnitFile struct {
 	Path string
 	Type string
-***REMOVED***
+}
 
-func (c *Conn) listUnitFilesInternal(f storeFunc) ([]UnitFile, error) ***REMOVED***
-	result := make([][]interface***REMOVED******REMOVED***, 0)
+func (c *Conn) listUnitFilesInternal(f storeFunc) ([]UnitFile, error) {
+	result := make([][]interface{}, 0)
 	err := f(&result)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	resultInterface := make([]interface***REMOVED******REMOVED***, len(result))
-	for i := range result ***REMOVED***
+	resultInterface := make([]interface{}, len(result))
+	for i := range result {
 		resultInterface[i] = result[i]
-	***REMOVED***
+	}
 
 	files := make([]UnitFile, len(result))
-	fileInterface := make([]interface***REMOVED******REMOVED***, len(files))
-	for i := range files ***REMOVED***
+	fileInterface := make([]interface{}, len(files))
+	for i := range files {
 		fileInterface[i] = &files[i]
-	***REMOVED***
+	}
 
 	err = dbus.Store(resultInterface, fileInterface...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	return files, nil
-***REMOVED***
+}
 
 // ListUnitFiles returns an array of all available units on disk.
-func (c *Conn) ListUnitFiles() ([]UnitFile, error) ***REMOVED***
+func (c *Conn) ListUnitFiles() ([]UnitFile, error) {
 	return c.listUnitFilesInternal(c.sysobj.Call("org.freedesktop.systemd1.Manager.ListUnitFiles", 0).Store)
-***REMOVED***
+}
 
 // ListUnitFilesByPatterns returns an array of all available units on disk matched the patterns.
-func (c *Conn) ListUnitFilesByPatterns(states []string, patterns []string) ([]UnitFile, error) ***REMOVED***
+func (c *Conn) ListUnitFilesByPatterns(states []string, patterns []string) ([]UnitFile, error) {
 	return c.listUnitFilesInternal(c.sysobj.Call("org.freedesktop.systemd1.Manager.ListUnitFilesByPatterns", 0, states, patterns).Store)
-***REMOVED***
+}
 
 type LinkUnitFileChange EnableUnitFileChange
 
@@ -353,31 +353,31 @@ type LinkUnitFileChange EnableUnitFileChange
 // structures with three strings: the type of the change (one of symlink
 // or unlink), the file name of the symlink and the destination of the
 // symlink.
-func (c *Conn) LinkUnitFiles(files []string, runtime bool, force bool) ([]LinkUnitFileChange, error) ***REMOVED***
-	result := make([][]interface***REMOVED******REMOVED***, 0)
+func (c *Conn) LinkUnitFiles(files []string, runtime bool, force bool) ([]LinkUnitFileChange, error) {
+	result := make([][]interface{}, 0)
 	err := c.sysobj.Call("org.freedesktop.systemd1.Manager.LinkUnitFiles", 0, files, runtime, force).Store(&result)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	resultInterface := make([]interface***REMOVED******REMOVED***, len(result))
-	for i := range result ***REMOVED***
+	resultInterface := make([]interface{}, len(result))
+	for i := range result {
 		resultInterface[i] = result[i]
-	***REMOVED***
+	}
 
 	changes := make([]LinkUnitFileChange, len(result))
-	changesInterface := make([]interface***REMOVED******REMOVED***, len(changes))
-	for i := range changes ***REMOVED***
+	changesInterface := make([]interface{}, len(changes))
+	for i := range changes {
 		changesInterface[i] = &changes[i]
-	***REMOVED***
+	}
 
 	err = dbus.Store(resultInterface, changesInterface...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	return changes, nil
-***REMOVED***
+}
 
 // EnableUnitFiles() may be used to enable one or more units in the system (by
 // creating symlinks to them in /etc or /run).
@@ -395,39 +395,39 @@ func (c *Conn) LinkUnitFiles(files []string, runtime bool, force bool) ([]LinkUn
 // structures with three strings: the type of the change (one of symlink
 // or unlink), the file name of the symlink and the destination of the
 // symlink.
-func (c *Conn) EnableUnitFiles(files []string, runtime bool, force bool) (bool, []EnableUnitFileChange, error) ***REMOVED***
+func (c *Conn) EnableUnitFiles(files []string, runtime bool, force bool) (bool, []EnableUnitFileChange, error) {
 	var carries_install_info bool
 
-	result := make([][]interface***REMOVED******REMOVED***, 0)
+	result := make([][]interface{}, 0)
 	err := c.sysobj.Call("org.freedesktop.systemd1.Manager.EnableUnitFiles", 0, files, runtime, force).Store(&carries_install_info, &result)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return false, nil, err
-	***REMOVED***
+	}
 
-	resultInterface := make([]interface***REMOVED******REMOVED***, len(result))
-	for i := range result ***REMOVED***
+	resultInterface := make([]interface{}, len(result))
+	for i := range result {
 		resultInterface[i] = result[i]
-	***REMOVED***
+	}
 
 	changes := make([]EnableUnitFileChange, len(result))
-	changesInterface := make([]interface***REMOVED******REMOVED***, len(changes))
-	for i := range changes ***REMOVED***
+	changesInterface := make([]interface{}, len(changes))
+	for i := range changes {
 		changesInterface[i] = &changes[i]
-	***REMOVED***
+	}
 
 	err = dbus.Store(resultInterface, changesInterface...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return false, nil, err
-	***REMOVED***
+	}
 
 	return carries_install_info, changes, nil
-***REMOVED***
+}
 
-type EnableUnitFileChange struct ***REMOVED***
+type EnableUnitFileChange struct {
 	Type        string // Type of the change (one of symlink or unlink)
 	Filename    string // File name of the symlink
 	Destination string // Destination of the symlink
-***REMOVED***
+}
 
 // DisableUnitFiles() may be used to disable one or more units in the system (by
 // removing symlinks to them from /etc or /run).
@@ -441,37 +441,37 @@ type EnableUnitFileChange struct ***REMOVED***
 // consists of structures with three strings: the type of the change (one of
 // symlink or unlink), the file name of the symlink and the destination of the
 // symlink.
-func (c *Conn) DisableUnitFiles(files []string, runtime bool) ([]DisableUnitFileChange, error) ***REMOVED***
-	result := make([][]interface***REMOVED******REMOVED***, 0)
+func (c *Conn) DisableUnitFiles(files []string, runtime bool) ([]DisableUnitFileChange, error) {
+	result := make([][]interface{}, 0)
 	err := c.sysobj.Call("org.freedesktop.systemd1.Manager.DisableUnitFiles", 0, files, runtime).Store(&result)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	resultInterface := make([]interface***REMOVED******REMOVED***, len(result))
-	for i := range result ***REMOVED***
+	resultInterface := make([]interface{}, len(result))
+	for i := range result {
 		resultInterface[i] = result[i]
-	***REMOVED***
+	}
 
 	changes := make([]DisableUnitFileChange, len(result))
-	changesInterface := make([]interface***REMOVED******REMOVED***, len(changes))
-	for i := range changes ***REMOVED***
+	changesInterface := make([]interface{}, len(changes))
+	for i := range changes {
 		changesInterface[i] = &changes[i]
-	***REMOVED***
+	}
 
 	err = dbus.Store(resultInterface, changesInterface...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	return changes, nil
-***REMOVED***
+}
 
-type DisableUnitFileChange struct ***REMOVED***
+type DisableUnitFileChange struct {
 	Type        string // Type of the change (one of symlink or unlink)
 	Filename    string // File name of the symlink
 	Destination string // Destination of the symlink
-***REMOVED***
+}
 
 // MaskUnitFiles masks one or more units in the system
 //
@@ -482,37 +482,37 @@ type DisableUnitFileChange struct ***REMOVED***
 //   * runtime to specify whether the unit was enabled for runtime
 //     only (true, /run/systemd/..), or persistently (false, /etc/systemd/..)
 //   * force flag
-func (c *Conn) MaskUnitFiles(files []string, runtime bool, force bool) ([]MaskUnitFileChange, error) ***REMOVED***
-	result := make([][]interface***REMOVED******REMOVED***, 0)
+func (c *Conn) MaskUnitFiles(files []string, runtime bool, force bool) ([]MaskUnitFileChange, error) {
+	result := make([][]interface{}, 0)
 	err := c.sysobj.Call("org.freedesktop.systemd1.Manager.MaskUnitFiles", 0, files, runtime, force).Store(&result)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	resultInterface := make([]interface***REMOVED******REMOVED***, len(result))
-	for i := range result ***REMOVED***
+	resultInterface := make([]interface{}, len(result))
+	for i := range result {
 		resultInterface[i] = result[i]
-	***REMOVED***
+	}
 
 	changes := make([]MaskUnitFileChange, len(result))
-	changesInterface := make([]interface***REMOVED******REMOVED***, len(changes))
-	for i := range changes ***REMOVED***
+	changesInterface := make([]interface{}, len(changes))
+	for i := range changes {
 		changesInterface[i] = &changes[i]
-	***REMOVED***
+	}
 
 	err = dbus.Store(resultInterface, changesInterface...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	return changes, nil
-***REMOVED***
+}
 
-type MaskUnitFileChange struct ***REMOVED***
+type MaskUnitFileChange struct {
 	Type        string // Type of the change (one of symlink or unlink)
 	Filename    string // File name of the symlink
 	Destination string // Destination of the symlink
-***REMOVED***
+}
 
 // UnmaskUnitFiles unmasks one or more units in the system
 //
@@ -522,44 +522,44 @@ type MaskUnitFileChange struct ***REMOVED***
 //     the usual unit search paths)
 //   * runtime to specify whether the unit was enabled for runtime
 //     only (true, /run/systemd/..), or persistently (false, /etc/systemd/..)
-func (c *Conn) UnmaskUnitFiles(files []string, runtime bool) ([]UnmaskUnitFileChange, error) ***REMOVED***
-	result := make([][]interface***REMOVED******REMOVED***, 0)
+func (c *Conn) UnmaskUnitFiles(files []string, runtime bool) ([]UnmaskUnitFileChange, error) {
+	result := make([][]interface{}, 0)
 	err := c.sysobj.Call("org.freedesktop.systemd1.Manager.UnmaskUnitFiles", 0, files, runtime).Store(&result)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	resultInterface := make([]interface***REMOVED******REMOVED***, len(result))
-	for i := range result ***REMOVED***
+	resultInterface := make([]interface{}, len(result))
+	for i := range result {
 		resultInterface[i] = result[i]
-	***REMOVED***
+	}
 
 	changes := make([]UnmaskUnitFileChange, len(result))
-	changesInterface := make([]interface***REMOVED******REMOVED***, len(changes))
-	for i := range changes ***REMOVED***
+	changesInterface := make([]interface{}, len(changes))
+	for i := range changes {
 		changesInterface[i] = &changes[i]
-	***REMOVED***
+	}
 
 	err = dbus.Store(resultInterface, changesInterface...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	return changes, nil
-***REMOVED***
+}
 
-type UnmaskUnitFileChange struct ***REMOVED***
+type UnmaskUnitFileChange struct {
 	Type        string // Type of the change (one of symlink or unlink)
 	Filename    string // File name of the symlink
 	Destination string // Destination of the symlink
-***REMOVED***
+}
 
 // Reload instructs systemd to scan for and reload unit files. This is
 // equivalent to a 'systemctl daemon-reload'.
-func (c *Conn) Reload() error ***REMOVED***
+func (c *Conn) Reload() error {
 	return c.sysobj.Call("org.freedesktop.systemd1.Manager.Reload", 0).Store()
-***REMOVED***
+}
 
-func unitPath(name string) dbus.ObjectPath ***REMOVED***
+func unitPath(name string) dbus.ObjectPath {
 	return dbus.ObjectPath("/org/freedesktop/systemd1/unit/" + PathBusEscape(name))
-***REMOVED***
+}

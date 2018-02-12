@@ -11,6 +11,6 @@ var (
 // platform. It will be passed in something *similar* to a URL such as
 // https:/index.docker.io/v1. Not all platforms support directory names
 // which contain those characters (such as : on Windows)
-func cleanPath(s string) string ***REMOVED***
+func cleanPath(s string) string {
 	return s
-***REMOVED***
+}

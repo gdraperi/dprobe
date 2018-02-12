@@ -15,14 +15,14 @@
 set -e
 set -o pipefail
 
-errexit() ***REMOVED***
+errexit() {
     echo "$1"
     exit 1
-***REMOVED***
+}
 
 BUNDLE="bundles/$(cat VERSION)"
 
-bundle_files()***REMOVED***
+bundle_files(){
     # prefer dynbinary if exists
     for f in dockerd docker-proxy; do
 	if [ -d $BUNDLE/dynbinary-daemon ]; then
@@ -39,9 +39,9 @@ bundle_files()***REMOVED***
     else
 	echo $BUNDLE/binary-client/docker
     fi
-***REMOVED***
+}
 
-control_docker()***REMOVED***
+control_docker(){
     m=$1; op=$2
     # NOTE: `docker-machine ssh $m sh -c "foo bar"` does not work
     #       (but `docker-machine ssh $m sh -c "foo\ bar"` works)
@@ -58,15 +58,15 @@ else
   exit 1
 fi
 EOF
-***REMOVED***
+}
 
-detect_prefix()***REMOVED***
+detect_prefix(){
     m=$1
     script='dirname $(dirname $(which dockerd))'
     echo $script | docker-machine ssh $m sh
-***REMOVED***
+}
 
-install_to()***REMOVED***
+install_to(){
     m=$1; shift; files=$@
     echo "$m: detecting docker"
     prefix=$(detect_prefix $m)
@@ -80,12 +80,12 @@ install_to()***REMOVED***
     echo "$m: starting docker"
     control_docker $m start
     echo "$m: done"
-***REMOVED***
+}
 
-check_prereq()***REMOVED***
+check_prereq(){
     command -v docker-machine > /dev/null || errexit "docker-machine not installed"
     ( tar --version | grep GNU > /dev/null ) || errexit "GNU tar not installed"
-***REMOVED***
+}
 
 case "$1" in
     "install")
@@ -100,8 +100,8 @@ case "$1" in
 	    pids+=($!)
 	done
 	status=0
-	for pid in $***REMOVED***pids[@]***REMOVED***; do
-	    wait $pid || ***REMOVED*** status=$?; echo "background process $pid failed with exit status $status"; ***REMOVED***
+	for pid in ${pids[@]}; do
+	    wait $pid || { status=$?; echo "background process $pid failed with exit status $status"; }
 	done
 	exit $status
 	;;

@@ -53,12 +53,12 @@ option optimize_for = SPEED;
 
 // The protocol compiler can output a FileDescriptorSet containing the .proto
 // files it parses.
-message FileDescriptorSet ***REMOVED***
+message FileDescriptorSet {
   repeated FileDescriptorProto file = 1;
-***REMOVED***
+}
 
 // Describes a complete .proto file.
-message FileDescriptorProto ***REMOVED***
+message FileDescriptorProto {
   optional string name = 1;       // file name, relative to root of source tree
   optional string package = 2;    // e.g. "foo", "foo.bar", etc.
 
@@ -87,10 +87,10 @@ message FileDescriptorProto ***REMOVED***
   // The syntax of the proto file.
   // The supported values are "proto2" and "proto3".
   optional string syntax = 12;
-***REMOVED***
+}
 
 // Describes a message type.
-message DescriptorProto ***REMOVED***
+message DescriptorProto {
   optional string name = 1;
 
   repeated FieldDescriptorProto field = 2;
@@ -99,10 +99,10 @@ message DescriptorProto ***REMOVED***
   repeated DescriptorProto nested_type = 3;
   repeated EnumDescriptorProto enum_type = 4;
 
-  message ExtensionRange ***REMOVED***
+  message ExtensionRange {
     optional int32 start = 1;
     optional int32 end = 2;
-  ***REMOVED***
+  }
   repeated ExtensionRange extension_range = 5;
 
   repeated OneofDescriptorProto oneof_decl = 8;
@@ -112,19 +112,19 @@ message DescriptorProto ***REMOVED***
   // Range of reserved tag numbers. Reserved tag numbers may not be used by
   // fields or extension ranges in the same message. Reserved ranges may
   // not overlap.
-  message ReservedRange ***REMOVED***
+  message ReservedRange {
     optional int32 start = 1; // Inclusive.
     optional int32 end = 2;   // Exclusive.
-  ***REMOVED***
+  }
   repeated ReservedRange reserved_range = 9;
   // Reserved field names, which may not be used by fields in the same message.
   // A given name may only be reserved once.
   repeated string reserved_name = 10;
-***REMOVED***
+}
 
 // Describes a field within a message.
-message FieldDescriptorProto ***REMOVED***
-  enum Type ***REMOVED***
+message FieldDescriptorProto {
+  enum Type {
     // 0 is reserved for errors.
     // Order is weird for historical reasons.
     TYPE_DOUBLE         = 1;
@@ -151,15 +151,15 @@ message FieldDescriptorProto ***REMOVED***
     TYPE_SFIXED64       = 16;
     TYPE_SINT32         = 17;  // Uses ZigZag encoding.
     TYPE_SINT64         = 18;  // Uses ZigZag encoding.
-  ***REMOVED***;
+  };
 
-  enum Label ***REMOVED***
+  enum Label {
     // 0 is reserved for errors
     LABEL_OPTIONAL      = 1;
     LABEL_REQUIRED      = 2;
     LABEL_REPEATED      = 3;
     // TODO(sanjay): Should we add LABEL_MAP?
-  ***REMOVED***;
+  };
 
   optional string name = 1;
   optional int32 number = 3;
@@ -198,41 +198,41 @@ message FieldDescriptorProto ***REMOVED***
   optional string json_name = 10;
 
   optional FieldOptions options = 8;
-***REMOVED***
+}
 
 // Describes a oneof.
-message OneofDescriptorProto ***REMOVED***
+message OneofDescriptorProto {
   optional string name = 1;
   optional OneofOptions options = 2;
-***REMOVED***
+}
 
 // Describes an enum type.
-message EnumDescriptorProto ***REMOVED***
+message EnumDescriptorProto {
   optional string name = 1;
 
   repeated EnumValueDescriptorProto value = 2;
 
   optional EnumOptions options = 3;
-***REMOVED***
+}
 
 // Describes a value within an enum.
-message EnumValueDescriptorProto ***REMOVED***
+message EnumValueDescriptorProto {
   optional string name = 1;
   optional int32 number = 2;
 
   optional EnumValueOptions options = 3;
-***REMOVED***
+}
 
 // Describes a service.
-message ServiceDescriptorProto ***REMOVED***
+message ServiceDescriptorProto {
   optional string name = 1;
   repeated MethodDescriptorProto method = 2;
 
   optional ServiceOptions options = 3;
-***REMOVED***
+}
 
 // Describes a method of a service.
-message MethodDescriptorProto ***REMOVED***
+message MethodDescriptorProto {
   optional string name = 1;
 
   // Input and output type names.  These are resolved in the same way as
@@ -246,7 +246,7 @@ message MethodDescriptorProto ***REMOVED***
   optional bool client_streaming = 5 [default=false];
   // Identifies if server streams multiple server messages
   optional bool server_streaming = 6 [default=false];
-***REMOVED***
+}
 
 
 // ===================================================================
@@ -282,7 +282,7 @@ message MethodDescriptorProto ***REMOVED***
 //   to automatically assign option numbers.
 
 
-message FileOptions ***REMOVED***
+message FileOptions {
 
   // Sets the Java package where classes generated from this .proto will be
   // placed.  By default, the proto package is used, but this is often
@@ -330,12 +330,12 @@ message FileOptions ***REMOVED***
 
 
   // Generated classes can be optimized for speed or code size.
-  enum OptimizeMode ***REMOVED***
+  enum OptimizeMode {
     SPEED = 1;        // Generate complete code for parsing, serialization,
                       // etc.
     CODE_SIZE = 2;    // Use ReflectionOps to implement these methods.
     LITE_RUNTIME = 3; // Generate code using MessageLite and the lite runtime.
-  ***REMOVED***
+  }
   optional OptimizeMode optimize_for = 9 [default=SPEED];
 
   // Sets the Go package where structs generated from this .proto will be
@@ -386,19 +386,19 @@ message FileOptions ***REMOVED***
   extensions 1000 to max;
 
   //reserved 38;
-***REMOVED***
+}
 
-message MessageOptions ***REMOVED***
+message MessageOptions {
   // Set true to use the old proto1 MessageSet wire format for extensions.
   // This is provided for backwards-compatibility with the MessageSet wire
   // format.  You should not use this for any other reason:  It's less
   // efficient, has fewer features, and is more complicated.
   //
   // The message must be defined exactly as follows:
-  //   message Foo ***REMOVED***
+  //   message Foo {
   //     option message_set_wire_format = true;
   //     extensions 4 to max;
-  //   ***REMOVED***
+  //   }
   // Note that the message cannot have any defined fields; MessageSets only
   // have extensions.
   //
@@ -426,11 +426,11 @@ message MessageOptions ***REMOVED***
   // For maps fields:
   //     map<KeyType, ValueType> map_field = 1;
   // The parsed descriptor looks like:
-  //     message MapFieldEntry ***REMOVED***
+  //     message MapFieldEntry {
   //         option map_entry = true;
   //         optional KeyType key = 1;
   //         optional ValueType value = 2;
-  // ***REMOVED***
+  //     }
   //     repeated MapFieldEntry map_field = 1;
   //
   // Implementations may choose not to generate the map_entry=true message, but
@@ -448,22 +448,22 @@ message MessageOptions ***REMOVED***
 
   // Clients can define custom options in extensions of this message. See above.
   extensions 1000 to max;
-***REMOVED***
+}
 
-message FieldOptions ***REMOVED***
+message FieldOptions {
   // The ctype option instructs the C++ code generator to use a different
   // representation of the field than it normally would.  See the specific
   // options below.  This option is not yet implemented in the open source
   // release -- sorry, we'll try to include it in a future version!
   optional CType ctype = 1 [default = STRING];
-  enum CType ***REMOVED***
+  enum CType {
     // Default mode.
     STRING = 0;
 
     CORD = 1;
 
     STRING_PIECE = 2;
-  ***REMOVED***
+  }
   // The packed option can be enabled for repeated primitive fields to enable
   // a more efficient representation on the wire. Rather than repeatedly
   // writing the tag and type for each element, the entire array is encoded as
@@ -482,7 +482,7 @@ message FieldOptions ***REMOVED***
   // This option is an enum to permit additional types to be added,
   // e.g. goog.math.Integer.
   optional JSType jstype = 6 [default = JS_NORMAL];
-  enum JSType ***REMOVED***
+  enum JSType {
     // Use the default type.
     JS_NORMAL = 0;
 
@@ -491,7 +491,7 @@ message FieldOptions ***REMOVED***
 
     // Use JavaScript numbers.
     JS_NUMBER = 2;
-  ***REMOVED***
+  }
 
   // Should this field be parsed lazily?  Lazy applies only to message-type
   // fields.  It means that when the outer message is initially parsed, the
@@ -538,17 +538,17 @@ message FieldOptions ***REMOVED***
 
   // Clients can define custom options in extensions of this message. See above.
   extensions 1000 to max;
-***REMOVED***
+}
 
-message OneofOptions ***REMOVED***
+message OneofOptions {
   // The parser stores options it doesn't recognize here. See above.
   repeated UninterpretedOption uninterpreted_option = 999;
 
   // Clients can define custom options in extensions of this message. See above.
   extensions 1000 to max;
-***REMOVED***
+}
 
-message EnumOptions ***REMOVED***
+message EnumOptions {
 
   // Set this option to true to allow mapping different tag names to the same
   // value.
@@ -565,9 +565,9 @@ message EnumOptions ***REMOVED***
 
   // Clients can define custom options in extensions of this message. See above.
   extensions 1000 to max;
-***REMOVED***
+}
 
-message EnumValueOptions ***REMOVED***
+message EnumValueOptions {
   // Is this enum value deprecated?
   // Depending on the target platform, this can emit Deprecated annotations
   // for the enum value, or it will be completely ignored; in the very least,
@@ -579,9 +579,9 @@ message EnumValueOptions ***REMOVED***
 
   // Clients can define custom options in extensions of this message. See above.
   extensions 1000 to max;
-***REMOVED***
+}
 
-message ServiceOptions ***REMOVED***
+message ServiceOptions {
 
   // Note:  Field numbers 1 through 32 are reserved for Google's internal RPC
   //   framework.  We apologize for hoarding these numbers to ourselves, but
@@ -599,9 +599,9 @@ message ServiceOptions ***REMOVED***
 
   // Clients can define custom options in extensions of this message. See above.
   extensions 1000 to max;
-***REMOVED***
+}
 
-message MethodOptions ***REMOVED***
+message MethodOptions {
 
   // Note:  Field numbers 1 through 32 are reserved for Google's internal RPC
   //   framework.  We apologize for hoarding these numbers to ourselves, but
@@ -619,7 +619,7 @@ message MethodOptions ***REMOVED***
 
   // Clients can define custom options in extensions of this message. See above.
   extensions 1000 to max;
-***REMOVED***
+}
 
 
 // A message representing a option the parser does not recognize. This only
@@ -628,16 +628,16 @@ message MethodOptions ***REMOVED***
 // options protos in descriptor objects (e.g. returned by Descriptor::options(),
 // or produced by Descriptor::CopyTo()) will never have UninterpretedOptions
 // in them.
-message UninterpretedOption ***REMOVED***
+message UninterpretedOption {
   // The name of the uninterpreted option.  Each string represents a segment in
   // a dot-separated name.  is_extension is true iff a segment represents an
   // extension (denoted with parentheses in options specs in .proto files).
-  // E.g.,***REMOVED*** ["foo", false], ["bar.baz", true], ["qux", false] ***REMOVED*** represents
+  // E.g.,{ ["foo", false], ["bar.baz", true], ["qux", false] } represents
   // "foo.(bar.baz).qux".
-  message NamePart ***REMOVED***
+  message NamePart {
     required string name_part = 1;
     required bool is_extension = 2;
-  ***REMOVED***
+  }
   repeated NamePart name = 2;
 
   // The value of the uninterpreted option, in whatever type the tokenizer
@@ -648,23 +648,23 @@ message UninterpretedOption ***REMOVED***
   optional double double_value = 6;
   optional bytes string_value = 7;
   optional string aggregate_value = 8;
-***REMOVED***
+}
 
 // ===================================================================
 // Optional source code info
 
 // Encapsulates information about the original source file from which a
 // FileDescriptorProto was generated.
-message SourceCodeInfo ***REMOVED***
+message SourceCodeInfo {
   // A Location identifies a piece of source code in a .proto file which
   // corresponds to a particular definition.  This information is intended
   // to be useful to IDEs, code indexers, documentation generators, and similar
   // tools.
   //
   // For example, say we have a file like:
-  //   message Foo ***REMOVED***
+  //   message Foo {
   //     optional string foo = 1;
-  //   ***REMOVED***
+  //   }
   // Let's look at just the field definition:
   //   optional string foo = 1;
   //   ^       ^^     ^^  ^  ^^^
@@ -700,7 +700,7 @@ message SourceCodeInfo ***REMOVED***
   //   ignore those that it doesn't understand, as more types of locations could
   //   be recorded in the future.
   repeated Location location = 1;
-  message Location ***REMOVED***
+  message Location {
     // Identifies which part of the FileDescriptorProto was defined at this
     // location.
     //
@@ -783,17 +783,17 @@ message SourceCodeInfo ***REMOVED***
     optional string leading_comments = 3;
     optional string trailing_comments = 4;
     repeated string leading_detached_comments = 6;
-  ***REMOVED***
-***REMOVED***
+  }
+}
 
 // Describes the relationship between generated code and its original source
 // file. A GeneratedCodeInfo message is associated with only one generated
 // source file, but may contain references to different source .proto files.
-message GeneratedCodeInfo ***REMOVED***
+message GeneratedCodeInfo {
   // An Annotation connects some span of text in generated code to an element
   // of its generating .proto file.
   repeated Annotation annotation = 1;
-  message Annotation ***REMOVED***
+  message Annotation {
     // Identifies the element in the original source .proto file. This field
     // is formatted the same as SourceCodeInfo.Location.path.
     repeated int32 path = 1 [packed=true];
@@ -809,5 +809,5 @@ message GeneratedCodeInfo ***REMOVED***
     // relates to the identified offset. The end offset should be one past
     // the last relevant byte (so the length of the text = end - begin).
     optional int32 end = 4;
-  ***REMOVED***
-***REMOVED***
+  }
+}

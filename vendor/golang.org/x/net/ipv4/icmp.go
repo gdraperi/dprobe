@@ -9,18 +9,18 @@ import "golang.org/x/net/internal/iana"
 // An ICMPType represents a type of ICMP message.
 type ICMPType int
 
-func (typ ICMPType) String() string ***REMOVED***
+func (typ ICMPType) String() string {
 	s, ok := icmpTypes[typ]
-	if !ok ***REMOVED***
+	if !ok {
 		return "<nil>"
-	***REMOVED***
+	}
 	return s
-***REMOVED***
+}
 
 // Protocol returns the ICMPv4 protocol number.
-func (typ ICMPType) Protocol() int ***REMOVED***
+func (typ ICMPType) Protocol() int {
 	return iana.ProtocolICMP
-***REMOVED***
+}
 
 // An ICMPFilter represents an ICMP message filter for incoming
 // packets. The filter belongs to a packet delivery path on a host and
@@ -30,28 +30,28 @@ func (typ ICMPType) Protocol() int ***REMOVED***
 // only for IPv6 but IPv4. A node means a device that implements IP.
 // A router means a node that forwards IP packets not explicitly
 // addressed to itself, and a host means a node that is not a router.
-type ICMPFilter struct ***REMOVED***
+type ICMPFilter struct {
 	icmpFilter
-***REMOVED***
+}
 
 // Accept accepts incoming ICMP packets including the type field value
 // typ.
-func (f *ICMPFilter) Accept(typ ICMPType) ***REMOVED***
+func (f *ICMPFilter) Accept(typ ICMPType) {
 	f.accept(typ)
-***REMOVED***
+}
 
 // Block blocks incoming ICMP packets including the type field value
 // typ.
-func (f *ICMPFilter) Block(typ ICMPType) ***REMOVED***
+func (f *ICMPFilter) Block(typ ICMPType) {
 	f.block(typ)
-***REMOVED***
+}
 
 // SetAll sets the filter action to the filter.
-func (f *ICMPFilter) SetAll(block bool) ***REMOVED***
+func (f *ICMPFilter) SetAll(block bool) {
 	f.setAll(block)
-***REMOVED***
+}
 
 // WillBlock reports whether the ICMP type will be blocked.
-func (f *ICMPFilter) WillBlock(typ ICMPType) bool ***REMOVED***
+func (f *ICMPFilter) WillBlock(typ ICMPType) bool {
 	return f.willBlock(typ)
-***REMOVED***
+}

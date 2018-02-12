@@ -19,13 +19,13 @@ var (
 type ErrorHandler func(err error) error
 
 // IgnoreNotExist ignores any errors that are for not existing files
-func IgnoreNotExist(err error) error ***REMOVED***
-	if os.IsNotExist(err) ***REMOVED***
+func IgnoreNotExist(err error) error {
+	if os.IsNotExist(err) {
 		return nil
-	***REMOVED***
+	}
 	return err
-***REMOVED***
+}
 
-func errPassthrough(err error) error ***REMOVED***
+func errPassthrough(err error) error {
 	return err
-***REMOVED***
+}

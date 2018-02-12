@@ -9,67 +9,67 @@ import (
 )
 
 // DecodeMsg implements msgp.Decodable
-func (z *TestMessage) DecodeMsg(dc *msgp.Reader) (err error) ***REMOVED***
+func (z *TestMessage) DecodeMsg(dc *msgp.Reader) (err error) {
 	var field []byte
 	_ = field
 	var zxvk uint32
 	zxvk, err = dc.ReadMapHeader()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
-	for zxvk > 0 ***REMOVED***
+	}
+	for zxvk > 0 {
 		zxvk--
 		field, err = dc.ReadMapKeyPtr()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
-		switch msgp.UnsafeString(field) ***REMOVED***
+		}
+		switch msgp.UnsafeString(field) {
 		case "foo":
 			z.Foo, err = dc.ReadString()
-			if err != nil ***REMOVED***
+			if err != nil {
 				return
-			***REMOVED***
+			}
 		case "hoge":
 			z.Hoge, err = dc.ReadString()
-			if err != nil ***REMOVED***
+			if err != nil {
 				return
-			***REMOVED***
+			}
 		default:
 			err = dc.Skip()
-			if err != nil ***REMOVED***
+			if err != nil {
 				return
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return
-***REMOVED***
+}
 
 // EncodeMsg implements msgp.Encodable
-func (z TestMessage) EncodeMsg(en *msgp.Writer) (err error) ***REMOVED***
+func (z TestMessage) EncodeMsg(en *msgp.Writer) (err error) {
 	// map header, size 2
 	// write "foo"
 	err = en.Append(0x82, 0xa3, 0x66, 0x6f, 0x6f)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	err = en.WriteString(z.Foo)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	// write "hoge"
 	err = en.Append(0xa4, 0x68, 0x6f, 0x67, 0x65)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	err = en.WriteString(z.Hoge)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // MarshalMsg implements msgp.Marshaler
-func (z TestMessage) MarshalMsg(b []byte) (o []byte, err error) ***REMOVED***
+func (z TestMessage) MarshalMsg(b []byte) (o []byte, err error) {
 	o = msgp.Require(b, z.Msgsize())
 	// map header, size 2
 	// string "foo"
@@ -79,47 +79,47 @@ func (z TestMessage) MarshalMsg(b []byte) (o []byte, err error) ***REMOVED***
 	o = append(o, 0xa4, 0x68, 0x6f, 0x67, 0x65)
 	o = msgp.AppendString(o, z.Hoge)
 	return
-***REMOVED***
+}
 
 // UnmarshalMsg implements msgp.Unmarshaler
-func (z *TestMessage) UnmarshalMsg(bts []byte) (o []byte, err error) ***REMOVED***
+func (z *TestMessage) UnmarshalMsg(bts []byte) (o []byte, err error) {
 	var field []byte
 	_ = field
 	var zbzg uint32
 	zbzg, bts, err = msgp.ReadMapHeaderBytes(bts)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
-	for zbzg > 0 ***REMOVED***
+	}
+	for zbzg > 0 {
 		zbzg--
 		field, bts, err = msgp.ReadMapKeyZC(bts)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
-		switch msgp.UnsafeString(field) ***REMOVED***
+		}
+		switch msgp.UnsafeString(field) {
 		case "foo":
 			z.Foo, bts, err = msgp.ReadStringBytes(bts)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return
-			***REMOVED***
+			}
 		case "hoge":
 			z.Hoge, bts, err = msgp.ReadStringBytes(bts)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return
-			***REMOVED***
+			}
 		default:
 			bts, err = msgp.Skip(bts)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	o = bts
 	return
-***REMOVED***
+}
 
 // Msgsize returns an upper bound estimate of the number of bytes occupied by the serialized message
-func (z TestMessage) Msgsize() (s int) ***REMOVED***
+func (z TestMessage) Msgsize() (s int) {
 	s = 1 + 4 + msgp.StringPrefixSize + len(z.Foo) + 5 + msgp.StringPrefixSize + len(z.Hoge)
 	return
-***REMOVED***
+}

@@ -17,7 +17,7 @@ in some particular ways:
 2. visit all items matching particular prefix (visit subtree), or
 3. given a string, visit all items matching some prefix of that string.
 
-`[]byte` type is used for keys, `interface***REMOVED******REMOVED***` for values.
+`[]byte` type is used for keys, `interface{}` for values.
 
 `Trie` is not thread safe. Synchronize the access yourself.
 
@@ -45,10 +45,10 @@ import "gopkg.in/tchap/go-patricia.v2/patricia"
 Then you can start having fun.
 
 ```go
-printItem := func(prefix patricia.Prefix, item patricia.Item) error ***REMOVED***
+printItem := func(prefix patricia.Prefix, item patricia.Item) error {
 	fmt.Printf("%q: %v\n", prefix, item)
 	return nil
-***REMOVED***
+}
 
 // Create a new default trie (using the default parameter values).
 trie := NewTrie()

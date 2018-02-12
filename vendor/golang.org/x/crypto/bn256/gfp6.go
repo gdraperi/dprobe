@@ -14,67 +14,67 @@ import (
 
 // gfP6 implements the field of size p⁶ as a cubic extension of gfP2 where τ³=ξ
 // and ξ=i+3.
-type gfP6 struct ***REMOVED***
+type gfP6 struct {
 	x, y, z *gfP2 // value is xτ² + yτ + z
-***REMOVED***
+}
 
-func newGFp6(pool *bnPool) *gfP6 ***REMOVED***
-	return &gfP6***REMOVED***newGFp2(pool), newGFp2(pool), newGFp2(pool)***REMOVED***
-***REMOVED***
+func newGFp6(pool *bnPool) *gfP6 {
+	return &gfP6{newGFp2(pool), newGFp2(pool), newGFp2(pool)}
+}
 
-func (e *gfP6) String() string ***REMOVED***
+func (e *gfP6) String() string {
 	return "(" + e.x.String() + "," + e.y.String() + "," + e.z.String() + ")"
-***REMOVED***
+}
 
-func (e *gfP6) Put(pool *bnPool) ***REMOVED***
+func (e *gfP6) Put(pool *bnPool) {
 	e.x.Put(pool)
 	e.y.Put(pool)
 	e.z.Put(pool)
-***REMOVED***
+}
 
-func (e *gfP6) Set(a *gfP6) *gfP6 ***REMOVED***
+func (e *gfP6) Set(a *gfP6) *gfP6 {
 	e.x.Set(a.x)
 	e.y.Set(a.y)
 	e.z.Set(a.z)
 	return e
-***REMOVED***
+}
 
-func (e *gfP6) SetZero() *gfP6 ***REMOVED***
+func (e *gfP6) SetZero() *gfP6 {
 	e.x.SetZero()
 	e.y.SetZero()
 	e.z.SetZero()
 	return e
-***REMOVED***
+}
 
-func (e *gfP6) SetOne() *gfP6 ***REMOVED***
+func (e *gfP6) SetOne() *gfP6 {
 	e.x.SetZero()
 	e.y.SetZero()
 	e.z.SetOne()
 	return e
-***REMOVED***
+}
 
-func (e *gfP6) Minimal() ***REMOVED***
+func (e *gfP6) Minimal() {
 	e.x.Minimal()
 	e.y.Minimal()
 	e.z.Minimal()
-***REMOVED***
+}
 
-func (e *gfP6) IsZero() bool ***REMOVED***
+func (e *gfP6) IsZero() bool {
 	return e.x.IsZero() && e.y.IsZero() && e.z.IsZero()
-***REMOVED***
+}
 
-func (e *gfP6) IsOne() bool ***REMOVED***
+func (e *gfP6) IsOne() bool {
 	return e.x.IsZero() && e.y.IsZero() && e.z.IsOne()
-***REMOVED***
+}
 
-func (e *gfP6) Negative(a *gfP6) *gfP6 ***REMOVED***
+func (e *gfP6) Negative(a *gfP6) *gfP6 {
 	e.x.Negative(a.x)
 	e.y.Negative(a.y)
 	e.z.Negative(a.z)
 	return e
-***REMOVED***
+}
 
-func (e *gfP6) Frobenius(a *gfP6, pool *bnPool) *gfP6 ***REMOVED***
+func (e *gfP6) Frobenius(a *gfP6, pool *bnPool) *gfP6 {
 	e.x.Conjugate(a.x)
 	e.y.Conjugate(a.y)
 	e.z.Conjugate(a.z)
@@ -82,40 +82,40 @@ func (e *gfP6) Frobenius(a *gfP6, pool *bnPool) *gfP6 ***REMOVED***
 	e.x.Mul(e.x, xiTo2PMinus2Over3, pool)
 	e.y.Mul(e.y, xiToPMinus1Over3, pool)
 	return e
-***REMOVED***
+}
 
 // FrobeniusP2 computes (xτ²+yτ+z)^(p²) = xτ^(2p²) + yτ^(p²) + z
-func (e *gfP6) FrobeniusP2(a *gfP6) *gfP6 ***REMOVED***
+func (e *gfP6) FrobeniusP2(a *gfP6) *gfP6 {
 	// τ^(2p²) = τ²τ^(2p²-2) = τ²ξ^((2p²-2)/3)
 	e.x.MulScalar(a.x, xiTo2PSquaredMinus2Over3)
 	// τ^(p²) = ττ^(p²-1) = τξ^((p²-1)/3)
 	e.y.MulScalar(a.y, xiToPSquaredMinus1Over3)
 	e.z.Set(a.z)
 	return e
-***REMOVED***
+}
 
-func (e *gfP6) Add(a, b *gfP6) *gfP6 ***REMOVED***
+func (e *gfP6) Add(a, b *gfP6) *gfP6 {
 	e.x.Add(a.x, b.x)
 	e.y.Add(a.y, b.y)
 	e.z.Add(a.z, b.z)
 	return e
-***REMOVED***
+}
 
-func (e *gfP6) Sub(a, b *gfP6) *gfP6 ***REMOVED***
+func (e *gfP6) Sub(a, b *gfP6) *gfP6 {
 	e.x.Sub(a.x, b.x)
 	e.y.Sub(a.y, b.y)
 	e.z.Sub(a.z, b.z)
 	return e
-***REMOVED***
+}
 
-func (e *gfP6) Double(a *gfP6) *gfP6 ***REMOVED***
+func (e *gfP6) Double(a *gfP6) *gfP6 {
 	e.x.Double(a.x)
 	e.y.Double(a.y)
 	e.z.Double(a.z)
 	return e
-***REMOVED***
+}
 
-func (e *gfP6) Mul(a, b *gfP6, pool *bnPool) *gfP6 ***REMOVED***
+func (e *gfP6) Mul(a, b *gfP6, pool *bnPool) *gfP6 {
 	// "Multiplication and Squaring on Pairing-Friendly Fields"
 	// Section 4, Karatsuba method.
 	// http://eprint.iacr.org/2006/471.pdf
@@ -169,24 +169,24 @@ func (e *gfP6) Mul(a, b *gfP6, pool *bnPool) *gfP6 ***REMOVED***
 	v1.Put(pool)
 	v2.Put(pool)
 	return e
-***REMOVED***
+}
 
-func (e *gfP6) MulScalar(a *gfP6, b *gfP2, pool *bnPool) *gfP6 ***REMOVED***
+func (e *gfP6) MulScalar(a *gfP6, b *gfP2, pool *bnPool) *gfP6 {
 	e.x.Mul(a.x, b, pool)
 	e.y.Mul(a.y, b, pool)
 	e.z.Mul(a.z, b, pool)
 	return e
-***REMOVED***
+}
 
-func (e *gfP6) MulGFP(a *gfP6, b *big.Int) *gfP6 ***REMOVED***
+func (e *gfP6) MulGFP(a *gfP6, b *big.Int) *gfP6 {
 	e.x.MulScalar(a.x, b)
 	e.y.MulScalar(a.y, b)
 	e.z.MulScalar(a.z, b)
 	return e
-***REMOVED***
+}
 
 // MulTau computes τ·(aτ²+bτ+c) = bτ²+cτ+aξ
-func (e *gfP6) MulTau(a *gfP6, pool *bnPool) ***REMOVED***
+func (e *gfP6) MulTau(a *gfP6, pool *bnPool) {
 	tz := newGFp2(pool)
 	tz.MulXi(a.x, pool)
 	ty := newGFp2(pool)
@@ -196,9 +196,9 @@ func (e *gfP6) MulTau(a *gfP6, pool *bnPool) ***REMOVED***
 	e.z.Set(tz)
 	tz.Put(pool)
 	ty.Put(pool)
-***REMOVED***
+}
 
-func (e *gfP6) Square(a *gfP6, pool *bnPool) *gfP6 ***REMOVED***
+func (e *gfP6) Square(a *gfP6, pool *bnPool) *gfP6 {
 	v0 := newGFp2(pool).Square(a.z, pool)
 	v1 := newGFp2(pool).Square(a.y, pool)
 	v2 := newGFp2(pool).Square(a.x, pool)
@@ -236,9 +236,9 @@ func (e *gfP6) Square(a *gfP6, pool *bnPool) *gfP6 ***REMOVED***
 	xiV2.Put(pool)
 
 	return e
-***REMOVED***
+}
 
-func (e *gfP6) Invert(a *gfP6, pool *bnPool) *gfP6 ***REMOVED***
+func (e *gfP6) Invert(a *gfP6, pool *bnPool) *gfP6 {
 	// See "Implementing cryptographic pairings", M. Scott, section 3.2.
 	// ftp://136.206.11.249/pub/crypto/pairings.pdf
 
@@ -293,4 +293,4 @@ func (e *gfP6) Invert(a *gfP6, pool *bnPool) *gfP6 ***REMOVED***
 	F.Put(pool)
 
 	return e
-***REMOVED***
+}

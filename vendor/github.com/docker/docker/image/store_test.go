@@ -10,24 +10,24 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestRestore(t *testing.T) ***REMOVED***
+func TestRestore(t *testing.T) {
 	fs, cleanup := defaultFSStoreBackend(t)
 	defer cleanup()
 
-	id1, err := fs.Set([]byte(`***REMOVED***"comment": "abc", "rootfs": ***REMOVED***"type": "layers"***REMOVED******REMOVED***`))
+	id1, err := fs.Set([]byte(`{"comment": "abc", "rootfs": {"type": "layers"}}`))
 	assert.NoError(t, err)
 
 	_, err = fs.Set([]byte(`invalid`))
 	assert.NoError(t, err)
 
-	id2, err := fs.Set([]byte(`***REMOVED***"comment": "def", "rootfs": ***REMOVED***"type": "layers", "diff_ids": ["2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae"]***REMOVED******REMOVED***`))
+	id2, err := fs.Set([]byte(`{"comment": "def", "rootfs": {"type": "layers", "diff_ids": ["2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae"]}}`))
 	assert.NoError(t, err)
 
 	err = fs.SetMetadata(id2, "parent", []byte(id1))
 	assert.NoError(t, err)
 
 	mlgrMap := make(map[string]LayerGetReleaser)
-	mlgrMap[runtime.GOOS] = &mockLayerGetReleaser***REMOVED******REMOVED***
+	mlgrMap[runtime.GOOS] = &mockLayerGetReleaser{}
 	is, err := NewImageStore(fs, mlgrMap)
 	assert.NoError(t, err)
 
@@ -66,13 +66,13 @@ func TestRestore(t *testing.T) ***REMOVED***
 	invalidPattern := digest.Digest(id1).Hex()[1:6]
 	_, err = is.Search(invalidPattern)
 	testutil.ErrorContains(t, err, "No such image")
-***REMOVED***
+}
 
-func TestAddDelete(t *testing.T) ***REMOVED***
+func TestAddDelete(t *testing.T) {
 	is, cleanup := defaultImageStore(t)
 	defer cleanup()
 
-	id1, err := is.Create([]byte(`***REMOVED***"comment": "abc", "rootfs": ***REMOVED***"type": "layers", "diff_ids": ["2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae"]***REMOVED******REMOVED***`))
+	id1, err := is.Create([]byte(`{"comment": "abc", "rootfs": {"type": "layers", "diff_ids": ["2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae"]}}`))
 	assert.NoError(t, err)
 	assert.Equal(t, ID("sha256:8d25a9c45df515f9d0fe8e4a6b1c64dd3b965a84790ddbcc7954bb9bc89eb993"), id1)
 
@@ -80,7 +80,7 @@ func TestAddDelete(t *testing.T) ***REMOVED***
 	assert.NoError(t, err)
 	assert.Equal(t, "abc", img.Comment)
 
-	id2, err := is.Create([]byte(`***REMOVED***"comment": "def", "rootfs": ***REMOVED***"type": "layers", "diff_ids": ["2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae"]***REMOVED******REMOVED***`))
+	id2, err := is.Create([]byte(`{"comment": "def", "rootfs": {"type": "layers", "diff_ids": ["2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae"]}}`))
 	assert.NoError(t, err)
 
 	err = is.SetParent(id2, id1)
@@ -101,13 +101,13 @@ func TestAddDelete(t *testing.T) ***REMOVED***
 
 	_, err = is.GetParent(id2)
 	testutil.ErrorContains(t, err, "failed to read metadata")
-***REMOVED***
+}
 
-func TestSearchAfterDelete(t *testing.T) ***REMOVED***
+func TestSearchAfterDelete(t *testing.T) {
 	is, cleanup := defaultImageStore(t)
 	defer cleanup()
 
-	id, err := is.Create([]byte(`***REMOVED***"comment": "abc", "rootfs": ***REMOVED***"type": "layers"***REMOVED******REMOVED***`))
+	id, err := is.Create([]byte(`{"comment": "abc", "rootfs": {"type": "layers"}}`))
 	assert.NoError(t, err)
 
 	id1, err := is.Search(string(id)[:15])
@@ -119,19 +119,19 @@ func TestSearchAfterDelete(t *testing.T) ***REMOVED***
 
 	_, err = is.Search(string(id)[:15])
 	testutil.ErrorContains(t, err, "No such image")
-***REMOVED***
+}
 
-func TestParentReset(t *testing.T) ***REMOVED***
+func TestParentReset(t *testing.T) {
 	is, cleanup := defaultImageStore(t)
 	defer cleanup()
 
-	id, err := is.Create([]byte(`***REMOVED***"comment": "abc1", "rootfs": ***REMOVED***"type": "layers"***REMOVED******REMOVED***`))
+	id, err := is.Create([]byte(`{"comment": "abc1", "rootfs": {"type": "layers"}}`))
 	assert.NoError(t, err)
 
-	id2, err := is.Create([]byte(`***REMOVED***"comment": "abc2", "rootfs": ***REMOVED***"type": "layers"***REMOVED******REMOVED***`))
+	id2, err := is.Create([]byte(`{"comment": "abc2", "rootfs": {"type": "layers"}}`))
 	assert.NoError(t, err)
 
-	id3, err := is.Create([]byte(`***REMOVED***"comment": "abc3", "rootfs": ***REMOVED***"type": "layers"***REMOVED******REMOVED***`))
+	id3, err := is.Create([]byte(`{"comment": "abc3", "rootfs": {"type": "layers"}}`))
 	assert.NoError(t, err)
 
 	assert.NoError(t, is.SetParent(id, id2))
@@ -140,24 +140,24 @@ func TestParentReset(t *testing.T) ***REMOVED***
 	assert.NoError(t, is.SetParent(id, id3))
 	assert.Len(t, is.Children(id2), 0)
 	assert.Len(t, is.Children(id3), 1)
-***REMOVED***
+}
 
-func defaultImageStore(t *testing.T) (Store, func()) ***REMOVED***
+func defaultImageStore(t *testing.T) (Store, func()) {
 	fsBackend, cleanup := defaultFSStoreBackend(t)
 
 	mlgrMap := make(map[string]LayerGetReleaser)
-	mlgrMap[runtime.GOOS] = &mockLayerGetReleaser***REMOVED******REMOVED***
+	mlgrMap[runtime.GOOS] = &mockLayerGetReleaser{}
 	store, err := NewImageStore(fsBackend, mlgrMap)
 	assert.NoError(t, err)
 
 	return store, cleanup
-***REMOVED***
+}
 
-func TestGetAndSetLastUpdated(t *testing.T) ***REMOVED***
+func TestGetAndSetLastUpdated(t *testing.T) {
 	store, cleanup := defaultImageStore(t)
 	defer cleanup()
 
-	id, err := store.Create([]byte(`***REMOVED***"comment": "abc1", "rootfs": ***REMOVED***"type": "layers"***REMOVED******REMOVED***`))
+	id, err := store.Create([]byte(`{"comment": "abc1", "rootfs": {"type": "layers"}}`))
 	assert.NoError(t, err)
 
 	updated, err := store.GetLastUpdated(id)
@@ -169,14 +169,14 @@ func TestGetAndSetLastUpdated(t *testing.T) ***REMOVED***
 	updated, err = store.GetLastUpdated(id)
 	assert.NoError(t, err)
 	assert.Equal(t, updated.IsZero(), false)
-***REMOVED***
+}
 
-type mockLayerGetReleaser struct***REMOVED******REMOVED***
+type mockLayerGetReleaser struct{}
 
-func (ls *mockLayerGetReleaser) Get(layer.ChainID) (layer.Layer, error) ***REMOVED***
+func (ls *mockLayerGetReleaser) Get(layer.ChainID) (layer.Layer, error) {
 	return nil, nil
-***REMOVED***
+}
 
-func (ls *mockLayerGetReleaser) Release(layer.Layer) ([]layer.Metadata, error) ***REMOVED***
+func (ls *mockLayerGetReleaser) Release(layer.Layer) ([]layer.Metadata, error) {
 	return nil, nil
-***REMOVED***
+}

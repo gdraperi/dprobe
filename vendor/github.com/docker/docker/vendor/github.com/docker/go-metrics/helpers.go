@@ -1,10 +1,10 @@
 package metrics
 
-func sumFloat64(vs ...float64) float64 ***REMOVED***
+func sumFloat64(vs ...float64) float64 {
 	var sum float64
-	for _, v := range vs ***REMOVED***
+	for _, v := range vs {
 		sum += v
-	***REMOVED***
+	}
 
 	return sum
-***REMOVED***
+}

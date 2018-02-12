@@ -22,8 +22,8 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestSlashClean(t *testing.T) ***REMOVED***
-	testCases := []string***REMOVED***
+func TestSlashClean(t *testing.T) {
+	testCases := []string{
 		"",
 		".",
 		"/",
@@ -36,247 +36,247 @@ func TestSlashClean(t *testing.T) ***REMOVED***
 		"/a//b/./../c/d/",
 		"a",
 		"a/b/c",
-	***REMOVED***
-	for _, tc := range testCases ***REMOVED***
+	}
+	for _, tc := range testCases {
 		got := slashClean(tc)
 		want := path.Clean("/" + tc)
-		if got != want ***REMOVED***
+		if got != want {
 			t.Errorf("tc=%q: got %q, want %q", tc, got, want)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestDirResolve(t *testing.T) ***REMOVED***
-	testCases := []struct ***REMOVED***
+func TestDirResolve(t *testing.T) {
+	testCases := []struct {
 		dir, name, want string
-	***REMOVED******REMOVED***
-		***REMOVED***"/", "", "/"***REMOVED***,
-		***REMOVED***"/", "/", "/"***REMOVED***,
-		***REMOVED***"/", ".", "/"***REMOVED***,
-		***REMOVED***"/", "./a", "/a"***REMOVED***,
-		***REMOVED***"/", "..", "/"***REMOVED***,
-		***REMOVED***"/", "..", "/"***REMOVED***,
-		***REMOVED***"/", "../", "/"***REMOVED***,
-		***REMOVED***"/", "../.", "/"***REMOVED***,
-		***REMOVED***"/", "../a", "/a"***REMOVED***,
-		***REMOVED***"/", "../..", "/"***REMOVED***,
-		***REMOVED***"/", "../bar/a", "/bar/a"***REMOVED***,
-		***REMOVED***"/", "../baz/a", "/baz/a"***REMOVED***,
-		***REMOVED***"/", "...", "/..."***REMOVED***,
-		***REMOVED***"/", ".../a", "/.../a"***REMOVED***,
-		***REMOVED***"/", ".../..", "/"***REMOVED***,
-		***REMOVED***"/", "a", "/a"***REMOVED***,
-		***REMOVED***"/", "a/./b", "/a/b"***REMOVED***,
-		***REMOVED***"/", "a/../../b", "/b"***REMOVED***,
-		***REMOVED***"/", "a/../b", "/b"***REMOVED***,
-		***REMOVED***"/", "a/b", "/a/b"***REMOVED***,
-		***REMOVED***"/", "a/b/c/../../d", "/a/d"***REMOVED***,
-		***REMOVED***"/", "a/b/c/../../../d", "/d"***REMOVED***,
-		***REMOVED***"/", "a/b/c/../../../../d", "/d"***REMOVED***,
-		***REMOVED***"/", "a/b/c/d", "/a/b/c/d"***REMOVED***,
+	}{
+		{"/", "", "/"},
+		{"/", "/", "/"},
+		{"/", ".", "/"},
+		{"/", "./a", "/a"},
+		{"/", "..", "/"},
+		{"/", "..", "/"},
+		{"/", "../", "/"},
+		{"/", "../.", "/"},
+		{"/", "../a", "/a"},
+		{"/", "../..", "/"},
+		{"/", "../bar/a", "/bar/a"},
+		{"/", "../baz/a", "/baz/a"},
+		{"/", "...", "/..."},
+		{"/", ".../a", "/.../a"},
+		{"/", ".../..", "/"},
+		{"/", "a", "/a"},
+		{"/", "a/./b", "/a/b"},
+		{"/", "a/../../b", "/b"},
+		{"/", "a/../b", "/b"},
+		{"/", "a/b", "/a/b"},
+		{"/", "a/b/c/../../d", "/a/d"},
+		{"/", "a/b/c/../../../d", "/d"},
+		{"/", "a/b/c/../../../../d", "/d"},
+		{"/", "a/b/c/d", "/a/b/c/d"},
 
-		***REMOVED***"/foo/bar", "", "/foo/bar"***REMOVED***,
-		***REMOVED***"/foo/bar", "/", "/foo/bar"***REMOVED***,
-		***REMOVED***"/foo/bar", ".", "/foo/bar"***REMOVED***,
-		***REMOVED***"/foo/bar", "./a", "/foo/bar/a"***REMOVED***,
-		***REMOVED***"/foo/bar", "..", "/foo/bar"***REMOVED***,
-		***REMOVED***"/foo/bar", "../", "/foo/bar"***REMOVED***,
-		***REMOVED***"/foo/bar", "../.", "/foo/bar"***REMOVED***,
-		***REMOVED***"/foo/bar", "../a", "/foo/bar/a"***REMOVED***,
-		***REMOVED***"/foo/bar", "../..", "/foo/bar"***REMOVED***,
-		***REMOVED***"/foo/bar", "../bar/a", "/foo/bar/bar/a"***REMOVED***,
-		***REMOVED***"/foo/bar", "../baz/a", "/foo/bar/baz/a"***REMOVED***,
-		***REMOVED***"/foo/bar", "...", "/foo/bar/..."***REMOVED***,
-		***REMOVED***"/foo/bar", ".../a", "/foo/bar/.../a"***REMOVED***,
-		***REMOVED***"/foo/bar", ".../..", "/foo/bar"***REMOVED***,
-		***REMOVED***"/foo/bar", "a", "/foo/bar/a"***REMOVED***,
-		***REMOVED***"/foo/bar", "a/./b", "/foo/bar/a/b"***REMOVED***,
-		***REMOVED***"/foo/bar", "a/../../b", "/foo/bar/b"***REMOVED***,
-		***REMOVED***"/foo/bar", "a/../b", "/foo/bar/b"***REMOVED***,
-		***REMOVED***"/foo/bar", "a/b", "/foo/bar/a/b"***REMOVED***,
-		***REMOVED***"/foo/bar", "a/b/c/../../d", "/foo/bar/a/d"***REMOVED***,
-		***REMOVED***"/foo/bar", "a/b/c/../../../d", "/foo/bar/d"***REMOVED***,
-		***REMOVED***"/foo/bar", "a/b/c/../../../../d", "/foo/bar/d"***REMOVED***,
-		***REMOVED***"/foo/bar", "a/b/c/d", "/foo/bar/a/b/c/d"***REMOVED***,
+		{"/foo/bar", "", "/foo/bar"},
+		{"/foo/bar", "/", "/foo/bar"},
+		{"/foo/bar", ".", "/foo/bar"},
+		{"/foo/bar", "./a", "/foo/bar/a"},
+		{"/foo/bar", "..", "/foo/bar"},
+		{"/foo/bar", "../", "/foo/bar"},
+		{"/foo/bar", "../.", "/foo/bar"},
+		{"/foo/bar", "../a", "/foo/bar/a"},
+		{"/foo/bar", "../..", "/foo/bar"},
+		{"/foo/bar", "../bar/a", "/foo/bar/bar/a"},
+		{"/foo/bar", "../baz/a", "/foo/bar/baz/a"},
+		{"/foo/bar", "...", "/foo/bar/..."},
+		{"/foo/bar", ".../a", "/foo/bar/.../a"},
+		{"/foo/bar", ".../..", "/foo/bar"},
+		{"/foo/bar", "a", "/foo/bar/a"},
+		{"/foo/bar", "a/./b", "/foo/bar/a/b"},
+		{"/foo/bar", "a/../../b", "/foo/bar/b"},
+		{"/foo/bar", "a/../b", "/foo/bar/b"},
+		{"/foo/bar", "a/b", "/foo/bar/a/b"},
+		{"/foo/bar", "a/b/c/../../d", "/foo/bar/a/d"},
+		{"/foo/bar", "a/b/c/../../../d", "/foo/bar/d"},
+		{"/foo/bar", "a/b/c/../../../../d", "/foo/bar/d"},
+		{"/foo/bar", "a/b/c/d", "/foo/bar/a/b/c/d"},
 
-		***REMOVED***"/foo/bar/", "", "/foo/bar"***REMOVED***,
-		***REMOVED***"/foo/bar/", "/", "/foo/bar"***REMOVED***,
-		***REMOVED***"/foo/bar/", ".", "/foo/bar"***REMOVED***,
-		***REMOVED***"/foo/bar/", "./a", "/foo/bar/a"***REMOVED***,
-		***REMOVED***"/foo/bar/", "..", "/foo/bar"***REMOVED***,
+		{"/foo/bar/", "", "/foo/bar"},
+		{"/foo/bar/", "/", "/foo/bar"},
+		{"/foo/bar/", ".", "/foo/bar"},
+		{"/foo/bar/", "./a", "/foo/bar/a"},
+		{"/foo/bar/", "..", "/foo/bar"},
 
-		***REMOVED***"/foo//bar///", "", "/foo/bar"***REMOVED***,
-		***REMOVED***"/foo//bar///", "/", "/foo/bar"***REMOVED***,
-		***REMOVED***"/foo//bar///", ".", "/foo/bar"***REMOVED***,
-		***REMOVED***"/foo//bar///", "./a", "/foo/bar/a"***REMOVED***,
-		***REMOVED***"/foo//bar///", "..", "/foo/bar"***REMOVED***,
+		{"/foo//bar///", "", "/foo/bar"},
+		{"/foo//bar///", "/", "/foo/bar"},
+		{"/foo//bar///", ".", "/foo/bar"},
+		{"/foo//bar///", "./a", "/foo/bar/a"},
+		{"/foo//bar///", "..", "/foo/bar"},
 
-		***REMOVED***"/x/y/z", "ab/c\x00d/ef", ""***REMOVED***,
+		{"/x/y/z", "ab/c\x00d/ef", ""},
 
-		***REMOVED***".", "", "."***REMOVED***,
-		***REMOVED***".", "/", "."***REMOVED***,
-		***REMOVED***".", ".", "."***REMOVED***,
-		***REMOVED***".", "./a", "a"***REMOVED***,
-		***REMOVED***".", "..", "."***REMOVED***,
-		***REMOVED***".", "..", "."***REMOVED***,
-		***REMOVED***".", "../", "."***REMOVED***,
-		***REMOVED***".", "../.", "."***REMOVED***,
-		***REMOVED***".", "../a", "a"***REMOVED***,
-		***REMOVED***".", "../..", "."***REMOVED***,
-		***REMOVED***".", "../bar/a", "bar/a"***REMOVED***,
-		***REMOVED***".", "../baz/a", "baz/a"***REMOVED***,
-		***REMOVED***".", "...", "..."***REMOVED***,
-		***REMOVED***".", ".../a", ".../a"***REMOVED***,
-		***REMOVED***".", ".../..", "."***REMOVED***,
-		***REMOVED***".", "a", "a"***REMOVED***,
-		***REMOVED***".", "a/./b", "a/b"***REMOVED***,
-		***REMOVED***".", "a/../../b", "b"***REMOVED***,
-		***REMOVED***".", "a/../b", "b"***REMOVED***,
-		***REMOVED***".", "a/b", "a/b"***REMOVED***,
-		***REMOVED***".", "a/b/c/../../d", "a/d"***REMOVED***,
-		***REMOVED***".", "a/b/c/../../../d", "d"***REMOVED***,
-		***REMOVED***".", "a/b/c/../../../../d", "d"***REMOVED***,
-		***REMOVED***".", "a/b/c/d", "a/b/c/d"***REMOVED***,
+		{".", "", "."},
+		{".", "/", "."},
+		{".", ".", "."},
+		{".", "./a", "a"},
+		{".", "..", "."},
+		{".", "..", "."},
+		{".", "../", "."},
+		{".", "../.", "."},
+		{".", "../a", "a"},
+		{".", "../..", "."},
+		{".", "../bar/a", "bar/a"},
+		{".", "../baz/a", "baz/a"},
+		{".", "...", "..."},
+		{".", ".../a", ".../a"},
+		{".", ".../..", "."},
+		{".", "a", "a"},
+		{".", "a/./b", "a/b"},
+		{".", "a/../../b", "b"},
+		{".", "a/../b", "b"},
+		{".", "a/b", "a/b"},
+		{".", "a/b/c/../../d", "a/d"},
+		{".", "a/b/c/../../../d", "d"},
+		{".", "a/b/c/../../../../d", "d"},
+		{".", "a/b/c/d", "a/b/c/d"},
 
-		***REMOVED***"", "", "."***REMOVED***,
-		***REMOVED***"", "/", "."***REMOVED***,
-		***REMOVED***"", ".", "."***REMOVED***,
-		***REMOVED***"", "./a", "a"***REMOVED***,
-		***REMOVED***"", "..", "."***REMOVED***,
-	***REMOVED***
+		{"", "", "."},
+		{"", "/", "."},
+		{"", ".", "."},
+		{"", "./a", "a"},
+		{"", "..", "."},
+	}
 
-	for _, tc := range testCases ***REMOVED***
+	for _, tc := range testCases {
 		d := Dir(filepath.FromSlash(tc.dir))
-		if got := filepath.ToSlash(d.resolve(tc.name)); got != tc.want ***REMOVED***
+		if got := filepath.ToSlash(d.resolve(tc.name)); got != tc.want {
 			t.Errorf("dir=%q, name=%q: got %q, want %q", tc.dir, tc.name, got, tc.want)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestWalk(t *testing.T) ***REMOVED***
-	type walkStep struct ***REMOVED***
+func TestWalk(t *testing.T) {
+	type walkStep struct {
 		name, frag string
 		final      bool
-	***REMOVED***
+	}
 
-	testCases := []struct ***REMOVED***
+	testCases := []struct {
 		dir  string
 		want []walkStep
-	***REMOVED******REMOVED***
-		***REMOVED***"", []walkStep***REMOVED***
-			***REMOVED***"", "", true***REMOVED***,
-		***REMOVED******REMOVED***,
-		***REMOVED***"/", []walkStep***REMOVED***
-			***REMOVED***"", "", true***REMOVED***,
-		***REMOVED******REMOVED***,
-		***REMOVED***"/a", []walkStep***REMOVED***
-			***REMOVED***"", "a", true***REMOVED***,
-		***REMOVED******REMOVED***,
-		***REMOVED***"/a/", []walkStep***REMOVED***
-			***REMOVED***"", "a", true***REMOVED***,
-		***REMOVED******REMOVED***,
-		***REMOVED***"/a/b", []walkStep***REMOVED***
-			***REMOVED***"", "a", false***REMOVED***,
-			***REMOVED***"a", "b", true***REMOVED***,
-		***REMOVED******REMOVED***,
-		***REMOVED***"/a/b/", []walkStep***REMOVED***
-			***REMOVED***"", "a", false***REMOVED***,
-			***REMOVED***"a", "b", true***REMOVED***,
-		***REMOVED******REMOVED***,
-		***REMOVED***"/a/b/c", []walkStep***REMOVED***
-			***REMOVED***"", "a", false***REMOVED***,
-			***REMOVED***"a", "b", false***REMOVED***,
-			***REMOVED***"b", "c", true***REMOVED***,
-		***REMOVED******REMOVED***,
+	}{
+		{"", []walkStep{
+			{"", "", true},
+		}},
+		{"/", []walkStep{
+			{"", "", true},
+		}},
+		{"/a", []walkStep{
+			{"", "a", true},
+		}},
+		{"/a/", []walkStep{
+			{"", "a", true},
+		}},
+		{"/a/b", []walkStep{
+			{"", "a", false},
+			{"a", "b", true},
+		}},
+		{"/a/b/", []walkStep{
+			{"", "a", false},
+			{"a", "b", true},
+		}},
+		{"/a/b/c", []walkStep{
+			{"", "a", false},
+			{"a", "b", false},
+			{"b", "c", true},
+		}},
 		// The following test case is the one mentioned explicitly
 		// in the method description.
-		***REMOVED***"/foo/bar/x", []walkStep***REMOVED***
-			***REMOVED***"", "foo", false***REMOVED***,
-			***REMOVED***"foo", "bar", false***REMOVED***,
-			***REMOVED***"bar", "x", true***REMOVED***,
-		***REMOVED******REMOVED***,
-	***REMOVED***
+		{"/foo/bar/x", []walkStep{
+			{"", "foo", false},
+			{"foo", "bar", false},
+			{"bar", "x", true},
+		}},
+	}
 
 	ctx := context.Background()
 
-	for _, tc := range testCases ***REMOVED***
+	for _, tc := range testCases {
 		fs := NewMemFS().(*memFS)
 
 		parts := strings.Split(tc.dir, "/")
-		for p := 2; p < len(parts); p++ ***REMOVED***
+		for p := 2; p < len(parts); p++ {
 			d := strings.Join(parts[:p], "/")
-			if err := fs.Mkdir(ctx, d, 0666); err != nil ***REMOVED***
+			if err := fs.Mkdir(ctx, d, 0666); err != nil {
 				t.Errorf("tc.dir=%q: mkdir: %q: %v", tc.dir, d, err)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		i, prevFrag := 0, ""
-		err := fs.walk("test", tc.dir, func(dir *memFSNode, frag string, final bool) error ***REMOVED***
-			got := walkStep***REMOVED***
+		err := fs.walk("test", tc.dir, func(dir *memFSNode, frag string, final bool) error {
+			got := walkStep{
 				name:  prevFrag,
 				frag:  frag,
 				final: final,
-			***REMOVED***
+			}
 			want := tc.want[i]
 
-			if got != want ***REMOVED***
+			if got != want {
 				return fmt.Errorf("got %+v, want %+v", got, want)
-			***REMOVED***
+			}
 			i, prevFrag = i+1, frag
 			return nil
-		***REMOVED***)
-		if err != nil ***REMOVED***
+		})
+		if err != nil {
 			t.Errorf("tc.dir=%q: %v", tc.dir, err)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // find appends to ss the names of the named file and its children. It is
 // analogous to the Unix find command.
 //
 // The returned strings are not guaranteed to be in any particular order.
-func find(ctx context.Context, ss []string, fs FileSystem, name string) ([]string, error) ***REMOVED***
+func find(ctx context.Context, ss []string, fs FileSystem, name string) ([]string, error) {
 	stat, err := fs.Stat(ctx, name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	ss = append(ss, name)
-	if stat.IsDir() ***REMOVED***
+	if stat.IsDir() {
 		f, err := fs.OpenFile(ctx, name, os.O_RDONLY, 0)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		defer f.Close()
 		children, err := f.Readdir(-1)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-		for _, c := range children ***REMOVED***
+		}
+		for _, c := range children {
 			ss, err = find(ctx, ss, fs, path.Join(name, c.Name()))
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return ss, nil
-***REMOVED***
+}
 
-func testFS(t *testing.T, fs FileSystem) ***REMOVED***
-	errStr := func(err error) string ***REMOVED***
-		switch ***REMOVED***
+func testFS(t *testing.T, fs FileSystem) {
+	errStr := func(err error) string {
+		switch {
 		case os.IsExist(err):
 			return "errExist"
 		case os.IsNotExist(err):
 			return "errNotExist"
 		case err != nil:
 			return "err"
-		***REMOVED***
+		}
 		return "ok"
-	***REMOVED***
+	}
 
 	// The non-"find" non-"stat" test cases should change the file system state. The
 	// indentation of the "find"s and "stat"s helps distinguish such test cases.
-	testCases := []string***REMOVED***
+	testCases := []string{
 		"  stat / want dir",
 		"  stat /a want errNotExist",
 		"  stat /d want errNotExist",
@@ -405,71 +405,71 @@ func testFS(t *testing.T, fs FileSystem) ***REMOVED***
 		"  stat /u want errNotExist",
 		"  find / /c /d /d/x /d/y /d/y/q /d/y/r /d/y/w /d/y/w/s",
 		"copy__ o=F d=∞ /d/y /d/x want errExist",
-	***REMOVED***
+	}
 
 	ctx := context.Background()
 
-	for i, tc := range testCases ***REMOVED***
+	for i, tc := range testCases {
 		tc = strings.TrimSpace(tc)
 		j := strings.IndexByte(tc, ' ')
-		if j < 0 ***REMOVED***
+		if j < 0 {
 			t.Fatalf("test case #%d %q: invalid command", i, tc)
-		***REMOVED***
+		}
 		op, arg := tc[:j], tc[j+1:]
 
-		switch op ***REMOVED***
+		switch op {
 		default:
 			t.Fatalf("test case #%d %q: invalid operation %q", i, tc, op)
 
 		case "create":
 			parts := strings.Split(arg, " ")
-			if len(parts) != 4 || parts[2] != "want" ***REMOVED***
+			if len(parts) != 4 || parts[2] != "want" {
 				t.Fatalf("test case #%d %q: invalid write", i, tc)
-			***REMOVED***
+			}
 			f, opErr := fs.OpenFile(ctx, parts[0], os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
-			if got := errStr(opErr); got != parts[3] ***REMOVED***
+			if got := errStr(opErr); got != parts[3] {
 				t.Fatalf("test case #%d %q: OpenFile: got %q (%v), want %q", i, tc, got, opErr, parts[3])
-			***REMOVED***
-			if f != nil ***REMOVED***
-				if _, err := f.Write([]byte(parts[1])); err != nil ***REMOVED***
+			}
+			if f != nil {
+				if _, err := f.Write([]byte(parts[1])); err != nil {
 					t.Fatalf("test case #%d %q: Write: %v", i, tc, err)
-				***REMOVED***
-				if err := f.Close(); err != nil ***REMOVED***
+				}
+				if err := f.Close(); err != nil {
 					t.Fatalf("test case #%d %q: Close: %v", i, tc, err)
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 
 		case "find":
 			got, err := find(ctx, nil, fs, "/")
-			if err != nil ***REMOVED***
+			if err != nil {
 				t.Fatalf("test case #%d %q: find: %v", i, tc, err)
-			***REMOVED***
+			}
 			sort.Strings(got)
 			want := strings.Split(arg, " ")
-			if !reflect.DeepEqual(got, want) ***REMOVED***
+			if !reflect.DeepEqual(got, want) {
 				t.Fatalf("test case #%d %q:\ngot  %s\nwant %s", i, tc, got, want)
-			***REMOVED***
+			}
 
 		case "copy__", "mk-dir", "move__", "rm-all", "stat":
 			nParts := 3
-			switch op ***REMOVED***
+			switch op {
 			case "copy__":
 				nParts = 6
 			case "move__":
 				nParts = 5
-			***REMOVED***
+			}
 			parts := strings.Split(arg, " ")
-			if len(parts) != nParts ***REMOVED***
+			if len(parts) != nParts {
 				t.Fatalf("test case #%d %q: invalid %s", i, tc, op)
-			***REMOVED***
+			}
 
 			got, opErr := "", error(nil)
-			switch op ***REMOVED***
+			switch op {
 			case "copy__":
 				depth := 0
-				if parts[1] == "d=∞" ***REMOVED***
+				if parts[1] == "d=∞" {
 					depth = infiniteDepth
-				***REMOVED***
+				}
 				_, opErr = copyFiles(ctx, fs, parts[2], parts[3], parts[0] == "o=T", depth, 0)
 			case "mk-dir":
 				opErr = fs.Mkdir(ctx, parts[0], 0777)
@@ -480,116 +480,116 @@ func testFS(t *testing.T, fs FileSystem) ***REMOVED***
 			case "stat":
 				var stat os.FileInfo
 				fileName := parts[0]
-				if stat, opErr = fs.Stat(ctx, fileName); opErr == nil ***REMOVED***
-					if stat.IsDir() ***REMOVED***
+				if stat, opErr = fs.Stat(ctx, fileName); opErr == nil {
+					if stat.IsDir() {
 						got = "dir"
-					***REMOVED*** else ***REMOVED***
+					} else {
 						got = strconv.Itoa(int(stat.Size()))
-					***REMOVED***
+					}
 
-					if fileName == "/" ***REMOVED***
+					if fileName == "/" {
 						// For a Dir FileSystem, the virtual file system root maps to a
 						// real file system name like "/tmp/webdav-test012345", which does
 						// not end with "/". We skip such cases.
-					***REMOVED*** else if statName := stat.Name(); path.Base(fileName) != statName ***REMOVED***
+					} else if statName := stat.Name(); path.Base(fileName) != statName {
 						t.Fatalf("test case #%d %q: file name %q inconsistent with stat name %q",
 							i, tc, fileName, statName)
-					***REMOVED***
-				***REMOVED***
-			***REMOVED***
-			if got == "" ***REMOVED***
+					}
+				}
+			}
+			if got == "" {
 				got = errStr(opErr)
-			***REMOVED***
+			}
 
-			if parts[len(parts)-2] != "want" ***REMOVED***
+			if parts[len(parts)-2] != "want" {
 				t.Fatalf("test case #%d %q: invalid %s", i, tc, op)
-			***REMOVED***
-			if want := parts[len(parts)-1]; got != want ***REMOVED***
+			}
+			if want := parts[len(parts)-1]; got != want {
 				t.Fatalf("test case #%d %q: got %q (%v), want %q", i, tc, got, opErr, want)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}
 
-func TestDir(t *testing.T) ***REMOVED***
-	switch runtime.GOOS ***REMOVED***
+func TestDir(t *testing.T) {
+	switch runtime.GOOS {
 	case "nacl":
 		t.Skip("see golang.org/issue/12004")
 	case "plan9":
 		t.Skip("see golang.org/issue/11453")
-	***REMOVED***
+	}
 
 	td, err := ioutil.TempDir("", "webdav-test")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	defer os.RemoveAll(td)
 	testFS(t, Dir(td))
-***REMOVED***
+}
 
-func TestMemFS(t *testing.T) ***REMOVED***
+func TestMemFS(t *testing.T) {
 	testFS(t, NewMemFS())
-***REMOVED***
+}
 
-func TestMemFSRoot(t *testing.T) ***REMOVED***
+func TestMemFSRoot(t *testing.T) {
 	ctx := context.Background()
 	fs := NewMemFS()
-	for i := 0; i < 5; i++ ***REMOVED***
+	for i := 0; i < 5; i++ {
 		stat, err := fs.Stat(ctx, "/")
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("i=%d: Stat: %v", i, err)
-		***REMOVED***
-		if !stat.IsDir() ***REMOVED***
+		}
+		if !stat.IsDir() {
 			t.Fatalf("i=%d: Stat.IsDir is false, want true", i)
-		***REMOVED***
+		}
 
 		f, err := fs.OpenFile(ctx, "/", os.O_RDONLY, 0)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("i=%d: OpenFile: %v", i, err)
-		***REMOVED***
+		}
 		defer f.Close()
 		children, err := f.Readdir(-1)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("i=%d: Readdir: %v", i, err)
-		***REMOVED***
-		if len(children) != i ***REMOVED***
+		}
+		if len(children) != i {
 			t.Fatalf("i=%d: got %d children, want %d", i, len(children), i)
-		***REMOVED***
+		}
 
-		if _, err := f.Write(make([]byte, 1)); err == nil ***REMOVED***
+		if _, err := f.Write(make([]byte, 1)); err == nil {
 			t.Fatalf("i=%d: Write: got nil error, want non-nil", i)
-		***REMOVED***
+		}
 
-		if err := fs.Mkdir(ctx, fmt.Sprintf("/dir%d", i), 0777); err != nil ***REMOVED***
+		if err := fs.Mkdir(ctx, fmt.Sprintf("/dir%d", i), 0777); err != nil {
 			t.Fatalf("i=%d: Mkdir: %v", i, err)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestMemFileReaddir(t *testing.T) ***REMOVED***
+func TestMemFileReaddir(t *testing.T) {
 	ctx := context.Background()
 	fs := NewMemFS()
-	if err := fs.Mkdir(ctx, "/foo", 0777); err != nil ***REMOVED***
+	if err := fs.Mkdir(ctx, "/foo", 0777); err != nil {
 		t.Fatalf("Mkdir: %v", err)
-	***REMOVED***
-	readdir := func(count int) ([]os.FileInfo, error) ***REMOVED***
+	}
+	readdir := func(count int) ([]os.FileInfo, error) {
 		f, err := fs.OpenFile(ctx, "/foo", os.O_RDONLY, 0)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("OpenFile: %v", err)
-		***REMOVED***
+		}
 		defer f.Close()
 		return f.Readdir(count)
-	***REMOVED***
-	if got, err := readdir(-1); len(got) != 0 || err != nil ***REMOVED***
+	}
+	if got, err := readdir(-1); len(got) != 0 || err != nil {
 		t.Fatalf("readdir(-1): got %d fileInfos with err=%v, want 0, <nil>", len(got), err)
-	***REMOVED***
-	if got, err := readdir(+1); len(got) != 0 || err != io.EOF ***REMOVED***
+	}
+	if got, err := readdir(+1); len(got) != 0 || err != io.EOF {
 		t.Fatalf("readdir(+1): got %d fileInfos with err=%v, want 0, EOF", len(got), err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestMemFile(t *testing.T) ***REMOVED***
-	testCases := []string***REMOVED***
+func TestMemFile(t *testing.T) {
+	testCases := []string{
 		"wantData ",
 		"wantSize 0",
 		"write abc",
@@ -655,60 +655,60 @@ func TestMemFile(t *testing.T) ***REMOVED***
 		"wantSize 50",
 		"seek cur 0 want 50",
 		"seek cur -99 want err",
-	***REMOVED***
+	}
 
 	ctx := context.Background()
 
 	const filename = "/foo"
 	fs := NewMemFS()
 	f, err := fs.OpenFile(ctx, filename, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("OpenFile: %v", err)
-	***REMOVED***
+	}
 	defer f.Close()
 
-	for i, tc := range testCases ***REMOVED***
+	for i, tc := range testCases {
 		j := strings.IndexByte(tc, ' ')
-		if j < 0 ***REMOVED***
+		if j < 0 {
 			t.Fatalf("test case #%d %q: invalid command", i, tc)
-		***REMOVED***
+		}
 		op, arg := tc[:j], tc[j+1:]
 
 		// Expand an arg like "3*a+2*b" to "aaabb".
 		parts := strings.Split(arg, "+")
-		for j, part := range parts ***REMOVED***
-			if k := strings.IndexByte(part, '*'); k >= 0 ***REMOVED***
+		for j, part := range parts {
+			if k := strings.IndexByte(part, '*'); k >= 0 {
 				repeatCount, repeatStr := part[:k], part[k+1:]
 				n, err := strconv.Atoi(repeatCount)
-				if err != nil ***REMOVED***
+				if err != nil {
 					t.Fatalf("test case #%d %q: invalid repeat count %q", i, tc, repeatCount)
-				***REMOVED***
+				}
 				parts[j] = strings.Repeat(repeatStr, n)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		arg = strings.Join(parts, "")
 
-		switch op ***REMOVED***
+		switch op {
 		default:
 			t.Fatalf("test case #%d %q: invalid operation %q", i, tc, op)
 
 		case "read":
 			buf := make([]byte, len(arg))
-			if _, err := io.ReadFull(f, buf); err != nil ***REMOVED***
+			if _, err := io.ReadFull(f, buf); err != nil {
 				t.Fatalf("test case #%d %q: ReadFull: %v", i, tc, err)
-			***REMOVED***
-			if got := string(buf); got != arg ***REMOVED***
+			}
+			if got := string(buf); got != arg {
 				t.Fatalf("test case #%d %q:\ngot  %q\nwant %q", i, tc, got, arg)
-			***REMOVED***
+			}
 
 		case "seek":
 			parts := strings.Split(arg, " ")
-			if len(parts) != 4 ***REMOVED***
+			if len(parts) != 4 {
 				t.Fatalf("test case #%d %q: invalid seek", i, tc)
-			***REMOVED***
+			}
 
 			whence := 0
-			switch parts[0] ***REMOVED***
+			switch parts[0] {
 			default:
 				t.Fatalf("test case #%d %q: invalid seek whence", i, tc)
 			case "set":
@@ -717,278 +717,278 @@ func TestMemFile(t *testing.T) ***REMOVED***
 				whence = os.SEEK_CUR
 			case "end":
 				whence = os.SEEK_END
-			***REMOVED***
+			}
 			offset, err := strconv.Atoi(parts[1])
-			if err != nil ***REMOVED***
+			if err != nil {
 				t.Fatalf("test case #%d %q: invalid offset %q", i, tc, parts[1])
-			***REMOVED***
+			}
 
-			if parts[2] != "want" ***REMOVED***
+			if parts[2] != "want" {
 				t.Fatalf("test case #%d %q: invalid seek", i, tc)
-			***REMOVED***
-			if parts[3] == "err" ***REMOVED***
+			}
+			if parts[3] == "err" {
 				_, err := f.Seek(int64(offset), whence)
-				if err == nil ***REMOVED***
+				if err == nil {
 					t.Fatalf("test case #%d %q: Seek returned nil error, want non-nil", i, tc)
-				***REMOVED***
-			***REMOVED*** else ***REMOVED***
+				}
+			} else {
 				got, err := f.Seek(int64(offset), whence)
-				if err != nil ***REMOVED***
+				if err != nil {
 					t.Fatalf("test case #%d %q: Seek: %v", i, tc, err)
-				***REMOVED***
+				}
 				want, err := strconv.Atoi(parts[3])
-				if err != nil ***REMOVED***
+				if err != nil {
 					t.Fatalf("test case #%d %q: invalid want %q", i, tc, parts[3])
-				***REMOVED***
-				if got != int64(want) ***REMOVED***
+				}
+				if got != int64(want) {
 					t.Fatalf("test case #%d %q: got %d, want %d", i, tc, got, want)
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 
 		case "write":
 			n, err := f.Write([]byte(arg))
-			if err != nil ***REMOVED***
+			if err != nil {
 				t.Fatalf("test case #%d %q: write: %v", i, tc, err)
-			***REMOVED***
-			if n != len(arg) ***REMOVED***
+			}
+			if n != len(arg) {
 				t.Fatalf("test case #%d %q: write returned %d bytes, want %d", i, tc, n, len(arg))
-			***REMOVED***
+			}
 
 		case "wantData":
 			g, err := fs.OpenFile(ctx, filename, os.O_RDONLY, 0666)
-			if err != nil ***REMOVED***
+			if err != nil {
 				t.Fatalf("test case #%d %q: OpenFile: %v", i, tc, err)
-			***REMOVED***
+			}
 			gotBytes, err := ioutil.ReadAll(g)
-			if err != nil ***REMOVED***
+			if err != nil {
 				t.Fatalf("test case #%d %q: ReadAll: %v", i, tc, err)
-			***REMOVED***
-			for i, c := range gotBytes ***REMOVED***
-				if c == '\x00' ***REMOVED***
+			}
+			for i, c := range gotBytes {
+				if c == '\x00' {
 					gotBytes[i] = '.'
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			got := string(gotBytes)
-			if got != arg ***REMOVED***
+			if got != arg {
 				t.Fatalf("test case #%d %q:\ngot  %q\nwant %q", i, tc, got, arg)
-			***REMOVED***
-			if err := g.Close(); err != nil ***REMOVED***
+			}
+			if err := g.Close(); err != nil {
 				t.Fatalf("test case #%d %q: Close: %v", i, tc, err)
-			***REMOVED***
+			}
 
 		case "wantSize":
 			n, err := strconv.Atoi(arg)
-			if err != nil ***REMOVED***
+			if err != nil {
 				t.Fatalf("test case #%d %q: invalid size %q", i, tc, arg)
-			***REMOVED***
+			}
 			fi, err := fs.Stat(ctx, filename)
-			if err != nil ***REMOVED***
+			if err != nil {
 				t.Fatalf("test case #%d %q: Stat: %v", i, tc, err)
-			***REMOVED***
-			if got, want := fi.Size(), int64(n); got != want ***REMOVED***
+			}
+			if got, want := fi.Size(), int64(n); got != want {
 				t.Fatalf("test case #%d %q: got %d, want %d", i, tc, got, want)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}
 
 // TestMemFileWriteAllocs tests that writing N consecutive 1KiB chunks to a
 // memFile doesn't allocate a new buffer for each of those N times. Otherwise,
 // calling io.Copy(aMemFile, src) is likely to have quadratic complexity.
-func TestMemFileWriteAllocs(t *testing.T) ***REMOVED***
-	if runtime.Compiler == "gccgo" ***REMOVED***
+func TestMemFileWriteAllocs(t *testing.T) {
+	if runtime.Compiler == "gccgo" {
 		t.Skip("gccgo allocates here")
-	***REMOVED***
+	}
 	ctx := context.Background()
 	fs := NewMemFS()
 	f, err := fs.OpenFile(ctx, "/xxx", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("OpenFile: %v", err)
-	***REMOVED***
+	}
 	defer f.Close()
 
 	xxx := make([]byte, 1024)
-	for i := range xxx ***REMOVED***
+	for i := range xxx {
 		xxx[i] = 'x'
-	***REMOVED***
+	}
 
-	a := testing.AllocsPerRun(100, func() ***REMOVED***
+	a := testing.AllocsPerRun(100, func() {
 		f.Write(xxx)
-	***REMOVED***)
+	})
 	// AllocsPerRun returns an integral value, so we compare the rounded-down
 	// number to zero.
-	if a > 0 ***REMOVED***
+	if a > 0 {
 		t.Fatalf("%v allocs per run, want 0", a)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func BenchmarkMemFileWrite(b *testing.B) ***REMOVED***
+func BenchmarkMemFileWrite(b *testing.B) {
 	ctx := context.Background()
 	fs := NewMemFS()
 	xxx := make([]byte, 1024)
-	for i := range xxx ***REMOVED***
+	for i := range xxx {
 		xxx[i] = 'x'
-	***REMOVED***
+	}
 
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		f, err := fs.OpenFile(ctx, "/xxx", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
-		if err != nil ***REMOVED***
+		if err != nil {
 			b.Fatalf("OpenFile: %v", err)
-		***REMOVED***
-		for j := 0; j < 100; j++ ***REMOVED***
+		}
+		for j := 0; j < 100; j++ {
 			f.Write(xxx)
-		***REMOVED***
-		if err := f.Close(); err != nil ***REMOVED***
+		}
+		if err := f.Close(); err != nil {
 			b.Fatalf("Close: %v", err)
-		***REMOVED***
-		if err := fs.RemoveAll(ctx, "/xxx"); err != nil ***REMOVED***
+		}
+		if err := fs.RemoveAll(ctx, "/xxx"); err != nil {
 			b.Fatalf("RemoveAll: %v", err)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestCopyMoveProps(t *testing.T) ***REMOVED***
+func TestCopyMoveProps(t *testing.T) {
 	ctx := context.Background()
 	fs := NewMemFS()
-	create := func(name string) error ***REMOVED***
+	create := func(name string) error {
 		f, err := fs.OpenFile(ctx, name, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		_, wErr := f.Write([]byte("contents"))
 		cErr := f.Close()
-		if wErr != nil ***REMOVED***
+		if wErr != nil {
 			return wErr
-		***REMOVED***
+		}
 		return cErr
-	***REMOVED***
-	patch := func(name string, patches ...Proppatch) error ***REMOVED***
+	}
+	patch := func(name string, patches ...Proppatch) error {
 		f, err := fs.OpenFile(ctx, name, os.O_RDWR, 0666)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		_, pErr := f.(DeadPropsHolder).Patch(patches)
 		cErr := f.Close()
-		if pErr != nil ***REMOVED***
+		if pErr != nil {
 			return pErr
-		***REMOVED***
+		}
 		return cErr
-	***REMOVED***
-	props := func(name string) (map[xml.Name]Property, error) ***REMOVED***
+	}
+	props := func(name string) (map[xml.Name]Property, error) {
 		f, err := fs.OpenFile(ctx, name, os.O_RDWR, 0666)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		m, pErr := f.(DeadPropsHolder).DeadProps()
 		cErr := f.Close()
-		if pErr != nil ***REMOVED***
+		if pErr != nil {
 			return nil, pErr
-		***REMOVED***
-		if cErr != nil ***REMOVED***
+		}
+		if cErr != nil {
 			return nil, cErr
-		***REMOVED***
+		}
 		return m, nil
-	***REMOVED***
+	}
 
-	p0 := Property***REMOVED***
-		XMLName:  xml.Name***REMOVED***Space: "x:", Local: "boat"***REMOVED***,
+	p0 := Property{
+		XMLName:  xml.Name{Space: "x:", Local: "boat"},
 		InnerXML: []byte("pea-green"),
-	***REMOVED***
-	p1 := Property***REMOVED***
-		XMLName:  xml.Name***REMOVED***Space: "x:", Local: "ring"***REMOVED***,
+	}
+	p1 := Property{
+		XMLName:  xml.Name{Space: "x:", Local: "ring"},
 		InnerXML: []byte("1 shilling"),
-	***REMOVED***
-	p2 := Property***REMOVED***
-		XMLName:  xml.Name***REMOVED***Space: "x:", Local: "spoon"***REMOVED***,
+	}
+	p2 := Property{
+		XMLName:  xml.Name{Space: "x:", Local: "spoon"},
 		InnerXML: []byte("runcible"),
-	***REMOVED***
-	p3 := Property***REMOVED***
-		XMLName:  xml.Name***REMOVED***Space: "x:", Local: "moon"***REMOVED***,
+	}
+	p3 := Property{
+		XMLName:  xml.Name{Space: "x:", Local: "moon"},
 		InnerXML: []byte("light"),
-	***REMOVED***
+	}
 
-	if err := create("/src"); err != nil ***REMOVED***
+	if err := create("/src"); err != nil {
 		t.Fatalf("create /src: %v", err)
-	***REMOVED***
-	if err := patch("/src", Proppatch***REMOVED***Props: []Property***REMOVED***p0, p1***REMOVED******REMOVED***); err != nil ***REMOVED***
+	}
+	if err := patch("/src", Proppatch{Props: []Property{p0, p1}}); err != nil {
 		t.Fatalf("patch /src +p0 +p1: %v", err)
-	***REMOVED***
-	if _, err := copyFiles(ctx, fs, "/src", "/tmp", true, infiniteDepth, 0); err != nil ***REMOVED***
+	}
+	if _, err := copyFiles(ctx, fs, "/src", "/tmp", true, infiniteDepth, 0); err != nil {
 		t.Fatalf("copyFiles /src /tmp: %v", err)
-	***REMOVED***
-	if _, err := moveFiles(ctx, fs, "/tmp", "/dst", true); err != nil ***REMOVED***
+	}
+	if _, err := moveFiles(ctx, fs, "/tmp", "/dst", true); err != nil {
 		t.Fatalf("moveFiles /tmp /dst: %v", err)
-	***REMOVED***
-	if err := patch("/src", Proppatch***REMOVED***Props: []Property***REMOVED***p0***REMOVED***, Remove: true***REMOVED***); err != nil ***REMOVED***
+	}
+	if err := patch("/src", Proppatch{Props: []Property{p0}, Remove: true}); err != nil {
 		t.Fatalf("patch /src -p0: %v", err)
-	***REMOVED***
-	if err := patch("/src", Proppatch***REMOVED***Props: []Property***REMOVED***p2***REMOVED******REMOVED***); err != nil ***REMOVED***
+	}
+	if err := patch("/src", Proppatch{Props: []Property{p2}}); err != nil {
 		t.Fatalf("patch /src +p2: %v", err)
-	***REMOVED***
-	if err := patch("/dst", Proppatch***REMOVED***Props: []Property***REMOVED***p1***REMOVED***, Remove: true***REMOVED***); err != nil ***REMOVED***
+	}
+	if err := patch("/dst", Proppatch{Props: []Property{p1}, Remove: true}); err != nil {
 		t.Fatalf("patch /dst -p1: %v", err)
-	***REMOVED***
-	if err := patch("/dst", Proppatch***REMOVED***Props: []Property***REMOVED***p3***REMOVED******REMOVED***); err != nil ***REMOVED***
+	}
+	if err := patch("/dst", Proppatch{Props: []Property{p3}}); err != nil {
 		t.Fatalf("patch /dst +p3: %v", err)
-	***REMOVED***
+	}
 
 	gotSrc, err := props("/src")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("props /src: %v", err)
-	***REMOVED***
-	wantSrc := map[xml.Name]Property***REMOVED***
+	}
+	wantSrc := map[xml.Name]Property{
 		p1.XMLName: p1,
 		p2.XMLName: p2,
-	***REMOVED***
-	if !reflect.DeepEqual(gotSrc, wantSrc) ***REMOVED***
+	}
+	if !reflect.DeepEqual(gotSrc, wantSrc) {
 		t.Fatalf("props /src:\ngot  %v\nwant %v", gotSrc, wantSrc)
-	***REMOVED***
+	}
 
 	gotDst, err := props("/dst")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("props /dst: %v", err)
-	***REMOVED***
-	wantDst := map[xml.Name]Property***REMOVED***
+	}
+	wantDst := map[xml.Name]Property{
 		p0.XMLName: p0,
 		p3.XMLName: p3,
-	***REMOVED***
-	if !reflect.DeepEqual(gotDst, wantDst) ***REMOVED***
+	}
+	if !reflect.DeepEqual(gotDst, wantDst) {
 		t.Fatalf("props /dst:\ngot  %v\nwant %v", gotDst, wantDst)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestWalkFS(t *testing.T) ***REMOVED***
-	testCases := []struct ***REMOVED***
+func TestWalkFS(t *testing.T) {
+	testCases := []struct {
 		desc    string
 		buildfs []string
 		startAt string
 		depth   int
 		walkFn  filepath.WalkFunc
 		want    []string
-	***REMOVED******REMOVED******REMOVED***
+	}{{
 		"just root",
-		[]string***REMOVED******REMOVED***,
+		[]string{},
 		"/",
 		infiniteDepth,
 		nil,
-		[]string***REMOVED***
+		[]string{
 			"/",
-		***REMOVED***,
-	***REMOVED***, ***REMOVED***
+		},
+	}, {
 		"infinite walk from root",
-		[]string***REMOVED***
+		[]string{
 			"mkdir /a",
 			"mkdir /a/b",
 			"touch /a/b/c",
 			"mkdir /a/d",
 			"mkdir /e",
 			"touch /f",
-		***REMOVED***,
+		},
 		"/",
 		infiniteDepth,
 		nil,
-		[]string***REMOVED***
+		[]string{
 			"/",
 			"/a",
 			"/a/b",
@@ -996,48 +996,48 @@ func TestWalkFS(t *testing.T) ***REMOVED***
 			"/a/d",
 			"/e",
 			"/f",
-		***REMOVED***,
-	***REMOVED***, ***REMOVED***
+		},
+	}, {
 		"infinite walk from subdir",
-		[]string***REMOVED***
+		[]string{
 			"mkdir /a",
 			"mkdir /a/b",
 			"touch /a/b/c",
 			"mkdir /a/d",
 			"mkdir /e",
 			"touch /f",
-		***REMOVED***,
+		},
 		"/a",
 		infiniteDepth,
 		nil,
-		[]string***REMOVED***
+		[]string{
 			"/a",
 			"/a/b",
 			"/a/b/c",
 			"/a/d",
-		***REMOVED***,
-	***REMOVED***, ***REMOVED***
+		},
+	}, {
 		"depth 1 walk from root",
-		[]string***REMOVED***
+		[]string{
 			"mkdir /a",
 			"mkdir /a/b",
 			"touch /a/b/c",
 			"mkdir /a/d",
 			"mkdir /e",
 			"touch /f",
-		***REMOVED***,
+		},
 		"/",
 		1,
 		nil,
-		[]string***REMOVED***
+		[]string{
 			"/",
 			"/a",
 			"/e",
 			"/f",
-		***REMOVED***,
-	***REMOVED***, ***REMOVED***
+		},
+	}, {
 		"depth 1 walk from subdir",
-		[]string***REMOVED***
+		[]string{
 			"mkdir /a",
 			"mkdir /a/b",
 			"touch /a/b/c",
@@ -1045,18 +1045,18 @@ func TestWalkFS(t *testing.T) ***REMOVED***
 			"mkdir /a/b/g/h",
 			"touch /a/b/g/i",
 			"touch /a/b/g/h/j",
-		***REMOVED***,
+		},
 		"/a/b",
 		1,
 		nil,
-		[]string***REMOVED***
+		[]string{
 			"/a/b",
 			"/a/b/c",
 			"/a/b/g",
-		***REMOVED***,
-	***REMOVED***, ***REMOVED***
+		},
+	}, {
 		"depth 0 walk from subdir",
-		[]string***REMOVED***
+		[]string{
 			"mkdir /a",
 			"mkdir /a/b",
 			"touch /a/b/c",
@@ -1064,29 +1064,29 @@ func TestWalkFS(t *testing.T) ***REMOVED***
 			"mkdir /a/b/g/h",
 			"touch /a/b/g/i",
 			"touch /a/b/g/h/j",
-		***REMOVED***,
+		},
 		"/a/b",
 		0,
 		nil,
-		[]string***REMOVED***
+		[]string{
 			"/a/b",
-		***REMOVED***,
-	***REMOVED***, ***REMOVED***
+		},
+	}, {
 		"infinite walk from file",
-		[]string***REMOVED***
+		[]string{
 			"mkdir /a",
 			"touch /a/b",
 			"touch /a/c",
-		***REMOVED***,
+		},
 		"/a/b",
 		0,
 		nil,
-		[]string***REMOVED***
+		[]string{
 			"/a/b",
-		***REMOVED***,
-	***REMOVED***, ***REMOVED***
+		},
+	}, {
 		"infinite walk with skipped subdir",
-		[]string***REMOVED***
+		[]string{
 			"mkdir /a",
 			"mkdir /a/b",
 			"touch /a/b/c",
@@ -1095,90 +1095,90 @@ func TestWalkFS(t *testing.T) ***REMOVED***
 			"touch /a/b/g/i",
 			"touch /a/b/g/h/j",
 			"touch /a/b/z",
-		***REMOVED***,
+		},
 		"/",
 		infiniteDepth,
-		func(path string, info os.FileInfo, err error) error ***REMOVED***
-			if path == "/a/b/g" ***REMOVED***
+		func(path string, info os.FileInfo, err error) error {
+			if path == "/a/b/g" {
 				return filepath.SkipDir
-			***REMOVED***
+			}
 			return nil
-		***REMOVED***,
-		[]string***REMOVED***
+		},
+		[]string{
 			"/",
 			"/a",
 			"/a/b",
 			"/a/b/c",
 			"/a/b/z",
-		***REMOVED***,
-	***REMOVED******REMOVED***
+		},
+	}}
 	ctx := context.Background()
-	for _, tc := range testCases ***REMOVED***
+	for _, tc := range testCases {
 		fs, err := buildTestFS(tc.buildfs)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("%s: cannot create test filesystem: %v", tc.desc, err)
-		***REMOVED***
+		}
 		var got []string
-		traceFn := func(path string, info os.FileInfo, err error) error ***REMOVED***
-			if tc.walkFn != nil ***REMOVED***
+		traceFn := func(path string, info os.FileInfo, err error) error {
+			if tc.walkFn != nil {
 				err = tc.walkFn(path, info, err)
-				if err != nil ***REMOVED***
+				if err != nil {
 					return err
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			got = append(got, path)
 			return nil
-		***REMOVED***
+		}
 		fi, err := fs.Stat(ctx, tc.startAt)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("%s: cannot stat: %v", tc.desc, err)
-		***REMOVED***
+		}
 		err = walkFS(ctx, fs, tc.depth, tc.startAt, fi, traceFn)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Errorf("%s:\ngot error %v, want nil", tc.desc, err)
 			continue
-		***REMOVED***
+		}
 		sort.Strings(got)
 		sort.Strings(tc.want)
-		if !reflect.DeepEqual(got, tc.want) ***REMOVED***
+		if !reflect.DeepEqual(got, tc.want) {
 			t.Errorf("%s:\ngot  %q\nwant %q", tc.desc, got, tc.want)
 			continue
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func buildTestFS(buildfs []string) (FileSystem, error) ***REMOVED***
+func buildTestFS(buildfs []string) (FileSystem, error) {
 	// TODO: Could this be merged with the build logic in TestFS?
 
 	ctx := context.Background()
 	fs := NewMemFS()
-	for _, b := range buildfs ***REMOVED***
+	for _, b := range buildfs {
 		op := strings.Split(b, " ")
-		switch op[0] ***REMOVED***
+		switch op[0] {
 		case "mkdir":
 			err := fs.Mkdir(ctx, op[1], os.ModeDir|0777)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 		case "touch":
 			f, err := fs.OpenFile(ctx, op[1], os.O_RDWR|os.O_CREATE, 0666)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			f.Close()
 		case "write":
 			f, err := fs.OpenFile(ctx, op[1], os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			_, err = f.Write([]byte(op[2]))
 			f.Close()
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 		default:
 			return nil, fmt.Errorf("unknown file operation %q", op[0])
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return fs, nil
-***REMOVED***
+}

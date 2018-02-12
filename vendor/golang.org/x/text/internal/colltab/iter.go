@@ -7,7 +7,7 @@ package colltab
 // An Iter incrementally converts chunks of the input text to collation
 // elements, while ensuring that the collation elements are in normalized order
 // (that is, they are in the order as if the input text were normalized first).
-type Iter struct ***REMOVED***
+type Iter struct {
 	Weighter Weighter
 	Elems    []Elem
 	// N is the number of elements in Elems that will not be reordered on
@@ -22,109 +22,109 @@ type Iter struct ***REMOVED***
 	// start of the next call to appendNext.
 	pEnd  int // end position in text corresponding to N.
 	pNext int // pEnd <= pNext.
-***REMOVED***
+}
 
 // Reset sets the position in the current input text to p and discards any
 // results obtained so far.
-func (i *Iter) Reset(p int) ***REMOVED***
+func (i *Iter) Reset(p int) {
 	i.Elems = i.Elems[:0]
 	i.N = 0
 	i.pEnd = p
 	i.pNext = p
-***REMOVED***
+}
 
 // Len returns the length of the input text.
-func (i *Iter) Len() int ***REMOVED***
-	if i.bytes != nil ***REMOVED***
+func (i *Iter) Len() int {
+	if i.bytes != nil {
 		return len(i.bytes)
-	***REMOVED***
+	}
 	return len(i.str)
-***REMOVED***
+}
 
 // Discard removes the collation elements up to N.
-func (i *Iter) Discard() ***REMOVED***
+func (i *Iter) Discard() {
 	// TODO: change this such that only modifiers following starters will have
 	// to be copied.
 	i.Elems = i.Elems[:copy(i.Elems, i.Elems[i.N:])]
 	i.N = 0
-***REMOVED***
+}
 
 // End returns the end position of the input text for which Next has returned
 // results.
-func (i *Iter) End() int ***REMOVED***
+func (i *Iter) End() int {
 	return i.pEnd
-***REMOVED***
+}
 
 // SetInput resets i to input s.
-func (i *Iter) SetInput(s []byte) ***REMOVED***
+func (i *Iter) SetInput(s []byte) {
 	i.bytes = s
 	i.str = ""
 	i.Reset(0)
-***REMOVED***
+}
 
 // SetInputString resets i to input s.
-func (i *Iter) SetInputString(s string) ***REMOVED***
+func (i *Iter) SetInputString(s string) {
 	i.str = s
 	i.bytes = nil
 	i.Reset(0)
-***REMOVED***
+}
 
-func (i *Iter) done() bool ***REMOVED***
+func (i *Iter) done() bool {
 	return i.pNext >= len(i.str) && i.pNext >= len(i.bytes)
-***REMOVED***
+}
 
-func (i *Iter) appendNext() bool ***REMOVED***
-	if i.done() ***REMOVED***
+func (i *Iter) appendNext() bool {
+	if i.done() {
 		return false
-	***REMOVED***
+	}
 	var sz int
-	if i.bytes == nil ***REMOVED***
+	if i.bytes == nil {
 		i.Elems, sz = i.Weighter.AppendNextString(i.Elems, i.str[i.pNext:])
-	***REMOVED*** else ***REMOVED***
+	} else {
 		i.Elems, sz = i.Weighter.AppendNext(i.Elems, i.bytes[i.pNext:])
-	***REMOVED***
-	if sz == 0 ***REMOVED***
+	}
+	if sz == 0 {
 		sz = 1
-	***REMOVED***
+	}
 	i.pNext += sz
 	return true
-***REMOVED***
+}
 
 // Next appends Elems to the internal array. On each iteration, it will either
 // add starters or modifiers. In the majority of cases, an Elem with a primary
 // value > 0 will have a CCC of 0. The CCC values of collation elements are also
 // used to detect if the input string was not normalized and to adjust the
 // result accordingly.
-func (i *Iter) Next() bool ***REMOVED***
-	if i.N == len(i.Elems) && !i.appendNext() ***REMOVED***
+func (i *Iter) Next() bool {
+	if i.N == len(i.Elems) && !i.appendNext() {
 		return false
-	***REMOVED***
+	}
 
 	// Check if the current segment starts with a starter.
 	prevCCC := i.Elems[len(i.Elems)-1].CCC()
-	if prevCCC == 0 ***REMOVED***
+	if prevCCC == 0 {
 		i.N = len(i.Elems)
 		i.pEnd = i.pNext
 		return true
-	***REMOVED*** else if i.Elems[i.N].CCC() == 0 ***REMOVED***
+	} else if i.Elems[i.N].CCC() == 0 {
 		// set i.N to only cover part of i.Elems for which prevCCC == 0 and
 		// use rest for the next call to next.
-		for i.N++; i.N < len(i.Elems) && i.Elems[i.N].CCC() == 0; i.N++ ***REMOVED***
-		***REMOVED***
+		for i.N++; i.N < len(i.Elems) && i.Elems[i.N].CCC() == 0; i.N++ {
+		}
 		i.pEnd = i.pNext
 		return true
-	***REMOVED***
+	}
 
 	// The current (partial) segment starts with modifiers. We need to collect
 	// all successive modifiers to ensure that they are normalized.
-	for ***REMOVED***
+	for {
 		p := len(i.Elems)
 		i.pEnd = i.pNext
-		if !i.appendNext() ***REMOVED***
+		if !i.appendNext() {
 			break
-		***REMOVED***
+		}
 
-		if ccc := i.Elems[p].CCC(); ccc == 0 || len(i.Elems)-i.N > maxCombiningCharacters ***REMOVED***
+		if ccc := i.Elems[p].CCC(); ccc == 0 || len(i.Elems)-i.N > maxCombiningCharacters {
 			// Leave the starter for the next iteration. This ensures that we
 			// do not return sequences of collation elements that cross two
 			// segments.
@@ -134,31 +134,31 @@ func (i *Iter) Next() bool ***REMOVED***
 			// results are consistent across the text repo.
 			i.N = p
 			return true
-		***REMOVED*** else if ccc < prevCCC ***REMOVED***
+		} else if ccc < prevCCC {
 			i.doNorm(p, ccc) // should be rare, never occurs for NFD and FCC.
-		***REMOVED*** else ***REMOVED***
+		} else {
 			prevCCC = ccc
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	done := len(i.Elems) != i.N
 	i.N = len(i.Elems)
 	return done
-***REMOVED***
+}
 
 // nextNoNorm is the same as next, but does not "normalize" the collation
 // elements.
-func (i *Iter) nextNoNorm() bool ***REMOVED***
+func (i *Iter) nextNoNorm() bool {
 	// TODO: remove this function. Using this instead of next does not seem
 	// to improve performance in any significant way. We retain this until
 	// later for evaluation purposes.
-	if i.done() ***REMOVED***
+	if i.done() {
 		return false
-	***REMOVED***
+	}
 	i.appendNext()
 	i.N = len(i.Elems)
 	return true
-***REMOVED***
+}
 
 const maxCombiningCharacters = 30
 
@@ -167,12 +167,12 @@ const maxCombiningCharacters = 30
 // either start and end with the same CCC or start with CCC == 0.
 // This allows for a single insertion point for the entire block.
 // The correctness of this assumption is verified in builder.go.
-func (i *Iter) doNorm(p int, ccc uint8) ***REMOVED***
+func (i *Iter) doNorm(p int, ccc uint8) {
 	n := len(i.Elems)
 	k := p
-	for p--; p > i.N && ccc < i.Elems[p-1].CCC(); p-- ***REMOVED***
-	***REMOVED***
+	for p--; p > i.N && ccc < i.Elems[p-1].CCC(); p-- {
+	}
 	i.Elems = append(i.Elems, i.Elems[p:k]...)
 	copy(i.Elems[p:], i.Elems[k:])
 	i.Elems = i.Elems[:n]
-***REMOVED***
+}

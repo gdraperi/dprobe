@@ -112,16 +112,16 @@ Consider file test.proto, containing
 ```proto
 	package example;
 	
-	enum FOO ***REMOVED*** X = 17; ***REMOVED***;
+	enum FOO { X = 17; };
 	
-	message Test ***REMOVED***
+	message Test {
 	  required string label = 1;
 	  optional int32 type = 2 [default=77];
 	  repeated int64 reps = 3;
-	  optional group OptionalGroup = 4 ***REMOVED***
+	  optional group OptionalGroup = 4 {
 	    required string RequiredField = 5;
-	  ***REMOVED***
-	***REMOVED***
+	  }
+	}
 ```
 
 To create and play with a Test object from the example package,
@@ -136,30 +136,30 @@ To create and play with a Test object from the example package,
 		"path/to/example"
 	)
 
-	func main() ***REMOVED***
-		test := &example.Test ***REMOVED***
+	func main() {
+		test := &example.Test {
 			Label: proto.String("hello"),
 			Type:  proto.Int32(17),
-			Reps:  []int64***REMOVED***1, 2, 3***REMOVED***,
-			Optionalgroup: &example.Test_OptionalGroup ***REMOVED***
+			Reps:  []int64{1, 2, 3},
+			Optionalgroup: &example.Test_OptionalGroup {
 				RequiredField: proto.String("good bye"),
-			***REMOVED***,
-		***REMOVED***
+			},
+		}
 		data, err := proto.Marshal(test)
-		if err != nil ***REMOVED***
+		if err != nil {
 			log.Fatal("marshaling error: ", err)
-		***REMOVED***
-		newTest := &example.Test***REMOVED******REMOVED***
+		}
+		newTest := &example.Test{}
 		err = proto.Unmarshal(data, newTest)
-		if err != nil ***REMOVED***
+		if err != nil {
 			log.Fatal("unmarshaling error: ", err)
-		***REMOVED***
+		}
 		// Now test and newTest contain the same data.
-		if test.GetLabel() != newTest.GetLabel() ***REMOVED***
+		if test.GetLabel() != newTest.GetLabel() {
 			log.Fatalf("data mismatch %q != %q", test.GetLabel(), newTest.GetLabel())
-		***REMOVED***
+		}
 		// etc.
-	***REMOVED***
+	}
 ```
 
 ## Parameters ##

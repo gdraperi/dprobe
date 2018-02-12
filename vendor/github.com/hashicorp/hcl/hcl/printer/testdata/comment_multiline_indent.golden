@@ -1,4 +1,4 @@
-resource "provider" "resource" ***REMOVED***
+resource "provider" "resource" {
   /*
   SPACE_SENSITIVE_CODE = <<EOF
 yaml code:
@@ -9,4 +9,4 @@ EOF
   /*
        OTHER
                 */
-***REMOVED***
+}

@@ -11,7 +11,7 @@ import (
 	"golang.org/x/text/message"
 )
 
-func main() ***REMOVED***
+func main() {
 	p := message.NewPrinter(language.English)
 
 	p.Print("Hello world!\n")
@@ -42,13 +42,13 @@ func main() ***REMOVED***
 		place,  // Place the person is visiting.
 	)
 
-	pp := struct ***REMOVED***
+	pp := struct {
 		Person string // The person of matter. // TODO: get this comment.
 		Place  string
 		extra  int
-	***REMOVED******REMOVED***
+	}{
 		person, place, 4,
-	***REMOVED***
+	}
 
 	// extract will drop this comment in favor of the one below.
 	// argument is added as a placeholder.
@@ -83,4 +83,4 @@ func main() ***REMOVED***
 	// Double arguments.
 	miles := 1.2345
 	p.Printf("%.2[1]f miles traveled (%[1]f)", miles)
-***REMOVED***
+}

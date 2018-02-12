@@ -9,35 +9,35 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func main() ***REMOVED***
-	sigmap := map[string]os.Signal***REMOVED***
+func main() {
+	sigmap := map[string]os.Signal{
 		"TERM": syscall.SIGTERM,
 		"QUIT": syscall.SIGQUIT,
 		"INT":  os.Interrupt,
-	***REMOVED***
-	signal.Trap(func() ***REMOVED***
+	}
+	signal.Trap(func() {
 		time.Sleep(time.Second)
 		os.Exit(99)
-	***REMOVED***, logrus.StandardLogger())
-	go func() ***REMOVED***
+	}, logrus.StandardLogger())
+	go func() {
 		p, err := os.FindProcess(os.Getpid())
-		if err != nil ***REMOVED***
+		if err != nil {
 			panic(err)
-		***REMOVED***
+		}
 		s := os.Getenv("SIGNAL_TYPE")
 		multiple := os.Getenv("IF_MULTIPLE")
-		switch s ***REMOVED***
+		switch s {
 		case "TERM", "INT":
-			if multiple == "1" ***REMOVED***
-				for ***REMOVED***
+			if multiple == "1" {
+				for {
 					p.Signal(sigmap[s])
-				***REMOVED***
-			***REMOVED*** else ***REMOVED***
+				}
+			} else {
 				p.Signal(sigmap[s])
-			***REMOVED***
+			}
 		case "QUIT":
 			p.Signal(sigmap[s])
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 	time.Sleep(2 * time.Second)
-***REMOVED***
+}

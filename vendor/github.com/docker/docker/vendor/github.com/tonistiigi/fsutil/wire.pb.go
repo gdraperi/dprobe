@@ -31,178 +31,178 @@ const (
 	PACKET_FIN  Packet_PacketType = 3
 )
 
-var Packet_PacketType_name = map[int32]string***REMOVED***
+var Packet_PacketType_name = map[int32]string{
 	0: "PACKET_STAT",
 	1: "PACKET_REQ",
 	2: "PACKET_DATA",
 	3: "PACKET_FIN",
-***REMOVED***
-var Packet_PacketType_value = map[string]int32***REMOVED***
+}
+var Packet_PacketType_value = map[string]int32{
 	"PACKET_STAT": 0,
 	"PACKET_REQ":  1,
 	"PACKET_DATA": 2,
 	"PACKET_FIN":  3,
-***REMOVED***
+}
 
-func (Packet_PacketType) EnumDescriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorWire, []int***REMOVED***0, 0***REMOVED*** ***REMOVED***
+func (Packet_PacketType) EnumDescriptor() ([]byte, []int) { return fileDescriptorWire, []int{0, 0} }
 
-type Packet struct ***REMOVED***
+type Packet struct {
 	Type Packet_PacketType `protobuf:"varint,1,opt,name=type,proto3,enum=fsutil.Packet_PacketType" json:"type,omitempty"`
 	Stat *Stat             `protobuf:"bytes,2,opt,name=stat" json:"stat,omitempty"`
 	ID   uint32            `protobuf:"varint,3,opt,name=ID,proto3" json:"ID,omitempty"`
 	Data []byte            `protobuf:"bytes,4,opt,name=data,proto3" json:"data,omitempty"`
-***REMOVED***
+}
 
-func (m *Packet) Reset()                    ***REMOVED*** *m = Packet***REMOVED******REMOVED*** ***REMOVED***
-func (*Packet) ProtoMessage()               ***REMOVED******REMOVED***
-func (*Packet) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorWire, []int***REMOVED***0***REMOVED*** ***REMOVED***
+func (m *Packet) Reset()                    { *m = Packet{} }
+func (*Packet) ProtoMessage()               {}
+func (*Packet) Descriptor() ([]byte, []int) { return fileDescriptorWire, []int{0} }
 
-func (m *Packet) GetType() Packet_PacketType ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Packet) GetType() Packet_PacketType {
+	if m != nil {
 		return m.Type
-	***REMOVED***
+	}
 	return PACKET_STAT
-***REMOVED***
+}
 
-func (m *Packet) GetStat() *Stat ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Packet) GetStat() *Stat {
+	if m != nil {
 		return m.Stat
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *Packet) GetID() uint32 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Packet) GetID() uint32 {
+	if m != nil {
 		return m.ID
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *Packet) GetData() []byte ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Packet) GetData() []byte {
+	if m != nil {
 		return m.Data
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*Packet)(nil), "fsutil.Packet")
 	proto.RegisterEnum("fsutil.Packet_PacketType", Packet_PacketType_name, Packet_PacketType_value)
-***REMOVED***
-func (x Packet_PacketType) String() string ***REMOVED***
+}
+func (x Packet_PacketType) String() string {
 	s, ok := Packet_PacketType_name[int32(x)]
-	if ok ***REMOVED***
+	if ok {
 		return s
-	***REMOVED***
+	}
 	return strconv.Itoa(int(x))
-***REMOVED***
-func (this *Packet) Equal(that interface***REMOVED******REMOVED***) bool ***REMOVED***
-	if that == nil ***REMOVED***
-		if this == nil ***REMOVED***
+}
+func (this *Packet) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
 			return true
-		***REMOVED***
+		}
 		return false
-	***REMOVED***
+	}
 
 	that1, ok := that.(*Packet)
-	if !ok ***REMOVED***
+	if !ok {
 		that2, ok := that.(Packet)
-		if ok ***REMOVED***
+		if ok {
 			that1 = &that2
-		***REMOVED*** else ***REMOVED***
+		} else {
 			return false
-		***REMOVED***
-	***REMOVED***
-	if that1 == nil ***REMOVED***
-		if this == nil ***REMOVED***
+		}
+	}
+	if that1 == nil {
+		if this == nil {
 			return true
-		***REMOVED***
+		}
 		return false
-	***REMOVED*** else if this == nil ***REMOVED***
+	} else if this == nil {
 		return false
-	***REMOVED***
-	if this.Type != that1.Type ***REMOVED***
+	}
+	if this.Type != that1.Type {
 		return false
-	***REMOVED***
-	if !this.Stat.Equal(that1.Stat) ***REMOVED***
+	}
+	if !this.Stat.Equal(that1.Stat) {
 		return false
-	***REMOVED***
-	if this.ID != that1.ID ***REMOVED***
+	}
+	if this.ID != that1.ID {
 		return false
-	***REMOVED***
-	if !bytes.Equal(this.Data, that1.Data) ***REMOVED***
+	}
+	if !bytes.Equal(this.Data, that1.Data) {
 		return false
-	***REMOVED***
+	}
 	return true
-***REMOVED***
-func (this *Packet) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Packet) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 8)
-	s = append(s, "&fsutil.Packet***REMOVED***")
+	s = append(s, "&fsutil.Packet{")
 	s = append(s, "Type: "+fmt.Sprintf("%#v", this.Type)+",\n")
-	if this.Stat != nil ***REMOVED***
+	if this.Stat != nil {
 		s = append(s, "Stat: "+fmt.Sprintf("%#v", this.Stat)+",\n")
-	***REMOVED***
+	}
 	s = append(s, "ID: "+fmt.Sprintf("%#v", this.ID)+",\n")
 	s = append(s, "Data: "+fmt.Sprintf("%#v", this.Data)+",\n")
-	s = append(s, "***REMOVED***")
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func valueToGoStringWire(v interface***REMOVED******REMOVED***, typ string) string ***REMOVED***
+}
+func valueToGoStringWire(v interface{}, typ string) string {
 	rv := reflect.ValueOf(v)
-	if rv.IsNil() ***REMOVED***
+	if rv.IsNil() {
 		return "nil"
-	***REMOVED***
+	}
 	pv := reflect.Indirect(rv).Interface()
-	return fmt.Sprintf("func(v %v) *%v ***REMOVED*** return &v ***REMOVED*** ( %#v )", typ, typ, pv)
-***REMOVED***
-func (m *Packet) Marshal() (dAtA []byte, err error) ***REMOVED***
+	return fmt.Sprintf("func(v %v) *%v { return &v } ( %#v )", typ, typ, pv)
+}
+func (m *Packet) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *Packet) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *Packet) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.Type != 0 ***REMOVED***
+	if m.Type != 0 {
 		dAtA[i] = 0x8
 		i++
 		i = encodeVarintWire(dAtA, i, uint64(m.Type))
-	***REMOVED***
-	if m.Stat != nil ***REMOVED***
+	}
+	if m.Stat != nil {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintWire(dAtA, i, uint64(m.Stat.Size()))
 		n1, err := m.Stat.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n1
-	***REMOVED***
-	if m.ID != 0 ***REMOVED***
+	}
+	if m.ID != 0 {
 		dAtA[i] = 0x18
 		i++
 		i = encodeVarintWire(dAtA, i, uint64(m.ID))
-	***REMOVED***
-	if len(m.Data) > 0 ***REMOVED***
+	}
+	if len(m.Data) > 0 {
 		dAtA[i] = 0x22
 		i++
 		i = encodeVarintWire(dAtA, i, uint64(len(m.Data)))
 		i += copy(dAtA[i:], m.Data)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func encodeFixed64Wire(dAtA []byte, offset int, v uint64) int ***REMOVED***
+func encodeFixed64Wire(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
 	dAtA[offset+2] = uint8(v >> 16)
@@ -212,316 +212,316 @@ func encodeFixed64Wire(dAtA []byte, offset int, v uint64) int ***REMOVED***
 	dAtA[offset+6] = uint8(v >> 48)
 	dAtA[offset+7] = uint8(v >> 56)
 	return offset + 8
-***REMOVED***
-func encodeFixed32Wire(dAtA []byte, offset int, v uint32) int ***REMOVED***
+}
+func encodeFixed32Wire(dAtA []byte, offset int, v uint32) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
 	dAtA[offset+2] = uint8(v >> 16)
 	dAtA[offset+3] = uint8(v >> 24)
 	return offset + 4
-***REMOVED***
-func encodeVarintWire(dAtA []byte, offset int, v uint64) int ***REMOVED***
-	for v >= 1<<7 ***REMOVED***
+}
+func encodeVarintWire(dAtA []byte, offset int, v uint64) int {
+	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
-	***REMOVED***
+	}
 	dAtA[offset] = uint8(v)
 	return offset + 1
-***REMOVED***
-func (m *Packet) Size() (n int) ***REMOVED***
+}
+func (m *Packet) Size() (n int) {
 	var l int
 	_ = l
-	if m.Type != 0 ***REMOVED***
+	if m.Type != 0 {
 		n += 1 + sovWire(uint64(m.Type))
-	***REMOVED***
-	if m.Stat != nil ***REMOVED***
+	}
+	if m.Stat != nil {
 		l = m.Stat.Size()
 		n += 1 + l + sovWire(uint64(l))
-	***REMOVED***
-	if m.ID != 0 ***REMOVED***
+	}
+	if m.ID != 0 {
 		n += 1 + sovWire(uint64(m.ID))
-	***REMOVED***
+	}
 	l = len(m.Data)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovWire(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func sovWire(x uint64) (n int) ***REMOVED***
-	for ***REMOVED***
+func sovWire(x uint64) (n int) {
+	for {
 		n++
 		x >>= 7
-		if x == 0 ***REMOVED***
+		if x == 0 {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
-func sozWire(x uint64) (n int) ***REMOVED***
+}
+func sozWire(x uint64) (n int) {
 	return sovWire(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-***REMOVED***
-func (this *Packet) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Packet) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&Packet***REMOVED***`,
+	}
+	s := strings.Join([]string{`&Packet{`,
 		`Type:` + fmt.Sprintf("%v", this.Type) + `,`,
 		`Stat:` + strings.Replace(fmt.Sprintf("%v", this.Stat), "Stat", "Stat", 1) + `,`,
 		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
 		`Data:` + fmt.Sprintf("%v", this.Data) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func valueToStringWire(v interface***REMOVED******REMOVED***) string ***REMOVED***
+}
+func valueToStringWire(v interface{}) string {
 	rv := reflect.ValueOf(v)
-	if rv.IsNil() ***REMOVED***
+	if rv.IsNil() {
 		return "nil"
-	***REMOVED***
+	}
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
-***REMOVED***
-func (m *Packet) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *Packet) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowWire
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: Packet: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: Packet: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
-			***REMOVED***
+			}
 			m.Type = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWire
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Type |= (Packet_PacketType(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Stat", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWire
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthWire
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Stat == nil ***REMOVED***
-				m.Stat = &Stat***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.Stat.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.Stat == nil {
+				m.Stat = &Stat{}
+			}
+			if err := m.Stat.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 3:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
-			***REMOVED***
+			}
 			m.ID = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWire
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.ID |= (uint32(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 4:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Data", wireType)
-			***REMOVED***
+			}
 			var byteLen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWire
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				byteLen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if byteLen < 0 ***REMOVED***
+				}
+			}
+			if byteLen < 0 {
 				return ErrInvalidLengthWire
-			***REMOVED***
+			}
 			postIndex := iNdEx + byteLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Data = append(m.Data[:0], dAtA[iNdEx:postIndex]...)
-			if m.Data == nil ***REMOVED***
-				m.Data = []byte***REMOVED******REMOVED***
-			***REMOVED***
+			if m.Data == nil {
+				m.Data = []byte{}
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipWire(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthWire
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func skipWire(dAtA []byte) (n int, err error) ***REMOVED***
+}
+func skipWire(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return 0, ErrIntOverflowWire
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return 0, io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		wireType := int(wire & 0x7)
-		switch wireType ***REMOVED***
+		switch wireType {
 		case 0:
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowWire
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				iNdEx++
-				if dAtA[iNdEx-1] < 0x80 ***REMOVED***
+				if dAtA[iNdEx-1] < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return iNdEx, nil
 		case 1:
 			iNdEx += 8
 			return iNdEx, nil
 		case 2:
 			var length int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowWire
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				length |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			iNdEx += length
-			if length < 0 ***REMOVED***
+			if length < 0 {
 				return 0, ErrInvalidLengthWire
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 3:
-			for ***REMOVED***
+			for {
 				var innerWire uint64
 				var start int = iNdEx
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return 0, ErrIntOverflowWire
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return 0, io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					innerWire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				innerWireType := int(innerWire & 0x7)
-				if innerWireType == 4 ***REMOVED***
+				if innerWireType == 4 {
 					break
-				***REMOVED***
+				}
 				next, err := skipWire(dAtA[start:])
-				if err != nil ***REMOVED***
+				if err != nil {
 					return 0, err
-				***REMOVED***
+				}
 				iNdEx = start + next
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 4:
 			return iNdEx, nil
@@ -530,19 +530,19 @@ func skipWire(dAtA []byte) (n int, err error) ***REMOVED***
 			return iNdEx, nil
 		default:
 			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	panic("unreachable")
-***REMOVED***
+}
 
 var (
 	ErrInvalidLengthWire = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowWire   = fmt.Errorf("proto: integer overflow")
 )
 
-func init() ***REMOVED*** proto.RegisterFile("wire.proto", fileDescriptorWire) ***REMOVED***
+func init() { proto.RegisterFile("wire.proto", fileDescriptorWire) }
 
-var fileDescriptorWire = []byte***REMOVED***
+var fileDescriptorWire = []byte{
 	// 253 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xe2, 0xe2, 0x2a, 0xcf, 0x2c, 0x4a,
 	0xd5, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x4b, 0x2b, 0x2e, 0x2d, 0xc9, 0xcc, 0x91, 0xe2,
@@ -560,4 +560,4 @@ var fileDescriptorWire = []byte***REMOVED***
 	0x27, 0x1e, 0xc9, 0x31, 0x5e, 0x78, 0x24, 0xc7, 0xf8, 0xe0, 0x91, 0x1c, 0xe3, 0x8b, 0x47, 0x72,
 	0x0c, 0x1f, 0x1e, 0xc9, 0x31, 0x4e, 0x78, 0x2c, 0xc7, 0x90, 0xc4, 0x06, 0x0e, 0x04, 0x63, 0x40,
 	0x00, 0x00, 0x00, 0xff, 0xff, 0xda, 0x30, 0x43, 0x22, 0x26, 0x01, 0x00, 0x00,
-***REMOVED***
+}

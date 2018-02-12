@@ -28,21 +28,21 @@ var _ = fmt.Errorf
 var _ = math.Inf
 
 // Meta contains metadata about objects. Every object contains a meta field.
-type Meta struct ***REMOVED***
+type Meta struct {
 	// Version tracks the current version of the object.
 	Version Version `protobuf:"bytes,1,opt,name=version" json:"version"`
 	// Object timestamps.
 	// Note: can't use stdtime because these fields are nullable.
 	CreatedAt *google_protobuf.Timestamp `protobuf:"bytes,2,opt,name=created_at,json=createdAt" json:"created_at,omitempty"`
 	UpdatedAt *google_protobuf.Timestamp `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt" json:"updated_at,omitempty"`
-***REMOVED***
+}
 
-func (m *Meta) Reset()                    ***REMOVED*** *m = Meta***REMOVED******REMOVED*** ***REMOVED***
-func (*Meta) ProtoMessage()               ***REMOVED******REMOVED***
-func (*Meta) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorObjects, []int***REMOVED***0***REMOVED*** ***REMOVED***
+func (m *Meta) Reset()                    { *m = Meta{} }
+func (*Meta) ProtoMessage()               {}
+func (*Meta) Descriptor() ([]byte, []int) { return fileDescriptorObjects, []int{0} }
 
 // Node provides the internal node state as seen by the cluster.
-type Node struct ***REMOVED***
+type Node struct {
 	// ID specifies the identity of the node.
 	ID   string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Meta Meta   `protobuf:"bytes,2,opt,name=meta" json:"meta"`
@@ -76,13 +76,13 @@ type Node struct ***REMOVED***
 	// endpoint on the node to be used for load balancing. Each overlay
 	// network, including ingress network, will have an NetworkAttachment.
 	Attachments []*NetworkAttachment `protobuf:"bytes,10,rep,name=attachments" json:"attachments,omitempty"`
-***REMOVED***
+}
 
-func (m *Node) Reset()                    ***REMOVED*** *m = Node***REMOVED******REMOVED*** ***REMOVED***
-func (*Node) ProtoMessage()               ***REMOVED******REMOVED***
-func (*Node) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorObjects, []int***REMOVED***1***REMOVED*** ***REMOVED***
+func (m *Node) Reset()                    { *m = Node{} }
+func (*Node) ProtoMessage()               {}
+func (*Node) Descriptor() ([]byte, []int) { return fileDescriptorObjects, []int{1} }
 
-type Service struct ***REMOVED***
+type Service struct {
 	ID   string      `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Meta Meta        `protobuf:"bytes,2,opt,name=meta" json:"meta"`
 	Spec ServiceSpec `protobuf:"bytes,3,opt,name=spec" json:"spec"`
@@ -103,15 +103,15 @@ type Service struct ***REMOVED***
 	// UpdateStatus contains the status of an update, if one is in
 	// progress.
 	UpdateStatus *UpdateStatus `protobuf:"bytes,5,opt,name=update_status,json=updateStatus" json:"update_status,omitempty"`
-***REMOVED***
+}
 
-func (m *Service) Reset()                    ***REMOVED*** *m = Service***REMOVED******REMOVED*** ***REMOVED***
-func (*Service) ProtoMessage()               ***REMOVED******REMOVED***
-func (*Service) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorObjects, []int***REMOVED***2***REMOVED*** ***REMOVED***
+func (m *Service) Reset()                    { *m = Service{} }
+func (*Service) ProtoMessage()               {}
+func (*Service) Descriptor() ([]byte, []int) { return fileDescriptorObjects, []int{2} }
 
 // Endpoint specified all the network parameters required to
 // correctly discover and load balance a service
-type Endpoint struct ***REMOVED***
+type Endpoint struct {
 	Spec *EndpointSpec `protobuf:"bytes,1,opt,name=spec" json:"spec,omitempty"`
 	// Runtime state of the exposed ports which may carry
 	// auto-allocated swarm ports in addition to the user
@@ -120,15 +120,15 @@ type Endpoint struct ***REMOVED***
 	// VirtualIPs specifies the IP addresses under which this endpoint will be
 	// made available.
 	VirtualIPs []*Endpoint_VirtualIP `protobuf:"bytes,3,rep,name=virtual_ips,json=virtualIps" json:"virtual_ips,omitempty"`
-***REMOVED***
+}
 
-func (m *Endpoint) Reset()                    ***REMOVED*** *m = Endpoint***REMOVED******REMOVED*** ***REMOVED***
-func (*Endpoint) ProtoMessage()               ***REMOVED******REMOVED***
-func (*Endpoint) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorObjects, []int***REMOVED***3***REMOVED*** ***REMOVED***
+func (m *Endpoint) Reset()                    { *m = Endpoint{} }
+func (*Endpoint) ProtoMessage()               {}
+func (*Endpoint) Descriptor() ([]byte, []int) { return fileDescriptorObjects, []int{3} }
 
 // VirtualIP specifies a set of networks this endpoint will be attached to
 // and the IP addresses the target service will be made available under.
-type Endpoint_VirtualIP struct ***REMOVED***
+type Endpoint_VirtualIP struct {
 	// NetworkID for which this endpoint attachment was created.
 	NetworkID string `protobuf:"bytes,1,opt,name=network_id,json=networkId,proto3" json:"network_id,omitempty"`
 	// A virtual IP is used to address this service in IP
@@ -140,16 +140,16 @@ type Endpoint_VirtualIP struct ***REMOVED***
 	// created for this address.  More than one to
 	// accommodate for both IPv4 and IPv6
 	Addr string `protobuf:"bytes,2,opt,name=addr,proto3" json:"addr,omitempty"`
-***REMOVED***
+}
 
-func (m *Endpoint_VirtualIP) Reset()                    ***REMOVED*** *m = Endpoint_VirtualIP***REMOVED******REMOVED*** ***REMOVED***
-func (*Endpoint_VirtualIP) ProtoMessage()               ***REMOVED******REMOVED***
-func (*Endpoint_VirtualIP) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorObjects, []int***REMOVED***3, 0***REMOVED*** ***REMOVED***
+func (m *Endpoint_VirtualIP) Reset()                    { *m = Endpoint_VirtualIP{} }
+func (*Endpoint_VirtualIP) ProtoMessage()               {}
+func (*Endpoint_VirtualIP) Descriptor() ([]byte, []int) { return fileDescriptorObjects, []int{3, 0} }
 
 // Task specifies the parameters for implementing a Spec. A task is effectively
 // immutable and idempotent. Once it is dispatched to a node, it will not be
 // dispatched to another node.
-type Task struct ***REMOVED***
+type Task struct {
 	ID   string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Meta Meta   `protobuf:"bytes,2,opt,name=meta" json:"meta"`
 	// Spec defines the desired state of the task as specified by the user.
@@ -205,15 +205,15 @@ type Task struct ***REMOVED***
 	// If not present, the daemon's default will be used.
 	LogDriver                *Driver            `protobuf:"bytes,13,opt,name=log_driver,json=logDriver" json:"log_driver,omitempty"`
 	AssignedGenericResources []*GenericResource `protobuf:"bytes,15,rep,name=assigned_generic_resources,json=assignedGenericResources" json:"assigned_generic_resources,omitempty"`
-***REMOVED***
+}
 
-func (m *Task) Reset()                    ***REMOVED*** *m = Task***REMOVED******REMOVED*** ***REMOVED***
-func (*Task) ProtoMessage()               ***REMOVED******REMOVED***
-func (*Task) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorObjects, []int***REMOVED***4***REMOVED*** ***REMOVED***
+func (m *Task) Reset()                    { *m = Task{} }
+func (*Task) ProtoMessage()               {}
+func (*Task) Descriptor() ([]byte, []int) { return fileDescriptorObjects, []int{4} }
 
 // NetworkAttachment specifies the network parameters of attachment to
 // a single network by an object such as task or node.
-type NetworkAttachment struct ***REMOVED***
+type NetworkAttachment struct {
 	// Network state as a whole becomes part of the object so that
 	// it always is available for use in agents so that agents
 	// don't have any other dependency during execution.
@@ -225,13 +225,13 @@ type NetworkAttachment struct ***REMOVED***
 	Aliases []string `protobuf:"bytes,3,rep,name=aliases" json:"aliases,omitempty"`
 	// Map of all the driver attachment options for this network
 	DriverAttachmentOpts map[string]string `protobuf:"bytes,4,rep,name=driver_attachment_opts,json=driverAttachmentOpts" json:"driver_attachment_opts,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-***REMOVED***
+}
 
-func (m *NetworkAttachment) Reset()                    ***REMOVED*** *m = NetworkAttachment***REMOVED******REMOVED*** ***REMOVED***
-func (*NetworkAttachment) ProtoMessage()               ***REMOVED******REMOVED***
-func (*NetworkAttachment) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorObjects, []int***REMOVED***5***REMOVED*** ***REMOVED***
+func (m *NetworkAttachment) Reset()                    { *m = NetworkAttachment{} }
+func (*NetworkAttachment) ProtoMessage()               {}
+func (*NetworkAttachment) Descriptor() ([]byte, []int) { return fileDescriptorObjects, []int{5} }
 
-type Network struct ***REMOVED***
+type Network struct {
 	ID   string      `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Meta Meta        `protobuf:"bytes,2,opt,name=meta" json:"meta"`
 	Spec NetworkSpec `protobuf:"bytes,3,opt,name=spec" json:"spec"`
@@ -240,14 +240,14 @@ type Network struct ***REMOVED***
 	// Runtime state of IPAM options. This may not reflect the
 	// ipam options from NetworkSpec.
 	IPAM *IPAMOptions `protobuf:"bytes,5,opt,name=ipam" json:"ipam,omitempty"`
-***REMOVED***
+}
 
-func (m *Network) Reset()                    ***REMOVED*** *m = Network***REMOVED******REMOVED*** ***REMOVED***
-func (*Network) ProtoMessage()               ***REMOVED******REMOVED***
-func (*Network) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorObjects, []int***REMOVED***6***REMOVED*** ***REMOVED***
+func (m *Network) Reset()                    { *m = Network{} }
+func (*Network) ProtoMessage()               {}
+func (*Network) Descriptor() ([]byte, []int) { return fileDescriptorObjects, []int{6} }
 
 // Cluster provides global cluster settings.
-type Cluster struct ***REMOVED***
+type Cluster struct {
 	ID   string      `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Meta Meta        `protobuf:"bytes,2,opt,name=meta" json:"meta"`
 	Spec ClusterSpec `protobuf:"bytes,3,opt,name=spec" json:"spec"`
@@ -270,15 +270,15 @@ type Cluster struct ***REMOVED***
 	// If the key is empty, the node will be unlocked (will not require a key
 	// to start up from a shut down state).
 	UnlockKeys []*EncryptionKey `protobuf:"bytes,9,rep,name=unlock_keys,json=unlockKeys" json:"unlock_keys,omitempty"`
-***REMOVED***
+}
 
-func (m *Cluster) Reset()                    ***REMOVED*** *m = Cluster***REMOVED******REMOVED*** ***REMOVED***
-func (*Cluster) ProtoMessage()               ***REMOVED******REMOVED***
-func (*Cluster) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorObjects, []int***REMOVED***7***REMOVED*** ***REMOVED***
+func (m *Cluster) Reset()                    { *m = Cluster{} }
+func (*Cluster) ProtoMessage()               {}
+func (*Cluster) Descriptor() ([]byte, []int) { return fileDescriptorObjects, []int{7} }
 
 // Secret represents a secret that should be passed to a container or a node,
 // and is immutable.
-type Secret struct ***REMOVED***
+type Secret struct {
 	ID   string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Meta Meta   `protobuf:"bytes,2,opt,name=meta" json:"meta"`
 	// Spec contains the actual secret data, as well as any context around the
@@ -286,30 +286,30 @@ type Secret struct ***REMOVED***
 	Spec SecretSpec `protobuf:"bytes,3,opt,name=spec" json:"spec"`
 	// Whether the secret is an internal secret (not set by a user) or not.
 	Internal bool `protobuf:"varint,4,opt,name=internal,proto3" json:"internal,omitempty"`
-***REMOVED***
+}
 
-func (m *Secret) Reset()                    ***REMOVED*** *m = Secret***REMOVED******REMOVED*** ***REMOVED***
-func (*Secret) ProtoMessage()               ***REMOVED******REMOVED***
-func (*Secret) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorObjects, []int***REMOVED***8***REMOVED*** ***REMOVED***
+func (m *Secret) Reset()                    { *m = Secret{} }
+func (*Secret) ProtoMessage()               {}
+func (*Secret) Descriptor() ([]byte, []int) { return fileDescriptorObjects, []int{8} }
 
 // Config represents a set of configuration files that should be passed to a
 // container.
-type Config struct ***REMOVED***
+type Config struct {
 	ID   string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Meta Meta   `protobuf:"bytes,2,opt,name=meta" json:"meta"`
 	// Spec contains the actual config data, as well as any context around the
 	// config data that the user provides.
 	Spec ConfigSpec `protobuf:"bytes,3,opt,name=spec" json:"spec"`
-***REMOVED***
+}
 
-func (m *Config) Reset()                    ***REMOVED*** *m = Config***REMOVED******REMOVED*** ***REMOVED***
-func (*Config) ProtoMessage()               ***REMOVED******REMOVED***
-func (*Config) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorObjects, []int***REMOVED***9***REMOVED*** ***REMOVED***
+func (m *Config) Reset()                    { *m = Config{} }
+func (*Config) ProtoMessage()               {}
+func (*Config) Descriptor() ([]byte, []int) { return fileDescriptorObjects, []int{9} }
 
 // Resource is a top-level object with externally defined content and indexing.
 // SwarmKit can serve as a store for these objects without understanding their
 // meanings.
-type Resource struct ***REMOVED***
+type Resource struct {
 	ID          string      `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Meta        Meta        `protobuf:"bytes,2,opt,name=meta" json:"meta"`
 	Annotations Annotations `protobuf:"bytes,3,opt,name=annotations" json:"annotations"`
@@ -320,26 +320,26 @@ type Resource struct ***REMOVED***
 	// Payload bytes. This data is not interpreted in any way by SwarmKit.
 	// By convention, it should be a marshalled protocol buffers message.
 	Payload *google_protobuf3.Any `protobuf:"bytes,5,opt,name=payload" json:"payload,omitempty"`
-***REMOVED***
+}
 
-func (m *Resource) Reset()                    ***REMOVED*** *m = Resource***REMOVED******REMOVED*** ***REMOVED***
-func (*Resource) ProtoMessage()               ***REMOVED******REMOVED***
-func (*Resource) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorObjects, []int***REMOVED***10***REMOVED*** ***REMOVED***
+func (m *Resource) Reset()                    { *m = Resource{} }
+func (*Resource) ProtoMessage()               {}
+func (*Resource) Descriptor() ([]byte, []int) { return fileDescriptorObjects, []int{10} }
 
 // Extension declares a type of "resource" object. This message provides some
 // metadata about the objects.
-type Extension struct ***REMOVED***
+type Extension struct {
 	ID          string      `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Meta        Meta        `protobuf:"bytes,2,opt,name=meta" json:"meta"`
 	Annotations Annotations `protobuf:"bytes,3,opt,name=annotations" json:"annotations"`
 	Description string      `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
-***REMOVED***
+}
 
-func (m *Extension) Reset()                    ***REMOVED*** *m = Extension***REMOVED******REMOVED*** ***REMOVED***
-func (*Extension) ProtoMessage()               ***REMOVED******REMOVED***
-func (*Extension) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorObjects, []int***REMOVED***11***REMOVED*** ***REMOVED***
+func (m *Extension) Reset()                    { *m = Extension{} }
+func (*Extension) ProtoMessage()               {}
+func (*Extension) Descriptor() ([]byte, []int) { return fileDescriptorObjects, []int{11} }
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*Meta)(nil), "docker.swarmkit.v1.Meta")
 	proto.RegisterType((*Node)(nil), "docker.swarmkit.v1.Node")
 	proto.RegisterType((*Service)(nil), "docker.swarmkit.v1.Service")
@@ -353,392 +353,392 @@ func init() ***REMOVED***
 	proto.RegisterType((*Config)(nil), "docker.swarmkit.v1.Config")
 	proto.RegisterType((*Resource)(nil), "docker.swarmkit.v1.Resource")
 	proto.RegisterType((*Extension)(nil), "docker.swarmkit.v1.Extension")
-***REMOVED***
+}
 
-func (m *Meta) Copy() *Meta ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *Meta) Copy() *Meta {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &Meta***REMOVED******REMOVED***
+	}
+	o := &Meta{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *Meta) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *Meta) CopyFrom(src interface{}) {
 
 	o := src.(*Meta)
 	*m = *o
 	github_com_docker_swarmkit_api_deepcopy.Copy(&m.Version, &o.Version)
-	if o.CreatedAt != nil ***REMOVED***
-		m.CreatedAt = &google_protobuf.Timestamp***REMOVED******REMOVED***
+	if o.CreatedAt != nil {
+		m.CreatedAt = &google_protobuf.Timestamp{}
 		github_com_docker_swarmkit_api_deepcopy.Copy(m.CreatedAt, o.CreatedAt)
-	***REMOVED***
-	if o.UpdatedAt != nil ***REMOVED***
-		m.UpdatedAt = &google_protobuf.Timestamp***REMOVED******REMOVED***
+	}
+	if o.UpdatedAt != nil {
+		m.UpdatedAt = &google_protobuf.Timestamp{}
 		github_com_docker_swarmkit_api_deepcopy.Copy(m.UpdatedAt, o.UpdatedAt)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (m *Node) Copy() *Node ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *Node) Copy() *Node {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &Node***REMOVED******REMOVED***
+	}
+	o := &Node{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *Node) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *Node) CopyFrom(src interface{}) {
 
 	o := src.(*Node)
 	*m = *o
 	github_com_docker_swarmkit_api_deepcopy.Copy(&m.Meta, &o.Meta)
 	github_com_docker_swarmkit_api_deepcopy.Copy(&m.Spec, &o.Spec)
-	if o.Description != nil ***REMOVED***
-		m.Description = &NodeDescription***REMOVED******REMOVED***
+	if o.Description != nil {
+		m.Description = &NodeDescription{}
 		github_com_docker_swarmkit_api_deepcopy.Copy(m.Description, o.Description)
-	***REMOVED***
+	}
 	github_com_docker_swarmkit_api_deepcopy.Copy(&m.Status, &o.Status)
-	if o.ManagerStatus != nil ***REMOVED***
-		m.ManagerStatus = &ManagerStatus***REMOVED******REMOVED***
+	if o.ManagerStatus != nil {
+		m.ManagerStatus = &ManagerStatus{}
 		github_com_docker_swarmkit_api_deepcopy.Copy(m.ManagerStatus, o.ManagerStatus)
-	***REMOVED***
-	if o.Attachment != nil ***REMOVED***
-		m.Attachment = &NetworkAttachment***REMOVED******REMOVED***
+	}
+	if o.Attachment != nil {
+		m.Attachment = &NetworkAttachment{}
 		github_com_docker_swarmkit_api_deepcopy.Copy(m.Attachment, o.Attachment)
-	***REMOVED***
+	}
 	github_com_docker_swarmkit_api_deepcopy.Copy(&m.Certificate, &o.Certificate)
-	if o.Attachments != nil ***REMOVED***
+	if o.Attachments != nil {
 		m.Attachments = make([]*NetworkAttachment, len(o.Attachments))
-		for i := range m.Attachments ***REMOVED***
-			m.Attachments[i] = &NetworkAttachment***REMOVED******REMOVED***
+		for i := range m.Attachments {
+			m.Attachments[i] = &NetworkAttachment{}
 			github_com_docker_swarmkit_api_deepcopy.Copy(m.Attachments[i], o.Attachments[i])
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-***REMOVED***
+}
 
-func (m *Service) Copy() *Service ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *Service) Copy() *Service {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &Service***REMOVED******REMOVED***
+	}
+	o := &Service{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *Service) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *Service) CopyFrom(src interface{}) {
 
 	o := src.(*Service)
 	*m = *o
 	github_com_docker_swarmkit_api_deepcopy.Copy(&m.Meta, &o.Meta)
 	github_com_docker_swarmkit_api_deepcopy.Copy(&m.Spec, &o.Spec)
-	if o.SpecVersion != nil ***REMOVED***
-		m.SpecVersion = &Version***REMOVED******REMOVED***
+	if o.SpecVersion != nil {
+		m.SpecVersion = &Version{}
 		github_com_docker_swarmkit_api_deepcopy.Copy(m.SpecVersion, o.SpecVersion)
-	***REMOVED***
-	if o.PreviousSpec != nil ***REMOVED***
-		m.PreviousSpec = &ServiceSpec***REMOVED******REMOVED***
+	}
+	if o.PreviousSpec != nil {
+		m.PreviousSpec = &ServiceSpec{}
 		github_com_docker_swarmkit_api_deepcopy.Copy(m.PreviousSpec, o.PreviousSpec)
-	***REMOVED***
-	if o.PreviousSpecVersion != nil ***REMOVED***
-		m.PreviousSpecVersion = &Version***REMOVED******REMOVED***
+	}
+	if o.PreviousSpecVersion != nil {
+		m.PreviousSpecVersion = &Version{}
 		github_com_docker_swarmkit_api_deepcopy.Copy(m.PreviousSpecVersion, o.PreviousSpecVersion)
-	***REMOVED***
-	if o.Endpoint != nil ***REMOVED***
-		m.Endpoint = &Endpoint***REMOVED******REMOVED***
+	}
+	if o.Endpoint != nil {
+		m.Endpoint = &Endpoint{}
 		github_com_docker_swarmkit_api_deepcopy.Copy(m.Endpoint, o.Endpoint)
-	***REMOVED***
-	if o.UpdateStatus != nil ***REMOVED***
-		m.UpdateStatus = &UpdateStatus***REMOVED******REMOVED***
+	}
+	if o.UpdateStatus != nil {
+		m.UpdateStatus = &UpdateStatus{}
 		github_com_docker_swarmkit_api_deepcopy.Copy(m.UpdateStatus, o.UpdateStatus)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (m *Endpoint) Copy() *Endpoint ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *Endpoint) Copy() *Endpoint {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &Endpoint***REMOVED******REMOVED***
+	}
+	o := &Endpoint{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *Endpoint) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *Endpoint) CopyFrom(src interface{}) {
 
 	o := src.(*Endpoint)
 	*m = *o
-	if o.Spec != nil ***REMOVED***
-		m.Spec = &EndpointSpec***REMOVED******REMOVED***
+	if o.Spec != nil {
+		m.Spec = &EndpointSpec{}
 		github_com_docker_swarmkit_api_deepcopy.Copy(m.Spec, o.Spec)
-	***REMOVED***
-	if o.Ports != nil ***REMOVED***
+	}
+	if o.Ports != nil {
 		m.Ports = make([]*PortConfig, len(o.Ports))
-		for i := range m.Ports ***REMOVED***
-			m.Ports[i] = &PortConfig***REMOVED******REMOVED***
+		for i := range m.Ports {
+			m.Ports[i] = &PortConfig{}
 			github_com_docker_swarmkit_api_deepcopy.Copy(m.Ports[i], o.Ports[i])
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if o.VirtualIPs != nil ***REMOVED***
+	if o.VirtualIPs != nil {
 		m.VirtualIPs = make([]*Endpoint_VirtualIP, len(o.VirtualIPs))
-		for i := range m.VirtualIPs ***REMOVED***
-			m.VirtualIPs[i] = &Endpoint_VirtualIP***REMOVED******REMOVED***
+		for i := range m.VirtualIPs {
+			m.VirtualIPs[i] = &Endpoint_VirtualIP{}
 			github_com_docker_swarmkit_api_deepcopy.Copy(m.VirtualIPs[i], o.VirtualIPs[i])
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-***REMOVED***
+}
 
-func (m *Endpoint_VirtualIP) Copy() *Endpoint_VirtualIP ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *Endpoint_VirtualIP) Copy() *Endpoint_VirtualIP {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &Endpoint_VirtualIP***REMOVED******REMOVED***
+	}
+	o := &Endpoint_VirtualIP{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *Endpoint_VirtualIP) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *Endpoint_VirtualIP) CopyFrom(src interface{}) {
 
 	o := src.(*Endpoint_VirtualIP)
 	*m = *o
-***REMOVED***
+}
 
-func (m *Task) Copy() *Task ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *Task) Copy() *Task {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &Task***REMOVED******REMOVED***
+	}
+	o := &Task{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *Task) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *Task) CopyFrom(src interface{}) {
 
 	o := src.(*Task)
 	*m = *o
 	github_com_docker_swarmkit_api_deepcopy.Copy(&m.Meta, &o.Meta)
 	github_com_docker_swarmkit_api_deepcopy.Copy(&m.Spec, &o.Spec)
-	if o.SpecVersion != nil ***REMOVED***
-		m.SpecVersion = &Version***REMOVED******REMOVED***
+	if o.SpecVersion != nil {
+		m.SpecVersion = &Version{}
 		github_com_docker_swarmkit_api_deepcopy.Copy(m.SpecVersion, o.SpecVersion)
-	***REMOVED***
+	}
 	github_com_docker_swarmkit_api_deepcopy.Copy(&m.Annotations, &o.Annotations)
 	github_com_docker_swarmkit_api_deepcopy.Copy(&m.ServiceAnnotations, &o.ServiceAnnotations)
 	github_com_docker_swarmkit_api_deepcopy.Copy(&m.Status, &o.Status)
-	if o.Networks != nil ***REMOVED***
+	if o.Networks != nil {
 		m.Networks = make([]*NetworkAttachment, len(o.Networks))
-		for i := range m.Networks ***REMOVED***
-			m.Networks[i] = &NetworkAttachment***REMOVED******REMOVED***
+		for i := range m.Networks {
+			m.Networks[i] = &NetworkAttachment{}
 			github_com_docker_swarmkit_api_deepcopy.Copy(m.Networks[i], o.Networks[i])
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if o.Endpoint != nil ***REMOVED***
-		m.Endpoint = &Endpoint***REMOVED******REMOVED***
+	if o.Endpoint != nil {
+		m.Endpoint = &Endpoint{}
 		github_com_docker_swarmkit_api_deepcopy.Copy(m.Endpoint, o.Endpoint)
-	***REMOVED***
-	if o.LogDriver != nil ***REMOVED***
-		m.LogDriver = &Driver***REMOVED******REMOVED***
+	}
+	if o.LogDriver != nil {
+		m.LogDriver = &Driver{}
 		github_com_docker_swarmkit_api_deepcopy.Copy(m.LogDriver, o.LogDriver)
-	***REMOVED***
-	if o.AssignedGenericResources != nil ***REMOVED***
+	}
+	if o.AssignedGenericResources != nil {
 		m.AssignedGenericResources = make([]*GenericResource, len(o.AssignedGenericResources))
-		for i := range m.AssignedGenericResources ***REMOVED***
-			m.AssignedGenericResources[i] = &GenericResource***REMOVED******REMOVED***
+		for i := range m.AssignedGenericResources {
+			m.AssignedGenericResources[i] = &GenericResource{}
 			github_com_docker_swarmkit_api_deepcopy.Copy(m.AssignedGenericResources[i], o.AssignedGenericResources[i])
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-***REMOVED***
+}
 
-func (m *NetworkAttachment) Copy() *NetworkAttachment ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *NetworkAttachment) Copy() *NetworkAttachment {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &NetworkAttachment***REMOVED******REMOVED***
+	}
+	o := &NetworkAttachment{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *NetworkAttachment) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *NetworkAttachment) CopyFrom(src interface{}) {
 
 	o := src.(*NetworkAttachment)
 	*m = *o
-	if o.Network != nil ***REMOVED***
-		m.Network = &Network***REMOVED******REMOVED***
+	if o.Network != nil {
+		m.Network = &Network{}
 		github_com_docker_swarmkit_api_deepcopy.Copy(m.Network, o.Network)
-	***REMOVED***
-	if o.Addresses != nil ***REMOVED***
+	}
+	if o.Addresses != nil {
 		m.Addresses = make([]string, len(o.Addresses))
 		copy(m.Addresses, o.Addresses)
-	***REMOVED***
+	}
 
-	if o.Aliases != nil ***REMOVED***
+	if o.Aliases != nil {
 		m.Aliases = make([]string, len(o.Aliases))
 		copy(m.Aliases, o.Aliases)
-	***REMOVED***
+	}
 
-	if o.DriverAttachmentOpts != nil ***REMOVED***
+	if o.DriverAttachmentOpts != nil {
 		m.DriverAttachmentOpts = make(map[string]string, len(o.DriverAttachmentOpts))
-		for k, v := range o.DriverAttachmentOpts ***REMOVED***
+		for k, v := range o.DriverAttachmentOpts {
 			m.DriverAttachmentOpts[k] = v
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-***REMOVED***
+}
 
-func (m *Network) Copy() *Network ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *Network) Copy() *Network {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &Network***REMOVED******REMOVED***
+	}
+	o := &Network{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *Network) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *Network) CopyFrom(src interface{}) {
 
 	o := src.(*Network)
 	*m = *o
 	github_com_docker_swarmkit_api_deepcopy.Copy(&m.Meta, &o.Meta)
 	github_com_docker_swarmkit_api_deepcopy.Copy(&m.Spec, &o.Spec)
-	if o.DriverState != nil ***REMOVED***
-		m.DriverState = &Driver***REMOVED******REMOVED***
+	if o.DriverState != nil {
+		m.DriverState = &Driver{}
 		github_com_docker_swarmkit_api_deepcopy.Copy(m.DriverState, o.DriverState)
-	***REMOVED***
-	if o.IPAM != nil ***REMOVED***
-		m.IPAM = &IPAMOptions***REMOVED******REMOVED***
+	}
+	if o.IPAM != nil {
+		m.IPAM = &IPAMOptions{}
 		github_com_docker_swarmkit_api_deepcopy.Copy(m.IPAM, o.IPAM)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (m *Cluster) Copy() *Cluster ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *Cluster) Copy() *Cluster {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &Cluster***REMOVED******REMOVED***
+	}
+	o := &Cluster{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *Cluster) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *Cluster) CopyFrom(src interface{}) {
 
 	o := src.(*Cluster)
 	*m = *o
 	github_com_docker_swarmkit_api_deepcopy.Copy(&m.Meta, &o.Meta)
 	github_com_docker_swarmkit_api_deepcopy.Copy(&m.Spec, &o.Spec)
 	github_com_docker_swarmkit_api_deepcopy.Copy(&m.RootCA, &o.RootCA)
-	if o.NetworkBootstrapKeys != nil ***REMOVED***
+	if o.NetworkBootstrapKeys != nil {
 		m.NetworkBootstrapKeys = make([]*EncryptionKey, len(o.NetworkBootstrapKeys))
-		for i := range m.NetworkBootstrapKeys ***REMOVED***
-			m.NetworkBootstrapKeys[i] = &EncryptionKey***REMOVED******REMOVED***
+		for i := range m.NetworkBootstrapKeys {
+			m.NetworkBootstrapKeys[i] = &EncryptionKey{}
 			github_com_docker_swarmkit_api_deepcopy.Copy(m.NetworkBootstrapKeys[i], o.NetworkBootstrapKeys[i])
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if o.BlacklistedCertificates != nil ***REMOVED***
+	if o.BlacklistedCertificates != nil {
 		m.BlacklistedCertificates = make(map[string]*BlacklistedCertificate, len(o.BlacklistedCertificates))
-		for k, v := range o.BlacklistedCertificates ***REMOVED***
-			m.BlacklistedCertificates[k] = &BlacklistedCertificate***REMOVED******REMOVED***
+		for k, v := range o.BlacklistedCertificates {
+			m.BlacklistedCertificates[k] = &BlacklistedCertificate{}
 			github_com_docker_swarmkit_api_deepcopy.Copy(m.BlacklistedCertificates[k], v)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if o.UnlockKeys != nil ***REMOVED***
+	if o.UnlockKeys != nil {
 		m.UnlockKeys = make([]*EncryptionKey, len(o.UnlockKeys))
-		for i := range m.UnlockKeys ***REMOVED***
-			m.UnlockKeys[i] = &EncryptionKey***REMOVED******REMOVED***
+		for i := range m.UnlockKeys {
+			m.UnlockKeys[i] = &EncryptionKey{}
 			github_com_docker_swarmkit_api_deepcopy.Copy(m.UnlockKeys[i], o.UnlockKeys[i])
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-***REMOVED***
+}
 
-func (m *Secret) Copy() *Secret ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *Secret) Copy() *Secret {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &Secret***REMOVED******REMOVED***
+	}
+	o := &Secret{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *Secret) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *Secret) CopyFrom(src interface{}) {
 
 	o := src.(*Secret)
 	*m = *o
 	github_com_docker_swarmkit_api_deepcopy.Copy(&m.Meta, &o.Meta)
 	github_com_docker_swarmkit_api_deepcopy.Copy(&m.Spec, &o.Spec)
-***REMOVED***
+}
 
-func (m *Config) Copy() *Config ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *Config) Copy() *Config {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &Config***REMOVED******REMOVED***
+	}
+	o := &Config{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *Config) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *Config) CopyFrom(src interface{}) {
 
 	o := src.(*Config)
 	*m = *o
 	github_com_docker_swarmkit_api_deepcopy.Copy(&m.Meta, &o.Meta)
 	github_com_docker_swarmkit_api_deepcopy.Copy(&m.Spec, &o.Spec)
-***REMOVED***
+}
 
-func (m *Resource) Copy() *Resource ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *Resource) Copy() *Resource {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &Resource***REMOVED******REMOVED***
+	}
+	o := &Resource{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *Resource) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *Resource) CopyFrom(src interface{}) {
 
 	o := src.(*Resource)
 	*m = *o
 	github_com_docker_swarmkit_api_deepcopy.Copy(&m.Meta, &o.Meta)
 	github_com_docker_swarmkit_api_deepcopy.Copy(&m.Annotations, &o.Annotations)
-	if o.Payload != nil ***REMOVED***
-		m.Payload = &google_protobuf3.Any***REMOVED******REMOVED***
+	if o.Payload != nil {
+		m.Payload = &google_protobuf3.Any{}
 		github_com_docker_swarmkit_api_deepcopy.Copy(m.Payload, o.Payload)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (m *Extension) Copy() *Extension ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *Extension) Copy() *Extension {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &Extension***REMOVED******REMOVED***
+	}
+	o := &Extension{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *Extension) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *Extension) CopyFrom(src interface{}) {
 
 	o := src.(*Extension)
 	*m = *o
 	github_com_docker_swarmkit_api_deepcopy.Copy(&m.Meta, &o.Meta)
 	github_com_docker_swarmkit_api_deepcopy.Copy(&m.Annotations, &o.Annotations)
-***REMOVED***
+}
 
-func (m *Meta) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *Meta) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *Meta) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *Meta) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -747,505 +747,505 @@ func (m *Meta) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
 	i++
 	i = encodeVarintObjects(dAtA, i, uint64(m.Version.Size()))
 	n1, err := m.Version.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n1
-	if m.CreatedAt != nil ***REMOVED***
+	if m.CreatedAt != nil {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintObjects(dAtA, i, uint64(m.CreatedAt.Size()))
 		n2, err := m.CreatedAt.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n2
-	***REMOVED***
-	if m.UpdatedAt != nil ***REMOVED***
+	}
+	if m.UpdatedAt != nil {
 		dAtA[i] = 0x1a
 		i++
 		i = encodeVarintObjects(dAtA, i, uint64(m.UpdatedAt.Size()))
 		n3, err := m.UpdatedAt.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n3
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *Node) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *Node) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *Node) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *Node) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ID) > 0 ***REMOVED***
+	if len(m.ID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintObjects(dAtA, i, uint64(len(m.ID)))
 		i += copy(dAtA[i:], m.ID)
-	***REMOVED***
+	}
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintObjects(dAtA, i, uint64(m.Meta.Size()))
 	n4, err := m.Meta.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n4
 	dAtA[i] = 0x1a
 	i++
 	i = encodeVarintObjects(dAtA, i, uint64(m.Spec.Size()))
 	n5, err := m.Spec.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n5
-	if m.Description != nil ***REMOVED***
+	if m.Description != nil {
 		dAtA[i] = 0x22
 		i++
 		i = encodeVarintObjects(dAtA, i, uint64(m.Description.Size()))
 		n6, err := m.Description.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n6
-	***REMOVED***
+	}
 	dAtA[i] = 0x2a
 	i++
 	i = encodeVarintObjects(dAtA, i, uint64(m.Status.Size()))
 	n7, err := m.Status.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n7
-	if m.ManagerStatus != nil ***REMOVED***
+	if m.ManagerStatus != nil {
 		dAtA[i] = 0x32
 		i++
 		i = encodeVarintObjects(dAtA, i, uint64(m.ManagerStatus.Size()))
 		n8, err := m.ManagerStatus.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n8
-	***REMOVED***
-	if m.Attachment != nil ***REMOVED***
+	}
+	if m.Attachment != nil {
 		dAtA[i] = 0x3a
 		i++
 		i = encodeVarintObjects(dAtA, i, uint64(m.Attachment.Size()))
 		n9, err := m.Attachment.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n9
-	***REMOVED***
+	}
 	dAtA[i] = 0x42
 	i++
 	i = encodeVarintObjects(dAtA, i, uint64(m.Certificate.Size()))
 	n10, err := m.Certificate.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n10
-	if m.Role != 0 ***REMOVED***
+	if m.Role != 0 {
 		dAtA[i] = 0x48
 		i++
 		i = encodeVarintObjects(dAtA, i, uint64(m.Role))
-	***REMOVED***
-	if len(m.Attachments) > 0 ***REMOVED***
-		for _, msg := range m.Attachments ***REMOVED***
+	}
+	if len(m.Attachments) > 0 {
+		for _, msg := range m.Attachments {
 			dAtA[i] = 0x52
 			i++
 			i = encodeVarintObjects(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			i += n
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *Service) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *Service) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *Service) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *Service) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ID) > 0 ***REMOVED***
+	if len(m.ID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintObjects(dAtA, i, uint64(len(m.ID)))
 		i += copy(dAtA[i:], m.ID)
-	***REMOVED***
+	}
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintObjects(dAtA, i, uint64(m.Meta.Size()))
 	n11, err := m.Meta.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n11
 	dAtA[i] = 0x1a
 	i++
 	i = encodeVarintObjects(dAtA, i, uint64(m.Spec.Size()))
 	n12, err := m.Spec.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n12
-	if m.Endpoint != nil ***REMOVED***
+	if m.Endpoint != nil {
 		dAtA[i] = 0x22
 		i++
 		i = encodeVarintObjects(dAtA, i, uint64(m.Endpoint.Size()))
 		n13, err := m.Endpoint.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n13
-	***REMOVED***
-	if m.UpdateStatus != nil ***REMOVED***
+	}
+	if m.UpdateStatus != nil {
 		dAtA[i] = 0x2a
 		i++
 		i = encodeVarintObjects(dAtA, i, uint64(m.UpdateStatus.Size()))
 		n14, err := m.UpdateStatus.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n14
-	***REMOVED***
-	if m.PreviousSpec != nil ***REMOVED***
+	}
+	if m.PreviousSpec != nil {
 		dAtA[i] = 0x32
 		i++
 		i = encodeVarintObjects(dAtA, i, uint64(m.PreviousSpec.Size()))
 		n15, err := m.PreviousSpec.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n15
-	***REMOVED***
-	if m.SpecVersion != nil ***REMOVED***
+	}
+	if m.SpecVersion != nil {
 		dAtA[i] = 0x52
 		i++
 		i = encodeVarintObjects(dAtA, i, uint64(m.SpecVersion.Size()))
 		n16, err := m.SpecVersion.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n16
-	***REMOVED***
-	if m.PreviousSpecVersion != nil ***REMOVED***
+	}
+	if m.PreviousSpecVersion != nil {
 		dAtA[i] = 0x5a
 		i++
 		i = encodeVarintObjects(dAtA, i, uint64(m.PreviousSpecVersion.Size()))
 		n17, err := m.PreviousSpecVersion.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n17
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *Endpoint) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *Endpoint) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *Endpoint) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *Endpoint) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.Spec != nil ***REMOVED***
+	if m.Spec != nil {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintObjects(dAtA, i, uint64(m.Spec.Size()))
 		n18, err := m.Spec.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n18
-	***REMOVED***
-	if len(m.Ports) > 0 ***REMOVED***
-		for _, msg := range m.Ports ***REMOVED***
+	}
+	if len(m.Ports) > 0 {
+		for _, msg := range m.Ports {
 			dAtA[i] = 0x12
 			i++
 			i = encodeVarintObjects(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			i += n
-		***REMOVED***
-	***REMOVED***
-	if len(m.VirtualIPs) > 0 ***REMOVED***
-		for _, msg := range m.VirtualIPs ***REMOVED***
+		}
+	}
+	if len(m.VirtualIPs) > 0 {
+		for _, msg := range m.VirtualIPs {
 			dAtA[i] = 0x1a
 			i++
 			i = encodeVarintObjects(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			i += n
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *Endpoint_VirtualIP) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *Endpoint_VirtualIP) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *Endpoint_VirtualIP) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *Endpoint_VirtualIP) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.NetworkID) > 0 ***REMOVED***
+	if len(m.NetworkID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintObjects(dAtA, i, uint64(len(m.NetworkID)))
 		i += copy(dAtA[i:], m.NetworkID)
-	***REMOVED***
-	if len(m.Addr) > 0 ***REMOVED***
+	}
+	if len(m.Addr) > 0 {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintObjects(dAtA, i, uint64(len(m.Addr)))
 		i += copy(dAtA[i:], m.Addr)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *Task) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *Task) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *Task) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *Task) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ID) > 0 ***REMOVED***
+	if len(m.ID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintObjects(dAtA, i, uint64(len(m.ID)))
 		i += copy(dAtA[i:], m.ID)
-	***REMOVED***
+	}
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintObjects(dAtA, i, uint64(m.Meta.Size()))
 	n19, err := m.Meta.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n19
 	dAtA[i] = 0x1a
 	i++
 	i = encodeVarintObjects(dAtA, i, uint64(m.Spec.Size()))
 	n20, err := m.Spec.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n20
-	if len(m.ServiceID) > 0 ***REMOVED***
+	if len(m.ServiceID) > 0 {
 		dAtA[i] = 0x22
 		i++
 		i = encodeVarintObjects(dAtA, i, uint64(len(m.ServiceID)))
 		i += copy(dAtA[i:], m.ServiceID)
-	***REMOVED***
-	if m.Slot != 0 ***REMOVED***
+	}
+	if m.Slot != 0 {
 		dAtA[i] = 0x28
 		i++
 		i = encodeVarintObjects(dAtA, i, uint64(m.Slot))
-	***REMOVED***
-	if len(m.NodeID) > 0 ***REMOVED***
+	}
+	if len(m.NodeID) > 0 {
 		dAtA[i] = 0x32
 		i++
 		i = encodeVarintObjects(dAtA, i, uint64(len(m.NodeID)))
 		i += copy(dAtA[i:], m.NodeID)
-	***REMOVED***
+	}
 	dAtA[i] = 0x3a
 	i++
 	i = encodeVarintObjects(dAtA, i, uint64(m.Annotations.Size()))
 	n21, err := m.Annotations.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n21
 	dAtA[i] = 0x42
 	i++
 	i = encodeVarintObjects(dAtA, i, uint64(m.ServiceAnnotations.Size()))
 	n22, err := m.ServiceAnnotations.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n22
 	dAtA[i] = 0x4a
 	i++
 	i = encodeVarintObjects(dAtA, i, uint64(m.Status.Size()))
 	n23, err := m.Status.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n23
-	if m.DesiredState != 0 ***REMOVED***
+	if m.DesiredState != 0 {
 		dAtA[i] = 0x50
 		i++
 		i = encodeVarintObjects(dAtA, i, uint64(m.DesiredState))
-	***REMOVED***
-	if len(m.Networks) > 0 ***REMOVED***
-		for _, msg := range m.Networks ***REMOVED***
+	}
+	if len(m.Networks) > 0 {
+		for _, msg := range m.Networks {
 			dAtA[i] = 0x5a
 			i++
 			i = encodeVarintObjects(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			i += n
-		***REMOVED***
-	***REMOVED***
-	if m.Endpoint != nil ***REMOVED***
+		}
+	}
+	if m.Endpoint != nil {
 		dAtA[i] = 0x62
 		i++
 		i = encodeVarintObjects(dAtA, i, uint64(m.Endpoint.Size()))
 		n24, err := m.Endpoint.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n24
-	***REMOVED***
-	if m.LogDriver != nil ***REMOVED***
+	}
+	if m.LogDriver != nil {
 		dAtA[i] = 0x6a
 		i++
 		i = encodeVarintObjects(dAtA, i, uint64(m.LogDriver.Size()))
 		n25, err := m.LogDriver.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n25
-	***REMOVED***
-	if m.SpecVersion != nil ***REMOVED***
+	}
+	if m.SpecVersion != nil {
 		dAtA[i] = 0x72
 		i++
 		i = encodeVarintObjects(dAtA, i, uint64(m.SpecVersion.Size()))
 		n26, err := m.SpecVersion.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n26
-	***REMOVED***
-	if len(m.AssignedGenericResources) > 0 ***REMOVED***
-		for _, msg := range m.AssignedGenericResources ***REMOVED***
+	}
+	if len(m.AssignedGenericResources) > 0 {
+		for _, msg := range m.AssignedGenericResources {
 			dAtA[i] = 0x7a
 			i++
 			i = encodeVarintObjects(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			i += n
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *NetworkAttachment) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *NetworkAttachment) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *NetworkAttachment) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *NetworkAttachment) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.Network != nil ***REMOVED***
+	if m.Network != nil {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintObjects(dAtA, i, uint64(m.Network.Size()))
 		n27, err := m.Network.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n27
-	***REMOVED***
-	if len(m.Addresses) > 0 ***REMOVED***
-		for _, s := range m.Addresses ***REMOVED***
+	}
+	if len(m.Addresses) > 0 {
+		for _, s := range m.Addresses {
 			dAtA[i] = 0x12
 			i++
 			l = len(s)
-			for l >= 1<<7 ***REMOVED***
+			for l >= 1<<7 {
 				dAtA[i] = uint8(uint64(l)&0x7f | 0x80)
 				l >>= 7
 				i++
-			***REMOVED***
+			}
 			dAtA[i] = uint8(l)
 			i++
 			i += copy(dAtA[i:], s)
-		***REMOVED***
-	***REMOVED***
-	if len(m.Aliases) > 0 ***REMOVED***
-		for _, s := range m.Aliases ***REMOVED***
+		}
+	}
+	if len(m.Aliases) > 0 {
+		for _, s := range m.Aliases {
 			dAtA[i] = 0x1a
 			i++
 			l = len(s)
-			for l >= 1<<7 ***REMOVED***
+			for l >= 1<<7 {
 				dAtA[i] = uint8(uint64(l)&0x7f | 0x80)
 				l >>= 7
 				i++
-			***REMOVED***
+			}
 			dAtA[i] = uint8(l)
 			i++
 			i += copy(dAtA[i:], s)
-		***REMOVED***
-	***REMOVED***
-	if len(m.DriverAttachmentOpts) > 0 ***REMOVED***
-		for k, _ := range m.DriverAttachmentOpts ***REMOVED***
+		}
+	}
+	if len(m.DriverAttachmentOpts) > 0 {
+		for k, _ := range m.DriverAttachmentOpts {
 			dAtA[i] = 0x22
 			i++
 			v := m.DriverAttachmentOpts[k]
@@ -1259,369 +1259,369 @@ func (m *NetworkAttachment) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
 			i++
 			i = encodeVarintObjects(dAtA, i, uint64(len(v)))
 			i += copy(dAtA[i:], v)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *Network) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *Network) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *Network) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *Network) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ID) > 0 ***REMOVED***
+	if len(m.ID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintObjects(dAtA, i, uint64(len(m.ID)))
 		i += copy(dAtA[i:], m.ID)
-	***REMOVED***
+	}
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintObjects(dAtA, i, uint64(m.Meta.Size()))
 	n28, err := m.Meta.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n28
 	dAtA[i] = 0x1a
 	i++
 	i = encodeVarintObjects(dAtA, i, uint64(m.Spec.Size()))
 	n29, err := m.Spec.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n29
-	if m.DriverState != nil ***REMOVED***
+	if m.DriverState != nil {
 		dAtA[i] = 0x22
 		i++
 		i = encodeVarintObjects(dAtA, i, uint64(m.DriverState.Size()))
 		n30, err := m.DriverState.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n30
-	***REMOVED***
-	if m.IPAM != nil ***REMOVED***
+	}
+	if m.IPAM != nil {
 		dAtA[i] = 0x2a
 		i++
 		i = encodeVarintObjects(dAtA, i, uint64(m.IPAM.Size()))
 		n31, err := m.IPAM.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n31
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *Cluster) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *Cluster) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *Cluster) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *Cluster) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ID) > 0 ***REMOVED***
+	if len(m.ID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintObjects(dAtA, i, uint64(len(m.ID)))
 		i += copy(dAtA[i:], m.ID)
-	***REMOVED***
+	}
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintObjects(dAtA, i, uint64(m.Meta.Size()))
 	n32, err := m.Meta.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n32
 	dAtA[i] = 0x1a
 	i++
 	i = encodeVarintObjects(dAtA, i, uint64(m.Spec.Size()))
 	n33, err := m.Spec.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n33
 	dAtA[i] = 0x22
 	i++
 	i = encodeVarintObjects(dAtA, i, uint64(m.RootCA.Size()))
 	n34, err := m.RootCA.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n34
-	if len(m.NetworkBootstrapKeys) > 0 ***REMOVED***
-		for _, msg := range m.NetworkBootstrapKeys ***REMOVED***
+	if len(m.NetworkBootstrapKeys) > 0 {
+		for _, msg := range m.NetworkBootstrapKeys {
 			dAtA[i] = 0x2a
 			i++
 			i = encodeVarintObjects(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			i += n
-		***REMOVED***
-	***REMOVED***
-	if m.EncryptionKeyLamportClock != 0 ***REMOVED***
+		}
+	}
+	if m.EncryptionKeyLamportClock != 0 {
 		dAtA[i] = 0x30
 		i++
 		i = encodeVarintObjects(dAtA, i, uint64(m.EncryptionKeyLamportClock))
-	***REMOVED***
-	if len(m.BlacklistedCertificates) > 0 ***REMOVED***
-		for k, _ := range m.BlacklistedCertificates ***REMOVED***
+	}
+	if len(m.BlacklistedCertificates) > 0 {
+		for k, _ := range m.BlacklistedCertificates {
 			dAtA[i] = 0x42
 			i++
 			v := m.BlacklistedCertificates[k]
 			msgSize := 0
-			if v != nil ***REMOVED***
+			if v != nil {
 				msgSize = v.Size()
 				msgSize += 1 + sovObjects(uint64(msgSize))
-			***REMOVED***
+			}
 			mapSize := 1 + len(k) + sovObjects(uint64(len(k))) + msgSize
 			i = encodeVarintObjects(dAtA, i, uint64(mapSize))
 			dAtA[i] = 0xa
 			i++
 			i = encodeVarintObjects(dAtA, i, uint64(len(k)))
 			i += copy(dAtA[i:], k)
-			if v != nil ***REMOVED***
+			if v != nil {
 				dAtA[i] = 0x12
 				i++
 				i = encodeVarintObjects(dAtA, i, uint64(v.Size()))
 				n35, err := v.MarshalTo(dAtA[i:])
-				if err != nil ***REMOVED***
+				if err != nil {
 					return 0, err
-				***REMOVED***
+				}
 				i += n35
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-	if len(m.UnlockKeys) > 0 ***REMOVED***
-		for _, msg := range m.UnlockKeys ***REMOVED***
+			}
+		}
+	}
+	if len(m.UnlockKeys) > 0 {
+		for _, msg := range m.UnlockKeys {
 			dAtA[i] = 0x4a
 			i++
 			i = encodeVarintObjects(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			i += n
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *Secret) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *Secret) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *Secret) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *Secret) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ID) > 0 ***REMOVED***
+	if len(m.ID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintObjects(dAtA, i, uint64(len(m.ID)))
 		i += copy(dAtA[i:], m.ID)
-	***REMOVED***
+	}
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintObjects(dAtA, i, uint64(m.Meta.Size()))
 	n36, err := m.Meta.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n36
 	dAtA[i] = 0x1a
 	i++
 	i = encodeVarintObjects(dAtA, i, uint64(m.Spec.Size()))
 	n37, err := m.Spec.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n37
-	if m.Internal ***REMOVED***
+	if m.Internal {
 		dAtA[i] = 0x20
 		i++
-		if m.Internal ***REMOVED***
+		if m.Internal {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *Config) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *Config) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *Config) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *Config) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ID) > 0 ***REMOVED***
+	if len(m.ID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintObjects(dAtA, i, uint64(len(m.ID)))
 		i += copy(dAtA[i:], m.ID)
-	***REMOVED***
+	}
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintObjects(dAtA, i, uint64(m.Meta.Size()))
 	n38, err := m.Meta.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n38
 	dAtA[i] = 0x1a
 	i++
 	i = encodeVarintObjects(dAtA, i, uint64(m.Spec.Size()))
 	n39, err := m.Spec.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n39
 	return i, nil
-***REMOVED***
+}
 
-func (m *Resource) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *Resource) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *Resource) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *Resource) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ID) > 0 ***REMOVED***
+	if len(m.ID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintObjects(dAtA, i, uint64(len(m.ID)))
 		i += copy(dAtA[i:], m.ID)
-	***REMOVED***
+	}
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintObjects(dAtA, i, uint64(m.Meta.Size()))
 	n40, err := m.Meta.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n40
 	dAtA[i] = 0x1a
 	i++
 	i = encodeVarintObjects(dAtA, i, uint64(m.Annotations.Size()))
 	n41, err := m.Annotations.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n41
-	if len(m.Kind) > 0 ***REMOVED***
+	if len(m.Kind) > 0 {
 		dAtA[i] = 0x22
 		i++
 		i = encodeVarintObjects(dAtA, i, uint64(len(m.Kind)))
 		i += copy(dAtA[i:], m.Kind)
-	***REMOVED***
-	if m.Payload != nil ***REMOVED***
+	}
+	if m.Payload != nil {
 		dAtA[i] = 0x2a
 		i++
 		i = encodeVarintObjects(dAtA, i, uint64(m.Payload.Size()))
 		n42, err := m.Payload.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n42
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *Extension) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *Extension) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *Extension) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *Extension) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ID) > 0 ***REMOVED***
+	if len(m.ID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintObjects(dAtA, i, uint64(len(m.ID)))
 		i += copy(dAtA[i:], m.ID)
-	***REMOVED***
+	}
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintObjects(dAtA, i, uint64(m.Meta.Size()))
 	n43, err := m.Meta.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n43
 	dAtA[i] = 0x1a
 	i++
 	i = encodeVarintObjects(dAtA, i, uint64(m.Annotations.Size()))
 	n44, err := m.Annotations.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n44
-	if len(m.Description) > 0 ***REMOVED***
+	if len(m.Description) > 0 {
 		dAtA[i] = 0x22
 		i++
 		i = encodeVarintObjects(dAtA, i, uint64(len(m.Description)))
 		i += copy(dAtA[i:], m.Description)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func encodeFixed64Objects(dAtA []byte, offset int, v uint64) int ***REMOVED***
+func encodeFixed64Objects(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
 	dAtA[offset+2] = uint8(v >> 16)
@@ -1631,518 +1631,518 @@ func encodeFixed64Objects(dAtA []byte, offset int, v uint64) int ***REMOVED***
 	dAtA[offset+6] = uint8(v >> 48)
 	dAtA[offset+7] = uint8(v >> 56)
 	return offset + 8
-***REMOVED***
-func encodeFixed32Objects(dAtA []byte, offset int, v uint32) int ***REMOVED***
+}
+func encodeFixed32Objects(dAtA []byte, offset int, v uint32) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
 	dAtA[offset+2] = uint8(v >> 16)
 	dAtA[offset+3] = uint8(v >> 24)
 	return offset + 4
-***REMOVED***
-func encodeVarintObjects(dAtA []byte, offset int, v uint64) int ***REMOVED***
-	for v >= 1<<7 ***REMOVED***
+}
+func encodeVarintObjects(dAtA []byte, offset int, v uint64) int {
+	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
-	***REMOVED***
+	}
 	dAtA[offset] = uint8(v)
 	return offset + 1
-***REMOVED***
+}
 
-func (m *Meta) Size() (n int) ***REMOVED***
+func (m *Meta) Size() (n int) {
 	var l int
 	_ = l
 	l = m.Version.Size()
 	n += 1 + l + sovObjects(uint64(l))
-	if m.CreatedAt != nil ***REMOVED***
+	if m.CreatedAt != nil {
 		l = m.CreatedAt.Size()
 		n += 1 + l + sovObjects(uint64(l))
-	***REMOVED***
-	if m.UpdatedAt != nil ***REMOVED***
+	}
+	if m.UpdatedAt != nil {
 		l = m.UpdatedAt.Size()
 		n += 1 + l + sovObjects(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *Node) Size() (n int) ***REMOVED***
+func (m *Node) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovObjects(uint64(l))
-	***REMOVED***
+	}
 	l = m.Meta.Size()
 	n += 1 + l + sovObjects(uint64(l))
 	l = m.Spec.Size()
 	n += 1 + l + sovObjects(uint64(l))
-	if m.Description != nil ***REMOVED***
+	if m.Description != nil {
 		l = m.Description.Size()
 		n += 1 + l + sovObjects(uint64(l))
-	***REMOVED***
+	}
 	l = m.Status.Size()
 	n += 1 + l + sovObjects(uint64(l))
-	if m.ManagerStatus != nil ***REMOVED***
+	if m.ManagerStatus != nil {
 		l = m.ManagerStatus.Size()
 		n += 1 + l + sovObjects(uint64(l))
-	***REMOVED***
-	if m.Attachment != nil ***REMOVED***
+	}
+	if m.Attachment != nil {
 		l = m.Attachment.Size()
 		n += 1 + l + sovObjects(uint64(l))
-	***REMOVED***
+	}
 	l = m.Certificate.Size()
 	n += 1 + l + sovObjects(uint64(l))
-	if m.Role != 0 ***REMOVED***
+	if m.Role != 0 {
 		n += 1 + sovObjects(uint64(m.Role))
-	***REMOVED***
-	if len(m.Attachments) > 0 ***REMOVED***
-		for _, e := range m.Attachments ***REMOVED***
+	}
+	if len(m.Attachments) > 0 {
+		for _, e := range m.Attachments {
 			l = e.Size()
 			n += 1 + l + sovObjects(uint64(l))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
+}
 
-func (m *Service) Size() (n int) ***REMOVED***
+func (m *Service) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovObjects(uint64(l))
-	***REMOVED***
+	}
 	l = m.Meta.Size()
 	n += 1 + l + sovObjects(uint64(l))
 	l = m.Spec.Size()
 	n += 1 + l + sovObjects(uint64(l))
-	if m.Endpoint != nil ***REMOVED***
+	if m.Endpoint != nil {
 		l = m.Endpoint.Size()
 		n += 1 + l + sovObjects(uint64(l))
-	***REMOVED***
-	if m.UpdateStatus != nil ***REMOVED***
+	}
+	if m.UpdateStatus != nil {
 		l = m.UpdateStatus.Size()
 		n += 1 + l + sovObjects(uint64(l))
-	***REMOVED***
-	if m.PreviousSpec != nil ***REMOVED***
+	}
+	if m.PreviousSpec != nil {
 		l = m.PreviousSpec.Size()
 		n += 1 + l + sovObjects(uint64(l))
-	***REMOVED***
-	if m.SpecVersion != nil ***REMOVED***
+	}
+	if m.SpecVersion != nil {
 		l = m.SpecVersion.Size()
 		n += 1 + l + sovObjects(uint64(l))
-	***REMOVED***
-	if m.PreviousSpecVersion != nil ***REMOVED***
+	}
+	if m.PreviousSpecVersion != nil {
 		l = m.PreviousSpecVersion.Size()
 		n += 1 + l + sovObjects(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *Endpoint) Size() (n int) ***REMOVED***
+func (m *Endpoint) Size() (n int) {
 	var l int
 	_ = l
-	if m.Spec != nil ***REMOVED***
+	if m.Spec != nil {
 		l = m.Spec.Size()
 		n += 1 + l + sovObjects(uint64(l))
-	***REMOVED***
-	if len(m.Ports) > 0 ***REMOVED***
-		for _, e := range m.Ports ***REMOVED***
+	}
+	if len(m.Ports) > 0 {
+		for _, e := range m.Ports {
 			l = e.Size()
 			n += 1 + l + sovObjects(uint64(l))
-		***REMOVED***
-	***REMOVED***
-	if len(m.VirtualIPs) > 0 ***REMOVED***
-		for _, e := range m.VirtualIPs ***REMOVED***
+		}
+	}
+	if len(m.VirtualIPs) > 0 {
+		for _, e := range m.VirtualIPs {
 			l = e.Size()
 			n += 1 + l + sovObjects(uint64(l))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
+}
 
-func (m *Endpoint_VirtualIP) Size() (n int) ***REMOVED***
+func (m *Endpoint_VirtualIP) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.NetworkID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovObjects(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.Addr)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovObjects(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *Task) Size() (n int) ***REMOVED***
+func (m *Task) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovObjects(uint64(l))
-	***REMOVED***
+	}
 	l = m.Meta.Size()
 	n += 1 + l + sovObjects(uint64(l))
 	l = m.Spec.Size()
 	n += 1 + l + sovObjects(uint64(l))
 	l = len(m.ServiceID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovObjects(uint64(l))
-	***REMOVED***
-	if m.Slot != 0 ***REMOVED***
+	}
+	if m.Slot != 0 {
 		n += 1 + sovObjects(uint64(m.Slot))
-	***REMOVED***
+	}
 	l = len(m.NodeID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovObjects(uint64(l))
-	***REMOVED***
+	}
 	l = m.Annotations.Size()
 	n += 1 + l + sovObjects(uint64(l))
 	l = m.ServiceAnnotations.Size()
 	n += 1 + l + sovObjects(uint64(l))
 	l = m.Status.Size()
 	n += 1 + l + sovObjects(uint64(l))
-	if m.DesiredState != 0 ***REMOVED***
+	if m.DesiredState != 0 {
 		n += 1 + sovObjects(uint64(m.DesiredState))
-	***REMOVED***
-	if len(m.Networks) > 0 ***REMOVED***
-		for _, e := range m.Networks ***REMOVED***
+	}
+	if len(m.Networks) > 0 {
+		for _, e := range m.Networks {
 			l = e.Size()
 			n += 1 + l + sovObjects(uint64(l))
-		***REMOVED***
-	***REMOVED***
-	if m.Endpoint != nil ***REMOVED***
+		}
+	}
+	if m.Endpoint != nil {
 		l = m.Endpoint.Size()
 		n += 1 + l + sovObjects(uint64(l))
-	***REMOVED***
-	if m.LogDriver != nil ***REMOVED***
+	}
+	if m.LogDriver != nil {
 		l = m.LogDriver.Size()
 		n += 1 + l + sovObjects(uint64(l))
-	***REMOVED***
-	if m.SpecVersion != nil ***REMOVED***
+	}
+	if m.SpecVersion != nil {
 		l = m.SpecVersion.Size()
 		n += 1 + l + sovObjects(uint64(l))
-	***REMOVED***
-	if len(m.AssignedGenericResources) > 0 ***REMOVED***
-		for _, e := range m.AssignedGenericResources ***REMOVED***
+	}
+	if len(m.AssignedGenericResources) > 0 {
+		for _, e := range m.AssignedGenericResources {
 			l = e.Size()
 			n += 1 + l + sovObjects(uint64(l))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
+}
 
-func (m *NetworkAttachment) Size() (n int) ***REMOVED***
+func (m *NetworkAttachment) Size() (n int) {
 	var l int
 	_ = l
-	if m.Network != nil ***REMOVED***
+	if m.Network != nil {
 		l = m.Network.Size()
 		n += 1 + l + sovObjects(uint64(l))
-	***REMOVED***
-	if len(m.Addresses) > 0 ***REMOVED***
-		for _, s := range m.Addresses ***REMOVED***
+	}
+	if len(m.Addresses) > 0 {
+		for _, s := range m.Addresses {
 			l = len(s)
 			n += 1 + l + sovObjects(uint64(l))
-		***REMOVED***
-	***REMOVED***
-	if len(m.Aliases) > 0 ***REMOVED***
-		for _, s := range m.Aliases ***REMOVED***
+		}
+	}
+	if len(m.Aliases) > 0 {
+		for _, s := range m.Aliases {
 			l = len(s)
 			n += 1 + l + sovObjects(uint64(l))
-		***REMOVED***
-	***REMOVED***
-	if len(m.DriverAttachmentOpts) > 0 ***REMOVED***
-		for k, v := range m.DriverAttachmentOpts ***REMOVED***
+		}
+	}
+	if len(m.DriverAttachmentOpts) > 0 {
+		for k, v := range m.DriverAttachmentOpts {
 			_ = k
 			_ = v
 			mapEntrySize := 1 + len(k) + sovObjects(uint64(len(k))) + 1 + len(v) + sovObjects(uint64(len(v)))
 			n += mapEntrySize + 1 + sovObjects(uint64(mapEntrySize))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
+}
 
-func (m *Network) Size() (n int) ***REMOVED***
+func (m *Network) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovObjects(uint64(l))
-	***REMOVED***
+	}
 	l = m.Meta.Size()
 	n += 1 + l + sovObjects(uint64(l))
 	l = m.Spec.Size()
 	n += 1 + l + sovObjects(uint64(l))
-	if m.DriverState != nil ***REMOVED***
+	if m.DriverState != nil {
 		l = m.DriverState.Size()
 		n += 1 + l + sovObjects(uint64(l))
-	***REMOVED***
-	if m.IPAM != nil ***REMOVED***
+	}
+	if m.IPAM != nil {
 		l = m.IPAM.Size()
 		n += 1 + l + sovObjects(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *Cluster) Size() (n int) ***REMOVED***
+func (m *Cluster) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovObjects(uint64(l))
-	***REMOVED***
+	}
 	l = m.Meta.Size()
 	n += 1 + l + sovObjects(uint64(l))
 	l = m.Spec.Size()
 	n += 1 + l + sovObjects(uint64(l))
 	l = m.RootCA.Size()
 	n += 1 + l + sovObjects(uint64(l))
-	if len(m.NetworkBootstrapKeys) > 0 ***REMOVED***
-		for _, e := range m.NetworkBootstrapKeys ***REMOVED***
+	if len(m.NetworkBootstrapKeys) > 0 {
+		for _, e := range m.NetworkBootstrapKeys {
 			l = e.Size()
 			n += 1 + l + sovObjects(uint64(l))
-		***REMOVED***
-	***REMOVED***
-	if m.EncryptionKeyLamportClock != 0 ***REMOVED***
+		}
+	}
+	if m.EncryptionKeyLamportClock != 0 {
 		n += 1 + sovObjects(uint64(m.EncryptionKeyLamportClock))
-	***REMOVED***
-	if len(m.BlacklistedCertificates) > 0 ***REMOVED***
-		for k, v := range m.BlacklistedCertificates ***REMOVED***
+	}
+	if len(m.BlacklistedCertificates) > 0 {
+		for k, v := range m.BlacklistedCertificates {
 			_ = k
 			_ = v
 			l = 0
-			if v != nil ***REMOVED***
+			if v != nil {
 				l = v.Size()
 				l += 1 + sovObjects(uint64(l))
-			***REMOVED***
+			}
 			mapEntrySize := 1 + len(k) + sovObjects(uint64(len(k))) + l
 			n += mapEntrySize + 1 + sovObjects(uint64(mapEntrySize))
-		***REMOVED***
-	***REMOVED***
-	if len(m.UnlockKeys) > 0 ***REMOVED***
-		for _, e := range m.UnlockKeys ***REMOVED***
+		}
+	}
+	if len(m.UnlockKeys) > 0 {
+		for _, e := range m.UnlockKeys {
 			l = e.Size()
 			n += 1 + l + sovObjects(uint64(l))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
+}
 
-func (m *Secret) Size() (n int) ***REMOVED***
+func (m *Secret) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovObjects(uint64(l))
-	***REMOVED***
+	}
 	l = m.Meta.Size()
 	n += 1 + l + sovObjects(uint64(l))
 	l = m.Spec.Size()
 	n += 1 + l + sovObjects(uint64(l))
-	if m.Internal ***REMOVED***
+	if m.Internal {
 		n += 2
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *Config) Size() (n int) ***REMOVED***
+func (m *Config) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovObjects(uint64(l))
-	***REMOVED***
+	}
 	l = m.Meta.Size()
 	n += 1 + l + sovObjects(uint64(l))
 	l = m.Spec.Size()
 	n += 1 + l + sovObjects(uint64(l))
 	return n
-***REMOVED***
+}
 
-func (m *Resource) Size() (n int) ***REMOVED***
+func (m *Resource) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovObjects(uint64(l))
-	***REMOVED***
+	}
 	l = m.Meta.Size()
 	n += 1 + l + sovObjects(uint64(l))
 	l = m.Annotations.Size()
 	n += 1 + l + sovObjects(uint64(l))
 	l = len(m.Kind)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovObjects(uint64(l))
-	***REMOVED***
-	if m.Payload != nil ***REMOVED***
+	}
+	if m.Payload != nil {
 		l = m.Payload.Size()
 		n += 1 + l + sovObjects(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *Extension) Size() (n int) ***REMOVED***
+func (m *Extension) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovObjects(uint64(l))
-	***REMOVED***
+	}
 	l = m.Meta.Size()
 	n += 1 + l + sovObjects(uint64(l))
 	l = m.Annotations.Size()
 	n += 1 + l + sovObjects(uint64(l))
 	l = len(m.Description)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovObjects(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func sovObjects(x uint64) (n int) ***REMOVED***
-	for ***REMOVED***
+func sovObjects(x uint64) (n int) {
+	for {
 		n++
 		x >>= 7
-		if x == 0 ***REMOVED***
+		if x == 0 {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
-func sozObjects(x uint64) (n int) ***REMOVED***
+}
+func sozObjects(x uint64) (n int) {
 	return sovObjects(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-***REMOVED***
+}
 
 type NodeCheckFunc func(t1, t2 *Node) bool
 
-type EventCreateNode struct ***REMOVED***
+type EventCreateNode struct {
 	Node   *Node
 	Checks []NodeCheckFunc
-***REMOVED***
+}
 
-func (e EventCreateNode) Matches(apiEvent github_com_docker_go_events.Event) bool ***REMOVED***
+func (e EventCreateNode) Matches(apiEvent github_com_docker_go_events.Event) bool {
 	typedEvent, ok := apiEvent.(EventCreateNode)
-	if !ok ***REMOVED***
+	if !ok {
 		return false
-	***REMOVED***
+	}
 
-	for _, check := range e.Checks ***REMOVED***
-		if !check(e.Node, typedEvent.Node) ***REMOVED***
+	for _, check := range e.Checks {
+		if !check(e.Node, typedEvent.Node) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}
 
-type EventUpdateNode struct ***REMOVED***
+type EventUpdateNode struct {
 	Node    *Node
 	OldNode *Node
 	Checks  []NodeCheckFunc
-***REMOVED***
+}
 
-func (e EventUpdateNode) Matches(apiEvent github_com_docker_go_events.Event) bool ***REMOVED***
+func (e EventUpdateNode) Matches(apiEvent github_com_docker_go_events.Event) bool {
 	typedEvent, ok := apiEvent.(EventUpdateNode)
-	if !ok ***REMOVED***
+	if !ok {
 		return false
-	***REMOVED***
+	}
 
-	for _, check := range e.Checks ***REMOVED***
-		if !check(e.Node, typedEvent.Node) ***REMOVED***
+	for _, check := range e.Checks {
+		if !check(e.Node, typedEvent.Node) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}
 
-type EventDeleteNode struct ***REMOVED***
+type EventDeleteNode struct {
 	Node   *Node
 	Checks []NodeCheckFunc
-***REMOVED***
+}
 
-func (e EventDeleteNode) Matches(apiEvent github_com_docker_go_events.Event) bool ***REMOVED***
+func (e EventDeleteNode) Matches(apiEvent github_com_docker_go_events.Event) bool {
 	typedEvent, ok := apiEvent.(EventDeleteNode)
-	if !ok ***REMOVED***
+	if !ok {
 		return false
-	***REMOVED***
+	}
 
-	for _, check := range e.Checks ***REMOVED***
-		if !check(e.Node, typedEvent.Node) ***REMOVED***
+	for _, check := range e.Checks {
+		if !check(e.Node, typedEvent.Node) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
-func (m *Node) CopyStoreObject() StoreObject ***REMOVED***
+}
+func (m *Node) CopyStoreObject() StoreObject {
 	return m.Copy()
-***REMOVED***
+}
 
-func (m *Node) GetMeta() Meta ***REMOVED***
+func (m *Node) GetMeta() Meta {
 	return m.Meta
-***REMOVED***
+}
 
-func (m *Node) SetMeta(meta Meta) ***REMOVED***
+func (m *Node) SetMeta(meta Meta) {
 	m.Meta = meta
-***REMOVED***
+}
 
-func (m *Node) GetID() string ***REMOVED***
+func (m *Node) GetID() string {
 	return m.ID
-***REMOVED***
+}
 
-func (m *Node) EventCreate() Event ***REMOVED***
-	return EventCreateNode***REMOVED***Node: m***REMOVED***
-***REMOVED***
+func (m *Node) EventCreate() Event {
+	return EventCreateNode{Node: m}
+}
 
-func (m *Node) EventUpdate(oldObject StoreObject) Event ***REMOVED***
-	if oldObject != nil ***REMOVED***
-		return EventUpdateNode***REMOVED***Node: m, OldNode: oldObject.(*Node)***REMOVED***
-	***REMOVED*** else ***REMOVED***
-		return EventUpdateNode***REMOVED***Node: m***REMOVED***
-	***REMOVED***
-***REMOVED***
+func (m *Node) EventUpdate(oldObject StoreObject) Event {
+	if oldObject != nil {
+		return EventUpdateNode{Node: m, OldNode: oldObject.(*Node)}
+	} else {
+		return EventUpdateNode{Node: m}
+	}
+}
 
-func (m *Node) EventDelete() Event ***REMOVED***
-	return EventDeleteNode***REMOVED***Node: m***REMOVED***
-***REMOVED***
+func (m *Node) EventDelete() Event {
+	return EventDeleteNode{Node: m}
+}
 
-func NodeCheckID(v1, v2 *Node) bool ***REMOVED***
+func NodeCheckID(v1, v2 *Node) bool {
 	return v1.ID == v2.ID
-***REMOVED***
+}
 
-func NodeCheckIDPrefix(v1, v2 *Node) bool ***REMOVED***
+func NodeCheckIDPrefix(v1, v2 *Node) bool {
 	return strings.HasPrefix(v2.ID, v1.ID)
-***REMOVED***
+}
 
-func NodeCheckName(v1, v2 *Node) bool ***REMOVED***
-	if v1.Description == nil || v2.Description == nil ***REMOVED***
+func NodeCheckName(v1, v2 *Node) bool {
+	if v1.Description == nil || v2.Description == nil {
 		return false
-	***REMOVED***
+	}
 	return v1.Description.Hostname == v2.Description.Hostname
-***REMOVED***
+}
 
-func NodeCheckNamePrefix(v1, v2 *Node) bool ***REMOVED***
-	if v1.Description == nil || v2.Description == nil ***REMOVED***
+func NodeCheckNamePrefix(v1, v2 *Node) bool {
+	if v1.Description == nil || v2.Description == nil {
 		return false
-	***REMOVED***
+	}
 	return strings.HasPrefix(v2.Description.Hostname, v1.Description.Hostname)
-***REMOVED***
+}
 
-func NodeCheckCustom(v1, v2 *Node) bool ***REMOVED***
+func NodeCheckCustom(v1, v2 *Node) bool {
 	return checkCustom(v1.Spec.Annotations, v2.Spec.Annotations)
-***REMOVED***
+}
 
-func NodeCheckCustomPrefix(v1, v2 *Node) bool ***REMOVED***
+func NodeCheckCustomPrefix(v1, v2 *Node) bool {
 	return checkCustomPrefix(v1.Spec.Annotations, v2.Spec.Annotations)
-***REMOVED***
+}
 
-func NodeCheckRole(v1, v2 *Node) bool ***REMOVED***
+func NodeCheckRole(v1, v2 *Node) bool {
 	return v1.Role == v2.Role
-***REMOVED***
+}
 
-func NodeCheckMembership(v1, v2 *Node) bool ***REMOVED***
+func NodeCheckMembership(v1, v2 *Node) bool {
 	return v1.Spec.Membership == v2.Spec.Membership
-***REMOVED***
+}
 
-func ConvertNodeWatch(action WatchActionKind, filters []*SelectBy) ([]Event, error) ***REMOVED***
+func ConvertNodeWatch(action WatchActionKind, filters []*SelectBy) ([]Event, error) {
 	var (
 		m             Node
 		checkFuncs    []NodeCheckFunc
@@ -2150,1581 +2150,1581 @@ func ConvertNodeWatch(action WatchActionKind, filters []*SelectBy) ([]Event, err
 		hasMembership bool
 	)
 
-	for _, filter := range filters ***REMOVED***
-		switch v := filter.By.(type) ***REMOVED***
+	for _, filter := range filters {
+		switch v := filter.By.(type) {
 		case *SelectBy_ID:
-			if m.ID != "" ***REMOVED***
+			if m.ID != "" {
 				return nil, errConflictingFilters
-			***REMOVED***
+			}
 			m.ID = v.ID
 			checkFuncs = append(checkFuncs, NodeCheckID)
 		case *SelectBy_IDPrefix:
-			if m.ID != "" ***REMOVED***
+			if m.ID != "" {
 				return nil, errConflictingFilters
-			***REMOVED***
+			}
 			m.ID = v.IDPrefix
 			checkFuncs = append(checkFuncs, NodeCheckIDPrefix)
 		case *SelectBy_Name:
-			if m.Description != nil ***REMOVED***
+			if m.Description != nil {
 				return nil, errConflictingFilters
-			***REMOVED***
-			m.Description = &NodeDescription***REMOVED***Hostname: v.Name***REMOVED***
+			}
+			m.Description = &NodeDescription{Hostname: v.Name}
 			checkFuncs = append(checkFuncs, NodeCheckName)
 		case *SelectBy_NamePrefix:
-			if m.Description != nil ***REMOVED***
+			if m.Description != nil {
 				return nil, errConflictingFilters
-			***REMOVED***
-			m.Description = &NodeDescription***REMOVED***Hostname: v.NamePrefix***REMOVED***
+			}
+			m.Description = &NodeDescription{Hostname: v.NamePrefix}
 			checkFuncs = append(checkFuncs, NodeCheckNamePrefix)
 		case *SelectBy_Custom:
-			if len(m.Spec.Annotations.Indices) != 0 ***REMOVED***
+			if len(m.Spec.Annotations.Indices) != 0 {
 				return nil, errConflictingFilters
-			***REMOVED***
-			m.Spec.Annotations.Indices = []IndexEntry***REMOVED******REMOVED***Key: v.Custom.Index, Val: v.Custom.Value***REMOVED******REMOVED***
+			}
+			m.Spec.Annotations.Indices = []IndexEntry{{Key: v.Custom.Index, Val: v.Custom.Value}}
 			checkFuncs = append(checkFuncs, NodeCheckCustom)
 		case *SelectBy_CustomPrefix:
-			if len(m.Spec.Annotations.Indices) != 0 ***REMOVED***
+			if len(m.Spec.Annotations.Indices) != 0 {
 				return nil, errConflictingFilters
-			***REMOVED***
-			m.Spec.Annotations.Indices = []IndexEntry***REMOVED******REMOVED***Key: v.CustomPrefix.Index, Val: v.CustomPrefix.Value***REMOVED******REMOVED***
+			}
+			m.Spec.Annotations.Indices = []IndexEntry{{Key: v.CustomPrefix.Index, Val: v.CustomPrefix.Value}}
 			checkFuncs = append(checkFuncs, NodeCheckCustomPrefix)
 		case *SelectBy_Role:
-			if hasRole ***REMOVED***
+			if hasRole {
 				return nil, errConflictingFilters
-			***REMOVED***
+			}
 			hasRole = true
 			m.Role = v.Role
 			checkFuncs = append(checkFuncs, NodeCheckRole)
 		case *SelectBy_Membership:
-			if hasMembership ***REMOVED***
+			if hasMembership {
 				return nil, errConflictingFilters
-			***REMOVED***
+			}
 			hasMembership = true
 			m.Spec.Membership = v.Membership
 			checkFuncs = append(checkFuncs, NodeCheckMembership)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	var events []Event
-	if (action & WatchActionKindCreate) != 0 ***REMOVED***
-		events = append(events, EventCreateNode***REMOVED***Node: &m, Checks: checkFuncs***REMOVED***)
-	***REMOVED***
-	if (action & WatchActionKindUpdate) != 0 ***REMOVED***
-		events = append(events, EventUpdateNode***REMOVED***Node: &m, Checks: checkFuncs***REMOVED***)
-	***REMOVED***
-	if (action & WatchActionKindRemove) != 0 ***REMOVED***
-		events = append(events, EventDeleteNode***REMOVED***Node: &m, Checks: checkFuncs***REMOVED***)
-	***REMOVED***
-	if len(events) == 0 ***REMOVED***
+	if (action & WatchActionKindCreate) != 0 {
+		events = append(events, EventCreateNode{Node: &m, Checks: checkFuncs})
+	}
+	if (action & WatchActionKindUpdate) != 0 {
+		events = append(events, EventUpdateNode{Node: &m, Checks: checkFuncs})
+	}
+	if (action & WatchActionKindRemove) != 0 {
+		events = append(events, EventDeleteNode{Node: &m, Checks: checkFuncs})
+	}
+	if len(events) == 0 {
 		return nil, errUnrecognizedAction
-	***REMOVED***
+	}
 	return events, nil
-***REMOVED***
+}
 
-type NodeIndexerByID struct***REMOVED******REMOVED***
+type NodeIndexerByID struct{}
 
-func (indexer NodeIndexerByID) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (indexer NodeIndexerByID) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
-func (indexer NodeIndexerByID) PrefixFromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+}
+func (indexer NodeIndexerByID) PrefixFromArgs(args ...interface{}) ([]byte, error) {
 	return prefixFromArgs(args...)
-***REMOVED***
-func (indexer NodeIndexerByID) FromObject(obj interface***REMOVED******REMOVED***) (bool, []byte, error) ***REMOVED***
+}
+func (indexer NodeIndexerByID) FromObject(obj interface{}) (bool, []byte, error) {
 	m := obj.(*Node)
 	return true, []byte(m.ID + "\x00"), nil
-***REMOVED***
+}
 
-type NodeIndexerByName struct***REMOVED******REMOVED***
+type NodeIndexerByName struct{}
 
-func (indexer NodeIndexerByName) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (indexer NodeIndexerByName) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
-func (indexer NodeIndexerByName) PrefixFromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+}
+func (indexer NodeIndexerByName) PrefixFromArgs(args ...interface{}) ([]byte, error) {
 	return prefixFromArgs(args...)
-***REMOVED***
-func (indexer NodeIndexerByName) FromObject(obj interface***REMOVED******REMOVED***) (bool, []byte, error) ***REMOVED***
+}
+func (indexer NodeIndexerByName) FromObject(obj interface{}) (bool, []byte, error) {
 	m := obj.(*Node)
 	val := m.Spec.Annotations.Name
 	return true, []byte(strings.ToLower(val) + "\x00"), nil
-***REMOVED***
+}
 
-type NodeCustomIndexer struct***REMOVED******REMOVED***
+type NodeCustomIndexer struct{}
 
-func (indexer NodeCustomIndexer) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (indexer NodeCustomIndexer) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
-func (indexer NodeCustomIndexer) PrefixFromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+}
+func (indexer NodeCustomIndexer) PrefixFromArgs(args ...interface{}) ([]byte, error) {
 	return prefixFromArgs(args...)
-***REMOVED***
-func (indexer NodeCustomIndexer) FromObject(obj interface***REMOVED******REMOVED***) (bool, [][]byte, error) ***REMOVED***
+}
+func (indexer NodeCustomIndexer) FromObject(obj interface{}) (bool, [][]byte, error) {
 	m := obj.(*Node)
 	return customIndexer("", &m.Spec.Annotations)
-***REMOVED***
+}
 
 type ServiceCheckFunc func(t1, t2 *Service) bool
 
-type EventCreateService struct ***REMOVED***
+type EventCreateService struct {
 	Service *Service
 	Checks  []ServiceCheckFunc
-***REMOVED***
+}
 
-func (e EventCreateService) Matches(apiEvent github_com_docker_go_events.Event) bool ***REMOVED***
+func (e EventCreateService) Matches(apiEvent github_com_docker_go_events.Event) bool {
 	typedEvent, ok := apiEvent.(EventCreateService)
-	if !ok ***REMOVED***
+	if !ok {
 		return false
-	***REMOVED***
+	}
 
-	for _, check := range e.Checks ***REMOVED***
-		if !check(e.Service, typedEvent.Service) ***REMOVED***
+	for _, check := range e.Checks {
+		if !check(e.Service, typedEvent.Service) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}
 
-type EventUpdateService struct ***REMOVED***
+type EventUpdateService struct {
 	Service    *Service
 	OldService *Service
 	Checks     []ServiceCheckFunc
-***REMOVED***
+}
 
-func (e EventUpdateService) Matches(apiEvent github_com_docker_go_events.Event) bool ***REMOVED***
+func (e EventUpdateService) Matches(apiEvent github_com_docker_go_events.Event) bool {
 	typedEvent, ok := apiEvent.(EventUpdateService)
-	if !ok ***REMOVED***
+	if !ok {
 		return false
-	***REMOVED***
+	}
 
-	for _, check := range e.Checks ***REMOVED***
-		if !check(e.Service, typedEvent.Service) ***REMOVED***
+	for _, check := range e.Checks {
+		if !check(e.Service, typedEvent.Service) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}
 
-type EventDeleteService struct ***REMOVED***
+type EventDeleteService struct {
 	Service *Service
 	Checks  []ServiceCheckFunc
-***REMOVED***
+}
 
-func (e EventDeleteService) Matches(apiEvent github_com_docker_go_events.Event) bool ***REMOVED***
+func (e EventDeleteService) Matches(apiEvent github_com_docker_go_events.Event) bool {
 	typedEvent, ok := apiEvent.(EventDeleteService)
-	if !ok ***REMOVED***
+	if !ok {
 		return false
-	***REMOVED***
+	}
 
-	for _, check := range e.Checks ***REMOVED***
-		if !check(e.Service, typedEvent.Service) ***REMOVED***
+	for _, check := range e.Checks {
+		if !check(e.Service, typedEvent.Service) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
-func (m *Service) CopyStoreObject() StoreObject ***REMOVED***
+}
+func (m *Service) CopyStoreObject() StoreObject {
 	return m.Copy()
-***REMOVED***
+}
 
-func (m *Service) GetMeta() Meta ***REMOVED***
+func (m *Service) GetMeta() Meta {
 	return m.Meta
-***REMOVED***
+}
 
-func (m *Service) SetMeta(meta Meta) ***REMOVED***
+func (m *Service) SetMeta(meta Meta) {
 	m.Meta = meta
-***REMOVED***
+}
 
-func (m *Service) GetID() string ***REMOVED***
+func (m *Service) GetID() string {
 	return m.ID
-***REMOVED***
+}
 
-func (m *Service) EventCreate() Event ***REMOVED***
-	return EventCreateService***REMOVED***Service: m***REMOVED***
-***REMOVED***
+func (m *Service) EventCreate() Event {
+	return EventCreateService{Service: m}
+}
 
-func (m *Service) EventUpdate(oldObject StoreObject) Event ***REMOVED***
-	if oldObject != nil ***REMOVED***
-		return EventUpdateService***REMOVED***Service: m, OldService: oldObject.(*Service)***REMOVED***
-	***REMOVED*** else ***REMOVED***
-		return EventUpdateService***REMOVED***Service: m***REMOVED***
-	***REMOVED***
-***REMOVED***
+func (m *Service) EventUpdate(oldObject StoreObject) Event {
+	if oldObject != nil {
+		return EventUpdateService{Service: m, OldService: oldObject.(*Service)}
+	} else {
+		return EventUpdateService{Service: m}
+	}
+}
 
-func (m *Service) EventDelete() Event ***REMOVED***
-	return EventDeleteService***REMOVED***Service: m***REMOVED***
-***REMOVED***
+func (m *Service) EventDelete() Event {
+	return EventDeleteService{Service: m}
+}
 
-func ServiceCheckID(v1, v2 *Service) bool ***REMOVED***
+func ServiceCheckID(v1, v2 *Service) bool {
 	return v1.ID == v2.ID
-***REMOVED***
+}
 
-func ServiceCheckIDPrefix(v1, v2 *Service) bool ***REMOVED***
+func ServiceCheckIDPrefix(v1, v2 *Service) bool {
 	return strings.HasPrefix(v2.ID, v1.ID)
-***REMOVED***
+}
 
-func ServiceCheckName(v1, v2 *Service) bool ***REMOVED***
+func ServiceCheckName(v1, v2 *Service) bool {
 	return v1.Spec.Annotations.Name == v2.Spec.Annotations.Name
-***REMOVED***
+}
 
-func ServiceCheckNamePrefix(v1, v2 *Service) bool ***REMOVED***
+func ServiceCheckNamePrefix(v1, v2 *Service) bool {
 	return strings.HasPrefix(v2.Spec.Annotations.Name, v1.Spec.Annotations.Name)
-***REMOVED***
+}
 
-func ServiceCheckCustom(v1, v2 *Service) bool ***REMOVED***
+func ServiceCheckCustom(v1, v2 *Service) bool {
 	return checkCustom(v1.Spec.Annotations, v2.Spec.Annotations)
-***REMOVED***
+}
 
-func ServiceCheckCustomPrefix(v1, v2 *Service) bool ***REMOVED***
+func ServiceCheckCustomPrefix(v1, v2 *Service) bool {
 	return checkCustomPrefix(v1.Spec.Annotations, v2.Spec.Annotations)
-***REMOVED***
+}
 
-func ConvertServiceWatch(action WatchActionKind, filters []*SelectBy) ([]Event, error) ***REMOVED***
+func ConvertServiceWatch(action WatchActionKind, filters []*SelectBy) ([]Event, error) {
 	var (
 		m          Service
 		checkFuncs []ServiceCheckFunc
 	)
 
-	for _, filter := range filters ***REMOVED***
-		switch v := filter.By.(type) ***REMOVED***
+	for _, filter := range filters {
+		switch v := filter.By.(type) {
 		case *SelectBy_ID:
-			if m.ID != "" ***REMOVED***
+			if m.ID != "" {
 				return nil, errConflictingFilters
-			***REMOVED***
+			}
 			m.ID = v.ID
 			checkFuncs = append(checkFuncs, ServiceCheckID)
 		case *SelectBy_IDPrefix:
-			if m.ID != "" ***REMOVED***
+			if m.ID != "" {
 				return nil, errConflictingFilters
-			***REMOVED***
+			}
 			m.ID = v.IDPrefix
 			checkFuncs = append(checkFuncs, ServiceCheckIDPrefix)
 		case *SelectBy_Name:
-			if m.Spec.Annotations.Name != "" ***REMOVED***
+			if m.Spec.Annotations.Name != "" {
 				return nil, errConflictingFilters
-			***REMOVED***
+			}
 			m.Spec.Annotations.Name = v.Name
 			checkFuncs = append(checkFuncs, ServiceCheckName)
 		case *SelectBy_NamePrefix:
-			if m.Spec.Annotations.Name != "" ***REMOVED***
+			if m.Spec.Annotations.Name != "" {
 				return nil, errConflictingFilters
-			***REMOVED***
+			}
 			m.Spec.Annotations.Name = v.NamePrefix
 			checkFuncs = append(checkFuncs, ServiceCheckNamePrefix)
 		case *SelectBy_Custom:
-			if len(m.Spec.Annotations.Indices) != 0 ***REMOVED***
+			if len(m.Spec.Annotations.Indices) != 0 {
 				return nil, errConflictingFilters
-			***REMOVED***
-			m.Spec.Annotations.Indices = []IndexEntry***REMOVED******REMOVED***Key: v.Custom.Index, Val: v.Custom.Value***REMOVED******REMOVED***
+			}
+			m.Spec.Annotations.Indices = []IndexEntry{{Key: v.Custom.Index, Val: v.Custom.Value}}
 			checkFuncs = append(checkFuncs, ServiceCheckCustom)
 		case *SelectBy_CustomPrefix:
-			if len(m.Spec.Annotations.Indices) != 0 ***REMOVED***
+			if len(m.Spec.Annotations.Indices) != 0 {
 				return nil, errConflictingFilters
-			***REMOVED***
-			m.Spec.Annotations.Indices = []IndexEntry***REMOVED******REMOVED***Key: v.CustomPrefix.Index, Val: v.CustomPrefix.Value***REMOVED******REMOVED***
+			}
+			m.Spec.Annotations.Indices = []IndexEntry{{Key: v.CustomPrefix.Index, Val: v.CustomPrefix.Value}}
 			checkFuncs = append(checkFuncs, ServiceCheckCustomPrefix)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	var events []Event
-	if (action & WatchActionKindCreate) != 0 ***REMOVED***
-		events = append(events, EventCreateService***REMOVED***Service: &m, Checks: checkFuncs***REMOVED***)
-	***REMOVED***
-	if (action & WatchActionKindUpdate) != 0 ***REMOVED***
-		events = append(events, EventUpdateService***REMOVED***Service: &m, Checks: checkFuncs***REMOVED***)
-	***REMOVED***
-	if (action & WatchActionKindRemove) != 0 ***REMOVED***
-		events = append(events, EventDeleteService***REMOVED***Service: &m, Checks: checkFuncs***REMOVED***)
-	***REMOVED***
-	if len(events) == 0 ***REMOVED***
+	if (action & WatchActionKindCreate) != 0 {
+		events = append(events, EventCreateService{Service: &m, Checks: checkFuncs})
+	}
+	if (action & WatchActionKindUpdate) != 0 {
+		events = append(events, EventUpdateService{Service: &m, Checks: checkFuncs})
+	}
+	if (action & WatchActionKindRemove) != 0 {
+		events = append(events, EventDeleteService{Service: &m, Checks: checkFuncs})
+	}
+	if len(events) == 0 {
 		return nil, errUnrecognizedAction
-	***REMOVED***
+	}
 	return events, nil
-***REMOVED***
+}
 
-type ServiceIndexerByID struct***REMOVED******REMOVED***
+type ServiceIndexerByID struct{}
 
-func (indexer ServiceIndexerByID) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (indexer ServiceIndexerByID) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
-func (indexer ServiceIndexerByID) PrefixFromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+}
+func (indexer ServiceIndexerByID) PrefixFromArgs(args ...interface{}) ([]byte, error) {
 	return prefixFromArgs(args...)
-***REMOVED***
-func (indexer ServiceIndexerByID) FromObject(obj interface***REMOVED******REMOVED***) (bool, []byte, error) ***REMOVED***
+}
+func (indexer ServiceIndexerByID) FromObject(obj interface{}) (bool, []byte, error) {
 	m := obj.(*Service)
 	return true, []byte(m.ID + "\x00"), nil
-***REMOVED***
+}
 
-type ServiceIndexerByName struct***REMOVED******REMOVED***
+type ServiceIndexerByName struct{}
 
-func (indexer ServiceIndexerByName) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (indexer ServiceIndexerByName) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
-func (indexer ServiceIndexerByName) PrefixFromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+}
+func (indexer ServiceIndexerByName) PrefixFromArgs(args ...interface{}) ([]byte, error) {
 	return prefixFromArgs(args...)
-***REMOVED***
-func (indexer ServiceIndexerByName) FromObject(obj interface***REMOVED******REMOVED***) (bool, []byte, error) ***REMOVED***
+}
+func (indexer ServiceIndexerByName) FromObject(obj interface{}) (bool, []byte, error) {
 	m := obj.(*Service)
 	val := m.Spec.Annotations.Name
 	return true, []byte(strings.ToLower(val) + "\x00"), nil
-***REMOVED***
+}
 
-type ServiceCustomIndexer struct***REMOVED******REMOVED***
+type ServiceCustomIndexer struct{}
 
-func (indexer ServiceCustomIndexer) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (indexer ServiceCustomIndexer) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
-func (indexer ServiceCustomIndexer) PrefixFromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+}
+func (indexer ServiceCustomIndexer) PrefixFromArgs(args ...interface{}) ([]byte, error) {
 	return prefixFromArgs(args...)
-***REMOVED***
-func (indexer ServiceCustomIndexer) FromObject(obj interface***REMOVED******REMOVED***) (bool, [][]byte, error) ***REMOVED***
+}
+func (indexer ServiceCustomIndexer) FromObject(obj interface{}) (bool, [][]byte, error) {
 	m := obj.(*Service)
 	return customIndexer("", &m.Spec.Annotations)
-***REMOVED***
+}
 
 type TaskCheckFunc func(t1, t2 *Task) bool
 
-type EventCreateTask struct ***REMOVED***
+type EventCreateTask struct {
 	Task   *Task
 	Checks []TaskCheckFunc
-***REMOVED***
+}
 
-func (e EventCreateTask) Matches(apiEvent github_com_docker_go_events.Event) bool ***REMOVED***
+func (e EventCreateTask) Matches(apiEvent github_com_docker_go_events.Event) bool {
 	typedEvent, ok := apiEvent.(EventCreateTask)
-	if !ok ***REMOVED***
+	if !ok {
 		return false
-	***REMOVED***
+	}
 
-	for _, check := range e.Checks ***REMOVED***
-		if !check(e.Task, typedEvent.Task) ***REMOVED***
+	for _, check := range e.Checks {
+		if !check(e.Task, typedEvent.Task) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}
 
-type EventUpdateTask struct ***REMOVED***
+type EventUpdateTask struct {
 	Task    *Task
 	OldTask *Task
 	Checks  []TaskCheckFunc
-***REMOVED***
+}
 
-func (e EventUpdateTask) Matches(apiEvent github_com_docker_go_events.Event) bool ***REMOVED***
+func (e EventUpdateTask) Matches(apiEvent github_com_docker_go_events.Event) bool {
 	typedEvent, ok := apiEvent.(EventUpdateTask)
-	if !ok ***REMOVED***
+	if !ok {
 		return false
-	***REMOVED***
+	}
 
-	for _, check := range e.Checks ***REMOVED***
-		if !check(e.Task, typedEvent.Task) ***REMOVED***
+	for _, check := range e.Checks {
+		if !check(e.Task, typedEvent.Task) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}
 
-type EventDeleteTask struct ***REMOVED***
+type EventDeleteTask struct {
 	Task   *Task
 	Checks []TaskCheckFunc
-***REMOVED***
+}
 
-func (e EventDeleteTask) Matches(apiEvent github_com_docker_go_events.Event) bool ***REMOVED***
+func (e EventDeleteTask) Matches(apiEvent github_com_docker_go_events.Event) bool {
 	typedEvent, ok := apiEvent.(EventDeleteTask)
-	if !ok ***REMOVED***
+	if !ok {
 		return false
-	***REMOVED***
+	}
 
-	for _, check := range e.Checks ***REMOVED***
-		if !check(e.Task, typedEvent.Task) ***REMOVED***
+	for _, check := range e.Checks {
+		if !check(e.Task, typedEvent.Task) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
-func (m *Task) CopyStoreObject() StoreObject ***REMOVED***
+}
+func (m *Task) CopyStoreObject() StoreObject {
 	return m.Copy()
-***REMOVED***
+}
 
-func (m *Task) GetMeta() Meta ***REMOVED***
+func (m *Task) GetMeta() Meta {
 	return m.Meta
-***REMOVED***
+}
 
-func (m *Task) SetMeta(meta Meta) ***REMOVED***
+func (m *Task) SetMeta(meta Meta) {
 	m.Meta = meta
-***REMOVED***
+}
 
-func (m *Task) GetID() string ***REMOVED***
+func (m *Task) GetID() string {
 	return m.ID
-***REMOVED***
+}
 
-func (m *Task) EventCreate() Event ***REMOVED***
-	return EventCreateTask***REMOVED***Task: m***REMOVED***
-***REMOVED***
+func (m *Task) EventCreate() Event {
+	return EventCreateTask{Task: m}
+}
 
-func (m *Task) EventUpdate(oldObject StoreObject) Event ***REMOVED***
-	if oldObject != nil ***REMOVED***
-		return EventUpdateTask***REMOVED***Task: m, OldTask: oldObject.(*Task)***REMOVED***
-	***REMOVED*** else ***REMOVED***
-		return EventUpdateTask***REMOVED***Task: m***REMOVED***
-	***REMOVED***
-***REMOVED***
+func (m *Task) EventUpdate(oldObject StoreObject) Event {
+	if oldObject != nil {
+		return EventUpdateTask{Task: m, OldTask: oldObject.(*Task)}
+	} else {
+		return EventUpdateTask{Task: m}
+	}
+}
 
-func (m *Task) EventDelete() Event ***REMOVED***
-	return EventDeleteTask***REMOVED***Task: m***REMOVED***
-***REMOVED***
+func (m *Task) EventDelete() Event {
+	return EventDeleteTask{Task: m}
+}
 
-func TaskCheckID(v1, v2 *Task) bool ***REMOVED***
+func TaskCheckID(v1, v2 *Task) bool {
 	return v1.ID == v2.ID
-***REMOVED***
+}
 
-func TaskCheckIDPrefix(v1, v2 *Task) bool ***REMOVED***
+func TaskCheckIDPrefix(v1, v2 *Task) bool {
 	return strings.HasPrefix(v2.ID, v1.ID)
-***REMOVED***
+}
 
-func TaskCheckName(v1, v2 *Task) bool ***REMOVED***
+func TaskCheckName(v1, v2 *Task) bool {
 	return v1.Annotations.Name == v2.Annotations.Name
-***REMOVED***
+}
 
-func TaskCheckNamePrefix(v1, v2 *Task) bool ***REMOVED***
+func TaskCheckNamePrefix(v1, v2 *Task) bool {
 	return strings.HasPrefix(v2.Annotations.Name, v1.Annotations.Name)
-***REMOVED***
+}
 
-func TaskCheckCustom(v1, v2 *Task) bool ***REMOVED***
+func TaskCheckCustom(v1, v2 *Task) bool {
 	return checkCustom(v1.Annotations, v2.Annotations)
-***REMOVED***
+}
 
-func TaskCheckCustomPrefix(v1, v2 *Task) bool ***REMOVED***
+func TaskCheckCustomPrefix(v1, v2 *Task) bool {
 	return checkCustomPrefix(v1.Annotations, v2.Annotations)
-***REMOVED***
+}
 
-func TaskCheckNodeID(v1, v2 *Task) bool ***REMOVED***
+func TaskCheckNodeID(v1, v2 *Task) bool {
 	return v1.NodeID == v2.NodeID
-***REMOVED***
+}
 
-func TaskCheckServiceID(v1, v2 *Task) bool ***REMOVED***
+func TaskCheckServiceID(v1, v2 *Task) bool {
 	return v1.ServiceID == v2.ServiceID
-***REMOVED***
+}
 
-func TaskCheckSlot(v1, v2 *Task) bool ***REMOVED***
+func TaskCheckSlot(v1, v2 *Task) bool {
 	return v1.Slot == v2.Slot
-***REMOVED***
+}
 
-func TaskCheckDesiredState(v1, v2 *Task) bool ***REMOVED***
+func TaskCheckDesiredState(v1, v2 *Task) bool {
 	return v1.DesiredState == v2.DesiredState
-***REMOVED***
+}
 
-func ConvertTaskWatch(action WatchActionKind, filters []*SelectBy) ([]Event, error) ***REMOVED***
+func ConvertTaskWatch(action WatchActionKind, filters []*SelectBy) ([]Event, error) {
 	var (
 		m               Task
 		checkFuncs      []TaskCheckFunc
 		hasDesiredState bool
 	)
 
-	for _, filter := range filters ***REMOVED***
-		switch v := filter.By.(type) ***REMOVED***
+	for _, filter := range filters {
+		switch v := filter.By.(type) {
 		case *SelectBy_ID:
-			if m.ID != "" ***REMOVED***
+			if m.ID != "" {
 				return nil, errConflictingFilters
-			***REMOVED***
+			}
 			m.ID = v.ID
 			checkFuncs = append(checkFuncs, TaskCheckID)
 		case *SelectBy_IDPrefix:
-			if m.ID != "" ***REMOVED***
+			if m.ID != "" {
 				return nil, errConflictingFilters
-			***REMOVED***
+			}
 			m.ID = v.IDPrefix
 			checkFuncs = append(checkFuncs, TaskCheckIDPrefix)
 		case *SelectBy_Name:
-			if m.Annotations.Name != "" ***REMOVED***
+			if m.Annotations.Name != "" {
 				return nil, errConflictingFilters
-			***REMOVED***
+			}
 			m.Annotations.Name = v.Name
 			checkFuncs = append(checkFuncs, TaskCheckName)
 		case *SelectBy_NamePrefix:
-			if m.Annotations.Name != "" ***REMOVED***
+			if m.Annotations.Name != "" {
 				return nil, errConflictingFilters
-			***REMOVED***
+			}
 			m.Annotations.Name = v.NamePrefix
 			checkFuncs = append(checkFuncs, TaskCheckNamePrefix)
 		case *SelectBy_Custom:
-			if len(m.Annotations.Indices) != 0 ***REMOVED***
+			if len(m.Annotations.Indices) != 0 {
 				return nil, errConflictingFilters
-			***REMOVED***
-			m.Annotations.Indices = []IndexEntry***REMOVED******REMOVED***Key: v.Custom.Index, Val: v.Custom.Value***REMOVED******REMOVED***
+			}
+			m.Annotations.Indices = []IndexEntry{{Key: v.Custom.Index, Val: v.Custom.Value}}
 			checkFuncs = append(checkFuncs, TaskCheckCustom)
 		case *SelectBy_CustomPrefix:
-			if len(m.Annotations.Indices) != 0 ***REMOVED***
+			if len(m.Annotations.Indices) != 0 {
 				return nil, errConflictingFilters
-			***REMOVED***
-			m.Annotations.Indices = []IndexEntry***REMOVED******REMOVED***Key: v.CustomPrefix.Index, Val: v.CustomPrefix.Value***REMOVED******REMOVED***
+			}
+			m.Annotations.Indices = []IndexEntry{{Key: v.CustomPrefix.Index, Val: v.CustomPrefix.Value}}
 			checkFuncs = append(checkFuncs, TaskCheckCustomPrefix)
 		case *SelectBy_ServiceID:
-			if m.ServiceID != "" ***REMOVED***
+			if m.ServiceID != "" {
 				return nil, errConflictingFilters
-			***REMOVED***
+			}
 			m.ServiceID = v.ServiceID
 			checkFuncs = append(checkFuncs, TaskCheckServiceID)
 		case *SelectBy_NodeID:
-			if m.NodeID != "" ***REMOVED***
+			if m.NodeID != "" {
 				return nil, errConflictingFilters
-			***REMOVED***
+			}
 			m.NodeID = v.NodeID
 			checkFuncs = append(checkFuncs, TaskCheckNodeID)
 		case *SelectBy_Slot:
-			if m.Slot != 0 || m.ServiceID != "" ***REMOVED***
+			if m.Slot != 0 || m.ServiceID != "" {
 				return nil, errConflictingFilters
-			***REMOVED***
+			}
 			m.ServiceID = v.Slot.ServiceID
 			m.Slot = v.Slot.Slot
 			checkFuncs = append(checkFuncs, TaskCheckNodeID, TaskCheckSlot)
 		case *SelectBy_DesiredState:
-			if hasDesiredState ***REMOVED***
+			if hasDesiredState {
 				return nil, errConflictingFilters
-			***REMOVED***
+			}
 			hasDesiredState = true
 			m.DesiredState = v.DesiredState
 			checkFuncs = append(checkFuncs, TaskCheckDesiredState)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	var events []Event
-	if (action & WatchActionKindCreate) != 0 ***REMOVED***
-		events = append(events, EventCreateTask***REMOVED***Task: &m, Checks: checkFuncs***REMOVED***)
-	***REMOVED***
-	if (action & WatchActionKindUpdate) != 0 ***REMOVED***
-		events = append(events, EventUpdateTask***REMOVED***Task: &m, Checks: checkFuncs***REMOVED***)
-	***REMOVED***
-	if (action & WatchActionKindRemove) != 0 ***REMOVED***
-		events = append(events, EventDeleteTask***REMOVED***Task: &m, Checks: checkFuncs***REMOVED***)
-	***REMOVED***
-	if len(events) == 0 ***REMOVED***
+	if (action & WatchActionKindCreate) != 0 {
+		events = append(events, EventCreateTask{Task: &m, Checks: checkFuncs})
+	}
+	if (action & WatchActionKindUpdate) != 0 {
+		events = append(events, EventUpdateTask{Task: &m, Checks: checkFuncs})
+	}
+	if (action & WatchActionKindRemove) != 0 {
+		events = append(events, EventDeleteTask{Task: &m, Checks: checkFuncs})
+	}
+	if len(events) == 0 {
 		return nil, errUnrecognizedAction
-	***REMOVED***
+	}
 	return events, nil
-***REMOVED***
+}
 
-type TaskIndexerByID struct***REMOVED******REMOVED***
+type TaskIndexerByID struct{}
 
-func (indexer TaskIndexerByID) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (indexer TaskIndexerByID) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
-func (indexer TaskIndexerByID) PrefixFromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+}
+func (indexer TaskIndexerByID) PrefixFromArgs(args ...interface{}) ([]byte, error) {
 	return prefixFromArgs(args...)
-***REMOVED***
-func (indexer TaskIndexerByID) FromObject(obj interface***REMOVED******REMOVED***) (bool, []byte, error) ***REMOVED***
+}
+func (indexer TaskIndexerByID) FromObject(obj interface{}) (bool, []byte, error) {
 	m := obj.(*Task)
 	return true, []byte(m.ID + "\x00"), nil
-***REMOVED***
+}
 
-type TaskIndexerByName struct***REMOVED******REMOVED***
+type TaskIndexerByName struct{}
 
-func (indexer TaskIndexerByName) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (indexer TaskIndexerByName) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
-func (indexer TaskIndexerByName) PrefixFromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+}
+func (indexer TaskIndexerByName) PrefixFromArgs(args ...interface{}) ([]byte, error) {
 	return prefixFromArgs(args...)
-***REMOVED***
-func (indexer TaskIndexerByName) FromObject(obj interface***REMOVED******REMOVED***) (bool, []byte, error) ***REMOVED***
+}
+func (indexer TaskIndexerByName) FromObject(obj interface{}) (bool, []byte, error) {
 	m := obj.(*Task)
 	val := m.Annotations.Name
 	return true, []byte(strings.ToLower(val) + "\x00"), nil
-***REMOVED***
+}
 
-type TaskCustomIndexer struct***REMOVED******REMOVED***
+type TaskCustomIndexer struct{}
 
-func (indexer TaskCustomIndexer) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (indexer TaskCustomIndexer) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
-func (indexer TaskCustomIndexer) PrefixFromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+}
+func (indexer TaskCustomIndexer) PrefixFromArgs(args ...interface{}) ([]byte, error) {
 	return prefixFromArgs(args...)
-***REMOVED***
-func (indexer TaskCustomIndexer) FromObject(obj interface***REMOVED******REMOVED***) (bool, [][]byte, error) ***REMOVED***
+}
+func (indexer TaskCustomIndexer) FromObject(obj interface{}) (bool, [][]byte, error) {
 	m := obj.(*Task)
 	return customIndexer("", &m.Annotations)
-***REMOVED***
+}
 
 type NetworkCheckFunc func(t1, t2 *Network) bool
 
-type EventCreateNetwork struct ***REMOVED***
+type EventCreateNetwork struct {
 	Network *Network
 	Checks  []NetworkCheckFunc
-***REMOVED***
+}
 
-func (e EventCreateNetwork) Matches(apiEvent github_com_docker_go_events.Event) bool ***REMOVED***
+func (e EventCreateNetwork) Matches(apiEvent github_com_docker_go_events.Event) bool {
 	typedEvent, ok := apiEvent.(EventCreateNetwork)
-	if !ok ***REMOVED***
+	if !ok {
 		return false
-	***REMOVED***
+	}
 
-	for _, check := range e.Checks ***REMOVED***
-		if !check(e.Network, typedEvent.Network) ***REMOVED***
+	for _, check := range e.Checks {
+		if !check(e.Network, typedEvent.Network) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}
 
-type EventUpdateNetwork struct ***REMOVED***
+type EventUpdateNetwork struct {
 	Network    *Network
 	OldNetwork *Network
 	Checks     []NetworkCheckFunc
-***REMOVED***
+}
 
-func (e EventUpdateNetwork) Matches(apiEvent github_com_docker_go_events.Event) bool ***REMOVED***
+func (e EventUpdateNetwork) Matches(apiEvent github_com_docker_go_events.Event) bool {
 	typedEvent, ok := apiEvent.(EventUpdateNetwork)
-	if !ok ***REMOVED***
+	if !ok {
 		return false
-	***REMOVED***
+	}
 
-	for _, check := range e.Checks ***REMOVED***
-		if !check(e.Network, typedEvent.Network) ***REMOVED***
+	for _, check := range e.Checks {
+		if !check(e.Network, typedEvent.Network) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}
 
-type EventDeleteNetwork struct ***REMOVED***
+type EventDeleteNetwork struct {
 	Network *Network
 	Checks  []NetworkCheckFunc
-***REMOVED***
+}
 
-func (e EventDeleteNetwork) Matches(apiEvent github_com_docker_go_events.Event) bool ***REMOVED***
+func (e EventDeleteNetwork) Matches(apiEvent github_com_docker_go_events.Event) bool {
 	typedEvent, ok := apiEvent.(EventDeleteNetwork)
-	if !ok ***REMOVED***
+	if !ok {
 		return false
-	***REMOVED***
+	}
 
-	for _, check := range e.Checks ***REMOVED***
-		if !check(e.Network, typedEvent.Network) ***REMOVED***
+	for _, check := range e.Checks {
+		if !check(e.Network, typedEvent.Network) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
-func (m *Network) CopyStoreObject() StoreObject ***REMOVED***
+}
+func (m *Network) CopyStoreObject() StoreObject {
 	return m.Copy()
-***REMOVED***
+}
 
-func (m *Network) GetMeta() Meta ***REMOVED***
+func (m *Network) GetMeta() Meta {
 	return m.Meta
-***REMOVED***
+}
 
-func (m *Network) SetMeta(meta Meta) ***REMOVED***
+func (m *Network) SetMeta(meta Meta) {
 	m.Meta = meta
-***REMOVED***
+}
 
-func (m *Network) GetID() string ***REMOVED***
+func (m *Network) GetID() string {
 	return m.ID
-***REMOVED***
+}
 
-func (m *Network) EventCreate() Event ***REMOVED***
-	return EventCreateNetwork***REMOVED***Network: m***REMOVED***
-***REMOVED***
+func (m *Network) EventCreate() Event {
+	return EventCreateNetwork{Network: m}
+}
 
-func (m *Network) EventUpdate(oldObject StoreObject) Event ***REMOVED***
-	if oldObject != nil ***REMOVED***
-		return EventUpdateNetwork***REMOVED***Network: m, OldNetwork: oldObject.(*Network)***REMOVED***
-	***REMOVED*** else ***REMOVED***
-		return EventUpdateNetwork***REMOVED***Network: m***REMOVED***
-	***REMOVED***
-***REMOVED***
+func (m *Network) EventUpdate(oldObject StoreObject) Event {
+	if oldObject != nil {
+		return EventUpdateNetwork{Network: m, OldNetwork: oldObject.(*Network)}
+	} else {
+		return EventUpdateNetwork{Network: m}
+	}
+}
 
-func (m *Network) EventDelete() Event ***REMOVED***
-	return EventDeleteNetwork***REMOVED***Network: m***REMOVED***
-***REMOVED***
+func (m *Network) EventDelete() Event {
+	return EventDeleteNetwork{Network: m}
+}
 
-func NetworkCheckID(v1, v2 *Network) bool ***REMOVED***
+func NetworkCheckID(v1, v2 *Network) bool {
 	return v1.ID == v2.ID
-***REMOVED***
+}
 
-func NetworkCheckIDPrefix(v1, v2 *Network) bool ***REMOVED***
+func NetworkCheckIDPrefix(v1, v2 *Network) bool {
 	return strings.HasPrefix(v2.ID, v1.ID)
-***REMOVED***
+}
 
-func NetworkCheckName(v1, v2 *Network) bool ***REMOVED***
+func NetworkCheckName(v1, v2 *Network) bool {
 	return v1.Spec.Annotations.Name == v2.Spec.Annotations.Name
-***REMOVED***
+}
 
-func NetworkCheckNamePrefix(v1, v2 *Network) bool ***REMOVED***
+func NetworkCheckNamePrefix(v1, v2 *Network) bool {
 	return strings.HasPrefix(v2.Spec.Annotations.Name, v1.Spec.Annotations.Name)
-***REMOVED***
+}
 
-func NetworkCheckCustom(v1, v2 *Network) bool ***REMOVED***
+func NetworkCheckCustom(v1, v2 *Network) bool {
 	return checkCustom(v1.Spec.Annotations, v2.Spec.Annotations)
-***REMOVED***
+}
 
-func NetworkCheckCustomPrefix(v1, v2 *Network) bool ***REMOVED***
+func NetworkCheckCustomPrefix(v1, v2 *Network) bool {
 	return checkCustomPrefix(v1.Spec.Annotations, v2.Spec.Annotations)
-***REMOVED***
+}
 
-func ConvertNetworkWatch(action WatchActionKind, filters []*SelectBy) ([]Event, error) ***REMOVED***
+func ConvertNetworkWatch(action WatchActionKind, filters []*SelectBy) ([]Event, error) {
 	var (
 		m          Network
 		checkFuncs []NetworkCheckFunc
 	)
 
-	for _, filter := range filters ***REMOVED***
-		switch v := filter.By.(type) ***REMOVED***
+	for _, filter := range filters {
+		switch v := filter.By.(type) {
 		case *SelectBy_ID:
-			if m.ID != "" ***REMOVED***
+			if m.ID != "" {
 				return nil, errConflictingFilters
-			***REMOVED***
+			}
 			m.ID = v.ID
 			checkFuncs = append(checkFuncs, NetworkCheckID)
 		case *SelectBy_IDPrefix:
-			if m.ID != "" ***REMOVED***
+			if m.ID != "" {
 				return nil, errConflictingFilters
-			***REMOVED***
+			}
 			m.ID = v.IDPrefix
 			checkFuncs = append(checkFuncs, NetworkCheckIDPrefix)
 		case *SelectBy_Name:
-			if m.Spec.Annotations.Name != "" ***REMOVED***
+			if m.Spec.Annotations.Name != "" {
 				return nil, errConflictingFilters
-			***REMOVED***
+			}
 			m.Spec.Annotations.Name = v.Name
 			checkFuncs = append(checkFuncs, NetworkCheckName)
 		case *SelectBy_NamePrefix:
-			if m.Spec.Annotations.Name != "" ***REMOVED***
+			if m.Spec.Annotations.Name != "" {
 				return nil, errConflictingFilters
-			***REMOVED***
+			}
 			m.Spec.Annotations.Name = v.NamePrefix
 			checkFuncs = append(checkFuncs, NetworkCheckNamePrefix)
 		case *SelectBy_Custom:
-			if len(m.Spec.Annotations.Indices) != 0 ***REMOVED***
+			if len(m.Spec.Annotations.Indices) != 0 {
 				return nil, errConflictingFilters
-			***REMOVED***
-			m.Spec.Annotations.Indices = []IndexEntry***REMOVED******REMOVED***Key: v.Custom.Index, Val: v.Custom.Value***REMOVED******REMOVED***
+			}
+			m.Spec.Annotations.Indices = []IndexEntry{{Key: v.Custom.Index, Val: v.Custom.Value}}
 			checkFuncs = append(checkFuncs, NetworkCheckCustom)
 		case *SelectBy_CustomPrefix:
-			if len(m.Spec.Annotations.Indices) != 0 ***REMOVED***
+			if len(m.Spec.Annotations.Indices) != 0 {
 				return nil, errConflictingFilters
-			***REMOVED***
-			m.Spec.Annotations.Indices = []IndexEntry***REMOVED******REMOVED***Key: v.CustomPrefix.Index, Val: v.CustomPrefix.Value***REMOVED******REMOVED***
+			}
+			m.Spec.Annotations.Indices = []IndexEntry{{Key: v.CustomPrefix.Index, Val: v.CustomPrefix.Value}}
 			checkFuncs = append(checkFuncs, NetworkCheckCustomPrefix)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	var events []Event
-	if (action & WatchActionKindCreate) != 0 ***REMOVED***
-		events = append(events, EventCreateNetwork***REMOVED***Network: &m, Checks: checkFuncs***REMOVED***)
-	***REMOVED***
-	if (action & WatchActionKindUpdate) != 0 ***REMOVED***
-		events = append(events, EventUpdateNetwork***REMOVED***Network: &m, Checks: checkFuncs***REMOVED***)
-	***REMOVED***
-	if (action & WatchActionKindRemove) != 0 ***REMOVED***
-		events = append(events, EventDeleteNetwork***REMOVED***Network: &m, Checks: checkFuncs***REMOVED***)
-	***REMOVED***
-	if len(events) == 0 ***REMOVED***
+	if (action & WatchActionKindCreate) != 0 {
+		events = append(events, EventCreateNetwork{Network: &m, Checks: checkFuncs})
+	}
+	if (action & WatchActionKindUpdate) != 0 {
+		events = append(events, EventUpdateNetwork{Network: &m, Checks: checkFuncs})
+	}
+	if (action & WatchActionKindRemove) != 0 {
+		events = append(events, EventDeleteNetwork{Network: &m, Checks: checkFuncs})
+	}
+	if len(events) == 0 {
 		return nil, errUnrecognizedAction
-	***REMOVED***
+	}
 	return events, nil
-***REMOVED***
+}
 
-type NetworkIndexerByID struct***REMOVED******REMOVED***
+type NetworkIndexerByID struct{}
 
-func (indexer NetworkIndexerByID) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (indexer NetworkIndexerByID) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
-func (indexer NetworkIndexerByID) PrefixFromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+}
+func (indexer NetworkIndexerByID) PrefixFromArgs(args ...interface{}) ([]byte, error) {
 	return prefixFromArgs(args...)
-***REMOVED***
-func (indexer NetworkIndexerByID) FromObject(obj interface***REMOVED******REMOVED***) (bool, []byte, error) ***REMOVED***
+}
+func (indexer NetworkIndexerByID) FromObject(obj interface{}) (bool, []byte, error) {
 	m := obj.(*Network)
 	return true, []byte(m.ID + "\x00"), nil
-***REMOVED***
+}
 
-type NetworkIndexerByName struct***REMOVED******REMOVED***
+type NetworkIndexerByName struct{}
 
-func (indexer NetworkIndexerByName) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (indexer NetworkIndexerByName) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
-func (indexer NetworkIndexerByName) PrefixFromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+}
+func (indexer NetworkIndexerByName) PrefixFromArgs(args ...interface{}) ([]byte, error) {
 	return prefixFromArgs(args...)
-***REMOVED***
-func (indexer NetworkIndexerByName) FromObject(obj interface***REMOVED******REMOVED***) (bool, []byte, error) ***REMOVED***
+}
+func (indexer NetworkIndexerByName) FromObject(obj interface{}) (bool, []byte, error) {
 	m := obj.(*Network)
 	val := m.Spec.Annotations.Name
 	return true, []byte(strings.ToLower(val) + "\x00"), nil
-***REMOVED***
+}
 
-type NetworkCustomIndexer struct***REMOVED******REMOVED***
+type NetworkCustomIndexer struct{}
 
-func (indexer NetworkCustomIndexer) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (indexer NetworkCustomIndexer) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
-func (indexer NetworkCustomIndexer) PrefixFromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+}
+func (indexer NetworkCustomIndexer) PrefixFromArgs(args ...interface{}) ([]byte, error) {
 	return prefixFromArgs(args...)
-***REMOVED***
-func (indexer NetworkCustomIndexer) FromObject(obj interface***REMOVED******REMOVED***) (bool, [][]byte, error) ***REMOVED***
+}
+func (indexer NetworkCustomIndexer) FromObject(obj interface{}) (bool, [][]byte, error) {
 	m := obj.(*Network)
 	return customIndexer("", &m.Spec.Annotations)
-***REMOVED***
+}
 
 type ClusterCheckFunc func(t1, t2 *Cluster) bool
 
-type EventCreateCluster struct ***REMOVED***
+type EventCreateCluster struct {
 	Cluster *Cluster
 	Checks  []ClusterCheckFunc
-***REMOVED***
+}
 
-func (e EventCreateCluster) Matches(apiEvent github_com_docker_go_events.Event) bool ***REMOVED***
+func (e EventCreateCluster) Matches(apiEvent github_com_docker_go_events.Event) bool {
 	typedEvent, ok := apiEvent.(EventCreateCluster)
-	if !ok ***REMOVED***
+	if !ok {
 		return false
-	***REMOVED***
+	}
 
-	for _, check := range e.Checks ***REMOVED***
-		if !check(e.Cluster, typedEvent.Cluster) ***REMOVED***
+	for _, check := range e.Checks {
+		if !check(e.Cluster, typedEvent.Cluster) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}
 
-type EventUpdateCluster struct ***REMOVED***
+type EventUpdateCluster struct {
 	Cluster    *Cluster
 	OldCluster *Cluster
 	Checks     []ClusterCheckFunc
-***REMOVED***
+}
 
-func (e EventUpdateCluster) Matches(apiEvent github_com_docker_go_events.Event) bool ***REMOVED***
+func (e EventUpdateCluster) Matches(apiEvent github_com_docker_go_events.Event) bool {
 	typedEvent, ok := apiEvent.(EventUpdateCluster)
-	if !ok ***REMOVED***
+	if !ok {
 		return false
-	***REMOVED***
+	}
 
-	for _, check := range e.Checks ***REMOVED***
-		if !check(e.Cluster, typedEvent.Cluster) ***REMOVED***
+	for _, check := range e.Checks {
+		if !check(e.Cluster, typedEvent.Cluster) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}
 
-type EventDeleteCluster struct ***REMOVED***
+type EventDeleteCluster struct {
 	Cluster *Cluster
 	Checks  []ClusterCheckFunc
-***REMOVED***
+}
 
-func (e EventDeleteCluster) Matches(apiEvent github_com_docker_go_events.Event) bool ***REMOVED***
+func (e EventDeleteCluster) Matches(apiEvent github_com_docker_go_events.Event) bool {
 	typedEvent, ok := apiEvent.(EventDeleteCluster)
-	if !ok ***REMOVED***
+	if !ok {
 		return false
-	***REMOVED***
+	}
 
-	for _, check := range e.Checks ***REMOVED***
-		if !check(e.Cluster, typedEvent.Cluster) ***REMOVED***
+	for _, check := range e.Checks {
+		if !check(e.Cluster, typedEvent.Cluster) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
-func (m *Cluster) CopyStoreObject() StoreObject ***REMOVED***
+}
+func (m *Cluster) CopyStoreObject() StoreObject {
 	return m.Copy()
-***REMOVED***
+}
 
-func (m *Cluster) GetMeta() Meta ***REMOVED***
+func (m *Cluster) GetMeta() Meta {
 	return m.Meta
-***REMOVED***
+}
 
-func (m *Cluster) SetMeta(meta Meta) ***REMOVED***
+func (m *Cluster) SetMeta(meta Meta) {
 	m.Meta = meta
-***REMOVED***
+}
 
-func (m *Cluster) GetID() string ***REMOVED***
+func (m *Cluster) GetID() string {
 	return m.ID
-***REMOVED***
+}
 
-func (m *Cluster) EventCreate() Event ***REMOVED***
-	return EventCreateCluster***REMOVED***Cluster: m***REMOVED***
-***REMOVED***
+func (m *Cluster) EventCreate() Event {
+	return EventCreateCluster{Cluster: m}
+}
 
-func (m *Cluster) EventUpdate(oldObject StoreObject) Event ***REMOVED***
-	if oldObject != nil ***REMOVED***
-		return EventUpdateCluster***REMOVED***Cluster: m, OldCluster: oldObject.(*Cluster)***REMOVED***
-	***REMOVED*** else ***REMOVED***
-		return EventUpdateCluster***REMOVED***Cluster: m***REMOVED***
-	***REMOVED***
-***REMOVED***
+func (m *Cluster) EventUpdate(oldObject StoreObject) Event {
+	if oldObject != nil {
+		return EventUpdateCluster{Cluster: m, OldCluster: oldObject.(*Cluster)}
+	} else {
+		return EventUpdateCluster{Cluster: m}
+	}
+}
 
-func (m *Cluster) EventDelete() Event ***REMOVED***
-	return EventDeleteCluster***REMOVED***Cluster: m***REMOVED***
-***REMOVED***
+func (m *Cluster) EventDelete() Event {
+	return EventDeleteCluster{Cluster: m}
+}
 
-func ClusterCheckID(v1, v2 *Cluster) bool ***REMOVED***
+func ClusterCheckID(v1, v2 *Cluster) bool {
 	return v1.ID == v2.ID
-***REMOVED***
+}
 
-func ClusterCheckIDPrefix(v1, v2 *Cluster) bool ***REMOVED***
+func ClusterCheckIDPrefix(v1, v2 *Cluster) bool {
 	return strings.HasPrefix(v2.ID, v1.ID)
-***REMOVED***
+}
 
-func ClusterCheckName(v1, v2 *Cluster) bool ***REMOVED***
+func ClusterCheckName(v1, v2 *Cluster) bool {
 	return v1.Spec.Annotations.Name == v2.Spec.Annotations.Name
-***REMOVED***
+}
 
-func ClusterCheckNamePrefix(v1, v2 *Cluster) bool ***REMOVED***
+func ClusterCheckNamePrefix(v1, v2 *Cluster) bool {
 	return strings.HasPrefix(v2.Spec.Annotations.Name, v1.Spec.Annotations.Name)
-***REMOVED***
+}
 
-func ClusterCheckCustom(v1, v2 *Cluster) bool ***REMOVED***
+func ClusterCheckCustom(v1, v2 *Cluster) bool {
 	return checkCustom(v1.Spec.Annotations, v2.Spec.Annotations)
-***REMOVED***
+}
 
-func ClusterCheckCustomPrefix(v1, v2 *Cluster) bool ***REMOVED***
+func ClusterCheckCustomPrefix(v1, v2 *Cluster) bool {
 	return checkCustomPrefix(v1.Spec.Annotations, v2.Spec.Annotations)
-***REMOVED***
+}
 
-func ConvertClusterWatch(action WatchActionKind, filters []*SelectBy) ([]Event, error) ***REMOVED***
+func ConvertClusterWatch(action WatchActionKind, filters []*SelectBy) ([]Event, error) {
 	var (
 		m          Cluster
 		checkFuncs []ClusterCheckFunc
 	)
 
-	for _, filter := range filters ***REMOVED***
-		switch v := filter.By.(type) ***REMOVED***
+	for _, filter := range filters {
+		switch v := filter.By.(type) {
 		case *SelectBy_ID:
-			if m.ID != "" ***REMOVED***
+			if m.ID != "" {
 				return nil, errConflictingFilters
-			***REMOVED***
+			}
 			m.ID = v.ID
 			checkFuncs = append(checkFuncs, ClusterCheckID)
 		case *SelectBy_IDPrefix:
-			if m.ID != "" ***REMOVED***
+			if m.ID != "" {
 				return nil, errConflictingFilters
-			***REMOVED***
+			}
 			m.ID = v.IDPrefix
 			checkFuncs = append(checkFuncs, ClusterCheckIDPrefix)
 		case *SelectBy_Name:
-			if m.Spec.Annotations.Name != "" ***REMOVED***
+			if m.Spec.Annotations.Name != "" {
 				return nil, errConflictingFilters
-			***REMOVED***
+			}
 			m.Spec.Annotations.Name = v.Name
 			checkFuncs = append(checkFuncs, ClusterCheckName)
 		case *SelectBy_NamePrefix:
-			if m.Spec.Annotations.Name != "" ***REMOVED***
+			if m.Spec.Annotations.Name != "" {
 				return nil, errConflictingFilters
-			***REMOVED***
+			}
 			m.Spec.Annotations.Name = v.NamePrefix
 			checkFuncs = append(checkFuncs, ClusterCheckNamePrefix)
 		case *SelectBy_Custom:
-			if len(m.Spec.Annotations.Indices) != 0 ***REMOVED***
+			if len(m.Spec.Annotations.Indices) != 0 {
 				return nil, errConflictingFilters
-			***REMOVED***
-			m.Spec.Annotations.Indices = []IndexEntry***REMOVED******REMOVED***Key: v.Custom.Index, Val: v.Custom.Value***REMOVED******REMOVED***
+			}
+			m.Spec.Annotations.Indices = []IndexEntry{{Key: v.Custom.Index, Val: v.Custom.Value}}
 			checkFuncs = append(checkFuncs, ClusterCheckCustom)
 		case *SelectBy_CustomPrefix:
-			if len(m.Spec.Annotations.Indices) != 0 ***REMOVED***
+			if len(m.Spec.Annotations.Indices) != 0 {
 				return nil, errConflictingFilters
-			***REMOVED***
-			m.Spec.Annotations.Indices = []IndexEntry***REMOVED******REMOVED***Key: v.CustomPrefix.Index, Val: v.CustomPrefix.Value***REMOVED******REMOVED***
+			}
+			m.Spec.Annotations.Indices = []IndexEntry{{Key: v.CustomPrefix.Index, Val: v.CustomPrefix.Value}}
 			checkFuncs = append(checkFuncs, ClusterCheckCustomPrefix)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	var events []Event
-	if (action & WatchActionKindCreate) != 0 ***REMOVED***
-		events = append(events, EventCreateCluster***REMOVED***Cluster: &m, Checks: checkFuncs***REMOVED***)
-	***REMOVED***
-	if (action & WatchActionKindUpdate) != 0 ***REMOVED***
-		events = append(events, EventUpdateCluster***REMOVED***Cluster: &m, Checks: checkFuncs***REMOVED***)
-	***REMOVED***
-	if (action & WatchActionKindRemove) != 0 ***REMOVED***
-		events = append(events, EventDeleteCluster***REMOVED***Cluster: &m, Checks: checkFuncs***REMOVED***)
-	***REMOVED***
-	if len(events) == 0 ***REMOVED***
+	if (action & WatchActionKindCreate) != 0 {
+		events = append(events, EventCreateCluster{Cluster: &m, Checks: checkFuncs})
+	}
+	if (action & WatchActionKindUpdate) != 0 {
+		events = append(events, EventUpdateCluster{Cluster: &m, Checks: checkFuncs})
+	}
+	if (action & WatchActionKindRemove) != 0 {
+		events = append(events, EventDeleteCluster{Cluster: &m, Checks: checkFuncs})
+	}
+	if len(events) == 0 {
 		return nil, errUnrecognizedAction
-	***REMOVED***
+	}
 	return events, nil
-***REMOVED***
+}
 
-type ClusterIndexerByID struct***REMOVED******REMOVED***
+type ClusterIndexerByID struct{}
 
-func (indexer ClusterIndexerByID) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (indexer ClusterIndexerByID) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
-func (indexer ClusterIndexerByID) PrefixFromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+}
+func (indexer ClusterIndexerByID) PrefixFromArgs(args ...interface{}) ([]byte, error) {
 	return prefixFromArgs(args...)
-***REMOVED***
-func (indexer ClusterIndexerByID) FromObject(obj interface***REMOVED******REMOVED***) (bool, []byte, error) ***REMOVED***
+}
+func (indexer ClusterIndexerByID) FromObject(obj interface{}) (bool, []byte, error) {
 	m := obj.(*Cluster)
 	return true, []byte(m.ID + "\x00"), nil
-***REMOVED***
+}
 
-type ClusterIndexerByName struct***REMOVED******REMOVED***
+type ClusterIndexerByName struct{}
 
-func (indexer ClusterIndexerByName) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (indexer ClusterIndexerByName) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
-func (indexer ClusterIndexerByName) PrefixFromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+}
+func (indexer ClusterIndexerByName) PrefixFromArgs(args ...interface{}) ([]byte, error) {
 	return prefixFromArgs(args...)
-***REMOVED***
-func (indexer ClusterIndexerByName) FromObject(obj interface***REMOVED******REMOVED***) (bool, []byte, error) ***REMOVED***
+}
+func (indexer ClusterIndexerByName) FromObject(obj interface{}) (bool, []byte, error) {
 	m := obj.(*Cluster)
 	val := m.Spec.Annotations.Name
 	return true, []byte(strings.ToLower(val) + "\x00"), nil
-***REMOVED***
+}
 
-type ClusterCustomIndexer struct***REMOVED******REMOVED***
+type ClusterCustomIndexer struct{}
 
-func (indexer ClusterCustomIndexer) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (indexer ClusterCustomIndexer) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
-func (indexer ClusterCustomIndexer) PrefixFromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+}
+func (indexer ClusterCustomIndexer) PrefixFromArgs(args ...interface{}) ([]byte, error) {
 	return prefixFromArgs(args...)
-***REMOVED***
-func (indexer ClusterCustomIndexer) FromObject(obj interface***REMOVED******REMOVED***) (bool, [][]byte, error) ***REMOVED***
+}
+func (indexer ClusterCustomIndexer) FromObject(obj interface{}) (bool, [][]byte, error) {
 	m := obj.(*Cluster)
 	return customIndexer("", &m.Spec.Annotations)
-***REMOVED***
+}
 
 type SecretCheckFunc func(t1, t2 *Secret) bool
 
-type EventCreateSecret struct ***REMOVED***
+type EventCreateSecret struct {
 	Secret *Secret
 	Checks []SecretCheckFunc
-***REMOVED***
+}
 
-func (e EventCreateSecret) Matches(apiEvent github_com_docker_go_events.Event) bool ***REMOVED***
+func (e EventCreateSecret) Matches(apiEvent github_com_docker_go_events.Event) bool {
 	typedEvent, ok := apiEvent.(EventCreateSecret)
-	if !ok ***REMOVED***
+	if !ok {
 		return false
-	***REMOVED***
+	}
 
-	for _, check := range e.Checks ***REMOVED***
-		if !check(e.Secret, typedEvent.Secret) ***REMOVED***
+	for _, check := range e.Checks {
+		if !check(e.Secret, typedEvent.Secret) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}
 
-type EventUpdateSecret struct ***REMOVED***
+type EventUpdateSecret struct {
 	Secret    *Secret
 	OldSecret *Secret
 	Checks    []SecretCheckFunc
-***REMOVED***
+}
 
-func (e EventUpdateSecret) Matches(apiEvent github_com_docker_go_events.Event) bool ***REMOVED***
+func (e EventUpdateSecret) Matches(apiEvent github_com_docker_go_events.Event) bool {
 	typedEvent, ok := apiEvent.(EventUpdateSecret)
-	if !ok ***REMOVED***
+	if !ok {
 		return false
-	***REMOVED***
+	}
 
-	for _, check := range e.Checks ***REMOVED***
-		if !check(e.Secret, typedEvent.Secret) ***REMOVED***
+	for _, check := range e.Checks {
+		if !check(e.Secret, typedEvent.Secret) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}
 
-type EventDeleteSecret struct ***REMOVED***
+type EventDeleteSecret struct {
 	Secret *Secret
 	Checks []SecretCheckFunc
-***REMOVED***
+}
 
-func (e EventDeleteSecret) Matches(apiEvent github_com_docker_go_events.Event) bool ***REMOVED***
+func (e EventDeleteSecret) Matches(apiEvent github_com_docker_go_events.Event) bool {
 	typedEvent, ok := apiEvent.(EventDeleteSecret)
-	if !ok ***REMOVED***
+	if !ok {
 		return false
-	***REMOVED***
+	}
 
-	for _, check := range e.Checks ***REMOVED***
-		if !check(e.Secret, typedEvent.Secret) ***REMOVED***
+	for _, check := range e.Checks {
+		if !check(e.Secret, typedEvent.Secret) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
-func (m *Secret) CopyStoreObject() StoreObject ***REMOVED***
+}
+func (m *Secret) CopyStoreObject() StoreObject {
 	return m.Copy()
-***REMOVED***
+}
 
-func (m *Secret) GetMeta() Meta ***REMOVED***
+func (m *Secret) GetMeta() Meta {
 	return m.Meta
-***REMOVED***
+}
 
-func (m *Secret) SetMeta(meta Meta) ***REMOVED***
+func (m *Secret) SetMeta(meta Meta) {
 	m.Meta = meta
-***REMOVED***
+}
 
-func (m *Secret) GetID() string ***REMOVED***
+func (m *Secret) GetID() string {
 	return m.ID
-***REMOVED***
+}
 
-func (m *Secret) EventCreate() Event ***REMOVED***
-	return EventCreateSecret***REMOVED***Secret: m***REMOVED***
-***REMOVED***
+func (m *Secret) EventCreate() Event {
+	return EventCreateSecret{Secret: m}
+}
 
-func (m *Secret) EventUpdate(oldObject StoreObject) Event ***REMOVED***
-	if oldObject != nil ***REMOVED***
-		return EventUpdateSecret***REMOVED***Secret: m, OldSecret: oldObject.(*Secret)***REMOVED***
-	***REMOVED*** else ***REMOVED***
-		return EventUpdateSecret***REMOVED***Secret: m***REMOVED***
-	***REMOVED***
-***REMOVED***
+func (m *Secret) EventUpdate(oldObject StoreObject) Event {
+	if oldObject != nil {
+		return EventUpdateSecret{Secret: m, OldSecret: oldObject.(*Secret)}
+	} else {
+		return EventUpdateSecret{Secret: m}
+	}
+}
 
-func (m *Secret) EventDelete() Event ***REMOVED***
-	return EventDeleteSecret***REMOVED***Secret: m***REMOVED***
-***REMOVED***
+func (m *Secret) EventDelete() Event {
+	return EventDeleteSecret{Secret: m}
+}
 
-func SecretCheckID(v1, v2 *Secret) bool ***REMOVED***
+func SecretCheckID(v1, v2 *Secret) bool {
 	return v1.ID == v2.ID
-***REMOVED***
+}
 
-func SecretCheckIDPrefix(v1, v2 *Secret) bool ***REMOVED***
+func SecretCheckIDPrefix(v1, v2 *Secret) bool {
 	return strings.HasPrefix(v2.ID, v1.ID)
-***REMOVED***
+}
 
-func SecretCheckName(v1, v2 *Secret) bool ***REMOVED***
+func SecretCheckName(v1, v2 *Secret) bool {
 	return v1.Spec.Annotations.Name == v2.Spec.Annotations.Name
-***REMOVED***
+}
 
-func SecretCheckNamePrefix(v1, v2 *Secret) bool ***REMOVED***
+func SecretCheckNamePrefix(v1, v2 *Secret) bool {
 	return strings.HasPrefix(v2.Spec.Annotations.Name, v1.Spec.Annotations.Name)
-***REMOVED***
+}
 
-func SecretCheckCustom(v1, v2 *Secret) bool ***REMOVED***
+func SecretCheckCustom(v1, v2 *Secret) bool {
 	return checkCustom(v1.Spec.Annotations, v2.Spec.Annotations)
-***REMOVED***
+}
 
-func SecretCheckCustomPrefix(v1, v2 *Secret) bool ***REMOVED***
+func SecretCheckCustomPrefix(v1, v2 *Secret) bool {
 	return checkCustomPrefix(v1.Spec.Annotations, v2.Spec.Annotations)
-***REMOVED***
+}
 
-func ConvertSecretWatch(action WatchActionKind, filters []*SelectBy) ([]Event, error) ***REMOVED***
+func ConvertSecretWatch(action WatchActionKind, filters []*SelectBy) ([]Event, error) {
 	var (
 		m          Secret
 		checkFuncs []SecretCheckFunc
 	)
 
-	for _, filter := range filters ***REMOVED***
-		switch v := filter.By.(type) ***REMOVED***
+	for _, filter := range filters {
+		switch v := filter.By.(type) {
 		case *SelectBy_ID:
-			if m.ID != "" ***REMOVED***
+			if m.ID != "" {
 				return nil, errConflictingFilters
-			***REMOVED***
+			}
 			m.ID = v.ID
 			checkFuncs = append(checkFuncs, SecretCheckID)
 		case *SelectBy_IDPrefix:
-			if m.ID != "" ***REMOVED***
+			if m.ID != "" {
 				return nil, errConflictingFilters
-			***REMOVED***
+			}
 			m.ID = v.IDPrefix
 			checkFuncs = append(checkFuncs, SecretCheckIDPrefix)
 		case *SelectBy_Name:
-			if m.Spec.Annotations.Name != "" ***REMOVED***
+			if m.Spec.Annotations.Name != "" {
 				return nil, errConflictingFilters
-			***REMOVED***
+			}
 			m.Spec.Annotations.Name = v.Name
 			checkFuncs = append(checkFuncs, SecretCheckName)
 		case *SelectBy_NamePrefix:
-			if m.Spec.Annotations.Name != "" ***REMOVED***
+			if m.Spec.Annotations.Name != "" {
 				return nil, errConflictingFilters
-			***REMOVED***
+			}
 			m.Spec.Annotations.Name = v.NamePrefix
 			checkFuncs = append(checkFuncs, SecretCheckNamePrefix)
 		case *SelectBy_Custom:
-			if len(m.Spec.Annotations.Indices) != 0 ***REMOVED***
+			if len(m.Spec.Annotations.Indices) != 0 {
 				return nil, errConflictingFilters
-			***REMOVED***
-			m.Spec.Annotations.Indices = []IndexEntry***REMOVED******REMOVED***Key: v.Custom.Index, Val: v.Custom.Value***REMOVED******REMOVED***
+			}
+			m.Spec.Annotations.Indices = []IndexEntry{{Key: v.Custom.Index, Val: v.Custom.Value}}
 			checkFuncs = append(checkFuncs, SecretCheckCustom)
 		case *SelectBy_CustomPrefix:
-			if len(m.Spec.Annotations.Indices) != 0 ***REMOVED***
+			if len(m.Spec.Annotations.Indices) != 0 {
 				return nil, errConflictingFilters
-			***REMOVED***
-			m.Spec.Annotations.Indices = []IndexEntry***REMOVED******REMOVED***Key: v.CustomPrefix.Index, Val: v.CustomPrefix.Value***REMOVED******REMOVED***
+			}
+			m.Spec.Annotations.Indices = []IndexEntry{{Key: v.CustomPrefix.Index, Val: v.CustomPrefix.Value}}
 			checkFuncs = append(checkFuncs, SecretCheckCustomPrefix)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	var events []Event
-	if (action & WatchActionKindCreate) != 0 ***REMOVED***
-		events = append(events, EventCreateSecret***REMOVED***Secret: &m, Checks: checkFuncs***REMOVED***)
-	***REMOVED***
-	if (action & WatchActionKindUpdate) != 0 ***REMOVED***
-		events = append(events, EventUpdateSecret***REMOVED***Secret: &m, Checks: checkFuncs***REMOVED***)
-	***REMOVED***
-	if (action & WatchActionKindRemove) != 0 ***REMOVED***
-		events = append(events, EventDeleteSecret***REMOVED***Secret: &m, Checks: checkFuncs***REMOVED***)
-	***REMOVED***
-	if len(events) == 0 ***REMOVED***
+	if (action & WatchActionKindCreate) != 0 {
+		events = append(events, EventCreateSecret{Secret: &m, Checks: checkFuncs})
+	}
+	if (action & WatchActionKindUpdate) != 0 {
+		events = append(events, EventUpdateSecret{Secret: &m, Checks: checkFuncs})
+	}
+	if (action & WatchActionKindRemove) != 0 {
+		events = append(events, EventDeleteSecret{Secret: &m, Checks: checkFuncs})
+	}
+	if len(events) == 0 {
 		return nil, errUnrecognizedAction
-	***REMOVED***
+	}
 	return events, nil
-***REMOVED***
+}
 
-type SecretIndexerByID struct***REMOVED******REMOVED***
+type SecretIndexerByID struct{}
 
-func (indexer SecretIndexerByID) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (indexer SecretIndexerByID) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
-func (indexer SecretIndexerByID) PrefixFromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+}
+func (indexer SecretIndexerByID) PrefixFromArgs(args ...interface{}) ([]byte, error) {
 	return prefixFromArgs(args...)
-***REMOVED***
-func (indexer SecretIndexerByID) FromObject(obj interface***REMOVED******REMOVED***) (bool, []byte, error) ***REMOVED***
+}
+func (indexer SecretIndexerByID) FromObject(obj interface{}) (bool, []byte, error) {
 	m := obj.(*Secret)
 	return true, []byte(m.ID + "\x00"), nil
-***REMOVED***
+}
 
-type SecretIndexerByName struct***REMOVED******REMOVED***
+type SecretIndexerByName struct{}
 
-func (indexer SecretIndexerByName) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (indexer SecretIndexerByName) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
-func (indexer SecretIndexerByName) PrefixFromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+}
+func (indexer SecretIndexerByName) PrefixFromArgs(args ...interface{}) ([]byte, error) {
 	return prefixFromArgs(args...)
-***REMOVED***
-func (indexer SecretIndexerByName) FromObject(obj interface***REMOVED******REMOVED***) (bool, []byte, error) ***REMOVED***
+}
+func (indexer SecretIndexerByName) FromObject(obj interface{}) (bool, []byte, error) {
 	m := obj.(*Secret)
 	val := m.Spec.Annotations.Name
 	return true, []byte(strings.ToLower(val) + "\x00"), nil
-***REMOVED***
+}
 
-type SecretCustomIndexer struct***REMOVED******REMOVED***
+type SecretCustomIndexer struct{}
 
-func (indexer SecretCustomIndexer) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (indexer SecretCustomIndexer) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
-func (indexer SecretCustomIndexer) PrefixFromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+}
+func (indexer SecretCustomIndexer) PrefixFromArgs(args ...interface{}) ([]byte, error) {
 	return prefixFromArgs(args...)
-***REMOVED***
-func (indexer SecretCustomIndexer) FromObject(obj interface***REMOVED******REMOVED***) (bool, [][]byte, error) ***REMOVED***
+}
+func (indexer SecretCustomIndexer) FromObject(obj interface{}) (bool, [][]byte, error) {
 	m := obj.(*Secret)
 	return customIndexer("", &m.Spec.Annotations)
-***REMOVED***
+}
 
 type ConfigCheckFunc func(t1, t2 *Config) bool
 
-type EventCreateConfig struct ***REMOVED***
+type EventCreateConfig struct {
 	Config *Config
 	Checks []ConfigCheckFunc
-***REMOVED***
+}
 
-func (e EventCreateConfig) Matches(apiEvent github_com_docker_go_events.Event) bool ***REMOVED***
+func (e EventCreateConfig) Matches(apiEvent github_com_docker_go_events.Event) bool {
 	typedEvent, ok := apiEvent.(EventCreateConfig)
-	if !ok ***REMOVED***
+	if !ok {
 		return false
-	***REMOVED***
+	}
 
-	for _, check := range e.Checks ***REMOVED***
-		if !check(e.Config, typedEvent.Config) ***REMOVED***
+	for _, check := range e.Checks {
+		if !check(e.Config, typedEvent.Config) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}
 
-type EventUpdateConfig struct ***REMOVED***
+type EventUpdateConfig struct {
 	Config    *Config
 	OldConfig *Config
 	Checks    []ConfigCheckFunc
-***REMOVED***
+}
 
-func (e EventUpdateConfig) Matches(apiEvent github_com_docker_go_events.Event) bool ***REMOVED***
+func (e EventUpdateConfig) Matches(apiEvent github_com_docker_go_events.Event) bool {
 	typedEvent, ok := apiEvent.(EventUpdateConfig)
-	if !ok ***REMOVED***
+	if !ok {
 		return false
-	***REMOVED***
+	}
 
-	for _, check := range e.Checks ***REMOVED***
-		if !check(e.Config, typedEvent.Config) ***REMOVED***
+	for _, check := range e.Checks {
+		if !check(e.Config, typedEvent.Config) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}
 
-type EventDeleteConfig struct ***REMOVED***
+type EventDeleteConfig struct {
 	Config *Config
 	Checks []ConfigCheckFunc
-***REMOVED***
+}
 
-func (e EventDeleteConfig) Matches(apiEvent github_com_docker_go_events.Event) bool ***REMOVED***
+func (e EventDeleteConfig) Matches(apiEvent github_com_docker_go_events.Event) bool {
 	typedEvent, ok := apiEvent.(EventDeleteConfig)
-	if !ok ***REMOVED***
+	if !ok {
 		return false
-	***REMOVED***
+	}
 
-	for _, check := range e.Checks ***REMOVED***
-		if !check(e.Config, typedEvent.Config) ***REMOVED***
+	for _, check := range e.Checks {
+		if !check(e.Config, typedEvent.Config) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
-func (m *Config) CopyStoreObject() StoreObject ***REMOVED***
+}
+func (m *Config) CopyStoreObject() StoreObject {
 	return m.Copy()
-***REMOVED***
+}
 
-func (m *Config) GetMeta() Meta ***REMOVED***
+func (m *Config) GetMeta() Meta {
 	return m.Meta
-***REMOVED***
+}
 
-func (m *Config) SetMeta(meta Meta) ***REMOVED***
+func (m *Config) SetMeta(meta Meta) {
 	m.Meta = meta
-***REMOVED***
+}
 
-func (m *Config) GetID() string ***REMOVED***
+func (m *Config) GetID() string {
 	return m.ID
-***REMOVED***
+}
 
-func (m *Config) EventCreate() Event ***REMOVED***
-	return EventCreateConfig***REMOVED***Config: m***REMOVED***
-***REMOVED***
+func (m *Config) EventCreate() Event {
+	return EventCreateConfig{Config: m}
+}
 
-func (m *Config) EventUpdate(oldObject StoreObject) Event ***REMOVED***
-	if oldObject != nil ***REMOVED***
-		return EventUpdateConfig***REMOVED***Config: m, OldConfig: oldObject.(*Config)***REMOVED***
-	***REMOVED*** else ***REMOVED***
-		return EventUpdateConfig***REMOVED***Config: m***REMOVED***
-	***REMOVED***
-***REMOVED***
+func (m *Config) EventUpdate(oldObject StoreObject) Event {
+	if oldObject != nil {
+		return EventUpdateConfig{Config: m, OldConfig: oldObject.(*Config)}
+	} else {
+		return EventUpdateConfig{Config: m}
+	}
+}
 
-func (m *Config) EventDelete() Event ***REMOVED***
-	return EventDeleteConfig***REMOVED***Config: m***REMOVED***
-***REMOVED***
+func (m *Config) EventDelete() Event {
+	return EventDeleteConfig{Config: m}
+}
 
-func ConfigCheckID(v1, v2 *Config) bool ***REMOVED***
+func ConfigCheckID(v1, v2 *Config) bool {
 	return v1.ID == v2.ID
-***REMOVED***
+}
 
-func ConfigCheckIDPrefix(v1, v2 *Config) bool ***REMOVED***
+func ConfigCheckIDPrefix(v1, v2 *Config) bool {
 	return strings.HasPrefix(v2.ID, v1.ID)
-***REMOVED***
+}
 
-func ConfigCheckName(v1, v2 *Config) bool ***REMOVED***
+func ConfigCheckName(v1, v2 *Config) bool {
 	return v1.Spec.Annotations.Name == v2.Spec.Annotations.Name
-***REMOVED***
+}
 
-func ConfigCheckNamePrefix(v1, v2 *Config) bool ***REMOVED***
+func ConfigCheckNamePrefix(v1, v2 *Config) bool {
 	return strings.HasPrefix(v2.Spec.Annotations.Name, v1.Spec.Annotations.Name)
-***REMOVED***
+}
 
-func ConfigCheckCustom(v1, v2 *Config) bool ***REMOVED***
+func ConfigCheckCustom(v1, v2 *Config) bool {
 	return checkCustom(v1.Spec.Annotations, v2.Spec.Annotations)
-***REMOVED***
+}
 
-func ConfigCheckCustomPrefix(v1, v2 *Config) bool ***REMOVED***
+func ConfigCheckCustomPrefix(v1, v2 *Config) bool {
 	return checkCustomPrefix(v1.Spec.Annotations, v2.Spec.Annotations)
-***REMOVED***
+}
 
-func ConvertConfigWatch(action WatchActionKind, filters []*SelectBy) ([]Event, error) ***REMOVED***
+func ConvertConfigWatch(action WatchActionKind, filters []*SelectBy) ([]Event, error) {
 	var (
 		m          Config
 		checkFuncs []ConfigCheckFunc
 	)
 
-	for _, filter := range filters ***REMOVED***
-		switch v := filter.By.(type) ***REMOVED***
+	for _, filter := range filters {
+		switch v := filter.By.(type) {
 		case *SelectBy_ID:
-			if m.ID != "" ***REMOVED***
+			if m.ID != "" {
 				return nil, errConflictingFilters
-			***REMOVED***
+			}
 			m.ID = v.ID
 			checkFuncs = append(checkFuncs, ConfigCheckID)
 		case *SelectBy_IDPrefix:
-			if m.ID != "" ***REMOVED***
+			if m.ID != "" {
 				return nil, errConflictingFilters
-			***REMOVED***
+			}
 			m.ID = v.IDPrefix
 			checkFuncs = append(checkFuncs, ConfigCheckIDPrefix)
 		case *SelectBy_Name:
-			if m.Spec.Annotations.Name != "" ***REMOVED***
+			if m.Spec.Annotations.Name != "" {
 				return nil, errConflictingFilters
-			***REMOVED***
+			}
 			m.Spec.Annotations.Name = v.Name
 			checkFuncs = append(checkFuncs, ConfigCheckName)
 		case *SelectBy_NamePrefix:
-			if m.Spec.Annotations.Name != "" ***REMOVED***
+			if m.Spec.Annotations.Name != "" {
 				return nil, errConflictingFilters
-			***REMOVED***
+			}
 			m.Spec.Annotations.Name = v.NamePrefix
 			checkFuncs = append(checkFuncs, ConfigCheckNamePrefix)
 		case *SelectBy_Custom:
-			if len(m.Spec.Annotations.Indices) != 0 ***REMOVED***
+			if len(m.Spec.Annotations.Indices) != 0 {
 				return nil, errConflictingFilters
-			***REMOVED***
-			m.Spec.Annotations.Indices = []IndexEntry***REMOVED******REMOVED***Key: v.Custom.Index, Val: v.Custom.Value***REMOVED******REMOVED***
+			}
+			m.Spec.Annotations.Indices = []IndexEntry{{Key: v.Custom.Index, Val: v.Custom.Value}}
 			checkFuncs = append(checkFuncs, ConfigCheckCustom)
 		case *SelectBy_CustomPrefix:
-			if len(m.Spec.Annotations.Indices) != 0 ***REMOVED***
+			if len(m.Spec.Annotations.Indices) != 0 {
 				return nil, errConflictingFilters
-			***REMOVED***
-			m.Spec.Annotations.Indices = []IndexEntry***REMOVED******REMOVED***Key: v.CustomPrefix.Index, Val: v.CustomPrefix.Value***REMOVED******REMOVED***
+			}
+			m.Spec.Annotations.Indices = []IndexEntry{{Key: v.CustomPrefix.Index, Val: v.CustomPrefix.Value}}
 			checkFuncs = append(checkFuncs, ConfigCheckCustomPrefix)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	var events []Event
-	if (action & WatchActionKindCreate) != 0 ***REMOVED***
-		events = append(events, EventCreateConfig***REMOVED***Config: &m, Checks: checkFuncs***REMOVED***)
-	***REMOVED***
-	if (action & WatchActionKindUpdate) != 0 ***REMOVED***
-		events = append(events, EventUpdateConfig***REMOVED***Config: &m, Checks: checkFuncs***REMOVED***)
-	***REMOVED***
-	if (action & WatchActionKindRemove) != 0 ***REMOVED***
-		events = append(events, EventDeleteConfig***REMOVED***Config: &m, Checks: checkFuncs***REMOVED***)
-	***REMOVED***
-	if len(events) == 0 ***REMOVED***
+	if (action & WatchActionKindCreate) != 0 {
+		events = append(events, EventCreateConfig{Config: &m, Checks: checkFuncs})
+	}
+	if (action & WatchActionKindUpdate) != 0 {
+		events = append(events, EventUpdateConfig{Config: &m, Checks: checkFuncs})
+	}
+	if (action & WatchActionKindRemove) != 0 {
+		events = append(events, EventDeleteConfig{Config: &m, Checks: checkFuncs})
+	}
+	if len(events) == 0 {
 		return nil, errUnrecognizedAction
-	***REMOVED***
+	}
 	return events, nil
-***REMOVED***
+}
 
-type ConfigIndexerByID struct***REMOVED******REMOVED***
+type ConfigIndexerByID struct{}
 
-func (indexer ConfigIndexerByID) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (indexer ConfigIndexerByID) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
-func (indexer ConfigIndexerByID) PrefixFromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+}
+func (indexer ConfigIndexerByID) PrefixFromArgs(args ...interface{}) ([]byte, error) {
 	return prefixFromArgs(args...)
-***REMOVED***
-func (indexer ConfigIndexerByID) FromObject(obj interface***REMOVED******REMOVED***) (bool, []byte, error) ***REMOVED***
+}
+func (indexer ConfigIndexerByID) FromObject(obj interface{}) (bool, []byte, error) {
 	m := obj.(*Config)
 	return true, []byte(m.ID + "\x00"), nil
-***REMOVED***
+}
 
-type ConfigIndexerByName struct***REMOVED******REMOVED***
+type ConfigIndexerByName struct{}
 
-func (indexer ConfigIndexerByName) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (indexer ConfigIndexerByName) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
-func (indexer ConfigIndexerByName) PrefixFromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+}
+func (indexer ConfigIndexerByName) PrefixFromArgs(args ...interface{}) ([]byte, error) {
 	return prefixFromArgs(args...)
-***REMOVED***
-func (indexer ConfigIndexerByName) FromObject(obj interface***REMOVED******REMOVED***) (bool, []byte, error) ***REMOVED***
+}
+func (indexer ConfigIndexerByName) FromObject(obj interface{}) (bool, []byte, error) {
 	m := obj.(*Config)
 	val := m.Spec.Annotations.Name
 	return true, []byte(strings.ToLower(val) + "\x00"), nil
-***REMOVED***
+}
 
-type ConfigCustomIndexer struct***REMOVED******REMOVED***
+type ConfigCustomIndexer struct{}
 
-func (indexer ConfigCustomIndexer) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (indexer ConfigCustomIndexer) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
-func (indexer ConfigCustomIndexer) PrefixFromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+}
+func (indexer ConfigCustomIndexer) PrefixFromArgs(args ...interface{}) ([]byte, error) {
 	return prefixFromArgs(args...)
-***REMOVED***
-func (indexer ConfigCustomIndexer) FromObject(obj interface***REMOVED******REMOVED***) (bool, [][]byte, error) ***REMOVED***
+}
+func (indexer ConfigCustomIndexer) FromObject(obj interface{}) (bool, [][]byte, error) {
 	m := obj.(*Config)
 	return customIndexer("", &m.Spec.Annotations)
-***REMOVED***
+}
 
 type ResourceCheckFunc func(t1, t2 *Resource) bool
 
-type EventCreateResource struct ***REMOVED***
+type EventCreateResource struct {
 	Resource *Resource
 	Checks   []ResourceCheckFunc
-***REMOVED***
+}
 
-func (e EventCreateResource) Matches(apiEvent github_com_docker_go_events.Event) bool ***REMOVED***
+func (e EventCreateResource) Matches(apiEvent github_com_docker_go_events.Event) bool {
 	typedEvent, ok := apiEvent.(EventCreateResource)
-	if !ok ***REMOVED***
+	if !ok {
 		return false
-	***REMOVED***
+	}
 
-	for _, check := range e.Checks ***REMOVED***
-		if !check(e.Resource, typedEvent.Resource) ***REMOVED***
+	for _, check := range e.Checks {
+		if !check(e.Resource, typedEvent.Resource) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}
 
-type EventUpdateResource struct ***REMOVED***
+type EventUpdateResource struct {
 	Resource    *Resource
 	OldResource *Resource
 	Checks      []ResourceCheckFunc
-***REMOVED***
+}
 
-func (e EventUpdateResource) Matches(apiEvent github_com_docker_go_events.Event) bool ***REMOVED***
+func (e EventUpdateResource) Matches(apiEvent github_com_docker_go_events.Event) bool {
 	typedEvent, ok := apiEvent.(EventUpdateResource)
-	if !ok ***REMOVED***
+	if !ok {
 		return false
-	***REMOVED***
+	}
 
-	for _, check := range e.Checks ***REMOVED***
-		if !check(e.Resource, typedEvent.Resource) ***REMOVED***
+	for _, check := range e.Checks {
+		if !check(e.Resource, typedEvent.Resource) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}
 
-type EventDeleteResource struct ***REMOVED***
+type EventDeleteResource struct {
 	Resource *Resource
 	Checks   []ResourceCheckFunc
-***REMOVED***
+}
 
-func (e EventDeleteResource) Matches(apiEvent github_com_docker_go_events.Event) bool ***REMOVED***
+func (e EventDeleteResource) Matches(apiEvent github_com_docker_go_events.Event) bool {
 	typedEvent, ok := apiEvent.(EventDeleteResource)
-	if !ok ***REMOVED***
+	if !ok {
 		return false
-	***REMOVED***
+	}
 
-	for _, check := range e.Checks ***REMOVED***
-		if !check(e.Resource, typedEvent.Resource) ***REMOVED***
+	for _, check := range e.Checks {
+		if !check(e.Resource, typedEvent.Resource) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
-func (m *Resource) CopyStoreObject() StoreObject ***REMOVED***
+}
+func (m *Resource) CopyStoreObject() StoreObject {
 	return m.Copy()
-***REMOVED***
+}
 
-func (m *Resource) GetMeta() Meta ***REMOVED***
+func (m *Resource) GetMeta() Meta {
 	return m.Meta
-***REMOVED***
+}
 
-func (m *Resource) SetMeta(meta Meta) ***REMOVED***
+func (m *Resource) SetMeta(meta Meta) {
 	m.Meta = meta
-***REMOVED***
+}
 
-func (m *Resource) GetID() string ***REMOVED***
+func (m *Resource) GetID() string {
 	return m.ID
-***REMOVED***
+}
 
-func (m *Resource) EventCreate() Event ***REMOVED***
-	return EventCreateResource***REMOVED***Resource: m***REMOVED***
-***REMOVED***
+func (m *Resource) EventCreate() Event {
+	return EventCreateResource{Resource: m}
+}
 
-func (m *Resource) EventUpdate(oldObject StoreObject) Event ***REMOVED***
-	if oldObject != nil ***REMOVED***
-		return EventUpdateResource***REMOVED***Resource: m, OldResource: oldObject.(*Resource)***REMOVED***
-	***REMOVED*** else ***REMOVED***
-		return EventUpdateResource***REMOVED***Resource: m***REMOVED***
-	***REMOVED***
-***REMOVED***
+func (m *Resource) EventUpdate(oldObject StoreObject) Event {
+	if oldObject != nil {
+		return EventUpdateResource{Resource: m, OldResource: oldObject.(*Resource)}
+	} else {
+		return EventUpdateResource{Resource: m}
+	}
+}
 
-func (m *Resource) EventDelete() Event ***REMOVED***
-	return EventDeleteResource***REMOVED***Resource: m***REMOVED***
-***REMOVED***
+func (m *Resource) EventDelete() Event {
+	return EventDeleteResource{Resource: m}
+}
 
-func ResourceCheckID(v1, v2 *Resource) bool ***REMOVED***
+func ResourceCheckID(v1, v2 *Resource) bool {
 	return v1.ID == v2.ID
-***REMOVED***
+}
 
-func ResourceCheckIDPrefix(v1, v2 *Resource) bool ***REMOVED***
+func ResourceCheckIDPrefix(v1, v2 *Resource) bool {
 	return strings.HasPrefix(v2.ID, v1.ID)
-***REMOVED***
+}
 
-func ResourceCheckName(v1, v2 *Resource) bool ***REMOVED***
+func ResourceCheckName(v1, v2 *Resource) bool {
 	return v1.Annotations.Name == v2.Annotations.Name
-***REMOVED***
+}
 
-func ResourceCheckNamePrefix(v1, v2 *Resource) bool ***REMOVED***
+func ResourceCheckNamePrefix(v1, v2 *Resource) bool {
 	return strings.HasPrefix(v2.Annotations.Name, v1.Annotations.Name)
-***REMOVED***
+}
 
-func ResourceCheckCustom(v1, v2 *Resource) bool ***REMOVED***
+func ResourceCheckCustom(v1, v2 *Resource) bool {
 	return checkCustom(v1.Annotations, v2.Annotations)
-***REMOVED***
+}
 
-func ResourceCheckCustomPrefix(v1, v2 *Resource) bool ***REMOVED***
+func ResourceCheckCustomPrefix(v1, v2 *Resource) bool {
 	return checkCustomPrefix(v1.Annotations, v2.Annotations)
-***REMOVED***
+}
 
-func ResourceCheckKind(v1, v2 *Resource) bool ***REMOVED***
+func ResourceCheckKind(v1, v2 *Resource) bool {
 	return v1.Kind == v2.Kind
-***REMOVED***
+}
 
-func ConvertResourceWatch(action WatchActionKind, filters []*SelectBy, kind string) ([]Event, error) ***REMOVED***
+func ConvertResourceWatch(action WatchActionKind, filters []*SelectBy, kind string) ([]Event, error) {
 	var (
 		m          Resource
 		checkFuncs []ResourceCheckFunc
@@ -3732,633 +3732,633 @@ func ConvertResourceWatch(action WatchActionKind, filters []*SelectBy, kind stri
 	m.Kind = kind
 	checkFuncs = append(checkFuncs, ResourceCheckKind)
 
-	for _, filter := range filters ***REMOVED***
-		switch v := filter.By.(type) ***REMOVED***
+	for _, filter := range filters {
+		switch v := filter.By.(type) {
 		case *SelectBy_ID:
-			if m.ID != "" ***REMOVED***
+			if m.ID != "" {
 				return nil, errConflictingFilters
-			***REMOVED***
+			}
 			m.ID = v.ID
 			checkFuncs = append(checkFuncs, ResourceCheckID)
 		case *SelectBy_IDPrefix:
-			if m.ID != "" ***REMOVED***
+			if m.ID != "" {
 				return nil, errConflictingFilters
-			***REMOVED***
+			}
 			m.ID = v.IDPrefix
 			checkFuncs = append(checkFuncs, ResourceCheckIDPrefix)
 		case *SelectBy_Name:
-			if m.Annotations.Name != "" ***REMOVED***
+			if m.Annotations.Name != "" {
 				return nil, errConflictingFilters
-			***REMOVED***
+			}
 			m.Annotations.Name = v.Name
 			checkFuncs = append(checkFuncs, ResourceCheckName)
 		case *SelectBy_NamePrefix:
-			if m.Annotations.Name != "" ***REMOVED***
+			if m.Annotations.Name != "" {
 				return nil, errConflictingFilters
-			***REMOVED***
+			}
 			m.Annotations.Name = v.NamePrefix
 			checkFuncs = append(checkFuncs, ResourceCheckNamePrefix)
 		case *SelectBy_Custom:
-			if len(m.Annotations.Indices) != 0 ***REMOVED***
+			if len(m.Annotations.Indices) != 0 {
 				return nil, errConflictingFilters
-			***REMOVED***
-			m.Annotations.Indices = []IndexEntry***REMOVED******REMOVED***Key: v.Custom.Index, Val: v.Custom.Value***REMOVED******REMOVED***
+			}
+			m.Annotations.Indices = []IndexEntry{{Key: v.Custom.Index, Val: v.Custom.Value}}
 			checkFuncs = append(checkFuncs, ResourceCheckCustom)
 		case *SelectBy_CustomPrefix:
-			if len(m.Annotations.Indices) != 0 ***REMOVED***
+			if len(m.Annotations.Indices) != 0 {
 				return nil, errConflictingFilters
-			***REMOVED***
-			m.Annotations.Indices = []IndexEntry***REMOVED******REMOVED***Key: v.CustomPrefix.Index, Val: v.CustomPrefix.Value***REMOVED******REMOVED***
+			}
+			m.Annotations.Indices = []IndexEntry{{Key: v.CustomPrefix.Index, Val: v.CustomPrefix.Value}}
 			checkFuncs = append(checkFuncs, ResourceCheckCustomPrefix)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	var events []Event
-	if (action & WatchActionKindCreate) != 0 ***REMOVED***
-		events = append(events, EventCreateResource***REMOVED***Resource: &m, Checks: checkFuncs***REMOVED***)
-	***REMOVED***
-	if (action & WatchActionKindUpdate) != 0 ***REMOVED***
-		events = append(events, EventUpdateResource***REMOVED***Resource: &m, Checks: checkFuncs***REMOVED***)
-	***REMOVED***
-	if (action & WatchActionKindRemove) != 0 ***REMOVED***
-		events = append(events, EventDeleteResource***REMOVED***Resource: &m, Checks: checkFuncs***REMOVED***)
-	***REMOVED***
-	if len(events) == 0 ***REMOVED***
+	if (action & WatchActionKindCreate) != 0 {
+		events = append(events, EventCreateResource{Resource: &m, Checks: checkFuncs})
+	}
+	if (action & WatchActionKindUpdate) != 0 {
+		events = append(events, EventUpdateResource{Resource: &m, Checks: checkFuncs})
+	}
+	if (action & WatchActionKindRemove) != 0 {
+		events = append(events, EventDeleteResource{Resource: &m, Checks: checkFuncs})
+	}
+	if len(events) == 0 {
 		return nil, errUnrecognizedAction
-	***REMOVED***
+	}
 	return events, nil
-***REMOVED***
+}
 
-type ResourceIndexerByID struct***REMOVED******REMOVED***
+type ResourceIndexerByID struct{}
 
-func (indexer ResourceIndexerByID) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (indexer ResourceIndexerByID) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
-func (indexer ResourceIndexerByID) PrefixFromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+}
+func (indexer ResourceIndexerByID) PrefixFromArgs(args ...interface{}) ([]byte, error) {
 	return prefixFromArgs(args...)
-***REMOVED***
-func (indexer ResourceIndexerByID) FromObject(obj interface***REMOVED******REMOVED***) (bool, []byte, error) ***REMOVED***
+}
+func (indexer ResourceIndexerByID) FromObject(obj interface{}) (bool, []byte, error) {
 	m := obj.(*Resource)
 	return true, []byte(m.ID + "\x00"), nil
-***REMOVED***
+}
 
-type ResourceIndexerByName struct***REMOVED******REMOVED***
+type ResourceIndexerByName struct{}
 
-func (indexer ResourceIndexerByName) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (indexer ResourceIndexerByName) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
-func (indexer ResourceIndexerByName) PrefixFromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+}
+func (indexer ResourceIndexerByName) PrefixFromArgs(args ...interface{}) ([]byte, error) {
 	return prefixFromArgs(args...)
-***REMOVED***
-func (indexer ResourceIndexerByName) FromObject(obj interface***REMOVED******REMOVED***) (bool, []byte, error) ***REMOVED***
+}
+func (indexer ResourceIndexerByName) FromObject(obj interface{}) (bool, []byte, error) {
 	m := obj.(*Resource)
 	val := m.Annotations.Name
 	return true, []byte(strings.ToLower(val) + "\x00"), nil
-***REMOVED***
+}
 
-type ResourceCustomIndexer struct***REMOVED******REMOVED***
+type ResourceCustomIndexer struct{}
 
-func (indexer ResourceCustomIndexer) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (indexer ResourceCustomIndexer) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
-func (indexer ResourceCustomIndexer) PrefixFromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+}
+func (indexer ResourceCustomIndexer) PrefixFromArgs(args ...interface{}) ([]byte, error) {
 	return prefixFromArgs(args...)
-***REMOVED***
-func (indexer ResourceCustomIndexer) FromObject(obj interface***REMOVED******REMOVED***) (bool, [][]byte, error) ***REMOVED***
+}
+func (indexer ResourceCustomIndexer) FromObject(obj interface{}) (bool, [][]byte, error) {
 	m := obj.(*Resource)
 	return customIndexer("", &m.Annotations)
-***REMOVED***
+}
 
 type ExtensionCheckFunc func(t1, t2 *Extension) bool
 
-type EventCreateExtension struct ***REMOVED***
+type EventCreateExtension struct {
 	Extension *Extension
 	Checks    []ExtensionCheckFunc
-***REMOVED***
+}
 
-func (e EventCreateExtension) Matches(apiEvent github_com_docker_go_events.Event) bool ***REMOVED***
+func (e EventCreateExtension) Matches(apiEvent github_com_docker_go_events.Event) bool {
 	typedEvent, ok := apiEvent.(EventCreateExtension)
-	if !ok ***REMOVED***
+	if !ok {
 		return false
-	***REMOVED***
+	}
 
-	for _, check := range e.Checks ***REMOVED***
-		if !check(e.Extension, typedEvent.Extension) ***REMOVED***
+	for _, check := range e.Checks {
+		if !check(e.Extension, typedEvent.Extension) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}
 
-type EventUpdateExtension struct ***REMOVED***
+type EventUpdateExtension struct {
 	Extension    *Extension
 	OldExtension *Extension
 	Checks       []ExtensionCheckFunc
-***REMOVED***
+}
 
-func (e EventUpdateExtension) Matches(apiEvent github_com_docker_go_events.Event) bool ***REMOVED***
+func (e EventUpdateExtension) Matches(apiEvent github_com_docker_go_events.Event) bool {
 	typedEvent, ok := apiEvent.(EventUpdateExtension)
-	if !ok ***REMOVED***
+	if !ok {
 		return false
-	***REMOVED***
+	}
 
-	for _, check := range e.Checks ***REMOVED***
-		if !check(e.Extension, typedEvent.Extension) ***REMOVED***
+	for _, check := range e.Checks {
+		if !check(e.Extension, typedEvent.Extension) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}
 
-type EventDeleteExtension struct ***REMOVED***
+type EventDeleteExtension struct {
 	Extension *Extension
 	Checks    []ExtensionCheckFunc
-***REMOVED***
+}
 
-func (e EventDeleteExtension) Matches(apiEvent github_com_docker_go_events.Event) bool ***REMOVED***
+func (e EventDeleteExtension) Matches(apiEvent github_com_docker_go_events.Event) bool {
 	typedEvent, ok := apiEvent.(EventDeleteExtension)
-	if !ok ***REMOVED***
+	if !ok {
 		return false
-	***REMOVED***
+	}
 
-	for _, check := range e.Checks ***REMOVED***
-		if !check(e.Extension, typedEvent.Extension) ***REMOVED***
+	for _, check := range e.Checks {
+		if !check(e.Extension, typedEvent.Extension) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
-func (m *Extension) CopyStoreObject() StoreObject ***REMOVED***
+}
+func (m *Extension) CopyStoreObject() StoreObject {
 	return m.Copy()
-***REMOVED***
+}
 
-func (m *Extension) GetMeta() Meta ***REMOVED***
+func (m *Extension) GetMeta() Meta {
 	return m.Meta
-***REMOVED***
+}
 
-func (m *Extension) SetMeta(meta Meta) ***REMOVED***
+func (m *Extension) SetMeta(meta Meta) {
 	m.Meta = meta
-***REMOVED***
+}
 
-func (m *Extension) GetID() string ***REMOVED***
+func (m *Extension) GetID() string {
 	return m.ID
-***REMOVED***
+}
 
-func (m *Extension) EventCreate() Event ***REMOVED***
-	return EventCreateExtension***REMOVED***Extension: m***REMOVED***
-***REMOVED***
+func (m *Extension) EventCreate() Event {
+	return EventCreateExtension{Extension: m}
+}
 
-func (m *Extension) EventUpdate(oldObject StoreObject) Event ***REMOVED***
-	if oldObject != nil ***REMOVED***
-		return EventUpdateExtension***REMOVED***Extension: m, OldExtension: oldObject.(*Extension)***REMOVED***
-	***REMOVED*** else ***REMOVED***
-		return EventUpdateExtension***REMOVED***Extension: m***REMOVED***
-	***REMOVED***
-***REMOVED***
+func (m *Extension) EventUpdate(oldObject StoreObject) Event {
+	if oldObject != nil {
+		return EventUpdateExtension{Extension: m, OldExtension: oldObject.(*Extension)}
+	} else {
+		return EventUpdateExtension{Extension: m}
+	}
+}
 
-func (m *Extension) EventDelete() Event ***REMOVED***
-	return EventDeleteExtension***REMOVED***Extension: m***REMOVED***
-***REMOVED***
+func (m *Extension) EventDelete() Event {
+	return EventDeleteExtension{Extension: m}
+}
 
-func ExtensionCheckID(v1, v2 *Extension) bool ***REMOVED***
+func ExtensionCheckID(v1, v2 *Extension) bool {
 	return v1.ID == v2.ID
-***REMOVED***
+}
 
-func ExtensionCheckIDPrefix(v1, v2 *Extension) bool ***REMOVED***
+func ExtensionCheckIDPrefix(v1, v2 *Extension) bool {
 	return strings.HasPrefix(v2.ID, v1.ID)
-***REMOVED***
+}
 
-func ExtensionCheckName(v1, v2 *Extension) bool ***REMOVED***
+func ExtensionCheckName(v1, v2 *Extension) bool {
 	return v1.Annotations.Name == v2.Annotations.Name
-***REMOVED***
+}
 
-func ExtensionCheckNamePrefix(v1, v2 *Extension) bool ***REMOVED***
+func ExtensionCheckNamePrefix(v1, v2 *Extension) bool {
 	return strings.HasPrefix(v2.Annotations.Name, v1.Annotations.Name)
-***REMOVED***
+}
 
-func ExtensionCheckCustom(v1, v2 *Extension) bool ***REMOVED***
+func ExtensionCheckCustom(v1, v2 *Extension) bool {
 	return checkCustom(v1.Annotations, v2.Annotations)
-***REMOVED***
+}
 
-func ExtensionCheckCustomPrefix(v1, v2 *Extension) bool ***REMOVED***
+func ExtensionCheckCustomPrefix(v1, v2 *Extension) bool {
 	return checkCustomPrefix(v1.Annotations, v2.Annotations)
-***REMOVED***
+}
 
-func ConvertExtensionWatch(action WatchActionKind, filters []*SelectBy) ([]Event, error) ***REMOVED***
+func ConvertExtensionWatch(action WatchActionKind, filters []*SelectBy) ([]Event, error) {
 	var (
 		m          Extension
 		checkFuncs []ExtensionCheckFunc
 	)
 
-	for _, filter := range filters ***REMOVED***
-		switch v := filter.By.(type) ***REMOVED***
+	for _, filter := range filters {
+		switch v := filter.By.(type) {
 		case *SelectBy_ID:
-			if m.ID != "" ***REMOVED***
+			if m.ID != "" {
 				return nil, errConflictingFilters
-			***REMOVED***
+			}
 			m.ID = v.ID
 			checkFuncs = append(checkFuncs, ExtensionCheckID)
 		case *SelectBy_IDPrefix:
-			if m.ID != "" ***REMOVED***
+			if m.ID != "" {
 				return nil, errConflictingFilters
-			***REMOVED***
+			}
 			m.ID = v.IDPrefix
 			checkFuncs = append(checkFuncs, ExtensionCheckIDPrefix)
 		case *SelectBy_Name:
-			if m.Annotations.Name != "" ***REMOVED***
+			if m.Annotations.Name != "" {
 				return nil, errConflictingFilters
-			***REMOVED***
+			}
 			m.Annotations.Name = v.Name
 			checkFuncs = append(checkFuncs, ExtensionCheckName)
 		case *SelectBy_NamePrefix:
-			if m.Annotations.Name != "" ***REMOVED***
+			if m.Annotations.Name != "" {
 				return nil, errConflictingFilters
-			***REMOVED***
+			}
 			m.Annotations.Name = v.NamePrefix
 			checkFuncs = append(checkFuncs, ExtensionCheckNamePrefix)
 		case *SelectBy_Custom:
-			if len(m.Annotations.Indices) != 0 ***REMOVED***
+			if len(m.Annotations.Indices) != 0 {
 				return nil, errConflictingFilters
-			***REMOVED***
-			m.Annotations.Indices = []IndexEntry***REMOVED******REMOVED***Key: v.Custom.Index, Val: v.Custom.Value***REMOVED******REMOVED***
+			}
+			m.Annotations.Indices = []IndexEntry{{Key: v.Custom.Index, Val: v.Custom.Value}}
 			checkFuncs = append(checkFuncs, ExtensionCheckCustom)
 		case *SelectBy_CustomPrefix:
-			if len(m.Annotations.Indices) != 0 ***REMOVED***
+			if len(m.Annotations.Indices) != 0 {
 				return nil, errConflictingFilters
-			***REMOVED***
-			m.Annotations.Indices = []IndexEntry***REMOVED******REMOVED***Key: v.CustomPrefix.Index, Val: v.CustomPrefix.Value***REMOVED******REMOVED***
+			}
+			m.Annotations.Indices = []IndexEntry{{Key: v.CustomPrefix.Index, Val: v.CustomPrefix.Value}}
 			checkFuncs = append(checkFuncs, ExtensionCheckCustomPrefix)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	var events []Event
-	if (action & WatchActionKindCreate) != 0 ***REMOVED***
-		events = append(events, EventCreateExtension***REMOVED***Extension: &m, Checks: checkFuncs***REMOVED***)
-	***REMOVED***
-	if (action & WatchActionKindUpdate) != 0 ***REMOVED***
-		events = append(events, EventUpdateExtension***REMOVED***Extension: &m, Checks: checkFuncs***REMOVED***)
-	***REMOVED***
-	if (action & WatchActionKindRemove) != 0 ***REMOVED***
-		events = append(events, EventDeleteExtension***REMOVED***Extension: &m, Checks: checkFuncs***REMOVED***)
-	***REMOVED***
-	if len(events) == 0 ***REMOVED***
+	if (action & WatchActionKindCreate) != 0 {
+		events = append(events, EventCreateExtension{Extension: &m, Checks: checkFuncs})
+	}
+	if (action & WatchActionKindUpdate) != 0 {
+		events = append(events, EventUpdateExtension{Extension: &m, Checks: checkFuncs})
+	}
+	if (action & WatchActionKindRemove) != 0 {
+		events = append(events, EventDeleteExtension{Extension: &m, Checks: checkFuncs})
+	}
+	if len(events) == 0 {
 		return nil, errUnrecognizedAction
-	***REMOVED***
+	}
 	return events, nil
-***REMOVED***
+}
 
-type ExtensionIndexerByID struct***REMOVED******REMOVED***
+type ExtensionIndexerByID struct{}
 
-func (indexer ExtensionIndexerByID) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (indexer ExtensionIndexerByID) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
-func (indexer ExtensionIndexerByID) PrefixFromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+}
+func (indexer ExtensionIndexerByID) PrefixFromArgs(args ...interface{}) ([]byte, error) {
 	return prefixFromArgs(args...)
-***REMOVED***
-func (indexer ExtensionIndexerByID) FromObject(obj interface***REMOVED******REMOVED***) (bool, []byte, error) ***REMOVED***
+}
+func (indexer ExtensionIndexerByID) FromObject(obj interface{}) (bool, []byte, error) {
 	m := obj.(*Extension)
 	return true, []byte(m.ID + "\x00"), nil
-***REMOVED***
+}
 
-type ExtensionIndexerByName struct***REMOVED******REMOVED***
+type ExtensionIndexerByName struct{}
 
-func (indexer ExtensionIndexerByName) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (indexer ExtensionIndexerByName) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
-func (indexer ExtensionIndexerByName) PrefixFromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+}
+func (indexer ExtensionIndexerByName) PrefixFromArgs(args ...interface{}) ([]byte, error) {
 	return prefixFromArgs(args...)
-***REMOVED***
-func (indexer ExtensionIndexerByName) FromObject(obj interface***REMOVED******REMOVED***) (bool, []byte, error) ***REMOVED***
+}
+func (indexer ExtensionIndexerByName) FromObject(obj interface{}) (bool, []byte, error) {
 	m := obj.(*Extension)
 	val := m.Annotations.Name
 	return true, []byte(strings.ToLower(val) + "\x00"), nil
-***REMOVED***
+}
 
-type ExtensionCustomIndexer struct***REMOVED******REMOVED***
+type ExtensionCustomIndexer struct{}
 
-func (indexer ExtensionCustomIndexer) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (indexer ExtensionCustomIndexer) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
-func (indexer ExtensionCustomIndexer) PrefixFromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+}
+func (indexer ExtensionCustomIndexer) PrefixFromArgs(args ...interface{}) ([]byte, error) {
 	return prefixFromArgs(args...)
-***REMOVED***
-func (indexer ExtensionCustomIndexer) FromObject(obj interface***REMOVED******REMOVED***) (bool, [][]byte, error) ***REMOVED***
+}
+func (indexer ExtensionCustomIndexer) FromObject(obj interface{}) (bool, [][]byte, error) {
 	m := obj.(*Extension)
 	return customIndexer("", &m.Annotations)
-***REMOVED***
-func NewStoreAction(c Event) (StoreAction, error) ***REMOVED***
+}
+func NewStoreAction(c Event) (StoreAction, error) {
 	var sa StoreAction
-	switch v := c.(type) ***REMOVED***
+	switch v := c.(type) {
 	case EventCreateNode:
 		sa.Action = StoreActionKindCreate
-		sa.Target = &StoreAction_Node***REMOVED***Node: v.Node***REMOVED***
+		sa.Target = &StoreAction_Node{Node: v.Node}
 	case EventUpdateNode:
 		sa.Action = StoreActionKindUpdate
-		sa.Target = &StoreAction_Node***REMOVED***Node: v.Node***REMOVED***
+		sa.Target = &StoreAction_Node{Node: v.Node}
 	case EventDeleteNode:
 		sa.Action = StoreActionKindRemove
-		sa.Target = &StoreAction_Node***REMOVED***Node: v.Node***REMOVED***
+		sa.Target = &StoreAction_Node{Node: v.Node}
 	case EventCreateService:
 		sa.Action = StoreActionKindCreate
-		sa.Target = &StoreAction_Service***REMOVED***Service: v.Service***REMOVED***
+		sa.Target = &StoreAction_Service{Service: v.Service}
 	case EventUpdateService:
 		sa.Action = StoreActionKindUpdate
-		sa.Target = &StoreAction_Service***REMOVED***Service: v.Service***REMOVED***
+		sa.Target = &StoreAction_Service{Service: v.Service}
 	case EventDeleteService:
 		sa.Action = StoreActionKindRemove
-		sa.Target = &StoreAction_Service***REMOVED***Service: v.Service***REMOVED***
+		sa.Target = &StoreAction_Service{Service: v.Service}
 	case EventCreateTask:
 		sa.Action = StoreActionKindCreate
-		sa.Target = &StoreAction_Task***REMOVED***Task: v.Task***REMOVED***
+		sa.Target = &StoreAction_Task{Task: v.Task}
 	case EventUpdateTask:
 		sa.Action = StoreActionKindUpdate
-		sa.Target = &StoreAction_Task***REMOVED***Task: v.Task***REMOVED***
+		sa.Target = &StoreAction_Task{Task: v.Task}
 	case EventDeleteTask:
 		sa.Action = StoreActionKindRemove
-		sa.Target = &StoreAction_Task***REMOVED***Task: v.Task***REMOVED***
+		sa.Target = &StoreAction_Task{Task: v.Task}
 	case EventCreateNetwork:
 		sa.Action = StoreActionKindCreate
-		sa.Target = &StoreAction_Network***REMOVED***Network: v.Network***REMOVED***
+		sa.Target = &StoreAction_Network{Network: v.Network}
 	case EventUpdateNetwork:
 		sa.Action = StoreActionKindUpdate
-		sa.Target = &StoreAction_Network***REMOVED***Network: v.Network***REMOVED***
+		sa.Target = &StoreAction_Network{Network: v.Network}
 	case EventDeleteNetwork:
 		sa.Action = StoreActionKindRemove
-		sa.Target = &StoreAction_Network***REMOVED***Network: v.Network***REMOVED***
+		sa.Target = &StoreAction_Network{Network: v.Network}
 	case EventCreateCluster:
 		sa.Action = StoreActionKindCreate
-		sa.Target = &StoreAction_Cluster***REMOVED***Cluster: v.Cluster***REMOVED***
+		sa.Target = &StoreAction_Cluster{Cluster: v.Cluster}
 	case EventUpdateCluster:
 		sa.Action = StoreActionKindUpdate
-		sa.Target = &StoreAction_Cluster***REMOVED***Cluster: v.Cluster***REMOVED***
+		sa.Target = &StoreAction_Cluster{Cluster: v.Cluster}
 	case EventDeleteCluster:
 		sa.Action = StoreActionKindRemove
-		sa.Target = &StoreAction_Cluster***REMOVED***Cluster: v.Cluster***REMOVED***
+		sa.Target = &StoreAction_Cluster{Cluster: v.Cluster}
 	case EventCreateSecret:
 		sa.Action = StoreActionKindCreate
-		sa.Target = &StoreAction_Secret***REMOVED***Secret: v.Secret***REMOVED***
+		sa.Target = &StoreAction_Secret{Secret: v.Secret}
 	case EventUpdateSecret:
 		sa.Action = StoreActionKindUpdate
-		sa.Target = &StoreAction_Secret***REMOVED***Secret: v.Secret***REMOVED***
+		sa.Target = &StoreAction_Secret{Secret: v.Secret}
 	case EventDeleteSecret:
 		sa.Action = StoreActionKindRemove
-		sa.Target = &StoreAction_Secret***REMOVED***Secret: v.Secret***REMOVED***
+		sa.Target = &StoreAction_Secret{Secret: v.Secret}
 	case EventCreateConfig:
 		sa.Action = StoreActionKindCreate
-		sa.Target = &StoreAction_Config***REMOVED***Config: v.Config***REMOVED***
+		sa.Target = &StoreAction_Config{Config: v.Config}
 	case EventUpdateConfig:
 		sa.Action = StoreActionKindUpdate
-		sa.Target = &StoreAction_Config***REMOVED***Config: v.Config***REMOVED***
+		sa.Target = &StoreAction_Config{Config: v.Config}
 	case EventDeleteConfig:
 		sa.Action = StoreActionKindRemove
-		sa.Target = &StoreAction_Config***REMOVED***Config: v.Config***REMOVED***
+		sa.Target = &StoreAction_Config{Config: v.Config}
 	case EventCreateResource:
 		sa.Action = StoreActionKindCreate
-		sa.Target = &StoreAction_Resource***REMOVED***Resource: v.Resource***REMOVED***
+		sa.Target = &StoreAction_Resource{Resource: v.Resource}
 	case EventUpdateResource:
 		sa.Action = StoreActionKindUpdate
-		sa.Target = &StoreAction_Resource***REMOVED***Resource: v.Resource***REMOVED***
+		sa.Target = &StoreAction_Resource{Resource: v.Resource}
 	case EventDeleteResource:
 		sa.Action = StoreActionKindRemove
-		sa.Target = &StoreAction_Resource***REMOVED***Resource: v.Resource***REMOVED***
+		sa.Target = &StoreAction_Resource{Resource: v.Resource}
 	case EventCreateExtension:
 		sa.Action = StoreActionKindCreate
-		sa.Target = &StoreAction_Extension***REMOVED***Extension: v.Extension***REMOVED***
+		sa.Target = &StoreAction_Extension{Extension: v.Extension}
 	case EventUpdateExtension:
 		sa.Action = StoreActionKindUpdate
-		sa.Target = &StoreAction_Extension***REMOVED***Extension: v.Extension***REMOVED***
+		sa.Target = &StoreAction_Extension{Extension: v.Extension}
 	case EventDeleteExtension:
 		sa.Action = StoreActionKindRemove
-		sa.Target = &StoreAction_Extension***REMOVED***Extension: v.Extension***REMOVED***
+		sa.Target = &StoreAction_Extension{Extension: v.Extension}
 	default:
-		return StoreAction***REMOVED******REMOVED***, errUnknownStoreAction
-	***REMOVED***
+		return StoreAction{}, errUnknownStoreAction
+	}
 	return sa, nil
-***REMOVED***
+}
 
-func EventFromStoreAction(sa StoreAction, oldObject StoreObject) (Event, error) ***REMOVED***
-	switch v := sa.Target.(type) ***REMOVED***
+func EventFromStoreAction(sa StoreAction, oldObject StoreObject) (Event, error) {
+	switch v := sa.Target.(type) {
 	case *StoreAction_Node:
-		switch sa.Action ***REMOVED***
+		switch sa.Action {
 		case StoreActionKindCreate:
-			return EventCreateNode***REMOVED***Node: v.Node***REMOVED***, nil
+			return EventCreateNode{Node: v.Node}, nil
 		case StoreActionKindUpdate:
-			if oldObject != nil ***REMOVED***
-				return EventUpdateNode***REMOVED***Node: v.Node, OldNode: oldObject.(*Node)***REMOVED***, nil
-			***REMOVED*** else ***REMOVED***
-				return EventUpdateNode***REMOVED***Node: v.Node***REMOVED***, nil
-			***REMOVED***
+			if oldObject != nil {
+				return EventUpdateNode{Node: v.Node, OldNode: oldObject.(*Node)}, nil
+			} else {
+				return EventUpdateNode{Node: v.Node}, nil
+			}
 		case StoreActionKindRemove:
-			return EventDeleteNode***REMOVED***Node: v.Node***REMOVED***, nil
-		***REMOVED***
+			return EventDeleteNode{Node: v.Node}, nil
+		}
 	case *StoreAction_Service:
-		switch sa.Action ***REMOVED***
+		switch sa.Action {
 		case StoreActionKindCreate:
-			return EventCreateService***REMOVED***Service: v.Service***REMOVED***, nil
+			return EventCreateService{Service: v.Service}, nil
 		case StoreActionKindUpdate:
-			if oldObject != nil ***REMOVED***
-				return EventUpdateService***REMOVED***Service: v.Service, OldService: oldObject.(*Service)***REMOVED***, nil
-			***REMOVED*** else ***REMOVED***
-				return EventUpdateService***REMOVED***Service: v.Service***REMOVED***, nil
-			***REMOVED***
+			if oldObject != nil {
+				return EventUpdateService{Service: v.Service, OldService: oldObject.(*Service)}, nil
+			} else {
+				return EventUpdateService{Service: v.Service}, nil
+			}
 		case StoreActionKindRemove:
-			return EventDeleteService***REMOVED***Service: v.Service***REMOVED***, nil
-		***REMOVED***
+			return EventDeleteService{Service: v.Service}, nil
+		}
 	case *StoreAction_Task:
-		switch sa.Action ***REMOVED***
+		switch sa.Action {
 		case StoreActionKindCreate:
-			return EventCreateTask***REMOVED***Task: v.Task***REMOVED***, nil
+			return EventCreateTask{Task: v.Task}, nil
 		case StoreActionKindUpdate:
-			if oldObject != nil ***REMOVED***
-				return EventUpdateTask***REMOVED***Task: v.Task, OldTask: oldObject.(*Task)***REMOVED***, nil
-			***REMOVED*** else ***REMOVED***
-				return EventUpdateTask***REMOVED***Task: v.Task***REMOVED***, nil
-			***REMOVED***
+			if oldObject != nil {
+				return EventUpdateTask{Task: v.Task, OldTask: oldObject.(*Task)}, nil
+			} else {
+				return EventUpdateTask{Task: v.Task}, nil
+			}
 		case StoreActionKindRemove:
-			return EventDeleteTask***REMOVED***Task: v.Task***REMOVED***, nil
-		***REMOVED***
+			return EventDeleteTask{Task: v.Task}, nil
+		}
 	case *StoreAction_Network:
-		switch sa.Action ***REMOVED***
+		switch sa.Action {
 		case StoreActionKindCreate:
-			return EventCreateNetwork***REMOVED***Network: v.Network***REMOVED***, nil
+			return EventCreateNetwork{Network: v.Network}, nil
 		case StoreActionKindUpdate:
-			if oldObject != nil ***REMOVED***
-				return EventUpdateNetwork***REMOVED***Network: v.Network, OldNetwork: oldObject.(*Network)***REMOVED***, nil
-			***REMOVED*** else ***REMOVED***
-				return EventUpdateNetwork***REMOVED***Network: v.Network***REMOVED***, nil
-			***REMOVED***
+			if oldObject != nil {
+				return EventUpdateNetwork{Network: v.Network, OldNetwork: oldObject.(*Network)}, nil
+			} else {
+				return EventUpdateNetwork{Network: v.Network}, nil
+			}
 		case StoreActionKindRemove:
-			return EventDeleteNetwork***REMOVED***Network: v.Network***REMOVED***, nil
-		***REMOVED***
+			return EventDeleteNetwork{Network: v.Network}, nil
+		}
 	case *StoreAction_Cluster:
-		switch sa.Action ***REMOVED***
+		switch sa.Action {
 		case StoreActionKindCreate:
-			return EventCreateCluster***REMOVED***Cluster: v.Cluster***REMOVED***, nil
+			return EventCreateCluster{Cluster: v.Cluster}, nil
 		case StoreActionKindUpdate:
-			if oldObject != nil ***REMOVED***
-				return EventUpdateCluster***REMOVED***Cluster: v.Cluster, OldCluster: oldObject.(*Cluster)***REMOVED***, nil
-			***REMOVED*** else ***REMOVED***
-				return EventUpdateCluster***REMOVED***Cluster: v.Cluster***REMOVED***, nil
-			***REMOVED***
+			if oldObject != nil {
+				return EventUpdateCluster{Cluster: v.Cluster, OldCluster: oldObject.(*Cluster)}, nil
+			} else {
+				return EventUpdateCluster{Cluster: v.Cluster}, nil
+			}
 		case StoreActionKindRemove:
-			return EventDeleteCluster***REMOVED***Cluster: v.Cluster***REMOVED***, nil
-		***REMOVED***
+			return EventDeleteCluster{Cluster: v.Cluster}, nil
+		}
 	case *StoreAction_Secret:
-		switch sa.Action ***REMOVED***
+		switch sa.Action {
 		case StoreActionKindCreate:
-			return EventCreateSecret***REMOVED***Secret: v.Secret***REMOVED***, nil
+			return EventCreateSecret{Secret: v.Secret}, nil
 		case StoreActionKindUpdate:
-			if oldObject != nil ***REMOVED***
-				return EventUpdateSecret***REMOVED***Secret: v.Secret, OldSecret: oldObject.(*Secret)***REMOVED***, nil
-			***REMOVED*** else ***REMOVED***
-				return EventUpdateSecret***REMOVED***Secret: v.Secret***REMOVED***, nil
-			***REMOVED***
+			if oldObject != nil {
+				return EventUpdateSecret{Secret: v.Secret, OldSecret: oldObject.(*Secret)}, nil
+			} else {
+				return EventUpdateSecret{Secret: v.Secret}, nil
+			}
 		case StoreActionKindRemove:
-			return EventDeleteSecret***REMOVED***Secret: v.Secret***REMOVED***, nil
-		***REMOVED***
+			return EventDeleteSecret{Secret: v.Secret}, nil
+		}
 	case *StoreAction_Config:
-		switch sa.Action ***REMOVED***
+		switch sa.Action {
 		case StoreActionKindCreate:
-			return EventCreateConfig***REMOVED***Config: v.Config***REMOVED***, nil
+			return EventCreateConfig{Config: v.Config}, nil
 		case StoreActionKindUpdate:
-			if oldObject != nil ***REMOVED***
-				return EventUpdateConfig***REMOVED***Config: v.Config, OldConfig: oldObject.(*Config)***REMOVED***, nil
-			***REMOVED*** else ***REMOVED***
-				return EventUpdateConfig***REMOVED***Config: v.Config***REMOVED***, nil
-			***REMOVED***
+			if oldObject != nil {
+				return EventUpdateConfig{Config: v.Config, OldConfig: oldObject.(*Config)}, nil
+			} else {
+				return EventUpdateConfig{Config: v.Config}, nil
+			}
 		case StoreActionKindRemove:
-			return EventDeleteConfig***REMOVED***Config: v.Config***REMOVED***, nil
-		***REMOVED***
+			return EventDeleteConfig{Config: v.Config}, nil
+		}
 	case *StoreAction_Resource:
-		switch sa.Action ***REMOVED***
+		switch sa.Action {
 		case StoreActionKindCreate:
-			return EventCreateResource***REMOVED***Resource: v.Resource***REMOVED***, nil
+			return EventCreateResource{Resource: v.Resource}, nil
 		case StoreActionKindUpdate:
-			if oldObject != nil ***REMOVED***
-				return EventUpdateResource***REMOVED***Resource: v.Resource, OldResource: oldObject.(*Resource)***REMOVED***, nil
-			***REMOVED*** else ***REMOVED***
-				return EventUpdateResource***REMOVED***Resource: v.Resource***REMOVED***, nil
-			***REMOVED***
+			if oldObject != nil {
+				return EventUpdateResource{Resource: v.Resource, OldResource: oldObject.(*Resource)}, nil
+			} else {
+				return EventUpdateResource{Resource: v.Resource}, nil
+			}
 		case StoreActionKindRemove:
-			return EventDeleteResource***REMOVED***Resource: v.Resource***REMOVED***, nil
-		***REMOVED***
+			return EventDeleteResource{Resource: v.Resource}, nil
+		}
 	case *StoreAction_Extension:
-		switch sa.Action ***REMOVED***
+		switch sa.Action {
 		case StoreActionKindCreate:
-			return EventCreateExtension***REMOVED***Extension: v.Extension***REMOVED***, nil
+			return EventCreateExtension{Extension: v.Extension}, nil
 		case StoreActionKindUpdate:
-			if oldObject != nil ***REMOVED***
-				return EventUpdateExtension***REMOVED***Extension: v.Extension, OldExtension: oldObject.(*Extension)***REMOVED***, nil
-			***REMOVED*** else ***REMOVED***
-				return EventUpdateExtension***REMOVED***Extension: v.Extension***REMOVED***, nil
-			***REMOVED***
+			if oldObject != nil {
+				return EventUpdateExtension{Extension: v.Extension, OldExtension: oldObject.(*Extension)}, nil
+			} else {
+				return EventUpdateExtension{Extension: v.Extension}, nil
+			}
 		case StoreActionKindRemove:
-			return EventDeleteExtension***REMOVED***Extension: v.Extension***REMOVED***, nil
-		***REMOVED***
-	***REMOVED***
+			return EventDeleteExtension{Extension: v.Extension}, nil
+		}
+	}
 	return nil, errUnknownStoreAction
-***REMOVED***
+}
 
-func WatchMessageEvent(c Event) *WatchMessage_Event ***REMOVED***
-	switch v := c.(type) ***REMOVED***
+func WatchMessageEvent(c Event) *WatchMessage_Event {
+	switch v := c.(type) {
 	case EventCreateNode:
-		return &WatchMessage_Event***REMOVED***Action: WatchActionKindCreate, Object: &Object***REMOVED***Object: &Object_Node***REMOVED***Node: v.Node***REMOVED******REMOVED******REMOVED***
+		return &WatchMessage_Event{Action: WatchActionKindCreate, Object: &Object{Object: &Object_Node{Node: v.Node}}}
 	case EventUpdateNode:
-		if v.OldNode != nil ***REMOVED***
-			return &WatchMessage_Event***REMOVED***Action: WatchActionKindUpdate, Object: &Object***REMOVED***Object: &Object_Node***REMOVED***Node: v.Node***REMOVED******REMOVED***, OldObject: &Object***REMOVED***Object: &Object_Node***REMOVED***Node: v.OldNode***REMOVED******REMOVED******REMOVED***
-		***REMOVED*** else ***REMOVED***
-			return &WatchMessage_Event***REMOVED***Action: WatchActionKindUpdate, Object: &Object***REMOVED***Object: &Object_Node***REMOVED***Node: v.Node***REMOVED******REMOVED******REMOVED***
-		***REMOVED***
+		if v.OldNode != nil {
+			return &WatchMessage_Event{Action: WatchActionKindUpdate, Object: &Object{Object: &Object_Node{Node: v.Node}}, OldObject: &Object{Object: &Object_Node{Node: v.OldNode}}}
+		} else {
+			return &WatchMessage_Event{Action: WatchActionKindUpdate, Object: &Object{Object: &Object_Node{Node: v.Node}}}
+		}
 	case EventDeleteNode:
-		return &WatchMessage_Event***REMOVED***Action: WatchActionKindRemove, Object: &Object***REMOVED***Object: &Object_Node***REMOVED***Node: v.Node***REMOVED******REMOVED******REMOVED***
+		return &WatchMessage_Event{Action: WatchActionKindRemove, Object: &Object{Object: &Object_Node{Node: v.Node}}}
 	case EventCreateService:
-		return &WatchMessage_Event***REMOVED***Action: WatchActionKindCreate, Object: &Object***REMOVED***Object: &Object_Service***REMOVED***Service: v.Service***REMOVED******REMOVED******REMOVED***
+		return &WatchMessage_Event{Action: WatchActionKindCreate, Object: &Object{Object: &Object_Service{Service: v.Service}}}
 	case EventUpdateService:
-		if v.OldService != nil ***REMOVED***
-			return &WatchMessage_Event***REMOVED***Action: WatchActionKindUpdate, Object: &Object***REMOVED***Object: &Object_Service***REMOVED***Service: v.Service***REMOVED******REMOVED***, OldObject: &Object***REMOVED***Object: &Object_Service***REMOVED***Service: v.OldService***REMOVED******REMOVED******REMOVED***
-		***REMOVED*** else ***REMOVED***
-			return &WatchMessage_Event***REMOVED***Action: WatchActionKindUpdate, Object: &Object***REMOVED***Object: &Object_Service***REMOVED***Service: v.Service***REMOVED******REMOVED******REMOVED***
-		***REMOVED***
+		if v.OldService != nil {
+			return &WatchMessage_Event{Action: WatchActionKindUpdate, Object: &Object{Object: &Object_Service{Service: v.Service}}, OldObject: &Object{Object: &Object_Service{Service: v.OldService}}}
+		} else {
+			return &WatchMessage_Event{Action: WatchActionKindUpdate, Object: &Object{Object: &Object_Service{Service: v.Service}}}
+		}
 	case EventDeleteService:
-		return &WatchMessage_Event***REMOVED***Action: WatchActionKindRemove, Object: &Object***REMOVED***Object: &Object_Service***REMOVED***Service: v.Service***REMOVED******REMOVED******REMOVED***
+		return &WatchMessage_Event{Action: WatchActionKindRemove, Object: &Object{Object: &Object_Service{Service: v.Service}}}
 	case EventCreateTask:
-		return &WatchMessage_Event***REMOVED***Action: WatchActionKindCreate, Object: &Object***REMOVED***Object: &Object_Task***REMOVED***Task: v.Task***REMOVED******REMOVED******REMOVED***
+		return &WatchMessage_Event{Action: WatchActionKindCreate, Object: &Object{Object: &Object_Task{Task: v.Task}}}
 	case EventUpdateTask:
-		if v.OldTask != nil ***REMOVED***
-			return &WatchMessage_Event***REMOVED***Action: WatchActionKindUpdate, Object: &Object***REMOVED***Object: &Object_Task***REMOVED***Task: v.Task***REMOVED******REMOVED***, OldObject: &Object***REMOVED***Object: &Object_Task***REMOVED***Task: v.OldTask***REMOVED******REMOVED******REMOVED***
-		***REMOVED*** else ***REMOVED***
-			return &WatchMessage_Event***REMOVED***Action: WatchActionKindUpdate, Object: &Object***REMOVED***Object: &Object_Task***REMOVED***Task: v.Task***REMOVED******REMOVED******REMOVED***
-		***REMOVED***
+		if v.OldTask != nil {
+			return &WatchMessage_Event{Action: WatchActionKindUpdate, Object: &Object{Object: &Object_Task{Task: v.Task}}, OldObject: &Object{Object: &Object_Task{Task: v.OldTask}}}
+		} else {
+			return &WatchMessage_Event{Action: WatchActionKindUpdate, Object: &Object{Object: &Object_Task{Task: v.Task}}}
+		}
 	case EventDeleteTask:
-		return &WatchMessage_Event***REMOVED***Action: WatchActionKindRemove, Object: &Object***REMOVED***Object: &Object_Task***REMOVED***Task: v.Task***REMOVED******REMOVED******REMOVED***
+		return &WatchMessage_Event{Action: WatchActionKindRemove, Object: &Object{Object: &Object_Task{Task: v.Task}}}
 	case EventCreateNetwork:
-		return &WatchMessage_Event***REMOVED***Action: WatchActionKindCreate, Object: &Object***REMOVED***Object: &Object_Network***REMOVED***Network: v.Network***REMOVED******REMOVED******REMOVED***
+		return &WatchMessage_Event{Action: WatchActionKindCreate, Object: &Object{Object: &Object_Network{Network: v.Network}}}
 	case EventUpdateNetwork:
-		if v.OldNetwork != nil ***REMOVED***
-			return &WatchMessage_Event***REMOVED***Action: WatchActionKindUpdate, Object: &Object***REMOVED***Object: &Object_Network***REMOVED***Network: v.Network***REMOVED******REMOVED***, OldObject: &Object***REMOVED***Object: &Object_Network***REMOVED***Network: v.OldNetwork***REMOVED******REMOVED******REMOVED***
-		***REMOVED*** else ***REMOVED***
-			return &WatchMessage_Event***REMOVED***Action: WatchActionKindUpdate, Object: &Object***REMOVED***Object: &Object_Network***REMOVED***Network: v.Network***REMOVED******REMOVED******REMOVED***
-		***REMOVED***
+		if v.OldNetwork != nil {
+			return &WatchMessage_Event{Action: WatchActionKindUpdate, Object: &Object{Object: &Object_Network{Network: v.Network}}, OldObject: &Object{Object: &Object_Network{Network: v.OldNetwork}}}
+		} else {
+			return &WatchMessage_Event{Action: WatchActionKindUpdate, Object: &Object{Object: &Object_Network{Network: v.Network}}}
+		}
 	case EventDeleteNetwork:
-		return &WatchMessage_Event***REMOVED***Action: WatchActionKindRemove, Object: &Object***REMOVED***Object: &Object_Network***REMOVED***Network: v.Network***REMOVED******REMOVED******REMOVED***
+		return &WatchMessage_Event{Action: WatchActionKindRemove, Object: &Object{Object: &Object_Network{Network: v.Network}}}
 	case EventCreateCluster:
-		return &WatchMessage_Event***REMOVED***Action: WatchActionKindCreate, Object: &Object***REMOVED***Object: &Object_Cluster***REMOVED***Cluster: v.Cluster***REMOVED******REMOVED******REMOVED***
+		return &WatchMessage_Event{Action: WatchActionKindCreate, Object: &Object{Object: &Object_Cluster{Cluster: v.Cluster}}}
 	case EventUpdateCluster:
-		if v.OldCluster != nil ***REMOVED***
-			return &WatchMessage_Event***REMOVED***Action: WatchActionKindUpdate, Object: &Object***REMOVED***Object: &Object_Cluster***REMOVED***Cluster: v.Cluster***REMOVED******REMOVED***, OldObject: &Object***REMOVED***Object: &Object_Cluster***REMOVED***Cluster: v.OldCluster***REMOVED******REMOVED******REMOVED***
-		***REMOVED*** else ***REMOVED***
-			return &WatchMessage_Event***REMOVED***Action: WatchActionKindUpdate, Object: &Object***REMOVED***Object: &Object_Cluster***REMOVED***Cluster: v.Cluster***REMOVED******REMOVED******REMOVED***
-		***REMOVED***
+		if v.OldCluster != nil {
+			return &WatchMessage_Event{Action: WatchActionKindUpdate, Object: &Object{Object: &Object_Cluster{Cluster: v.Cluster}}, OldObject: &Object{Object: &Object_Cluster{Cluster: v.OldCluster}}}
+		} else {
+			return &WatchMessage_Event{Action: WatchActionKindUpdate, Object: &Object{Object: &Object_Cluster{Cluster: v.Cluster}}}
+		}
 	case EventDeleteCluster:
-		return &WatchMessage_Event***REMOVED***Action: WatchActionKindRemove, Object: &Object***REMOVED***Object: &Object_Cluster***REMOVED***Cluster: v.Cluster***REMOVED******REMOVED******REMOVED***
+		return &WatchMessage_Event{Action: WatchActionKindRemove, Object: &Object{Object: &Object_Cluster{Cluster: v.Cluster}}}
 	case EventCreateSecret:
-		return &WatchMessage_Event***REMOVED***Action: WatchActionKindCreate, Object: &Object***REMOVED***Object: &Object_Secret***REMOVED***Secret: v.Secret***REMOVED******REMOVED******REMOVED***
+		return &WatchMessage_Event{Action: WatchActionKindCreate, Object: &Object{Object: &Object_Secret{Secret: v.Secret}}}
 	case EventUpdateSecret:
-		if v.OldSecret != nil ***REMOVED***
-			return &WatchMessage_Event***REMOVED***Action: WatchActionKindUpdate, Object: &Object***REMOVED***Object: &Object_Secret***REMOVED***Secret: v.Secret***REMOVED******REMOVED***, OldObject: &Object***REMOVED***Object: &Object_Secret***REMOVED***Secret: v.OldSecret***REMOVED******REMOVED******REMOVED***
-		***REMOVED*** else ***REMOVED***
-			return &WatchMessage_Event***REMOVED***Action: WatchActionKindUpdate, Object: &Object***REMOVED***Object: &Object_Secret***REMOVED***Secret: v.Secret***REMOVED******REMOVED******REMOVED***
-		***REMOVED***
+		if v.OldSecret != nil {
+			return &WatchMessage_Event{Action: WatchActionKindUpdate, Object: &Object{Object: &Object_Secret{Secret: v.Secret}}, OldObject: &Object{Object: &Object_Secret{Secret: v.OldSecret}}}
+		} else {
+			return &WatchMessage_Event{Action: WatchActionKindUpdate, Object: &Object{Object: &Object_Secret{Secret: v.Secret}}}
+		}
 	case EventDeleteSecret:
-		return &WatchMessage_Event***REMOVED***Action: WatchActionKindRemove, Object: &Object***REMOVED***Object: &Object_Secret***REMOVED***Secret: v.Secret***REMOVED******REMOVED******REMOVED***
+		return &WatchMessage_Event{Action: WatchActionKindRemove, Object: &Object{Object: &Object_Secret{Secret: v.Secret}}}
 	case EventCreateConfig:
-		return &WatchMessage_Event***REMOVED***Action: WatchActionKindCreate, Object: &Object***REMOVED***Object: &Object_Config***REMOVED***Config: v.Config***REMOVED******REMOVED******REMOVED***
+		return &WatchMessage_Event{Action: WatchActionKindCreate, Object: &Object{Object: &Object_Config{Config: v.Config}}}
 	case EventUpdateConfig:
-		if v.OldConfig != nil ***REMOVED***
-			return &WatchMessage_Event***REMOVED***Action: WatchActionKindUpdate, Object: &Object***REMOVED***Object: &Object_Config***REMOVED***Config: v.Config***REMOVED******REMOVED***, OldObject: &Object***REMOVED***Object: &Object_Config***REMOVED***Config: v.OldConfig***REMOVED******REMOVED******REMOVED***
-		***REMOVED*** else ***REMOVED***
-			return &WatchMessage_Event***REMOVED***Action: WatchActionKindUpdate, Object: &Object***REMOVED***Object: &Object_Config***REMOVED***Config: v.Config***REMOVED******REMOVED******REMOVED***
-		***REMOVED***
+		if v.OldConfig != nil {
+			return &WatchMessage_Event{Action: WatchActionKindUpdate, Object: &Object{Object: &Object_Config{Config: v.Config}}, OldObject: &Object{Object: &Object_Config{Config: v.OldConfig}}}
+		} else {
+			return &WatchMessage_Event{Action: WatchActionKindUpdate, Object: &Object{Object: &Object_Config{Config: v.Config}}}
+		}
 	case EventDeleteConfig:
-		return &WatchMessage_Event***REMOVED***Action: WatchActionKindRemove, Object: &Object***REMOVED***Object: &Object_Config***REMOVED***Config: v.Config***REMOVED******REMOVED******REMOVED***
+		return &WatchMessage_Event{Action: WatchActionKindRemove, Object: &Object{Object: &Object_Config{Config: v.Config}}}
 	case EventCreateResource:
-		return &WatchMessage_Event***REMOVED***Action: WatchActionKindCreate, Object: &Object***REMOVED***Object: &Object_Resource***REMOVED***Resource: v.Resource***REMOVED******REMOVED******REMOVED***
+		return &WatchMessage_Event{Action: WatchActionKindCreate, Object: &Object{Object: &Object_Resource{Resource: v.Resource}}}
 	case EventUpdateResource:
-		if v.OldResource != nil ***REMOVED***
-			return &WatchMessage_Event***REMOVED***Action: WatchActionKindUpdate, Object: &Object***REMOVED***Object: &Object_Resource***REMOVED***Resource: v.Resource***REMOVED******REMOVED***, OldObject: &Object***REMOVED***Object: &Object_Resource***REMOVED***Resource: v.OldResource***REMOVED******REMOVED******REMOVED***
-		***REMOVED*** else ***REMOVED***
-			return &WatchMessage_Event***REMOVED***Action: WatchActionKindUpdate, Object: &Object***REMOVED***Object: &Object_Resource***REMOVED***Resource: v.Resource***REMOVED******REMOVED******REMOVED***
-		***REMOVED***
+		if v.OldResource != nil {
+			return &WatchMessage_Event{Action: WatchActionKindUpdate, Object: &Object{Object: &Object_Resource{Resource: v.Resource}}, OldObject: &Object{Object: &Object_Resource{Resource: v.OldResource}}}
+		} else {
+			return &WatchMessage_Event{Action: WatchActionKindUpdate, Object: &Object{Object: &Object_Resource{Resource: v.Resource}}}
+		}
 	case EventDeleteResource:
-		return &WatchMessage_Event***REMOVED***Action: WatchActionKindRemove, Object: &Object***REMOVED***Object: &Object_Resource***REMOVED***Resource: v.Resource***REMOVED******REMOVED******REMOVED***
+		return &WatchMessage_Event{Action: WatchActionKindRemove, Object: &Object{Object: &Object_Resource{Resource: v.Resource}}}
 	case EventCreateExtension:
-		return &WatchMessage_Event***REMOVED***Action: WatchActionKindCreate, Object: &Object***REMOVED***Object: &Object_Extension***REMOVED***Extension: v.Extension***REMOVED******REMOVED******REMOVED***
+		return &WatchMessage_Event{Action: WatchActionKindCreate, Object: &Object{Object: &Object_Extension{Extension: v.Extension}}}
 	case EventUpdateExtension:
-		if v.OldExtension != nil ***REMOVED***
-			return &WatchMessage_Event***REMOVED***Action: WatchActionKindUpdate, Object: &Object***REMOVED***Object: &Object_Extension***REMOVED***Extension: v.Extension***REMOVED******REMOVED***, OldObject: &Object***REMOVED***Object: &Object_Extension***REMOVED***Extension: v.OldExtension***REMOVED******REMOVED******REMOVED***
-		***REMOVED*** else ***REMOVED***
-			return &WatchMessage_Event***REMOVED***Action: WatchActionKindUpdate, Object: &Object***REMOVED***Object: &Object_Extension***REMOVED***Extension: v.Extension***REMOVED******REMOVED******REMOVED***
-		***REMOVED***
+		if v.OldExtension != nil {
+			return &WatchMessage_Event{Action: WatchActionKindUpdate, Object: &Object{Object: &Object_Extension{Extension: v.Extension}}, OldObject: &Object{Object: &Object_Extension{Extension: v.OldExtension}}}
+		} else {
+			return &WatchMessage_Event{Action: WatchActionKindUpdate, Object: &Object{Object: &Object_Extension{Extension: v.Extension}}}
+		}
 	case EventDeleteExtension:
-		return &WatchMessage_Event***REMOVED***Action: WatchActionKindRemove, Object: &Object***REMOVED***Object: &Object_Extension***REMOVED***Extension: v.Extension***REMOVED******REMOVED******REMOVED***
-	***REMOVED***
+		return &WatchMessage_Event{Action: WatchActionKindRemove, Object: &Object{Object: &Object_Extension{Extension: v.Extension}}}
+	}
 	return nil
-***REMOVED***
+}
 
-func ConvertWatchArgs(entries []*WatchRequest_WatchEntry) ([]Event, error) ***REMOVED***
+func ConvertWatchArgs(entries []*WatchRequest_WatchEntry) ([]Event, error) {
 	var events []Event
-	for _, entry := range entries ***REMOVED***
+	for _, entry := range entries {
 		var newEvents []Event
 		var err error
-		switch entry.Kind ***REMOVED***
+		switch entry.Kind {
 		case "":
 			return nil, errNoKindSpecified
 		case "node":
@@ -4379,32 +4379,32 @@ func ConvertWatchArgs(entries []*WatchRequest_WatchEntry) ([]Event, error) ***RE
 			newEvents, err = ConvertResourceWatch(entry.Action, entry.Filters, entry.Kind)
 		case "extension":
 			newEvents, err = ConvertExtensionWatch(entry.Action, entry.Filters)
-		***REMOVED***
-		if err != nil ***REMOVED***
+		}
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		events = append(events, newEvents...)
-	***REMOVED***
+	}
 	return events, nil
-***REMOVED***
+}
 
-func (this *Meta) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+func (this *Meta) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&Meta***REMOVED***`,
+	}
+	s := strings.Join([]string{`&Meta{`,
 		`Version:` + strings.Replace(strings.Replace(this.Version.String(), "Version", "Version", 1), `&`, ``, 1) + `,`,
 		`CreatedAt:` + strings.Replace(fmt.Sprintf("%v", this.CreatedAt), "Timestamp", "google_protobuf.Timestamp", 1) + `,`,
 		`UpdatedAt:` + strings.Replace(fmt.Sprintf("%v", this.UpdatedAt), "Timestamp", "google_protobuf.Timestamp", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *Node) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Node) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&Node***REMOVED***`,
+	}
+	s := strings.Join([]string{`&Node{`,
 		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
 		`Meta:` + strings.Replace(strings.Replace(this.Meta.String(), "Meta", "Meta", 1), `&`, ``, 1) + `,`,
 		`Spec:` + strings.Replace(strings.Replace(this.Spec.String(), "NodeSpec", "NodeSpec", 1), `&`, ``, 1) + `,`,
@@ -4415,15 +4415,15 @@ func (this *Node) String() string ***REMOVED***
 		`Certificate:` + strings.Replace(strings.Replace(this.Certificate.String(), "Certificate", "Certificate", 1), `&`, ``, 1) + `,`,
 		`Role:` + fmt.Sprintf("%v", this.Role) + `,`,
 		`Attachments:` + strings.Replace(fmt.Sprintf("%v", this.Attachments), "NetworkAttachment", "NetworkAttachment", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *Service) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Service) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&Service***REMOVED***`,
+	}
+	s := strings.Join([]string{`&Service{`,
 		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
 		`Meta:` + strings.Replace(strings.Replace(this.Meta.String(), "Meta", "Meta", 1), `&`, ``, 1) + `,`,
 		`Spec:` + strings.Replace(strings.Replace(this.Spec.String(), "ServiceSpec", "ServiceSpec", 1), `&`, ``, 1) + `,`,
@@ -4432,38 +4432,38 @@ func (this *Service) String() string ***REMOVED***
 		`PreviousSpec:` + strings.Replace(fmt.Sprintf("%v", this.PreviousSpec), "ServiceSpec", "ServiceSpec", 1) + `,`,
 		`SpecVersion:` + strings.Replace(fmt.Sprintf("%v", this.SpecVersion), "Version", "Version", 1) + `,`,
 		`PreviousSpecVersion:` + strings.Replace(fmt.Sprintf("%v", this.PreviousSpecVersion), "Version", "Version", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *Endpoint) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Endpoint) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&Endpoint***REMOVED***`,
+	}
+	s := strings.Join([]string{`&Endpoint{`,
 		`Spec:` + strings.Replace(fmt.Sprintf("%v", this.Spec), "EndpointSpec", "EndpointSpec", 1) + `,`,
 		`Ports:` + strings.Replace(fmt.Sprintf("%v", this.Ports), "PortConfig", "PortConfig", 1) + `,`,
 		`VirtualIPs:` + strings.Replace(fmt.Sprintf("%v", this.VirtualIPs), "Endpoint_VirtualIP", "Endpoint_VirtualIP", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *Endpoint_VirtualIP) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Endpoint_VirtualIP) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&Endpoint_VirtualIP***REMOVED***`,
+	}
+	s := strings.Join([]string{`&Endpoint_VirtualIP{`,
 		`NetworkID:` + fmt.Sprintf("%v", this.NetworkID) + `,`,
 		`Addr:` + fmt.Sprintf("%v", this.Addr) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *Task) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Task) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&Task***REMOVED***`,
+	}
+	s := strings.Join([]string{`&Task{`,
 		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
 		`Meta:` + strings.Replace(strings.Replace(this.Meta.String(), "Meta", "Meta", 1), `&`, ``, 1) + `,`,
 		`Spec:` + strings.Replace(strings.Replace(this.Spec.String(), "TaskSpec", "TaskSpec", 1), `&`, ``, 1) + `,`,
@@ -4479,62 +4479,62 @@ func (this *Task) String() string ***REMOVED***
 		`LogDriver:` + strings.Replace(fmt.Sprintf("%v", this.LogDriver), "Driver", "Driver", 1) + `,`,
 		`SpecVersion:` + strings.Replace(fmt.Sprintf("%v", this.SpecVersion), "Version", "Version", 1) + `,`,
 		`AssignedGenericResources:` + strings.Replace(fmt.Sprintf("%v", this.AssignedGenericResources), "GenericResource", "GenericResource", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *NetworkAttachment) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *NetworkAttachment) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	keysForDriverAttachmentOpts := make([]string, 0, len(this.DriverAttachmentOpts))
-	for k, _ := range this.DriverAttachmentOpts ***REMOVED***
+	for k, _ := range this.DriverAttachmentOpts {
 		keysForDriverAttachmentOpts = append(keysForDriverAttachmentOpts, k)
-	***REMOVED***
+	}
 	github_com_gogo_protobuf_sortkeys.Strings(keysForDriverAttachmentOpts)
-	mapStringForDriverAttachmentOpts := "map[string]string***REMOVED***"
-	for _, k := range keysForDriverAttachmentOpts ***REMOVED***
+	mapStringForDriverAttachmentOpts := "map[string]string{"
+	for _, k := range keysForDriverAttachmentOpts {
 		mapStringForDriverAttachmentOpts += fmt.Sprintf("%v: %v,", k, this.DriverAttachmentOpts[k])
-	***REMOVED***
-	mapStringForDriverAttachmentOpts += "***REMOVED***"
-	s := strings.Join([]string***REMOVED***`&NetworkAttachment***REMOVED***`,
+	}
+	mapStringForDriverAttachmentOpts += "}"
+	s := strings.Join([]string{`&NetworkAttachment{`,
 		`Network:` + strings.Replace(fmt.Sprintf("%v", this.Network), "Network", "Network", 1) + `,`,
 		`Addresses:` + fmt.Sprintf("%v", this.Addresses) + `,`,
 		`Aliases:` + fmt.Sprintf("%v", this.Aliases) + `,`,
 		`DriverAttachmentOpts:` + mapStringForDriverAttachmentOpts + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *Network) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Network) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&Network***REMOVED***`,
+	}
+	s := strings.Join([]string{`&Network{`,
 		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
 		`Meta:` + strings.Replace(strings.Replace(this.Meta.String(), "Meta", "Meta", 1), `&`, ``, 1) + `,`,
 		`Spec:` + strings.Replace(strings.Replace(this.Spec.String(), "NetworkSpec", "NetworkSpec", 1), `&`, ``, 1) + `,`,
 		`DriverState:` + strings.Replace(fmt.Sprintf("%v", this.DriverState), "Driver", "Driver", 1) + `,`,
 		`IPAM:` + strings.Replace(fmt.Sprintf("%v", this.IPAM), "IPAMOptions", "IPAMOptions", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *Cluster) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Cluster) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	keysForBlacklistedCertificates := make([]string, 0, len(this.BlacklistedCertificates))
-	for k, _ := range this.BlacklistedCertificates ***REMOVED***
+	for k, _ := range this.BlacklistedCertificates {
 		keysForBlacklistedCertificates = append(keysForBlacklistedCertificates, k)
-	***REMOVED***
+	}
 	github_com_gogo_protobuf_sortkeys.Strings(keysForBlacklistedCertificates)
-	mapStringForBlacklistedCertificates := "map[string]*BlacklistedCertificate***REMOVED***"
-	for _, k := range keysForBlacklistedCertificates ***REMOVED***
+	mapStringForBlacklistedCertificates := "map[string]*BlacklistedCertificate{"
+	for _, k := range keysForBlacklistedCertificates {
 		mapStringForBlacklistedCertificates += fmt.Sprintf("%v: %v,", k, this.BlacklistedCertificates[k])
-	***REMOVED***
-	mapStringForBlacklistedCertificates += "***REMOVED***"
-	s := strings.Join([]string***REMOVED***`&Cluster***REMOVED***`,
+	}
+	mapStringForBlacklistedCertificates += "}"
+	s := strings.Join([]string{`&Cluster{`,
 		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
 		`Meta:` + strings.Replace(strings.Replace(this.Meta.String(), "Meta", "Meta", 1), `&`, ``, 1) + `,`,
 		`Spec:` + strings.Replace(strings.Replace(this.Spec.String(), "ClusterSpec", "ClusterSpec", 1), `&`, ``, 1) + `,`,
@@ -4543,3194 +4543,3194 @@ func (this *Cluster) String() string ***REMOVED***
 		`EncryptionKeyLamportClock:` + fmt.Sprintf("%v", this.EncryptionKeyLamportClock) + `,`,
 		`BlacklistedCertificates:` + mapStringForBlacklistedCertificates + `,`,
 		`UnlockKeys:` + strings.Replace(fmt.Sprintf("%v", this.UnlockKeys), "EncryptionKey", "EncryptionKey", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *Secret) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Secret) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&Secret***REMOVED***`,
+	}
+	s := strings.Join([]string{`&Secret{`,
 		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
 		`Meta:` + strings.Replace(strings.Replace(this.Meta.String(), "Meta", "Meta", 1), `&`, ``, 1) + `,`,
 		`Spec:` + strings.Replace(strings.Replace(this.Spec.String(), "SecretSpec", "SecretSpec", 1), `&`, ``, 1) + `,`,
 		`Internal:` + fmt.Sprintf("%v", this.Internal) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *Config) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Config) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&Config***REMOVED***`,
+	}
+	s := strings.Join([]string{`&Config{`,
 		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
 		`Meta:` + strings.Replace(strings.Replace(this.Meta.String(), "Meta", "Meta", 1), `&`, ``, 1) + `,`,
 		`Spec:` + strings.Replace(strings.Replace(this.Spec.String(), "ConfigSpec", "ConfigSpec", 1), `&`, ``, 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *Resource) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Resource) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&Resource***REMOVED***`,
+	}
+	s := strings.Join([]string{`&Resource{`,
 		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
 		`Meta:` + strings.Replace(strings.Replace(this.Meta.String(), "Meta", "Meta", 1), `&`, ``, 1) + `,`,
 		`Annotations:` + strings.Replace(strings.Replace(this.Annotations.String(), "Annotations", "Annotations", 1), `&`, ``, 1) + `,`,
 		`Kind:` + fmt.Sprintf("%v", this.Kind) + `,`,
 		`Payload:` + strings.Replace(fmt.Sprintf("%v", this.Payload), "Any", "google_protobuf3.Any", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *Extension) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Extension) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&Extension***REMOVED***`,
+	}
+	s := strings.Join([]string{`&Extension{`,
 		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
 		`Meta:` + strings.Replace(strings.Replace(this.Meta.String(), "Meta", "Meta", 1), `&`, ``, 1) + `,`,
 		`Annotations:` + strings.Replace(strings.Replace(this.Annotations.String(), "Annotations", "Annotations", 1), `&`, ``, 1) + `,`,
 		`Description:` + fmt.Sprintf("%v", this.Description) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func valueToStringObjects(v interface***REMOVED******REMOVED***) string ***REMOVED***
+}
+func valueToStringObjects(v interface{}) string {
 	rv := reflect.ValueOf(v)
-	if rv.IsNil() ***REMOVED***
+	if rv.IsNil() {
 		return "nil"
-	***REMOVED***
+	}
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
-***REMOVED***
-func (m *Meta) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *Meta) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowObjects
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: Meta: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: Meta: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Version", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Version.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Version.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CreatedAt", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.CreatedAt == nil ***REMOVED***
-				m.CreatedAt = &google_protobuf.Timestamp***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.CreatedAt.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.CreatedAt == nil {
+				m.CreatedAt = &google_protobuf.Timestamp{}
+			}
+			if err := m.CreatedAt.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field UpdatedAt", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.UpdatedAt == nil ***REMOVED***
-				m.UpdatedAt = &google_protobuf.Timestamp***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.UpdatedAt.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.UpdatedAt == nil {
+				m.UpdatedAt = &google_protobuf.Timestamp{}
+			}
+			if err := m.UpdatedAt.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipObjects(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *Node) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *Node) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowObjects
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: Node: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: Node: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Meta", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Meta.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Meta.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Spec", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Spec.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Spec.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 4:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Description == nil ***REMOVED***
-				m.Description = &NodeDescription***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.Description.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.Description == nil {
+				m.Description = &NodeDescription{}
+			}
+			if err := m.Description.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 5:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Status.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Status.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 6:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ManagerStatus", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.ManagerStatus == nil ***REMOVED***
-				m.ManagerStatus = &ManagerStatus***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.ManagerStatus.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.ManagerStatus == nil {
+				m.ManagerStatus = &ManagerStatus{}
+			}
+			if err := m.ManagerStatus.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 7:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Attachment", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Attachment == nil ***REMOVED***
-				m.Attachment = &NetworkAttachment***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.Attachment.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.Attachment == nil {
+				m.Attachment = &NetworkAttachment{}
+			}
+			if err := m.Attachment.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 8:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Certificate", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Certificate.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Certificate.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 9:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Role", wireType)
-			***REMOVED***
+			}
 			m.Role = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Role |= (NodeRole(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 10:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Attachments", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.Attachments = append(m.Attachments, &NetworkAttachment***REMOVED******REMOVED***)
-			if err := m.Attachments[len(m.Attachments)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			m.Attachments = append(m.Attachments, &NetworkAttachment{})
+			if err := m.Attachments[len(m.Attachments)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipObjects(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *Service) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *Service) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowObjects
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: Service: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: Service: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Meta", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Meta.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Meta.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Spec", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Spec.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Spec.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 4:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Endpoint", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Endpoint == nil ***REMOVED***
-				m.Endpoint = &Endpoint***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.Endpoint.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.Endpoint == nil {
+				m.Endpoint = &Endpoint{}
+			}
+			if err := m.Endpoint.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 5:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field UpdateStatus", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.UpdateStatus == nil ***REMOVED***
-				m.UpdateStatus = &UpdateStatus***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.UpdateStatus.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.UpdateStatus == nil {
+				m.UpdateStatus = &UpdateStatus{}
+			}
+			if err := m.UpdateStatus.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 6:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field PreviousSpec", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.PreviousSpec == nil ***REMOVED***
-				m.PreviousSpec = &ServiceSpec***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.PreviousSpec.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.PreviousSpec == nil {
+				m.PreviousSpec = &ServiceSpec{}
+			}
+			if err := m.PreviousSpec.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 10:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field SpecVersion", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.SpecVersion == nil ***REMOVED***
-				m.SpecVersion = &Version***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.SpecVersion.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.SpecVersion == nil {
+				m.SpecVersion = &Version{}
+			}
+			if err := m.SpecVersion.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 11:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field PreviousSpecVersion", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.PreviousSpecVersion == nil ***REMOVED***
-				m.PreviousSpecVersion = &Version***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.PreviousSpecVersion.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.PreviousSpecVersion == nil {
+				m.PreviousSpecVersion = &Version{}
+			}
+			if err := m.PreviousSpecVersion.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipObjects(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *Endpoint) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *Endpoint) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowObjects
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: Endpoint: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: Endpoint: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Spec", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Spec == nil ***REMOVED***
-				m.Spec = &EndpointSpec***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.Spec.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.Spec == nil {
+				m.Spec = &EndpointSpec{}
+			}
+			if err := m.Spec.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Ports", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.Ports = append(m.Ports, &PortConfig***REMOVED******REMOVED***)
-			if err := m.Ports[len(m.Ports)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			m.Ports = append(m.Ports, &PortConfig{})
+			if err := m.Ports[len(m.Ports)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field VirtualIPs", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.VirtualIPs = append(m.VirtualIPs, &Endpoint_VirtualIP***REMOVED******REMOVED***)
-			if err := m.VirtualIPs[len(m.VirtualIPs)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			m.VirtualIPs = append(m.VirtualIPs, &Endpoint_VirtualIP{})
+			if err := m.VirtualIPs[len(m.VirtualIPs)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipObjects(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *Endpoint_VirtualIP) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *Endpoint_VirtualIP) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowObjects
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: VirtualIP: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: VirtualIP: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field NetworkID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.NetworkID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Addr", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Addr = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipObjects(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *Task) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *Task) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowObjects
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: Task: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: Task: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Meta", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Meta.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Meta.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Spec", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Spec.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Spec.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 4:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ServiceID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ServiceID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 5:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Slot", wireType)
-			***REMOVED***
+			}
 			m.Slot = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Slot |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 6:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field NodeID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.NodeID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 7:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Annotations", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Annotations.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Annotations.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 8:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ServiceAnnotations", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.ServiceAnnotations.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.ServiceAnnotations.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 9:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Status.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Status.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 10:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field DesiredState", wireType)
-			***REMOVED***
+			}
 			m.DesiredState = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.DesiredState |= (TaskState(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 11:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Networks", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.Networks = append(m.Networks, &NetworkAttachment***REMOVED******REMOVED***)
-			if err := m.Networks[len(m.Networks)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			m.Networks = append(m.Networks, &NetworkAttachment{})
+			if err := m.Networks[len(m.Networks)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 12:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Endpoint", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Endpoint == nil ***REMOVED***
-				m.Endpoint = &Endpoint***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.Endpoint.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.Endpoint == nil {
+				m.Endpoint = &Endpoint{}
+			}
+			if err := m.Endpoint.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 13:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field LogDriver", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.LogDriver == nil ***REMOVED***
-				m.LogDriver = &Driver***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.LogDriver.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.LogDriver == nil {
+				m.LogDriver = &Driver{}
+			}
+			if err := m.LogDriver.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 14:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field SpecVersion", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.SpecVersion == nil ***REMOVED***
-				m.SpecVersion = &Version***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.SpecVersion.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.SpecVersion == nil {
+				m.SpecVersion = &Version{}
+			}
+			if err := m.SpecVersion.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 15:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field AssignedGenericResources", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.AssignedGenericResources = append(m.AssignedGenericResources, &GenericResource***REMOVED******REMOVED***)
-			if err := m.AssignedGenericResources[len(m.AssignedGenericResources)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			m.AssignedGenericResources = append(m.AssignedGenericResources, &GenericResource{})
+			if err := m.AssignedGenericResources[len(m.AssignedGenericResources)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipObjects(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *NetworkAttachment) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *NetworkAttachment) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowObjects
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: NetworkAttachment: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: NetworkAttachment: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Network", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Network == nil ***REMOVED***
-				m.Network = &Network***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.Network.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.Network == nil {
+				m.Network = &Network{}
+			}
+			if err := m.Network.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Addresses", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Addresses = append(m.Addresses, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Aliases", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Aliases = append(m.Aliases, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		case 4:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field DriverAttachmentOpts", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			var keykey uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				keykey |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			var stringLenmapkey uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLenmapkey |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLenmapkey := int(stringLenmapkey)
-			if intStringLenmapkey < 0 ***REMOVED***
+			if intStringLenmapkey < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postStringIndexmapkey := iNdEx + intStringLenmapkey
-			if postStringIndexmapkey > l ***REMOVED***
+			if postStringIndexmapkey > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			mapkey := string(dAtA[iNdEx:postStringIndexmapkey])
 			iNdEx = postStringIndexmapkey
-			if m.DriverAttachmentOpts == nil ***REMOVED***
+			if m.DriverAttachmentOpts == nil {
 				m.DriverAttachmentOpts = make(map[string]string)
-			***REMOVED***
-			if iNdEx < postIndex ***REMOVED***
+			}
+			if iNdEx < postIndex {
 				var valuekey uint64
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return ErrIntOverflowObjects
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					valuekey |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				var stringLenmapvalue uint64
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return ErrIntOverflowObjects
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					stringLenmapvalue |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				intStringLenmapvalue := int(stringLenmapvalue)
-				if intStringLenmapvalue < 0 ***REMOVED***
+				if intStringLenmapvalue < 0 {
 					return ErrInvalidLengthObjects
-				***REMOVED***
+				}
 				postStringIndexmapvalue := iNdEx + intStringLenmapvalue
-				if postStringIndexmapvalue > l ***REMOVED***
+				if postStringIndexmapvalue > l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				mapvalue := string(dAtA[iNdEx:postStringIndexmapvalue])
 				iNdEx = postStringIndexmapvalue
 				m.DriverAttachmentOpts[mapkey] = mapvalue
-			***REMOVED*** else ***REMOVED***
+			} else {
 				var mapvalue string
 				m.DriverAttachmentOpts[mapkey] = mapvalue
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipObjects(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *Network) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *Network) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowObjects
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: Network: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: Network: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Meta", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Meta.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Meta.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Spec", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Spec.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Spec.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 4:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field DriverState", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.DriverState == nil ***REMOVED***
-				m.DriverState = &Driver***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.DriverState.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.DriverState == nil {
+				m.DriverState = &Driver{}
+			}
+			if err := m.DriverState.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 5:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field IPAM", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.IPAM == nil ***REMOVED***
-				m.IPAM = &IPAMOptions***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.IPAM.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.IPAM == nil {
+				m.IPAM = &IPAMOptions{}
+			}
+			if err := m.IPAM.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipObjects(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *Cluster) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *Cluster) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowObjects
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: Cluster: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: Cluster: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Meta", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Meta.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Meta.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Spec", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Spec.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Spec.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 4:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RootCA", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.RootCA.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.RootCA.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 5:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field NetworkBootstrapKeys", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.NetworkBootstrapKeys = append(m.NetworkBootstrapKeys, &EncryptionKey***REMOVED******REMOVED***)
-			if err := m.NetworkBootstrapKeys[len(m.NetworkBootstrapKeys)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			m.NetworkBootstrapKeys = append(m.NetworkBootstrapKeys, &EncryptionKey{})
+			if err := m.NetworkBootstrapKeys[len(m.NetworkBootstrapKeys)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 6:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field EncryptionKeyLamportClock", wireType)
-			***REMOVED***
+			}
 			m.EncryptionKeyLamportClock = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.EncryptionKeyLamportClock |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 8:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field BlacklistedCertificates", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			var keykey uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				keykey |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			var stringLenmapkey uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLenmapkey |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLenmapkey := int(stringLenmapkey)
-			if intStringLenmapkey < 0 ***REMOVED***
+			if intStringLenmapkey < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postStringIndexmapkey := iNdEx + intStringLenmapkey
-			if postStringIndexmapkey > l ***REMOVED***
+			if postStringIndexmapkey > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			mapkey := string(dAtA[iNdEx:postStringIndexmapkey])
 			iNdEx = postStringIndexmapkey
-			if m.BlacklistedCertificates == nil ***REMOVED***
+			if m.BlacklistedCertificates == nil {
 				m.BlacklistedCertificates = make(map[string]*BlacklistedCertificate)
-			***REMOVED***
-			if iNdEx < postIndex ***REMOVED***
+			}
+			if iNdEx < postIndex {
 				var valuekey uint64
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return ErrIntOverflowObjects
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					valuekey |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				var mapmsglen int
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return ErrIntOverflowObjects
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					mapmsglen |= (int(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
-				if mapmsglen < 0 ***REMOVED***
+					}
+				}
+				if mapmsglen < 0 {
 					return ErrInvalidLengthObjects
-				***REMOVED***
+				}
 				postmsgIndex := iNdEx + mapmsglen
-				if mapmsglen < 0 ***REMOVED***
+				if mapmsglen < 0 {
 					return ErrInvalidLengthObjects
-				***REMOVED***
-				if postmsgIndex > l ***REMOVED***
+				}
+				if postmsgIndex > l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
-				mapvalue := &BlacklistedCertificate***REMOVED******REMOVED***
-				if err := mapvalue.Unmarshal(dAtA[iNdEx:postmsgIndex]); err != nil ***REMOVED***
+				}
+				mapvalue := &BlacklistedCertificate{}
+				if err := mapvalue.Unmarshal(dAtA[iNdEx:postmsgIndex]); err != nil {
 					return err
-				***REMOVED***
+				}
 				iNdEx = postmsgIndex
 				m.BlacklistedCertificates[mapkey] = mapvalue
-			***REMOVED*** else ***REMOVED***
+			} else {
 				var mapvalue *BlacklistedCertificate
 				m.BlacklistedCertificates[mapkey] = mapvalue
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 9:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field UnlockKeys", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.UnlockKeys = append(m.UnlockKeys, &EncryptionKey***REMOVED******REMOVED***)
-			if err := m.UnlockKeys[len(m.UnlockKeys)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			m.UnlockKeys = append(m.UnlockKeys, &EncryptionKey{})
+			if err := m.UnlockKeys[len(m.UnlockKeys)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipObjects(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *Secret) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *Secret) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowObjects
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: Secret: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: Secret: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Meta", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Meta.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Meta.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Spec", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Spec.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Spec.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 4:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Internal", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			m.Internal = bool(v != 0)
 		default:
 			iNdEx = preIndex
 			skippy, err := skipObjects(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *Config) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *Config) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowObjects
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: Config: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: Config: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Meta", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Meta.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Meta.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Spec", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Spec.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Spec.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipObjects(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *Resource) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *Resource) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowObjects
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: Resource: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: Resource: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Meta", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Meta.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Meta.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Annotations", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Annotations.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Annotations.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 4:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Kind", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Kind = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 5:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Payload", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Payload == nil ***REMOVED***
-				m.Payload = &google_protobuf3.Any***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.Payload.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.Payload == nil {
+				m.Payload = &google_protobuf3.Any{}
+			}
+			if err := m.Payload.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipObjects(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *Extension) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *Extension) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowObjects
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: Extension: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: Extension: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Meta", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Meta.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Meta.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Annotations", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Annotations.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Annotations.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 4:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Description = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipObjects(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthObjects
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func skipObjects(dAtA []byte) (n int, err error) ***REMOVED***
+}
+func skipObjects(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return 0, ErrIntOverflowObjects
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return 0, io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		wireType := int(wire & 0x7)
-		switch wireType ***REMOVED***
+		switch wireType {
 		case 0:
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				iNdEx++
-				if dAtA[iNdEx-1] < 0x80 ***REMOVED***
+				if dAtA[iNdEx-1] < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return iNdEx, nil
 		case 1:
 			iNdEx += 8
 			return iNdEx, nil
 		case 2:
 			var length int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowObjects
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				length |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			iNdEx += length
-			if length < 0 ***REMOVED***
+			if length < 0 {
 				return 0, ErrInvalidLengthObjects
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 3:
-			for ***REMOVED***
+			for {
 				var innerWire uint64
 				var start int = iNdEx
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return 0, ErrIntOverflowObjects
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return 0, io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					innerWire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				innerWireType := int(innerWire & 0x7)
-				if innerWireType == 4 ***REMOVED***
+				if innerWireType == 4 {
 					break
-				***REMOVED***
+				}
 				next, err := skipObjects(dAtA[start:])
-				if err != nil ***REMOVED***
+				if err != nil {
 					return 0, err
-				***REMOVED***
+				}
 				iNdEx = start + next
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 4:
 			return iNdEx, nil
@@ -7739,19 +7739,19 @@ func skipObjects(dAtA []byte) (n int, err error) ***REMOVED***
 			return iNdEx, nil
 		default:
 			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	panic("unreachable")
-***REMOVED***
+}
 
 var (
 	ErrInvalidLengthObjects = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowObjects   = fmt.Errorf("proto: integer overflow")
 )
 
-func init() ***REMOVED*** proto.RegisterFile("github.com/docker/swarmkit/api/objects.proto", fileDescriptorObjects) ***REMOVED***
+func init() { proto.RegisterFile("github.com/docker/swarmkit/api/objects.proto", fileDescriptorObjects) }
 
-var fileDescriptorObjects = []byte***REMOVED***
+var fileDescriptorObjects = []byte{
 	// 1527 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x58, 0xcf, 0x6f, 0x1b, 0x4f,
 	0x15, 0xef, 0xda, 0x1b, 0xff, 0x78, 0x4e, 0x4c, 0x98, 0x86, 0xb0, 0x35, 0xc1, 0x0e, 0xae, 0x40,
@@ -7849,4 +7849,4 @@ var fileDescriptorObjects = []byte***REMOVED***
 	0xbf, 0xbe, 0xd4, 0x6f, 0x7c, 0x9c, 0xd4, 0x8d, 0xcf, 0x93, 0xba, 0xf1, 0x8f, 0x49, 0xdd, 0xf8,
 	0xf7, 0xa4, 0x6e, 0x1c, 0x14, 0x54, 0x7c, 0x7e, 0xf2, 0xbf, 0x00, 0x00, 0x00, 0xff, 0xff, 0xf9,
 	0xa1, 0x26, 0x54, 0x90, 0x13, 0x00, 0x00,
-***REMOVED***
+}

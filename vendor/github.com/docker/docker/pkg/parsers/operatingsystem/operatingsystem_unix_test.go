@@ -9,40 +9,40 @@ import (
 	"testing"
 )
 
-func TestGetOperatingSystem(t *testing.T) ***REMOVED***
+func TestGetOperatingSystem(t *testing.T) {
 	var backup = etcOsRelease
 
-	invalids := []struct ***REMOVED***
+	invalids := []struct {
 		content       string
 		errorExpected string
-	***REMOVED******REMOVED***
-		***REMOVED***
+	}{
+		{
 			`PRETTY_NAME=Source Mage GNU/Linux
 PRETTY_NAME=Ubuntu 14.04.LTS`,
 			"PRETTY_NAME needs to be enclosed by quotes if they have spaces: Source Mage GNU/Linux",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			`PRETTY_NAME="Ubuntu Linux
 PRETTY_NAME=Ubuntu 14.04.LTS`,
 			"PRETTY_NAME is invalid: invalid command line string",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			`PRETTY_NAME=Ubuntu'
 PRETTY_NAME=Ubuntu 14.04.LTS`,
 			"PRETTY_NAME is invalid: invalid command line string",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			`PRETTY_NAME'
 PRETTY_NAME=Ubuntu 14.04.LTS`,
 			"PRETTY_NAME needs to be enclosed by quotes if they have spaces: Ubuntu 14.04.LTS",
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
-	valids := []struct ***REMOVED***
+	valids := []struct {
 		content  string
 		expected string
-	***REMOVED******REMOVED***
-		***REMOVED***
+	}{
+		{
 			`NAME="Ubuntu"
 PRETTY_NAME_AGAIN="Ubuntu 14.04.LTS"
 VERSION="14.04, Trusty Tahr"
@@ -53,8 +53,8 @@ HOME_URL="http://www.ubuntu.com/"
 SUPPORT_URL="http://help.ubuntu.com/"
 BUG_REPORT_URL="http://bugs.launchpad.net/ubuntu/"`,
 			"Linux",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			`NAME="Ubuntu"
 VERSION="14.04, Trusty Tahr"
 ID=ubuntu
@@ -64,8 +64,8 @@ HOME_URL="http://www.ubuntu.com/"
 SUPPORT_URL="http://help.ubuntu.com/"
 BUG_REPORT_URL="http://bugs.launchpad.net/ubuntu/"`,
 			"Linux",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			`NAME=Gentoo
 ID=gentoo
 PRETTY_NAME="Gentoo/Linux"
@@ -75,8 +75,8 @@ SUPPORT_URL="http://www.gentoo.org/main/en/support.xml"
 BUG_REPORT_URL="https://bugs.gentoo.org/"
 `,
 			"Gentoo/Linux",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			`NAME="Ubuntu"
 VERSION="14.04, Trusty Tahr"
 ID=ubuntu
@@ -87,57 +87,57 @@ HOME_URL="http://www.ubuntu.com/"
 SUPPORT_URL="http://help.ubuntu.com/"
 BUG_REPORT_URL="http://bugs.launchpad.net/ubuntu/"`,
 			"Ubuntu 14.04 LTS",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			`NAME="Ubuntu"
 VERSION="14.04, Trusty Tahr"
 ID=ubuntu
 ID_LIKE=debian
 PRETTY_NAME='Ubuntu 14.04 LTS'`,
 			"Ubuntu 14.04 LTS",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			`PRETTY_NAME=Source
 NAME="Source Mage"`,
 			"Source",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			`PRETTY_NAME=Source
 PRETTY_NAME="Source Mage"`,
 			"Source Mage",
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
 	dir := os.TempDir()
 	etcOsRelease = filepath.Join(dir, "etcOsRelease")
 
-	defer func() ***REMOVED***
+	defer func() {
 		os.Remove(etcOsRelease)
 		etcOsRelease = backup
-	***REMOVED***()
+	}()
 
-	for _, elt := range invalids ***REMOVED***
-		if err := ioutil.WriteFile(etcOsRelease, []byte(elt.content), 0600); err != nil ***REMOVED***
+	for _, elt := range invalids {
+		if err := ioutil.WriteFile(etcOsRelease, []byte(elt.content), 0600); err != nil {
 			t.Fatalf("failed to write to %s: %v", etcOsRelease, err)
-		***REMOVED***
+		}
 		s, err := GetOperatingSystem()
-		if err == nil || err.Error() != elt.errorExpected ***REMOVED***
+		if err == nil || err.Error() != elt.errorExpected {
 			t.Fatalf("Expected an error %q, got %q (err: %v)", elt.errorExpected, s, err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	for _, elt := range valids ***REMOVED***
-		if err := ioutil.WriteFile(etcOsRelease, []byte(elt.content), 0600); err != nil ***REMOVED***
+	for _, elt := range valids {
+		if err := ioutil.WriteFile(etcOsRelease, []byte(elt.content), 0600); err != nil {
 			t.Fatalf("failed to write to %s: %v", etcOsRelease, err)
-		***REMOVED***
+		}
 		s, err := GetOperatingSystem()
-		if err != nil || s != elt.expected ***REMOVED***
+		if err != nil || s != elt.expected {
 			t.Fatalf("Expected %q, got %q (err: %v)", elt.expected, s, err)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestIsContainerized(t *testing.T) ***REMOVED***
+func TestIsContainerized(t *testing.T) {
 	var (
 		backup                                = proc1Cgroup
 		nonContainerizedProc1Cgroupsystemd226 = []byte(`9:memory:/init.scope
@@ -178,57 +178,57 @@ func TestIsContainerized(t *testing.T) ***REMOVED***
 	dir := os.TempDir()
 	proc1Cgroup = filepath.Join(dir, "proc1Cgroup")
 
-	defer func() ***REMOVED***
+	defer func() {
 		os.Remove(proc1Cgroup)
 		proc1Cgroup = backup
-	***REMOVED***()
+	}()
 
-	if err := ioutil.WriteFile(proc1Cgroup, nonContainerizedProc1Cgroup, 0600); err != nil ***REMOVED***
+	if err := ioutil.WriteFile(proc1Cgroup, nonContainerizedProc1Cgroup, 0600); err != nil {
 		t.Fatalf("failed to write to %s: %v", proc1Cgroup, err)
-	***REMOVED***
+	}
 	inContainer, err := IsContainerized()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if inContainer ***REMOVED***
+	}
+	if inContainer {
 		t.Fatal("Wrongly assuming containerized")
-	***REMOVED***
+	}
 
-	if err := ioutil.WriteFile(proc1Cgroup, nonContainerizedProc1Cgroupsystemd226, 0600); err != nil ***REMOVED***
+	if err := ioutil.WriteFile(proc1Cgroup, nonContainerizedProc1Cgroupsystemd226, 0600); err != nil {
 		t.Fatalf("failed to write to %s: %v", proc1Cgroup, err)
-	***REMOVED***
+	}
 	inContainer, err = IsContainerized()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if inContainer ***REMOVED***
+	}
+	if inContainer {
 		t.Fatal("Wrongly assuming containerized for systemd /init.scope cgroup layout")
-	***REMOVED***
+	}
 
-	if err := ioutil.WriteFile(proc1Cgroup, containerizedProc1Cgroup, 0600); err != nil ***REMOVED***
+	if err := ioutil.WriteFile(proc1Cgroup, containerizedProc1Cgroup, 0600); err != nil {
 		t.Fatalf("failed to write to %s: %v", proc1Cgroup, err)
-	***REMOVED***
+	}
 	inContainer, err = IsContainerized()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if !inContainer ***REMOVED***
+	}
+	if !inContainer {
 		t.Fatal("Wrongly assuming non-containerized")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestOsReleaseFallback(t *testing.T) ***REMOVED***
+func TestOsReleaseFallback(t *testing.T) {
 	var backup = etcOsRelease
 	var altBackup = altOsRelease
 	dir := os.TempDir()
 	etcOsRelease = filepath.Join(dir, "etcOsRelease")
 	altOsRelease = filepath.Join(dir, "altOsRelease")
 
-	defer func() ***REMOVED***
+	defer func() {
 		os.Remove(dir)
 		etcOsRelease = backup
 		altOsRelease = altBackup
-	***REMOVED***()
+	}()
 	content := `NAME=Gentoo
 ID=gentoo
 PRETTY_NAME="Gentoo/Linux"
@@ -237,11 +237,11 @@ HOME_URL="http://www.gentoo.org/"
 SUPPORT_URL="http://www.gentoo.org/main/en/support.xml"
 BUG_REPORT_URL="https://bugs.gentoo.org/"
 `
-	if err := ioutil.WriteFile(altOsRelease, []byte(content), 0600); err != nil ***REMOVED***
+	if err := ioutil.WriteFile(altOsRelease, []byte(content), 0600); err != nil {
 		t.Fatalf("failed to write to %s: %v", etcOsRelease, err)
-	***REMOVED***
+	}
 	s, err := GetOperatingSystem()
-	if err != nil || s != "Gentoo/Linux" ***REMOVED***
+	if err != nil || s != "Gentoo/Linux" {
 		t.Fatalf("Expected %q, got %q (err: %v)", "Gentoo/Linux", s, err)
-	***REMOVED***
-***REMOVED***
+	}
+}

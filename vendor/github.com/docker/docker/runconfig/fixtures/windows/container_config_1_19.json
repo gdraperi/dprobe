@@ -1,4 +1,4 @@
-***REMOVED***
+{
      "Hostname": "",
      "Domainname": "",
      "User": "",
@@ -14,29 +14,29 @@
      ],
      "Entrypoint": "cmd",
      "Image": "windows",
-     "Labels": ***REMOVED***
+     "Labels": {
              "com.example.vendor": "Acme",
              "com.example.license": "GPL",
              "com.example.version": "1.0"
- ***REMOVED***,
-     "Volumes": ***REMOVED***
-             "c:/windows": ***REMOVED******REMOVED***
- ***REMOVED***,
+     },
+     "Volumes": {
+             "c:/windows": {}
+     },
      "WorkingDir": "",
      "NetworkDisabled": false,
      "MacAddress": "12:34:56:78:9a:bc",
-     "ExposedPorts": ***REMOVED***
-             "22/tcp": ***REMOVED******REMOVED***
- ***REMOVED***,
-     "HostConfig": ***REMOVED***
+     "ExposedPorts": {
+             "22/tcp": {}
+     },
+     "HostConfig": {
        "Binds": ["c:/windows:d:/tmp"],
        "Links": ["redis3:redis"],
-       "LxcConf": ***REMOVED***"lxc.utsname":"docker"***REMOVED***,
+       "LxcConf": {"lxc.utsname":"docker"},
        "Memory": 1000,
        "MemorySwap": 0,
        "CpuShares": 512,
        "CpusetCpus": "0,1",
-       "PortBindings": ***REMOVED*** "22/tcp": [***REMOVED*** "HostPort": "11022" ***REMOVED***] ***REMOVED***,
+       "PortBindings": { "22/tcp": [{ "HostPort": "11022" }] },
        "PublishAllPorts": false,
        "Privileged": false,
        "ReadonlyRootfs": false,
@@ -47,12 +47,12 @@
        "VolumesFrom": ["parent", "other:ro"],
        "CapAdd": ["NET_ADMIN"],
        "CapDrop": ["MKNOD"],
-       "RestartPolicy": ***REMOVED*** "Name": "", "MaximumRetryCount": 0 ***REMOVED***,
+       "RestartPolicy": { "Name": "", "MaximumRetryCount": 0 },
        "NetworkMode": "default",
        "Devices": [],
-       "Ulimits": [***REMOVED******REMOVED***],
-       "LogConfig": ***REMOVED*** "Type": "json-file", "Config": ***REMOVED******REMOVED*** ***REMOVED***,
+       "Ulimits": [{}],
+       "LogConfig": { "Type": "json-file", "Config": {} },
        "SecurityOpt": [""],
        "CgroupParent": ""
-***REMOVED***
-***REMOVED***
+    }
+}

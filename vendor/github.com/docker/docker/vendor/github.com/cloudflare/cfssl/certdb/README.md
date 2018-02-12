@@ -64,12 +64,12 @@ To tear down a SQLite DB using goose
 Several cfssl commands take a -db-config flag. Create a file with a
 JSON dictionary:
 
-    ***REMOVED***"driver":"sqlite3","data_source":"certs.db"***REMOVED***
+    {"driver":"sqlite3","data_source":"certs.db"}
 
 or
 
-    ***REMOVED***"driver":"postgres","data_source":"postgres://user:password@host/db"***REMOVED***
+    {"driver":"postgres","data_source":"postgres://user:password@host/db"}
  
 or
 
-    ***REMOVED***"driver":"mysql","data_source":"user:password@tcp(hostname:3306)/db?parseTime=true"***REMOVED***
+    {"driver":"mysql","data_source":"user:password@tcp(hostname:3306)/db?parseTime=true"}

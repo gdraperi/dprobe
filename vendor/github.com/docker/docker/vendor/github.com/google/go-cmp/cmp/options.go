@@ -22,7 +22,7 @@ import (
 //
 // The cmp/cmpopts package provides helper functions for creating options that
 // may be used with Equal and Diff.
-type Option interface ***REMOVED***
+type Option interface {
 	// filter applies all filters and returns the option that remains.
 	// Each option may only read s.curPath and call s.callTTBFunc.
 	//
@@ -30,30 +30,30 @@ type Option interface ***REMOVED***
 	// can apply simultaneously and will only contain values of those types
 	// or sub-Options containing values of those types.
 	filter(s *state, vx, vy reflect.Value, t reflect.Type) applicableOption
-***REMOVED***
+}
 
 // applicableOption represents the following types:
 //	Fundamental: ignore | invalid | *comparer | *transformer
 //	Grouping:    Options
-type applicableOption interface ***REMOVED***
+type applicableOption interface {
 	Option
 
 	// apply executes the option and reports whether the option was applied.
 	// Each option may mutate s.
 	apply(s *state, vx, vy reflect.Value) bool
-***REMOVED***
+}
 
 // coreOption represents the following types:
 //	Fundamental: ignore | invalid | *comparer | *transformer
 //	Filters:     *pathFilter | *valuesFilter
-type coreOption interface ***REMOVED***
+type coreOption interface {
 	Option
 	isCore()
-***REMOVED***
+}
 
-type core struct***REMOVED******REMOVED***
+type core struct{}
 
-func (core) isCore() ***REMOVED******REMOVED***
+func (core) isCore() {}
 
 // Options is a list of Option values that also satisfies the Option interface.
 // Helper comparison packages may return an Options value when packing multiple
@@ -64,78 +64,78 @@ func (core) isCore() ***REMOVED******REMOVED***
 // on all individual options held within.
 type Options []Option
 
-func (opts Options) filter(s *state, vx, vy reflect.Value, t reflect.Type) (out applicableOption) ***REMOVED***
-	for _, opt := range opts ***REMOVED***
-		switch opt := opt.filter(s, vx, vy, t); opt.(type) ***REMOVED***
+func (opts Options) filter(s *state, vx, vy reflect.Value, t reflect.Type) (out applicableOption) {
+	for _, opt := range opts {
+		switch opt := opt.filter(s, vx, vy, t); opt.(type) {
 		case ignore:
-			return ignore***REMOVED******REMOVED*** // Only ignore can short-circuit evaluation
+			return ignore{} // Only ignore can short-circuit evaluation
 		case invalid:
-			out = invalid***REMOVED******REMOVED*** // Takes precedence over comparer or transformer
+			out = invalid{} // Takes precedence over comparer or transformer
 		case *comparer, *transformer, Options:
-			switch out.(type) ***REMOVED***
+			switch out.(type) {
 			case nil:
 				out = opt
 			case invalid:
 				// Keep invalid
 			case *comparer, *transformer, Options:
-				out = Options***REMOVED***out, opt***REMOVED*** // Conflicting comparers or transformers
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+				out = Options{out, opt} // Conflicting comparers or transformers
+			}
+		}
+	}
 	return out
-***REMOVED***
+}
 
-func (opts Options) apply(s *state, _, _ reflect.Value) bool ***REMOVED***
+func (opts Options) apply(s *state, _, _ reflect.Value) bool {
 	const warning = "ambiguous set of applicable options"
 	const help = "consider using filters to ensure at most one Comparer or Transformer may apply"
 	var ss []string
-	for _, opt := range flattenOptions(nil, opts) ***REMOVED***
+	for _, opt := range flattenOptions(nil, opts) {
 		ss = append(ss, fmt.Sprint(opt))
-	***REMOVED***
+	}
 	set := strings.Join(ss, "\n\t")
 	panic(fmt.Sprintf("%s at %#v:\n\t%s\n%s", warning, s.curPath, set, help))
-***REMOVED***
+}
 
-func (opts Options) String() string ***REMOVED***
+func (opts Options) String() string {
 	var ss []string
-	for _, opt := range opts ***REMOVED***
+	for _, opt := range opts {
 		ss = append(ss, fmt.Sprint(opt))
-	***REMOVED***
-	return fmt.Sprintf("Options***REMOVED***%s***REMOVED***", strings.Join(ss, ", "))
-***REMOVED***
+	}
+	return fmt.Sprintf("Options{%s}", strings.Join(ss, ", "))
+}
 
 // FilterPath returns a new Option where opt is only evaluated if filter f
 // returns true for the current Path in the value tree.
 //
 // The option passed in may be an Ignore, Transformer, Comparer, Options, or
 // a previously filtered Option.
-func FilterPath(f func(Path) bool, opt Option) Option ***REMOVED***
-	if f == nil ***REMOVED***
+func FilterPath(f func(Path) bool, opt Option) Option {
+	if f == nil {
 		panic("invalid path filter function")
-	***REMOVED***
-	if opt := normalizeOption(opt); opt != nil ***REMOVED***
-		return &pathFilter***REMOVED***fnc: f, opt: opt***REMOVED***
-	***REMOVED***
+	}
+	if opt := normalizeOption(opt); opt != nil {
+		return &pathFilter{fnc: f, opt: opt}
+	}
 	return nil
-***REMOVED***
+}
 
-type pathFilter struct ***REMOVED***
+type pathFilter struct {
 	core
 	fnc func(Path) bool
 	opt Option
-***REMOVED***
+}
 
-func (f pathFilter) filter(s *state, vx, vy reflect.Value, t reflect.Type) applicableOption ***REMOVED***
-	if f.fnc(s.curPath) ***REMOVED***
+func (f pathFilter) filter(s *state, vx, vy reflect.Value, t reflect.Type) applicableOption {
+	if f.fnc(s.curPath) {
 		return f.opt.filter(s, vx, vy, t)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (f pathFilter) String() string ***REMOVED***
+func (f pathFilter) String() string {
 	fn := getFuncName(reflect.ValueOf(f.fnc).Pointer())
 	return fmt.Sprintf("FilterPath(%s, %v)", fn, f.opt)
-***REMOVED***
+}
 
 // FilterValues returns a new Option where opt is only evaluated if filter f,
 // which is a function of the form "func(T, T) bool", returns true for the
@@ -150,64 +150,64 @@ func (f pathFilter) String() string ***REMOVED***
 //
 // The option passed in may be an Ignore, Transformer, Comparer, Options, or
 // a previously filtered Option.
-func FilterValues(f interface***REMOVED******REMOVED***, opt Option) Option ***REMOVED***
+func FilterValues(f interface{}, opt Option) Option {
 	v := reflect.ValueOf(f)
-	if !function.IsType(v.Type(), function.ValueFilter) || v.IsNil() ***REMOVED***
+	if !function.IsType(v.Type(), function.ValueFilter) || v.IsNil() {
 		panic(fmt.Sprintf("invalid values filter function: %T", f))
-	***REMOVED***
-	if opt := normalizeOption(opt); opt != nil ***REMOVED***
-		vf := &valuesFilter***REMOVED***fnc: v, opt: opt***REMOVED***
-		if ti := v.Type().In(0); ti.Kind() != reflect.Interface || ti.NumMethod() > 0 ***REMOVED***
+	}
+	if opt := normalizeOption(opt); opt != nil {
+		vf := &valuesFilter{fnc: v, opt: opt}
+		if ti := v.Type().In(0); ti.Kind() != reflect.Interface || ti.NumMethod() > 0 {
 			vf.typ = ti
-		***REMOVED***
+		}
 		return vf
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-type valuesFilter struct ***REMOVED***
+type valuesFilter struct {
 	core
 	typ reflect.Type  // T
 	fnc reflect.Value // func(T, T) bool
 	opt Option
-***REMOVED***
+}
 
-func (f valuesFilter) filter(s *state, vx, vy reflect.Value, t reflect.Type) applicableOption ***REMOVED***
-	if !vx.IsValid() || !vy.IsValid() ***REMOVED***
-		return invalid***REMOVED******REMOVED***
-	***REMOVED***
-	if (f.typ == nil || t.AssignableTo(f.typ)) && s.callTTBFunc(f.fnc, vx, vy) ***REMOVED***
+func (f valuesFilter) filter(s *state, vx, vy reflect.Value, t reflect.Type) applicableOption {
+	if !vx.IsValid() || !vy.IsValid() {
+		return invalid{}
+	}
+	if (f.typ == nil || t.AssignableTo(f.typ)) && s.callTTBFunc(f.fnc, vx, vy) {
 		return f.opt.filter(s, vx, vy, t)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (f valuesFilter) String() string ***REMOVED***
+func (f valuesFilter) String() string {
 	fn := getFuncName(f.fnc.Pointer())
 	return fmt.Sprintf("FilterValues(%s, %v)", fn, f.opt)
-***REMOVED***
+}
 
 // Ignore is an Option that causes all comparisons to be ignored.
 // This value is intended to be combined with FilterPath or FilterValues.
 // It is an error to pass an unfiltered Ignore option to Equal.
-func Ignore() Option ***REMOVED*** return ignore***REMOVED******REMOVED*** ***REMOVED***
+func Ignore() Option { return ignore{} }
 
-type ignore struct***REMOVED*** core ***REMOVED***
+type ignore struct{ core }
 
-func (ignore) isFiltered() bool                                                     ***REMOVED*** return false ***REMOVED***
-func (ignore) filter(_ *state, _, _ reflect.Value, _ reflect.Type) applicableOption ***REMOVED*** return ignore***REMOVED******REMOVED*** ***REMOVED***
-func (ignore) apply(_ *state, _, _ reflect.Value) bool                              ***REMOVED*** return true ***REMOVED***
-func (ignore) String() string                                                       ***REMOVED*** return "Ignore()" ***REMOVED***
+func (ignore) isFiltered() bool                                                     { return false }
+func (ignore) filter(_ *state, _, _ reflect.Value, _ reflect.Type) applicableOption { return ignore{} }
+func (ignore) apply(_ *state, _, _ reflect.Value) bool                              { return true }
+func (ignore) String() string                                                       { return "Ignore()" }
 
 // invalid is a sentinel Option type to indicate that some options could not
 // be evaluated due to unexported fields.
-type invalid struct***REMOVED*** core ***REMOVED***
+type invalid struct{ core }
 
-func (invalid) filter(_ *state, _, _ reflect.Value, _ reflect.Type) applicableOption ***REMOVED*** return invalid***REMOVED******REMOVED*** ***REMOVED***
-func (invalid) apply(s *state, _, _ reflect.Value) bool ***REMOVED***
+func (invalid) filter(_ *state, _, _ reflect.Value, _ reflect.Type) applicableOption { return invalid{} }
+func (invalid) apply(s *state, _, _ reflect.Value) bool {
 	const help = "consider using AllowUnexported or cmpopts.IgnoreUnexported"
 	panic(fmt.Sprintf("cannot handle unexported field: %#v\n%s", s.curPath, help))
-***REMOVED***
+}
 
 // Transformer returns an Option that applies a transformation function that
 // converts values of a certain type into that of another.
@@ -221,55 +221,55 @@ func (invalid) apply(s *state, _, _ reflect.Value) bool ***REMOVED***
 //
 // The name is a user provided label that is used as the Transform.Name in the
 // transformation PathStep. If empty, an arbitrary name is used.
-func Transformer(name string, f interface***REMOVED******REMOVED***) Option ***REMOVED***
+func Transformer(name string, f interface{}) Option {
 	v := reflect.ValueOf(f)
-	if !function.IsType(v.Type(), function.Transformer) || v.IsNil() ***REMOVED***
+	if !function.IsType(v.Type(), function.Transformer) || v.IsNil() {
 		panic(fmt.Sprintf("invalid transformer function: %T", f))
-	***REMOVED***
-	if name == "" ***REMOVED***
+	}
+	if name == "" {
 		name = "λ" // Lambda-symbol as place-holder for anonymous transformer
-	***REMOVED***
-	if !isValid(name) ***REMOVED***
+	}
+	if !isValid(name) {
 		panic(fmt.Sprintf("invalid name: %q", name))
-	***REMOVED***
-	tr := &transformer***REMOVED***name: name, fnc: reflect.ValueOf(f)***REMOVED***
-	if ti := v.Type().In(0); ti.Kind() != reflect.Interface || ti.NumMethod() > 0 ***REMOVED***
+	}
+	tr := &transformer{name: name, fnc: reflect.ValueOf(f)}
+	if ti := v.Type().In(0); ti.Kind() != reflect.Interface || ti.NumMethod() > 0 {
 		tr.typ = ti
-	***REMOVED***
+	}
 	return tr
-***REMOVED***
+}
 
-type transformer struct ***REMOVED***
+type transformer struct {
 	core
 	name string
 	typ  reflect.Type  // T
 	fnc  reflect.Value // func(T) R
-***REMOVED***
+}
 
-func (tr *transformer) isFiltered() bool ***REMOVED*** return tr.typ != nil ***REMOVED***
+func (tr *transformer) isFiltered() bool { return tr.typ != nil }
 
-func (tr *transformer) filter(_ *state, _, _ reflect.Value, t reflect.Type) applicableOption ***REMOVED***
-	if tr.typ == nil || t.AssignableTo(tr.typ) ***REMOVED***
+func (tr *transformer) filter(_ *state, _, _ reflect.Value, t reflect.Type) applicableOption {
+	if tr.typ == nil || t.AssignableTo(tr.typ) {
 		return tr
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (tr *transformer) apply(s *state, vx, vy reflect.Value) bool ***REMOVED***
+func (tr *transformer) apply(s *state, vx, vy reflect.Value) bool {
 	// Update path before calling the Transformer so that dynamic checks
 	// will use the updated path.
-	s.curPath.push(&transform***REMOVED***pathStep***REMOVED***tr.fnc.Type().Out(0)***REMOVED***, tr***REMOVED***)
+	s.curPath.push(&transform{pathStep{tr.fnc.Type().Out(0)}, tr})
 	defer s.curPath.pop()
 
 	vx = s.callTRFunc(tr.fnc, vx)
 	vy = s.callTRFunc(tr.fnc, vy)
 	s.compareAny(vx, vy)
 	return true
-***REMOVED***
+}
 
-func (tr transformer) String() string ***REMOVED***
+func (tr transformer) String() string {
 	return fmt.Sprintf("Transformer(%s, %s)", tr.name, getFuncName(tr.fnc.Pointer()))
-***REMOVED***
+}
 
 // Comparer returns an Option that determines whether two values are equal
 // to each other.
@@ -283,42 +283,42 @@ func (tr transformer) String() string ***REMOVED***
 //	• Symmetric: equal(x, y) == equal(y, x)
 //	• Deterministic: equal(x, y) == equal(x, y)
 //	• Pure: equal(x, y) does not modify x or y
-func Comparer(f interface***REMOVED******REMOVED***) Option ***REMOVED***
+func Comparer(f interface{}) Option {
 	v := reflect.ValueOf(f)
-	if !function.IsType(v.Type(), function.Equal) || v.IsNil() ***REMOVED***
+	if !function.IsType(v.Type(), function.Equal) || v.IsNil() {
 		panic(fmt.Sprintf("invalid comparer function: %T", f))
-	***REMOVED***
-	cm := &comparer***REMOVED***fnc: v***REMOVED***
-	if ti := v.Type().In(0); ti.Kind() != reflect.Interface || ti.NumMethod() > 0 ***REMOVED***
+	}
+	cm := &comparer{fnc: v}
+	if ti := v.Type().In(0); ti.Kind() != reflect.Interface || ti.NumMethod() > 0 {
 		cm.typ = ti
-	***REMOVED***
+	}
 	return cm
-***REMOVED***
+}
 
-type comparer struct ***REMOVED***
+type comparer struct {
 	core
 	typ reflect.Type  // T
 	fnc reflect.Value // func(T, T) bool
-***REMOVED***
+}
 
-func (cm *comparer) isFiltered() bool ***REMOVED*** return cm.typ != nil ***REMOVED***
+func (cm *comparer) isFiltered() bool { return cm.typ != nil }
 
-func (cm *comparer) filter(_ *state, _, _ reflect.Value, t reflect.Type) applicableOption ***REMOVED***
-	if cm.typ == nil || t.AssignableTo(cm.typ) ***REMOVED***
+func (cm *comparer) filter(_ *state, _, _ reflect.Value, t reflect.Type) applicableOption {
+	if cm.typ == nil || t.AssignableTo(cm.typ) {
 		return cm
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (cm *comparer) apply(s *state, vx, vy reflect.Value) bool ***REMOVED***
+func (cm *comparer) apply(s *state, vx, vy reflect.Value) bool {
 	eq := s.callTTBFunc(cm.fnc, vx, vy)
 	s.report(eq, vx, vy)
 	return true
-***REMOVED***
+}
 
-func (cm comparer) String() string ***REMOVED***
+func (cm comparer) String() string {
 	return fmt.Sprintf("Comparer(%s)", getFuncName(cm.fnc.Pointer()))
-***REMOVED***
+}
 
 // AllowUnexported returns an Option that forcibly allows operations on
 // unexported fields in certain structs, which are specified by passing in a
@@ -341,34 +341,34 @@ func (cm comparer) String() string ***REMOVED***
 // in only checking that the regular expression strings are equal.
 // Both of these are accomplished using Comparers:
 //
-//	Comparer(func(x, y reflect.Type) bool ***REMOVED*** return x == y ***REMOVED***)
-//	Comparer(func(x, y *regexp.Regexp) bool ***REMOVED*** return x.String() == y.String() ***REMOVED***)
+//	Comparer(func(x, y reflect.Type) bool { return x == y })
+//	Comparer(func(x, y *regexp.Regexp) bool { return x.String() == y.String() })
 //
 // In other cases, the cmpopts.IgnoreUnexported option can be used to ignore
 // all unexported fields on specified struct types.
-func AllowUnexported(types ...interface***REMOVED******REMOVED***) Option ***REMOVED***
-	if !supportAllowUnexported ***REMOVED***
+func AllowUnexported(types ...interface{}) Option {
+	if !supportAllowUnexported {
 		panic("AllowUnexported is not supported on App Engine Classic or GopherJS")
-	***REMOVED***
+	}
 	m := make(map[reflect.Type]bool)
-	for _, typ := range types ***REMOVED***
+	for _, typ := range types {
 		t := reflect.TypeOf(typ)
-		if t.Kind() != reflect.Struct ***REMOVED***
+		if t.Kind() != reflect.Struct {
 			panic(fmt.Sprintf("invalid struct type: %T", typ))
-		***REMOVED***
+		}
 		m[t] = true
-	***REMOVED***
+	}
 	return visibleStructs(m)
-***REMOVED***
+}
 
 type visibleStructs map[reflect.Type]bool
 
-func (visibleStructs) filter(_ *state, _, _ reflect.Value, _ reflect.Type) applicableOption ***REMOVED***
+func (visibleStructs) filter(_ *state, _, _ reflect.Value, _ reflect.Type) applicableOption {
 	panic("not implemented")
-***REMOVED***
+}
 
 // reporter is an Option that configures how differences are reported.
-type reporter interface ***REMOVED***
+type reporter interface {
 	// TODO: Not exported yet.
 	//
 	// Perhaps add PushStep and PopStep and change Report to only accept
@@ -384,27 +384,27 @@ type reporter interface ***REMOVED***
 	// invalid reflect.Value if one of the values is non-existent;
 	// which is possible with maps and slices.
 	Report(x, y reflect.Value, eq bool, p Path)
-***REMOVED***
+}
 
 // normalizeOption normalizes the input options such that all Options groups
 // are flattened and groups with a single element are reduced to that element.
 // Only coreOptions and Options containing coreOptions are allowed.
-func normalizeOption(src Option) Option ***REMOVED***
-	switch opts := flattenOptions(nil, Options***REMOVED***src***REMOVED***); len(opts) ***REMOVED***
+func normalizeOption(src Option) Option {
+	switch opts := flattenOptions(nil, Options{src}); len(opts) {
 	case 0:
 		return nil
 	case 1:
 		return opts[0]
 	default:
 		return opts
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // flattenOptions copies all options in src to dst as a flat list.
 // Only coreOptions and Options containing coreOptions are allowed.
-func flattenOptions(dst, src Options) Options ***REMOVED***
-	for _, opt := range src ***REMOVED***
-		switch opt := opt.(type) ***REMOVED***
+func flattenOptions(dst, src Options) Options {
+	for _, opt := range src {
+		switch opt := opt.(type) {
 		case nil:
 			continue
 		case Options:
@@ -413,34 +413,34 @@ func flattenOptions(dst, src Options) Options ***REMOVED***
 			dst = append(dst, opt)
 		default:
 			panic(fmt.Sprintf("invalid option type: %T", opt))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return dst
-***REMOVED***
+}
 
 // getFuncName returns a short function name from the pointer.
 // The string parsing logic works up until Go1.9.
-func getFuncName(p uintptr) string ***REMOVED***
+func getFuncName(p uintptr) string {
 	fnc := runtime.FuncForPC(p)
-	if fnc == nil ***REMOVED***
+	if fnc == nil {
 		return "<unknown>"
-	***REMOVED***
+	}
 	name := fnc.Name() // E.g., "long/path/name/mypkg.(mytype).(long/path/name/mypkg.myfunc)-fm"
-	if strings.HasSuffix(name, ")-fm") || strings.HasSuffix(name, ")·fm") ***REMOVED***
+	if strings.HasSuffix(name, ")-fm") || strings.HasSuffix(name, ")·fm") {
 		// Strip the package name from method name.
 		name = strings.TrimSuffix(name, ")-fm")
 		name = strings.TrimSuffix(name, ")·fm")
-		if i := strings.LastIndexByte(name, '('); i >= 0 ***REMOVED***
+		if i := strings.LastIndexByte(name, '('); i >= 0 {
 			methodName := name[i+1:] // E.g., "long/path/name/mypkg.myfunc"
-			if j := strings.LastIndexByte(methodName, '.'); j >= 0 ***REMOVED***
+			if j := strings.LastIndexByte(methodName, '.'); j >= 0 {
 				methodName = methodName[j+1:] // E.g., "myfunc"
-			***REMOVED***
+			}
 			name = name[:i] + methodName // E.g., "long/path/name/mypkg.(mytype)." + "myfunc"
-		***REMOVED***
-	***REMOVED***
-	if i := strings.LastIndexByte(name, '/'); i >= 0 ***REMOVED***
+		}
+	}
+	if i := strings.LastIndexByte(name, '/'); i >= 0 {
 		// Strip the package name.
 		name = name[i+1:] // E.g., "mypkg.(mytype).myfunc"
-	***REMOVED***
+	}
 	return name
-***REMOVED***
+}

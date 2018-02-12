@@ -25,73 +25,73 @@ const frozenImgDir = "/docker-frozen-images"
 // TODO: This loads whatever is in the frozen image dir, regardless of what
 // images were passed in. If the images need to be downloaded, then it will respect
 // the passed in images
-func FrozenImagesLinux(client client.APIClient, images ...string) error ***REMOVED***
-	var loadImages []struct***REMOVED*** srcName, destName string ***REMOVED***
-	for _, img := range images ***REMOVED***
-		if !imageExists(client, img) ***REMOVED***
+func FrozenImagesLinux(client client.APIClient, images ...string) error {
+	var loadImages []struct{ srcName, destName string }
+	for _, img := range images {
+		if !imageExists(client, img) {
 			srcName := img
 			// hello-world:latest gets re-tagged as hello-world:frozen
 			// there are some tests that use hello-world:latest specifically so it pulls
 			// the image and hello-world:frozen is used for when we just want a super
 			// small image
-			if img == "hello-world:frozen" ***REMOVED***
+			if img == "hello-world:frozen" {
 				srcName = "hello-world:latest"
-			***REMOVED***
-			loadImages = append(loadImages, struct***REMOVED*** srcName, destName string ***REMOVED******REMOVED***
+			}
+			loadImages = append(loadImages, struct{ srcName, destName string }{
 				srcName:  srcName,
 				destName: img,
-			***REMOVED***)
-		***REMOVED***
-	***REMOVED***
-	if len(loadImages) == 0 ***REMOVED***
+			})
+		}
+	}
+	if len(loadImages) == 0 {
 		// everything is loaded, we're done
 		return nil
-	***REMOVED***
+	}
 
 	ctx := context.Background()
 	fi, err := os.Stat(frozenImgDir)
-	if err != nil || !fi.IsDir() ***REMOVED***
+	if err != nil || !fi.IsDir() {
 		srcImages := make([]string, 0, len(loadImages))
-		for _, img := range loadImages ***REMOVED***
+		for _, img := range loadImages {
 			srcImages = append(srcImages, img.srcName)
-		***REMOVED***
-		if err := pullImages(ctx, client, srcImages); err != nil ***REMOVED***
+		}
+		if err := pullImages(ctx, client, srcImages); err != nil {
 			return errors.Wrap(err, "error pulling image list")
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
-		if err := loadFrozenImages(ctx, client); err != nil ***REMOVED***
+		}
+	} else {
+		if err := loadFrozenImages(ctx, client); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	for _, img := range loadImages ***REMOVED***
-		if img.srcName != img.destName ***REMOVED***
-			if err := client.ImageTag(ctx, img.srcName, img.destName); err != nil ***REMOVED***
+	for _, img := range loadImages {
+		if img.srcName != img.destName {
+			if err := client.ImageTag(ctx, img.srcName, img.destName); err != nil {
 				return errors.Wrapf(err, "failed to tag %s as %s", img.srcName, img.destName)
-			***REMOVED***
-			if _, err := client.ImageRemove(ctx, img.srcName, types.ImageRemoveOptions***REMOVED******REMOVED***); err != nil ***REMOVED***
+			}
+			if _, err := client.ImageRemove(ctx, img.srcName, types.ImageRemoveOptions{}); err != nil {
 				return errors.Wrapf(err, "failed to remove %s", img.srcName)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func imageExists(client client.APIClient, name string) bool ***REMOVED***
+func imageExists(client client.APIClient, name string) bool {
 	_, _, err := client.ImageInspectWithRaw(context.Background(), name)
 	return err == nil
-***REMOVED***
+}
 
-func loadFrozenImages(ctx context.Context, client client.APIClient) error ***REMOVED***
+func loadFrozenImages(ctx context.Context, client client.APIClient) error {
 	tar, err := exec.LookPath("tar")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return errors.Wrap(err, "could not find tar binary")
-	***REMOVED***
+	}
 	tarCmd := exec.Command(tar, "-cC", frozenImgDir, ".")
 	out, err := tarCmd.StdoutPipe()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return errors.Wrap(err, "error getting stdout pipe for tar command")
-	***REMOVED***
+	}
 
 	errBuf := bytes.NewBuffer(nil)
 	tarCmd.Stderr = errBuf
@@ -99,99 +99,99 @@ func loadFrozenImages(ctx context.Context, client client.APIClient) error ***REM
 	defer tarCmd.Wait()
 
 	resp, err := client.ImageLoad(ctx, out, true)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return errors.Wrap(err, "failed to load frozen images")
-	***REMOVED***
+	}
 	defer resp.Body.Close()
 	fd, isTerminal := term.GetFdInfo(os.Stdout)
 	return jsonmessage.DisplayJSONMessagesStream(resp.Body, os.Stdout, fd, isTerminal, nil)
-***REMOVED***
+}
 
-func pullImages(ctx context.Context, client client.APIClient, images []string) error ***REMOVED***
+func pullImages(ctx context.Context, client client.APIClient, images []string) error {
 	cwd, err := os.Getwd()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return errors.Wrap(err, "error getting path to dockerfile")
-	***REMOVED***
+	}
 	dockerfile := os.Getenv("DOCKERFILE")
-	if dockerfile == "" ***REMOVED***
+	if dockerfile == "" {
 		dockerfile = "Dockerfile"
-	***REMOVED***
+	}
 	dockerfilePath := filepath.Join(filepath.Dir(filepath.Clean(cwd)), dockerfile)
 	pullRefs, err := readFrozenImageList(dockerfilePath, images)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return errors.Wrap(err, "error reading frozen image list")
-	***REMOVED***
+	}
 
 	var wg sync.WaitGroup
 	chErr := make(chan error, len(images))
-	for tag, ref := range pullRefs ***REMOVED***
+	for tag, ref := range pullRefs {
 		wg.Add(1)
-		go func(tag, ref string) ***REMOVED***
+		go func(tag, ref string) {
 			defer wg.Done()
-			if err := pullTagAndRemove(ctx, client, ref, tag); err != nil ***REMOVED***
+			if err := pullTagAndRemove(ctx, client, ref, tag); err != nil {
 				chErr <- err
 				return
-			***REMOVED***
-		***REMOVED***(tag, ref)
-	***REMOVED***
+			}
+		}(tag, ref)
+	}
 	wg.Wait()
 	close(chErr)
 	return <-chErr
-***REMOVED***
+}
 
-func pullTagAndRemove(ctx context.Context, client client.APIClient, ref string, tag string) error ***REMOVED***
-	resp, err := client.ImagePull(ctx, ref, types.ImagePullOptions***REMOVED******REMOVED***)
-	if err != nil ***REMOVED***
+func pullTagAndRemove(ctx context.Context, client client.APIClient, ref string, tag string) error {
+	resp, err := client.ImagePull(ctx, ref, types.ImagePullOptions{})
+	if err != nil {
 		return errors.Wrapf(err, "failed to pull %s", ref)
-	***REMOVED***
+	}
 	defer resp.Close()
 	fd, isTerminal := term.GetFdInfo(os.Stdout)
-	if err := jsonmessage.DisplayJSONMessagesStream(resp, os.Stdout, fd, isTerminal, nil); err != nil ***REMOVED***
+	if err := jsonmessage.DisplayJSONMessagesStream(resp, os.Stdout, fd, isTerminal, nil); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if err := client.ImageTag(ctx, ref, tag); err != nil ***REMOVED***
+	if err := client.ImageTag(ctx, ref, tag); err != nil {
 		return errors.Wrapf(err, "failed to tag %s as %s", ref, tag)
-	***REMOVED***
-	_, err = client.ImageRemove(ctx, ref, types.ImageRemoveOptions***REMOVED******REMOVED***)
+	}
+	_, err = client.ImageRemove(ctx, ref, types.ImageRemoveOptions{})
 	return errors.Wrapf(err, "failed to remove %s", ref)
 
-***REMOVED***
+}
 
-func readFrozenImageList(dockerfilePath string, images []string) (map[string]string, error) ***REMOVED***
+func readFrozenImageList(dockerfilePath string, images []string) (map[string]string, error) {
 	f, err := os.Open(dockerfilePath)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, errors.Wrap(err, "error reading dockerfile")
-	***REMOVED***
+	}
 	defer f.Close()
 	ls := make(map[string]string)
 
 	scanner := bufio.NewScanner(f)
-	for scanner.Scan() ***REMOVED***
+	for scanner.Scan() {
 		line := strings.Fields(scanner.Text())
-		if len(line) < 3 ***REMOVED***
+		if len(line) < 3 {
 			continue
-		***REMOVED***
-		if !(line[0] == "RUN" && line[1] == "./contrib/download-frozen-image-v2.sh") ***REMOVED***
+		}
+		if !(line[0] == "RUN" && line[1] == "./contrib/download-frozen-image-v2.sh") {
 			continue
-		***REMOVED***
+		}
 
-		for scanner.Scan() ***REMOVED***
+		for scanner.Scan() {
 			img := strings.TrimSpace(scanner.Text())
 			img = strings.TrimSuffix(img, "\\")
 			img = strings.TrimSpace(img)
 			split := strings.Split(img, "@")
-			if len(split) < 2 ***REMOVED***
+			if len(split) < 2 {
 				break
-			***REMOVED***
+			}
 
-			for _, i := range images ***REMOVED***
-				if split[0] == i ***REMOVED***
+			for _, i := range images {
+				if split[0] == i {
 					ls[i] = img
 					break
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+				}
+			}
+		}
+	}
 	return ls, nil
-***REMOVED***
+}

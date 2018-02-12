@@ -20,168 +20,168 @@ import (
 // A Conn represents a network endpoint that uses the IPv4 transport.
 // It is used to control basic IP-level socket options such as TOS and
 // TTL.
-type Conn struct ***REMOVED***
+type Conn struct {
 	genericOpt
-***REMOVED***
+}
 
-type genericOpt struct ***REMOVED***
+type genericOpt struct {
 	*socket.Conn
-***REMOVED***
+}
 
-func (c *genericOpt) ok() bool ***REMOVED*** return c != nil && c.Conn != nil ***REMOVED***
+func (c *genericOpt) ok() bool { return c != nil && c.Conn != nil }
 
 // NewConn returns a new Conn.
-func NewConn(c net.Conn) *Conn ***REMOVED***
+func NewConn(c net.Conn) *Conn {
 	cc, _ := socket.NewConn(c)
-	return &Conn***REMOVED***
-		genericOpt: genericOpt***REMOVED***Conn: cc***REMOVED***,
-	***REMOVED***
-***REMOVED***
+	return &Conn{
+		genericOpt: genericOpt{Conn: cc},
+	}
+}
 
 // A PacketConn represents a packet network endpoint that uses the
 // IPv4 transport. It is used to control several IP-level socket
 // options including multicasting. It also provides datagram based
 // network I/O methods specific to the IPv4 and higher layer protocols
 // such as UDP.
-type PacketConn struct ***REMOVED***
+type PacketConn struct {
 	genericOpt
 	dgramOpt
 	payloadHandler
-***REMOVED***
+}
 
-type dgramOpt struct ***REMOVED***
+type dgramOpt struct {
 	*socket.Conn
-***REMOVED***
+}
 
-func (c *dgramOpt) ok() bool ***REMOVED*** return c != nil && c.Conn != nil ***REMOVED***
+func (c *dgramOpt) ok() bool { return c != nil && c.Conn != nil }
 
 // SetControlMessage sets the per packet IP-level socket options.
-func (c *PacketConn) SetControlMessage(cf ControlFlags, on bool) error ***REMOVED***
-	if !c.payloadHandler.ok() ***REMOVED***
+func (c *PacketConn) SetControlMessage(cf ControlFlags, on bool) error {
+	if !c.payloadHandler.ok() {
 		return syscall.EINVAL
-	***REMOVED***
+	}
 	return setControlMessage(c.dgramOpt.Conn, &c.payloadHandler.rawOpt, cf, on)
-***REMOVED***
+}
 
 // SetDeadline sets the read and write deadlines associated with the
 // endpoint.
-func (c *PacketConn) SetDeadline(t time.Time) error ***REMOVED***
-	if !c.payloadHandler.ok() ***REMOVED***
+func (c *PacketConn) SetDeadline(t time.Time) error {
+	if !c.payloadHandler.ok() {
 		return syscall.EINVAL
-	***REMOVED***
+	}
 	return c.payloadHandler.PacketConn.SetDeadline(t)
-***REMOVED***
+}
 
 // SetReadDeadline sets the read deadline associated with the
 // endpoint.
-func (c *PacketConn) SetReadDeadline(t time.Time) error ***REMOVED***
-	if !c.payloadHandler.ok() ***REMOVED***
+func (c *PacketConn) SetReadDeadline(t time.Time) error {
+	if !c.payloadHandler.ok() {
 		return syscall.EINVAL
-	***REMOVED***
+	}
 	return c.payloadHandler.PacketConn.SetReadDeadline(t)
-***REMOVED***
+}
 
 // SetWriteDeadline sets the write deadline associated with the
 // endpoint.
-func (c *PacketConn) SetWriteDeadline(t time.Time) error ***REMOVED***
-	if !c.payloadHandler.ok() ***REMOVED***
+func (c *PacketConn) SetWriteDeadline(t time.Time) error {
+	if !c.payloadHandler.ok() {
 		return syscall.EINVAL
-	***REMOVED***
+	}
 	return c.payloadHandler.PacketConn.SetWriteDeadline(t)
-***REMOVED***
+}
 
 // Close closes the endpoint.
-func (c *PacketConn) Close() error ***REMOVED***
-	if !c.payloadHandler.ok() ***REMOVED***
+func (c *PacketConn) Close() error {
+	if !c.payloadHandler.ok() {
 		return syscall.EINVAL
-	***REMOVED***
+	}
 	return c.payloadHandler.PacketConn.Close()
-***REMOVED***
+}
 
 // NewPacketConn returns a new PacketConn using c as its underlying
 // transport.
-func NewPacketConn(c net.PacketConn) *PacketConn ***REMOVED***
+func NewPacketConn(c net.PacketConn) *PacketConn {
 	cc, _ := socket.NewConn(c.(net.Conn))
-	p := &PacketConn***REMOVED***
-		genericOpt:     genericOpt***REMOVED***Conn: cc***REMOVED***,
-		dgramOpt:       dgramOpt***REMOVED***Conn: cc***REMOVED***,
-		payloadHandler: payloadHandler***REMOVED***PacketConn: c, Conn: cc***REMOVED***,
-	***REMOVED***
+	p := &PacketConn{
+		genericOpt:     genericOpt{Conn: cc},
+		dgramOpt:       dgramOpt{Conn: cc},
+		payloadHandler: payloadHandler{PacketConn: c, Conn: cc},
+	}
 	return p
-***REMOVED***
+}
 
 // A RawConn represents a packet network endpoint that uses the IPv4
 // transport. It is used to control several IP-level socket options
 // including IPv4 header manipulation. It also provides datagram
 // based network I/O methods specific to the IPv4 and higher layer
 // protocols that handle IPv4 datagram directly such as OSPF, GRE.
-type RawConn struct ***REMOVED***
+type RawConn struct {
 	genericOpt
 	dgramOpt
 	packetHandler
-***REMOVED***
+}
 
 // SetControlMessage sets the per packet IP-level socket options.
-func (c *RawConn) SetControlMessage(cf ControlFlags, on bool) error ***REMOVED***
-	if !c.packetHandler.ok() ***REMOVED***
+func (c *RawConn) SetControlMessage(cf ControlFlags, on bool) error {
+	if !c.packetHandler.ok() {
 		return syscall.EINVAL
-	***REMOVED***
+	}
 	return setControlMessage(c.dgramOpt.Conn, &c.packetHandler.rawOpt, cf, on)
-***REMOVED***
+}
 
 // SetDeadline sets the read and write deadlines associated with the
 // endpoint.
-func (c *RawConn) SetDeadline(t time.Time) error ***REMOVED***
-	if !c.packetHandler.ok() ***REMOVED***
+func (c *RawConn) SetDeadline(t time.Time) error {
+	if !c.packetHandler.ok() {
 		return syscall.EINVAL
-	***REMOVED***
+	}
 	return c.packetHandler.IPConn.SetDeadline(t)
-***REMOVED***
+}
 
 // SetReadDeadline sets the read deadline associated with the
 // endpoint.
-func (c *RawConn) SetReadDeadline(t time.Time) error ***REMOVED***
-	if !c.packetHandler.ok() ***REMOVED***
+func (c *RawConn) SetReadDeadline(t time.Time) error {
+	if !c.packetHandler.ok() {
 		return syscall.EINVAL
-	***REMOVED***
+	}
 	return c.packetHandler.IPConn.SetReadDeadline(t)
-***REMOVED***
+}
 
 // SetWriteDeadline sets the write deadline associated with the
 // endpoint.
-func (c *RawConn) SetWriteDeadline(t time.Time) error ***REMOVED***
-	if !c.packetHandler.ok() ***REMOVED***
+func (c *RawConn) SetWriteDeadline(t time.Time) error {
+	if !c.packetHandler.ok() {
 		return syscall.EINVAL
-	***REMOVED***
+	}
 	return c.packetHandler.IPConn.SetWriteDeadline(t)
-***REMOVED***
+}
 
 // Close closes the endpoint.
-func (c *RawConn) Close() error ***REMOVED***
-	if !c.packetHandler.ok() ***REMOVED***
+func (c *RawConn) Close() error {
+	if !c.packetHandler.ok() {
 		return syscall.EINVAL
-	***REMOVED***
+	}
 	return c.packetHandler.IPConn.Close()
-***REMOVED***
+}
 
 // NewRawConn returns a new RawConn using c as its underlying
 // transport.
-func NewRawConn(c net.PacketConn) (*RawConn, error) ***REMOVED***
+func NewRawConn(c net.PacketConn) (*RawConn, error) {
 	cc, err := socket.NewConn(c.(net.Conn))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	r := &RawConn***REMOVED***
-		genericOpt:    genericOpt***REMOVED***Conn: cc***REMOVED***,
-		dgramOpt:      dgramOpt***REMOVED***Conn: cc***REMOVED***,
-		packetHandler: packetHandler***REMOVED***IPConn: c.(*net.IPConn), Conn: cc***REMOVED***,
-	***REMOVED***
+	}
+	r := &RawConn{
+		genericOpt:    genericOpt{Conn: cc},
+		dgramOpt:      dgramOpt{Conn: cc},
+		packetHandler: packetHandler{IPConn: c.(*net.IPConn), Conn: cc},
+	}
 	so, ok := sockOpts[ssoHeaderPrepend]
-	if !ok ***REMOVED***
+	if !ok {
 		return nil, errOpNoSupport
-	***REMOVED***
-	if err := so.SetInt(r.dgramOpt.Conn, boolint(true)); err != nil ***REMOVED***
+	}
+	if err := so.SetInt(r.dgramOpt.Conn, boolint(true)); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return r, nil
-***REMOVED***
+}

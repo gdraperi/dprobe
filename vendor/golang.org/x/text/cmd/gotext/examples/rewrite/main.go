@@ -11,7 +11,7 @@ import (
 	"golang.org/x/text/message"
 )
 
-func main() ***REMOVED***
+func main() {
 	var nPizzas = 4
 	// The following call gets replaced by a call to the globally
 	// defined printer.
@@ -25,13 +25,13 @@ func main() ***REMOVED***
 	// Replaced by a call to p.
 	fmt.Println("Example punctuation:", "$%^&!")
 
-	***REMOVED***
+	{
 		q := message.NewPrinter(language.French)
 
 		const leaveAnIdentBe = "Don't expand me."
 		fmt.Print(leaveAnIdentBe)
 		q.Println() // Prevent build failure, although it is okay for gotext.
-	***REMOVED***
+	}
 
 	fmt.Printf("Hello %s\n", "City")
-***REMOVED***
+}

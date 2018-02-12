@@ -12,6 +12,6 @@ import (
 	"golang.org/x/text/cmd/gotext/examples/extract_http/pkg"
 )
 
-func main() ***REMOVED***
+func main() {
 	http.Handle("/generize", http.HandlerFunc(pkg.Generize))
-***REMOVED***
+}

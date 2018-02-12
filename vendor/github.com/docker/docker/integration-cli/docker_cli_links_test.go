@@ -12,16 +12,16 @@ import (
 	"github.com/go-check/check"
 )
 
-func (s *DockerSuite) TestLinksPingUnlinkedContainers(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestLinksPingUnlinkedContainers(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	_, exitCode, err := dockerCmdWithError("run", "--rm", "busybox", "sh", "-c", "ping -c 1 alias1 -W 1 && ping -c 1 alias2 -W 1")
 
 	// run ping failed with error
 	c.Assert(exitCode, checker.Equals, 1, check.Commentf("error: %v", err))
-***REMOVED***
+}
 
 // Test for appropriate error when calling --link with an invalid target container
-func (s *DockerSuite) TestLinksInvalidContainerTarget(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestLinksInvalidContainerTarget(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	out, _, err := dockerCmdWithError("run", "--link", "bogus:alias", "busybox", "true")
 
@@ -29,37 +29,37 @@ func (s *DockerSuite) TestLinksInvalidContainerTarget(c *check.C) ***REMOVED***
 	c.Assert(err, checker.NotNil, check.Commentf("out: %s", out))
 	// an invalid container target should produce an error
 	c.Assert(out, checker.Contains, "could not get container")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestLinksPingLinkedContainers(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestLinksPingLinkedContainers(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	// Test with the three different ways of specifying the default network on Linux
 	testLinkPingOnNetwork(c, "")
 	testLinkPingOnNetwork(c, "default")
 	testLinkPingOnNetwork(c, "bridge")
-***REMOVED***
+}
 
-func testLinkPingOnNetwork(c *check.C, network string) ***REMOVED***
+func testLinkPingOnNetwork(c *check.C, network string) {
 	var postArgs []string
-	if network != "" ***REMOVED***
-		postArgs = append(postArgs, []string***REMOVED***"--net", network***REMOVED***...)
-	***REMOVED***
-	postArgs = append(postArgs, []string***REMOVED***"busybox", "top"***REMOVED***...)
-	runArgs1 := append([]string***REMOVED***"run", "-d", "--name", "container1", "--hostname", "fred"***REMOVED***, postArgs...)
-	runArgs2 := append([]string***REMOVED***"run", "-d", "--name", "container2", "--hostname", "wilma"***REMOVED***, postArgs...)
+	if network != "" {
+		postArgs = append(postArgs, []string{"--net", network}...)
+	}
+	postArgs = append(postArgs, []string{"busybox", "top"}...)
+	runArgs1 := append([]string{"run", "-d", "--name", "container1", "--hostname", "fred"}, postArgs...)
+	runArgs2 := append([]string{"run", "-d", "--name", "container2", "--hostname", "wilma"}, postArgs...)
 
 	// Run the two named containers
 	dockerCmd(c, runArgs1...)
 	dockerCmd(c, runArgs2...)
 
-	postArgs = []string***REMOVED******REMOVED***
-	if network != "" ***REMOVED***
-		postArgs = append(postArgs, []string***REMOVED***"--net", network***REMOVED***...)
-	***REMOVED***
-	postArgs = append(postArgs, []string***REMOVED***"busybox", "sh", "-c"***REMOVED***...)
+	postArgs = []string{}
+	if network != "" {
+		postArgs = append(postArgs, []string{"--net", network}...)
+	}
+	postArgs = append(postArgs, []string{"busybox", "sh", "-c"}...)
 
 	// Format a run for a container which links to the other two
-	runArgs := append([]string***REMOVED***"run", "--rm", "--link", "container1:alias1", "--link", "container2:alias2"***REMOVED***, postArgs...)
+	runArgs := append([]string{"run", "--rm", "--link", "container1:alias1", "--link", "container2:alias2"}, postArgs...)
 	pingCmd := "ping -c 1 %s -W 1 && ping -c 1 %s -W 1"
 
 	// test ping by alias, ping by name, and ping by hostname
@@ -73,9 +73,9 @@ func testLinkPingOnNetwork(c *check.C, network string) ***REMOVED***
 	// Clean for next round
 	dockerCmd(c, "rm", "-f", "container1")
 	dockerCmd(c, "rm", "-f", "container2")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestLinksPingLinkedContainersAfterRename(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestLinksPingLinkedContainersAfterRename(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	out, _ := dockerCmd(c, "run", "-d", "--name", "container1", "busybox", "top")
 	idA := strings.TrimSpace(out)
@@ -86,9 +86,9 @@ func (s *DockerSuite) TestLinksPingLinkedContainersAfterRename(c *check.C) ***RE
 	dockerCmd(c, "kill", idA)
 	dockerCmd(c, "kill", idB)
 
-***REMOVED***
+}
 
-func (s *DockerSuite) TestLinksInspectLinksStarted(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestLinksInspectLinksStarted(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	dockerCmd(c, "run", "-d", "--name", "container1", "busybox", "top")
 	dockerCmd(c, "run", "-d", "--name", "container2", "busybox", "top")
@@ -99,15 +99,15 @@ func (s *DockerSuite) TestLinksInspectLinksStarted(c *check.C) ***REMOVED***
 	err := json.Unmarshal([]byte(links), &result)
 	c.Assert(err, checker.IsNil)
 
-	var expected = []string***REMOVED***
+	var expected = []string{
 		"/container1:/testinspectlink/alias1",
 		"/container2:/testinspectlink/alias2",
-	***REMOVED***
+	}
 	sort.Strings(result)
 	c.Assert(result, checker.DeepEquals, expected)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestLinksInspectLinksStopped(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestLinksInspectLinksStopped(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 
 	dockerCmd(c, "run", "-d", "--name", "container1", "busybox", "top")
@@ -119,23 +119,23 @@ func (s *DockerSuite) TestLinksInspectLinksStopped(c *check.C) ***REMOVED***
 	err := json.Unmarshal([]byte(links), &result)
 	c.Assert(err, checker.IsNil)
 
-	var expected = []string***REMOVED***
+	var expected = []string{
 		"/container1:/testinspectlink/alias1",
 		"/container2:/testinspectlink/alias2",
-	***REMOVED***
+	}
 	sort.Strings(result)
 	c.Assert(result, checker.DeepEquals, expected)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestLinksNotStartedParentNotFail(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestLinksNotStartedParentNotFail(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	dockerCmd(c, "create", "--name=first", "busybox", "top")
 	dockerCmd(c, "create", "--name=second", "--link=first:first", "busybox", "top")
 	dockerCmd(c, "start", "first")
 
-***REMOVED***
+}
 
-func (s *DockerSuite) TestLinksHostsFilesInject(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestLinksHostsFilesInject(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	testRequires(c, SameHostDaemon, ExecSupport)
 
@@ -151,9 +151,9 @@ func (s *DockerSuite) TestLinksHostsFilesInject(c *check.C) ***REMOVED***
 	contentTwo := readContainerFileWithExec(c, idTwo, "/etc/hosts")
 	// Host is not present in updated hosts file
 	c.Assert(string(contentTwo), checker.Contains, "onetwo")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestLinksUpdateOnRestart(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestLinksUpdateOnRestart(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	testRequires(c, SameHostDaemon, ExecSupport)
 	dockerCmd(c, "run", "-d", "--name", "one", "busybox", "top")
@@ -163,12 +163,12 @@ func (s *DockerSuite) TestLinksUpdateOnRestart(c *check.C) ***REMOVED***
 	realIP := inspectField(c, "one", "NetworkSettings.Networks.bridge.IPAddress")
 	content := readContainerFileWithExec(c, id, "/etc/hosts")
 
-	getIP := func(hosts []byte, hostname string) string ***REMOVED***
+	getIP := func(hosts []byte, hostname string) string {
 		re := regexp.MustCompile(fmt.Sprintf(`(\S*)\t%s`, regexp.QuoteMeta(hostname)))
 		matches := re.FindSubmatch(hosts)
 		c.Assert(matches, checker.NotNil, check.Commentf("Hostname %s have no matches in hosts", hostname))
 		return string(matches[1])
-	***REMOVED***
+	}
 	ip := getIP(content, "one")
 	c.Assert(ip, checker.Equals, realIP)
 
@@ -184,18 +184,18 @@ func (s *DockerSuite) TestLinksUpdateOnRestart(c *check.C) ***REMOVED***
 
 	ip = getIP(content, "onetwo")
 	c.Assert(ip, checker.Equals, realIP)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestLinksEnvs(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestLinksEnvs(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	dockerCmd(c, "run", "-d", "-e", "e1=", "-e", "e2=v2", "-e", "e3=v3=v3", "--name=first", "busybox", "top")
 	out, _ := dockerCmd(c, "run", "--name=second", "--link=first:first", "busybox", "env")
 	c.Assert(out, checker.Contains, "FIRST_ENV_e1=\n")
 	c.Assert(out, checker.Contains, "FIRST_ENV_e2=v2")
 	c.Assert(out, checker.Contains, "FIRST_ENV_e3=v3=v3")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestLinkShortDefinition(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestLinkShortDefinition(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	out, _ := dockerCmd(c, "run", "-d", "--name", "shortlinkdef", "busybox", "top")
 
@@ -209,9 +209,9 @@ func (s *DockerSuite) TestLinkShortDefinition(c *check.C) ***REMOVED***
 
 	links := inspectFieldJSON(c, cid2, "HostConfig.Links")
 	c.Assert(links, checker.Equals, "[\"/shortlinkdef:/link2/shortlinkdef\"]")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestLinksNetworkHostContainer(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestLinksNetworkHostContainer(c *check.C) {
 	testRequires(c, DaemonIsLinux, NotUserNamespace)
 	dockerCmd(c, "run", "-d", "--net", "host", "--name", "host_container", "busybox", "top")
 	out, _, err := dockerCmdWithError("run", "--name", "should_fail", "--link", "host_container:tester", "busybox", "true")
@@ -220,18 +220,18 @@ func (s *DockerSuite) TestLinksNetworkHostContainer(c *check.C) ***REMOVED***
 	c.Assert(err, checker.NotNil, check.Commentf("out: %s", out))
 	// Running container linking to a container with --net host should have failed
 	c.Assert(out, checker.Contains, runconfig.ErrConflictHostNetworkAndLinks.Error())
-***REMOVED***
+}
 
-func (s *DockerSuite) TestLinksEtcHostsRegularFile(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestLinksEtcHostsRegularFile(c *check.C) {
 	testRequires(c, DaemonIsLinux, NotUserNamespace)
 	out, _ := dockerCmd(c, "run", "--net=host", "busybox", "ls", "-la", "/etc/hosts")
 	// /etc/hosts should be a regular file
 	c.Assert(out, checker.Matches, "^-.+\n")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestLinksMultipleWithSameName(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestLinksMultipleWithSameName(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	dockerCmd(c, "run", "-d", "--name=upstream-a", "busybox", "top")
 	dockerCmd(c, "run", "-d", "--name=upstream-b", "busybox", "top")
 	dockerCmd(c, "run", "--link", "upstream-a:upstream", "--link", "upstream-b:upstream", "busybox", "sh", "-c", "ping -c 1 upstream")
-***REMOVED***
+}

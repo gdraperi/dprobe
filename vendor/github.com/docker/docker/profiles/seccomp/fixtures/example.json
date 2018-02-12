@@ -1,27 +1,27 @@
-***REMOVED***
+{
     "defaultAction": "SCMP_ACT_ERRNO",
     "syscalls": [
-        ***REMOVED***
+        {
             "name": "clone",
             "action": "SCMP_ACT_ALLOW",
             "args": [
-                ***REMOVED***
+                {
                     "index": 0,
                     "value": 2080505856,
                     "valueTwo": 0,
                     "op": "SCMP_CMP_MASKED_EQ"
-            ***REMOVED***
+                }
             ]
-    ***REMOVED***,
-        ***REMOVED***
+        },
+        {
             "name": "open",
             "action": "SCMP_ACT_ALLOW",
             "args": []
-    ***REMOVED***,
-        ***REMOVED***
+        },
+        {
             "name": "close",
             "action": "SCMP_ACT_ALLOW",
             "args": []
-    ***REMOVED***
+        }
     ]
-***REMOVED***
+}

@@ -26,8 +26,8 @@ const (
 
 // Subsystems returns a complete list of the default cgroups
 // avaliable on most linux systems
-func Subsystems() []Name ***REMOVED***
-	n := []Name***REMOVED***
+func Subsystems() []Name {
+	n := []Name{
 		Hugetlb,
 		Freezer,
 		Pids,
@@ -39,56 +39,56 @@ func Subsystems() []Name ***REMOVED***
 		Cpuacct,
 		Memory,
 		Blkio,
-	***REMOVED***
-	if !isUserNS ***REMOVED***
+	}
+	if !isUserNS {
 		n = append(n, Devices)
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-type Subsystem interface ***REMOVED***
+type Subsystem interface {
 	Name() Name
-***REMOVED***
+}
 
-type pather interface ***REMOVED***
+type pather interface {
 	Subsystem
 	Path(path string) string
-***REMOVED***
+}
 
-type creator interface ***REMOVED***
+type creator interface {
 	Subsystem
 	Create(path string, resources *specs.LinuxResources) error
-***REMOVED***
+}
 
-type deleter interface ***REMOVED***
+type deleter interface {
 	Subsystem
 	Delete(path string) error
-***REMOVED***
+}
 
-type stater interface ***REMOVED***
+type stater interface {
 	Subsystem
 	Stat(path string, stats *Metrics) error
-***REMOVED***
+}
 
-type updater interface ***REMOVED***
+type updater interface {
 	Subsystem
 	Update(path string, resources *specs.LinuxResources) error
-***REMOVED***
+}
 
 // SingleSubsystem returns a single cgroup subsystem within the base Hierarchy
-func SingleSubsystem(baseHierarchy Hierarchy, subsystem Name) Hierarchy ***REMOVED***
-	return func() ([]Subsystem, error) ***REMOVED***
+func SingleSubsystem(baseHierarchy Hierarchy, subsystem Name) Hierarchy {
+	return func() ([]Subsystem, error) {
 		subsystems, err := baseHierarchy()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-		for _, s := range subsystems ***REMOVED***
-			if s.Name() == subsystem ***REMOVED***
-				return []Subsystem***REMOVED***
+		}
+		for _, s := range subsystems {
+			if s.Name() == subsystem {
+				return []Subsystem{
 					s,
-				***REMOVED***, nil
-			***REMOVED***
-		***REMOVED***
+				}, nil
+			}
+		}
 		return nil, fmt.Errorf("unable to find subsystem %s", subsystem)
-	***REMOVED***
-***REMOVED***
+	}
+}

@@ -11,7 +11,7 @@ import (
 
 // SetupRootCommand sets default usage, help, and error handling for the
 // root command.
-func SetupRootCommand(rootCmd *cobra.Command) ***REMOVED***
+func SetupRootCommand(rootCmd *cobra.Command) {
 	cobra.AddTemplateFunc("hasSubCommands", hasSubCommands)
 	cobra.AddTemplateFunc("hasManagementSubCommands", hasManagementSubCommands)
 	cobra.AddTemplateFunc("operationSubCommands", operationSubCommands)
@@ -25,126 +25,126 @@ func SetupRootCommand(rootCmd *cobra.Command) ***REMOVED***
 
 	rootCmd.PersistentFlags().BoolP("help", "h", false, "Print usage")
 	rootCmd.PersistentFlags().MarkShorthandDeprecated("help", "please use --help")
-***REMOVED***
+}
 
 // FlagErrorFunc prints an error message which matches the format of the
 // docker/docker/cli error messages
-func FlagErrorFunc(cmd *cobra.Command, err error) error ***REMOVED***
-	if err == nil ***REMOVED***
+func FlagErrorFunc(cmd *cobra.Command, err error) error {
+	if err == nil {
 		return nil
-	***REMOVED***
+	}
 
 	usage := ""
-	if cmd.HasSubCommands() ***REMOVED***
+	if cmd.HasSubCommands() {
 		usage = "\n\n" + cmd.UsageString()
-	***REMOVED***
-	return StatusError***REMOVED***
+	}
+	return StatusError{
 		Status:     fmt.Sprintf("%s\nSee '%s --help'.%s", err, cmd.CommandPath(), usage),
 		StatusCode: 125,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-var helpCommand = &cobra.Command***REMOVED***
+var helpCommand = &cobra.Command{
 	Use:               "help [command]",
 	Short:             "Help about the command",
-	PersistentPreRun:  func(cmd *cobra.Command, args []string) ***REMOVED******REMOVED***,
-	PersistentPostRun: func(cmd *cobra.Command, args []string) ***REMOVED******REMOVED***,
-	RunE: func(c *cobra.Command, args []string) error ***REMOVED***
+	PersistentPreRun:  func(cmd *cobra.Command, args []string) {},
+	PersistentPostRun: func(cmd *cobra.Command, args []string) {},
+	RunE: func(c *cobra.Command, args []string) error {
 		cmd, args, e := c.Root().Find(args)
-		if cmd == nil || e != nil || len(args) > 0 ***REMOVED***
+		if cmd == nil || e != nil || len(args) > 0 {
 			return errors.Errorf("unknown help topic: %v", strings.Join(args, " "))
-		***REMOVED***
+		}
 
 		helpFunc := cmd.HelpFunc()
 		helpFunc(cmd, args)
 		return nil
-	***REMOVED***,
-***REMOVED***
+	},
+}
 
-func hasSubCommands(cmd *cobra.Command) bool ***REMOVED***
+func hasSubCommands(cmd *cobra.Command) bool {
 	return len(operationSubCommands(cmd)) > 0
-***REMOVED***
+}
 
-func hasManagementSubCommands(cmd *cobra.Command) bool ***REMOVED***
+func hasManagementSubCommands(cmd *cobra.Command) bool {
 	return len(managementSubCommands(cmd)) > 0
-***REMOVED***
+}
 
-func operationSubCommands(cmd *cobra.Command) []*cobra.Command ***REMOVED***
-	cmds := []*cobra.Command***REMOVED******REMOVED***
-	for _, sub := range cmd.Commands() ***REMOVED***
-		if sub.IsAvailableCommand() && !sub.HasSubCommands() ***REMOVED***
+func operationSubCommands(cmd *cobra.Command) []*cobra.Command {
+	cmds := []*cobra.Command{}
+	for _, sub := range cmd.Commands() {
+		if sub.IsAvailableCommand() && !sub.HasSubCommands() {
 			cmds = append(cmds, sub)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return cmds
-***REMOVED***
+}
 
-func wrappedFlagUsages(cmd *cobra.Command) string ***REMOVED***
+func wrappedFlagUsages(cmd *cobra.Command) string {
 	width := 80
-	if ws, err := term.GetWinsize(0); err == nil ***REMOVED***
+	if ws, err := term.GetWinsize(0); err == nil {
 		width = int(ws.Width)
-	***REMOVED***
+	}
 	return cmd.Flags().FlagUsagesWrapped(width - 1)
-***REMOVED***
+}
 
-func managementSubCommands(cmd *cobra.Command) []*cobra.Command ***REMOVED***
-	cmds := []*cobra.Command***REMOVED******REMOVED***
-	for _, sub := range cmd.Commands() ***REMOVED***
-		if sub.IsAvailableCommand() && sub.HasSubCommands() ***REMOVED***
+func managementSubCommands(cmd *cobra.Command) []*cobra.Command {
+	cmds := []*cobra.Command{}
+	for _, sub := range cmd.Commands() {
+		if sub.IsAvailableCommand() && sub.HasSubCommands() {
 			cmds = append(cmds, sub)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return cmds
-***REMOVED***
+}
 
 var usageTemplate = `Usage:
 
-***REMOVED******REMOVED***- if not .HasSubCommands***REMOVED******REMOVED***	***REMOVED******REMOVED***.UseLine***REMOVED******REMOVED******REMOVED******REMOVED***end***REMOVED******REMOVED***
-***REMOVED******REMOVED***- if .HasSubCommands***REMOVED******REMOVED***	***REMOVED******REMOVED*** .CommandPath***REMOVED******REMOVED*** COMMAND***REMOVED******REMOVED***end***REMOVED******REMOVED***
+{{- if not .HasSubCommands}}	{{.UseLine}}{{end}}
+{{- if .HasSubCommands}}	{{ .CommandPath}} COMMAND{{end}}
 
-***REMOVED******REMOVED*** .Short | trim ***REMOVED******REMOVED***
+{{ .Short | trim }}
 
-***REMOVED******REMOVED***- if gt .Aliases 0***REMOVED******REMOVED***
+{{- if gt .Aliases 0}}
 
 Aliases:
-  ***REMOVED******REMOVED***.NameAndAliases***REMOVED******REMOVED***
+  {{.NameAndAliases}}
 
-***REMOVED******REMOVED***- end***REMOVED******REMOVED***
-***REMOVED******REMOVED***- if .HasExample***REMOVED******REMOVED***
+{{- end}}
+{{- if .HasExample}}
 
 Examples:
-***REMOVED******REMOVED*** .Example ***REMOVED******REMOVED***
+{{ .Example }}
 
-***REMOVED******REMOVED***- end***REMOVED******REMOVED***
-***REMOVED******REMOVED***- if .HasFlags***REMOVED******REMOVED***
+{{- end}}
+{{- if .HasFlags}}
 
 Options:
-***REMOVED******REMOVED*** wrappedFlagUsages . | trimRightSpace***REMOVED******REMOVED***
+{{ wrappedFlagUsages . | trimRightSpace}}
 
-***REMOVED******REMOVED***- end***REMOVED******REMOVED***
-***REMOVED******REMOVED***- if hasManagementSubCommands . ***REMOVED******REMOVED***
+{{- end}}
+{{- if hasManagementSubCommands . }}
 
 Management Commands:
 
-***REMOVED******REMOVED***- range managementSubCommands . ***REMOVED******REMOVED***
-  ***REMOVED******REMOVED***rpad .Name .NamePadding ***REMOVED******REMOVED*** ***REMOVED******REMOVED***.Short***REMOVED******REMOVED***
-***REMOVED******REMOVED***- end***REMOVED******REMOVED***
+{{- range managementSubCommands . }}
+  {{rpad .Name .NamePadding }} {{.Short}}
+{{- end}}
 
-***REMOVED******REMOVED***- end***REMOVED******REMOVED***
-***REMOVED******REMOVED***- if hasSubCommands .***REMOVED******REMOVED***
+{{- end}}
+{{- if hasSubCommands .}}
 
 Commands:
 
-***REMOVED******REMOVED***- range operationSubCommands . ***REMOVED******REMOVED***
-  ***REMOVED******REMOVED***rpad .Name .NamePadding ***REMOVED******REMOVED*** ***REMOVED******REMOVED***.Short***REMOVED******REMOVED***
-***REMOVED******REMOVED***- end***REMOVED******REMOVED***
-***REMOVED******REMOVED***- end***REMOVED******REMOVED***
+{{- range operationSubCommands . }}
+  {{rpad .Name .NamePadding }} {{.Short}}
+{{- end}}
+{{- end}}
 
-***REMOVED******REMOVED***- if .HasSubCommands ***REMOVED******REMOVED***
+{{- if .HasSubCommands }}
 
-Run '***REMOVED******REMOVED***.CommandPath***REMOVED******REMOVED*** COMMAND --help' for more information on a command.
-***REMOVED******REMOVED***- end***REMOVED******REMOVED***
+Run '{{.CommandPath}} COMMAND --help' for more information on a command.
+{{- end}}
 `
 
 var helpTemplate = `
-***REMOVED******REMOVED***if or .Runnable .HasSubCommands***REMOVED******REMOVED******REMOVED******REMOVED***.UsageString***REMOVED******REMOVED******REMOVED******REMOVED***end***REMOVED******REMOVED***`
+{{if or .Runnable .HasSubCommands}}{{.UsageString}}{{end}}`

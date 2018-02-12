@@ -42,17 +42,17 @@ var _ = time.Kitchen
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
-type CreateOptions struct ***REMOVED***
+type CreateOptions struct {
 	TerminateDuration time.Duration `protobuf:"bytes,1,opt,name=terminate_duration,json=terminateDuration,stdduration" json:"terminate_duration"`
-***REMOVED***
+}
 
-func (m *CreateOptions) Reset()                    ***REMOVED*** *m = CreateOptions***REMOVED******REMOVED*** ***REMOVED***
-func (*CreateOptions) ProtoMessage()               ***REMOVED******REMOVED***
-func (*CreateOptions) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorHcsshim, []int***REMOVED***0***REMOVED*** ***REMOVED***
+func (m *CreateOptions) Reset()                    { *m = CreateOptions{} }
+func (*CreateOptions) ProtoMessage()               {}
+func (*CreateOptions) Descriptor() ([]byte, []int) { return fileDescriptorHcsshim, []int{0} }
 
 // ProcessDetails contains additional information about a process
 // ProcessDetails is made of the same fields as found in hcsshim.ProcessListItem
-type ProcessDetails struct ***REMOVED***
+type ProcessDetails struct {
 	ImageName                    string    `protobuf:"bytes,1,opt,name=image_name,json=imageName,proto3" json:"image_name,omitempty"`
 	CreatedAt                    time.Time `protobuf:"bytes,2,opt,name=created_at,json=createdAt,stdtime" json:"created_at"`
 	KernelTime_100Ns             uint64    `protobuf:"varint,3,opt,name=kernel_time_100_ns,json=kernelTime100Ns,proto3" json:"kernel_time_100_ns,omitempty"`
@@ -62,27 +62,27 @@ type ProcessDetails struct ***REMOVED***
 	ProcessID                    uint32    `protobuf:"varint,7,opt,name=process_id,json=processId,proto3" json:"process_id,omitempty"`
 	UserTime_100Ns               uint64    `protobuf:"varint,8,opt,name=user_time_100_ns,json=userTime100Ns,proto3" json:"user_time_100_ns,omitempty"`
 	ExecID                       string    `protobuf:"bytes,9,opt,name=exec_id,json=execId,proto3" json:"exec_id,omitempty"`
-***REMOVED***
+}
 
-func (m *ProcessDetails) Reset()                    ***REMOVED*** *m = ProcessDetails***REMOVED******REMOVED*** ***REMOVED***
-func (*ProcessDetails) ProtoMessage()               ***REMOVED******REMOVED***
-func (*ProcessDetails) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorHcsshim, []int***REMOVED***1***REMOVED*** ***REMOVED***
+func (m *ProcessDetails) Reset()                    { *m = ProcessDetails{} }
+func (*ProcessDetails) ProtoMessage()               {}
+func (*ProcessDetails) Descriptor() ([]byte, []int) { return fileDescriptorHcsshim, []int{1} }
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*CreateOptions)(nil), "containerd.windows.hcsshim.CreateOptions")
 	proto.RegisterType((*ProcessDetails)(nil), "containerd.windows.hcsshim.ProcessDetails")
-***REMOVED***
-func (m *CreateOptions) Marshal() (dAtA []byte, err error) ***REMOVED***
+}
+func (m *CreateOptions) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *CreateOptions) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *CreateOptions) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -91,160 +91,160 @@ func (m *CreateOptions) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
 	i++
 	i = encodeVarintHcsshim(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(m.TerminateDuration)))
 	n1, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(m.TerminateDuration, dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n1
 	return i, nil
-***REMOVED***
+}
 
-func (m *ProcessDetails) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *ProcessDetails) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *ProcessDetails) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *ProcessDetails) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ImageName) > 0 ***REMOVED***
+	if len(m.ImageName) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintHcsshim(dAtA, i, uint64(len(m.ImageName)))
 		i += copy(dAtA[i:], m.ImageName)
-	***REMOVED***
+	}
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintHcsshim(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)))
 	n2, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.CreatedAt, dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n2
-	if m.KernelTime_100Ns != 0 ***REMOVED***
+	if m.KernelTime_100Ns != 0 {
 		dAtA[i] = 0x18
 		i++
 		i = encodeVarintHcsshim(dAtA, i, uint64(m.KernelTime_100Ns))
-	***REMOVED***
-	if m.MemoryCommitBytes != 0 ***REMOVED***
+	}
+	if m.MemoryCommitBytes != 0 {
 		dAtA[i] = 0x20
 		i++
 		i = encodeVarintHcsshim(dAtA, i, uint64(m.MemoryCommitBytes))
-	***REMOVED***
-	if m.MemoryWorkingSetPrivateBytes != 0 ***REMOVED***
+	}
+	if m.MemoryWorkingSetPrivateBytes != 0 {
 		dAtA[i] = 0x28
 		i++
 		i = encodeVarintHcsshim(dAtA, i, uint64(m.MemoryWorkingSetPrivateBytes))
-	***REMOVED***
-	if m.MemoryWorkingSetSharedBytes != 0 ***REMOVED***
+	}
+	if m.MemoryWorkingSetSharedBytes != 0 {
 		dAtA[i] = 0x30
 		i++
 		i = encodeVarintHcsshim(dAtA, i, uint64(m.MemoryWorkingSetSharedBytes))
-	***REMOVED***
-	if m.ProcessID != 0 ***REMOVED***
+	}
+	if m.ProcessID != 0 {
 		dAtA[i] = 0x38
 		i++
 		i = encodeVarintHcsshim(dAtA, i, uint64(m.ProcessID))
-	***REMOVED***
-	if m.UserTime_100Ns != 0 ***REMOVED***
+	}
+	if m.UserTime_100Ns != 0 {
 		dAtA[i] = 0x40
 		i++
 		i = encodeVarintHcsshim(dAtA, i, uint64(m.UserTime_100Ns))
-	***REMOVED***
-	if len(m.ExecID) > 0 ***REMOVED***
+	}
+	if len(m.ExecID) > 0 {
 		dAtA[i] = 0x4a
 		i++
 		i = encodeVarintHcsshim(dAtA, i, uint64(len(m.ExecID)))
 		i += copy(dAtA[i:], m.ExecID)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func encodeVarintHcsshim(dAtA []byte, offset int, v uint64) int ***REMOVED***
-	for v >= 1<<7 ***REMOVED***
+func encodeVarintHcsshim(dAtA []byte, offset int, v uint64) int {
+	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
-	***REMOVED***
+	}
 	dAtA[offset] = uint8(v)
 	return offset + 1
-***REMOVED***
-func (m *CreateOptions) Size() (n int) ***REMOVED***
+}
+func (m *CreateOptions) Size() (n int) {
 	var l int
 	_ = l
 	l = github_com_gogo_protobuf_types.SizeOfStdDuration(m.TerminateDuration)
 	n += 1 + l + sovHcsshim(uint64(l))
 	return n
-***REMOVED***
+}
 
-func (m *ProcessDetails) Size() (n int) ***REMOVED***
+func (m *ProcessDetails) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ImageName)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovHcsshim(uint64(l))
-	***REMOVED***
+	}
 	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.CreatedAt)
 	n += 1 + l + sovHcsshim(uint64(l))
-	if m.KernelTime_100Ns != 0 ***REMOVED***
+	if m.KernelTime_100Ns != 0 {
 		n += 1 + sovHcsshim(uint64(m.KernelTime_100Ns))
-	***REMOVED***
-	if m.MemoryCommitBytes != 0 ***REMOVED***
+	}
+	if m.MemoryCommitBytes != 0 {
 		n += 1 + sovHcsshim(uint64(m.MemoryCommitBytes))
-	***REMOVED***
-	if m.MemoryWorkingSetPrivateBytes != 0 ***REMOVED***
+	}
+	if m.MemoryWorkingSetPrivateBytes != 0 {
 		n += 1 + sovHcsshim(uint64(m.MemoryWorkingSetPrivateBytes))
-	***REMOVED***
-	if m.MemoryWorkingSetSharedBytes != 0 ***REMOVED***
+	}
+	if m.MemoryWorkingSetSharedBytes != 0 {
 		n += 1 + sovHcsshim(uint64(m.MemoryWorkingSetSharedBytes))
-	***REMOVED***
-	if m.ProcessID != 0 ***REMOVED***
+	}
+	if m.ProcessID != 0 {
 		n += 1 + sovHcsshim(uint64(m.ProcessID))
-	***REMOVED***
-	if m.UserTime_100Ns != 0 ***REMOVED***
+	}
+	if m.UserTime_100Ns != 0 {
 		n += 1 + sovHcsshim(uint64(m.UserTime_100Ns))
-	***REMOVED***
+	}
 	l = len(m.ExecID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovHcsshim(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func sovHcsshim(x uint64) (n int) ***REMOVED***
-	for ***REMOVED***
+func sovHcsshim(x uint64) (n int) {
+	for {
 		n++
 		x >>= 7
-		if x == 0 ***REMOVED***
+		if x == 0 {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
-func sozHcsshim(x uint64) (n int) ***REMOVED***
+}
+func sozHcsshim(x uint64) (n int) {
 	return sovHcsshim(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-***REMOVED***
-func (this *CreateOptions) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *CreateOptions) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&CreateOptions***REMOVED***`,
+	}
+	s := strings.Join([]string{`&CreateOptions{`,
 		`TerminateDuration:` + strings.Replace(strings.Replace(this.TerminateDuration.String(), "Duration", "google_protobuf1.Duration", 1), `&`, ``, 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *ProcessDetails) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *ProcessDetails) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&ProcessDetails***REMOVED***`,
+	}
+	s := strings.Join([]string{`&ProcessDetails{`,
 		`ImageName:` + fmt.Sprintf("%v", this.ImageName) + `,`,
 		`CreatedAt:` + strings.Replace(strings.Replace(this.CreatedAt.String(), "Timestamp", "google_protobuf2.Timestamp", 1), `&`, ``, 1) + `,`,
 		`KernelTime_100Ns:` + fmt.Sprintf("%v", this.KernelTime_100Ns) + `,`,
@@ -254,437 +254,437 @@ func (this *ProcessDetails) String() string ***REMOVED***
 		`ProcessID:` + fmt.Sprintf("%v", this.ProcessID) + `,`,
 		`UserTime_100Ns:` + fmt.Sprintf("%v", this.UserTime_100Ns) + `,`,
 		`ExecID:` + fmt.Sprintf("%v", this.ExecID) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func valueToStringHcsshim(v interface***REMOVED******REMOVED***) string ***REMOVED***
+}
+func valueToStringHcsshim(v interface{}) string {
 	rv := reflect.ValueOf(v)
-	if rv.IsNil() ***REMOVED***
+	if rv.IsNil() {
 		return "nil"
-	***REMOVED***
+	}
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
-***REMOVED***
-func (m *CreateOptions) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *CreateOptions) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowHcsshim
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: CreateOptions: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: CreateOptions: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field TerminateDuration", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowHcsshim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthHcsshim
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(&m.TerminateDuration, dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(&m.TerminateDuration, dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipHcsshim(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthHcsshim
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *ProcessDetails) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *ProcessDetails) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowHcsshim
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: ProcessDetails: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: ProcessDetails: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ImageName", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowHcsshim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthHcsshim
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ImageName = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CreatedAt", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowHcsshim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthHcsshim
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.CreatedAt, dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.CreatedAt, dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 3:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field KernelTime_100Ns", wireType)
-			***REMOVED***
+			}
 			m.KernelTime_100Ns = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowHcsshim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.KernelTime_100Ns |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 4:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field MemoryCommitBytes", wireType)
-			***REMOVED***
+			}
 			m.MemoryCommitBytes = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowHcsshim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.MemoryCommitBytes |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 5:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field MemoryWorkingSetPrivateBytes", wireType)
-			***REMOVED***
+			}
 			m.MemoryWorkingSetPrivateBytes = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowHcsshim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.MemoryWorkingSetPrivateBytes |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 6:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field MemoryWorkingSetSharedBytes", wireType)
-			***REMOVED***
+			}
 			m.MemoryWorkingSetSharedBytes = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowHcsshim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.MemoryWorkingSetSharedBytes |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 7:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ProcessID", wireType)
-			***REMOVED***
+			}
 			m.ProcessID = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowHcsshim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.ProcessID |= (uint32(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 8:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field UserTime_100Ns", wireType)
-			***REMOVED***
+			}
 			m.UserTime_100Ns = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowHcsshim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.UserTime_100Ns |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 9:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ExecID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowHcsshim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthHcsshim
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ExecID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipHcsshim(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthHcsshim
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func skipHcsshim(dAtA []byte) (n int, err error) ***REMOVED***
+}
+func skipHcsshim(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return 0, ErrIntOverflowHcsshim
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return 0, io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		wireType := int(wire & 0x7)
-		switch wireType ***REMOVED***
+		switch wireType {
 		case 0:
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowHcsshim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				iNdEx++
-				if dAtA[iNdEx-1] < 0x80 ***REMOVED***
+				if dAtA[iNdEx-1] < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return iNdEx, nil
 		case 1:
 			iNdEx += 8
 			return iNdEx, nil
 		case 2:
 			var length int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowHcsshim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				length |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			iNdEx += length
-			if length < 0 ***REMOVED***
+			if length < 0 {
 				return 0, ErrInvalidLengthHcsshim
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 3:
-			for ***REMOVED***
+			for {
 				var innerWire uint64
 				var start int = iNdEx
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return 0, ErrIntOverflowHcsshim
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return 0, io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					innerWire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				innerWireType := int(innerWire & 0x7)
-				if innerWireType == 4 ***REMOVED***
+				if innerWireType == 4 {
 					break
-				***REMOVED***
+				}
 				next, err := skipHcsshim(dAtA[start:])
-				if err != nil ***REMOVED***
+				if err != nil {
 					return 0, err
-				***REMOVED***
+				}
 				iNdEx = start + next
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 4:
 			return iNdEx, nil
@@ -693,21 +693,21 @@ func skipHcsshim(dAtA []byte) (n int, err error) ***REMOVED***
 			return iNdEx, nil
 		default:
 			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	panic("unreachable")
-***REMOVED***
+}
 
 var (
 	ErrInvalidLengthHcsshim = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowHcsshim   = fmt.Errorf("proto: integer overflow")
 )
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterFile("github.com/containerd/containerd/windows/hcsshimtypes/hcsshim.proto", fileDescriptorHcsshim)
-***REMOVED***
+}
 
-var fileDescriptorHcsshim = []byte***REMOVED***
+var fileDescriptorHcsshim = []byte{
 	// 507 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x93, 0x41, 0x6f, 0xd3, 0x3c,
 	0x18, 0xc7, 0x9b, 0x77, 0x7b, 0xbb, 0xc5, 0xa8, 0xc0, 0x0c, 0x87, 0x52, 0x20, 0xa9, 0xc6, 0x81,
@@ -741,4 +741,4 @@ var fileDescriptorHcsshim = []byte***REMOVED***
 	0xf1, 0xa9, 0x0a, 0xbc, 0x55, 0x15, 0x78, 0x5f, 0xab, 0xc0, 0xfb, 0x59, 0x05, 0xde, 0xbb, 0xf8,
 	0x9f, 0x7e, 0x8a, 0x67, 0x97, 0x37, 0x6f, 0x1b, 0x93, 0xa6, 0x7d, 0xef, 0xa7, 0xbf, 0x02, 0x00,
 	0x00, 0xff, 0xff, 0x1e, 0xd7, 0x2f, 0xa8, 0x63, 0x03, 0x00, 0x00,
-***REMOVED***
+}

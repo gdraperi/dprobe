@@ -9,18 +9,18 @@ package unix
 import "unsafe"
 
 // readInt returns the size-bytes unsigned integer in native byte order at offset off.
-func readInt(b []byte, off, size uintptr) (u uint64, ok bool) ***REMOVED***
-	if len(b) < int(off+size) ***REMOVED***
+func readInt(b []byte, off, size uintptr) (u uint64, ok bool) {
+	if len(b) < int(off+size) {
 		return 0, false
-	***REMOVED***
-	if isBigEndian ***REMOVED***
+	}
+	if isBigEndian {
 		return readIntBE(b[off:], size), true
-	***REMOVED***
+	}
 	return readIntLE(b[off:], size), true
-***REMOVED***
+}
 
-func readIntBE(b []byte, size uintptr) uint64 ***REMOVED***
-	switch size ***REMOVED***
+func readIntBE(b []byte, size uintptr) uint64 {
+	switch size {
 	case 1:
 		return uint64(b[0])
 	case 2:
@@ -35,11 +35,11 @@ func readIntBE(b []byte, size uintptr) uint64 ***REMOVED***
 			uint64(b[3])<<32 | uint64(b[2])<<40 | uint64(b[1])<<48 | uint64(b[0])<<56
 	default:
 		panic("syscall: readInt with unsupported size")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func readIntLE(b []byte, size uintptr) uint64 ***REMOVED***
-	switch size ***REMOVED***
+func readIntLE(b []byte, size uintptr) uint64 {
+	switch size {
 	case 1:
 		return uint64(b[0])
 	case 2:
@@ -54,49 +54,49 @@ func readIntLE(b []byte, size uintptr) uint64 ***REMOVED***
 			uint64(b[4])<<32 | uint64(b[5])<<40 | uint64(b[6])<<48 | uint64(b[7])<<56
 	default:
 		panic("syscall: readInt with unsupported size")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // ParseDirent parses up to max directory entries in buf,
 // appending the names to names. It returns the number of
 // bytes consumed from buf, the number of entries added
 // to names, and the new names slice.
-func ParseDirent(buf []byte, max int, names []string) (consumed int, count int, newnames []string) ***REMOVED***
+func ParseDirent(buf []byte, max int, names []string) (consumed int, count int, newnames []string) {
 	origlen := len(buf)
 	count = 0
-	for max != 0 && len(buf) > 0 ***REMOVED***
+	for max != 0 && len(buf) > 0 {
 		reclen, ok := direntReclen(buf)
-		if !ok || reclen > uint64(len(buf)) ***REMOVED***
+		if !ok || reclen > uint64(len(buf)) {
 			return origlen, count, names
-		***REMOVED***
+		}
 		rec := buf[:reclen]
 		buf = buf[reclen:]
 		ino, ok := direntIno(rec)
-		if !ok ***REMOVED***
+		if !ok {
 			break
-		***REMOVED***
-		if ino == 0 ***REMOVED*** // File absent in directory.
+		}
+		if ino == 0 { // File absent in directory.
 			continue
-		***REMOVED***
-		const namoff = uint64(unsafe.Offsetof(Dirent***REMOVED******REMOVED***.Name))
+		}
+		const namoff = uint64(unsafe.Offsetof(Dirent{}.Name))
 		namlen, ok := direntNamlen(rec)
-		if !ok || namoff+namlen > uint64(len(rec)) ***REMOVED***
+		if !ok || namoff+namlen > uint64(len(rec)) {
 			break
-		***REMOVED***
+		}
 		name := rec[namoff : namoff+namlen]
-		for i, c := range name ***REMOVED***
-			if c == 0 ***REMOVED***
+		for i, c := range name {
+			if c == 0 {
 				name = name[:i]
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		// Check for useless names before allocating a string.
-		if string(name) == "." || string(name) == ".." ***REMOVED***
+		if string(name) == "." || string(name) == ".." {
 			continue
-		***REMOVED***
+		}
 		max--
 		count++
 		names = append(names, string(name))
-	***REMOVED***
+	}
 	return origlen - len(buf), count, names
-***REMOVED***
+}

@@ -11,48 +11,48 @@ import (
 )
 
 // createContainerOSSpecificSettings performs host-OS specific container create functionality
-func (daemon *Daemon) createContainerOSSpecificSettings(container *container.Container, config *containertypes.Config, hostConfig *containertypes.HostConfig) error ***REMOVED***
+func (daemon *Daemon) createContainerOSSpecificSettings(container *container.Container, config *containertypes.Config, hostConfig *containertypes.HostConfig) error {
 
-	if container.OS == runtime.GOOS ***REMOVED***
+	if container.OS == runtime.GOOS {
 		// Make sure the host config has the default daemon isolation if not specified by caller.
-		if containertypes.Isolation.IsDefault(containertypes.Isolation(hostConfig.Isolation)) ***REMOVED***
+		if containertypes.Isolation.IsDefault(containertypes.Isolation(hostConfig.Isolation)) {
 			hostConfig.Isolation = daemon.defaultIsolation
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
+		}
+	} else {
 		// LCOW must be a Hyper-V container as you can't run a shared kernel when one
 		// is a Windows kernel, the other is a Linux kernel.
-		if containertypes.Isolation.IsProcess(containertypes.Isolation(hostConfig.Isolation)) ***REMOVED***
+		if containertypes.Isolation.IsProcess(containertypes.Isolation(hostConfig.Isolation)) {
 			return fmt.Errorf("process isolation is invalid for Linux containers on Windows")
-		***REMOVED***
+		}
 		hostConfig.Isolation = "hyperv"
-	***REMOVED***
+	}
 	parser := volume.NewParser(container.OS)
-	for spec := range config.Volumes ***REMOVED***
+	for spec := range config.Volumes {
 
 		mp, err := parser.ParseMountRaw(spec, hostConfig.VolumeDriver)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return fmt.Errorf("Unrecognised volume spec: %v", err)
-		***REMOVED***
+		}
 
 		// If the mountpoint doesn't have a name, generate one.
-		if len(mp.Name) == 0 ***REMOVED***
+		if len(mp.Name) == 0 {
 			mp.Name = stringid.GenerateNonCryptoID()
-		***REMOVED***
+		}
 
 		// Skip volumes for which we already have something mounted on that
 		// destination because of a --volume-from.
-		if container.IsDestinationMounted(mp.Destination) ***REMOVED***
+		if container.IsDestinationMounted(mp.Destination) {
 			continue
-		***REMOVED***
+		}
 
 		volumeDriver := hostConfig.VolumeDriver
 
 		// Create the volume in the volume driver. If it doesn't exist,
 		// a new one will be created.
 		v, err := daemon.volumes.CreateWithRef(mp.Name, volumeDriver, container.ID, nil, nil)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 
 		// FIXME Windows: This code block is present in the Linux version and
 		// allows the contents to be copied to the container FS prior to it
@@ -78,14 +78,14 @@ func (daemon *Daemon) createContainerOSSpecificSettings(container *container.Con
 		//   docker run -it --rm vol cmd  <-- This is where HCS will error out.
 		//
 		//	// never attempt to copy existing content in a container FS to a shared volume
-		//	if v.DriverName() == volume.DefaultDriverName ***REMOVED***
-		//		if err := container.CopyImagePathContent(v, mp.Destination); err != nil ***REMOVED***
+		//	if v.DriverName() == volume.DefaultDriverName {
+		//		if err := container.CopyImagePathContent(v, mp.Destination); err != nil {
 		//			return err
-		//		***REMOVED***
-		//	***REMOVED***
+		//		}
+		//	}
 
 		// Add it to container.MountPoints
 		container.AddMountPointWithVolume(mp.Destination, v, mp.RW)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

@@ -11,321 +11,321 @@ import (
 
 const tableTask = "task"
 
-func init() ***REMOVED***
-	register(ObjectStoreConfig***REMOVED***
-		Table: &memdb.TableSchema***REMOVED***
+func init() {
+	register(ObjectStoreConfig{
+		Table: &memdb.TableSchema{
 			Name: tableTask,
-			Indexes: map[string]*memdb.IndexSchema***REMOVED***
-				indexID: ***REMOVED***
+			Indexes: map[string]*memdb.IndexSchema{
+				indexID: {
 					Name:    indexID,
 					Unique:  true,
-					Indexer: api.TaskIndexerByID***REMOVED******REMOVED***,
-				***REMOVED***,
-				indexName: ***REMOVED***
+					Indexer: api.TaskIndexerByID{},
+				},
+				indexName: {
 					Name:         indexName,
 					AllowMissing: true,
-					Indexer:      taskIndexerByName***REMOVED******REMOVED***,
-				***REMOVED***,
-				indexRuntime: ***REMOVED***
+					Indexer:      taskIndexerByName{},
+				},
+				indexRuntime: {
 					Name:         indexRuntime,
 					AllowMissing: true,
-					Indexer:      taskIndexerByRuntime***REMOVED******REMOVED***,
-				***REMOVED***,
-				indexServiceID: ***REMOVED***
+					Indexer:      taskIndexerByRuntime{},
+				},
+				indexServiceID: {
 					Name:         indexServiceID,
 					AllowMissing: true,
-					Indexer:      taskIndexerByServiceID***REMOVED******REMOVED***,
-				***REMOVED***,
-				indexNodeID: ***REMOVED***
+					Indexer:      taskIndexerByServiceID{},
+				},
+				indexNodeID: {
 					Name:         indexNodeID,
 					AllowMissing: true,
-					Indexer:      taskIndexerByNodeID***REMOVED******REMOVED***,
-				***REMOVED***,
-				indexSlot: ***REMOVED***
+					Indexer:      taskIndexerByNodeID{},
+				},
+				indexSlot: {
 					Name:         indexSlot,
 					AllowMissing: true,
-					Indexer:      taskIndexerBySlot***REMOVED******REMOVED***,
-				***REMOVED***,
-				indexDesiredState: ***REMOVED***
+					Indexer:      taskIndexerBySlot{},
+				},
+				indexDesiredState: {
 					Name:    indexDesiredState,
-					Indexer: taskIndexerByDesiredState***REMOVED******REMOVED***,
-				***REMOVED***,
-				indexTaskState: ***REMOVED***
+					Indexer: taskIndexerByDesiredState{},
+				},
+				indexTaskState: {
 					Name:    indexTaskState,
-					Indexer: taskIndexerByTaskState***REMOVED******REMOVED***,
-				***REMOVED***,
-				indexNetwork: ***REMOVED***
+					Indexer: taskIndexerByTaskState{},
+				},
+				indexNetwork: {
 					Name:         indexNetwork,
 					AllowMissing: true,
-					Indexer:      taskIndexerByNetwork***REMOVED******REMOVED***,
-				***REMOVED***,
-				indexSecret: ***REMOVED***
+					Indexer:      taskIndexerByNetwork{},
+				},
+				indexSecret: {
 					Name:         indexSecret,
 					AllowMissing: true,
-					Indexer:      taskIndexerBySecret***REMOVED******REMOVED***,
-				***REMOVED***,
-				indexConfig: ***REMOVED***
+					Indexer:      taskIndexerBySecret{},
+				},
+				indexConfig: {
 					Name:         indexConfig,
 					AllowMissing: true,
-					Indexer:      taskIndexerByConfig***REMOVED******REMOVED***,
-				***REMOVED***,
-				indexCustom: ***REMOVED***
+					Indexer:      taskIndexerByConfig{},
+				},
+				indexCustom: {
 					Name:         indexCustom,
-					Indexer:      api.TaskCustomIndexer***REMOVED******REMOVED***,
+					Indexer:      api.TaskCustomIndexer{},
 					AllowMissing: true,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		Save: func(tx ReadTx, snapshot *api.StoreSnapshot) error ***REMOVED***
+				},
+			},
+		},
+		Save: func(tx ReadTx, snapshot *api.StoreSnapshot) error {
 			var err error
 			snapshot.Tasks, err = FindTasks(tx, All)
 			return err
-		***REMOVED***,
-		Restore: func(tx Tx, snapshot *api.StoreSnapshot) error ***REMOVED***
+		},
+		Restore: func(tx Tx, snapshot *api.StoreSnapshot) error {
 			toStoreObj := make([]api.StoreObject, len(snapshot.Tasks))
-			for i, x := range snapshot.Tasks ***REMOVED***
+			for i, x := range snapshot.Tasks {
 				toStoreObj[i] = x
-			***REMOVED***
+			}
 			return RestoreTable(tx, tableTask, toStoreObj)
-		***REMOVED***,
-		ApplyStoreAction: func(tx Tx, sa api.StoreAction) error ***REMOVED***
-			switch v := sa.Target.(type) ***REMOVED***
+		},
+		ApplyStoreAction: func(tx Tx, sa api.StoreAction) error {
+			switch v := sa.Target.(type) {
 			case *api.StoreAction_Task:
 				obj := v.Task
-				switch sa.Action ***REMOVED***
+				switch sa.Action {
 				case api.StoreActionKindCreate:
 					return CreateTask(tx, obj)
 				case api.StoreActionKindUpdate:
 					return UpdateTask(tx, obj)
 				case api.StoreActionKindRemove:
 					return DeleteTask(tx, obj.ID)
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return errUnknownStoreAction
-		***REMOVED***,
-	***REMOVED***)
-***REMOVED***
+		},
+	})
+}
 
 // CreateTask adds a new task to the store.
 // Returns ErrExist if the ID is already taken.
-func CreateTask(tx Tx, t *api.Task) error ***REMOVED***
+func CreateTask(tx Tx, t *api.Task) error {
 	return tx.create(tableTask, t)
-***REMOVED***
+}
 
 // UpdateTask updates an existing task in the store.
 // Returns ErrNotExist if the node doesn't exist.
-func UpdateTask(tx Tx, t *api.Task) error ***REMOVED***
+func UpdateTask(tx Tx, t *api.Task) error {
 	return tx.update(tableTask, t)
-***REMOVED***
+}
 
 // DeleteTask removes a task from the store.
 // Returns ErrNotExist if the task doesn't exist.
-func DeleteTask(tx Tx, id string) error ***REMOVED***
+func DeleteTask(tx Tx, id string) error {
 	return tx.delete(tableTask, id)
-***REMOVED***
+}
 
 // GetTask looks up a task by ID.
 // Returns nil if the task doesn't exist.
-func GetTask(tx ReadTx, id string) *api.Task ***REMOVED***
+func GetTask(tx ReadTx, id string) *api.Task {
 	t := tx.get(tableTask, id)
-	if t == nil ***REMOVED***
+	if t == nil {
 		return nil
-	***REMOVED***
+	}
 	return t.(*api.Task)
-***REMOVED***
+}
 
 // FindTasks selects a set of tasks and returns them.
-func FindTasks(tx ReadTx, by By) ([]*api.Task, error) ***REMOVED***
-	checkType := func(by By) error ***REMOVED***
-		switch by.(type) ***REMOVED***
+func FindTasks(tx ReadTx, by By) ([]*api.Task, error) {
+	checkType := func(by By) error {
+		switch by.(type) {
 		case byName, byNamePrefix, byIDPrefix, byRuntime, byDesiredState, byTaskState, byNode, byService, bySlot, byReferencedNetworkID, byReferencedSecretID, byReferencedConfigID, byCustom, byCustomPrefix:
 			return nil
 		default:
 			return ErrInvalidFindBy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	taskList := []*api.Task***REMOVED******REMOVED***
-	appendResult := func(o api.StoreObject) ***REMOVED***
+	taskList := []*api.Task{}
+	appendResult := func(o api.StoreObject) {
 		taskList = append(taskList, o.(*api.Task))
-	***REMOVED***
+	}
 
 	err := tx.find(tableTask, by, checkType, appendResult)
 	return taskList, err
-***REMOVED***
+}
 
-type taskIndexerByName struct***REMOVED******REMOVED***
+type taskIndexerByName struct{}
 
-func (ti taskIndexerByName) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (ti taskIndexerByName) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
+}
 
-func (ti taskIndexerByName) FromObject(obj interface***REMOVED******REMOVED***) (bool, []byte, error) ***REMOVED***
+func (ti taskIndexerByName) FromObject(obj interface{}) (bool, []byte, error) {
 	t := obj.(*api.Task)
 
 	name := naming.Task(t)
 
 	// Add the null character as a terminator
 	return true, []byte(strings.ToLower(name) + "\x00"), nil
-***REMOVED***
+}
 
-func (ti taskIndexerByName) PrefixFromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (ti taskIndexerByName) PrefixFromArgs(args ...interface{}) ([]byte, error) {
 	return prefixFromArgs(args...)
-***REMOVED***
+}
 
-type taskIndexerByRuntime struct***REMOVED******REMOVED***
+type taskIndexerByRuntime struct{}
 
-func (ti taskIndexerByRuntime) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (ti taskIndexerByRuntime) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
+}
 
-func (ti taskIndexerByRuntime) FromObject(obj interface***REMOVED******REMOVED***) (bool, []byte, error) ***REMOVED***
+func (ti taskIndexerByRuntime) FromObject(obj interface{}) (bool, []byte, error) {
 	t := obj.(*api.Task)
 	r, err := naming.Runtime(t.Spec)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return false, nil, nil
-	***REMOVED***
+	}
 	return true, []byte(r + "\x00"), nil
-***REMOVED***
+}
 
-func (ti taskIndexerByRuntime) PrefixFromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (ti taskIndexerByRuntime) PrefixFromArgs(args ...interface{}) ([]byte, error) {
 	return prefixFromArgs(args...)
-***REMOVED***
+}
 
-type taskIndexerByServiceID struct***REMOVED******REMOVED***
+type taskIndexerByServiceID struct{}
 
-func (ti taskIndexerByServiceID) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (ti taskIndexerByServiceID) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
+}
 
-func (ti taskIndexerByServiceID) FromObject(obj interface***REMOVED******REMOVED***) (bool, []byte, error) ***REMOVED***
+func (ti taskIndexerByServiceID) FromObject(obj interface{}) (bool, []byte, error) {
 	t := obj.(*api.Task)
 
 	// Add the null character as a terminator
 	val := t.ServiceID + "\x00"
 	return true, []byte(val), nil
-***REMOVED***
+}
 
-type taskIndexerByNodeID struct***REMOVED******REMOVED***
+type taskIndexerByNodeID struct{}
 
-func (ti taskIndexerByNodeID) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (ti taskIndexerByNodeID) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
+}
 
-func (ti taskIndexerByNodeID) FromObject(obj interface***REMOVED******REMOVED***) (bool, []byte, error) ***REMOVED***
+func (ti taskIndexerByNodeID) FromObject(obj interface{}) (bool, []byte, error) {
 	t := obj.(*api.Task)
 
 	// Add the null character as a terminator
 	val := t.NodeID + "\x00"
 	return true, []byte(val), nil
-***REMOVED***
+}
 
-type taskIndexerBySlot struct***REMOVED******REMOVED***
+type taskIndexerBySlot struct{}
 
-func (ti taskIndexerBySlot) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (ti taskIndexerBySlot) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
+}
 
-func (ti taskIndexerBySlot) FromObject(obj interface***REMOVED******REMOVED***) (bool, []byte, error) ***REMOVED***
+func (ti taskIndexerBySlot) FromObject(obj interface{}) (bool, []byte, error) {
 	t := obj.(*api.Task)
 
 	// Add the null character as a terminator
 	val := t.ServiceID + "\x00" + strconv.FormatUint(t.Slot, 10) + "\x00"
 	return true, []byte(val), nil
-***REMOVED***
+}
 
-type taskIndexerByDesiredState struct***REMOVED******REMOVED***
+type taskIndexerByDesiredState struct{}
 
-func (ti taskIndexerByDesiredState) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (ti taskIndexerByDesiredState) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
+}
 
-func (ti taskIndexerByDesiredState) FromObject(obj interface***REMOVED******REMOVED***) (bool, []byte, error) ***REMOVED***
+func (ti taskIndexerByDesiredState) FromObject(obj interface{}) (bool, []byte, error) {
 	t := obj.(*api.Task)
 
 	// Add the null character as a terminator
 	return true, []byte(strconv.FormatInt(int64(t.DesiredState), 10) + "\x00"), nil
-***REMOVED***
+}
 
-type taskIndexerByNetwork struct***REMOVED******REMOVED***
+type taskIndexerByNetwork struct{}
 
-func (ti taskIndexerByNetwork) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (ti taskIndexerByNetwork) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
+}
 
-func (ti taskIndexerByNetwork) FromObject(obj interface***REMOVED******REMOVED***) (bool, [][]byte, error) ***REMOVED***
+func (ti taskIndexerByNetwork) FromObject(obj interface{}) (bool, [][]byte, error) {
 	t := obj.(*api.Task)
 
 	var networkIDs [][]byte
 
-	for _, na := range t.Spec.Networks ***REMOVED***
+	for _, na := range t.Spec.Networks {
 		// Add the null character as a terminator
 		networkIDs = append(networkIDs, []byte(na.Target+"\x00"))
-	***REMOVED***
+	}
 
 	return len(networkIDs) != 0, networkIDs, nil
-***REMOVED***
+}
 
-type taskIndexerBySecret struct***REMOVED******REMOVED***
+type taskIndexerBySecret struct{}
 
-func (ti taskIndexerBySecret) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (ti taskIndexerBySecret) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
+}
 
-func (ti taskIndexerBySecret) FromObject(obj interface***REMOVED******REMOVED***) (bool, [][]byte, error) ***REMOVED***
+func (ti taskIndexerBySecret) FromObject(obj interface{}) (bool, [][]byte, error) {
 	t := obj.(*api.Task)
 
 	container := t.Spec.GetContainer()
-	if container == nil ***REMOVED***
+	if container == nil {
 		return false, nil, nil
-	***REMOVED***
+	}
 
 	var secretIDs [][]byte
 
-	for _, secretRef := range container.Secrets ***REMOVED***
+	for _, secretRef := range container.Secrets {
 		// Add the null character as a terminator
 		secretIDs = append(secretIDs, []byte(secretRef.SecretID+"\x00"))
-	***REMOVED***
+	}
 
 	return len(secretIDs) != 0, secretIDs, nil
-***REMOVED***
+}
 
-type taskIndexerByConfig struct***REMOVED******REMOVED***
+type taskIndexerByConfig struct{}
 
-func (ti taskIndexerByConfig) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (ti taskIndexerByConfig) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
+}
 
-func (ti taskIndexerByConfig) FromObject(obj interface***REMOVED******REMOVED***) (bool, [][]byte, error) ***REMOVED***
+func (ti taskIndexerByConfig) FromObject(obj interface{}) (bool, [][]byte, error) {
 	t, ok := obj.(*api.Task)
-	if !ok ***REMOVED***
+	if !ok {
 		panic("unexpected type passed to FromObject")
-	***REMOVED***
+	}
 
 	container := t.Spec.GetContainer()
-	if container == nil ***REMOVED***
+	if container == nil {
 		return false, nil, nil
-	***REMOVED***
+	}
 
 	var configIDs [][]byte
 
-	for _, configRef := range container.Configs ***REMOVED***
+	for _, configRef := range container.Configs {
 		// Add the null character as a terminator
 		configIDs = append(configIDs, []byte(configRef.ConfigID+"\x00"))
-	***REMOVED***
+	}
 
 	return len(configIDs) != 0, configIDs, nil
-***REMOVED***
+}
 
-type taskIndexerByTaskState struct***REMOVED******REMOVED***
+type taskIndexerByTaskState struct{}
 
-func (ts taskIndexerByTaskState) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (ts taskIndexerByTaskState) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
+}
 
-func (ts taskIndexerByTaskState) FromObject(obj interface***REMOVED******REMOVED***) (bool, []byte, error) ***REMOVED***
+func (ts taskIndexerByTaskState) FromObject(obj interface{}) (bool, []byte, error) {
 	t := obj.(*api.Task)
 
 	// Add the null character as a terminator
 	return true, []byte(strconv.FormatInt(int64(t.Status.State), 10) + "\x00"), nil
-***REMOVED***
+}

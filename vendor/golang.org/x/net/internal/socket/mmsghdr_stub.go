@@ -8,14 +8,14 @@ package socket
 
 import "net"
 
-type mmsghdr struct***REMOVED******REMOVED***
+type mmsghdr struct{}
 
 type mmsghdrs []mmsghdr
 
-func (hs mmsghdrs) pack(ms []Message, parseFn func([]byte, string) (net.Addr, error), marshalFn func(net.Addr) []byte) error ***REMOVED***
+func (hs mmsghdrs) pack(ms []Message, parseFn func([]byte, string) (net.Addr, error), marshalFn func(net.Addr) []byte) error {
 	return nil
-***REMOVED***
+}
 
-func (hs mmsghdrs) unpack(ms []Message, parseFn func([]byte, string) (net.Addr, error), hint string) error ***REMOVED***
+func (hs mmsghdrs) unpack(ms []Message, parseFn func([]byte, string) (net.Addr, error), hint string) error {
 	return nil
-***REMOVED***
+}

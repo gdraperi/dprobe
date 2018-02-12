@@ -35,31 +35,31 @@ Rich Feature Set includes:
     when encoding into or decoding from a byte slice.
   - Standard field renaming via tags
   - Encoding from any value  
-    (struct, slice, map, primitives, pointers, interface***REMOVED******REMOVED***, etc)
+    (struct, slice, map, primitives, pointers, interface{}, etc)
   - Decoding into pointer to any non-nil typed value  
     (struct, slice, map, int, float32, bool, string, reflect.Value, etc)
   - Supports extension functions to handle the encode/decode of custom types
   - Support Go 1.2 encoding.BinaryMarshaler/BinaryUnmarshaler
   - Schema-less decoding  
-    (decode into a pointer to a nil interface***REMOVED******REMOVED*** as opposed to a typed non-nil value).  
+    (decode into a pointer to a nil interface{} as opposed to a typed non-nil value).  
     Includes Options to configure what specific map or slice type to use 
-    when decoding an encoded list or map into a nil interface***REMOVED******REMOVED***
+    when decoding an encoded list or map into a nil interface{}
   - Provides a RPC Server and Client Codec for net/rpc communication protocol.
   - Msgpack Specific:
       - Provides extension functions to handle spec-defined extensions (binary, timestamp)
       - Options to resolve ambiguities in handling raw bytes (as string or []byte)  
-        during schema-less decoding (decoding into a nil interface***REMOVED******REMOVED***)
+        during schema-less decoding (decoding into a nil interface{})
       - RPC Server/Client Codec for msgpack-rpc protocol defined at: 
         https://github.com/msgpack-rpc/msgpack-rpc/blob/master/spec.md
   - Fast Paths for some container types:  
     For some container types, we circumvent reflection and its associated overhead
     and allocation costs, and encode/decode directly. These types are:  
-	    []interface***REMOVED******REMOVED***
+	    []interface{}
 	    []int
 	    []string
-	    map[interface***REMOVED******REMOVED***]interface***REMOVED******REMOVED***
-	    map[int]interface***REMOVED******REMOVED***
-	    map[string]interface***REMOVED******REMOVED***
+	    map[interface{}]interface{}
+	    map[int]interface{}
+	    map[string]interface{}
 
 ## Extension Support
 
@@ -71,8 +71,8 @@ There are no restrictions on what the custom type can be. Some examples:
     type BisSet   []int
     type BitSet64 uint64
     type UUID     string
-    type MyStructWithUnexportedFields struct ***REMOVED*** a int; b bool; c []int; ***REMOVED***
-    type GifImage struct ***REMOVED*** ... ***REMOVED***
+    type MyStructWithUnexportedFields struct { a int; b bool; c []int; }
+    type GifImage struct { ... }
 
 As an illustration, MyStructWithUnexportedFields would normally be
 encoded as an empty map because it has no exported fields, while UUID
@@ -94,11 +94,11 @@ Typical usage model:
       mh codec.MsgpackHandle
     )
 
-    mh.MapType = reflect.TypeOf(map[string]interface***REMOVED******REMOVED***(nil))
+    mh.MapType = reflect.TypeOf(map[string]interface{}(nil))
     
     // configure extensions
     // e.g. for msgpack, define functions and enable Time support for tag 1
-    // mh.AddExt(reflect.TypeOf(time.Time***REMOVED******REMOVED***), 1, myMsgpackTimeEncodeExtFn, myMsgpackTimeDecodeExtFn)
+    // mh.AddExt(reflect.TypeOf(time.Time{}), 1, myMsgpackTimeEncodeExtFn, myMsgpackTimeDecodeExtFn)
 
     // create and use decoder/encoder
     var (
@@ -117,14 +117,14 @@ Typical usage model:
     err = enc.Encode(v)
     
     //RPC Server
-    go func() ***REMOVED***
-        for ***REMOVED***
+    go func() {
+        for {
             conn, err := listener.Accept()
             rpcCodec := codec.GoRpc.ServerCodec(conn, h)
             //OR rpcCodec := codec.MsgpackSpecRpc.ServerCodec(conn, h)
             rpc.ServeCodec(rpcCodec)
-    ***REMOVED***
-***REMOVED***()
+        }
+    }()
 
     //RPC Communication (client side)
     conn, err = net.Dial("tcp", "localhost:5555")

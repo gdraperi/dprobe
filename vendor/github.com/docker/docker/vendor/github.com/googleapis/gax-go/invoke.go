@@ -40,51 +40,51 @@ type APICall func(context.Context) error
 
 // Invoke calls the given APICall,
 // performing retries as specified by opts, if any.
-func Invoke(ctx context.Context, call APICall, opts ...CallOption) error ***REMOVED***
+func Invoke(ctx context.Context, call APICall, opts ...CallOption) error {
 	var settings CallSettings
-	for _, opt := range opts ***REMOVED***
+	for _, opt := range opts {
 		opt.Resolve(&settings)
-	***REMOVED***
+	}
 	return invoke(ctx, call, settings, Sleep)
-***REMOVED***
+}
 
 // Sleep is similar to time.Sleep, but it can be interrupted by ctx.Done() closing.
 // If interrupted, Sleep returns ctx.Err().
-func Sleep(ctx context.Context, d time.Duration) error ***REMOVED***
+func Sleep(ctx context.Context, d time.Duration) error {
 	t := time.NewTimer(d)
-	select ***REMOVED***
+	select {
 	case <-ctx.Done():
 		t.Stop()
 		return ctx.Err()
 	case <-t.C:
 		return nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 type sleeper func(ctx context.Context, d time.Duration) error
 
 // invoke implements Invoke, taking an additional sleeper argument for testing.
-func invoke(ctx context.Context, call APICall, settings CallSettings, sp sleeper) error ***REMOVED***
+func invoke(ctx context.Context, call APICall, settings CallSettings, sp sleeper) error {
 	var retryer Retryer
-	for ***REMOVED***
+	for {
 		err := call(ctx)
-		if err == nil ***REMOVED***
+		if err == nil {
 			return nil
-		***REMOVED***
-		if settings.Retry == nil ***REMOVED***
+		}
+		if settings.Retry == nil {
 			return err
-		***REMOVED***
-		if retryer == nil ***REMOVED***
-			if r := settings.Retry(); r != nil ***REMOVED***
+		}
+		if retryer == nil {
+			if r := settings.Retry(); r != nil {
 				retryer = r
-			***REMOVED*** else ***REMOVED***
+			} else {
 				return err
-			***REMOVED***
-		***REMOVED***
-		if d, ok := retryer.Retry(err); !ok ***REMOVED***
+			}
+		}
+		if d, ok := retryer.Retry(err); !ok {
 			return err
-		***REMOVED*** else if err = sp(ctx, d); err != nil ***REMOVED***
+		} else if err = sp(ctx, d); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

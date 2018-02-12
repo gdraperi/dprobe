@@ -5,7 +5,7 @@ package types
 
 // PluginEnv plugin env
 // swagger:model PluginEnv
-type PluginEnv struct ***REMOVED***
+type PluginEnv struct {
 
 	// description
 	// Required: true
@@ -22,4 +22,4 @@ type PluginEnv struct ***REMOVED***
 	// value
 	// Required: true
 	Value *string `json:"Value"`
-***REMOVED***
+}

@@ -4,30 +4,30 @@ import "time"
 
 // ClusterInfo represents info about the cluster for outputting in "info"
 // it contains the same information as "Swarm", but without the JoinTokens
-type ClusterInfo struct ***REMOVED***
+type ClusterInfo struct {
 	ID string
 	Meta
 	Spec                   Spec
 	TLSInfo                TLSInfo
 	RootRotationInProgress bool
-***REMOVED***
+}
 
 // Swarm represents a swarm.
-type Swarm struct ***REMOVED***
+type Swarm struct {
 	ClusterInfo
 	JoinTokens JoinTokens
-***REMOVED***
+}
 
 // JoinTokens contains the tokens workers and managers need to join the swarm.
-type JoinTokens struct ***REMOVED***
+type JoinTokens struct {
 	// Worker is the join token workers may use to join the swarm.
 	Worker string
 	// Manager is the join token managers may use to join the swarm.
 	Manager string
-***REMOVED***
+}
 
 // Spec represents the spec of a swarm.
-type Spec struct ***REMOVED***
+type Spec struct {
 	Annotations
 
 	Orchestration    OrchestrationConfig `json:",omitempty"`
@@ -36,17 +36,17 @@ type Spec struct ***REMOVED***
 	CAConfig         CAConfig            `json:",omitempty"`
 	TaskDefaults     TaskDefaults        `json:",omitempty"`
 	EncryptionConfig EncryptionConfig    `json:",omitempty"`
-***REMOVED***
+}
 
 // OrchestrationConfig represents orchestration configuration.
-type OrchestrationConfig struct ***REMOVED***
+type OrchestrationConfig struct {
 	// TaskHistoryRetentionLimit is the number of historic tasks to keep per instance or
 	// node. If negative, never remove completed or failed tasks.
 	TaskHistoryRetentionLimit *int64 `json:",omitempty"`
-***REMOVED***
+}
 
 // TaskDefaults parameterizes cluster-level task creation with default values.
-type TaskDefaults struct ***REMOVED***
+type TaskDefaults struct {
 	// LogDriver selects the log driver to use for tasks created in the
 	// orchestrator if unspecified by a service.
 	//
@@ -54,18 +54,18 @@ type TaskDefaults struct ***REMOVED***
 	// will continue use their previously configured log driver until
 	// recreated.
 	LogDriver *Driver `json:",omitempty"`
-***REMOVED***
+}
 
 // EncryptionConfig controls at-rest encryption of data and keys.
-type EncryptionConfig struct ***REMOVED***
+type EncryptionConfig struct {
 	// AutoLockManagers specifies whether or not managers TLS keys and raft data
 	// should be encrypted at rest in such a way that they must be unlocked
 	// before the manager node starts up again.
 	AutoLockManagers bool
-***REMOVED***
+}
 
 // RaftConfig represents raft configuration.
-type RaftConfig struct ***REMOVED***
+type RaftConfig struct {
 	// SnapshotInterval is the number of log entries between snapshots.
 	SnapshotInterval uint64 `json:",omitempty"`
 
@@ -92,17 +92,17 @@ type RaftConfig struct ***REMOVED***
 	// A tick currently defaults to one second, so these translate directly to
 	// seconds currently, but this is NOT guaranteed.
 	HeartbeatTick int
-***REMOVED***
+}
 
 // DispatcherConfig represents dispatcher configuration.
-type DispatcherConfig struct ***REMOVED***
+type DispatcherConfig struct {
 	// HeartbeatPeriod defines how often agent should send heartbeats to
 	// dispatcher.
 	HeartbeatPeriod time.Duration `json:",omitempty"`
-***REMOVED***
+}
 
 // CAConfig represents CA configuration.
-type CAConfig struct ***REMOVED***
+type CAConfig struct {
 	// NodeCertExpiry is the duration certificates should be issued for
 	NodeCertExpiry time.Duration `json:",omitempty"`
 
@@ -119,7 +119,7 @@ type CAConfig struct ***REMOVED***
 	// If this value changes, and there is no specified signing cert and key,
 	// then the swarm is forced to generate a new root certificate ane key.
 	ForceRotate uint64 `json:",omitempty"`
-***REMOVED***
+}
 
 // ExternalCAProtocol represents type of external CA.
 type ExternalCAProtocol string
@@ -128,7 +128,7 @@ type ExternalCAProtocol string
 const ExternalCAProtocolCFSSL ExternalCAProtocol = "cfssl"
 
 // ExternalCA defines external CA to be used by the cluster.
-type ExternalCA struct ***REMOVED***
+type ExternalCA struct {
 	// Protocol is the protocol used by this external CA.
 	Protocol ExternalCAProtocol
 
@@ -142,10 +142,10 @@ type ExternalCA struct ***REMOVED***
 	// CACert specifies which root CA is used by this external CA.  This certificate must
 	// be in PEM format.
 	CACert string
-***REMOVED***
+}
 
 // InitRequest is the request used to init a swarm.
-type InitRequest struct ***REMOVED***
+type InitRequest struct {
 	ListenAddr       string
 	AdvertiseAddr    string
 	DataPathAddr     string
@@ -153,23 +153,23 @@ type InitRequest struct ***REMOVED***
 	Spec             Spec
 	AutoLockManagers bool
 	Availability     NodeAvailability
-***REMOVED***
+}
 
 // JoinRequest is the request used to join a swarm.
-type JoinRequest struct ***REMOVED***
+type JoinRequest struct {
 	ListenAddr    string
 	AdvertiseAddr string
 	DataPathAddr  string
 	RemoteAddrs   []string
 	JoinToken     string // accept by secret
 	Availability  NodeAvailability
-***REMOVED***
+}
 
 // UnlockRequest is the request used to unlock a swarm.
-type UnlockRequest struct ***REMOVED***
+type UnlockRequest struct {
 	// UnlockKey is the unlock key in ASCII-armored format.
 	UnlockKey string
-***REMOVED***
+}
 
 // LocalNodeState represents the state of the local node.
 type LocalNodeState string
@@ -188,7 +188,7 @@ const (
 )
 
 // Info represents generic information about swarm.
-type Info struct ***REMOVED***
+type Info struct {
 	NodeID   string
 	NodeAddr string
 
@@ -201,17 +201,17 @@ type Info struct ***REMOVED***
 	Managers       int `json:",omitempty"`
 
 	Cluster *ClusterInfo `json:",omitempty"`
-***REMOVED***
+}
 
 // Peer represents a peer.
-type Peer struct ***REMOVED***
+type Peer struct {
 	NodeID string
 	Addr   string
-***REMOVED***
+}
 
 // UpdateFlags contains flags for SwarmUpdate.
-type UpdateFlags struct ***REMOVED***
+type UpdateFlags struct {
 	RotateWorkerToken      bool
 	RotateManagerToken     bool
 	RotateManagerUnlockKey bool
-***REMOVED***
+}

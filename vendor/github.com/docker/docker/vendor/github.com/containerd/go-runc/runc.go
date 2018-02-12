@@ -31,7 +31,7 @@ const (
 )
 
 // Runc is the client to the runc cli
-type Runc struct ***REMOVED***
+type Runc struct {
 	//If command is empty, DefaultCommand is used
 	Command       string
 	Root          string
@@ -42,39 +42,39 @@ type Runc struct ***REMOVED***
 	Setpgid       bool
 	Criu          string
 	SystemdCgroup bool
-***REMOVED***
+}
 
 // List returns all containers created inside the provided runc root directory
-func (r *Runc) List(context context.Context) ([]*Container, error) ***REMOVED***
+func (r *Runc) List(context context.Context) ([]*Container, error) {
 	data, err := cmdOutput(r.command(context, "list", "--format=json"), false)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	var out []*Container
-	if err := json.Unmarshal(data, &out); err != nil ***REMOVED***
+	if err := json.Unmarshal(data, &out); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
 // State returns the state for the container provided by id
-func (r *Runc) State(context context.Context, id string) (*Container, error) ***REMOVED***
+func (r *Runc) State(context context.Context, id string) (*Container, error) {
 	data, err := cmdOutput(r.command(context, "state", id), true)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("%s: %s", err, data)
-	***REMOVED***
+	}
 	var c Container
-	if err := json.Unmarshal(data, &c); err != nil ***REMOVED***
+	if err := json.Unmarshal(data, &c); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return &c, nil
-***REMOVED***
+}
 
-type ConsoleSocket interface ***REMOVED***
+type ConsoleSocket interface {
 	Path() string
-***REMOVED***
+}
 
-type CreateOpts struct ***REMOVED***
+type CreateOpts struct {
 	IO
 	// PidFile is a path to where a pid file should be created
 	PidFile       string
@@ -83,304 +83,304 @@ type CreateOpts struct ***REMOVED***
 	NoPivot       bool
 	NoNewKeyring  bool
 	ExtraFiles    []*os.File
-***REMOVED***
+}
 
-func (o *CreateOpts) args() (out []string, err error) ***REMOVED***
-	if o.PidFile != "" ***REMOVED***
+func (o *CreateOpts) args() (out []string, err error) {
+	if o.PidFile != "" {
 		abs, err := filepath.Abs(o.PidFile)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		out = append(out, "--pid-file", abs)
-	***REMOVED***
-	if o.ConsoleSocket != nil ***REMOVED***
+	}
+	if o.ConsoleSocket != nil {
 		out = append(out, "--console-socket", o.ConsoleSocket.Path())
-	***REMOVED***
-	if o.NoPivot ***REMOVED***
+	}
+	if o.NoPivot {
 		out = append(out, "--no-pivot")
-	***REMOVED***
-	if o.NoNewKeyring ***REMOVED***
+	}
+	if o.NoNewKeyring {
 		out = append(out, "--no-new-keyring")
-	***REMOVED***
-	if o.Detach ***REMOVED***
+	}
+	if o.Detach {
 		out = append(out, "--detach")
-	***REMOVED***
-	if o.ExtraFiles != nil ***REMOVED***
+	}
+	if o.ExtraFiles != nil {
 		out = append(out, "--preserve-fds", strconv.Itoa(len(o.ExtraFiles)))
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
 // Create creates a new container and returns its pid if it was created successfully
-func (r *Runc) Create(context context.Context, id, bundle string, opts *CreateOpts) error ***REMOVED***
-	args := []string***REMOVED***"create", "--bundle", bundle***REMOVED***
-	if opts != nil ***REMOVED***
+func (r *Runc) Create(context context.Context, id, bundle string, opts *CreateOpts) error {
+	args := []string{"create", "--bundle", bundle}
+	if opts != nil {
 		oargs, err := opts.args()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		args = append(args, oargs...)
-	***REMOVED***
+	}
 	cmd := r.command(context, append(args, id)...)
-	if opts != nil && opts.IO != nil ***REMOVED***
+	if opts != nil && opts.IO != nil {
 		opts.Set(cmd)
-	***REMOVED***
+	}
 	cmd.ExtraFiles = opts.ExtraFiles
 
-	if cmd.Stdout == nil && cmd.Stderr == nil ***REMOVED***
+	if cmd.Stdout == nil && cmd.Stderr == nil {
 		data, err := cmdOutput(cmd, true)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return fmt.Errorf("%s: %s", err, data)
-		***REMOVED***
+		}
 		return nil
-	***REMOVED***
+	}
 	ec, err := Monitor.Start(cmd)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	if opts != nil && opts.IO != nil ***REMOVED***
-		if c, ok := opts.IO.(StartCloser); ok ***REMOVED***
-			if err := c.CloseAfterStart(); err != nil ***REMOVED***
+	}
+	if opts != nil && opts.IO != nil {
+		if c, ok := opts.IO.(StartCloser); ok {
+			if err := c.CloseAfterStart(); err != nil {
 				return err
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	status, err := Monitor.Wait(cmd, ec)
-	if err == nil && status != 0 ***REMOVED***
+	if err == nil && status != 0 {
 		err = fmt.Errorf("%s did not terminate sucessfully", cmd.Args[0])
-	***REMOVED***
+	}
 	return err
-***REMOVED***
+}
 
 // Start will start an already created container
-func (r *Runc) Start(context context.Context, id string) error ***REMOVED***
+func (r *Runc) Start(context context.Context, id string) error {
 	return r.runOrError(r.command(context, "start", id))
-***REMOVED***
+}
 
-type ExecOpts struct ***REMOVED***
+type ExecOpts struct {
 	IO
 	PidFile       string
 	ConsoleSocket ConsoleSocket
 	Detach        bool
-***REMOVED***
+}
 
-func (o *ExecOpts) args() (out []string, err error) ***REMOVED***
-	if o.ConsoleSocket != nil ***REMOVED***
+func (o *ExecOpts) args() (out []string, err error) {
+	if o.ConsoleSocket != nil {
 		out = append(out, "--console-socket", o.ConsoleSocket.Path())
-	***REMOVED***
-	if o.Detach ***REMOVED***
+	}
+	if o.Detach {
 		out = append(out, "--detach")
-	***REMOVED***
-	if o.PidFile != "" ***REMOVED***
+	}
+	if o.PidFile != "" {
 		abs, err := filepath.Abs(o.PidFile)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		out = append(out, "--pid-file", abs)
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
 // Exec executres and additional process inside the container based on a full
 // OCI Process specification
-func (r *Runc) Exec(context context.Context, id string, spec specs.Process, opts *ExecOpts) error ***REMOVED***
+func (r *Runc) Exec(context context.Context, id string, spec specs.Process, opts *ExecOpts) error {
 	f, err := ioutil.TempFile("", "runc-process")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer os.Remove(f.Name())
 	err = json.NewEncoder(f).Encode(spec)
 	f.Close()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	args := []string***REMOVED***"exec", "--process", f.Name()***REMOVED***
-	if opts != nil ***REMOVED***
+	}
+	args := []string{"exec", "--process", f.Name()}
+	if opts != nil {
 		oargs, err := opts.args()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		args = append(args, oargs...)
-	***REMOVED***
+	}
 	cmd := r.command(context, append(args, id)...)
-	if opts != nil && opts.IO != nil ***REMOVED***
+	if opts != nil && opts.IO != nil {
 		opts.Set(cmd)
-	***REMOVED***
-	if cmd.Stdout == nil && cmd.Stderr == nil ***REMOVED***
+	}
+	if cmd.Stdout == nil && cmd.Stderr == nil {
 		data, err := cmdOutput(cmd, true)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return fmt.Errorf("%s: %s", err, data)
-		***REMOVED***
+		}
 		return nil
-	***REMOVED***
+	}
 	ec, err := Monitor.Start(cmd)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	if opts != nil && opts.IO != nil ***REMOVED***
-		if c, ok := opts.IO.(StartCloser); ok ***REMOVED***
-			if err := c.CloseAfterStart(); err != nil ***REMOVED***
+	}
+	if opts != nil && opts.IO != nil {
+		if c, ok := opts.IO.(StartCloser); ok {
+			if err := c.CloseAfterStart(); err != nil {
 				return err
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	status, err := Monitor.Wait(cmd, ec)
-	if err == nil && status != 0 ***REMOVED***
+	if err == nil && status != 0 {
 		err = fmt.Errorf("%s did not terminate sucessfully", cmd.Args[0])
-	***REMOVED***
+	}
 	return err
-***REMOVED***
+}
 
 // Run runs the create, start, delete lifecycle of the container
 // and returns its exit status after it has exited
-func (r *Runc) Run(context context.Context, id, bundle string, opts *CreateOpts) (int, error) ***REMOVED***
-	args := []string***REMOVED***"run", "--bundle", bundle***REMOVED***
-	if opts != nil ***REMOVED***
+func (r *Runc) Run(context context.Context, id, bundle string, opts *CreateOpts) (int, error) {
+	args := []string{"run", "--bundle", bundle}
+	if opts != nil {
 		oargs, err := opts.args()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return -1, err
-		***REMOVED***
+		}
 		args = append(args, oargs...)
-	***REMOVED***
+	}
 	cmd := r.command(context, append(args, id)...)
-	if opts != nil && opts.IO != nil ***REMOVED***
+	if opts != nil && opts.IO != nil {
 		opts.Set(cmd)
-	***REMOVED***
+	}
 	ec, err := Monitor.Start(cmd)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return -1, err
-	***REMOVED***
+	}
 	return Monitor.Wait(cmd, ec)
-***REMOVED***
+}
 
-type DeleteOpts struct ***REMOVED***
+type DeleteOpts struct {
 	Force bool
-***REMOVED***
+}
 
-func (o *DeleteOpts) args() (out []string) ***REMOVED***
-	if o.Force ***REMOVED***
+func (o *DeleteOpts) args() (out []string) {
+	if o.Force {
 		out = append(out, "--force")
-	***REMOVED***
+	}
 	return out
-***REMOVED***
+}
 
 // Delete deletes the container
-func (r *Runc) Delete(context context.Context, id string, opts *DeleteOpts) error ***REMOVED***
-	args := []string***REMOVED***"delete"***REMOVED***
-	if opts != nil ***REMOVED***
+func (r *Runc) Delete(context context.Context, id string, opts *DeleteOpts) error {
+	args := []string{"delete"}
+	if opts != nil {
 		args = append(args, opts.args()...)
-	***REMOVED***
+	}
 	return r.runOrError(r.command(context, append(args, id)...))
-***REMOVED***
+}
 
 // KillOpts specifies options for killing a container and its processes
-type KillOpts struct ***REMOVED***
+type KillOpts struct {
 	All bool
-***REMOVED***
+}
 
-func (o *KillOpts) args() (out []string) ***REMOVED***
-	if o.All ***REMOVED***
+func (o *KillOpts) args() (out []string) {
+	if o.All {
 		out = append(out, "--all")
-	***REMOVED***
+	}
 	return out
-***REMOVED***
+}
 
 // Kill sends the specified signal to the container
-func (r *Runc) Kill(context context.Context, id string, sig int, opts *KillOpts) error ***REMOVED***
-	args := []string***REMOVED***
+func (r *Runc) Kill(context context.Context, id string, sig int, opts *KillOpts) error {
+	args := []string{
 		"kill",
-	***REMOVED***
-	if opts != nil ***REMOVED***
+	}
+	if opts != nil {
 		args = append(args, opts.args()...)
-	***REMOVED***
+	}
 	return r.runOrError(r.command(context, append(args, id, strconv.Itoa(sig))...))
-***REMOVED***
+}
 
 // Stats return the stats for a container like cpu, memory, and io
-func (r *Runc) Stats(context context.Context, id string) (*Stats, error) ***REMOVED***
+func (r *Runc) Stats(context context.Context, id string) (*Stats, error) {
 	cmd := r.command(context, "events", "--stats", id)
 	rd, err := cmd.StdoutPipe()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	ec, err := Monitor.Start(cmd)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	defer func() ***REMOVED***
+	}
+	defer func() {
 		rd.Close()
 		Monitor.Wait(cmd, ec)
-	***REMOVED***()
+	}()
 	var e Event
-	if err := json.NewDecoder(rd).Decode(&e); err != nil ***REMOVED***
+	if err := json.NewDecoder(rd).Decode(&e); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return e.Stats, nil
-***REMOVED***
+}
 
 // Events returns an event stream from runc for a container with stats and OOM notifications
-func (r *Runc) Events(context context.Context, id string, interval time.Duration) (chan *Event, error) ***REMOVED***
+func (r *Runc) Events(context context.Context, id string, interval time.Duration) (chan *Event, error) {
 	cmd := r.command(context, "events", fmt.Sprintf("--interval=%ds", int(interval.Seconds())), id)
 	rd, err := cmd.StdoutPipe()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	ec, err := Monitor.Start(cmd)
-	if err != nil ***REMOVED***
+	if err != nil {
 		rd.Close()
 		return nil, err
-	***REMOVED***
+	}
 	var (
 		dec = json.NewDecoder(rd)
 		c   = make(chan *Event, 128)
 	)
-	go func() ***REMOVED***
-		defer func() ***REMOVED***
+	go func() {
+		defer func() {
 			close(c)
 			rd.Close()
 			Monitor.Wait(cmd, ec)
-		***REMOVED***()
-		for ***REMOVED***
+		}()
+		for {
 			var e Event
-			if err := dec.Decode(&e); err != nil ***REMOVED***
-				if err == io.EOF ***REMOVED***
+			if err := dec.Decode(&e); err != nil {
+				if err == io.EOF {
 					return
-				***REMOVED***
-				e = Event***REMOVED***
+				}
+				e = Event{
 					Type: "error",
 					Err:  err,
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			c <- &e
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 	return c, nil
-***REMOVED***
+}
 
 // Pause the container with the provided id
-func (r *Runc) Pause(context context.Context, id string) error ***REMOVED***
+func (r *Runc) Pause(context context.Context, id string) error {
 	return r.runOrError(r.command(context, "pause", id))
-***REMOVED***
+}
 
 // Resume the container with the provided id
-func (r *Runc) Resume(context context.Context, id string) error ***REMOVED***
+func (r *Runc) Resume(context context.Context, id string) error {
 	return r.runOrError(r.command(context, "resume", id))
-***REMOVED***
+}
 
 // Ps lists all the processes inside the container returning their pids
-func (r *Runc) Ps(context context.Context, id string) ([]int, error) ***REMOVED***
+func (r *Runc) Ps(context context.Context, id string) ([]int, error) {
 	data, err := cmdOutput(r.command(context, "ps", "--format", "json", id), true)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("%s: %s", err, data)
-	***REMOVED***
+	}
 	var pids []int
-	if err := json.Unmarshal(data, &pids); err != nil ***REMOVED***
+	if err := json.Unmarshal(data, &pids); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return pids, nil
-***REMOVED***
+}
 
-type CheckpointOpts struct ***REMOVED***
+type CheckpointOpts struct {
 	// ImagePath is the path for saving the criu image file
 	ImagePath string
 	// WorkDir is the working directory for criu
@@ -402,7 +402,7 @@ type CheckpointOpts struct ***REMOVED***
 	// EmptyNamespaces creates a namespace for the container but does not save its properties
 	// Provide the namespaces you wish to be checkpointed without their settings on restore
 	EmptyNamespaces []string
-***REMOVED***
+}
 
 type CgroupMode string
 
@@ -412,65 +412,65 @@ const (
 	Strict CgroupMode = "strict"
 )
 
-func (o *CheckpointOpts) args() (out []string) ***REMOVED***
-	if o.ImagePath != "" ***REMOVED***
+func (o *CheckpointOpts) args() (out []string) {
+	if o.ImagePath != "" {
 		out = append(out, "--image-path", o.ImagePath)
-	***REMOVED***
-	if o.WorkDir != "" ***REMOVED***
+	}
+	if o.WorkDir != "" {
 		out = append(out, "--work-path", o.WorkDir)
-	***REMOVED***
-	if o.ParentPath != "" ***REMOVED***
+	}
+	if o.ParentPath != "" {
 		out = append(out, "--parent-path", o.ParentPath)
-	***REMOVED***
-	if o.AllowOpenTCP ***REMOVED***
+	}
+	if o.AllowOpenTCP {
 		out = append(out, "--tcp-established")
-	***REMOVED***
-	if o.AllowExternalUnixSockets ***REMOVED***
+	}
+	if o.AllowExternalUnixSockets {
 		out = append(out, "--ext-unix-sk")
-	***REMOVED***
-	if o.AllowTerminal ***REMOVED***
+	}
+	if o.AllowTerminal {
 		out = append(out, "--shell-job")
-	***REMOVED***
-	if o.CriuPageServer != "" ***REMOVED***
+	}
+	if o.CriuPageServer != "" {
 		out = append(out, "--page-server", o.CriuPageServer)
-	***REMOVED***
-	if o.FileLocks ***REMOVED***
+	}
+	if o.FileLocks {
 		out = append(out, "--file-locks")
-	***REMOVED***
-	if string(o.Cgroups) != "" ***REMOVED***
+	}
+	if string(o.Cgroups) != "" {
 		out = append(out, "--manage-cgroups-mode", string(o.Cgroups))
-	***REMOVED***
-	for _, ns := range o.EmptyNamespaces ***REMOVED***
+	}
+	for _, ns := range o.EmptyNamespaces {
 		out = append(out, "--empty-ns", ns)
-	***REMOVED***
+	}
 	return out
-***REMOVED***
+}
 
 type CheckpointAction func([]string) []string
 
 // LeaveRunning keeps the container running after the checkpoint has been completed
-func LeaveRunning(args []string) []string ***REMOVED***
+func LeaveRunning(args []string) []string {
 	return append(args, "--leave-running")
-***REMOVED***
+}
 
 // PreDump allows a pre-dump of the checkpoint to be made and completed later
-func PreDump(args []string) []string ***REMOVED***
+func PreDump(args []string) []string {
 	return append(args, "--pre-dump")
-***REMOVED***
+}
 
 // Checkpoint allows you to checkpoint a container using criu
-func (r *Runc) Checkpoint(context context.Context, id string, opts *CheckpointOpts, actions ...CheckpointAction) error ***REMOVED***
-	args := []string***REMOVED***"checkpoint"***REMOVED***
-	if opts != nil ***REMOVED***
+func (r *Runc) Checkpoint(context context.Context, id string, opts *CheckpointOpts, actions ...CheckpointAction) error {
+	args := []string{"checkpoint"}
+	if opts != nil {
 		args = append(args, opts.args()...)
-	***REMOVED***
-	for _, a := range actions ***REMOVED***
+	}
+	for _, a := range actions {
 		args = a(args)
-	***REMOVED***
+	}
 	return r.runOrError(r.command(context, append(args, id)...))
-***REMOVED***
+}
 
-type RestoreOpts struct ***REMOVED***
+type RestoreOpts struct {
 	CheckpointOpts
 	IO
 
@@ -478,181 +478,181 @@ type RestoreOpts struct ***REMOVED***
 	PidFile     string
 	NoSubreaper bool
 	NoPivot     bool
-***REMOVED***
+}
 
-func (o *RestoreOpts) args() ([]string, error) ***REMOVED***
+func (o *RestoreOpts) args() ([]string, error) {
 	out := o.CheckpointOpts.args()
-	if o.Detach ***REMOVED***
+	if o.Detach {
 		out = append(out, "--detach")
-	***REMOVED***
-	if o.PidFile != "" ***REMOVED***
+	}
+	if o.PidFile != "" {
 		abs, err := filepath.Abs(o.PidFile)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		out = append(out, "--pid-file", abs)
-	***REMOVED***
-	if o.NoPivot ***REMOVED***
+	}
+	if o.NoPivot {
 		out = append(out, "--no-pivot")
-	***REMOVED***
-	if o.NoSubreaper ***REMOVED***
+	}
+	if o.NoSubreaper {
 		out = append(out, "-no-subreaper")
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
 // Restore restores a container with the provide id from an existing checkpoint
-func (r *Runc) Restore(context context.Context, id, bundle string, opts *RestoreOpts) (int, error) ***REMOVED***
-	args := []string***REMOVED***"restore"***REMOVED***
-	if opts != nil ***REMOVED***
+func (r *Runc) Restore(context context.Context, id, bundle string, opts *RestoreOpts) (int, error) {
+	args := []string{"restore"}
+	if opts != nil {
 		oargs, err := opts.args()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return -1, err
-		***REMOVED***
+		}
 		args = append(args, oargs...)
-	***REMOVED***
+	}
 	args = append(args, "--bundle", bundle)
 	cmd := r.command(context, append(args, id)...)
-	if opts != nil && opts.IO != nil ***REMOVED***
+	if opts != nil && opts.IO != nil {
 		opts.Set(cmd)
-	***REMOVED***
+	}
 	ec, err := Monitor.Start(cmd)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return -1, err
-	***REMOVED***
-	if opts != nil && opts.IO != nil ***REMOVED***
-		if c, ok := opts.IO.(StartCloser); ok ***REMOVED***
-			if err := c.CloseAfterStart(); err != nil ***REMOVED***
+	}
+	if opts != nil && opts.IO != nil {
+		if c, ok := opts.IO.(StartCloser); ok {
+			if err := c.CloseAfterStart(); err != nil {
 				return -1, err
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return Monitor.Wait(cmd, ec)
-***REMOVED***
+}
 
 // Update updates the current container with the provided resource spec
-func (r *Runc) Update(context context.Context, id string, resources *specs.LinuxResources) error ***REMOVED***
+func (r *Runc) Update(context context.Context, id string, resources *specs.LinuxResources) error {
 	buf := bytes.NewBuffer(nil)
-	if err := json.NewEncoder(buf).Encode(resources); err != nil ***REMOVED***
+	if err := json.NewEncoder(buf).Encode(resources); err != nil {
 		return err
-	***REMOVED***
-	args := []string***REMOVED***"update", "--resources", "-", id***REMOVED***
+	}
+	args := []string{"update", "--resources", "-", id}
 	cmd := r.command(context, args...)
 	cmd.Stdin = buf
 	return r.runOrError(cmd)
-***REMOVED***
+}
 
 var ErrParseRuncVersion = errors.New("unable to parse runc version")
 
-type Version struct ***REMOVED***
+type Version struct {
 	Runc   string
 	Commit string
 	Spec   string
-***REMOVED***
+}
 
 // Version returns the runc and runtime-spec versions
-func (r *Runc) Version(context context.Context) (Version, error) ***REMOVED***
+func (r *Runc) Version(context context.Context) (Version, error) {
 	data, err := cmdOutput(r.command(context, "--version"), false)
-	if err != nil ***REMOVED***
-		return Version***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return Version{}, err
+	}
 	return parseVersion(data)
-***REMOVED***
+}
 
-func parseVersion(data []byte) (Version, error) ***REMOVED***
+func parseVersion(data []byte) (Version, error) {
 	var v Version
 	parts := strings.Split(strings.TrimSpace(string(data)), "\n")
-	if len(parts) != 3 ***REMOVED***
+	if len(parts) != 3 {
 		return v, ErrParseRuncVersion
-	***REMOVED***
+	}
 
-	for i, p := range []struct ***REMOVED***
+	for i, p := range []struct {
 		dest  *string
 		split string
-	***REMOVED******REMOVED***
-		***REMOVED***
+	}{
+		{
 			dest:  &v.Runc,
 			split: "version ",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			dest:  &v.Commit,
 			split: ": ",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			dest:  &v.Spec,
 			split: ": ",
-		***REMOVED***,
-	***REMOVED*** ***REMOVED***
+		},
+	} {
 		p2 := strings.Split(parts[i], p.split)
-		if len(p2) != 2 ***REMOVED***
+		if len(p2) != 2 {
 			return v, fmt.Errorf("unable to parse version line %q", parts[i])
-		***REMOVED***
+		}
 		*p.dest = p2[1]
-	***REMOVED***
+	}
 	return v, nil
-***REMOVED***
+}
 
-func (r *Runc) args() (out []string) ***REMOVED***
-	if r.Root != "" ***REMOVED***
+func (r *Runc) args() (out []string) {
+	if r.Root != "" {
 		out = append(out, "--root", r.Root)
-	***REMOVED***
-	if r.Debug ***REMOVED***
+	}
+	if r.Debug {
 		out = append(out, "--debug")
-	***REMOVED***
-	if r.Log != "" ***REMOVED***
+	}
+	if r.Log != "" {
 		out = append(out, "--log", r.Log)
-	***REMOVED***
-	if r.LogFormat != none ***REMOVED***
+	}
+	if r.LogFormat != none {
 		out = append(out, "--log-format", string(r.LogFormat))
-	***REMOVED***
-	if r.Criu != "" ***REMOVED***
+	}
+	if r.Criu != "" {
 		out = append(out, "--criu", r.Criu)
-	***REMOVED***
-	if r.SystemdCgroup ***REMOVED***
+	}
+	if r.SystemdCgroup {
 		out = append(out, "--systemd-cgroup")
-	***REMOVED***
+	}
 	return out
-***REMOVED***
+}
 
 // runOrError will run the provided command.  If an error is
 // encountered and neither Stdout or Stderr was set the error and the
 // stderr of the command will be returned in the format of <error>:
 // <stderr>
-func (r *Runc) runOrError(cmd *exec.Cmd) error ***REMOVED***
-	if cmd.Stdout != nil || cmd.Stderr != nil ***REMOVED***
+func (r *Runc) runOrError(cmd *exec.Cmd) error {
+	if cmd.Stdout != nil || cmd.Stderr != nil {
 		ec, err := Monitor.Start(cmd)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		status, err := Monitor.Wait(cmd, ec)
-		if err == nil && status != 0 ***REMOVED***
+		if err == nil && status != 0 {
 			err = fmt.Errorf("%s did not terminate sucessfully", cmd.Args[0])
-		***REMOVED***
+		}
 		return err
-	***REMOVED***
+	}
 	data, err := cmdOutput(cmd, true)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("%s: %s", err, data)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func cmdOutput(cmd *exec.Cmd, combined bool) ([]byte, error) ***REMOVED***
+func cmdOutput(cmd *exec.Cmd, combined bool) ([]byte, error) {
 	var b bytes.Buffer
 
 	cmd.Stdout = &b
-	if combined ***REMOVED***
+	if combined {
 		cmd.Stderr = &b
-	***REMOVED***
+	}
 	ec, err := Monitor.Start(cmd)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	status, err := Monitor.Wait(cmd, ec)
-	if err == nil && status != 0 ***REMOVED***
+	if err == nil && status != 0 {
 		err = fmt.Errorf("%s did not terminate sucessfully", cmd.Args[0])
-	***REMOVED***
+	}
 
 	return b.Bytes(), err
-***REMOVED***
+}

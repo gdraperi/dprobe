@@ -11,78 +11,78 @@ import (
 // curvePoint implements the elliptic curve y²=x³+3. Points are kept in
 // Jacobian form and t=z² when valid. G₁ is the set of points of this curve on
 // GF(p).
-type curvePoint struct ***REMOVED***
+type curvePoint struct {
 	x, y, z, t *big.Int
-***REMOVED***
+}
 
 var curveB = new(big.Int).SetInt64(3)
 
 // curveGen is the generator of G₁.
-var curveGen = &curvePoint***REMOVED***
+var curveGen = &curvePoint{
 	new(big.Int).SetInt64(1),
 	new(big.Int).SetInt64(-2),
 	new(big.Int).SetInt64(1),
 	new(big.Int).SetInt64(1),
-***REMOVED***
+}
 
-func newCurvePoint(pool *bnPool) *curvePoint ***REMOVED***
-	return &curvePoint***REMOVED***
+func newCurvePoint(pool *bnPool) *curvePoint {
+	return &curvePoint{
 		pool.Get(),
 		pool.Get(),
 		pool.Get(),
 		pool.Get(),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (c *curvePoint) String() string ***REMOVED***
+func (c *curvePoint) String() string {
 	c.MakeAffine(new(bnPool))
 	return "(" + c.x.String() + ", " + c.y.String() + ")"
-***REMOVED***
+}
 
-func (c *curvePoint) Put(pool *bnPool) ***REMOVED***
+func (c *curvePoint) Put(pool *bnPool) {
 	pool.Put(c.x)
 	pool.Put(c.y)
 	pool.Put(c.z)
 	pool.Put(c.t)
-***REMOVED***
+}
 
-func (c *curvePoint) Set(a *curvePoint) ***REMOVED***
+func (c *curvePoint) Set(a *curvePoint) {
 	c.x.Set(a.x)
 	c.y.Set(a.y)
 	c.z.Set(a.z)
 	c.t.Set(a.t)
-***REMOVED***
+}
 
 // IsOnCurve returns true iff c is on the curve where c must be in affine form.
-func (c *curvePoint) IsOnCurve() bool ***REMOVED***
+func (c *curvePoint) IsOnCurve() bool {
 	yy := new(big.Int).Mul(c.y, c.y)
 	xxx := new(big.Int).Mul(c.x, c.x)
 	xxx.Mul(xxx, c.x)
 	yy.Sub(yy, xxx)
 	yy.Sub(yy, curveB)
-	if yy.Sign() < 0 || yy.Cmp(p) >= 0 ***REMOVED***
+	if yy.Sign() < 0 || yy.Cmp(p) >= 0 {
 		yy.Mod(yy, p)
-	***REMOVED***
+	}
 	return yy.Sign() == 0
-***REMOVED***
+}
 
-func (c *curvePoint) SetInfinity() ***REMOVED***
+func (c *curvePoint) SetInfinity() {
 	c.z.SetInt64(0)
-***REMOVED***
+}
 
-func (c *curvePoint) IsInfinity() bool ***REMOVED***
+func (c *curvePoint) IsInfinity() bool {
 	return c.z.Sign() == 0
-***REMOVED***
+}
 
-func (c *curvePoint) Add(a, b *curvePoint, pool *bnPool) ***REMOVED***
-	if a.IsInfinity() ***REMOVED***
+func (c *curvePoint) Add(a, b *curvePoint, pool *bnPool) {
+	if a.IsInfinity() {
 		c.Set(b)
 		return
-	***REMOVED***
-	if b.IsInfinity() ***REMOVED***
+	}
+	if b.IsInfinity() {
 		c.Set(a)
 		return
-	***REMOVED***
+	}
 
 	// See http://hyperelliptic.org/EFD/g1p/auto-code/shortw/jacobian-0/addition/add-2007-bl.op3
 
@@ -128,10 +128,10 @@ func (c *curvePoint) Add(a, b *curvePoint, pool *bnPool) ***REMOVED***
 
 	t.Sub(s2, s1)
 	yEqual := t.Sign() == 0
-	if xEqual && yEqual ***REMOVED***
+	if xEqual && yEqual {
 		c.Double(a, pool)
 		return
-	***REMOVED***
+	}
 	r := pool.Get().Add(t, t)
 
 	v := pool.Get().Mul(u1, i)
@@ -178,9 +178,9 @@ func (c *curvePoint) Add(a, b *curvePoint, pool *bnPool) ***REMOVED***
 	pool.Put(v)
 	pool.Put(t4)
 	pool.Put(t6)
-***REMOVED***
+}
 
-func (c *curvePoint) Double(a *curvePoint, pool *bnPool) ***REMOVED***
+func (c *curvePoint) Double(a *curvePoint, pool *bnPool) {
 	// See http://hyperelliptic.org/EFD/g1p/auto-code/shortw/jacobian-0/doubling/dbl-2009-l.op3
 	A := pool.Get().Mul(a.x, a.x)
 	A.Mod(A, p)
@@ -223,32 +223,32 @@ func (c *curvePoint) Double(a *curvePoint, pool *bnPool) ***REMOVED***
 	pool.Put(d)
 	pool.Put(e)
 	pool.Put(f)
-***REMOVED***
+}
 
-func (c *curvePoint) Mul(a *curvePoint, scalar *big.Int, pool *bnPool) *curvePoint ***REMOVED***
+func (c *curvePoint) Mul(a *curvePoint, scalar *big.Int, pool *bnPool) *curvePoint {
 	sum := newCurvePoint(pool)
 	sum.SetInfinity()
 	t := newCurvePoint(pool)
 
-	for i := scalar.BitLen(); i >= 0; i-- ***REMOVED***
+	for i := scalar.BitLen(); i >= 0; i-- {
 		t.Double(sum, pool)
-		if scalar.Bit(i) != 0 ***REMOVED***
+		if scalar.Bit(i) != 0 {
 			sum.Add(t, a, pool)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			sum.Set(t)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	c.Set(sum)
 	sum.Put(pool)
 	t.Put(pool)
 	return c
-***REMOVED***
+}
 
-func (c *curvePoint) MakeAffine(pool *bnPool) *curvePoint ***REMOVED***
-	if words := c.z.Bits(); len(words) == 1 && words[0] == 1 ***REMOVED***
+func (c *curvePoint) MakeAffine(pool *bnPool) *curvePoint {
+	if words := c.z.Bits(); len(words) == 1 && words[0] == 1 {
 		return c
-	***REMOVED***
+	}
 
 	zInv := pool.Get().ModInverse(c.z, p)
 	t := pool.Get().Mul(c.y, zInv)
@@ -268,11 +268,11 @@ func (c *curvePoint) MakeAffine(pool *bnPool) *curvePoint ***REMOVED***
 	pool.Put(zInv2)
 
 	return c
-***REMOVED***
+}
 
-func (c *curvePoint) Negative(a *curvePoint) ***REMOVED***
+func (c *curvePoint) Negative(a *curvePoint) {
 	c.x.Set(a.x)
 	c.y.Neg(a.y)
 	c.z.Set(a.z)
 	c.t.SetInt64(0)
-***REMOVED***
+}

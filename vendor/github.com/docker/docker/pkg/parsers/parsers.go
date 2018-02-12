@@ -10,13 +10,13 @@ import (
 )
 
 // ParseKeyValueOpt parses and validates the specified string as a key/value pair (key=value)
-func ParseKeyValueOpt(opt string) (string, string, error) ***REMOVED***
+func ParseKeyValueOpt(opt string) (string, string, error) {
 	parts := strings.SplitN(opt, "=", 2)
-	if len(parts) != 2 ***REMOVED***
+	if len(parts) != 2 {
 		return "", "", fmt.Errorf("Unable to parse key/value option: %s", opt)
-	***REMOVED***
+	}
 	return strings.TrimSpace(parts[0]), strings.TrimSpace(parts[1]), nil
-***REMOVED***
+}
 
 // ParseUintList parses and validates the specified string as the value
 // found in some cgroup file (e.g. `cpuset.cpus`, `cpuset.mems`), which could be
@@ -31,39 +31,39 @@ func ParseKeyValueOpt(opt string) (string, string, error) ***REMOVED***
 //     03,1-3      <- this is gonna get parsed as [1,2,3]
 //     3,2,1
 //     0-2,3,1
-func ParseUintList(val string) (map[int]bool, error) ***REMOVED***
-	if val == "" ***REMOVED***
-		return map[int]bool***REMOVED******REMOVED***, nil
-	***REMOVED***
+func ParseUintList(val string) (map[int]bool, error) {
+	if val == "" {
+		return map[int]bool{}, nil
+	}
 
 	availableInts := make(map[int]bool)
 	split := strings.Split(val, ",")
 	errInvalidFormat := fmt.Errorf("invalid format: %s", val)
 
-	for _, r := range split ***REMOVED***
-		if !strings.Contains(r, "-") ***REMOVED***
+	for _, r := range split {
+		if !strings.Contains(r, "-") {
 			v, err := strconv.Atoi(r)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, errInvalidFormat
-			***REMOVED***
+			}
 			availableInts[v] = true
-		***REMOVED*** else ***REMOVED***
+		} else {
 			split := strings.SplitN(r, "-", 2)
 			min, err := strconv.Atoi(split[0])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, errInvalidFormat
-			***REMOVED***
+			}
 			max, err := strconv.Atoi(split[1])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, errInvalidFormat
-			***REMOVED***
-			if max < min ***REMOVED***
+			}
+			if max < min {
 				return nil, errInvalidFormat
-			***REMOVED***
-			for i := min; i <= max; i++ ***REMOVED***
+			}
+			for i := min; i <= max; i++ {
 				availableInts[i] = true
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return availableInts, nil
-***REMOVED***
+}

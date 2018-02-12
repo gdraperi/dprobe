@@ -11,25 +11,25 @@ import "golang.org/x/text/internal/colltab"
 
 const blockSize = 64
 
-func getTable(t tableIndex) *colltab.Table ***REMOVED***
-	return &colltab.Table***REMOVED***
-		Index: colltab.Trie***REMOVED***
+func getTable(t tableIndex) *colltab.Table {
+	return &colltab.Table{
+		Index: colltab.Trie{
 			Index0:  mainLookup[:][blockSize*t.lookupOffset:],
 			Values0: mainValues[:][blockSize*t.valuesOffset:],
 			Index:   mainLookup[:],
 			Values:  mainValues[:],
-		***REMOVED***,
+		},
 		ExpandElem:     mainExpandElem[:],
 		ContractTries:  colltab.ContractTrieSet(mainCTEntries[:]),
 		ContractElem:   mainContractElem[:],
 		MaxContractLen: 18,
 		VariableTop:    varTop,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // tableIndex holds information for constructing a table
 // for a certain locale based on the main table.
-type tableIndex struct ***REMOVED***
+type tableIndex struct {
 	lookupOffset uint32
 	valuesOffset uint32
-***REMOVED***
+}

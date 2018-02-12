@@ -4,11 +4,11 @@ import (
 	"fmt"
 )
 
-type IfPrioMap struct ***REMOVED***
+type IfPrioMap struct {
 	Interface string `json:"interface"`
 	Priority  int64  `json:"priority"`
-***REMOVED***
+}
 
-func (i *IfPrioMap) CgroupString() string ***REMOVED***
+func (i *IfPrioMap) CgroupString() string {
 	return fmt.Sprintf("%s %d", i.Interface, i.Priority)
-***REMOVED***
+}

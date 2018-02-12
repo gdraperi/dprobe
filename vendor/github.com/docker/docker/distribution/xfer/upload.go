@@ -15,37 +15,37 @@ const maxUploadAttempts = 5
 
 // LayerUploadManager provides task management and progress reporting for
 // uploads.
-type LayerUploadManager struct ***REMOVED***
+type LayerUploadManager struct {
 	tm           TransferManager
 	waitDuration time.Duration
-***REMOVED***
+}
 
 // SetConcurrency sets the max concurrent uploads for each push
-func (lum *LayerUploadManager) SetConcurrency(concurrency int) ***REMOVED***
+func (lum *LayerUploadManager) SetConcurrency(concurrency int) {
 	lum.tm.SetConcurrency(concurrency)
-***REMOVED***
+}
 
 // NewLayerUploadManager returns a new LayerUploadManager.
-func NewLayerUploadManager(concurrencyLimit int, options ...func(*LayerUploadManager)) *LayerUploadManager ***REMOVED***
-	manager := LayerUploadManager***REMOVED***
+func NewLayerUploadManager(concurrencyLimit int, options ...func(*LayerUploadManager)) *LayerUploadManager {
+	manager := LayerUploadManager{
 		tm:           NewTransferManager(concurrencyLimit),
 		waitDuration: time.Second,
-	***REMOVED***
-	for _, option := range options ***REMOVED***
+	}
+	for _, option := range options {
 		option(&manager)
-	***REMOVED***
+	}
 	return &manager
-***REMOVED***
+}
 
-type uploadTransfer struct ***REMOVED***
+type uploadTransfer struct {
 	Transfer
 
 	remoteDescriptor distribution.Descriptor
 	err              error
-***REMOVED***
+}
 
 // An UploadDescriptor references a layer that may need to be uploaded.
-type UploadDescriptor interface ***REMOVED***
+type UploadDescriptor interface {
 	// Key returns the key used to deduplicate uploads.
 	Key() string
 	// ID returns the ID for display purposes.
@@ -59,116 +59,116 @@ type UploadDescriptor interface ***REMOVED***
 	// the UploadDescriptor interface, which is used for internally
 	// identifying layers that are being uploaded.
 	SetRemoteDescriptor(descriptor distribution.Descriptor)
-***REMOVED***
+}
 
 // Upload is a blocking function which ensures the listed layers are present on
 // the remote registry. It uses the string returned by the Key method to
 // deduplicate uploads.
-func (lum *LayerUploadManager) Upload(ctx context.Context, layers []UploadDescriptor, progressOutput progress.Output) error ***REMOVED***
+func (lum *LayerUploadManager) Upload(ctx context.Context, layers []UploadDescriptor, progressOutput progress.Output) error {
 	var (
 		uploads          []*uploadTransfer
 		dedupDescriptors = make(map[string]*uploadTransfer)
 	)
 
-	for _, descriptor := range layers ***REMOVED***
+	for _, descriptor := range layers {
 		progress.Update(progressOutput, descriptor.ID(), "Preparing")
 
 		key := descriptor.Key()
-		if _, present := dedupDescriptors[key]; present ***REMOVED***
+		if _, present := dedupDescriptors[key]; present {
 			continue
-		***REMOVED***
+		}
 
 		xferFunc := lum.makeUploadFunc(descriptor)
 		upload, watcher := lum.tm.Transfer(descriptor.Key(), xferFunc, progressOutput)
 		defer upload.Release(watcher)
 		uploads = append(uploads, upload.(*uploadTransfer))
 		dedupDescriptors[key] = upload.(*uploadTransfer)
-	***REMOVED***
+	}
 
-	for _, upload := range uploads ***REMOVED***
-		select ***REMOVED***
+	for _, upload := range uploads {
+		select {
 		case <-ctx.Done():
 			return ctx.Err()
 		case <-upload.Transfer.Done():
-			if upload.err != nil ***REMOVED***
+			if upload.err != nil {
 				return upload.err
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-	for _, l := range layers ***REMOVED***
+			}
+		}
+	}
+	for _, l := range layers {
 		l.SetRemoteDescriptor(dedupDescriptors[l.Key()].remoteDescriptor)
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (lum *LayerUploadManager) makeUploadFunc(descriptor UploadDescriptor) DoFunc ***REMOVED***
-	return func(progressChan chan<- progress.Progress, start <-chan struct***REMOVED******REMOVED***, inactive chan<- struct***REMOVED******REMOVED***) Transfer ***REMOVED***
-		u := &uploadTransfer***REMOVED***
+func (lum *LayerUploadManager) makeUploadFunc(descriptor UploadDescriptor) DoFunc {
+	return func(progressChan chan<- progress.Progress, start <-chan struct{}, inactive chan<- struct{}) Transfer {
+		u := &uploadTransfer{
 			Transfer: NewTransfer(),
-		***REMOVED***
+		}
 
-		go func() ***REMOVED***
-			defer func() ***REMOVED***
+		go func() {
+			defer func() {
 				close(progressChan)
-			***REMOVED***()
+			}()
 
 			progressOutput := progress.ChanOutput(progressChan)
 
-			select ***REMOVED***
+			select {
 			case <-start:
 			default:
 				progress.Update(progressOutput, descriptor.ID(), "Waiting")
 				<-start
-			***REMOVED***
+			}
 
 			retries := 0
-			for ***REMOVED***
+			for {
 				remoteDescriptor, err := descriptor.Upload(u.Transfer.Context(), progressOutput)
-				if err == nil ***REMOVED***
+				if err == nil {
 					u.remoteDescriptor = remoteDescriptor
 					break
-				***REMOVED***
+				}
 
 				// If an error was returned because the context
 				// was cancelled, we shouldn't retry.
-				select ***REMOVED***
+				select {
 				case <-u.Transfer.Context().Done():
 					u.err = err
 					return
 				default:
-				***REMOVED***
+				}
 
 				retries++
-				if _, isDNR := err.(DoNotRetry); isDNR || retries == maxUploadAttempts ***REMOVED***
+				if _, isDNR := err.(DoNotRetry); isDNR || retries == maxUploadAttempts {
 					logrus.Errorf("Upload failed: %v", err)
 					u.err = err
 					return
-				***REMOVED***
+				}
 
 				logrus.Errorf("Upload failed, retrying: %v", err)
 				delay := retries * 5
 				ticker := time.NewTicker(lum.waitDuration)
 
 			selectLoop:
-				for ***REMOVED***
-					progress.Updatef(progressOutput, descriptor.ID(), "Retrying in %d second%s", delay, (map[bool]string***REMOVED***true: "s"***REMOVED***)[delay != 1])
-					select ***REMOVED***
+				for {
+					progress.Updatef(progressOutput, descriptor.ID(), "Retrying in %d second%s", delay, (map[bool]string{true: "s"})[delay != 1])
+					select {
 					case <-ticker.C:
 						delay--
-						if delay == 0 ***REMOVED***
+						if delay == 0 {
 							ticker.Stop()
 							break selectLoop
-						***REMOVED***
+						}
 					case <-u.Transfer.Context().Done():
 						ticker.Stop()
 						u.err = errors.New("upload cancelled during retry delay")
 						return
-					***REMOVED***
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***()
+					}
+				}
+			}
+		}()
 
 		return u
-	***REMOVED***
-***REMOVED***
+	}
+}

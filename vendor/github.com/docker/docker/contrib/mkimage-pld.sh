@@ -12,7 +12,7 @@ fi
 
 image_name=pld
 
-tmpdir=$(mktemp -d $***REMOVED***TMPDIR:-/var/tmp***REMOVED***/pld-docker-XXXXXX)
+tmpdir=$(mktemp -d ${TMPDIR:-/var/tmp}/pld-docker-XXXXXX)
 root=$tmpdir/rootfs
 install -d -m 755 $root
 

@@ -13,17 +13,17 @@ import (
 	"syscall"
 )
 
-func maxOpenFiles() int ***REMOVED***
+func maxOpenFiles() int {
 	var rlim syscall.Rlimit
-	if err := syscall.Getrlimit(syscall.RLIMIT_NOFILE, &rlim); err != nil ***REMOVED***
+	if err := syscall.Getrlimit(syscall.RLIMIT_NOFILE, &rlim); err != nil {
 		return defaultMaxOpenFiles
-	***REMOVED***
+	}
 	return int(rlim.Cur)
-***REMOVED***
+}
 
-func supportsRawIPSocket() (string, bool) ***REMOVED***
-	if os.Getuid() != 0 ***REMOVED***
+func supportsRawIPSocket() (string, bool) {
+	if os.Getuid() != 0 {
 		return fmt.Sprintf("must be root on %s", runtime.GOOS), false
-	***REMOVED***
+	}
 	return "", true
-***REMOVED***
+}

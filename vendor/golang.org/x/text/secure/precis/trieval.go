@@ -13,8 +13,8 @@ const (
 	catMask   = 0x3f
 )
 
-func (e entry) property() property ***REMOVED*** return property(e & propMask) ***REMOVED***
-func (e entry) category() category ***REMOVED*** return category(e & catMask) ***REMOVED***
+func (e entry) property() property { return property(e & propMask) }
+func (e entry) category() category { return category(e & catMask) }
 
 type property uint8
 

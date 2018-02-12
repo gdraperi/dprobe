@@ -28,87 +28,87 @@ import (
 // standard encodings for HTML. Matching is case-insensitive and ignores
 // leading and trailing whitespace. Encoders will use HTML escape sequences for
 // runes that are not supported by the character set.
-func Lookup(label string) (e encoding.Encoding, name string) ***REMOVED***
+func Lookup(label string) (e encoding.Encoding, name string) {
 	e, err := htmlindex.Get(label)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, ""
-	***REMOVED***
+	}
 	name, _ = htmlindex.Name(e)
-	return &htmlEncoding***REMOVED***e***REMOVED***, name
-***REMOVED***
+	return &htmlEncoding{e}, name
+}
 
-type htmlEncoding struct***REMOVED*** encoding.Encoding ***REMOVED***
+type htmlEncoding struct{ encoding.Encoding }
 
-func (h *htmlEncoding) NewEncoder() *encoding.Encoder ***REMOVED***
+func (h *htmlEncoding) NewEncoder() *encoding.Encoder {
 	// HTML requires a non-terminating legacy encoder. We use HTML escapes to
 	// substitute unsupported code points.
 	return encoding.HTMLEscapeUnsupported(h.Encoding.NewEncoder())
-***REMOVED***
+}
 
 // DetermineEncoding determines the encoding of an HTML document by examining
 // up to the first 1024 bytes of content and the declared Content-Type.
 //
 // See http://www.whatwg.org/specs/web-apps/current-work/multipage/parsing.html#determining-the-character-encoding
-func DetermineEncoding(content []byte, contentType string) (e encoding.Encoding, name string, certain bool) ***REMOVED***
-	if len(content) > 1024 ***REMOVED***
+func DetermineEncoding(content []byte, contentType string) (e encoding.Encoding, name string, certain bool) {
+	if len(content) > 1024 {
 		content = content[:1024]
-	***REMOVED***
+	}
 
-	for _, b := range boms ***REMOVED***
-		if bytes.HasPrefix(content, b.bom) ***REMOVED***
+	for _, b := range boms {
+		if bytes.HasPrefix(content, b.bom) {
 			e, name = Lookup(b.enc)
 			return e, name, true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if _, params, err := mime.ParseMediaType(contentType); err == nil ***REMOVED***
-		if cs, ok := params["charset"]; ok ***REMOVED***
-			if e, name = Lookup(cs); e != nil ***REMOVED***
+	if _, params, err := mime.ParseMediaType(contentType); err == nil {
+		if cs, ok := params["charset"]; ok {
+			if e, name = Lookup(cs); e != nil {
 				return e, name, true
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
-	if len(content) > 0 ***REMOVED***
+	if len(content) > 0 {
 		e, name = prescan(content)
-		if e != nil ***REMOVED***
+		if e != nil {
 			return e, name, false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Try to detect UTF-8.
 	// First eliminate any partial rune at the end.
-	for i := len(content) - 1; i >= 0 && i > len(content)-4; i-- ***REMOVED***
+	for i := len(content) - 1; i >= 0 && i > len(content)-4; i-- {
 		b := content[i]
-		if b < 0x80 ***REMOVED***
+		if b < 0x80 {
 			break
-		***REMOVED***
-		if utf8.RuneStart(b) ***REMOVED***
+		}
+		if utf8.RuneStart(b) {
 			content = content[:i]
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	hasHighBit := false
-	for _, c := range content ***REMOVED***
-		if c >= 0x80 ***REMOVED***
+	for _, c := range content {
+		if c >= 0x80 {
 			hasHighBit = true
 			break
-		***REMOVED***
-	***REMOVED***
-	if hasHighBit && utf8.Valid(content) ***REMOVED***
+		}
+	}
+	if hasHighBit && utf8.Valid(content) {
 		return encoding.Nop, "utf-8", false
-	***REMOVED***
+	}
 
 	// TODO: change default depending on user's locale?
 	return charmap.Windows1252, "windows-1252", false
-***REMOVED***
+}
 
 // NewReader returns an io.Reader that converts the content of r to UTF-8.
 // It calls DetermineEncoding to find out what r's encoding is.
-func NewReader(r io.Reader, contentType string) (io.Reader, error) ***REMOVED***
+func NewReader(r io.Reader, contentType string) (io.Reader, error) {
 	preview := make([]byte, 1024)
 	n, err := io.ReadFull(r, preview)
-	switch ***REMOVED***
+	switch {
 	case err == io.ErrUnexpectedEOF:
 		preview = preview[:n]
 		r = bytes.NewReader(preview)
@@ -116,38 +116,38 @@ func NewReader(r io.Reader, contentType string) (io.Reader, error) ***REMOVED***
 		return nil, err
 	default:
 		r = io.MultiReader(bytes.NewReader(preview), r)
-	***REMOVED***
+	}
 
-	if e, _, _ := DetermineEncoding(preview, contentType); e != encoding.Nop ***REMOVED***
+	if e, _, _ := DetermineEncoding(preview, contentType); e != encoding.Nop {
 		r = transform.NewReader(r, e.NewDecoder())
-	***REMOVED***
+	}
 	return r, nil
-***REMOVED***
+}
 
 // NewReaderLabel returns a reader that converts from the specified charset to
 // UTF-8. It uses Lookup to find the encoding that corresponds to label, and
 // returns an error if Lookup returns nil. It is suitable for use as
 // encoding/xml.Decoder's CharsetReader function.
-func NewReaderLabel(label string, input io.Reader) (io.Reader, error) ***REMOVED***
+func NewReaderLabel(label string, input io.Reader) (io.Reader, error) {
 	e, _ := Lookup(label)
-	if e == nil ***REMOVED***
+	if e == nil {
 		return nil, fmt.Errorf("unsupported charset: %q", label)
-	***REMOVED***
+	}
 	return transform.NewReader(input, e.NewDecoder()), nil
-***REMOVED***
+}
 
-func prescan(content []byte) (e encoding.Encoding, name string) ***REMOVED***
+func prescan(content []byte) (e encoding.Encoding, name string) {
 	z := html.NewTokenizer(bytes.NewReader(content))
-	for ***REMOVED***
-		switch z.Next() ***REMOVED***
+	for {
+		switch z.Next() {
 		case html.ErrorToken:
 			return nil, ""
 
 		case html.StartTagToken, html.SelfClosingTagToken:
 			tagName, hasAttr := z.TagName()
-			if !bytes.Equal(tagName, []byte("meta")) ***REMOVED***
+			if !bytes.Equal(tagName, []byte("meta")) {
 				continue
-			***REMOVED***
+			}
 			attrList := make(map[string]bool)
 			gotPragma := false
 
@@ -160,98 +160,98 @@ func prescan(content []byte) (e encoding.Encoding, name string) ***REMOVED***
 
 			name = ""
 			e = nil
-			for hasAttr ***REMOVED***
+			for hasAttr {
 				var key, val []byte
 				key, val, hasAttr = z.TagAttr()
 				ks := string(key)
-				if attrList[ks] ***REMOVED***
+				if attrList[ks] {
 					continue
-				***REMOVED***
+				}
 				attrList[ks] = true
-				for i, c := range val ***REMOVED***
-					if 'A' <= c && c <= 'Z' ***REMOVED***
+				for i, c := range val {
+					if 'A' <= c && c <= 'Z' {
 						val[i] = c + 0x20
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 
-				switch ks ***REMOVED***
+				switch ks {
 				case "http-equiv":
-					if bytes.Equal(val, []byte("content-type")) ***REMOVED***
+					if bytes.Equal(val, []byte("content-type")) {
 						gotPragma = true
-					***REMOVED***
+					}
 
 				case "content":
-					if e == nil ***REMOVED***
+					if e == nil {
 						name = fromMetaElement(string(val))
-						if name != "" ***REMOVED***
+						if name != "" {
 							e, name = Lookup(name)
-							if e != nil ***REMOVED***
+							if e != nil {
 								needPragma = doNeedPragma
-							***REMOVED***
-						***REMOVED***
-					***REMOVED***
+							}
+						}
+					}
 
 				case "charset":
 					e, name = Lookup(string(val))
 					needPragma = doNotNeedPragma
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 
-			if needPragma == dontKnow || needPragma == doNeedPragma && !gotPragma ***REMOVED***
+			if needPragma == dontKnow || needPragma == doNeedPragma && !gotPragma {
 				continue
-			***REMOVED***
+			}
 
-			if strings.HasPrefix(name, "utf-16") ***REMOVED***
+			if strings.HasPrefix(name, "utf-16") {
 				name = "utf-8"
 				e = encoding.Nop
-			***REMOVED***
+			}
 
-			if e != nil ***REMOVED***
+			if e != nil {
 				return e, name
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}
 
-func fromMetaElement(s string) string ***REMOVED***
-	for s != "" ***REMOVED***
+func fromMetaElement(s string) string {
+	for s != "" {
 		csLoc := strings.Index(s, "charset")
-		if csLoc == -1 ***REMOVED***
+		if csLoc == -1 {
 			return ""
-		***REMOVED***
+		}
 		s = s[csLoc+len("charset"):]
 		s = strings.TrimLeft(s, " \t\n\f\r")
-		if !strings.HasPrefix(s, "=") ***REMOVED***
+		if !strings.HasPrefix(s, "=") {
 			continue
-		***REMOVED***
+		}
 		s = s[1:]
 		s = strings.TrimLeft(s, " \t\n\f\r")
-		if s == "" ***REMOVED***
+		if s == "" {
 			return ""
-		***REMOVED***
-		if q := s[0]; q == '"' || q == '\'' ***REMOVED***
+		}
+		if q := s[0]; q == '"' || q == '\'' {
 			s = s[1:]
 			closeQuote := strings.IndexRune(s, rune(q))
-			if closeQuote == -1 ***REMOVED***
+			if closeQuote == -1 {
 				return ""
-			***REMOVED***
+			}
 			return s[:closeQuote]
-		***REMOVED***
+		}
 
 		end := strings.IndexAny(s, "; \t\n\f\r")
-		if end == -1 ***REMOVED***
+		if end == -1 {
 			end = len(s)
-		***REMOVED***
+		}
 		return s[:end]
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-var boms = []struct ***REMOVED***
+var boms = []struct {
 	bom []byte
 	enc string
-***REMOVED******REMOVED***
-	***REMOVED***[]byte***REMOVED***0xfe, 0xff***REMOVED***, "utf-16be"***REMOVED***,
-	***REMOVED***[]byte***REMOVED***0xff, 0xfe***REMOVED***, "utf-16le"***REMOVED***,
-	***REMOVED***[]byte***REMOVED***0xef, 0xbb, 0xbf***REMOVED***, "utf-8"***REMOVED***,
-***REMOVED***
+}{
+	{[]byte{0xfe, 0xff}, "utf-16be"},
+	{[]byte{0xff, 0xfe}, "utf-16le"},
+	{[]byte{0xef, 0xbb, 0xbf}, "utf-8"},
+}

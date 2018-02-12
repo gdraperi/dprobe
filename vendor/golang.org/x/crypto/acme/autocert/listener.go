@@ -42,21 +42,21 @@ import (
 // The returned Listener also enables TCP keep-alives on the accepted
 // connections. The returned *tls.Conn are returned before their TLS
 // handshake has completed.
-func NewListener(domains ...string) net.Listener ***REMOVED***
-	m := &Manager***REMOVED***
+func NewListener(domains ...string) net.Listener {
+	m := &Manager{
 		Prompt: AcceptTOS,
-	***REMOVED***
-	if len(domains) > 0 ***REMOVED***
+	}
+	if len(domains) > 0 {
 		m.HostPolicy = HostWhitelist(domains...)
-	***REMOVED***
+	}
 	dir := cacheDir()
-	if err := os.MkdirAll(dir, 0700); err != nil ***REMOVED***
+	if err := os.MkdirAll(dir, 0700); err != nil {
 		log.Printf("warning: autocert.NewListener not using a cache: %v", err)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		m.Cache = DirCache(dir)
-	***REMOVED***
+	}
 	return m.Listener()
-***REMOVED***
+}
 
 // Listener listens on the standard TLS port (443) on all interfaces
 // and returns a net.Listener returning *tls.Conn connections.
@@ -70,34 +70,34 @@ func NewListener(domains ...string) net.Listener ***REMOVED***
 //
 // Unlike NewListener, it is the caller's responsibility to initialize
 // the Manager m's Prompt, Cache, HostPolicy, and other desired options.
-func (m *Manager) Listener() net.Listener ***REMOVED***
-	ln := &listener***REMOVED***
+func (m *Manager) Listener() net.Listener {
+	ln := &listener{
 		m: m,
-		conf: &tls.Config***REMOVED***
+		conf: &tls.Config{
 			GetCertificate: m.GetCertificate,           // bonus: panic on nil m
-			NextProtos:     []string***REMOVED***"h2", "http/1.1"***REMOVED***, // Enable HTTP/2
-		***REMOVED***,
-	***REMOVED***
+			NextProtos:     []string{"h2", "http/1.1"}, // Enable HTTP/2
+		},
+	}
 	ln.tcpListener, ln.tcpListenErr = net.Listen("tcp", ":443")
 	return ln
-***REMOVED***
+}
 
-type listener struct ***REMOVED***
+type listener struct {
 	m    *Manager
 	conf *tls.Config
 
 	tcpListener  net.Listener
 	tcpListenErr error
-***REMOVED***
+}
 
-func (ln *listener) Accept() (net.Conn, error) ***REMOVED***
-	if ln.tcpListenErr != nil ***REMOVED***
+func (ln *listener) Accept() (net.Conn, error) {
+	if ln.tcpListenErr != nil {
 		return nil, ln.tcpListenErr
-	***REMOVED***
+	}
 	conn, err := ln.tcpListener.Accept()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	tcpConn := conn.(*net.TCPConn)
 
 	// Because Listener is a convenience function, help out with
@@ -111,50 +111,50 @@ func (ln *listener) Accept() (net.Conn, error) ***REMOVED***
 	tcpConn.SetKeepAlivePeriod(3 * time.Minute)
 
 	return tls.Server(tcpConn, ln.conf), nil
-***REMOVED***
+}
 
-func (ln *listener) Addr() net.Addr ***REMOVED***
-	if ln.tcpListener != nil ***REMOVED***
+func (ln *listener) Addr() net.Addr {
+	if ln.tcpListener != nil {
 		return ln.tcpListener.Addr()
-	***REMOVED***
+	}
 	// net.Listen failed. Return something non-nil in case callers
 	// call Addr before Accept:
-	return &net.TCPAddr***REMOVED***IP: net.IP***REMOVED***0, 0, 0, 0***REMOVED***, Port: 443***REMOVED***
-***REMOVED***
+	return &net.TCPAddr{IP: net.IP{0, 0, 0, 0}, Port: 443}
+}
 
-func (ln *listener) Close() error ***REMOVED***
-	if ln.tcpListenErr != nil ***REMOVED***
+func (ln *listener) Close() error {
+	if ln.tcpListenErr != nil {
 		return ln.tcpListenErr
-	***REMOVED***
+	}
 	return ln.tcpListener.Close()
-***REMOVED***
+}
 
-func homeDir() string ***REMOVED***
-	if runtime.GOOS == "windows" ***REMOVED***
+func homeDir() string {
+	if runtime.GOOS == "windows" {
 		return os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
-	***REMOVED***
-	if h := os.Getenv("HOME"); h != "" ***REMOVED***
+	}
+	if h := os.Getenv("HOME"); h != "" {
 		return h
-	***REMOVED***
+	}
 	return "/"
-***REMOVED***
+}
 
-func cacheDir() string ***REMOVED***
+func cacheDir() string {
 	const base = "golang-autocert"
-	switch runtime.GOOS ***REMOVED***
+	switch runtime.GOOS {
 	case "darwin":
 		return filepath.Join(homeDir(), "Library", "Caches", base)
 	case "windows":
-		for _, ev := range []string***REMOVED***"APPDATA", "CSIDL_APPDATA", "TEMP", "TMP"***REMOVED*** ***REMOVED***
-			if v := os.Getenv(ev); v != "" ***REMOVED***
+		for _, ev := range []string{"APPDATA", "CSIDL_APPDATA", "TEMP", "TMP"} {
+			if v := os.Getenv(ev); v != "" {
 				return filepath.Join(v, base)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		// Worst case:
 		return filepath.Join(homeDir(), base)
-	***REMOVED***
-	if xdg := os.Getenv("XDG_CACHE_HOME"); xdg != "" ***REMOVED***
+	}
+	if xdg := os.Getenv("XDG_CACHE_HOME"); xdg != "" {
 		return filepath.Join(xdg, base)
-	***REMOVED***
+	}
 	return filepath.Join(homeDir(), ".cache", base)
-***REMOVED***
+}

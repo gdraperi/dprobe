@@ -7,16 +7,16 @@ import (
 )
 
 // StatAtime returns the access time from a stat struct
-func StatAtime(st *syscall.Stat_t) syscall.Timespec ***REMOVED***
+func StatAtime(st *syscall.Stat_t) syscall.Timespec {
 	return st.Atimespec
-***REMOVED***
+}
 
 // StatCtime returns the created time from a stat struct
-func StatCtime(st *syscall.Stat_t) syscall.Timespec ***REMOVED***
+func StatCtime(st *syscall.Stat_t) syscall.Timespec {
 	return st.Ctimespec
-***REMOVED***
+}
 
 // StatMtime returns the modified time from a stat struct
-func StatMtime(st *syscall.Stat_t) syscall.Timespec ***REMOVED***
+func StatMtime(st *syscall.Stat_t) syscall.Timespec {
 	return st.Mtimespec
-***REMOVED***
+}

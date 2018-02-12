@@ -8,13 +8,13 @@ option (gogoproto.sizer_all) = true;
 option (gogoproto.unmarshaler_all) = true;
 option (gogoproto.goproto_getters_all) = false;
 
-message Record ***REMOVED***
+message Record {
 	optional int64 type  = 1 [(gogoproto.nullable) = false];
 	optional uint32 crc  = 2 [(gogoproto.nullable) = false];
 	optional bytes data  = 3;
-***REMOVED***
+}
 
-message Snapshot ***REMOVED***
+message Snapshot {
 	optional uint64 index = 1 [(gogoproto.nullable) = false];
 	optional uint64 term  = 2 [(gogoproto.nullable) = false];
-***REMOVED***
+}

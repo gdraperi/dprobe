@@ -7,10 +7,10 @@ package bidi
 import "unicode/utf8"
 
 // Properties provides access to BiDi properties of runes.
-type Properties struct ***REMOVED***
+type Properties struct {
 	entry uint8
 	last  uint8
-***REMOVED***
+}
 
 var trie = newBidiTrie(0)
 
@@ -20,32 +20,32 @@ var trie = newBidiTrie(0)
 //
 // // CompactClass is like Class, but maps all of the BiDi control classes
 // // (LRO, RLO, LRE, RLE, PDF, LRI, RLI, FSI, PDI) to the class Control.
-// func (p Properties) CompactClass() Class ***REMOVED***
+// func (p Properties) CompactClass() Class {
 // 	return Class(p.entry & 0x0F)
-// ***REMOVED***
+// }
 
 // Class returns the Bidi class for p.
-func (p Properties) Class() Class ***REMOVED***
+func (p Properties) Class() Class {
 	c := Class(p.entry & 0x0F)
-	if c == Control ***REMOVED***
+	if c == Control {
 		c = controlByteToClass[p.last&0xF]
-	***REMOVED***
+	}
 	return c
-***REMOVED***
+}
 
 // IsBracket reports whether the rune is a bracket.
-func (p Properties) IsBracket() bool ***REMOVED*** return p.entry&0xF0 != 0 ***REMOVED***
+func (p Properties) IsBracket() bool { return p.entry&0xF0 != 0 }
 
 // IsOpeningBracket reports whether the rune is an opening bracket.
 // IsBracket must return true.
-func (p Properties) IsOpeningBracket() bool ***REMOVED*** return p.entry&openMask != 0 ***REMOVED***
+func (p Properties) IsOpeningBracket() bool { return p.entry&openMask != 0 }
 
 // TODO: find a better API and expose.
-func (p Properties) reverseBracket(r rune) rune ***REMOVED***
+func (p Properties) reverseBracket(r rune) rune {
 	return xorMasks[p.entry>>xorMaskShift] ^ r
-***REMOVED***
+}
 
-var controlByteToClass = [16]Class***REMOVED***
+var controlByteToClass = [16]Class{
 	0xD: LRO, // U+202D LeftToRightOverride,
 	0xE: RLO, // U+202E RightToLeftOverride,
 	0xA: LRE, // U+202A LeftToRightEmbedding,
@@ -55,14 +55,14 @@ var controlByteToClass = [16]Class***REMOVED***
 	0x7: RLI, // U+2067 RightToLeftIsolate,
 	0x8: FSI, // U+2068 FirstStrongIsolate,
 	0x9: PDI, // U+2069 PopDirectionalIsolate,
-***REMOVED***
+}
 
 // LookupRune returns properties for r.
-func LookupRune(r rune) (p Properties, size int) ***REMOVED***
+func LookupRune(r rune) (p Properties, size int) {
 	var buf [4]byte
 	n := utf8.EncodeRune(buf[:], r)
 	return Lookup(buf[:n])
-***REMOVED***
+}
 
 // TODO: these lookup methods are based on the generated trie code. The returned
 // sizes have slightly different semantics from the generated code, in that it
@@ -82,125 +82,125 @@ func LookupRune(r rune) (p Properties, size int) ***REMOVED***
 // Lookup returns properties for the first rune in s and the width in bytes of
 // its encoding. The size will be 0 if s does not hold enough bytes to complete
 // the encoding.
-func Lookup(s []byte) (p Properties, sz int) ***REMOVED***
+func Lookup(s []byte) (p Properties, sz int) {
 	c0 := s[0]
-	switch ***REMOVED***
+	switch {
 	case c0 < 0x80: // is ASCII
-		return Properties***REMOVED***entry: bidiValues[c0]***REMOVED***, 1
+		return Properties{entry: bidiValues[c0]}, 1
 	case c0 < 0xC2:
-		return Properties***REMOVED******REMOVED***, 1
+		return Properties{}, 1
 	case c0 < 0xE0: // 2-byte UTF-8
-		if len(s) < 2 ***REMOVED***
-			return Properties***REMOVED******REMOVED***, 0
-		***REMOVED***
+		if len(s) < 2 {
+			return Properties{}, 0
+		}
 		i := bidiIndex[c0]
 		c1 := s[1]
-		if c1 < 0x80 || 0xC0 <= c1 ***REMOVED***
-			return Properties***REMOVED******REMOVED***, 1
-		***REMOVED***
-		return Properties***REMOVED***entry: trie.lookupValue(uint32(i), c1)***REMOVED***, 2
+		if c1 < 0x80 || 0xC0 <= c1 {
+			return Properties{}, 1
+		}
+		return Properties{entry: trie.lookupValue(uint32(i), c1)}, 2
 	case c0 < 0xF0: // 3-byte UTF-8
-		if len(s) < 3 ***REMOVED***
-			return Properties***REMOVED******REMOVED***, 0
-		***REMOVED***
+		if len(s) < 3 {
+			return Properties{}, 0
+		}
 		i := bidiIndex[c0]
 		c1 := s[1]
-		if c1 < 0x80 || 0xC0 <= c1 ***REMOVED***
-			return Properties***REMOVED******REMOVED***, 1
-		***REMOVED***
+		if c1 < 0x80 || 0xC0 <= c1 {
+			return Properties{}, 1
+		}
 		o := uint32(i)<<6 + uint32(c1)
 		i = bidiIndex[o]
 		c2 := s[2]
-		if c2 < 0x80 || 0xC0 <= c2 ***REMOVED***
-			return Properties***REMOVED******REMOVED***, 1
-		***REMOVED***
-		return Properties***REMOVED***entry: trie.lookupValue(uint32(i), c2), last: c2***REMOVED***, 3
+		if c2 < 0x80 || 0xC0 <= c2 {
+			return Properties{}, 1
+		}
+		return Properties{entry: trie.lookupValue(uint32(i), c2), last: c2}, 3
 	case c0 < 0xF8: // 4-byte UTF-8
-		if len(s) < 4 ***REMOVED***
-			return Properties***REMOVED******REMOVED***, 0
-		***REMOVED***
+		if len(s) < 4 {
+			return Properties{}, 0
+		}
 		i := bidiIndex[c0]
 		c1 := s[1]
-		if c1 < 0x80 || 0xC0 <= c1 ***REMOVED***
-			return Properties***REMOVED******REMOVED***, 1
-		***REMOVED***
+		if c1 < 0x80 || 0xC0 <= c1 {
+			return Properties{}, 1
+		}
 		o := uint32(i)<<6 + uint32(c1)
 		i = bidiIndex[o]
 		c2 := s[2]
-		if c2 < 0x80 || 0xC0 <= c2 ***REMOVED***
-			return Properties***REMOVED******REMOVED***, 1
-		***REMOVED***
+		if c2 < 0x80 || 0xC0 <= c2 {
+			return Properties{}, 1
+		}
 		o = uint32(i)<<6 + uint32(c2)
 		i = bidiIndex[o]
 		c3 := s[3]
-		if c3 < 0x80 || 0xC0 <= c3 ***REMOVED***
-			return Properties***REMOVED******REMOVED***, 1
-		***REMOVED***
-		return Properties***REMOVED***entry: trie.lookupValue(uint32(i), c3)***REMOVED***, 4
-	***REMOVED***
+		if c3 < 0x80 || 0xC0 <= c3 {
+			return Properties{}, 1
+		}
+		return Properties{entry: trie.lookupValue(uint32(i), c3)}, 4
+	}
 	// Illegal rune
-	return Properties***REMOVED******REMOVED***, 1
-***REMOVED***
+	return Properties{}, 1
+}
 
 // LookupString returns properties for the first rune in s and the width in
 // bytes of its encoding. The size will be 0 if s does not hold enough bytes to
 // complete the encoding.
-func LookupString(s string) (p Properties, sz int) ***REMOVED***
+func LookupString(s string) (p Properties, sz int) {
 	c0 := s[0]
-	switch ***REMOVED***
+	switch {
 	case c0 < 0x80: // is ASCII
-		return Properties***REMOVED***entry: bidiValues[c0]***REMOVED***, 1
+		return Properties{entry: bidiValues[c0]}, 1
 	case c0 < 0xC2:
-		return Properties***REMOVED******REMOVED***, 1
+		return Properties{}, 1
 	case c0 < 0xE0: // 2-byte UTF-8
-		if len(s) < 2 ***REMOVED***
-			return Properties***REMOVED******REMOVED***, 0
-		***REMOVED***
+		if len(s) < 2 {
+			return Properties{}, 0
+		}
 		i := bidiIndex[c0]
 		c1 := s[1]
-		if c1 < 0x80 || 0xC0 <= c1 ***REMOVED***
-			return Properties***REMOVED******REMOVED***, 1
-		***REMOVED***
-		return Properties***REMOVED***entry: trie.lookupValue(uint32(i), c1)***REMOVED***, 2
+		if c1 < 0x80 || 0xC0 <= c1 {
+			return Properties{}, 1
+		}
+		return Properties{entry: trie.lookupValue(uint32(i), c1)}, 2
 	case c0 < 0xF0: // 3-byte UTF-8
-		if len(s) < 3 ***REMOVED***
-			return Properties***REMOVED******REMOVED***, 0
-		***REMOVED***
+		if len(s) < 3 {
+			return Properties{}, 0
+		}
 		i := bidiIndex[c0]
 		c1 := s[1]
-		if c1 < 0x80 || 0xC0 <= c1 ***REMOVED***
-			return Properties***REMOVED******REMOVED***, 1
-		***REMOVED***
+		if c1 < 0x80 || 0xC0 <= c1 {
+			return Properties{}, 1
+		}
 		o := uint32(i)<<6 + uint32(c1)
 		i = bidiIndex[o]
 		c2 := s[2]
-		if c2 < 0x80 || 0xC0 <= c2 ***REMOVED***
-			return Properties***REMOVED******REMOVED***, 1
-		***REMOVED***
-		return Properties***REMOVED***entry: trie.lookupValue(uint32(i), c2), last: c2***REMOVED***, 3
+		if c2 < 0x80 || 0xC0 <= c2 {
+			return Properties{}, 1
+		}
+		return Properties{entry: trie.lookupValue(uint32(i), c2), last: c2}, 3
 	case c0 < 0xF8: // 4-byte UTF-8
-		if len(s) < 4 ***REMOVED***
-			return Properties***REMOVED******REMOVED***, 0
-		***REMOVED***
+		if len(s) < 4 {
+			return Properties{}, 0
+		}
 		i := bidiIndex[c0]
 		c1 := s[1]
-		if c1 < 0x80 || 0xC0 <= c1 ***REMOVED***
-			return Properties***REMOVED******REMOVED***, 1
-		***REMOVED***
+		if c1 < 0x80 || 0xC0 <= c1 {
+			return Properties{}, 1
+		}
 		o := uint32(i)<<6 + uint32(c1)
 		i = bidiIndex[o]
 		c2 := s[2]
-		if c2 < 0x80 || 0xC0 <= c2 ***REMOVED***
-			return Properties***REMOVED******REMOVED***, 1
-		***REMOVED***
+		if c2 < 0x80 || 0xC0 <= c2 {
+			return Properties{}, 1
+		}
 		o = uint32(i)<<6 + uint32(c2)
 		i = bidiIndex[o]
 		c3 := s[3]
-		if c3 < 0x80 || 0xC0 <= c3 ***REMOVED***
-			return Properties***REMOVED******REMOVED***, 1
-		***REMOVED***
-		return Properties***REMOVED***entry: trie.lookupValue(uint32(i), c3)***REMOVED***, 4
-	***REMOVED***
+		if c3 < 0x80 || 0xC0 <= c3 {
+			return Properties{}, 1
+		}
+		return Properties{entry: trie.lookupValue(uint32(i), c3)}, 4
+	}
 	// Illegal rune
-	return Properties***REMOVED******REMOVED***, 1
-***REMOVED***
+	return Properties{}, 1
+}

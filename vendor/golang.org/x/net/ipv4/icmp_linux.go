@@ -4,22 +4,22 @@
 
 package ipv4
 
-func (f *icmpFilter) accept(typ ICMPType) ***REMOVED***
+func (f *icmpFilter) accept(typ ICMPType) {
 	f.Data &^= 1 << (uint32(typ) & 31)
-***REMOVED***
+}
 
-func (f *icmpFilter) block(typ ICMPType) ***REMOVED***
+func (f *icmpFilter) block(typ ICMPType) {
 	f.Data |= 1 << (uint32(typ) & 31)
-***REMOVED***
+}
 
-func (f *icmpFilter) setAll(block bool) ***REMOVED***
-	if block ***REMOVED***
+func (f *icmpFilter) setAll(block bool) {
+	if block {
 		f.Data = 1<<32 - 1
-	***REMOVED*** else ***REMOVED***
+	} else {
 		f.Data = 0
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (f *icmpFilter) willBlock(typ ICMPType) bool ***REMOVED***
+func (f *icmpFilter) willBlock(typ ICMPType) bool {
 	return f.Data&(1<<(uint32(typ)&31)) != 0
-***REMOVED***
+}

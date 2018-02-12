@@ -1,39 +1,39 @@
 package msgp
 
-type timer interface ***REMOVED***
+type timer interface {
 	StartTimer()
 	StopTimer()
-***REMOVED***
+}
 
 // EndlessReader is an io.Reader
 // that loops over the same data
 // endlessly. It is used for benchmarking.
-type EndlessReader struct ***REMOVED***
+type EndlessReader struct {
 	tb     timer
 	data   []byte
 	offset int
-***REMOVED***
+}
 
 // NewEndlessReader returns a new endless reader
-func NewEndlessReader(b []byte, tb timer) *EndlessReader ***REMOVED***
-	return &EndlessReader***REMOVED***tb: tb, data: b, offset: 0***REMOVED***
-***REMOVED***
+func NewEndlessReader(b []byte, tb timer) *EndlessReader {
+	return &EndlessReader{tb: tb, data: b, offset: 0}
+}
 
 // Read implements io.Reader. In practice, it
 // always returns (len(p), nil), although it
 // fills the supplied slice while the benchmark
 // timer is stopped.
-func (c *EndlessReader) Read(p []byte) (int, error) ***REMOVED***
+func (c *EndlessReader) Read(p []byte) (int, error) {
 	c.tb.StopTimer()
 	var n int
 	l := len(p)
 	m := len(c.data)
-	for n < l ***REMOVED***
+	for n < l {
 		nn := copy(p[n:], c.data[c.offset:])
 		n += nn
 		c.offset += nn
 		c.offset %= m
-	***REMOVED***
+	}
 	c.tb.StartTimer()
 	return n, nil
-***REMOVED***
+}

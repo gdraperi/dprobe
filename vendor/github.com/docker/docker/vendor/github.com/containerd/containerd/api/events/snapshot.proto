@@ -7,16 +7,16 @@ import weak "github.com/containerd/containerd/protobuf/plugin/fieldpath.proto";
 option go_package = "github.com/containerd/containerd/api/events;events";
 option (containerd.plugin.fieldpath_all) = true;
 
-message SnapshotPrepare ***REMOVED***
+message SnapshotPrepare {
 	string key = 1;
 	string parent = 2;
-***REMOVED***
+}
 
-message SnapshotCommit ***REMOVED***
+message SnapshotCommit {
 	string key = 1;
 	string name = 2;
-***REMOVED***
+}
 
-message SnapshotRemove ***REMOVED***
+message SnapshotRemove {
 	string key = 1;
-***REMOVED***
+}

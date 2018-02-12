@@ -10,11 +10,11 @@ import (
 // ContainerExport retrieves the raw contents of a container
 // and returns them as an io.ReadCloser. It's up to the caller
 // to close the stream.
-func (cli *Client) ContainerExport(ctx context.Context, containerID string) (io.ReadCloser, error) ***REMOVED***
-	serverResp, err := cli.get(ctx, "/containers/"+containerID+"/export", url.Values***REMOVED******REMOVED***, nil)
-	if err != nil ***REMOVED***
+func (cli *Client) ContainerExport(ctx context.Context, containerID string) (io.ReadCloser, error) {
+	serverResp, err := cli.get(ctx, "/containers/"+containerID+"/export", url.Values{}, nil)
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	return serverResp.body, nil
-***REMOVED***
+}

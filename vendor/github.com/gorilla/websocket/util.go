@@ -16,20 +16,20 @@ import (
 
 var keyGUID = []byte("258EAFA5-E914-47DA-95CA-C5AB0DC85B11")
 
-func computeAcceptKey(challengeKey string) string ***REMOVED***
+func computeAcceptKey(challengeKey string) string {
 	h := sha1.New()
 	h.Write([]byte(challengeKey))
 	h.Write(keyGUID)
 	return base64.StdEncoding.EncodeToString(h.Sum(nil))
-***REMOVED***
+}
 
-func generateChallengeKey() (string, error) ***REMOVED***
+func generateChallengeKey() (string, error) {
 	p := make([]byte, 16)
-	if _, err := io.ReadFull(rand.Reader, p); err != nil ***REMOVED***
+	if _, err := io.ReadFull(rand.Reader, p); err != nil {
 		return "", err
-	***REMOVED***
+	}
 	return base64.StdEncoding.EncodeToString(p), nil
-***REMOVED***
+}
 
 // Octet types from RFC 2616.
 var octetTypes [256]byte
@@ -39,7 +39,7 @@ const (
 	isSpaceOctet
 )
 
-func init() ***REMOVED***
+func init() {
 	// From RFC 2616
 	//
 	// OCTET      = <any 8-bit sequence of data>
@@ -54,61 +54,61 @@ func init() ***REMOVED***
 	// LWS        = [CRLF] 1*( SP | HT )
 	// TEXT       = <any OCTET except CTLs, but including LWS>
 	// separators = "(" | ")" | "<" | ">" | "@" | "," | ";" | ":" | "\" | <">
-	//              | "/" | "[" | "]" | "?" | "=" | "***REMOVED***" | "***REMOVED***" | SP | HT
+	//              | "/" | "[" | "]" | "?" | "=" | "{" | "}" | SP | HT
 	// token      = 1*<any CHAR except CTLs or separators>
 	// qdtext     = <any TEXT except <">>
 
-	for c := 0; c < 256; c++ ***REMOVED***
+	for c := 0; c < 256; c++ {
 		var t byte
 		isCtl := c <= 31 || c == 127
 		isChar := 0 <= c && c <= 127
-		isSeparator := strings.IndexRune(" \t\"(),/:;<=>?@[]\\***REMOVED******REMOVED***", rune(c)) >= 0
-		if strings.IndexRune(" \t\r\n", rune(c)) >= 0 ***REMOVED***
+		isSeparator := strings.IndexRune(" \t\"(),/:;<=>?@[]\\{}", rune(c)) >= 0
+		if strings.IndexRune(" \t\r\n", rune(c)) >= 0 {
 			t |= isSpaceOctet
-		***REMOVED***
-		if isChar && !isCtl && !isSeparator ***REMOVED***
+		}
+		if isChar && !isCtl && !isSeparator {
 			t |= isTokenOctet
-		***REMOVED***
+		}
 		octetTypes[c] = t
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func skipSpace(s string) (rest string) ***REMOVED***
+func skipSpace(s string) (rest string) {
 	i := 0
-	for ; i < len(s); i++ ***REMOVED***
-		if octetTypes[s[i]]&isSpaceOctet == 0 ***REMOVED***
+	for ; i < len(s); i++ {
+		if octetTypes[s[i]]&isSpaceOctet == 0 {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return s[i:]
-***REMOVED***
+}
 
-func nextToken(s string) (token, rest string) ***REMOVED***
+func nextToken(s string) (token, rest string) {
 	i := 0
-	for ; i < len(s); i++ ***REMOVED***
-		if octetTypes[s[i]]&isTokenOctet == 0 ***REMOVED***
+	for ; i < len(s); i++ {
+		if octetTypes[s[i]]&isTokenOctet == 0 {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return s[:i], s[i:]
-***REMOVED***
+}
 
-func nextTokenOrQuoted(s string) (value string, rest string) ***REMOVED***
-	if !strings.HasPrefix(s, "\"") ***REMOVED***
+func nextTokenOrQuoted(s string) (value string, rest string) {
+	if !strings.HasPrefix(s, "\"") {
 		return nextToken(s)
-	***REMOVED***
+	}
 	s = s[1:]
-	for i := 0; i < len(s); i++ ***REMOVED***
-		switch s[i] ***REMOVED***
+	for i := 0; i < len(s); i++ {
+		switch s[i] {
 		case '"':
 			return s[:i], s[i+1:]
 		case '\\':
 			p := make([]byte, len(s)-1)
 			j := copy(p, s[:i])
 			escape := true
-			for i = i + 1; i < len(s); i++ ***REMOVED***
+			for i = i + 1; i < len(s); i++ {
 				b := s[i]
-				switch ***REMOVED***
+				switch {
 				case escape:
 					escape = false
 					p[j] = b
@@ -120,66 +120,66 @@ func nextTokenOrQuoted(s string) (value string, rest string) ***REMOVED***
 				default:
 					p[j] = b
 					j++
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return "", ""
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return "", ""
-***REMOVED***
+}
 
 // equalASCIIFold returns true if s is equal to t with ASCII case folding.
-func equalASCIIFold(s, t string) bool ***REMOVED***
-	for s != "" && t != "" ***REMOVED***
+func equalASCIIFold(s, t string) bool {
+	for s != "" && t != "" {
 		sr, size := utf8.DecodeRuneInString(s)
 		s = s[size:]
 		tr, size := utf8.DecodeRuneInString(t)
 		t = t[size:]
-		if sr == tr ***REMOVED***
+		if sr == tr {
 			continue
-		***REMOVED***
-		if 'A' <= sr && sr <= 'Z' ***REMOVED***
+		}
+		if 'A' <= sr && sr <= 'Z' {
 			sr = sr + 'a' - 'A'
-		***REMOVED***
-		if 'A' <= tr && tr <= 'Z' ***REMOVED***
+		}
+		if 'A' <= tr && tr <= 'Z' {
 			tr = tr + 'a' - 'A'
-		***REMOVED***
-		if sr != tr ***REMOVED***
+		}
+		if sr != tr {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return s == t
-***REMOVED***
+}
 
 // tokenListContainsValue returns true if the 1#token header with the given
 // name contains a token equal to value with ASCII case folding.
-func tokenListContainsValue(header http.Header, name string, value string) bool ***REMOVED***
+func tokenListContainsValue(header http.Header, name string, value string) bool {
 headers:
-	for _, s := range header[name] ***REMOVED***
-		for ***REMOVED***
+	for _, s := range header[name] {
+		for {
 			var t string
 			t, s = nextToken(skipSpace(s))
-			if t == "" ***REMOVED***
+			if t == "" {
 				continue headers
-			***REMOVED***
+			}
 			s = skipSpace(s)
-			if s != "" && s[0] != ',' ***REMOVED***
+			if s != "" && s[0] != ',' {
 				continue headers
-			***REMOVED***
-			if equalASCIIFold(t, value) ***REMOVED***
+			}
+			if equalASCIIFold(t, value) {
 				return true
-			***REMOVED***
-			if s == "" ***REMOVED***
+			}
+			if s == "" {
 				continue headers
-			***REMOVED***
+			}
 			s = s[1:]
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false
-***REMOVED***
+}
 
 // parseExtensiosn parses WebSocket extensions from a header.
-func parseExtensions(header http.Header) []map[string]string ***REMOVED***
+func parseExtensions(header http.Header) []map[string]string {
 	// From RFC 6455:
 	//
 	//  Sec-WebSocket-Extensions = extension-list
@@ -194,44 +194,44 @@ func parseExtensions(header http.Header) []map[string]string ***REMOVED***
 
 	var result []map[string]string
 headers:
-	for _, s := range header["Sec-Websocket-Extensions"] ***REMOVED***
-		for ***REMOVED***
+	for _, s := range header["Sec-Websocket-Extensions"] {
+		for {
 			var t string
 			t, s = nextToken(skipSpace(s))
-			if t == "" ***REMOVED***
+			if t == "" {
 				continue headers
-			***REMOVED***
-			ext := map[string]string***REMOVED***"": t***REMOVED***
-			for ***REMOVED***
+			}
+			ext := map[string]string{"": t}
+			for {
 				s = skipSpace(s)
-				if !strings.HasPrefix(s, ";") ***REMOVED***
+				if !strings.HasPrefix(s, ";") {
 					break
-				***REMOVED***
+				}
 				var k string
 				k, s = nextToken(skipSpace(s[1:]))
-				if k == "" ***REMOVED***
+				if k == "" {
 					continue headers
-				***REMOVED***
+				}
 				s = skipSpace(s)
 				var v string
-				if strings.HasPrefix(s, "=") ***REMOVED***
+				if strings.HasPrefix(s, "=") {
 					v, s = nextTokenOrQuoted(skipSpace(s[1:]))
 					s = skipSpace(s)
-				***REMOVED***
-				if s != "" && s[0] != ',' && s[0] != ';' ***REMOVED***
+				}
+				if s != "" && s[0] != ',' && s[0] != ';' {
 					continue headers
-				***REMOVED***
+				}
 				ext[k] = v
-			***REMOVED***
-			if s != "" && s[0] != ',' ***REMOVED***
+			}
+			if s != "" && s[0] != ',' {
 				continue headers
-			***REMOVED***
+			}
 			result = append(result, ext)
-			if s == "" ***REMOVED***
+			if s == "" {
 				continue headers
-			***REMOVED***
+			}
 			s = s[1:]
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return result
-***REMOVED***
+}

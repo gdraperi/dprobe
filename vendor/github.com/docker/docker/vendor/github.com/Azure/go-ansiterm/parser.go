@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-type AnsiParser struct ***REMOVED***
+type AnsiParser struct {
 	currState          state
 	eventHandler       AnsiEventHandler
 	context            *ansiContext
@@ -20,54 +20,54 @@ type AnsiParser struct ***REMOVED***
 	oscString          state
 	stateMap           []state
 
-	logf func(string, ...interface***REMOVED******REMOVED***)
-***REMOVED***
+	logf func(string, ...interface{})
+}
 
 type Option func(*AnsiParser)
 
-func WithLogf(f func(string, ...interface***REMOVED******REMOVED***)) Option ***REMOVED***
-	return func(ap *AnsiParser) ***REMOVED***
+func WithLogf(f func(string, ...interface{})) Option {
+	return func(ap *AnsiParser) {
 		ap.logf = f
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func CreateParser(initialState string, evtHandler AnsiEventHandler, opts ...Option) *AnsiParser ***REMOVED***
-	ap := &AnsiParser***REMOVED***
+func CreateParser(initialState string, evtHandler AnsiEventHandler, opts ...Option) *AnsiParser {
+	ap := &AnsiParser{
 		eventHandler: evtHandler,
-		context:      &ansiContext***REMOVED******REMOVED***,
-	***REMOVED***
-	for _, o := range opts ***REMOVED***
+		context:      &ansiContext{},
+	}
+	for _, o := range opts {
 		o(ap)
-	***REMOVED***
+	}
 
-	if isDebugEnv := os.Getenv(LogEnv); isDebugEnv == "1" ***REMOVED***
+	if isDebugEnv := os.Getenv(LogEnv); isDebugEnv == "1" {
 		logFile, _ := os.Create("ansiParser.log")
 		logger := log.New(logFile, "", log.LstdFlags)
-		if ap.logf != nil ***REMOVED***
+		if ap.logf != nil {
 			l := ap.logf
-			ap.logf = func(s string, v ...interface***REMOVED******REMOVED***) ***REMOVED***
+			ap.logf = func(s string, v ...interface{}) {
 				l(s, v...)
 				logger.Printf(s, v...)
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
+			}
+		} else {
 			ap.logf = logger.Printf
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if ap.logf == nil ***REMOVED***
-		ap.logf = func(string, ...interface***REMOVED******REMOVED***) ***REMOVED******REMOVED***
-	***REMOVED***
+	if ap.logf == nil {
+		ap.logf = func(string, ...interface{}) {}
+	}
 
-	ap.csiEntry = csiEntryState***REMOVED***baseState***REMOVED***name: "CsiEntry", parser: ap***REMOVED******REMOVED***
-	ap.csiParam = csiParamState***REMOVED***baseState***REMOVED***name: "CsiParam", parser: ap***REMOVED******REMOVED***
-	ap.dcsEntry = dcsEntryState***REMOVED***baseState***REMOVED***name: "DcsEntry", parser: ap***REMOVED******REMOVED***
-	ap.escape = escapeState***REMOVED***baseState***REMOVED***name: "Escape", parser: ap***REMOVED******REMOVED***
-	ap.escapeIntermediate = escapeIntermediateState***REMOVED***baseState***REMOVED***name: "EscapeIntermediate", parser: ap***REMOVED******REMOVED***
-	ap.error = errorState***REMOVED***baseState***REMOVED***name: "Error", parser: ap***REMOVED******REMOVED***
-	ap.ground = groundState***REMOVED***baseState***REMOVED***name: "Ground", parser: ap***REMOVED******REMOVED***
-	ap.oscString = oscStringState***REMOVED***baseState***REMOVED***name: "OscString", parser: ap***REMOVED******REMOVED***
+	ap.csiEntry = csiEntryState{baseState{name: "CsiEntry", parser: ap}}
+	ap.csiParam = csiParamState{baseState{name: "CsiParam", parser: ap}}
+	ap.dcsEntry = dcsEntryState{baseState{name: "DcsEntry", parser: ap}}
+	ap.escape = escapeState{baseState{name: "Escape", parser: ap}}
+	ap.escapeIntermediate = escapeIntermediateState{baseState{name: "EscapeIntermediate", parser: ap}}
+	ap.error = errorState{baseState{name: "Error", parser: ap}}
+	ap.ground = groundState{baseState{name: "Ground", parser: ap}}
+	ap.oscString = oscStringState{baseState{name: "OscString", parser: ap}}
 
-	ap.stateMap = []state***REMOVED***
+	ap.stateMap = []state{
 		ap.csiEntry,
 		ap.csiParam,
 		ap.dcsEntry,
@@ -76,76 +76,76 @@ func CreateParser(initialState string, evtHandler AnsiEventHandler, opts ...Opti
 		ap.error,
 		ap.ground,
 		ap.oscString,
-	***REMOVED***
+	}
 
 	ap.currState = getState(initialState, ap.stateMap)
 
 	ap.logf("CreateParser: parser %p", ap)
 	return ap
-***REMOVED***
+}
 
-func getState(name string, states []state) state ***REMOVED***
-	for _, el := range states ***REMOVED***
-		if el.Name() == name ***REMOVED***
+func getState(name string, states []state) state {
+	for _, el := range states {
+		if el.Name() == name {
 			return el
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (ap *AnsiParser) Parse(bytes []byte) (int, error) ***REMOVED***
-	for i, b := range bytes ***REMOVED***
-		if err := ap.handle(b); err != nil ***REMOVED***
+func (ap *AnsiParser) Parse(bytes []byte) (int, error) {
+	for i, b := range bytes {
+		if err := ap.handle(b); err != nil {
 			return i, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return len(bytes), ap.eventHandler.Flush()
-***REMOVED***
+}
 
-func (ap *AnsiParser) handle(b byte) error ***REMOVED***
+func (ap *AnsiParser) handle(b byte) error {
 	ap.context.currentChar = b
 	newState, err := ap.currState.Handle(b)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if newState == nil ***REMOVED***
+	if newState == nil {
 		ap.logf("WARNING: newState is nil")
 		return errors.New("New state of 'nil' is invalid.")
-	***REMOVED***
+	}
 
-	if newState != ap.currState ***REMOVED***
-		if err := ap.changeState(newState); err != nil ***REMOVED***
+	if newState != ap.currState {
+		if err := ap.changeState(newState); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (ap *AnsiParser) changeState(newState state) error ***REMOVED***
+func (ap *AnsiParser) changeState(newState state) error {
 	ap.logf("ChangeState %s --> %s", ap.currState.Name(), newState.Name())
 
 	// Exit old state
-	if err := ap.currState.Exit(); err != nil ***REMOVED***
+	if err := ap.currState.Exit(); err != nil {
 		ap.logf("Exit state '%s' failed with : '%v'", ap.currState.Name(), err)
 		return err
-	***REMOVED***
+	}
 
 	// Perform transition action
-	if err := ap.currState.Transition(newState); err != nil ***REMOVED***
+	if err := ap.currState.Transition(newState); err != nil {
 		ap.logf("Transition from '%s' to '%s' failed with: '%v'", ap.currState.Name(), newState.Name, err)
 		return err
-	***REMOVED***
+	}
 
 	// Enter new state
-	if err := newState.Enter(); err != nil ***REMOVED***
+	if err := newState.Enter(); err != nil {
 		ap.logf("Enter state '%s' failed with: '%v'", newState.Name(), err)
 		return err
-	***REMOVED***
+	}
 
 	ap.currState = newState
 	return nil
-***REMOVED***
+}

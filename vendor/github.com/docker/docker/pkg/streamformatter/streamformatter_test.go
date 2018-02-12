@@ -12,54 +12,54 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestRawProgressFormatterFormatStatus(t *testing.T) ***REMOVED***
-	sf := rawProgressFormatter***REMOVED******REMOVED***
+func TestRawProgressFormatterFormatStatus(t *testing.T) {
+	sf := rawProgressFormatter{}
 	res := sf.formatStatus("ID", "%s%d", "a", 1)
 	assert.Equal(t, "a1\r\n", string(res))
-***REMOVED***
+}
 
-func TestRawProgressFormatterFormatProgress(t *testing.T) ***REMOVED***
-	sf := rawProgressFormatter***REMOVED******REMOVED***
-	jsonProgress := &jsonmessage.JSONProgress***REMOVED***
+func TestRawProgressFormatterFormatProgress(t *testing.T) {
+	sf := rawProgressFormatter{}
+	jsonProgress := &jsonmessage.JSONProgress{
 		Current: 15,
 		Total:   30,
 		Start:   1,
-	***REMOVED***
+	}
 	res := sf.formatProgress("id", "action", jsonProgress, nil)
 	out := string(res)
 	assert.True(t, strings.HasPrefix(out, "action [===="))
 	assert.Contains(t, out, "15B/30B")
 	assert.True(t, strings.HasSuffix(out, "\r"))
-***REMOVED***
+}
 
-func TestFormatStatus(t *testing.T) ***REMOVED***
+func TestFormatStatus(t *testing.T) {
 	res := FormatStatus("ID", "%s%d", "a", 1)
-	expected := `***REMOVED***"status":"a1","id":"ID"***REMOVED***` + streamNewline
+	expected := `{"status":"a1","id":"ID"}` + streamNewline
 	assert.Equal(t, expected, string(res))
-***REMOVED***
+}
 
-func TestFormatError(t *testing.T) ***REMOVED***
+func TestFormatError(t *testing.T) {
 	res := FormatError(errors.New("Error for formatter"))
-	expected := `***REMOVED***"errorDetail":***REMOVED***"message":"Error for formatter"***REMOVED***,"error":"Error for formatter"***REMOVED***` + "\r\n"
+	expected := `{"errorDetail":{"message":"Error for formatter"},"error":"Error for formatter"}` + "\r\n"
 	assert.Equal(t, expected, string(res))
-***REMOVED***
+}
 
-func TestFormatJSONError(t *testing.T) ***REMOVED***
-	err := &jsonmessage.JSONError***REMOVED***Code: 50, Message: "Json error"***REMOVED***
+func TestFormatJSONError(t *testing.T) {
+	err := &jsonmessage.JSONError{Code: 50, Message: "Json error"}
 	res := FormatError(err)
-	expected := `***REMOVED***"errorDetail":***REMOVED***"code":50,"message":"Json error"***REMOVED***,"error":"Json error"***REMOVED***` + streamNewline
+	expected := `{"errorDetail":{"code":50,"message":"Json error"},"error":"Json error"}` + streamNewline
 	assert.Equal(t, expected, string(res))
-***REMOVED***
+}
 
-func TestJsonProgressFormatterFormatProgress(t *testing.T) ***REMOVED***
-	sf := &jsonProgressFormatter***REMOVED******REMOVED***
-	jsonProgress := &jsonmessage.JSONProgress***REMOVED***
+func TestJsonProgressFormatterFormatProgress(t *testing.T) {
+	sf := &jsonProgressFormatter{}
+	jsonProgress := &jsonmessage.JSONProgress{
 		Current: 15,
 		Total:   30,
 		Start:   1,
-	***REMOVED***
-	res := sf.formatProgress("id", "action", jsonProgress, &AuxFormatter***REMOVED***Writer: &bytes.Buffer***REMOVED******REMOVED******REMOVED***)
-	msg := &jsonmessage.JSONMessage***REMOVED******REMOVED***
+	}
+	res := sf.formatProgress("id", "action", jsonProgress, &AuxFormatter{Writer: &bytes.Buffer{}})
+	msg := &jsonmessage.JSONMessage{}
 
 	require.NoError(t, json.Unmarshal(res, msg))
 	assert.Equal(t, "id", msg.ID)
@@ -76,34 +76,34 @@ func TestJsonProgressFormatterFormatProgress(t *testing.T) ***REMOVED***
 	// if terminal column is <= 110, expectedProgressShort is expected.
 	expectedProgressShort := "      15B/30B"
 	if !(strings.HasPrefix(msg.ProgressMessage, expectedProgress) ||
-		strings.HasPrefix(msg.ProgressMessage, expectedProgressShort)) ***REMOVED***
+		strings.HasPrefix(msg.ProgressMessage, expectedProgressShort)) {
 		t.Fatalf("ProgressMessage without the timeLeftBox must be %s or %s, got: %s",
 			expectedProgress, expectedProgressShort, msg.ProgressMessage)
-	***REMOVED***
+	}
 
 	assert.Equal(t, jsonProgress, msg.Progress)
-***REMOVED***
+}
 
-func TestJsonProgressFormatterFormatStatus(t *testing.T) ***REMOVED***
-	sf := jsonProgressFormatter***REMOVED******REMOVED***
+func TestJsonProgressFormatterFormatStatus(t *testing.T) {
+	sf := jsonProgressFormatter{}
 	res := sf.formatStatus("ID", "%s%d", "a", 1)
-	assert.Equal(t, `***REMOVED***"status":"a1","id":"ID"***REMOVED***`+streamNewline, string(res))
-***REMOVED***
+	assert.Equal(t, `{"status":"a1","id":"ID"}`+streamNewline, string(res))
+}
 
-func TestNewJSONProgressOutput(t *testing.T) ***REMOVED***
-	b := bytes.Buffer***REMOVED******REMOVED***
+func TestNewJSONProgressOutput(t *testing.T) {
+	b := bytes.Buffer{}
 	b.Write(FormatStatus("id", "Downloading"))
 	_ = NewJSONProgressOutput(&b, false)
-	assert.Equal(t, `***REMOVED***"status":"Downloading","id":"id"***REMOVED***`+streamNewline, b.String())
-***REMOVED***
+	assert.Equal(t, `{"status":"Downloading","id":"id"}`+streamNewline, b.String())
+}
 
-func TestAuxFormatterEmit(t *testing.T) ***REMOVED***
-	b := bytes.Buffer***REMOVED******REMOVED***
-	aux := &AuxFormatter***REMOVED***Writer: &b***REMOVED***
-	sampleAux := &struct ***REMOVED***
+func TestAuxFormatterEmit(t *testing.T) {
+	b := bytes.Buffer{}
+	aux := &AuxFormatter{Writer: &b}
+	sampleAux := &struct {
 		Data string
-	***REMOVED******REMOVED***"Additional data"***REMOVED***
+	}{"Additional data"}
 	err := aux.Emit(sampleAux)
 	require.NoError(t, err)
-	assert.Equal(t, `***REMOVED***"aux":***REMOVED***"Data":"Additional data"***REMOVED******REMOVED***`+streamNewline, b.String())
-***REMOVED***
+	assert.Equal(t, `{"aux":{"Data":"Additional data"}}`+streamNewline, b.String())
+}

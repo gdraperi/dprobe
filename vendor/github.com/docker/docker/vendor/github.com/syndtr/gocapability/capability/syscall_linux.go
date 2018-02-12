@@ -11,40 +11,40 @@ import (
 	"unsafe"
 )
 
-type capHeader struct ***REMOVED***
+type capHeader struct {
 	version uint32
 	pid     int
-***REMOVED***
+}
 
-type capData struct ***REMOVED***
+type capData struct {
 	effective   uint32
 	permitted   uint32
 	inheritable uint32
-***REMOVED***
+}
 
-func capget(hdr *capHeader, data *capData) (err error) ***REMOVED***
+func capget(hdr *capHeader, data *capData) (err error) {
 	_, _, e1 := syscall.Syscall(syscall.SYS_CAPGET, uintptr(unsafe.Pointer(hdr)), uintptr(unsafe.Pointer(data)), 0)
-	if e1 != 0 ***REMOVED***
+	if e1 != 0 {
 		err = e1
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func capset(hdr *capHeader, data *capData) (err error) ***REMOVED***
+func capset(hdr *capHeader, data *capData) (err error) {
 	_, _, e1 := syscall.Syscall(syscall.SYS_CAPSET, uintptr(unsafe.Pointer(hdr)), uintptr(unsafe.Pointer(data)), 0)
-	if e1 != 0 ***REMOVED***
+	if e1 != 0 {
 		err = e1
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func prctl(option int, arg2, arg3, arg4, arg5 uintptr) (err error) ***REMOVED***
+func prctl(option int, arg2, arg3, arg4, arg5 uintptr) (err error) {
 	_, _, e1 := syscall.Syscall6(syscall.SYS_PRCTL, uintptr(option), arg2, arg3, arg4, arg5, 0)
-	if e1 != 0 ***REMOVED***
+	if e1 != 0 {
 		err = e1
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 const (
 	vfsXattrName = "security.capability"
@@ -60,86 +60,86 @@ const (
 	vfscapDataSizeV2 = 4 * (1 + 2*2)
 )
 
-type vfscapData struct ***REMOVED***
+type vfscapData struct {
 	magic uint32
-	data  [2]struct ***REMOVED***
+	data  [2]struct {
 		permitted   uint32
 		inheritable uint32
-	***REMOVED***
+	}
 	effective [2]uint32
 	version   int8
-***REMOVED***
+}
 
 var (
 	_vfsXattrName *byte
 )
 
-func init() ***REMOVED***
+func init() {
 	_vfsXattrName, _ = syscall.BytePtrFromString(vfsXattrName)
-***REMOVED***
+}
 
-func getVfsCap(path string, dest *vfscapData) (err error) ***REMOVED***
+func getVfsCap(path string, dest *vfscapData) (err error) {
 	var _p0 *byte
 	_p0, err = syscall.BytePtrFromString(path)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, e1 := syscall.Syscall6(syscall.SYS_GETXATTR, uintptr(unsafe.Pointer(_p0)), uintptr(unsafe.Pointer(_vfsXattrName)), uintptr(unsafe.Pointer(dest)), vfscapDataSizeV2, 0, 0)
-	if e1 != 0 ***REMOVED***
-		if e1 == syscall.ENODATA ***REMOVED***
+	if e1 != 0 {
+		if e1 == syscall.ENODATA {
 			dest.version = 2
 			return
-		***REMOVED***
+		}
 		err = e1
-	***REMOVED***
-	switch dest.magic & vfsCapVerMask ***REMOVED***
+	}
+	switch dest.magic & vfsCapVerMask {
 	case vfsCapVer1:
 		dest.version = 1
-		if r0 != vfscapDataSizeV1 ***REMOVED***
+		if r0 != vfscapDataSizeV1 {
 			return syscall.EINVAL
-		***REMOVED***
+		}
 		dest.data[1].permitted = 0
 		dest.data[1].inheritable = 0
 	case vfsCapVer2:
 		dest.version = 2
-		if r0 != vfscapDataSizeV2 ***REMOVED***
+		if r0 != vfscapDataSizeV2 {
 			return syscall.EINVAL
-		***REMOVED***
+		}
 	default:
 		return syscall.EINVAL
-	***REMOVED***
-	if dest.magic&vfsCapFlageffective != 0 ***REMOVED***
+	}
+	if dest.magic&vfsCapFlageffective != 0 {
 		dest.effective[0] = dest.data[0].permitted | dest.data[0].inheritable
 		dest.effective[1] = dest.data[1].permitted | dest.data[1].inheritable
-	***REMOVED*** else ***REMOVED***
+	} else {
 		dest.effective[0] = 0
 		dest.effective[1] = 0
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func setVfsCap(path string, data *vfscapData) (err error) ***REMOVED***
+func setVfsCap(path string, data *vfscapData) (err error) {
 	var _p0 *byte
 	_p0, err = syscall.BytePtrFromString(path)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	var size uintptr
-	if data.version == 1 ***REMOVED***
+	if data.version == 1 {
 		data.magic = vfsCapVer1
 		size = vfscapDataSizeV1
-	***REMOVED*** else if data.version == 2 ***REMOVED***
+	} else if data.version == 2 {
 		data.magic = vfsCapVer2
-		if data.effective[0] != 0 || data.effective[1] != 0 ***REMOVED***
+		if data.effective[0] != 0 || data.effective[1] != 0 {
 			data.magic |= vfsCapFlageffective
-		***REMOVED***
+		}
 		size = vfscapDataSizeV2
-	***REMOVED*** else ***REMOVED***
+	} else {
 		return syscall.EINVAL
-	***REMOVED***
+	}
 	_, _, e1 := syscall.Syscall6(syscall.SYS_SETXATTR, uintptr(unsafe.Pointer(_p0)), uintptr(unsafe.Pointer(_vfsXattrName)), uintptr(unsafe.Pointer(data)), size, 0, 0)
-	if e1 != 0 ***REMOVED***
+	if e1 != 0 {
 		err = e1
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}

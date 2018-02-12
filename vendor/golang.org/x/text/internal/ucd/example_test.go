@@ -11,30 +11,30 @@ import (
 	"golang.org/x/text/internal/ucd"
 )
 
-func Example() ***REMOVED***
+func Example() {
 	// Read rune-by-rune from UnicodeData.
 	var count int
 	p := ucd.New(strings.NewReader(unicodeData))
-	for p.Next() ***REMOVED***
+	for p.Next() {
 		count++
-		if lower := p.Runes(ucd.SimpleLowercaseMapping); lower != nil ***REMOVED***
+		if lower := p.Runes(ucd.SimpleLowercaseMapping); lower != nil {
 			fmt.Printf("lower(%U) -> %U\n", p.Rune(0), lower[0])
-		***REMOVED***
-	***REMOVED***
-	if err := p.Err(); err != nil ***REMOVED***
+		}
+	}
+	if err := p.Err(); err != nil {
 		fmt.Println(err)
-	***REMOVED***
+	}
 	fmt.Println("Number of runes visited:", count)
 
 	// Read raw ranges from Scripts.
 	p = ucd.New(strings.NewReader(scripts), ucd.KeepRanges)
-	for p.Next() ***REMOVED***
+	for p.Next() {
 		start, end := p.Range(0)
 		fmt.Printf("%04X..%04X: %s\n", start, end, p.String(1))
-	***REMOVED***
-	if err := p.Err(); err != nil ***REMOVED***
+	}
+	if err := p.Err(); err != nil {
 		fmt.Println(err)
-	***REMOVED***
+	}
 
 	// Output:
 	// lower(U+00C0) -> U+00E0
@@ -47,7 +47,7 @@ func Example() ***REMOVED***
 	// 0020..0020: Common
 	// 0021..0023: Common
 	// 0024..0024: Common
-***REMOVED***
+}
 
 // Excerpt from UnicodeData.txt
 const unicodeData = `

@@ -23,15 +23,15 @@ const (
 	DEFAULT_MESSAGE_ESCAPE_TEXT      = true
 )
 
-type chatResponseFull struct ***REMOVED***
+type chatResponseFull struct {
 	Channel   string `json:"channel"`
 	Timestamp string `json:"ts"`
 	Text      string `json:"text"`
 	SlackResponse
-***REMOVED***
+}
 
 // PostMessageParameters contains all the parameters necessary (including the optional ones) for a PostMessage() request
-type PostMessageParameters struct ***REMOVED***
+type PostMessageParameters struct {
 	Username        string       `json:"user_name"`
 	AsUser          bool         `json:"as_user"`
 	Parse           string       `json:"parse"`
@@ -49,11 +49,11 @@ type PostMessageParameters struct ***REMOVED***
 	// chat.postEphemeral support
 	Channel string `json:"channel"`
 	User    string `json:"user"`
-***REMOVED***
+}
 
 // NewPostMessageParameters provides an instance of PostMessageParameters with all the sane default values set
-func NewPostMessageParameters() PostMessageParameters ***REMOVED***
-	return PostMessageParameters***REMOVED***
+func NewPostMessageParameters() PostMessageParameters {
+	return PostMessageParameters{
 		Username:        DEFAULT_MESSAGE_USERNAME,
 		User:            DEFAULT_MESSAGE_USERNAME,
 		AsUser:          DEFAULT_MESSAGE_ASUSER,
@@ -67,25 +67,25 @@ func NewPostMessageParameters() PostMessageParameters ***REMOVED***
 		IconEmoji:       DEFAULT_MESSAGE_ICON_EMOJI,
 		Markdown:        DEFAULT_MESSAGE_MARKDOWN,
 		EscapeText:      DEFAULT_MESSAGE_ESCAPE_TEXT,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // DeleteMessage deletes a message in a channel
-func (api *Client) DeleteMessage(channel, messageTimestamp string) (string, string, error) ***REMOVED***
+func (api *Client) DeleteMessage(channel, messageTimestamp string) (string, string, error) {
 	respChannel, respTimestamp, _, err := api.SendMessageContext(context.Background(), channel, MsgOptionDelete(messageTimestamp))
 	return respChannel, respTimestamp, err
-***REMOVED***
+}
 
 // DeleteMessageContext deletes a message in a channel with a custom context
-func (api *Client) DeleteMessageContext(ctx context.Context, channel, messageTimestamp string) (string, string, error) ***REMOVED***
+func (api *Client) DeleteMessageContext(ctx context.Context, channel, messageTimestamp string) (string, string, error) {
 	respChannel, respTimestamp, _, err := api.SendMessageContext(ctx, channel, MsgOptionDelete(messageTimestamp))
 	return respChannel, respTimestamp, err
-***REMOVED***
+}
 
 // PostMessage sends a message to a channel.
 // Message is escaped by default according to https://api.slack.com/docs/formatting
 // Use http://davestevens.github.io/slack-message-builder/ to help crafting your message.
-func (api *Client) PostMessage(channel, text string, params PostMessageParameters) (string, string, error) ***REMOVED***
+func (api *Client) PostMessage(channel, text string, params PostMessageParameters) (string, string, error) {
 	respChannel, respTimestamp, _, err := api.SendMessageContext(
 		context.Background(),
 		channel,
@@ -94,11 +94,11 @@ func (api *Client) PostMessage(channel, text string, params PostMessageParameter
 		MsgOptionPostMessageParameters(params),
 	)
 	return respChannel, respTimestamp, err
-***REMOVED***
+}
 
 // PostMessageContext sends a message to a channel with a custom context
 // For more details, see PostMessage documentation
-func (api *Client) PostMessageContext(ctx context.Context, channel, text string, params PostMessageParameters) (string, string, error) ***REMOVED***
+func (api *Client) PostMessageContext(ctx context.Context, channel, text string, params PostMessageParameters) (string, string, error) {
 	respChannel, respTimestamp, _, err := api.SendMessageContext(
 		ctx,
 		channel,
@@ -107,12 +107,12 @@ func (api *Client) PostMessageContext(ctx context.Context, channel, text string,
 		MsgOptionPostMessageParameters(params),
 	)
 	return respChannel, respTimestamp, err
-***REMOVED***
+}
 
 // PostEphemeral sends an ephemeral message to a user in a channel.
 // Message is escaped by default according to https://api.slack.com/docs/formatting
 // Use http://davestevens.github.io/slack-message-builder/ to help crafting your message.
-func (api *Client) PostEphemeral(channel, userID string, options ...MsgOption) (string, error) ***REMOVED***
+func (api *Client) PostEphemeral(channel, userID string, options ...MsgOption) (string, error) {
 	options = append(options, MsgOptionPostEphemeral())
 	return api.PostEphemeralContext(
 		context.Background(),
@@ -120,91 +120,91 @@ func (api *Client) PostEphemeral(channel, userID string, options ...MsgOption) (
 		userID,
 		options...,
 	)
-***REMOVED***
+}
 
 // PostEphemeralContext sends an ephemeal message to a user in a channel with a custom context
 // For more details, see PostEphemeral documentation
-func (api *Client) PostEphemeralContext(ctx context.Context, channel, userID string, options ...MsgOption) (string, error) ***REMOVED***
+func (api *Client) PostEphemeralContext(ctx context.Context, channel, userID string, options ...MsgOption) (string, error) {
 	path, values, err := ApplyMsgOptions(api.token, channel, options...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 
 	values.Add("user", userID)
 
 	response, err := chatRequest(ctx, api.httpclient, path, values, api.debug)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 
 	return response.Timestamp, nil
-***REMOVED***
+}
 
 // UpdateMessage updates a message in a channel
-func (api *Client) UpdateMessage(channel, timestamp, text string) (string, string, string, error) ***REMOVED***
+func (api *Client) UpdateMessage(channel, timestamp, text string) (string, string, string, error) {
 	return api.UpdateMessageContext(context.Background(), channel, timestamp, text)
-***REMOVED***
+}
 
 // UpdateMessageContext updates a message in a channel
-func (api *Client) UpdateMessageContext(ctx context.Context, channel, timestamp, text string) (string, string, string, error) ***REMOVED***
+func (api *Client) UpdateMessageContext(ctx context.Context, channel, timestamp, text string) (string, string, string, error) {
 	return api.SendMessageContext(ctx, channel, MsgOptionUpdate(timestamp), MsgOptionText(text, true))
-***REMOVED***
+}
 
 // SendMessage more flexible method for configuring messages.
-func (api *Client) SendMessage(channel string, options ...MsgOption) (string, string, string, error) ***REMOVED***
+func (api *Client) SendMessage(channel string, options ...MsgOption) (string, string, string, error) {
 	return api.SendMessageContext(context.Background(), channel, options...)
-***REMOVED***
+}
 
 // SendMessageContext more flexible method for configuring messages with a custom context.
-func (api *Client) SendMessageContext(ctx context.Context, channel string, options ...MsgOption) (string, string, string, error) ***REMOVED***
+func (api *Client) SendMessageContext(ctx context.Context, channel string, options ...MsgOption) (string, string, string, error) {
 	channel, values, err := ApplyMsgOptions(api.token, channel, options...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", "", "", err
-	***REMOVED***
+	}
 
 	response, err := chatRequest(ctx, api.httpclient, channel, values, api.debug)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", "", "", err
-	***REMOVED***
+	}
 
 	return response.Channel, response.Timestamp, response.Text, nil
-***REMOVED***
+}
 
 // ApplyMsgOptions utility function for debugging/testing chat requests.
-func ApplyMsgOptions(token, channel string, options ...MsgOption) (string, url.Values, error) ***REMOVED***
-	config := sendConfig***REMOVED***
+func ApplyMsgOptions(token, channel string, options ...MsgOption) (string, url.Values, error) {
+	config := sendConfig{
 		mode: chatPostMessage,
-		values: url.Values***REMOVED***
-			"token":   ***REMOVED***token***REMOVED***,
-			"channel": ***REMOVED***channel***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+		values: url.Values{
+			"token":   {token},
+			"channel": {channel},
+		},
+	}
 
-	for _, opt := range options ***REMOVED***
-		if err := opt(&config); err != nil ***REMOVED***
+	for _, opt := range options {
+		if err := opt(&config); err != nil {
 			return string(config.mode), config.values, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return string(config.mode), config.values, nil
-***REMOVED***
+}
 
-func escapeMessage(message string) string ***REMOVED***
+func escapeMessage(message string) string {
 	replacer := strings.NewReplacer("&", "&amp;", "<", "&lt;", ">", "&gt;")
 	return replacer.Replace(message)
-***REMOVED***
+}
 
-func chatRequest(ctx context.Context, client HTTPRequester, path string, values url.Values, debug bool) (*chatResponseFull, error) ***REMOVED***
-	response := &chatResponseFull***REMOVED******REMOVED***
+func chatRequest(ctx context.Context, client HTTPRequester, path string, values url.Values, debug bool) (*chatResponseFull, error) {
+	response := &chatResponseFull{}
 	err := post(ctx, client, path, values, response, debug)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if !response.Ok ***REMOVED***
+	}
+	if !response.Ok {
 		return nil, errors.New(response.Error)
-	***REMOVED***
+	}
 	return response, nil
-***REMOVED***
+}
 
 type sendMode string
 
@@ -215,170 +215,170 @@ const (
 	chatPostEphemeral sendMode = "chat.postEphemeral"
 )
 
-type sendConfig struct ***REMOVED***
+type sendConfig struct {
 	mode   sendMode
 	values url.Values
-***REMOVED***
+}
 
 // MsgOption option provided when sending a message.
 type MsgOption func(*sendConfig) error
 
 // MsgOptionPost posts a messages, this is the default.
-func MsgOptionPost() MsgOption ***REMOVED***
-	return func(config *sendConfig) error ***REMOVED***
+func MsgOptionPost() MsgOption {
+	return func(config *sendConfig) error {
 		config.mode = chatPostMessage
 		config.values.Del("ts")
 		return nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // MsgOptionPostEphemeral posts an ephemeral message
-func MsgOptionPostEphemeral() MsgOption ***REMOVED***
-	return func(config *sendConfig) error ***REMOVED***
+func MsgOptionPostEphemeral() MsgOption {
+	return func(config *sendConfig) error {
 		config.mode = chatPostEphemeral
 		config.values.Del("ts")
 		return nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // MsgOptionUpdate updates a message based on the timestamp.
-func MsgOptionUpdate(timestamp string) MsgOption ***REMOVED***
-	return func(config *sendConfig) error ***REMOVED***
+func MsgOptionUpdate(timestamp string) MsgOption {
+	return func(config *sendConfig) error {
 		config.mode = chatUpdate
 		config.values.Add("ts", timestamp)
 		return nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // MsgOptionDelete deletes a message based on the timestamp.
-func MsgOptionDelete(timestamp string) MsgOption ***REMOVED***
-	return func(config *sendConfig) error ***REMOVED***
+func MsgOptionDelete(timestamp string) MsgOption {
+	return func(config *sendConfig) error {
 		config.mode = chatDelete
 		config.values.Add("ts", timestamp)
 		return nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // MsgOptionAsUser whether or not to send the message as the user.
-func MsgOptionAsUser(b bool) MsgOption ***REMOVED***
-	return func(config *sendConfig) error ***REMOVED***
-		if b != DEFAULT_MESSAGE_ASUSER ***REMOVED***
+func MsgOptionAsUser(b bool) MsgOption {
+	return func(config *sendConfig) error {
+		if b != DEFAULT_MESSAGE_ASUSER {
 			config.values.Set("as_user", "true")
-		***REMOVED***
+		}
 		return nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // MsgOptionText provide the text for the message, optionally escape the provided
 // text.
-func MsgOptionText(text string, escape bool) MsgOption ***REMOVED***
-	return func(config *sendConfig) error ***REMOVED***
-		if escape ***REMOVED***
+func MsgOptionText(text string, escape bool) MsgOption {
+	return func(config *sendConfig) error {
+		if escape {
 			text = escapeMessage(text)
-		***REMOVED***
+		}
 		config.values.Add("text", text)
 		return nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // MsgOptionAttachments provide attachments for the message.
-func MsgOptionAttachments(attachments ...Attachment) MsgOption ***REMOVED***
-	return func(config *sendConfig) error ***REMOVED***
-		if attachments == nil ***REMOVED***
+func MsgOptionAttachments(attachments ...Attachment) MsgOption {
+	return func(config *sendConfig) error {
+		if attachments == nil {
 			return nil
-		***REMOVED***
+		}
 
 		attachments, err := json.Marshal(attachments)
-		if err == nil ***REMOVED***
+		if err == nil {
 			config.values.Set("attachments", string(attachments))
-		***REMOVED***
+		}
 		return err
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // MsgOptionEnableLinkUnfurl enables link unfurling
-func MsgOptionEnableLinkUnfurl() MsgOption ***REMOVED***
-	return func(config *sendConfig) error ***REMOVED***
+func MsgOptionEnableLinkUnfurl() MsgOption {
+	return func(config *sendConfig) error {
 		config.values.Set("unfurl_links", "true")
 		return nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // MsgOptionDisableLinkUnfurl disables link unfurling
-func MsgOptionDisableLinkUnfurl() MsgOption ***REMOVED***
-	return func(config *sendConfig) error ***REMOVED***
+func MsgOptionDisableLinkUnfurl() MsgOption {
+	return func(config *sendConfig) error {
 		config.values.Set("unfurl_links", "false")
 		return nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // MsgOptionDisableMediaUnfurl disables media unfurling.
-func MsgOptionDisableMediaUnfurl() MsgOption ***REMOVED***
-	return func(config *sendConfig) error ***REMOVED***
+func MsgOptionDisableMediaUnfurl() MsgOption {
+	return func(config *sendConfig) error {
 		config.values.Set("unfurl_media", "false")
 		return nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // MsgOptionDisableMarkdown disables markdown.
-func MsgOptionDisableMarkdown() MsgOption ***REMOVED***
-	return func(config *sendConfig) error ***REMOVED***
+func MsgOptionDisableMarkdown() MsgOption {
+	return func(config *sendConfig) error {
 		config.values.Set("mrkdwn", "false")
 		return nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // MsgOptionPostMessageParameters maintain backwards compatibility.
-func MsgOptionPostMessageParameters(params PostMessageParameters) MsgOption ***REMOVED***
-	return func(config *sendConfig) error ***REMOVED***
-		if params.Username != DEFAULT_MESSAGE_USERNAME ***REMOVED***
+func MsgOptionPostMessageParameters(params PostMessageParameters) MsgOption {
+	return func(config *sendConfig) error {
+		if params.Username != DEFAULT_MESSAGE_USERNAME {
 			config.values.Set("username", string(params.Username))
-		***REMOVED***
+		}
 
 		// chat.postEphemeral support
-		if params.User != DEFAULT_MESSAGE_USERNAME ***REMOVED***
+		if params.User != DEFAULT_MESSAGE_USERNAME {
 			config.values.Set("user", params.User)
-		***REMOVED***
+		}
 
 		// never generates an error.
 		MsgOptionAsUser(params.AsUser)(config)
 
-		if params.Parse != DEFAULT_MESSAGE_PARSE ***REMOVED***
+		if params.Parse != DEFAULT_MESSAGE_PARSE {
 			config.values.Set("parse", string(params.Parse))
-		***REMOVED***
-		if params.LinkNames != DEFAULT_MESSAGE_LINK_NAMES ***REMOVED***
+		}
+		if params.LinkNames != DEFAULT_MESSAGE_LINK_NAMES {
 			config.values.Set("link_names", "1")
-		***REMOVED***
+		}
 
-		if params.UnfurlLinks != DEFAULT_MESSAGE_UNFURL_LINKS ***REMOVED***
+		if params.UnfurlLinks != DEFAULT_MESSAGE_UNFURL_LINKS {
 			config.values.Set("unfurl_links", "true")
-		***REMOVED***
+		}
 
 		// I want to send a message with explicit `as_user` `true` and `unfurl_links` `false` in request.
 		// Because setting `as_user` to `true` will change the default value for `unfurl_links` to `true` on Slack API side.
-		if params.AsUser != DEFAULT_MESSAGE_ASUSER && params.UnfurlLinks == DEFAULT_MESSAGE_UNFURL_LINKS ***REMOVED***
+		if params.AsUser != DEFAULT_MESSAGE_ASUSER && params.UnfurlLinks == DEFAULT_MESSAGE_UNFURL_LINKS {
 			config.values.Set("unfurl_links", "false")
-		***REMOVED***
-		if params.UnfurlMedia != DEFAULT_MESSAGE_UNFURL_MEDIA ***REMOVED***
+		}
+		if params.UnfurlMedia != DEFAULT_MESSAGE_UNFURL_MEDIA {
 			config.values.Set("unfurl_media", "false")
-		***REMOVED***
-		if params.IconURL != DEFAULT_MESSAGE_ICON_URL ***REMOVED***
+		}
+		if params.IconURL != DEFAULT_MESSAGE_ICON_URL {
 			config.values.Set("icon_url", params.IconURL)
-		***REMOVED***
-		if params.IconEmoji != DEFAULT_MESSAGE_ICON_EMOJI ***REMOVED***
+		}
+		if params.IconEmoji != DEFAULT_MESSAGE_ICON_EMOJI {
 			config.values.Set("icon_emoji", params.IconEmoji)
-		***REMOVED***
-		if params.Markdown != DEFAULT_MESSAGE_MARKDOWN ***REMOVED***
+		}
+		if params.Markdown != DEFAULT_MESSAGE_MARKDOWN {
 			config.values.Set("mrkdwn", "false")
-		***REMOVED***
+		}
 
-		if params.ThreadTimestamp != DEFAULT_MESSAGE_THREAD_TIMESTAMP ***REMOVED***
+		if params.ThreadTimestamp != DEFAULT_MESSAGE_THREAD_TIMESTAMP {
 			config.values.Set("thread_ts", params.ThreadTimestamp)
-		***REMOVED***
-		if params.ReplyBroadcast != DEFAULT_MESSAGE_REPLY_BROADCAST ***REMOVED***
+		}
+		if params.ReplyBroadcast != DEFAULT_MESSAGE_REPLY_BROADCAST {
 			config.values.Set("reply_broadcast", "true")
-		***REMOVED***
+		}
 
 		return nil
-	***REMOVED***
-***REMOVED***
+	}
+}

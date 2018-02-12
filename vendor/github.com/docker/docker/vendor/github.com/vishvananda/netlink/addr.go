@@ -8,7 +8,7 @@ import (
 
 // Addr represents an IP address from netlink. Netlink ip addresses
 // include a mask, so it stores the address as a net.IPNet.
-type Addr struct ***REMOVED***
+type Addr struct {
 	*net.IPNet
 	Label       string
 	Flags       int
@@ -17,40 +17,40 @@ type Addr struct ***REMOVED***
 	Broadcast   net.IP
 	PreferedLft int
 	ValidLft    int
-***REMOVED***
+}
 
 // String returns $ip/$netmask $label
-func (a Addr) String() string ***REMOVED***
+func (a Addr) String() string {
 	return strings.TrimSpace(fmt.Sprintf("%s %s", a.IPNet, a.Label))
-***REMOVED***
+}
 
 // ParseAddr parses the string representation of an address in the
 // form $ip/$netmask $label. The label portion is optional
-func ParseAddr(s string) (*Addr, error) ***REMOVED***
+func ParseAddr(s string) (*Addr, error) {
 	label := ""
 	parts := strings.Split(s, " ")
-	if len(parts) > 1 ***REMOVED***
+	if len(parts) > 1 {
 		s = parts[0]
 		label = parts[1]
-	***REMOVED***
+	}
 	m, err := ParseIPNet(s)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	return &Addr***REMOVED***IPNet: m, Label: label***REMOVED***, nil
-***REMOVED***
+	}
+	return &Addr{IPNet: m, Label: label}, nil
+}
 
 // Equal returns true if both Addrs have the same net.IPNet value.
-func (a Addr) Equal(x Addr) bool ***REMOVED***
+func (a Addr) Equal(x Addr) bool {
 	sizea, _ := a.Mask.Size()
 	sizeb, _ := x.Mask.Size()
 	// ignore label for comparison
 	return a.IP.Equal(x.IP) && sizea == sizeb
-***REMOVED***
+}
 
-func (a Addr) PeerEqual(x Addr) bool ***REMOVED***
+func (a Addr) PeerEqual(x Addr) bool {
 	sizea, _ := a.Peer.Mask.Size()
 	sizeb, _ := x.Peer.Mask.Size()
 	// ignore label for comparison
 	return a.Peer.IP.Equal(x.Peer.IP) && sizea == sizeb
-***REMOVED***
+}

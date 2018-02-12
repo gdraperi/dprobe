@@ -7,9 +7,9 @@ import (
 )
 
 // WithResources sets the provided resources for task updates
-func WithResources(resources *specs.LinuxResources) UpdateTaskOpts ***REMOVED***
-	return func(ctx context.Context, client *Client, r *UpdateTaskInfo) error ***REMOVED***
+func WithResources(resources *specs.LinuxResources) UpdateTaskOpts {
+	return func(ctx context.Context, client *Client, r *UpdateTaskInfo) error {
 		r.Resources = resources
 		return nil
-	***REMOVED***
-***REMOVED***
+	}
+}

@@ -11,11 +11,11 @@ import (
 	"golang.org/x/crypto/poly1305"
 )
 
-func roundTo16(n int) int ***REMOVED***
+func roundTo16(n int) int {
 	return 16 * ((n + 15) / 16)
-***REMOVED***
+}
 
-func (c *chacha20poly1305) sealGeneric(dst, nonce, plaintext, additionalData []byte) []byte ***REMOVED***
+func (c *chacha20poly1305) sealGeneric(dst, nonce, plaintext, additionalData []byte) []byte {
 	var counter [16]byte
 	copy(counter[4:], nonce)
 
@@ -37,9 +37,9 @@ func (c *chacha20poly1305) sealGeneric(dst, nonce, plaintext, additionalData []b
 	copy(out[len(plaintext):], tag[:])
 
 	return ret
-***REMOVED***
+}
 
-func (c *chacha20poly1305) openGeneric(dst, nonce, ciphertext, additionalData []byte) ([]byte, error) ***REMOVED***
+func (c *chacha20poly1305) openGeneric(dst, nonce, ciphertext, additionalData []byte) ([]byte, error) {
 	var tag [poly1305.TagSize]byte
 	copy(tag[:], ciphertext[len(ciphertext)-16:])
 	ciphertext = ciphertext[:len(ciphertext)-16]
@@ -57,14 +57,14 @@ func (c *chacha20poly1305) openGeneric(dst, nonce, ciphertext, additionalData []
 	binary.LittleEndian.PutUint64(polyInput[len(polyInput)-8:], uint64(len(ciphertext)))
 
 	ret, out := sliceForAppend(dst, len(ciphertext))
-	if !poly1305.Verify(&tag, polyInput, &polyKey) ***REMOVED***
-		for i := range out ***REMOVED***
+	if !poly1305.Verify(&tag, polyInput, &polyKey) {
+		for i := range out {
 			out[i] = 0
-		***REMOVED***
+		}
 		return nil, errOpen
-	***REMOVED***
+	}
 
 	counter[0] = 1
 	chacha20.XORKeyStream(out, ciphertext, &counter, &c.key)
 	return ret, nil
-***REMOVED***
+}

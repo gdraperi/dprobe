@@ -7,20 +7,20 @@ import (
 )
 
 // MoveToSubdir moves all contents of a directory to a subdirectory underneath the original path
-func MoveToSubdir(oldpath, subdir string) error ***REMOVED***
+func MoveToSubdir(oldpath, subdir string) error {
 
 	infos, err := ioutil.ReadDir(oldpath)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	for _, info := range infos ***REMOVED***
-		if info.Name() != subdir ***REMOVED***
+	}
+	for _, info := range infos {
+		if info.Name() != subdir {
 			oldName := filepath.Join(oldpath, info.Name())
 			newName := filepath.Join(oldpath, subdir, info.Name())
-			if err := os.Rename(oldName, newName); err != nil ***REMOVED***
+			if err := os.Rename(oldName, newName); err != nil {
 				return err
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return nil
-***REMOVED***
+}

@@ -13,17 +13,17 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestContainerCommitError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestContainerCommitError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
-	***REMOVED***
-	_, err := client.ContainerCommit(context.Background(), "nothing", types.ContainerCommitOptions***REMOVED******REMOVED***)
-	if err == nil || err.Error() != "Error response from daemon: Server error" ***REMOVED***
+	}
+	_, err := client.ContainerCommit(context.Background(), "nothing", types.ContainerCommitOptions{})
+	if err == nil || err.Error() != "Error response from daemon: Server error" {
 		t.Fatalf("expected a Server Error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestContainerCommit(t *testing.T) ***REMOVED***
+func TestContainerCommit(t *testing.T) {
 	expectedURL := "/commit"
 	expectedContainerID := "container_id"
 	specifiedReference := "repository_name:tag"
@@ -31,66 +31,66 @@ func TestContainerCommit(t *testing.T) ***REMOVED***
 	expectedTag := "tag"
 	expectedComment := "comment"
 	expectedAuthor := "author"
-	expectedChanges := []string***REMOVED***"change1", "change2"***REMOVED***
+	expectedChanges := []string{"change1", "change2"}
 
-	client := &Client***REMOVED***
-		client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-			if !strings.HasPrefix(req.URL.Path, expectedURL) ***REMOVED***
+	client := &Client{
+		client: newMockClient(func(req *http.Request) (*http.Response, error) {
+			if !strings.HasPrefix(req.URL.Path, expectedURL) {
 				return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, req.URL)
-			***REMOVED***
+			}
 			query := req.URL.Query()
 			containerID := query.Get("container")
-			if containerID != expectedContainerID ***REMOVED***
+			if containerID != expectedContainerID {
 				return nil, fmt.Errorf("container id not set in URL query properly. Expected '%s', got %s", expectedContainerID, containerID)
-			***REMOVED***
+			}
 			repo := query.Get("repo")
-			if repo != expectedRepositoryName ***REMOVED***
+			if repo != expectedRepositoryName {
 				return nil, fmt.Errorf("container repo not set in URL query properly. Expected '%s', got %s", expectedRepositoryName, repo)
-			***REMOVED***
+			}
 			tag := query.Get("tag")
-			if tag != expectedTag ***REMOVED***
+			if tag != expectedTag {
 				return nil, fmt.Errorf("container tag not set in URL query properly. Expected '%s', got %s'", expectedTag, tag)
-			***REMOVED***
+			}
 			comment := query.Get("comment")
-			if comment != expectedComment ***REMOVED***
+			if comment != expectedComment {
 				return nil, fmt.Errorf("container comment not set in URL query properly. Expected '%s', got %s'", expectedComment, comment)
-			***REMOVED***
+			}
 			author := query.Get("author")
-			if author != expectedAuthor ***REMOVED***
+			if author != expectedAuthor {
 				return nil, fmt.Errorf("container author not set in URL query properly. Expected '%s', got %s'", expectedAuthor, author)
-			***REMOVED***
+			}
 			pause := query.Get("pause")
-			if pause != "0" ***REMOVED***
+			if pause != "0" {
 				return nil, fmt.Errorf("container pause not set in URL query properly. Expected 'true', got %v'", pause)
-			***REMOVED***
+			}
 			changes := query["changes"]
-			if len(changes) != len(expectedChanges) ***REMOVED***
+			if len(changes) != len(expectedChanges) {
 				return nil, fmt.Errorf("expected container changes size to be '%d', got %d", len(expectedChanges), len(changes))
-			***REMOVED***
-			b, err := json.Marshal(types.IDResponse***REMOVED***
+			}
+			b, err := json.Marshal(types.IDResponse{
 				ID: "new_container_id",
-			***REMOVED***)
-			if err != nil ***REMOVED***
+			})
+			if err != nil {
 				return nil, err
-			***REMOVED***
-			return &http.Response***REMOVED***
+			}
+			return &http.Response{
 				StatusCode: http.StatusOK,
 				Body:       ioutil.NopCloser(bytes.NewReader(b)),
-			***REMOVED***, nil
-		***REMOVED***),
-	***REMOVED***
+			}, nil
+		}),
+	}
 
-	r, err := client.ContainerCommit(context.Background(), expectedContainerID, types.ContainerCommitOptions***REMOVED***
+	r, err := client.ContainerCommit(context.Background(), expectedContainerID, types.ContainerCommitOptions{
 		Reference: specifiedReference,
 		Comment:   expectedComment,
 		Author:    expectedAuthor,
 		Changes:   expectedChanges,
 		Pause:     false,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if r.ID != "new_container_id" ***REMOVED***
+	}
+	if r.ID != "new_container_id" {
 		t.Fatalf("expected `new_container_id`, got %s", r.ID)
-	***REMOVED***
-***REMOVED***
+	}
+}

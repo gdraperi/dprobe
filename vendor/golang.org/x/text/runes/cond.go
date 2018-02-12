@@ -31,157 +31,157 @@ import (
 // substitute a nil value passed to tIn or tNotIn. Invalid UTF-8 is translated
 // to RuneError to determine which transformer to apply, but is passed as is to
 // the respective transformer.
-func If(s Set, tIn, tNotIn transform.Transformer) Transformer ***REMOVED***
-	if tIn == nil && tNotIn == nil ***REMOVED***
-		return Transformer***REMOVED***transform.Nop***REMOVED***
-	***REMOVED***
-	if tIn == nil ***REMOVED***
+func If(s Set, tIn, tNotIn transform.Transformer) Transformer {
+	if tIn == nil && tNotIn == nil {
+		return Transformer{transform.Nop}
+	}
+	if tIn == nil {
 		tIn = transform.Nop
-	***REMOVED***
-	if tNotIn == nil ***REMOVED***
+	}
+	if tNotIn == nil {
 		tNotIn = transform.Nop
-	***REMOVED***
+	}
 	sIn, ok := tIn.(transform.SpanningTransformer)
-	if !ok ***REMOVED***
-		sIn = dummySpan***REMOVED***tIn***REMOVED***
-	***REMOVED***
+	if !ok {
+		sIn = dummySpan{tIn}
+	}
 	sNotIn, ok := tNotIn.(transform.SpanningTransformer)
-	if !ok ***REMOVED***
-		sNotIn = dummySpan***REMOVED***tNotIn***REMOVED***
-	***REMOVED***
+	if !ok {
+		sNotIn = dummySpan{tNotIn}
+	}
 
-	a := &cond***REMOVED***
+	a := &cond{
 		tIn:    sIn,
 		tNotIn: sNotIn,
 		f:      s.Contains,
-	***REMOVED***
+	}
 	a.Reset()
-	return Transformer***REMOVED***a***REMOVED***
-***REMOVED***
+	return Transformer{a}
+}
 
-type dummySpan struct***REMOVED*** transform.Transformer ***REMOVED***
+type dummySpan struct{ transform.Transformer }
 
-func (d dummySpan) Span(src []byte, atEOF bool) (n int, err error) ***REMOVED***
+func (d dummySpan) Span(src []byte, atEOF bool) (n int, err error) {
 	return 0, transform.ErrEndOfSpan
-***REMOVED***
+}
 
-type cond struct ***REMOVED***
+type cond struct {
 	tIn, tNotIn transform.SpanningTransformer
 	f           func(rune) bool
 	check       func(rune) bool               // current check to perform
 	t           transform.SpanningTransformer // current transformer to use
-***REMOVED***
+}
 
 // Reset implements transform.Transformer.
-func (t *cond) Reset() ***REMOVED***
+func (t *cond) Reset() {
 	t.check = t.is
 	t.t = t.tIn
 	t.t.Reset() // notIn will be reset on first usage.
-***REMOVED***
+}
 
-func (t *cond) is(r rune) bool ***REMOVED***
-	if t.f(r) ***REMOVED***
+func (t *cond) is(r rune) bool {
+	if t.f(r) {
 		return true
-	***REMOVED***
+	}
 	t.check = t.isNot
 	t.t = t.tNotIn
 	t.tNotIn.Reset()
 	return false
-***REMOVED***
+}
 
-func (t *cond) isNot(r rune) bool ***REMOVED***
-	if !t.f(r) ***REMOVED***
+func (t *cond) isNot(r rune) bool {
+	if !t.f(r) {
 		return true
-	***REMOVED***
+	}
 	t.check = t.is
 	t.t = t.tIn
 	t.tIn.Reset()
 	return false
-***REMOVED***
+}
 
 // This implementation of Span doesn't help all too much, but it needs to be
 // there to satisfy this package's Transformer interface.
 // TODO: there are certainly room for improvements, though. For example, if
 // t.t == transform.Nop (which will a common occurrence) it will save a bundle
 // to special-case that loop.
-func (t *cond) Span(src []byte, atEOF bool) (n int, err error) ***REMOVED***
+func (t *cond) Span(src []byte, atEOF bool) (n int, err error) {
 	p := 0
-	for n < len(src) && err == nil ***REMOVED***
+	for n < len(src) && err == nil {
 		// Don't process too much at a time as the Spanner that will be
 		// called on this block may terminate early.
 		const maxChunk = 4096
 		max := len(src)
-		if v := n + maxChunk; v < max ***REMOVED***
+		if v := n + maxChunk; v < max {
 			max = v
-		***REMOVED***
+		}
 		atEnd := false
 		size := 0
 		current := t.t
-		for ; p < max; p += size ***REMOVED***
+		for ; p < max; p += size {
 			r := rune(src[p])
-			if r < utf8.RuneSelf ***REMOVED***
+			if r < utf8.RuneSelf {
 				size = 1
-			***REMOVED*** else if r, size = utf8.DecodeRune(src[p:]); size == 1 ***REMOVED***
-				if !atEOF && !utf8.FullRune(src[p:]) ***REMOVED***
+			} else if r, size = utf8.DecodeRune(src[p:]); size == 1 {
+				if !atEOF && !utf8.FullRune(src[p:]) {
 					err = transform.ErrShortSrc
 					break
-				***REMOVED***
-			***REMOVED***
-			if !t.check(r) ***REMOVED***
+				}
+			}
+			if !t.check(r) {
 				// The next rune will be the start of a new run.
 				atEnd = true
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		n2, err2 := current.Span(src[n:p], atEnd || (atEOF && p == len(src)))
 		n += n2
-		if err2 != nil ***REMOVED***
+		if err2 != nil {
 			return n, err2
-		***REMOVED***
+		}
 		// At this point either err != nil or t.check will pass for the rune at p.
 		p = n + size
-	***REMOVED***
+	}
 	return n, err
-***REMOVED***
+}
 
-func (t *cond) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) ***REMOVED***
+func (t *cond) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) {
 	p := 0
-	for nSrc < len(src) && err == nil ***REMOVED***
+	for nSrc < len(src) && err == nil {
 		// Don't process too much at a time, as the work might be wasted if the
 		// destination buffer isn't large enough to hold the result or a
 		// transform returns an error early.
 		const maxChunk = 4096
 		max := len(src)
-		if n := nSrc + maxChunk; n < len(src) ***REMOVED***
+		if n := nSrc + maxChunk; n < len(src) {
 			max = n
-		***REMOVED***
+		}
 		atEnd := false
 		size := 0
 		current := t.t
-		for ; p < max; p += size ***REMOVED***
+		for ; p < max; p += size {
 			r := rune(src[p])
-			if r < utf8.RuneSelf ***REMOVED***
+			if r < utf8.RuneSelf {
 				size = 1
-			***REMOVED*** else if r, size = utf8.DecodeRune(src[p:]); size == 1 ***REMOVED***
-				if !atEOF && !utf8.FullRune(src[p:]) ***REMOVED***
+			} else if r, size = utf8.DecodeRune(src[p:]); size == 1 {
+				if !atEOF && !utf8.FullRune(src[p:]) {
 					err = transform.ErrShortSrc
 					break
-				***REMOVED***
-			***REMOVED***
-			if !t.check(r) ***REMOVED***
+				}
+			}
+			if !t.check(r) {
 				// The next rune will be the start of a new run.
 				atEnd = true
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		nDst2, nSrc2, err2 := current.Transform(dst[nDst:], src[nSrc:p], atEnd || (atEOF && p == len(src)))
 		nDst += nDst2
 		nSrc += nSrc2
-		if err2 != nil ***REMOVED***
+		if err2 != nil {
 			return nDst, nSrc, err2
-		***REMOVED***
+		}
 		// At this point either err != nil or t.check will pass for the rune at p.
 		p = nSrc + size
-	***REMOVED***
+	}
 	return nDst, nSrc, err
-***REMOVED***
+}

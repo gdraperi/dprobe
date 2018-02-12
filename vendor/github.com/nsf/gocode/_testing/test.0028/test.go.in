@@ -2,13 +2,13 @@ package main
 
 type X int
 
-func (x X) PowerOfTwo() int ***REMOVED***
+func (x X) PowerOfTwo() int {
 	return int(x * x)
-***REMOVED***
+}
 
-func main() ***REMOVED***
+func main() {
 	a := X(56)
 	i := a + 67
 	j := ^i
 	j.
-***REMOVED***
+}

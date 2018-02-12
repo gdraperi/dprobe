@@ -11,224 +11,224 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestServiceConvertFromGRPCRuntimeContainer(t *testing.T) ***REMOVED***
-	gs := swarmapi.Service***REMOVED***
-		Meta: swarmapi.Meta***REMOVED***
-			Version: swarmapi.Version***REMOVED***
+func TestServiceConvertFromGRPCRuntimeContainer(t *testing.T) {
+	gs := swarmapi.Service{
+		Meta: swarmapi.Meta{
+			Version: swarmapi.Version{
 				Index: 1,
-			***REMOVED***,
+			},
 			CreatedAt: nil,
 			UpdatedAt: nil,
-		***REMOVED***,
-		SpecVersion: &swarmapi.Version***REMOVED***
+		},
+		SpecVersion: &swarmapi.Version{
 			Index: 1,
-		***REMOVED***,
-		Spec: swarmapi.ServiceSpec***REMOVED***
-			Task: swarmapi.TaskSpec***REMOVED***
-				Runtime: &swarmapi.TaskSpec_Container***REMOVED***
-					Container: &swarmapi.ContainerSpec***REMOVED***
+		},
+		Spec: swarmapi.ServiceSpec{
+			Task: swarmapi.TaskSpec{
+				Runtime: &swarmapi.TaskSpec_Container{
+					Container: &swarmapi.ContainerSpec{
 						Image: "alpine:latest",
-					***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+					},
+				},
+			},
+		},
+	}
 
 	svc, err := ServiceFromGRPC(gs)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if svc.Spec.TaskTemplate.Runtime != swarmtypes.RuntimeContainer ***REMOVED***
+	if svc.Spec.TaskTemplate.Runtime != swarmtypes.RuntimeContainer {
 		t.Fatalf("expected type %s; received %T", swarmtypes.RuntimeContainer, svc.Spec.TaskTemplate.Runtime)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestServiceConvertFromGRPCGenericRuntimePlugin(t *testing.T) ***REMOVED***
+func TestServiceConvertFromGRPCGenericRuntimePlugin(t *testing.T) {
 	kind := string(swarmtypes.RuntimePlugin)
 	url := swarmtypes.RuntimeURLPlugin
-	gs := swarmapi.Service***REMOVED***
-		Meta: swarmapi.Meta***REMOVED***
-			Version: swarmapi.Version***REMOVED***
+	gs := swarmapi.Service{
+		Meta: swarmapi.Meta{
+			Version: swarmapi.Version{
 				Index: 1,
-			***REMOVED***,
+			},
 			CreatedAt: nil,
 			UpdatedAt: nil,
-		***REMOVED***,
-		SpecVersion: &swarmapi.Version***REMOVED***
+		},
+		SpecVersion: &swarmapi.Version{
 			Index: 1,
-		***REMOVED***,
-		Spec: swarmapi.ServiceSpec***REMOVED***
-			Task: swarmapi.TaskSpec***REMOVED***
-				Runtime: &swarmapi.TaskSpec_Generic***REMOVED***
-					Generic: &swarmapi.GenericRuntimeSpec***REMOVED***
+		},
+		Spec: swarmapi.ServiceSpec{
+			Task: swarmapi.TaskSpec{
+				Runtime: &swarmapi.TaskSpec_Generic{
+					Generic: &swarmapi.GenericRuntimeSpec{
 						Kind: kind,
-						Payload: &google_protobuf3.Any***REMOVED***
+						Payload: &google_protobuf3.Any{
 							TypeUrl: string(url),
-						***REMOVED***,
-					***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+						},
+					},
+				},
+			},
+		},
+	}
 
 	svc, err := ServiceFromGRPC(gs)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if svc.Spec.TaskTemplate.Runtime != swarmtypes.RuntimePlugin ***REMOVED***
+	if svc.Spec.TaskTemplate.Runtime != swarmtypes.RuntimePlugin {
 		t.Fatalf("expected type %s; received %T", swarmtypes.RuntimePlugin, svc.Spec.TaskTemplate.Runtime)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestServiceConvertToGRPCGenericRuntimePlugin(t *testing.T) ***REMOVED***
-	s := swarmtypes.ServiceSpec***REMOVED***
-		TaskTemplate: swarmtypes.TaskSpec***REMOVED***
+func TestServiceConvertToGRPCGenericRuntimePlugin(t *testing.T) {
+	s := swarmtypes.ServiceSpec{
+		TaskTemplate: swarmtypes.TaskSpec{
 			Runtime:    swarmtypes.RuntimePlugin,
-			PluginSpec: &runtime.PluginSpec***REMOVED******REMOVED***,
-		***REMOVED***,
-		Mode: swarmtypes.ServiceMode***REMOVED***
-			Global: &swarmtypes.GlobalService***REMOVED******REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+			PluginSpec: &runtime.PluginSpec{},
+		},
+		Mode: swarmtypes.ServiceMode{
+			Global: &swarmtypes.GlobalService{},
+		},
+	}
 
 	svc, err := ServiceSpecToGRPC(s)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	v, ok := svc.Task.Runtime.(*swarmapi.TaskSpec_Generic)
-	if !ok ***REMOVED***
+	if !ok {
 		t.Fatal("expected type swarmapi.TaskSpec_Generic")
-	***REMOVED***
+	}
 
-	if v.Generic.Payload.TypeUrl != string(swarmtypes.RuntimeURLPlugin) ***REMOVED***
+	if v.Generic.Payload.TypeUrl != string(swarmtypes.RuntimeURLPlugin) {
 		t.Fatalf("expected url %s; received %s", swarmtypes.RuntimeURLPlugin, v.Generic.Payload.TypeUrl)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestServiceConvertToGRPCContainerRuntime(t *testing.T) ***REMOVED***
+func TestServiceConvertToGRPCContainerRuntime(t *testing.T) {
 	image := "alpine:latest"
-	s := swarmtypes.ServiceSpec***REMOVED***
-		TaskTemplate: swarmtypes.TaskSpec***REMOVED***
-			ContainerSpec: &swarmtypes.ContainerSpec***REMOVED***
+	s := swarmtypes.ServiceSpec{
+		TaskTemplate: swarmtypes.TaskSpec{
+			ContainerSpec: &swarmtypes.ContainerSpec{
 				Image: image,
-			***REMOVED***,
-		***REMOVED***,
-		Mode: swarmtypes.ServiceMode***REMOVED***
-			Global: &swarmtypes.GlobalService***REMOVED******REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+			},
+		},
+		Mode: swarmtypes.ServiceMode{
+			Global: &swarmtypes.GlobalService{},
+		},
+	}
 
 	svc, err := ServiceSpecToGRPC(s)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	v, ok := svc.Task.Runtime.(*swarmapi.TaskSpec_Container)
-	if !ok ***REMOVED***
+	if !ok {
 		t.Fatal("expected type swarmapi.TaskSpec_Container")
-	***REMOVED***
+	}
 
-	if v.Container.Image != image ***REMOVED***
+	if v.Container.Image != image {
 		t.Fatalf("expected image %s; received %s", image, v.Container.Image)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestServiceConvertToGRPCGenericRuntimeCustom(t *testing.T) ***REMOVED***
-	s := swarmtypes.ServiceSpec***REMOVED***
-		TaskTemplate: swarmtypes.TaskSpec***REMOVED***
+func TestServiceConvertToGRPCGenericRuntimeCustom(t *testing.T) {
+	s := swarmtypes.ServiceSpec{
+		TaskTemplate: swarmtypes.TaskSpec{
 			Runtime: "customruntime",
-		***REMOVED***,
-		Mode: swarmtypes.ServiceMode***REMOVED***
-			Global: &swarmtypes.GlobalService***REMOVED******REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+		},
+		Mode: swarmtypes.ServiceMode{
+			Global: &swarmtypes.GlobalService{},
+		},
+	}
 
-	if _, err := ServiceSpecToGRPC(s); err != ErrUnsupportedRuntime ***REMOVED***
+	if _, err := ServiceSpecToGRPC(s); err != ErrUnsupportedRuntime {
 		t.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestServiceConvertToGRPCIsolation(t *testing.T) ***REMOVED***
-	cases := []struct ***REMOVED***
+func TestServiceConvertToGRPCIsolation(t *testing.T) {
+	cases := []struct {
 		name string
 		from containertypes.Isolation
 		to   swarmapi.ContainerSpec_Isolation
-	***REMOVED******REMOVED***
-		***REMOVED***name: "empty", from: containertypes.IsolationEmpty, to: swarmapi.ContainerIsolationDefault***REMOVED***,
-		***REMOVED***name: "default", from: containertypes.IsolationDefault, to: swarmapi.ContainerIsolationDefault***REMOVED***,
-		***REMOVED***name: "process", from: containertypes.IsolationProcess, to: swarmapi.ContainerIsolationProcess***REMOVED***,
-		***REMOVED***name: "hyperv", from: containertypes.IsolationHyperV, to: swarmapi.ContainerIsolationHyperV***REMOVED***,
-		***REMOVED***name: "proCess", from: containertypes.Isolation("proCess"), to: swarmapi.ContainerIsolationProcess***REMOVED***,
-		***REMOVED***name: "hypErv", from: containertypes.Isolation("hypErv"), to: swarmapi.ContainerIsolationHyperV***REMOVED***,
-	***REMOVED***
-	for _, c := range cases ***REMOVED***
-		t.Run(c.name, func(t *testing.T) ***REMOVED***
-			s := swarmtypes.ServiceSpec***REMOVED***
-				TaskTemplate: swarmtypes.TaskSpec***REMOVED***
-					ContainerSpec: &swarmtypes.ContainerSpec***REMOVED***
+	}{
+		{name: "empty", from: containertypes.IsolationEmpty, to: swarmapi.ContainerIsolationDefault},
+		{name: "default", from: containertypes.IsolationDefault, to: swarmapi.ContainerIsolationDefault},
+		{name: "process", from: containertypes.IsolationProcess, to: swarmapi.ContainerIsolationProcess},
+		{name: "hyperv", from: containertypes.IsolationHyperV, to: swarmapi.ContainerIsolationHyperV},
+		{name: "proCess", from: containertypes.Isolation("proCess"), to: swarmapi.ContainerIsolationProcess},
+		{name: "hypErv", from: containertypes.Isolation("hypErv"), to: swarmapi.ContainerIsolationHyperV},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			s := swarmtypes.ServiceSpec{
+				TaskTemplate: swarmtypes.TaskSpec{
+					ContainerSpec: &swarmtypes.ContainerSpec{
 						Image:     "alpine:latest",
 						Isolation: c.from,
-					***REMOVED***,
-				***REMOVED***,
-				Mode: swarmtypes.ServiceMode***REMOVED***
-					Global: &swarmtypes.GlobalService***REMOVED******REMOVED***,
-				***REMOVED***,
-			***REMOVED***
+					},
+				},
+				Mode: swarmtypes.ServiceMode{
+					Global: &swarmtypes.GlobalService{},
+				},
+			}
 			res, err := ServiceSpecToGRPC(s)
 			require.NoError(t, err)
 			v, ok := res.Task.Runtime.(*swarmapi.TaskSpec_Container)
-			if !ok ***REMOVED***
+			if !ok {
 				t.Fatal("expected type swarmapi.TaskSpec_Container")
-			***REMOVED***
+			}
 			require.Equal(t, c.to, v.Container.Isolation)
-		***REMOVED***)
-	***REMOVED***
-***REMOVED***
+		})
+	}
+}
 
-func TestServiceConvertFromGRPCIsolation(t *testing.T) ***REMOVED***
-	cases := []struct ***REMOVED***
+func TestServiceConvertFromGRPCIsolation(t *testing.T) {
+	cases := []struct {
 		name string
 		from swarmapi.ContainerSpec_Isolation
 		to   containertypes.Isolation
-	***REMOVED******REMOVED***
-		***REMOVED***name: "default", to: containertypes.IsolationDefault, from: swarmapi.ContainerIsolationDefault***REMOVED***,
-		***REMOVED***name: "process", to: containertypes.IsolationProcess, from: swarmapi.ContainerIsolationProcess***REMOVED***,
-		***REMOVED***name: "hyperv", to: containertypes.IsolationHyperV, from: swarmapi.ContainerIsolationHyperV***REMOVED***,
-	***REMOVED***
-	for _, c := range cases ***REMOVED***
-		t.Run(c.name, func(t *testing.T) ***REMOVED***
-			gs := swarmapi.Service***REMOVED***
-				Meta: swarmapi.Meta***REMOVED***
-					Version: swarmapi.Version***REMOVED***
+	}{
+		{name: "default", to: containertypes.IsolationDefault, from: swarmapi.ContainerIsolationDefault},
+		{name: "process", to: containertypes.IsolationProcess, from: swarmapi.ContainerIsolationProcess},
+		{name: "hyperv", to: containertypes.IsolationHyperV, from: swarmapi.ContainerIsolationHyperV},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			gs := swarmapi.Service{
+				Meta: swarmapi.Meta{
+					Version: swarmapi.Version{
 						Index: 1,
-					***REMOVED***,
+					},
 					CreatedAt: nil,
 					UpdatedAt: nil,
-				***REMOVED***,
-				SpecVersion: &swarmapi.Version***REMOVED***
+				},
+				SpecVersion: &swarmapi.Version{
 					Index: 1,
-				***REMOVED***,
-				Spec: swarmapi.ServiceSpec***REMOVED***
-					Task: swarmapi.TaskSpec***REMOVED***
-						Runtime: &swarmapi.TaskSpec_Container***REMOVED***
-							Container: &swarmapi.ContainerSpec***REMOVED***
+				},
+				Spec: swarmapi.ServiceSpec{
+					Task: swarmapi.TaskSpec{
+						Runtime: &swarmapi.TaskSpec_Container{
+							Container: &swarmapi.ContainerSpec{
 								Image:     "alpine:latest",
 								Isolation: c.from,
-							***REMOVED***,
-						***REMOVED***,
-					***REMOVED***,
-				***REMOVED***,
-			***REMOVED***
+							},
+						},
+					},
+				},
+			}
 
 			svc, err := ServiceFromGRPC(gs)
-			if err != nil ***REMOVED***
+			if err != nil {
 				t.Fatal(err)
-			***REMOVED***
+			}
 
 			require.Equal(t, c.to, svc.Spec.TaskTemplate.ContainerSpec.Isolation)
-		***REMOVED***)
-	***REMOVED***
-***REMOVED***
+		})
+	}
+}

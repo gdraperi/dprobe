@@ -11,78 +11,78 @@ import (
 	"github.com/pkg/errors"
 )
 
-func parseChownFlag(chown, ctrRootPath string, idMappings *idtools.IDMappings) (idtools.IDPair, error) ***REMOVED***
+func parseChownFlag(chown, ctrRootPath string, idMappings *idtools.IDMappings) (idtools.IDPair, error) {
 	var userStr, grpStr string
 	parts := strings.Split(chown, ":")
-	if len(parts) > 2 ***REMOVED***
-		return idtools.IDPair***REMOVED******REMOVED***, errors.New("invalid chown string format: " + chown)
-	***REMOVED***
-	if len(parts) == 1 ***REMOVED***
+	if len(parts) > 2 {
+		return idtools.IDPair{}, errors.New("invalid chown string format: " + chown)
+	}
+	if len(parts) == 1 {
 		// if no group specified, use the user spec as group as well
 		userStr, grpStr = parts[0], parts[0]
-	***REMOVED*** else ***REMOVED***
+	} else {
 		userStr, grpStr = parts[0], parts[1]
-	***REMOVED***
+	}
 
 	passwdPath, err := symlink.FollowSymlinkInScope(filepath.Join(ctrRootPath, "etc", "passwd"), ctrRootPath)
-	if err != nil ***REMOVED***
-		return idtools.IDPair***REMOVED******REMOVED***, errors.Wrapf(err, "can't resolve /etc/passwd path in container rootfs")
-	***REMOVED***
+	if err != nil {
+		return idtools.IDPair{}, errors.Wrapf(err, "can't resolve /etc/passwd path in container rootfs")
+	}
 	groupPath, err := symlink.FollowSymlinkInScope(filepath.Join(ctrRootPath, "etc", "group"), ctrRootPath)
-	if err != nil ***REMOVED***
-		return idtools.IDPair***REMOVED******REMOVED***, errors.Wrapf(err, "can't resolve /etc/group path in container rootfs")
-	***REMOVED***
+	if err != nil {
+		return idtools.IDPair{}, errors.Wrapf(err, "can't resolve /etc/group path in container rootfs")
+	}
 	uid, err := lookupUser(userStr, passwdPath)
-	if err != nil ***REMOVED***
-		return idtools.IDPair***REMOVED******REMOVED***, errors.Wrapf(err, "can't find uid for user "+userStr)
-	***REMOVED***
+	if err != nil {
+		return idtools.IDPair{}, errors.Wrapf(err, "can't find uid for user "+userStr)
+	}
 	gid, err := lookupGroup(grpStr, groupPath)
-	if err != nil ***REMOVED***
-		return idtools.IDPair***REMOVED******REMOVED***, errors.Wrapf(err, "can't find gid for group "+grpStr)
-	***REMOVED***
+	if err != nil {
+		return idtools.IDPair{}, errors.Wrapf(err, "can't find gid for group "+grpStr)
+	}
 
 	// convert as necessary because of user namespaces
-	chownPair, err := idMappings.ToHost(idtools.IDPair***REMOVED***UID: uid, GID: gid***REMOVED***)
-	if err != nil ***REMOVED***
-		return idtools.IDPair***REMOVED******REMOVED***, errors.Wrapf(err, "unable to convert uid/gid to host mapping")
-	***REMOVED***
+	chownPair, err := idMappings.ToHost(idtools.IDPair{UID: uid, GID: gid})
+	if err != nil {
+		return idtools.IDPair{}, errors.Wrapf(err, "unable to convert uid/gid to host mapping")
+	}
 	return chownPair, nil
-***REMOVED***
+}
 
-func lookupUser(userStr, filepath string) (int, error) ***REMOVED***
+func lookupUser(userStr, filepath string) (int, error) {
 	// if the string is actually a uid integer, parse to int and return
 	// as we don't need to translate with the help of files
 	uid, err := strconv.Atoi(userStr)
-	if err == nil ***REMOVED***
+	if err == nil {
 		return uid, nil
-	***REMOVED***
-	users, err := lcUser.ParsePasswdFileFilter(filepath, func(u lcUser.User) bool ***REMOVED***
+	}
+	users, err := lcUser.ParsePasswdFileFilter(filepath, func(u lcUser.User) bool {
 		return u.Name == userStr
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		return 0, err
-	***REMOVED***
-	if len(users) == 0 ***REMOVED***
+	}
+	if len(users) == 0 {
 		return 0, errors.New("no such user: " + userStr)
-	***REMOVED***
+	}
 	return users[0].Uid, nil
-***REMOVED***
+}
 
-func lookupGroup(groupStr, filepath string) (int, error) ***REMOVED***
+func lookupGroup(groupStr, filepath string) (int, error) {
 	// if the string is actually a gid integer, parse to int and return
 	// as we don't need to translate with the help of files
 	gid, err := strconv.Atoi(groupStr)
-	if err == nil ***REMOVED***
+	if err == nil {
 		return gid, nil
-	***REMOVED***
-	groups, err := lcUser.ParseGroupFileFilter(filepath, func(g lcUser.Group) bool ***REMOVED***
+	}
+	groups, err := lcUser.ParseGroupFileFilter(filepath, func(g lcUser.Group) bool {
 		return g.Name == groupStr
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		return 0, err
-	***REMOVED***
-	if len(groups) == 0 ***REMOVED***
+	}
+	if len(groups) == 0 {
 		return 0, errors.New("no such group: " + groupStr)
-	***REMOVED***
+	}
 	return groups[0].Gid, nil
-***REMOVED***
+}

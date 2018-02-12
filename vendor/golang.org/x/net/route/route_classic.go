@@ -11,48 +11,48 @@ import (
 	"syscall"
 )
 
-func (m *RouteMessage) marshal() ([]byte, error) ***REMOVED***
+func (m *RouteMessage) marshal() ([]byte, error) {
 	w, ok := wireFormats[m.Type]
-	if !ok ***REMOVED***
+	if !ok {
 		return nil, errUnsupportedMessage
-	***REMOVED***
+	}
 	l := w.bodyOff + addrsSpace(m.Addrs)
-	if runtime.GOOS == "darwin" ***REMOVED***
+	if runtime.GOOS == "darwin" {
 		// Fix stray pointer writes on macOS.
 		// See golang.org/issue/22456.
 		l += 1024
-	***REMOVED***
+	}
 	b := make([]byte, l)
 	nativeEndian.PutUint16(b[:2], uint16(l))
-	if m.Version == 0 ***REMOVED***
+	if m.Version == 0 {
 		b[2] = sysRTM_VERSION
-	***REMOVED*** else ***REMOVED***
+	} else {
 		b[2] = byte(m.Version)
-	***REMOVED***
+	}
 	b[3] = byte(m.Type)
 	nativeEndian.PutUint32(b[8:12], uint32(m.Flags))
 	nativeEndian.PutUint16(b[4:6], uint16(m.Index))
 	nativeEndian.PutUint32(b[16:20], uint32(m.ID))
 	nativeEndian.PutUint32(b[20:24], uint32(m.Seq))
 	attrs, err := marshalAddrs(b[w.bodyOff:], m.Addrs)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if attrs > 0 ***REMOVED***
+	}
+	if attrs > 0 {
 		nativeEndian.PutUint32(b[12:16], uint32(attrs))
-	***REMOVED***
+	}
 	return b, nil
-***REMOVED***
+}
 
-func (w *wireFormat) parseRouteMessage(typ RIBType, b []byte) (Message, error) ***REMOVED***
-	if len(b) < w.bodyOff ***REMOVED***
+func (w *wireFormat) parseRouteMessage(typ RIBType, b []byte) (Message, error) {
+	if len(b) < w.bodyOff {
 		return nil, errMessageTooShort
-	***REMOVED***
+	}
 	l := int(nativeEndian.Uint16(b[:2]))
-	if len(b) < l ***REMOVED***
+	if len(b) < l {
 		return nil, errInvalidMessage
-	***REMOVED***
-	m := &RouteMessage***REMOVED***
+	}
+	m := &RouteMessage{
 		Version: int(b[2]),
 		Type:    int(b[3]),
 		Flags:   int(nativeEndian.Uint32(b[8:12])),
@@ -61,15 +61,15 @@ func (w *wireFormat) parseRouteMessage(typ RIBType, b []byte) (Message, error) *
 		Seq:     int(nativeEndian.Uint32(b[20:24])),
 		extOff:  w.extOff,
 		raw:     b[:l],
-	***REMOVED***
+	}
 	errno := syscall.Errno(nativeEndian.Uint32(b[28:32]))
-	if errno != 0 ***REMOVED***
+	if errno != 0 {
 		m.Err = errno
-	***REMOVED***
+	}
 	var err error
 	m.Addrs, err = parseAddrs(uint(nativeEndian.Uint32(b[12:16])), parseKernelInetAddr, b[w.bodyOff:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return m, nil
-***REMOVED***
+}

@@ -59,10 +59,10 @@ import (
 )
 
 
-func main() ***REMOVED***
+func main() {
 	client, err := containerd.New("/run/containerd/containerd.sock")
 	defer client.Close()
-***REMOVED***
+}
 
 ```
 
@@ -130,13 +130,13 @@ redis, err := client.NewContainer(context, "redis-master",
 )
 
 // use a readonly filesystem with multiple containers
-for i := 0; i < 10; i++ ***REMOVED***
+for i := 0; i < 10; i++ {
 	id := fmt.Sprintf("id-%s", i)
 	container, err := client.NewContainer(ctx, id,
 		containerd.WithNewSnapshotView(id, image),
 		containerd.WithNewSpec(oci.WithImageConfig(image)),
 	)
-***REMOVED***
+}
 ```
 
 ### Tasks

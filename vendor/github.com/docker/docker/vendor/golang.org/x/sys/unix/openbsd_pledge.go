@@ -17,22 +17,22 @@ const (
 )
 
 // Pledge implements the pledge syscall. For more information see pledge(2).
-func Pledge(promises string, paths []string) error ***REMOVED***
+func Pledge(promises string, paths []string) error {
 	promisesPtr, err := syscall.BytePtrFromString(promises)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	promisesUnsafe, pathsUnsafe := unsafe.Pointer(promisesPtr), unsafe.Pointer(nil)
-	if paths != nil ***REMOVED***
+	if paths != nil {
 		var pathsPtr []*byte
-		if pathsPtr, err = syscall.SlicePtrFromStrings(paths); err != nil ***REMOVED***
+		if pathsPtr, err = syscall.SlicePtrFromStrings(paths); err != nil {
 			return err
-		***REMOVED***
+		}
 		pathsUnsafe = unsafe.Pointer(&pathsPtr[0])
-	***REMOVED***
+	}
 	_, _, e := syscall.Syscall(SYS_PLEDGE, uintptr(promisesUnsafe), uintptr(pathsUnsafe), 0)
-	if e != 0 ***REMOVED***
+	if e != 0 {
 		return e
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

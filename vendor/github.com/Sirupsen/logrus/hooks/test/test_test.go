@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestAllHooks(t *testing.T) ***REMOVED***
+func TestAllHooks(t *testing.T) {
 
 	assert := assert.New(t)
 
@@ -36,4 +36,4 @@ func TestAllHooks(t *testing.T) ***REMOVED***
 	assert.Equal("Hello error", hook.LastEntry().Message)
 	assert.Equal(1, len(hook.Entries))
 
-***REMOVED***
+}

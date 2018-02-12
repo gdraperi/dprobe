@@ -8,16 +8,16 @@ import weak "github.com/containerd/containerd/protobuf/plugin/fieldpath.proto";
 option go_package = "github.com/containerd/containerd/api/events;events";
 option (containerd.plugin.fieldpath_all) = true;
 
-message NamespaceCreate ***REMOVED***
+message NamespaceCreate {
 	string name = 1;
 	map<string, string> labels  = 2;
-***REMOVED***
+}
 
-message NamespaceUpdate ***REMOVED***
+message NamespaceUpdate {
 	string name = 1;
 	map<string, string> labels  = 2;
-***REMOVED***
+}
 
-message NamespaceDelete ***REMOVED***
+message NamespaceDelete {
 	string name = 1;
-***REMOVED***
+}

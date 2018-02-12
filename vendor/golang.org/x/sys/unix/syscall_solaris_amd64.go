@@ -6,23 +6,23 @@
 
 package unix
 
-func setTimespec(sec, nsec int64) Timespec ***REMOVED***
-	return Timespec***REMOVED***Sec: sec, Nsec: nsec***REMOVED***
-***REMOVED***
+func setTimespec(sec, nsec int64) Timespec {
+	return Timespec{Sec: sec, Nsec: nsec}
+}
 
-func setTimeval(sec, usec int64) Timeval ***REMOVED***
-	return Timeval***REMOVED***Sec: sec, Usec: usec***REMOVED***
-***REMOVED***
+func setTimeval(sec, usec int64) Timeval {
+	return Timeval{Sec: sec, Usec: usec}
+}
 
-func (iov *Iovec) SetLen(length int) ***REMOVED***
+func (iov *Iovec) SetLen(length int) {
 	iov.Len = uint64(length)
-***REMOVED***
+}
 
-func (cmsg *Cmsghdr) SetLen(length int) ***REMOVED***
+func (cmsg *Cmsghdr) SetLen(length int) {
 	cmsg.Len = uint32(length)
-***REMOVED***
+}
 
-func sendfile(outfd int, infd int, offset *int64, count int) (written int, err error) ***REMOVED***
+func sendfile(outfd int, infd int, offset *int64, count int) (written int, err error) {
 	// TODO(aram): implement this, see issue 5847.
 	panic("unimplemented")
-***REMOVED***
+}

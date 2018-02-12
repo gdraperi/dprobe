@@ -7,44 +7,44 @@ import (
 // FilterByHosts filters the list of PublicKeys to only those which contain a
 // 'hosts' pattern which matches the given host. If *includeEmpty* is true,
 // then keys which do not specify any hosts are also returned.
-func FilterByHosts(keys []PublicKey, host string, includeEmpty bool) ([]PublicKey, error) ***REMOVED***
+func FilterByHosts(keys []PublicKey, host string, includeEmpty bool) ([]PublicKey, error) {
 	filtered := make([]PublicKey, 0, len(keys))
 
-	for _, pubKey := range keys ***REMOVED***
+	for _, pubKey := range keys {
 		var hosts []string
-		switch v := pubKey.GetExtendedField("hosts").(type) ***REMOVED***
+		switch v := pubKey.GetExtendedField("hosts").(type) {
 		case []string:
 			hosts = v
-		case []interface***REMOVED******REMOVED***:
-			for _, value := range v ***REMOVED***
+		case []interface{}:
+			for _, value := range v {
 				h, ok := value.(string)
-				if !ok ***REMOVED***
+				if !ok {
 					continue
-				***REMOVED***
+				}
 				hosts = append(hosts, h)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
-		if len(hosts) == 0 ***REMOVED***
-			if includeEmpty ***REMOVED***
+		if len(hosts) == 0 {
+			if includeEmpty {
 				filtered = append(filtered, pubKey)
-			***REMOVED***
+			}
 			continue
-		***REMOVED***
+		}
 
 		// Check if any hosts match pattern
-		for _, hostPattern := range hosts ***REMOVED***
+		for _, hostPattern := range hosts {
 			match, err := filepath.Match(hostPattern, host)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 
-			if match ***REMOVED***
+			if match {
 				filtered = append(filtered, pubKey)
 				continue
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	return filtered, nil
-***REMOVED***
+}

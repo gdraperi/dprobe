@@ -34,14 +34,14 @@ var (
 		optional(literal(`:`), match(`[0-9]+`)))
 
 	// TagRegexp matches valid tag names. From docker/docker:graph/tags.go.
-	TagRegexp = match(`[\w][\w.-]***REMOVED***0,127***REMOVED***`)
+	TagRegexp = match(`[\w][\w.-]{0,127}`)
 
 	// anchoredTagRegexp matches valid tag names, anchored at the start and
 	// end of the matched string.
 	anchoredTagRegexp = anchored(TagRegexp)
 
 	// DigestRegexp matches valid digests.
-	DigestRegexp = match(`[A-Za-z][A-Za-z0-9]*(?:[-_+.][A-Za-z][A-Za-z0-9]*)*[:][[:xdigit:]]***REMOVED***32,***REMOVED***`)
+	DigestRegexp = match(`[A-Za-z][A-Za-z0-9]*(?:[-_+.][A-Za-z][A-Za-z0-9]*)*[:][[:xdigit:]]{32,}`)
 
 	// anchoredDigestRegexp matches valid digests, anchored at the start and
 	// end of the matched string.
@@ -72,12 +72,12 @@ var (
 	// IdentifierRegexp is the format for string identifier used as a
 	// content addressable identifier using sha256. These identifiers
 	// are like digests without the algorithm, since sha256 is used.
-	IdentifierRegexp = match(`([a-f0-9]***REMOVED***64***REMOVED***)`)
+	IdentifierRegexp = match(`([a-f0-9]{64})`)
 
 	// ShortIdentifierRegexp is the format used to represent a prefix
 	// of an identifier. A prefix may be used to match a sha256 identifier
 	// within a list of trusted identifiers.
-	ShortIdentifierRegexp = match(`([a-f0-9]***REMOVED***6,64***REMOVED***)`)
+	ShortIdentifierRegexp = match(`([a-f0-9]{6,64})`)
 
 	// anchoredIdentifierRegexp is used to check or match an
 	// identifier value, anchored at start and end of string.
@@ -94,50 +94,50 @@ var match = regexp.MustCompile
 
 // literal compiles s into a literal regular expression, escaping any regexp
 // reserved characters.
-func literal(s string) *regexp.Regexp ***REMOVED***
+func literal(s string) *regexp.Regexp {
 	re := match(regexp.QuoteMeta(s))
 
-	if _, complete := re.LiteralPrefix(); !complete ***REMOVED***
+	if _, complete := re.LiteralPrefix(); !complete {
 		panic("must be a literal")
-	***REMOVED***
+	}
 
 	return re
-***REMOVED***
+}
 
 // expression defines a full expression, where each regular expression must
 // follow the previous.
-func expression(res ...*regexp.Regexp) *regexp.Regexp ***REMOVED***
+func expression(res ...*regexp.Regexp) *regexp.Regexp {
 	var s string
-	for _, re := range res ***REMOVED***
+	for _, re := range res {
 		s += re.String()
-	***REMOVED***
+	}
 
 	return match(s)
-***REMOVED***
+}
 
 // optional wraps the expression in a non-capturing group and makes the
 // production optional.
-func optional(res ...*regexp.Regexp) *regexp.Regexp ***REMOVED***
+func optional(res ...*regexp.Regexp) *regexp.Regexp {
 	return match(group(expression(res...)).String() + `?`)
-***REMOVED***
+}
 
 // repeated wraps the regexp in a non-capturing group to get one or more
 // matches.
-func repeated(res ...*regexp.Regexp) *regexp.Regexp ***REMOVED***
+func repeated(res ...*regexp.Regexp) *regexp.Regexp {
 	return match(group(expression(res...)).String() + `+`)
-***REMOVED***
+}
 
 // group wraps the regexp in a non-capturing group.
-func group(res ...*regexp.Regexp) *regexp.Regexp ***REMOVED***
+func group(res ...*regexp.Regexp) *regexp.Regexp {
 	return match(`(?:` + expression(res...).String() + `)`)
-***REMOVED***
+}
 
 // capture wraps the expression in a capturing group.
-func capture(res ...*regexp.Regexp) *regexp.Regexp ***REMOVED***
+func capture(res ...*regexp.Regexp) *regexp.Regexp {
 	return match(`(` + expression(res...).String() + `)`)
-***REMOVED***
+}
 
 // anchored anchors the regular expression by adding start and end delimiters.
-func anchored(res ...*regexp.Regexp) *regexp.Regexp ***REMOVED***
+func anchored(res ...*regexp.Regexp) *regexp.Regexp {
 	return match(`^` + expression(res...).String() + `$`)
-***REMOVED***
+}

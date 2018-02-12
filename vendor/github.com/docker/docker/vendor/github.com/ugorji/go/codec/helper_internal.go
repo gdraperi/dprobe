@@ -13,24 +13,24 @@ import (
 	"reflect"
 )
 
-func panicValToErr(panicVal interface***REMOVED******REMOVED***, err *error) ***REMOVED***
-	if panicVal == nil ***REMOVED***
+func panicValToErr(panicVal interface{}, err *error) {
+	if panicVal == nil {
 		return
-	***REMOVED***
+	}
 	// case nil
-	switch xerr := panicVal.(type) ***REMOVED***
+	switch xerr := panicVal.(type) {
 	case error:
 		*err = xerr
 	case string:
 		*err = errors.New(xerr)
 	default:
 		*err = fmt.Errorf("%v", panicVal)
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func hIsEmptyValue(v reflect.Value, deref, checkStruct bool) bool ***REMOVED***
-	switch v.Kind() ***REMOVED***
+func hIsEmptyValue(v reflect.Value, deref, checkStruct bool) bool {
+	switch v.Kind() {
 	case reflect.Invalid:
 		return true
 	case reflect.Array, reflect.Map, reflect.Slice, reflect.String:
@@ -44,117 +44,117 @@ func hIsEmptyValue(v reflect.Value, deref, checkStruct bool) bool ***REMOVED***
 	case reflect.Float32, reflect.Float64:
 		return v.Float() == 0
 	case reflect.Interface, reflect.Ptr:
-		if deref ***REMOVED***
-			if v.IsNil() ***REMOVED***
+		if deref {
+			if v.IsNil() {
 				return true
-			***REMOVED***
+			}
 			return hIsEmptyValue(v.Elem(), deref, checkStruct)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			return v.IsNil()
-		***REMOVED***
+		}
 	case reflect.Struct:
-		if !checkStruct ***REMOVED***
+		if !checkStruct {
 			return false
-		***REMOVED***
+		}
 		// return true if all fields are empty. else return false.
 		// we cannot use equality check, because some fields may be maps/slices/etc
 		// and consequently the structs are not comparable.
 		// return v.Interface() == reflect.Zero(v.Type()).Interface()
-		for i, n := 0, v.NumField(); i < n; i++ ***REMOVED***
-			if !hIsEmptyValue(v.Field(i), deref, checkStruct) ***REMOVED***
+		for i, n := 0, v.NumField(); i < n; i++ {
+			if !hIsEmptyValue(v.Field(i), deref, checkStruct) {
 				return false
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		return true
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
-func isEmptyValue(v reflect.Value) bool ***REMOVED***
+func isEmptyValue(v reflect.Value) bool {
 	return hIsEmptyValue(v, derefForIsEmptyValue, checkStructForEmptyValue)
-***REMOVED***
+}
 
-func pruneSignExt(v []byte, pos bool) (n int) ***REMOVED***
-	if len(v) < 2 ***REMOVED***
-	***REMOVED*** else if pos && v[0] == 0 ***REMOVED***
-		for ; v[n] == 0 && n+1 < len(v) && (v[n+1]&(1<<7) == 0); n++ ***REMOVED***
-		***REMOVED***
-	***REMOVED*** else if !pos && v[0] == 0xff ***REMOVED***
-		for ; v[n] == 0xff && n+1 < len(v) && (v[n+1]&(1<<7) != 0); n++ ***REMOVED***
-		***REMOVED***
-	***REMOVED***
+func pruneSignExt(v []byte, pos bool) (n int) {
+	if len(v) < 2 {
+	} else if pos && v[0] == 0 {
+		for ; v[n] == 0 && n+1 < len(v) && (v[n+1]&(1<<7) == 0); n++ {
+		}
+	} else if !pos && v[0] == 0xff {
+		for ; v[n] == 0xff && n+1 < len(v) && (v[n+1]&(1<<7) != 0); n++ {
+		}
+	}
 	return
-***REMOVED***
+}
 
-func implementsIntf(typ, iTyp reflect.Type) (success bool, indir int8) ***REMOVED***
-	if typ == nil ***REMOVED***
+func implementsIntf(typ, iTyp reflect.Type) (success bool, indir int8) {
+	if typ == nil {
 		return
-	***REMOVED***
+	}
 	rt := typ
 	// The type might be a pointer and we need to keep
 	// dereferencing to the base type until we find an implementation.
-	for ***REMOVED***
-		if rt.Implements(iTyp) ***REMOVED***
+	for {
+		if rt.Implements(iTyp) {
 			return true, indir
-		***REMOVED***
-		if p := rt; p.Kind() == reflect.Ptr ***REMOVED***
+		}
+		if p := rt; p.Kind() == reflect.Ptr {
 			indir++
-			if indir >= math.MaxInt8 ***REMOVED*** // insane number of indirections
+			if indir >= math.MaxInt8 { // insane number of indirections
 				return false, 0
-			***REMOVED***
+			}
 			rt = p.Elem()
 			continue
-		***REMOVED***
+		}
 		break
-	***REMOVED***
+	}
 	// No luck yet, but if this is a base type (non-pointer), the pointer might satisfy.
-	if typ.Kind() != reflect.Ptr ***REMOVED***
+	if typ.Kind() != reflect.Ptr {
 		// Not a pointer, but does the pointer work?
-		if reflect.PtrTo(typ).Implements(iTyp) ***REMOVED***
+		if reflect.PtrTo(typ).Implements(iTyp) {
 			return true, -1
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false, 0
-***REMOVED***
+}
 
 // validate that this function is correct ...
 // culled from OGRE (Object-Oriented Graphics Rendering Engine)
 // function: halfToFloatI (http://stderr.org/doc/ogre-doc/api/OgreBitwise_8h-source.html)
-func halfFloatToFloatBits(yy uint16) (d uint32) ***REMOVED***
+func halfFloatToFloatBits(yy uint16) (d uint32) {
 	y := uint32(yy)
 	s := (y >> 15) & 0x01
 	e := (y >> 10) & 0x1f
 	m := y & 0x03ff
 
-	if e == 0 ***REMOVED***
-		if m == 0 ***REMOVED*** // plu or minus 0
+	if e == 0 {
+		if m == 0 { // plu or minus 0
 			return s << 31
-		***REMOVED*** else ***REMOVED*** // Denormalized number -- renormalize it
-			for (m & 0x00000400) == 0 ***REMOVED***
+		} else { // Denormalized number -- renormalize it
+			for (m & 0x00000400) == 0 {
 				m <<= 1
 				e -= 1
-			***REMOVED***
+			}
 			e += 1
 			const zz uint32 = 0x0400
 			m &= ^zz
-		***REMOVED***
-	***REMOVED*** else if e == 31 ***REMOVED***
-		if m == 0 ***REMOVED*** // Inf
+		}
+	} else if e == 31 {
+		if m == 0 { // Inf
 			return (s << 31) | 0x7f800000
-		***REMOVED*** else ***REMOVED*** // NaN
+		} else { // NaN
 			return (s << 31) | 0x7f800000 | (m << 13)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	e = e + (127 - 15)
 	m = m << 13
 	return (s << 31) | (e << 23) | m
-***REMOVED***
+}
 
 // GrowCap will return a new capacity for a slice, given the following:
 //   - oldCap: current capacity
 //   - unit: in-memory size of an element
 //   - num: number of elements to add
-func growCap(oldCap, unit, num int) (newCap int) ***REMOVED***
+func growCap(oldCap, unit, num int) (newCap int) {
 	// appendslice logic (if cap < 1024, *2, else *1.25):
 	//   leads to many copy calls, especially when copying bytes.
 	//   bytes.Buffer model (2*cap + n): much better for bytes.
@@ -175,68 +175,68 @@ func growCap(oldCap, unit, num int) (newCap int) ***REMOVED***
 	//     50% up to 16K
 	//     25% beyond that
 
-	// unit can be 0 e.g. for struct***REMOVED******REMOVED******REMOVED******REMOVED***; handle that appropriately
+	// unit can be 0 e.g. for struct{}{}; handle that appropriately
 	var t1, t2, t3 int // thresholds
-	if unit <= 1 ***REMOVED***
+	if unit <= 1 {
 		t1, t2, t3 = 4*1024, 8*1024, 16*1024
-	***REMOVED*** else if unit < 16 ***REMOVED***
+	} else if unit < 16 {
 		t3 = 16 / unit * 1024
 		t1 = t3 * 1 / 4
 		t2 = t3 * 2 / 4
-	***REMOVED*** else ***REMOVED***
+	} else {
 		t1, t2, t3 = 1024, 1024, 1024
-	***REMOVED***
+	}
 
 	var x int // temporary variable
 
 	// x is multiplier here: one of 5, 6, 7 or 8; incr of 25%, 50%, 75% or 100% respectively
-	if oldCap <= t1 ***REMOVED*** // [0,t1]
+	if oldCap <= t1 { // [0,t1]
 		x = 8
-	***REMOVED*** else if oldCap > t3 ***REMOVED*** // (t3,infinity]
+	} else if oldCap > t3 { // (t3,infinity]
 		x = 5
-	***REMOVED*** else if oldCap <= t2 ***REMOVED*** // (t1,t2]
+	} else if oldCap <= t2 { // (t1,t2]
 		x = 7
-	***REMOVED*** else ***REMOVED*** // (t2,t3]
+	} else { // (t2,t3]
 		x = 6
-	***REMOVED***
+	}
 	newCap = x * oldCap / 4
 
-	if num > 0 ***REMOVED***
+	if num > 0 {
 		newCap += num
-	***REMOVED***
+	}
 
 	// ensure newCap is a multiple of 64 (if it is > 64) or 16.
-	if newCap > 64 ***REMOVED***
-		if x = newCap % 64; x != 0 ***REMOVED***
+	if newCap > 64 {
+		if x = newCap % 64; x != 0 {
 			x = newCap / 64
 			newCap = 64 * (x + 1)
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
-		if x = newCap % 16; x != 0 ***REMOVED***
+		}
+	} else {
+		if x = newCap % 16; x != 0 {
 			x = newCap / 16
 			newCap = 16 * (x + 1)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}
 
-func expandSliceValue(s reflect.Value, num int) reflect.Value ***REMOVED***
-	if num <= 0 ***REMOVED***
+func expandSliceValue(s reflect.Value, num int) reflect.Value {
+	if num <= 0 {
 		return s
-	***REMOVED***
+	}
 	l0 := s.Len()
 	l1 := l0 + num // new slice length
-	if l1 < l0 ***REMOVED***
+	if l1 < l0 {
 		panic("ExpandSlice: slice overflow")
-	***REMOVED***
+	}
 	c0 := s.Cap()
-	if l1 <= c0 ***REMOVED***
+	if l1 <= c0 {
 		return s.Slice(0, l1)
-	***REMOVED***
+	}
 	st := s.Type()
 	c1 := growCap(c0, int(st.Elem().Size()), num)
 	s2 := reflect.MakeSlice(st, l1, c1)
 	// println("expandslicevalue: cap-old: ", c0, ", cap-new: ", c1, ", len-new: ", l1)
 	reflect.Copy(s2, s)
 	return s2
-***REMOVED***
+}

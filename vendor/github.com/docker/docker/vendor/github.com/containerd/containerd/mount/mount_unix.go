@@ -10,16 +10,16 @@ var (
 )
 
 // Mount is not implemented on this platform
-func (m *Mount) Mount(target string) error ***REMOVED***
+func (m *Mount) Mount(target string) error {
 	return ErrNotImplementOnUnix
-***REMOVED***
+}
 
 // Unmount is not implemented on this platform
-func Unmount(mount string, flags int) error ***REMOVED***
+func Unmount(mount string, flags int) error {
 	return ErrNotImplementOnUnix
-***REMOVED***
+}
 
 // UnmountAll is not implemented on this platform
-func UnmountAll(mount string, flags int) error ***REMOVED***
+func UnmountAll(mount string, flags int) error {
 	return ErrNotImplementOnUnix
-***REMOVED***
+}

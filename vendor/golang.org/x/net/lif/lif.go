@@ -12,32 +12,32 @@ package lif
 
 import "syscall"
 
-type endpoint struct ***REMOVED***
+type endpoint struct {
 	af int
 	s  uintptr
-***REMOVED***
+}
 
-func (ep *endpoint) close() error ***REMOVED***
+func (ep *endpoint) close() error {
 	return syscall.Close(int(ep.s))
-***REMOVED***
+}
 
-func newEndpoints(af int) ([]endpoint, error) ***REMOVED***
+func newEndpoints(af int) ([]endpoint, error) {
 	var lastErr error
 	var eps []endpoint
-	afs := []int***REMOVED***sysAF_INET, sysAF_INET6***REMOVED***
-	if af != sysAF_UNSPEC ***REMOVED***
-		afs = []int***REMOVED***af***REMOVED***
-	***REMOVED***
-	for _, af := range afs ***REMOVED***
+	afs := []int{sysAF_INET, sysAF_INET6}
+	if af != sysAF_UNSPEC {
+		afs = []int{af}
+	}
+	for _, af := range afs {
 		s, err := syscall.Socket(af, sysSOCK_DGRAM, 0)
-		if err != nil ***REMOVED***
+		if err != nil {
 			lastErr = err
 			continue
-		***REMOVED***
-		eps = append(eps, endpoint***REMOVED***af: af, s: uintptr(s)***REMOVED***)
-	***REMOVED***
-	if len(eps) == 0 ***REMOVED***
+		}
+		eps = append(eps, endpoint{af: af, s: uintptr(s)})
+	}
+	if len(eps) == 0 {
 		return nil, lastErr
-	***REMOVED***
+	}
 	return eps, nil
-***REMOVED***
+}

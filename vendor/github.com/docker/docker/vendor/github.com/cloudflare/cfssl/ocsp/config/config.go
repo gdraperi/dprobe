@@ -5,9 +5,9 @@ package config
 import "time"
 
 // Config contains configuration information required to set up an OCSP signer.
-type Config struct ***REMOVED***
+type Config struct {
 	CACertFile        string
 	ResponderCertFile string
 	KeyFile           string
 	Interval          time.Duration
-***REMOVED***
+}

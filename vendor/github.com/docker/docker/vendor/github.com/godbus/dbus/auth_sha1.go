@@ -12,43 +12,43 @@ import (
 // AuthCookieSha1 returns an Auth that authenticates as the given user with the
 // DBUS_COOKIE_SHA1 mechanism. The home parameter should specify the home
 // directory of the user.
-func AuthCookieSha1(user, home string) Auth ***REMOVED***
-	return authCookieSha1***REMOVED***user, home***REMOVED***
-***REMOVED***
+func AuthCookieSha1(user, home string) Auth {
+	return authCookieSha1{user, home}
+}
 
-type authCookieSha1 struct ***REMOVED***
+type authCookieSha1 struct {
 	user, home string
-***REMOVED***
+}
 
-func (a authCookieSha1) FirstData() ([]byte, []byte, AuthStatus) ***REMOVED***
+func (a authCookieSha1) FirstData() ([]byte, []byte, AuthStatus) {
 	b := make([]byte, 2*len(a.user))
 	hex.Encode(b, []byte(a.user))
 	return []byte("DBUS_COOKIE_SHA1"), b, AuthContinue
-***REMOVED***
+}
 
-func (a authCookieSha1) HandleData(data []byte) ([]byte, AuthStatus) ***REMOVED***
+func (a authCookieSha1) HandleData(data []byte) ([]byte, AuthStatus) {
 	challenge := make([]byte, len(data)/2)
 	_, err := hex.Decode(challenge, data)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, AuthError
-	***REMOVED***
-	b := bytes.Split(challenge, []byte***REMOVED***' '***REMOVED***)
-	if len(b) != 3 ***REMOVED***
+	}
+	b := bytes.Split(challenge, []byte{' '})
+	if len(b) != 3 {
 		return nil, AuthError
-	***REMOVED***
+	}
 	context := b[0]
 	id := b[1]
 	svchallenge := b[2]
 	cookie := a.getCookie(context, id)
-	if cookie == nil ***REMOVED***
+	if cookie == nil {
 		return nil, AuthError
-	***REMOVED***
+	}
 	clchallenge := a.generateChallenge()
-	if clchallenge == nil ***REMOVED***
+	if clchallenge == nil {
 		return nil, AuthError
-	***REMOVED***
+	}
 	hash := sha1.New()
-	hash.Write(bytes.Join([][]byte***REMOVED***svchallenge, clchallenge, cookie***REMOVED***, []byte***REMOVED***':'***REMOVED***))
+	hash.Write(bytes.Join([][]byte{svchallenge, clchallenge, cookie}, []byte{':'}))
 	hexhash := make([]byte, 2*hash.Size())
 	hex.Encode(hexhash, hash.Sum(nil))
 	data = append(clchallenge, ' ')
@@ -56,47 +56,47 @@ func (a authCookieSha1) HandleData(data []byte) ([]byte, AuthStatus) ***REMOVED*
 	resp := make([]byte, 2*len(data))
 	hex.Encode(resp, data)
 	return resp, AuthOk
-***REMOVED***
+}
 
 // getCookie searches for the cookie identified by id in context and returns
 // the cookie content or nil. (Since HandleData can't return a specific error,
 // but only whether an error occured, this function also doesn't bother to
 // return an error.)
-func (a authCookieSha1) getCookie(context, id []byte) []byte ***REMOVED***
+func (a authCookieSha1) getCookie(context, id []byte) []byte {
 	file, err := os.Open(a.home + "/.dbus-keyrings/" + string(context))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil
-	***REMOVED***
+	}
 	defer file.Close()
 	rd := bufio.NewReader(file)
-	for ***REMOVED***
+	for {
 		line, err := rd.ReadBytes('\n')
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil
-		***REMOVED***
+		}
 		line = line[:len(line)-1]
-		b := bytes.Split(line, []byte***REMOVED***' '***REMOVED***)
-		if len(b) != 3 ***REMOVED***
+		b := bytes.Split(line, []byte{' '})
+		if len(b) != 3 {
 			return nil
-		***REMOVED***
-		if bytes.Equal(b[0], id) ***REMOVED***
+		}
+		if bytes.Equal(b[0], id) {
 			return b[2]
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // generateChallenge returns a random, hex-encoded challenge, or nil on error
 // (see above).
-func (a authCookieSha1) generateChallenge() []byte ***REMOVED***
+func (a authCookieSha1) generateChallenge() []byte {
 	b := make([]byte, 16)
 	n, err := rand.Read(b)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil
-	***REMOVED***
-	if n != 16 ***REMOVED***
+	}
+	if n != 16 {
 		return nil
-	***REMOVED***
+	}
 	enc := make([]byte, 32)
 	hex.Encode(enc, b)
 	return enc
-***REMOVED***
+}

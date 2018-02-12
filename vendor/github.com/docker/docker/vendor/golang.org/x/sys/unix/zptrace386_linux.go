@@ -8,7 +8,7 @@ package unix
 import "unsafe"
 
 // PtraceRegs386 is the registers used by 386 binaries.
-type PtraceRegs386 struct ***REMOVED***
+type PtraceRegs386 struct {
 	Ebx      int32
 	Ecx      int32
 	Edx      int32
@@ -26,20 +26,20 @@ type PtraceRegs386 struct ***REMOVED***
 	Eflags   int32
 	Esp      int32
 	Xss      int32
-***REMOVED***
+}
 
 // PtraceGetRegs386 fetches the registers used by 386 binaries.
-func PtraceGetRegs386(pid int, regsout *PtraceRegs386) error ***REMOVED***
+func PtraceGetRegs386(pid int, regsout *PtraceRegs386) error {
 	return ptrace(PTRACE_GETREGS, pid, 0, uintptr(unsafe.Pointer(regsout)))
-***REMOVED***
+}
 
 // PtraceSetRegs386 sets the registers used by 386 binaries.
-func PtraceSetRegs386(pid int, regs *PtraceRegs386) error ***REMOVED***
+func PtraceSetRegs386(pid int, regs *PtraceRegs386) error {
 	return ptrace(PTRACE_SETREGS, pid, 0, uintptr(unsafe.Pointer(regs)))
-***REMOVED***
+}
 
 // PtraceRegsAmd64 is the registers used by amd64 binaries.
-type PtraceRegsAmd64 struct ***REMOVED***
+type PtraceRegsAmd64 struct {
 	R15      uint64
 	R14      uint64
 	R13      uint64
@@ -67,14 +67,14 @@ type PtraceRegsAmd64 struct ***REMOVED***
 	Es       uint64
 	Fs       uint64
 	Gs       uint64
-***REMOVED***
+}
 
 // PtraceGetRegsAmd64 fetches the registers used by amd64 binaries.
-func PtraceGetRegsAmd64(pid int, regsout *PtraceRegsAmd64) error ***REMOVED***
+func PtraceGetRegsAmd64(pid int, regsout *PtraceRegsAmd64) error {
 	return ptrace(PTRACE_GETREGS, pid, 0, uintptr(unsafe.Pointer(regsout)))
-***REMOVED***
+}
 
 // PtraceSetRegsAmd64 sets the registers used by amd64 binaries.
-func PtraceSetRegsAmd64(pid int, regs *PtraceRegsAmd64) error ***REMOVED***
+func PtraceSetRegsAmd64(pid int, regs *PtraceRegsAmd64) error {
 	return ptrace(PTRACE_SETREGS, pid, 0, uintptr(unsafe.Pointer(regs)))
-***REMOVED***
+}

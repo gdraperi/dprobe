@@ -32,267 +32,267 @@ import (
 
 // Signer contains a signer that uses the standard library to
 // support both ECDSA and RSA CA keys.
-type Signer struct ***REMOVED***
+type Signer struct {
 	ca         *x509.Certificate
 	priv       crypto.Signer
 	policy     *config.Signing
 	sigAlgo    x509.SignatureAlgorithm
 	dbAccessor certdb.Accessor
-***REMOVED***
+}
 
 // NewSigner creates a new Signer directly from a
 // private key and certificate, with optional policy.
-func NewSigner(priv crypto.Signer, cert *x509.Certificate, sigAlgo x509.SignatureAlgorithm, policy *config.Signing) (*Signer, error) ***REMOVED***
-	if policy == nil ***REMOVED***
-		policy = &config.Signing***REMOVED***
-			Profiles: map[string]*config.SigningProfile***REMOVED******REMOVED***,
-			Default:  config.DefaultConfig()***REMOVED***
-	***REMOVED***
+func NewSigner(priv crypto.Signer, cert *x509.Certificate, sigAlgo x509.SignatureAlgorithm, policy *config.Signing) (*Signer, error) {
+	if policy == nil {
+		policy = &config.Signing{
+			Profiles: map[string]*config.SigningProfile{},
+			Default:  config.DefaultConfig()}
+	}
 
-	if !policy.Valid() ***REMOVED***
+	if !policy.Valid() {
 		return nil, cferr.New(cferr.PolicyError, cferr.InvalidPolicy)
-	***REMOVED***
+	}
 
-	return &Signer***REMOVED***
+	return &Signer{
 		ca:      cert,
 		priv:    priv,
 		sigAlgo: sigAlgo,
 		policy:  policy,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // NewSignerFromFile generates a new local signer from a caFile
 // and a caKey file, both PEM encoded.
-func NewSignerFromFile(caFile, caKeyFile string, policy *config.Signing) (*Signer, error) ***REMOVED***
+func NewSignerFromFile(caFile, caKeyFile string, policy *config.Signing) (*Signer, error) {
 	log.Debug("Loading CA: ", caFile)
 	ca, err := ioutil.ReadFile(caFile)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	log.Debug("Loading CA key: ", caKeyFile)
 	cakey, err := ioutil.ReadFile(caKeyFile)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, cferr.Wrap(cferr.CertificateError, cferr.ReadFailed, err)
-	***REMOVED***
+	}
 
 	parsedCa, err := helpers.ParseCertificatePEM(ca)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	strPassword := os.Getenv("CFSSL_CA_PK_PASSWORD")
 	password := []byte(strPassword)
-	if strPassword == "" ***REMOVED***
+	if strPassword == "" {
 		password = nil
-	***REMOVED***
+	}
 
 	priv, err := helpers.ParsePrivateKeyPEMWithPassword(cakey, password)
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Debug("Malformed private key %v", err)
 		return nil, err
-	***REMOVED***
+	}
 
 	return NewSigner(priv, parsedCa, signer.DefaultSigAlgo(priv), policy)
-***REMOVED***
+}
 
-func (s *Signer) sign(template *x509.Certificate, profile *config.SigningProfile) (cert []byte, err error) ***REMOVED***
+func (s *Signer) sign(template *x509.Certificate, profile *config.SigningProfile) (cert []byte, err error) {
 	var distPoints = template.CRLDistributionPoints
 	err = signer.FillTemplate(template, s.policy.Default, profile)
-	if distPoints != nil && len(distPoints) > 0 ***REMOVED***
+	if distPoints != nil && len(distPoints) > 0 {
 		template.CRLDistributionPoints = distPoints
-	***REMOVED***
-	if err != nil ***REMOVED***
+	}
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
 	var initRoot bool
-	if s.ca == nil ***REMOVED***
-		if !template.IsCA ***REMOVED***
+	if s.ca == nil {
+		if !template.IsCA {
 			err = cferr.New(cferr.PolicyError, cferr.InvalidRequest)
 			return
-		***REMOVED***
+		}
 		template.DNSNames = nil
 		template.EmailAddresses = nil
 		s.ca = template
 		initRoot = true
-	***REMOVED***
+	}
 
 	derBytes, err := x509.CreateCertificate(rand.Reader, template, s.ca, template.PublicKey, s.priv)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, cferr.Wrap(cferr.CertificateError, cferr.Unknown, err)
-	***REMOVED***
-	if initRoot ***REMOVED***
+	}
+	if initRoot {
 		s.ca, err = x509.ParseCertificate(derBytes)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, cferr.Wrap(cferr.CertificateError, cferr.ParseFailed, err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	cert = pem.EncodeToMemory(&pem.Block***REMOVED***Type: "CERTIFICATE", Bytes: derBytes***REMOVED***)
+	cert = pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: derBytes})
 	log.Infof("signed certificate with serial number %d", template.SerialNumber)
 	return
-***REMOVED***
+}
 
 // replaceSliceIfEmpty replaces the contents of replaced with newContents if
 // the slice referenced by replaced is empty
-func replaceSliceIfEmpty(replaced, newContents *[]string) ***REMOVED***
-	if len(*replaced) == 0 ***REMOVED***
+func replaceSliceIfEmpty(replaced, newContents *[]string) {
+	if len(*replaced) == 0 {
 		*replaced = *newContents
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // PopulateSubjectFromCSR has functionality similar to Name, except
 // it fills the fields of the resulting pkix.Name with req's if the
 // subject's corresponding fields are empty
-func PopulateSubjectFromCSR(s *signer.Subject, req pkix.Name) pkix.Name ***REMOVED***
+func PopulateSubjectFromCSR(s *signer.Subject, req pkix.Name) pkix.Name {
 	// if no subject, use req
-	if s == nil ***REMOVED***
+	if s == nil {
 		return req
-	***REMOVED***
+	}
 
 	name := s.Name()
 
-	if name.CommonName == "" ***REMOVED***
+	if name.CommonName == "" {
 		name.CommonName = req.CommonName
-	***REMOVED***
+	}
 
 	replaceSliceIfEmpty(&name.Country, &req.Country)
 	replaceSliceIfEmpty(&name.Province, &req.Province)
 	replaceSliceIfEmpty(&name.Locality, &req.Locality)
 	replaceSliceIfEmpty(&name.Organization, &req.Organization)
 	replaceSliceIfEmpty(&name.OrganizationalUnit, &req.OrganizationalUnit)
-	if name.SerialNumber == "" ***REMOVED***
+	if name.SerialNumber == "" {
 		name.SerialNumber = req.SerialNumber
-	***REMOVED***
+	}
 	return name
-***REMOVED***
+}
 
 // OverrideHosts fills template's IPAddresses, EmailAddresses, and DNSNames with the
 // content of hosts, if it is not nil.
-func OverrideHosts(template *x509.Certificate, hosts []string) ***REMOVED***
-	if hosts != nil ***REMOVED***
-		template.IPAddresses = []net.IP***REMOVED******REMOVED***
-		template.EmailAddresses = []string***REMOVED******REMOVED***
-		template.DNSNames = []string***REMOVED******REMOVED***
-	***REMOVED***
+func OverrideHosts(template *x509.Certificate, hosts []string) {
+	if hosts != nil {
+		template.IPAddresses = []net.IP{}
+		template.EmailAddresses = []string{}
+		template.DNSNames = []string{}
+	}
 
-	for i := range hosts ***REMOVED***
-		if ip := net.ParseIP(hosts[i]); ip != nil ***REMOVED***
+	for i := range hosts {
+		if ip := net.ParseIP(hosts[i]); ip != nil {
 			template.IPAddresses = append(template.IPAddresses, ip)
-		***REMOVED*** else if email, err := mail.ParseAddress(hosts[i]); err == nil && email != nil ***REMOVED***
+		} else if email, err := mail.ParseAddress(hosts[i]); err == nil && email != nil {
 			template.EmailAddresses = append(template.EmailAddresses, email.Address)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			template.DNSNames = append(template.DNSNames, hosts[i])
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-***REMOVED***
+}
 
 // Sign signs a new certificate based on the PEM-encoded client
 // certificate or certificate request with the signing profile,
 // specified by profileName.
-func (s *Signer) Sign(req signer.SignRequest) (cert []byte, err error) ***REMOVED***
+func (s *Signer) Sign(req signer.SignRequest) (cert []byte, err error) {
 	profile, err := signer.Profile(s, req.Profile)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
 	block, _ := pem.Decode([]byte(req.Request))
-	if block == nil ***REMOVED***
+	if block == nil {
 		return nil, cferr.New(cferr.CSRError, cferr.DecodeFailed)
-	***REMOVED***
+	}
 
-	if block.Type != "NEW CERTIFICATE REQUEST" && block.Type != "CERTIFICATE REQUEST" ***REMOVED***
+	if block.Type != "NEW CERTIFICATE REQUEST" && block.Type != "CERTIFICATE REQUEST" {
 		return nil, cferr.Wrap(cferr.CSRError,
 			cferr.BadRequest, errors.New("not a certificate or csr"))
-	***REMOVED***
+	}
 
 	csrTemplate, err := signer.ParseCertificateRequest(s, block.Bytes)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// Copy out only the fields from the CSR authorized by policy.
-	safeTemplate := x509.Certificate***REMOVED******REMOVED***
+	safeTemplate := x509.Certificate{}
 	// If the profile contains no explicit whitelist, assume that all fields
 	// should be copied from the CSR.
-	if profile.CSRWhitelist == nil ***REMOVED***
+	if profile.CSRWhitelist == nil {
 		safeTemplate = *csrTemplate
-	***REMOVED*** else ***REMOVED***
-		if profile.CSRWhitelist.Subject ***REMOVED***
+	} else {
+		if profile.CSRWhitelist.Subject {
 			safeTemplate.Subject = csrTemplate.Subject
-		***REMOVED***
-		if profile.CSRWhitelist.PublicKeyAlgorithm ***REMOVED***
+		}
+		if profile.CSRWhitelist.PublicKeyAlgorithm {
 			safeTemplate.PublicKeyAlgorithm = csrTemplate.PublicKeyAlgorithm
-		***REMOVED***
-		if profile.CSRWhitelist.PublicKey ***REMOVED***
+		}
+		if profile.CSRWhitelist.PublicKey {
 			safeTemplate.PublicKey = csrTemplate.PublicKey
-		***REMOVED***
-		if profile.CSRWhitelist.SignatureAlgorithm ***REMOVED***
+		}
+		if profile.CSRWhitelist.SignatureAlgorithm {
 			safeTemplate.SignatureAlgorithm = csrTemplate.SignatureAlgorithm
-		***REMOVED***
-		if profile.CSRWhitelist.DNSNames ***REMOVED***
+		}
+		if profile.CSRWhitelist.DNSNames {
 			safeTemplate.DNSNames = csrTemplate.DNSNames
-		***REMOVED***
-		if profile.CSRWhitelist.IPAddresses ***REMOVED***
+		}
+		if profile.CSRWhitelist.IPAddresses {
 			safeTemplate.IPAddresses = csrTemplate.IPAddresses
-		***REMOVED***
-		if profile.CSRWhitelist.EmailAddresses ***REMOVED***
+		}
+		if profile.CSRWhitelist.EmailAddresses {
 			safeTemplate.EmailAddresses = csrTemplate.EmailAddresses
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if req.CRLOverride != "" ***REMOVED***
-		safeTemplate.CRLDistributionPoints = []string***REMOVED***req.CRLOverride***REMOVED***
-	***REMOVED***
+	if req.CRLOverride != "" {
+		safeTemplate.CRLDistributionPoints = []string{req.CRLOverride}
+	}
 
-	if safeTemplate.IsCA ***REMOVED***
-		if !profile.CAConstraint.IsCA ***REMOVED***
+	if safeTemplate.IsCA {
+		if !profile.CAConstraint.IsCA {
 			log.Error("local signer policy disallows issuing CA certificate")
 			return nil, cferr.New(cferr.PolicyError, cferr.InvalidRequest)
-		***REMOVED***
+		}
 
-		if s.ca != nil && s.ca.MaxPathLen > 0 ***REMOVED***
-			if safeTemplate.MaxPathLen >= s.ca.MaxPathLen ***REMOVED***
+		if s.ca != nil && s.ca.MaxPathLen > 0 {
+			if safeTemplate.MaxPathLen >= s.ca.MaxPathLen {
 				log.Error("local signer certificate disallows CA MaxPathLen extending")
 				// do not sign a cert with pathlen > current
 				return nil, cferr.New(cferr.PolicyError, cferr.InvalidRequest)
-			***REMOVED***
-		***REMOVED*** else if s.ca != nil && s.ca.MaxPathLen == 0 && s.ca.MaxPathLenZero ***REMOVED***
+			}
+		} else if s.ca != nil && s.ca.MaxPathLen == 0 && s.ca.MaxPathLenZero {
 			log.Error("local signer certificate disallows issuing CA certificate")
 			// signer has pathlen of 0, do not sign more intermediate CAs
 			return nil, cferr.New(cferr.PolicyError, cferr.InvalidRequest)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	OverrideHosts(&safeTemplate, req.Hosts)
 	safeTemplate.Subject = PopulateSubjectFromCSR(req.Subject, safeTemplate.Subject)
 
 	// If there is a whitelist, ensure that both the Common Name and SAN DNSNames match
-	if profile.NameWhitelist != nil ***REMOVED***
-		if safeTemplate.Subject.CommonName != "" ***REMOVED***
-			if profile.NameWhitelist.Find([]byte(safeTemplate.Subject.CommonName)) == nil ***REMOVED***
+	if profile.NameWhitelist != nil {
+		if safeTemplate.Subject.CommonName != "" {
+			if profile.NameWhitelist.Find([]byte(safeTemplate.Subject.CommonName)) == nil {
 				return nil, cferr.New(cferr.PolicyError, cferr.UnmatchedWhitelist)
-			***REMOVED***
-		***REMOVED***
-		for _, name := range safeTemplate.DNSNames ***REMOVED***
-			if profile.NameWhitelist.Find([]byte(name)) == nil ***REMOVED***
+			}
+		}
+		for _, name := range safeTemplate.DNSNames {
+			if profile.NameWhitelist.Find([]byte(name)) == nil {
 				return nil, cferr.New(cferr.PolicyError, cferr.UnmatchedWhitelist)
-			***REMOVED***
-		***REMOVED***
-		for _, name := range safeTemplate.EmailAddresses ***REMOVED***
-			if profile.NameWhitelist.Find([]byte(name)) == nil ***REMOVED***
+			}
+		}
+		for _, name := range safeTemplate.EmailAddresses {
+			if profile.NameWhitelist.Find([]byte(name)) == nil {
 				return nil, cferr.New(cferr.PolicyError, cferr.UnmatchedWhitelist)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
-	if profile.ClientProvidesSerialNumbers ***REMOVED***
-		if req.Serial == nil ***REMOVED***
+	if profile.ClientProvidesSerialNumbers {
+		if req.Serial == nil {
 			return nil, cferr.New(cferr.CertificateError, cferr.MissingSerial)
-		***REMOVED***
+		}
 		safeTemplate.SerialNumber = req.Serial
-	***REMOVED*** else ***REMOVED***
+	} else {
 		// RFC 5280 4.1.2.2:
 		// Certificate users MUST be able to handle serialNumber
 		// values up to 20 octets.  Conforming CAs MUST NOT use
@@ -302,9 +302,9 @@ func (s *Signer) Sign(req signer.SignRequest) (cert []byte, err error) ***REMOVE
 		// sense to use the max supported size.
 		serialNumber := make([]byte, 20)
 		_, err = io.ReadFull(rand.Reader, serialNumber)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, cferr.Wrap(cferr.CertificateError, cferr.Unknown, err)
-		***REMOVED***
+		}
 
 		// SetBytes interprets buf as the bytes of a big-endian
 		// unsigned integer. The leading byte should be masked
@@ -312,78 +312,78 @@ func (s *Signer) Sign(req signer.SignRequest) (cert []byte, err error) ***REMOVE
 		serialNumber[0] &= 0x7F
 
 		safeTemplate.SerialNumber = new(big.Int).SetBytes(serialNumber)
-	***REMOVED***
+	}
 
-	if len(req.Extensions) > 0 ***REMOVED***
-		for _, ext := range req.Extensions ***REMOVED***
+	if len(req.Extensions) > 0 {
+		for _, ext := range req.Extensions {
 			oid := asn1.ObjectIdentifier(ext.ID)
-			if !profile.ExtensionWhitelist[oid.String()] ***REMOVED***
+			if !profile.ExtensionWhitelist[oid.String()] {
 				return nil, cferr.New(cferr.CertificateError, cferr.InvalidRequest)
-			***REMOVED***
+			}
 
 			rawValue, err := hex.DecodeString(ext.Value)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, cferr.Wrap(cferr.CertificateError, cferr.InvalidRequest, err)
-			***REMOVED***
+			}
 
-			safeTemplate.ExtraExtensions = append(safeTemplate.ExtraExtensions, pkix.Extension***REMOVED***
+			safeTemplate.ExtraExtensions = append(safeTemplate.ExtraExtensions, pkix.Extension{
 				Id:       oid,
 				Critical: ext.Critical,
 				Value:    rawValue,
-			***REMOVED***)
-		***REMOVED***
-	***REMOVED***
+			})
+		}
+	}
 
 	var certTBS = safeTemplate
 
-	if len(profile.CTLogServers) > 0 ***REMOVED***
+	if len(profile.CTLogServers) > 0 {
 		// Add a poison extension which prevents validation
-		var poisonExtension = pkix.Extension***REMOVED***Id: signer.CTPoisonOID, Critical: true, Value: []byte***REMOVED***0x05, 0x00***REMOVED******REMOVED***
+		var poisonExtension = pkix.Extension{Id: signer.CTPoisonOID, Critical: true, Value: []byte{0x05, 0x00}}
 		var poisonedPreCert = certTBS
 		poisonedPreCert.ExtraExtensions = append(safeTemplate.ExtraExtensions, poisonExtension)
 		cert, err = s.sign(&poisonedPreCert, profile)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
+		}
 
 		derCert, _ := pem.Decode(cert)
-		prechain := []ct.ASN1Cert***REMOVED***derCert.Bytes, s.ca.Raw***REMOVED***
+		prechain := []ct.ASN1Cert{derCert.Bytes, s.ca.Raw}
 		var sctList []ct.SignedCertificateTimestamp
 
-		for _, server := range profile.CTLogServers ***REMOVED***
+		for _, server := range profile.CTLogServers {
 			log.Infof("submitting poisoned precertificate to %s", server)
 			var ctclient = client.New(server, nil)
 			var resp *ct.SignedCertificateTimestamp
 			resp, err = ctclient.AddPreChain(prechain)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, cferr.Wrap(cferr.CTError, cferr.PrecertSubmissionFailed, err)
-			***REMOVED***
+			}
 			sctList = append(sctList, *resp)
-		***REMOVED***
+		}
 
 		var serializedSCTList []byte
 		serializedSCTList, err = serializeSCTList(sctList)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, cferr.Wrap(cferr.CTError, cferr.Unknown, err)
-		***REMOVED***
+		}
 
 		// Serialize again as an octet string before embedding
 		serializedSCTList, err = asn1.Marshal(serializedSCTList)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, cferr.Wrap(cferr.CTError, cferr.Unknown, err)
-		***REMOVED***
+		}
 
-		var SCTListExtension = pkix.Extension***REMOVED***Id: signer.SCTListOID, Critical: false, Value: serializedSCTList***REMOVED***
+		var SCTListExtension = pkix.Extension{Id: signer.SCTListOID, Critical: false, Value: serializedSCTList}
 		certTBS.ExtraExtensions = append(certTBS.ExtraExtensions, SCTListExtension)
-	***REMOVED***
+	}
 	var signedCert []byte
 	signedCert, err = s.sign(&certTBS, profile)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	if s.dbAccessor != nil ***REMOVED***
-		var certRecord = certdb.CertificateRecord***REMOVED***
+	if s.dbAccessor != nil {
+		var certRecord = certdb.CertificateRecord{
 			Serial: certTBS.SerialNumber.String(),
 			// this relies on the specific behavior of x509.CreateCertificate
 			// which updates certTBS AuthorityKeyId from the signer's SubjectKeyId
@@ -392,78 +392,78 @@ func (s *Signer) Sign(req signer.SignRequest) (cert []byte, err error) ***REMOVE
 			Status:  "good",
 			Expiry:  certTBS.NotAfter,
 			PEM:     string(signedCert),
-		***REMOVED***
+		}
 
 		err = s.dbAccessor.InsertCertificate(certRecord)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		log.Debug("saved certificate with serial number ", certTBS.SerialNumber)
-	***REMOVED***
+	}
 
 	return signedCert, nil
-***REMOVED***
+}
 
-func serializeSCTList(sctList []ct.SignedCertificateTimestamp) ([]byte, error) ***REMOVED***
+func serializeSCTList(sctList []ct.SignedCertificateTimestamp) ([]byte, error) {
 	var buf bytes.Buffer
-	for _, sct := range sctList ***REMOVED***
+	for _, sct := range sctList {
 		sct, err := ct.SerializeSCT(sct)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		binary.Write(&buf, binary.BigEndian, uint16(len(sct)))
 		buf.Write(sct)
-	***REMOVED***
+	}
 
 	var sctListLengthField = make([]byte, 2)
 	binary.BigEndian.PutUint16(sctListLengthField, uint16(buf.Len()))
-	return bytes.Join([][]byte***REMOVED***sctListLengthField, buf.Bytes()***REMOVED***, nil), nil
-***REMOVED***
+	return bytes.Join([][]byte{sctListLengthField, buf.Bytes()}, nil), nil
+}
 
 // Info return a populated info.Resp struct or an error.
-func (s *Signer) Info(req info.Req) (resp *info.Resp, err error) ***REMOVED***
+func (s *Signer) Info(req info.Req) (resp *info.Resp, err error) {
 	cert, err := s.Certificate(req.Label, req.Profile)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
 	profile, err := signer.Profile(s, req.Profile)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
 	resp = new(info.Resp)
-	if cert.Raw != nil ***REMOVED***
-		resp.Certificate = string(bytes.TrimSpace(pem.EncodeToMemory(&pem.Block***REMOVED***Type: "CERTIFICATE", Bytes: cert.Raw***REMOVED***)))
-	***REMOVED***
+	if cert.Raw != nil {
+		resp.Certificate = string(bytes.TrimSpace(pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: cert.Raw})))
+	}
 	resp.Usage = profile.Usage
 	resp.ExpiryString = profile.ExpiryString
 
 	return
-***REMOVED***
+}
 
 // SigAlgo returns the RSA signer's signature algorithm.
-func (s *Signer) SigAlgo() x509.SignatureAlgorithm ***REMOVED***
+func (s *Signer) SigAlgo() x509.SignatureAlgorithm {
 	return s.sigAlgo
-***REMOVED***
+}
 
 // Certificate returns the signer's certificate.
-func (s *Signer) Certificate(label, profile string) (*x509.Certificate, error) ***REMOVED***
+func (s *Signer) Certificate(label, profile string) (*x509.Certificate, error) {
 	cert := *s.ca
 	return &cert, nil
-***REMOVED***
+}
 
 // SetPolicy sets the signer's signature policy.
-func (s *Signer) SetPolicy(policy *config.Signing) ***REMOVED***
+func (s *Signer) SetPolicy(policy *config.Signing) {
 	s.policy = policy
-***REMOVED***
+}
 
 // SetDBAccessor sets the signers' cert db accessor
-func (s *Signer) SetDBAccessor(dba certdb.Accessor) ***REMOVED***
+func (s *Signer) SetDBAccessor(dba certdb.Accessor) {
 	s.dbAccessor = dba
-***REMOVED***
+}
 
 // Policy returns the signer's policy.
-func (s *Signer) Policy() *config.Signing ***REMOVED***
+func (s *Signer) Policy() *config.Signing {
 	return s.policy
-***REMOVED***
+}

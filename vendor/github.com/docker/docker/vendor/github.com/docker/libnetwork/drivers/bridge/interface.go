@@ -15,72 +15,72 @@ const (
 )
 
 // Interface models the bridge network device.
-type bridgeInterface struct ***REMOVED***
+type bridgeInterface struct {
 	Link        netlink.Link
 	bridgeIPv4  *net.IPNet
 	bridgeIPv6  *net.IPNet
 	gatewayIPv4 net.IP
 	gatewayIPv6 net.IP
 	nlh         *netlink.Handle
-***REMOVED***
+}
 
 // newInterface creates a new bridge interface structure. It attempts to find
 // an already existing device identified by the configuration BridgeName field,
 // or the default bridge name when unspecified, but doesn't attempt to create
 // one when missing
-func newInterface(nlh *netlink.Handle, config *networkConfiguration) (*bridgeInterface, error) ***REMOVED***
+func newInterface(nlh *netlink.Handle, config *networkConfiguration) (*bridgeInterface, error) {
 	var err error
-	i := &bridgeInterface***REMOVED***nlh: nlh***REMOVED***
+	i := &bridgeInterface{nlh: nlh}
 
 	// Initialize the bridge name to the default if unspecified.
-	if config.BridgeName == "" ***REMOVED***
+	if config.BridgeName == "" {
 		config.BridgeName = DefaultBridgeName
-	***REMOVED***
+	}
 
 	// Attempt to find an existing bridge named with the specified name.
 	i.Link, err = nlh.LinkByName(config.BridgeName)
-	if err != nil ***REMOVED***
+	if err != nil {
 		logrus.Debugf("Did not find any interface with name %s: %v", config.BridgeName, err)
-	***REMOVED*** else if _, ok := i.Link.(*netlink.Bridge); !ok ***REMOVED***
+	} else if _, ok := i.Link.(*netlink.Bridge); !ok {
 		return nil, fmt.Errorf("existing interface %s is not a bridge", i.Link.Attrs().Name)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
 // exists indicates if the existing bridge interface exists on the system.
-func (i *bridgeInterface) exists() bool ***REMOVED***
+func (i *bridgeInterface) exists() bool {
 	return i.Link != nil
-***REMOVED***
+}
 
 // addresses returns all IPv4 addresses and all IPv6 addresses for the bridge interface.
-func (i *bridgeInterface) addresses() ([]netlink.Addr, []netlink.Addr, error) ***REMOVED***
+func (i *bridgeInterface) addresses() ([]netlink.Addr, []netlink.Addr, error) {
 	v4addr, err := i.nlh.AddrList(i.Link, netlink.FAMILY_V4)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, nil, fmt.Errorf("Failed to retrieve V4 addresses: %v", err)
-	***REMOVED***
+	}
 
 	v6addr, err := i.nlh.AddrList(i.Link, netlink.FAMILY_V6)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, nil, fmt.Errorf("Failed to retrieve V6 addresses: %v", err)
-	***REMOVED***
+	}
 
-	if len(v4addr) == 0 ***REMOVED***
+	if len(v4addr) == 0 {
 		return nil, v6addr, nil
-	***REMOVED***
+	}
 	return v4addr, v6addr, nil
-***REMOVED***
+}
 
-func (i *bridgeInterface) programIPv6Address() error ***REMOVED***
+func (i *bridgeInterface) programIPv6Address() error {
 	_, nlAddressList, err := i.addresses()
-	if err != nil ***REMOVED***
-		return &IPv6AddrAddError***REMOVED***IP: i.bridgeIPv6, Err: fmt.Errorf("failed to retrieve address list: %v", err)***REMOVED***
-	***REMOVED***
-	nlAddr := netlink.Addr***REMOVED***IPNet: i.bridgeIPv6***REMOVED***
-	if findIPv6Address(nlAddr, nlAddressList) ***REMOVED***
+	if err != nil {
+		return &IPv6AddrAddError{IP: i.bridgeIPv6, Err: fmt.Errorf("failed to retrieve address list: %v", err)}
+	}
+	nlAddr := netlink.Addr{IPNet: i.bridgeIPv6}
+	if findIPv6Address(nlAddr, nlAddressList) {
 		return nil
-	***REMOVED***
-	if err := i.nlh.AddrAdd(i.Link, &nlAddr); err != nil ***REMOVED***
-		return &IPv6AddrAddError***REMOVED***IP: i.bridgeIPv6, Err: err***REMOVED***
-	***REMOVED***
+	}
+	if err := i.nlh.AddrAdd(i.Link, &nlAddr); err != nil {
+		return &IPv6AddrAddError{IP: i.bridgeIPv6, Err: err}
+	}
 	return nil
-***REMOVED***
+}

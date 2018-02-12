@@ -35,195 +35,195 @@ import (
 
 var timeType = reflect.TypeOf((*time.Time)(nil)).Elem()
 
-type timestamp struct ***REMOVED***
+type timestamp struct {
 	Seconds int64 `protobuf:"varint,1,opt,name=seconds,proto3" json:"seconds,omitempty"`
 	Nanos   int32 `protobuf:"varint,2,opt,name=nanos,proto3" json:"nanos,omitempty"`
-***REMOVED***
+}
 
-func (m *timestamp) Reset()       ***REMOVED*** *m = timestamp***REMOVED******REMOVED*** ***REMOVED***
-func (*timestamp) ProtoMessage()  ***REMOVED******REMOVED***
-func (*timestamp) String() string ***REMOVED*** return "timestamp<string>" ***REMOVED***
+func (m *timestamp) Reset()       { *m = timestamp{} }
+func (*timestamp) ProtoMessage()  {}
+func (*timestamp) String() string { return "timestamp<string>" }
 
-func init() ***REMOVED***
+func init() {
 	RegisterType((*timestamp)(nil), "gogo.protobuf.proto.timestamp")
-***REMOVED***
+}
 
-func (o *Buffer) decTimestamp() (time.Time, error) ***REMOVED***
+func (o *Buffer) decTimestamp() (time.Time, error) {
 	b, err := o.DecodeRawBytes(true)
-	if err != nil ***REMOVED***
-		return time.Time***REMOVED******REMOVED***, err
-	***REMOVED***
-	tproto := &timestamp***REMOVED******REMOVED***
-	if err := Unmarshal(b, tproto); err != nil ***REMOVED***
-		return time.Time***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return time.Time{}, err
+	}
+	tproto := &timestamp{}
+	if err := Unmarshal(b, tproto); err != nil {
+		return time.Time{}, err
+	}
 	return timestampFromProto(tproto)
-***REMOVED***
+}
 
-func (o *Buffer) dec_time(p *Properties, base structPointer) error ***REMOVED***
+func (o *Buffer) dec_time(p *Properties, base structPointer) error {
 	t, err := o.decTimestamp()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	setPtrCustomType(base, p.field, &t)
 	return nil
-***REMOVED***
+}
 
-func (o *Buffer) dec_ref_time(p *Properties, base structPointer) error ***REMOVED***
+func (o *Buffer) dec_ref_time(p *Properties, base structPointer) error {
 	t, err := o.decTimestamp()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	setCustomType(base, p.field, &t)
 	return nil
-***REMOVED***
+}
 
-func (o *Buffer) dec_slice_time(p *Properties, base structPointer) error ***REMOVED***
+func (o *Buffer) dec_slice_time(p *Properties, base structPointer) error {
 	t, err := o.decTimestamp()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	newBas := appendStructPointer(base, p.field, reflect.SliceOf(reflect.PtrTo(timeType)))
 	var zero field
 	setPtrCustomType(newBas, zero, &t)
 	return nil
-***REMOVED***
+}
 
-func (o *Buffer) dec_slice_ref_time(p *Properties, base structPointer) error ***REMOVED***
+func (o *Buffer) dec_slice_ref_time(p *Properties, base structPointer) error {
 	t, err := o.decTimestamp()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	newBas := appendStructPointer(base, p.field, reflect.SliceOf(timeType))
 	var zero field
 	setCustomType(newBas, zero, &t)
 	return nil
-***REMOVED***
+}
 
-func size_time(p *Properties, base structPointer) (n int) ***REMOVED***
+func size_time(p *Properties, base structPointer) (n int) {
 	structp := structPointer_GetStructPointer(base, p.field)
-	if structPointer_IsNil(structp) ***REMOVED***
+	if structPointer_IsNil(structp) {
 		return 0
-	***REMOVED***
+	}
 	tim := structPointer_Interface(structp, timeType).(*time.Time)
 	t, err := timestampProto(*tim)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0
-	***REMOVED***
+	}
 	size := Size(t)
 	return size + sizeVarint(uint64(size)) + len(p.tagcode)
-***REMOVED***
+}
 
-func (o *Buffer) enc_time(p *Properties, base structPointer) error ***REMOVED***
+func (o *Buffer) enc_time(p *Properties, base structPointer) error {
 	structp := structPointer_GetStructPointer(base, p.field)
-	if structPointer_IsNil(structp) ***REMOVED***
+	if structPointer_IsNil(structp) {
 		return ErrNil
-	***REMOVED***
+	}
 	tim := structPointer_Interface(structp, timeType).(*time.Time)
 	t, err := timestampProto(*tim)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	data, err := Marshal(t)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	o.buf = append(o.buf, p.tagcode...)
 	o.EncodeRawBytes(data)
 	return nil
-***REMOVED***
+}
 
-func size_ref_time(p *Properties, base structPointer) (n int) ***REMOVED***
+func size_ref_time(p *Properties, base structPointer) (n int) {
 	tim := structPointer_InterfaceAt(base, p.field, timeType).(*time.Time)
 	t, err := timestampProto(*tim)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0
-	***REMOVED***
+	}
 	size := Size(t)
 	return size + sizeVarint(uint64(size)) + len(p.tagcode)
-***REMOVED***
+}
 
-func (o *Buffer) enc_ref_time(p *Properties, base structPointer) error ***REMOVED***
+func (o *Buffer) enc_ref_time(p *Properties, base structPointer) error {
 	tim := structPointer_InterfaceAt(base, p.field, timeType).(*time.Time)
 	t, err := timestampProto(*tim)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	data, err := Marshal(t)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	o.buf = append(o.buf, p.tagcode...)
 	o.EncodeRawBytes(data)
 	return nil
-***REMOVED***
+}
 
-func size_slice_time(p *Properties, base structPointer) (n int) ***REMOVED***
+func size_slice_time(p *Properties, base structPointer) (n int) {
 	ptims := structPointer_InterfaceAt(base, p.field, reflect.SliceOf(reflect.PtrTo(timeType))).(*[]*time.Time)
 	tims := *ptims
-	for i := 0; i < len(tims); i++ ***REMOVED***
-		if tims[i] == nil ***REMOVED***
+	for i := 0; i < len(tims); i++ {
+		if tims[i] == nil {
 			return 0
-		***REMOVED***
+		}
 		tproto, err := timestampProto(*tims[i])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0
-		***REMOVED***
+		}
 		size := Size(tproto)
 		n += len(p.tagcode) + size + sizeVarint(uint64(size))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (o *Buffer) enc_slice_time(p *Properties, base structPointer) error ***REMOVED***
+func (o *Buffer) enc_slice_time(p *Properties, base structPointer) error {
 	ptims := structPointer_InterfaceAt(base, p.field, reflect.SliceOf(reflect.PtrTo(timeType))).(*[]*time.Time)
 	tims := *ptims
-	for i := 0; i < len(tims); i++ ***REMOVED***
-		if tims[i] == nil ***REMOVED***
+	for i := 0; i < len(tims); i++ {
+		if tims[i] == nil {
 			return errRepeatedHasNil
-		***REMOVED***
+		}
 		tproto, err := timestampProto(*tims[i])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		data, err := Marshal(tproto)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		o.buf = append(o.buf, p.tagcode...)
 		o.EncodeRawBytes(data)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func size_slice_ref_time(p *Properties, base structPointer) (n int) ***REMOVED***
+func size_slice_ref_time(p *Properties, base structPointer) (n int) {
 	ptims := structPointer_InterfaceAt(base, p.field, reflect.SliceOf(timeType)).(*[]time.Time)
 	tims := *ptims
-	for i := 0; i < len(tims); i++ ***REMOVED***
+	for i := 0; i < len(tims); i++ {
 		tproto, err := timestampProto(tims[i])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0
-		***REMOVED***
+		}
 		size := Size(tproto)
 		n += len(p.tagcode) + size + sizeVarint(uint64(size))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (o *Buffer) enc_slice_ref_time(p *Properties, base structPointer) error ***REMOVED***
+func (o *Buffer) enc_slice_ref_time(p *Properties, base structPointer) error {
 	ptims := structPointer_InterfaceAt(base, p.field, reflect.SliceOf(timeType)).(*[]time.Time)
 	tims := *ptims
-	for i := 0; i < len(tims); i++ ***REMOVED***
+	for i := 0; i < len(tims); i++ {
 		tproto, err := timestampProto(tims[i])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		data, err := Marshal(tproto)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		o.buf = append(o.buf, p.tagcode...)
 		o.EncodeRawBytes(data)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

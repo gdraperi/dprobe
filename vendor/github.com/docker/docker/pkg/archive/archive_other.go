@@ -2,6 +2,6 @@
 
 package archive
 
-func getWhiteoutConverter(format WhiteoutFormat) tarWhiteoutConverter ***REMOVED***
+func getWhiteoutConverter(format WhiteoutFormat) tarWhiteoutConverter {
 	return nil
-***REMOVED***
+}

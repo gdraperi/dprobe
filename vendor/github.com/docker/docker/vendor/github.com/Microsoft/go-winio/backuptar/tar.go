@@ -39,53 +39,53 @@ const (
 	hdrEaPrefix              = "xattr."
 )
 
-func writeZeroes(w io.Writer, count int64) error ***REMOVED***
+func writeZeroes(w io.Writer, count int64) error {
 	buf := make([]byte, 8192)
 	c := len(buf)
-	for i := int64(0); i < count; i += int64(c) ***REMOVED***
-		if int64(c) > count-i ***REMOVED***
+	for i := int64(0); i < count; i += int64(c) {
+		if int64(c) > count-i {
 			c = int(count - i)
-		***REMOVED***
+		}
 		_, err := w.Write(buf[:c])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func copySparse(t *tar.Writer, br *winio.BackupStreamReader) error ***REMOVED***
+func copySparse(t *tar.Writer, br *winio.BackupStreamReader) error {
 	curOffset := int64(0)
-	for ***REMOVED***
+	for {
 		bhdr, err := br.Next()
-		if err == io.EOF ***REMOVED***
+		if err == io.EOF {
 			err = io.ErrUnexpectedEOF
-		***REMOVED***
-		if err != nil ***REMOVED***
+		}
+		if err != nil {
 			return err
-		***REMOVED***
-		if bhdr.Id != winio.BackupSparseBlock ***REMOVED***
+		}
+		if bhdr.Id != winio.BackupSparseBlock {
 			return fmt.Errorf("unexpected stream %d", bhdr.Id)
-		***REMOVED***
+		}
 
 		// archive/tar does not support writing sparse files
 		// so just write zeroes to catch up to the current offset.
 		err = writeZeroes(t, bhdr.Offset-curOffset)
-		if bhdr.Size == 0 ***REMOVED***
+		if bhdr.Size == 0 {
 			break
-		***REMOVED***
+		}
 		n, err := io.Copy(t, br)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		curOffset = bhdr.Offset + n
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // BasicInfoHeader creates a tar header from basic file information.
-func BasicInfoHeader(name string, size int64, fileInfo *winio.FileBasicInfo) *tar.Header ***REMOVED***
-	hdr := &tar.Header***REMOVED***
+func BasicInfoHeader(name string, size int64, fileInfo *winio.FileBasicInfo) *tar.Header {
+	hdr := &tar.Header{
 		Name:         filepath.ToSlash(name),
 		Size:         size,
 		Typeflag:     tar.TypeReg,
@@ -94,16 +94,16 @@ func BasicInfoHeader(name string, size int64, fileInfo *winio.FileBasicInfo) *ta
 		AccessTime:   time.Unix(0, fileInfo.LastAccessTime.Nanoseconds()),
 		CreationTime: time.Unix(0, fileInfo.CreationTime.Nanoseconds()),
 		Winheaders:   make(map[string]string),
-	***REMOVED***
+	}
 	hdr.Winheaders[hdrFileAttributes] = fmt.Sprintf("%d", fileInfo.FileAttributes)
 
-	if (fileInfo.FileAttributes & syscall.FILE_ATTRIBUTE_DIRECTORY) != 0 ***REMOVED***
+	if (fileInfo.FileAttributes & syscall.FILE_ATTRIBUTE_DIRECTORY) != 0 {
 		hdr.Mode |= c_ISDIR
 		hdr.Size = 0
 		hdr.Typeflag = tar.TypeDir
-	***REMOVED***
+	}
 	return hdr
-***REMOVED***
+}
 
 // WriteTarFileFromBackupStream writes a file to a tar writer using data from a Win32 backup stream.
 //
@@ -116,7 +116,7 @@ func BasicInfoHeader(name string, size int64, fileInfo *winio.FileBasicInfo) *ta
 // MSWINDOWS.rawsd: The Win32 security descriptor, in raw binary format
 //
 // MSWINDOWS.mountpoint: If present, this is a mount point and not a symlink, even though the type is '2' (symlink)
-func WriteTarFileFromBackupStream(t *tar.Writer, r io.Reader, name string, size int64, fileInfo *winio.FileBasicInfo) error ***REMOVED***
+func WriteTarFileFromBackupStream(t *tar.Writer, r io.Reader, name string, size int64, fileInfo *winio.FileBasicInfo) error {
 	name = filepath.ToSlash(name)
 	hdr := BasicInfoHeader(name, size, fileInfo)
 
@@ -128,33 +128,33 @@ func WriteTarFileFromBackupStream(t *tar.Writer, r io.Reader, name string, size 
 		err        error
 	)
 	sr, readTwice := r.(io.Seeker)
-	if readTwice ***REMOVED***
-		if restartPos, err = sr.Seek(0, io.SeekCurrent); err != nil ***REMOVED***
+	if readTwice {
+		if restartPos, err = sr.Seek(0, io.SeekCurrent); err != nil {
 			readTwice = false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	br := winio.NewBackupStreamReader(r)
 	var dataHdr *winio.BackupHeader
-	for dataHdr == nil ***REMOVED***
+	for dataHdr == nil {
 		bhdr, err := br.Next()
-		if err == io.EOF ***REMOVED***
+		if err == io.EOF {
 			break
-		***REMOVED***
-		if err != nil ***REMOVED***
+		}
+		if err != nil {
 			return err
-		***REMOVED***
-		switch bhdr.Id ***REMOVED***
+		}
+		switch bhdr.Id {
 		case winio.BackupData:
 			hdr.Mode |= c_ISREG
-			if !readTwice ***REMOVED***
+			if !readTwice {
 				dataHdr = bhdr
-			***REMOVED***
+			}
 		case winio.BackupSecurity:
 			sd, err := ioutil.ReadAll(br)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
+			}
 			hdr.Winheaders[hdrRawSecurityDescriptor] = base64.StdEncoding.EncodeToString(sd)
 
 		case winio.BackupReparseData:
@@ -162,98 +162,98 @@ func WriteTarFileFromBackupStream(t *tar.Writer, r io.Reader, name string, size 
 			hdr.Typeflag = tar.TypeSymlink
 			reparseBuffer, err := ioutil.ReadAll(br)
 			rp, err := winio.DecodeReparsePoint(reparseBuffer)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if rp.IsMountPoint ***REMOVED***
+			}
+			if rp.IsMountPoint {
 				hdr.Winheaders[hdrMountPoint] = "1"
-			***REMOVED***
+			}
 			hdr.Linkname = rp.Target
 
 		case winio.BackupEaData:
 			eab, err := ioutil.ReadAll(br)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
+			}
 			eas, err := winio.DecodeExtendedAttributes(eab)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			for _, ea := range eas ***REMOVED***
+			}
+			for _, ea := range eas {
 				// Use base64 encoding for the binary value. Note that there
 				// is no way to encode the EA's flags, since their use doesn't
 				// make any sense for persisted EAs.
 				hdr.Winheaders[hdrEaPrefix+ea.Name] = base64.StdEncoding.EncodeToString(ea.Value)
-			***REMOVED***
+			}
 
 		case winio.BackupAlternateData, winio.BackupLink, winio.BackupPropertyData, winio.BackupObjectId, winio.BackupTxfsData:
 			// ignore these streams
 		default:
 			return fmt.Errorf("%s: unknown stream ID %d", name, bhdr.Id)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	err = t.WriteHeader(hdr)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if readTwice ***REMOVED***
+	if readTwice {
 		// Get back to the data stream.
-		if _, err = sr.Seek(restartPos, io.SeekStart); err != nil ***REMOVED***
+		if _, err = sr.Seek(restartPos, io.SeekStart); err != nil {
 			return err
-		***REMOVED***
-		for dataHdr == nil ***REMOVED***
+		}
+		for dataHdr == nil {
 			bhdr, err := br.Next()
-			if err == io.EOF ***REMOVED***
+			if err == io.EOF {
 				break
-			***REMOVED***
-			if err != nil ***REMOVED***
+			}
+			if err != nil {
 				return err
-			***REMOVED***
-			if bhdr.Id == winio.BackupData ***REMOVED***
+			}
+			if bhdr.Id == winio.BackupData {
 				dataHdr = bhdr
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
-	if dataHdr != nil ***REMOVED***
+	if dataHdr != nil {
 		// A data stream was found. Copy the data.
-		if (dataHdr.Attributes & winio.StreamSparseAttributes) == 0 ***REMOVED***
-			if size != dataHdr.Size ***REMOVED***
+		if (dataHdr.Attributes & winio.StreamSparseAttributes) == 0 {
+			if size != dataHdr.Size {
 				return fmt.Errorf("%s: mismatch between file size %d and header size %d", name, size, dataHdr.Size)
-			***REMOVED***
+			}
 			_, err = io.Copy(t, br)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
+			}
+		} else {
 			err = copySparse(t, br)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	// Look for streams after the data stream. The only ones we handle are alternate data streams.
 	// Other streams may have metadata that could be serialized, but the tar header has already
 	// been written. In practice, this means that we don't get EA or TXF metadata.
-	for ***REMOVED***
+	for {
 		bhdr, err := br.Next()
-		if err == io.EOF ***REMOVED***
+		if err == io.EOF {
 			break
-		***REMOVED***
-		if err != nil ***REMOVED***
+		}
+		if err != nil {
 			return err
-		***REMOVED***
-		switch bhdr.Id ***REMOVED***
+		}
+		switch bhdr.Id {
 		case winio.BackupAlternateData:
 			altName := bhdr.Name
-			if strings.HasSuffix(altName, ":$DATA") ***REMOVED***
+			if strings.HasSuffix(altName, ":$DATA") {
 				altName = altName[:len(altName)-len(":$DATA")]
-			***REMOVED***
-			if (bhdr.Attributes & winio.StreamSparseAttributes) == 0 ***REMOVED***
-				hdr = &tar.Header***REMOVED***
+			}
+			if (bhdr.Attributes & winio.StreamSparseAttributes) == 0 {
+				hdr = &tar.Header{
 					Name:       name + altName,
 					Mode:       hdr.Mode,
 					Typeflag:   tar.TypeReg,
@@ -261,179 +261,179 @@ func WriteTarFileFromBackupStream(t *tar.Writer, r io.Reader, name string, size 
 					ModTime:    hdr.ModTime,
 					AccessTime: hdr.AccessTime,
 					ChangeTime: hdr.ChangeTime,
-				***REMOVED***
+				}
 				err = t.WriteHeader(hdr)
-				if err != nil ***REMOVED***
+				if err != nil {
 					return err
-				***REMOVED***
+				}
 				_, err = io.Copy(t, br)
-				if err != nil ***REMOVED***
+				if err != nil {
 					return err
-				***REMOVED***
+				}
 
-			***REMOVED*** else ***REMOVED***
+			} else {
 				// Unsupported for now, since the size of the alternate stream is not present
 				// in the backup stream until after the data has been read.
 				return errors.New("tar of sparse alternate data streams is unsupported")
-			***REMOVED***
+			}
 		case winio.BackupEaData, winio.BackupLink, winio.BackupPropertyData, winio.BackupObjectId, winio.BackupTxfsData:
 			// ignore these streams
 		default:
 			return fmt.Errorf("%s: unknown stream ID %d after data", name, bhdr.Id)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
 // FileInfoFromHeader retrieves basic Win32 file information from a tar header, using the additional metadata written by
 // WriteTarFileFromBackupStream.
-func FileInfoFromHeader(hdr *tar.Header) (name string, size int64, fileInfo *winio.FileBasicInfo, err error) ***REMOVED***
+func FileInfoFromHeader(hdr *tar.Header) (name string, size int64, fileInfo *winio.FileBasicInfo, err error) {
 	name = hdr.Name
-	if hdr.Typeflag == tar.TypeReg || hdr.Typeflag == tar.TypeRegA ***REMOVED***
+	if hdr.Typeflag == tar.TypeReg || hdr.Typeflag == tar.TypeRegA {
 		size = hdr.Size
-	***REMOVED***
-	fileInfo = &winio.FileBasicInfo***REMOVED***
+	}
+	fileInfo = &winio.FileBasicInfo{
 		LastAccessTime: syscall.NsecToFiletime(hdr.AccessTime.UnixNano()),
 		LastWriteTime:  syscall.NsecToFiletime(hdr.ModTime.UnixNano()),
 		ChangeTime:     syscall.NsecToFiletime(hdr.ChangeTime.UnixNano()),
 		CreationTime:   syscall.NsecToFiletime(hdr.CreationTime.UnixNano()),
-	***REMOVED***
-	if attrStr, ok := hdr.Winheaders[hdrFileAttributes]; ok ***REMOVED***
+	}
+	if attrStr, ok := hdr.Winheaders[hdrFileAttributes]; ok {
 		attr, err := strconv.ParseUint(attrStr, 10, 32)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return "", 0, nil, err
-		***REMOVED***
+		}
 		fileInfo.FileAttributes = uintptr(attr)
-	***REMOVED*** else ***REMOVED***
-		if hdr.Typeflag == tar.TypeDir ***REMOVED***
+	} else {
+		if hdr.Typeflag == tar.TypeDir {
 			fileInfo.FileAttributes |= syscall.FILE_ATTRIBUTE_DIRECTORY
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}
 
 // WriteBackupStreamFromTarFile writes a Win32 backup stream from the current tar file. Since this function may process multiple
 // tar file entries in order to collect all the alternate data streams for the file, it returns the next
 // tar file that was not processed, or io.EOF is there are no more.
-func WriteBackupStreamFromTarFile(w io.Writer, t *tar.Reader, hdr *tar.Header) (*tar.Header, error) ***REMOVED***
+func WriteBackupStreamFromTarFile(w io.Writer, t *tar.Reader, hdr *tar.Header) (*tar.Header, error) {
 	bw := winio.NewBackupStreamWriter(w)
 	var sd []byte
 	var err error
 	// Maintaining old SDDL-based behavior for backward compatibility.  All new tar headers written
 	// by this library will have raw binary for the security descriptor.
-	if sddl, ok := hdr.Winheaders[hdrSecurityDescriptor]; ok ***REMOVED***
+	if sddl, ok := hdr.Winheaders[hdrSecurityDescriptor]; ok {
 		sd, err = winio.SddlToSecurityDescriptor(sddl)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
-	if sdraw, ok := hdr.Winheaders[hdrRawSecurityDescriptor]; ok ***REMOVED***
+		}
+	}
+	if sdraw, ok := hdr.Winheaders[hdrRawSecurityDescriptor]; ok {
 		sd, err = base64.StdEncoding.DecodeString(sdraw)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
-	if len(sd) != 0 ***REMOVED***
-		bhdr := winio.BackupHeader***REMOVED***
+		}
+	}
+	if len(sd) != 0 {
+		bhdr := winio.BackupHeader{
 			Id:   winio.BackupSecurity,
 			Size: int64(len(sd)),
-		***REMOVED***
+		}
 		err := bw.WriteHeader(&bhdr)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		_, err = bw.Write(sd)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	var eas []winio.ExtendedAttribute
-	for k, v := range hdr.Winheaders ***REMOVED***
-		if !strings.HasPrefix(k, hdrEaPrefix) ***REMOVED***
+	for k, v := range hdr.Winheaders {
+		if !strings.HasPrefix(k, hdrEaPrefix) {
 			continue
-		***REMOVED***
+		}
 		data, err := base64.StdEncoding.DecodeString(v)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-		eas = append(eas, winio.ExtendedAttribute***REMOVED***
+		}
+		eas = append(eas, winio.ExtendedAttribute{
 			Name:  k[len(hdrEaPrefix):],
 			Value: data,
-		***REMOVED***)
-	***REMOVED***
-	if len(eas) != 0 ***REMOVED***
+		})
+	}
+	if len(eas) != 0 {
 		eadata, err := winio.EncodeExtendedAttributes(eas)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-		bhdr := winio.BackupHeader***REMOVED***
+		}
+		bhdr := winio.BackupHeader{
 			Id:   winio.BackupEaData,
 			Size: int64(len(eadata)),
-		***REMOVED***
+		}
 		err = bw.WriteHeader(&bhdr)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		_, err = bw.Write(eadata)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
-	if hdr.Typeflag == tar.TypeSymlink ***REMOVED***
+		}
+	}
+	if hdr.Typeflag == tar.TypeSymlink {
 		_, isMountPoint := hdr.Winheaders[hdrMountPoint]
-		rp := winio.ReparsePoint***REMOVED***
+		rp := winio.ReparsePoint{
 			Target:       filepath.FromSlash(hdr.Linkname),
 			IsMountPoint: isMountPoint,
-		***REMOVED***
+		}
 		reparse := winio.EncodeReparsePoint(&rp)
-		bhdr := winio.BackupHeader***REMOVED***
+		bhdr := winio.BackupHeader{
 			Id:   winio.BackupReparseData,
 			Size: int64(len(reparse)),
-		***REMOVED***
+		}
 		err := bw.WriteHeader(&bhdr)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		_, err = bw.Write(reparse)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
-	if hdr.Typeflag == tar.TypeReg || hdr.Typeflag == tar.TypeRegA ***REMOVED***
-		bhdr := winio.BackupHeader***REMOVED***
+		}
+	}
+	if hdr.Typeflag == tar.TypeReg || hdr.Typeflag == tar.TypeRegA {
+		bhdr := winio.BackupHeader{
 			Id:   winio.BackupData,
 			Size: hdr.Size,
-		***REMOVED***
+		}
 		err := bw.WriteHeader(&bhdr)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		_, err = io.Copy(bw, t)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	// Copy all the alternate data streams and return the next non-ADS header.
-	for ***REMOVED***
+	for {
 		ahdr, err := t.Next()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-		if ahdr.Typeflag != tar.TypeReg || !strings.HasPrefix(ahdr.Name, hdr.Name+":") ***REMOVED***
+		}
+		if ahdr.Typeflag != tar.TypeReg || !strings.HasPrefix(ahdr.Name, hdr.Name+":") {
 			return ahdr, nil
-		***REMOVED***
-		bhdr := winio.BackupHeader***REMOVED***
+		}
+		bhdr := winio.BackupHeader{
 			Id:   winio.BackupAlternateData,
 			Size: ahdr.Size,
 			Name: ahdr.Name[len(hdr.Name):] + ":$DATA",
-		***REMOVED***
+		}
 		err = bw.WriteHeader(&bhdr)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		_, err = io.Copy(bw, t)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

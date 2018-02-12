@@ -13,7 +13,7 @@ const (
 	testToken   = "TEST_TOKEN"
 )
 
-func TestRTMSingleConnect(t *testing.T) ***REMOVED***
+func TestRTMSingleConnect(t *testing.T) {
 	// Set up the test server.
 	testServer := slacktest.NewTestServer()
 	go testServer.Start()
@@ -25,38 +25,38 @@ func TestRTMSingleConnect(t *testing.T) ***REMOVED***
 	go rtm.ManageConnection()
 
 	// Observe incoming messages.
-	done := make(chan struct***REMOVED******REMOVED***)
+	done := make(chan struct{})
 	connectingReceived := false
 	connectedReceived := false
 	testMessageReceived := false
-	go func() ***REMOVED***
-		for msg := range rtm.IncomingEvents ***REMOVED***
-			switch ev := msg.Data.(type) ***REMOVED***
+	go func() {
+		for msg := range rtm.IncomingEvents {
+			switch ev := msg.Data.(type) {
 			case *slack.ConnectingEvent:
-				if connectingReceived ***REMOVED***
+				if connectingReceived {
 					t.Error("Received multiple connecting events.")
 					t.Fail()
-				***REMOVED***
+				}
 				connectingReceived = true
 			case *slack.ConnectedEvent:
-				if connectedReceived ***REMOVED***
+				if connectedReceived {
 					t.Error("Received multiple connected events.")
 					t.Fail()
-				***REMOVED***
+				}
 				connectedReceived = true
 			case *slack.MessageEvent:
-				if ev.Text == testMessage ***REMOVED***
+				if ev.Text == testMessage {
 					testMessageReceived = true
 					rtm.Disconnect()
-					done <- struct***REMOVED******REMOVED******REMOVED******REMOVED***
+					done <- struct{}{}
 					return
-				***REMOVED***
+				}
 				t.Logf("Discarding message with content %+v", ev)
 			default:
 				t.Logf("Discarded event of type '%s' with content '%#v'", msg.Type, ev)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***()
+			}
+		}
+	}()
 
 	// Send a message and sleep for some time to make sure the message can be processed client-side.
 	testServer.SendDirectMessageToBot(testMessage)
@@ -67,4 +67,4 @@ func TestRTMSingleConnect(t *testing.T) ***REMOVED***
 	assert.True(t, connectingReceived, "Should have received a connecting event from the RTM instance.")
 	assert.True(t, connectedReceived, "Should have received a connected event from the RTM instance.")
 	assert.True(t, testMessageReceived, "Should have received a test message from the server.")
-***REMOVED***
+}

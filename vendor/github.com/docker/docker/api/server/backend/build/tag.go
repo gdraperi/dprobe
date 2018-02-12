@@ -10,68 +10,68 @@ import (
 )
 
 // Tagger is responsible for tagging an image created by a builder
-type Tagger struct ***REMOVED***
+type Tagger struct {
 	imageComponent ImageComponent
 	stdout         io.Writer
 	repoAndTags    []reference.Named
-***REMOVED***
+}
 
 // NewTagger returns a new Tagger for tagging the images of a build.
 // If any of the names are invalid tags an error is returned.
-func NewTagger(backend ImageComponent, stdout io.Writer, names []string) (*Tagger, error) ***REMOVED***
+func NewTagger(backend ImageComponent, stdout io.Writer, names []string) (*Tagger, error) {
 	reposAndTags, err := sanitizeRepoAndTags(names)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	return &Tagger***REMOVED***
+	}
+	return &Tagger{
 		imageComponent: backend,
 		stdout:         stdout,
 		repoAndTags:    reposAndTags,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // TagImages creates image tags for the imageID
-func (bt *Tagger) TagImages(imageID image.ID) error ***REMOVED***
-	for _, rt := range bt.repoAndTags ***REMOVED***
-		if err := bt.imageComponent.TagImageWithReference(imageID, rt); err != nil ***REMOVED***
+func (bt *Tagger) TagImages(imageID image.ID) error {
+	for _, rt := range bt.repoAndTags {
+		if err := bt.imageComponent.TagImageWithReference(imageID, rt); err != nil {
 			return err
-		***REMOVED***
+		}
 		fmt.Fprintf(bt.stdout, "Successfully tagged %s\n", reference.FamiliarString(rt))
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // sanitizeRepoAndTags parses the raw "t" parameter received from the client
 // to a slice of repoAndTag.
 // It also validates each repoName and tag.
-func sanitizeRepoAndTags(names []string) ([]reference.Named, error) ***REMOVED***
+func sanitizeRepoAndTags(names []string) ([]reference.Named, error) {
 	var (
 		repoAndTags []reference.Named
 		// This map is used for deduplicating the "-t" parameter.
-		uniqNames = make(map[string]struct***REMOVED******REMOVED***)
+		uniqNames = make(map[string]struct{})
 	)
-	for _, repo := range names ***REMOVED***
-		if repo == "" ***REMOVED***
+	for _, repo := range names {
+		if repo == "" {
 			continue
-		***REMOVED***
+		}
 
 		ref, err := reference.ParseNormalizedNamed(repo)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 
-		if _, isCanonical := ref.(reference.Canonical); isCanonical ***REMOVED***
+		if _, isCanonical := ref.(reference.Canonical); isCanonical {
 			return nil, errors.New("build tag cannot contain a digest")
-		***REMOVED***
+		}
 
 		ref = reference.TagNameOnly(ref)
 
 		nameWithTag := ref.String()
 
-		if _, exists := uniqNames[nameWithTag]; !exists ***REMOVED***
-			uniqNames[nameWithTag] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
+		if _, exists := uniqNames[nameWithTag]; !exists {
+			uniqNames[nameWithTag] = struct{}{}
 			repoAndTags = append(repoAndTags, ref)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return repoAndTags, nil
-***REMOVED***
+}

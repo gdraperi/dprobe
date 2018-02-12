@@ -9,52 +9,52 @@ import (
 	"unsafe"
 )
 
-func (typ RIBType) parseable() bool ***REMOVED*** return true ***REMOVED***
+func (typ RIBType) parseable() bool { return true }
 
 // RouteMetrics represents route metrics.
-type RouteMetrics struct ***REMOVED***
+type RouteMetrics struct {
 	PathMTU int // path maximum transmission unit
-***REMOVED***
+}
 
 // SysType implements the SysType method of Sys interface.
-func (rmx *RouteMetrics) SysType() SysType ***REMOVED*** return SysMetrics ***REMOVED***
+func (rmx *RouteMetrics) SysType() SysType { return SysMetrics }
 
 // Sys implements the Sys method of Message interface.
-func (m *RouteMessage) Sys() []Sys ***REMOVED***
-	if kernelAlign == 8 ***REMOVED***
-		return []Sys***REMOVED***
-			&RouteMetrics***REMOVED***
+func (m *RouteMessage) Sys() []Sys {
+	if kernelAlign == 8 {
+		return []Sys{
+			&RouteMetrics{
 				PathMTU: int(nativeEndian.Uint64(m.raw[m.extOff+8 : m.extOff+16])),
-			***REMOVED***,
-		***REMOVED***
-	***REMOVED***
-	return []Sys***REMOVED***
-		&RouteMetrics***REMOVED***
+			},
+		}
+	}
+	return []Sys{
+		&RouteMetrics{
 			PathMTU: int(nativeEndian.Uint32(m.raw[m.extOff+4 : m.extOff+8])),
-		***REMOVED***,
-	***REMOVED***
-***REMOVED***
+		},
+	}
+}
 
 // InterfaceMetrics represents interface metrics.
-type InterfaceMetrics struct ***REMOVED***
+type InterfaceMetrics struct {
 	Type int // interface type
 	MTU  int // maximum transmission unit
-***REMOVED***
+}
 
 // SysType implements the SysType method of Sys interface.
-func (imx *InterfaceMetrics) SysType() SysType ***REMOVED*** return SysMetrics ***REMOVED***
+func (imx *InterfaceMetrics) SysType() SysType { return SysMetrics }
 
 // Sys implements the Sys method of Message interface.
-func (m *InterfaceMessage) Sys() []Sys ***REMOVED***
-	return []Sys***REMOVED***
-		&InterfaceMetrics***REMOVED***
+func (m *InterfaceMessage) Sys() []Sys {
+	return []Sys{
+		&InterfaceMetrics{
 			Type: int(m.raw[m.extOff]),
 			MTU:  int(nativeEndian.Uint32(m.raw[m.extOff+8 : m.extOff+12])),
-		***REMOVED***,
-	***REMOVED***
-***REMOVED***
+		},
+	}
+}
 
-func probeRoutingStack() (int, map[int]*wireFormat) ***REMOVED***
+func probeRoutingStack() (int, map[int]*wireFormat) {
 	var p uintptr
 	wordSize := int(unsafe.Sizeof(p))
 	align := int(unsafe.Sizeof(p))
@@ -63,79 +63,79 @@ func probeRoutingStack() (int, map[int]*wireFormat) ***REMOVED***
 	// alignment for routing facilities are set at the build time
 	// of the kernel.
 	conf, _ := syscall.Sysctl("kern.conftxt")
-	for i, j := 0, 0; j < len(conf); j++ ***REMOVED***
-		if conf[j] != '\n' ***REMOVED***
+	for i, j := 0, 0; j < len(conf); j++ {
+		if conf[j] != '\n' {
 			continue
-		***REMOVED***
+		}
 		s := conf[i:j]
 		i = j + 1
-		if len(s) > len("machine") && s[:len("machine")] == "machine" ***REMOVED***
+		if len(s) > len("machine") && s[:len("machine")] == "machine" {
 			s = s[len("machine"):]
-			for k := 0; k < len(s); k++ ***REMOVED***
-				if s[k] == ' ' || s[k] == '\t' ***REMOVED***
+			for k := 0; k < len(s); k++ {
+				if s[k] == ' ' || s[k] == '\t' {
 					s = s[1:]
-				***REMOVED***
+				}
 				break
-			***REMOVED***
-			if s == "amd64" ***REMOVED***
+			}
+			if s == "amd64" {
 				align = 8
-			***REMOVED***
+			}
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	var rtm, ifm, ifam, ifmam, ifanm *wireFormat
-	if align != wordSize ***REMOVED*** // 386 emulation on amd64
-		rtm = &wireFormat***REMOVED***extOff: sizeofRtMsghdrFreeBSD10Emu - sizeofRtMetricsFreeBSD10Emu, bodyOff: sizeofRtMsghdrFreeBSD10Emu***REMOVED***
-		ifm = &wireFormat***REMOVED***extOff: 16***REMOVED***
-		ifam = &wireFormat***REMOVED***extOff: sizeofIfaMsghdrFreeBSD10Emu, bodyOff: sizeofIfaMsghdrFreeBSD10Emu***REMOVED***
-		ifmam = &wireFormat***REMOVED***extOff: sizeofIfmaMsghdrFreeBSD10Emu, bodyOff: sizeofIfmaMsghdrFreeBSD10Emu***REMOVED***
-		ifanm = &wireFormat***REMOVED***extOff: sizeofIfAnnouncemsghdrFreeBSD10Emu, bodyOff: sizeofIfAnnouncemsghdrFreeBSD10Emu***REMOVED***
-	***REMOVED*** else ***REMOVED***
-		rtm = &wireFormat***REMOVED***extOff: sizeofRtMsghdrFreeBSD10 - sizeofRtMetricsFreeBSD10, bodyOff: sizeofRtMsghdrFreeBSD10***REMOVED***
-		ifm = &wireFormat***REMOVED***extOff: 16***REMOVED***
-		ifam = &wireFormat***REMOVED***extOff: sizeofIfaMsghdrFreeBSD10, bodyOff: sizeofIfaMsghdrFreeBSD10***REMOVED***
-		ifmam = &wireFormat***REMOVED***extOff: sizeofIfmaMsghdrFreeBSD10, bodyOff: sizeofIfmaMsghdrFreeBSD10***REMOVED***
-		ifanm = &wireFormat***REMOVED***extOff: sizeofIfAnnouncemsghdrFreeBSD10, bodyOff: sizeofIfAnnouncemsghdrFreeBSD10***REMOVED***
-	***REMOVED***
+	if align != wordSize { // 386 emulation on amd64
+		rtm = &wireFormat{extOff: sizeofRtMsghdrFreeBSD10Emu - sizeofRtMetricsFreeBSD10Emu, bodyOff: sizeofRtMsghdrFreeBSD10Emu}
+		ifm = &wireFormat{extOff: 16}
+		ifam = &wireFormat{extOff: sizeofIfaMsghdrFreeBSD10Emu, bodyOff: sizeofIfaMsghdrFreeBSD10Emu}
+		ifmam = &wireFormat{extOff: sizeofIfmaMsghdrFreeBSD10Emu, bodyOff: sizeofIfmaMsghdrFreeBSD10Emu}
+		ifanm = &wireFormat{extOff: sizeofIfAnnouncemsghdrFreeBSD10Emu, bodyOff: sizeofIfAnnouncemsghdrFreeBSD10Emu}
+	} else {
+		rtm = &wireFormat{extOff: sizeofRtMsghdrFreeBSD10 - sizeofRtMetricsFreeBSD10, bodyOff: sizeofRtMsghdrFreeBSD10}
+		ifm = &wireFormat{extOff: 16}
+		ifam = &wireFormat{extOff: sizeofIfaMsghdrFreeBSD10, bodyOff: sizeofIfaMsghdrFreeBSD10}
+		ifmam = &wireFormat{extOff: sizeofIfmaMsghdrFreeBSD10, bodyOff: sizeofIfmaMsghdrFreeBSD10}
+		ifanm = &wireFormat{extOff: sizeofIfAnnouncemsghdrFreeBSD10, bodyOff: sizeofIfAnnouncemsghdrFreeBSD10}
+	}
 	rel, _ := syscall.SysctlUint32("kern.osreldate")
-	switch ***REMOVED***
+	switch {
 	case rel < 800000:
-		if align != wordSize ***REMOVED*** // 386 emulation on amd64
+		if align != wordSize { // 386 emulation on amd64
 			ifm.bodyOff = sizeofIfMsghdrFreeBSD7Emu
-		***REMOVED*** else ***REMOVED***
+		} else {
 			ifm.bodyOff = sizeofIfMsghdrFreeBSD7
-		***REMOVED***
+		}
 	case 800000 <= rel && rel < 900000:
-		if align != wordSize ***REMOVED*** // 386 emulation on amd64
+		if align != wordSize { // 386 emulation on amd64
 			ifm.bodyOff = sizeofIfMsghdrFreeBSD8Emu
-		***REMOVED*** else ***REMOVED***
+		} else {
 			ifm.bodyOff = sizeofIfMsghdrFreeBSD8
-		***REMOVED***
+		}
 	case 900000 <= rel && rel < 1000000:
-		if align != wordSize ***REMOVED*** // 386 emulation on amd64
+		if align != wordSize { // 386 emulation on amd64
 			ifm.bodyOff = sizeofIfMsghdrFreeBSD9Emu
-		***REMOVED*** else ***REMOVED***
+		} else {
 			ifm.bodyOff = sizeofIfMsghdrFreeBSD9
-		***REMOVED***
+		}
 	case 1000000 <= rel && rel < 1100000:
-		if align != wordSize ***REMOVED*** // 386 emulation on amd64
+		if align != wordSize { // 386 emulation on amd64
 			ifm.bodyOff = sizeofIfMsghdrFreeBSD10Emu
-		***REMOVED*** else ***REMOVED***
+		} else {
 			ifm.bodyOff = sizeofIfMsghdrFreeBSD10
-		***REMOVED***
+		}
 	default:
-		if align != wordSize ***REMOVED*** // 386 emulation on amd64
+		if align != wordSize { // 386 emulation on amd64
 			ifm.bodyOff = sizeofIfMsghdrFreeBSD11Emu
-		***REMOVED*** else ***REMOVED***
+		} else {
 			ifm.bodyOff = sizeofIfMsghdrFreeBSD11
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	rtm.parse = rtm.parseRouteMessage
 	ifm.parse = ifm.parseInterfaceMessage
 	ifam.parse = ifam.parseInterfaceAddrMessage
 	ifmam.parse = ifmam.parseInterfaceMulticastAddrMessage
 	ifanm.parse = ifanm.parseInterfaceAnnounceMessage
-	return align, map[int]*wireFormat***REMOVED***
+	return align, map[int]*wireFormat{
 		sysRTM_ADD:        rtm,
 		sysRTM_DELETE:     rtm,
 		sysRTM_CHANGE:     rtm,
@@ -151,5 +151,5 @@ func probeRoutingStack() (int, map[int]*wireFormat) ***REMOVED***
 		sysRTM_NEWMADDR:   ifmam,
 		sysRTM_DELMADDR:   ifmam,
 		sysRTM_IFANNOUNCE: ifanm,
-	***REMOVED***
-***REMOVED***
+	}
+}

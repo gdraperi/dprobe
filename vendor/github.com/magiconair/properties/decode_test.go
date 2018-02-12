@@ -10,8 +10,8 @@ import (
 	"time"
 )
 
-func TestDecodeValues(t *testing.T) ***REMOVED***
-	type S struct ***REMOVED***
+func TestDecodeValues(t *testing.T) {
+	type S struct {
 		S   string
 		BT  bool
 		BF  bool
@@ -29,7 +29,7 @@ func TestDecodeValues(t *testing.T) ***REMOVED***
 		F64 float64
 		D   time.Duration
 		TM  time.Time
-	***REMOVED***
+	}
 	in := `
 	S=abc
 	BT=true
@@ -49,7 +49,7 @@ func TestDecodeValues(t *testing.T) ***REMOVED***
 	D=5s
 	TM=2015-01-02T12:34:56Z
 	`
-	out := &S***REMOVED***
+	out := &S{
 		S:   "abc",
 		BT:  true,
 		BF:  false,
@@ -67,12 +67,12 @@ func TestDecodeValues(t *testing.T) ***REMOVED***
 		F64: 6.4,
 		D:   5 * time.Second,
 		TM:  tm(t, time.RFC3339, "2015-01-02T12:34:56Z"),
-	***REMOVED***
-	testDecode(t, in, &S***REMOVED******REMOVED***, out)
-***REMOVED***
+	}
+	testDecode(t, in, &S{}, out)
+}
 
-func TestDecodeValueDefaults(t *testing.T) ***REMOVED***
-	type S struct ***REMOVED***
+func TestDecodeValueDefaults(t *testing.T) {
+	type S struct {
 		S   string        `properties:",default=abc"`
 		BT  bool          `properties:",default=true"`
 		BF  bool          `properties:",default=false"`
@@ -90,8 +90,8 @@ func TestDecodeValueDefaults(t *testing.T) ***REMOVED***
 		F64 float64       `properties:",default=6.4"`
 		D   time.Duration `properties:",default=5s"`
 		TM  time.Time     `properties:",default=2015-01-02T12:34:56Z"`
-	***REMOVED***
-	out := &S***REMOVED***
+	}
+	out := &S{
 		S:   "abc",
 		BT:  true,
 		BF:  false,
@@ -109,12 +109,12 @@ func TestDecodeValueDefaults(t *testing.T) ***REMOVED***
 		F64: 6.4,
 		D:   5 * time.Second,
 		TM:  tm(t, time.RFC3339, "2015-01-02T12:34:56Z"),
-	***REMOVED***
-	testDecode(t, "", &S***REMOVED******REMOVED***, out)
-***REMOVED***
+	}
+	testDecode(t, "", &S{}, out)
+}
 
-func TestDecodeArrays(t *testing.T) ***REMOVED***
-	type S struct ***REMOVED***
+func TestDecodeArrays(t *testing.T) {
+	type S struct {
 		S   []string
 		B   []bool
 		I   []int
@@ -131,7 +131,7 @@ func TestDecodeArrays(t *testing.T) ***REMOVED***
 		F64 []float64
 		D   []time.Duration
 		TM  []time.Time
-	***REMOVED***
+	}
 	in := `
 	S=a;b
 	B=true;false
@@ -150,29 +150,29 @@ func TestDecodeArrays(t *testing.T) ***REMOVED***
 	D=4s;5s
 	TM=2015-01-01T00:00:00Z;2016-01-01T00:00:00Z
 	`
-	out := &S***REMOVED***
-		S:   []string***REMOVED***"a", "b"***REMOVED***,
-		B:   []bool***REMOVED***true, false***REMOVED***,
-		I:   []int***REMOVED***-1, -2***REMOVED***,
-		I8:  []int8***REMOVED***-8, -9***REMOVED***,
-		I16: []int16***REMOVED***-16, -17***REMOVED***,
-		I32: []int32***REMOVED***-32, -33***REMOVED***,
-		I64: []int64***REMOVED***-64, -65***REMOVED***,
-		U:   []uint***REMOVED***1, 2***REMOVED***,
-		U8:  []uint8***REMOVED***8, 9***REMOVED***,
-		U16: []uint16***REMOVED***16, 17***REMOVED***,
-		U32: []uint32***REMOVED***32, 33***REMOVED***,
-		U64: []uint64***REMOVED***64, 65***REMOVED***,
-		F32: []float32***REMOVED***3.2, 3.3***REMOVED***,
-		F64: []float64***REMOVED***6.4, 6.5***REMOVED***,
-		D:   []time.Duration***REMOVED***4 * time.Second, 5 * time.Second***REMOVED***,
-		TM:  []time.Time***REMOVED***tm(t, time.RFC3339, "2015-01-01T00:00:00Z"), tm(t, time.RFC3339, "2016-01-01T00:00:00Z")***REMOVED***,
-	***REMOVED***
-	testDecode(t, in, &S***REMOVED******REMOVED***, out)
-***REMOVED***
+	out := &S{
+		S:   []string{"a", "b"},
+		B:   []bool{true, false},
+		I:   []int{-1, -2},
+		I8:  []int8{-8, -9},
+		I16: []int16{-16, -17},
+		I32: []int32{-32, -33},
+		I64: []int64{-64, -65},
+		U:   []uint{1, 2},
+		U8:  []uint8{8, 9},
+		U16: []uint16{16, 17},
+		U32: []uint32{32, 33},
+		U64: []uint64{64, 65},
+		F32: []float32{3.2, 3.3},
+		F64: []float64{6.4, 6.5},
+		D:   []time.Duration{4 * time.Second, 5 * time.Second},
+		TM:  []time.Time{tm(t, time.RFC3339, "2015-01-01T00:00:00Z"), tm(t, time.RFC3339, "2016-01-01T00:00:00Z")},
+	}
+	testDecode(t, in, &S{}, out)
+}
 
-func TestDecodeArrayDefaults(t *testing.T) ***REMOVED***
-	type S struct ***REMOVED***
+func TestDecodeArrayDefaults(t *testing.T) {
+	type S struct {
 		S   []string        `properties:",default=a;b"`
 		B   []bool          `properties:",default=true;false"`
 		I   []int           `properties:",default=-1;-2"`
@@ -189,73 +189,73 @@ func TestDecodeArrayDefaults(t *testing.T) ***REMOVED***
 		F64 []float64       `properties:",default=6.4;6.5"`
 		D   []time.Duration `properties:",default=4s;5s"`
 		TM  []time.Time     `properties:",default=2015-01-01T00:00:00Z;2016-01-01T00:00:00Z"`
-	***REMOVED***
-	out := &S***REMOVED***
-		S:   []string***REMOVED***"a", "b"***REMOVED***,
-		B:   []bool***REMOVED***true, false***REMOVED***,
-		I:   []int***REMOVED***-1, -2***REMOVED***,
-		I8:  []int8***REMOVED***-8, -9***REMOVED***,
-		I16: []int16***REMOVED***-16, -17***REMOVED***,
-		I32: []int32***REMOVED***-32, -33***REMOVED***,
-		I64: []int64***REMOVED***-64, -65***REMOVED***,
-		U:   []uint***REMOVED***1, 2***REMOVED***,
-		U8:  []uint8***REMOVED***8, 9***REMOVED***,
-		U16: []uint16***REMOVED***16, 17***REMOVED***,
-		U32: []uint32***REMOVED***32, 33***REMOVED***,
-		U64: []uint64***REMOVED***64, 65***REMOVED***,
-		F32: []float32***REMOVED***3.2, 3.3***REMOVED***,
-		F64: []float64***REMOVED***6.4, 6.5***REMOVED***,
-		D:   []time.Duration***REMOVED***4 * time.Second, 5 * time.Second***REMOVED***,
-		TM:  []time.Time***REMOVED***tm(t, time.RFC3339, "2015-01-01T00:00:00Z"), tm(t, time.RFC3339, "2016-01-01T00:00:00Z")***REMOVED***,
-	***REMOVED***
-	testDecode(t, "", &S***REMOVED******REMOVED***, out)
-***REMOVED***
+	}
+	out := &S{
+		S:   []string{"a", "b"},
+		B:   []bool{true, false},
+		I:   []int{-1, -2},
+		I8:  []int8{-8, -9},
+		I16: []int16{-16, -17},
+		I32: []int32{-32, -33},
+		I64: []int64{-64, -65},
+		U:   []uint{1, 2},
+		U8:  []uint8{8, 9},
+		U16: []uint16{16, 17},
+		U32: []uint32{32, 33},
+		U64: []uint64{64, 65},
+		F32: []float32{3.2, 3.3},
+		F64: []float64{6.4, 6.5},
+		D:   []time.Duration{4 * time.Second, 5 * time.Second},
+		TM:  []time.Time{tm(t, time.RFC3339, "2015-01-01T00:00:00Z"), tm(t, time.RFC3339, "2016-01-01T00:00:00Z")},
+	}
+	testDecode(t, "", &S{}, out)
+}
 
-func TestDecodeSkipUndef(t *testing.T) ***REMOVED***
-	type S struct ***REMOVED***
+func TestDecodeSkipUndef(t *testing.T) {
+	type S struct {
 		X     string `properties:"-"`
 		Undef string `properties:",default=some value"`
-	***REMOVED***
+	}
 	in := `X=ignore`
-	out := &S***REMOVED***"", "some value"***REMOVED***
-	testDecode(t, in, &S***REMOVED******REMOVED***, out)
-***REMOVED***
+	out := &S{"", "some value"}
+	testDecode(t, in, &S{}, out)
+}
 
-func TestDecodeStruct(t *testing.T) ***REMOVED***
-	type A struct ***REMOVED***
+func TestDecodeStruct(t *testing.T) {
+	type A struct {
 		S string
 		T string `properties:"t"`
 		U string `properties:"u,default=uuu"`
-	***REMOVED***
-	type S struct ***REMOVED***
+	}
+	type S struct {
 		A A
 		B A `properties:"b"`
-	***REMOVED***
+	}
 	in := `
 	A.S=sss
 	A.t=ttt
 	b.S=SSS
 	b.t=TTT
 	`
-	out := &S***REMOVED***
-		A***REMOVED***S: "sss", T: "ttt", U: "uuu"***REMOVED***,
-		A***REMOVED***S: "SSS", T: "TTT", U: "uuu"***REMOVED***,
-	***REMOVED***
-	testDecode(t, in, &S***REMOVED******REMOVED***, out)
-***REMOVED***
+	out := &S{
+		A{S: "sss", T: "ttt", U: "uuu"},
+		A{S: "SSS", T: "TTT", U: "uuu"},
+	}
+	testDecode(t, in, &S{}, out)
+}
 
-func TestDecodeMap(t *testing.T) ***REMOVED***
-	type S struct ***REMOVED***
+func TestDecodeMap(t *testing.T) {
+	type S struct {
 		A string `properties:"a"`
-	***REMOVED***
-	type X struct ***REMOVED***
+	}
+	type X struct {
 		A map[string]string
 		B map[string][]string
 		C map[string]map[string]string
 		D map[string]S
 		E map[string]int
 		F map[string]int `properties:"-"`
-	***REMOVED***
+	}
 	in := `
 	A.foo=bar
 	A.bar=bang
@@ -267,33 +267,33 @@ func TestDecodeMap(t *testing.T) ***REMOVED***
 	C.bar.four=4
 	D.foo.a=bar
 	`
-	out := &X***REMOVED***
-		A: map[string]string***REMOVED***"foo": "bar", "bar": "bang"***REMOVED***,
-		B: map[string][]string***REMOVED***"foo": []string***REMOVED***"a", "b", "c"***REMOVED***, "bar": []string***REMOVED***"1", "2", "3"***REMOVED******REMOVED***,
-		C: map[string]map[string]string***REMOVED***"foo": map[string]string***REMOVED***"one": "1", "two": "2"***REMOVED***, "bar": map[string]string***REMOVED***"three": "3", "four": "4"***REMOVED******REMOVED***,
-		D: map[string]S***REMOVED***"foo": S***REMOVED***"bar"***REMOVED******REMOVED***,
-		E: map[string]int***REMOVED******REMOVED***,
-	***REMOVED***
-	testDecode(t, in, &X***REMOVED******REMOVED***, out)
-***REMOVED***
+	out := &X{
+		A: map[string]string{"foo": "bar", "bar": "bang"},
+		B: map[string][]string{"foo": []string{"a", "b", "c"}, "bar": []string{"1", "2", "3"}},
+		C: map[string]map[string]string{"foo": map[string]string{"one": "1", "two": "2"}, "bar": map[string]string{"three": "3", "four": "4"}},
+		D: map[string]S{"foo": S{"bar"}},
+		E: map[string]int{},
+	}
+	testDecode(t, in, &X{}, out)
+}
 
-func testDecode(t *testing.T, in string, v, out interface***REMOVED******REMOVED***) ***REMOVED***
+func testDecode(t *testing.T, in string, v, out interface{}) {
 	p, err := parse(in)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("got %v want nil", err)
-	***REMOVED***
-	if err := p.Decode(v); err != nil ***REMOVED***
+	}
+	if err := p.Decode(v); err != nil {
 		t.Fatalf("got %v want nil", err)
-	***REMOVED***
-	if got, want := v, out; !reflect.DeepEqual(got, want) ***REMOVED***
+	}
+	if got, want := v, out; !reflect.DeepEqual(got, want) {
 		t.Fatalf("\ngot  %+v\nwant %+v", got, want)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func tm(t *testing.T, layout, s string) time.Time ***REMOVED***
+func tm(t *testing.T, layout, s string) time.Time {
 	tm, err := time.Parse(layout, s)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("got %v want nil", err)
-	***REMOVED***
+	}
 	return tm
-***REMOVED***
+}

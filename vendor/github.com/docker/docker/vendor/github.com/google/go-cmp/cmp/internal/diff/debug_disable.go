@@ -8,10 +8,10 @@ package diff
 
 var debug debugger
 
-type debugger struct***REMOVED******REMOVED***
+type debugger struct{}
 
-func (debugger) Begin(_, _ int, f EqualFunc, _, _ *EditScript) EqualFunc ***REMOVED***
+func (debugger) Begin(_, _ int, f EqualFunc, _, _ *EditScript) EqualFunc {
 	return f
-***REMOVED***
-func (debugger) Update() ***REMOVED******REMOVED***
-func (debugger) Finish() ***REMOVED******REMOVED***
+}
+func (debugger) Update() {}
+func (debugger) Finish() {}

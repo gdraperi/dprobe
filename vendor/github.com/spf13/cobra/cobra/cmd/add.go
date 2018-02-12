@@ -22,16 +22,16 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func init() ***REMOVED***
+func init() {
 	addCmd.Flags().StringVarP(&packageName, "package", "t", "", "target package name (e.g. github.com/spf13/hugo)")
 	addCmd.Flags().StringVarP(&parentName, "parent", "p", "rootCmd", "variable name of parent command for this command")
-***REMOVED***
+}
 
 var packageName, parentName string
 
-var addCmd = &cobra.Command***REMOVED***
+var addCmd = &cobra.Command{
 	Use:     "add [command name]",
-	Aliases: []string***REMOVED***"command"***REMOVED***,
+	Aliases: []string{"command"},
 	Short:   "Add a command to a Cobra Application",
 	Long: `Add (cobra add) will create a new command, with a license and
 the appropriate structure for a Cobra-based CLI application,
@@ -42,59 +42,59 @@ with an initial uppercase letter.
 
 Example: cobra add server -> resulting in a new cmd/server.go`,
 
-	Run: func(cmd *cobra.Command, args []string) ***REMOVED***
-		if len(args) < 1 ***REMOVED***
+	Run: func(cmd *cobra.Command, args []string) {
+		if len(args) < 1 {
 			er("add needs a name for the command")
-		***REMOVED***
+		}
 
 		var project *Project
-		if packageName != "" ***REMOVED***
+		if packageName != "" {
 			project = NewProject(packageName)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			wd, err := os.Getwd()
-			if err != nil ***REMOVED***
+			if err != nil {
 				er(err)
-			***REMOVED***
+			}
 			project = NewProjectFromPath(wd)
-		***REMOVED***
+		}
 
 		cmdName := validateCmdName(args[0])
 		cmdPath := filepath.Join(project.CmdPath(), cmdName+".go")
 		createCmdFile(project.License(), cmdPath, cmdName)
 
 		fmt.Fprintln(cmd.OutOrStdout(), cmdName, "created at", cmdPath)
-	***REMOVED***,
-***REMOVED***
+	},
+}
 
 // validateCmdName returns source without any dashes and underscore.
 // If there will be dash or underscore, next letter will be uppered.
 // It supports only ASCII (1-byte character) strings.
 // https://github.com/spf13/cobra/issues/269
-func validateCmdName(source string) string ***REMOVED***
+func validateCmdName(source string) string {
 	i := 0
 	l := len(source)
 	// The output is initialized on demand, then first dash or underscore
 	// occurs.
 	var output string
 
-	for i < l ***REMOVED***
-		if source[i] == '-' || source[i] == '_' ***REMOVED***
-			if output == "" ***REMOVED***
+	for i < l {
+		if source[i] == '-' || source[i] == '_' {
+			if output == "" {
 				output = source[:i]
-			***REMOVED***
+			}
 
 			// If it's last rune and it's dash or underscore,
 			// don't add it output and break the loop.
-			if i == l-1 ***REMOVED***
+			if i == l-1 {
 				break
-			***REMOVED***
+			}
 
 			// If next character is dash or underscore,
 			// just skip the current character.
-			if source[i+1] == '-' || source[i+1] == '_' ***REMOVED***
+			if source[i+1] == '-' || source[i+1] == '_' {
 				i++
 				continue
-			***REMOVED***
+			}
 
 			// If the current character is dash or underscore,
 			// upper next letter and add to output.
@@ -103,27 +103,27 @@ func validateCmdName(source string) string ***REMOVED***
 			// uppered character, so make i = i+2.
 			i += 2
 			continue
-		***REMOVED***
+		}
 
 		// If the current character isn't dash or underscore,
 		// just add it.
-		if output != "" ***REMOVED***
+		if output != "" {
 			output += string(source[i])
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
+	}
 
-	if output == "" ***REMOVED***
+	if output == "" {
 		return source // source is initially valid name.
-	***REMOVED***
+	}
 	return output
-***REMOVED***
+}
 
-func createCmdFile(license License, path, cmdName string) ***REMOVED***
-	template := `***REMOVED******REMOVED***comment .copyright***REMOVED******REMOVED***
-***REMOVED******REMOVED***if .license***REMOVED******REMOVED******REMOVED******REMOVED***comment .license***REMOVED******REMOVED******REMOVED******REMOVED***end***REMOVED******REMOVED***
+func createCmdFile(license License, path, cmdName string) {
+	template := `{{comment .copyright}}
+{{if .license}}{{comment .license}}{{end}}
 
-package ***REMOVED******REMOVED***.cmdPackage***REMOVED******REMOVED***
+package {{.cmdPackage}}
 
 import (
 	"fmt"
@@ -131,9 +131,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// ***REMOVED******REMOVED***.cmdName***REMOVED******REMOVED***Cmd represents the ***REMOVED******REMOVED***.cmdName***REMOVED******REMOVED*** command
-var ***REMOVED******REMOVED***.cmdName***REMOVED******REMOVED***Cmd = &cobra.Command***REMOVED***
-	Use:   "***REMOVED******REMOVED***.cmdName***REMOVED******REMOVED***",
+// {{.cmdName}}Cmd represents the {{.cmdName}} command
+var {{.cmdName}}Cmd = &cobra.Command{
+	Use:   "{{.cmdName}}",
 	Short: "A brief description of your command",
 	Long: ` + "`" + `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
@@ -141,27 +141,27 @@ and usage of using your command. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.` + "`" + `,
-	Run: func(cmd *cobra.Command, args []string) ***REMOVED***
-		fmt.Println("***REMOVED******REMOVED***.cmdName***REMOVED******REMOVED*** called")
-	***REMOVED***,
-***REMOVED***
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("{{.cmdName}} called")
+	},
+}
 
-func init() ***REMOVED***
-	***REMOVED******REMOVED***.parentName***REMOVED******REMOVED***.AddCommand(***REMOVED******REMOVED***.cmdName***REMOVED******REMOVED***Cmd)
+func init() {
+	{{.parentName}}.AddCommand({{.cmdName}}Cmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// ***REMOVED******REMOVED***.cmdName***REMOVED******REMOVED***Cmd.PersistentFlags().String("foo", "", "A help for foo")
+	// {{.cmdName}}Cmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// ***REMOVED******REMOVED***.cmdName***REMOVED******REMOVED***Cmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-***REMOVED***
+	// {{.cmdName}}Cmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+}
 `
 
-	data := make(map[string]interface***REMOVED******REMOVED***)
+	data := make(map[string]interface{})
 	data["copyright"] = copyrightLine()
 	data["license"] = license.Header
 	data["cmdPackage"] = filepath.Base(filepath.Dir(path)) // last dir of path
@@ -169,11 +169,11 @@ func init() ***REMOVED***
 	data["cmdName"] = cmdName
 
 	cmdScript, err := executeTemplate(template, data)
-	if err != nil ***REMOVED***
+	if err != nil {
 		er(err)
-	***REMOVED***
+	}
 	err = writeStringToFile(path, cmdScript)
-	if err != nil ***REMOVED***
+	if err != nil {
 		er(err)
-	***REMOVED***
-***REMOVED***
+	}
+}

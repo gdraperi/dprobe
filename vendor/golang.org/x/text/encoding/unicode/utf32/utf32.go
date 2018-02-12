@@ -22,11 +22,11 @@ import (
 )
 
 // All lists a configuration for each IANA-defined UTF-32 variant.
-var All = []encoding.Encoding***REMOVED***
+var All = []encoding.Encoding{
 	UTF32(BigEndian, UseBOM),
 	UTF32(BigEndian, IgnoreBOM),
 	UTF32(LittleEndian, IgnoreBOM),
-***REMOVED***
+}
 
 // ErrMissingBOM means that decoding UTF-32 input with ExpectBOM did not
 // find a starting byte order mark.
@@ -63,23 +63,23 @@ var ErrMissingBOM = errors.New("encoding: missing byte order mark")
 // IgnoreBOM corresponds to "Where the precise type of the data stream is
 // known... the BOM should not be used" and ExpectBOM corresponds to "A
 // particular protocol... may require use of the BOM".
-func UTF32(e Endianness, b BOMPolicy) encoding.Encoding ***REMOVED***
-	return utf32Encoding***REMOVED***config***REMOVED***e, b***REMOVED***, mibValue[e][b&bomMask]***REMOVED***
-***REMOVED***
+func UTF32(e Endianness, b BOMPolicy) encoding.Encoding {
+	return utf32Encoding{config{e, b}, mibValue[e][b&bomMask]}
+}
 
 // mibValue maps Endianness and BOMPolicy settings to MIB constants for UTF-32.
 // Note that some configurations map to the same MIB identifier.
-var mibValue = map[Endianness][numBOMValues]identifier.MIB***REMOVED***
-	BigEndian: [numBOMValues]identifier.MIB***REMOVED***
+var mibValue = map[Endianness][numBOMValues]identifier.MIB{
+	BigEndian: [numBOMValues]identifier.MIB{
 		IgnoreBOM: identifier.UTF32BE,
 		UseBOM:    identifier.UTF32,
-	***REMOVED***,
-	LittleEndian: [numBOMValues]identifier.MIB***REMOVED***
+	},
+	LittleEndian: [numBOMValues]identifier.MIB{
 		IgnoreBOM: identifier.UTF32LE,
 		UseBOM:    identifier.UTF32,
-	***REMOVED***,
+	},
 	// ExpectBOM is not widely used and has no valid MIB identifier.
-***REMOVED***
+}
 
 // BOMPolicy is a UTF-32 encodings's byte order mark policy.
 type BOMPolicy uint8
@@ -122,72 +122,72 @@ const (
 	LittleEndian Endianness = true
 )
 
-type config struct ***REMOVED***
+type config struct {
 	endianness Endianness
 	bomPolicy  BOMPolicy
-***REMOVED***
+}
 
-type utf32Encoding struct ***REMOVED***
+type utf32Encoding struct {
 	config
 	mib identifier.MIB
-***REMOVED***
+}
 
-func (u utf32Encoding) NewDecoder() *encoding.Decoder ***REMOVED***
-	return &encoding.Decoder***REMOVED***Transformer: &utf32Decoder***REMOVED***
+func (u utf32Encoding) NewDecoder() *encoding.Decoder {
+	return &encoding.Decoder{Transformer: &utf32Decoder{
 		initial: u.config,
 		current: u.config,
-	***REMOVED******REMOVED***
-***REMOVED***
+	}}
+}
 
-func (u utf32Encoding) NewEncoder() *encoding.Encoder ***REMOVED***
-	return &encoding.Encoder***REMOVED***Transformer: &utf32Encoder***REMOVED***
+func (u utf32Encoding) NewEncoder() *encoding.Encoder {
+	return &encoding.Encoder{Transformer: &utf32Encoder{
 		endianness:       u.endianness,
 		initialBOMPolicy: u.bomPolicy,
 		currentBOMPolicy: u.bomPolicy,
-	***REMOVED******REMOVED***
-***REMOVED***
+	}}
+}
 
-func (u utf32Encoding) ID() (mib identifier.MIB, other string) ***REMOVED***
+func (u utf32Encoding) ID() (mib identifier.MIB, other string) {
 	return u.mib, ""
-***REMOVED***
+}
 
-func (u utf32Encoding) String() string ***REMOVED***
+func (u utf32Encoding) String() string {
 	e, b := "B", ""
-	if u.endianness == LittleEndian ***REMOVED***
+	if u.endianness == LittleEndian {
 		e = "L"
-	***REMOVED***
-	switch u.bomPolicy ***REMOVED***
+	}
+	switch u.bomPolicy {
 	case ExpectBOM:
 		b = "Expect"
 	case UseBOM:
 		b = "Use"
 	case IgnoreBOM:
 		b = "Ignore"
-	***REMOVED***
+	}
 	return "UTF-32" + e + "E (" + b + " BOM)"
-***REMOVED***
+}
 
-type utf32Decoder struct ***REMOVED***
+type utf32Decoder struct {
 	initial config
 	current config
-***REMOVED***
+}
 
-func (u *utf32Decoder) Reset() ***REMOVED***
+func (u *utf32Decoder) Reset() {
 	u.current = u.initial
-***REMOVED***
+}
 
-func (u *utf32Decoder) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) ***REMOVED***
-	if len(src) == 0 ***REMOVED***
-		if atEOF && u.current.bomPolicy&requireBOM != 0 ***REMOVED***
+func (u *utf32Decoder) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) {
+	if len(src) == 0 {
+		if atEOF && u.current.bomPolicy&requireBOM != 0 {
 			return 0, 0, ErrMissingBOM
-		***REMOVED***
+		}
 		return 0, 0, nil
-	***REMOVED***
-	if u.current.bomPolicy&acceptBOM != 0 ***REMOVED***
-		if len(src) < 4 ***REMOVED***
+	}
+	if u.current.bomPolicy&acceptBOM != 0 {
+		if len(src) < 4 {
 			return 0, 0, transform.ErrShortSrc
-		***REMOVED***
-		switch ***REMOVED***
+		}
+		switch {
 		case src[0] == 0x00 && src[1] == 0x00 && src[2] == 0xfe && src[3] == 0xff:
 			u.current.endianness = BigEndian
 			nSrc = 4
@@ -195,89 +195,89 @@ func (u *utf32Decoder) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, e
 			u.current.endianness = LittleEndian
 			nSrc = 4
 		default:
-			if u.current.bomPolicy&requireBOM != 0 ***REMOVED***
+			if u.current.bomPolicy&requireBOM != 0 {
 				return 0, 0, ErrMissingBOM
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		u.current.bomPolicy = IgnoreBOM
-	***REMOVED***
+	}
 
 	var r rune
 	var dSize, sSize int
-	for nSrc < len(src) ***REMOVED***
-		if nSrc+3 < len(src) ***REMOVED***
+	for nSrc < len(src) {
+		if nSrc+3 < len(src) {
 			x := uint32(src[nSrc+0])<<24 | uint32(src[nSrc+1])<<16 |
 				uint32(src[nSrc+2])<<8 | uint32(src[nSrc+3])
-			if u.current.endianness == LittleEndian ***REMOVED***
+			if u.current.endianness == LittleEndian {
 				x = x>>24 | (x >> 8 & 0x0000FF00) | (x << 8 & 0x00FF0000) | x<<24
-			***REMOVED***
+			}
 			r, sSize = rune(x), 4
-			if dSize = utf8.RuneLen(r); dSize < 0 ***REMOVED***
+			if dSize = utf8.RuneLen(r); dSize < 0 {
 				r, dSize = utf8.RuneError, 3
-			***REMOVED***
-		***REMOVED*** else if atEOF ***REMOVED***
+			}
+		} else if atEOF {
 			// 1..3 trailing bytes.
 			r, dSize, sSize = utf8.RuneError, 3, len(src)-nSrc
-		***REMOVED*** else ***REMOVED***
+		} else {
 			err = transform.ErrShortSrc
 			break
-		***REMOVED***
-		if nDst+dSize > len(dst) ***REMOVED***
+		}
+		if nDst+dSize > len(dst) {
 			err = transform.ErrShortDst
 			break
-		***REMOVED***
+		}
 		nDst += utf8.EncodeRune(dst[nDst:], r)
 		nSrc += sSize
-	***REMOVED***
+	}
 	return nDst, nSrc, err
-***REMOVED***
+}
 
-type utf32Encoder struct ***REMOVED***
+type utf32Encoder struct {
 	endianness       Endianness
 	initialBOMPolicy BOMPolicy
 	currentBOMPolicy BOMPolicy
-***REMOVED***
+}
 
-func (u *utf32Encoder) Reset() ***REMOVED***
+func (u *utf32Encoder) Reset() {
 	u.currentBOMPolicy = u.initialBOMPolicy
-***REMOVED***
+}
 
-func (u *utf32Encoder) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) ***REMOVED***
-	if u.currentBOMPolicy&writeBOM != 0 ***REMOVED***
-		if len(dst) < 4 ***REMOVED***
+func (u *utf32Encoder) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) {
+	if u.currentBOMPolicy&writeBOM != 0 {
+		if len(dst) < 4 {
 			return 0, 0, transform.ErrShortDst
-		***REMOVED***
+		}
 		dst[0], dst[1], dst[2], dst[3] = 0x00, 0x00, 0xfe, 0xff
 		u.currentBOMPolicy = IgnoreBOM
 		nDst = 4
-	***REMOVED***
+	}
 
 	r, size := rune(0), 0
-	for nSrc < len(src) ***REMOVED***
+	for nSrc < len(src) {
 		r = rune(src[nSrc])
 
 		// Decode a 1-byte rune.
-		if r < utf8.RuneSelf ***REMOVED***
+		if r < utf8.RuneSelf {
 			size = 1
 
-		***REMOVED*** else ***REMOVED***
+		} else {
 			// Decode a multi-byte rune.
 			r, size = utf8.DecodeRune(src[nSrc:])
-			if size == 1 ***REMOVED***
+			if size == 1 {
 				// All valid runes of size 1 (those below utf8.RuneSelf) were
 				// handled above. We have invalid UTF-8 or we haven't seen the
 				// full character yet.
-				if !atEOF && !utf8.FullRune(src[nSrc:]) ***REMOVED***
+				if !atEOF && !utf8.FullRune(src[nSrc:]) {
 					err = transform.ErrShortSrc
 					break
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
+				}
+			}
+		}
 
-		if nDst+4 > len(dst) ***REMOVED***
+		if nDst+4 > len(dst) {
 			err = transform.ErrShortDst
 			break
-		***REMOVED***
+		}
 
 		dst[nDst+0] = uint8(r >> 24)
 		dst[nDst+1] = uint8(r >> 16)
@@ -285,12 +285,12 @@ func (u *utf32Encoder) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, e
 		dst[nDst+3] = uint8(r)
 		nDst += 4
 		nSrc += size
-	***REMOVED***
+	}
 
-	if u.endianness == LittleEndian ***REMOVED***
-		for i := 0; i < nDst; i += 4 ***REMOVED***
+	if u.endianness == LittleEndian {
+		for i := 0; i < nDst; i += 4 {
 			dst[i], dst[i+1], dst[i+2], dst[i+3] = dst[i+3], dst[i+2], dst[i+1], dst[i]
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nDst, nSrc, err
-***REMOVED***
+}

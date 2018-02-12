@@ -6,7 +6,7 @@ package main
 
 import "golang.org/x/text/message"
 
-func main() ***REMOVED***
+func main() {
 	p := message.NewPrinter(message.MatchLanguage("en"))
 
 	// NOT EXTRACTED: strings passed to Println are not extracted.
@@ -32,13 +32,13 @@ func main() ***REMOVED***
 		place,  // Place the person is visiting.
 	)
 
-	pp := struct ***REMOVED***
+	pp := struct {
 		Person string // The person of matter. // TODO: get this comment.
 		Place  string
 		extra  int
-	***REMOVED******REMOVED***
+	}{
 		person, place, 4,
-	***REMOVED***
+	}
 
 	// extract will drop this comment in favor of the one below.
 	p.Printf("%[1]s is visiting %[3]s!\n", // Field names are placeholders.
@@ -72,4 +72,4 @@ func main() ***REMOVED***
 	// Multiple substitutions for same argument.
 	miles := 1.2345
 	p.Printf("%.2[1]f miles traveled (%[1]f)", miles)
-***REMOVED***
+}

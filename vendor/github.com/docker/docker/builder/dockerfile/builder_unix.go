@@ -2,6 +2,6 @@
 
 package dockerfile
 
-func defaultShellForOS(os string) []string ***REMOVED***
-	return []string***REMOVED***"/bin/sh", "-c"***REMOVED***
-***REMOVED***
+func defaultShellForOS(os string) []string {
+	return []string{"/bin/sh", "-c"}
+}

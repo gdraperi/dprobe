@@ -11,11 +11,11 @@ import "unicode/utf8"
 // A system identifies a CLDR numbering system.
 type system byte
 
-type systemData struct ***REMOVED***
+type systemData struct {
 	id        system
 	digitSize byte              // number of UTF-8 bytes per digit
 	zero      [utf8.UTFMax]byte // UTF-8 sequence of zero digit.
-***REMOVED***
+}
 
 // A SymbolType identifies a symbol of a specific kind.
 type SymbolType int
@@ -48,8 +48,8 @@ const hasNonLatnMask = 0x8000
 // in altSymData. In total this will save about 1K.
 type symOffset uint16
 
-type altSymData struct ***REMOVED***
+type altSymData struct {
 	compactTag uint16
 	symIndex   symOffset
 	system     system
-***REMOVED***
+}

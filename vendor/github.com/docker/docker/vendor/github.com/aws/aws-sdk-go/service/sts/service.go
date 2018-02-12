@@ -17,9 +17,9 @@ import (
 //
 // STS methods are safe to use concurrently. It is not safe to
 // modify mutate any of the struct's properties though.
-type STS struct ***REMOVED***
+type STS struct {
 	*client.Client
-***REMOVED***
+}
 
 // Used for custom client initialization logic
 var initClient func(*client.Client)
@@ -43,26 +43,26 @@ const (
 //
 //     // Create a STS client with additional configuration
 //     svc := sts.New(mySession, aws.NewConfig().WithRegion("us-west-2"))
-func New(p client.ConfigProvider, cfgs ...*aws.Config) *STS ***REMOVED***
+func New(p client.ConfigProvider, cfgs ...*aws.Config) *STS {
 	c := p.ClientConfig(EndpointsID, cfgs...)
 	return newClient(*c.Config, c.Handlers, c.Endpoint, c.SigningRegion, c.SigningName)
-***REMOVED***
+}
 
 // newClient creates, initializes and returns a new service client instance.
-func newClient(cfg aws.Config, handlers request.Handlers, endpoint, signingRegion, signingName string) *STS ***REMOVED***
-	svc := &STS***REMOVED***
+func newClient(cfg aws.Config, handlers request.Handlers, endpoint, signingRegion, signingName string) *STS {
+	svc := &STS{
 		Client: client.New(
 			cfg,
-			metadata.ClientInfo***REMOVED***
+			metadata.ClientInfo{
 				ServiceName:   ServiceName,
 				SigningName:   signingName,
 				SigningRegion: signingRegion,
 				Endpoint:      endpoint,
 				APIVersion:    "2011-06-15",
-			***REMOVED***,
+			},
 			handlers,
 		),
-	***REMOVED***
+	}
 
 	// Handlers
 	svc.Handlers.Sign.PushBackNamed(v4.SignRequestHandler)
@@ -72,22 +72,22 @@ func newClient(cfg aws.Config, handlers request.Handlers, endpoint, signingRegio
 	svc.Handlers.UnmarshalError.PushBackNamed(query.UnmarshalErrorHandler)
 
 	// Run custom client initialization if present
-	if initClient != nil ***REMOVED***
+	if initClient != nil {
 		initClient(svc.Client)
-	***REMOVED***
+	}
 
 	return svc
-***REMOVED***
+}
 
 // newRequest creates a new request for a STS operation and runs any
 // custom request initialization.
-func (c *STS) newRequest(op *request.Operation, params, data interface***REMOVED******REMOVED***) *request.Request ***REMOVED***
+func (c *STS) newRequest(op *request.Operation, params, data interface{}) *request.Request {
 	req := c.NewRequest(op, params, data)
 
 	// Run custom request initialization if present
-	if initRequest != nil ***REMOVED***
+	if initRequest != nil {
 		initRequest(req)
-	***REMOVED***
+	}
 
 	return req
-***REMOVED***
+}

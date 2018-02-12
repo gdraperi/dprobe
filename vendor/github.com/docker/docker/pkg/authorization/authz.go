@@ -30,18 +30,18 @@ const maxBodySize = 1048576 // 1MB
 // If multiple authZ plugins are specified, the block/allow decision is based on ANDing all plugin results
 // For response manipulation, the response from each plugin is piped between plugins. Plugin execution order
 // is determined according to daemon parameters
-func NewCtx(authZPlugins []Plugin, user, userAuthNMethod, requestMethod, requestURI string) *Ctx ***REMOVED***
-	return &Ctx***REMOVED***
+func NewCtx(authZPlugins []Plugin, user, userAuthNMethod, requestMethod, requestURI string) *Ctx {
+	return &Ctx{
 		plugins:         authZPlugins,
 		user:            user,
 		userAuthNMethod: userAuthNMethod,
 		requestMethod:   requestMethod,
 		requestURI:      requestURI,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Ctx stores a single request-response interaction context
-type Ctx struct ***REMOVED***
+type Ctx struct {
 	user            string
 	userAuthNMethod string
 	requestMethod   string
@@ -49,135 +49,135 @@ type Ctx struct ***REMOVED***
 	plugins         []Plugin
 	// authReq stores the cached request object for the current transaction
 	authReq *Request
-***REMOVED***
+}
 
 // AuthZRequest authorized the request to the docker daemon using authZ plugins
-func (ctx *Ctx) AuthZRequest(w http.ResponseWriter, r *http.Request) error ***REMOVED***
+func (ctx *Ctx) AuthZRequest(w http.ResponseWriter, r *http.Request) error {
 	var body []byte
-	if sendBody(ctx.requestURI, r.Header) && r.ContentLength > 0 && r.ContentLength < maxBodySize ***REMOVED***
+	if sendBody(ctx.requestURI, r.Header) && r.ContentLength > 0 && r.ContentLength < maxBodySize {
 		var err error
 		body, r.Body, err = drainBody(r.Body)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	var h bytes.Buffer
-	if err := r.Header.Write(&h); err != nil ***REMOVED***
+	if err := r.Header.Write(&h); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	ctx.authReq = &Request***REMOVED***
+	ctx.authReq = &Request{
 		User:            ctx.user,
 		UserAuthNMethod: ctx.userAuthNMethod,
 		RequestMethod:   ctx.requestMethod,
 		RequestURI:      ctx.requestURI,
 		RequestBody:     body,
 		RequestHeaders:  headers(r.Header),
-	***REMOVED***
+	}
 
-	if r.TLS != nil ***REMOVED***
-		for _, c := range r.TLS.PeerCertificates ***REMOVED***
+	if r.TLS != nil {
+		for _, c := range r.TLS.PeerCertificates {
 			pc := PeerCertificate(*c)
 			ctx.authReq.RequestPeerCertificates = append(ctx.authReq.RequestPeerCertificates, &pc)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	for _, plugin := range ctx.plugins ***REMOVED***
+	for _, plugin := range ctx.plugins {
 		logrus.Debugf("AuthZ request using plugin %s", plugin.Name())
 
 		authRes, err := plugin.AuthZRequest(ctx.authReq)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return fmt.Errorf("plugin %s failed with error: %s", plugin.Name(), err)
-		***REMOVED***
+		}
 
-		if !authRes.Allow ***REMOVED***
+		if !authRes.Allow {
 			return newAuthorizationError(plugin.Name(), authRes.Msg)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
 // AuthZResponse authorized and manipulates the response from docker daemon using authZ plugins
-func (ctx *Ctx) AuthZResponse(rm ResponseModifier, r *http.Request) error ***REMOVED***
+func (ctx *Ctx) AuthZResponse(rm ResponseModifier, r *http.Request) error {
 	ctx.authReq.ResponseStatusCode = rm.StatusCode()
 	ctx.authReq.ResponseHeaders = headers(rm.Header())
 
-	if sendBody(ctx.requestURI, rm.Header()) ***REMOVED***
+	if sendBody(ctx.requestURI, rm.Header()) {
 		ctx.authReq.ResponseBody = rm.RawBody()
-	***REMOVED***
+	}
 
-	for _, plugin := range ctx.plugins ***REMOVED***
+	for _, plugin := range ctx.plugins {
 		logrus.Debugf("AuthZ response using plugin %s", plugin.Name())
 
 		authRes, err := plugin.AuthZResponse(ctx.authReq)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return fmt.Errorf("plugin %s failed with error: %s", plugin.Name(), err)
-		***REMOVED***
+		}
 
-		if !authRes.Allow ***REMOVED***
+		if !authRes.Allow {
 			return newAuthorizationError(plugin.Name(), authRes.Msg)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	rm.FlushAll()
 
 	return nil
-***REMOVED***
+}
 
 // drainBody dump the body (if its length is less than 1MB) without modifying the request state
-func drainBody(body io.ReadCloser) ([]byte, io.ReadCloser, error) ***REMOVED***
+func drainBody(body io.ReadCloser) ([]byte, io.ReadCloser, error) {
 	bufReader := bufio.NewReaderSize(body, maxBodySize)
-	newBody := ioutils.NewReadCloserWrapper(bufReader, func() error ***REMOVED*** return body.Close() ***REMOVED***)
+	newBody := ioutils.NewReadCloserWrapper(bufReader, func() error { return body.Close() })
 
 	data, err := bufReader.Peek(maxBodySize)
 	// Body size exceeds max body size
-	if err == nil ***REMOVED***
+	if err == nil {
 		logrus.Warnf("Request body is larger than: '%d' skipping body", maxBodySize)
 		return nil, newBody, nil
-	***REMOVED***
+	}
 	// Body size is less than maximum size
-	if err == io.EOF ***REMOVED***
+	if err == io.EOF {
 		return data, newBody, nil
-	***REMOVED***
+	}
 	// Unknown error
 	return nil, newBody, err
-***REMOVED***
+}
 
 // sendBody returns true when request/response body should be sent to AuthZPlugin
-func sendBody(url string, header http.Header) bool ***REMOVED***
+func sendBody(url string, header http.Header) bool {
 	// Skip body for auth endpoint
-	if strings.HasSuffix(url, "/auth") ***REMOVED***
+	if strings.HasSuffix(url, "/auth") {
 		return false
-	***REMOVED***
+	}
 
 	// body is sent only for text or json messages
 	return header.Get("Content-Type") == "application/json"
-***REMOVED***
+}
 
 // headers returns flatten version of the http headers excluding authorization
-func headers(header http.Header) map[string]string ***REMOVED***
+func headers(header http.Header) map[string]string {
 	v := make(map[string]string)
-	for k, values := range header ***REMOVED***
+	for k, values := range header {
 		// Skip authorization headers
-		if strings.EqualFold(k, "Authorization") || strings.EqualFold(k, "X-Registry-Config") || strings.EqualFold(k, "X-Registry-Auth") ***REMOVED***
+		if strings.EqualFold(k, "Authorization") || strings.EqualFold(k, "X-Registry-Config") || strings.EqualFold(k, "X-Registry-Auth") {
 			continue
-		***REMOVED***
-		for _, val := range values ***REMOVED***
+		}
+		for _, val := range values {
 			v[k] = val
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return v
-***REMOVED***
+}
 
 // authorizationError represents an authorization deny error
-type authorizationError struct ***REMOVED***
+type authorizationError struct {
 	error
-***REMOVED***
+}
 
-func (authorizationError) Forbidden() ***REMOVED******REMOVED***
+func (authorizationError) Forbidden() {}
 
-func newAuthorizationError(plugin, msg string) authorizationError ***REMOVED***
-	return authorizationError***REMOVED***error: fmt.Errorf("authorization denied by plugin %s: %s", plugin, msg)***REMOVED***
-***REMOVED***
+func newAuthorizationError(plugin, msg string) authorizationError {
+	return authorizationError{error: fmt.Errorf("authorization denied by plugin %s: %s", plugin, msg)}
+}

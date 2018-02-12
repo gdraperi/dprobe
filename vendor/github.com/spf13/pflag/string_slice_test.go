@@ -10,244 +10,244 @@ import (
 	"testing"
 )
 
-func setUpSSFlagSet(ssp *[]string) *FlagSet ***REMOVED***
+func setUpSSFlagSet(ssp *[]string) *FlagSet {
 	f := NewFlagSet("test", ContinueOnError)
-	f.StringSliceVar(ssp, "ss", []string***REMOVED******REMOVED***, "Command separated list!")
+	f.StringSliceVar(ssp, "ss", []string{}, "Command separated list!")
 	return f
-***REMOVED***
+}
 
-func setUpSSFlagSetWithDefault(ssp *[]string) *FlagSet ***REMOVED***
+func setUpSSFlagSetWithDefault(ssp *[]string) *FlagSet {
 	f := NewFlagSet("test", ContinueOnError)
-	f.StringSliceVar(ssp, "ss", []string***REMOVED***"default", "values"***REMOVED***, "Command separated list!")
+	f.StringSliceVar(ssp, "ss", []string{"default", "values"}, "Command separated list!")
 	return f
-***REMOVED***
+}
 
-func TestEmptySS(t *testing.T) ***REMOVED***
+func TestEmptySS(t *testing.T) {
 	var ss []string
 	f := setUpSSFlagSet(&ss)
-	err := f.Parse([]string***REMOVED******REMOVED***)
-	if err != nil ***REMOVED***
+	err := f.Parse([]string{})
+	if err != nil {
 		t.Fatal("expected no error; got", err)
-	***REMOVED***
+	}
 
 	getSS, err := f.GetStringSlice("ss")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal("got an error from GetStringSlice():", err)
-	***REMOVED***
-	if len(getSS) != 0 ***REMOVED***
+	}
+	if len(getSS) != 0 {
 		t.Fatalf("got ss %v with len=%d but expected length=0", getSS, len(getSS))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestEmptySSValue(t *testing.T) ***REMOVED***
+func TestEmptySSValue(t *testing.T) {
 	var ss []string
 	f := setUpSSFlagSet(&ss)
-	err := f.Parse([]string***REMOVED***"--ss="***REMOVED***)
-	if err != nil ***REMOVED***
+	err := f.Parse([]string{"--ss="})
+	if err != nil {
 		t.Fatal("expected no error; got", err)
-	***REMOVED***
+	}
 
 	getSS, err := f.GetStringSlice("ss")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal("got an error from GetStringSlice():", err)
-	***REMOVED***
-	if len(getSS) != 0 ***REMOVED***
+	}
+	if len(getSS) != 0 {
 		t.Fatalf("got ss %v with len=%d but expected length=0", getSS, len(getSS))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestSS(t *testing.T) ***REMOVED***
+func TestSS(t *testing.T) {
 	var ss []string
 	f := setUpSSFlagSet(&ss)
 
-	vals := []string***REMOVED***"one", "two", "4", "3"***REMOVED***
+	vals := []string{"one", "two", "4", "3"}
 	arg := fmt.Sprintf("--ss=%s", strings.Join(vals, ","))
-	err := f.Parse([]string***REMOVED***arg***REMOVED***)
-	if err != nil ***REMOVED***
+	err := f.Parse([]string{arg})
+	if err != nil {
 		t.Fatal("expected no error; got", err)
-	***REMOVED***
-	for i, v := range ss ***REMOVED***
-		if vals[i] != v ***REMOVED***
+	}
+	for i, v := range ss {
+		if vals[i] != v {
 			t.Fatalf("expected ss[%d] to be %s but got: %s", i, vals[i], v)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	getSS, err := f.GetStringSlice("ss")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal("got an error from GetStringSlice():", err)
-	***REMOVED***
-	for i, v := range getSS ***REMOVED***
-		if vals[i] != v ***REMOVED***
+	}
+	for i, v := range getSS {
+		if vals[i] != v {
 			t.Fatalf("expected ss[%d] to be %s from GetStringSlice but got: %s", i, vals[i], v)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestSSDefault(t *testing.T) ***REMOVED***
+func TestSSDefault(t *testing.T) {
 	var ss []string
 	f := setUpSSFlagSetWithDefault(&ss)
 
-	vals := []string***REMOVED***"default", "values"***REMOVED***
+	vals := []string{"default", "values"}
 
-	err := f.Parse([]string***REMOVED******REMOVED***)
-	if err != nil ***REMOVED***
+	err := f.Parse([]string{})
+	if err != nil {
 		t.Fatal("expected no error; got", err)
-	***REMOVED***
-	for i, v := range ss ***REMOVED***
-		if vals[i] != v ***REMOVED***
+	}
+	for i, v := range ss {
+		if vals[i] != v {
 			t.Fatalf("expected ss[%d] to be %s but got: %s", i, vals[i], v)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	getSS, err := f.GetStringSlice("ss")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal("got an error from GetStringSlice():", err)
-	***REMOVED***
-	for i, v := range getSS ***REMOVED***
-		if vals[i] != v ***REMOVED***
+	}
+	for i, v := range getSS {
+		if vals[i] != v {
 			t.Fatalf("expected ss[%d] to be %s from GetStringSlice but got: %s", i, vals[i], v)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestSSWithDefault(t *testing.T) ***REMOVED***
+func TestSSWithDefault(t *testing.T) {
 	var ss []string
 	f := setUpSSFlagSetWithDefault(&ss)
 
-	vals := []string***REMOVED***"one", "two", "4", "3"***REMOVED***
+	vals := []string{"one", "two", "4", "3"}
 	arg := fmt.Sprintf("--ss=%s", strings.Join(vals, ","))
-	err := f.Parse([]string***REMOVED***arg***REMOVED***)
-	if err != nil ***REMOVED***
+	err := f.Parse([]string{arg})
+	if err != nil {
 		t.Fatal("expected no error; got", err)
-	***REMOVED***
-	for i, v := range ss ***REMOVED***
-		if vals[i] != v ***REMOVED***
+	}
+	for i, v := range ss {
+		if vals[i] != v {
 			t.Fatalf("expected ss[%d] to be %s but got: %s", i, vals[i], v)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	getSS, err := f.GetStringSlice("ss")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal("got an error from GetStringSlice():", err)
-	***REMOVED***
-	for i, v := range getSS ***REMOVED***
-		if vals[i] != v ***REMOVED***
+	}
+	for i, v := range getSS {
+		if vals[i] != v {
 			t.Fatalf("expected ss[%d] to be %s from GetStringSlice but got: %s", i, vals[i], v)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestSSCalledTwice(t *testing.T) ***REMOVED***
+func TestSSCalledTwice(t *testing.T) {
 	var ss []string
 	f := setUpSSFlagSet(&ss)
 
-	in := []string***REMOVED***"one,two", "three"***REMOVED***
-	expected := []string***REMOVED***"one", "two", "three"***REMOVED***
+	in := []string{"one,two", "three"}
+	expected := []string{"one", "two", "three"}
 	argfmt := "--ss=%s"
 	arg1 := fmt.Sprintf(argfmt, in[0])
 	arg2 := fmt.Sprintf(argfmt, in[1])
-	err := f.Parse([]string***REMOVED***arg1, arg2***REMOVED***)
-	if err != nil ***REMOVED***
+	err := f.Parse([]string{arg1, arg2})
+	if err != nil {
 		t.Fatal("expected no error; got", err)
-	***REMOVED***
+	}
 
-	if len(expected) != len(ss) ***REMOVED***
+	if len(expected) != len(ss) {
 		t.Fatalf("expected number of ss to be %d but got: %d", len(expected), len(ss))
-	***REMOVED***
-	for i, v := range ss ***REMOVED***
-		if expected[i] != v ***REMOVED***
+	}
+	for i, v := range ss {
+		if expected[i] != v {
 			t.Fatalf("expected ss[%d] to be %s but got: %s", i, expected[i], v)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	values, err := f.GetStringSlice("ss")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal("expected no error; got", err)
-	***REMOVED***
+	}
 
-	if len(expected) != len(values) ***REMOVED***
+	if len(expected) != len(values) {
 		t.Fatalf("expected number of values to be %d but got: %d", len(expected), len(ss))
-	***REMOVED***
-	for i, v := range values ***REMOVED***
-		if expected[i] != v ***REMOVED***
+	}
+	for i, v := range values {
+		if expected[i] != v {
 			t.Fatalf("expected got ss[%d] to be %s but got: %s", i, expected[i], v)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestSSWithComma(t *testing.T) ***REMOVED***
+func TestSSWithComma(t *testing.T) {
 	var ss []string
 	f := setUpSSFlagSet(&ss)
 
-	in := []string***REMOVED***`"one,two"`, `"three"`, `"four,five",six`***REMOVED***
-	expected := []string***REMOVED***"one,two", "three", "four,five", "six"***REMOVED***
+	in := []string{`"one,two"`, `"three"`, `"four,five",six`}
+	expected := []string{"one,two", "three", "four,five", "six"}
 	argfmt := "--ss=%s"
 	arg1 := fmt.Sprintf(argfmt, in[0])
 	arg2 := fmt.Sprintf(argfmt, in[1])
 	arg3 := fmt.Sprintf(argfmt, in[2])
-	err := f.Parse([]string***REMOVED***arg1, arg2, arg3***REMOVED***)
-	if err != nil ***REMOVED***
+	err := f.Parse([]string{arg1, arg2, arg3})
+	if err != nil {
 		t.Fatal("expected no error; got", err)
-	***REMOVED***
+	}
 
-	if len(expected) != len(ss) ***REMOVED***
+	if len(expected) != len(ss) {
 		t.Fatalf("expected number of ss to be %d but got: %d", len(expected), len(ss))
-	***REMOVED***
-	for i, v := range ss ***REMOVED***
-		if expected[i] != v ***REMOVED***
+	}
+	for i, v := range ss {
+		if expected[i] != v {
 			t.Fatalf("expected ss[%d] to be %s but got: %s", i, expected[i], v)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	values, err := f.GetStringSlice("ss")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal("expected no error; got", err)
-	***REMOVED***
+	}
 
-	if len(expected) != len(values) ***REMOVED***
+	if len(expected) != len(values) {
 		t.Fatalf("expected number of values to be %d but got: %d", len(expected), len(values))
-	***REMOVED***
-	for i, v := range values ***REMOVED***
-		if expected[i] != v ***REMOVED***
+	}
+	for i, v := range values {
+		if expected[i] != v {
 			t.Fatalf("expected got ss[%d] to be %s but got: %s", i, expected[i], v)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestSSWithSquareBrackets(t *testing.T) ***REMOVED***
+func TestSSWithSquareBrackets(t *testing.T) {
 	var ss []string
 	f := setUpSSFlagSet(&ss)
 
-	in := []string***REMOVED***`"[a-z]"`, `"[a-z]+"`***REMOVED***
-	expected := []string***REMOVED***"[a-z]", "[a-z]+"***REMOVED***
+	in := []string{`"[a-z]"`, `"[a-z]+"`}
+	expected := []string{"[a-z]", "[a-z]+"}
 	argfmt := "--ss=%s"
 	arg1 := fmt.Sprintf(argfmt, in[0])
 	arg2 := fmt.Sprintf(argfmt, in[1])
-	err := f.Parse([]string***REMOVED***arg1, arg2***REMOVED***)
-	if err != nil ***REMOVED***
+	err := f.Parse([]string{arg1, arg2})
+	if err != nil {
 		t.Fatal("expected no error; got", err)
-	***REMOVED***
+	}
 
-	if len(expected) != len(ss) ***REMOVED***
+	if len(expected) != len(ss) {
 		t.Fatalf("expected number of ss to be %d but got: %d", len(expected), len(ss))
-	***REMOVED***
-	for i, v := range ss ***REMOVED***
-		if expected[i] != v ***REMOVED***
+	}
+	for i, v := range ss {
+		if expected[i] != v {
 			t.Fatalf("expected ss[%d] to be %s but got: %s", i, expected[i], v)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	values, err := f.GetStringSlice("ss")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal("expected no error; got", err)
-	***REMOVED***
+	}
 
-	if len(expected) != len(values) ***REMOVED***
+	if len(expected) != len(values) {
 		t.Fatalf("expected number of values to be %d but got: %d", len(expected), len(values))
-	***REMOVED***
-	for i, v := range values ***REMOVED***
-		if expected[i] != v ***REMOVED***
+	}
+	for i, v := range values {
+		if expected[i] != v {
 			t.Fatalf("expected got ss[%d] to be %s but got: %s", i, expected[i], v)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

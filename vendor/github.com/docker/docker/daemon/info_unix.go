@@ -15,7 +15,7 @@ import (
 )
 
 // FillPlatformInfo fills the platform related info.
-func (daemon *Daemon) FillPlatformInfo(v *types.Info, sysInfo *sysinfo.SysInfo) ***REMOVED***
+func (daemon *Daemon) FillPlatformInfo(v *types.Info, sysInfo *sysinfo.SysInfo) {
 	v.MemoryLimit = sysInfo.MemoryLimit
 	v.SwapLimit = sysInfo.SwapLimit
 	v.KernelMemory = sysInfo.KernelMemory
@@ -30,64 +30,64 @@ func (daemon *Daemon) FillPlatformInfo(v *types.Info, sysInfo *sysinfo.SysInfo) 
 
 	v.RuncCommit.Expected = dockerversion.RuncCommitID
 	defaultRuntimeBinary := daemon.configStore.GetRuntime(v.DefaultRuntime).Path
-	if rv, err := exec.Command(defaultRuntimeBinary, "--version").Output(); err == nil ***REMOVED***
+	if rv, err := exec.Command(defaultRuntimeBinary, "--version").Output(); err == nil {
 		parts := strings.Split(strings.TrimSpace(string(rv)), "\n")
-		if len(parts) == 3 ***REMOVED***
+		if len(parts) == 3 {
 			parts = strings.Split(parts[1], ": ")
-			if len(parts) == 2 ***REMOVED***
+			if len(parts) == 2 {
 				v.RuncCommit.ID = strings.TrimSpace(parts[1])
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
-		if v.RuncCommit.ID == "" ***REMOVED***
+		if v.RuncCommit.ID == "" {
 			logrus.Warnf("failed to retrieve %s version: unknown output format: %s", defaultRuntimeBinary, string(rv))
 			v.RuncCommit.ID = "N/A"
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
+		}
+	} else {
 		logrus.Warnf("failed to retrieve %s version: %v", defaultRuntimeBinary, err)
 		v.RuncCommit.ID = "N/A"
-	***REMOVED***
+	}
 
 	v.ContainerdCommit.Expected = dockerversion.ContainerdCommitID
-	if rv, err := daemon.containerd.Version(context.Background()); err == nil ***REMOVED***
+	if rv, err := daemon.containerd.Version(context.Background()); err == nil {
 		v.ContainerdCommit.ID = rv.Revision
-	***REMOVED*** else ***REMOVED***
+	} else {
 		logrus.Warnf("failed to retrieve containerd version: %v", err)
 		v.ContainerdCommit.ID = "N/A"
-	***REMOVED***
+	}
 
 	defaultInitBinary := daemon.configStore.GetInitPath()
-	if rv, err := exec.Command(defaultInitBinary, "--version").Output(); err == nil ***REMOVED***
+	if rv, err := exec.Command(defaultInitBinary, "--version").Output(); err == nil {
 		ver, err := parseInitVersion(string(rv))
 
-		if err != nil ***REMOVED***
+		if err != nil {
 			logrus.Warnf("failed to retrieve %s version: %s", defaultInitBinary, err)
-		***REMOVED***
+		}
 		v.InitCommit = ver
-	***REMOVED*** else ***REMOVED***
+	} else {
 		logrus.Warnf("failed to retrieve %s version: %s", defaultInitBinary, err)
 		v.InitCommit.ID = "N/A"
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // parseInitVersion parses a Tini version string, and extracts the version.
-func parseInitVersion(v string) (types.Commit, error) ***REMOVED***
-	version := types.Commit***REMOVED***ID: "", Expected: dockerversion.InitCommitID***REMOVED***
+func parseInitVersion(v string) (types.Commit, error) {
+	version := types.Commit{ID: "", Expected: dockerversion.InitCommitID}
 	parts := strings.Split(strings.TrimSpace(v), " - ")
 
-	if len(parts) >= 2 ***REMOVED***
+	if len(parts) >= 2 {
 		gitParts := strings.Split(parts[1], ".")
-		if len(gitParts) == 2 && gitParts[0] == "git" ***REMOVED***
+		if len(gitParts) == 2 && gitParts[0] == "git" {
 			version.ID = gitParts[1]
 			version.Expected = dockerversion.InitCommitID[0:len(version.ID)]
-		***REMOVED***
-	***REMOVED***
-	if version.ID == "" && strings.HasPrefix(parts[0], "tini version ") ***REMOVED***
+		}
+	}
+	if version.ID == "" && strings.HasPrefix(parts[0], "tini version ") {
 		version.ID = "v" + strings.TrimPrefix(parts[0], "tini version ")
-	***REMOVED***
-	if version.ID == "" ***REMOVED***
+	}
+	if version.ID == "" {
 		version.ID = "N/A"
 		return version, errors.Errorf("unknown output format: %s", v)
-	***REMOVED***
+	}
 	return version, nil
-***REMOVED***
+}

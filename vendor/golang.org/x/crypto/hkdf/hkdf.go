@@ -19,7 +19,7 @@ import (
 	"io"
 )
 
-type hkdf struct ***REMOVED***
+type hkdf struct {
 	expander hash.Hash
 	size     int
 
@@ -28,25 +28,25 @@ type hkdf struct ***REMOVED***
 
 	prev  []byte
 	cache []byte
-***REMOVED***
+}
 
-func (f *hkdf) Read(p []byte) (int, error) ***REMOVED***
+func (f *hkdf) Read(p []byte) (int, error) {
 	// Check whether enough data can be generated
 	need := len(p)
 	remains := len(f.cache) + int(255-f.counter+1)*f.size
-	if remains < need ***REMOVED***
+	if remains < need {
 		return 0, errors.New("hkdf: entropy limit reached")
-	***REMOVED***
+	}
 	// Read from the cache, if enough data is present
 	n := copy(p, f.cache)
 	p = p[n:]
 
 	// Fill the buffer
-	for len(p) > 0 ***REMOVED***
+	for len(p) > 0 {
 		f.expander.Reset()
 		f.expander.Write(f.prev)
 		f.expander.Write(f.info)
-		f.expander.Write([]byte***REMOVED***f.counter***REMOVED***)
+		f.expander.Write([]byte{f.counter})
 		f.prev = f.expander.Sum(f.prev[:0])
 		f.counter++
 
@@ -54,22 +54,22 @@ func (f *hkdf) Read(p []byte) (int, error) ***REMOVED***
 		f.cache = f.prev
 		n = copy(p, f.cache)
 		p = p[n:]
-	***REMOVED***
+	}
 	// Save leftovers for next run
 	f.cache = f.cache[n:]
 
 	return need, nil
-***REMOVED***
+}
 
 // New returns a new HKDF using the given hash, the secret keying material to expand
 // and optional salt and info fields.
-func New(hash func() hash.Hash, secret, salt, info []byte) io.Reader ***REMOVED***
-	if salt == nil ***REMOVED***
+func New(hash func() hash.Hash, secret, salt, info []byte) io.Reader {
+	if salt == nil {
 		salt = make([]byte, hash().Size())
-	***REMOVED***
+	}
 	extractor := hmac.New(hash, salt)
 	extractor.Write(secret)
 	prk := extractor.Sum(nil)
 
-	return &hkdf***REMOVED***hmac.New(hash, prk), extractor.Size(), info, 1, nil, nil***REMOVED***
-***REMOVED***
+	return &hkdf{hmac.New(hash, prk), extractor.Size(), info, 1, nil, nil}
+}

@@ -19,116 +19,116 @@ import (
 	"golang.org/x/net/context"
 )
 
-func optionsHandler(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error ***REMOVED***
+func optionsHandler(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error {
 	w.WriteHeader(http.StatusOK)
 	return nil
-***REMOVED***
+}
 
-func pingHandler(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error ***REMOVED***
-	_, err := w.Write([]byte***REMOVED***'O', 'K'***REMOVED***)
+func pingHandler(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error {
+	_, err := w.Write([]byte{'O', 'K'})
 	return err
-***REMOVED***
+}
 
-func (s *systemRouter) getInfo(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error ***REMOVED***
+func (s *systemRouter) getInfo(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error {
 	info, err := s.backend.SystemInfo()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	if s.cluster != nil ***REMOVED***
+	}
+	if s.cluster != nil {
 		info.Swarm = s.cluster.Info()
-	***REMOVED***
+	}
 
-	if versions.LessThan(httputils.VersionFromContext(ctx), "1.25") ***REMOVED***
+	if versions.LessThan(httputils.VersionFromContext(ctx), "1.25") {
 		// TODO: handle this conversion in engine-api
-		type oldInfo struct ***REMOVED***
+		type oldInfo struct {
 			*types.Info
 			ExecutionDriver string
-		***REMOVED***
-		old := &oldInfo***REMOVED***
+		}
+		old := &oldInfo{
 			Info:            info,
 			ExecutionDriver: "<not supported>",
-		***REMOVED***
-		nameOnlySecurityOptions := []string***REMOVED******REMOVED***
+		}
+		nameOnlySecurityOptions := []string{}
 		kvSecOpts, err := types.DecodeSecurityOptions(old.SecurityOptions)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-		for _, s := range kvSecOpts ***REMOVED***
+		}
+		for _, s := range kvSecOpts {
 			nameOnlySecurityOptions = append(nameOnlySecurityOptions, s.Name)
-		***REMOVED***
+		}
 		old.SecurityOptions = nameOnlySecurityOptions
 		return httputils.WriteJSON(w, http.StatusOK, old)
-	***REMOVED***
+	}
 	return httputils.WriteJSON(w, http.StatusOK, info)
-***REMOVED***
+}
 
-func (s *systemRouter) getVersion(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error ***REMOVED***
+func (s *systemRouter) getVersion(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error {
 	info := s.backend.SystemVersion()
 
 	return httputils.WriteJSON(w, http.StatusOK, info)
-***REMOVED***
+}
 
-func (s *systemRouter) getDiskUsage(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error ***REMOVED***
+func (s *systemRouter) getDiskUsage(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error {
 	du, err := s.backend.SystemDiskUsage(ctx)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	builderSize, err := s.builder.DiskUsage()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return pkgerrors.Wrap(err, "error getting build cache usage")
-	***REMOVED***
+	}
 	du.BuilderSize = builderSize
 
 	return httputils.WriteJSON(w, http.StatusOK, du)
-***REMOVED***
+}
 
-type invalidRequestError struct ***REMOVED***
+type invalidRequestError struct {
 	Err error
-***REMOVED***
+}
 
-func (e invalidRequestError) Error() string ***REMOVED***
+func (e invalidRequestError) Error() string {
 	return e.Err.Error()
-***REMOVED***
+}
 
-func (e invalidRequestError) InvalidParameter() ***REMOVED******REMOVED***
+func (e invalidRequestError) InvalidParameter() {}
 
-func (s *systemRouter) getEvents(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error ***REMOVED***
-	if err := httputils.ParseForm(r); err != nil ***REMOVED***
+func (s *systemRouter) getEvents(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error {
+	if err := httputils.ParseForm(r); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	since, err := eventTime(r.Form.Get("since"))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	until, err := eventTime(r.Form.Get("until"))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	var (
 		timeout        <-chan time.Time
 		onlyPastEvents bool
 	)
-	if !until.IsZero() ***REMOVED***
-		if until.Before(since) ***REMOVED***
-			return invalidRequestError***REMOVED***fmt.Errorf("`since` time (%s) cannot be after `until` time (%s)", r.Form.Get("since"), r.Form.Get("until"))***REMOVED***
-		***REMOVED***
+	if !until.IsZero() {
+		if until.Before(since) {
+			return invalidRequestError{fmt.Errorf("`since` time (%s) cannot be after `until` time (%s)", r.Form.Get("since"), r.Form.Get("until"))}
+		}
 
 		now := time.Now()
 
 		onlyPastEvents = until.Before(now)
 
-		if !onlyPastEvents ***REMOVED***
+		if !onlyPastEvents {
 			dur := until.Sub(now)
 			timeout = time.After(dur)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	ef, err := filters.FromJSON(r.Form.Get("filters"))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	output := ioutils.NewWriteFlusher(w)
@@ -140,60 +140,60 @@ func (s *systemRouter) getEvents(ctx context.Context, w http.ResponseWriter, r *
 	buffered, l := s.backend.SubscribeToEvents(since, until, ef)
 	defer s.backend.UnsubscribeFromEvents(l)
 
-	for _, ev := range buffered ***REMOVED***
-		if err := enc.Encode(ev); err != nil ***REMOVED***
+	for _, ev := range buffered {
+		if err := enc.Encode(ev); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if onlyPastEvents ***REMOVED***
+	if onlyPastEvents {
 		return nil
-	***REMOVED***
+	}
 
-	for ***REMOVED***
-		select ***REMOVED***
+	for {
+		select {
 		case ev := <-l:
 			jev, ok := ev.(events.Message)
-			if !ok ***REMOVED***
+			if !ok {
 				logrus.Warnf("unexpected event message: %q", ev)
 				continue
-			***REMOVED***
-			if err := enc.Encode(jev); err != nil ***REMOVED***
+			}
+			if err := enc.Encode(jev); err != nil {
 				return err
-			***REMOVED***
+			}
 		case <-timeout:
 			return nil
 		case <-ctx.Done():
 			logrus.Debug("Client context cancelled, stop sending events")
 			return nil
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (s *systemRouter) postAuth(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error ***REMOVED***
+func (s *systemRouter) postAuth(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error {
 	var config *types.AuthConfig
 	err := json.NewDecoder(r.Body).Decode(&config)
 	r.Body.Close()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	status, token, err := s.backend.AuthenticateToRegistry(ctx, config)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	return httputils.WriteJSON(w, http.StatusOK, &registry.AuthenticateOKBody***REMOVED***
+	}
+	return httputils.WriteJSON(w, http.StatusOK, &registry.AuthenticateOKBody{
 		Status:        status,
 		IdentityToken: token,
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func eventTime(formTime string) (time.Time, error) ***REMOVED***
+func eventTime(formTime string) (time.Time, error) {
 	t, tNano, err := timetypes.ParseTimestamps(formTime, -1)
-	if err != nil ***REMOVED***
-		return time.Time***REMOVED******REMOVED***, err
-	***REMOVED***
-	if t == -1 ***REMOVED***
-		return time.Time***REMOVED******REMOVED***, nil
-	***REMOVED***
+	if err != nil {
+		return time.Time{}, err
+	}
+	if t == -1 {
+		return time.Time{}, nil
+	}
 	return time.Unix(t, tNano), nil
-***REMOVED***
+}

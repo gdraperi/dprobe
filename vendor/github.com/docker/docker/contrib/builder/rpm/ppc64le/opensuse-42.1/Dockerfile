@@ -10,7 +10,7 @@ RUN zypper --non-interactive install ca-certificates* curl gzip rpm-build
 RUN zypper --non-interactive install libbtrfs-devel device-mapper-devel glibc-static  libselinux-devel pkg-config selinux-policy selinux-policy-devel sqlite-devel systemd-devel tar git cmake vim
 
 ENV GO_VERSION 1.9.3
-RUN curl -fsSL "https://golang.org/dl/go$***REMOVED***GO_VERSION***REMOVED***.linux-ppc64le.tar.gz" | tar xzC /usr/local
+RUN curl -fsSL "https://golang.org/dl/go${GO_VERSION}.linux-ppc64le.tar.gz" | tar xzC /usr/local
 ENV PATH $PATH:/usr/local/go/bin
 
 ENV AUTO_GOPATH 1

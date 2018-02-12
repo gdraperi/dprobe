@@ -13,61 +13,61 @@ import (
 // attachment of a docker unmanaged container managed as a task from
 // agent point of view. It provides network attachment information to
 // the unmanaged container for it to attach to the network and run.
-type networkAttacherController struct ***REMOVED***
+type networkAttacherController struct {
 	backend executorpkg.Backend
 	task    *api.Task
 	adapter *containerAdapter
-	closed  chan struct***REMOVED******REMOVED***
-***REMOVED***
+	closed  chan struct{}
+}
 
-func newNetworkAttacherController(b executorpkg.Backend, task *api.Task, node *api.NodeDescription, dependencies exec.DependencyGetter) (*networkAttacherController, error) ***REMOVED***
+func newNetworkAttacherController(b executorpkg.Backend, task *api.Task, node *api.NodeDescription, dependencies exec.DependencyGetter) (*networkAttacherController, error) {
 	adapter, err := newContainerAdapter(b, task, node, dependencies)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	return &networkAttacherController***REMOVED***
+	return &networkAttacherController{
 		backend: b,
 		task:    task,
 		adapter: adapter,
-		closed:  make(chan struct***REMOVED******REMOVED***),
-	***REMOVED***, nil
-***REMOVED***
+		closed:  make(chan struct{}),
+	}, nil
+}
 
-func (nc *networkAttacherController) Update(ctx context.Context, t *api.Task) error ***REMOVED***
+func (nc *networkAttacherController) Update(ctx context.Context, t *api.Task) error {
 	return nil
-***REMOVED***
+}
 
-func (nc *networkAttacherController) Prepare(ctx context.Context) error ***REMOVED***
+func (nc *networkAttacherController) Prepare(ctx context.Context) error {
 	// Make sure all the networks that the task needs are created.
 	return nc.adapter.createNetworks(ctx)
-***REMOVED***
+}
 
-func (nc *networkAttacherController) Start(ctx context.Context) error ***REMOVED***
+func (nc *networkAttacherController) Start(ctx context.Context) error {
 	return nc.adapter.networkAttach(ctx)
-***REMOVED***
+}
 
-func (nc *networkAttacherController) Wait(pctx context.Context) error ***REMOVED***
+func (nc *networkAttacherController) Wait(pctx context.Context) error {
 	ctx, cancel := context.WithCancel(pctx)
 	defer cancel()
 
 	return nc.adapter.waitForDetach(ctx)
-***REMOVED***
+}
 
-func (nc *networkAttacherController) Shutdown(ctx context.Context) error ***REMOVED***
+func (nc *networkAttacherController) Shutdown(ctx context.Context) error {
 	return nil
-***REMOVED***
+}
 
-func (nc *networkAttacherController) Terminate(ctx context.Context) error ***REMOVED***
+func (nc *networkAttacherController) Terminate(ctx context.Context) error {
 	return nil
-***REMOVED***
+}
 
-func (nc *networkAttacherController) Remove(ctx context.Context) error ***REMOVED***
+func (nc *networkAttacherController) Remove(ctx context.Context) error {
 	// Try removing the network referenced in this task in case this
 	// task is the last one referencing it
 	return nc.adapter.removeNetworks(ctx)
-***REMOVED***
+}
 
-func (nc *networkAttacherController) Close() error ***REMOVED***
+func (nc *networkAttacherController) Close() error {
 	return nil
-***REMOVED***
+}

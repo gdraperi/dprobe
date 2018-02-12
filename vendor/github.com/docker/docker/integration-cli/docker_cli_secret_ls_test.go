@@ -10,33 +10,33 @@ import (
 	"github.com/go-check/check"
 )
 
-func (s *DockerSwarmSuite) TestSecretList(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestSecretList(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 
 	testName0 := "test0"
 	testName1 := "test1"
 
 	// create secret test0
-	id0 := d.CreateSecret(c, swarm.SecretSpec***REMOVED***
-		Annotations: swarm.Annotations***REMOVED***
+	id0 := d.CreateSecret(c, swarm.SecretSpec{
+		Annotations: swarm.Annotations{
 			Name:   testName0,
-			Labels: map[string]string***REMOVED***"type": "test"***REMOVED***,
-		***REMOVED***,
+			Labels: map[string]string{"type": "test"},
+		},
 		Data: []byte("TESTINGDATA0"),
-	***REMOVED***)
+	})
 	c.Assert(id0, checker.Not(checker.Equals), "", check.Commentf("secrets: %s", id0))
 
 	secret := d.GetSecret(c, id0)
 	c.Assert(secret.Spec.Name, checker.Equals, testName0)
 
 	// create secret test1
-	id1 := d.CreateSecret(c, swarm.SecretSpec***REMOVED***
-		Annotations: swarm.Annotations***REMOVED***
+	id1 := d.CreateSecret(c, swarm.SecretSpec{
+		Annotations: swarm.Annotations{
 			Name:   testName1,
-			Labels: map[string]string***REMOVED***"type": "production"***REMOVED***,
-		***REMOVED***,
+			Labels: map[string]string{"type": "production"},
+		},
 		Data: []byte("TESTINGDATA1"),
-	***REMOVED***)
+	})
 	c.Assert(id1, checker.Not(checker.Equals), "", check.Commentf("secrets: %s", id1))
 
 	secret = d.GetSecret(c, id1)
@@ -49,12 +49,12 @@ func (s *DockerSwarmSuite) TestSecretList(c *check.C) ***REMOVED***
 	c.Assert(strings.TrimSpace(out), checker.Contains, testName1)
 
 	// test filter by name `docker secret ls --filter name=xxx`
-	args := []string***REMOVED***
+	args := []string{
 		"secret",
 		"ls",
 		"--filter",
 		"name=test0",
-	***REMOVED***
+	}
 	out, err = d.Cmd(args...)
 	c.Assert(err, checker.IsNil, check.Commentf(out))
 
@@ -62,12 +62,12 @@ func (s *DockerSwarmSuite) TestSecretList(c *check.C) ***REMOVED***
 	c.Assert(strings.TrimSpace(out), checker.Not(checker.Contains), testName1)
 
 	// test filter by id `docker secret ls --filter id=xxx`
-	args = []string***REMOVED***
+	args = []string{
 		"secret",
 		"ls",
 		"--filter",
 		"id=" + id1,
-	***REMOVED***
+	}
 	out, err = d.Cmd(args...)
 	c.Assert(err, checker.IsNil, check.Commentf(out))
 
@@ -75,36 +75,36 @@ func (s *DockerSwarmSuite) TestSecretList(c *check.C) ***REMOVED***
 	c.Assert(strings.TrimSpace(out), checker.Contains, testName1)
 
 	// test filter by label `docker secret ls --filter label=xxx`
-	args = []string***REMOVED***
+	args = []string{
 		"secret",
 		"ls",
 		"--filter",
 		"label=type",
-	***REMOVED***
+	}
 	out, err = d.Cmd(args...)
 	c.Assert(err, checker.IsNil, check.Commentf(out))
 
 	c.Assert(strings.TrimSpace(out), checker.Contains, testName0)
 	c.Assert(strings.TrimSpace(out), checker.Contains, testName1)
 
-	args = []string***REMOVED***
+	args = []string{
 		"secret",
 		"ls",
 		"--filter",
 		"label=type=test",
-	***REMOVED***
+	}
 	out, err = d.Cmd(args...)
 	c.Assert(err, checker.IsNil, check.Commentf(out))
 
 	c.Assert(strings.TrimSpace(out), checker.Contains, testName0)
 	c.Assert(strings.TrimSpace(out), checker.Not(checker.Contains), testName1)
 
-	args = []string***REMOVED***
+	args = []string{
 		"secret",
 		"ls",
 		"--filter",
 		"label=type=production",
-	***REMOVED***
+	}
 	out, err = d.Cmd(args...)
 	c.Assert(err, checker.IsNil, check.Commentf(out))
 
@@ -112,14 +112,14 @@ func (s *DockerSwarmSuite) TestSecretList(c *check.C) ***REMOVED***
 	c.Assert(strings.TrimSpace(out), checker.Contains, testName1)
 
 	// test invalid filter `docker secret ls --filter noexisttype=xxx`
-	args = []string***REMOVED***
+	args = []string{
 		"secret",
 		"ls",
 		"--filter",
 		"noexisttype=test0",
-	***REMOVED***
+	}
 	out, err = d.Cmd(args...)
 	c.Assert(err, checker.NotNil, check.Commentf(out))
 
 	c.Assert(strings.TrimSpace(out), checker.Contains, "Error response from daemon: Invalid filter 'noexisttype'")
-***REMOVED***
+}

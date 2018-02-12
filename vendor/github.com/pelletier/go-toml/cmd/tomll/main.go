@@ -15,8 +15,8 @@ import (
 	"github.com/pelletier/go-toml"
 )
 
-func main() ***REMOVED***
-	flag.Usage = func() ***REMOVED***
+func main() {
+	flag.Usage = func() {
 		fmt.Fprintln(os.Stderr, `tomll can be used in two ways:
 Writing to STDIN and reading from STDOUT:
   cat file.toml | tomll > file.toml
@@ -26,41 +26,41 @@ Reading and updating a list of files:
 
 When given a list of files, tomll will modify all files in place without asking.
 `)
-	***REMOVED***
+	}
 	flag.Parse()
 	// read from stdin and print to stdout
-	if flag.NArg() == 0 ***REMOVED***
+	if flag.NArg() == 0 {
 		s, err := lintReader(os.Stdin)
-		if err != nil ***REMOVED***
+		if err != nil {
 			io.WriteString(os.Stderr, err.Error())
 			os.Exit(-1)
-		***REMOVED***
+		}
 		io.WriteString(os.Stdout, s)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		// otherwise modify a list of files
-		for _, filename := range flag.Args() ***REMOVED***
+		for _, filename := range flag.Args() {
 			s, err := lintFile(filename)
-			if err != nil ***REMOVED***
+			if err != nil {
 				io.WriteString(os.Stderr, err.Error())
 				os.Exit(-1)
-			***REMOVED***
+			}
 			ioutil.WriteFile(filename, []byte(s), 0644)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func lintFile(filename string) (string, error) ***REMOVED***
+func lintFile(filename string) (string, error) {
 	tree, err := toml.LoadFile(filename)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	return tree.String(), nil
-***REMOVED***
+}
 
-func lintReader(r io.Reader) (string, error) ***REMOVED***
+func lintReader(r io.Reader) (string, error) {
 	tree, err := toml.LoadReader(r)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	return tree.String(), nil
-***REMOVED***
+}

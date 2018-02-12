@@ -24,41 +24,41 @@ var clockTicksPerSecond = uint64(system.GetClockTicks())
 // statistics line and then sums up the first seven fields
 // provided. See `man 5 proc` for details on specific field
 // information.
-func GetSystemCPUUsage() (uint64, error) ***REMOVED***
+func GetSystemCPUUsage() (uint64, error) {
 	var line string
 	f, err := os.Open("/proc/stat")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	bufReader := bufio.NewReaderSize(nil, 128)
-	defer func() ***REMOVED***
+	defer func() {
 		bufReader.Reset(nil)
 		f.Close()
-	***REMOVED***()
+	}()
 	bufReader.Reset(f)
 	err = nil
-	for err == nil ***REMOVED***
+	for err == nil {
 		line, err = bufReader.ReadString('\n')
-		if err != nil ***REMOVED***
+		if err != nil {
 			break
-		***REMOVED***
+		}
 		parts := strings.Fields(line)
-		switch parts[0] ***REMOVED***
+		switch parts[0] {
 		case "cpu":
-			if len(parts) < 8 ***REMOVED***
+			if len(parts) < 8 {
 				return 0, fmt.Errorf("bad format of cpu stats")
-			***REMOVED***
+			}
 			var totalClockTicks uint64
-			for _, i := range parts[1:8] ***REMOVED***
+			for _, i := range parts[1:8] {
 				v, err := strconv.ParseUint(i, 10, 64)
-				if err != nil ***REMOVED***
+				if err != nil {
 					return 0, fmt.Errorf("error parsing cpu stats")
-				***REMOVED***
+				}
 				totalClockTicks += v
-			***REMOVED***
+			}
 			return (totalClockTicks * nanoSecondsPerSecond) /
 				clockTicksPerSecond, nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return 0, fmt.Errorf("bad stats format")
-***REMOVED***
+}

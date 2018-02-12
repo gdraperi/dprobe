@@ -356,8 +356,8 @@ const (
 // "This list includes those cipher suites that do not
 // offer an ephemeral key exchange and those that are
 // based on the TLS null, stream or block cipher type"
-func isBadCipher(cipher uint16) bool ***REMOVED***
-	switch cipher ***REMOVED***
+func isBadCipher(cipher uint16) bool {
+	switch cipher {
 	case cipher_TLS_NULL_WITH_NULL_NULL,
 		cipher_TLS_RSA_WITH_NULL_MD5,
 		cipher_TLS_RSA_WITH_NULL_SHA,
@@ -637,5 +637,5 @@ func isBadCipher(cipher uint16) bool ***REMOVED***
 		return true
 	default:
 		return false
-	***REMOVED***
-***REMOVED***
+	}
+}

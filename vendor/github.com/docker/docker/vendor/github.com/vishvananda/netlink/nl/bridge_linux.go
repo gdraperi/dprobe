@@ -16,11 +16,11 @@ const (
 )
 
 /* Bridge management nested attributes
- * [IFLA_AF_SPEC] = ***REMOVED***
+ * [IFLA_AF_SPEC] = {
  *     [IFLA_BRIDGE_FLAGS]
  *     [IFLA_BRIDGE_MODE]
  *     [IFLA_BRIDGE_VLAN_INFO]
- * ***REMOVED***
+ * }
  */
 const (
 	IFLA_BRIDGE_FLAGS = iota
@@ -36,35 +36,35 @@ const (
 	BRIDGE_VLAN_INFO_RANGE_END
 )
 
-// struct bridge_vlan_info ***REMOVED***
+// struct bridge_vlan_info {
 //   __u16 flags;
 //   __u16 vid;
-// ***REMOVED***;
+// };
 
-type BridgeVlanInfo struct ***REMOVED***
+type BridgeVlanInfo struct {
 	Flags uint16
 	Vid   uint16
-***REMOVED***
+}
 
-func (b *BridgeVlanInfo) Serialize() []byte ***REMOVED***
+func (b *BridgeVlanInfo) Serialize() []byte {
 	return (*(*[SizeofBridgeVlanInfo]byte)(unsafe.Pointer(b)))[:]
-***REMOVED***
+}
 
-func DeserializeBridgeVlanInfo(b []byte) *BridgeVlanInfo ***REMOVED***
+func DeserializeBridgeVlanInfo(b []byte) *BridgeVlanInfo {
 	return (*BridgeVlanInfo)(unsafe.Pointer(&b[0:SizeofBridgeVlanInfo][0]))
-***REMOVED***
+}
 
-func (b *BridgeVlanInfo) PortVID() bool ***REMOVED***
+func (b *BridgeVlanInfo) PortVID() bool {
 	return b.Flags&BRIDGE_VLAN_INFO_PVID > 0
-***REMOVED***
+}
 
-func (b *BridgeVlanInfo) EngressUntag() bool ***REMOVED***
+func (b *BridgeVlanInfo) EngressUntag() bool {
 	return b.Flags&BRIDGE_VLAN_INFO_UNTAGGED > 0
-***REMOVED***
+}
 
-func (b *BridgeVlanInfo) String() string ***REMOVED***
+func (b *BridgeVlanInfo) String() string {
 	return fmt.Sprintf("%+v", *b)
-***REMOVED***
+}
 
 /* New extended info filters for IFLA_EXT_MASK */
 const (

@@ -16,179 +16,179 @@ import (
 	"time"
 )
 
-type closeWriter interface ***REMOVED***
+type closeWriter interface {
 	CloseWrite() error
-***REMOVED***
+}
 
-func testPortForward(t *testing.T, n, listenAddr string) ***REMOVED***
+func testPortForward(t *testing.T, n, listenAddr string) {
 	server := newServer(t)
 	defer server.Shutdown()
 	conn := server.Dial(clientConfig())
 	defer conn.Close()
 
 	sshListener, err := conn.Listen(n, listenAddr)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	go func() ***REMOVED***
+	go func() {
 		sshConn, err := sshListener.Accept()
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("listen.Accept failed: %v", err)
-		***REMOVED***
+		}
 
 		_, err = io.Copy(sshConn, sshConn)
-		if err != nil && err != io.EOF ***REMOVED***
+		if err != nil && err != io.EOF {
 			t.Fatalf("ssh client copy: %v", err)
-		***REMOVED***
+		}
 		sshConn.Close()
-	***REMOVED***()
+	}()
 
 	forwardedAddr := sshListener.Addr().String()
 	netConn, err := net.Dial(n, forwardedAddr)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("net dial failed: %v", err)
-	***REMOVED***
+	}
 
 	readChan := make(chan []byte)
-	go func() ***REMOVED***
+	go func() {
 		data, _ := ioutil.ReadAll(netConn)
 		readChan <- data
-	***REMOVED***()
+	}()
 
 	// Invent some data.
 	data := make([]byte, 100*1000)
-	for i := range data ***REMOVED***
+	for i := range data {
 		data[i] = byte(i % 255)
-	***REMOVED***
+	}
 
 	var sent []byte
-	for len(sent) < 1000*1000 ***REMOVED***
+	for len(sent) < 1000*1000 {
 		// Send random sized chunks
 		m := rand.Intn(len(data))
 		n, err := netConn.Write(data[:m])
-		if err != nil ***REMOVED***
+		if err != nil {
 			break
-		***REMOVED***
+		}
 		sent = append(sent, data[:n]...)
-	***REMOVED***
-	if err := netConn.(closeWriter).CloseWrite(); err != nil ***REMOVED***
+	}
+	if err := netConn.(closeWriter).CloseWrite(); err != nil {
 		t.Errorf("netConn.CloseWrite: %v", err)
-	***REMOVED***
+	}
 
 	read := <-readChan
 
-	if len(sent) != len(read) ***REMOVED***
+	if len(sent) != len(read) {
 		t.Fatalf("got %d bytes, want %d", len(read), len(sent))
-	***REMOVED***
-	if bytes.Compare(sent, read) != 0 ***REMOVED***
+	}
+	if bytes.Compare(sent, read) != 0 {
 		t.Fatalf("read back data does not match")
-	***REMOVED***
+	}
 
-	if err := sshListener.Close(); err != nil ***REMOVED***
+	if err := sshListener.Close(); err != nil {
 		t.Fatalf("sshListener.Close: %v", err)
-	***REMOVED***
+	}
 
 	// Check that the forward disappeared.
 	netConn, err = net.Dial(n, forwardedAddr)
-	if err == nil ***REMOVED***
+	if err == nil {
 		netConn.Close()
 		t.Errorf("still listening to %s after closing", forwardedAddr)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestPortForwardTCP(t *testing.T) ***REMOVED***
+func TestPortForwardTCP(t *testing.T) {
 	testPortForward(t, "tcp", "localhost:0")
-***REMOVED***
+}
 
-func TestPortForwardUnix(t *testing.T) ***REMOVED***
+func TestPortForwardUnix(t *testing.T) {
 	addr, cleanup := newTempSocket(t)
 	defer cleanup()
 	testPortForward(t, "unix", addr)
-***REMOVED***
+}
 
-func testAcceptClose(t *testing.T, n, listenAddr string) ***REMOVED***
+func testAcceptClose(t *testing.T, n, listenAddr string) {
 	server := newServer(t)
 	defer server.Shutdown()
 	conn := server.Dial(clientConfig())
 
 	sshListener, err := conn.Listen(n, listenAddr)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	quit := make(chan error, 1)
-	go func() ***REMOVED***
-		for ***REMOVED***
+	go func() {
+		for {
 			c, err := sshListener.Accept()
-			if err != nil ***REMOVED***
+			if err != nil {
 				quit <- err
 				break
-			***REMOVED***
+			}
 			c.Close()
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 	sshListener.Close()
 
-	select ***REMOVED***
+	select {
 	case <-time.After(1 * time.Second):
 		t.Errorf("timeout: listener did not close.")
 	case err := <-quit:
 		t.Logf("quit as expected (error %v)", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestAcceptCloseTCP(t *testing.T) ***REMOVED***
+func TestAcceptCloseTCP(t *testing.T) {
 	testAcceptClose(t, "tcp", "localhost:0")
-***REMOVED***
+}
 
-func TestAcceptCloseUnix(t *testing.T) ***REMOVED***
+func TestAcceptCloseUnix(t *testing.T) {
 	addr, cleanup := newTempSocket(t)
 	defer cleanup()
 	testAcceptClose(t, "unix", addr)
-***REMOVED***
+}
 
 // Check that listeners exit if the underlying client transport dies.
-func testPortForwardConnectionClose(t *testing.T, n, listenAddr string) ***REMOVED***
+func testPortForwardConnectionClose(t *testing.T, n, listenAddr string) {
 	server := newServer(t)
 	defer server.Shutdown()
 	conn := server.Dial(clientConfig())
 
 	sshListener, err := conn.Listen(n, listenAddr)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	quit := make(chan error, 1)
-	go func() ***REMOVED***
-		for ***REMOVED***
+	go func() {
+		for {
 			c, err := sshListener.Accept()
-			if err != nil ***REMOVED***
+			if err != nil {
 				quit <- err
 				break
-			***REMOVED***
+			}
 			c.Close()
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
 	// It would be even nicer if we closed the server side, but it
 	// is more involved as the fd for that side is dup()ed.
 	server.clientConn.Close()
 
-	select ***REMOVED***
+	select {
 	case <-time.After(1 * time.Second):
 		t.Errorf("timeout: listener did not close.")
 	case err := <-quit:
 		t.Logf("quit as expected (error %v)", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestPortForwardConnectionCloseTCP(t *testing.T) ***REMOVED***
+func TestPortForwardConnectionCloseTCP(t *testing.T) {
 	testPortForwardConnectionClose(t, "tcp", "localhost:0")
-***REMOVED***
+}
 
-func TestPortForwardConnectionCloseUnix(t *testing.T) ***REMOVED***
+func TestPortForwardConnectionCloseUnix(t *testing.T) {
 	addr, cleanup := newTempSocket(t)
 	defer cleanup()
 	testPortForwardConnectionClose(t, "unix", addr)
-***REMOVED***
+}

@@ -14,87 +14,87 @@ import "sort"
 type Index string
 
 // Elem returns the element data at the given index.
-func (s Index) Elem(x int) string ***REMOVED***
+func (s Index) Elem(x int) string {
 	return string(s[x*4 : x*4+4])
-***REMOVED***
+}
 
 // Index reports the index of the given key or -1 if it could not be found.
 // Only the first len(key) bytes from the start of the 4-byte entries will be
 // considered for the search and the first match in Index will be returned.
-func (s Index) Index(key []byte) int ***REMOVED***
+func (s Index) Index(key []byte) int {
 	n := len(key)
 	// search the index of the first entry with an equal or higher value than
 	// key in s.
-	index := sort.Search(len(s)/4, func(i int) bool ***REMOVED***
+	index := sort.Search(len(s)/4, func(i int) bool {
 		return cmp(s[i*4:i*4+n], key) != -1
-	***REMOVED***)
+	})
 	i := index * 4
-	if cmp(s[i:i+len(key)], key) != 0 ***REMOVED***
+	if cmp(s[i:i+len(key)], key) != 0 {
 		return -1
-	***REMOVED***
+	}
 	return index
-***REMOVED***
+}
 
 // Next finds the next occurrence of key after index x, which must have been
 // obtained from a call to Index using the same key. It returns x+1 or -1.
-func (s Index) Next(key []byte, x int) int ***REMOVED***
-	if x++; x*4 < len(s) && cmp(s[x*4:x*4+len(key)], key) == 0 ***REMOVED***
+func (s Index) Next(key []byte, x int) int {
+	if x++; x*4 < len(s) && cmp(s[x*4:x*4+len(key)], key) == 0 {
 		return x
-	***REMOVED***
+	}
 	return -1
-***REMOVED***
+}
 
 // cmp returns an integer comparing a and b lexicographically.
-func cmp(a Index, b []byte) int ***REMOVED***
+func cmp(a Index, b []byte) int {
 	n := len(a)
-	if len(b) < n ***REMOVED***
+	if len(b) < n {
 		n = len(b)
-	***REMOVED***
-	for i, c := range b[:n] ***REMOVED***
-		switch ***REMOVED***
+	}
+	for i, c := range b[:n] {
+		switch {
 		case a[i] > c:
 			return 1
 		case a[i] < c:
 			return -1
-		***REMOVED***
-	***REMOVED***
-	switch ***REMOVED***
+		}
+	}
+	switch {
 	case len(a) < len(b):
 		return -1
 	case len(a) > len(b):
 		return 1
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
 // Compare returns an integer comparing a and b lexicographically.
-func Compare(a string, b []byte) int ***REMOVED***
+func Compare(a string, b []byte) int {
 	return cmp(Index(a), b)
-***REMOVED***
+}
 
 // FixCase reformats b to the same pattern of cases as form.
 // If returns false if string b is malformed.
-func FixCase(form string, b []byte) bool ***REMOVED***
-	if len(form) != len(b) ***REMOVED***
+func FixCase(form string, b []byte) bool {
+	if len(form) != len(b) {
 		return false
-	***REMOVED***
-	for i, c := range b ***REMOVED***
-		if form[i] <= 'Z' ***REMOVED***
-			if c >= 'a' ***REMOVED***
+	}
+	for i, c := range b {
+		if form[i] <= 'Z' {
+			if c >= 'a' {
 				c -= 'z' - 'Z'
-			***REMOVED***
-			if c < 'A' || 'Z' < c ***REMOVED***
+			}
+			if c < 'A' || 'Z' < c {
 				return false
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
-			if c <= 'Z' ***REMOVED***
+			}
+		} else {
+			if c <= 'Z' {
 				c += 'z' - 'Z'
-			***REMOVED***
-			if c < 'a' || 'z' < c ***REMOVED***
+			}
+			if c < 'a' || 'z' < c {
 				return false
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		b[i] = c
-	***REMOVED***
+	}
 	return true
-***REMOVED***
+}

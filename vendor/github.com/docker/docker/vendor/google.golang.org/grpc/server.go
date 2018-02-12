@@ -61,36 +61,36 @@ import (
 	"google.golang.org/grpc/transport"
 )
 
-type methodHandler func(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error)
+type methodHandler func(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor UnaryServerInterceptor) (interface{}, error)
 
 // MethodDesc represents an RPC service's method specification.
-type MethodDesc struct ***REMOVED***
+type MethodDesc struct {
 	MethodName string
 	Handler    methodHandler
-***REMOVED***
+}
 
 // ServiceDesc represents an RPC service's specification.
-type ServiceDesc struct ***REMOVED***
+type ServiceDesc struct {
 	ServiceName string
 	// The pointer to the service interface. Used to check whether the user
 	// provided implementation satisfies the interface requirements.
-	HandlerType interface***REMOVED******REMOVED***
+	HandlerType interface{}
 	Methods     []MethodDesc
 	Streams     []StreamDesc
-	Metadata    interface***REMOVED******REMOVED***
-***REMOVED***
+	Metadata    interface{}
+}
 
 // service consists of the information of the server serving this service and
 // the methods in this service.
-type service struct ***REMOVED***
-	server interface***REMOVED******REMOVED*** // the server for service methods
+type service struct {
+	server interface{} // the server for service methods
 	md     map[string]*MethodDesc
 	sd     map[string]*StreamDesc
-	mdata  interface***REMOVED******REMOVED***
-***REMOVED***
+	mdata  interface{}
+}
 
 // Server is a gRPC server to serve RPC requests.
-type Server struct ***REMOVED***
+type Server struct {
 	opts options
 
 	mu     sync.Mutex // guards following
@@ -104,9 +104,9 @@ type Server struct ***REMOVED***
 	cv     *sync.Cond
 	m      map[string]*service // service name -> service info
 	events trace.EventLog
-***REMOVED***
+}
 
-type options struct ***REMOVED***
+type options struct {
 	creds                credentials.TransportCredentials
 	codec                Codec
 	cp                   Compressor
@@ -121,7 +121,7 @@ type options struct ***REMOVED***
 	unknownStreamDesc    *StreamDesc
 	keepaliveParams      keepalive.ServerParameters
 	keepalivePolicy      keepalive.EnforcementPolicy
-***REMOVED***
+}
 
 var defaultMaxMsgSize = 1024 * 1024 * 4 // use 4MB as the default message size limit
 
@@ -129,103 +129,103 @@ var defaultMaxMsgSize = 1024 * 1024 * 4 // use 4MB as the default message size l
 type ServerOption func(*options)
 
 // KeepaliveParams returns a ServerOption that sets keepalive and max-age parameters for the server.
-func KeepaliveParams(kp keepalive.ServerParameters) ServerOption ***REMOVED***
-	return func(o *options) ***REMOVED***
+func KeepaliveParams(kp keepalive.ServerParameters) ServerOption {
+	return func(o *options) {
 		o.keepaliveParams = kp
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // KeepaliveEnforcementPolicy returns a ServerOption that sets keepalive enforcement policy for the server.
-func KeepaliveEnforcementPolicy(kep keepalive.EnforcementPolicy) ServerOption ***REMOVED***
-	return func(o *options) ***REMOVED***
+func KeepaliveEnforcementPolicy(kep keepalive.EnforcementPolicy) ServerOption {
+	return func(o *options) {
 		o.keepalivePolicy = kep
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // CustomCodec returns a ServerOption that sets a codec for message marshaling and unmarshaling.
-func CustomCodec(codec Codec) ServerOption ***REMOVED***
-	return func(o *options) ***REMOVED***
+func CustomCodec(codec Codec) ServerOption {
+	return func(o *options) {
 		o.codec = codec
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // RPCCompressor returns a ServerOption that sets a compressor for outbound messages.
-func RPCCompressor(cp Compressor) ServerOption ***REMOVED***
-	return func(o *options) ***REMOVED***
+func RPCCompressor(cp Compressor) ServerOption {
+	return func(o *options) {
 		o.cp = cp
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // RPCDecompressor returns a ServerOption that sets a decompressor for inbound messages.
-func RPCDecompressor(dc Decompressor) ServerOption ***REMOVED***
-	return func(o *options) ***REMOVED***
+func RPCDecompressor(dc Decompressor) ServerOption {
+	return func(o *options) {
 		o.dc = dc
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // MaxMsgSize returns a ServerOption to set the max message size in bytes for inbound mesages.
 // If this is not set, gRPC uses the default 4MB.
-func MaxMsgSize(m int) ServerOption ***REMOVED***
-	return func(o *options) ***REMOVED***
+func MaxMsgSize(m int) ServerOption {
+	return func(o *options) {
 		o.maxMsgSize = m
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // MaxConcurrentStreams returns a ServerOption that will apply a limit on the number
 // of concurrent streams to each ServerTransport.
-func MaxConcurrentStreams(n uint32) ServerOption ***REMOVED***
-	return func(o *options) ***REMOVED***
+func MaxConcurrentStreams(n uint32) ServerOption {
+	return func(o *options) {
 		o.maxConcurrentStreams = n
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Creds returns a ServerOption that sets credentials for server connections.
-func Creds(c credentials.TransportCredentials) ServerOption ***REMOVED***
-	return func(o *options) ***REMOVED***
+func Creds(c credentials.TransportCredentials) ServerOption {
+	return func(o *options) {
 		o.creds = c
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // UnaryInterceptor returns a ServerOption that sets the UnaryServerInterceptor for the
 // server. Only one unary interceptor can be installed. The construction of multiple
 // interceptors (e.g., chaining) can be implemented at the caller.
-func UnaryInterceptor(i UnaryServerInterceptor) ServerOption ***REMOVED***
-	return func(o *options) ***REMOVED***
-		if o.unaryInt != nil ***REMOVED***
+func UnaryInterceptor(i UnaryServerInterceptor) ServerOption {
+	return func(o *options) {
+		if o.unaryInt != nil {
 			panic("The unary server interceptor has been set.")
-		***REMOVED***
+		}
 		o.unaryInt = i
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // StreamInterceptor returns a ServerOption that sets the StreamServerInterceptor for the
 // server. Only one stream interceptor can be installed.
-func StreamInterceptor(i StreamServerInterceptor) ServerOption ***REMOVED***
-	return func(o *options) ***REMOVED***
-		if o.streamInt != nil ***REMOVED***
+func StreamInterceptor(i StreamServerInterceptor) ServerOption {
+	return func(o *options) {
+		if o.streamInt != nil {
 			panic("The stream server interceptor has been set.")
-		***REMOVED***
+		}
 		o.streamInt = i
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // InTapHandle returns a ServerOption that sets the tap handle for all the server
 // transport to be created. Only one can be installed.
-func InTapHandle(h tap.ServerInHandle) ServerOption ***REMOVED***
-	return func(o *options) ***REMOVED***
-		if o.inTapHandle != nil ***REMOVED***
+func InTapHandle(h tap.ServerInHandle) ServerOption {
+	return func(o *options) {
+		if o.inTapHandle != nil {
 			panic("The tap handle has been set.")
-		***REMOVED***
+		}
 		o.inTapHandle = h
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // StatsHandler returns a ServerOption that sets the stats handler for the server.
-func StatsHandler(h stats.Handler) ServerOption ***REMOVED***
-	return func(o *options) ***REMOVED***
+func StatsHandler(h stats.Handler) ServerOption {
+	return func(o *options) {
 		o.statsHandler = h
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // UnknownServiceHandler returns a ServerOption that allows for adding a custom
 // unknown service handler. The provided method is a bidi-streaming RPC service
@@ -233,142 +233,142 @@ func StatsHandler(h stats.Handler) ServerOption ***REMOVED***
 // error whenever a request is received for an unregistered service or method.
 // The handling function has full access to the Context of the request and the
 // stream, and the invocation passes through interceptors.
-func UnknownServiceHandler(streamHandler StreamHandler) ServerOption ***REMOVED***
-	return func(o *options) ***REMOVED***
-		o.unknownStreamDesc = &StreamDesc***REMOVED***
+func UnknownServiceHandler(streamHandler StreamHandler) ServerOption {
+	return func(o *options) {
+		o.unknownStreamDesc = &StreamDesc{
 			StreamName: "unknown_service_handler",
 			Handler:    streamHandler,
 			// We need to assume that the users of the streamHandler will want to use both.
 			ClientStreams: true,
 			ServerStreams: true,
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // NewServer creates a gRPC server which has no service registered and has not
 // started to accept requests yet.
-func NewServer(opt ...ServerOption) *Server ***REMOVED***
+func NewServer(opt ...ServerOption) *Server {
 	var opts options
 	opts.maxMsgSize = defaultMaxMsgSize
-	for _, o := range opt ***REMOVED***
+	for _, o := range opt {
 		o(&opts)
-	***REMOVED***
-	if opts.codec == nil ***REMOVED***
+	}
+	if opts.codec == nil {
 		// Set the default codec.
-		opts.codec = protoCodec***REMOVED******REMOVED***
-	***REMOVED***
-	s := &Server***REMOVED***
+		opts.codec = protoCodec{}
+	}
+	s := &Server{
 		lis:   make(map[net.Listener]bool),
 		opts:  opts,
 		conns: make(map[io.Closer]bool),
 		m:     make(map[string]*service),
-	***REMOVED***
+	}
 	s.cv = sync.NewCond(&s.mu)
 	s.ctx, s.cancel = context.WithCancel(context.Background())
-	if EnableTracing ***REMOVED***
+	if EnableTracing {
 		_, file, line, _ := runtime.Caller(1)
 		s.events = trace.NewEventLog("grpc.Server", fmt.Sprintf("%s:%d", file, line))
-	***REMOVED***
+	}
 	return s
-***REMOVED***
+}
 
 // printf records an event in s's event log, unless s has been stopped.
 // REQUIRES s.mu is held.
-func (s *Server) printf(format string, a ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if s.events != nil ***REMOVED***
+func (s *Server) printf(format string, a ...interface{}) {
+	if s.events != nil {
 		s.events.Printf(format, a...)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // errorf records an error in s's event log, unless s has been stopped.
 // REQUIRES s.mu is held.
-func (s *Server) errorf(format string, a ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if s.events != nil ***REMOVED***
+func (s *Server) errorf(format string, a ...interface{}) {
+	if s.events != nil {
 		s.events.Errorf(format, a...)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // RegisterService register a service and its implementation to the gRPC
 // server. Called from the IDL generated code. This must be called before
 // invoking Serve.
-func (s *Server) RegisterService(sd *ServiceDesc, ss interface***REMOVED******REMOVED***) ***REMOVED***
+func (s *Server) RegisterService(sd *ServiceDesc, ss interface{}) {
 	ht := reflect.TypeOf(sd.HandlerType).Elem()
 	st := reflect.TypeOf(ss)
-	if !st.Implements(ht) ***REMOVED***
+	if !st.Implements(ht) {
 		grpclog.Fatalf("grpc: Server.RegisterService found the handler of type %v that does not satisfy %v", st, ht)
-	***REMOVED***
+	}
 	s.register(sd, ss)
-***REMOVED***
+}
 
-func (s *Server) register(sd *ServiceDesc, ss interface***REMOVED******REMOVED***) ***REMOVED***
+func (s *Server) register(sd *ServiceDesc, ss interface{}) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	s.printf("RegisterService(%q)", sd.ServiceName)
-	if _, ok := s.m[sd.ServiceName]; ok ***REMOVED***
+	if _, ok := s.m[sd.ServiceName]; ok {
 		grpclog.Fatalf("grpc: Server.RegisterService found duplicate service registration for %q", sd.ServiceName)
-	***REMOVED***
-	srv := &service***REMOVED***
+	}
+	srv := &service{
 		server: ss,
 		md:     make(map[string]*MethodDesc),
 		sd:     make(map[string]*StreamDesc),
 		mdata:  sd.Metadata,
-	***REMOVED***
-	for i := range sd.Methods ***REMOVED***
+	}
+	for i := range sd.Methods {
 		d := &sd.Methods[i]
 		srv.md[d.MethodName] = d
-	***REMOVED***
-	for i := range sd.Streams ***REMOVED***
+	}
+	for i := range sd.Streams {
 		d := &sd.Streams[i]
 		srv.sd[d.StreamName] = d
-	***REMOVED***
+	}
 	s.m[sd.ServiceName] = srv
-***REMOVED***
+}
 
 // MethodInfo contains the information of an RPC including its method name and type.
-type MethodInfo struct ***REMOVED***
+type MethodInfo struct {
 	// Name is the method name only, without the service name or package name.
 	Name string
 	// IsClientStream indicates whether the RPC is a client streaming RPC.
 	IsClientStream bool
 	// IsServerStream indicates whether the RPC is a server streaming RPC.
 	IsServerStream bool
-***REMOVED***
+}
 
 // ServiceInfo contains unary RPC method info, streaming RPC methid info and metadata for a service.
-type ServiceInfo struct ***REMOVED***
+type ServiceInfo struct {
 	Methods []MethodInfo
 	// Metadata is the metadata specified in ServiceDesc when registering service.
-	Metadata interface***REMOVED******REMOVED***
-***REMOVED***
+	Metadata interface{}
+}
 
 // GetServiceInfo returns a map from service names to ServiceInfo.
 // Service names include the package names, in the form of <package>.<service>.
-func (s *Server) GetServiceInfo() map[string]ServiceInfo ***REMOVED***
+func (s *Server) GetServiceInfo() map[string]ServiceInfo {
 	ret := make(map[string]ServiceInfo)
-	for n, srv := range s.m ***REMOVED***
+	for n, srv := range s.m {
 		methods := make([]MethodInfo, 0, len(srv.md)+len(srv.sd))
-		for m := range srv.md ***REMOVED***
-			methods = append(methods, MethodInfo***REMOVED***
+		for m := range srv.md {
+			methods = append(methods, MethodInfo{
 				Name:           m,
 				IsClientStream: false,
 				IsServerStream: false,
-			***REMOVED***)
-		***REMOVED***
-		for m, d := range srv.sd ***REMOVED***
-			methods = append(methods, MethodInfo***REMOVED***
+			})
+		}
+		for m, d := range srv.sd {
+			methods = append(methods, MethodInfo{
 				Name:           m,
 				IsClientStream: d.ClientStreams,
 				IsServerStream: d.ServerStreams,
-			***REMOVED***)
-		***REMOVED***
+			})
+		}
 
-		ret[n] = ServiceInfo***REMOVED***
+		ret[n] = ServiceInfo{
 			Methods:  methods,
 			Metadata: srv.mdata,
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return ret
-***REMOVED***
+}
 
 var (
 	// ErrServerStopped indicates that the operation is now illegal because of
@@ -376,12 +376,12 @@ var (
 	ErrServerStopped = errors.New("grpc: the server has been stopped")
 )
 
-func (s *Server) useTransportAuthenticator(rawConn net.Conn) (net.Conn, credentials.AuthInfo, error) ***REMOVED***
-	if s.opts.creds == nil ***REMOVED***
+func (s *Server) useTransportAuthenticator(rawConn net.Conn) (net.Conn, credentials.AuthInfo, error) {
+	if s.opts.creds == nil {
 		return rawConn, nil, nil
-	***REMOVED***
+	}
 	return s.opts.creds.ServerHandshake(rawConn)
-***REMOVED***
+}
 
 // Serve accepts incoming connections on the listener lis, creating a new
 // ServerTransport and service goroutine for each. The service goroutines
@@ -389,142 +389,142 @@ func (s *Server) useTransportAuthenticator(rawConn net.Conn) (net.Conn, credenti
 // Serve returns when lis.Accept fails with fatal errors.  lis will be closed when
 // this method returns.
 // Serve always returns non-nil error.
-func (s *Server) Serve(lis net.Listener) error ***REMOVED***
+func (s *Server) Serve(lis net.Listener) error {
 	s.mu.Lock()
 	s.printf("serving")
-	if s.lis == nil ***REMOVED***
+	if s.lis == nil {
 		s.mu.Unlock()
 		lis.Close()
 		return ErrServerStopped
-	***REMOVED***
+	}
 	s.lis[lis] = true
 	s.mu.Unlock()
-	defer func() ***REMOVED***
+	defer func() {
 		s.mu.Lock()
-		if s.lis != nil && s.lis[lis] ***REMOVED***
+		if s.lis != nil && s.lis[lis] {
 			lis.Close()
 			delete(s.lis, lis)
-		***REMOVED***
+		}
 		s.mu.Unlock()
-	***REMOVED***()
+	}()
 
 	var tempDelay time.Duration // how long to sleep on accept failure
 
-	for ***REMOVED***
+	for {
 		rawConn, err := lis.Accept()
-		if err != nil ***REMOVED***
-			if ne, ok := err.(interface ***REMOVED***
+		if err != nil {
+			if ne, ok := err.(interface {
 				Temporary() bool
-			***REMOVED***); ok && ne.Temporary() ***REMOVED***
-				if tempDelay == 0 ***REMOVED***
+			}); ok && ne.Temporary() {
+				if tempDelay == 0 {
 					tempDelay = 5 * time.Millisecond
-				***REMOVED*** else ***REMOVED***
+				} else {
 					tempDelay *= 2
-				***REMOVED***
-				if max := 1 * time.Second; tempDelay > max ***REMOVED***
+				}
+				if max := 1 * time.Second; tempDelay > max {
 					tempDelay = max
-				***REMOVED***
+				}
 				s.mu.Lock()
 				s.printf("Accept error: %v; retrying in %v", err, tempDelay)
 				s.mu.Unlock()
-				select ***REMOVED***
+				select {
 				case <-time.After(tempDelay):
 				case <-s.ctx.Done():
-				***REMOVED***
+				}
 				continue
-			***REMOVED***
+			}
 			s.mu.Lock()
 			s.printf("done serving; Accept = %v", err)
 			s.mu.Unlock()
 			return err
-		***REMOVED***
+		}
 		tempDelay = 0
 		// Start a new goroutine to deal with rawConn
 		// so we don't stall this Accept loop goroutine.
 		go s.handleRawConn(rawConn)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // handleRawConn is run in its own goroutine and handles a just-accepted
 // connection that has not had any I/O performed on it yet.
-func (s *Server) handleRawConn(rawConn net.Conn) ***REMOVED***
+func (s *Server) handleRawConn(rawConn net.Conn) {
 	conn, authInfo, err := s.useTransportAuthenticator(rawConn)
-	if err != nil ***REMOVED***
+	if err != nil {
 		s.mu.Lock()
 		s.errorf("ServerHandshake(%q) failed: %v", rawConn.RemoteAddr(), err)
 		s.mu.Unlock()
 		grpclog.Printf("grpc: Server.Serve failed to complete security handshake from %q: %v", rawConn.RemoteAddr(), err)
 		// If serverHandShake returns ErrConnDispatched, keep rawConn open.
-		if err != credentials.ErrConnDispatched ***REMOVED***
+		if err != credentials.ErrConnDispatched {
 			rawConn.Close()
-		***REMOVED***
+		}
 		return
-	***REMOVED***
+	}
 
 	s.mu.Lock()
-	if s.conns == nil ***REMOVED***
+	if s.conns == nil {
 		s.mu.Unlock()
 		conn.Close()
 		return
-	***REMOVED***
+	}
 	s.mu.Unlock()
 
-	if s.opts.useHandlerImpl ***REMOVED***
+	if s.opts.useHandlerImpl {
 		s.serveUsingHandler(conn)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		s.serveHTTP2Transport(conn, authInfo)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // serveHTTP2Transport sets up a http/2 transport (using the
 // gRPC http2 server transport in transport/http2_server.go) and
 // serves streams on it.
 // This is run in its own goroutine (it does network I/O in
 // transport.NewServerTransport).
-func (s *Server) serveHTTP2Transport(c net.Conn, authInfo credentials.AuthInfo) ***REMOVED***
-	config := &transport.ServerConfig***REMOVED***
+func (s *Server) serveHTTP2Transport(c net.Conn, authInfo credentials.AuthInfo) {
+	config := &transport.ServerConfig{
 		MaxStreams:      s.opts.maxConcurrentStreams,
 		AuthInfo:        authInfo,
 		InTapHandle:     s.opts.inTapHandle,
 		StatsHandler:    s.opts.statsHandler,
 		KeepaliveParams: s.opts.keepaliveParams,
 		KeepalivePolicy: s.opts.keepalivePolicy,
-	***REMOVED***
+	}
 	st, err := transport.NewServerTransport("http2", c, config)
-	if err != nil ***REMOVED***
+	if err != nil {
 		s.mu.Lock()
 		s.errorf("NewServerTransport(%q) failed: %v", c.RemoteAddr(), err)
 		s.mu.Unlock()
 		c.Close()
 		grpclog.Println("grpc: Server.Serve failed to create ServerTransport: ", err)
 		return
-	***REMOVED***
-	if !s.addConn(st) ***REMOVED***
+	}
+	if !s.addConn(st) {
 		st.Close()
 		return
-	***REMOVED***
+	}
 	s.serveStreams(st)
-***REMOVED***
+}
 
-func (s *Server) serveStreams(st transport.ServerTransport) ***REMOVED***
+func (s *Server) serveStreams(st transport.ServerTransport) {
 	defer s.removeConn(st)
 	defer st.Close()
 	var wg sync.WaitGroup
-	st.HandleStreams(func(stream *transport.Stream) ***REMOVED***
+	st.HandleStreams(func(stream *transport.Stream) {
 		wg.Add(1)
-		go func() ***REMOVED***
+		go func() {
 			defer wg.Done()
 			s.handleStream(st, stream, s.traceInfo(st, stream))
-		***REMOVED***()
-	***REMOVED***, func(ctx context.Context, method string) context.Context ***REMOVED***
-		if !EnableTracing ***REMOVED***
+		}()
+	}, func(ctx context.Context, method string) context.Context {
+		if !EnableTracing {
 			return ctx
-		***REMOVED***
+		}
 		tr := trace.New("grpc.Recv."+methodFamily(method), method)
 		return trace.NewContext(ctx, tr)
-	***REMOVED***)
+	})
 	wg.Wait()
-***REMOVED***
+}
 
 var _ http.Handler = (*Server)(nil)
 
@@ -540,86 +540,86 @@ var _ http.Handler = (*Server)(nil)
 // method as one of the environment types.
 //
 // conn is the *tls.Conn that's already been authenticated.
-func (s *Server) serveUsingHandler(conn net.Conn) ***REMOVED***
-	if !s.addConn(conn) ***REMOVED***
+func (s *Server) serveUsingHandler(conn net.Conn) {
+	if !s.addConn(conn) {
 		conn.Close()
 		return
-	***REMOVED***
+	}
 	defer s.removeConn(conn)
-	h2s := &http2.Server***REMOVED***
+	h2s := &http2.Server{
 		MaxConcurrentStreams: s.opts.maxConcurrentStreams,
-	***REMOVED***
-	h2s.ServeConn(conn, &http2.ServeConnOpts***REMOVED***
+	}
+	h2s.ServeConn(conn, &http2.ServeConnOpts{
 		Handler: s,
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) ***REMOVED***
+func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	st, err := transport.NewServerHandlerTransport(w, r)
-	if err != nil ***REMOVED***
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
-	***REMOVED***
-	if !s.addConn(st) ***REMOVED***
+	}
+	if !s.addConn(st) {
 		st.Close()
 		return
-	***REMOVED***
+	}
 	defer s.removeConn(st)
 	s.serveStreams(st)
-***REMOVED***
+}
 
 // traceInfo returns a traceInfo and associates it with stream, if tracing is enabled.
 // If tracing is not enabled, it returns nil.
-func (s *Server) traceInfo(st transport.ServerTransport, stream *transport.Stream) (trInfo *traceInfo) ***REMOVED***
+func (s *Server) traceInfo(st transport.ServerTransport, stream *transport.Stream) (trInfo *traceInfo) {
 	tr, ok := trace.FromContext(stream.Context())
-	if !ok ***REMOVED***
+	if !ok {
 		return nil
-	***REMOVED***
+	}
 
-	trInfo = &traceInfo***REMOVED***
+	trInfo = &traceInfo{
 		tr: tr,
-	***REMOVED***
+	}
 	trInfo.firstLine.client = false
 	trInfo.firstLine.remoteAddr = st.RemoteAddr()
 
-	if dl, ok := stream.Context().Deadline(); ok ***REMOVED***
+	if dl, ok := stream.Context().Deadline(); ok {
 		trInfo.firstLine.deadline = dl.Sub(time.Now())
-	***REMOVED***
+	}
 	return trInfo
-***REMOVED***
+}
 
-func (s *Server) addConn(c io.Closer) bool ***REMOVED***
+func (s *Server) addConn(c io.Closer) bool {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if s.conns == nil || s.drain ***REMOVED***
+	if s.conns == nil || s.drain {
 		return false
-	***REMOVED***
+	}
 	s.conns[c] = true
 	return true
-***REMOVED***
+}
 
-func (s *Server) removeConn(c io.Closer) ***REMOVED***
+func (s *Server) removeConn(c io.Closer) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if s.conns != nil ***REMOVED***
+	if s.conns != nil {
 		delete(s.conns, c)
 		s.cv.Broadcast()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *Server) sendResponse(t transport.ServerTransport, stream *transport.Stream, msg interface***REMOVED******REMOVED***, cp Compressor, opts *transport.Options) error ***REMOVED***
+func (s *Server) sendResponse(t transport.ServerTransport, stream *transport.Stream, msg interface{}, cp Compressor, opts *transport.Options) error {
 	var (
 		cbuf       *bytes.Buffer
 		outPayload *stats.OutPayload
 	)
-	if cp != nil ***REMOVED***
+	if cp != nil {
 		cbuf = new(bytes.Buffer)
-	***REMOVED***
-	if s.opts.statsHandler != nil ***REMOVED***
-		outPayload = &stats.OutPayload***REMOVED******REMOVED***
-	***REMOVED***
+	}
+	if s.opts.statsHandler != nil {
+		outPayload = &stats.OutPayload{}
+	}
 	p, err := encode(s.opts.codec, msg, cp, cbuf, outPayload)
-	if err != nil ***REMOVED***
+	if err != nil {
 		// This typically indicates a fatal issue (e.g., memory
 		// corruption or hardware faults) the application program
 		// cannot handle.
@@ -628,364 +628,364 @@ func (s *Server) sendResponse(t transport.ServerTransport, stream *transport.Str
 		// faulty stream locally and remotely (Other streams can keep going). Find
 		// the optimal option.
 		grpclog.Fatalf("grpc: Server failed to encode response %v", err)
-	***REMOVED***
+	}
 	err = t.Write(stream, p, opts)
-	if err == nil && outPayload != nil ***REMOVED***
+	if err == nil && outPayload != nil {
 		outPayload.SentTime = time.Now()
 		s.opts.statsHandler.HandleRPC(stream.Context(), outPayload)
-	***REMOVED***
+	}
 	return err
-***REMOVED***
+}
 
-func (s *Server) processUnaryRPC(t transport.ServerTransport, stream *transport.Stream, srv *service, md *MethodDesc, trInfo *traceInfo) (err error) ***REMOVED***
+func (s *Server) processUnaryRPC(t transport.ServerTransport, stream *transport.Stream, srv *service, md *MethodDesc, trInfo *traceInfo) (err error) {
 	sh := s.opts.statsHandler
-	if sh != nil ***REMOVED***
-		begin := &stats.Begin***REMOVED***
+	if sh != nil {
+		begin := &stats.Begin{
 			BeginTime: time.Now(),
-		***REMOVED***
+		}
 		sh.HandleRPC(stream.Context(), begin)
-	***REMOVED***
-	defer func() ***REMOVED***
-		if sh != nil ***REMOVED***
-			end := &stats.End***REMOVED***
+	}
+	defer func() {
+		if sh != nil {
+			end := &stats.End{
 				EndTime: time.Now(),
-			***REMOVED***
-			if err != nil && err != io.EOF ***REMOVED***
+			}
+			if err != nil && err != io.EOF {
 				end.Error = toRPCErr(err)
-			***REMOVED***
+			}
 			sh.HandleRPC(stream.Context(), end)
-		***REMOVED***
-	***REMOVED***()
-	if trInfo != nil ***REMOVED***
+		}
+	}()
+	if trInfo != nil {
 		defer trInfo.tr.Finish()
 		trInfo.firstLine.client = false
 		trInfo.tr.LazyLog(&trInfo.firstLine, false)
-		defer func() ***REMOVED***
-			if err != nil && err != io.EOF ***REMOVED***
-				trInfo.tr.LazyLog(&fmtStringer***REMOVED***"%v", []interface***REMOVED******REMOVED******REMOVED***err***REMOVED******REMOVED***, true)
+		defer func() {
+			if err != nil && err != io.EOF {
+				trInfo.tr.LazyLog(&fmtStringer{"%v", []interface{}{err}}, true)
 				trInfo.tr.SetError()
-			***REMOVED***
-		***REMOVED***()
-	***REMOVED***
-	if s.opts.cp != nil ***REMOVED***
+			}
+		}()
+	}
+	if s.opts.cp != nil {
 		// NOTE: this needs to be ahead of all handling, https://github.com/grpc/grpc-go/issues/686.
 		stream.SetSendCompress(s.opts.cp.Type())
-	***REMOVED***
-	p := &parser***REMOVED***r: stream***REMOVED***
-	for ***REMOVED*** // TODO: delete
+	}
+	p := &parser{r: stream}
+	for { // TODO: delete
 		pf, req, err := p.recvMsg(s.opts.maxMsgSize)
-		if err == io.EOF ***REMOVED***
+		if err == io.EOF {
 			// The entire stream is done (for unary RPC only).
 			return err
-		***REMOVED***
-		if err == io.ErrUnexpectedEOF ***REMOVED***
+		}
+		if err == io.ErrUnexpectedEOF {
 			err = Errorf(codes.Internal, io.ErrUnexpectedEOF.Error())
-		***REMOVED***
-		if err != nil ***REMOVED***
-			if st, ok := status.FromError(err); ok ***REMOVED***
-				if e := t.WriteStatus(stream, st); e != nil ***REMOVED***
+		}
+		if err != nil {
+			if st, ok := status.FromError(err); ok {
+				if e := t.WriteStatus(stream, st); e != nil {
 					grpclog.Printf("grpc: Server.processUnaryRPC failed to write status %v", e)
-				***REMOVED***
-			***REMOVED*** else ***REMOVED***
-				switch st := err.(type) ***REMOVED***
+				}
+			} else {
+				switch st := err.(type) {
 				case transport.ConnectionError:
 					// Nothing to do here.
 				case transport.StreamError:
-					if e := t.WriteStatus(stream, status.New(st.Code, st.Desc)); e != nil ***REMOVED***
+					if e := t.WriteStatus(stream, status.New(st.Code, st.Desc)); e != nil {
 						grpclog.Printf("grpc: Server.processUnaryRPC failed to write status %v", e)
-					***REMOVED***
+					}
 				default:
 					panic(fmt.Sprintf("grpc: Unexpected error (%T) from recvMsg: %v", st, st))
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return err
-		***REMOVED***
+		}
 
-		if err := checkRecvPayload(pf, stream.RecvCompress(), s.opts.dc); err != nil ***REMOVED***
-			if st, ok := status.FromError(err); ok ***REMOVED***
-				if e := t.WriteStatus(stream, st); e != nil ***REMOVED***
+		if err := checkRecvPayload(pf, stream.RecvCompress(), s.opts.dc); err != nil {
+			if st, ok := status.FromError(err); ok {
+				if e := t.WriteStatus(stream, st); e != nil {
 					grpclog.Printf("grpc: Server.processUnaryRPC failed to write status %v", e)
-				***REMOVED***
+				}
 				return err
-			***REMOVED***
-			if e := t.WriteStatus(stream, status.New(codes.Internal, err.Error())); e != nil ***REMOVED***
+			}
+			if e := t.WriteStatus(stream, status.New(codes.Internal, err.Error())); e != nil {
 				grpclog.Printf("grpc: Server.processUnaryRPC failed to write status %v", e)
-			***REMOVED***
+			}
 
 			// TODO checkRecvPayload always return RPC error. Add a return here if necessary.
-		***REMOVED***
+		}
 		var inPayload *stats.InPayload
-		if sh != nil ***REMOVED***
-			inPayload = &stats.InPayload***REMOVED***
+		if sh != nil {
+			inPayload = &stats.InPayload{
 				RecvTime: time.Now(),
-			***REMOVED***
-		***REMOVED***
-		df := func(v interface***REMOVED******REMOVED***) error ***REMOVED***
-			if inPayload != nil ***REMOVED***
+			}
+		}
+		df := func(v interface{}) error {
+			if inPayload != nil {
 				inPayload.WireLength = len(req)
-			***REMOVED***
-			if pf == compressionMade ***REMOVED***
+			}
+			if pf == compressionMade {
 				var err error
 				req, err = s.opts.dc.Do(bytes.NewReader(req))
-				if err != nil ***REMOVED***
+				if err != nil {
 					return Errorf(codes.Internal, err.Error())
-				***REMOVED***
-			***REMOVED***
-			if len(req) > s.opts.maxMsgSize ***REMOVED***
+				}
+			}
+			if len(req) > s.opts.maxMsgSize {
 				// TODO: Revisit the error code. Currently keep it consistent with
 				// java implementation.
 				return status.Errorf(codes.Internal, "grpc: server received a message of %d bytes exceeding %d limit", len(req), s.opts.maxMsgSize)
-			***REMOVED***
-			if err := s.opts.codec.Unmarshal(req, v); err != nil ***REMOVED***
+			}
+			if err := s.opts.codec.Unmarshal(req, v); err != nil {
 				return status.Errorf(codes.Internal, "grpc: error unmarshalling request: %v", err)
-			***REMOVED***
-			if inPayload != nil ***REMOVED***
+			}
+			if inPayload != nil {
 				inPayload.Payload = v
 				inPayload.Data = req
 				inPayload.Length = len(req)
 				sh.HandleRPC(stream.Context(), inPayload)
-			***REMOVED***
-			if trInfo != nil ***REMOVED***
-				trInfo.tr.LazyLog(&payload***REMOVED***sent: false, msg: v***REMOVED***, true)
-			***REMOVED***
+			}
+			if trInfo != nil {
+				trInfo.tr.LazyLog(&payload{sent: false, msg: v}, true)
+			}
 			return nil
-		***REMOVED***
+		}
 		reply, appErr := md.Handler(srv.server, stream.Context(), df, s.opts.unaryInt)
-		if appErr != nil ***REMOVED***
+		if appErr != nil {
 			appStatus, ok := status.FromError(appErr)
-			if !ok ***REMOVED***
+			if !ok {
 				// Convert appErr if it is not a grpc status error.
 				appErr = status.Error(convertCode(appErr), appErr.Error())
 				appStatus, _ = status.FromError(appErr)
-			***REMOVED***
-			if trInfo != nil ***REMOVED***
+			}
+			if trInfo != nil {
 				trInfo.tr.LazyLog(stringer(appStatus.Message()), true)
 				trInfo.tr.SetError()
-			***REMOVED***
-			if e := t.WriteStatus(stream, appStatus); e != nil ***REMOVED***
+			}
+			if e := t.WriteStatus(stream, appStatus); e != nil {
 				grpclog.Printf("grpc: Server.processUnaryRPC failed to write status: %v", e)
-			***REMOVED***
+			}
 			return appErr
-		***REMOVED***
-		if trInfo != nil ***REMOVED***
+		}
+		if trInfo != nil {
 			trInfo.tr.LazyLog(stringer("OK"), false)
-		***REMOVED***
-		opts := &transport.Options***REMOVED***
+		}
+		opts := &transport.Options{
 			Last:  true,
 			Delay: false,
-		***REMOVED***
-		if err := s.sendResponse(t, stream, reply, s.opts.cp, opts); err != nil ***REMOVED***
-			if err == io.EOF ***REMOVED***
+		}
+		if err := s.sendResponse(t, stream, reply, s.opts.cp, opts); err != nil {
+			if err == io.EOF {
 				// The entire stream is done (for unary RPC only).
 				return err
-			***REMOVED***
-			if s, ok := status.FromError(err); ok ***REMOVED***
-				if e := t.WriteStatus(stream, s); e != nil ***REMOVED***
+			}
+			if s, ok := status.FromError(err); ok {
+				if e := t.WriteStatus(stream, s); e != nil {
 					grpclog.Printf("grpc: Server.processUnaryRPC failed to write status: %v", e)
-				***REMOVED***
-			***REMOVED*** else ***REMOVED***
-				switch st := err.(type) ***REMOVED***
+				}
+			} else {
+				switch st := err.(type) {
 				case transport.ConnectionError:
 					// Nothing to do here.
 				case transport.StreamError:
-					if e := t.WriteStatus(stream, status.New(st.Code, st.Desc)); e != nil ***REMOVED***
+					if e := t.WriteStatus(stream, status.New(st.Code, st.Desc)); e != nil {
 						grpclog.Printf("grpc: Server.processUnaryRPC failed to write status %v", e)
-					***REMOVED***
+					}
 				default:
 					panic(fmt.Sprintf("grpc: Unexpected error (%T) from sendResponse: %v", st, st))
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return err
-		***REMOVED***
-		if trInfo != nil ***REMOVED***
-			trInfo.tr.LazyLog(&payload***REMOVED***sent: true, msg: reply***REMOVED***, true)
-		***REMOVED***
+		}
+		if trInfo != nil {
+			trInfo.tr.LazyLog(&payload{sent: true, msg: reply}, true)
+		}
 		// TODO: Should we be logging if writing status failed here, like above?
 		// Should the logging be in WriteStatus?  Should we ignore the WriteStatus
 		// error or allow the stats handler to see it?
 		return t.WriteStatus(stream, status.New(codes.OK, ""))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *Server) processStreamingRPC(t transport.ServerTransport, stream *transport.Stream, srv *service, sd *StreamDesc, trInfo *traceInfo) (err error) ***REMOVED***
+func (s *Server) processStreamingRPC(t transport.ServerTransport, stream *transport.Stream, srv *service, sd *StreamDesc, trInfo *traceInfo) (err error) {
 	sh := s.opts.statsHandler
-	if sh != nil ***REMOVED***
-		begin := &stats.Begin***REMOVED***
+	if sh != nil {
+		begin := &stats.Begin{
 			BeginTime: time.Now(),
-		***REMOVED***
+		}
 		sh.HandleRPC(stream.Context(), begin)
-	***REMOVED***
-	defer func() ***REMOVED***
-		if sh != nil ***REMOVED***
-			end := &stats.End***REMOVED***
+	}
+	defer func() {
+		if sh != nil {
+			end := &stats.End{
 				EndTime: time.Now(),
-			***REMOVED***
-			if err != nil && err != io.EOF ***REMOVED***
+			}
+			if err != nil && err != io.EOF {
 				end.Error = toRPCErr(err)
-			***REMOVED***
+			}
 			sh.HandleRPC(stream.Context(), end)
-		***REMOVED***
-	***REMOVED***()
-	if s.opts.cp != nil ***REMOVED***
+		}
+	}()
+	if s.opts.cp != nil {
 		stream.SetSendCompress(s.opts.cp.Type())
-	***REMOVED***
-	ss := &serverStream***REMOVED***
+	}
+	ss := &serverStream{
 		t:            t,
 		s:            stream,
-		p:            &parser***REMOVED***r: stream***REMOVED***,
+		p:            &parser{r: stream},
 		codec:        s.opts.codec,
 		cp:           s.opts.cp,
 		dc:           s.opts.dc,
 		maxMsgSize:   s.opts.maxMsgSize,
 		trInfo:       trInfo,
 		statsHandler: sh,
-	***REMOVED***
-	if ss.cp != nil ***REMOVED***
+	}
+	if ss.cp != nil {
 		ss.cbuf = new(bytes.Buffer)
-	***REMOVED***
-	if trInfo != nil ***REMOVED***
+	}
+	if trInfo != nil {
 		trInfo.tr.LazyLog(&trInfo.firstLine, false)
-		defer func() ***REMOVED***
+		defer func() {
 			ss.mu.Lock()
-			if err != nil && err != io.EOF ***REMOVED***
-				ss.trInfo.tr.LazyLog(&fmtStringer***REMOVED***"%v", []interface***REMOVED******REMOVED******REMOVED***err***REMOVED******REMOVED***, true)
+			if err != nil && err != io.EOF {
+				ss.trInfo.tr.LazyLog(&fmtStringer{"%v", []interface{}{err}}, true)
 				ss.trInfo.tr.SetError()
-			***REMOVED***
+			}
 			ss.trInfo.tr.Finish()
 			ss.trInfo.tr = nil
 			ss.mu.Unlock()
-		***REMOVED***()
-	***REMOVED***
+		}()
+	}
 	var appErr error
-	var server interface***REMOVED******REMOVED***
-	if srv != nil ***REMOVED***
+	var server interface{}
+	if srv != nil {
 		server = srv.server
-	***REMOVED***
-	if s.opts.streamInt == nil ***REMOVED***
+	}
+	if s.opts.streamInt == nil {
 		appErr = sd.Handler(server, ss)
-	***REMOVED*** else ***REMOVED***
-		info := &StreamServerInfo***REMOVED***
+	} else {
+		info := &StreamServerInfo{
 			FullMethod:     stream.Method(),
 			IsClientStream: sd.ClientStreams,
 			IsServerStream: sd.ServerStreams,
-		***REMOVED***
+		}
 		appErr = s.opts.streamInt(server, ss, info, sd.Handler)
-	***REMOVED***
-	if appErr != nil ***REMOVED***
+	}
+	if appErr != nil {
 		appStatus, ok := status.FromError(appErr)
-		if !ok ***REMOVED***
-			switch err := appErr.(type) ***REMOVED***
+		if !ok {
+			switch err := appErr.(type) {
 			case transport.StreamError:
 				appStatus = status.New(err.Code, err.Desc)
 			default:
 				appStatus = status.New(convertCode(appErr), appErr.Error())
-			***REMOVED***
+			}
 			appErr = appStatus.Err()
-		***REMOVED***
-		if trInfo != nil ***REMOVED***
+		}
+		if trInfo != nil {
 			ss.mu.Lock()
 			ss.trInfo.tr.LazyLog(stringer(appStatus.Message()), true)
 			ss.trInfo.tr.SetError()
 			ss.mu.Unlock()
-		***REMOVED***
+		}
 		t.WriteStatus(ss.s, appStatus)
 		// TODO: Should we log an error from WriteStatus here and below?
 		return appErr
-	***REMOVED***
-	if trInfo != nil ***REMOVED***
+	}
+	if trInfo != nil {
 		ss.mu.Lock()
 		ss.trInfo.tr.LazyLog(stringer("OK"), false)
 		ss.mu.Unlock()
-	***REMOVED***
+	}
 	return t.WriteStatus(ss.s, status.New(codes.OK, ""))
 
-***REMOVED***
+}
 
-func (s *Server) handleStream(t transport.ServerTransport, stream *transport.Stream, trInfo *traceInfo) ***REMOVED***
+func (s *Server) handleStream(t transport.ServerTransport, stream *transport.Stream, trInfo *traceInfo) {
 	sm := stream.Method()
-	if sm != "" && sm[0] == '/' ***REMOVED***
+	if sm != "" && sm[0] == '/' {
 		sm = sm[1:]
-	***REMOVED***
+	}
 	pos := strings.LastIndex(sm, "/")
-	if pos == -1 ***REMOVED***
-		if trInfo != nil ***REMOVED***
-			trInfo.tr.LazyLog(&fmtStringer***REMOVED***"Malformed method name %q", []interface***REMOVED******REMOVED******REMOVED***sm***REMOVED******REMOVED***, true)
+	if pos == -1 {
+		if trInfo != nil {
+			trInfo.tr.LazyLog(&fmtStringer{"Malformed method name %q", []interface{}{sm}}, true)
 			trInfo.tr.SetError()
-		***REMOVED***
+		}
 		errDesc := fmt.Sprintf("malformed method name: %q", stream.Method())
-		if err := t.WriteStatus(stream, status.New(codes.InvalidArgument, errDesc)); err != nil ***REMOVED***
-			if trInfo != nil ***REMOVED***
-				trInfo.tr.LazyLog(&fmtStringer***REMOVED***"%v", []interface***REMOVED******REMOVED******REMOVED***err***REMOVED******REMOVED***, true)
+		if err := t.WriteStatus(stream, status.New(codes.InvalidArgument, errDesc)); err != nil {
+			if trInfo != nil {
+				trInfo.tr.LazyLog(&fmtStringer{"%v", []interface{}{err}}, true)
 				trInfo.tr.SetError()
-			***REMOVED***
+			}
 			grpclog.Printf("grpc: Server.handleStream failed to write status: %v", err)
-		***REMOVED***
-		if trInfo != nil ***REMOVED***
+		}
+		if trInfo != nil {
 			trInfo.tr.Finish()
-		***REMOVED***
+		}
 		return
-	***REMOVED***
+	}
 	service := sm[:pos]
 	method := sm[pos+1:]
 	srv, ok := s.m[service]
-	if !ok ***REMOVED***
-		if unknownDesc := s.opts.unknownStreamDesc; unknownDesc != nil ***REMOVED***
+	if !ok {
+		if unknownDesc := s.opts.unknownStreamDesc; unknownDesc != nil {
 			s.processStreamingRPC(t, stream, nil, unknownDesc, trInfo)
 			return
-		***REMOVED***
-		if trInfo != nil ***REMOVED***
-			trInfo.tr.LazyLog(&fmtStringer***REMOVED***"Unknown service %v", []interface***REMOVED******REMOVED******REMOVED***service***REMOVED******REMOVED***, true)
+		}
+		if trInfo != nil {
+			trInfo.tr.LazyLog(&fmtStringer{"Unknown service %v", []interface{}{service}}, true)
 			trInfo.tr.SetError()
-		***REMOVED***
+		}
 		errDesc := fmt.Sprintf("unknown service %v", service)
-		if err := t.WriteStatus(stream, status.New(codes.Unimplemented, errDesc)); err != nil ***REMOVED***
-			if trInfo != nil ***REMOVED***
-				trInfo.tr.LazyLog(&fmtStringer***REMOVED***"%v", []interface***REMOVED******REMOVED******REMOVED***err***REMOVED******REMOVED***, true)
+		if err := t.WriteStatus(stream, status.New(codes.Unimplemented, errDesc)); err != nil {
+			if trInfo != nil {
+				trInfo.tr.LazyLog(&fmtStringer{"%v", []interface{}{err}}, true)
 				trInfo.tr.SetError()
-			***REMOVED***
+			}
 			grpclog.Printf("grpc: Server.handleStream failed to write status: %v", err)
-		***REMOVED***
-		if trInfo != nil ***REMOVED***
+		}
+		if trInfo != nil {
 			trInfo.tr.Finish()
-		***REMOVED***
+		}
 		return
-	***REMOVED***
+	}
 	// Unary RPC or Streaming RPC?
-	if md, ok := srv.md[method]; ok ***REMOVED***
+	if md, ok := srv.md[method]; ok {
 		s.processUnaryRPC(t, stream, srv, md, trInfo)
 		return
-	***REMOVED***
-	if sd, ok := srv.sd[method]; ok ***REMOVED***
+	}
+	if sd, ok := srv.sd[method]; ok {
 		s.processStreamingRPC(t, stream, srv, sd, trInfo)
 		return
-	***REMOVED***
-	if trInfo != nil ***REMOVED***
-		trInfo.tr.LazyLog(&fmtStringer***REMOVED***"Unknown method %v", []interface***REMOVED******REMOVED******REMOVED***method***REMOVED******REMOVED***, true)
+	}
+	if trInfo != nil {
+		trInfo.tr.LazyLog(&fmtStringer{"Unknown method %v", []interface{}{method}}, true)
 		trInfo.tr.SetError()
-	***REMOVED***
-	if unknownDesc := s.opts.unknownStreamDesc; unknownDesc != nil ***REMOVED***
+	}
+	if unknownDesc := s.opts.unknownStreamDesc; unknownDesc != nil {
 		s.processStreamingRPC(t, stream, nil, unknownDesc, trInfo)
 		return
-	***REMOVED***
+	}
 	errDesc := fmt.Sprintf("unknown method %v", method)
-	if err := t.WriteStatus(stream, status.New(codes.Unimplemented, errDesc)); err != nil ***REMOVED***
-		if trInfo != nil ***REMOVED***
-			trInfo.tr.LazyLog(&fmtStringer***REMOVED***"%v", []interface***REMOVED******REMOVED******REMOVED***err***REMOVED******REMOVED***, true)
+	if err := t.WriteStatus(stream, status.New(codes.Unimplemented, errDesc)); err != nil {
+		if trInfo != nil {
+			trInfo.tr.LazyLog(&fmtStringer{"%v", []interface{}{err}}, true)
 			trInfo.tr.SetError()
-		***REMOVED***
+		}
 		grpclog.Printf("grpc: Server.handleStream failed to write status: %v", err)
-	***REMOVED***
-	if trInfo != nil ***REMOVED***
+	}
+	if trInfo != nil {
 		trInfo.tr.Finish()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Stop stops the gRPC server. It immediately closes all open
 // connections and listeners.
 // It cancels all active RPCs on the server side and the corresponding
 // pending RPCs on the client side will get notified by connection
 // errors.
-func (s *Server) Stop() ***REMOVED***
+func (s *Server) Stop() {
 	s.mu.Lock()
 	listeners := s.lis
 	s.lis = nil
@@ -995,70 +995,70 @@ func (s *Server) Stop() ***REMOVED***
 	s.cv.Broadcast()
 	s.mu.Unlock()
 
-	for lis := range listeners ***REMOVED***
+	for lis := range listeners {
 		lis.Close()
-	***REMOVED***
-	for c := range st ***REMOVED***
+	}
+	for c := range st {
 		c.Close()
-	***REMOVED***
+	}
 
 	s.mu.Lock()
 	s.cancel()
-	if s.events != nil ***REMOVED***
+	if s.events != nil {
 		s.events.Finish()
 		s.events = nil
-	***REMOVED***
+	}
 	s.mu.Unlock()
-***REMOVED***
+}
 
 // GracefulStop stops the gRPC server gracefully. It stops the server to accept new
 // connections and RPCs and blocks until all the pending RPCs are finished.
-func (s *Server) GracefulStop() ***REMOVED***
+func (s *Server) GracefulStop() {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if s.conns == nil ***REMOVED***
+	if s.conns == nil {
 		return
-	***REMOVED***
-	for lis := range s.lis ***REMOVED***
+	}
+	for lis := range s.lis {
 		lis.Close()
-	***REMOVED***
+	}
 	s.lis = nil
 	s.cancel()
-	if !s.drain ***REMOVED***
-		for c := range s.conns ***REMOVED***
+	if !s.drain {
+		for c := range s.conns {
 			c.(transport.ServerTransport).Drain()
-		***REMOVED***
+		}
 		s.drain = true
-	***REMOVED***
-	for len(s.conns) != 0 ***REMOVED***
+	}
+	for len(s.conns) != 0 {
 		s.cv.Wait()
-	***REMOVED***
+	}
 	s.conns = nil
-	if s.events != nil ***REMOVED***
+	if s.events != nil {
 		s.events.Finish()
 		s.events = nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func init() ***REMOVED***
-	internal.TestingCloseConns = func(arg interface***REMOVED******REMOVED***) ***REMOVED***
+func init() {
+	internal.TestingCloseConns = func(arg interface{}) {
 		arg.(*Server).testingCloseConns()
-	***REMOVED***
-	internal.TestingUseHandlerImpl = func(arg interface***REMOVED******REMOVED***) ***REMOVED***
+	}
+	internal.TestingUseHandlerImpl = func(arg interface{}) {
 		arg.(*Server).opts.useHandlerImpl = true
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // testingCloseConns closes all existing transports but keeps s.lis
 // accepting new connections.
-func (s *Server) testingCloseConns() ***REMOVED***
+func (s *Server) testingCloseConns() {
 	s.mu.Lock()
-	for c := range s.conns ***REMOVED***
+	for c := range s.conns {
 		c.Close()
 		delete(s.conns, c)
-	***REMOVED***
+	}
 	s.mu.Unlock()
-***REMOVED***
+}
 
 // SetHeader sets the header metadata.
 // When called multiple times, all the provided metadata will be merged.
@@ -1066,43 +1066,43 @@ func (s *Server) testingCloseConns() ***REMOVED***
 //  - grpc.SendHeader() is called;
 //  - The first response is sent out;
 //  - An RPC status is sent out (error or success).
-func SetHeader(ctx context.Context, md metadata.MD) error ***REMOVED***
-	if md.Len() == 0 ***REMOVED***
+func SetHeader(ctx context.Context, md metadata.MD) error {
+	if md.Len() == 0 {
 		return nil
-	***REMOVED***
+	}
 	stream, ok := transport.StreamFromContext(ctx)
-	if !ok ***REMOVED***
+	if !ok {
 		return Errorf(codes.Internal, "grpc: failed to fetch the stream from the context %v", ctx)
-	***REMOVED***
+	}
 	return stream.SetHeader(md)
-***REMOVED***
+}
 
 // SendHeader sends header metadata. It may be called at most once.
 // The provided md and headers set by SetHeader() will be sent.
-func SendHeader(ctx context.Context, md metadata.MD) error ***REMOVED***
+func SendHeader(ctx context.Context, md metadata.MD) error {
 	stream, ok := transport.StreamFromContext(ctx)
-	if !ok ***REMOVED***
+	if !ok {
 		return Errorf(codes.Internal, "grpc: failed to fetch the stream from the context %v", ctx)
-	***REMOVED***
+	}
 	t := stream.ServerTransport()
-	if t == nil ***REMOVED***
+	if t == nil {
 		grpclog.Fatalf("grpc: SendHeader: %v has no ServerTransport to send header metadata.", stream)
-	***REMOVED***
-	if err := t.WriteHeader(stream, md); err != nil ***REMOVED***
+	}
+	if err := t.WriteHeader(stream, md); err != nil {
 		return toRPCErr(err)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetTrailer sets the trailer metadata that will be sent when an RPC returns.
 // When called more than once, all the provided metadata will be merged.
-func SetTrailer(ctx context.Context, md metadata.MD) error ***REMOVED***
-	if md.Len() == 0 ***REMOVED***
+func SetTrailer(ctx context.Context, md metadata.MD) error {
+	if md.Len() == 0 {
 		return nil
-	***REMOVED***
+	}
 	stream, ok := transport.StreamFromContext(ctx)
-	if !ok ***REMOVED***
+	if !ok {
 		return Errorf(codes.Internal, "grpc: failed to fetch the stream from the context %v", ctx)
-	***REMOVED***
+	}
 	return stream.SetTrailer(md)
-***REMOVED***
+}

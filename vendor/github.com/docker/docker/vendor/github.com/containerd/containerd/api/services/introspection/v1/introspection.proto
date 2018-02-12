@@ -8,15 +8,15 @@ import weak "gogoproto/gogo.proto";
 
 option go_package = "github.com/containerd/containerd/api/services/introspection/v1;introspection";
 
-service Introspection ***REMOVED***
+service Introspection {
 	// Plugins returns a list of plugins in containerd.
 	//
 	// Clients can use this to detect features and capabilities when using
 	// containerd.
 	rpc Plugins(PluginsRequest) returns (PluginsResponse);
-***REMOVED***
+}
 
-message Plugin ***REMOVED***
+message Plugin {
 	// Type defines the type of plugin.
 	//
 	// See package plugin for a list of possible values. Non core plugins may
@@ -60,9 +60,9 @@ message Plugin ***REMOVED***
 	//
 	// Plugins that have this value set cannot be used.
 	google.rpc.Status init_err = 7;
-***REMOVED***
+}
 
-message PluginsRequest ***REMOVED***
+message PluginsRequest {
 	// Filters contains one or more filters using the syntax defined in the
 	// containerd filter package.
 	//
@@ -74,8 +74,8 @@ message PluginsRequest ***REMOVED***
 	//
 	// If filters is zero-length or nil, all items will be returned.
 	repeated string filters = 1;
-***REMOVED***
+}
 
-message PluginsResponse ***REMOVED***
+message PluginsResponse {
 	repeated Plugin plugins = 1 [(gogoproto.nullable) = false];
-***REMOVED***
+}

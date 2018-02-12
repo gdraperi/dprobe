@@ -2,4 +2,4 @@
 
 package plugins
 
-var specsPaths = []string***REMOVED***"/etc/docker/plugins", "/usr/lib/docker/plugins"***REMOVED***
+var specsPaths = []string{"/etc/docker/plugins", "/usr/lib/docker/plugins"}

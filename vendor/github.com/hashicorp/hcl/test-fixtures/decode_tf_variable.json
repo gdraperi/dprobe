@@ -1,14 +1,14 @@
-***REMOVED***
-    "variable": ***REMOVED***
-        "foo": ***REMOVED***
+{
+    "variable": {
+        "foo": {
             "default": "bar",
             "description": "bar"
-    ***REMOVED***,
+        },
 
-        "amis": ***REMOVED***
-            "default": ***REMOVED***
+        "amis": {
+            "default": {
                 "east": "foo"
-        ***REMOVED***
-    ***REMOVED***
-***REMOVED***
-***REMOVED***
+            }
+        }
+    }
+}

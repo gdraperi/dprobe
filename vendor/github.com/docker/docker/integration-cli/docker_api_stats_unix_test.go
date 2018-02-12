@@ -13,7 +13,7 @@ import (
 	"github.com/go-check/check"
 )
 
-func (s *DockerSuite) TestAPIStatsContainerGetMemoryLimit(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestAPIStatsContainerGetMemoryLimit(c *check.C) {
 	testRequires(c, DaemonIsLinux, memoryLimitSupport)
 
 	resp, body, err := request.Get("/info", request.JSON)
@@ -39,4 +39,4 @@ func (s *DockerSuite) TestAPIStatsContainerGetMemoryLimit(c *check.C) ***REMOVED
 	c.Assert(err, checker.IsNil)
 	body.Close()
 	c.Assert(fmt.Sprintf("%d", v.MemoryStats.Limit), checker.Equals, fmt.Sprintf("%d", info.MemTotal))
-***REMOVED***
+}

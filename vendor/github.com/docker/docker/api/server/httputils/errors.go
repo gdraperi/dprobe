@@ -13,16 +13,16 @@ import (
 	"google.golang.org/grpc/codes"
 )
 
-type causer interface ***REMOVED***
+type causer interface {
 	Cause() error
-***REMOVED***
+}
 
 // GetHTTPErrorStatusCode retrieves status code from error message.
-func GetHTTPErrorStatusCode(err error) int ***REMOVED***
-	if err == nil ***REMOVED***
-		logrus.WithFields(logrus.Fields***REMOVED***"error": err***REMOVED***).Error("unexpected HTTP error handling")
+func GetHTTPErrorStatusCode(err error) int {
+	if err == nil {
+		logrus.WithFields(logrus.Fields{"error": err}).Error("unexpected HTTP error handling")
 		return http.StatusInternalServerError
-	***REMOVED***
+	}
 
 	var statusCode int
 
@@ -30,7 +30,7 @@ func GetHTTPErrorStatusCode(err error) int ***REMOVED***
 	// Are you sure you should be adding a new error class here? Do one of the existing ones work?
 
 	// Note that the below functions are already checking the error causal chain for matches.
-	switch ***REMOVED***
+	switch {
 	case errdefs.IsNotFound(err):
 		statusCode = http.StatusNotFound
 	case errdefs.IsInvalidParameter(err):
@@ -51,52 +51,52 @@ func GetHTTPErrorStatusCode(err error) int ***REMOVED***
 		statusCode = http.StatusInternalServerError
 	default:
 		statusCode = statusCodeFromGRPCError(err)
-		if statusCode != http.StatusInternalServerError ***REMOVED***
+		if statusCode != http.StatusInternalServerError {
 			return statusCode
-		***REMOVED***
+		}
 
-		if e, ok := err.(causer); ok ***REMOVED***
+		if e, ok := err.(causer); ok {
 			return GetHTTPErrorStatusCode(e.Cause())
-		***REMOVED***
+		}
 
-		logrus.WithFields(logrus.Fields***REMOVED***
+		logrus.WithFields(logrus.Fields{
 			"module":     "api",
 			"error_type": fmt.Sprintf("%T", err),
-		***REMOVED***).Debugf("FIXME: Got an API for which error does not match any expected type!!!: %+v", err)
-	***REMOVED***
+		}).Debugf("FIXME: Got an API for which error does not match any expected type!!!: %+v", err)
+	}
 
-	if statusCode == 0 ***REMOVED***
+	if statusCode == 0 {
 		statusCode = http.StatusInternalServerError
-	***REMOVED***
+	}
 
 	return statusCode
-***REMOVED***
+}
 
-func apiVersionSupportsJSONErrors(version string) bool ***REMOVED***
+func apiVersionSupportsJSONErrors(version string) bool {
 	const firstAPIVersionWithJSONErrors = "1.23"
 	return version == "" || versions.GreaterThan(version, firstAPIVersionWithJSONErrors)
-***REMOVED***
+}
 
 // MakeErrorHandler makes an HTTP handler that decodes a Docker error and
 // returns it in the response.
-func MakeErrorHandler(err error) http.HandlerFunc ***REMOVED***
-	return func(w http.ResponseWriter, r *http.Request) ***REMOVED***
+func MakeErrorHandler(err error) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		statusCode := GetHTTPErrorStatusCode(err)
 		vars := mux.Vars(r)
-		if apiVersionSupportsJSONErrors(vars["version"]) ***REMOVED***
-			response := &types.ErrorResponse***REMOVED***
+		if apiVersionSupportsJSONErrors(vars["version"]) {
+			response := &types.ErrorResponse{
 				Message: err.Error(),
-			***REMOVED***
+			}
 			WriteJSON(w, statusCode, response)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			http.Error(w, grpc.ErrorDesc(err), statusCode)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // statusCodeFromGRPCError returns status code according to gRPC error
-func statusCodeFromGRPCError(err error) int ***REMOVED***
-	switch grpc.Code(err) ***REMOVED***
+func statusCodeFromGRPCError(err error) int {
+	switch grpc.Code(err) {
 	case codes.InvalidArgument: // code 3
 		return http.StatusBadRequest
 	case codes.NotFound: // code 5
@@ -116,9 +116,9 @@ func statusCodeFromGRPCError(err error) int ***REMOVED***
 	case codes.Unavailable: // code 14
 		return http.StatusServiceUnavailable
 	default:
-		if e, ok := err.(causer); ok ***REMOVED***
+		if e, ok := err.(causer); ok {
 			return statusCodeFromGRPCError(e.Cause())
-		***REMOVED***
+		}
 		// codes.Canceled(1)
 		// codes.Unknown(2)
 		// codes.DeadlineExceeded(4)
@@ -127,5 +127,5 @@ func statusCodeFromGRPCError(err error) int ***REMOVED***
 		// codes.Internal(13)
 		// codes.DataLoss(15)
 		return http.StatusInternalServerError
-	***REMOVED***
-***REMOVED***
+	}
+}

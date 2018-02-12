@@ -23,135 +23,135 @@ const (
 
 var (
 	serverStartedCounter = prom.NewCounterVec(
-		prom.CounterOpts***REMOVED***
+		prom.CounterOpts{
 			Namespace: "grpc",
 			Subsystem: "server",
 			Name:      "started_total",
 			Help:      "Total number of RPCs started on the server.",
-		***REMOVED***, []string***REMOVED***"grpc_type", "grpc_service", "grpc_method"***REMOVED***)
+		}, []string{"grpc_type", "grpc_service", "grpc_method"})
 
 	serverHandledCounter = prom.NewCounterVec(
-		prom.CounterOpts***REMOVED***
+		prom.CounterOpts{
 			Namespace: "grpc",
 			Subsystem: "server",
 			Name:      "handled_total",
 			Help:      "Total number of RPCs completed on the server, regardless of success or failure.",
-		***REMOVED***, []string***REMOVED***"grpc_type", "grpc_service", "grpc_method", "grpc_code"***REMOVED***)
+		}, []string{"grpc_type", "grpc_service", "grpc_method", "grpc_code"})
 
 	serverStreamMsgReceived = prom.NewCounterVec(
-		prom.CounterOpts***REMOVED***
+		prom.CounterOpts{
 			Namespace: "grpc",
 			Subsystem: "server",
 			Name:      "msg_received_total",
 			Help:      "Total number of RPC stream messages received on the server.",
-		***REMOVED***, []string***REMOVED***"grpc_type", "grpc_service", "grpc_method"***REMOVED***)
+		}, []string{"grpc_type", "grpc_service", "grpc_method"})
 
 	serverStreamMsgSent = prom.NewCounterVec(
-		prom.CounterOpts***REMOVED***
+		prom.CounterOpts{
 			Namespace: "grpc",
 			Subsystem: "server",
 			Name:      "msg_sent_total",
 			Help:      "Total number of gRPC stream messages sent by the server.",
-		***REMOVED***, []string***REMOVED***"grpc_type", "grpc_service", "grpc_method"***REMOVED***)
+		}, []string{"grpc_type", "grpc_service", "grpc_method"})
 
 	serverHandledHistogramEnabled = false
-	serverHandledHistogramOpts    = prom.HistogramOpts***REMOVED***
+	serverHandledHistogramOpts    = prom.HistogramOpts{
 		Namespace: "grpc",
 		Subsystem: "server",
 		Name:      "handling_seconds",
 		Help:      "Histogram of response latency (seconds) of gRPC that had been application-level handled by the server.",
 		Buckets:   prom.DefBuckets,
-	***REMOVED***
+	}
 	serverHandledHistogram *prom.HistogramVec
 )
 
-func init() ***REMOVED***
+func init() {
 	prom.MustRegister(serverStartedCounter)
 	prom.MustRegister(serverHandledCounter)
 	prom.MustRegister(serverStreamMsgReceived)
 	prom.MustRegister(serverStreamMsgSent)
-***REMOVED***
+}
 
 type HistogramOption func(*prom.HistogramOpts)
 
 // WithHistogramBuckets allows you to specify custom bucket ranges for histograms if EnableHandlingTimeHistogram is on.
-func WithHistogramBuckets(buckets []float64) HistogramOption ***REMOVED***
-	return func(o *prom.HistogramOpts) ***REMOVED*** o.Buckets = buckets ***REMOVED***
-***REMOVED***
+func WithHistogramBuckets(buckets []float64) HistogramOption {
+	return func(o *prom.HistogramOpts) { o.Buckets = buckets }
+}
 
 // EnableHandlingTimeHistogram turns on recording of handling time of RPCs for server-side interceptors.
 // Histogram metrics can be very expensive for Prometheus to retain and query.
-func EnableHandlingTimeHistogram(opts ...HistogramOption) ***REMOVED***
-	for _, o := range opts ***REMOVED***
+func EnableHandlingTimeHistogram(opts ...HistogramOption) {
+	for _, o := range opts {
 		o(&serverHandledHistogramOpts)
-	***REMOVED***
-	if !serverHandledHistogramEnabled ***REMOVED***
+	}
+	if !serverHandledHistogramEnabled {
 		serverHandledHistogram = prom.NewHistogramVec(
 			serverHandledHistogramOpts,
-			[]string***REMOVED***"grpc_type", "grpc_service", "grpc_method"***REMOVED***,
+			[]string{"grpc_type", "grpc_service", "grpc_method"},
 		)
 		prom.Register(serverHandledHistogram)
-	***REMOVED***
+	}
 	serverHandledHistogramEnabled = true
-***REMOVED***
+}
 
-type serverReporter struct ***REMOVED***
+type serverReporter struct {
 	rpcType     grpcType
 	serviceName string
 	methodName  string
 	startTime   time.Time
-***REMOVED***
+}
 
-func newServerReporter(rpcType grpcType, fullMethod string) *serverReporter ***REMOVED***
-	r := &serverReporter***REMOVED***rpcType: rpcType***REMOVED***
-	if serverHandledHistogramEnabled ***REMOVED***
+func newServerReporter(rpcType grpcType, fullMethod string) *serverReporter {
+	r := &serverReporter{rpcType: rpcType}
+	if serverHandledHistogramEnabled {
 		r.startTime = time.Now()
-	***REMOVED***
+	}
 	r.serviceName, r.methodName = splitMethodName(fullMethod)
 	serverStartedCounter.WithLabelValues(string(r.rpcType), r.serviceName, r.methodName).Inc()
 	return r
-***REMOVED***
+}
 
-func (r *serverReporter) ReceivedMessage() ***REMOVED***
+func (r *serverReporter) ReceivedMessage() {
 	serverStreamMsgReceived.WithLabelValues(string(r.rpcType), r.serviceName, r.methodName).Inc()
-***REMOVED***
+}
 
-func (r *serverReporter) SentMessage() ***REMOVED***
+func (r *serverReporter) SentMessage() {
 	serverStreamMsgSent.WithLabelValues(string(r.rpcType), r.serviceName, r.methodName).Inc()
-***REMOVED***
+}
 
-func (r *serverReporter) Handled(code codes.Code) ***REMOVED***
+func (r *serverReporter) Handled(code codes.Code) {
 	serverHandledCounter.WithLabelValues(string(r.rpcType), r.serviceName, r.methodName, code.String()).Inc()
-	if serverHandledHistogramEnabled ***REMOVED***
+	if serverHandledHistogramEnabled {
 		serverHandledHistogram.WithLabelValues(string(r.rpcType), r.serviceName, r.methodName).Observe(time.Since(r.startTime).Seconds())
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // preRegisterMethod is invoked on Register of a Server, allowing all gRPC services labels to be pre-populated.
-func preRegisterMethod(serviceName string, mInfo *grpc.MethodInfo) ***REMOVED***
+func preRegisterMethod(serviceName string, mInfo *grpc.MethodInfo) {
 	methodName := mInfo.Name
 	methodType := string(typeFromMethodInfo(mInfo))
 	// These are just references (no increments), as just referencing will create the labels but not set values.
 	serverStartedCounter.GetMetricWithLabelValues(methodType, serviceName, methodName)
 	serverStreamMsgReceived.GetMetricWithLabelValues(methodType, serviceName, methodName)
 	serverStreamMsgSent.GetMetricWithLabelValues(methodType, serviceName, methodName)
-	if serverHandledHistogramEnabled ***REMOVED***
+	if serverHandledHistogramEnabled {
 		serverHandledHistogram.GetMetricWithLabelValues(methodType, serviceName, methodName)
-	***REMOVED***
-	for _, code := range allCodes ***REMOVED***
+	}
+	for _, code := range allCodes {
 		serverHandledCounter.GetMetricWithLabelValues(methodType, serviceName, methodName, code.String())
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func typeFromMethodInfo(mInfo *grpc.MethodInfo) grpcType ***REMOVED***
-	if mInfo.IsClientStream == false && mInfo.IsServerStream == false ***REMOVED***
+func typeFromMethodInfo(mInfo *grpc.MethodInfo) grpcType {
+	if mInfo.IsClientStream == false && mInfo.IsServerStream == false {
 		return Unary
-	***REMOVED***
-	if mInfo.IsClientStream == true && mInfo.IsServerStream == false ***REMOVED***
+	}
+	if mInfo.IsClientStream == true && mInfo.IsServerStream == false {
 		return ClientStream
-	***REMOVED***
-	if mInfo.IsClientStream == false && mInfo.IsServerStream == true ***REMOVED***
+	}
+	if mInfo.IsClientStream == false && mInfo.IsServerStream == true {
 		return ServerStream
-	***REMOVED***
+	}
 	return BidiStream
-***REMOVED***
+}

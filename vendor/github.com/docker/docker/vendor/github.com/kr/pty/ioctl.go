@@ -2,10 +2,10 @@ package pty
 
 import "syscall"
 
-func ioctl(fd, cmd, ptr uintptr) error ***REMOVED***
+func ioctl(fd, cmd, ptr uintptr) error {
 	_, _, e := syscall.Syscall(syscall.SYS_IOCTL, fd, cmd, ptr)
-	if e != 0 ***REMOVED***
+	if e != 0 {
 		return e
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

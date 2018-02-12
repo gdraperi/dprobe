@@ -5,47 +5,47 @@ package sys
 import "golang.org/x/sys/unix"
 
 // Exit is the wait4 information from an exited process
-type Exit struct ***REMOVED***
+type Exit struct {
 	Pid    int
 	Status int
-***REMOVED***
+}
 
 // Reap reaps all child processes for the calling process and returns their
 // exit information
-func Reap(wait bool) (exits []Exit, err error) ***REMOVED***
+func Reap(wait bool) (exits []Exit, err error) {
 	var (
 		ws  unix.WaitStatus
 		rus unix.Rusage
 	)
 	flag := unix.WNOHANG
-	if wait ***REMOVED***
+	if wait {
 		flag = 0
-	***REMOVED***
-	for ***REMOVED***
+	}
+	for {
 		pid, err := unix.Wait4(-1, &ws, flag, &rus)
-		if err != nil ***REMOVED***
-			if err == unix.ECHILD ***REMOVED***
+		if err != nil {
+			if err == unix.ECHILD {
 				return exits, nil
-			***REMOVED***
+			}
 			return exits, err
-		***REMOVED***
-		if pid <= 0 ***REMOVED***
+		}
+		if pid <= 0 {
 			return exits, nil
-		***REMOVED***
-		exits = append(exits, Exit***REMOVED***
+		}
+		exits = append(exits, Exit{
 			Pid:    pid,
 			Status: exitStatus(ws),
-		***REMOVED***)
-	***REMOVED***
-***REMOVED***
+		})
+	}
+}
 
 const exitSignalOffset = 128
 
 // exitStatus returns the correct exit status for a process based on if it
 // was signaled or exited cleanly
-func exitStatus(status unix.WaitStatus) int ***REMOVED***
-	if status.Signaled() ***REMOVED***
+func exitStatus(status unix.WaitStatus) int {
+	if status.Signaled() {
 		return exitSignalOffset + int(status.Signal())
-	***REMOVED***
+	}
 	return status.ExitStatus()
-***REMOVED***
+}

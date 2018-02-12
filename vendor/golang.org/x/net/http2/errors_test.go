@@ -6,19 +6,19 @@ package http2
 
 import "testing"
 
-func TestErrCodeString(t *testing.T) ***REMOVED***
-	tests := []struct ***REMOVED***
+func TestErrCodeString(t *testing.T) {
+	tests := []struct {
 		err  ErrCode
 		want string
-	***REMOVED******REMOVED***
-		***REMOVED***ErrCodeProtocol, "PROTOCOL_ERROR"***REMOVED***,
-		***REMOVED***0xd, "HTTP_1_1_REQUIRED"***REMOVED***,
-		***REMOVED***0xf, "unknown error code 0xf"***REMOVED***,
-	***REMOVED***
-	for i, tt := range tests ***REMOVED***
+	}{
+		{ErrCodeProtocol, "PROTOCOL_ERROR"},
+		{0xd, "HTTP_1_1_REQUIRED"},
+		{0xf, "unknown error code 0xf"},
+	}
+	for i, tt := range tests {
 		got := tt.err.String()
-		if got != tt.want ***REMOVED***
+		if got != tt.want {
 			t.Errorf("%d. Error = %q; want %q", i, got, tt.want)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

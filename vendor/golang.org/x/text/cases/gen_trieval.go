@@ -18,17 +18,17 @@ package main
 //
 // The per-rune values have the following format:
 //
-//   if (exception) ***REMOVED***
+//   if (exception) {
 //     15..5  unsigned exception index
 //         4  unused
-//   ***REMOVED*** else ***REMOVED***
+//   } else {
 //     15..8  XOR pattern or index to XOR pattern for case mapping
 //            Only 13..8 are used for XOR patterns.
 //         7  inverseFold (fold to upper, not to lower)
 //         6  index: interpret the XOR pattern as an index
 //            or isMid if case mode is cIgnorableUncased.
 //      5..4  CCC: zero (normal or break), above or other
-//   ***REMOVED***
+//   }
 //      3  exception: interpret this value as an exception index
 //         (TODO: is this bit necessary? Probably implied from case mode.)
 //   2..0  case mode
@@ -89,25 +89,25 @@ const (
 	maxCaseMode = cUpper
 )
 
-func (c info) isCased() bool ***REMOVED***
+func (c info) isCased() bool {
 	return c&casedMask != 0
-***REMOVED***
+}
 
-func (c info) isCaseIgnorable() bool ***REMOVED***
+func (c info) isCaseIgnorable() bool {
 	return c&ignorableMask == ignorableValue
-***REMOVED***
+}
 
-func (c info) isNotCasedAndNotCaseIgnorable() bool ***REMOVED***
+func (c info) isNotCasedAndNotCaseIgnorable() bool {
 	return c&fullCasedMask == 0
-***REMOVED***
+}
 
-func (c info) isCaseIgnorableAndNotCased() bool ***REMOVED***
+func (c info) isCaseIgnorableAndNotCased() bool {
 	return c&fullCasedMask == cIgnorableUncased
-***REMOVED***
+}
 
-func (c info) isMid() bool ***REMOVED***
+func (c info) isMid() bool {
 	return c&(fullCasedMask|isMidBit) == isMidBit|cIgnorableUncased
-***REMOVED***
+}
 
 // The case mapping implementation will need to know about various Canonical
 // Combining Class (CCC) values. We encode two of these in the trie value:
@@ -177,42 +177,42 @@ const (
 
 var trie = newCaseTrie(0)
 
-var sparse = sparseBlocks***REMOVED***
+var sparse = sparseBlocks{
 	values:  sparseValues[:],
 	offsets: sparseOffsets[:],
-***REMOVED***
+}
 
 // Sparse block lookup code.
 
 // valueRange is an entry in a sparse block.
-type valueRange struct ***REMOVED***
+type valueRange struct {
 	value  uint16
 	lo, hi byte
-***REMOVED***
+}
 
-type sparseBlocks struct ***REMOVED***
+type sparseBlocks struct {
 	values  []valueRange
 	offsets []uint16
-***REMOVED***
+}
 
 // lookup returns the value from values block n for byte b using binary search.
-func (s *sparseBlocks) lookup(n uint32, b byte) uint16 ***REMOVED***
+func (s *sparseBlocks) lookup(n uint32, b byte) uint16 {
 	lo := s.offsets[n]
 	hi := s.offsets[n+1]
-	for lo < hi ***REMOVED***
+	for lo < hi {
 		m := lo + (hi-lo)/2
 		r := s.values[m]
-		if r.lo <= b && b <= r.hi ***REMOVED***
+		if r.lo <= b && b <= r.hi {
 			return r.value
-		***REMOVED***
-		if b < r.lo ***REMOVED***
+		}
+		if b < r.lo {
 			hi = m
-		***REMOVED*** else ***REMOVED***
+		} else {
 			lo = m + 1
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return 0
-***REMOVED***
+}
 
 // lastRuneForTesting is the last rune used for testing. Everything after this
 // is boring.

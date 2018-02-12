@@ -1,4 +1,4 @@
-***REMOVED***
+{
 	"foo": "bar",
-    "bar": "$***REMOVED***file(\"bing/bong.txt\")***REMOVED***"
-***REMOVED***
+    "bar": "${file(\"bing/bong.txt\")}"
+}

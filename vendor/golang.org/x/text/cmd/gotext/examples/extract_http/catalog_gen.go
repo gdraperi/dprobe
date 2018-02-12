@@ -8,49 +8,49 @@ import (
 	"golang.org/x/text/message/catalog"
 )
 
-type dictionary struct ***REMOVED***
+type dictionary struct {
 	index []uint32
 	data  string
-***REMOVED***
+}
 
-func (d *dictionary) Lookup(key string) (data string, ok bool) ***REMOVED***
+func (d *dictionary) Lookup(key string) (data string, ok bool) {
 	p := messageKeyToIndex[key]
 	start, end := d.index[p], d.index[p+1]
-	if start == end ***REMOVED***
+	if start == end {
 		return "", false
-	***REMOVED***
+	}
 	return d.data[start:end], true
-***REMOVED***
+}
 
-func init() ***REMOVED***
-	dict := map[string]catalog.Dictionary***REMOVED***
-		"en": &dictionary***REMOVED***index: enIndex, data: enData***REMOVED***,
-		"zh": &dictionary***REMOVED***index: zhIndex, data: zhData***REMOVED***,
-	***REMOVED***
+func init() {
+	dict := map[string]catalog.Dictionary{
+		"en": &dictionary{index: enIndex, data: enData},
+		"zh": &dictionary{index: zhIndex, data: zhData},
+	}
 	fallback := language.MustParse("en")
 	cat, err := catalog.NewFromMap(dict, catalog.Fallback(fallback))
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 	message.DefaultCatalog = cat
-***REMOVED***
+}
 
-var messageKeyToIndex = map[string]int***REMOVED***
+var messageKeyToIndex = map[string]int{
 	"Do you like your browser (%s)?\n": 1,
 	"Hello %s!\n":                      0,
-***REMOVED***
+}
 
-var enIndex = []uint32***REMOVED*** // 3 elements
+var enIndex = []uint32{ // 3 elements
 	0x00000000, 0x00000012, 0x00000039,
-***REMOVED*** // Size: 36 bytes
+} // Size: 36 bytes
 
 const enData string = "" + // Size: 57 bytes
 	"\x04\x00\x01\x0a\x0d\x02Hello %[1]s!\x04\x00\x01\x0a\x22\x02Do you like " +
 	"your browser (%[1]s)?"
 
-var zhIndex = []uint32***REMOVED*** // 3 elements
+var zhIndex = []uint32{ // 3 elements
 	0x00000000, 0x00000000, 0x00000000,
-***REMOVED*** // Size: 36 bytes
+} // Size: 36 bytes
 
 const zhData string = ""
 

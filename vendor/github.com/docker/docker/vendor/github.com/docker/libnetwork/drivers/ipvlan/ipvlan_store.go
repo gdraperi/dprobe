@@ -19,7 +19,7 @@ const (
 )
 
 // networkConfiguration for this driver's network specific configuration
-type configuration struct ***REMOVED***
+type configuration struct {
 	ID               string
 	Mtu              int
 	dbIndex          uint64
@@ -30,320 +30,320 @@ type configuration struct ***REMOVED***
 	CreatedSlaveLink bool
 	Ipv4Subnets      []*ipv4Subnet
 	Ipv6Subnets      []*ipv6Subnet
-***REMOVED***
+}
 
-type ipv4Subnet struct ***REMOVED***
+type ipv4Subnet struct {
 	SubnetIP string
 	GwIP     string
-***REMOVED***
+}
 
-type ipv6Subnet struct ***REMOVED***
+type ipv6Subnet struct {
 	SubnetIP string
 	GwIP     string
-***REMOVED***
+}
 
 // initStore drivers are responsible for caching their own persistent state
-func (d *driver) initStore(option map[string]interface***REMOVED******REMOVED***) error ***REMOVED***
-	if data, ok := option[netlabel.LocalKVClient]; ok ***REMOVED***
+func (d *driver) initStore(option map[string]interface{}) error {
+	if data, ok := option[netlabel.LocalKVClient]; ok {
 		var err error
 		dsc, ok := data.(discoverapi.DatastoreConfigData)
-		if !ok ***REMOVED***
+		if !ok {
 			return types.InternalErrorf("incorrect data in datastore configuration: %v", data)
-		***REMOVED***
+		}
 		d.store, err = datastore.NewDataStoreFromConfig(dsc)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return types.InternalErrorf("ipvlan driver failed to initialize data store: %v", err)
-		***REMOVED***
+		}
 
 		return d.populateNetworks()
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // populateNetworks is invoked at driver init to recreate persistently stored networks
-func (d *driver) populateNetworks() error ***REMOVED***
-	kvol, err := d.store.List(datastore.Key(ipvlanNetworkPrefix), &configuration***REMOVED******REMOVED***)
-	if err != nil && err != datastore.ErrKeyNotFound ***REMOVED***
+func (d *driver) populateNetworks() error {
+	kvol, err := d.store.List(datastore.Key(ipvlanNetworkPrefix), &configuration{})
+	if err != nil && err != datastore.ErrKeyNotFound {
 		return fmt.Errorf("failed to get ipvlan network configurations from store: %v", err)
-	***REMOVED***
+	}
 	// If empty it simply means no ipvlan networks have been created yet
-	if err == datastore.ErrKeyNotFound ***REMOVED***
+	if err == datastore.ErrKeyNotFound {
 		return nil
-	***REMOVED***
-	for _, kvo := range kvol ***REMOVED***
+	}
+	for _, kvo := range kvol {
 		config := kvo.(*configuration)
-		if err = d.createNetwork(config); err != nil ***REMOVED***
+		if err = d.createNetwork(config); err != nil {
 			logrus.Warnf("could not create ipvlan network for id %s from persistent state", config.ID)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (d *driver) populateEndpoints() error ***REMOVED***
-	kvol, err := d.store.List(datastore.Key(ipvlanEndpointPrefix), &endpoint***REMOVED******REMOVED***)
-	if err != nil && err != datastore.ErrKeyNotFound ***REMOVED***
+func (d *driver) populateEndpoints() error {
+	kvol, err := d.store.List(datastore.Key(ipvlanEndpointPrefix), &endpoint{})
+	if err != nil && err != datastore.ErrKeyNotFound {
 		return fmt.Errorf("failed to get ipvlan endpoints from store: %v", err)
-	***REMOVED***
+	}
 
-	if err == datastore.ErrKeyNotFound ***REMOVED***
+	if err == datastore.ErrKeyNotFound {
 		return nil
-	***REMOVED***
+	}
 
-	for _, kvo := range kvol ***REMOVED***
+	for _, kvo := range kvol {
 		ep := kvo.(*endpoint)
 		n, ok := d.networks[ep.nid]
-		if !ok ***REMOVED***
+		if !ok {
 			logrus.Debugf("Network (%s) not found for restored ipvlan endpoint (%s)", ep.nid[0:7], ep.id[0:7])
 			logrus.Debugf("Deleting stale ipvlan endpoint (%s) from store", ep.id[0:7])
-			if err := d.storeDelete(ep); err != nil ***REMOVED***
+			if err := d.storeDelete(ep); err != nil {
 				logrus.Debugf("Failed to delete stale ipvlan endpoint (%s) from store", ep.id[0:7])
-			***REMOVED***
+			}
 			continue
-		***REMOVED***
+		}
 		n.endpoints[ep.id] = ep
 		logrus.Debugf("Endpoint (%s) restored to network (%s)", ep.id[0:7], ep.nid[0:7])
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // storeUpdate used to update persistent ipvlan network records as they are created
-func (d *driver) storeUpdate(kvObject datastore.KVObject) error ***REMOVED***
-	if d.store == nil ***REMOVED***
+func (d *driver) storeUpdate(kvObject datastore.KVObject) error {
+	if d.store == nil {
 		logrus.Warnf("ipvlan store not initialized. kv object %s is not added to the store", datastore.Key(kvObject.Key()...))
 		return nil
-	***REMOVED***
-	if err := d.store.PutObjectAtomic(kvObject); err != nil ***REMOVED***
+	}
+	if err := d.store.PutObjectAtomic(kvObject); err != nil {
 		return fmt.Errorf("failed to update ipvlan store for object type %T: %v", kvObject, err)
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // storeDelete used to delete ipvlan network records from persistent cache as they are deleted
-func (d *driver) storeDelete(kvObject datastore.KVObject) error ***REMOVED***
-	if d.store == nil ***REMOVED***
+func (d *driver) storeDelete(kvObject datastore.KVObject) error {
+	if d.store == nil {
 		logrus.Debugf("ipvlan store not initialized. kv object %s is not deleted from store", datastore.Key(kvObject.Key()...))
 		return nil
-	***REMOVED***
+	}
 retry:
-	if err := d.store.DeleteObjectAtomic(kvObject); err != nil ***REMOVED***
-		if err == datastore.ErrKeyModified ***REMOVED***
-			if err := d.store.GetObject(datastore.Key(kvObject.Key()...), kvObject); err != nil ***REMOVED***
+	if err := d.store.DeleteObjectAtomic(kvObject); err != nil {
+		if err == datastore.ErrKeyModified {
+			if err := d.store.GetObject(datastore.Key(kvObject.Key()...), kvObject); err != nil {
 				return fmt.Errorf("could not update the kvobject to latest when trying to delete: %v", err)
-			***REMOVED***
+			}
 			goto retry
-		***REMOVED***
+		}
 		return err
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (config *configuration) MarshalJSON() ([]byte, error) ***REMOVED***
-	nMap := make(map[string]interface***REMOVED******REMOVED***)
+func (config *configuration) MarshalJSON() ([]byte, error) {
+	nMap := make(map[string]interface{})
 	nMap["ID"] = config.ID
 	nMap["Mtu"] = config.Mtu
 	nMap["Parent"] = config.Parent
 	nMap["IpvlanMode"] = config.IpvlanMode
 	nMap["Internal"] = config.Internal
 	nMap["CreatedSubIface"] = config.CreatedSlaveLink
-	if len(config.Ipv4Subnets) > 0 ***REMOVED***
+	if len(config.Ipv4Subnets) > 0 {
 		iis, err := json.Marshal(config.Ipv4Subnets)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		nMap["Ipv4Subnets"] = string(iis)
-	***REMOVED***
-	if len(config.Ipv6Subnets) > 0 ***REMOVED***
+	}
+	if len(config.Ipv6Subnets) > 0 {
 		iis, err := json.Marshal(config.Ipv6Subnets)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		nMap["Ipv6Subnets"] = string(iis)
-	***REMOVED***
+	}
 
 	return json.Marshal(nMap)
-***REMOVED***
+}
 
-func (config *configuration) UnmarshalJSON(b []byte) error ***REMOVED***
+func (config *configuration) UnmarshalJSON(b []byte) error {
 	var (
 		err  error
-		nMap map[string]interface***REMOVED******REMOVED***
+		nMap map[string]interface{}
 	)
 
-	if err = json.Unmarshal(b, &nMap); err != nil ***REMOVED***
+	if err = json.Unmarshal(b, &nMap); err != nil {
 		return err
-	***REMOVED***
+	}
 	config.ID = nMap["ID"].(string)
 	config.Mtu = int(nMap["Mtu"].(float64))
 	config.Parent = nMap["Parent"].(string)
 	config.IpvlanMode = nMap["IpvlanMode"].(string)
 	config.Internal = nMap["Internal"].(bool)
 	config.CreatedSlaveLink = nMap["CreatedSubIface"].(bool)
-	if v, ok := nMap["Ipv4Subnets"]; ok ***REMOVED***
-		if err := json.Unmarshal([]byte(v.(string)), &config.Ipv4Subnets); err != nil ***REMOVED***
+	if v, ok := nMap["Ipv4Subnets"]; ok {
+		if err := json.Unmarshal([]byte(v.(string)), &config.Ipv4Subnets); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
-	if v, ok := nMap["Ipv6Subnets"]; ok ***REMOVED***
-		if err := json.Unmarshal([]byte(v.(string)), &config.Ipv6Subnets); err != nil ***REMOVED***
+		}
+	}
+	if v, ok := nMap["Ipv6Subnets"]; ok {
+		if err := json.Unmarshal([]byte(v.(string)), &config.Ipv6Subnets); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (config *configuration) Key() []string ***REMOVED***
-	return []string***REMOVED***ipvlanNetworkPrefix, config.ID***REMOVED***
-***REMOVED***
+func (config *configuration) Key() []string {
+	return []string{ipvlanNetworkPrefix, config.ID}
+}
 
-func (config *configuration) KeyPrefix() []string ***REMOVED***
-	return []string***REMOVED***ipvlanNetworkPrefix***REMOVED***
-***REMOVED***
+func (config *configuration) KeyPrefix() []string {
+	return []string{ipvlanNetworkPrefix}
+}
 
-func (config *configuration) Value() []byte ***REMOVED***
+func (config *configuration) Value() []byte {
 	b, err := json.Marshal(config)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil
-	***REMOVED***
+	}
 	return b
-***REMOVED***
+}
 
-func (config *configuration) SetValue(value []byte) error ***REMOVED***
+func (config *configuration) SetValue(value []byte) error {
 	return json.Unmarshal(value, config)
-***REMOVED***
+}
 
-func (config *configuration) Index() uint64 ***REMOVED***
+func (config *configuration) Index() uint64 {
 	return config.dbIndex
-***REMOVED***
+}
 
-func (config *configuration) SetIndex(index uint64) ***REMOVED***
+func (config *configuration) SetIndex(index uint64) {
 	config.dbIndex = index
 	config.dbExists = true
-***REMOVED***
+}
 
-func (config *configuration) Exists() bool ***REMOVED***
+func (config *configuration) Exists() bool {
 	return config.dbExists
-***REMOVED***
+}
 
-func (config *configuration) Skip() bool ***REMOVED***
+func (config *configuration) Skip() bool {
 	return false
-***REMOVED***
+}
 
-func (config *configuration) New() datastore.KVObject ***REMOVED***
-	return &configuration***REMOVED******REMOVED***
-***REMOVED***
+func (config *configuration) New() datastore.KVObject {
+	return &configuration{}
+}
 
-func (config *configuration) CopyTo(o datastore.KVObject) error ***REMOVED***
+func (config *configuration) CopyTo(o datastore.KVObject) error {
 	dstNcfg := o.(*configuration)
 	*dstNcfg = *config
 	return nil
-***REMOVED***
+}
 
-func (config *configuration) DataScope() string ***REMOVED***
+func (config *configuration) DataScope() string {
 	return datastore.LocalScope
-***REMOVED***
+}
 
-func (ep *endpoint) MarshalJSON() ([]byte, error) ***REMOVED***
-	epMap := make(map[string]interface***REMOVED******REMOVED***)
+func (ep *endpoint) MarshalJSON() ([]byte, error) {
+	epMap := make(map[string]interface{})
 	epMap["id"] = ep.id
 	epMap["nid"] = ep.nid
 	epMap["SrcName"] = ep.srcName
-	if len(ep.mac) != 0 ***REMOVED***
+	if len(ep.mac) != 0 {
 		epMap["MacAddress"] = ep.mac.String()
-	***REMOVED***
-	if ep.addr != nil ***REMOVED***
+	}
+	if ep.addr != nil {
 		epMap["Addr"] = ep.addr.String()
-	***REMOVED***
-	if ep.addrv6 != nil ***REMOVED***
+	}
+	if ep.addrv6 != nil {
 		epMap["Addrv6"] = ep.addrv6.String()
-	***REMOVED***
+	}
 	return json.Marshal(epMap)
-***REMOVED***
+}
 
-func (ep *endpoint) UnmarshalJSON(b []byte) error ***REMOVED***
+func (ep *endpoint) UnmarshalJSON(b []byte) error {
 	var (
 		err   error
-		epMap map[string]interface***REMOVED******REMOVED***
+		epMap map[string]interface{}
 	)
 
-	if err = json.Unmarshal(b, &epMap); err != nil ***REMOVED***
+	if err = json.Unmarshal(b, &epMap); err != nil {
 		return fmt.Errorf("Failed to unmarshal to ipvlan endpoint: %v", err)
-	***REMOVED***
+	}
 
-	if v, ok := epMap["MacAddress"]; ok ***REMOVED***
-		if ep.mac, err = net.ParseMAC(v.(string)); err != nil ***REMOVED***
+	if v, ok := epMap["MacAddress"]; ok {
+		if ep.mac, err = net.ParseMAC(v.(string)); err != nil {
 			return types.InternalErrorf("failed to decode ipvlan endpoint MAC address (%s) after json unmarshal: %v", v.(string), err)
-		***REMOVED***
-	***REMOVED***
-	if v, ok := epMap["Addr"]; ok ***REMOVED***
-		if ep.addr, err = types.ParseCIDR(v.(string)); err != nil ***REMOVED***
+		}
+	}
+	if v, ok := epMap["Addr"]; ok {
+		if ep.addr, err = types.ParseCIDR(v.(string)); err != nil {
 			return types.InternalErrorf("failed to decode ipvlan endpoint IPv4 address (%s) after json unmarshal: %v", v.(string), err)
-		***REMOVED***
-	***REMOVED***
-	if v, ok := epMap["Addrv6"]; ok ***REMOVED***
-		if ep.addrv6, err = types.ParseCIDR(v.(string)); err != nil ***REMOVED***
+		}
+	}
+	if v, ok := epMap["Addrv6"]; ok {
+		if ep.addrv6, err = types.ParseCIDR(v.(string)); err != nil {
 			return types.InternalErrorf("failed to decode ipvlan endpoint IPv6 address (%s) after json unmarshal: %v", v.(string), err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	ep.id = epMap["id"].(string)
 	ep.nid = epMap["nid"].(string)
 	ep.srcName = epMap["SrcName"].(string)
 
 	return nil
-***REMOVED***
+}
 
-func (ep *endpoint) Key() []string ***REMOVED***
-	return []string***REMOVED***ipvlanEndpointPrefix, ep.id***REMOVED***
-***REMOVED***
+func (ep *endpoint) Key() []string {
+	return []string{ipvlanEndpointPrefix, ep.id}
+}
 
-func (ep *endpoint) KeyPrefix() []string ***REMOVED***
-	return []string***REMOVED***ipvlanEndpointPrefix***REMOVED***
-***REMOVED***
+func (ep *endpoint) KeyPrefix() []string {
+	return []string{ipvlanEndpointPrefix}
+}
 
-func (ep *endpoint) Value() []byte ***REMOVED***
+func (ep *endpoint) Value() []byte {
 	b, err := json.Marshal(ep)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil
-	***REMOVED***
+	}
 	return b
-***REMOVED***
+}
 
-func (ep *endpoint) SetValue(value []byte) error ***REMOVED***
+func (ep *endpoint) SetValue(value []byte) error {
 	return json.Unmarshal(value, ep)
-***REMOVED***
+}
 
-func (ep *endpoint) Index() uint64 ***REMOVED***
+func (ep *endpoint) Index() uint64 {
 	return ep.dbIndex
-***REMOVED***
+}
 
-func (ep *endpoint) SetIndex(index uint64) ***REMOVED***
+func (ep *endpoint) SetIndex(index uint64) {
 	ep.dbIndex = index
 	ep.dbExists = true
-***REMOVED***
+}
 
-func (ep *endpoint) Exists() bool ***REMOVED***
+func (ep *endpoint) Exists() bool {
 	return ep.dbExists
-***REMOVED***
+}
 
-func (ep *endpoint) Skip() bool ***REMOVED***
+func (ep *endpoint) Skip() bool {
 	return false
-***REMOVED***
+}
 
-func (ep *endpoint) New() datastore.KVObject ***REMOVED***
-	return &endpoint***REMOVED******REMOVED***
-***REMOVED***
+func (ep *endpoint) New() datastore.KVObject {
+	return &endpoint{}
+}
 
-func (ep *endpoint) CopyTo(o datastore.KVObject) error ***REMOVED***
+func (ep *endpoint) CopyTo(o datastore.KVObject) error {
 	dstEp := o.(*endpoint)
 	*dstEp = *ep
 	return nil
-***REMOVED***
+}
 
-func (ep *endpoint) DataScope() string ***REMOVED***
+func (ep *endpoint) DataScope() string {
 	return datastore.LocalScope
-***REMOVED***
+}

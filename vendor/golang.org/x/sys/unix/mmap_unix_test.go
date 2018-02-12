@@ -12,24 +12,24 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-func TestMmap(t *testing.T) ***REMOVED***
+func TestMmap(t *testing.T) {
 	b, err := unix.Mmap(-1, 0, unix.Getpagesize(), unix.PROT_NONE, unix.MAP_ANON|unix.MAP_PRIVATE)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("Mmap: %v", err)
-	***REMOVED***
-	if err := unix.Mprotect(b, unix.PROT_READ|unix.PROT_WRITE); err != nil ***REMOVED***
+	}
+	if err := unix.Mprotect(b, unix.PROT_READ|unix.PROT_WRITE); err != nil {
 		t.Fatalf("Mprotect: %v", err)
-	***REMOVED***
+	}
 
 	b[0] = 42
 
-	if err := unix.Msync(b, unix.MS_SYNC); err != nil ***REMOVED***
+	if err := unix.Msync(b, unix.MS_SYNC); err != nil {
 		t.Fatalf("Msync: %v", err)
-	***REMOVED***
-	if err := unix.Madvise(b, unix.MADV_DONTNEED); err != nil ***REMOVED***
+	}
+	if err := unix.Madvise(b, unix.MADV_DONTNEED); err != nil {
 		t.Fatalf("Madvise: %v", err)
-	***REMOVED***
-	if err := unix.Munmap(b); err != nil ***REMOVED***
+	}
+	if err := unix.Munmap(b); err != nil {
 		t.Fatalf("Munmap: %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}

@@ -14,17 +14,17 @@
 package unix
 
 // Major returns the major component of a FreeBSD device number.
-func Major(dev uint64) uint32 ***REMOVED***
+func Major(dev uint64) uint32 {
 	return uint32((dev >> 8) & 0xff)
-***REMOVED***
+}
 
 // Minor returns the minor component of a FreeBSD device number.
-func Minor(dev uint64) uint32 ***REMOVED***
+func Minor(dev uint64) uint32 {
 	return uint32(dev & 0xffff00ff)
-***REMOVED***
+}
 
 // Mkdev returns a FreeBSD device number generated from the given major and
 // minor components.
-func Mkdev(major, minor uint32) uint64 ***REMOVED***
+func Mkdev(major, minor uint32) uint64 {
 	return (uint64(major) << 8) | uint64(minor)
-***REMOVED***
+}

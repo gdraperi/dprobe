@@ -24,7 +24,7 @@ import "C"
 
 import "unsafe"
 
-func doICU(tag, caser, input string) string ***REMOVED***
+func doICU(tag, caser, input string) string {
 	err := C.UErrorCode(0)
 	loc := C.CString(tag)
 	cm := C.ucasemap_open(loc, C.uint32_t(0), &err)
@@ -35,7 +35,7 @@ func doICU(tag, caser, input string) string ***REMOVED***
 
 	cn := C.int32_t(0)
 
-	switch caser ***REMOVED***
+	switch caser {
 	case "fold":
 		cn = C.ucasemap_utf8FoldCase(cm,
 			dst, C.int32_t(len(buf)),
@@ -56,6 +56,6 @@ func doICU(tag, caser, input string) string ***REMOVED***
 			dst, C.int32_t(len(buf)),
 			src, C.int32_t(len(input)),
 			&err)
-	***REMOVED***
+	}
 	return string(buf[:cn])
-***REMOVED***
+}

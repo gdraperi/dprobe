@@ -16,12 +16,12 @@
 // A Matcher for an application that supports English, Australian English,
 // Danish, and standard Mandarin can be created as follows:
 //
-//    var matcher = language.NewMatcher([]language.Tag***REMOVED***
+//    var matcher = language.NewMatcher([]language.Tag{
 //        language.English,   // The first language is used as fallback.
 //        language.MustParse("en-AU"),
 //        language.Danish,
 //        language.Chinese,
-//***REMOVED***)
+//    })
 //
 // This list of supported languages is typically implied by the languages for
 // which there exists translations of the user interface.
@@ -30,14 +30,14 @@
 // language tags.
 // The MatchString finds best matches for such strings:
 //
-//    handler(w http.ResponseWriter, r *http.Request) ***REMOVED***
+//    handler(w http.ResponseWriter, r *http.Request) {
 //        lang, _ := r.Cookie("lang")
 //        accept := r.Header.Get("Accept-Language")
 //        tag, _ := language.MatchStrings(matcher, lang.String(), accept)
 //
 //        // tag should now be used for the initialization of any
 //        // locale-specific service.
-//***REMOVED***
+//    }
 //
 // The Matcher's Match method can be used to match Tags directly.
 //

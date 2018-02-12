@@ -6,7 +6,7 @@ package main
 
 // hub maintains the set of active clients and broadcasts messages to the
 // clients.
-type Hub struct ***REMOVED***
+type Hub struct {
 	// Registered clients.
 	clients map[*Client]bool
 
@@ -18,36 +18,36 @@ type Hub struct ***REMOVED***
 
 	// Unregister requests from clients.
 	unregister chan *Client
-***REMOVED***
+}
 
-func newHub() *Hub ***REMOVED***
-	return &Hub***REMOVED***
+func newHub() *Hub {
+	return &Hub{
 		broadcast:  make(chan []byte),
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
 		clients:    make(map[*Client]bool),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (h *Hub) run() ***REMOVED***
-	for ***REMOVED***
-		select ***REMOVED***
+func (h *Hub) run() {
+	for {
+		select {
 		case client := <-h.register:
 			h.clients[client] = true
 		case client := <-h.unregister:
-			if _, ok := h.clients[client]; ok ***REMOVED***
+			if _, ok := h.clients[client]; ok {
 				delete(h.clients, client)
 				close(client.send)
-			***REMOVED***
+			}
 		case message := <-h.broadcast:
-			for client := range h.clients ***REMOVED***
-				select ***REMOVED***
+			for client := range h.clients {
+				select {
 				case client.send <- message:
 				default:
 					close(client.send)
 					delete(h.clients, client)
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+				}
+			}
+		}
+	}
+}

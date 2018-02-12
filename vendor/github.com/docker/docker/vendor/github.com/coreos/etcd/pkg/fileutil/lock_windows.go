@@ -40,36 +40,36 @@ const (
 	errLockViolation syscall.Errno = 0x21
 )
 
-func TryLockFile(path string, flag int, perm os.FileMode) (*LockedFile, error) ***REMOVED***
+func TryLockFile(path string, flag int, perm os.FileMode) (*LockedFile, error) {
 	f, err := open(path, flag, perm)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if err := lockFile(syscall.Handle(f.Fd()), LOCKFILE_FAIL_IMMEDIATELY); err != nil ***REMOVED***
+	}
+	if err := lockFile(syscall.Handle(f.Fd()), LOCKFILE_FAIL_IMMEDIATELY); err != nil {
 		f.Close()
 		return nil, err
-	***REMOVED***
-	return &LockedFile***REMOVED***f***REMOVED***, nil
-***REMOVED***
+	}
+	return &LockedFile{f}, nil
+}
 
-func LockFile(path string, flag int, perm os.FileMode) (*LockedFile, error) ***REMOVED***
+func LockFile(path string, flag int, perm os.FileMode) (*LockedFile, error) {
 	f, err := open(path, flag, perm)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if err := lockFile(syscall.Handle(f.Fd()), 0); err != nil ***REMOVED***
+	}
+	if err := lockFile(syscall.Handle(f.Fd()), 0); err != nil {
 		f.Close()
 		return nil, err
-	***REMOVED***
-	return &LockedFile***REMOVED***f***REMOVED***, nil
-***REMOVED***
+	}
+	return &LockedFile{f}, nil
+}
 
-func open(path string, flag int, perm os.FileMode) (*os.File, error) ***REMOVED***
-	if path == "" ***REMOVED***
+func open(path string, flag int, perm os.FileMode) (*os.File, error) {
+	if path == "" {
 		return nil, fmt.Errorf("cannot open empty filename")
-	***REMOVED***
+	}
 	var access uint32
-	switch flag ***REMOVED***
+	switch flag {
 	case syscall.O_RDONLY:
 		access = syscall.GENERIC_READ
 	case syscall.O_WRONLY:
@@ -80,7 +80,7 @@ func open(path string, flag int, perm os.FileMode) (*os.File, error) ***REMOVED*
 		access = syscall.GENERIC_ALL
 	default:
 		panic(fmt.Errorf("flag %v is not supported", flag))
-	***REMOVED***
+	}
 	fd, err := syscall.CreateFile(&(syscall.StringToUTF16(path)[0]),
 		access,
 		syscall.FILE_SHARE_READ|syscall.FILE_SHARE_WRITE|syscall.FILE_SHARE_DELETE,
@@ -88,38 +88,38 @@ func open(path string, flag int, perm os.FileMode) (*os.File, error) ***REMOVED*
 		syscall.OPEN_ALWAYS,
 		syscall.FILE_ATTRIBUTE_NORMAL,
 		0)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return os.NewFile(uintptr(fd), path), nil
-***REMOVED***
+}
 
-func lockFile(fd syscall.Handle, flags uint32) error ***REMOVED***
+func lockFile(fd syscall.Handle, flags uint32) error {
 	var flag uint32 = LOCKFILE_EXCLUSIVE_LOCK
 	flag |= flags
-	if fd == syscall.InvalidHandle ***REMOVED***
+	if fd == syscall.InvalidHandle {
 		return nil
-	***REMOVED***
-	err := lockFileEx(fd, flag, 1, 0, &syscall.Overlapped***REMOVED******REMOVED***)
-	if err == nil ***REMOVED***
+	}
+	err := lockFileEx(fd, flag, 1, 0, &syscall.Overlapped{})
+	if err == nil {
 		return nil
-	***REMOVED*** else if err.Error() == errLocked.Error() ***REMOVED***
+	} else if err.Error() == errLocked.Error() {
 		return ErrLocked
-	***REMOVED*** else if err != errLockViolation ***REMOVED***
+	} else if err != errLockViolation {
 		return err
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func lockFileEx(h syscall.Handle, flags, locklow, lockhigh uint32, ol *syscall.Overlapped) (err error) ***REMOVED***
+func lockFileEx(h syscall.Handle, flags, locklow, lockhigh uint32, ol *syscall.Overlapped) (err error) {
 	var reserved uint32 = 0
 	r1, _, e1 := syscall.Syscall6(procLockFileEx.Addr(), 6, uintptr(h), uintptr(flags), uintptr(reserved), uintptr(locklow), uintptr(lockhigh), uintptr(unsafe.Pointer(ol)))
-	if r1 == 0 ***REMOVED***
-		if e1 != 0 ***REMOVED***
+	if r1 == 0 {
+		if e1 != 0 {
 			err = error(e1)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			err = syscall.EINVAL
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}

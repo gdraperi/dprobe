@@ -11,38 +11,38 @@ import (
 	"strings"
 )
 
-type testLoader struct ***REMOVED***
-***REMOVED***
+type testLoader struct {
+}
 
-func (t testLoader) Len() int ***REMOVED***
+func (t testLoader) Len() int {
 	return len(testFiles)
-***REMOVED***
+}
 
-func (t testLoader) Path(i int) string ***REMOVED***
+func (t testLoader) Path(i int) string {
 	return testPaths[i]
-***REMOVED***
+}
 
-func (t testLoader) Reader(i int) (io.ReadCloser, error) ***REMOVED***
-	return &reader***REMOVED****strings.NewReader(testFiles[i])***REMOVED***, nil
-***REMOVED***
+func (t testLoader) Reader(i int) (io.ReadCloser, error) {
+	return &reader{*strings.NewReader(testFiles[i])}, nil
+}
 
 // reader adds a dummy Close method to strings.Reader so that it
 // satisfies the io.ReadCloser interface.
-type reader struct ***REMOVED***
+type reader struct {
 	strings.Reader
-***REMOVED***
+}
 
-func (r reader) Close() error ***REMOVED***
+func (r reader) Close() error {
 	return nil
-***REMOVED***
+}
 
 var (
-	testFiles = []string***REMOVED***de_xml, gsw_xml, root_xml***REMOVED***
-	testPaths = []string***REMOVED***
+	testFiles = []string{de_xml, gsw_xml, root_xml}
+	testPaths = []string{
 		"common/main/de.xml",
 		"common/main/gsw.xml",
 		"common/main/root.xml",
-	***REMOVED***
+	}
 )
 
 var root_xml = `<?xml version="1.0" encoding="UTF-8" ?>
@@ -56,8 +56,8 @@ var root_xml = `<?xml version="1.0" encoding="UTF-8" ?>
 		<exemplarCharacters>[]</exemplarCharacters>
 		<exemplarCharacters type="auxiliary">[]</exemplarCharacters>
 		<exemplarCharacters type="punctuation">[\- ‐ – — … ' ‘ ‚ &quot; “ „ \&amp; #]</exemplarCharacters>
-		<ellipsis type="final">***REMOVED***0***REMOVED***…</ellipsis>
-		<ellipsis type="initial">…***REMOVED***0***REMOVED***</ellipsis>
+		<ellipsis type="final">{0}…</ellipsis>
+		<ellipsis type="initial">…{0}</ellipsis>
 		<moreInformation>?</moreInformation>
 	</characters>
 	<dates>
@@ -116,8 +116,8 @@ var de_xml = `<?xml version="1.0" encoding="UTF-8" ?>
 		<exemplarCharacters>[a ä b c d e ö p q r s ß t u ü v w x y z]</exemplarCharacters>
 		<exemplarCharacters type="auxiliary">[á à ă]</exemplarCharacters>
 		<exemplarCharacters type="index">[A B C D E F G H Z]</exemplarCharacters>
-		<ellipsis type="final">***REMOVED***0***REMOVED*** …</ellipsis>
-		<ellipsis type="initial">… ***REMOVED***0***REMOVED***</ellipsis>
+		<ellipsis type="final">{0} …</ellipsis>
+		<ellipsis type="initial">… {0}</ellipsis>
 		<moreInformation>?</moreInformation>
 		<stopwords>
 			<stopwordList type="collation" draft="provisional">der die das</stopwordList>

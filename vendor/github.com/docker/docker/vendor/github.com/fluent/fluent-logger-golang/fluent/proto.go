@@ -9,33 +9,33 @@ import (
 )
 
 //msgp:tuple Entry
-type Entry struct ***REMOVED***
+type Entry struct {
 	Time   int64       `msg:"time"`
-	Record interface***REMOVED******REMOVED*** `msg:"record"`
-***REMOVED***
+	Record interface{} `msg:"record"`
+}
 
 //msgp:tuple Forward
-type Forward struct ***REMOVED***
+type Forward struct {
 	Tag     string      `msg:"tag"`
 	Entries []Entry     `msg:"entries"`
-	Option  interface***REMOVED******REMOVED*** `msg:"option"`
-***REMOVED***
+	Option  interface{} `msg:"option"`
+}
 
 //msgp:tuple Message
-type Message struct ***REMOVED***
+type Message struct {
 	Tag    string      `msg:"tag"`
 	Time   int64       `msg:"time"`
-	Record interface***REMOVED******REMOVED*** `msg:"record"`
-	Option interface***REMOVED******REMOVED*** `msg:"option"`
-***REMOVED***
+	Record interface{} `msg:"record"`
+	Option interface{} `msg:"option"`
+}
 
 //msgp:tuple MessageExt
-type MessageExt struct ***REMOVED***
+type MessageExt struct {
 	Tag    string      `msg:"tag"`
 	Time   EventTime   `msg:"time,extension"`
-	Record interface***REMOVED******REMOVED*** `msg:"record"`
-	Option interface***REMOVED******REMOVED*** `msg:"option"`
-***REMOVED***
+	Record interface{} `msg:"record"`
+	Option interface{} `msg:"option"`
+}
 
 // EventTime is an extension to the serialized time value. It builds in support
 // for sub-second (nanosecond) precision in serialized timestamps.
@@ -52,15 +52,15 @@ const (
 	length        = 8
 )
 
-func init() ***REMOVED***
-	msgp.RegisterExtension(extensionType, func() msgp.Extension ***REMOVED*** return new(EventTime) ***REMOVED***)
-***REMOVED***
+func init() {
+	msgp.RegisterExtension(extensionType, func() msgp.Extension { return new(EventTime) })
+}
 
-func (t *EventTime) ExtensionType() int8 ***REMOVED*** return extensionType ***REMOVED***
+func (t *EventTime) ExtensionType() int8 { return extensionType }
 
-func (t *EventTime) Len() int ***REMOVED*** return length ***REMOVED***
+func (t *EventTime) Len() int { return length }
 
-func (t *EventTime) MarshalBinaryTo(b []byte) error ***REMOVED***
+func (t *EventTime) MarshalBinaryTo(b []byte) error {
 	// Unwrap to Golang time
 	goTime := time.Time(*t)
 
@@ -87,10 +87,10 @@ func (t *EventTime) MarshalBinaryTo(b []byte) error ***REMOVED***
 	b[7] = byte(nsec)
 
 	return nil
-***REMOVED***
+}
 
 // UnmarshalBinary is not implemented since decoding messages is not supported
 // by this library.
-func (t *EventTime) UnmarshalBinary(b []byte) error ***REMOVED***
+func (t *EventTime) UnmarshalBinary(b []byte) error {
 	return nil
-***REMOVED***
+}

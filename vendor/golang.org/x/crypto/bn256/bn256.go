@@ -31,72 +31,72 @@ import (
 
 // G1 is an abstract cyclic group. The zero value is suitable for use as the
 // output of an operation, but cannot be used as an input.
-type G1 struct ***REMOVED***
+type G1 struct {
 	p *curvePoint
-***REMOVED***
+}
 
 // RandomG1 returns x and g₁ˣ where x is a random, non-zero number read from r.
-func RandomG1(r io.Reader) (*big.Int, *G1, error) ***REMOVED***
+func RandomG1(r io.Reader) (*big.Int, *G1, error) {
 	var k *big.Int
 	var err error
 
-	for ***REMOVED***
+	for {
 		k, err = rand.Int(r, Order)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, nil, err
-		***REMOVED***
-		if k.Sign() > 0 ***REMOVED***
+		}
+		if k.Sign() > 0 {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return k, new(G1).ScalarBaseMult(k), nil
-***REMOVED***
+}
 
-func (e *G1) String() string ***REMOVED***
+func (e *G1) String() string {
 	return "bn256.G1" + e.p.String()
-***REMOVED***
+}
 
 // ScalarBaseMult sets e to g*k where g is the generator of the group and
 // then returns e.
-func (e *G1) ScalarBaseMult(k *big.Int) *G1 ***REMOVED***
-	if e.p == nil ***REMOVED***
+func (e *G1) ScalarBaseMult(k *big.Int) *G1 {
+	if e.p == nil {
 		e.p = newCurvePoint(nil)
-	***REMOVED***
+	}
 	e.p.Mul(curveGen, k, new(bnPool))
 	return e
-***REMOVED***
+}
 
 // ScalarMult sets e to a*k and then returns e.
-func (e *G1) ScalarMult(a *G1, k *big.Int) *G1 ***REMOVED***
-	if e.p == nil ***REMOVED***
+func (e *G1) ScalarMult(a *G1, k *big.Int) *G1 {
+	if e.p == nil {
 		e.p = newCurvePoint(nil)
-	***REMOVED***
+	}
 	e.p.Mul(a.p, k, new(bnPool))
 	return e
-***REMOVED***
+}
 
 // Add sets e to a+b and then returns e.
 // BUG(agl): this function is not complete: a==b fails.
-func (e *G1) Add(a, b *G1) *G1 ***REMOVED***
-	if e.p == nil ***REMOVED***
+func (e *G1) Add(a, b *G1) *G1 {
+	if e.p == nil {
 		e.p = newCurvePoint(nil)
-	***REMOVED***
+	}
 	e.p.Add(a.p, b.p, new(bnPool))
 	return e
-***REMOVED***
+}
 
 // Neg sets e to -a and then returns e.
-func (e *G1) Neg(a *G1) *G1 ***REMOVED***
-	if e.p == nil ***REMOVED***
+func (e *G1) Neg(a *G1) *G1 {
+	if e.p == nil {
 		e.p = newCurvePoint(nil)
-	***REMOVED***
+	}
 	e.p.Negative(a.p)
 	return e
-***REMOVED***
+}
 
 // Marshal converts n to a byte slice.
-func (e *G1) Marshal() []byte ***REMOVED***
+func (e *G1) Marshal() []byte {
 	e.p.MakeAffine(nil)
 
 	xBytes := new(big.Int).Mod(e.p.x, p).Bytes()
@@ -110,101 +110,101 @@ func (e *G1) Marshal() []byte ***REMOVED***
 	copy(ret[2*numBytes-len(yBytes):], yBytes)
 
 	return ret
-***REMOVED***
+}
 
 // Unmarshal sets e to the result of converting the output of Marshal back into
 // a group element and then returns e.
-func (e *G1) Unmarshal(m []byte) (*G1, bool) ***REMOVED***
+func (e *G1) Unmarshal(m []byte) (*G1, bool) {
 	// Each value is a 256-bit number.
 	const numBytes = 256 / 8
 
-	if len(m) != 2*numBytes ***REMOVED***
+	if len(m) != 2*numBytes {
 		return nil, false
-	***REMOVED***
+	}
 
-	if e.p == nil ***REMOVED***
+	if e.p == nil {
 		e.p = newCurvePoint(nil)
-	***REMOVED***
+	}
 
 	e.p.x.SetBytes(m[0*numBytes : 1*numBytes])
 	e.p.y.SetBytes(m[1*numBytes : 2*numBytes])
 
-	if e.p.x.Sign() == 0 && e.p.y.Sign() == 0 ***REMOVED***
+	if e.p.x.Sign() == 0 && e.p.y.Sign() == 0 {
 		// This is the point at infinity.
 		e.p.y.SetInt64(1)
 		e.p.z.SetInt64(0)
 		e.p.t.SetInt64(0)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		e.p.z.SetInt64(1)
 		e.p.t.SetInt64(1)
 
-		if !e.p.IsOnCurve() ***REMOVED***
+		if !e.p.IsOnCurve() {
 			return nil, false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return e, true
-***REMOVED***
+}
 
 // G2 is an abstract cyclic group. The zero value is suitable for use as the
 // output of an operation, but cannot be used as an input.
-type G2 struct ***REMOVED***
+type G2 struct {
 	p *twistPoint
-***REMOVED***
+}
 
 // RandomG1 returns x and g₂ˣ where x is a random, non-zero number read from r.
-func RandomG2(r io.Reader) (*big.Int, *G2, error) ***REMOVED***
+func RandomG2(r io.Reader) (*big.Int, *G2, error) {
 	var k *big.Int
 	var err error
 
-	for ***REMOVED***
+	for {
 		k, err = rand.Int(r, Order)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, nil, err
-		***REMOVED***
-		if k.Sign() > 0 ***REMOVED***
+		}
+		if k.Sign() > 0 {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return k, new(G2).ScalarBaseMult(k), nil
-***REMOVED***
+}
 
-func (e *G2) String() string ***REMOVED***
+func (e *G2) String() string {
 	return "bn256.G2" + e.p.String()
-***REMOVED***
+}
 
 // ScalarBaseMult sets e to g*k where g is the generator of the group and
 // then returns out.
-func (e *G2) ScalarBaseMult(k *big.Int) *G2 ***REMOVED***
-	if e.p == nil ***REMOVED***
+func (e *G2) ScalarBaseMult(k *big.Int) *G2 {
+	if e.p == nil {
 		e.p = newTwistPoint(nil)
-	***REMOVED***
+	}
 	e.p.Mul(twistGen, k, new(bnPool))
 	return e
-***REMOVED***
+}
 
 // ScalarMult sets e to a*k and then returns e.
-func (e *G2) ScalarMult(a *G2, k *big.Int) *G2 ***REMOVED***
-	if e.p == nil ***REMOVED***
+func (e *G2) ScalarMult(a *G2, k *big.Int) *G2 {
+	if e.p == nil {
 		e.p = newTwistPoint(nil)
-	***REMOVED***
+	}
 	e.p.Mul(a.p, k, new(bnPool))
 	return e
-***REMOVED***
+}
 
 // Add sets e to a+b and then returns e.
 // BUG(agl): this function is not complete: a==b fails.
-func (e *G2) Add(a, b *G2) *G2 ***REMOVED***
-	if e.p == nil ***REMOVED***
+func (e *G2) Add(a, b *G2) *G2 {
+	if e.p == nil {
 		e.p = newTwistPoint(nil)
-	***REMOVED***
+	}
 	e.p.Add(a.p, b.p, new(bnPool))
 	return e
-***REMOVED***
+}
 
 // Marshal converts n into a byte slice.
-func (n *G2) Marshal() []byte ***REMOVED***
+func (n *G2) Marshal() []byte {
 	n.p.MakeAffine(nil)
 
 	xxBytes := new(big.Int).Mod(n.p.x.x, p).Bytes()
@@ -222,21 +222,21 @@ func (n *G2) Marshal() []byte ***REMOVED***
 	copy(ret[4*numBytes-len(yyBytes):], yyBytes)
 
 	return ret
-***REMOVED***
+}
 
 // Unmarshal sets e to the result of converting the output of Marshal back into
 // a group element and then returns e.
-func (e *G2) Unmarshal(m []byte) (*G2, bool) ***REMOVED***
+func (e *G2) Unmarshal(m []byte) (*G2, bool) {
 	// Each value is a 256-bit number.
 	const numBytes = 256 / 8
 
-	if len(m) != 4*numBytes ***REMOVED***
+	if len(m) != 4*numBytes {
 		return nil, false
-	***REMOVED***
+	}
 
-	if e.p == nil ***REMOVED***
+	if e.p == nil {
 		e.p = newTwistPoint(nil)
-	***REMOVED***
+	}
 
 	e.p.x.x.SetBytes(m[0*numBytes : 1*numBytes])
 	e.p.x.y.SetBytes(m[1*numBytes : 2*numBytes])
@@ -246,62 +246,62 @@ func (e *G2) Unmarshal(m []byte) (*G2, bool) ***REMOVED***
 	if e.p.x.x.Sign() == 0 &&
 		e.p.x.y.Sign() == 0 &&
 		e.p.y.x.Sign() == 0 &&
-		e.p.y.y.Sign() == 0 ***REMOVED***
+		e.p.y.y.Sign() == 0 {
 		// This is the point at infinity.
 		e.p.y.SetOne()
 		e.p.z.SetZero()
 		e.p.t.SetZero()
-	***REMOVED*** else ***REMOVED***
+	} else {
 		e.p.z.SetOne()
 		e.p.t.SetOne()
 
-		if !e.p.IsOnCurve() ***REMOVED***
+		if !e.p.IsOnCurve() {
 			return nil, false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return e, true
-***REMOVED***
+}
 
 // GT is an abstract cyclic group. The zero value is suitable for use as the
 // output of an operation, but cannot be used as an input.
-type GT struct ***REMOVED***
+type GT struct {
 	p *gfP12
-***REMOVED***
+}
 
-func (g *GT) String() string ***REMOVED***
+func (g *GT) String() string {
 	return "bn256.GT" + g.p.String()
-***REMOVED***
+}
 
 // ScalarMult sets e to a*k and then returns e.
-func (e *GT) ScalarMult(a *GT, k *big.Int) *GT ***REMOVED***
-	if e.p == nil ***REMOVED***
+func (e *GT) ScalarMult(a *GT, k *big.Int) *GT {
+	if e.p == nil {
 		e.p = newGFp12(nil)
-	***REMOVED***
+	}
 	e.p.Exp(a.p, k, new(bnPool))
 	return e
-***REMOVED***
+}
 
 // Add sets e to a+b and then returns e.
-func (e *GT) Add(a, b *GT) *GT ***REMOVED***
-	if e.p == nil ***REMOVED***
+func (e *GT) Add(a, b *GT) *GT {
+	if e.p == nil {
 		e.p = newGFp12(nil)
-	***REMOVED***
+	}
 	e.p.Mul(a.p, b.p, new(bnPool))
 	return e
-***REMOVED***
+}
 
 // Neg sets e to -a and then returns e.
-func (e *GT) Neg(a *GT) *GT ***REMOVED***
-	if e.p == nil ***REMOVED***
+func (e *GT) Neg(a *GT) *GT {
+	if e.p == nil {
 		e.p = newGFp12(nil)
-	***REMOVED***
+	}
 	e.p.Invert(a.p, new(bnPool))
 	return e
-***REMOVED***
+}
 
 // Marshal converts n into a byte slice.
-func (n *GT) Marshal() []byte ***REMOVED***
+func (n *GT) Marshal() []byte {
 	n.p.Minimal()
 
 	xxxBytes := n.p.x.x.x.Bytes()
@@ -335,21 +335,21 @@ func (n *GT) Marshal() []byte ***REMOVED***
 	copy(ret[12*numBytes-len(yzyBytes):], yzyBytes)
 
 	return ret
-***REMOVED***
+}
 
 // Unmarshal sets e to the result of converting the output of Marshal back into
 // a group element and then returns e.
-func (e *GT) Unmarshal(m []byte) (*GT, bool) ***REMOVED***
+func (e *GT) Unmarshal(m []byte) (*GT, bool) {
 	// Each value is a 256-bit number.
 	const numBytes = 256 / 8
 
-	if len(m) != 12*numBytes ***REMOVED***
+	if len(m) != 12*numBytes {
 		return nil, false
-	***REMOVED***
+	}
 
-	if e.p == nil ***REMOVED***
+	if e.p == nil {
 		e.p = newGFp12(nil)
-	***REMOVED***
+	}
 
 	e.p.x.x.x.SetBytes(m[0*numBytes : 1*numBytes])
 	e.p.x.x.y.SetBytes(m[1*numBytes : 2*numBytes])
@@ -365,44 +365,44 @@ func (e *GT) Unmarshal(m []byte) (*GT, bool) ***REMOVED***
 	e.p.y.z.y.SetBytes(m[11*numBytes : 12*numBytes])
 
 	return e, true
-***REMOVED***
+}
 
 // Pair calculates an Optimal Ate pairing.
-func Pair(g1 *G1, g2 *G2) *GT ***REMOVED***
-	return &GT***REMOVED***optimalAte(g2.p, g1.p, new(bnPool))***REMOVED***
-***REMOVED***
+func Pair(g1 *G1, g2 *G2) *GT {
+	return &GT{optimalAte(g2.p, g1.p, new(bnPool))}
+}
 
 // bnPool implements a tiny cache of *big.Int objects that's used to reduce the
 // number of allocations made during processing.
-type bnPool struct ***REMOVED***
+type bnPool struct {
 	bns   []*big.Int
 	count int
-***REMOVED***
+}
 
-func (pool *bnPool) Get() *big.Int ***REMOVED***
-	if pool == nil ***REMOVED***
+func (pool *bnPool) Get() *big.Int {
+	if pool == nil {
 		return new(big.Int)
-	***REMOVED***
+	}
 
 	pool.count++
 	l := len(pool.bns)
-	if l == 0 ***REMOVED***
+	if l == 0 {
 		return new(big.Int)
-	***REMOVED***
+	}
 
 	bn := pool.bns[l-1]
 	pool.bns = pool.bns[:l-1]
 	return bn
-***REMOVED***
+}
 
-func (pool *bnPool) Put(bn *big.Int) ***REMOVED***
-	if pool == nil ***REMOVED***
+func (pool *bnPool) Put(bn *big.Int) {
+	if pool == nil {
 		return
-	***REMOVED***
+	}
 	pool.bns = append(pool.bns, bn)
 	pool.count--
-***REMOVED***
+}
 
-func (pool *bnPool) Count() int ***REMOVED***
+func (pool *bnPool) Count() int {
 	return pool.count
-***REMOVED***
+}

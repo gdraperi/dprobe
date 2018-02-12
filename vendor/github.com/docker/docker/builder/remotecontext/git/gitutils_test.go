@@ -17,101 +17,101 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestParseRemoteURL(t *testing.T) ***REMOVED***
+func TestParseRemoteURL(t *testing.T) {
 	dir, err := parseRemoteURL("git://github.com/user/repo.git")
 	require.NoError(t, err)
 	assert.NotEmpty(t, dir)
-	assert.Equal(t, gitRepo***REMOVED***"git://github.com/user/repo.git", "master", ""***REMOVED***, dir)
+	assert.Equal(t, gitRepo{"git://github.com/user/repo.git", "master", ""}, dir)
 
 	dir, err = parseRemoteURL("git://github.com/user/repo.git#mybranch:mydir/mysubdir/")
 	require.NoError(t, err)
 	assert.NotEmpty(t, dir)
-	assert.Equal(t, gitRepo***REMOVED***"git://github.com/user/repo.git", "mybranch", "mydir/mysubdir/"***REMOVED***, dir)
+	assert.Equal(t, gitRepo{"git://github.com/user/repo.git", "mybranch", "mydir/mysubdir/"}, dir)
 
 	dir, err = parseRemoteURL("https://github.com/user/repo.git")
 	require.NoError(t, err)
 	assert.NotEmpty(t, dir)
-	assert.Equal(t, gitRepo***REMOVED***"https://github.com/user/repo.git", "master", ""***REMOVED***, dir)
+	assert.Equal(t, gitRepo{"https://github.com/user/repo.git", "master", ""}, dir)
 
 	dir, err = parseRemoteURL("https://github.com/user/repo.git#mybranch:mydir/mysubdir/")
 	require.NoError(t, err)
 	assert.NotEmpty(t, dir)
-	assert.Equal(t, gitRepo***REMOVED***"https://github.com/user/repo.git", "mybranch", "mydir/mysubdir/"***REMOVED***, dir)
+	assert.Equal(t, gitRepo{"https://github.com/user/repo.git", "mybranch", "mydir/mysubdir/"}, dir)
 
 	dir, err = parseRemoteURL("git@github.com:user/repo.git")
 	require.NoError(t, err)
 	assert.NotEmpty(t, dir)
-	assert.Equal(t, gitRepo***REMOVED***"git@github.com:user/repo.git", "master", ""***REMOVED***, dir)
+	assert.Equal(t, gitRepo{"git@github.com:user/repo.git", "master", ""}, dir)
 
 	dir, err = parseRemoteURL("git@github.com:user/repo.git#mybranch:mydir/mysubdir/")
 	require.NoError(t, err)
 	assert.NotEmpty(t, dir)
-	assert.Equal(t, gitRepo***REMOVED***"git@github.com:user/repo.git", "mybranch", "mydir/mysubdir/"***REMOVED***, dir)
-***REMOVED***
+	assert.Equal(t, gitRepo{"git@github.com:user/repo.git", "mybranch", "mydir/mysubdir/"}, dir)
+}
 
-func TestCloneArgsSmartHttp(t *testing.T) ***REMOVED***
+func TestCloneArgsSmartHttp(t *testing.T) {
 	mux := http.NewServeMux()
 	server := httptest.NewServer(mux)
 	serverURL, _ := url.Parse(server.URL)
 
 	serverURL.Path = "/repo.git"
 
-	mux.HandleFunc("/repo.git/info/refs", func(w http.ResponseWriter, r *http.Request) ***REMOVED***
+	mux.HandleFunc("/repo.git/info/refs", func(w http.ResponseWriter, r *http.Request) {
 		q := r.URL.Query().Get("service")
 		w.Header().Set("Content-Type", fmt.Sprintf("application/x-%s-advertisement", q))
-	***REMOVED***)
+	})
 
 	args := fetchArgs(serverURL.String(), "master")
-	exp := []string***REMOVED***"fetch", "--depth", "1", "origin", "master"***REMOVED***
+	exp := []string{"fetch", "--depth", "1", "origin", "master"}
 	assert.Equal(t, exp, args)
-***REMOVED***
+}
 
-func TestCloneArgsDumbHttp(t *testing.T) ***REMOVED***
+func TestCloneArgsDumbHttp(t *testing.T) {
 	mux := http.NewServeMux()
 	server := httptest.NewServer(mux)
 	serverURL, _ := url.Parse(server.URL)
 
 	serverURL.Path = "/repo.git"
 
-	mux.HandleFunc("/repo.git/info/refs", func(w http.ResponseWriter, r *http.Request) ***REMOVED***
+	mux.HandleFunc("/repo.git/info/refs", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/plain")
-	***REMOVED***)
+	})
 
 	args := fetchArgs(serverURL.String(), "master")
-	exp := []string***REMOVED***"fetch", "origin", "master"***REMOVED***
+	exp := []string{"fetch", "origin", "master"}
 	assert.Equal(t, exp, args)
-***REMOVED***
+}
 
-func TestCloneArgsGit(t *testing.T) ***REMOVED***
+func TestCloneArgsGit(t *testing.T) {
 	args := fetchArgs("git://github.com/docker/docker", "master")
-	exp := []string***REMOVED***"fetch", "--depth", "1", "origin", "master"***REMOVED***
+	exp := []string{"fetch", "--depth", "1", "origin", "master"}
 	assert.Equal(t, exp, args)
-***REMOVED***
+}
 
-func gitGetConfig(name string) string ***REMOVED***
-	b, err := git([]string***REMOVED***"config", "--get", name***REMOVED***...)
-	if err != nil ***REMOVED***
+func gitGetConfig(name string) string {
+	b, err := git([]string{"config", "--get", name}...)
+	if err != nil {
 		// since we are interested in empty or non empty string,
 		// we can safely ignore the err here.
 		return ""
-	***REMOVED***
+	}
 	return strings.TrimSpace(string(b))
-***REMOVED***
+}
 
-func TestCheckoutGit(t *testing.T) ***REMOVED***
+func TestCheckoutGit(t *testing.T) {
 	root, err := ioutil.TempDir("", "docker-build-git-checkout")
 	require.NoError(t, err)
 	defer os.RemoveAll(root)
 
 	autocrlf := gitGetConfig("core.autocrlf")
 	if !(autocrlf == "true" || autocrlf == "false" ||
-		autocrlf == "input" || autocrlf == "") ***REMOVED***
+		autocrlf == "input" || autocrlf == "") {
 		t.Logf("unknown core.autocrlf value: \"%s\"", autocrlf)
-	***REMOVED***
+	}
 	eol := "\n"
-	if autocrlf == "true" ***REMOVED***
+	if autocrlf == "true" {
 		eol = "\r\n"
-	***REMOVED***
+	}
 
 	gitDir := filepath.Join(root, "repo")
 	_, err = git("init", gitDir)
@@ -132,15 +132,15 @@ func TestCheckoutGit(t *testing.T) ***REMOVED***
 	err = ioutil.WriteFile(filepath.Join(subDir, "Dockerfile"), []byte("FROM scratch\nEXPOSE 5000"), 0644)
 	require.NoError(t, err)
 
-	if runtime.GOOS != "windows" ***REMOVED***
-		if err = os.Symlink("../subdir", filepath.Join(gitDir, "parentlink")); err != nil ***REMOVED***
+	if runtime.GOOS != "windows" {
+		if err = os.Symlink("../subdir", filepath.Join(gitDir, "parentlink")); err != nil {
 			t.Fatal(err)
-		***REMOVED***
+		}
 
-		if err = os.Symlink("/subdir", filepath.Join(gitDir, "absolutelink")); err != nil ***REMOVED***
+		if err = os.Symlink("/subdir", filepath.Join(gitDir, "absolutelink")); err != nil {
 			t.Fatal(err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	_, err = gitWithinDir(gitDir, "add", "-A")
 	require.NoError(t, err)
@@ -196,65 +196,65 @@ func TestCheckoutGit(t *testing.T) ***REMOVED***
 	_, err = gitWithinDir(gitDir, "commit", "-am", "With submodule")
 	require.NoError(t, err)
 
-	type singleCase struct ***REMOVED***
+	type singleCase struct {
 		frag      string
 		exp       string
 		fail      bool
 		submodule bool
-	***REMOVED***
+	}
 
-	cases := []singleCase***REMOVED***
-		***REMOVED***"", "FROM scratch", false, true***REMOVED***,
-		***REMOVED***"master", "FROM scratch", false, true***REMOVED***,
-		***REMOVED***":subdir", "FROM scratch" + eol + "EXPOSE 5000", false, false***REMOVED***,
-		***REMOVED***":nosubdir", "", true, false***REMOVED***,   // missing directory error
-		***REMOVED***":Dockerfile", "", true, false***REMOVED***, // not a directory error
-		***REMOVED***"master:nosubdir", "", true, false***REMOVED***,
-		***REMOVED***"master:subdir", "FROM scratch" + eol + "EXPOSE 5000", false, false***REMOVED***,
-		***REMOVED***"master:../subdir", "", true, false***REMOVED***,
-		***REMOVED***"test", "FROM scratch" + eol + "EXPOSE 3000", false, false***REMOVED***,
-		***REMOVED***"test:", "FROM scratch" + eol + "EXPOSE 3000", false, false***REMOVED***,
-		***REMOVED***"test:subdir", "FROM busybox" + eol + "EXPOSE 5000", false, false***REMOVED***,
-	***REMOVED***
+	cases := []singleCase{
+		{"", "FROM scratch", false, true},
+		{"master", "FROM scratch", false, true},
+		{":subdir", "FROM scratch" + eol + "EXPOSE 5000", false, false},
+		{":nosubdir", "", true, false},   // missing directory error
+		{":Dockerfile", "", true, false}, // not a directory error
+		{"master:nosubdir", "", true, false},
+		{"master:subdir", "FROM scratch" + eol + "EXPOSE 5000", false, false},
+		{"master:../subdir", "", true, false},
+		{"test", "FROM scratch" + eol + "EXPOSE 3000", false, false},
+		{"test:", "FROM scratch" + eol + "EXPOSE 3000", false, false},
+		{"test:subdir", "FROM busybox" + eol + "EXPOSE 5000", false, false},
+	}
 
-	if runtime.GOOS != "windows" ***REMOVED***
+	if runtime.GOOS != "windows" {
 		// Windows GIT (2.7.1 x64) does not support parentlink/absolutelink. Sample output below
 		// 	git --work-tree .\repo --git-dir .\repo\.git add -A
 		//	error: readlink("absolutelink"): Function not implemented
 		// 	error: unable to index file absolutelink
 		// 	fatal: adding files failed
-		cases = append(cases, singleCase***REMOVED***frag: "master:absolutelink", exp: "FROM scratch" + eol + "EXPOSE 5000", fail: false***REMOVED***)
-		cases = append(cases, singleCase***REMOVED***frag: "master:parentlink", exp: "FROM scratch" + eol + "EXPOSE 5000", fail: false***REMOVED***)
-	***REMOVED***
+		cases = append(cases, singleCase{frag: "master:absolutelink", exp: "FROM scratch" + eol + "EXPOSE 5000", fail: false})
+		cases = append(cases, singleCase{frag: "master:parentlink", exp: "FROM scratch" + eol + "EXPOSE 5000", fail: false})
+	}
 
-	for _, c := range cases ***REMOVED***
+	for _, c := range cases {
 		ref, subdir := getRefAndSubdir(c.frag)
-		r, err := cloneGitRepo(gitRepo***REMOVED***remote: gitDir, ref: ref, subdir: subdir***REMOVED***)
+		r, err := cloneGitRepo(gitRepo{remote: gitDir, ref: ref, subdir: subdir})
 
-		if c.fail ***REMOVED***
+		if c.fail {
 			assert.Error(t, err)
 			continue
-		***REMOVED***
+		}
 		require.NoError(t, err)
 		defer os.RemoveAll(r)
-		if c.submodule ***REMOVED***
+		if c.submodule {
 			b, err := ioutil.ReadFile(filepath.Join(r, "sub/subfile"))
 			require.NoError(t, err)
 			assert.Equal(t, "subcontents", string(b))
-		***REMOVED*** else ***REMOVED***
+		} else {
 			_, err := os.Stat(filepath.Join(r, "sub/subfile"))
 			require.Error(t, err)
 			require.True(t, os.IsNotExist(err))
-		***REMOVED***
+		}
 
 		b, err := ioutil.ReadFile(filepath.Join(r, "Dockerfile"))
 		require.NoError(t, err)
 		assert.Equal(t, c.exp, string(b))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestValidGitTransport(t *testing.T) ***REMOVED***
-	gitUrls := []string***REMOVED***
+func TestValidGitTransport(t *testing.T) {
+	gitUrls := []string{
 		"git://github.com/docker/docker",
 		"git@github.com:docker/docker.git",
 		"git@bitbucket.org:atlassianlabs/atlassian-docker.git",
@@ -262,20 +262,20 @@ func TestValidGitTransport(t *testing.T) ***REMOVED***
 		"http://github.com/docker/docker.git",
 		"http://github.com/docker/docker.git#branch",
 		"http://github.com/docker/docker.git#:dir",
-	***REMOVED***
-	incompleteGitUrls := []string***REMOVED***
+	}
+	incompleteGitUrls := []string{
 		"github.com/docker/docker",
-	***REMOVED***
+	}
 
-	for _, url := range gitUrls ***REMOVED***
-		if !isGitTransport(url) ***REMOVED***
+	for _, url := range gitUrls {
+		if !isGitTransport(url) {
 			t.Fatalf("%q should be detected as valid Git prefix", url)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	for _, url := range incompleteGitUrls ***REMOVED***
-		if isGitTransport(url) ***REMOVED***
+	for _, url := range incompleteGitUrls {
+		if isGitTransport(url) {
 			t.Fatalf("%q should not be detected as valid Git prefix", url)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

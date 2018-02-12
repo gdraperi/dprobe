@@ -5,40 +5,40 @@ RED = "\033[0;31m"
 GRN = "\033[0;32m"
 NC  = "\033[0m"
 
-PASS = "#***REMOVED***GRN***REMOVED***PASS!#***REMOVED***NC***REMOVED***"
-FAIL = "#***REMOVED***RED***REMOVED***FAIL!#***REMOVED***NC***REMOVED***"
+PASS = "#{GRN}PASS!#{NC}"
+FAIL = "#{RED}FAIL!#{NC}"
 
 Stats = Struct.new :total, :ok, :fail
 $stats = Stats.new 0, 0, 0
 
 def print_fail_report(t, out, outexpected)
-	puts "#***REMOVED***t***REMOVED***: #***REMOVED***FAIL***REMOVED***"
+	puts "#{t}: #{FAIL}"
 	puts "-"*65
-	puts "Got:\n#***REMOVED***out***REMOVED***"
+	puts "Got:\n#{out}"
 	puts "-"*65
-	puts "Expected:\n#***REMOVED***outexpected***REMOVED***"
+	puts "Expected:\n#{outexpected}"
 	puts "-"*65
 end
 
 def print_pass_report(t)
-	puts "#***REMOVED***t***REMOVED***: #***REMOVED***PASS***REMOVED***"
+	puts "#{t}: #{PASS}"
 end
 
 def print_stats
-	puts "\nSummary (total: #***REMOVED***$stats.total***REMOVED***)"
-	puts "#***REMOVED***GRN***REMOVED***  PASS#***REMOVED***NC***REMOVED***: #***REMOVED***$stats.ok***REMOVED***"
-	puts "#***REMOVED***RED***REMOVED***  FAIL#***REMOVED***NC***REMOVED***: #***REMOVED***$stats.fail***REMOVED***"
-	puts "#***REMOVED***$stats.fail == 0 ? GRN : RED***REMOVED***#***REMOVED***"█"*72***REMOVED***#***REMOVED***NC***REMOVED***"
+	puts "\nSummary (total: #{$stats.total})"
+	puts "#{GRN}  PASS#{NC}: #{$stats.ok}"
+	puts "#{RED}  FAIL#{NC}: #{$stats.fail}"
+	puts "#{$stats.fail == 0 ? GRN : RED}#{"█"*72}#{NC}"
 end
 
 def run_test(t)
 	$stats.total += 1
 
-	cursorpos = Dir["#***REMOVED***t***REMOVED***/cursor.*"].map***REMOVED***|d| File.extname(d)[1..-1]***REMOVED***.first
-	outexpected = IO.read("#***REMOVED***t***REMOVED***/out.expected") rescue "To be determined"
-	filename = "#***REMOVED***t***REMOVED***/test.go.in"
+	cursorpos = Dir["#{t}/cursor.*"].map{|d| File.extname(d)[1..-1]}.first
+	outexpected = IO.read("#{t}/out.expected") rescue "To be determined"
+	filename = "#{t}/test.go.in"
 
-	out = %x[gocode -in #***REMOVED***filename***REMOVED*** autocomplete #***REMOVED***filename***REMOVED*** #***REMOVED***cursorpos***REMOVED***]
+	out = %x[gocode -in #{filename} autocomplete #{filename} #{cursorpos}]
 
 	if out != outexpected then
 		print_fail_report(t, out, outexpected)

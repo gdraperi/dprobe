@@ -7,12 +7,12 @@ import (
 	"syscall"
 )
 
-func getSysProcAttr() *syscall.SysProcAttr ***REMOVED***
-	return &syscall.SysProcAttr***REMOVED***
+func getSysProcAttr() *syscall.SysProcAttr {
+	return &syscall.SysProcAttr{
 		Setpgid: true,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func setCgroup(cgroupPath string, cmd *exec.Cmd) error ***REMOVED***
+func setCgroup(cgroupPath string, cmd *exec.Cmd) error {
 	return nil
-***REMOVED***
+}

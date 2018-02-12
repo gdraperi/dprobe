@@ -10,87 +10,87 @@ const (
 	defaultInitializer = "linux-init"
 )
 
-func init() ***REMOVED***
+func init() {
 	initializers[defaultInitializer] = initFS
-***REMOVED***
+}
 
-func createDirectory(name string, uid, gid int) initializerFunc ***REMOVED***
-	return func(root string) error ***REMOVED***
+func createDirectory(name string, uid, gid int) initializerFunc {
+	return func(root string) error {
 		dname := filepath.Join(root, name)
 		st, err := os.Stat(dname)
-		if err != nil && !os.IsNotExist(err) ***REMOVED***
+		if err != nil && !os.IsNotExist(err) {
 			return err
-		***REMOVED*** else if err == nil ***REMOVED***
-			if st.IsDir() ***REMOVED***
+		} else if err == nil {
+			if st.IsDir() {
 				stat := st.Sys().(*syscall.Stat_t)
-				if int(stat.Gid) == gid && int(stat.Uid) == uid ***REMOVED***
+				if int(stat.Gid) == gid && int(stat.Uid) == uid {
 					return nil
-				***REMOVED***
-			***REMOVED*** else ***REMOVED***
-				if err := os.Remove(dname); err != nil ***REMOVED***
+				}
+			} else {
+				if err := os.Remove(dname); err != nil {
 					return err
-				***REMOVED***
-				if err := os.Mkdir(dname, 0755); err != nil ***REMOVED***
+				}
+				if err := os.Mkdir(dname, 0755); err != nil {
 					return err
-				***REMOVED***
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
-			if err := os.Mkdir(dname, 0755); err != nil ***REMOVED***
+				}
+			}
+		} else {
+			if err := os.Mkdir(dname, 0755); err != nil {
 				return err
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		return os.Chown(dname, uid, gid)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func touchFile(name string, uid, gid int) initializerFunc ***REMOVED***
-	return func(root string) error ***REMOVED***
+func touchFile(name string, uid, gid int) initializerFunc {
+	return func(root string) error {
 		fname := filepath.Join(root, name)
 
 		st, err := os.Stat(fname)
-		if err != nil && !os.IsNotExist(err) ***REMOVED***
+		if err != nil && !os.IsNotExist(err) {
 			return err
-		***REMOVED*** else if err == nil ***REMOVED***
+		} else if err == nil {
 			stat := st.Sys().(*syscall.Stat_t)
-			if int(stat.Gid) == gid && int(stat.Uid) == uid ***REMOVED***
+			if int(stat.Gid) == gid && int(stat.Uid) == uid {
 				return nil
-			***REMOVED***
+			}
 			return os.Chown(fname, uid, gid)
-		***REMOVED***
+		}
 
 		f, err := os.OpenFile(fname, os.O_CREATE, 0644)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		defer f.Close()
 
 		return f.Chown(uid, gid)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func symlink(oldname, newname string) initializerFunc ***REMOVED***
-	return func(root string) error ***REMOVED***
+func symlink(oldname, newname string) initializerFunc {
+	return func(root string) error {
 		linkName := filepath.Join(root, newname)
-		if _, err := os.Stat(linkName); err != nil && !os.IsNotExist(err) ***REMOVED***
+		if _, err := os.Stat(linkName); err != nil && !os.IsNotExist(err) {
 			return err
-		***REMOVED*** else if err == nil ***REMOVED***
+		} else if err == nil {
 			return nil
-		***REMOVED***
+		}
 		return os.Symlink(oldname, linkName)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func initFS(root string) error ***REMOVED***
+func initFS(root string) error {
 	st, err := os.Stat(root)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	stat := st.Sys().(*syscall.Stat_t)
 	uid := int(stat.Uid)
 	gid := int(stat.Gid)
 
-	initFuncs := []initializerFunc***REMOVED***
+	initFuncs := []initializerFunc{
 		createDirectory("/dev", uid, gid),
 		createDirectory("/dev/pts", uid, gid),
 		createDirectory("/dev/shm", uid, gid),
@@ -102,13 +102,13 @@ func initFS(root string) error ***REMOVED***
 		touchFile("/etc/hosts", uid, gid),
 		touchFile("/etc/hostname", uid, gid),
 		symlink("/proc/mounts", "/etc/mtab"),
-	***REMOVED***
+	}
 
-	for _, fn := range initFuncs ***REMOVED***
-		if err := fn(root); err != nil ***REMOVED***
+	for _, fn := range initFuncs {
+		if err := fn(root); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}

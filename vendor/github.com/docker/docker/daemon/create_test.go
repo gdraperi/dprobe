@@ -9,13 +9,13 @@ import (
 )
 
 // Test case for 35752
-func TestVerifyNetworkingConfig(t *testing.T) ***REMOVED***
+func TestVerifyNetworkingConfig(t *testing.T) {
 	name := "mynet"
 	endpoints := make(map[string]*network.EndpointSettings, 1)
 	endpoints[name] = nil
-	nwConfig := &network.NetworkingConfig***REMOVED***
+	nwConfig := &network.NetworkingConfig{
 		EndpointsConfig: endpoints,
-	***REMOVED***
+	}
 	err := verifyNetworkingConfig(nwConfig)
 	assert.True(t, errdefs.IsInvalidParameter(err))
-***REMOVED***
+}

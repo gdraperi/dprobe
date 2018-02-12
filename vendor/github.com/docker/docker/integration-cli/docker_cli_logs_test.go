@@ -16,29 +16,29 @@ import (
 )
 
 // This used to work, it test a log of PageSize-1 (gh#4851)
-func (s *DockerSuite) TestLogsContainerSmallerThanPage(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestLogsContainerSmallerThanPage(c *check.C) {
 	testLogsContainerPagination(c, 32767)
-***REMOVED***
+}
 
 // Regression test: When going over the PageSize, it used to panic (gh#4851)
-func (s *DockerSuite) TestLogsContainerBiggerThanPage(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestLogsContainerBiggerThanPage(c *check.C) {
 	testLogsContainerPagination(c, 32768)
-***REMOVED***
+}
 
 // Regression test: When going much over the PageSize, it used to block (gh#4851)
-func (s *DockerSuite) TestLogsContainerMuchBiggerThanPage(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestLogsContainerMuchBiggerThanPage(c *check.C) {
 	testLogsContainerPagination(c, 33000)
-***REMOVED***
+}
 
-func testLogsContainerPagination(c *check.C, testLen int) ***REMOVED***
+func testLogsContainerPagination(c *check.C, testLen int) {
 	out, _ := dockerCmd(c, "run", "-d", "busybox", "sh", "-c", fmt.Sprintf("for i in $(seq 1 %d); do echo -n = >> a.a; done; echo >> a.a; cat a.a", testLen))
 	id := strings.TrimSpace(out)
 	dockerCmd(c, "wait", id)
 	out, _ = dockerCmd(c, "logs", id)
 	c.Assert(out, checker.HasLen, testLen+1)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestLogsTimestamps(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestLogsTimestamps(c *check.C) {
 	testLen := 100
 	out, _ := dockerCmd(c, "run", "-d", "busybox", "sh", "-c", fmt.Sprintf("for i in $(seq 1 %d); do echo = >> a.a; done; cat a.a", testLen))
 
@@ -53,28 +53,28 @@ func (s *DockerSuite) TestLogsTimestamps(c *check.C) ***REMOVED***
 
 	ts := regexp.MustCompile(`^.* `)
 
-	for _, l := range lines ***REMOVED***
-		if l != "" ***REMOVED***
+	for _, l := range lines {
+		if l != "" {
 			_, err := time.Parse(jsonmessage.RFC3339NanoFixed+" ", ts.FindString(l))
 			c.Assert(err, checker.IsNil, check.Commentf("Failed to parse timestamp from %v", l))
 			// ensure we have padded 0's
 			c.Assert(l[29], checker.Equals, uint8('Z'))
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (s *DockerSuite) TestLogsSeparateStderr(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestLogsSeparateStderr(c *check.C) {
 	msg := "stderr_log"
 	out := cli.DockerCmd(c, "run", "-d", "busybox", "sh", "-c", fmt.Sprintf("echo %s 1>&2", msg)).Combined()
 	id := strings.TrimSpace(out)
 	cli.DockerCmd(c, "wait", id)
-	cli.DockerCmd(c, "logs", id).Assert(c, icmd.Expected***REMOVED***
+	cli.DockerCmd(c, "logs", id).Assert(c, icmd.Expected{
 		Out: "",
 		Err: msg,
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func (s *DockerSuite) TestLogsStderrInStdout(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestLogsStderrInStdout(c *check.C) {
 	// TODO Windows: Needs investigation why this fails. Obtained string includes
 	// a bunch of ANSI escape sequences before the "stderr_log" message.
 	testRequires(c, DaemonIsLinux)
@@ -83,13 +83,13 @@ func (s *DockerSuite) TestLogsStderrInStdout(c *check.C) ***REMOVED***
 	id := strings.TrimSpace(out)
 	cli.DockerCmd(c, "wait", id)
 
-	cli.DockerCmd(c, "logs", id).Assert(c, icmd.Expected***REMOVED***
+	cli.DockerCmd(c, "logs", id).Assert(c, icmd.Expected{
 		Out: msg,
 		Err: "",
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func (s *DockerSuite) TestLogsTail(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestLogsTail(c *check.C) {
 	testLen := 100
 	out := cli.DockerCmd(c, "run", "-d", "busybox", "sh", "-c", fmt.Sprintf("for i in $(seq 1 %d); do echo =; done;", testLen)).Combined()
 
@@ -119,9 +119,9 @@ func (s *DockerSuite) TestLogsTail(c *check.C) ***REMOVED***
 	out = cli.DockerCmd(c, "logs", "--tail", "random", id).Combined()
 	lines = strings.Split(out, "\n")
 	c.Assert(lines, checker.HasLen, testLen+1)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestLogsFollowStopped(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestLogsFollowStopped(c *check.C) {
 	dockerCmd(c, "run", "--name=test", "busybox", "echo", "hello")
 	id := getIDByName(c, "test")
 
@@ -129,20 +129,20 @@ func (s *DockerSuite) TestLogsFollowStopped(c *check.C) ***REMOVED***
 	c.Assert(logsCmd.Start(), checker.IsNil)
 
 	errChan := make(chan error)
-	go func() ***REMOVED***
+	go func() {
 		errChan <- logsCmd.Wait()
 		close(errChan)
-	***REMOVED***()
+	}()
 
-	select ***REMOVED***
+	select {
 	case err := <-errChan:
 		c.Assert(err, checker.IsNil)
 	case <-time.After(30 * time.Second):
 		c.Fatal("Following logs is hanged")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *DockerSuite) TestLogsSince(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestLogsSince(c *check.C) {
 	name := "testlogssince"
 	dockerCmd(c, "run", "--name="+name, "busybox", "/bin/sh", "-c", "for i in $(seq 1 3); do sleep 2; echo log$i; done")
 	out, _ := dockerCmd(c, "logs", "-t", name)
@@ -154,30 +154,30 @@ func (s *DockerSuite) TestLogsSince(c *check.C) ***REMOVED***
 	out, _ = dockerCmd(c, "logs", "-t", fmt.Sprintf("--since=%v", since), name)
 
 	// Skip 2 seconds
-	unexpected := []string***REMOVED***"log1", "log2"***REMOVED***
-	for _, v := range unexpected ***REMOVED***
+	unexpected := []string{"log1", "log2"}
+	for _, v := range unexpected {
 		c.Assert(out, checker.Not(checker.Contains), v, check.Commentf("unexpected log message returned, since=%v", since))
-	***REMOVED***
+	}
 
 	// Test to make sure a bad since format is caught by the client
 	out, _, _ = dockerCmdWithError("logs", "-t", "--since=2006-01-02T15:04:0Z", name)
 	c.Assert(out, checker.Contains, "cannot parse \"0Z\" as \"05\"", check.Commentf("bad since format passed to server"))
 
 	// Test with default value specified and parameter omitted
-	expected := []string***REMOVED***"log1", "log2", "log3"***REMOVED***
-	for _, cmd := range [][]string***REMOVED***
-		***REMOVED***"logs", "-t", name***REMOVED***,
-		***REMOVED***"logs", "-t", "--since=0", name***REMOVED***,
-	***REMOVED*** ***REMOVED***
+	expected := []string{"log1", "log2", "log3"}
+	for _, cmd := range [][]string{
+		{"logs", "-t", name},
+		{"logs", "-t", "--since=0", name},
+	} {
 		result := icmd.RunCommand(dockerBinary, cmd...)
 		result.Assert(c, icmd.Success)
-		for _, v := range expected ***REMOVED***
+		for _, v := range expected {
 			c.Assert(result.Combined(), checker.Contains, v)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (s *DockerSuite) TestLogsSinceFutureFollow(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestLogsSinceFutureFollow(c *check.C) {
 	// TODO Windows TP5 - Figure out why this test is so flakey. Disabled for now.
 	testRequires(c, DaemonIsLinux)
 	name := "testlogssincefuturefollow"
@@ -187,13 +187,13 @@ func (s *DockerSuite) TestLogsSinceFutureFollow(c *check.C) ***REMOVED***
 	// our `--since` argument. Because the log producer runs in the background,
 	// we need to check repeatedly for some output to be produced.
 	var timestamp string
-	for i := 0; i != 100 && timestamp == ""; i++ ***REMOVED***
-		if out, _ = dockerCmd(c, "logs", "-t", name); out == "" ***REMOVED***
+	for i := 0; i != 100 && timestamp == ""; i++ {
+		if out, _ = dockerCmd(c, "logs", "-t", name); out == "" {
 			time.Sleep(time.Millisecond * 100) // Retry
-		***REMOVED*** else ***REMOVED***
+		} else {
 			timestamp = strings.Split(strings.Split(out, "\n")[0], " ")[0]
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	c.Assert(timestamp, checker.Not(checker.Equals), "")
 	t, err := time.Parse(time.RFC3339Nano, timestamp)
@@ -203,15 +203,15 @@ func (s *DockerSuite) TestLogsSinceFutureFollow(c *check.C) ***REMOVED***
 	out, _ = dockerCmd(c, "logs", "-t", "-f", fmt.Sprintf("--since=%v", since), name)
 	c.Assert(out, checker.Not(checker.HasLen), 0, check.Commentf("cannot read from empty log"))
 	lines := strings.Split(strings.TrimSpace(out), "\n")
-	for _, v := range lines ***REMOVED***
+	for _, v := range lines {
 		ts, err := time.Parse(time.RFC3339Nano, strings.Split(v, " ")[0])
 		c.Assert(err, checker.IsNil, check.Commentf("cannot parse timestamp output from log: '%v'", v))
 		c.Assert(ts.Unix() >= since, checker.Equals, true, check.Commentf("earlier log found. since=%v logdate=%v", since, ts))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Regression test for #8832
-func (s *DockerSuite) TestLogsFollowSlowStdoutConsumer(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestLogsFollowSlowStdoutConsumer(c *check.C) {
 	// TODO Windows: Fix this test for TP5.
 	testRequires(c, DaemonIsLinux)
 	expected := 150000
@@ -221,16 +221,16 @@ func (s *DockerSuite) TestLogsFollowSlowStdoutConsumer(c *check.C) ***REMOVED***
 
 	stopSlowRead := make(chan bool)
 
-	go func() ***REMOVED***
+	go func() {
 		dockerCmd(c, "wait", id)
 		stopSlowRead <- true
-	***REMOVED***()
+	}()
 
 	logCmd := exec.Command(dockerBinary, "logs", "-f", id)
 	stdout, err := logCmd.StdoutPipe()
 	c.Assert(err, checker.IsNil)
 	c.Assert(logCmd.Start(), checker.IsNil)
-	defer func() ***REMOVED*** go logCmd.Wait() ***REMOVED***()
+	defer func() { go logCmd.Wait() }()
 
 	// First read slowly
 	bytes1, err := ConsumeWithSpeed(stdout, 10, 50*time.Millisecond, stopSlowRead)
@@ -244,32 +244,32 @@ func (s *DockerSuite) TestLogsFollowSlowStdoutConsumer(c *check.C) ***REMOVED***
 
 	actual := bytes1 + bytes2
 	c.Assert(actual, checker.Equals, expected)
-***REMOVED***
+}
 
 // ConsumeWithSpeed reads chunkSize bytes from reader before sleeping
 // for interval duration. Returns total read bytes. Send true to the
 // stop channel to return before reading to EOF on the reader.
-func ConsumeWithSpeed(reader io.Reader, chunkSize int, interval time.Duration, stop chan bool) (n int, err error) ***REMOVED***
+func ConsumeWithSpeed(reader io.Reader, chunkSize int, interval time.Duration, stop chan bool) (n int, err error) {
 	buffer := make([]byte, chunkSize)
-	for ***REMOVED***
+	for {
 		var readBytes int
 		readBytes, err = reader.Read(buffer)
 		n += readBytes
-		if err != nil ***REMOVED***
-			if err == io.EOF ***REMOVED***
+		if err != nil {
+			if err == io.EOF {
 				err = nil
-			***REMOVED***
+			}
 			return
-		***REMOVED***
-		select ***REMOVED***
+		}
+		select {
 		case <-stop:
 			return
 		case <-time.After(interval):
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (s *DockerSuite) TestLogsFollowGoroutinesWithStdout(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestLogsFollowGoroutinesWithStdout(c *check.C) {
 	out, _ := dockerCmd(c, "run", "-d", "busybox", "/bin/sh", "-c", "while true; do echo hello; sleep 2; done")
 	id := strings.TrimSpace(out)
 	c.Assert(waitRun(id), checker.IsNil)
@@ -284,20 +284,20 @@ func (s *DockerSuite) TestLogsFollowGoroutinesWithStdout(c *check.C) ***REMOVED*
 
 	// Make sure pipe is written to
 	chErr := make(chan error)
-	go func() ***REMOVED***
+	go func() {
 		b := make([]byte, 1)
 		_, err := r.Read(b)
 		chErr <- err
-	***REMOVED***()
+	}()
 	c.Assert(<-chErr, checker.IsNil)
 	c.Assert(cmd.Process.Kill(), checker.IsNil)
 	r.Close()
 	cmd.Wait()
 	// NGoroutines is not updated right away, so we need to wait before failing
 	c.Assert(waitForGoroutines(nroutines), checker.IsNil)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestLogsFollowGoroutinesNoOutput(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestLogsFollowGoroutinesNoOutput(c *check.C) {
 	out, _ := dockerCmd(c, "run", "-d", "busybox", "/bin/sh", "-c", "while true; do sleep 2; done")
 	id := strings.TrimSpace(out)
 	c.Assert(waitRun(id), checker.IsNil)
@@ -313,16 +313,16 @@ func (s *DockerSuite) TestLogsFollowGoroutinesNoOutput(c *check.C) ***REMOVED***
 
 	// NGoroutines is not updated right away, so we need to wait before failing
 	c.Assert(waitForGoroutines(nroutines), checker.IsNil)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestLogsCLIContainerNotFound(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestLogsCLIContainerNotFound(c *check.C) {
 	name := "testlogsnocontainer"
 	out, _, _ := dockerCmdWithError("logs", name)
 	message := fmt.Sprintf("No such container: %s\n", name)
 	c.Assert(out, checker.Contains, message)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestLogsWithDetails(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestLogsWithDetails(c *check.C) {
 	dockerCmd(c, "run", "--name=test", "--label", "foo=bar", "-e", "baz=qux", "--log-opt", "labels=foo", "--log-opt", "env=baz", "busybox", "echo", "hello")
 	out, _ := dockerCmd(c, "logs", "--details", "--timestamps", "test")
 
@@ -333,4 +333,4 @@ func (s *DockerSuite) TestLogsWithDetails(c *check.C) ***REMOVED***
 	c.Assert(details, checker.HasLen, 2)
 	c.Assert(details[0], checker.Equals, "baz=qux")
 	c.Assert(details[1], checker.Equals, "foo=bar")
-***REMOVED***
+}

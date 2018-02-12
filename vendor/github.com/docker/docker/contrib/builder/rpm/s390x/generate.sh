@@ -14,21 +14,21 @@ set -e
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
 versions=( "$@" )
-if [ $***REMOVED***#versions[@]***REMOVED*** -eq 0 ]; then
+if [ ${#versions[@]} -eq 0 ]; then
 	versions=( */ )
 fi
-versions=( "$***REMOVED***versions[@]%/***REMOVED***" )
+versions=( "${versions[@]%/}" )
 
-for version in "$***REMOVED***versions[@]***REMOVED***"; do
-	echo "$***REMOVED***versions[@]***REMOVED***"
-	distro="$***REMOVED***version%-****REMOVED***"
-	suite="$***REMOVED***version##*-***REMOVED***"
+for version in "${versions[@]}"; do
+	echo "${versions[@]}"
+	distro="${version%-*}"
+	suite="${version##*-}"
 	case "$distro" in
 		*opensuse*)
 		from="opensuse/s390x:tumbleweed"
 		;;
 	*clefos*)
-		from="sinenomine/$***REMOVED***distro***REMOVED***"
+		from="sinenomine/${distro}"
 		;;
 	*)
 		echo No appropriate or supported image available.
@@ -92,7 +92,7 @@ for version in "$***REMOVED***versions[@]***REMOVED***"; do
 			runcBuildTags="seccomp selinux"
 			;;
 		*opensuse*)
-			packages=( "$***REMOVED***packages[@]/libseccomp-devel***REMOVED***" )
+			packages=( "${packages[@]/libseccomp-devel}" )
 			runcBuildTags="selinux"
 			;;
 		*)
@@ -104,17 +104,17 @@ for version in "$***REMOVED***versions[@]***REMOVED***"; do
 	case "$from" in
 		*clefos*)
 			# Same RHBZ fix needed on all yum lines
-			echo "RUN touch /var/lib/rpm/* && $***REMOVED***installer***REMOVED*** install -y $***REMOVED***packages[*]***REMOVED***" >> "$version/Dockerfile"
+			echo "RUN touch /var/lib/rpm/* && ${installer} install -y ${packages[*]}" >> "$version/Dockerfile"
 			;;
 		*opensuse*)
-			packages=( "$***REMOVED***packages[@]/btrfs-progs-devel/libbtrfs-devel***REMOVED***" )
-			packages=( "$***REMOVED***packages[@]/pkgconfig/pkg-config***REMOVED***" )
-			packages=( "$***REMOVED***packages[@]/vim-common/vim***REMOVED***" )
+			packages=( "${packages[@]/btrfs-progs-devel/libbtrfs-devel}" )
+			packages=( "${packages[@]/pkgconfig/pkg-config}" )
+			packages=( "${packages[@]/vim-common/vim}" )
 
 			packages+=( systemd-rpm-macros ) # for use of >= opensuse:13.*
 
 			# use zypper
-			echo "RUN zypper --non-interactive install $***REMOVED***packages[*]***REMOVED***" >> "$version/Dockerfile"
+			echo "RUN zypper --non-interactive install ${packages[*]}" >> "$version/Dockerfile"
 			;;
 		*)
 			echo No appropriate or supported image available.
@@ -124,8 +124,8 @@ for version in "$***REMOVED***versions[@]***REMOVED***"; do
 
 	echo >> "$version/Dockerfile"
 
-	awk '$1 == "ENV" && $2 == "GO_VERSION" ***REMOVED*** print; exit ***REMOVED***' ../../../../Dockerfile.s390x >> "$version/Dockerfile"
-	echo 'RUN curl -fsSL "https://golang.org/dl/go$***REMOVED***GO_VERSION***REMOVED***.linux-s390x.tar.gz" | tar xzC /usr/local' >> "$version/Dockerfile"
+	awk '$1 == "ENV" && $2 == "GO_VERSION" { print; exit }' ../../../../Dockerfile.s390x >> "$version/Dockerfile"
+	echo 'RUN curl -fsSL "https://golang.org/dl/go${GO_VERSION}.linux-s390x.tar.gz" | tar xzC /usr/local' >> "$version/Dockerfile"
 	echo 'ENV PATH $PATH:/usr/local/go/bin' >> "$version/Dockerfile"
 
 	echo >> "$version/Dockerfile"

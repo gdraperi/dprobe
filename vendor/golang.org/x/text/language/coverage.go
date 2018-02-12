@@ -13,7 +13,7 @@ import (
 // internationalization service. Note that not all types are supported by all
 // services. As lists may be generated on the fly, it is recommended that users
 // of a Coverage cache the results.
-type Coverage interface ***REMOVED***
+type Coverage interface {
 	// Tags returns the list of supported tags.
 	Tags() []Tag
 
@@ -25,12 +25,12 @@ type Coverage interface ***REMOVED***
 
 	// Regions returns the list of supported regions.
 	Regions() []Region
-***REMOVED***
+}
 
 var (
 	// Supported defines a Coverage that lists all supported subtags. Tags
 	// always returns nil.
-	Supported Coverage = allSubtags***REMOVED******REMOVED***
+	Supported Coverage = allSubtags{}
 )
 
 // TODO:
@@ -38,130 +38,130 @@ var (
 // - CLDR coverage levels.
 // - Set of common tags defined in this package.
 
-type allSubtags struct***REMOVED******REMOVED***
+type allSubtags struct{}
 
 // Regions returns the list of supported regions. As all regions are in a
 // consecutive range, it simply returns a slice of numbers in increasing order.
 // The "undefined" region is not returned.
-func (s allSubtags) Regions() []Region ***REMOVED***
+func (s allSubtags) Regions() []Region {
 	reg := make([]Region, numRegions)
-	for i := range reg ***REMOVED***
-		reg[i] = Region***REMOVED***regionID(i + 1)***REMOVED***
-	***REMOVED***
+	for i := range reg {
+		reg[i] = Region{regionID(i + 1)}
+	}
 	return reg
-***REMOVED***
+}
 
 // Scripts returns the list of supported scripts. As all scripts are in a
 // consecutive range, it simply returns a slice of numbers in increasing order.
 // The "undefined" script is not returned.
-func (s allSubtags) Scripts() []Script ***REMOVED***
+func (s allSubtags) Scripts() []Script {
 	scr := make([]Script, numScripts)
-	for i := range scr ***REMOVED***
-		scr[i] = Script***REMOVED***scriptID(i + 1)***REMOVED***
-	***REMOVED***
+	for i := range scr {
+		scr[i] = Script{scriptID(i + 1)}
+	}
 	return scr
-***REMOVED***
+}
 
 // BaseLanguages returns the list of all supported base languages. It generates
 // the list by traversing the internal structures.
-func (s allSubtags) BaseLanguages() []Base ***REMOVED***
+func (s allSubtags) BaseLanguages() []Base {
 	base := make([]Base, 0, numLanguages)
-	for i := 0; i < langNoIndexOffset; i++ ***REMOVED***
+	for i := 0; i < langNoIndexOffset; i++ {
 		// We included "und" already for the value 0.
-		if i != nonCanonicalUnd ***REMOVED***
-			base = append(base, Base***REMOVED***langID(i)***REMOVED***)
-		***REMOVED***
-	***REMOVED***
+		if i != nonCanonicalUnd {
+			base = append(base, Base{langID(i)})
+		}
+	}
 	i := langNoIndexOffset
-	for _, v := range langNoIndex ***REMOVED***
-		for k := 0; k < 8; k++ ***REMOVED***
-			if v&1 == 1 ***REMOVED***
-				base = append(base, Base***REMOVED***langID(i)***REMOVED***)
-			***REMOVED***
+	for _, v := range langNoIndex {
+		for k := 0; k < 8; k++ {
+			if v&1 == 1 {
+				base = append(base, Base{langID(i)})
+			}
 			v >>= 1
 			i++
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return base
-***REMOVED***
+}
 
 // Tags always returns nil.
-func (s allSubtags) Tags() []Tag ***REMOVED***
+func (s allSubtags) Tags() []Tag {
 	return nil
-***REMOVED***
+}
 
 // coverage is used used by NewCoverage which is used as a convenient way for
 // creating Coverage implementations for partially defined data. Very often a
 // package will only need to define a subset of slices. coverage provides a
 // convenient way to do this. Moreover, packages using NewCoverage, instead of
 // their own implementation, will not break if later new slice types are added.
-type coverage struct ***REMOVED***
+type coverage struct {
 	tags    func() []Tag
 	bases   func() []Base
 	scripts func() []Script
 	regions func() []Region
-***REMOVED***
+}
 
-func (s *coverage) Tags() []Tag ***REMOVED***
-	if s.tags == nil ***REMOVED***
+func (s *coverage) Tags() []Tag {
+	if s.tags == nil {
 		return nil
-	***REMOVED***
+	}
 	return s.tags()
-***REMOVED***
+}
 
 // bases implements sort.Interface and is used to sort base languages.
 type bases []Base
 
-func (b bases) Len() int ***REMOVED***
+func (b bases) Len() int {
 	return len(b)
-***REMOVED***
+}
 
-func (b bases) Swap(i, j int) ***REMOVED***
+func (b bases) Swap(i, j int) {
 	b[i], b[j] = b[j], b[i]
-***REMOVED***
+}
 
-func (b bases) Less(i, j int) bool ***REMOVED***
+func (b bases) Less(i, j int) bool {
 	return b[i].langID < b[j].langID
-***REMOVED***
+}
 
 // BaseLanguages returns the result from calling s.bases if it is specified or
 // otherwise derives the set of supported base languages from tags.
-func (s *coverage) BaseLanguages() []Base ***REMOVED***
-	if s.bases == nil ***REMOVED***
+func (s *coverage) BaseLanguages() []Base {
+	if s.bases == nil {
 		tags := s.Tags()
-		if len(tags) == 0 ***REMOVED***
+		if len(tags) == 0 {
 			return nil
-		***REMOVED***
+		}
 		a := make([]Base, len(tags))
-		for i, t := range tags ***REMOVED***
-			a[i] = Base***REMOVED***langID(t.lang)***REMOVED***
-		***REMOVED***
+		for i, t := range tags {
+			a[i] = Base{langID(t.lang)}
+		}
 		sort.Sort(bases(a))
 		k := 0
-		for i := 1; i < len(a); i++ ***REMOVED***
-			if a[k] != a[i] ***REMOVED***
+		for i := 1; i < len(a); i++ {
+			if a[k] != a[i] {
 				k++
 				a[k] = a[i]
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		return a[:k+1]
-	***REMOVED***
+	}
 	return s.bases()
-***REMOVED***
+}
 
-func (s *coverage) Scripts() []Script ***REMOVED***
-	if s.scripts == nil ***REMOVED***
+func (s *coverage) Scripts() []Script {
+	if s.scripts == nil {
 		return nil
-	***REMOVED***
+	}
 	return s.scripts()
-***REMOVED***
+}
 
-func (s *coverage) Regions() []Region ***REMOVED***
-	if s.regions == nil ***REMOVED***
+func (s *coverage) Regions() []Region {
+	if s.regions == nil {
 		return nil
-	***REMOVED***
+	}
 	return s.regions()
-***REMOVED***
+}
 
 // NewCoverage returns a Coverage for the given lists. It is typically used by
 // packages providing internationalization services to define their level of
@@ -169,10 +169,10 @@ func (s *coverage) Regions() []Region ***REMOVED***
 // Base, Script or Region. The returned Coverage derives the value for Bases
 // from Tags if no func or slice for []Base is specified. For other unspecified
 // types the returned Coverage will return nil for the respective methods.
-func NewCoverage(list ...interface***REMOVED******REMOVED***) Coverage ***REMOVED***
-	s := &coverage***REMOVED******REMOVED***
-	for _, x := range list ***REMOVED***
-		switch v := x.(type) ***REMOVED***
+func NewCoverage(list ...interface{}) Coverage {
+	s := &coverage{}
+	for _, x := range list {
+		switch v := x.(type) {
 		case func() []Base:
 			s.bases = v
 		case func() []Script:
@@ -182,16 +182,16 @@ func NewCoverage(list ...interface***REMOVED******REMOVED***) Coverage ***REMOVE
 		case func() []Tag:
 			s.tags = v
 		case []Base:
-			s.bases = func() []Base ***REMOVED*** return v ***REMOVED***
+			s.bases = func() []Base { return v }
 		case []Script:
-			s.scripts = func() []Script ***REMOVED*** return v ***REMOVED***
+			s.scripts = func() []Script { return v }
 		case []Region:
-			s.regions = func() []Region ***REMOVED*** return v ***REMOVED***
+			s.regions = func() []Region { return v }
 		case []Tag:
-			s.tags = func() []Tag ***REMOVED*** return v ***REMOVED***
+			s.tags = func() []Tag { return v }
 		default:
 			panic(fmt.Sprintf("language: unsupported set type %T", v))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return s
-***REMOVED***
+}

@@ -15,157 +15,157 @@ import (
 
 type testFd [2]int
 
-func makeTestFd(t *testing.T) testFd ***REMOVED***
+func makeTestFd(t *testing.T) testFd {
 	var tfd testFd
 	errno := unix.Pipe(tfd[:])
-	if errno != nil ***REMOVED***
+	if errno != nil {
 		t.Fatalf("Failed to create pipe: %v", errno)
-	***REMOVED***
+	}
 	return tfd
-***REMOVED***
+}
 
-func (tfd testFd) fd() int ***REMOVED***
+func (tfd testFd) fd() int {
 	return tfd[0]
-***REMOVED***
+}
 
-func (tfd testFd) closeWrite(t *testing.T) ***REMOVED***
+func (tfd testFd) closeWrite(t *testing.T) {
 	errno := unix.Close(tfd[1])
-	if errno != nil ***REMOVED***
+	if errno != nil {
 		t.Fatalf("Failed to close write end of pipe: %v", errno)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (tfd testFd) put(t *testing.T) ***REMOVED***
+func (tfd testFd) put(t *testing.T) {
 	buf := make([]byte, 10)
 	_, errno := unix.Write(tfd[1], buf)
-	if errno != nil ***REMOVED***
+	if errno != nil {
 		t.Fatalf("Failed to write to pipe: %v", errno)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (tfd testFd) get(t *testing.T) ***REMOVED***
+func (tfd testFd) get(t *testing.T) {
 	buf := make([]byte, 10)
 	_, errno := unix.Read(tfd[0], buf)
-	if errno != nil ***REMOVED***
+	if errno != nil {
 		t.Fatalf("Failed to read from pipe: %v", errno)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (tfd testFd) close() ***REMOVED***
+func (tfd testFd) close() {
 	unix.Close(tfd[1])
 	unix.Close(tfd[0])
-***REMOVED***
+}
 
-func makePoller(t *testing.T) (testFd, *fdPoller) ***REMOVED***
+func makePoller(t *testing.T) (testFd, *fdPoller) {
 	tfd := makeTestFd(t)
 	poller, err := newFdPoller(tfd.fd())
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("Failed to create poller: %v", err)
-	***REMOVED***
+	}
 	return tfd, poller
-***REMOVED***
+}
 
-func TestPollerWithBadFd(t *testing.T) ***REMOVED***
+func TestPollerWithBadFd(t *testing.T) {
 	_, err := newFdPoller(-1)
-	if err != unix.EBADF ***REMOVED***
+	if err != unix.EBADF {
 		t.Fatalf("Expected EBADF, got: %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestPollerWithData(t *testing.T) ***REMOVED***
+func TestPollerWithData(t *testing.T) {
 	tfd, poller := makePoller(t)
 	defer tfd.close()
 	defer poller.close()
 
 	tfd.put(t)
 	ok, err := poller.wait()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("poller failed: %v", err)
-	***REMOVED***
-	if !ok ***REMOVED***
+	}
+	if !ok {
 		t.Fatalf("expected poller to return true")
-	***REMOVED***
+	}
 	tfd.get(t)
-***REMOVED***
+}
 
-func TestPollerWithWakeup(t *testing.T) ***REMOVED***
+func TestPollerWithWakeup(t *testing.T) {
 	tfd, poller := makePoller(t)
 	defer tfd.close()
 	defer poller.close()
 
 	err := poller.wake()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("wake failed: %v", err)
-	***REMOVED***
+	}
 	ok, err := poller.wait()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("poller failed: %v", err)
-	***REMOVED***
-	if ok ***REMOVED***
+	}
+	if ok {
 		t.Fatalf("expected poller to return false")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestPollerWithClose(t *testing.T) ***REMOVED***
+func TestPollerWithClose(t *testing.T) {
 	tfd, poller := makePoller(t)
 	defer tfd.close()
 	defer poller.close()
 
 	tfd.closeWrite(t)
 	ok, err := poller.wait()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("poller failed: %v", err)
-	***REMOVED***
-	if !ok ***REMOVED***
+	}
+	if !ok {
 		t.Fatalf("expected poller to return true")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestPollerWithWakeupAndData(t *testing.T) ***REMOVED***
+func TestPollerWithWakeupAndData(t *testing.T) {
 	tfd, poller := makePoller(t)
 	defer tfd.close()
 	defer poller.close()
 
 	tfd.put(t)
 	err := poller.wake()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("wake failed: %v", err)
-	***REMOVED***
+	}
 
 	// both data and wakeup
 	ok, err := poller.wait()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("poller failed: %v", err)
-	***REMOVED***
-	if !ok ***REMOVED***
+	}
+	if !ok {
 		t.Fatalf("expected poller to return true")
-	***REMOVED***
+	}
 
 	// data is still in the buffer, wakeup is cleared
 	ok, err = poller.wait()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("poller failed: %v", err)
-	***REMOVED***
-	if !ok ***REMOVED***
+	}
+	if !ok {
 		t.Fatalf("expected poller to return true")
-	***REMOVED***
+	}
 
 	tfd.get(t)
 	// data is gone, only wakeup now
 	err = poller.wake()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("wake failed: %v", err)
-	***REMOVED***
+	}
 	ok, err = poller.wait()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("poller failed: %v", err)
-	***REMOVED***
-	if ok ***REMOVED***
+	}
+	if ok {
 		t.Fatalf("expected poller to return false")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestPollerConcurrent(t *testing.T) ***REMOVED***
+func TestPollerConcurrent(t *testing.T) {
 	tfd, poller := makePoller(t)
 	defer tfd.close()
 	defer poller.close()
@@ -173,57 +173,57 @@ func TestPollerConcurrent(t *testing.T) ***REMOVED***
 	oks := make(chan bool)
 	live := make(chan bool)
 	defer close(live)
-	go func() ***REMOVED***
+	go func() {
 		defer close(oks)
-		for ***REMOVED***
+		for {
 			ok, err := poller.wait()
-			if err != nil ***REMOVED***
+			if err != nil {
 				t.Fatalf("poller failed: %v", err)
-			***REMOVED***
+			}
 			oks <- ok
-			if !<-live ***REMOVED***
+			if !<-live {
 				return
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***()
+			}
+		}
+	}()
 
 	// Try a write
-	select ***REMOVED***
+	select {
 	case <-time.After(50 * time.Millisecond):
 	case <-oks:
 		t.Fatalf("poller did not wait")
-	***REMOVED***
+	}
 	tfd.put(t)
-	if !<-oks ***REMOVED***
+	if !<-oks {
 		t.Fatalf("expected true")
-	***REMOVED***
+	}
 	tfd.get(t)
 	live <- true
 
 	// Try a wakeup
-	select ***REMOVED***
+	select {
 	case <-time.After(50 * time.Millisecond):
 	case <-oks:
 		t.Fatalf("poller did not wait")
-	***REMOVED***
+	}
 	err := poller.wake()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("wake failed: %v", err)
-	***REMOVED***
-	if <-oks ***REMOVED***
+	}
+	if <-oks {
 		t.Fatalf("expected false")
-	***REMOVED***
+	}
 	live <- true
 
 	// Try a close
-	select ***REMOVED***
+	select {
 	case <-time.After(50 * time.Millisecond):
 	case <-oks:
 		t.Fatalf("poller did not wait")
-	***REMOVED***
+	}
 	tfd.closeWrite(t)
-	if !<-oks ***REMOVED***
+	if !<-oks {
 		t.Fatalf("expected true")
-	***REMOVED***
+	}
 	tfd.get(t)
-***REMOVED***
+}

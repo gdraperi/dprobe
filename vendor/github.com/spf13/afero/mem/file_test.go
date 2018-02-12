@@ -5,150 +5,150 @@ import (
 	"time"
 )
 
-func TestFileDataNameRace(t *testing.T) ***REMOVED***
+func TestFileDataNameRace(t *testing.T) {
 	t.Parallel()
 	const someName = "someName"
 	const someOtherName = "someOtherName"
-	d := FileData***REMOVED***
+	d := FileData{
 		name: someName,
-	***REMOVED***
+	}
 
-	if d.Name() != someName ***REMOVED***
+	if d.Name() != someName {
 		t.Errorf("Failed to read correct Name, was %v", d.Name())
-	***REMOVED***
+	}
 
 	ChangeFileName(&d, someOtherName)
-	if d.Name() != someOtherName ***REMOVED***
+	if d.Name() != someOtherName {
 		t.Errorf("Failed to set Name, was %v", d.Name())
-	***REMOVED***
+	}
 
-	go func() ***REMOVED***
+	go func() {
 		ChangeFileName(&d, someName)
-	***REMOVED***()
+	}()
 
-	if d.Name() != someName && d.Name() != someOtherName ***REMOVED***
+	if d.Name() != someName && d.Name() != someOtherName {
 		t.Errorf("Failed to read either Name, was %v", d.Name())
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestFileDataModTimeRace(t *testing.T) ***REMOVED***
+func TestFileDataModTimeRace(t *testing.T) {
 	t.Parallel()
 	someTime := time.Now()
 	someOtherTime := someTime.Add(1 * time.Minute)
 
-	d := FileData***REMOVED***
+	d := FileData{
 		modtime: someTime,
-	***REMOVED***
+	}
 
-	s := FileInfo***REMOVED***
+	s := FileInfo{
 		FileData: &d,
-	***REMOVED***
+	}
 
-	if s.ModTime() != someTime ***REMOVED***
+	if s.ModTime() != someTime {
 		t.Errorf("Failed to read correct value, was %v", s.ModTime())
-	***REMOVED***
+	}
 
 	SetModTime(&d, someOtherTime)
-	if s.ModTime() != someOtherTime ***REMOVED***
+	if s.ModTime() != someOtherTime {
 		t.Errorf("Failed to set ModTime, was %v", s.ModTime())
-	***REMOVED***
+	}
 
-	go func() ***REMOVED***
+	go func() {
 		SetModTime(&d, someTime)
-	***REMOVED***()
+	}()
 
-	if s.ModTime() != someTime && s.ModTime() != someOtherTime ***REMOVED***
+	if s.ModTime() != someTime && s.ModTime() != someOtherTime {
 		t.Errorf("Failed to read either modtime, was %v", s.ModTime())
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestFileDataModeRace(t *testing.T) ***REMOVED***
+func TestFileDataModeRace(t *testing.T) {
 	t.Parallel()
 	const someMode = 0777
 	const someOtherMode = 0660
 
-	d := FileData***REMOVED***
+	d := FileData{
 		mode: someMode,
-	***REMOVED***
+	}
 
-	s := FileInfo***REMOVED***
+	s := FileInfo{
 		FileData: &d,
-	***REMOVED***
+	}
 
-	if s.Mode() != someMode ***REMOVED***
+	if s.Mode() != someMode {
 		t.Errorf("Failed to read correct value, was %v", s.Mode())
-	***REMOVED***
+	}
 
 	SetMode(&d, someOtherMode)
-	if s.Mode() != someOtherMode ***REMOVED***
+	if s.Mode() != someOtherMode {
 		t.Errorf("Failed to set Mode, was %v", s.Mode())
-	***REMOVED***
+	}
 
-	go func() ***REMOVED***
+	go func() {
 		SetMode(&d, someMode)
-	***REMOVED***()
+	}()
 
-	if s.Mode() != someMode && s.Mode() != someOtherMode ***REMOVED***
+	if s.Mode() != someMode && s.Mode() != someOtherMode {
 		t.Errorf("Failed to read either mode, was %v", s.Mode())
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestFileDataIsDirRace(t *testing.T) ***REMOVED***
+func TestFileDataIsDirRace(t *testing.T) {
 	t.Parallel()
 
-	d := FileData***REMOVED***
+	d := FileData{
 		dir: true,
-	***REMOVED***
+	}
 
-	s := FileInfo***REMOVED***
+	s := FileInfo{
 		FileData: &d,
-	***REMOVED***
+	}
 
-	if s.IsDir() != true ***REMOVED***
+	if s.IsDir() != true {
 		t.Errorf("Failed to read correct value, was %v", s.IsDir())
-	***REMOVED***
+	}
 
-	go func() ***REMOVED***
+	go func() {
 		s.Lock()
 		d.dir = false
 		s.Unlock()
-	***REMOVED***()
+	}()
 
 	//just logging the value to trigger a read:
 	t.Logf("Value is %v", s.IsDir())
-***REMOVED***
+}
 
-func TestFileDataSizeRace(t *testing.T) ***REMOVED***
+func TestFileDataSizeRace(t *testing.T) {
 	t.Parallel()
 
 	const someData = "Hello"
 	const someOtherDataSize = "Hello World"
 
-	d := FileData***REMOVED***
+	d := FileData{
 		data: []byte(someData),
 		dir:  false,
-	***REMOVED***
+	}
 
-	s := FileInfo***REMOVED***
+	s := FileInfo{
 		FileData: &d,
-	***REMOVED***
+	}
 
-	if s.Size() != int64(len(someData)) ***REMOVED***
+	if s.Size() != int64(len(someData)) {
 		t.Errorf("Failed to read correct value, was %v", s.Size())
-	***REMOVED***
+	}
 
-	go func() ***REMOVED***
+	go func() {
 		s.Lock()
 		d.data = []byte(someOtherDataSize)
 		s.Unlock()
-	***REMOVED***()
+	}()
 
 	//just logging the value to trigger a read:
 	t.Logf("Value is %v", s.Size())
 
 	//Testing the Dir size case
 	d.dir = true
-	if s.Size() != int64(42) ***REMOVED***
+	if s.Size() != int64(42) {
 		t.Errorf("Failed to read correct value for dir, was %v", s.Size())
-	***REMOVED***
-***REMOVED***
+	}
+}

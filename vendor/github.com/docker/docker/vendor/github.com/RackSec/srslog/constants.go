@@ -59,10 +59,10 @@ const (
 	LOG_LOCAL7
 )
 
-func validatePriority(p Priority) error ***REMOVED***
-	if p < 0 || p > LOG_LOCAL7|LOG_DEBUG ***REMOVED***
+func validatePriority(p Priority) error {
+	if p < 0 || p > LOG_LOCAL7|LOG_DEBUG {
 		return errors.New("log/syslog: invalid priority")
-	***REMOVED*** else ***REMOVED***
+	} else {
 		return nil
-	***REMOVED***
-***REMOVED***
+	}
+}

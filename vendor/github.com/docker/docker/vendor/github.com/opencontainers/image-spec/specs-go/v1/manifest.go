@@ -17,7 +17,7 @@ package v1
 import "github.com/opencontainers/image-spec/specs-go"
 
 // Manifest provides `application/vnd.oci.image.manifest.v1+json` mediatype structure when marshalled to JSON.
-type Manifest struct ***REMOVED***
+type Manifest struct {
 	specs.Versioned
 
 	// Config references a configuration object for a container, by digest.
@@ -29,4 +29,4 @@ type Manifest struct ***REMOVED***
 
 	// Annotations contains arbitrary metadata for the image manifest.
 	Annotations map[string]string `json:"annotations,omitempty"`
-***REMOVED***
+}

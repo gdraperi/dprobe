@@ -29,16 +29,16 @@ var Licenses = make(map[string]License)
 // the license, its possible matches (on the command line as given to cobra),
 // the header to be used with each file on the file's creating, and the text
 // of the license
-type License struct ***REMOVED***
+type License struct {
 	Name            string   // The type of license in use
 	PossibleMatches []string // Similar names to guess
 	Text            string   // License text data
 	Header          string   // License header for source files
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	// Allows a user to not use a license.
-	Licenses["none"] = License***REMOVED***"None", []string***REMOVED***"none", "false"***REMOVED***, "", ""***REMOVED***
+	Licenses["none"] = License{"None", []string{"none", "false"}, "", ""}
 
 	initApache2()
 	initMit()
@@ -48,71 +48,71 @@ func init() ***REMOVED***
 	initGpl3()
 	initLgpl()
 	initAgpl()
-***REMOVED***
+}
 
 // getLicense returns license specified by user in flag or in config.
 // If user didn't specify the license, it returns Apache License 2.0.
 //
 // TODO: Inspect project for existing license
-func getLicense() License ***REMOVED***
+func getLicense() License {
 	// If explicitly flagged, use that.
-	if userLicense != "" ***REMOVED***
+	if userLicense != "" {
 		return findLicense(userLicense)
-	***REMOVED***
+	}
 
 	// If user wants to have custom license, use that.
-	if viper.IsSet("license.header") || viper.IsSet("license.text") ***REMOVED***
-		return License***REMOVED***Header: viper.GetString("license.header"),
-			Text: viper.GetString("license.text")***REMOVED***
-	***REMOVED***
+	if viper.IsSet("license.header") || viper.IsSet("license.text") {
+		return License{Header: viper.GetString("license.header"),
+			Text: viper.GetString("license.text")}
+	}
 
 	// If user wants to have built-in license, use that.
-	if viper.IsSet("license") ***REMOVED***
+	if viper.IsSet("license") {
 		return findLicense(viper.GetString("license"))
-	***REMOVED***
+	}
 
 	// If user didn't set any license, use Apache 2.0 by default.
 	return Licenses["apache"]
-***REMOVED***
+}
 
-func copyrightLine() string ***REMOVED***
+func copyrightLine() string {
 	author := viper.GetString("author")
 
 	year := viper.GetString("year") // For tests.
-	if year == "" ***REMOVED***
+	if year == "" {
 		year = time.Now().Format("2006")
-	***REMOVED***
+	}
 
 	return "Copyright © " + year + " " + author
-***REMOVED***
+}
 
 // findLicense looks for License object of built-in licenses.
 // If it didn't find license, then the app will be terminated and
 // error will be printed.
-func findLicense(name string) License ***REMOVED***
+func findLicense(name string) License {
 	found := matchLicense(name)
-	if found == "" ***REMOVED***
+	if found == "" {
 		er("unknown license: " + name)
-	***REMOVED***
+	}
 	return Licenses[found]
-***REMOVED***
+}
 
 // matchLicense compares the given a license name
 // to PossibleMatches of all built-in licenses.
 // It returns blank string, if name is blank string or it didn't find
 // then appropriate match to name.
-func matchLicense(name string) string ***REMOVED***
-	if name == "" ***REMOVED***
+func matchLicense(name string) string {
+	if name == "" {
 		return ""
-	***REMOVED***
+	}
 
-	for key, lic := range Licenses ***REMOVED***
-		for _, match := range lic.PossibleMatches ***REMOVED***
-			if strings.EqualFold(name, match) ***REMOVED***
+	for key, lic := range Licenses {
+		for _, match := range lic.PossibleMatches {
+			if strings.EqualFold(name, match) {
 				return key
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	return ""
-***REMOVED***
+}

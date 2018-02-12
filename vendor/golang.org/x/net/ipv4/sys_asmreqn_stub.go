@@ -12,10 +12,10 @@ import (
 	"golang.org/x/net/internal/socket"
 )
 
-func (so *sockOpt) getIPMreqn(c *socket.Conn) (*net.Interface, error) ***REMOVED***
+func (so *sockOpt) getIPMreqn(c *socket.Conn) (*net.Interface, error) {
 	return nil, errOpNoSupport
-***REMOVED***
+}
 
-func (so *sockOpt) setIPMreqn(c *socket.Conn, ifi *net.Interface, grp net.IP) error ***REMOVED***
+func (so *sockOpt) setIPMreqn(c *socket.Conn, ifi *net.Interface, grp net.IP) error {
 	return errOpNoSupport
-***REMOVED***
+}

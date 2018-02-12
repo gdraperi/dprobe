@@ -25,27 +25,27 @@ plain text):
 
 ![Colored](http://i.imgur.com/PY7qMwd.png)
 
-With `log.SetFormatter(&log.JSONFormatter***REMOVED******REMOVED***)`, for easy parsing by logstash
+With `log.SetFormatter(&log.JSONFormatter{})`, for easy parsing by logstash
 or Splunk:
 
 ```json
-***REMOVED***"animal":"walrus","level":"info","msg":"A group of walrus emerges from the
-ocean","size":10,"time":"2014-03-10 19:57:38.562264131 -0400 EDT"***REMOVED***
+{"animal":"walrus","level":"info","msg":"A group of walrus emerges from the
+ocean","size":10,"time":"2014-03-10 19:57:38.562264131 -0400 EDT"}
 
-***REMOVED***"level":"warning","msg":"The group's number increased tremendously!",
-"number":122,"omg":true,"time":"2014-03-10 19:57:38.562471297 -0400 EDT"***REMOVED***
+{"level":"warning","msg":"The group's number increased tremendously!",
+"number":122,"omg":true,"time":"2014-03-10 19:57:38.562471297 -0400 EDT"}
 
-***REMOVED***"animal":"walrus","level":"info","msg":"A giant walrus appears!",
-"size":10,"time":"2014-03-10 19:57:38.562500591 -0400 EDT"***REMOVED***
+{"animal":"walrus","level":"info","msg":"A giant walrus appears!",
+"size":10,"time":"2014-03-10 19:57:38.562500591 -0400 EDT"}
 
-***REMOVED***"animal":"walrus","level":"info","msg":"Tremendously sized cow enters the ocean.",
-"size":9,"time":"2014-03-10 19:57:38.562527896 -0400 EDT"***REMOVED***
+{"animal":"walrus","level":"info","msg":"Tremendously sized cow enters the ocean.",
+"size":9,"time":"2014-03-10 19:57:38.562527896 -0400 EDT"}
 
-***REMOVED***"level":"fatal","msg":"The ice breaks!","number":100,"omg":true,
-"time":"2014-03-10 19:57:38.562543128 -0400 EDT"***REMOVED***
+{"level":"fatal","msg":"The ice breaks!","number":100,"omg":true,
+"time":"2014-03-10 19:57:38.562543128 -0400 EDT"}
 ```
 
-With the default `log.SetFormatter(&log.TextFormatter***REMOVED******REMOVED***)` when a TTY is not
+With the default `log.SetFormatter(&log.TextFormatter{})` when a TTY is not
 attached, the output is compatible with the
 [logfmt](http://godoc.org/github.com/kr/logfmt) format:
 
@@ -55,7 +55,7 @@ time="2015-03-26T01:27:38-04:00" level=info msg="A group of walrus emerges from 
 time="2015-03-26T01:27:38-04:00" level=warning msg="The group's number increased tremendously!" number=122 omg=true
 time="2015-03-26T01:27:38-04:00" level=debug msg="Temperature changes" temperature=-4
 time="2015-03-26T01:27:38-04:00" level=panic msg="It's over 9000!" animal=orca size=9009
-time="2015-03-26T01:27:38-04:00" level=fatal msg="The ice breaks!" err=&***REMOVED***0x2082280c0 map[animal:orca size:9009] 2015-03-26 01:27:38.441574009 -0400 EDT panic It's over 9000!***REMOVED*** number=100 omg=true
+time="2015-03-26T01:27:38-04:00" level=fatal msg="The ice breaks!" err=&{0x2082280c0 map[animal:orca size:9009] 2015-03-26 01:27:38.441574009 -0400 EDT panic It's over 9000!} number=100 omg=true
 exit status 1
 ```
 
@@ -76,11 +76,11 @@ import (
   log "github.com/sirupsen/logrus"
 )
 
-func main() ***REMOVED***
-  log.WithFields(log.Fields***REMOVED***
+func main() {
+  log.WithFields(log.Fields{
     "animal": "walrus",
-  ***REMOVED***).Info("A walrus appears")
-***REMOVED***
+  }).Info("A walrus appears")
+}
 ```
 
 Note that it's completely api-compatible with the stdlib logger, so you can
@@ -96,9 +96,9 @@ import (
   log "github.com/sirupsen/logrus"
 )
 
-func init() ***REMOVED***
+func init() {
   // Log as JSON instead of the default ASCII formatter.
-  log.SetFormatter(&log.JSONFormatter***REMOVED******REMOVED***)
+  log.SetFormatter(&log.JSONFormatter{})
 
   // Output to stdout instead of the default stderr
   // Can be any io.Writer, see below for File example
@@ -106,34 +106,34 @@ func init() ***REMOVED***
 
   // Only log the warning severity or above.
   log.SetLevel(log.WarnLevel)
-***REMOVED***
+}
 
-func main() ***REMOVED***
-  log.WithFields(log.Fields***REMOVED***
+func main() {
+  log.WithFields(log.Fields{
     "animal": "walrus",
     "size":   10,
-  ***REMOVED***).Info("A group of walrus emerges from the ocean")
+  }).Info("A group of walrus emerges from the ocean")
 
-  log.WithFields(log.Fields***REMOVED***
+  log.WithFields(log.Fields{
     "omg":    true,
     "number": 122,
-  ***REMOVED***).Warn("The group's number increased tremendously!")
+  }).Warn("The group's number increased tremendously!")
 
-  log.WithFields(log.Fields***REMOVED***
+  log.WithFields(log.Fields{
     "omg":    true,
     "number": 100,
-  ***REMOVED***).Fatal("The ice breaks!")
+  }).Fatal("The ice breaks!")
 
   // A common pattern is to re-use fields between logging statements by re-using
   // the logrus.Entry returned from WithFields()
-  contextLogger := log.WithFields(log.Fields***REMOVED***
+  contextLogger := log.WithFields(log.Fields{
     "common": "this is a common field",
     "other": "I also should be logged always",
-  ***REMOVED***)
+  })
 
   contextLogger.Info("I'll be logged with common and other field")
   contextLogger.Info("Me too")
-***REMOVED***
+}
 ```
 
 For more advanced usage such as logging to multiple locations from the same
@@ -150,24 +150,24 @@ import (
 // Create a new instance of the logger. You can have any number of instances.
 var log = logrus.New()
 
-func main() ***REMOVED***
+func main() {
   // The API for setting attributes is a little different than the package level
   // exported logger. See Godoc.
   log.Out = os.Stdout
 
   // You could set this to any `io.Writer` such as a file
   // file, err := os.OpenFile("logrus.log", os.O_CREATE|os.O_WRONLY, 0666)
-  // if err == nil ***REMOVED***
+  // if err == nil {
   //  log.Out = file
-  // ***REMOVED*** else ***REMOVED***
+  // } else {
   //  log.Info("Failed to log to file, using default stderr")
-  // ***REMOVED***
+  // }
 
-  log.WithFields(logrus.Fields***REMOVED***
+  log.WithFields(logrus.Fields{
     "animal": "walrus",
     "size":   10,
-  ***REMOVED***).Info("A group of walrus emerges from the ocean")
-***REMOVED***
+  }).Info("A group of walrus emerges from the ocean")
+}
 ```
 
 #### Fields
@@ -178,11 +178,11 @@ to send event %s to topic %s with key %d")`, you should log the much more
 discoverable:
 
 ```go
-log.WithFields(log.Fields***REMOVED***
+log.WithFields(log.Fields{
   "event": event,
   "topic": topic,
   "key": key,
-***REMOVED***).Fatal("Failed to send event")
+}).Fatal("Failed to send event")
 ```
 
 We've found this API forces you to think about logging in a way that produces
@@ -199,11 +199,11 @@ seen as a hint you should add a field, however, you can still use the
 Often it's helpful to have fields _always_ attached to log statements in an
 application or parts of one. For example, you may want to always log the
 `request_id` and `user_ip` in the context of a request. Instead of writing
-`log.WithFields(log.Fields***REMOVED***"request_id": request_id, "user_ip": user_ip***REMOVED***)` on
+`log.WithFields(log.Fields{"request_id": request_id, "user_ip": user_ip})` on
 every line, you can create a `logrus.Entry` to pass around instead:
 
 ```go
-requestLogger := log.WithFields(log.Fields***REMOVED***"request_id": request_id, "user_ip": user_ip***REMOVED***)
+requestLogger := log.WithFields(log.Fields{"request_id": request_id, "user_ip": user_ip})
 requestLogger.Info("something happened on that request") # will log request_id and user_ip
 requestLogger.Warn("something not great happened")
 ```
@@ -225,19 +225,19 @@ import (
   "log/syslog"
 )
 
-func init() ***REMOVED***
+func init() {
 
   // Use the Airbrake hook to report errors that have Error severity or above to
   // an exception tracker. You can create custom hooks, see the Hooks section.
   log.AddHook(airbrake.NewHook(123, "xyz", "production"))
 
   hook, err := logrus_syslog.NewSyslogHook("udp", "localhost:514", syslog.LOG_INFO, "")
-  if err != nil ***REMOVED***
+  if err != nil {
     log.Error("Unable to connect to local syslog daemon")
-  ***REMOVED*** else ***REMOVED***
+  } else {
     log.AddHook(hook)
-  ***REMOVED***
-***REMOVED***
+  }
+}
 ```
 Note: Syslog hook also support connecting to local syslog (Ex. "/dev/log" or "/var/run/syslog" or "/var/run/log"). For the detail, please check the [syslog hook README](hooks/syslog/README.md).
 
@@ -322,7 +322,7 @@ Besides the fields added with `WithField` or `WithFields` some fields are
 automatically added to all logging events:
 
 1. `time`. The timestamp when the entry was created.
-2. `msg`. The logging message passed to `***REMOVED***Info,Warn,Error,Fatal,Panic***REMOVED***` after
+2. `msg`. The logging message passed to `{Info,Warn,Error,Fatal,Panic}` after
    the `AddFields` call. E.g. `Failed to send event.`
 3. `level`. The logging level. E.g. `info`.
 
@@ -340,16 +340,16 @@ import (
   log "github.com/sirupsen/logrus"
 )
 
-init() ***REMOVED***
+init() {
   // do something here to set environment depending on an environment variable
   // or command-line flag
-  if Environment == "production" ***REMOVED***
-    log.SetFormatter(&log.JSONFormatter***REMOVED******REMOVED***)
-  ***REMOVED*** else ***REMOVED***
+  if Environment == "production" {
+    log.SetFormatter(&log.JSONFormatter{})
+  } else {
     // The TextFormatter is default, you don't actually have to do this.
-    log.SetFormatter(&log.TextFormatter***REMOVED******REMOVED***)
-  ***REMOVED***
-***REMOVED***
+    log.SetFormatter(&log.TextFormatter{})
+  }
+}
 ```
 
 This configuration is how `logrus` was intended to be used, but JSON in
@@ -379,25 +379,25 @@ Third party logging formatters:
 
 You can define your formatter by implementing the `Formatter` interface,
 requiring a `Format` method. `Format` takes an `*Entry`. `entry.Data` is a
-`Fields` type (`map[string]interface***REMOVED******REMOVED***`) with all your fields as well as the
+`Fields` type (`map[string]interface{}`) with all your fields as well as the
 default ones (see Entries section above):
 
 ```go
-type MyJSONFormatter struct ***REMOVED***
-***REMOVED***
+type MyJSONFormatter struct {
+}
 
 log.SetFormatter(new(MyJSONFormatter))
 
-func (f *MyJSONFormatter) Format(entry *Entry) ([]byte, error) ***REMOVED***
+func (f *MyJSONFormatter) Format(entry *Entry) ([]byte, error) {
   // Note this doesn't include Time, Level and Message which are available on
   // the Entry. Consult `godoc` on information about those fields or read the
   // source of the official loggers.
   serialized, err := json.Marshal(entry.Data)
-    if err != nil ***REMOVED***
+    if err != nil {
       return nil, fmt.Errorf("Failed to marshal fields to JSON, %v", err)
-***REMOVED***
+    }
   return append(serialized, '\n'), nil
-***REMOVED***
+}
 ```
 
 #### Logger as an `io.Writer`
@@ -408,11 +408,11 @@ Logrus can be transformed into an `io.Writer`. That writer is the end of an `io.
 w := logger.Writer()
 defer w.Close()
 
-srv := http.Server***REMOVED***
+srv := http.Server{
     // create a stdlib log.Logger that writes to
     // logrus.Logger.
     ErrorLog: log.New(w, "", 0),
-***REMOVED***
+}
 ```
 
 Each line written to that writer will be printed the usual way, using formatters
@@ -422,7 +422,7 @@ This means that we can override the standard library logger easily:
 
 ```go
 logger := logrus.New()
-logger.Formatter = &logrus.JSONFormatter***REMOVED******REMOVED***
+logger.Formatter = &logrus.JSONFormatter{}
 
 // Use logrus for standard log output
 // Note that `log` here references stdlib's log
@@ -458,7 +458,7 @@ import(
   "testing"
 )
 
-func TestSomething(t*testing.T)***REMOVED***
+func TestSomething(t*testing.T){
   logger, hook := test.NewNullLogger()
   logger.Error("Helloerror")
 
@@ -468,7 +468,7 @@ func TestSomething(t*testing.T)***REMOVED***
 
   hook.Reset()
   assert.Nil(t, hook.LastEntry())
-***REMOVED***
+}
 ```
 
 #### Fatal handlers
@@ -480,9 +480,9 @@ to gracefully shutdown. Unlike a `panic("Something went wrong...")` call which c
 
 ```
 ...
-handler := func() ***REMOVED***
+handler := func() {
   // gracefully shutdown something...
-***REMOVED***
+}
 logrus.RegisterExitHandler(handler)
 ...
 ```

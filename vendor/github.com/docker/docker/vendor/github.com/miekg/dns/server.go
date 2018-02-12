@@ -14,13 +14,13 @@ import (
 const maxTCPQueries = 128
 
 // Handler is implemented by any value that implements ServeDNS.
-type Handler interface ***REMOVED***
+type Handler interface {
 	ServeDNS(w ResponseWriter, r *Msg)
-***REMOVED***
+}
 
 // A ResponseWriter interface is used by an DNS handler to
 // construct an DNS response.
-type ResponseWriter interface ***REMOVED***
+type ResponseWriter interface {
 	// LocalAddr returns the net.Addr of the server
 	LocalAddr() net.Addr
 	// RemoteAddr returns the net.Addr of the client that sent the current request.
@@ -38,9 +38,9 @@ type ResponseWriter interface ***REMOVED***
 	// Hijack lets the caller take over the connection.
 	// After a call to Hijack(), the DNS package will not do anything with the connection.
 	Hijack()
-***REMOVED***
+}
 
-type response struct ***REMOVED***
+type response struct {
 	hijacked       bool // connection has been hijacked by handler
 	tsigStatus     error
 	tsigTimersOnly bool
@@ -51,7 +51,7 @@ type response struct ***REMOVED***
 	udpSession     *SessionUDP       // oob data to get egress interface right
 	remoteAddr     net.Addr          // address of the client
 	writer         Writer            // writer to output the raw DNS bits
-***REMOVED***
+}
 
 // ServeMux is an DNS request multiplexer. It matches the
 // zone name of each incoming request against a list of
@@ -60,13 +60,13 @@ type response struct ***REMOVED***
 // that queries for the DS record are redirected to the parent zone (if that
 // is also registered), otherwise the child gets the query.
 // ServeMux is also safe for concurrent access from multiple goroutines.
-type ServeMux struct ***REMOVED***
+type ServeMux struct {
 	z map[string]Handler
 	m *sync.RWMutex
-***REMOVED***
+}
 
 // NewServeMux allocates and returns a new ServeMux.
-func NewServeMux() *ServeMux ***REMOVED*** return &ServeMux***REMOVED***z: make(map[string]Handler), m: new(sync.RWMutex)***REMOVED*** ***REMOVED***
+func NewServeMux() *ServeMux { return &ServeMux{z: make(map[string]Handler), m: new(sync.RWMutex)} }
 
 // DefaultServeMux is the default ServeMux used by Serve.
 var DefaultServeMux = NewServeMux()
@@ -78,94 +78,94 @@ var DefaultServeMux = NewServeMux()
 type HandlerFunc func(ResponseWriter, *Msg)
 
 // ServeDNS calls f(w, r).
-func (f HandlerFunc) ServeDNS(w ResponseWriter, r *Msg) ***REMOVED***
+func (f HandlerFunc) ServeDNS(w ResponseWriter, r *Msg) {
 	f(w, r)
-***REMOVED***
+}
 
 // HandleFailed returns a HandlerFunc that returns SERVFAIL for every request it gets.
-func HandleFailed(w ResponseWriter, r *Msg) ***REMOVED***
+func HandleFailed(w ResponseWriter, r *Msg) {
 	m := new(Msg)
 	m.SetRcode(r, RcodeServerFailure)
 	// does not matter if this write fails
 	w.WriteMsg(m)
-***REMOVED***
+}
 
-func failedHandler() Handler ***REMOVED*** return HandlerFunc(HandleFailed) ***REMOVED***
+func failedHandler() Handler { return HandlerFunc(HandleFailed) }
 
 // ListenAndServe Starts a server on addresss and network speficied. Invoke handler
 // for incoming queries.
-func ListenAndServe(addr string, network string, handler Handler) error ***REMOVED***
-	server := &Server***REMOVED***Addr: addr, Net: network, Handler: handler***REMOVED***
+func ListenAndServe(addr string, network string, handler Handler) error {
+	server := &Server{Addr: addr, Net: network, Handler: handler}
 	return server.ListenAndServe()
-***REMOVED***
+}
 
 // ActivateAndServe activates a server with a listener from systemd,
 // l and p should not both be non-nil.
 // If both l and p are not nil only p will be used.
 // Invoke handler for incoming queries.
-func ActivateAndServe(l net.Listener, p net.PacketConn, handler Handler) error ***REMOVED***
-	server := &Server***REMOVED***Listener: l, PacketConn: p, Handler: handler***REMOVED***
+func ActivateAndServe(l net.Listener, p net.PacketConn, handler Handler) error {
+	server := &Server{Listener: l, PacketConn: p, Handler: handler}
 	return server.ActivateAndServe()
-***REMOVED***
+}
 
-func (mux *ServeMux) match(q string, t uint16) Handler ***REMOVED***
+func (mux *ServeMux) match(q string, t uint16) Handler {
 	mux.m.RLock()
 	defer mux.m.RUnlock()
 	var handler Handler
 	b := make([]byte, len(q)) // worst case, one label of length q
 	off := 0
 	end := false
-	for ***REMOVED***
+	for {
 		l := len(q[off:])
-		for i := 0; i < l; i++ ***REMOVED***
+		for i := 0; i < l; i++ {
 			b[i] = q[off+i]
-			if b[i] >= 'A' && b[i] <= 'Z' ***REMOVED***
+			if b[i] >= 'A' && b[i] <= 'Z' {
 				b[i] |= ('a' - 'A')
-			***REMOVED***
-		***REMOVED***
-		if h, ok := mux.z[string(b[:l])]; ok ***REMOVED*** // 'causes garbage, might want to change the map key
-			if t != TypeDS ***REMOVED***
+			}
+		}
+		if h, ok := mux.z[string(b[:l])]; ok { // 'causes garbage, might want to change the map key
+			if t != TypeDS {
 				return h
-			***REMOVED***
+			}
 			// Continue for DS to see if we have a parent too, if so delegeate to the parent
 			handler = h
-		***REMOVED***
+		}
 		off, end = NextLabel(q, off)
-		if end ***REMOVED***
+		if end {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	// Wildcard match, if we have found nothing try the root zone as a last resort.
-	if h, ok := mux.z["."]; ok ***REMOVED***
+	if h, ok := mux.z["."]; ok {
 		return h
-	***REMOVED***
+	}
 	return handler
-***REMOVED***
+}
 
 // Handle adds a handler to the ServeMux for pattern.
-func (mux *ServeMux) Handle(pattern string, handler Handler) ***REMOVED***
-	if pattern == "" ***REMOVED***
+func (mux *ServeMux) Handle(pattern string, handler Handler) {
+	if pattern == "" {
 		panic("dns: invalid pattern " + pattern)
-	***REMOVED***
+	}
 	mux.m.Lock()
 	mux.z[Fqdn(pattern)] = handler
 	mux.m.Unlock()
-***REMOVED***
+}
 
 // HandleFunc adds a handler function to the ServeMux for pattern.
-func (mux *ServeMux) HandleFunc(pattern string, handler func(ResponseWriter, *Msg)) ***REMOVED***
+func (mux *ServeMux) HandleFunc(pattern string, handler func(ResponseWriter, *Msg)) {
 	mux.Handle(pattern, HandlerFunc(handler))
-***REMOVED***
+}
 
 // HandleRemove deregistrars the handler specific for pattern from the ServeMux.
-func (mux *ServeMux) HandleRemove(pattern string) ***REMOVED***
-	if pattern == "" ***REMOVED***
+func (mux *ServeMux) HandleRemove(pattern string) {
+	if pattern == "" {
 		panic("dns: invalid pattern " + pattern)
-	***REMOVED***
+	}
 	mux.m.Lock()
 	delete(mux.z, Fqdn(pattern))
 	mux.m.Unlock()
-***REMOVED***
+}
 
 // ServeDNS dispatches the request to the handler whose
 // pattern most closely matches the request message. If DefaultServeMux
@@ -174,61 +174,61 @@ func (mux *ServeMux) HandleRemove(pattern string) ***REMOVED***
 // If no handler is found a standard SERVFAIL message is returned
 // If the request message does not have exactly one question in the
 // question section a SERVFAIL is returned, unlesss Unsafe is true.
-func (mux *ServeMux) ServeDNS(w ResponseWriter, request *Msg) ***REMOVED***
+func (mux *ServeMux) ServeDNS(w ResponseWriter, request *Msg) {
 	var h Handler
-	if len(request.Question) < 1 ***REMOVED*** // allow more than one question
+	if len(request.Question) < 1 { // allow more than one question
 		h = failedHandler()
-	***REMOVED*** else ***REMOVED***
-		if h = mux.match(request.Question[0].Name, request.Question[0].Qtype); h == nil ***REMOVED***
+	} else {
+		if h = mux.match(request.Question[0].Name, request.Question[0].Qtype); h == nil {
 			h = failedHandler()
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	h.ServeDNS(w, request)
-***REMOVED***
+}
 
 // Handle registers the handler with the given pattern
 // in the DefaultServeMux. The documentation for
 // ServeMux explains how patterns are matched.
-func Handle(pattern string, handler Handler) ***REMOVED*** DefaultServeMux.Handle(pattern, handler) ***REMOVED***
+func Handle(pattern string, handler Handler) { DefaultServeMux.Handle(pattern, handler) }
 
 // HandleRemove deregisters the handle with the given pattern
 // in the DefaultServeMux.
-func HandleRemove(pattern string) ***REMOVED*** DefaultServeMux.HandleRemove(pattern) ***REMOVED***
+func HandleRemove(pattern string) { DefaultServeMux.HandleRemove(pattern) }
 
 // HandleFunc registers the handler function with the given pattern
 // in the DefaultServeMux.
-func HandleFunc(pattern string, handler func(ResponseWriter, *Msg)) ***REMOVED***
+func HandleFunc(pattern string, handler func(ResponseWriter, *Msg)) {
 	DefaultServeMux.HandleFunc(pattern, handler)
-***REMOVED***
+}
 
 // Writer writes raw DNS messages; each call to Write should send an entire message.
-type Writer interface ***REMOVED***
+type Writer interface {
 	io.Writer
-***REMOVED***
+}
 
 // Reader reads raw DNS messages; each call to ReadTCP or ReadUDP should return an entire message.
-type Reader interface ***REMOVED***
+type Reader interface {
 	// ReadTCP reads a raw message from a TCP connection. Implementations may alter
 	// connection properties, for example the read-deadline.
 	ReadTCP(conn *net.TCPConn, timeout time.Duration) ([]byte, error)
 	// ReadUDP reads a raw message from a UDP connection. Implementations may alter
 	// connection properties, for example the read-deadline.
 	ReadUDP(conn *net.UDPConn, timeout time.Duration) ([]byte, *SessionUDP, error)
-***REMOVED***
+}
 
 // defaultReader is an adapter for the Server struct that implements the Reader interface
 // using the readTCP and readUDP func of the embedded Server.
-type defaultReader struct ***REMOVED***
+type defaultReader struct {
 	*Server
-***REMOVED***
+}
 
-func (dr *defaultReader) ReadTCP(conn *net.TCPConn, timeout time.Duration) ([]byte, error) ***REMOVED***
+func (dr *defaultReader) ReadTCP(conn *net.TCPConn, timeout time.Duration) ([]byte, error) {
 	return dr.readTCP(conn, timeout)
-***REMOVED***
+}
 
-func (dr *defaultReader) ReadUDP(conn *net.UDPConn, timeout time.Duration) ([]byte, *SessionUDP, error) ***REMOVED***
+func (dr *defaultReader) ReadUDP(conn *net.UDPConn, timeout time.Duration) ([]byte, *SessionUDP, error) {
 	return dr.readUDP(conn, timeout)
-***REMOVED***
+}
 
 // DecorateReader is a decorator hook for extending or supplanting the functionality of a Reader.
 // Implementations should never return a nil Reader.
@@ -239,7 +239,7 @@ type DecorateReader func(Reader) Reader
 type DecorateWriter func(Writer) Writer
 
 // A Server defines parameters for running an DNS server.
-type Server struct ***REMOVED***
+type Server struct {
 	// Address to listen on, ":dns" if empty.
 	Addr string
 	// if "tcp" it will invoke a TCP listener, otherwise an UDP one.
@@ -277,32 +277,32 @@ type Server struct ***REMOVED***
 
 	lock    sync.RWMutex
 	started bool
-***REMOVED***
+}
 
 // ListenAndServe starts a nameserver on the configured address in *Server.
-func (srv *Server) ListenAndServe() error ***REMOVED***
+func (srv *Server) ListenAndServe() error {
 	srv.lock.Lock()
 	defer srv.lock.Unlock()
-	if srv.started ***REMOVED***
-		return &Error***REMOVED***err: "server already started"***REMOVED***
-	***REMOVED***
+	if srv.started {
+		return &Error{err: "server already started"}
+	}
 	addr := srv.Addr
-	if addr == "" ***REMOVED***
+	if addr == "" {
 		addr = ":domain"
-	***REMOVED***
-	if srv.UDPSize == 0 ***REMOVED***
+	}
+	if srv.UDPSize == 0 {
 		srv.UDPSize = MinMsgSize
-	***REMOVED***
-	switch srv.Net ***REMOVED***
+	}
+	switch srv.Net {
 	case "tcp", "tcp4", "tcp6":
 		a, e := net.ResolveTCPAddr(srv.Net, addr)
-		if e != nil ***REMOVED***
+		if e != nil {
 			return e
-		***REMOVED***
+		}
 		l, e := net.ListenTCP(srv.Net, a)
-		if e != nil ***REMOVED***
+		if e != nil {
 			return e
-		***REMOVED***
+		}
 		srv.Listener = l
 		srv.started = true
 		srv.lock.Unlock()
@@ -311,380 +311,380 @@ func (srv *Server) ListenAndServe() error ***REMOVED***
 		return e
 	case "udp", "udp4", "udp6":
 		a, e := net.ResolveUDPAddr(srv.Net, addr)
-		if e != nil ***REMOVED***
+		if e != nil {
 			return e
-		***REMOVED***
+		}
 		l, e := net.ListenUDP(srv.Net, a)
-		if e != nil ***REMOVED***
+		if e != nil {
 			return e
-		***REMOVED***
-		if e := setUDPSocketOptions(l); e != nil ***REMOVED***
+		}
+		if e := setUDPSocketOptions(l); e != nil {
 			return e
-		***REMOVED***
+		}
 		srv.PacketConn = l
 		srv.started = true
 		srv.lock.Unlock()
 		e = srv.serveUDP(l)
 		srv.lock.Lock() // to satisfy the defer at the top
 		return e
-	***REMOVED***
-	return &Error***REMOVED***err: "bad network"***REMOVED***
-***REMOVED***
+	}
+	return &Error{err: "bad network"}
+}
 
 // ActivateAndServe starts a nameserver with the PacketConn or Listener
 // configured in *Server. Its main use is to start a server from systemd.
-func (srv *Server) ActivateAndServe() error ***REMOVED***
+func (srv *Server) ActivateAndServe() error {
 	srv.lock.Lock()
 	defer srv.lock.Unlock()
-	if srv.started ***REMOVED***
-		return &Error***REMOVED***err: "server already started"***REMOVED***
-	***REMOVED***
+	if srv.started {
+		return &Error{err: "server already started"}
+	}
 	pConn := srv.PacketConn
 	l := srv.Listener
-	if pConn != nil ***REMOVED***
-		if srv.UDPSize == 0 ***REMOVED***
+	if pConn != nil {
+		if srv.UDPSize == 0 {
 			srv.UDPSize = MinMsgSize
-		***REMOVED***
-		if t, ok := pConn.(*net.UDPConn); ok ***REMOVED***
-			if e := setUDPSocketOptions(t); e != nil ***REMOVED***
+		}
+		if t, ok := pConn.(*net.UDPConn); ok {
+			if e := setUDPSocketOptions(t); e != nil {
 				return e
-			***REMOVED***
+			}
 			srv.started = true
 			srv.lock.Unlock()
 			e := srv.serveUDP(t)
 			srv.lock.Lock() // to satisfy the defer at the top
 			return e
-		***REMOVED***
-	***REMOVED***
-	if l != nil ***REMOVED***
-		if t, ok := l.(*net.TCPListener); ok ***REMOVED***
+		}
+	}
+	if l != nil {
+		if t, ok := l.(*net.TCPListener); ok {
 			srv.started = true
 			srv.lock.Unlock()
 			e := srv.serveTCP(t)
 			srv.lock.Lock() // to satisfy the defer at the top
 			return e
-		***REMOVED***
-	***REMOVED***
-	return &Error***REMOVED***err: "bad listeners"***REMOVED***
-***REMOVED***
+		}
+	}
+	return &Error{err: "bad listeners"}
+}
 
 // Shutdown gracefully shuts down a server. After a call to Shutdown, ListenAndServe and
 // ActivateAndServe will return. All in progress queries are completed before the server
 // is taken down. If the Shutdown is taking longer than the reading timeout an error
 // is returned.
-func (srv *Server) Shutdown() error ***REMOVED***
+func (srv *Server) Shutdown() error {
 	srv.lock.Lock()
-	if !srv.started ***REMOVED***
+	if !srv.started {
 		srv.lock.Unlock()
-		return &Error***REMOVED***err: "server not started"***REMOVED***
-	***REMOVED***
+		return &Error{err: "server not started"}
+	}
 	srv.started = false
 	srv.lock.Unlock()
 
-	if srv.PacketConn != nil ***REMOVED***
+	if srv.PacketConn != nil {
 		srv.PacketConn.Close()
-	***REMOVED***
-	if srv.Listener != nil ***REMOVED***
+	}
+	if srv.Listener != nil {
 		srv.Listener.Close()
-	***REMOVED***
+	}
 
 	fin := make(chan bool)
-	go func() ***REMOVED***
+	go func() {
 		srv.inFlight.Wait()
 		fin <- true
-	***REMOVED***()
+	}()
 
-	select ***REMOVED***
+	select {
 	case <-time.After(srv.getReadTimeout()):
-		return &Error***REMOVED***err: "server shutdown is pending"***REMOVED***
+		return &Error{err: "server shutdown is pending"}
 	case <-fin:
 		return nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // getReadTimeout is a helper func to use system timeout if server did not intend to change it.
-func (srv *Server) getReadTimeout() time.Duration ***REMOVED***
+func (srv *Server) getReadTimeout() time.Duration {
 	rtimeout := dnsTimeout
-	if srv.ReadTimeout != 0 ***REMOVED***
+	if srv.ReadTimeout != 0 {
 		rtimeout = srv.ReadTimeout
-	***REMOVED***
+	}
 	return rtimeout
-***REMOVED***
+}
 
 // serveTCP starts a TCP listener for the server.
 // Each request is handled in a separate goroutine.
-func (srv *Server) serveTCP(l *net.TCPListener) error ***REMOVED***
+func (srv *Server) serveTCP(l *net.TCPListener) error {
 	defer l.Close()
 
-	if srv.NotifyStartedFunc != nil ***REMOVED***
+	if srv.NotifyStartedFunc != nil {
 		srv.NotifyStartedFunc()
-	***REMOVED***
+	}
 
-	reader := Reader(&defaultReader***REMOVED***srv***REMOVED***)
-	if srv.DecorateReader != nil ***REMOVED***
+	reader := Reader(&defaultReader{srv})
+	if srv.DecorateReader != nil {
 		reader = srv.DecorateReader(reader)
-	***REMOVED***
+	}
 
 	handler := srv.Handler
-	if handler == nil ***REMOVED***
+	if handler == nil {
 		handler = DefaultServeMux
-	***REMOVED***
+	}
 	rtimeout := srv.getReadTimeout()
 	// deadline is not used here
-	for ***REMOVED***
+	for {
 		rw, e := l.AcceptTCP()
-		if e != nil ***REMOVED***
-			if neterr, ok := e.(net.Error); ok && neterr.Temporary() ***REMOVED***
+		if e != nil {
+			if neterr, ok := e.(net.Error); ok && neterr.Temporary() {
 				continue
-			***REMOVED***
+			}
 			return e
-		***REMOVED***
+		}
 		m, e := reader.ReadTCP(rw, rtimeout)
 		srv.lock.RLock()
-		if !srv.started ***REMOVED***
+		if !srv.started {
 			srv.lock.RUnlock()
 			return nil
-		***REMOVED***
+		}
 		srv.lock.RUnlock()
-		if e != nil ***REMOVED***
+		if e != nil {
 			continue
-		***REMOVED***
+		}
 		srv.inFlight.Add(1)
 		go srv.serve(rw.RemoteAddr(), handler, m, nil, nil, rw)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // serveUDP starts a UDP listener for the server.
 // Each request is handled in a separate goroutine.
-func (srv *Server) serveUDP(l *net.UDPConn) error ***REMOVED***
+func (srv *Server) serveUDP(l *net.UDPConn) error {
 	defer l.Close()
 
-	if srv.NotifyStartedFunc != nil ***REMOVED***
+	if srv.NotifyStartedFunc != nil {
 		srv.NotifyStartedFunc()
-	***REMOVED***
+	}
 
-	reader := Reader(&defaultReader***REMOVED***srv***REMOVED***)
-	if srv.DecorateReader != nil ***REMOVED***
+	reader := Reader(&defaultReader{srv})
+	if srv.DecorateReader != nil {
 		reader = srv.DecorateReader(reader)
-	***REMOVED***
+	}
 
 	handler := srv.Handler
-	if handler == nil ***REMOVED***
+	if handler == nil {
 		handler = DefaultServeMux
-	***REMOVED***
+	}
 	rtimeout := srv.getReadTimeout()
 	// deadline is not used here
-	for ***REMOVED***
+	for {
 		m, s, e := reader.ReadUDP(l, rtimeout)
 		srv.lock.RLock()
-		if !srv.started ***REMOVED***
+		if !srv.started {
 			srv.lock.RUnlock()
 			return nil
-		***REMOVED***
+		}
 		srv.lock.RUnlock()
-		if e != nil ***REMOVED***
+		if e != nil {
 			continue
-		***REMOVED***
+		}
 		srv.inFlight.Add(1)
 		go srv.serve(s.RemoteAddr(), handler, m, l, s, nil)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Serve a new connection.
-func (srv *Server) serve(a net.Addr, h Handler, m []byte, u *net.UDPConn, s *SessionUDP, t *net.TCPConn) ***REMOVED***
+func (srv *Server) serve(a net.Addr, h Handler, m []byte, u *net.UDPConn, s *SessionUDP, t *net.TCPConn) {
 	defer srv.inFlight.Done()
 
-	w := &response***REMOVED***tsigSecret: srv.TsigSecret, udp: u, tcp: t, remoteAddr: a, udpSession: s***REMOVED***
-	if srv.DecorateWriter != nil ***REMOVED***
+	w := &response{tsigSecret: srv.TsigSecret, udp: u, tcp: t, remoteAddr: a, udpSession: s}
+	if srv.DecorateWriter != nil {
 		w.writer = srv.DecorateWriter(w)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		w.writer = w
-	***REMOVED***
+	}
 
 	q := 0 // counter for the amount of TCP queries we get
 
-	reader := Reader(&defaultReader***REMOVED***srv***REMOVED***)
-	if srv.DecorateReader != nil ***REMOVED***
+	reader := Reader(&defaultReader{srv})
+	if srv.DecorateReader != nil {
 		reader = srv.DecorateReader(reader)
-	***REMOVED***
+	}
 Redo:
 	req := new(Msg)
 	err := req.Unpack(m)
-	if err != nil ***REMOVED*** // Send a FormatError back
+	if err != nil { // Send a FormatError back
 		x := new(Msg)
 		x.SetRcodeFormatError(req)
 		w.WriteMsg(x)
 		goto Exit
-	***REMOVED***
-	if !srv.Unsafe && req.Response ***REMOVED***
+	}
+	if !srv.Unsafe && req.Response {
 		goto Exit
-	***REMOVED***
+	}
 
 	w.tsigStatus = nil
-	if w.tsigSecret != nil ***REMOVED***
-		if t := req.IsTsig(); t != nil ***REMOVED***
+	if w.tsigSecret != nil {
+		if t := req.IsTsig(); t != nil {
 			secret := t.Hdr.Name
-			if _, ok := w.tsigSecret[secret]; !ok ***REMOVED***
+			if _, ok := w.tsigSecret[secret]; !ok {
 				w.tsigStatus = ErrKeyAlg
-			***REMOVED***
+			}
 			w.tsigStatus = TsigVerify(m, w.tsigSecret[secret], "", false)
 			w.tsigTimersOnly = false
 			w.tsigRequestMAC = req.Extra[len(req.Extra)-1].(*TSIG).MAC
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	h.ServeDNS(w, req) // Writes back to the client
 
 Exit:
-	if w.tcp == nil ***REMOVED***
+	if w.tcp == nil {
 		return
-	***REMOVED***
+	}
 	// TODO(miek): make this number configurable?
-	if q > maxTCPQueries ***REMOVED*** // close socket after this many queries
+	if q > maxTCPQueries { // close socket after this many queries
 		w.Close()
 		return
-	***REMOVED***
+	}
 
-	if w.hijacked ***REMOVED***
+	if w.hijacked {
 		return // client calls Close()
-	***REMOVED***
-	if u != nil ***REMOVED*** // UDP, "close" and return
+	}
+	if u != nil { // UDP, "close" and return
 		w.Close()
 		return
-	***REMOVED***
+	}
 	idleTimeout := tcpIdleTimeout
-	if srv.IdleTimeout != nil ***REMOVED***
+	if srv.IdleTimeout != nil {
 		idleTimeout = srv.IdleTimeout()
-	***REMOVED***
+	}
 	m, e := reader.ReadTCP(w.tcp, idleTimeout)
-	if e == nil ***REMOVED***
+	if e == nil {
 		q++
 		goto Redo
-	***REMOVED***
+	}
 	w.Close()
 	return
-***REMOVED***
+}
 
-func (srv *Server) readTCP(conn *net.TCPConn, timeout time.Duration) ([]byte, error) ***REMOVED***
+func (srv *Server) readTCP(conn *net.TCPConn, timeout time.Duration) ([]byte, error) {
 	conn.SetReadDeadline(time.Now().Add(timeout))
 	l := make([]byte, 2)
 	n, err := conn.Read(l)
-	if err != nil || n != 2 ***REMOVED***
-		if err != nil ***REMOVED***
+	if err != nil || n != 2 {
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		return nil, ErrShortRead
-	***REMOVED***
+	}
 	length, _ := unpackUint16(l, 0)
-	if length == 0 ***REMOVED***
+	if length == 0 {
 		return nil, ErrShortRead
-	***REMOVED***
+	}
 	m := make([]byte, int(length))
 	n, err = conn.Read(m[:int(length)])
-	if err != nil || n == 0 ***REMOVED***
-		if err != nil ***REMOVED***
+	if err != nil || n == 0 {
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		return nil, ErrShortRead
-	***REMOVED***
+	}
 	i := n
-	for i < int(length) ***REMOVED***
+	for i < int(length) {
 		j, err := conn.Read(m[i:int(length)])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		i += j
-	***REMOVED***
+	}
 	n = i
 	m = m[:n]
 	return m, nil
-***REMOVED***
+}
 
-func (srv *Server) readUDP(conn *net.UDPConn, timeout time.Duration) ([]byte, *SessionUDP, error) ***REMOVED***
+func (srv *Server) readUDP(conn *net.UDPConn, timeout time.Duration) ([]byte, *SessionUDP, error) {
 	conn.SetReadDeadline(time.Now().Add(timeout))
 	m := make([]byte, srv.UDPSize)
 	n, s, e := ReadFromSessionUDP(conn, m)
-	if e != nil || n == 0 ***REMOVED***
-		if e != nil ***REMOVED***
+	if e != nil || n == 0 {
+		if e != nil {
 			return nil, nil, e
-		***REMOVED***
+		}
 		return nil, nil, ErrShortRead
-	***REMOVED***
+	}
 	m = m[:n]
 	return m, s, nil
-***REMOVED***
+}
 
 // WriteMsg implements the ResponseWriter.WriteMsg method.
-func (w *response) WriteMsg(m *Msg) (err error) ***REMOVED***
+func (w *response) WriteMsg(m *Msg) (err error) {
 	var data []byte
-	if w.tsigSecret != nil ***REMOVED*** // if no secrets, dont check for the tsig (which is a longer check)
-		if t := m.IsTsig(); t != nil ***REMOVED***
+	if w.tsigSecret != nil { // if no secrets, dont check for the tsig (which is a longer check)
+		if t := m.IsTsig(); t != nil {
 			data, w.tsigRequestMAC, err = TsigGenerate(m, w.tsigSecret[t.Hdr.Name], w.tsigRequestMAC, w.tsigTimersOnly)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
+			}
 			_, err = w.writer.Write(data)
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	data, err = m.Pack()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	_, err = w.writer.Write(data)
 	return err
-***REMOVED***
+}
 
 // Write implements the ResponseWriter.Write method.
-func (w *response) Write(m []byte) (int, error) ***REMOVED***
-	switch ***REMOVED***
+func (w *response) Write(m []byte) (int, error) {
+	switch {
 	case w.udp != nil:
 		n, err := WriteToSessionUDP(w.udp, m, w.udpSession)
 		return n, err
 	case w.tcp != nil:
 		lm := len(m)
-		if lm < 2 ***REMOVED***
+		if lm < 2 {
 			return 0, io.ErrShortBuffer
-		***REMOVED***
-		if lm > MaxMsgSize ***REMOVED***
-			return 0, &Error***REMOVED***err: "message too large"***REMOVED***
-		***REMOVED***
+		}
+		if lm > MaxMsgSize {
+			return 0, &Error{err: "message too large"}
+		}
 		l := make([]byte, 2, 2+lm)
 		l[0], l[1] = packUint16(uint16(lm))
 		m = append(l, m...)
 
 		n, err := io.Copy(w.tcp, bytes.NewReader(m))
 		return int(n), err
-	***REMOVED***
+	}
 	panic("not reached")
-***REMOVED***
+}
 
 // LocalAddr implements the ResponseWriter.LocalAddr method.
-func (w *response) LocalAddr() net.Addr ***REMOVED***
-	if w.tcp != nil ***REMOVED***
+func (w *response) LocalAddr() net.Addr {
+	if w.tcp != nil {
 		return w.tcp.LocalAddr()
-	***REMOVED***
+	}
 	return w.udp.LocalAddr()
-***REMOVED***
+}
 
 // RemoteAddr implements the ResponseWriter.RemoteAddr method.
-func (w *response) RemoteAddr() net.Addr ***REMOVED*** return w.remoteAddr ***REMOVED***
+func (w *response) RemoteAddr() net.Addr { return w.remoteAddr }
 
 // TsigStatus implements the ResponseWriter.TsigStatus method.
-func (w *response) TsigStatus() error ***REMOVED*** return w.tsigStatus ***REMOVED***
+func (w *response) TsigStatus() error { return w.tsigStatus }
 
 // TsigTimersOnly implements the ResponseWriter.TsigTimersOnly method.
-func (w *response) TsigTimersOnly(b bool) ***REMOVED*** w.tsigTimersOnly = b ***REMOVED***
+func (w *response) TsigTimersOnly(b bool) { w.tsigTimersOnly = b }
 
 // Hijack implements the ResponseWriter.Hijack method.
-func (w *response) Hijack() ***REMOVED*** w.hijacked = true ***REMOVED***
+func (w *response) Hijack() { w.hijacked = true }
 
 // Close implements the ResponseWriter.Close method
-func (w *response) Close() error ***REMOVED***
+func (w *response) Close() error {
 	// Can't close the udp conn, as that is actually the listener.
-	if w.tcp != nil ***REMOVED***
+	if w.tcp != nil {
 		e := w.tcp.Close()
 		w.tcp = nil
 		return e
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

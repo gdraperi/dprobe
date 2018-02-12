@@ -45,17 +45,17 @@ const quantileLabel = "quantile"
 // metric type. See the Prometheus documentation for more details.
 //
 // To create Summary instances, use NewSummary.
-type Summary interface ***REMOVED***
+type Summary interface {
 	Metric
 	Collector
 
 	// Observe adds a single observation to the summary.
 	Observe(float64)
-***REMOVED***
+}
 
 var (
 	// DefObjectives are the default Summary quantile values.
-	DefObjectives = map[float64]float64***REMOVED***0.5: 0.05, 0.9: 0.01, 0.99: 0.001***REMOVED***
+	DefObjectives = map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001}
 
 	errQuantileLabelNotAllowed = fmt.Errorf(
 		"%q is not allowed as label name in summaries", quantileLabel,
@@ -77,7 +77,7 @@ const (
 // SummaryOpts bundles the options for creating a Summary metric. It is
 // mandatory to set Name and Help to a non-empty string. All other fields are
 // optional and can safely be left at their zero value.
-type SummaryOpts struct ***REMOVED***
+type SummaryOpts struct {
 	// Namespace, Subsystem, and Name are components of the fully-qualified
 	// name of the Summary (created by joining these components with
 	// "_"). Only Name is mandatory, the others merely help structuring the
@@ -137,7 +137,7 @@ type SummaryOpts struct ***REMOVED***
 	// is the internal buffer size of the underlying package
 	// "github.com/bmizerany/perks/quantile").
 	BufCap uint32
-***REMOVED***
+}
 
 // TODO: Great fuck-up with the sliding-window decay algorithm... The Merge
 // method of perk/quantile is actually not working as advertised - and it might
@@ -155,7 +155,7 @@ type SummaryOpts struct ***REMOVED***
 // can't be used anymore.
 
 // NewSummary creates a new Summary based on the provided SummaryOpts.
-func NewSummary(opts SummaryOpts) Summary ***REMOVED***
+func NewSummary(opts SummaryOpts) Summary {
 	return newSummary(
 		NewDesc(
 			BuildFQName(opts.Namespace, opts.Subsystem, opts.Name),
@@ -165,44 +165,44 @@ func NewSummary(opts SummaryOpts) Summary ***REMOVED***
 		),
 		opts,
 	)
-***REMOVED***
+}
 
-func newSummary(desc *Desc, opts SummaryOpts, labelValues ...string) Summary ***REMOVED***
-	if len(desc.variableLabels) != len(labelValues) ***REMOVED***
+func newSummary(desc *Desc, opts SummaryOpts, labelValues ...string) Summary {
+	if len(desc.variableLabels) != len(labelValues) {
 		panic(errInconsistentCardinality)
-	***REMOVED***
+	}
 
-	for _, n := range desc.variableLabels ***REMOVED***
-		if n == quantileLabel ***REMOVED***
+	for _, n := range desc.variableLabels {
+		if n == quantileLabel {
 			panic(errQuantileLabelNotAllowed)
-		***REMOVED***
-	***REMOVED***
-	for _, lp := range desc.constLabelPairs ***REMOVED***
-		if lp.GetName() == quantileLabel ***REMOVED***
+		}
+	}
+	for _, lp := range desc.constLabelPairs {
+		if lp.GetName() == quantileLabel {
 			panic(errQuantileLabelNotAllowed)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if len(opts.Objectives) == 0 ***REMOVED***
+	if len(opts.Objectives) == 0 {
 		opts.Objectives = DefObjectives
-	***REMOVED***
+	}
 
-	if opts.MaxAge < 0 ***REMOVED***
+	if opts.MaxAge < 0 {
 		panic(fmt.Errorf("illegal max age MaxAge=%v", opts.MaxAge))
-	***REMOVED***
-	if opts.MaxAge == 0 ***REMOVED***
+	}
+	if opts.MaxAge == 0 {
 		opts.MaxAge = DefMaxAge
-	***REMOVED***
+	}
 
-	if opts.AgeBuckets == 0 ***REMOVED***
+	if opts.AgeBuckets == 0 {
 		opts.AgeBuckets = DefAgeBuckets
-	***REMOVED***
+	}
 
-	if opts.BufCap == 0 ***REMOVED***
+	if opts.BufCap == 0 {
 		opts.BufCap = DefBufCap
-	***REMOVED***
+	}
 
-	s := &summary***REMOVED***
+	s := &summary{
 		desc: desc,
 
 		objectives:       opts.Objectives,
@@ -213,25 +213,25 @@ func newSummary(desc *Desc, opts SummaryOpts, labelValues ...string) Summary ***
 		hotBuf:         make([]float64, 0, opts.BufCap),
 		coldBuf:        make([]float64, 0, opts.BufCap),
 		streamDuration: opts.MaxAge / time.Duration(opts.AgeBuckets),
-	***REMOVED***
+	}
 	s.headStreamExpTime = time.Now().Add(s.streamDuration)
 	s.hotBufExpTime = s.headStreamExpTime
 
-	for i := uint32(0); i < opts.AgeBuckets; i++ ***REMOVED***
+	for i := uint32(0); i < opts.AgeBuckets; i++ {
 		s.streams = append(s.streams, s.newStream())
-	***REMOVED***
+	}
 	s.headStream = s.streams[0]
 
-	for qu := range s.objectives ***REMOVED***
+	for qu := range s.objectives {
 		s.sortedObjectives = append(s.sortedObjectives, qu)
-	***REMOVED***
+	}
 	sort.Float64s(s.sortedObjectives)
 
 	s.Init(s) // Init self-collection.
 	return s
-***REMOVED***
+}
 
-type summary struct ***REMOVED***
+type summary struct {
 	SelfCollector
 
 	bufMtx sync.Mutex // Protects hotBuf and hotBufExpTime.
@@ -255,28 +255,28 @@ type summary struct ***REMOVED***
 	headStream                       *quantile.Stream
 	headStreamIdx                    int
 	headStreamExpTime, hotBufExpTime time.Time
-***REMOVED***
+}
 
-func (s *summary) Desc() *Desc ***REMOVED***
+func (s *summary) Desc() *Desc {
 	return s.desc
-***REMOVED***
+}
 
-func (s *summary) Observe(v float64) ***REMOVED***
+func (s *summary) Observe(v float64) {
 	s.bufMtx.Lock()
 	defer s.bufMtx.Unlock()
 
 	now := time.Now()
-	if now.After(s.hotBufExpTime) ***REMOVED***
+	if now.After(s.hotBufExpTime) {
 		s.asyncFlush(now)
-	***REMOVED***
+	}
 	s.hotBuf = append(s.hotBuf, v)
-	if len(s.hotBuf) == cap(s.hotBuf) ***REMOVED***
+	if len(s.hotBuf) == cap(s.hotBuf) {
 		s.asyncFlush(now)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *summary) Write(out *dto.Metric) error ***REMOVED***
-	sum := &dto.Summary***REMOVED******REMOVED***
+func (s *summary) Write(out *dto.Metric) error {
+	sum := &dto.Summary{}
 	qs := make([]*dto.Quantile, 0, len(s.objectives))
 
 	s.bufMtx.Lock()
@@ -289,204 +289,204 @@ func (s *summary) Write(out *dto.Metric) error ***REMOVED***
 	sum.SampleCount = proto.Uint64(s.cnt)
 	sum.SampleSum = proto.Float64(s.sum)
 
-	for _, rank := range s.sortedObjectives ***REMOVED***
+	for _, rank := range s.sortedObjectives {
 		var q float64
-		if s.headStream.Count() == 0 ***REMOVED***
+		if s.headStream.Count() == 0 {
 			q = math.NaN()
-		***REMOVED*** else ***REMOVED***
+		} else {
 			q = s.headStream.Query(rank)
-		***REMOVED***
-		qs = append(qs, &dto.Quantile***REMOVED***
+		}
+		qs = append(qs, &dto.Quantile{
 			Quantile: proto.Float64(rank),
 			Value:    proto.Float64(q),
-		***REMOVED***)
-	***REMOVED***
+		})
+	}
 
 	s.mtx.Unlock()
 
-	if len(qs) > 0 ***REMOVED***
+	if len(qs) > 0 {
 		sort.Sort(quantSort(qs))
-	***REMOVED***
+	}
 	sum.Quantile = qs
 
 	out.Summary = sum
 	out.Label = s.labelPairs
 	return nil
-***REMOVED***
+}
 
-func (s *summary) newStream() *quantile.Stream ***REMOVED***
+func (s *summary) newStream() *quantile.Stream {
 	return quantile.NewTargeted(s.objectives)
-***REMOVED***
+}
 
 // asyncFlush needs bufMtx locked.
-func (s *summary) asyncFlush(now time.Time) ***REMOVED***
+func (s *summary) asyncFlush(now time.Time) {
 	s.mtx.Lock()
 	s.swapBufs(now)
 
 	// Unblock the original goroutine that was responsible for the mutation
 	// that triggered the compaction.  But hold onto the global non-buffer
 	// state mutex until the operation finishes.
-	go func() ***REMOVED***
+	go func() {
 		s.flushColdBuf()
 		s.mtx.Unlock()
-	***REMOVED***()
-***REMOVED***
+	}()
+}
 
 // rotateStreams needs mtx AND bufMtx locked.
-func (s *summary) maybeRotateStreams() ***REMOVED***
-	for !s.hotBufExpTime.Equal(s.headStreamExpTime) ***REMOVED***
+func (s *summary) maybeRotateStreams() {
+	for !s.hotBufExpTime.Equal(s.headStreamExpTime) {
 		s.headStream.Reset()
 		s.headStreamIdx++
-		if s.headStreamIdx >= len(s.streams) ***REMOVED***
+		if s.headStreamIdx >= len(s.streams) {
 			s.headStreamIdx = 0
-		***REMOVED***
+		}
 		s.headStream = s.streams[s.headStreamIdx]
 		s.headStreamExpTime = s.headStreamExpTime.Add(s.streamDuration)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // flushColdBuf needs mtx locked.
-func (s *summary) flushColdBuf() ***REMOVED***
-	for _, v := range s.coldBuf ***REMOVED***
-		for _, stream := range s.streams ***REMOVED***
+func (s *summary) flushColdBuf() {
+	for _, v := range s.coldBuf {
+		for _, stream := range s.streams {
 			stream.Insert(v)
-		***REMOVED***
+		}
 		s.cnt++
 		s.sum += v
-	***REMOVED***
+	}
 	s.coldBuf = s.coldBuf[0:0]
 	s.maybeRotateStreams()
-***REMOVED***
+}
 
 // swapBufs needs mtx AND bufMtx locked, coldBuf must be empty.
-func (s *summary) swapBufs(now time.Time) ***REMOVED***
-	if len(s.coldBuf) != 0 ***REMOVED***
+func (s *summary) swapBufs(now time.Time) {
+	if len(s.coldBuf) != 0 {
 		panic("coldBuf is not empty")
-	***REMOVED***
+	}
 	s.hotBuf, s.coldBuf = s.coldBuf, s.hotBuf
 	// hotBuf is now empty and gets new expiration set.
-	for now.After(s.hotBufExpTime) ***REMOVED***
+	for now.After(s.hotBufExpTime) {
 		s.hotBufExpTime = s.hotBufExpTime.Add(s.streamDuration)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 type quantSort []*dto.Quantile
 
-func (s quantSort) Len() int ***REMOVED***
+func (s quantSort) Len() int {
 	return len(s)
-***REMOVED***
+}
 
-func (s quantSort) Swap(i, j int) ***REMOVED***
+func (s quantSort) Swap(i, j int) {
 	s[i], s[j] = s[j], s[i]
-***REMOVED***
+}
 
-func (s quantSort) Less(i, j int) bool ***REMOVED***
+func (s quantSort) Less(i, j int) bool {
 	return s[i].GetQuantile() < s[j].GetQuantile()
-***REMOVED***
+}
 
 // SummaryVec is a Collector that bundles a set of Summaries that all share the
 // same Desc, but have different values for their variable labels. This is used
 // if you want to count the same thing partitioned by various dimensions
 // (e.g. HTTP request latencies, partitioned by status code and method). Create
 // instances with NewSummaryVec.
-type SummaryVec struct ***REMOVED***
+type SummaryVec struct {
 	MetricVec
-***REMOVED***
+}
 
 // NewSummaryVec creates a new SummaryVec based on the provided SummaryOpts and
 // partitioned by the given label names. At least one label name must be
 // provided.
-func NewSummaryVec(opts SummaryOpts, labelNames []string) *SummaryVec ***REMOVED***
+func NewSummaryVec(opts SummaryOpts, labelNames []string) *SummaryVec {
 	desc := NewDesc(
 		BuildFQName(opts.Namespace, opts.Subsystem, opts.Name),
 		opts.Help,
 		labelNames,
 		opts.ConstLabels,
 	)
-	return &SummaryVec***REMOVED***
-		MetricVec: MetricVec***REMOVED***
-			children: map[uint64]Metric***REMOVED******REMOVED***,
+	return &SummaryVec{
+		MetricVec: MetricVec{
+			children: map[uint64]Metric{},
 			desc:     desc,
-			newMetric: func(lvs ...string) Metric ***REMOVED***
+			newMetric: func(lvs ...string) Metric {
 				return newSummary(desc, opts, lvs...)
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
-***REMOVED***
+			},
+		},
+	}
+}
 
 // GetMetricWithLabelValues replaces the method of the same name in
 // MetricVec. The difference is that this method returns a Summary and not a
 // Metric so that no type conversion is required.
-func (m *SummaryVec) GetMetricWithLabelValues(lvs ...string) (Summary, error) ***REMOVED***
+func (m *SummaryVec) GetMetricWithLabelValues(lvs ...string) (Summary, error) {
 	metric, err := m.MetricVec.GetMetricWithLabelValues(lvs...)
-	if metric != nil ***REMOVED***
+	if metric != nil {
 		return metric.(Summary), err
-	***REMOVED***
+	}
 	return nil, err
-***REMOVED***
+}
 
 // GetMetricWith replaces the method of the same name in MetricVec. The
 // difference is that this method returns a Summary and not a Metric so that no
 // type conversion is required.
-func (m *SummaryVec) GetMetricWith(labels Labels) (Summary, error) ***REMOVED***
+func (m *SummaryVec) GetMetricWith(labels Labels) (Summary, error) {
 	metric, err := m.MetricVec.GetMetricWith(labels)
-	if metric != nil ***REMOVED***
+	if metric != nil {
 		return metric.(Summary), err
-	***REMOVED***
+	}
 	return nil, err
-***REMOVED***
+}
 
 // WithLabelValues works as GetMetricWithLabelValues, but panics where
 // GetMetricWithLabelValues would have returned an error. By not returning an
 // error, WithLabelValues allows shortcuts like
 //     myVec.WithLabelValues("404", "GET").Observe(42.21)
-func (m *SummaryVec) WithLabelValues(lvs ...string) Summary ***REMOVED***
+func (m *SummaryVec) WithLabelValues(lvs ...string) Summary {
 	return m.MetricVec.WithLabelValues(lvs...).(Summary)
-***REMOVED***
+}
 
 // With works as GetMetricWith, but panics where GetMetricWithLabels would have
 // returned an error. By not returning an error, With allows shortcuts like
-//     myVec.With(Labels***REMOVED***"code": "404", "method": "GET"***REMOVED***).Observe(42.21)
-func (m *SummaryVec) With(labels Labels) Summary ***REMOVED***
+//     myVec.With(Labels{"code": "404", "method": "GET"}).Observe(42.21)
+func (m *SummaryVec) With(labels Labels) Summary {
 	return m.MetricVec.With(labels).(Summary)
-***REMOVED***
+}
 
-type constSummary struct ***REMOVED***
+type constSummary struct {
 	desc       *Desc
 	count      uint64
 	sum        float64
 	quantiles  map[float64]float64
 	labelPairs []*dto.LabelPair
-***REMOVED***
+}
 
-func (s *constSummary) Desc() *Desc ***REMOVED***
+func (s *constSummary) Desc() *Desc {
 	return s.desc
-***REMOVED***
+}
 
-func (s *constSummary) Write(out *dto.Metric) error ***REMOVED***
-	sum := &dto.Summary***REMOVED******REMOVED***
+func (s *constSummary) Write(out *dto.Metric) error {
+	sum := &dto.Summary{}
 	qs := make([]*dto.Quantile, 0, len(s.quantiles))
 
 	sum.SampleCount = proto.Uint64(s.count)
 	sum.SampleSum = proto.Float64(s.sum)
 
-	for rank, q := range s.quantiles ***REMOVED***
-		qs = append(qs, &dto.Quantile***REMOVED***
+	for rank, q := range s.quantiles {
+		qs = append(qs, &dto.Quantile{
 			Quantile: proto.Float64(rank),
 			Value:    proto.Float64(q),
-		***REMOVED***)
-	***REMOVED***
+		})
+	}
 
-	if len(qs) > 0 ***REMOVED***
+	if len(qs) > 0 {
 		sort.Sort(quantSort(qs))
-	***REMOVED***
+	}
 	sum.Quantile = qs
 
 	out.Summary = sum
 	out.Label = s.labelPairs
 
 	return nil
-***REMOVED***
+}
 
 // NewConstSummary returns a metric representing a Prometheus summary with fixed
 // values for the count, sum, and quantiles. As those parameters cannot be
@@ -498,7 +498,7 @@ func (s *constSummary) Write(out *dto.Metric) error ***REMOVED***
 //
 // quantiles maps ranks to quantile values. For example, a median latency of
 // 0.23s and a 99th percentile latency of 0.56s would be expressed as:
-//     map[float64]float64***REMOVED***0.5: 0.23, 0.99: 0.56***REMOVED***
+//     map[float64]float64{0.5: 0.23, 0.99: 0.56}
 //
 // NewConstSummary returns an error if the length of labelValues is not
 // consistent with the variable labels in Desc.
@@ -508,18 +508,18 @@ func NewConstSummary(
 	sum float64,
 	quantiles map[float64]float64,
 	labelValues ...string,
-) (Metric, error) ***REMOVED***
-	if len(desc.variableLabels) != len(labelValues) ***REMOVED***
+) (Metric, error) {
+	if len(desc.variableLabels) != len(labelValues) {
 		return nil, errInconsistentCardinality
-	***REMOVED***
-	return &constSummary***REMOVED***
+	}
+	return &constSummary{
 		desc:       desc,
 		count:      count,
 		sum:        sum,
 		quantiles:  quantiles,
 		labelPairs: makeLabelPairs(desc, labelValues),
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // MustNewConstSummary is a version of NewConstSummary that panics where
 // NewConstMetric would have returned an error.
@@ -529,10 +529,10 @@ func MustNewConstSummary(
 	sum float64,
 	quantiles map[float64]float64,
 	labelValues ...string,
-) Metric ***REMOVED***
+) Metric {
 	m, err := NewConstSummary(desc, count, sum, quantiles, labelValues...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 	return m
-***REMOVED***
+}

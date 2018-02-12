@@ -8,7 +8,7 @@ import (
 	"github.com/opencontainers/runc/libcontainer/configs"
 )
 
-type Manager interface ***REMOVED***
+type Manager interface {
 	// Applies cgroup configuration to the process with the specified pid
 	Apply(pid int) error
 
@@ -39,26 +39,26 @@ type Manager interface ***REMOVED***
 
 	// Sets the cgroup as configured.
 	Set(container *configs.Config) error
-***REMOVED***
+}
 
-type NotFoundError struct ***REMOVED***
+type NotFoundError struct {
 	Subsystem string
-***REMOVED***
+}
 
-func (e *NotFoundError) Error() string ***REMOVED***
+func (e *NotFoundError) Error() string {
 	return fmt.Sprintf("mountpoint for %s not found", e.Subsystem)
-***REMOVED***
+}
 
-func NewNotFoundError(sub string) error ***REMOVED***
-	return &NotFoundError***REMOVED***
+func NewNotFoundError(sub string) error {
+	return &NotFoundError{
 		Subsystem: sub,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func IsNotFound(err error) bool ***REMOVED***
-	if err == nil ***REMOVED***
+func IsNotFound(err error) bool {
+	if err == nil {
 		return false
-	***REMOVED***
+	}
 	_, ok := err.(*NotFoundError)
 	return ok
-***REMOVED***
+}

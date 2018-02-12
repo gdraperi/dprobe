@@ -34,93 +34,93 @@ import (
 	"io"
 )
 
-func NewUint32DelimitedWriter(w io.Writer, byteOrder binary.ByteOrder) WriteCloser ***REMOVED***
-	return &uint32Writer***REMOVED***w, byteOrder, nil***REMOVED***
-***REMOVED***
+func NewUint32DelimitedWriter(w io.Writer, byteOrder binary.ByteOrder) WriteCloser {
+	return &uint32Writer{w, byteOrder, nil}
+}
 
-func NewSizeUint32DelimitedWriter(w io.Writer, byteOrder binary.ByteOrder, size int) WriteCloser ***REMOVED***
-	return &uint32Writer***REMOVED***w, byteOrder, make([]byte, size)***REMOVED***
-***REMOVED***
+func NewSizeUint32DelimitedWriter(w io.Writer, byteOrder binary.ByteOrder, size int) WriteCloser {
+	return &uint32Writer{w, byteOrder, make([]byte, size)}
+}
 
-type uint32Writer struct ***REMOVED***
+type uint32Writer struct {
 	w         io.Writer
 	byteOrder binary.ByteOrder
 	buffer    []byte
-***REMOVED***
+}
 
-func (this *uint32Writer) WriteMsg(msg proto.Message) (err error) ***REMOVED***
+func (this *uint32Writer) WriteMsg(msg proto.Message) (err error) {
 	var data []byte
-	if m, ok := msg.(marshaler); ok ***REMOVED***
+	if m, ok := msg.(marshaler); ok {
 		n, ok := getSize(m)
-		if !ok ***REMOVED***
+		if !ok {
 			data, err = proto.Marshal(msg)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-		***REMOVED***
-		if n >= len(this.buffer) ***REMOVED***
+			}
+		}
+		if n >= len(this.buffer) {
 			this.buffer = make([]byte, n)
-		***REMOVED***
+		}
 		_, err = m.MarshalTo(this.buffer)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		data = this.buffer[:n]
-	***REMOVED*** else ***REMOVED***
+	} else {
 		data, err = proto.Marshal(msg)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	length := uint32(len(data))
-	if err = binary.Write(this.w, this.byteOrder, &length); err != nil ***REMOVED***
+	if err = binary.Write(this.w, this.byteOrder, &length); err != nil {
 		return err
-	***REMOVED***
+	}
 	_, err = this.w.Write(data)
 	return err
-***REMOVED***
+}
 
-func (this *uint32Writer) Close() error ***REMOVED***
-	if closer, ok := this.w.(io.Closer); ok ***REMOVED***
+func (this *uint32Writer) Close() error {
+	if closer, ok := this.w.(io.Closer); ok {
 		return closer.Close()
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-type uint32Reader struct ***REMOVED***
+type uint32Reader struct {
 	r         io.Reader
 	byteOrder binary.ByteOrder
 	lenBuf    []byte
 	buf       []byte
 	maxSize   int
-***REMOVED***
+}
 
-func NewUint32DelimitedReader(r io.Reader, byteOrder binary.ByteOrder, maxSize int) ReadCloser ***REMOVED***
-	return &uint32Reader***REMOVED***r, byteOrder, make([]byte, 4), nil, maxSize***REMOVED***
-***REMOVED***
+func NewUint32DelimitedReader(r io.Reader, byteOrder binary.ByteOrder, maxSize int) ReadCloser {
+	return &uint32Reader{r, byteOrder, make([]byte, 4), nil, maxSize}
+}
 
-func (this *uint32Reader) ReadMsg(msg proto.Message) error ***REMOVED***
-	if _, err := io.ReadFull(this.r, this.lenBuf); err != nil ***REMOVED***
+func (this *uint32Reader) ReadMsg(msg proto.Message) error {
+	if _, err := io.ReadFull(this.r, this.lenBuf); err != nil {
 		return err
-	***REMOVED***
+	}
 	length32 := this.byteOrder.Uint32(this.lenBuf)
 	length := int(length32)
-	if length < 0 || length > this.maxSize ***REMOVED***
+	if length < 0 || length > this.maxSize {
 		return io.ErrShortBuffer
-	***REMOVED***
-	if length >= len(this.buf) ***REMOVED***
+	}
+	if length >= len(this.buf) {
 		this.buf = make([]byte, length)
-	***REMOVED***
+	}
 	_, err := io.ReadFull(this.r, this.buf[:length])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return proto.Unmarshal(this.buf[:length], msg)
-***REMOVED***
+}
 
-func (this *uint32Reader) Close() error ***REMOVED***
-	if closer, ok := this.r.(io.Closer); ok ***REMOVED***
+func (this *uint32Reader) Close() error {
+	if closer, ok := this.r.(io.Closer); ok {
 		return closer.Close()
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

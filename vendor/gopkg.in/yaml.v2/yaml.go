@@ -19,18 +19,18 @@ import (
 type MapSlice []MapItem
 
 // MapItem is an item in a MapSlice.
-type MapItem struct ***REMOVED***
-	Key, Value interface***REMOVED******REMOVED***
-***REMOVED***
+type MapItem struct {
+	Key, Value interface{}
+}
 
 // The Unmarshaler interface may be implemented by types to customize their
 // behavior when being unmarshaled from a YAML document. The UnmarshalYAML
 // method receives a function that may be called to unmarshal the original
 // YAML value into a field or variable. It is safe to call the unmarshal
 // function parameter more than once if necessary.
-type Unmarshaler interface ***REMOVED***
-	UnmarshalYAML(unmarshal func(interface***REMOVED******REMOVED***) error) error
-***REMOVED***
+type Unmarshaler interface {
+	UnmarshalYAML(unmarshal func(interface{}) error) error
+}
 
 // The Marshaler interface may be implemented by types to customize their
 // behavior when being marshaled into a YAML document. The returned value
@@ -38,9 +38,9 @@ type Unmarshaler interface ***REMOVED***
 //
 // If an error is returned by MarshalYAML, the marshaling procedure stops
 // and returns with the provided error.
-type Marshaler interface ***REMOVED***
-	MarshalYAML() (interface***REMOVED******REMOVED***, error)
-***REMOVED***
+type Marshaler interface {
+	MarshalYAML() (interface{}, error)
+}
 
 // Unmarshal decodes the first document found within the in byte slice
 // and assigns decoded values into the out value.
@@ -66,45 +66,45 @@ type Marshaler interface ***REMOVED***
 //
 // For example:
 //
-//     type T struct ***REMOVED***
+//     type T struct {
 //         F int `yaml:"a,omitempty"`
 //         B int
-// ***REMOVED***
+//     }
 //     var t T
 //     yaml.Unmarshal([]byte("a: 1\nb: 2"), &t)
 //
 // See the documentation of Marshal for the format of tags and a list of
 // supported tag options.
 //
-func Unmarshal(in []byte, out interface***REMOVED******REMOVED***) (err error) ***REMOVED***
+func Unmarshal(in []byte, out interface{}) (err error) {
 	return unmarshal(in, out, false)
-***REMOVED***
+}
 
 // UnmarshalStrict is like Unmarshal except that any fields that are found
 // in the data that do not have corresponding struct members will result in
 // an error.
-func UnmarshalStrict(in []byte, out interface***REMOVED******REMOVED***) (err error) ***REMOVED***
+func UnmarshalStrict(in []byte, out interface{}) (err error) {
 	return unmarshal(in, out, true)
-***REMOVED***
+}
 
-func unmarshal(in []byte, out interface***REMOVED******REMOVED***, strict bool) (err error) ***REMOVED***
+func unmarshal(in []byte, out interface{}, strict bool) (err error) {
 	defer handleErr(&err)
 	d := newDecoder(strict)
 	p := newParser(in)
 	defer p.destroy()
 	node := p.parse()
-	if node != nil ***REMOVED***
+	if node != nil {
 		v := reflect.ValueOf(out)
-		if v.Kind() == reflect.Ptr && !v.IsNil() ***REMOVED***
+		if v.Kind() == reflect.Ptr && !v.IsNil() {
 			v = v.Elem()
-		***REMOVED***
+		}
 		d.unmarshal(node, v)
-	***REMOVED***
-	if len(d.terrors) > 0 ***REMOVED***
-		return &TypeError***REMOVED***d.terrors***REMOVED***
-	***REMOVED***
+	}
+	if len(d.terrors) > 0 {
+		return &TypeError{d.terrors}
+	}
 	return nil
-***REMOVED***
+}
 
 // Marshal serializes the value provided into a YAML document. The structure
 // of the generated document will reflect the structure of the value itself.
@@ -139,14 +139,14 @@ func unmarshal(in []byte, out interface***REMOVED******REMOVED***, strict bool) 
 //
 // For example:
 //
-//     type T struct ***REMOVED***
+//     type T struct {
 //         F int `yaml:"a,omitempty"`
 //         B int
-// ***REMOVED***
-//     yaml.Marshal(&T***REMOVED***B: 2***REMOVED***) // Returns "b: 2\n"
-//     yaml.Marshal(&T***REMOVED***F: 1***REMOVED******REMOVED*** // Returns "a: 1\nb: 0\n"
+//     }
+//     yaml.Marshal(&T{B: 2}) // Returns "b: 2\n"
+//     yaml.Marshal(&T{F: 1}} // Returns "a: 1\nb: 0\n"
 //
-func Marshal(in interface***REMOVED******REMOVED***) (out []byte, err error) ***REMOVED***
+func Marshal(in interface{}) (out []byte, err error) {
 	defer handleErr(&err)
 	e := newEncoder()
 	defer e.destroy()
@@ -154,41 +154,41 @@ func Marshal(in interface***REMOVED******REMOVED***) (out []byte, err error) ***
 	e.finish()
 	out = e.out
 	return
-***REMOVED***
+}
 
-func handleErr(err *error) ***REMOVED***
-	if v := recover(); v != nil ***REMOVED***
-		if e, ok := v.(yamlError); ok ***REMOVED***
+func handleErr(err *error) {
+	if v := recover(); v != nil {
+		if e, ok := v.(yamlError); ok {
 			*err = e.err
-		***REMOVED*** else ***REMOVED***
+		} else {
 			panic(v)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-type yamlError struct ***REMOVED***
+type yamlError struct {
 	err error
-***REMOVED***
+}
 
-func fail(err error) ***REMOVED***
-	panic(yamlError***REMOVED***err***REMOVED***)
-***REMOVED***
+func fail(err error) {
+	panic(yamlError{err})
+}
 
-func failf(format string, args ...interface***REMOVED******REMOVED***) ***REMOVED***
-	panic(yamlError***REMOVED***fmt.Errorf("yaml: "+format, args...)***REMOVED***)
-***REMOVED***
+func failf(format string, args ...interface{}) {
+	panic(yamlError{fmt.Errorf("yaml: "+format, args...)})
+}
 
 // A TypeError is returned by Unmarshal when one or more fields in
 // the YAML document cannot be properly decoded into the requested
 // types. When this error is returned, the value is still
 // unmarshaled partially.
-type TypeError struct ***REMOVED***
+type TypeError struct {
 	Errors []string
-***REMOVED***
+}
 
-func (e *TypeError) Error() string ***REMOVED***
+func (e *TypeError) Error() string {
 	return fmt.Sprintf("yaml: unmarshal errors:\n  %s", strings.Join(e.Errors, "\n  "))
-***REMOVED***
+}
 
 // --------------------------------------------------------------------------
 // Maintain a mapping of keys to structure field indexes
@@ -197,16 +197,16 @@ func (e *TypeError) Error() string ***REMOVED***
 
 // structInfo holds details for the serialization of fields of
 // a given struct.
-type structInfo struct ***REMOVED***
+type structInfo struct {
 	FieldsMap  map[string]fieldInfo
 	FieldsList []fieldInfo
 
 	// InlineMap is the number of the field in the struct that
 	// contains an ,inline map, or -1 if there's none.
 	InlineMap int
-***REMOVED***
+}
 
-type fieldInfo struct ***REMOVED***
+type fieldInfo struct {
 	Key       string
 	Num       int
 	OmitEmpty bool
@@ -214,44 +214,44 @@ type fieldInfo struct ***REMOVED***
 
 	// Inline holds the field index if the field is part of an inlined struct.
 	Inline []int
-***REMOVED***
+}
 
 var structMap = make(map[reflect.Type]*structInfo)
 var fieldMapMutex sync.RWMutex
 
-func getStructInfo(st reflect.Type) (*structInfo, error) ***REMOVED***
+func getStructInfo(st reflect.Type) (*structInfo, error) {
 	fieldMapMutex.RLock()
 	sinfo, found := structMap[st]
 	fieldMapMutex.RUnlock()
-	if found ***REMOVED***
+	if found {
 		return sinfo, nil
-	***REMOVED***
+	}
 
 	n := st.NumField()
 	fieldsMap := make(map[string]fieldInfo)
 	fieldsList := make([]fieldInfo, 0, n)
 	inlineMap := -1
-	for i := 0; i != n; i++ ***REMOVED***
+	for i := 0; i != n; i++ {
 		field := st.Field(i)
-		if field.PkgPath != "" && !field.Anonymous ***REMOVED***
+		if field.PkgPath != "" && !field.Anonymous {
 			continue // Private field
-		***REMOVED***
+		}
 
-		info := fieldInfo***REMOVED***Num: i***REMOVED***
+		info := fieldInfo{Num: i}
 
 		tag := field.Tag.Get("yaml")
-		if tag == "" && strings.Index(string(field.Tag), ":") < 0 ***REMOVED***
+		if tag == "" && strings.Index(string(field.Tag), ":") < 0 {
 			tag = string(field.Tag)
-		***REMOVED***
-		if tag == "-" ***REMOVED***
+		}
+		if tag == "-" {
 			continue
-		***REMOVED***
+		}
 
 		inline := false
 		fields := strings.Split(tag, ",")
-		if len(fields) > 1 ***REMOVED***
-			for _, flag := range fields[1:] ***REMOVED***
-				switch flag ***REMOVED***
+		if len(fields) > 1 {
+			for _, flag := range fields[1:] {
+				switch flag {
 				case "omitempty":
 					info.OmitEmpty = true
 				case "flow":
@@ -260,71 +260,71 @@ func getStructInfo(st reflect.Type) (*structInfo, error) ***REMOVED***
 					inline = true
 				default:
 					return nil, errors.New(fmt.Sprintf("Unsupported flag %q in tag %q of type %s", flag, tag, st))
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			tag = fields[0]
-		***REMOVED***
+		}
 
-		if inline ***REMOVED***
-			switch field.Type.Kind() ***REMOVED***
+		if inline {
+			switch field.Type.Kind() {
 			case reflect.Map:
-				if inlineMap >= 0 ***REMOVED***
+				if inlineMap >= 0 {
 					return nil, errors.New("Multiple ,inline maps in struct " + st.String())
-				***REMOVED***
-				if field.Type.Key() != reflect.TypeOf("") ***REMOVED***
+				}
+				if field.Type.Key() != reflect.TypeOf("") {
 					return nil, errors.New("Option ,inline needs a map with string keys in struct " + st.String())
-				***REMOVED***
+				}
 				inlineMap = info.Num
 			case reflect.Struct:
 				sinfo, err := getStructInfo(field.Type)
-				if err != nil ***REMOVED***
+				if err != nil {
 					return nil, err
-				***REMOVED***
-				for _, finfo := range sinfo.FieldsList ***REMOVED***
-					if _, found := fieldsMap[finfo.Key]; found ***REMOVED***
+				}
+				for _, finfo := range sinfo.FieldsList {
+					if _, found := fieldsMap[finfo.Key]; found {
 						msg := "Duplicated key '" + finfo.Key + "' in struct " + st.String()
 						return nil, errors.New(msg)
-					***REMOVED***
-					if finfo.Inline == nil ***REMOVED***
-						finfo.Inline = []int***REMOVED***i, finfo.Num***REMOVED***
-					***REMOVED*** else ***REMOVED***
-						finfo.Inline = append([]int***REMOVED***i***REMOVED***, finfo.Inline...)
-					***REMOVED***
+					}
+					if finfo.Inline == nil {
+						finfo.Inline = []int{i, finfo.Num}
+					} else {
+						finfo.Inline = append([]int{i}, finfo.Inline...)
+					}
 					fieldsMap[finfo.Key] = finfo
 					fieldsList = append(fieldsList, finfo)
-				***REMOVED***
+				}
 			default:
 				//return nil, errors.New("Option ,inline needs a struct value or map field")
 				return nil, errors.New("Option ,inline needs a struct value field")
-			***REMOVED***
+			}
 			continue
-		***REMOVED***
+		}
 
-		if tag != "" ***REMOVED***
+		if tag != "" {
 			info.Key = tag
-		***REMOVED*** else ***REMOVED***
+		} else {
 			info.Key = strings.ToLower(field.Name)
-		***REMOVED***
+		}
 
-		if _, found = fieldsMap[info.Key]; found ***REMOVED***
+		if _, found = fieldsMap[info.Key]; found {
 			msg := "Duplicated key '" + info.Key + "' in struct " + st.String()
 			return nil, errors.New(msg)
-		***REMOVED***
+		}
 
 		fieldsList = append(fieldsList, info)
 		fieldsMap[info.Key] = info
-	***REMOVED***
+	}
 
-	sinfo = &structInfo***REMOVED***fieldsMap, fieldsList, inlineMap***REMOVED***
+	sinfo = &structInfo{fieldsMap, fieldsList, inlineMap}
 
 	fieldMapMutex.Lock()
 	structMap[st] = sinfo
 	fieldMapMutex.Unlock()
 	return sinfo, nil
-***REMOVED***
+}
 
-func isZero(v reflect.Value) bool ***REMOVED***
-	switch v.Kind() ***REMOVED***
+func isZero(v reflect.Value) bool {
+	switch v.Kind() {
 	case reflect.String:
 		return len(v.String()) == 0
 	case reflect.Interface, reflect.Ptr:
@@ -343,15 +343,15 @@ func isZero(v reflect.Value) bool ***REMOVED***
 		return !v.Bool()
 	case reflect.Struct:
 		vt := v.Type()
-		for i := v.NumField() - 1; i >= 0; i-- ***REMOVED***
-			if vt.Field(i).PkgPath != "" ***REMOVED***
+		for i := v.NumField() - 1; i >= 0; i-- {
+			if vt.Field(i).PkgPath != "" {
 				continue // Private field
-			***REMOVED***
-			if !isZero(v.Field(i)) ***REMOVED***
+			}
+			if !isZero(v.Field(i)) {
 				return false
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		return true
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}

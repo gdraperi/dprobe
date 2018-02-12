@@ -10,191 +10,191 @@ const UnicodeVersion = "10.0.0"
 // lookup returns the trie value for the first UTF-8 encoding in s and
 // the width in bytes of this encoding. The size will be 0 if s does not
 // hold enough bytes to complete the encoding. len(s) must be greater than 0.
-func (t *derivedPropertiesTrie) lookup(s []byte) (v uint8, sz int) ***REMOVED***
+func (t *derivedPropertiesTrie) lookup(s []byte) (v uint8, sz int) {
 	c0 := s[0]
-	switch ***REMOVED***
+	switch {
 	case c0 < 0x80: // is ASCII
 		return derivedPropertiesValues[c0], 1
 	case c0 < 0xC2:
 		return 0, 1 // Illegal UTF-8: not a starter, not ASCII.
 	case c0 < 0xE0: // 2-byte UTF-8
-		if len(s) < 2 ***REMOVED***
+		if len(s) < 2 {
 			return 0, 0
-		***REMOVED***
+		}
 		i := derivedPropertiesIndex[c0]
 		c1 := s[1]
-		if c1 < 0x80 || 0xC0 <= c1 ***REMOVED***
+		if c1 < 0x80 || 0xC0 <= c1 {
 			return 0, 1 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		return t.lookupValue(uint32(i), c1), 2
 	case c0 < 0xF0: // 3-byte UTF-8
-		if len(s) < 3 ***REMOVED***
+		if len(s) < 3 {
 			return 0, 0
-		***REMOVED***
+		}
 		i := derivedPropertiesIndex[c0]
 		c1 := s[1]
-		if c1 < 0x80 || 0xC0 <= c1 ***REMOVED***
+		if c1 < 0x80 || 0xC0 <= c1 {
 			return 0, 1 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		o := uint32(i)<<6 + uint32(c1)
 		i = derivedPropertiesIndex[o]
 		c2 := s[2]
-		if c2 < 0x80 || 0xC0 <= c2 ***REMOVED***
+		if c2 < 0x80 || 0xC0 <= c2 {
 			return 0, 2 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		return t.lookupValue(uint32(i), c2), 3
 	case c0 < 0xF8: // 4-byte UTF-8
-		if len(s) < 4 ***REMOVED***
+		if len(s) < 4 {
 			return 0, 0
-		***REMOVED***
+		}
 		i := derivedPropertiesIndex[c0]
 		c1 := s[1]
-		if c1 < 0x80 || 0xC0 <= c1 ***REMOVED***
+		if c1 < 0x80 || 0xC0 <= c1 {
 			return 0, 1 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		o := uint32(i)<<6 + uint32(c1)
 		i = derivedPropertiesIndex[o]
 		c2 := s[2]
-		if c2 < 0x80 || 0xC0 <= c2 ***REMOVED***
+		if c2 < 0x80 || 0xC0 <= c2 {
 			return 0, 2 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		o = uint32(i)<<6 + uint32(c2)
 		i = derivedPropertiesIndex[o]
 		c3 := s[3]
-		if c3 < 0x80 || 0xC0 <= c3 ***REMOVED***
+		if c3 < 0x80 || 0xC0 <= c3 {
 			return 0, 3 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		return t.lookupValue(uint32(i), c3), 4
-	***REMOVED***
+	}
 	// Illegal rune
 	return 0, 1
-***REMOVED***
+}
 
 // lookupUnsafe returns the trie value for the first UTF-8 encoding in s.
 // s must start with a full and valid UTF-8 encoded rune.
-func (t *derivedPropertiesTrie) lookupUnsafe(s []byte) uint8 ***REMOVED***
+func (t *derivedPropertiesTrie) lookupUnsafe(s []byte) uint8 {
 	c0 := s[0]
-	if c0 < 0x80 ***REMOVED*** // is ASCII
+	if c0 < 0x80 { // is ASCII
 		return derivedPropertiesValues[c0]
-	***REMOVED***
+	}
 	i := derivedPropertiesIndex[c0]
-	if c0 < 0xE0 ***REMOVED*** // 2-byte UTF-8
+	if c0 < 0xE0 { // 2-byte UTF-8
 		return t.lookupValue(uint32(i), s[1])
-	***REMOVED***
+	}
 	i = derivedPropertiesIndex[uint32(i)<<6+uint32(s[1])]
-	if c0 < 0xF0 ***REMOVED*** // 3-byte UTF-8
+	if c0 < 0xF0 { // 3-byte UTF-8
 		return t.lookupValue(uint32(i), s[2])
-	***REMOVED***
+	}
 	i = derivedPropertiesIndex[uint32(i)<<6+uint32(s[2])]
-	if c0 < 0xF8 ***REMOVED*** // 4-byte UTF-8
+	if c0 < 0xF8 { // 4-byte UTF-8
 		return t.lookupValue(uint32(i), s[3])
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
 // lookupString returns the trie value for the first UTF-8 encoding in s and
 // the width in bytes of this encoding. The size will be 0 if s does not
 // hold enough bytes to complete the encoding. len(s) must be greater than 0.
-func (t *derivedPropertiesTrie) lookupString(s string) (v uint8, sz int) ***REMOVED***
+func (t *derivedPropertiesTrie) lookupString(s string) (v uint8, sz int) {
 	c0 := s[0]
-	switch ***REMOVED***
+	switch {
 	case c0 < 0x80: // is ASCII
 		return derivedPropertiesValues[c0], 1
 	case c0 < 0xC2:
 		return 0, 1 // Illegal UTF-8: not a starter, not ASCII.
 	case c0 < 0xE0: // 2-byte UTF-8
-		if len(s) < 2 ***REMOVED***
+		if len(s) < 2 {
 			return 0, 0
-		***REMOVED***
+		}
 		i := derivedPropertiesIndex[c0]
 		c1 := s[1]
-		if c1 < 0x80 || 0xC0 <= c1 ***REMOVED***
+		if c1 < 0x80 || 0xC0 <= c1 {
 			return 0, 1 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		return t.lookupValue(uint32(i), c1), 2
 	case c0 < 0xF0: // 3-byte UTF-8
-		if len(s) < 3 ***REMOVED***
+		if len(s) < 3 {
 			return 0, 0
-		***REMOVED***
+		}
 		i := derivedPropertiesIndex[c0]
 		c1 := s[1]
-		if c1 < 0x80 || 0xC0 <= c1 ***REMOVED***
+		if c1 < 0x80 || 0xC0 <= c1 {
 			return 0, 1 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		o := uint32(i)<<6 + uint32(c1)
 		i = derivedPropertiesIndex[o]
 		c2 := s[2]
-		if c2 < 0x80 || 0xC0 <= c2 ***REMOVED***
+		if c2 < 0x80 || 0xC0 <= c2 {
 			return 0, 2 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		return t.lookupValue(uint32(i), c2), 3
 	case c0 < 0xF8: // 4-byte UTF-8
-		if len(s) < 4 ***REMOVED***
+		if len(s) < 4 {
 			return 0, 0
-		***REMOVED***
+		}
 		i := derivedPropertiesIndex[c0]
 		c1 := s[1]
-		if c1 < 0x80 || 0xC0 <= c1 ***REMOVED***
+		if c1 < 0x80 || 0xC0 <= c1 {
 			return 0, 1 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		o := uint32(i)<<6 + uint32(c1)
 		i = derivedPropertiesIndex[o]
 		c2 := s[2]
-		if c2 < 0x80 || 0xC0 <= c2 ***REMOVED***
+		if c2 < 0x80 || 0xC0 <= c2 {
 			return 0, 2 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		o = uint32(i)<<6 + uint32(c2)
 		i = derivedPropertiesIndex[o]
 		c3 := s[3]
-		if c3 < 0x80 || 0xC0 <= c3 ***REMOVED***
+		if c3 < 0x80 || 0xC0 <= c3 {
 			return 0, 3 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		return t.lookupValue(uint32(i), c3), 4
-	***REMOVED***
+	}
 	// Illegal rune
 	return 0, 1
-***REMOVED***
+}
 
 // lookupStringUnsafe returns the trie value for the first UTF-8 encoding in s.
 // s must start with a full and valid UTF-8 encoded rune.
-func (t *derivedPropertiesTrie) lookupStringUnsafe(s string) uint8 ***REMOVED***
+func (t *derivedPropertiesTrie) lookupStringUnsafe(s string) uint8 {
 	c0 := s[0]
-	if c0 < 0x80 ***REMOVED*** // is ASCII
+	if c0 < 0x80 { // is ASCII
 		return derivedPropertiesValues[c0]
-	***REMOVED***
+	}
 	i := derivedPropertiesIndex[c0]
-	if c0 < 0xE0 ***REMOVED*** // 2-byte UTF-8
+	if c0 < 0xE0 { // 2-byte UTF-8
 		return t.lookupValue(uint32(i), s[1])
-	***REMOVED***
+	}
 	i = derivedPropertiesIndex[uint32(i)<<6+uint32(s[1])]
-	if c0 < 0xF0 ***REMOVED*** // 3-byte UTF-8
+	if c0 < 0xF0 { // 3-byte UTF-8
 		return t.lookupValue(uint32(i), s[2])
-	***REMOVED***
+	}
 	i = derivedPropertiesIndex[uint32(i)<<6+uint32(s[2])]
-	if c0 < 0xF8 ***REMOVED*** // 4-byte UTF-8
+	if c0 < 0xF8 { // 4-byte UTF-8
 		return t.lookupValue(uint32(i), s[3])
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
 // derivedPropertiesTrie. Total size: 25920 bytes (25.31 KiB). Checksum: 25eb1c8ad0a9331f.
-type derivedPropertiesTrie struct***REMOVED******REMOVED***
+type derivedPropertiesTrie struct{}
 
-func newDerivedPropertiesTrie(i int) *derivedPropertiesTrie ***REMOVED***
-	return &derivedPropertiesTrie***REMOVED******REMOVED***
-***REMOVED***
+func newDerivedPropertiesTrie(i int) *derivedPropertiesTrie {
+	return &derivedPropertiesTrie{}
+}
 
 // lookupValue determines the type of block n and looks up the value for b.
-func (t *derivedPropertiesTrie) lookupValue(n uint32, b byte) uint8 ***REMOVED***
-	switch ***REMOVED***
+func (t *derivedPropertiesTrie) lookupValue(n uint32, b byte) uint8 {
+	switch {
 	default:
 		return uint8(derivedPropertiesValues[n<<6+uint32(b)])
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // derivedPropertiesValues: 331 blocks, 21184 entries, 21184 bytes
 // The third block is the zero block.
-var derivedPropertiesValues = [21184]uint8***REMOVED***
+var derivedPropertiesValues = [21184]uint8{
 	// Block 0x0, offset 0x0
 	0x00: 0x0040, 0x01: 0x0040, 0x02: 0x0040, 0x03: 0x0040, 0x04: 0x0040, 0x05: 0x0040,
 	0x06: 0x0040, 0x07: 0x0040, 0x08: 0x0040, 0x09: 0x0040, 0x0a: 0x0040, 0x0b: 0x0040,
@@ -3648,11 +3648,11 @@ var derivedPropertiesValues = [21184]uint8***REMOVED***
 	0x52b0: 0x0040, 0x52b1: 0x0040, 0x52b2: 0x0040, 0x52b3: 0x0040, 0x52b4: 0x0040, 0x52b5: 0x0040,
 	0x52b6: 0x0040, 0x52b7: 0x0040, 0x52b8: 0x0040, 0x52b9: 0x0040, 0x52ba: 0x0040, 0x52bb: 0x0040,
 	0x52bc: 0x0040, 0x52bd: 0x0040,
-***REMOVED***
+}
 
 // derivedPropertiesIndex: 37 blocks, 2368 entries, 4736 bytes
 // Block 0 is the zero block.
-var derivedPropertiesIndex = [2368]uint16***REMOVED***
+var derivedPropertiesIndex = [2368]uint16{
 	// Block 0x0, offset 0x0
 	// Block 0x1, offset 0x40
 	// Block 0x2, offset 0x80
@@ -3884,6 +3884,6 @@ var derivedPropertiesIndex = [2368]uint16***REMOVED***
 	// Block 0x24, offset 0x900
 	0x900: 0x0c, 0x901: 0x0c, 0x902: 0x0c, 0x903: 0x0c, 0x904: 0x0c, 0x905: 0x0c, 0x906: 0x0c, 0x907: 0x0c,
 	0x908: 0x0c, 0x909: 0x0c, 0x90a: 0x0c, 0x90b: 0x0c, 0x90c: 0x0c, 0x90d: 0x0c, 0x90e: 0x0c, 0x90f: 0x20,
-***REMOVED***
+}
 
 // Total table size 25920 bytes (25KiB); checksum: 811C9DC5

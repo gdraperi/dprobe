@@ -6,35 +6,35 @@ import (
 
 // EscapeError is special error which returned by a TTY proxy reader's Read()
 // method in case its detach escape sequence is read.
-type EscapeError struct***REMOVED******REMOVED***
+type EscapeError struct{}
 
-func (EscapeError) Error() string ***REMOVED***
+func (EscapeError) Error() string {
 	return "read escape sequence"
-***REMOVED***
+}
 
 // escapeProxy is used only for attaches with a TTY. It is used to proxy
 // stdin keypresses from the underlying reader and look for the passed in
 // escape key sequence to signal a detach.
-type escapeProxy struct ***REMOVED***
+type escapeProxy struct {
 	escapeKeys   []byte
 	escapeKeyPos int
 	r            io.Reader
-***REMOVED***
+}
 
 // NewEscapeProxy returns a new TTY proxy reader which wraps the given reader
 // and detects when the specified escape keys are read, in which case the Read
 // method will return an error of type EscapeError.
-func NewEscapeProxy(r io.Reader, escapeKeys []byte) io.Reader ***REMOVED***
-	return &escapeProxy***REMOVED***
+func NewEscapeProxy(r io.Reader, escapeKeys []byte) io.Reader {
+	return &escapeProxy{
 		escapeKeys: escapeKeys,
 		r:          r,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (r *escapeProxy) Read(buf []byte) (int, error) ***REMOVED***
+func (r *escapeProxy) Read(buf []byte) (int, error) {
 	nr, err := r.r.Read(buf)
 
-	preserve := func() ***REMOVED***
+	preserve := func() {
 		// this preserves the original key presses in the passed in buffer
 		nr += r.escapeKeyPos
 		preserve := make([]byte, 0, r.escapeKeyPos+len(buf))
@@ -42,25 +42,25 @@ func (r *escapeProxy) Read(buf []byte) (int, error) ***REMOVED***
 		preserve = append(preserve, buf...)
 		r.escapeKeyPos = 0
 		copy(buf[0:nr], preserve)
-	***REMOVED***
+	}
 
-	if nr != 1 || err != nil ***REMOVED***
-		if r.escapeKeyPos > 0 ***REMOVED***
+	if nr != 1 || err != nil {
+		if r.escapeKeyPos > 0 {
 			preserve()
-		***REMOVED***
+		}
 		return nr, err
-	***REMOVED***
+	}
 
-	if buf[0] != r.escapeKeys[r.escapeKeyPos] ***REMOVED***
-		if r.escapeKeyPos > 0 ***REMOVED***
+	if buf[0] != r.escapeKeys[r.escapeKeyPos] {
+		if r.escapeKeyPos > 0 {
 			preserve()
-		***REMOVED***
+		}
 		return nr, nil
-	***REMOVED***
+	}
 
-	if r.escapeKeyPos == len(r.escapeKeys)-1 ***REMOVED***
-		return 0, EscapeError***REMOVED******REMOVED***
-	***REMOVED***
+	if r.escapeKeyPos == len(r.escapeKeys)-1 {
+		return 0, EscapeError{}
+	}
 
 	// Looks like we've got an escape key, but we need to match again on the next
 	// read.
@@ -71,4 +71,4 @@ func (r *escapeProxy) Read(buf []byte) (int, error) ***REMOVED***
 	// keys back
 	r.escapeKeyPos++
 	return nr - r.escapeKeyPos, nil
-***REMOVED***
+}

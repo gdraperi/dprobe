@@ -6,8 +6,8 @@ import "crypto/tls"
 
 // tlsConfigClone returns a clone of tls.Config. This function is provided for
 // compatibility for go1.7 that doesn't include this method in stdlib.
-func tlsConfigClone(c *tls.Config) *tls.Config ***REMOVED***
-	return &tls.Config***REMOVED***
+func tlsConfigClone(c *tls.Config) *tls.Config {
+	return &tls.Config{
 		Rand:                        c.Rand,
 		Time:                        c.Time,
 		Certificates:                c.Certificates,
@@ -29,5 +29,5 @@ func tlsConfigClone(c *tls.Config) *tls.Config ***REMOVED***
 		CurvePreferences:            c.CurvePreferences,
 		DynamicRecordSizingDisabled: c.DynamicRecordSizingDisabled,
 		Renegotiation:               c.Renegotiation,
-	***REMOVED***
-***REMOVED***
+	}
+}

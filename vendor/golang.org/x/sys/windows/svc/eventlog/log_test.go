@@ -12,40 +12,40 @@ import (
 	"golang.org/x/sys/windows/svc/eventlog"
 )
 
-func TestLog(t *testing.T) ***REMOVED***
-	if testing.Short() ***REMOVED***
+func TestLog(t *testing.T) {
+	if testing.Short() {
 		t.Skip("skipping test in short mode - it modifies system logs")
-	***REMOVED***
+	}
 
 	const name = "mylog"
 	const supports = eventlog.Error | eventlog.Warning | eventlog.Info
 	err := eventlog.InstallAsEventCreate(name, supports)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("Install failed: %s", err)
-	***REMOVED***
-	defer func() ***REMOVED***
+	}
+	defer func() {
 		err = eventlog.Remove(name)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("Remove failed: %s", err)
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
 	l, err := eventlog.Open(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("Open failed: %s", err)
-	***REMOVED***
+	}
 	defer l.Close()
 
 	err = l.Info(1, "info")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("Info failed: %s", err)
-	***REMOVED***
+	}
 	err = l.Warning(2, "warning")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("Warning failed: %s", err)
-	***REMOVED***
+	}
 	err = l.Error(3, "error")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("Error failed: %s", err)
-	***REMOVED***
-***REMOVED***
+	}
+}

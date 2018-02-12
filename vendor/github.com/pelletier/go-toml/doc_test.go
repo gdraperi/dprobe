@@ -9,12 +9,12 @@ import (
 	toml "github.com/pelletier/go-toml"
 )
 
-func Example_tree() ***REMOVED***
+func Example_tree() {
 	config, err := toml.LoadFile("config.toml")
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		fmt.Println("Error ", err.Error())
-	***REMOVED*** else ***REMOVED***
+	} else {
 		// retrieve data directly
 		user := config.Get("postgres.user").(string)
 		password := config.Get("postgres.password").(string)
@@ -28,19 +28,19 @@ func Example_tree() ***REMOVED***
 		// show where elements are in the file
 		fmt.Printf("User position: %v\n", configTree.GetPosition("user"))
 		fmt.Printf("Password position: %v\n", configTree.GetPosition("password"))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func Example_unmarshal() ***REMOVED***
-	type Employer struct ***REMOVED***
+func Example_unmarshal() {
+	type Employer struct {
 		Name  string
 		Phone string
-	***REMOVED***
-	type Person struct ***REMOVED***
+	}
+	type Person struct {
 		Name     string
 		Age      int64
 		Employer Employer
-	***REMOVED***
+	}
 
 	document := []byte(`
 	name = "John"
@@ -50,28 +50,28 @@ func Example_unmarshal() ***REMOVED***
 		phone = "+1 234 567 89012"
 	`)
 
-	person := Person***REMOVED******REMOVED***
+	person := Person{}
 	toml.Unmarshal(document, &person)
 	fmt.Println(person.Name, "is", person.Age, "and works at", person.Employer.Name)
 	// Output:
 	// John is 30 and works at Company Inc.
-***REMOVED***
+}
 
-func ExampleMarshal() ***REMOVED***
-	type Postgres struct ***REMOVED***
+func ExampleMarshal() {
+	type Postgres struct {
 		User     string `toml:"user"`
 		Password string `toml:"password"`
 		Database string `toml:"db" commented:"true" comment:"not used anymore"`
-	***REMOVED***
-	type Config struct ***REMOVED***
+	}
+	type Config struct {
 		Postgres Postgres `toml:"postgres" comment:"Postgres configuration"`
-	***REMOVED***
+	}
 
-	config := Config***REMOVED***Postgres***REMOVED***User: "pelletier", Password: "mypassword", Database: "old_database"***REMOVED******REMOVED***
+	config := Config{Postgres{User: "pelletier", Password: "mypassword", Database: "old_database"}}
 	b, err := toml.Marshal(config)
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatal(err)
-	***REMOVED***
+	}
 	fmt.Println(string(b))
 	// Output:
 	// # Postgres configuration
@@ -81,25 +81,25 @@ func ExampleMarshal() ***REMOVED***
 	//   # db = "old_database"
 	//   password = "mypassword"
 	//   user = "pelletier"
-***REMOVED***
+}
 
-func ExampleUnmarshal() ***REMOVED***
-	type Postgres struct ***REMOVED***
+func ExampleUnmarshal() {
+	type Postgres struct {
 		User     string
 		Password string
-	***REMOVED***
-	type Config struct ***REMOVED***
+	}
+	type Config struct {
 		Postgres Postgres
-	***REMOVED***
+	}
 
 	doc := []byte(`
 	[postgres]
 	user = "pelletier"
 	password = "mypassword"`)
 
-	config := Config***REMOVED******REMOVED***
+	config := Config{}
 	toml.Unmarshal(doc, &config)
 	fmt.Println("user=", config.Postgres.User)
 	// Output:
 	// user= pelletier
-***REMOVED***
+}

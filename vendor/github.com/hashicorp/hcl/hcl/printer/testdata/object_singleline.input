@@ -1,19 +1,19 @@
-variable "foo" ***REMOVED******REMOVED***
-variable "bar" ***REMOVED******REMOVED***
-variable "baz" ***REMOVED******REMOVED***
+variable "foo" {}
+variable "bar" {}
+variable "baz" {}
 
-variable "qux" ***REMOVED******REMOVED***
-variable "foo" ***REMOVED*** foo = "bar" ***REMOVED***
+variable "qux" {}
+variable "foo" { foo = "bar" }
 
-variable "foo" ***REMOVED******REMOVED***
+variable "foo" {}
 # lead comment
-variable "bar" ***REMOVED******REMOVED***
+variable "bar" {}
 
-variable "foo" ***REMOVED*** default = "bar" ***REMOVED***
-variable "bar" ***REMOVED******REMOVED***
+variable "foo" { default = "bar" }
+variable "bar" {}
 
 # Purposeful newline check below:
 
-variable "foo" ***REMOVED******REMOVED***
+variable "foo" {}
 
-variable "purposeful-newline" ***REMOVED******REMOVED***
+variable "purposeful-newline" {}

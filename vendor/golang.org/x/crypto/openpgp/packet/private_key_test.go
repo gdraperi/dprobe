@@ -19,244 +19,244 @@ import (
 	"time"
 )
 
-var privateKeyTests = []struct ***REMOVED***
+var privateKeyTests = []struct {
 	privateKeyHex string
 	creationTime  time.Time
-***REMOVED******REMOVED***
-	***REMOVED***
+}{
+	{
 		privKeyRSAHex,
 		time.Unix(0x4cc349a8, 0),
-	***REMOVED***,
-	***REMOVED***
+	},
+	{
 		privKeyElGamalHex,
 		time.Unix(0x4df9ee1a, 0),
-	***REMOVED***,
-***REMOVED***
+	},
+}
 
-func TestPrivateKeyRead(t *testing.T) ***REMOVED***
-	for i, test := range privateKeyTests ***REMOVED***
+func TestPrivateKeyRead(t *testing.T) {
+	for i, test := range privateKeyTests {
 		packet, err := Read(readerFromHex(test.privateKeyHex))
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Errorf("#%d: failed to parse: %s", i, err)
 			continue
-		***REMOVED***
+		}
 
 		privKey := packet.(*PrivateKey)
 
-		if !privKey.Encrypted ***REMOVED***
+		if !privKey.Encrypted {
 			t.Errorf("#%d: private key isn't encrypted", i)
 			continue
-		***REMOVED***
+		}
 
 		err = privKey.Decrypt([]byte("wrong password"))
-		if err == nil ***REMOVED***
+		if err == nil {
 			t.Errorf("#%d: decrypted with incorrect key", i)
 			continue
-		***REMOVED***
+		}
 
 		err = privKey.Decrypt([]byte("testing"))
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Errorf("#%d: failed to decrypt: %s", i, err)
 			continue
-		***REMOVED***
+		}
 
-		if !privKey.CreationTime.Equal(test.creationTime) || privKey.Encrypted ***REMOVED***
+		if !privKey.CreationTime.Equal(test.creationTime) || privKey.Encrypted {
 			t.Errorf("#%d: bad result, got: %#v", i, privKey)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func populateHash(hashFunc crypto.Hash, msg []byte) (hash.Hash, error) ***REMOVED***
+func populateHash(hashFunc crypto.Hash, msg []byte) (hash.Hash, error) {
 	h := hashFunc.New()
-	if _, err := h.Write(msg); err != nil ***REMOVED***
+	if _, err := h.Write(msg); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return h, nil
-***REMOVED***
+}
 
-func TestRSAPrivateKey(t *testing.T) ***REMOVED***
+func TestRSAPrivateKey(t *testing.T) {
 	privKeyDER, _ := hex.DecodeString(pkcs1PrivKeyHex)
 	rsaPriv, err := x509.ParsePKCS1PrivateKey(privKeyDER)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	var buf bytes.Buffer
-	if err := NewRSAPrivateKey(time.Now(), rsaPriv).Serialize(&buf); err != nil ***REMOVED***
+	if err := NewRSAPrivateKey(time.Now(), rsaPriv).Serialize(&buf); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	p, err := Read(&buf)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	priv, ok := p.(*PrivateKey)
-	if !ok ***REMOVED***
+	if !ok {
 		t.Fatal("didn't parse private key")
-	***REMOVED***
+	}
 
-	sig := &Signature***REMOVED***
+	sig := &Signature{
 		PubKeyAlgo: PubKeyAlgoRSA,
 		Hash:       crypto.SHA256,
-	***REMOVED***
+	}
 	msg := []byte("Hello World!")
 
 	h, err := populateHash(sig.Hash, msg)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if err := sig.Sign(h, priv, nil); err != nil ***REMOVED***
+	}
+	if err := sig.Sign(h, priv, nil); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if h, err = populateHash(sig.Hash, msg); err != nil ***REMOVED***
+	if h, err = populateHash(sig.Hash, msg); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if err := priv.VerifySignature(h, sig); err != nil ***REMOVED***
+	}
+	if err := priv.VerifySignature(h, sig); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestECDSAPrivateKey(t *testing.T) ***REMOVED***
+func TestECDSAPrivateKey(t *testing.T) {
 	ecdsaPriv, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	var buf bytes.Buffer
-	if err := NewECDSAPrivateKey(time.Now(), ecdsaPriv).Serialize(&buf); err != nil ***REMOVED***
+	if err := NewECDSAPrivateKey(time.Now(), ecdsaPriv).Serialize(&buf); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	p, err := Read(&buf)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	priv, ok := p.(*PrivateKey)
-	if !ok ***REMOVED***
+	if !ok {
 		t.Fatal("didn't parse private key")
-	***REMOVED***
+	}
 
-	sig := &Signature***REMOVED***
+	sig := &Signature{
 		PubKeyAlgo: PubKeyAlgoECDSA,
 		Hash:       crypto.SHA256,
-	***REMOVED***
+	}
 	msg := []byte("Hello World!")
 
 	h, err := populateHash(sig.Hash, msg)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if err := sig.Sign(h, priv, nil); err != nil ***REMOVED***
+	}
+	if err := sig.Sign(h, priv, nil); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if h, err = populateHash(sig.Hash, msg); err != nil ***REMOVED***
+	if h, err = populateHash(sig.Hash, msg); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if err := priv.VerifySignature(h, sig); err != nil ***REMOVED***
+	}
+	if err := priv.VerifySignature(h, sig); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type rsaSigner struct ***REMOVED***
+type rsaSigner struct {
 	priv *rsa.PrivateKey
-***REMOVED***
+}
 
-func (s *rsaSigner) Public() crypto.PublicKey ***REMOVED***
+func (s *rsaSigner) Public() crypto.PublicKey {
 	return s.priv.PublicKey
-***REMOVED***
+}
 
-func (s *rsaSigner) Sign(rand io.Reader, msg []byte, opts crypto.SignerOpts) ([]byte, error) ***REMOVED***
+func (s *rsaSigner) Sign(rand io.Reader, msg []byte, opts crypto.SignerOpts) ([]byte, error) {
 	return s.priv.Sign(rand, msg, opts)
-***REMOVED***
+}
 
-func TestRSASignerPrivateKey(t *testing.T) ***REMOVED***
+func TestRSASignerPrivateKey(t *testing.T) {
 	rsaPriv, err := rsa.GenerateKey(rand.Reader, 1024)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	priv := NewSignerPrivateKey(time.Now(), &rsaSigner***REMOVED***rsaPriv***REMOVED***)
+	priv := NewSignerPrivateKey(time.Now(), &rsaSigner{rsaPriv})
 
-	if priv.PubKeyAlgo != PubKeyAlgoRSASignOnly ***REMOVED***
+	if priv.PubKeyAlgo != PubKeyAlgoRSASignOnly {
 		t.Fatal("NewSignerPrivateKey should have made a sign-only RSA private key")
-	***REMOVED***
+	}
 
-	sig := &Signature***REMOVED***
+	sig := &Signature{
 		PubKeyAlgo: PubKeyAlgoRSASignOnly,
 		Hash:       crypto.SHA256,
-	***REMOVED***
+	}
 	msg := []byte("Hello World!")
 
 	h, err := populateHash(sig.Hash, msg)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if err := sig.Sign(h, priv, nil); err != nil ***REMOVED***
+	}
+	if err := sig.Sign(h, priv, nil); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if h, err = populateHash(sig.Hash, msg); err != nil ***REMOVED***
+	if h, err = populateHash(sig.Hash, msg); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if err := priv.VerifySignature(h, sig); err != nil ***REMOVED***
+	}
+	if err := priv.VerifySignature(h, sig); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type ecdsaSigner struct ***REMOVED***
+type ecdsaSigner struct {
 	priv *ecdsa.PrivateKey
-***REMOVED***
+}
 
-func (s *ecdsaSigner) Public() crypto.PublicKey ***REMOVED***
+func (s *ecdsaSigner) Public() crypto.PublicKey {
 	return s.priv.PublicKey
-***REMOVED***
+}
 
-func (s *ecdsaSigner) Sign(rand io.Reader, msg []byte, opts crypto.SignerOpts) ([]byte, error) ***REMOVED***
+func (s *ecdsaSigner) Sign(rand io.Reader, msg []byte, opts crypto.SignerOpts) ([]byte, error) {
 	return s.priv.Sign(rand, msg, opts)
-***REMOVED***
+}
 
-func TestECDSASignerPrivateKey(t *testing.T) ***REMOVED***
+func TestECDSASignerPrivateKey(t *testing.T) {
 	ecdsaPriv, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	priv := NewSignerPrivateKey(time.Now(), &ecdsaSigner***REMOVED***ecdsaPriv***REMOVED***)
+	priv := NewSignerPrivateKey(time.Now(), &ecdsaSigner{ecdsaPriv})
 
-	if priv.PubKeyAlgo != PubKeyAlgoECDSA ***REMOVED***
+	if priv.PubKeyAlgo != PubKeyAlgoECDSA {
 		t.Fatal("NewSignerPrivateKey should have made an ECSDA private key")
-	***REMOVED***
+	}
 
-	sig := &Signature***REMOVED***
+	sig := &Signature{
 		PubKeyAlgo: PubKeyAlgoECDSA,
 		Hash:       crypto.SHA256,
-	***REMOVED***
+	}
 	msg := []byte("Hello World!")
 
 	h, err := populateHash(sig.Hash, msg)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if err := sig.Sign(h, priv, nil); err != nil ***REMOVED***
+	}
+	if err := sig.Sign(h, priv, nil); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if h, err = populateHash(sig.Hash, msg); err != nil ***REMOVED***
+	if h, err = populateHash(sig.Hash, msg); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if err := priv.VerifySignature(h, sig); err != nil ***REMOVED***
+	}
+	if err := priv.VerifySignature(h, sig); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestIssue11505(t *testing.T) ***REMOVED***
+func TestIssue11505(t *testing.T) {
 	// parsing a rsa private key with p or q == 1 used to panic due to a divide by zero
 	_, _ = Read(readerFromHex("9c3004303030300100000011303030000000000000010130303030303030303030303030303030303030303030303030303030303030303030303030303030303030"))
-***REMOVED***
+}
 
 // Generated with `gpg --export-secret-keys "Test Key 2"`
 const privKeyRSAHex = "9501fe044cc349a8010400b70ca0010e98c090008d45d1ee8f9113bd5861fd57b88bacb7c68658747663f1e1a3b5a98f32fda6472373c024b97359cd2efc88ff60f77751adfbf6af5e615e6a1408cfad8bf0cea30b0d5f53aa27ad59089ba9b15b7ebc2777a25d7b436144027e3bcd203909f147d0e332b240cf63d3395f5dfe0df0a6c04e8655af7eacdf0011010001fe0303024a252e7d475fd445607de39a265472aa74a9320ba2dac395faa687e9e0336aeb7e9a7397e511b5afd9dc84557c80ac0f3d4d7bfec5ae16f20d41c8c84a04552a33870b930420e230e179564f6d19bb153145e76c33ae993886c388832b0fa042ddda7f133924f3854481533e0ede31d51278c0519b29abc3bf53da673e13e3e1214b52413d179d7f66deee35cac8eacb060f78379d70ef4af8607e68131ff529439668fc39c9ce6dfef8a5ac234d234802cbfb749a26107db26406213ae5c06d4673253a3cbee1fcbae58d6ab77e38d6e2c0e7c6317c48e054edadb5a40d0d48acb44643d998139a8a66bb820be1f3f80185bc777d14b5954b60effe2448a036d565c6bc0b915fcea518acdd20ab07bc1529f561c58cd044f723109b93f6fd99f876ff891d64306b5d08f48bab59f38695e9109c4dec34013ba3153488ce070268381ba923ee1eb77125b36afcb4347ec3478c8f2735b06ef17351d872e577fa95d0c397c88c71b59629a36aec"

@@ -103,31 +103,31 @@ const (
 	formatMax
 )
 
-func (f Format) has(f2 Format) bool   ***REMOVED*** return f&f2 != 0 ***REMOVED***
-func (f *Format) mayBe(f2 Format)     ***REMOVED*** *f |= f2 ***REMOVED***
-func (f *Format) mayOnlyBe(f2 Format) ***REMOVED*** *f &= f2 ***REMOVED***
-func (f *Format) mustNotBe(f2 Format) ***REMOVED*** *f &^= f2 ***REMOVED***
+func (f Format) has(f2 Format) bool   { return f&f2 != 0 }
+func (f *Format) mayBe(f2 Format)     { *f |= f2 }
+func (f *Format) mayOnlyBe(f2 Format) { *f &= f2 }
+func (f *Format) mustNotBe(f2 Format) { *f &^= f2 }
 
-var formatNames = map[Format]string***REMOVED***
+var formatNames = map[Format]string{
 	formatV7: "V7", FormatUSTAR: "USTAR", FormatPAX: "PAX", FormatGNU: "GNU", formatSTAR: "STAR",
-***REMOVED***
+}
 
-func (f Format) String() string ***REMOVED***
+func (f Format) String() string {
 	var ss []string
-	for f2 := Format(1); f2 < formatMax; f2 <<= 1 ***REMOVED***
-		if f.has(f2) ***REMOVED***
+	for f2 := Format(1); f2 < formatMax; f2 <<= 1 {
+		if f.has(f2) {
 			ss = append(ss, formatNames[f2])
-		***REMOVED***
-	***REMOVED***
-	switch len(ss) ***REMOVED***
+		}
+	}
+	switch len(ss) {
 	case 0:
 		return "<unknown>"
 	case 1:
 		return ss[0]
 	default:
 		return "(" + strings.Join(ss, " | ") + ")"
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Magics used to identify various formats.
 const (
@@ -145,38 +145,38 @@ const (
 
 // blockPadding computes the number of bytes needed to pad offset up to the
 // nearest block edge where 0 <= n < blockSize.
-func blockPadding(offset int64) (n int64) ***REMOVED***
+func blockPadding(offset int64) (n int64) {
 	return -offset & (blockSize - 1)
-***REMOVED***
+}
 
 var zeroBlock block
 
 type block [blockSize]byte
 
 // Convert block to any number of formats.
-func (b *block) V7() *headerV7       ***REMOVED*** return (*headerV7)(b) ***REMOVED***
-func (b *block) GNU() *headerGNU     ***REMOVED*** return (*headerGNU)(b) ***REMOVED***
-func (b *block) STAR() *headerSTAR   ***REMOVED*** return (*headerSTAR)(b) ***REMOVED***
-func (b *block) USTAR() *headerUSTAR ***REMOVED*** return (*headerUSTAR)(b) ***REMOVED***
-func (b *block) Sparse() sparseArray ***REMOVED*** return (sparseArray)(b[:]) ***REMOVED***
+func (b *block) V7() *headerV7       { return (*headerV7)(b) }
+func (b *block) GNU() *headerGNU     { return (*headerGNU)(b) }
+func (b *block) STAR() *headerSTAR   { return (*headerSTAR)(b) }
+func (b *block) USTAR() *headerUSTAR { return (*headerUSTAR)(b) }
+func (b *block) Sparse() sparseArray { return (sparseArray)(b[:]) }
 
 // GetFormat checks that the block is a valid tar header based on the checksum.
 // It then attempts to guess the specific format based on magic values.
 // If the checksum fails, then FormatUnknown is returned.
-func (b *block) GetFormat() Format ***REMOVED***
+func (b *block) GetFormat() Format {
 	// Verify checksum.
 	var p parser
 	value := p.parseOctal(b.V7().Chksum())
 	chksum1, chksum2 := b.ComputeChecksum()
-	if p.err != nil || (value != chksum1 && value != chksum2) ***REMOVED***
+	if p.err != nil || (value != chksum1 && value != chksum2) {
 		return FormatUnknown
-	***REMOVED***
+	}
 
 	// Guess the magic values.
 	magic := string(b.USTAR().Magic())
 	version := string(b.USTAR().Version())
 	trailer := string(b.STAR().Trailer())
-	switch ***REMOVED***
+	switch {
 	case magic == magicUSTAR && trailer == trailerSTAR:
 		return formatSTAR
 	case magic == magicUSTAR:
@@ -185,14 +185,14 @@ func (b *block) GetFormat() Format ***REMOVED***
 		return FormatGNU
 	default:
 		return formatV7
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // SetFormat writes the magic values necessary for specified format
 // and then updates the checksum accordingly.
-func (b *block) SetFormat(format Format) ***REMOVED***
+func (b *block) SetFormat(format Format) {
 	// Set the magic values.
-	switch ***REMOVED***
+	switch {
 	case format.has(formatV7):
 		// Do nothing.
 	case format.has(FormatGNU):
@@ -207,7 +207,7 @@ func (b *block) SetFormat(format Format) ***REMOVED***
 		copy(b.USTAR().Version(), versionUSTAR)
 	default:
 		panic("invalid format")
-	***REMOVED***
+	}
 
 	// Update checksum.
 	// This field is special in that it is terminated by a NULL then space.
@@ -216,86 +216,86 @@ func (b *block) SetFormat(format Format) ***REMOVED***
 	chksum, _ := b.ComputeChecksum() // Possible values are 256..128776
 	f.formatOctal(field[:7], chksum) // Never fails since 128776 < 262143
 	field[7] = ' '
-***REMOVED***
+}
 
 // ComputeChecksum computes the checksum for the header block.
 // POSIX specifies a sum of the unsigned byte values, but the Sun tar used
 // signed byte values.
 // We compute and return both.
-func (b *block) ComputeChecksum() (unsigned, signed int64) ***REMOVED***
-	for i, c := range b ***REMOVED***
-		if 148 <= i && i < 156 ***REMOVED***
+func (b *block) ComputeChecksum() (unsigned, signed int64) {
+	for i, c := range b {
+		if 148 <= i && i < 156 {
 			c = ' ' // Treat the checksum field itself as all spaces.
-		***REMOVED***
+		}
 		unsigned += int64(uint8(c))
 		signed += int64(int8(c))
-	***REMOVED***
+	}
 	return unsigned, signed
-***REMOVED***
+}
 
 // Reset clears the block with all zeros.
-func (b *block) Reset() ***REMOVED***
-	*b = block***REMOVED******REMOVED***
-***REMOVED***
+func (b *block) Reset() {
+	*b = block{}
+}
 
 type headerV7 [blockSize]byte
 
-func (h *headerV7) Name() []byte     ***REMOVED*** return h[000:][:100] ***REMOVED***
-func (h *headerV7) Mode() []byte     ***REMOVED*** return h[100:][:8] ***REMOVED***
-func (h *headerV7) UID() []byte      ***REMOVED*** return h[108:][:8] ***REMOVED***
-func (h *headerV7) GID() []byte      ***REMOVED*** return h[116:][:8] ***REMOVED***
-func (h *headerV7) Size() []byte     ***REMOVED*** return h[124:][:12] ***REMOVED***
-func (h *headerV7) ModTime() []byte  ***REMOVED*** return h[136:][:12] ***REMOVED***
-func (h *headerV7) Chksum() []byte   ***REMOVED*** return h[148:][:8] ***REMOVED***
-func (h *headerV7) TypeFlag() []byte ***REMOVED*** return h[156:][:1] ***REMOVED***
-func (h *headerV7) LinkName() []byte ***REMOVED*** return h[157:][:100] ***REMOVED***
+func (h *headerV7) Name() []byte     { return h[000:][:100] }
+func (h *headerV7) Mode() []byte     { return h[100:][:8] }
+func (h *headerV7) UID() []byte      { return h[108:][:8] }
+func (h *headerV7) GID() []byte      { return h[116:][:8] }
+func (h *headerV7) Size() []byte     { return h[124:][:12] }
+func (h *headerV7) ModTime() []byte  { return h[136:][:12] }
+func (h *headerV7) Chksum() []byte   { return h[148:][:8] }
+func (h *headerV7) TypeFlag() []byte { return h[156:][:1] }
+func (h *headerV7) LinkName() []byte { return h[157:][:100] }
 
 type headerGNU [blockSize]byte
 
-func (h *headerGNU) V7() *headerV7       ***REMOVED*** return (*headerV7)(h) ***REMOVED***
-func (h *headerGNU) Magic() []byte       ***REMOVED*** return h[257:][:6] ***REMOVED***
-func (h *headerGNU) Version() []byte     ***REMOVED*** return h[263:][:2] ***REMOVED***
-func (h *headerGNU) UserName() []byte    ***REMOVED*** return h[265:][:32] ***REMOVED***
-func (h *headerGNU) GroupName() []byte   ***REMOVED*** return h[297:][:32] ***REMOVED***
-func (h *headerGNU) DevMajor() []byte    ***REMOVED*** return h[329:][:8] ***REMOVED***
-func (h *headerGNU) DevMinor() []byte    ***REMOVED*** return h[337:][:8] ***REMOVED***
-func (h *headerGNU) AccessTime() []byte  ***REMOVED*** return h[345:][:12] ***REMOVED***
-func (h *headerGNU) ChangeTime() []byte  ***REMOVED*** return h[357:][:12] ***REMOVED***
-func (h *headerGNU) Sparse() sparseArray ***REMOVED*** return (sparseArray)(h[386:][:24*4+1]) ***REMOVED***
-func (h *headerGNU) RealSize() []byte    ***REMOVED*** return h[483:][:12] ***REMOVED***
+func (h *headerGNU) V7() *headerV7       { return (*headerV7)(h) }
+func (h *headerGNU) Magic() []byte       { return h[257:][:6] }
+func (h *headerGNU) Version() []byte     { return h[263:][:2] }
+func (h *headerGNU) UserName() []byte    { return h[265:][:32] }
+func (h *headerGNU) GroupName() []byte   { return h[297:][:32] }
+func (h *headerGNU) DevMajor() []byte    { return h[329:][:8] }
+func (h *headerGNU) DevMinor() []byte    { return h[337:][:8] }
+func (h *headerGNU) AccessTime() []byte  { return h[345:][:12] }
+func (h *headerGNU) ChangeTime() []byte  { return h[357:][:12] }
+func (h *headerGNU) Sparse() sparseArray { return (sparseArray)(h[386:][:24*4+1]) }
+func (h *headerGNU) RealSize() []byte    { return h[483:][:12] }
 
 type headerSTAR [blockSize]byte
 
-func (h *headerSTAR) V7() *headerV7      ***REMOVED*** return (*headerV7)(h) ***REMOVED***
-func (h *headerSTAR) Magic() []byte      ***REMOVED*** return h[257:][:6] ***REMOVED***
-func (h *headerSTAR) Version() []byte    ***REMOVED*** return h[263:][:2] ***REMOVED***
-func (h *headerSTAR) UserName() []byte   ***REMOVED*** return h[265:][:32] ***REMOVED***
-func (h *headerSTAR) GroupName() []byte  ***REMOVED*** return h[297:][:32] ***REMOVED***
-func (h *headerSTAR) DevMajor() []byte   ***REMOVED*** return h[329:][:8] ***REMOVED***
-func (h *headerSTAR) DevMinor() []byte   ***REMOVED*** return h[337:][:8] ***REMOVED***
-func (h *headerSTAR) Prefix() []byte     ***REMOVED*** return h[345:][:131] ***REMOVED***
-func (h *headerSTAR) AccessTime() []byte ***REMOVED*** return h[476:][:12] ***REMOVED***
-func (h *headerSTAR) ChangeTime() []byte ***REMOVED*** return h[488:][:12] ***REMOVED***
-func (h *headerSTAR) Trailer() []byte    ***REMOVED*** return h[508:][:4] ***REMOVED***
+func (h *headerSTAR) V7() *headerV7      { return (*headerV7)(h) }
+func (h *headerSTAR) Magic() []byte      { return h[257:][:6] }
+func (h *headerSTAR) Version() []byte    { return h[263:][:2] }
+func (h *headerSTAR) UserName() []byte   { return h[265:][:32] }
+func (h *headerSTAR) GroupName() []byte  { return h[297:][:32] }
+func (h *headerSTAR) DevMajor() []byte   { return h[329:][:8] }
+func (h *headerSTAR) DevMinor() []byte   { return h[337:][:8] }
+func (h *headerSTAR) Prefix() []byte     { return h[345:][:131] }
+func (h *headerSTAR) AccessTime() []byte { return h[476:][:12] }
+func (h *headerSTAR) ChangeTime() []byte { return h[488:][:12] }
+func (h *headerSTAR) Trailer() []byte    { return h[508:][:4] }
 
 type headerUSTAR [blockSize]byte
 
-func (h *headerUSTAR) V7() *headerV7     ***REMOVED*** return (*headerV7)(h) ***REMOVED***
-func (h *headerUSTAR) Magic() []byte     ***REMOVED*** return h[257:][:6] ***REMOVED***
-func (h *headerUSTAR) Version() []byte   ***REMOVED*** return h[263:][:2] ***REMOVED***
-func (h *headerUSTAR) UserName() []byte  ***REMOVED*** return h[265:][:32] ***REMOVED***
-func (h *headerUSTAR) GroupName() []byte ***REMOVED*** return h[297:][:32] ***REMOVED***
-func (h *headerUSTAR) DevMajor() []byte  ***REMOVED*** return h[329:][:8] ***REMOVED***
-func (h *headerUSTAR) DevMinor() []byte  ***REMOVED*** return h[337:][:8] ***REMOVED***
-func (h *headerUSTAR) Prefix() []byte    ***REMOVED*** return h[345:][:155] ***REMOVED***
+func (h *headerUSTAR) V7() *headerV7     { return (*headerV7)(h) }
+func (h *headerUSTAR) Magic() []byte     { return h[257:][:6] }
+func (h *headerUSTAR) Version() []byte   { return h[263:][:2] }
+func (h *headerUSTAR) UserName() []byte  { return h[265:][:32] }
+func (h *headerUSTAR) GroupName() []byte { return h[297:][:32] }
+func (h *headerUSTAR) DevMajor() []byte  { return h[329:][:8] }
+func (h *headerUSTAR) DevMinor() []byte  { return h[337:][:8] }
+func (h *headerUSTAR) Prefix() []byte    { return h[345:][:155] }
 
 type sparseArray []byte
 
-func (s sparseArray) Entry(i int) sparseElem ***REMOVED*** return (sparseElem)(s[i*24:]) ***REMOVED***
-func (s sparseArray) IsExtended() []byte     ***REMOVED*** return s[24*s.MaxEntries():][:1] ***REMOVED***
-func (s sparseArray) MaxEntries() int        ***REMOVED*** return len(s) / 24 ***REMOVED***
+func (s sparseArray) Entry(i int) sparseElem { return (sparseElem)(s[i*24:]) }
+func (s sparseArray) IsExtended() []byte     { return s[24*s.MaxEntries():][:1] }
+func (s sparseArray) MaxEntries() int        { return len(s) / 24 }
 
 type sparseElem []byte
 
-func (s sparseElem) Offset() []byte ***REMOVED*** return s[00:][:12] ***REMOVED***
-func (s sparseElem) Length() []byte ***REMOVED*** return s[12:][:12] ***REMOVED***
+func (s sparseElem) Offset() []byte { return s[00:][:12] }
+func (s sparseElem) Length() []byte { return s[12:][:12] }

@@ -21,10 +21,10 @@ import (
 
 // ReaderAndCloser implements io.ReadCloser interface by combining
 // reader and closer together.
-type ReaderAndCloser struct ***REMOVED***
+type ReaderAndCloser struct {
 	io.Reader
 	io.Closer
-***REMOVED***
+}
 
 var (
 	ErrShortRead = fmt.Errorf("ioutil: short read")
@@ -33,34 +33,34 @@ var (
 
 // NewExactReadCloser returns a ReadCloser that returns errors if the underlying
 // reader does not read back exactly the requested number of bytes.
-func NewExactReadCloser(rc io.ReadCloser, totalBytes int64) io.ReadCloser ***REMOVED***
-	return &exactReadCloser***REMOVED***rc: rc, totalBytes: totalBytes***REMOVED***
-***REMOVED***
+func NewExactReadCloser(rc io.ReadCloser, totalBytes int64) io.ReadCloser {
+	return &exactReadCloser{rc: rc, totalBytes: totalBytes}
+}
 
-type exactReadCloser struct ***REMOVED***
+type exactReadCloser struct {
 	rc         io.ReadCloser
 	br         int64
 	totalBytes int64
-***REMOVED***
+}
 
-func (e *exactReadCloser) Read(p []byte) (int, error) ***REMOVED***
+func (e *exactReadCloser) Read(p []byte) (int, error) {
 	n, err := e.rc.Read(p)
 	e.br += int64(n)
-	if e.br > e.totalBytes ***REMOVED***
+	if e.br > e.totalBytes {
 		return 0, ErrExpectEOF
-	***REMOVED***
-	if e.br < e.totalBytes && n == 0 ***REMOVED***
+	}
+	if e.br < e.totalBytes && n == 0 {
 		return 0, ErrShortRead
-	***REMOVED***
+	}
 	return n, err
-***REMOVED***
+}
 
-func (e *exactReadCloser) Close() error ***REMOVED***
-	if err := e.rc.Close(); err != nil ***REMOVED***
+func (e *exactReadCloser) Close() error {
+	if err := e.rc.Close(); err != nil {
 		return err
-	***REMOVED***
-	if e.br < e.totalBytes ***REMOVED***
+	}
+	if e.br < e.totalBytes {
 		return ErrShortRead
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

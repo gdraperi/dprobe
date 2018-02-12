@@ -7,7 +7,7 @@ import (
 	"github.com/nlopes/slack"
 )
 
-func main() ***REMOVED***
+func main() {
 	var (
 		apiToken string
 		debug    bool
@@ -18,20 +18,20 @@ func main() ***REMOVED***
 	flag.Parse()
 
 	api := slack.New(apiToken)
-	if debug ***REMOVED***
+	if debug {
 		api.SetDebug(true)
-	***REMOVED***
+	}
 
 	// Get all stars for the usr.
 	params := slack.NewStarsParameters()
 	starredItems, _, err := api.GetStarred(params)
-	if err != nil ***REMOVED***
+	if err != nil {
 		fmt.Printf("Error getting stars: %s\n", err)
 		return
-	***REMOVED***
-	for _, s := range starredItems ***REMOVED***
+	}
+	for _, s := range starredItems {
 		var desc string
-		switch s.Type ***REMOVED***
+		switch s.Type {
 		case slack.TYPE_MESSAGE:
 			desc = s.Message.Text
 		case slack.TYPE_FILE:
@@ -40,7 +40,7 @@ func main() ***REMOVED***
 			desc = s.File.Name + " - " + s.Comment.Comment
 		case slack.TYPE_CHANNEL, slack.TYPE_IM, slack.TYPE_GROUP:
 			desc = s.Channel
-		***REMOVED***
+		}
 		fmt.Printf("Starred %s: %s\n", s.Type, desc)
-	***REMOVED***
-***REMOVED***
+	}
+}

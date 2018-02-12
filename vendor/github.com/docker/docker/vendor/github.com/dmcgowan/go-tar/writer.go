@@ -18,7 +18,7 @@ import (
 // Writer provides sequential writing of a tar archive.
 // Write.WriteHeader begins a new file with the provided Header,
 // and then Writer can be treated as an io.Writer to supply that file's data.
-type Writer struct ***REMOVED***
+type Writer struct {
 	w    io.Writer
 	pad  int64      // Amount of padding to write after current file entry
 	curr fileWriter // Writer for current file entry
@@ -29,47 +29,47 @@ type Writer struct ***REMOVED***
 	// It is only the responsibility of every exported method of Writer to
 	// ensure that this error is sticky.
 	err error
-***REMOVED***
+}
 
 // NewWriter creates a new Writer writing to w.
-func NewWriter(w io.Writer) *Writer ***REMOVED***
-	return &Writer***REMOVED***w: w, curr: &regFileWriter***REMOVED***w, 0***REMOVED******REMOVED***
-***REMOVED***
+func NewWriter(w io.Writer) *Writer {
+	return &Writer{w: w, curr: &regFileWriter{w, 0}}
+}
 
-type fileWriter interface ***REMOVED***
+type fileWriter interface {
 	io.Writer
 	fileState
 
 	ReadFrom(io.Reader) (int64, error)
-***REMOVED***
+}
 
 // Flush finishes writing the current file's block padding.
 // The current file must be fully written before Flush can be called.
 //
 // Deprecated: This is unnecessary as the next call to WriteHeader or Close
 // will implicitly flush out the file's padding.
-func (tw *Writer) Flush() error ***REMOVED***
-	if tw.err != nil ***REMOVED***
+func (tw *Writer) Flush() error {
+	if tw.err != nil {
 		return tw.err
-	***REMOVED***
-	if nb := tw.curr.LogicalRemaining(); nb > 0 ***REMOVED***
+	}
+	if nb := tw.curr.LogicalRemaining(); nb > 0 {
 		return fmt.Errorf("tar: missed writing %d bytes", nb)
-	***REMOVED***
-	if _, tw.err = tw.w.Write(zeroBlock[:tw.pad]); tw.err != nil ***REMOVED***
+	}
+	if _, tw.err = tw.w.Write(zeroBlock[:tw.pad]); tw.err != nil {
 		return tw.err
-	***REMOVED***
+	}
 	tw.pad = 0
 	return nil
-***REMOVED***
+}
 
 // WriteHeader writes hdr and prepares to accept the file's contents.
 // The Header.Size determines how many bytes can be written for the next file.
 // If the current file is not fully written, then this returns an error.
 // This implicitly flushes any padding necessary before writing the header.
-func (tw *Writer) WriteHeader(hdr *Header) error ***REMOVED***
-	if err := tw.Flush(); err != nil ***REMOVED***
+func (tw *Writer) WriteHeader(hdr *Header) error {
+	if err := tw.Flush(); err != nil {
 		return err
-	***REMOVED***
+	}
 	tw.hdr = *hdr // Shallow copy of Header
 
 	// Round ModTime and ignore AccessTime and ChangeTime unless
@@ -77,14 +77,14 @@ func (tw *Writer) WriteHeader(hdr *Header) error ***REMOVED***
 	// This ensures nominal usage of WriteHeader (without specifying the format)
 	// does not always result in the PAX format being chosen, which
 	// causes a 1KiB increase to every header.
-	if tw.hdr.Format == FormatUnknown ***REMOVED***
+	if tw.hdr.Format == FormatUnknown {
 		tw.hdr.ModTime = tw.hdr.ModTime.Round(time.Second)
-		tw.hdr.AccessTime = time.Time***REMOVED******REMOVED***
-		tw.hdr.ChangeTime = time.Time***REMOVED******REMOVED***
-	***REMOVED***
+		tw.hdr.AccessTime = time.Time{}
+		tw.hdr.ChangeTime = time.Time{}
+	}
 
 	allowedFormats, paxHdrs, err := tw.hdr.allowedFormats()
-	switch ***REMOVED***
+	switch {
 	case allowedFormats.has(FormatUSTAR):
 		tw.err = tw.writeUSTARHeader(&tw.hdr)
 		return tw.err
@@ -96,46 +96,46 @@ func (tw *Writer) WriteHeader(hdr *Header) error ***REMOVED***
 		return tw.err
 	default:
 		return err // Non-fatal error
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (tw *Writer) writeUSTARHeader(hdr *Header) error ***REMOVED***
+func (tw *Writer) writeUSTARHeader(hdr *Header) error {
 	// Check if we can use USTAR prefix/suffix splitting.
 	var namePrefix string
-	if prefix, suffix, ok := splitUSTARPath(hdr.Name); ok ***REMOVED***
+	if prefix, suffix, ok := splitUSTARPath(hdr.Name); ok {
 		namePrefix, hdr.Name = prefix, suffix
-	***REMOVED***
+	}
 
 	// Pack the main header.
 	var f formatter
 	blk := tw.templateV7Plus(hdr, f.formatString, f.formatOctal)
 	f.formatString(blk.USTAR().Prefix(), namePrefix)
 	blk.SetFormat(FormatUSTAR)
-	if f.err != nil ***REMOVED***
+	if f.err != nil {
 		return f.err // Should never happen since header is validated
-	***REMOVED***
+	}
 	return tw.writeRawHeader(blk, hdr.Size, hdr.Typeflag)
-***REMOVED***
+}
 
-func (tw *Writer) writePAXHeader(hdr *Header, paxHdrs map[string]string) error ***REMOVED***
+func (tw *Writer) writePAXHeader(hdr *Header, paxHdrs map[string]string) error {
 	realName, realSize := hdr.Name, hdr.Size
 
 	// Handle sparse files.
 	var spd sparseDatas
 	var spb []byte
-	if len(hdr.SparseHoles) > 0 ***REMOVED***
-		sph := append([]SparseEntry***REMOVED******REMOVED***, hdr.SparseHoles...) // Copy sparse map
+	if len(hdr.SparseHoles) > 0 {
+		sph := append([]SparseEntry{}, hdr.SparseHoles...) // Copy sparse map
 		sph = alignSparseEntries(sph, hdr.Size)
 		spd = invertSparseEntries(sph, hdr.Size)
 
 		// Format the sparse map.
 		hdr.Size = 0 // Replace with encoded size
 		spb = append(strconv.AppendInt(spb, int64(len(spd)), 10), '\n')
-		for _, s := range spd ***REMOVED***
+		for _, s := range spd {
 			hdr.Size += s.Length
 			spb = append(strconv.AppendInt(spb, s.Offset, 10), '\n')
 			spb = append(strconv.AppendInt(spb, s.Length, 10), '\n')
-		***REMOVED***
+		}
 		pad := blockPadding(int64(len(spb)))
 		spb = append(spb, zeroBlock[:pad]...)
 		hdr.Size += int64(len(spb)) // Accounts for encoded sparse map
@@ -149,141 +149,141 @@ func (tw *Writer) writePAXHeader(hdr *Header, paxHdrs map[string]string) error *
 		paxHdrs[paxGNUSparseRealSize] = strconv.FormatInt(realSize, 10)
 		paxHdrs[paxSize] = strconv.FormatInt(hdr.Size, 10)
 		delete(paxHdrs, paxPath) // Recorded by paxGNUSparseName
-	***REMOVED***
+	}
 
 	// Write PAX records to the output.
 	isGlobal := hdr.Typeflag == TypeXGlobalHeader
-	if len(paxHdrs) > 0 || isGlobal ***REMOVED***
+	if len(paxHdrs) > 0 || isGlobal {
 		// Sort keys for deterministic ordering.
 		var keys []string
-		for k := range paxHdrs ***REMOVED***
+		for k := range paxHdrs {
 			keys = append(keys, k)
-		***REMOVED***
+		}
 		sort.Strings(keys)
 
 		// Write each record to a buffer.
 		var buf bytes.Buffer
-		for _, k := range keys ***REMOVED***
+		for _, k := range keys {
 			rec, err := formatPAXRecord(k, paxHdrs[k])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
+			}
 			buf.WriteString(rec)
-		***REMOVED***
+		}
 
 		// Write the extended header file.
 		var name string
 		var flag byte
-		if isGlobal ***REMOVED***
+		if isGlobal {
 			name = "GlobalHead.0.0"
 			flag = TypeXGlobalHeader
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dir, file := path.Split(realName)
 			name = path.Join(dir, "PaxHeaders.0", file)
 			flag = TypeXHeader
-		***REMOVED***
+		}
 		data := buf.String()
-		if err := tw.writeRawFile(name, data, flag, FormatPAX); err != nil || isGlobal ***REMOVED***
+		if err := tw.writeRawFile(name, data, flag, FormatPAX); err != nil || isGlobal {
 			return err // Global headers return here
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Pack the main header.
 	var f formatter // Ignore errors since they are expected
-	fmtStr := func(b []byte, s string) ***REMOVED*** f.formatString(b, toASCII(s)) ***REMOVED***
+	fmtStr := func(b []byte, s string) { f.formatString(b, toASCII(s)) }
 	blk := tw.templateV7Plus(hdr, fmtStr, f.formatOctal)
 	blk.SetFormat(FormatPAX)
-	if err := tw.writeRawHeader(blk, hdr.Size, hdr.Typeflag); err != nil ***REMOVED***
+	if err := tw.writeRawHeader(blk, hdr.Size, hdr.Typeflag); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	// Write the sparse map and setup the sparse writer if necessary.
-	if len(spd) > 0 ***REMOVED***
+	if len(spd) > 0 {
 		// Use tw.curr since the sparse map is accounted for in hdr.Size.
-		if _, err := tw.curr.Write(spb); err != nil ***REMOVED***
+		if _, err := tw.curr.Write(spb); err != nil {
 			return err
-		***REMOVED***
-		tw.curr = &sparseFileWriter***REMOVED***tw.curr, spd, 0***REMOVED***
-	***REMOVED***
+		}
+		tw.curr = &sparseFileWriter{tw.curr, spd, 0}
+	}
 	return nil
-***REMOVED***
+}
 
-func (tw *Writer) writeGNUHeader(hdr *Header) error ***REMOVED***
+func (tw *Writer) writeGNUHeader(hdr *Header) error {
 	// Use long-link files if Name or Linkname exceeds the field size.
 	const longName = "././@LongLink"
-	if len(hdr.Name) > nameSize ***REMOVED***
+	if len(hdr.Name) > nameSize {
 		data := hdr.Name + "\x00"
-		if err := tw.writeRawFile(longName, data, TypeGNULongName, FormatGNU); err != nil ***REMOVED***
+		if err := tw.writeRawFile(longName, data, TypeGNULongName, FormatGNU); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
-	if len(hdr.Linkname) > nameSize ***REMOVED***
+		}
+	}
+	if len(hdr.Linkname) > nameSize {
 		data := hdr.Linkname + "\x00"
-		if err := tw.writeRawFile(longName, data, TypeGNULongLink, FormatGNU); err != nil ***REMOVED***
+		if err := tw.writeRawFile(longName, data, TypeGNULongLink, FormatGNU); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Pack the main header.
 	var f formatter // Ignore errors since they are expected
 	var spd sparseDatas
 	var spb []byte
 	blk := tw.templateV7Plus(hdr, f.formatString, f.formatNumeric)
-	if !hdr.AccessTime.IsZero() ***REMOVED***
+	if !hdr.AccessTime.IsZero() {
 		f.formatNumeric(blk.GNU().AccessTime(), hdr.AccessTime.Unix())
-	***REMOVED***
-	if !hdr.ChangeTime.IsZero() ***REMOVED***
+	}
+	if !hdr.ChangeTime.IsZero() {
 		f.formatNumeric(blk.GNU().ChangeTime(), hdr.ChangeTime.Unix())
-	***REMOVED***
-	if hdr.Typeflag == TypeGNUSparse ***REMOVED***
-		sph := append([]SparseEntry***REMOVED******REMOVED***, hdr.SparseHoles...) // Copy sparse map
+	}
+	if hdr.Typeflag == TypeGNUSparse {
+		sph := append([]SparseEntry{}, hdr.SparseHoles...) // Copy sparse map
 		sph = alignSparseEntries(sph, hdr.Size)
 		spd = invertSparseEntries(sph, hdr.Size)
 
 		// Format the sparse map.
-		formatSPD := func(sp sparseDatas, sa sparseArray) sparseDatas ***REMOVED***
-			for i := 0; len(sp) > 0 && i < sa.MaxEntries(); i++ ***REMOVED***
+		formatSPD := func(sp sparseDatas, sa sparseArray) sparseDatas {
+			for i := 0; len(sp) > 0 && i < sa.MaxEntries(); i++ {
 				f.formatNumeric(sa.Entry(i).Offset(), sp[0].Offset)
 				f.formatNumeric(sa.Entry(i).Length(), sp[0].Length)
 				sp = sp[1:]
-			***REMOVED***
-			if len(sp) > 0 ***REMOVED***
+			}
+			if len(sp) > 0 {
 				sa.IsExtended()[0] = 1
-			***REMOVED***
+			}
 			return sp
-		***REMOVED***
+		}
 		sp2 := formatSPD(spd, blk.GNU().Sparse())
-		for len(sp2) > 0 ***REMOVED***
+		for len(sp2) > 0 {
 			var spHdr block
 			sp2 = formatSPD(sp2, spHdr.Sparse())
 			spb = append(spb, spHdr[:]...)
-		***REMOVED***
+		}
 
 		// Update size fields in the header block.
 		realSize := hdr.Size
 		hdr.Size = 0 // Encoded size; does not account for encoded sparse map
-		for _, s := range spd ***REMOVED***
+		for _, s := range spd {
 			hdr.Size += s.Length
-		***REMOVED***
+		}
 		copy(blk.V7().Size(), zeroBlock[:]) // Reset field
 		f.formatNumeric(blk.V7().Size(), hdr.Size)
 		f.formatNumeric(blk.GNU().RealSize(), realSize)
-	***REMOVED***
+	}
 	blk.SetFormat(FormatGNU)
-	if err := tw.writeRawHeader(blk, hdr.Size, hdr.Typeflag); err != nil ***REMOVED***
+	if err := tw.writeRawHeader(blk, hdr.Size, hdr.Typeflag); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	// Write the extended sparse map and setup the sparse writer if necessary.
-	if len(spd) > 0 ***REMOVED***
+	if len(spd) > 0 {
 		// Use tw.w since the sparse map is not accounted for in hdr.Size.
-		if _, err := tw.w.Write(spb); err != nil ***REMOVED***
+		if _, err := tw.w.Write(spb); err != nil {
 			return err
-		***REMOVED***
-		tw.curr = &sparseFileWriter***REMOVED***tw.curr, spd, 0***REMOVED***
-	***REMOVED***
+		}
+		tw.curr = &sparseFileWriter{tw.curr, spd, 0}
+	}
 	return nil
-***REMOVED***
+}
 
 type (
 	stringFormatter func([]byte, string)
@@ -296,13 +296,13 @@ type (
 //
 // The block returned is only valid until the next call to
 // templateV7Plus or writeRawFile.
-func (tw *Writer) templateV7Plus(hdr *Header, fmtStr stringFormatter, fmtNum numberFormatter) *block ***REMOVED***
+func (tw *Writer) templateV7Plus(hdr *Header, fmtStr stringFormatter, fmtNum numberFormatter) *block {
 	tw.blk.Reset()
 
 	modTime := hdr.ModTime
-	if modTime.IsZero() ***REMOVED***
+	if modTime.IsZero() {
 		modTime = time.Unix(0, 0)
-	***REMOVED***
+	}
 
 	v7 := tw.blk.V7()
 	v7.TypeFlag()[0] = hdr.Typeflag
@@ -321,19 +321,19 @@ func (tw *Writer) templateV7Plus(hdr *Header, fmtStr stringFormatter, fmtNum num
 	fmtNum(ustar.DevMinor(), hdr.Devminor)
 
 	return &tw.blk
-***REMOVED***
+}
 
 // writeRawFile writes a minimal file with the given name and flag type.
 // It uses format to encode the header format and will write data as the body.
 // It uses default values for all of the other fields (as BSD and GNU tar does).
-func (tw *Writer) writeRawFile(name, data string, flag byte, format Format) error ***REMOVED***
+func (tw *Writer) writeRawFile(name, data string, flag byte, format Format) error {
 	tw.blk.Reset()
 
 	// Best effort for the filename.
 	name = toASCII(name)
-	if len(name) > nameSize ***REMOVED***
+	if len(name) > nameSize {
 		name = name[:nameSize]
-	***REMOVED***
+	}
 	name = strings.TrimRight(name, "/")
 
 	var f formatter
@@ -346,56 +346,56 @@ func (tw *Writer) writeRawFile(name, data string, flag byte, format Format) erro
 	f.formatOctal(v7.Size(), int64(len(data))) // Must be < 8GiB
 	f.formatOctal(v7.ModTime(), 0)
 	tw.blk.SetFormat(format)
-	if f.err != nil ***REMOVED***
+	if f.err != nil {
 		return f.err // Only occurs if size condition is violated
-	***REMOVED***
+	}
 
 	// Write the header and data.
-	if err := tw.writeRawHeader(&tw.blk, int64(len(data)), flag); err != nil ***REMOVED***
+	if err := tw.writeRawHeader(&tw.blk, int64(len(data)), flag); err != nil {
 		return err
-	***REMOVED***
+	}
 	_, err := io.WriteString(tw, data)
 	return err
-***REMOVED***
+}
 
 // writeRawHeader writes the value of blk, regardless of its value.
 // It sets up the Writer such that it can accept a file of the given size.
 // If the flag is a special header-only flag, then the size is treated as zero.
-func (tw *Writer) writeRawHeader(blk *block, size int64, flag byte) error ***REMOVED***
-	if err := tw.Flush(); err != nil ***REMOVED***
+func (tw *Writer) writeRawHeader(blk *block, size int64, flag byte) error {
+	if err := tw.Flush(); err != nil {
 		return err
-	***REMOVED***
-	if _, err := tw.w.Write(blk[:]); err != nil ***REMOVED***
+	}
+	if _, err := tw.w.Write(blk[:]); err != nil {
 		return err
-	***REMOVED***
-	if isHeaderOnlyType(flag) ***REMOVED***
+	}
+	if isHeaderOnlyType(flag) {
 		size = 0
-	***REMOVED***
-	tw.curr = &regFileWriter***REMOVED***tw.w, size***REMOVED***
+	}
+	tw.curr = &regFileWriter{tw.w, size}
 	tw.pad = blockPadding(size)
 	return nil
-***REMOVED***
+}
 
 // splitUSTARPath splits a path according to USTAR prefix and suffix rules.
 // If the path is not splittable, then it will return ("", "", false).
-func splitUSTARPath(name string) (prefix, suffix string, ok bool) ***REMOVED***
+func splitUSTARPath(name string) (prefix, suffix string, ok bool) {
 	length := len(name)
-	if length <= nameSize || !isASCII(name) ***REMOVED***
+	if length <= nameSize || !isASCII(name) {
 		return "", "", false
-	***REMOVED*** else if length > prefixSize+1 ***REMOVED***
+	} else if length > prefixSize+1 {
 		length = prefixSize + 1
-	***REMOVED*** else if name[length-1] == '/' ***REMOVED***
+	} else if name[length-1] == '/' {
 		length--
-	***REMOVED***
+	}
 
 	i := strings.LastIndex(name[:length], "/")
 	nlen := len(name) - i - 1 // nlen is length of suffix
 	plen := i                 // plen is length of prefix
-	if i <= 0 || nlen > nameSize || nlen == 0 || plen > prefixSize ***REMOVED***
+	if i <= 0 || nlen > nameSize || nlen == 0 || plen > prefixSize {
 		return "", "", false
-	***REMOVED***
+	}
 	return name[:i], name[i+1:], true
-***REMOVED***
+}
 
 // Write writes to the current file in the tar archive.
 // Write returns the error ErrWriteTooLong if more than
@@ -407,16 +407,16 @@ func splitUSTARPath(name string) (prefix, suffix string, ok bool) ***REMOVED***
 // Calling Write on special types like TypeLink, TypeSymlink, TypeChar,
 // TypeBlock, TypeDir, and TypeFifo returns (0, ErrWriteTooLong) regardless
 // of what the Header.Size claims.
-func (tw *Writer) Write(b []byte) (int, error) ***REMOVED***
-	if tw.err != nil ***REMOVED***
+func (tw *Writer) Write(b []byte) (int, error) {
+	if tw.err != nil {
 		return 0, tw.err
-	***REMOVED***
+	}
 	n, err := tw.curr.Write(b)
-	if err != nil && err != ErrWriteTooLong ***REMOVED***
+	if err != nil && err != ErrWriteTooLong {
 		tw.err = err
-	***REMOVED***
+	}
 	return n, err
-***REMOVED***
+}
 
 // ReadFrom populates the content of the current file by reading from r.
 // The bytes read must match the number of remaining bytes in the current file.
@@ -425,109 +425,109 @@ func (tw *Writer) Write(b []byte) (int, error) ***REMOVED***
 // then ReadFrom uses Seek to skip past holes defined in Header.SparseHoles,
 // assuming that skipped regions are all NULs.
 // This always reads the last byte to ensure r is the right size.
-func (tw *Writer) ReadFrom(r io.Reader) (int64, error) ***REMOVED***
-	if tw.err != nil ***REMOVED***
+func (tw *Writer) ReadFrom(r io.Reader) (int64, error) {
+	if tw.err != nil {
 		return 0, tw.err
-	***REMOVED***
+	}
 	n, err := tw.curr.ReadFrom(r)
-	if err != nil && err != ErrWriteTooLong ***REMOVED***
+	if err != nil && err != ErrWriteTooLong {
 		tw.err = err
-	***REMOVED***
+	}
 	return n, err
-***REMOVED***
+}
 
 // Close closes the tar archive by flushing the padding, and writing the footer.
 // If the current file (from a prior call to WriteHeader) is not fully written,
 // then this returns an error.
-func (tw *Writer) Close() error ***REMOVED***
-	if tw.err == ErrWriteAfterClose ***REMOVED***
+func (tw *Writer) Close() error {
+	if tw.err == ErrWriteAfterClose {
 		return nil
-	***REMOVED***
-	if tw.err != nil ***REMOVED***
+	}
+	if tw.err != nil {
 		return tw.err
-	***REMOVED***
+	}
 
 	// Trailer: two zero blocks.
 	err := tw.Flush()
-	for i := 0; i < 2 && err == nil; i++ ***REMOVED***
+	for i := 0; i < 2 && err == nil; i++ {
 		_, err = tw.w.Write(zeroBlock[:])
-	***REMOVED***
+	}
 
 	// Ensure all future actions are invalid.
 	tw.err = ErrWriteAfterClose
 	return err // Report IO errors
-***REMOVED***
+}
 
 // regFileWriter is a fileWriter for writing data to a regular file entry.
-type regFileWriter struct ***REMOVED***
+type regFileWriter struct {
 	w  io.Writer // Underlying Writer
 	nb int64     // Number of remaining bytes to write
-***REMOVED***
+}
 
-func (fw *regFileWriter) Write(b []byte) (n int, err error) ***REMOVED***
+func (fw *regFileWriter) Write(b []byte) (n int, err error) {
 	overwrite := int64(len(b)) > fw.nb
-	if overwrite ***REMOVED***
+	if overwrite {
 		b = b[:fw.nb]
-	***REMOVED***
-	if len(b) > 0 ***REMOVED***
+	}
+	if len(b) > 0 {
 		n, err = fw.w.Write(b)
 		fw.nb -= int64(n)
-	***REMOVED***
-	switch ***REMOVED***
+	}
+	switch {
 	case err != nil:
 		return n, err
 	case overwrite:
 		return n, ErrWriteTooLong
 	default:
 		return n, nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (fw *regFileWriter) ReadFrom(r io.Reader) (int64, error) ***REMOVED***
-	return io.Copy(struct***REMOVED*** io.Writer ***REMOVED******REMOVED***fw***REMOVED***, r)
-***REMOVED***
+func (fw *regFileWriter) ReadFrom(r io.Reader) (int64, error) {
+	return io.Copy(struct{ io.Writer }{fw}, r)
+}
 
-func (fw regFileWriter) LogicalRemaining() int64 ***REMOVED***
+func (fw regFileWriter) LogicalRemaining() int64 {
 	return fw.nb
-***REMOVED***
-func (fw regFileWriter) PhysicalRemaining() int64 ***REMOVED***
+}
+func (fw regFileWriter) PhysicalRemaining() int64 {
 	return fw.nb
-***REMOVED***
+}
 
 // sparseFileWriter is a fileWriter for writing data to a sparse file entry.
-type sparseFileWriter struct ***REMOVED***
+type sparseFileWriter struct {
 	fw  fileWriter  // Underlying fileWriter
 	sp  sparseDatas // Normalized list of data fragments
 	pos int64       // Current position in sparse file
-***REMOVED***
+}
 
-func (sw *sparseFileWriter) Write(b []byte) (n int, err error) ***REMOVED***
+func (sw *sparseFileWriter) Write(b []byte) (n int, err error) {
 	overwrite := int64(len(b)) > sw.LogicalRemaining()
-	if overwrite ***REMOVED***
+	if overwrite {
 		b = b[:sw.LogicalRemaining()]
-	***REMOVED***
+	}
 
 	b0 := b
 	endPos := sw.pos + int64(len(b))
-	for endPos > sw.pos && err == nil ***REMOVED***
+	for endPos > sw.pos && err == nil {
 		var nf int // Bytes written in fragment
 		dataStart, dataEnd := sw.sp[0].Offset, sw.sp[0].endOffset()
-		if sw.pos < dataStart ***REMOVED*** // In a hole fragment
+		if sw.pos < dataStart { // In a hole fragment
 			bf := b[:min(int64(len(b)), dataStart-sw.pos)]
-			nf, err = zeroWriter***REMOVED******REMOVED***.Write(bf)
-		***REMOVED*** else ***REMOVED*** // In a data fragment
+			nf, err = zeroWriter{}.Write(bf)
+		} else { // In a data fragment
 			bf := b[:min(int64(len(b)), dataEnd-sw.pos)]
 			nf, err = sw.fw.Write(bf)
-		***REMOVED***
+		}
 		b = b[nf:]
 		sw.pos += int64(nf)
-		if sw.pos >= dataEnd && len(sw.sp) > 1 ***REMOVED***
+		if sw.pos >= dataEnd && len(sw.sp) > 1 {
 			sw.sp = sw.sp[1:] // Ensure last fragment always remains
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	n = len(b0) - len(b)
-	switch ***REMOVED***
+	switch {
 	case err == ErrWriteTooLong:
 		return n, errMissData // Not possible; implies bug in validation logic
 	case err != nil:
@@ -538,51 +538,51 @@ func (sw *sparseFileWriter) Write(b []byte) (n int, err error) ***REMOVED***
 		return n, ErrWriteTooLong
 	default:
 		return n, nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (sw *sparseFileWriter) ReadFrom(r io.Reader) (n int64, err error) ***REMOVED***
+func (sw *sparseFileWriter) ReadFrom(r io.Reader) (n int64, err error) {
 	rs, ok := r.(io.ReadSeeker)
-	if ok ***REMOVED***
-		if _, err := rs.Seek(0, io.SeekCurrent); err != nil ***REMOVED***
+	if ok {
+		if _, err := rs.Seek(0, io.SeekCurrent); err != nil {
 			ok = false // Not all io.Seeker can really seek
-		***REMOVED***
-	***REMOVED***
-	if !ok ***REMOVED***
-		return io.Copy(struct***REMOVED*** io.Writer ***REMOVED******REMOVED***sw***REMOVED***, r)
-	***REMOVED***
+		}
+	}
+	if !ok {
+		return io.Copy(struct{ io.Writer }{sw}, r)
+	}
 
 	var readLastByte bool
 	pos0 := sw.pos
-	for sw.LogicalRemaining() > 0 && !readLastByte && err == nil ***REMOVED***
+	for sw.LogicalRemaining() > 0 && !readLastByte && err == nil {
 		var nf int64 // Size of fragment
 		dataStart, dataEnd := sw.sp[0].Offset, sw.sp[0].endOffset()
-		if sw.pos < dataStart ***REMOVED*** // In a hole fragment
+		if sw.pos < dataStart { // In a hole fragment
 			nf = dataStart - sw.pos
-			if sw.PhysicalRemaining() == 0 ***REMOVED***
+			if sw.PhysicalRemaining() == 0 {
 				readLastByte = true
 				nf--
-			***REMOVED***
+			}
 			_, err = rs.Seek(nf, io.SeekCurrent)
-		***REMOVED*** else ***REMOVED*** // In a data fragment
+		} else { // In a data fragment
 			nf = dataEnd - sw.pos
 			nf, err = io.CopyN(sw.fw, rs, nf)
-		***REMOVED***
+		}
 		sw.pos += nf
-		if sw.pos >= dataEnd && len(sw.sp) > 1 ***REMOVED***
+		if sw.pos >= dataEnd && len(sw.sp) > 1 {
 			sw.sp = sw.sp[1:] // Ensure last fragment always remains
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// If the last fragment is a hole, then seek to 1-byte before EOF, and
 	// read a single byte to ensure the file is the right size.
-	if readLastByte && err == nil ***REMOVED***
-		_, err = mustReadFull(rs, []byte***REMOVED***0***REMOVED***)
+	if readLastByte && err == nil {
+		_, err = mustReadFull(rs, []byte{0})
 		sw.pos++
-	***REMOVED***
+	}
 
 	n = sw.pos - pos0
-	switch ***REMOVED***
+	switch {
 	case err == io.EOF:
 		return n, io.ErrUnexpectedEOF
 	case err == ErrWriteTooLong:
@@ -593,37 +593,37 @@ func (sw *sparseFileWriter) ReadFrom(r io.Reader) (n int64, err error) ***REMOVE
 		return n, errUnrefData // Not possible; implies bug in validation logic
 	default:
 		return n, ensureEOF(rs)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (sw sparseFileWriter) LogicalRemaining() int64 ***REMOVED***
+func (sw sparseFileWriter) LogicalRemaining() int64 {
 	return sw.sp[len(sw.sp)-1].endOffset() - sw.pos
-***REMOVED***
-func (sw sparseFileWriter) PhysicalRemaining() int64 ***REMOVED***
+}
+func (sw sparseFileWriter) PhysicalRemaining() int64 {
 	return sw.fw.PhysicalRemaining()
-***REMOVED***
+}
 
 // zeroWriter may only be written with NULs, otherwise it returns errWriteHole.
-type zeroWriter struct***REMOVED******REMOVED***
+type zeroWriter struct{}
 
-func (zeroWriter) Write(b []byte) (int, error) ***REMOVED***
-	for i, c := range b ***REMOVED***
-		if c != 0 ***REMOVED***
+func (zeroWriter) Write(b []byte) (int, error) {
+	for i, c := range b {
+		if c != 0 {
 			return i, errWriteHole
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return len(b), nil
-***REMOVED***
+}
 
 // ensureEOF checks whether r is at EOF, reporting ErrWriteTooLong if not so.
-func ensureEOF(r io.Reader) error ***REMOVED***
-	n, err := tryReadFull(r, []byte***REMOVED***0***REMOVED***)
-	switch ***REMOVED***
+func ensureEOF(r io.Reader) error {
+	n, err := tryReadFull(r, []byte{0})
+	switch {
 	case n > 0:
 		return ErrWriteTooLong
 	case err == io.EOF:
 		return nil
 	default:
 		return err
-	***REMOVED***
-***REMOVED***
+	}
+}

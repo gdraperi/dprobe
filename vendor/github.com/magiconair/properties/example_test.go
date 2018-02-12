@@ -9,7 +9,7 @@ import (
 	"log"
 )
 
-func ExampleLoad_iso88591() ***REMOVED***
+func ExampleLoad_iso88591() {
 	buf := []byte("key = ISO-8859-1 value with unicode literal \\u2318 and umlaut \xE4") // 0xE4 == ä
 	p, _ := Load(buf, ISO_8859_1)
 	v, ok := p.Get("key")
@@ -18,9 +18,9 @@ func ExampleLoad_iso88591() ***REMOVED***
 	// Output:
 	// true
 	// ISO-8859-1 value with unicode literal ⌘ and umlaut ä
-***REMOVED***
+}
 
-func ExampleLoad_utf8() ***REMOVED***
+func ExampleLoad_utf8() {
 	p, _ := Load([]byte("key = UTF-8 value with unicode character ⌘ and umlaut ä"), UTF8)
 	v, ok := p.Get("key")
 	fmt.Println(ok)
@@ -28,9 +28,9 @@ func ExampleLoad_utf8() ***REMOVED***
 	// Output:
 	// true
 	// UTF-8 value with unicode character ⌘ and umlaut ä
-***REMOVED***
+}
 
-func ExampleProperties_GetBool() ***REMOVED***
+func ExampleProperties_GetBool() {
 	var input = `
 	key=1
 	key2=On
@@ -48,32 +48,32 @@ func ExampleProperties_GetBool() ***REMOVED***
 	// true
 	// true
 	// false
-***REMOVED***
+}
 
-func ExampleProperties_GetString() ***REMOVED***
+func ExampleProperties_GetString() {
 	p, _ := Load([]byte("key=value"), ISO_8859_1)
 	v := p.GetString("another key", "default value")
 	fmt.Println(v)
 	// Output:
 	// default value
-***REMOVED***
+}
 
-func Example() ***REMOVED***
+func Example() {
 	// Decode some key/value pairs with expressions
-	p, err := Load([]byte("key=value\nkey2=$***REMOVED***key***REMOVED***"), ISO_8859_1)
-	if err != nil ***REMOVED***
+	p, err := Load([]byte("key=value\nkey2=${key}"), ISO_8859_1)
+	if err != nil {
 		log.Fatal(err)
-	***REMOVED***
+	}
 
 	// Get a valid key
-	if v, ok := p.Get("key"); ok ***REMOVED***
+	if v, ok := p.Get("key"); ok {
 		fmt.Println(v)
-	***REMOVED***
+	}
 
 	// Get an invalid key
-	if _, ok := p.Get("does not exist"); !ok ***REMOVED***
+	if _, ok := p.Get("does not exist"); !ok {
 		fmt.Println("invalid key")
-	***REMOVED***
+	}
 
 	// Get a key with a default value
 	v := p.GetString("does not exist", "some value")
@@ -90,4 +90,4 @@ func Example() ***REMOVED***
 	// Expanded key/value pairs
 	// key = value
 	// key2 = value
-***REMOVED***
+}

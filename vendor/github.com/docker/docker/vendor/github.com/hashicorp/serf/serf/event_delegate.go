@@ -4,18 +4,18 @@ import (
 	"github.com/hashicorp/memberlist"
 )
 
-type eventDelegate struct ***REMOVED***
+type eventDelegate struct {
 	serf *Serf
-***REMOVED***
+}
 
-func (e *eventDelegate) NotifyJoin(n *memberlist.Node) ***REMOVED***
+func (e *eventDelegate) NotifyJoin(n *memberlist.Node) {
 	e.serf.handleNodeJoin(n)
-***REMOVED***
+}
 
-func (e *eventDelegate) NotifyLeave(n *memberlist.Node) ***REMOVED***
+func (e *eventDelegate) NotifyLeave(n *memberlist.Node) {
 	e.serf.handleNodeLeave(n)
-***REMOVED***
+}
 
-func (e *eventDelegate) NotifyUpdate(n *memberlist.Node) ***REMOVED***
+func (e *eventDelegate) NotifyUpdate(n *memberlist.Node) {
 	e.serf.handleNodeUpdate(n)
-***REMOVED***
+}

@@ -1,21 +1,21 @@
 package types
 
 // Seccomp represents the config for a seccomp profile for syscall restriction.
-type Seccomp struct ***REMOVED***
+type Seccomp struct {
 	DefaultAction Action `json:"defaultAction"`
 	// Architectures is kept to maintain backward compatibility with the old
 	// seccomp profile.
 	Architectures []Arch         `json:"architectures,omitempty"`
 	ArchMap       []Architecture `json:"archMap,omitempty"`
 	Syscalls      []*Syscall     `json:"syscalls"`
-***REMOVED***
+}
 
 // Architecture is used to represent a specific architecture
 // and its sub-architectures
-type Architecture struct ***REMOVED***
+type Architecture struct {
 	Arch      Arch   `json:"architecture"`
 	SubArches []Arch `json:"subArchitectures"`
-***REMOVED***
+}
 
 // Arch used for architectures
 type Arch string
@@ -68,21 +68,21 @@ const (
 )
 
 // Arg used for matching specific syscall arguments in Seccomp
-type Arg struct ***REMOVED***
+type Arg struct {
 	Index    uint     `json:"index"`
 	Value    uint64   `json:"value"`
 	ValueTwo uint64   `json:"valueTwo"`
 	Op       Operator `json:"op"`
-***REMOVED***
+}
 
 // Filter is used to conditionally apply Seccomp rules
-type Filter struct ***REMOVED***
+type Filter struct {
 	Caps   []string `json:"caps,omitempty"`
 	Arches []string `json:"arches,omitempty"`
-***REMOVED***
+}
 
 // Syscall is used to match a group of syscalls in Seccomp
-type Syscall struct ***REMOVED***
+type Syscall struct {
 	Name     string   `json:"name,omitempty"`
 	Names    []string `json:"names,omitempty"`
 	Action   Action   `json:"action"`
@@ -90,4 +90,4 @@ type Syscall struct ***REMOVED***
 	Comment  string   `json:"comment"`
 	Includes Filter   `json:"includes"`
 	Excludes Filter   `json:"excludes"`
-***REMOVED***
+}

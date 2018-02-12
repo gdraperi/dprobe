@@ -1,29 +1,29 @@
 package slack
 
 // ChannelCreatedEvent represents the Channel created event
-type ChannelCreatedEvent struct ***REMOVED***
+type ChannelCreatedEvent struct {
 	Type           string             `json:"type"`
 	Channel        ChannelCreatedInfo `json:"channel"`
 	EventTimestamp string             `json:"event_ts"`
-***REMOVED***
+}
 
 // ChannelCreatedInfo represents the information associated with the Channel created event
-type ChannelCreatedInfo struct ***REMOVED***
+type ChannelCreatedInfo struct {
 	ID        string `json:"id"`
 	IsChannel bool   `json:"is_channel"`
 	Name      string `json:"name"`
 	Created   int    `json:"created"`
 	Creator   string `json:"creator"`
-***REMOVED***
+}
 
 // ChannelJoinedEvent represents the Channel joined event
-type ChannelJoinedEvent struct ***REMOVED***
+type ChannelJoinedEvent struct {
 	Type    string  `json:"type"`
 	Channel Channel `json:"channel"`
-***REMOVED***
+}
 
 // ChannelInfoEvent represents the Channel info event
-type ChannelInfoEvent struct ***REMOVED***
+type ChannelInfoEvent struct {
 	// channel_left
 	// channel_deleted
 	// channel_archive
@@ -32,29 +32,29 @@ type ChannelInfoEvent struct ***REMOVED***
 	Channel   string `json:"channel"`
 	User      string `json:"user,omitempty"`
 	Timestamp string `json:"ts,omitempty"`
-***REMOVED***
+}
 
 // ChannelRenameEvent represents the Channel rename event
-type ChannelRenameEvent struct ***REMOVED***
+type ChannelRenameEvent struct {
 	Type      string            `json:"type"`
 	Channel   ChannelRenameInfo `json:"channel"`
 	Timestamp string            `json:"event_ts"`
-***REMOVED***
+}
 
 // ChannelRenameInfo represents the information associated with a Channel rename event
-type ChannelRenameInfo struct ***REMOVED***
+type ChannelRenameInfo struct {
 	ID      string `json:"id"`
 	Name    string `json:"name"`
 	Created string `json:"created"`
-***REMOVED***
+}
 
 // ChannelHistoryChangedEvent represents the Channel history changed event
-type ChannelHistoryChangedEvent struct ***REMOVED***
+type ChannelHistoryChangedEvent struct {
 	Type           string `json:"type"`
 	Latest         string `json:"latest"`
 	Timestamp      string `json:"ts"`
 	EventTimestamp string `json:"event_ts"`
-***REMOVED***
+}
 
 // ChannelMarkedEvent represents the Channel marked event
 type ChannelMarkedEvent ChannelInfoEvent

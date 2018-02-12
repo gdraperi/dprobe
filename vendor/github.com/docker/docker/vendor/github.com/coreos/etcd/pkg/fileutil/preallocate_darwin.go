@@ -22,22 +22,22 @@ import (
 	"unsafe"
 )
 
-func preallocExtend(f *os.File, sizeInBytes int64) error ***REMOVED***
-	if err := preallocFixed(f, sizeInBytes); err != nil ***REMOVED***
+func preallocExtend(f *os.File, sizeInBytes int64) error {
+	if err := preallocFixed(f, sizeInBytes); err != nil {
 		return err
-	***REMOVED***
+	}
 	return preallocExtendTrunc(f, sizeInBytes)
-***REMOVED***
+}
 
-func preallocFixed(f *os.File, sizeInBytes int64) error ***REMOVED***
-	fstore := &syscall.Fstore_t***REMOVED***
+func preallocFixed(f *os.File, sizeInBytes int64) error {
+	fstore := &syscall.Fstore_t{
 		Flags:   syscall.F_ALLOCATEALL,
 		Posmode: syscall.F_PEOFPOSMODE,
-		Length:  sizeInBytes***REMOVED***
+		Length:  sizeInBytes}
 	p := unsafe.Pointer(fstore)
 	_, _, errno := syscall.Syscall(syscall.SYS_FCNTL, f.Fd(), uintptr(syscall.F_PREALLOCATE), uintptr(p))
-	if errno == 0 || errno == syscall.ENOTSUP ***REMOVED***
+	if errno == 0 || errno == syscall.ENOTSUP {
 		return nil
-	***REMOVED***
+	}
 	return errno
-***REMOVED***
+}

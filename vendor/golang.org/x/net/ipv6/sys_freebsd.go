@@ -16,71 +16,71 @@ import (
 )
 
 var (
-	ctlOpts = [ctlMax]ctlOpt***REMOVED***
-		ctlTrafficClass: ***REMOVED***sysIPV6_TCLASS, 4, marshalTrafficClass, parseTrafficClass***REMOVED***,
-		ctlHopLimit:     ***REMOVED***sysIPV6_HOPLIMIT, 4, marshalHopLimit, parseHopLimit***REMOVED***,
-		ctlPacketInfo:   ***REMOVED***sysIPV6_PKTINFO, sizeofInet6Pktinfo, marshalPacketInfo, parsePacketInfo***REMOVED***,
-		ctlNextHop:      ***REMOVED***sysIPV6_NEXTHOP, sizeofSockaddrInet6, marshalNextHop, parseNextHop***REMOVED***,
-		ctlPathMTU:      ***REMOVED***sysIPV6_PATHMTU, sizeofIPv6Mtuinfo, marshalPathMTU, parsePathMTU***REMOVED***,
-	***REMOVED***
+	ctlOpts = [ctlMax]ctlOpt{
+		ctlTrafficClass: {sysIPV6_TCLASS, 4, marshalTrafficClass, parseTrafficClass},
+		ctlHopLimit:     {sysIPV6_HOPLIMIT, 4, marshalHopLimit, parseHopLimit},
+		ctlPacketInfo:   {sysIPV6_PKTINFO, sizeofInet6Pktinfo, marshalPacketInfo, parsePacketInfo},
+		ctlNextHop:      {sysIPV6_NEXTHOP, sizeofSockaddrInet6, marshalNextHop, parseNextHop},
+		ctlPathMTU:      {sysIPV6_PATHMTU, sizeofIPv6Mtuinfo, marshalPathMTU, parsePathMTU},
+	}
 
-	sockOpts = map[int]sockOpt***REMOVED***
-		ssoTrafficClass:        ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIPv6, Name: sysIPV6_TCLASS, Len: 4***REMOVED******REMOVED***,
-		ssoHopLimit:            ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIPv6, Name: sysIPV6_UNICAST_HOPS, Len: 4***REMOVED******REMOVED***,
-		ssoMulticastInterface:  ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIPv6, Name: sysIPV6_MULTICAST_IF, Len: 4***REMOVED******REMOVED***,
-		ssoMulticastHopLimit:   ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIPv6, Name: sysIPV6_MULTICAST_HOPS, Len: 4***REMOVED******REMOVED***,
-		ssoMulticastLoopback:   ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIPv6, Name: sysIPV6_MULTICAST_LOOP, Len: 4***REMOVED******REMOVED***,
-		ssoReceiveTrafficClass: ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIPv6, Name: sysIPV6_RECVTCLASS, Len: 4***REMOVED******REMOVED***,
-		ssoReceiveHopLimit:     ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIPv6, Name: sysIPV6_RECVHOPLIMIT, Len: 4***REMOVED******REMOVED***,
-		ssoReceivePacketInfo:   ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIPv6, Name: sysIPV6_RECVPKTINFO, Len: 4***REMOVED******REMOVED***,
-		ssoReceivePathMTU:      ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIPv6, Name: sysIPV6_RECVPATHMTU, Len: 4***REMOVED******REMOVED***,
-		ssoPathMTU:             ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIPv6, Name: sysIPV6_PATHMTU, Len: sizeofIPv6Mtuinfo***REMOVED******REMOVED***,
-		ssoChecksum:            ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIPv6, Name: sysIPV6_CHECKSUM, Len: 4***REMOVED******REMOVED***,
-		ssoICMPFilter:          ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIPv6ICMP, Name: sysICMP6_FILTER, Len: sizeofICMPv6Filter***REMOVED******REMOVED***,
-		ssoJoinGroup:           ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIPv6, Name: sysMCAST_JOIN_GROUP, Len: sizeofGroupReq***REMOVED***, typ: ssoTypeGroupReq***REMOVED***,
-		ssoLeaveGroup:          ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIPv6, Name: sysMCAST_LEAVE_GROUP, Len: sizeofGroupReq***REMOVED***, typ: ssoTypeGroupReq***REMOVED***,
-		ssoJoinSourceGroup:     ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIPv6, Name: sysMCAST_JOIN_SOURCE_GROUP, Len: sizeofGroupSourceReq***REMOVED***, typ: ssoTypeGroupSourceReq***REMOVED***,
-		ssoLeaveSourceGroup:    ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIPv6, Name: sysMCAST_LEAVE_SOURCE_GROUP, Len: sizeofGroupSourceReq***REMOVED***, typ: ssoTypeGroupSourceReq***REMOVED***,
-		ssoBlockSourceGroup:    ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIPv6, Name: sysMCAST_BLOCK_SOURCE, Len: sizeofGroupSourceReq***REMOVED***, typ: ssoTypeGroupSourceReq***REMOVED***,
-		ssoUnblockSourceGroup:  ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIPv6, Name: sysMCAST_UNBLOCK_SOURCE, Len: sizeofGroupSourceReq***REMOVED***, typ: ssoTypeGroupSourceReq***REMOVED***,
-	***REMOVED***
+	sockOpts = map[int]sockOpt{
+		ssoTrafficClass:        {Option: socket.Option{Level: iana.ProtocolIPv6, Name: sysIPV6_TCLASS, Len: 4}},
+		ssoHopLimit:            {Option: socket.Option{Level: iana.ProtocolIPv6, Name: sysIPV6_UNICAST_HOPS, Len: 4}},
+		ssoMulticastInterface:  {Option: socket.Option{Level: iana.ProtocolIPv6, Name: sysIPV6_MULTICAST_IF, Len: 4}},
+		ssoMulticastHopLimit:   {Option: socket.Option{Level: iana.ProtocolIPv6, Name: sysIPV6_MULTICAST_HOPS, Len: 4}},
+		ssoMulticastLoopback:   {Option: socket.Option{Level: iana.ProtocolIPv6, Name: sysIPV6_MULTICAST_LOOP, Len: 4}},
+		ssoReceiveTrafficClass: {Option: socket.Option{Level: iana.ProtocolIPv6, Name: sysIPV6_RECVTCLASS, Len: 4}},
+		ssoReceiveHopLimit:     {Option: socket.Option{Level: iana.ProtocolIPv6, Name: sysIPV6_RECVHOPLIMIT, Len: 4}},
+		ssoReceivePacketInfo:   {Option: socket.Option{Level: iana.ProtocolIPv6, Name: sysIPV6_RECVPKTINFO, Len: 4}},
+		ssoReceivePathMTU:      {Option: socket.Option{Level: iana.ProtocolIPv6, Name: sysIPV6_RECVPATHMTU, Len: 4}},
+		ssoPathMTU:             {Option: socket.Option{Level: iana.ProtocolIPv6, Name: sysIPV6_PATHMTU, Len: sizeofIPv6Mtuinfo}},
+		ssoChecksum:            {Option: socket.Option{Level: iana.ProtocolIPv6, Name: sysIPV6_CHECKSUM, Len: 4}},
+		ssoICMPFilter:          {Option: socket.Option{Level: iana.ProtocolIPv6ICMP, Name: sysICMP6_FILTER, Len: sizeofICMPv6Filter}},
+		ssoJoinGroup:           {Option: socket.Option{Level: iana.ProtocolIPv6, Name: sysMCAST_JOIN_GROUP, Len: sizeofGroupReq}, typ: ssoTypeGroupReq},
+		ssoLeaveGroup:          {Option: socket.Option{Level: iana.ProtocolIPv6, Name: sysMCAST_LEAVE_GROUP, Len: sizeofGroupReq}, typ: ssoTypeGroupReq},
+		ssoJoinSourceGroup:     {Option: socket.Option{Level: iana.ProtocolIPv6, Name: sysMCAST_JOIN_SOURCE_GROUP, Len: sizeofGroupSourceReq}, typ: ssoTypeGroupSourceReq},
+		ssoLeaveSourceGroup:    {Option: socket.Option{Level: iana.ProtocolIPv6, Name: sysMCAST_LEAVE_SOURCE_GROUP, Len: sizeofGroupSourceReq}, typ: ssoTypeGroupSourceReq},
+		ssoBlockSourceGroup:    {Option: socket.Option{Level: iana.ProtocolIPv6, Name: sysMCAST_BLOCK_SOURCE, Len: sizeofGroupSourceReq}, typ: ssoTypeGroupSourceReq},
+		ssoUnblockSourceGroup:  {Option: socket.Option{Level: iana.ProtocolIPv6, Name: sysMCAST_UNBLOCK_SOURCE, Len: sizeofGroupSourceReq}, typ: ssoTypeGroupSourceReq},
+	}
 )
 
-func init() ***REMOVED***
-	if runtime.GOOS == "freebsd" && runtime.GOARCH == "386" ***REMOVED***
+func init() {
+	if runtime.GOOS == "freebsd" && runtime.GOARCH == "386" {
 		archs, _ := syscall.Sysctl("kern.supported_archs")
-		for _, s := range strings.Fields(archs) ***REMOVED***
-			if s == "amd64" ***REMOVED***
+		for _, s := range strings.Fields(archs) {
+			if s == "amd64" {
 				freebsd32o64 = true
 				break
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}
 
-func (sa *sockaddrInet6) setSockaddr(ip net.IP, i int) ***REMOVED***
+func (sa *sockaddrInet6) setSockaddr(ip net.IP, i int) {
 	sa.Len = sizeofSockaddrInet6
 	sa.Family = syscall.AF_INET6
 	copy(sa.Addr[:], ip)
 	sa.Scope_id = uint32(i)
-***REMOVED***
+}
 
-func (pi *inet6Pktinfo) setIfindex(i int) ***REMOVED***
+func (pi *inet6Pktinfo) setIfindex(i int) {
 	pi.Ifindex = uint32(i)
-***REMOVED***
+}
 
-func (mreq *ipv6Mreq) setIfindex(i int) ***REMOVED***
+func (mreq *ipv6Mreq) setIfindex(i int) {
 	mreq.Interface = uint32(i)
-***REMOVED***
+}
 
-func (gr *groupReq) setGroup(grp net.IP) ***REMOVED***
+func (gr *groupReq) setGroup(grp net.IP) {
 	sa := (*sockaddrInet6)(unsafe.Pointer(&gr.Group))
 	sa.Len = sizeofSockaddrInet6
 	sa.Family = syscall.AF_INET6
 	copy(sa.Addr[:], grp)
-***REMOVED***
+}
 
-func (gsr *groupSourceReq) setSourceGroup(grp, src net.IP) ***REMOVED***
+func (gsr *groupSourceReq) setSourceGroup(grp, src net.IP) {
 	sa := (*sockaddrInet6)(unsafe.Pointer(&gsr.Group))
 	sa.Len = sizeofSockaddrInet6
 	sa.Family = syscall.AF_INET6
@@ -89,4 +89,4 @@ func (gsr *groupSourceReq) setSourceGroup(grp, src net.IP) ***REMOVED***
 	sa.Len = sizeofSockaddrInet6
 	sa.Family = syscall.AF_INET6
 	copy(sa.Addr[:], src)
-***REMOVED***
+}

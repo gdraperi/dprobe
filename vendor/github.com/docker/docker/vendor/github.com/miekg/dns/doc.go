@@ -13,8 +13,8 @@ Resource records are native types. They are not stored in wire format.
 Basic usage pattern for creating a new resource record:
 
      r := new(dns.MX)
-     r.Hdr = dns.RR_Header***REMOVED***Name: "miek.nl.", Rrtype: dns.TypeMX,
-	Class: dns.ClassINET, Ttl: 3600***REMOVED***
+     r.Hdr = dns.RR_Header{Name: "miek.nl.", Rrtype: dns.TypeMX,
+	Class: dns.ClassINET, Ttl: 3600}
      r.Preference = 10
      r.Mx = "mx.miek.nl."
 
@@ -49,7 +49,7 @@ The following is slightly more verbose, but more flexible:
      m1.Id = dns.Id()
      m1.RecursionDesired = true
      m1.Question = make([]dns.Question, 1)
-     m1.Question[0] = dns.Question***REMOVED***"miek.nl.", dns.TypeMX, dns.ClassINET***REMOVED***
+     m1.Question[0] = dns.Question{"miek.nl.", dns.TypeMX, dns.ClassINET}
 
 After creating a message it can be send.
 Basic use pattern for synchronous querying the DNS at a
@@ -77,9 +77,9 @@ Each of these sections (except the Question section) contain a []RR. Basic
 use pattern for accessing the rdata of a TXT RR as the first RR in
 the Answer section:
 
-	if t, ok := in.Answer[0].(*dns.TXT); ok ***REMOVED***
+	if t, ok := in.Answer[0].(*dns.TXT); ok {
 		// do something with t.Txt
-	***REMOVED***
+	}
 
 Domain Name and TXT Character String Representations
 
@@ -153,7 +153,7 @@ must be fully qualified - as they are domain names) and the base64 secret
 "so6ZGir4GPAqINNh9U5c3A==":
 
 	c := new(dns.Client)
-	c.TsigSecret = map[string]string***REMOVED***"axfr.": "so6ZGir4GPAqINNh9U5c3A=="***REMOVED***
+	c.TsigSecret = map[string]string{"axfr.": "so6ZGir4GPAqINNh9U5c3A=="}
 	m := new(dns.Msg)
 	m.SetQuestion("miek.nl.", dns.TypeMX)
 	m.SetTsig("axfr.", dns.HmacMD5, 300, time.Now().Unix())
@@ -167,35 +167,35 @@ and using the server 176.58.119.54:
 
 	t := new(dns.Transfer)
 	m := new(dns.Msg)
-	t.TsigSecret = map[string]string***REMOVED***"axfr.": "so6ZGir4GPAqINNh9U5c3A=="***REMOVED***
+	t.TsigSecret = map[string]string{"axfr.": "so6ZGir4GPAqINNh9U5c3A=="}
 	m.SetAxfr("miek.nl.")
 	m.SetTsig("axfr.", dns.HmacMD5, 300, time.Now().Unix())
 	c, err := t.In(m, "176.58.119.54:53")
-	for r := range c ***REMOVED*** ... ***REMOVED***
+	for r := range c { ... }
 
 You can now read the records from the transfer as they come in. Each envelope is checked with TSIG.
 If something is not correct an error is returned.
 
 Basic use pattern validating and replying to a message that has TSIG set.
 
-	server := &dns.Server***REMOVED***Addr: ":53", Net: "udp"***REMOVED***
-	server.TsigSecret = map[string]string***REMOVED***"axfr.": "so6ZGir4GPAqINNh9U5c3A=="***REMOVED***
+	server := &dns.Server{Addr: ":53", Net: "udp"}
+	server.TsigSecret = map[string]string{"axfr.": "so6ZGir4GPAqINNh9U5c3A=="}
 	go server.ListenAndServe()
 	dns.HandleFunc(".", handleRequest)
 
-	func handleRequest(w dns.ResponseWriter, r *dns.Msg) ***REMOVED***
+	func handleRequest(w dns.ResponseWriter, r *dns.Msg) {
 		m := new(dns.Msg)
 		m.SetReply(r)
-		if r.IsTsig() ***REMOVED***
-			if w.TsigStatus() == nil ***REMOVED***
+		if r.IsTsig() {
+			if w.TsigStatus() == nil {
 				// *Msg r has an TSIG record and it was validated
 				m.SetTsig("axfr.", dns.HmacMD5, 300, time.Now().Unix())
-			***REMOVED*** else ***REMOVED***
+			} else {
 				// *Msg r has an TSIG records and it was not valided
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		w.WriteMsg(m)
-	***REMOVED***
+	}
 
 PRIVATE RRS
 
@@ -224,14 +224,14 @@ that these options may be combined in an OPT RR.
 Basic use pattern for a server to check if (and which) options are set:
 
 	// o is a dns.OPT
-	for _, s := range o.Option ***REMOVED***
-		switch e := s.(type) ***REMOVED***
+	for _, s := range o.Option {
+		switch e := s.(type) {
 		case *dns.EDNS0_NSID:
 			// do stuff with e.Nsid
 		case *dns.EDNS0_SUBNET:
 			// access e.Family, e.Address, etc.
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 SIG(0)
 

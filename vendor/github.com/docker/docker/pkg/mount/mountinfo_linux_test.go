@@ -422,41 +422,41 @@ const (
 99 15 8:33 / /media/REMOVE\040ME rw,nosuid,nodev,relatime - fuseblk /dev/sdc1 rw,user_id=0,group_id=0,allow_other,blksize=4096`
 )
 
-func TestParseFedoraMountinfo(t *testing.T) ***REMOVED***
+func TestParseFedoraMountinfo(t *testing.T) {
 	r := bytes.NewBuffer([]byte(fedoraMountinfo))
 	_, err := parseInfoFile(r)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestParseUbuntuMountinfo(t *testing.T) ***REMOVED***
+func TestParseUbuntuMountinfo(t *testing.T) {
 	r := bytes.NewBuffer([]byte(ubuntuMountInfo))
 	_, err := parseInfoFile(r)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestParseGentooMountinfo(t *testing.T) ***REMOVED***
+func TestParseGentooMountinfo(t *testing.T) {
 	r := bytes.NewBuffer([]byte(gentooMountinfo))
 	_, err := parseInfoFile(r)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestParseFedoraMountinfoFields(t *testing.T) ***REMOVED***
+func TestParseFedoraMountinfoFields(t *testing.T) {
 	r := bytes.NewBuffer([]byte(fedoraMountinfo))
 	infos, err := parseInfoFile(r)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	expectedLength := 58
-	if len(infos) != expectedLength ***REMOVED***
+	if len(infos) != expectedLength {
 		t.Fatalf("Expected %d entries, got %d", expectedLength, len(infos))
-	***REMOVED***
-	mi := Info***REMOVED***
+	}
+	mi := Info{
 		ID:         15,
 		Parent:     35,
 		Major:      0,
@@ -468,9 +468,9 @@ func TestParseFedoraMountinfoFields(t *testing.T) ***REMOVED***
 		Fstype:     "proc",
 		Source:     "proc",
 		VfsOpts:    "rw",
-	***REMOVED***
+	}
 
-	if *infos[0] != mi ***REMOVED***
+	if *infos[0] != mi {
 		t.Fatalf("expected %#v, got %#v", mi, infos[0])
-	***REMOVED***
-***REMOVED***
+	}
+}

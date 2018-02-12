@@ -7,7 +7,7 @@ import (
 	"github.com/nlopes/slack"
 )
 
-func main() ***REMOVED***
+func main() {
 	var (
 		apiToken string
 		debug    bool
@@ -18,9 +18,9 @@ func main() ***REMOVED***
 	flag.Parse()
 
 	api := slack.New(apiToken)
-	if debug ***REMOVED***
+	if debug {
 		api.SetDebug(true)
-	***REMOVED***
+	}
 
 	var (
 		postAsUserName  string
@@ -32,10 +32,10 @@ func main() ***REMOVED***
 
 	// Find the user to post as.
 	authTest, err := api.AuthTest()
-	if err != nil ***REMOVED***
+	if err != nil {
 		fmt.Printf("Error getting channels: %s\n", err)
 		return
-	***REMOVED***
+	}
 
 	// Post as the authenticated user.
 	postAsUserName = authTest.User
@@ -47,80 +47,80 @@ func main() ***REMOVED***
 
 	// Find the channel.
 	_, _, chanID, err := api.OpenIMChannel(postToUserID)
-	if err != nil ***REMOVED***
+	if err != nil {
 		fmt.Printf("Error opening IM: %s\n", err)
 		return
-	***REMOVED***
+	}
 	postToChannelID = chanID
 
 	fmt.Printf("Posting as %s (%s) in DM with %s (%s), channel %s\n", postAsUserName, postAsUserID, postToUserName, postToUserID, postToChannelID)
 
 	// Post a message.
-	postParams := slack.PostMessageParameters***REMOVED******REMOVED***
+	postParams := slack.PostMessageParameters{}
 	channelID, timestamp, err := api.PostMessage(postToChannelID, "Is this any good?", postParams)
-	if err != nil ***REMOVED***
+	if err != nil {
 		fmt.Printf("Error posting message: %s\n", err)
 		return
-	***REMOVED***
+	}
 
 	// Grab a reference to the message.
 	msgRef := slack.NewRefToMessage(channelID, timestamp)
 
 	// React with :+1:
-	if err := api.AddReaction("+1", msgRef); err != nil ***REMOVED***
+	if err := api.AddReaction("+1", msgRef); err != nil {
 		fmt.Printf("Error adding reaction: %s\n", err)
 		return
-	***REMOVED***
+	}
 
 	// React with :-1:
-	if err := api.AddReaction("cry", msgRef); err != nil ***REMOVED***
+	if err := api.AddReaction("cry", msgRef); err != nil {
 		fmt.Printf("Error adding reaction: %s\n", err)
 		return
-	***REMOVED***
+	}
 
 	// Get all reactions on the message.
 	msgReactions, err := api.GetReactions(msgRef, slack.NewGetReactionsParameters())
-	if err != nil ***REMOVED***
+	if err != nil {
 		fmt.Printf("Error getting reactions: %s\n", err)
 		return
-	***REMOVED***
+	}
 	fmt.Printf("\n")
 	fmt.Printf("%d reactions to message...\n", len(msgReactions))
-	for _, r := range msgReactions ***REMOVED***
+	for _, r := range msgReactions {
 		fmt.Printf("  %d users say %s\n", r.Count, r.Name)
-	***REMOVED***
+	}
 
 	// List all of the users reactions.
 	listReactions, _, err := api.ListReactions(slack.NewListReactionsParameters())
-	if err != nil ***REMOVED***
+	if err != nil {
 		fmt.Printf("Error listing reactions: %s\n", err)
 		return
-	***REMOVED***
+	}
 	fmt.Printf("\n")
 	fmt.Printf("All reactions by %s...\n", authTest.User)
-	for _, item := range listReactions ***REMOVED***
+	for _, item := range listReactions {
 		fmt.Printf("%d on a %s...\n", len(item.Reactions), item.Type)
-		for _, r := range item.Reactions ***REMOVED***
+		for _, r := range item.Reactions {
 			fmt.Printf("  %s (along with %d others)\n", r.Name, r.Count-1)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Remove the :cry: reaction.
 	err = api.RemoveReaction("cry", msgRef)
-	if err != nil ***REMOVED***
+	if err != nil {
 		fmt.Printf("Error remove reaction: %s\n", err)
 		return
-	***REMOVED***
+	}
 
 	// Get all reactions on the message.
 	msgReactions, err = api.GetReactions(msgRef, slack.NewGetReactionsParameters())
-	if err != nil ***REMOVED***
+	if err != nil {
 		fmt.Printf("Error getting reactions: %s\n", err)
 		return
-	***REMOVED***
+	}
 	fmt.Printf("\n")
 	fmt.Printf("%d reactions to message after removing cry...\n", len(msgReactions))
-	for _, r := range msgReactions ***REMOVED***
+	for _, r := range msgReactions {
 		fmt.Printf("  %d users say %s\n", r.Count, r.Name)
-	***REMOVED***
-***REMOVED***
+	}
+}

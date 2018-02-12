@@ -10,217 +10,217 @@ import (
 	"strings"
 )
 
-type tomlValue struct ***REMOVED***
-	value     interface***REMOVED******REMOVED*** // string, int64, uint64, float64, bool, time.Time, [] of any of this list
+type tomlValue struct {
+	value     interface{} // string, int64, uint64, float64, bool, time.Time, [] of any of this list
 	comment   string
 	commented bool
 	position  Position
-***REMOVED***
+}
 
 // Tree is the result of the parsing of a TOML file.
-type Tree struct ***REMOVED***
-	values    map[string]interface***REMOVED******REMOVED*** // string -> *tomlValue, *Tree, []*Tree
+type Tree struct {
+	values    map[string]interface{} // string -> *tomlValue, *Tree, []*Tree
 	comment   string
 	commented bool
 	position  Position
-***REMOVED***
+}
 
-func newTree() *Tree ***REMOVED***
-	return &Tree***REMOVED***
-		values:   make(map[string]interface***REMOVED******REMOVED***),
-		position: Position***REMOVED******REMOVED***,
-	***REMOVED***
-***REMOVED***
+func newTree() *Tree {
+	return &Tree{
+		values:   make(map[string]interface{}),
+		position: Position{},
+	}
+}
 
 // TreeFromMap initializes a new Tree object using the given map.
-func TreeFromMap(m map[string]interface***REMOVED******REMOVED***) (*Tree, error) ***REMOVED***
+func TreeFromMap(m map[string]interface{}) (*Tree, error) {
 	result, err := toTree(m)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return result.(*Tree), nil
-***REMOVED***
+}
 
 // Position returns the position of the tree.
-func (t *Tree) Position() Position ***REMOVED***
+func (t *Tree) Position() Position {
 	return t.position
-***REMOVED***
+}
 
 // Has returns a boolean indicating if the given key exists.
-func (t *Tree) Has(key string) bool ***REMOVED***
-	if key == "" ***REMOVED***
+func (t *Tree) Has(key string) bool {
+	if key == "" {
 		return false
-	***REMOVED***
+	}
 	return t.HasPath(strings.Split(key, "."))
-***REMOVED***
+}
 
 // HasPath returns true if the given path of keys exists, false otherwise.
-func (t *Tree) HasPath(keys []string) bool ***REMOVED***
+func (t *Tree) HasPath(keys []string) bool {
 	return t.GetPath(keys) != nil
-***REMOVED***
+}
 
 // Keys returns the keys of the toplevel tree (does not recurse).
-func (t *Tree) Keys() []string ***REMOVED***
+func (t *Tree) Keys() []string {
 	keys := make([]string, len(t.values))
 	i := 0
-	for k := range t.values ***REMOVED***
+	for k := range t.values {
 		keys[i] = k
 		i++
-	***REMOVED***
+	}
 	return keys
-***REMOVED***
+}
 
 // Get the value at key in the Tree.
 // Key is a dot-separated path (e.g. a.b.c) without single/double quoted strings.
 // If you need to retrieve non-bare keys, use GetPath.
 // Returns nil if the path does not exist in the tree.
 // If keys is of length zero, the current tree is returned.
-func (t *Tree) Get(key string) interface***REMOVED******REMOVED*** ***REMOVED***
-	if key == "" ***REMOVED***
+func (t *Tree) Get(key string) interface{} {
+	if key == "" {
 		return t
-	***REMOVED***
+	}
 	return t.GetPath(strings.Split(key, "."))
-***REMOVED***
+}
 
 // GetPath returns the element in the tree indicated by 'keys'.
 // If keys is of length zero, the current tree is returned.
-func (t *Tree) GetPath(keys []string) interface***REMOVED******REMOVED*** ***REMOVED***
-	if len(keys) == 0 ***REMOVED***
+func (t *Tree) GetPath(keys []string) interface{} {
+	if len(keys) == 0 {
 		return t
-	***REMOVED***
+	}
 	subtree := t
-	for _, intermediateKey := range keys[:len(keys)-1] ***REMOVED***
+	for _, intermediateKey := range keys[:len(keys)-1] {
 		value, exists := subtree.values[intermediateKey]
-		if !exists ***REMOVED***
+		if !exists {
 			return nil
-		***REMOVED***
-		switch node := value.(type) ***REMOVED***
+		}
+		switch node := value.(type) {
 		case *Tree:
 			subtree = node
 		case []*Tree:
 			// go to most recent element
-			if len(node) == 0 ***REMOVED***
+			if len(node) == 0 {
 				return nil
-			***REMOVED***
+			}
 			subtree = node[len(node)-1]
 		default:
 			return nil // cannot navigate through other node types
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	// branch based on final node type
-	switch node := subtree.values[keys[len(keys)-1]].(type) ***REMOVED***
+	switch node := subtree.values[keys[len(keys)-1]].(type) {
 	case *tomlValue:
 		return node.value
 	default:
 		return node
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // GetPosition returns the position of the given key.
-func (t *Tree) GetPosition(key string) Position ***REMOVED***
-	if key == "" ***REMOVED***
+func (t *Tree) GetPosition(key string) Position {
+	if key == "" {
 		return t.position
-	***REMOVED***
+	}
 	return t.GetPositionPath(strings.Split(key, "."))
-***REMOVED***
+}
 
 // GetPositionPath returns the element in the tree indicated by 'keys'.
 // If keys is of length zero, the current tree is returned.
-func (t *Tree) GetPositionPath(keys []string) Position ***REMOVED***
-	if len(keys) == 0 ***REMOVED***
+func (t *Tree) GetPositionPath(keys []string) Position {
+	if len(keys) == 0 {
 		return t.position
-	***REMOVED***
+	}
 	subtree := t
-	for _, intermediateKey := range keys[:len(keys)-1] ***REMOVED***
+	for _, intermediateKey := range keys[:len(keys)-1] {
 		value, exists := subtree.values[intermediateKey]
-		if !exists ***REMOVED***
-			return Position***REMOVED***0, 0***REMOVED***
-		***REMOVED***
-		switch node := value.(type) ***REMOVED***
+		if !exists {
+			return Position{0, 0}
+		}
+		switch node := value.(type) {
 		case *Tree:
 			subtree = node
 		case []*Tree:
 			// go to most recent element
-			if len(node) == 0 ***REMOVED***
-				return Position***REMOVED***0, 0***REMOVED***
-			***REMOVED***
+			if len(node) == 0 {
+				return Position{0, 0}
+			}
 			subtree = node[len(node)-1]
 		default:
-			return Position***REMOVED***0, 0***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			return Position{0, 0}
+		}
+	}
 	// branch based on final node type
-	switch node := subtree.values[keys[len(keys)-1]].(type) ***REMOVED***
+	switch node := subtree.values[keys[len(keys)-1]].(type) {
 	case *tomlValue:
 		return node.position
 	case *Tree:
 		return node.position
 	case []*Tree:
 		// go to most recent element
-		if len(node) == 0 ***REMOVED***
-			return Position***REMOVED***0, 0***REMOVED***
-		***REMOVED***
+		if len(node) == 0 {
+			return Position{0, 0}
+		}
 		return node[len(node)-1].position
 	default:
-		return Position***REMOVED***0, 0***REMOVED***
-	***REMOVED***
-***REMOVED***
+		return Position{0, 0}
+	}
+}
 
 // GetDefault works like Get but with a default value
-func (t *Tree) GetDefault(key string, def interface***REMOVED******REMOVED***) interface***REMOVED******REMOVED*** ***REMOVED***
+func (t *Tree) GetDefault(key string, def interface{}) interface{} {
 	val := t.Get(key)
-	if val == nil ***REMOVED***
+	if val == nil {
 		return def
-	***REMOVED***
+	}
 	return val
-***REMOVED***
+}
 
 // Set an element in the tree.
 // Key is a dot-separated path (e.g. a.b.c).
 // Creates all necessary intermediate trees, if needed.
-func (t *Tree) Set(key string, value interface***REMOVED******REMOVED***) ***REMOVED***
+func (t *Tree) Set(key string, value interface{}) {
 	t.SetWithComment(key, "", false, value)
-***REMOVED***
+}
 
 // SetWithComment is the same as Set, but allows you to provide comment
 // information to the key, that will be reused by Marshal().
-func (t *Tree) SetWithComment(key string, comment string, commented bool, value interface***REMOVED******REMOVED***) ***REMOVED***
+func (t *Tree) SetWithComment(key string, comment string, commented bool, value interface{}) {
 	t.SetPathWithComment(strings.Split(key, "."), comment, commented, value)
-***REMOVED***
+}
 
 // SetPath sets an element in the tree.
-// Keys is an array of path elements (e.g. ***REMOVED***"a","b","c"***REMOVED***).
+// Keys is an array of path elements (e.g. {"a","b","c"}).
 // Creates all necessary intermediate trees, if needed.
-func (t *Tree) SetPath(keys []string, value interface***REMOVED******REMOVED***) ***REMOVED***
+func (t *Tree) SetPath(keys []string, value interface{}) {
 	t.SetPathWithComment(keys, "", false, value)
-***REMOVED***
+}
 
 // SetPathWithComment is the same as SetPath, but allows you to provide comment
 // information to the key, that will be reused by Marshal().
-func (t *Tree) SetPathWithComment(keys []string, comment string, commented bool, value interface***REMOVED******REMOVED***) ***REMOVED***
+func (t *Tree) SetPathWithComment(keys []string, comment string, commented bool, value interface{}) {
 	subtree := t
-	for _, intermediateKey := range keys[:len(keys)-1] ***REMOVED***
+	for _, intermediateKey := range keys[:len(keys)-1] {
 		nextTree, exists := subtree.values[intermediateKey]
-		if !exists ***REMOVED***
+		if !exists {
 			nextTree = newTree()
 			subtree.values[intermediateKey] = nextTree // add new element here
-		***REMOVED***
-		switch node := nextTree.(type) ***REMOVED***
+		}
+		switch node := nextTree.(type) {
 		case *Tree:
 			subtree = node
 		case []*Tree:
 			// go to most recent element
-			if len(node) == 0 ***REMOVED***
+			if len(node) == 0 {
 				// create element if it does not exist
 				subtree.values[intermediateKey] = append(node, newTree())
-			***REMOVED***
+			}
 			subtree = node[len(node)-1]
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	var toInsert interface***REMOVED******REMOVED***
+	var toInsert interface{}
 
-	switch value.(type) ***REMOVED***
+	switch value.(type) {
 	case *Tree:
 		tt := value.(*Tree)
 		tt.comment = comment
@@ -232,11 +232,11 @@ func (t *Tree) SetPathWithComment(keys []string, comment string, commented bool,
 		tt.comment = comment
 		toInsert = tt
 	default:
-		toInsert = &tomlValue***REMOVED***value: value, comment: comment, commented: commented***REMOVED***
-	***REMOVED***
+		toInsert = &tomlValue{value: value, comment: comment, commented: commented}
+	}
 
 	subtree.values[keys[len(keys)-1]] = toInsert
-***REMOVED***
+}
 
 // createSubTree takes a tree and a key and create the necessary intermediate
 // subtrees to create a subtree at that point. In-place.
@@ -245,18 +245,18 @@ func (t *Tree) SetPathWithComment(keys []string, comment string, commented bool,
 // and tree[a][b][c]
 //
 // Returns nil on success, error object on failure
-func (t *Tree) createSubTree(keys []string, pos Position) error ***REMOVED***
+func (t *Tree) createSubTree(keys []string, pos Position) error {
 	subtree := t
-	for _, intermediateKey := range keys ***REMOVED***
+	for _, intermediateKey := range keys {
 		nextTree, exists := subtree.values[intermediateKey]
-		if !exists ***REMOVED***
+		if !exists {
 			tree := newTree()
 			tree.position = pos
 			subtree.values[intermediateKey] = tree
 			nextTree = tree
-		***REMOVED***
+		}
 
-		switch node := nextTree.(type) ***REMOVED***
+		switch node := nextTree.(type) {
 		case []*Tree:
 			subtree = node[len(node)-1]
 		case *Tree:
@@ -264,46 +264,46 @@ func (t *Tree) createSubTree(keys []string, pos Position) error ***REMOVED***
 		default:
 			return fmt.Errorf("unknown type for path %s (%s): %T (%#v)",
 				strings.Join(keys, "."), intermediateKey, nextTree, nextTree)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
 // LoadBytes creates a Tree from a []byte.
-func LoadBytes(b []byte) (tree *Tree, err error) ***REMOVED***
-	defer func() ***REMOVED***
-		if r := recover(); r != nil ***REMOVED***
-			if _, ok := r.(runtime.Error); ok ***REMOVED***
+func LoadBytes(b []byte) (tree *Tree, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			if _, ok := r.(runtime.Error); ok {
 				panic(r)
-			***REMOVED***
+			}
 			err = errors.New(r.(string))
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 	tree = parseToml(lexToml(b))
 	return
-***REMOVED***
+}
 
 // LoadReader creates a Tree from any io.Reader.
-func LoadReader(reader io.Reader) (tree *Tree, err error) ***REMOVED***
+func LoadReader(reader io.Reader) (tree *Tree, err error) {
 	inputBytes, err := ioutil.ReadAll(reader)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	tree, err = LoadBytes(inputBytes)
 	return
-***REMOVED***
+}
 
 // Load creates a Tree from a string.
-func Load(content string) (tree *Tree, err error) ***REMOVED***
+func Load(content string) (tree *Tree, err error) {
 	return LoadBytes([]byte(content))
-***REMOVED***
+}
 
 // LoadFile creates a Tree from a file.
-func LoadFile(path string) (tree *Tree, err error) ***REMOVED***
+func LoadFile(path string) (tree *Tree, err error) {
 	file, err := os.Open(path)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	defer file.Close()
 	return LoadReader(file)
-***REMOVED***
+}

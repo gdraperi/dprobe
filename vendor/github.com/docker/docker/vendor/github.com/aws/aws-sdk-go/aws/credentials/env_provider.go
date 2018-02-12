@@ -31,48 +31,48 @@ var (
 // * Access Key ID:     AWS_ACCESS_KEY_ID or AWS_ACCESS_KEY
 //
 // * Secret Access Key: AWS_SECRET_ACCESS_KEY or AWS_SECRET_KEY
-type EnvProvider struct ***REMOVED***
+type EnvProvider struct {
 	retrieved bool
-***REMOVED***
+}
 
 // NewEnvCredentials returns a pointer to a new Credentials object
 // wrapping the environment variable provider.
-func NewEnvCredentials() *Credentials ***REMOVED***
-	return NewCredentials(&EnvProvider***REMOVED******REMOVED***)
-***REMOVED***
+func NewEnvCredentials() *Credentials {
+	return NewCredentials(&EnvProvider{})
+}
 
 // Retrieve retrieves the keys from the environment.
-func (e *EnvProvider) Retrieve() (Value, error) ***REMOVED***
+func (e *EnvProvider) Retrieve() (Value, error) {
 	e.retrieved = false
 
 	id := os.Getenv("AWS_ACCESS_KEY_ID")
-	if id == "" ***REMOVED***
+	if id == "" {
 		id = os.Getenv("AWS_ACCESS_KEY")
-	***REMOVED***
+	}
 
 	secret := os.Getenv("AWS_SECRET_ACCESS_KEY")
-	if secret == "" ***REMOVED***
+	if secret == "" {
 		secret = os.Getenv("AWS_SECRET_KEY")
-	***REMOVED***
+	}
 
-	if id == "" ***REMOVED***
-		return Value***REMOVED***ProviderName: EnvProviderName***REMOVED***, ErrAccessKeyIDNotFound
-	***REMOVED***
+	if id == "" {
+		return Value{ProviderName: EnvProviderName}, ErrAccessKeyIDNotFound
+	}
 
-	if secret == "" ***REMOVED***
-		return Value***REMOVED***ProviderName: EnvProviderName***REMOVED***, ErrSecretAccessKeyNotFound
-	***REMOVED***
+	if secret == "" {
+		return Value{ProviderName: EnvProviderName}, ErrSecretAccessKeyNotFound
+	}
 
 	e.retrieved = true
-	return Value***REMOVED***
+	return Value{
 		AccessKeyID:     id,
 		SecretAccessKey: secret,
 		SessionToken:    os.Getenv("AWS_SESSION_TOKEN"),
 		ProviderName:    EnvProviderName,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // IsExpired returns if the credentials have been retrieved.
-func (e *EnvProvider) IsExpired() bool ***REMOVED***
+func (e *EnvProvider) IsExpired() bool {
 	return !e.retrieved
-***REMOVED***
+}

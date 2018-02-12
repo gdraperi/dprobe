@@ -2,17 +2,17 @@ package portmapper
 
 import "net"
 
-func newMockProxyCommand(proto string, hostIP net.IP, hostPort int, containerIP net.IP, containerPort int, userlandProxyPath string) (userlandProxy, error) ***REMOVED***
-	return &mockProxyCommand***REMOVED******REMOVED***, nil
-***REMOVED***
+func newMockProxyCommand(proto string, hostIP net.IP, hostPort int, containerIP net.IP, containerPort int, userlandProxyPath string) (userlandProxy, error) {
+	return &mockProxyCommand{}, nil
+}
 
-type mockProxyCommand struct ***REMOVED***
-***REMOVED***
+type mockProxyCommand struct {
+}
 
-func (p *mockProxyCommand) Start() error ***REMOVED***
+func (p *mockProxyCommand) Start() error {
 	return nil
-***REMOVED***
+}
 
-func (p *mockProxyCommand) Stop() error ***REMOVED***
+func (p *mockProxyCommand) Stop() error {
 	return nil
-***REMOVED***
+}

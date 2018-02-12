@@ -15,10 +15,10 @@
 
 package cmd
 
-func initBsdClause3() ***REMOVED***
-	Licenses["bsd"] = License***REMOVED***
+func initBsdClause3() {
+	Licenses["bsd"] = License{
 		Name:            "NewBSD",
-		PossibleMatches: []string***REMOVED***"bsd", "newbsd", "3 clause bsd", "3-clause bsd"***REMOVED***,
+		PossibleMatches: []string{"bsd", "newbsd", "3 clause bsd", "3-clause bsd"},
 		Header: `All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -46,7 +46,7 @@ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
 CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.`,
-		Text: `***REMOVED******REMOVED*** .copyright ***REMOVED******REMOVED***
+		Text: `{{ .copyright }}
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -74,5 +74,5 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 `,
-	***REMOVED***
-***REMOVED***
+	}
+}

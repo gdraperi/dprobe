@@ -9,47 +9,47 @@ package ipv6
 
 import "net"
 
-func (c *payloadHandler) readFrom(b []byte) (n int, cm *ControlMessage, src net.Addr, err error) ***REMOVED***
+func (c *payloadHandler) readFrom(b []byte) (n int, cm *ControlMessage, src net.Addr, err error) {
 	c.rawOpt.RLock()
 	oob := NewControlMessage(c.rawOpt.cflags)
 	c.rawOpt.RUnlock()
 	var nn int
-	switch c := c.PacketConn.(type) ***REMOVED***
+	switch c := c.PacketConn.(type) {
 	case *net.UDPConn:
-		if n, nn, _, src, err = c.ReadMsgUDP(b, oob); err != nil ***REMOVED***
+		if n, nn, _, src, err = c.ReadMsgUDP(b, oob); err != nil {
 			return 0, nil, nil, err
-		***REMOVED***
+		}
 	case *net.IPConn:
-		if n, nn, _, src, err = c.ReadMsgIP(b, oob); err != nil ***REMOVED***
+		if n, nn, _, src, err = c.ReadMsgIP(b, oob); err != nil {
 			return 0, nil, nil, err
-		***REMOVED***
+		}
 	default:
-		return 0, nil, nil, &net.OpError***REMOVED***Op: "read", Net: c.LocalAddr().Network(), Source: c.LocalAddr(), Err: errInvalidConnType***REMOVED***
-	***REMOVED***
-	if nn > 0 ***REMOVED***
+		return 0, nil, nil, &net.OpError{Op: "read", Net: c.LocalAddr().Network(), Source: c.LocalAddr(), Err: errInvalidConnType}
+	}
+	if nn > 0 {
 		cm = new(ControlMessage)
-		if err = cm.Parse(oob[:nn]); err != nil ***REMOVED***
-			return 0, nil, nil, &net.OpError***REMOVED***Op: "read", Net: c.PacketConn.LocalAddr().Network(), Source: c.PacketConn.LocalAddr(), Err: err***REMOVED***
-		***REMOVED***
-	***REMOVED***
-	if cm != nil ***REMOVED***
+		if err = cm.Parse(oob[:nn]); err != nil {
+			return 0, nil, nil, &net.OpError{Op: "read", Net: c.PacketConn.LocalAddr().Network(), Source: c.PacketConn.LocalAddr(), Err: err}
+		}
+	}
+	if cm != nil {
 		cm.Src = netAddrToIP16(src)
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func (c *payloadHandler) writeTo(b []byte, cm *ControlMessage, dst net.Addr) (n int, err error) ***REMOVED***
+func (c *payloadHandler) writeTo(b []byte, cm *ControlMessage, dst net.Addr) (n int, err error) {
 	oob := cm.Marshal()
-	if dst == nil ***REMOVED***
-		return 0, &net.OpError***REMOVED***Op: "write", Net: c.PacketConn.LocalAddr().Network(), Source: c.PacketConn.LocalAddr(), Err: errMissingAddress***REMOVED***
-	***REMOVED***
-	switch c := c.PacketConn.(type) ***REMOVED***
+	if dst == nil {
+		return 0, &net.OpError{Op: "write", Net: c.PacketConn.LocalAddr().Network(), Source: c.PacketConn.LocalAddr(), Err: errMissingAddress}
+	}
+	switch c := c.PacketConn.(type) {
 	case *net.UDPConn:
 		n, _, err = c.WriteMsgUDP(b, oob, dst.(*net.UDPAddr))
 	case *net.IPConn:
 		n, _, err = c.WriteMsgIP(b, oob, dst.(*net.IPAddr))
 	default:
-		return 0, &net.OpError***REMOVED***Op: "write", Net: c.LocalAddr().Network(), Source: c.LocalAddr(), Addr: opAddr(dst), Err: errInvalidConnType***REMOVED***
-	***REMOVED***
+		return 0, &net.OpError{Op: "write", Net: c.LocalAddr().Network(), Source: c.LocalAddr(), Addr: opAddr(dst), Err: errInvalidConnType}
+	}
 	return
-***REMOVED***
+}

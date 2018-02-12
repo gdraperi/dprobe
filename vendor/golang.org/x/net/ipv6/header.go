@@ -16,7 +16,7 @@ const (
 )
 
 // A Header represents an IPv6 base header.
-type Header struct ***REMOVED***
+type Header struct {
 	Version      int    // protocol version
 	TrafficClass int    // traffic class
 	FlowLabel    int    // flow label
@@ -25,31 +25,31 @@ type Header struct ***REMOVED***
 	HopLimit     int    // hop limit
 	Src          net.IP // source address
 	Dst          net.IP // destination address
-***REMOVED***
+}
 
-func (h *Header) String() string ***REMOVED***
-	if h == nil ***REMOVED***
+func (h *Header) String() string {
+	if h == nil {
 		return "<nil>"
-	***REMOVED***
+	}
 	return fmt.Sprintf("ver=%d tclass=%#x flowlbl=%#x payloadlen=%d nxthdr=%d hoplim=%d src=%v dst=%v", h.Version, h.TrafficClass, h.FlowLabel, h.PayloadLen, h.NextHeader, h.HopLimit, h.Src, h.Dst)
-***REMOVED***
+}
 
 // ParseHeader parses b as an IPv6 base header.
-func ParseHeader(b []byte) (*Header, error) ***REMOVED***
-	if len(b) < HeaderLen ***REMOVED***
+func ParseHeader(b []byte) (*Header, error) {
+	if len(b) < HeaderLen {
 		return nil, errHeaderTooShort
-	***REMOVED***
-	h := &Header***REMOVED***
+	}
+	h := &Header{
 		Version:      int(b[0]) >> 4,
 		TrafficClass: int(b[0]&0x0f)<<4 | int(b[1])>>4,
 		FlowLabel:    int(b[1]&0x0f)<<16 | int(b[2])<<8 | int(b[3]),
 		PayloadLen:   int(binary.BigEndian.Uint16(b[4:6])),
 		NextHeader:   int(b[6]),
 		HopLimit:     int(b[7]),
-	***REMOVED***
+	}
 	h.Src = make(net.IP, net.IPv6len)
 	copy(h.Src, b[8:24])
 	h.Dst = make(net.IP, net.IPv6len)
 	copy(h.Dst, b[24:40])
 	return h, nil
-***REMOVED***
+}

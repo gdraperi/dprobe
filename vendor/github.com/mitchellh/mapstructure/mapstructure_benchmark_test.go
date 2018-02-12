@@ -5,66 +5,66 @@ import (
 	"testing"
 )
 
-func Benchmark_Decode(b *testing.B) ***REMOVED***
-	type Person struct ***REMOVED***
+func Benchmark_Decode(b *testing.B) {
+	type Person struct {
 		Name   string
 		Age    int
 		Emails []string
 		Extra  map[string]string
-	***REMOVED***
+	}
 
-	input := map[string]interface***REMOVED******REMOVED******REMOVED***
+	input := map[string]interface{}{
 		"name":   "Mitchell",
 		"age":    91,
-		"emails": []string***REMOVED***"one", "two", "three"***REMOVED***,
-		"extra": map[string]string***REMOVED***
+		"emails": []string{"one", "two", "three"},
+		"extra": map[string]string{
 			"twitter": "mitchellh",
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
 	var result Person
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		Decode(input, &result)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // decodeViaJSON takes the map data and passes it through encoding/json to convert it into the
 // given Go native structure pointed to by v. v must be a pointer to a struct.
-func decodeViaJSON(data interface***REMOVED******REMOVED***, v interface***REMOVED******REMOVED***) error ***REMOVED***
+func decodeViaJSON(data interface{}, v interface{}) error {
 	// Perform the task by simply marshalling the input into JSON,
 	// then unmarshalling it into target native Go struct.
 	b, err := json.Marshal(data)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return json.Unmarshal(b, v)
-***REMOVED***
+}
 
-func Benchmark_DecodeViaJSON(b *testing.B) ***REMOVED***
-	type Person struct ***REMOVED***
+func Benchmark_DecodeViaJSON(b *testing.B) {
+	type Person struct {
 		Name   string
 		Age    int
 		Emails []string
 		Extra  map[string]string
-	***REMOVED***
+	}
 
-	input := map[string]interface***REMOVED******REMOVED******REMOVED***
+	input := map[string]interface{}{
 		"name":   "Mitchell",
 		"age":    91,
-		"emails": []string***REMOVED***"one", "two", "three"***REMOVED***,
-		"extra": map[string]string***REMOVED***
+		"emails": []string{"one", "two", "three"},
+		"extra": map[string]string{
 			"twitter": "mitchellh",
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
 	var result Person
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		decodeViaJSON(input, &result)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func Benchmark_DecodeBasic(b *testing.B) ***REMOVED***
-	input := map[string]interface***REMOVED******REMOVED******REMOVED***
+func Benchmark_DecodeBasic(b *testing.B) {
+	input := map[string]interface{}{
 		"vstring": "foo",
 		"vint":    42,
 		"Vuint":   42,
@@ -72,31 +72,31 @@ func Benchmark_DecodeBasic(b *testing.B) ***REMOVED***
 		"Vfloat":  42.42,
 		"vsilent": true,
 		"vdata":   42,
-	***REMOVED***
+	}
 
 	var result Basic
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		Decode(input, &result)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func Benchmark_DecodeEmbedded(b *testing.B) ***REMOVED***
-	input := map[string]interface***REMOVED******REMOVED******REMOVED***
+func Benchmark_DecodeEmbedded(b *testing.B) {
+	input := map[string]interface{}{
 		"vstring": "foo",
-		"Basic": map[string]interface***REMOVED******REMOVED******REMOVED***
+		"Basic": map[string]interface{}{
 			"vstring": "innerfoo",
-		***REMOVED***,
+		},
 		"vunique": "bar",
-	***REMOVED***
+	}
 
 	var result Embedded
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		Decode(input, &result)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func Benchmark_DecodeTypeConversion(b *testing.B) ***REMOVED***
-	input := map[string]interface***REMOVED******REMOVED******REMOVED***
+func Benchmark_DecodeTypeConversion(b *testing.B) {
+	input := map[string]interface{}{
 		"IntToFloat":    42,
 		"IntToUint":     42,
 		"IntToBool":     1,
@@ -117,163 +117,163 @@ func Benchmark_DecodeTypeConversion(b *testing.B) ***REMOVED***
 		"StringToUint":  "42",
 		"StringToBool":  "1",
 		"StringToFloat": "42.42",
-		"SliceToMap":    []interface***REMOVED******REMOVED******REMOVED******REMOVED***,
-		"MapToSlice":    map[string]interface***REMOVED******REMOVED******REMOVED******REMOVED***,
-	***REMOVED***
+		"SliceToMap":    []interface{}{},
+		"MapToSlice":    map[string]interface{}{},
+	}
 
 	var resultStrict TypeConversionResult
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		Decode(input, &resultStrict)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func Benchmark_DecodeMap(b *testing.B) ***REMOVED***
-	input := map[string]interface***REMOVED******REMOVED******REMOVED***
+func Benchmark_DecodeMap(b *testing.B) {
+	input := map[string]interface{}{
 		"vfoo": "foo",
-		"vother": map[interface***REMOVED******REMOVED***]interface***REMOVED******REMOVED******REMOVED***
+		"vother": map[interface{}]interface{}{
 			"foo": "foo",
 			"bar": "bar",
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
 	var result Map
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		Decode(input, &result)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func Benchmark_DecodeMapOfStruct(b *testing.B) ***REMOVED***
-	input := map[string]interface***REMOVED******REMOVED******REMOVED***
-		"value": map[string]interface***REMOVED******REMOVED******REMOVED***
-			"foo": map[string]string***REMOVED***"vstring": "one"***REMOVED***,
-			"bar": map[string]string***REMOVED***"vstring": "two"***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+func Benchmark_DecodeMapOfStruct(b *testing.B) {
+	input := map[string]interface{}{
+		"value": map[string]interface{}{
+			"foo": map[string]string{"vstring": "one"},
+			"bar": map[string]string{"vstring": "two"},
+		},
+	}
 
 	var result MapOfStruct
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		Decode(input, &result)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func Benchmark_DecodeSlice(b *testing.B) ***REMOVED***
-	input := map[string]interface***REMOVED******REMOVED******REMOVED***
+func Benchmark_DecodeSlice(b *testing.B) {
+	input := map[string]interface{}{
 		"vfoo": "foo",
-		"vbar": []string***REMOVED***"foo", "bar", "baz"***REMOVED***,
-	***REMOVED***
+		"vbar": []string{"foo", "bar", "baz"},
+	}
 
 	var result Slice
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		Decode(input, &result)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func Benchmark_DecodeSliceOfStruct(b *testing.B) ***REMOVED***
-	input := map[string]interface***REMOVED******REMOVED******REMOVED***
-		"value": []map[string]interface***REMOVED******REMOVED******REMOVED***
-			***REMOVED***"vstring": "one"***REMOVED***,
-			***REMOVED***"vstring": "two"***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+func Benchmark_DecodeSliceOfStruct(b *testing.B) {
+	input := map[string]interface{}{
+		"value": []map[string]interface{}{
+			{"vstring": "one"},
+			{"vstring": "two"},
+		},
+	}
 
 	var result SliceOfStruct
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		Decode(input, &result)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func Benchmark_DecodeWeaklyTypedInput(b *testing.B) ***REMOVED***
-	type Person struct ***REMOVED***
+func Benchmark_DecodeWeaklyTypedInput(b *testing.B) {
+	type Person struct {
 		Name   string
 		Age    int
 		Emails []string
-	***REMOVED***
+	}
 
 	// This input can come from anywhere, but typically comes from
 	// something like decoding JSON, generated by a weakly typed language
 	// such as PHP.
-	input := map[string]interface***REMOVED******REMOVED******REMOVED***
+	input := map[string]interface{}{
 		"name":   123,                      // number => string
 		"age":    "42",                     // string => number
-		"emails": map[string]interface***REMOVED******REMOVED******REMOVED******REMOVED***, // empty map => empty array
-	***REMOVED***
+		"emails": map[string]interface{}{}, // empty map => empty array
+	}
 
 	var result Person
-	config := &DecoderConfig***REMOVED***
+	config := &DecoderConfig{
 		WeaklyTypedInput: true,
 		Result:           &result,
-	***REMOVED***
+	}
 
 	decoder, err := NewDecoder(config)
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		decoder.Decode(input)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func Benchmark_DecodeMetadata(b *testing.B) ***REMOVED***
-	type Person struct ***REMOVED***
+func Benchmark_DecodeMetadata(b *testing.B) {
+	type Person struct {
 		Name string
 		Age  int
-	***REMOVED***
+	}
 
-	input := map[string]interface***REMOVED******REMOVED******REMOVED***
+	input := map[string]interface{}{
 		"name":  "Mitchell",
 		"age":   91,
 		"email": "foo@bar.com",
-	***REMOVED***
+	}
 
 	var md Metadata
 	var result Person
-	config := &DecoderConfig***REMOVED***
+	config := &DecoderConfig{
 		Metadata: &md,
 		Result:   &result,
-	***REMOVED***
+	}
 
 	decoder, err := NewDecoder(config)
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		decoder.Decode(input)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func Benchmark_DecodeMetadataEmbedded(b *testing.B) ***REMOVED***
-	input := map[string]interface***REMOVED******REMOVED******REMOVED***
+func Benchmark_DecodeMetadataEmbedded(b *testing.B) {
+	input := map[string]interface{}{
 		"vstring": "foo",
 		"vunique": "bar",
-	***REMOVED***
+	}
 
 	var md Metadata
 	var result EmbeddedSquash
-	config := &DecoderConfig***REMOVED***
+	config := &DecoderConfig{
 		Metadata: &md,
 		Result:   &result,
-	***REMOVED***
+	}
 
 	decoder, err := NewDecoder(config)
-	if err != nil ***REMOVED***
+	if err != nil {
 		b.Fatalf("err: %s", err)
-	***REMOVED***
+	}
 
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		decoder.Decode(input)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func Benchmark_DecodeTagged(b *testing.B) ***REMOVED***
-	input := map[string]interface***REMOVED******REMOVED******REMOVED***
+func Benchmark_DecodeTagged(b *testing.B) {
+	input := map[string]interface{}{
 		"foo": "bar",
 		"bar": "value",
-	***REMOVED***
+	}
 
 	var result Tagged
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		Decode(input, &result)
-	***REMOVED***
-***REMOVED***
+	}
+}

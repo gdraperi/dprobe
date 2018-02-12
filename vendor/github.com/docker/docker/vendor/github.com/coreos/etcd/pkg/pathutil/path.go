@@ -14,18 +14,18 @@ import "path"
 // 3. replace each '.' '..' path name element with equivalent one
 // 4. keep the trailing slash
 // The function is borrowed from stdlib http.cleanPath in server.go.
-func CanonicalURLPath(p string) string ***REMOVED***
-	if p == "" ***REMOVED***
+func CanonicalURLPath(p string) string {
+	if p == "" {
 		return "/"
-	***REMOVED***
-	if p[0] != '/' ***REMOVED***
+	}
+	if p[0] != '/' {
 		p = "/" + p
-	***REMOVED***
+	}
 	np := path.Clean(p)
 	// path.Clean removes trailing slash except for root,
 	// put the trailing slash back if necessary.
-	if p[len(p)-1] == '/' && np != "/" ***REMOVED***
+	if p[len(p)-1] == '/' && np != "/" {
 		np += "/"
-	***REMOVED***
+	}
 	return np
-***REMOVED***
+}

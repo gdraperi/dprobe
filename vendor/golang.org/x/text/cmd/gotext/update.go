@@ -19,34 +19,34 @@ var (
 	out  *string
 )
 
-func init() ***REMOVED***
+func init() {
 	lang = cmdUpdate.Flag.String("lang", "en-US", "comma-separated list of languages to process")
 	out = cmdUpdate.Flag.String("out", "", "output file to write to")
-***REMOVED***
+}
 
-var cmdUpdate = &Command***REMOVED***
+var cmdUpdate = &Command{
 	Run:       runUpdate,
 	UsageLine: "update <package>* [-out <gofile>]",
 	Short:     "merge translations and generate catalog",
-***REMOVED***
+}
 
-func runUpdate(cmd *Command, config *pipeline.Config, args []string) error ***REMOVED***
+func runUpdate(cmd *Command, config *pipeline.Config, args []string) error {
 	config.Packages = args
 	state, err := pipeline.Extract(config)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return wrap(err, "extract failed")
-	***REMOVED***
-	if err := state.Import(); err != nil ***REMOVED***
+	}
+	if err := state.Import(); err != nil {
 		return wrap(err, "import failed")
-	***REMOVED***
-	if err := state.Merge(); err != nil ***REMOVED***
+	}
+	if err := state.Merge(); err != nil {
 		return wrap(err, "merge failed")
-	***REMOVED***
-	if err := state.Export(); err != nil ***REMOVED***
+	}
+	if err := state.Export(); err != nil {
 		return wrap(err, "export failed")
-	***REMOVED***
-	if *out != "" ***REMOVED***
+	}
+	if *out != "" {
 		return wrap(state.Generate(), "generation failed")
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

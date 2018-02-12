@@ -12,97 +12,97 @@ import (
 // Can copy between structs of different type, but will only copy fields which
 // are assignable, and exist in both structs. Fields which are not assignable,
 // or do not exist in both structs are ignored.
-func Copy(dst, src interface***REMOVED******REMOVED***) ***REMOVED***
+func Copy(dst, src interface{}) {
 	dstval := reflect.ValueOf(dst)
-	if !dstval.IsValid() ***REMOVED***
+	if !dstval.IsValid() {
 		panic("Copy dst cannot be nil")
-	***REMOVED***
+	}
 
 	rcopy(dstval, reflect.ValueOf(src), true)
-***REMOVED***
+}
 
 // CopyOf returns a copy of src while also allocating the memory for dst.
 // src must be a pointer type or this operation will fail.
-func CopyOf(src interface***REMOVED******REMOVED***) (dst interface***REMOVED******REMOVED***) ***REMOVED***
+func CopyOf(src interface{}) (dst interface{}) {
 	dsti := reflect.New(reflect.TypeOf(src).Elem())
 	dst = dsti.Interface()
 	rcopy(dsti, reflect.ValueOf(src), true)
 	return
-***REMOVED***
+}
 
 // rcopy performs a recursive copy of values from the source to destination.
 //
 // root is used to skip certain aspects of the copy which are not valid
 // for the root node of a object.
-func rcopy(dst, src reflect.Value, root bool) ***REMOVED***
-	if !src.IsValid() ***REMOVED***
+func rcopy(dst, src reflect.Value, root bool) {
+	if !src.IsValid() {
 		return
-	***REMOVED***
+	}
 
-	switch src.Kind() ***REMOVED***
+	switch src.Kind() {
 	case reflect.Ptr:
-		if _, ok := src.Interface().(io.Reader); ok ***REMOVED***
-			if dst.Kind() == reflect.Ptr && dst.Elem().CanSet() ***REMOVED***
+		if _, ok := src.Interface().(io.Reader); ok {
+			if dst.Kind() == reflect.Ptr && dst.Elem().CanSet() {
 				dst.Elem().Set(src)
-			***REMOVED*** else if dst.CanSet() ***REMOVED***
+			} else if dst.CanSet() {
 				dst.Set(src)
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
+			}
+		} else {
 			e := src.Type().Elem()
-			if dst.CanSet() && !src.IsNil() ***REMOVED***
-				if _, ok := src.Interface().(*time.Time); !ok ***REMOVED***
+			if dst.CanSet() && !src.IsNil() {
+				if _, ok := src.Interface().(*time.Time); !ok {
 					dst.Set(reflect.New(e))
-				***REMOVED*** else ***REMOVED***
+				} else {
 					tempValue := reflect.New(e)
 					tempValue.Elem().Set(src.Elem())
 					// Sets time.Time's unexported values
 					dst.Set(tempValue)
-				***REMOVED***
-			***REMOVED***
-			if src.Elem().IsValid() ***REMOVED***
+				}
+			}
+			if src.Elem().IsValid() {
 				// Keep the current root state since the depth hasn't changed
 				rcopy(dst.Elem(), src.Elem(), root)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 	case reflect.Struct:
 		t := dst.Type()
-		for i := 0; i < t.NumField(); i++ ***REMOVED***
+		for i := 0; i < t.NumField(); i++ {
 			name := t.Field(i).Name
 			srcVal := src.FieldByName(name)
 			dstVal := dst.FieldByName(name)
-			if srcVal.IsValid() && dstVal.CanSet() ***REMOVED***
+			if srcVal.IsValid() && dstVal.CanSet() {
 				rcopy(dstVal, srcVal, false)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 	case reflect.Slice:
-		if src.IsNil() ***REMOVED***
+		if src.IsNil() {
 			break
-		***REMOVED***
+		}
 
 		s := reflect.MakeSlice(src.Type(), src.Len(), src.Cap())
 		dst.Set(s)
-		for i := 0; i < src.Len(); i++ ***REMOVED***
+		for i := 0; i < src.Len(); i++ {
 			rcopy(dst.Index(i), src.Index(i), false)
-		***REMOVED***
+		}
 	case reflect.Map:
-		if src.IsNil() ***REMOVED***
+		if src.IsNil() {
 			break
-		***REMOVED***
+		}
 
 		s := reflect.MakeMap(src.Type())
 		dst.Set(s)
-		for _, k := range src.MapKeys() ***REMOVED***
+		for _, k := range src.MapKeys() {
 			v := src.MapIndex(k)
 			v2 := reflect.New(v.Type()).Elem()
 			rcopy(v2, v, false)
 			dst.SetMapIndex(k, v2)
-		***REMOVED***
+		}
 	default:
 		// Assign the value if possible. If its not assignable, the value would
 		// need to be converted and the impact of that may be unexpected, or is
 		// not compatible with the dst type.
-		if src.Type().AssignableTo(dst.Type()) ***REMOVED***
+		if src.Type().AssignableTo(dst.Type()) {
 			dst.Set(src)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

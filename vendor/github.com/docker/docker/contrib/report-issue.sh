@@ -5,38 +5,38 @@
 
 set -e
 
-DOCKER_ISSUE_URL=$***REMOVED***DOCKER_ISSUE_URL:-"https://github.com/docker/docker/issues/new"***REMOVED***
-DOCKER_ISSUE_NAME_PREFIX=$***REMOVED***DOCKER_ISSUE_NAME_PREFIX:-"Report: "***REMOVED***
-DOCKER=$***REMOVED***DOCKER:-"docker"***REMOVED***
-DOCKER_COMMAND="$***REMOVED***DOCKER***REMOVED***"
+DOCKER_ISSUE_URL=${DOCKER_ISSUE_URL:-"https://github.com/docker/docker/issues/new"}
+DOCKER_ISSUE_NAME_PREFIX=${DOCKER_ISSUE_NAME_PREFIX:-"Report: "}
+DOCKER=${DOCKER:-"docker"}
+DOCKER_COMMAND="${DOCKER}"
 export DOCKER_COMMAND
 
 # pulled from https://gist.github.com/cdown/1163649
-function urlencode() ***REMOVED***
+function urlencode() {
 	# urlencode <string>
 
-	local length="$***REMOVED***#1***REMOVED***"
+	local length="${#1}"
 	for (( i = 0; i < length; i++ )); do
-			local c="$***REMOVED***1:i:1***REMOVED***"
+			local c="${1:i:1}"
 			case $c in
 					[a-zA-Z0-9.~_-]) printf "$c" ;;
 					*) printf '%%%02X' "'$c"
 			esac
 	done
-***REMOVED***
+}
 
-function template() ***REMOVED***
+function template() {
 # this should always match the template from CONTRIBUTING.md
 	cat <<- EOM
 	Description of problem:
 
 
 	\`docker version\`:
-	`$***REMOVED***DOCKER_COMMAND***REMOVED*** -D version`
+	`${DOCKER_COMMAND} -D version`
 
 
 	\`docker info\`:
-	`$***REMOVED***DOCKER_COMMAND***REMOVED*** -D info`
+	`${DOCKER_COMMAND} -D info`
 
 
 	\`uname -a\`:
@@ -65,41 +65,41 @@ function template() ***REMOVED***
 
 
 	EOM
-***REMOVED***
+}
 
-function format_issue_url() ***REMOVED***
-	if [ $***REMOVED***#@***REMOVED*** -ne 2 ] ; then
+function format_issue_url() {
+	if [ ${#@} -ne 2 ] ; then
 		return 1
 	fi
-	local issue_name=$(urlencode "$***REMOVED***DOCKER_ISSUE_NAME_PREFIX***REMOVED***$***REMOVED***1***REMOVED***")
-	local issue_body=$(urlencode "$***REMOVED***2***REMOVED***")
-	echo "$***REMOVED***DOCKER_ISSUE_URL***REMOVED***?title=$***REMOVED***issue_name***REMOVED***&body=$***REMOVED***issue_body***REMOVED***"
-***REMOVED***
+	local issue_name=$(urlencode "${DOCKER_ISSUE_NAME_PREFIX}${1}")
+	local issue_body=$(urlencode "${2}")
+	echo "${DOCKER_ISSUE_URL}?title=${issue_name}&body=${issue_body}"
+}
 
 
 echo -ne "Do you use \`sudo\` to call docker? [y|N]: "
 read -r -n 1 use_sudo
 echo ""
 
-if [ "x$***REMOVED***use_sudo***REMOVED***" = "xy" -o "x$***REMOVED***use_sudo***REMOVED***" = "xY" ]; then
-	export DOCKER_COMMAND="sudo $***REMOVED***DOCKER***REMOVED***"
+if [ "x${use_sudo}" = "xy" -o "x${use_sudo}" = "xY" ]; then
+	export DOCKER_COMMAND="sudo ${DOCKER}"
 fi
 
 echo -ne "Title of new issue?: "
 read -r issue_title
 echo ""
 
-issue_url=$(format_issue_url "$***REMOVED***issue_title***REMOVED***" "$(template)")
+issue_url=$(format_issue_url "${issue_title}" "$(template)")
 
 if which xdg-open 2>/dev/null >/dev/null ; then
 	echo -ne "Would like to launch this report in your browser? [Y|n]: "
 	read -r -n 1 launch_now
 	echo ""
 
-	if [ "$***REMOVED***launch_now***REMOVED***" != "n" -a "$***REMOVED***launch_now***REMOVED***" != "N" ]; then
-		xdg-open "$***REMOVED***issue_url***REMOVED***"
+	if [ "${launch_now}" != "n" -a "${launch_now}" != "N" ]; then
+		xdg-open "${issue_url}"
 	fi
 fi
 
-echo "If you would like to manually open the url, you can open this link if your browser: $***REMOVED***issue_url***REMOVED***"
+echo "If you would like to manually open the url, you can open this link if your browser: ${issue_url}"
 

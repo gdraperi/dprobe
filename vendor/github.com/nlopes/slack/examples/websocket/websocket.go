@@ -8,7 +8,7 @@ import (
 	"github.com/nlopes/slack"
 )
 
-func main() ***REMOVED***
+func main() {
 	api := slack.New("YOUR TOKEN HERE")
 	logger := log.New(os.Stdout, "slack-bot: ", log.Lshortfile|log.LstdFlags)
 	slack.SetLogger(logger)
@@ -17,9 +17,9 @@ func main() ***REMOVED***
 	rtm := api.NewRTM()
 	go rtm.ManageConnection()
 
-	for msg := range rtm.IncomingEvents ***REMOVED***
+	for msg := range rtm.IncomingEvents {
 		fmt.Print("Event Received: ")
-		switch ev := msg.Data.(type) ***REMOVED***
+		switch ev := msg.Data.(type) {
 		case *slack.HelloEvent:
 			// Ignore hello
 
@@ -49,6 +49,6 @@ func main() ***REMOVED***
 
 			// Ignore other events..
 			// fmt.Printf("Unexpected: %v\n", msg.Data)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

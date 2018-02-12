@@ -14,89 +14,89 @@ import (
 
 // Init creates new listeners for the server.
 // TODO: Clean up the fact that socketGroup and tlsConfig aren't always used.
-func Init(proto, addr, socketGroup string, tlsConfig *tls.Config) ([]net.Listener, error) ***REMOVED***
-	ls := []net.Listener***REMOVED******REMOVED***
+func Init(proto, addr, socketGroup string, tlsConfig *tls.Config) ([]net.Listener, error) {
+	ls := []net.Listener{}
 
-	switch proto ***REMOVED***
+	switch proto {
 	case "fd":
 		fds, err := listenFD(addr, tlsConfig)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		ls = append(ls, fds...)
 	case "tcp":
 		l, err := sockets.NewTCPSocket(addr, tlsConfig)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		ls = append(ls, l)
 	case "unix":
 		gid, err := lookupGID(socketGroup)
-		if err != nil ***REMOVED***
-			if socketGroup != "" ***REMOVED***
-				if socketGroup != defaultSocketGroup ***REMOVED***
+		if err != nil {
+			if socketGroup != "" {
+				if socketGroup != defaultSocketGroup {
 					return nil, err
-				***REMOVED***
+				}
 				logrus.Warnf("could not change group %s to %s: %v", addr, defaultSocketGroup, err)
-			***REMOVED***
+			}
 			gid = os.Getgid()
-		***REMOVED***
+		}
 		l, err := sockets.NewUnixSocket(addr, gid)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, fmt.Errorf("can't create unix socket %s: %v", addr, err)
-		***REMOVED***
+		}
 		ls = append(ls, l)
 	default:
 		return nil, fmt.Errorf("invalid protocol format: %q", proto)
-	***REMOVED***
+	}
 
 	return ls, nil
-***REMOVED***
+}
 
 // listenFD returns the specified socket activated files as a slice of
 // net.Listeners or all of the activated files if "*" is given.
-func listenFD(addr string, tlsConfig *tls.Config) ([]net.Listener, error) ***REMOVED***
+func listenFD(addr string, tlsConfig *tls.Config) ([]net.Listener, error) {
 	var (
 		err       error
 		listeners []net.Listener
 	)
 	// socket activation
-	if tlsConfig != nil ***REMOVED***
+	if tlsConfig != nil {
 		listeners, err = activation.TLSListeners(false, tlsConfig)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		listeners, err = activation.Listeners(false)
-	***REMOVED***
-	if err != nil ***REMOVED***
+	}
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	if len(listeners) == 0 ***REMOVED***
+	if len(listeners) == 0 {
 		return nil, fmt.Errorf("no sockets found via socket activation: make sure the service was started by systemd")
-	***REMOVED***
+	}
 
 	// default to all fds just like unix:// and tcp://
-	if addr == "" || addr == "*" ***REMOVED***
+	if addr == "" || addr == "*" {
 		return listeners, nil
-	***REMOVED***
+	}
 
 	fdNum, err := strconv.Atoi(addr)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("failed to parse systemd fd address: should be a number: %v", addr)
-	***REMOVED***
+	}
 	fdOffset := fdNum - 3
-	if len(listeners) < fdOffset+1 ***REMOVED***
+	if len(listeners) < fdOffset+1 {
 		return nil, fmt.Errorf("too few socket activated files passed in by systemd")
-	***REMOVED***
-	if listeners[fdOffset] == nil ***REMOVED***
+	}
+	if listeners[fdOffset] == nil {
 		return nil, fmt.Errorf("failed to listen on systemd activated file: fd %d", fdOffset+3)
-	***REMOVED***
-	for i, ls := range listeners ***REMOVED***
-		if i == fdOffset || ls == nil ***REMOVED***
+	}
+	for i, ls := range listeners {
+		if i == fdOffset || ls == nil {
 			continue
-		***REMOVED***
-		if err := ls.Close(); err != nil ***REMOVED***
+		}
+		if err := ls.Close(); err != nil {
 			return nil, fmt.Errorf("failed to close systemd activated file: fd %d: %v", fdOffset+3, err)
-		***REMOVED***
-	***REMOVED***
-	return []net.Listener***REMOVED***listeners[fdOffset]***REMOVED***, nil
-***REMOVED***
+		}
+	}
+	return []net.Listener{listeners[fdOffset]}, nil
+}

@@ -88,106 +88,106 @@ var LabelNameRE = regexp.MustCompile("^[a-zA-Z_][a-zA-Z0-9_]*$")
 type LabelName string
 
 // IsValid is true iff the label name matches the pattern of LabelNameRE.
-func (ln LabelName) IsValid() bool ***REMOVED***
-	if len(ln) == 0 ***REMOVED***
+func (ln LabelName) IsValid() bool {
+	if len(ln) == 0 {
 		return false
-	***REMOVED***
-	for i, b := range ln ***REMOVED***
-		if !((b >= 'a' && b <= 'z') || (b >= 'A' && b <= 'Z') || b == '_' || (b >= '0' && b <= '9' && i > 0)) ***REMOVED***
+	}
+	for i, b := range ln {
+		if !((b >= 'a' && b <= 'z') || (b >= 'A' && b <= 'Z') || b == '_' || (b >= '0' && b <= '9' && i > 0)) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}
 
 // UnmarshalYAML implements the yaml.Unmarshaler interface.
-func (ln *LabelName) UnmarshalYAML(unmarshal func(interface***REMOVED******REMOVED***) error) error ***REMOVED***
+func (ln *LabelName) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var s string
-	if err := unmarshal(&s); err != nil ***REMOVED***
+	if err := unmarshal(&s); err != nil {
 		return err
-	***REMOVED***
-	if !LabelNameRE.MatchString(s) ***REMOVED***
+	}
+	if !LabelNameRE.MatchString(s) {
 		return fmt.Errorf("%q is not a valid label name", s)
-	***REMOVED***
+	}
 	*ln = LabelName(s)
 	return nil
-***REMOVED***
+}
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
-func (ln *LabelName) UnmarshalJSON(b []byte) error ***REMOVED***
+func (ln *LabelName) UnmarshalJSON(b []byte) error {
 	var s string
-	if err := json.Unmarshal(b, &s); err != nil ***REMOVED***
+	if err := json.Unmarshal(b, &s); err != nil {
 		return err
-	***REMOVED***
-	if !LabelNameRE.MatchString(s) ***REMOVED***
+	}
+	if !LabelNameRE.MatchString(s) {
 		return fmt.Errorf("%q is not a valid label name", s)
-	***REMOVED***
+	}
 	*ln = LabelName(s)
 	return nil
-***REMOVED***
+}
 
 // LabelNames is a sortable LabelName slice. In implements sort.Interface.
 type LabelNames []LabelName
 
-func (l LabelNames) Len() int ***REMOVED***
+func (l LabelNames) Len() int {
 	return len(l)
-***REMOVED***
+}
 
-func (l LabelNames) Less(i, j int) bool ***REMOVED***
+func (l LabelNames) Less(i, j int) bool {
 	return l[i] < l[j]
-***REMOVED***
+}
 
-func (l LabelNames) Swap(i, j int) ***REMOVED***
+func (l LabelNames) Swap(i, j int) {
 	l[i], l[j] = l[j], l[i]
-***REMOVED***
+}
 
-func (l LabelNames) String() string ***REMOVED***
+func (l LabelNames) String() string {
 	labelStrings := make([]string, 0, len(l))
-	for _, label := range l ***REMOVED***
+	for _, label := range l {
 		labelStrings = append(labelStrings, string(label))
-	***REMOVED***
+	}
 	return strings.Join(labelStrings, ", ")
-***REMOVED***
+}
 
 // A LabelValue is an associated value for a LabelName.
 type LabelValue string
 
 // IsValid returns true iff the string is a valid UTF8.
-func (lv LabelValue) IsValid() bool ***REMOVED***
+func (lv LabelValue) IsValid() bool {
 	return utf8.ValidString(string(lv))
-***REMOVED***
+}
 
 // LabelValues is a sortable LabelValue slice. It implements sort.Interface.
 type LabelValues []LabelValue
 
-func (l LabelValues) Len() int ***REMOVED***
+func (l LabelValues) Len() int {
 	return len(l)
-***REMOVED***
+}
 
-func (l LabelValues) Less(i, j int) bool ***REMOVED***
+func (l LabelValues) Less(i, j int) bool {
 	return string(l[i]) < string(l[j])
-***REMOVED***
+}
 
-func (l LabelValues) Swap(i, j int) ***REMOVED***
+func (l LabelValues) Swap(i, j int) {
 	l[i], l[j] = l[j], l[i]
-***REMOVED***
+}
 
 // LabelPair pairs a name with a value.
-type LabelPair struct ***REMOVED***
+type LabelPair struct {
 	Name  LabelName
 	Value LabelValue
-***REMOVED***
+}
 
 // LabelPairs is a sortable slice of LabelPair pointers. It implements
 // sort.Interface.
 type LabelPairs []*LabelPair
 
-func (l LabelPairs) Len() int ***REMOVED***
+func (l LabelPairs) Len() int {
 	return len(l)
-***REMOVED***
+}
 
-func (l LabelPairs) Less(i, j int) bool ***REMOVED***
-	switch ***REMOVED***
+func (l LabelPairs) Less(i, j int) bool {
+	switch {
 	case l[i].Name > l[j].Name:
 		return false
 	case l[i].Name < l[j].Name:
@@ -198,9 +198,9 @@ func (l LabelPairs) Less(i, j int) bool ***REMOVED***
 		return true
 	default:
 		return false
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (l LabelPairs) Swap(i, j int) ***REMOVED***
+func (l LabelPairs) Swap(i, j int) {
 	l[i], l[j] = l[j], l[i]
-***REMOVED***
+}

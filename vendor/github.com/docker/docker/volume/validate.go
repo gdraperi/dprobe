@@ -9,18 +9,18 @@ import (
 
 var errBindNotExist = errors.New("bind source path does not exist")
 
-type errMountConfig struct ***REMOVED***
+type errMountConfig struct {
 	mount *mount.Mount
 	err   error
-***REMOVED***
+}
 
-func (e *errMountConfig) Error() string ***REMOVED***
+func (e *errMountConfig) Error() string {
 	return fmt.Sprintf("invalid mount config for type %q: %v", e.mount.Type, e.err.Error())
-***REMOVED***
+}
 
-func errExtraField(name string) error ***REMOVED***
+func errExtraField(name string) error {
 	return errors.Errorf("field %s must not be specified", name)
-***REMOVED***
-func errMissingField(name string) error ***REMOVED***
+}
+func errMissingField(name string) error {
 	return errors.Errorf("field %s must not be empty", name)
-***REMOVED***
+}

@@ -10,7 +10,7 @@ import (
 )
 
 // TestChtimesLinux tests Chtimes access time on a tempfile on Linux
-func TestChtimesLinux(t *testing.T) ***REMOVED***
+func TestChtimesLinux(t *testing.T) {
 	file, dir := prepareTempFile(t)
 	defer os.RemoveAll(dir)
 
@@ -23,69 +23,69 @@ func TestChtimesLinux(t *testing.T) ***REMOVED***
 	Chtimes(file, unixEpochTime, unixEpochTime)
 
 	f, err := os.Stat(file)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	stat := f.Sys().(*syscall.Stat_t)
 	aTime := time.Unix(int64(stat.Atim.Sec), int64(stat.Atim.Nsec))
-	if aTime != unixEpochTime ***REMOVED***
+	if aTime != unixEpochTime {
 		t.Fatalf("Expected: %s, got: %s", unixEpochTime, aTime)
-	***REMOVED***
+	}
 
 	// Test aTime before Unix Epoch and mTime set to Unix Epoch
 	Chtimes(file, beforeUnixEpochTime, unixEpochTime)
 
 	f, err = os.Stat(file)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	stat = f.Sys().(*syscall.Stat_t)
 	aTime = time.Unix(int64(stat.Atim.Sec), int64(stat.Atim.Nsec))
-	if aTime != unixEpochTime ***REMOVED***
+	if aTime != unixEpochTime {
 		t.Fatalf("Expected: %s, got: %s", unixEpochTime, aTime)
-	***REMOVED***
+	}
 
 	// Test aTime set to Unix Epoch and mTime before Unix Epoch
 	Chtimes(file, unixEpochTime, beforeUnixEpochTime)
 
 	f, err = os.Stat(file)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	stat = f.Sys().(*syscall.Stat_t)
 	aTime = time.Unix(int64(stat.Atim.Sec), int64(stat.Atim.Nsec))
-	if aTime != unixEpochTime ***REMOVED***
+	if aTime != unixEpochTime {
 		t.Fatalf("Expected: %s, got: %s", unixEpochTime, aTime)
-	***REMOVED***
+	}
 
 	// Test both aTime and mTime set to after Unix Epoch (valid time)
 	Chtimes(file, afterUnixEpochTime, afterUnixEpochTime)
 
 	f, err = os.Stat(file)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	stat = f.Sys().(*syscall.Stat_t)
 	aTime = time.Unix(int64(stat.Atim.Sec), int64(stat.Atim.Nsec))
-	if aTime != afterUnixEpochTime ***REMOVED***
+	if aTime != afterUnixEpochTime {
 		t.Fatalf("Expected: %s, got: %s", afterUnixEpochTime, aTime)
-	***REMOVED***
+	}
 
 	// Test both aTime and mTime set to Unix max time
 	Chtimes(file, unixMaxTime, unixMaxTime)
 
 	f, err = os.Stat(file)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	stat = f.Sys().(*syscall.Stat_t)
 	aTime = time.Unix(int64(stat.Atim.Sec), int64(stat.Atim.Nsec))
-	if aTime.Truncate(time.Second) != unixMaxTime.Truncate(time.Second) ***REMOVED***
+	if aTime.Truncate(time.Second) != unixMaxTime.Truncate(time.Second) {
 		t.Fatalf("Expected: %s, got: %s", unixMaxTime.Truncate(time.Second), aTime.Truncate(time.Second))
-	***REMOVED***
-***REMOVED***
+	}
+}

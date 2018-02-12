@@ -23,35 +23,35 @@ const (
 )
 
 // loginV1 tries to register/login to the v1 registry server.
-func loginV1(authConfig *types.AuthConfig, apiEndpoint APIEndpoint, userAgent string) (string, string, error) ***REMOVED***
+func loginV1(authConfig *types.AuthConfig, apiEndpoint APIEndpoint, userAgent string) (string, string, error) {
 	registryEndpoint := apiEndpoint.ToV1Endpoint(userAgent, nil)
 	serverAddress := registryEndpoint.String()
 
 	logrus.Debugf("attempting v1 login to registry endpoint %s", serverAddress)
 
-	if serverAddress == "" ***REMOVED***
+	if serverAddress == "" {
 		return "", "", errdefs.System(errors.New("server Error: Server Address not set"))
-	***REMOVED***
+	}
 
 	req, err := http.NewRequest("GET", serverAddress+"users/", nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", "", err
-	***REMOVED***
+	}
 	req.SetBasicAuth(authConfig.Username, authConfig.Password)
 	resp, err := registryEndpoint.client.Do(req)
-	if err != nil ***REMOVED***
+	if err != nil {
 		// fallback when request could not be completed
-		return "", "", fallbackError***REMOVED***
+		return "", "", fallbackError{
 			err: err,
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", "", errdefs.System(err)
-	***REMOVED***
+	}
 
-	switch resp.StatusCode ***REMOVED***
+	switch resp.StatusCode {
 	case http.StatusOK:
 		return "Login Succeeded", "", nil
 	case http.StatusUnauthorized:
@@ -62,235 +62,235 @@ func loginV1(authConfig *types.AuthConfig, apiEndpoint APIEndpoint, userAgent st
 	case http.StatusInternalServerError:
 		logrus.Errorf("%s returned status code %d. Response Body :\n%s", req.URL.String(), resp.StatusCode, body)
 		return "", "", errdefs.System(errors.New("Internal Server Error"))
-	***REMOVED***
+	}
 	return "", "", errdefs.System(errors.Errorf("Login: %s (Code: %d; Headers: %s)", body,
 		resp.StatusCode, resp.Header))
-***REMOVED***
+}
 
-type loginCredentialStore struct ***REMOVED***
+type loginCredentialStore struct {
 	authConfig *types.AuthConfig
-***REMOVED***
+}
 
-func (lcs loginCredentialStore) Basic(*url.URL) (string, string) ***REMOVED***
+func (lcs loginCredentialStore) Basic(*url.URL) (string, string) {
 	return lcs.authConfig.Username, lcs.authConfig.Password
-***REMOVED***
+}
 
-func (lcs loginCredentialStore) RefreshToken(*url.URL, string) string ***REMOVED***
+func (lcs loginCredentialStore) RefreshToken(*url.URL, string) string {
 	return lcs.authConfig.IdentityToken
-***REMOVED***
+}
 
-func (lcs loginCredentialStore) SetRefreshToken(u *url.URL, service, token string) ***REMOVED***
+func (lcs loginCredentialStore) SetRefreshToken(u *url.URL, service, token string) {
 	lcs.authConfig.IdentityToken = token
-***REMOVED***
+}
 
-type staticCredentialStore struct ***REMOVED***
+type staticCredentialStore struct {
 	auth *types.AuthConfig
-***REMOVED***
+}
 
 // NewStaticCredentialStore returns a credential store
 // which always returns the same credential values.
-func NewStaticCredentialStore(auth *types.AuthConfig) auth.CredentialStore ***REMOVED***
-	return staticCredentialStore***REMOVED***
+func NewStaticCredentialStore(auth *types.AuthConfig) auth.CredentialStore {
+	return staticCredentialStore{
 		auth: auth,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (scs staticCredentialStore) Basic(*url.URL) (string, string) ***REMOVED***
-	if scs.auth == nil ***REMOVED***
+func (scs staticCredentialStore) Basic(*url.URL) (string, string) {
+	if scs.auth == nil {
 		return "", ""
-	***REMOVED***
+	}
 	return scs.auth.Username, scs.auth.Password
-***REMOVED***
+}
 
-func (scs staticCredentialStore) RefreshToken(*url.URL, string) string ***REMOVED***
-	if scs.auth == nil ***REMOVED***
+func (scs staticCredentialStore) RefreshToken(*url.URL, string) string {
+	if scs.auth == nil {
 		return ""
-	***REMOVED***
+	}
 	return scs.auth.IdentityToken
-***REMOVED***
+}
 
-func (scs staticCredentialStore) SetRefreshToken(*url.URL, string, string) ***REMOVED***
-***REMOVED***
+func (scs staticCredentialStore) SetRefreshToken(*url.URL, string, string) {
+}
 
-type fallbackError struct ***REMOVED***
+type fallbackError struct {
 	err error
-***REMOVED***
+}
 
-func (err fallbackError) Error() string ***REMOVED***
+func (err fallbackError) Error() string {
 	return err.err.Error()
-***REMOVED***
+}
 
 // loginV2 tries to login to the v2 registry server. The given registry
 // endpoint will be pinged to get authorization challenges. These challenges
 // will be used to authenticate against the registry to validate credentials.
-func loginV2(authConfig *types.AuthConfig, endpoint APIEndpoint, userAgent string) (string, string, error) ***REMOVED***
+func loginV2(authConfig *types.AuthConfig, endpoint APIEndpoint, userAgent string) (string, string, error) {
 	logrus.Debugf("attempting v2 login to registry endpoint %s", strings.TrimRight(endpoint.URL.String(), "/")+"/v2/")
 
 	modifiers := Headers(userAgent, nil)
 	authTransport := transport.NewTransport(NewTransport(endpoint.TLSConfig), modifiers...)
 
 	credentialAuthConfig := *authConfig
-	creds := loginCredentialStore***REMOVED***
+	creds := loginCredentialStore{
 		authConfig: &credentialAuthConfig,
-	***REMOVED***
+	}
 
 	loginClient, foundV2, err := v2AuthHTTPClient(endpoint.URL, authTransport, modifiers, creds, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", "", err
-	***REMOVED***
+	}
 
 	endpointStr := strings.TrimRight(endpoint.URL.String(), "/") + "/v2/"
 	req, err := http.NewRequest("GET", endpointStr, nil)
-	if err != nil ***REMOVED***
-		if !foundV2 ***REMOVED***
-			err = fallbackError***REMOVED***err: err***REMOVED***
-		***REMOVED***
+	if err != nil {
+		if !foundV2 {
+			err = fallbackError{err: err}
+		}
 		return "", "", err
-	***REMOVED***
+	}
 
 	resp, err := loginClient.Do(req)
-	if err != nil ***REMOVED***
+	if err != nil {
 		err = translateV2AuthError(err)
-		if !foundV2 ***REMOVED***
-			err = fallbackError***REMOVED***err: err***REMOVED***
-		***REMOVED***
+		if !foundV2 {
+			err = fallbackError{err: err}
+		}
 
 		return "", "", err
-	***REMOVED***
+	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode == http.StatusOK ***REMOVED***
+	if resp.StatusCode == http.StatusOK {
 		return "Login Succeeded", credentialAuthConfig.IdentityToken, nil
-	***REMOVED***
+	}
 
 	// TODO(dmcgowan): Attempt to further interpret result, status code and error code string
 	err = errors.Errorf("login attempt to %s failed with status: %d %s", endpointStr, resp.StatusCode, http.StatusText(resp.StatusCode))
-	if !foundV2 ***REMOVED***
-		err = fallbackError***REMOVED***err: err***REMOVED***
-	***REMOVED***
+	if !foundV2 {
+		err = fallbackError{err: err}
+	}
 	return "", "", err
-***REMOVED***
+}
 
-func v2AuthHTTPClient(endpoint *url.URL, authTransport http.RoundTripper, modifiers []transport.RequestModifier, creds auth.CredentialStore, scopes []auth.Scope) (*http.Client, bool, error) ***REMOVED***
+func v2AuthHTTPClient(endpoint *url.URL, authTransport http.RoundTripper, modifiers []transport.RequestModifier, creds auth.CredentialStore, scopes []auth.Scope) (*http.Client, bool, error) {
 	challengeManager, foundV2, err := PingV2Registry(endpoint, authTransport)
-	if err != nil ***REMOVED***
-		if !foundV2 ***REMOVED***
-			err = fallbackError***REMOVED***err: err***REMOVED***
-		***REMOVED***
+	if err != nil {
+		if !foundV2 {
+			err = fallbackError{err: err}
+		}
 		return nil, foundV2, err
-	***REMOVED***
+	}
 
-	tokenHandlerOptions := auth.TokenHandlerOptions***REMOVED***
+	tokenHandlerOptions := auth.TokenHandlerOptions{
 		Transport:     authTransport,
 		Credentials:   creds,
 		OfflineAccess: true,
 		ClientID:      AuthClientID,
 		Scopes:        scopes,
-	***REMOVED***
+	}
 	tokenHandler := auth.NewTokenHandlerWithOptions(tokenHandlerOptions)
 	basicHandler := auth.NewBasicHandler(creds)
 	modifiers = append(modifiers, auth.NewAuthorizer(challengeManager, tokenHandler, basicHandler))
 	tr := transport.NewTransport(authTransport, modifiers...)
 
-	return &http.Client***REMOVED***
+	return &http.Client{
 		Transport: tr,
 		Timeout:   15 * time.Second,
-	***REMOVED***, foundV2, nil
+	}, foundV2, nil
 
-***REMOVED***
+}
 
 // ConvertToHostname converts a registry url which has http|https prepended
 // to just an hostname.
-func ConvertToHostname(url string) string ***REMOVED***
+func ConvertToHostname(url string) string {
 	stripped := url
-	if strings.HasPrefix(url, "http://") ***REMOVED***
+	if strings.HasPrefix(url, "http://") {
 		stripped = strings.TrimPrefix(url, "http://")
-	***REMOVED*** else if strings.HasPrefix(url, "https://") ***REMOVED***
+	} else if strings.HasPrefix(url, "https://") {
 		stripped = strings.TrimPrefix(url, "https://")
-	***REMOVED***
+	}
 
 	nameParts := strings.SplitN(stripped, "/", 2)
 
 	return nameParts[0]
-***REMOVED***
+}
 
 // ResolveAuthConfig matches an auth configuration to a server address or a URL
-func ResolveAuthConfig(authConfigs map[string]types.AuthConfig, index *registrytypes.IndexInfo) types.AuthConfig ***REMOVED***
+func ResolveAuthConfig(authConfigs map[string]types.AuthConfig, index *registrytypes.IndexInfo) types.AuthConfig {
 	configKey := GetAuthConfigKey(index)
 	// First try the happy case
-	if c, found := authConfigs[configKey]; found || index.Official ***REMOVED***
+	if c, found := authConfigs[configKey]; found || index.Official {
 		return c
-	***REMOVED***
+	}
 
 	// Maybe they have a legacy config file, we will iterate the keys converting
 	// them to the new format and testing
-	for registry, ac := range authConfigs ***REMOVED***
-		if configKey == ConvertToHostname(registry) ***REMOVED***
+	for registry, ac := range authConfigs {
+		if configKey == ConvertToHostname(registry) {
 			return ac
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// When all else fails, return an empty auth config
-	return types.AuthConfig***REMOVED******REMOVED***
-***REMOVED***
+	return types.AuthConfig{}
+}
 
 // PingResponseError is used when the response from a ping
 // was received but invalid.
-type PingResponseError struct ***REMOVED***
+type PingResponseError struct {
 	Err error
-***REMOVED***
+}
 
-func (err PingResponseError) Error() string ***REMOVED***
+func (err PingResponseError) Error() string {
 	return err.Err.Error()
-***REMOVED***
+}
 
 // PingV2Registry attempts to ping a v2 registry and on success return a
 // challenge manager for the supported authentication types and
 // whether v2 was confirmed by the response. If a response is received but
 // cannot be interpreted a PingResponseError will be returned.
 // nolint: interfacer
-func PingV2Registry(endpoint *url.URL, transport http.RoundTripper) (challenge.Manager, bool, error) ***REMOVED***
+func PingV2Registry(endpoint *url.URL, transport http.RoundTripper) (challenge.Manager, bool, error) {
 	var (
 		foundV2   = false
-		v2Version = auth.APIVersion***REMOVED***
+		v2Version = auth.APIVersion{
 			Type:    "registry",
 			Version: "2.0",
-		***REMOVED***
+		}
 	)
 
-	pingClient := &http.Client***REMOVED***
+	pingClient := &http.Client{
 		Transport: transport,
 		Timeout:   15 * time.Second,
-	***REMOVED***
+	}
 	endpointStr := strings.TrimRight(endpoint.String(), "/") + "/v2/"
 	req, err := http.NewRequest("GET", endpointStr, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, false, err
-	***REMOVED***
+	}
 	resp, err := pingClient.Do(req)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, false, err
-	***REMOVED***
+	}
 	defer resp.Body.Close()
 
 	versions := auth.APIVersions(resp, DefaultRegistryVersionHeader)
-	for _, pingVersion := range versions ***REMOVED***
-		if pingVersion == v2Version ***REMOVED***
+	for _, pingVersion := range versions {
+		if pingVersion == v2Version {
 			// The version header indicates we're definitely
 			// talking to a v2 registry. So don't allow future
 			// fallbacks to the v1 protocol.
 
 			foundV2 = true
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	challengeManager := challenge.NewSimpleManager()
-	if err := challengeManager.AddResponse(resp); err != nil ***REMOVED***
-		return nil, foundV2, PingResponseError***REMOVED***
+	if err := challengeManager.AddResponse(resp); err != nil {
+		return nil, foundV2, PingResponseError{
 			Err: err,
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return challengeManager, foundV2, nil
-***REMOVED***
+}

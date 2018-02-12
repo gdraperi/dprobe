@@ -35,8 +35,8 @@ const (
 
 type validationError string
 
-func (e validationError) Error() string ***REMOVED***
+func (e validationError) Error() string {
 	return string(e)
-***REMOVED***
+}
 
-func (e validationError) InvalidParameter() ***REMOVED******REMOVED***
+func (e validationError) InvalidParameter() {}

@@ -20,84 +20,84 @@ const (
 var ErrRestartCanceled = errors.New("restart canceled")
 
 // RestartManager defines object that controls container restarting rules.
-type RestartManager interface ***REMOVED***
+type RestartManager interface {
 	Cancel() error
 	ShouldRestart(exitCode uint32, hasBeenManuallyStopped bool, executionDuration time.Duration) (bool, chan error, error)
-***REMOVED***
+}
 
-type restartManager struct ***REMOVED***
+type restartManager struct {
 	sync.Mutex
 	sync.Once
 	policy       container.RestartPolicy
 	restartCount int
 	timeout      time.Duration
 	active       bool
-	cancel       chan struct***REMOVED******REMOVED***
+	cancel       chan struct{}
 	canceled     bool
-***REMOVED***
+}
 
 // New returns a new restartManager based on a policy.
-func New(policy container.RestartPolicy, restartCount int) RestartManager ***REMOVED***
-	return &restartManager***REMOVED***policy: policy, restartCount: restartCount, cancel: make(chan struct***REMOVED******REMOVED***)***REMOVED***
-***REMOVED***
+func New(policy container.RestartPolicy, restartCount int) RestartManager {
+	return &restartManager{policy: policy, restartCount: restartCount, cancel: make(chan struct{})}
+}
 
-func (rm *restartManager) SetPolicy(policy container.RestartPolicy) ***REMOVED***
+func (rm *restartManager) SetPolicy(policy container.RestartPolicy) {
 	rm.Lock()
 	rm.policy = policy
 	rm.Unlock()
-***REMOVED***
+}
 
-func (rm *restartManager) ShouldRestart(exitCode uint32, hasBeenManuallyStopped bool, executionDuration time.Duration) (bool, chan error, error) ***REMOVED***
-	if rm.policy.IsNone() ***REMOVED***
+func (rm *restartManager) ShouldRestart(exitCode uint32, hasBeenManuallyStopped bool, executionDuration time.Duration) (bool, chan error, error) {
+	if rm.policy.IsNone() {
 		return false, nil, nil
-	***REMOVED***
+	}
 	rm.Lock()
 	unlockOnExit := true
-	defer func() ***REMOVED***
-		if unlockOnExit ***REMOVED***
+	defer func() {
+		if unlockOnExit {
 			rm.Unlock()
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
-	if rm.canceled ***REMOVED***
+	if rm.canceled {
 		return false, nil, ErrRestartCanceled
-	***REMOVED***
+	}
 
-	if rm.active ***REMOVED***
+	if rm.active {
 		return false, nil, fmt.Errorf("invalid call on an active restart manager")
-	***REMOVED***
+	}
 	// if the container ran for more than 10s, regardless of status and policy reset the
 	// the timeout back to the default.
-	if executionDuration.Seconds() >= 10 ***REMOVED***
+	if executionDuration.Seconds() >= 10 {
 		rm.timeout = 0
-	***REMOVED***
-	switch ***REMOVED***
+	}
+	switch {
 	case rm.timeout == 0:
 		rm.timeout = defaultTimeout
 	case rm.timeout < maxRestartTimeout:
 		rm.timeout *= backoffMultiplier
-	***REMOVED***
-	if rm.timeout > maxRestartTimeout ***REMOVED***
+	}
+	if rm.timeout > maxRestartTimeout {
 		rm.timeout = maxRestartTimeout
-	***REMOVED***
+	}
 
 	var restart bool
-	switch ***REMOVED***
+	switch {
 	case rm.policy.IsAlways():
 		restart = true
 	case rm.policy.IsUnlessStopped() && !hasBeenManuallyStopped:
 		restart = true
 	case rm.policy.IsOnFailure():
 		// the default value of 0 for MaximumRetryCount means that we will not enforce a maximum count
-		if max := rm.policy.MaximumRetryCount; max == 0 || rm.restartCount < max ***REMOVED***
+		if max := rm.policy.MaximumRetryCount; max == 0 || rm.restartCount < max {
 			restart = exitCode != 0
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if !restart ***REMOVED***
+	if !restart {
 		rm.active = false
 		return false, nil, nil
-	***REMOVED***
+	}
 
 	rm.restartCount++
 
@@ -106,8 +106,8 @@ func (rm *restartManager) ShouldRestart(exitCode uint32, hasBeenManuallyStopped 
 	rm.Unlock()
 
 	ch := make(chan error)
-	go func() ***REMOVED***
-		select ***REMOVED***
+	go func() {
+		select {
 		case <-rm.cancel:
 			ch <- ErrRestartCanceled
 			close(ch)
@@ -116,18 +116,18 @@ func (rm *restartManager) ShouldRestart(exitCode uint32, hasBeenManuallyStopped 
 			close(ch)
 			rm.active = false
 			rm.Unlock()
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
 	return true, ch, nil
-***REMOVED***
+}
 
-func (rm *restartManager) Cancel() error ***REMOVED***
-	rm.Do(func() ***REMOVED***
+func (rm *restartManager) Cancel() error {
+	rm.Do(func() {
 		rm.Lock()
 		rm.canceled = true
 		close(rm.cancel)
 		rm.Unlock()
-	***REMOVED***)
+	})
 	return nil
-***REMOVED***
+}

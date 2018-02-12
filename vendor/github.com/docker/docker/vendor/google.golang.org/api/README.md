@@ -64,28 +64,28 @@ import (
         "google.golang.org/api/compute/v1"
 )
 
-func main() ***REMOVED***
+func main() {
         // Use oauth2.NoContext if there isn't a good context to pass in.
         ctx := context.Background()
 
         client, err := google.DefaultClient(ctx, compute.ComputeScope)
-        if err != nil ***REMOVED***
+        if err != nil {
                 //...
-    ***REMOVED***
+        }
         computeService, err := compute.New(client)
-        if err != nil ***REMOVED***
+        if err != nil {
                 //...
-    ***REMOVED***
-***REMOVED***
+        }
+}
 ```
 
 If you need a `oauth2.TokenSource`, use the `DefaultTokenSource` function:
 
 ```
 ts, err := google.DefaultTokenSource(ctx, scope1, scope2, ...)
-if err != nil ***REMOVED***
+if err != nil {
         //...
-***REMOVED***
+}
 client := oauth2.NewClient(ctx, ts)
 ```
 

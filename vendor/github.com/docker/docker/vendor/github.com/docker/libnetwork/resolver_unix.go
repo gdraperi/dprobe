@@ -15,9 +15,9 @@ import (
 	"github.com/vishvananda/netns"
 )
 
-func init() ***REMOVED***
+func init() {
 	reexec.Register("setup-resolver", reexecSetupResolver)
-***REMOVED***
+}
 
 const (
 	// outputChain used for docker embed dns
@@ -26,76 +26,76 @@ const (
 	postroutingchain = "DOCKER_POSTROUTING"
 )
 
-func reexecSetupResolver() ***REMOVED***
+func reexecSetupResolver() {
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()
 
-	if len(os.Args) < 4 ***REMOVED***
+	if len(os.Args) < 4 {
 		logrus.Error("invalid number of arguments..")
 		os.Exit(1)
-	***REMOVED***
+	}
 
 	resolverIP, ipPort, _ := net.SplitHostPort(os.Args[2])
 	_, tcpPort, _ := net.SplitHostPort(os.Args[3])
-	rules := [][]string***REMOVED***
-		***REMOVED***"-t", "nat", "-I", outputChain, "-d", resolverIP, "-p", "udp", "--dport", dnsPort, "-j", "DNAT", "--to-destination", os.Args[2]***REMOVED***,
-		***REMOVED***"-t", "nat", "-I", postroutingchain, "-s", resolverIP, "-p", "udp", "--sport", ipPort, "-j", "SNAT", "--to-source", ":" + dnsPort***REMOVED***,
-		***REMOVED***"-t", "nat", "-I", outputChain, "-d", resolverIP, "-p", "tcp", "--dport", dnsPort, "-j", "DNAT", "--to-destination", os.Args[3]***REMOVED***,
-		***REMOVED***"-t", "nat", "-I", postroutingchain, "-s", resolverIP, "-p", "tcp", "--sport", tcpPort, "-j", "SNAT", "--to-source", ":" + dnsPort***REMOVED***,
-	***REMOVED***
+	rules := [][]string{
+		{"-t", "nat", "-I", outputChain, "-d", resolverIP, "-p", "udp", "--dport", dnsPort, "-j", "DNAT", "--to-destination", os.Args[2]},
+		{"-t", "nat", "-I", postroutingchain, "-s", resolverIP, "-p", "udp", "--sport", ipPort, "-j", "SNAT", "--to-source", ":" + dnsPort},
+		{"-t", "nat", "-I", outputChain, "-d", resolverIP, "-p", "tcp", "--dport", dnsPort, "-j", "DNAT", "--to-destination", os.Args[3]},
+		{"-t", "nat", "-I", postroutingchain, "-s", resolverIP, "-p", "tcp", "--sport", tcpPort, "-j", "SNAT", "--to-source", ":" + dnsPort},
+	}
 
 	f, err := os.OpenFile(os.Args[1], os.O_RDONLY, 0)
-	if err != nil ***REMOVED***
+	if err != nil {
 		logrus.Errorf("failed get network namespace %q: %v", os.Args[1], err)
 		os.Exit(2)
-	***REMOVED***
+	}
 	defer f.Close()
 
 	nsFD := f.Fd()
-	if err = netns.Set(netns.NsHandle(nsFD)); err != nil ***REMOVED***
+	if err = netns.Set(netns.NsHandle(nsFD)); err != nil {
 		logrus.Errorf("setting into container net ns %v failed, %v", os.Args[1], err)
 		os.Exit(3)
-	***REMOVED***
+	}
 
 	// insert outputChain and postroutingchain
 	err = iptables.RawCombinedOutputNative("-t", "nat", "-C", "OUTPUT", "-d", resolverIP, "-j", outputChain)
-	if err == nil ***REMOVED***
+	if err == nil {
 		iptables.RawCombinedOutputNative("-t", "nat", "-F", outputChain)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		iptables.RawCombinedOutputNative("-t", "nat", "-N", outputChain)
 		iptables.RawCombinedOutputNative("-t", "nat", "-I", "OUTPUT", "-d", resolverIP, "-j", outputChain)
-	***REMOVED***
+	}
 
 	err = iptables.RawCombinedOutputNative("-t", "nat", "-C", "POSTROUTING", "-d", resolverIP, "-j", postroutingchain)
-	if err == nil ***REMOVED***
+	if err == nil {
 		iptables.RawCombinedOutputNative("-t", "nat", "-F", postroutingchain)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		iptables.RawCombinedOutputNative("-t", "nat", "-N", postroutingchain)
 		iptables.RawCombinedOutputNative("-t", "nat", "-I", "POSTROUTING", "-d", resolverIP, "-j", postroutingchain)
-	***REMOVED***
+	}
 
-	for _, rule := range rules ***REMOVED***
-		if iptables.RawCombinedOutputNative(rule...) != nil ***REMOVED***
+	for _, rule := range rules {
+		if iptables.RawCombinedOutputNative(rule...) != nil {
 			logrus.Errorf("setting up rule failed, %v", rule)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (r *resolver) setupIPTable() error ***REMOVED***
-	if r.err != nil ***REMOVED***
+func (r *resolver) setupIPTable() error {
+	if r.err != nil {
 		return r.err
-	***REMOVED***
+	}
 	laddr := r.conn.LocalAddr().String()
 	ltcpaddr := r.tcpListen.Addr().String()
 
-	cmd := &exec.Cmd***REMOVED***
+	cmd := &exec.Cmd{
 		Path:   reexec.Self(),
-		Args:   append([]string***REMOVED***"setup-resolver"***REMOVED***, r.resolverKey, laddr, ltcpaddr),
+		Args:   append([]string{"setup-resolver"}, r.resolverKey, laddr, ltcpaddr),
 		Stdout: os.Stdout,
 		Stderr: os.Stderr,
-	***REMOVED***
-	if err := cmd.Run(); err != nil ***REMOVED***
+	}
+	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("reexec failed: %v", err)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

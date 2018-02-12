@@ -51,12 +51,12 @@ import (
 
 var (
 	// alpnProtoStr are the specified application level protocols for gRPC.
-	alpnProtoStr = []string***REMOVED***"h2"***REMOVED***
+	alpnProtoStr = []string{"h2"}
 )
 
 // PerRPCCredentials defines the common interface for the credentials which need to
 // attach security information to every RPC (e.g., oauth2).
-type PerRPCCredentials interface ***REMOVED***
+type PerRPCCredentials interface {
 	// GetRequestMetadata gets the current request metadata, refreshing
 	// tokens if required. This should be called by the transport layer on
 	// each request, and the data should be populated in headers or other
@@ -69,11 +69,11 @@ type PerRPCCredentials interface ***REMOVED***
 	// RequireTransportSecurity indicates whether the credentials requires
 	// transport security.
 	RequireTransportSecurity() bool
-***REMOVED***
+}
 
 // ProtocolInfo provides information regarding the gRPC wire protocol version,
 // security protocol, security protocol version in use, server name, etc.
-type ProtocolInfo struct ***REMOVED***
+type ProtocolInfo struct {
 	// ProtocolVersion is the gRPC wire protocol version.
 	ProtocolVersion string
 	// SecurityProtocol is the security protocol in use.
@@ -82,12 +82,12 @@ type ProtocolInfo struct ***REMOVED***
 	SecurityVersion string
 	// ServerName is the user-configured server name.
 	ServerName string
-***REMOVED***
+}
 
 // AuthInfo defines the common interface for the auth information the users are interested in.
-type AuthInfo interface ***REMOVED***
+type AuthInfo interface {
 	AuthType() string
-***REMOVED***
+}
 
 var (
 	// ErrConnDispatched indicates that rawConn has been dispatched out of gRPC
@@ -97,7 +97,7 @@ var (
 
 // TransportCredentials defines the common interface for all the live gRPC wire
 // protocols and supported transport security protocols (e.g., TLS, SSL).
-type TransportCredentials interface ***REMOVED***
+type TransportCredentials interface {
 	// ClientHandshake does the authentication handshake specified by the corresponding
 	// authentication protocol on rawConn for clients. It returns the authenticated
 	// connection and the corresponding auth information about the connection.
@@ -119,116 +119,116 @@ type TransportCredentials interface ***REMOVED***
 	// gRPC internals also use it to override the virtual hosting name if it is set.
 	// It must be called before dialing. Currently, this is only used by grpclb.
 	OverrideServerName(string) error
-***REMOVED***
+}
 
 // TLSInfo contains the auth information for a TLS authenticated connection.
 // It implements the AuthInfo interface.
-type TLSInfo struct ***REMOVED***
+type TLSInfo struct {
 	State tls.ConnectionState
-***REMOVED***
+}
 
 // AuthType returns the type of TLSInfo as a string.
-func (t TLSInfo) AuthType() string ***REMOVED***
+func (t TLSInfo) AuthType() string {
 	return "tls"
-***REMOVED***
+}
 
 // tlsCreds is the credentials required for authenticating a connection using TLS.
-type tlsCreds struct ***REMOVED***
+type tlsCreds struct {
 	// TLS configuration
 	config *tls.Config
-***REMOVED***
+}
 
-func (c tlsCreds) Info() ProtocolInfo ***REMOVED***
-	return ProtocolInfo***REMOVED***
+func (c tlsCreds) Info() ProtocolInfo {
+	return ProtocolInfo{
 		SecurityProtocol: "tls",
 		SecurityVersion:  "1.2",
 		ServerName:       c.config.ServerName,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (c *tlsCreds) ClientHandshake(ctx context.Context, addr string, rawConn net.Conn) (_ net.Conn, _ AuthInfo, err error) ***REMOVED***
+func (c *tlsCreds) ClientHandshake(ctx context.Context, addr string, rawConn net.Conn) (_ net.Conn, _ AuthInfo, err error) {
 	// use local cfg to avoid clobbering ServerName if using multiple endpoints
 	cfg := cloneTLSConfig(c.config)
-	if cfg.ServerName == "" ***REMOVED***
+	if cfg.ServerName == "" {
 		colonPos := strings.LastIndex(addr, ":")
-		if colonPos == -1 ***REMOVED***
+		if colonPos == -1 {
 			colonPos = len(addr)
-		***REMOVED***
+		}
 		cfg.ServerName = addr[:colonPos]
-	***REMOVED***
+	}
 	conn := tls.Client(rawConn, cfg)
 	errChannel := make(chan error, 1)
-	go func() ***REMOVED***
+	go func() {
 		errChannel <- conn.Handshake()
-	***REMOVED***()
-	select ***REMOVED***
+	}()
+	select {
 	case err := <-errChannel:
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, nil, err
-		***REMOVED***
+		}
 	case <-ctx.Done():
 		return nil, nil, ctx.Err()
-	***REMOVED***
-	return conn, TLSInfo***REMOVED***conn.ConnectionState()***REMOVED***, nil
-***REMOVED***
+	}
+	return conn, TLSInfo{conn.ConnectionState()}, nil
+}
 
-func (c *tlsCreds) ServerHandshake(rawConn net.Conn) (net.Conn, AuthInfo, error) ***REMOVED***
+func (c *tlsCreds) ServerHandshake(rawConn net.Conn) (net.Conn, AuthInfo, error) {
 	conn := tls.Server(rawConn, c.config)
-	if err := conn.Handshake(); err != nil ***REMOVED***
+	if err := conn.Handshake(); err != nil {
 		return nil, nil, err
-	***REMOVED***
-	return conn, TLSInfo***REMOVED***conn.ConnectionState()***REMOVED***, nil
-***REMOVED***
+	}
+	return conn, TLSInfo{conn.ConnectionState()}, nil
+}
 
-func (c *tlsCreds) Clone() TransportCredentials ***REMOVED***
+func (c *tlsCreds) Clone() TransportCredentials {
 	return NewTLS(c.config)
-***REMOVED***
+}
 
-func (c *tlsCreds) OverrideServerName(serverNameOverride string) error ***REMOVED***
+func (c *tlsCreds) OverrideServerName(serverNameOverride string) error {
 	c.config.ServerName = serverNameOverride
 	return nil
-***REMOVED***
+}
 
 // NewTLS uses c to construct a TransportCredentials based on TLS.
-func NewTLS(c *tls.Config) TransportCredentials ***REMOVED***
-	tc := &tlsCreds***REMOVED***cloneTLSConfig(c)***REMOVED***
+func NewTLS(c *tls.Config) TransportCredentials {
+	tc := &tlsCreds{cloneTLSConfig(c)}
 	tc.config.NextProtos = alpnProtoStr
 	return tc
-***REMOVED***
+}
 
 // NewClientTLSFromCert constructs a TLS from the input certificate for client.
 // serverNameOverride is for testing only. If set to a non empty string,
 // it will override the virtual host name of authority (e.g. :authority header field) in requests.
-func NewClientTLSFromCert(cp *x509.CertPool, serverNameOverride string) TransportCredentials ***REMOVED***
-	return NewTLS(&tls.Config***REMOVED***ServerName: serverNameOverride, RootCAs: cp***REMOVED***)
-***REMOVED***
+func NewClientTLSFromCert(cp *x509.CertPool, serverNameOverride string) TransportCredentials {
+	return NewTLS(&tls.Config{ServerName: serverNameOverride, RootCAs: cp})
+}
 
 // NewClientTLSFromFile constructs a TLS from the input certificate file for client.
 // serverNameOverride is for testing only. If set to a non empty string,
 // it will override the virtual host name of authority (e.g. :authority header field) in requests.
-func NewClientTLSFromFile(certFile, serverNameOverride string) (TransportCredentials, error) ***REMOVED***
+func NewClientTLSFromFile(certFile, serverNameOverride string) (TransportCredentials, error) {
 	b, err := ioutil.ReadFile(certFile)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	cp := x509.NewCertPool()
-	if !cp.AppendCertsFromPEM(b) ***REMOVED***
+	if !cp.AppendCertsFromPEM(b) {
 		return nil, fmt.Errorf("credentials: failed to append certificates")
-	***REMOVED***
-	return NewTLS(&tls.Config***REMOVED***ServerName: serverNameOverride, RootCAs: cp***REMOVED***), nil
-***REMOVED***
+	}
+	return NewTLS(&tls.Config{ServerName: serverNameOverride, RootCAs: cp}), nil
+}
 
 // NewServerTLSFromCert constructs a TLS from the input certificate for server.
-func NewServerTLSFromCert(cert *tls.Certificate) TransportCredentials ***REMOVED***
-	return NewTLS(&tls.Config***REMOVED***Certificates: []tls.Certificate***REMOVED****cert***REMOVED******REMOVED***)
-***REMOVED***
+func NewServerTLSFromCert(cert *tls.Certificate) TransportCredentials {
+	return NewTLS(&tls.Config{Certificates: []tls.Certificate{*cert}})
+}
 
 // NewServerTLSFromFile constructs a TLS from the input certificate file and key
 // file for server.
-func NewServerTLSFromFile(certFile, keyFile string) (TransportCredentials, error) ***REMOVED***
+func NewServerTLSFromFile(certFile, keyFile string) (TransportCredentials, error) {
 	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	return NewTLS(&tls.Config***REMOVED***Certificates: []tls.Certificate***REMOVED***cert***REMOVED******REMOVED***), nil
-***REMOVED***
+	}
+	return NewTLS(&tls.Config{Certificates: []tls.Certificate{cert}}), nil
+}

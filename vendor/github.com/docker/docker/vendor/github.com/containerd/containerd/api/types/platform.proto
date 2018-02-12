@@ -8,8 +8,8 @@ option go_package = "github.com/containerd/containerd/api/types;types";
 
 // Platform follows the structure of the OCI platform specification, from
 // descriptors.
-message Platform ***REMOVED***
+message Platform {
 	string os = 1 [(gogoproto.customname) = "OS"];
 	string architecture = 2;
 	string variant = 3;
-***REMOVED***
+}

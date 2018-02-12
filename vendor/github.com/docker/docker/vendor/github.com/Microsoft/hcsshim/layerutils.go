@@ -12,41 +12,41 @@ import (
 
 /* To pass into syscall, we need a struct matching the following:
 enum GraphDriverType
-***REMOVED***
+{
     DiffDriver,
     FilterDriver
-***REMOVED***;
+};
 
-struct DriverInfo ***REMOVED***
+struct DriverInfo {
     GraphDriverType Flavour;
     LPCWSTR HomeDir;
-***REMOVED***;
+};
 */
-type DriverInfo struct ***REMOVED***
+type DriverInfo struct {
 	Flavour int
 	HomeDir string
-***REMOVED***
+}
 
-type driverInfo struct ***REMOVED***
+type driverInfo struct {
 	Flavour  int
 	HomeDirp *uint16
-***REMOVED***
+}
 
-func convertDriverInfo(info DriverInfo) (driverInfo, error) ***REMOVED***
+func convertDriverInfo(info DriverInfo) (driverInfo, error) {
 	homedirp, err := syscall.UTF16PtrFromString(info.HomeDir)
-	if err != nil ***REMOVED***
+	if err != nil {
 		logrus.Debugf("Failed conversion of home to pointer for driver info: %s", err.Error())
-		return driverInfo***REMOVED******REMOVED***, err
-	***REMOVED***
+		return driverInfo{}, err
+	}
 
-	return driverInfo***REMOVED***
+	return driverInfo{
 		Flavour:  info.Flavour,
 		HomeDirp: homedirp,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 /* To pass into syscall, we need a struct matching the following:
-typedef struct _WC_LAYER_DESCRIPTOR ***REMOVED***
+typedef struct _WC_LAYER_DESCRIPTOR {
 
     //
     // The ID of the layer
@@ -58,13 +58,13 @@ typedef struct _WC_LAYER_DESCRIPTOR ***REMOVED***
     // Additional flags
     //
 
-    union ***REMOVED***
-        struct ***REMOVED***
+    union {
+        struct {
             ULONG Reserved : 31;
             ULONG Dirty : 1;    // Created from sandbox as a result of snapshot
-    ***REMOVED***;
+        };
         ULONG Value;
-***REMOVED*** Flags;
+    } Flags;
 
     //
     // Path to the layer root directory, null-terminated
@@ -72,40 +72,40 @@ typedef struct _WC_LAYER_DESCRIPTOR ***REMOVED***
 
     PCWSTR Path;
 
-***REMOVED*** WC_LAYER_DESCRIPTOR, *PWC_LAYER_DESCRIPTOR;
+} WC_LAYER_DESCRIPTOR, *PWC_LAYER_DESCRIPTOR;
 */
-type WC_LAYER_DESCRIPTOR struct ***REMOVED***
+type WC_LAYER_DESCRIPTOR struct {
 	LayerId GUID
 	Flags   uint32
 	Pathp   *uint16
-***REMOVED***
+}
 
-func layerPathsToDescriptors(parentLayerPaths []string) ([]WC_LAYER_DESCRIPTOR, error) ***REMOVED***
+func layerPathsToDescriptors(parentLayerPaths []string) ([]WC_LAYER_DESCRIPTOR, error) {
 	// Array of descriptors that gets constructed.
 	var layers []WC_LAYER_DESCRIPTOR
 
-	for i := 0; i < len(parentLayerPaths); i++ ***REMOVED***
+	for i := 0; i < len(parentLayerPaths); i++ {
 		// Create a layer descriptor, using the folder name
 		// as the source for a GUID LayerId
 		_, folderName := filepath.Split(parentLayerPaths[i])
 		g, err := NameToGuid(folderName)
-		if err != nil ***REMOVED***
+		if err != nil {
 			logrus.Debugf("Failed to convert name to guid %s", err)
 			return nil, err
-		***REMOVED***
+		}
 
 		p, err := syscall.UTF16PtrFromString(parentLayerPaths[i])
-		if err != nil ***REMOVED***
+		if err != nil {
 			logrus.Debugf("Failed conversion of parentLayerPath to pointer %s", err)
 			return nil, err
-		***REMOVED***
+		}
 
-		layers = append(layers, WC_LAYER_DESCRIPTOR***REMOVED***
+		layers = append(layers, WC_LAYER_DESCRIPTOR{
 			LayerId: g,
 			Flags:   0,
 			Pathp:   p,
-		***REMOVED***)
-	***REMOVED***
+		})
+	}
 
 	return layers, nil
-***REMOVED***
+}

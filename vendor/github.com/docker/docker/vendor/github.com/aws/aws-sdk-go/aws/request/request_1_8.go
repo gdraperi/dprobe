@@ -21,13 +21,13 @@ var NoBody = http.NoBody
 //
 // Will also set the Go 1.8's http.Request.GetBody member to allow retrying
 // PUT/POST redirects.
-func (r *Request) ResetBody() ***REMOVED***
+func (r *Request) ResetBody() {
 	body, err := r.getNextRequestBody()
-	if err != nil ***REMOVED***
+	if err != nil {
 		r.Error = err
 		return
-	***REMOVED***
+	}
 
 	r.HTTPRequest.Body = body
 	r.HTTPRequest.GetBody = r.getNextRequestBody
-***REMOVED***
+}

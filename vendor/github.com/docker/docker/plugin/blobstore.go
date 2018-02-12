@@ -19,165 +19,165 @@ import (
 	"golang.org/x/net/context"
 )
 
-type blobstore interface ***REMOVED***
+type blobstore interface {
 	New() (WriteCommitCloser, error)
 	Get(dgst digest.Digest) (io.ReadCloser, error)
 	Size(dgst digest.Digest) (int64, error)
-***REMOVED***
+}
 
-type basicBlobStore struct ***REMOVED***
+type basicBlobStore struct {
 	path string
-***REMOVED***
+}
 
-func newBasicBlobStore(p string) (*basicBlobStore, error) ***REMOVED***
+func newBasicBlobStore(p string) (*basicBlobStore, error) {
 	tmpdir := filepath.Join(p, "tmp")
-	if err := os.MkdirAll(tmpdir, 0700); err != nil ***REMOVED***
+	if err := os.MkdirAll(tmpdir, 0700); err != nil {
 		return nil, errors.Wrapf(err, "failed to mkdir %v", p)
-	***REMOVED***
-	return &basicBlobStore***REMOVED***path: p***REMOVED***, nil
-***REMOVED***
+	}
+	return &basicBlobStore{path: p}, nil
+}
 
-func (b *basicBlobStore) New() (WriteCommitCloser, error) ***REMOVED***
+func (b *basicBlobStore) New() (WriteCommitCloser, error) {
 	f, err := ioutil.TempFile(filepath.Join(b.path, "tmp"), ".insertion")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, errors.Wrap(err, "failed to create temp file")
-	***REMOVED***
+	}
 	return newInsertion(f), nil
-***REMOVED***
+}
 
-func (b *basicBlobStore) Get(dgst digest.Digest) (io.ReadCloser, error) ***REMOVED***
+func (b *basicBlobStore) Get(dgst digest.Digest) (io.ReadCloser, error) {
 	return os.Open(filepath.Join(b.path, string(dgst.Algorithm()), dgst.Hex()))
-***REMOVED***
+}
 
-func (b *basicBlobStore) Size(dgst digest.Digest) (int64, error) ***REMOVED***
+func (b *basicBlobStore) Size(dgst digest.Digest) (int64, error) {
 	stat, err := os.Stat(filepath.Join(b.path, string(dgst.Algorithm()), dgst.Hex()))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	return stat.Size(), nil
-***REMOVED***
+}
 
-func (b *basicBlobStore) gc(whitelist map[digest.Digest]struct***REMOVED******REMOVED***) ***REMOVED***
-	for _, alg := range []string***REMOVED***string(digest.Canonical)***REMOVED*** ***REMOVED***
+func (b *basicBlobStore) gc(whitelist map[digest.Digest]struct{}) {
+	for _, alg := range []string{string(digest.Canonical)} {
 		items, err := ioutil.ReadDir(filepath.Join(b.path, alg))
-		if err != nil ***REMOVED***
+		if err != nil {
 			continue
-		***REMOVED***
-		for _, fi := range items ***REMOVED***
-			if _, exists := whitelist[digest.Digest(alg+":"+fi.Name())]; !exists ***REMOVED***
+		}
+		for _, fi := range items {
+			if _, exists := whitelist[digest.Digest(alg+":"+fi.Name())]; !exists {
 				p := filepath.Join(b.path, alg, fi.Name())
 				err := os.RemoveAll(p)
 				logrus.Debugf("cleaned up blob %v: %v", p, err)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
-***REMOVED***
+}
 
 // WriteCommitCloser defines object that can be committed to blobstore.
-type WriteCommitCloser interface ***REMOVED***
+type WriteCommitCloser interface {
 	io.WriteCloser
 	Commit() (digest.Digest, error)
-***REMOVED***
+}
 
-type insertion struct ***REMOVED***
+type insertion struct {
 	io.Writer
 	f        *os.File
 	digester digest.Digester
 	closed   bool
-***REMOVED***
+}
 
-func newInsertion(tempFile *os.File) *insertion ***REMOVED***
+func newInsertion(tempFile *os.File) *insertion {
 	digester := digest.Canonical.Digester()
-	return &insertion***REMOVED***f: tempFile, digester: digester, Writer: io.MultiWriter(tempFile, digester.Hash())***REMOVED***
-***REMOVED***
+	return &insertion{f: tempFile, digester: digester, Writer: io.MultiWriter(tempFile, digester.Hash())}
+}
 
-func (i *insertion) Commit() (digest.Digest, error) ***REMOVED***
+func (i *insertion) Commit() (digest.Digest, error) {
 	p := i.f.Name()
 	d := filepath.Join(filepath.Join(p, "../../"))
 	i.f.Sync()
 	defer os.RemoveAll(p)
-	if err := i.f.Close(); err != nil ***REMOVED***
+	if err := i.f.Close(); err != nil {
 		return "", err
-	***REMOVED***
+	}
 	i.closed = true
 	dgst := i.digester.Digest()
-	if err := os.MkdirAll(filepath.Join(d, string(dgst.Algorithm())), 0700); err != nil ***REMOVED***
+	if err := os.MkdirAll(filepath.Join(d, string(dgst.Algorithm())), 0700); err != nil {
 		return "", errors.Wrapf(err, "failed to mkdir %v", d)
-	***REMOVED***
-	if err := os.Rename(p, filepath.Join(d, string(dgst.Algorithm()), dgst.Hex())); err != nil ***REMOVED***
+	}
+	if err := os.Rename(p, filepath.Join(d, string(dgst.Algorithm()), dgst.Hex())); err != nil {
 		return "", errors.Wrapf(err, "failed to rename %v", p)
-	***REMOVED***
+	}
 	return dgst, nil
-***REMOVED***
+}
 
-func (i *insertion) Close() error ***REMOVED***
-	if i.closed ***REMOVED***
+func (i *insertion) Close() error {
+	if i.closed {
 		return nil
-	***REMOVED***
+	}
 	defer os.RemoveAll(i.f.Name())
 	return i.f.Close()
-***REMOVED***
+}
 
-type downloadManager struct ***REMOVED***
+type downloadManager struct {
 	blobStore    blobstore
 	tmpDir       string
 	blobs        []digest.Digest
 	configDigest digest.Digest
-***REMOVED***
+}
 
-func (dm *downloadManager) Download(ctx context.Context, initialRootFS image.RootFS, os string, layers []xfer.DownloadDescriptor, progressOutput progress.Output) (image.RootFS, func(), error) ***REMOVED***
-	for _, l := range layers ***REMOVED***
+func (dm *downloadManager) Download(ctx context.Context, initialRootFS image.RootFS, os string, layers []xfer.DownloadDescriptor, progressOutput progress.Output) (image.RootFS, func(), error) {
+	for _, l := range layers {
 		b, err := dm.blobStore.New()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return initialRootFS, nil, err
-		***REMOVED***
+		}
 		defer b.Close()
 		rc, _, err := l.Download(ctx, progressOutput)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return initialRootFS, nil, errors.Wrap(err, "failed to download")
-		***REMOVED***
+		}
 		defer rc.Close()
 		r := io.TeeReader(rc, b)
 		inflatedLayerData, err := archive.DecompressStream(r)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return initialRootFS, nil, err
-		***REMOVED***
+		}
 		digester := digest.Canonical.Digester()
-		if _, err := chrootarchive.ApplyLayer(dm.tmpDir, io.TeeReader(inflatedLayerData, digester.Hash())); err != nil ***REMOVED***
+		if _, err := chrootarchive.ApplyLayer(dm.tmpDir, io.TeeReader(inflatedLayerData, digester.Hash())); err != nil {
 			return initialRootFS, nil, err
-		***REMOVED***
+		}
 		initialRootFS.Append(layer.DiffID(digester.Digest()))
 		d, err := b.Commit()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return initialRootFS, nil, err
-		***REMOVED***
+		}
 		dm.blobs = append(dm.blobs, d)
-	***REMOVED***
+	}
 	return initialRootFS, nil, nil
-***REMOVED***
+}
 
-func (dm *downloadManager) Put(dt []byte) (digest.Digest, error) ***REMOVED***
+func (dm *downloadManager) Put(dt []byte) (digest.Digest, error) {
 	b, err := dm.blobStore.New()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	defer b.Close()
 	n, err := b.Write(dt)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
-	if n != len(dt) ***REMOVED***
+	}
+	if n != len(dt) {
 		return "", io.ErrShortWrite
-	***REMOVED***
+	}
 	d, err := b.Commit()
 	dm.configDigest = d
 	return d, err
-***REMOVED***
+}
 
-func (dm *downloadManager) Get(d digest.Digest) ([]byte, error) ***REMOVED***
+func (dm *downloadManager) Get(d digest.Digest) ([]byte, error) {
 	return nil, fmt.Errorf("digest not found")
-***REMOVED***
-func (dm *downloadManager) RootFSAndOSFromConfig(c []byte) (*image.RootFS, string, error) ***REMOVED***
+}
+func (dm *downloadManager) RootFSAndOSFromConfig(c []byte) (*image.RootFS, string, error) {
 	return configToRootFS(c)
-***REMOVED***
+}

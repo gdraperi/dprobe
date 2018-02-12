@@ -31,26 +31,26 @@ const opAssumeRole = "AssumeRole"
 //    req, resp := client.AssumeRoleRequest(params)
 //
 //    err := req.Send()
-//    if err == nil ***REMOVED*** // resp is now filled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
-//***REMOVED***
+//    }
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/sts-2011-06-15/AssumeRole
-func (c *STS) AssumeRoleRequest(input *AssumeRoleInput) (req *request.Request, output *AssumeRoleOutput) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (c *STS) AssumeRoleRequest(input *AssumeRoleInput) (req *request.Request, output *AssumeRoleOutput) {
+	op := &request.Operation{
 		Name:       opAssumeRole,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
-	***REMOVED***
+	}
 
-	if input == nil ***REMOVED***
-		input = &AssumeRoleInput***REMOVED******REMOVED***
-	***REMOVED***
+	if input == nil {
+		input = &AssumeRoleInput{}
+	}
 
-	output = &AssumeRoleOutput***REMOVED******REMOVED***
+	output = &AssumeRoleOutput{}
 	req = c.newRequest(op, input, output)
 	return
-***REMOVED***
+}
 
 // AssumeRole API operation for AWS Security Token Service.
 //
@@ -134,7 +134,7 @@ func (c *STS) AssumeRoleRequest(input *AssumeRoleInput) (req *request.Request, o
 // denied. The condition in a trust policy that tests for MFA authentication
 // might look like the following example.
 //
-// "Condition": ***REMOVED***"Bool": ***REMOVED***"aws:MultiFactorAuthPresent": true***REMOVED******REMOVED***
+// "Condition": {"Bool": {"aws:MultiFactorAuthPresent": true}}
 //
 // For more information, see Configuring MFA-Protected API Access (http://docs.aws.amazon.com/IAM/latest/UserGuide/MFAProtectedAPI.html)
 // in the IAM User Guide guide.
@@ -169,10 +169,10 @@ func (c *STS) AssumeRoleRequest(input *AssumeRoleInput) (req *request.Request, o
 //   in the IAM User Guide.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/sts-2011-06-15/AssumeRole
-func (c *STS) AssumeRole(input *AssumeRoleInput) (*AssumeRoleOutput, error) ***REMOVED***
+func (c *STS) AssumeRole(input *AssumeRoleInput) (*AssumeRoleOutput, error) {
 	req, out := c.AssumeRoleRequest(input)
 	return out, req.Send()
-***REMOVED***
+}
 
 // AssumeRoleWithContext is the same as AssumeRole with the addition of
 // the ability to pass a context and additional request options.
@@ -183,12 +183,12 @@ func (c *STS) AssumeRole(input *AssumeRoleInput) (*AssumeRoleOutput, error) ***R
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *STS) AssumeRoleWithContext(ctx aws.Context, input *AssumeRoleInput, opts ...request.Option) (*AssumeRoleOutput, error) ***REMOVED***
+func (c *STS) AssumeRoleWithContext(ctx aws.Context, input *AssumeRoleInput, opts ...request.Option) (*AssumeRoleOutput, error) {
 	req, out := c.AssumeRoleRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
-***REMOVED***
+}
 
 const opAssumeRoleWithSAML = "AssumeRoleWithSAML"
 
@@ -211,26 +211,26 @@ const opAssumeRoleWithSAML = "AssumeRoleWithSAML"
 //    req, resp := client.AssumeRoleWithSAMLRequest(params)
 //
 //    err := req.Send()
-//    if err == nil ***REMOVED*** // resp is now filled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
-//***REMOVED***
+//    }
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/sts-2011-06-15/AssumeRoleWithSAML
-func (c *STS) AssumeRoleWithSAMLRequest(input *AssumeRoleWithSAMLInput) (req *request.Request, output *AssumeRoleWithSAMLOutput) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (c *STS) AssumeRoleWithSAMLRequest(input *AssumeRoleWithSAMLInput) (req *request.Request, output *AssumeRoleWithSAMLOutput) {
+	op := &request.Operation{
 		Name:       opAssumeRoleWithSAML,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
-	***REMOVED***
+	}
 
-	if input == nil ***REMOVED***
-		input = &AssumeRoleWithSAMLInput***REMOVED******REMOVED***
-	***REMOVED***
+	if input == nil {
+		input = &AssumeRoleWithSAMLInput{}
+	}
 
-	output = &AssumeRoleWithSAMLOutput***REMOVED******REMOVED***
+	output = &AssumeRoleWithSAMLOutput{}
 	req = c.newRequest(op, input, output)
 	return
-***REMOVED***
+}
 
 // AssumeRoleWithSAML API operation for AWS Security Token Service.
 //
@@ -342,10 +342,10 @@ func (c *STS) AssumeRoleWithSAMLRequest(input *AssumeRoleWithSAMLInput) (req *re
 //   in the IAM User Guide.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/sts-2011-06-15/AssumeRoleWithSAML
-func (c *STS) AssumeRoleWithSAML(input *AssumeRoleWithSAMLInput) (*AssumeRoleWithSAMLOutput, error) ***REMOVED***
+func (c *STS) AssumeRoleWithSAML(input *AssumeRoleWithSAMLInput) (*AssumeRoleWithSAMLOutput, error) {
 	req, out := c.AssumeRoleWithSAMLRequest(input)
 	return out, req.Send()
-***REMOVED***
+}
 
 // AssumeRoleWithSAMLWithContext is the same as AssumeRoleWithSAML with the addition of
 // the ability to pass a context and additional request options.
@@ -356,12 +356,12 @@ func (c *STS) AssumeRoleWithSAML(input *AssumeRoleWithSAMLInput) (*AssumeRoleWit
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *STS) AssumeRoleWithSAMLWithContext(ctx aws.Context, input *AssumeRoleWithSAMLInput, opts ...request.Option) (*AssumeRoleWithSAMLOutput, error) ***REMOVED***
+func (c *STS) AssumeRoleWithSAMLWithContext(ctx aws.Context, input *AssumeRoleWithSAMLInput, opts ...request.Option) (*AssumeRoleWithSAMLOutput, error) {
 	req, out := c.AssumeRoleWithSAMLRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
-***REMOVED***
+}
 
 const opAssumeRoleWithWebIdentity = "AssumeRoleWithWebIdentity"
 
@@ -384,26 +384,26 @@ const opAssumeRoleWithWebIdentity = "AssumeRoleWithWebIdentity"
 //    req, resp := client.AssumeRoleWithWebIdentityRequest(params)
 //
 //    err := req.Send()
-//    if err == nil ***REMOVED*** // resp is now filled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
-//***REMOVED***
+//    }
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/sts-2011-06-15/AssumeRoleWithWebIdentity
-func (c *STS) AssumeRoleWithWebIdentityRequest(input *AssumeRoleWithWebIdentityInput) (req *request.Request, output *AssumeRoleWithWebIdentityOutput) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (c *STS) AssumeRoleWithWebIdentityRequest(input *AssumeRoleWithWebIdentityInput) (req *request.Request, output *AssumeRoleWithWebIdentityOutput) {
+	op := &request.Operation{
 		Name:       opAssumeRoleWithWebIdentity,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
-	***REMOVED***
+	}
 
-	if input == nil ***REMOVED***
-		input = &AssumeRoleWithWebIdentityInput***REMOVED******REMOVED***
-	***REMOVED***
+	if input == nil {
+		input = &AssumeRoleWithWebIdentityInput{}
+	}
 
-	output = &AssumeRoleWithWebIdentityOutput***REMOVED******REMOVED***
+	output = &AssumeRoleWithWebIdentityOutput{}
 	req = c.newRequest(op, input, output)
 	return
-***REMOVED***
+}
 
 // AssumeRoleWithWebIdentity API operation for AWS Security Token Service.
 //
@@ -544,10 +544,10 @@ func (c *STS) AssumeRoleWithWebIdentityRequest(input *AssumeRoleWithWebIdentityI
 //   in the IAM User Guide.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/sts-2011-06-15/AssumeRoleWithWebIdentity
-func (c *STS) AssumeRoleWithWebIdentity(input *AssumeRoleWithWebIdentityInput) (*AssumeRoleWithWebIdentityOutput, error) ***REMOVED***
+func (c *STS) AssumeRoleWithWebIdentity(input *AssumeRoleWithWebIdentityInput) (*AssumeRoleWithWebIdentityOutput, error) {
 	req, out := c.AssumeRoleWithWebIdentityRequest(input)
 	return out, req.Send()
-***REMOVED***
+}
 
 // AssumeRoleWithWebIdentityWithContext is the same as AssumeRoleWithWebIdentity with the addition of
 // the ability to pass a context and additional request options.
@@ -558,12 +558,12 @@ func (c *STS) AssumeRoleWithWebIdentity(input *AssumeRoleWithWebIdentityInput) (
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *STS) AssumeRoleWithWebIdentityWithContext(ctx aws.Context, input *AssumeRoleWithWebIdentityInput, opts ...request.Option) (*AssumeRoleWithWebIdentityOutput, error) ***REMOVED***
+func (c *STS) AssumeRoleWithWebIdentityWithContext(ctx aws.Context, input *AssumeRoleWithWebIdentityInput, opts ...request.Option) (*AssumeRoleWithWebIdentityOutput, error) {
 	req, out := c.AssumeRoleWithWebIdentityRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
-***REMOVED***
+}
 
 const opDecodeAuthorizationMessage = "DecodeAuthorizationMessage"
 
@@ -586,26 +586,26 @@ const opDecodeAuthorizationMessage = "DecodeAuthorizationMessage"
 //    req, resp := client.DecodeAuthorizationMessageRequest(params)
 //
 //    err := req.Send()
-//    if err == nil ***REMOVED*** // resp is now filled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
-//***REMOVED***
+//    }
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/sts-2011-06-15/DecodeAuthorizationMessage
-func (c *STS) DecodeAuthorizationMessageRequest(input *DecodeAuthorizationMessageInput) (req *request.Request, output *DecodeAuthorizationMessageOutput) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (c *STS) DecodeAuthorizationMessageRequest(input *DecodeAuthorizationMessageInput) (req *request.Request, output *DecodeAuthorizationMessageOutput) {
+	op := &request.Operation{
 		Name:       opDecodeAuthorizationMessage,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
-	***REMOVED***
+	}
 
-	if input == nil ***REMOVED***
-		input = &DecodeAuthorizationMessageInput***REMOVED******REMOVED***
-	***REMOVED***
+	if input == nil {
+		input = &DecodeAuthorizationMessageInput{}
+	}
 
-	output = &DecodeAuthorizationMessageOutput***REMOVED******REMOVED***
+	output = &DecodeAuthorizationMessageOutput{}
 	req = c.newRequest(op, input, output)
 	return
-***REMOVED***
+}
 
 // DecodeAuthorizationMessage API operation for AWS Security Token Service.
 //
@@ -656,10 +656,10 @@ func (c *STS) DecodeAuthorizationMessageRequest(input *DecodeAuthorizationMessag
 //   linebreaks.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/sts-2011-06-15/DecodeAuthorizationMessage
-func (c *STS) DecodeAuthorizationMessage(input *DecodeAuthorizationMessageInput) (*DecodeAuthorizationMessageOutput, error) ***REMOVED***
+func (c *STS) DecodeAuthorizationMessage(input *DecodeAuthorizationMessageInput) (*DecodeAuthorizationMessageOutput, error) {
 	req, out := c.DecodeAuthorizationMessageRequest(input)
 	return out, req.Send()
-***REMOVED***
+}
 
 // DecodeAuthorizationMessageWithContext is the same as DecodeAuthorizationMessage with the addition of
 // the ability to pass a context and additional request options.
@@ -670,12 +670,12 @@ func (c *STS) DecodeAuthorizationMessage(input *DecodeAuthorizationMessageInput)
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *STS) DecodeAuthorizationMessageWithContext(ctx aws.Context, input *DecodeAuthorizationMessageInput, opts ...request.Option) (*DecodeAuthorizationMessageOutput, error) ***REMOVED***
+func (c *STS) DecodeAuthorizationMessageWithContext(ctx aws.Context, input *DecodeAuthorizationMessageInput, opts ...request.Option) (*DecodeAuthorizationMessageOutput, error) {
 	req, out := c.DecodeAuthorizationMessageRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
-***REMOVED***
+}
 
 const opGetCallerIdentity = "GetCallerIdentity"
 
@@ -698,26 +698,26 @@ const opGetCallerIdentity = "GetCallerIdentity"
 //    req, resp := client.GetCallerIdentityRequest(params)
 //
 //    err := req.Send()
-//    if err == nil ***REMOVED*** // resp is now filled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
-//***REMOVED***
+//    }
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/sts-2011-06-15/GetCallerIdentity
-func (c *STS) GetCallerIdentityRequest(input *GetCallerIdentityInput) (req *request.Request, output *GetCallerIdentityOutput) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (c *STS) GetCallerIdentityRequest(input *GetCallerIdentityInput) (req *request.Request, output *GetCallerIdentityOutput) {
+	op := &request.Operation{
 		Name:       opGetCallerIdentity,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
-	***REMOVED***
+	}
 
-	if input == nil ***REMOVED***
-		input = &GetCallerIdentityInput***REMOVED******REMOVED***
-	***REMOVED***
+	if input == nil {
+		input = &GetCallerIdentityInput{}
+	}
 
-	output = &GetCallerIdentityOutput***REMOVED******REMOVED***
+	output = &GetCallerIdentityOutput{}
 	req = c.newRequest(op, input, output)
 	return
-***REMOVED***
+}
 
 // GetCallerIdentity API operation for AWS Security Token Service.
 //
@@ -731,10 +731,10 @@ func (c *STS) GetCallerIdentityRequest(input *GetCallerIdentityInput) (req *requ
 // See the AWS API reference guide for AWS Security Token Service's
 // API operation GetCallerIdentity for usage and error information.
 // See also, https://docs.aws.amazon.com/goto/WebAPI/sts-2011-06-15/GetCallerIdentity
-func (c *STS) GetCallerIdentity(input *GetCallerIdentityInput) (*GetCallerIdentityOutput, error) ***REMOVED***
+func (c *STS) GetCallerIdentity(input *GetCallerIdentityInput) (*GetCallerIdentityOutput, error) {
 	req, out := c.GetCallerIdentityRequest(input)
 	return out, req.Send()
-***REMOVED***
+}
 
 // GetCallerIdentityWithContext is the same as GetCallerIdentity with the addition of
 // the ability to pass a context and additional request options.
@@ -745,12 +745,12 @@ func (c *STS) GetCallerIdentity(input *GetCallerIdentityInput) (*GetCallerIdenti
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *STS) GetCallerIdentityWithContext(ctx aws.Context, input *GetCallerIdentityInput, opts ...request.Option) (*GetCallerIdentityOutput, error) ***REMOVED***
+func (c *STS) GetCallerIdentityWithContext(ctx aws.Context, input *GetCallerIdentityInput, opts ...request.Option) (*GetCallerIdentityOutput, error) {
 	req, out := c.GetCallerIdentityRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
-***REMOVED***
+}
 
 const opGetFederationToken = "GetFederationToken"
 
@@ -773,26 +773,26 @@ const opGetFederationToken = "GetFederationToken"
 //    req, resp := client.GetFederationTokenRequest(params)
 //
 //    err := req.Send()
-//    if err == nil ***REMOVED*** // resp is now filled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
-//***REMOVED***
+//    }
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/sts-2011-06-15/GetFederationToken
-func (c *STS) GetFederationTokenRequest(input *GetFederationTokenInput) (req *request.Request, output *GetFederationTokenOutput) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (c *STS) GetFederationTokenRequest(input *GetFederationTokenInput) (req *request.Request, output *GetFederationTokenOutput) {
+	op := &request.Operation{
 		Name:       opGetFederationToken,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
-	***REMOVED***
+	}
 
-	if input == nil ***REMOVED***
-		input = &GetFederationTokenInput***REMOVED******REMOVED***
-	***REMOVED***
+	if input == nil {
+		input = &GetFederationTokenInput{}
+	}
 
-	output = &GetFederationTokenOutput***REMOVED******REMOVED***
+	output = &GetFederationTokenOutput{}
 	req = c.newRequest(op, input, output)
 	return
-***REMOVED***
+}
 
 // GetFederationToken API operation for AWS Security Token Service.
 //
@@ -900,10 +900,10 @@ func (c *STS) GetFederationTokenRequest(input *GetFederationTokenInput) (req *re
 //   in the IAM User Guide.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/sts-2011-06-15/GetFederationToken
-func (c *STS) GetFederationToken(input *GetFederationTokenInput) (*GetFederationTokenOutput, error) ***REMOVED***
+func (c *STS) GetFederationToken(input *GetFederationTokenInput) (*GetFederationTokenOutput, error) {
 	req, out := c.GetFederationTokenRequest(input)
 	return out, req.Send()
-***REMOVED***
+}
 
 // GetFederationTokenWithContext is the same as GetFederationToken with the addition of
 // the ability to pass a context and additional request options.
@@ -914,12 +914,12 @@ func (c *STS) GetFederationToken(input *GetFederationTokenInput) (*GetFederation
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *STS) GetFederationTokenWithContext(ctx aws.Context, input *GetFederationTokenInput, opts ...request.Option) (*GetFederationTokenOutput, error) ***REMOVED***
+func (c *STS) GetFederationTokenWithContext(ctx aws.Context, input *GetFederationTokenInput, opts ...request.Option) (*GetFederationTokenOutput, error) {
 	req, out := c.GetFederationTokenRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
-***REMOVED***
+}
 
 const opGetSessionToken = "GetSessionToken"
 
@@ -942,26 +942,26 @@ const opGetSessionToken = "GetSessionToken"
 //    req, resp := client.GetSessionTokenRequest(params)
 //
 //    err := req.Send()
-//    if err == nil ***REMOVED*** // resp is now filled
+//    if err == nil { // resp is now filled
 //        fmt.Println(resp)
-//***REMOVED***
+//    }
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/sts-2011-06-15/GetSessionToken
-func (c *STS) GetSessionTokenRequest(input *GetSessionTokenInput) (req *request.Request, output *GetSessionTokenOutput) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (c *STS) GetSessionTokenRequest(input *GetSessionTokenInput) (req *request.Request, output *GetSessionTokenOutput) {
+	op := &request.Operation{
 		Name:       opGetSessionToken,
 		HTTPMethod: "POST",
 		HTTPPath:   "/",
-	***REMOVED***
+	}
 
-	if input == nil ***REMOVED***
-		input = &GetSessionTokenInput***REMOVED******REMOVED***
-	***REMOVED***
+	if input == nil {
+		input = &GetSessionTokenInput{}
+	}
 
-	output = &GetSessionTokenOutput***REMOVED******REMOVED***
+	output = &GetSessionTokenOutput{}
 	req = c.newRequest(op, input, output)
 	return
-***REMOVED***
+}
 
 // GetSessionToken API operation for AWS Security Token Service.
 //
@@ -1028,10 +1028,10 @@ func (c *STS) GetSessionTokenRequest(input *GetSessionTokenInput) (req *request.
 //   in the IAM User Guide.
 //
 // See also, https://docs.aws.amazon.com/goto/WebAPI/sts-2011-06-15/GetSessionToken
-func (c *STS) GetSessionToken(input *GetSessionTokenInput) (*GetSessionTokenOutput, error) ***REMOVED***
+func (c *STS) GetSessionToken(input *GetSessionTokenInput) (*GetSessionTokenOutput, error) {
 	req, out := c.GetSessionTokenRequest(input)
 	return out, req.Send()
-***REMOVED***
+}
 
 // GetSessionTokenWithContext is the same as GetSessionToken with the addition of
 // the ability to pass a context and additional request options.
@@ -1042,16 +1042,16 @@ func (c *STS) GetSessionToken(input *GetSessionTokenInput) (*GetSessionTokenOutp
 // the context is nil a panic will occur. In the future the SDK may create
 // sub-contexts for http.Requests. See https://golang.org/pkg/context/
 // for more information on using Contexts.
-func (c *STS) GetSessionTokenWithContext(ctx aws.Context, input *GetSessionTokenInput, opts ...request.Option) (*GetSessionTokenOutput, error) ***REMOVED***
+func (c *STS) GetSessionTokenWithContext(ctx aws.Context, input *GetSessionTokenInput, opts ...request.Option) (*GetSessionTokenOutput, error) {
 	req, out := c.GetSessionTokenRequest(input)
 	req.SetContext(ctx)
 	req.ApplyOptions(opts...)
 	return out, req.Send()
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/sts-2011-06-15/AssumeRoleRequest
-type AssumeRoleInput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type AssumeRoleInput struct {
+	_ struct{} `type:"structure"`
 
 	// The duration, in seconds, of the role session. The value can range from 900
 	// seconds (15 minutes) to 3600 seconds (1 hour). By default, the value is set
@@ -1148,102 +1148,102 @@ type AssumeRoleInput struct ***REMOVED***
 	// The format for this parameter, as described by its regex pattern, is a sequence
 	// of six numeric digits.
 	TokenCode *string `min:"6" type:"string"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s AssumeRoleInput) String() string ***REMOVED***
+func (s AssumeRoleInput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s AssumeRoleInput) GoString() string ***REMOVED***
+func (s AssumeRoleInput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Validate inspects the fields of the type to determine if they are valid.
-func (s *AssumeRoleInput) Validate() error ***REMOVED***
-	invalidParams := request.ErrInvalidParams***REMOVED***Context: "AssumeRoleInput"***REMOVED***
-	if s.DurationSeconds != nil && *s.DurationSeconds < 900 ***REMOVED***
+func (s *AssumeRoleInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "AssumeRoleInput"}
+	if s.DurationSeconds != nil && *s.DurationSeconds < 900 {
 		invalidParams.Add(request.NewErrParamMinValue("DurationSeconds", 900))
-	***REMOVED***
-	if s.ExternalId != nil && len(*s.ExternalId) < 2 ***REMOVED***
+	}
+	if s.ExternalId != nil && len(*s.ExternalId) < 2 {
 		invalidParams.Add(request.NewErrParamMinLen("ExternalId", 2))
-	***REMOVED***
-	if s.Policy != nil && len(*s.Policy) < 1 ***REMOVED***
+	}
+	if s.Policy != nil && len(*s.Policy) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("Policy", 1))
-	***REMOVED***
-	if s.RoleArn == nil ***REMOVED***
+	}
+	if s.RoleArn == nil {
 		invalidParams.Add(request.NewErrParamRequired("RoleArn"))
-	***REMOVED***
-	if s.RoleArn != nil && len(*s.RoleArn) < 20 ***REMOVED***
+	}
+	if s.RoleArn != nil && len(*s.RoleArn) < 20 {
 		invalidParams.Add(request.NewErrParamMinLen("RoleArn", 20))
-	***REMOVED***
-	if s.RoleSessionName == nil ***REMOVED***
+	}
+	if s.RoleSessionName == nil {
 		invalidParams.Add(request.NewErrParamRequired("RoleSessionName"))
-	***REMOVED***
-	if s.RoleSessionName != nil && len(*s.RoleSessionName) < 2 ***REMOVED***
+	}
+	if s.RoleSessionName != nil && len(*s.RoleSessionName) < 2 {
 		invalidParams.Add(request.NewErrParamMinLen("RoleSessionName", 2))
-	***REMOVED***
-	if s.SerialNumber != nil && len(*s.SerialNumber) < 9 ***REMOVED***
+	}
+	if s.SerialNumber != nil && len(*s.SerialNumber) < 9 {
 		invalidParams.Add(request.NewErrParamMinLen("SerialNumber", 9))
-	***REMOVED***
-	if s.TokenCode != nil && len(*s.TokenCode) < 6 ***REMOVED***
+	}
+	if s.TokenCode != nil && len(*s.TokenCode) < 6 {
 		invalidParams.Add(request.NewErrParamMinLen("TokenCode", 6))
-	***REMOVED***
+	}
 
-	if invalidParams.Len() > 0 ***REMOVED***
+	if invalidParams.Len() > 0 {
 		return invalidParams
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetDurationSeconds sets the DurationSeconds field's value.
-func (s *AssumeRoleInput) SetDurationSeconds(v int64) *AssumeRoleInput ***REMOVED***
+func (s *AssumeRoleInput) SetDurationSeconds(v int64) *AssumeRoleInput {
 	s.DurationSeconds = &v
 	return s
-***REMOVED***
+}
 
 // SetExternalId sets the ExternalId field's value.
-func (s *AssumeRoleInput) SetExternalId(v string) *AssumeRoleInput ***REMOVED***
+func (s *AssumeRoleInput) SetExternalId(v string) *AssumeRoleInput {
 	s.ExternalId = &v
 	return s
-***REMOVED***
+}
 
 // SetPolicy sets the Policy field's value.
-func (s *AssumeRoleInput) SetPolicy(v string) *AssumeRoleInput ***REMOVED***
+func (s *AssumeRoleInput) SetPolicy(v string) *AssumeRoleInput {
 	s.Policy = &v
 	return s
-***REMOVED***
+}
 
 // SetRoleArn sets the RoleArn field's value.
-func (s *AssumeRoleInput) SetRoleArn(v string) *AssumeRoleInput ***REMOVED***
+func (s *AssumeRoleInput) SetRoleArn(v string) *AssumeRoleInput {
 	s.RoleArn = &v
 	return s
-***REMOVED***
+}
 
 // SetRoleSessionName sets the RoleSessionName field's value.
-func (s *AssumeRoleInput) SetRoleSessionName(v string) *AssumeRoleInput ***REMOVED***
+func (s *AssumeRoleInput) SetRoleSessionName(v string) *AssumeRoleInput {
 	s.RoleSessionName = &v
 	return s
-***REMOVED***
+}
 
 // SetSerialNumber sets the SerialNumber field's value.
-func (s *AssumeRoleInput) SetSerialNumber(v string) *AssumeRoleInput ***REMOVED***
+func (s *AssumeRoleInput) SetSerialNumber(v string) *AssumeRoleInput {
 	s.SerialNumber = &v
 	return s
-***REMOVED***
+}
 
 // SetTokenCode sets the TokenCode field's value.
-func (s *AssumeRoleInput) SetTokenCode(v string) *AssumeRoleInput ***REMOVED***
+func (s *AssumeRoleInput) SetTokenCode(v string) *AssumeRoleInput {
 	s.TokenCode = &v
 	return s
-***REMOVED***
+}
 
 // Contains the response to a successful AssumeRole request, including temporary
 // AWS credentials that can be used to make AWS requests.
 // See also, https://docs.aws.amazon.com/goto/WebAPI/sts-2011-06-15/AssumeRoleResponse
-type AssumeRoleOutput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type AssumeRoleOutput struct {
+	_ struct{} `type:"structure"`
 
 	// The Amazon Resource Name (ARN) and the assumed role ID, which are identifiers
 	// that you can use to refer to the resulting temporary security credentials.
@@ -1265,39 +1265,39 @@ type AssumeRoleOutput struct ***REMOVED***
 	// The service rejects any policy with a packed size greater than 100 percent,
 	// which means the policy exceeded the allowed space.
 	PackedPolicySize *int64 `type:"integer"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s AssumeRoleOutput) String() string ***REMOVED***
+func (s AssumeRoleOutput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s AssumeRoleOutput) GoString() string ***REMOVED***
+func (s AssumeRoleOutput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // SetAssumedRoleUser sets the AssumedRoleUser field's value.
-func (s *AssumeRoleOutput) SetAssumedRoleUser(v *AssumedRoleUser) *AssumeRoleOutput ***REMOVED***
+func (s *AssumeRoleOutput) SetAssumedRoleUser(v *AssumedRoleUser) *AssumeRoleOutput {
 	s.AssumedRoleUser = v
 	return s
-***REMOVED***
+}
 
 // SetCredentials sets the Credentials field's value.
-func (s *AssumeRoleOutput) SetCredentials(v *Credentials) *AssumeRoleOutput ***REMOVED***
+func (s *AssumeRoleOutput) SetCredentials(v *Credentials) *AssumeRoleOutput {
 	s.Credentials = v
 	return s
-***REMOVED***
+}
 
 // SetPackedPolicySize sets the PackedPolicySize field's value.
-func (s *AssumeRoleOutput) SetPackedPolicySize(v int64) *AssumeRoleOutput ***REMOVED***
+func (s *AssumeRoleOutput) SetPackedPolicySize(v int64) *AssumeRoleOutput {
 	s.PackedPolicySize = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/sts-2011-06-15/AssumeRoleWithSAMLRequest
-type AssumeRoleWithSAMLInput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type AssumeRoleWithSAMLInput struct {
+	_ struct{} `type:"structure"`
 
 	// The duration, in seconds, of the role session. The value can range from 900
 	// seconds (15 minutes) to 3600 seconds (1 hour). By default, the value is set
@@ -1358,87 +1358,87 @@ type AssumeRoleWithSAMLInput struct ***REMOVED***
 	//
 	// SAMLAssertion is a required field
 	SAMLAssertion *string `min:"4" type:"string" required:"true"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s AssumeRoleWithSAMLInput) String() string ***REMOVED***
+func (s AssumeRoleWithSAMLInput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s AssumeRoleWithSAMLInput) GoString() string ***REMOVED***
+func (s AssumeRoleWithSAMLInput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Validate inspects the fields of the type to determine if they are valid.
-func (s *AssumeRoleWithSAMLInput) Validate() error ***REMOVED***
-	invalidParams := request.ErrInvalidParams***REMOVED***Context: "AssumeRoleWithSAMLInput"***REMOVED***
-	if s.DurationSeconds != nil && *s.DurationSeconds < 900 ***REMOVED***
+func (s *AssumeRoleWithSAMLInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "AssumeRoleWithSAMLInput"}
+	if s.DurationSeconds != nil && *s.DurationSeconds < 900 {
 		invalidParams.Add(request.NewErrParamMinValue("DurationSeconds", 900))
-	***REMOVED***
-	if s.Policy != nil && len(*s.Policy) < 1 ***REMOVED***
+	}
+	if s.Policy != nil && len(*s.Policy) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("Policy", 1))
-	***REMOVED***
-	if s.PrincipalArn == nil ***REMOVED***
+	}
+	if s.PrincipalArn == nil {
 		invalidParams.Add(request.NewErrParamRequired("PrincipalArn"))
-	***REMOVED***
-	if s.PrincipalArn != nil && len(*s.PrincipalArn) < 20 ***REMOVED***
+	}
+	if s.PrincipalArn != nil && len(*s.PrincipalArn) < 20 {
 		invalidParams.Add(request.NewErrParamMinLen("PrincipalArn", 20))
-	***REMOVED***
-	if s.RoleArn == nil ***REMOVED***
+	}
+	if s.RoleArn == nil {
 		invalidParams.Add(request.NewErrParamRequired("RoleArn"))
-	***REMOVED***
-	if s.RoleArn != nil && len(*s.RoleArn) < 20 ***REMOVED***
+	}
+	if s.RoleArn != nil && len(*s.RoleArn) < 20 {
 		invalidParams.Add(request.NewErrParamMinLen("RoleArn", 20))
-	***REMOVED***
-	if s.SAMLAssertion == nil ***REMOVED***
+	}
+	if s.SAMLAssertion == nil {
 		invalidParams.Add(request.NewErrParamRequired("SAMLAssertion"))
-	***REMOVED***
-	if s.SAMLAssertion != nil && len(*s.SAMLAssertion) < 4 ***REMOVED***
+	}
+	if s.SAMLAssertion != nil && len(*s.SAMLAssertion) < 4 {
 		invalidParams.Add(request.NewErrParamMinLen("SAMLAssertion", 4))
-	***REMOVED***
+	}
 
-	if invalidParams.Len() > 0 ***REMOVED***
+	if invalidParams.Len() > 0 {
 		return invalidParams
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetDurationSeconds sets the DurationSeconds field's value.
-func (s *AssumeRoleWithSAMLInput) SetDurationSeconds(v int64) *AssumeRoleWithSAMLInput ***REMOVED***
+func (s *AssumeRoleWithSAMLInput) SetDurationSeconds(v int64) *AssumeRoleWithSAMLInput {
 	s.DurationSeconds = &v
 	return s
-***REMOVED***
+}
 
 // SetPolicy sets the Policy field's value.
-func (s *AssumeRoleWithSAMLInput) SetPolicy(v string) *AssumeRoleWithSAMLInput ***REMOVED***
+func (s *AssumeRoleWithSAMLInput) SetPolicy(v string) *AssumeRoleWithSAMLInput {
 	s.Policy = &v
 	return s
-***REMOVED***
+}
 
 // SetPrincipalArn sets the PrincipalArn field's value.
-func (s *AssumeRoleWithSAMLInput) SetPrincipalArn(v string) *AssumeRoleWithSAMLInput ***REMOVED***
+func (s *AssumeRoleWithSAMLInput) SetPrincipalArn(v string) *AssumeRoleWithSAMLInput {
 	s.PrincipalArn = &v
 	return s
-***REMOVED***
+}
 
 // SetRoleArn sets the RoleArn field's value.
-func (s *AssumeRoleWithSAMLInput) SetRoleArn(v string) *AssumeRoleWithSAMLInput ***REMOVED***
+func (s *AssumeRoleWithSAMLInput) SetRoleArn(v string) *AssumeRoleWithSAMLInput {
 	s.RoleArn = &v
 	return s
-***REMOVED***
+}
 
 // SetSAMLAssertion sets the SAMLAssertion field's value.
-func (s *AssumeRoleWithSAMLInput) SetSAMLAssertion(v string) *AssumeRoleWithSAMLInput ***REMOVED***
+func (s *AssumeRoleWithSAMLInput) SetSAMLAssertion(v string) *AssumeRoleWithSAMLInput {
 	s.SAMLAssertion = &v
 	return s
-***REMOVED***
+}
 
 // Contains the response to a successful AssumeRoleWithSAML request, including
 // temporary AWS credentials that can be used to make AWS requests.
 // See also, https://docs.aws.amazon.com/goto/WebAPI/sts-2011-06-15/AssumeRoleWithSAMLResponse
-type AssumeRoleWithSAMLOutput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type AssumeRoleWithSAMLOutput struct {
+	_ struct{} `type:"structure"`
 
 	// The identifiers for the temporary security credentials that the operation
 	// returns.
@@ -1488,69 +1488,69 @@ type AssumeRoleWithSAMLOutput struct ***REMOVED***
 	// is returned as transient. If the format includes any other prefix, the format
 	// is returned with no modifications.
 	SubjectType *string `type:"string"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s AssumeRoleWithSAMLOutput) String() string ***REMOVED***
+func (s AssumeRoleWithSAMLOutput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s AssumeRoleWithSAMLOutput) GoString() string ***REMOVED***
+func (s AssumeRoleWithSAMLOutput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // SetAssumedRoleUser sets the AssumedRoleUser field's value.
-func (s *AssumeRoleWithSAMLOutput) SetAssumedRoleUser(v *AssumedRoleUser) *AssumeRoleWithSAMLOutput ***REMOVED***
+func (s *AssumeRoleWithSAMLOutput) SetAssumedRoleUser(v *AssumedRoleUser) *AssumeRoleWithSAMLOutput {
 	s.AssumedRoleUser = v
 	return s
-***REMOVED***
+}
 
 // SetAudience sets the Audience field's value.
-func (s *AssumeRoleWithSAMLOutput) SetAudience(v string) *AssumeRoleWithSAMLOutput ***REMOVED***
+func (s *AssumeRoleWithSAMLOutput) SetAudience(v string) *AssumeRoleWithSAMLOutput {
 	s.Audience = &v
 	return s
-***REMOVED***
+}
 
 // SetCredentials sets the Credentials field's value.
-func (s *AssumeRoleWithSAMLOutput) SetCredentials(v *Credentials) *AssumeRoleWithSAMLOutput ***REMOVED***
+func (s *AssumeRoleWithSAMLOutput) SetCredentials(v *Credentials) *AssumeRoleWithSAMLOutput {
 	s.Credentials = v
 	return s
-***REMOVED***
+}
 
 // SetIssuer sets the Issuer field's value.
-func (s *AssumeRoleWithSAMLOutput) SetIssuer(v string) *AssumeRoleWithSAMLOutput ***REMOVED***
+func (s *AssumeRoleWithSAMLOutput) SetIssuer(v string) *AssumeRoleWithSAMLOutput {
 	s.Issuer = &v
 	return s
-***REMOVED***
+}
 
 // SetNameQualifier sets the NameQualifier field's value.
-func (s *AssumeRoleWithSAMLOutput) SetNameQualifier(v string) *AssumeRoleWithSAMLOutput ***REMOVED***
+func (s *AssumeRoleWithSAMLOutput) SetNameQualifier(v string) *AssumeRoleWithSAMLOutput {
 	s.NameQualifier = &v
 	return s
-***REMOVED***
+}
 
 // SetPackedPolicySize sets the PackedPolicySize field's value.
-func (s *AssumeRoleWithSAMLOutput) SetPackedPolicySize(v int64) *AssumeRoleWithSAMLOutput ***REMOVED***
+func (s *AssumeRoleWithSAMLOutput) SetPackedPolicySize(v int64) *AssumeRoleWithSAMLOutput {
 	s.PackedPolicySize = &v
 	return s
-***REMOVED***
+}
 
 // SetSubject sets the Subject field's value.
-func (s *AssumeRoleWithSAMLOutput) SetSubject(v string) *AssumeRoleWithSAMLOutput ***REMOVED***
+func (s *AssumeRoleWithSAMLOutput) SetSubject(v string) *AssumeRoleWithSAMLOutput {
 	s.Subject = &v
 	return s
-***REMOVED***
+}
 
 // SetSubjectType sets the SubjectType field's value.
-func (s *AssumeRoleWithSAMLOutput) SetSubjectType(v string) *AssumeRoleWithSAMLOutput ***REMOVED***
+func (s *AssumeRoleWithSAMLOutput) SetSubjectType(v string) *AssumeRoleWithSAMLOutput {
 	s.SubjectType = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/sts-2011-06-15/AssumeRoleWithWebIdentityRequest
-type AssumeRoleWithWebIdentityInput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type AssumeRoleWithWebIdentityInput struct {
+	_ struct{} `type:"structure"`
 
 	// The duration, in seconds, of the role session. The value can range from 900
 	// seconds (15 minutes) to 3600 seconds (1 hour). By default, the value is set
@@ -1624,96 +1624,96 @@ type AssumeRoleWithWebIdentityInput struct ***REMOVED***
 	//
 	// WebIdentityToken is a required field
 	WebIdentityToken *string `min:"4" type:"string" required:"true"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s AssumeRoleWithWebIdentityInput) String() string ***REMOVED***
+func (s AssumeRoleWithWebIdentityInput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s AssumeRoleWithWebIdentityInput) GoString() string ***REMOVED***
+func (s AssumeRoleWithWebIdentityInput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Validate inspects the fields of the type to determine if they are valid.
-func (s *AssumeRoleWithWebIdentityInput) Validate() error ***REMOVED***
-	invalidParams := request.ErrInvalidParams***REMOVED***Context: "AssumeRoleWithWebIdentityInput"***REMOVED***
-	if s.DurationSeconds != nil && *s.DurationSeconds < 900 ***REMOVED***
+func (s *AssumeRoleWithWebIdentityInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "AssumeRoleWithWebIdentityInput"}
+	if s.DurationSeconds != nil && *s.DurationSeconds < 900 {
 		invalidParams.Add(request.NewErrParamMinValue("DurationSeconds", 900))
-	***REMOVED***
-	if s.Policy != nil && len(*s.Policy) < 1 ***REMOVED***
+	}
+	if s.Policy != nil && len(*s.Policy) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("Policy", 1))
-	***REMOVED***
-	if s.ProviderId != nil && len(*s.ProviderId) < 4 ***REMOVED***
+	}
+	if s.ProviderId != nil && len(*s.ProviderId) < 4 {
 		invalidParams.Add(request.NewErrParamMinLen("ProviderId", 4))
-	***REMOVED***
-	if s.RoleArn == nil ***REMOVED***
+	}
+	if s.RoleArn == nil {
 		invalidParams.Add(request.NewErrParamRequired("RoleArn"))
-	***REMOVED***
-	if s.RoleArn != nil && len(*s.RoleArn) < 20 ***REMOVED***
+	}
+	if s.RoleArn != nil && len(*s.RoleArn) < 20 {
 		invalidParams.Add(request.NewErrParamMinLen("RoleArn", 20))
-	***REMOVED***
-	if s.RoleSessionName == nil ***REMOVED***
+	}
+	if s.RoleSessionName == nil {
 		invalidParams.Add(request.NewErrParamRequired("RoleSessionName"))
-	***REMOVED***
-	if s.RoleSessionName != nil && len(*s.RoleSessionName) < 2 ***REMOVED***
+	}
+	if s.RoleSessionName != nil && len(*s.RoleSessionName) < 2 {
 		invalidParams.Add(request.NewErrParamMinLen("RoleSessionName", 2))
-	***REMOVED***
-	if s.WebIdentityToken == nil ***REMOVED***
+	}
+	if s.WebIdentityToken == nil {
 		invalidParams.Add(request.NewErrParamRequired("WebIdentityToken"))
-	***REMOVED***
-	if s.WebIdentityToken != nil && len(*s.WebIdentityToken) < 4 ***REMOVED***
+	}
+	if s.WebIdentityToken != nil && len(*s.WebIdentityToken) < 4 {
 		invalidParams.Add(request.NewErrParamMinLen("WebIdentityToken", 4))
-	***REMOVED***
+	}
 
-	if invalidParams.Len() > 0 ***REMOVED***
+	if invalidParams.Len() > 0 {
 		return invalidParams
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetDurationSeconds sets the DurationSeconds field's value.
-func (s *AssumeRoleWithWebIdentityInput) SetDurationSeconds(v int64) *AssumeRoleWithWebIdentityInput ***REMOVED***
+func (s *AssumeRoleWithWebIdentityInput) SetDurationSeconds(v int64) *AssumeRoleWithWebIdentityInput {
 	s.DurationSeconds = &v
 	return s
-***REMOVED***
+}
 
 // SetPolicy sets the Policy field's value.
-func (s *AssumeRoleWithWebIdentityInput) SetPolicy(v string) *AssumeRoleWithWebIdentityInput ***REMOVED***
+func (s *AssumeRoleWithWebIdentityInput) SetPolicy(v string) *AssumeRoleWithWebIdentityInput {
 	s.Policy = &v
 	return s
-***REMOVED***
+}
 
 // SetProviderId sets the ProviderId field's value.
-func (s *AssumeRoleWithWebIdentityInput) SetProviderId(v string) *AssumeRoleWithWebIdentityInput ***REMOVED***
+func (s *AssumeRoleWithWebIdentityInput) SetProviderId(v string) *AssumeRoleWithWebIdentityInput {
 	s.ProviderId = &v
 	return s
-***REMOVED***
+}
 
 // SetRoleArn sets the RoleArn field's value.
-func (s *AssumeRoleWithWebIdentityInput) SetRoleArn(v string) *AssumeRoleWithWebIdentityInput ***REMOVED***
+func (s *AssumeRoleWithWebIdentityInput) SetRoleArn(v string) *AssumeRoleWithWebIdentityInput {
 	s.RoleArn = &v
 	return s
-***REMOVED***
+}
 
 // SetRoleSessionName sets the RoleSessionName field's value.
-func (s *AssumeRoleWithWebIdentityInput) SetRoleSessionName(v string) *AssumeRoleWithWebIdentityInput ***REMOVED***
+func (s *AssumeRoleWithWebIdentityInput) SetRoleSessionName(v string) *AssumeRoleWithWebIdentityInput {
 	s.RoleSessionName = &v
 	return s
-***REMOVED***
+}
 
 // SetWebIdentityToken sets the WebIdentityToken field's value.
-func (s *AssumeRoleWithWebIdentityInput) SetWebIdentityToken(v string) *AssumeRoleWithWebIdentityInput ***REMOVED***
+func (s *AssumeRoleWithWebIdentityInput) SetWebIdentityToken(v string) *AssumeRoleWithWebIdentityInput {
 	s.WebIdentityToken = &v
 	return s
-***REMOVED***
+}
 
 // Contains the response to a successful AssumeRoleWithWebIdentity request,
 // including temporary AWS credentials that can be used to make AWS requests.
 // See also, https://docs.aws.amazon.com/goto/WebAPI/sts-2011-06-15/AssumeRoleWithWebIdentityResponse
-type AssumeRoleWithWebIdentityOutput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type AssumeRoleWithWebIdentityOutput struct {
+	_ struct{} `type:"structure"`
 
 	// The Amazon Resource Name (ARN) and the assumed role ID, which are identifiers
 	// that you can use to refer to the resulting temporary security credentials.
@@ -1754,59 +1754,59 @@ type AssumeRoleWithWebIdentityOutput struct ***REMOVED***
 	// identifier). For OpenID Connect ID tokens, this field contains the value
 	// returned by the identity provider as the token's sub (Subject) claim.
 	SubjectFromWebIdentityToken *string `min:"6" type:"string"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s AssumeRoleWithWebIdentityOutput) String() string ***REMOVED***
+func (s AssumeRoleWithWebIdentityOutput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s AssumeRoleWithWebIdentityOutput) GoString() string ***REMOVED***
+func (s AssumeRoleWithWebIdentityOutput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // SetAssumedRoleUser sets the AssumedRoleUser field's value.
-func (s *AssumeRoleWithWebIdentityOutput) SetAssumedRoleUser(v *AssumedRoleUser) *AssumeRoleWithWebIdentityOutput ***REMOVED***
+func (s *AssumeRoleWithWebIdentityOutput) SetAssumedRoleUser(v *AssumedRoleUser) *AssumeRoleWithWebIdentityOutput {
 	s.AssumedRoleUser = v
 	return s
-***REMOVED***
+}
 
 // SetAudience sets the Audience field's value.
-func (s *AssumeRoleWithWebIdentityOutput) SetAudience(v string) *AssumeRoleWithWebIdentityOutput ***REMOVED***
+func (s *AssumeRoleWithWebIdentityOutput) SetAudience(v string) *AssumeRoleWithWebIdentityOutput {
 	s.Audience = &v
 	return s
-***REMOVED***
+}
 
 // SetCredentials sets the Credentials field's value.
-func (s *AssumeRoleWithWebIdentityOutput) SetCredentials(v *Credentials) *AssumeRoleWithWebIdentityOutput ***REMOVED***
+func (s *AssumeRoleWithWebIdentityOutput) SetCredentials(v *Credentials) *AssumeRoleWithWebIdentityOutput {
 	s.Credentials = v
 	return s
-***REMOVED***
+}
 
 // SetPackedPolicySize sets the PackedPolicySize field's value.
-func (s *AssumeRoleWithWebIdentityOutput) SetPackedPolicySize(v int64) *AssumeRoleWithWebIdentityOutput ***REMOVED***
+func (s *AssumeRoleWithWebIdentityOutput) SetPackedPolicySize(v int64) *AssumeRoleWithWebIdentityOutput {
 	s.PackedPolicySize = &v
 	return s
-***REMOVED***
+}
 
 // SetProvider sets the Provider field's value.
-func (s *AssumeRoleWithWebIdentityOutput) SetProvider(v string) *AssumeRoleWithWebIdentityOutput ***REMOVED***
+func (s *AssumeRoleWithWebIdentityOutput) SetProvider(v string) *AssumeRoleWithWebIdentityOutput {
 	s.Provider = &v
 	return s
-***REMOVED***
+}
 
 // SetSubjectFromWebIdentityToken sets the SubjectFromWebIdentityToken field's value.
-func (s *AssumeRoleWithWebIdentityOutput) SetSubjectFromWebIdentityToken(v string) *AssumeRoleWithWebIdentityOutput ***REMOVED***
+func (s *AssumeRoleWithWebIdentityOutput) SetSubjectFromWebIdentityToken(v string) *AssumeRoleWithWebIdentityOutput {
 	s.SubjectFromWebIdentityToken = &v
 	return s
-***REMOVED***
+}
 
 // The identifiers for the temporary security credentials that the operation
 // returns.
 // See also, https://docs.aws.amazon.com/goto/WebAPI/sts-2011-06-15/AssumedRoleUser
-type AssumedRoleUser struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type AssumedRoleUser struct {
+	_ struct{} `type:"structure"`
 
 	// The ARN of the temporary security credentials that are returned from the
 	// AssumeRole action. For more information about ARNs and how to use them in
@@ -1822,34 +1822,34 @@ type AssumedRoleUser struct ***REMOVED***
 	//
 	// AssumedRoleId is a required field
 	AssumedRoleId *string `min:"2" type:"string" required:"true"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s AssumedRoleUser) String() string ***REMOVED***
+func (s AssumedRoleUser) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s AssumedRoleUser) GoString() string ***REMOVED***
+func (s AssumedRoleUser) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // SetArn sets the Arn field's value.
-func (s *AssumedRoleUser) SetArn(v string) *AssumedRoleUser ***REMOVED***
+func (s *AssumedRoleUser) SetArn(v string) *AssumedRoleUser {
 	s.Arn = &v
 	return s
-***REMOVED***
+}
 
 // SetAssumedRoleId sets the AssumedRoleId field's value.
-func (s *AssumedRoleUser) SetAssumedRoleId(v string) *AssumedRoleUser ***REMOVED***
+func (s *AssumedRoleUser) SetAssumedRoleId(v string) *AssumedRoleUser {
 	s.AssumedRoleId = &v
 	return s
-***REMOVED***
+}
 
 // AWS credentials for API authentication.
 // See also, https://docs.aws.amazon.com/goto/WebAPI/sts-2011-06-15/Credentials
-type Credentials struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type Credentials struct {
+	_ struct{} `type:"structure"`
 
 	// The access key ID that identifies the temporary security credentials.
 	//
@@ -1870,115 +1870,115 @@ type Credentials struct ***REMOVED***
 	//
 	// SessionToken is a required field
 	SessionToken *string `type:"string" required:"true"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s Credentials) String() string ***REMOVED***
+func (s Credentials) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s Credentials) GoString() string ***REMOVED***
+func (s Credentials) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // SetAccessKeyId sets the AccessKeyId field's value.
-func (s *Credentials) SetAccessKeyId(v string) *Credentials ***REMOVED***
+func (s *Credentials) SetAccessKeyId(v string) *Credentials {
 	s.AccessKeyId = &v
 	return s
-***REMOVED***
+}
 
 // SetExpiration sets the Expiration field's value.
-func (s *Credentials) SetExpiration(v time.Time) *Credentials ***REMOVED***
+func (s *Credentials) SetExpiration(v time.Time) *Credentials {
 	s.Expiration = &v
 	return s
-***REMOVED***
+}
 
 // SetSecretAccessKey sets the SecretAccessKey field's value.
-func (s *Credentials) SetSecretAccessKey(v string) *Credentials ***REMOVED***
+func (s *Credentials) SetSecretAccessKey(v string) *Credentials {
 	s.SecretAccessKey = &v
 	return s
-***REMOVED***
+}
 
 // SetSessionToken sets the SessionToken field's value.
-func (s *Credentials) SetSessionToken(v string) *Credentials ***REMOVED***
+func (s *Credentials) SetSessionToken(v string) *Credentials {
 	s.SessionToken = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/sts-2011-06-15/DecodeAuthorizationMessageRequest
-type DecodeAuthorizationMessageInput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type DecodeAuthorizationMessageInput struct {
+	_ struct{} `type:"structure"`
 
 	// The encoded message that was returned with the response.
 	//
 	// EncodedMessage is a required field
 	EncodedMessage *string `min:"1" type:"string" required:"true"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s DecodeAuthorizationMessageInput) String() string ***REMOVED***
+func (s DecodeAuthorizationMessageInput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s DecodeAuthorizationMessageInput) GoString() string ***REMOVED***
+func (s DecodeAuthorizationMessageInput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Validate inspects the fields of the type to determine if they are valid.
-func (s *DecodeAuthorizationMessageInput) Validate() error ***REMOVED***
-	invalidParams := request.ErrInvalidParams***REMOVED***Context: "DecodeAuthorizationMessageInput"***REMOVED***
-	if s.EncodedMessage == nil ***REMOVED***
+func (s *DecodeAuthorizationMessageInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "DecodeAuthorizationMessageInput"}
+	if s.EncodedMessage == nil {
 		invalidParams.Add(request.NewErrParamRequired("EncodedMessage"))
-	***REMOVED***
-	if s.EncodedMessage != nil && len(*s.EncodedMessage) < 1 ***REMOVED***
+	}
+	if s.EncodedMessage != nil && len(*s.EncodedMessage) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("EncodedMessage", 1))
-	***REMOVED***
+	}
 
-	if invalidParams.Len() > 0 ***REMOVED***
+	if invalidParams.Len() > 0 {
 		return invalidParams
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetEncodedMessage sets the EncodedMessage field's value.
-func (s *DecodeAuthorizationMessageInput) SetEncodedMessage(v string) *DecodeAuthorizationMessageInput ***REMOVED***
+func (s *DecodeAuthorizationMessageInput) SetEncodedMessage(v string) *DecodeAuthorizationMessageInput {
 	s.EncodedMessage = &v
 	return s
-***REMOVED***
+}
 
 // A document that contains additional information about the authorization status
 // of a request from an encoded message that is returned in response to an AWS
 // request.
 // See also, https://docs.aws.amazon.com/goto/WebAPI/sts-2011-06-15/DecodeAuthorizationMessageResponse
-type DecodeAuthorizationMessageOutput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type DecodeAuthorizationMessageOutput struct {
+	_ struct{} `type:"structure"`
 
 	// An XML document that contains the decoded message.
 	DecodedMessage *string `type:"string"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s DecodeAuthorizationMessageOutput) String() string ***REMOVED***
+func (s DecodeAuthorizationMessageOutput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s DecodeAuthorizationMessageOutput) GoString() string ***REMOVED***
+func (s DecodeAuthorizationMessageOutput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // SetDecodedMessage sets the DecodedMessage field's value.
-func (s *DecodeAuthorizationMessageOutput) SetDecodedMessage(v string) *DecodeAuthorizationMessageOutput ***REMOVED***
+func (s *DecodeAuthorizationMessageOutput) SetDecodedMessage(v string) *DecodeAuthorizationMessageOutput {
 	s.DecodedMessage = &v
 	return s
-***REMOVED***
+}
 
 // Identifiers for the federated user that is associated with the credentials.
 // See also, https://docs.aws.amazon.com/goto/WebAPI/sts-2011-06-15/FederatedUser
-type FederatedUser struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type FederatedUser struct {
+	_ struct{} `type:"structure"`
 
 	// The ARN that specifies the federated user that is associated with the credentials.
 	// For more information about ARNs and how to use them in policies, see IAM
@@ -1993,50 +1993,50 @@ type FederatedUser struct ***REMOVED***
 	//
 	// FederatedUserId is a required field
 	FederatedUserId *string `min:"2" type:"string" required:"true"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s FederatedUser) String() string ***REMOVED***
+func (s FederatedUser) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s FederatedUser) GoString() string ***REMOVED***
+func (s FederatedUser) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // SetArn sets the Arn field's value.
-func (s *FederatedUser) SetArn(v string) *FederatedUser ***REMOVED***
+func (s *FederatedUser) SetArn(v string) *FederatedUser {
 	s.Arn = &v
 	return s
-***REMOVED***
+}
 
 // SetFederatedUserId sets the FederatedUserId field's value.
-func (s *FederatedUser) SetFederatedUserId(v string) *FederatedUser ***REMOVED***
+func (s *FederatedUser) SetFederatedUserId(v string) *FederatedUser {
 	s.FederatedUserId = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/sts-2011-06-15/GetCallerIdentityRequest
-type GetCallerIdentityInput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
-***REMOVED***
+type GetCallerIdentityInput struct {
+	_ struct{} `type:"structure"`
+}
 
 // String returns the string representation
-func (s GetCallerIdentityInput) String() string ***REMOVED***
+func (s GetCallerIdentityInput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s GetCallerIdentityInput) GoString() string ***REMOVED***
+func (s GetCallerIdentityInput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Contains the response to a successful GetCallerIdentity request, including
 // information about the entity making the request.
 // See also, https://docs.aws.amazon.com/goto/WebAPI/sts-2011-06-15/GetCallerIdentityResponse
-type GetCallerIdentityOutput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type GetCallerIdentityOutput struct {
+	_ struct{} `type:"structure"`
 
 	// The AWS account ID number of the account that owns or contains the calling
 	// entity.
@@ -2050,39 +2050,39 @@ type GetCallerIdentityOutput struct ***REMOVED***
 	// aws:userid column in the Principal table (http://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_variables.html#principaltable)
 	// found on the Policy Variables reference page in the IAM User Guide.
 	UserId *string `type:"string"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s GetCallerIdentityOutput) String() string ***REMOVED***
+func (s GetCallerIdentityOutput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s GetCallerIdentityOutput) GoString() string ***REMOVED***
+func (s GetCallerIdentityOutput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // SetAccount sets the Account field's value.
-func (s *GetCallerIdentityOutput) SetAccount(v string) *GetCallerIdentityOutput ***REMOVED***
+func (s *GetCallerIdentityOutput) SetAccount(v string) *GetCallerIdentityOutput {
 	s.Account = &v
 	return s
-***REMOVED***
+}
 
 // SetArn sets the Arn field's value.
-func (s *GetCallerIdentityOutput) SetArn(v string) *GetCallerIdentityOutput ***REMOVED***
+func (s *GetCallerIdentityOutput) SetArn(v string) *GetCallerIdentityOutput {
 	s.Arn = &v
 	return s
-***REMOVED***
+}
 
 // SetUserId sets the UserId field's value.
-func (s *GetCallerIdentityOutput) SetUserId(v string) *GetCallerIdentityOutput ***REMOVED***
+func (s *GetCallerIdentityOutput) SetUserId(v string) *GetCallerIdentityOutput {
 	s.UserId = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/sts-2011-06-15/GetFederationTokenRequest
-type GetFederationTokenInput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type GetFederationTokenInput struct {
+	_ struct{} `type:"structure"`
 
 	// The duration, in seconds, that the session should last. Acceptable durations
 	// for federation sessions range from 900 seconds (15 minutes) to 129600 seconds
@@ -2135,63 +2135,63 @@ type GetFederationTokenInput struct ***REMOVED***
 	// For more information about how permissions work, see Permissions for GetFederationToken
 	// (http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_control-access_getfederationtoken.html).
 	Policy *string `min:"1" type:"string"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s GetFederationTokenInput) String() string ***REMOVED***
+func (s GetFederationTokenInput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s GetFederationTokenInput) GoString() string ***REMOVED***
+func (s GetFederationTokenInput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Validate inspects the fields of the type to determine if they are valid.
-func (s *GetFederationTokenInput) Validate() error ***REMOVED***
-	invalidParams := request.ErrInvalidParams***REMOVED***Context: "GetFederationTokenInput"***REMOVED***
-	if s.DurationSeconds != nil && *s.DurationSeconds < 900 ***REMOVED***
+func (s *GetFederationTokenInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "GetFederationTokenInput"}
+	if s.DurationSeconds != nil && *s.DurationSeconds < 900 {
 		invalidParams.Add(request.NewErrParamMinValue("DurationSeconds", 900))
-	***REMOVED***
-	if s.Name == nil ***REMOVED***
+	}
+	if s.Name == nil {
 		invalidParams.Add(request.NewErrParamRequired("Name"))
-	***REMOVED***
-	if s.Name != nil && len(*s.Name) < 2 ***REMOVED***
+	}
+	if s.Name != nil && len(*s.Name) < 2 {
 		invalidParams.Add(request.NewErrParamMinLen("Name", 2))
-	***REMOVED***
-	if s.Policy != nil && len(*s.Policy) < 1 ***REMOVED***
+	}
+	if s.Policy != nil && len(*s.Policy) < 1 {
 		invalidParams.Add(request.NewErrParamMinLen("Policy", 1))
-	***REMOVED***
+	}
 
-	if invalidParams.Len() > 0 ***REMOVED***
+	if invalidParams.Len() > 0 {
 		return invalidParams
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetDurationSeconds sets the DurationSeconds field's value.
-func (s *GetFederationTokenInput) SetDurationSeconds(v int64) *GetFederationTokenInput ***REMOVED***
+func (s *GetFederationTokenInput) SetDurationSeconds(v int64) *GetFederationTokenInput {
 	s.DurationSeconds = &v
 	return s
-***REMOVED***
+}
 
 // SetName sets the Name field's value.
-func (s *GetFederationTokenInput) SetName(v string) *GetFederationTokenInput ***REMOVED***
+func (s *GetFederationTokenInput) SetName(v string) *GetFederationTokenInput {
 	s.Name = &v
 	return s
-***REMOVED***
+}
 
 // SetPolicy sets the Policy field's value.
-func (s *GetFederationTokenInput) SetPolicy(v string) *GetFederationTokenInput ***REMOVED***
+func (s *GetFederationTokenInput) SetPolicy(v string) *GetFederationTokenInput {
 	s.Policy = &v
 	return s
-***REMOVED***
+}
 
 // Contains the response to a successful GetFederationToken request, including
 // temporary AWS credentials that can be used to make AWS requests.
 // See also, https://docs.aws.amazon.com/goto/WebAPI/sts-2011-06-15/GetFederationTokenResponse
-type GetFederationTokenOutput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type GetFederationTokenOutput struct {
+	_ struct{} `type:"structure"`
 
 	// The temporary security credentials, which include an access key ID, a secret
 	// access key, and a security (or session) token.
@@ -2212,39 +2212,39 @@ type GetFederationTokenOutput struct ***REMOVED***
 	// service rejects policies for which the packed size is greater than 100 percent
 	// of the allowed value.
 	PackedPolicySize *int64 `type:"integer"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s GetFederationTokenOutput) String() string ***REMOVED***
+func (s GetFederationTokenOutput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s GetFederationTokenOutput) GoString() string ***REMOVED***
+func (s GetFederationTokenOutput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // SetCredentials sets the Credentials field's value.
-func (s *GetFederationTokenOutput) SetCredentials(v *Credentials) *GetFederationTokenOutput ***REMOVED***
+func (s *GetFederationTokenOutput) SetCredentials(v *Credentials) *GetFederationTokenOutput {
 	s.Credentials = v
 	return s
-***REMOVED***
+}
 
 // SetFederatedUser sets the FederatedUser field's value.
-func (s *GetFederationTokenOutput) SetFederatedUser(v *FederatedUser) *GetFederationTokenOutput ***REMOVED***
+func (s *GetFederationTokenOutput) SetFederatedUser(v *FederatedUser) *GetFederationTokenOutput {
 	s.FederatedUser = v
 	return s
-***REMOVED***
+}
 
 // SetPackedPolicySize sets the PackedPolicySize field's value.
-func (s *GetFederationTokenOutput) SetPackedPolicySize(v int64) *GetFederationTokenOutput ***REMOVED***
+func (s *GetFederationTokenOutput) SetPackedPolicySize(v int64) *GetFederationTokenOutput {
 	s.PackedPolicySize = &v
 	return s
-***REMOVED***
+}
 
 // See also, https://docs.aws.amazon.com/goto/WebAPI/sts-2011-06-15/GetSessionTokenRequest
-type GetSessionTokenInput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type GetSessionTokenInput struct {
+	_ struct{} `type:"structure"`
 
 	// The duration, in seconds, that the credentials should remain valid. Acceptable
 	// durations for IAM user sessions range from 900 seconds (15 minutes) to 129600
@@ -2276,60 +2276,60 @@ type GetSessionTokenInput struct ***REMOVED***
 	// The format for this parameter, as described by its regex pattern, is a sequence
 	// of six numeric digits.
 	TokenCode *string `min:"6" type:"string"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s GetSessionTokenInput) String() string ***REMOVED***
+func (s GetSessionTokenInput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s GetSessionTokenInput) GoString() string ***REMOVED***
+func (s GetSessionTokenInput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // Validate inspects the fields of the type to determine if they are valid.
-func (s *GetSessionTokenInput) Validate() error ***REMOVED***
-	invalidParams := request.ErrInvalidParams***REMOVED***Context: "GetSessionTokenInput"***REMOVED***
-	if s.DurationSeconds != nil && *s.DurationSeconds < 900 ***REMOVED***
+func (s *GetSessionTokenInput) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "GetSessionTokenInput"}
+	if s.DurationSeconds != nil && *s.DurationSeconds < 900 {
 		invalidParams.Add(request.NewErrParamMinValue("DurationSeconds", 900))
-	***REMOVED***
-	if s.SerialNumber != nil && len(*s.SerialNumber) < 9 ***REMOVED***
+	}
+	if s.SerialNumber != nil && len(*s.SerialNumber) < 9 {
 		invalidParams.Add(request.NewErrParamMinLen("SerialNumber", 9))
-	***REMOVED***
-	if s.TokenCode != nil && len(*s.TokenCode) < 6 ***REMOVED***
+	}
+	if s.TokenCode != nil && len(*s.TokenCode) < 6 {
 		invalidParams.Add(request.NewErrParamMinLen("TokenCode", 6))
-	***REMOVED***
+	}
 
-	if invalidParams.Len() > 0 ***REMOVED***
+	if invalidParams.Len() > 0 {
 		return invalidParams
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetDurationSeconds sets the DurationSeconds field's value.
-func (s *GetSessionTokenInput) SetDurationSeconds(v int64) *GetSessionTokenInput ***REMOVED***
+func (s *GetSessionTokenInput) SetDurationSeconds(v int64) *GetSessionTokenInput {
 	s.DurationSeconds = &v
 	return s
-***REMOVED***
+}
 
 // SetSerialNumber sets the SerialNumber field's value.
-func (s *GetSessionTokenInput) SetSerialNumber(v string) *GetSessionTokenInput ***REMOVED***
+func (s *GetSessionTokenInput) SetSerialNumber(v string) *GetSessionTokenInput {
 	s.SerialNumber = &v
 	return s
-***REMOVED***
+}
 
 // SetTokenCode sets the TokenCode field's value.
-func (s *GetSessionTokenInput) SetTokenCode(v string) *GetSessionTokenInput ***REMOVED***
+func (s *GetSessionTokenInput) SetTokenCode(v string) *GetSessionTokenInput {
 	s.TokenCode = &v
 	return s
-***REMOVED***
+}
 
 // Contains the response to a successful GetSessionToken request, including
 // temporary AWS credentials that can be used to make AWS requests.
 // See also, https://docs.aws.amazon.com/goto/WebAPI/sts-2011-06-15/GetSessionTokenResponse
-type GetSessionTokenOutput struct ***REMOVED***
-	_ struct***REMOVED******REMOVED*** `type:"structure"`
+type GetSessionTokenOutput struct {
+	_ struct{} `type:"structure"`
 
 	// The temporary security credentials, which include an access key ID, a secret
 	// access key, and a security (or session) token.
@@ -2339,20 +2339,20 @@ type GetSessionTokenOutput struct ***REMOVED***
 	// of this writing, the typical size is less than 4096 bytes, but that can vary.
 	// Also, future updates to AWS might require larger sizes.
 	Credentials *Credentials `type:"structure"`
-***REMOVED***
+}
 
 // String returns the string representation
-func (s GetSessionTokenOutput) String() string ***REMOVED***
+func (s GetSessionTokenOutput) String() string {
 	return awsutil.Prettify(s)
-***REMOVED***
+}
 
 // GoString returns the string representation
-func (s GetSessionTokenOutput) GoString() string ***REMOVED***
+func (s GetSessionTokenOutput) GoString() string {
 	return s.String()
-***REMOVED***
+}
 
 // SetCredentials sets the Credentials field's value.
-func (s *GetSessionTokenOutput) SetCredentials(v *Credentials) *GetSessionTokenOutput ***REMOVED***
+func (s *GetSessionTokenOutput) SetCredentials(v *Credentials) *GetSessionTokenOutput {
 	s.Credentials = v
 	return s
-***REMOVED***
+}

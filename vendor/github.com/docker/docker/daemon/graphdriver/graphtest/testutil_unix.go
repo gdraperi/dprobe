@@ -14,7 +14,7 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-func verifyFile(t testing.TB, path string, mode os.FileMode, uid, gid uint32) ***REMOVED***
+func verifyFile(t testing.TB, path string, mode os.FileMode, uid, gid uint32) {
 	fi, err := os.Stat(path)
 	require.NoError(t, err)
 
@@ -25,13 +25,13 @@ func verifyFile(t testing.TB, path string, mode os.FileMode, uid, gid uint32) **
 	assert.Equal(t, mode&os.ModeSetuid, actual&os.ModeSetuid, path)
 	assert.Equal(t, mode&os.ModeSetgid, actual&os.ModeSetgid, path)
 
-	if stat, ok := fi.Sys().(*syscall.Stat_t); ok ***REMOVED***
+	if stat, ok := fi.Sys().(*syscall.Stat_t); ok {
 		assert.Equal(t, uid, stat.Uid, path)
 		assert.Equal(t, gid, stat.Gid, path)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func createBase(t testing.TB, driver graphdriver.Driver, name string) ***REMOVED***
+func createBase(t testing.TB, driver graphdriver.Driver, name string) {
 	// We need to be able to set any perms
 	oldmask := unix.Umask(0)
 	defer unix.Umask(oldmask)
@@ -50,9 +50,9 @@ func createBase(t testing.TB, driver graphdriver.Driver, name string) ***REMOVED
 	file := dirFS.Join(dirFS.Path(), "a file")
 	err = contdriver.WriteFile(dirFS, file, []byte("Some data"), 0222|os.ModeSetuid)
 	require.NoError(t, err)
-***REMOVED***
+}
 
-func verifyBase(t testing.TB, driver graphdriver.Driver, name string) ***REMOVED***
+func verifyBase(t testing.TB, driver graphdriver.Driver, name string) {
 	dirFS, err := driver.Get(name, "")
 	require.NoError(t, err)
 	defer driver.Put(name)
@@ -66,4 +66,4 @@ func verifyBase(t testing.TB, driver graphdriver.Driver, name string) ***REMOVED
 	files, err := readDir(dirFS, dirFS.Path())
 	require.NoError(t, err)
 	assert.Len(t, files, 2)
-***REMOVED***
+}

@@ -1,9 +1,9 @@
 package cmd
 
-func initAgpl() ***REMOVED***
-	Licenses["agpl"] = License***REMOVED***
+func initAgpl() {
+	Licenses["agpl"] = License{
 		Name:            "GNU Affero General Public License",
-		PossibleMatches: []string***REMOVED***"agpl", "affero gpl", "gnu agpl"***REMOVED***,
+		PossibleMatches: []string{"agpl", "affero gpl", "gnu agpl"},
 		Header: `
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by
@@ -679,5 +679,5 @@ if any, to sign a "copyright disclaimer" for the program, if necessary.
 For more information on this, and how to apply and follow the GNU AGPL, see
 <http://www.gnu.org/licenses/>.
 `,
-	***REMOVED***
-***REMOVED***
+	}
+}

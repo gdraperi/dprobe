@@ -10,10 +10,10 @@
 // sent over a network and then verified and decrypted.  It is asn1, and the type of
 // PKCS #7 ContentInfo, which comprises the PKCS #7 structure, is:
 //
-//			ContentInfo ::= SEQUENCE ***REMOVED***
+//			ContentInfo ::= SEQUENCE {
 //				contentType ContentType,
 //				content [0] EXPLICIT ANY DEFINED BY contentType OPTIONAL
-//			***REMOVED***
+//			}
 //
 // There are 6 possible ContentTypes, data, signedData, envelopedData,
 // signedAndEnvelopedData, digestedData, and encryptedData.  Here signedData, Data, and encrypted
@@ -23,14 +23,14 @@
 // The ContentType signedData has the form:
 //
 //
-//			signedData ::= SEQUENCE ***REMOVED***
+//			signedData ::= SEQUENCE {
 //				version Version,
 //				digestAlgorithms DigestAlgorithmIdentifiers,
 //				contentInfo ContentInfo,
 //				certificates [0] IMPLICIT ExtendedCertificatesAndCertificates OPTIONAL
 //				crls [1] IMPLICIT CertificateRevocationLists OPTIONAL,
 //				signerInfos SignerInfos
-//			***REMOVED***
+//			}
 //
 // As of yet signerInfos and digestAlgorithms are not parsed, as they are not relevant to
 // this system's use of PKCS #7 data.  Version is an integer type, note that PKCS #7 is
@@ -57,20 +57,20 @@ import (
 
 // Types used for asn1 Unmarshaling.
 
-type signedData struct ***REMOVED***
+type signedData struct {
 	Version          int
 	DigestAlgorithms asn1.RawValue
 	ContentInfo      asn1.RawValue
 	Certificates     asn1.RawValue `asn1:"optional" asn1:"tag:0"`
 	Crls             asn1.RawValue `asn1:"optional"`
 	SignerInfos      asn1.RawValue
-***REMOVED***
+}
 
-type initPKCS7 struct ***REMOVED***
+type initPKCS7 struct {
 	Raw         asn1.RawContent
 	ContentType asn1.ObjectIdentifier
 	Content     asn1.RawValue `asn1:"tag:0,explicit,optional"`
-***REMOVED***
+}
 
 // Object identifier strings of the three implemented PKCS7 types.
 const (
@@ -85,104 +85,104 @@ const (
 // is the degenerate SignedData Content info without signature used
 // to hold certificates and crls.  Data is raw bytes, and EncryptedData
 // is as defined in PKCS #7 standard.
-type PKCS7 struct ***REMOVED***
+type PKCS7 struct {
 	Raw         asn1.RawContent
 	ContentInfo string
 	Content     Content
-***REMOVED***
+}
 
 // Content implements three of the six possible PKCS7 data types.  Only one is non-nil.
-type Content struct ***REMOVED***
+type Content struct {
 	Data          []byte
 	SignedData    SignedData
 	EncryptedData EncryptedData
-***REMOVED***
+}
 
 // SignedData defines the typical carrier of certificates and crls.
-type SignedData struct ***REMOVED***
+type SignedData struct {
 	Raw          asn1.RawContent
 	Version      int
 	Certificates []*x509.Certificate
 	Crl          *pkix.CertificateList
-***REMOVED***
+}
 
 // Data contains raw bytes.  Used as a subtype in PKCS12.
-type Data struct ***REMOVED***
+type Data struct {
 	Bytes []byte
-***REMOVED***
+}
 
 // EncryptedData contains encrypted data.  Used as a subtype in PKCS12.
-type EncryptedData struct ***REMOVED***
+type EncryptedData struct {
 	Raw                  asn1.RawContent
 	Version              int
 	EncryptedContentInfo EncryptedContentInfo
-***REMOVED***
+}
 
 // EncryptedContentInfo is a subtype of PKCS7EncryptedData.
-type EncryptedContentInfo struct ***REMOVED***
+type EncryptedContentInfo struct {
 	Raw                        asn1.RawContent
 	ContentType                asn1.ObjectIdentifier
 	ContentEncryptionAlgorithm pkix.AlgorithmIdentifier
 	EncryptedContent           []byte `asn1:"tag:0,optional"`
-***REMOVED***
+}
 
 // ParsePKCS7 attempts to parse the DER encoded bytes of a
 // PKCS7 structure.
-func ParsePKCS7(raw []byte) (msg *PKCS7, err error) ***REMOVED***
+func ParsePKCS7(raw []byte) (msg *PKCS7, err error) {
 
 	var pkcs7 initPKCS7
 	_, err = asn1.Unmarshal(raw, &pkcs7)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, cferr.Wrap(cferr.CertificateError, cferr.ParseFailed, err)
-	***REMOVED***
+	}
 
 	msg = new(PKCS7)
 	msg.Raw = pkcs7.Raw
 	msg.ContentInfo = pkcs7.ContentType.String()
-	switch ***REMOVED***
+	switch {
 	case msg.ContentInfo == ObjIDData:
 		msg.ContentInfo = "Data"
 		_, err = asn1.Unmarshal(pkcs7.Content.Bytes, &msg.Content.Data)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, cferr.Wrap(cferr.CertificateError, cferr.ParseFailed, err)
-		***REMOVED***
+		}
 	case msg.ContentInfo == ObjIDSignedData:
 		msg.ContentInfo = "SignedData"
 		var signedData signedData
 		_, err = asn1.Unmarshal(pkcs7.Content.Bytes, &signedData)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, cferr.Wrap(cferr.CertificateError, cferr.ParseFailed, err)
-		***REMOVED***
-		if len(signedData.Certificates.Bytes) != 0 ***REMOVED***
+		}
+		if len(signedData.Certificates.Bytes) != 0 {
 			msg.Content.SignedData.Certificates, err = x509.ParseCertificates(signedData.Certificates.Bytes)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, cferr.Wrap(cferr.CertificateError, cferr.ParseFailed, err)
-			***REMOVED***
-		***REMOVED***
-		if len(signedData.Crls.Bytes) != 0 ***REMOVED***
+			}
+		}
+		if len(signedData.Crls.Bytes) != 0 {
 			msg.Content.SignedData.Crl, err = x509.ParseDERCRL(signedData.Crls.Bytes)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, cferr.Wrap(cferr.CertificateError, cferr.ParseFailed, err)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		msg.Content.SignedData.Version = signedData.Version
 		msg.Content.SignedData.Raw = pkcs7.Content.Bytes
 	case msg.ContentInfo == ObjIDEncryptedData:
 		msg.ContentInfo = "EncryptedData"
 		var encryptedData EncryptedData
 		_, err = asn1.Unmarshal(pkcs7.Content.Bytes, &encryptedData)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, cferr.Wrap(cferr.CertificateError, cferr.ParseFailed, err)
-		***REMOVED***
-		if encryptedData.Version != 0 ***REMOVED***
+		}
+		if encryptedData.Version != 0 {
 			return nil, cferr.Wrap(cferr.CertificateError, cferr.ParseFailed, errors.New("Only support for PKCS #7 encryptedData version 0"))
-		***REMOVED***
+		}
 		msg.Content.EncryptedData = encryptedData
 
 	default:
 		return nil, cferr.Wrap(cferr.CertificateError, cferr.ParseFailed, errors.New("Attempt to parse PKCS# 7 Content not of type data, signed data or encrypted data"))
-	***REMOVED***
+	}
 
 	return msg, nil
 
-***REMOVED***
+}

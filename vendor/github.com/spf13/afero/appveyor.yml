@@ -1,4 +1,4 @@
-version: '***REMOVED***build***REMOVED***'
+version: '{build}'
 clone_folder: C:\gopath\src\github.com\spf13\afero
 environment:
   GOPATH: C:\gopath

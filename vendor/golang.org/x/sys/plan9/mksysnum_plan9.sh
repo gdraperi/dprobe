@@ -15,7 +15,7 @@ const(
 EOF
 
 SP='[ 	]' # space or tab
-sed "s/^#define$***REMOVED***SP***REMOVED***\\([A-Z0-9_][A-Z0-9_]*\\)$***REMOVED***SP***REMOVED***$***REMOVED***SP***REMOVED****\\([0-9][0-9]*\\)/SYS_\\1=\\2/g" \
+sed "s/^#define${SP}\\([A-Z0-9_][A-Z0-9_]*\\)${SP}${SP}*\\([0-9][0-9]*\\)/SYS_\\1=\\2/g" \
 	< $1 | grep -v SYS__
 
 cat <<EOF

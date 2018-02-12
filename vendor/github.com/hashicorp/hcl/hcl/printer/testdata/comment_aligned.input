@@ -1,28 +1,28 @@
-aligned ***REMOVED***
+aligned {
 # We have some aligned items below
    foo = "fatih" # yoo1
    default = "bar" # yoo2
    bar = "bar and foo" # yoo3
-   default  = ***REMOVED***
+   default  = {
      bar = "example"
-   ***REMOVED***
+   }
   #deneme arslan
    fatih = ["fatih"] # yoo4
 	#fatih arslan
    fatiharslan = ["arslan"] // yoo5
-   default  = ***REMOVED***
+   default  = {
      bar = "example"
-   ***REMOVED***
+   }
 
 security_groups = [
 	"foo",    # kenya 1
-	"$***REMOVED***aws_security_group.firewall.foo***REMOVED***", # kenya 2
+	"${aws_security_group.firewall.foo}", # kenya 2
 ]
 
 security_groups2 = [
 	"foo",    # kenya 1
 	"bar",  # kenya 1.5
-	"$***REMOVED***aws_security_group.firewall.foo***REMOVED***", # kenya 2
+	"${aws_security_group.firewall.foo}", # kenya 2
 	"foobar", # kenya 3
 ]
-***REMOVED***
+}

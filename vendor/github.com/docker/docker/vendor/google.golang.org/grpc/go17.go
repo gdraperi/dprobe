@@ -42,14 +42,14 @@ import (
 )
 
 // dialContext connects to the address on the named network.
-func dialContext(ctx context.Context, network, address string) (net.Conn, error) ***REMOVED***
-	return (&net.Dialer***REMOVED******REMOVED***).DialContext(ctx, network, address)
-***REMOVED***
+func dialContext(ctx context.Context, network, address string) (net.Conn, error) {
+	return (&net.Dialer{}).DialContext(ctx, network, address)
+}
 
-func sendHTTPRequest(ctx context.Context, req *http.Request, conn net.Conn) error ***REMOVED***
+func sendHTTPRequest(ctx context.Context, req *http.Request, conn net.Conn) error {
 	req = req.WithContext(ctx)
-	if err := req.Write(conn); err != nil ***REMOVED***
+	if err := req.Write(conn); err != nil {
 		return err
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

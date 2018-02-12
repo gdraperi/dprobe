@@ -15,24 +15,24 @@ const (
 
 // lexMode returns whether we're going to be parsing in JSON
 // mode or HCL mode.
-func lexMode(v []byte) lexModeValue ***REMOVED***
+func lexMode(v []byte) lexModeValue {
 	var (
 		r      rune
 		w      int
 		offset int
 	)
 
-	for ***REMOVED***
+	for {
 		r, w = utf8.DecodeRune(v[offset:])
 		offset += w
-		if unicode.IsSpace(r) ***REMOVED***
+		if unicode.IsSpace(r) {
 			continue
-		***REMOVED***
-		if r == '***REMOVED***' ***REMOVED***
+		}
+		if r == '{' {
 			return lexModeJson
-		***REMOVED***
+		}
 		break
-	***REMOVED***
+	}
 
 	return lexModeHcl
-***REMOVED***
+}

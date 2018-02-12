@@ -10,7 +10,7 @@ import (
 // for a similar sample
 
 // GetOperatingSystem gets the name of the current operating system.
-func GetOperatingSystem() (string, error) ***REMOVED***
+func GetOperatingSystem() (string, error) {
 
 	var h windows.Handle
 
@@ -21,9 +21,9 @@ func GetOperatingSystem() (string, error) ***REMOVED***
 		windows.StringToUTF16Ptr(`SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\`),
 		0,
 		windows.KEY_READ,
-		&h); err != nil ***REMOVED***
+		&h); err != nil {
 		return ret, err
-	***REMOVED***
+	}
 	defer windows.RegCloseKey(h)
 
 	var buf [1 << 10]uint16
@@ -35,16 +35,16 @@ func GetOperatingSystem() (string, error) ***REMOVED***
 		nil,
 		&typ,
 		(*byte)(unsafe.Pointer(&buf[0])),
-		&n); err != nil ***REMOVED***
+		&n); err != nil {
 		return ret, err
-	***REMOVED***
+	}
 	ret = windows.UTF16ToString(buf[:])
 
 	return ret, nil
-***REMOVED***
+}
 
 // IsContainerized returns true if we are running inside a container.
 // No-op on Windows, always returns false.
-func IsContainerized() (bool, error) ***REMOVED***
+func IsContainerized() (bool, error) {
 	return false, nil
-***REMOVED***
+}

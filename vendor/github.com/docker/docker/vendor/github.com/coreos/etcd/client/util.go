@@ -23,31 +23,31 @@ var (
 	userNotFoundRegExp *regexp.Regexp
 )
 
-func init() ***REMOVED***
+func init() {
 	roleNotFoundRegExp = regexp.MustCompile("auth: Role .* does not exist.")
 	userNotFoundRegExp = regexp.MustCompile("auth: User .* does not exist.")
-***REMOVED***
+}
 
 // IsKeyNotFound returns true if the error code is ErrorCodeKeyNotFound.
-func IsKeyNotFound(err error) bool ***REMOVED***
-	if cErr, ok := err.(Error); ok ***REMOVED***
+func IsKeyNotFound(err error) bool {
+	if cErr, ok := err.(Error); ok {
 		return cErr.Code == ErrorCodeKeyNotFound
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
 // IsRoleNotFound returns true if the error means role not found of v2 API.
-func IsRoleNotFound(err error) bool ***REMOVED***
-	if ae, ok := err.(authError); ok ***REMOVED***
+func IsRoleNotFound(err error) bool {
+	if ae, ok := err.(authError); ok {
 		return roleNotFoundRegExp.MatchString(ae.Message)
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
 // IsUserNotFound returns true if the error means user not found of v2 API.
-func IsUserNotFound(err error) bool ***REMOVED***
-	if ae, ok := err.(authError); ok ***REMOVED***
+func IsUserNotFound(err error) bool {
+	if ae, ok := err.(authError); ok {
 		return userNotFoundRegExp.MatchString(ae.Message)
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}

@@ -11,17 +11,17 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-func (d *Daemon) setupDumpStackTrap(root string) ***REMOVED***
+func (d *Daemon) setupDumpStackTrap(root string) {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, unix.SIGUSR1)
-	go func() ***REMOVED***
-		for range c ***REMOVED***
+	go func() {
+		for range c {
 			path, err := stackdump.DumpStacks(root)
-			if err != nil ***REMOVED***
+			if err != nil {
 				logrus.WithError(err).Error("failed to write goroutines dump")
-			***REMOVED*** else ***REMOVED***
+			} else {
 				logrus.Infof("goroutine stacks written to %s", path)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***()
-***REMOVED***
+			}
+		}
+	}()
+}

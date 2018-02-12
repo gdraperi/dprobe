@@ -15,24 +15,24 @@ const (
 	shortTimeout = 1 * time.Minute
 )
 
-type client interface ***REMOVED***
-	CallWithOptions(string, interface***REMOVED******REMOVED***, interface***REMOVED******REMOVED***, ...func(*plugins.RequestOpts)) error
-***REMOVED***
+type client interface {
+	CallWithOptions(string, interface{}, interface{}, ...func(*plugins.RequestOpts)) error
+}
 
-type volumeDriverProxy struct ***REMOVED***
+type volumeDriverProxy struct {
 	client
-***REMOVED***
+}
 
-type volumeDriverProxyCreateRequest struct ***REMOVED***
+type volumeDriverProxyCreateRequest struct {
 	Name string
 	Opts map[string]string
-***REMOVED***
+}
 
-type volumeDriverProxyCreateResponse struct ***REMOVED***
+type volumeDriverProxyCreateResponse struct {
 	Err string
-***REMOVED***
+}
 
-func (pp *volumeDriverProxy) Create(name string, opts map[string]string) (err error) ***REMOVED***
+func (pp *volumeDriverProxy) Create(name string, opts map[string]string) (err error) {
 	var (
 		req volumeDriverProxyCreateRequest
 		ret volumeDriverProxyCreateResponse
@@ -41,26 +41,26 @@ func (pp *volumeDriverProxy) Create(name string, opts map[string]string) (err er
 	req.Name = name
 	req.Opts = opts
 
-	if err = pp.CallWithOptions("VolumeDriver.Create", req, &ret, plugins.WithRequestTimeout(longTimeout)); err != nil ***REMOVED***
+	if err = pp.CallWithOptions("VolumeDriver.Create", req, &ret, plugins.WithRequestTimeout(longTimeout)); err != nil {
 		return
-	***REMOVED***
+	}
 
-	if ret.Err != "" ***REMOVED***
+	if ret.Err != "" {
 		err = errors.New(ret.Err)
-	***REMOVED***
+	}
 
 	return
-***REMOVED***
+}
 
-type volumeDriverProxyRemoveRequest struct ***REMOVED***
+type volumeDriverProxyRemoveRequest struct {
 	Name string
-***REMOVED***
+}
 
-type volumeDriverProxyRemoveResponse struct ***REMOVED***
+type volumeDriverProxyRemoveResponse struct {
 	Err string
-***REMOVED***
+}
 
-func (pp *volumeDriverProxy) Remove(name string) (err error) ***REMOVED***
+func (pp *volumeDriverProxy) Remove(name string) (err error) {
 	var (
 		req volumeDriverProxyRemoveRequest
 		ret volumeDriverProxyRemoveResponse
@@ -68,27 +68,27 @@ func (pp *volumeDriverProxy) Remove(name string) (err error) ***REMOVED***
 
 	req.Name = name
 
-	if err = pp.CallWithOptions("VolumeDriver.Remove", req, &ret, plugins.WithRequestTimeout(shortTimeout)); err != nil ***REMOVED***
+	if err = pp.CallWithOptions("VolumeDriver.Remove", req, &ret, plugins.WithRequestTimeout(shortTimeout)); err != nil {
 		return
-	***REMOVED***
+	}
 
-	if ret.Err != "" ***REMOVED***
+	if ret.Err != "" {
 		err = errors.New(ret.Err)
-	***REMOVED***
+	}
 
 	return
-***REMOVED***
+}
 
-type volumeDriverProxyPathRequest struct ***REMOVED***
+type volumeDriverProxyPathRequest struct {
 	Name string
-***REMOVED***
+}
 
-type volumeDriverProxyPathResponse struct ***REMOVED***
+type volumeDriverProxyPathResponse struct {
 	Mountpoint string
 	Err        string
-***REMOVED***
+}
 
-func (pp *volumeDriverProxy) Path(name string) (mountpoint string, err error) ***REMOVED***
+func (pp *volumeDriverProxy) Path(name string) (mountpoint string, err error) {
 	var (
 		req volumeDriverProxyPathRequest
 		ret volumeDriverProxyPathResponse
@@ -96,30 +96,30 @@ func (pp *volumeDriverProxy) Path(name string) (mountpoint string, err error) **
 
 	req.Name = name
 
-	if err = pp.CallWithOptions("VolumeDriver.Path", req, &ret, plugins.WithRequestTimeout(shortTimeout)); err != nil ***REMOVED***
+	if err = pp.CallWithOptions("VolumeDriver.Path", req, &ret, plugins.WithRequestTimeout(shortTimeout)); err != nil {
 		return
-	***REMOVED***
+	}
 
 	mountpoint = ret.Mountpoint
 
-	if ret.Err != "" ***REMOVED***
+	if ret.Err != "" {
 		err = errors.New(ret.Err)
-	***REMOVED***
+	}
 
 	return
-***REMOVED***
+}
 
-type volumeDriverProxyMountRequest struct ***REMOVED***
+type volumeDriverProxyMountRequest struct {
 	Name string
 	ID   string
-***REMOVED***
+}
 
-type volumeDriverProxyMountResponse struct ***REMOVED***
+type volumeDriverProxyMountResponse struct {
 	Mountpoint string
 	Err        string
-***REMOVED***
+}
 
-func (pp *volumeDriverProxy) Mount(name string, id string) (mountpoint string, err error) ***REMOVED***
+func (pp *volumeDriverProxy) Mount(name string, id string) (mountpoint string, err error) {
 	var (
 		req volumeDriverProxyMountRequest
 		ret volumeDriverProxyMountResponse
@@ -128,29 +128,29 @@ func (pp *volumeDriverProxy) Mount(name string, id string) (mountpoint string, e
 	req.Name = name
 	req.ID = id
 
-	if err = pp.CallWithOptions("VolumeDriver.Mount", req, &ret, plugins.WithRequestTimeout(longTimeout)); err != nil ***REMOVED***
+	if err = pp.CallWithOptions("VolumeDriver.Mount", req, &ret, plugins.WithRequestTimeout(longTimeout)); err != nil {
 		return
-	***REMOVED***
+	}
 
 	mountpoint = ret.Mountpoint
 
-	if ret.Err != "" ***REMOVED***
+	if ret.Err != "" {
 		err = errors.New(ret.Err)
-	***REMOVED***
+	}
 
 	return
-***REMOVED***
+}
 
-type volumeDriverProxyUnmountRequest struct ***REMOVED***
+type volumeDriverProxyUnmountRequest struct {
 	Name string
 	ID   string
-***REMOVED***
+}
 
-type volumeDriverProxyUnmountResponse struct ***REMOVED***
+type volumeDriverProxyUnmountResponse struct {
 	Err string
-***REMOVED***
+}
 
-func (pp *volumeDriverProxy) Unmount(name string, id string) (err error) ***REMOVED***
+func (pp *volumeDriverProxy) Unmount(name string, id string) (err error) {
 	var (
 		req volumeDriverProxyUnmountRequest
 		ret volumeDriverProxyUnmountResponse
@@ -159,54 +159,54 @@ func (pp *volumeDriverProxy) Unmount(name string, id string) (err error) ***REMO
 	req.Name = name
 	req.ID = id
 
-	if err = pp.CallWithOptions("VolumeDriver.Unmount", req, &ret, plugins.WithRequestTimeout(shortTimeout)); err != nil ***REMOVED***
+	if err = pp.CallWithOptions("VolumeDriver.Unmount", req, &ret, plugins.WithRequestTimeout(shortTimeout)); err != nil {
 		return
-	***REMOVED***
+	}
 
-	if ret.Err != "" ***REMOVED***
+	if ret.Err != "" {
 		err = errors.New(ret.Err)
-	***REMOVED***
+	}
 
 	return
-***REMOVED***
+}
 
-type volumeDriverProxyListRequest struct ***REMOVED***
-***REMOVED***
+type volumeDriverProxyListRequest struct {
+}
 
-type volumeDriverProxyListResponse struct ***REMOVED***
+type volumeDriverProxyListResponse struct {
 	Volumes []*proxyVolume
 	Err     string
-***REMOVED***
+}
 
-func (pp *volumeDriverProxy) List() (volumes []*proxyVolume, err error) ***REMOVED***
+func (pp *volumeDriverProxy) List() (volumes []*proxyVolume, err error) {
 	var (
 		req volumeDriverProxyListRequest
 		ret volumeDriverProxyListResponse
 	)
 
-	if err = pp.CallWithOptions("VolumeDriver.List", req, &ret, plugins.WithRequestTimeout(shortTimeout)); err != nil ***REMOVED***
+	if err = pp.CallWithOptions("VolumeDriver.List", req, &ret, plugins.WithRequestTimeout(shortTimeout)); err != nil {
 		return
-	***REMOVED***
+	}
 
 	volumes = ret.Volumes
 
-	if ret.Err != "" ***REMOVED***
+	if ret.Err != "" {
 		err = errors.New(ret.Err)
-	***REMOVED***
+	}
 
 	return
-***REMOVED***
+}
 
-type volumeDriverProxyGetRequest struct ***REMOVED***
+type volumeDriverProxyGetRequest struct {
 	Name string
-***REMOVED***
+}
 
-type volumeDriverProxyGetResponse struct ***REMOVED***
+type volumeDriverProxyGetResponse struct {
 	Volume *proxyVolume
 	Err    string
-***REMOVED***
+}
 
-func (pp *volumeDriverProxy) Get(name string) (volume *proxyVolume, err error) ***REMOVED***
+func (pp *volumeDriverProxy) Get(name string) (volume *proxyVolume, err error) {
 	var (
 		req volumeDriverProxyGetRequest
 		ret volumeDriverProxyGetResponse
@@ -214,42 +214,42 @@ func (pp *volumeDriverProxy) Get(name string) (volume *proxyVolume, err error) *
 
 	req.Name = name
 
-	if err = pp.CallWithOptions("VolumeDriver.Get", req, &ret, plugins.WithRequestTimeout(shortTimeout)); err != nil ***REMOVED***
+	if err = pp.CallWithOptions("VolumeDriver.Get", req, &ret, plugins.WithRequestTimeout(shortTimeout)); err != nil {
 		return
-	***REMOVED***
+	}
 
 	volume = ret.Volume
 
-	if ret.Err != "" ***REMOVED***
+	if ret.Err != "" {
 		err = errors.New(ret.Err)
-	***REMOVED***
+	}
 
 	return
-***REMOVED***
+}
 
-type volumeDriverProxyCapabilitiesRequest struct ***REMOVED***
-***REMOVED***
+type volumeDriverProxyCapabilitiesRequest struct {
+}
 
-type volumeDriverProxyCapabilitiesResponse struct ***REMOVED***
+type volumeDriverProxyCapabilitiesResponse struct {
 	Capabilities volume.Capability
 	Err          string
-***REMOVED***
+}
 
-func (pp *volumeDriverProxy) Capabilities() (capabilities volume.Capability, err error) ***REMOVED***
+func (pp *volumeDriverProxy) Capabilities() (capabilities volume.Capability, err error) {
 	var (
 		req volumeDriverProxyCapabilitiesRequest
 		ret volumeDriverProxyCapabilitiesResponse
 	)
 
-	if err = pp.CallWithOptions("VolumeDriver.Capabilities", req, &ret, plugins.WithRequestTimeout(shortTimeout)); err != nil ***REMOVED***
+	if err = pp.CallWithOptions("VolumeDriver.Capabilities", req, &ret, plugins.WithRequestTimeout(shortTimeout)); err != nil {
 		return
-	***REMOVED***
+	}
 
 	capabilities = ret.Capabilities
 
-	if ret.Err != "" ***REMOVED***
+	if ret.Err != "" {
 		err = errors.New(ret.Err)
-	***REMOVED***
+	}
 
 	return
-***REMOVED***
+}

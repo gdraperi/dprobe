@@ -12,7 +12,7 @@ import (
 )
 
 // Backend for Plugin
-type Backend interface ***REMOVED***
+type Backend interface {
 	Disable(name string, config *enginetypes.PluginDisableConfig) error
 	Enable(name string, config *enginetypes.PluginEnableConfig) error
 	List(filters.Args) ([]enginetypes.Plugin, error)
@@ -24,4 +24,4 @@ type Backend interface ***REMOVED***
 	Push(ctx context.Context, name string, metaHeaders http.Header, authConfig *enginetypes.AuthConfig, outStream io.Writer) error
 	Upgrade(ctx context.Context, ref reference.Named, name string, metaHeaders http.Header, authConfig *enginetypes.AuthConfig, privileges enginetypes.PluginPrivileges, outStream io.Writer) error
 	CreateFromContext(ctx context.Context, tarCtx io.ReadCloser, options *enginetypes.PluginCreateOptions) error
-***REMOVED***
+}

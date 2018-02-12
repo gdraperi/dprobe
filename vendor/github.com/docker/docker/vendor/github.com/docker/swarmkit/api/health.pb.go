@@ -40,95 +40,95 @@ const (
 	HealthCheckResponse_NOT_SERVING HealthCheckResponse_ServingStatus = 2
 )
 
-var HealthCheckResponse_ServingStatus_name = map[int32]string***REMOVED***
+var HealthCheckResponse_ServingStatus_name = map[int32]string{
 	0: "UNKNOWN",
 	1: "SERVING",
 	2: "NOT_SERVING",
-***REMOVED***
-var HealthCheckResponse_ServingStatus_value = map[string]int32***REMOVED***
+}
+var HealthCheckResponse_ServingStatus_value = map[string]int32{
 	"UNKNOWN":     0,
 	"SERVING":     1,
 	"NOT_SERVING": 2,
-***REMOVED***
+}
 
-func (x HealthCheckResponse_ServingStatus) String() string ***REMOVED***
+func (x HealthCheckResponse_ServingStatus) String() string {
 	return proto.EnumName(HealthCheckResponse_ServingStatus_name, int32(x))
-***REMOVED***
-func (HealthCheckResponse_ServingStatus) EnumDescriptor() ([]byte, []int) ***REMOVED***
-	return fileDescriptorHealth, []int***REMOVED***1, 0***REMOVED***
-***REMOVED***
+}
+func (HealthCheckResponse_ServingStatus) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptorHealth, []int{1, 0}
+}
 
-type HealthCheckRequest struct ***REMOVED***
+type HealthCheckRequest struct {
 	Service string `protobuf:"bytes,1,opt,name=service,proto3" json:"service,omitempty"`
-***REMOVED***
+}
 
-func (m *HealthCheckRequest) Reset()                    ***REMOVED*** *m = HealthCheckRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*HealthCheckRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*HealthCheckRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorHealth, []int***REMOVED***0***REMOVED*** ***REMOVED***
+func (m *HealthCheckRequest) Reset()                    { *m = HealthCheckRequest{} }
+func (*HealthCheckRequest) ProtoMessage()               {}
+func (*HealthCheckRequest) Descriptor() ([]byte, []int) { return fileDescriptorHealth, []int{0} }
 
-type HealthCheckResponse struct ***REMOVED***
+type HealthCheckResponse struct {
 	Status HealthCheckResponse_ServingStatus `protobuf:"varint,1,opt,name=status,proto3,enum=docker.swarmkit.v1.HealthCheckResponse_ServingStatus" json:"status,omitempty"`
-***REMOVED***
+}
 
-func (m *HealthCheckResponse) Reset()                    ***REMOVED*** *m = HealthCheckResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*HealthCheckResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*HealthCheckResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorHealth, []int***REMOVED***1***REMOVED*** ***REMOVED***
+func (m *HealthCheckResponse) Reset()                    { *m = HealthCheckResponse{} }
+func (*HealthCheckResponse) ProtoMessage()               {}
+func (*HealthCheckResponse) Descriptor() ([]byte, []int) { return fileDescriptorHealth, []int{1} }
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*HealthCheckRequest)(nil), "docker.swarmkit.v1.HealthCheckRequest")
 	proto.RegisterType((*HealthCheckResponse)(nil), "docker.swarmkit.v1.HealthCheckResponse")
 	proto.RegisterEnum("docker.swarmkit.v1.HealthCheckResponse_ServingStatus", HealthCheckResponse_ServingStatus_name, HealthCheckResponse_ServingStatus_value)
-***REMOVED***
+}
 
-type authenticatedWrapperHealthServer struct ***REMOVED***
+type authenticatedWrapperHealthServer struct {
 	local     HealthServer
 	authorize func(context.Context, []string) error
-***REMOVED***
+}
 
-func NewAuthenticatedWrapperHealthServer(local HealthServer, authorize func(context.Context, []string) error) HealthServer ***REMOVED***
-	return &authenticatedWrapperHealthServer***REMOVED***
+func NewAuthenticatedWrapperHealthServer(local HealthServer, authorize func(context.Context, []string) error) HealthServer {
+	return &authenticatedWrapperHealthServer{
 		local:     local,
 		authorize: authorize,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (p *authenticatedWrapperHealthServer) Check(ctx context.Context, r *HealthCheckRequest) (*HealthCheckResponse, error) ***REMOVED***
+func (p *authenticatedWrapperHealthServer) Check(ctx context.Context, r *HealthCheckRequest) (*HealthCheckResponse, error) {
 
-	if err := p.authorize(ctx, []string***REMOVED***"swarm-manager"***REMOVED***); err != nil ***REMOVED***
+	if err := p.authorize(ctx, []string{"swarm-manager"}); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return p.local.Check(ctx, r)
-***REMOVED***
+}
 
-func (m *HealthCheckRequest) Copy() *HealthCheckRequest ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *HealthCheckRequest) Copy() *HealthCheckRequest {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &HealthCheckRequest***REMOVED******REMOVED***
+	}
+	o := &HealthCheckRequest{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *HealthCheckRequest) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *HealthCheckRequest) CopyFrom(src interface{}) {
 
 	o := src.(*HealthCheckRequest)
 	*m = *o
-***REMOVED***
+}
 
-func (m *HealthCheckResponse) Copy() *HealthCheckResponse ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *HealthCheckResponse) Copy() *HealthCheckResponse {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &HealthCheckResponse***REMOVED******REMOVED***
+	}
+	o := &HealthCheckResponse{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *HealthCheckResponse) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *HealthCheckResponse) CopyFrom(src interface{}) {
 
 	o := src.(*HealthCheckResponse)
 	*m = *o
-***REMOVED***
+}
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
@@ -140,116 +140,116 @@ const _ = grpc.SupportPackageIsVersion4
 
 // Client API for Health service
 
-type HealthClient interface ***REMOVED***
+type HealthClient interface {
 	Check(ctx context.Context, in *HealthCheckRequest, opts ...grpc.CallOption) (*HealthCheckResponse, error)
-***REMOVED***
+}
 
-type healthClient struct ***REMOVED***
+type healthClient struct {
 	cc *grpc.ClientConn
-***REMOVED***
+}
 
-func NewHealthClient(cc *grpc.ClientConn) HealthClient ***REMOVED***
-	return &healthClient***REMOVED***cc***REMOVED***
-***REMOVED***
+func NewHealthClient(cc *grpc.ClientConn) HealthClient {
+	return &healthClient{cc}
+}
 
-func (c *healthClient) Check(ctx context.Context, in *HealthCheckRequest, opts ...grpc.CallOption) (*HealthCheckResponse, error) ***REMOVED***
+func (c *healthClient) Check(ctx context.Context, in *HealthCheckRequest, opts ...grpc.CallOption) (*HealthCheckResponse, error) {
 	out := new(HealthCheckResponse)
 	err := grpc.Invoke(ctx, "/docker.swarmkit.v1.Health/Check", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
 // Server API for Health service
 
-type HealthServer interface ***REMOVED***
+type HealthServer interface {
 	Check(context.Context, *HealthCheckRequest) (*HealthCheckResponse, error)
-***REMOVED***
+}
 
-func RegisterHealthServer(s *grpc.Server, srv HealthServer) ***REMOVED***
+func RegisterHealthServer(s *grpc.Server, srv HealthServer) {
 	s.RegisterService(&_Health_serviceDesc, srv)
-***REMOVED***
+}
 
-func _Health_Check_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _Health_Check_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(HealthCheckRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(HealthServer).Check(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/docker.swarmkit.v1.Health/Check",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(HealthServer).Check(ctx, req.(*HealthCheckRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-var _Health_serviceDesc = grpc.ServiceDesc***REMOVED***
+var _Health_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "docker.swarmkit.v1.Health",
 	HandlerType: (*HealthServer)(nil),
-	Methods: []grpc.MethodDesc***REMOVED***
-		***REMOVED***
+	Methods: []grpc.MethodDesc{
+		{
 			MethodName: "Check",
 			Handler:    _Health_Check_Handler,
-		***REMOVED***,
-	***REMOVED***,
-	Streams:  []grpc.StreamDesc***REMOVED******REMOVED***,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
 	Metadata: "github.com/docker/swarmkit/api/health.proto",
-***REMOVED***
+}
 
-func (m *HealthCheckRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *HealthCheckRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *HealthCheckRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *HealthCheckRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Service) > 0 ***REMOVED***
+	if len(m.Service) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintHealth(dAtA, i, uint64(len(m.Service)))
 		i += copy(dAtA[i:], m.Service)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *HealthCheckResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *HealthCheckResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *HealthCheckResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *HealthCheckResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.Status != 0 ***REMOVED***
+	if m.Status != 0 {
 		dAtA[i] = 0x8
 		i++
 		i = encodeVarintHealth(dAtA, i, uint64(m.Status))
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func encodeFixed64Health(dAtA []byte, offset int, v uint64) int ***REMOVED***
+func encodeFixed64Health(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
 	dAtA[offset+2] = uint8(v >> 16)
@@ -259,426 +259,426 @@ func encodeFixed64Health(dAtA []byte, offset int, v uint64) int ***REMOVED***
 	dAtA[offset+6] = uint8(v >> 48)
 	dAtA[offset+7] = uint8(v >> 56)
 	return offset + 8
-***REMOVED***
-func encodeFixed32Health(dAtA []byte, offset int, v uint32) int ***REMOVED***
+}
+func encodeFixed32Health(dAtA []byte, offset int, v uint32) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
 	dAtA[offset+2] = uint8(v >> 16)
 	dAtA[offset+3] = uint8(v >> 24)
 	return offset + 4
-***REMOVED***
-func encodeVarintHealth(dAtA []byte, offset int, v uint64) int ***REMOVED***
-	for v >= 1<<7 ***REMOVED***
+}
+func encodeVarintHealth(dAtA []byte, offset int, v uint64) int {
+	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
-	***REMOVED***
+	}
 	dAtA[offset] = uint8(v)
 	return offset + 1
-***REMOVED***
+}
 
-type raftProxyHealthServer struct ***REMOVED***
+type raftProxyHealthServer struct {
 	local                       HealthServer
 	connSelector                raftselector.ConnProvider
 	localCtxMods, remoteCtxMods []func(context.Context) (context.Context, error)
-***REMOVED***
+}
 
-func NewRaftProxyHealthServer(local HealthServer, connSelector raftselector.ConnProvider, localCtxMod, remoteCtxMod func(context.Context) (context.Context, error)) HealthServer ***REMOVED***
-	redirectChecker := func(ctx context.Context) (context.Context, error) ***REMOVED***
+func NewRaftProxyHealthServer(local HealthServer, connSelector raftselector.ConnProvider, localCtxMod, remoteCtxMod func(context.Context) (context.Context, error)) HealthServer {
+	redirectChecker := func(ctx context.Context) (context.Context, error) {
 		s, ok := transport.StreamFromContext(ctx)
-		if !ok ***REMOVED***
+		if !ok {
 			return ctx, status.Errorf(codes.InvalidArgument, "remote addr is not found in context")
-		***REMOVED***
+		}
 		addr := s.ServerTransport().RemoteAddr().String()
 		md, ok := metadata.FromContext(ctx)
-		if ok && len(md["redirect"]) != 0 ***REMOVED***
+		if ok && len(md["redirect"]) != 0 {
 			return ctx, status.Errorf(codes.ResourceExhausted, "more than one redirect to leader from: %s", md["redirect"])
-		***REMOVED***
-		if !ok ***REMOVED***
-			md = metadata.New(map[string]string***REMOVED******REMOVED***)
-		***REMOVED***
+		}
+		if !ok {
+			md = metadata.New(map[string]string{})
+		}
 		md["redirect"] = append(md["redirect"], addr)
 		return metadata.NewContext(ctx, md), nil
-	***REMOVED***
-	remoteMods := []func(context.Context) (context.Context, error)***REMOVED***redirectChecker***REMOVED***
+	}
+	remoteMods := []func(context.Context) (context.Context, error){redirectChecker}
 	remoteMods = append(remoteMods, remoteCtxMod)
 
 	var localMods []func(context.Context) (context.Context, error)
-	if localCtxMod != nil ***REMOVED***
-		localMods = []func(context.Context) (context.Context, error)***REMOVED***localCtxMod***REMOVED***
-	***REMOVED***
+	if localCtxMod != nil {
+		localMods = []func(context.Context) (context.Context, error){localCtxMod}
+	}
 
-	return &raftProxyHealthServer***REMOVED***
+	return &raftProxyHealthServer{
 		local:         local,
 		connSelector:  connSelector,
 		localCtxMods:  localMods,
 		remoteCtxMods: remoteMods,
-	***REMOVED***
-***REMOVED***
-func (p *raftProxyHealthServer) runCtxMods(ctx context.Context, ctxMods []func(context.Context) (context.Context, error)) (context.Context, error) ***REMOVED***
+	}
+}
+func (p *raftProxyHealthServer) runCtxMods(ctx context.Context, ctxMods []func(context.Context) (context.Context, error)) (context.Context, error) {
 	var err error
-	for _, mod := range ctxMods ***REMOVED***
+	for _, mod := range ctxMods {
 		ctx, err = mod(ctx)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return ctx, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return ctx, nil
-***REMOVED***
-func (p *raftProxyHealthServer) pollNewLeaderConn(ctx context.Context) (*grpc.ClientConn, error) ***REMOVED***
+}
+func (p *raftProxyHealthServer) pollNewLeaderConn(ctx context.Context) (*grpc.ClientConn, error) {
 	ticker := rafttime.NewTicker(500 * rafttime.Millisecond)
 	defer ticker.Stop()
-	for ***REMOVED***
-		select ***REMOVED***
+	for {
+		select {
 		case <-ticker.C:
 			conn, err := p.connSelector.LeaderConn(ctx)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 
 			client := NewHealthClient(conn)
 
-			resp, err := client.Check(ctx, &HealthCheckRequest***REMOVED***Service: "Raft"***REMOVED***)
-			if err != nil || resp.Status != HealthCheckResponse_SERVING ***REMOVED***
+			resp, err := client.Check(ctx, &HealthCheckRequest{Service: "Raft"})
+			if err != nil || resp.Status != HealthCheckResponse_SERVING {
 				continue
-			***REMOVED***
+			}
 			return conn, nil
 		case <-ctx.Done():
 			return nil, ctx.Err()
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (p *raftProxyHealthServer) Check(ctx context.Context, r *HealthCheckRequest) (*HealthCheckResponse, error) ***REMOVED***
+func (p *raftProxyHealthServer) Check(ctx context.Context, r *HealthCheckRequest) (*HealthCheckResponse, error) {
 
 	conn, err := p.connSelector.LeaderConn(ctx)
-	if err != nil ***REMOVED***
-		if err == raftselector.ErrIsLeader ***REMOVED***
+	if err != nil {
+		if err == raftselector.ErrIsLeader {
 			ctx, err = p.runCtxMods(ctx, p.localCtxMods)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			return p.local.Check(ctx, r)
-		***REMOVED***
+		}
 		return nil, err
-	***REMOVED***
+	}
 	modCtx, err := p.runCtxMods(ctx, p.remoteCtxMods)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	resp, err := NewHealthClient(conn).Check(modCtx, r)
-	if err != nil ***REMOVED***
-		if !strings.Contains(err.Error(), "is closing") && !strings.Contains(err.Error(), "the connection is unavailable") && !strings.Contains(err.Error(), "connection error") ***REMOVED***
+	if err != nil {
+		if !strings.Contains(err.Error(), "is closing") && !strings.Contains(err.Error(), "the connection is unavailable") && !strings.Contains(err.Error(), "connection error") {
 			return resp, err
-		***REMOVED***
+		}
 		conn, err := p.pollNewLeaderConn(ctx)
-		if err != nil ***REMOVED***
-			if err == raftselector.ErrIsLeader ***REMOVED***
+		if err != nil {
+			if err == raftselector.ErrIsLeader {
 				return p.local.Check(ctx, r)
-			***REMOVED***
+			}
 			return nil, err
-		***REMOVED***
+		}
 		return NewHealthClient(conn).Check(modCtx, r)
-	***REMOVED***
+	}
 	return resp, err
-***REMOVED***
+}
 
-func (m *HealthCheckRequest) Size() (n int) ***REMOVED***
+func (m *HealthCheckRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.Service)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovHealth(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *HealthCheckResponse) Size() (n int) ***REMOVED***
+func (m *HealthCheckResponse) Size() (n int) {
 	var l int
 	_ = l
-	if m.Status != 0 ***REMOVED***
+	if m.Status != 0 {
 		n += 1 + sovHealth(uint64(m.Status))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func sovHealth(x uint64) (n int) ***REMOVED***
-	for ***REMOVED***
+func sovHealth(x uint64) (n int) {
+	for {
 		n++
 		x >>= 7
-		if x == 0 ***REMOVED***
+		if x == 0 {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
-func sozHealth(x uint64) (n int) ***REMOVED***
+}
+func sozHealth(x uint64) (n int) {
 	return sovHealth(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-***REMOVED***
-func (this *HealthCheckRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *HealthCheckRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&HealthCheckRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&HealthCheckRequest{`,
 		`Service:` + fmt.Sprintf("%v", this.Service) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *HealthCheckResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *HealthCheckResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&HealthCheckResponse***REMOVED***`,
+	}
+	s := strings.Join([]string{`&HealthCheckResponse{`,
 		`Status:` + fmt.Sprintf("%v", this.Status) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func valueToStringHealth(v interface***REMOVED******REMOVED***) string ***REMOVED***
+}
+func valueToStringHealth(v interface{}) string {
 	rv := reflect.ValueOf(v)
-	if rv.IsNil() ***REMOVED***
+	if rv.IsNil() {
 		return "nil"
-	***REMOVED***
+	}
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
-***REMOVED***
-func (m *HealthCheckRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *HealthCheckRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowHealth
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: HealthCheckRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: HealthCheckRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Service", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowHealth
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthHealth
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Service = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipHealth(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthHealth
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *HealthCheckResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *HealthCheckResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowHealth
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: HealthCheckResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: HealthCheckResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
-			***REMOVED***
+			}
 			m.Status = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowHealth
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Status |= (HealthCheckResponse_ServingStatus(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipHealth(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthHealth
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func skipHealth(dAtA []byte) (n int, err error) ***REMOVED***
+}
+func skipHealth(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return 0, ErrIntOverflowHealth
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return 0, io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		wireType := int(wire & 0x7)
-		switch wireType ***REMOVED***
+		switch wireType {
 		case 0:
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowHealth
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				iNdEx++
-				if dAtA[iNdEx-1] < 0x80 ***REMOVED***
+				if dAtA[iNdEx-1] < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return iNdEx, nil
 		case 1:
 			iNdEx += 8
 			return iNdEx, nil
 		case 2:
 			var length int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowHealth
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				length |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			iNdEx += length
-			if length < 0 ***REMOVED***
+			if length < 0 {
 				return 0, ErrInvalidLengthHealth
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 3:
-			for ***REMOVED***
+			for {
 				var innerWire uint64
 				var start int = iNdEx
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return 0, ErrIntOverflowHealth
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return 0, io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					innerWire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				innerWireType := int(innerWire & 0x7)
-				if innerWireType == 4 ***REMOVED***
+				if innerWireType == 4 {
 					break
-				***REMOVED***
+				}
 				next, err := skipHealth(dAtA[start:])
-				if err != nil ***REMOVED***
+				if err != nil {
 					return 0, err
-				***REMOVED***
+				}
 				iNdEx = start + next
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 4:
 			return iNdEx, nil
@@ -687,19 +687,19 @@ func skipHealth(dAtA []byte) (n int, err error) ***REMOVED***
 			return iNdEx, nil
 		default:
 			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	panic("unreachable")
-***REMOVED***
+}
 
 var (
 	ErrInvalidLengthHealth = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowHealth   = fmt.Errorf("proto: integer overflow")
 )
 
-func init() ***REMOVED*** proto.RegisterFile("github.com/docker/swarmkit/api/health.proto", fileDescriptorHealth) ***REMOVED***
+func init() { proto.RegisterFile("github.com/docker/swarmkit/api/health.proto", fileDescriptorHealth) }
 
-var fileDescriptorHealth = []byte***REMOVED***
+var fileDescriptorHealth = []byte{
 	// 315 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xd2, 0x4e, 0xcf, 0x2c, 0xc9,
 	0x28, 0x4d, 0xd2, 0x4b, 0xce, 0xcf, 0xd5, 0x4f, 0xc9, 0x4f, 0xce, 0x4e, 0x2d, 0xd2, 0x2f, 0x2e,
@@ -721,4 +721,4 @@ var fileDescriptorHealth = []byte***REMOVED***
 	0x87, 0x72, 0x0c, 0x37, 0x1e, 0xca, 0x31, 0x34, 0x3c, 0x92, 0x63, 0x3c, 0xf1, 0x48, 0x8e, 0xf1,
 	0xc2, 0x23, 0x39, 0xc6, 0x07, 0x8f, 0xe4, 0x18, 0x93, 0xd8, 0xc0, 0xc1, 0x6d, 0x0c, 0x08, 0x00,
 	0x00, 0xff, 0xff, 0x7b, 0xf2, 0xdd, 0x23, 0x00, 0x02, 0x00, 0x00,
-***REMOVED***
+}

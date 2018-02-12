@@ -15,68 +15,68 @@ import (
 	"github.com/opencontainers/go-digest"
 )
 
-func TestGetRepositoryMountCandidates(t *testing.T) ***REMOVED***
-	for _, tc := range []struct ***REMOVED***
+func TestGetRepositoryMountCandidates(t *testing.T) {
+	for _, tc := range []struct {
 		name          string
 		hmacKey       string
 		targetRepo    string
 		maxCandidates int
 		metadata      []metadata.V2Metadata
 		candidates    []metadata.V2Metadata
-	***REMOVED******REMOVED***
-		***REMOVED***
+	}{
+		{
 			name:          "empty metadata",
 			targetRepo:    "busybox",
 			maxCandidates: -1,
-			metadata:      []metadata.V2Metadata***REMOVED******REMOVED***,
-			candidates:    []metadata.V2Metadata***REMOVED******REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			metadata:      []metadata.V2Metadata{},
+			candidates:    []metadata.V2Metadata{},
+		},
+		{
 			name:          "one item not matching",
 			targetRepo:    "busybox",
 			maxCandidates: -1,
-			metadata:      []metadata.V2Metadata***REMOVED***taggedMetadata("key", "dgst", "127.0.0.1/repo")***REMOVED***,
-			candidates:    []metadata.V2Metadata***REMOVED******REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			metadata:      []metadata.V2Metadata{taggedMetadata("key", "dgst", "127.0.0.1/repo")},
+			candidates:    []metadata.V2Metadata{},
+		},
+		{
 			name:          "one item matching",
 			targetRepo:    "busybox",
 			maxCandidates: -1,
-			metadata:      []metadata.V2Metadata***REMOVED***taggedMetadata("hash", "1", "docker.io/library/hello-world")***REMOVED***,
-			candidates:    []metadata.V2Metadata***REMOVED***taggedMetadata("hash", "1", "docker.io/library/hello-world")***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			metadata:      []metadata.V2Metadata{taggedMetadata("hash", "1", "docker.io/library/hello-world")},
+			candidates:    []metadata.V2Metadata{taggedMetadata("hash", "1", "docker.io/library/hello-world")},
+		},
+		{
 			name:          "allow missing SourceRepository",
 			targetRepo:    "busybox",
 			maxCandidates: -1,
-			metadata: []metadata.V2Metadata***REMOVED***
-				***REMOVED***Digest: digest.Digest("1")***REMOVED***,
-				***REMOVED***Digest: digest.Digest("3")***REMOVED***,
-				***REMOVED***Digest: digest.Digest("2")***REMOVED***,
-			***REMOVED***,
-			candidates: []metadata.V2Metadata***REMOVED******REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			metadata: []metadata.V2Metadata{
+				{Digest: digest.Digest("1")},
+				{Digest: digest.Digest("3")},
+				{Digest: digest.Digest("2")},
+			},
+			candidates: []metadata.V2Metadata{},
+		},
+		{
 			name:          "handle docker.io",
 			targetRepo:    "user/app",
 			maxCandidates: -1,
-			metadata: []metadata.V2Metadata***REMOVED***
-				***REMOVED***Digest: digest.Digest("1"), SourceRepository: "docker.io/user/foo"***REMOVED***,
-				***REMOVED***Digest: digest.Digest("3"), SourceRepository: "docker.io/user/bar"***REMOVED***,
-				***REMOVED***Digest: digest.Digest("2"), SourceRepository: "docker.io/library/app"***REMOVED***,
-			***REMOVED***,
-			candidates: []metadata.V2Metadata***REMOVED***
-				***REMOVED***Digest: digest.Digest("3"), SourceRepository: "docker.io/user/bar"***REMOVED***,
-				***REMOVED***Digest: digest.Digest("1"), SourceRepository: "docker.io/user/foo"***REMOVED***,
-				***REMOVED***Digest: digest.Digest("2"), SourceRepository: "docker.io/library/app"***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			metadata: []metadata.V2Metadata{
+				{Digest: digest.Digest("1"), SourceRepository: "docker.io/user/foo"},
+				{Digest: digest.Digest("3"), SourceRepository: "docker.io/user/bar"},
+				{Digest: digest.Digest("2"), SourceRepository: "docker.io/library/app"},
+			},
+			candidates: []metadata.V2Metadata{
+				{Digest: digest.Digest("3"), SourceRepository: "docker.io/user/bar"},
+				{Digest: digest.Digest("1"), SourceRepository: "docker.io/user/foo"},
+				{Digest: digest.Digest("2"), SourceRepository: "docker.io/library/app"},
+			},
+		},
+		{
 			name:          "sort more items",
 			hmacKey:       "abcd",
 			targetRepo:    "127.0.0.1/foo/bar",
 			maxCandidates: -1,
-			metadata: []metadata.V2Metadata***REMOVED***
+			metadata: []metadata.V2Metadata{
 				taggedMetadata("hash", "1", "docker.io/library/hello-world"),
 				taggedMetadata("efgh", "2", "127.0.0.1/hello-world"),
 				taggedMetadata("abcd", "3", "docker.io/library/busybox"),
@@ -86,8 +86,8 @@ func TestGetRepositoryMountCandidates(t *testing.T) ***REMOVED***
 				taggedMetadata("efgh", "7", "127.0.0.1/foo/bar"),
 				taggedMetadata("abcd", "8", "127.0.0.1/xyz"),
 				taggedMetadata("hash", "9", "127.0.0.1/foo/app"),
-			***REMOVED***,
-			candidates: []metadata.V2Metadata***REMOVED***
+			},
+			candidates: []metadata.V2Metadata{
 				// first by matching hash
 				taggedMetadata("abcd", "8", "127.0.0.1/xyz"),
 				// then by longest matching prefix
@@ -96,22 +96,22 @@ func TestGetRepositoryMountCandidates(t *testing.T) ***REMOVED***
 				// sort the rest of the matching items in reversed order
 				taggedMetadata("hash", "6", "127.0.0.1/bar"),
 				taggedMetadata("efgh", "2", "127.0.0.1/hello-world"),
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			},
+		},
+		{
 			name:          "limit max candidates",
 			hmacKey:       "abcd",
 			targetRepo:    "user/app",
 			maxCandidates: 3,
-			metadata: []metadata.V2Metadata***REMOVED***
+			metadata: []metadata.V2Metadata{
 				taggedMetadata("abcd", "1", "docker.io/user/app1"),
 				taggedMetadata("abcd", "2", "docker.io/user/app/base"),
 				taggedMetadata("hash", "3", "docker.io/user/app"),
 				taggedMetadata("abcd", "4", "127.0.0.1/user/app"),
 				taggedMetadata("hash", "5", "docker.io/user/foo"),
 				taggedMetadata("hash", "6", "docker.io/app/bar"),
-			***REMOVED***,
-			candidates: []metadata.V2Metadata***REMOVED***
+			},
+			candidates: []metadata.V2Metadata{
 				// first by matching hash
 				taggedMetadata("abcd", "2", "docker.io/user/app/base"),
 				taggedMetadata("abcd", "1", "docker.io/user/app1"),
@@ -119,33 +119,33 @@ func TestGetRepositoryMountCandidates(t *testing.T) ***REMOVED***
 				// "docker.io/usr/app" is excluded since candidates must
 				// be from a different repository
 				taggedMetadata("hash", "5", "docker.io/user/foo"),
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED*** ***REMOVED***
+			},
+		},
+	} {
 		repoInfo, err := reference.ParseNormalizedNamed(tc.targetRepo)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("[%s] failed to parse reference name: %v", tc.name, err)
-		***REMOVED***
+		}
 		candidates := getRepositoryMountCandidates(repoInfo, []byte(tc.hmacKey), tc.maxCandidates, tc.metadata)
-		if len(candidates) != len(tc.candidates) ***REMOVED***
+		if len(candidates) != len(tc.candidates) {
 			t.Errorf("[%s] got unexpected number of candidates: %d != %d", tc.name, len(candidates), len(tc.candidates))
-		***REMOVED***
-		for i := 0; i < len(candidates) && i < len(tc.candidates); i++ ***REMOVED***
-			if !reflect.DeepEqual(candidates[i], tc.candidates[i]) ***REMOVED***
+		}
+		for i := 0; i < len(candidates) && i < len(tc.candidates); i++ {
+			if !reflect.DeepEqual(candidates[i], tc.candidates[i]) {
 				t.Errorf("[%s] candidate %d does not match expected: %#+v != %#+v", tc.name, i, candidates[i], tc.candidates[i])
-			***REMOVED***
-		***REMOVED***
-		for i := len(candidates); i < len(tc.candidates); i++ ***REMOVED***
+			}
+		}
+		for i := len(candidates); i < len(tc.candidates); i++ {
 			t.Errorf("[%s] missing expected candidate at position %d (%#+v)", tc.name, i, tc.candidates[i])
-		***REMOVED***
-		for i := len(tc.candidates); i < len(candidates); i++ ***REMOVED***
+		}
+		for i := len(tc.candidates); i < len(candidates); i++ {
 			t.Errorf("[%s] got unexpected candidate at position %d (%#+v)", tc.name, i, candidates[i])
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestLayerAlreadyExists(t *testing.T) ***REMOVED***
-	for _, tc := range []struct ***REMOVED***
+func TestLayerAlreadyExists(t *testing.T) {
+	for _, tc := range []struct {
 		name                   string
 		metadata               []metadata.V2Metadata
 		targetRepo             string
@@ -160,424 +160,424 @@ func TestLayerAlreadyExists(t *testing.T) ***REMOVED***
 		expectedRequests       []string
 		expectedAdditions      []metadata.V2Metadata
 		expectedRemovals       []metadata.V2Metadata
-	***REMOVED******REMOVED***
-		***REMOVED***
+	}{
+		{
 			name:                   "empty metadata",
 			targetRepo:             "busybox",
 			maxExistenceChecks:     3,
 			checkOtherRepositories: true,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			name:               "single not existent metadata",
 			targetRepo:         "busybox",
-			metadata:           []metadata.V2Metadata***REMOVED******REMOVED***Digest: digest.Digest("pear"), SourceRepository: "docker.io/library/busybox"***REMOVED******REMOVED***,
+			metadata:           []metadata.V2Metadata{{Digest: digest.Digest("pear"), SourceRepository: "docker.io/library/busybox"}},
 			maxExistenceChecks: 3,
-			expectedRequests:   []string***REMOVED***"pear"***REMOVED***,
-			expectedRemovals:   []metadata.V2Metadata***REMOVED******REMOVED***Digest: digest.Digest("pear"), SourceRepository: "docker.io/library/busybox"***REMOVED******REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			expectedRequests:   []string{"pear"},
+			expectedRemovals:   []metadata.V2Metadata{{Digest: digest.Digest("pear"), SourceRepository: "docker.io/library/busybox"}},
+		},
+		{
 			name:               "access denied",
 			targetRepo:         "busybox",
 			maxExistenceChecks: 1,
-			metadata:           []metadata.V2Metadata***REMOVED******REMOVED***Digest: digest.Digest("apple"), SourceRepository: "docker.io/library/busybox"***REMOVED******REMOVED***,
-			remoteErrors:       map[digest.Digest]error***REMOVED***digest.Digest("apple"): distribution.ErrAccessDenied***REMOVED***,
+			metadata:           []metadata.V2Metadata{{Digest: digest.Digest("apple"), SourceRepository: "docker.io/library/busybox"}},
+			remoteErrors:       map[digest.Digest]error{digest.Digest("apple"): distribution.ErrAccessDenied},
 			expectedError:      nil,
-			expectedRequests:   []string***REMOVED***"apple"***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			expectedRequests:   []string{"apple"},
+		},
+		{
 			name:               "not matching repositories",
 			targetRepo:         "busybox",
 			maxExistenceChecks: 3,
-			metadata: []metadata.V2Metadata***REMOVED***
-				***REMOVED***Digest: digest.Digest("apple"), SourceRepository: "docker.io/library/hello-world"***REMOVED***,
-				***REMOVED***Digest: digest.Digest("orange"), SourceRepository: "docker.io/library/busybox/subapp"***REMOVED***,
-				***REMOVED***Digest: digest.Digest("pear"), SourceRepository: "docker.io/busybox"***REMOVED***,
-				***REMOVED***Digest: digest.Digest("plum"), SourceRepository: "busybox"***REMOVED***,
-				***REMOVED***Digest: digest.Digest("banana"), SourceRepository: "127.0.0.1/busybox"***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			metadata: []metadata.V2Metadata{
+				{Digest: digest.Digest("apple"), SourceRepository: "docker.io/library/hello-world"},
+				{Digest: digest.Digest("orange"), SourceRepository: "docker.io/library/busybox/subapp"},
+				{Digest: digest.Digest("pear"), SourceRepository: "docker.io/busybox"},
+				{Digest: digest.Digest("plum"), SourceRepository: "busybox"},
+				{Digest: digest.Digest("banana"), SourceRepository: "127.0.0.1/busybox"},
+			},
+		},
+		{
 			name:                   "check other repositories",
 			targetRepo:             "busybox",
 			maxExistenceChecks:     10,
 			checkOtherRepositories: true,
-			metadata: []metadata.V2Metadata***REMOVED***
-				***REMOVED***Digest: digest.Digest("apple"), SourceRepository: "docker.io/library/hello-world"***REMOVED***,
-				***REMOVED***Digest: digest.Digest("orange"), SourceRepository: "docker.io/busybox/subapp"***REMOVED***,
-				***REMOVED***Digest: digest.Digest("pear"), SourceRepository: "docker.io/busybox"***REMOVED***,
-				***REMOVED***Digest: digest.Digest("plum"), SourceRepository: "docker.io/library/busybox"***REMOVED***,
-				***REMOVED***Digest: digest.Digest("banana"), SourceRepository: "127.0.0.1/busybox"***REMOVED***,
-			***REMOVED***,
-			expectedRequests: []string***REMOVED***"plum", "apple", "pear", "orange", "banana"***REMOVED***,
-			expectedRemovals: []metadata.V2Metadata***REMOVED***
-				***REMOVED***Digest: digest.Digest("plum"), SourceRepository: "docker.io/library/busybox"***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			metadata: []metadata.V2Metadata{
+				{Digest: digest.Digest("apple"), SourceRepository: "docker.io/library/hello-world"},
+				{Digest: digest.Digest("orange"), SourceRepository: "docker.io/busybox/subapp"},
+				{Digest: digest.Digest("pear"), SourceRepository: "docker.io/busybox"},
+				{Digest: digest.Digest("plum"), SourceRepository: "docker.io/library/busybox"},
+				{Digest: digest.Digest("banana"), SourceRepository: "127.0.0.1/busybox"},
+			},
+			expectedRequests: []string{"plum", "apple", "pear", "orange", "banana"},
+			expectedRemovals: []metadata.V2Metadata{
+				{Digest: digest.Digest("plum"), SourceRepository: "docker.io/library/busybox"},
+			},
+		},
+		{
 			name:               "find existing blob",
 			targetRepo:         "busybox",
-			metadata:           []metadata.V2Metadata***REMOVED******REMOVED***Digest: digest.Digest("apple"), SourceRepository: "docker.io/library/busybox"***REMOVED******REMOVED***,
+			metadata:           []metadata.V2Metadata{{Digest: digest.Digest("apple"), SourceRepository: "docker.io/library/busybox"}},
 			maxExistenceChecks: 3,
-			remoteBlobs:        map[digest.Digest]distribution.Descriptor***REMOVED***digest.Digest("apple"): ***REMOVED***Digest: digest.Digest("apple")***REMOVED******REMOVED***,
-			expectedDescriptor: distribution.Descriptor***REMOVED***Digest: digest.Digest("apple"), MediaType: schema2.MediaTypeLayer***REMOVED***,
+			remoteBlobs:        map[digest.Digest]distribution.Descriptor{digest.Digest("apple"): {Digest: digest.Digest("apple")}},
+			expectedDescriptor: distribution.Descriptor{Digest: digest.Digest("apple"), MediaType: schema2.MediaTypeLayer},
 			expectedExists:     true,
-			expectedRequests:   []string***REMOVED***"apple"***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			expectedRequests:   []string{"apple"},
+		},
+		{
 			name:               "find existing blob with different hmac",
 			targetRepo:         "busybox",
-			metadata:           []metadata.V2Metadata***REMOVED******REMOVED***SourceRepository: "docker.io/library/busybox", Digest: digest.Digest("apple"), HMAC: "dummyhmac"***REMOVED******REMOVED***,
+			metadata:           []metadata.V2Metadata{{SourceRepository: "docker.io/library/busybox", Digest: digest.Digest("apple"), HMAC: "dummyhmac"}},
 			maxExistenceChecks: 3,
-			remoteBlobs:        map[digest.Digest]distribution.Descriptor***REMOVED***digest.Digest("apple"): ***REMOVED***Digest: digest.Digest("apple")***REMOVED******REMOVED***,
-			expectedDescriptor: distribution.Descriptor***REMOVED***Digest: digest.Digest("apple"), MediaType: schema2.MediaTypeLayer***REMOVED***,
+			remoteBlobs:        map[digest.Digest]distribution.Descriptor{digest.Digest("apple"): {Digest: digest.Digest("apple")}},
+			expectedDescriptor: distribution.Descriptor{Digest: digest.Digest("apple"), MediaType: schema2.MediaTypeLayer},
 			expectedExists:     true,
-			expectedRequests:   []string***REMOVED***"apple"***REMOVED***,
-			expectedAdditions:  []metadata.V2Metadata***REMOVED******REMOVED***Digest: digest.Digest("apple"), SourceRepository: "docker.io/library/busybox"***REMOVED******REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			expectedRequests:   []string{"apple"},
+			expectedAdditions:  []metadata.V2Metadata{{Digest: digest.Digest("apple"), SourceRepository: "docker.io/library/busybox"}},
+		},
+		{
 			name:               "overwrite media types",
 			targetRepo:         "busybox",
-			metadata:           []metadata.V2Metadata***REMOVED******REMOVED***Digest: digest.Digest("apple"), SourceRepository: "docker.io/library/busybox"***REMOVED******REMOVED***,
+			metadata:           []metadata.V2Metadata{{Digest: digest.Digest("apple"), SourceRepository: "docker.io/library/busybox"}},
 			hmacKey:            "key",
 			maxExistenceChecks: 3,
-			remoteBlobs:        map[digest.Digest]distribution.Descriptor***REMOVED***digest.Digest("apple"): ***REMOVED***Digest: digest.Digest("apple"), MediaType: "custom-media-type"***REMOVED******REMOVED***,
-			expectedDescriptor: distribution.Descriptor***REMOVED***Digest: digest.Digest("apple"), MediaType: schema2.MediaTypeLayer***REMOVED***,
+			remoteBlobs:        map[digest.Digest]distribution.Descriptor{digest.Digest("apple"): {Digest: digest.Digest("apple"), MediaType: "custom-media-type"}},
+			expectedDescriptor: distribution.Descriptor{Digest: digest.Digest("apple"), MediaType: schema2.MediaTypeLayer},
 			expectedExists:     true,
-			expectedRequests:   []string***REMOVED***"apple"***REMOVED***,
-			expectedAdditions:  []metadata.V2Metadata***REMOVED***taggedMetadata("key", "apple", "docker.io/library/busybox")***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			expectedRequests:   []string{"apple"},
+			expectedAdditions:  []metadata.V2Metadata{taggedMetadata("key", "apple", "docker.io/library/busybox")},
+		},
+		{
 			name:       "find existing blob among many",
 			targetRepo: "127.0.0.1/myapp",
 			hmacKey:    "key",
-			metadata: []metadata.V2Metadata***REMOVED***
+			metadata: []metadata.V2Metadata{
 				taggedMetadata("someotherkey", "pear", "127.0.0.1/myapp"),
 				taggedMetadata("key", "apple", "127.0.0.1/myapp"),
 				taggedMetadata("", "plum", "127.0.0.1/myapp"),
-			***REMOVED***,
+			},
 			maxExistenceChecks: 3,
-			remoteBlobs:        map[digest.Digest]distribution.Descriptor***REMOVED***digest.Digest("pear"): ***REMOVED***Digest: digest.Digest("pear")***REMOVED******REMOVED***,
-			expectedDescriptor: distribution.Descriptor***REMOVED***Digest: digest.Digest("pear"), MediaType: schema2.MediaTypeLayer***REMOVED***,
+			remoteBlobs:        map[digest.Digest]distribution.Descriptor{digest.Digest("pear"): {Digest: digest.Digest("pear")}},
+			expectedDescriptor: distribution.Descriptor{Digest: digest.Digest("pear"), MediaType: schema2.MediaTypeLayer},
 			expectedExists:     true,
-			expectedRequests:   []string***REMOVED***"apple", "plum", "pear"***REMOVED***,
-			expectedAdditions:  []metadata.V2Metadata***REMOVED***taggedMetadata("key", "pear", "127.0.0.1/myapp")***REMOVED***,
-			expectedRemovals: []metadata.V2Metadata***REMOVED***
+			expectedRequests:   []string{"apple", "plum", "pear"},
+			expectedAdditions:  []metadata.V2Metadata{taggedMetadata("key", "pear", "127.0.0.1/myapp")},
+			expectedRemovals: []metadata.V2Metadata{
 				taggedMetadata("key", "apple", "127.0.0.1/myapp"),
-				***REMOVED***Digest: digest.Digest("plum"), SourceRepository: "127.0.0.1/myapp"***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+				{Digest: digest.Digest("plum"), SourceRepository: "127.0.0.1/myapp"},
+			},
+		},
+		{
 			name:       "reach maximum existence checks",
 			targetRepo: "user/app",
-			metadata: []metadata.V2Metadata***REMOVED***
-				***REMOVED***Digest: digest.Digest("pear"), SourceRepository: "docker.io/user/app"***REMOVED***,
-				***REMOVED***Digest: digest.Digest("apple"), SourceRepository: "docker.io/user/app"***REMOVED***,
-				***REMOVED***Digest: digest.Digest("plum"), SourceRepository: "docker.io/user/app"***REMOVED***,
-				***REMOVED***Digest: digest.Digest("banana"), SourceRepository: "docker.io/user/app"***REMOVED***,
-			***REMOVED***,
+			metadata: []metadata.V2Metadata{
+				{Digest: digest.Digest("pear"), SourceRepository: "docker.io/user/app"},
+				{Digest: digest.Digest("apple"), SourceRepository: "docker.io/user/app"},
+				{Digest: digest.Digest("plum"), SourceRepository: "docker.io/user/app"},
+				{Digest: digest.Digest("banana"), SourceRepository: "docker.io/user/app"},
+			},
 			maxExistenceChecks: 3,
-			remoteBlobs:        map[digest.Digest]distribution.Descriptor***REMOVED***digest.Digest("pear"): ***REMOVED***Digest: digest.Digest("pear")***REMOVED******REMOVED***,
+			remoteBlobs:        map[digest.Digest]distribution.Descriptor{digest.Digest("pear"): {Digest: digest.Digest("pear")}},
 			expectedExists:     false,
-			expectedRequests:   []string***REMOVED***"banana", "plum", "apple"***REMOVED***,
-			expectedRemovals: []metadata.V2Metadata***REMOVED***
-				***REMOVED***Digest: digest.Digest("banana"), SourceRepository: "docker.io/user/app"***REMOVED***,
-				***REMOVED***Digest: digest.Digest("plum"), SourceRepository: "docker.io/user/app"***REMOVED***,
-				***REMOVED***Digest: digest.Digest("apple"), SourceRepository: "docker.io/user/app"***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			expectedRequests:   []string{"banana", "plum", "apple"},
+			expectedRemovals: []metadata.V2Metadata{
+				{Digest: digest.Digest("banana"), SourceRepository: "docker.io/user/app"},
+				{Digest: digest.Digest("plum"), SourceRepository: "docker.io/user/app"},
+				{Digest: digest.Digest("apple"), SourceRepository: "docker.io/user/app"},
+			},
+		},
+		{
 			name:       "zero allowed existence checks",
 			targetRepo: "user/app",
-			metadata: []metadata.V2Metadata***REMOVED***
-				***REMOVED***Digest: digest.Digest("pear"), SourceRepository: "docker.io/user/app"***REMOVED***,
-				***REMOVED***Digest: digest.Digest("apple"), SourceRepository: "docker.io/user/app"***REMOVED***,
-				***REMOVED***Digest: digest.Digest("plum"), SourceRepository: "docker.io/user/app"***REMOVED***,
-				***REMOVED***Digest: digest.Digest("banana"), SourceRepository: "docker.io/user/app"***REMOVED***,
-			***REMOVED***,
+			metadata: []metadata.V2Metadata{
+				{Digest: digest.Digest("pear"), SourceRepository: "docker.io/user/app"},
+				{Digest: digest.Digest("apple"), SourceRepository: "docker.io/user/app"},
+				{Digest: digest.Digest("plum"), SourceRepository: "docker.io/user/app"},
+				{Digest: digest.Digest("banana"), SourceRepository: "docker.io/user/app"},
+			},
 			maxExistenceChecks: 0,
-			remoteBlobs:        map[digest.Digest]distribution.Descriptor***REMOVED***digest.Digest("pear"): ***REMOVED***Digest: digest.Digest("pear")***REMOVED******REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			remoteBlobs:        map[digest.Digest]distribution.Descriptor{digest.Digest("pear"): {Digest: digest.Digest("pear")}},
+		},
+		{
 			name:       "stat single digest just once",
 			targetRepo: "busybox",
-			metadata: []metadata.V2Metadata***REMOVED***
+			metadata: []metadata.V2Metadata{
 				taggedMetadata("key1", "pear", "docker.io/library/busybox"),
 				taggedMetadata("key2", "apple", "docker.io/library/busybox"),
 				taggedMetadata("key3", "apple", "docker.io/library/busybox"),
-			***REMOVED***,
+			},
 			maxExistenceChecks: 3,
-			remoteBlobs:        map[digest.Digest]distribution.Descriptor***REMOVED***digest.Digest("pear"): ***REMOVED***Digest: digest.Digest("pear")***REMOVED******REMOVED***,
-			expectedDescriptor: distribution.Descriptor***REMOVED***Digest: digest.Digest("pear"), MediaType: schema2.MediaTypeLayer***REMOVED***,
+			remoteBlobs:        map[digest.Digest]distribution.Descriptor{digest.Digest("pear"): {Digest: digest.Digest("pear")}},
+			expectedDescriptor: distribution.Descriptor{Digest: digest.Digest("pear"), MediaType: schema2.MediaTypeLayer},
 			expectedExists:     true,
-			expectedRequests:   []string***REMOVED***"apple", "pear"***REMOVED***,
-			expectedAdditions:  []metadata.V2Metadata***REMOVED******REMOVED***Digest: digest.Digest("pear"), SourceRepository: "docker.io/library/busybox"***REMOVED******REMOVED***,
-			expectedRemovals:   []metadata.V2Metadata***REMOVED***taggedMetadata("key3", "apple", "docker.io/library/busybox")***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			expectedRequests:   []string{"apple", "pear"},
+			expectedAdditions:  []metadata.V2Metadata{{Digest: digest.Digest("pear"), SourceRepository: "docker.io/library/busybox"}},
+			expectedRemovals:   []metadata.V2Metadata{taggedMetadata("key3", "apple", "docker.io/library/busybox")},
+		},
+		{
 			name:       "don't stop on first error",
 			targetRepo: "user/app",
 			hmacKey:    "key",
-			metadata: []metadata.V2Metadata***REMOVED***
+			metadata: []metadata.V2Metadata{
 				taggedMetadata("key", "banana", "docker.io/user/app"),
 				taggedMetadata("key", "orange", "docker.io/user/app"),
 				taggedMetadata("key", "plum", "docker.io/user/app"),
-			***REMOVED***,
+			},
 			maxExistenceChecks: 3,
-			remoteErrors:       map[digest.Digest]error***REMOVED***"orange": distribution.ErrAccessDenied***REMOVED***,
-			remoteBlobs:        map[digest.Digest]distribution.Descriptor***REMOVED***digest.Digest("apple"): ***REMOVED******REMOVED******REMOVED***,
+			remoteErrors:       map[digest.Digest]error{"orange": distribution.ErrAccessDenied},
+			remoteBlobs:        map[digest.Digest]distribution.Descriptor{digest.Digest("apple"): {}},
 			expectedError:      nil,
-			expectedRequests:   []string***REMOVED***"plum", "orange", "banana"***REMOVED***,
-			expectedRemovals: []metadata.V2Metadata***REMOVED***
+			expectedRequests:   []string{"plum", "orange", "banana"},
+			expectedRemovals: []metadata.V2Metadata{
 				taggedMetadata("key", "plum", "docker.io/user/app"),
 				taggedMetadata("key", "banana", "docker.io/user/app"),
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			},
+		},
+		{
 			name:       "remove outdated metadata",
 			targetRepo: "docker.io/user/app",
-			metadata: []metadata.V2Metadata***REMOVED***
-				***REMOVED***Digest: digest.Digest("plum"), SourceRepository: "docker.io/library/busybox"***REMOVED***,
-				***REMOVED***Digest: digest.Digest("orange"), SourceRepository: "docker.io/user/app"***REMOVED***,
-			***REMOVED***,
+			metadata: []metadata.V2Metadata{
+				{Digest: digest.Digest("plum"), SourceRepository: "docker.io/library/busybox"},
+				{Digest: digest.Digest("orange"), SourceRepository: "docker.io/user/app"},
+			},
 			maxExistenceChecks: 3,
-			remoteErrors:       map[digest.Digest]error***REMOVED***"orange": distribution.ErrBlobUnknown***REMOVED***,
-			remoteBlobs:        map[digest.Digest]distribution.Descriptor***REMOVED***digest.Digest("plum"): ***REMOVED******REMOVED******REMOVED***,
+			remoteErrors:       map[digest.Digest]error{"orange": distribution.ErrBlobUnknown},
+			remoteBlobs:        map[digest.Digest]distribution.Descriptor{digest.Digest("plum"): {}},
 			expectedExists:     false,
-			expectedRequests:   []string***REMOVED***"orange"***REMOVED***,
-			expectedRemovals:   []metadata.V2Metadata***REMOVED******REMOVED***Digest: digest.Digest("orange"), SourceRepository: "docker.io/user/app"***REMOVED******REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			expectedRequests:   []string{"orange"},
+			expectedRemovals:   []metadata.V2Metadata{{Digest: digest.Digest("orange"), SourceRepository: "docker.io/user/app"}},
+		},
+		{
 			name:       "missing SourceRepository",
 			targetRepo: "busybox",
-			metadata: []metadata.V2Metadata***REMOVED***
-				***REMOVED***Digest: digest.Digest("1")***REMOVED***,
-				***REMOVED***Digest: digest.Digest("3")***REMOVED***,
-				***REMOVED***Digest: digest.Digest("2")***REMOVED***,
-			***REMOVED***,
+			metadata: []metadata.V2Metadata{
+				{Digest: digest.Digest("1")},
+				{Digest: digest.Digest("3")},
+				{Digest: digest.Digest("2")},
+			},
 			maxExistenceChecks: 3,
 			expectedExists:     false,
-			expectedRequests:   []string***REMOVED***"2", "3", "1"***REMOVED***,
-		***REMOVED***,
+			expectedRequests:   []string{"2", "3", "1"},
+		},
 
-		***REMOVED***
+		{
 			name:       "with and without SourceRepository",
 			targetRepo: "busybox",
-			metadata: []metadata.V2Metadata***REMOVED***
-				***REMOVED***Digest: digest.Digest("1")***REMOVED***,
-				***REMOVED***Digest: digest.Digest("2"), SourceRepository: "docker.io/library/busybox"***REMOVED***,
-				***REMOVED***Digest: digest.Digest("3")***REMOVED***,
-			***REMOVED***,
-			remoteBlobs:        map[digest.Digest]distribution.Descriptor***REMOVED***digest.Digest("1"): ***REMOVED***Digest: digest.Digest("1")***REMOVED******REMOVED***,
+			metadata: []metadata.V2Metadata{
+				{Digest: digest.Digest("1")},
+				{Digest: digest.Digest("2"), SourceRepository: "docker.io/library/busybox"},
+				{Digest: digest.Digest("3")},
+			},
+			remoteBlobs:        map[digest.Digest]distribution.Descriptor{digest.Digest("1"): {Digest: digest.Digest("1")}},
 			maxExistenceChecks: 3,
-			expectedDescriptor: distribution.Descriptor***REMOVED***Digest: digest.Digest("1"), MediaType: schema2.MediaTypeLayer***REMOVED***,
+			expectedDescriptor: distribution.Descriptor{Digest: digest.Digest("1"), MediaType: schema2.MediaTypeLayer},
 			expectedExists:     true,
-			expectedRequests:   []string***REMOVED***"2", "3", "1"***REMOVED***,
-			expectedAdditions:  []metadata.V2Metadata***REMOVED******REMOVED***Digest: digest.Digest("1"), SourceRepository: "docker.io/library/busybox"***REMOVED******REMOVED***,
-			expectedRemovals: []metadata.V2Metadata***REMOVED***
-				***REMOVED***Digest: digest.Digest("2"), SourceRepository: "docker.io/library/busybox"***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED*** ***REMOVED***
+			expectedRequests:   []string{"2", "3", "1"},
+			expectedAdditions:  []metadata.V2Metadata{{Digest: digest.Digest("1"), SourceRepository: "docker.io/library/busybox"}},
+			expectedRemovals: []metadata.V2Metadata{
+				{Digest: digest.Digest("2"), SourceRepository: "docker.io/library/busybox"},
+			},
+		},
+	} {
 		repoInfo, err := reference.ParseNormalizedNamed(tc.targetRepo)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("[%s] failed to parse reference name: %v", tc.name, err)
-		***REMOVED***
-		repo := &mockRepo***REMOVED***
+		}
+		repo := &mockRepo{
 			t:        t,
 			errors:   tc.remoteErrors,
 			blobs:    tc.remoteBlobs,
-			requests: []string***REMOVED******REMOVED***,
-		***REMOVED***
+			requests: []string{},
+		}
 		ctx := context.Background()
-		ms := &mockV2MetadataService***REMOVED******REMOVED***
-		pd := &v2PushDescriptor***REMOVED***
+		ms := &mockV2MetadataService{}
+		pd := &v2PushDescriptor{
 			hmacKey:  []byte(tc.hmacKey),
 			repoInfo: repoInfo,
-			layer: &storeLayer***REMOVED***
+			layer: &storeLayer{
 				Layer: layer.EmptyLayer,
-			***REMOVED***,
+			},
 			repo:              repo,
 			v2MetadataService: ms,
-			pushState:         &pushState***REMOVED***remoteLayers: make(map[layer.DiffID]distribution.Descriptor)***REMOVED***,
-			checkedDigests:    make(map[digest.Digest]struct***REMOVED******REMOVED***),
-		***REMOVED***
+			pushState:         &pushState{remoteLayers: make(map[layer.DiffID]distribution.Descriptor)},
+			checkedDigests:    make(map[digest.Digest]struct{}),
+		}
 
-		desc, exists, err := pd.layerAlreadyExists(ctx, &progressSink***REMOVED***t***REMOVED***, layer.EmptyLayer.DiffID(), tc.checkOtherRepositories, tc.maxExistenceChecks, tc.metadata)
+		desc, exists, err := pd.layerAlreadyExists(ctx, &progressSink{t}, layer.EmptyLayer.DiffID(), tc.checkOtherRepositories, tc.maxExistenceChecks, tc.metadata)
 
-		if !reflect.DeepEqual(desc, tc.expectedDescriptor) ***REMOVED***
+		if !reflect.DeepEqual(desc, tc.expectedDescriptor) {
 			t.Errorf("[%s] got unexpected descriptor: %#+v != %#+v", tc.name, desc, tc.expectedDescriptor)
-		***REMOVED***
-		if exists != tc.expectedExists ***REMOVED***
+		}
+		if exists != tc.expectedExists {
 			t.Errorf("[%s] got unexpected exists: %t != %t", tc.name, exists, tc.expectedExists)
-		***REMOVED***
-		if !reflect.DeepEqual(err, tc.expectedError) ***REMOVED***
+		}
+		if !reflect.DeepEqual(err, tc.expectedError) {
 			t.Errorf("[%s] got unexpected error: %#+v != %#+v", tc.name, err, tc.expectedError)
-		***REMOVED***
+		}
 
-		if len(repo.requests) != len(tc.expectedRequests) ***REMOVED***
+		if len(repo.requests) != len(tc.expectedRequests) {
 			t.Errorf("[%s] got unexpected number of requests: %d != %d", tc.name, len(repo.requests), len(tc.expectedRequests))
-		***REMOVED***
-		for i := 0; i < len(repo.requests) && i < len(tc.expectedRequests); i++ ***REMOVED***
-			if repo.requests[i] != tc.expectedRequests[i] ***REMOVED***
+		}
+		for i := 0; i < len(repo.requests) && i < len(tc.expectedRequests); i++ {
+			if repo.requests[i] != tc.expectedRequests[i] {
 				t.Errorf("[%s] request %d does not match expected: %q != %q", tc.name, i, repo.requests[i], tc.expectedRequests[i])
-			***REMOVED***
-		***REMOVED***
-		for i := len(repo.requests); i < len(tc.expectedRequests); i++ ***REMOVED***
+			}
+		}
+		for i := len(repo.requests); i < len(tc.expectedRequests); i++ {
 			t.Errorf("[%s] missing expected request at position %d (%q)", tc.name, i, tc.expectedRequests[i])
-		***REMOVED***
-		for i := len(tc.expectedRequests); i < len(repo.requests); i++ ***REMOVED***
+		}
+		for i := len(tc.expectedRequests); i < len(repo.requests); i++ {
 			t.Errorf("[%s] got unexpected request at position %d (%q)", tc.name, i, repo.requests[i])
-		***REMOVED***
+		}
 
-		if len(ms.added) != len(tc.expectedAdditions) ***REMOVED***
+		if len(ms.added) != len(tc.expectedAdditions) {
 			t.Errorf("[%s] got unexpected number of additions: %d != %d", tc.name, len(ms.added), len(tc.expectedAdditions))
-		***REMOVED***
-		for i := 0; i < len(ms.added) && i < len(tc.expectedAdditions); i++ ***REMOVED***
-			if ms.added[i] != tc.expectedAdditions[i] ***REMOVED***
+		}
+		for i := 0; i < len(ms.added) && i < len(tc.expectedAdditions); i++ {
+			if ms.added[i] != tc.expectedAdditions[i] {
 				t.Errorf("[%s] added metadata at %d does not match expected: %q != %q", tc.name, i, ms.added[i], tc.expectedAdditions[i])
-			***REMOVED***
-		***REMOVED***
-		for i := len(ms.added); i < len(tc.expectedAdditions); i++ ***REMOVED***
+			}
+		}
+		for i := len(ms.added); i < len(tc.expectedAdditions); i++ {
 			t.Errorf("[%s] missing expected addition at position %d (%q)", tc.name, i, tc.expectedAdditions[i])
-		***REMOVED***
-		for i := len(tc.expectedAdditions); i < len(ms.added); i++ ***REMOVED***
+		}
+		for i := len(tc.expectedAdditions); i < len(ms.added); i++ {
 			t.Errorf("[%s] unexpected metadata addition at position %d (%q)", tc.name, i, ms.added[i])
-		***REMOVED***
+		}
 
-		if len(ms.removed) != len(tc.expectedRemovals) ***REMOVED***
+		if len(ms.removed) != len(tc.expectedRemovals) {
 			t.Errorf("[%s] got unexpected number of removals: %d != %d", tc.name, len(ms.removed), len(tc.expectedRemovals))
-		***REMOVED***
-		for i := 0; i < len(ms.removed) && i < len(tc.expectedRemovals); i++ ***REMOVED***
-			if ms.removed[i] != tc.expectedRemovals[i] ***REMOVED***
+		}
+		for i := 0; i < len(ms.removed) && i < len(tc.expectedRemovals); i++ {
+			if ms.removed[i] != tc.expectedRemovals[i] {
 				t.Errorf("[%s] removed metadata at %d does not match expected: %q != %q", tc.name, i, ms.removed[i], tc.expectedRemovals[i])
-			***REMOVED***
-		***REMOVED***
-		for i := len(ms.removed); i < len(tc.expectedRemovals); i++ ***REMOVED***
+			}
+		}
+		for i := len(ms.removed); i < len(tc.expectedRemovals); i++ {
 			t.Errorf("[%s] missing expected removal at position %d (%q)", tc.name, i, tc.expectedRemovals[i])
-		***REMOVED***
-		for i := len(tc.expectedRemovals); i < len(ms.removed); i++ ***REMOVED***
+		}
+		for i := len(tc.expectedRemovals); i < len(ms.removed); i++ {
 			t.Errorf("[%s] removed unexpected metadata at position %d (%q)", tc.name, i, ms.removed[i])
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func taggedMetadata(key string, dgst string, sourceRepo string) metadata.V2Metadata ***REMOVED***
-	meta := metadata.V2Metadata***REMOVED***
+func taggedMetadata(key string, dgst string, sourceRepo string) metadata.V2Metadata {
+	meta := metadata.V2Metadata{
 		Digest:           digest.Digest(dgst),
 		SourceRepository: sourceRepo,
-	***REMOVED***
+	}
 
 	meta.HMAC = metadata.ComputeV2MetadataHMAC([]byte(key), &meta)
 	return meta
-***REMOVED***
+}
 
-type mockRepo struct ***REMOVED***
+type mockRepo struct {
 	t        *testing.T
 	errors   map[digest.Digest]error
 	blobs    map[digest.Digest]distribution.Descriptor
 	requests []string
-***REMOVED***
+}
 
-var _ distribution.Repository = &mockRepo***REMOVED******REMOVED***
+var _ distribution.Repository = &mockRepo{}
 
-func (m *mockRepo) Named() reference.Named ***REMOVED***
+func (m *mockRepo) Named() reference.Named {
 	m.t.Fatalf("Named() not implemented")
 	return nil
-***REMOVED***
-func (m *mockRepo) Manifests(ctc context.Context, options ...distribution.ManifestServiceOption) (distribution.ManifestService, error) ***REMOVED***
+}
+func (m *mockRepo) Manifests(ctc context.Context, options ...distribution.ManifestServiceOption) (distribution.ManifestService, error) {
 	m.t.Fatalf("Manifests() not implemented")
 	return nil, nil
-***REMOVED***
-func (m *mockRepo) Tags(ctc context.Context) distribution.TagService ***REMOVED***
+}
+func (m *mockRepo) Tags(ctc context.Context) distribution.TagService {
 	m.t.Fatalf("Tags() not implemented")
 	return nil
-***REMOVED***
-func (m *mockRepo) Blobs(ctx context.Context) distribution.BlobStore ***REMOVED***
-	return &mockBlobStore***REMOVED***
+}
+func (m *mockRepo) Blobs(ctx context.Context) distribution.BlobStore {
+	return &mockBlobStore{
 		repo: m,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type mockBlobStore struct ***REMOVED***
+type mockBlobStore struct {
 	repo *mockRepo
-***REMOVED***
+}
 
-var _ distribution.BlobStore = &mockBlobStore***REMOVED******REMOVED***
+var _ distribution.BlobStore = &mockBlobStore{}
 
-func (m *mockBlobStore) Stat(ctx context.Context, dgst digest.Digest) (distribution.Descriptor, error) ***REMOVED***
+func (m *mockBlobStore) Stat(ctx context.Context, dgst digest.Digest) (distribution.Descriptor, error) {
 	m.repo.requests = append(m.repo.requests, dgst.String())
-	if err, exists := m.repo.errors[dgst]; exists ***REMOVED***
-		return distribution.Descriptor***REMOVED******REMOVED***, err
-	***REMOVED***
-	if desc, exists := m.repo.blobs[dgst]; exists ***REMOVED***
+	if err, exists := m.repo.errors[dgst]; exists {
+		return distribution.Descriptor{}, err
+	}
+	if desc, exists := m.repo.blobs[dgst]; exists {
 		return desc, nil
-	***REMOVED***
-	return distribution.Descriptor***REMOVED******REMOVED***, distribution.ErrBlobUnknown
-***REMOVED***
-func (m *mockBlobStore) Get(ctx context.Context, dgst digest.Digest) ([]byte, error) ***REMOVED***
+	}
+	return distribution.Descriptor{}, distribution.ErrBlobUnknown
+}
+func (m *mockBlobStore) Get(ctx context.Context, dgst digest.Digest) ([]byte, error) {
 	m.repo.t.Fatal("Get() not implemented")
 	return nil, nil
-***REMOVED***
+}
 
-func (m *mockBlobStore) Open(ctx context.Context, dgst digest.Digest) (distribution.ReadSeekCloser, error) ***REMOVED***
+func (m *mockBlobStore) Open(ctx context.Context, dgst digest.Digest) (distribution.ReadSeekCloser, error) {
 	m.repo.t.Fatal("Open() not implemented")
 	return nil, nil
-***REMOVED***
+}
 
-func (m *mockBlobStore) Put(ctx context.Context, mediaType string, p []byte) (distribution.Descriptor, error) ***REMOVED***
+func (m *mockBlobStore) Put(ctx context.Context, mediaType string, p []byte) (distribution.Descriptor, error) {
 	m.repo.t.Fatal("Put() not implemented")
-	return distribution.Descriptor***REMOVED******REMOVED***, nil
-***REMOVED***
+	return distribution.Descriptor{}, nil
+}
 
-func (m *mockBlobStore) Create(ctx context.Context, options ...distribution.BlobCreateOption) (distribution.BlobWriter, error) ***REMOVED***
+func (m *mockBlobStore) Create(ctx context.Context, options ...distribution.BlobCreateOption) (distribution.BlobWriter, error) {
 	m.repo.t.Fatal("Create() not implemented")
 	return nil, nil
-***REMOVED***
-func (m *mockBlobStore) Resume(ctx context.Context, id string) (distribution.BlobWriter, error) ***REMOVED***
+}
+func (m *mockBlobStore) Resume(ctx context.Context, id string) (distribution.BlobWriter, error) {
 	m.repo.t.Fatal("Resume() not implemented")
 	return nil, nil
-***REMOVED***
-func (m *mockBlobStore) Delete(ctx context.Context, dgst digest.Digest) error ***REMOVED***
+}
+func (m *mockBlobStore) Delete(ctx context.Context, dgst digest.Digest) error {
 	m.repo.t.Fatal("Delete() not implemented")
 	return nil
-***REMOVED***
-func (m *mockBlobStore) ServeBlob(ctx context.Context, w http.ResponseWriter, r *http.Request, dgst digest.Digest) error ***REMOVED***
+}
+func (m *mockBlobStore) ServeBlob(ctx context.Context, w http.ResponseWriter, r *http.Request, dgst digest.Digest) error {
 	m.repo.t.Fatalf("ServeBlob() not implemented")
 	return nil
-***REMOVED***
+}
 
-type mockV2MetadataService struct ***REMOVED***
+type mockV2MetadataService struct {
 	added   []metadata.V2Metadata
 	removed []metadata.V2Metadata
-***REMOVED***
+}
 
-var _ metadata.V2MetadataService = &mockV2MetadataService***REMOVED******REMOVED***
+var _ metadata.V2MetadataService = &mockV2MetadataService{}
 
-func (*mockV2MetadataService) GetMetadata(diffID layer.DiffID) ([]metadata.V2Metadata, error) ***REMOVED***
+func (*mockV2MetadataService) GetMetadata(diffID layer.DiffID) ([]metadata.V2Metadata, error) {
 	return nil, nil
-***REMOVED***
-func (*mockV2MetadataService) GetDiffID(dgst digest.Digest) (layer.DiffID, error) ***REMOVED***
+}
+func (*mockV2MetadataService) GetDiffID(dgst digest.Digest) (layer.DiffID, error) {
 	return "", nil
-***REMOVED***
-func (m *mockV2MetadataService) Add(diffID layer.DiffID, metadata metadata.V2Metadata) error ***REMOVED***
+}
+func (m *mockV2MetadataService) Add(diffID layer.DiffID, metadata metadata.V2Metadata) error {
 	m.added = append(m.added, metadata)
 	return nil
-***REMOVED***
-func (m *mockV2MetadataService) TagAndAdd(diffID layer.DiffID, hmacKey []byte, meta metadata.V2Metadata) error ***REMOVED***
+}
+func (m *mockV2MetadataService) TagAndAdd(diffID layer.DiffID, hmacKey []byte, meta metadata.V2Metadata) error {
 	meta.HMAC = metadata.ComputeV2MetadataHMAC(hmacKey, &meta)
 	m.Add(diffID, meta)
 	return nil
-***REMOVED***
-func (m *mockV2MetadataService) Remove(metadata metadata.V2Metadata) error ***REMOVED***
+}
+func (m *mockV2MetadataService) Remove(metadata metadata.V2Metadata) error {
 	m.removed = append(m.removed, metadata)
 	return nil
-***REMOVED***
+}
 
-type progressSink struct ***REMOVED***
+type progressSink struct {
 	t *testing.T
-***REMOVED***
+}
 
-func (s *progressSink) WriteProgress(p progress.Progress) error ***REMOVED***
+func (s *progressSink) WriteProgress(p progress.Progress) error {
 	s.t.Logf("progress update: %#+v", p)
 	return nil
-***REMOVED***
+}

@@ -36,13 +36,13 @@ key = "another value"
 
 # Inline tables provide a more compact syntax for expressing tables. They are
 # especially useful for grouped data that can otherwise quickly become verbose.
-# Inline tables are enclosed in curly braces `***REMOVED***` and `***REMOVED***`. No newlines are
+# Inline tables are enclosed in curly braces `{` and `}`. No newlines are
 # allowed between the curly braces unless they are valid within a value.
 
 [table.inline]
 
-name = ***REMOVED*** first = "Tom", last = "Preston-Werner" ***REMOVED***
-point = ***REMOVED*** x = 1, y = 2 ***REMOVED***
+name = { first = "Tom", last = "Preston-Werner" }
+point = { x = 1, y = 2 }
 
 
 ################################################################################
@@ -93,7 +93,7 @@ regex    = '<\i\c*\s*>'
 
 [string.literal.multiline]
 
-regex2 = '''I [dw]on't need \d***REMOVED***2***REMOVED*** apples'''
+regex2 = '''I [dw]on't need \d{2} apples'''
 lines  = '''
 The first newline is
 trimmed in raw strings.

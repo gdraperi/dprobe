@@ -12,15 +12,15 @@ import (
 // -----------------------------------------------------------------------
 // Test suite registry.
 
-var allSuites []interface***REMOVED******REMOVED***
+var allSuites []interface{}
 
 // Suite registers the given value as a test suite to be run. Any methods
 // starting with the Test prefix in the given value will be considered as
 // a test method.
-func Suite(suite interface***REMOVED******REMOVED***) interface***REMOVED******REMOVED*** ***REMOVED***
+func Suite(suite interface{}) interface{} {
 	allSuites = append(allSuites, suite)
 	return suite
-***REMOVED***
+}
 
 // -----------------------------------------------------------------------
 // Public running interface.
@@ -48,12 +48,12 @@ var (
 // TestingT runs all test suites registered with the Suite function,
 // printing results to stdout, and reporting any failures back to
 // the "testing" package.
-func TestingT(testingT *testing.T) ***REMOVED***
+func TestingT(testingT *testing.T) {
 	benchTime := *newBenchTime
-	if benchTime == 1*time.Second ***REMOVED***
+	if benchTime == 1*time.Second {
 		benchTime = *oldBenchTime
-	***REMOVED***
-	conf := &RunConf***REMOVED***
+	}
+	conf := &RunConf{
 		Filter:        *oldFilterFlag + *newFilterFlag,
 		Verbose:       *oldVerboseFlag || *newVerboseFlag,
 		Stream:        *oldStreamFlag || *newStreamFlag,
@@ -61,70 +61,70 @@ func TestingT(testingT *testing.T) ***REMOVED***
 		BenchmarkTime: benchTime,
 		BenchmarkMem:  *newBenchMem,
 		KeepWorkDir:   *oldWorkFlag || *newWorkFlag,
-	***REMOVED***
-	if *checkTimeout != "" ***REMOVED***
+	}
+	if *checkTimeout != "" {
 		timeout, err := time.ParseDuration(*checkTimeout)
-		if err != nil ***REMOVED***
+		if err != nil {
 			testingT.Fatalf("error parsing specified timeout flag: %v", err)
-		***REMOVED***
+		}
 		conf.CheckTimeout = timeout
-	***REMOVED***
-	if *oldListFlag || *newListFlag ***REMOVED***
+	}
+	if *oldListFlag || *newListFlag {
 		w := bufio.NewWriter(os.Stdout)
-		for _, name := range ListAll(conf) ***REMOVED***
+		for _, name := range ListAll(conf) {
 			fmt.Fprintln(w, name)
-		***REMOVED***
+		}
 		w.Flush()
 		return
-	***REMOVED***
+	}
 	result := RunAll(conf)
 	println(result.String())
-	if !result.Passed() ***REMOVED***
+	if !result.Passed() {
 		testingT.Fail()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // RunAll runs all test suites registered with the Suite function, using the
 // provided run configuration.
-func RunAll(runConf *RunConf) *Result ***REMOVED***
-	result := Result***REMOVED******REMOVED***
-	for _, suite := range allSuites ***REMOVED***
+func RunAll(runConf *RunConf) *Result {
+	result := Result{}
+	for _, suite := range allSuites {
 		result.Add(Run(suite, runConf))
-	***REMOVED***
+	}
 	return &result
-***REMOVED***
+}
 
 // Run runs the provided test suite using the provided run configuration.
-func Run(suite interface***REMOVED******REMOVED***, runConf *RunConf) *Result ***REMOVED***
+func Run(suite interface{}, runConf *RunConf) *Result {
 	runner := newSuiteRunner(suite, runConf)
 	return runner.run()
-***REMOVED***
+}
 
 // ListAll returns the names of all the test functions registered with the
 // Suite function that will be run with the provided run configuration.
-func ListAll(runConf *RunConf) []string ***REMOVED***
+func ListAll(runConf *RunConf) []string {
 	var names []string
-	for _, suite := range allSuites ***REMOVED***
+	for _, suite := range allSuites {
 		names = append(names, List(suite, runConf)...)
-	***REMOVED***
+	}
 	return names
-***REMOVED***
+}
 
 // List returns the names of the test functions in the given
 // suite that will be run with the provided run configuration.
-func List(suite interface***REMOVED******REMOVED***, runConf *RunConf) []string ***REMOVED***
+func List(suite interface{}, runConf *RunConf) []string {
 	var names []string
 	runner := newSuiteRunner(suite, runConf)
-	for _, t := range runner.tests ***REMOVED***
+	for _, t := range runner.tests {
 		names = append(names, t.String())
-	***REMOVED***
+	}
 	return names
-***REMOVED***
+}
 
 // -----------------------------------------------------------------------
 // Result methods.
 
-func (r *Result) Add(other *Result) ***REMOVED***
+func (r *Result) Add(other *Result) {
 	r.Succeeded += other.Succeeded
 	r.Skipped += other.Skipped
 	r.Failed += other.Failed
@@ -132,52 +132,52 @@ func (r *Result) Add(other *Result) ***REMOVED***
 	r.FixturePanicked += other.FixturePanicked
 	r.ExpectedFailures += other.ExpectedFailures
 	r.Missed += other.Missed
-	if r.WorkDir != "" && other.WorkDir != "" ***REMOVED***
+	if r.WorkDir != "" && other.WorkDir != "" {
 		r.WorkDir += ":" + other.WorkDir
-	***REMOVED*** else if other.WorkDir != "" ***REMOVED***
+	} else if other.WorkDir != "" {
 		r.WorkDir = other.WorkDir
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (r *Result) Passed() bool ***REMOVED***
+func (r *Result) Passed() bool {
 	return (r.Failed == 0 && r.Panicked == 0 &&
 		r.FixturePanicked == 0 && r.Missed == 0 &&
 		r.RunError == nil)
-***REMOVED***
+}
 
-func (r *Result) String() string ***REMOVED***
-	if r.RunError != nil ***REMOVED***
+func (r *Result) String() string {
+	if r.RunError != nil {
 		return "ERROR: " + r.RunError.Error()
-	***REMOVED***
+	}
 
 	var value string
 	if r.Failed == 0 && r.Panicked == 0 && r.FixturePanicked == 0 &&
-		r.Missed == 0 ***REMOVED***
+		r.Missed == 0 {
 		value = "OK: "
-	***REMOVED*** else ***REMOVED***
+	} else {
 		value = "OOPS: "
-	***REMOVED***
+	}
 	value += fmt.Sprintf("%d passed", r.Succeeded)
-	if r.Skipped != 0 ***REMOVED***
+	if r.Skipped != 0 {
 		value += fmt.Sprintf(", %d skipped", r.Skipped)
-	***REMOVED***
-	if r.ExpectedFailures != 0 ***REMOVED***
+	}
+	if r.ExpectedFailures != 0 {
 		value += fmt.Sprintf(", %d expected failures", r.ExpectedFailures)
-	***REMOVED***
-	if r.Failed != 0 ***REMOVED***
+	}
+	if r.Failed != 0 {
 		value += fmt.Sprintf(", %d FAILED", r.Failed)
-	***REMOVED***
-	if r.Panicked != 0 ***REMOVED***
+	}
+	if r.Panicked != 0 {
 		value += fmt.Sprintf(", %d PANICKED", r.Panicked)
-	***REMOVED***
-	if r.FixturePanicked != 0 ***REMOVED***
+	}
+	if r.FixturePanicked != 0 {
 		value += fmt.Sprintf(", %d FIXTURE-PANICKED", r.FixturePanicked)
-	***REMOVED***
-	if r.Missed != 0 ***REMOVED***
+	}
+	if r.Missed != 0 {
 		value += fmt.Sprintf(", %d MISSED", r.Missed)
-	***REMOVED***
-	if r.WorkDir != "" ***REMOVED***
+	}
+	if r.WorkDir != "" {
 		value += "\nWORK=" + r.WorkDir
-	***REMOVED***
+	}
 	return value
-***REMOVED***
+}

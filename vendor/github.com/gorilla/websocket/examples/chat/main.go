@@ -12,29 +12,29 @@ import (
 
 var addr = flag.String("addr", ":8080", "http service address")
 
-func serveHome(w http.ResponseWriter, r *http.Request) ***REMOVED***
+func serveHome(w http.ResponseWriter, r *http.Request) {
 	log.Println(r.URL)
-	if r.URL.Path != "/" ***REMOVED***
+	if r.URL.Path != "/" {
 		http.Error(w, "Not found", 404)
 		return
-	***REMOVED***
-	if r.Method != "GET" ***REMOVED***
+	}
+	if r.Method != "GET" {
 		http.Error(w, "Method not allowed", 405)
 		return
-	***REMOVED***
+	}
 	http.ServeFile(w, r, "home.html")
-***REMOVED***
+}
 
-func main() ***REMOVED***
+func main() {
 	flag.Parse()
 	hub := newHub()
 	go hub.run()
 	http.HandleFunc("/", serveHome)
-	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) ***REMOVED***
+	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		serveWs(hub, w, r)
-	***REMOVED***)
+	})
 	err := http.ListenAndServe(*addr, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
-	***REMOVED***
-***REMOVED***
+	}
+}

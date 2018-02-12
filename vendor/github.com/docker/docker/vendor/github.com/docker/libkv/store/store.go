@@ -40,7 +40,7 @@ var (
 )
 
 // Config contains the options for a storage client
-type Config struct ***REMOVED***
+type Config struct {
 	ClientTLS         *ClientTLSConfig
 	TLS               *tls.Config
 	ConnectionTimeout time.Duration
@@ -48,21 +48,21 @@ type Config struct ***REMOVED***
 	PersistConnection bool
 	Username          string
 	Password          string
-***REMOVED***
+}
 
 // ClientTLSConfig contains data for a Client TLS configuration in the form
 // the etcd client wants it.  Eventually we'll adapt it for ZK and Consul.
-type ClientTLSConfig struct ***REMOVED***
+type ClientTLSConfig struct {
 	CertFile   string
 	KeyFile    string
 	CACertFile string
-***REMOVED***
+}
 
 // Store represents the backend K/V storage
 // Each store should support every call listed
 // here. Or it couldn't be implemented as a K/V
 // backend for libkv
-type Store interface ***REMOVED***
+type Store interface {
 	// Put a value at the specified key
 	Put(key string, value []byte, options *WriteOptions) error
 
@@ -76,11 +76,11 @@ type Store interface ***REMOVED***
 	Exists(key string) (bool, error)
 
 	// Watch for changes on a key
-	Watch(key string, stopCh <-chan struct***REMOVED******REMOVED***) (<-chan *KVPair, error)
+	Watch(key string, stopCh <-chan struct{}) (<-chan *KVPair, error)
 
 	// WatchTree watches for changes on child nodes under
 	// a given directory
-	WatchTree(directory string, stopCh <-chan struct***REMOVED******REMOVED***) (<-chan []*KVPair, error)
+	WatchTree(directory string, stopCh <-chan struct{}) (<-chan []*KVPair, error)
 
 	// NewLock creates a lock for a given key.
 	// The returned Locker is not held and must be acquired
@@ -102,31 +102,31 @@ type Store interface ***REMOVED***
 
 	// Close the store connection
 	Close()
-***REMOVED***
+}
 
-// KVPair represents ***REMOVED***Key, Value, Lastindex***REMOVED*** tuple
-type KVPair struct ***REMOVED***
+// KVPair represents {Key, Value, Lastindex} tuple
+type KVPair struct {
 	Key       string
 	Value     []byte
 	LastIndex uint64
-***REMOVED***
+}
 
 // WriteOptions contains optional request parameters
-type WriteOptions struct ***REMOVED***
+type WriteOptions struct {
 	IsDir bool
 	TTL   time.Duration
-***REMOVED***
+}
 
 // LockOptions contains optional request parameters
-type LockOptions struct ***REMOVED***
+type LockOptions struct {
 	Value     []byte        // Optional, value to associate with the lock
 	TTL       time.Duration // Optional, expiration ttl associated with the lock
-	RenewLock chan struct***REMOVED******REMOVED*** // Optional, chan used to control and stop the session ttl renewal for the lock
-***REMOVED***
+	RenewLock chan struct{} // Optional, chan used to control and stop the session ttl renewal for the lock
+}
 
 // Locker provides locking mechanism on top of the store.
 // Similar to `sync.Lock` except it may return errors.
-type Locker interface ***REMOVED***
-	Lock(stopChan chan struct***REMOVED******REMOVED***) (<-chan struct***REMOVED******REMOVED***, error)
+type Locker interface {
+	Lock(stopChan chan struct{}) (<-chan struct{}, error)
 	Unlock() error
-***REMOVED***
+}

@@ -10,24 +10,24 @@ import (
 	"testing"
 )
 
-func TestGoroutineLock(t *testing.T) ***REMOVED***
+func TestGoroutineLock(t *testing.T) {
 	oldDebug := DebugGoroutines
 	DebugGoroutines = true
-	defer func() ***REMOVED*** DebugGoroutines = oldDebug ***REMOVED***()
+	defer func() { DebugGoroutines = oldDebug }()
 
 	g := newGoroutineLock()
 	g.check()
 
-	sawPanic := make(chan interface***REMOVED******REMOVED***)
-	go func() ***REMOVED***
-		defer func() ***REMOVED*** sawPanic <- recover() ***REMOVED***()
+	sawPanic := make(chan interface{})
+	go func() {
+		defer func() { sawPanic <- recover() }()
 		g.check() // should panic
-	***REMOVED***()
+	}()
 	e := <-sawPanic
-	if e == nil ***REMOVED***
+	if e == nil {
 		t.Fatal("did not see panic from check in other goroutine")
-	***REMOVED***
-	if !strings.Contains(fmt.Sprint(e), "wrong goroutine") ***REMOVED***
+	}
+	if !strings.Contains(fmt.Sprint(e), "wrong goroutine") {
 		t.Errorf("expected on see panic about running on the wrong goroutine; got %v", e)
-	***REMOVED***
-***REMOVED***
+	}
+}

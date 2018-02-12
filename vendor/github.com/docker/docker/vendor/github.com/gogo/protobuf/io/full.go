@@ -33,70 +33,70 @@ import (
 	"io"
 )
 
-func NewFullWriter(w io.Writer) WriteCloser ***REMOVED***
-	return &fullWriter***REMOVED***w, nil***REMOVED***
-***REMOVED***
+func NewFullWriter(w io.Writer) WriteCloser {
+	return &fullWriter{w, nil}
+}
 
-type fullWriter struct ***REMOVED***
+type fullWriter struct {
 	w      io.Writer
 	buffer []byte
-***REMOVED***
+}
 
-func (this *fullWriter) WriteMsg(msg proto.Message) (err error) ***REMOVED***
+func (this *fullWriter) WriteMsg(msg proto.Message) (err error) {
 	var data []byte
-	if m, ok := msg.(marshaler); ok ***REMOVED***
+	if m, ok := msg.(marshaler); ok {
 		n, ok := getSize(m)
-		if !ok ***REMOVED***
+		if !ok {
 			data, err = proto.Marshal(msg)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-		***REMOVED***
-		if n >= len(this.buffer) ***REMOVED***
+			}
+		}
+		if n >= len(this.buffer) {
 			this.buffer = make([]byte, n)
-		***REMOVED***
+		}
 		_, err = m.MarshalTo(this.buffer)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		data = this.buffer[:n]
-	***REMOVED*** else ***REMOVED***
+	} else {
 		data, err = proto.Marshal(msg)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	_, err = this.w.Write(data)
 	return err
-***REMOVED***
+}
 
-func (this *fullWriter) Close() error ***REMOVED***
-	if closer, ok := this.w.(io.Closer); ok ***REMOVED***
+func (this *fullWriter) Close() error {
+	if closer, ok := this.w.(io.Closer); ok {
 		return closer.Close()
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-type fullReader struct ***REMOVED***
+type fullReader struct {
 	r   io.Reader
 	buf []byte
-***REMOVED***
+}
 
-func NewFullReader(r io.Reader, maxSize int) ReadCloser ***REMOVED***
-	return &fullReader***REMOVED***r, make([]byte, maxSize)***REMOVED***
-***REMOVED***
+func NewFullReader(r io.Reader, maxSize int) ReadCloser {
+	return &fullReader{r, make([]byte, maxSize)}
+}
 
-func (this *fullReader) ReadMsg(msg proto.Message) error ***REMOVED***
+func (this *fullReader) ReadMsg(msg proto.Message) error {
 	length, err := this.r.Read(this.buf)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return proto.Unmarshal(this.buf[:length], msg)
-***REMOVED***
+}
 
-func (this *fullReader) Close() error ***REMOVED***
-	if closer, ok := this.r.(io.Closer); ok ***REMOVED***
+func (this *fullReader) Close() error {
+	if closer, ok := this.r.(io.Closer); ok {
 		return closer.Close()
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

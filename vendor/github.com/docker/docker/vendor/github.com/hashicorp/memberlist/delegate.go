@@ -3,7 +3,7 @@ package memberlist
 // Delegate is the interface that clients must implement if they want to hook
 // into the gossip layer of Memberlist. All the methods must be thread-safe,
 // as they can and generally will be called concurrently.
-type Delegate interface ***REMOVED***
+type Delegate interface {
 	// NodeMeta is used to retrieve meta-data about the current node
 	// when broadcasting an alive message. It's length is limited to
 	// the given byte size. This metadata is available in the Node structure.
@@ -34,4 +34,4 @@ type Delegate interface ***REMOVED***
 	// remote side's LocalState call. The 'join'
 	// boolean indicates this is for a join instead of a push/pull.
 	MergeRemoteState(buf []byte, join bool)
-***REMOVED***
+}

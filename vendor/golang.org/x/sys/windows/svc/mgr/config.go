@@ -30,7 +30,7 @@ const (
 
 // TODO(brainman): Password is not returned by windows.QueryServiceConfig, not sure how to get it.
 
-type Config struct ***REMOVED***
+type Config struct {
 	ServiceType      uint32
 	StartType        uint32
 	ErrorControl     uint32
@@ -42,71 +42,71 @@ type Config struct ***REMOVED***
 	DisplayName      string
 	Password         string
 	Description      string
-***REMOVED***
+}
 
-func toString(p *uint16) string ***REMOVED***
-	if p == nil ***REMOVED***
+func toString(p *uint16) string {
+	if p == nil {
 		return ""
-	***REMOVED***
+	}
 	return syscall.UTF16ToString((*[4096]uint16)(unsafe.Pointer(p))[:])
-***REMOVED***
+}
 
-func toStringSlice(ps *uint16) []string ***REMOVED***
-	if ps == nil ***REMOVED***
+func toStringSlice(ps *uint16) []string {
+	if ps == nil {
 		return nil
-	***REMOVED***
+	}
 	r := make([]string, 0)
-	for from, i, p := 0, 0, (*[1 << 24]uint16)(unsafe.Pointer(ps)); true; i++ ***REMOVED***
-		if p[i] == 0 ***REMOVED***
+	for from, i, p := 0, 0, (*[1 << 24]uint16)(unsafe.Pointer(ps)); true; i++ {
+		if p[i] == 0 {
 			// empty string marks the end
-			if i <= from ***REMOVED***
+			if i <= from {
 				break
-			***REMOVED***
+			}
 			r = append(r, string(utf16.Decode(p[from:i])))
 			from = i + 1
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return r
-***REMOVED***
+}
 
 // Config retrieves service s configuration paramteres.
-func (s *Service) Config() (Config, error) ***REMOVED***
+func (s *Service) Config() (Config, error) {
 	var p *windows.QUERY_SERVICE_CONFIG
 	n := uint32(1024)
-	for ***REMOVED***
+	for {
 		b := make([]byte, n)
 		p = (*windows.QUERY_SERVICE_CONFIG)(unsafe.Pointer(&b[0]))
 		err := windows.QueryServiceConfig(s.Handle, p, n, &n)
-		if err == nil ***REMOVED***
+		if err == nil {
 			break
-		***REMOVED***
-		if err.(syscall.Errno) != syscall.ERROR_INSUFFICIENT_BUFFER ***REMOVED***
-			return Config***REMOVED******REMOVED***, err
-		***REMOVED***
-		if n <= uint32(len(b)) ***REMOVED***
-			return Config***REMOVED******REMOVED***, err
-		***REMOVED***
-	***REMOVED***
+		}
+		if err.(syscall.Errno) != syscall.ERROR_INSUFFICIENT_BUFFER {
+			return Config{}, err
+		}
+		if n <= uint32(len(b)) {
+			return Config{}, err
+		}
+	}
 
 	var p2 *windows.SERVICE_DESCRIPTION
 	n = uint32(1024)
-	for ***REMOVED***
+	for {
 		b := make([]byte, n)
 		p2 = (*windows.SERVICE_DESCRIPTION)(unsafe.Pointer(&b[0]))
 		err := windows.QueryServiceConfig2(s.Handle,
 			windows.SERVICE_CONFIG_DESCRIPTION, &b[0], n, &n)
-		if err == nil ***REMOVED***
+		if err == nil {
 			break
-		***REMOVED***
-		if err.(syscall.Errno) != syscall.ERROR_INSUFFICIENT_BUFFER ***REMOVED***
-			return Config***REMOVED******REMOVED***, err
-		***REMOVED***
-		if n <= uint32(len(b)) ***REMOVED***
-			return Config***REMOVED******REMOVED***, err
-		***REMOVED***
-	***REMOVED***
+		}
+		if err.(syscall.Errno) != syscall.ERROR_INSUFFICIENT_BUFFER {
+			return Config{}, err
+		}
+		if n <= uint32(len(b)) {
+			return Config{}, err
+		}
+	}
 
-	return Config***REMOVED***
+	return Config{
 		ServiceType:      p.ServiceType,
 		StartType:        p.StartType,
 		ErrorControl:     p.ErrorControl,
@@ -117,23 +117,23 @@ func (s *Service) Config() (Config, error) ***REMOVED***
 		ServiceStartName: toString(p.ServiceStartName),
 		DisplayName:      toString(p.DisplayName),
 		Description:      toString(p2.Description),
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-func updateDescription(handle windows.Handle, desc string) error ***REMOVED***
-	d := windows.SERVICE_DESCRIPTION***REMOVED***toPtr(desc)***REMOVED***
+func updateDescription(handle windows.Handle, desc string) error {
+	d := windows.SERVICE_DESCRIPTION{toPtr(desc)}
 	return windows.ChangeServiceConfig2(handle,
 		windows.SERVICE_CONFIG_DESCRIPTION, (*byte)(unsafe.Pointer(&d)))
-***REMOVED***
+}
 
 // UpdateConfig updates service s configuration parameters.
-func (s *Service) UpdateConfig(c Config) error ***REMOVED***
+func (s *Service) UpdateConfig(c Config) error {
 	err := windows.ChangeServiceConfig(s.Handle, c.ServiceType, c.StartType,
 		c.ErrorControl, toPtr(c.BinaryPathName), toPtr(c.LoadOrderGroup),
 		nil, toStringBlock(c.Dependencies), toPtr(c.ServiceStartName),
 		toPtr(c.Password), toPtr(c.DisplayName))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return updateDescription(s.Handle, c.Description)
-***REMOVED***
+}

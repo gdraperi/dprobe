@@ -12,7 +12,7 @@ import (
 )
 
 // ClientKeyManager manages client keys on the filesystem
-type ClientKeyManager struct ***REMOVED***
+type ClientKeyManager struct {
 	key        PrivateKey
 	clientFile string
 	clientDir  string
@@ -22,65 +22,65 @@ type ClientKeyManager struct ***REMOVED***
 
 	configLock sync.Mutex
 	configs    []*tls.Config
-***REMOVED***
+}
 
 // NewClientKeyManager loads a new manager from a set of key files
 // and managed by the given private key.
-func NewClientKeyManager(trustKey PrivateKey, clientFile, clientDir string) (*ClientKeyManager, error) ***REMOVED***
-	m := &ClientKeyManager***REMOVED***
+func NewClientKeyManager(trustKey PrivateKey, clientFile, clientDir string) (*ClientKeyManager, error) {
+	m := &ClientKeyManager{
 		key:        trustKey,
 		clientFile: clientFile,
 		clientDir:  clientDir,
-	***REMOVED***
-	if err := m.loadKeys(); err != nil ***REMOVED***
+	}
+	if err := m.loadKeys(); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	// TODO Start watching file and directory
 
 	return m, nil
-***REMOVED***
+}
 
-func (c *ClientKeyManager) loadKeys() (err error) ***REMOVED***
+func (c *ClientKeyManager) loadKeys() (err error) {
 	// Load authorized keys file
 	var clients []PublicKey
-	if c.clientFile != "" ***REMOVED***
+	if c.clientFile != "" {
 		clients, err = LoadKeySetFile(c.clientFile)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return fmt.Errorf("unable to load authorized keys: %s", err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Add clients from authorized keys directory
 	files, err := ioutil.ReadDir(c.clientDir)
-	if err != nil && !os.IsNotExist(err) ***REMOVED***
+	if err != nil && !os.IsNotExist(err) {
 		return fmt.Errorf("unable to open authorized keys directory: %s", err)
-	***REMOVED***
-	for _, f := range files ***REMOVED***
-		if !f.IsDir() ***REMOVED***
+	}
+	for _, f := range files {
+		if !f.IsDir() {
 			publicKey, err := LoadPublicKeyFile(path.Join(c.clientDir, f.Name()))
-			if err != nil ***REMOVED***
+			if err != nil {
 				return fmt.Errorf("unable to load authorized key file: %s", err)
-			***REMOVED***
+			}
 			clients = append(clients, publicKey)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	c.clientLock.Lock()
 	c.clients = clients
 	c.clientLock.Unlock()
 
 	return nil
-***REMOVED***
+}
 
 // RegisterTLSConfig registers a tls configuration to manager
 // such that any changes to the keys may be reflected in
 // the tls client CA pool
-func (c *ClientKeyManager) RegisterTLSConfig(tlsConfig *tls.Config) error ***REMOVED***
+func (c *ClientKeyManager) RegisterTLSConfig(tlsConfig *tls.Config) error {
 	c.clientLock.RLock()
 	certPool, err := GenerateCACertPool(c.key, c.clients)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("CA pool generation error: %s", err)
-	***REMOVED***
+	}
 	c.clientLock.RUnlock()
 
 	tlsConfig.ClientCAs = certPool
@@ -90,86 +90,86 @@ func (c *ClientKeyManager) RegisterTLSConfig(tlsConfig *tls.Config) error ***REM
 	c.configLock.Unlock()
 
 	return nil
-***REMOVED***
+}
 
 // NewIdentityAuthTLSConfig creates a tls.Config for the server to use for
 // libtrust identity authentication for the domain specified
-func NewIdentityAuthTLSConfig(trustKey PrivateKey, clients *ClientKeyManager, addr string, domain string) (*tls.Config, error) ***REMOVED***
+func NewIdentityAuthTLSConfig(trustKey PrivateKey, clients *ClientKeyManager, addr string, domain string) (*tls.Config, error) {
 	tlsConfig := newTLSConfig()
 
 	tlsConfig.ClientAuth = tls.RequireAndVerifyClientCert
-	if err := clients.RegisterTLSConfig(tlsConfig); err != nil ***REMOVED***
+	if err := clients.RegisterTLSConfig(tlsConfig); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// Generate cert
 	ips, domains, err := parseAddr(addr)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	// add domain that it expects clients to use
 	domains = append(domains, domain)
 	x509Cert, err := GenerateSelfSignedServerCert(trustKey, domains, ips)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("certificate generation error: %s", err)
-	***REMOVED***
-	tlsConfig.Certificates = []tls.Certificate***REMOVED******REMOVED***
-		Certificate: [][]byte***REMOVED***x509Cert.Raw***REMOVED***,
+	}
+	tlsConfig.Certificates = []tls.Certificate{{
+		Certificate: [][]byte{x509Cert.Raw},
 		PrivateKey:  trustKey.CryptoPrivateKey(),
 		Leaf:        x509Cert,
-	***REMOVED******REMOVED***
+	}}
 
 	return tlsConfig, nil
-***REMOVED***
+}
 
 // NewCertAuthTLSConfig creates a tls.Config for the server to use for
 // certificate authentication
-func NewCertAuthTLSConfig(caPath, certPath, keyPath string) (*tls.Config, error) ***REMOVED***
+func NewCertAuthTLSConfig(caPath, certPath, keyPath string) (*tls.Config, error) {
 	tlsConfig := newTLSConfig()
 
 	cert, err := tls.LoadX509KeyPair(certPath, keyPath)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("Couldn't load X509 key pair (%s, %s): %s. Key encrypted?", certPath, keyPath, err)
-	***REMOVED***
-	tlsConfig.Certificates = []tls.Certificate***REMOVED***cert***REMOVED***
+	}
+	tlsConfig.Certificates = []tls.Certificate{cert}
 
 	// Verify client certificates against a CA?
-	if caPath != "" ***REMOVED***
+	if caPath != "" {
 		certPool := x509.NewCertPool()
 		file, err := ioutil.ReadFile(caPath)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, fmt.Errorf("Couldn't read CA certificate: %s", err)
-		***REMOVED***
+		}
 		certPool.AppendCertsFromPEM(file)
 
 		tlsConfig.ClientAuth = tls.RequireAndVerifyClientCert
 		tlsConfig.ClientCAs = certPool
-	***REMOVED***
+	}
 
 	return tlsConfig, nil
-***REMOVED***
+}
 
-func newTLSConfig() *tls.Config ***REMOVED***
-	return &tls.Config***REMOVED***
-		NextProtos: []string***REMOVED***"http/1.1"***REMOVED***,
+func newTLSConfig() *tls.Config {
+	return &tls.Config{
+		NextProtos: []string{"http/1.1"},
 		// Avoid fallback on insecure SSL protocols
 		MinVersion: tls.VersionTLS10,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // parseAddr parses an address into an array of IPs and domains
-func parseAddr(addr string) ([]net.IP, []string, error) ***REMOVED***
+func parseAddr(addr string) ([]net.IP, []string, error) {
 	host, _, err := net.SplitHostPort(addr)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 	var domains []string
 	var ips []net.IP
 	ip := net.ParseIP(host)
-	if ip != nil ***REMOVED***
-		ips = []net.IP***REMOVED***ip***REMOVED***
-	***REMOVED*** else ***REMOVED***
-		domains = []string***REMOVED***host***REMOVED***
-	***REMOVED***
+	if ip != nil {
+		ips = []net.IP{ip}
+	} else {
+		domains = []string{host}
+	}
 	return ips, domains, nil
-***REMOVED***
+}

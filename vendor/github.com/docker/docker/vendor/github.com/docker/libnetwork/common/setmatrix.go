@@ -7,21 +7,21 @@ import (
 )
 
 // SetMatrix is a map of Sets
-type SetMatrix interface ***REMOVED***
+type SetMatrix interface {
 	// Get returns the members of the set for a specific key as a slice.
-	Get(key string) ([]interface***REMOVED******REMOVED***, bool)
+	Get(key string) ([]interface{}, bool)
 	// Contains is used to verify if an element is in a set for a specific key
 	// returns true if the element is in the set
 	// returns true if there is a set for the key
-	Contains(key string, value interface***REMOVED******REMOVED***) (bool, bool)
+	Contains(key string, value interface{}) (bool, bool)
 	// Insert inserts the value in the set of a key
 	// returns true if the value is inserted (was not already in the set), false otherwise
 	// returns also the length of the set for the key
-	Insert(key string, value interface***REMOVED******REMOVED***) (bool, int)
+	Insert(key string, value interface{}) (bool, int)
 	// Remove removes the value in the set for a specific key
 	// returns true if the value is deleted, false otherwise
 	// returns also the length of the set for the key
-	Remove(key string, value interface***REMOVED******REMOVED***) (bool, int)
+	Remove(key string, value interface{}) (bool, int)
 	// Cardinality returns the number of elements in the set for a key
 	// returns false if the set is not present
 	Cardinality(key string) (int, bool)
@@ -30,106 +30,106 @@ type SetMatrix interface ***REMOVED***
 	String(key string) (string, bool)
 	// Returns all the keys in the map
 	Keys() []string
-***REMOVED***
+}
 
-type setMatrix struct ***REMOVED***
+type setMatrix struct {
 	matrix map[string]mapset.Set
 
 	sync.Mutex
-***REMOVED***
+}
 
 // NewSetMatrix creates a new set matrix object
-func NewSetMatrix() SetMatrix ***REMOVED***
-	s := &setMatrix***REMOVED******REMOVED***
+func NewSetMatrix() SetMatrix {
+	s := &setMatrix{}
 	s.init()
 	return s
-***REMOVED***
+}
 
-func (s *setMatrix) init() ***REMOVED***
+func (s *setMatrix) init() {
 	s.matrix = make(map[string]mapset.Set)
-***REMOVED***
+}
 
-func (s *setMatrix) Get(key string) ([]interface***REMOVED******REMOVED***, bool) ***REMOVED***
+func (s *setMatrix) Get(key string) ([]interface{}, bool) {
 	s.Lock()
 	defer s.Unlock()
 	set, ok := s.matrix[key]
-	if !ok ***REMOVED***
+	if !ok {
 		return nil, ok
-	***REMOVED***
+	}
 	return set.ToSlice(), ok
-***REMOVED***
+}
 
-func (s *setMatrix) Contains(key string, value interface***REMOVED******REMOVED***) (bool, bool) ***REMOVED***
+func (s *setMatrix) Contains(key string, value interface{}) (bool, bool) {
 	s.Lock()
 	defer s.Unlock()
 	set, ok := s.matrix[key]
-	if !ok ***REMOVED***
+	if !ok {
 		return false, ok
-	***REMOVED***
+	}
 	return set.Contains(value), ok
-***REMOVED***
+}
 
-func (s *setMatrix) Insert(key string, value interface***REMOVED******REMOVED***) (bool, int) ***REMOVED***
+func (s *setMatrix) Insert(key string, value interface{}) (bool, int) {
 	s.Lock()
 	defer s.Unlock()
 	set, ok := s.matrix[key]
-	if !ok ***REMOVED***
+	if !ok {
 		s.matrix[key] = mapset.NewSet()
 		s.matrix[key].Add(value)
 		return true, 1
-	***REMOVED***
+	}
 
 	return set.Add(value), set.Cardinality()
-***REMOVED***
+}
 
-func (s *setMatrix) Remove(key string, value interface***REMOVED******REMOVED***) (bool, int) ***REMOVED***
+func (s *setMatrix) Remove(key string, value interface{}) (bool, int) {
 	s.Lock()
 	defer s.Unlock()
 	set, ok := s.matrix[key]
-	if !ok ***REMOVED***
+	if !ok {
 		return false, 0
-	***REMOVED***
+	}
 
 	var removed bool
-	if set.Contains(value) ***REMOVED***
+	if set.Contains(value) {
 		set.Remove(value)
 		removed = true
 		// If the set is empty remove it from the matrix
-		if set.Cardinality() == 0 ***REMOVED***
+		if set.Cardinality() == 0 {
 			delete(s.matrix, key)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return removed, set.Cardinality()
-***REMOVED***
+}
 
-func (s *setMatrix) Cardinality(key string) (int, bool) ***REMOVED***
+func (s *setMatrix) Cardinality(key string) (int, bool) {
 	s.Lock()
 	defer s.Unlock()
 	set, ok := s.matrix[key]
-	if !ok ***REMOVED***
+	if !ok {
 		return 0, ok
-	***REMOVED***
+	}
 
 	return set.Cardinality(), ok
-***REMOVED***
+}
 
-func (s *setMatrix) String(key string) (string, bool) ***REMOVED***
+func (s *setMatrix) String(key string) (string, bool) {
 	s.Lock()
 	defer s.Unlock()
 	set, ok := s.matrix[key]
-	if !ok ***REMOVED***
+	if !ok {
 		return "", ok
-	***REMOVED***
+	}
 	return set.String(), ok
-***REMOVED***
+}
 
-func (s *setMatrix) Keys() []string ***REMOVED***
+func (s *setMatrix) Keys() []string {
 	s.Lock()
 	defer s.Unlock()
 	keys := make([]string, 0, len(s.matrix))
-	for k := range s.matrix ***REMOVED***
+	for k := range s.matrix {
 		keys = append(keys, k)
-	***REMOVED***
+	}
 	return keys
-***REMOVED***
+}

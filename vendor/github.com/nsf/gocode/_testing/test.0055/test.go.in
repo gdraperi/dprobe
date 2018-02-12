@@ -1,21 +1,21 @@
 package main
 
-type Baz struct ***REMOVED***
+type Baz struct {
 	Jim string
 	John string
 	Kim string
-***REMOVED***
+}
 
-type FooBar struct ***REMOVED***
+type FooBar struct {
 	A int
 	B int
 	C float64
-***REMOVED***
+}
 
-func (b *FooBar) Foobarer() Baz ***REMOVED*** return Baz***REMOVED******REMOVED*** ***REMOVED***
+func (b *FooBar) Foobarer() Baz { return Baz{} }
 
-func main() ***REMOVED***
+func main() {
 	type Bar = FooBar
 	var b Bar
 	b.Foobarer().
-***REMOVED***
+}

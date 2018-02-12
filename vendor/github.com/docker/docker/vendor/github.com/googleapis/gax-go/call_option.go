@@ -39,61 +39,61 @@ import (
 
 // CallOption is an option used by Invoke to control behaviors of RPC calls.
 // CallOption works by modifying relevant fields of CallSettings.
-type CallOption interface ***REMOVED***
+type CallOption interface {
 	// Resolve applies the option by modifying cs.
 	Resolve(cs *CallSettings)
-***REMOVED***
+}
 
 // Retryer is used by Invoke to determine retry behavior.
-type Retryer interface ***REMOVED***
+type Retryer interface {
 	// Retry reports whether a request should be retriedand how long to pause before retrying
 	// if the previous attempt returned with err. Invoke never calls Retry with nil error.
 	Retry(err error) (pause time.Duration, shouldRetry bool)
-***REMOVED***
+}
 
 type retryerOption func() Retryer
 
-func (o retryerOption) Resolve(s *CallSettings) ***REMOVED***
+func (o retryerOption) Resolve(s *CallSettings) {
 	s.Retry = o
-***REMOVED***
+}
 
 // WithRetry sets CallSettings.Retry to fn.
-func WithRetry(fn func() Retryer) CallOption ***REMOVED***
+func WithRetry(fn func() Retryer) CallOption {
 	return retryerOption(fn)
-***REMOVED***
+}
 
 // OnCodes returns a Retryer that retries if and only if
 // the previous attempt returns a GRPC error whose error code is stored in cc.
 // Pause times between retries are specified by bo.
 //
 // bo is only used for its parameters; each Retryer has its own copy.
-func OnCodes(cc []codes.Code, bo Backoff) Retryer ***REMOVED***
-	return &boRetryer***REMOVED***
+func OnCodes(cc []codes.Code, bo Backoff) Retryer {
+	return &boRetryer{
 		backoff: bo,
 		codes:   append([]codes.Code(nil), cc...),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type boRetryer struct ***REMOVED***
+type boRetryer struct {
 	backoff Backoff
 	codes   []codes.Code
-***REMOVED***
+}
 
-func (r *boRetryer) Retry(err error) (time.Duration, bool) ***REMOVED***
+func (r *boRetryer) Retry(err error) (time.Duration, bool) {
 	c := grpc.Code(err)
-	for _, rc := range r.codes ***REMOVED***
-		if c == rc ***REMOVED***
+	for _, rc := range r.codes {
+		if c == rc {
 			return r.backoff.Pause(), true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return 0, false
-***REMOVED***
+}
 
 // Backoff implements exponential backoff.
 // The wait time between retries is a random value between 0 and the "retry envelope".
 // The envelope starts at Initial and increases by the factor of Multiplier every retry,
 // but is capped at Max.
-type Backoff struct ***REMOVED***
+type Backoff struct {
 	// Initial is the initial value of the retry envelope, defaults to 1 second.
 	Initial time.Duration
 
@@ -106,31 +106,31 @@ type Backoff struct ***REMOVED***
 
 	// cur is the current retry envelope
 	cur time.Duration
-***REMOVED***
+}
 
-func (bo *Backoff) Pause() time.Duration ***REMOVED***
-	if bo.Initial == 0 ***REMOVED***
+func (bo *Backoff) Pause() time.Duration {
+	if bo.Initial == 0 {
 		bo.Initial = time.Second
-	***REMOVED***
-	if bo.cur == 0 ***REMOVED***
+	}
+	if bo.cur == 0 {
 		bo.cur = bo.Initial
-	***REMOVED***
-	if bo.Max == 0 ***REMOVED***
+	}
+	if bo.Max == 0 {
 		bo.Max = 30 * time.Second
-	***REMOVED***
-	if bo.Multiplier < 1 ***REMOVED***
+	}
+	if bo.Multiplier < 1 {
 		bo.Multiplier = 2
-	***REMOVED***
+	}
 	d := time.Duration(rand.Int63n(int64(bo.cur)))
 	bo.cur = time.Duration(float64(bo.cur) * bo.Multiplier)
-	if bo.cur > bo.Max ***REMOVED***
+	if bo.cur > bo.Max {
 		bo.cur = bo.Max
-	***REMOVED***
+	}
 	return d
-***REMOVED***
+}
 
-type CallSettings struct ***REMOVED***
+type CallSettings struct {
 	// Retry returns a Retryer to be used to control retry logic of a method call.
 	// If Retry is nil or the returned Retryer is nil, the call will not be retried.
 	Retry func() Retryer
-***REMOVED***
+}

@@ -6,10 +6,10 @@
 
 package argon2
 
-func processBlock(out, in1, in2 *block) ***REMOVED***
+func processBlock(out, in1, in2 *block) {
 	processBlockGeneric(out, in1, in2, false)
-***REMOVED***
+}
 
-func processBlockXOR(out, in1, in2 *block) ***REMOVED***
+func processBlockXOR(out, in1, in2 *block) {
 	processBlockGeneric(out, in1, in2, true)
-***REMOVED***
+}

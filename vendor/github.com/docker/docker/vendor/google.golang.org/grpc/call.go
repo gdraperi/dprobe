@@ -52,159 +52,159 @@ import (
 //
 // TODO(zhaoq): Check whether the received message sequence is valid.
 // TODO ctx is used for stats collection and processing. It is the context passed from the application.
-func recvResponse(ctx context.Context, dopts dialOptions, t transport.ClientTransport, c *callInfo, stream *transport.Stream, reply interface***REMOVED******REMOVED***) (err error) ***REMOVED***
+func recvResponse(ctx context.Context, dopts dialOptions, t transport.ClientTransport, c *callInfo, stream *transport.Stream, reply interface{}) (err error) {
 	// Try to acquire header metadata from the server if there is any.
-	defer func() ***REMOVED***
-		if err != nil ***REMOVED***
-			if _, ok := err.(transport.ConnectionError); !ok ***REMOVED***
+	defer func() {
+		if err != nil {
+			if _, ok := err.(transport.ConnectionError); !ok {
 				t.CloseStream(stream, err)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***()
+			}
+		}
+	}()
 	c.headerMD, err = stream.Header()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
-	p := &parser***REMOVED***r: stream***REMOVED***
+	}
+	p := &parser{r: stream}
 	var inPayload *stats.InPayload
-	if dopts.copts.StatsHandler != nil ***REMOVED***
-		inPayload = &stats.InPayload***REMOVED***
+	if dopts.copts.StatsHandler != nil {
+		inPayload = &stats.InPayload{
 			Client: true,
-		***REMOVED***
-	***REMOVED***
-	for ***REMOVED***
-		if err = recv(p, dopts.codec, stream, dopts.dc, reply, dopts.maxMsgSize, inPayload); err != nil ***REMOVED***
-			if err == io.EOF ***REMOVED***
+		}
+	}
+	for {
+		if err = recv(p, dopts.codec, stream, dopts.dc, reply, dopts.maxMsgSize, inPayload); err != nil {
+			if err == io.EOF {
 				break
-			***REMOVED***
+			}
 			return
-		***REMOVED***
-	***REMOVED***
-	if inPayload != nil && err == io.EOF && stream.Status().Code() == codes.OK ***REMOVED***
+		}
+	}
+	if inPayload != nil && err == io.EOF && stream.Status().Code() == codes.OK {
 		// TODO in the current implementation, inTrailer may be handled before inPayload in some cases.
 		// Fix the order if necessary.
 		dopts.copts.StatsHandler.HandleRPC(ctx, inPayload)
-	***REMOVED***
+	}
 	c.trailerMD = stream.Trailer()
-	if peer, ok := peer.FromContext(stream.Context()); ok ***REMOVED***
+	if peer, ok := peer.FromContext(stream.Context()); ok {
 		c.peer = peer
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // sendRequest writes out various information of an RPC such as Context and Message.
-func sendRequest(ctx context.Context, dopts dialOptions, compressor Compressor, callHdr *transport.CallHdr, stream *transport.Stream, t transport.ClientTransport, args interface***REMOVED******REMOVED***, opts *transport.Options) (err error) ***REMOVED***
-	defer func() ***REMOVED***
-		if err != nil ***REMOVED***
+func sendRequest(ctx context.Context, dopts dialOptions, compressor Compressor, callHdr *transport.CallHdr, stream *transport.Stream, t transport.ClientTransport, args interface{}, opts *transport.Options) (err error) {
+	defer func() {
+		if err != nil {
 			// If err is connection error, t will be closed, no need to close stream here.
-			if _, ok := err.(transport.ConnectionError); !ok ***REMOVED***
+			if _, ok := err.(transport.ConnectionError); !ok {
 				t.CloseStream(stream, err)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***()
+			}
+		}
+	}()
 	var (
 		cbuf       *bytes.Buffer
 		outPayload *stats.OutPayload
 	)
-	if compressor != nil ***REMOVED***
+	if compressor != nil {
 		cbuf = new(bytes.Buffer)
-	***REMOVED***
-	if dopts.copts.StatsHandler != nil ***REMOVED***
-		outPayload = &stats.OutPayload***REMOVED***
+	}
+	if dopts.copts.StatsHandler != nil {
+		outPayload = &stats.OutPayload{
 			Client: true,
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	outBuf, err := encode(dopts.codec, args, compressor, cbuf, outPayload)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return Errorf(codes.Internal, "grpc: %v", err)
-	***REMOVED***
+	}
 	err = t.Write(stream, outBuf, opts)
-	if err == nil && outPayload != nil ***REMOVED***
+	if err == nil && outPayload != nil {
 		outPayload.SentTime = time.Now()
 		dopts.copts.StatsHandler.HandleRPC(ctx, outPayload)
-	***REMOVED***
+	}
 	// t.NewStream(...) could lead to an early rejection of the RPC (e.g., the service/method
 	// does not exist.) so that t.Write could get io.EOF from wait(...). Leave the following
 	// recvResponse to get the final status.
-	if err != nil && err != io.EOF ***REMOVED***
+	if err != nil && err != io.EOF {
 		return err
-	***REMOVED***
+	}
 	// Sent successfully.
 	return nil
-***REMOVED***
+}
 
 // Invoke sends the RPC request on the wire and returns after response is received.
 // Invoke is called by generated code. Also users can call Invoke directly when it
 // is really needed in their use cases.
-func Invoke(ctx context.Context, method string, args, reply interface***REMOVED******REMOVED***, cc *ClientConn, opts ...CallOption) error ***REMOVED***
-	if cc.dopts.unaryInt != nil ***REMOVED***
+func Invoke(ctx context.Context, method string, args, reply interface{}, cc *ClientConn, opts ...CallOption) error {
+	if cc.dopts.unaryInt != nil {
 		return cc.dopts.unaryInt(ctx, method, args, reply, cc, invoke, opts...)
-	***REMOVED***
+	}
 	return invoke(ctx, method, args, reply, cc, opts...)
-***REMOVED***
+}
 
-func invoke(ctx context.Context, method string, args, reply interface***REMOVED******REMOVED***, cc *ClientConn, opts ...CallOption) (e error) ***REMOVED***
+func invoke(ctx context.Context, method string, args, reply interface{}, cc *ClientConn, opts ...CallOption) (e error) {
 	c := defaultCallInfo
-	if mc, ok := cc.getMethodConfig(method); ok ***REMOVED***
+	if mc, ok := cc.getMethodConfig(method); ok {
 		c.failFast = !mc.WaitForReady
-		if mc.Timeout > 0 ***REMOVED***
+		if mc.Timeout > 0 {
 			var cancel context.CancelFunc
 			ctx, cancel = context.WithTimeout(ctx, mc.Timeout)
 			defer cancel()
-		***REMOVED***
-	***REMOVED***
-	for _, o := range opts ***REMOVED***
-		if err := o.before(&c); err != nil ***REMOVED***
+		}
+	}
+	for _, o := range opts {
+		if err := o.before(&c); err != nil {
 			return toRPCErr(err)
-		***REMOVED***
-	***REMOVED***
-	defer func() ***REMOVED***
-		for _, o := range opts ***REMOVED***
+		}
+	}
+	defer func() {
+		for _, o := range opts {
 			o.after(&c)
-		***REMOVED***
-	***REMOVED***()
-	if EnableTracing ***REMOVED***
+		}
+	}()
+	if EnableTracing {
 		c.traceInfo.tr = trace.New("grpc.Sent."+methodFamily(method), method)
 		defer c.traceInfo.tr.Finish()
 		c.traceInfo.firstLine.client = true
-		if deadline, ok := ctx.Deadline(); ok ***REMOVED***
+		if deadline, ok := ctx.Deadline(); ok {
 			c.traceInfo.firstLine.deadline = deadline.Sub(time.Now())
-		***REMOVED***
+		}
 		c.traceInfo.tr.LazyLog(&c.traceInfo.firstLine, false)
 		// TODO(dsymonds): Arrange for c.traceInfo.firstLine.remoteAddr to be set.
-		defer func() ***REMOVED***
-			if e != nil ***REMOVED***
-				c.traceInfo.tr.LazyLog(&fmtStringer***REMOVED***"%v", []interface***REMOVED******REMOVED******REMOVED***e***REMOVED******REMOVED***, true)
+		defer func() {
+			if e != nil {
+				c.traceInfo.tr.LazyLog(&fmtStringer{"%v", []interface{}{e}}, true)
 				c.traceInfo.tr.SetError()
-			***REMOVED***
-		***REMOVED***()
-	***REMOVED***
+			}
+		}()
+	}
 	ctx = newContextWithRPCInfo(ctx)
 	sh := cc.dopts.copts.StatsHandler
-	if sh != nil ***REMOVED***
-		ctx = sh.TagRPC(ctx, &stats.RPCTagInfo***REMOVED***FullMethodName: method***REMOVED***)
-		begin := &stats.Begin***REMOVED***
+	if sh != nil {
+		ctx = sh.TagRPC(ctx, &stats.RPCTagInfo{FullMethodName: method})
+		begin := &stats.Begin{
 			Client:    true,
 			BeginTime: time.Now(),
 			FailFast:  c.failFast,
-		***REMOVED***
+		}
 		sh.HandleRPC(ctx, begin)
-	***REMOVED***
-	defer func() ***REMOVED***
-		if sh != nil ***REMOVED***
-			end := &stats.End***REMOVED***
+	}
+	defer func() {
+		if sh != nil {
+			end := &stats.End{
 				Client:  true,
 				EndTime: time.Now(),
 				Error:   e,
-			***REMOVED***
+			}
 			sh.HandleRPC(ctx, end)
-		***REMOVED***
-	***REMOVED***()
-	topts := &transport.Options***REMOVED***
+		}
+	}()
+	topts := &transport.Options{
 		Last:  true,
 		Delay: false,
-	***REMOVED***
-	for ***REMOVED***
+	}
+	for {
 		var (
 			err    error
 			t      transport.ClientTransport
@@ -214,93 +214,93 @@ func invoke(ctx context.Context, method string, args, reply interface***REMOVED*
 			put func()
 		)
 		// TODO(zhaoq): Need a formal spec of fail-fast.
-		callHdr := &transport.CallHdr***REMOVED***
+		callHdr := &transport.CallHdr{
 			Host:   cc.authority,
 			Method: method,
-		***REMOVED***
-		if cc.dopts.cp != nil ***REMOVED***
+		}
+		if cc.dopts.cp != nil {
 			callHdr.SendCompress = cc.dopts.cp.Type()
-		***REMOVED***
+		}
 
-		gopts := BalancerGetOptions***REMOVED***
+		gopts := BalancerGetOptions{
 			BlockingWait: !c.failFast,
-		***REMOVED***
+		}
 		t, put, err = cc.getTransport(ctx, gopts)
-		if err != nil ***REMOVED***
+		if err != nil {
 			// TODO(zhaoq): Probably revisit the error handling.
-			if _, ok := status.FromError(err); ok ***REMOVED***
+			if _, ok := status.FromError(err); ok {
 				return err
-			***REMOVED***
-			if err == errConnClosing || err == errConnUnavailable ***REMOVED***
-				if c.failFast ***REMOVED***
+			}
+			if err == errConnClosing || err == errConnUnavailable {
+				if c.failFast {
 					return Errorf(codes.Unavailable, "%v", err)
-				***REMOVED***
+				}
 				continue
-			***REMOVED***
+			}
 			// All the other errors are treated as Internal errors.
 			return Errorf(codes.Internal, "%v", err)
-		***REMOVED***
-		if c.traceInfo.tr != nil ***REMOVED***
-			c.traceInfo.tr.LazyLog(&payload***REMOVED***sent: true, msg: args***REMOVED***, true)
-		***REMOVED***
+		}
+		if c.traceInfo.tr != nil {
+			c.traceInfo.tr.LazyLog(&payload{sent: true, msg: args}, true)
+		}
 		stream, err = t.NewStream(ctx, callHdr)
-		if err != nil ***REMOVED***
-			if put != nil ***REMOVED***
-				if _, ok := err.(transport.ConnectionError); ok ***REMOVED***
+		if err != nil {
+			if put != nil {
+				if _, ok := err.(transport.ConnectionError); ok {
 					// If error is connection error, transport was sending data on wire,
 					// and we are not sure if anything has been sent on wire.
 					// If error is not connection error, we are sure nothing has been sent.
-					updateRPCInfoInContext(ctx, rpcInfo***REMOVED***bytesSent: true, bytesReceived: false***REMOVED***)
-				***REMOVED***
+					updateRPCInfoInContext(ctx, rpcInfo{bytesSent: true, bytesReceived: false})
+				}
 				put()
-			***REMOVED***
-			if _, ok := err.(transport.ConnectionError); (ok || err == transport.ErrStreamDrain) && !c.failFast ***REMOVED***
+			}
+			if _, ok := err.(transport.ConnectionError); (ok || err == transport.ErrStreamDrain) && !c.failFast {
 				continue
-			***REMOVED***
+			}
 			return toRPCErr(err)
-		***REMOVED***
+		}
 		err = sendRequest(ctx, cc.dopts, cc.dopts.cp, callHdr, stream, t, args, topts)
-		if err != nil ***REMOVED***
-			if put != nil ***REMOVED***
-				updateRPCInfoInContext(ctx, rpcInfo***REMOVED***
+		if err != nil {
+			if put != nil {
+				updateRPCInfoInContext(ctx, rpcInfo{
 					bytesSent:     stream.BytesSent(),
 					bytesReceived: stream.BytesReceived(),
-				***REMOVED***)
+				})
 				put()
-			***REMOVED***
+			}
 			// Retry a non-failfast RPC when
 			// i) there is a connection error; or
 			// ii) the server started to drain before this RPC was initiated.
-			if _, ok := err.(transport.ConnectionError); (ok || err == transport.ErrStreamDrain) && !c.failFast ***REMOVED***
+			if _, ok := err.(transport.ConnectionError); (ok || err == transport.ErrStreamDrain) && !c.failFast {
 				continue
-			***REMOVED***
+			}
 			return toRPCErr(err)
-		***REMOVED***
+		}
 		err = recvResponse(ctx, cc.dopts, t, &c, stream, reply)
-		if err != nil ***REMOVED***
-			if put != nil ***REMOVED***
-				updateRPCInfoInContext(ctx, rpcInfo***REMOVED***
+		if err != nil {
+			if put != nil {
+				updateRPCInfoInContext(ctx, rpcInfo{
 					bytesSent:     stream.BytesSent(),
 					bytesReceived: stream.BytesReceived(),
-				***REMOVED***)
+				})
 				put()
-			***REMOVED***
-			if _, ok := err.(transport.ConnectionError); (ok || err == transport.ErrStreamDrain) && !c.failFast ***REMOVED***
+			}
+			if _, ok := err.(transport.ConnectionError); (ok || err == transport.ErrStreamDrain) && !c.failFast {
 				continue
-			***REMOVED***
+			}
 			return toRPCErr(err)
-		***REMOVED***
-		if c.traceInfo.tr != nil ***REMOVED***
-			c.traceInfo.tr.LazyLog(&payload***REMOVED***sent: false, msg: reply***REMOVED***, true)
-		***REMOVED***
+		}
+		if c.traceInfo.tr != nil {
+			c.traceInfo.tr.LazyLog(&payload{sent: false, msg: reply}, true)
+		}
 		t.CloseStream(stream, nil)
-		if put != nil ***REMOVED***
-			updateRPCInfoInContext(ctx, rpcInfo***REMOVED***
+		if put != nil {
+			updateRPCInfoInContext(ctx, rpcInfo{
 				bytesSent:     stream.BytesSent(),
 				bytesReceived: stream.BytesReceived(),
-			***REMOVED***)
+			})
 			put()
-		***REMOVED***
+		}
 		return stream.Status().Err()
-	***REMOVED***
-***REMOVED***
+	}
+}

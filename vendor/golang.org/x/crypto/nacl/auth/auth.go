@@ -37,22 +37,22 @@ const (
 
 // Sum generates an authenticator for m using a secret key and returns the
 // 32-byte digest.
-func Sum(m []byte, key *[KeySize]byte) *[Size]byte ***REMOVED***
+func Sum(m []byte, key *[KeySize]byte) *[Size]byte {
 	mac := hmac.New(sha512.New, key[:])
 	mac.Write(m)
 	out := new([KeySize]byte)
 	copy(out[:], mac.Sum(nil)[:Size])
 	return out
-***REMOVED***
+}
 
 // Verify checks that digest is a valid authenticator of message m under the
 // given secret key. Verify does not leak timing information.
-func Verify(digest []byte, m []byte, key *[KeySize]byte) bool ***REMOVED***
-	if len(digest) != Size ***REMOVED***
+func Verify(digest []byte, m []byte, key *[KeySize]byte) bool {
+	if len(digest) != Size {
 		return false
-	***REMOVED***
+	}
 	mac := hmac.New(sha512.New, key[:])
 	mac.Write(m)
 	expectedMAC := mac.Sum(nil) // first 256 bits of 512-bit sum
 	return hmac.Equal(digest, expectedMAC[:Size])
-***REMOVED***
+}

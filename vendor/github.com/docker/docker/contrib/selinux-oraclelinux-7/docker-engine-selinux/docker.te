@@ -63,9 +63,9 @@ files_type(docker_share_t)
 #
 # docker local policy
 #
-allow docker_t self:capability ***REMOVED*** chown kill fowner fsetid mknod net_admin net_bind_service net_raw setfcap ***REMOVED***;
+allow docker_t self:capability { chown kill fowner fsetid mknod net_admin net_bind_service net_raw setfcap };
 allow docker_t self:tun_socket relabelto;
-allow docker_t self:process ***REMOVED*** getattr signal_perms setrlimit setfscreate ***REMOVED***;
+allow docker_t self:process { getattr signal_perms setrlimit setfscreate };
 allow docker_t self:fifo_file rw_fifo_file_perms;
 allow docker_t self:unix_stream_socket create_stream_socket_perms;
 allow docker_t self:tcp_socket create_stream_socket_perms;
@@ -87,13 +87,13 @@ manage_files_pattern(docker_t, docker_lock_t, docker_lock_t)
 manage_dirs_pattern(docker_t, docker_log_t, docker_log_t)
 manage_files_pattern(docker_t, docker_log_t, docker_log_t)
 manage_lnk_files_pattern(docker_t, docker_log_t, docker_log_t)
-logging_log_filetrans(docker_t, docker_log_t, ***REMOVED*** dir file lnk_file ***REMOVED***)
-allow docker_t docker_log_t:dir_file_class_set ***REMOVED*** relabelfrom relabelto ***REMOVED***;
+logging_log_filetrans(docker_t, docker_log_t, { dir file lnk_file })
+allow docker_t docker_log_t:dir_file_class_set { relabelfrom relabelto };
 
 manage_dirs_pattern(docker_t, docker_tmp_t, docker_tmp_t)
 manage_files_pattern(docker_t, docker_tmp_t, docker_tmp_t)
 manage_lnk_files_pattern(docker_t, docker_tmp_t, docker_tmp_t)
-files_tmp_filetrans(docker_t, docker_tmp_t, ***REMOVED*** dir file lnk_file ***REMOVED***)
+files_tmp_filetrans(docker_t, docker_tmp_t, { dir file lnk_file })
 
 manage_dirs_pattern(docker_t, docker_tmpfs_t, docker_tmpfs_t)
 manage_files_pattern(docker_t, docker_tmpfs_t, docker_tmpfs_t)
@@ -103,13 +103,13 @@ manage_chr_files_pattern(docker_t, docker_tmpfs_t, docker_tmpfs_t)
 manage_blk_files_pattern(docker_t, docker_tmpfs_t, docker_tmpfs_t)
 allow docker_t docker_tmpfs_t:dir relabelfrom;
 can_exec(docker_t, docker_tmpfs_t)
-fs_tmpfs_filetrans(docker_t, docker_tmpfs_t, ***REMOVED*** dir file ***REMOVED***)
+fs_tmpfs_filetrans(docker_t, docker_tmpfs_t, { dir file })
 allow docker_t docker_tmpfs_t:chr_file mounton;
 
 manage_dirs_pattern(docker_t, docker_share_t, docker_share_t)
 manage_files_pattern(docker_t, docker_share_t, docker_share_t)
 manage_lnk_files_pattern(docker_t, docker_share_t, docker_share_t)
-allow docker_t docker_share_t:dir_file_class_set ***REMOVED*** relabelfrom relabelto ***REMOVED***;
+allow docker_t docker_share_t:dir_file_class_set { relabelfrom relabelto };
 
 can_exec(docker_t, docker_share_t)
 #docker_filetrans_named_content(docker_t)
@@ -119,16 +119,16 @@ manage_chr_files_pattern(docker_t, docker_var_lib_t, docker_var_lib_t)
 manage_blk_files_pattern(docker_t, docker_var_lib_t, docker_var_lib_t)
 manage_files_pattern(docker_t, docker_var_lib_t, docker_var_lib_t)
 manage_lnk_files_pattern(docker_t, docker_var_lib_t, docker_var_lib_t)
-allow docker_t docker_var_lib_t:dir_file_class_set ***REMOVED*** relabelfrom relabelto ***REMOVED***;
-files_var_lib_filetrans(docker_t, docker_var_lib_t, ***REMOVED*** dir file lnk_file ***REMOVED***)
+allow docker_t docker_var_lib_t:dir_file_class_set { relabelfrom relabelto };
+files_var_lib_filetrans(docker_t, docker_var_lib_t, { dir file lnk_file })
 
 manage_dirs_pattern(docker_t, docker_var_run_t, docker_var_run_t)
 manage_files_pattern(docker_t, docker_var_run_t, docker_var_run_t)
 manage_sock_files_pattern(docker_t, docker_var_run_t, docker_var_run_t)
 manage_lnk_files_pattern(docker_t, docker_var_run_t, docker_var_run_t)
-files_pid_filetrans(docker_t, docker_var_run_t, ***REMOVED*** dir file lnk_file sock_file ***REMOVED***)
+files_pid_filetrans(docker_t, docker_var_run_t, { dir file lnk_file sock_file })
 
-allow docker_t docker_devpts_t:chr_file ***REMOVED*** relabelfrom rw_chr_file_perms setattr_chr_file_perms ***REMOVED***;
+allow docker_t docker_devpts_t:chr_file { relabelfrom rw_chr_file_perms setattr_chr_file_perms };
 term_create_pty(docker_t, docker_devpts_t)
 
 kernel_read_system_state(docker_t)
@@ -205,14 +205,14 @@ optional_policy(`
 	openvswitch_stream_connect(docker_t)
 ')
 
-allow docker_t self:capability ***REMOVED*** dac_override setgid setpcap setuid sys_admin sys_boot sys_chroot sys_ptrace ***REMOVED***;
+allow docker_t self:capability { dac_override setgid setpcap setuid sys_admin sys_boot sys_chroot sys_ptrace };
 
-allow docker_t self:process ***REMOVED*** getcap setcap setexec setpgid setsched signal_perms ***REMOVED***;
+allow docker_t self:process { getcap setcap setexec setpgid setsched signal_perms };
 
 allow docker_t self:netlink_route_socket rw_netlink_socket_perms;;
 allow docker_t self:netlink_audit_socket create_netlink_socket_perms;
-allow docker_t self:unix_dgram_socket ***REMOVED*** create_socket_perms sendto ***REMOVED***;
-allow docker_t self:unix_stream_socket ***REMOVED*** create_stream_socket_perms connectto ***REMOVED***;
+allow docker_t self:unix_dgram_socket { create_socket_perms sendto };
+allow docker_t self:unix_stream_socket { create_stream_socket_perms connectto };
 
 allow docker_t docker_var_lib_t:dir mounton;
 allow docker_t docker_var_lib_t:chr_file mounton;
@@ -329,9 +329,9 @@ domain_entry_file(spc_t, docker_share_t)
 domain_entry_file(spc_t, docker_var_lib_t)
 domtrans_pattern(docker_t, docker_share_t, spc_t)
 domtrans_pattern(docker_t, docker_var_lib_t, spc_t)
-allow docker_t spc_t:process ***REMOVED*** setsched signal_perms ***REMOVED***;
+allow docker_t spc_t:process { setsched signal_perms };
 ps_process_pattern(docker_t, spc_t)
-allow docker_t spc_t:socket_class_set ***REMOVED*** relabelto relabelfrom ***REMOVED***;
+allow docker_t spc_t:socket_class_set { relabelto relabelfrom };
 
 optional_policy(`
 	dbus_chat_system_bus(spc_t)
@@ -396,7 +396,7 @@ optional_policy(`
         attribute domain;
      ')
 
-     dontaudit svirt_sandbox_domain domain:key ***REMOVED***search link***REMOVED***;
+     dontaudit svirt_sandbox_domain domain:key {search link};
 ')
 
 optional_policy(`

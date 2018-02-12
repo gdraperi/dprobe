@@ -20,7 +20,7 @@ import pb "github.com/coreos/etcd/raft/raftpb"
 // Note that unstable.offset may be less than the highest log
 // position in storage; this means that the next write to storage
 // might need to truncate the log before persisting unstable.entries.
-type unstable struct ***REMOVED***
+type unstable struct {
 	// the incoming unstable snapshot, if any.
 	snapshot *pb.Snapshot
 	// all entries that have not yet been written to storage.
@@ -28,101 +28,101 @@ type unstable struct ***REMOVED***
 	offset  uint64
 
 	logger Logger
-***REMOVED***
+}
 
 // maybeFirstIndex returns the index of the first possible entry in entries
 // if it has a snapshot.
-func (u *unstable) maybeFirstIndex() (uint64, bool) ***REMOVED***
-	if u.snapshot != nil ***REMOVED***
+func (u *unstable) maybeFirstIndex() (uint64, bool) {
+	if u.snapshot != nil {
 		return u.snapshot.Metadata.Index + 1, true
-	***REMOVED***
+	}
 	return 0, false
-***REMOVED***
+}
 
 // maybeLastIndex returns the last index if it has at least one
 // unstable entry or snapshot.
-func (u *unstable) maybeLastIndex() (uint64, bool) ***REMOVED***
-	if l := len(u.entries); l != 0 ***REMOVED***
+func (u *unstable) maybeLastIndex() (uint64, bool) {
+	if l := len(u.entries); l != 0 {
 		return u.offset + uint64(l) - 1, true
-	***REMOVED***
-	if u.snapshot != nil ***REMOVED***
+	}
+	if u.snapshot != nil {
 		return u.snapshot.Metadata.Index, true
-	***REMOVED***
+	}
 	return 0, false
-***REMOVED***
+}
 
 // maybeTerm returns the term of the entry at index i, if there
 // is any.
-func (u *unstable) maybeTerm(i uint64) (uint64, bool) ***REMOVED***
-	if i < u.offset ***REMOVED***
-		if u.snapshot == nil ***REMOVED***
+func (u *unstable) maybeTerm(i uint64) (uint64, bool) {
+	if i < u.offset {
+		if u.snapshot == nil {
 			return 0, false
-		***REMOVED***
-		if u.snapshot.Metadata.Index == i ***REMOVED***
+		}
+		if u.snapshot.Metadata.Index == i {
 			return u.snapshot.Metadata.Term, true
-		***REMOVED***
+		}
 		return 0, false
-	***REMOVED***
+	}
 
 	last, ok := u.maybeLastIndex()
-	if !ok ***REMOVED***
+	if !ok {
 		return 0, false
-	***REMOVED***
-	if i > last ***REMOVED***
+	}
+	if i > last {
 		return 0, false
-	***REMOVED***
+	}
 	return u.entries[i-u.offset].Term, true
-***REMOVED***
+}
 
-func (u *unstable) stableTo(i, t uint64) ***REMOVED***
+func (u *unstable) stableTo(i, t uint64) {
 	gt, ok := u.maybeTerm(i)
-	if !ok ***REMOVED***
+	if !ok {
 		return
-	***REMOVED***
+	}
 	// if i < offset, term is matched with the snapshot
 	// only update the unstable entries if term is matched with
 	// an unstable entry.
-	if gt == t && i >= u.offset ***REMOVED***
+	if gt == t && i >= u.offset {
 		u.entries = u.entries[i+1-u.offset:]
 		u.offset = i + 1
 		u.shrinkEntriesArray()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // shrinkEntriesArray discards the underlying array used by the entries slice
 // if most of it isn't being used. This avoids holding references to a bunch of
 // potentially large entries that aren't needed anymore. Simply clearing the
 // entries wouldn't be safe because clients might still be using them.
-func (u *unstable) shrinkEntriesArray() ***REMOVED***
+func (u *unstable) shrinkEntriesArray() {
 	// We replace the array if we're using less than half of the space in
 	// it. This number is fairly arbitrary, chosen as an attempt to balance
 	// memory usage vs number of allocations. It could probably be improved
 	// with some focused tuning.
 	const lenMultiple = 2
-	if len(u.entries) == 0 ***REMOVED***
+	if len(u.entries) == 0 {
 		u.entries = nil
-	***REMOVED*** else if len(u.entries)*lenMultiple < cap(u.entries) ***REMOVED***
+	} else if len(u.entries)*lenMultiple < cap(u.entries) {
 		newEntries := make([]pb.Entry, len(u.entries))
 		copy(newEntries, u.entries)
 		u.entries = newEntries
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (u *unstable) stableSnapTo(i uint64) ***REMOVED***
-	if u.snapshot != nil && u.snapshot.Metadata.Index == i ***REMOVED***
+func (u *unstable) stableSnapTo(i uint64) {
+	if u.snapshot != nil && u.snapshot.Metadata.Index == i {
 		u.snapshot = nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (u *unstable) restore(s pb.Snapshot) ***REMOVED***
+func (u *unstable) restore(s pb.Snapshot) {
 	u.offset = s.Metadata.Index + 1
 	u.entries = nil
 	u.snapshot = &s
-***REMOVED***
+}
 
-func (u *unstable) truncateAndAppend(ents []pb.Entry) ***REMOVED***
+func (u *unstable) truncateAndAppend(ents []pb.Entry) {
 	after := ents[0].Index
-	switch ***REMOVED***
+	switch {
 	case after == u.offset+uint64(len(u.entries)):
 		// after is the next index in the u.entries
 		// directly append
@@ -137,23 +137,23 @@ func (u *unstable) truncateAndAppend(ents []pb.Entry) ***REMOVED***
 		// truncate to after and copy to u.entries
 		// then append
 		u.logger.Infof("truncate the unstable entries before index %d", after)
-		u.entries = append([]pb.Entry***REMOVED******REMOVED***, u.slice(u.offset, after)...)
+		u.entries = append([]pb.Entry{}, u.slice(u.offset, after)...)
 		u.entries = append(u.entries, ents...)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (u *unstable) slice(lo uint64, hi uint64) []pb.Entry ***REMOVED***
+func (u *unstable) slice(lo uint64, hi uint64) []pb.Entry {
 	u.mustCheckOutOfBounds(lo, hi)
 	return u.entries[lo-u.offset : hi-u.offset]
-***REMOVED***
+}
 
 // u.offset <= lo <= hi <= u.offset+len(u.offset)
-func (u *unstable) mustCheckOutOfBounds(lo, hi uint64) ***REMOVED***
-	if lo > hi ***REMOVED***
+func (u *unstable) mustCheckOutOfBounds(lo, hi uint64) {
+	if lo > hi {
 		u.logger.Panicf("invalid unstable.slice %d > %d", lo, hi)
-	***REMOVED***
+	}
 	upper := u.offset + uint64(len(u.entries))
-	if lo < u.offset || hi > upper ***REMOVED***
+	if lo < u.offset || hi > upper {
 		u.logger.Panicf("unstable.slice[%d,%d) out of bound [%d,%d]", lo, hi, u.offset, upper)
-	***REMOVED***
-***REMOVED***
+	}
+}

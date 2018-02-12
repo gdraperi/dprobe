@@ -8,18 +8,18 @@ import (
 	"github.com/docker/docker/pkg/idtools"
 )
 
-func (daemon *Daemon) tarCopyOptions(container *container.Container, noOverwriteDirNonDir bool) (*archive.TarOptions, error) ***REMOVED***
-	if container.Config.User == "" ***REMOVED***
+func (daemon *Daemon) tarCopyOptions(container *container.Container, noOverwriteDirNonDir bool) (*archive.TarOptions, error) {
+	if container.Config.User == "" {
 		return daemon.defaultTarCopyOptions(noOverwriteDirNonDir), nil
-	***REMOVED***
+	}
 
 	user, err := idtools.LookupUser(container.Config.User)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	return &archive.TarOptions***REMOVED***
+	return &archive.TarOptions{
 		NoOverwriteDirNonDir: noOverwriteDirNonDir,
-		ChownOpts:            &idtools.IDPair***REMOVED***UID: user.Uid, GID: user.Gid***REMOVED***,
-	***REMOVED***, nil
-***REMOVED***
+		ChownOpts:            &idtools.IDPair{UID: user.Uid, GID: user.Gid},
+	}, nil
+}

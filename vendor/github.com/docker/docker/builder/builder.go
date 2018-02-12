@@ -23,7 +23,7 @@ const (
 
 // Source defines a location that can be used as a source for the ADD/COPY
 // instructions in the builder.
-type Source interface ***REMOVED***
+type Source interface {
 	// Root returns root path for accessing source
 	Root() containerfs.ContainerFS
 	// Close allows to signal that the filesystem tree won't be used anymore.
@@ -32,10 +32,10 @@ type Source interface ***REMOVED***
 	Close() error
 	// Hash returns a checksum for a file
 	Hash(path string) (string, error)
-***REMOVED***
+}
 
 // Backend abstracts calls to a Docker Daemon.
-type Backend interface ***REMOVED***
+type Backend interface {
 	ImageBackend
 	ExecBackend
 
@@ -47,17 +47,17 @@ type Backend interface ***REMOVED***
 	CreateImage(config []byte, parent string) (Image, error)
 
 	ImageCacheBuilder
-***REMOVED***
+}
 
 // ImageBackend are the interface methods required from an image component
-type ImageBackend interface ***REMOVED***
+type ImageBackend interface {
 	GetImageAndReleasableLayer(ctx context.Context, refOrID string, opts backend.GetImageAndLayerOptions) (Image, ReleaseableLayer, error)
-***REMOVED***
+}
 
 // ExecBackend contains the interface methods required for executing containers
-type ExecBackend interface ***REMOVED***
+type ExecBackend interface {
 	// ContainerAttachRaw attaches to container.
-	ContainerAttachRaw(cID string, stdin io.ReadCloser, stdout, stderr io.Writer, stream bool, attached chan struct***REMOVED******REMOVED***) error
+	ContainerAttachRaw(cID string, stdin io.ReadCloser, stdout, stderr io.Writer, stream bool, attached chan struct{}) error
 	// ContainerCreate creates a new Docker container and returns potential warnings
 	ContainerCreate(config types.ContainerCreateConfig) (container.ContainerCreateCreatedBody, error)
 	// ContainerRm removes a container specified by `id`.
@@ -68,40 +68,40 @@ type ExecBackend interface ***REMOVED***
 	ContainerStart(containerID string, hostConfig *container.HostConfig, checkpoint string, checkpointDir string) error
 	// ContainerWait stops processing until the given container is stopped.
 	ContainerWait(ctx context.Context, name string, condition containerpkg.WaitCondition) (<-chan containerpkg.StateStatus, error)
-***REMOVED***
+}
 
 // Result is the output produced by a Builder
-type Result struct ***REMOVED***
+type Result struct {
 	ImageID   string
 	FromImage Image
-***REMOVED***
+}
 
 // ImageCacheBuilder represents a generator for stateful image cache.
-type ImageCacheBuilder interface ***REMOVED***
+type ImageCacheBuilder interface {
 	// MakeImageCache creates a stateful image cache.
 	MakeImageCache(cacheFrom []string) ImageCache
-***REMOVED***
+}
 
 // ImageCache abstracts an image cache.
 // (parent image, child runconfig) -> child image
-type ImageCache interface ***REMOVED***
+type ImageCache interface {
 	// GetCache returns a reference to a cached image whose parent equals `parent`
 	// and runconfig equals `cfg`. A cache miss is expected to return an empty ID and a nil error.
 	GetCache(parentID string, cfg *container.Config) (imageID string, err error)
-***REMOVED***
+}
 
 // Image represents a Docker image used by the builder.
-type Image interface ***REMOVED***
+type Image interface {
 	ImageID() string
 	RunConfig() *container.Config
 	MarshalJSON() ([]byte, error)
 	OperatingSystem() string
-***REMOVED***
+}
 
 // ReleaseableLayer is an image layer that can be mounted and released
-type ReleaseableLayer interface ***REMOVED***
+type ReleaseableLayer interface {
 	Release() error
 	Mount() (containerfs.ContainerFS, error)
 	Commit() (ReleaseableLayer, error)
 	DiffID() layer.DiffID
-***REMOVED***
+}

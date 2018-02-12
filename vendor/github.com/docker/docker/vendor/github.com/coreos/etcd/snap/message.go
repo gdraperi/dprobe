@@ -29,36 +29,36 @@ import (
 // copying the entire snapshot into a byte array, which consumes a lot of memory.
 //
 // User of Message should close the Message after sending it.
-type Message struct ***REMOVED***
+type Message struct {
 	raftpb.Message
 	ReadCloser io.ReadCloser
 	TotalSize  int64
 	closeC     chan bool
-***REMOVED***
+}
 
-func NewMessage(rs raftpb.Message, rc io.ReadCloser, rcSize int64) *Message ***REMOVED***
-	return &Message***REMOVED***
+func NewMessage(rs raftpb.Message, rc io.ReadCloser, rcSize int64) *Message {
+	return &Message{
 		Message:    rs,
 		ReadCloser: ioutil.NewExactReadCloser(rc, rcSize),
 		TotalSize:  int64(rs.Size()) + rcSize,
 		closeC:     make(chan bool, 1),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // CloseNotify returns a channel that receives a single value
 // when the message sent is finished. true indicates the sent
 // is successful.
-func (m Message) CloseNotify() <-chan bool ***REMOVED***
+func (m Message) CloseNotify() <-chan bool {
 	return m.closeC
-***REMOVED***
+}
 
-func (m Message) CloseWithError(err error) ***REMOVED***
-	if cerr := m.ReadCloser.Close(); cerr != nil ***REMOVED***
+func (m Message) CloseWithError(err error) {
+	if cerr := m.ReadCloser.Close(); cerr != nil {
 		err = cerr
-	***REMOVED***
-	if err == nil ***REMOVED***
+	}
+	if err == nil {
 		m.closeC <- true
-	***REMOVED*** else ***REMOVED***
+	} else {
 		m.closeC <- false
-	***REMOVED***
-***REMOVED***
+	}
+}

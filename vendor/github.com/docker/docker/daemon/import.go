@@ -27,7 +27,7 @@ import (
 // inConfig (if src is "-"), or from a URI specified in src. Progress output is
 // written to outStream. Repository and tag names can optionally be given in
 // the repo and tag arguments, respectively.
-func (daemon *Daemon) ImportImage(src string, repository, os string, tag string, msg string, inConfig io.ReadCloser, outStream io.Writer, changes []string) error ***REMOVED***
+func (daemon *Daemon) ImportImage(src string, repository, os string, tag string, msg string, inConfig io.ReadCloser, outStream io.Writer, changes []string) error {
 	var (
 		rc     io.ReadCloser
 		resp   *http.Response
@@ -35,104 +35,104 @@ func (daemon *Daemon) ImportImage(src string, repository, os string, tag string,
 	)
 
 	// Default the operating system if not supplied.
-	if os == "" ***REMOVED***
+	if os == "" {
 		os = runtime.GOOS
-	***REMOVED***
+	}
 
-	if repository != "" ***REMOVED***
+	if repository != "" {
 		var err error
 		newRef, err = reference.ParseNormalizedNamed(repository)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return errdefs.InvalidParameter(err)
-		***REMOVED***
-		if _, isCanonical := newRef.(reference.Canonical); isCanonical ***REMOVED***
+		}
+		if _, isCanonical := newRef.(reference.Canonical); isCanonical {
 			return errdefs.InvalidParameter(errors.New("cannot import digest reference"))
-		***REMOVED***
+		}
 
-		if tag != "" ***REMOVED***
+		if tag != "" {
 			newRef, err = reference.WithTag(newRef, tag)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return errdefs.InvalidParameter(err)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
-	config, err := dockerfile.BuildFromConfig(&container.Config***REMOVED******REMOVED***, changes, os)
-	if err != nil ***REMOVED***
+	config, err := dockerfile.BuildFromConfig(&container.Config{}, changes, os)
+	if err != nil {
 		return err
-	***REMOVED***
-	if src == "-" ***REMOVED***
+	}
+	if src == "-" {
 		rc = inConfig
-	***REMOVED*** else ***REMOVED***
+	} else {
 		inConfig.Close()
-		if len(strings.Split(src, "://")) == 1 ***REMOVED***
+		if len(strings.Split(src, "://")) == 1 {
 			src = "http://" + src
-		***REMOVED***
+		}
 		u, err := url.Parse(src)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return errdefs.InvalidParameter(err)
-		***REMOVED***
+		}
 
 		resp, err = remotecontext.GetWithStatusError(u.String())
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		outStream.Write(streamformatter.FormatStatus("", "Downloading from %s", u))
 		progressOutput := streamformatter.NewJSONProgressOutput(outStream, true)
 		rc = progress.NewProgressReader(resp.Body, progressOutput, resp.ContentLength, "", "Importing")
-	***REMOVED***
+	}
 
 	defer rc.Close()
-	if len(msg) == 0 ***REMOVED***
+	if len(msg) == 0 {
 		msg = "Imported from " + src
-	***REMOVED***
+	}
 
 	inflatedLayerData, err := archive.DecompressStream(rc)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	l, err := daemon.layerStores[os].Register(inflatedLayerData, "")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer layer.ReleaseAndLog(daemon.layerStores[os], l)
 
 	created := time.Now().UTC()
-	imgConfig, err := json.Marshal(&image.Image***REMOVED***
-		V1Image: image.V1Image***REMOVED***
+	imgConfig, err := json.Marshal(&image.Image{
+		V1Image: image.V1Image{
 			DockerVersion: dockerversion.Version,
 			Config:        config,
 			Architecture:  runtime.GOARCH,
 			OS:            os,
 			Created:       created,
 			Comment:       msg,
-		***REMOVED***,
-		RootFS: &image.RootFS***REMOVED***
+		},
+		RootFS: &image.RootFS{
 			Type:    "layers",
-			DiffIDs: []layer.DiffID***REMOVED***l.DiffID()***REMOVED***,
-		***REMOVED***,
-		History: []image.History***REMOVED******REMOVED***
+			DiffIDs: []layer.DiffID{l.DiffID()},
+		},
+		History: []image.History{{
 			Created: created,
 			Comment: msg,
-		***REMOVED******REMOVED***,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+		}},
+	})
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	id, err := daemon.imageStore.Create(imgConfig)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	// FIXME: connect with commit code and call refstore directly
-	if newRef != nil ***REMOVED***
-		if err := daemon.TagImageWithReference(id, newRef); err != nil ***REMOVED***
+	if newRef != nil {
+		if err := daemon.TagImageWithReference(id, newRef); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	daemon.LogImageEvent(id.String(), id.String(), "import")
 	outStream.Write(streamformatter.FormatStatus("", id.String()))
 	return nil
-***REMOVED***
+}

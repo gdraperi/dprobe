@@ -26,15 +26,15 @@ option go_package = "github.com/containerd/containerd/api/services/containers/v1
 // is invariant of the runtime state of the container. If it has to do with
 // runtime, or changes as the "container" is started and stops, it probably
 // doesn't belong on this object.
-service Containers ***REMOVED***
+service Containers {
 	rpc Get(GetContainerRequest) returns (GetContainerResponse);
 	rpc List(ListContainersRequest) returns (ListContainersResponse);
 	rpc Create(CreateContainerRequest) returns (CreateContainerResponse);
 	rpc Update(UpdateContainerRequest) returns (UpdateContainerResponse);
 	rpc Delete(DeleteContainerRequest) returns (google.protobuf.Empty);
-***REMOVED***
+}
 
-message Container ***REMOVED***
+message Container {
 	// ID is the user-specified identifier.
 	//
 	// This field may not be updated.
@@ -54,12 +54,12 @@ message Container ***REMOVED***
 	// If this field is updated, the spec and rootfs needed to updated, as well.
 	string image = 3;
 
-	message Runtime ***REMOVED***
+	message Runtime {
 		// Name is the name of the runtime.
 		string name = 1;
 		// Options specify additional runtime initialization options.
 		google.protobuf.Any options = 2;
-	***REMOVED***
+	}
 	// Runtime specifies which runtime to use for executing this container.
 	Runtime runtime = 4;
 
@@ -97,17 +97,17 @@ message Container ***REMOVED***
 	// data, one should only update the specified extension using field paths
 	// to select a specific map key.
 	map<string, google.protobuf.Any> extensions = 10 [(gogoproto.nullable) = false];
-***REMOVED***
+}
 
-message GetContainerRequest ***REMOVED***
+message GetContainerRequest {
 	string id = 1;
-***REMOVED***
+}
 
-message GetContainerResponse ***REMOVED***
+message GetContainerResponse {
 	Container container = 1 [(gogoproto.nullable) = false];
-***REMOVED***
+}
 
-message ListContainersRequest ***REMOVED***
+message ListContainersRequest {
 	// Filters contains one or more filters using the syntax defined in the
 	// containerd filter package.
 	//
@@ -119,26 +119,26 @@ message ListContainersRequest ***REMOVED***
 	//
 	// If filters is zero-length or nil, all items will be returned.
 	repeated string filters = 1;
-***REMOVED***
+}
 
-message ListContainersResponse ***REMOVED***
+message ListContainersResponse {
 	repeated Container containers = 1 [(gogoproto.nullable) = false];
-***REMOVED***
+}
 
-message CreateContainerRequest ***REMOVED***
+message CreateContainerRequest {
 	Container container = 1 [(gogoproto.nullable) = false];
-***REMOVED***
+}
 
-message CreateContainerResponse ***REMOVED***
+message CreateContainerResponse {
 	Container container = 1 [(gogoproto.nullable) = false];
-***REMOVED***
+}
 
 // UpdateContainerRequest updates the metadata on one or more container.
 //
 // The operation should follow semantics described in
 // https://developers.google.com/protocol-buffers/docs/reference/csharp/class/google/protobuf/well-known-types/field-mask,
 // unless otherwise qualified.
-message UpdateContainerRequest ***REMOVED***
+message UpdateContainerRequest {
 	// Container provides the target values, as declared by the mask, for the update.
 	//
 	// The ID field must be set.
@@ -147,12 +147,12 @@ message UpdateContainerRequest ***REMOVED***
 	// UpdateMask specifies which fields to perform the update on. If empty,
 	// the operation applies to all fields.
 	google.protobuf.FieldMask update_mask = 2;
-***REMOVED***
+}
 
-message UpdateContainerResponse ***REMOVED***
+message UpdateContainerResponse {
 	Container container = 1 [(gogoproto.nullable) = false];
-***REMOVED***
+}
 
-message DeleteContainerRequest ***REMOVED***
+message DeleteContainerRequest {
 	string id = 1;
-***REMOVED***
+}

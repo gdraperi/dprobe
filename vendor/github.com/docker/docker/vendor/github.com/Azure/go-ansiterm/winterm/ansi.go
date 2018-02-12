@@ -54,71 +54,71 @@ const (
 	ENHANCED_KEY       = 0x0100
 )
 
-type ansiCommand struct ***REMOVED***
+type ansiCommand struct {
 	CommandBytes []byte
 	Command      string
 	Parameters   []string
 	IsSpecial    bool
-***REMOVED***
+}
 
-func newAnsiCommand(command []byte) *ansiCommand ***REMOVED***
+func newAnsiCommand(command []byte) *ansiCommand {
 
-	if isCharacterSelectionCmdChar(command[1]) ***REMOVED***
+	if isCharacterSelectionCmdChar(command[1]) {
 		// Is Character Set Selection commands
-		return &ansiCommand***REMOVED***
+		return &ansiCommand{
 			CommandBytes: command,
 			Command:      string(command),
 			IsSpecial:    true,
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// last char is command character
 	lastCharIndex := len(command) - 1
 
-	ac := &ansiCommand***REMOVED***
+	ac := &ansiCommand{
 		CommandBytes: command,
 		Command:      string(command[lastCharIndex]),
 		IsSpecial:    false,
-	***REMOVED***
+	}
 
 	// more than a single escape
-	if lastCharIndex != 0 ***REMOVED***
+	if lastCharIndex != 0 {
 		start := 1
 		// skip if double char escape sequence
-		if command[0] == ansiterm.ANSI_ESCAPE_PRIMARY && command[1] == ansiterm.ANSI_ESCAPE_SECONDARY ***REMOVED***
+		if command[0] == ansiterm.ANSI_ESCAPE_PRIMARY && command[1] == ansiterm.ANSI_ESCAPE_SECONDARY {
 			start++
-		***REMOVED***
+		}
 		// convert this to GetNextParam method
 		ac.Parameters = strings.Split(string(command[start:lastCharIndex]), ansiterm.ANSI_PARAMETER_SEP)
-	***REMOVED***
+	}
 
 	return ac
-***REMOVED***
+}
 
-func (ac *ansiCommand) paramAsSHORT(index int, defaultValue int16) int16 ***REMOVED***
-	if index < 0 || index >= len(ac.Parameters) ***REMOVED***
+func (ac *ansiCommand) paramAsSHORT(index int, defaultValue int16) int16 {
+	if index < 0 || index >= len(ac.Parameters) {
 		return defaultValue
-	***REMOVED***
+	}
 
 	param, err := strconv.ParseInt(ac.Parameters[index], 10, 16)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return defaultValue
-	***REMOVED***
+	}
 
 	return int16(param)
-***REMOVED***
+}
 
-func (ac *ansiCommand) String() string ***REMOVED***
+func (ac *ansiCommand) String() string {
 	return fmt.Sprintf("0x%v \"%v\" (\"%v\")",
 		bytesToHex(ac.CommandBytes),
 		ac.Command,
 		strings.Join(ac.Parameters, "\",\""))
-***REMOVED***
+}
 
 // isAnsiCommandChar returns true if the passed byte falls within the range of ANSI commands.
 // See http://manpages.ubuntu.com/manpages/intrepid/man4/console_codes.4.html.
-func isAnsiCommandChar(b byte) bool ***REMOVED***
-	switch ***REMOVED***
+func isAnsiCommandChar(b byte) bool {
+	switch {
 	case ansiterm.ANSI_COMMAND_FIRST <= b && b <= ansiterm.ANSI_COMMAND_LAST && b != ansiterm.ANSI_ESCAPE_SECONDARY:
 		return true
 	case b == ansiterm.ANSI_CMD_G1 || b == ansiterm.ANSI_CMD_OSC || b == ansiterm.ANSI_CMD_DECPAM || b == ansiterm.ANSI_CMD_DECPNM:
@@ -127,42 +127,42 @@ func isAnsiCommandChar(b byte) bool ***REMOVED***
 	case b == ansiterm.ANSI_CMD_STR_TERM || b == ansiterm.ANSI_BEL:
 		// String escape sequence terminator
 		return true
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
-func isXtermOscSequence(command []byte, current byte) bool ***REMOVED***
+func isXtermOscSequence(command []byte, current byte) bool {
 	return (len(command) >= 2 && command[0] == ansiterm.ANSI_ESCAPE_PRIMARY && command[1] == ansiterm.ANSI_CMD_OSC && current != ansiterm.ANSI_BEL)
-***REMOVED***
+}
 
-func isCharacterSelectionCmdChar(b byte) bool ***REMOVED***
+func isCharacterSelectionCmdChar(b byte) bool {
 	return (b == ansiterm.ANSI_CMD_G0 || b == ansiterm.ANSI_CMD_G1 || b == ansiterm.ANSI_CMD_G2 || b == ansiterm.ANSI_CMD_G3)
-***REMOVED***
+}
 
 // bytesToHex converts a slice of bytes to a human-readable string.
-func bytesToHex(b []byte) string ***REMOVED***
+func bytesToHex(b []byte) string {
 	hex := make([]string, len(b))
-	for i, ch := range b ***REMOVED***
+	for i, ch := range b {
 		hex[i] = fmt.Sprintf("%X", ch)
-	***REMOVED***
+	}
 	return strings.Join(hex, "")
-***REMOVED***
+}
 
 // ensureInRange adjusts the passed value, if necessary, to ensure it is within
 // the passed min / max range.
-func ensureInRange(n int16, min int16, max int16) int16 ***REMOVED***
-	if n < min ***REMOVED***
+func ensureInRange(n int16, min int16, max int16) int16 {
+	if n < min {
 		return min
-	***REMOVED*** else if n > max ***REMOVED***
+	} else if n > max {
 		return max
-	***REMOVED*** else ***REMOVED***
+	} else {
 		return n
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func GetStdFile(nFile int) (*os.File, uintptr) ***REMOVED***
+func GetStdFile(nFile int) (*os.File, uintptr) {
 	var file *os.File
-	switch nFile ***REMOVED***
+	switch nFile {
 	case syscall.STD_INPUT_HANDLE:
 		file = os.Stdin
 	case syscall.STD_OUTPUT_HANDLE:
@@ -171,12 +171,12 @@ func GetStdFile(nFile int) (*os.File, uintptr) ***REMOVED***
 		file = os.Stderr
 	default:
 		panic(fmt.Errorf("Invalid standard handle identifier: %v", nFile))
-	***REMOVED***
+	}
 
 	fd, err := syscall.GetStdHandle(nFile)
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(fmt.Errorf("Invalid standard handle identifier: %v -- %v", nFile, err))
-	***REMOVED***
+	}
 
 	return file, uintptr(fd)
-***REMOVED***
+}

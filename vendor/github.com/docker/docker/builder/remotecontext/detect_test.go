@@ -20,49 +20,49 @@ const (
 
 const shouldStayFilename = "should_stay"
 
-func extractFilenames(files []os.FileInfo) []string ***REMOVED***
+func extractFilenames(files []os.FileInfo) []string {
 	filenames := make([]string, len(files))
 
-	for i, file := range files ***REMOVED***
+	for i, file := range files {
 		filenames[i] = file.Name()
-	***REMOVED***
+	}
 
 	return filenames
-***REMOVED***
+}
 
-func checkDirectory(t *testing.T, dir string, expectedFiles []string) ***REMOVED***
+func checkDirectory(t *testing.T, dir string, expectedFiles []string) {
 	files, err := ioutil.ReadDir(dir)
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("Could not read directory: %s", err)
-	***REMOVED***
+	}
 
-	if len(files) != len(expectedFiles) ***REMOVED***
+	if len(files) != len(expectedFiles) {
 		log.Fatalf("Directory should contain exactly %d file(s), got %d", len(expectedFiles), len(files))
-	***REMOVED***
+	}
 
 	filenames := extractFilenames(files)
 	sort.Strings(filenames)
 	sort.Strings(expectedFiles)
 
-	for i, filename := range filenames ***REMOVED***
-		if filename != expectedFiles[i] ***REMOVED***
+	for i, filename := range filenames {
+		if filename != expectedFiles[i] {
 			t.Fatalf("File %s should be in the directory, got: %s", expectedFiles[i], filename)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func executeProcess(t *testing.T, contextDir string) ***REMOVED***
-	modifiableCtx := &stubRemote***REMOVED***root: containerfs.NewLocalContainerFS(contextDir)***REMOVED***
+func executeProcess(t *testing.T, contextDir string) {
+	modifiableCtx := &stubRemote{root: containerfs.NewLocalContainerFS(contextDir)}
 
 	err := removeDockerfile(modifiableCtx, builder.DefaultDockerfileName)
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("Error when executing Process: %s", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestProcessShouldRemoveDockerfileDockerignore(t *testing.T) ***REMOVED***
+func TestProcessShouldRemoveDockerfileDockerignore(t *testing.T) {
 	contextDir, cleanup := createTestTempDir(t, "", "builder-dockerignore-process-test")
 	defer cleanup()
 
@@ -72,11 +72,11 @@ func TestProcessShouldRemoveDockerfileDockerignore(t *testing.T) ***REMOVED***
 
 	executeProcess(t, contextDir)
 
-	checkDirectory(t, contextDir, []string***REMOVED***shouldStayFilename***REMOVED***)
+	checkDirectory(t, contextDir, []string{shouldStayFilename})
 
-***REMOVED***
+}
 
-func TestProcessNoDockerignore(t *testing.T) ***REMOVED***
+func TestProcessNoDockerignore(t *testing.T) {
 	contextDir, cleanup := createTestTempDir(t, "", "builder-dockerignore-process-test")
 	defer cleanup()
 
@@ -85,11 +85,11 @@ func TestProcessNoDockerignore(t *testing.T) ***REMOVED***
 
 	executeProcess(t, contextDir)
 
-	checkDirectory(t, contextDir, []string***REMOVED***shouldStayFilename, builder.DefaultDockerfileName***REMOVED***)
+	checkDirectory(t, contextDir, []string{shouldStayFilename, builder.DefaultDockerfileName})
 
-***REMOVED***
+}
 
-func TestProcessShouldLeaveAllFiles(t *testing.T) ***REMOVED***
+func TestProcessShouldLeaveAllFiles(t *testing.T) {
 	contextDir, cleanup := createTestTempDir(t, "", "builder-dockerignore-process-test")
 	defer cleanup()
 
@@ -99,25 +99,25 @@ func TestProcessShouldLeaveAllFiles(t *testing.T) ***REMOVED***
 
 	executeProcess(t, contextDir)
 
-	checkDirectory(t, contextDir, []string***REMOVED***shouldStayFilename, builder.DefaultDockerfileName, dockerignoreFilename***REMOVED***)
+	checkDirectory(t, contextDir, []string{shouldStayFilename, builder.DefaultDockerfileName, dockerignoreFilename})
 
-***REMOVED***
+}
 
 // TODO: remove after moving to a separate pkg
-type stubRemote struct ***REMOVED***
+type stubRemote struct {
 	root containerfs.ContainerFS
-***REMOVED***
+}
 
-func (r *stubRemote) Hash(path string) (string, error) ***REMOVED***
+func (r *stubRemote) Hash(path string) (string, error) {
 	return "", errors.New("not implemented")
-***REMOVED***
+}
 
-func (r *stubRemote) Root() containerfs.ContainerFS ***REMOVED***
+func (r *stubRemote) Root() containerfs.ContainerFS {
 	return r.root
-***REMOVED***
-func (r *stubRemote) Close() error ***REMOVED***
+}
+func (r *stubRemote) Close() error {
 	return errors.New("not implemented")
-***REMOVED***
-func (r *stubRemote) Remove(p string) error ***REMOVED***
+}
+func (r *stubRemote) Remove(p string) error {
 	return r.root.Remove(r.root.Join(r.root.Path(), p))
-***REMOVED***
+}

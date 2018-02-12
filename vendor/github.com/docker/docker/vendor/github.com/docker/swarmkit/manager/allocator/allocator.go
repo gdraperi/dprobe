@@ -12,7 +12,7 @@ import (
 )
 
 // Allocator controls how the allocation stage in the manager is handled.
-type Allocator struct ***REMOVED***
+type Allocator struct {
 	// The manager store.
 	store *store.MemoryStore
 
@@ -26,19 +26,19 @@ type Allocator struct ***REMOVED***
 	netCtx *networkContext
 
 	// stopChan signals to the allocator to stop running.
-	stopChan chan struct***REMOVED******REMOVED***
+	stopChan chan struct{}
 	// doneChan is closed when the allocator is finished running.
-	doneChan chan struct***REMOVED******REMOVED***
+	doneChan chan struct{}
 
 	// pluginGetter provides access to docker's plugin inventory.
 	pluginGetter plugingetter.PluginGetter
-***REMOVED***
+}
 
 // taskBallot controls how the voting for task allocation is
 // coordinated b/w different allocators. This the only structure that
 // will be written by all allocator goroutines concurrently. Hence the
 // mutex.
-type taskBallot struct ***REMOVED***
+type taskBallot struct {
 	sync.Mutex
 
 	// List of registered voters who have to cast their vote to
@@ -47,10 +47,10 @@ type taskBallot struct ***REMOVED***
 
 	// List of votes collected for every task so far from different voters.
 	votes map[string][]string
-***REMOVED***
+}
 
 // allocActor controls the various phases in the lifecycle of one kind of allocator.
-type allocActor struct ***REMOVED***
+type allocActor struct {
 	// Task voter identity of the allocator.
 	taskVoter string
 
@@ -61,26 +61,26 @@ type allocActor struct ***REMOVED***
 	// Init routine which is called during the initialization of
 	// the allocator.
 	init func(ctx context.Context) error
-***REMOVED***
+}
 
 // New returns a new instance of Allocator for use during allocation
 // stage of the manager.
-func New(store *store.MemoryStore, pg plugingetter.PluginGetter) (*Allocator, error) ***REMOVED***
-	a := &Allocator***REMOVED***
+func New(store *store.MemoryStore, pg plugingetter.PluginGetter) (*Allocator, error) {
+	a := &Allocator{
 		store: store,
-		taskBallot: &taskBallot***REMOVED***
+		taskBallot: &taskBallot{
 			votes: make(map[string][]string),
-		***REMOVED***,
-		stopChan:     make(chan struct***REMOVED******REMOVED***),
-		doneChan:     make(chan struct***REMOVED******REMOVED***),
+		},
+		stopChan:     make(chan struct{}),
+		doneChan:     make(chan struct{}),
 		pluginGetter: pg,
-	***REMOVED***
+	}
 
 	return a, nil
-***REMOVED***
+}
 
 // Run starts all allocator go-routines and waits for Stop to be called.
-func (a *Allocator) Run(ctx context.Context) error ***REMOVED***
+func (a *Allocator) Run(ctx context.Context) error {
 	// Setup cancel context for all goroutines to use.
 	ctx, cancel := context.WithCancel(ctx)
 	var (
@@ -88,26 +88,26 @@ func (a *Allocator) Run(ctx context.Context) error ***REMOVED***
 		actors []func() error
 	)
 
-	defer func() ***REMOVED***
+	defer func() {
 		cancel()
 		wg.Wait()
 		close(a.doneChan)
-	***REMOVED***()
+	}()
 
-	for _, aa := range []allocActor***REMOVED***
-		***REMOVED***
+	for _, aa := range []allocActor{
+		{
 			taskVoter: networkVoter,
 			init:      a.doNetworkInit,
 			action:    a.doNetworkAlloc,
-		***REMOVED***,
-	***REMOVED*** ***REMOVED***
-		if aa.taskVoter != "" ***REMOVED***
+		},
+	} {
+		if aa.taskVoter != "" {
 			a.registerToVote(aa.taskVoter)
-		***REMOVED***
+		}
 
 		// Assign a pointer for variable capture
 		aaPtr := &aa
-		actor := func() error ***REMOVED***
+		actor := func() error {
 			wg.Add(1)
 			defer wg.Done()
 
@@ -115,117 +115,117 @@ func (a *Allocator) Run(ctx context.Context) error ***REMOVED***
 			// which is a child of the passed in context to hold
 			// allocator specific state
 			watch, watchCancel, err := a.init(ctx, aaPtr)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
+			}
 
 			wg.Add(1)
-			go func(watch <-chan events.Event, watchCancel func()) ***REMOVED***
-				defer func() ***REMOVED***
+			go func(watch <-chan events.Event, watchCancel func()) {
+				defer func() {
 					wg.Done()
 					watchCancel()
-				***REMOVED***()
+				}()
 				a.run(ctx, *aaPtr, watch)
-			***REMOVED***(watch, watchCancel)
+			}(watch, watchCancel)
 			return nil
-		***REMOVED***
+		}
 
 		actors = append(actors, actor)
-	***REMOVED***
+	}
 
-	for _, actor := range actors ***REMOVED***
-		if err := actor(); err != nil ***REMOVED***
+	for _, actor := range actors {
+		if err := actor(); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	<-a.stopChan
 	return nil
-***REMOVED***
+}
 
 // Stop stops the allocator
-func (a *Allocator) Stop() ***REMOVED***
+func (a *Allocator) Stop() {
 	close(a.stopChan)
 	// Wait for all allocator goroutines to truly exit
 	<-a.doneChan
-***REMOVED***
+}
 
-func (a *Allocator) init(ctx context.Context, aa *allocActor) (<-chan events.Event, func(), error) ***REMOVED***
+func (a *Allocator) init(ctx context.Context, aa *allocActor) (<-chan events.Event, func(), error) {
 	watch, watchCancel := state.Watch(a.store.WatchQueue(),
-		api.EventCreateNetwork***REMOVED******REMOVED***,
-		api.EventDeleteNetwork***REMOVED******REMOVED***,
-		api.EventCreateService***REMOVED******REMOVED***,
-		api.EventUpdateService***REMOVED******REMOVED***,
-		api.EventDeleteService***REMOVED******REMOVED***,
-		api.EventCreateTask***REMOVED******REMOVED***,
-		api.EventUpdateTask***REMOVED******REMOVED***,
-		api.EventDeleteTask***REMOVED******REMOVED***,
-		api.EventCreateNode***REMOVED******REMOVED***,
-		api.EventUpdateNode***REMOVED******REMOVED***,
-		api.EventDeleteNode***REMOVED******REMOVED***,
-		state.EventCommit***REMOVED******REMOVED***,
+		api.EventCreateNetwork{},
+		api.EventDeleteNetwork{},
+		api.EventCreateService{},
+		api.EventUpdateService{},
+		api.EventDeleteService{},
+		api.EventCreateTask{},
+		api.EventUpdateTask{},
+		api.EventDeleteTask{},
+		api.EventCreateNode{},
+		api.EventUpdateNode{},
+		api.EventDeleteNode{},
+		state.EventCommit{},
 	)
 
-	if err := aa.init(ctx); err != nil ***REMOVED***
+	if err := aa.init(ctx); err != nil {
 		watchCancel()
 		return nil, nil, err
-	***REMOVED***
+	}
 
 	return watch, watchCancel, nil
-***REMOVED***
+}
 
-func (a *Allocator) run(ctx context.Context, aa allocActor, watch <-chan events.Event) ***REMOVED***
-	for ***REMOVED***
-		select ***REMOVED***
+func (a *Allocator) run(ctx context.Context, aa allocActor, watch <-chan events.Event) {
+	for {
+		select {
 		case ev, ok := <-watch:
-			if !ok ***REMOVED***
+			if !ok {
 				return
-			***REMOVED***
+			}
 
 			aa.action(ctx, ev)
 		case <-ctx.Done():
 			return
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (a *Allocator) registerToVote(name string) ***REMOVED***
+func (a *Allocator) registerToVote(name string) {
 	a.taskBallot.Lock()
 	defer a.taskBallot.Unlock()
 
 	a.taskBallot.voters = append(a.taskBallot.voters, name)
-***REMOVED***
+}
 
-func (a *Allocator) taskAllocateVote(voter string, id string) bool ***REMOVED***
+func (a *Allocator) taskAllocateVote(voter string, id string) bool {
 	a.taskBallot.Lock()
 	defer a.taskBallot.Unlock()
 
 	// If voter has already voted, return false
-	for _, v := range a.taskBallot.votes[id] ***REMOVED***
+	for _, v := range a.taskBallot.votes[id] {
 		// check if voter is in x
-		if v == voter ***REMOVED***
+		if v == voter {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	a.taskBallot.votes[id] = append(a.taskBallot.votes[id], voter)
 
 	// We haven't gotten enough votes yet
-	if len(a.taskBallot.voters) > len(a.taskBallot.votes[id]) ***REMOVED***
+	if len(a.taskBallot.voters) > len(a.taskBallot.votes[id]) {
 		return false
-	***REMOVED***
+	}
 
 nextVoter:
-	for _, voter := range a.taskBallot.voters ***REMOVED***
-		for _, vote := range a.taskBallot.votes[id] ***REMOVED***
-			if voter == vote ***REMOVED***
+	for _, voter := range a.taskBallot.voters {
+		for _, vote := range a.taskBallot.votes[id] {
+			if voter == vote {
 				continue nextVoter
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		// Not every registered voter has registered a vote.
 		return false
-	***REMOVED***
+	}
 
 	return true
-***REMOVED***
+}

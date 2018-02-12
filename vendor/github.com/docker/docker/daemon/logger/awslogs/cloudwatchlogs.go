@@ -57,7 +57,7 @@ const (
 	userAgentHeader = "User-Agent"
 )
 
-type logStream struct ***REMOVED***
+type logStream struct {
 	logStreamName    string
 	logGroupName     string
 	logCreateGroup   bool
@@ -67,33 +67,33 @@ type logStream struct ***REMOVED***
 	lock             sync.RWMutex
 	closed           bool
 	sequenceToken    *string
-***REMOVED***
+}
 
-type api interface ***REMOVED***
+type api interface {
 	CreateLogGroup(*cloudwatchlogs.CreateLogGroupInput) (*cloudwatchlogs.CreateLogGroupOutput, error)
 	CreateLogStream(*cloudwatchlogs.CreateLogStreamInput) (*cloudwatchlogs.CreateLogStreamOutput, error)
 	PutLogEvents(*cloudwatchlogs.PutLogEventsInput) (*cloudwatchlogs.PutLogEventsOutput, error)
-***REMOVED***
+}
 
-type regionFinder interface ***REMOVED***
+type regionFinder interface {
 	Region() (string, error)
-***REMOVED***
+}
 
-type wrappedEvent struct ***REMOVED***
+type wrappedEvent struct {
 	inputLogEvent *cloudwatchlogs.InputLogEvent
 	insertOrder   int
-***REMOVED***
+}
 type byTimestamp []wrappedEvent
 
 // init registers the awslogs driver
-func init() ***REMOVED***
-	if err := logger.RegisterLogDriver(name, New); err != nil ***REMOVED***
+func init() {
+	if err := logger.RegisterLogDriver(name, New); err != nil {
 		logrus.Fatal(err)
-	***REMOVED***
-	if err := logger.RegisterLogOptValidator(name, ValidateLogOpt); err != nil ***REMOVED***
+	}
+	if err := logger.RegisterLogOptValidator(name, ValidateLogOpt); err != nil {
 		logrus.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // eventBatch holds the events that are batched for submission and the
 // associated data about it.
@@ -101,10 +101,10 @@ func init() ***REMOVED***
 // Warning: this type is not threadsafe and must not be used
 // concurrently. This type is expected to be consumed in a single go
 // routine and never concurrently.
-type eventBatch struct ***REMOVED***
+type eventBatch struct {
 	batch []wrappedEvent
 	bytes int
-***REMOVED***
+}
 
 // New creates an awslogs logger using the configuration passed in on the
 // context.  Supported context configuration variables are awslogs-region,
@@ -113,79 +113,79 @@ type eventBatch struct ***REMOVED***
 // also taken from environment variables AWS_REGION, AWS_ACCESS_KEY_ID,
 // AWS_SECRET_ACCESS_KEY, the shared credentials file (~/.aws/credentials), and
 // the EC2 Instance Metadata Service.
-func New(info logger.Info) (logger.Logger, error) ***REMOVED***
+func New(info logger.Info) (logger.Logger, error) {
 	logGroupName := info.Config[logGroupKey]
-	logStreamName, err := loggerutils.ParseLogTag(info, "***REMOVED******REMOVED***.FullID***REMOVED******REMOVED***")
-	if err != nil ***REMOVED***
+	logStreamName, err := loggerutils.ParseLogTag(info, "{{.FullID}}")
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	logCreateGroup := false
-	if info.Config[logCreateGroupKey] != "" ***REMOVED***
+	if info.Config[logCreateGroupKey] != "" {
 		logCreateGroup, err = strconv.ParseBool(info.Config[logCreateGroupKey])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if info.Config[logStreamKey] != "" ***REMOVED***
+	if info.Config[logStreamKey] != "" {
 		logStreamName = info.Config[logStreamKey]
-	***REMOVED***
+	}
 
 	multilinePattern, err := parseMultilineOptions(info)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	client, err := newAWSLogsClient(info)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	containerStream := &logStream***REMOVED***
+	}
+	containerStream := &logStream{
 		logStreamName:    logStreamName,
 		logGroupName:     logGroupName,
 		logCreateGroup:   logCreateGroup,
 		multilinePattern: multilinePattern,
 		client:           client,
 		messages:         make(chan *logger.Message, 4096),
-	***REMOVED***
+	}
 	err = containerStream.create()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	go containerStream.collectBatch()
 
 	return containerStream, nil
-***REMOVED***
+}
 
 // Parses awslogs-multiline-pattern and awslogs-datetime-format options
 // If awslogs-datetime-format is present, convert the format from strftime
 // to regexp and return.
 // If awslogs-multiline-pattern is present, compile regexp and return
-func parseMultilineOptions(info logger.Info) (*regexp.Regexp, error) ***REMOVED***
+func parseMultilineOptions(info logger.Info) (*regexp.Regexp, error) {
 	dateTimeFormat := info.Config[datetimeFormatKey]
 	multilinePatternKey := info.Config[multilinePatternKey]
 	// strftime input is parsed into a regular expression
-	if dateTimeFormat != "" ***REMOVED***
+	if dateTimeFormat != "" {
 		// %. matches each strftime format sequence and ReplaceAllStringFunc
 		// looks up each format sequence in the conversion table strftimeToRegex
 		// to replace with a defined regular expression
 		r := regexp.MustCompile("%.")
-		multilinePatternKey = r.ReplaceAllStringFunc(dateTimeFormat, func(s string) string ***REMOVED***
+		multilinePatternKey = r.ReplaceAllStringFunc(dateTimeFormat, func(s string) string {
 			return strftimeToRegex[s]
-		***REMOVED***)
-	***REMOVED***
-	if multilinePatternKey != "" ***REMOVED***
+		})
+	}
+	if multilinePatternKey != "" {
 		multilinePattern, err := regexp.Compile(multilinePatternKey)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, errors.Wrapf(err, "awslogs could not parse multiline pattern key %q", multilinePatternKey)
-		***REMOVED***
+		}
 		return multilinePattern, nil
-	***REMOVED***
+	}
 	return nil, nil
-***REMOVED***
+}
 
 // Maps strftime format strings to regex
-var strftimeToRegex = map[string]string***REMOVED***
+var strftimeToRegex = map[string]string{
 	/*weekdayShort          */ `%a`: `(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)`,
 	/*weekdayFull           */ `%A`: `(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)`,
 	/*weekdayZeroIndex      */ `%w`: `[0-6]`,
@@ -193,25 +193,25 @@ var strftimeToRegex = map[string]string***REMOVED***
 	/*monthShort            */ `%b`: `(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)`,
 	/*monthFull             */ `%B`: `(?:January|February|March|April|May|June|July|August|September|October|November|December)`,
 	/*monthZeroPadded       */ `%m`: `(?:0[1-9]|1[0-2])`,
-	/*yearCentury           */ `%Y`: `\d***REMOVED***4***REMOVED***`,
-	/*yearZeroPadded        */ `%y`: `\d***REMOVED***2***REMOVED***`,
+	/*yearCentury           */ `%Y`: `\d{4}`,
+	/*yearZeroPadded        */ `%y`: `\d{2}`,
 	/*hour24ZeroPadded      */ `%H`: `(?:[0,1][0-9]|2[0-3])`,
 	/*hour12ZeroPadded      */ `%I`: `(?:0[0-9]|1[0-2])`,
 	/*AM or PM              */ `%p`: "[A,P]M",
 	/*minuteZeroPadded      */ `%M`: `[0-5][0-9]`,
 	/*secondZeroPadded      */ `%S`: `[0-5][0-9]`,
-	/*microsecondZeroPadded */ `%f`: `\d***REMOVED***6***REMOVED***`,
-	/*utcOffset             */ `%z`: `[+-]\d***REMOVED***4***REMOVED***`,
-	/*tzName                */ `%Z`: `[A-Z]***REMOVED***1,4***REMOVED***T`,
+	/*microsecondZeroPadded */ `%f`: `\d{6}`,
+	/*utcOffset             */ `%z`: `[+-]\d{4}`,
+	/*tzName                */ `%Z`: `[A-Z]{1,4}T`,
 	/*dayOfYearZeroPadded   */ `%j`: `(?:0[0-9][1-9]|[1,2][0-9][0-9]|3[0-5][0-9]|36[0-6])`,
-	/*milliseconds          */ `%L`: `\.\d***REMOVED***3***REMOVED***`,
-***REMOVED***
+	/*milliseconds          */ `%L`: `\.\d{3}`,
+}
 
 // newRegionFinder is a variable such that the implementation
 // can be swapped out for unit tests.
-var newRegionFinder = func() regionFinder ***REMOVED***
+var newRegionFinder = func() regionFinder {
 	return ec2metadata.New(session.New())
-***REMOVED***
+}
 
 // newSDKEndpoint is a variable such that the implementation
 // can be swapped out for unit tests.
@@ -221,172 +221,172 @@ var newSDKEndpoint = credentialsEndpoint
 // Customizations to the default client from the SDK include a Docker-specific
 // User-Agent string and automatic region detection using the EC2 Instance
 // Metadata Service when region is otherwise unspecified.
-func newAWSLogsClient(info logger.Info) (api, error) ***REMOVED***
+func newAWSLogsClient(info logger.Info) (api, error) {
 	var region *string
-	if os.Getenv(regionEnvKey) != "" ***REMOVED***
+	if os.Getenv(regionEnvKey) != "" {
 		region = aws.String(os.Getenv(regionEnvKey))
-	***REMOVED***
-	if info.Config[regionKey] != "" ***REMOVED***
+	}
+	if info.Config[regionKey] != "" {
 		region = aws.String(info.Config[regionKey])
-	***REMOVED***
-	if region == nil || *region == "" ***REMOVED***
+	}
+	if region == nil || *region == "" {
 		logrus.Info("Trying to get region from EC2 Metadata")
 		ec2MetadataClient := newRegionFinder()
 		r, err := ec2MetadataClient.Region()
-		if err != nil ***REMOVED***
-			logrus.WithFields(logrus.Fields***REMOVED***
+		if err != nil {
+			logrus.WithFields(logrus.Fields{
 				"error": err,
-			***REMOVED***).Error("Could not get region from EC2 metadata, environment, or log option")
+			}).Error("Could not get region from EC2 metadata, environment, or log option")
 			return nil, errors.New("Cannot determine region for awslogs driver")
-		***REMOVED***
+		}
 		region = &r
-	***REMOVED***
+	}
 
 	sess, err := session.NewSession()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, errors.New("Failed to create a service client session for for awslogs driver")
-	***REMOVED***
+	}
 
 	// attach region to cloudwatchlogs config
 	sess.Config.Region = region
 
-	if uri, ok := info.Config[credentialsEndpointKey]; ok ***REMOVED***
+	if uri, ok := info.Config[credentialsEndpointKey]; ok {
 		logrus.Debugf("Trying to get credentials from awslogs-credentials-endpoint")
 
 		endpoint := fmt.Sprintf("%s%s", newSDKEndpoint, uri)
 		creds := endpointcreds.NewCredentialsClient(*sess.Config, sess.Handlers, endpoint,
-			func(p *endpointcreds.Provider) ***REMOVED***
+			func(p *endpointcreds.Provider) {
 				p.ExpiryWindow = 5 * time.Minute
-			***REMOVED***)
+			})
 
 		// attach credentials to cloudwatchlogs config
 		sess.Config.Credentials = creds
-	***REMOVED***
+	}
 
-	logrus.WithFields(logrus.Fields***REMOVED***
+	logrus.WithFields(logrus.Fields{
 		"region": *region,
-	***REMOVED***).Debug("Created awslogs client")
+	}).Debug("Created awslogs client")
 
 	client := cloudwatchlogs.New(sess)
 
-	client.Handlers.Build.PushBackNamed(request.NamedHandler***REMOVED***
+	client.Handlers.Build.PushBackNamed(request.NamedHandler{
 		Name: "DockerUserAgentHandler",
-		Fn: func(r *request.Request) ***REMOVED***
+		Fn: func(r *request.Request) {
 			currentAgent := r.HTTPRequest.Header.Get(userAgentHeader)
 			r.HTTPRequest.Header.Set(userAgentHeader,
 				fmt.Sprintf("Docker %s (%s) %s",
 					dockerversion.Version, runtime.GOOS, currentAgent))
-		***REMOVED***,
-	***REMOVED***)
+		},
+	})
 	return client, nil
-***REMOVED***
+}
 
 // Name returns the name of the awslogs logging driver
-func (l *logStream) Name() string ***REMOVED***
+func (l *logStream) Name() string {
 	return name
-***REMOVED***
+}
 
-func (l *logStream) BufSize() int ***REMOVED***
+func (l *logStream) BufSize() int {
 	return maximumBytesPerEvent
-***REMOVED***
+}
 
 // Log submits messages for logging by an instance of the awslogs logging driver
-func (l *logStream) Log(msg *logger.Message) error ***REMOVED***
+func (l *logStream) Log(msg *logger.Message) error {
 	l.lock.RLock()
 	defer l.lock.RUnlock()
-	if !l.closed ***REMOVED***
+	if !l.closed {
 		l.messages <- msg
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // Close closes the instance of the awslogs logging driver
-func (l *logStream) Close() error ***REMOVED***
+func (l *logStream) Close() error {
 	l.lock.Lock()
 	defer l.lock.Unlock()
-	if !l.closed ***REMOVED***
+	if !l.closed {
 		close(l.messages)
-	***REMOVED***
+	}
 	l.closed = true
 	return nil
-***REMOVED***
+}
 
 // create creates log group and log stream for the instance of the awslogs logging driver
-func (l *logStream) create() error ***REMOVED***
-	if err := l.createLogStream(); err != nil ***REMOVED***
-		if l.logCreateGroup ***REMOVED***
-			if awsErr, ok := err.(awserr.Error); ok && awsErr.Code() == resourceNotFoundCode ***REMOVED***
-				if err := l.createLogGroup(); err != nil ***REMOVED***
+func (l *logStream) create() error {
+	if err := l.createLogStream(); err != nil {
+		if l.logCreateGroup {
+			if awsErr, ok := err.(awserr.Error); ok && awsErr.Code() == resourceNotFoundCode {
+				if err := l.createLogGroup(); err != nil {
 					return err
-				***REMOVED***
+				}
 				return l.createLogStream()
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		return err
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // createLogGroup creates a log group for the instance of the awslogs logging driver
-func (l *logStream) createLogGroup() error ***REMOVED***
-	if _, err := l.client.CreateLogGroup(&cloudwatchlogs.CreateLogGroupInput***REMOVED***
+func (l *logStream) createLogGroup() error {
+	if _, err := l.client.CreateLogGroup(&cloudwatchlogs.CreateLogGroupInput{
 		LogGroupName: aws.String(l.logGroupName),
-	***REMOVED***); err != nil ***REMOVED***
-		if awsErr, ok := err.(awserr.Error); ok ***REMOVED***
-			fields := logrus.Fields***REMOVED***
+	}); err != nil {
+		if awsErr, ok := err.(awserr.Error); ok {
+			fields := logrus.Fields{
 				"errorCode":      awsErr.Code(),
 				"message":        awsErr.Message(),
 				"origError":      awsErr.OrigErr(),
 				"logGroupName":   l.logGroupName,
 				"logCreateGroup": l.logCreateGroup,
-			***REMOVED***
-			if awsErr.Code() == resourceAlreadyExistsCode ***REMOVED***
+			}
+			if awsErr.Code() == resourceAlreadyExistsCode {
 				// Allow creation to succeed
 				logrus.WithFields(fields).Info("Log group already exists")
 				return nil
-			***REMOVED***
+			}
 			logrus.WithFields(fields).Error("Failed to create log group")
-		***REMOVED***
+		}
 		return err
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // createLogStream creates a log stream for the instance of the awslogs logging driver
-func (l *logStream) createLogStream() error ***REMOVED***
-	input := &cloudwatchlogs.CreateLogStreamInput***REMOVED***
+func (l *logStream) createLogStream() error {
+	input := &cloudwatchlogs.CreateLogStreamInput{
 		LogGroupName:  aws.String(l.logGroupName),
 		LogStreamName: aws.String(l.logStreamName),
-	***REMOVED***
+	}
 
 	_, err := l.client.CreateLogStream(input)
 
-	if err != nil ***REMOVED***
-		if awsErr, ok := err.(awserr.Error); ok ***REMOVED***
-			fields := logrus.Fields***REMOVED***
+	if err != nil {
+		if awsErr, ok := err.(awserr.Error); ok {
+			fields := logrus.Fields{
 				"errorCode":     awsErr.Code(),
 				"message":       awsErr.Message(),
 				"origError":     awsErr.OrigErr(),
 				"logGroupName":  l.logGroupName,
 				"logStreamName": l.logStreamName,
-			***REMOVED***
-			if awsErr.Code() == resourceAlreadyExistsCode ***REMOVED***
+			}
+			if awsErr.Code() == resourceAlreadyExistsCode {
 				// Allow creation to succeed
 				logrus.WithFields(fields).Info("Log stream already exists")
 				return nil
-			***REMOVED***
+			}
 			logrus.WithFields(fields).Error("Failed to create log stream")
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return err
-***REMOVED***
+}
 
 // newTicker is used for time-based batching.  newTicker is a variable such
 // that the implementation can be swapped out for unit tests.
-var newTicker = func(freq time.Duration) *time.Ticker ***REMOVED***
+var newTicker = func(freq time.Duration) *time.Ticker {
 	return time.NewTicker(freq)
-***REMOVED***
+}
 
 // collectBatch executes as a goroutine to perform batching of log events for
 // submission to the log stream.  If the awslogs-multiline-pattern or
@@ -399,60 +399,60 @@ var newTicker = func(freq time.Duration) *time.Ticker ***REMOVED***
 // seconds.  When events are ready to be processed for submission to CloudWatch
 // Logs, the processEvents method is called.  If a multiline pattern is not
 // configured, log events are submitted to the processEvents method immediately.
-func (l *logStream) collectBatch() ***REMOVED***
+func (l *logStream) collectBatch() {
 	ticker := newTicker(batchPublishFrequency)
 	var eventBuffer []byte
 	var eventBufferTimestamp int64
 	var batch = newEventBatch()
-	for ***REMOVED***
-		select ***REMOVED***
+	for {
+		select {
 		case t := <-ticker.C:
 			// If event buffer is older than batch publish frequency flush the event buffer
-			if eventBufferTimestamp > 0 && len(eventBuffer) > 0 ***REMOVED***
+			if eventBufferTimestamp > 0 && len(eventBuffer) > 0 {
 				eventBufferAge := t.UnixNano()/int64(time.Millisecond) - eventBufferTimestamp
 				eventBufferExpired := eventBufferAge >= int64(batchPublishFrequency)/int64(time.Millisecond)
 				eventBufferNegative := eventBufferAge < 0
-				if eventBufferExpired || eventBufferNegative ***REMOVED***
+				if eventBufferExpired || eventBufferNegative {
 					l.processEvent(batch, eventBuffer, eventBufferTimestamp)
 					eventBuffer = eventBuffer[:0]
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			l.publishBatch(batch)
 			batch.reset()
 		case msg, more := <-l.messages:
-			if !more ***REMOVED***
+			if !more {
 				// Flush event buffer and release resources
 				l.processEvent(batch, eventBuffer, eventBufferTimestamp)
 				eventBuffer = eventBuffer[:0]
 				l.publishBatch(batch)
 				batch.reset()
 				return
-			***REMOVED***
-			if eventBufferTimestamp == 0 ***REMOVED***
+			}
+			if eventBufferTimestamp == 0 {
 				eventBufferTimestamp = msg.Timestamp.UnixNano() / int64(time.Millisecond)
-			***REMOVED***
+			}
 			line := msg.Line
-			if l.multilinePattern != nil ***REMOVED***
-				if l.multilinePattern.Match(line) || len(eventBuffer)+len(line) > maximumBytesPerEvent ***REMOVED***
+			if l.multilinePattern != nil {
+				if l.multilinePattern.Match(line) || len(eventBuffer)+len(line) > maximumBytesPerEvent {
 					// This is a new log event or we will exceed max bytes per event
 					// so flush the current eventBuffer to events and reset timestamp
 					l.processEvent(batch, eventBuffer, eventBufferTimestamp)
 					eventBufferTimestamp = msg.Timestamp.UnixNano() / int64(time.Millisecond)
 					eventBuffer = eventBuffer[:0]
-				***REMOVED***
+				}
 				// Append new line if event is less than max event size
-				if len(line) < maximumBytesPerEvent ***REMOVED***
+				if len(line) < maximumBytesPerEvent {
 					line = append(line, "\n"...)
-				***REMOVED***
+				}
 				eventBuffer = append(eventBuffer, line...)
 				logger.PutMessage(msg)
-			***REMOVED*** else ***REMOVED***
+			} else {
 				l.processEvent(batch, line, msg.Timestamp.UnixNano()/int64(time.Millisecond))
 				logger.PutMessage(msg)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}
 
 // processEvent processes log events that are ready for submission to CloudWatch
 // logs.  Batching is performed on time- and size-bases.  Time-based batching
@@ -463,102 +463,102 @@ func (l *logStream) collectBatch() ***REMOVED***
 // bytes per event (defined in maximumBytesPerEvent).  There is a fixed per-event
 // byte overhead (defined in perEventBytes) which is accounted for in split- and
 // batch-calculations.
-func (l *logStream) processEvent(batch *eventBatch, events []byte, timestamp int64) ***REMOVED***
-	for len(events) > 0 ***REMOVED***
+func (l *logStream) processEvent(batch *eventBatch, events []byte, timestamp int64) {
+	for len(events) > 0 {
 		// Split line length so it does not exceed the maximum
 		lineBytes := len(events)
-		if lineBytes > maximumBytesPerEvent ***REMOVED***
+		if lineBytes > maximumBytesPerEvent {
 			lineBytes = maximumBytesPerEvent
-		***REMOVED***
+		}
 		line := events[:lineBytes]
 
-		event := wrappedEvent***REMOVED***
-			inputLogEvent: &cloudwatchlogs.InputLogEvent***REMOVED***
+		event := wrappedEvent{
+			inputLogEvent: &cloudwatchlogs.InputLogEvent{
 				Message:   aws.String(string(line)),
 				Timestamp: aws.Int64(timestamp),
-			***REMOVED***,
+			},
 			insertOrder: batch.count(),
-		***REMOVED***
+		}
 
 		added := batch.add(event, lineBytes)
-		if added ***REMOVED***
+		if added {
 			events = events[lineBytes:]
-		***REMOVED*** else ***REMOVED***
+		} else {
 			l.publishBatch(batch)
 			batch.reset()
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // publishBatch calls PutLogEvents for a given set of InputLogEvents,
 // accounting for sequencing requirements (each request must reference the
 // sequence token returned by the previous request).
-func (l *logStream) publishBatch(batch *eventBatch) ***REMOVED***
-	if batch.isEmpty() ***REMOVED***
+func (l *logStream) publishBatch(batch *eventBatch) {
+	if batch.isEmpty() {
 		return
-	***REMOVED***
+	}
 	cwEvents := unwrapEvents(batch.events())
 
 	nextSequenceToken, err := l.putLogEvents(cwEvents, l.sequenceToken)
 
-	if err != nil ***REMOVED***
-		if awsErr, ok := err.(awserr.Error); ok ***REMOVED***
-			if awsErr.Code() == dataAlreadyAcceptedCode ***REMOVED***
+	if err != nil {
+		if awsErr, ok := err.(awserr.Error); ok {
+			if awsErr.Code() == dataAlreadyAcceptedCode {
 				// already submitted, just grab the correct sequence token
 				parts := strings.Split(awsErr.Message(), " ")
 				nextSequenceToken = &parts[len(parts)-1]
-				logrus.WithFields(logrus.Fields***REMOVED***
+				logrus.WithFields(logrus.Fields{
 					"errorCode":     awsErr.Code(),
 					"message":       awsErr.Message(),
 					"logGroupName":  l.logGroupName,
 					"logStreamName": l.logStreamName,
-				***REMOVED***).Info("Data already accepted, ignoring error")
+				}).Info("Data already accepted, ignoring error")
 				err = nil
-			***REMOVED*** else if awsErr.Code() == invalidSequenceTokenCode ***REMOVED***
+			} else if awsErr.Code() == invalidSequenceTokenCode {
 				// sequence code is bad, grab the correct one and retry
 				parts := strings.Split(awsErr.Message(), " ")
 				token := parts[len(parts)-1]
 				nextSequenceToken, err = l.putLogEvents(cwEvents, &token)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-	if err != nil ***REMOVED***
+			}
+		}
+	}
+	if err != nil {
 		logrus.Error(err)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		l.sequenceToken = nextSequenceToken
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // putLogEvents wraps the PutLogEvents API
-func (l *logStream) putLogEvents(events []*cloudwatchlogs.InputLogEvent, sequenceToken *string) (*string, error) ***REMOVED***
-	input := &cloudwatchlogs.PutLogEventsInput***REMOVED***
+func (l *logStream) putLogEvents(events []*cloudwatchlogs.InputLogEvent, sequenceToken *string) (*string, error) {
+	input := &cloudwatchlogs.PutLogEventsInput{
 		LogEvents:     events,
 		SequenceToken: sequenceToken,
 		LogGroupName:  aws.String(l.logGroupName),
 		LogStreamName: aws.String(l.logStreamName),
-	***REMOVED***
+	}
 	resp, err := l.client.PutLogEvents(input)
-	if err != nil ***REMOVED***
-		if awsErr, ok := err.(awserr.Error); ok ***REMOVED***
-			logrus.WithFields(logrus.Fields***REMOVED***
+	if err != nil {
+		if awsErr, ok := err.(awserr.Error); ok {
+			logrus.WithFields(logrus.Fields{
 				"errorCode":     awsErr.Code(),
 				"message":       awsErr.Message(),
 				"origError":     awsErr.OrigErr(),
 				"logGroupName":  l.logGroupName,
 				"logStreamName": l.logStreamName,
-			***REMOVED***).Error("Failed to put log events")
-		***REMOVED***
+			}).Error("Failed to put log events")
+		}
 		return nil, err
-	***REMOVED***
+	}
 	return resp.NextSequenceToken, nil
-***REMOVED***
+}
 
 // ValidateLogOpt looks for awslogs-specific log options awslogs-region,
 // awslogs-group, awslogs-stream, awslogs-create-group, awslogs-datetime-format,
 // awslogs-multiline-pattern
-func ValidateLogOpt(cfg map[string]string) error ***REMOVED***
-	for key := range cfg ***REMOVED***
-		switch key ***REMOVED***
+func ValidateLogOpt(cfg map[string]string) error {
+	for key := range cfg {
+		switch key {
 		case logGroupKey:
 		case logStreamKey:
 		case logCreateGroupKey:
@@ -569,76 +569,76 @@ func ValidateLogOpt(cfg map[string]string) error ***REMOVED***
 		case credentialsEndpointKey:
 		default:
 			return fmt.Errorf("unknown log opt '%s' for %s log driver", key, name)
-		***REMOVED***
-	***REMOVED***
-	if cfg[logGroupKey] == "" ***REMOVED***
+		}
+	}
+	if cfg[logGroupKey] == "" {
 		return fmt.Errorf("must specify a value for log opt '%s'", logGroupKey)
-	***REMOVED***
-	if cfg[logCreateGroupKey] != "" ***REMOVED***
-		if _, err := strconv.ParseBool(cfg[logCreateGroupKey]); err != nil ***REMOVED***
+	}
+	if cfg[logCreateGroupKey] != "" {
+		if _, err := strconv.ParseBool(cfg[logCreateGroupKey]); err != nil {
 			return fmt.Errorf("must specify valid value for log opt '%s': %v", logCreateGroupKey, err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	_, datetimeFormatKeyExists := cfg[datetimeFormatKey]
 	_, multilinePatternKeyExists := cfg[multilinePatternKey]
-	if datetimeFormatKeyExists && multilinePatternKeyExists ***REMOVED***
+	if datetimeFormatKeyExists && multilinePatternKeyExists {
 		return fmt.Errorf("you cannot configure log opt '%s' and '%s' at the same time", datetimeFormatKey, multilinePatternKey)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // Len returns the length of a byTimestamp slice.  Len is required by the
 // sort.Interface interface.
-func (slice byTimestamp) Len() int ***REMOVED***
+func (slice byTimestamp) Len() int {
 	return len(slice)
-***REMOVED***
+}
 
 // Less compares two values in a byTimestamp slice by Timestamp.  Less is
 // required by the sort.Interface interface.
-func (slice byTimestamp) Less(i, j int) bool ***REMOVED***
+func (slice byTimestamp) Less(i, j int) bool {
 	iTimestamp, jTimestamp := int64(0), int64(0)
-	if slice != nil && slice[i].inputLogEvent.Timestamp != nil ***REMOVED***
+	if slice != nil && slice[i].inputLogEvent.Timestamp != nil {
 		iTimestamp = *slice[i].inputLogEvent.Timestamp
-	***REMOVED***
-	if slice != nil && slice[j].inputLogEvent.Timestamp != nil ***REMOVED***
+	}
+	if slice != nil && slice[j].inputLogEvent.Timestamp != nil {
 		jTimestamp = *slice[j].inputLogEvent.Timestamp
-	***REMOVED***
-	if iTimestamp == jTimestamp ***REMOVED***
+	}
+	if iTimestamp == jTimestamp {
 		return slice[i].insertOrder < slice[j].insertOrder
-	***REMOVED***
+	}
 	return iTimestamp < jTimestamp
-***REMOVED***
+}
 
 // Swap swaps two values in a byTimestamp slice with each other.  Swap is
 // required by the sort.Interface interface.
-func (slice byTimestamp) Swap(i, j int) ***REMOVED***
+func (slice byTimestamp) Swap(i, j int) {
 	slice[i], slice[j] = slice[j], slice[i]
-***REMOVED***
+}
 
-func unwrapEvents(events []wrappedEvent) []*cloudwatchlogs.InputLogEvent ***REMOVED***
+func unwrapEvents(events []wrappedEvent) []*cloudwatchlogs.InputLogEvent {
 	cwEvents := make([]*cloudwatchlogs.InputLogEvent, len(events))
-	for i, input := range events ***REMOVED***
+	for i, input := range events {
 		cwEvents[i] = input.inputLogEvent
-	***REMOVED***
+	}
 	return cwEvents
-***REMOVED***
+}
 
-func newEventBatch() *eventBatch ***REMOVED***
-	return &eventBatch***REMOVED***
+func newEventBatch() *eventBatch {
+	return &eventBatch{
 		batch: make([]wrappedEvent, 0),
 		bytes: 0,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // events returns a slice of wrappedEvents sorted in order of their
 // timestamps and then by their insertion order (see `byTimestamp`).
 //
 // Warning: this method is not threadsafe and must not be used
 // concurrently.
-func (b *eventBatch) events() []wrappedEvent ***REMOVED***
+func (b *eventBatch) events() []wrappedEvent {
 	sort.Sort(byTimestamp(b.batch))
 	return b.batch
-***REMOVED***
+}
 
 // add adds an event to the batch of events accounting for the
 // necessary overhead for an event to be logged. An error will be
@@ -647,45 +647,45 @@ func (b *eventBatch) events() []wrappedEvent ***REMOVED***
 //
 // Warning: this method is not threadsafe and must not be used
 // concurrently.
-func (b *eventBatch) add(event wrappedEvent, size int) bool ***REMOVED***
+func (b *eventBatch) add(event wrappedEvent, size int) bool {
 	addBytes := size + perEventBytes
 
 	// verify we are still within service limits
-	switch ***REMOVED***
+	switch {
 	case len(b.batch)+1 > maximumLogEventsPerPut:
 		return false
 	case b.bytes+addBytes > maximumBytesPerPut:
 		return false
-	***REMOVED***
+	}
 
 	b.bytes += addBytes
 	b.batch = append(b.batch, event)
 
 	return true
-***REMOVED***
+}
 
 // count is the number of batched events.  Warning: this method
 // is not threadsafe and must not be used concurrently.
-func (b *eventBatch) count() int ***REMOVED***
+func (b *eventBatch) count() int {
 	return len(b.batch)
-***REMOVED***
+}
 
 // size is the total number of bytes that the batch represents.
 //
 // Warning: this method is not threadsafe and must not be used
 // concurrently.
-func (b *eventBatch) size() int ***REMOVED***
+func (b *eventBatch) size() int {
 	return b.bytes
-***REMOVED***
+}
 
-func (b *eventBatch) isEmpty() bool ***REMOVED***
+func (b *eventBatch) isEmpty() bool {
 	zeroEvents := b.count() == 0
 	zeroSize := b.size() == 0
 	return zeroEvents && zeroSize
-***REMOVED***
+}
 
 // reset prepares the batch for reuse.
-func (b *eventBatch) reset() ***REMOVED***
+func (b *eventBatch) reset() {
 	b.bytes = 0
 	b.batch = b.batch[:0]
-***REMOVED***
+}

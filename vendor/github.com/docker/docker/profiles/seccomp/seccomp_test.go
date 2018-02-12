@@ -9,24 +9,24 @@ import (
 	"github.com/docker/docker/oci"
 )
 
-func TestLoadProfile(t *testing.T) ***REMOVED***
+func TestLoadProfile(t *testing.T) {
 	f, err := ioutil.ReadFile("fixtures/example.json")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	rs := oci.DefaultSpec()
-	if _, err := LoadProfile(string(f), &rs); err != nil ***REMOVED***
+	if _, err := LoadProfile(string(f), &rs); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestLoadDefaultProfile(t *testing.T) ***REMOVED***
+func TestLoadDefaultProfile(t *testing.T) {
 	f, err := ioutil.ReadFile("default.json")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	rs := oci.DefaultSpec()
-	if _, err := LoadProfile(string(f), &rs); err != nil ***REMOVED***
+	if _, err := LoadProfile(string(f), &rs); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}

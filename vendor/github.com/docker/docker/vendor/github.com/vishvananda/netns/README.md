@@ -25,7 +25,7 @@ import (
     "github.com/vishvananada/netns"
 )
 
-func main() ***REMOVED***
+func main() {
     // Lock the OS Thread so we don't accidentally switch namespaces
     runtime.LockOSThread()
     defer runtime.UnlockOSThread()
@@ -44,6 +44,6 @@ func main() ***REMOVED***
 
     // Switch back to the original namespace
     netns.Set(origns)
-***REMOVED***
+}
 
 ```

@@ -52,87 +52,87 @@ const mountsFixture = `142 78 0:38 / / rw,relatime - aufs none rw,si=573b861da0b
 310 142 0:60 / /run/docker/netns/71a18572176b rw,nosuid,nodev,noexec,relatime - proc proc rw
 `
 
-func TestCleanupMounts(t *testing.T) ***REMOVED***
-	d := &Daemon***REMOVED***
+func TestCleanupMounts(t *testing.T) {
+	d := &Daemon{
 		root: "/var/lib/docker/",
-	***REMOVED***
+	}
 
 	expected := "/var/lib/docker/containers/d045dc441d2e2e1d5b3e328d47e5943811a40819fb47497c5f5a5df2d6d13c37/shm"
 	var unmounted int
-	unmount := func(target string) error ***REMOVED***
-		if target == expected ***REMOVED***
+	unmount := func(target string) error {
+		if target == expected {
 			unmounted++
-		***REMOVED***
+		}
 		return nil
-	***REMOVED***
+	}
 
 	d.cleanupMountsFromReaderByID(strings.NewReader(mountsFixture), "", unmount)
 
-	if unmounted != 1 ***REMOVED***
+	if unmounted != 1 {
 		t.Fatal("Expected to unmount the shm (and the shm only)")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestCleanupMountsByID(t *testing.T) ***REMOVED***
-	d := &Daemon***REMOVED***
+func TestCleanupMountsByID(t *testing.T) {
+	d := &Daemon{
 		root: "/var/lib/docker/",
-	***REMOVED***
+	}
 
 	expected := "/var/lib/docker/aufs/mnt/03ca4b49e71f1e49a41108829f4d5c70ac95934526e2af8984a1f65f1de0715d"
 	var unmounted int
-	unmount := func(target string) error ***REMOVED***
-		if target == expected ***REMOVED***
+	unmount := func(target string) error {
+		if target == expected {
 			unmounted++
-		***REMOVED***
+		}
 		return nil
-	***REMOVED***
+	}
 
 	d.cleanupMountsFromReaderByID(strings.NewReader(mountsFixture), "03ca4b49e71f1e49a41108829f4d5c70ac95934526e2af8984a1f65f1de0715d", unmount)
 
-	if unmounted != 1 ***REMOVED***
+	if unmounted != 1 {
 		t.Fatal("Expected to unmount the auf root (and that only)")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestNotCleanupMounts(t *testing.T) ***REMOVED***
-	d := &Daemon***REMOVED***
+func TestNotCleanupMounts(t *testing.T) {
+	d := &Daemon{
 		repository: "",
-	***REMOVED***
+	}
 	var unmounted bool
-	unmount := func(target string) error ***REMOVED***
+	unmount := func(target string) error {
 		unmounted = true
 		return nil
-	***REMOVED***
+	}
 	mountInfo := `234 232 0:59 / /dev/shm rw,nosuid,nodev,noexec,relatime - tmpfs shm rw,size=65536k`
 	d.cleanupMountsFromReaderByID(strings.NewReader(mountInfo), "", unmount)
-	if unmounted ***REMOVED***
+	if unmounted {
 		t.Fatal("Expected not to clean up /dev/shm")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // TestTmpfsDevShmSizeOverride checks that user-specified /dev/tmpfs mount
 // size is not overriden by the default shmsize (that should only be used
 // for default /dev/shm (as in "shareable" and "private" ipc modes).
 // https://github.com/moby/moby/issues/35271
-func TestTmpfsDevShmSizeOverride(t *testing.T) ***REMOVED***
+func TestTmpfsDevShmSizeOverride(t *testing.T) {
 	size := "777m"
 	mnt := "/dev/shm"
 
-	d := Daemon***REMOVED***
-		idMappings: &idtools.IDMappings***REMOVED******REMOVED***,
-	***REMOVED***
-	c := &container.Container***REMOVED***
-		HostConfig: &containertypes.HostConfig***REMOVED***
+	d := Daemon{
+		idMappings: &idtools.IDMappings{},
+	}
+	c := &container.Container{
+		HostConfig: &containertypes.HostConfig{
 			ShmSize: 48 * 1024, // size we should NOT end up with
-		***REMOVED***,
-	***REMOVED***
-	ms := []container.Mount***REMOVED***
-		***REMOVED***
+		},
+	}
+	ms := []container.Mount{
+		{
 			Source:      "tmpfs",
 			Destination: mnt,
 			Data:        "size=" + size,
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
 	// convert ms to spec
 	spec := oci.DefaultSpec()
@@ -141,26 +141,26 @@ func TestTmpfsDevShmSizeOverride(t *testing.T) ***REMOVED***
 
 	// Check the resulting spec for the correct size
 	found := false
-	for _, m := range spec.Mounts ***REMOVED***
-		if m.Destination == mnt ***REMOVED***
-			for _, o := range m.Options ***REMOVED***
-				if !strings.HasPrefix(o, "size=") ***REMOVED***
+	for _, m := range spec.Mounts {
+		if m.Destination == mnt {
+			for _, o := range m.Options {
+				if !strings.HasPrefix(o, "size=") {
 					continue
-				***REMOVED***
+				}
 				t.Logf("%+v\n", m.Options)
 				assert.Equal(t, "size="+size, o)
 				found = true
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-	if !found ***REMOVED***
+			}
+		}
+	}
+	if !found {
 		t.Fatal("/dev/shm not found in spec, or size option missing")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestValidateContainerIsolationLinux(t *testing.T) ***REMOVED***
-	d := Daemon***REMOVED******REMOVED***
+func TestValidateContainerIsolationLinux(t *testing.T) {
+	d := Daemon{}
 
-	_, err := d.verifyContainerSettings("linux", &containertypes.HostConfig***REMOVED***Isolation: containertypes.IsolationHyperV***REMOVED***, nil, false)
+	_, err := d.verifyContainerSettings("linux", &containertypes.HostConfig{Isolation: containertypes.IsolationHyperV}, nil, false)
 	assert.EqualError(t, err, "invalid isolation 'hyperv' on linux")
-***REMOVED***
+}

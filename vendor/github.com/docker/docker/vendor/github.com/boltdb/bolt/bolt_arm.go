@@ -11,7 +11,7 @@ const maxAllocSize = 0xFFFFFFF
 // Are unaligned load/stores broken on this arch?
 var brokenUnaligned bool
 
-func init() ***REMOVED***
+func init() {
 	// Simple check to see whether this arch handles unaligned load/stores
 	// correctly.
 
@@ -21,8 +21,8 @@ func init() ***REMOVED***
 
 	// See http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.faqs/ka15414.html
 
-	raw := [6]byte***REMOVED***0xfe, 0xef, 0x11, 0x22, 0x22, 0x11***REMOVED***
+	raw := [6]byte{0xfe, 0xef, 0x11, 0x22, 0x22, 0x11}
 	val := *(*uint32)(unsafe.Pointer(uintptr(unsafe.Pointer(&raw)) + 2))
 
 	brokenUnaligned = val != 0x11222211
-***REMOVED***
+}

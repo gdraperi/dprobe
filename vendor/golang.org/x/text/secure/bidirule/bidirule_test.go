@@ -29,7 +29,7 @@ const (
 	strON  = "@"      // Other Neutrals, including @, &, parentheses, MIDDLE DOT
 )
 
-type ruleTest struct ***REMOVED***
+type ruleTest struct {
 	in  string
 	dir bidi.Direction
 	n   int // position at which the rule fails
@@ -40,129 +40,129 @@ type ruleTest struct ***REMOVED***
 	szDst int   // size of destination buffer
 	nSrc  int   // source bytes consumed and bytes written
 	err0  error // error after first run
-***REMOVED***
+}
 
-func init() ***REMOVED***
-	for rule, cases := range testCases ***REMOVED***
-		for i, tc := range cases ***REMOVED***
-			if tc.err == nil ***REMOVED***
+func init() {
+	for rule, cases := range testCases {
+		for i, tc := range cases {
+			if tc.err == nil {
 				testCases[rule][i].n = len(tc.in)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}
 
-func doTests(t *testing.T, fn func(t *testing.T, tc ruleTest)) ***REMOVED***
-	for rule, cases := range testCases ***REMOVED***
-		for i, tc := range cases ***REMOVED***
+func doTests(t *testing.T, fn func(t *testing.T, tc ruleTest)) {
+	for rule, cases := range testCases {
+		for i, tc := range cases {
 			name := fmt.Sprintf("%d/%d:%+q:%s", rule, i, tc.in, tc.in)
-			testtext.Run(t, name, func(t *testing.T) ***REMOVED***
+			testtext.Run(t, name, func(t *testing.T) {
 				fn(t, tc)
-			***REMOVED***)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			})
+		}
+	}
+}
 
-func TestDirection(t *testing.T) ***REMOVED***
-	doTests(t, func(t *testing.T, tc ruleTest) ***REMOVED***
+func TestDirection(t *testing.T) {
+	doTests(t, func(t *testing.T, tc ruleTest) {
 		dir := Direction([]byte(tc.in))
-		if dir != tc.dir ***REMOVED***
+		if dir != tc.dir {
 			t.Errorf("dir was %v; want %v", dir, tc.dir)
-		***REMOVED***
-	***REMOVED***)
-***REMOVED***
+		}
+	})
+}
 
-func TestDirectionString(t *testing.T) ***REMOVED***
-	doTests(t, func(t *testing.T, tc ruleTest) ***REMOVED***
+func TestDirectionString(t *testing.T) {
+	doTests(t, func(t *testing.T, tc ruleTest) {
 		dir := DirectionString(tc.in)
-		if dir != tc.dir ***REMOVED***
+		if dir != tc.dir {
 			t.Errorf("dir was %v; want %v", dir, tc.dir)
-		***REMOVED***
-	***REMOVED***)
-***REMOVED***
+		}
+	})
+}
 
-func TestValid(t *testing.T) ***REMOVED***
-	doTests(t, func(t *testing.T, tc ruleTest) ***REMOVED***
+func TestValid(t *testing.T) {
+	doTests(t, func(t *testing.T, tc ruleTest) {
 		got := Valid([]byte(tc.in))
 		want := tc.err == nil
-		if got != want ***REMOVED***
+		if got != want {
 			t.Fatalf("Valid: got %v; want %v", got, want)
-		***REMOVED***
+		}
 
 		got = ValidString(tc.in)
 		want = tc.err == nil
-		if got != want ***REMOVED***
+		if got != want {
 			t.Fatalf("Valid: got %v; want %v", got, want)
-		***REMOVED***
-	***REMOVED***)
-***REMOVED***
+		}
+	})
+}
 
-func TestSpan(t *testing.T) ***REMOVED***
-	doTests(t, func(t *testing.T, tc ruleTest) ***REMOVED***
+func TestSpan(t *testing.T) {
+	doTests(t, func(t *testing.T, tc ruleTest) {
 		// Skip tests that test for limited destination buffer size.
-		if tc.szDst > 0 ***REMOVED***
+		if tc.szDst > 0 {
 			return
-		***REMOVED***
+		}
 
 		r := New()
 		src := []byte(tc.in)
 
 		n, err := r.Span(src[:tc.pSrc], tc.pSrc == len(tc.in))
-		if err != tc.err0 ***REMOVED***
+		if err != tc.err0 {
 			t.Errorf("err0 was %v; want %v", err, tc.err0)
-		***REMOVED***
-		if n != tc.nSrc ***REMOVED***
+		}
+		if n != tc.nSrc {
 			t.Fatalf("nSrc was %d; want %d", n, tc.nSrc)
-		***REMOVED***
+		}
 
 		n, err = r.Span(src[n:], true)
-		if err != tc.err ***REMOVED***
+		if err != tc.err {
 			t.Errorf("error was %v; want %v", err, tc.err)
-		***REMOVED***
-		if got := n + tc.nSrc; got != tc.n ***REMOVED***
+		}
+		if got := n + tc.nSrc; got != tc.n {
 			t.Errorf("n was %d; want %d", got, tc.n)
-		***REMOVED***
-	***REMOVED***)
-***REMOVED***
+		}
+	})
+}
 
-func TestTransform(t *testing.T) ***REMOVED***
-	doTests(t, func(t *testing.T, tc ruleTest) ***REMOVED***
+func TestTransform(t *testing.T) {
+	doTests(t, func(t *testing.T, tc ruleTest) {
 		r := New()
 
 		src := []byte(tc.in)
 		dst := make([]byte, len(tc.in))
-		if tc.szDst > 0 ***REMOVED***
+		if tc.szDst > 0 {
 			dst = make([]byte, tc.szDst)
-		***REMOVED***
+		}
 
 		// First transform operates on a zero-length string for most tests.
 		nDst, nSrc, err := r.Transform(dst, src[:tc.pSrc], tc.pSrc == len(tc.in))
-		if err != tc.err0 ***REMOVED***
+		if err != tc.err0 {
 			t.Errorf("err0 was %v; want %v", err, tc.err0)
-		***REMOVED***
-		if nDst != nSrc ***REMOVED***
+		}
+		if nDst != nSrc {
 			t.Fatalf("nDst (%d) and nSrc (%d) should match", nDst, nSrc)
-		***REMOVED***
-		if nSrc != tc.nSrc ***REMOVED***
+		}
+		if nSrc != tc.nSrc {
 			t.Fatalf("nSrc was %d; want %d", nSrc, tc.nSrc)
-		***REMOVED***
+		}
 
 		dst1 := make([]byte, len(tc.in))
 		copy(dst1, dst[:nDst])
 
 		nDst, nSrc, err = r.Transform(dst1[nDst:], src[nSrc:], true)
-		if err != tc.err ***REMOVED***
+		if err != tc.err {
 			t.Errorf("error was %v; want %v", err, tc.err)
-		***REMOVED***
-		if nDst != nSrc ***REMOVED***
+		}
+		if nDst != nSrc {
 			t.Fatalf("nDst (%d) and nSrc (%d) should match", nDst, nSrc)
-		***REMOVED***
+		}
 		n := nSrc + tc.nSrc
-		if n != tc.n ***REMOVED***
+		if n != tc.n {
 			t.Fatalf("n was %d; want %d", n, tc.n)
-		***REMOVED***
-		if got, want := string(dst1[:n]), tc.in[:tc.n]; got != want ***REMOVED***
+		}
+		if got, want := string(dst1[:n]), tc.in[:tc.n]; got != want {
 			t.Errorf("got %+q; want %+q", got, want)
-		***REMOVED***
-	***REMOVED***)
-***REMOVED***
+		}
+	})
+}

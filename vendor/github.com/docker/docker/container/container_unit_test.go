@@ -9,60 +9,60 @@ import (
 	"github.com/docker/docker/pkg/signal"
 )
 
-func TestContainerStopSignal(t *testing.T) ***REMOVED***
-	c := &Container***REMOVED***
-		Config: &container.Config***REMOVED******REMOVED***,
-	***REMOVED***
+func TestContainerStopSignal(t *testing.T) {
+	c := &Container{
+		Config: &container.Config{},
+	}
 
 	def, err := signal.ParseSignal(signal.DefaultStopSignal)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	s := c.StopSignal()
-	if s != int(def) ***REMOVED***
+	if s != int(def) {
 		t.Fatalf("Expected %v, got %v", def, s)
-	***REMOVED***
+	}
 
-	c = &Container***REMOVED***
-		Config: &container.Config***REMOVED***StopSignal: "SIGKILL"***REMOVED***,
-	***REMOVED***
+	c = &Container{
+		Config: &container.Config{StopSignal: "SIGKILL"},
+	}
 	s = c.StopSignal()
-	if s != 9 ***REMOVED***
+	if s != 9 {
 		t.Fatalf("Expected 9, got %v", s)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestContainerStopTimeout(t *testing.T) ***REMOVED***
-	c := &Container***REMOVED***
-		Config: &container.Config***REMOVED******REMOVED***,
-	***REMOVED***
+func TestContainerStopTimeout(t *testing.T) {
+	c := &Container{
+		Config: &container.Config{},
+	}
 
 	s := c.StopTimeout()
-	if s != DefaultStopTimeout ***REMOVED***
+	if s != DefaultStopTimeout {
 		t.Fatalf("Expected %v, got %v", DefaultStopTimeout, s)
-	***REMOVED***
+	}
 
 	stopTimeout := 15
-	c = &Container***REMOVED***
-		Config: &container.Config***REMOVED***StopTimeout: &stopTimeout***REMOVED***,
-	***REMOVED***
+	c = &Container{
+		Config: &container.Config{StopTimeout: &stopTimeout},
+	}
 	s = c.StopSignal()
-	if s != 15 ***REMOVED***
+	if s != 15 {
 		t.Fatalf("Expected 15, got %v", s)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestContainerSecretReferenceDestTarget(t *testing.T) ***REMOVED***
-	ref := &swarmtypes.SecretReference***REMOVED***
-		File: &swarmtypes.SecretReferenceFileTarget***REMOVED***
+func TestContainerSecretReferenceDestTarget(t *testing.T) {
+	ref := &swarmtypes.SecretReference{
+		File: &swarmtypes.SecretReferenceFileTarget{
 			Name: "app",
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
 	d := getSecretTargetPath(ref)
 	expected := filepath.Join(containerSecretMountPath, "app")
-	if d != expected ***REMOVED***
+	if d != expected {
 		t.Fatalf("expected secret dest %q; received %q", expected, d)
-	***REMOVED***
-***REMOVED***
+	}
+}

@@ -6,39 +6,39 @@ package argon2
 
 var useSSE4 bool
 
-func processBlockGeneric(out, in1, in2 *block, xor bool) ***REMOVED***
+func processBlockGeneric(out, in1, in2 *block, xor bool) {
 	var t block
-	for i := range t ***REMOVED***
+	for i := range t {
 		t[i] = in1[i] ^ in2[i]
-	***REMOVED***
-	for i := 0; i < blockLength; i += 16 ***REMOVED***
+	}
+	for i := 0; i < blockLength; i += 16 {
 		blamkaGeneric(
 			&t[i+0], &t[i+1], &t[i+2], &t[i+3],
 			&t[i+4], &t[i+5], &t[i+6], &t[i+7],
 			&t[i+8], &t[i+9], &t[i+10], &t[i+11],
 			&t[i+12], &t[i+13], &t[i+14], &t[i+15],
 		)
-	***REMOVED***
-	for i := 0; i < blockLength/8; i += 2 ***REMOVED***
+	}
+	for i := 0; i < blockLength/8; i += 2 {
 		blamkaGeneric(
 			&t[i], &t[i+1], &t[16+i], &t[16+i+1],
 			&t[32+i], &t[32+i+1], &t[48+i], &t[48+i+1],
 			&t[64+i], &t[64+i+1], &t[80+i], &t[80+i+1],
 			&t[96+i], &t[96+i+1], &t[112+i], &t[112+i+1],
 		)
-	***REMOVED***
-	if xor ***REMOVED***
-		for i := range t ***REMOVED***
+	}
+	if xor {
+		for i := range t {
 			out[i] ^= in1[i] ^ in2[i] ^ t[i]
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
-		for i := range t ***REMOVED***
+		}
+	} else {
+		for i := range t {
 			out[i] = in1[i] ^ in2[i] ^ t[i]
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func blamkaGeneric(t00, t01, t02, t03, t04, t05, t06, t07, t08, t09, t10, t11, t12, t13, t14, t15 *uint64) ***REMOVED***
+func blamkaGeneric(t00, t01, t02, t03, t04, t05, t06, t07, t08, t09, t10, t11, t12, t13, t14, t15 *uint64) {
 	v00, v01, v02, v03 := *t00, *t01, *t02, *t03
 	v04, v05, v06, v07 := *t04, *t05, *t06, *t07
 	v08, v09, v10, v11 := *t08, *t09, *t10, *t11
@@ -160,4 +160,4 @@ func blamkaGeneric(t00, t01, t02, t03, t04, t05, t06, t07, t08, t09, t10, t11, t
 	*t04, *t05, *t06, *t07 = v04, v05, v06, v07
 	*t08, *t09, *t10, *t11 = v08, v09, v10, v11
 	*t12, *t13, *t14, *t15 = v12, v13, v14, v15
-***REMOVED***
+}

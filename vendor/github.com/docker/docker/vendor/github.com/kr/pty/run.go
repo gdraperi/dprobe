@@ -9,20 +9,20 @@ import (
 // Start assigns a pseudo-terminal tty os.File to c.Stdin, c.Stdout,
 // and c.Stderr, calls c.Start, and returns the File of the tty's
 // corresponding pty.
-func Start(c *exec.Cmd) (pty *os.File, err error) ***REMOVED***
+func Start(c *exec.Cmd) (pty *os.File, err error) {
 	pty, tty, err := Open()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	defer tty.Close()
 	c.Stdout = tty
 	c.Stdin = tty
 	c.Stderr = tty
-	c.SysProcAttr = &syscall.SysProcAttr***REMOVED***Setctty: true, Setsid: true***REMOVED***
+	c.SysProcAttr = &syscall.SysProcAttr{Setctty: true, Setsid: true}
 	err = c.Start()
-	if err != nil ***REMOVED***
+	if err != nil {
 		pty.Close()
 		return nil, err
-	***REMOVED***
+	}
 	return pty, err
-***REMOVED***
+}

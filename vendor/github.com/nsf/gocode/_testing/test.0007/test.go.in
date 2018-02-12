@@ -2,6 +2,6 @@ package main
 
 import "syscall"
 
-func main() ***REMOVED***
+func main() {
 	syscall.var
-***REMOVED***
+}

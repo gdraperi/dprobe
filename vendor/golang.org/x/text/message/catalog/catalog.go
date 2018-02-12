@@ -75,14 +75,14 @@
 //   catalog.Set(language.English, "You are %d minute(s) late.",
 //       catalog.Var("minutes",
 //           plural.Select(1, "one", "minute", "other", "minutes")),
-//       catalog.String("You are %[1]d $***REMOVED***minutes***REMOVED*** late."))
+//       catalog.String("You are %[1]d ${minutes} late."))
 //
 // Var is defined to return the variable name if the message does not yield a
 // match. This allows us to further simplify this snippet to
 //
 //   catalog.Set(language.English, "You are %d minute(s) late.",
 //       catalog.Var("minutes", plural.Select(1, "one", "minute")),
-//       catalog.String("You are %d $***REMOVED***minutes***REMOVED*** late."))
+//       catalog.String("You are %d ${minutes} late."))
 //
 // Overall this is still only a minor improvement, but things can get a lot more
 // unwieldy if more than one linguistic feature is used to determine a message
@@ -94,7 +94,7 @@
 //         plural.Select(1,
 //             "one", gender.Select(1, "female", "her", "other", "his"))),
 //     catalog.Var("invites", plural.Select(1, "one", "invite"))
-//     catalog.String("%[1]v $***REMOVED***invites***REMOVED*** %[2]v to $***REMOVED***their***REMOVED*** party.")),
+//     catalog.String("%[1]v ${invites} %[2]v to ${their} party.")),
 //
 // Without variable substitution, this would have to be written as
 //
@@ -115,7 +115,7 @@
 //
 //   // argument 1: list of hosts, argument 2: list of guests
 //   catalog.SetString(language.English, "%[1]v invite(s) %[2]v to their party.",
-//       "%[1]v $***REMOVED***invites(1)***REMOVED*** %[2]v to $***REMOVED***their(1)***REMOVED*** party.")
+//       "%[1]v ${invites(1)} %[2]v to ${their(1)} party.")
 //
 // Where the following macros were defined separately.
 //
@@ -163,7 +163,7 @@ import (
 )
 
 // A Catalog allows lookup of translated messages.
-type Catalog interface ***REMOVED***
+type Catalog interface {
 	// Languages returns all languages for which the Catalog contains variants.
 	Languages() []language.Tag
 
@@ -175,149 +175,149 @@ type Catalog interface ***REMOVED***
 
 	// This method also makes Catalog a private interface.
 	lookup(tag language.Tag, key string) (data string, ok bool)
-***REMOVED***
+}
 
 // NewFromMap creates a Catalog from the given map. If a Dictionary is
 // underspecified the entry is retrieved from a parent language.
-func NewFromMap(dictionaries map[string]Dictionary, opts ...Option) (Catalog, error) ***REMOVED***
-	options := options***REMOVED******REMOVED***
-	for _, o := range opts ***REMOVED***
+func NewFromMap(dictionaries map[string]Dictionary, opts ...Option) (Catalog, error) {
+	options := options{}
+	for _, o := range opts {
 		o(&options)
-	***REMOVED***
-	c := &catalog***REMOVED***
-		dicts: map[language.Tag]Dictionary***REMOVED******REMOVED***,
-	***REMOVED***
+	}
+	c := &catalog{
+		dicts: map[language.Tag]Dictionary{},
+	}
 	_, hasFallback := dictionaries[options.fallback.String()]
-	if hasFallback ***REMOVED***
+	if hasFallback {
 		// TODO: Should it be okay to not have a fallback language?
 		// Catalog generators could enforce there is always a fallback.
 		c.langs = append(c.langs, options.fallback)
-	***REMOVED***
-	for lang, dict := range dictionaries ***REMOVED***
+	}
+	for lang, dict := range dictionaries {
 		tag, err := language.Parse(lang)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, fmt.Errorf("catalog: invalid language tag %q", lang)
-		***REMOVED***
-		if _, ok := c.dicts[tag]; ok ***REMOVED***
+		}
+		if _, ok := c.dicts[tag]; ok {
 			return nil, fmt.Errorf("catalog: duplicate entry for tag %q after normalization", tag)
-		***REMOVED***
+		}
 		c.dicts[tag] = dict
-		if !hasFallback || tag != options.fallback ***REMOVED***
+		if !hasFallback || tag != options.fallback {
 			c.langs = append(c.langs, tag)
-		***REMOVED***
-	***REMOVED***
-	if hasFallback ***REMOVED***
+		}
+	}
+	if hasFallback {
 		internal.SortTags(c.langs[1:])
-	***REMOVED*** else ***REMOVED***
+	} else {
 		internal.SortTags(c.langs)
-	***REMOVED***
+	}
 	c.matcher = language.NewMatcher(c.langs)
 	return c, nil
-***REMOVED***
+}
 
 // A Dictionary is a source of translations for a single language.
-type Dictionary interface ***REMOVED***
+type Dictionary interface {
 	// Lookup returns a message compiled with catmsg.Compile for the given key.
 	// It returns false for ok if such a message could not be found.
 	Lookup(key string) (data string, ok bool)
-***REMOVED***
+}
 
-type catalog struct ***REMOVED***
+type catalog struct {
 	langs   []language.Tag
 	dicts   map[language.Tag]Dictionary
 	macros  store
 	matcher language.Matcher
-***REMOVED***
+}
 
-func (c *catalog) Languages() []language.Tag ***REMOVED*** return c.langs ***REMOVED***
-func (c *catalog) Matcher() language.Matcher ***REMOVED*** return c.matcher ***REMOVED***
+func (c *catalog) Languages() []language.Tag { return c.langs }
+func (c *catalog) Matcher() language.Matcher { return c.matcher }
 
-func (c *catalog) lookup(tag language.Tag, key string) (data string, ok bool) ***REMOVED***
-	for ; ; tag = tag.Parent() ***REMOVED***
-		if dict, ok := c.dicts[tag]; ok ***REMOVED***
-			if data, ok := dict.Lookup(key); ok ***REMOVED***
+func (c *catalog) lookup(tag language.Tag, key string) (data string, ok bool) {
+	for ; ; tag = tag.Parent() {
+		if dict, ok := c.dicts[tag]; ok {
+			if data, ok := dict.Lookup(key); ok {
 				return data, true
-			***REMOVED***
-		***REMOVED***
-		if tag == language.Und ***REMOVED***
+			}
+		}
+		if tag == language.Und {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return "", false
-***REMOVED***
+}
 
 // Context returns a Context for formatting messages.
 // Only one Message may be formatted per context at any given time.
-func (c *catalog) Context(tag language.Tag, r catmsg.Renderer) *Context ***REMOVED***
-	return &Context***REMOVED***
+func (c *catalog) Context(tag language.Tag, r catmsg.Renderer) *Context {
+	return &Context{
 		cat: c,
 		tag: tag,
-		dec: catmsg.NewDecoder(tag, r, &dict***REMOVED***&c.macros, tag***REMOVED***),
-	***REMOVED***
-***REMOVED***
+		dec: catmsg.NewDecoder(tag, r, &dict{&c.macros, tag}),
+	}
+}
 
 // A Builder allows building a Catalog programmatically.
-type Builder struct ***REMOVED***
+type Builder struct {
 	options
 	matcher language.Matcher
 
 	index  store
 	macros store
-***REMOVED***
+}
 
-type options struct ***REMOVED***
+type options struct {
 	fallback language.Tag
-***REMOVED***
+}
 
 // An Option configures Catalog behavior.
 type Option func(*options)
 
 // Fallback specifies the default fallback language. The default is Und.
-func Fallback(tag language.Tag) Option ***REMOVED***
-	return func(o *options) ***REMOVED*** o.fallback = tag ***REMOVED***
-***REMOVED***
+func Fallback(tag language.Tag) Option {
+	return func(o *options) { o.fallback = tag }
+}
 
 // TODO:
 // // Catalogs specifies one or more sources for a Catalog.
 // // Lookups are in order.
 // // This can be changed inserting a Catalog used for setting, which implements
 // // Loader, used for setting in the chain.
-// func Catalogs(d ...Loader) Option ***REMOVED***
+// func Catalogs(d ...Loader) Option {
 // 	return nil
-// ***REMOVED***
+// }
 //
-// func Delims(start, end string) Option ***REMOVED******REMOVED***
+// func Delims(start, end string) Option {}
 //
 // func Dict(tag language.Tag, d ...Dictionary) Option
 
 // NewBuilder returns an empty mutable Catalog.
-func NewBuilder(opts ...Option) *Builder ***REMOVED***
-	c := &Builder***REMOVED******REMOVED***
-	for _, o := range opts ***REMOVED***
+func NewBuilder(opts ...Option) *Builder {
+	c := &Builder{}
+	for _, o := range opts {
 		o(&c.options)
-	***REMOVED***
+	}
 	return c
-***REMOVED***
+}
 
 // SetString is shorthand for Set(tag, key, String(msg)).
-func (c *Builder) SetString(tag language.Tag, key string, msg string) error ***REMOVED***
+func (c *Builder) SetString(tag language.Tag, key string, msg string) error {
 	return c.set(tag, key, &c.index, String(msg))
-***REMOVED***
+}
 
 // Set sets the translation for the given language and key.
 //
 // When evaluation this message, the first Message in the sequence to msgs to
 // evaluate to a string will be the message returned.
-func (c *Builder) Set(tag language.Tag, key string, msg ...Message) error ***REMOVED***
+func (c *Builder) Set(tag language.Tag, key string, msg ...Message) error {
 	return c.set(tag, key, &c.index, msg...)
-***REMOVED***
+}
 
 // SetMacro defines a Message that may be substituted in another message.
 // The arguments to a macro Message are passed as arguments in the
-// placeholder the form "$***REMOVED***foo(arg1, arg2)***REMOVED***".
-func (c *Builder) SetMacro(tag language.Tag, name string, msg ...Message) error ***REMOVED***
+// placeholder the form "${foo(arg1, arg2)}".
+func (c *Builder) SetMacro(tag language.Tag, name string, msg ...Message) error {
 	return c.set(tag, name, &c.macros, msg...)
-***REMOVED***
+}
 
 // ErrNotFound indicates there was no message for the given key.
 var ErrNotFound = errors.New("catalog: message not found")
@@ -326,44 +326,44 @@ var ErrNotFound = errors.New("catalog: message not found")
 // other strings match or as a simple standalone message.
 //
 // It is an error to pass more than one String in a message sequence.
-func String(name string) Message ***REMOVED***
+func String(name string) Message {
 	return catmsg.String(name)
-***REMOVED***
+}
 
 // Var sets a variable that may be substituted in formatting patterns using
-// named substitution of the form "$***REMOVED***name***REMOVED***". The name argument is used as a
+// named substitution of the form "${name}". The name argument is used as a
 // fallback if the statements do not produce a match. The statement sequence may
 // not contain any Var calls.
 //
 // The name passed to a Var must be unique within message sequence.
-func Var(name string, msg ...Message) Message ***REMOVED***
-	return &catmsg.Var***REMOVED***Name: name, Message: firstInSequence(msg)***REMOVED***
-***REMOVED***
+func Var(name string, msg ...Message) Message {
+	return &catmsg.Var{Name: name, Message: firstInSequence(msg)}
+}
 
 // Context returns a Context for formatting messages.
 // Only one Message may be formatted per context at any given time.
-func (b *Builder) Context(tag language.Tag, r catmsg.Renderer) *Context ***REMOVED***
-	return &Context***REMOVED***
+func (b *Builder) Context(tag language.Tag, r catmsg.Renderer) *Context {
+	return &Context{
 		cat: b,
 		tag: tag,
-		dec: catmsg.NewDecoder(tag, r, &dict***REMOVED***&b.macros, tag***REMOVED***),
-	***REMOVED***
-***REMOVED***
+		dec: catmsg.NewDecoder(tag, r, &dict{&b.macros, tag}),
+	}
+}
 
 // A Context is used for evaluating Messages.
 // Only one Message may be formatted per context at any given time.
-type Context struct ***REMOVED***
+type Context struct {
 	cat Catalog
 	tag language.Tag // TODO: use compact index.
 	dec *catmsg.Decoder
-***REMOVED***
+}
 
 // Execute looks up and executes the message with the given key.
 // It returns ErrNotFound if no message could be found in the index.
-func (c *Context) Execute(key string) error ***REMOVED***
+func (c *Context) Execute(key string) error {
 	data, ok := c.cat.lookup(c.tag, key)
-	if !ok ***REMOVED***
+	if !ok {
 		return ErrNotFound
-	***REMOVED***
+	}
 	return c.dec.Execute(data)
-***REMOVED***
+}

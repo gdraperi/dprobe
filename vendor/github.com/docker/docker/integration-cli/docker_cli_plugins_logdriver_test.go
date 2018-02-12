@@ -9,7 +9,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-func (s *DockerSuite) TestPluginLogDriver(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestPluginLogDriver(c *check.C) {
 	testRequires(c, IsAmd64, DaemonIsLinux)
 
 	pluginName := "cpuguy83/docker-logdriver-test:latest"
@@ -26,10 +26,10 @@ func (s *DockerSuite) TestPluginLogDriver(c *check.C) ***REMOVED***
 	dockerCmd(c, "rm", "test")
 	dockerCmd(c, "plugin", "disable", pluginName)
 	dockerCmd(c, "plugin", "rm", pluginName)
-***REMOVED***
+}
 
 // Make sure log drivers are listed in info, and v2 plugins are not.
-func (s *DockerSuite) TestPluginLogDriverInfoList(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestPluginLogDriverInfoList(c *check.C) {
 	testRequires(c, IsAmd64, DaemonIsLinux)
 	pluginName := "cpuguy83/docker-logdriver-test"
 
@@ -45,4 +45,4 @@ func (s *DockerSuite) TestPluginLogDriverInfoList(c *check.C) ***REMOVED***
 	drivers := strings.Join(info.Plugins.Log, " ")
 	c.Assert(drivers, checker.Contains, "json-file")
 	c.Assert(drivers, checker.Not(checker.Contains), pluginName)
-***REMOVED***
+}

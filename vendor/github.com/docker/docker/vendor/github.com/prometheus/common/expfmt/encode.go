@@ -26,63 +26,63 @@ import (
 )
 
 // Encoder types encode metric families into an underlying wire protocol.
-type Encoder interface ***REMOVED***
+type Encoder interface {
 	Encode(*dto.MetricFamily) error
-***REMOVED***
+}
 
 type encoder func(*dto.MetricFamily) error
 
-func (e encoder) Encode(v *dto.MetricFamily) error ***REMOVED***
+func (e encoder) Encode(v *dto.MetricFamily) error {
 	return e(v)
-***REMOVED***
+}
 
 // Negotiate returns the Content-Type based on the given Accept header.
 // If no appropriate accepted type is found, FmtText is returned.
-func Negotiate(h http.Header) Format ***REMOVED***
-	for _, ac := range goautoneg.ParseAccept(h.Get(hdrAccept)) ***REMOVED***
+func Negotiate(h http.Header) Format {
+	for _, ac := range goautoneg.ParseAccept(h.Get(hdrAccept)) {
 		// Check for protocol buffer
-		if ac.Type+"/"+ac.SubType == ProtoType && ac.Params["proto"] == ProtoProtocol ***REMOVED***
-			switch ac.Params["encoding"] ***REMOVED***
+		if ac.Type+"/"+ac.SubType == ProtoType && ac.Params["proto"] == ProtoProtocol {
+			switch ac.Params["encoding"] {
 			case "delimited":
 				return FmtProtoDelim
 			case "text":
 				return FmtProtoText
 			case "compact-text":
 				return FmtProtoCompact
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		// Check for text format.
 		ver := ac.Params["version"]
-		if ac.Type == "text" && ac.SubType == "plain" && (ver == TextVersion || ver == "") ***REMOVED***
+		if ac.Type == "text" && ac.SubType == "plain" && (ver == TextVersion || ver == "") {
 			return FmtText
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return FmtText
-***REMOVED***
+}
 
 // NewEncoder returns a new encoder based on content type negotiation.
-func NewEncoder(w io.Writer, format Format) Encoder ***REMOVED***
-	switch format ***REMOVED***
+func NewEncoder(w io.Writer, format Format) Encoder {
+	switch format {
 	case FmtProtoDelim:
-		return encoder(func(v *dto.MetricFamily) error ***REMOVED***
+		return encoder(func(v *dto.MetricFamily) error {
 			_, err := pbutil.WriteDelimited(w, v)
 			return err
-		***REMOVED***)
+		})
 	case FmtProtoCompact:
-		return encoder(func(v *dto.MetricFamily) error ***REMOVED***
+		return encoder(func(v *dto.MetricFamily) error {
 			_, err := fmt.Fprintln(w, v.String())
 			return err
-		***REMOVED***)
+		})
 	case FmtProtoText:
-		return encoder(func(v *dto.MetricFamily) error ***REMOVED***
+		return encoder(func(v *dto.MetricFamily) error {
 			_, err := fmt.Fprintln(w, proto.MarshalTextString(v))
 			return err
-		***REMOVED***)
+		})
 	case FmtText:
-		return encoder(func(v *dto.MetricFamily) error ***REMOVED***
+		return encoder(func(v *dto.MetricFamily) error {
 			_, err := MetricFamilyToText(w, v)
 			return err
-		***REMOVED***)
-	***REMOVED***
+		})
+	}
 	panic("expfmt.NewEncoder: unknown format")
-***REMOVED***
+}

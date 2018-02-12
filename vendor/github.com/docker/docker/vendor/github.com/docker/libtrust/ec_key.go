@@ -20,65 +20,65 @@ import (
 
 // ecPublicKey implements a libtrust.PublicKey using elliptic curve digital
 // signature algorithms.
-type ecPublicKey struct ***REMOVED***
+type ecPublicKey struct {
 	*ecdsa.PublicKey
 	curveName          string
 	signatureAlgorithm *signatureAlgorithm
-	extended           map[string]interface***REMOVED******REMOVED***
-***REMOVED***
+	extended           map[string]interface{}
+}
 
-func fromECPublicKey(cryptoPublicKey *ecdsa.PublicKey) (*ecPublicKey, error) ***REMOVED***
+func fromECPublicKey(cryptoPublicKey *ecdsa.PublicKey) (*ecPublicKey, error) {
 	curve := cryptoPublicKey.Curve
 
-	switch ***REMOVED***
+	switch {
 	case curve == elliptic.P256():
-		return &ecPublicKey***REMOVED***cryptoPublicKey, "P-256", es256, map[string]interface***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***, nil
+		return &ecPublicKey{cryptoPublicKey, "P-256", es256, map[string]interface{}{}}, nil
 	case curve == elliptic.P384():
-		return &ecPublicKey***REMOVED***cryptoPublicKey, "P-384", es384, map[string]interface***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***, nil
+		return &ecPublicKey{cryptoPublicKey, "P-384", es384, map[string]interface{}{}}, nil
 	case curve == elliptic.P521():
-		return &ecPublicKey***REMOVED***cryptoPublicKey, "P-521", es512, map[string]interface***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***, nil
+		return &ecPublicKey{cryptoPublicKey, "P-521", es512, map[string]interface{}{}}, nil
 	default:
 		return nil, errors.New("unsupported elliptic curve")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // KeyType returns the key type for elliptic curve keys, i.e., "EC".
-func (k *ecPublicKey) KeyType() string ***REMOVED***
+func (k *ecPublicKey) KeyType() string {
 	return "EC"
-***REMOVED***
+}
 
 // CurveName returns the elliptic curve identifier.
 // Possible values are "P-256", "P-384", and "P-521".
-func (k *ecPublicKey) CurveName() string ***REMOVED***
+func (k *ecPublicKey) CurveName() string {
 	return k.curveName
-***REMOVED***
+}
 
 // KeyID returns a distinct identifier which is unique to this Public Key.
-func (k *ecPublicKey) KeyID() string ***REMOVED***
+func (k *ecPublicKey) KeyID() string {
 	return keyIDFromCryptoKey(k)
-***REMOVED***
+}
 
-func (k *ecPublicKey) String() string ***REMOVED***
+func (k *ecPublicKey) String() string {
 	return fmt.Sprintf("EC Public Key <%s>", k.KeyID())
-***REMOVED***
+}
 
 // Verify verifyies the signature of the data in the io.Reader using this
 // PublicKey. The alg parameter should identify the digital signature
 // algorithm which was used to produce the signature and should be supported
 // by this public key. Returns a nil error if the signature is valid.
-func (k *ecPublicKey) Verify(data io.Reader, alg string, signature []byte) error ***REMOVED***
+func (k *ecPublicKey) Verify(data io.Reader, alg string, signature []byte) error {
 	// For EC keys there is only one supported signature algorithm depending
 	// on the curve parameters.
-	if k.signatureAlgorithm.HeaderParam() != alg ***REMOVED***
+	if k.signatureAlgorithm.HeaderParam() != alg {
 		return fmt.Errorf("unable to verify signature: EC Public Key with curve %q does not support signature algorithm %q", k.curveName, alg)
-	***REMOVED***
+	}
 
 	// signature is the concatenation of (r, s), base64Url encoded.
 	sigLength := len(signature)
 	expectedOctetLength := 2 * ((k.Params().BitSize + 7) >> 3)
-	if sigLength != expectedOctetLength ***REMOVED***
+	if sigLength != expectedOctetLength {
 		return fmt.Errorf("signature length is %d octets long, should be %d", sigLength, expectedOctetLength)
-	***REMOVED***
+	}
 
 	rBytes, sBytes := signature[:sigLength/2], signature[sigLength/2:]
 	r := new(big.Int).SetBytes(rBytes)
@@ -86,30 +86,30 @@ func (k *ecPublicKey) Verify(data io.Reader, alg string, signature []byte) error
 
 	hasher := k.signatureAlgorithm.HashID().New()
 	_, err := io.Copy(hasher, data)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("error reading data to sign: %s", err)
-	***REMOVED***
+	}
 	hash := hasher.Sum(nil)
 
-	if !ecdsa.Verify(k.PublicKey, hash, r, s) ***REMOVED***
+	if !ecdsa.Verify(k.PublicKey, hash, r, s) {
 		return errors.New("invalid signature")
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // CryptoPublicKey returns the internal object which can be used as a
 // crypto.PublicKey for use with other standard library operations. The type
 // is either *rsa.PublicKey or *ecdsa.PublicKey
-func (k *ecPublicKey) CryptoPublicKey() crypto.PublicKey ***REMOVED***
+func (k *ecPublicKey) CryptoPublicKey() crypto.PublicKey {
 	return k.PublicKey
-***REMOVED***
+}
 
-func (k *ecPublicKey) toMap() map[string]interface***REMOVED******REMOVED*** ***REMOVED***
-	jwk := make(map[string]interface***REMOVED******REMOVED***)
-	for k, v := range k.extended ***REMOVED***
+func (k *ecPublicKey) toMap() map[string]interface{} {
+	jwk := make(map[string]interface{})
+	for k, v := range k.extended {
 		jwk[k] = v
-	***REMOVED***
+	}
 	jwk["kty"] = k.KeyType()
 	jwk["kid"] = k.KeyID()
 	jwk["crv"] = k.CurveName()
@@ -128,53 +128,53 @@ func (k *ecPublicKey) toMap() map[string]interface***REMOVED******REMOVED*** ***
 	jwk["y"] = joseBase64UrlEncode(yBuf)
 
 	return jwk
-***REMOVED***
+}
 
 // MarshalJSON serializes this Public Key using the JWK JSON serialization format for
 // elliptic curve keys.
-func (k *ecPublicKey) MarshalJSON() (data []byte, err error) ***REMOVED***
+func (k *ecPublicKey) MarshalJSON() (data []byte, err error) {
 	return json.Marshal(k.toMap())
-***REMOVED***
+}
 
 // PEMBlock serializes this Public Key to DER-encoded PKIX format.
-func (k *ecPublicKey) PEMBlock() (*pem.Block, error) ***REMOVED***
+func (k *ecPublicKey) PEMBlock() (*pem.Block, error) {
 	derBytes, err := x509.MarshalPKIXPublicKey(k.PublicKey)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("unable to serialize EC PublicKey to DER-encoded PKIX format: %s", err)
-	***REMOVED***
+	}
 	k.extended["kid"] = k.KeyID() // For display purposes.
 	return createPemBlock("PUBLIC KEY", derBytes, k.extended)
-***REMOVED***
+}
 
-func (k *ecPublicKey) AddExtendedField(field string, value interface***REMOVED******REMOVED***) ***REMOVED***
+func (k *ecPublicKey) AddExtendedField(field string, value interface{}) {
 	k.extended[field] = value
-***REMOVED***
+}
 
-func (k *ecPublicKey) GetExtendedField(field string) interface***REMOVED******REMOVED*** ***REMOVED***
+func (k *ecPublicKey) GetExtendedField(field string) interface{} {
 	v, ok := k.extended[field]
-	if !ok ***REMOVED***
+	if !ok {
 		return nil
-	***REMOVED***
+	}
 	return v
-***REMOVED***
+}
 
-func ecPublicKeyFromMap(jwk map[string]interface***REMOVED******REMOVED***) (*ecPublicKey, error) ***REMOVED***
+func ecPublicKeyFromMap(jwk map[string]interface{}) (*ecPublicKey, error) {
 	// JWK key type (kty) has already been determined to be "EC".
 	// Need to extract 'crv', 'x', 'y', and 'kid' and check for
 	// consistency.
 
 	// Get the curve identifier value.
 	crv, err := stringFromMap(jwk, "crv")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("JWK EC Public Key curve identifier: %s", err)
-	***REMOVED***
+	}
 
 	var (
 		curve  elliptic.Curve
 		sigAlg *signatureAlgorithm
 	)
 
-	switch ***REMOVED***
+	switch {
 	case crv == "P-256":
 		curve = elliptic.P256()
 		sigAlg = es256
@@ -186,48 +186,48 @@ func ecPublicKeyFromMap(jwk map[string]interface***REMOVED******REMOVED***) (*ec
 		sigAlg = es512
 	default:
 		return nil, fmt.Errorf("JWK EC Public Key curve identifier not supported: %q\n", crv)
-	***REMOVED***
+	}
 
 	// Get the X and Y coordinates for the public key point.
 	xB64Url, err := stringFromMap(jwk, "x")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("JWK EC Public Key x-coordinate: %s", err)
-	***REMOVED***
+	}
 	x, err := parseECCoordinate(xB64Url, curve)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("JWK EC Public Key x-coordinate: %s", err)
-	***REMOVED***
+	}
 
 	yB64Url, err := stringFromMap(jwk, "y")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("JWK EC Public Key y-coordinate: %s", err)
-	***REMOVED***
+	}
 	y, err := parseECCoordinate(yB64Url, curve)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("JWK EC Public Key y-coordinate: %s", err)
-	***REMOVED***
+	}
 
-	key := &ecPublicKey***REMOVED***
-		PublicKey: &ecdsa.PublicKey***REMOVED***Curve: curve, X: x, Y: y***REMOVED***,
+	key := &ecPublicKey{
+		PublicKey: &ecdsa.PublicKey{Curve: curve, X: x, Y: y},
 		curveName: crv, signatureAlgorithm: sigAlg,
-	***REMOVED***
+	}
 
 	// Key ID is optional too, but if it exists, it should match the key.
 	_, ok := jwk["kid"]
-	if ok ***REMOVED***
+	if ok {
 		kid, err := stringFromMap(jwk, "kid")
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, fmt.Errorf("JWK EC Public Key ID: %s", err)
-		***REMOVED***
-		if kid != key.KeyID() ***REMOVED***
+		}
+		if kid != key.KeyID() {
 			return nil, fmt.Errorf("JWK EC Public Key ID does not match: %s", kid)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	key.extended = jwk
 
 	return key, nil
-***REMOVED***
+}
 
 /*
  * EC DSA PRIVATE KEY
@@ -235,28 +235,28 @@ func ecPublicKeyFromMap(jwk map[string]interface***REMOVED******REMOVED***) (*ec
 
 // ecPrivateKey implements a JWK Private Key using elliptic curve digital signature
 // algorithms.
-type ecPrivateKey struct ***REMOVED***
+type ecPrivateKey struct {
 	ecPublicKey
 	*ecdsa.PrivateKey
-***REMOVED***
+}
 
-func fromECPrivateKey(cryptoPrivateKey *ecdsa.PrivateKey) (*ecPrivateKey, error) ***REMOVED***
+func fromECPrivateKey(cryptoPrivateKey *ecdsa.PrivateKey) (*ecPrivateKey, error) {
 	publicKey, err := fromECPublicKey(&cryptoPrivateKey.PublicKey)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	return &ecPrivateKey***REMOVED****publicKey, cryptoPrivateKey***REMOVED***, nil
-***REMOVED***
+	return &ecPrivateKey{*publicKey, cryptoPrivateKey}, nil
+}
 
 // PublicKey returns the Public Key data associated with this Private Key.
-func (k *ecPrivateKey) PublicKey() PublicKey ***REMOVED***
+func (k *ecPrivateKey) PublicKey() PublicKey {
 	return &k.ecPublicKey
-***REMOVED***
+}
 
-func (k *ecPrivateKey) String() string ***REMOVED***
+func (k *ecPrivateKey) String() string {
 	return fmt.Sprintf("EC Private Key <%s>", k.KeyID())
-***REMOVED***
+}
 
 // Sign signs the data read from the io.Reader using a signature algorithm supported
 // by the elliptic curve private key. If the specified hashing algorithm is
@@ -264,22 +264,22 @@ func (k *ecPrivateKey) String() string ***REMOVED***
 // otherwise the the default hashing algorithm for this key is used. Returns
 // the signature and the name of the JWK signature algorithm used, e.g.,
 // "ES256", "ES384", "ES512".
-func (k *ecPrivateKey) Sign(data io.Reader, hashID crypto.Hash) (signature []byte, alg string, err error) ***REMOVED***
+func (k *ecPrivateKey) Sign(data io.Reader, hashID crypto.Hash) (signature []byte, alg string, err error) {
 	// Generate a signature of the data using the internal alg.
 	// The given hashId is only a suggestion, and since EC keys only support
 	// on signature/hash algorithm given the curve name, we disregard it for
 	// the elliptic curve JWK signature implementation.
 	hasher := k.signatureAlgorithm.HashID().New()
 	_, err = io.Copy(hasher, data)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, "", fmt.Errorf("error reading data to sign: %s", err)
-	***REMOVED***
+	}
 	hash := hasher.Sum(nil)
 
 	r, s, err := ecdsa.Sign(rand.Reader, k.PrivateKey, hash)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, "", fmt.Errorf("error producing signature: %s", err)
-	***REMOVED***
+	}
 	rBytes, sBytes := r.Bytes(), s.Bytes()
 	octetLength := (k.ecPublicKey.Params().BitSize + 7) >> 3
 	// MUST include leading zeros in the output
@@ -293,16 +293,16 @@ func (k *ecPrivateKey) Sign(data io.Reader, hashID crypto.Hash) (signature []byt
 	alg = k.signatureAlgorithm.HeaderParam()
 
 	return
-***REMOVED***
+}
 
 // CryptoPrivateKey returns the internal object which can be used as a
 // crypto.PublicKey for use with other standard library operations. The type
 // is either *rsa.PublicKey or *ecdsa.PublicKey
-func (k *ecPrivateKey) CryptoPrivateKey() crypto.PrivateKey ***REMOVED***
+func (k *ecPrivateKey) CryptoPrivateKey() crypto.PrivateKey {
 	return k.PrivateKey
-***REMOVED***
+}
 
-func (k *ecPrivateKey) toMap() map[string]interface***REMOVED******REMOVED*** ***REMOVED***
+func (k *ecPrivateKey) toMap() map[string]interface{} {
 	jwk := k.ecPublicKey.toMap()
 
 	dBytes := k.D.Bytes()
@@ -323,106 +323,106 @@ func (k *ecPrivateKey) toMap() map[string]interface***REMOVED******REMOVED*** **
 	jwk["d"] = joseBase64UrlEncode(dBuf)
 
 	return jwk
-***REMOVED***
+}
 
 // MarshalJSON serializes this Private Key using the JWK JSON serialization format for
 // elliptic curve keys.
-func (k *ecPrivateKey) MarshalJSON() (data []byte, err error) ***REMOVED***
+func (k *ecPrivateKey) MarshalJSON() (data []byte, err error) {
 	return json.Marshal(k.toMap())
-***REMOVED***
+}
 
 // PEMBlock serializes this Private Key to DER-encoded PKIX format.
-func (k *ecPrivateKey) PEMBlock() (*pem.Block, error) ***REMOVED***
+func (k *ecPrivateKey) PEMBlock() (*pem.Block, error) {
 	derBytes, err := x509.MarshalECPrivateKey(k.PrivateKey)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("unable to serialize EC PrivateKey to DER-encoded PKIX format: %s", err)
-	***REMOVED***
+	}
 	k.extended["keyID"] = k.KeyID() // For display purposes.
 	return createPemBlock("EC PRIVATE KEY", derBytes, k.extended)
-***REMOVED***
+}
 
-func ecPrivateKeyFromMap(jwk map[string]interface***REMOVED******REMOVED***) (*ecPrivateKey, error) ***REMOVED***
+func ecPrivateKeyFromMap(jwk map[string]interface{}) (*ecPrivateKey, error) {
 	dB64Url, err := stringFromMap(jwk, "d")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("JWK EC Private Key: %s", err)
-	***REMOVED***
+	}
 
 	// JWK key type (kty) has already been determined to be "EC".
 	// Need to extract the public key information, then extract the private
 	// key value 'd'.
 	publicKey, err := ecPublicKeyFromMap(jwk)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	d, err := parseECPrivateParam(dB64Url, publicKey.Curve)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("JWK EC Private Key d-param: %s", err)
-	***REMOVED***
+	}
 
-	key := &ecPrivateKey***REMOVED***
+	key := &ecPrivateKey{
 		ecPublicKey: *publicKey,
-		PrivateKey: &ecdsa.PrivateKey***REMOVED***
+		PrivateKey: &ecdsa.PrivateKey{
 			PublicKey: *publicKey.PublicKey,
 			D:         d,
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
 	return key, nil
-***REMOVED***
+}
 
 /*
  *	Key Generation Functions.
  */
 
-func generateECPrivateKey(curve elliptic.Curve) (k *ecPrivateKey, err error) ***REMOVED***
+func generateECPrivateKey(curve elliptic.Curve) (k *ecPrivateKey, err error) {
 	k = new(ecPrivateKey)
 	k.PrivateKey, err = ecdsa.GenerateKey(curve, rand.Reader)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	k.ecPublicKey.PublicKey = &k.PrivateKey.PublicKey
-	k.extended = make(map[string]interface***REMOVED******REMOVED***)
+	k.extended = make(map[string]interface{})
 
 	return
-***REMOVED***
+}
 
 // GenerateECP256PrivateKey generates a key pair using elliptic curve P-256.
-func GenerateECP256PrivateKey() (PrivateKey, error) ***REMOVED***
+func GenerateECP256PrivateKey() (PrivateKey, error) {
 	k, err := generateECPrivateKey(elliptic.P256())
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("error generating EC P-256 key: %s", err)
-	***REMOVED***
+	}
 
 	k.curveName = "P-256"
 	k.signatureAlgorithm = es256
 
 	return k, nil
-***REMOVED***
+}
 
 // GenerateECP384PrivateKey generates a key pair using elliptic curve P-384.
-func GenerateECP384PrivateKey() (PrivateKey, error) ***REMOVED***
+func GenerateECP384PrivateKey() (PrivateKey, error) {
 	k, err := generateECPrivateKey(elliptic.P384())
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("error generating EC P-384 key: %s", err)
-	***REMOVED***
+	}
 
 	k.curveName = "P-384"
 	k.signatureAlgorithm = es384
 
 	return k, nil
-***REMOVED***
+}
 
 // GenerateECP521PrivateKey generates aß key pair using elliptic curve P-521.
-func GenerateECP521PrivateKey() (PrivateKey, error) ***REMOVED***
+func GenerateECP521PrivateKey() (PrivateKey, error) {
 	k, err := generateECPrivateKey(elliptic.P521())
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("error generating EC P-521 key: %s", err)
-	***REMOVED***
+	}
 
 	k.curveName = "P-521"
 	k.signatureAlgorithm = es512
 
 	return k, nil
-***REMOVED***
+}

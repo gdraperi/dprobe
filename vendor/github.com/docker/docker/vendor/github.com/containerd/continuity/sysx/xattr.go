@@ -12,56 +12,56 @@ var ErrNotSupported = fmt.Errorf("not supported")
 
 type listxattrFunc func(path string, dest []byte) (int, error)
 
-func listxattrAll(path string, listFunc listxattrFunc) ([]string, error) ***REMOVED***
+func listxattrAll(path string, listFunc listxattrFunc) ([]string, error) {
 	var p []byte // nil on first execution
 
-	for ***REMOVED***
+	for {
 		n, err := listFunc(path, p) // first call gets buffer size.
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 
-		if n > len(p) ***REMOVED***
+		if n > len(p) {
 			p = make([]byte, n)
 			continue
-		***REMOVED***
+		}
 
 		p = p[:n]
 
-		ps := bytes.Split(bytes.TrimSuffix(p, []byte***REMOVED***0***REMOVED***), []byte***REMOVED***0***REMOVED***)
+		ps := bytes.Split(bytes.TrimSuffix(p, []byte{0}), []byte{0})
 		var entries []string
-		for _, p := range ps ***REMOVED***
+		for _, p := range ps {
 			s := string(p)
-			if s != "" ***REMOVED***
+			if s != "" {
 				entries = append(entries, s)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		return entries, nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 type getxattrFunc func(string, string, []byte) (int, error)
 
-func getxattrAll(path, attr string, getFunc getxattrFunc) ([]byte, error) ***REMOVED***
+func getxattrAll(path, attr string, getFunc getxattrFunc) ([]byte, error) {
 	p := make([]byte, defaultXattrBufferSize)
-	for ***REMOVED***
+	for {
 		n, err := getFunc(path, attr, p)
-		if err != nil ***REMOVED***
-			if errno, ok := err.(syscall.Errno); ok && errno == syscall.ERANGE ***REMOVED***
+		if err != nil {
+			if errno, ok := err.(syscall.Errno); ok && errno == syscall.ERANGE {
 				p = make([]byte, len(p)*2) // this can't be ideal.
 				continue                   // try again!
-			***REMOVED***
+			}
 
 			return nil, err
-		***REMOVED***
+		}
 
 		// realloc to correct size and repeat
-		if n > len(p) ***REMOVED***
+		if n > len(p) {
 			p = make([]byte, n)
 			continue
-		***REMOVED***
+		}
 
 		return p[:n], nil
-	***REMOVED***
-***REMOVED***
+	}
+}

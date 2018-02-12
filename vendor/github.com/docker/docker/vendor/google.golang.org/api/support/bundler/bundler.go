@@ -45,7 +45,7 @@ var (
 
 // A Bundler collects items added to it into a bundle until the bundle
 // exceeds a given size, then calls a user-provided function to handle the bundle.
-type Bundler struct ***REMOVED***
+type Bundler struct {
 	// Starting from the time that the first message is added to a bundle, once
 	// this delay has passed, handle the bundle. The default is DefaultDelayThreshold.
 	DelayThreshold time.Duration
@@ -68,9 +68,9 @@ type Bundler struct ***REMOVED***
 	// returning ErrOverflow. The default is DefaultBufferedByteLimit.
 	BufferedByteLimit int
 
-	handler       func(interface***REMOVED******REMOVED***) // called to handle a bundle
+	handler       func(interface{}) // called to handle a bundle
 	itemSliceZero reflect.Value     // nil (zero value) for slice of items
-	donec         chan struct***REMOVED******REMOVED***     // closed when the Bundler is closed
+	donec         chan struct{}     // closed when the Bundler is closed
 	handlec       chan int          // sent to when a bundle is ready for handling
 	timer         *time.Timer       // implements DelayThreshold
 
@@ -78,25 +78,25 @@ type Bundler struct ***REMOVED***
 	bufferedSize  int           // total bytes buffered
 	closedBundles []bundle      // bundles waiting to be handled
 	curBundle     bundle        // incoming items added to this bundle
-	calledc       chan struct***REMOVED******REMOVED*** // closed and re-created after handler is called
-***REMOVED***
+	calledc       chan struct{} // closed and re-created after handler is called
+}
 
-type bundle struct ***REMOVED***
+type bundle struct {
 	items reflect.Value // slice of item type
 	size  int           // size in bytes of all items
-***REMOVED***
+}
 
 // NewBundler creates a new Bundler. When you are finished with a Bundler, call
 // its Close method.
 //
 // itemExample is a value of the type that will be bundled. For example, if you
-// want to create bundles of *Entry, you could pass &Entry***REMOVED******REMOVED*** for itemExample.
+// want to create bundles of *Entry, you could pass &Entry{} for itemExample.
 //
 // handler is a function that will be called on each bundle. If itemExample is
 // of type T, the argument to handler is of type []T. handler is always called
 // sequentially for each bundle, and never in parallel.
-func NewBundler(itemExample interface***REMOVED******REMOVED***, handler func(interface***REMOVED******REMOVED***)) *Bundler ***REMOVED***
-	b := &Bundler***REMOVED***
+func NewBundler(itemExample interface{}, handler func(interface{})) *Bundler {
+	b := &Bundler{
 		DelayThreshold:       DefaultDelayThreshold,
 		BundleCountThreshold: DefaultBundleCountThreshold,
 		BundleByteThreshold:  DefaultBundleByteThreshold,
@@ -104,15 +104,15 @@ func NewBundler(itemExample interface***REMOVED******REMOVED***, handler func(in
 
 		handler:       handler,
 		itemSliceZero: reflect.Zero(reflect.SliceOf(reflect.TypeOf(itemExample))),
-		donec:         make(chan struct***REMOVED******REMOVED***),
+		donec:         make(chan struct{}),
 		handlec:       make(chan int, 1),
-		calledc:       make(chan struct***REMOVED******REMOVED***),
+		calledc:       make(chan struct{}),
 		timer:         time.NewTimer(1000 * time.Hour), // harmless initial timeout
-	***REMOVED***
+	}
 	b.curBundle.items = b.itemSliceZero
 	go b.background()
 	return b
-***REMOVED***
+}
 
 // Add adds item to the current bundle. It marks the bundle for handling and
 // starts a new one if any of the thresholds or limits are exceeded.
@@ -124,138 +124,138 @@ func NewBundler(itemExample interface***REMOVED******REMOVED***, handler func(in
 // Add returns ErrOverflow.
 //
 // Add never blocks.
-func (b *Bundler) Add(item interface***REMOVED******REMOVED***, size int) error ***REMOVED***
+func (b *Bundler) Add(item interface{}, size int) error {
 	// If this item exceeds the maximum size of a bundle,
 	// we can never send it.
-	if b.BundleByteLimit > 0 && size > b.BundleByteLimit ***REMOVED***
+	if b.BundleByteLimit > 0 && size > b.BundleByteLimit {
 		return ErrOversizedItem
-	***REMOVED***
+	}
 	b.mu.Lock()
 	defer b.mu.Unlock()
 	// If adding this item would exceed our allotted memory
 	// footprint, we can't accept it.
-	if b.bufferedSize+size > b.BufferedByteLimit ***REMOVED***
+	if b.bufferedSize+size > b.BufferedByteLimit {
 		return ErrOverflow
-	***REMOVED***
+	}
 	// If adding this item to the current bundle would cause it to exceed the
 	// maximum bundle size, close the current bundle and start a new one.
-	if b.BundleByteLimit > 0 && b.curBundle.size+size > b.BundleByteLimit ***REMOVED***
+	if b.BundleByteLimit > 0 && b.curBundle.size+size > b.BundleByteLimit {
 		b.closeAndHandleBundle()
-	***REMOVED***
+	}
 	// Add the item.
 	b.curBundle.items = reflect.Append(b.curBundle.items, reflect.ValueOf(item))
 	b.curBundle.size += size
 	b.bufferedSize += size
 	// If this is the first item in the bundle, restart the timer.
-	if b.curBundle.items.Len() == 1 ***REMOVED***
+	if b.curBundle.items.Len() == 1 {
 		b.timer.Reset(b.DelayThreshold)
-	***REMOVED***
+	}
 	// If the current bundle equals the count threshold, close it.
-	if b.curBundle.items.Len() == b.BundleCountThreshold ***REMOVED***
+	if b.curBundle.items.Len() == b.BundleCountThreshold {
 		b.closeAndHandleBundle()
-	***REMOVED***
+	}
 	// If the current bundle equals or exceeds the byte threshold, close it.
-	if b.curBundle.size >= b.BundleByteThreshold ***REMOVED***
+	if b.curBundle.size >= b.BundleByteThreshold {
 		b.closeAndHandleBundle()
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // Flush waits until all items in the Bundler have been handled (that is,
 // until the last invocation of handler has returned).
-func (b *Bundler) Flush() ***REMOVED***
+func (b *Bundler) Flush() {
 	b.mu.Lock()
 	b.closeBundle()
 	// Unconditionally trigger the handling goroutine, to ensure calledc is closed
 	// even if there are no outstanding bundles.
-	select ***REMOVED***
+	select {
 	case b.handlec <- 1:
 	default:
-	***REMOVED***
+	}
 	calledc := b.calledc // remember locally, because it may change
 	b.mu.Unlock()
 	<-calledc
-***REMOVED***
+}
 
 // Close calls Flush, then shuts down the Bundler. Close should always be
 // called on a Bundler when it is no longer needed. You must wait for all calls
 // to Add to complete before calling Close. Calling Add concurrently with Close
 // may result in the added items being ignored.
-func (b *Bundler) Close() ***REMOVED***
+func (b *Bundler) Close() {
 	b.Flush()
 	b.mu.Lock()
 	b.timer.Stop()
 	b.mu.Unlock()
 	close(b.donec)
-***REMOVED***
+}
 
-func (b *Bundler) closeAndHandleBundle() ***REMOVED***
-	if b.closeBundle() ***REMOVED***
+func (b *Bundler) closeAndHandleBundle() {
+	if b.closeBundle() {
 		// We have created a closed bundle.
 		// Send to handlec without blocking.
-		select ***REMOVED***
+		select {
 		case b.handlec <- 1:
 		default:
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // closeBundle finishes the current bundle, adds it to the list of closed
 // bundles and informs the background goroutine that there are bundles ready
 // for processing.
 //
 // This should always be called with b.mu held.
-func (b *Bundler) closeBundle() bool ***REMOVED***
-	if b.curBundle.items.Len() == 0 ***REMOVED***
+func (b *Bundler) closeBundle() bool {
+	if b.curBundle.items.Len() == 0 {
 		return false
-	***REMOVED***
+	}
 	b.closedBundles = append(b.closedBundles, b.curBundle)
 	b.curBundle.items = b.itemSliceZero
 	b.curBundle.size = 0
 	return true
-***REMOVED***
+}
 
 // background runs in a separate goroutine, waiting for events and handling
 // bundles.
-func (b *Bundler) background() ***REMOVED***
+func (b *Bundler) background() {
 	done := false
-	for ***REMOVED***
+	for {
 		timedOut := false
 		// Wait for something to happen.
-		select ***REMOVED***
+		select {
 		case <-b.handlec:
 		case <-b.donec:
 			done = true
 		case <-b.timer.C:
 			timedOut = true
-		***REMOVED***
+		}
 		// Handle closed bundles.
 		b.mu.Lock()
-		if timedOut ***REMOVED***
+		if timedOut {
 			b.closeBundle()
-		***REMOVED***
+		}
 		buns := b.closedBundles
 		b.closedBundles = nil
 		// Closing calledc means we've sent all bundles. We need
 		// a new channel for the next set of bundles, which may start
 		// accumulating as soon as we release the lock.
 		calledc := b.calledc
-		b.calledc = make(chan struct***REMOVED******REMOVED***)
+		b.calledc = make(chan struct{})
 		b.mu.Unlock()
-		for i, bun := range buns ***REMOVED***
+		for i, bun := range buns {
 			b.handler(bun.items.Interface())
 			// Drop the bundle's items, reducing our memory footprint.
-			buns[i].items = reflect.Value***REMOVED******REMOVED*** // buns[i] because bun is a copy
+			buns[i].items = reflect.Value{} // buns[i] because bun is a copy
 			// Note immediately that we have more space, so Adds that occur
 			// during this loop will have a chance of succeeding.
 			b.mu.Lock()
 			b.bufferedSize -= bun.size
 			b.mu.Unlock()
-		***REMOVED***
+		}
 		// Signal that we've sent all outstanding bundles.
 		close(calledc)
-		if done ***REMOVED***
+		if done {
 			break
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

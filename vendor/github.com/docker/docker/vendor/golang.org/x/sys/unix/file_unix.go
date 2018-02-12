@@ -11,17 +11,17 @@ import (
 
 // FIXME: unexported function from os
 // syscallMode returns the syscall-specific mode bits from Go's portable mode bits.
-func syscallMode(i os.FileMode) (o uint32) ***REMOVED***
+func syscallMode(i os.FileMode) (o uint32) {
 	o |= uint32(i.Perm())
-	if i&os.ModeSetuid != 0 ***REMOVED***
+	if i&os.ModeSetuid != 0 {
 		o |= syscall.S_ISUID
-	***REMOVED***
-	if i&os.ModeSetgid != 0 ***REMOVED***
+	}
+	if i&os.ModeSetgid != 0 {
 		o |= syscall.S_ISGID
-	***REMOVED***
-	if i&os.ModeSticky != 0 ***REMOVED***
+	}
+	if i&os.ModeSticky != 0 {
 		o |= syscall.S_ISVTX
-	***REMOVED***
+	}
 	// No mapping for Go's ModeTemporary (plan9 only).
 	return
-***REMOVED***
+}

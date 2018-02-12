@@ -10,79 +10,79 @@ import (
 
 // configs is a map that keeps all the currently available configs to the agent
 // mapped by config ID.
-type configs struct ***REMOVED***
+type configs struct {
 	mu sync.RWMutex
 	m  map[string]*api.Config
-***REMOVED***
+}
 
 // NewManager returns a place to store configs.
-func NewManager() exec.ConfigsManager ***REMOVED***
-	return &configs***REMOVED***
+func NewManager() exec.ConfigsManager {
+	return &configs{
 		m: make(map[string]*api.Config),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Get returns a config by ID.  If the config doesn't exist, returns nil.
-func (r *configs) Get(configID string) (*api.Config, error) ***REMOVED***
+func (r *configs) Get(configID string) (*api.Config, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
-	if r, ok := r.m[configID]; ok ***REMOVED***
+	if r, ok := r.m[configID]; ok {
 		return r, nil
-	***REMOVED***
+	}
 	return nil, fmt.Errorf("config %s not found", configID)
-***REMOVED***
+}
 
 // Add adds one or more configs to the config map.
-func (r *configs) Add(configs ...api.Config) ***REMOVED***
+func (r *configs) Add(configs ...api.Config) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	for _, config := range configs ***REMOVED***
+	for _, config := range configs {
 		r.m[config.ID] = config.Copy()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Remove removes one or more configs by ID from the config map. Succeeds
 // whether or not the given IDs are in the map.
-func (r *configs) Remove(configs []string) ***REMOVED***
+func (r *configs) Remove(configs []string) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	for _, config := range configs ***REMOVED***
+	for _, config := range configs {
 		delete(r.m, config)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Reset removes all the configs.
-func (r *configs) Reset() ***REMOVED***
+func (r *configs) Reset() {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	r.m = make(map[string]*api.Config)
-***REMOVED***
+}
 
 // taskRestrictedConfigsProvider restricts the ids to the task.
-type taskRestrictedConfigsProvider struct ***REMOVED***
+type taskRestrictedConfigsProvider struct {
 	configs   exec.ConfigGetter
-	configIDs map[string]struct***REMOVED******REMOVED*** // allow list of config ids
-***REMOVED***
+	configIDs map[string]struct{} // allow list of config ids
+}
 
-func (sp *taskRestrictedConfigsProvider) Get(configID string) (*api.Config, error) ***REMOVED***
-	if _, ok := sp.configIDs[configID]; !ok ***REMOVED***
+func (sp *taskRestrictedConfigsProvider) Get(configID string) (*api.Config, error) {
+	if _, ok := sp.configIDs[configID]; !ok {
 		return nil, fmt.Errorf("task not authorized to access config %s", configID)
-	***REMOVED***
+	}
 
 	return sp.configs.Get(configID)
-***REMOVED***
+}
 
 // Restrict provides a getter that only allows access to the configs
 // referenced by the task.
-func Restrict(configs exec.ConfigGetter, t *api.Task) exec.ConfigGetter ***REMOVED***
-	cids := map[string]struct***REMOVED******REMOVED******REMOVED******REMOVED***
+func Restrict(configs exec.ConfigGetter, t *api.Task) exec.ConfigGetter {
+	cids := map[string]struct{}{}
 
 	container := t.Spec.GetContainer()
-	if container != nil ***REMOVED***
-		for _, configRef := range container.Configs ***REMOVED***
-			cids[configRef.ConfigID] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-		***REMOVED***
-	***REMOVED***
+	if container != nil {
+		for _, configRef := range container.Configs {
+			cids[configRef.ConfigID] = struct{}{}
+		}
+	}
 
-	return &taskRestrictedConfigsProvider***REMOVED***configs: configs, configIDs: cids***REMOVED***
-***REMOVED***
+	return &taskRestrictedConfigsProvider{configs: configs, configIDs: cids}
+}

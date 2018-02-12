@@ -12,31 +12,31 @@ import (
 	"github.com/go-check/check"
 )
 
-func waitForHealthStatus(c *check.C, name string, prev string, expected string) ***REMOVED***
+func waitForHealthStatus(c *check.C, name string, prev string, expected string) {
 	prev = prev + "\n"
 	expected = expected + "\n"
-	for ***REMOVED***
-		out, _ := dockerCmd(c, "inspect", "--format=***REMOVED******REMOVED***.State.Health.Status***REMOVED******REMOVED***", name)
-		if out == expected ***REMOVED***
+	for {
+		out, _ := dockerCmd(c, "inspect", "--format={{.State.Health.Status}}", name)
+		if out == expected {
 			return
-		***REMOVED***
+		}
 		c.Check(out, checker.Equals, prev)
-		if out != prev ***REMOVED***
+		if out != prev {
 			return
-		***REMOVED***
+		}
 		time.Sleep(100 * time.Millisecond)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func getHealth(c *check.C, name string) *types.Health ***REMOVED***
-	out, _ := dockerCmd(c, "inspect", "--format=***REMOVED******REMOVED***json .State.Health***REMOVED******REMOVED***", name)
+func getHealth(c *check.C, name string) *types.Health {
+	out, _ := dockerCmd(c, "inspect", "--format={{json .State.Health}}", name)
 	var health types.Health
 	err := json.Unmarshal([]byte(out), &health)
 	c.Check(err, checker.Equals, nil)
 	return &health
-***REMOVED***
+}
 
-func (s *DockerSuite) TestHealth(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestHealth(c *check.C) {
 	testRequires(c, DaemonIsLinux) // busybox doesn't work on Windows
 
 	existingContainers := ExistingContainerIDs(c)
@@ -52,13 +52,13 @@ func (s *DockerSuite) TestHealth(c *check.C) ***REMOVED***
 	// No health status before starting
 	name := "test_health"
 	cid, _ := dockerCmd(c, "create", "--name", name, imageName)
-	out, _ := dockerCmd(c, "ps", "-a", "--format=***REMOVED******REMOVED***.ID***REMOVED******REMOVED*** ***REMOVED******REMOVED***.Status***REMOVED******REMOVED***")
+	out, _ := dockerCmd(c, "ps", "-a", "--format={{.ID}} {{.Status}}")
 	out = RemoveOutputForExistingElements(out, existingContainers)
 	c.Check(out, checker.Equals, cid[:12]+" Created\n")
 
 	// Inspect the options
 	out, _ = dockerCmd(c, "inspect",
-		"--format=timeout=***REMOVED******REMOVED***.Config.Healthcheck.Timeout***REMOVED******REMOVED*** interval=***REMOVED******REMOVED***.Config.Healthcheck.Interval***REMOVED******REMOVED*** retries=***REMOVED******REMOVED***.Config.Healthcheck.Retries***REMOVED******REMOVED*** test=***REMOVED******REMOVED***.Config.Healthcheck.Test***REMOVED******REMOVED***", name)
+		"--format=timeout={{.Config.Healthcheck.Timeout}} interval={{.Config.Healthcheck.Interval}} retries={{.Config.Healthcheck.Retries}} test={{.Config.Healthcheck.Test}}", name)
 	c.Check(out, checker.Equals, "timeout=30s interval=1s retries=0 test=[CMD-SHELL cat /status]\n")
 
 	// Start
@@ -70,7 +70,7 @@ func (s *DockerSuite) TestHealth(c *check.C) ***REMOVED***
 	waitForHealthStatus(c, name, "healthy", "unhealthy")
 
 	// Inspect the status
-	out, _ = dockerCmd(c, "inspect", "--format=***REMOVED******REMOVED***.State.Health.Status***REMOVED******REMOVED***", name)
+	out, _ = dockerCmd(c, "inspect", "--format={{.State.Health.Status}}", name)
 	c.Check(out, checker.Equals, "unhealthy\n")
 
 	// Make it healthy again
@@ -82,7 +82,7 @@ func (s *DockerSuite) TestHealth(c *check.C) ***REMOVED***
 
 	// Disable the check from the CLI
 	out, _ = dockerCmd(c, "create", "--name=noh", "--no-healthcheck", imageName)
-	out, _ = dockerCmd(c, "inspect", "--format=***REMOVED******REMOVED***.Config.Healthcheck.Test***REMOVED******REMOVED***", "noh")
+	out, _ = dockerCmd(c, "inspect", "--format={{.Config.Healthcheck.Test}}", "noh")
 	c.Check(out, checker.Equals, "[NONE]\n")
 	dockerCmd(c, "rm", "noh")
 
@@ -90,7 +90,7 @@ func (s *DockerSuite) TestHealth(c *check.C) ***REMOVED***
 	buildImageSuccessfully(c, "no_healthcheck", build.WithDockerfile(`FROM testhealth
 		HEALTHCHECK NONE`))
 
-	out, _ = dockerCmd(c, "inspect", "--format=***REMOVED******REMOVED***.ContainerConfig.Healthcheck.Test***REMOVED******REMOVED***", "no_healthcheck")
+	out, _ = dockerCmd(c, "inspect", "--format={{.ContainerConfig.Healthcheck.Test}}", "no_healthcheck")
 	c.Check(out, checker.Equals, "[NONE]\n")
 
 	// Enable the checks from the CLI
@@ -111,7 +111,7 @@ func (s *DockerSuite) TestHealth(c *check.C) ***REMOVED***
 	dockerCmd(c, "exec", "fatal_healthcheck", "rm", "/status")
 	waitForHealthStatus(c, "fatal_healthcheck", "healthy", "unhealthy")
 
-	failsStr, _ := dockerCmd(c, "inspect", "--format=***REMOVED******REMOVED***.State.Health.FailingStreak***REMOVED******REMOVED***", "fatal_healthcheck")
+	failsStr, _ := dockerCmd(c, "inspect", "--format={{.State.Health.FailingStreak}}", "fatal_healthcheck")
 	fails, err := strconv.Atoi(strings.TrimSpace(failsStr))
 	c.Check(err, check.IsNil)
 	c.Check(fails >= 3, checker.Equals, true)
@@ -138,13 +138,13 @@ func (s *DockerSuite) TestHealth(c *check.C) ***REMOVED***
 		HEALTHCHECK --interval=1s --timeout=30s \
 		  CMD ["cat", "/my status"]`))
 	out, _ = dockerCmd(c, "inspect",
-		"--format=***REMOVED******REMOVED***.Config.Healthcheck.Test***REMOVED******REMOVED***", imageName)
+		"--format={{.Config.Healthcheck.Test}}", imageName)
 	c.Check(out, checker.Equals, "[CMD cat /my status]\n")
 
-***REMOVED***
+}
 
 // GitHub #33021
-func (s *DockerSuite) TestUnsetEnvVarHealthCheck(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestUnsetEnvVarHealthCheck(c *check.C) {
 	testRequires(c, DaemonIsLinux) // busybox doesn't work on Windows
 
 	imageName := "testhealth"
@@ -155,13 +155,13 @@ ENTRYPOINT /bin/sh -c "sleep 600"`))
 	name := "env_test_health"
 	// No health status before starting
 	dockerCmd(c, "run", "-d", "--name", name, "-e", "FOO", imageName)
-	defer func() ***REMOVED***
+	defer func() {
 		dockerCmd(c, "rm", "-f", name)
 		dockerCmd(c, "rmi", imageName)
-	***REMOVED***()
+	}()
 
 	// Start
 	dockerCmd(c, "start", name)
 	waitForHealthStatus(c, name, "starting", "healthy")
 
-***REMOVED***
+}

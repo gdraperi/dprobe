@@ -16,121 +16,121 @@ import (
 )
 
 // MockBackend implements the builder.Backend interface for unit testing
-type MockBackend struct ***REMOVED***
+type MockBackend struct {
 	containerCreateFunc func(config types.ContainerCreateConfig) (container.ContainerCreateCreatedBody, error)
 	commitFunc          func(string, *backend.ContainerCommitConfig) (string, error)
 	getImageFunc        func(string) (builder.Image, builder.ReleaseableLayer, error)
 	makeImageCacheFunc  func(cacheFrom []string) builder.ImageCache
-***REMOVED***
+}
 
-func (m *MockBackend) ContainerAttachRaw(cID string, stdin io.ReadCloser, stdout, stderr io.Writer, stream bool, attached chan struct***REMOVED******REMOVED***) error ***REMOVED***
+func (m *MockBackend) ContainerAttachRaw(cID string, stdin io.ReadCloser, stdout, stderr io.Writer, stream bool, attached chan struct{}) error {
 	return nil
-***REMOVED***
+}
 
-func (m *MockBackend) ContainerCreate(config types.ContainerCreateConfig) (container.ContainerCreateCreatedBody, error) ***REMOVED***
-	if m.containerCreateFunc != nil ***REMOVED***
+func (m *MockBackend) ContainerCreate(config types.ContainerCreateConfig) (container.ContainerCreateCreatedBody, error) {
+	if m.containerCreateFunc != nil {
 		return m.containerCreateFunc(config)
-	***REMOVED***
-	return container.ContainerCreateCreatedBody***REMOVED******REMOVED***, nil
-***REMOVED***
+	}
+	return container.ContainerCreateCreatedBody{}, nil
+}
 
-func (m *MockBackend) ContainerRm(name string, config *types.ContainerRmConfig) error ***REMOVED***
+func (m *MockBackend) ContainerRm(name string, config *types.ContainerRmConfig) error {
 	return nil
-***REMOVED***
+}
 
-func (m *MockBackend) Commit(cID string, cfg *backend.ContainerCommitConfig) (string, error) ***REMOVED***
-	if m.commitFunc != nil ***REMOVED***
+func (m *MockBackend) Commit(cID string, cfg *backend.ContainerCommitConfig) (string, error) {
+	if m.commitFunc != nil {
 		return m.commitFunc(cID, cfg)
-	***REMOVED***
+	}
 	return "", nil
-***REMOVED***
+}
 
-func (m *MockBackend) ContainerKill(containerID string, sig uint64) error ***REMOVED***
+func (m *MockBackend) ContainerKill(containerID string, sig uint64) error {
 	return nil
-***REMOVED***
+}
 
-func (m *MockBackend) ContainerStart(containerID string, hostConfig *container.HostConfig, checkpoint string, checkpointDir string) error ***REMOVED***
+func (m *MockBackend) ContainerStart(containerID string, hostConfig *container.HostConfig, checkpoint string, checkpointDir string) error {
 	return nil
-***REMOVED***
+}
 
-func (m *MockBackend) ContainerWait(ctx context.Context, containerID string, condition containerpkg.WaitCondition) (<-chan containerpkg.StateStatus, error) ***REMOVED***
+func (m *MockBackend) ContainerWait(ctx context.Context, containerID string, condition containerpkg.WaitCondition) (<-chan containerpkg.StateStatus, error) {
 	return nil, nil
-***REMOVED***
+}
 
-func (m *MockBackend) ContainerCreateWorkdir(containerID string) error ***REMOVED***
+func (m *MockBackend) ContainerCreateWorkdir(containerID string) error {
 	return nil
-***REMOVED***
+}
 
-func (m *MockBackend) CopyOnBuild(containerID string, destPath string, srcRoot string, srcPath string, decompress bool) error ***REMOVED***
+func (m *MockBackend) CopyOnBuild(containerID string, destPath string, srcRoot string, srcPath string, decompress bool) error {
 	return nil
-***REMOVED***
+}
 
-func (m *MockBackend) GetImageAndReleasableLayer(ctx context.Context, refOrID string, opts backend.GetImageAndLayerOptions) (builder.Image, builder.ReleaseableLayer, error) ***REMOVED***
-	if m.getImageFunc != nil ***REMOVED***
+func (m *MockBackend) GetImageAndReleasableLayer(ctx context.Context, refOrID string, opts backend.GetImageAndLayerOptions) (builder.Image, builder.ReleaseableLayer, error) {
+	if m.getImageFunc != nil {
 		return m.getImageFunc(refOrID)
-	***REMOVED***
+	}
 
-	return &mockImage***REMOVED***id: "theid"***REMOVED***, &mockLayer***REMOVED******REMOVED***, nil
-***REMOVED***
+	return &mockImage{id: "theid"}, &mockLayer{}, nil
+}
 
-func (m *MockBackend) MakeImageCache(cacheFrom []string) builder.ImageCache ***REMOVED***
-	if m.makeImageCacheFunc != nil ***REMOVED***
+func (m *MockBackend) MakeImageCache(cacheFrom []string) builder.ImageCache {
+	if m.makeImageCacheFunc != nil {
 		return m.makeImageCacheFunc(cacheFrom)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *MockBackend) CreateImage(config []byte, parent string) (builder.Image, error) ***REMOVED***
+func (m *MockBackend) CreateImage(config []byte, parent string) (builder.Image, error) {
 	return nil, nil
-***REMOVED***
+}
 
-type mockImage struct ***REMOVED***
+type mockImage struct {
 	id     string
 	config *container.Config
-***REMOVED***
+}
 
-func (i *mockImage) ImageID() string ***REMOVED***
+func (i *mockImage) ImageID() string {
 	return i.id
-***REMOVED***
+}
 
-func (i *mockImage) RunConfig() *container.Config ***REMOVED***
+func (i *mockImage) RunConfig() *container.Config {
 	return i.config
-***REMOVED***
+}
 
-func (i *mockImage) OperatingSystem() string ***REMOVED***
+func (i *mockImage) OperatingSystem() string {
 	return runtime.GOOS
-***REMOVED***
+}
 
-func (i *mockImage) MarshalJSON() ([]byte, error) ***REMOVED***
+func (i *mockImage) MarshalJSON() ([]byte, error) {
 	type rawImage mockImage
 	return json.Marshal(rawImage(*i))
-***REMOVED***
+}
 
-type mockImageCache struct ***REMOVED***
+type mockImageCache struct {
 	getCacheFunc func(parentID string, cfg *container.Config) (string, error)
-***REMOVED***
+}
 
-func (mic *mockImageCache) GetCache(parentID string, cfg *container.Config) (string, error) ***REMOVED***
-	if mic.getCacheFunc != nil ***REMOVED***
+func (mic *mockImageCache) GetCache(parentID string, cfg *container.Config) (string, error) {
+	if mic.getCacheFunc != nil {
 		return mic.getCacheFunc(parentID, cfg)
-	***REMOVED***
+	}
 	return "", nil
-***REMOVED***
+}
 
-type mockLayer struct***REMOVED******REMOVED***
+type mockLayer struct{}
 
-func (l *mockLayer) Release() error ***REMOVED***
+func (l *mockLayer) Release() error {
 	return nil
-***REMOVED***
+}
 
-func (l *mockLayer) Mount() (containerfs.ContainerFS, error) ***REMOVED***
+func (l *mockLayer) Mount() (containerfs.ContainerFS, error) {
 	return containerfs.NewLocalContainerFS("mountPath"), nil
-***REMOVED***
+}
 
-func (l *mockLayer) Commit() (builder.ReleaseableLayer, error) ***REMOVED***
+func (l *mockLayer) Commit() (builder.ReleaseableLayer, error) {
 	return nil, nil
-***REMOVED***
+}
 
-func (l *mockLayer) DiffID() layer.DiffID ***REMOVED***
+func (l *mockLayer) DiffID() layer.DiffID {
 	return layer.DiffID("abcdef")
-***REMOVED***
+}

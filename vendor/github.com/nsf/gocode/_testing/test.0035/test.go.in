@@ -1,9 +1,9 @@
 package main
 
-func main() ***REMOVED***
+func main() {
 	var err error
 	s := err.Error()
-	for offset, r := range s ***REMOVED***
+	for offset, r := range s {
 		
-	***REMOVED***
-***REMOVED***
+	}
+}

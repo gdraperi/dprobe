@@ -33,27 +33,27 @@ import (
 const configFileName = "config.json"
 const rootFSFileName = "rootfs"
 
-var validFullID = regexp.MustCompile(`^([a-f0-9]***REMOVED***64***REMOVED***)$`)
+var validFullID = regexp.MustCompile(`^([a-f0-9]{64})$`)
 
 // Executor is the interface that the plugin manager uses to interact with for starting/stopping plugins
-type Executor interface ***REMOVED***
+type Executor interface {
 	Create(id string, spec specs.Spec, stdout, stderr io.WriteCloser) error
 	Restore(id string, stdout, stderr io.WriteCloser) error
 	IsRunning(id string) (bool, error)
 	Signal(id string, signal int) error
-***REMOVED***
+}
 
-func (pm *Manager) restorePlugin(p *v2.Plugin) error ***REMOVED***
-	if p.IsEnabled() ***REMOVED***
+func (pm *Manager) restorePlugin(p *v2.Plugin) error {
+	if p.IsEnabled() {
 		return pm.restore(p)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 type eventLogger func(id, name, action string)
 
 // ManagerConfig defines configuration needed to start new manager.
-type ManagerConfig struct ***REMOVED***
+type ManagerConfig struct {
 	Store              *Store // remove
 	RegistryService    registry.Service
 	LiveRestoreEnabled bool // TODO: remove
@@ -62,13 +62,13 @@ type ManagerConfig struct ***REMOVED***
 	ExecRoot           string
 	CreateExecutor     ExecutorCreator
 	AuthzMiddleware    *authorization.Middleware
-***REMOVED***
+}
 
 // ExecutorCreator is used in the manager config to pass in an `Executor`
 type ExecutorCreator func(*Manager) (Executor, error)
 
 // Manager controls the plugin subsystem.
-type Manager struct ***REMOVED***
+type Manager struct {
 	config    ManagerConfig
 	mu        sync.RWMutex // protects cMap
 	muGC      sync.RWMutex // protects blobstore deletions
@@ -76,328 +76,328 @@ type Manager struct ***REMOVED***
 	blobStore *basicBlobStore
 	publisher *pubsub.Publisher
 	executor  Executor
-***REMOVED***
+}
 
 // controller represents the manager's control on a plugin.
-type controller struct ***REMOVED***
+type controller struct {
 	restart       bool
 	exitChan      chan bool
 	timeoutInSecs int
-***REMOVED***
+}
 
 // pluginRegistryService ensures that all resolved repositories
 // are of the plugin class.
-type pluginRegistryService struct ***REMOVED***
+type pluginRegistryService struct {
 	registry.Service
-***REMOVED***
+}
 
-func (s pluginRegistryService) ResolveRepository(name reference.Named) (repoInfo *registry.RepositoryInfo, err error) ***REMOVED***
+func (s pluginRegistryService) ResolveRepository(name reference.Named) (repoInfo *registry.RepositoryInfo, err error) {
 	repoInfo, err = s.Service.ResolveRepository(name)
-	if repoInfo != nil ***REMOVED***
+	if repoInfo != nil {
 		repoInfo.Class = "plugin"
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // NewManager returns a new plugin manager.
-func NewManager(config ManagerConfig) (*Manager, error) ***REMOVED***
-	if config.RegistryService != nil ***REMOVED***
-		config.RegistryService = pluginRegistryService***REMOVED***config.RegistryService***REMOVED***
-	***REMOVED***
-	manager := &Manager***REMOVED***
+func NewManager(config ManagerConfig) (*Manager, error) {
+	if config.RegistryService != nil {
+		config.RegistryService = pluginRegistryService{config.RegistryService}
+	}
+	manager := &Manager{
 		config: config,
-	***REMOVED***
-	for _, dirName := range []string***REMOVED***manager.config.Root, manager.config.ExecRoot, manager.tmpDir()***REMOVED*** ***REMOVED***
-		if err := os.MkdirAll(dirName, 0700); err != nil ***REMOVED***
+	}
+	for _, dirName := range []string{manager.config.Root, manager.config.ExecRoot, manager.tmpDir()} {
+		if err := os.MkdirAll(dirName, 0700); err != nil {
 			return nil, errors.Wrapf(err, "failed to mkdir %v", dirName)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if err := setupRoot(manager.config.Root); err != nil ***REMOVED***
+	if err := setupRoot(manager.config.Root); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	var err error
 	manager.executor, err = config.CreateExecutor(manager)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	manager.blobStore, err = newBasicBlobStore(filepath.Join(manager.config.Root, "storage/blobs"))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	manager.cMap = make(map[*v2.Plugin]*controller)
-	if err := manager.reload(); err != nil ***REMOVED***
+	if err := manager.reload(); err != nil {
 		return nil, errors.Wrap(err, "failed to restore plugins")
-	***REMOVED***
+	}
 
 	manager.publisher = pubsub.NewPublisher(0, 0)
 	return manager, nil
-***REMOVED***
+}
 
-func (pm *Manager) tmpDir() string ***REMOVED***
+func (pm *Manager) tmpDir() string {
 	return filepath.Join(pm.config.Root, "tmp")
-***REMOVED***
+}
 
 // HandleExitEvent is called when the executor receives the exit event
 // In the future we may change this, but for now all we care about is the exit event.
-func (pm *Manager) HandleExitEvent(id string) error ***REMOVED***
+func (pm *Manager) HandleExitEvent(id string) error {
 	p, err := pm.config.Store.GetV2Plugin(id)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	os.RemoveAll(filepath.Join(pm.config.ExecRoot, id))
 
-	if p.PropagatedMount != "" ***REMOVED***
-		if err := mount.Unmount(p.PropagatedMount); err != nil ***REMOVED***
+	if p.PropagatedMount != "" {
+		if err := mount.Unmount(p.PropagatedMount); err != nil {
 			logrus.Warnf("Could not unmount %s: %v", p.PropagatedMount, err)
-		***REMOVED***
+		}
 		propRoot := filepath.Join(filepath.Dir(p.Rootfs), "propagated-mount")
-		if err := mount.Unmount(propRoot); err != nil ***REMOVED***
+		if err := mount.Unmount(propRoot); err != nil {
 			logrus.Warn("Could not unmount %s: %v", propRoot, err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	pm.mu.RLock()
 	c := pm.cMap[p]
-	if c.exitChan != nil ***REMOVED***
+	if c.exitChan != nil {
 		close(c.exitChan)
-	***REMOVED***
+	}
 	restart := c.restart
 	pm.mu.RUnlock()
 
-	if restart ***REMOVED***
+	if restart {
 		pm.enable(p, c, true)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func handleLoadError(err error, id string) ***REMOVED***
-	if err == nil ***REMOVED***
+func handleLoadError(err error, id string) {
+	if err == nil {
 		return
-	***REMOVED***
+	}
 	logger := logrus.WithError(err).WithField("id", id)
-	if os.IsNotExist(errors.Cause(err)) ***REMOVED***
+	if os.IsNotExist(errors.Cause(err)) {
 		// Likely some error while removing on an older version of docker
 		logger.Warn("missing plugin config, skipping: this may be caused due to a failed remove and requires manual cleanup.")
 		return
-	***REMOVED***
+	}
 	logger.Error("error loading plugin, skipping")
-***REMOVED***
+}
 
-func (pm *Manager) reload() error ***REMOVED*** // todo: restore
+func (pm *Manager) reload() error { // todo: restore
 	dir, err := ioutil.ReadDir(pm.config.Root)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return errors.Wrapf(err, "failed to read %v", pm.config.Root)
-	***REMOVED***
+	}
 	plugins := make(map[string]*v2.Plugin)
-	for _, v := range dir ***REMOVED***
-		if validFullID.MatchString(v.Name()) ***REMOVED***
+	for _, v := range dir {
+		if validFullID.MatchString(v.Name()) {
 			p, err := pm.loadPlugin(v.Name())
-			if err != nil ***REMOVED***
+			if err != nil {
 				handleLoadError(err, v.Name())
 				continue
-			***REMOVED***
+			}
 			plugins[p.GetID()] = p
-		***REMOVED*** else ***REMOVED***
-			if validFullID.MatchString(strings.TrimSuffix(v.Name(), "-removing")) ***REMOVED***
+		} else {
+			if validFullID.MatchString(strings.TrimSuffix(v.Name(), "-removing")) {
 				// There was likely some error while removing this plugin, let's try to remove again here
-				if err := system.EnsureRemoveAll(v.Name()); err != nil ***REMOVED***
+				if err := system.EnsureRemoveAll(v.Name()); err != nil {
 					logrus.WithError(err).WithField("id", v.Name()).Warn("error while attempting to clean up previously removed plugin")
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+				}
+			}
+		}
+	}
 
 	pm.config.Store.SetAll(plugins)
 
 	var wg sync.WaitGroup
 	wg.Add(len(plugins))
-	for _, p := range plugins ***REMOVED***
-		c := &controller***REMOVED******REMOVED*** // todo: remove this
+	for _, p := range plugins {
+		c := &controller{} // todo: remove this
 		pm.cMap[p] = c
-		go func(p *v2.Plugin) ***REMOVED***
+		go func(p *v2.Plugin) {
 			defer wg.Done()
-			if err := pm.restorePlugin(p); err != nil ***REMOVED***
+			if err := pm.restorePlugin(p); err != nil {
 				logrus.Errorf("failed to restore plugin '%s': %s", p.Name(), err)
 				return
-			***REMOVED***
+			}
 
-			if p.Rootfs != "" ***REMOVED***
+			if p.Rootfs != "" {
 				p.Rootfs = filepath.Join(pm.config.Root, p.PluginObj.ID, "rootfs")
-			***REMOVED***
+			}
 
 			// We should only enable rootfs propagation for certain plugin types that need it.
-			for _, typ := range p.PluginObj.Config.Interface.Types ***REMOVED***
-				if (typ.Capability == "volumedriver" || typ.Capability == "graphdriver") && typ.Prefix == "docker" && strings.HasPrefix(typ.Version, "1.") ***REMOVED***
-					if p.PluginObj.Config.PropagatedMount != "" ***REMOVED***
+			for _, typ := range p.PluginObj.Config.Interface.Types {
+				if (typ.Capability == "volumedriver" || typ.Capability == "graphdriver") && typ.Prefix == "docker" && strings.HasPrefix(typ.Version, "1.") {
+					if p.PluginObj.Config.PropagatedMount != "" {
 						propRoot := filepath.Join(filepath.Dir(p.Rootfs), "propagated-mount")
 
 						// check if we need to migrate an older propagated mount from before
 						// these mounts were stored outside the plugin rootfs
-						if _, err := os.Stat(propRoot); os.IsNotExist(err) ***REMOVED***
-							if _, err := os.Stat(p.PropagatedMount); err == nil ***REMOVED***
+						if _, err := os.Stat(propRoot); os.IsNotExist(err) {
+							if _, err := os.Stat(p.PropagatedMount); err == nil {
 								// make sure nothing is mounted here
 								// don't care about errors
 								mount.Unmount(p.PropagatedMount)
-								if err := os.Rename(p.PropagatedMount, propRoot); err != nil ***REMOVED***
+								if err := os.Rename(p.PropagatedMount, propRoot); err != nil {
 									logrus.WithError(err).WithField("dir", propRoot).Error("error migrating propagated mount storage")
-								***REMOVED***
-								if err := os.MkdirAll(p.PropagatedMount, 0755); err != nil ***REMOVED***
+								}
+								if err := os.MkdirAll(p.PropagatedMount, 0755); err != nil {
 									logrus.WithError(err).WithField("dir", p.PropagatedMount).Error("error migrating propagated mount storage")
-								***REMOVED***
-							***REMOVED***
-						***REMOVED***
+								}
+							}
+						}
 
-						if err := os.MkdirAll(propRoot, 0755); err != nil ***REMOVED***
+						if err := os.MkdirAll(propRoot, 0755); err != nil {
 							logrus.Errorf("failed to create PropagatedMount directory at %s: %v", propRoot, err)
-						***REMOVED***
+						}
 						// TODO: sanitize PropagatedMount and prevent breakout
 						p.PropagatedMount = filepath.Join(p.Rootfs, p.PluginObj.Config.PropagatedMount)
-						if err := os.MkdirAll(p.PropagatedMount, 0755); err != nil ***REMOVED***
+						if err := os.MkdirAll(p.PropagatedMount, 0755); err != nil {
 							logrus.Errorf("failed to create PropagatedMount directory at %s: %v", p.PropagatedMount, err)
 							return
-						***REMOVED***
-					***REMOVED***
-				***REMOVED***
-			***REMOVED***
+						}
+					}
+				}
+			}
 
 			pm.save(p)
 			requiresManualRestore := !pm.config.LiveRestoreEnabled && p.IsEnabled()
 
-			if requiresManualRestore ***REMOVED***
+			if requiresManualRestore {
 				// if liveRestore is not enabled, the plugin will be stopped now so we should enable it
-				if err := pm.enable(p, c, true); err != nil ***REMOVED***
+				if err := pm.enable(p, c, true); err != nil {
 					logrus.Errorf("failed to enable plugin '%s': %s", p.Name(), err)
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***(p)
-	***REMOVED***
+				}
+			}
+		}(p)
+	}
 	wg.Wait()
 	return nil
-***REMOVED***
+}
 
 // Get looks up the requested plugin in the store.
-func (pm *Manager) Get(idOrName string) (*v2.Plugin, error) ***REMOVED***
+func (pm *Manager) Get(idOrName string) (*v2.Plugin, error) {
 	return pm.config.Store.GetV2Plugin(idOrName)
-***REMOVED***
+}
 
-func (pm *Manager) loadPlugin(id string) (*v2.Plugin, error) ***REMOVED***
+func (pm *Manager) loadPlugin(id string) (*v2.Plugin, error) {
 	p := filepath.Join(pm.config.Root, id, configFileName)
 	dt, err := ioutil.ReadFile(p)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, errors.Wrapf(err, "error reading %v", p)
-	***REMOVED***
+	}
 	var plugin v2.Plugin
-	if err := json.Unmarshal(dt, &plugin); err != nil ***REMOVED***
+	if err := json.Unmarshal(dt, &plugin); err != nil {
 		return nil, errors.Wrapf(err, "error decoding %v", p)
-	***REMOVED***
+	}
 	return &plugin, nil
-***REMOVED***
+}
 
-func (pm *Manager) save(p *v2.Plugin) error ***REMOVED***
+func (pm *Manager) save(p *v2.Plugin) error {
 	pluginJSON, err := json.Marshal(p)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return errors.Wrap(err, "failed to marshal plugin json")
-	***REMOVED***
-	if err := ioutils.AtomicWriteFile(filepath.Join(pm.config.Root, p.GetID(), configFileName), pluginJSON, 0600); err != nil ***REMOVED***
+	}
+	if err := ioutils.AtomicWriteFile(filepath.Join(pm.config.Root, p.GetID(), configFileName), pluginJSON, 0600); err != nil {
 		return errors.Wrap(err, "failed to write atomically plugin json")
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // GC cleans up unreferenced blobs. This is recommended to run in a goroutine
-func (pm *Manager) GC() ***REMOVED***
+func (pm *Manager) GC() {
 	pm.muGC.Lock()
 	defer pm.muGC.Unlock()
 
-	whitelist := make(map[digest.Digest]struct***REMOVED******REMOVED***)
-	for _, p := range pm.config.Store.GetAll() ***REMOVED***
-		whitelist[p.Config] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-		for _, b := range p.Blobsums ***REMOVED***
-			whitelist[b] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-		***REMOVED***
-	***REMOVED***
+	whitelist := make(map[digest.Digest]struct{})
+	for _, p := range pm.config.Store.GetAll() {
+		whitelist[p.Config] = struct{}{}
+		for _, b := range p.Blobsums {
+			whitelist[b] = struct{}{}
+		}
+	}
 
 	pm.blobStore.gc(whitelist)
-***REMOVED***
+}
 
-type logHook struct***REMOVED*** id string ***REMOVED***
+type logHook struct{ id string }
 
-func (logHook) Levels() []logrus.Level ***REMOVED***
+func (logHook) Levels() []logrus.Level {
 	return logrus.AllLevels
-***REMOVED***
+}
 
-func (l logHook) Fire(entry *logrus.Entry) error ***REMOVED***
-	entry.Data = logrus.Fields***REMOVED***"plugin": l.id***REMOVED***
+func (l logHook) Fire(entry *logrus.Entry) error {
+	entry.Data = logrus.Fields{"plugin": l.id}
 	return nil
-***REMOVED***
+}
 
-func makeLoggerStreams(id string) (stdout, stderr io.WriteCloser) ***REMOVED***
+func makeLoggerStreams(id string) (stdout, stderr io.WriteCloser) {
 	logger := logrus.New()
-	logger.Hooks.Add(logHook***REMOVED***id***REMOVED***)
+	logger.Hooks.Add(logHook{id})
 	return logger.WriterLevel(logrus.InfoLevel), logger.WriterLevel(logrus.ErrorLevel)
-***REMOVED***
+}
 
-func validatePrivileges(requiredPrivileges, privileges types.PluginPrivileges) error ***REMOVED***
-	if !isEqual(requiredPrivileges, privileges, isEqualPrivilege) ***REMOVED***
+func validatePrivileges(requiredPrivileges, privileges types.PluginPrivileges) error {
+	if !isEqual(requiredPrivileges, privileges, isEqualPrivilege) {
 		return errors.New("incorrect privileges")
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func isEqual(arrOne, arrOther types.PluginPrivileges, compare func(x, y types.PluginPrivilege) bool) bool ***REMOVED***
-	if len(arrOne) != len(arrOther) ***REMOVED***
+func isEqual(arrOne, arrOther types.PluginPrivileges, compare func(x, y types.PluginPrivilege) bool) bool {
+	if len(arrOne) != len(arrOther) {
 		return false
-	***REMOVED***
+	}
 
 	sort.Sort(arrOne)
 	sort.Sort(arrOther)
 
-	for i := 1; i < arrOne.Len(); i++ ***REMOVED***
-		if !compare(arrOne[i], arrOther[i]) ***REMOVED***
+	for i := 1; i < arrOne.Len(); i++ {
+		if !compare(arrOne[i], arrOther[i]) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return true
-***REMOVED***
+}
 
-func isEqualPrivilege(a, b types.PluginPrivilege) bool ***REMOVED***
-	if a.Name != b.Name ***REMOVED***
+func isEqualPrivilege(a, b types.PluginPrivilege) bool {
+	if a.Name != b.Name {
 		return false
-	***REMOVED***
+	}
 
 	return reflect.DeepEqual(a.Value, b.Value)
-***REMOVED***
+}
 
-func configToRootFS(c []byte) (*image.RootFS, string, error) ***REMOVED***
+func configToRootFS(c []byte) (*image.RootFS, string, error) {
 	// TODO @jhowardmsft LCOW - Will need to revisit this.
 	os := runtime.GOOS
 	var pluginConfig types.PluginConfig
-	if err := json.Unmarshal(c, &pluginConfig); err != nil ***REMOVED***
+	if err := json.Unmarshal(c, &pluginConfig); err != nil {
 		return nil, "", err
-	***REMOVED***
+	}
 	// validation for empty rootfs is in distribution code
-	if pluginConfig.Rootfs == nil ***REMOVED***
+	if pluginConfig.Rootfs == nil {
 		return nil, os, nil
-	***REMOVED***
+	}
 
 	return rootFSFromPlugin(pluginConfig.Rootfs), os, nil
-***REMOVED***
+}
 
-func rootFSFromPlugin(pluginfs *types.PluginConfigRootfs) *image.RootFS ***REMOVED***
-	rootFS := image.RootFS***REMOVED***
+func rootFSFromPlugin(pluginfs *types.PluginConfigRootfs) *image.RootFS {
+	rootFS := image.RootFS{
 		Type:    pluginfs.Type,
 		DiffIDs: make([]layer.DiffID, len(pluginfs.DiffIds)),
-	***REMOVED***
-	for i := range pluginfs.DiffIds ***REMOVED***
+	}
+	for i := range pluginfs.DiffIds {
 		rootFS.DiffIDs[i] = layer.DiffID(pluginfs.DiffIds[i])
-	***REMOVED***
+	}
 
 	return &rootFS
-***REMOVED***
+}

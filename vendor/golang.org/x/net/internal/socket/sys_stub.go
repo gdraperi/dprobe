@@ -21,44 +21,44 @@ const (
 	sysSOCK_RAW = 0x3
 )
 
-func probeProtocolStack() int ***REMOVED***
-	switch runtime.GOARCH ***REMOVED***
+func probeProtocolStack() int {
+	switch runtime.GOARCH {
 	case "amd64p32", "mips64p32":
 		return 4
 	default:
 		var p uintptr
 		return int(unsafe.Sizeof(p))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func marshalInetAddr(ip net.IP, port int, zone string) []byte ***REMOVED***
+func marshalInetAddr(ip net.IP, port int, zone string) []byte {
 	return nil
-***REMOVED***
+}
 
-func parseInetAddr(b []byte, network string) (net.Addr, error) ***REMOVED***
+func parseInetAddr(b []byte, network string) (net.Addr, error) {
 	return nil, errors.New("not implemented")
-***REMOVED***
+}
 
-func getsockopt(s uintptr, level, name int, b []byte) (int, error) ***REMOVED***
+func getsockopt(s uintptr, level, name int, b []byte) (int, error) {
 	return 0, errors.New("not implemented")
-***REMOVED***
+}
 
-func setsockopt(s uintptr, level, name int, b []byte) error ***REMOVED***
+func setsockopt(s uintptr, level, name int, b []byte) error {
 	return errors.New("not implemented")
-***REMOVED***
+}
 
-func recvmsg(s uintptr, h *msghdr, flags int) (int, error) ***REMOVED***
+func recvmsg(s uintptr, h *msghdr, flags int) (int, error) {
 	return 0, errors.New("not implemented")
-***REMOVED***
+}
 
-func sendmsg(s uintptr, h *msghdr, flags int) (int, error) ***REMOVED***
+func sendmsg(s uintptr, h *msghdr, flags int) (int, error) {
 	return 0, errors.New("not implemented")
-***REMOVED***
+}
 
-func recvmmsg(s uintptr, hs []mmsghdr, flags int) (int, error) ***REMOVED***
+func recvmmsg(s uintptr, hs []mmsghdr, flags int) (int, error) {
 	return 0, errors.New("not implemented")
-***REMOVED***
+}
 
-func sendmmsg(s uintptr, hs []mmsghdr, flags int) (int, error) ***REMOVED***
+func sendmmsg(s uintptr, hs []mmsghdr, flags int) (int, error) {
 	return 0, errors.New("not implemented")
-***REMOVED***
+}

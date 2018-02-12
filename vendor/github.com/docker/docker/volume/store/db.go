@@ -10,79 +10,79 @@ import (
 
 var volumeBucketName = []byte("volumes")
 
-type volumeMetadata struct ***REMOVED***
+type volumeMetadata struct {
 	Name    string
 	Driver  string
 	Labels  map[string]string
 	Options map[string]string
-***REMOVED***
+}
 
-func (s *VolumeStore) setMeta(name string, meta volumeMetadata) error ***REMOVED***
-	return s.db.Update(func(tx *bolt.Tx) error ***REMOVED***
+func (s *VolumeStore) setMeta(name string, meta volumeMetadata) error {
+	return s.db.Update(func(tx *bolt.Tx) error {
 		return setMeta(tx, name, meta)
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func setMeta(tx *bolt.Tx, name string, meta volumeMetadata) error ***REMOVED***
+func setMeta(tx *bolt.Tx, name string, meta volumeMetadata) error {
 	metaJSON, err := json.Marshal(meta)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	b := tx.Bucket(volumeBucketName)
 	return errors.Wrap(b.Put([]byte(name), metaJSON), "error setting volume metadata")
-***REMOVED***
+}
 
-func (s *VolumeStore) getMeta(name string) (volumeMetadata, error) ***REMOVED***
+func (s *VolumeStore) getMeta(name string) (volumeMetadata, error) {
 	var meta volumeMetadata
-	err := s.db.View(func(tx *bolt.Tx) error ***REMOVED***
+	err := s.db.View(func(tx *bolt.Tx) error {
 		return getMeta(tx, name, &meta)
-	***REMOVED***)
+	})
 	return meta, err
-***REMOVED***
+}
 
-func getMeta(tx *bolt.Tx, name string, meta *volumeMetadata) error ***REMOVED***
+func getMeta(tx *bolt.Tx, name string, meta *volumeMetadata) error {
 	b := tx.Bucket(volumeBucketName)
 	val := b.Get([]byte(name))
-	if string(val) == "" ***REMOVED***
+	if string(val) == "" {
 		return nil
-	***REMOVED***
-	if err := json.Unmarshal(val, meta); err != nil ***REMOVED***
+	}
+	if err := json.Unmarshal(val, meta); err != nil {
 		return errors.Wrap(err, "error unmarshaling volume metadata")
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (s *VolumeStore) removeMeta(name string) error ***REMOVED***
-	return s.db.Update(func(tx *bolt.Tx) error ***REMOVED***
+func (s *VolumeStore) removeMeta(name string) error {
+	return s.db.Update(func(tx *bolt.Tx) error {
 		return removeMeta(tx, name)
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func removeMeta(tx *bolt.Tx, name string) error ***REMOVED***
+func removeMeta(tx *bolt.Tx, name string) error {
 	b := tx.Bucket(volumeBucketName)
 	return errors.Wrap(b.Delete([]byte(name)), "error removing volume metadata")
-***REMOVED***
+}
 
 // listMeta is used during restore to get the list of volume metadata
 // from the on-disk database.
 // Any errors that occur are only logged.
-func listMeta(tx *bolt.Tx) []volumeMetadata ***REMOVED***
+func listMeta(tx *bolt.Tx) []volumeMetadata {
 	var ls []volumeMetadata
 	b := tx.Bucket(volumeBucketName)
-	b.ForEach(func(k, v []byte) error ***REMOVED***
-		if len(v) == 0 ***REMOVED***
+	b.ForEach(func(k, v []byte) error {
+		if len(v) == 0 {
 			// don't try to unmarshal an empty value
 			return nil
-		***REMOVED***
+		}
 
 		var m volumeMetadata
-		if err := json.Unmarshal(v, &m); err != nil ***REMOVED***
+		if err := json.Unmarshal(v, &m); err != nil {
 			// Just log the error
 			logrus.Errorf("Error while reading volume metadata for volume %q: %v", string(k), err)
 			return nil
-		***REMOVED***
+		}
 		ls = append(ls, m)
 		return nil
-	***REMOVED***)
+	})
 	return ls
-***REMOVED***
+}

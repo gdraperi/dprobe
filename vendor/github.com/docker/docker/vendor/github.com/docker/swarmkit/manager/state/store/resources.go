@@ -8,190 +8,190 @@ import (
 
 const tableResource = "resource"
 
-func init() ***REMOVED***
-	register(ObjectStoreConfig***REMOVED***
-		Table: &memdb.TableSchema***REMOVED***
+func init() {
+	register(ObjectStoreConfig{
+		Table: &memdb.TableSchema{
 			Name: tableResource,
-			Indexes: map[string]*memdb.IndexSchema***REMOVED***
-				indexID: ***REMOVED***
+			Indexes: map[string]*memdb.IndexSchema{
+				indexID: {
 					Name:    indexID,
 					Unique:  true,
-					Indexer: resourceIndexerByID***REMOVED******REMOVED***,
-				***REMOVED***,
-				indexName: ***REMOVED***
+					Indexer: resourceIndexerByID{},
+				},
+				indexName: {
 					Name:    indexName,
 					Unique:  true,
-					Indexer: resourceIndexerByName***REMOVED******REMOVED***,
-				***REMOVED***,
-				indexKind: ***REMOVED***
+					Indexer: resourceIndexerByName{},
+				},
+				indexKind: {
 					Name:    indexKind,
-					Indexer: resourceIndexerByKind***REMOVED******REMOVED***,
-				***REMOVED***,
-				indexCustom: ***REMOVED***
+					Indexer: resourceIndexerByKind{},
+				},
+				indexCustom: {
 					Name:         indexCustom,
-					Indexer:      resourceCustomIndexer***REMOVED******REMOVED***,
+					Indexer:      resourceCustomIndexer{},
 					AllowMissing: true,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		Save: func(tx ReadTx, snapshot *api.StoreSnapshot) error ***REMOVED***
+				},
+			},
+		},
+		Save: func(tx ReadTx, snapshot *api.StoreSnapshot) error {
 			var err error
 			snapshot.Resources, err = FindResources(tx, All)
 			return err
-		***REMOVED***,
-		Restore: func(tx Tx, snapshot *api.StoreSnapshot) error ***REMOVED***
+		},
+		Restore: func(tx Tx, snapshot *api.StoreSnapshot) error {
 			toStoreObj := make([]api.StoreObject, len(snapshot.Resources))
-			for i, x := range snapshot.Resources ***REMOVED***
-				toStoreObj[i] = resourceEntry***REMOVED***x***REMOVED***
-			***REMOVED***
+			for i, x := range snapshot.Resources {
+				toStoreObj[i] = resourceEntry{x}
+			}
 			return RestoreTable(tx, tableResource, toStoreObj)
-		***REMOVED***,
-		ApplyStoreAction: func(tx Tx, sa api.StoreAction) error ***REMOVED***
-			switch v := sa.Target.(type) ***REMOVED***
+		},
+		ApplyStoreAction: func(tx Tx, sa api.StoreAction) error {
+			switch v := sa.Target.(type) {
 			case *api.StoreAction_Resource:
 				obj := v.Resource
-				switch sa.Action ***REMOVED***
+				switch sa.Action {
 				case api.StoreActionKindCreate:
 					return CreateResource(tx, obj)
 				case api.StoreActionKindUpdate:
 					return UpdateResource(tx, obj)
 				case api.StoreActionKindRemove:
 					return DeleteResource(tx, obj.ID)
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return errUnknownStoreAction
-		***REMOVED***,
-	***REMOVED***)
-***REMOVED***
+		},
+	})
+}
 
-type resourceEntry struct ***REMOVED***
+type resourceEntry struct {
 	*api.Resource
-***REMOVED***
+}
 
-func (r resourceEntry) CopyStoreObject() api.StoreObject ***REMOVED***
-	return resourceEntry***REMOVED***Resource: r.Resource.Copy()***REMOVED***
-***REMOVED***
+func (r resourceEntry) CopyStoreObject() api.StoreObject {
+	return resourceEntry{Resource: r.Resource.Copy()}
+}
 
 // ensure that when update events are emitted, we unwrap resourceEntry
-func (r resourceEntry) EventUpdate(oldObject api.StoreObject) api.Event ***REMOVED***
-	if oldObject != nil ***REMOVED***
-		return api.EventUpdateResource***REMOVED***Resource: r.Resource, OldResource: oldObject.(resourceEntry).Resource***REMOVED***
-	***REMOVED***
-	return api.EventUpdateResource***REMOVED***Resource: r.Resource***REMOVED***
-***REMOVED***
+func (r resourceEntry) EventUpdate(oldObject api.StoreObject) api.Event {
+	if oldObject != nil {
+		return api.EventUpdateResource{Resource: r.Resource, OldResource: oldObject.(resourceEntry).Resource}
+	}
+	return api.EventUpdateResource{Resource: r.Resource}
+}
 
-func confirmExtension(tx Tx, r *api.Resource) error ***REMOVED***
+func confirmExtension(tx Tx, r *api.Resource) error {
 	// There must be an extension corresponding to the Kind field.
 	extensions, err := FindExtensions(tx, ByName(r.Kind))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return errors.Wrap(err, "failed to query extensions")
-	***REMOVED***
-	if len(extensions) == 0 ***REMOVED***
+	}
+	if len(extensions) == 0 {
 		return errors.Errorf("object kind %s is unregistered", r.Kind)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // CreateResource adds a new resource object to the store.
 // Returns ErrExist if the ID is already taken.
-func CreateResource(tx Tx, r *api.Resource) error ***REMOVED***
-	if err := confirmExtension(tx, r); err != nil ***REMOVED***
+func CreateResource(tx Tx, r *api.Resource) error {
+	if err := confirmExtension(tx, r); err != nil {
 		return err
-	***REMOVED***
-	return tx.create(tableResource, resourceEntry***REMOVED***r***REMOVED***)
-***REMOVED***
+	}
+	return tx.create(tableResource, resourceEntry{r})
+}
 
 // UpdateResource updates an existing resource object in the store.
 // Returns ErrNotExist if the object doesn't exist.
-func UpdateResource(tx Tx, r *api.Resource) error ***REMOVED***
-	if err := confirmExtension(tx, r); err != nil ***REMOVED***
+func UpdateResource(tx Tx, r *api.Resource) error {
+	if err := confirmExtension(tx, r); err != nil {
 		return err
-	***REMOVED***
-	return tx.update(tableResource, resourceEntry***REMOVED***r***REMOVED***)
-***REMOVED***
+	}
+	return tx.update(tableResource, resourceEntry{r})
+}
 
 // DeleteResource removes a resource object from the store.
 // Returns ErrNotExist if the object doesn't exist.
-func DeleteResource(tx Tx, id string) error ***REMOVED***
+func DeleteResource(tx Tx, id string) error {
 	return tx.delete(tableResource, id)
-***REMOVED***
+}
 
 // GetResource looks up a resource object by ID.
 // Returns nil if the object doesn't exist.
-func GetResource(tx ReadTx, id string) *api.Resource ***REMOVED***
+func GetResource(tx ReadTx, id string) *api.Resource {
 	r := tx.get(tableResource, id)
-	if r == nil ***REMOVED***
+	if r == nil {
 		return nil
-	***REMOVED***
+	}
 	return r.(resourceEntry).Resource
-***REMOVED***
+}
 
 // FindResources selects a set of resource objects and returns them.
-func FindResources(tx ReadTx, by By) ([]*api.Resource, error) ***REMOVED***
-	checkType := func(by By) error ***REMOVED***
-		switch by.(type) ***REMOVED***
+func FindResources(tx ReadTx, by By) ([]*api.Resource, error) {
+	checkType := func(by By) error {
+		switch by.(type) {
 		case byIDPrefix, byName, byKind, byCustom, byCustomPrefix:
 			return nil
 		default:
 			return ErrInvalidFindBy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	resourceList := []*api.Resource***REMOVED******REMOVED***
-	appendResult := func(o api.StoreObject) ***REMOVED***
+	resourceList := []*api.Resource{}
+	appendResult := func(o api.StoreObject) {
 		resourceList = append(resourceList, o.(resourceEntry).Resource)
-	***REMOVED***
+	}
 
 	err := tx.find(tableResource, by, checkType, appendResult)
 	return resourceList, err
-***REMOVED***
+}
 
-type resourceIndexerByKind struct***REMOVED******REMOVED***
+type resourceIndexerByKind struct{}
 
-func (ri resourceIndexerByKind) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
+func (ri resourceIndexerByKind) FromArgs(args ...interface{}) ([]byte, error) {
 	return fromArgs(args...)
-***REMOVED***
+}
 
-func (ri resourceIndexerByKind) FromObject(obj interface***REMOVED******REMOVED***) (bool, []byte, error) ***REMOVED***
+func (ri resourceIndexerByKind) FromObject(obj interface{}) (bool, []byte, error) {
 	r := obj.(resourceEntry)
 
 	// Add the null character as a terminator
 	val := r.Resource.Kind + "\x00"
 	return true, []byte(val), nil
-***REMOVED***
+}
 
-type resourceIndexerByID struct***REMOVED******REMOVED***
+type resourceIndexerByID struct{}
 
-func (indexer resourceIndexerByID) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
-	return api.ResourceIndexerByID***REMOVED******REMOVED***.FromArgs(args...)
-***REMOVED***
-func (indexer resourceIndexerByID) PrefixFromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
-	return api.ResourceIndexerByID***REMOVED******REMOVED***.PrefixFromArgs(args...)
-***REMOVED***
-func (indexer resourceIndexerByID) FromObject(obj interface***REMOVED******REMOVED***) (bool, []byte, error) ***REMOVED***
-	return api.ResourceIndexerByID***REMOVED******REMOVED***.FromObject(obj.(resourceEntry).Resource)
-***REMOVED***
+func (indexer resourceIndexerByID) FromArgs(args ...interface{}) ([]byte, error) {
+	return api.ResourceIndexerByID{}.FromArgs(args...)
+}
+func (indexer resourceIndexerByID) PrefixFromArgs(args ...interface{}) ([]byte, error) {
+	return api.ResourceIndexerByID{}.PrefixFromArgs(args...)
+}
+func (indexer resourceIndexerByID) FromObject(obj interface{}) (bool, []byte, error) {
+	return api.ResourceIndexerByID{}.FromObject(obj.(resourceEntry).Resource)
+}
 
-type resourceIndexerByName struct***REMOVED******REMOVED***
+type resourceIndexerByName struct{}
 
-func (indexer resourceIndexerByName) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
-	return api.ResourceIndexerByName***REMOVED******REMOVED***.FromArgs(args...)
-***REMOVED***
-func (indexer resourceIndexerByName) PrefixFromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
-	return api.ResourceIndexerByName***REMOVED******REMOVED***.PrefixFromArgs(args...)
-***REMOVED***
-func (indexer resourceIndexerByName) FromObject(obj interface***REMOVED******REMOVED***) (bool, []byte, error) ***REMOVED***
-	return api.ResourceIndexerByName***REMOVED******REMOVED***.FromObject(obj.(resourceEntry).Resource)
-***REMOVED***
+func (indexer resourceIndexerByName) FromArgs(args ...interface{}) ([]byte, error) {
+	return api.ResourceIndexerByName{}.FromArgs(args...)
+}
+func (indexer resourceIndexerByName) PrefixFromArgs(args ...interface{}) ([]byte, error) {
+	return api.ResourceIndexerByName{}.PrefixFromArgs(args...)
+}
+func (indexer resourceIndexerByName) FromObject(obj interface{}) (bool, []byte, error) {
+	return api.ResourceIndexerByName{}.FromObject(obj.(resourceEntry).Resource)
+}
 
-type resourceCustomIndexer struct***REMOVED******REMOVED***
+type resourceCustomIndexer struct{}
 
-func (indexer resourceCustomIndexer) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
-	return api.ResourceCustomIndexer***REMOVED******REMOVED***.FromArgs(args...)
-***REMOVED***
-func (indexer resourceCustomIndexer) PrefixFromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
-	return api.ResourceCustomIndexer***REMOVED******REMOVED***.PrefixFromArgs(args...)
-***REMOVED***
-func (indexer resourceCustomIndexer) FromObject(obj interface***REMOVED******REMOVED***) (bool, [][]byte, error) ***REMOVED***
-	return api.ResourceCustomIndexer***REMOVED******REMOVED***.FromObject(obj.(resourceEntry).Resource)
-***REMOVED***
+func (indexer resourceCustomIndexer) FromArgs(args ...interface{}) ([]byte, error) {
+	return api.ResourceCustomIndexer{}.FromArgs(args...)
+}
+func (indexer resourceCustomIndexer) PrefixFromArgs(args ...interface{}) ([]byte, error) {
+	return api.ResourceCustomIndexer{}.PrefixFromArgs(args...)
+}
+func (indexer resourceCustomIndexer) FromObject(obj interface{}) (bool, [][]byte, error) {
+	return api.ResourceCustomIndexer{}.FromObject(obj.(resourceEntry).Resource)
+}

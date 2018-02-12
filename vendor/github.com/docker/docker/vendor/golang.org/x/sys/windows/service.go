@@ -99,7 +99,7 @@ const (
 	SC_ENUM_PROCESS_INFO = 0
 )
 
-type SERVICE_STATUS struct ***REMOVED***
+type SERVICE_STATUS struct {
 	ServiceType             uint32
 	CurrentState            uint32
 	ControlsAccepted        uint32
@@ -107,14 +107,14 @@ type SERVICE_STATUS struct ***REMOVED***
 	ServiceSpecificExitCode uint32
 	CheckPoint              uint32
 	WaitHint                uint32
-***REMOVED***
+}
 
-type SERVICE_TABLE_ENTRY struct ***REMOVED***
+type SERVICE_TABLE_ENTRY struct {
 	ServiceName *uint16
 	ServiceProc uintptr
-***REMOVED***
+}
 
-type QUERY_SERVICE_CONFIG struct ***REMOVED***
+type QUERY_SERVICE_CONFIG struct {
 	ServiceType      uint32
 	StartType        uint32
 	ErrorControl     uint32
@@ -124,13 +124,13 @@ type QUERY_SERVICE_CONFIG struct ***REMOVED***
 	Dependencies     *uint16
 	ServiceStartName *uint16
 	DisplayName      *uint16
-***REMOVED***
+}
 
-type SERVICE_DESCRIPTION struct ***REMOVED***
+type SERVICE_DESCRIPTION struct {
 	Description *uint16
-***REMOVED***
+}
 
-type SERVICE_STATUS_PROCESS struct ***REMOVED***
+type SERVICE_STATUS_PROCESS struct {
 	ServiceType             uint32
 	CurrentState            uint32
 	ControlsAccepted        uint32
@@ -140,13 +140,13 @@ type SERVICE_STATUS_PROCESS struct ***REMOVED***
 	WaitHint                uint32
 	ProcessId               uint32
 	ServiceFlags            uint32
-***REMOVED***
+}
 
-type ENUM_SERVICE_STATUS_PROCESS struct ***REMOVED***
+type ENUM_SERVICE_STATUS_PROCESS struct {
 	ServiceName          *uint16
 	DisplayName          *uint16
 	ServiceStatusProcess SERVICE_STATUS_PROCESS
-***REMOVED***
+}
 
 //sys	CloseServiceHandle(handle Handle) (err error) = advapi32.CloseServiceHandle
 //sys	CreateService(mgr Handle, serviceName *uint16, displayName *uint16, access uint32, srvType uint32, startType uint32, errCtl uint32, pathName *uint16, loadOrderGroup *uint16, tagId *uint32, dependencies *uint16, serviceStartName *uint16, password *uint16) (handle Handle, err error) [failretval==0] = advapi32.CreateServiceW

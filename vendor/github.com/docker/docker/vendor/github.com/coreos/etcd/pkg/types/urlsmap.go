@@ -26,82 +26,82 @@ type URLsMap map[string]URLs
 // NewURLsMap returns a URLsMap instantiated from the given string,
 // which consists of discovery-formatted names-to-URLs, like:
 // mach0=http://1.1.1.1:2380,mach0=http://2.2.2.2::2380,mach1=http://3.3.3.3:2380,mach2=http://4.4.4.4:2380
-func NewURLsMap(s string) (URLsMap, error) ***REMOVED***
+func NewURLsMap(s string) (URLsMap, error) {
 	m := parse(s)
 
-	cl := URLsMap***REMOVED******REMOVED***
-	for name, urls := range m ***REMOVED***
+	cl := URLsMap{}
+	for name, urls := range m {
 		us, err := NewURLs(urls)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		cl[name] = us
-	***REMOVED***
+	}
 	return cl, nil
-***REMOVED***
+}
 
 // NewURLsMapFromStringMap takes a map of strings and returns a URLsMap. The
 // string values in the map can be multiple values separated by the sep string.
-func NewURLsMapFromStringMap(m map[string]string, sep string) (URLsMap, error) ***REMOVED***
+func NewURLsMapFromStringMap(m map[string]string, sep string) (URLsMap, error) {
 	var err error
-	um := URLsMap***REMOVED******REMOVED***
-	for k, v := range m ***REMOVED***
+	um := URLsMap{}
+	for k, v := range m {
 		um[k], err = NewURLs(strings.Split(v, sep))
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return um, nil
-***REMOVED***
+}
 
 // String turns URLsMap into discovery-formatted name-to-URLs sorted by name.
-func (c URLsMap) String() string ***REMOVED***
+func (c URLsMap) String() string {
 	var pairs []string
-	for name, urls := range c ***REMOVED***
-		for _, url := range urls ***REMOVED***
+	for name, urls := range c {
+		for _, url := range urls {
 			pairs = append(pairs, fmt.Sprintf("%s=%s", name, url.String()))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	sort.Strings(pairs)
 	return strings.Join(pairs, ",")
-***REMOVED***
+}
 
 // URLs returns a list of all URLs.
 // The returned list is sorted in ascending lexicographical order.
-func (c URLsMap) URLs() []string ***REMOVED***
+func (c URLsMap) URLs() []string {
 	var urls []string
-	for _, us := range c ***REMOVED***
-		for _, u := range us ***REMOVED***
+	for _, us := range c {
+		for _, u := range us {
 			urls = append(urls, u.String())
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	sort.Strings(urls)
 	return urls
-***REMOVED***
+}
 
 // Len returns the size of URLsMap.
-func (c URLsMap) Len() int ***REMOVED***
+func (c URLsMap) Len() int {
 	return len(c)
-***REMOVED***
+}
 
 // parse parses the given string and returns a map listing the values specified for each key.
-func parse(s string) map[string][]string ***REMOVED***
+func parse(s string) map[string][]string {
 	m := make(map[string][]string)
-	for s != "" ***REMOVED***
+	for s != "" {
 		key := s
-		if i := strings.IndexAny(key, ","); i >= 0 ***REMOVED***
+		if i := strings.IndexAny(key, ","); i >= 0 {
 			key, s = key[:i], key[i+1:]
-		***REMOVED*** else ***REMOVED***
+		} else {
 			s = ""
-		***REMOVED***
-		if key == "" ***REMOVED***
+		}
+		if key == "" {
 			continue
-		***REMOVED***
+		}
 		value := ""
-		if i := strings.Index(key, "="); i >= 0 ***REMOVED***
+		if i := strings.Index(key, "="); i >= 0 {
 			key, value = key[:i], key[i+1:]
-		***REMOVED***
+		}
 		m[key] = append(m[key], value)
-	***REMOVED***
+	}
 	return m
-***REMOVED***
+}

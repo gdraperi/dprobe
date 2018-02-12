@@ -56,121 +56,121 @@ var (
 	bucketKeyCreatedAt   = []byte("createdat")
 )
 
-func getBucket(tx *bolt.Tx, keys ...[]byte) *bolt.Bucket ***REMOVED***
+func getBucket(tx *bolt.Tx, keys ...[]byte) *bolt.Bucket {
 	bkt := tx.Bucket(keys[0])
 
-	for _, key := range keys[1:] ***REMOVED***
-		if bkt == nil ***REMOVED***
+	for _, key := range keys[1:] {
+		if bkt == nil {
 			break
-		***REMOVED***
+		}
 		bkt = bkt.Bucket(key)
-	***REMOVED***
+	}
 
 	return bkt
-***REMOVED***
+}
 
-func createBucketIfNotExists(tx *bolt.Tx, keys ...[]byte) (*bolt.Bucket, error) ***REMOVED***
+func createBucketIfNotExists(tx *bolt.Tx, keys ...[]byte) (*bolt.Bucket, error) {
 	bkt, err := tx.CreateBucketIfNotExists(keys[0])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	for _, key := range keys[1:] ***REMOVED***
+	for _, key := range keys[1:] {
 		bkt, err = bkt.CreateBucketIfNotExists(key)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return bkt, nil
-***REMOVED***
+}
 
-func namespaceLabelsBucketPath(namespace string) [][]byte ***REMOVED***
-	return [][]byte***REMOVED***bucketKeyVersion, []byte(namespace), bucketKeyObjectLabels***REMOVED***
-***REMOVED***
+func namespaceLabelsBucketPath(namespace string) [][]byte {
+	return [][]byte{bucketKeyVersion, []byte(namespace), bucketKeyObjectLabels}
+}
 
-func withNamespacesLabelsBucket(tx *bolt.Tx, namespace string, fn func(bkt *bolt.Bucket) error) error ***REMOVED***
+func withNamespacesLabelsBucket(tx *bolt.Tx, namespace string, fn func(bkt *bolt.Bucket) error) error {
 	bkt, err := createBucketIfNotExists(tx, namespaceLabelsBucketPath(namespace)...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	return fn(bkt)
-***REMOVED***
+}
 
-func getNamespaceLabelsBucket(tx *bolt.Tx, namespace string) *bolt.Bucket ***REMOVED***
+func getNamespaceLabelsBucket(tx *bolt.Tx, namespace string) *bolt.Bucket {
 	return getBucket(tx, namespaceLabelsBucketPath(namespace)...)
-***REMOVED***
+}
 
-func imagesBucketPath(namespace string) [][]byte ***REMOVED***
-	return [][]byte***REMOVED***bucketKeyVersion, []byte(namespace), bucketKeyObjectImages***REMOVED***
-***REMOVED***
+func imagesBucketPath(namespace string) [][]byte {
+	return [][]byte{bucketKeyVersion, []byte(namespace), bucketKeyObjectImages}
+}
 
-func withImagesBucket(tx *bolt.Tx, namespace string, fn func(bkt *bolt.Bucket) error) error ***REMOVED***
+func withImagesBucket(tx *bolt.Tx, namespace string, fn func(bkt *bolt.Bucket) error) error {
 	bkt, err := createBucketIfNotExists(tx, imagesBucketPath(namespace)...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	return fn(bkt)
-***REMOVED***
+}
 
-func getImagesBucket(tx *bolt.Tx, namespace string) *bolt.Bucket ***REMOVED***
+func getImagesBucket(tx *bolt.Tx, namespace string) *bolt.Bucket {
 	return getBucket(tx, imagesBucketPath(namespace)...)
-***REMOVED***
+}
 
-func createContainersBucket(tx *bolt.Tx, namespace string) (*bolt.Bucket, error) ***REMOVED***
+func createContainersBucket(tx *bolt.Tx, namespace string) (*bolt.Bucket, error) {
 	bkt, err := createBucketIfNotExists(tx, bucketKeyVersion, []byte(namespace), bucketKeyObjectContainers)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return bkt, nil
-***REMOVED***
+}
 
-func getContainersBucket(tx *bolt.Tx, namespace string) *bolt.Bucket ***REMOVED***
+func getContainersBucket(tx *bolt.Tx, namespace string) *bolt.Bucket {
 	return getBucket(tx, bucketKeyVersion, []byte(namespace), bucketKeyObjectContainers)
-***REMOVED***
+}
 
-func getContainerBucket(tx *bolt.Tx, namespace, id string) *bolt.Bucket ***REMOVED***
+func getContainerBucket(tx *bolt.Tx, namespace, id string) *bolt.Bucket {
 	return getBucket(tx, bucketKeyVersion, []byte(namespace), bucketKeyObjectContainers, []byte(id))
-***REMOVED***
+}
 
-func createSnapshotterBucket(tx *bolt.Tx, namespace, snapshotter string) (*bolt.Bucket, error) ***REMOVED***
+func createSnapshotterBucket(tx *bolt.Tx, namespace, snapshotter string) (*bolt.Bucket, error) {
 	bkt, err := createBucketIfNotExists(tx, bucketKeyVersion, []byte(namespace), bucketKeyObjectSnapshots, []byte(snapshotter))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return bkt, nil
-***REMOVED***
+}
 
-func getSnapshotterBucket(tx *bolt.Tx, namespace, snapshotter string) *bolt.Bucket ***REMOVED***
+func getSnapshotterBucket(tx *bolt.Tx, namespace, snapshotter string) *bolt.Bucket {
 	return getBucket(tx, bucketKeyVersion, []byte(namespace), bucketKeyObjectSnapshots, []byte(snapshotter))
-***REMOVED***
+}
 
-func createBlobBucket(tx *bolt.Tx, namespace string, dgst digest.Digest) (*bolt.Bucket, error) ***REMOVED***
+func createBlobBucket(tx *bolt.Tx, namespace string, dgst digest.Digest) (*bolt.Bucket, error) {
 	bkt, err := createBucketIfNotExists(tx, bucketKeyVersion, []byte(namespace), bucketKeyObjectContent, bucketKeyObjectBlob, []byte(dgst.String()))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return bkt, nil
-***REMOVED***
+}
 
-func getBlobsBucket(tx *bolt.Tx, namespace string) *bolt.Bucket ***REMOVED***
+func getBlobsBucket(tx *bolt.Tx, namespace string) *bolt.Bucket {
 	return getBucket(tx, bucketKeyVersion, []byte(namespace), bucketKeyObjectContent, bucketKeyObjectBlob)
-***REMOVED***
+}
 
-func getBlobBucket(tx *bolt.Tx, namespace string, dgst digest.Digest) *bolt.Bucket ***REMOVED***
+func getBlobBucket(tx *bolt.Tx, namespace string, dgst digest.Digest) *bolt.Bucket {
 	return getBucket(tx, bucketKeyVersion, []byte(namespace), bucketKeyObjectContent, bucketKeyObjectBlob, []byte(dgst.String()))
-***REMOVED***
+}
 
-func createIngestBucket(tx *bolt.Tx, namespace string) (*bolt.Bucket, error) ***REMOVED***
+func createIngestBucket(tx *bolt.Tx, namespace string) (*bolt.Bucket, error) {
 	bkt, err := createBucketIfNotExists(tx, bucketKeyVersion, []byte(namespace), bucketKeyObjectContent, bucketKeyObjectIngest)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return bkt, nil
-***REMOVED***
+}
 
-func getIngestBucket(tx *bolt.Tx, namespace string) *bolt.Bucket ***REMOVED***
+func getIngestBucket(tx *bolt.Tx, namespace string) *bolt.Bucket {
 	return getBucket(tx, bucketKeyVersion, []byte(namespace), bucketKeyObjectContent, bucketKeyObjectIngest)
-***REMOVED***
+}

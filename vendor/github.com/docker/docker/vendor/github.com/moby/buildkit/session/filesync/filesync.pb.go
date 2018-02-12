@@ -41,72 +41,72 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
 // BytesMessage contains a chunk of byte data
-type BytesMessage struct ***REMOVED***
+type BytesMessage struct {
 	Data []byte `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
-***REMOVED***
+}
 
-func (m *BytesMessage) Reset()                    ***REMOVED*** *m = BytesMessage***REMOVED******REMOVED*** ***REMOVED***
-func (*BytesMessage) ProtoMessage()               ***REMOVED******REMOVED***
-func (*BytesMessage) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorFilesync, []int***REMOVED***0***REMOVED*** ***REMOVED***
+func (m *BytesMessage) Reset()                    { *m = BytesMessage{} }
+func (*BytesMessage) ProtoMessage()               {}
+func (*BytesMessage) Descriptor() ([]byte, []int) { return fileDescriptorFilesync, []int{0} }
 
-func (m *BytesMessage) GetData() []byte ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *BytesMessage) GetData() []byte {
+	if m != nil {
 		return m.Data
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*BytesMessage)(nil), "moby.filesync.v1.BytesMessage")
-***REMOVED***
-func (this *BytesMessage) Equal(that interface***REMOVED******REMOVED***) bool ***REMOVED***
-	if that == nil ***REMOVED***
-		if this == nil ***REMOVED***
+}
+func (this *BytesMessage) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
 			return true
-		***REMOVED***
+		}
 		return false
-	***REMOVED***
+	}
 
 	that1, ok := that.(*BytesMessage)
-	if !ok ***REMOVED***
+	if !ok {
 		that2, ok := that.(BytesMessage)
-		if ok ***REMOVED***
+		if ok {
 			that1 = &that2
-		***REMOVED*** else ***REMOVED***
+		} else {
 			return false
-		***REMOVED***
-	***REMOVED***
-	if that1 == nil ***REMOVED***
-		if this == nil ***REMOVED***
+		}
+	}
+	if that1 == nil {
+		if this == nil {
 			return true
-		***REMOVED***
+		}
 		return false
-	***REMOVED*** else if this == nil ***REMOVED***
+	} else if this == nil {
 		return false
-	***REMOVED***
-	if !bytes.Equal(this.Data, that1.Data) ***REMOVED***
+	}
+	if !bytes.Equal(this.Data, that1.Data) {
 		return false
-	***REMOVED***
+	}
 	return true
-***REMOVED***
-func (this *BytesMessage) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *BytesMessage) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 5)
-	s = append(s, "&filesync.BytesMessage***REMOVED***")
+	s = append(s, "&filesync.BytesMessage{")
 	s = append(s, "Data: "+fmt.Sprintf("%#v", this.Data)+",\n")
-	s = append(s, "***REMOVED***")
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func valueToGoStringFilesync(v interface***REMOVED******REMOVED***, typ string) string ***REMOVED***
+}
+func valueToGoStringFilesync(v interface{}, typ string) string {
 	rv := reflect.ValueOf(v)
-	if rv.IsNil() ***REMOVED***
+	if rv.IsNil() {
 		return "nil"
-	***REMOVED***
+	}
 	pv := reflect.Indirect(rv).Interface()
-	return fmt.Sprintf("func(v %v) *%v ***REMOVED*** return &v ***REMOVED*** ( %#v )", typ, typ, pv)
-***REMOVED***
+	return fmt.Sprintf("func(v %v) *%v { return &v } ( %#v )", typ, typ, pv)
+}
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
@@ -118,286 +118,286 @@ const _ = grpc.SupportPackageIsVersion4
 
 // Client API for FileSync service
 
-type FileSyncClient interface ***REMOVED***
+type FileSyncClient interface {
 	DiffCopy(ctx context.Context, opts ...grpc.CallOption) (FileSync_DiffCopyClient, error)
 	TarStream(ctx context.Context, opts ...grpc.CallOption) (FileSync_TarStreamClient, error)
-***REMOVED***
+}
 
-type fileSyncClient struct ***REMOVED***
+type fileSyncClient struct {
 	cc *grpc.ClientConn
-***REMOVED***
+}
 
-func NewFileSyncClient(cc *grpc.ClientConn) FileSyncClient ***REMOVED***
-	return &fileSyncClient***REMOVED***cc***REMOVED***
-***REMOVED***
+func NewFileSyncClient(cc *grpc.ClientConn) FileSyncClient {
+	return &fileSyncClient{cc}
+}
 
-func (c *fileSyncClient) DiffCopy(ctx context.Context, opts ...grpc.CallOption) (FileSync_DiffCopyClient, error) ***REMOVED***
+func (c *fileSyncClient) DiffCopy(ctx context.Context, opts ...grpc.CallOption) (FileSync_DiffCopyClient, error) {
 	stream, err := grpc.NewClientStream(ctx, &_FileSync_serviceDesc.Streams[0], c.cc, "/moby.filesync.v1.FileSync/DiffCopy", opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	x := &fileSyncDiffCopyClient***REMOVED***stream***REMOVED***
+	}
+	x := &fileSyncDiffCopyClient{stream}
 	return x, nil
-***REMOVED***
+}
 
-type FileSync_DiffCopyClient interface ***REMOVED***
+type FileSync_DiffCopyClient interface {
 	Send(*BytesMessage) error
 	Recv() (*BytesMessage, error)
 	grpc.ClientStream
-***REMOVED***
+}
 
-type fileSyncDiffCopyClient struct ***REMOVED***
+type fileSyncDiffCopyClient struct {
 	grpc.ClientStream
-***REMOVED***
+}
 
-func (x *fileSyncDiffCopyClient) Send(m *BytesMessage) error ***REMOVED***
+func (x *fileSyncDiffCopyClient) Send(m *BytesMessage) error {
 	return x.ClientStream.SendMsg(m)
-***REMOVED***
+}
 
-func (x *fileSyncDiffCopyClient) Recv() (*BytesMessage, error) ***REMOVED***
+func (x *fileSyncDiffCopyClient) Recv() (*BytesMessage, error) {
 	m := new(BytesMessage)
-	if err := x.ClientStream.RecvMsg(m); err != nil ***REMOVED***
+	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return m, nil
-***REMOVED***
+}
 
-func (c *fileSyncClient) TarStream(ctx context.Context, opts ...grpc.CallOption) (FileSync_TarStreamClient, error) ***REMOVED***
+func (c *fileSyncClient) TarStream(ctx context.Context, opts ...grpc.CallOption) (FileSync_TarStreamClient, error) {
 	stream, err := grpc.NewClientStream(ctx, &_FileSync_serviceDesc.Streams[1], c.cc, "/moby.filesync.v1.FileSync/TarStream", opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	x := &fileSyncTarStreamClient***REMOVED***stream***REMOVED***
+	}
+	x := &fileSyncTarStreamClient{stream}
 	return x, nil
-***REMOVED***
+}
 
-type FileSync_TarStreamClient interface ***REMOVED***
+type FileSync_TarStreamClient interface {
 	Send(*BytesMessage) error
 	Recv() (*BytesMessage, error)
 	grpc.ClientStream
-***REMOVED***
+}
 
-type fileSyncTarStreamClient struct ***REMOVED***
+type fileSyncTarStreamClient struct {
 	grpc.ClientStream
-***REMOVED***
+}
 
-func (x *fileSyncTarStreamClient) Send(m *BytesMessage) error ***REMOVED***
+func (x *fileSyncTarStreamClient) Send(m *BytesMessage) error {
 	return x.ClientStream.SendMsg(m)
-***REMOVED***
+}
 
-func (x *fileSyncTarStreamClient) Recv() (*BytesMessage, error) ***REMOVED***
+func (x *fileSyncTarStreamClient) Recv() (*BytesMessage, error) {
 	m := new(BytesMessage)
-	if err := x.ClientStream.RecvMsg(m); err != nil ***REMOVED***
+	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return m, nil
-***REMOVED***
+}
 
 // Server API for FileSync service
 
-type FileSyncServer interface ***REMOVED***
+type FileSyncServer interface {
 	DiffCopy(FileSync_DiffCopyServer) error
 	TarStream(FileSync_TarStreamServer) error
-***REMOVED***
+}
 
-func RegisterFileSyncServer(s *grpc.Server, srv FileSyncServer) ***REMOVED***
+func RegisterFileSyncServer(s *grpc.Server, srv FileSyncServer) {
 	s.RegisterService(&_FileSync_serviceDesc, srv)
-***REMOVED***
+}
 
-func _FileSync_DiffCopy_Handler(srv interface***REMOVED******REMOVED***, stream grpc.ServerStream) error ***REMOVED***
-	return srv.(FileSyncServer).DiffCopy(&fileSyncDiffCopyServer***REMOVED***stream***REMOVED***)
-***REMOVED***
+func _FileSync_DiffCopy_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(FileSyncServer).DiffCopy(&fileSyncDiffCopyServer{stream})
+}
 
-type FileSync_DiffCopyServer interface ***REMOVED***
+type FileSync_DiffCopyServer interface {
 	Send(*BytesMessage) error
 	Recv() (*BytesMessage, error)
 	grpc.ServerStream
-***REMOVED***
+}
 
-type fileSyncDiffCopyServer struct ***REMOVED***
+type fileSyncDiffCopyServer struct {
 	grpc.ServerStream
-***REMOVED***
+}
 
-func (x *fileSyncDiffCopyServer) Send(m *BytesMessage) error ***REMOVED***
+func (x *fileSyncDiffCopyServer) Send(m *BytesMessage) error {
 	return x.ServerStream.SendMsg(m)
-***REMOVED***
+}
 
-func (x *fileSyncDiffCopyServer) Recv() (*BytesMessage, error) ***REMOVED***
+func (x *fileSyncDiffCopyServer) Recv() (*BytesMessage, error) {
 	m := new(BytesMessage)
-	if err := x.ServerStream.RecvMsg(m); err != nil ***REMOVED***
+	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return m, nil
-***REMOVED***
+}
 
-func _FileSync_TarStream_Handler(srv interface***REMOVED******REMOVED***, stream grpc.ServerStream) error ***REMOVED***
-	return srv.(FileSyncServer).TarStream(&fileSyncTarStreamServer***REMOVED***stream***REMOVED***)
-***REMOVED***
+func _FileSync_TarStream_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(FileSyncServer).TarStream(&fileSyncTarStreamServer{stream})
+}
 
-type FileSync_TarStreamServer interface ***REMOVED***
+type FileSync_TarStreamServer interface {
 	Send(*BytesMessage) error
 	Recv() (*BytesMessage, error)
 	grpc.ServerStream
-***REMOVED***
+}
 
-type fileSyncTarStreamServer struct ***REMOVED***
+type fileSyncTarStreamServer struct {
 	grpc.ServerStream
-***REMOVED***
+}
 
-func (x *fileSyncTarStreamServer) Send(m *BytesMessage) error ***REMOVED***
+func (x *fileSyncTarStreamServer) Send(m *BytesMessage) error {
 	return x.ServerStream.SendMsg(m)
-***REMOVED***
+}
 
-func (x *fileSyncTarStreamServer) Recv() (*BytesMessage, error) ***REMOVED***
+func (x *fileSyncTarStreamServer) Recv() (*BytesMessage, error) {
 	m := new(BytesMessage)
-	if err := x.ServerStream.RecvMsg(m); err != nil ***REMOVED***
+	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return m, nil
-***REMOVED***
+}
 
-var _FileSync_serviceDesc = grpc.ServiceDesc***REMOVED***
+var _FileSync_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "moby.filesync.v1.FileSync",
 	HandlerType: (*FileSyncServer)(nil),
-	Methods:     []grpc.MethodDesc***REMOVED******REMOVED***,
-	Streams: []grpc.StreamDesc***REMOVED***
-		***REMOVED***
+	Methods:     []grpc.MethodDesc{},
+	Streams: []grpc.StreamDesc{
+		{
 			StreamName:    "DiffCopy",
 			Handler:       _FileSync_DiffCopy_Handler,
 			ServerStreams: true,
 			ClientStreams: true,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			StreamName:    "TarStream",
 			Handler:       _FileSync_TarStream_Handler,
 			ServerStreams: true,
 			ClientStreams: true,
-		***REMOVED***,
-	***REMOVED***,
+		},
+	},
 	Metadata: "filesync.proto",
-***REMOVED***
+}
 
 // Client API for FileSend service
 
-type FileSendClient interface ***REMOVED***
+type FileSendClient interface {
 	DiffCopy(ctx context.Context, opts ...grpc.CallOption) (FileSend_DiffCopyClient, error)
-***REMOVED***
+}
 
-type fileSendClient struct ***REMOVED***
+type fileSendClient struct {
 	cc *grpc.ClientConn
-***REMOVED***
+}
 
-func NewFileSendClient(cc *grpc.ClientConn) FileSendClient ***REMOVED***
-	return &fileSendClient***REMOVED***cc***REMOVED***
-***REMOVED***
+func NewFileSendClient(cc *grpc.ClientConn) FileSendClient {
+	return &fileSendClient{cc}
+}
 
-func (c *fileSendClient) DiffCopy(ctx context.Context, opts ...grpc.CallOption) (FileSend_DiffCopyClient, error) ***REMOVED***
+func (c *fileSendClient) DiffCopy(ctx context.Context, opts ...grpc.CallOption) (FileSend_DiffCopyClient, error) {
 	stream, err := grpc.NewClientStream(ctx, &_FileSend_serviceDesc.Streams[0], c.cc, "/moby.filesync.v1.FileSend/DiffCopy", opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	x := &fileSendDiffCopyClient***REMOVED***stream***REMOVED***
+	}
+	x := &fileSendDiffCopyClient{stream}
 	return x, nil
-***REMOVED***
+}
 
-type FileSend_DiffCopyClient interface ***REMOVED***
+type FileSend_DiffCopyClient interface {
 	Send(*BytesMessage) error
 	Recv() (*BytesMessage, error)
 	grpc.ClientStream
-***REMOVED***
+}
 
-type fileSendDiffCopyClient struct ***REMOVED***
+type fileSendDiffCopyClient struct {
 	grpc.ClientStream
-***REMOVED***
+}
 
-func (x *fileSendDiffCopyClient) Send(m *BytesMessage) error ***REMOVED***
+func (x *fileSendDiffCopyClient) Send(m *BytesMessage) error {
 	return x.ClientStream.SendMsg(m)
-***REMOVED***
+}
 
-func (x *fileSendDiffCopyClient) Recv() (*BytesMessage, error) ***REMOVED***
+func (x *fileSendDiffCopyClient) Recv() (*BytesMessage, error) {
 	m := new(BytesMessage)
-	if err := x.ClientStream.RecvMsg(m); err != nil ***REMOVED***
+	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return m, nil
-***REMOVED***
+}
 
 // Server API for FileSend service
 
-type FileSendServer interface ***REMOVED***
+type FileSendServer interface {
 	DiffCopy(FileSend_DiffCopyServer) error
-***REMOVED***
+}
 
-func RegisterFileSendServer(s *grpc.Server, srv FileSendServer) ***REMOVED***
+func RegisterFileSendServer(s *grpc.Server, srv FileSendServer) {
 	s.RegisterService(&_FileSend_serviceDesc, srv)
-***REMOVED***
+}
 
-func _FileSend_DiffCopy_Handler(srv interface***REMOVED******REMOVED***, stream grpc.ServerStream) error ***REMOVED***
-	return srv.(FileSendServer).DiffCopy(&fileSendDiffCopyServer***REMOVED***stream***REMOVED***)
-***REMOVED***
+func _FileSend_DiffCopy_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(FileSendServer).DiffCopy(&fileSendDiffCopyServer{stream})
+}
 
-type FileSend_DiffCopyServer interface ***REMOVED***
+type FileSend_DiffCopyServer interface {
 	Send(*BytesMessage) error
 	Recv() (*BytesMessage, error)
 	grpc.ServerStream
-***REMOVED***
+}
 
-type fileSendDiffCopyServer struct ***REMOVED***
+type fileSendDiffCopyServer struct {
 	grpc.ServerStream
-***REMOVED***
+}
 
-func (x *fileSendDiffCopyServer) Send(m *BytesMessage) error ***REMOVED***
+func (x *fileSendDiffCopyServer) Send(m *BytesMessage) error {
 	return x.ServerStream.SendMsg(m)
-***REMOVED***
+}
 
-func (x *fileSendDiffCopyServer) Recv() (*BytesMessage, error) ***REMOVED***
+func (x *fileSendDiffCopyServer) Recv() (*BytesMessage, error) {
 	m := new(BytesMessage)
-	if err := x.ServerStream.RecvMsg(m); err != nil ***REMOVED***
+	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return m, nil
-***REMOVED***
+}
 
-var _FileSend_serviceDesc = grpc.ServiceDesc***REMOVED***
+var _FileSend_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "moby.filesync.v1.FileSend",
 	HandlerType: (*FileSendServer)(nil),
-	Methods:     []grpc.MethodDesc***REMOVED******REMOVED***,
-	Streams: []grpc.StreamDesc***REMOVED***
-		***REMOVED***
+	Methods:     []grpc.MethodDesc{},
+	Streams: []grpc.StreamDesc{
+		{
 			StreamName:    "DiffCopy",
 			Handler:       _FileSend_DiffCopy_Handler,
 			ServerStreams: true,
 			ClientStreams: true,
-		***REMOVED***,
-	***REMOVED***,
+		},
+	},
 	Metadata: "filesync.proto",
-***REMOVED***
+}
 
-func (m *BytesMessage) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *BytesMessage) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *BytesMessage) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *BytesMessage) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Data) > 0 ***REMOVED***
+	if len(m.Data) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintFilesync(dAtA, i, uint64(len(m.Data)))
 		i += copy(dAtA[i:], m.Data)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func encodeFixed64Filesync(dAtA []byte, offset int, v uint64) int ***REMOVED***
+func encodeFixed64Filesync(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
 	dAtA[offset+2] = uint8(v >> 16)
@@ -407,232 +407,232 @@ func encodeFixed64Filesync(dAtA []byte, offset int, v uint64) int ***REMOVED***
 	dAtA[offset+6] = uint8(v >> 48)
 	dAtA[offset+7] = uint8(v >> 56)
 	return offset + 8
-***REMOVED***
-func encodeFixed32Filesync(dAtA []byte, offset int, v uint32) int ***REMOVED***
+}
+func encodeFixed32Filesync(dAtA []byte, offset int, v uint32) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
 	dAtA[offset+2] = uint8(v >> 16)
 	dAtA[offset+3] = uint8(v >> 24)
 	return offset + 4
-***REMOVED***
-func encodeVarintFilesync(dAtA []byte, offset int, v uint64) int ***REMOVED***
-	for v >= 1<<7 ***REMOVED***
+}
+func encodeVarintFilesync(dAtA []byte, offset int, v uint64) int {
+	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
-	***REMOVED***
+	}
 	dAtA[offset] = uint8(v)
 	return offset + 1
-***REMOVED***
-func (m *BytesMessage) Size() (n int) ***REMOVED***
+}
+func (m *BytesMessage) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.Data)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovFilesync(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func sovFilesync(x uint64) (n int) ***REMOVED***
-	for ***REMOVED***
+func sovFilesync(x uint64) (n int) {
+	for {
 		n++
 		x >>= 7
-		if x == 0 ***REMOVED***
+		if x == 0 {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
-func sozFilesync(x uint64) (n int) ***REMOVED***
+}
+func sozFilesync(x uint64) (n int) {
 	return sovFilesync(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-***REMOVED***
-func (this *BytesMessage) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *BytesMessage) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&BytesMessage***REMOVED***`,
+	}
+	s := strings.Join([]string{`&BytesMessage{`,
 		`Data:` + fmt.Sprintf("%v", this.Data) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func valueToStringFilesync(v interface***REMOVED******REMOVED***) string ***REMOVED***
+}
+func valueToStringFilesync(v interface{}) string {
 	rv := reflect.ValueOf(v)
-	if rv.IsNil() ***REMOVED***
+	if rv.IsNil() {
 		return "nil"
-	***REMOVED***
+	}
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
-***REMOVED***
-func (m *BytesMessage) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *BytesMessage) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowFilesync
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: BytesMessage: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: BytesMessage: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Data", wireType)
-			***REMOVED***
+			}
 			var byteLen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowFilesync
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				byteLen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if byteLen < 0 ***REMOVED***
+				}
+			}
+			if byteLen < 0 {
 				return ErrInvalidLengthFilesync
-			***REMOVED***
+			}
 			postIndex := iNdEx + byteLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Data = append(m.Data[:0], dAtA[iNdEx:postIndex]...)
-			if m.Data == nil ***REMOVED***
-				m.Data = []byte***REMOVED******REMOVED***
-			***REMOVED***
+			if m.Data == nil {
+				m.Data = []byte{}
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipFilesync(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthFilesync
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func skipFilesync(dAtA []byte) (n int, err error) ***REMOVED***
+}
+func skipFilesync(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return 0, ErrIntOverflowFilesync
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return 0, io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		wireType := int(wire & 0x7)
-		switch wireType ***REMOVED***
+		switch wireType {
 		case 0:
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowFilesync
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				iNdEx++
-				if dAtA[iNdEx-1] < 0x80 ***REMOVED***
+				if dAtA[iNdEx-1] < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return iNdEx, nil
 		case 1:
 			iNdEx += 8
 			return iNdEx, nil
 		case 2:
 			var length int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowFilesync
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				length |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			iNdEx += length
-			if length < 0 ***REMOVED***
+			if length < 0 {
 				return 0, ErrInvalidLengthFilesync
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 3:
-			for ***REMOVED***
+			for {
 				var innerWire uint64
 				var start int = iNdEx
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return 0, ErrIntOverflowFilesync
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return 0, io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					innerWire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				innerWireType := int(innerWire & 0x7)
-				if innerWireType == 4 ***REMOVED***
+				if innerWireType == 4 {
 					break
-				***REMOVED***
+				}
 				next, err := skipFilesync(dAtA[start:])
-				if err != nil ***REMOVED***
+				if err != nil {
 					return 0, err
-				***REMOVED***
+				}
 				iNdEx = start + next
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 4:
 			return iNdEx, nil
@@ -641,19 +641,19 @@ func skipFilesync(dAtA []byte) (n int, err error) ***REMOVED***
 			return iNdEx, nil
 		default:
 			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	panic("unreachable")
-***REMOVED***
+}
 
 var (
 	ErrInvalidLengthFilesync = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowFilesync   = fmt.Errorf("proto: integer overflow")
 )
 
-func init() ***REMOVED*** proto.RegisterFile("filesync.proto", fileDescriptorFilesync) ***REMOVED***
+func init() { proto.RegisterFile("filesync.proto", fileDescriptorFilesync) }
 
-var fileDescriptorFilesync = []byte***REMOVED***
+var fileDescriptorFilesync = []byte{
 	// 208 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xe2, 0xe2, 0x4b, 0xcb, 0xcc, 0x49,
 	0x2d, 0xae, 0xcc, 0x4b, 0xd6, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x12, 0xc8, 0xcd, 0x4f, 0xaa,
@@ -668,4 +668,4 @@ var fileDescriptorFilesync = []byte***REMOVED***
 	0xe2, 0x91, 0x1c, 0xe3, 0x85, 0x47, 0x72, 0x8c, 0x0f, 0x1e, 0xc9, 0x31, 0xbe, 0x78, 0x24, 0xc7,
 	0xf0, 0xe1, 0x91, 0x1c, 0xe3, 0x84, 0xc7, 0x72, 0x0c, 0x51, 0x1c, 0x30, 0xb3, 0x92, 0xd8, 0xc0,
 	0xc1, 0x6f, 0x0c, 0x08, 0x00, 0x00, 0xff, 0xff, 0x72, 0x81, 0x1a, 0x91, 0x90, 0x01, 0x00, 0x00,
-***REMOVED***
+}

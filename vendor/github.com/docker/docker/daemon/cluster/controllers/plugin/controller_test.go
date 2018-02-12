@@ -25,366 +25,366 @@ const (
 	pluginTestRemoteUpgrade = "testremote2"
 )
 
-func TestPrepare(t *testing.T) ***REMOVED***
+func TestPrepare(t *testing.T) {
 	b := newMockBackend()
 	c := newTestController(b, false)
 	ctx := context.Background()
 
-	if err := c.Prepare(ctx); err != nil ***REMOVED***
+	if err := c.Prepare(ctx); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if b.p == nil ***REMOVED***
+	if b.p == nil {
 		t.Fatal("pull not performed")
-	***REMOVED***
+	}
 
 	c = newTestController(b, false)
-	if err := c.Prepare(ctx); err != nil ***REMOVED***
+	if err := c.Prepare(ctx); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if b.p == nil ***REMOVED***
+	}
+	if b.p == nil {
 		t.Fatal("unexpected nil")
-	***REMOVED***
-	if b.p.PluginObj.PluginReference != pluginTestRemoteUpgrade ***REMOVED***
+	}
+	if b.p.PluginObj.PluginReference != pluginTestRemoteUpgrade {
 		t.Fatal("upgrade not performed")
-	***REMOVED***
+	}
 
 	c = newTestController(b, false)
 	c.serviceID = "1"
-	if err := c.Prepare(ctx); err == nil ***REMOVED***
+	if err := c.Prepare(ctx); err == nil {
 		t.Fatal("expected error on prepare")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestStart(t *testing.T) ***REMOVED***
+func TestStart(t *testing.T) {
 	b := newMockBackend()
 	c := newTestController(b, false)
 	ctx := context.Background()
 
-	if err := c.Prepare(ctx); err != nil ***REMOVED***
+	if err := c.Prepare(ctx); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if err := c.Start(ctx); err != nil ***REMOVED***
+	if err := c.Start(ctx); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if !b.p.IsEnabled() ***REMOVED***
+	if !b.p.IsEnabled() {
 		t.Fatal("expected plugin to be enabled")
-	***REMOVED***
+	}
 
 	c = newTestController(b, true)
-	if err := c.Prepare(ctx); err != nil ***REMOVED***
+	if err := c.Prepare(ctx); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if err := c.Start(ctx); err != nil ***REMOVED***
+	}
+	if err := c.Start(ctx); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if b.p.IsEnabled() ***REMOVED***
+	}
+	if b.p.IsEnabled() {
 		t.Fatal("expected plugin to be disabled")
-	***REMOVED***
+	}
 
 	c = newTestController(b, false)
-	if err := c.Prepare(ctx); err != nil ***REMOVED***
+	if err := c.Prepare(ctx); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if err := c.Start(ctx); err != nil ***REMOVED***
+	}
+	if err := c.Start(ctx); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if !b.p.IsEnabled() ***REMOVED***
+	}
+	if !b.p.IsEnabled() {
 		t.Fatal("expected plugin to be enabled")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestWaitCancel(t *testing.T) ***REMOVED***
+func TestWaitCancel(t *testing.T) {
 	b := newMockBackend()
 	c := newTestController(b, true)
 	ctx := context.Background()
-	if err := c.Prepare(ctx); err != nil ***REMOVED***
+	if err := c.Prepare(ctx); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if err := c.Start(ctx); err != nil ***REMOVED***
+	}
+	if err := c.Start(ctx); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	ctxCancel, cancel := context.WithCancel(ctx)
 	chErr := make(chan error)
-	go func() ***REMOVED***
+	go func() {
 		chErr <- c.Wait(ctxCancel)
-	***REMOVED***()
+	}()
 	cancel()
-	select ***REMOVED***
+	select {
 	case err := <-chErr:
-		if err != context.Canceled ***REMOVED***
+		if err != context.Canceled {
 			t.Fatal(err)
-		***REMOVED***
+		}
 	case <-time.After(10 * time.Second):
 		t.Fatal("timeout waiting for cancelation")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestWaitDisabled(t *testing.T) ***REMOVED***
+func TestWaitDisabled(t *testing.T) {
 	b := newMockBackend()
 	c := newTestController(b, true)
 	ctx := context.Background()
-	if err := c.Prepare(ctx); err != nil ***REMOVED***
+	if err := c.Prepare(ctx); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if err := c.Start(ctx); err != nil ***REMOVED***
+	}
+	if err := c.Start(ctx); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	chErr := make(chan error)
-	go func() ***REMOVED***
+	go func() {
 		chErr <- c.Wait(ctx)
-	***REMOVED***()
+	}()
 
-	if err := b.Enable("test", nil); err != nil ***REMOVED***
+	if err := b.Enable("test", nil); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	select ***REMOVED***
+	}
+	select {
 	case err := <-chErr:
-		if err == nil ***REMOVED***
+		if err == nil {
 			t.Fatal("expected error")
-		***REMOVED***
+		}
 	case <-time.After(10 * time.Second):
 		t.Fatal("timeout waiting for event")
-	***REMOVED***
+	}
 
-	if err := c.Start(ctx); err != nil ***REMOVED***
+	if err := c.Start(ctx); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	ctxWaitReady, cancelCtxWaitReady := context.WithTimeout(ctx, 30*time.Second)
 	c.signalWaitReady = cancelCtxWaitReady
 	defer cancelCtxWaitReady()
 
-	go func() ***REMOVED***
+	go func() {
 		chErr <- c.Wait(ctx)
-	***REMOVED***()
+	}()
 
 	chEvent, cancel := b.SubscribeEvents(1)
 	defer cancel()
 
-	if err := b.Disable("test", nil); err != nil ***REMOVED***
+	if err := b.Disable("test", nil); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	select ***REMOVED***
+	select {
 	case <-chEvent:
 		<-ctxWaitReady.Done()
-		if err := ctxWaitReady.Err(); err == context.DeadlineExceeded ***REMOVED***
+		if err := ctxWaitReady.Err(); err == context.DeadlineExceeded {
 			t.Fatal(err)
-		***REMOVED***
-		select ***REMOVED***
+		}
+		select {
 		case <-chErr:
 			t.Fatal("wait returned unexpectedly")
 		default:
 			// all good
-		***REMOVED***
+		}
 	case <-chErr:
 		t.Fatal("wait returned unexpectedly")
 	case <-time.After(10 * time.Second):
 		t.Fatal("timeout waiting for event")
-	***REMOVED***
+	}
 
-	if err := b.Remove("test", nil); err != nil ***REMOVED***
+	if err := b.Remove("test", nil); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	select ***REMOVED***
+	}
+	select {
 	case err := <-chErr:
-		if err == nil ***REMOVED***
+		if err == nil {
 			t.Fatal("expected error")
-		***REMOVED***
-		if !strings.Contains(err.Error(), "removed") ***REMOVED***
+		}
+		if !strings.Contains(err.Error(), "removed") {
 			t.Fatal(err)
-		***REMOVED***
+		}
 	case <-time.After(10 * time.Second):
 		t.Fatal("timeout waiting for event")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestWaitEnabled(t *testing.T) ***REMOVED***
+func TestWaitEnabled(t *testing.T) {
 	b := newMockBackend()
 	c := newTestController(b, false)
 	ctx := context.Background()
-	if err := c.Prepare(ctx); err != nil ***REMOVED***
+	if err := c.Prepare(ctx); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if err := c.Start(ctx); err != nil ***REMOVED***
+	}
+	if err := c.Start(ctx); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	chErr := make(chan error)
-	go func() ***REMOVED***
+	go func() {
 		chErr <- c.Wait(ctx)
-	***REMOVED***()
+	}()
 
-	if err := b.Disable("test", nil); err != nil ***REMOVED***
+	if err := b.Disable("test", nil); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	select ***REMOVED***
+	}
+	select {
 	case err := <-chErr:
-		if err == nil ***REMOVED***
+		if err == nil {
 			t.Fatal("expected error")
-		***REMOVED***
+		}
 	case <-time.After(10 * time.Second):
 		t.Fatal("timeout waiting for event")
-	***REMOVED***
+	}
 
-	if err := c.Start(ctx); err != nil ***REMOVED***
+	if err := c.Start(ctx); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	ctxWaitReady, ctxWaitCancel := context.WithCancel(ctx)
 	c.signalWaitReady = ctxWaitCancel
 	defer ctxWaitCancel()
 
-	go func() ***REMOVED***
+	go func() {
 		chErr <- c.Wait(ctx)
-	***REMOVED***()
+	}()
 
 	chEvent, cancel := b.SubscribeEvents(1)
 	defer cancel()
 
-	if err := b.Enable("test", nil); err != nil ***REMOVED***
+	if err := b.Enable("test", nil); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	select ***REMOVED***
+	select {
 	case <-chEvent:
 		<-ctxWaitReady.Done()
-		if err := ctxWaitReady.Err(); err == context.DeadlineExceeded ***REMOVED***
+		if err := ctxWaitReady.Err(); err == context.DeadlineExceeded {
 			t.Fatal(err)
-		***REMOVED***
-		select ***REMOVED***
+		}
+		select {
 		case <-chErr:
 			t.Fatal("wait returned unexpectedly")
 		default:
 			// all good
-		***REMOVED***
+		}
 	case <-chErr:
 		t.Fatal("wait returned unexpectedly")
 	case <-time.After(10 * time.Second):
 		t.Fatal("timeout waiting for event")
-	***REMOVED***
+	}
 
-	if err := b.Remove("test", nil); err != nil ***REMOVED***
+	if err := b.Remove("test", nil); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	select ***REMOVED***
+	}
+	select {
 	case err := <-chErr:
-		if err == nil ***REMOVED***
+		if err == nil {
 			t.Fatal("expected error")
-		***REMOVED***
-		if !strings.Contains(err.Error(), "removed") ***REMOVED***
+		}
+		if !strings.Contains(err.Error(), "removed") {
 			t.Fatal(err)
-		***REMOVED***
+		}
 	case <-time.After(10 * time.Second):
 		t.Fatal("timeout waiting for event")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestRemove(t *testing.T) ***REMOVED***
+func TestRemove(t *testing.T) {
 	b := newMockBackend()
 	c := newTestController(b, false)
 	ctx := context.Background()
 
-	if err := c.Prepare(ctx); err != nil ***REMOVED***
+	if err := c.Prepare(ctx); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if err := c.Shutdown(ctx); err != nil ***REMOVED***
+	}
+	if err := c.Shutdown(ctx); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	c2 := newTestController(b, false)
-	if err := c2.Prepare(ctx); err != nil ***REMOVED***
+	if err := c2.Prepare(ctx); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if err := c.Remove(ctx); err != nil ***REMOVED***
+	if err := c.Remove(ctx); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if b.p == nil ***REMOVED***
+	}
+	if b.p == nil {
 		t.Fatal("plugin removed unexpectedly")
-	***REMOVED***
-	if err := c2.Shutdown(ctx); err != nil ***REMOVED***
+	}
+	if err := c2.Shutdown(ctx); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if err := c2.Remove(ctx); err != nil ***REMOVED***
+	}
+	if err := c2.Remove(ctx); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if b.p != nil ***REMOVED***
+	}
+	if b.p != nil {
 		t.Fatal("expected plugin to be removed")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func newTestController(b Backend, disabled bool) *Controller ***REMOVED***
-	return &Controller***REMOVED***
-		logger:  &logrus.Entry***REMOVED***Logger: &logrus.Logger***REMOVED***Out: ioutil.Discard***REMOVED******REMOVED***,
+func newTestController(b Backend, disabled bool) *Controller {
+	return &Controller{
+		logger:  &logrus.Entry{Logger: &logrus.Logger{Out: ioutil.Discard}},
 		backend: b,
-		spec: runtime.PluginSpec***REMOVED***
+		spec: runtime.PluginSpec{
 			Name:     pluginTestName,
 			Remote:   pluginTestRemote,
 			Disabled: disabled,
-		***REMOVED***,
-	***REMOVED***
-***REMOVED***
+		},
+	}
+}
 
-func newMockBackend() *mockBackend ***REMOVED***
-	return &mockBackend***REMOVED***
+func newMockBackend() *mockBackend {
+	return &mockBackend{
 		pub: pubsub.NewPublisher(0, 0),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type mockBackend struct ***REMOVED***
+type mockBackend struct {
 	p   *v2.Plugin
 	pub *pubsub.Publisher
-***REMOVED***
+}
 
-func (m *mockBackend) Disable(name string, config *enginetypes.PluginDisableConfig) error ***REMOVED***
+func (m *mockBackend) Disable(name string, config *enginetypes.PluginDisableConfig) error {
 	m.p.PluginObj.Enabled = false
-	m.pub.Publish(plugin.EventDisable***REMOVED******REMOVED***)
+	m.pub.Publish(plugin.EventDisable{})
 	return nil
-***REMOVED***
+}
 
-func (m *mockBackend) Enable(name string, config *enginetypes.PluginEnableConfig) error ***REMOVED***
+func (m *mockBackend) Enable(name string, config *enginetypes.PluginEnableConfig) error {
 	m.p.PluginObj.Enabled = true
-	m.pub.Publish(plugin.EventEnable***REMOVED******REMOVED***)
+	m.pub.Publish(plugin.EventEnable{})
 	return nil
-***REMOVED***
+}
 
-func (m *mockBackend) Remove(name string, config *enginetypes.PluginRmConfig) error ***REMOVED***
+func (m *mockBackend) Remove(name string, config *enginetypes.PluginRmConfig) error {
 	m.p = nil
-	m.pub.Publish(plugin.EventRemove***REMOVED******REMOVED***)
+	m.pub.Publish(plugin.EventRemove{})
 	return nil
-***REMOVED***
+}
 
-func (m *mockBackend) Pull(ctx context.Context, ref reference.Named, name string, metaHeaders http.Header, authConfig *enginetypes.AuthConfig, privileges enginetypes.PluginPrivileges, outStream io.Writer, opts ...plugin.CreateOpt) error ***REMOVED***
-	m.p = &v2.Plugin***REMOVED***
-		PluginObj: enginetypes.Plugin***REMOVED***
+func (m *mockBackend) Pull(ctx context.Context, ref reference.Named, name string, metaHeaders http.Header, authConfig *enginetypes.AuthConfig, privileges enginetypes.PluginPrivileges, outStream io.Writer, opts ...plugin.CreateOpt) error {
+	m.p = &v2.Plugin{
+		PluginObj: enginetypes.Plugin{
 			ID:              "1234",
 			Name:            name,
 			PluginReference: ref.String(),
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *mockBackend) Upgrade(ctx context.Context, ref reference.Named, name string, metaHeaders http.Header, authConfig *enginetypes.AuthConfig, privileges enginetypes.PluginPrivileges, outStream io.Writer) error ***REMOVED***
+func (m *mockBackend) Upgrade(ctx context.Context, ref reference.Named, name string, metaHeaders http.Header, authConfig *enginetypes.AuthConfig, privileges enginetypes.PluginPrivileges, outStream io.Writer) error {
 	m.p.PluginObj.PluginReference = pluginTestRemoteUpgrade
 	return nil
-***REMOVED***
+}
 
-func (m *mockBackend) Get(name string) (*v2.Plugin, error) ***REMOVED***
-	if m.p == nil ***REMOVED***
+func (m *mockBackend) Get(name string) (*v2.Plugin, error) {
+	if m.p == nil {
 		return nil, errors.New("not found")
-	***REMOVED***
+	}
 	return m.p, nil
-***REMOVED***
+}
 
-func (m *mockBackend) SubscribeEvents(buffer int, events ...plugin.Event) (eventCh <-chan interface***REMOVED******REMOVED***, cancel func()) ***REMOVED***
+func (m *mockBackend) SubscribeEvents(buffer int, events ...plugin.Event) (eventCh <-chan interface{}, cancel func()) {
 	ch := m.pub.SubscribeTopicWithBuffer(nil, buffer)
-	cancel = func() ***REMOVED*** m.pub.Evict(ch) ***REMOVED***
+	cancel = func() { m.pub.Evict(ch) }
 	return ch, cancel
-***REMOVED***
+}

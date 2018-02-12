@@ -5,7 +5,7 @@ package japanese // import "golang.org/x/text/encoding/japanese"
 
 // jis0208Decode is the decoding table from JIS 0208 code to Unicode.
 // It is defined at http://encoding.spec.whatwg.org/index-jis0208.txt
-var jis0208Decode = [...]uint16***REMOVED***
+var jis0208Decode = [...]uint16{
 	0:     0x3000,
 	1:     0x3001,
 	2:     0x3002,
@@ -7730,11 +7730,11 @@ var jis0208Decode = [...]uint16***REMOVED***
 	11101: 0xFA2D,
 	11102: 0x9E19,
 	11103: 0x9ED1,
-***REMOVED***
+}
 
 // jis0212Decode is the decoding table from JIS 0212 code to Unicode.
 // It is defined at http://encoding.spec.whatwg.org/index-jis0212.txt
-var jis0212Decode = [...]uint16***REMOVED***
+var jis0212Decode = [...]uint16{
 	108:  0x02D8,
 	109:  0x02C7,
 	110:  0x00B8,
@@ -13802,7 +13802,7 @@ var jis0212Decode = [...]uint16***REMOVED***
 	7208: 0x9FA2,
 	7209: 0x9FA3,
 	7210: 0x9FA5,
-***REMOVED***
+}
 
 const (
 	jis0208    = 1
@@ -13830,7 +13830,7 @@ const numEncodeTables = 6
 
 const encode0Low, encode0High = 19968, 40870
 
-var encode0 = [...]uint16***REMOVED***
+var encode0 = [...]uint16{
 	19968 - 19968: jis0208<<14 | 0x0F<<7 | 0x4B,
 	19969 - 19968: jis0208<<14 | 0x22<<7 | 0x59,
 	19970 - 19968: jis0212<<14 | 0x0F<<7 | 0x00,
@@ -26035,11 +26035,11 @@ var encode0 = [...]uint16***REMOVED***
 	40866 - 19968: jis0212<<14 | 0x4C<<7 | 0x40,
 	40867 - 19968: jis0212<<14 | 0x4C<<7 | 0x41,
 	40869 - 19968: jis0212<<14 | 0x4C<<7 | 0x42,
-***REMOVED***
+}
 
 const encode1Low, encode1High = 8208, 9840
 
-var encode1 = [...]uint16***REMOVED***
+var encode1 = [...]uint16{
 	8208 - 8208: jis0208<<14 | 0x00<<7 | 0x1D,
 	8213 - 8208: jis0208<<14 | 0x00<<7 | 0x1C,
 	8216 - 8208: jis0208<<14 | 0x00<<7 | 0x25,
@@ -26193,11 +26193,11 @@ var encode1 = [...]uint16***REMOVED***
 	9834 - 8208: jis0208<<14 | 0x01<<7 | 0x55,
 	9837 - 8208: jis0208<<14 | 0x01<<7 | 0x54,
 	9839 - 8208: jis0208<<14 | 0x01<<7 | 0x53,
-***REMOVED***
+}
 
 const encode2Low, encode2High = 12288, 13262
 
-var encode2 = [...]uint16***REMOVED***
+var encode2 = [...]uint16{
 	12288 - 12288: jis0208<<14 | 0x00<<7 | 0x00,
 	12289 - 12288: jis0208<<14 | 0x00<<7 | 0x01,
 	12290 - 12288: jis0208<<14 | 0x00<<7 | 0x02,
@@ -26434,11 +26434,11 @@ var encode2 = [...]uint16***REMOVED***
 	13217 - 12288: jis0208<<14 | 0x0C<<7 | 0x35,
 	13252 - 12288: jis0208<<14 | 0x0C<<7 | 0x34,
 	13261 - 12288: jis0208<<14 | 0x0C<<7 | 0x42,
-***REMOVED***
+}
 
 const encode3Low, encode3High = 161, 1120
 
-var encode3 = [...]uint16***REMOVED***
+var encode3 = [...]uint16{
 	161 - 161:  jis0212<<14 | 0x01<<7 | 0x21,
 	164 - 161:  jis0212<<14 | 0x01<<7 | 0x4F,
 	166 - 161:  jis0212<<14 | 0x01<<7 | 0x22,
@@ -26824,11 +26824,11 @@ var encode3 = [...]uint16***REMOVED***
 	1116 - 161: jis0212<<14 | 0x06<<7 | 0x5B,
 	1118 - 161: jis0212<<14 | 0x06<<7 | 0x5C,
 	1119 - 161: jis0212<<14 | 0x06<<7 | 0x5D,
-***REMOVED***
+}
 
 const encode4Low, encode4High = 63785, 64046
 
-var encode4 = [...]uint16***REMOVED***
+var encode4 = [...]uint16{
 	63785 - 63785: jis0208<<14 | 0x59<<7 | 0x25,
 	63964 - 63785: jis0208<<14 | 0x5B<<7 | 0x2E,
 	64014 - 63785: jis0208<<14 | 0x58<<7 | 0x33,
@@ -26863,11 +26863,11 @@ var encode4 = [...]uint16***REMOVED***
 	64043 - 63785: jis0208<<14 | 0x5B<<7 | 0x3C,
 	64044 - 63785: jis0208<<14 | 0x5B<<7 | 0x3E,
 	64045 - 63785: jis0208<<14 | 0x5B<<7 | 0x4B,
-***REMOVED***
+}
 
 const encode5Low, encode5High = 65281, 65510
 
-var encode5 = [...]uint16***REMOVED***
+var encode5 = [...]uint16{
 	65281 - 65281: jis0208<<14 | 0x00<<7 | 0x09,
 	65282 - 65281: jis0208<<14 | 0x5B<<7 | 0x5D,
 	65283 - 65281: jis0208<<14 | 0x00<<7 | 0x53,
@@ -26968,4 +26968,4 @@ var encode5 = [...]uint16***REMOVED***
 	65507 - 65281: jis0208<<14 | 0x00<<7 | 0x10,
 	65508 - 65281: jis0208<<14 | 0x5B<<7 | 0x5B,
 	65509 - 65281: jis0208<<14 | 0x00<<7 | 0x4E,
-***REMOVED***
+}

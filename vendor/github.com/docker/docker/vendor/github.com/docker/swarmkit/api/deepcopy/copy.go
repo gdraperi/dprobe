@@ -8,12 +8,12 @@ import (
 )
 
 // CopierFrom can be implemented if an object knows how to copy another into itself.
-type CopierFrom interface ***REMOVED***
+type CopierFrom interface {
 	// Copy takes the fields from src and copies them into the target object.
 	//
 	// Calling this method with a nil receiver or a nil src may panic.
-	CopyFrom(src interface***REMOVED******REMOVED***)
-***REMOVED***
+	CopyFrom(src interface{})
+}
 
 // Copy copies src into dst. dst and src must have the same type.
 //
@@ -24,17 +24,17 @@ type CopierFrom interface ***REMOVED***
 //
 // If the copy cannot be performed, this function will panic. Make sure to test
 // types that use this function.
-func Copy(dst, src interface***REMOVED******REMOVED***) ***REMOVED***
-	switch dst := dst.(type) ***REMOVED***
+func Copy(dst, src interface{}) {
+	switch dst := dst.(type) {
 	case *types.Any:
 		src := src.(*types.Any)
 		dst.TypeUrl = src.TypeUrl
-		if src.Value != nil ***REMOVED***
+		if src.Value != nil {
 			dst.Value = make([]byte, len(src.Value))
 			copy(dst.Value, src.Value)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dst.Value = nil
-		***REMOVED***
+		}
 	case *types.Duration:
 		src := src.(*types.Duration)
 		*dst = *src
@@ -48,6 +48,6 @@ func Copy(dst, src interface***REMOVED******REMOVED***) ***REMOVED***
 		dst.CopyFrom(src)
 	default:
 		panic(fmt.Sprintf("Copy for %T not implemented", dst))
-	***REMOVED***
+	}
 
-***REMOVED***
+}

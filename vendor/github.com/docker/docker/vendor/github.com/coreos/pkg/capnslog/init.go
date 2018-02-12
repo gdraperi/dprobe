@@ -29,21 +29,21 @@ import (
 // otherwise it's a bug. Doing so is creating your own init_log.go file much
 // like this one.
 
-func init() ***REMOVED***
+func init() {
 	initHijack()
 
 	// Go `log` pacakge uses os.Stderr.
 	SetFormatter(NewDefaultFormatter(os.Stderr))
 	SetGlobalLogLevel(INFO)
-***REMOVED***
+}
 
-func NewDefaultFormatter(out io.Writer) Formatter ***REMOVED***
-	if syscall.Getppid() == 1 ***REMOVED***
+func NewDefaultFormatter(out io.Writer) Formatter {
+	if syscall.Getppid() == 1 {
 		// We're running under init, which may be systemd.
 		f, err := NewJournaldFormatter()
-		if err == nil ***REMOVED***
+		if err == nil {
 			return f
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return NewPrettyFormatter(out, false)
-***REMOVED***
+}

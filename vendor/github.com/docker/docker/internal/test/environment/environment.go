@@ -15,85 +15,85 @@ import (
 
 // Execution contains information about the current test execution and daemon
 // under test
-type Execution struct ***REMOVED***
+type Execution struct {
 	client            client.APIClient
 	DaemonInfo        types.Info
 	OSType            string
 	PlatformDefaults  PlatformDefaults
 	protectedElements protectedElements
-***REMOVED***
+}
 
 // PlatformDefaults are defaults values for the platform of the daemon under test
-type PlatformDefaults struct ***REMOVED***
+type PlatformDefaults struct {
 	BaseImage            string
 	VolumesConfigPath    string
 	ContainerStoragePath string
-***REMOVED***
+}
 
 // New creates a new Execution struct
-func New() (*Execution, error) ***REMOVED***
+func New() (*Execution, error) {
 	client, err := client.NewEnvClient()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, errors.Wrapf(err, "failed to create client")
-	***REMOVED***
+	}
 
 	info, err := client.Info(context.Background())
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, errors.Wrapf(err, "failed to get info from daemon")
-	***REMOVED***
+	}
 
 	osType := getOSType(info)
 
-	return &Execution***REMOVED***
+	return &Execution{
 		client:            client,
 		DaemonInfo:        info,
 		OSType:            osType,
 		PlatformDefaults:  getPlatformDefaults(info, osType),
 		protectedElements: newProtectedElements(),
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-func getOSType(info types.Info) string ***REMOVED***
+func getOSType(info types.Info) string {
 	// Docker EE does not set the OSType so allow the user to override this value.
 	userOsType := os.Getenv("TEST_OSTYPE")
-	if userOsType != "" ***REMOVED***
+	if userOsType != "" {
 		return userOsType
-	***REMOVED***
+	}
 	return info.OSType
-***REMOVED***
+}
 
-func getPlatformDefaults(info types.Info, osType string) PlatformDefaults ***REMOVED***
+func getPlatformDefaults(info types.Info, osType string) PlatformDefaults {
 	volumesPath := filepath.Join(info.DockerRootDir, "volumes")
 	containersPath := filepath.Join(info.DockerRootDir, "containers")
 
-	switch osType ***REMOVED***
+	switch osType {
 	case "linux":
-		return PlatformDefaults***REMOVED***
+		return PlatformDefaults{
 			BaseImage:            "scratch",
 			VolumesConfigPath:    toSlash(volumesPath),
 			ContainerStoragePath: toSlash(containersPath),
-		***REMOVED***
+		}
 	case "windows":
 		baseImage := "microsoft/windowsservercore"
-		if override := os.Getenv("WINDOWS_BASE_IMAGE"); override != "" ***REMOVED***
+		if override := os.Getenv("WINDOWS_BASE_IMAGE"); override != "" {
 			baseImage = override
 			fmt.Println("INFO: Windows Base image is ", baseImage)
-		***REMOVED***
-		return PlatformDefaults***REMOVED***
+		}
+		return PlatformDefaults{
 			BaseImage:            baseImage,
 			VolumesConfigPath:    filepath.FromSlash(volumesPath),
 			ContainerStoragePath: filepath.FromSlash(containersPath),
-		***REMOVED***
+		}
 	default:
 		panic(fmt.Sprintf("unknown OSType for daemon: %s", osType))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Make sure in context of daemon, not the local platform. Note we can't
 // use filepath.FromSlash or ToSlash here as they are a no-op on Unix.
-func toSlash(path string) string ***REMOVED***
+func toSlash(path string) string {
 	return strings.Replace(path, `\`, `/`, -1)
-***REMOVED***
+}
 
 // IsLocalDaemon is true if the daemon under test is on the same
 // host as the CLI.
@@ -111,33 +111,33 @@ func toSlash(path string) string ***REMOVED***
 //
 // Similarly, it will be perfectly valid to also run CLI tests from
 // a Linux CLI (built with the daemon tag) against a Windows daemon.
-func (e *Execution) IsLocalDaemon() bool ***REMOVED***
+func (e *Execution) IsLocalDaemon() bool {
 	return os.Getenv("DOCKER_REMOTE_DAEMON") == ""
-***REMOVED***
+}
 
 // Print the execution details to stdout
 // TODO: print everything
-func (e *Execution) Print() ***REMOVED***
-	if e.IsLocalDaemon() ***REMOVED***
+func (e *Execution) Print() {
+	if e.IsLocalDaemon() {
 		fmt.Println("INFO: Testing against a local daemon")
-	***REMOVED*** else ***REMOVED***
+	} else {
 		fmt.Println("INFO: Testing against a remote daemon")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // APIClient returns an APIClient connected to the daemon under test
-func (e *Execution) APIClient() client.APIClient ***REMOVED***
+func (e *Execution) APIClient() client.APIClient {
 	return e.client
-***REMOVED***
+}
 
 // EnsureFrozenImagesLinux loads frozen test images into the daemon
 // if they aren't already loaded
-func EnsureFrozenImagesLinux(testEnv *Execution) error ***REMOVED***
-	if testEnv.OSType == "linux" ***REMOVED***
+func EnsureFrozenImagesLinux(testEnv *Execution) error {
+	if testEnv.OSType == "linux" {
 		err := load.FrozenImagesLinux(testEnv.APIClient(), frozenImages...)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return errors.Wrap(err, "error loading frozen images")
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}

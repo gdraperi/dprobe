@@ -3,17 +3,17 @@ package swarm
 import "time"
 
 // Service represents a service.
-type Service struct ***REMOVED***
+type Service struct {
 	ID string
 	Meta
 	Spec         ServiceSpec   `json:",omitempty"`
 	PreviousSpec *ServiceSpec  `json:",omitempty"`
 	Endpoint     Endpoint      `json:",omitempty"`
 	UpdateStatus *UpdateStatus `json:",omitempty"`
-***REMOVED***
+}
 
 // ServiceSpec represents the spec of a service.
-type ServiceSpec struct ***REMOVED***
+type ServiceSpec struct {
 	Annotations
 
 	// TaskTemplate defines how the service should construct new tasks when
@@ -28,13 +28,13 @@ type ServiceSpec struct ***REMOVED***
 	// This field will be removed in a future release.
 	Networks     []NetworkAttachmentConfig `json:",omitempty"`
 	EndpointSpec *EndpointSpec             `json:",omitempty"`
-***REMOVED***
+}
 
 // ServiceMode represents the mode of a service.
-type ServiceMode struct ***REMOVED***
+type ServiceMode struct {
 	Replicated *ReplicatedService `json:",omitempty"`
 	Global     *GlobalService     `json:",omitempty"`
-***REMOVED***
+}
 
 // UpdateState is the state of a service update.
 type UpdateState string
@@ -55,20 +55,20 @@ const (
 )
 
 // UpdateStatus reports the status of a service update.
-type UpdateStatus struct ***REMOVED***
+type UpdateStatus struct {
 	State       UpdateState `json:",omitempty"`
 	StartedAt   *time.Time  `json:",omitempty"`
 	CompletedAt *time.Time  `json:",omitempty"`
 	Message     string      `json:",omitempty"`
-***REMOVED***
+}
 
 // ReplicatedService is a kind of ServiceMode.
-type ReplicatedService struct ***REMOVED***
+type ReplicatedService struct {
 	Replicas *uint64 `json:",omitempty"`
-***REMOVED***
+}
 
 // GlobalService is a kind of ServiceMode.
-type GlobalService struct***REMOVED******REMOVED***
+type GlobalService struct{}
 
 const (
 	// UpdateFailureActionPause PAUSE
@@ -85,7 +85,7 @@ const (
 )
 
 // UpdateConfig represents the update configuration.
-type UpdateConfig struct ***REMOVED***
+type UpdateConfig struct {
 	// Maximum number of tasks to be updated in one iteration.
 	// 0 means unlimited parallelism.
 	Parallelism uint64
@@ -121,4 +121,4 @@ type UpdateConfig struct ***REMOVED***
 	// task. Either the old task is shut down before the new task is
 	// started, or the new task is started before the old task is shut down.
 	Order string
-***REMOVED***
+}

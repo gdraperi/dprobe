@@ -16,7 +16,7 @@ import (
 )
 
 // mibMap maps a MIB identifier to an htmlEncoding index.
-var mibMap = map[identifier.MIB]htmlEncoding***REMOVED***
+var mibMap = map[identifier.MIB]htmlEncoding{
 	identifier.UTF8:              utf8,
 	identifier.UTF16BE:           utf16be,
 	identifier.UTF16LE:           utf16le,
@@ -57,11 +57,11 @@ var mibMap = map[identifier.MIB]htmlEncoding***REMOVED***
 	identifier.ShiftJIS:          shiftJIS,
 	identifier.EUCKR:             euckr,
 	identifier.Replacement:       replacement,
-***REMOVED***
+}
 
 // encodings maps the internal htmlEncoding to an Encoding.
 // TODO: consider using a reusable index in encoding/internal.
-var encodings = [numEncodings]encoding.Encoding***REMOVED***
+var encodings = [numEncodings]encoding.Encoding{
 	utf8:              unicode.UTF8,
 	ibm866:            charmap.CodePage866,
 	iso8859_2:         charmap.ISO8859_2,
@@ -102,4 +102,4 @@ var encodings = [numEncodings]encoding.Encoding***REMOVED***
 	utf16be:           unicode.UTF16(unicode.BigEndian, unicode.IgnoreBOM),
 	utf16le:           unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM),
 	xUserDefined:      charmap.XUserDefined,
-***REMOVED***
+}

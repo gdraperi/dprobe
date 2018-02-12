@@ -38,10 +38,10 @@
                                 </div>
                             </div>
                             <div ng-cloak="" ng-show="isLoggedOut() &amp;&amp; !hideLogin" class="row-fluid" id="cf2-3">
-                                <a ng-href="***REMOVED******REMOVED***ROUTES.login***REMOVED******REMOVED***" class="btn btn-primary">Sign in. Painless.</a> <span>or</span> <a ng-href="***REMOVED******REMOVED***ROUTES.help***REMOVED******REMOVED***" class="link">learn more about provok.in.</a>
+                                <a ng-href="{{ROUTES.login}}" class="btn btn-primary">Sign in. Painless.</a> <span>or</span> <a ng-href="{{ROUTES.help}}" class="link">learn more about provok.in.</a>
                             </div>
                             <div ng-cloak="" ng-show="isLoggedIn()" class="row-fluid logged-in-state" id="cf2-4">
-                                <span>Welcome,</span> <a ng-href="***REMOVED******REMOVED***ROUTES.profile***REMOVED******REMOVED***" class="link">***REMOVED******REMOVED***getUserName()***REMOVED******REMOVED***</a> <span>(</span> <a ng-click="doLogout($event)" class="link">logout</a> <span>)</span>
+                                <span>Welcome,</span> <a ng-href="{{ROUTES.profile}}" class="link">{{getUserName()}}</a> <span>(</span> <a ng-click="doLogout($event)" class="link">logout</a> <span>)</span>
                             </div>
                         </div>
                     </div>
@@ -57,14 +57,14 @@
                 <div class="pvk-content" id="pc2">
                     <div class="container-fluid" id="cf3">
                         <div class="row-fluid">
-                            <div ng-cloak="" view-on-display="" ng-controller="MsgCtrl" ng-class="***REMOVED***'displayed': blockIsDisplayed***REMOVED***" class="message-box">
-                                <div ng-class="***REMOVED***'alert-info': isInfo, 'alert-error': !isInfo, 'displayed': isDisplayed***REMOVED***" class="alert">
+                            <div ng-cloak="" view-on-display="" ng-controller="MsgCtrl" ng-class="{'displayed': blockIsDisplayed}" class="message-box">
+                                <div ng-class="{'alert-info': isInfo, 'alert-error': !isInfo, 'displayed': isDisplayed}" class="alert">
                                     <a ng-click="hideMessage(true, $event)" class="close">×</a>
                                     <h4 class="alert-heading">
-                                        ***REMOVED******REMOVED*** title ***REMOVED******REMOVED***
+                                        {{ title }}
                                     </h4>
                                     <p>
-                                        ***REMOVED******REMOVED*** message ***REMOVED******REMOVED***
+                                        {{ message }}
                                     </p>
                                 </div>
                             </div>

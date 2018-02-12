@@ -20,7 +20,7 @@ package prometheus
 // no type information is implied.
 //
 // To create Untyped instances, use NewUntyped.
-type Untyped interface ***REMOVED***
+type Untyped interface {
 	Metric
 	Collector
 
@@ -36,95 +36,95 @@ type Untyped interface ***REMOVED***
 	// Sub subtracts the given value from the Untyped metric. (The value can
 	// be negative, resulting in an increase.)
 	Sub(float64)
-***REMOVED***
+}
 
 // UntypedOpts is an alias for Opts. See there for doc comments.
 type UntypedOpts Opts
 
 // NewUntyped creates a new Untyped metric from the provided UntypedOpts.
-func NewUntyped(opts UntypedOpts) Untyped ***REMOVED***
+func NewUntyped(opts UntypedOpts) Untyped {
 	return newValue(NewDesc(
 		BuildFQName(opts.Namespace, opts.Subsystem, opts.Name),
 		opts.Help,
 		nil,
 		opts.ConstLabels,
 	), UntypedValue, 0)
-***REMOVED***
+}
 
 // UntypedVec is a Collector that bundles a set of Untyped metrics that all
 // share the same Desc, but have different values for their variable
 // labels. This is used if you want to count the same thing partitioned by
 // various dimensions. Create instances with NewUntypedVec.
-type UntypedVec struct ***REMOVED***
+type UntypedVec struct {
 	MetricVec
-***REMOVED***
+}
 
 // NewUntypedVec creates a new UntypedVec based on the provided UntypedOpts and
 // partitioned by the given label names. At least one label name must be
 // provided.
-func NewUntypedVec(opts UntypedOpts, labelNames []string) *UntypedVec ***REMOVED***
+func NewUntypedVec(opts UntypedOpts, labelNames []string) *UntypedVec {
 	desc := NewDesc(
 		BuildFQName(opts.Namespace, opts.Subsystem, opts.Name),
 		opts.Help,
 		labelNames,
 		opts.ConstLabels,
 	)
-	return &UntypedVec***REMOVED***
-		MetricVec: MetricVec***REMOVED***
-			children: map[uint64]Metric***REMOVED******REMOVED***,
+	return &UntypedVec{
+		MetricVec: MetricVec{
+			children: map[uint64]Metric{},
 			desc:     desc,
-			newMetric: func(lvs ...string) Metric ***REMOVED***
+			newMetric: func(lvs ...string) Metric {
 				return newValue(desc, UntypedValue, 0, lvs...)
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
-***REMOVED***
+			},
+		},
+	}
+}
 
 // GetMetricWithLabelValues replaces the method of the same name in
 // MetricVec. The difference is that this method returns an Untyped and not a
 // Metric so that no type conversion is required.
-func (m *UntypedVec) GetMetricWithLabelValues(lvs ...string) (Untyped, error) ***REMOVED***
+func (m *UntypedVec) GetMetricWithLabelValues(lvs ...string) (Untyped, error) {
 	metric, err := m.MetricVec.GetMetricWithLabelValues(lvs...)
-	if metric != nil ***REMOVED***
+	if metric != nil {
 		return metric.(Untyped), err
-	***REMOVED***
+	}
 	return nil, err
-***REMOVED***
+}
 
 // GetMetricWith replaces the method of the same name in MetricVec. The
 // difference is that this method returns an Untyped and not a Metric so that no
 // type conversion is required.
-func (m *UntypedVec) GetMetricWith(labels Labels) (Untyped, error) ***REMOVED***
+func (m *UntypedVec) GetMetricWith(labels Labels) (Untyped, error) {
 	metric, err := m.MetricVec.GetMetricWith(labels)
-	if metric != nil ***REMOVED***
+	if metric != nil {
 		return metric.(Untyped), err
-	***REMOVED***
+	}
 	return nil, err
-***REMOVED***
+}
 
 // WithLabelValues works as GetMetricWithLabelValues, but panics where
 // GetMetricWithLabelValues would have returned an error. By not returning an
 // error, WithLabelValues allows shortcuts like
 //     myVec.WithLabelValues("404", "GET").Add(42)
-func (m *UntypedVec) WithLabelValues(lvs ...string) Untyped ***REMOVED***
+func (m *UntypedVec) WithLabelValues(lvs ...string) Untyped {
 	return m.MetricVec.WithLabelValues(lvs...).(Untyped)
-***REMOVED***
+}
 
 // With works as GetMetricWith, but panics where GetMetricWithLabels would have
 // returned an error. By not returning an error, With allows shortcuts like
-//     myVec.With(Labels***REMOVED***"code": "404", "method": "GET"***REMOVED***).Add(42)
-func (m *UntypedVec) With(labels Labels) Untyped ***REMOVED***
+//     myVec.With(Labels{"code": "404", "method": "GET"}).Add(42)
+func (m *UntypedVec) With(labels Labels) Untyped {
 	return m.MetricVec.With(labels).(Untyped)
-***REMOVED***
+}
 
 // UntypedFunc is an Untyped whose value is determined at collect time by
 // calling a provided function.
 //
 // To create UntypedFunc instances, use NewUntypedFunc.
-type UntypedFunc interface ***REMOVED***
+type UntypedFunc interface {
 	Metric
 	Collector
-***REMOVED***
+}
 
 // NewUntypedFunc creates a new UntypedFunc based on the provided
 // UntypedOpts. The value reported is determined by calling the given function
@@ -132,11 +132,11 @@ type UntypedFunc interface ***REMOVED***
 // happen concurrently. If that results in concurrent calls to Write, like in
 // the case where an UntypedFunc is directly registered with Prometheus, the
 // provided function must be concurrency-safe.
-func NewUntypedFunc(opts UntypedOpts, function func() float64) UntypedFunc ***REMOVED***
+func NewUntypedFunc(opts UntypedOpts, function func() float64) UntypedFunc {
 	return newValueFunc(NewDesc(
 		BuildFQName(opts.Namespace, opts.Subsystem, opts.Name),
 		opts.Help,
 		nil,
 		opts.ConstLabels,
 	), UntypedValue, function)
-***REMOVED***
+}

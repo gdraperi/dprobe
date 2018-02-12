@@ -10,41 +10,41 @@ import (
 
 const testFixture = "fixtures/foo.go"
 
-func TestParseEmptyInterface(t *testing.T) ***REMOVED***
+func TestParseEmptyInterface(t *testing.T) {
 	pkg, err := Parse(testFixture, "Fooer")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	assertName(t, "foo", pkg.Name)
 	assertNum(t, 0, len(pkg.Functions))
-***REMOVED***
+}
 
-func TestParseNonInterfaceType(t *testing.T) ***REMOVED***
+func TestParseNonInterfaceType(t *testing.T) {
 	_, err := Parse(testFixture, "wobble")
-	if _, ok := err.(errUnexpectedType); !ok ***REMOVED***
+	if _, ok := err.(errUnexpectedType); !ok {
 		t.Fatal("expected type error when parsing non-interface type")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestParseWithOneFunction(t *testing.T) ***REMOVED***
+func TestParseWithOneFunction(t *testing.T) {
 	pkg, err := Parse(testFixture, "Fooer2")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	assertName(t, "foo", pkg.Name)
 	assertNum(t, 1, len(pkg.Functions))
 	assertName(t, "Foo", pkg.Functions[0].Name)
 	assertNum(t, 0, len(pkg.Functions[0].Args))
 	assertNum(t, 0, len(pkg.Functions[0].Returns))
-***REMOVED***
+}
 
-func TestParseWithMultipleFuncs(t *testing.T) ***REMOVED***
+func TestParseWithMultipleFuncs(t *testing.T) {
 	pkg, err := Parse(testFixture, "Fooer3")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	assertName(t, "foo", pkg.Name)
 	assertNum(t, 7, len(pkg.Functions))
@@ -110,44 +110,44 @@ func TestParseWithMultipleFuncs(t *testing.T) ***REMOVED***
 	assertName(t, "WiggleWobble", f.Name)
 	assertNum(t, 6, len(f.Args))
 	assertNum(t, 6, len(f.Returns))
-	expectedArgs := [][]string***REMOVED***
-		***REMOVED***"a", "[]*wobble"***REMOVED***,
-		***REMOVED***"b", "[]wobble"***REMOVED***,
-		***REMOVED***"c", "map[string]*wobble"***REMOVED***,
-		***REMOVED***"d", "map[*wobble]wobble"***REMOVED***,
-		***REMOVED***"e", "map[string][]wobble"***REMOVED***,
-		***REMOVED***"f", "[]*otherfixture.Spaceship"***REMOVED***,
-	***REMOVED***
-	for i, arg := range f.Args ***REMOVED***
+	expectedArgs := [][]string{
+		{"a", "[]*wobble"},
+		{"b", "[]wobble"},
+		{"c", "map[string]*wobble"},
+		{"d", "map[*wobble]wobble"},
+		{"e", "map[string][]wobble"},
+		{"f", "[]*otherfixture.Spaceship"},
+	}
+	for i, arg := range f.Args {
 		assertName(t, expectedArgs[i][0], arg.Name)
 		assertName(t, expectedArgs[i][1], arg.ArgType)
-	***REMOVED***
-	expectedReturns := [][]string***REMOVED***
-		***REMOVED***"g", "map[*wobble]wobble"***REMOVED***,
-		***REMOVED***"h", "[][]*wobble"***REMOVED***,
-		***REMOVED***"i", "otherfixture.Spaceship"***REMOVED***,
-		***REMOVED***"j", "*otherfixture.Spaceship"***REMOVED***,
-		***REMOVED***"k", "map[*otherfixture.Spaceship]otherfixture.Spaceship"***REMOVED***,
-		***REMOVED***"l", "[]otherfixture.Spaceship"***REMOVED***,
-	***REMOVED***
-	for i, ret := range f.Returns ***REMOVED***
+	}
+	expectedReturns := [][]string{
+		{"g", "map[*wobble]wobble"},
+		{"h", "[][]*wobble"},
+		{"i", "otherfixture.Spaceship"},
+		{"j", "*otherfixture.Spaceship"},
+		{"k", "map[*otherfixture.Spaceship]otherfixture.Spaceship"},
+		{"l", "[]otherfixture.Spaceship"},
+	}
+	for i, ret := range f.Returns {
 		assertName(t, expectedReturns[i][0], ret.Name)
 		assertName(t, expectedReturns[i][1], ret.ArgType)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestParseWithUnnamedReturn(t *testing.T) ***REMOVED***
+func TestParseWithUnnamedReturn(t *testing.T) {
 	_, err := Parse(testFixture, "Fooer4")
-	if !strings.HasSuffix(err.Error(), errBadReturn.Error()) ***REMOVED***
+	if !strings.HasSuffix(err.Error(), errBadReturn.Error()) {
 		t.Fatalf("expected ErrBadReturn, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestEmbeddedInterface(t *testing.T) ***REMOVED***
+func TestEmbeddedInterface(t *testing.T) {
 	pkg, err := Parse(testFixture, "Fooer5")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	assertName(t, "foo", pkg.Name)
 	assertNum(t, 2, len(pkg.Functions))
@@ -177,46 +177,46 @@ func TestEmbeddedInterface(t *testing.T) ***REMOVED***
 	arg = f.Returns[1]
 	assertName(t, "err", arg.Name)
 	assertName(t, "error", arg.ArgType)
-***REMOVED***
+}
 
-func TestParsedImports(t *testing.T) ***REMOVED***
-	cases := []string***REMOVED***"Fooer6", "Fooer7", "Fooer8", "Fooer9", "Fooer10", "Fooer11"***REMOVED***
-	for _, testCase := range cases ***REMOVED***
+func TestParsedImports(t *testing.T) {
+	cases := []string{"Fooer6", "Fooer7", "Fooer8", "Fooer9", "Fooer10", "Fooer11"}
+	for _, testCase := range cases {
 		pkg, err := Parse(testFixture, testCase)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
+		}
 
 		assertNum(t, 1, len(pkg.Imports))
 		importPath := strings.Split(pkg.Imports[0].Path, "/")
 		assertName(t, "otherfixture\"", importPath[len(importPath)-1])
 		assertName(t, "", pkg.Imports[0].Name)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestAliasedImports(t *testing.T) ***REMOVED***
+func TestAliasedImports(t *testing.T) {
 	pkg, err := Parse(testFixture, "Fooer12")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	assertNum(t, 1, len(pkg.Imports))
 	assertName(t, "aliasedio", pkg.Imports[0].Name)
-***REMOVED***
+}
 
-func assertName(t *testing.T, expected, actual string) ***REMOVED***
-	if expected != actual ***REMOVED***
+func assertName(t *testing.T, expected, actual string) {
+	if expected != actual {
 		fatalOut(t, fmt.Sprintf("expected name to be `%s`, got: %s", expected, actual))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func assertNum(t *testing.T, expected, actual int) ***REMOVED***
-	if expected != actual ***REMOVED***
+func assertNum(t *testing.T, expected, actual int) {
+	if expected != actual {
 		fatalOut(t, fmt.Sprintf("expected number to be %d, got: %d", expected, actual))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func fatalOut(t *testing.T, msg string) ***REMOVED***
+func fatalOut(t *testing.T, msg string) {
 	_, file, ln, _ := runtime.Caller(2)
 	t.Fatalf("%s:%d: %s", filepath.Base(file), ln, msg)
-***REMOVED***
+}

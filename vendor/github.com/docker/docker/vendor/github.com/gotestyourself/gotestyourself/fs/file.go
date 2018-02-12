@@ -12,86 +12,86 @@ import (
 )
 
 // Path objects return their filesystem path. Both File and Dir implement Path.
-type Path interface ***REMOVED***
+type Path interface {
 	Path() string
 	Remove()
-***REMOVED***
+}
 
 var (
-	_ Path = &Dir***REMOVED******REMOVED***
-	_ Path = &File***REMOVED******REMOVED***
+	_ Path = &Dir{}
+	_ Path = &File{}
 )
 
 // File is a temporary file on the filesystem
-type File struct ***REMOVED***
+type File struct {
 	path string
-***REMOVED***
+}
 
-type helperT interface ***REMOVED***
+type helperT interface {
 	Helper()
-***REMOVED***
+}
 
 // NewFile creates a new file in a temporary directory using prefix as part of
 // the filename. The PathOps are applied to the before returning the File.
-func NewFile(t assert.TestingT, prefix string, ops ...PathOp) *File ***REMOVED***
-	if ht, ok := t.(helperT); ok ***REMOVED***
+func NewFile(t assert.TestingT, prefix string, ops ...PathOp) *File {
+	if ht, ok := t.(helperT); ok {
 		ht.Helper()
-	***REMOVED***
+	}
 	tempfile, err := ioutil.TempFile("", prefix+"-")
 	assert.NilError(t, err)
-	file := &File***REMOVED***path: tempfile.Name()***REMOVED***
+	file := &File{path: tempfile.Name()}
 	assert.NilError(t, tempfile.Close())
 
-	for _, op := range ops ***REMOVED***
+	for _, op := range ops {
 		assert.NilError(t, op(file))
-	***REMOVED***
+	}
 	return file
-***REMOVED***
+}
 
 // Path returns the full path to the file
-func (f *File) Path() string ***REMOVED***
+func (f *File) Path() string {
 	return f.path
-***REMOVED***
+}
 
 // Remove the file
-func (f *File) Remove() ***REMOVED***
+func (f *File) Remove() {
 	// nolint: errcheck
 	os.Remove(f.path)
-***REMOVED***
+}
 
 // Dir is a temporary directory
-type Dir struct ***REMOVED***
+type Dir struct {
 	path string
-***REMOVED***
+}
 
 // NewDir returns a new temporary directory using prefix as part of the directory
 // name. The PathOps are applied before returning the Dir.
-func NewDir(t assert.TestingT, prefix string, ops ...PathOp) *Dir ***REMOVED***
-	if ht, ok := t.(helperT); ok ***REMOVED***
+func NewDir(t assert.TestingT, prefix string, ops ...PathOp) *Dir {
+	if ht, ok := t.(helperT); ok {
 		ht.Helper()
-	***REMOVED***
+	}
 	path, err := ioutil.TempDir("", prefix+"-")
 	assert.NilError(t, err)
-	dir := &Dir***REMOVED***path: path***REMOVED***
+	dir := &Dir{path: path}
 
-	for _, op := range ops ***REMOVED***
+	for _, op := range ops {
 		assert.NilError(t, op(dir))
-	***REMOVED***
+	}
 	return dir
-***REMOVED***
+}
 
 // Path returns the full path to the directory
-func (d *Dir) Path() string ***REMOVED***
+func (d *Dir) Path() string {
 	return d.path
-***REMOVED***
+}
 
 // Remove the directory
-func (d *Dir) Remove() ***REMOVED***
+func (d *Dir) Remove() {
 	// nolint: errcheck
 	os.RemoveAll(d.path)
-***REMOVED***
+}
 
 // Join returns a new path with this directory as the base of the path
-func (d *Dir) Join(parts ...string) string ***REMOVED***
-	return filepath.Join(append([]string***REMOVED***d.Path()***REMOVED***, parts...)...)
-***REMOVED***
+func (d *Dir) Join(parts ...string) string {
+	return filepath.Join(append([]string{d.Path()}, parts...)...)
+}

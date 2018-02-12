@@ -9,11 +9,11 @@ import (
 	"strings"
 )
 
-func shellRun(line string) (string, error) ***REMOVED***
+func shellRun(line string) (string, error) {
 	shell := os.Getenv("SHELL")
 	b, err := exec.Command(shell, "-c", line).Output()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", errors.New(err.Error() + ":" + string(b))
-	***REMOVED***
+	}
 	return strings.TrimSpace(string(b)), nil
-***REMOVED***
+}

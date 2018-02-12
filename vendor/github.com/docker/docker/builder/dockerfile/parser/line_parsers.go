@@ -28,39 +28,39 @@ const (
 
 // ignore the current argument. This will still leave a command parsed, but
 // will not incorporate the arguments into the ast.
-func parseIgnore(rest string, d *Directive) (*Node, map[string]bool, error) ***REMOVED***
-	return &Node***REMOVED******REMOVED***, nil, nil
-***REMOVED***
+func parseIgnore(rest string, d *Directive) (*Node, map[string]bool, error) {
+	return &Node{}, nil, nil
+}
 
 // used for onbuild. Could potentially be used for anything that represents a
 // statement with sub-statements.
 //
 // ONBUILD RUN foo bar -> (onbuild (run foo bar))
 //
-func parseSubCommand(rest string, d *Directive) (*Node, map[string]bool, error) ***REMOVED***
-	if rest == "" ***REMOVED***
+func parseSubCommand(rest string, d *Directive) (*Node, map[string]bool, error) {
+	if rest == "" {
 		return nil, nil, nil
-	***REMOVED***
+	}
 
 	child, err := newNodeFromLine(rest, d)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 
-	return &Node***REMOVED***Children: []*Node***REMOVED***child***REMOVED******REMOVED***, nil, nil
-***REMOVED***
+	return &Node{Children: []*Node{child}}, nil, nil
+}
 
 // helper to parse words (i.e space delimited or quoted strings) in a statement.
 // The quotes are preserved as part of this function and they are stripped later
 // as part of processWords().
-func parseWords(rest string, d *Directive) []string ***REMOVED***
+func parseWords(rest string, d *Directive) []string {
 	const (
 		inSpaces = iota // looking for start of a word
 		inWord
 		inQuote
 	)
 
-	words := []string***REMOVED******REMOVED***
+	words := []string{}
 	phase := inSpaces
 	word := ""
 	quote := '\000'
@@ -68,79 +68,79 @@ func parseWords(rest string, d *Directive) []string ***REMOVED***
 	var ch rune
 	var chWidth int
 
-	for pos := 0; pos <= len(rest); pos += chWidth ***REMOVED***
-		if pos != len(rest) ***REMOVED***
+	for pos := 0; pos <= len(rest); pos += chWidth {
+		if pos != len(rest) {
 			ch, chWidth = utf8.DecodeRuneInString(rest[pos:])
-		***REMOVED***
+		}
 
-		if phase == inSpaces ***REMOVED*** // Looking for start of word
-			if pos == len(rest) ***REMOVED*** // end of input
+		if phase == inSpaces { // Looking for start of word
+			if pos == len(rest) { // end of input
 				break
-			***REMOVED***
-			if unicode.IsSpace(ch) ***REMOVED*** // skip spaces
+			}
+			if unicode.IsSpace(ch) { // skip spaces
 				continue
-			***REMOVED***
+			}
 			phase = inWord // found it, fall through
-		***REMOVED***
-		if (phase == inWord || phase == inQuote) && (pos == len(rest)) ***REMOVED***
-			if blankOK || len(word) > 0 ***REMOVED***
+		}
+		if (phase == inWord || phase == inQuote) && (pos == len(rest)) {
+			if blankOK || len(word) > 0 {
 				words = append(words, word)
-			***REMOVED***
+			}
 			break
-		***REMOVED***
-		if phase == inWord ***REMOVED***
-			if unicode.IsSpace(ch) ***REMOVED***
+		}
+		if phase == inWord {
+			if unicode.IsSpace(ch) {
 				phase = inSpaces
-				if blankOK || len(word) > 0 ***REMOVED***
+				if blankOK || len(word) > 0 {
 					words = append(words, word)
-				***REMOVED***
+				}
 				word = ""
 				blankOK = false
 				continue
-			***REMOVED***
-			if ch == '\'' || ch == '"' ***REMOVED***
+			}
+			if ch == '\'' || ch == '"' {
 				quote = ch
 				blankOK = true
 				phase = inQuote
-			***REMOVED***
-			if ch == d.escapeToken ***REMOVED***
-				if pos+chWidth == len(rest) ***REMOVED***
+			}
+			if ch == d.escapeToken {
+				if pos+chWidth == len(rest) {
 					continue // just skip an escape token at end of line
-				***REMOVED***
+				}
 				// If we're not quoted and we see an escape token, then always just
 				// add the escape token plus the char to the word, even if the char
 				// is a quote.
 				word += string(ch)
 				pos += chWidth
 				ch, chWidth = utf8.DecodeRuneInString(rest[pos:])
-			***REMOVED***
+			}
 			word += string(ch)
 			continue
-		***REMOVED***
-		if phase == inQuote ***REMOVED***
-			if ch == quote ***REMOVED***
+		}
+		if phase == inQuote {
+			if ch == quote {
 				phase = inWord
-			***REMOVED***
+			}
 			// The escape token is special except for ' quotes - can't escape anything for '
-			if ch == d.escapeToken && quote != '\'' ***REMOVED***
-				if pos+chWidth == len(rest) ***REMOVED***
+			if ch == d.escapeToken && quote != '\'' {
+				if pos+chWidth == len(rest) {
 					phase = inWord
 					continue // just skip the escape token at end
-				***REMOVED***
+				}
 				pos += chWidth
 				word += string(ch)
 				ch, chWidth = utf8.DecodeRuneInString(rest[pos:])
-			***REMOVED***
+			}
 			word += string(ch)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return words
-***REMOVED***
+}
 
 // parse environment like statements. Note that this does *not* handle
 // variable interpolation, which will be handled in the evaluator.
-func parseNameVal(rest string, key string, d *Directive) (*Node, error) ***REMOVED***
+func parseNameVal(rest string, key string, d *Directive) (*Node, error) {
 	// This is kind of tricky because we need to support the old
 	// variant:   KEY name value
 	// as well as the new one:    KEY name=value ...
@@ -148,90 +148,90 @@ func parseNameVal(rest string, key string, d *Directive) (*Node, error) ***REMOV
 	// a space or = first.  space ==> old, "=" ==> new
 
 	words := parseWords(rest, d)
-	if len(words) == 0 ***REMOVED***
+	if len(words) == 0 {
 		return nil, nil
-	***REMOVED***
+	}
 
 	// Old format (KEY name value)
-	if !strings.Contains(words[0], "=") ***REMOVED***
+	if !strings.Contains(words[0], "=") {
 		parts := tokenWhitespace.Split(rest, 2)
-		if len(parts) < 2 ***REMOVED***
+		if len(parts) < 2 {
 			return nil, fmt.Errorf(key + " must have two arguments")
-		***REMOVED***
+		}
 		return newKeyValueNode(parts[0], parts[1]), nil
-	***REMOVED***
+	}
 
 	var rootNode *Node
 	var prevNode *Node
-	for _, word := range words ***REMOVED***
-		if !strings.Contains(word, "=") ***REMOVED***
+	for _, word := range words {
+		if !strings.Contains(word, "=") {
 			return nil, fmt.Errorf("Syntax error - can't find = in %q. Must be of the form: name=value", word)
-		***REMOVED***
+		}
 
 		parts := strings.SplitN(word, "=", 2)
 		node := newKeyValueNode(parts[0], parts[1])
 		rootNode, prevNode = appendKeyValueNode(node, rootNode, prevNode)
-	***REMOVED***
+	}
 
 	return rootNode, nil
-***REMOVED***
+}
 
-func newKeyValueNode(key, value string) *Node ***REMOVED***
-	return &Node***REMOVED***
+func newKeyValueNode(key, value string) *Node {
+	return &Node{
 		Value: key,
-		Next:  &Node***REMOVED***Value: value***REMOVED***,
-	***REMOVED***
-***REMOVED***
+		Next:  &Node{Value: value},
+	}
+}
 
-func appendKeyValueNode(node, rootNode, prevNode *Node) (*Node, *Node) ***REMOVED***
-	if rootNode == nil ***REMOVED***
+func appendKeyValueNode(node, rootNode, prevNode *Node) (*Node, *Node) {
+	if rootNode == nil {
 		rootNode = node
-	***REMOVED***
-	if prevNode != nil ***REMOVED***
+	}
+	if prevNode != nil {
 		prevNode.Next = node
-	***REMOVED***
+	}
 
 	prevNode = node.Next
 	return rootNode, prevNode
-***REMOVED***
+}
 
-func parseEnv(rest string, d *Directive) (*Node, map[string]bool, error) ***REMOVED***
+func parseEnv(rest string, d *Directive) (*Node, map[string]bool, error) {
 	node, err := parseNameVal(rest, "ENV", d)
 	return node, nil, err
-***REMOVED***
+}
 
-func parseLabel(rest string, d *Directive) (*Node, map[string]bool, error) ***REMOVED***
+func parseLabel(rest string, d *Directive) (*Node, map[string]bool, error) {
 	node, err := parseNameVal(rest, commandLabel, d)
 	return node, nil, err
-***REMOVED***
+}
 
 // NodeFromLabels returns a Node for the injected labels
-func NodeFromLabels(labels map[string]string) *Node ***REMOVED***
-	keys := []string***REMOVED******REMOVED***
-	for key := range labels ***REMOVED***
+func NodeFromLabels(labels map[string]string) *Node {
+	keys := []string{}
+	for key := range labels {
 		keys = append(keys, key)
-	***REMOVED***
+	}
 	// Sort the label to have a repeatable order
 	sort.Strings(keys)
 
-	labelPairs := []string***REMOVED******REMOVED***
+	labelPairs := []string{}
 	var rootNode *Node
 	var prevNode *Node
-	for _, key := range keys ***REMOVED***
+	for _, key := range keys {
 		value := labels[key]
 		labelPairs = append(labelPairs, fmt.Sprintf("%q='%s'", key, value))
 		// Value must be single quoted to prevent env variable expansion
 		// See https://github.com/docker/docker/issues/26027
 		node := newKeyValueNode(key, "'"+value+"'")
 		rootNode, prevNode = appendKeyValueNode(node, rootNode, prevNode)
-	***REMOVED***
+	}
 
-	return &Node***REMOVED***
+	return &Node{
 		Value:    command.Label,
 		Original: commandLabel + " " + strings.Join(labelPairs, " "),
 		Next:     rootNode,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // parses a statement containing one or more keyword definition(s) and/or
 // value assignments, like `name1 name2= name3="" name4=value`.
@@ -241,46 +241,46 @@ func NodeFromLabels(labels map[string]string) *Node ***REMOVED***
 // In addition, a keyword definition alone is of the form `keyword` like `name1`
 // above. And the assignments `name2=` and `name3=""` are equivalent and
 // assign an empty value to the respective keywords.
-func parseNameOrNameVal(rest string, d *Directive) (*Node, map[string]bool, error) ***REMOVED***
+func parseNameOrNameVal(rest string, d *Directive) (*Node, map[string]bool, error) {
 	words := parseWords(rest, d)
-	if len(words) == 0 ***REMOVED***
+	if len(words) == 0 {
 		return nil, nil, nil
-	***REMOVED***
+	}
 
 	var (
 		rootnode *Node
 		prevNode *Node
 	)
-	for i, word := range words ***REMOVED***
-		node := &Node***REMOVED******REMOVED***
+	for i, word := range words {
+		node := &Node{}
 		node.Value = word
-		if i == 0 ***REMOVED***
+		if i == 0 {
 			rootnode = node
-		***REMOVED*** else ***REMOVED***
+		} else {
 			prevNode.Next = node
-		***REMOVED***
+		}
 		prevNode = node
-	***REMOVED***
+	}
 
 	return rootnode, nil, nil
-***REMOVED***
+}
 
 // parses a whitespace-delimited set of arguments. The result is effectively a
 // linked list of string arguments.
-func parseStringsWhitespaceDelimited(rest string, d *Directive) (*Node, map[string]bool, error) ***REMOVED***
-	if rest == "" ***REMOVED***
+func parseStringsWhitespaceDelimited(rest string, d *Directive) (*Node, map[string]bool, error) {
+	if rest == "" {
 		return nil, nil, nil
-	***REMOVED***
+	}
 
-	node := &Node***REMOVED******REMOVED***
+	node := &Node{}
 	rootnode := node
 	prevnode := node
-	for _, str := range tokenWhitespace.Split(rest, -1) ***REMOVED*** // use regexp
+	for _, str := range tokenWhitespace.Split(rest, -1) { // use regexp
 		prevnode = node
 		node.Value = str
-		node.Next = &Node***REMOVED******REMOVED***
+		node.Next = &Node{}
 		node = node.Next
-	***REMOVED***
+	}
 
 	// XXX to get around regexp.Split *always* providing an empty string at the
 	// end due to how our loop is constructed, nil out the last node in the
@@ -288,112 +288,112 @@ func parseStringsWhitespaceDelimited(rest string, d *Directive) (*Node, map[stri
 	prevnode.Next = nil
 
 	return rootnode, nil, nil
-***REMOVED***
+}
 
 // parseString just wraps the string in quotes and returns a working node.
-func parseString(rest string, d *Directive) (*Node, map[string]bool, error) ***REMOVED***
-	if rest == "" ***REMOVED***
+func parseString(rest string, d *Directive) (*Node, map[string]bool, error) {
+	if rest == "" {
 		return nil, nil, nil
-	***REMOVED***
-	n := &Node***REMOVED******REMOVED***
+	}
+	n := &Node{}
 	n.Value = rest
 	return n, nil, nil
-***REMOVED***
+}
 
 // parseJSON converts JSON arrays to an AST.
-func parseJSON(rest string, d *Directive) (*Node, map[string]bool, error) ***REMOVED***
+func parseJSON(rest string, d *Directive) (*Node, map[string]bool, error) {
 	rest = strings.TrimLeftFunc(rest, unicode.IsSpace)
-	if !strings.HasPrefix(rest, "[") ***REMOVED***
+	if !strings.HasPrefix(rest, "[") {
 		return nil, nil, fmt.Errorf(`Error parsing "%s" as a JSON array`, rest)
-	***REMOVED***
+	}
 
-	var myJSON []interface***REMOVED******REMOVED***
-	if err := json.NewDecoder(strings.NewReader(rest)).Decode(&myJSON); err != nil ***REMOVED***
+	var myJSON []interface{}
+	if err := json.NewDecoder(strings.NewReader(rest)).Decode(&myJSON); err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 
 	var top, prev *Node
-	for _, str := range myJSON ***REMOVED***
+	for _, str := range myJSON {
 		s, ok := str.(string)
-		if !ok ***REMOVED***
+		if !ok {
 			return nil, nil, errDockerfileNotStringArray
-		***REMOVED***
+		}
 
-		node := &Node***REMOVED***Value: s***REMOVED***
-		if prev == nil ***REMOVED***
+		node := &Node{Value: s}
+		if prev == nil {
 			top = node
-		***REMOVED*** else ***REMOVED***
+		} else {
 			prev.Next = node
-		***REMOVED***
+		}
 		prev = node
-	***REMOVED***
+	}
 
-	return top, map[string]bool***REMOVED***"json": true***REMOVED***, nil
-***REMOVED***
+	return top, map[string]bool{"json": true}, nil
+}
 
 // parseMaybeJSON determines if the argument appears to be a JSON array. If
 // so, passes to parseJSON; if not, quotes the result and returns a single
 // node.
-func parseMaybeJSON(rest string, d *Directive) (*Node, map[string]bool, error) ***REMOVED***
-	if rest == "" ***REMOVED***
+func parseMaybeJSON(rest string, d *Directive) (*Node, map[string]bool, error) {
+	if rest == "" {
 		return nil, nil, nil
-	***REMOVED***
+	}
 
 	node, attrs, err := parseJSON(rest, d)
 
-	if err == nil ***REMOVED***
+	if err == nil {
 		return node, attrs, nil
-	***REMOVED***
-	if err == errDockerfileNotStringArray ***REMOVED***
+	}
+	if err == errDockerfileNotStringArray {
 		return nil, nil, err
-	***REMOVED***
+	}
 
-	node = &Node***REMOVED******REMOVED***
+	node = &Node{}
 	node.Value = rest
 	return node, nil, nil
-***REMOVED***
+}
 
 // parseMaybeJSONToList determines if the argument appears to be a JSON array. If
 // so, passes to parseJSON; if not, attempts to parse it as a whitespace
 // delimited string.
-func parseMaybeJSONToList(rest string, d *Directive) (*Node, map[string]bool, error) ***REMOVED***
+func parseMaybeJSONToList(rest string, d *Directive) (*Node, map[string]bool, error) {
 	node, attrs, err := parseJSON(rest, d)
 
-	if err == nil ***REMOVED***
+	if err == nil {
 		return node, attrs, nil
-	***REMOVED***
-	if err == errDockerfileNotStringArray ***REMOVED***
+	}
+	if err == errDockerfileNotStringArray {
 		return nil, nil, err
-	***REMOVED***
+	}
 
 	return parseStringsWhitespaceDelimited(rest, d)
-***REMOVED***
+}
 
 // The HEALTHCHECK command is like parseMaybeJSON, but has an extra type argument.
-func parseHealthConfig(rest string, d *Directive) (*Node, map[string]bool, error) ***REMOVED***
+func parseHealthConfig(rest string, d *Directive) (*Node, map[string]bool, error) {
 	// Find end of first argument
 	var sep int
-	for ; sep < len(rest); sep++ ***REMOVED***
-		if unicode.IsSpace(rune(rest[sep])) ***REMOVED***
+	for ; sep < len(rest); sep++ {
+		if unicode.IsSpace(rune(rest[sep])) {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	next := sep
-	for ; next < len(rest); next++ ***REMOVED***
-		if !unicode.IsSpace(rune(rest[next])) ***REMOVED***
+	for ; next < len(rest); next++ {
+		if !unicode.IsSpace(rune(rest[next])) {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if sep == 0 ***REMOVED***
+	if sep == 0 {
 		return nil, nil, nil
-	***REMOVED***
+	}
 
 	typ := rest[:sep]
 	cmd, attrs, err := parseMaybeJSON(rest[next:], d)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 
-	return &Node***REMOVED***Value: typ, Next: cmd***REMOVED***, attrs, err
-***REMOVED***
+	return &Node{Value: typ, Next: cmd}, attrs, err
+}

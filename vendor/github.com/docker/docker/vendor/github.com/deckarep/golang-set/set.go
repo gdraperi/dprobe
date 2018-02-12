@@ -33,10 +33,10 @@ SOFTWARE.
 // implementation which is slightly more performant.
 package mapset
 
-type Set interface ***REMOVED***
+type Set interface {
 	// Adds an element to the set. Returns whether
 	// the item was added.
-	Add(i interface***REMOVED******REMOVED***) bool
+	Add(i interface{}) bool
 
 	// Returns the number of elements in the set.
 	Cardinality() int
@@ -51,7 +51,7 @@ type Set interface ***REMOVED***
 
 	// Returns whether the given items
 	// are all in the set.
-	Contains(i ...interface***REMOVED******REMOVED***) bool
+	Contains(i ...interface{}) bool
 
 	// Returns the difference between this set
 	// and other. The returned set will contain
@@ -104,10 +104,10 @@ type Set interface ***REMOVED***
 
 	// Returns a channel of elements that you can
 	// range over.
-	Iter() <-chan interface***REMOVED******REMOVED***
+	Iter() <-chan interface{}
 
 	// Remove a single element from the set.
-	Remove(i interface***REMOVED******REMOVED***)
+	Remove(i interface{})
 
 	// Provides a convenient string representation
 	// of the current state of the set.
@@ -136,33 +136,33 @@ type Set interface ***REMOVED***
 	CartesianProduct(other Set) Set
 
 	// Returns the members of the set as a slice.
-	ToSlice() []interface***REMOVED******REMOVED***
-***REMOVED***
+	ToSlice() []interface{}
+}
 
 // Creates and returns a reference to an empty set.
-func NewSet() Set ***REMOVED***
+func NewSet() Set {
 	set := newThreadSafeSet()
 	return &set
-***REMOVED***
+}
 
 // Creates and returns a reference to a set from an existing slice
-func NewSetFromSlice(s []interface***REMOVED******REMOVED***) Set ***REMOVED***
+func NewSetFromSlice(s []interface{}) Set {
 	a := NewSet()
-	for _, item := range s ***REMOVED***
+	for _, item := range s {
 		a.Add(item)
-	***REMOVED***
+	}
 	return a
-***REMOVED***
+}
 
-func NewThreadUnsafeSet() Set ***REMOVED***
+func NewThreadUnsafeSet() Set {
 	set := newThreadUnsafeSet()
 	return &set
-***REMOVED***
+}
 
-func NewThreadUnsafeSetFromSlice(s []interface***REMOVED******REMOVED***) Set ***REMOVED***
+func NewThreadUnsafeSetFromSlice(s []interface{}) Set {
 	a := NewThreadUnsafeSet()
-	for _, item := range s ***REMOVED***
+	for _, item := range s {
 		a.Add(item)
-	***REMOVED***
+	}
 	return a
-***REMOVED***
+}

@@ -15,33 +15,33 @@ const (
 	sizeofSocket        = sizeofSocketID + 0x18
 )
 
-type socketRequest struct ***REMOVED***
+type socketRequest struct {
 	Family   uint8
 	Protocol uint8
 	Ext      uint8
 	pad      uint8
 	States   uint32
 	ID       SocketID
-***REMOVED***
+}
 
-type writeBuffer struct ***REMOVED***
+type writeBuffer struct {
 	Bytes []byte
 	pos   int
-***REMOVED***
+}
 
-func (b *writeBuffer) Write(c byte) ***REMOVED***
+func (b *writeBuffer) Write(c byte) {
 	b.Bytes[b.pos] = c
 	b.pos++
-***REMOVED***
+}
 
-func (b *writeBuffer) Next(n int) []byte ***REMOVED***
+func (b *writeBuffer) Next(n int) []byte {
 	s := b.Bytes[b.pos : b.pos+n]
 	b.pos += n
 	return s
-***REMOVED***
+}
 
-func (r *socketRequest) Serialize() []byte ***REMOVED***
-	b := writeBuffer***REMOVED***Bytes: make([]byte, sizeofSocketRequest)***REMOVED***
+func (r *socketRequest) Serialize() []byte {
+	b := writeBuffer{Bytes: make([]byte, sizeofSocketRequest)}
 	b.Write(r.Family)
 	b.Write(r.Protocol)
 	b.Write(r.Ext)
@@ -57,32 +57,32 @@ func (r *socketRequest) Serialize() []byte ***REMOVED***
 	native.PutUint32(b.Next(4), r.ID.Cookie[0])
 	native.PutUint32(b.Next(4), r.ID.Cookie[1])
 	return b.Bytes
-***REMOVED***
+}
 
-func (r *socketRequest) Len() int ***REMOVED*** return sizeofSocketRequest ***REMOVED***
+func (r *socketRequest) Len() int { return sizeofSocketRequest }
 
-type readBuffer struct ***REMOVED***
+type readBuffer struct {
 	Bytes []byte
 	pos   int
-***REMOVED***
+}
 
-func (b *readBuffer) Read() byte ***REMOVED***
+func (b *readBuffer) Read() byte {
 	c := b.Bytes[b.pos]
 	b.pos++
 	return c
-***REMOVED***
+}
 
-func (b *readBuffer) Next(n int) []byte ***REMOVED***
+func (b *readBuffer) Next(n int) []byte {
 	s := b.Bytes[b.pos : b.pos+n]
 	b.pos += n
 	return s
-***REMOVED***
+}
 
-func (s *Socket) deserialize(b []byte) error ***REMOVED***
-	if len(b) < sizeofSocket ***REMOVED***
+func (s *Socket) deserialize(b []byte) error {
+	if len(b) < sizeofSocket {
 		return fmt.Errorf("socket data short read (%d); want %d", len(b), sizeofSocket)
-	***REMOVED***
-	rb := readBuffer***REMOVED***Bytes: b***REMOVED***
+	}
+	rb := readBuffer{Bytes: b}
 	s.Family = rb.Read()
 	s.State = rb.Read()
 	s.Timer = rb.Read()
@@ -102,58 +102,58 @@ func (s *Socket) deserialize(b []byte) error ***REMOVED***
 	s.UID = native.Uint32(rb.Next(4))
 	s.INode = native.Uint32(rb.Next(4))
 	return nil
-***REMOVED***
+}
 
 // SocketGet returns the Socket identified by its local and remote addresses.
-func SocketGet(local, remote net.Addr) (*Socket, error) ***REMOVED***
+func SocketGet(local, remote net.Addr) (*Socket, error) {
 	localTCP, ok := local.(*net.TCPAddr)
-	if !ok ***REMOVED***
+	if !ok {
 		return nil, ErrNotImplemented
-	***REMOVED***
+	}
 	remoteTCP, ok := remote.(*net.TCPAddr)
-	if !ok ***REMOVED***
+	if !ok {
 		return nil, ErrNotImplemented
-	***REMOVED***
+	}
 	localIP := localTCP.IP.To4()
-	if localIP == nil ***REMOVED***
+	if localIP == nil {
 		return nil, ErrNotImplemented
-	***REMOVED***
+	}
 	remoteIP := remoteTCP.IP.To4()
-	if remoteIP == nil ***REMOVED***
+	if remoteIP == nil {
 		return nil, ErrNotImplemented
-	***REMOVED***
+	}
 
 	s, err := nl.Subscribe(syscall.NETLINK_INET_DIAG)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	defer s.Close()
 	req := nl.NewNetlinkRequest(nl.SOCK_DIAG_BY_FAMILY, 0)
-	req.AddData(&socketRequest***REMOVED***
+	req.AddData(&socketRequest{
 		Family:   syscall.AF_INET,
 		Protocol: syscall.IPPROTO_TCP,
-		ID: SocketID***REMOVED***
+		ID: SocketID{
 			SourcePort:      uint16(localTCP.Port),
 			DestinationPort: uint16(remoteTCP.Port),
 			Source:          localIP,
 			Destination:     remoteIP,
-			Cookie:          [2]uint32***REMOVED***nl.TCPDIAG_NOCOOKIE, nl.TCPDIAG_NOCOOKIE***REMOVED***,
-		***REMOVED***,
-	***REMOVED***)
+			Cookie:          [2]uint32{nl.TCPDIAG_NOCOOKIE, nl.TCPDIAG_NOCOOKIE},
+		},
+	})
 	s.Send(req)
 	msgs, err := s.Receive()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if len(msgs) == 0 ***REMOVED***
+	}
+	if len(msgs) == 0 {
 		return nil, errors.New("no message nor error from netlink")
-	***REMOVED***
-	if len(msgs) > 2 ***REMOVED***
+	}
+	if len(msgs) > 2 {
 		return nil, fmt.Errorf("multiple (%d) matching sockets", len(msgs))
-	***REMOVED***
-	sock := &Socket***REMOVED******REMOVED***
-	if err := sock.deserialize(msgs[0].Data); err != nil ***REMOVED***
+	}
+	sock := &Socket{}
+	if err := sock.deserialize(msgs[0].Data); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return sock, nil
-***REMOVED***
+}

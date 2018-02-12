@@ -13,7 +13,7 @@ option (gogoproto.goproto_stringer_all) = false;
 
 // MessageType enum defines all the core message types that networkdb
 // uses to communicate to peers.
-enum MessageType ***REMOVED***
+enum MessageType {
 	option (gogoproto.goproto_enum_prefix) = false;
 	option (gogoproto.enum_customname) = "MessageType";
 
@@ -45,17 +45,17 @@ enum MessageType ***REMOVED***
 	// NodeEvent message type is used to communicare node
 	// join/leave events in the cluster
 	NODE_EVENT = 6 [(gogoproto.enumvalue_customname) = "MessageTypeNodeEvent"];
-***REMOVED***
+}
 
 // GossipMessage is a basic message header used by all messages types.
-message GossipMessage ***REMOVED***
+message GossipMessage {
 	MessageType type = 1; // type defines one of the message types defined above.
 	bytes data = 2; // Payload of the message of any type defined here.
-***REMOVED***
+}
 
 // NodeEvent message payload definition.
-message NodeEvent ***REMOVED***
-	enum Type ***REMOVED***
+message NodeEvent {
+	enum Type {
 		option (gogoproto.goproto_enum_prefix) = false;
 		option (gogoproto.enum_customname) = "Type";
 
@@ -64,7 +64,7 @@ message NodeEvent ***REMOVED***
 		JOIN = 1 [(gogoproto.enumvalue_customname) = "NodeEventTypeJoin"];;
 		// Leave event is generated when this node leaves the cluster.
 		LEAVE = 2 [(gogoproto.enumvalue_customname) = "NodeEventTypeLeave"];;
-	***REMOVED***
+	}
 
 	Type type = 1;
 
@@ -74,11 +74,11 @@ message NodeEvent ***REMOVED***
 	uint64 l_time = 2 [(gogoproto.customtype) = "github.com/hashicorp/serf/serf.LamportTime", (gogoproto.nullable) = false];
 	// Source node name.
 	string node_name = 3;
-***REMOVED***
+}
 
 // NetworkEvent message payload definition.
-message NetworkEvent ***REMOVED***
-	enum Type ***REMOVED***
+message NetworkEvent {
+	enum Type {
 		option (gogoproto.goproto_enum_prefix) = false;
 		option (gogoproto.enum_customname) = "Type";
 
@@ -87,7 +87,7 @@ message NetworkEvent ***REMOVED***
 		JOIN = 1 [(gogoproto.enumvalue_customname) = "NetworkEventTypeJoin"];;
 		// Leave event is generated when this node leaves a network.
 		LEAVE = 2 [(gogoproto.enumvalue_customname) = "NetworkEventTypeLeave"];;
-	***REMOVED***
+	}
 
 	Type type = 1;
 
@@ -99,10 +99,10 @@ message NetworkEvent ***REMOVED***
 	string node_name = 3;
 	// ID of the network for which the event is generated.
 	string network_id = 4 [(gogoproto.customname) = "NetworkID"];
-***REMOVED***
+}
 
 // NetworkEntry for push pull of networks.
-message NetworkEntry ***REMOVED***
+message NetworkEntry {
 	// ID of the network
 	string network_id = 1 [(gogoproto.customname) = "NetworkID"];
 	// Latest lamport time of the network attachment when this
@@ -112,20 +112,20 @@ message NetworkEntry ***REMOVED***
 	string node_name = 3 [(gogoproto.customname) = "NodeName"];
 	// Indicates if a leave from this network is in progress.
 	bool leaving = 4;
-***REMOVED***
+}
 
 // NetworkPushpull message payload definition.
-message NetworkPushPull ***REMOVED***
+message NetworkPushPull {
 	// Lamport time when this push pull was initiated.
 	uint64 l_time = 1 [(gogoproto.customtype) = "github.com/hashicorp/serf/serf.LamportTime", (gogoproto.nullable) = false];
 	repeated NetworkEntry networks = 2;
 	// Name of the node sending this push pull payload.
 	string node_name = 3 [(gogoproto.customname) = "NodeName"];
-***REMOVED***
+}
 
 // TableEvent message payload definition.
-message TableEvent ***REMOVED***
-	enum Type ***REMOVED***
+message TableEvent {
+	enum Type {
 		option (gogoproto.goproto_enum_prefix) = false;
 		option (gogoproto.enum_customname) = "Type";
 
@@ -139,7 +139,7 @@ message TableEvent ***REMOVED***
 		// Delete signifies that this table entry was just
 		// updated.
 		DELETE = 3 [(gogoproto.enumvalue_customname) = "TableEventTypeDelete"];
-	***REMOVED***
+	}
 
 	Type type = 1;
 	// Lamport time when this event was generated.
@@ -156,10 +156,10 @@ message TableEvent ***REMOVED***
 	bytes value = 7;
 	// Residual reap time for the entry before getting deleted in seconds
 	int32 residual_reap_time = 8 [(gogoproto.customname) = "ResidualReapTime"];;
-***REMOVED***
+}
 
 // BulkSync message payload definition.
-message BulkSyncMessage ***REMOVED***
+message BulkSyncMessage {
 	// Lamport time when this bulk sync was initiated.
 	uint64 l_time = 1 [(gogoproto.customtype) = "github.com/hashicorp/serf/serf.LamportTime", (gogoproto.nullable) = false];
 	// Indicates if this bulksync is a response to a bulk sync
@@ -172,16 +172,16 @@ message BulkSyncMessage ***REMOVED***
 	repeated string networks = 4;
 	// Bulksync payload
 	bytes payload = 5;
-***REMOVED***
+}
 
 // Compound message payload definition.
-message CompoundMessage ***REMOVED***
-	message SimpleMessage ***REMOVED***
+message CompoundMessage {
+	message SimpleMessage {
 		// Bytestring payload of a message constructed using
 		// other message type definitions.
 		bytes Payload = 1;
-	***REMOVED***
+	}
 
 	// A list of simple messages.
 	repeated SimpleMessage messages = 1;
-***REMOVED***
+}

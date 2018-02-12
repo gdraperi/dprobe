@@ -25,7 +25,7 @@ with the SDKs's stscreds package.
 
 	// Create service client value configured for credentials
 	// from assumed role.
-	svc := s3.New(sess, &aws.Config***REMOVED***Credentials: creds***REMOVED***)
+	svc := s3.New(sess, &aws.Config{Credentials: creds})
 
 Assume Role with static MFA Token
 
@@ -40,14 +40,14 @@ credentials.
 
 	// Create the credentials from AssumeRoleProvider to assume the role
 	// referenced by the "myRoleARN" ARN using the MFA token code provided.
-	creds := stscreds.NewCredentials(sess, "myRoleArn", func(p *stscreds.AssumeRoleProvider) ***REMOVED***
+	creds := stscreds.NewCredentials(sess, "myRoleArn", func(p *stscreds.AssumeRoleProvider) {
 		p.SerialNumber = aws.String("myTokenSerialNumber")
 		p.TokenCode = aws.String("00000000")
-	***REMOVED***)
+	})
 
 	// Create service client value configured for credentials
 	// from assumed role.
-	svc := s3.New(sess, &aws.Config***REMOVED***Credentials: creds***REMOVED***)
+	svc := s3.New(sess, &aws.Config{Credentials: creds})
 
 Assume Role with MFA Token Provider
 
@@ -66,14 +66,14 @@ single Credentials with an AssumeRoleProvider can be shared safely.
 
 	// Create the credentials from AssumeRoleProvider to assume the role
 	// referenced by the "myRoleARN" ARN. Prompting for MFA token from stdin.
-	creds := stscreds.NewCredentials(sess, "myRoleArn", func(p *stscreds.AssumeRoleProvider) ***REMOVED***
+	creds := stscreds.NewCredentials(sess, "myRoleArn", func(p *stscreds.AssumeRoleProvider) {
 		p.SerialNumber = aws.String("myTokenSerialNumber")
 		p.TokenProvider = stscreds.StdinTokenProvider
-	***REMOVED***)
+	})
 
 	// Create service client value configured for credentials
 	// from assumed role.
-	svc := s3.New(sess, &aws.Config***REMOVED***Credentials: creds***REMOVED***)
+	svc := s3.New(sess, &aws.Config{Credentials: creds})
 
 */
 package stscreds
@@ -100,21 +100,21 @@ import (
 // single Credentials with an AssumeRoleProvider can be shared safely
 //
 // Will wait forever until something is provided on the stdin.
-func StdinTokenProvider() (string, error) ***REMOVED***
+func StdinTokenProvider() (string, error) {
 	var v string
 	fmt.Printf("Assume Role MFA token code: ")
 	_, err := fmt.Scanln(&v)
 
 	return v, err
-***REMOVED***
+}
 
 // ProviderName provides a name of AssumeRole provider
 const ProviderName = "AssumeRoleProvider"
 
 // AssumeRoler represents the minimal subset of the STS client API used by this provider.
-type AssumeRoler interface ***REMOVED***
+type AssumeRoler interface {
 	AssumeRole(input *sts.AssumeRoleInput) (*sts.AssumeRoleOutput, error)
-***REMOVED***
+}
 
 // DefaultDuration is the default amount of time in minutes that the credentials
 // will be valid for.
@@ -130,7 +130,7 @@ var DefaultDuration = time.Duration(15) * time.Minute
 // AssumeRoleProvider does not provide any synchronization and it is not safe
 // to share this value across multiple Credentials, Sessions, or service clients
 // without also sharing the same Credentials instance.
-type AssumeRoleProvider struct ***REMOVED***
+type AssumeRoleProvider struct {
 	credentials.Expiry
 
 	// STS client to make assume role request with.
@@ -193,7 +193,7 @@ type AssumeRoleProvider struct ***REMOVED***
 	//
 	// If ExpiryWindow is 0 or less it will be ignored.
 	ExpiryWindow time.Duration
-***REMOVED***
+}
 
 // NewCredentials returns a pointer to a new Credentials object wrapping the
 // AssumeRoleProvider. The credentials will expire every 15 minutes and the
@@ -205,19 +205,19 @@ type AssumeRoleProvider struct ***REMOVED***
 // It is safe to share the returned Credentials with multiple Sessions and
 // service clients. All access to the credentials and refreshing them
 // will be synchronized.
-func NewCredentials(c client.ConfigProvider, roleARN string, options ...func(*AssumeRoleProvider)) *credentials.Credentials ***REMOVED***
-	p := &AssumeRoleProvider***REMOVED***
+func NewCredentials(c client.ConfigProvider, roleARN string, options ...func(*AssumeRoleProvider)) *credentials.Credentials {
+	p := &AssumeRoleProvider{
 		Client:   sts.New(c),
 		RoleARN:  roleARN,
 		Duration: DefaultDuration,
-	***REMOVED***
+	}
 
-	for _, option := range options ***REMOVED***
+	for _, option := range options {
 		option(p)
-	***REMOVED***
+	}
 
 	return credentials.NewCredentials(p)
-***REMOVED***
+}
 
 // NewCredentialsWithClient returns a pointer to a new Credentials object wrapping the
 // AssumeRoleProvider. The credentials will expire every 15 minutes and the
@@ -228,71 +228,71 @@ func NewCredentials(c client.ConfigProvider, roleARN string, options ...func(*As
 // It is safe to share the returned Credentials with multiple Sessions and
 // service clients. All access to the credentials and refreshing them
 // will be synchronized.
-func NewCredentialsWithClient(svc AssumeRoler, roleARN string, options ...func(*AssumeRoleProvider)) *credentials.Credentials ***REMOVED***
-	p := &AssumeRoleProvider***REMOVED***
+func NewCredentialsWithClient(svc AssumeRoler, roleARN string, options ...func(*AssumeRoleProvider)) *credentials.Credentials {
+	p := &AssumeRoleProvider{
 		Client:   svc,
 		RoleARN:  roleARN,
 		Duration: DefaultDuration,
-	***REMOVED***
+	}
 
-	for _, option := range options ***REMOVED***
+	for _, option := range options {
 		option(p)
-	***REMOVED***
+	}
 
 	return credentials.NewCredentials(p)
-***REMOVED***
+}
 
 // Retrieve generates a new set of temporary credentials using STS.
-func (p *AssumeRoleProvider) Retrieve() (credentials.Value, error) ***REMOVED***
+func (p *AssumeRoleProvider) Retrieve() (credentials.Value, error) {
 
 	// Apply defaults where parameters are not set.
-	if p.RoleSessionName == "" ***REMOVED***
+	if p.RoleSessionName == "" {
 		// Try to work out a role name that will hopefully end up unique.
 		p.RoleSessionName = fmt.Sprintf("%d", time.Now().UTC().UnixNano())
-	***REMOVED***
-	if p.Duration == 0 ***REMOVED***
+	}
+	if p.Duration == 0 {
 		// Expire as often as AWS permits.
 		p.Duration = DefaultDuration
-	***REMOVED***
-	input := &sts.AssumeRoleInput***REMOVED***
+	}
+	input := &sts.AssumeRoleInput{
 		DurationSeconds: aws.Int64(int64(p.Duration / time.Second)),
 		RoleArn:         aws.String(p.RoleARN),
 		RoleSessionName: aws.String(p.RoleSessionName),
 		ExternalId:      p.ExternalID,
-	***REMOVED***
-	if p.Policy != nil ***REMOVED***
+	}
+	if p.Policy != nil {
 		input.Policy = p.Policy
-	***REMOVED***
-	if p.SerialNumber != nil ***REMOVED***
-		if p.TokenCode != nil ***REMOVED***
+	}
+	if p.SerialNumber != nil {
+		if p.TokenCode != nil {
 			input.SerialNumber = p.SerialNumber
 			input.TokenCode = p.TokenCode
-		***REMOVED*** else if p.TokenProvider != nil ***REMOVED***
+		} else if p.TokenProvider != nil {
 			input.SerialNumber = p.SerialNumber
 			code, err := p.TokenProvider()
-			if err != nil ***REMOVED***
-				return credentials.Value***REMOVED***ProviderName: ProviderName***REMOVED***, err
-			***REMOVED***
+			if err != nil {
+				return credentials.Value{ProviderName: ProviderName}, err
+			}
 			input.TokenCode = aws.String(code)
-		***REMOVED*** else ***REMOVED***
-			return credentials.Value***REMOVED***ProviderName: ProviderName***REMOVED***,
+		} else {
+			return credentials.Value{ProviderName: ProviderName},
 				awserr.New("AssumeRoleTokenNotAvailable",
 					"assume role with MFA enabled, but neither TokenCode nor TokenProvider are set", nil)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	roleOutput, err := p.Client.AssumeRole(input)
-	if err != nil ***REMOVED***
-		return credentials.Value***REMOVED***ProviderName: ProviderName***REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return credentials.Value{ProviderName: ProviderName}, err
+	}
 
 	// We will proactively generate new credentials before they expire.
 	p.SetExpiration(*roleOutput.Credentials.Expiration, p.ExpiryWindow)
 
-	return credentials.Value***REMOVED***
+	return credentials.Value{
 		AccessKeyID:     *roleOutput.Credentials.AccessKeyId,
 		SecretAccessKey: *roleOutput.Credentials.SecretAccessKey,
 		SessionToken:    *roleOutput.Credentials.SessionToken,
 		ProviderName:    ProviderName,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}

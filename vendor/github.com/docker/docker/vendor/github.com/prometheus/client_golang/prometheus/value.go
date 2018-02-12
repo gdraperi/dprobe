@@ -42,7 +42,7 @@ var errInconsistentCardinality = errors.New("inconsistent label cardinality")
 // Counter, Gauge, and Untyped. Its effective type is determined by
 // ValueType. This is a low-level building block used by the library to back the
 // implementations of Counter, Gauge, and Untyped.
-type value struct ***REMOVED***
+type value struct {
 	// valBits containst the bits of the represented float64 value. It has
 	// to go first in the struct to guarantee alignment for atomic
 	// operations.  http://golang.org/pkg/sync/atomic/#pkg-note-BUG
@@ -53,73 +53,73 @@ type value struct ***REMOVED***
 	desc       *Desc
 	valType    ValueType
 	labelPairs []*dto.LabelPair
-***REMOVED***
+}
 
 // newValue returns a newly allocated value with the given Desc, ValueType,
 // sample value and label values. It panics if the number of label
 // values is different from the number of variable labels in Desc.
-func newValue(desc *Desc, valueType ValueType, val float64, labelValues ...string) *value ***REMOVED***
-	if len(labelValues) != len(desc.variableLabels) ***REMOVED***
+func newValue(desc *Desc, valueType ValueType, val float64, labelValues ...string) *value {
+	if len(labelValues) != len(desc.variableLabels) {
 		panic(errInconsistentCardinality)
-	***REMOVED***
-	result := &value***REMOVED***
+	}
+	result := &value{
 		desc:       desc,
 		valType:    valueType,
 		valBits:    math.Float64bits(val),
 		labelPairs: makeLabelPairs(desc, labelValues),
-	***REMOVED***
+	}
 	result.Init(result)
 	return result
-***REMOVED***
+}
 
-func (v *value) Desc() *Desc ***REMOVED***
+func (v *value) Desc() *Desc {
 	return v.desc
-***REMOVED***
+}
 
-func (v *value) Set(val float64) ***REMOVED***
+func (v *value) Set(val float64) {
 	atomic.StoreUint64(&v.valBits, math.Float64bits(val))
-***REMOVED***
+}
 
-func (v *value) Inc() ***REMOVED***
+func (v *value) Inc() {
 	v.Add(1)
-***REMOVED***
+}
 
-func (v *value) Dec() ***REMOVED***
+func (v *value) Dec() {
 	v.Add(-1)
-***REMOVED***
+}
 
-func (v *value) Add(val float64) ***REMOVED***
-	for ***REMOVED***
+func (v *value) Add(val float64) {
+	for {
 		oldBits := atomic.LoadUint64(&v.valBits)
 		newBits := math.Float64bits(math.Float64frombits(oldBits) + val)
-		if atomic.CompareAndSwapUint64(&v.valBits, oldBits, newBits) ***REMOVED***
+		if atomic.CompareAndSwapUint64(&v.valBits, oldBits, newBits) {
 			return
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (v *value) Sub(val float64) ***REMOVED***
+func (v *value) Sub(val float64) {
 	v.Add(val * -1)
-***REMOVED***
+}
 
-func (v *value) Write(out *dto.Metric) error ***REMOVED***
+func (v *value) Write(out *dto.Metric) error {
 	val := math.Float64frombits(atomic.LoadUint64(&v.valBits))
 	return populateMetric(v.valType, val, v.labelPairs, out)
-***REMOVED***
+}
 
 // valueFunc is a generic metric for simple values retrieved on collect time
 // from a function. It implements Metric and Collector. Its effective type is
 // determined by ValueType. This is a low-level building block used by the
 // library to back the implementations of CounterFunc, GaugeFunc, and
 // UntypedFunc.
-type valueFunc struct ***REMOVED***
+type valueFunc struct {
 	SelfCollector
 
 	desc       *Desc
 	valType    ValueType
 	function   func() float64
 	labelPairs []*dto.LabelPair
-***REMOVED***
+}
 
 // newValueFunc returns a newly allocated valueFunc with the given Desc and
 // ValueType. The value reported is determined by calling the given function
@@ -127,24 +127,24 @@ type valueFunc struct ***REMOVED***
 // happen concurrently. If that results in concurrent calls to Write, like in
 // the case where a valueFunc is directly registered with Prometheus, the
 // provided function must be concurrency-safe.
-func newValueFunc(desc *Desc, valueType ValueType, function func() float64) *valueFunc ***REMOVED***
-	result := &valueFunc***REMOVED***
+func newValueFunc(desc *Desc, valueType ValueType, function func() float64) *valueFunc {
+	result := &valueFunc{
 		desc:       desc,
 		valType:    valueType,
 		function:   function,
 		labelPairs: makeLabelPairs(desc, nil),
-	***REMOVED***
+	}
 	result.Init(result)
 	return result
-***REMOVED***
+}
 
-func (v *valueFunc) Desc() *Desc ***REMOVED***
+func (v *valueFunc) Desc() *Desc {
 	return v.desc
-***REMOVED***
+}
 
-func (v *valueFunc) Write(out *dto.Metric) error ***REMOVED***
+func (v *valueFunc) Write(out *dto.Metric) error {
 	return populateMetric(v.valType, v.function(), v.labelPairs, out)
-***REMOVED***
+}
 
 // NewConstMetric returns a metric with one fixed value that cannot be
 // changed. Users of this package will not have much use for it in regular
@@ -152,83 +152,83 @@ func (v *valueFunc) Write(out *dto.Metric) error ***REMOVED***
 // throw-away metric that is generated on the fly to send it to Prometheus in
 // the Collect method. NewConstMetric returns an error if the length of
 // labelValues is not consistent with the variable labels in Desc.
-func NewConstMetric(desc *Desc, valueType ValueType, value float64, labelValues ...string) (Metric, error) ***REMOVED***
-	if len(desc.variableLabels) != len(labelValues) ***REMOVED***
+func NewConstMetric(desc *Desc, valueType ValueType, value float64, labelValues ...string) (Metric, error) {
+	if len(desc.variableLabels) != len(labelValues) {
 		return nil, errInconsistentCardinality
-	***REMOVED***
-	return &constMetric***REMOVED***
+	}
+	return &constMetric{
 		desc:       desc,
 		valType:    valueType,
 		val:        value,
 		labelPairs: makeLabelPairs(desc, labelValues),
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // MustNewConstMetric is a version of NewConstMetric that panics where
 // NewConstMetric would have returned an error.
-func MustNewConstMetric(desc *Desc, valueType ValueType, value float64, labelValues ...string) Metric ***REMOVED***
+func MustNewConstMetric(desc *Desc, valueType ValueType, value float64, labelValues ...string) Metric {
 	m, err := NewConstMetric(desc, valueType, value, labelValues...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 	return m
-***REMOVED***
+}
 
-type constMetric struct ***REMOVED***
+type constMetric struct {
 	desc       *Desc
 	valType    ValueType
 	val        float64
 	labelPairs []*dto.LabelPair
-***REMOVED***
+}
 
-func (m *constMetric) Desc() *Desc ***REMOVED***
+func (m *constMetric) Desc() *Desc {
 	return m.desc
-***REMOVED***
+}
 
-func (m *constMetric) Write(out *dto.Metric) error ***REMOVED***
+func (m *constMetric) Write(out *dto.Metric) error {
 	return populateMetric(m.valType, m.val, m.labelPairs, out)
-***REMOVED***
+}
 
 func populateMetric(
 	t ValueType,
 	v float64,
 	labelPairs []*dto.LabelPair,
 	m *dto.Metric,
-) error ***REMOVED***
+) error {
 	m.Label = labelPairs
-	switch t ***REMOVED***
+	switch t {
 	case CounterValue:
-		m.Counter = &dto.Counter***REMOVED***Value: proto.Float64(v)***REMOVED***
+		m.Counter = &dto.Counter{Value: proto.Float64(v)}
 	case GaugeValue:
-		m.Gauge = &dto.Gauge***REMOVED***Value: proto.Float64(v)***REMOVED***
+		m.Gauge = &dto.Gauge{Value: proto.Float64(v)}
 	case UntypedValue:
-		m.Untyped = &dto.Untyped***REMOVED***Value: proto.Float64(v)***REMOVED***
+		m.Untyped = &dto.Untyped{Value: proto.Float64(v)}
 	default:
 		return fmt.Errorf("encountered unknown type %v", t)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func makeLabelPairs(desc *Desc, labelValues []string) []*dto.LabelPair ***REMOVED***
+func makeLabelPairs(desc *Desc, labelValues []string) []*dto.LabelPair {
 	totalLen := len(desc.variableLabels) + len(desc.constLabelPairs)
-	if totalLen == 0 ***REMOVED***
+	if totalLen == 0 {
 		// Super fast path.
 		return nil
-	***REMOVED***
-	if len(desc.variableLabels) == 0 ***REMOVED***
+	}
+	if len(desc.variableLabels) == 0 {
 		// Moderately fast path.
 		return desc.constLabelPairs
-	***REMOVED***
+	}
 	labelPairs := make([]*dto.LabelPair, 0, totalLen)
-	for i, n := range desc.variableLabels ***REMOVED***
-		labelPairs = append(labelPairs, &dto.LabelPair***REMOVED***
+	for i, n := range desc.variableLabels {
+		labelPairs = append(labelPairs, &dto.LabelPair{
 			Name:  proto.String(n),
 			Value: proto.String(labelValues[i]),
-		***REMOVED***)
-	***REMOVED***
-	for _, lp := range desc.constLabelPairs ***REMOVED***
+		})
+	}
+	for _, lp := range desc.constLabelPairs {
 		labelPairs = append(labelPairs, lp)
-	***REMOVED***
+	}
 	sort.Sort(LabelPairSorter(labelPairs))
 	return labelPairs
-***REMOVED***
+}

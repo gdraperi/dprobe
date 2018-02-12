@@ -18,78 +18,78 @@ import (
 	"os"
 )
 
-type File struct ***REMOVED***
+type File struct {
 	fd *sftp.File
-***REMOVED***
+}
 
-func FileOpen(s *sftp.Client, name string) (*File, error) ***REMOVED***
+func FileOpen(s *sftp.Client, name string) (*File, error) {
 	fd, err := s.Open(name)
-	if err != nil ***REMOVED***
-		return &File***REMOVED******REMOVED***, err
-	***REMOVED***
-	return &File***REMOVED***fd: fd***REMOVED***, nil
-***REMOVED***
+	if err != nil {
+		return &File{}, err
+	}
+	return &File{fd: fd}, nil
+}
 
-func FileCreate(s *sftp.Client, name string) (*File, error) ***REMOVED***
+func FileCreate(s *sftp.Client, name string) (*File, error) {
 	fd, err := s.Create(name)
-	if err != nil ***REMOVED***
-		return &File***REMOVED******REMOVED***, err
-	***REMOVED***
-	return &File***REMOVED***fd: fd***REMOVED***, nil
-***REMOVED***
+	if err != nil {
+		return &File{}, err
+	}
+	return &File{fd: fd}, nil
+}
 
-func (f *File) Close() error ***REMOVED***
+func (f *File) Close() error {
 	return f.fd.Close()
-***REMOVED***
+}
 
-func (f *File) Name() string ***REMOVED***
+func (f *File) Name() string {
 	return f.fd.Name()
-***REMOVED***
+}
 
-func (f *File) Stat() (os.FileInfo, error) ***REMOVED***
+func (f *File) Stat() (os.FileInfo, error) {
 	return f.fd.Stat()
-***REMOVED***
+}
 
-func (f *File) Sync() error ***REMOVED***
+func (f *File) Sync() error {
 	return nil
-***REMOVED***
+}
 
-func (f *File) Truncate(size int64) error ***REMOVED***
+func (f *File) Truncate(size int64) error {
 	return f.fd.Truncate(size)
-***REMOVED***
+}
 
-func (f *File) Read(b []byte) (n int, err error) ***REMOVED***
+func (f *File) Read(b []byte) (n int, err error) {
 	return f.fd.Read(b)
-***REMOVED***
+}
 
 // TODO
-func (f *File) ReadAt(b []byte, off int64) (n int, err error) ***REMOVED***
+func (f *File) ReadAt(b []byte, off int64) (n int, err error) {
 	return 0, nil
-***REMOVED***
+}
 
 // TODO
-func (f *File) Readdir(count int) (res []os.FileInfo, err error) ***REMOVED***
+func (f *File) Readdir(count int) (res []os.FileInfo, err error) {
 	return nil, nil
-***REMOVED***
+}
 
 // TODO
-func (f *File) Readdirnames(n int) (names []string, err error) ***REMOVED***
+func (f *File) Readdirnames(n int) (names []string, err error) {
 	return nil, nil
-***REMOVED***
+}
 
-func (f *File) Seek(offset int64, whence int) (int64, error) ***REMOVED***
+func (f *File) Seek(offset int64, whence int) (int64, error) {
 	return f.fd.Seek(offset, whence)
-***REMOVED***
+}
 
-func (f *File) Write(b []byte) (n int, err error) ***REMOVED***
+func (f *File) Write(b []byte) (n int, err error) {
 	return f.fd.Write(b)
-***REMOVED***
+}
 
 // TODO
-func (f *File) WriteAt(b []byte, off int64) (n int, err error) ***REMOVED***
+func (f *File) WriteAt(b []byte, off int64) (n int, err error) {
 	return 0, nil
-***REMOVED***
+}
 
-func (f *File) WriteString(s string) (ret int, err error) ***REMOVED***
+func (f *File) WriteString(s string) (ret int, err error) {
 	return f.fd.Write([]byte(s))
-***REMOVED***
+}

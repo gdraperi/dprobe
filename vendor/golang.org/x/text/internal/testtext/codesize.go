@@ -18,36 +18,36 @@ import (
 // if an error occurred. The code sample typically will look like this:
 //     package main
 //     import "golang.org/x/text/somepackage"
-//     func main() ***REMOVED***
+//     func main() {
 //         somepackage.Func() // reference Func to cause it to be linked in.
-// ***REMOVED***
+//     }
 // See dict_test.go in the display package for an example.
-func CodeSize(s string) (int, error) ***REMOVED***
+func CodeSize(s string) (int, error) {
 	// Write the file.
 	tmpdir, err := ioutil.TempDir(os.TempDir(), "testtext")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, fmt.Errorf("testtext: failed to create tmpdir: %v", err)
-	***REMOVED***
+	}
 	defer os.RemoveAll(tmpdir)
 	filename := filepath.Join(tmpdir, "main.go")
-	if err := ioutil.WriteFile(filename, []byte(s), 0644); err != nil ***REMOVED***
+	if err := ioutil.WriteFile(filename, []byte(s), 0644); err != nil {
 		return 0, fmt.Errorf("testtext: failed to write main.go: %v", err)
-	***REMOVED***
+	}
 
 	// Build the binary.
-	w := &bytes.Buffer***REMOVED******REMOVED***
+	w := &bytes.Buffer{}
 	cmd := exec.Command(filepath.Join(runtime.GOROOT(), "bin", "go"), "build", "-o", "main")
 	cmd.Dir = tmpdir
 	cmd.Stderr = w
 	cmd.Stdout = w
-	if err := cmd.Run(); err != nil ***REMOVED***
+	if err := cmd.Run(); err != nil {
 		return 0, fmt.Errorf("testtext: failed to execute command: %v\nmain.go:\n%vErrors:%s", err, s, w)
-	***REMOVED***
+	}
 
 	// Determine the size.
 	fi, err := os.Stat(filepath.Join(tmpdir, "main"))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, fmt.Errorf("testtext: failed to get file info: %v", err)
-	***REMOVED***
+	}
 	return int(fi.Size()), nil
-***REMOVED***
+}

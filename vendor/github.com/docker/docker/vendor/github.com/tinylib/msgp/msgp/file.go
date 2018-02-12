@@ -21,31 +21,31 @@ import (
 // files are best read and written using
 // the ordinary streaming interfaces.
 //
-func ReadFile(dst Unmarshaler, file *os.File) error ***REMOVED***
+func ReadFile(dst Unmarshaler, file *os.File) error {
 	stat, err := file.Stat()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	data, err := syscall.Mmap(int(file.Fd()), 0, int(stat.Size()), syscall.PROT_READ, syscall.MAP_SHARED)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	adviseRead(data)
 	_, err = dst.UnmarshalMsg(data)
 	uerr := syscall.Munmap(data)
-	if err == nil ***REMOVED***
+	if err == nil {
 		err = uerr
-	***REMOVED***
+	}
 	return err
-***REMOVED***
+}
 
 // MarshalSizer is the combination
 // of the Marshaler and Sizer
 // interfaces.
-type MarshalSizer interface ***REMOVED***
+type MarshalSizer interface {
 	Marshaler
 	Sizer
-***REMOVED***
+}
 
 // WriteFile writes a file from 'src' using
 // memory mapping. It overwrites the entire
@@ -68,25 +68,25 @@ type MarshalSizer interface ***REMOVED***
 // performs as expected in a production environment.
 // (Linux users should run a kernel and filesystem
 // that support fallocate(2) for the best results.)
-func WriteFile(src MarshalSizer, file *os.File) error ***REMOVED***
+func WriteFile(src MarshalSizer, file *os.File) error {
 	sz := src.Msgsize()
 	err := fallocate(file, int64(sz))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	data, err := syscall.Mmap(int(file.Fd()), 0, sz, syscall.PROT_READ|syscall.PROT_WRITE, syscall.MAP_SHARED)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	adviseWrite(data)
 	chunk := data[:0]
 	chunk, err = src.MarshalMsg(chunk)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	uerr := syscall.Munmap(data)
-	if uerr != nil ***REMOVED***
+	if uerr != nil {
 		return uerr
-	***REMOVED***
+	}
 	return file.Truncate(int64(len(chunk)))
-***REMOVED***
+}

@@ -32,70 +32,70 @@ import (
 	"sort"
 )
 
-func Strings(l []string) ***REMOVED***
+func Strings(l []string) {
 	sort.Strings(l)
-***REMOVED***
+}
 
-func Float64s(l []float64) ***REMOVED***
+func Float64s(l []float64) {
 	sort.Float64s(l)
-***REMOVED***
+}
 
-func Float32s(l []float32) ***REMOVED***
+func Float32s(l []float32) {
 	sort.Sort(Float32Slice(l))
-***REMOVED***
+}
 
-func Int64s(l []int64) ***REMOVED***
+func Int64s(l []int64) {
 	sort.Sort(Int64Slice(l))
-***REMOVED***
+}
 
-func Int32s(l []int32) ***REMOVED***
+func Int32s(l []int32) {
 	sort.Sort(Int32Slice(l))
-***REMOVED***
+}
 
-func Uint64s(l []uint64) ***REMOVED***
+func Uint64s(l []uint64) {
 	sort.Sort(Uint64Slice(l))
-***REMOVED***
+}
 
-func Uint32s(l []uint32) ***REMOVED***
+func Uint32s(l []uint32) {
 	sort.Sort(Uint32Slice(l))
-***REMOVED***
+}
 
-func Bools(l []bool) ***REMOVED***
+func Bools(l []bool) {
 	sort.Sort(BoolSlice(l))
-***REMOVED***
+}
 
 type BoolSlice []bool
 
-func (p BoolSlice) Len() int           ***REMOVED*** return len(p) ***REMOVED***
-func (p BoolSlice) Less(i, j int) bool ***REMOVED*** return p[j] ***REMOVED***
-func (p BoolSlice) Swap(i, j int)      ***REMOVED*** p[i], p[j] = p[j], p[i] ***REMOVED***
+func (p BoolSlice) Len() int           { return len(p) }
+func (p BoolSlice) Less(i, j int) bool { return p[j] }
+func (p BoolSlice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
 
 type Int64Slice []int64
 
-func (p Int64Slice) Len() int           ***REMOVED*** return len(p) ***REMOVED***
-func (p Int64Slice) Less(i, j int) bool ***REMOVED*** return p[i] < p[j] ***REMOVED***
-func (p Int64Slice) Swap(i, j int)      ***REMOVED*** p[i], p[j] = p[j], p[i] ***REMOVED***
+func (p Int64Slice) Len() int           { return len(p) }
+func (p Int64Slice) Less(i, j int) bool { return p[i] < p[j] }
+func (p Int64Slice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
 
 type Int32Slice []int32
 
-func (p Int32Slice) Len() int           ***REMOVED*** return len(p) ***REMOVED***
-func (p Int32Slice) Less(i, j int) bool ***REMOVED*** return p[i] < p[j] ***REMOVED***
-func (p Int32Slice) Swap(i, j int)      ***REMOVED*** p[i], p[j] = p[j], p[i] ***REMOVED***
+func (p Int32Slice) Len() int           { return len(p) }
+func (p Int32Slice) Less(i, j int) bool { return p[i] < p[j] }
+func (p Int32Slice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
 
 type Uint64Slice []uint64
 
-func (p Uint64Slice) Len() int           ***REMOVED*** return len(p) ***REMOVED***
-func (p Uint64Slice) Less(i, j int) bool ***REMOVED*** return p[i] < p[j] ***REMOVED***
-func (p Uint64Slice) Swap(i, j int)      ***REMOVED*** p[i], p[j] = p[j], p[i] ***REMOVED***
+func (p Uint64Slice) Len() int           { return len(p) }
+func (p Uint64Slice) Less(i, j int) bool { return p[i] < p[j] }
+func (p Uint64Slice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
 
 type Uint32Slice []uint32
 
-func (p Uint32Slice) Len() int           ***REMOVED*** return len(p) ***REMOVED***
-func (p Uint32Slice) Less(i, j int) bool ***REMOVED*** return p[i] < p[j] ***REMOVED***
-func (p Uint32Slice) Swap(i, j int)      ***REMOVED*** p[i], p[j] = p[j], p[i] ***REMOVED***
+func (p Uint32Slice) Len() int           { return len(p) }
+func (p Uint32Slice) Less(i, j int) bool { return p[i] < p[j] }
+func (p Uint32Slice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
 
 type Float32Slice []float32
 
-func (p Float32Slice) Len() int           ***REMOVED*** return len(p) ***REMOVED***
-func (p Float32Slice) Less(i, j int) bool ***REMOVED*** return p[i] < p[j] ***REMOVED***
-func (p Float32Slice) Swap(i, j int)      ***REMOVED*** p[i], p[j] = p[j], p[i] ***REMOVED***
+func (p Float32Slice) Len() int           { return len(p) }
+func (p Float32Slice) Less(i, j int) bool { return p[i] < p[j] }
+func (p Float32Slice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }

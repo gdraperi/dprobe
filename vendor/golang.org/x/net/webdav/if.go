@@ -12,112 +12,112 @@ import (
 )
 
 // ifHeader is a disjunction (OR) of ifLists.
-type ifHeader struct ***REMOVED***
+type ifHeader struct {
 	lists []ifList
-***REMOVED***
+}
 
 // ifList is a conjunction (AND) of Conditions, and an optional resource tag.
-type ifList struct ***REMOVED***
+type ifList struct {
 	resourceTag string
 	conditions  []Condition
-***REMOVED***
+}
 
 // parseIfHeader parses the "If: foo bar" HTTP header. The httpHeader string
 // should omit the "If:" prefix and have any "\r\n"s collapsed to a " ", as is
 // returned by req.Header.Get("If") for a http.Request req.
-func parseIfHeader(httpHeader string) (h ifHeader, ok bool) ***REMOVED***
+func parseIfHeader(httpHeader string) (h ifHeader, ok bool) {
 	s := strings.TrimSpace(httpHeader)
-	switch tokenType, _, _ := lex(s); tokenType ***REMOVED***
+	switch tokenType, _, _ := lex(s); tokenType {
 	case '(':
 		return parseNoTagLists(s)
 	case angleTokenType:
 		return parseTaggedLists(s)
 	default:
-		return ifHeader***REMOVED******REMOVED***, false
-	***REMOVED***
-***REMOVED***
+		return ifHeader{}, false
+	}
+}
 
-func parseNoTagLists(s string) (h ifHeader, ok bool) ***REMOVED***
-	for ***REMOVED***
+func parseNoTagLists(s string) (h ifHeader, ok bool) {
+	for {
 		l, remaining, ok := parseList(s)
-		if !ok ***REMOVED***
-			return ifHeader***REMOVED******REMOVED***, false
-		***REMOVED***
+		if !ok {
+			return ifHeader{}, false
+		}
 		h.lists = append(h.lists, l)
-		if remaining == "" ***REMOVED***
+		if remaining == "" {
 			return h, true
-		***REMOVED***
+		}
 		s = remaining
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func parseTaggedLists(s string) (h ifHeader, ok bool) ***REMOVED***
+func parseTaggedLists(s string) (h ifHeader, ok bool) {
 	resourceTag, n := "", 0
-	for first := true; ; first = false ***REMOVED***
+	for first := true; ; first = false {
 		tokenType, tokenStr, remaining := lex(s)
-		switch tokenType ***REMOVED***
+		switch tokenType {
 		case angleTokenType:
-			if !first && n == 0 ***REMOVED***
-				return ifHeader***REMOVED******REMOVED***, false
-			***REMOVED***
+			if !first && n == 0 {
+				return ifHeader{}, false
+			}
 			resourceTag, n = tokenStr, 0
 			s = remaining
 		case '(':
 			n++
 			l, remaining, ok := parseList(s)
-			if !ok ***REMOVED***
-				return ifHeader***REMOVED******REMOVED***, false
-			***REMOVED***
+			if !ok {
+				return ifHeader{}, false
+			}
 			l.resourceTag = resourceTag
 			h.lists = append(h.lists, l)
-			if remaining == "" ***REMOVED***
+			if remaining == "" {
 				return h, true
-			***REMOVED***
+			}
 			s = remaining
 		default:
-			return ifHeader***REMOVED******REMOVED***, false
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			return ifHeader{}, false
+		}
+	}
+}
 
-func parseList(s string) (l ifList, remaining string, ok bool) ***REMOVED***
+func parseList(s string) (l ifList, remaining string, ok bool) {
 	tokenType, _, s := lex(s)
-	if tokenType != '(' ***REMOVED***
-		return ifList***REMOVED******REMOVED***, "", false
-	***REMOVED***
-	for ***REMOVED***
+	if tokenType != '(' {
+		return ifList{}, "", false
+	}
+	for {
 		tokenType, _, remaining = lex(s)
-		if tokenType == ')' ***REMOVED***
-			if len(l.conditions) == 0 ***REMOVED***
-				return ifList***REMOVED******REMOVED***, "", false
-			***REMOVED***
+		if tokenType == ')' {
+			if len(l.conditions) == 0 {
+				return ifList{}, "", false
+			}
 			return l, remaining, true
-		***REMOVED***
+		}
 		c, remaining, ok := parseCondition(s)
-		if !ok ***REMOVED***
-			return ifList***REMOVED******REMOVED***, "", false
-		***REMOVED***
+		if !ok {
+			return ifList{}, "", false
+		}
 		l.conditions = append(l.conditions, c)
 		s = remaining
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func parseCondition(s string) (c Condition, remaining string, ok bool) ***REMOVED***
+func parseCondition(s string) (c Condition, remaining string, ok bool) {
 	tokenType, tokenStr, s := lex(s)
-	if tokenType == notTokenType ***REMOVED***
+	if tokenType == notTokenType {
 		c.Not = true
 		tokenType, tokenStr, s = lex(s)
-	***REMOVED***
-	switch tokenType ***REMOVED***
+	}
+	switch tokenType {
 	case strTokenType, angleTokenType:
 		c.Token = tokenStr
 	case squareTokenType:
 		c.ETag = tokenStr
 	default:
-		return Condition***REMOVED******REMOVED***, "", false
-	***REMOVED***
+		return Condition{}, "", false
+	}
 	return c, s, true
-***REMOVED***
+}
 
 // Single-rune tokens like '(' or ')' have a token type equal to their rune.
 // All other tokens have a negative token type.
@@ -130,44 +130,44 @@ const (
 	squareTokenType = rune(-6)
 )
 
-func lex(s string) (tokenType rune, tokenStr string, remaining string) ***REMOVED***
+func lex(s string) (tokenType rune, tokenStr string, remaining string) {
 	// The net/textproto Reader that parses the HTTP header will collapse
 	// Linear White Space that spans multiple "\r\n" lines to a single " ",
 	// so we don't need to look for '\r' or '\n'.
-	for len(s) > 0 && (s[0] == '\t' || s[0] == ' ') ***REMOVED***
+	for len(s) > 0 && (s[0] == '\t' || s[0] == ' ') {
 		s = s[1:]
-	***REMOVED***
-	if len(s) == 0 ***REMOVED***
+	}
+	if len(s) == 0 {
 		return eofTokenType, "", ""
-	***REMOVED***
+	}
 	i := 0
 loop:
-	for ; i < len(s); i++ ***REMOVED***
-		switch s[i] ***REMOVED***
+	for ; i < len(s); i++ {
+		switch s[i] {
 		case '\t', ' ', '(', ')', '<', '>', '[', ']':
 			break loop
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if i != 0 ***REMOVED***
+	if i != 0 {
 		tokenStr, remaining = s[:i], s[i:]
-		if tokenStr == "Not" ***REMOVED***
+		if tokenStr == "Not" {
 			return notTokenType, "", remaining
-		***REMOVED***
+		}
 		return strTokenType, tokenStr, remaining
-	***REMOVED***
+	}
 
 	j := 0
-	switch s[0] ***REMOVED***
+	switch s[0] {
 	case '<':
 		j, tokenType = strings.IndexByte(s, '>'), angleTokenType
 	case '[':
 		j, tokenType = strings.IndexByte(s, ']'), squareTokenType
 	default:
 		return rune(s[0]), "", s[1:]
-	***REMOVED***
-	if j < 0 ***REMOVED***
+	}
+	if j < 0 {
 		return errTokenType, "", ""
-	***REMOVED***
+	}
 	return tokenType, s[1:j], s[j+1:]
-***REMOVED***
+}

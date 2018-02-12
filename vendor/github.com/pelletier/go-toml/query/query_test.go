@@ -7,26 +7,26 @@ import (
 	"github.com/pelletier/go-toml"
 )
 
-func assertArrayContainsInAnyOrder(t *testing.T, array []interface***REMOVED******REMOVED***, objects ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if len(array) != len(objects) ***REMOVED***
+func assertArrayContainsInAnyOrder(t *testing.T, array []interface{}, objects ...interface{}) {
+	if len(array) != len(objects) {
 		t.Fatalf("array contains %d objects but %d are expected", len(array), len(objects))
-	***REMOVED***
+	}
 
-	for _, o := range objects ***REMOVED***
+	for _, o := range objects {
 		found := false
-		for _, a := range array ***REMOVED***
-			if a == o ***REMOVED***
+		for _, a := range array {
+			if a == o {
 				found = true
 				break
-			***REMOVED***
-		***REMOVED***
-		if !found ***REMOVED***
+			}
+		}
+		if !found {
 			t.Fatal(o, "not found in array", array)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestQueryExample(t *testing.T) ***REMOVED***
+func TestQueryExample(t *testing.T) {
 	config, _ := toml.Load(`
       [[book]]
       title = "The Stand"
@@ -39,17 +39,17 @@ func TestQueryExample(t *testing.T) ***REMOVED***
       author = "William Gibson"
     `)
 	authors, err := CompileAndExecute("$.book.author", config)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal("unexpected error:", err)
-	***REMOVED***
+	}
 	names := authors.Values()
-	if len(names) != 3 ***REMOVED***
+	if len(names) != 3 {
 		t.Fatalf("query should return 3 names but returned %d", len(names))
-	***REMOVED***
+	}
 	assertArrayContainsInAnyOrder(t, names, "Stephen King", "Ernest Hemmingway", "William Gibson")
-***REMOVED***
+}
 
-func TestQueryReadmeExample(t *testing.T) ***REMOVED***
+func TestQueryReadmeExample(t *testing.T) {
 	config, _ := toml.Load(`
 [postgres]
 user = "pelletier"
@@ -57,33 +57,33 @@ password = "mypassword"
 `)
 
 	query, err := Compile("$..[user,password]")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal("unexpected error:", err)
-	***REMOVED***
+	}
 	results := query.Execute(config)
 	values := results.Values()
-	if len(values) != 2 ***REMOVED***
+	if len(values) != 2 {
 		t.Fatalf("query should return 2 values but returned %d", len(values))
-	***REMOVED***
+	}
 	assertArrayContainsInAnyOrder(t, values, "pelletier", "mypassword")
-***REMOVED***
+}
 
-func TestQueryPathNotPresent(t *testing.T) ***REMOVED***
+func TestQueryPathNotPresent(t *testing.T) {
 	config, _ := toml.Load(`a = "hello"`)
 	query, err := Compile("$.foo.bar")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal("unexpected error:", err)
-	***REMOVED***
+	}
 	results := query.Execute(config)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("err should be nil. got %s instead", err)
-	***REMOVED***
-	if len(results.items) != 0 ***REMOVED***
+	}
+	if len(results.items) != 0 {
 		t.Fatalf("no items should be matched. %d matched instead", len(results.items))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func ExampleNodeFilterFn_filterExample() ***REMOVED***
+func ExampleNodeFilterFn_filterExample() {
 	tree, _ := toml.Load(`
       [struct_one]
       foo = "foo"
@@ -98,18 +98,18 @@ func ExampleNodeFilterFn_filterExample() ***REMOVED***
 	query, _ := Compile("$[?(bazOnly)]")
 
 	// define the filter, and assign it to the query
-	query.SetFilter("bazOnly", func(node interface***REMOVED******REMOVED***) bool ***REMOVED***
-		if tree, ok := node.(*toml.Tree); ok ***REMOVED***
+	query.SetFilter("bazOnly", func(node interface{}) bool {
+		if tree, ok := node.(*toml.Tree); ok {
 			return tree.Has("baz")
-		***REMOVED***
+		}
 		return false // reject all other node types
-	***REMOVED***)
+	})
 
 	// results contain only the 'struct_two' Tree
 	query.Execute(tree)
-***REMOVED***
+}
 
-func ExampleQuery_queryExample() ***REMOVED***
+func ExampleQuery_queryExample() {
 	config, _ := toml.Load(`
       [[book]]
       title = "The Stand"
@@ -125,33 +125,33 @@ func ExampleQuery_queryExample() ***REMOVED***
 	// find and print all the authors in the document
 	query, _ := Compile("$.book.author")
 	authors := query.Execute(config)
-	for _, name := range authors.Values() ***REMOVED***
+	for _, name := range authors.Values() {
 		fmt.Println(name)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestTomlQuery(t *testing.T) ***REMOVED***
+func TestTomlQuery(t *testing.T) {
 	tree, err := toml.Load("[foo.bar]\na=1\nb=2\n[baz.foo]\na=3\nb=4\n[gorf.foo]\na=5\nb=6")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Error(err)
 		return
-	***REMOVED***
+	}
 	query, err := Compile("$.foo.bar")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Error(err)
 		return
-	***REMOVED***
+	}
 	result := query.Execute(tree)
 	values := result.Values()
-	if len(values) != 1 ***REMOVED***
+	if len(values) != 1 {
 		t.Errorf("Expected resultset of 1, got %d instead: %v", len(values), values)
-	***REMOVED***
+	}
 
-	if tt, ok := values[0].(*toml.Tree); !ok ***REMOVED***
+	if tt, ok := values[0].(*toml.Tree); !ok {
 		t.Errorf("Expected type of Tree: %T", values[0])
-	***REMOVED*** else if tt.Get("a") != int64(1) ***REMOVED***
+	} else if tt.Get("a") != int64(1) {
 		t.Errorf("Expected 'a' with a value 1: %v", tt.Get("a"))
-	***REMOVED*** else if tt.Get("b") != int64(2) ***REMOVED***
+	} else if tt.Get("b") != int64(2) {
 		t.Errorf("Expected 'b' with a value 2: %v", tt.Get("b"))
-	***REMOVED***
-***REMOVED***
+	}
+}

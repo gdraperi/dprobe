@@ -11,24 +11,24 @@ import (
 	"golang.org/x/text/language"
 )
 
-func Example() ***REMOVED***
-	src := []string***REMOVED***
+func Example() {
+	src := []string{
 		"hello world!",
 		"i with dot",
 		"'n ijsberg",
 		"here comes O'Brian",
-	***REMOVED***
-	for _, c := range []cases.Caser***REMOVED***
+	}
+	for _, c := range []cases.Caser{
 		cases.Lower(language.Und),
 		cases.Upper(language.Turkish),
 		cases.Title(language.Dutch),
 		cases.Title(language.Und, cases.NoLower),
-	***REMOVED*** ***REMOVED***
+	} {
 		fmt.Println()
-		for _, s := range src ***REMOVED***
+		for _, s := range src {
 			fmt.Println(c.String(s))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Output:
 	// hello world!
@@ -50,4 +50,4 @@ func Example() ***REMOVED***
 	// I With Dot
 	// 'N Ijsberg
 	// Here Comes O'Brian
-***REMOVED***
+}

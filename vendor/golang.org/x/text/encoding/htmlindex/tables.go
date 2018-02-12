@@ -48,7 +48,7 @@ const (
 	numEncodings
 )
 
-var canonical = [numEncodings]string***REMOVED***
+var canonical = [numEncodings]string{
 	"utf-8",
 	"ibm866",
 	"iso-8859-2",
@@ -89,9 +89,9 @@ var canonical = [numEncodings]string***REMOVED***
 	"utf-16be",
 	"utf-16le",
 	"x-user-defined",
-***REMOVED***
+}
 
-var nameMap = map[string]htmlEncoding***REMOVED***
+var nameMap = map[string]htmlEncoding{
 	"unicode-1-1-utf-8":   utf8,
 	"utf-8":               utf8,
 	"utf8":                utf8,
@@ -310,9 +310,9 @@ var nameMap = map[string]htmlEncoding***REMOVED***
 	"utf-16":              utf16le,
 	"utf-16le":            utf16le,
 	"x-user-defined":      xUserDefined,
-***REMOVED***
+}
 
-var localeMap = []htmlEncoding***REMOVED***
+var localeMap = []htmlEncoding{
 	windows1252, // und_Latn
 	windows1256, // ar
 	windows1251, // ba
@@ -347,6 +347,6 @@ var localeMap = []htmlEncoding***REMOVED***
 	windows1258, // vi
 	gb18030,     // zh-hans
 	big5,        // zh-hant
-***REMOVED***
+}
 
 const locales = "und_Latn ar ba be bg cs el et fa he hr hu ja kk ko ku ky lt lv mk pl ru sah sk sl sr tg th tr tt uk vi zh-hans zh-hant"

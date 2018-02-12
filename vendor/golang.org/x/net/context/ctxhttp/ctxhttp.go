@@ -23,52 +23,52 @@ import (
 //
 // The provided ctx must be non-nil. If it is canceled or times out,
 // ctx.Err() will be returned.
-func Do(ctx context.Context, client *http.Client, req *http.Request) (*http.Response, error) ***REMOVED***
-	if client == nil ***REMOVED***
+func Do(ctx context.Context, client *http.Client, req *http.Request) (*http.Response, error) {
+	if client == nil {
 		client = http.DefaultClient
-	***REMOVED***
+	}
 	resp, err := client.Do(req.WithContext(ctx))
 	// If we got an error, and the context has been canceled,
 	// the context's error is probably more useful.
-	if err != nil ***REMOVED***
-		select ***REMOVED***
+	if err != nil {
+		select {
 		case <-ctx.Done():
 			err = ctx.Err()
 		default:
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return resp, err
-***REMOVED***
+}
 
 // Get issues a GET request via the Do function.
-func Get(ctx context.Context, client *http.Client, url string) (*http.Response, error) ***REMOVED***
+func Get(ctx context.Context, client *http.Client, url string) (*http.Response, error) {
 	req, err := http.NewRequest("GET", url, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return Do(ctx, client, req)
-***REMOVED***
+}
 
 // Head issues a HEAD request via the Do function.
-func Head(ctx context.Context, client *http.Client, url string) (*http.Response, error) ***REMOVED***
+func Head(ctx context.Context, client *http.Client, url string) (*http.Response, error) {
 	req, err := http.NewRequest("HEAD", url, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return Do(ctx, client, req)
-***REMOVED***
+}
 
 // Post issues a POST request via the Do function.
-func Post(ctx context.Context, client *http.Client, url string, bodyType string, body io.Reader) (*http.Response, error) ***REMOVED***
+func Post(ctx context.Context, client *http.Client, url string, bodyType string, body io.Reader) (*http.Response, error) {
 	req, err := http.NewRequest("POST", url, body)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	req.Header.Set("Content-Type", bodyType)
 	return Do(ctx, client, req)
-***REMOVED***
+}
 
 // PostForm issues a POST request via the Do function.
-func PostForm(ctx context.Context, client *http.Client, url string, data url.Values) (*http.Response, error) ***REMOVED***
+func PostForm(ctx context.Context, client *http.Client, url string, data url.Values) (*http.Response, error) {
 	return Post(ctx, client, url, "application/x-www-form-urlencoded", strings.NewReader(data.Encode()))
-***REMOVED***
+}

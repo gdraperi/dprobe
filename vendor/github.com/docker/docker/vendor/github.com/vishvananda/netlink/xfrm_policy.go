@@ -17,8 +17,8 @@ const (
 	XFRM_SOCKET_FWD
 )
 
-func (d Dir) String() string ***REMOVED***
-	switch d ***REMOVED***
+func (d Dir) String() string {
+	switch d {
 	case XFRM_DIR_IN:
 		return "dir in"
 	case XFRM_DIR_OUT:
@@ -31,31 +31,31 @@ func (d Dir) String() string ***REMOVED***
 		return "socket out"
 	case XFRM_SOCKET_FWD:
 		return "socket fwd"
-	***REMOVED***
+	}
 	return fmt.Sprintf("socket %d", d-XFRM_SOCKET_IN)
-***REMOVED***
+}
 
 // XfrmPolicyTmpl encapsulates a rule for the base addresses of an ipsec
 // policy. These rules are matched with XfrmState to determine encryption
 // and authentication algorithms.
-type XfrmPolicyTmpl struct ***REMOVED***
+type XfrmPolicyTmpl struct {
 	Dst   net.IP
 	Src   net.IP
 	Proto Proto
 	Mode  Mode
 	Spi   int
 	Reqid int
-***REMOVED***
+}
 
-func (t XfrmPolicyTmpl) String() string ***REMOVED***
-	return fmt.Sprintf("***REMOVED***Dst: %v, Src: %v, Proto: %s, Mode: %s, Spi: 0x%x, Reqid: 0x%x***REMOVED***",
+func (t XfrmPolicyTmpl) String() string {
+	return fmt.Sprintf("{Dst: %v, Src: %v, Proto: %s, Mode: %s, Spi: 0x%x, Reqid: 0x%x}",
 		t.Dst, t.Src, t.Proto, t.Mode, t.Spi, t.Reqid)
-***REMOVED***
+}
 
 // XfrmPolicy represents an ipsec policy. It represents the overlay network
 // and has a list of XfrmPolicyTmpls representing the base addresses of
 // the policy.
-type XfrmPolicy struct ***REMOVED***
+type XfrmPolicy struct {
 	Dst      *net.IPNet
 	Src      *net.IPNet
 	Proto    Proto
@@ -66,9 +66,9 @@ type XfrmPolicy struct ***REMOVED***
 	Index    int
 	Mark     *XfrmMark
 	Tmpls    []XfrmPolicyTmpl
-***REMOVED***
+}
 
-func (p XfrmPolicy) String() string ***REMOVED***
-	return fmt.Sprintf("***REMOVED***Dst: %v, Src: %v, Proto: %s, DstPort: %d, SrcPort: %d, Dir: %s, Priority: %d, Index: %d, Mark: %s, Tmpls: %s***REMOVED***",
+func (p XfrmPolicy) String() string {
+	return fmt.Sprintf("{Dst: %v, Src: %v, Proto: %s, DstPort: %d, SrcPort: %d, Dir: %s, Priority: %d, Index: %d, Mark: %s, Tmpls: %s}",
 		p.Dst, p.Src, p.Proto, p.DstPort, p.SrcPort, p.Dir, p.Priority, p.Index, p.Mark, p.Tmpls)
-***REMOVED***
+}

@@ -130,6 +130,6 @@ import (
 	"unicode/utf8"
 )
 
-func main() ***REMOVED***
+func main() {
 
-***REMOVED***
+}

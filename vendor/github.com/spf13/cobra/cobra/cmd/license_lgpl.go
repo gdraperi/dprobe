@@ -1,9 +1,9 @@
 package cmd
 
-func initLgpl() ***REMOVED***
-	Licenses["lgpl"] = License***REMOVED***
+func initLgpl() {
+	Licenses["lgpl"] = License{
 		Name:            "GNU Lesser General Public License",
-		PossibleMatches: []string***REMOVED***"lgpl", "lesser gpl", "gnu lgpl"***REMOVED***,
+		PossibleMatches: []string{"lgpl", "lesser gpl", "gnu lgpl"},
 		Header: `
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
@@ -182,5 +182,5 @@ whether future versions of the GNU Lesser General Public License shall
 apply, that proxy's public statement of acceptance of any version is
 permanent authorization for you to choose that version for the
 Library.`,
-	***REMOVED***
-***REMOVED***
+	}
+}

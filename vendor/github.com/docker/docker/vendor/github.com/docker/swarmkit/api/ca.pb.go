@@ -258,24 +258,24 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
-type NodeCertificateStatusRequest struct ***REMOVED***
+type NodeCertificateStatusRequest struct {
 	NodeID string `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
-***REMOVED***
+}
 
-func (m *NodeCertificateStatusRequest) Reset()                    ***REMOVED*** *m = NodeCertificateStatusRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*NodeCertificateStatusRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*NodeCertificateStatusRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorCa, []int***REMOVED***0***REMOVED*** ***REMOVED***
+func (m *NodeCertificateStatusRequest) Reset()                    { *m = NodeCertificateStatusRequest{} }
+func (*NodeCertificateStatusRequest) ProtoMessage()               {}
+func (*NodeCertificateStatusRequest) Descriptor() ([]byte, []int) { return fileDescriptorCa, []int{0} }
 
-type NodeCertificateStatusResponse struct ***REMOVED***
+type NodeCertificateStatusResponse struct {
 	Status      *IssuanceStatus `protobuf:"bytes,1,opt,name=status" json:"status,omitempty"`
 	Certificate *Certificate    `protobuf:"bytes,2,opt,name=certificate" json:"certificate,omitempty"`
-***REMOVED***
+}
 
-func (m *NodeCertificateStatusResponse) Reset()                    ***REMOVED*** *m = NodeCertificateStatusResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*NodeCertificateStatusResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*NodeCertificateStatusResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorCa, []int***REMOVED***1***REMOVED*** ***REMOVED***
+func (m *NodeCertificateStatusResponse) Reset()                    { *m = NodeCertificateStatusResponse{} }
+func (*NodeCertificateStatusResponse) ProtoMessage()               {}
+func (*NodeCertificateStatusResponse) Descriptor() ([]byte, []int) { return fileDescriptorCa, []int{1} }
 
-type IssueNodeCertificateRequest struct ***REMOVED***
+type IssueNodeCertificateRequest struct {
 	// DEPRECATED: Role is now selected based on which secret is matched.
 	Role NodeRole `protobuf:"varint,1,opt,name=role,proto3,enum=docker.swarmkit.v1.NodeRole" json:"role,omitempty"`
 	// CSR is the certificate signing request.
@@ -285,53 +285,53 @@ type IssueNodeCertificateRequest struct ***REMOVED***
 	Token string `protobuf:"bytes,3,opt,name=token,proto3" json:"token,omitempty"`
 	// Availability allows a user to control the current scheduling status of a node
 	Availability NodeSpec_Availability `protobuf:"varint,4,opt,name=availability,proto3,enum=docker.swarmkit.v1.NodeSpec_Availability" json:"availability,omitempty"`
-***REMOVED***
+}
 
-func (m *IssueNodeCertificateRequest) Reset()                    ***REMOVED*** *m = IssueNodeCertificateRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*IssueNodeCertificateRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*IssueNodeCertificateRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorCa, []int***REMOVED***2***REMOVED*** ***REMOVED***
+func (m *IssueNodeCertificateRequest) Reset()                    { *m = IssueNodeCertificateRequest{} }
+func (*IssueNodeCertificateRequest) ProtoMessage()               {}
+func (*IssueNodeCertificateRequest) Descriptor() ([]byte, []int) { return fileDescriptorCa, []int{2} }
 
-type IssueNodeCertificateResponse struct ***REMOVED***
+type IssueNodeCertificateResponse struct {
 	NodeID         string              `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
 	NodeMembership NodeSpec_Membership `protobuf:"varint,2,opt,name=node_membership,json=nodeMembership,proto3,enum=docker.swarmkit.v1.NodeSpec_Membership" json:"node_membership,omitempty"`
-***REMOVED***
+}
 
-func (m *IssueNodeCertificateResponse) Reset()                    ***REMOVED*** *m = IssueNodeCertificateResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*IssueNodeCertificateResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*IssueNodeCertificateResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorCa, []int***REMOVED***3***REMOVED*** ***REMOVED***
+func (m *IssueNodeCertificateResponse) Reset()                    { *m = IssueNodeCertificateResponse{} }
+func (*IssueNodeCertificateResponse) ProtoMessage()               {}
+func (*IssueNodeCertificateResponse) Descriptor() ([]byte, []int) { return fileDescriptorCa, []int{3} }
 
-type GetRootCACertificateRequest struct ***REMOVED***
-***REMOVED***
+type GetRootCACertificateRequest struct {
+}
 
-func (m *GetRootCACertificateRequest) Reset()                    ***REMOVED*** *m = GetRootCACertificateRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*GetRootCACertificateRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*GetRootCACertificateRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorCa, []int***REMOVED***4***REMOVED*** ***REMOVED***
+func (m *GetRootCACertificateRequest) Reset()                    { *m = GetRootCACertificateRequest{} }
+func (*GetRootCACertificateRequest) ProtoMessage()               {}
+func (*GetRootCACertificateRequest) Descriptor() ([]byte, []int) { return fileDescriptorCa, []int{4} }
 
-type GetRootCACertificateResponse struct ***REMOVED***
+type GetRootCACertificateResponse struct {
 	Certificate []byte `protobuf:"bytes,1,opt,name=certificate,proto3" json:"certificate,omitempty"`
-***REMOVED***
+}
 
-func (m *GetRootCACertificateResponse) Reset()                    ***REMOVED*** *m = GetRootCACertificateResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*GetRootCACertificateResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*GetRootCACertificateResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorCa, []int***REMOVED***5***REMOVED*** ***REMOVED***
+func (m *GetRootCACertificateResponse) Reset()                    { *m = GetRootCACertificateResponse{} }
+func (*GetRootCACertificateResponse) ProtoMessage()               {}
+func (*GetRootCACertificateResponse) Descriptor() ([]byte, []int) { return fileDescriptorCa, []int{5} }
 
-type GetUnlockKeyRequest struct ***REMOVED***
-***REMOVED***
+type GetUnlockKeyRequest struct {
+}
 
-func (m *GetUnlockKeyRequest) Reset()                    ***REMOVED*** *m = GetUnlockKeyRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*GetUnlockKeyRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*GetUnlockKeyRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorCa, []int***REMOVED***6***REMOVED*** ***REMOVED***
+func (m *GetUnlockKeyRequest) Reset()                    { *m = GetUnlockKeyRequest{} }
+func (*GetUnlockKeyRequest) ProtoMessage()               {}
+func (*GetUnlockKeyRequest) Descriptor() ([]byte, []int) { return fileDescriptorCa, []int{6} }
 
-type GetUnlockKeyResponse struct ***REMOVED***
+type GetUnlockKeyResponse struct {
 	UnlockKey []byte  `protobuf:"bytes,1,opt,name=unlock_key,json=unlockKey,proto3" json:"unlock_key,omitempty"`
 	Version   Version `protobuf:"bytes,2,opt,name=version" json:"version"`
-***REMOVED***
+}
 
-func (m *GetUnlockKeyResponse) Reset()                    ***REMOVED*** *m = GetUnlockKeyResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*GetUnlockKeyResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*GetUnlockKeyResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorCa, []int***REMOVED***7***REMOVED*** ***REMOVED***
+func (m *GetUnlockKeyResponse) Reset()                    { *m = GetUnlockKeyResponse{} }
+func (*GetUnlockKeyResponse) ProtoMessage()               {}
+func (*GetUnlockKeyResponse) Descriptor() ([]byte, []int) { return fileDescriptorCa, []int{7} }
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*NodeCertificateStatusRequest)(nil), "docker.swarmkit.v1.NodeCertificateStatusRequest")
 	proto.RegisterType((*NodeCertificateStatusResponse)(nil), "docker.swarmkit.v1.NodeCertificateStatusResponse")
 	proto.RegisterType((*IssueNodeCertificateRequest)(nil), "docker.swarmkit.v1.IssueNodeCertificateRequest")
@@ -340,185 +340,185 @@ func init() ***REMOVED***
 	proto.RegisterType((*GetRootCACertificateResponse)(nil), "docker.swarmkit.v1.GetRootCACertificateResponse")
 	proto.RegisterType((*GetUnlockKeyRequest)(nil), "docker.swarmkit.v1.GetUnlockKeyRequest")
 	proto.RegisterType((*GetUnlockKeyResponse)(nil), "docker.swarmkit.v1.GetUnlockKeyResponse")
-***REMOVED***
+}
 
-type authenticatedWrapperCAServer struct ***REMOVED***
+type authenticatedWrapperCAServer struct {
 	local     CAServer
 	authorize func(context.Context, []string) error
-***REMOVED***
+}
 
-func NewAuthenticatedWrapperCAServer(local CAServer, authorize func(context.Context, []string) error) CAServer ***REMOVED***
-	return &authenticatedWrapperCAServer***REMOVED***
+func NewAuthenticatedWrapperCAServer(local CAServer, authorize func(context.Context, []string) error) CAServer {
+	return &authenticatedWrapperCAServer{
 		local:     local,
 		authorize: authorize,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (p *authenticatedWrapperCAServer) GetRootCACertificate(ctx context.Context, r *GetRootCACertificateRequest) (*GetRootCACertificateResponse, error) ***REMOVED***
+func (p *authenticatedWrapperCAServer) GetRootCACertificate(ctx context.Context, r *GetRootCACertificateRequest) (*GetRootCACertificateResponse, error) {
 
 	return p.local.GetRootCACertificate(ctx, r)
-***REMOVED***
+}
 
-func (p *authenticatedWrapperCAServer) GetUnlockKey(ctx context.Context, r *GetUnlockKeyRequest) (*GetUnlockKeyResponse, error) ***REMOVED***
+func (p *authenticatedWrapperCAServer) GetUnlockKey(ctx context.Context, r *GetUnlockKeyRequest) (*GetUnlockKeyResponse, error) {
 
-	if err := p.authorize(ctx, []string***REMOVED***"swarm-manager"***REMOVED***); err != nil ***REMOVED***
+	if err := p.authorize(ctx, []string{"swarm-manager"}); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return p.local.GetUnlockKey(ctx, r)
-***REMOVED***
+}
 
-type authenticatedWrapperNodeCAServer struct ***REMOVED***
+type authenticatedWrapperNodeCAServer struct {
 	local     NodeCAServer
 	authorize func(context.Context, []string) error
-***REMOVED***
+}
 
-func NewAuthenticatedWrapperNodeCAServer(local NodeCAServer, authorize func(context.Context, []string) error) NodeCAServer ***REMOVED***
-	return &authenticatedWrapperNodeCAServer***REMOVED***
+func NewAuthenticatedWrapperNodeCAServer(local NodeCAServer, authorize func(context.Context, []string) error) NodeCAServer {
+	return &authenticatedWrapperNodeCAServer{
 		local:     local,
 		authorize: authorize,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (p *authenticatedWrapperNodeCAServer) IssueNodeCertificate(ctx context.Context, r *IssueNodeCertificateRequest) (*IssueNodeCertificateResponse, error) ***REMOVED***
+func (p *authenticatedWrapperNodeCAServer) IssueNodeCertificate(ctx context.Context, r *IssueNodeCertificateRequest) (*IssueNodeCertificateResponse, error) {
 
 	return p.local.IssueNodeCertificate(ctx, r)
-***REMOVED***
+}
 
-func (p *authenticatedWrapperNodeCAServer) NodeCertificateStatus(ctx context.Context, r *NodeCertificateStatusRequest) (*NodeCertificateStatusResponse, error) ***REMOVED***
+func (p *authenticatedWrapperNodeCAServer) NodeCertificateStatus(ctx context.Context, r *NodeCertificateStatusRequest) (*NodeCertificateStatusResponse, error) {
 
 	return p.local.NodeCertificateStatus(ctx, r)
-***REMOVED***
+}
 
-func (m *NodeCertificateStatusRequest) Copy() *NodeCertificateStatusRequest ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *NodeCertificateStatusRequest) Copy() *NodeCertificateStatusRequest {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &NodeCertificateStatusRequest***REMOVED******REMOVED***
+	}
+	o := &NodeCertificateStatusRequest{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *NodeCertificateStatusRequest) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *NodeCertificateStatusRequest) CopyFrom(src interface{}) {
 
 	o := src.(*NodeCertificateStatusRequest)
 	*m = *o
-***REMOVED***
+}
 
-func (m *NodeCertificateStatusResponse) Copy() *NodeCertificateStatusResponse ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *NodeCertificateStatusResponse) Copy() *NodeCertificateStatusResponse {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &NodeCertificateStatusResponse***REMOVED******REMOVED***
+	}
+	o := &NodeCertificateStatusResponse{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *NodeCertificateStatusResponse) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *NodeCertificateStatusResponse) CopyFrom(src interface{}) {
 
 	o := src.(*NodeCertificateStatusResponse)
 	*m = *o
-	if o.Status != nil ***REMOVED***
-		m.Status = &IssuanceStatus***REMOVED******REMOVED***
+	if o.Status != nil {
+		m.Status = &IssuanceStatus{}
 		github_com_docker_swarmkit_api_deepcopy.Copy(m.Status, o.Status)
-	***REMOVED***
-	if o.Certificate != nil ***REMOVED***
-		m.Certificate = &Certificate***REMOVED******REMOVED***
+	}
+	if o.Certificate != nil {
+		m.Certificate = &Certificate{}
 		github_com_docker_swarmkit_api_deepcopy.Copy(m.Certificate, o.Certificate)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (m *IssueNodeCertificateRequest) Copy() *IssueNodeCertificateRequest ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *IssueNodeCertificateRequest) Copy() *IssueNodeCertificateRequest {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &IssueNodeCertificateRequest***REMOVED******REMOVED***
+	}
+	o := &IssueNodeCertificateRequest{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *IssueNodeCertificateRequest) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *IssueNodeCertificateRequest) CopyFrom(src interface{}) {
 
 	o := src.(*IssueNodeCertificateRequest)
 	*m = *o
-	if o.CSR != nil ***REMOVED***
+	if o.CSR != nil {
 		m.CSR = make([]byte, len(o.CSR))
 		copy(m.CSR, o.CSR)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (m *IssueNodeCertificateResponse) Copy() *IssueNodeCertificateResponse ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *IssueNodeCertificateResponse) Copy() *IssueNodeCertificateResponse {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &IssueNodeCertificateResponse***REMOVED******REMOVED***
+	}
+	o := &IssueNodeCertificateResponse{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *IssueNodeCertificateResponse) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *IssueNodeCertificateResponse) CopyFrom(src interface{}) {
 
 	o := src.(*IssueNodeCertificateResponse)
 	*m = *o
-***REMOVED***
+}
 
-func (m *GetRootCACertificateRequest) Copy() *GetRootCACertificateRequest ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *GetRootCACertificateRequest) Copy() *GetRootCACertificateRequest {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &GetRootCACertificateRequest***REMOVED******REMOVED***
+	}
+	o := &GetRootCACertificateRequest{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *GetRootCACertificateRequest) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED******REMOVED***
-func (m *GetRootCACertificateResponse) Copy() *GetRootCACertificateResponse ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *GetRootCACertificateRequest) CopyFrom(src interface{}) {}
+func (m *GetRootCACertificateResponse) Copy() *GetRootCACertificateResponse {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &GetRootCACertificateResponse***REMOVED******REMOVED***
+	}
+	o := &GetRootCACertificateResponse{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *GetRootCACertificateResponse) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *GetRootCACertificateResponse) CopyFrom(src interface{}) {
 
 	o := src.(*GetRootCACertificateResponse)
 	*m = *o
-	if o.Certificate != nil ***REMOVED***
+	if o.Certificate != nil {
 		m.Certificate = make([]byte, len(o.Certificate))
 		copy(m.Certificate, o.Certificate)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (m *GetUnlockKeyRequest) Copy() *GetUnlockKeyRequest ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *GetUnlockKeyRequest) Copy() *GetUnlockKeyRequest {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &GetUnlockKeyRequest***REMOVED******REMOVED***
+	}
+	o := &GetUnlockKeyRequest{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *GetUnlockKeyRequest) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED******REMOVED***
-func (m *GetUnlockKeyResponse) Copy() *GetUnlockKeyResponse ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *GetUnlockKeyRequest) CopyFrom(src interface{}) {}
+func (m *GetUnlockKeyResponse) Copy() *GetUnlockKeyResponse {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &GetUnlockKeyResponse***REMOVED******REMOVED***
+	}
+	o := &GetUnlockKeyResponse{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *GetUnlockKeyResponse) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *GetUnlockKeyResponse) CopyFrom(src interface{}) {
 
 	o := src.(*GetUnlockKeyResponse)
 	*m = *o
-	if o.UnlockKey != nil ***REMOVED***
+	if o.UnlockKey != nil {
 		m.UnlockKey = make([]byte, len(o.UnlockKey))
 		copy(m.UnlockKey, o.UnlockKey)
-	***REMOVED***
+	}
 	github_com_docker_swarmkit_api_deepcopy.Copy(&m.Version, &o.Version)
-***REMOVED***
+}
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
@@ -530,426 +530,426 @@ const _ = grpc.SupportPackageIsVersion4
 
 // Client API for CA service
 
-type CAClient interface ***REMOVED***
+type CAClient interface {
 	GetRootCACertificate(ctx context.Context, in *GetRootCACertificateRequest, opts ...grpc.CallOption) (*GetRootCACertificateResponse, error)
 	// GetUnlockKey returns the current unlock key for the cluster for the role of the client
 	// asking.
 	GetUnlockKey(ctx context.Context, in *GetUnlockKeyRequest, opts ...grpc.CallOption) (*GetUnlockKeyResponse, error)
-***REMOVED***
+}
 
-type cAClient struct ***REMOVED***
+type cAClient struct {
 	cc *grpc.ClientConn
-***REMOVED***
+}
 
-func NewCAClient(cc *grpc.ClientConn) CAClient ***REMOVED***
-	return &cAClient***REMOVED***cc***REMOVED***
-***REMOVED***
+func NewCAClient(cc *grpc.ClientConn) CAClient {
+	return &cAClient{cc}
+}
 
-func (c *cAClient) GetRootCACertificate(ctx context.Context, in *GetRootCACertificateRequest, opts ...grpc.CallOption) (*GetRootCACertificateResponse, error) ***REMOVED***
+func (c *cAClient) GetRootCACertificate(ctx context.Context, in *GetRootCACertificateRequest, opts ...grpc.CallOption) (*GetRootCACertificateResponse, error) {
 	out := new(GetRootCACertificateResponse)
 	err := grpc.Invoke(ctx, "/docker.swarmkit.v1.CA/GetRootCACertificate", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *cAClient) GetUnlockKey(ctx context.Context, in *GetUnlockKeyRequest, opts ...grpc.CallOption) (*GetUnlockKeyResponse, error) ***REMOVED***
+func (c *cAClient) GetUnlockKey(ctx context.Context, in *GetUnlockKeyRequest, opts ...grpc.CallOption) (*GetUnlockKeyResponse, error) {
 	out := new(GetUnlockKeyResponse)
 	err := grpc.Invoke(ctx, "/docker.swarmkit.v1.CA/GetUnlockKey", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
 // Server API for CA service
 
-type CAServer interface ***REMOVED***
+type CAServer interface {
 	GetRootCACertificate(context.Context, *GetRootCACertificateRequest) (*GetRootCACertificateResponse, error)
 	// GetUnlockKey returns the current unlock key for the cluster for the role of the client
 	// asking.
 	GetUnlockKey(context.Context, *GetUnlockKeyRequest) (*GetUnlockKeyResponse, error)
-***REMOVED***
+}
 
-func RegisterCAServer(s *grpc.Server, srv CAServer) ***REMOVED***
+func RegisterCAServer(s *grpc.Server, srv CAServer) {
 	s.RegisterService(&_CA_serviceDesc, srv)
-***REMOVED***
+}
 
-func _CA_GetRootCACertificate_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _CA_GetRootCACertificate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetRootCACertificateRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(CAServer).GetRootCACertificate(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/docker.swarmkit.v1.CA/GetRootCACertificate",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(CAServer).GetRootCACertificate(ctx, req.(*GetRootCACertificateRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _CA_GetUnlockKey_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _CA_GetUnlockKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetUnlockKeyRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(CAServer).GetUnlockKey(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/docker.swarmkit.v1.CA/GetUnlockKey",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(CAServer).GetUnlockKey(ctx, req.(*GetUnlockKeyRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-var _CA_serviceDesc = grpc.ServiceDesc***REMOVED***
+var _CA_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "docker.swarmkit.v1.CA",
 	HandlerType: (*CAServer)(nil),
-	Methods: []grpc.MethodDesc***REMOVED***
-		***REMOVED***
+	Methods: []grpc.MethodDesc{
+		{
 			MethodName: "GetRootCACertificate",
 			Handler:    _CA_GetRootCACertificate_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "GetUnlockKey",
 			Handler:    _CA_GetUnlockKey_Handler,
-		***REMOVED***,
-	***REMOVED***,
-	Streams:  []grpc.StreamDesc***REMOVED******REMOVED***,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
 	Metadata: "github.com/docker/swarmkit/api/ca.proto",
-***REMOVED***
+}
 
 // Client API for NodeCA service
 
-type NodeCAClient interface ***REMOVED***
+type NodeCAClient interface {
 	IssueNodeCertificate(ctx context.Context, in *IssueNodeCertificateRequest, opts ...grpc.CallOption) (*IssueNodeCertificateResponse, error)
 	NodeCertificateStatus(ctx context.Context, in *NodeCertificateStatusRequest, opts ...grpc.CallOption) (*NodeCertificateStatusResponse, error)
-***REMOVED***
+}
 
-type nodeCAClient struct ***REMOVED***
+type nodeCAClient struct {
 	cc *grpc.ClientConn
-***REMOVED***
+}
 
-func NewNodeCAClient(cc *grpc.ClientConn) NodeCAClient ***REMOVED***
-	return &nodeCAClient***REMOVED***cc***REMOVED***
-***REMOVED***
+func NewNodeCAClient(cc *grpc.ClientConn) NodeCAClient {
+	return &nodeCAClient{cc}
+}
 
-func (c *nodeCAClient) IssueNodeCertificate(ctx context.Context, in *IssueNodeCertificateRequest, opts ...grpc.CallOption) (*IssueNodeCertificateResponse, error) ***REMOVED***
+func (c *nodeCAClient) IssueNodeCertificate(ctx context.Context, in *IssueNodeCertificateRequest, opts ...grpc.CallOption) (*IssueNodeCertificateResponse, error) {
 	out := new(IssueNodeCertificateResponse)
 	err := grpc.Invoke(ctx, "/docker.swarmkit.v1.NodeCA/IssueNodeCertificate", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *nodeCAClient) NodeCertificateStatus(ctx context.Context, in *NodeCertificateStatusRequest, opts ...grpc.CallOption) (*NodeCertificateStatusResponse, error) ***REMOVED***
+func (c *nodeCAClient) NodeCertificateStatus(ctx context.Context, in *NodeCertificateStatusRequest, opts ...grpc.CallOption) (*NodeCertificateStatusResponse, error) {
 	out := new(NodeCertificateStatusResponse)
 	err := grpc.Invoke(ctx, "/docker.swarmkit.v1.NodeCA/NodeCertificateStatus", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
 // Server API for NodeCA service
 
-type NodeCAServer interface ***REMOVED***
+type NodeCAServer interface {
 	IssueNodeCertificate(context.Context, *IssueNodeCertificateRequest) (*IssueNodeCertificateResponse, error)
 	NodeCertificateStatus(context.Context, *NodeCertificateStatusRequest) (*NodeCertificateStatusResponse, error)
-***REMOVED***
+}
 
-func RegisterNodeCAServer(s *grpc.Server, srv NodeCAServer) ***REMOVED***
+func RegisterNodeCAServer(s *grpc.Server, srv NodeCAServer) {
 	s.RegisterService(&_NodeCA_serviceDesc, srv)
-***REMOVED***
+}
 
-func _NodeCA_IssueNodeCertificate_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _NodeCA_IssueNodeCertificate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(IssueNodeCertificateRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(NodeCAServer).IssueNodeCertificate(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/docker.swarmkit.v1.NodeCA/IssueNodeCertificate",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(NodeCAServer).IssueNodeCertificate(ctx, req.(*IssueNodeCertificateRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _NodeCA_NodeCertificateStatus_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _NodeCA_NodeCertificateStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(NodeCertificateStatusRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(NodeCAServer).NodeCertificateStatus(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/docker.swarmkit.v1.NodeCA/NodeCertificateStatus",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(NodeCAServer).NodeCertificateStatus(ctx, req.(*NodeCertificateStatusRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-var _NodeCA_serviceDesc = grpc.ServiceDesc***REMOVED***
+var _NodeCA_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "docker.swarmkit.v1.NodeCA",
 	HandlerType: (*NodeCAServer)(nil),
-	Methods: []grpc.MethodDesc***REMOVED***
-		***REMOVED***
+	Methods: []grpc.MethodDesc{
+		{
 			MethodName: "IssueNodeCertificate",
 			Handler:    _NodeCA_IssueNodeCertificate_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "NodeCertificateStatus",
 			Handler:    _NodeCA_NodeCertificateStatus_Handler,
-		***REMOVED***,
-	***REMOVED***,
-	Streams:  []grpc.StreamDesc***REMOVED******REMOVED***,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
 	Metadata: "github.com/docker/swarmkit/api/ca.proto",
-***REMOVED***
+}
 
-func (m *NodeCertificateStatusRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *NodeCertificateStatusRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *NodeCertificateStatusRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *NodeCertificateStatusRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.NodeID) > 0 ***REMOVED***
+	if len(m.NodeID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintCa(dAtA, i, uint64(len(m.NodeID)))
 		i += copy(dAtA[i:], m.NodeID)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *NodeCertificateStatusResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *NodeCertificateStatusResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *NodeCertificateStatusResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *NodeCertificateStatusResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.Status != nil ***REMOVED***
+	if m.Status != nil {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintCa(dAtA, i, uint64(m.Status.Size()))
 		n1, err := m.Status.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n1
-	***REMOVED***
-	if m.Certificate != nil ***REMOVED***
+	}
+	if m.Certificate != nil {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintCa(dAtA, i, uint64(m.Certificate.Size()))
 		n2, err := m.Certificate.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n2
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *IssueNodeCertificateRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *IssueNodeCertificateRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *IssueNodeCertificateRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *IssueNodeCertificateRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.Role != 0 ***REMOVED***
+	if m.Role != 0 {
 		dAtA[i] = 0x8
 		i++
 		i = encodeVarintCa(dAtA, i, uint64(m.Role))
-	***REMOVED***
-	if len(m.CSR) > 0 ***REMOVED***
+	}
+	if len(m.CSR) > 0 {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintCa(dAtA, i, uint64(len(m.CSR)))
 		i += copy(dAtA[i:], m.CSR)
-	***REMOVED***
-	if len(m.Token) > 0 ***REMOVED***
+	}
+	if len(m.Token) > 0 {
 		dAtA[i] = 0x1a
 		i++
 		i = encodeVarintCa(dAtA, i, uint64(len(m.Token)))
 		i += copy(dAtA[i:], m.Token)
-	***REMOVED***
-	if m.Availability != 0 ***REMOVED***
+	}
+	if m.Availability != 0 {
 		dAtA[i] = 0x20
 		i++
 		i = encodeVarintCa(dAtA, i, uint64(m.Availability))
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *IssueNodeCertificateResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *IssueNodeCertificateResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *IssueNodeCertificateResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *IssueNodeCertificateResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.NodeID) > 0 ***REMOVED***
+	if len(m.NodeID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintCa(dAtA, i, uint64(len(m.NodeID)))
 		i += copy(dAtA[i:], m.NodeID)
-	***REMOVED***
-	if m.NodeMembership != 0 ***REMOVED***
+	}
+	if m.NodeMembership != 0 {
 		dAtA[i] = 0x10
 		i++
 		i = encodeVarintCa(dAtA, i, uint64(m.NodeMembership))
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *GetRootCACertificateRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *GetRootCACertificateRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *GetRootCACertificateRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *GetRootCACertificateRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
 	return i, nil
-***REMOVED***
+}
 
-func (m *GetRootCACertificateResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *GetRootCACertificateResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *GetRootCACertificateResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *GetRootCACertificateResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Certificate) > 0 ***REMOVED***
+	if len(m.Certificate) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintCa(dAtA, i, uint64(len(m.Certificate)))
 		i += copy(dAtA[i:], m.Certificate)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *GetUnlockKeyRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *GetUnlockKeyRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *GetUnlockKeyRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *GetUnlockKeyRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
 	return i, nil
-***REMOVED***
+}
 
-func (m *GetUnlockKeyResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *GetUnlockKeyResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *GetUnlockKeyResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *GetUnlockKeyResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.UnlockKey) > 0 ***REMOVED***
+	if len(m.UnlockKey) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintCa(dAtA, i, uint64(len(m.UnlockKey)))
 		i += copy(dAtA[i:], m.UnlockKey)
-	***REMOVED***
+	}
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintCa(dAtA, i, uint64(m.Version.Size()))
 	n3, err := m.Version.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n3
 	return i, nil
-***REMOVED***
+}
 
-func encodeFixed64Ca(dAtA []byte, offset int, v uint64) int ***REMOVED***
+func encodeFixed64Ca(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
 	dAtA[offset+2] = uint8(v >> 16)
@@ -959,1324 +959,1324 @@ func encodeFixed64Ca(dAtA []byte, offset int, v uint64) int ***REMOVED***
 	dAtA[offset+6] = uint8(v >> 48)
 	dAtA[offset+7] = uint8(v >> 56)
 	return offset + 8
-***REMOVED***
-func encodeFixed32Ca(dAtA []byte, offset int, v uint32) int ***REMOVED***
+}
+func encodeFixed32Ca(dAtA []byte, offset int, v uint32) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
 	dAtA[offset+2] = uint8(v >> 16)
 	dAtA[offset+3] = uint8(v >> 24)
 	return offset + 4
-***REMOVED***
-func encodeVarintCa(dAtA []byte, offset int, v uint64) int ***REMOVED***
-	for v >= 1<<7 ***REMOVED***
+}
+func encodeVarintCa(dAtA []byte, offset int, v uint64) int {
+	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
-	***REMOVED***
+	}
 	dAtA[offset] = uint8(v)
 	return offset + 1
-***REMOVED***
+}
 
-type raftProxyCAServer struct ***REMOVED***
+type raftProxyCAServer struct {
 	local                       CAServer
 	connSelector                raftselector.ConnProvider
 	localCtxMods, remoteCtxMods []func(context.Context) (context.Context, error)
-***REMOVED***
+}
 
-func NewRaftProxyCAServer(local CAServer, connSelector raftselector.ConnProvider, localCtxMod, remoteCtxMod func(context.Context) (context.Context, error)) CAServer ***REMOVED***
-	redirectChecker := func(ctx context.Context) (context.Context, error) ***REMOVED***
+func NewRaftProxyCAServer(local CAServer, connSelector raftselector.ConnProvider, localCtxMod, remoteCtxMod func(context.Context) (context.Context, error)) CAServer {
+	redirectChecker := func(ctx context.Context) (context.Context, error) {
 		s, ok := transport.StreamFromContext(ctx)
-		if !ok ***REMOVED***
+		if !ok {
 			return ctx, status.Errorf(codes.InvalidArgument, "remote addr is not found in context")
-		***REMOVED***
+		}
 		addr := s.ServerTransport().RemoteAddr().String()
 		md, ok := metadata.FromContext(ctx)
-		if ok && len(md["redirect"]) != 0 ***REMOVED***
+		if ok && len(md["redirect"]) != 0 {
 			return ctx, status.Errorf(codes.ResourceExhausted, "more than one redirect to leader from: %s", md["redirect"])
-		***REMOVED***
-		if !ok ***REMOVED***
-			md = metadata.New(map[string]string***REMOVED******REMOVED***)
-		***REMOVED***
+		}
+		if !ok {
+			md = metadata.New(map[string]string{})
+		}
 		md["redirect"] = append(md["redirect"], addr)
 		return metadata.NewContext(ctx, md), nil
-	***REMOVED***
-	remoteMods := []func(context.Context) (context.Context, error)***REMOVED***redirectChecker***REMOVED***
+	}
+	remoteMods := []func(context.Context) (context.Context, error){redirectChecker}
 	remoteMods = append(remoteMods, remoteCtxMod)
 
 	var localMods []func(context.Context) (context.Context, error)
-	if localCtxMod != nil ***REMOVED***
-		localMods = []func(context.Context) (context.Context, error)***REMOVED***localCtxMod***REMOVED***
-	***REMOVED***
+	if localCtxMod != nil {
+		localMods = []func(context.Context) (context.Context, error){localCtxMod}
+	}
 
-	return &raftProxyCAServer***REMOVED***
+	return &raftProxyCAServer{
 		local:         local,
 		connSelector:  connSelector,
 		localCtxMods:  localMods,
 		remoteCtxMods: remoteMods,
-	***REMOVED***
-***REMOVED***
-func (p *raftProxyCAServer) runCtxMods(ctx context.Context, ctxMods []func(context.Context) (context.Context, error)) (context.Context, error) ***REMOVED***
+	}
+}
+func (p *raftProxyCAServer) runCtxMods(ctx context.Context, ctxMods []func(context.Context) (context.Context, error)) (context.Context, error) {
 	var err error
-	for _, mod := range ctxMods ***REMOVED***
+	for _, mod := range ctxMods {
 		ctx, err = mod(ctx)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return ctx, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return ctx, nil
-***REMOVED***
-func (p *raftProxyCAServer) pollNewLeaderConn(ctx context.Context) (*grpc.ClientConn, error) ***REMOVED***
+}
+func (p *raftProxyCAServer) pollNewLeaderConn(ctx context.Context) (*grpc.ClientConn, error) {
 	ticker := rafttime.NewTicker(500 * rafttime.Millisecond)
 	defer ticker.Stop()
-	for ***REMOVED***
-		select ***REMOVED***
+	for {
+		select {
 		case <-ticker.C:
 			conn, err := p.connSelector.LeaderConn(ctx)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 
 			client := NewHealthClient(conn)
 
-			resp, err := client.Check(ctx, &HealthCheckRequest***REMOVED***Service: "Raft"***REMOVED***)
-			if err != nil || resp.Status != HealthCheckResponse_SERVING ***REMOVED***
+			resp, err := client.Check(ctx, &HealthCheckRequest{Service: "Raft"})
+			if err != nil || resp.Status != HealthCheckResponse_SERVING {
 				continue
-			***REMOVED***
+			}
 			return conn, nil
 		case <-ctx.Done():
 			return nil, ctx.Err()
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (p *raftProxyCAServer) GetRootCACertificate(ctx context.Context, r *GetRootCACertificateRequest) (*GetRootCACertificateResponse, error) ***REMOVED***
+func (p *raftProxyCAServer) GetRootCACertificate(ctx context.Context, r *GetRootCACertificateRequest) (*GetRootCACertificateResponse, error) {
 
 	conn, err := p.connSelector.LeaderConn(ctx)
-	if err != nil ***REMOVED***
-		if err == raftselector.ErrIsLeader ***REMOVED***
+	if err != nil {
+		if err == raftselector.ErrIsLeader {
 			ctx, err = p.runCtxMods(ctx, p.localCtxMods)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			return p.local.GetRootCACertificate(ctx, r)
-		***REMOVED***
+		}
 		return nil, err
-	***REMOVED***
+	}
 	modCtx, err := p.runCtxMods(ctx, p.remoteCtxMods)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	resp, err := NewCAClient(conn).GetRootCACertificate(modCtx, r)
-	if err != nil ***REMOVED***
-		if !strings.Contains(err.Error(), "is closing") && !strings.Contains(err.Error(), "the connection is unavailable") && !strings.Contains(err.Error(), "connection error") ***REMOVED***
+	if err != nil {
+		if !strings.Contains(err.Error(), "is closing") && !strings.Contains(err.Error(), "the connection is unavailable") && !strings.Contains(err.Error(), "connection error") {
 			return resp, err
-		***REMOVED***
+		}
 		conn, err := p.pollNewLeaderConn(ctx)
-		if err != nil ***REMOVED***
-			if err == raftselector.ErrIsLeader ***REMOVED***
+		if err != nil {
+			if err == raftselector.ErrIsLeader {
 				return p.local.GetRootCACertificate(ctx, r)
-			***REMOVED***
+			}
 			return nil, err
-		***REMOVED***
+		}
 		return NewCAClient(conn).GetRootCACertificate(modCtx, r)
-	***REMOVED***
+	}
 	return resp, err
-***REMOVED***
+}
 
-func (p *raftProxyCAServer) GetUnlockKey(ctx context.Context, r *GetUnlockKeyRequest) (*GetUnlockKeyResponse, error) ***REMOVED***
+func (p *raftProxyCAServer) GetUnlockKey(ctx context.Context, r *GetUnlockKeyRequest) (*GetUnlockKeyResponse, error) {
 
 	conn, err := p.connSelector.LeaderConn(ctx)
-	if err != nil ***REMOVED***
-		if err == raftselector.ErrIsLeader ***REMOVED***
+	if err != nil {
+		if err == raftselector.ErrIsLeader {
 			ctx, err = p.runCtxMods(ctx, p.localCtxMods)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			return p.local.GetUnlockKey(ctx, r)
-		***REMOVED***
+		}
 		return nil, err
-	***REMOVED***
+	}
 	modCtx, err := p.runCtxMods(ctx, p.remoteCtxMods)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	resp, err := NewCAClient(conn).GetUnlockKey(modCtx, r)
-	if err != nil ***REMOVED***
-		if !strings.Contains(err.Error(), "is closing") && !strings.Contains(err.Error(), "the connection is unavailable") && !strings.Contains(err.Error(), "connection error") ***REMOVED***
+	if err != nil {
+		if !strings.Contains(err.Error(), "is closing") && !strings.Contains(err.Error(), "the connection is unavailable") && !strings.Contains(err.Error(), "connection error") {
 			return resp, err
-		***REMOVED***
+		}
 		conn, err := p.pollNewLeaderConn(ctx)
-		if err != nil ***REMOVED***
-			if err == raftselector.ErrIsLeader ***REMOVED***
+		if err != nil {
+			if err == raftselector.ErrIsLeader {
 				return p.local.GetUnlockKey(ctx, r)
-			***REMOVED***
+			}
 			return nil, err
-		***REMOVED***
+		}
 		return NewCAClient(conn).GetUnlockKey(modCtx, r)
-	***REMOVED***
+	}
 	return resp, err
-***REMOVED***
+}
 
-type raftProxyNodeCAServer struct ***REMOVED***
+type raftProxyNodeCAServer struct {
 	local                       NodeCAServer
 	connSelector                raftselector.ConnProvider
 	localCtxMods, remoteCtxMods []func(context.Context) (context.Context, error)
-***REMOVED***
+}
 
-func NewRaftProxyNodeCAServer(local NodeCAServer, connSelector raftselector.ConnProvider, localCtxMod, remoteCtxMod func(context.Context) (context.Context, error)) NodeCAServer ***REMOVED***
-	redirectChecker := func(ctx context.Context) (context.Context, error) ***REMOVED***
+func NewRaftProxyNodeCAServer(local NodeCAServer, connSelector raftselector.ConnProvider, localCtxMod, remoteCtxMod func(context.Context) (context.Context, error)) NodeCAServer {
+	redirectChecker := func(ctx context.Context) (context.Context, error) {
 		s, ok := transport.StreamFromContext(ctx)
-		if !ok ***REMOVED***
+		if !ok {
 			return ctx, status.Errorf(codes.InvalidArgument, "remote addr is not found in context")
-		***REMOVED***
+		}
 		addr := s.ServerTransport().RemoteAddr().String()
 		md, ok := metadata.FromContext(ctx)
-		if ok && len(md["redirect"]) != 0 ***REMOVED***
+		if ok && len(md["redirect"]) != 0 {
 			return ctx, status.Errorf(codes.ResourceExhausted, "more than one redirect to leader from: %s", md["redirect"])
-		***REMOVED***
-		if !ok ***REMOVED***
-			md = metadata.New(map[string]string***REMOVED******REMOVED***)
-		***REMOVED***
+		}
+		if !ok {
+			md = metadata.New(map[string]string{})
+		}
 		md["redirect"] = append(md["redirect"], addr)
 		return metadata.NewContext(ctx, md), nil
-	***REMOVED***
-	remoteMods := []func(context.Context) (context.Context, error)***REMOVED***redirectChecker***REMOVED***
+	}
+	remoteMods := []func(context.Context) (context.Context, error){redirectChecker}
 	remoteMods = append(remoteMods, remoteCtxMod)
 
 	var localMods []func(context.Context) (context.Context, error)
-	if localCtxMod != nil ***REMOVED***
-		localMods = []func(context.Context) (context.Context, error)***REMOVED***localCtxMod***REMOVED***
-	***REMOVED***
+	if localCtxMod != nil {
+		localMods = []func(context.Context) (context.Context, error){localCtxMod}
+	}
 
-	return &raftProxyNodeCAServer***REMOVED***
+	return &raftProxyNodeCAServer{
 		local:         local,
 		connSelector:  connSelector,
 		localCtxMods:  localMods,
 		remoteCtxMods: remoteMods,
-	***REMOVED***
-***REMOVED***
-func (p *raftProxyNodeCAServer) runCtxMods(ctx context.Context, ctxMods []func(context.Context) (context.Context, error)) (context.Context, error) ***REMOVED***
+	}
+}
+func (p *raftProxyNodeCAServer) runCtxMods(ctx context.Context, ctxMods []func(context.Context) (context.Context, error)) (context.Context, error) {
 	var err error
-	for _, mod := range ctxMods ***REMOVED***
+	for _, mod := range ctxMods {
 		ctx, err = mod(ctx)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return ctx, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return ctx, nil
-***REMOVED***
-func (p *raftProxyNodeCAServer) pollNewLeaderConn(ctx context.Context) (*grpc.ClientConn, error) ***REMOVED***
+}
+func (p *raftProxyNodeCAServer) pollNewLeaderConn(ctx context.Context) (*grpc.ClientConn, error) {
 	ticker := rafttime.NewTicker(500 * rafttime.Millisecond)
 	defer ticker.Stop()
-	for ***REMOVED***
-		select ***REMOVED***
+	for {
+		select {
 		case <-ticker.C:
 			conn, err := p.connSelector.LeaderConn(ctx)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 
 			client := NewHealthClient(conn)
 
-			resp, err := client.Check(ctx, &HealthCheckRequest***REMOVED***Service: "Raft"***REMOVED***)
-			if err != nil || resp.Status != HealthCheckResponse_SERVING ***REMOVED***
+			resp, err := client.Check(ctx, &HealthCheckRequest{Service: "Raft"})
+			if err != nil || resp.Status != HealthCheckResponse_SERVING {
 				continue
-			***REMOVED***
+			}
 			return conn, nil
 		case <-ctx.Done():
 			return nil, ctx.Err()
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (p *raftProxyNodeCAServer) IssueNodeCertificate(ctx context.Context, r *IssueNodeCertificateRequest) (*IssueNodeCertificateResponse, error) ***REMOVED***
+func (p *raftProxyNodeCAServer) IssueNodeCertificate(ctx context.Context, r *IssueNodeCertificateRequest) (*IssueNodeCertificateResponse, error) {
 
 	conn, err := p.connSelector.LeaderConn(ctx)
-	if err != nil ***REMOVED***
-		if err == raftselector.ErrIsLeader ***REMOVED***
+	if err != nil {
+		if err == raftselector.ErrIsLeader {
 			ctx, err = p.runCtxMods(ctx, p.localCtxMods)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			return p.local.IssueNodeCertificate(ctx, r)
-		***REMOVED***
+		}
 		return nil, err
-	***REMOVED***
+	}
 	modCtx, err := p.runCtxMods(ctx, p.remoteCtxMods)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	resp, err := NewNodeCAClient(conn).IssueNodeCertificate(modCtx, r)
-	if err != nil ***REMOVED***
-		if !strings.Contains(err.Error(), "is closing") && !strings.Contains(err.Error(), "the connection is unavailable") && !strings.Contains(err.Error(), "connection error") ***REMOVED***
+	if err != nil {
+		if !strings.Contains(err.Error(), "is closing") && !strings.Contains(err.Error(), "the connection is unavailable") && !strings.Contains(err.Error(), "connection error") {
 			return resp, err
-		***REMOVED***
+		}
 		conn, err := p.pollNewLeaderConn(ctx)
-		if err != nil ***REMOVED***
-			if err == raftselector.ErrIsLeader ***REMOVED***
+		if err != nil {
+			if err == raftselector.ErrIsLeader {
 				return p.local.IssueNodeCertificate(ctx, r)
-			***REMOVED***
+			}
 			return nil, err
-		***REMOVED***
+		}
 		return NewNodeCAClient(conn).IssueNodeCertificate(modCtx, r)
-	***REMOVED***
+	}
 	return resp, err
-***REMOVED***
+}
 
-func (p *raftProxyNodeCAServer) NodeCertificateStatus(ctx context.Context, r *NodeCertificateStatusRequest) (*NodeCertificateStatusResponse, error) ***REMOVED***
+func (p *raftProxyNodeCAServer) NodeCertificateStatus(ctx context.Context, r *NodeCertificateStatusRequest) (*NodeCertificateStatusResponse, error) {
 
 	conn, err := p.connSelector.LeaderConn(ctx)
-	if err != nil ***REMOVED***
-		if err == raftselector.ErrIsLeader ***REMOVED***
+	if err != nil {
+		if err == raftselector.ErrIsLeader {
 			ctx, err = p.runCtxMods(ctx, p.localCtxMods)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			return p.local.NodeCertificateStatus(ctx, r)
-		***REMOVED***
+		}
 		return nil, err
-	***REMOVED***
+	}
 	modCtx, err := p.runCtxMods(ctx, p.remoteCtxMods)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	resp, err := NewNodeCAClient(conn).NodeCertificateStatus(modCtx, r)
-	if err != nil ***REMOVED***
-		if !strings.Contains(err.Error(), "is closing") && !strings.Contains(err.Error(), "the connection is unavailable") && !strings.Contains(err.Error(), "connection error") ***REMOVED***
+	if err != nil {
+		if !strings.Contains(err.Error(), "is closing") && !strings.Contains(err.Error(), "the connection is unavailable") && !strings.Contains(err.Error(), "connection error") {
 			return resp, err
-		***REMOVED***
+		}
 		conn, err := p.pollNewLeaderConn(ctx)
-		if err != nil ***REMOVED***
-			if err == raftselector.ErrIsLeader ***REMOVED***
+		if err != nil {
+			if err == raftselector.ErrIsLeader {
 				return p.local.NodeCertificateStatus(ctx, r)
-			***REMOVED***
+			}
 			return nil, err
-		***REMOVED***
+		}
 		return NewNodeCAClient(conn).NodeCertificateStatus(modCtx, r)
-	***REMOVED***
+	}
 	return resp, err
-***REMOVED***
+}
 
-func (m *NodeCertificateStatusRequest) Size() (n int) ***REMOVED***
+func (m *NodeCertificateStatusRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.NodeID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovCa(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *NodeCertificateStatusResponse) Size() (n int) ***REMOVED***
+func (m *NodeCertificateStatusResponse) Size() (n int) {
 	var l int
 	_ = l
-	if m.Status != nil ***REMOVED***
+	if m.Status != nil {
 		l = m.Status.Size()
 		n += 1 + l + sovCa(uint64(l))
-	***REMOVED***
-	if m.Certificate != nil ***REMOVED***
+	}
+	if m.Certificate != nil {
 		l = m.Certificate.Size()
 		n += 1 + l + sovCa(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *IssueNodeCertificateRequest) Size() (n int) ***REMOVED***
+func (m *IssueNodeCertificateRequest) Size() (n int) {
 	var l int
 	_ = l
-	if m.Role != 0 ***REMOVED***
+	if m.Role != 0 {
 		n += 1 + sovCa(uint64(m.Role))
-	***REMOVED***
+	}
 	l = len(m.CSR)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovCa(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.Token)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovCa(uint64(l))
-	***REMOVED***
-	if m.Availability != 0 ***REMOVED***
+	}
+	if m.Availability != 0 {
 		n += 1 + sovCa(uint64(m.Availability))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *IssueNodeCertificateResponse) Size() (n int) ***REMOVED***
+func (m *IssueNodeCertificateResponse) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.NodeID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovCa(uint64(l))
-	***REMOVED***
-	if m.NodeMembership != 0 ***REMOVED***
+	}
+	if m.NodeMembership != 0 {
 		n += 1 + sovCa(uint64(m.NodeMembership))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *GetRootCACertificateRequest) Size() (n int) ***REMOVED***
+func (m *GetRootCACertificateRequest) Size() (n int) {
 	var l int
 	_ = l
 	return n
-***REMOVED***
+}
 
-func (m *GetRootCACertificateResponse) Size() (n int) ***REMOVED***
+func (m *GetRootCACertificateResponse) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.Certificate)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovCa(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *GetUnlockKeyRequest) Size() (n int) ***REMOVED***
+func (m *GetUnlockKeyRequest) Size() (n int) {
 	var l int
 	_ = l
 	return n
-***REMOVED***
+}
 
-func (m *GetUnlockKeyResponse) Size() (n int) ***REMOVED***
+func (m *GetUnlockKeyResponse) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.UnlockKey)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovCa(uint64(l))
-	***REMOVED***
+	}
 	l = m.Version.Size()
 	n += 1 + l + sovCa(uint64(l))
 	return n
-***REMOVED***
+}
 
-func sovCa(x uint64) (n int) ***REMOVED***
-	for ***REMOVED***
+func sovCa(x uint64) (n int) {
+	for {
 		n++
 		x >>= 7
-		if x == 0 ***REMOVED***
+		if x == 0 {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
-func sozCa(x uint64) (n int) ***REMOVED***
+}
+func sozCa(x uint64) (n int) {
 	return sovCa(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-***REMOVED***
-func (this *NodeCertificateStatusRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *NodeCertificateStatusRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&NodeCertificateStatusRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&NodeCertificateStatusRequest{`,
 		`NodeID:` + fmt.Sprintf("%v", this.NodeID) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *NodeCertificateStatusResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *NodeCertificateStatusResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&NodeCertificateStatusResponse***REMOVED***`,
+	}
+	s := strings.Join([]string{`&NodeCertificateStatusResponse{`,
 		`Status:` + strings.Replace(fmt.Sprintf("%v", this.Status), "IssuanceStatus", "IssuanceStatus", 1) + `,`,
 		`Certificate:` + strings.Replace(fmt.Sprintf("%v", this.Certificate), "Certificate", "Certificate", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *IssueNodeCertificateRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *IssueNodeCertificateRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&IssueNodeCertificateRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&IssueNodeCertificateRequest{`,
 		`Role:` + fmt.Sprintf("%v", this.Role) + `,`,
 		`CSR:` + fmt.Sprintf("%v", this.CSR) + `,`,
 		`Token:` + fmt.Sprintf("%v", this.Token) + `,`,
 		`Availability:` + fmt.Sprintf("%v", this.Availability) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *IssueNodeCertificateResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *IssueNodeCertificateResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&IssueNodeCertificateResponse***REMOVED***`,
+	}
+	s := strings.Join([]string{`&IssueNodeCertificateResponse{`,
 		`NodeID:` + fmt.Sprintf("%v", this.NodeID) + `,`,
 		`NodeMembership:` + fmt.Sprintf("%v", this.NodeMembership) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *GetRootCACertificateRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *GetRootCACertificateRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&GetRootCACertificateRequest***REMOVED***`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+	}
+	s := strings.Join([]string{`&GetRootCACertificateRequest{`,
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *GetRootCACertificateResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *GetRootCACertificateResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&GetRootCACertificateResponse***REMOVED***`,
+	}
+	s := strings.Join([]string{`&GetRootCACertificateResponse{`,
 		`Certificate:` + fmt.Sprintf("%v", this.Certificate) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *GetUnlockKeyRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *GetUnlockKeyRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&GetUnlockKeyRequest***REMOVED***`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+	}
+	s := strings.Join([]string{`&GetUnlockKeyRequest{`,
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *GetUnlockKeyResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *GetUnlockKeyResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&GetUnlockKeyResponse***REMOVED***`,
+	}
+	s := strings.Join([]string{`&GetUnlockKeyResponse{`,
 		`UnlockKey:` + fmt.Sprintf("%v", this.UnlockKey) + `,`,
 		`Version:` + strings.Replace(strings.Replace(this.Version.String(), "Version", "Version", 1), `&`, ``, 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func valueToStringCa(v interface***REMOVED******REMOVED***) string ***REMOVED***
+}
+func valueToStringCa(v interface{}) string {
 	rv := reflect.ValueOf(v)
-	if rv.IsNil() ***REMOVED***
+	if rv.IsNil() {
 		return "nil"
-	***REMOVED***
+	}
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
-***REMOVED***
-func (m *NodeCertificateStatusRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *NodeCertificateStatusRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowCa
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: NodeCertificateStatusRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: NodeCertificateStatusRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field NodeID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowCa
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthCa
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.NodeID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipCa(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthCa
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *NodeCertificateStatusResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *NodeCertificateStatusResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowCa
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: NodeCertificateStatusResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: NodeCertificateStatusResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowCa
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthCa
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Status == nil ***REMOVED***
-				m.Status = &IssuanceStatus***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.Status.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.Status == nil {
+				m.Status = &IssuanceStatus{}
+			}
+			if err := m.Status.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Certificate", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowCa
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthCa
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Certificate == nil ***REMOVED***
-				m.Certificate = &Certificate***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.Certificate.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.Certificate == nil {
+				m.Certificate = &Certificate{}
+			}
+			if err := m.Certificate.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipCa(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthCa
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *IssueNodeCertificateRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *IssueNodeCertificateRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowCa
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: IssueNodeCertificateRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: IssueNodeCertificateRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Role", wireType)
-			***REMOVED***
+			}
 			m.Role = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowCa
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Role |= (NodeRole(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CSR", wireType)
-			***REMOVED***
+			}
 			var byteLen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowCa
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				byteLen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if byteLen < 0 ***REMOVED***
+				}
+			}
+			if byteLen < 0 {
 				return ErrInvalidLengthCa
-			***REMOVED***
+			}
 			postIndex := iNdEx + byteLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.CSR = append(m.CSR[:0], dAtA[iNdEx:postIndex]...)
-			if m.CSR == nil ***REMOVED***
-				m.CSR = []byte***REMOVED******REMOVED***
-			***REMOVED***
+			if m.CSR == nil {
+				m.CSR = []byte{}
+			}
 			iNdEx = postIndex
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Token", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowCa
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthCa
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Token = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 4:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Availability", wireType)
-			***REMOVED***
+			}
 			m.Availability = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowCa
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Availability |= (NodeSpec_Availability(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipCa(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthCa
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *IssueNodeCertificateResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *IssueNodeCertificateResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowCa
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: IssueNodeCertificateResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: IssueNodeCertificateResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field NodeID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowCa
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthCa
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.NodeID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field NodeMembership", wireType)
-			***REMOVED***
+			}
 			m.NodeMembership = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowCa
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.NodeMembership |= (NodeSpec_Membership(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipCa(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthCa
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *GetRootCACertificateRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *GetRootCACertificateRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowCa
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: GetRootCACertificateRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: GetRootCACertificateRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		default:
 			iNdEx = preIndex
 			skippy, err := skipCa(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthCa
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *GetRootCACertificateResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *GetRootCACertificateResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowCa
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: GetRootCACertificateResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: GetRootCACertificateResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Certificate", wireType)
-			***REMOVED***
+			}
 			var byteLen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowCa
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				byteLen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if byteLen < 0 ***REMOVED***
+				}
+			}
+			if byteLen < 0 {
 				return ErrInvalidLengthCa
-			***REMOVED***
+			}
 			postIndex := iNdEx + byteLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Certificate = append(m.Certificate[:0], dAtA[iNdEx:postIndex]...)
-			if m.Certificate == nil ***REMOVED***
-				m.Certificate = []byte***REMOVED******REMOVED***
-			***REMOVED***
+			if m.Certificate == nil {
+				m.Certificate = []byte{}
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipCa(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthCa
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *GetUnlockKeyRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *GetUnlockKeyRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowCa
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: GetUnlockKeyRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: GetUnlockKeyRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		default:
 			iNdEx = preIndex
 			skippy, err := skipCa(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthCa
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *GetUnlockKeyResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *GetUnlockKeyResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowCa
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: GetUnlockKeyResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: GetUnlockKeyResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field UnlockKey", wireType)
-			***REMOVED***
+			}
 			var byteLen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowCa
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				byteLen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if byteLen < 0 ***REMOVED***
+				}
+			}
+			if byteLen < 0 {
 				return ErrInvalidLengthCa
-			***REMOVED***
+			}
 			postIndex := iNdEx + byteLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.UnlockKey = append(m.UnlockKey[:0], dAtA[iNdEx:postIndex]...)
-			if m.UnlockKey == nil ***REMOVED***
-				m.UnlockKey = []byte***REMOVED******REMOVED***
-			***REMOVED***
+			if m.UnlockKey == nil {
+				m.UnlockKey = []byte{}
+			}
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Version", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowCa
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthCa
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Version.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Version.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipCa(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthCa
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func skipCa(dAtA []byte) (n int, err error) ***REMOVED***
+}
+func skipCa(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return 0, ErrIntOverflowCa
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return 0, io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		wireType := int(wire & 0x7)
-		switch wireType ***REMOVED***
+		switch wireType {
 		case 0:
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowCa
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				iNdEx++
-				if dAtA[iNdEx-1] < 0x80 ***REMOVED***
+				if dAtA[iNdEx-1] < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return iNdEx, nil
 		case 1:
 			iNdEx += 8
 			return iNdEx, nil
 		case 2:
 			var length int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowCa
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				length |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			iNdEx += length
-			if length < 0 ***REMOVED***
+			if length < 0 {
 				return 0, ErrInvalidLengthCa
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 3:
-			for ***REMOVED***
+			for {
 				var innerWire uint64
 				var start int = iNdEx
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return 0, ErrIntOverflowCa
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return 0, io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					innerWire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				innerWireType := int(innerWire & 0x7)
-				if innerWireType == 4 ***REMOVED***
+				if innerWireType == 4 {
 					break
-				***REMOVED***
+				}
 				next, err := skipCa(dAtA[start:])
-				if err != nil ***REMOVED***
+				if err != nil {
 					return 0, err
-				***REMOVED***
+				}
 				iNdEx = start + next
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 4:
 			return iNdEx, nil
@@ -2285,19 +2285,19 @@ func skipCa(dAtA []byte) (n int, err error) ***REMOVED***
 			return iNdEx, nil
 		default:
 			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	panic("unreachable")
-***REMOVED***
+}
 
 var (
 	ErrInvalidLengthCa = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowCa   = fmt.Errorf("proto: integer overflow")
 )
 
-func init() ***REMOVED*** proto.RegisterFile("github.com/docker/swarmkit/api/ca.proto", fileDescriptorCa) ***REMOVED***
+func init() { proto.RegisterFile("github.com/docker/swarmkit/api/ca.proto", fileDescriptorCa) }
 
-var fileDescriptorCa = []byte***REMOVED***
+var fileDescriptorCa = []byte{
 	// 638 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x54, 0xc1, 0x6e, 0xd3, 0x4c,
 	0x10, 0xee, 0xba, 0xfd, 0xd3, 0xbf, 0xd3, 0xd0, 0xa2, 0xa5, 0x95, 0x4c, 0x9a, 0x3a, 0x95, 0x39,
@@ -2339,4 +2339,4 @@ var fileDescriptorCa = []byte***REMOVED***
 	0xfd, 0x03, 0xe3, 0x7c, 0x23, 0x4d, 0xfd, 0xf8, 0xd4, 0x98, 0xfa, 0x79, 0x6a, 0x4c, 0xbd, 0x8d,
 	0x0d, 0x74, 0x1c, 0x1b, 0xe8, 0x7b, 0x6c, 0xa0, 0x5f, 0xb1, 0x81, 0xda, 0x25, 0xf5, 0x02, 0xdf,
 	0xfb, 0x13, 0x00, 0x00, 0xff, 0xff, 0xe1, 0xda, 0xca, 0xba, 0x67, 0x06, 0x00, 0x00,
-***REMOVED***
+}

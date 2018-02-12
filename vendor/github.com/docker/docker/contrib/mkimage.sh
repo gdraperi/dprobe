@@ -3,7 +3,7 @@ set -e
 
 mkimg="$(basename "$0")"
 
-usage() ***REMOVED***
+usage() {
 	echo >&2 "usage: $mkimg [-d dir] [-t tag] [--compression algo| --no-compression] script [script-args]"
 	echo >&2 "   ie: $mkimg -t someuser/debian debootstrap --variant=minbase jessie"
 	echo >&2 "       $mkimg -t someuser/ubuntu debootstrap --include=ubuntu-minimal --components=main,universe trusty"
@@ -12,7 +12,7 @@ usage() ***REMOVED***
 	echo >&2 "       $mkimg -t someuser/mageia:4 mageia-urpmi --version=4"
 	echo >&2 "       $mkimg -t someuser/mageia:4 mageia-urpmi --version=4 --mirror=http://somemirror/"
 	exit 1
-***REMOVED***
+}
 
 scriptDir="$(dirname "$(readlink -f "$BASH_SOURCE")")/mkimage"
 
@@ -63,7 +63,7 @@ fi
 
 delDir=
 if [ -z "$dir" ]; then
-	dir="$(mktemp -d $***REMOVED***TMPDIR:-/var/tmp***REMOVED***/docker-mkimage.XXXXXXXXXX)"
+	dir="$(mktemp -d ${TMPDIR:-/var/tmp}/docker-mkimage.XXXXXXXXXX)"
 	delDir=1
 fi
 
@@ -84,7 +84,7 @@ nameserver 8.8.8.8
 nameserver 8.8.4.4
 EOF
 
-tarFile="$dir/rootfs.tar$***REMOVED***compression:+.$compression***REMOVED***"
+tarFile="$dir/rootfs.tar${compression:+.$compression}"
 touch "$tarFile"
 
 (

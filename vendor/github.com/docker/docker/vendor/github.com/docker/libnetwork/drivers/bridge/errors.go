@@ -6,336 +6,336 @@ import (
 )
 
 // ErrConfigExists error is returned when driver already has a config applied.
-type ErrConfigExists struct***REMOVED******REMOVED***
+type ErrConfigExists struct{}
 
-func (ece *ErrConfigExists) Error() string ***REMOVED***
+func (ece *ErrConfigExists) Error() string {
 	return "configuration already exists, bridge configuration can be applied only once"
-***REMOVED***
+}
 
 // Forbidden denotes the type of this error
-func (ece *ErrConfigExists) Forbidden() ***REMOVED******REMOVED***
+func (ece *ErrConfigExists) Forbidden() {}
 
 // ErrInvalidDriverConfig error is returned when Bridge Driver is passed an invalid config
-type ErrInvalidDriverConfig struct***REMOVED******REMOVED***
+type ErrInvalidDriverConfig struct{}
 
-func (eidc *ErrInvalidDriverConfig) Error() string ***REMOVED***
+func (eidc *ErrInvalidDriverConfig) Error() string {
 	return "Invalid configuration passed to Bridge Driver"
-***REMOVED***
+}
 
 // BadRequest denotes the type of this error
-func (eidc *ErrInvalidDriverConfig) BadRequest() ***REMOVED******REMOVED***
+func (eidc *ErrInvalidDriverConfig) BadRequest() {}
 
 // ErrInvalidNetworkConfig error is returned when a network is created on a driver without valid config.
-type ErrInvalidNetworkConfig struct***REMOVED******REMOVED***
+type ErrInvalidNetworkConfig struct{}
 
-func (einc *ErrInvalidNetworkConfig) Error() string ***REMOVED***
+func (einc *ErrInvalidNetworkConfig) Error() string {
 	return "trying to create a network on a driver without valid config"
-***REMOVED***
+}
 
 // Forbidden denotes the type of this error
-func (einc *ErrInvalidNetworkConfig) Forbidden() ***REMOVED******REMOVED***
+func (einc *ErrInvalidNetworkConfig) Forbidden() {}
 
 // ErrInvalidContainerConfig error is returned when an endpoint create is attempted with an invalid configuration.
-type ErrInvalidContainerConfig struct***REMOVED******REMOVED***
+type ErrInvalidContainerConfig struct{}
 
-func (eicc *ErrInvalidContainerConfig) Error() string ***REMOVED***
+func (eicc *ErrInvalidContainerConfig) Error() string {
 	return "Error in joining a container due to invalid configuration"
-***REMOVED***
+}
 
 // BadRequest denotes the type of this error
-func (eicc *ErrInvalidContainerConfig) BadRequest() ***REMOVED******REMOVED***
+func (eicc *ErrInvalidContainerConfig) BadRequest() {}
 
 // ErrInvalidEndpointConfig error is returned when an endpoint create is attempted with an invalid endpoint configuration.
-type ErrInvalidEndpointConfig struct***REMOVED******REMOVED***
+type ErrInvalidEndpointConfig struct{}
 
-func (eiec *ErrInvalidEndpointConfig) Error() string ***REMOVED***
+func (eiec *ErrInvalidEndpointConfig) Error() string {
 	return "trying to create an endpoint with an invalid endpoint configuration"
-***REMOVED***
+}
 
 // BadRequest denotes the type of this error
-func (eiec *ErrInvalidEndpointConfig) BadRequest() ***REMOVED******REMOVED***
+func (eiec *ErrInvalidEndpointConfig) BadRequest() {}
 
 // ErrNetworkExists error is returned when a network already exists and another network is created.
-type ErrNetworkExists struct***REMOVED******REMOVED***
+type ErrNetworkExists struct{}
 
-func (ene *ErrNetworkExists) Error() string ***REMOVED***
+func (ene *ErrNetworkExists) Error() string {
 	return "network already exists, bridge can only have one network"
-***REMOVED***
+}
 
 // Forbidden denotes the type of this error
-func (ene *ErrNetworkExists) Forbidden() ***REMOVED******REMOVED***
+func (ene *ErrNetworkExists) Forbidden() {}
 
 // ErrIfaceName error is returned when a new name could not be generated.
-type ErrIfaceName struct***REMOVED******REMOVED***
+type ErrIfaceName struct{}
 
-func (ein *ErrIfaceName) Error() string ***REMOVED***
+func (ein *ErrIfaceName) Error() string {
 	return "failed to find name for new interface"
-***REMOVED***
+}
 
 // InternalError denotes the type of this error
-func (ein *ErrIfaceName) InternalError() ***REMOVED******REMOVED***
+func (ein *ErrIfaceName) InternalError() {}
 
 // ErrNoIPAddr error is returned when bridge has no IPv4 address configured.
-type ErrNoIPAddr struct***REMOVED******REMOVED***
+type ErrNoIPAddr struct{}
 
-func (enip *ErrNoIPAddr) Error() string ***REMOVED***
+func (enip *ErrNoIPAddr) Error() string {
 	return "bridge has no IPv4 address configured"
-***REMOVED***
+}
 
 // InternalError denotes the type of this error
-func (enip *ErrNoIPAddr) InternalError() ***REMOVED******REMOVED***
+func (enip *ErrNoIPAddr) InternalError() {}
 
 // ErrInvalidGateway is returned when the user provided default gateway (v4/v6) is not not valid.
-type ErrInvalidGateway struct***REMOVED******REMOVED***
+type ErrInvalidGateway struct{}
 
-func (eig *ErrInvalidGateway) Error() string ***REMOVED***
+func (eig *ErrInvalidGateway) Error() string {
 	return "default gateway ip must be part of the network"
-***REMOVED***
+}
 
 // BadRequest denotes the type of this error
-func (eig *ErrInvalidGateway) BadRequest() ***REMOVED******REMOVED***
+func (eig *ErrInvalidGateway) BadRequest() {}
 
 // ErrInvalidContainerSubnet is returned when the container subnet (FixedCIDR) is not valid.
-type ErrInvalidContainerSubnet struct***REMOVED******REMOVED***
+type ErrInvalidContainerSubnet struct{}
 
-func (eis *ErrInvalidContainerSubnet) Error() string ***REMOVED***
+func (eis *ErrInvalidContainerSubnet) Error() string {
 	return "container subnet must be a subset of bridge network"
-***REMOVED***
+}
 
 // BadRequest denotes the type of this error
-func (eis *ErrInvalidContainerSubnet) BadRequest() ***REMOVED******REMOVED***
+func (eis *ErrInvalidContainerSubnet) BadRequest() {}
 
 // ErrInvalidMtu is returned when the user provided MTU is not valid.
 type ErrInvalidMtu int
 
-func (eim ErrInvalidMtu) Error() string ***REMOVED***
+func (eim ErrInvalidMtu) Error() string {
 	return fmt.Sprintf("invalid MTU number: %d", int(eim))
-***REMOVED***
+}
 
 // BadRequest denotes the type of this error
-func (eim ErrInvalidMtu) BadRequest() ***REMOVED******REMOVED***
+func (eim ErrInvalidMtu) BadRequest() {}
 
 // ErrInvalidPort is returned when the container or host port specified in the port binding is not valid.
 type ErrInvalidPort string
 
-func (ip ErrInvalidPort) Error() string ***REMOVED***
+func (ip ErrInvalidPort) Error() string {
 	return fmt.Sprintf("invalid transport port: %s", string(ip))
-***REMOVED***
+}
 
 // BadRequest denotes the type of this error
-func (ip ErrInvalidPort) BadRequest() ***REMOVED******REMOVED***
+func (ip ErrInvalidPort) BadRequest() {}
 
 // ErrUnsupportedAddressType is returned when the specified address type is not supported.
 type ErrUnsupportedAddressType string
 
-func (uat ErrUnsupportedAddressType) Error() string ***REMOVED***
+func (uat ErrUnsupportedAddressType) Error() string {
 	return fmt.Sprintf("unsupported address type: %s", string(uat))
-***REMOVED***
+}
 
 // BadRequest denotes the type of this error
-func (uat ErrUnsupportedAddressType) BadRequest() ***REMOVED******REMOVED***
+func (uat ErrUnsupportedAddressType) BadRequest() {}
 
 // ErrInvalidAddressBinding is returned when the host address specified in the port binding is not valid.
 type ErrInvalidAddressBinding string
 
-func (iab ErrInvalidAddressBinding) Error() string ***REMOVED***
+func (iab ErrInvalidAddressBinding) Error() string {
 	return fmt.Sprintf("invalid host address in port binding: %s", string(iab))
-***REMOVED***
+}
 
 // BadRequest denotes the type of this error
-func (iab ErrInvalidAddressBinding) BadRequest() ***REMOVED******REMOVED***
+func (iab ErrInvalidAddressBinding) BadRequest() {}
 
 // ActiveEndpointsError is returned when there are
 // still active endpoints in the network being deleted.
 type ActiveEndpointsError string
 
-func (aee ActiveEndpointsError) Error() string ***REMOVED***
+func (aee ActiveEndpointsError) Error() string {
 	return fmt.Sprintf("network %s has active endpoint", string(aee))
-***REMOVED***
+}
 
 // Forbidden denotes the type of this error
-func (aee ActiveEndpointsError) Forbidden() ***REMOVED******REMOVED***
+func (aee ActiveEndpointsError) Forbidden() {}
 
 // InvalidNetworkIDError is returned when the passed
 // network id for an existing network is not a known id.
 type InvalidNetworkIDError string
 
-func (inie InvalidNetworkIDError) Error() string ***REMOVED***
+func (inie InvalidNetworkIDError) Error() string {
 	return fmt.Sprintf("invalid network id %s", string(inie))
-***REMOVED***
+}
 
 // NotFound denotes the type of this error
-func (inie InvalidNetworkIDError) NotFound() ***REMOVED******REMOVED***
+func (inie InvalidNetworkIDError) NotFound() {}
 
 // InvalidEndpointIDError is returned when the passed
 // endpoint id is not valid.
 type InvalidEndpointIDError string
 
-func (ieie InvalidEndpointIDError) Error() string ***REMOVED***
+func (ieie InvalidEndpointIDError) Error() string {
 	return fmt.Sprintf("invalid endpoint id: %s", string(ieie))
-***REMOVED***
+}
 
 // BadRequest denotes the type of this error
-func (ieie InvalidEndpointIDError) BadRequest() ***REMOVED******REMOVED***
+func (ieie InvalidEndpointIDError) BadRequest() {}
 
 // InvalidSandboxIDError is returned when the passed
 // sandbox id is not valid.
 type InvalidSandboxIDError string
 
-func (isie InvalidSandboxIDError) Error() string ***REMOVED***
+func (isie InvalidSandboxIDError) Error() string {
 	return fmt.Sprintf("invalid sandbox id: %s", string(isie))
-***REMOVED***
+}
 
 // BadRequest denotes the type of this error
-func (isie InvalidSandboxIDError) BadRequest() ***REMOVED******REMOVED***
+func (isie InvalidSandboxIDError) BadRequest() {}
 
 // EndpointNotFoundError is returned when the no endpoint
 // with the passed endpoint id is found.
 type EndpointNotFoundError string
 
-func (enfe EndpointNotFoundError) Error() string ***REMOVED***
+func (enfe EndpointNotFoundError) Error() string {
 	return fmt.Sprintf("endpoint not found: %s", string(enfe))
-***REMOVED***
+}
 
 // NotFound denotes the type of this error
-func (enfe EndpointNotFoundError) NotFound() ***REMOVED******REMOVED***
+func (enfe EndpointNotFoundError) NotFound() {}
 
 // NonDefaultBridgeExistError is returned when a non-default
 // bridge config is passed but it does not already exist.
 type NonDefaultBridgeExistError string
 
-func (ndbee NonDefaultBridgeExistError) Error() string ***REMOVED***
+func (ndbee NonDefaultBridgeExistError) Error() string {
 	return fmt.Sprintf("bridge device with non default name %s must be created manually", string(ndbee))
-***REMOVED***
+}
 
 // Forbidden denotes the type of this error
-func (ndbee NonDefaultBridgeExistError) Forbidden() ***REMOVED******REMOVED***
+func (ndbee NonDefaultBridgeExistError) Forbidden() {}
 
 // NonDefaultBridgeNeedsIPError is returned when a non-default
 // bridge config is passed but it has no ip configured
 type NonDefaultBridgeNeedsIPError string
 
-func (ndbee NonDefaultBridgeNeedsIPError) Error() string ***REMOVED***
+func (ndbee NonDefaultBridgeNeedsIPError) Error() string {
 	return fmt.Sprintf("bridge device with non default name %s must have a valid IP address", string(ndbee))
-***REMOVED***
+}
 
 // Forbidden denotes the type of this error
-func (ndbee NonDefaultBridgeNeedsIPError) Forbidden() ***REMOVED******REMOVED***
+func (ndbee NonDefaultBridgeNeedsIPError) Forbidden() {}
 
 // FixedCIDRv4Error is returned when fixed-cidrv4 configuration
 // failed.
-type FixedCIDRv4Error struct ***REMOVED***
+type FixedCIDRv4Error struct {
 	Net    *net.IPNet
 	Subnet *net.IPNet
 	Err    error
-***REMOVED***
+}
 
-func (fcv4 *FixedCIDRv4Error) Error() string ***REMOVED***
+func (fcv4 *FixedCIDRv4Error) Error() string {
 	return fmt.Sprintf("setup FixedCIDRv4 failed for subnet %s in %s: %v", fcv4.Subnet, fcv4.Net, fcv4.Err)
-***REMOVED***
+}
 
 // InternalError denotes the type of this error
-func (fcv4 *FixedCIDRv4Error) InternalError() ***REMOVED******REMOVED***
+func (fcv4 *FixedCIDRv4Error) InternalError() {}
 
 // FixedCIDRv6Error is returned when fixed-cidrv6 configuration
 // failed.
-type FixedCIDRv6Error struct ***REMOVED***
+type FixedCIDRv6Error struct {
 	Net *net.IPNet
 	Err error
-***REMOVED***
+}
 
-func (fcv6 *FixedCIDRv6Error) Error() string ***REMOVED***
+func (fcv6 *FixedCIDRv6Error) Error() string {
 	return fmt.Sprintf("setup FixedCIDRv6 failed for subnet %s in %s: %v", fcv6.Net, fcv6.Net, fcv6.Err)
-***REMOVED***
+}
 
 // InternalError denotes the type of this error
-func (fcv6 *FixedCIDRv6Error) InternalError() ***REMOVED******REMOVED***
+func (fcv6 *FixedCIDRv6Error) InternalError() {}
 
 // IPTableCfgError is returned when an unexpected ip tables configuration is entered
 type IPTableCfgError string
 
-func (name IPTableCfgError) Error() string ***REMOVED***
+func (name IPTableCfgError) Error() string {
 	return fmt.Sprintf("unexpected request to set IP tables for interface: %s", string(name))
-***REMOVED***
+}
 
 // BadRequest denotes the type of this error
-func (name IPTableCfgError) BadRequest() ***REMOVED******REMOVED***
+func (name IPTableCfgError) BadRequest() {}
 
 // InvalidIPTablesCfgError is returned when an invalid ip tables configuration is entered
 type InvalidIPTablesCfgError string
 
-func (action InvalidIPTablesCfgError) Error() string ***REMOVED***
+func (action InvalidIPTablesCfgError) Error() string {
 	return fmt.Sprintf("Invalid IPTables action '%s'", string(action))
-***REMOVED***
+}
 
 // BadRequest denotes the type of this error
-func (action InvalidIPTablesCfgError) BadRequest() ***REMOVED******REMOVED***
+func (action InvalidIPTablesCfgError) BadRequest() {}
 
 // IPv4AddrRangeError is returned when a valid IP address range couldn't be found.
 type IPv4AddrRangeError string
 
-func (name IPv4AddrRangeError) Error() string ***REMOVED***
+func (name IPv4AddrRangeError) Error() string {
 	return fmt.Sprintf("can't find an address range for interface %q", string(name))
-***REMOVED***
+}
 
 // BadRequest denotes the type of this error
-func (name IPv4AddrRangeError) BadRequest() ***REMOVED******REMOVED***
+func (name IPv4AddrRangeError) BadRequest() {}
 
 // IPv4AddrAddError is returned when IPv4 address could not be added to the bridge.
-type IPv4AddrAddError struct ***REMOVED***
+type IPv4AddrAddError struct {
 	IP  *net.IPNet
 	Err error
-***REMOVED***
+}
 
-func (ipv4 *IPv4AddrAddError) Error() string ***REMOVED***
+func (ipv4 *IPv4AddrAddError) Error() string {
 	return fmt.Sprintf("failed to add IPv4 address %s to bridge: %v", ipv4.IP, ipv4.Err)
-***REMOVED***
+}
 
 // InternalError denotes the type of this error
-func (ipv4 *IPv4AddrAddError) InternalError() ***REMOVED******REMOVED***
+func (ipv4 *IPv4AddrAddError) InternalError() {}
 
 // IPv6AddrAddError is returned when IPv6 address could not be added to the bridge.
-type IPv6AddrAddError struct ***REMOVED***
+type IPv6AddrAddError struct {
 	IP  *net.IPNet
 	Err error
-***REMOVED***
+}
 
-func (ipv6 *IPv6AddrAddError) Error() string ***REMOVED***
+func (ipv6 *IPv6AddrAddError) Error() string {
 	return fmt.Sprintf("failed to add IPv6 address %s to bridge: %v", ipv6.IP, ipv6.Err)
-***REMOVED***
+}
 
 // InternalError denotes the type of this error
-func (ipv6 *IPv6AddrAddError) InternalError() ***REMOVED******REMOVED***
+func (ipv6 *IPv6AddrAddError) InternalError() {}
 
 // IPv4AddrNoMatchError is returned when the bridge's IPv4 address does not match configured.
-type IPv4AddrNoMatchError struct ***REMOVED***
+type IPv4AddrNoMatchError struct {
 	IP    net.IP
 	CfgIP net.IP
-***REMOVED***
+}
 
-func (ipv4 *IPv4AddrNoMatchError) Error() string ***REMOVED***
+func (ipv4 *IPv4AddrNoMatchError) Error() string {
 	return fmt.Sprintf("bridge IPv4 (%s) does not match requested configuration %s", ipv4.IP, ipv4.CfgIP)
-***REMOVED***
+}
 
 // BadRequest denotes the type of this error
-func (ipv4 *IPv4AddrNoMatchError) BadRequest() ***REMOVED******REMOVED***
+func (ipv4 *IPv4AddrNoMatchError) BadRequest() {}
 
 // IPv6AddrNoMatchError is returned when the bridge's IPv6 address does not match configured.
 type IPv6AddrNoMatchError net.IPNet
 
-func (ipv6 *IPv6AddrNoMatchError) Error() string ***REMOVED***
+func (ipv6 *IPv6AddrNoMatchError) Error() string {
 	return fmt.Sprintf("bridge IPv6 addresses do not match the expected bridge configuration %s", (*net.IPNet)(ipv6).String())
-***REMOVED***
+}
 
 // BadRequest denotes the type of this error
-func (ipv6 *IPv6AddrNoMatchError) BadRequest() ***REMOVED******REMOVED***
+func (ipv6 *IPv6AddrNoMatchError) BadRequest() {}
 
 // InvalidLinkIPAddrError is returned when a link is configured to a container with an invalid ip address
 type InvalidLinkIPAddrError string
 
-func (address InvalidLinkIPAddrError) Error() string ***REMOVED***
+func (address InvalidLinkIPAddrError) Error() string {
 	return fmt.Sprintf("Cannot link to a container with Invalid IP Address '%s'", string(address))
-***REMOVED***
+}
 
 // BadRequest denotes the type of this error
-func (address InvalidLinkIPAddrError) BadRequest() ***REMOVED******REMOVED***
+func (address InvalidLinkIPAddrError) BadRequest() {}

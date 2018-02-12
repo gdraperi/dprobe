@@ -26,19 +26,19 @@ import (
 	"github.com/docker/docker/pkg/locker"
 )
 
-type important struct ***REMOVED***
+type important struct {
 	locks *locker.Locker
-	data  map[string]interface***REMOVED******REMOVED***
+	data  map[string]interface{}
 	mu    sync.Mutex
-***REMOVED***
+}
 
-func (i *important) Get(name string) interface***REMOVED******REMOVED*** ***REMOVED***
+func (i *important) Get(name string) interface{} {
 	i.locks.Lock(name)
 	defer i.locks.Unlock(name)
 	return i.data[name]
-***REMOVED***
+}
 
-func (i *important) Create(name string, data interface***REMOVED******REMOVED***) ***REMOVED***
+func (i *important) Create(name string, data interface{}) {
 	i.locks.Lock(name)
 	defer i.locks.Unlock(name)
 
@@ -47,11 +47,11 @@ func (i *important) Create(name string, data interface***REMOVED******REMOVED***
 	i.mu.Lock()
 	i.data[name] = data
 	i.mu.Unlock()
-***REMOVED***
+}
 
-func (i *important) createImportant(data interface***REMOVED******REMOVED***) ***REMOVED***
+func (i *important) createImportant(data interface{}) {
 	time.Sleep(10 * time.Second)
-***REMOVED***
+}
 ```
 
 For functions dealing with a given name, always lock at the beginning of the

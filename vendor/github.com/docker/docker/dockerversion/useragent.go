@@ -15,62 +15,62 @@ const UAStringKey = "upstream-user-agent"
 // DockerUserAgent is the User-Agent the Docker client uses to identify itself.
 // In accordance with RFC 7231 (5.5.3) is of the form:
 //    [docker client's UA] UpstreamClient([upstream client's UA])
-func DockerUserAgent(ctx context.Context) string ***REMOVED***
+func DockerUserAgent(ctx context.Context) string {
 	httpVersion := make([]useragent.VersionInfo, 0, 6)
-	httpVersion = append(httpVersion, useragent.VersionInfo***REMOVED***Name: "docker", Version: Version***REMOVED***)
-	httpVersion = append(httpVersion, useragent.VersionInfo***REMOVED***Name: "go", Version: runtime.Version()***REMOVED***)
-	httpVersion = append(httpVersion, useragent.VersionInfo***REMOVED***Name: "git-commit", Version: GitCommit***REMOVED***)
-	if kernelVersion, err := kernel.GetKernelVersion(); err == nil ***REMOVED***
-		httpVersion = append(httpVersion, useragent.VersionInfo***REMOVED***Name: "kernel", Version: kernelVersion.String()***REMOVED***)
-	***REMOVED***
-	httpVersion = append(httpVersion, useragent.VersionInfo***REMOVED***Name: "os", Version: runtime.GOOS***REMOVED***)
-	httpVersion = append(httpVersion, useragent.VersionInfo***REMOVED***Name: "arch", Version: runtime.GOARCH***REMOVED***)
+	httpVersion = append(httpVersion, useragent.VersionInfo{Name: "docker", Version: Version})
+	httpVersion = append(httpVersion, useragent.VersionInfo{Name: "go", Version: runtime.Version()})
+	httpVersion = append(httpVersion, useragent.VersionInfo{Name: "git-commit", Version: GitCommit})
+	if kernelVersion, err := kernel.GetKernelVersion(); err == nil {
+		httpVersion = append(httpVersion, useragent.VersionInfo{Name: "kernel", Version: kernelVersion.String()})
+	}
+	httpVersion = append(httpVersion, useragent.VersionInfo{Name: "os", Version: runtime.GOOS})
+	httpVersion = append(httpVersion, useragent.VersionInfo{Name: "arch", Version: runtime.GOARCH})
 
 	dockerUA := useragent.AppendVersions("", httpVersion...)
 	upstreamUA := getUserAgentFromContext(ctx)
-	if len(upstreamUA) > 0 ***REMOVED***
+	if len(upstreamUA) > 0 {
 		ret := insertUpstreamUserAgent(upstreamUA, dockerUA)
 		return ret
-	***REMOVED***
+	}
 	return dockerUA
-***REMOVED***
+}
 
 // getUserAgentFromContext returns the previously saved user-agent context stored in ctx, if one exists
-func getUserAgentFromContext(ctx context.Context) string ***REMOVED***
+func getUserAgentFromContext(ctx context.Context) string {
 	var upstreamUA string
-	if ctx != nil ***REMOVED***
-		var ki interface***REMOVED******REMOVED*** = ctx.Value(UAStringKey)
-		if ki != nil ***REMOVED***
+	if ctx != nil {
+		var ki interface{} = ctx.Value(UAStringKey)
+		if ki != nil {
 			upstreamUA = ctx.Value(UAStringKey).(string)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return upstreamUA
-***REMOVED***
+}
 
 // escapeStr returns s with every rune in charsToEscape escaped by a backslash
-func escapeStr(s string, charsToEscape string) string ***REMOVED***
+func escapeStr(s string, charsToEscape string) string {
 	var ret string
-	for _, currRune := range s ***REMOVED***
+	for _, currRune := range s {
 		appended := false
-		for _, escapableRune := range charsToEscape ***REMOVED***
-			if currRune == escapableRune ***REMOVED***
+		for _, escapableRune := range charsToEscape {
+			if currRune == escapableRune {
 				ret += `\` + string(currRune)
 				appended = true
 				break
-			***REMOVED***
-		***REMOVED***
-		if !appended ***REMOVED***
+			}
+		}
+		if !appended {
 			ret += string(currRune)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return ret
-***REMOVED***
+}
 
 // insertUpstreamUserAgent adds the upstream client useragent to create a user-agent
 // string of the form:
 //   $dockerUA UpstreamClient($upstreamUA)
-func insertUpstreamUserAgent(upstreamUA string, dockerUA string) string ***REMOVED***
+func insertUpstreamUserAgent(upstreamUA string, dockerUA string) string {
 	charsToEscape := `();\`
 	upstreamUAEscaped := escapeStr(upstreamUA, charsToEscape)
 	return fmt.Sprintf("%s UpstreamClient(%s)", dockerUA, upstreamUAEscaped)
-***REMOVED***
+}

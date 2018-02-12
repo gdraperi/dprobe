@@ -21,7 +21,7 @@ import (
 	"syscall"
 )
 
-func TryLockFile(path string, flag int, perm os.FileMode) (*LockedFile, error) ***REMOVED***
+func TryLockFile(path string, flag int, perm os.FileMode) (*LockedFile, error) {
 	var lock syscall.Flock_t
 	lock.Start = 0
 	lock.Len = 0
@@ -30,20 +30,20 @@ func TryLockFile(path string, flag int, perm os.FileMode) (*LockedFile, error) *
 	lock.Whence = 0
 	lock.Pid = 0
 	f, err := os.OpenFile(path, flag, perm)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if err := syscall.FcntlFlock(f.Fd(), syscall.F_SETLK, &lock); err != nil ***REMOVED***
+	}
+	if err := syscall.FcntlFlock(f.Fd(), syscall.F_SETLK, &lock); err != nil {
 		f.Close()
-		if err == syscall.EAGAIN ***REMOVED***
+		if err == syscall.EAGAIN {
 			err = ErrLocked
-		***REMOVED***
+		}
 		return nil, err
-	***REMOVED***
-	return &LockedFile***REMOVED***f***REMOVED***, nil
-***REMOVED***
+	}
+	return &LockedFile{f}, nil
+}
 
-func LockFile(path string, flag int, perm os.FileMode) (*LockedFile, error) ***REMOVED***
+func LockFile(path string, flag int, perm os.FileMode) (*LockedFile, error) {
 	var lock syscall.Flock_t
 	lock.Start = 0
 	lock.Len = 0
@@ -51,12 +51,12 @@ func LockFile(path string, flag int, perm os.FileMode) (*LockedFile, error) ***R
 	lock.Type = syscall.F_WRLCK
 	lock.Whence = 0
 	f, err := os.OpenFile(path, flag, perm)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if err = syscall.FcntlFlock(f.Fd(), syscall.F_SETLKW, &lock); err != nil ***REMOVED***
+	}
+	if err = syscall.FcntlFlock(f.Fd(), syscall.F_SETLKW, &lock); err != nil {
 		f.Close()
 		return nil, err
-	***REMOVED***
-	return &LockedFile***REMOVED***f***REMOVED***, nil
-***REMOVED***
+	}
+	return &LockedFile{f}, nil
+}

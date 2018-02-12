@@ -12,7 +12,7 @@ import (
 	"github.com/go-check/check"
 )
 
-func (s *DockerSuite) TestPortList(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestPortList(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	// one port
 	out, _ := dockerCmd(c, "run", "-d", "-p", "9876:80", "busybox", "top")
@@ -20,13 +20,13 @@ func (s *DockerSuite) TestPortList(c *check.C) ***REMOVED***
 
 	out, _ = dockerCmd(c, "port", firstID, "80")
 
-	err := assertPortList(c, out, []string***REMOVED***"0.0.0.0:9876"***REMOVED***)
+	err := assertPortList(c, out, []string{"0.0.0.0:9876"})
 	// Port list is not correct
 	c.Assert(err, checker.IsNil)
 
 	out, _ = dockerCmd(c, "port", firstID)
 
-	err = assertPortList(c, out, []string***REMOVED***"80/tcp -> 0.0.0.0:9876"***REMOVED***)
+	err = assertPortList(c, out, []string{"80/tcp -> 0.0.0.0:9876"})
 	// Port list is not correct
 	c.Assert(err, checker.IsNil)
 
@@ -42,16 +42,16 @@ func (s *DockerSuite) TestPortList(c *check.C) ***REMOVED***
 
 	out, _ = dockerCmd(c, "port", ID, "80")
 
-	err = assertPortList(c, out, []string***REMOVED***"0.0.0.0:9876"***REMOVED***)
+	err = assertPortList(c, out, []string{"0.0.0.0:9876"})
 	// Port list is not correct
 	c.Assert(err, checker.IsNil)
 
 	out, _ = dockerCmd(c, "port", ID)
 
-	err = assertPortList(c, out, []string***REMOVED***
+	err = assertPortList(c, out, []string{
 		"80/tcp -> 0.0.0.0:9876",
 		"81/tcp -> 0.0.0.0:9877",
-		"82/tcp -> 0.0.0.0:9878"***REMOVED***)
+		"82/tcp -> 0.0.0.0:9878"})
 	// Port list is not correct
 	c.Assert(err, checker.IsNil)
 
@@ -68,25 +68,25 @@ func (s *DockerSuite) TestPortList(c *check.C) ***REMOVED***
 
 	out, _ = dockerCmd(c, "port", ID, "80")
 
-	err = assertPortList(c, out, []string***REMOVED***"0.0.0.0:9876", "0.0.0.0:9999"***REMOVED***)
+	err = assertPortList(c, out, []string{"0.0.0.0:9876", "0.0.0.0:9999"})
 	// Port list is not correct
 	c.Assert(err, checker.IsNil)
 
 	out, _ = dockerCmd(c, "port", ID)
 
-	err = assertPortList(c, out, []string***REMOVED***
+	err = assertPortList(c, out, []string{
 		"80/tcp -> 0.0.0.0:9876",
 		"80/tcp -> 0.0.0.0:9999",
 		"81/tcp -> 0.0.0.0:9877",
-		"82/tcp -> 0.0.0.0:9878"***REMOVED***)
+		"82/tcp -> 0.0.0.0:9878"})
 	// Port list is not correct
 	c.Assert(err, checker.IsNil)
 	dockerCmd(c, "rm", "-f", ID)
 
-	testRange := func() ***REMOVED***
+	testRange := func() {
 		// host port ranges used
 		IDs := make([]string, 3)
-		for i := 0; i < 3; i++ ***REMOVED***
+		for i := 0; i < 3; i++ {
 			out, _ = dockerCmd(c, "run", "-d",
 				"-p", "9090-9092:80",
 				"busybox", "top")
@@ -94,10 +94,10 @@ func (s *DockerSuite) TestPortList(c *check.C) ***REMOVED***
 
 			out, _ = dockerCmd(c, "port", IDs[i])
 
-			err = assertPortList(c, out, []string***REMOVED***fmt.Sprintf("80/tcp -> 0.0.0.0:%d", 9090+i)***REMOVED***)
+			err = assertPortList(c, out, []string{fmt.Sprintf("80/tcp -> 0.0.0.0:%d", 9090+i)})
 			// Port list is not correct
 			c.Assert(err, checker.IsNil)
-		***REMOVED***
+		}
 
 		// test port range exhaustion
 		out, _, err = dockerCmdWithError("run", "-d",
@@ -106,22 +106,22 @@ func (s *DockerSuite) TestPortList(c *check.C) ***REMOVED***
 		// Exhausted port range did not return an error
 		c.Assert(err, checker.NotNil, check.Commentf("out: %s", out))
 
-		for i := 0; i < 3; i++ ***REMOVED***
+		for i := 0; i < 3; i++ {
 			dockerCmd(c, "rm", "-f", IDs[i])
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	testRange()
 	// Verify we ran re-use port ranges after they are no longer in use.
 	testRange()
 
 	// test invalid port ranges
-	for _, invalidRange := range []string***REMOVED***"9090-9089:80", "9090-:80", "-9090:80"***REMOVED*** ***REMOVED***
+	for _, invalidRange := range []string{"9090-9089:80", "9090-:80", "-9090:80"} {
 		out, _, err = dockerCmdWithError("run", "-d",
 			"-p", invalidRange,
 			"busybox", "top")
 		// Port range should have returned an error
 		c.Assert(err, checker.NotNil, check.Commentf("out: %s", out))
-	***REMOVED***
+	}
 
 	// test host range:container range spec.
 	out, _ = dockerCmd(c, "run", "-d",
@@ -131,11 +131,11 @@ func (s *DockerSuite) TestPortList(c *check.C) ***REMOVED***
 
 	out, _ = dockerCmd(c, "port", ID)
 
-	err = assertPortList(c, out, []string***REMOVED***
+	err = assertPortList(c, out, []string{
 		"80/tcp -> 0.0.0.0:9800",
 		"81/tcp -> 0.0.0.0:9801",
 		"82/tcp -> 0.0.0.0:9802",
-		"83/tcp -> 0.0.0.0:9803"***REMOVED***)
+		"83/tcp -> 0.0.0.0:9803"})
 	// Port list is not correct
 	c.Assert(err, checker.IsNil)
 	dockerCmd(c, "rm", "-f", ID)
@@ -150,66 +150,66 @@ func (s *DockerSuite) TestPortList(c *check.C) ***REMOVED***
 	out, _ = dockerCmd(c, "port", ID)
 
 	// Running this test multiple times causes the TCP port to increment.
-	err = assertPortRange(c, out, []int***REMOVED***8000, 8080***REMOVED***, []int***REMOVED***8000, 8080***REMOVED***)
+	err = assertPortRange(c, out, []int{8000, 8080}, []int{8000, 8080})
 	// Port list is not correct
 	c.Assert(err, checker.IsNil)
 	dockerCmd(c, "rm", "-f", ID)
-***REMOVED***
+}
 
-func assertPortList(c *check.C, out string, expected []string) error ***REMOVED***
+func assertPortList(c *check.C, out string, expected []string) error {
 	lines := strings.Split(strings.Trim(out, "\n "), "\n")
-	if len(lines) != len(expected) ***REMOVED***
+	if len(lines) != len(expected) {
 		return fmt.Errorf("different size lists %s, %d, %d", out, len(lines), len(expected))
-	***REMOVED***
+	}
 	sort.Strings(lines)
 	sort.Strings(expected)
 
-	for i := 0; i < len(expected); i++ ***REMOVED***
-		if lines[i] != expected[i] ***REMOVED***
+	for i := 0; i < len(expected); i++ {
+		if lines[i] != expected[i] {
 			return fmt.Errorf("|" + lines[i] + "!=" + expected[i] + "|")
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
-func assertPortRange(c *check.C, out string, expectedTcp, expectedUdp []int) error ***REMOVED***
+func assertPortRange(c *check.C, out string, expectedTcp, expectedUdp []int) error {
 	lines := strings.Split(strings.Trim(out, "\n "), "\n")
 
 	var validTcp, validUdp bool
-	for _, l := range lines ***REMOVED***
+	for _, l := range lines {
 		// 80/tcp -> 0.0.0.0:8015
 		port, err := strconv.Atoi(strings.Split(l, ":")[1])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-		if strings.Contains(l, "tcp") && expectedTcp != nil ***REMOVED***
-			if port < expectedTcp[0] || port > expectedTcp[1] ***REMOVED***
+		}
+		if strings.Contains(l, "tcp") && expectedTcp != nil {
+			if port < expectedTcp[0] || port > expectedTcp[1] {
 				return fmt.Errorf("tcp port (%d) not in range expected range %d-%d", port, expectedTcp[0], expectedTcp[1])
-			***REMOVED***
+			}
 			validTcp = true
-		***REMOVED***
-		if strings.Contains(l, "udp") && expectedUdp != nil ***REMOVED***
-			if port < expectedUdp[0] || port > expectedUdp[1] ***REMOVED***
+		}
+		if strings.Contains(l, "udp") && expectedUdp != nil {
+			if port < expectedUdp[0] || port > expectedUdp[1] {
 				return fmt.Errorf("udp port (%d) not in range expected range %d-%d", port, expectedUdp[0], expectedUdp[1])
-			***REMOVED***
+			}
 			validUdp = true
-		***REMOVED***
-	***REMOVED***
-	if !validTcp ***REMOVED***
+		}
+	}
+	if !validTcp {
 		return fmt.Errorf("tcp port not found")
-	***REMOVED***
-	if !validUdp ***REMOVED***
+	}
+	if !validUdp {
 		return fmt.Errorf("udp port not found")
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func stopRemoveContainer(id string, c *check.C) ***REMOVED***
+func stopRemoveContainer(id string, c *check.C) {
 	dockerCmd(c, "rm", "-f", id)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestUnpublishedPortsInPsOutput(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestUnpublishedPortsInPsOutput(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	// Run busybox with command line expose (equivalent to EXPOSE in image's Dockerfile) for the following ports
 	port1 := 80
@@ -280,9 +280,9 @@ func (s *DockerSuite) TestUnpublishedPortsInPsOutput(c *check.C) ***REMOVED***
 	c.Assert(out, checker.Contains, unpPort1)
 	// Missing port binding (expBnd2) in docker ps output
 	c.Assert(out, checker.Contains, expBnd2)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestPortHostBinding(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestPortHostBinding(c *check.C) {
 	testRequires(c, DaemonIsLinux, NotUserNamespace)
 	out, _ := dockerCmd(c, "run", "-d", "-p", "9876:80", "busybox",
 		"nc", "-l", "-p", "80")
@@ -290,7 +290,7 @@ func (s *DockerSuite) TestPortHostBinding(c *check.C) ***REMOVED***
 
 	out, _ = dockerCmd(c, "port", firstID, "80")
 
-	err := assertPortList(c, out, []string***REMOVED***"0.0.0.0:9876"***REMOVED***)
+	err := assertPortList(c, out, []string{"0.0.0.0:9876"})
 	// Port list is not correct
 	c.Assert(err, checker.IsNil)
 
@@ -302,9 +302,9 @@ func (s *DockerSuite) TestPortHostBinding(c *check.C) ***REMOVED***
 	out, _, err = dockerCmdWithError("run", "--net=host", "busybox", "nc", "localhost", "9876")
 	// Port is still bound after the Container is removed
 	c.Assert(err, checker.NotNil, check.Commentf("out: %s", out))
-***REMOVED***
+}
 
-func (s *DockerSuite) TestPortExposeHostBinding(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestPortExposeHostBinding(c *check.C) {
 	testRequires(c, DaemonIsLinux, NotUserNamespace)
 	out, _ := dockerCmd(c, "run", "-d", "-P", "--expose", "80", "busybox",
 		"nc", "-l", "-p", "80")
@@ -324,9 +324,9 @@ func (s *DockerSuite) TestPortExposeHostBinding(c *check.C) ***REMOVED***
 		"nc", "localhost", strings.TrimSpace(exposedPort))
 	// Port is still bound after the Container is removed
 	c.Assert(err, checker.NotNil, check.Commentf("out: %s", out))
-***REMOVED***
+}
 
-func (s *DockerSuite) TestPortBindingOnSandbox(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestPortBindingOnSandbox(c *check.C) {
 	testRequires(c, DaemonIsLinux, NotUserNamespace)
 	dockerCmd(c, "network", "create", "--internal", "-d", "bridge", "internal-net")
 	nr := getNetworkResource(c, "internal-net")
@@ -348,4 +348,4 @@ func (s *DockerSuite) TestPortBindingOnSandbox(c *check.C) ***REMOVED***
 	c.Assert(err, check.IsNil,
 		check.Commentf("Port mapping on the new network is expected to succeed"))
 
-***REMOVED***
+}

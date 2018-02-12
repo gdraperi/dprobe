@@ -18,6 +18,6 @@ var (
 // NotImplementedError indicates that the input is not currently supported.
 type NotImplementedError string
 
-func (e NotImplementedError) Error() string ***REMOVED***
+func (e NotImplementedError) Error() string {
 	return "pkcs12: " + string(e)
-***REMOVED***
+}

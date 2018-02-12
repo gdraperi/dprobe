@@ -2,5 +2,5 @@
 
 package journald
 
-type journald struct ***REMOVED***
-***REMOVED***
+type journald struct {
+}

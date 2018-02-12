@@ -10,120 +10,120 @@ import (
 	"testing"
 )
 
-func testParse(t *testing.T, input []byte, expected, expectedPlaintext string) ***REMOVED***
+func testParse(t *testing.T, input []byte, expected, expectedPlaintext string) {
 	b, rest := Decode(input)
-	if b == nil ***REMOVED***
+	if b == nil {
 		t.Fatal("failed to decode clearsign message")
-	***REMOVED***
-	if !bytes.Equal(rest, []byte("trailing")) ***REMOVED***
+	}
+	if !bytes.Equal(rest, []byte("trailing")) {
 		t.Errorf("unexpected remaining bytes returned: %s", string(rest))
-	***REMOVED***
-	if b.ArmoredSignature.Type != "PGP SIGNATURE" ***REMOVED***
+	}
+	if b.ArmoredSignature.Type != "PGP SIGNATURE" {
 		t.Errorf("bad armor type, got:%s, want:PGP SIGNATURE", b.ArmoredSignature.Type)
-	***REMOVED***
-	if !bytes.Equal(b.Bytes, []byte(expected)) ***REMOVED***
+	}
+	if !bytes.Equal(b.Bytes, []byte(expected)) {
 		t.Errorf("bad body, got:%x want:%x", b.Bytes, expected)
-	***REMOVED***
+	}
 
-	if !bytes.Equal(b.Plaintext, []byte(expectedPlaintext)) ***REMOVED***
+	if !bytes.Equal(b.Plaintext, []byte(expectedPlaintext)) {
 		t.Errorf("bad plaintext, got:%x want:%x", b.Plaintext, expectedPlaintext)
-	***REMOVED***
+	}
 
 	keyring, err := openpgp.ReadArmoredKeyRing(bytes.NewBufferString(signingKey))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("failed to parse public key: %s", err)
-	***REMOVED***
+	}
 
-	if _, err := openpgp.CheckDetachedSignature(keyring, bytes.NewBuffer(b.Bytes), b.ArmoredSignature.Body); err != nil ***REMOVED***
+	if _, err := openpgp.CheckDetachedSignature(keyring, bytes.NewBuffer(b.Bytes), b.ArmoredSignature.Body); err != nil {
 		t.Errorf("failed to check signature: %s", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestParse(t *testing.T) ***REMOVED***
+func TestParse(t *testing.T) {
 	testParse(t, clearsignInput, "Hello world\r\nline 2", "Hello world\nline 2\n")
 	testParse(t, clearsignInput2, "\r\n\r\n(This message has a couple of blank lines at the start and end.)\r\n\r\n", "\n\n(This message has a couple of blank lines at the start and end.)\n\n\n")
-***REMOVED***
+}
 
-func TestParseInvalid(t *testing.T) ***REMOVED***
-	if b, _ := Decode(clearsignInput3); b != nil ***REMOVED***
+func TestParseInvalid(t *testing.T) {
+	if b, _ := Decode(clearsignInput3); b != nil {
 		t.Fatal("decoded a bad clearsigned message without any error")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestParseWithNoNewlineAtEnd(t *testing.T) ***REMOVED***
+func TestParseWithNoNewlineAtEnd(t *testing.T) {
 	input := clearsignInput
 	input = input[:len(input)-len("trailing")-1]
 	b, rest := Decode(input)
-	if b == nil ***REMOVED***
+	if b == nil {
 		t.Fatal("failed to decode clearsign message")
-	***REMOVED***
-	if len(rest) > 0 ***REMOVED***
+	}
+	if len(rest) > 0 {
 		t.Errorf("unexpected remaining bytes returned: %s", string(rest))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-var signingTests = []struct ***REMOVED***
+var signingTests = []struct {
 	in, signed, plaintext string
-***REMOVED******REMOVED***
-	***REMOVED***"", "", ""***REMOVED***,
-	***REMOVED***"a", "a", "a\n"***REMOVED***,
-	***REMOVED***"a\n", "a", "a\n"***REMOVED***,
-	***REMOVED***"-a\n", "-a", "-a\n"***REMOVED***,
-	***REMOVED***"--a\nb", "--a\r\nb", "--a\nb\n"***REMOVED***,
+}{
+	{"", "", ""},
+	{"a", "a", "a\n"},
+	{"a\n", "a", "a\n"},
+	{"-a\n", "-a", "-a\n"},
+	{"--a\nb", "--a\r\nb", "--a\nb\n"},
 	// leading whitespace
-	***REMOVED***" a\n", " a", " a\n"***REMOVED***,
-	***REMOVED***"  a\n", "  a", "  a\n"***REMOVED***,
+	{" a\n", " a", " a\n"},
+	{"  a\n", "  a", "  a\n"},
 	// trailing whitespace (should be stripped)
-	***REMOVED***"a \n", "a", "a\n"***REMOVED***,
-	***REMOVED***"a ", "a", "a\n"***REMOVED***,
+	{"a \n", "a", "a\n"},
+	{"a ", "a", "a\n"},
 	// whitespace-only lines (should be stripped)
-	***REMOVED***"  \n", "", "\n"***REMOVED***,
-	***REMOVED***"  ", "", "\n"***REMOVED***,
-	***REMOVED***"a\n  \n  \nb\n", "a\r\n\r\n\r\nb", "a\n\n\nb\n"***REMOVED***,
-***REMOVED***
+	{"  \n", "", "\n"},
+	{"  ", "", "\n"},
+	{"a\n  \n  \nb\n", "a\r\n\r\n\r\nb", "a\n\n\nb\n"},
+}
 
-func TestSigning(t *testing.T) ***REMOVED***
+func TestSigning(t *testing.T) {
 	keyring, err := openpgp.ReadArmoredKeyRing(bytes.NewBufferString(signingKey))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("failed to parse public key: %s", err)
-	***REMOVED***
+	}
 
-	for i, test := range signingTests ***REMOVED***
+	for i, test := range signingTests {
 		var buf bytes.Buffer
 
 		plaintext, err := Encode(&buf, keyring[0].PrivateKey, nil)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Errorf("#%d: error from Encode: %s", i, err)
 			continue
-		***REMOVED***
-		if _, err := plaintext.Write([]byte(test.in)); err != nil ***REMOVED***
+		}
+		if _, err := plaintext.Write([]byte(test.in)); err != nil {
 			t.Errorf("#%d: error from Write: %s", i, err)
 			continue
-		***REMOVED***
-		if err := plaintext.Close(); err != nil ***REMOVED***
+		}
+		if err := plaintext.Close(); err != nil {
 			t.Fatalf("#%d: error from Close: %s", i, err)
 			continue
-		***REMOVED***
+		}
 
 		b, _ := Decode(buf.Bytes())
-		if b == nil ***REMOVED***
+		if b == nil {
 			t.Errorf("#%d: failed to decode clearsign message", i)
 			continue
-		***REMOVED***
-		if !bytes.Equal(b.Bytes, []byte(test.signed)) ***REMOVED***
+		}
+		if !bytes.Equal(b.Bytes, []byte(test.signed)) {
 			t.Errorf("#%d: bad result, got:%x, want:%x", i, b.Bytes, test.signed)
 			continue
-		***REMOVED***
-		if !bytes.Equal(b.Plaintext, []byte(test.plaintext)) ***REMOVED***
+		}
+		if !bytes.Equal(b.Plaintext, []byte(test.plaintext)) {
 			t.Errorf("#%d: bad result, got:%x, want:%x", i, b.Plaintext, test.plaintext)
 			continue
-		***REMOVED***
+		}
 
-		if _, err := openpgp.CheckDetachedSignature(keyring, bytes.NewBuffer(b.Bytes), b.ArmoredSignature.Body); err != nil ***REMOVED***
+		if _, err := openpgp.CheckDetachedSignature(keyring, bytes.NewBuffer(b.Bytes), b.ArmoredSignature.Body); err != nil {
 			t.Errorf("#%d: failed to check signature: %s", i, err)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 var clearsignInput = []byte(`
 ;lasjlkfdsa

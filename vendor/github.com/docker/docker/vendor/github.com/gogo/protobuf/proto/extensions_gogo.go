@@ -38,116 +38,116 @@ import (
 	"sync"
 )
 
-func GetBoolExtension(pb Message, extension *ExtensionDesc, ifnotset bool) bool ***REMOVED***
-	if reflect.ValueOf(pb).IsNil() ***REMOVED***
+func GetBoolExtension(pb Message, extension *ExtensionDesc, ifnotset bool) bool {
+	if reflect.ValueOf(pb).IsNil() {
 		return ifnotset
-	***REMOVED***
+	}
 	value, err := GetExtension(pb, extension)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return ifnotset
-	***REMOVED***
-	if value == nil ***REMOVED***
+	}
+	if value == nil {
 		return ifnotset
-	***REMOVED***
-	if value.(*bool) == nil ***REMOVED***
+	}
+	if value.(*bool) == nil {
 		return ifnotset
-	***REMOVED***
+	}
 	return *(value.(*bool))
-***REMOVED***
+}
 
-func (this *Extension) Equal(that *Extension) bool ***REMOVED***
+func (this *Extension) Equal(that *Extension) bool {
 	return bytes.Equal(this.enc, that.enc)
-***REMOVED***
+}
 
-func (this *Extension) Compare(that *Extension) int ***REMOVED***
+func (this *Extension) Compare(that *Extension) int {
 	return bytes.Compare(this.enc, that.enc)
-***REMOVED***
+}
 
-func SizeOfInternalExtension(m extendableProto) (n int) ***REMOVED***
+func SizeOfInternalExtension(m extendableProto) (n int) {
 	return SizeOfExtensionMap(m.extensionsWrite())
-***REMOVED***
+}
 
-func SizeOfExtensionMap(m map[int32]Extension) (n int) ***REMOVED***
+func SizeOfExtensionMap(m map[int32]Extension) (n int) {
 	return extensionsMapSize(m)
-***REMOVED***
+}
 
-type sortableMapElem struct ***REMOVED***
+type sortableMapElem struct {
 	field int32
 	ext   Extension
-***REMOVED***
+}
 
-func newSortableExtensionsFromMap(m map[int32]Extension) sortableExtensions ***REMOVED***
+func newSortableExtensionsFromMap(m map[int32]Extension) sortableExtensions {
 	s := make(sortableExtensions, 0, len(m))
-	for k, v := range m ***REMOVED***
-		s = append(s, &sortableMapElem***REMOVED***field: k, ext: v***REMOVED***)
-	***REMOVED***
+	for k, v := range m {
+		s = append(s, &sortableMapElem{field: k, ext: v})
+	}
 	return s
-***REMOVED***
+}
 
 type sortableExtensions []*sortableMapElem
 
-func (this sortableExtensions) Len() int ***REMOVED*** return len(this) ***REMOVED***
+func (this sortableExtensions) Len() int { return len(this) }
 
-func (this sortableExtensions) Swap(i, j int) ***REMOVED*** this[i], this[j] = this[j], this[i] ***REMOVED***
+func (this sortableExtensions) Swap(i, j int) { this[i], this[j] = this[j], this[i] }
 
-func (this sortableExtensions) Less(i, j int) bool ***REMOVED*** return this[i].field < this[j].field ***REMOVED***
+func (this sortableExtensions) Less(i, j int) bool { return this[i].field < this[j].field }
 
-func (this sortableExtensions) String() string ***REMOVED***
+func (this sortableExtensions) String() string {
 	sort.Sort(this)
 	ss := make([]string, len(this))
-	for i := range this ***REMOVED***
+	for i := range this {
 		ss[i] = fmt.Sprintf("%d: %v", this[i].field, this[i].ext)
-	***REMOVED***
+	}
 	return "map[" + strings.Join(ss, ",") + "]"
-***REMOVED***
+}
 
-func StringFromInternalExtension(m extendableProto) string ***REMOVED***
+func StringFromInternalExtension(m extendableProto) string {
 	return StringFromExtensionsMap(m.extensionsWrite())
-***REMOVED***
+}
 
-func StringFromExtensionsMap(m map[int32]Extension) string ***REMOVED***
+func StringFromExtensionsMap(m map[int32]Extension) string {
 	return newSortableExtensionsFromMap(m).String()
-***REMOVED***
+}
 
-func StringFromExtensionsBytes(ext []byte) string ***REMOVED***
+func StringFromExtensionsBytes(ext []byte) string {
 	m, err := BytesToExtensionsMap(ext)
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 	return StringFromExtensionsMap(m)
-***REMOVED***
+}
 
-func EncodeInternalExtension(m extendableProto, data []byte) (n int, err error) ***REMOVED***
+func EncodeInternalExtension(m extendableProto, data []byte) (n int, err error) {
 	return EncodeExtensionMap(m.extensionsWrite(), data)
-***REMOVED***
+}
 
-func EncodeExtensionMap(m map[int32]Extension, data []byte) (n int, err error) ***REMOVED***
-	if err := encodeExtensionsMap(m); err != nil ***REMOVED***
+func EncodeExtensionMap(m map[int32]Extension, data []byte) (n int, err error) {
+	if err := encodeExtensionsMap(m); err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	keys := make([]int, 0, len(m))
-	for k := range m ***REMOVED***
+	for k := range m {
 		keys = append(keys, int(k))
-	***REMOVED***
+	}
 	sort.Ints(keys)
-	for _, k := range keys ***REMOVED***
+	for _, k := range keys {
 		n += copy(data[n:], m[int32(k)].enc)
-	***REMOVED***
+	}
 	return n, nil
-***REMOVED***
+}
 
-func GetRawExtension(m map[int32]Extension, id int32) ([]byte, error) ***REMOVED***
-	if m[id].value == nil || m[id].desc == nil ***REMOVED***
+func GetRawExtension(m map[int32]Extension, id int32) ([]byte, error) {
+	if m[id].value == nil || m[id].desc == nil {
 		return m[id].enc, nil
-	***REMOVED***
-	if err := encodeExtensionsMap(m); err != nil ***REMOVED***
+	}
+	if err := encodeExtensionsMap(m); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return m[id].enc, nil
-***REMOVED***
+}
 
-func size(buf []byte, wire int) (int, error) ***REMOVED***
-	switch wire ***REMOVED***
+func size(buf []byte, wire int) (int, error) {
+	switch wire {
 	case WireVarint:
 		_, n := DecodeVarint(buf)
 		return n, nil
@@ -160,69 +160,69 @@ func size(buf []byte, wire int) (int, error) ***REMOVED***
 		return 4, nil
 	case WireStartGroup:
 		offset := 0
-		for ***REMOVED***
+		for {
 			u, n := DecodeVarint(buf[offset:])
 			fwire := int(u & 0x7)
 			offset += n
-			if fwire == WireEndGroup ***REMOVED***
+			if fwire == WireEndGroup {
 				return offset, nil
-			***REMOVED***
+			}
 			s, err := size(buf[offset:], wire)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			offset += s
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return 0, fmt.Errorf("proto: can't get size for unknown wire type %d", wire)
-***REMOVED***
+}
 
-func BytesToExtensionsMap(buf []byte) (map[int32]Extension, error) ***REMOVED***
+func BytesToExtensionsMap(buf []byte) (map[int32]Extension, error) {
 	m := make(map[int32]Extension)
 	i := 0
-	for i < len(buf) ***REMOVED***
+	for i < len(buf) {
 		tag, n := DecodeVarint(buf[i:])
-		if n <= 0 ***REMOVED***
+		if n <= 0 {
 			return nil, fmt.Errorf("unable to decode varint")
-		***REMOVED***
+		}
 		fieldNum := int32(tag >> 3)
 		wireType := int(tag & 0x7)
 		l, err := size(buf[i+n:], wireType)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		end := i + int(l) + n
-		m[int32(fieldNum)] = Extension***REMOVED***enc: buf[i:end]***REMOVED***
+		m[int32(fieldNum)] = Extension{enc: buf[i:end]}
 		i = end
-	***REMOVED***
+	}
 	return m, nil
-***REMOVED***
+}
 
-func NewExtension(e []byte) Extension ***REMOVED***
-	ee := Extension***REMOVED***enc: make([]byte, len(e))***REMOVED***
+func NewExtension(e []byte) Extension {
+	ee := Extension{enc: make([]byte, len(e))}
 	copy(ee.enc, e)
 	return ee
-***REMOVED***
+}
 
-func AppendExtension(e Message, tag int32, buf []byte) ***REMOVED***
-	if ee, eok := e.(extensionsBytes); eok ***REMOVED***
+func AppendExtension(e Message, tag int32, buf []byte) {
+	if ee, eok := e.(extensionsBytes); eok {
 		ext := ee.GetExtensions()
 		*ext = append(*ext, buf...)
 		return
-	***REMOVED***
-	if ee, eok := e.(extendableProto); eok ***REMOVED***
+	}
+	if ee, eok := e.(extendableProto); eok {
 		m := ee.extensionsWrite()
 		ext := m[int32(tag)] // may be missing
 		ext.enc = append(ext.enc, buf...)
 		m[int32(tag)] = ext
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func encodeExtension(e *Extension) error ***REMOVED***
-	if e.value == nil || e.desc == nil ***REMOVED***
+func encodeExtension(e *Extension) error {
+	if e.value == nil || e.desc == nil {
 		// Extension is only in its encoded form.
 		return nil
-	***REMOVED***
+	}
 	// We don't skip extensions that have an encoded form set,
 	// because the extension value may have been mutated after
 	// the last time this function was called.
@@ -231,64 +231,64 @@ func encodeExtension(e *Extension) error ***REMOVED***
 	props := extensionProperties(e.desc)
 
 	p := NewBuffer(nil)
-	// If e.value has type T, the encoder expects a *struct***REMOVED*** X T ***REMOVED***.
+	// If e.value has type T, the encoder expects a *struct{ X T }.
 	// Pass a *T with a zero field and hope it all works out.
 	x := reflect.New(et)
 	x.Elem().Set(reflect.ValueOf(e.value))
-	if err := props.enc(p, props, toStructPointer(x)); err != nil ***REMOVED***
+	if err := props.enc(p, props, toStructPointer(x)); err != nil {
 		return err
-	***REMOVED***
+	}
 	e.enc = p.buf
 	return nil
-***REMOVED***
+}
 
-func (this Extension) GoString() string ***REMOVED***
-	if this.enc == nil ***REMOVED***
-		if err := encodeExtension(&this); err != nil ***REMOVED***
+func (this Extension) GoString() string {
+	if this.enc == nil {
+		if err := encodeExtension(&this); err != nil {
 			panic(err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return fmt.Sprintf("proto.NewExtension(%#v)", this.enc)
-***REMOVED***
+}
 
-func SetUnsafeExtension(pb Message, fieldNum int32, value interface***REMOVED******REMOVED***) error ***REMOVED***
+func SetUnsafeExtension(pb Message, fieldNum int32, value interface{}) error {
 	typ := reflect.TypeOf(pb).Elem()
 	ext, ok := extensionMaps[typ]
-	if !ok ***REMOVED***
+	if !ok {
 		return fmt.Errorf("proto: bad extended type; %s is not extendable", typ.String())
-	***REMOVED***
+	}
 	desc, ok := ext[fieldNum]
-	if !ok ***REMOVED***
+	if !ok {
 		return errors.New("proto: bad extension number; not in declared ranges")
-	***REMOVED***
+	}
 	return SetExtension(pb, desc, value)
-***REMOVED***
+}
 
-func GetUnsafeExtension(pb Message, fieldNum int32) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func GetUnsafeExtension(pb Message, fieldNum int32) (interface{}, error) {
 	typ := reflect.TypeOf(pb).Elem()
 	ext, ok := extensionMaps[typ]
-	if !ok ***REMOVED***
+	if !ok {
 		return nil, fmt.Errorf("proto: bad extended type; %s is not extendable", typ.String())
-	***REMOVED***
+	}
 	desc, ok := ext[fieldNum]
-	if !ok ***REMOVED***
+	if !ok {
 		return nil, fmt.Errorf("unregistered field number %d", fieldNum)
-	***REMOVED***
+	}
 	return GetExtension(pb, desc)
-***REMOVED***
+}
 
-func NewUnsafeXXX_InternalExtensions(m map[int32]Extension) XXX_InternalExtensions ***REMOVED***
-	x := &XXX_InternalExtensions***REMOVED***
-		p: new(struct ***REMOVED***
+func NewUnsafeXXX_InternalExtensions(m map[int32]Extension) XXX_InternalExtensions {
+	x := &XXX_InternalExtensions{
+		p: new(struct {
 			mu           sync.Mutex
 			extensionMap map[int32]Extension
-		***REMOVED***),
-	***REMOVED***
+		}),
+	}
 	x.p.extensionMap = m
 	return *x
-***REMOVED***
+}
 
-func GetUnsafeExtensionsMap(extendable Message) map[int32]Extension ***REMOVED***
+func GetUnsafeExtensionsMap(extendable Message) map[int32]Extension {
 	pb := extendable.(extendableProto)
 	return pb.extensionsWrite()
-***REMOVED***
+}

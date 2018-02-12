@@ -17,7 +17,7 @@ type endpointTable map[string]*endpoint
 
 const overlayEndpointPrefix = "overlay/endpoint"
 
-type endpoint struct ***REMOVED***
+type endpoint struct {
 	id       string
 	nid      string
 	ifName   string
@@ -25,228 +25,228 @@ type endpoint struct ***REMOVED***
 	addr     *net.IPNet
 	dbExists bool
 	dbIndex  uint64
-***REMOVED***
+}
 
-func (n *network) endpoint(eid string) *endpoint ***REMOVED***
+func (n *network) endpoint(eid string) *endpoint {
 	n.Lock()
 	defer n.Unlock()
 
 	return n.endpoints[eid]
-***REMOVED***
+}
 
-func (n *network) addEndpoint(ep *endpoint) ***REMOVED***
+func (n *network) addEndpoint(ep *endpoint) {
 	n.Lock()
 	n.endpoints[ep.id] = ep
 	n.Unlock()
-***REMOVED***
+}
 
-func (n *network) deleteEndpoint(eid string) ***REMOVED***
+func (n *network) deleteEndpoint(eid string) {
 	n.Lock()
 	delete(n.endpoints, eid)
 	n.Unlock()
-***REMOVED***
+}
 
 func (d *driver) CreateEndpoint(nid, eid string, ifInfo driverapi.InterfaceInfo,
-	epOptions map[string]interface***REMOVED******REMOVED***) error ***REMOVED***
+	epOptions map[string]interface{}) error {
 	var err error
 
-	if err = validateID(nid, eid); err != nil ***REMOVED***
+	if err = validateID(nid, eid); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	// Since we perform lazy configuration make sure we try
 	// configuring the driver when we enter CreateEndpoint since
 	// CreateNetwork may not be called in every node.
-	if err := d.configure(); err != nil ***REMOVED***
+	if err := d.configure(); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	n := d.network(nid)
-	if n == nil ***REMOVED***
+	if n == nil {
 		return fmt.Errorf("network id %q not found", nid)
-	***REMOVED***
+	}
 
-	ep := &endpoint***REMOVED***
+	ep := &endpoint{
 		id:   eid,
 		nid:  n.id,
 		addr: ifInfo.Address(),
 		mac:  ifInfo.MacAddress(),
-	***REMOVED***
-	if ep.addr == nil ***REMOVED***
+	}
+	if ep.addr == nil {
 		return fmt.Errorf("create endpoint was not passed interface IP address")
-	***REMOVED***
+	}
 
-	if s := n.getSubnetforIP(ep.addr); s == nil ***REMOVED***
+	if s := n.getSubnetforIP(ep.addr); s == nil {
 		return fmt.Errorf("no matching subnet for IP %q in network %q", ep.addr, nid)
-	***REMOVED***
+	}
 
-	if ep.mac == nil ***REMOVED***
+	if ep.mac == nil {
 		ep.mac = netutils.GenerateMACFromIP(ep.addr.IP)
-		if err := ifInfo.SetMacAddress(ep.mac); err != nil ***REMOVED***
+		if err := ifInfo.SetMacAddress(ep.mac); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	n.addEndpoint(ep)
 
-	if err := d.writeEndpointToStore(ep); err != nil ***REMOVED***
+	if err := d.writeEndpointToStore(ep); err != nil {
 		return fmt.Errorf("failed to update overlay endpoint %s to local store: %v", ep.id[0:7], err)
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (d *driver) DeleteEndpoint(nid, eid string) error ***REMOVED***
+func (d *driver) DeleteEndpoint(nid, eid string) error {
 	nlh := ns.NlHandle()
 
-	if err := validateID(nid, eid); err != nil ***REMOVED***
+	if err := validateID(nid, eid); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	n := d.network(nid)
-	if n == nil ***REMOVED***
+	if n == nil {
 		return fmt.Errorf("network id %q not found", nid)
-	***REMOVED***
+	}
 
 	ep := n.endpoint(eid)
-	if ep == nil ***REMOVED***
+	if ep == nil {
 		return fmt.Errorf("endpoint id %q not found", eid)
-	***REMOVED***
+	}
 
 	n.deleteEndpoint(eid)
 
-	if err := d.deleteEndpointFromStore(ep); err != nil ***REMOVED***
+	if err := d.deleteEndpointFromStore(ep); err != nil {
 		logrus.Warnf("Failed to delete overlay endpoint %s from local store: %v", ep.id[0:7], err)
-	***REMOVED***
+	}
 
-	if ep.ifName == "" ***REMOVED***
+	if ep.ifName == "" {
 		return nil
-	***REMOVED***
+	}
 
 	link, err := nlh.LinkByName(ep.ifName)
-	if err != nil ***REMOVED***
+	if err != nil {
 		logrus.Debugf("Failed to retrieve interface (%s)'s link on endpoint (%s) delete: %v", ep.ifName, ep.id, err)
 		return nil
-	***REMOVED***
-	if err := nlh.LinkDel(link); err != nil ***REMOVED***
+	}
+	if err := nlh.LinkDel(link); err != nil {
 		logrus.Debugf("Failed to delete interface (%s)'s link on endpoint (%s) delete: %v", ep.ifName, ep.id, err)
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (d *driver) EndpointOperInfo(nid, eid string) (map[string]interface***REMOVED******REMOVED***, error) ***REMOVED***
-	return make(map[string]interface***REMOVED******REMOVED***, 0), nil
-***REMOVED***
+func (d *driver) EndpointOperInfo(nid, eid string) (map[string]interface{}, error) {
+	return make(map[string]interface{}, 0), nil
+}
 
-func (d *driver) deleteEndpointFromStore(e *endpoint) error ***REMOVED***
-	if d.localStore == nil ***REMOVED***
+func (d *driver) deleteEndpointFromStore(e *endpoint) error {
+	if d.localStore == nil {
 		return fmt.Errorf("overlay local store not initialized, ep not deleted")
-	***REMOVED***
+	}
 
 	return d.localStore.DeleteObjectAtomic(e)
-***REMOVED***
+}
 
-func (d *driver) writeEndpointToStore(e *endpoint) error ***REMOVED***
-	if d.localStore == nil ***REMOVED***
+func (d *driver) writeEndpointToStore(e *endpoint) error {
+	if d.localStore == nil {
 		return fmt.Errorf("overlay local store not initialized, ep not added")
-	***REMOVED***
+	}
 
 	return d.localStore.PutObjectAtomic(e)
-***REMOVED***
+}
 
-func (ep *endpoint) DataScope() string ***REMOVED***
+func (ep *endpoint) DataScope() string {
 	return datastore.LocalScope
-***REMOVED***
+}
 
-func (ep *endpoint) New() datastore.KVObject ***REMOVED***
-	return &endpoint***REMOVED******REMOVED***
-***REMOVED***
+func (ep *endpoint) New() datastore.KVObject {
+	return &endpoint{}
+}
 
-func (ep *endpoint) CopyTo(o datastore.KVObject) error ***REMOVED***
+func (ep *endpoint) CopyTo(o datastore.KVObject) error {
 	dstep := o.(*endpoint)
 	*dstep = *ep
 	return nil
-***REMOVED***
+}
 
-func (ep *endpoint) Key() []string ***REMOVED***
-	return []string***REMOVED***overlayEndpointPrefix, ep.id***REMOVED***
-***REMOVED***
+func (ep *endpoint) Key() []string {
+	return []string{overlayEndpointPrefix, ep.id}
+}
 
-func (ep *endpoint) KeyPrefix() []string ***REMOVED***
-	return []string***REMOVED***overlayEndpointPrefix***REMOVED***
-***REMOVED***
+func (ep *endpoint) KeyPrefix() []string {
+	return []string{overlayEndpointPrefix}
+}
 
-func (ep *endpoint) Index() uint64 ***REMOVED***
+func (ep *endpoint) Index() uint64 {
 	return ep.dbIndex
-***REMOVED***
+}
 
-func (ep *endpoint) SetIndex(index uint64) ***REMOVED***
+func (ep *endpoint) SetIndex(index uint64) {
 	ep.dbIndex = index
 	ep.dbExists = true
-***REMOVED***
+}
 
-func (ep *endpoint) Exists() bool ***REMOVED***
+func (ep *endpoint) Exists() bool {
 	return ep.dbExists
-***REMOVED***
+}
 
-func (ep *endpoint) Skip() bool ***REMOVED***
+func (ep *endpoint) Skip() bool {
 	return false
-***REMOVED***
+}
 
-func (ep *endpoint) Value() []byte ***REMOVED***
+func (ep *endpoint) Value() []byte {
 	b, err := json.Marshal(ep)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil
-	***REMOVED***
+	}
 	return b
-***REMOVED***
+}
 
-func (ep *endpoint) SetValue(value []byte) error ***REMOVED***
+func (ep *endpoint) SetValue(value []byte) error {
 	return json.Unmarshal(value, ep)
-***REMOVED***
+}
 
-func (ep *endpoint) MarshalJSON() ([]byte, error) ***REMOVED***
-	epMap := make(map[string]interface***REMOVED******REMOVED***)
+func (ep *endpoint) MarshalJSON() ([]byte, error) {
+	epMap := make(map[string]interface{})
 
 	epMap["id"] = ep.id
 	epMap["nid"] = ep.nid
-	if ep.ifName != "" ***REMOVED***
+	if ep.ifName != "" {
 		epMap["ifName"] = ep.ifName
-	***REMOVED***
-	if ep.addr != nil ***REMOVED***
+	}
+	if ep.addr != nil {
 		epMap["addr"] = ep.addr.String()
-	***REMOVED***
-	if len(ep.mac) != 0 ***REMOVED***
+	}
+	if len(ep.mac) != 0 {
 		epMap["mac"] = ep.mac.String()
-	***REMOVED***
+	}
 
 	return json.Marshal(epMap)
-***REMOVED***
+}
 
-func (ep *endpoint) UnmarshalJSON(value []byte) error ***REMOVED***
+func (ep *endpoint) UnmarshalJSON(value []byte) error {
 	var (
 		err   error
-		epMap map[string]interface***REMOVED******REMOVED***
+		epMap map[string]interface{}
 	)
 
 	json.Unmarshal(value, &epMap)
 
 	ep.id = epMap["id"].(string)
 	ep.nid = epMap["nid"].(string)
-	if v, ok := epMap["mac"]; ok ***REMOVED***
-		if ep.mac, err = net.ParseMAC(v.(string)); err != nil ***REMOVED***
+	if v, ok := epMap["mac"]; ok {
+		if ep.mac, err = net.ParseMAC(v.(string)); err != nil {
 			return types.InternalErrorf("failed to decode endpoint interface mac address after json unmarshal: %s", v.(string))
-		***REMOVED***
-	***REMOVED***
-	if v, ok := epMap["addr"]; ok ***REMOVED***
-		if ep.addr, err = types.ParseCIDR(v.(string)); err != nil ***REMOVED***
+		}
+	}
+	if v, ok := epMap["addr"]; ok {
+		if ep.addr, err = types.ParseCIDR(v.(string)); err != nil {
 			return types.InternalErrorf("failed to decode endpoint interface ipv4 address after json unmarshal: %v", err)
-		***REMOVED***
-	***REMOVED***
-	if v, ok := epMap["ifName"]; ok ***REMOVED***
+		}
+	}
+	if v, ok := epMap["ifName"]; ok {
 		ep.ifName = v.(string)
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}

@@ -16,27 +16,27 @@ var (
 // Task returns the task name from Annotations.Name,
 // and, in case Annotations.Name is missing, fallback
 // to construct the name from other information.
-func Task(t *api.Task) string ***REMOVED***
-	if t.Annotations.Name != "" ***REMOVED***
+func Task(t *api.Task) string {
+	if t.Annotations.Name != "" {
 		// if set, use the container Annotations.Name field, set in the orchestrator.
 		return t.Annotations.Name
-	***REMOVED***
+	}
 
 	slot := fmt.Sprint(t.Slot)
-	if slot == "" || t.Slot == 0 ***REMOVED***
+	if slot == "" || t.Slot == 0 {
 		// when no slot id is assigned, we assume that this is node-bound task.
 		slot = t.NodeID
-	***REMOVED***
+	}
 
 	// fallback to service.instance.id.
 	return fmt.Sprintf("%s.%s.%s", t.ServiceAnnotations.Name, slot, t.ID)
-***REMOVED***
+}
 
 // TODO(stevvooe): Consolidate "Hostname" style validation here.
 
 // Runtime returns the runtime name from a given spec.
-func Runtime(t api.TaskSpec) (string, error) ***REMOVED***
-	switch r := t.GetRuntime().(type) ***REMOVED***
+func Runtime(t api.TaskSpec) (string, error) {
+	switch r := t.GetRuntime().(type) {
 	case *api.TaskSpec_Attachment:
 		return "attachment", nil
 	case *api.TaskSpec_Container:
@@ -45,5 +45,5 @@ func Runtime(t api.TaskSpec) (string, error) ***REMOVED***
 		return strings.ToLower(r.Generic.Kind), nil
 	default:
 		return "", errUnknownRuntime
-	***REMOVED***
-***REMOVED***
+	}
+}

@@ -11,39 +11,39 @@ import (
 	"golang.org/x/text/message"
 )
 
-func TestCatalog(t *testing.T) ***REMOVED***
-	args := func(a ...interface***REMOVED******REMOVED***) []interface***REMOVED******REMOVED*** ***REMOVED*** return a ***REMOVED***
-	testCases := []struct ***REMOVED***
+func TestCatalog(t *testing.T) {
+	args := func(a ...interface{}) []interface{} { return a }
+	testCases := []struct {
 		lang string
 		key  string
-		args []interface***REMOVED******REMOVED***
+		args []interface{}
 		want string
-	***REMOVED******REMOVED******REMOVED***
+	}{{
 		lang: "en",
 		key:  "Hello world!\n",
 		want: "Hello world!\n",
-	***REMOVED***, ***REMOVED***
+	}, {
 		lang: "de",
 		key:  "Hello world!\n",
 		want: "Hallo Welt!\n",
-	***REMOVED***, ***REMOVED***
+	}, {
 		lang: "en",
 		key:  "%d more files remaining!",
 		args: args(1),
 		want: "One file remaining!",
-	***REMOVED***, ***REMOVED***
+	}, {
 		lang: "en-u-nu-fullwide",
 		key:  "%d more files remaining!",
 		args: args(5),
 		want: "There are ５ more files remaining!",
-	***REMOVED******REMOVED***
-	for _, tc := range testCases ***REMOVED***
-		t.Run(path.Join(tc.lang, tc.key), func(t *testing.T) ***REMOVED***
+	}}
+	for _, tc := range testCases {
+		t.Run(path.Join(tc.lang, tc.key), func(t *testing.T) {
 			p := message.NewPrinter(message.MatchLanguage(tc.lang))
 			got := p.Sprintf(tc.key, tc.args...)
-			if got != tc.want ***REMOVED***
+			if got != tc.want {
 				t.Errorf("got %q; want %q", got, tc.want)
-			***REMOVED***
-		***REMOVED***)
-	***REMOVED***
-***REMOVED***
+			}
+		})
+	}
+}

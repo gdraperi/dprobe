@@ -12,7 +12,7 @@ import (
 // it as the node observes round trip times and estimated coordinates from other
 // nodes. The core algorithm is based on Vivaldi, see the documentation for Config
 // for more details.
-type Client struct ***REMOVED***
+type Client struct {
 	// coord is the current estimate of the client's network coordinate.
 	coord *Coordinate
 
@@ -36,61 +36,61 @@ type Client struct ***REMOVED***
 
 	// mutex enables safe concurrent access to the client.
 	mutex sync.RWMutex
-***REMOVED***
+}
 
 // NewClient creates a new Client and verifies the configuration is valid.
-func NewClient(config *Config) (*Client, error) ***REMOVED***
-	if !(config.Dimensionality > 0) ***REMOVED***
+func NewClient(config *Config) (*Client, error) {
+	if !(config.Dimensionality > 0) {
 		return nil, fmt.Errorf("dimensionality must be >0")
-	***REMOVED***
+	}
 
-	return &Client***REMOVED***
+	return &Client{
 		coord:                NewCoordinate(config),
 		origin:               NewCoordinate(config),
 		config:               config,
 		adjustmentIndex:      0,
 		adjustmentSamples:    make([]float64, config.AdjustmentWindowSize),
 		latencyFilterSamples: make(map[string][]float64),
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // GetCoordinate returns a copy of the coordinate for this client.
-func (c *Client) GetCoordinate() *Coordinate ***REMOVED***
+func (c *Client) GetCoordinate() *Coordinate {
 	c.mutex.RLock()
 	defer c.mutex.RUnlock()
 
 	return c.coord.Clone()
-***REMOVED***
+}
 
 // SetCoordinate forces the client's coordinate to a known state.
-func (c *Client) SetCoordinate(coord *Coordinate) ***REMOVED***
+func (c *Client) SetCoordinate(coord *Coordinate) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
 	c.coord = coord.Clone()
-***REMOVED***
+}
 
 // ForgetNode removes any client state for the given node.
-func (c *Client) ForgetNode(node string) ***REMOVED***
+func (c *Client) ForgetNode(node string) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
 	delete(c.latencyFilterSamples, node)
-***REMOVED***
+}
 
 // latencyFilter applies a simple moving median filter with a new sample for
 // a node. This assumes that the mutex has been locked already.
-func (c *Client) latencyFilter(node string, rttSeconds float64) float64 ***REMOVED***
+func (c *Client) latencyFilter(node string, rttSeconds float64) float64 {
 	samples, ok := c.latencyFilterSamples[node]
-	if !ok ***REMOVED***
+	if !ok {
 		samples = make([]float64, 0, c.config.LatencyFilterSize)
-	***REMOVED***
+	}
 
 	// Add the new sample and trim the list, if needed.
 	samples = append(samples, rttSeconds)
-	if len(samples) > int(c.config.LatencyFilterSize) ***REMOVED***
+	if len(samples) > int(c.config.LatencyFilterSize) {
 		samples = samples[1:]
-	***REMOVED***
+	}
 	c.latencyFilterSamples[node] = samples
 
 	// Sort a copy of the samples and return the median.
@@ -98,41 +98,41 @@ func (c *Client) latencyFilter(node string, rttSeconds float64) float64 ***REMOV
 	copy(sorted, samples)
 	sort.Float64s(sorted)
 	return sorted[len(sorted)/2]
-***REMOVED***
+}
 
 // updateVivialdi updates the Vivaldi portion of the client's coordinate. This
 // assumes that the mutex has been locked already.
-func (c *Client) updateVivaldi(other *Coordinate, rttSeconds float64) ***REMOVED***
+func (c *Client) updateVivaldi(other *Coordinate, rttSeconds float64) {
 	const zeroThreshold = 1.0e-6
 
 	dist := c.coord.DistanceTo(other).Seconds()
-	if rttSeconds < zeroThreshold ***REMOVED***
+	if rttSeconds < zeroThreshold {
 		rttSeconds = zeroThreshold
-	***REMOVED***
+	}
 	wrongness := math.Abs(dist-rttSeconds) / rttSeconds
 
 	totalError := c.coord.Error + other.Error
-	if totalError < zeroThreshold ***REMOVED***
+	if totalError < zeroThreshold {
 		totalError = zeroThreshold
-	***REMOVED***
+	}
 	weight := c.coord.Error / totalError
 
 	c.coord.Error = c.config.VivaldiCE*weight*wrongness + c.coord.Error*(1.0-c.config.VivaldiCE*weight)
-	if c.coord.Error > c.config.VivaldiErrorMax ***REMOVED***
+	if c.coord.Error > c.config.VivaldiErrorMax {
 		c.coord.Error = c.config.VivaldiErrorMax
-	***REMOVED***
+	}
 
 	delta := c.config.VivaldiCC * weight
 	force := delta * (rttSeconds - dist)
 	c.coord = c.coord.ApplyForce(c.config, force, other)
-***REMOVED***
+}
 
 // updateAdjustment updates the adjustment portion of the client's coordinate, if
 // the feature is enabled. This assumes that the mutex has been locked already.
-func (c *Client) updateAdjustment(other *Coordinate, rttSeconds float64) ***REMOVED***
-	if c.config.AdjustmentWindowSize == 0 ***REMOVED***
+func (c *Client) updateAdjustment(other *Coordinate, rttSeconds float64) {
+	if c.config.AdjustmentWindowSize == 0 {
 		return
-	***REMOVED***
+	}
 
 	// Note that the existing adjustment factors don't figure in to this
 	// calculation so we use the raw distance here.
@@ -141,25 +141,25 @@ func (c *Client) updateAdjustment(other *Coordinate, rttSeconds float64) ***REMO
 	c.adjustmentIndex = (c.adjustmentIndex + 1) % c.config.AdjustmentWindowSize
 
 	sum := 0.0
-	for _, sample := range c.adjustmentSamples ***REMOVED***
+	for _, sample := range c.adjustmentSamples {
 		sum += sample
-	***REMOVED***
+	}
 	c.coord.Adjustment = sum / (2.0 * float64(c.config.AdjustmentWindowSize))
-***REMOVED***
+}
 
 // updateGravity applies a small amount of gravity to pull coordinates towards
 // the center of the coordinate system to combat drift. This assumes that the
 // mutex is locked already.
-func (c *Client) updateGravity() ***REMOVED***
+func (c *Client) updateGravity() {
 	dist := c.origin.DistanceTo(c.coord).Seconds()
 	force := -1.0 * math.Pow(dist/c.config.GravityRho, 2.0)
 	c.coord = c.coord.ApplyForce(c.config, force, c.origin)
-***REMOVED***
+}
 
 // Update takes other, a coordinate for another node, and rtt, a round trip
 // time observation for a ping to that node, and updates the estimated position of
 // the client's coordinate. Returns the updated coordinate.
-func (c *Client) Update(node string, other *Coordinate, rtt time.Duration) *Coordinate ***REMOVED***
+func (c *Client) Update(node string, other *Coordinate, rtt time.Duration) *Coordinate {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
@@ -168,13 +168,13 @@ func (c *Client) Update(node string, other *Coordinate, rtt time.Duration) *Coor
 	c.updateAdjustment(other, rttSeconds)
 	c.updateGravity()
 	return c.coord.Clone()
-***REMOVED***
+}
 
 // DistanceTo returns the estimated RTT from the client's coordinate to other, the
 // coordinate for another node.
-func (c *Client) DistanceTo(other *Coordinate) time.Duration ***REMOVED***
+func (c *Client) DistanceTo(other *Coordinate) time.Duration {
 	c.mutex.RLock()
 	defer c.mutex.RUnlock()
 
 	return c.coord.DistanceTo(other)
-***REMOVED***
+}

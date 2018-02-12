@@ -5,7 +5,7 @@ package types
 
 // PluginInterfaceType plugin interface type
 // swagger:model PluginInterfaceType
-type PluginInterfaceType struct ***REMOVED***
+type PluginInterfaceType struct {
 
 	// capability
 	// Required: true
@@ -18,4 +18,4 @@ type PluginInterfaceType struct ***REMOVED***
 	// version
 	// Required: true
 	Version string `json:"Version"`
-***REMOVED***
+}

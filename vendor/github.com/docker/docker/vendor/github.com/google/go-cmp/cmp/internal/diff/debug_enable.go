@@ -60,15 +60,15 @@ const (
 
 var debug debugger
 
-type debugger struct ***REMOVED***
+type debugger struct {
 	sync.Mutex
 	p1, p2           EditScript
 	fwdPath, revPath *EditScript
 	grid             []byte
 	lines            int
-***REMOVED***
+}
 
-func (dbg *debugger) Begin(nx, ny int, f EqualFunc, p1, p2 *EditScript) EqualFunc ***REMOVED***
+func (dbg *debugger) Begin(nx, ny int, f EqualFunc, p1, p2 *EditScript) EqualFunc {
 	dbg.Lock()
 	dbg.fwdPath, dbg.revPath = p1, p2
 	top := "┌─" + strings.Repeat("──", nx) + "┐\n"
@@ -79,44 +79,44 @@ func (dbg *debugger) Begin(nx, ny int, f EqualFunc, p1, p2 *EditScript) EqualFun
 	fmt.Print(dbg)
 
 	// Wrap the EqualFunc so that we can intercept each result.
-	return func(ix, iy int) (r Result) ***REMOVED***
+	return func(ix, iy int) (r Result) {
 		cell := dbg.grid[len(top)+iy*len(row):][len("│ ")+len("· ")*ix:][:len("·")]
-		for i := range cell ***REMOVED***
+		for i := range cell {
 			cell[i] = 0 // Zero out the multiple bytes of UTF-8 middle-dot
-		***REMOVED***
-		switch r = f(ix, iy); ***REMOVED***
+		}
+		switch r = f(ix, iy); {
 		case r.Equal():
 			cell[0] = '\\'
 		case r.Similar():
 			cell[0] = 'X'
 		default:
 			cell[0] = '#'
-		***REMOVED***
+		}
 		return
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (dbg *debugger) Update() ***REMOVED***
+func (dbg *debugger) Update() {
 	dbg.print(updateDelay)
-***REMOVED***
+}
 
-func (dbg *debugger) Finish() ***REMOVED***
+func (dbg *debugger) Finish() {
 	dbg.print(finishDelay)
 	dbg.Unlock()
-***REMOVED***
+}
 
-func (dbg *debugger) String() string ***REMOVED***
+func (dbg *debugger) String() string {
 	dbg.p1, dbg.p2 = *dbg.fwdPath, dbg.p2[:0]
-	for i := len(*dbg.revPath) - 1; i >= 0; i-- ***REMOVED***
+	for i := len(*dbg.revPath) - 1; i >= 0; i-- {
 		dbg.p2 = append(dbg.p2, (*dbg.revPath)[i])
-	***REMOVED***
+	}
 	return fmt.Sprintf("%s[%v|%v]\n\n", dbg.grid, dbg.p1, dbg.p2)
-***REMOVED***
+}
 
-func (dbg *debugger) print(d time.Duration) ***REMOVED***
-	if ansiTerminal ***REMOVED***
+func (dbg *debugger) print(d time.Duration) {
+	if ansiTerminal {
 		fmt.Printf("\x1b[%dA", dbg.lines) // Reset terminal cursor
-	***REMOVED***
+	}
 	fmt.Print(dbg)
 	time.Sleep(d)
-***REMOVED***
+}

@@ -9,11 +9,11 @@ package socket
 
 import "unsafe"
 
-func (v *iovec) set(b []byte) ***REMOVED***
+func (v *iovec) set(b []byte) {
 	l := len(b)
-	if l == 0 ***REMOVED***
+	if l == 0 {
 		return
-	***REMOVED***
+	}
 	v.Base = (*byte)(unsafe.Pointer(&b[0]))
 	v.Len = uint32(l)
-***REMOVED***
+}

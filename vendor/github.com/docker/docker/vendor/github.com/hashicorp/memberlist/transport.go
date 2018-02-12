@@ -7,7 +7,7 @@ import (
 
 // Packet is used to provide some metadata about incoming packets from peers
 // over a packet connection, as well as the packet payload.
-type Packet struct ***REMOVED***
+type Packet struct {
 	// Buf has the raw contents of the packet.
 	Buf []byte
 
@@ -19,12 +19,12 @@ type Packet struct ***REMOVED***
 	// taken as close as possible to the actual receipt time to help make an
 	// accurate RTT measurements during probes.
 	Timestamp time.Time
-***REMOVED***
+}
 
 // Transport is used to abstract over communicating with other peers. The packet
 // interface is assumed to be best-effort and the stream interface is assumed to
 // be reliable.
-type Transport interface ***REMOVED***
+type Transport interface {
 	// FinalAdvertiseAddr is given the user's configured values (which
 	// might be empty) and returns the desired IP and port to advertise to
 	// the rest of the cluster.
@@ -62,4 +62,4 @@ type Transport interface ***REMOVED***
 	// Shutdown is called when memberlist is shutting down; this gives the
 	// transport a chance to clean up any listeners.
 	Shutdown() error
-***REMOVED***
+}

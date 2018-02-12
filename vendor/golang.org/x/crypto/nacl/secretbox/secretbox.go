@@ -43,7 +43,7 @@ import (
 const Overhead = poly1305.TagSize
 
 // setup produces a sub-key and Salsa20 counter given a nonce and key.
-func setup(subKey *[32]byte, counter *[16]byte, nonce *[24]byte, key *[32]byte) ***REMOVED***
+func setup(subKey *[32]byte, counter *[16]byte, nonce *[24]byte, key *[32]byte) {
 	// We use XSalsa20 for encryption so first we need to generate a
 	// key and nonce with HSalsa20.
 	var hNonce [16]byte
@@ -52,27 +52,27 @@ func setup(subKey *[32]byte, counter *[16]byte, nonce *[24]byte, key *[32]byte) 
 
 	// The final 8 bytes of the original nonce form the new nonce.
 	copy(counter[:], nonce[16:])
-***REMOVED***
+}
 
 // sliceForAppend takes a slice and a requested number of bytes. It returns a
 // slice with the contents of the given slice followed by that many bytes and a
 // second slice that aliases into it and contains only the extra bytes. If the
 // original slice has sufficient capacity then no allocation is performed.
-func sliceForAppend(in []byte, n int) (head, tail []byte) ***REMOVED***
-	if total := len(in) + n; cap(in) >= total ***REMOVED***
+func sliceForAppend(in []byte, n int) (head, tail []byte) {
+	if total := len(in) + n; cap(in) >= total {
 		head = in[:total]
-	***REMOVED*** else ***REMOVED***
+	} else {
 		head = make([]byte, total)
 		copy(head, in)
-	***REMOVED***
+	}
 	tail = head[len(in):]
 	return
-***REMOVED***
+}
 
 // Seal appends an encrypted and authenticated copy of message to out, which
 // must not overlap message. The key and nonce pair must be unique for each
 // distinct message and the output will be Overhead bytes longer than message.
-func Seal(out, message []byte, nonce *[24]byte, key *[32]byte) []byte ***REMOVED***
+func Seal(out, message []byte, nonce *[24]byte, key *[32]byte) []byte {
 	var subKey [32]byte
 	var counter [16]byte
 	setup(&subKey, &counter, nonce, key)
@@ -91,15 +91,15 @@ func Seal(out, message []byte, nonce *[24]byte, key *[32]byte) []byte ***REMOVED
 	// We XOR up to 32 bytes of message with the keystream generated from
 	// the first block.
 	firstMessageBlock := message
-	if len(firstMessageBlock) > 32 ***REMOVED***
+	if len(firstMessageBlock) > 32 {
 		firstMessageBlock = firstMessageBlock[:32]
-	***REMOVED***
+	}
 
 	tagOut := out
 	out = out[poly1305.TagSize:]
-	for i, x := range firstMessageBlock ***REMOVED***
+	for i, x := range firstMessageBlock {
 		out[i] = firstBlock[32+i] ^ x
-	***REMOVED***
+	}
 	message = message[len(firstMessageBlock):]
 	ciphertext := out
 	out = out[len(firstMessageBlock):]
@@ -113,15 +113,15 @@ func Seal(out, message []byte, nonce *[24]byte, key *[32]byte) []byte ***REMOVED
 	copy(tagOut, tag[:])
 
 	return ret
-***REMOVED***
+}
 
 // Open authenticates and decrypts a box produced by Seal and appends the
 // message to out, which must not overlap box. The output will be Overhead
 // bytes smaller than box.
-func Open(out []byte, box []byte, nonce *[24]byte, key *[32]byte) ([]byte, bool) ***REMOVED***
-	if len(box) < Overhead ***REMOVED***
+func Open(out []byte, box []byte, nonce *[24]byte, key *[32]byte) ([]byte, bool) {
+	if len(box) < Overhead {
 		return nil, false
-	***REMOVED***
+	}
 
 	var subKey [32]byte
 	var counter [16]byte
@@ -138,9 +138,9 @@ func Open(out []byte, box []byte, nonce *[24]byte, key *[32]byte) ([]byte, bool)
 	var tag [poly1305.TagSize]byte
 	copy(tag[:], box)
 
-	if !poly1305.Verify(&tag, box[poly1305.TagSize:], &poly1305Key) ***REMOVED***
+	if !poly1305.Verify(&tag, box[poly1305.TagSize:], &poly1305Key) {
 		return nil, false
-	***REMOVED***
+	}
 
 	ret, out := sliceForAppend(out, len(box)-Overhead)
 
@@ -148,12 +148,12 @@ func Open(out []byte, box []byte, nonce *[24]byte, key *[32]byte) ([]byte, bool)
 	// the first block.
 	box = box[Overhead:]
 	firstMessageBlock := box
-	if len(firstMessageBlock) > 32 ***REMOVED***
+	if len(firstMessageBlock) > 32 {
 		firstMessageBlock = firstMessageBlock[:32]
-	***REMOVED***
-	for i, x := range firstMessageBlock ***REMOVED***
+	}
+	for i, x := range firstMessageBlock {
 		out[i] = firstBlock[32+i] ^ x
-	***REMOVED***
+	}
 
 	box = box[len(firstMessageBlock):]
 	out = out[len(firstMessageBlock):]
@@ -163,4 +163,4 @@ func Open(out []byte, box []byte, nonce *[24]byte, key *[32]byte) ([]byte, bool)
 	salsa.XORKeyStream(out, box, &counter, &subKey)
 
 	return ret, true
-***REMOVED***
+}

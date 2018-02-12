@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func buildTestBinary(t *testing.T, tmpdir string, prefix string) (string, string) ***REMOVED***
+func buildTestBinary(t *testing.T, tmpdir string, prefix string) (string, string) {
 	tmpDir, err := ioutil.TempDir(tmpdir, prefix)
 	require.NoError(t, err)
 	exePath := tmpDir + "/" + prefix
@@ -24,47 +24,47 @@ func buildTestBinary(t *testing.T, tmpdir string, prefix string) (string, string
 	err = cmd.Run()
 	require.NoError(t, err)
 	return exePath, tmpDir
-***REMOVED***
+}
 
-func TestTrap(t *testing.T) ***REMOVED***
-	var sigmap = []struct ***REMOVED***
+func TestTrap(t *testing.T) {
+	var sigmap = []struct {
 		name     string
 		signal   os.Signal
 		multiple bool
-	***REMOVED******REMOVED***
-		***REMOVED***"TERM", syscall.SIGTERM, false***REMOVED***,
-		***REMOVED***"QUIT", syscall.SIGQUIT, true***REMOVED***,
-		***REMOVED***"INT", os.Interrupt, false***REMOVED***,
-		***REMOVED***"TERM", syscall.SIGTERM, true***REMOVED***,
-		***REMOVED***"INT", os.Interrupt, true***REMOVED***,
-	***REMOVED***
+	}{
+		{"TERM", syscall.SIGTERM, false},
+		{"QUIT", syscall.SIGQUIT, true},
+		{"INT", os.Interrupt, false},
+		{"TERM", syscall.SIGTERM, true},
+		{"INT", os.Interrupt, true},
+	}
 	exePath, tmpDir := buildTestBinary(t, "", "main")
 	defer os.RemoveAll(tmpDir)
 
-	for _, v := range sigmap ***REMOVED***
+	for _, v := range sigmap {
 		cmd := exec.Command(exePath)
 		cmd.Env = append(os.Environ(), fmt.Sprintf("SIGNAL_TYPE=%s", v.name))
-		if v.multiple ***REMOVED***
+		if v.multiple {
 			cmd.Env = append(cmd.Env, "IF_MULTIPLE=1")
-		***REMOVED***
+		}
 		err := cmd.Start()
 		require.NoError(t, err)
 		err = cmd.Wait()
-		if e, ok := err.(*exec.ExitError); ok ***REMOVED***
+		if e, ok := err.(*exec.ExitError); ok {
 			code := e.Sys().(syscall.WaitStatus).ExitStatus()
-			if v.multiple ***REMOVED***
+			if v.multiple {
 				assert.Equal(t, 128+int(v.signal.(syscall.Signal)), code)
-			***REMOVED*** else ***REMOVED***
+			} else {
 				assert.Equal(t, 99, code)
-			***REMOVED***
+			}
 			continue
-		***REMOVED***
+		}
 		t.Fatal("process didn't end with any error")
-	***REMOVED***
+	}
 
-***REMOVED***
+}
 
-func TestDumpStacks(t *testing.T) ***REMOVED***
+func TestDumpStacks(t *testing.T) {
 	directory, err := ioutil.TempDir("", "test-dump-tasks")
 	assert.NoError(t, err)
 	defer os.RemoveAll(directory)
@@ -73,10 +73,10 @@ func TestDumpStacks(t *testing.T) ***REMOVED***
 	readFile, _ := ioutil.ReadFile(dumpPath)
 	fileData := string(readFile)
 	assert.Contains(t, fileData, "goroutine")
-***REMOVED***
+}
 
-func TestDumpStacksWithEmptyInput(t *testing.T) ***REMOVED***
+func TestDumpStacksWithEmptyInput(t *testing.T) {
 	path, err := DumpStacks("")
 	assert.NoError(t, err)
 	assert.Equal(t, os.Stderr.Name(), path)
-***REMOVED***
+}

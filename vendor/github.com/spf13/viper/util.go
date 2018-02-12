@@ -24,146 +24,146 @@ import (
 )
 
 // ConfigParseError denotes failing to parse configuration file.
-type ConfigParseError struct ***REMOVED***
+type ConfigParseError struct {
 	err error
-***REMOVED***
+}
 
 // Error returns the formatted configuration error.
-func (pe ConfigParseError) Error() string ***REMOVED***
+func (pe ConfigParseError) Error() string {
 	return fmt.Sprintf("While parsing config: %s", pe.err.Error())
-***REMOVED***
+}
 
 // toCaseInsensitiveValue checks if the value is a  map;
 // if so, create a copy and lower-case the keys recursively.
-func toCaseInsensitiveValue(value interface***REMOVED******REMOVED***) interface***REMOVED******REMOVED*** ***REMOVED***
-	switch v := value.(type) ***REMOVED***
-	case map[interface***REMOVED******REMOVED***]interface***REMOVED******REMOVED***:
+func toCaseInsensitiveValue(value interface{}) interface{} {
+	switch v := value.(type) {
+	case map[interface{}]interface{}:
 		value = copyAndInsensitiviseMap(cast.ToStringMap(v))
-	case map[string]interface***REMOVED******REMOVED***:
+	case map[string]interface{}:
 		value = copyAndInsensitiviseMap(v)
-	***REMOVED***
+	}
 
 	return value
-***REMOVED***
+}
 
 // copyAndInsensitiviseMap behaves like insensitiviseMap, but creates a copy of
 // any map it makes case insensitive.
-func copyAndInsensitiviseMap(m map[string]interface***REMOVED******REMOVED***) map[string]interface***REMOVED******REMOVED*** ***REMOVED***
-	nm := make(map[string]interface***REMOVED******REMOVED***)
+func copyAndInsensitiviseMap(m map[string]interface{}) map[string]interface{} {
+	nm := make(map[string]interface{})
 
-	for key, val := range m ***REMOVED***
+	for key, val := range m {
 		lkey := strings.ToLower(key)
-		switch v := val.(type) ***REMOVED***
-		case map[interface***REMOVED******REMOVED***]interface***REMOVED******REMOVED***:
+		switch v := val.(type) {
+		case map[interface{}]interface{}:
 			nm[lkey] = copyAndInsensitiviseMap(cast.ToStringMap(v))
-		case map[string]interface***REMOVED******REMOVED***:
+		case map[string]interface{}:
 			nm[lkey] = copyAndInsensitiviseMap(v)
 		default:
 			nm[lkey] = v
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nm
-***REMOVED***
+}
 
-func insensitiviseMap(m map[string]interface***REMOVED******REMOVED***) ***REMOVED***
-	for key, val := range m ***REMOVED***
-		switch val.(type) ***REMOVED***
-		case map[interface***REMOVED******REMOVED***]interface***REMOVED******REMOVED***:
+func insensitiviseMap(m map[string]interface{}) {
+	for key, val := range m {
+		switch val.(type) {
+		case map[interface{}]interface{}:
 			// nested map: cast and recursively insensitivise
 			val = cast.ToStringMap(val)
-			insensitiviseMap(val.(map[string]interface***REMOVED******REMOVED***))
-		case map[string]interface***REMOVED******REMOVED***:
+			insensitiviseMap(val.(map[string]interface{}))
+		case map[string]interface{}:
 			// nested map: recursively insensitivise
-			insensitiviseMap(val.(map[string]interface***REMOVED******REMOVED***))
-		***REMOVED***
+			insensitiviseMap(val.(map[string]interface{}))
+		}
 
 		lower := strings.ToLower(key)
-		if key != lower ***REMOVED***
+		if key != lower {
 			// remove old key (not lower-cased)
 			delete(m, key)
-		***REMOVED***
+		}
 		// update map
 		m[lower] = val
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func absPathify(inPath string) string ***REMOVED***
+func absPathify(inPath string) string {
 	jww.INFO.Println("Trying to resolve absolute path to", inPath)
 
-	if strings.HasPrefix(inPath, "$HOME") ***REMOVED***
+	if strings.HasPrefix(inPath, "$HOME") {
 		inPath = userHomeDir() + inPath[5:]
-	***REMOVED***
+	}
 
-	if strings.HasPrefix(inPath, "$") ***REMOVED***
+	if strings.HasPrefix(inPath, "$") {
 		end := strings.Index(inPath, string(os.PathSeparator))
 		inPath = os.Getenv(inPath[1:end]) + inPath[end:]
-	***REMOVED***
+	}
 
-	if filepath.IsAbs(inPath) ***REMOVED***
+	if filepath.IsAbs(inPath) {
 		return filepath.Clean(inPath)
-	***REMOVED***
+	}
 
 	p, err := filepath.Abs(inPath)
-	if err == nil ***REMOVED***
+	if err == nil {
 		return filepath.Clean(p)
-	***REMOVED***
+	}
 
 	jww.ERROR.Println("Couldn't discover absolute path")
 	jww.ERROR.Println(err)
 	return ""
-***REMOVED***
+}
 
 // Check if File / Directory Exists
-func exists(fs afero.Fs, path string) (bool, error) ***REMOVED***
+func exists(fs afero.Fs, path string) (bool, error) {
 	_, err := fs.Stat(path)
-	if err == nil ***REMOVED***
+	if err == nil {
 		return true, nil
-	***REMOVED***
-	if os.IsNotExist(err) ***REMOVED***
+	}
+	if os.IsNotExist(err) {
 		return false, nil
-	***REMOVED***
+	}
 	return false, err
-***REMOVED***
+}
 
-func stringInSlice(a string, list []string) bool ***REMOVED***
-	for _, b := range list ***REMOVED***
-		if b == a ***REMOVED***
+func stringInSlice(a string, list []string) bool {
+	for _, b := range list {
+		if b == a {
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false
-***REMOVED***
+}
 
-func userHomeDir() string ***REMOVED***
-	if runtime.GOOS == "windows" ***REMOVED***
+func userHomeDir() string {
+	if runtime.GOOS == "windows" {
 		home := os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
-		if home == "" ***REMOVED***
+		if home == "" {
 			home = os.Getenv("USERPROFILE")
-		***REMOVED***
+		}
 		return home
-	***REMOVED***
+	}
 	return os.Getenv("HOME")
-***REMOVED***
+}
 
-func safeMul(a, b uint) uint ***REMOVED***
+func safeMul(a, b uint) uint {
 	c := a * b
-	if a > 1 && b > 1 && c/b != a ***REMOVED***
+	if a > 1 && b > 1 && c/b != a {
 		return 0
-	***REMOVED***
+	}
 	return c
-***REMOVED***
+}
 
 // parseSizeInBytes converts strings like 1GB or 12 mb into an unsigned integer number of bytes
-func parseSizeInBytes(sizeStr string) uint ***REMOVED***
+func parseSizeInBytes(sizeStr string) uint {
 	sizeStr = strings.TrimSpace(sizeStr)
 	lastChar := len(sizeStr) - 1
 	multiplier := uint(1)
 
-	if lastChar > 0 ***REMOVED***
-		if sizeStr[lastChar] == 'b' || sizeStr[lastChar] == 'B' ***REMOVED***
-			if lastChar > 1 ***REMOVED***
-				switch unicode.ToLower(rune(sizeStr[lastChar-1])) ***REMOVED***
+	if lastChar > 0 {
+		if sizeStr[lastChar] == 'b' || sizeStr[lastChar] == 'B' {
+			if lastChar > 1 {
+				switch unicode.ToLower(rune(sizeStr[lastChar-1])) {
 				case 'k':
 					multiplier = 1 << 10
 					sizeStr = strings.TrimSpace(sizeStr[:lastChar-1])
@@ -176,18 +176,18 @@ func parseSizeInBytes(sizeStr string) uint ***REMOVED***
 				default:
 					multiplier = 1
 					sizeStr = strings.TrimSpace(sizeStr[:lastChar])
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+				}
+			}
+		}
+	}
 
 	size := cast.ToInt(sizeStr)
-	if size < 0 ***REMOVED***
+	if size < 0 {
 		size = 0
-	***REMOVED***
+	}
 
 	return safeMul(uint(size), multiplier)
-***REMOVED***
+}
 
 // deepSearch scans deep maps, following the key indexes listed in the
 // sequence "path".
@@ -196,26 +196,26 @@ func parseSizeInBytes(sizeStr string) uint ***REMOVED***
 // In case intermediate keys do not exist, or map to a non-map value,
 // a new map is created and inserted, and the search continues from there:
 // the initial map "m" may be modified!
-func deepSearch(m map[string]interface***REMOVED******REMOVED***, path []string) map[string]interface***REMOVED******REMOVED*** ***REMOVED***
-	for _, k := range path ***REMOVED***
+func deepSearch(m map[string]interface{}, path []string) map[string]interface{} {
+	for _, k := range path {
 		m2, ok := m[k]
-		if !ok ***REMOVED***
+		if !ok {
 			// intermediate key does not exist
 			// => create it and continue from there
-			m3 := make(map[string]interface***REMOVED******REMOVED***)
+			m3 := make(map[string]interface{})
 			m[k] = m3
 			m = m3
 			continue
-		***REMOVED***
-		m3, ok := m2.(map[string]interface***REMOVED******REMOVED***)
-		if !ok ***REMOVED***
+		}
+		m3, ok := m2.(map[string]interface{})
+		if !ok {
 			// intermediate key is a value
 			// => replace with a new map
-			m3 = make(map[string]interface***REMOVED******REMOVED***)
+			m3 = make(map[string]interface{})
 			m[k] = m3
-		***REMOVED***
+		}
 		// continue search from here
 		m = m3
-	***REMOVED***
+	}
 	return m
-***REMOVED***
+}

@@ -34,7 +34,7 @@ const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 // A common proto for logging HTTP requests. Only contains semantics
 // defined by the HTTP specification. Product-specific logging
 // information MUST be defined in a separate message.
-type HttpRequest struct ***REMOVED***
+type HttpRequest struct {
 	// The request method. Examples: `"GET"`, `"HEAD"`, `"PUT"`, `"POST"`.
 	RequestMethod string `protobuf:"bytes,1,opt,name=request_method,json=requestMethod" json:"request_method,omitempty"`
 	// The scheme (http, https), the host name, the path and the query
@@ -77,118 +77,118 @@ type HttpRequest struct ***REMOVED***
 	// The number of HTTP response bytes inserted into cache. Set only when a
 	// cache fill was attempted.
 	CacheFillBytes int64 `protobuf:"varint,12,opt,name=cache_fill_bytes,json=cacheFillBytes" json:"cache_fill_bytes,omitempty"`
-***REMOVED***
+}
 
-func (m *HttpRequest) Reset()                    ***REMOVED*** *m = HttpRequest***REMOVED******REMOVED*** ***REMOVED***
-func (m *HttpRequest) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*HttpRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*HttpRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***0***REMOVED*** ***REMOVED***
+func (m *HttpRequest) Reset()                    { *m = HttpRequest{} }
+func (m *HttpRequest) String() string            { return proto.CompactTextString(m) }
+func (*HttpRequest) ProtoMessage()               {}
+func (*HttpRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
-func (m *HttpRequest) GetRequestMethod() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *HttpRequest) GetRequestMethod() string {
+	if m != nil {
 		return m.RequestMethod
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *HttpRequest) GetRequestUrl() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *HttpRequest) GetRequestUrl() string {
+	if m != nil {
 		return m.RequestUrl
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *HttpRequest) GetRequestSize() int64 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *HttpRequest) GetRequestSize() int64 {
+	if m != nil {
 		return m.RequestSize
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *HttpRequest) GetStatus() int32 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *HttpRequest) GetStatus() int32 {
+	if m != nil {
 		return m.Status
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *HttpRequest) GetResponseSize() int64 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *HttpRequest) GetResponseSize() int64 {
+	if m != nil {
 		return m.ResponseSize
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *HttpRequest) GetUserAgent() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *HttpRequest) GetUserAgent() string {
+	if m != nil {
 		return m.UserAgent
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *HttpRequest) GetRemoteIp() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *HttpRequest) GetRemoteIp() string {
+	if m != nil {
 		return m.RemoteIp
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *HttpRequest) GetServerIp() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *HttpRequest) GetServerIp() string {
+	if m != nil {
 		return m.ServerIp
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *HttpRequest) GetReferer() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *HttpRequest) GetReferer() string {
+	if m != nil {
 		return m.Referer
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *HttpRequest) GetLatency() *google_protobuf1.Duration ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *HttpRequest) GetLatency() *google_protobuf1.Duration {
+	if m != nil {
 		return m.Latency
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *HttpRequest) GetCacheLookup() bool ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *HttpRequest) GetCacheLookup() bool {
+	if m != nil {
 		return m.CacheLookup
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
-func (m *HttpRequest) GetCacheHit() bool ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *HttpRequest) GetCacheHit() bool {
+	if m != nil {
 		return m.CacheHit
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
-func (m *HttpRequest) GetCacheValidatedWithOriginServer() bool ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *HttpRequest) GetCacheValidatedWithOriginServer() bool {
+	if m != nil {
 		return m.CacheValidatedWithOriginServer
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
-func (m *HttpRequest) GetCacheFillBytes() int64 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *HttpRequest) GetCacheFillBytes() int64 {
+	if m != nil {
 		return m.CacheFillBytes
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*HttpRequest)(nil), "google.logging.type.HttpRequest")
-***REMOVED***
+}
 
-func init() ***REMOVED*** proto.RegisterFile("google/logging/type/http_request.proto", fileDescriptor0) ***REMOVED***
+func init() { proto.RegisterFile("google/logging/type/http_request.proto", fileDescriptor0) }
 
-var fileDescriptor0 = []byte***REMOVED***
+var fileDescriptor0 = []byte{
 	// 488 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x6c, 0x92, 0x5b, 0x6b, 0x14, 0x31,
 	0x14, 0xc7, 0x99, 0x5e, 0xf6, 0x92, 0xbd, 0x50, 0x22, 0x68, 0x5a, 0xb5, 0xae, 0x15, 0x65, 0x9e,
@@ -221,4 +221,4 @@ var fileDescriptor0 = []byte***REMOVED***
 	0xfb, 0xfd, 0x52, 0xb5, 0xbf, 0x7f, 0x76, 0x0e, 0xdf, 0x85, 0xea, 0x6b, 0xa5, 0x9b, 0x55, 0x76,
 	0x11, 0x27, 0x7d, 0xda, 0x1a, 0x58, 0xf4, 0xf0, 0x01, 0xa7, 0x7f, 0x03, 0x00, 0x00, 0xff, 0xff,
 	0x6f, 0xb5, 0x28, 0xee, 0x1f, 0x03, 0x00, 0x00,
-***REMOVED***
+}

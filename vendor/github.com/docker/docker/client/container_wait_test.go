@@ -16,59 +16,59 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestContainerWaitError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestContainerWaitError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
-	***REMOVED***
+	}
 	resultC, errC := client.ContainerWait(context.Background(), "nothing", "")
-	select ***REMOVED***
+	select {
 	case result := <-resultC:
 		t.Fatalf("expected to not get a wait result, got %d", result.StatusCode)
 	case err := <-errC:
-		if err.Error() != "Error response from daemon: Server error" ***REMOVED***
+		if err.Error() != "Error response from daemon: Server error" {
 			t.Fatalf("expected a Server Error, got %v", err)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestContainerWait(t *testing.T) ***REMOVED***
+func TestContainerWait(t *testing.T) {
 	expectedURL := "/containers/container_id/wait"
-	client := &Client***REMOVED***
-		client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-			if !strings.HasPrefix(req.URL.Path, expectedURL) ***REMOVED***
+	client := &Client{
+		client: newMockClient(func(req *http.Request) (*http.Response, error) {
+			if !strings.HasPrefix(req.URL.Path, expectedURL) {
 				return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, req.URL)
-			***REMOVED***
-			b, err := json.Marshal(container.ContainerWaitOKBody***REMOVED***
+			}
+			b, err := json.Marshal(container.ContainerWaitOKBody{
 				StatusCode: 15,
-			***REMOVED***)
-			if err != nil ***REMOVED***
+			})
+			if err != nil {
 				return nil, err
-			***REMOVED***
-			return &http.Response***REMOVED***
+			}
+			return &http.Response{
 				StatusCode: http.StatusOK,
 				Body:       ioutil.NopCloser(bytes.NewReader(b)),
-			***REMOVED***, nil
-		***REMOVED***),
-	***REMOVED***
+			}, nil
+		}),
+	}
 
 	resultC, errC := client.ContainerWait(context.Background(), "container_id", "")
-	select ***REMOVED***
+	select {
 	case err := <-errC:
 		t.Fatal(err)
 	case result := <-resultC:
-		if result.StatusCode != 15 ***REMOVED***
+		if result.StatusCode != 15 {
 			t.Fatalf("expected a status code equal to '15', got %d", result.StatusCode)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func ExampleClient_ContainerWait_withTimeout() ***REMOVED***
+func ExampleClient_ContainerWait_withTimeout() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	client, _ := NewEnvClient()
 	_, errC := client.ContainerWait(ctx, "container_id", "")
-	if err := <-errC; err != nil ***REMOVED***
+	if err := <-errC; err != nil {
 		log.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}

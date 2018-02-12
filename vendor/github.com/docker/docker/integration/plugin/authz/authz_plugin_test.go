@@ -38,11 +38,11 @@ const (
 )
 
 var (
-	alwaysAllowed = []string***REMOVED***"/_ping", "/info"***REMOVED***
+	alwaysAllowed = []string{"/_ping", "/info"}
 	ctrl          *authorizationController
 )
 
-type authorizationController struct ***REMOVED***
+type authorizationController struct {
 	reqRes          authorization.Response // reqRes holds the plugin response to the initial client request
 	resRes          authorization.Response // resRes holds the plugin response to the daemon response
 	versionReqCount int                    // versionReqCount counts the number of requests to the server version API endpoint
@@ -50,10 +50,10 @@ type authorizationController struct ***REMOVED***
 	requestsURIs    []string               // requestsURIs stores all request URIs that are sent to the authorization controller
 	reqUser         string
 	resUser         string
-***REMOVED***
+}
 
-func setupTestV1(t *testing.T) func() ***REMOVED***
-	ctrl = &authorizationController***REMOVED******REMOVED***
+func setupTestV1(t *testing.T) func() {
+	ctrl = &authorizationController{}
 	teardown := setupTest(t)
 
 	err := os.MkdirAll("/etc/docker/plugins", 0755)
@@ -63,26 +63,26 @@ func setupTestV1(t *testing.T) func() ***REMOVED***
 	err = ioutil.WriteFile(fileName, []byte(server.URL), 0644)
 	require.Nil(t, err)
 
-	return func() ***REMOVED***
+	return func() {
 		err := os.RemoveAll("/etc/docker/plugins")
 		require.Nil(t, err)
 
 		teardown()
 		ctrl = nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // check for always allowed endpoints to not inhibit test framework functions
-func isAllowed(reqURI string) bool ***REMOVED***
-	for _, endpoint := range alwaysAllowed ***REMOVED***
-		if strings.HasSuffix(reqURI, endpoint) ***REMOVED***
+func isAllowed(reqURI string) bool {
+	for _, endpoint := range alwaysAllowed {
+		if strings.HasSuffix(reqURI, endpoint) {
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false
-***REMOVED***
+}
 
-func TestAuthZPluginAllowRequest(t *testing.T) ***REMOVED***
+func TestAuthZPluginAllowRequest(t *testing.T) {
 	defer setupTestV1(t)()
 	ctrl.reqRes.Allow = true
 	ctrl.resRes.Allow = true
@@ -92,10 +92,10 @@ func TestAuthZPluginAllowRequest(t *testing.T) ***REMOVED***
 	require.Nil(t, err)
 
 	// Ensure command successful
-	createResponse, err := client.ContainerCreate(context.Background(), &container.Config***REMOVED***Cmd: []string***REMOVED***"top"***REMOVED***, Image: "busybox"***REMOVED***, &container.HostConfig***REMOVED******REMOVED***, &networktypes.NetworkingConfig***REMOVED******REMOVED***, "")
+	createResponse, err := client.ContainerCreate(context.Background(), &container.Config{Cmd: []string{"top"}, Image: "busybox"}, &container.HostConfig{}, &networktypes.NetworkingConfig{}, "")
 	require.Nil(t, err)
 
-	err = client.ContainerStart(context.Background(), createResponse.ID, types.ContainerStartOptions***REMOVED******REMOVED***)
+	err = client.ContainerStart(context.Background(), createResponse.ID, types.ContainerStartOptions{})
 	require.Nil(t, err)
 
 	assertURIRecorded(t, ctrl.requestsURIs, "/containers/create")
@@ -105,9 +105,9 @@ func TestAuthZPluginAllowRequest(t *testing.T) ***REMOVED***
 	require.Nil(t, err)
 	require.Equal(t, 1, ctrl.versionReqCount)
 	require.Equal(t, 1, ctrl.versionResCount)
-***REMOVED***
+}
 
-func TestAuthZPluginTLS(t *testing.T) ***REMOVED***
+func TestAuthZPluginTLS(t *testing.T) {
 	defer setupTestV1(t)()
 	const (
 		testDaemonHTTPSAddr = "tcp://localhost:4271"
@@ -137,9 +137,9 @@ func TestAuthZPluginTLS(t *testing.T) ***REMOVED***
 
 	require.Equal(t, "client", ctrl.reqUser)
 	require.Equal(t, "client", ctrl.resUser)
-***REMOVED***
+}
 
-func TestAuthZPluginDenyRequest(t *testing.T) ***REMOVED***
+func TestAuthZPluginDenyRequest(t *testing.T) {
 	defer setupTestV1(t)()
 	d.Start(t, "--authorization-plugin="+testAuthZPlugin)
 	ctrl.reqRes.Allow = false
@@ -156,11 +156,11 @@ func TestAuthZPluginDenyRequest(t *testing.T) ***REMOVED***
 
 	// Ensure unauthorized message appears in response
 	require.Equal(t, fmt.Sprintf("Error response from daemon: authorization denied by plugin %s: %s", testAuthZPlugin, unauthorizedMessage), err.Error())
-***REMOVED***
+}
 
 // TestAuthZPluginAPIDenyResponse validates that when authorization
 // plugin deny the request, the status code is forbidden
-func TestAuthZPluginAPIDenyResponse(t *testing.T) ***REMOVED***
+func TestAuthZPluginAPIDenyResponse(t *testing.T) {
 	defer setupTestV1(t)()
 	d.Start(t, "--authorization-plugin="+testAuthZPlugin)
 	ctrl.reqRes.Allow = false
@@ -178,9 +178,9 @@ func TestAuthZPluginAPIDenyResponse(t *testing.T) ***REMOVED***
 
 	require.Nil(t, err)
 	require.Equal(t, http.StatusForbidden, resp.StatusCode)
-***REMOVED***
+}
 
-func TestAuthZPluginDenyResponse(t *testing.T) ***REMOVED***
+func TestAuthZPluginDenyResponse(t *testing.T) {
 	defer setupTestV1(t)()
 	d.Start(t, "--authorization-plugin="+testAuthZPlugin)
 	ctrl.reqRes.Allow = true
@@ -198,11 +198,11 @@ func TestAuthZPluginDenyResponse(t *testing.T) ***REMOVED***
 
 	// Ensure unauthorized message appears in response
 	require.Equal(t, fmt.Sprintf("Error response from daemon: authorization denied by plugin %s: %s", testAuthZPlugin, unauthorizedMessage), err.Error())
-***REMOVED***
+}
 
 // TestAuthZPluginAllowEventStream verifies event stream propagates
 // correctly after request pass through by the authorization plugin
-func TestAuthZPluginAllowEventStream(t *testing.T) ***REMOVED***
+func TestAuthZPluginAllowEventStream(t *testing.T) {
 	skip.IfCondition(t, testEnv.DaemonInfo.OSType != "linux")
 
 	defer setupTestV1(t)()
@@ -218,59 +218,59 @@ func TestAuthZPluginAllowEventStream(t *testing.T) ***REMOVED***
 	defer cancel()
 
 	// Create a container and wait for the creation events
-	createResponse, err := client.ContainerCreate(context.Background(), &container.Config***REMOVED***Cmd: []string***REMOVED***"top"***REMOVED***, Image: "busybox"***REMOVED***, &container.HostConfig***REMOVED******REMOVED***, &networktypes.NetworkingConfig***REMOVED******REMOVED***, "")
+	createResponse, err := client.ContainerCreate(context.Background(), &container.Config{Cmd: []string{"top"}, Image: "busybox"}, &container.HostConfig{}, &networktypes.NetworkingConfig{}, "")
 	require.Nil(t, err)
 
-	err = client.ContainerStart(context.Background(), createResponse.ID, types.ContainerStartOptions***REMOVED******REMOVED***)
+	err = client.ContainerStart(context.Background(), createResponse.ID, types.ContainerStartOptions{})
 	require.Nil(t, err)
 
-	for i := 0; i < 100; i++ ***REMOVED***
+	for i := 0; i < 100; i++ {
 		c, err := client.ContainerInspect(context.Background(), createResponse.ID)
 		require.Nil(t, err)
-		if c.State.Running ***REMOVED***
+		if c.State.Running {
 			break
-		***REMOVED***
-		if i == 99 ***REMOVED***
+		}
+		if i == 99 {
 			t.Fatal("Container didn't run within 10s")
-		***REMOVED***
+		}
 		time.Sleep(100 * time.Millisecond)
-	***REMOVED***
+	}
 
 	created := false
 	started := false
-	for !created && !started ***REMOVED***
-		select ***REMOVED***
+	for !created && !started {
+		select {
 		case event := <-events:
-			if event.Type == eventtypes.ContainerEventType && event.Actor.ID == createResponse.ID ***REMOVED***
-				if event.Action == "create" ***REMOVED***
+			if event.Type == eventtypes.ContainerEventType && event.Actor.ID == createResponse.ID {
+				if event.Action == "create" {
 					created = true
-				***REMOVED***
-				if event.Action == "start" ***REMOVED***
+				}
+				if event.Action == "start" {
 					started = true
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case err := <-errs:
-			if err == io.EOF ***REMOVED***
+			if err == io.EOF {
 				t.Fatal("premature end of event stream")
-			***REMOVED***
+			}
 			require.Nil(t, err)
 		case <-time.After(30 * time.Second):
 			// Fail the test
 			t.Fatal("event stream timeout")
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Ensure both events and container endpoints are passed to the
 	// authorization plugin
 	assertURIRecorded(t, ctrl.requestsURIs, "/events")
 	assertURIRecorded(t, ctrl.requestsURIs, "/containers/create")
 	assertURIRecorded(t, ctrl.requestsURIs, fmt.Sprintf("/containers/%s/start", createResponse.ID))
-***REMOVED***
+}
 
-func systemTime(t *testing.T, client client.APIClient, testEnv *environment.Execution) time.Time ***REMOVED***
-	if testEnv.IsLocalDaemon() ***REMOVED***
+func systemTime(t *testing.T, client client.APIClient, testEnv *environment.Execution) time.Time {
+	if testEnv.IsLocalDaemon() {
 		return time.Now()
-	***REMOVED***
+	}
 
 	ctx := context.Background()
 	info, err := client.Info(ctx)
@@ -279,19 +279,19 @@ func systemTime(t *testing.T, client client.APIClient, testEnv *environment.Exec
 	dt, err := time.Parse(time.RFC3339Nano, info.SystemTime)
 	require.Nil(t, err, "invalid time format in GET /info response")
 	return dt
-***REMOVED***
+}
 
-func systemEventsSince(client client.APIClient, since string) (<-chan eventtypes.Message, <-chan error, func()) ***REMOVED***
-	eventOptions := types.EventsOptions***REMOVED***
+func systemEventsSince(client client.APIClient, since string) (<-chan eventtypes.Message, <-chan error, func()) {
+	eventOptions := types.EventsOptions{
 		Since: since,
-	***REMOVED***
+	}
 	ctx, cancel := context.WithCancel(context.Background())
 	events, errs := client.Events(ctx, eventOptions)
 
 	return events, errs, cancel
-***REMOVED***
+}
 
-func TestAuthZPluginErrorResponse(t *testing.T) ***REMOVED***
+func TestAuthZPluginErrorResponse(t *testing.T) {
 	defer setupTestV1(t)()
 	d.Start(t, "--authorization-plugin="+testAuthZPlugin)
 	ctrl.reqRes.Allow = true
@@ -304,9 +304,9 @@ func TestAuthZPluginErrorResponse(t *testing.T) ***REMOVED***
 	_, err = client.ServerVersion(context.Background())
 	require.NotNil(t, err)
 	require.Equal(t, fmt.Sprintf("Error response from daemon: plugin %s failed with error: %s: %s", testAuthZPlugin, authorization.AuthZApiResponse, errorMessage), err.Error())
-***REMOVED***
+}
 
-func TestAuthZPluginErrorRequest(t *testing.T) ***REMOVED***
+func TestAuthZPluginErrorRequest(t *testing.T) {
 	defer setupTestV1(t)()
 	d.Start(t, "--authorization-plugin="+testAuthZPlugin)
 	ctrl.reqRes.Err = errorMessage
@@ -318,9 +318,9 @@ func TestAuthZPluginErrorRequest(t *testing.T) ***REMOVED***
 	_, err = client.ServerVersion(context.Background())
 	require.NotNil(t, err)
 	require.Equal(t, fmt.Sprintf("Error response from daemon: plugin %s failed with error: %s: %s", testAuthZPlugin, authorization.AuthZApiRequest, errorMessage), err.Error())
-***REMOVED***
+}
 
-func TestAuthZPluginEnsureNoDuplicatePluginRegistration(t *testing.T) ***REMOVED***
+func TestAuthZPluginEnsureNoDuplicatePluginRegistration(t *testing.T) {
 	defer setupTestV1(t)()
 	d.Start(t, "--authorization-plugin="+testAuthZPlugin, "--authorization-plugin="+testAuthZPlugin)
 
@@ -336,9 +336,9 @@ func TestAuthZPluginEnsureNoDuplicatePluginRegistration(t *testing.T) ***REMOVED
 	// assert plugin is only called once..
 	require.Equal(t, 1, ctrl.versionReqCount)
 	require.Equal(t, 1, ctrl.versionResCount)
-***REMOVED***
+}
 
-func TestAuthZPluginEnsureLoadImportWorking(t *testing.T) ***REMOVED***
+func TestAuthZPluginEnsureLoadImportWorking(t *testing.T) {
 	defer setupTestV1(t)()
 	ctrl.reqRes.Allow = true
 	ctrl.resRes.Allow = true
@@ -360,10 +360,10 @@ func TestAuthZPluginEnsureLoadImportWorking(t *testing.T) ***REMOVED***
 
 	exportedImagePath := filepath.Join(tmp, "export.tar")
 
-	createResponse, err := client.ContainerCreate(context.Background(), &container.Config***REMOVED***Cmd: []string***REMOVED******REMOVED***, Image: "busybox"***REMOVED***, &container.HostConfig***REMOVED******REMOVED***, &networktypes.NetworkingConfig***REMOVED******REMOVED***, "")
+	createResponse, err := client.ContainerCreate(context.Background(), &container.Config{Cmd: []string{}, Image: "busybox"}, &container.HostConfig{}, &networktypes.NetworkingConfig{}, "")
 	require.Nil(t, err)
 
-	err = client.ContainerStart(context.Background(), createResponse.ID, types.ContainerStartOptions***REMOVED******REMOVED***)
+	err = client.ContainerStart(context.Background(), createResponse.ID, types.ContainerStartOptions{})
 	require.Nil(t, err)
 
 	responseReader, err := client.ContainerExport(context.Background(), createResponse.ID)
@@ -377,62 +377,62 @@ func TestAuthZPluginEnsureLoadImportWorking(t *testing.T) ***REMOVED***
 
 	err = imageImport(client, exportedImagePath)
 	require.Nil(t, err)
-***REMOVED***
+}
 
-func imageSave(client client.APIClient, path, image string) error ***REMOVED***
+func imageSave(client client.APIClient, path, image string) error {
 	ctx := context.Background()
-	responseReader, err := client.ImageSave(ctx, []string***REMOVED***image***REMOVED***)
-	if err != nil ***REMOVED***
+	responseReader, err := client.ImageSave(ctx, []string{image})
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer responseReader.Close()
 	file, err := os.Create(path)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer file.Close()
 	_, err = io.Copy(file, responseReader)
 	return err
-***REMOVED***
+}
 
-func imageLoad(client client.APIClient, path string) error ***REMOVED***
+func imageLoad(client client.APIClient, path string) error {
 	file, err := os.Open(path)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer file.Close()
 	quiet := true
 	ctx := context.Background()
 	response, err := client.ImageLoad(ctx, file, quiet)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer response.Body.Close()
 	return nil
-***REMOVED***
+}
 
-func imageImport(client client.APIClient, path string) error ***REMOVED***
+func imageImport(client client.APIClient, path string) error {
 	file, err := os.Open(path)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer file.Close()
-	options := types.ImageImportOptions***REMOVED******REMOVED***
+	options := types.ImageImportOptions{}
 	ref := ""
-	source := types.ImageImportSource***REMOVED***
+	source := types.ImageImportSource{
 		Source:     file,
 		SourceName: "-",
-	***REMOVED***
+	}
 	ctx := context.Background()
 	responseReader, err := client.ImageImport(ctx, source, ref, options)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer responseReader.Close()
 	return nil
-***REMOVED***
+}
 
-func TestAuthZPluginHeader(t *testing.T) ***REMOVED***
+func TestAuthZPluginHeader(t *testing.T) {
 	defer setupTestV1(t)()
 	ctrl.reqRes.Allow = true
 	ctrl.resRes.Allow = true
@@ -449,19 +449,19 @@ func TestAuthZPluginHeader(t *testing.T) ***REMOVED***
 	resp, err := client.Do(req)
 	require.Nil(t, err)
 	require.Equal(t, "application/json", resp.Header["Content-Type"][0])
-***REMOVED***
+}
 
 // assertURIRecorded verifies that the given URI was sent and recorded
 // in the authz plugin
-func assertURIRecorded(t *testing.T, uris []string, uri string) ***REMOVED***
+func assertURIRecorded(t *testing.T, uris []string, uri string) {
 	var found bool
-	for _, u := range uris ***REMOVED***
-		if strings.Contains(u, uri) ***REMOVED***
+	for _, u := range uris {
+		if strings.Contains(u, uri) {
 			found = true
 			break
-		***REMOVED***
-	***REMOVED***
-	if !found ***REMOVED***
+		}
+	}
+	if !found {
 		t.Fatalf("Expected to find URI '%s', recorded uris '%s'", uri, strings.Join(uris, ","))
-	***REMOVED***
-***REMOVED***
+	}
+}

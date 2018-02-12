@@ -51,25 +51,25 @@ var (
 // specifies a class of target information and the Addrs field
 // specifies target information like the following:
 //
-//	route.RouteMessage***REMOVED***
+//	route.RouteMessage{
 //		Version: RTM_VERSION,
 //		Type: RTM_GET,
 //		Flags: RTF_UP | RTF_HOST,
 //		ID: uintptr(os.Getpid()),
 //		Seq: 1,
-//		Addrs: []route.Addrs***REMOVED***
-//			RTAX_DST: &route.Inet4Addr***REMOVED*** ... ***REMOVED***,
-//			RTAX_IFP: &route.LinkAddr***REMOVED*** ... ***REMOVED***,
-//			RTAX_BRD: &route.Inet4Addr***REMOVED*** ... ***REMOVED***,
-//		***REMOVED***,
-//	***REMOVED***
+//		Addrs: []route.Addrs{
+//			RTAX_DST: &route.Inet4Addr{ ... },
+//			RTAX_IFP: &route.LinkAddr{ ... },
+//			RTAX_BRD: &route.Inet4Addr{ ... },
+//		},
+//	}
 //
 // The values for the above fields depend on the implementation of
 // each operating system.
 //
 // The Err field on a response message contains an error value on the
 // requested operation. If non-nil, the requested operation is failed.
-type RouteMessage struct ***REMOVED***
+type RouteMessage struct {
 	Version int     // message version
 	Type    int     // message type
 	Flags   int     // route flags
@@ -81,12 +81,12 @@ type RouteMessage struct ***REMOVED***
 
 	extOff int    // offset of header extension
 	raw    []byte // raw message
-***REMOVED***
+}
 
 // Marshal returns the binary encoding of m.
-func (m *RouteMessage) Marshal() ([]byte, error) ***REMOVED***
+func (m *RouteMessage) Marshal() ([]byte, error) {
 	return m.marshal()
-***REMOVED***
+}
 
 // A RIBType reprensents a type of routing information base.
 type RIBType int
@@ -106,18 +106,18 @@ const (
 // flags. When RIBType is related to network interfaces, arg might be
 // an interface index or a set of interface flags. In most cases, zero
 // means a wildcard.
-func FetchRIB(af int, typ RIBType, arg int) ([]byte, error) ***REMOVED***
-	mib := [6]int32***REMOVED***sysCTL_NET, sysAF_ROUTE, 0, int32(af), int32(typ), int32(arg)***REMOVED***
+func FetchRIB(af int, typ RIBType, arg int) ([]byte, error) {
+	mib := [6]int32{sysCTL_NET, sysAF_ROUTE, 0, int32(af), int32(typ), int32(arg)}
 	n := uintptr(0)
-	if err := sysctl(mib[:], nil, &n, nil, 0); err != nil ***REMOVED***
+	if err := sysctl(mib[:], nil, &n, nil, 0); err != nil {
 		return nil, os.NewSyscallError("sysctl", err)
-	***REMOVED***
-	if n == 0 ***REMOVED***
+	}
+	if n == 0 {
 		return nil, nil
-	***REMOVED***
+	}
 	b := make([]byte, n)
-	if err := sysctl(mib[:], &b[0], &n, nil, 0); err != nil ***REMOVED***
+	if err := sysctl(mib[:], &b[0], &n, nil, 0); err != nil {
 		return nil, os.NewSyscallError("sysctl", err)
-	***REMOVED***
+	}
 	return b[:n], nil
-***REMOVED***
+}

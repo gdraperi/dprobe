@@ -4,4 +4,4 @@
 
 package socket
 
-func probeProtocolStack() int ***REMOVED*** return 4 ***REMOVED***
+func probeProtocolStack() int { return 4 }

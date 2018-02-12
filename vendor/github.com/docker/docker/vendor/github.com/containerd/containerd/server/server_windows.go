@@ -6,6 +6,6 @@ import (
 	"context"
 )
 
-func apply(_ context.Context, _ *Config) error ***REMOVED***
+func apply(_ context.Context, _ *Config) error {
 	return nil
-***REMOVED***
+}

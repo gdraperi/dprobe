@@ -29,9 +29,9 @@ var errQuoteSyntax = errors.New("quote syntax error")
 //
 // This is from Go strconv package, modified to support `|` and `/` as double
 // quotes for use with regular expressions.
-func unquoteChar(s string, quote byte) (value rune, multibyte bool, tail string, err error) ***REMOVED***
+func unquoteChar(s string, quote byte) (value rune, multibyte bool, tail string, err error) {
 	// easy cases
-	switch c := s[0]; ***REMOVED***
+	switch c := s[0]; {
 	case c == quote && (quote == '\'' || quote == '"' || quote == '/' || quote == '|'):
 		err = errQuoteSyntax
 		return
@@ -40,17 +40,17 @@ func unquoteChar(s string, quote byte) (value rune, multibyte bool, tail string,
 		return r, true, s[size:], nil
 	case c != '\\':
 		return rune(s[0]), false, s[1:], nil
-	***REMOVED***
+	}
 
 	// hard case: c is backslash
-	if len(s) <= 1 ***REMOVED***
+	if len(s) <= 1 {
 		err = errQuoteSyntax
 		return
-	***REMOVED***
+	}
 	c := s[1]
 	s = s[2:]
 
-	switch c ***REMOVED***
+	switch c {
 	case 'a':
 		value = '\a'
 	case 'b':
@@ -67,74 +67,74 @@ func unquoteChar(s string, quote byte) (value rune, multibyte bool, tail string,
 		value = '\v'
 	case 'x', 'u', 'U':
 		n := 0
-		switch c ***REMOVED***
+		switch c {
 		case 'x':
 			n = 2
 		case 'u':
 			n = 4
 		case 'U':
 			n = 8
-		***REMOVED***
+		}
 		var v rune
-		if len(s) < n ***REMOVED***
+		if len(s) < n {
 			err = errQuoteSyntax
 			return
-		***REMOVED***
-		for j := 0; j < n; j++ ***REMOVED***
+		}
+		for j := 0; j < n; j++ {
 			x, ok := unhex(s[j])
-			if !ok ***REMOVED***
+			if !ok {
 				err = errQuoteSyntax
 				return
-			***REMOVED***
+			}
 			v = v<<4 | x
-		***REMOVED***
+		}
 		s = s[n:]
-		if c == 'x' ***REMOVED***
+		if c == 'x' {
 			// single-byte string, possibly not UTF-8
 			value = v
 			break
-		***REMOVED***
-		if v > utf8.MaxRune ***REMOVED***
+		}
+		if v > utf8.MaxRune {
 			err = errQuoteSyntax
 			return
-		***REMOVED***
+		}
 		value = v
 		multibyte = true
 	case '0', '1', '2', '3', '4', '5', '6', '7':
 		v := rune(c) - '0'
-		if len(s) < 2 ***REMOVED***
+		if len(s) < 2 {
 			err = errQuoteSyntax
 			return
-		***REMOVED***
-		for j := 0; j < 2; j++ ***REMOVED*** // one digit already; two more
+		}
+		for j := 0; j < 2; j++ { // one digit already; two more
 			x := rune(s[j]) - '0'
-			if x < 0 || x > 7 ***REMOVED***
+			if x < 0 || x > 7 {
 				err = errQuoteSyntax
 				return
-			***REMOVED***
+			}
 			v = (v << 3) | x
-		***REMOVED***
+		}
 		s = s[2:]
-		if v > 255 ***REMOVED***
+		if v > 255 {
 			err = errQuoteSyntax
 			return
-		***REMOVED***
+		}
 		value = v
 	case '\\':
 		value = '\\'
 	case '\'', '"', '|', '/':
-		if c != quote ***REMOVED***
+		if c != quote {
 			err = errQuoteSyntax
 			return
-		***REMOVED***
+		}
 		value = rune(c)
 	default:
 		err = errQuoteSyntax
 		return
-	***REMOVED***
+	}
 	tail = s
 	return
-***REMOVED***
+}
 
 // unquote interprets s as a single-quoted, double-quoted,
 // or backquoted Go string literal, returning the string value
@@ -144,94 +144,94 @@ func unquoteChar(s string, quote byte) (value rune, multibyte bool, tail string,
 //
 // This is modified from the standard library to support `|` and `/` as quote
 // characters for use with regular expressions.
-func unquote(s string) (string, error) ***REMOVED***
+func unquote(s string) (string, error) {
 	n := len(s)
-	if n < 2 ***REMOVED***
+	if n < 2 {
 		return "", errQuoteSyntax
-	***REMOVED***
+	}
 	quote := s[0]
-	if quote != s[n-1] ***REMOVED***
+	if quote != s[n-1] {
 		return "", errQuoteSyntax
-	***REMOVED***
+	}
 	s = s[1 : n-1]
 
-	if quote == '`' ***REMOVED***
-		if contains(s, '`') ***REMOVED***
+	if quote == '`' {
+		if contains(s, '`') {
 			return "", errQuoteSyntax
-		***REMOVED***
-		if contains(s, '\r') ***REMOVED***
+		}
+		if contains(s, '\r') {
 			// -1 because we know there is at least one \r to remove.
 			buf := make([]byte, 0, len(s)-1)
-			for i := 0; i < len(s); i++ ***REMOVED***
-				if s[i] != '\r' ***REMOVED***
+			for i := 0; i < len(s); i++ {
+				if s[i] != '\r' {
 					buf = append(buf, s[i])
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return string(buf), nil
-		***REMOVED***
+		}
 		return s, nil
-	***REMOVED***
-	if quote != '"' && quote != '\'' && quote != '|' && quote != '/' ***REMOVED***
+	}
+	if quote != '"' && quote != '\'' && quote != '|' && quote != '/' {
 		return "", errQuoteSyntax
-	***REMOVED***
-	if contains(s, '\n') ***REMOVED***
+	}
+	if contains(s, '\n') {
 		return "", errQuoteSyntax
-	***REMOVED***
+	}
 
 	// Is it trivial?  Avoid allocation.
-	if !contains(s, '\\') && !contains(s, quote) ***REMOVED***
-		switch quote ***REMOVED***
+	if !contains(s, '\\') && !contains(s, quote) {
+		switch quote {
 		case '"', '/', '|': // pipe and slash are treated like double quote
 			return s, nil
 		case '\'':
 			r, size := utf8.DecodeRuneInString(s)
-			if size == len(s) && (r != utf8.RuneError || size != 1) ***REMOVED***
+			if size == len(s) && (r != utf8.RuneError || size != 1) {
 				return s, nil
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	var runeTmp [utf8.UTFMax]byte
 	buf := make([]byte, 0, 3*len(s)/2) // Try to avoid more allocations.
-	for len(s) > 0 ***REMOVED***
+	for len(s) > 0 {
 		c, multibyte, ss, err := unquoteChar(s, quote)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return "", err
-		***REMOVED***
+		}
 		s = ss
-		if c < utf8.RuneSelf || !multibyte ***REMOVED***
+		if c < utf8.RuneSelf || !multibyte {
 			buf = append(buf, byte(c))
-		***REMOVED*** else ***REMOVED***
+		} else {
 			n := utf8.EncodeRune(runeTmp[:], c)
 			buf = append(buf, runeTmp[:n]...)
-		***REMOVED***
-		if quote == '\'' && len(s) != 0 ***REMOVED***
+		}
+		if quote == '\'' && len(s) != 0 {
 			// single-quoted must be single character
 			return "", errQuoteSyntax
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return string(buf), nil
-***REMOVED***
+}
 
 // contains reports whether the string contains the byte c.
-func contains(s string, c byte) bool ***REMOVED***
-	for i := 0; i < len(s); i++ ***REMOVED***
-		if s[i] == c ***REMOVED***
+func contains(s string, c byte) bool {
+	for i := 0; i < len(s); i++ {
+		if s[i] == c {
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false
-***REMOVED***
+}
 
-func unhex(b byte) (v rune, ok bool) ***REMOVED***
+func unhex(b byte) (v rune, ok bool) {
 	c := rune(b)
-	switch ***REMOVED***
+	switch {
 	case '0' <= c && c <= '9':
 		return c - '0', true
 	case 'a' <= c && c <= 'f':
 		return c - 'a' + 10, true
 	case 'A' <= c && c <= 'F':
 		return c - 'A' + 10, true
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}

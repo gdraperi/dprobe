@@ -15,32 +15,32 @@ import (
 )
 
 // ErrReadLogsNotSupported is returned when the underlying log driver does not support reading
-type ErrReadLogsNotSupported struct***REMOVED******REMOVED***
+type ErrReadLogsNotSupported struct{}
 
-func (ErrReadLogsNotSupported) Error() string ***REMOVED***
+func (ErrReadLogsNotSupported) Error() string {
 	return "configured logging driver does not support reading"
-***REMOVED***
+}
 
 // NotImplemented makes this error implement the `NotImplemented` interface from api/errdefs
-func (ErrReadLogsNotSupported) NotImplemented() ***REMOVED******REMOVED***
+func (ErrReadLogsNotSupported) NotImplemented() {}
 
 const (
 	logWatcherBufferSize = 4096
 )
 
-var messagePool = &sync.Pool***REMOVED***New: func() interface***REMOVED******REMOVED*** ***REMOVED*** return &Message***REMOVED***Line: make([]byte, 0, 256)***REMOVED*** ***REMOVED******REMOVED***
+var messagePool = &sync.Pool{New: func() interface{} { return &Message{Line: make([]byte, 0, 256)} }}
 
 // NewMessage returns a new message from the message sync.Pool
-func NewMessage() *Message ***REMOVED***
+func NewMessage() *Message {
 	return messagePool.Get().(*Message)
-***REMOVED***
+}
 
 // PutMessage puts the specified message back n the message pool.
 // The message fields are reset before putting into the pool.
-func PutMessage(msg *Message) ***REMOVED***
+func PutMessage(msg *Message) {
 	msg.reset()
 	messagePool.Put(msg)
-***REMOVED***
+}
 
 // Message is datastructure that represents piece of output produced by some
 // container.  The Line member is a slice of an array whose contents can be
@@ -56,90 +56,90 @@ type Message backend.LogMessage
 // reset sets the message back to default values
 // This is used when putting a message back into the message pool.
 // Any changes to the `Message` struct should be reflected here.
-func (m *Message) reset() ***REMOVED***
+func (m *Message) reset() {
 	m.Line = m.Line[:0]
 	m.Source = ""
 	m.Attrs = nil
 	m.Partial = false
 
 	m.Err = nil
-***REMOVED***
+}
 
 // AsLogMessage returns a pointer to the message as a pointer to
 // backend.LogMessage, which is an identical type with a different purpose
-func (m *Message) AsLogMessage() *backend.LogMessage ***REMOVED***
+func (m *Message) AsLogMessage() *backend.LogMessage {
 	return (*backend.LogMessage)(m)
-***REMOVED***
+}
 
 // Logger is the interface for docker logging drivers.
-type Logger interface ***REMOVED***
+type Logger interface {
 	Log(*Message) error
 	Name() string
 	Close() error
-***REMOVED***
+}
 
 // SizedLogger is the interface for logging drivers that can control
 // the size of buffer used for their messages.
-type SizedLogger interface ***REMOVED***
+type SizedLogger interface {
 	Logger
 	BufSize() int
-***REMOVED***
+}
 
 // ReadConfig is the configuration passed into ReadLogs.
-type ReadConfig struct ***REMOVED***
+type ReadConfig struct {
 	Since  time.Time
 	Until  time.Time
 	Tail   int
 	Follow bool
-***REMOVED***
+}
 
 // LogReader is the interface for reading log messages for loggers that support reading.
-type LogReader interface ***REMOVED***
+type LogReader interface {
 	// Read logs from underlying logging backend
 	ReadLogs(ReadConfig) *LogWatcher
-***REMOVED***
+}
 
 // LogWatcher is used when consuming logs read from the LogReader interface.
-type LogWatcher struct ***REMOVED***
+type LogWatcher struct {
 	// For sending log messages to a reader.
 	Msg chan *Message
 	// For sending error messages that occur while while reading logs.
 	Err           chan error
 	closeOnce     sync.Once
-	closeNotifier chan struct***REMOVED******REMOVED***
-***REMOVED***
+	closeNotifier chan struct{}
+}
 
 // NewLogWatcher returns a new LogWatcher.
-func NewLogWatcher() *LogWatcher ***REMOVED***
-	return &LogWatcher***REMOVED***
+func NewLogWatcher() *LogWatcher {
+	return &LogWatcher{
 		Msg:           make(chan *Message, logWatcherBufferSize),
 		Err:           make(chan error, 1),
-		closeNotifier: make(chan struct***REMOVED******REMOVED***),
-	***REMOVED***
-***REMOVED***
+		closeNotifier: make(chan struct{}),
+	}
+}
 
 // Close notifies the underlying log reader to stop.
-func (w *LogWatcher) Close() ***REMOVED***
+func (w *LogWatcher) Close() {
 	// only close if not already closed
-	w.closeOnce.Do(func() ***REMOVED***
+	w.closeOnce.Do(func() {
 		close(w.closeNotifier)
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
 // WatchClose returns a channel receiver that receives notification
 // when the watcher has been closed. This should only be called from
 // one goroutine.
-func (w *LogWatcher) WatchClose() <-chan struct***REMOVED******REMOVED*** ***REMOVED***
+func (w *LogWatcher) WatchClose() <-chan struct{} {
 	return w.closeNotifier
-***REMOVED***
+}
 
 // Capability defines the list of capabilties that a driver can implement
 // These capabilities are not required to be a logging driver, however do
 // determine how a logging driver can be used
-type Capability struct ***REMOVED***
+type Capability struct {
 	// Determines if a log driver can read back logs
 	ReadLogs bool
-***REMOVED***
+}
 
 // MarshalFunc is a func that marshals a message into an arbitrary format
 type MarshalFunc func(*Message) ([]byte, error)

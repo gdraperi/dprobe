@@ -66,7 +66,7 @@ var _ = time.Kitchen
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
-type CreateTaskRequest struct ***REMOVED***
+type CreateTaskRequest struct {
 	ID               string                    `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Bundle           string                    `protobuf:"bytes,2,opt,name=bundle,proto3" json:"bundle,omitempty"`
 	Runtime          string                    `protobuf:"bytes,3,opt,name=runtime,proto3" json:"runtime,omitempty"`
@@ -78,77 +78,77 @@ type CreateTaskRequest struct ***REMOVED***
 	Checkpoint       string                    `protobuf:"bytes,9,opt,name=checkpoint,proto3" json:"checkpoint,omitempty"`
 	ParentCheckpoint string                    `protobuf:"bytes,10,opt,name=parent_checkpoint,json=parentCheckpoint,proto3" json:"parent_checkpoint,omitempty"`
 	Options          *google_protobuf.Any      `protobuf:"bytes,11,opt,name=options" json:"options,omitempty"`
-***REMOVED***
+}
 
-func (m *CreateTaskRequest) Reset()                    ***REMOVED*** *m = CreateTaskRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*CreateTaskRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*CreateTaskRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorShim, []int***REMOVED***0***REMOVED*** ***REMOVED***
+func (m *CreateTaskRequest) Reset()                    { *m = CreateTaskRequest{} }
+func (*CreateTaskRequest) ProtoMessage()               {}
+func (*CreateTaskRequest) Descriptor() ([]byte, []int) { return fileDescriptorShim, []int{0} }
 
-type CreateTaskResponse struct ***REMOVED***
+type CreateTaskResponse struct {
 	Pid uint32 `protobuf:"varint,1,opt,name=pid,proto3" json:"pid,omitempty"`
-***REMOVED***
+}
 
-func (m *CreateTaskResponse) Reset()                    ***REMOVED*** *m = CreateTaskResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*CreateTaskResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*CreateTaskResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorShim, []int***REMOVED***1***REMOVED*** ***REMOVED***
+func (m *CreateTaskResponse) Reset()                    { *m = CreateTaskResponse{} }
+func (*CreateTaskResponse) ProtoMessage()               {}
+func (*CreateTaskResponse) Descriptor() ([]byte, []int) { return fileDescriptorShim, []int{1} }
 
-type DeleteResponse struct ***REMOVED***
+type DeleteResponse struct {
 	Pid        uint32    `protobuf:"varint,1,opt,name=pid,proto3" json:"pid,omitempty"`
 	ExitStatus uint32    `protobuf:"varint,2,opt,name=exit_status,json=exitStatus,proto3" json:"exit_status,omitempty"`
 	ExitedAt   time.Time `protobuf:"bytes,3,opt,name=exited_at,json=exitedAt,stdtime" json:"exited_at"`
-***REMOVED***
+}
 
-func (m *DeleteResponse) Reset()                    ***REMOVED*** *m = DeleteResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*DeleteResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*DeleteResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorShim, []int***REMOVED***2***REMOVED*** ***REMOVED***
+func (m *DeleteResponse) Reset()                    { *m = DeleteResponse{} }
+func (*DeleteResponse) ProtoMessage()               {}
+func (*DeleteResponse) Descriptor() ([]byte, []int) { return fileDescriptorShim, []int{2} }
 
-type DeleteProcessRequest struct ***REMOVED***
+type DeleteProcessRequest struct {
 	ID string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-***REMOVED***
+}
 
-func (m *DeleteProcessRequest) Reset()                    ***REMOVED*** *m = DeleteProcessRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*DeleteProcessRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*DeleteProcessRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorShim, []int***REMOVED***3***REMOVED*** ***REMOVED***
+func (m *DeleteProcessRequest) Reset()                    { *m = DeleteProcessRequest{} }
+func (*DeleteProcessRequest) ProtoMessage()               {}
+func (*DeleteProcessRequest) Descriptor() ([]byte, []int) { return fileDescriptorShim, []int{3} }
 
-type ExecProcessRequest struct ***REMOVED***
+type ExecProcessRequest struct {
 	ID       string               `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Terminal bool                 `protobuf:"varint,2,opt,name=terminal,proto3" json:"terminal,omitempty"`
 	Stdin    string               `protobuf:"bytes,3,opt,name=stdin,proto3" json:"stdin,omitempty"`
 	Stdout   string               `protobuf:"bytes,4,opt,name=stdout,proto3" json:"stdout,omitempty"`
 	Stderr   string               `protobuf:"bytes,5,opt,name=stderr,proto3" json:"stderr,omitempty"`
 	Spec     *google_protobuf.Any `protobuf:"bytes,6,opt,name=spec" json:"spec,omitempty"`
-***REMOVED***
+}
 
-func (m *ExecProcessRequest) Reset()                    ***REMOVED*** *m = ExecProcessRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*ExecProcessRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*ExecProcessRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorShim, []int***REMOVED***4***REMOVED*** ***REMOVED***
+func (m *ExecProcessRequest) Reset()                    { *m = ExecProcessRequest{} }
+func (*ExecProcessRequest) ProtoMessage()               {}
+func (*ExecProcessRequest) Descriptor() ([]byte, []int) { return fileDescriptorShim, []int{4} }
 
-type ExecProcessResponse struct ***REMOVED***
-***REMOVED***
+type ExecProcessResponse struct {
+}
 
-func (m *ExecProcessResponse) Reset()                    ***REMOVED*** *m = ExecProcessResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*ExecProcessResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*ExecProcessResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorShim, []int***REMOVED***5***REMOVED*** ***REMOVED***
+func (m *ExecProcessResponse) Reset()                    { *m = ExecProcessResponse{} }
+func (*ExecProcessResponse) ProtoMessage()               {}
+func (*ExecProcessResponse) Descriptor() ([]byte, []int) { return fileDescriptorShim, []int{5} }
 
-type ResizePtyRequest struct ***REMOVED***
+type ResizePtyRequest struct {
 	ID     string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Width  uint32 `protobuf:"varint,2,opt,name=width,proto3" json:"width,omitempty"`
 	Height uint32 `protobuf:"varint,3,opt,name=height,proto3" json:"height,omitempty"`
-***REMOVED***
+}
 
-func (m *ResizePtyRequest) Reset()                    ***REMOVED*** *m = ResizePtyRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*ResizePtyRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*ResizePtyRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorShim, []int***REMOVED***6***REMOVED*** ***REMOVED***
+func (m *ResizePtyRequest) Reset()                    { *m = ResizePtyRequest{} }
+func (*ResizePtyRequest) ProtoMessage()               {}
+func (*ResizePtyRequest) Descriptor() ([]byte, []int) { return fileDescriptorShim, []int{6} }
 
-type StateRequest struct ***REMOVED***
+type StateRequest struct {
 	ID string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-***REMOVED***
+}
 
-func (m *StateRequest) Reset()                    ***REMOVED*** *m = StateRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*StateRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*StateRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorShim, []int***REMOVED***7***REMOVED*** ***REMOVED***
+func (m *StateRequest) Reset()                    { *m = StateRequest{} }
+func (*StateRequest) ProtoMessage()               {}
+func (*StateRequest) Descriptor() ([]byte, []int) { return fileDescriptorShim, []int{7} }
 
-type StateResponse struct ***REMOVED***
+type StateResponse struct {
 	ID         string                     `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Bundle     string                     `protobuf:"bytes,2,opt,name=bundle,proto3" json:"bundle,omitempty"`
 	Pid        uint32                     `protobuf:"varint,3,opt,name=pid,proto3" json:"pid,omitempty"`
@@ -159,107 +159,107 @@ type StateResponse struct ***REMOVED***
 	Terminal   bool                       `protobuf:"varint,8,opt,name=terminal,proto3" json:"terminal,omitempty"`
 	ExitStatus uint32                     `protobuf:"varint,9,opt,name=exit_status,json=exitStatus,proto3" json:"exit_status,omitempty"`
 	ExitedAt   time.Time                  `protobuf:"bytes,10,opt,name=exited_at,json=exitedAt,stdtime" json:"exited_at"`
-***REMOVED***
+}
 
-func (m *StateResponse) Reset()                    ***REMOVED*** *m = StateResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*StateResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*StateResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorShim, []int***REMOVED***8***REMOVED*** ***REMOVED***
+func (m *StateResponse) Reset()                    { *m = StateResponse{} }
+func (*StateResponse) ProtoMessage()               {}
+func (*StateResponse) Descriptor() ([]byte, []int) { return fileDescriptorShim, []int{8} }
 
-type KillRequest struct ***REMOVED***
+type KillRequest struct {
 	ID     string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Signal uint32 `protobuf:"varint,2,opt,name=signal,proto3" json:"signal,omitempty"`
 	All    bool   `protobuf:"varint,3,opt,name=all,proto3" json:"all,omitempty"`
-***REMOVED***
+}
 
-func (m *KillRequest) Reset()                    ***REMOVED*** *m = KillRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*KillRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*KillRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorShim, []int***REMOVED***9***REMOVED*** ***REMOVED***
+func (m *KillRequest) Reset()                    { *m = KillRequest{} }
+func (*KillRequest) ProtoMessage()               {}
+func (*KillRequest) Descriptor() ([]byte, []int) { return fileDescriptorShim, []int{9} }
 
-type CloseIORequest struct ***REMOVED***
+type CloseIORequest struct {
 	ID    string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Stdin bool   `protobuf:"varint,2,opt,name=stdin,proto3" json:"stdin,omitempty"`
-***REMOVED***
+}
 
-func (m *CloseIORequest) Reset()                    ***REMOVED*** *m = CloseIORequest***REMOVED******REMOVED*** ***REMOVED***
-func (*CloseIORequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*CloseIORequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorShim, []int***REMOVED***10***REMOVED*** ***REMOVED***
+func (m *CloseIORequest) Reset()                    { *m = CloseIORequest{} }
+func (*CloseIORequest) ProtoMessage()               {}
+func (*CloseIORequest) Descriptor() ([]byte, []int) { return fileDescriptorShim, []int{10} }
 
-type ListPidsRequest struct ***REMOVED***
+type ListPidsRequest struct {
 	ID string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-***REMOVED***
+}
 
-func (m *ListPidsRequest) Reset()                    ***REMOVED*** *m = ListPidsRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*ListPidsRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*ListPidsRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorShim, []int***REMOVED***11***REMOVED*** ***REMOVED***
+func (m *ListPidsRequest) Reset()                    { *m = ListPidsRequest{} }
+func (*ListPidsRequest) ProtoMessage()               {}
+func (*ListPidsRequest) Descriptor() ([]byte, []int) { return fileDescriptorShim, []int{11} }
 
-type ListPidsResponse struct ***REMOVED***
+type ListPidsResponse struct {
 	Processes []*containerd_v1_types.ProcessInfo `protobuf:"bytes,1,rep,name=processes" json:"processes,omitempty"`
-***REMOVED***
+}
 
-func (m *ListPidsResponse) Reset()                    ***REMOVED*** *m = ListPidsResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*ListPidsResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*ListPidsResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorShim, []int***REMOVED***12***REMOVED*** ***REMOVED***
+func (m *ListPidsResponse) Reset()                    { *m = ListPidsResponse{} }
+func (*ListPidsResponse) ProtoMessage()               {}
+func (*ListPidsResponse) Descriptor() ([]byte, []int) { return fileDescriptorShim, []int{12} }
 
-type CheckpointTaskRequest struct ***REMOVED***
+type CheckpointTaskRequest struct {
 	Path    string               `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
 	Options *google_protobuf.Any `protobuf:"bytes,2,opt,name=options" json:"options,omitempty"`
-***REMOVED***
+}
 
-func (m *CheckpointTaskRequest) Reset()                    ***REMOVED*** *m = CheckpointTaskRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*CheckpointTaskRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*CheckpointTaskRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorShim, []int***REMOVED***13***REMOVED*** ***REMOVED***
+func (m *CheckpointTaskRequest) Reset()                    { *m = CheckpointTaskRequest{} }
+func (*CheckpointTaskRequest) ProtoMessage()               {}
+func (*CheckpointTaskRequest) Descriptor() ([]byte, []int) { return fileDescriptorShim, []int{13} }
 
-type ShimInfoResponse struct ***REMOVED***
+type ShimInfoResponse struct {
 	ShimPid uint32 `protobuf:"varint,1,opt,name=shim_pid,json=shimPid,proto3" json:"shim_pid,omitempty"`
-***REMOVED***
+}
 
-func (m *ShimInfoResponse) Reset()                    ***REMOVED*** *m = ShimInfoResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*ShimInfoResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*ShimInfoResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorShim, []int***REMOVED***14***REMOVED*** ***REMOVED***
+func (m *ShimInfoResponse) Reset()                    { *m = ShimInfoResponse{} }
+func (*ShimInfoResponse) ProtoMessage()               {}
+func (*ShimInfoResponse) Descriptor() ([]byte, []int) { return fileDescriptorShim, []int{14} }
 
-type UpdateTaskRequest struct ***REMOVED***
+type UpdateTaskRequest struct {
 	Resources *google_protobuf.Any `protobuf:"bytes,1,opt,name=resources" json:"resources,omitempty"`
-***REMOVED***
+}
 
-func (m *UpdateTaskRequest) Reset()                    ***REMOVED*** *m = UpdateTaskRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*UpdateTaskRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*UpdateTaskRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorShim, []int***REMOVED***15***REMOVED*** ***REMOVED***
+func (m *UpdateTaskRequest) Reset()                    { *m = UpdateTaskRequest{} }
+func (*UpdateTaskRequest) ProtoMessage()               {}
+func (*UpdateTaskRequest) Descriptor() ([]byte, []int) { return fileDescriptorShim, []int{15} }
 
-type StartRequest struct ***REMOVED***
+type StartRequest struct {
 	ID string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-***REMOVED***
+}
 
-func (m *StartRequest) Reset()                    ***REMOVED*** *m = StartRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*StartRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*StartRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorShim, []int***REMOVED***16***REMOVED*** ***REMOVED***
+func (m *StartRequest) Reset()                    { *m = StartRequest{} }
+func (*StartRequest) ProtoMessage()               {}
+func (*StartRequest) Descriptor() ([]byte, []int) { return fileDescriptorShim, []int{16} }
 
-type StartResponse struct ***REMOVED***
+type StartResponse struct {
 	ID  string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Pid uint32 `protobuf:"varint,2,opt,name=pid,proto3" json:"pid,omitempty"`
-***REMOVED***
+}
 
-func (m *StartResponse) Reset()                    ***REMOVED*** *m = StartResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*StartResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*StartResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorShim, []int***REMOVED***17***REMOVED*** ***REMOVED***
+func (m *StartResponse) Reset()                    { *m = StartResponse{} }
+func (*StartResponse) ProtoMessage()               {}
+func (*StartResponse) Descriptor() ([]byte, []int) { return fileDescriptorShim, []int{17} }
 
-type WaitRequest struct ***REMOVED***
+type WaitRequest struct {
 	ID string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-***REMOVED***
+}
 
-func (m *WaitRequest) Reset()                    ***REMOVED*** *m = WaitRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*WaitRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*WaitRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorShim, []int***REMOVED***18***REMOVED*** ***REMOVED***
+func (m *WaitRequest) Reset()                    { *m = WaitRequest{} }
+func (*WaitRequest) ProtoMessage()               {}
+func (*WaitRequest) Descriptor() ([]byte, []int) { return fileDescriptorShim, []int{18} }
 
-type WaitResponse struct ***REMOVED***
+type WaitResponse struct {
 	ExitStatus uint32    `protobuf:"varint,1,opt,name=exit_status,json=exitStatus,proto3" json:"exit_status,omitempty"`
 	ExitedAt   time.Time `protobuf:"bytes,2,opt,name=exited_at,json=exitedAt,stdtime" json:"exited_at"`
-***REMOVED***
+}
 
-func (m *WaitResponse) Reset()                    ***REMOVED*** *m = WaitResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*WaitResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*WaitResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorShim, []int***REMOVED***19***REMOVED*** ***REMOVED***
+func (m *WaitResponse) Reset()                    { *m = WaitResponse{} }
+func (*WaitResponse) ProtoMessage()               {}
+func (*WaitResponse) Descriptor() ([]byte, []int) { return fileDescriptorShim, []int{19} }
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*CreateTaskRequest)(nil), "containerd.runtime.linux.shim.v1.CreateTaskRequest")
 	proto.RegisterType((*CreateTaskResponse)(nil), "containerd.runtime.linux.shim.v1.CreateTaskResponse")
 	proto.RegisterType((*DeleteResponse)(nil), "containerd.runtime.linux.shim.v1.DeleteResponse")
@@ -280,1067 +280,1067 @@ func init() ***REMOVED***
 	proto.RegisterType((*StartResponse)(nil), "containerd.runtime.linux.shim.v1.StartResponse")
 	proto.RegisterType((*WaitRequest)(nil), "containerd.runtime.linux.shim.v1.WaitRequest")
 	proto.RegisterType((*WaitResponse)(nil), "containerd.runtime.linux.shim.v1.WaitResponse")
-***REMOVED***
-func (m *CreateTaskRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+}
+func (m *CreateTaskRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *CreateTaskRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *CreateTaskRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ID) > 0 ***REMOVED***
+	if len(m.ID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(len(m.ID)))
 		i += copy(dAtA[i:], m.ID)
-	***REMOVED***
-	if len(m.Bundle) > 0 ***REMOVED***
+	}
+	if len(m.Bundle) > 0 {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(len(m.Bundle)))
 		i += copy(dAtA[i:], m.Bundle)
-	***REMOVED***
-	if len(m.Runtime) > 0 ***REMOVED***
+	}
+	if len(m.Runtime) > 0 {
 		dAtA[i] = 0x1a
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(len(m.Runtime)))
 		i += copy(dAtA[i:], m.Runtime)
-	***REMOVED***
-	if len(m.Rootfs) > 0 ***REMOVED***
-		for _, msg := range m.Rootfs ***REMOVED***
+	}
+	if len(m.Rootfs) > 0 {
+		for _, msg := range m.Rootfs {
 			dAtA[i] = 0x22
 			i++
 			i = encodeVarintShim(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			i += n
-		***REMOVED***
-	***REMOVED***
-	if m.Terminal ***REMOVED***
+		}
+	}
+	if m.Terminal {
 		dAtA[i] = 0x28
 		i++
-		if m.Terminal ***REMOVED***
+		if m.Terminal {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
-	if len(m.Stdin) > 0 ***REMOVED***
+	}
+	if len(m.Stdin) > 0 {
 		dAtA[i] = 0x32
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(len(m.Stdin)))
 		i += copy(dAtA[i:], m.Stdin)
-	***REMOVED***
-	if len(m.Stdout) > 0 ***REMOVED***
+	}
+	if len(m.Stdout) > 0 {
 		dAtA[i] = 0x3a
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(len(m.Stdout)))
 		i += copy(dAtA[i:], m.Stdout)
-	***REMOVED***
-	if len(m.Stderr) > 0 ***REMOVED***
+	}
+	if len(m.Stderr) > 0 {
 		dAtA[i] = 0x42
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(len(m.Stderr)))
 		i += copy(dAtA[i:], m.Stderr)
-	***REMOVED***
-	if len(m.Checkpoint) > 0 ***REMOVED***
+	}
+	if len(m.Checkpoint) > 0 {
 		dAtA[i] = 0x4a
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(len(m.Checkpoint)))
 		i += copy(dAtA[i:], m.Checkpoint)
-	***REMOVED***
-	if len(m.ParentCheckpoint) > 0 ***REMOVED***
+	}
+	if len(m.ParentCheckpoint) > 0 {
 		dAtA[i] = 0x52
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(len(m.ParentCheckpoint)))
 		i += copy(dAtA[i:], m.ParentCheckpoint)
-	***REMOVED***
-	if m.Options != nil ***REMOVED***
+	}
+	if m.Options != nil {
 		dAtA[i] = 0x5a
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(m.Options.Size()))
 		n1, err := m.Options.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n1
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *CreateTaskResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *CreateTaskResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *CreateTaskResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *CreateTaskResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.Pid != 0 ***REMOVED***
+	if m.Pid != 0 {
 		dAtA[i] = 0x8
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(m.Pid))
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *DeleteResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *DeleteResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *DeleteResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *DeleteResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.Pid != 0 ***REMOVED***
+	if m.Pid != 0 {
 		dAtA[i] = 0x8
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(m.Pid))
-	***REMOVED***
-	if m.ExitStatus != 0 ***REMOVED***
+	}
+	if m.ExitStatus != 0 {
 		dAtA[i] = 0x10
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(m.ExitStatus))
-	***REMOVED***
+	}
 	dAtA[i] = 0x1a
 	i++
 	i = encodeVarintShim(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.ExitedAt)))
 	n2, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.ExitedAt, dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n2
 	return i, nil
-***REMOVED***
+}
 
-func (m *DeleteProcessRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *DeleteProcessRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *DeleteProcessRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *DeleteProcessRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ID) > 0 ***REMOVED***
+	if len(m.ID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(len(m.ID)))
 		i += copy(dAtA[i:], m.ID)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *ExecProcessRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *ExecProcessRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *ExecProcessRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *ExecProcessRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ID) > 0 ***REMOVED***
+	if len(m.ID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(len(m.ID)))
 		i += copy(dAtA[i:], m.ID)
-	***REMOVED***
-	if m.Terminal ***REMOVED***
+	}
+	if m.Terminal {
 		dAtA[i] = 0x10
 		i++
-		if m.Terminal ***REMOVED***
+		if m.Terminal {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
-	if len(m.Stdin) > 0 ***REMOVED***
+	}
+	if len(m.Stdin) > 0 {
 		dAtA[i] = 0x1a
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(len(m.Stdin)))
 		i += copy(dAtA[i:], m.Stdin)
-	***REMOVED***
-	if len(m.Stdout) > 0 ***REMOVED***
+	}
+	if len(m.Stdout) > 0 {
 		dAtA[i] = 0x22
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(len(m.Stdout)))
 		i += copy(dAtA[i:], m.Stdout)
-	***REMOVED***
-	if len(m.Stderr) > 0 ***REMOVED***
+	}
+	if len(m.Stderr) > 0 {
 		dAtA[i] = 0x2a
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(len(m.Stderr)))
 		i += copy(dAtA[i:], m.Stderr)
-	***REMOVED***
-	if m.Spec != nil ***REMOVED***
+	}
+	if m.Spec != nil {
 		dAtA[i] = 0x32
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(m.Spec.Size()))
 		n3, err := m.Spec.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n3
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *ExecProcessResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *ExecProcessResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *ExecProcessResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *ExecProcessResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
 	return i, nil
-***REMOVED***
+}
 
-func (m *ResizePtyRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *ResizePtyRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *ResizePtyRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *ResizePtyRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ID) > 0 ***REMOVED***
+	if len(m.ID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(len(m.ID)))
 		i += copy(dAtA[i:], m.ID)
-	***REMOVED***
-	if m.Width != 0 ***REMOVED***
+	}
+	if m.Width != 0 {
 		dAtA[i] = 0x10
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(m.Width))
-	***REMOVED***
-	if m.Height != 0 ***REMOVED***
+	}
+	if m.Height != 0 {
 		dAtA[i] = 0x18
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(m.Height))
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *StateRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *StateRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *StateRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *StateRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ID) > 0 ***REMOVED***
+	if len(m.ID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(len(m.ID)))
 		i += copy(dAtA[i:], m.ID)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *StateResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *StateResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *StateResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *StateResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ID) > 0 ***REMOVED***
+	if len(m.ID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(len(m.ID)))
 		i += copy(dAtA[i:], m.ID)
-	***REMOVED***
-	if len(m.Bundle) > 0 ***REMOVED***
+	}
+	if len(m.Bundle) > 0 {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(len(m.Bundle)))
 		i += copy(dAtA[i:], m.Bundle)
-	***REMOVED***
-	if m.Pid != 0 ***REMOVED***
+	}
+	if m.Pid != 0 {
 		dAtA[i] = 0x18
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(m.Pid))
-	***REMOVED***
-	if m.Status != 0 ***REMOVED***
+	}
+	if m.Status != 0 {
 		dAtA[i] = 0x20
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(m.Status))
-	***REMOVED***
-	if len(m.Stdin) > 0 ***REMOVED***
+	}
+	if len(m.Stdin) > 0 {
 		dAtA[i] = 0x2a
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(len(m.Stdin)))
 		i += copy(dAtA[i:], m.Stdin)
-	***REMOVED***
-	if len(m.Stdout) > 0 ***REMOVED***
+	}
+	if len(m.Stdout) > 0 {
 		dAtA[i] = 0x32
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(len(m.Stdout)))
 		i += copy(dAtA[i:], m.Stdout)
-	***REMOVED***
-	if len(m.Stderr) > 0 ***REMOVED***
+	}
+	if len(m.Stderr) > 0 {
 		dAtA[i] = 0x3a
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(len(m.Stderr)))
 		i += copy(dAtA[i:], m.Stderr)
-	***REMOVED***
-	if m.Terminal ***REMOVED***
+	}
+	if m.Terminal {
 		dAtA[i] = 0x40
 		i++
-		if m.Terminal ***REMOVED***
+		if m.Terminal {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
-	if m.ExitStatus != 0 ***REMOVED***
+	}
+	if m.ExitStatus != 0 {
 		dAtA[i] = 0x48
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(m.ExitStatus))
-	***REMOVED***
+	}
 	dAtA[i] = 0x52
 	i++
 	i = encodeVarintShim(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.ExitedAt)))
 	n4, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.ExitedAt, dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n4
 	return i, nil
-***REMOVED***
+}
 
-func (m *KillRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *KillRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *KillRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *KillRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ID) > 0 ***REMOVED***
+	if len(m.ID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(len(m.ID)))
 		i += copy(dAtA[i:], m.ID)
-	***REMOVED***
-	if m.Signal != 0 ***REMOVED***
+	}
+	if m.Signal != 0 {
 		dAtA[i] = 0x10
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(m.Signal))
-	***REMOVED***
-	if m.All ***REMOVED***
+	}
+	if m.All {
 		dAtA[i] = 0x18
 		i++
-		if m.All ***REMOVED***
+		if m.All {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *CloseIORequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *CloseIORequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *CloseIORequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *CloseIORequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ID) > 0 ***REMOVED***
+	if len(m.ID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(len(m.ID)))
 		i += copy(dAtA[i:], m.ID)
-	***REMOVED***
-	if m.Stdin ***REMOVED***
+	}
+	if m.Stdin {
 		dAtA[i] = 0x10
 		i++
-		if m.Stdin ***REMOVED***
+		if m.Stdin {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *ListPidsRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *ListPidsRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *ListPidsRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *ListPidsRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ID) > 0 ***REMOVED***
+	if len(m.ID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(len(m.ID)))
 		i += copy(dAtA[i:], m.ID)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *ListPidsResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *ListPidsResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *ListPidsResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *ListPidsResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Processes) > 0 ***REMOVED***
-		for _, msg := range m.Processes ***REMOVED***
+	if len(m.Processes) > 0 {
+		for _, msg := range m.Processes {
 			dAtA[i] = 0xa
 			i++
 			i = encodeVarintShim(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			i += n
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *CheckpointTaskRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *CheckpointTaskRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *CheckpointTaskRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *CheckpointTaskRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Path) > 0 ***REMOVED***
+	if len(m.Path) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(len(m.Path)))
 		i += copy(dAtA[i:], m.Path)
-	***REMOVED***
-	if m.Options != nil ***REMOVED***
+	}
+	if m.Options != nil {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(m.Options.Size()))
 		n5, err := m.Options.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n5
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *ShimInfoResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *ShimInfoResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *ShimInfoResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *ShimInfoResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.ShimPid != 0 ***REMOVED***
+	if m.ShimPid != 0 {
 		dAtA[i] = 0x8
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(m.ShimPid))
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *UpdateTaskRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *UpdateTaskRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *UpdateTaskRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *UpdateTaskRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.Resources != nil ***REMOVED***
+	if m.Resources != nil {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(m.Resources.Size()))
 		n6, err := m.Resources.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n6
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *StartRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *StartRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *StartRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *StartRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ID) > 0 ***REMOVED***
+	if len(m.ID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(len(m.ID)))
 		i += copy(dAtA[i:], m.ID)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *StartResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *StartResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *StartResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *StartResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ID) > 0 ***REMOVED***
+	if len(m.ID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(len(m.ID)))
 		i += copy(dAtA[i:], m.ID)
-	***REMOVED***
-	if m.Pid != 0 ***REMOVED***
+	}
+	if m.Pid != 0 {
 		dAtA[i] = 0x10
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(m.Pid))
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *WaitRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *WaitRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *WaitRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *WaitRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ID) > 0 ***REMOVED***
+	if len(m.ID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(len(m.ID)))
 		i += copy(dAtA[i:], m.ID)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *WaitResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *WaitResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *WaitResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *WaitResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.ExitStatus != 0 ***REMOVED***
+	if m.ExitStatus != 0 {
 		dAtA[i] = 0x8
 		i++
 		i = encodeVarintShim(dAtA, i, uint64(m.ExitStatus))
-	***REMOVED***
+	}
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintShim(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(m.ExitedAt)))
 	n7, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.ExitedAt, dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n7
 	return i, nil
-***REMOVED***
+}
 
-func encodeVarintShim(dAtA []byte, offset int, v uint64) int ***REMOVED***
-	for v >= 1<<7 ***REMOVED***
+func encodeVarintShim(dAtA []byte, offset int, v uint64) int {
+	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
-	***REMOVED***
+	}
 	dAtA[offset] = uint8(v)
 	return offset + 1
-***REMOVED***
-func (m *CreateTaskRequest) Size() (n int) ***REMOVED***
+}
+func (m *CreateTaskRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovShim(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.Bundle)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovShim(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.Runtime)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovShim(uint64(l))
-	***REMOVED***
-	if len(m.Rootfs) > 0 ***REMOVED***
-		for _, e := range m.Rootfs ***REMOVED***
+	}
+	if len(m.Rootfs) > 0 {
+		for _, e := range m.Rootfs {
 			l = e.Size()
 			n += 1 + l + sovShim(uint64(l))
-		***REMOVED***
-	***REMOVED***
-	if m.Terminal ***REMOVED***
+		}
+	}
+	if m.Terminal {
 		n += 2
-	***REMOVED***
+	}
 	l = len(m.Stdin)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovShim(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.Stdout)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovShim(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.Stderr)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovShim(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.Checkpoint)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovShim(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.ParentCheckpoint)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovShim(uint64(l))
-	***REMOVED***
-	if m.Options != nil ***REMOVED***
+	}
+	if m.Options != nil {
 		l = m.Options.Size()
 		n += 1 + l + sovShim(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *CreateTaskResponse) Size() (n int) ***REMOVED***
+func (m *CreateTaskResponse) Size() (n int) {
 	var l int
 	_ = l
-	if m.Pid != 0 ***REMOVED***
+	if m.Pid != 0 {
 		n += 1 + sovShim(uint64(m.Pid))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *DeleteResponse) Size() (n int) ***REMOVED***
+func (m *DeleteResponse) Size() (n int) {
 	var l int
 	_ = l
-	if m.Pid != 0 ***REMOVED***
+	if m.Pid != 0 {
 		n += 1 + sovShim(uint64(m.Pid))
-	***REMOVED***
-	if m.ExitStatus != 0 ***REMOVED***
+	}
+	if m.ExitStatus != 0 {
 		n += 1 + sovShim(uint64(m.ExitStatus))
-	***REMOVED***
+	}
 	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.ExitedAt)
 	n += 1 + l + sovShim(uint64(l))
 	return n
-***REMOVED***
+}
 
-func (m *DeleteProcessRequest) Size() (n int) ***REMOVED***
+func (m *DeleteProcessRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovShim(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *ExecProcessRequest) Size() (n int) ***REMOVED***
+func (m *ExecProcessRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovShim(uint64(l))
-	***REMOVED***
-	if m.Terminal ***REMOVED***
+	}
+	if m.Terminal {
 		n += 2
-	***REMOVED***
+	}
 	l = len(m.Stdin)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovShim(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.Stdout)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovShim(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.Stderr)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovShim(uint64(l))
-	***REMOVED***
-	if m.Spec != nil ***REMOVED***
+	}
+	if m.Spec != nil {
 		l = m.Spec.Size()
 		n += 1 + l + sovShim(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *ExecProcessResponse) Size() (n int) ***REMOVED***
+func (m *ExecProcessResponse) Size() (n int) {
 	var l int
 	_ = l
 	return n
-***REMOVED***
+}
 
-func (m *ResizePtyRequest) Size() (n int) ***REMOVED***
+func (m *ResizePtyRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovShim(uint64(l))
-	***REMOVED***
-	if m.Width != 0 ***REMOVED***
+	}
+	if m.Width != 0 {
 		n += 1 + sovShim(uint64(m.Width))
-	***REMOVED***
-	if m.Height != 0 ***REMOVED***
+	}
+	if m.Height != 0 {
 		n += 1 + sovShim(uint64(m.Height))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *StateRequest) Size() (n int) ***REMOVED***
+func (m *StateRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovShim(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *StateResponse) Size() (n int) ***REMOVED***
+func (m *StateResponse) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovShim(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.Bundle)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovShim(uint64(l))
-	***REMOVED***
-	if m.Pid != 0 ***REMOVED***
+	}
+	if m.Pid != 0 {
 		n += 1 + sovShim(uint64(m.Pid))
-	***REMOVED***
-	if m.Status != 0 ***REMOVED***
+	}
+	if m.Status != 0 {
 		n += 1 + sovShim(uint64(m.Status))
-	***REMOVED***
+	}
 	l = len(m.Stdin)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovShim(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.Stdout)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovShim(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.Stderr)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovShim(uint64(l))
-	***REMOVED***
-	if m.Terminal ***REMOVED***
+	}
+	if m.Terminal {
 		n += 2
-	***REMOVED***
-	if m.ExitStatus != 0 ***REMOVED***
+	}
+	if m.ExitStatus != 0 {
 		n += 1 + sovShim(uint64(m.ExitStatus))
-	***REMOVED***
+	}
 	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.ExitedAt)
 	n += 1 + l + sovShim(uint64(l))
 	return n
-***REMOVED***
+}
 
-func (m *KillRequest) Size() (n int) ***REMOVED***
+func (m *KillRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovShim(uint64(l))
-	***REMOVED***
-	if m.Signal != 0 ***REMOVED***
+	}
+	if m.Signal != 0 {
 		n += 1 + sovShim(uint64(m.Signal))
-	***REMOVED***
-	if m.All ***REMOVED***
+	}
+	if m.All {
 		n += 2
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *CloseIORequest) Size() (n int) ***REMOVED***
+func (m *CloseIORequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovShim(uint64(l))
-	***REMOVED***
-	if m.Stdin ***REMOVED***
+	}
+	if m.Stdin {
 		n += 2
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *ListPidsRequest) Size() (n int) ***REMOVED***
+func (m *ListPidsRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovShim(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *ListPidsResponse) Size() (n int) ***REMOVED***
+func (m *ListPidsResponse) Size() (n int) {
 	var l int
 	_ = l
-	if len(m.Processes) > 0 ***REMOVED***
-		for _, e := range m.Processes ***REMOVED***
+	if len(m.Processes) > 0 {
+		for _, e := range m.Processes {
 			l = e.Size()
 			n += 1 + l + sovShim(uint64(l))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
+}
 
-func (m *CheckpointTaskRequest) Size() (n int) ***REMOVED***
+func (m *CheckpointTaskRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.Path)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovShim(uint64(l))
-	***REMOVED***
-	if m.Options != nil ***REMOVED***
+	}
+	if m.Options != nil {
 		l = m.Options.Size()
 		n += 1 + l + sovShim(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *ShimInfoResponse) Size() (n int) ***REMOVED***
+func (m *ShimInfoResponse) Size() (n int) {
 	var l int
 	_ = l
-	if m.ShimPid != 0 ***REMOVED***
+	if m.ShimPid != 0 {
 		n += 1 + sovShim(uint64(m.ShimPid))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *UpdateTaskRequest) Size() (n int) ***REMOVED***
+func (m *UpdateTaskRequest) Size() (n int) {
 	var l int
 	_ = l
-	if m.Resources != nil ***REMOVED***
+	if m.Resources != nil {
 		l = m.Resources.Size()
 		n += 1 + l + sovShim(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *StartRequest) Size() (n int) ***REMOVED***
+func (m *StartRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovShim(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *StartResponse) Size() (n int) ***REMOVED***
+func (m *StartResponse) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovShim(uint64(l))
-	***REMOVED***
-	if m.Pid != 0 ***REMOVED***
+	}
+	if m.Pid != 0 {
 		n += 1 + sovShim(uint64(m.Pid))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *WaitRequest) Size() (n int) ***REMOVED***
+func (m *WaitRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovShim(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *WaitResponse) Size() (n int) ***REMOVED***
+func (m *WaitResponse) Size() (n int) {
 	var l int
 	_ = l
-	if m.ExitStatus != 0 ***REMOVED***
+	if m.ExitStatus != 0 {
 		n += 1 + sovShim(uint64(m.ExitStatus))
-	***REMOVED***
+	}
 	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.ExitedAt)
 	n += 1 + l + sovShim(uint64(l))
 	return n
-***REMOVED***
+}
 
-func sovShim(x uint64) (n int) ***REMOVED***
-	for ***REMOVED***
+func sovShim(x uint64) (n int) {
+	for {
 		n++
 		x >>= 7
-		if x == 0 ***REMOVED***
+		if x == 0 {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
-func sozShim(x uint64) (n int) ***REMOVED***
+}
+func sozShim(x uint64) (n int) {
 	return sovShim(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-***REMOVED***
-func (this *CreateTaskRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *CreateTaskRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&CreateTaskRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&CreateTaskRequest{`,
 		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
 		`Bundle:` + fmt.Sprintf("%v", this.Bundle) + `,`,
 		`Runtime:` + fmt.Sprintf("%v", this.Runtime) + `,`,
@@ -1352,93 +1352,93 @@ func (this *CreateTaskRequest) String() string ***REMOVED***
 		`Checkpoint:` + fmt.Sprintf("%v", this.Checkpoint) + `,`,
 		`ParentCheckpoint:` + fmt.Sprintf("%v", this.ParentCheckpoint) + `,`,
 		`Options:` + strings.Replace(fmt.Sprintf("%v", this.Options), "Any", "google_protobuf.Any", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *CreateTaskResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *CreateTaskResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&CreateTaskResponse***REMOVED***`,
+	}
+	s := strings.Join([]string{`&CreateTaskResponse{`,
 		`Pid:` + fmt.Sprintf("%v", this.Pid) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *DeleteResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *DeleteResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&DeleteResponse***REMOVED***`,
+	}
+	s := strings.Join([]string{`&DeleteResponse{`,
 		`Pid:` + fmt.Sprintf("%v", this.Pid) + `,`,
 		`ExitStatus:` + fmt.Sprintf("%v", this.ExitStatus) + `,`,
 		`ExitedAt:` + strings.Replace(strings.Replace(this.ExitedAt.String(), "Timestamp", "google_protobuf3.Timestamp", 1), `&`, ``, 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *DeleteProcessRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *DeleteProcessRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&DeleteProcessRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&DeleteProcessRequest{`,
 		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *ExecProcessRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *ExecProcessRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&ExecProcessRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&ExecProcessRequest{`,
 		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
 		`Terminal:` + fmt.Sprintf("%v", this.Terminal) + `,`,
 		`Stdin:` + fmt.Sprintf("%v", this.Stdin) + `,`,
 		`Stdout:` + fmt.Sprintf("%v", this.Stdout) + `,`,
 		`Stderr:` + fmt.Sprintf("%v", this.Stderr) + `,`,
 		`Spec:` + strings.Replace(fmt.Sprintf("%v", this.Spec), "Any", "google_protobuf.Any", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *ExecProcessResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *ExecProcessResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&ExecProcessResponse***REMOVED***`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+	}
+	s := strings.Join([]string{`&ExecProcessResponse{`,
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *ResizePtyRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *ResizePtyRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&ResizePtyRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&ResizePtyRequest{`,
 		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
 		`Width:` + fmt.Sprintf("%v", this.Width) + `,`,
 		`Height:` + fmt.Sprintf("%v", this.Height) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *StateRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *StateRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&StateRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&StateRequest{`,
 		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *StateResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *StateResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&StateResponse***REMOVED***`,
+	}
+	s := strings.Join([]string{`&StateResponse{`,
 		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
 		`Bundle:` + fmt.Sprintf("%v", this.Bundle) + `,`,
 		`Pid:` + fmt.Sprintf("%v", this.Pid) + `,`,
@@ -1449,136 +1449,136 @@ func (this *StateResponse) String() string ***REMOVED***
 		`Terminal:` + fmt.Sprintf("%v", this.Terminal) + `,`,
 		`ExitStatus:` + fmt.Sprintf("%v", this.ExitStatus) + `,`,
 		`ExitedAt:` + strings.Replace(strings.Replace(this.ExitedAt.String(), "Timestamp", "google_protobuf3.Timestamp", 1), `&`, ``, 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *KillRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *KillRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&KillRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&KillRequest{`,
 		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
 		`Signal:` + fmt.Sprintf("%v", this.Signal) + `,`,
 		`All:` + fmt.Sprintf("%v", this.All) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *CloseIORequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *CloseIORequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&CloseIORequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&CloseIORequest{`,
 		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
 		`Stdin:` + fmt.Sprintf("%v", this.Stdin) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *ListPidsRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *ListPidsRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&ListPidsRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&ListPidsRequest{`,
 		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *ListPidsResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *ListPidsResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&ListPidsResponse***REMOVED***`,
+	}
+	s := strings.Join([]string{`&ListPidsResponse{`,
 		`Processes:` + strings.Replace(fmt.Sprintf("%v", this.Processes), "ProcessInfo", "containerd_v1_types.ProcessInfo", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *CheckpointTaskRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *CheckpointTaskRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&CheckpointTaskRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&CheckpointTaskRequest{`,
 		`Path:` + fmt.Sprintf("%v", this.Path) + `,`,
 		`Options:` + strings.Replace(fmt.Sprintf("%v", this.Options), "Any", "google_protobuf.Any", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *ShimInfoResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *ShimInfoResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&ShimInfoResponse***REMOVED***`,
+	}
+	s := strings.Join([]string{`&ShimInfoResponse{`,
 		`ShimPid:` + fmt.Sprintf("%v", this.ShimPid) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *UpdateTaskRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *UpdateTaskRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&UpdateTaskRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&UpdateTaskRequest{`,
 		`Resources:` + strings.Replace(fmt.Sprintf("%v", this.Resources), "Any", "google_protobuf.Any", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *StartRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *StartRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&StartRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&StartRequest{`,
 		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *StartResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *StartResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&StartResponse***REMOVED***`,
+	}
+	s := strings.Join([]string{`&StartResponse{`,
 		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
 		`Pid:` + fmt.Sprintf("%v", this.Pid) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *WaitRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *WaitRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&WaitRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&WaitRequest{`,
 		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *WaitResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *WaitResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&WaitResponse***REMOVED***`,
+	}
+	s := strings.Join([]string{`&WaitResponse{`,
 		`ExitStatus:` + fmt.Sprintf("%v", this.ExitStatus) + `,`,
 		`ExitedAt:` + strings.Replace(strings.Replace(this.ExitedAt.String(), "Timestamp", "google_protobuf3.Timestamp", 1), `&`, ``, 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func valueToStringShim(v interface***REMOVED******REMOVED***) string ***REMOVED***
+}
+func valueToStringShim(v interface{}) string {
 	rv := reflect.ValueOf(v)
-	if rv.IsNil() ***REMOVED***
+	if rv.IsNil() {
 		return "nil"
-	***REMOVED***
+	}
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
-***REMOVED***
+}
 
-type ShimService interface ***REMOVED***
+type ShimService interface {
 	State(ctx context.Context, req *StateRequest) (*StateResponse, error)
 	Create(ctx context.Context, req *CreateTaskRequest) (*CreateTaskResponse, error)
 	Start(ctx context.Context, req *StartRequest) (*StartResponse, error)
@@ -1595,2744 +1595,2744 @@ type ShimService interface ***REMOVED***
 	ShimInfo(ctx context.Context, req *google_protobuf1.Empty) (*ShimInfoResponse, error)
 	Update(ctx context.Context, req *UpdateTaskRequest) (*google_protobuf1.Empty, error)
 	Wait(ctx context.Context, req *WaitRequest) (*WaitResponse, error)
-***REMOVED***
+}
 
-func RegisterShimService(srv *github_com_stevvooe_ttrpc.Server, svc ShimService) ***REMOVED***
-	srv.Register("containerd.runtime.linux.shim.v1.Shim", map[string]github_com_stevvooe_ttrpc.Method***REMOVED***
-		"State": func(ctx context.Context, unmarshal func(interface***REMOVED******REMOVED***) error) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func RegisterShimService(srv *github_com_stevvooe_ttrpc.Server, svc ShimService) {
+	srv.Register("containerd.runtime.linux.shim.v1.Shim", map[string]github_com_stevvooe_ttrpc.Method{
+		"State": func(ctx context.Context, unmarshal func(interface{}) error) (interface{}, error) {
 			var req StateRequest
-			if err := unmarshal(&req); err != nil ***REMOVED***
+			if err := unmarshal(&req); err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			return svc.State(ctx, &req)
-		***REMOVED***,
-		"Create": func(ctx context.Context, unmarshal func(interface***REMOVED******REMOVED***) error) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+		},
+		"Create": func(ctx context.Context, unmarshal func(interface{}) error) (interface{}, error) {
 			var req CreateTaskRequest
-			if err := unmarshal(&req); err != nil ***REMOVED***
+			if err := unmarshal(&req); err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			return svc.Create(ctx, &req)
-		***REMOVED***,
-		"Start": func(ctx context.Context, unmarshal func(interface***REMOVED******REMOVED***) error) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+		},
+		"Start": func(ctx context.Context, unmarshal func(interface{}) error) (interface{}, error) {
 			var req StartRequest
-			if err := unmarshal(&req); err != nil ***REMOVED***
+			if err := unmarshal(&req); err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			return svc.Start(ctx, &req)
-		***REMOVED***,
-		"Delete": func(ctx context.Context, unmarshal func(interface***REMOVED******REMOVED***) error) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+		},
+		"Delete": func(ctx context.Context, unmarshal func(interface{}) error) (interface{}, error) {
 			var req google_protobuf1.Empty
-			if err := unmarshal(&req); err != nil ***REMOVED***
+			if err := unmarshal(&req); err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			return svc.Delete(ctx, &req)
-		***REMOVED***,
-		"DeleteProcess": func(ctx context.Context, unmarshal func(interface***REMOVED******REMOVED***) error) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+		},
+		"DeleteProcess": func(ctx context.Context, unmarshal func(interface{}) error) (interface{}, error) {
 			var req DeleteProcessRequest
-			if err := unmarshal(&req); err != nil ***REMOVED***
+			if err := unmarshal(&req); err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			return svc.DeleteProcess(ctx, &req)
-		***REMOVED***,
-		"ListPids": func(ctx context.Context, unmarshal func(interface***REMOVED******REMOVED***) error) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+		},
+		"ListPids": func(ctx context.Context, unmarshal func(interface{}) error) (interface{}, error) {
 			var req ListPidsRequest
-			if err := unmarshal(&req); err != nil ***REMOVED***
+			if err := unmarshal(&req); err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			return svc.ListPids(ctx, &req)
-		***REMOVED***,
-		"Pause": func(ctx context.Context, unmarshal func(interface***REMOVED******REMOVED***) error) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+		},
+		"Pause": func(ctx context.Context, unmarshal func(interface{}) error) (interface{}, error) {
 			var req google_protobuf1.Empty
-			if err := unmarshal(&req); err != nil ***REMOVED***
+			if err := unmarshal(&req); err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			return svc.Pause(ctx, &req)
-		***REMOVED***,
-		"Resume": func(ctx context.Context, unmarshal func(interface***REMOVED******REMOVED***) error) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+		},
+		"Resume": func(ctx context.Context, unmarshal func(interface{}) error) (interface{}, error) {
 			var req google_protobuf1.Empty
-			if err := unmarshal(&req); err != nil ***REMOVED***
+			if err := unmarshal(&req); err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			return svc.Resume(ctx, &req)
-		***REMOVED***,
-		"Checkpoint": func(ctx context.Context, unmarshal func(interface***REMOVED******REMOVED***) error) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+		},
+		"Checkpoint": func(ctx context.Context, unmarshal func(interface{}) error) (interface{}, error) {
 			var req CheckpointTaskRequest
-			if err := unmarshal(&req); err != nil ***REMOVED***
+			if err := unmarshal(&req); err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			return svc.Checkpoint(ctx, &req)
-		***REMOVED***,
-		"Kill": func(ctx context.Context, unmarshal func(interface***REMOVED******REMOVED***) error) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+		},
+		"Kill": func(ctx context.Context, unmarshal func(interface{}) error) (interface{}, error) {
 			var req KillRequest
-			if err := unmarshal(&req); err != nil ***REMOVED***
+			if err := unmarshal(&req); err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			return svc.Kill(ctx, &req)
-		***REMOVED***,
-		"Exec": func(ctx context.Context, unmarshal func(interface***REMOVED******REMOVED***) error) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+		},
+		"Exec": func(ctx context.Context, unmarshal func(interface{}) error) (interface{}, error) {
 			var req ExecProcessRequest
-			if err := unmarshal(&req); err != nil ***REMOVED***
+			if err := unmarshal(&req); err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			return svc.Exec(ctx, &req)
-		***REMOVED***,
-		"ResizePty": func(ctx context.Context, unmarshal func(interface***REMOVED******REMOVED***) error) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+		},
+		"ResizePty": func(ctx context.Context, unmarshal func(interface{}) error) (interface{}, error) {
 			var req ResizePtyRequest
-			if err := unmarshal(&req); err != nil ***REMOVED***
+			if err := unmarshal(&req); err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			return svc.ResizePty(ctx, &req)
-		***REMOVED***,
-		"CloseIO": func(ctx context.Context, unmarshal func(interface***REMOVED******REMOVED***) error) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+		},
+		"CloseIO": func(ctx context.Context, unmarshal func(interface{}) error) (interface{}, error) {
 			var req CloseIORequest
-			if err := unmarshal(&req); err != nil ***REMOVED***
+			if err := unmarshal(&req); err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			return svc.CloseIO(ctx, &req)
-		***REMOVED***,
-		"ShimInfo": func(ctx context.Context, unmarshal func(interface***REMOVED******REMOVED***) error) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+		},
+		"ShimInfo": func(ctx context.Context, unmarshal func(interface{}) error) (interface{}, error) {
 			var req google_protobuf1.Empty
-			if err := unmarshal(&req); err != nil ***REMOVED***
+			if err := unmarshal(&req); err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			return svc.ShimInfo(ctx, &req)
-		***REMOVED***,
-		"Update": func(ctx context.Context, unmarshal func(interface***REMOVED******REMOVED***) error) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+		},
+		"Update": func(ctx context.Context, unmarshal func(interface{}) error) (interface{}, error) {
 			var req UpdateTaskRequest
-			if err := unmarshal(&req); err != nil ***REMOVED***
+			if err := unmarshal(&req); err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			return svc.Update(ctx, &req)
-		***REMOVED***,
-		"Wait": func(ctx context.Context, unmarshal func(interface***REMOVED******REMOVED***) error) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+		},
+		"Wait": func(ctx context.Context, unmarshal func(interface{}) error) (interface{}, error) {
 			var req WaitRequest
-			if err := unmarshal(&req); err != nil ***REMOVED***
+			if err := unmarshal(&req); err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			return svc.Wait(ctx, &req)
-		***REMOVED***,
-	***REMOVED***)
-***REMOVED***
+		},
+	})
+}
 
-type shimClient struct ***REMOVED***
+type shimClient struct {
 	client *github_com_stevvooe_ttrpc.Client
-***REMOVED***
+}
 
-func NewShimClient(client *github_com_stevvooe_ttrpc.Client) ShimService ***REMOVED***
-	return &shimClient***REMOVED***
+func NewShimClient(client *github_com_stevvooe_ttrpc.Client) ShimService {
+	return &shimClient{
 		client: client,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (c *shimClient) State(ctx context.Context, req *StateRequest) (*StateResponse, error) ***REMOVED***
+func (c *shimClient) State(ctx context.Context, req *StateRequest) (*StateResponse, error) {
 	var resp StateResponse
-	if err := c.client.Call(ctx, "containerd.runtime.linux.shim.v1.Shim", "State", req, &resp); err != nil ***REMOVED***
+	if err := c.client.Call(ctx, "containerd.runtime.linux.shim.v1.Shim", "State", req, &resp); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return &resp, nil
-***REMOVED***
+}
 
-func (c *shimClient) Create(ctx context.Context, req *CreateTaskRequest) (*CreateTaskResponse, error) ***REMOVED***
+func (c *shimClient) Create(ctx context.Context, req *CreateTaskRequest) (*CreateTaskResponse, error) {
 	var resp CreateTaskResponse
-	if err := c.client.Call(ctx, "containerd.runtime.linux.shim.v1.Shim", "Create", req, &resp); err != nil ***REMOVED***
+	if err := c.client.Call(ctx, "containerd.runtime.linux.shim.v1.Shim", "Create", req, &resp); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return &resp, nil
-***REMOVED***
+}
 
-func (c *shimClient) Start(ctx context.Context, req *StartRequest) (*StartResponse, error) ***REMOVED***
+func (c *shimClient) Start(ctx context.Context, req *StartRequest) (*StartResponse, error) {
 	var resp StartResponse
-	if err := c.client.Call(ctx, "containerd.runtime.linux.shim.v1.Shim", "Start", req, &resp); err != nil ***REMOVED***
+	if err := c.client.Call(ctx, "containerd.runtime.linux.shim.v1.Shim", "Start", req, &resp); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return &resp, nil
-***REMOVED***
+}
 
-func (c *shimClient) Delete(ctx context.Context, req *google_protobuf1.Empty) (*DeleteResponse, error) ***REMOVED***
+func (c *shimClient) Delete(ctx context.Context, req *google_protobuf1.Empty) (*DeleteResponse, error) {
 	var resp DeleteResponse
-	if err := c.client.Call(ctx, "containerd.runtime.linux.shim.v1.Shim", "Delete", req, &resp); err != nil ***REMOVED***
+	if err := c.client.Call(ctx, "containerd.runtime.linux.shim.v1.Shim", "Delete", req, &resp); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return &resp, nil
-***REMOVED***
+}
 
-func (c *shimClient) DeleteProcess(ctx context.Context, req *DeleteProcessRequest) (*DeleteResponse, error) ***REMOVED***
+func (c *shimClient) DeleteProcess(ctx context.Context, req *DeleteProcessRequest) (*DeleteResponse, error) {
 	var resp DeleteResponse
-	if err := c.client.Call(ctx, "containerd.runtime.linux.shim.v1.Shim", "DeleteProcess", req, &resp); err != nil ***REMOVED***
+	if err := c.client.Call(ctx, "containerd.runtime.linux.shim.v1.Shim", "DeleteProcess", req, &resp); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return &resp, nil
-***REMOVED***
+}
 
-func (c *shimClient) ListPids(ctx context.Context, req *ListPidsRequest) (*ListPidsResponse, error) ***REMOVED***
+func (c *shimClient) ListPids(ctx context.Context, req *ListPidsRequest) (*ListPidsResponse, error) {
 	var resp ListPidsResponse
-	if err := c.client.Call(ctx, "containerd.runtime.linux.shim.v1.Shim", "ListPids", req, &resp); err != nil ***REMOVED***
+	if err := c.client.Call(ctx, "containerd.runtime.linux.shim.v1.Shim", "ListPids", req, &resp); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return &resp, nil
-***REMOVED***
+}
 
-func (c *shimClient) Pause(ctx context.Context, req *google_protobuf1.Empty) (*google_protobuf1.Empty, error) ***REMOVED***
+func (c *shimClient) Pause(ctx context.Context, req *google_protobuf1.Empty) (*google_protobuf1.Empty, error) {
 	var resp google_protobuf1.Empty
-	if err := c.client.Call(ctx, "containerd.runtime.linux.shim.v1.Shim", "Pause", req, &resp); err != nil ***REMOVED***
+	if err := c.client.Call(ctx, "containerd.runtime.linux.shim.v1.Shim", "Pause", req, &resp); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return &resp, nil
-***REMOVED***
+}
 
-func (c *shimClient) Resume(ctx context.Context, req *google_protobuf1.Empty) (*google_protobuf1.Empty, error) ***REMOVED***
+func (c *shimClient) Resume(ctx context.Context, req *google_protobuf1.Empty) (*google_protobuf1.Empty, error) {
 	var resp google_protobuf1.Empty
-	if err := c.client.Call(ctx, "containerd.runtime.linux.shim.v1.Shim", "Resume", req, &resp); err != nil ***REMOVED***
+	if err := c.client.Call(ctx, "containerd.runtime.linux.shim.v1.Shim", "Resume", req, &resp); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return &resp, nil
-***REMOVED***
+}
 
-func (c *shimClient) Checkpoint(ctx context.Context, req *CheckpointTaskRequest) (*google_protobuf1.Empty, error) ***REMOVED***
+func (c *shimClient) Checkpoint(ctx context.Context, req *CheckpointTaskRequest) (*google_protobuf1.Empty, error) {
 	var resp google_protobuf1.Empty
-	if err := c.client.Call(ctx, "containerd.runtime.linux.shim.v1.Shim", "Checkpoint", req, &resp); err != nil ***REMOVED***
+	if err := c.client.Call(ctx, "containerd.runtime.linux.shim.v1.Shim", "Checkpoint", req, &resp); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return &resp, nil
-***REMOVED***
+}
 
-func (c *shimClient) Kill(ctx context.Context, req *KillRequest) (*google_protobuf1.Empty, error) ***REMOVED***
+func (c *shimClient) Kill(ctx context.Context, req *KillRequest) (*google_protobuf1.Empty, error) {
 	var resp google_protobuf1.Empty
-	if err := c.client.Call(ctx, "containerd.runtime.linux.shim.v1.Shim", "Kill", req, &resp); err != nil ***REMOVED***
+	if err := c.client.Call(ctx, "containerd.runtime.linux.shim.v1.Shim", "Kill", req, &resp); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return &resp, nil
-***REMOVED***
+}
 
-func (c *shimClient) Exec(ctx context.Context, req *ExecProcessRequest) (*google_protobuf1.Empty, error) ***REMOVED***
+func (c *shimClient) Exec(ctx context.Context, req *ExecProcessRequest) (*google_protobuf1.Empty, error) {
 	var resp google_protobuf1.Empty
-	if err := c.client.Call(ctx, "containerd.runtime.linux.shim.v1.Shim", "Exec", req, &resp); err != nil ***REMOVED***
+	if err := c.client.Call(ctx, "containerd.runtime.linux.shim.v1.Shim", "Exec", req, &resp); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return &resp, nil
-***REMOVED***
+}
 
-func (c *shimClient) ResizePty(ctx context.Context, req *ResizePtyRequest) (*google_protobuf1.Empty, error) ***REMOVED***
+func (c *shimClient) ResizePty(ctx context.Context, req *ResizePtyRequest) (*google_protobuf1.Empty, error) {
 	var resp google_protobuf1.Empty
-	if err := c.client.Call(ctx, "containerd.runtime.linux.shim.v1.Shim", "ResizePty", req, &resp); err != nil ***REMOVED***
+	if err := c.client.Call(ctx, "containerd.runtime.linux.shim.v1.Shim", "ResizePty", req, &resp); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return &resp, nil
-***REMOVED***
+}
 
-func (c *shimClient) CloseIO(ctx context.Context, req *CloseIORequest) (*google_protobuf1.Empty, error) ***REMOVED***
+func (c *shimClient) CloseIO(ctx context.Context, req *CloseIORequest) (*google_protobuf1.Empty, error) {
 	var resp google_protobuf1.Empty
-	if err := c.client.Call(ctx, "containerd.runtime.linux.shim.v1.Shim", "CloseIO", req, &resp); err != nil ***REMOVED***
+	if err := c.client.Call(ctx, "containerd.runtime.linux.shim.v1.Shim", "CloseIO", req, &resp); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return &resp, nil
-***REMOVED***
+}
 
-func (c *shimClient) ShimInfo(ctx context.Context, req *google_protobuf1.Empty) (*ShimInfoResponse, error) ***REMOVED***
+func (c *shimClient) ShimInfo(ctx context.Context, req *google_protobuf1.Empty) (*ShimInfoResponse, error) {
 	var resp ShimInfoResponse
-	if err := c.client.Call(ctx, "containerd.runtime.linux.shim.v1.Shim", "ShimInfo", req, &resp); err != nil ***REMOVED***
+	if err := c.client.Call(ctx, "containerd.runtime.linux.shim.v1.Shim", "ShimInfo", req, &resp); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return &resp, nil
-***REMOVED***
+}
 
-func (c *shimClient) Update(ctx context.Context, req *UpdateTaskRequest) (*google_protobuf1.Empty, error) ***REMOVED***
+func (c *shimClient) Update(ctx context.Context, req *UpdateTaskRequest) (*google_protobuf1.Empty, error) {
 	var resp google_protobuf1.Empty
-	if err := c.client.Call(ctx, "containerd.runtime.linux.shim.v1.Shim", "Update", req, &resp); err != nil ***REMOVED***
+	if err := c.client.Call(ctx, "containerd.runtime.linux.shim.v1.Shim", "Update", req, &resp); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return &resp, nil
-***REMOVED***
+}
 
-func (c *shimClient) Wait(ctx context.Context, req *WaitRequest) (*WaitResponse, error) ***REMOVED***
+func (c *shimClient) Wait(ctx context.Context, req *WaitRequest) (*WaitResponse, error) {
 	var resp WaitResponse
-	if err := c.client.Call(ctx, "containerd.runtime.linux.shim.v1.Shim", "Wait", req, &resp); err != nil ***REMOVED***
+	if err := c.client.Call(ctx, "containerd.runtime.linux.shim.v1.Shim", "Wait", req, &resp); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return &resp, nil
-***REMOVED***
-func (m *CreateTaskRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *CreateTaskRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowShim
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: CreateTaskRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: CreateTaskRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Bundle", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Bundle = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Runtime", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Runtime = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 4:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Rootfs", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.Rootfs = append(m.Rootfs, &containerd_types.Mount***REMOVED******REMOVED***)
-			if err := m.Rootfs[len(m.Rootfs)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			m.Rootfs = append(m.Rootfs, &containerd_types.Mount{})
+			if err := m.Rootfs[len(m.Rootfs)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 5:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Terminal", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			m.Terminal = bool(v != 0)
 		case 6:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Stdin", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Stdin = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 7:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Stdout", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Stdout = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 8:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Stderr", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Stderr = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 9:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Checkpoint", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Checkpoint = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 10:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ParentCheckpoint", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ParentCheckpoint = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 11:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Options", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Options == nil ***REMOVED***
-				m.Options = &google_protobuf.Any***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.Options.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.Options == nil {
+				m.Options = &google_protobuf.Any{}
+			}
+			if err := m.Options.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipShim(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *CreateTaskResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *CreateTaskResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowShim
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: CreateTaskResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: CreateTaskResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Pid", wireType)
-			***REMOVED***
+			}
 			m.Pid = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Pid |= (uint32(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipShim(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *DeleteResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *DeleteResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowShim
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: DeleteResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: DeleteResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Pid", wireType)
-			***REMOVED***
+			}
 			m.Pid = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Pid |= (uint32(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 2:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ExitStatus", wireType)
-			***REMOVED***
+			}
 			m.ExitStatus = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.ExitStatus |= (uint32(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ExitedAt", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.ExitedAt, dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.ExitedAt, dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipShim(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *DeleteProcessRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *DeleteProcessRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowShim
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: DeleteProcessRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: DeleteProcessRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipShim(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *ExecProcessRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *ExecProcessRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowShim
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: ExecProcessRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: ExecProcessRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Terminal", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			m.Terminal = bool(v != 0)
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Stdin", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Stdin = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 4:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Stdout", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Stdout = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 5:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Stderr", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Stderr = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 6:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Spec", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Spec == nil ***REMOVED***
-				m.Spec = &google_protobuf.Any***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.Spec.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.Spec == nil {
+				m.Spec = &google_protobuf.Any{}
+			}
+			if err := m.Spec.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipShim(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *ExecProcessResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *ExecProcessResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowShim
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: ExecProcessResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: ExecProcessResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		default:
 			iNdEx = preIndex
 			skippy, err := skipShim(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *ResizePtyRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *ResizePtyRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowShim
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: ResizePtyRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: ResizePtyRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Width", wireType)
-			***REMOVED***
+			}
 			m.Width = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Width |= (uint32(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 3:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Height", wireType)
-			***REMOVED***
+			}
 			m.Height = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Height |= (uint32(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipShim(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *StateRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *StateRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowShim
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: StateRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: StateRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipShim(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *StateResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *StateResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowShim
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: StateResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: StateResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Bundle", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Bundle = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Pid", wireType)
-			***REMOVED***
+			}
 			m.Pid = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Pid |= (uint32(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 4:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
-			***REMOVED***
+			}
 			m.Status = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Status |= (containerd_v1_types.Status(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 5:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Stdin", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Stdin = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 6:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Stdout", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Stdout = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 7:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Stderr", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Stderr = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 8:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Terminal", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			m.Terminal = bool(v != 0)
 		case 9:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ExitStatus", wireType)
-			***REMOVED***
+			}
 			m.ExitStatus = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.ExitStatus |= (uint32(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 10:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ExitedAt", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.ExitedAt, dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.ExitedAt, dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipShim(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *KillRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *KillRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowShim
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: KillRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: KillRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Signal", wireType)
-			***REMOVED***
+			}
 			m.Signal = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Signal |= (uint32(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 3:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field All", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			m.All = bool(v != 0)
 		default:
 			iNdEx = preIndex
 			skippy, err := skipShim(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *CloseIORequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *CloseIORequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowShim
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: CloseIORequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: CloseIORequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Stdin", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			m.Stdin = bool(v != 0)
 		default:
 			iNdEx = preIndex
 			skippy, err := skipShim(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *ListPidsRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *ListPidsRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowShim
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: ListPidsRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: ListPidsRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipShim(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *ListPidsResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *ListPidsResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowShim
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: ListPidsResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: ListPidsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Processes", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.Processes = append(m.Processes, &containerd_v1_types.ProcessInfo***REMOVED******REMOVED***)
-			if err := m.Processes[len(m.Processes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			m.Processes = append(m.Processes, &containerd_v1_types.ProcessInfo{})
+			if err := m.Processes[len(m.Processes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipShim(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *CheckpointTaskRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *CheckpointTaskRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowShim
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: CheckpointTaskRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: CheckpointTaskRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Path", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Path = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Options", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Options == nil ***REMOVED***
-				m.Options = &google_protobuf.Any***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.Options.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.Options == nil {
+				m.Options = &google_protobuf.Any{}
+			}
+			if err := m.Options.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipShim(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *ShimInfoResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *ShimInfoResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowShim
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: ShimInfoResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: ShimInfoResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ShimPid", wireType)
-			***REMOVED***
+			}
 			m.ShimPid = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.ShimPid |= (uint32(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipShim(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *UpdateTaskRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *UpdateTaskRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowShim
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: UpdateTaskRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: UpdateTaskRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Resources", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Resources == nil ***REMOVED***
-				m.Resources = &google_protobuf.Any***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.Resources.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.Resources == nil {
+				m.Resources = &google_protobuf.Any{}
+			}
+			if err := m.Resources.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipShim(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *StartRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *StartRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowShim
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: StartRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: StartRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipShim(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *StartResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *StartResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowShim
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: StartResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: StartResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Pid", wireType)
-			***REMOVED***
+			}
 			m.Pid = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Pid |= (uint32(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipShim(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *WaitRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *WaitRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowShim
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: WaitRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: WaitRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipShim(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *WaitResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *WaitResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowShim
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: WaitResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: WaitResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ExitStatus", wireType)
-			***REMOVED***
+			}
 			m.ExitStatus = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.ExitStatus |= (uint32(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ExitedAt", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.ExitedAt, dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.ExitedAt, dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipShim(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthShim
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func skipShim(dAtA []byte) (n int, err error) ***REMOVED***
+}
+func skipShim(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return 0, ErrIntOverflowShim
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return 0, io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		wireType := int(wire & 0x7)
-		switch wireType ***REMOVED***
+		switch wireType {
 		case 0:
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				iNdEx++
-				if dAtA[iNdEx-1] < 0x80 ***REMOVED***
+				if dAtA[iNdEx-1] < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return iNdEx, nil
 		case 1:
 			iNdEx += 8
 			return iNdEx, nil
 		case 2:
 			var length int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowShim
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				length |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			iNdEx += length
-			if length < 0 ***REMOVED***
+			if length < 0 {
 				return 0, ErrInvalidLengthShim
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 3:
-			for ***REMOVED***
+			for {
 				var innerWire uint64
 				var start int = iNdEx
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return 0, ErrIntOverflowShim
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return 0, io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					innerWire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				innerWireType := int(innerWire & 0x7)
-				if innerWireType == 4 ***REMOVED***
+				if innerWireType == 4 {
 					break
-				***REMOVED***
+				}
 				next, err := skipShim(dAtA[start:])
-				if err != nil ***REMOVED***
+				if err != nil {
 					return 0, err
-				***REMOVED***
+				}
 				iNdEx = start + next
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 4:
 			return iNdEx, nil
@@ -4341,21 +4341,21 @@ func skipShim(dAtA []byte) (n int, err error) ***REMOVED***
 			return iNdEx, nil
 		default:
 			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	panic("unreachable")
-***REMOVED***
+}
 
 var (
 	ErrInvalidLengthShim = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowShim   = fmt.Errorf("proto: integer overflow")
 )
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterFile("github.com/containerd/containerd/linux/shim/v1/shim.proto", fileDescriptorShim)
-***REMOVED***
+}
 
-var fileDescriptorShim = []byte***REMOVED***
+var fileDescriptorShim = []byte{
 	// 1133 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x57, 0xcd, 0x6e, 0xdb, 0x46,
 	0x10, 0x36, 0x69, 0xfd, 0x8e, 0x22, 0xd7, 0xde, 0x3a, 0x2e, 0xa3, 0x00, 0xb2, 0x40, 0xa0, 0x81,
@@ -4428,4 +4428,4 @@ var fileDescriptorShim = []byte***REMOVED***
 	0x17, 0x7e, 0x1b, 0x35, 0xb5, 0xab, 0x51, 0x53, 0xfb, 0x6b, 0xd4, 0xd4, 0xfe, 0x1d, 0x35, 0xb5,
 	0x1f, 0xb7, 0xe6, 0xfb, 0xff, 0xf7, 0x1b, 0xfe, 0xfb, 0x5a, 0x3f, 0x29, 0x89, 0x73, 0x6c, 0xfd,
 	0x1f, 0x00, 0x00, 0xff, 0xff, 0x4d, 0xd0, 0xe6, 0x46, 0x3f, 0x0f, 0x00, 0x00,
-***REMOVED***
+}

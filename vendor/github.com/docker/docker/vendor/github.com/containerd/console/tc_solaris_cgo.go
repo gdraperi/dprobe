@@ -17,19 +17,19 @@ const (
 )
 
 // ptsname retrieves the name of the first available pts for the given master.
-func ptsname(f *os.File) (string, error) ***REMOVED***
+func ptsname(f *os.File) (string, error) {
 	ptspath, err := C.ptsname(C.int(f.Fd()))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	return C.GoString(ptspath), nil
-***REMOVED***
+}
 
 // unlockpt unlocks the slave pseudoterminal device corresponding to the master pseudoterminal referred to by f.
 // unlockpt should be called before opening the slave side of a pty.
-func unlockpt(f *os.File) error ***REMOVED***
-	if _, err := C.grantpt(C.int(f.Fd())); err != nil ***REMOVED***
+func unlockpt(f *os.File) error {
+	if _, err := C.grantpt(C.int(f.Fd())); err != nil {
 		return err
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

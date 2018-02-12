@@ -70,7 +70,7 @@ ENV	DOCKER_CROSSPLATFORMS	\
 	freebsd/amd64 freebsd/386 freebsd/arm
 # (set an explicit GOARM of 5 for maximum compatibility)
 ENV	GOARM	5
-RUN	cd /usr/local/go/src && bash -xc 'for platform in $DOCKER_CROSSPLATFORMS; do GOOS=$***REMOVED***platform%/****REMOVED*** GOARCH=$***REMOVED***platform##*/***REMOVED*** ./make.bash --no-clean 2>&1; done'
+RUN	cd /usr/local/go/src && bash -xc 'for platform in $DOCKER_CROSSPLATFORMS; do GOOS=${platform%/*} GOARCH=${platform##*/} ./make.bash --no-clean 2>&1; done'
 
 # Grab Go's cover tool for dead-simple code coverage testing
 RUN	go get golang.org/x/tools/cmd/cover

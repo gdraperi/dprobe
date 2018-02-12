@@ -11,9 +11,9 @@ import (
 	"golang.org/x/text/internal/ucd"
 )
 
-func catFromEntry(p *ucd.Parser) (cat category) ***REMOVED***
+func catFromEntry(p *ucd.Parser) (cat category) {
 	r := p.Rune(0)
-	switch s := p.String(1); s ***REMOVED***
+	switch s := p.String(1); s {
 	case "valid":
 		cat = valid
 	case "disallowed":
@@ -30,26 +30,26 @@ func catFromEntry(p *ucd.Parser) (cat category) ***REMOVED***
 		cat = ignored
 	default:
 		log.Fatalf("%U: Unknown category %q", r, s)
-	***REMOVED***
-	if s := p.String(3); s != "" ***REMOVED***
-		if cat != valid ***REMOVED***
+	}
+	if s := p.String(3); s != "" {
+		if cat != valid {
 			log.Fatalf(`%U: %s defined for %q; want "valid"`, r, s, p.String(1))
-		***REMOVED***
-		switch s ***REMOVED***
+		}
+		switch s {
 		case "NV8":
 			cat = validNV8
 		case "XV8":
 			cat = validXV8
 		default:
 			log.Fatalf("%U: Unexpected exception %q", r, s)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return cat
-***REMOVED***
+}
 
-var joinType = map[string]info***REMOVED***
+var joinType = map[string]info{
 	"L": joiningL,
 	"D": joiningD,
 	"T": joiningT,
 	"R": joiningR,
-***REMOVED***
+}

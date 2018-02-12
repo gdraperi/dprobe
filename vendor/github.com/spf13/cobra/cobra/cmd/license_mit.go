@@ -15,10 +15,10 @@
 
 package cmd
 
-func initMit() ***REMOVED***
-	Licenses["mit"] = License***REMOVED***
+func initMit() {
+	Licenses["mit"] = License{
 		Name:            "MIT License",
-		PossibleMatches: []string***REMOVED***"mit"***REMOVED***,
+		PossibleMatches: []string{"mit"},
 		Header: `
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -39,7 +39,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.`,
 		Text: `The MIT License (MIT)
 
-***REMOVED******REMOVED*** .copyright ***REMOVED******REMOVED***
+{{ .copyright }}
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -59,5 +59,5 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 `,
-	***REMOVED***
-***REMOVED***
+	}
+}

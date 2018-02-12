@@ -31,10 +31,10 @@ var (
 
 //CreateOpts contains optional arguments for Create() and CreateReadWrite()
 // methods.
-type CreateOpts struct ***REMOVED***
+type CreateOpts struct {
 	MountLabel string
 	StorageOpt map[string]string
-***REMOVED***
+}
 
 // InitFunc initializes the storage driver.
 type InitFunc func(root string, options []string, uidMaps, gidMaps []idtools.IDMap) (Driver, error)
@@ -45,7 +45,7 @@ type InitFunc func(root string, options []string, uidMaps, gidMaps []idtools.IDM
 // interface and use the NaiveDiffDriver wrapper constructor.
 //
 // Use of ProtoDriver directly by client code is not recommended.
-type ProtoDriver interface ***REMOVED***
+type ProtoDriver interface {
 	// String returns a string representation of this driver.
 	String() string
 	// CreateReadWrite creates a new, empty filesystem layer that is ready
@@ -78,10 +78,10 @@ type ProtoDriver interface ***REMOVED***
 	// held by the driver, e.g., unmounting all layered filesystems
 	// known to this driver.
 	Cleanup() error
-***REMOVED***
+}
 
 // DiffDriver is the interface to use to implement graph diffs
-type DiffDriver interface ***REMOVED***
+type DiffDriver interface {
 	// Diff produces an archive of the changes between the specified
 	// layer and its parent layer which may be "".
 	Diff(id, parent string) (io.ReadCloser, error)
@@ -97,211 +97,211 @@ type DiffDriver interface ***REMOVED***
 	// and its parent and returns the size in bytes of the changes
 	// relative to its base filesystem directory.
 	DiffSize(id, parent string) (size int64, err error)
-***REMOVED***
+}
 
 // Driver is the interface for layered/snapshot file system drivers.
-type Driver interface ***REMOVED***
+type Driver interface {
 	ProtoDriver
 	DiffDriver
-***REMOVED***
+}
 
 // Capabilities defines a list of capabilities a driver may implement.
 // These capabilities are not required; however, they do determine how a
 // graphdriver can be used.
-type Capabilities struct ***REMOVED***
+type Capabilities struct {
 	// Flags that this driver is capable of reproducing exactly equivalent
 	// diffs for read-only layers. If set, clients can rely on the driver
 	// for consistent tar streams, and avoid extra processing to account
 	// for potential differences (eg: the layer store's use of tar-split).
 	ReproducesExactDiffs bool
-***REMOVED***
+}
 
 // CapabilityDriver is the interface for layered file system drivers that
 // can report on their Capabilities.
-type CapabilityDriver interface ***REMOVED***
+type CapabilityDriver interface {
 	Capabilities() Capabilities
-***REMOVED***
+}
 
 // DiffGetterDriver is the interface for layered file system drivers that
 // provide a specialized function for getting file contents for tar-split.
-type DiffGetterDriver interface ***REMOVED***
+type DiffGetterDriver interface {
 	Driver
 	// DiffGetter returns an interface to efficiently retrieve the contents
 	// of files in a layer.
 	DiffGetter(id string) (FileGetCloser, error)
-***REMOVED***
+}
 
 // FileGetCloser extends the storage.FileGetter interface with a Close method
 // for cleaning up.
-type FileGetCloser interface ***REMOVED***
+type FileGetCloser interface {
 	storage.FileGetter
 	// Close cleans up any resources associated with the FileGetCloser.
 	Close() error
-***REMOVED***
+}
 
 // Checker makes checks on specified filesystems.
-type Checker interface ***REMOVED***
+type Checker interface {
 	// IsMounted returns true if the provided path is mounted for the specific checker
 	IsMounted(path string) bool
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	drivers = make(map[string]InitFunc)
-***REMOVED***
+}
 
 // Register registers an InitFunc for the driver.
-func Register(name string, initFunc InitFunc) error ***REMOVED***
-	if _, exists := drivers[name]; exists ***REMOVED***
+func Register(name string, initFunc InitFunc) error {
+	if _, exists := drivers[name]; exists {
 		return fmt.Errorf("Name already registered %s", name)
-	***REMOVED***
+	}
 	drivers[name] = initFunc
 
 	return nil
-***REMOVED***
+}
 
 // GetDriver initializes and returns the registered driver
-func GetDriver(name string, pg plugingetter.PluginGetter, config Options) (Driver, error) ***REMOVED***
-	if initFunc, exists := drivers[name]; exists ***REMOVED***
+func GetDriver(name string, pg plugingetter.PluginGetter, config Options) (Driver, error) {
+	if initFunc, exists := drivers[name]; exists {
 		return initFunc(filepath.Join(config.Root, name), config.DriverOptions, config.UIDMaps, config.GIDMaps)
-	***REMOVED***
+	}
 
 	pluginDriver, err := lookupPlugin(name, pg, config)
-	if err == nil ***REMOVED***
+	if err == nil {
 		return pluginDriver, nil
-	***REMOVED***
+	}
 	logrus.WithError(err).WithField("driver", name).WithField("home-dir", config.Root).Error("Failed to GetDriver graph")
 	return nil, ErrNotSupported
-***REMOVED***
+}
 
 // getBuiltinDriver initializes and returns the registered driver, but does not try to load from plugins
-func getBuiltinDriver(name, home string, options []string, uidMaps, gidMaps []idtools.IDMap) (Driver, error) ***REMOVED***
-	if initFunc, exists := drivers[name]; exists ***REMOVED***
+func getBuiltinDriver(name, home string, options []string, uidMaps, gidMaps []idtools.IDMap) (Driver, error) {
+	if initFunc, exists := drivers[name]; exists {
 		return initFunc(filepath.Join(home, name), options, uidMaps, gidMaps)
-	***REMOVED***
+	}
 	logrus.Errorf("Failed to built-in GetDriver graph %s %s", name, home)
 	return nil, ErrNotSupported
-***REMOVED***
+}
 
 // Options is used to initialize a graphdriver
-type Options struct ***REMOVED***
+type Options struct {
 	Root                string
 	DriverOptions       []string
 	UIDMaps             []idtools.IDMap
 	GIDMaps             []idtools.IDMap
 	ExperimentalEnabled bool
-***REMOVED***
+}
 
 // New creates the driver and initializes it at the specified root.
-func New(name string, pg plugingetter.PluginGetter, config Options) (Driver, error) ***REMOVED***
-	if name != "" ***REMOVED***
+func New(name string, pg plugingetter.PluginGetter, config Options) (Driver, error) {
+	if name != "" {
 		logrus.Debugf("[graphdriver] trying provided driver: %s", name) // so the logs show specified driver
 		return GetDriver(name, pg, config)
-	***REMOVED***
+	}
 
 	// Guess for prior driver
 	driversMap := scanPriorDrivers(config.Root)
 	list := strings.Split(priority, ",")
 	logrus.Debugf("[graphdriver] priority list: %v", list)
-	for _, name := range list ***REMOVED***
-		if name == "vfs" ***REMOVED***
+	for _, name := range list {
+		if name == "vfs" {
 			// don't use vfs even if there is state present.
 			continue
-		***REMOVED***
-		if _, prior := driversMap[name]; prior ***REMOVED***
+		}
+		if _, prior := driversMap[name]; prior {
 			// of the state found from prior drivers, check in order of our priority
 			// which we would prefer
 			driver, err := getBuiltinDriver(name, config.Root, config.DriverOptions, config.UIDMaps, config.GIDMaps)
-			if err != nil ***REMOVED***
+			if err != nil {
 				// unlike below, we will return error here, because there is prior
 				// state, and now it is no longer supported/prereq/compatible, so
 				// something changed and needs attention. Otherwise the daemon's
 				// images would just "disappear".
 				logrus.Errorf("[graphdriver] prior storage driver %s failed: %s", name, err)
 				return nil, err
-			***REMOVED***
+			}
 
 			// abort starting when there are other prior configured drivers
 			// to ensure the user explicitly selects the driver to load
-			if len(driversMap)-1 > 0 ***REMOVED***
+			if len(driversMap)-1 > 0 {
 				var driversSlice []string
-				for name := range driversMap ***REMOVED***
+				for name := range driversMap {
 					driversSlice = append(driversSlice, name)
-				***REMOVED***
+				}
 
 				return nil, fmt.Errorf("%s contains several valid graphdrivers: %s; Please cleanup or explicitly choose storage driver (-s <DRIVER>)", config.Root, strings.Join(driversSlice, ", "))
-			***REMOVED***
+			}
 
 			logrus.Infof("[graphdriver] using prior storage driver: %s", name)
 			return driver, nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Check for priority drivers first
-	for _, name := range list ***REMOVED***
+	for _, name := range list {
 		driver, err := getBuiltinDriver(name, config.Root, config.DriverOptions, config.UIDMaps, config.GIDMaps)
-		if err != nil ***REMOVED***
-			if IsDriverNotSupported(err) ***REMOVED***
+		if err != nil {
+			if IsDriverNotSupported(err) {
 				continue
-			***REMOVED***
+			}
 			return nil, err
-		***REMOVED***
+		}
 		return driver, nil
-	***REMOVED***
+	}
 
 	// Check all registered drivers if no priority driver is found
-	for name, initFunc := range drivers ***REMOVED***
+	for name, initFunc := range drivers {
 		driver, err := initFunc(filepath.Join(config.Root, name), config.DriverOptions, config.UIDMaps, config.GIDMaps)
-		if err != nil ***REMOVED***
-			if IsDriverNotSupported(err) ***REMOVED***
+		if err != nil {
+			if IsDriverNotSupported(err) {
 				continue
-			***REMOVED***
+			}
 			return nil, err
-		***REMOVED***
+		}
 		return driver, nil
-	***REMOVED***
+	}
 	return nil, fmt.Errorf("No supported storage backend found")
-***REMOVED***
+}
 
 // scanPriorDrivers returns an un-ordered scan of directories of prior storage drivers
-func scanPriorDrivers(root string) map[string]bool ***REMOVED***
+func scanPriorDrivers(root string) map[string]bool {
 	driversMap := make(map[string]bool)
 
-	for driver := range drivers ***REMOVED***
+	for driver := range drivers {
 		p := filepath.Join(root, driver)
-		if _, err := os.Stat(p); err == nil && driver != "vfs" ***REMOVED***
-			if !isEmptyDir(p) ***REMOVED***
+		if _, err := os.Stat(p); err == nil && driver != "vfs" {
+			if !isEmptyDir(p) {
 				driversMap[driver] = true
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return driversMap
-***REMOVED***
+}
 
 // IsInitialized checks if the driver's home-directory exists and is non-empty.
-func IsInitialized(driverHome string) bool ***REMOVED***
+func IsInitialized(driverHome string) bool {
 	_, err := os.Stat(driverHome)
-	if os.IsNotExist(err) ***REMOVED***
+	if os.IsNotExist(err) {
 		return false
-	***REMOVED***
-	if err != nil ***REMOVED***
+	}
+	if err != nil {
 		logrus.Warnf("graphdriver.IsInitialized: stat failed: %v", err)
-	***REMOVED***
+	}
 	return !isEmptyDir(driverHome)
-***REMOVED***
+}
 
 // isEmptyDir checks if a directory is empty. It is used to check if prior
 // storage-driver directories exist. If an error occurs, it also assumes the
 // directory is not empty (which preserves the behavior _before_ this check
 // was added)
-func isEmptyDir(name string) bool ***REMOVED***
+func isEmptyDir(name string) bool {
 	f, err := os.Open(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return false
-	***REMOVED***
+	}
 	defer f.Close()
 
-	if _, err = f.Readdirnames(1); err == io.EOF ***REMOVED***
+	if _, err = f.Readdirnames(1); err == io.EOF {
 		return true
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}

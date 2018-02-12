@@ -15,9 +15,9 @@ import (
 
 // Compressed represents a compressed OpenPGP packet. The decompressed contents
 // will contain more OpenPGP packets. See RFC 4880, section 5.6.
-type Compressed struct ***REMOVED***
+type Compressed struct {
 	Body io.Reader
-***REMOVED***
+}
 
 const (
 	NoCompression      = flate.NoCompression
@@ -27,7 +27,7 @@ const (
 )
 
 // CompressionConfig contains compressor configuration settings.
-type CompressionConfig struct ***REMOVED***
+type CompressionConfig struct {
 	// Level is the compression level to use. It must be set to
 	// between -1 and 9, with -1 causing the compressor to use the
 	// default compression level, 0 causing the compressor to use
@@ -37,16 +37,16 @@ type CompressionConfig struct ***REMOVED***
 	// encryption. See the constants above for convenient common
 	// settings for Level.
 	Level int
-***REMOVED***
+}
 
-func (c *Compressed) parse(r io.Reader) error ***REMOVED***
+func (c *Compressed) parse(r io.Reader) error {
 	var buf [1]byte
 	_, err := readFull(r, buf[:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	switch buf[0] ***REMOVED***
+	switch buf[0] {
 	case 1:
 		c.Body = flate.NewReader(r)
 	case 2:
@@ -55,56 +55,56 @@ func (c *Compressed) parse(r io.Reader) error ***REMOVED***
 		c.Body = bzip2.NewReader(r)
 	default:
 		err = errors.UnsupportedError("unknown compression algorithm: " + strconv.Itoa(int(buf[0])))
-	***REMOVED***
+	}
 
 	return err
-***REMOVED***
+}
 
 // compressedWriterCloser represents the serialized compression stream
 // header and the compressor. Its Close() method ensures that both the
 // compressor and serialized stream header are closed. Its Write()
 // method writes to the compressor.
-type compressedWriteCloser struct ***REMOVED***
+type compressedWriteCloser struct {
 	sh io.Closer      // Stream Header
 	c  io.WriteCloser // Compressor
-***REMOVED***
+}
 
-func (cwc compressedWriteCloser) Write(p []byte) (int, error) ***REMOVED***
+func (cwc compressedWriteCloser) Write(p []byte) (int, error) {
 	return cwc.c.Write(p)
-***REMOVED***
+}
 
-func (cwc compressedWriteCloser) Close() (err error) ***REMOVED***
+func (cwc compressedWriteCloser) Close() (err error) {
 	err = cwc.c.Close()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	return cwc.sh.Close()
-***REMOVED***
+}
 
 // SerializeCompressed serializes a compressed data packet to w and
 // returns a WriteCloser to which the literal data packets themselves
 // can be written and which MUST be closed on completion. If cc is
 // nil, sensible defaults will be used to configure the compression
 // algorithm.
-func SerializeCompressed(w io.WriteCloser, algo CompressionAlgo, cc *CompressionConfig) (literaldata io.WriteCloser, err error) ***REMOVED***
+func SerializeCompressed(w io.WriteCloser, algo CompressionAlgo, cc *CompressionConfig) (literaldata io.WriteCloser, err error) {
 	compressed, err := serializeStreamHeader(w, packetTypeCompressed)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
-	_, err = compressed.Write([]byte***REMOVED***uint8(algo)***REMOVED***)
-	if err != nil ***REMOVED***
+	_, err = compressed.Write([]byte{uint8(algo)})
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
 	level := DefaultCompression
-	if cc != nil ***REMOVED***
+	if cc != nil {
 		level = cc.Level
-	***REMOVED***
+	}
 
 	var compressor io.WriteCloser
-	switch algo ***REMOVED***
+	switch algo {
 	case CompressionZIP:
 		compressor, err = flate.NewWriter(compressed, level)
 	case CompressionZLIB:
@@ -112,12 +112,12 @@ func SerializeCompressed(w io.WriteCloser, algo CompressionAlgo, cc *Compression
 	default:
 		s := strconv.Itoa(int(algo))
 		err = errors.UnsupportedError("Unsupported compression algorithm: " + s)
-	***REMOVED***
-	if err != nil ***REMOVED***
+	}
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
-	literaldata = compressedWriteCloser***REMOVED***compressed, compressor***REMOVED***
+	literaldata = compressedWriteCloser{compressed, compressor}
 
 	return
-***REMOVED***
+}

@@ -14,51 +14,51 @@ import (
 	"golang.org/x/net/context"
 )
 
-type containerManager struct ***REMOVED***
-	tmpContainers map[string]struct***REMOVED******REMOVED***
+type containerManager struct {
+	tmpContainers map[string]struct{}
 	backend       builder.ExecBackend
-***REMOVED***
+}
 
 // newContainerManager creates a new container backend
-func newContainerManager(docker builder.ExecBackend) *containerManager ***REMOVED***
-	return &containerManager***REMOVED***
+func newContainerManager(docker builder.ExecBackend) *containerManager {
+	return &containerManager{
 		backend:       docker,
-		tmpContainers: make(map[string]struct***REMOVED******REMOVED***),
-	***REMOVED***
-***REMOVED***
+		tmpContainers: make(map[string]struct{}),
+	}
+}
 
 // Create a container
-func (c *containerManager) Create(runConfig *container.Config, hostConfig *container.HostConfig) (container.ContainerCreateCreatedBody, error) ***REMOVED***
-	container, err := c.backend.ContainerCreate(types.ContainerCreateConfig***REMOVED***
+func (c *containerManager) Create(runConfig *container.Config, hostConfig *container.HostConfig) (container.ContainerCreateCreatedBody, error) {
+	container, err := c.backend.ContainerCreate(types.ContainerCreateConfig{
 		Config:     runConfig,
 		HostConfig: hostConfig,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		return container, err
-	***REMOVED***
-	c.tmpContainers[container.ID] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
+	}
+	c.tmpContainers[container.ID] = struct{}{}
 	return container, nil
-***REMOVED***
+}
 
 var errCancelled = errors.New("build cancelled")
 
 // Run a container by ID
-func (c *containerManager) Run(ctx context.Context, cID string, stdout, stderr io.Writer) (err error) ***REMOVED***
-	attached := make(chan struct***REMOVED******REMOVED***)
+func (c *containerManager) Run(ctx context.Context, cID string, stdout, stderr io.Writer) (err error) {
+	attached := make(chan struct{})
 	errCh := make(chan error)
-	go func() ***REMOVED***
+	go func() {
 		errCh <- c.backend.ContainerAttachRaw(cID, nil, stdout, stderr, true, attached)
-	***REMOVED***()
-	select ***REMOVED***
+	}()
+	select {
 	case err := <-errCh:
 		return err
 	case <-attached:
-	***REMOVED***
+	}
 
-	finished := make(chan struct***REMOVED******REMOVED***)
+	finished := make(chan struct{})
 	cancelErrCh := make(chan error, 1)
-	go func() ***REMOVED***
-		select ***REMOVED***
+	go func() {
+		select {
 		case <-ctx.Done():
 			logrus.Debugln("Build cancelled, killing and removing container:", cID)
 			c.backend.ContainerKill(cID, 0)
@@ -66,78 +66,78 @@ func (c *containerManager) Run(ctx context.Context, cID string, stdout, stderr i
 			cancelErrCh <- errCancelled
 		case <-finished:
 			cancelErrCh <- nil
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
-	if err := c.backend.ContainerStart(cID, nil, "", ""); err != nil ***REMOVED***
+	if err := c.backend.ContainerStart(cID, nil, "", ""); err != nil {
 		close(finished)
 		logCancellationError(cancelErrCh, "error from ContainerStart: "+err.Error())
 		return err
-	***REMOVED***
+	}
 
 	// Block on reading output from container, stop on err or chan closed
-	if err := <-errCh; err != nil ***REMOVED***
+	if err := <-errCh; err != nil {
 		close(finished)
 		logCancellationError(cancelErrCh, "error from errCh: "+err.Error())
 		return err
-	***REMOVED***
+	}
 
 	waitC, err := c.backend.ContainerWait(ctx, cID, containerpkg.WaitConditionNotRunning)
-	if err != nil ***REMOVED***
+	if err != nil {
 		close(finished)
 		logCancellationError(cancelErrCh, fmt.Sprintf("unable to begin ContainerWait: %s", err))
 		return err
-	***REMOVED***
+	}
 
-	if status := <-waitC; status.ExitCode() != 0 ***REMOVED***
+	if status := <-waitC; status.ExitCode() != 0 {
 		close(finished)
 		logCancellationError(cancelErrCh,
 			fmt.Sprintf("a non-zero code from ContainerWait: %d", status.ExitCode()))
-		return &statusCodeError***REMOVED***code: status.ExitCode(), err: err***REMOVED***
-	***REMOVED***
+		return &statusCodeError{code: status.ExitCode(), err: err}
+	}
 
 	close(finished)
 	return <-cancelErrCh
-***REMOVED***
+}
 
-func logCancellationError(cancelErrCh chan error, msg string) ***REMOVED***
-	if cancelErr := <-cancelErrCh; cancelErr != nil ***REMOVED***
+func logCancellationError(cancelErrCh chan error, msg string) {
+	if cancelErr := <-cancelErrCh; cancelErr != nil {
 		logrus.Debugf("Build cancelled (%v): %s", cancelErr, msg)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type statusCodeError struct ***REMOVED***
+type statusCodeError struct {
 	code int
 	err  error
-***REMOVED***
+}
 
-func (e *statusCodeError) Error() string ***REMOVED***
+func (e *statusCodeError) Error() string {
 	return e.err.Error()
-***REMOVED***
+}
 
-func (e *statusCodeError) StatusCode() int ***REMOVED***
+func (e *statusCodeError) StatusCode() int {
 	return e.code
-***REMOVED***
+}
 
-func (c *containerManager) removeContainer(containerID string, stdout io.Writer) error ***REMOVED***
-	rmConfig := &types.ContainerRmConfig***REMOVED***
+func (c *containerManager) removeContainer(containerID string, stdout io.Writer) error {
+	rmConfig := &types.ContainerRmConfig{
 		ForceRemove:  true,
 		RemoveVolume: true,
-	***REMOVED***
-	if err := c.backend.ContainerRm(containerID, rmConfig); err != nil ***REMOVED***
+	}
+	if err := c.backend.ContainerRm(containerID, rmConfig); err != nil {
 		fmt.Fprintf(stdout, "Error removing intermediate container %s: %v\n", stringid.TruncateID(containerID), err)
 		return err
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // RemoveAll containers managed by this container manager
-func (c *containerManager) RemoveAll(stdout io.Writer) ***REMOVED***
-	for containerID := range c.tmpContainers ***REMOVED***
-		if err := c.removeContainer(containerID, stdout); err != nil ***REMOVED***
+func (c *containerManager) RemoveAll(stdout io.Writer) {
+	for containerID := range c.tmpContainers {
+		if err := c.removeContainer(containerID, stdout); err != nil {
 			return
-		***REMOVED***
+		}
 		delete(c.tmpContainers, containerID)
 		fmt.Fprintf(stdout, "Removing intermediate container %s\n", stringid.TruncateID(containerID))
-	***REMOVED***
-***REMOVED***
+	}
+}

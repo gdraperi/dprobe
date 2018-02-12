@@ -6,17 +6,17 @@ import "time"
 
 // ThrottlingData stores CPU throttling stats of one running container.
 // Not used on Windows.
-type ThrottlingData struct ***REMOVED***
+type ThrottlingData struct {
 	// Number of periods with throttling active
 	Periods uint64 `json:"periods"`
 	// Number of periods when the container hits its throttling limit.
 	ThrottledPeriods uint64 `json:"throttled_periods"`
 	// Aggregate time the container was throttled for in nanoseconds.
 	ThrottledTime uint64 `json:"throttled_time"`
-***REMOVED***
+}
 
 // CPUUsage stores All CPU stats aggregated since container inception.
-type CPUUsage struct ***REMOVED***
+type CPUUsage struct {
 	// Total CPU time consumed.
 	// Units: nanoseconds (Linux)
 	// Units: 100's of nanoseconds (Windows)
@@ -37,10 +37,10 @@ type CPUUsage struct ***REMOVED***
 	// Units: nanoseconds (Linux).
 	// Units: 100's of nanoseconds (Windows). Not populated for Hyper-V Containers
 	UsageInUsermode uint64 `json:"usage_in_usermode"`
-***REMOVED***
+}
 
 // CPUStats aggregates and wraps all CPU related info of container
-type CPUStats struct ***REMOVED***
+type CPUStats struct {
 	// CPU Usage. Linux and Windows.
 	CPUUsage CPUUsage `json:"cpu_usage"`
 
@@ -52,11 +52,11 @@ type CPUStats struct ***REMOVED***
 
 	// Throttling Data. Linux only.
 	ThrottlingData ThrottlingData `json:"throttling_data,omitempty"`
-***REMOVED***
+}
 
 // MemoryStats aggregates all memory stats since container inception on Linux.
 // Windows returns stats for commit and private working set only.
-type MemoryStats struct ***REMOVED***
+type MemoryStats struct {
 	// Linux Memory Stats
 
 	// current res_counter usage for memory
@@ -79,22 +79,22 @@ type MemoryStats struct ***REMOVED***
 	CommitPeak uint64 `json:"commitpeakbytes,omitempty"`
 	// private working set
 	PrivateWorkingSet uint64 `json:"privateworkingset,omitempty"`
-***REMOVED***
+}
 
 // BlkioStatEntry is one small entity to store a piece of Blkio stats
 // Not used on Windows.
-type BlkioStatEntry struct ***REMOVED***
+type BlkioStatEntry struct {
 	Major uint64 `json:"major"`
 	Minor uint64 `json:"minor"`
 	Op    string `json:"op"`
 	Value uint64 `json:"value"`
-***REMOVED***
+}
 
 // BlkioStats stores All IO service stats for data read and write.
 // This is a Linux specific structure as the differences between expressing
 // block I/O on Windows and Linux are sufficiently significant to make
 // little sense attempting to morph into a combined structure.
-type BlkioStats struct ***REMOVED***
+type BlkioStats struct {
 	// number of bytes transferred to and from the block device
 	IoServiceBytesRecursive []BlkioStatEntry `json:"io_service_bytes_recursive"`
 	IoServicedRecursive     []BlkioStatEntry `json:"io_serviced_recursive"`
@@ -104,18 +104,18 @@ type BlkioStats struct ***REMOVED***
 	IoMergedRecursive       []BlkioStatEntry `json:"io_merged_recursive"`
 	IoTimeRecursive         []BlkioStatEntry `json:"io_time_recursive"`
 	SectorsRecursive        []BlkioStatEntry `json:"sectors_recursive"`
-***REMOVED***
+}
 
 // StorageStats is the disk I/O stats for read/write on Windows.
-type StorageStats struct ***REMOVED***
+type StorageStats struct {
 	ReadCountNormalized  uint64 `json:"read_count_normalized,omitempty"`
 	ReadSizeBytes        uint64 `json:"read_size_bytes,omitempty"`
 	WriteCountNormalized uint64 `json:"write_count_normalized,omitempty"`
 	WriteSizeBytes       uint64 `json:"write_size_bytes,omitempty"`
-***REMOVED***
+}
 
 // NetworkStats aggregates the network stats of one container
-type NetworkStats struct ***REMOVED***
+type NetworkStats struct {
 	// Bytes received. Windows and Linux.
 	RxBytes uint64 `json:"rx_bytes"`
 	// Packets received. Windows and Linux.
@@ -138,19 +138,19 @@ type NetworkStats struct ***REMOVED***
 	EndpointID string `json:"endpoint_id,omitempty"`
 	// Instance ID. Not used on Linux.
 	InstanceID string `json:"instance_id,omitempty"`
-***REMOVED***
+}
 
 // PidsStats contains the stats of a container's pids
-type PidsStats struct ***REMOVED***
+type PidsStats struct {
 	// Current is the number of pids in the cgroup
 	Current uint64 `json:"current,omitempty"`
 	// Limit is the hard limit on the number of pids in the cgroup.
 	// A "Limit" of 0 means that there is no limit.
 	Limit uint64 `json:"limit,omitempty"`
-***REMOVED***
+}
 
 // Stats is Ultimate struct aggregating all types of stats of one container
-type Stats struct ***REMOVED***
+type Stats struct {
 	// Common stats
 	Read    time.Time `json:"read"`
 	PreRead time.Time `json:"preread"`
@@ -167,10 +167,10 @@ type Stats struct ***REMOVED***
 	CPUStats    CPUStats    `json:"cpu_stats,omitempty"`
 	PreCPUStats CPUStats    `json:"precpu_stats,omitempty"` // "Pre"="Previous"
 	MemoryStats MemoryStats `json:"memory_stats,omitempty"`
-***REMOVED***
+}
 
 // StatsJSON is newly used Networks
-type StatsJSON struct ***REMOVED***
+type StatsJSON struct {
 	Stats
 
 	Name string `json:"name,omitempty"`
@@ -178,4 +178,4 @@ type StatsJSON struct ***REMOVED***
 
 	// Networks request version >=1.21
 	Networks map[string]NetworkStats `json:"networks,omitempty"`
-***REMOVED***
+}

@@ -9,114 +9,114 @@ import (
 
 const tableSecret = "secret"
 
-func init() ***REMOVED***
-	register(ObjectStoreConfig***REMOVED***
-		Table: &memdb.TableSchema***REMOVED***
+func init() {
+	register(ObjectStoreConfig{
+		Table: &memdb.TableSchema{
 			Name: tableSecret,
-			Indexes: map[string]*memdb.IndexSchema***REMOVED***
-				indexID: ***REMOVED***
+			Indexes: map[string]*memdb.IndexSchema{
+				indexID: {
 					Name:    indexID,
 					Unique:  true,
-					Indexer: api.SecretIndexerByID***REMOVED******REMOVED***,
-				***REMOVED***,
-				indexName: ***REMOVED***
+					Indexer: api.SecretIndexerByID{},
+				},
+				indexName: {
 					Name:    indexName,
 					Unique:  true,
-					Indexer: api.SecretIndexerByName***REMOVED******REMOVED***,
-				***REMOVED***,
-				indexCustom: ***REMOVED***
+					Indexer: api.SecretIndexerByName{},
+				},
+				indexCustom: {
 					Name:         indexCustom,
-					Indexer:      api.SecretCustomIndexer***REMOVED******REMOVED***,
+					Indexer:      api.SecretCustomIndexer{},
 					AllowMissing: true,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		Save: func(tx ReadTx, snapshot *api.StoreSnapshot) error ***REMOVED***
+				},
+			},
+		},
+		Save: func(tx ReadTx, snapshot *api.StoreSnapshot) error {
 			var err error
 			snapshot.Secrets, err = FindSecrets(tx, All)
 			return err
-		***REMOVED***,
-		Restore: func(tx Tx, snapshot *api.StoreSnapshot) error ***REMOVED***
+		},
+		Restore: func(tx Tx, snapshot *api.StoreSnapshot) error {
 			toStoreObj := make([]api.StoreObject, len(snapshot.Secrets))
-			for i, x := range snapshot.Secrets ***REMOVED***
+			for i, x := range snapshot.Secrets {
 				toStoreObj[i] = x
-			***REMOVED***
+			}
 			return RestoreTable(tx, tableSecret, toStoreObj)
-		***REMOVED***,
-		ApplyStoreAction: func(tx Tx, sa api.StoreAction) error ***REMOVED***
-			switch v := sa.Target.(type) ***REMOVED***
+		},
+		ApplyStoreAction: func(tx Tx, sa api.StoreAction) error {
+			switch v := sa.Target.(type) {
 			case *api.StoreAction_Secret:
 				obj := v.Secret
-				switch sa.Action ***REMOVED***
+				switch sa.Action {
 				case api.StoreActionKindCreate:
 					return CreateSecret(tx, obj)
 				case api.StoreActionKindUpdate:
 					return UpdateSecret(tx, obj)
 				case api.StoreActionKindRemove:
 					return DeleteSecret(tx, obj.ID)
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return errUnknownStoreAction
-		***REMOVED***,
-	***REMOVED***)
-***REMOVED***
+		},
+	})
+}
 
 // CreateSecret adds a new secret to the store.
 // Returns ErrExist if the ID is already taken.
-func CreateSecret(tx Tx, s *api.Secret) error ***REMOVED***
+func CreateSecret(tx Tx, s *api.Secret) error {
 	// Ensure the name is not already in use.
-	if tx.lookup(tableSecret, indexName, strings.ToLower(s.Spec.Annotations.Name)) != nil ***REMOVED***
+	if tx.lookup(tableSecret, indexName, strings.ToLower(s.Spec.Annotations.Name)) != nil {
 		return ErrNameConflict
-	***REMOVED***
+	}
 
 	return tx.create(tableSecret, s)
-***REMOVED***
+}
 
 // UpdateSecret updates an existing secret in the store.
 // Returns ErrNotExist if the secret doesn't exist.
-func UpdateSecret(tx Tx, s *api.Secret) error ***REMOVED***
+func UpdateSecret(tx Tx, s *api.Secret) error {
 	// Ensure the name is either not in use or already used by this same Secret.
-	if existing := tx.lookup(tableSecret, indexName, strings.ToLower(s.Spec.Annotations.Name)); existing != nil ***REMOVED***
-		if existing.GetID() != s.ID ***REMOVED***
+	if existing := tx.lookup(tableSecret, indexName, strings.ToLower(s.Spec.Annotations.Name)); existing != nil {
+		if existing.GetID() != s.ID {
 			return ErrNameConflict
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return tx.update(tableSecret, s)
-***REMOVED***
+}
 
 // DeleteSecret removes a secret from the store.
 // Returns ErrNotExist if the secret doesn't exist.
-func DeleteSecret(tx Tx, id string) error ***REMOVED***
+func DeleteSecret(tx Tx, id string) error {
 	return tx.delete(tableSecret, id)
-***REMOVED***
+}
 
 // GetSecret looks up a secret by ID.
 // Returns nil if the secret doesn't exist.
-func GetSecret(tx ReadTx, id string) *api.Secret ***REMOVED***
+func GetSecret(tx ReadTx, id string) *api.Secret {
 	n := tx.get(tableSecret, id)
-	if n == nil ***REMOVED***
+	if n == nil {
 		return nil
-	***REMOVED***
+	}
 	return n.(*api.Secret)
-***REMOVED***
+}
 
 // FindSecrets selects a set of secrets and returns them.
-func FindSecrets(tx ReadTx, by By) ([]*api.Secret, error) ***REMOVED***
-	checkType := func(by By) error ***REMOVED***
-		switch by.(type) ***REMOVED***
+func FindSecrets(tx ReadTx, by By) ([]*api.Secret, error) {
+	checkType := func(by By) error {
+		switch by.(type) {
 		case byName, byNamePrefix, byIDPrefix, byCustom, byCustomPrefix:
 			return nil
 		default:
 			return ErrInvalidFindBy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	secretList := []*api.Secret***REMOVED******REMOVED***
-	appendResult := func(o api.StoreObject) ***REMOVED***
+	secretList := []*api.Secret{}
+	appendResult := func(o api.StoreObject) {
 		secretList = append(secretList, o.(*api.Secret))
-	***REMOVED***
+	}
 
 	err := tx.find(tableSecret, by, checkType, appendResult)
 	return secretList, err
-***REMOVED***
+}

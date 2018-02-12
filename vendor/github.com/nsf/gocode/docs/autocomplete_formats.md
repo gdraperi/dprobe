@@ -14,35 +14,35 @@ Following formats supported:
 ## json ###
 Generic JSON format. Example (manually formatted):
 ```json
-[6, [***REMOVED***
+[6, [{
 		 "class": "func",
 		 "name": "client_auto_complete",
 		 "type": "func(cli *rpc.Client, Arg0 []byte, Arg1 string, Arg2 int, Arg3 gocode_env) (c []candidate, d int)"
-	 ***REMOVED***, ***REMOVED***
+	 }, {
 		 "class": "func",
 		 "name": "client_close",
 		 "type": "func(cli *rpc.Client, Arg0 int) int"
-	 ***REMOVED***, ***REMOVED***
+	 }, {
 		 "class": "func",
 		 "name": "client_cursor_type_pkg",
 		 "type": "func(cli *rpc.Client, Arg0 []byte, Arg1 string, Arg2 int) (typ, pkg string)"
-	 ***REMOVED***, ***REMOVED***
+	 }, {
 		 "class": "func",
 		 "name": "client_drop_cache",
 		 "type": "func(cli *rpc.Client, Arg0 int) int"
-	 ***REMOVED***, ***REMOVED***
+	 }, {
 		 "class": "func",
 		 "name": "client_highlight",
 		 "type": "func(cli *rpc.Client, Arg0 []byte, Arg1 string, Arg2 gocode_env) (c []highlight_range, d int)"
-	 ***REMOVED***, ***REMOVED***
+	 }, {
 		 "class": "func",
 		 "name": "client_set",
 		 "type": "func(cli *rpc.Client, Arg0, Arg1 string) string"
-	 ***REMOVED***, ***REMOVED***
+	 }, {
 		 "class": "func",
 		 "name": "client_status",
 		 "type": "func(cli *rpc.Client, Arg0 int) string"
-	 ***REMOVED***
+	 }
  ]]
 ```
 Limitations:
@@ -68,7 +68,7 @@ Found 7 candidates:
 ## vim ##
 Format designed to be used in VIM scripts. Example:
 ```
-[6, [***REMOVED***'word': 'client_auto_complete(', 'abbr': 'func client_auto_complete(cli *rpc.Client, Arg0 []byte, Arg1 string, Arg2 int, Arg3 gocode_env) (c []candidate, d int)', 'info': 'func client_auto_complete(cli *rpc.Client, Arg0 []byte, Arg1 string, Arg2 int, Arg3 gocode_env) (c []candidate, d int)'***REMOVED***, ***REMOVED***'word': 'client_close(', 'abbr': 'func client_close(cli *rpc.Client, Arg0 int) int', 'info': 'func client_close(cli *rpc.Client, Arg0 int) int'***REMOVED***, ***REMOVED***'word': 'client_cursor_type_pkg(', 'abbr': 'func client_cursor_type_pkg(cli *rpc.Client, Arg0 []byte, Arg1 string, Arg2 int) (typ, pkg string)', 'info': 'func client_cursor_type_pkg(cli *rpc.Client, Arg0 []byte, Arg1 string, Arg2 int) (typ, pkg string)'***REMOVED***, ***REMOVED***'word': 'client_drop_cache(', 'abbr': 'func client_drop_cache(cli *rpc.Client, Arg0 int) int', 'info': 'func client_drop_cache(cli *rpc.Client, Arg0 int) int'***REMOVED***, ***REMOVED***'word': 'client_highlight(', 'abbr': 'func client_highlight(cli *rpc.Client, Arg0 []byte, Arg1 string, Arg2 gocode_env) (c []highlight_range, d int)', 'info': 'func client_highlight(cli *rpc.Client, Arg0 []byte, Arg1 string, Arg2 gocode_env) (c []highlight_range, d int)'***REMOVED***, ***REMOVED***'word': 'client_set(', 'abbr': 'func client_set(cli *rpc.Client, Arg0, Arg1 string) string', 'info': 'func client_set(cli *rpc.Client, Arg0, Arg1 string) string'***REMOVED***, ***REMOVED***'word': 'client_status(', 'abbr': 'func client_status(cli *rpc.Client, Arg0 int) string', 'info': 'func client_status(cli *rpc.Client, Arg0 int) string'***REMOVED***]]
+[6, [{'word': 'client_auto_complete(', 'abbr': 'func client_auto_complete(cli *rpc.Client, Arg0 []byte, Arg1 string, Arg2 int, Arg3 gocode_env) (c []candidate, d int)', 'info': 'func client_auto_complete(cli *rpc.Client, Arg0 []byte, Arg1 string, Arg2 int, Arg3 gocode_env) (c []candidate, d int)'}, {'word': 'client_close(', 'abbr': 'func client_close(cli *rpc.Client, Arg0 int) int', 'info': 'func client_close(cli *rpc.Client, Arg0 int) int'}, {'word': 'client_cursor_type_pkg(', 'abbr': 'func client_cursor_type_pkg(cli *rpc.Client, Arg0 []byte, Arg1 string, Arg2 int) (typ, pkg string)', 'info': 'func client_cursor_type_pkg(cli *rpc.Client, Arg0 []byte, Arg1 string, Arg2 int) (typ, pkg string)'}, {'word': 'client_drop_cache(', 'abbr': 'func client_drop_cache(cli *rpc.Client, Arg0 int) int', 'info': 'func client_drop_cache(cli *rpc.Client, Arg0 int) int'}, {'word': 'client_highlight(', 'abbr': 'func client_highlight(cli *rpc.Client, Arg0 []byte, Arg1 string, Arg2 gocode_env) (c []highlight_range, d int)', 'info': 'func client_highlight(cli *rpc.Client, Arg0 []byte, Arg1 string, Arg2 gocode_env) (c []highlight_range, d int)'}, {'word': 'client_set(', 'abbr': 'func client_set(cli *rpc.Client, Arg0, Arg1 string) string', 'info': 'func client_set(cli *rpc.Client, Arg0, Arg1 string) string'}, {'word': 'client_status(', 'abbr': 'func client_status(cli *rpc.Client, Arg0 int) string', 'info': 'func client_status(cli *rpc.Client, Arg0 int) string'}]]
 ```
 
 ## godit ##

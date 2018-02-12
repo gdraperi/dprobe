@@ -20,59 +20,59 @@ import (
 )
 
 // Mgr is used to manage Windows service.
-type Mgr struct ***REMOVED***
+type Mgr struct {
 	Handle windows.Handle
-***REMOVED***
+}
 
 // Connect establishes a connection to the service control manager.
-func Connect() (*Mgr, error) ***REMOVED***
+func Connect() (*Mgr, error) {
 	return ConnectRemote("")
-***REMOVED***
+}
 
 // ConnectRemote establishes a connection to the
 // service control manager on computer named host.
-func ConnectRemote(host string) (*Mgr, error) ***REMOVED***
+func ConnectRemote(host string) (*Mgr, error) {
 	var s *uint16
-	if host != "" ***REMOVED***
+	if host != "" {
 		s = syscall.StringToUTF16Ptr(host)
-	***REMOVED***
+	}
 	h, err := windows.OpenSCManager(s, nil, windows.SC_MANAGER_ALL_ACCESS)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	return &Mgr***REMOVED***Handle: h***REMOVED***, nil
-***REMOVED***
+	}
+	return &Mgr{Handle: h}, nil
+}
 
 // Disconnect closes connection to the service control manager m.
-func (m *Mgr) Disconnect() error ***REMOVED***
+func (m *Mgr) Disconnect() error {
 	return windows.CloseServiceHandle(m.Handle)
-***REMOVED***
+}
 
-func toPtr(s string) *uint16 ***REMOVED***
-	if len(s) == 0 ***REMOVED***
+func toPtr(s string) *uint16 {
+	if len(s) == 0 {
 		return nil
-	***REMOVED***
+	}
 	return syscall.StringToUTF16Ptr(s)
-***REMOVED***
+}
 
 // toStringBlock terminates strings in ss with 0, and then
 // concatenates them together. It also adds extra 0 at the end.
-func toStringBlock(ss []string) *uint16 ***REMOVED***
-	if len(ss) == 0 ***REMOVED***
+func toStringBlock(ss []string) *uint16 {
+	if len(ss) == 0 {
 		return nil
-	***REMOVED***
+	}
 	t := ""
-	for _, s := range ss ***REMOVED***
-		if s != "" ***REMOVED***
+	for _, s := range ss {
+		if s != "" {
 			t += s + "\x00"
-		***REMOVED***
-	***REMOVED***
-	if t == "" ***REMOVED***
+		}
+	}
+	if t == "" {
 		return nil
-	***REMOVED***
+	}
 	t += "\x00"
 	return &utf16.Encode([]rune(t))[0]
-***REMOVED***
+}
 
 // CreateService installs new service name on the system.
 // The service will be executed by running exepath binary.
@@ -81,82 +81,82 @@ func toStringBlock(ss []string) *uint16 ***REMOVED***
 // the service is started; these arguments are distinct from
 // the arguments passed to Service.Start or via the "Start
 // parameters" field in the service's Properties dialog box.
-func (m *Mgr) CreateService(name, exepath string, c Config, args ...string) (*Service, error) ***REMOVED***
-	if c.StartType == 0 ***REMOVED***
+func (m *Mgr) CreateService(name, exepath string, c Config, args ...string) (*Service, error) {
+	if c.StartType == 0 {
 		c.StartType = StartManual
-	***REMOVED***
-	if c.ErrorControl == 0 ***REMOVED***
+	}
+	if c.ErrorControl == 0 {
 		c.ErrorControl = ErrorNormal
-	***REMOVED***
-	if c.ServiceType == 0 ***REMOVED***
+	}
+	if c.ServiceType == 0 {
 		c.ServiceType = windows.SERVICE_WIN32_OWN_PROCESS
-	***REMOVED***
+	}
 	s := syscall.EscapeArg(exepath)
-	for _, v := range args ***REMOVED***
+	for _, v := range args {
 		s += " " + syscall.EscapeArg(v)
-	***REMOVED***
+	}
 	h, err := windows.CreateService(m.Handle, toPtr(name), toPtr(c.DisplayName),
 		windows.SERVICE_ALL_ACCESS, c.ServiceType,
 		c.StartType, c.ErrorControl, toPtr(s), toPtr(c.LoadOrderGroup),
 		nil, toStringBlock(c.Dependencies), toPtr(c.ServiceStartName), toPtr(c.Password))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if c.Description != "" ***REMOVED***
+	}
+	if c.Description != "" {
 		err = updateDescription(h, c.Description)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
-	return &Service***REMOVED***Name: name, Handle: h***REMOVED***, nil
-***REMOVED***
+		}
+	}
+	return &Service{Name: name, Handle: h}, nil
+}
 
 // OpenService retrieves access to service name, so it can
 // be interrogated and controlled.
-func (m *Mgr) OpenService(name string) (*Service, error) ***REMOVED***
+func (m *Mgr) OpenService(name string) (*Service, error) {
 	h, err := windows.OpenService(m.Handle, syscall.StringToUTF16Ptr(name), windows.SERVICE_ALL_ACCESS)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	return &Service***REMOVED***Name: name, Handle: h***REMOVED***, nil
-***REMOVED***
+	}
+	return &Service{Name: name, Handle: h}, nil
+}
 
 // ListServices enumerates services in the specified
 // service control manager database m.
 // If the caller does not have the SERVICE_QUERY_STATUS
 // access right to a service, the service is silently
 // omitted from the list of services returned.
-func (m *Mgr) ListServices() ([]string, error) ***REMOVED***
+func (m *Mgr) ListServices() ([]string, error) {
 	var err error
 	var bytesNeeded, servicesReturned uint32
 	var buf []byte
-	for ***REMOVED***
+	for {
 		var p *byte
-		if len(buf) > 0 ***REMOVED***
+		if len(buf) > 0 {
 			p = &buf[0]
-		***REMOVED***
+		}
 		err = windows.EnumServicesStatusEx(m.Handle, windows.SC_ENUM_PROCESS_INFO,
 			windows.SERVICE_WIN32, windows.SERVICE_STATE_ALL,
 			p, uint32(len(buf)), &bytesNeeded, &servicesReturned, nil, nil)
-		if err == nil ***REMOVED***
+		if err == nil {
 			break
-		***REMOVED***
-		if err != syscall.ERROR_MORE_DATA ***REMOVED***
+		}
+		if err != syscall.ERROR_MORE_DATA {
 			return nil, err
-		***REMOVED***
-		if bytesNeeded <= uint32(len(buf)) ***REMOVED***
+		}
+		if bytesNeeded <= uint32(len(buf)) {
 			return nil, err
-		***REMOVED***
+		}
 		buf = make([]byte, bytesNeeded)
-	***REMOVED***
-	if servicesReturned == 0 ***REMOVED***
+	}
+	if servicesReturned == 0 {
 		return nil, nil
-	***REMOVED***
+	}
 	services := (*[1 << 20]windows.ENUM_SERVICE_STATUS_PROCESS)(unsafe.Pointer(&buf[0]))[:servicesReturned]
 	var names []string
-	for _, s := range services ***REMOVED***
+	for _, s := range services {
 		name := syscall.UTF16ToString((*[1 << 20]uint16)(unsafe.Pointer(s.ServiceName))[:])
 		names = append(names, name)
-	***REMOVED***
+	}
 	return names, nil
-***REMOVED***
+}

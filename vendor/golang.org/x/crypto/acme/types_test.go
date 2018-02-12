@@ -11,53 +11,53 @@ import (
 	"time"
 )
 
-func TestRateLimit(t *testing.T) ***REMOVED***
+func TestRateLimit(t *testing.T) {
 	now := time.Date(2017, 04, 27, 10, 0, 0, 0, time.UTC)
 	f := timeNow
-	defer func() ***REMOVED*** timeNow = f ***REMOVED***()
-	timeNow = func() time.Time ***REMOVED*** return now ***REMOVED***
+	defer func() { timeNow = f }()
+	timeNow = func() time.Time { return now }
 
-	h120, hTime := http.Header***REMOVED******REMOVED***, http.Header***REMOVED******REMOVED***
+	h120, hTime := http.Header{}, http.Header{}
 	h120.Set("Retry-After", "120")
 	hTime.Set("Retry-After", "Tue Apr 27 11:00:00 2017")
 
-	err1 := &Error***REMOVED***
+	err1 := &Error{
 		ProblemType: "urn:ietf:params:acme:error:nolimit",
 		Header:      h120,
-	***REMOVED***
-	err2 := &Error***REMOVED***
+	}
+	err2 := &Error{
 		ProblemType: "urn:ietf:params:acme:error:rateLimited",
 		Header:      h120,
-	***REMOVED***
-	err3 := &Error***REMOVED***
+	}
+	err3 := &Error{
 		ProblemType: "urn:ietf:params:acme:error:rateLimited",
 		Header:      nil,
-	***REMOVED***
-	err4 := &Error***REMOVED***
+	}
+	err4 := &Error{
 		ProblemType: "urn:ietf:params:acme:error:rateLimited",
 		Header:      hTime,
-	***REMOVED***
+	}
 
-	tt := []struct ***REMOVED***
+	tt := []struct {
 		err error
 		res time.Duration
 		ok  bool
-	***REMOVED******REMOVED***
-		***REMOVED***nil, 0, false***REMOVED***,
-		***REMOVED***errors.New("dummy"), 0, false***REMOVED***,
-		***REMOVED***err1, 0, false***REMOVED***,
-		***REMOVED***err2, 2 * time.Minute, true***REMOVED***,
-		***REMOVED***err3, 0, true***REMOVED***,
-		***REMOVED***err4, time.Hour, true***REMOVED***,
-	***REMOVED***
-	for i, test := range tt ***REMOVED***
+	}{
+		{nil, 0, false},
+		{errors.New("dummy"), 0, false},
+		{err1, 0, false},
+		{err2, 2 * time.Minute, true},
+		{err3, 0, true},
+		{err4, time.Hour, true},
+	}
+	for i, test := range tt {
 		res, ok := RateLimit(test.err)
-		if ok != test.ok ***REMOVED***
+		if ok != test.ok {
 			t.Errorf("%d: RateLimit(%+v): ok = %v; want %v", i, test.err, ok, test.ok)
 			continue
-		***REMOVED***
-		if res != test.res ***REMOVED***
+		}
+		if res != test.res {
 			t.Errorf("%d: RateLimit(%+v) = %v; want %v", i, test.err, res, test.res)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

@@ -24,35 +24,35 @@ const (
 )
 
 // Load reads a buffer into a Properties struct.
-func Load(buf []byte, enc Encoding) (*Properties, error) ***REMOVED***
+func Load(buf []byte, enc Encoding) (*Properties, error) {
 	return loadBuf(buf, enc)
-***REMOVED***
+}
 
 // LoadString reads an UTF8 string into a properties struct.
-func LoadString(s string) (*Properties, error) ***REMOVED***
+func LoadString(s string) (*Properties, error) {
 	return loadBuf([]byte(s), UTF8)
-***REMOVED***
+}
 
 // LoadMap creates a new Properties struct from a string map.
-func LoadMap(m map[string]string) *Properties ***REMOVED***
+func LoadMap(m map[string]string) *Properties {
 	p := NewProperties()
-	for k, v := range m ***REMOVED***
+	for k, v := range m {
 		p.Set(k, v)
-	***REMOVED***
+	}
 	return p
-***REMOVED***
+}
 
 // LoadFile reads a file into a Properties struct.
-func LoadFile(filename string, enc Encoding) (*Properties, error) ***REMOVED***
-	return loadAll([]string***REMOVED***filename***REMOVED***, enc, false)
-***REMOVED***
+func LoadFile(filename string, enc Encoding) (*Properties, error) {
+	return loadAll([]string{filename}, enc, false)
+}
 
 // LoadFiles reads multiple files in the given order into
 // a Properties struct. If 'ignoreMissing' is true then
 // non-existent files will not be reported as error.
-func LoadFiles(filenames []string, enc Encoding, ignoreMissing bool) (*Properties, error) ***REMOVED***
+func LoadFiles(filenames []string, enc Encoding, ignoreMissing bool) (*Properties, error) {
 	return loadAll(filenames, enc, ignoreMissing)
-***REMOVED***
+}
 
 // LoadURL reads the content of the URL into a Properties struct.
 //
@@ -62,180 +62,180 @@ func LoadFiles(filenames []string, enc Encoding, ignoreMissing bool) (*Propertie
 // ISO-8859-1. If the 'charset' parameter is set to 'utf-8' the
 // encoding is set to UTF-8. A missing content type header is
 // interpreted as 'text/plain; charset=utf-8'.
-func LoadURL(url string) (*Properties, error) ***REMOVED***
-	return loadAll([]string***REMOVED***url***REMOVED***, UTF8, false)
-***REMOVED***
+func LoadURL(url string) (*Properties, error) {
+	return loadAll([]string{url}, UTF8, false)
+}
 
 // LoadURLs reads the content of multiple URLs in the given order into a
 // Properties struct. If 'ignoreMissing' is true then a 404 status code will
 // not be reported as error. See LoadURL for the Content-Type header
 // and the encoding.
-func LoadURLs(urls []string, ignoreMissing bool) (*Properties, error) ***REMOVED***
+func LoadURLs(urls []string, ignoreMissing bool) (*Properties, error) {
 	return loadAll(urls, UTF8, ignoreMissing)
-***REMOVED***
+}
 
 // LoadAll reads the content of multiple URLs or files in the given order into a
 // Properties struct. If 'ignoreMissing' is true then a 404 status code or missing file will
 // not be reported as error. Encoding sets the encoding for files. For the URLs please see
 // LoadURL for the Content-Type header and the encoding.
-func LoadAll(names []string, enc Encoding, ignoreMissing bool) (*Properties, error) ***REMOVED***
+func LoadAll(names []string, enc Encoding, ignoreMissing bool) (*Properties, error) {
 	return loadAll(names, enc, ignoreMissing)
-***REMOVED***
+}
 
 // MustLoadString reads an UTF8 string into a Properties struct and
 // panics on error.
-func MustLoadString(s string) *Properties ***REMOVED***
+func MustLoadString(s string) *Properties {
 	return must(LoadString(s))
-***REMOVED***
+}
 
 // MustLoadFile reads a file into a Properties struct and
 // panics on error.
-func MustLoadFile(filename string, enc Encoding) *Properties ***REMOVED***
+func MustLoadFile(filename string, enc Encoding) *Properties {
 	return must(LoadFile(filename, enc))
-***REMOVED***
+}
 
 // MustLoadFiles reads multiple files in the given order into
 // a Properties struct and panics on error. If 'ignoreMissing'
 // is true then non-existent files will not be reported as error.
-func MustLoadFiles(filenames []string, enc Encoding, ignoreMissing bool) *Properties ***REMOVED***
+func MustLoadFiles(filenames []string, enc Encoding, ignoreMissing bool) *Properties {
 	return must(LoadFiles(filenames, enc, ignoreMissing))
-***REMOVED***
+}
 
 // MustLoadURL reads the content of a URL into a Properties struct and
 // panics on error.
-func MustLoadURL(url string) *Properties ***REMOVED***
+func MustLoadURL(url string) *Properties {
 	return must(LoadURL(url))
-***REMOVED***
+}
 
 // MustLoadURLs reads the content of multiple URLs in the given order into a
 // Properties struct and panics on error. If 'ignoreMissing' is true then a 404
 // status code will not be reported as error.
-func MustLoadURLs(urls []string, ignoreMissing bool) *Properties ***REMOVED***
+func MustLoadURLs(urls []string, ignoreMissing bool) *Properties {
 	return must(LoadURLs(urls, ignoreMissing))
-***REMOVED***
+}
 
 // MustLoadAll reads the content of multiple URLs or files in the given order into a
 // Properties struct. If 'ignoreMissing' is true then a 404 status code or missing file will
 // not be reported as error. Encoding sets the encoding for files. For the URLs please see
 // LoadURL for the Content-Type header and the encoding. It panics on error.
-func MustLoadAll(names []string, enc Encoding, ignoreMissing bool) *Properties ***REMOVED***
+func MustLoadAll(names []string, enc Encoding, ignoreMissing bool) *Properties {
 	return must(LoadAll(names, enc, ignoreMissing))
-***REMOVED***
+}
 
-func loadBuf(buf []byte, enc Encoding) (*Properties, error) ***REMOVED***
+func loadBuf(buf []byte, enc Encoding) (*Properties, error) {
 	p, err := parse(convert(buf, enc))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return p, p.check()
-***REMOVED***
+}
 
-func loadAll(names []string, enc Encoding, ignoreMissing bool) (*Properties, error) ***REMOVED***
+func loadAll(names []string, enc Encoding, ignoreMissing bool) (*Properties, error) {
 	result := NewProperties()
-	for _, name := range names ***REMOVED***
+	for _, name := range names {
 		n, err := expandName(name)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		var p *Properties
-		if strings.HasPrefix(n, "http://") || strings.HasPrefix(n, "https://") ***REMOVED***
+		if strings.HasPrefix(n, "http://") || strings.HasPrefix(n, "https://") {
 			p, err = loadURL(n, ignoreMissing)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			p, err = loadFile(n, enc, ignoreMissing)
-		***REMOVED***
-		if err != nil ***REMOVED***
+		}
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		result.Merge(p)
 
-	***REMOVED***
+	}
 	return result, result.check()
-***REMOVED***
+}
 
-func loadFile(filename string, enc Encoding, ignoreMissing bool) (*Properties, error) ***REMOVED***
+func loadFile(filename string, enc Encoding, ignoreMissing bool) (*Properties, error) {
 	data, err := ioutil.ReadFile(filename)
-	if err != nil ***REMOVED***
-		if ignoreMissing && os.IsNotExist(err) ***REMOVED***
+	if err != nil {
+		if ignoreMissing && os.IsNotExist(err) {
 			LogPrintf("properties: %s not found. skipping", filename)
 			return NewProperties(), nil
-		***REMOVED***
+		}
 		return nil, err
-	***REMOVED***
+	}
 	p, err := parse(convert(data, enc))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return p, nil
-***REMOVED***
+}
 
-func loadURL(url string, ignoreMissing bool) (*Properties, error) ***REMOVED***
+func loadURL(url string, ignoreMissing bool) (*Properties, error) {
 	resp, err := http.Get(url)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("properties: error fetching %q. %s", url, err)
-	***REMOVED***
-	if resp.StatusCode == 404 && ignoreMissing ***REMOVED***
+	}
+	if resp.StatusCode == 404 && ignoreMissing {
 		LogPrintf("properties: %s returned %d. skipping", url, resp.StatusCode)
 		return NewProperties(), nil
-	***REMOVED***
-	if resp.StatusCode != 200 ***REMOVED***
+	}
+	if resp.StatusCode != 200 {
 		return nil, fmt.Errorf("properties: %s returned %d", url, resp.StatusCode)
-	***REMOVED***
+	}
 	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("properties: %s error reading response. %s", url, err)
-	***REMOVED***
-	if err = resp.Body.Close(); err != nil ***REMOVED***
+	}
+	if err = resp.Body.Close(); err != nil {
 		return nil, fmt.Errorf("properties: %s error reading response. %s", url, err)
-	***REMOVED***
+	}
 
 	ct := resp.Header.Get("Content-Type")
 	var enc Encoding
-	switch strings.ToLower(ct) ***REMOVED***
+	switch strings.ToLower(ct) {
 	case "text/plain", "text/plain; charset=iso-8859-1", "text/plain; charset=latin1":
 		enc = ISO_8859_1
 	case "", "text/plain; charset=utf-8":
 		enc = UTF8
 	default:
 		return nil, fmt.Errorf("properties: invalid content type %s", ct)
-	***REMOVED***
+	}
 
 	p, err := parse(convert(body, enc))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return p, nil
-***REMOVED***
+}
 
-func must(p *Properties, err error) *Properties ***REMOVED***
-	if err != nil ***REMOVED***
+func must(p *Properties, err error) *Properties {
+	if err != nil {
 		ErrorHandler(err)
-	***REMOVED***
+	}
 	return p
-***REMOVED***
+}
 
-// expandName expands $***REMOVED***ENV_VAR***REMOVED*** expressions in a name.
+// expandName expands ${ENV_VAR} expressions in a name.
 // If the environment variable does not exist then it will be replaced
-// with an empty string. Malformed expressions like "$***REMOVED***ENV_VAR" will
+// with an empty string. Malformed expressions like "${ENV_VAR" will
 // be reported as error.
-func expandName(name string) (string, error) ***REMOVED***
-	return expand(name, make(map[string]bool), "$***REMOVED***", "***REMOVED***", make(map[string]string))
-***REMOVED***
+func expandName(name string) (string, error) {
+	return expand(name, make(map[string]bool), "${", "}", make(map[string]string))
+}
 
 // Interprets a byte buffer either as an ISO-8859-1 or UTF-8 encoded string.
 // For ISO-8859-1 we can convert each byte straight into a rune since the
 // first 256 unicode code points cover ISO-8859-1.
-func convert(buf []byte, enc Encoding) string ***REMOVED***
-	switch enc ***REMOVED***
+func convert(buf []byte, enc Encoding) string {
+	switch enc {
 	case UTF8:
 		return string(buf)
 	case ISO_8859_1:
 		runes := make([]rune, len(buf))
-		for i, b := range buf ***REMOVED***
+		for i, b := range buf {
 			runes[i] = rune(b)
-		***REMOVED***
+		}
 		return string(runes)
 	default:
 		ErrorHandler(fmt.Errorf("unsupported encoding %v", enc))
-	***REMOVED***
+	}
 	panic("ErrorHandler should exit")
-***REMOVED***
+}

@@ -33,25 +33,25 @@ import (
 	"reflect"
 )
 
-func (tm *TextMarshaler) writeEnum(w *textWriter, v reflect.Value, props *Properties) error ***REMOVED***
+func (tm *TextMarshaler) writeEnum(w *textWriter, v reflect.Value, props *Properties) error {
 	m, ok := enumStringMaps[props.Enum]
-	if !ok ***REMOVED***
-		if err := tm.writeAny(w, v, props); err != nil ***REMOVED***
+	if !ok {
+		if err := tm.writeAny(w, v, props); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	key := int32(0)
-	if v.Kind() == reflect.Ptr ***REMOVED***
+	if v.Kind() == reflect.Ptr {
 		key = int32(v.Elem().Int())
-	***REMOVED*** else ***REMOVED***
+	} else {
 		key = int32(v.Int())
-	***REMOVED***
+	}
 	s, ok := m[key]
-	if !ok ***REMOVED***
-		if err := tm.writeAny(w, v, props); err != nil ***REMOVED***
+	if !ok {
+		if err := tm.writeAny(w, v, props); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	_, err := fmt.Fprint(w, s)
 	return err
-***REMOVED***
+}

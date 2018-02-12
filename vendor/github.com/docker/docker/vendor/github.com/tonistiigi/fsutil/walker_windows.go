@@ -6,9 +6,9 @@ import (
 	"os"
 )
 
-func loadXattr(_ string, _ *Stat) error ***REMOVED***
+func loadXattr(_ string, _ *Stat) error {
 	return nil
-***REMOVED***
+}
 
-func setUnixOpt(_ os.FileInfo, _ *Stat, _ string, _ map[uint64]string) ***REMOVED***
-***REMOVED***
+func setUnixOpt(_ os.FileInfo, _ *Stat, _ string, _ map[uint64]string) {
+}

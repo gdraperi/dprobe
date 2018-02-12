@@ -11,10 +11,10 @@ import "syscall"
 //extern gettimeofday
 func realGettimeofday(*Timeval, *byte) int32
 
-func gettimeofday(tv *Timeval) (err syscall.Errno) ***REMOVED***
+func gettimeofday(tv *Timeval) (err syscall.Errno) {
 	r := realGettimeofday(tv, nil)
-	if r < 0 ***REMOVED***
+	if r < 0 {
 		return syscall.GetErrno()
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}

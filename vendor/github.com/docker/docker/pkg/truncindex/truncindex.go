@@ -25,115 +25,115 @@ var (
 
 // ErrAmbiguousPrefix is returned if the prefix was ambiguous
 // (multiple ids for the prefix).
-type ErrAmbiguousPrefix struct ***REMOVED***
+type ErrAmbiguousPrefix struct {
 	prefix string
-***REMOVED***
+}
 
-func (e ErrAmbiguousPrefix) Error() string ***REMOVED***
+func (e ErrAmbiguousPrefix) Error() string {
 	return fmt.Sprintf("Multiple IDs found with provided prefix: %s", e.prefix)
-***REMOVED***
+}
 
 // TruncIndex allows the retrieval of string identifiers by any of their unique prefixes.
 // This is used to retrieve image and container IDs by more convenient shorthand prefixes.
-type TruncIndex struct ***REMOVED***
+type TruncIndex struct {
 	sync.RWMutex
 	trie *patricia.Trie
-	ids  map[string]struct***REMOVED******REMOVED***
-***REMOVED***
+	ids  map[string]struct{}
+}
 
 // NewTruncIndex creates a new TruncIndex and initializes with a list of IDs.
-func NewTruncIndex(ids []string) (idx *TruncIndex) ***REMOVED***
-	idx = &TruncIndex***REMOVED***
-		ids: make(map[string]struct***REMOVED******REMOVED***),
+func NewTruncIndex(ids []string) (idx *TruncIndex) {
+	idx = &TruncIndex{
+		ids: make(map[string]struct{}),
 
 		// Change patricia max prefix per node length,
 		// because our len(ID) always 64
 		trie: patricia.NewTrie(patricia.MaxPrefixPerNode(64)),
-	***REMOVED***
-	for _, id := range ids ***REMOVED***
+	}
+	for _, id := range ids {
 		idx.addID(id)
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func (idx *TruncIndex) addID(id string) error ***REMOVED***
-	if strings.Contains(id, " ") ***REMOVED***
+func (idx *TruncIndex) addID(id string) error {
+	if strings.Contains(id, " ") {
 		return ErrIllegalChar
-	***REMOVED***
-	if id == "" ***REMOVED***
+	}
+	if id == "" {
 		return ErrEmptyPrefix
-	***REMOVED***
-	if _, exists := idx.ids[id]; exists ***REMOVED***
+	}
+	if _, exists := idx.ids[id]; exists {
 		return fmt.Errorf("id already exists: '%s'", id)
-	***REMOVED***
-	idx.ids[id] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	if inserted := idx.trie.Insert(patricia.Prefix(id), struct***REMOVED******REMOVED******REMOVED******REMOVED***); !inserted ***REMOVED***
+	}
+	idx.ids[id] = struct{}{}
+	if inserted := idx.trie.Insert(patricia.Prefix(id), struct{}{}); !inserted {
 		return fmt.Errorf("failed to insert id: %s", id)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // Add adds a new ID to the TruncIndex.
-func (idx *TruncIndex) Add(id string) error ***REMOVED***
+func (idx *TruncIndex) Add(id string) error {
 	idx.Lock()
 	defer idx.Unlock()
 	return idx.addID(id)
-***REMOVED***
+}
 
 // Delete removes an ID from the TruncIndex. If there are multiple IDs
 // with the given prefix, an error is thrown.
-func (idx *TruncIndex) Delete(id string) error ***REMOVED***
+func (idx *TruncIndex) Delete(id string) error {
 	idx.Lock()
 	defer idx.Unlock()
-	if _, exists := idx.ids[id]; !exists || id == "" ***REMOVED***
+	if _, exists := idx.ids[id]; !exists || id == "" {
 		return fmt.Errorf("no such id: '%s'", id)
-	***REMOVED***
+	}
 	delete(idx.ids, id)
-	if deleted := idx.trie.Delete(patricia.Prefix(id)); !deleted ***REMOVED***
+	if deleted := idx.trie.Delete(patricia.Prefix(id)); !deleted {
 		return fmt.Errorf("no such id: '%s'", id)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // Get retrieves an ID from the TruncIndex. If there are multiple IDs
 // with the given prefix, an error is thrown.
-func (idx *TruncIndex) Get(s string) (string, error) ***REMOVED***
-	if s == "" ***REMOVED***
+func (idx *TruncIndex) Get(s string) (string, error) {
+	if s == "" {
 		return "", ErrEmptyPrefix
-	***REMOVED***
+	}
 	var (
 		id string
 	)
-	subTreeVisitFunc := func(prefix patricia.Prefix, item patricia.Item) error ***REMOVED***
-		if id != "" ***REMOVED***
+	subTreeVisitFunc := func(prefix patricia.Prefix, item patricia.Item) error {
+		if id != "" {
 			// we haven't found the ID if there are two or more IDs
 			id = ""
-			return ErrAmbiguousPrefix***REMOVED***prefix: string(prefix)***REMOVED***
-		***REMOVED***
+			return ErrAmbiguousPrefix{prefix: string(prefix)}
+		}
 		id = string(prefix)
 		return nil
-	***REMOVED***
+	}
 
 	idx.RLock()
 	defer idx.RUnlock()
-	if err := idx.trie.VisitSubtree(patricia.Prefix(s), subTreeVisitFunc); err != nil ***REMOVED***
+	if err := idx.trie.VisitSubtree(patricia.Prefix(s), subTreeVisitFunc); err != nil {
 		return "", err
-	***REMOVED***
-	if id != "" ***REMOVED***
+	}
+	if id != "" {
 		return id, nil
-	***REMOVED***
+	}
 	return "", ErrNotExist
-***REMOVED***
+}
 
 // Iterate iterates over all stored IDs and passes each of them to the given
 // handler. Take care that the handler method does not call any public
 // method on truncindex as the internal locking is not reentrant/recursive
 // and will result in deadlock.
-func (idx *TruncIndex) Iterate(handler func(id string)) ***REMOVED***
+func (idx *TruncIndex) Iterate(handler func(id string)) {
 	idx.Lock()
 	defer idx.Unlock()
-	idx.trie.Visit(func(prefix patricia.Prefix, item patricia.Item) error ***REMOVED***
+	idx.trie.Visit(func(prefix patricia.Prefix, item patricia.Item) error {
 		handler(string(prefix))
 		return nil
-	***REMOVED***)
-***REMOVED***
+	})
+}

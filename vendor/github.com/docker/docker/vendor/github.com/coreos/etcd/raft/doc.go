@@ -33,15 +33,15 @@ using raft.StartNode or start a Node from some initial state using raft.RestartN
 To start a node from scratch:
 
   storage := raft.NewMemoryStorage()
-  c := &Config***REMOVED***
+  c := &Config{
     ID:              0x01,
     ElectionTick:    10,
     HeartbeatTick:   1,
     Storage:         storage,
     MaxSizePerMsg:   4096,
     MaxInflightMsgs: 256,
-  ***REMOVED***
-  n := raft.StartNode(c, []raft.Peer***REMOVED******REMOVED***ID: 0x02***REMOVED***, ***REMOVED***ID: 0x03***REMOVED******REMOVED***)
+  }
+  n := raft.StartNode(c, []raft.Peer{{ID: 0x02}, {ID: 0x03}})
 
 To restart a node from previous state:
 
@@ -53,14 +53,14 @@ To restart a node from previous state:
   storage.SetHardState(state)
   storage.Append(entries)
 
-  c := &Config***REMOVED***
+  c := &Config{
     ID:              0x01,
     ElectionTick:    10,
     HeartbeatTick:   1,
     Storage:         storage,
     MaxSizePerMsg:   4096,
     MaxInflightMsgs: 256,
-  ***REMOVED***
+  }
 
   // restart raft without peer information.
   // peer information is already included in the storage.
@@ -109,9 +109,9 @@ restart), or you can supply your own disk-backed implementation.
 
 Third, when you receive a message from another node, pass it to Node.Step:
 
-	func recvRaftRPC(ctx context.Context, m raftpb.Message) ***REMOVED***
+	func recvRaftRPC(ctx context.Context, m raftpb.Message) {
 		n.Step(ctx, m)
-	***REMOVED***
+	}
 
 Finally, you need to call Node.Tick() at regular intervals (probably
 via a time.Ticker). Raft has two important timeouts: heartbeat and the
@@ -120,29 +120,29 @@ represented by an abstract "tick".
 
 The total state machine handling loop will look something like this:
 
-  for ***REMOVED***
-    select ***REMOVED***
+  for {
+    select {
     case <-s.Ticker:
       n.Tick()
     case rd := <-s.Node.Ready():
       saveToStorage(rd.State, rd.Entries, rd.Snapshot)
       send(rd.Messages)
-      if !raft.IsEmptySnap(rd.Snapshot) ***REMOVED***
+      if !raft.IsEmptySnap(rd.Snapshot) {
         processSnapshot(rd.Snapshot)
-  ***REMOVED***
-      for _, entry := range rd.CommittedEntries ***REMOVED***
+      }
+      for _, entry := range rd.CommittedEntries {
         process(entry)
-        if entry.Type == raftpb.EntryConfChange ***REMOVED***
+        if entry.Type == raftpb.EntryConfChange {
           var cc raftpb.ConfChange
           cc.Unmarshal(entry.Data)
           s.Node.ApplyConfChange(cc)
-    ***REMOVED***
-  ***REMOVED***
+        }
+      }
       s.Node.Advance()
     case <-s.done:
       return
-***REMOVED***
-  ***REMOVED***
+    }
+  }
 
 To propose changes to the state machine from your node take your application
 data, serialize it into a byte slice and call:

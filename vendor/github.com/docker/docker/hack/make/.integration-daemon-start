@@ -42,14 +42,14 @@ fi
 # intentionally open a couple bogus file descriptors to help test that they get scrubbed in containers
 exec 41>&1 42>&2
 
-export DOCKER_GRAPHDRIVER=$***REMOVED***DOCKER_GRAPHDRIVER:-vfs***REMOVED***
-export DOCKER_USERLANDPROXY=$***REMOVED***DOCKER_USERLANDPROXY:-true***REMOVED***
+export DOCKER_GRAPHDRIVER=${DOCKER_GRAPHDRIVER:-vfs}
+export DOCKER_USERLANDPROXY=${DOCKER_USERLANDPROXY:-true}
 
 # example usage: DOCKER_STORAGE_OPTS="dm.basesize=20G,dm.loopdatasize=200G"
 storage_params=""
 if [ -n "$DOCKER_STORAGE_OPTS" ]; then
 	IFS=','
-	for i in $***REMOVED***DOCKER_STORAGE_OPTS***REMOVED***; do
+	for i in ${DOCKER_STORAGE_OPTS}; do
 		storage_params="--storage-opt $i $storage_params"
 	done
 	unset IFS

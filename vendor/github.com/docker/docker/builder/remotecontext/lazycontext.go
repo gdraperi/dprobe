@@ -14,89 +14,89 @@ import (
 // NewLazySource creates a new LazyContext. LazyContext defines a hashed build
 // context based on a root directory. Individual files are hashed first time
 // they are asked. It is not safe to call methods of LazyContext concurrently.
-func NewLazySource(root containerfs.ContainerFS) (builder.Source, error) ***REMOVED***
-	return &lazySource***REMOVED***
+func NewLazySource(root containerfs.ContainerFS) (builder.Source, error) {
+	return &lazySource{
 		root: root,
 		sums: make(map[string]string),
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-type lazySource struct ***REMOVED***
+type lazySource struct {
 	root containerfs.ContainerFS
 	sums map[string]string
-***REMOVED***
+}
 
-func (c *lazySource) Root() containerfs.ContainerFS ***REMOVED***
+func (c *lazySource) Root() containerfs.ContainerFS {
 	return c.root
-***REMOVED***
+}
 
-func (c *lazySource) Close() error ***REMOVED***
+func (c *lazySource) Close() error {
 	return nil
-***REMOVED***
+}
 
-func (c *lazySource) Hash(path string) (string, error) ***REMOVED***
+func (c *lazySource) Hash(path string) (string, error) {
 	cleanPath, fullPath, err := normalize(path, c.root)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 
 	relPath, err := Rel(c.root, fullPath)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", errors.WithStack(convertPathError(err, cleanPath))
-	***REMOVED***
+	}
 
 	fi, err := os.Lstat(fullPath)
-	if err != nil ***REMOVED***
+	if err != nil {
 		// Backwards compatibility: a missing file returns a path as hash.
 		// This is reached in the case of a broken symlink.
 		return relPath, nil
-	***REMOVED***
+	}
 
 	sum, ok := c.sums[relPath]
-	if !ok ***REMOVED***
+	if !ok {
 		sum, err = c.prepareHash(relPath, fi)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return "", err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return sum, nil
-***REMOVED***
+}
 
-func (c *lazySource) prepareHash(relPath string, fi os.FileInfo) (string, error) ***REMOVED***
+func (c *lazySource) prepareHash(relPath string, fi os.FileInfo) (string, error) {
 	p := c.root.Join(c.root.Path(), relPath)
 	h, err := NewFileHash(p, relPath, fi)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", errors.Wrapf(err, "failed to create hash for %s", relPath)
-	***REMOVED***
-	if fi.Mode().IsRegular() && fi.Size() > 0 ***REMOVED***
+	}
+	if fi.Mode().IsRegular() && fi.Size() > 0 {
 		f, err := c.root.Open(p)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return "", errors.Wrapf(err, "failed to open %s", relPath)
-		***REMOVED***
+		}
 		defer f.Close()
-		if _, err := pools.Copy(h, f); err != nil ***REMOVED***
+		if _, err := pools.Copy(h, f); err != nil {
 			return "", errors.Wrapf(err, "failed to copy file data for %s", relPath)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	sum := hex.EncodeToString(h.Sum(nil))
 	c.sums[relPath] = sum
 	return sum, nil
-***REMOVED***
+}
 
 // Rel makes a path relative to base path. Same as `filepath.Rel` but can also
 // handle UUID paths in windows.
-func Rel(basepath containerfs.ContainerFS, targpath string) (string, error) ***REMOVED***
+func Rel(basepath containerfs.ContainerFS, targpath string) (string, error) {
 	// filepath.Rel can't handle UUID paths in windows
-	if basepath.OS() == "windows" ***REMOVED***
+	if basepath.OS() == "windows" {
 		pfx := basepath.Path() + `\`
-		if strings.HasPrefix(targpath, pfx) ***REMOVED***
+		if strings.HasPrefix(targpath, pfx) {
 			p := strings.TrimPrefix(targpath, pfx)
-			if p == "" ***REMOVED***
+			if p == "" {
 				p = "."
-			***REMOVED***
+			}
 			return p, nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return basepath.Rel(basepath.Path(), targpath)
-***REMOVED***
+}

@@ -11,27 +11,27 @@ import (
 
 var (
 	// locks lets us lock in process
-	locks   = map[string]struct***REMOVED******REMOVED******REMOVED******REMOVED***
+	locks   = map[string]struct{}{}
 	locksMu sync.Mutex
 )
 
-func tryLock(ref string) error ***REMOVED***
+func tryLock(ref string) error {
 	locksMu.Lock()
 	defer locksMu.Unlock()
 
-	if _, ok := locks[ref]; ok ***REMOVED***
+	if _, ok := locks[ref]; ok {
 		return errors.Wrapf(errdefs.ErrUnavailable, "ref %s locked", ref)
-	***REMOVED***
+	}
 
-	locks[ref] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
+	locks[ref] = struct{}{}
 	return nil
-***REMOVED***
+}
 
-func unlock(ref string) ***REMOVED***
+func unlock(ref string) {
 	locksMu.Lock()
 	defer locksMu.Unlock()
 
-	if _, ok := locks[ref]; ok ***REMOVED***
+	if _, ok := locks[ref]; ok {
 		delete(locks, ref)
-	***REMOVED***
-***REMOVED***
+	}
+}

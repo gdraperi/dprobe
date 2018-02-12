@@ -8,53 +8,53 @@ import (
 	"path/filepath"
 )
 
-func diskUsage(roots ...string) (Usage, error) ***REMOVED***
+func diskUsage(roots ...string) (Usage, error) {
 	var (
 		size int64
 	)
 
 	// TODO(stevvooe): Support inodes (or equivalent) for windows.
 
-	for _, root := range roots ***REMOVED***
-		if err := filepath.Walk(root, func(path string, fi os.FileInfo, err error) error ***REMOVED***
-			if err != nil ***REMOVED***
+	for _, root := range roots {
+		if err := filepath.Walk(root, func(path string, fi os.FileInfo, err error) error {
+			if err != nil {
 				return err
-			***REMOVED***
+			}
 
 			size += fi.Size()
 			return nil
-		***REMOVED***); err != nil ***REMOVED***
-			return Usage***REMOVED******REMOVED***, err
-		***REMOVED***
-	***REMOVED***
+		}); err != nil {
+			return Usage{}, err
+		}
+	}
 
-	return Usage***REMOVED***
+	return Usage{
 		Size: size,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-func diffUsage(ctx context.Context, a, b string) (Usage, error) ***REMOVED***
+func diffUsage(ctx context.Context, a, b string) (Usage, error) {
 	var (
 		size int64
 	)
 
-	if err := Changes(ctx, a, b, func(kind ChangeKind, _ string, fi os.FileInfo, err error) error ***REMOVED***
-		if err != nil ***REMOVED***
+	if err := Changes(ctx, a, b, func(kind ChangeKind, _ string, fi os.FileInfo, err error) error {
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 
-		if kind == ChangeKindAdd || kind == ChangeKindModify ***REMOVED***
+		if kind == ChangeKindAdd || kind == ChangeKindModify {
 			size += fi.Size()
 
 			return nil
 
-		***REMOVED***
+		}
 		return nil
-	***REMOVED***); err != nil ***REMOVED***
-		return Usage***REMOVED******REMOVED***, err
-	***REMOVED***
+	}); err != nil {
+		return Usage{}, err
+	}
 
-	return Usage***REMOVED***
+	return Usage{
 		Size: size,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}

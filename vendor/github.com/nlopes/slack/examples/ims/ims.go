@@ -6,16 +6,16 @@ import (
 	"github.com/nlopes/slack"
 )
 
-func main() ***REMOVED***
+func main() {
 	api := slack.New("YOUR_TOKEN_HERE")
 
 	userID := "USER_ID"
 
 	_, _, channelID, err := api.OpenIMChannel(userID)
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		fmt.Printf("%s\n", err)
-	***REMOVED***
+	}
 
-	api.PostMessage(channelID, "Hello World!", slack.PostMessageParameters***REMOVED******REMOVED***)
-***REMOVED***
+	api.PostMessage(channelID, "Hello World!", slack.PostMessageParameters{})
+}

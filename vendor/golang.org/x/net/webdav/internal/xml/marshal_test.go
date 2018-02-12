@@ -24,13 +24,13 @@ const (
 	ImprobabilityDrive
 )
 
-type Passenger struct ***REMOVED***
+type Passenger struct {
 	Name   []string `xml:"name"`
 	Weight float32  `xml:"weight"`
-***REMOVED***
+}
 
-type Ship struct ***REMOVED***
-	XMLName struct***REMOVED******REMOVED*** `xml:"spaceship"`
+type Ship struct {
+	XMLName struct{} `xml:"spaceship"`
 
 	Name      string       `xml:"name,attr"`
 	Pilot     string       `xml:"pilot,attr"`
@@ -38,157 +38,157 @@ type Ship struct ***REMOVED***
 	Age       uint         `xml:"age"`
 	Passenger []*Passenger `xml:"passenger"`
 	secret    string
-***REMOVED***
+}
 
 type NamedType string
 
-type Port struct ***REMOVED***
-	XMLName struct***REMOVED******REMOVED*** `xml:"port"`
+type Port struct {
+	XMLName struct{} `xml:"port"`
 	Type    string   `xml:"type,attr,omitempty"`
 	Comment string   `xml:",comment"`
 	Number  string   `xml:",chardata"`
-***REMOVED***
+}
 
-type Domain struct ***REMOVED***
-	XMLName struct***REMOVED******REMOVED*** `xml:"domain"`
+type Domain struct {
+	XMLName struct{} `xml:"domain"`
 	Country string   `xml:",attr,omitempty"`
 	Name    []byte   `xml:",chardata"`
 	Comment []byte   `xml:",comment"`
-***REMOVED***
+}
 
-type Book struct ***REMOVED***
-	XMLName struct***REMOVED******REMOVED*** `xml:"book"`
+type Book struct {
+	XMLName struct{} `xml:"book"`
 	Title   string   `xml:",chardata"`
-***REMOVED***
+}
 
-type Event struct ***REMOVED***
-	XMLName struct***REMOVED******REMOVED*** `xml:"event"`
+type Event struct {
+	XMLName struct{} `xml:"event"`
 	Year    int      `xml:",chardata"`
-***REMOVED***
+}
 
-type Movie struct ***REMOVED***
-	XMLName struct***REMOVED******REMOVED*** `xml:"movie"`
+type Movie struct {
+	XMLName struct{} `xml:"movie"`
 	Length  uint     `xml:",chardata"`
-***REMOVED***
+}
 
-type Pi struct ***REMOVED***
-	XMLName       struct***REMOVED******REMOVED*** `xml:"pi"`
+type Pi struct {
+	XMLName       struct{} `xml:"pi"`
 	Approximation float32  `xml:",chardata"`
-***REMOVED***
+}
 
-type Universe struct ***REMOVED***
-	XMLName struct***REMOVED******REMOVED*** `xml:"universe"`
+type Universe struct {
+	XMLName struct{} `xml:"universe"`
 	Visible float64  `xml:",chardata"`
-***REMOVED***
+}
 
-type Particle struct ***REMOVED***
-	XMLName struct***REMOVED******REMOVED*** `xml:"particle"`
+type Particle struct {
+	XMLName struct{} `xml:"particle"`
 	HasMass bool     `xml:",chardata"`
-***REMOVED***
+}
 
-type Departure struct ***REMOVED***
-	XMLName struct***REMOVED******REMOVED***  `xml:"departure"`
+type Departure struct {
+	XMLName struct{}  `xml:"departure"`
 	When    time.Time `xml:",chardata"`
-***REMOVED***
+}
 
-type SecretAgent struct ***REMOVED***
-	XMLName   struct***REMOVED******REMOVED*** `xml:"agent"`
+type SecretAgent struct {
+	XMLName   struct{} `xml:"agent"`
 	Handle    string   `xml:"handle,attr"`
 	Identity  string
 	Obfuscate string `xml:",innerxml"`
-***REMOVED***
+}
 
-type NestedItems struct ***REMOVED***
-	XMLName struct***REMOVED******REMOVED*** `xml:"result"`
+type NestedItems struct {
+	XMLName struct{} `xml:"result"`
 	Items   []string `xml:">item"`
 	Item1   []string `xml:"Items>item1"`
-***REMOVED***
+}
 
-type NestedOrder struct ***REMOVED***
-	XMLName struct***REMOVED******REMOVED*** `xml:"result"`
+type NestedOrder struct {
+	XMLName struct{} `xml:"result"`
 	Field1  string   `xml:"parent>c"`
 	Field2  string   `xml:"parent>b"`
 	Field3  string   `xml:"parent>a"`
-***REMOVED***
+}
 
-type MixedNested struct ***REMOVED***
-	XMLName struct***REMOVED******REMOVED*** `xml:"result"`
+type MixedNested struct {
+	XMLName struct{} `xml:"result"`
 	A       string   `xml:"parent1>a"`
 	B       string   `xml:"b"`
 	C       string   `xml:"parent1>parent2>c"`
 	D       string   `xml:"parent1>d"`
-***REMOVED***
+}
 
-type NilTest struct ***REMOVED***
-	A interface***REMOVED******REMOVED*** `xml:"parent1>parent2>a"`
-	B interface***REMOVED******REMOVED*** `xml:"parent1>b"`
-	C interface***REMOVED******REMOVED*** `xml:"parent1>parent2>c"`
-***REMOVED***
+type NilTest struct {
+	A interface{} `xml:"parent1>parent2>a"`
+	B interface{} `xml:"parent1>b"`
+	C interface{} `xml:"parent1>parent2>c"`
+}
 
-type Service struct ***REMOVED***
-	XMLName struct***REMOVED******REMOVED*** `xml:"service"`
+type Service struct {
+	XMLName struct{} `xml:"service"`
 	Domain  *Domain  `xml:"host>domain"`
 	Port    *Port    `xml:"host>port"`
-	Extra1  interface***REMOVED******REMOVED***
-	Extra2  interface***REMOVED******REMOVED*** `xml:"host>extra2"`
-***REMOVED***
+	Extra1  interface{}
+	Extra2  interface{} `xml:"host>extra2"`
+}
 
 var nilStruct *Ship
 
-type EmbedA struct ***REMOVED***
+type EmbedA struct {
 	EmbedC
 	EmbedB EmbedB
 	FieldA string
-***REMOVED***
+}
 
-type EmbedB struct ***REMOVED***
+type EmbedB struct {
 	FieldB string
 	*EmbedC
-***REMOVED***
+}
 
-type EmbedC struct ***REMOVED***
+type EmbedC struct {
 	FieldA1 string `xml:"FieldA>A1"`
 	FieldA2 string `xml:"FieldA>A2"`
 	FieldB  string
 	FieldC  string
-***REMOVED***
+}
 
-type NameCasing struct ***REMOVED***
-	XMLName struct***REMOVED******REMOVED*** `xml:"casing"`
+type NameCasing struct {
+	XMLName struct{} `xml:"casing"`
 	Xy      string
 	XY      string
 	XyA     string `xml:"Xy,attr"`
 	XYA     string `xml:"XY,attr"`
-***REMOVED***
+}
 
-type NamePrecedence struct ***REMOVED***
+type NamePrecedence struct {
 	XMLName     Name              `xml:"Parent"`
 	FromTag     XMLNameWithoutTag `xml:"InTag"`
 	FromNameVal XMLNameWithoutTag
 	FromNameTag XMLNameWithTag
 	InFieldName string
-***REMOVED***
+}
 
-type XMLNameWithTag struct ***REMOVED***
+type XMLNameWithTag struct {
 	XMLName Name   `xml:"InXMLNameTag"`
 	Value   string `xml:",chardata"`
-***REMOVED***
+}
 
-type XMLNameWithNSTag struct ***REMOVED***
+type XMLNameWithNSTag struct {
 	XMLName Name   `xml:"ns InXMLNameWithNSTag"`
 	Value   string `xml:",chardata"`
-***REMOVED***
+}
 
-type XMLNameWithoutTag struct ***REMOVED***
+type XMLNameWithoutTag struct {
 	XMLName Name
 	Value   string `xml:",chardata"`
-***REMOVED***
+}
 
-type NameInField struct ***REMOVED***
+type NameInField struct {
 	Foo Name `xml:"ns foo"`
-***REMOVED***
+}
 
-type AttrTest struct ***REMOVED***
+type AttrTest struct {
 	Int   int     `xml:",attr"`
 	Named int     `xml:"int,attr"`
 	Float float64 `xml:",attr"`
@@ -196,9 +196,9 @@ type AttrTest struct ***REMOVED***
 	Bool  bool    `xml:",attr"`
 	Str   string  `xml:",attr"`
 	Bytes []byte  `xml:",attr"`
-***REMOVED***
+}
 
-type OmitAttrTest struct ***REMOVED***
+type OmitAttrTest struct {
 	Int   int     `xml:",attr,omitempty"`
 	Named int     `xml:"int,attr,omitempty"`
 	Float float64 `xml:",attr,omitempty"`
@@ -206,9 +206,9 @@ type OmitAttrTest struct ***REMOVED***
 	Bool  bool    `xml:",attr,omitempty"`
 	Str   string  `xml:",attr,omitempty"`
 	Bytes []byte  `xml:",attr,omitempty"`
-***REMOVED***
+}
 
-type OmitFieldTest struct ***REMOVED***
+type OmitFieldTest struct {
 	Int   int           `xml:",omitempty"`
 	Named int           `xml:"int,omitempty"`
 	Float float64       `xml:",omitempty"`
@@ -217,186 +217,186 @@ type OmitFieldTest struct ***REMOVED***
 	Str   string        `xml:",omitempty"`
 	Bytes []byte        `xml:",omitempty"`
 	Ptr   *PresenceTest `xml:",omitempty"`
-***REMOVED***
+}
 
-type AnyTest struct ***REMOVED***
-	XMLName  struct***REMOVED******REMOVED***  `xml:"a"`
+type AnyTest struct {
+	XMLName  struct{}  `xml:"a"`
 	Nested   string    `xml:"nested>value"`
 	AnyField AnyHolder `xml:",any"`
-***REMOVED***
+}
 
-type AnyOmitTest struct ***REMOVED***
-	XMLName  struct***REMOVED******REMOVED***   `xml:"a"`
+type AnyOmitTest struct {
+	XMLName  struct{}   `xml:"a"`
 	Nested   string     `xml:"nested>value"`
 	AnyField *AnyHolder `xml:",any,omitempty"`
-***REMOVED***
+}
 
-type AnySliceTest struct ***REMOVED***
-	XMLName  struct***REMOVED******REMOVED***    `xml:"a"`
+type AnySliceTest struct {
+	XMLName  struct{}    `xml:"a"`
 	Nested   string      `xml:"nested>value"`
 	AnyField []AnyHolder `xml:",any"`
-***REMOVED***
+}
 
-type AnyHolder struct ***REMOVED***
+type AnyHolder struct {
 	XMLName Name
 	XML     string `xml:",innerxml"`
-***REMOVED***
+}
 
-type RecurseA struct ***REMOVED***
+type RecurseA struct {
 	A string
 	B *RecurseB
-***REMOVED***
+}
 
-type RecurseB struct ***REMOVED***
+type RecurseB struct {
 	A *RecurseA
 	B string
-***REMOVED***
+}
 
-type PresenceTest struct ***REMOVED***
-	Exists *struct***REMOVED******REMOVED***
-***REMOVED***
+type PresenceTest struct {
+	Exists *struct{}
+}
 
-type IgnoreTest struct ***REMOVED***
+type IgnoreTest struct {
 	PublicSecret string `xml:"-"`
-***REMOVED***
+}
 
 type MyBytes []byte
 
-type Data struct ***REMOVED***
+type Data struct {
 	Bytes  []byte
 	Attr   []byte `xml:",attr"`
 	Custom MyBytes
-***REMOVED***
+}
 
-type Plain struct ***REMOVED***
-	V interface***REMOVED******REMOVED***
-***REMOVED***
+type Plain struct {
+	V interface{}
+}
 
 type MyInt int
 
-type EmbedInt struct ***REMOVED***
+type EmbedInt struct {
 	MyInt
-***REMOVED***
+}
 
-type Strings struct ***REMOVED***
+type Strings struct {
 	X []string `xml:"A>B,omitempty"`
-***REMOVED***
+}
 
-type PointerFieldsTest struct ***REMOVED***
+type PointerFieldsTest struct {
 	XMLName  Name    `xml:"dummy"`
 	Name     *string `xml:"name,attr"`
 	Age      *uint   `xml:"age,attr"`
 	Empty    *string `xml:"empty,attr"`
 	Contents *string `xml:",chardata"`
-***REMOVED***
+}
 
-type ChardataEmptyTest struct ***REMOVED***
+type ChardataEmptyTest struct {
 	XMLName  Name    `xml:"test"`
 	Contents *string `xml:",chardata"`
-***REMOVED***
+}
 
-type MyMarshalerTest struct ***REMOVED***
-***REMOVED***
+type MyMarshalerTest struct {
+}
 
 var _ Marshaler = (*MyMarshalerTest)(nil)
 
-func (m *MyMarshalerTest) MarshalXML(e *Encoder, start StartElement) error ***REMOVED***
+func (m *MyMarshalerTest) MarshalXML(e *Encoder, start StartElement) error {
 	e.EncodeToken(start)
 	e.EncodeToken(CharData([]byte("hello world")))
-	e.EncodeToken(EndElement***REMOVED***start.Name***REMOVED***)
+	e.EncodeToken(EndElement{start.Name})
 	return nil
-***REMOVED***
+}
 
-type MyMarshalerAttrTest struct***REMOVED******REMOVED***
+type MyMarshalerAttrTest struct{}
 
 var _ MarshalerAttr = (*MyMarshalerAttrTest)(nil)
 
-func (m *MyMarshalerAttrTest) MarshalXMLAttr(name Name) (Attr, error) ***REMOVED***
-	return Attr***REMOVED***name, "hello world"***REMOVED***, nil
-***REMOVED***
+func (m *MyMarshalerAttrTest) MarshalXMLAttr(name Name) (Attr, error) {
+	return Attr{name, "hello world"}, nil
+}
 
-type MyMarshalerValueAttrTest struct***REMOVED******REMOVED***
+type MyMarshalerValueAttrTest struct{}
 
-var _ MarshalerAttr = MyMarshalerValueAttrTest***REMOVED******REMOVED***
+var _ MarshalerAttr = MyMarshalerValueAttrTest{}
 
-func (m MyMarshalerValueAttrTest) MarshalXMLAttr(name Name) (Attr, error) ***REMOVED***
-	return Attr***REMOVED***name, "hello world"***REMOVED***, nil
-***REMOVED***
+func (m MyMarshalerValueAttrTest) MarshalXMLAttr(name Name) (Attr, error) {
+	return Attr{name, "hello world"}, nil
+}
 
-type MarshalerStruct struct ***REMOVED***
+type MarshalerStruct struct {
 	Foo MyMarshalerAttrTest `xml:",attr"`
-***REMOVED***
+}
 
-type MarshalerValueStruct struct ***REMOVED***
+type MarshalerValueStruct struct {
 	Foo MyMarshalerValueAttrTest `xml:",attr"`
-***REMOVED***
+}
 
-type InnerStruct struct ***REMOVED***
+type InnerStruct struct {
 	XMLName Name `xml:"testns outer"`
-***REMOVED***
+}
 
-type OuterStruct struct ***REMOVED***
+type OuterStruct struct {
 	InnerStruct
 	IntAttr int `xml:"int,attr"`
-***REMOVED***
+}
 
-type OuterNamedStruct struct ***REMOVED***
+type OuterNamedStruct struct {
 	InnerStruct
 	XMLName Name `xml:"outerns test"`
 	IntAttr int  `xml:"int,attr"`
-***REMOVED***
+}
 
-type OuterNamedOrderedStruct struct ***REMOVED***
+type OuterNamedOrderedStruct struct {
 	XMLName Name `xml:"outerns test"`
 	InnerStruct
 	IntAttr int `xml:"int,attr"`
-***REMOVED***
+}
 
-type OuterOuterStruct struct ***REMOVED***
+type OuterOuterStruct struct {
 	OuterStruct
-***REMOVED***
+}
 
-type NestedAndChardata struct ***REMOVED***
+type NestedAndChardata struct {
 	AB       []string `xml:"A>B"`
 	Chardata string   `xml:",chardata"`
-***REMOVED***
+}
 
-type NestedAndComment struct ***REMOVED***
+type NestedAndComment struct {
 	AB      []string `xml:"A>B"`
 	Comment string   `xml:",comment"`
-***REMOVED***
+}
 
-type XMLNSFieldStruct struct ***REMOVED***
+type XMLNSFieldStruct struct {
 	Ns   string `xml:"xmlns,attr"`
 	Body string
-***REMOVED***
+}
 
-type NamedXMLNSFieldStruct struct ***REMOVED***
-	XMLName struct***REMOVED******REMOVED*** `xml:"testns test"`
+type NamedXMLNSFieldStruct struct {
+	XMLName struct{} `xml:"testns test"`
 	Ns      string   `xml:"xmlns,attr"`
 	Body    string
-***REMOVED***
+}
 
-type XMLNSFieldStructWithOmitEmpty struct ***REMOVED***
+type XMLNSFieldStructWithOmitEmpty struct {
 	Ns   string `xml:"xmlns,attr,omitempty"`
 	Body string
-***REMOVED***
+}
 
-type NamedXMLNSFieldStructWithEmptyNamespace struct ***REMOVED***
-	XMLName struct***REMOVED******REMOVED*** `xml:"test"`
+type NamedXMLNSFieldStructWithEmptyNamespace struct {
+	XMLName struct{} `xml:"test"`
 	Ns      string   `xml:"xmlns,attr"`
 	Body    string
-***REMOVED***
+}
 
-type RecursiveXMLNSFieldStruct struct ***REMOVED***
+type RecursiveXMLNSFieldStruct struct {
 	Ns   string                     `xml:"xmlns,attr"`
 	Body *RecursiveXMLNSFieldStruct `xml:",omitempty"`
 	Text string                     `xml:",omitempty"`
-***REMOVED***
+}
 
-func ifaceptr(x interface***REMOVED******REMOVED***) interface***REMOVED******REMOVED*** ***REMOVED***
+func ifaceptr(x interface{}) interface{} {
 	return &x
-***REMOVED***
+}
 
 var (
 	nameAttr     = "Sarah"
@@ -408,145 +408,145 @@ var (
 // tests below are two-way tests. When introducing new tests,
 // please try to make them two-way as well to ensure that
 // marshalling and unmarshalling are as symmetrical as feasible.
-var marshalTests = []struct ***REMOVED***
-	Value         interface***REMOVED******REMOVED***
+var marshalTests = []struct {
+	Value         interface{}
 	ExpectXML     string
 	MarshalOnly   bool
 	UnmarshalOnly bool
-***REMOVED******REMOVED***
+}{
 	// Test nil marshals to nothing
-	***REMOVED***Value: nil, ExpectXML: ``, MarshalOnly: true***REMOVED***,
-	***REMOVED***Value: nilStruct, ExpectXML: ``, MarshalOnly: true***REMOVED***,
+	{Value: nil, ExpectXML: ``, MarshalOnly: true},
+	{Value: nilStruct, ExpectXML: ``, MarshalOnly: true},
 
 	// Test value types
-	***REMOVED***Value: &Plain***REMOVED***true***REMOVED***, ExpectXML: `<Plain><V>true</V></Plain>`***REMOVED***,
-	***REMOVED***Value: &Plain***REMOVED***false***REMOVED***, ExpectXML: `<Plain><V>false</V></Plain>`***REMOVED***,
-	***REMOVED***Value: &Plain***REMOVED***int(42)***REMOVED***, ExpectXML: `<Plain><V>42</V></Plain>`***REMOVED***,
-	***REMOVED***Value: &Plain***REMOVED***int8(42)***REMOVED***, ExpectXML: `<Plain><V>42</V></Plain>`***REMOVED***,
-	***REMOVED***Value: &Plain***REMOVED***int16(42)***REMOVED***, ExpectXML: `<Plain><V>42</V></Plain>`***REMOVED***,
-	***REMOVED***Value: &Plain***REMOVED***int32(42)***REMOVED***, ExpectXML: `<Plain><V>42</V></Plain>`***REMOVED***,
-	***REMOVED***Value: &Plain***REMOVED***uint(42)***REMOVED***, ExpectXML: `<Plain><V>42</V></Plain>`***REMOVED***,
-	***REMOVED***Value: &Plain***REMOVED***uint8(42)***REMOVED***, ExpectXML: `<Plain><V>42</V></Plain>`***REMOVED***,
-	***REMOVED***Value: &Plain***REMOVED***uint16(42)***REMOVED***, ExpectXML: `<Plain><V>42</V></Plain>`***REMOVED***,
-	***REMOVED***Value: &Plain***REMOVED***uint32(42)***REMOVED***, ExpectXML: `<Plain><V>42</V></Plain>`***REMOVED***,
-	***REMOVED***Value: &Plain***REMOVED***float32(1.25)***REMOVED***, ExpectXML: `<Plain><V>1.25</V></Plain>`***REMOVED***,
-	***REMOVED***Value: &Plain***REMOVED***float64(1.25)***REMOVED***, ExpectXML: `<Plain><V>1.25</V></Plain>`***REMOVED***,
-	***REMOVED***Value: &Plain***REMOVED***uintptr(0xFFDD)***REMOVED***, ExpectXML: `<Plain><V>65501</V></Plain>`***REMOVED***,
-	***REMOVED***Value: &Plain***REMOVED***"gopher"***REMOVED***, ExpectXML: `<Plain><V>gopher</V></Plain>`***REMOVED***,
-	***REMOVED***Value: &Plain***REMOVED***[]byte("gopher")***REMOVED***, ExpectXML: `<Plain><V>gopher</V></Plain>`***REMOVED***,
-	***REMOVED***Value: &Plain***REMOVED***"</>"***REMOVED***, ExpectXML: `<Plain><V>&lt;/&gt;</V></Plain>`***REMOVED***,
-	***REMOVED***Value: &Plain***REMOVED***[]byte("</>")***REMOVED***, ExpectXML: `<Plain><V>&lt;/&gt;</V></Plain>`***REMOVED***,
-	***REMOVED***Value: &Plain***REMOVED***[3]byte***REMOVED***'<', '/', '>'***REMOVED******REMOVED***, ExpectXML: `<Plain><V>&lt;/&gt;</V></Plain>`***REMOVED***,
-	***REMOVED***Value: &Plain***REMOVED***NamedType("potato")***REMOVED***, ExpectXML: `<Plain><V>potato</V></Plain>`***REMOVED***,
-	***REMOVED***Value: &Plain***REMOVED***[]int***REMOVED***1, 2, 3***REMOVED******REMOVED***, ExpectXML: `<Plain><V>1</V><V>2</V><V>3</V></Plain>`***REMOVED***,
-	***REMOVED***Value: &Plain***REMOVED***[3]int***REMOVED***1, 2, 3***REMOVED******REMOVED***, ExpectXML: `<Plain><V>1</V><V>2</V><V>3</V></Plain>`***REMOVED***,
-	***REMOVED***Value: ifaceptr(true), MarshalOnly: true, ExpectXML: `<bool>true</bool>`***REMOVED***,
+	{Value: &Plain{true}, ExpectXML: `<Plain><V>true</V></Plain>`},
+	{Value: &Plain{false}, ExpectXML: `<Plain><V>false</V></Plain>`},
+	{Value: &Plain{int(42)}, ExpectXML: `<Plain><V>42</V></Plain>`},
+	{Value: &Plain{int8(42)}, ExpectXML: `<Plain><V>42</V></Plain>`},
+	{Value: &Plain{int16(42)}, ExpectXML: `<Plain><V>42</V></Plain>`},
+	{Value: &Plain{int32(42)}, ExpectXML: `<Plain><V>42</V></Plain>`},
+	{Value: &Plain{uint(42)}, ExpectXML: `<Plain><V>42</V></Plain>`},
+	{Value: &Plain{uint8(42)}, ExpectXML: `<Plain><V>42</V></Plain>`},
+	{Value: &Plain{uint16(42)}, ExpectXML: `<Plain><V>42</V></Plain>`},
+	{Value: &Plain{uint32(42)}, ExpectXML: `<Plain><V>42</V></Plain>`},
+	{Value: &Plain{float32(1.25)}, ExpectXML: `<Plain><V>1.25</V></Plain>`},
+	{Value: &Plain{float64(1.25)}, ExpectXML: `<Plain><V>1.25</V></Plain>`},
+	{Value: &Plain{uintptr(0xFFDD)}, ExpectXML: `<Plain><V>65501</V></Plain>`},
+	{Value: &Plain{"gopher"}, ExpectXML: `<Plain><V>gopher</V></Plain>`},
+	{Value: &Plain{[]byte("gopher")}, ExpectXML: `<Plain><V>gopher</V></Plain>`},
+	{Value: &Plain{"</>"}, ExpectXML: `<Plain><V>&lt;/&gt;</V></Plain>`},
+	{Value: &Plain{[]byte("</>")}, ExpectXML: `<Plain><V>&lt;/&gt;</V></Plain>`},
+	{Value: &Plain{[3]byte{'<', '/', '>'}}, ExpectXML: `<Plain><V>&lt;/&gt;</V></Plain>`},
+	{Value: &Plain{NamedType("potato")}, ExpectXML: `<Plain><V>potato</V></Plain>`},
+	{Value: &Plain{[]int{1, 2, 3}}, ExpectXML: `<Plain><V>1</V><V>2</V><V>3</V></Plain>`},
+	{Value: &Plain{[3]int{1, 2, 3}}, ExpectXML: `<Plain><V>1</V><V>2</V><V>3</V></Plain>`},
+	{Value: ifaceptr(true), MarshalOnly: true, ExpectXML: `<bool>true</bool>`},
 
 	// Test time.
-	***REMOVED***
-		Value:     &Plain***REMOVED***time.Unix(1e9, 123456789).UTC()***REMOVED***,
+	{
+		Value:     &Plain{time.Unix(1e9, 123456789).UTC()},
 		ExpectXML: `<Plain><V>2001-09-09T01:46:40.123456789Z</V></Plain>`,
-	***REMOVED***,
+	},
 
-	// A pointer to struct***REMOVED******REMOVED*** may be used to test for an element's presence.
-	***REMOVED***
-		Value:     &PresenceTest***REMOVED***new(struct***REMOVED******REMOVED***)***REMOVED***,
+	// A pointer to struct{} may be used to test for an element's presence.
+	{
+		Value:     &PresenceTest{new(struct{})},
 		ExpectXML: `<PresenceTest><Exists></Exists></PresenceTest>`,
-	***REMOVED***,
-	***REMOVED***
-		Value:     &PresenceTest***REMOVED******REMOVED***,
+	},
+	{
+		Value:     &PresenceTest{},
 		ExpectXML: `<PresenceTest></PresenceTest>`,
-	***REMOVED***,
+	},
 
-	// A pointer to struct***REMOVED******REMOVED*** may be used to test for an element's presence.
-	***REMOVED***
-		Value:     &PresenceTest***REMOVED***new(struct***REMOVED******REMOVED***)***REMOVED***,
+	// A pointer to struct{} may be used to test for an element's presence.
+	{
+		Value:     &PresenceTest{new(struct{})},
 		ExpectXML: `<PresenceTest><Exists></Exists></PresenceTest>`,
-	***REMOVED***,
-	***REMOVED***
-		Value:     &PresenceTest***REMOVED******REMOVED***,
+	},
+	{
+		Value:     &PresenceTest{},
 		ExpectXML: `<PresenceTest></PresenceTest>`,
-	***REMOVED***,
+	},
 
 	// A []byte field is only nil if the element was not found.
-	***REMOVED***
-		Value:         &Data***REMOVED******REMOVED***,
+	{
+		Value:         &Data{},
 		ExpectXML:     `<Data></Data>`,
 		UnmarshalOnly: true,
-	***REMOVED***,
-	***REMOVED***
-		Value:         &Data***REMOVED***Bytes: []byte***REMOVED******REMOVED***, Custom: MyBytes***REMOVED******REMOVED***, Attr: []byte***REMOVED******REMOVED******REMOVED***,
+	},
+	{
+		Value:         &Data{Bytes: []byte{}, Custom: MyBytes{}, Attr: []byte{}},
 		ExpectXML:     `<Data Attr=""><Bytes></Bytes><Custom></Custom></Data>`,
 		UnmarshalOnly: true,
-	***REMOVED***,
+	},
 
 	// Check that []byte works, including named []byte types.
-	***REMOVED***
-		Value:     &Data***REMOVED***Bytes: []byte("ab"), Custom: MyBytes("cd"), Attr: []byte***REMOVED***'v'***REMOVED******REMOVED***,
+	{
+		Value:     &Data{Bytes: []byte("ab"), Custom: MyBytes("cd"), Attr: []byte{'v'}},
 		ExpectXML: `<Data Attr="v"><Bytes>ab</Bytes><Custom>cd</Custom></Data>`,
-	***REMOVED***,
+	},
 
 	// Test innerxml
-	***REMOVED***
-		Value: &SecretAgent***REMOVED***
+	{
+		Value: &SecretAgent{
 			Handle:    "007",
 			Identity:  "James Bond",
 			Obfuscate: "<redacted/>",
-		***REMOVED***,
+		},
 		ExpectXML:   `<agent handle="007"><Identity>James Bond</Identity><redacted/></agent>`,
 		MarshalOnly: true,
-	***REMOVED***,
-	***REMOVED***
-		Value: &SecretAgent***REMOVED***
+	},
+	{
+		Value: &SecretAgent{
 			Handle:    "007",
 			Identity:  "James Bond",
 			Obfuscate: "<Identity>James Bond</Identity><redacted/>",
-		***REMOVED***,
+		},
 		ExpectXML:     `<agent handle="007"><Identity>James Bond</Identity><redacted/></agent>`,
 		UnmarshalOnly: true,
-	***REMOVED***,
+	},
 
 	// Test structs
-	***REMOVED***Value: &Port***REMOVED***Type: "ssl", Number: "443"***REMOVED***, ExpectXML: `<port type="ssl">443</port>`***REMOVED***,
-	***REMOVED***Value: &Port***REMOVED***Number: "443"***REMOVED***, ExpectXML: `<port>443</port>`***REMOVED***,
-	***REMOVED***Value: &Port***REMOVED***Type: "<unix>"***REMOVED***, ExpectXML: `<port type="&lt;unix&gt;"></port>`***REMOVED***,
-	***REMOVED***Value: &Port***REMOVED***Number: "443", Comment: "https"***REMOVED***, ExpectXML: `<port><!--https-->443</port>`***REMOVED***,
-	***REMOVED***Value: &Port***REMOVED***Number: "443", Comment: "add space-"***REMOVED***, ExpectXML: `<port><!--add space- -->443</port>`, MarshalOnly: true***REMOVED***,
-	***REMOVED***Value: &Domain***REMOVED***Name: []byte("google.com&friends")***REMOVED***, ExpectXML: `<domain>google.com&amp;friends</domain>`***REMOVED***,
-	***REMOVED***Value: &Domain***REMOVED***Name: []byte("google.com"), Comment: []byte(" &friends ")***REMOVED***, ExpectXML: `<domain>google.com<!-- &friends --></domain>`***REMOVED***,
-	***REMOVED***Value: &Book***REMOVED***Title: "Pride & Prejudice"***REMOVED***, ExpectXML: `<book>Pride &amp; Prejudice</book>`***REMOVED***,
-	***REMOVED***Value: &Event***REMOVED***Year: -3114***REMOVED***, ExpectXML: `<event>-3114</event>`***REMOVED***,
-	***REMOVED***Value: &Movie***REMOVED***Length: 13440***REMOVED***, ExpectXML: `<movie>13440</movie>`***REMOVED***,
-	***REMOVED***Value: &Pi***REMOVED***Approximation: 3.14159265***REMOVED***, ExpectXML: `<pi>3.1415927</pi>`***REMOVED***,
-	***REMOVED***Value: &Universe***REMOVED***Visible: 9.3e13***REMOVED***, ExpectXML: `<universe>9.3e+13</universe>`***REMOVED***,
-	***REMOVED***Value: &Particle***REMOVED***HasMass: true***REMOVED***, ExpectXML: `<particle>true</particle>`***REMOVED***,
-	***REMOVED***Value: &Departure***REMOVED***When: ParseTime("2013-01-09T00:15:00-09:00")***REMOVED***, ExpectXML: `<departure>2013-01-09T00:15:00-09:00</departure>`***REMOVED***,
-	***REMOVED***Value: atomValue, ExpectXML: atomXml***REMOVED***,
-	***REMOVED***
-		Value: &Ship***REMOVED***
+	{Value: &Port{Type: "ssl", Number: "443"}, ExpectXML: `<port type="ssl">443</port>`},
+	{Value: &Port{Number: "443"}, ExpectXML: `<port>443</port>`},
+	{Value: &Port{Type: "<unix>"}, ExpectXML: `<port type="&lt;unix&gt;"></port>`},
+	{Value: &Port{Number: "443", Comment: "https"}, ExpectXML: `<port><!--https-->443</port>`},
+	{Value: &Port{Number: "443", Comment: "add space-"}, ExpectXML: `<port><!--add space- -->443</port>`, MarshalOnly: true},
+	{Value: &Domain{Name: []byte("google.com&friends")}, ExpectXML: `<domain>google.com&amp;friends</domain>`},
+	{Value: &Domain{Name: []byte("google.com"), Comment: []byte(" &friends ")}, ExpectXML: `<domain>google.com<!-- &friends --></domain>`},
+	{Value: &Book{Title: "Pride & Prejudice"}, ExpectXML: `<book>Pride &amp; Prejudice</book>`},
+	{Value: &Event{Year: -3114}, ExpectXML: `<event>-3114</event>`},
+	{Value: &Movie{Length: 13440}, ExpectXML: `<movie>13440</movie>`},
+	{Value: &Pi{Approximation: 3.14159265}, ExpectXML: `<pi>3.1415927</pi>`},
+	{Value: &Universe{Visible: 9.3e13}, ExpectXML: `<universe>9.3e+13</universe>`},
+	{Value: &Particle{HasMass: true}, ExpectXML: `<particle>true</particle>`},
+	{Value: &Departure{When: ParseTime("2013-01-09T00:15:00-09:00")}, ExpectXML: `<departure>2013-01-09T00:15:00-09:00</departure>`},
+	{Value: atomValue, ExpectXML: atomXml},
+	{
+		Value: &Ship{
 			Name:  "Heart of Gold",
 			Pilot: "Computer",
 			Age:   1,
 			Drive: ImprobabilityDrive,
-			Passenger: []*Passenger***REMOVED***
-				***REMOVED***
-					Name:   []string***REMOVED***"Zaphod", "Beeblebrox"***REMOVED***,
+			Passenger: []*Passenger{
+				{
+					Name:   []string{"Zaphod", "Beeblebrox"},
 					Weight: 7.25,
-				***REMOVED***,
-				***REMOVED***
-					Name:   []string***REMOVED***"Trisha", "McMillen"***REMOVED***,
+				},
+				{
+					Name:   []string{"Trisha", "McMillen"},
 					Weight: 5.5,
-				***REMOVED***,
-				***REMOVED***
-					Name:   []string***REMOVED***"Ford", "Prefect"***REMOVED***,
+				},
+				{
+					Name:   []string{"Ford", "Prefect"},
 					Weight: 7,
-				***REMOVED***,
-				***REMOVED***
-					Name:   []string***REMOVED***"Arthur", "Dent"***REMOVED***,
+				},
+				{
+					Name:   []string{"Arthur", "Dent"},
 					Weight: 6.75,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
+				},
+			},
+		},
 		ExpectXML: `<spaceship name="Heart of Gold" pilot="Computer">` +
 			`<drive>` + strconv.Itoa(int(ImprobabilityDrive)) + `</drive>` +
 			`<age>1</age>` +
@@ -571,43 +571,43 @@ var marshalTests = []struct ***REMOVED***
 			`<weight>6.75</weight>` +
 			`</passenger>` +
 			`</spaceship>`,
-	***REMOVED***,
+	},
 
 	// Test a>b
-	***REMOVED***
-		Value: &NestedItems***REMOVED***Items: nil, Item1: nil***REMOVED***,
+	{
+		Value: &NestedItems{Items: nil, Item1: nil},
 		ExpectXML: `<result>` +
 			`<Items>` +
 			`</Items>` +
 			`</result>`,
-	***REMOVED***,
-	***REMOVED***
-		Value: &NestedItems***REMOVED***Items: []string***REMOVED******REMOVED***, Item1: []string***REMOVED******REMOVED******REMOVED***,
+	},
+	{
+		Value: &NestedItems{Items: []string{}, Item1: []string{}},
 		ExpectXML: `<result>` +
 			`<Items>` +
 			`</Items>` +
 			`</result>`,
 		MarshalOnly: true,
-	***REMOVED***,
-	***REMOVED***
-		Value: &NestedItems***REMOVED***Items: nil, Item1: []string***REMOVED***"A"***REMOVED******REMOVED***,
+	},
+	{
+		Value: &NestedItems{Items: nil, Item1: []string{"A"}},
 		ExpectXML: `<result>` +
 			`<Items>` +
 			`<item1>A</item1>` +
 			`</Items>` +
 			`</result>`,
-	***REMOVED***,
-	***REMOVED***
-		Value: &NestedItems***REMOVED***Items: []string***REMOVED***"A", "B"***REMOVED***, Item1: nil***REMOVED***,
+	},
+	{
+		Value: &NestedItems{Items: []string{"A", "B"}, Item1: nil},
 		ExpectXML: `<result>` +
 			`<Items>` +
 			`<item>A</item>` +
 			`<item>B</item>` +
 			`</Items>` +
 			`</result>`,
-	***REMOVED***,
-	***REMOVED***
-		Value: &NestedItems***REMOVED***Items: []string***REMOVED***"A", "B"***REMOVED***, Item1: []string***REMOVED***"C"***REMOVED******REMOVED***,
+	},
+	{
+		Value: &NestedItems{Items: []string{"A", "B"}, Item1: []string{"C"}},
 		ExpectXML: `<result>` +
 			`<Items>` +
 			`<item>A</item>` +
@@ -615,9 +615,9 @@ var marshalTests = []struct ***REMOVED***
 			`<item1>C</item1>` +
 			`</Items>` +
 			`</result>`,
-	***REMOVED***,
-	***REMOVED***
-		Value: &NestedOrder***REMOVED***Field1: "C", Field2: "B", Field3: "A"***REMOVED***,
+	},
+	{
+		Value: &NestedOrder{Field1: "C", Field2: "B", Field3: "A"},
 		ExpectXML: `<result>` +
 			`<parent>` +
 			`<c>C</c>` +
@@ -625,19 +625,19 @@ var marshalTests = []struct ***REMOVED***
 			`<a>A</a>` +
 			`</parent>` +
 			`</result>`,
-	***REMOVED***,
-	***REMOVED***
-		Value: &NilTest***REMOVED***A: "A", B: nil, C: "C"***REMOVED***,
+	},
+	{
+		Value: &NilTest{A: "A", B: nil, C: "C"},
 		ExpectXML: `<NilTest>` +
 			`<parent1>` +
 			`<parent2><a>A</a></parent2>` +
 			`<parent2><c>C</c></parent2>` +
 			`</parent1>` +
 			`</NilTest>`,
-		MarshalOnly: true, // Uses interface***REMOVED******REMOVED***
-	***REMOVED***,
-	***REMOVED***
-		Value: &MixedNested***REMOVED***A: "A", B: "B", C: "C", D: "D"***REMOVED***,
+		MarshalOnly: true, // Uses interface{}
+	},
+	{
+		Value: &MixedNested{A: "A", B: "B", C: "C", D: "D"},
 		ExpectXML: `<result>` +
 			`<parent1><a>A</a></parent1>` +
 			`<b>B</b>` +
@@ -646,49 +646,49 @@ var marshalTests = []struct ***REMOVED***
 			`<d>D</d>` +
 			`</parent1>` +
 			`</result>`,
-	***REMOVED***,
-	***REMOVED***
-		Value:     &Service***REMOVED***Port: &Port***REMOVED***Number: "80"***REMOVED******REMOVED***,
+	},
+	{
+		Value:     &Service{Port: &Port{Number: "80"}},
 		ExpectXML: `<service><host><port>80</port></host></service>`,
-	***REMOVED***,
-	***REMOVED***
-		Value:     &Service***REMOVED******REMOVED***,
+	},
+	{
+		Value:     &Service{},
 		ExpectXML: `<service></service>`,
-	***REMOVED***,
-	***REMOVED***
-		Value: &Service***REMOVED***Port: &Port***REMOVED***Number: "80"***REMOVED***, Extra1: "A", Extra2: "B"***REMOVED***,
+	},
+	{
+		Value: &Service{Port: &Port{Number: "80"}, Extra1: "A", Extra2: "B"},
 		ExpectXML: `<service>` +
 			`<host><port>80</port></host>` +
 			`<Extra1>A</Extra1>` +
 			`<host><extra2>B</extra2></host>` +
 			`</service>`,
 		MarshalOnly: true,
-	***REMOVED***,
-	***REMOVED***
-		Value: &Service***REMOVED***Port: &Port***REMOVED***Number: "80"***REMOVED***, Extra2: "example"***REMOVED***,
+	},
+	{
+		Value: &Service{Port: &Port{Number: "80"}, Extra2: "example"},
 		ExpectXML: `<service>` +
 			`<host><port>80</port></host>` +
 			`<host><extra2>example</extra2></host>` +
 			`</service>`,
 		MarshalOnly: true,
-	***REMOVED***,
-	***REMOVED***
-		Value: &struct ***REMOVED***
-			XMLName struct***REMOVED******REMOVED*** `xml:"space top"`
+	},
+	{
+		Value: &struct {
+			XMLName struct{} `xml:"space top"`
 			A       string   `xml:"x>a"`
 			B       string   `xml:"x>b"`
 			C       string   `xml:"space x>c"`
 			C1      string   `xml:"space1 x>c"`
 			D1      string   `xml:"space1 x>d"`
 			E1      string   `xml:"x>e"`
-		***REMOVED******REMOVED***
+		}{
 			A:  "a",
 			B:  "b",
 			C:  "c",
 			C1: "c1",
 			D1: "d1",
 			E1: "e1",
-		***REMOVED***,
+		},
 		ExpectXML: `<top xmlns="space">` +
 			`<x><a>a</a><b>b</b><c>c</c></x>` +
 			`<x xmlns="space1">` +
@@ -699,26 +699,26 @@ var marshalTests = []struct ***REMOVED***
 			`<e>e1</e>` +
 			`</x>` +
 			`</top>`,
-	***REMOVED***,
-	***REMOVED***
-		Value: &struct ***REMOVED***
+	},
+	{
+		Value: &struct {
 			XMLName Name
 			A       string `xml:"x>a"`
 			B       string `xml:"x>b"`
 			C       string `xml:"space x>c"`
 			C1      string `xml:"space1 x>c"`
 			D1      string `xml:"space1 x>d"`
-		***REMOVED******REMOVED***
-			XMLName: Name***REMOVED***
+		}{
+			XMLName: Name{
 				Space: "space0",
 				Local: "top",
-			***REMOVED***,
+			},
 			A:  "a",
 			B:  "b",
 			C:  "c",
 			C1: "c1",
 			D1: "d1",
-		***REMOVED***,
+		},
 		ExpectXML: `<top xmlns="space0">` +
 			`<x><a>a</a><b>b</b></x>` +
 			`<x xmlns="space"><c>c</c></x>` +
@@ -727,42 +727,42 @@ var marshalTests = []struct ***REMOVED***
 			`<d>d1</d>` +
 			`</x>` +
 			`</top>`,
-	***REMOVED***,
-	***REMOVED***
-		Value: &struct ***REMOVED***
-			XMLName struct***REMOVED******REMOVED*** `xml:"top"`
+	},
+	{
+		Value: &struct {
+			XMLName struct{} `xml:"top"`
 			B       string   `xml:"space x>b"`
 			B1      string   `xml:"space1 x>b"`
-		***REMOVED******REMOVED***
+		}{
 			B:  "b",
 			B1: "b1",
-		***REMOVED***,
+		},
 		ExpectXML: `<top>` +
 			`<x xmlns="space"><b>b</b></x>` +
 			`<x xmlns="space1"><b>b1</b></x>` +
 			`</top>`,
-	***REMOVED***,
+	},
 
 	// Test struct embedding
-	***REMOVED***
-		Value: &EmbedA***REMOVED***
-			EmbedC: EmbedC***REMOVED***
+	{
+		Value: &EmbedA{
+			EmbedC: EmbedC{
 				FieldA1: "", // Shadowed by A.A
 				FieldA2: "", // Shadowed by A.A
 				FieldB:  "A.C.B",
 				FieldC:  "A.C.C",
-			***REMOVED***,
-			EmbedB: EmbedB***REMOVED***
+			},
+			EmbedB: EmbedB{
 				FieldB: "A.B.B",
-				EmbedC: &EmbedC***REMOVED***
+				EmbedC: &EmbedC{
 					FieldA1: "A.B.C.A1",
 					FieldA2: "A.B.C.A2",
 					FieldB:  "", // Shadowed by A.B.B
 					FieldC:  "A.B.C.C",
-				***REMOVED***,
-			***REMOVED***,
+				},
+			},
 			FieldA: "A.A",
-		***REMOVED***,
+		},
 		ExpectXML: `<EmbedA>` +
 			`<FieldB>A.C.B</FieldB>` +
 			`<FieldC>A.C.C</FieldC>` +
@@ -776,22 +776,22 @@ var marshalTests = []struct ***REMOVED***
 			`</EmbedB>` +
 			`<FieldA>A.A</FieldA>` +
 			`</EmbedA>`,
-	***REMOVED***,
+	},
 
 	// Test that name casing matters
-	***REMOVED***
-		Value:     &NameCasing***REMOVED***Xy: "mixed", XY: "upper", XyA: "mixedA", XYA: "upperA"***REMOVED***,
+	{
+		Value:     &NameCasing{Xy: "mixed", XY: "upper", XyA: "mixedA", XYA: "upperA"},
 		ExpectXML: `<casing Xy="mixedA" XY="upperA"><Xy>mixed</Xy><XY>upper</XY></casing>`,
-	***REMOVED***,
+	},
 
 	// Test the order in which the XML element name is chosen
-	***REMOVED***
-		Value: &NamePrecedence***REMOVED***
-			FromTag:     XMLNameWithoutTag***REMOVED***Value: "A"***REMOVED***,
-			FromNameVal: XMLNameWithoutTag***REMOVED***XMLName: Name***REMOVED***Local: "InXMLName"***REMOVED***, Value: "B"***REMOVED***,
-			FromNameTag: XMLNameWithTag***REMOVED***Value: "C"***REMOVED***,
+	{
+		Value: &NamePrecedence{
+			FromTag:     XMLNameWithoutTag{Value: "A"},
+			FromNameVal: XMLNameWithoutTag{XMLName: Name{Local: "InXMLName"}, Value: "B"},
+			FromNameTag: XMLNameWithTag{Value: "C"},
 			InFieldName: "D",
-		***REMOVED***,
+		},
 		ExpectXML: `<Parent>` +
 			`<InTag>A</InTag>` +
 			`<InXMLName>B</InXMLName>` +
@@ -799,15 +799,15 @@ var marshalTests = []struct ***REMOVED***
 			`<InFieldName>D</InFieldName>` +
 			`</Parent>`,
 		MarshalOnly: true,
-	***REMOVED***,
-	***REMOVED***
-		Value: &NamePrecedence***REMOVED***
-			XMLName:     Name***REMOVED***Local: "Parent"***REMOVED***,
-			FromTag:     XMLNameWithoutTag***REMOVED***XMLName: Name***REMOVED***Local: "InTag"***REMOVED***, Value: "A"***REMOVED***,
-			FromNameVal: XMLNameWithoutTag***REMOVED***XMLName: Name***REMOVED***Local: "FromNameVal"***REMOVED***, Value: "B"***REMOVED***,
-			FromNameTag: XMLNameWithTag***REMOVED***XMLName: Name***REMOVED***Local: "InXMLNameTag"***REMOVED***, Value: "C"***REMOVED***,
+	},
+	{
+		Value: &NamePrecedence{
+			XMLName:     Name{Local: "Parent"},
+			FromTag:     XMLNameWithoutTag{XMLName: Name{Local: "InTag"}, Value: "A"},
+			FromNameVal: XMLNameWithoutTag{XMLName: Name{Local: "FromNameVal"}, Value: "B"},
+			FromNameTag: XMLNameWithTag{XMLName: Name{Local: "InXMLNameTag"}, Value: "C"},
 			InFieldName: "D",
-		***REMOVED***,
+		},
 		ExpectXML: `<Parent>` +
 			`<InTag>A</InTag>` +
 			`<FromNameVal>B</FromNameVal>` +
@@ -815,29 +815,29 @@ var marshalTests = []struct ***REMOVED***
 			`<InFieldName>D</InFieldName>` +
 			`</Parent>`,
 		UnmarshalOnly: true,
-	***REMOVED***,
+	},
 
 	// xml.Name works in a plain field as well.
-	***REMOVED***
-		Value:     &NameInField***REMOVED***Name***REMOVED***Space: "ns", Local: "foo"***REMOVED******REMOVED***,
+	{
+		Value:     &NameInField{Name{Space: "ns", Local: "foo"}},
 		ExpectXML: `<NameInField><foo xmlns="ns"></foo></NameInField>`,
-	***REMOVED***,
-	***REMOVED***
-		Value:         &NameInField***REMOVED***Name***REMOVED***Space: "ns", Local: "foo"***REMOVED******REMOVED***,
+	},
+	{
+		Value:         &NameInField{Name{Space: "ns", Local: "foo"}},
 		ExpectXML:     `<NameInField><foo xmlns="ns"><ignore></ignore></foo></NameInField>`,
 		UnmarshalOnly: true,
-	***REMOVED***,
+	},
 
 	// Marshaling zero xml.Name uses the tag or field name.
-	***REMOVED***
-		Value:       &NameInField***REMOVED******REMOVED***,
+	{
+		Value:       &NameInField{},
 		ExpectXML:   `<NameInField><foo xmlns="ns"></foo></NameInField>`,
 		MarshalOnly: true,
-	***REMOVED***,
+	},
 
 	// Test attributes
-	***REMOVED***
-		Value: &AttrTest***REMOVED***
+	{
+		Value: &AttrTest{
 			Int:   8,
 			Named: 9,
 			Float: 23.5,
@@ -845,17 +845,17 @@ var marshalTests = []struct ***REMOVED***
 			Bool:  true,
 			Str:   "str",
 			Bytes: []byte("byt"),
-		***REMOVED***,
+		},
 		ExpectXML: `<AttrTest Int="8" int="9" Float="23.5" Uint8="255"` +
 			` Bool="true" Str="str" Bytes="byt"></AttrTest>`,
-	***REMOVED***,
-	***REMOVED***
-		Value: &AttrTest***REMOVED***Bytes: []byte***REMOVED******REMOVED******REMOVED***,
+	},
+	{
+		Value: &AttrTest{Bytes: []byte{}},
 		ExpectXML: `<AttrTest Int="0" int="0" Float="0" Uint8="0"` +
 			` Bool="false" Str="" Bytes=""></AttrTest>`,
-	***REMOVED***,
-	***REMOVED***
-		Value: &OmitAttrTest***REMOVED***
+	},
+	{
+		Value: &OmitAttrTest{
 			Int:   8,
 			Named: 9,
 			Float: 23.5,
@@ -863,32 +863,32 @@ var marshalTests = []struct ***REMOVED***
 			Bool:  true,
 			Str:   "str",
 			Bytes: []byte("byt"),
-		***REMOVED***,
+		},
 		ExpectXML: `<OmitAttrTest Int="8" int="9" Float="23.5" Uint8="255"` +
 			` Bool="true" Str="str" Bytes="byt"></OmitAttrTest>`,
-	***REMOVED***,
-	***REMOVED***
-		Value:     &OmitAttrTest***REMOVED******REMOVED***,
+	},
+	{
+		Value:     &OmitAttrTest{},
 		ExpectXML: `<OmitAttrTest></OmitAttrTest>`,
-	***REMOVED***,
+	},
 
 	// pointer fields
-	***REMOVED***
-		Value:       &PointerFieldsTest***REMOVED***Name: &nameAttr, Age: &ageAttr, Contents: &contentsAttr***REMOVED***,
+	{
+		Value:       &PointerFieldsTest{Name: &nameAttr, Age: &ageAttr, Contents: &contentsAttr},
 		ExpectXML:   `<dummy name="Sarah" age="12">lorem ipsum</dummy>`,
 		MarshalOnly: true,
-	***REMOVED***,
+	},
 
 	// empty chardata pointer field
-	***REMOVED***
-		Value:       &ChardataEmptyTest***REMOVED******REMOVED***,
+	{
+		Value:       &ChardataEmptyTest{},
 		ExpectXML:   `<test></test>`,
 		MarshalOnly: true,
-	***REMOVED***,
+	},
 
 	// omitempty on fields
-	***REMOVED***
-		Value: &OmitFieldTest***REMOVED***
+	{
+		Value: &OmitFieldTest{
 			Int:   8,
 			Named: 9,
 			Float: 23.5,
@@ -896,8 +896,8 @@ var marshalTests = []struct ***REMOVED***
 			Bool:  true,
 			Str:   "str",
 			Bytes: []byte("byt"),
-			Ptr:   &PresenceTest***REMOVED******REMOVED***,
-		***REMOVED***,
+			Ptr:   &PresenceTest{},
+		},
 		ExpectXML: `<OmitFieldTest>` +
 			`<Int>8</Int>` +
 			`<int>9</int>` +
@@ -908,901 +908,901 @@ var marshalTests = []struct ***REMOVED***
 			`<Bytes>byt</Bytes>` +
 			`<Ptr></Ptr>` +
 			`</OmitFieldTest>`,
-	***REMOVED***,
-	***REMOVED***
-		Value:     &OmitFieldTest***REMOVED******REMOVED***,
+	},
+	{
+		Value:     &OmitFieldTest{},
 		ExpectXML: `<OmitFieldTest></OmitFieldTest>`,
-	***REMOVED***,
+	},
 
 	// Test ",any"
-	***REMOVED***
+	{
 		ExpectXML: `<a><nested><value>known</value></nested><other><sub>unknown</sub></other></a>`,
-		Value: &AnyTest***REMOVED***
+		Value: &AnyTest{
 			Nested: "known",
-			AnyField: AnyHolder***REMOVED***
-				XMLName: Name***REMOVED***Local: "other"***REMOVED***,
+			AnyField: AnyHolder{
+				XMLName: Name{Local: "other"},
 				XML:     "<sub>unknown</sub>",
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***,
-	***REMOVED***
-		Value: &AnyTest***REMOVED***Nested: "known",
-			AnyField: AnyHolder***REMOVED***
+			},
+		},
+	},
+	{
+		Value: &AnyTest{Nested: "known",
+			AnyField: AnyHolder{
 				XML:     "<unknown/>",
-				XMLName: Name***REMOVED***Local: "AnyField"***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
+				XMLName: Name{Local: "AnyField"},
+			},
+		},
 		ExpectXML: `<a><nested><value>known</value></nested><AnyField><unknown/></AnyField></a>`,
-	***REMOVED***,
-	***REMOVED***
+	},
+	{
 		ExpectXML: `<a><nested><value>b</value></nested></a>`,
-		Value: &AnyOmitTest***REMOVED***
+		Value: &AnyOmitTest{
 			Nested: "b",
-		***REMOVED***,
-	***REMOVED***,
-	***REMOVED***
+		},
+	},
+	{
 		ExpectXML: `<a><nested><value>b</value></nested><c><d>e</d></c><g xmlns="f"><h>i</h></g></a>`,
-		Value: &AnySliceTest***REMOVED***
+		Value: &AnySliceTest{
 			Nested: "b",
-			AnyField: []AnyHolder***REMOVED***
-				***REMOVED***
-					XMLName: Name***REMOVED***Local: "c"***REMOVED***,
+			AnyField: []AnyHolder{
+				{
+					XMLName: Name{Local: "c"},
 					XML:     "<d>e</d>",
-				***REMOVED***,
-				***REMOVED***
-					XMLName: Name***REMOVED***Space: "f", Local: "g"***REMOVED***,
+				},
+				{
+					XMLName: Name{Space: "f", Local: "g"},
 					XML:     "<h>i</h>",
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***,
-	***REMOVED***
+				},
+			},
+		},
+	},
+	{
 		ExpectXML: `<a><nested><value>b</value></nested></a>`,
-		Value: &AnySliceTest***REMOVED***
+		Value: &AnySliceTest{
 			Nested: "b",
-		***REMOVED***,
-	***REMOVED***,
+		},
+	},
 
 	// Test recursive types.
-	***REMOVED***
-		Value: &RecurseA***REMOVED***
+	{
+		Value: &RecurseA{
 			A: "a1",
-			B: &RecurseB***REMOVED***
-				A: &RecurseA***REMOVED***"a2", nil***REMOVED***,
+			B: &RecurseB{
+				A: &RecurseA{"a2", nil},
 				B: "b1",
-			***REMOVED***,
-		***REMOVED***,
+			},
+		},
 		ExpectXML: `<RecurseA><A>a1</A><B><A><A>a2</A></A><B>b1</B></B></RecurseA>`,
-	***REMOVED***,
+	},
 
 	// Test ignoring fields via "-" tag
-	***REMOVED***
+	{
 		ExpectXML: `<IgnoreTest></IgnoreTest>`,
-		Value:     &IgnoreTest***REMOVED******REMOVED***,
-	***REMOVED***,
-	***REMOVED***
+		Value:     &IgnoreTest{},
+	},
+	{
 		ExpectXML:   `<IgnoreTest></IgnoreTest>`,
-		Value:       &IgnoreTest***REMOVED***PublicSecret: "can't tell"***REMOVED***,
+		Value:       &IgnoreTest{PublicSecret: "can't tell"},
 		MarshalOnly: true,
-	***REMOVED***,
-	***REMOVED***
+	},
+	{
 		ExpectXML:     `<IgnoreTest><PublicSecret>ignore me</PublicSecret></IgnoreTest>`,
-		Value:         &IgnoreTest***REMOVED******REMOVED***,
+		Value:         &IgnoreTest{},
 		UnmarshalOnly: true,
-	***REMOVED***,
+	},
 
 	// Test escaping.
-	***REMOVED***
+	{
 		ExpectXML: `<a><nested><value>dquote: &#34;; squote: &#39;; ampersand: &amp;; less: &lt;; greater: &gt;;</value></nested><empty></empty></a>`,
-		Value: &AnyTest***REMOVED***
+		Value: &AnyTest{
 			Nested:   `dquote: "; squote: '; ampersand: &; less: <; greater: >;`,
-			AnyField: AnyHolder***REMOVED***XMLName: Name***REMOVED***Local: "empty"***REMOVED******REMOVED***,
-		***REMOVED***,
-	***REMOVED***,
-	***REMOVED***
+			AnyField: AnyHolder{XMLName: Name{Local: "empty"}},
+		},
+	},
+	{
 		ExpectXML: `<a><nested><value>newline: &#xA;; cr: &#xD;; tab: &#x9;;</value></nested><AnyField></AnyField></a>`,
-		Value: &AnyTest***REMOVED***
+		Value: &AnyTest{
 			Nested:   "newline: \n; cr: \r; tab: \t;",
-			AnyField: AnyHolder***REMOVED***XMLName: Name***REMOVED***Local: "AnyField"***REMOVED******REMOVED***,
-		***REMOVED***,
-	***REMOVED***,
-	***REMOVED***
+			AnyField: AnyHolder{XMLName: Name{Local: "AnyField"}},
+		},
+	},
+	{
 		ExpectXML: "<a><nested><value>1\r2\r\n3\n\r4\n5</value></nested></a>",
-		Value: &AnyTest***REMOVED***
+		Value: &AnyTest{
 			Nested: "1\n2\n3\n\n4\n5",
-		***REMOVED***,
+		},
 		UnmarshalOnly: true,
-	***REMOVED***,
-	***REMOVED***
+	},
+	{
 		ExpectXML: `<EmbedInt><MyInt>42</MyInt></EmbedInt>`,
-		Value: &EmbedInt***REMOVED***
+		Value: &EmbedInt{
 			MyInt: 42,
-		***REMOVED***,
-	***REMOVED***,
+		},
+	},
 	// Test omitempty with parent chain; see golang.org/issue/4168.
-	***REMOVED***
+	{
 		ExpectXML: `<Strings><A></A></Strings>`,
-		Value:     &Strings***REMOVED******REMOVED***,
-	***REMOVED***,
+		Value:     &Strings{},
+	},
 	// Custom marshalers.
-	***REMOVED***
+	{
 		ExpectXML: `<MyMarshalerTest>hello world</MyMarshalerTest>`,
-		Value:     &MyMarshalerTest***REMOVED******REMOVED***,
-	***REMOVED***,
-	***REMOVED***
+		Value:     &MyMarshalerTest{},
+	},
+	{
 		ExpectXML: `<MarshalerStruct Foo="hello world"></MarshalerStruct>`,
-		Value:     &MarshalerStruct***REMOVED******REMOVED***,
-	***REMOVED***,
-	***REMOVED***
+		Value:     &MarshalerStruct{},
+	},
+	{
 		ExpectXML: `<MarshalerValueStruct Foo="hello world"></MarshalerValueStruct>`,
-		Value:     &MarshalerValueStruct***REMOVED******REMOVED***,
-	***REMOVED***,
-	***REMOVED***
+		Value:     &MarshalerValueStruct{},
+	},
+	{
 		ExpectXML: `<outer xmlns="testns" int="10"></outer>`,
-		Value:     &OuterStruct***REMOVED***IntAttr: 10***REMOVED***,
-	***REMOVED***,
-	***REMOVED***
+		Value:     &OuterStruct{IntAttr: 10},
+	},
+	{
 		ExpectXML: `<test xmlns="outerns" int="10"></test>`,
-		Value:     &OuterNamedStruct***REMOVED***XMLName: Name***REMOVED***Space: "outerns", Local: "test"***REMOVED***, IntAttr: 10***REMOVED***,
-	***REMOVED***,
-	***REMOVED***
+		Value:     &OuterNamedStruct{XMLName: Name{Space: "outerns", Local: "test"}, IntAttr: 10},
+	},
+	{
 		ExpectXML: `<test xmlns="outerns" int="10"></test>`,
-		Value:     &OuterNamedOrderedStruct***REMOVED***XMLName: Name***REMOVED***Space: "outerns", Local: "test"***REMOVED***, IntAttr: 10***REMOVED***,
-	***REMOVED***,
-	***REMOVED***
+		Value:     &OuterNamedOrderedStruct{XMLName: Name{Space: "outerns", Local: "test"}, IntAttr: 10},
+	},
+	{
 		ExpectXML: `<outer xmlns="testns" int="10"></outer>`,
-		Value:     &OuterOuterStruct***REMOVED***OuterStruct***REMOVED***IntAttr: 10***REMOVED******REMOVED***,
-	***REMOVED***,
-	***REMOVED***
+		Value:     &OuterOuterStruct{OuterStruct{IntAttr: 10}},
+	},
+	{
 		ExpectXML: `<NestedAndChardata><A><B></B><B></B></A>test</NestedAndChardata>`,
-		Value:     &NestedAndChardata***REMOVED***AB: make([]string, 2), Chardata: "test"***REMOVED***,
-	***REMOVED***,
-	***REMOVED***
+		Value:     &NestedAndChardata{AB: make([]string, 2), Chardata: "test"},
+	},
+	{
 		ExpectXML: `<NestedAndComment><A><B></B><B></B></A><!--test--></NestedAndComment>`,
-		Value:     &NestedAndComment***REMOVED***AB: make([]string, 2), Comment: "test"***REMOVED***,
-	***REMOVED***,
-	***REMOVED***
+		Value:     &NestedAndComment{AB: make([]string, 2), Comment: "test"},
+	},
+	{
 		ExpectXML: `<XMLNSFieldStruct xmlns="http://example.com/ns"><Body>hello world</Body></XMLNSFieldStruct>`,
-		Value:     &XMLNSFieldStruct***REMOVED***Ns: "http://example.com/ns", Body: "hello world"***REMOVED***,
-	***REMOVED***,
-	***REMOVED***
+		Value:     &XMLNSFieldStruct{Ns: "http://example.com/ns", Body: "hello world"},
+	},
+	{
 		ExpectXML: `<testns:test xmlns:testns="testns" xmlns="http://example.com/ns"><Body>hello world</Body></testns:test>`,
-		Value:     &NamedXMLNSFieldStruct***REMOVED***Ns: "http://example.com/ns", Body: "hello world"***REMOVED***,
-	***REMOVED***,
-	***REMOVED***
+		Value:     &NamedXMLNSFieldStruct{Ns: "http://example.com/ns", Body: "hello world"},
+	},
+	{
 		ExpectXML: `<testns:test xmlns:testns="testns"><Body>hello world</Body></testns:test>`,
-		Value:     &NamedXMLNSFieldStruct***REMOVED***Ns: "", Body: "hello world"***REMOVED***,
-	***REMOVED***,
-	***REMOVED***
+		Value:     &NamedXMLNSFieldStruct{Ns: "", Body: "hello world"},
+	},
+	{
 		ExpectXML: `<XMLNSFieldStructWithOmitEmpty><Body>hello world</Body></XMLNSFieldStructWithOmitEmpty>`,
-		Value:     &XMLNSFieldStructWithOmitEmpty***REMOVED***Body: "hello world"***REMOVED***,
-	***REMOVED***,
-	***REMOVED***
+		Value:     &XMLNSFieldStructWithOmitEmpty{Body: "hello world"},
+	},
+	{
 		// The xmlns attribute must be ignored because the <test>
 		// element is in the empty namespace, so it's not possible
 		// to set the default namespace to something non-empty.
 		ExpectXML:   `<test><Body>hello world</Body></test>`,
-		Value:       &NamedXMLNSFieldStructWithEmptyNamespace***REMOVED***Ns: "foo", Body: "hello world"***REMOVED***,
+		Value:       &NamedXMLNSFieldStructWithEmptyNamespace{Ns: "foo", Body: "hello world"},
 		MarshalOnly: true,
-	***REMOVED***,
-	***REMOVED***
+	},
+	{
 		ExpectXML: `<RecursiveXMLNSFieldStruct xmlns="foo"><Body xmlns=""><Text>hello world</Text></Body></RecursiveXMLNSFieldStruct>`,
-		Value: &RecursiveXMLNSFieldStruct***REMOVED***
+		Value: &RecursiveXMLNSFieldStruct{
 			Ns: "foo",
-			Body: &RecursiveXMLNSFieldStruct***REMOVED***
+			Body: &RecursiveXMLNSFieldStruct{
 				Text: "hello world",
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***,
-***REMOVED***
+			},
+		},
+	},
+}
 
-func TestMarshal(t *testing.T) ***REMOVED***
-	for idx, test := range marshalTests ***REMOVED***
-		if test.UnmarshalOnly ***REMOVED***
+func TestMarshal(t *testing.T) {
+	for idx, test := range marshalTests {
+		if test.UnmarshalOnly {
 			continue
-		***REMOVED***
+		}
 		data, err := Marshal(test.Value)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Errorf("#%d: marshal(%#v): %s", idx, test.Value, err)
 			continue
-		***REMOVED***
-		if got, want := string(data), test.ExpectXML; got != want ***REMOVED***
-			if strings.Contains(want, "\n") ***REMOVED***
+		}
+		if got, want := string(data), test.ExpectXML; got != want {
+			if strings.Contains(want, "\n") {
 				t.Errorf("#%d: marshal(%#v):\nHAVE:\n%s\nWANT:\n%s", idx, test.Value, got, want)
-			***REMOVED*** else ***REMOVED***
+			} else {
 				t.Errorf("#%d: marshal(%#v):\nhave %#q\nwant %#q", idx, test.Value, got, want)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}
 
-type AttrParent struct ***REMOVED***
+type AttrParent struct {
 	X string `xml:"X>Y,attr"`
-***REMOVED***
+}
 
-type BadAttr struct ***REMOVED***
+type BadAttr struct {
 	Name []string `xml:"name,attr"`
-***REMOVED***
+}
 
-var marshalErrorTests = []struct ***REMOVED***
-	Value interface***REMOVED******REMOVED***
+var marshalErrorTests = []struct {
+	Value interface{}
 	Err   string
 	Kind  reflect.Kind
-***REMOVED******REMOVED***
-	***REMOVED***
+}{
+	{
 		Value: make(chan bool),
 		Err:   "xml: unsupported type: chan bool",
 		Kind:  reflect.Chan,
-	***REMOVED***,
-	***REMOVED***
-		Value: map[string]string***REMOVED***
+	},
+	{
+		Value: map[string]string{
 			"question": "What do you get when you multiply six by nine?",
 			"answer":   "42",
-		***REMOVED***,
+		},
 		Err:  "xml: unsupported type: map[string]string",
 		Kind: reflect.Map,
-	***REMOVED***,
-	***REMOVED***
-		Value: map[*Ship]bool***REMOVED***nil: false***REMOVED***,
+	},
+	{
+		Value: map[*Ship]bool{nil: false},
 		Err:   "xml: unsupported type: map[*xml.Ship]bool",
 		Kind:  reflect.Map,
-	***REMOVED***,
-	***REMOVED***
-		Value: &Domain***REMOVED***Comment: []byte("f--bar")***REMOVED***,
+	},
+	{
+		Value: &Domain{Comment: []byte("f--bar")},
 		Err:   `xml: comments must not contain "--"`,
-	***REMOVED***,
+	},
 	// Reject parent chain with attr, never worked; see golang.org/issue/5033.
-	***REMOVED***
-		Value: &AttrParent***REMOVED******REMOVED***,
+	{
+		Value: &AttrParent{},
 		Err:   `xml: X>Y chain not valid with attr flag`,
-	***REMOVED***,
-	***REMOVED***
-		Value: BadAttr***REMOVED***[]string***REMOVED***"X", "Y"***REMOVED******REMOVED***,
+	},
+	{
+		Value: BadAttr{[]string{"X", "Y"}},
 		Err:   `xml: unsupported type: []string`,
-	***REMOVED***,
-***REMOVED***
+	},
+}
 
-var marshalIndentTests = []struct ***REMOVED***
-	Value     interface***REMOVED******REMOVED***
+var marshalIndentTests = []struct {
+	Value     interface{}
 	Prefix    string
 	Indent    string
 	ExpectXML string
-***REMOVED******REMOVED***
-	***REMOVED***
-		Value: &SecretAgent***REMOVED***
+}{
+	{
+		Value: &SecretAgent{
 			Handle:    "007",
 			Identity:  "James Bond",
 			Obfuscate: "<redacted/>",
-		***REMOVED***,
+		},
 		Prefix:    "",
 		Indent:    "\t",
 		ExpectXML: fmt.Sprintf("<agent handle=\"007\">\n\t<Identity>James Bond</Identity><redacted/>\n</agent>"),
-	***REMOVED***,
-***REMOVED***
+	},
+}
 
-func TestMarshalErrors(t *testing.T) ***REMOVED***
-	for idx, test := range marshalErrorTests ***REMOVED***
+func TestMarshalErrors(t *testing.T) {
+	for idx, test := range marshalErrorTests {
 		data, err := Marshal(test.Value)
-		if err == nil ***REMOVED***
+		if err == nil {
 			t.Errorf("#%d: marshal(%#v) = [success] %q, want error %v", idx, test.Value, data, test.Err)
 			continue
-		***REMOVED***
-		if err.Error() != test.Err ***REMOVED***
+		}
+		if err.Error() != test.Err {
 			t.Errorf("#%d: marshal(%#v) = [error] %v, want %v", idx, test.Value, err, test.Err)
-		***REMOVED***
-		if test.Kind != reflect.Invalid ***REMOVED***
-			if kind := err.(*UnsupportedTypeError).Type.Kind(); kind != test.Kind ***REMOVED***
+		}
+		if test.Kind != reflect.Invalid {
+			if kind := err.(*UnsupportedTypeError).Type.Kind(); kind != test.Kind {
 				t.Errorf("#%d: marshal(%#v) = [error kind] %s, want %s", idx, test.Value, kind, test.Kind)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}
 
 // Do invertibility testing on the various structures that we test
-func TestUnmarshal(t *testing.T) ***REMOVED***
-	for i, test := range marshalTests ***REMOVED***
-		if test.MarshalOnly ***REMOVED***
+func TestUnmarshal(t *testing.T) {
+	for i, test := range marshalTests {
+		if test.MarshalOnly {
 			continue
-		***REMOVED***
-		if _, ok := test.Value.(*Plain); ok ***REMOVED***
+		}
+		if _, ok := test.Value.(*Plain); ok {
 			continue
-		***REMOVED***
+		}
 		vt := reflect.TypeOf(test.Value)
 		dest := reflect.New(vt.Elem()).Interface()
 		err := Unmarshal([]byte(test.ExpectXML), dest)
 
-		switch fix := dest.(type) ***REMOVED***
+		switch fix := dest.(type) {
 		case *Feed:
 			fix.Author.InnerXML = ""
-			for i := range fix.Entry ***REMOVED***
+			for i := range fix.Entry {
 				fix.Entry[i].Author.InnerXML = ""
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Errorf("#%d: unexpected error: %#v", i, err)
-		***REMOVED*** else if got, want := dest, test.Value; !reflect.DeepEqual(got, want) ***REMOVED***
+		} else if got, want := dest, test.Value; !reflect.DeepEqual(got, want) {
 			t.Errorf("#%d: unmarshal(%q):\nhave %#v\nwant %#v", i, test.ExpectXML, got, want)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestMarshalIndent(t *testing.T) ***REMOVED***
-	for i, test := range marshalIndentTests ***REMOVED***
+func TestMarshalIndent(t *testing.T) {
+	for i, test := range marshalIndentTests {
 		data, err := MarshalIndent(test.Value, test.Prefix, test.Indent)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Errorf("#%d: Error: %s", i, err)
 			continue
-		***REMOVED***
-		if got, want := string(data), test.ExpectXML; got != want ***REMOVED***
+		}
+		if got, want := string(data), test.ExpectXML; got != want {
 			t.Errorf("#%d: MarshalIndent:\nGot:%s\nWant:\n%s", i, got, want)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-type limitedBytesWriter struct ***REMOVED***
+type limitedBytesWriter struct {
 	w      io.Writer
 	remain int // until writes fail
-***REMOVED***
+}
 
-func (lw *limitedBytesWriter) Write(p []byte) (n int, err error) ***REMOVED***
-	if lw.remain <= 0 ***REMOVED***
+func (lw *limitedBytesWriter) Write(p []byte) (n int, err error) {
+	if lw.remain <= 0 {
 		println("error")
 		return 0, errors.New("write limit hit")
-	***REMOVED***
-	if len(p) > lw.remain ***REMOVED***
+	}
+	if len(p) > lw.remain {
 		p = p[:lw.remain]
 		n, _ = lw.w.Write(p)
 		lw.remain = 0
 		return n, errors.New("write limit hit")
-	***REMOVED***
+	}
 	n, err = lw.w.Write(p)
 	lw.remain -= n
 	return n, err
-***REMOVED***
+}
 
-func TestMarshalWriteErrors(t *testing.T) ***REMOVED***
+func TestMarshalWriteErrors(t *testing.T) {
 	var buf bytes.Buffer
 	const writeCap = 1024
-	w := &limitedBytesWriter***REMOVED***&buf, writeCap***REMOVED***
+	w := &limitedBytesWriter{&buf, writeCap}
 	enc := NewEncoder(w)
 	var err error
 	var i int
 	const n = 4000
-	for i = 1; i <= n; i++ ***REMOVED***
-		err = enc.Encode(&Passenger***REMOVED***
-			Name:   []string***REMOVED***"Alice", "Bob"***REMOVED***,
+	for i = 1; i <= n; i++ {
+		err = enc.Encode(&Passenger{
+			Name:   []string{"Alice", "Bob"},
 			Weight: 5,
-		***REMOVED***)
-		if err != nil ***REMOVED***
+		})
+		if err != nil {
 			break
-		***REMOVED***
-	***REMOVED***
-	if err == nil ***REMOVED***
+		}
+	}
+	if err == nil {
 		t.Error("expected an error")
-	***REMOVED***
-	if i == n ***REMOVED***
+	}
+	if i == n {
 		t.Errorf("expected to fail before the end")
-	***REMOVED***
-	if buf.Len() != writeCap ***REMOVED***
+	}
+	if buf.Len() != writeCap {
 		t.Errorf("buf.Len() = %d; want %d", buf.Len(), writeCap)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestMarshalWriteIOErrors(t *testing.T) ***REMOVED***
-	enc := NewEncoder(errWriter***REMOVED******REMOVED***)
+func TestMarshalWriteIOErrors(t *testing.T) {
+	enc := NewEncoder(errWriter{})
 
 	expectErr := "unwritable"
-	err := enc.Encode(&Passenger***REMOVED******REMOVED***)
-	if err == nil || err.Error() != expectErr ***REMOVED***
+	err := enc.Encode(&Passenger{})
+	if err == nil || err.Error() != expectErr {
 		t.Errorf("EscapeTest = [error] %v, want %v", err, expectErr)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestMarshalFlush(t *testing.T) ***REMOVED***
+func TestMarshalFlush(t *testing.T) {
 	var buf bytes.Buffer
 	enc := NewEncoder(&buf)
-	if err := enc.EncodeToken(CharData("hello world")); err != nil ***REMOVED***
+	if err := enc.EncodeToken(CharData("hello world")); err != nil {
 		t.Fatalf("enc.EncodeToken: %v", err)
-	***REMOVED***
-	if buf.Len() > 0 ***REMOVED***
+	}
+	if buf.Len() > 0 {
 		t.Fatalf("enc.EncodeToken caused actual write: %q", buf.Bytes())
-	***REMOVED***
-	if err := enc.Flush(); err != nil ***REMOVED***
+	}
+	if err := enc.Flush(); err != nil {
 		t.Fatalf("enc.Flush: %v", err)
-	***REMOVED***
-	if buf.String() != "hello world" ***REMOVED***
+	}
+	if buf.String() != "hello world" {
 		t.Fatalf("after enc.Flush, buf.String() = %q, want %q", buf.String(), "hello world")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-var encodeElementTests = []struct ***REMOVED***
+var encodeElementTests = []struct {
 	desc      string
-	value     interface***REMOVED******REMOVED***
+	value     interface{}
 	start     StartElement
 	expectXML string
-***REMOVED******REMOVED******REMOVED***
+}{{
 	desc:  "simple string",
 	value: "hello",
-	start: StartElement***REMOVED***
-		Name: Name***REMOVED***Local: "a"***REMOVED***,
-	***REMOVED***,
+	start: StartElement{
+		Name: Name{Local: "a"},
+	},
 	expectXML: `<a>hello</a>`,
-***REMOVED***, ***REMOVED***
+}, {
 	desc:  "string with added attributes",
 	value: "hello",
-	start: StartElement***REMOVED***
-		Name: Name***REMOVED***Local: "a"***REMOVED***,
-		Attr: []Attr***REMOVED******REMOVED***
-			Name:  Name***REMOVED***Local: "x"***REMOVED***,
+	start: StartElement{
+		Name: Name{Local: "a"},
+		Attr: []Attr{{
+			Name:  Name{Local: "x"},
 			Value: "y",
-		***REMOVED***, ***REMOVED***
-			Name:  Name***REMOVED***Local: "foo"***REMOVED***,
+		}, {
+			Name:  Name{Local: "foo"},
 			Value: "bar",
-		***REMOVED******REMOVED***,
-	***REMOVED***,
+		}},
+	},
 	expectXML: `<a x="y" foo="bar">hello</a>`,
-***REMOVED***, ***REMOVED***
+}, {
 	desc: "start element with default name space",
-	value: struct ***REMOVED***
+	value: struct {
 		Foo XMLNameWithNSTag
-	***REMOVED******REMOVED***
-		Foo: XMLNameWithNSTag***REMOVED***
+	}{
+		Foo: XMLNameWithNSTag{
 			Value: "hello",
-		***REMOVED***,
-	***REMOVED***,
-	start: StartElement***REMOVED***
-		Name: Name***REMOVED***Space: "ns", Local: "a"***REMOVED***,
-		Attr: []Attr***REMOVED******REMOVED***
-			Name: Name***REMOVED***Local: "xmlns"***REMOVED***,
+		},
+	},
+	start: StartElement{
+		Name: Name{Space: "ns", Local: "a"},
+		Attr: []Attr{{
+			Name: Name{Local: "xmlns"},
 			// "ns" is the name space defined in XMLNameWithNSTag
 			Value: "ns",
-		***REMOVED******REMOVED***,
-	***REMOVED***,
+		}},
+	},
 	expectXML: `<a xmlns="ns"><InXMLNameWithNSTag>hello</InXMLNameWithNSTag></a>`,
-***REMOVED***, ***REMOVED***
+}, {
 	desc: "start element in name space with different default name space",
-	value: struct ***REMOVED***
+	value: struct {
 		Foo XMLNameWithNSTag
-	***REMOVED******REMOVED***
-		Foo: XMLNameWithNSTag***REMOVED***
+	}{
+		Foo: XMLNameWithNSTag{
 			Value: "hello",
-		***REMOVED***,
-	***REMOVED***,
-	start: StartElement***REMOVED***
-		Name: Name***REMOVED***Space: "ns2", Local: "a"***REMOVED***,
-		Attr: []Attr***REMOVED******REMOVED***
-			Name: Name***REMOVED***Local: "xmlns"***REMOVED***,
+		},
+	},
+	start: StartElement{
+		Name: Name{Space: "ns2", Local: "a"},
+		Attr: []Attr{{
+			Name: Name{Local: "xmlns"},
 			// "ns" is the name space defined in XMLNameWithNSTag
 			Value: "ns",
-		***REMOVED******REMOVED***,
-	***REMOVED***,
+		}},
+	},
 	expectXML: `<ns2:a xmlns:ns2="ns2" xmlns="ns"><InXMLNameWithNSTag>hello</InXMLNameWithNSTag></ns2:a>`,
-***REMOVED***, ***REMOVED***
+}, {
 	desc:  "XMLMarshaler with start element with default name space",
-	value: &MyMarshalerTest***REMOVED******REMOVED***,
-	start: StartElement***REMOVED***
-		Name: Name***REMOVED***Space: "ns2", Local: "a"***REMOVED***,
-		Attr: []Attr***REMOVED******REMOVED***
-			Name: Name***REMOVED***Local: "xmlns"***REMOVED***,
+	value: &MyMarshalerTest{},
+	start: StartElement{
+		Name: Name{Space: "ns2", Local: "a"},
+		Attr: []Attr{{
+			Name: Name{Local: "xmlns"},
 			// "ns" is the name space defined in XMLNameWithNSTag
 			Value: "ns",
-		***REMOVED******REMOVED***,
-	***REMOVED***,
+		}},
+	},
 	expectXML: `<ns2:a xmlns:ns2="ns2" xmlns="ns">hello world</ns2:a>`,
-***REMOVED******REMOVED***
+}}
 
-func TestEncodeElement(t *testing.T) ***REMOVED***
-	for idx, test := range encodeElementTests ***REMOVED***
+func TestEncodeElement(t *testing.T) {
+	for idx, test := range encodeElementTests {
 		var buf bytes.Buffer
 		enc := NewEncoder(&buf)
 		err := enc.EncodeElement(test.value, test.start)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("enc.EncodeElement: %v", err)
-		***REMOVED***
+		}
 		err = enc.Flush()
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("enc.Flush: %v", err)
-		***REMOVED***
-		if got, want := buf.String(), test.expectXML; got != want ***REMOVED***
+		}
+		if got, want := buf.String(), test.expectXML; got != want {
 			t.Errorf("#%d(%s): EncodeElement(%#v, %#v):\nhave %#q\nwant %#q", idx, test.desc, test.value, test.start, got, want)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func BenchmarkMarshal(b *testing.B) ***REMOVED***
+func BenchmarkMarshal(b *testing.B) {
 	b.ReportAllocs()
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		Marshal(atomValue)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func BenchmarkUnmarshal(b *testing.B) ***REMOVED***
+func BenchmarkUnmarshal(b *testing.B) {
 	b.ReportAllocs()
 	xml := []byte(atomXml)
-	for i := 0; i < b.N; i++ ***REMOVED***
-		Unmarshal(xml, &Feed***REMOVED******REMOVED***)
-	***REMOVED***
-***REMOVED***
+	for i := 0; i < b.N; i++ {
+		Unmarshal(xml, &Feed{})
+	}
+}
 
 // golang.org/issue/6556
-func TestStructPointerMarshal(t *testing.T) ***REMOVED***
-	type A struct ***REMOVED***
+func TestStructPointerMarshal(t *testing.T) {
+	type A struct {
 		XMLName string `xml:"a"`
-		B       []interface***REMOVED******REMOVED***
-	***REMOVED***
-	type C struct ***REMOVED***
+		B       []interface{}
+	}
+	type C struct {
 		XMLName Name
 		Value   string `xml:"value"`
-	***REMOVED***
+	}
 
 	a := new(A)
-	a.B = append(a.B, &C***REMOVED***
-		XMLName: Name***REMOVED***Local: "c"***REMOVED***,
+	a.B = append(a.B, &C{
+		XMLName: Name{Local: "c"},
 		Value:   "x",
-	***REMOVED***)
+	})
 
 	b, err := Marshal(a)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if x := string(b); x != "<a><c><value>x</value></c></a>" ***REMOVED***
+	}
+	if x := string(b); x != "<a><c><value>x</value></c></a>" {
 		t.Fatal(x)
-	***REMOVED***
+	}
 	var v A
 	err = Unmarshal(b, &v)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-var encodeTokenTests = []struct ***REMOVED***
+var encodeTokenTests = []struct {
 	desc string
 	toks []Token
 	want string
 	err  string
-***REMOVED******REMOVED******REMOVED***
+}{{
 	desc: "start element with name space",
-	toks: []Token***REMOVED***
-		StartElement***REMOVED***Name***REMOVED***"space", "local"***REMOVED***, nil***REMOVED***,
-	***REMOVED***,
+	toks: []Token{
+		StartElement{Name{"space", "local"}, nil},
+	},
 	want: `<space:local xmlns:space="space">`,
-***REMOVED***, ***REMOVED***
+}, {
 	desc: "start element with no name",
-	toks: []Token***REMOVED***
-		StartElement***REMOVED***Name***REMOVED***"space", ""***REMOVED***, nil***REMOVED***,
-	***REMOVED***,
+	toks: []Token{
+		StartElement{Name{"space", ""}, nil},
+	},
 	err: "xml: start tag with no name",
-***REMOVED***, ***REMOVED***
+}, {
 	desc: "end element with no name",
-	toks: []Token***REMOVED***
-		EndElement***REMOVED***Name***REMOVED***"space", ""***REMOVED******REMOVED***,
-	***REMOVED***,
+	toks: []Token{
+		EndElement{Name{"space", ""}},
+	},
 	err: "xml: end tag with no name",
-***REMOVED***, ***REMOVED***
+}, {
 	desc: "char data",
-	toks: []Token***REMOVED***
+	toks: []Token{
 		CharData("foo"),
-	***REMOVED***,
+	},
 	want: `foo`,
-***REMOVED***, ***REMOVED***
+}, {
 	desc: "char data with escaped chars",
-	toks: []Token***REMOVED***
+	toks: []Token{
 		CharData(" \t\n"),
-	***REMOVED***,
+	},
 	want: " &#x9;\n",
-***REMOVED***, ***REMOVED***
+}, {
 	desc: "comment",
-	toks: []Token***REMOVED***
+	toks: []Token{
 		Comment("foo"),
-	***REMOVED***,
+	},
 	want: `<!--foo-->`,
-***REMOVED***, ***REMOVED***
+}, {
 	desc: "comment with invalid content",
-	toks: []Token***REMOVED***
+	toks: []Token{
 		Comment("foo-->"),
-	***REMOVED***,
+	},
 	err: "xml: EncodeToken of Comment containing --> marker",
-***REMOVED***, ***REMOVED***
+}, {
 	desc: "proc instruction",
-	toks: []Token***REMOVED***
-		ProcInst***REMOVED***"Target", []byte("Instruction")***REMOVED***,
-	***REMOVED***,
+	toks: []Token{
+		ProcInst{"Target", []byte("Instruction")},
+	},
 	want: `<?Target Instruction?>`,
-***REMOVED***, ***REMOVED***
+}, {
 	desc: "proc instruction with empty target",
-	toks: []Token***REMOVED***
-		ProcInst***REMOVED***"", []byte("Instruction")***REMOVED***,
-	***REMOVED***,
+	toks: []Token{
+		ProcInst{"", []byte("Instruction")},
+	},
 	err: "xml: EncodeToken of ProcInst with invalid Target",
-***REMOVED***, ***REMOVED***
+}, {
 	desc: "proc instruction with bad content",
-	toks: []Token***REMOVED***
-		ProcInst***REMOVED***"", []byte("Instruction?>")***REMOVED***,
-	***REMOVED***,
+	toks: []Token{
+		ProcInst{"", []byte("Instruction?>")},
+	},
 	err: "xml: EncodeToken of ProcInst with invalid Target",
-***REMOVED***, ***REMOVED***
+}, {
 	desc: "directive",
-	toks: []Token***REMOVED***
+	toks: []Token{
 		Directive("foo"),
-	***REMOVED***,
+	},
 	want: `<!foo>`,
-***REMOVED***, ***REMOVED***
+}, {
 	desc: "more complex directive",
-	toks: []Token***REMOVED***
+	toks: []Token{
 		Directive("DOCTYPE doc [ <!ELEMENT doc '>'> <!-- com>ment --> ]"),
-	***REMOVED***,
+	},
 	want: `<!DOCTYPE doc [ <!ELEMENT doc '>'> <!-- com>ment --> ]>`,
-***REMOVED***, ***REMOVED***
+}, {
 	desc: "directive instruction with bad name",
-	toks: []Token***REMOVED***
+	toks: []Token{
 		Directive("foo>"),
-	***REMOVED***,
+	},
 	err: "xml: EncodeToken of Directive containing wrong < or > markers",
-***REMOVED***, ***REMOVED***
+}, {
 	desc: "end tag without start tag",
-	toks: []Token***REMOVED***
-		EndElement***REMOVED***Name***REMOVED***"foo", "bar"***REMOVED******REMOVED***,
-	***REMOVED***,
+	toks: []Token{
+		EndElement{Name{"foo", "bar"}},
+	},
 	err: "xml: end tag </bar> without start tag",
-***REMOVED***, ***REMOVED***
+}, {
 	desc: "mismatching end tag local name",
-	toks: []Token***REMOVED***
-		StartElement***REMOVED***Name***REMOVED***"", "foo"***REMOVED***, nil***REMOVED***,
-		EndElement***REMOVED***Name***REMOVED***"", "bar"***REMOVED******REMOVED***,
-	***REMOVED***,
+	toks: []Token{
+		StartElement{Name{"", "foo"}, nil},
+		EndElement{Name{"", "bar"}},
+	},
 	err:  "xml: end tag </bar> does not match start tag <foo>",
 	want: `<foo>`,
-***REMOVED***, ***REMOVED***
+}, {
 	desc: "mismatching end tag namespace",
-	toks: []Token***REMOVED***
-		StartElement***REMOVED***Name***REMOVED***"space", "foo"***REMOVED***, nil***REMOVED***,
-		EndElement***REMOVED***Name***REMOVED***"another", "foo"***REMOVED******REMOVED***,
-	***REMOVED***,
+	toks: []Token{
+		StartElement{Name{"space", "foo"}, nil},
+		EndElement{Name{"another", "foo"}},
+	},
 	err:  "xml: end tag </foo> in namespace another does not match start tag <foo> in namespace space",
 	want: `<space:foo xmlns:space="space">`,
-***REMOVED***, ***REMOVED***
+}, {
 	desc: "start element with explicit namespace",
-	toks: []Token***REMOVED***
-		StartElement***REMOVED***Name***REMOVED***"space", "local"***REMOVED***, []Attr***REMOVED***
-			***REMOVED***Name***REMOVED***"xmlns", "x"***REMOVED***, "space"***REMOVED***,
-			***REMOVED***Name***REMOVED***"space", "foo"***REMOVED***, "value"***REMOVED***,
-		***REMOVED******REMOVED***,
-	***REMOVED***,
+	toks: []Token{
+		StartElement{Name{"space", "local"}, []Attr{
+			{Name{"xmlns", "x"}, "space"},
+			{Name{"space", "foo"}, "value"},
+		}},
+	},
 	want: `<x:local xmlns:x="space" x:foo="value">`,
-***REMOVED***, ***REMOVED***
+}, {
 	desc: "start element with explicit namespace and colliding prefix",
-	toks: []Token***REMOVED***
-		StartElement***REMOVED***Name***REMOVED***"space", "local"***REMOVED***, []Attr***REMOVED***
-			***REMOVED***Name***REMOVED***"xmlns", "x"***REMOVED***, "space"***REMOVED***,
-			***REMOVED***Name***REMOVED***"space", "foo"***REMOVED***, "value"***REMOVED***,
-			***REMOVED***Name***REMOVED***"x", "bar"***REMOVED***, "other"***REMOVED***,
-		***REMOVED******REMOVED***,
-	***REMOVED***,
+	toks: []Token{
+		StartElement{Name{"space", "local"}, []Attr{
+			{Name{"xmlns", "x"}, "space"},
+			{Name{"space", "foo"}, "value"},
+			{Name{"x", "bar"}, "other"},
+		}},
+	},
 	want: `<x:local xmlns:x_1="x" xmlns:x="space" x:foo="value" x_1:bar="other">`,
-***REMOVED***, ***REMOVED***
+}, {
 	desc: "start element using previously defined namespace",
-	toks: []Token***REMOVED***
-		StartElement***REMOVED***Name***REMOVED***"", "local"***REMOVED***, []Attr***REMOVED***
-			***REMOVED***Name***REMOVED***"xmlns", "x"***REMOVED***, "space"***REMOVED***,
-		***REMOVED******REMOVED***,
-		StartElement***REMOVED***Name***REMOVED***"space", "foo"***REMOVED***, []Attr***REMOVED***
-			***REMOVED***Name***REMOVED***"space", "x"***REMOVED***, "y"***REMOVED***,
-		***REMOVED******REMOVED***,
-	***REMOVED***,
+	toks: []Token{
+		StartElement{Name{"", "local"}, []Attr{
+			{Name{"xmlns", "x"}, "space"},
+		}},
+		StartElement{Name{"space", "foo"}, []Attr{
+			{Name{"space", "x"}, "y"},
+		}},
+	},
 	want: `<local xmlns:x="space"><x:foo x:x="y">`,
-***REMOVED***, ***REMOVED***
+}, {
 	desc: "nested name space with same prefix",
-	toks: []Token***REMOVED***
-		StartElement***REMOVED***Name***REMOVED***"", "foo"***REMOVED***, []Attr***REMOVED***
-			***REMOVED***Name***REMOVED***"xmlns", "x"***REMOVED***, "space1"***REMOVED***,
-		***REMOVED******REMOVED***,
-		StartElement***REMOVED***Name***REMOVED***"", "foo"***REMOVED***, []Attr***REMOVED***
-			***REMOVED***Name***REMOVED***"xmlns", "x"***REMOVED***, "space2"***REMOVED***,
-		***REMOVED******REMOVED***,
-		StartElement***REMOVED***Name***REMOVED***"", "foo"***REMOVED***, []Attr***REMOVED***
-			***REMOVED***Name***REMOVED***"space1", "a"***REMOVED***, "space1 value"***REMOVED***,
-			***REMOVED***Name***REMOVED***"space2", "b"***REMOVED***, "space2 value"***REMOVED***,
-		***REMOVED******REMOVED***,
-		EndElement***REMOVED***Name***REMOVED***"", "foo"***REMOVED******REMOVED***,
-		EndElement***REMOVED***Name***REMOVED***"", "foo"***REMOVED******REMOVED***,
-		StartElement***REMOVED***Name***REMOVED***"", "foo"***REMOVED***, []Attr***REMOVED***
-			***REMOVED***Name***REMOVED***"space1", "a"***REMOVED***, "space1 value"***REMOVED***,
-			***REMOVED***Name***REMOVED***"space2", "b"***REMOVED***, "space2 value"***REMOVED***,
-		***REMOVED******REMOVED***,
-	***REMOVED***,
+	toks: []Token{
+		StartElement{Name{"", "foo"}, []Attr{
+			{Name{"xmlns", "x"}, "space1"},
+		}},
+		StartElement{Name{"", "foo"}, []Attr{
+			{Name{"xmlns", "x"}, "space2"},
+		}},
+		StartElement{Name{"", "foo"}, []Attr{
+			{Name{"space1", "a"}, "space1 value"},
+			{Name{"space2", "b"}, "space2 value"},
+		}},
+		EndElement{Name{"", "foo"}},
+		EndElement{Name{"", "foo"}},
+		StartElement{Name{"", "foo"}, []Attr{
+			{Name{"space1", "a"}, "space1 value"},
+			{Name{"space2", "b"}, "space2 value"},
+		}},
+	},
 	want: `<foo xmlns:x="space1"><foo xmlns:x="space2"><foo xmlns:space1="space1" space1:a="space1 value" x:b="space2 value"></foo></foo><foo xmlns:space2="space2" x:a="space1 value" space2:b="space2 value">`,
-***REMOVED***, ***REMOVED***
+}, {
 	desc: "start element defining several prefixes for the same name space",
-	toks: []Token***REMOVED***
-		StartElement***REMOVED***Name***REMOVED***"space", "foo"***REMOVED***, []Attr***REMOVED***
-			***REMOVED***Name***REMOVED***"xmlns", "a"***REMOVED***, "space"***REMOVED***,
-			***REMOVED***Name***REMOVED***"xmlns", "b"***REMOVED***, "space"***REMOVED***,
-			***REMOVED***Name***REMOVED***"space", "x"***REMOVED***, "value"***REMOVED***,
-		***REMOVED******REMOVED***,
-	***REMOVED***,
+	toks: []Token{
+		StartElement{Name{"space", "foo"}, []Attr{
+			{Name{"xmlns", "a"}, "space"},
+			{Name{"xmlns", "b"}, "space"},
+			{Name{"space", "x"}, "value"},
+		}},
+	},
 	want: `<a:foo xmlns:a="space" a:x="value">`,
-***REMOVED***, ***REMOVED***
+}, {
 	desc: "nested element redefines name space",
-	toks: []Token***REMOVED***
-		StartElement***REMOVED***Name***REMOVED***"", "foo"***REMOVED***, []Attr***REMOVED***
-			***REMOVED***Name***REMOVED***"xmlns", "x"***REMOVED***, "space"***REMOVED***,
-		***REMOVED******REMOVED***,
-		StartElement***REMOVED***Name***REMOVED***"space", "foo"***REMOVED***, []Attr***REMOVED***
-			***REMOVED***Name***REMOVED***"xmlns", "y"***REMOVED***, "space"***REMOVED***,
-			***REMOVED***Name***REMOVED***"space", "a"***REMOVED***, "value"***REMOVED***,
-		***REMOVED******REMOVED***,
-	***REMOVED***,
+	toks: []Token{
+		StartElement{Name{"", "foo"}, []Attr{
+			{Name{"xmlns", "x"}, "space"},
+		}},
+		StartElement{Name{"space", "foo"}, []Attr{
+			{Name{"xmlns", "y"}, "space"},
+			{Name{"space", "a"}, "value"},
+		}},
+	},
 	want: `<foo xmlns:x="space"><x:foo x:a="value">`,
-***REMOVED***, ***REMOVED***
+}, {
 	desc: "nested element creates alias for default name space",
-	toks: []Token***REMOVED***
-		StartElement***REMOVED***Name***REMOVED***"space", "foo"***REMOVED***, []Attr***REMOVED***
-			***REMOVED***Name***REMOVED***"", "xmlns"***REMOVED***, "space"***REMOVED***,
-		***REMOVED******REMOVED***,
-		StartElement***REMOVED***Name***REMOVED***"space", "foo"***REMOVED***, []Attr***REMOVED***
-			***REMOVED***Name***REMOVED***"xmlns", "y"***REMOVED***, "space"***REMOVED***,
-			***REMOVED***Name***REMOVED***"space", "a"***REMOVED***, "value"***REMOVED***,
-		***REMOVED******REMOVED***,
-	***REMOVED***,
+	toks: []Token{
+		StartElement{Name{"space", "foo"}, []Attr{
+			{Name{"", "xmlns"}, "space"},
+		}},
+		StartElement{Name{"space", "foo"}, []Attr{
+			{Name{"xmlns", "y"}, "space"},
+			{Name{"space", "a"}, "value"},
+		}},
+	},
 	want: `<foo xmlns="space"><foo xmlns:y="space" y:a="value">`,
-***REMOVED***, ***REMOVED***
+}, {
 	desc: "nested element defines default name space with existing prefix",
-	toks: []Token***REMOVED***
-		StartElement***REMOVED***Name***REMOVED***"", "foo"***REMOVED***, []Attr***REMOVED***
-			***REMOVED***Name***REMOVED***"xmlns", "x"***REMOVED***, "space"***REMOVED***,
-		***REMOVED******REMOVED***,
-		StartElement***REMOVED***Name***REMOVED***"space", "foo"***REMOVED***, []Attr***REMOVED***
-			***REMOVED***Name***REMOVED***"", "xmlns"***REMOVED***, "space"***REMOVED***,
-			***REMOVED***Name***REMOVED***"space", "a"***REMOVED***, "value"***REMOVED***,
-		***REMOVED******REMOVED***,
-	***REMOVED***,
+	toks: []Token{
+		StartElement{Name{"", "foo"}, []Attr{
+			{Name{"xmlns", "x"}, "space"},
+		}},
+		StartElement{Name{"space", "foo"}, []Attr{
+			{Name{"", "xmlns"}, "space"},
+			{Name{"space", "a"}, "value"},
+		}},
+	},
 	want: `<foo xmlns:x="space"><foo xmlns="space" x:a="value">`,
-***REMOVED***, ***REMOVED***
+}, {
 	desc: "nested element uses empty attribute name space when default ns defined",
-	toks: []Token***REMOVED***
-		StartElement***REMOVED***Name***REMOVED***"space", "foo"***REMOVED***, []Attr***REMOVED***
-			***REMOVED***Name***REMOVED***"", "xmlns"***REMOVED***, "space"***REMOVED***,
-		***REMOVED******REMOVED***,
-		StartElement***REMOVED***Name***REMOVED***"space", "foo"***REMOVED***, []Attr***REMOVED***
-			***REMOVED***Name***REMOVED***"", "attr"***REMOVED***, "value"***REMOVED***,
-		***REMOVED******REMOVED***,
-	***REMOVED***,
+	toks: []Token{
+		StartElement{Name{"space", "foo"}, []Attr{
+			{Name{"", "xmlns"}, "space"},
+		}},
+		StartElement{Name{"space", "foo"}, []Attr{
+			{Name{"", "attr"}, "value"},
+		}},
+	},
 	want: `<foo xmlns="space"><foo attr="value">`,
-***REMOVED***, ***REMOVED***
+}, {
 	desc: "redefine xmlns",
-	toks: []Token***REMOVED***
-		StartElement***REMOVED***Name***REMOVED***"", "foo"***REMOVED***, []Attr***REMOVED***
-			***REMOVED***Name***REMOVED***"foo", "xmlns"***REMOVED***, "space"***REMOVED***,
-		***REMOVED******REMOVED***,
-	***REMOVED***,
+	toks: []Token{
+		StartElement{Name{"", "foo"}, []Attr{
+			{Name{"foo", "xmlns"}, "space"},
+		}},
+	},
 	err: `xml: cannot redefine xmlns attribute prefix`,
-***REMOVED***, ***REMOVED***
+}, {
 	desc: "xmlns with explicit name space #1",
-	toks: []Token***REMOVED***
-		StartElement***REMOVED***Name***REMOVED***"space", "foo"***REMOVED***, []Attr***REMOVED***
-			***REMOVED***Name***REMOVED***"xml", "xmlns"***REMOVED***, "space"***REMOVED***,
-		***REMOVED******REMOVED***,
-	***REMOVED***,
+	toks: []Token{
+		StartElement{Name{"space", "foo"}, []Attr{
+			{Name{"xml", "xmlns"}, "space"},
+		}},
+	},
 	want: `<foo xmlns="space">`,
-***REMOVED***, ***REMOVED***
+}, {
 	desc: "xmlns with explicit name space #2",
-	toks: []Token***REMOVED***
-		StartElement***REMOVED***Name***REMOVED***"space", "foo"***REMOVED***, []Attr***REMOVED***
-			***REMOVED***Name***REMOVED***xmlURL, "xmlns"***REMOVED***, "space"***REMOVED***,
-		***REMOVED******REMOVED***,
-	***REMOVED***,
+	toks: []Token{
+		StartElement{Name{"space", "foo"}, []Attr{
+			{Name{xmlURL, "xmlns"}, "space"},
+		}},
+	},
 	want: `<foo xmlns="space">`,
-***REMOVED***, ***REMOVED***
+}, {
 	desc: "empty name space declaration is ignored",
-	toks: []Token***REMOVED***
-		StartElement***REMOVED***Name***REMOVED***"", "foo"***REMOVED***, []Attr***REMOVED***
-			***REMOVED***Name***REMOVED***"xmlns", "foo"***REMOVED***, ""***REMOVED***,
-		***REMOVED******REMOVED***,
-	***REMOVED***,
+	toks: []Token{
+		StartElement{Name{"", "foo"}, []Attr{
+			{Name{"xmlns", "foo"}, ""},
+		}},
+	},
 	want: `<foo>`,
-***REMOVED***, ***REMOVED***
+}, {
 	desc: "attribute with no name is ignored",
-	toks: []Token***REMOVED***
-		StartElement***REMOVED***Name***REMOVED***"", "foo"***REMOVED***, []Attr***REMOVED***
-			***REMOVED***Name***REMOVED***"", ""***REMOVED***, "value"***REMOVED***,
-		***REMOVED******REMOVED***,
-	***REMOVED***,
+	toks: []Token{
+		StartElement{Name{"", "foo"}, []Attr{
+			{Name{"", ""}, "value"},
+		}},
+	},
 	want: `<foo>`,
-***REMOVED***, ***REMOVED***
+}, {
 	desc: "namespace URL with non-valid name",
-	toks: []Token***REMOVED***
-		StartElement***REMOVED***Name***REMOVED***"/34", "foo"***REMOVED***, []Attr***REMOVED***
-			***REMOVED***Name***REMOVED***"/34", "x"***REMOVED***, "value"***REMOVED***,
-		***REMOVED******REMOVED***,
-	***REMOVED***,
+	toks: []Token{
+		StartElement{Name{"/34", "foo"}, []Attr{
+			{Name{"/34", "x"}, "value"},
+		}},
+	},
 	want: `<_:foo xmlns:_="/34" _:x="value">`,
-***REMOVED***, ***REMOVED***
+}, {
 	desc: "nested element resets default namespace to empty",
-	toks: []Token***REMOVED***
-		StartElement***REMOVED***Name***REMOVED***"space", "foo"***REMOVED***, []Attr***REMOVED***
-			***REMOVED***Name***REMOVED***"", "xmlns"***REMOVED***, "space"***REMOVED***,
-		***REMOVED******REMOVED***,
-		StartElement***REMOVED***Name***REMOVED***"", "foo"***REMOVED***, []Attr***REMOVED***
-			***REMOVED***Name***REMOVED***"", "xmlns"***REMOVED***, ""***REMOVED***,
-			***REMOVED***Name***REMOVED***"", "x"***REMOVED***, "value"***REMOVED***,
-			***REMOVED***Name***REMOVED***"space", "x"***REMOVED***, "value"***REMOVED***,
-		***REMOVED******REMOVED***,
-	***REMOVED***,
+	toks: []Token{
+		StartElement{Name{"space", "foo"}, []Attr{
+			{Name{"", "xmlns"}, "space"},
+		}},
+		StartElement{Name{"", "foo"}, []Attr{
+			{Name{"", "xmlns"}, ""},
+			{Name{"", "x"}, "value"},
+			{Name{"space", "x"}, "value"},
+		}},
+	},
 	want: `<foo xmlns="space"><foo xmlns:space="space" xmlns="" x="value" space:x="value">`,
-***REMOVED***, ***REMOVED***
+}, {
 	desc: "nested element requires empty default name space",
-	toks: []Token***REMOVED***
-		StartElement***REMOVED***Name***REMOVED***"space", "foo"***REMOVED***, []Attr***REMOVED***
-			***REMOVED***Name***REMOVED***"", "xmlns"***REMOVED***, "space"***REMOVED***,
-		***REMOVED******REMOVED***,
-		StartElement***REMOVED***Name***REMOVED***"", "foo"***REMOVED***, nil***REMOVED***,
-	***REMOVED***,
+	toks: []Token{
+		StartElement{Name{"space", "foo"}, []Attr{
+			{Name{"", "xmlns"}, "space"},
+		}},
+		StartElement{Name{"", "foo"}, nil},
+	},
 	want: `<foo xmlns="space"><foo xmlns="">`,
-***REMOVED***, ***REMOVED***
+}, {
 	desc: "attribute uses name space from xmlns",
-	toks: []Token***REMOVED***
-		StartElement***REMOVED***Name***REMOVED***"some/space", "foo"***REMOVED***, []Attr***REMOVED***
-			***REMOVED***Name***REMOVED***"", "attr"***REMOVED***, "value"***REMOVED***,
-			***REMOVED***Name***REMOVED***"some/space", "other"***REMOVED***, "other value"***REMOVED***,
-		***REMOVED******REMOVED***,
-	***REMOVED***,
+	toks: []Token{
+		StartElement{Name{"some/space", "foo"}, []Attr{
+			{Name{"", "attr"}, "value"},
+			{Name{"some/space", "other"}, "other value"},
+		}},
+	},
 	want: `<space:foo xmlns:space="some/space" attr="value" space:other="other value">`,
-***REMOVED***, ***REMOVED***
+}, {
 	desc: "default name space should not be used by attributes",
-	toks: []Token***REMOVED***
-		StartElement***REMOVED***Name***REMOVED***"space", "foo"***REMOVED***, []Attr***REMOVED***
-			***REMOVED***Name***REMOVED***"", "xmlns"***REMOVED***, "space"***REMOVED***,
-			***REMOVED***Name***REMOVED***"xmlns", "bar"***REMOVED***, "space"***REMOVED***,
-			***REMOVED***Name***REMOVED***"space", "baz"***REMOVED***, "foo"***REMOVED***,
-		***REMOVED******REMOVED***,
-		StartElement***REMOVED***Name***REMOVED***"space", "baz"***REMOVED***, nil***REMOVED***,
-		EndElement***REMOVED***Name***REMOVED***"space", "baz"***REMOVED******REMOVED***,
-		EndElement***REMOVED***Name***REMOVED***"space", "foo"***REMOVED******REMOVED***,
-	***REMOVED***,
+	toks: []Token{
+		StartElement{Name{"space", "foo"}, []Attr{
+			{Name{"", "xmlns"}, "space"},
+			{Name{"xmlns", "bar"}, "space"},
+			{Name{"space", "baz"}, "foo"},
+		}},
+		StartElement{Name{"space", "baz"}, nil},
+		EndElement{Name{"space", "baz"}},
+		EndElement{Name{"space", "foo"}},
+	},
 	want: `<foo xmlns:bar="space" xmlns="space" bar:baz="foo"><baz></baz></foo>`,
-***REMOVED***, ***REMOVED***
+}, {
 	desc: "default name space not used by attributes, not explicitly defined",
-	toks: []Token***REMOVED***
-		StartElement***REMOVED***Name***REMOVED***"space", "foo"***REMOVED***, []Attr***REMOVED***
-			***REMOVED***Name***REMOVED***"", "xmlns"***REMOVED***, "space"***REMOVED***,
-			***REMOVED***Name***REMOVED***"space", "baz"***REMOVED***, "foo"***REMOVED***,
-		***REMOVED******REMOVED***,
-		StartElement***REMOVED***Name***REMOVED***"space", "baz"***REMOVED***, nil***REMOVED***,
-		EndElement***REMOVED***Name***REMOVED***"space", "baz"***REMOVED******REMOVED***,
-		EndElement***REMOVED***Name***REMOVED***"space", "foo"***REMOVED******REMOVED***,
-	***REMOVED***,
+	toks: []Token{
+		StartElement{Name{"space", "foo"}, []Attr{
+			{Name{"", "xmlns"}, "space"},
+			{Name{"space", "baz"}, "foo"},
+		}},
+		StartElement{Name{"space", "baz"}, nil},
+		EndElement{Name{"space", "baz"}},
+		EndElement{Name{"space", "foo"}},
+	},
 	want: `<foo xmlns:space="space" xmlns="space" space:baz="foo"><baz></baz></foo>`,
-***REMOVED***, ***REMOVED***
+}, {
 	desc: "impossible xmlns declaration",
-	toks: []Token***REMOVED***
-		StartElement***REMOVED***Name***REMOVED***"", "foo"***REMOVED***, []Attr***REMOVED***
-			***REMOVED***Name***REMOVED***"", "xmlns"***REMOVED***, "space"***REMOVED***,
-		***REMOVED******REMOVED***,
-		StartElement***REMOVED***Name***REMOVED***"space", "bar"***REMOVED***, []Attr***REMOVED***
-			***REMOVED***Name***REMOVED***"space", "attr"***REMOVED***, "value"***REMOVED***,
-		***REMOVED******REMOVED***,
-	***REMOVED***,
+	toks: []Token{
+		StartElement{Name{"", "foo"}, []Attr{
+			{Name{"", "xmlns"}, "space"},
+		}},
+		StartElement{Name{"space", "bar"}, []Attr{
+			{Name{"space", "attr"}, "value"},
+		}},
+	},
 	want: `<foo><space:bar xmlns:space="space" space:attr="value">`,
-***REMOVED******REMOVED***
+}}
 
-func TestEncodeToken(t *testing.T) ***REMOVED***
+func TestEncodeToken(t *testing.T) {
 loop:
-	for i, tt := range encodeTokenTests ***REMOVED***
+	for i, tt := range encodeTokenTests {
 		var buf bytes.Buffer
 		enc := NewEncoder(&buf)
 		var err error
-		for j, tok := range tt.toks ***REMOVED***
+		for j, tok := range tt.toks {
 			err = enc.EncodeToken(tok)
-			if err != nil && j < len(tt.toks)-1 ***REMOVED***
+			if err != nil && j < len(tt.toks)-1 {
 				t.Errorf("#%d %s token #%d: %v", i, tt.desc, j, err)
 				continue loop
-			***REMOVED***
-		***REMOVED***
-		errorf := func(f string, a ...interface***REMOVED******REMOVED***) ***REMOVED***
+			}
+		}
+		errorf := func(f string, a ...interface{}) {
 			t.Errorf("#%d %s token #%d:%s", i, tt.desc, len(tt.toks)-1, fmt.Sprintf(f, a...))
-		***REMOVED***
-		switch ***REMOVED***
+		}
+		switch {
 		case tt.err != "" && err == nil:
 			errorf(" expected error; got none")
 			continue
@@ -1812,36 +1812,36 @@ loop:
 		case tt.err != "" && err != nil && tt.err != err.Error():
 			errorf(" error mismatch; got %v, want %v", err, tt.err)
 			continue
-		***REMOVED***
-		if err := enc.Flush(); err != nil ***REMOVED***
+		}
+		if err := enc.Flush(); err != nil {
 			errorf(" %v", err)
 			continue
-		***REMOVED***
-		if got := buf.String(); got != tt.want ***REMOVED***
+		}
+		if got := buf.String(); got != tt.want {
 			errorf("\ngot  %v\nwant %v", got, tt.want)
 			continue
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestProcInstEncodeToken(t *testing.T) ***REMOVED***
+func TestProcInstEncodeToken(t *testing.T) {
 	var buf bytes.Buffer
 	enc := NewEncoder(&buf)
 
-	if err := enc.EncodeToken(ProcInst***REMOVED***"xml", []byte("Instruction")***REMOVED***); err != nil ***REMOVED***
+	if err := enc.EncodeToken(ProcInst{"xml", []byte("Instruction")}); err != nil {
 		t.Fatalf("enc.EncodeToken: expected to be able to encode xml target ProcInst as first token, %s", err)
-	***REMOVED***
+	}
 
-	if err := enc.EncodeToken(ProcInst***REMOVED***"Target", []byte("Instruction")***REMOVED***); err != nil ***REMOVED***
+	if err := enc.EncodeToken(ProcInst{"Target", []byte("Instruction")}); err != nil {
 		t.Fatalf("enc.EncodeToken: expected to be able to add non-xml target ProcInst")
-	***REMOVED***
+	}
 
-	if err := enc.EncodeToken(ProcInst***REMOVED***"xml", []byte("Instruction")***REMOVED***); err == nil ***REMOVED***
+	if err := enc.EncodeToken(ProcInst{"xml", []byte("Instruction")}); err == nil {
 		t.Fatalf("enc.EncodeToken: expected to not be allowed to encode xml target ProcInst when not first token")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestDecodeEncode(t *testing.T) ***REMOVED***
+func TestDecodeEncode(t *testing.T) {
 	var in, out bytes.Buffer
 	in.WriteString(`<?xml version="1.0" encoding="UTF-8"?>
 <?Target Instruction?>
@@ -1850,41 +1850,41 @@ func TestDecodeEncode(t *testing.T) ***REMOVED***
 `)
 	dec := NewDecoder(&in)
 	enc := NewEncoder(&out)
-	for tok, err := dec.Token(); err == nil; tok, err = dec.Token() ***REMOVED***
+	for tok, err := dec.Token(); err == nil; tok, err = dec.Token() {
 		err = enc.EncodeToken(tok)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("enc.EncodeToken: Unable to encode token (%#v), %v", tok, err)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // Issue 9796. Used to fail with GORACE="halt_on_error=1" -race.
-func TestRace9796(t *testing.T) ***REMOVED***
-	type A struct***REMOVED******REMOVED***
-	type B struct ***REMOVED***
+func TestRace9796(t *testing.T) {
+	type A struct{}
+	type B struct {
 		C []A `xml:"X>Y"`
-	***REMOVED***
+	}
 	var wg sync.WaitGroup
-	for i := 0; i < 2; i++ ***REMOVED***
+	for i := 0; i < 2; i++ {
 		wg.Add(1)
-		go func() ***REMOVED***
-			Marshal(B***REMOVED***[]A***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***)
+		go func() {
+			Marshal(B{[]A{{}}})
 			wg.Done()
-		***REMOVED***()
-	***REMOVED***
+		}()
+	}
 	wg.Wait()
-***REMOVED***
+}
 
-func TestIsValidDirective(t *testing.T) ***REMOVED***
-	testOK := []string***REMOVED***
+func TestIsValidDirective(t *testing.T) {
+	testOK := []string{
 		"<>",
 		"< < > >",
 		"<!DOCTYPE '<' '>' '>' <!--nothing-->>",
 		"<!DOCTYPE doc [ <!ELEMENT doc ANY> <!ELEMENT doc ANY> ]>",
 		"<!DOCTYPE doc [ <!ELEMENT doc \"ANY> '<' <!E\" LEMENT '>' doc ANY> ]>",
 		"<!DOCTYPE doc <!-- just>>>> a < comment --> [ <!ITEM anything> ] >",
-	***REMOVED***
-	testKO := []string***REMOVED***
+	}
+	testKO := []string{
 		"<",
 		">",
 		"<!--",
@@ -1894,46 +1894,46 @@ func TestIsValidDirective(t *testing.T) ***REMOVED***
 		"<!DOCTYPE doc '>",
 		"<!DOCTYPE doc '>'",
 		"<!DOCTYPE doc <!--comment>",
-	***REMOVED***
-	for _, s := range testOK ***REMOVED***
-		if !isValidDirective(Directive(s)) ***REMOVED***
+	}
+	for _, s := range testOK {
+		if !isValidDirective(Directive(s)) {
 			t.Errorf("Directive %q is expected to be valid", s)
-		***REMOVED***
-	***REMOVED***
-	for _, s := range testKO ***REMOVED***
-		if isValidDirective(Directive(s)) ***REMOVED***
+		}
+	}
+	for _, s := range testKO {
+		if isValidDirective(Directive(s)) {
 			t.Errorf("Directive %q is expected to be invalid", s)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // Issue 11719. EncodeToken used to silently eat tokens with an invalid type.
-func TestSimpleUseOfEncodeToken(t *testing.T) ***REMOVED***
+func TestSimpleUseOfEncodeToken(t *testing.T) {
 	var buf bytes.Buffer
 	enc := NewEncoder(&buf)
-	if err := enc.EncodeToken(&StartElement***REMOVED***Name: Name***REMOVED***"", "object1"***REMOVED******REMOVED***); err == nil ***REMOVED***
+	if err := enc.EncodeToken(&StartElement{Name: Name{"", "object1"}}); err == nil {
 		t.Errorf("enc.EncodeToken: pointer type should be rejected")
-	***REMOVED***
-	if err := enc.EncodeToken(&EndElement***REMOVED***Name: Name***REMOVED***"", "object1"***REMOVED******REMOVED***); err == nil ***REMOVED***
+	}
+	if err := enc.EncodeToken(&EndElement{Name: Name{"", "object1"}}); err == nil {
 		t.Errorf("enc.EncodeToken: pointer type should be rejected")
-	***REMOVED***
-	if err := enc.EncodeToken(StartElement***REMOVED***Name: Name***REMOVED***"", "object2"***REMOVED******REMOVED***); err != nil ***REMOVED***
+	}
+	if err := enc.EncodeToken(StartElement{Name: Name{"", "object2"}}); err != nil {
 		t.Errorf("enc.EncodeToken: StartElement %s", err)
-	***REMOVED***
-	if err := enc.EncodeToken(EndElement***REMOVED***Name: Name***REMOVED***"", "object2"***REMOVED******REMOVED***); err != nil ***REMOVED***
+	}
+	if err := enc.EncodeToken(EndElement{Name: Name{"", "object2"}}); err != nil {
 		t.Errorf("enc.EncodeToken: EndElement %s", err)
-	***REMOVED***
-	if err := enc.EncodeToken(Universe***REMOVED******REMOVED***); err == nil ***REMOVED***
+	}
+	if err := enc.EncodeToken(Universe{}); err == nil {
 		t.Errorf("enc.EncodeToken: invalid type not caught")
-	***REMOVED***
-	if err := enc.Flush(); err != nil ***REMOVED***
+	}
+	if err := enc.Flush(); err != nil {
 		t.Errorf("enc.Flush: %s", err)
-	***REMOVED***
-	if buf.Len() == 0 ***REMOVED***
+	}
+	if buf.Len() == 0 {
 		t.Errorf("enc.EncodeToken: empty buffer")
-	***REMOVED***
+	}
 	want := "<object2></object2>"
-	if buf.String() != want ***REMOVED***
+	if buf.String() != want {
 		t.Errorf("enc.EncodeToken: expected %q; got %q", want, buf.String())
-	***REMOVED***
-***REMOVED***
+	}
+}

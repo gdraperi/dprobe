@@ -5,7 +5,7 @@ import (
 )
 
 // SlashCommand contains information about a request of the slash command
-type SlashCommand struct ***REMOVED***
+type SlashCommand struct {
 	Token       string `json:"token"`
 	TeamID      string `json:"team_id"`
 	TeamDomain  string `json:"team_domain"`
@@ -17,13 +17,13 @@ type SlashCommand struct ***REMOVED***
 	Text        string `json:"text"`
 	ResponseURL string `json:"response_url"`
 	TriggerID   string `json:"trigger_id"`
-***REMOVED***
+}
 
 // SlashCommandParse will parse the request of the slash command
-func SlashCommandParse(r *http.Request) (s SlashCommand, err error) ***REMOVED***
-	if err = r.ParseForm(); err != nil ***REMOVED***
+func SlashCommandParse(r *http.Request) (s SlashCommand, err error) {
+	if err = r.ParseForm(); err != nil {
 		return s, err
-	***REMOVED***
+	}
 	s.Token = r.PostForm.Get("token")
 	s.TeamID = r.PostForm.Get("team_id")
 	s.TeamDomain = r.PostForm.Get("team_domain")
@@ -36,14 +36,14 @@ func SlashCommandParse(r *http.Request) (s SlashCommand, err error) ***REMOVED**
 	s.ResponseURL = r.PostForm.Get("response_url")
 	s.TriggerID = r.PostForm.Get("trigger_id")
 	return s, nil
-***REMOVED***
+}
 
 // ValidateToken validates verificationTokens
-func (s SlashCommand) ValidateToken(verificationTokens ...string) bool ***REMOVED***
-	for _, token := range verificationTokens ***REMOVED***
-		if s.Token == token ***REMOVED***
+func (s SlashCommand) ValidateToken(verificationTokens ...string) bool {
+	for _, token := range verificationTokens {
+		if s.Token == token {
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false
-***REMOVED***
+}

@@ -4,7 +4,7 @@ package docker.protobuf.plugin;
 
 import "google/protobuf/descriptor.proto";
 
-message WatchSelectors ***REMOVED***
+message WatchSelectors {
 	// supported by all object types
 	optional bool id = 1;
 	optional bool id_prefix = 2;
@@ -25,18 +25,18 @@ message WatchSelectors ***REMOVED***
 
 	// supported by: resource
 	optional bool kind = 13;
-***REMOVED***
+}
 
-message StoreObject ***REMOVED***
+message StoreObject {
 	required WatchSelectors watch_selectors = 1;
-***REMOVED***
+}
 
-extend google.protobuf.MessageOptions ***REMOVED***
+extend google.protobuf.MessageOptions {
 	optional bool deepcopy = 70000 [default=true];
 	optional StoreObject store_object = 70001;
-***REMOVED***
+}
 
-message TLSAuthorization ***REMOVED***
+message TLSAuthorization {
 	// Roles contains the acceptable TLS OU roles for the handler.
 	repeated string roles = 1;
 
@@ -44,10 +44,10 @@ message TLSAuthorization ***REMOVED***
 	// authorization. NOTE: Specifying both "insecure" and a nonempty
 	// list of roles is invalid. This would fail at codegen time.
 	optional bool insecure = 2;
-***REMOVED***
+}
 
-extend google.protobuf.MethodOptions ***REMOVED***
+extend google.protobuf.MethodOptions {
 	// TLSAuthorization contains the authorization parameters for this
 	// method.
 	optional TLSAuthorization tls_authorization = 73626345;
-***REMOVED***
+}

@@ -12,82 +12,82 @@ import (
 )
 
 // Implement io.Reader
-type errorReader struct***REMOVED******REMOVED***
+type errorReader struct{}
 
-func (r *errorReader) Read(p []byte) (int, error) ***REMOVED***
+func (r *errorReader) Read(p []byte) (int, error) {
 	return 0, fmt.Errorf("error reader always fail")
-***REMOVED***
+}
 
-func TestReadCloserWrapperClose(t *testing.T) ***REMOVED***
+func TestReadCloserWrapperClose(t *testing.T) {
 	reader := strings.NewReader("A string reader")
-	wrapper := NewReadCloserWrapper(reader, func() error ***REMOVED***
+	wrapper := NewReadCloserWrapper(reader, func() error {
 		return fmt.Errorf("This will be called when closing")
-	***REMOVED***)
+	})
 	err := wrapper.Close()
-	if err == nil || !strings.Contains(err.Error(), "This will be called when closing") ***REMOVED***
+	if err == nil || !strings.Contains(err.Error(), "This will be called when closing") {
 		t.Fatalf("readCloserWrapper should have call the anonymous func and thus, fail.")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestReaderErrWrapperReadOnError(t *testing.T) ***REMOVED***
+func TestReaderErrWrapperReadOnError(t *testing.T) {
 	called := false
-	reader := &errorReader***REMOVED******REMOVED***
-	wrapper := NewReaderErrWrapper(reader, func() ***REMOVED***
+	reader := &errorReader{}
+	wrapper := NewReaderErrWrapper(reader, func() {
 		called = true
-	***REMOVED***)
-	_, err := wrapper.Read([]byte***REMOVED******REMOVED***)
+	})
+	_, err := wrapper.Read([]byte{})
 	assert.EqualError(t, err, "error reader always fail")
-	if !called ***REMOVED***
+	if !called {
 		t.Fatalf("readErrWrapper should have call the anonymous function on failure")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestReaderErrWrapperRead(t *testing.T) ***REMOVED***
+func TestReaderErrWrapperRead(t *testing.T) {
 	reader := strings.NewReader("a string reader.")
-	wrapper := NewReaderErrWrapper(reader, func() ***REMOVED***
+	wrapper := NewReaderErrWrapper(reader, func() {
 		t.Fatalf("readErrWrapper should not have called the anonymous function")
-	***REMOVED***)
+	})
 	// Read 20 byte (should be ok with the string above)
 	num, err := wrapper.Read(make([]byte, 20))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if num != 16 ***REMOVED***
+	}
+	if num != 16 {
 		t.Fatalf("readerErrWrapper should have read 16 byte, but read %d", num)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestHashData(t *testing.T) ***REMOVED***
+func TestHashData(t *testing.T) {
 	reader := strings.NewReader("hash-me")
 	actual, err := HashData(reader)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	expected := "sha256:4d11186aed035cc624d553e10db358492c84a7cd6b9670d92123c144930450aa"
-	if actual != expected ***REMOVED***
+	if actual != expected {
 		t.Fatalf("Expecting %s, got %s", expected, actual)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type perpetualReader struct***REMOVED******REMOVED***
+type perpetualReader struct{}
 
-func (p *perpetualReader) Read(buf []byte) (n int, err error) ***REMOVED***
-	for i := 0; i != len(buf); i++ ***REMOVED***
+func (p *perpetualReader) Read(buf []byte) (n int, err error) {
+	for i := 0; i != len(buf); i++ {
 		buf[i] = 'a'
-	***REMOVED***
+	}
 	return len(buf), nil
-***REMOVED***
+}
 
-func TestCancelReadCloser(t *testing.T) ***REMOVED***
+func TestCancelReadCloser(t *testing.T) {
 	ctx, _ := context.WithTimeout(context.Background(), 100*time.Millisecond)
-	cancelReadCloser := NewCancelReadCloser(ctx, ioutil.NopCloser(&perpetualReader***REMOVED******REMOVED***))
-	for ***REMOVED***
+	cancelReadCloser := NewCancelReadCloser(ctx, ioutil.NopCloser(&perpetualReader{}))
+	for {
 		var buf [128]byte
 		_, err := cancelReadCloser.Read(buf[:])
-		if err == context.DeadlineExceeded ***REMOVED***
+		if err == context.DeadlineExceeded {
 			break
-		***REMOVED*** else if err != nil ***REMOVED***
+		} else if err != nil {
 			t.Fatalf("got unexpected error: %v", err)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

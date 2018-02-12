@@ -1,13 +1,13 @@
 package main
 
-type FooBar struct ***REMOVED***
+type FooBar struct {
 	A int
 	B int
 	C float64
-***REMOVED***
+}
 
-func main() ***REMOVED***
-	x := []FooBar***REMOVED***
-		***REMOVED******REMOVED***,
-	***REMOVED***
-***REMOVED***
+func main() {
+	x := []FooBar{
+		{},
+	}
+}

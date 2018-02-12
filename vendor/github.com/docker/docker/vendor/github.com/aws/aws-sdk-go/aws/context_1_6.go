@@ -9,32 +9,32 @@ import "time"
 // 1.7's Context.
 //
 // An emptyCtx is never canceled, has no values, and has no deadline. It is not
-// struct***REMOVED******REMOVED***, since vars of this type must have distinct addresses.
+// struct{}, since vars of this type must have distinct addresses.
 type emptyCtx int
 
-func (*emptyCtx) Deadline() (deadline time.Time, ok bool) ***REMOVED***
+func (*emptyCtx) Deadline() (deadline time.Time, ok bool) {
 	return
-***REMOVED***
+}
 
-func (*emptyCtx) Done() <-chan struct***REMOVED******REMOVED*** ***REMOVED***
+func (*emptyCtx) Done() <-chan struct{} {
 	return nil
-***REMOVED***
+}
 
-func (*emptyCtx) Err() error ***REMOVED***
+func (*emptyCtx) Err() error {
 	return nil
-***REMOVED***
+}
 
-func (*emptyCtx) Value(key interface***REMOVED******REMOVED***) interface***REMOVED******REMOVED*** ***REMOVED***
+func (*emptyCtx) Value(key interface{}) interface{} {
 	return nil
-***REMOVED***
+}
 
-func (e *emptyCtx) String() string ***REMOVED***
-	switch e ***REMOVED***
+func (e *emptyCtx) String() string {
+	switch e {
 	case backgroundCtx:
 		return "aws.BackgroundContext"
-	***REMOVED***
+	}
 	return "unknown empty Context"
-***REMOVED***
+}
 
 var (
 	backgroundCtx = new(emptyCtx)

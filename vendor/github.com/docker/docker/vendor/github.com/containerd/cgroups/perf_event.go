@@ -2,20 +2,20 @@ package cgroups
 
 import "path/filepath"
 
-func NewPerfEvent(root string) *PerfEventController ***REMOVED***
-	return &PerfEventController***REMOVED***
+func NewPerfEvent(root string) *PerfEventController {
+	return &PerfEventController{
 		root: filepath.Join(root, string(PerfEvent)),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type PerfEventController struct ***REMOVED***
+type PerfEventController struct {
 	root string
-***REMOVED***
+}
 
-func (p *PerfEventController) Name() Name ***REMOVED***
+func (p *PerfEventController) Name() Name {
 	return PerfEvent
-***REMOVED***
+}
 
-func (p *PerfEventController) Path(path string) string ***REMOVED***
+func (p *PerfEventController) Path(path string) string {
 	return filepath.Join(p.root, path)
-***REMOVED***
+}

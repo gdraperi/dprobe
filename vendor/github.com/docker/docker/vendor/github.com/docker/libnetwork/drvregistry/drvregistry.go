@@ -12,35 +12,35 @@ import (
 	"github.com/docker/libnetwork/types"
 )
 
-type driverData struct ***REMOVED***
+type driverData struct {
 	driver     driverapi.Driver
 	capability driverapi.Capability
-***REMOVED***
+}
 
-type ipamData struct ***REMOVED***
+type ipamData struct {
 	driver     ipamapi.Ipam
 	capability *ipamapi.Capability
 	// default address spaces are provided by ipam driver at registration time
 	defaultLocalAddressSpace, defaultGlobalAddressSpace string
-***REMOVED***
+}
 
 type driverTable map[string]*driverData
 type ipamTable map[string]*ipamData
 
 // DrvRegistry holds the registry of all network drivers and IPAM drivers that it knows about.
-type DrvRegistry struct ***REMOVED***
+type DrvRegistry struct {
 	sync.Mutex
 	drivers      driverTable
 	ipamDrivers  ipamTable
 	dfn          DriverNotifyFunc
 	ifn          IPAMNotifyFunc
 	pluginGetter plugingetter.PluginGetter
-***REMOVED***
+}
 
 // Functors definition
 
 // InitFunc defines the driver initialization function signature.
-type InitFunc func(driverapi.DriverCallback, map[string]interface***REMOVED******REMOVED***) error
+type InitFunc func(driverapi.DriverCallback, map[string]interface{}) error
 
 // IPAMWalkFunc defines the IPAM driver table walker function signature.
 type IPAMWalkFunc func(name string, driver ipamapi.Ipam, cap *ipamapi.Capability) bool
@@ -55,174 +55,174 @@ type IPAMNotifyFunc func(name string, driver ipamapi.Ipam, cap *ipamapi.Capabili
 type DriverNotifyFunc func(name string, driver driverapi.Driver, capability driverapi.Capability) error
 
 // New retruns a new driver registry handle.
-func New(lDs, gDs interface***REMOVED******REMOVED***, dfn DriverNotifyFunc, ifn IPAMNotifyFunc, pg plugingetter.PluginGetter) (*DrvRegistry, error) ***REMOVED***
-	r := &DrvRegistry***REMOVED***
+func New(lDs, gDs interface{}, dfn DriverNotifyFunc, ifn IPAMNotifyFunc, pg plugingetter.PluginGetter) (*DrvRegistry, error) {
+	r := &DrvRegistry{
 		drivers:      make(driverTable),
 		ipamDrivers:  make(ipamTable),
 		dfn:          dfn,
 		ifn:          ifn,
 		pluginGetter: pg,
-	***REMOVED***
+	}
 
 	return r, nil
-***REMOVED***
+}
 
 // AddDriver adds a network driver to the registry.
-func (r *DrvRegistry) AddDriver(ntype string, fn InitFunc, config map[string]interface***REMOVED******REMOVED***) error ***REMOVED***
+func (r *DrvRegistry) AddDriver(ntype string, fn InitFunc, config map[string]interface{}) error {
 	return fn(r, config)
-***REMOVED***
+}
 
 // WalkIPAMs walks the IPAM drivers registered in the registry and invokes the passed walk function and each one of them.
-func (r *DrvRegistry) WalkIPAMs(ifn IPAMWalkFunc) ***REMOVED***
-	type ipamVal struct ***REMOVED***
+func (r *DrvRegistry) WalkIPAMs(ifn IPAMWalkFunc) {
+	type ipamVal struct {
 		name string
 		data *ipamData
-	***REMOVED***
+	}
 
 	r.Lock()
 	ivl := make([]ipamVal, 0, len(r.ipamDrivers))
-	for k, v := range r.ipamDrivers ***REMOVED***
-		ivl = append(ivl, ipamVal***REMOVED***name: k, data: v***REMOVED***)
-	***REMOVED***
+	for k, v := range r.ipamDrivers {
+		ivl = append(ivl, ipamVal{name: k, data: v})
+	}
 	r.Unlock()
 
-	for _, iv := range ivl ***REMOVED***
-		if ifn(iv.name, iv.data.driver, iv.data.capability) ***REMOVED***
+	for _, iv := range ivl {
+		if ifn(iv.name, iv.data.driver, iv.data.capability) {
 			break
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // WalkDrivers walks the network drivers registered in the registry and invokes the passed walk function and each one of them.
-func (r *DrvRegistry) WalkDrivers(dfn DriverWalkFunc) ***REMOVED***
-	type driverVal struct ***REMOVED***
+func (r *DrvRegistry) WalkDrivers(dfn DriverWalkFunc) {
+	type driverVal struct {
 		name string
 		data *driverData
-	***REMOVED***
+	}
 
 	r.Lock()
 	dvl := make([]driverVal, 0, len(r.drivers))
-	for k, v := range r.drivers ***REMOVED***
-		dvl = append(dvl, driverVal***REMOVED***name: k, data: v***REMOVED***)
-	***REMOVED***
+	for k, v := range r.drivers {
+		dvl = append(dvl, driverVal{name: k, data: v})
+	}
 	r.Unlock()
 
-	for _, dv := range dvl ***REMOVED***
-		if dfn(dv.name, dv.data.driver, dv.data.capability) ***REMOVED***
+	for _, dv := range dvl {
+		if dfn(dv.name, dv.data.driver, dv.data.capability) {
 			break
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // Driver returns the actual network driver instance and its capability  which registered with the passed name.
-func (r *DrvRegistry) Driver(name string) (driverapi.Driver, *driverapi.Capability) ***REMOVED***
+func (r *DrvRegistry) Driver(name string) (driverapi.Driver, *driverapi.Capability) {
 	r.Lock()
 	defer r.Unlock()
 
 	d, ok := r.drivers[name]
-	if !ok ***REMOVED***
+	if !ok {
 		return nil, nil
-	***REMOVED***
+	}
 
 	return d.driver, &d.capability
-***REMOVED***
+}
 
 // IPAM returns the actual IPAM driver instance and its capability which registered with the passed name.
-func (r *DrvRegistry) IPAM(name string) (ipamapi.Ipam, *ipamapi.Capability) ***REMOVED***
+func (r *DrvRegistry) IPAM(name string) (ipamapi.Ipam, *ipamapi.Capability) {
 	r.Lock()
 	defer r.Unlock()
 
 	i, ok := r.ipamDrivers[name]
-	if !ok ***REMOVED***
+	if !ok {
 		return nil, nil
-	***REMOVED***
+	}
 
 	return i.driver, i.capability
-***REMOVED***
+}
 
 // IPAMDefaultAddressSpaces returns the default address space strings for the passed IPAM driver name.
-func (r *DrvRegistry) IPAMDefaultAddressSpaces(name string) (string, string, error) ***REMOVED***
+func (r *DrvRegistry) IPAMDefaultAddressSpaces(name string) (string, string, error) {
 	r.Lock()
 	defer r.Unlock()
 
 	i, ok := r.ipamDrivers[name]
-	if !ok ***REMOVED***
+	if !ok {
 		return "", "", fmt.Errorf("ipam %s not found", name)
-	***REMOVED***
+	}
 
 	return i.defaultLocalAddressSpace, i.defaultGlobalAddressSpace, nil
-***REMOVED***
+}
 
 // GetPluginGetter returns the plugingetter
-func (r *DrvRegistry) GetPluginGetter() plugingetter.PluginGetter ***REMOVED***
+func (r *DrvRegistry) GetPluginGetter() plugingetter.PluginGetter {
 	return r.pluginGetter
-***REMOVED***
+}
 
 // RegisterDriver registers the network driver when it gets discovered.
-func (r *DrvRegistry) RegisterDriver(ntype string, driver driverapi.Driver, capability driverapi.Capability) error ***REMOVED***
-	if strings.TrimSpace(ntype) == "" ***REMOVED***
+func (r *DrvRegistry) RegisterDriver(ntype string, driver driverapi.Driver, capability driverapi.Capability) error {
+	if strings.TrimSpace(ntype) == "" {
 		return errors.New("network type string cannot be empty")
-	***REMOVED***
+	}
 
 	r.Lock()
 	dd, ok := r.drivers[ntype]
 	r.Unlock()
 
-	if ok && dd.driver.IsBuiltIn() ***REMOVED***
+	if ok && dd.driver.IsBuiltIn() {
 		return driverapi.ErrActiveRegistration(ntype)
-	***REMOVED***
+	}
 
-	if r.dfn != nil ***REMOVED***
-		if err := r.dfn(ntype, driver, capability); err != nil ***REMOVED***
+	if r.dfn != nil {
+		if err := r.dfn(ntype, driver, capability); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	dData := &driverData***REMOVED***driver, capability***REMOVED***
+	dData := &driverData{driver, capability}
 
 	r.Lock()
 	r.drivers[ntype] = dData
 	r.Unlock()
 
 	return nil
-***REMOVED***
+}
 
-func (r *DrvRegistry) registerIpamDriver(name string, driver ipamapi.Ipam, caps *ipamapi.Capability) error ***REMOVED***
-	if strings.TrimSpace(name) == "" ***REMOVED***
+func (r *DrvRegistry) registerIpamDriver(name string, driver ipamapi.Ipam, caps *ipamapi.Capability) error {
+	if strings.TrimSpace(name) == "" {
 		return errors.New("ipam driver name string cannot be empty")
-	***REMOVED***
+	}
 
 	r.Lock()
 	dd, ok := r.ipamDrivers[name]
 	r.Unlock()
-	if ok && dd.driver.IsBuiltIn() ***REMOVED***
+	if ok && dd.driver.IsBuiltIn() {
 		return types.ForbiddenErrorf("ipam driver %q already registered", name)
-	***REMOVED***
+	}
 
 	locAS, glbAS, err := driver.GetDefaultAddressSpaces()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return types.InternalErrorf("ipam driver %q failed to return default address spaces: %v", name, err)
-	***REMOVED***
+	}
 
-	if r.ifn != nil ***REMOVED***
-		if err := r.ifn(name, driver, caps); err != nil ***REMOVED***
+	if r.ifn != nil {
+		if err := r.ifn(name, driver, caps); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	r.Lock()
-	r.ipamDrivers[name] = &ipamData***REMOVED***driver: driver, defaultLocalAddressSpace: locAS, defaultGlobalAddressSpace: glbAS, capability: caps***REMOVED***
+	r.ipamDrivers[name] = &ipamData{driver: driver, defaultLocalAddressSpace: locAS, defaultGlobalAddressSpace: glbAS, capability: caps}
 	r.Unlock()
 
 	return nil
-***REMOVED***
+}
 
 // RegisterIpamDriver registers the IPAM driver discovered with default capabilities.
-func (r *DrvRegistry) RegisterIpamDriver(name string, driver ipamapi.Ipam) error ***REMOVED***
-	return r.registerIpamDriver(name, driver, &ipamapi.Capability***REMOVED******REMOVED***)
-***REMOVED***
+func (r *DrvRegistry) RegisterIpamDriver(name string, driver ipamapi.Ipam) error {
+	return r.registerIpamDriver(name, driver, &ipamapi.Capability{})
+}
 
 // RegisterIpamDriverWithCapabilities registers the IPAM driver discovered with specified capabilities.
-func (r *DrvRegistry) RegisterIpamDriverWithCapabilities(name string, driver ipamapi.Ipam, caps *ipamapi.Capability) error ***REMOVED***
+func (r *DrvRegistry) RegisterIpamDriverWithCapabilities(name string, driver ipamapi.Ipam, caps *ipamapi.Capability) error {
 	return r.registerIpamDriver(name, driver, caps)
-***REMOVED***
+}

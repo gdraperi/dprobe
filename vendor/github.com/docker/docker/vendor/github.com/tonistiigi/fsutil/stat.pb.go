@@ -38,7 +38,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
-type Stat struct ***REMOVED***
+type Stat struct {
 	Path    string `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
 	Mode    uint32 `protobuf:"varint,2,opt,name=mode,proto3" json:"mode,omitempty"`
 	Uid     uint32 `protobuf:"varint,3,opt,name=uid,proto3" json:"uid,omitempty"`
@@ -50,153 +50,153 @@ type Stat struct ***REMOVED***
 	Devmajor int64             `protobuf:"varint,8,opt,name=devmajor,proto3" json:"devmajor,omitempty"`
 	Devminor int64             `protobuf:"varint,9,opt,name=devminor,proto3" json:"devminor,omitempty"`
 	Xattrs   map[string][]byte `protobuf:"bytes,10,rep,name=xattrs" json:"xattrs,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-***REMOVED***
+}
 
-func (m *Stat) Reset()                    ***REMOVED*** *m = Stat***REMOVED******REMOVED*** ***REMOVED***
-func (*Stat) ProtoMessage()               ***REMOVED******REMOVED***
-func (*Stat) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorStat, []int***REMOVED***0***REMOVED*** ***REMOVED***
+func (m *Stat) Reset()                    { *m = Stat{} }
+func (*Stat) ProtoMessage()               {}
+func (*Stat) Descriptor() ([]byte, []int) { return fileDescriptorStat, []int{0} }
 
-func (m *Stat) GetPath() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Stat) GetPath() string {
+	if m != nil {
 		return m.Path
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *Stat) GetMode() uint32 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Stat) GetMode() uint32 {
+	if m != nil {
 		return m.Mode
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *Stat) GetUid() uint32 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Stat) GetUid() uint32 {
+	if m != nil {
 		return m.Uid
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *Stat) GetGid() uint32 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Stat) GetGid() uint32 {
+	if m != nil {
 		return m.Gid
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *Stat) GetSize_() int64 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Stat) GetSize_() int64 {
+	if m != nil {
 		return m.Size_
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *Stat) GetModTime() int64 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Stat) GetModTime() int64 {
+	if m != nil {
 		return m.ModTime
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *Stat) GetLinkname() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Stat) GetLinkname() string {
+	if m != nil {
 		return m.Linkname
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *Stat) GetDevmajor() int64 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Stat) GetDevmajor() int64 {
+	if m != nil {
 		return m.Devmajor
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *Stat) GetDevminor() int64 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Stat) GetDevminor() int64 {
+	if m != nil {
 		return m.Devminor
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *Stat) GetXattrs() map[string][]byte ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Stat) GetXattrs() map[string][]byte {
+	if m != nil {
 		return m.Xattrs
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*Stat)(nil), "fsutil.Stat")
-***REMOVED***
-func (this *Stat) Equal(that interface***REMOVED******REMOVED***) bool ***REMOVED***
-	if that == nil ***REMOVED***
-		if this == nil ***REMOVED***
+}
+func (this *Stat) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
 			return true
-		***REMOVED***
+		}
 		return false
-	***REMOVED***
+	}
 
 	that1, ok := that.(*Stat)
-	if !ok ***REMOVED***
+	if !ok {
 		that2, ok := that.(Stat)
-		if ok ***REMOVED***
+		if ok {
 			that1 = &that2
-		***REMOVED*** else ***REMOVED***
+		} else {
 			return false
-		***REMOVED***
-	***REMOVED***
-	if that1 == nil ***REMOVED***
-		if this == nil ***REMOVED***
+		}
+	}
+	if that1 == nil {
+		if this == nil {
 			return true
-		***REMOVED***
+		}
 		return false
-	***REMOVED*** else if this == nil ***REMOVED***
+	} else if this == nil {
 		return false
-	***REMOVED***
-	if this.Path != that1.Path ***REMOVED***
+	}
+	if this.Path != that1.Path {
 		return false
-	***REMOVED***
-	if this.Mode != that1.Mode ***REMOVED***
+	}
+	if this.Mode != that1.Mode {
 		return false
-	***REMOVED***
-	if this.Uid != that1.Uid ***REMOVED***
+	}
+	if this.Uid != that1.Uid {
 		return false
-	***REMOVED***
-	if this.Gid != that1.Gid ***REMOVED***
+	}
+	if this.Gid != that1.Gid {
 		return false
-	***REMOVED***
-	if this.Size_ != that1.Size_ ***REMOVED***
+	}
+	if this.Size_ != that1.Size_ {
 		return false
-	***REMOVED***
-	if this.ModTime != that1.ModTime ***REMOVED***
+	}
+	if this.ModTime != that1.ModTime {
 		return false
-	***REMOVED***
-	if this.Linkname != that1.Linkname ***REMOVED***
+	}
+	if this.Linkname != that1.Linkname {
 		return false
-	***REMOVED***
-	if this.Devmajor != that1.Devmajor ***REMOVED***
+	}
+	if this.Devmajor != that1.Devmajor {
 		return false
-	***REMOVED***
-	if this.Devminor != that1.Devminor ***REMOVED***
+	}
+	if this.Devminor != that1.Devminor {
 		return false
-	***REMOVED***
-	if len(this.Xattrs) != len(that1.Xattrs) ***REMOVED***
+	}
+	if len(this.Xattrs) != len(that1.Xattrs) {
 		return false
-	***REMOVED***
-	for i := range this.Xattrs ***REMOVED***
-		if !bytes.Equal(this.Xattrs[i], that1.Xattrs[i]) ***REMOVED***
+	}
+	for i := range this.Xattrs {
+		if !bytes.Equal(this.Xattrs[i], that1.Xattrs[i]) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
-func (this *Stat) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Stat) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 14)
-	s = append(s, "&fsutil.Stat***REMOVED***")
+	s = append(s, "&fsutil.Stat{")
 	s = append(s, "Path: "+fmt.Sprintf("%#v", this.Path)+",\n")
 	s = append(s, "Mode: "+fmt.Sprintf("%#v", this.Mode)+",\n")
 	s = append(s, "Uid: "+fmt.Sprintf("%#v", this.Uid)+",\n")
@@ -207,118 +207,118 @@ func (this *Stat) GoString() string ***REMOVED***
 	s = append(s, "Devmajor: "+fmt.Sprintf("%#v", this.Devmajor)+",\n")
 	s = append(s, "Devminor: "+fmt.Sprintf("%#v", this.Devminor)+",\n")
 	keysForXattrs := make([]string, 0, len(this.Xattrs))
-	for k, _ := range this.Xattrs ***REMOVED***
+	for k, _ := range this.Xattrs {
 		keysForXattrs = append(keysForXattrs, k)
-	***REMOVED***
+	}
 	github_com_gogo_protobuf_sortkeys.Strings(keysForXattrs)
-	mapStringForXattrs := "map[string][]byte***REMOVED***"
-	for _, k := range keysForXattrs ***REMOVED***
+	mapStringForXattrs := "map[string][]byte{"
+	for _, k := range keysForXattrs {
 		mapStringForXattrs += fmt.Sprintf("%#v: %#v,", k, this.Xattrs[k])
-	***REMOVED***
-	mapStringForXattrs += "***REMOVED***"
-	if this.Xattrs != nil ***REMOVED***
+	}
+	mapStringForXattrs += "}"
+	if this.Xattrs != nil {
 		s = append(s, "Xattrs: "+mapStringForXattrs+",\n")
-	***REMOVED***
-	s = append(s, "***REMOVED***")
+	}
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func valueToGoStringStat(v interface***REMOVED******REMOVED***, typ string) string ***REMOVED***
+}
+func valueToGoStringStat(v interface{}, typ string) string {
 	rv := reflect.ValueOf(v)
-	if rv.IsNil() ***REMOVED***
+	if rv.IsNil() {
 		return "nil"
-	***REMOVED***
+	}
 	pv := reflect.Indirect(rv).Interface()
-	return fmt.Sprintf("func(v %v) *%v ***REMOVED*** return &v ***REMOVED*** ( %#v )", typ, typ, pv)
-***REMOVED***
-func (m *Stat) Marshal() (dAtA []byte, err error) ***REMOVED***
+	return fmt.Sprintf("func(v %v) *%v { return &v } ( %#v )", typ, typ, pv)
+}
+func (m *Stat) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *Stat) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *Stat) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Path) > 0 ***REMOVED***
+	if len(m.Path) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintStat(dAtA, i, uint64(len(m.Path)))
 		i += copy(dAtA[i:], m.Path)
-	***REMOVED***
-	if m.Mode != 0 ***REMOVED***
+	}
+	if m.Mode != 0 {
 		dAtA[i] = 0x10
 		i++
 		i = encodeVarintStat(dAtA, i, uint64(m.Mode))
-	***REMOVED***
-	if m.Uid != 0 ***REMOVED***
+	}
+	if m.Uid != 0 {
 		dAtA[i] = 0x18
 		i++
 		i = encodeVarintStat(dAtA, i, uint64(m.Uid))
-	***REMOVED***
-	if m.Gid != 0 ***REMOVED***
+	}
+	if m.Gid != 0 {
 		dAtA[i] = 0x20
 		i++
 		i = encodeVarintStat(dAtA, i, uint64(m.Gid))
-	***REMOVED***
-	if m.Size_ != 0 ***REMOVED***
+	}
+	if m.Size_ != 0 {
 		dAtA[i] = 0x28
 		i++
 		i = encodeVarintStat(dAtA, i, uint64(m.Size_))
-	***REMOVED***
-	if m.ModTime != 0 ***REMOVED***
+	}
+	if m.ModTime != 0 {
 		dAtA[i] = 0x30
 		i++
 		i = encodeVarintStat(dAtA, i, uint64(m.ModTime))
-	***REMOVED***
-	if len(m.Linkname) > 0 ***REMOVED***
+	}
+	if len(m.Linkname) > 0 {
 		dAtA[i] = 0x3a
 		i++
 		i = encodeVarintStat(dAtA, i, uint64(len(m.Linkname)))
 		i += copy(dAtA[i:], m.Linkname)
-	***REMOVED***
-	if m.Devmajor != 0 ***REMOVED***
+	}
+	if m.Devmajor != 0 {
 		dAtA[i] = 0x40
 		i++
 		i = encodeVarintStat(dAtA, i, uint64(m.Devmajor))
-	***REMOVED***
-	if m.Devminor != 0 ***REMOVED***
+	}
+	if m.Devminor != 0 {
 		dAtA[i] = 0x48
 		i++
 		i = encodeVarintStat(dAtA, i, uint64(m.Devminor))
-	***REMOVED***
-	if len(m.Xattrs) > 0 ***REMOVED***
-		for k, _ := range m.Xattrs ***REMOVED***
+	}
+	if len(m.Xattrs) > 0 {
+		for k, _ := range m.Xattrs {
 			dAtA[i] = 0x52
 			i++
 			v := m.Xattrs[k]
 			byteSize := 0
-			if len(v) > 0 ***REMOVED***
+			if len(v) > 0 {
 				byteSize = 1 + len(v) + sovStat(uint64(len(v)))
-			***REMOVED***
+			}
 			mapSize := 1 + len(k) + sovStat(uint64(len(k))) + byteSize
 			i = encodeVarintStat(dAtA, i, uint64(mapSize))
 			dAtA[i] = 0xa
 			i++
 			i = encodeVarintStat(dAtA, i, uint64(len(k)))
 			i += copy(dAtA[i:], k)
-			if len(v) > 0 ***REMOVED***
+			if len(v) > 0 {
 				dAtA[i] = 0x12
 				i++
 				i = encodeVarintStat(dAtA, i, uint64(len(v)))
 				i += copy(dAtA[i:], v)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return i, nil
-***REMOVED***
+}
 
-func encodeFixed64Stat(dAtA []byte, offset int, v uint64) int ***REMOVED***
+func encodeFixed64Stat(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
 	dAtA[offset+2] = uint8(v >> 16)
@@ -328,98 +328,98 @@ func encodeFixed64Stat(dAtA []byte, offset int, v uint64) int ***REMOVED***
 	dAtA[offset+6] = uint8(v >> 48)
 	dAtA[offset+7] = uint8(v >> 56)
 	return offset + 8
-***REMOVED***
-func encodeFixed32Stat(dAtA []byte, offset int, v uint32) int ***REMOVED***
+}
+func encodeFixed32Stat(dAtA []byte, offset int, v uint32) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
 	dAtA[offset+2] = uint8(v >> 16)
 	dAtA[offset+3] = uint8(v >> 24)
 	return offset + 4
-***REMOVED***
-func encodeVarintStat(dAtA []byte, offset int, v uint64) int ***REMOVED***
-	for v >= 1<<7 ***REMOVED***
+}
+func encodeVarintStat(dAtA []byte, offset int, v uint64) int {
+	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
-	***REMOVED***
+	}
 	dAtA[offset] = uint8(v)
 	return offset + 1
-***REMOVED***
-func (m *Stat) Size() (n int) ***REMOVED***
+}
+func (m *Stat) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.Path)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovStat(uint64(l))
-	***REMOVED***
-	if m.Mode != 0 ***REMOVED***
+	}
+	if m.Mode != 0 {
 		n += 1 + sovStat(uint64(m.Mode))
-	***REMOVED***
-	if m.Uid != 0 ***REMOVED***
+	}
+	if m.Uid != 0 {
 		n += 1 + sovStat(uint64(m.Uid))
-	***REMOVED***
-	if m.Gid != 0 ***REMOVED***
+	}
+	if m.Gid != 0 {
 		n += 1 + sovStat(uint64(m.Gid))
-	***REMOVED***
-	if m.Size_ != 0 ***REMOVED***
+	}
+	if m.Size_ != 0 {
 		n += 1 + sovStat(uint64(m.Size_))
-	***REMOVED***
-	if m.ModTime != 0 ***REMOVED***
+	}
+	if m.ModTime != 0 {
 		n += 1 + sovStat(uint64(m.ModTime))
-	***REMOVED***
+	}
 	l = len(m.Linkname)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovStat(uint64(l))
-	***REMOVED***
-	if m.Devmajor != 0 ***REMOVED***
+	}
+	if m.Devmajor != 0 {
 		n += 1 + sovStat(uint64(m.Devmajor))
-	***REMOVED***
-	if m.Devminor != 0 ***REMOVED***
+	}
+	if m.Devminor != 0 {
 		n += 1 + sovStat(uint64(m.Devminor))
-	***REMOVED***
-	if len(m.Xattrs) > 0 ***REMOVED***
-		for k, v := range m.Xattrs ***REMOVED***
+	}
+	if len(m.Xattrs) > 0 {
+		for k, v := range m.Xattrs {
 			_ = k
 			_ = v
 			l = 0
-			if len(v) > 0 ***REMOVED***
+			if len(v) > 0 {
 				l = 1 + len(v) + sovStat(uint64(len(v)))
-			***REMOVED***
+			}
 			mapEntrySize := 1 + len(k) + sovStat(uint64(len(k))) + l
 			n += mapEntrySize + 1 + sovStat(uint64(mapEntrySize))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
+}
 
-func sovStat(x uint64) (n int) ***REMOVED***
-	for ***REMOVED***
+func sovStat(x uint64) (n int) {
+	for {
 		n++
 		x >>= 7
-		if x == 0 ***REMOVED***
+		if x == 0 {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
-func sozStat(x uint64) (n int) ***REMOVED***
+}
+func sozStat(x uint64) (n int) {
 	return sovStat(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-***REMOVED***
-func (this *Stat) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Stat) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	keysForXattrs := make([]string, 0, len(this.Xattrs))
-	for k, _ := range this.Xattrs ***REMOVED***
+	for k, _ := range this.Xattrs {
 		keysForXattrs = append(keysForXattrs, k)
-	***REMOVED***
+	}
 	github_com_gogo_protobuf_sortkeys.Strings(keysForXattrs)
-	mapStringForXattrs := "map[string][]byte***REMOVED***"
-	for _, k := range keysForXattrs ***REMOVED***
+	mapStringForXattrs := "map[string][]byte{"
+	for _, k := range keysForXattrs {
 		mapStringForXattrs += fmt.Sprintf("%v: %v,", k, this.Xattrs[k])
-	***REMOVED***
-	mapStringForXattrs += "***REMOVED***"
-	s := strings.Join([]string***REMOVED***`&Stat***REMOVED***`,
+	}
+	mapStringForXattrs += "}"
+	s := strings.Join([]string{`&Stat{`,
 		`Path:` + fmt.Sprintf("%v", this.Path) + `,`,
 		`Mode:` + fmt.Sprintf("%v", this.Mode) + `,`,
 		`Uid:` + fmt.Sprintf("%v", this.Uid) + `,`,
@@ -430,463 +430,463 @@ func (this *Stat) String() string ***REMOVED***
 		`Devmajor:` + fmt.Sprintf("%v", this.Devmajor) + `,`,
 		`Devminor:` + fmt.Sprintf("%v", this.Devminor) + `,`,
 		`Xattrs:` + mapStringForXattrs + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func valueToStringStat(v interface***REMOVED******REMOVED***) string ***REMOVED***
+}
+func valueToStringStat(v interface{}) string {
 	rv := reflect.ValueOf(v)
-	if rv.IsNil() ***REMOVED***
+	if rv.IsNil() {
 		return "nil"
-	***REMOVED***
+	}
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
-***REMOVED***
-func (m *Stat) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *Stat) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowStat
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: Stat: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: Stat: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Path", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowStat
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthStat
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Path = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Mode", wireType)
-			***REMOVED***
+			}
 			m.Mode = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowStat
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Mode |= (uint32(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 3:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Uid", wireType)
-			***REMOVED***
+			}
 			m.Uid = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowStat
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Uid |= (uint32(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 4:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Gid", wireType)
-			***REMOVED***
+			}
 			m.Gid = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowStat
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Gid |= (uint32(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 5:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Size_", wireType)
-			***REMOVED***
+			}
 			m.Size_ = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowStat
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Size_ |= (int64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 6:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ModTime", wireType)
-			***REMOVED***
+			}
 			m.ModTime = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowStat
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.ModTime |= (int64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 7:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Linkname", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowStat
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthStat
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Linkname = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 8:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Devmajor", wireType)
-			***REMOVED***
+			}
 			m.Devmajor = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowStat
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Devmajor |= (int64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 9:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Devminor", wireType)
-			***REMOVED***
+			}
 			m.Devminor = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowStat
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Devminor |= (int64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 10:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Xattrs", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowStat
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthStat
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			var keykey uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowStat
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				keykey |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			var stringLenmapkey uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowStat
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLenmapkey |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLenmapkey := int(stringLenmapkey)
-			if intStringLenmapkey < 0 ***REMOVED***
+			if intStringLenmapkey < 0 {
 				return ErrInvalidLengthStat
-			***REMOVED***
+			}
 			postStringIndexmapkey := iNdEx + intStringLenmapkey
-			if postStringIndexmapkey > l ***REMOVED***
+			if postStringIndexmapkey > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			mapkey := string(dAtA[iNdEx:postStringIndexmapkey])
 			iNdEx = postStringIndexmapkey
-			if m.Xattrs == nil ***REMOVED***
+			if m.Xattrs == nil {
 				m.Xattrs = make(map[string][]byte)
-			***REMOVED***
-			if iNdEx < postIndex ***REMOVED***
+			}
+			if iNdEx < postIndex {
 				var valuekey uint64
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return ErrIntOverflowStat
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					valuekey |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				var mapbyteLen uint64
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return ErrIntOverflowStat
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					mapbyteLen |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				intMapbyteLen := int(mapbyteLen)
-				if intMapbyteLen < 0 ***REMOVED***
+				if intMapbyteLen < 0 {
 					return ErrInvalidLengthStat
-				***REMOVED***
+				}
 				postbytesIndex := iNdEx + intMapbyteLen
-				if postbytesIndex > l ***REMOVED***
+				if postbytesIndex > l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				mapvalue := make([]byte, mapbyteLen)
 				copy(mapvalue, dAtA[iNdEx:postbytesIndex])
 				iNdEx = postbytesIndex
 				m.Xattrs[mapkey] = mapvalue
-			***REMOVED*** else ***REMOVED***
+			} else {
 				var mapvalue []byte
 				m.Xattrs[mapkey] = mapvalue
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipStat(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthStat
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func skipStat(dAtA []byte) (n int, err error) ***REMOVED***
+}
+func skipStat(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return 0, ErrIntOverflowStat
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return 0, io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		wireType := int(wire & 0x7)
-		switch wireType ***REMOVED***
+		switch wireType {
 		case 0:
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowStat
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				iNdEx++
-				if dAtA[iNdEx-1] < 0x80 ***REMOVED***
+				if dAtA[iNdEx-1] < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return iNdEx, nil
 		case 1:
 			iNdEx += 8
 			return iNdEx, nil
 		case 2:
 			var length int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowStat
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				length |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			iNdEx += length
-			if length < 0 ***REMOVED***
+			if length < 0 {
 				return 0, ErrInvalidLengthStat
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 3:
-			for ***REMOVED***
+			for {
 				var innerWire uint64
 				var start int = iNdEx
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return 0, ErrIntOverflowStat
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return 0, io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					innerWire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				innerWireType := int(innerWire & 0x7)
-				if innerWireType == 4 ***REMOVED***
+				if innerWireType == 4 {
 					break
-				***REMOVED***
+				}
 				next, err := skipStat(dAtA[start:])
-				if err != nil ***REMOVED***
+				if err != nil {
 					return 0, err
-				***REMOVED***
+				}
 				iNdEx = start + next
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 4:
 			return iNdEx, nil
@@ -895,19 +895,19 @@ func skipStat(dAtA []byte) (n int, err error) ***REMOVED***
 			return iNdEx, nil
 		default:
 			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	panic("unreachable")
-***REMOVED***
+}
 
 var (
 	ErrInvalidLengthStat = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowStat   = fmt.Errorf("proto: integer overflow")
 )
 
-func init() ***REMOVED*** proto.RegisterFile("stat.proto", fileDescriptorStat) ***REMOVED***
+func init() { proto.RegisterFile("stat.proto", fileDescriptorStat) }
 
-var fileDescriptorStat = []byte***REMOVED***
+var fileDescriptorStat = []byte{
 	// 303 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x4c, 0x91, 0xb1, 0x4e, 0xf3, 0x30,
 	0x14, 0x85, 0x73, 0x9b, 0x36, 0x6d, 0xdd, 0xff, 0x97, 0x90, 0xc5, 0x70, 0xd5, 0xc1, 0x8a, 0x98,
@@ -928,4 +928,4 @@ var fileDescriptorStat = []byte***REMOVED***
 	0x1f, 0x0d, 0x0b, 0xd6, 0x0d, 0x83, 0x67, 0xcb, 0xe0, 0xd5, 0x32, 0x78, 0xb7, 0x0c, 0x56, 0x96,
 	0xc1, 0xa7, 0x65, 0xf0, 0x6d, 0x59, 0xb0, 0xb6, 0x0c, 0x5e, 0xbe, 0x58, 0x70, 0x1b, 0xf9, 0x03,
 	0x9c, 0xfc, 0x04, 0x00, 0x00, 0xff, 0xff, 0x19, 0x97, 0x14, 0xf4, 0x8e, 0x01, 0x00, 0x00,
-***REMOVED***
+}

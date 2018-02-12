@@ -9,40 +9,40 @@ import (
 
 type partitions []partition
 
-func (ps partitions) EndpointFor(service, region string, opts ...func(*Options)) (ResolvedEndpoint, error) ***REMOVED***
+func (ps partitions) EndpointFor(service, region string, opts ...func(*Options)) (ResolvedEndpoint, error) {
 	var opt Options
 	opt.Set(opts...)
 
-	for i := 0; i < len(ps); i++ ***REMOVED***
-		if !ps[i].canResolveEndpoint(service, region, opt.StrictMatching) ***REMOVED***
+	for i := 0; i < len(ps); i++ {
+		if !ps[i].canResolveEndpoint(service, region, opt.StrictMatching) {
 			continue
-		***REMOVED***
+		}
 
 		return ps[i].EndpointFor(service, region, opts...)
-	***REMOVED***
+	}
 
 	// If loose matching fallback to first partition format to use
 	// when resolving the endpoint.
-	if !opt.StrictMatching && len(ps) > 0 ***REMOVED***
+	if !opt.StrictMatching && len(ps) > 0 {
 		return ps[0].EndpointFor(service, region, opts...)
-	***REMOVED***
+	}
 
-	return ResolvedEndpoint***REMOVED******REMOVED***, NewUnknownEndpointError("all partitions", service, region, []string***REMOVED******REMOVED***)
-***REMOVED***
+	return ResolvedEndpoint{}, NewUnknownEndpointError("all partitions", service, region, []string{})
+}
 
 // Partitions satisfies the EnumPartitions interface and returns a list
 // of Partitions representing each partition represented in the SDK's
 // endpoints model.
-func (ps partitions) Partitions() []Partition ***REMOVED***
+func (ps partitions) Partitions() []Partition {
 	parts := make([]Partition, 0, len(ps))
-	for i := 0; i < len(ps); i++ ***REMOVED***
+	for i := 0; i < len(ps); i++ {
 		parts = append(parts, ps[i].Partition())
-	***REMOVED***
+	}
 
 	return parts
-***REMOVED***
+}
 
-type partition struct ***REMOVED***
+type partition struct {
 	ID          string      `json:"partition"`
 	Name        string      `json:"partitionName"`
 	DNSSuffix   string      `json:"dnsSuffix"`
@@ -50,115 +50,115 @@ type partition struct ***REMOVED***
 	Defaults    endpoint    `json:"defaults"`
 	Regions     regions     `json:"regions"`
 	Services    services    `json:"services"`
-***REMOVED***
+}
 
-func (p partition) Partition() Partition ***REMOVED***
-	return Partition***REMOVED***
+func (p partition) Partition() Partition {
+	return Partition{
 		id: p.ID,
 		p:  &p,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (p partition) canResolveEndpoint(service, region string, strictMatch bool) bool ***REMOVED***
+func (p partition) canResolveEndpoint(service, region string, strictMatch bool) bool {
 	s, hasService := p.Services[service]
 	_, hasEndpoint := s.Endpoints[region]
 
-	if hasEndpoint && hasService ***REMOVED***
+	if hasEndpoint && hasService {
 		return true
-	***REMOVED***
+	}
 
-	if strictMatch ***REMOVED***
+	if strictMatch {
 		return false
-	***REMOVED***
+	}
 
 	return p.RegionRegex.MatchString(region)
-***REMOVED***
+}
 
-func (p partition) EndpointFor(service, region string, opts ...func(*Options)) (resolved ResolvedEndpoint, err error) ***REMOVED***
+func (p partition) EndpointFor(service, region string, opts ...func(*Options)) (resolved ResolvedEndpoint, err error) {
 	var opt Options
 	opt.Set(opts...)
 
 	s, hasService := p.Services[service]
-	if !(hasService || opt.ResolveUnknownService) ***REMOVED***
+	if !(hasService || opt.ResolveUnknownService) {
 		// Only return error if the resolver will not fallback to creating
 		// endpoint based on service endpoint ID passed in.
 		return resolved, NewUnknownServiceError(p.ID, service, serviceList(p.Services))
-	***REMOVED***
+	}
 
 	e, hasEndpoint := s.endpointForRegion(region)
-	if !hasEndpoint && opt.StrictMatching ***REMOVED***
+	if !hasEndpoint && opt.StrictMatching {
 		return resolved, NewUnknownEndpointError(p.ID, service, region, endpointList(s.Endpoints))
-	***REMOVED***
+	}
 
-	defs := []endpoint***REMOVED***p.Defaults, s.Defaults***REMOVED***
+	defs := []endpoint{p.Defaults, s.Defaults}
 	return e.resolve(service, region, p.DNSSuffix, defs, opt), nil
-***REMOVED***
+}
 
-func serviceList(ss services) []string ***REMOVED***
+func serviceList(ss services) []string {
 	list := make([]string, 0, len(ss))
-	for k := range ss ***REMOVED***
+	for k := range ss {
 		list = append(list, k)
-	***REMOVED***
+	}
 	return list
-***REMOVED***
-func endpointList(es endpoints) []string ***REMOVED***
+}
+func endpointList(es endpoints) []string {
 	list := make([]string, 0, len(es))
-	for k := range es ***REMOVED***
+	for k := range es {
 		list = append(list, k)
-	***REMOVED***
+	}
 	return list
-***REMOVED***
+}
 
-type regionRegex struct ***REMOVED***
+type regionRegex struct {
 	*regexp.Regexp
-***REMOVED***
+}
 
-func (rr *regionRegex) UnmarshalJSON(b []byte) (err error) ***REMOVED***
+func (rr *regionRegex) UnmarshalJSON(b []byte) (err error) {
 	// Strip leading and trailing quotes
 	regex, err := strconv.Unquote(string(b))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("unable to strip quotes from regex, %v", err)
-	***REMOVED***
+	}
 
 	rr.Regexp, err = regexp.Compile(regex)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("unable to unmarshal region regex, %v", err)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 type regions map[string]region
 
-type region struct ***REMOVED***
+type region struct {
 	Description string `json:"description"`
-***REMOVED***
+}
 
 type services map[string]service
 
-type service struct ***REMOVED***
+type service struct {
 	PartitionEndpoint string    `json:"partitionEndpoint"`
 	IsRegionalized    boxedBool `json:"isRegionalized,omitempty"`
 	Defaults          endpoint  `json:"defaults"`
 	Endpoints         endpoints `json:"endpoints"`
-***REMOVED***
+}
 
-func (s *service) endpointForRegion(region string) (endpoint, bool) ***REMOVED***
-	if s.IsRegionalized == boxedFalse ***REMOVED***
+func (s *service) endpointForRegion(region string) (endpoint, bool) {
+	if s.IsRegionalized == boxedFalse {
 		return s.Endpoints[s.PartitionEndpoint], region == s.PartitionEndpoint
-	***REMOVED***
+	}
 
-	if e, ok := s.Endpoints[region]; ok ***REMOVED***
+	if e, ok := s.Endpoints[region]; ok {
 		return e, true
-	***REMOVED***
+	}
 
 	// Unable to find any matching endpoint, return
 	// blank that will be used for generic endpoint creation.
-	return endpoint***REMOVED******REMOVED***, false
-***REMOVED***
+	return endpoint{}, false
+}
 
 type endpoints map[string]endpoint
 
-type endpoint struct ***REMOVED***
+type endpoint struct {
 	Hostname        string          `json:"hostname"`
 	Protocols       []string        `json:"protocols"`
 	CredentialScope credentialScope `json:"credentialScope"`
@@ -172,7 +172,7 @@ type endpoint struct ***REMOVED***
 
 	// SSLCommonName not used.
 	SSLCommonName string `json:"sslCommonName"`
-***REMOVED***
+}
 
 const (
 	defaultProtocol = "https"
@@ -180,121 +180,121 @@ const (
 )
 
 var (
-	protocolPriority = []string***REMOVED***"https", "http"***REMOVED***
-	signerPriority   = []string***REMOVED***"v4", "v2"***REMOVED***
+	protocolPriority = []string{"https", "http"}
+	signerPriority   = []string{"v4", "v2"}
 )
 
-func getByPriority(s []string, p []string, def string) string ***REMOVED***
-	if len(s) == 0 ***REMOVED***
+func getByPriority(s []string, p []string, def string) string {
+	if len(s) == 0 {
 		return def
-	***REMOVED***
+	}
 
-	for i := 0; i < len(p); i++ ***REMOVED***
-		for j := 0; j < len(s); j++ ***REMOVED***
-			if s[j] == p[i] ***REMOVED***
+	for i := 0; i < len(p); i++ {
+		for j := 0; j < len(s); j++ {
+			if s[j] == p[i] {
 				return s[j]
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	return s[0]
-***REMOVED***
+}
 
-func (e endpoint) resolve(service, region, dnsSuffix string, defs []endpoint, opts Options) ResolvedEndpoint ***REMOVED***
+func (e endpoint) resolve(service, region, dnsSuffix string, defs []endpoint, opts Options) ResolvedEndpoint {
 	var merged endpoint
-	for _, def := range defs ***REMOVED***
+	for _, def := range defs {
 		merged.mergeIn(def)
-	***REMOVED***
+	}
 	merged.mergeIn(e)
 	e = merged
 
 	hostname := e.Hostname
 
 	// Offset the hostname for dualstack if enabled
-	if opts.UseDualStack && e.HasDualStack == boxedTrue ***REMOVED***
+	if opts.UseDualStack && e.HasDualStack == boxedTrue {
 		hostname = e.DualStackHostname
-	***REMOVED***
+	}
 
-	u := strings.Replace(hostname, "***REMOVED***service***REMOVED***", service, 1)
-	u = strings.Replace(u, "***REMOVED***region***REMOVED***", region, 1)
-	u = strings.Replace(u, "***REMOVED***dnsSuffix***REMOVED***", dnsSuffix, 1)
+	u := strings.Replace(hostname, "{service}", service, 1)
+	u = strings.Replace(u, "{region}", region, 1)
+	u = strings.Replace(u, "{dnsSuffix}", dnsSuffix, 1)
 
 	scheme := getEndpointScheme(e.Protocols, opts.DisableSSL)
 	u = fmt.Sprintf("%s://%s", scheme, u)
 
 	signingRegion := e.CredentialScope.Region
-	if len(signingRegion) == 0 ***REMOVED***
+	if len(signingRegion) == 0 {
 		signingRegion = region
-	***REMOVED***
+	}
 	signingName := e.CredentialScope.Service
-	if len(signingName) == 0 ***REMOVED***
+	if len(signingName) == 0 {
 		signingName = service
-	***REMOVED***
+	}
 
-	return ResolvedEndpoint***REMOVED***
+	return ResolvedEndpoint{
 		URL:           u,
 		SigningRegion: signingRegion,
 		SigningName:   signingName,
 		SigningMethod: getByPriority(e.SignatureVersions, signerPriority, defaultSigner),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func getEndpointScheme(protocols []string, disableSSL bool) string ***REMOVED***
-	if disableSSL ***REMOVED***
+func getEndpointScheme(protocols []string, disableSSL bool) string {
+	if disableSSL {
 		return "http"
-	***REMOVED***
+	}
 
 	return getByPriority(protocols, protocolPriority, defaultProtocol)
-***REMOVED***
+}
 
-func (e *endpoint) mergeIn(other endpoint) ***REMOVED***
-	if len(other.Hostname) > 0 ***REMOVED***
+func (e *endpoint) mergeIn(other endpoint) {
+	if len(other.Hostname) > 0 {
 		e.Hostname = other.Hostname
-	***REMOVED***
-	if len(other.Protocols) > 0 ***REMOVED***
+	}
+	if len(other.Protocols) > 0 {
 		e.Protocols = other.Protocols
-	***REMOVED***
-	if len(other.SignatureVersions) > 0 ***REMOVED***
+	}
+	if len(other.SignatureVersions) > 0 {
 		e.SignatureVersions = other.SignatureVersions
-	***REMOVED***
-	if len(other.CredentialScope.Region) > 0 ***REMOVED***
+	}
+	if len(other.CredentialScope.Region) > 0 {
 		e.CredentialScope.Region = other.CredentialScope.Region
-	***REMOVED***
-	if len(other.CredentialScope.Service) > 0 ***REMOVED***
+	}
+	if len(other.CredentialScope.Service) > 0 {
 		e.CredentialScope.Service = other.CredentialScope.Service
-	***REMOVED***
-	if len(other.SSLCommonName) > 0 ***REMOVED***
+	}
+	if len(other.SSLCommonName) > 0 {
 		e.SSLCommonName = other.SSLCommonName
-	***REMOVED***
-	if other.HasDualStack != boxedBoolUnset ***REMOVED***
+	}
+	if other.HasDualStack != boxedBoolUnset {
 		e.HasDualStack = other.HasDualStack
-	***REMOVED***
-	if len(other.DualStackHostname) > 0 ***REMOVED***
+	}
+	if len(other.DualStackHostname) > 0 {
 		e.DualStackHostname = other.DualStackHostname
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type credentialScope struct ***REMOVED***
+type credentialScope struct {
 	Region  string `json:"region"`
 	Service string `json:"service"`
-***REMOVED***
+}
 
 type boxedBool int
 
-func (b *boxedBool) UnmarshalJSON(buf []byte) error ***REMOVED***
+func (b *boxedBool) UnmarshalJSON(buf []byte) error {
 	v, err := strconv.ParseBool(string(buf))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if v ***REMOVED***
+	if v {
 		*b = boxedTrue
-	***REMOVED*** else ***REMOVED***
+	} else {
 		*b = boxedFalse
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 const (
 	boxedBoolUnset boxedBool = iota

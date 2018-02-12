@@ -27,207 +27,207 @@ import (
 
 // GenHelperEncoder is exported so that it can be used externally by codecgen.
 // Library users: DO NOT USE IT DIRECTLY. IT WILL CHANGE CONTINOUSLY WITHOUT NOTICE.
-func GenHelperEncoder(e *Encoder) (genHelperEncoder, encDriver) ***REMOVED***
-	return genHelperEncoder***REMOVED***e: e***REMOVED***, e.e
-***REMOVED***
+func GenHelperEncoder(e *Encoder) (genHelperEncoder, encDriver) {
+	return genHelperEncoder{e: e}, e.e
+}
 
 // GenHelperDecoder is exported so that it can be used externally by codecgen.
 // Library users: DO NOT USE IT DIRECTLY. IT WILL CHANGE CONTINOUSLY WITHOUT NOTICE.
-func GenHelperDecoder(d *Decoder) (genHelperDecoder, decDriver) ***REMOVED***
-	return genHelperDecoder***REMOVED***d: d***REMOVED***, d.d
-***REMOVED***
+func GenHelperDecoder(d *Decoder) (genHelperDecoder, decDriver) {
+	return genHelperDecoder{d: d}, d.d
+}
 
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
-type genHelperEncoder struct ***REMOVED***
+type genHelperEncoder struct {
 	e *Encoder
 	F fastpathT
-***REMOVED***
+}
 
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
-type genHelperDecoder struct ***REMOVED***
+type genHelperDecoder struct {
 	d *Decoder
 	F fastpathT
-***REMOVED***
+}
 
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
-func (f genHelperEncoder) EncBasicHandle() *BasicHandle ***REMOVED***
+func (f genHelperEncoder) EncBasicHandle() *BasicHandle {
 	return f.e.h
-***REMOVED***
+}
 
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
-func (f genHelperEncoder) EncBinary() bool ***REMOVED***
+func (f genHelperEncoder) EncBinary() bool {
 	return f.e.be // f.e.hh.isBinaryEncoding()
-***REMOVED***
+}
 
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
-func (f genHelperEncoder) EncFallback(iv interface***REMOVED******REMOVED***) ***REMOVED***
+func (f genHelperEncoder) EncFallback(iv interface{}) {
 	// println(">>>>>>>>> EncFallback")
 	f.e.encodeI(iv, false, false)
-***REMOVED***
+}
 
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
-func (f genHelperEncoder) EncTextMarshal(iv encoding.TextMarshaler) ***REMOVED***
+func (f genHelperEncoder) EncTextMarshal(iv encoding.TextMarshaler) {
 	bs, fnerr := iv.MarshalText()
 	f.e.marshal(bs, fnerr, false, c_UTF8)
-***REMOVED***
+}
 
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
-func (f genHelperEncoder) EncJSONMarshal(iv jsonMarshaler) ***REMOVED***
+func (f genHelperEncoder) EncJSONMarshal(iv jsonMarshaler) {
 	bs, fnerr := iv.MarshalJSON()
 	f.e.marshal(bs, fnerr, true, c_UTF8)
-***REMOVED***
+}
 
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
-func (f genHelperEncoder) EncBinaryMarshal(iv encoding.BinaryMarshaler) ***REMOVED***
+func (f genHelperEncoder) EncBinaryMarshal(iv encoding.BinaryMarshaler) {
 	bs, fnerr := iv.MarshalBinary()
 	f.e.marshal(bs, fnerr, false, c_RAW)
-***REMOVED***
+}
 
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
-func (f genHelperEncoder) TimeRtidIfBinc() uintptr ***REMOVED***
-	if _, ok := f.e.hh.(*BincHandle); ok ***REMOVED***
+func (f genHelperEncoder) TimeRtidIfBinc() uintptr {
+	if _, ok := f.e.hh.(*BincHandle); ok {
 		return timeTypId
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
-func (f genHelperEncoder) IsJSONHandle() bool ***REMOVED***
+func (f genHelperEncoder) IsJSONHandle() bool {
 	return f.e.js
-***REMOVED***
+}
 
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
-func (f genHelperEncoder) HasExtensions() bool ***REMOVED***
+func (f genHelperEncoder) HasExtensions() bool {
 	return len(f.e.h.extHandle) != 0
-***REMOVED***
+}
 
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
-func (f genHelperEncoder) EncExt(v interface***REMOVED******REMOVED***) (r bool) ***REMOVED***
+func (f genHelperEncoder) EncExt(v interface{}) (r bool) {
 	rt := reflect.TypeOf(v)
-	if rt.Kind() == reflect.Ptr ***REMOVED***
+	if rt.Kind() == reflect.Ptr {
 		rt = rt.Elem()
-	***REMOVED***
+	}
 	rtid := reflect.ValueOf(rt).Pointer()
-	if xfFn := f.e.h.getExt(rtid); xfFn != nil ***REMOVED***
+	if xfFn := f.e.h.getExt(rtid); xfFn != nil {
 		f.e.e.EncodeExt(v, xfFn.tag, xfFn.ext, f.e)
 		return true
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
-func (f genHelperEncoder) EncSendContainerState(c containerState) ***REMOVED***
-	if f.e.cr != nil ***REMOVED***
+func (f genHelperEncoder) EncSendContainerState(c containerState) {
+	if f.e.cr != nil {
 		f.e.cr.sendContainerState(c)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // ---------------- DECODER FOLLOWS -----------------
 
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
-func (f genHelperDecoder) DecBasicHandle() *BasicHandle ***REMOVED***
+func (f genHelperDecoder) DecBasicHandle() *BasicHandle {
 	return f.d.h
-***REMOVED***
+}
 
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
-func (f genHelperDecoder) DecBinary() bool ***REMOVED***
+func (f genHelperDecoder) DecBinary() bool {
 	return f.d.be // f.d.hh.isBinaryEncoding()
-***REMOVED***
+}
 
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
-func (f genHelperDecoder) DecSwallow() ***REMOVED***
+func (f genHelperDecoder) DecSwallow() {
 	f.d.swallow()
-***REMOVED***
+}
 
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
-func (f genHelperDecoder) DecScratchBuffer() []byte ***REMOVED***
+func (f genHelperDecoder) DecScratchBuffer() []byte {
 	return f.d.b[:]
-***REMOVED***
+}
 
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
-func (f genHelperDecoder) DecFallback(iv interface***REMOVED******REMOVED***, chkPtr bool) ***REMOVED***
+func (f genHelperDecoder) DecFallback(iv interface{}, chkPtr bool) {
 	// println(">>>>>>>>> DecFallback")
 	f.d.decodeI(iv, chkPtr, false, false, false)
-***REMOVED***
+}
 
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
-func (f genHelperDecoder) DecSliceHelperStart() (decSliceHelper, int) ***REMOVED***
+func (f genHelperDecoder) DecSliceHelperStart() (decSliceHelper, int) {
 	return f.d.decSliceHelperStart()
-***REMOVED***
+}
 
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
-func (f genHelperDecoder) DecStructFieldNotFound(index int, name string) ***REMOVED***
+func (f genHelperDecoder) DecStructFieldNotFound(index int, name string) {
 	f.d.structFieldNotFound(index, name)
-***REMOVED***
+}
 
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
-func (f genHelperDecoder) DecArrayCannotExpand(sliceLen, streamLen int) ***REMOVED***
+func (f genHelperDecoder) DecArrayCannotExpand(sliceLen, streamLen int) {
 	f.d.arrayCannotExpand(sliceLen, streamLen)
-***REMOVED***
+}
 
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
-func (f genHelperDecoder) DecTextUnmarshal(tm encoding.TextUnmarshaler) ***REMOVED***
+func (f genHelperDecoder) DecTextUnmarshal(tm encoding.TextUnmarshaler) {
 	fnerr := tm.UnmarshalText(f.d.d.DecodeBytes(f.d.b[:], true, true))
-	if fnerr != nil ***REMOVED***
+	if fnerr != nil {
 		panic(fnerr)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
-func (f genHelperDecoder) DecJSONUnmarshal(tm jsonUnmarshaler) ***REMOVED***
+func (f genHelperDecoder) DecJSONUnmarshal(tm jsonUnmarshaler) {
 	// bs := f.dd.DecodeBytes(f.d.b[:], true, true)
 	// grab the bytes to be read, as UnmarshalJSON needs the full JSON so as to unmarshal it itself.
 	fnerr := tm.UnmarshalJSON(f.d.nextValueBytes())
-	if fnerr != nil ***REMOVED***
+	if fnerr != nil {
 		panic(fnerr)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
-func (f genHelperDecoder) DecBinaryUnmarshal(bm encoding.BinaryUnmarshaler) ***REMOVED***
+func (f genHelperDecoder) DecBinaryUnmarshal(bm encoding.BinaryUnmarshaler) {
 	fnerr := bm.UnmarshalBinary(f.d.d.DecodeBytes(nil, false, true))
-	if fnerr != nil ***REMOVED***
+	if fnerr != nil {
 		panic(fnerr)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
-func (f genHelperDecoder) TimeRtidIfBinc() uintptr ***REMOVED***
-	if _, ok := f.d.hh.(*BincHandle); ok ***REMOVED***
+func (f genHelperDecoder) TimeRtidIfBinc() uintptr {
+	if _, ok := f.d.hh.(*BincHandle); ok {
 		return timeTypId
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
-func (f genHelperDecoder) IsJSONHandle() bool ***REMOVED***
+func (f genHelperDecoder) IsJSONHandle() bool {
 	return f.d.js
-***REMOVED***
+}
 
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
-func (f genHelperDecoder) HasExtensions() bool ***REMOVED***
+func (f genHelperDecoder) HasExtensions() bool {
 	return len(f.d.h.extHandle) != 0
-***REMOVED***
+}
 
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
-func (f genHelperDecoder) DecExt(v interface***REMOVED******REMOVED***) (r bool) ***REMOVED***
+func (f genHelperDecoder) DecExt(v interface{}) (r bool) {
 	rt := reflect.TypeOf(v).Elem()
 	rtid := reflect.ValueOf(rt).Pointer()
-	if xfFn := f.d.h.getExt(rtid); xfFn != nil ***REMOVED***
+	if xfFn := f.d.h.getExt(rtid); xfFn != nil {
 		f.d.d.DecodeExt(v, xfFn.tag, xfFn.ext)
 		return true
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
-func (f genHelperDecoder) DecInferLen(clen, maxlen, unit int) (rvlen int, truncated bool) ***REMOVED***
+func (f genHelperDecoder) DecInferLen(clen, maxlen, unit int) (rvlen int, truncated bool) {
 	return decInferLen(clen, maxlen, unit)
-***REMOVED***
+}
 
 // FOR USE BY CODECGEN ONLY. IT *WILL* CHANGE WITHOUT NOTICE. *DO NOT USE*
-func (f genHelperDecoder) DecSendContainerState(c containerState) ***REMOVED***
-	if f.d.cr != nil ***REMOVED***
+func (f genHelperDecoder) DecSendContainerState(c containerState) {
+	if f.d.cr != nil {
 		f.d.cr.sendContainerState(c)
-	***REMOVED***
-***REMOVED***
+	}
+}

@@ -11,61 +11,61 @@ import (
 
 // StatusReporter receives updates to task status. Method may be called
 // concurrently, so implementations should be goroutine-safe.
-type StatusReporter interface ***REMOVED***
+type StatusReporter interface {
 	UpdateTaskStatus(ctx context.Context, taskID string, status *api.TaskStatus) error
-***REMOVED***
+}
 
 type statusReporterFunc func(ctx context.Context, taskID string, status *api.TaskStatus) error
 
-func (fn statusReporterFunc) UpdateTaskStatus(ctx context.Context, taskID string, status *api.TaskStatus) error ***REMOVED***
+func (fn statusReporterFunc) UpdateTaskStatus(ctx context.Context, taskID string, status *api.TaskStatus) error {
 	return fn(ctx, taskID, status)
-***REMOVED***
+}
 
 // statusReporter creates a reliable StatusReporter that will always succeed.
 // It handles several tasks at once, ensuring all statuses are reported.
 //
 // The reporter will continue reporting the current status until it succeeds.
-type statusReporter struct ***REMOVED***
+type statusReporter struct {
 	reporter StatusReporter
 	statuses map[string]*api.TaskStatus
 	mu       sync.Mutex
 	cond     sync.Cond
 	closed   bool
-***REMOVED***
+}
 
-func newStatusReporter(ctx context.Context, upstream StatusReporter) *statusReporter ***REMOVED***
-	r := &statusReporter***REMOVED***
+func newStatusReporter(ctx context.Context, upstream StatusReporter) *statusReporter {
+	r := &statusReporter{
 		reporter: upstream,
 		statuses: make(map[string]*api.TaskStatus),
-	***REMOVED***
+	}
 
 	r.cond.L = &r.mu
 
 	go r.run(ctx)
 	return r
-***REMOVED***
+}
 
-func (sr *statusReporter) UpdateTaskStatus(ctx context.Context, taskID string, status *api.TaskStatus) error ***REMOVED***
+func (sr *statusReporter) UpdateTaskStatus(ctx context.Context, taskID string, status *api.TaskStatus) error {
 	sr.mu.Lock()
 	defer sr.mu.Unlock()
 
 	current, ok := sr.statuses[taskID]
-	if ok ***REMOVED***
-		if reflect.DeepEqual(current, status) ***REMOVED***
+	if ok {
+		if reflect.DeepEqual(current, status) {
 			return nil
-		***REMOVED***
+		}
 
-		if current.State > status.State ***REMOVED***
+		if current.State > status.State {
 			return nil // ignore old updates
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	sr.statuses[taskID] = status
 	sr.cond.Signal()
 
 	return nil
-***REMOVED***
+}
 
-func (sr *statusReporter) Close() error ***REMOVED***
+func (sr *statusReporter) Close() error {
 	sr.mu.Lock()
 	defer sr.mu.Unlock()
 
@@ -73,36 +73,36 @@ func (sr *statusReporter) Close() error ***REMOVED***
 	sr.cond.Signal()
 
 	return nil
-***REMOVED***
+}
 
-func (sr *statusReporter) run(ctx context.Context) ***REMOVED***
-	done := make(chan struct***REMOVED******REMOVED***)
+func (sr *statusReporter) run(ctx context.Context) {
+	done := make(chan struct{})
 	defer close(done)
 
 	sr.mu.Lock() // released during wait, below.
 	defer sr.mu.Unlock()
 
-	go func() ***REMOVED***
-		select ***REMOVED***
+	go func() {
+		select {
 		case <-ctx.Done():
 			sr.Close()
 		case <-done:
 			return
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
-	for ***REMOVED***
-		if len(sr.statuses) == 0 ***REMOVED***
+	for {
+		if len(sr.statuses) == 0 {
 			sr.cond.Wait()
-		***REMOVED***
+		}
 
-		if sr.closed ***REMOVED***
+		if sr.closed {
 			// TODO(stevvooe): Add support here for waiting until all
 			// statuses are flushed before shutting down.
 			return
-		***REMOVED***
+		}
 
-		for taskID, status := range sr.statuses ***REMOVED***
+		for taskID, status := range sr.statuses {
 			delete(sr.statuses, taskID) // delete the entry, while trying to send.
 
 			sr.mu.Unlock()
@@ -110,20 +110,20 @@ func (sr *statusReporter) run(ctx context.Context) ***REMOVED***
 			sr.mu.Lock()
 
 			// reporter might be closed during UpdateTaskStatus call
-			if sr.closed ***REMOVED***
+			if sr.closed {
 				return
-			***REMOVED***
+			}
 
-			if err != nil ***REMOVED***
+			if err != nil {
 				log.G(ctx).WithError(err).Error("status reporter failed to report status to agent")
 
 				// place it back in the map, if not there, allowing us to pick
 				// the value if a new one came in when we were sending the last
 				// update.
-				if _, ok := sr.statuses[taskID]; !ok ***REMOVED***
+				if _, ok := sr.statuses[taskID]; !ok {
 					sr.statuses[taskID] = status
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+				}
+			}
+		}
+	}
+}

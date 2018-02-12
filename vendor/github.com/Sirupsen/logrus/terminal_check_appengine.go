@@ -6,6 +6,6 @@ import (
 	"io"
 )
 
-func checkIfTerminal(w io.Writer) bool ***REMOVED***
+func checkIfTerminal(w io.Writer) bool {
 	return true
-***REMOVED***
+}

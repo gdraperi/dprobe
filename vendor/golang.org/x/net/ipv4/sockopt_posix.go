@@ -14,43 +14,43 @@ import (
 	"golang.org/x/net/internal/socket"
 )
 
-func (so *sockOpt) getMulticastInterface(c *socket.Conn) (*net.Interface, error) ***REMOVED***
-	switch so.typ ***REMOVED***
+func (so *sockOpt) getMulticastInterface(c *socket.Conn) (*net.Interface, error) {
+	switch so.typ {
 	case ssoTypeIPMreqn:
 		return so.getIPMreqn(c)
 	default:
 		return so.getMulticastIf(c)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (so *sockOpt) setMulticastInterface(c *socket.Conn, ifi *net.Interface) error ***REMOVED***
-	switch so.typ ***REMOVED***
+func (so *sockOpt) setMulticastInterface(c *socket.Conn, ifi *net.Interface) error {
+	switch so.typ {
 	case ssoTypeIPMreqn:
 		return so.setIPMreqn(c, ifi, nil)
 	default:
 		return so.setMulticastIf(c, ifi)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (so *sockOpt) getICMPFilter(c *socket.Conn) (*ICMPFilter, error) ***REMOVED***
+func (so *sockOpt) getICMPFilter(c *socket.Conn) (*ICMPFilter, error) {
 	b := make([]byte, so.Len)
 	n, err := so.Get(c, b)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if n != sizeofICMPFilter ***REMOVED***
+	}
+	if n != sizeofICMPFilter {
 		return nil, errOpNoSupport
-	***REMOVED***
+	}
 	return (*ICMPFilter)(unsafe.Pointer(&b[0])), nil
-***REMOVED***
+}
 
-func (so *sockOpt) setICMPFilter(c *socket.Conn, f *ICMPFilter) error ***REMOVED***
+func (so *sockOpt) setICMPFilter(c *socket.Conn, f *ICMPFilter) error {
 	b := (*[sizeofICMPFilter]byte)(unsafe.Pointer(f))[:sizeofICMPFilter]
 	return so.Set(c, b)
-***REMOVED***
+}
 
-func (so *sockOpt) setGroup(c *socket.Conn, ifi *net.Interface, grp net.IP) error ***REMOVED***
-	switch so.typ ***REMOVED***
+func (so *sockOpt) setGroup(c *socket.Conn, ifi *net.Interface, grp net.IP) error {
+	switch so.typ {
 	case ssoTypeIPMreq:
 		return so.setIPMreq(c, ifi, grp)
 	case ssoTypeIPMreqn:
@@ -59,13 +59,13 @@ func (so *sockOpt) setGroup(c *socket.Conn, ifi *net.Interface, grp net.IP) erro
 		return so.setGroupReq(c, ifi, grp)
 	default:
 		return errOpNoSupport
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (so *sockOpt) setSourceGroup(c *socket.Conn, ifi *net.Interface, grp, src net.IP) error ***REMOVED***
+func (so *sockOpt) setSourceGroup(c *socket.Conn, ifi *net.Interface, grp, src net.IP) error {
 	return so.setGroupSourceReq(c, ifi, grp, src)
-***REMOVED***
+}
 
-func (so *sockOpt) setBPF(c *socket.Conn, f []bpf.RawInstruction) error ***REMOVED***
+func (so *sockOpt) setBPF(c *socket.Conn, f []bpf.RawInstruction) error {
 	return so.setAttachFilter(c, f)
-***REMOVED***
+}

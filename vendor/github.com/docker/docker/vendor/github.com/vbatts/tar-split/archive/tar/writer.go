@@ -30,7 +30,7 @@ var (
 // A tar archive consists of a sequence of files.
 // Call WriteHeader to begin a new file, and then call Write to supply that file's data,
 // writing at most hdr.Size bytes in total.
-type Writer struct ***REMOVED***
+type Writer struct {
 	w          io.Writer
 	err        error
 	nb         int64 // number of unwritten bytes for current file entry
@@ -40,59 +40,59 @@ type Writer struct ***REMOVED***
 	preferPax  bool            // use pax header instead of binary numeric header
 	hdrBuff    [blockSize]byte // buffer to use in writeHeader when writing a regular header
 	paxHdrBuff [blockSize]byte // buffer to use in writeHeader when writing a pax header
-***REMOVED***
+}
 
-type formatter struct ***REMOVED***
+type formatter struct {
 	err error // Last error seen
-***REMOVED***
+}
 
 // NewWriter creates a new Writer writing to w.
-func NewWriter(w io.Writer) *Writer ***REMOVED*** return &Writer***REMOVED***w: w***REMOVED*** ***REMOVED***
+func NewWriter(w io.Writer) *Writer { return &Writer{w: w} }
 
 // Flush finishes writing the current file (optional).
-func (tw *Writer) Flush() error ***REMOVED***
-	if tw.nb > 0 ***REMOVED***
+func (tw *Writer) Flush() error {
+	if tw.nb > 0 {
 		tw.err = fmt.Errorf("archive/tar: missed writing %d bytes", tw.nb)
 		return tw.err
-	***REMOVED***
+	}
 
 	n := tw.nb + tw.pad
-	for n > 0 && tw.err == nil ***REMOVED***
+	for n > 0 && tw.err == nil {
 		nr := n
-		if nr > blockSize ***REMOVED***
+		if nr > blockSize {
 			nr = blockSize
-		***REMOVED***
+		}
 		var nw int
 		nw, tw.err = tw.w.Write(zeroBlock[0:nr])
 		n -= int64(nw)
-	***REMOVED***
+	}
 	tw.nb = 0
 	tw.pad = 0
 	return tw.err
-***REMOVED***
+}
 
 // Write s into b, terminating it with a NUL if there is room.
-func (f *formatter) formatString(b []byte, s string) ***REMOVED***
-	if len(s) > len(b) ***REMOVED***
+func (f *formatter) formatString(b []byte, s string) {
+	if len(s) > len(b) {
 		f.err = ErrFieldTooLong
 		return
-	***REMOVED***
+	}
 	ascii := toASCII(s)
 	copy(b, ascii)
-	if len(ascii) < len(b) ***REMOVED***
+	if len(ascii) < len(b) {
 		b[len(ascii)] = 0
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Encode x as an octal ASCII string and write it into b with leading zeros.
-func (f *formatter) formatOctal(b []byte, x int64) ***REMOVED***
+func (f *formatter) formatOctal(b []byte, x int64) {
 	s := strconv.FormatInt(x, 8)
 	// leading zeros, but leave room for a NUL.
-	for len(s)+1 < len(b) ***REMOVED***
+	for len(s)+1 < len(b) {
 		s = "0" + s
-	***REMOVED***
+	}
 	f.formatString(b, s)
-***REMOVED***
+}
 
 // fitsInBase256 reports whether x can be encoded into n bytes using base-256
 // encoding. Unlike octal encoding, base-256 encoding does not require that the
@@ -101,25 +101,25 @@ func (f *formatter) formatOctal(b []byte, x int64) ***REMOVED***
 // If operating in binary mode, this assumes strict GNU binary mode; which means
 // that the first byte can only be either 0x80 or 0xff. Thus, the first byte is
 // equivalent to the sign bit in two's complement form.
-func fitsInBase256(n int, x int64) bool ***REMOVED***
+func fitsInBase256(n int, x int64) bool {
 	var binBits = uint(n-1) * 8
 	return n >= 9 || (x >= -1<<binBits && x < 1<<binBits)
-***REMOVED***
+}
 
 // Write x into b, as binary (GNUtar/star extension).
-func (f *formatter) formatNumeric(b []byte, x int64) ***REMOVED***
-	if fitsInBase256(len(b), x) ***REMOVED***
-		for i := len(b) - 1; i >= 0; i-- ***REMOVED***
+func (f *formatter) formatNumeric(b []byte, x int64) {
+	if fitsInBase256(len(b), x) {
+		for i := len(b) - 1; i >= 0; i-- {
 			b[i] = byte(x)
 			x >>= 8
-		***REMOVED***
+		}
 		b[0] |= 0x80 // Highest bit indicates binary format
 		return
-	***REMOVED***
+	}
 
 	f.formatOctal(b, 0) // Last resort, just write zero
 	f.err = ErrFieldTooLong
-***REMOVED***
+}
 
 var (
 	minTime = time.Unix(0, 0)
@@ -130,25 +130,25 @@ var (
 // WriteHeader writes hdr and prepares to accept the file's contents.
 // WriteHeader calls Flush if it is not the first header.
 // Calling after a Close will return ErrWriteAfterClose.
-func (tw *Writer) WriteHeader(hdr *Header) error ***REMOVED***
+func (tw *Writer) WriteHeader(hdr *Header) error {
 	return tw.writeHeader(hdr, true)
-***REMOVED***
+}
 
 // WriteHeader writes hdr and prepares to accept the file's contents.
 // WriteHeader calls Flush if it is not the first header.
 // Calling after a Close will return ErrWriteAfterClose.
 // As this method is called internally by writePax header to allow it to
 // suppress writing the pax header.
-func (tw *Writer) writeHeader(hdr *Header, allowPax bool) error ***REMOVED***
-	if tw.closed ***REMOVED***
+func (tw *Writer) writeHeader(hdr *Header, allowPax bool) error {
+	if tw.closed {
 		return ErrWriteAfterClose
-	***REMOVED***
-	if tw.err == nil ***REMOVED***
+	}
+	if tw.err == nil {
 		tw.Flush()
-	***REMOVED***
-	if tw.err != nil ***REMOVED***
+	}
+	if tw.err != nil {
 		return tw.err
-	***REMOVED***
+	}
 
 	// a map to hold pax header records, if any are needed
 	paxHeaders := make(map[string]string)
@@ -166,41 +166,41 @@ func (tw *Writer) writeHeader(hdr *Header, allowPax bool) error ***REMOVED***
 	// If allowPax is false, we are being called by writePAXHeader, and hdrBuff is
 	// already being used by the non-recursive call, so we must use paxHdrBuff.
 	header = tw.hdrBuff[:]
-	if !allowPax ***REMOVED***
+	if !allowPax {
 		header = tw.paxHdrBuff[:]
-	***REMOVED***
+	}
 	copy(header, zeroBlock)
 	s := slicer(header)
 
 	// Wrappers around formatter that automatically sets paxHeaders if the
 	// argument extends beyond the capacity of the input byte slice.
-	var formatString = func(b []byte, s string, paxKeyword string) ***REMOVED***
+	var formatString = func(b []byte, s string, paxKeyword string) {
 		needsPaxHeader := paxKeyword != paxNone && len(s) > len(b) || !isASCII(s)
-		if needsPaxHeader ***REMOVED***
+		if needsPaxHeader {
 			paxHeaders[paxKeyword] = s
 			return
-		***REMOVED***
+		}
 		f.formatString(b, s)
-	***REMOVED***
-	var formatNumeric = func(b []byte, x int64, paxKeyword string) ***REMOVED***
+	}
+	var formatNumeric = func(b []byte, x int64, paxKeyword string) {
 		// Try octal first.
 		s := strconv.FormatInt(x, 8)
-		if len(s) < len(b) ***REMOVED***
+		if len(s) < len(b) {
 			f.formatOctal(b, x)
 			return
-		***REMOVED***
+		}
 
 		// If it is too long for octal, and PAX is preferred, use a PAX header.
-		if paxKeyword != paxNone && tw.preferPax ***REMOVED***
+		if paxKeyword != paxNone && tw.preferPax {
 			f.formatOctal(b, 0)
 			s := strconv.FormatInt(x, 10)
 			paxHeaders[paxKeyword] = s
 			return
-		***REMOVED***
+		}
 
 		tw.usedBinary = true
 		f.formatNumeric(b, x)
-	***REMOVED***
+	}
 
 	// keep a reference to the filename to allow to overwrite it later if we detect that we can use ustar longnames instead of pax
 	pathHeaderBytes := s.next(fileNameSize)
@@ -209,9 +209,9 @@ func (tw *Writer) writeHeader(hdr *Header, allowPax bool) error ***REMOVED***
 
 	// Handle out of range ModTime carefully.
 	var modTime int64
-	if !hdr.ModTime.Before(minTime) && !hdr.ModTime.After(maxTime) ***REMOVED***
+	if !hdr.ModTime.Before(minTime) && !hdr.ModTime.After(maxTime) {
 		modTime = hdr.ModTime.Unix()
-	***REMOVED***
+	}
 
 	f.formatOctal(s.next(8), hdr.Mode)               // 100:108
 	formatNumeric(s.next(8), int64(hdr.Uid), paxUid) // 108:116
@@ -234,23 +234,23 @@ func (tw *Writer) writeHeader(hdr *Header, allowPax bool) error ***REMOVED***
 	formatString(prefixHeaderBytes, "", paxNone) // 345:500  prefix
 
 	// Use the GNU magic instead of POSIX magic if we used any GNU extensions.
-	if tw.usedBinary ***REMOVED***
+	if tw.usedBinary {
 		copy(header[257:265], []byte("ustar  \x00"))
-	***REMOVED***
+	}
 
 	_, paxPathUsed := paxHeaders[paxPath]
 	// try to use a ustar header when only the name is too long
-	if !tw.preferPax && len(paxHeaders) == 1 && paxPathUsed ***REMOVED***
+	if !tw.preferPax && len(paxHeaders) == 1 && paxPathUsed {
 		prefix, suffix, ok := splitUSTARPath(hdr.Name)
-		if ok ***REMOVED***
+		if ok {
 			// Since we can encode in USTAR format, disable PAX header.
 			delete(paxHeaders, paxPath)
 
 			// Update the path fields
 			formatString(pathHeaderBytes, suffix, paxNone)
 			formatString(prefixHeaderBytes, prefix, paxNone)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// The chksum field is terminated by a NUL and a space.
 	// This is different from the other octal fields.
@@ -259,56 +259,56 @@ func (tw *Writer) writeHeader(hdr *Header, allowPax bool) error ***REMOVED***
 	header[155] = ' '
 
 	// Check if there were any formatting errors.
-	if f.err != nil ***REMOVED***
+	if f.err != nil {
 		tw.err = f.err
 		return tw.err
-	***REMOVED***
+	}
 
-	if allowPax ***REMOVED***
-		for k, v := range hdr.Xattrs ***REMOVED***
+	if allowPax {
+		for k, v := range hdr.Xattrs {
 			paxHeaders[paxXattr+k] = v
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if len(paxHeaders) > 0 ***REMOVED***
-		if !allowPax ***REMOVED***
+	if len(paxHeaders) > 0 {
+		if !allowPax {
 			return errInvalidHeader
-		***REMOVED***
-		if err := tw.writePAXHeader(hdr, paxHeaders); err != nil ***REMOVED***
+		}
+		if err := tw.writePAXHeader(hdr, paxHeaders); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	tw.nb = int64(hdr.Size)
 	tw.pad = (blockSize - (tw.nb % blockSize)) % blockSize
 
 	_, tw.err = tw.w.Write(header)
 	return tw.err
-***REMOVED***
+}
 
 // splitUSTARPath splits a path according to USTAR prefix and suffix rules.
 // If the path is not splittable, then it will return ("", "", false).
-func splitUSTARPath(name string) (prefix, suffix string, ok bool) ***REMOVED***
+func splitUSTARPath(name string) (prefix, suffix string, ok bool) {
 	length := len(name)
-	if length <= fileNameSize || !isASCII(name) ***REMOVED***
+	if length <= fileNameSize || !isASCII(name) {
 		return "", "", false
-	***REMOVED*** else if length > fileNamePrefixSize+1 ***REMOVED***
+	} else if length > fileNamePrefixSize+1 {
 		length = fileNamePrefixSize + 1
-	***REMOVED*** else if name[length-1] == '/' ***REMOVED***
+	} else if name[length-1] == '/' {
 		length--
-	***REMOVED***
+	}
 
 	i := strings.LastIndex(name[:length], "/")
 	nlen := len(name) - i - 1 // nlen is length of suffix
 	plen := i                 // plen is length of prefix
-	if i <= 0 || nlen > fileNameSize || nlen == 0 || plen > fileNamePrefixSize ***REMOVED***
+	if i <= 0 || nlen > fileNameSize || nlen == 0 || plen > fileNamePrefixSize {
 		return "", "", false
-	***REMOVED***
+	}
 	return name[:i], name[i+1:], true
-***REMOVED***
+}
 
 // writePaxHeader writes an extended pax header to the
 // archive.
-func (tw *Writer) writePAXHeader(hdr *Header, paxHeaders map[string]string) error ***REMOVED***
+func (tw *Writer) writePAXHeader(hdr *Header, paxHeaders map[string]string) error {
 	// Prepare extended header
 	ext := new(Header)
 	ext.Typeflag = TypeXHeader
@@ -323,94 +323,94 @@ func (tw *Writer) writePAXHeader(hdr *Header, paxHeaders map[string]string) erro
 	fullName := path.Join(dir, "PaxHeaders.0", file)
 
 	ascii := toASCII(fullName)
-	if len(ascii) > 100 ***REMOVED***
+	if len(ascii) > 100 {
 		ascii = ascii[:100]
-	***REMOVED***
+	}
 	ext.Name = ascii
 	// Construct the body
 	var buf bytes.Buffer
 
 	// Keys are sorted before writing to body to allow deterministic output.
 	var keys []string
-	for k := range paxHeaders ***REMOVED***
+	for k := range paxHeaders {
 		keys = append(keys, k)
-	***REMOVED***
+	}
 	sort.Strings(keys)
 
-	for _, k := range keys ***REMOVED***
+	for _, k := range keys {
 		fmt.Fprint(&buf, formatPAXRecord(k, paxHeaders[k]))
-	***REMOVED***
+	}
 
 	ext.Size = int64(len(buf.Bytes()))
-	if err := tw.writeHeader(ext, false); err != nil ***REMOVED***
+	if err := tw.writeHeader(ext, false); err != nil {
 		return err
-	***REMOVED***
-	if _, err := tw.Write(buf.Bytes()); err != nil ***REMOVED***
+	}
+	if _, err := tw.Write(buf.Bytes()); err != nil {
 		return err
-	***REMOVED***
-	if err := tw.Flush(); err != nil ***REMOVED***
+	}
+	if err := tw.Flush(); err != nil {
 		return err
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // formatPAXRecord formats a single PAX record, prefixing it with the
 // appropriate length.
-func formatPAXRecord(k, v string) string ***REMOVED***
+func formatPAXRecord(k, v string) string {
 	const padding = 3 // Extra padding for ' ', '=', and '\n'
 	size := len(k) + len(v) + padding
 	size += len(strconv.Itoa(size))
 	record := fmt.Sprintf("%d %s=%s\n", size, k, v)
 
 	// Final adjustment if adding size field increased the record size.
-	if len(record) != size ***REMOVED***
+	if len(record) != size {
 		size = len(record)
 		record = fmt.Sprintf("%d %s=%s\n", size, k, v)
-	***REMOVED***
+	}
 	return record
-***REMOVED***
+}
 
 // Write writes to the current entry in the tar archive.
 // Write returns the error ErrWriteTooLong if more than
 // hdr.Size bytes are written after WriteHeader.
-func (tw *Writer) Write(b []byte) (n int, err error) ***REMOVED***
-	if tw.closed ***REMOVED***
+func (tw *Writer) Write(b []byte) (n int, err error) {
+	if tw.closed {
 		err = ErrWriteAfterClose
 		return
-	***REMOVED***
+	}
 	overwrite := false
-	if int64(len(b)) > tw.nb ***REMOVED***
+	if int64(len(b)) > tw.nb {
 		b = b[0:tw.nb]
 		overwrite = true
-	***REMOVED***
+	}
 	n, err = tw.w.Write(b)
 	tw.nb -= int64(n)
-	if err == nil && overwrite ***REMOVED***
+	if err == nil && overwrite {
 		err = ErrWriteTooLong
 		return
-	***REMOVED***
+	}
 	tw.err = err
 	return
-***REMOVED***
+}
 
 // Close closes the tar archive, flushing any unwritten
 // data to the underlying writer.
-func (tw *Writer) Close() error ***REMOVED***
-	if tw.err != nil || tw.closed ***REMOVED***
+func (tw *Writer) Close() error {
+	if tw.err != nil || tw.closed {
 		return tw.err
-	***REMOVED***
+	}
 	tw.Flush()
 	tw.closed = true
-	if tw.err != nil ***REMOVED***
+	if tw.err != nil {
 		return tw.err
-	***REMOVED***
+	}
 
 	// trailer: two zero blocks
-	for i := 0; i < 2; i++ ***REMOVED***
+	for i := 0; i < 2; i++ {
 		_, tw.err = tw.w.Write(zeroBlock)
-		if tw.err != nil ***REMOVED***
+		if tw.err != nil {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return tw.err
-***REMOVED***
+}

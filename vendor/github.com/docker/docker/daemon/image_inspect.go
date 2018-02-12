@@ -12,57 +12,57 @@ import (
 
 // LookupImage looks up an image by name and returns it as an ImageInspect
 // structure.
-func (daemon *Daemon) LookupImage(name string) (*types.ImageInspect, error) ***REMOVED***
+func (daemon *Daemon) LookupImage(name string) (*types.ImageInspect, error) {
 	img, err := daemon.GetImage(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, errors.Wrapf(err, "no such image: %s", name)
-	***REMOVED***
-	if !system.IsOSSupported(img.OperatingSystem()) ***REMOVED***
+	}
+	if !system.IsOSSupported(img.OperatingSystem()) {
 		return nil, system.ErrNotSupportedOperatingSystem
-	***REMOVED***
+	}
 	refs := daemon.referenceStore.References(img.ID().Digest())
-	repoTags := []string***REMOVED******REMOVED***
-	repoDigests := []string***REMOVED******REMOVED***
-	for _, ref := range refs ***REMOVED***
-		switch ref.(type) ***REMOVED***
+	repoTags := []string{}
+	repoDigests := []string{}
+	for _, ref := range refs {
+		switch ref.(type) {
 		case reference.NamedTagged:
 			repoTags = append(repoTags, reference.FamiliarString(ref))
 		case reference.Canonical:
 			repoDigests = append(repoDigests, reference.FamiliarString(ref))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	var size int64
 	var layerMetadata map[string]string
 	layerID := img.RootFS.ChainID()
-	if layerID != "" ***REMOVED***
+	if layerID != "" {
 		l, err := daemon.layerStores[img.OperatingSystem()].Get(layerID)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		defer layer.ReleaseAndLog(daemon.layerStores[img.OperatingSystem()], l)
 		size, err = l.Size()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 
 		layerMetadata, err = l.Metadata()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	comment := img.Comment
-	if len(comment) == 0 && len(img.History) > 0 ***REMOVED***
+	if len(comment) == 0 && len(img.History) > 0 {
 		comment = img.History[len(img.History)-1].Comment
-	***REMOVED***
+	}
 
 	lastUpdated, err := daemon.imageStore.GetLastUpdated(img.ID())
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	imageInspect := &types.ImageInspect***REMOVED***
+	imageInspect := &types.ImageInspect{
 		ID:              img.ID().String(),
 		RepoTags:        repoTags,
 		RepoDigests:     repoDigests,
@@ -80,13 +80,13 @@ func (daemon *Daemon) LookupImage(name string) (*types.ImageInspect, error) ***R
 		Size:            size,
 		VirtualSize:     size, // TODO: field unused, deprecate
 		RootFS:          rootFSToAPIType(img.RootFS),
-		Metadata: types.ImageMetadata***REMOVED***
+		Metadata: types.ImageMetadata{
 			LastTagTime: lastUpdated,
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
 	imageInspect.GraphDriver.Name = daemon.GraphDriverName(img.OperatingSystem())
 	imageInspect.GraphDriver.Data = layerMetadata
 
 	return imageInspect, nil
-***REMOVED***
+}

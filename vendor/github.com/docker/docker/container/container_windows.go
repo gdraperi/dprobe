@@ -21,121 +21,121 @@ const (
 
 // UnmountIpcMount unmounts Ipc related mounts.
 // This is a NOOP on windows.
-func (container *Container) UnmountIpcMount(unmount func(pth string) error) error ***REMOVED***
+func (container *Container) UnmountIpcMount(unmount func(pth string) error) error {
 	return nil
-***REMOVED***
+}
 
 // IpcMounts returns the list of Ipc related mounts.
-func (container *Container) IpcMounts() []Mount ***REMOVED***
+func (container *Container) IpcMounts() []Mount {
 	return nil
-***REMOVED***
+}
 
 // CreateSecretSymlinks creates symlinks to files in the secret mount.
-func (container *Container) CreateSecretSymlinks() error ***REMOVED***
-	for _, r := range container.SecretReferences ***REMOVED***
-		if r.File == nil ***REMOVED***
+func (container *Container) CreateSecretSymlinks() error {
+	for _, r := range container.SecretReferences {
+		if r.File == nil {
 			continue
-		***REMOVED***
+		}
 		resolvedPath, _, err := container.ResolvePath(getSecretTargetPath(r))
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-		if err := system.MkdirAll(filepath.Dir(resolvedPath), 0, ""); err != nil ***REMOVED***
+		}
+		if err := system.MkdirAll(filepath.Dir(resolvedPath), 0, ""); err != nil {
 			return err
-		***REMOVED***
-		if err := os.Symlink(filepath.Join(containerInternalSecretMountPath, r.SecretID), resolvedPath); err != nil ***REMOVED***
+		}
+		if err := os.Symlink(filepath.Join(containerInternalSecretMountPath, r.SecretID), resolvedPath); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
 // SecretMounts returns the mount for the secret path.
 // All secrets are stored in a single mount on Windows. Target symlinks are
 // created for each secret, pointing to the files in this mount.
-func (container *Container) SecretMounts() ([]Mount, error) ***REMOVED***
+func (container *Container) SecretMounts() ([]Mount, error) {
 	var mounts []Mount
-	if len(container.SecretReferences) > 0 ***REMOVED***
+	if len(container.SecretReferences) > 0 {
 		src, err := container.SecretMountPath()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-		mounts = append(mounts, Mount***REMOVED***
+		}
+		mounts = append(mounts, Mount{
 			Source:      src,
 			Destination: containerInternalSecretMountPath,
 			Writable:    false,
-		***REMOVED***)
-	***REMOVED***
+		})
+	}
 
 	return mounts, nil
-***REMOVED***
+}
 
 // UnmountSecrets unmounts the fs for secrets
-func (container *Container) UnmountSecrets() error ***REMOVED***
+func (container *Container) UnmountSecrets() error {
 	p, err := container.SecretMountPath()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return os.RemoveAll(p)
-***REMOVED***
+}
 
 // CreateConfigSymlinks creates symlinks to files in the config mount.
-func (container *Container) CreateConfigSymlinks() error ***REMOVED***
-	for _, configRef := range container.ConfigReferences ***REMOVED***
-		if configRef.File == nil ***REMOVED***
+func (container *Container) CreateConfigSymlinks() error {
+	for _, configRef := range container.ConfigReferences {
+		if configRef.File == nil {
 			continue
-		***REMOVED***
+		}
 		resolvedPath, _, err := container.ResolvePath(configRef.File.Name)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-		if err := system.MkdirAll(filepath.Dir(resolvedPath), 0, ""); err != nil ***REMOVED***
+		}
+		if err := system.MkdirAll(filepath.Dir(resolvedPath), 0, ""); err != nil {
 			return err
-		***REMOVED***
-		if err := os.Symlink(filepath.Join(containerInternalConfigsDirPath, configRef.ConfigID), resolvedPath); err != nil ***REMOVED***
+		}
+		if err := os.Symlink(filepath.Join(containerInternalConfigsDirPath, configRef.ConfigID), resolvedPath); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
 // ConfigMounts returns the mount for configs.
 // All configs are stored in a single mount on Windows. Target symlinks are
 // created for each config, pointing to the files in this mount.
-func (container *Container) ConfigMounts() ([]Mount, error) ***REMOVED***
+func (container *Container) ConfigMounts() ([]Mount, error) {
 	var mounts []Mount
-	if len(container.ConfigReferences) > 0 ***REMOVED***
+	if len(container.ConfigReferences) > 0 {
 		src, err := container.ConfigsDirPath()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-		mounts = append(mounts, Mount***REMOVED***
+		}
+		mounts = append(mounts, Mount{
 			Source:      src,
 			Destination: containerInternalConfigsDirPath,
 			Writable:    false,
-		***REMOVED***)
-	***REMOVED***
+		})
+	}
 
 	return mounts, nil
-***REMOVED***
+}
 
 // DetachAndUnmount unmounts all volumes.
 // On Windows it only delegates to `UnmountVolumes` since there is nothing to
 // force unmount.
-func (container *Container) DetachAndUnmount(volumeEventLog func(name, action string, attributes map[string]string)) error ***REMOVED***
+func (container *Container) DetachAndUnmount(volumeEventLog func(name, action string, attributes map[string]string)) error {
 	return container.UnmountVolumes(volumeEventLog)
-***REMOVED***
+}
 
 // TmpfsMounts returns the list of tmpfs mounts
-func (container *Container) TmpfsMounts() ([]Mount, error) ***REMOVED***
+func (container *Container) TmpfsMounts() ([]Mount, error) {
 	var mounts []Mount
 	return mounts, nil
-***REMOVED***
+}
 
 // UpdateContainer updates configuration of a container. Callers must hold a Lock on the Container.
-func (container *Container) UpdateContainer(hostConfig *containertypes.HostConfig) error ***REMOVED***
+func (container *Container) UpdateContainer(hostConfig *containertypes.HostConfig) error {
 	resources := hostConfig.Resources
 	if resources.CPUShares != 0 ||
 		resources.Memory != 0 ||
@@ -166,41 +166,41 @@ func (container *Container) UpdateContainer(hostConfig *containertypes.HostConfi
 		resources.CPUCount != 0 ||
 		resources.CPUPercent != 0 ||
 		resources.IOMaximumIOps != 0 ||
-		resources.IOMaximumBandwidth != 0 ***REMOVED***
+		resources.IOMaximumBandwidth != 0 {
 		return fmt.Errorf("resource updating isn't supported on Windows")
-	***REMOVED***
+	}
 	// update HostConfig of container
-	if hostConfig.RestartPolicy.Name != "" ***REMOVED***
-		if container.HostConfig.AutoRemove && !hostConfig.RestartPolicy.IsNone() ***REMOVED***
+	if hostConfig.RestartPolicy.Name != "" {
+		if container.HostConfig.AutoRemove && !hostConfig.RestartPolicy.IsNone() {
 			return fmt.Errorf("Restart policy cannot be updated because AutoRemove is enabled for the container")
-		***REMOVED***
+		}
 		container.HostConfig.RestartPolicy = hostConfig.RestartPolicy
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // BuildHostnameFile writes the container's hostname file.
-func (container *Container) BuildHostnameFile() error ***REMOVED***
+func (container *Container) BuildHostnameFile() error {
 	return nil
-***REMOVED***
+}
 
 // EnableServiceDiscoveryOnDefaultNetwork Enable service discovery on default network
-func (container *Container) EnableServiceDiscoveryOnDefaultNetwork() bool ***REMOVED***
+func (container *Container) EnableServiceDiscoveryOnDefaultNetwork() bool {
 	return true
-***REMOVED***
+}
 
 // GetMountPoints gives a platform specific transformation to types.MountPoint. Callers must hold a Container lock.
-func (container *Container) GetMountPoints() []types.MountPoint ***REMOVED***
+func (container *Container) GetMountPoints() []types.MountPoint {
 	mountPoints := make([]types.MountPoint, 0, len(container.MountPoints))
-	for _, m := range container.MountPoints ***REMOVED***
-		mountPoints = append(mountPoints, types.MountPoint***REMOVED***
+	for _, m := range container.MountPoints {
+		mountPoints = append(mountPoints, types.MountPoint{
 			Type:        m.Type,
 			Name:        m.Name,
 			Source:      m.Path(),
 			Destination: m.Destination,
 			Driver:      m.Driver,
 			RW:          m.RW,
-		***REMOVED***)
-	***REMOVED***
+		})
+	}
 	return mountPoints
-***REMOVED***
+}

@@ -11,11 +11,11 @@ import (
 	"golang.org/x/text/message"
 )
 
-func Example_http() ***REMOVED***
+func Example_http() {
 	// languages supported by this service:
 	matcher := language.NewMatcher(message.DefaultCatalog.Languages())
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) ***REMOVED***
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		lang, _ := r.Cookie("lang")
 		accept := r.Header.Get("Accept-Language")
 		fallback := "en"
@@ -24,14 +24,14 @@ func Example_http() ***REMOVED***
 		p := message.NewPrinter(tag)
 
 		p.Fprintln(w, "User language is", tag)
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func ExamplePrinter_numbers() ***REMOVED***
-	for _, lang := range []string***REMOVED***"en", "de", "de-CH", "fr", "bn"***REMOVED*** ***REMOVED***
+func ExamplePrinter_numbers() {
+	for _, lang := range []string{"en", "de", "de-CH", "fr", "bn"} {
 		p := message.NewPrinter(language.Make(lang))
 		p.Printf("%-6s %g\n", lang, 123456.78)
-	***REMOVED***
+	}
 
 	// Output:
 	// en     123,456.78
@@ -39,4 +39,4 @@ func ExamplePrinter_numbers() ***REMOVED***
 	// de-CH  123’456.78
 	// fr     123 456,78
 	// bn     ১,২৩,৪৫৬.৭৮
-***REMOVED***
+}

@@ -13,48 +13,48 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-func testSetGetenv(t *testing.T, key, value string) ***REMOVED***
+func testSetGetenv(t *testing.T, key, value string) {
 	err := unix.Setenv(key, value)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("Setenv failed to set %q: %v", value, err)
-	***REMOVED***
+	}
 	newvalue, found := unix.Getenv(key)
-	if !found ***REMOVED***
+	if !found {
 		t.Fatalf("Getenv failed to find %v variable (want value %q)", key, value)
-	***REMOVED***
-	if newvalue != value ***REMOVED***
+	}
+	if newvalue != value {
 		t.Fatalf("Getenv(%v) = %q; want %q", key, newvalue, value)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestEnv(t *testing.T) ***REMOVED***
+func TestEnv(t *testing.T) {
 	testSetGetenv(t, "TESTENV", "AVALUE")
 	// make sure TESTENV gets set to "", not deleted
 	testSetGetenv(t, "TESTENV", "")
-***REMOVED***
+}
 
-func TestItoa(t *testing.T) ***REMOVED***
+func TestItoa(t *testing.T) {
 	// Make most negative integer: 0x8000...
 	i := 1
-	for i<<1 != 0 ***REMOVED***
+	for i<<1 != 0 {
 		i <<= 1
-	***REMOVED***
-	if i >= 0 ***REMOVED***
+	}
+	if i >= 0 {
 		t.Fatal("bad math")
-	***REMOVED***
+	}
 	s := unix.Itoa(i)
 	f := fmt.Sprint(i)
-	if s != f ***REMOVED***
+	if s != f {
 		t.Fatalf("itoa(%d) = %s, want %s", i, s, f)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestUname(t *testing.T) ***REMOVED***
+func TestUname(t *testing.T) {
 	var utsname unix.Utsname
 	err := unix.Uname(&utsname)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("Uname: %v", err)
-	***REMOVED***
+	}
 
 	t.Logf("OS: %s/%s %s", utsname.Sysname[:], utsname.Machine[:], utsname.Release[:])
-***REMOVED***
+}

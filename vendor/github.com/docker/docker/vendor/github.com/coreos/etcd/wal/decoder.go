@@ -29,157 +29,157 @@ import (
 
 const minSectorSize = 512
 
-type decoder struct ***REMOVED***
+type decoder struct {
 	mu  sync.Mutex
 	brs []*bufio.Reader
 
 	// lastValidOff file offset following the last valid decoded record
 	lastValidOff int64
 	crc          hash.Hash32
-***REMOVED***
+}
 
-func newDecoder(r ...io.Reader) *decoder ***REMOVED***
+func newDecoder(r ...io.Reader) *decoder {
 	readers := make([]*bufio.Reader, len(r))
-	for i := range r ***REMOVED***
+	for i := range r {
 		readers[i] = bufio.NewReader(r[i])
-	***REMOVED***
-	return &decoder***REMOVED***
+	}
+	return &decoder{
 		brs: readers,
 		crc: crc.New(0, crcTable),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (d *decoder) decode(rec *walpb.Record) error ***REMOVED***
+func (d *decoder) decode(rec *walpb.Record) error {
 	rec.Reset()
 	d.mu.Lock()
 	defer d.mu.Unlock()
 	return d.decodeRecord(rec)
-***REMOVED***
+}
 
-func (d *decoder) decodeRecord(rec *walpb.Record) error ***REMOVED***
-	if len(d.brs) == 0 ***REMOVED***
+func (d *decoder) decodeRecord(rec *walpb.Record) error {
+	if len(d.brs) == 0 {
 		return io.EOF
-	***REMOVED***
+	}
 
 	l, err := readInt64(d.brs[0])
-	if err == io.EOF || (err == nil && l == 0) ***REMOVED***
+	if err == io.EOF || (err == nil && l == 0) {
 		// hit end of file or preallocated space
 		d.brs = d.brs[1:]
-		if len(d.brs) == 0 ***REMOVED***
+		if len(d.brs) == 0 {
 			return io.EOF
-		***REMOVED***
+		}
 		d.lastValidOff = 0
 		return d.decodeRecord(rec)
-	***REMOVED***
-	if err != nil ***REMOVED***
+	}
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	recBytes, padBytes := decodeFrameSize(l)
 
 	data := make([]byte, recBytes+padBytes)
-	if _, err = io.ReadFull(d.brs[0], data); err != nil ***REMOVED***
+	if _, err = io.ReadFull(d.brs[0], data); err != nil {
 		// ReadFull returns io.EOF only if no bytes were read
 		// the decoder should treat this as an ErrUnexpectedEOF instead.
-		if err == io.EOF ***REMOVED***
+		if err == io.EOF {
 			err = io.ErrUnexpectedEOF
-		***REMOVED***
+		}
 		return err
-	***REMOVED***
-	if err := rec.Unmarshal(data[:recBytes]); err != nil ***REMOVED***
-		if d.isTornEntry(data) ***REMOVED***
+	}
+	if err := rec.Unmarshal(data[:recBytes]); err != nil {
+		if d.isTornEntry(data) {
 			return io.ErrUnexpectedEOF
-		***REMOVED***
+		}
 		return err
-	***REMOVED***
+	}
 
 	// skip crc checking if the record type is crcType
-	if rec.Type != crcType ***REMOVED***
+	if rec.Type != crcType {
 		d.crc.Write(rec.Data)
-		if err := rec.Validate(d.crc.Sum32()); err != nil ***REMOVED***
-			if d.isTornEntry(data) ***REMOVED***
+		if err := rec.Validate(d.crc.Sum32()); err != nil {
+			if d.isTornEntry(data) {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	// record decoded as valid; point last valid offset to end of record
 	d.lastValidOff += recBytes + padBytes + 8
 	return nil
-***REMOVED***
+}
 
-func decodeFrameSize(lenField int64) (recBytes int64, padBytes int64) ***REMOVED***
+func decodeFrameSize(lenField int64) (recBytes int64, padBytes int64) {
 	// the record size is stored in the lower 56 bits of the 64-bit length
 	recBytes = int64(uint64(lenField) & ^(uint64(0xff) << 56))
 	// non-zero padding is indicated by set MSb / a negative length
-	if lenField < 0 ***REMOVED***
+	if lenField < 0 {
 		// padding is stored in lower 3 bits of length MSB
 		padBytes = int64((uint64(lenField) >> 56) & 0x7)
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // isTornEntry determines whether the last entry of the WAL was partially written
 // and corrupted because of a torn write.
-func (d *decoder) isTornEntry(data []byte) bool ***REMOVED***
-	if len(d.brs) != 1 ***REMOVED***
+func (d *decoder) isTornEntry(data []byte) bool {
+	if len(d.brs) != 1 {
 		return false
-	***REMOVED***
+	}
 
 	fileOff := d.lastValidOff + 8
 	curOff := 0
-	chunks := [][]byte***REMOVED******REMOVED***
+	chunks := [][]byte{}
 	// split data on sector boundaries
-	for curOff < len(data) ***REMOVED***
+	for curOff < len(data) {
 		chunkLen := int(minSectorSize - (fileOff % minSectorSize))
-		if chunkLen > len(data)-curOff ***REMOVED***
+		if chunkLen > len(data)-curOff {
 			chunkLen = len(data) - curOff
-		***REMOVED***
+		}
 		chunks = append(chunks, data[curOff:curOff+chunkLen])
 		fileOff += int64(chunkLen)
 		curOff += chunkLen
-	***REMOVED***
+	}
 
 	// if any data for a sector chunk is all 0, it's a torn write
-	for _, sect := range chunks ***REMOVED***
+	for _, sect := range chunks {
 		isZero := true
-		for _, v := range sect ***REMOVED***
-			if v != 0 ***REMOVED***
+		for _, v := range sect {
+			if v != 0 {
 				isZero = false
 				break
-			***REMOVED***
-		***REMOVED***
-		if isZero ***REMOVED***
+			}
+		}
+		if isZero {
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false
-***REMOVED***
+}
 
-func (d *decoder) updateCRC(prevCrc uint32) ***REMOVED***
+func (d *decoder) updateCRC(prevCrc uint32) {
 	d.crc = crc.New(prevCrc, crcTable)
-***REMOVED***
+}
 
-func (d *decoder) lastCRC() uint32 ***REMOVED***
+func (d *decoder) lastCRC() uint32 {
 	return d.crc.Sum32()
-***REMOVED***
+}
 
-func (d *decoder) lastOffset() int64 ***REMOVED*** return d.lastValidOff ***REMOVED***
+func (d *decoder) lastOffset() int64 { return d.lastValidOff }
 
-func mustUnmarshalEntry(d []byte) raftpb.Entry ***REMOVED***
+func mustUnmarshalEntry(d []byte) raftpb.Entry {
 	var e raftpb.Entry
 	pbutil.MustUnmarshal(&e, d)
 	return e
-***REMOVED***
+}
 
-func mustUnmarshalState(d []byte) raftpb.HardState ***REMOVED***
+func mustUnmarshalState(d []byte) raftpb.HardState {
 	var s raftpb.HardState
 	pbutil.MustUnmarshal(&s, d)
 	return s
-***REMOVED***
+}
 
-func readInt64(r io.Reader) (int64, error) ***REMOVED***
+func readInt64(r io.Reader) (int64, error) {
 	var n int64
 	err := binary.Read(r, binary.LittleEndian, &n)
 	return n, err
-***REMOVED***
+}

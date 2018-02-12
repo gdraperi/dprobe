@@ -2,7 +2,7 @@
 
 package publicsuffix
 
-var rules = [...]string***REMOVED***
+var rules = [...]string{
 	"ac",
 	"com.ac",
 	"edu.ac",
@@ -8343,9 +8343,9 @@ var rules = [...]string***REMOVED***
 	"za.net",
 	"za.org",
 	"now.sh",
-***REMOVED***
+}
 
-var nodeLabels = [...]string***REMOVED***
+var nodeLabels = [...]string{
 	"aaa",
 	"aarp",
 	"abarth",
@@ -16753,4 +16753,4 @@ var nodeLabels = [...]string***REMOVED***
 	"gov",
 	"mil",
 	"org",
-***REMOVED***
+}

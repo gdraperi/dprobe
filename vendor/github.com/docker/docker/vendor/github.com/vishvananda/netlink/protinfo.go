@@ -5,7 +5,7 @@ import (
 )
 
 // Protinfo represents bridge flags from netlink.
-type Protinfo struct ***REMOVED***
+type Protinfo struct {
 	Hairpin      bool
 	Guard        bool
 	FastLeave    bool
@@ -14,45 +14,45 @@ type Protinfo struct ***REMOVED***
 	Flood        bool
 	ProxyArp     bool
 	ProxyArpWiFi bool
-***REMOVED***
+}
 
 // String returns a list of enabled flags
-func (prot *Protinfo) String() string ***REMOVED***
+func (prot *Protinfo) String() string {
 	var boolStrings []string
-	if prot.Hairpin ***REMOVED***
+	if prot.Hairpin {
 		boolStrings = append(boolStrings, "Hairpin")
-	***REMOVED***
-	if prot.Guard ***REMOVED***
+	}
+	if prot.Guard {
 		boolStrings = append(boolStrings, "Guard")
-	***REMOVED***
-	if prot.FastLeave ***REMOVED***
+	}
+	if prot.FastLeave {
 		boolStrings = append(boolStrings, "FastLeave")
-	***REMOVED***
-	if prot.RootBlock ***REMOVED***
+	}
+	if prot.RootBlock {
 		boolStrings = append(boolStrings, "RootBlock")
-	***REMOVED***
-	if prot.Learning ***REMOVED***
+	}
+	if prot.Learning {
 		boolStrings = append(boolStrings, "Learning")
-	***REMOVED***
-	if prot.Flood ***REMOVED***
+	}
+	if prot.Flood {
 		boolStrings = append(boolStrings, "Flood")
-	***REMOVED***
-	if prot.ProxyArp ***REMOVED***
+	}
+	if prot.ProxyArp {
 		boolStrings = append(boolStrings, "ProxyArp")
-	***REMOVED***
-	if prot.ProxyArpWiFi ***REMOVED***
+	}
+	if prot.ProxyArpWiFi {
 		boolStrings = append(boolStrings, "ProxyArpWiFi")
-	***REMOVED***
+	}
 	return strings.Join(boolStrings, " ")
-***REMOVED***
+}
 
-func boolToByte(x bool) []byte ***REMOVED***
-	if x ***REMOVED***
-		return []byte***REMOVED***1***REMOVED***
-	***REMOVED***
-	return []byte***REMOVED***0***REMOVED***
-***REMOVED***
+func boolToByte(x bool) []byte {
+	if x {
+		return []byte{1}
+	}
+	return []byte{0}
+}
 
-func byteToBool(x byte) bool ***REMOVED***
+func byteToBool(x byte) bool {
 	return uint8(x) != 0
-***REMOVED***
+}

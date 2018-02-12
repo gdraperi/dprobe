@@ -12,45 +12,45 @@ import (
 )
 
 // Log interface allows different log implementations to be used.
-type Log interface ***REMOVED***
+type Log interface {
 	Close() error
 	Info(eid uint32, msg string) error
 	Warning(eid uint32, msg string) error
 	Error(eid uint32, msg string) error
-***REMOVED***
+}
 
 // ConsoleLog provides access to the console.
-type ConsoleLog struct ***REMOVED***
+type ConsoleLog struct {
 	Name string
-***REMOVED***
+}
 
 // New creates new ConsoleLog.
-func New(source string) *ConsoleLog ***REMOVED***
-	return &ConsoleLog***REMOVED***Name: source***REMOVED***
-***REMOVED***
+func New(source string) *ConsoleLog {
+	return &ConsoleLog{Name: source}
+}
 
 // Close closes console log l.
-func (l *ConsoleLog) Close() error ***REMOVED***
+func (l *ConsoleLog) Close() error {
 	return nil
-***REMOVED***
+}
 
-func (l *ConsoleLog) report(kind string, eid uint32, msg string) error ***REMOVED***
+func (l *ConsoleLog) report(kind string, eid uint32, msg string) error {
 	s := l.Name + "." + kind + "(" + strconv.Itoa(int(eid)) + "): " + msg + "\n"
 	_, err := os.Stdout.Write([]byte(s))
 	return err
-***REMOVED***
+}
 
 // Info writes an information event msg with event id eid to the console l.
-func (l *ConsoleLog) Info(eid uint32, msg string) error ***REMOVED***
+func (l *ConsoleLog) Info(eid uint32, msg string) error {
 	return l.report("info", eid, msg)
-***REMOVED***
+}
 
 // Warning writes an warning event msg with event id eid to the console l.
-func (l *ConsoleLog) Warning(eid uint32, msg string) error ***REMOVED***
+func (l *ConsoleLog) Warning(eid uint32, msg string) error {
 	return l.report("warn", eid, msg)
-***REMOVED***
+}
 
 // Error writes an error event msg with event id eid to the console l.
-func (l *ConsoleLog) Error(eid uint32, msg string) error ***REMOVED***
+func (l *ConsoleLog) Error(eid uint32, msg string) error {
 	return l.report("error", eid, msg)
-***REMOVED***
+}

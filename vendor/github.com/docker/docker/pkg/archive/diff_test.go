@@ -13,213 +13,213 @@ import (
 	"github.com/docker/docker/pkg/ioutils"
 )
 
-func TestApplyLayerInvalidFilenames(t *testing.T) ***REMOVED***
+func TestApplyLayerInvalidFilenames(t *testing.T) {
 	// TODO Windows: Figure out how to fix this test.
-	if runtime.GOOS == "windows" ***REMOVED***
+	if runtime.GOOS == "windows" {
 		t.Skip("Passes but hits breakoutError: platform and architecture is not supported")
-	***REMOVED***
-	for i, headers := range [][]*tar.Header***REMOVED***
-		***REMOVED***
-			***REMOVED***
+	}
+	for i, headers := range [][]*tar.Header{
+		{
+			{
 				Name:     "../victim/dotdot",
 				Typeflag: tar.TypeReg,
 				Mode:     0644,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			***REMOVED***
+			},
+		},
+		{
+			{
 				// Note the leading slash
 				Name:     "/../victim/slash-dotdot",
 				Typeflag: tar.TypeReg,
 				Mode:     0644,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED*** ***REMOVED***
-		if err := testBreakout("applylayer", "docker-TestApplyLayerInvalidFilenames", headers); err != nil ***REMOVED***
+			},
+		},
+	} {
+		if err := testBreakout("applylayer", "docker-TestApplyLayerInvalidFilenames", headers); err != nil {
 			t.Fatalf("i=%d. %v", i, err)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestApplyLayerInvalidHardlink(t *testing.T) ***REMOVED***
-	if runtime.GOOS == "windows" ***REMOVED***
+func TestApplyLayerInvalidHardlink(t *testing.T) {
+	if runtime.GOOS == "windows" {
 		t.Skip("TypeLink support on Windows")
-	***REMOVED***
-	for i, headers := range [][]*tar.Header***REMOVED***
-		***REMOVED*** // try reading victim/hello (../)
-			***REMOVED***
+	}
+	for i, headers := range [][]*tar.Header{
+		{ // try reading victim/hello (../)
+			{
 				Name:     "dotdot",
 				Typeflag: tar.TypeLink,
 				Linkname: "../victim/hello",
 				Mode:     0644,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED*** // try reading victim/hello (/../)
-			***REMOVED***
+			},
+		},
+		{ // try reading victim/hello (/../)
+			{
 				Name:     "slash-dotdot",
 				Typeflag: tar.TypeLink,
 				// Note the leading slash
 				Linkname: "/../victim/hello",
 				Mode:     0644,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED*** // try writing victim/file
-			***REMOVED***
+			},
+		},
+		{ // try writing victim/file
+			{
 				Name:     "loophole-victim",
 				Typeflag: tar.TypeLink,
 				Linkname: "../victim",
 				Mode:     0755,
-			***REMOVED***,
-			***REMOVED***
+			},
+			{
 				Name:     "loophole-victim/file",
 				Typeflag: tar.TypeReg,
 				Mode:     0644,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED*** // try reading victim/hello (hardlink, symlink)
-			***REMOVED***
+			},
+		},
+		{ // try reading victim/hello (hardlink, symlink)
+			{
 				Name:     "loophole-victim",
 				Typeflag: tar.TypeLink,
 				Linkname: "../victim",
 				Mode:     0755,
-			***REMOVED***,
-			***REMOVED***
+			},
+			{
 				Name:     "symlink",
 				Typeflag: tar.TypeSymlink,
 				Linkname: "loophole-victim/hello",
 				Mode:     0644,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED*** // Try reading victim/hello (hardlink, hardlink)
-			***REMOVED***
+			},
+		},
+		{ // Try reading victim/hello (hardlink, hardlink)
+			{
 				Name:     "loophole-victim",
 				Typeflag: tar.TypeLink,
 				Linkname: "../victim",
 				Mode:     0755,
-			***REMOVED***,
-			***REMOVED***
+			},
+			{
 				Name:     "hardlink",
 				Typeflag: tar.TypeLink,
 				Linkname: "loophole-victim/hello",
 				Mode:     0644,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED*** // Try removing victim directory (hardlink)
-			***REMOVED***
+			},
+		},
+		{ // Try removing victim directory (hardlink)
+			{
 				Name:     "loophole-victim",
 				Typeflag: tar.TypeLink,
 				Linkname: "../victim",
 				Mode:     0755,
-			***REMOVED***,
-			***REMOVED***
+			},
+			{
 				Name:     "loophole-victim",
 				Typeflag: tar.TypeReg,
 				Mode:     0644,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED*** ***REMOVED***
-		if err := testBreakout("applylayer", "docker-TestApplyLayerInvalidHardlink", headers); err != nil ***REMOVED***
+			},
+		},
+	} {
+		if err := testBreakout("applylayer", "docker-TestApplyLayerInvalidHardlink", headers); err != nil {
 			t.Fatalf("i=%d. %v", i, err)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestApplyLayerInvalidSymlink(t *testing.T) ***REMOVED***
-	if runtime.GOOS == "windows" ***REMOVED***
+func TestApplyLayerInvalidSymlink(t *testing.T) {
+	if runtime.GOOS == "windows" {
 		t.Skip("TypeSymLink support on Windows")
-	***REMOVED***
-	for i, headers := range [][]*tar.Header***REMOVED***
-		***REMOVED*** // try reading victim/hello (../)
-			***REMOVED***
+	}
+	for i, headers := range [][]*tar.Header{
+		{ // try reading victim/hello (../)
+			{
 				Name:     "dotdot",
 				Typeflag: tar.TypeSymlink,
 				Linkname: "../victim/hello",
 				Mode:     0644,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED*** // try reading victim/hello (/../)
-			***REMOVED***
+			},
+		},
+		{ // try reading victim/hello (/../)
+			{
 				Name:     "slash-dotdot",
 				Typeflag: tar.TypeSymlink,
 				// Note the leading slash
 				Linkname: "/../victim/hello",
 				Mode:     0644,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED*** // try writing victim/file
-			***REMOVED***
+			},
+		},
+		{ // try writing victim/file
+			{
 				Name:     "loophole-victim",
 				Typeflag: tar.TypeSymlink,
 				Linkname: "../victim",
 				Mode:     0755,
-			***REMOVED***,
-			***REMOVED***
+			},
+			{
 				Name:     "loophole-victim/file",
 				Typeflag: tar.TypeReg,
 				Mode:     0644,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED*** // try reading victim/hello (symlink, symlink)
-			***REMOVED***
+			},
+		},
+		{ // try reading victim/hello (symlink, symlink)
+			{
 				Name:     "loophole-victim",
 				Typeflag: tar.TypeSymlink,
 				Linkname: "../victim",
 				Mode:     0755,
-			***REMOVED***,
-			***REMOVED***
+			},
+			{
 				Name:     "symlink",
 				Typeflag: tar.TypeSymlink,
 				Linkname: "loophole-victim/hello",
 				Mode:     0644,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED*** // try reading victim/hello (symlink, hardlink)
-			***REMOVED***
+			},
+		},
+		{ // try reading victim/hello (symlink, hardlink)
+			{
 				Name:     "loophole-victim",
 				Typeflag: tar.TypeSymlink,
 				Linkname: "../victim",
 				Mode:     0755,
-			***REMOVED***,
-			***REMOVED***
+			},
+			{
 				Name:     "hardlink",
 				Typeflag: tar.TypeLink,
 				Linkname: "loophole-victim/hello",
 				Mode:     0644,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED*** // try removing victim directory (symlink)
-			***REMOVED***
+			},
+		},
+		{ // try removing victim directory (symlink)
+			{
 				Name:     "loophole-victim",
 				Typeflag: tar.TypeSymlink,
 				Linkname: "../victim",
 				Mode:     0755,
-			***REMOVED***,
-			***REMOVED***
+			},
+			{
 				Name:     "loophole-victim",
 				Typeflag: tar.TypeReg,
 				Mode:     0644,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED*** ***REMOVED***
-		if err := testBreakout("applylayer", "docker-TestApplyLayerInvalidSymlink", headers); err != nil ***REMOVED***
+			},
+		},
+	} {
+		if err := testBreakout("applylayer", "docker-TestApplyLayerInvalidSymlink", headers); err != nil {
 			t.Fatalf("i=%d. %v", i, err)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestApplyLayerWhiteouts(t *testing.T) ***REMOVED***
+func TestApplyLayerWhiteouts(t *testing.T) {
 	// TODO Windows: Figure out why this test fails
-	if runtime.GOOS == "windows" ***REMOVED***
+	if runtime.GOOS == "windows" {
 		t.Skip("Failing on Windows")
-	***REMOVED***
+	}
 
 	wd, err := ioutil.TempDir("", "graphdriver-test-whiteouts")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	defer os.RemoveAll(wd)
 
-	base := []string***REMOVED***
+	base := []string{
 		".baz",
 		"bar/",
 		"bar/bax",
@@ -234,19 +234,19 @@ func TestApplyLayerWhiteouts(t *testing.T) ***REMOVED***
 		"foo/cde/efg",
 		"foo/fgh",
 		"foobar",
-	***REMOVED***
+	}
 
-	type tcase struct ***REMOVED***
+	type tcase struct {
 		change, expected []string
-	***REMOVED***
+	}
 
-	tcases := []tcase***REMOVED***
-		***REMOVED***
+	tcases := []tcase{
+		{
 			base,
 			base,
-		***REMOVED***,
-		***REMOVED***
-			[]string***REMOVED***
+		},
+		{
+			[]string{
 				".bay",
 				".wh.baz",
 				"foo/",
@@ -254,8 +254,8 @@ func TestApplyLayerWhiteouts(t *testing.T) ***REMOVED***
 				"foo/.wh..wh..opq",
 				"foo/cde/",
 				"foo/cde/efg",
-			***REMOVED***,
-			[]string***REMOVED***
+			},
+			[]string{
 				".bay",
 				".baz",
 				"bar/",
@@ -266,10 +266,10 @@ func TestApplyLayerWhiteouts(t *testing.T) ***REMOVED***
 				"foo/cde/",
 				"foo/cde/efg",
 				"foobar",
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			[]string***REMOVED***
+			},
+		},
+		{
+			[]string{
 				".bay",
 				".wh..baz",
 				".wh.foobar",
@@ -277,8 +277,8 @@ func TestApplyLayerWhiteouts(t *testing.T) ***REMOVED***
 				"foo/.abc",
 				"foo/.wh.cde",
 				"bar/",
-			***REMOVED***,
-			[]string***REMOVED***
+			},
+			[]string{
 				".bay",
 				"bar/",
 				"bar/bax",
@@ -286,101 +286,101 @@ func TestApplyLayerWhiteouts(t *testing.T) ***REMOVED***
 				"foo/",
 				"foo/.abc",
 				"foo/.bce",
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			[]string***REMOVED***
+			},
+		},
+		{
+			[]string{
 				".abc",
 				".wh..wh..opq",
 				"foobar",
-			***REMOVED***,
-			[]string***REMOVED***
+			},
+			[]string{
 				".abc",
 				"foobar",
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+			},
+		},
+	}
 
-	for i, tc := range tcases ***REMOVED***
+	for i, tc := range tcases {
 		l, err := makeTestLayer(tc.change)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
+		}
 
 		_, err = UnpackLayer(wd, l, nil)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
+		}
 		err = l.Close()
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
+		}
 
 		paths, err := readDirContents(wd)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
+		}
 
-		if !reflect.DeepEqual(tc.expected, paths) ***REMOVED***
+		if !reflect.DeepEqual(tc.expected, paths) {
 			t.Fatalf("invalid files for layer %d: expected %q, got %q", i, tc.expected, paths)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-***REMOVED***
+}
 
-func makeTestLayer(paths []string) (rc io.ReadCloser, err error) ***REMOVED***
+func makeTestLayer(paths []string) (rc io.ReadCloser, err error) {
 	tmpDir, err := ioutil.TempDir("", "graphdriver-test-mklayer")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
-	defer func() ***REMOVED***
-		if err != nil ***REMOVED***
+	}
+	defer func() {
+		if err != nil {
 			os.RemoveAll(tmpDir)
-		***REMOVED***
-	***REMOVED***()
-	for _, p := range paths ***REMOVED***
-		if p[len(p)-1] == filepath.Separator ***REMOVED***
-			if err = os.MkdirAll(filepath.Join(tmpDir, p), 0700); err != nil ***REMOVED***
+		}
+	}()
+	for _, p := range paths {
+		if p[len(p)-1] == filepath.Separator {
+			if err = os.MkdirAll(filepath.Join(tmpDir, p), 0700); err != nil {
 				return
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
-			if err = ioutil.WriteFile(filepath.Join(tmpDir, p), nil, 0600); err != nil ***REMOVED***
+			}
+		} else {
+			if err = ioutil.WriteFile(filepath.Join(tmpDir, p), nil, 0600); err != nil {
 				return
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	archive, err := Tar(tmpDir, Uncompressed)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
-	return ioutils.NewReadCloserWrapper(archive, func() error ***REMOVED***
+	}
+	return ioutils.NewReadCloserWrapper(archive, func() error {
 		err := archive.Close()
 		os.RemoveAll(tmpDir)
 		return err
-	***REMOVED***), nil
-***REMOVED***
+	}), nil
+}
 
-func readDirContents(root string) ([]string, error) ***REMOVED***
+func readDirContents(root string) ([]string, error) {
 	var files []string
-	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error ***REMOVED***
-		if err != nil ***REMOVED***
+	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
 			return err
-		***REMOVED***
-		if path == root ***REMOVED***
+		}
+		if path == root {
 			return nil
-		***REMOVED***
+		}
 		rel, err := filepath.Rel(root, path)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-		if info.IsDir() ***REMOVED***
+		}
+		if info.IsDir() {
 			rel = rel + "/"
-		***REMOVED***
+		}
 		files = append(files, rel)
 		return nil
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return files, nil
-***REMOVED***
+}

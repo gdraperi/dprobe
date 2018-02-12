@@ -9,53 +9,53 @@ import (
 // listener must operate in separate goroutines.
 //
 // Consumers should listen on Channel.C until Closed is closed.
-type Channel struct ***REMOVED***
+type Channel struct {
 	C chan Event
 
-	closed chan struct***REMOVED******REMOVED***
+	closed chan struct{}
 	once   sync.Once
-***REMOVED***
+}
 
 // NewChannel returns a channel. If buffer is zero, the channel is
 // unbuffered.
-func NewChannel(buffer int) *Channel ***REMOVED***
-	return &Channel***REMOVED***
+func NewChannel(buffer int) *Channel {
+	return &Channel{
 		C:      make(chan Event, buffer),
-		closed: make(chan struct***REMOVED******REMOVED***),
-	***REMOVED***
-***REMOVED***
+		closed: make(chan struct{}),
+	}
+}
 
 // Done returns a channel that will always proceed once the sink is closed.
-func (ch *Channel) Done() chan struct***REMOVED******REMOVED*** ***REMOVED***
+func (ch *Channel) Done() chan struct{} {
 	return ch.closed
-***REMOVED***
+}
 
 // Write the event to the channel. Must be called in a separate goroutine from
 // the listener.
-func (ch *Channel) Write(event Event) error ***REMOVED***
-	select ***REMOVED***
+func (ch *Channel) Write(event Event) error {
+	select {
 	case ch.C <- event:
 		return nil
 	case <-ch.closed:
 		return ErrSinkClosed
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Close the channel sink.
-func (ch *Channel) Close() error ***REMOVED***
-	ch.once.Do(func() ***REMOVED***
+func (ch *Channel) Close() error {
+	ch.once.Do(func() {
 		close(ch.closed)
-	***REMOVED***)
+	})
 
 	return nil
-***REMOVED***
+}
 
-func (ch *Channel) String() string ***REMOVED***
+func (ch *Channel) String() string {
 	// Serialize a copy of the Channel that doesn't contain the sync.Once,
 	// to avoid a data race.
-	ch2 := map[string]interface***REMOVED******REMOVED******REMOVED***
+	ch2 := map[string]interface{}{
 		"C":      ch.C,
 		"closed": ch.closed,
-	***REMOVED***
+	}
 	return fmt.Sprint(ch2)
-***REMOVED***
+}

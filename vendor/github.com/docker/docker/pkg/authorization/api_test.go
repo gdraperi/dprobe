@@ -14,22 +14,22 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestPeerCertificateMarshalJSON(t *testing.T) ***REMOVED***
-	template := &x509.Certificate***REMOVED***
+func TestPeerCertificateMarshalJSON(t *testing.T) {
+	template := &x509.Certificate{
 		IsCA: true,
 		BasicConstraintsValid: true,
-		SubjectKeyId:          []byte***REMOVED***1, 2, 3***REMOVED***,
+		SubjectKeyId:          []byte{1, 2, 3},
 		SerialNumber:          big.NewInt(1234),
-		Subject: pkix.Name***REMOVED***
-			Country:      []string***REMOVED***"Earth"***REMOVED***,
-			Organization: []string***REMOVED***"Mother Nature"***REMOVED***,
-		***REMOVED***,
+		Subject: pkix.Name{
+			Country:      []string{"Earth"},
+			Organization: []string{"Mother Nature"},
+		},
 		NotBefore: time.Now(),
 		NotAfter:  time.Now().AddDate(5, 5, 5),
 
-		ExtKeyUsage: []x509.ExtKeyUsage***REMOVED***x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth***REMOVED***,
+		ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
 		KeyUsage:    x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
-	***REMOVED***
+	}
 	// generate private key
 	privatekey, err := rsa.GenerateKey(rand.Reader, 2048)
 	require.NoError(t, err)
@@ -43,33 +43,33 @@ func TestPeerCertificateMarshalJSON(t *testing.T) ***REMOVED***
 	cert, err := x509.ParseCertificate(raw)
 	require.NoError(t, err)
 
-	var certs = []*x509.Certificate***REMOVED***cert***REMOVED***
+	var certs = []*x509.Certificate{cert}
 	addr := "www.authz.com/auth"
 	req, err := http.NewRequest("GET", addr, nil)
 	require.NoError(t, err)
 
 	req.RequestURI = addr
-	req.TLS = &tls.ConnectionState***REMOVED******REMOVED***
+	req.TLS = &tls.ConnectionState{}
 	req.TLS.PeerCertificates = certs
 	req.Header.Add("header", "value")
 
-	for _, c := range req.TLS.PeerCertificates ***REMOVED***
+	for _, c := range req.TLS.PeerCertificates {
 		pcObj := PeerCertificate(*c)
 
-		t.Run("Marshalling :", func(t *testing.T) ***REMOVED***
+		t.Run("Marshalling :", func(t *testing.T) {
 			raw, err = pcObj.MarshalJSON()
 			require.NotNil(t, raw)
 			require.Nil(t, err)
-		***REMOVED***)
+		})
 
-		t.Run("UnMarshalling :", func(t *testing.T) ***REMOVED***
+		t.Run("UnMarshalling :", func(t *testing.T) {
 			err := pcObj.UnmarshalJSON(raw)
 			require.Nil(t, err)
 			require.Equal(t, "Earth", pcObj.Subject.Country[0])
 			require.Equal(t, true, pcObj.IsCA)
 
-		***REMOVED***)
+		})
 
-	***REMOVED***
+	}
 
-***REMOVED***
+}

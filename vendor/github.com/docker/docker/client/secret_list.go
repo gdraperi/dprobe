@@ -11,28 +11,28 @@ import (
 )
 
 // SecretList returns the list of secrets.
-func (cli *Client) SecretList(ctx context.Context, options types.SecretListOptions) ([]swarm.Secret, error) ***REMOVED***
-	if err := cli.NewVersionError("1.25", "secret list"); err != nil ***REMOVED***
+func (cli *Client) SecretList(ctx context.Context, options types.SecretListOptions) ([]swarm.Secret, error) {
+	if err := cli.NewVersionError("1.25", "secret list"); err != nil {
 		return nil, err
-	***REMOVED***
-	query := url.Values***REMOVED******REMOVED***
+	}
+	query := url.Values{}
 
-	if options.Filters.Len() > 0 ***REMOVED***
+	if options.Filters.Len() > 0 {
 		filterJSON, err := filters.ToJSON(options.Filters)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 
 		query.Set("filters", filterJSON)
-	***REMOVED***
+	}
 
 	resp, err := cli.get(ctx, "/secrets", query, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	var secrets []swarm.Secret
 	err = json.NewDecoder(resp.body).Decode(&secrets)
 	ensureReaderClosed(resp)
 	return secrets, err
-***REMOVED***
+}

@@ -21,44 +21,44 @@ var (
 	utf32BEEB = UTF32(BigEndian, ExpectBOM) // UTF-32 Expect
 )
 
-func TestBasics(t *testing.T) ***REMOVED***
-	testCases := []struct ***REMOVED***
+func TestBasics(t *testing.T) {
+	testCases := []struct {
 		e         encoding.Encoding
 		encPrefix string
 		encSuffix string
 		encoded   string
 		utf8      string
-	***REMOVED******REMOVED******REMOVED***
+	}{{
 		e:       utf32BEIB,
 		encoded: "\x00\x00\x00\x57\x00\x00\x00\xe4\x00\x01\xd5\x65",
 		utf8:    "\x57\u00e4\U0001d565",
-	***REMOVED***, ***REMOVED***
+	}, {
 		e:         UTF32(BigEndian, ExpectBOM),
 		encPrefix: "\x00\x00\xfe\xff",
 		encoded:   "\x00\x00\x00\x57\x00\x00\x00\xe4\x00\x01\xd5\x65",
 		utf8:      "\x57\u00e4\U0001d565",
-	***REMOVED***, ***REMOVED***
+	}, {
 		e:       UTF32(LittleEndian, IgnoreBOM),
 		encoded: "\x57\x00\x00\x00\xe4\x00\x00\x00\x65\xd5\x01\x00",
 		utf8:    "\x57\u00e4\U0001d565",
-	***REMOVED***, ***REMOVED***
+	}, {
 		e:         UTF32(LittleEndian, ExpectBOM),
 		encPrefix: "\xff\xfe\x00\x00",
 		encoded:   "\x57\x00\x00\x00\xe4\x00\x00\x00\x65\xd5\x01\x00",
 		utf8:      "\x57\u00e4\U0001d565",
-	***REMOVED******REMOVED***
+	}}
 
-	for _, tc := range testCases ***REMOVED***
+	for _, tc := range testCases {
 		enctest.TestEncoding(t, tc.e, tc.encoded, tc.utf8, tc.encPrefix, tc.encSuffix)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestFiles(t *testing.T) ***REMOVED*** enctest.TestFile(t, utf32BEIB) ***REMOVED***
+func TestFiles(t *testing.T) { enctest.TestFile(t, utf32BEIB) }
 
-func BenchmarkEncoding(b *testing.B) ***REMOVED*** enctest.Benchmark(b, utf32BEIB) ***REMOVED***
+func BenchmarkEncoding(b *testing.B) { enctest.Benchmark(b, utf32BEIB) }
 
-func TestUTF32(t *testing.T) ***REMOVED***
-	testCases := []struct ***REMOVED***
+func TestUTF32(t *testing.T) {
+	testCases := []struct {
 		desc    string
 		src     string
 		notEOF  bool // the inverse of atEOF
@@ -67,115 +67,115 @@ func TestUTF32(t *testing.T) ***REMOVED***
 		nSrc    int
 		err     error
 		t       transform.Transformer
-	***REMOVED******REMOVED******REMOVED***
+	}{{
 		desc: "utf-32 IgnoreBOM dec: empty string",
 		t:    utf32BEIB.NewDecoder(),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc: "utf-32 UseBOM dec: empty string",
 		t:    utf32BEUB.NewDecoder(),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc: "utf-32 ExpectBOM dec: empty string",
 		err:  ErrMissingBOM,
 		t:    utf32BEEB.NewDecoder(),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:    "utf-32be dec: Doesn't interpret U+FEFF as BOM",
 		src:     "\x00\x00\xFE\xFF\x00\x01\x23\x45\x00\x00\x00\x3D\x00\x00\x00\x52\x00\x00\x00\x61",
 		sizeDst: 100,
 		want:    "\uFEFF\U00012345=Ra",
 		nSrc:    20,
 		t:       utf32BEIB.NewDecoder(),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:    "utf-32be dec: Interprets little endian U+FEFF as invalid",
 		src:     "\xFF\xFE\x00\x00\x00\x01\x23\x45\x00\x00\x00\x3D\x00\x00\x00\x52\x00\x00\x00\x61",
 		sizeDst: 100,
 		want:    "\uFFFD\U00012345=Ra",
 		nSrc:    20,
 		t:       utf32BEIB.NewDecoder(),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:    "utf-32le dec: Doesn't interpret U+FEFF as BOM",
 		src:     "\xFF\xFE\x00\x00\x45\x23\x01\x00\x3D\x00\x00\x00\x52\x00\x00\x00\x61\x00\x00\x00",
 		sizeDst: 100,
 		want:    "\uFEFF\U00012345=Ra",
 		nSrc:    20,
 		t:       utf32LEIB.NewDecoder(),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:    "utf-32le dec: Interprets big endian U+FEFF as invalid",
 		src:     "\x00\x00\xFE\xFF\x45\x23\x01\x00\x3D\x00\x00\x00\x52\x00\x00\x00\x61\x00\x00\x00",
 		sizeDst: 100,
 		want:    "\uFFFD\U00012345=Ra",
 		nSrc:    20,
 		t:       utf32LEIB.NewDecoder(),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:    "utf-32 enc: Writes big-endian BOM",
 		src:     "\U00012345=Ra",
 		sizeDst: 100,
 		want:    "\x00\x00\xFE\xFF\x00\x01\x23\x45\x00\x00\x00\x3D\x00\x00\x00\x52\x00\x00\x00\x61",
 		nSrc:    7,
 		t:       utf32BEUB.NewEncoder(),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:    "utf-32 enc: Writes little-endian BOM",
 		src:     "\U00012345=Ra",
 		sizeDst: 100,
 		want:    "\xFF\xFE\x00\x00\x45\x23\x01\x00\x3D\x00\x00\x00\x52\x00\x00\x00\x61\x00\x00\x00",
 		nSrc:    7,
 		t:       utf32LEUB.NewEncoder(),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:    "utf-32 dec: Interprets text using big-endian default when BOM not present",
 		src:     "\x00\x01\x23\x45\x00\x00\x00\x3D\x00\x00\x00\x52\x00\x00\x00\x61",
 		sizeDst: 100,
 		want:    "\U00012345=Ra",
 		nSrc:    16,
 		t:       utf32BEUB.NewDecoder(),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:    "utf-32 dec: Interprets text using little-endian default when BOM not present",
 		src:     "\x45\x23\x01\x00\x3D\x00\x00\x00\x52\x00\x00\x00\x61\x00\x00\x00",
 		sizeDst: 100,
 		want:    "\U00012345=Ra",
 		nSrc:    16,
 		t:       utf32LEUB.NewDecoder(),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:    "utf-32 dec: BOM determines encoding BE",
 		src:     "\x00\x00\xFE\xFF\x00\x01\x23\x45\x00\x00\x00\x3D\x00\x00\x00\x52\x00\x00\x00\x61",
 		sizeDst: 100,
 		want:    "\U00012345=Ra",
 		nSrc:    20,
 		t:       utf32BEUB.NewDecoder(),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:    "utf-32 dec: BOM determines encoding LE",
 		src:     "\xFF\xFE\x00\x00\x45\x23\x01\x00\x3D\x00\x00\x00\x52\x00\x00\x00\x61\x00\x00\x00",
 		sizeDst: 100,
 		want:    "\U00012345=Ra",
 		nSrc:    20,
 		t:       utf32LEUB.NewDecoder(),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:    "utf-32 dec: BOM determines encoding LE, change default",
 		src:     "\xFF\xFE\x00\x00\x45\x23\x01\x00\x3D\x00\x00\x00\x52\x00\x00\x00\x61\x00\x00\x00",
 		sizeDst: 100,
 		want:    "\U00012345=Ra",
 		nSrc:    20,
 		t:       utf32BEUB.NewDecoder(),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:    "utf-32 dec: BOM determines encoding BE, change default",
 		src:     "\x00\x00\xFE\xFF\x00\x01\x23\x45\x00\x00\x00\x3D\x00\x00\x00\x52\x00\x00\x00\x61",
 		sizeDst: 100,
 		want:    "\U00012345=Ra",
 		nSrc:    20,
 		t:       utf32LEUB.NewDecoder(),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:    "utf-32 dec: Don't change big-endian byte order mid-stream",
 		src:     "\x00\x01\x23\x45\x00\x00\x00\x3D\xFF\xFE\x00\x00\x00\x00\xFE\xFF\x00\x00\x00\x52\x00\x00\x00\x61",
 		sizeDst: 100,
 		want:    "\U00012345=\uFFFD\uFEFFRa",
 		nSrc:    24,
 		t:       utf32BEUB.NewDecoder(),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:    "utf-32 dec: Don't change little-endian byte order mid-stream",
 		src:     "\x45\x23\x01\x00\x3D\x00\x00\x00\x00\x00\xFE\xFF\xFF\xFE\x00\x00\x52\x00\x00\x00\x61\x00\x00\x00",
 		sizeDst: 100,
 		want:    "\U00012345=\uFFFD\uFEFFRa",
 		nSrc:    24,
 		t:       utf32LEUB.NewDecoder(),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:    "utf-32 dec: Fail on missing BOM when required",
 		src:     "\x00\x01\x23\x45\x00\x00\x00\x3D\x00\x00\x00\x52\x00\x00\x00\x61",
 		sizeDst: 100,
@@ -183,7 +183,7 @@ func TestUTF32(t *testing.T) ***REMOVED***
 		nSrc:    0,
 		err:     ErrMissingBOM,
 		t:       utf32BEEB.NewDecoder(),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:    "utf-32 enc: Short dst",
 		src:     "\U00012345=Ra",
 		sizeDst: 15,
@@ -191,7 +191,7 @@ func TestUTF32(t *testing.T) ***REMOVED***
 		nSrc:    6,
 		err:     transform.ErrShortDst,
 		t:       utf32BEIB.NewEncoder(),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:    "utf-32 enc: Short src",
 		src:     "\U00012345=Ra\xC2",
 		notEOF:  true,
@@ -200,14 +200,14 @@ func TestUTF32(t *testing.T) ***REMOVED***
 		nSrc:    7,
 		err:     transform.ErrShortSrc,
 		t:       utf32BEIB.NewEncoder(),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:    "utf-32 enc: Invalid input",
 		src:     "\x80\xC1\xC2\x7F\xC2",
 		sizeDst: 100,
 		want:    "\x00\x00\xFF\xFD\x00\x00\xFF\xFD\x00\x00\xFF\xFD\x00\x00\x00\x7F\x00\x00\xFF\xFD",
 		nSrc:    5,
 		t:       utf32BEIB.NewEncoder(),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:    "utf-32 dec: Short dst",
 		src:     "\x00\x00\x00\x41",
 		sizeDst: 0,
@@ -215,7 +215,7 @@ func TestUTF32(t *testing.T) ***REMOVED***
 		nSrc:    0,
 		err:     transform.ErrShortDst,
 		t:       utf32BEIB.NewDecoder(),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:    "utf-32 dec: Short src",
 		src:     "\x00\x00\x00",
 		notEOF:  true,
@@ -224,25 +224,25 @@ func TestUTF32(t *testing.T) ***REMOVED***
 		nSrc:    0,
 		err:     transform.ErrShortSrc,
 		t:       utf32BEIB.NewDecoder(),
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:    "utf-32 dec: Invalid input",
 		src:     "\x00\x00\xD8\x00\x00\x00\xDF\xFF\x00\x11\x00\x00\x00\x00\x00",
 		sizeDst: 100,
 		want:    "\uFFFD\uFFFD\uFFFD\uFFFD",
 		nSrc:    15,
 		t:       utf32BEIB.NewDecoder(),
-	***REMOVED******REMOVED***
-	for i, tc := range testCases ***REMOVED***
+	}}
+	for i, tc := range testCases {
 		b := make([]byte, tc.sizeDst)
 		nDst, nSrc, err := tc.t.Transform(b, []byte(tc.src), !tc.notEOF)
-		if err != tc.err ***REMOVED***
+		if err != tc.err {
 			t.Errorf("%d:%s: error was %v; want %v", i, tc.desc, err, tc.err)
-		***REMOVED***
-		if got := string(b[:nDst]); got != tc.want ***REMOVED***
+		}
+		if got := string(b[:nDst]); got != tc.want {
 			t.Errorf("%d:%s: result was %q: want %q", i, tc.desc, got, tc.want)
-		***REMOVED***
-		if nSrc != tc.nSrc ***REMOVED***
+		}
+		if nSrc != tc.nSrc {
 			t.Errorf("%d:%s: nSrc was %d; want %d", i, tc.desc, nSrc, tc.nSrc)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

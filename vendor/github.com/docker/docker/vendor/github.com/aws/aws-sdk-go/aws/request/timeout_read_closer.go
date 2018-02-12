@@ -13,42 +13,42 @@ var timeoutErr = awserr.New(
 	nil,
 )
 
-type readResult struct ***REMOVED***
+type readResult struct {
 	n   int
 	err error
-***REMOVED***
+}
 
 // timeoutReadCloser will handle body reads that take too long.
 // We will return a ErrReadTimeout error if a timeout occurs.
-type timeoutReadCloser struct ***REMOVED***
+type timeoutReadCloser struct {
 	reader   io.ReadCloser
 	duration time.Duration
-***REMOVED***
+}
 
 // Read will spin off a goroutine to call the reader's Read method. We will
 // select on the timer's channel or the read's channel. Whoever completes first
 // will be returned.
-func (r *timeoutReadCloser) Read(b []byte) (int, error) ***REMOVED***
+func (r *timeoutReadCloser) Read(b []byte) (int, error) {
 	timer := time.NewTimer(r.duration)
 	c := make(chan readResult, 1)
 
-	go func() ***REMOVED***
+	go func() {
 		n, err := r.reader.Read(b)
 		timer.Stop()
-		c <- readResult***REMOVED***n: n, err: err***REMOVED***
-	***REMOVED***()
+		c <- readResult{n: n, err: err}
+	}()
 
-	select ***REMOVED***
+	select {
 	case data := <-c:
 		return data.n, data.err
 	case <-timer.C:
 		return 0, timeoutErr
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (r *timeoutReadCloser) Close() error ***REMOVED***
+func (r *timeoutReadCloser) Close() error {
 	return r.reader.Close()
-***REMOVED***
+}
 
 const (
 	// HandlerResponseTimeout is what we use to signify the name of the
@@ -58,31 +58,31 @@ const (
 
 // adaptToResponseTimeoutError is a handler that will replace any top level error
 // to a ErrCodeResponseTimeout, if its child is that.
-func adaptToResponseTimeoutError(req *Request) ***REMOVED***
-	if err, ok := req.Error.(awserr.Error); ok ***REMOVED***
+func adaptToResponseTimeoutError(req *Request) {
+	if err, ok := req.Error.(awserr.Error); ok {
 		aerr, ok := err.OrigErr().(awserr.Error)
-		if ok && aerr.Code() == ErrCodeResponseTimeout ***REMOVED***
+		if ok && aerr.Code() == ErrCodeResponseTimeout {
 			req.Error = aerr
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // WithResponseReadTimeout is a request option that will wrap the body in a timeout read closer.
 // This will allow for per read timeouts. If a timeout occurred, we will return the
 // ErrCodeResponseTimeout.
 //
 //     svc.PutObjectWithContext(ctx, params, request.WithTimeoutReadCloser(30 * time.Second)
-func WithResponseReadTimeout(duration time.Duration) Option ***REMOVED***
-	return func(r *Request) ***REMOVED***
+func WithResponseReadTimeout(duration time.Duration) Option {
+	return func(r *Request) {
 
-		var timeoutHandler = NamedHandler***REMOVED***
+		var timeoutHandler = NamedHandler{
 			HandlerResponseTimeout,
-			func(req *Request) ***REMOVED***
-				req.HTTPResponse.Body = &timeoutReadCloser***REMOVED***
+			func(req *Request) {
+				req.HTTPResponse.Body = &timeoutReadCloser{
 					reader:   req.HTTPResponse.Body,
 					duration: duration,
-				***REMOVED***
-			***REMOVED******REMOVED***
+				}
+			}}
 
 		// remove the handler so we are not stomping over any new durations.
 		r.Handlers.Send.RemoveByName(HandlerResponseTimeout)
@@ -90,5 +90,5 @@ func WithResponseReadTimeout(duration time.Duration) Option ***REMOVED***
 
 		r.Handlers.Unmarshal.PushBack(adaptToResponseTimeoutError)
 		r.Handlers.UnmarshalError.PushBack(adaptToResponseTimeoutError)
-	***REMOVED***
-***REMOVED***
+	}
+}

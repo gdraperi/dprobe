@@ -5,7 +5,7 @@ import (
 )
 
 // HealthCheck is used to represent a single check
-type HealthCheck struct ***REMOVED***
+type HealthCheck struct {
 	Node        string
 	CheckID     string
 	Name        string
@@ -14,100 +14,100 @@ type HealthCheck struct ***REMOVED***
 	Output      string
 	ServiceID   string
 	ServiceName string
-***REMOVED***
+}
 
 // ServiceEntry is used for the health service endpoint
-type ServiceEntry struct ***REMOVED***
+type ServiceEntry struct {
 	Node    *Node
 	Service *AgentService
 	Checks  []*HealthCheck
-***REMOVED***
+}
 
 // Health can be used to query the Health endpoints
-type Health struct ***REMOVED***
+type Health struct {
 	c *Client
-***REMOVED***
+}
 
 // Health returns a handle to the health endpoints
-func (c *Client) Health() *Health ***REMOVED***
-	return &Health***REMOVED***c***REMOVED***
-***REMOVED***
+func (c *Client) Health() *Health {
+	return &Health{c}
+}
 
 // Node is used to query for checks belonging to a given node
-func (h *Health) Node(node string, q *QueryOptions) ([]*HealthCheck, *QueryMeta, error) ***REMOVED***
+func (h *Health) Node(node string, q *QueryOptions) ([]*HealthCheck, *QueryMeta, error) {
 	r := h.c.newRequest("GET", "/v1/health/node/"+node)
 	r.setQueryOptions(q)
 	rtt, resp, err := requireOK(h.c.doRequest(r))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 	defer resp.Body.Close()
 
-	qm := &QueryMeta***REMOVED******REMOVED***
+	qm := &QueryMeta{}
 	parseQueryMeta(resp, qm)
 	qm.RequestTime = rtt
 
 	var out []*HealthCheck
-	if err := decodeBody(resp, &out); err != nil ***REMOVED***
+	if err := decodeBody(resp, &out); err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 	return out, qm, nil
-***REMOVED***
+}
 
 // Checks is used to return the checks associated with a service
-func (h *Health) Checks(service string, q *QueryOptions) ([]*HealthCheck, *QueryMeta, error) ***REMOVED***
+func (h *Health) Checks(service string, q *QueryOptions) ([]*HealthCheck, *QueryMeta, error) {
 	r := h.c.newRequest("GET", "/v1/health/checks/"+service)
 	r.setQueryOptions(q)
 	rtt, resp, err := requireOK(h.c.doRequest(r))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 	defer resp.Body.Close()
 
-	qm := &QueryMeta***REMOVED******REMOVED***
+	qm := &QueryMeta{}
 	parseQueryMeta(resp, qm)
 	qm.RequestTime = rtt
 
 	var out []*HealthCheck
-	if err := decodeBody(resp, &out); err != nil ***REMOVED***
+	if err := decodeBody(resp, &out); err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 	return out, qm, nil
-***REMOVED***
+}
 
 // Service is used to query health information along with service info
 // for a given service. It can optionally do server-side filtering on a tag
 // or nodes with passing health checks only.
-func (h *Health) Service(service, tag string, passingOnly bool, q *QueryOptions) ([]*ServiceEntry, *QueryMeta, error) ***REMOVED***
+func (h *Health) Service(service, tag string, passingOnly bool, q *QueryOptions) ([]*ServiceEntry, *QueryMeta, error) {
 	r := h.c.newRequest("GET", "/v1/health/service/"+service)
 	r.setQueryOptions(q)
-	if tag != "" ***REMOVED***
+	if tag != "" {
 		r.params.Set("tag", tag)
-	***REMOVED***
-	if passingOnly ***REMOVED***
+	}
+	if passingOnly {
 		r.params.Set("passing", "1")
-	***REMOVED***
+	}
 	rtt, resp, err := requireOK(h.c.doRequest(r))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 	defer resp.Body.Close()
 
-	qm := &QueryMeta***REMOVED******REMOVED***
+	qm := &QueryMeta{}
 	parseQueryMeta(resp, qm)
 	qm.RequestTime = rtt
 
 	var out []*ServiceEntry
-	if err := decodeBody(resp, &out); err != nil ***REMOVED***
+	if err := decodeBody(resp, &out); err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 	return out, qm, nil
-***REMOVED***
+}
 
 // State is used to retreive all the checks in a given state.
 // The wildcard "any" state can also be used for all checks.
-func (h *Health) State(state string, q *QueryOptions) ([]*HealthCheck, *QueryMeta, error) ***REMOVED***
-	switch state ***REMOVED***
+func (h *Health) State(state string, q *QueryOptions) ([]*HealthCheck, *QueryMeta, error) {
+	switch state {
 	case "any":
 	case "warning":
 	case "critical":
@@ -115,22 +115,22 @@ func (h *Health) State(state string, q *QueryOptions) ([]*HealthCheck, *QueryMet
 	case "unknown":
 	default:
 		return nil, nil, fmt.Errorf("Unsupported state: %v", state)
-	***REMOVED***
+	}
 	r := h.c.newRequest("GET", "/v1/health/state/"+state)
 	r.setQueryOptions(q)
 	rtt, resp, err := requireOK(h.c.doRequest(r))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 	defer resp.Body.Close()
 
-	qm := &QueryMeta***REMOVED******REMOVED***
+	qm := &QueryMeta{}
 	parseQueryMeta(resp, qm)
 	qm.RequestTime = rtt
 
 	var out []*HealthCheck
-	if err := decodeBody(resp, &out); err != nil ***REMOVED***
+	if err := decodeBody(resp, &out); err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 	return out, qm, nil
-***REMOVED***
+}

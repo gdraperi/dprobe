@@ -17,7 +17,7 @@ import (
 	"unsafe"
 )
 
-type SockaddrDatalink struct ***REMOVED***
+type SockaddrDatalink struct {
 	Len    uint8
 	Family uint8
 	Index  uint16
@@ -27,102 +27,102 @@ type SockaddrDatalink struct ***REMOVED***
 	Slen   uint8
 	Data   [12]int8
 	raw    RawSockaddrDatalink
-***REMOVED***
+}
 
 func Syscall9(trap, a1, a2, a3, a4, a5, a6, a7, a8, a9 uintptr) (r1, r2 uintptr, err syscall.Errno)
 
-func sysctlNodes(mib []_C_int) (nodes []Sysctlnode, err error) ***REMOVED***
+func sysctlNodes(mib []_C_int) (nodes []Sysctlnode, err error) {
 	var olen uintptr
 
 	// Get a list of all sysctl nodes below the given MIB by performing
 	// a sysctl for the given MIB with CTL_QUERY appended.
 	mib = append(mib, CTL_QUERY)
-	qnode := Sysctlnode***REMOVED***Flags: SYSCTL_VERS_1***REMOVED***
+	qnode := Sysctlnode{Flags: SYSCTL_VERS_1}
 	qp := (*byte)(unsafe.Pointer(&qnode))
 	sz := unsafe.Sizeof(qnode)
-	if err = sysctl(mib, nil, &olen, qp, sz); err != nil ***REMOVED***
+	if err = sysctl(mib, nil, &olen, qp, sz); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// Now that we know the size, get the actual nodes.
 	nodes = make([]Sysctlnode, olen/sz)
 	np := (*byte)(unsafe.Pointer(&nodes[0]))
-	if err = sysctl(mib, np, &olen, qp, sz); err != nil ***REMOVED***
+	if err = sysctl(mib, np, &olen, qp, sz); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	return nodes, nil
-***REMOVED***
+}
 
-func nametomib(name string) (mib []_C_int, err error) ***REMOVED***
+func nametomib(name string) (mib []_C_int, err error) {
 
 	// Split name into components.
 	var parts []string
 	last := 0
-	for i := 0; i < len(name); i++ ***REMOVED***
-		if name[i] == '.' ***REMOVED***
+	for i := 0; i < len(name); i++ {
+		if name[i] == '.' {
 			parts = append(parts, name[last:i])
 			last = i + 1
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	parts = append(parts, name[last:])
 
 	// Discover the nodes and construct the MIB OID.
-	for partno, part := range parts ***REMOVED***
+	for partno, part := range parts {
 		nodes, err := sysctlNodes(mib)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-		for _, node := range nodes ***REMOVED***
+		}
+		for _, node := range nodes {
 			n := make([]byte, 0)
-			for i := range node.Name ***REMOVED***
-				if node.Name[i] != 0 ***REMOVED***
+			for i := range node.Name {
+				if node.Name[i] != 0 {
 					n = append(n, byte(node.Name[i]))
-				***REMOVED***
-			***REMOVED***
-			if string(n) == part ***REMOVED***
+				}
+			}
+			if string(n) == part {
 				mib = append(mib, _C_int(node.Num))
 				break
-			***REMOVED***
-		***REMOVED***
-		if len(mib) != partno+1 ***REMOVED***
+			}
+		}
+		if len(mib) != partno+1 {
 			return nil, EINVAL
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return mib, nil
-***REMOVED***
+}
 
-func direntIno(buf []byte) (uint64, bool) ***REMOVED***
-	return readInt(buf, unsafe.Offsetof(Dirent***REMOVED******REMOVED***.Fileno), unsafe.Sizeof(Dirent***REMOVED******REMOVED***.Fileno))
-***REMOVED***
+func direntIno(buf []byte) (uint64, bool) {
+	return readInt(buf, unsafe.Offsetof(Dirent{}.Fileno), unsafe.Sizeof(Dirent{}.Fileno))
+}
 
-func direntReclen(buf []byte) (uint64, bool) ***REMOVED***
-	return readInt(buf, unsafe.Offsetof(Dirent***REMOVED******REMOVED***.Reclen), unsafe.Sizeof(Dirent***REMOVED******REMOVED***.Reclen))
-***REMOVED***
+func direntReclen(buf []byte) (uint64, bool) {
+	return readInt(buf, unsafe.Offsetof(Dirent{}.Reclen), unsafe.Sizeof(Dirent{}.Reclen))
+}
 
-func direntNamlen(buf []byte) (uint64, bool) ***REMOVED***
-	return readInt(buf, unsafe.Offsetof(Dirent***REMOVED******REMOVED***.Namlen), unsafe.Sizeof(Dirent***REMOVED******REMOVED***.Namlen))
-***REMOVED***
+func direntNamlen(buf []byte) (uint64, bool) {
+	return readInt(buf, unsafe.Offsetof(Dirent{}.Namlen), unsafe.Sizeof(Dirent{}.Namlen))
+}
 
 //sysnb pipe() (fd1 int, fd2 int, err error)
-func Pipe(p []int) (err error) ***REMOVED***
-	if len(p) != 2 ***REMOVED***
+func Pipe(p []int) (err error) {
+	if len(p) != 2 {
 		return EINVAL
-	***REMOVED***
+	}
 	p[0], p[1], err = pipe()
 	return
-***REMOVED***
+}
 
 //sys getdents(fd int, buf []byte) (n int, err error)
-func Getdirentries(fd int, buf []byte, basep *uintptr) (n int, err error) ***REMOVED***
+func Getdirentries(fd int, buf []byte, basep *uintptr) (n int, err error) {
 	return getdents(fd, buf)
-***REMOVED***
+}
 
 // TODO
-func sendfile(outfd int, infd int, offset *int64, count int) (written int, err error) ***REMOVED***
+func sendfile(outfd int, infd int, offset *int64, count int) (written int, err error) {
 	return -1, ENOSYS
-***REMOVED***
+}
 
 /*
  * Exposed directly

@@ -13,7 +13,7 @@ const (
 	initialHeaderTableSize = 4096
 )
 
-type Encoder struct ***REMOVED***
+type Encoder struct {
 	dynTab dynamicTable
 	// minSize is the minimum table size set by
 	// SetMaxDynamicTableSize after the previous Header Table Size
@@ -28,58 +28,58 @@ type Encoder struct ***REMOVED***
 	tableSizeUpdate bool
 	w               io.Writer
 	buf             []byte
-***REMOVED***
+}
 
 // NewEncoder returns a new Encoder which performs HPACK encoding. An
 // encoded data is written to w.
-func NewEncoder(w io.Writer) *Encoder ***REMOVED***
-	e := &Encoder***REMOVED***
+func NewEncoder(w io.Writer) *Encoder {
+	e := &Encoder{
 		minSize:         uint32Max,
 		maxSizeLimit:    initialHeaderTableSize,
 		tableSizeUpdate: false,
 		w:               w,
-	***REMOVED***
+	}
 	e.dynTab.table.init()
 	e.dynTab.setMaxSize(initialHeaderTableSize)
 	return e
-***REMOVED***
+}
 
 // WriteField encodes f into a single Write to e's underlying Writer.
 // This function may also produce bytes for "Header Table Size Update"
 // if necessary. If produced, it is done before encoding f.
-func (e *Encoder) WriteField(f HeaderField) error ***REMOVED***
+func (e *Encoder) WriteField(f HeaderField) error {
 	e.buf = e.buf[:0]
 
-	if e.tableSizeUpdate ***REMOVED***
+	if e.tableSizeUpdate {
 		e.tableSizeUpdate = false
-		if e.minSize < e.dynTab.maxSize ***REMOVED***
+		if e.minSize < e.dynTab.maxSize {
 			e.buf = appendTableSize(e.buf, e.minSize)
-		***REMOVED***
+		}
 		e.minSize = uint32Max
 		e.buf = appendTableSize(e.buf, e.dynTab.maxSize)
-	***REMOVED***
+	}
 
 	idx, nameValueMatch := e.searchTable(f)
-	if nameValueMatch ***REMOVED***
+	if nameValueMatch {
 		e.buf = appendIndexed(e.buf, idx)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		indexing := e.shouldIndex(f)
-		if indexing ***REMOVED***
+		if indexing {
 			e.dynTab.add(f)
-		***REMOVED***
+		}
 
-		if idx == 0 ***REMOVED***
+		if idx == 0 {
 			e.buf = appendNewName(e.buf, f, indexing)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			e.buf = appendIndexedName(e.buf, f, idx, indexing)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	n, err := e.w.Write(e.buf)
-	if err == nil && n != len(e.buf) ***REMOVED***
+	if err == nil && n != len(e.buf) {
 		err = io.ErrShortWrite
-	***REMOVED***
+	}
 	return err
-***REMOVED***
+}
 
 // searchTable searches f in both stable and dynamic header tables.
 // The static header table is searched first. Only when there is no
@@ -88,33 +88,33 @@ func (e *Encoder) WriteField(f HeaderField) error ***REMOVED***
 // match, i is the matched index and nameValueMatch becomes true. If
 // only name matches, i points to that index and nameValueMatch
 // becomes false.
-func (e *Encoder) searchTable(f HeaderField) (i uint64, nameValueMatch bool) ***REMOVED***
+func (e *Encoder) searchTable(f HeaderField) (i uint64, nameValueMatch bool) {
 	i, nameValueMatch = staticTable.search(f)
-	if nameValueMatch ***REMOVED***
+	if nameValueMatch {
 		return i, true
-	***REMOVED***
+	}
 
 	j, nameValueMatch := e.dynTab.table.search(f)
-	if nameValueMatch || (i == 0 && j != 0) ***REMOVED***
+	if nameValueMatch || (i == 0 && j != 0) {
 		return j + uint64(staticTable.len()), nameValueMatch
-	***REMOVED***
+	}
 
 	return i, false
-***REMOVED***
+}
 
 // SetMaxDynamicTableSize changes the dynamic header table size to v.
 // The actual size is bounded by the value passed to
 // SetMaxDynamicTableSizeLimit.
-func (e *Encoder) SetMaxDynamicTableSize(v uint32) ***REMOVED***
-	if v > e.maxSizeLimit ***REMOVED***
+func (e *Encoder) SetMaxDynamicTableSize(v uint32) {
+	if v > e.maxSizeLimit {
 		v = e.maxSizeLimit
-	***REMOVED***
-	if v < e.minSize ***REMOVED***
+	}
+	if v < e.minSize {
 		e.minSize = v
-	***REMOVED***
+	}
 	e.tableSizeUpdate = true
 	e.dynTab.setMaxSize(v)
-***REMOVED***
+}
 
 // SetMaxDynamicTableSizeLimit changes the maximum value that can be
 // specified in SetMaxDynamicTableSize to v. By default, it is set to
@@ -123,27 +123,27 @@ func (e *Encoder) SetMaxDynamicTableSize(v uint32) ***REMOVED***
 // dynamic header table size is strictly greater than v, "Header Table
 // Size Update" will be done in the next WriteField call and the
 // maximum dynamic header table size is truncated to v.
-func (e *Encoder) SetMaxDynamicTableSizeLimit(v uint32) ***REMOVED***
+func (e *Encoder) SetMaxDynamicTableSizeLimit(v uint32) {
 	e.maxSizeLimit = v
-	if e.dynTab.maxSize > v ***REMOVED***
+	if e.dynTab.maxSize > v {
 		e.tableSizeUpdate = true
 		e.dynTab.setMaxSize(v)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // shouldIndex reports whether f should be indexed.
-func (e *Encoder) shouldIndex(f HeaderField) bool ***REMOVED***
+func (e *Encoder) shouldIndex(f HeaderField) bool {
 	return !f.Sensitive && f.Size() <= e.dynTab.maxSize
-***REMOVED***
+}
 
 // appendIndexed appends index i, as encoded in "Indexed Header Field"
 // representation, to dst and returns the extended buffer.
-func appendIndexed(dst []byte, i uint64) []byte ***REMOVED***
+func appendIndexed(dst []byte, i uint64) []byte {
 	first := len(dst)
 	dst = appendVarInt(dst, 7, i)
 	dst[first] |= 0x80
 	return dst
-***REMOVED***
+}
 
 // appendNewName appends f, as encoded in one of "Literal Header field
 // - New Name" representation variants, to dst and returns the
@@ -152,11 +152,11 @@ func appendIndexed(dst []byte, i uint64) []byte ***REMOVED***
 // If f.Sensitive is true, "Never Indexed" representation is used. If
 // f.Sensitive is false and indexing is true, "Inremental Indexing"
 // representation is used.
-func appendNewName(dst []byte, f HeaderField, indexing bool) []byte ***REMOVED***
+func appendNewName(dst []byte, f HeaderField, indexing bool) []byte {
 	dst = append(dst, encodeTypeByte(indexing, f.Sensitive))
 	dst = appendHpackString(dst, f.Name)
 	return appendHpackString(dst, f.Value)
-***REMOVED***
+}
 
 // appendIndexedName appends f and index i referring indexed name
 // entry, as encoded in one of "Literal Header field - Indexed Name"
@@ -165,76 +165,76 @@ func appendNewName(dst []byte, f HeaderField, indexing bool) []byte ***REMOVED**
 // If f.Sensitive is true, "Never Indexed" representation is used. If
 // f.Sensitive is false and indexing is true, "Incremental Indexing"
 // representation is used.
-func appendIndexedName(dst []byte, f HeaderField, i uint64, indexing bool) []byte ***REMOVED***
+func appendIndexedName(dst []byte, f HeaderField, i uint64, indexing bool) []byte {
 	first := len(dst)
 	var n byte
-	if indexing ***REMOVED***
+	if indexing {
 		n = 6
-	***REMOVED*** else ***REMOVED***
+	} else {
 		n = 4
-	***REMOVED***
+	}
 	dst = appendVarInt(dst, n, i)
 	dst[first] |= encodeTypeByte(indexing, f.Sensitive)
 	return appendHpackString(dst, f.Value)
-***REMOVED***
+}
 
 // appendTableSize appends v, as encoded in "Header Table Size Update"
 // representation, to dst and returns the extended buffer.
-func appendTableSize(dst []byte, v uint32) []byte ***REMOVED***
+func appendTableSize(dst []byte, v uint32) []byte {
 	first := len(dst)
 	dst = appendVarInt(dst, 5, uint64(v))
 	dst[first] |= 0x20
 	return dst
-***REMOVED***
+}
 
 // appendVarInt appends i, as encoded in variable integer form using n
 // bit prefix, to dst and returns the extended buffer.
 //
 // See
 // http://http2.github.io/http2-spec/compression.html#integer.representation
-func appendVarInt(dst []byte, n byte, i uint64) []byte ***REMOVED***
+func appendVarInt(dst []byte, n byte, i uint64) []byte {
 	k := uint64((1 << n) - 1)
-	if i < k ***REMOVED***
+	if i < k {
 		return append(dst, byte(i))
-	***REMOVED***
+	}
 	dst = append(dst, byte(k))
 	i -= k
-	for ; i >= 128; i >>= 7 ***REMOVED***
+	for ; i >= 128; i >>= 7 {
 		dst = append(dst, byte(0x80|(i&0x7f)))
-	***REMOVED***
+	}
 	return append(dst, byte(i))
-***REMOVED***
+}
 
 // appendHpackString appends s, as encoded in "String Literal"
 // representation, to dst and returns the the extended buffer.
 //
 // s will be encoded in Huffman codes only when it produces strictly
 // shorter byte string.
-func appendHpackString(dst []byte, s string) []byte ***REMOVED***
+func appendHpackString(dst []byte, s string) []byte {
 	huffmanLength := HuffmanEncodeLength(s)
-	if huffmanLength < uint64(len(s)) ***REMOVED***
+	if huffmanLength < uint64(len(s)) {
 		first := len(dst)
 		dst = appendVarInt(dst, 7, huffmanLength)
 		dst = AppendHuffmanString(dst, s)
 		dst[first] |= 0x80
-	***REMOVED*** else ***REMOVED***
+	} else {
 		dst = appendVarInt(dst, 7, uint64(len(s)))
 		dst = append(dst, s...)
-	***REMOVED***
+	}
 	return dst
-***REMOVED***
+}
 
 // encodeTypeByte returns type byte. If sensitive is true, type byte
 // for "Never Indexed" representation is returned. If sensitive is
 // false and indexing is true, type byte for "Incremental Indexing"
 // representation is returned. Otherwise, type byte for "Without
 // Indexing" is returned.
-func encodeTypeByte(indexing, sensitive bool) byte ***REMOVED***
-	if sensitive ***REMOVED***
+func encodeTypeByte(indexing, sensitive bool) byte {
+	if sensitive {
 		return 0x10
-	***REMOVED***
-	if indexing ***REMOVED***
+	}
+	if indexing {
 		return 0x40
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}

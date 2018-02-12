@@ -5,7 +5,7 @@ Received messages are written to stdin followed by a `\n`. Each line read from
 standard out is sent as a message to the client.
 
     $ go get github.com/gorilla/websocket
-    $ cd `go list -f '***REMOVED******REMOVED***.Dir***REMOVED******REMOVED***' github.com/gorilla/websocket/examples/command`
+    $ cd `go list -f '{{.Dir}}' github.com/gorilla/websocket/examples/command`
     $ go run main.go <command and arguments to run>
     # Open http://localhost:8080/ .
 

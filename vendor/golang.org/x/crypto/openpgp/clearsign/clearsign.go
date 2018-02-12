@@ -25,12 +25,12 @@ import (
 
 // A Block represents a clearsigned message. A signature on a Block can
 // be checked by passing Bytes into openpgp.CheckDetachedSignature.
-type Block struct ***REMOVED***
+type Block struct {
 	Headers          textproto.MIMEHeader // Optional message headers
 	Plaintext        []byte               // The original message text
 	Bytes            []byte               // The signed message
 	ArmoredSignature *armor.Block         // The signature block
-***REMOVED***
+}
 
 // start is the marker which denotes the beginning of a clearsigned message.
 var start = []byte("\n-----BEGIN PGP SIGNED MESSAGE-----")
@@ -53,121 +53,121 @@ var lf = byte('\n')
 // array. The line does not include the \r\n or \n. The remainder of the byte
 // array (also not including the new line bytes) is also returned and this will
 // always be smaller than the original argument.
-func getLine(data []byte) (line, rest []byte) ***REMOVED***
-	i := bytes.Index(data, []byte***REMOVED***'\n'***REMOVED***)
+func getLine(data []byte) (line, rest []byte) {
+	i := bytes.Index(data, []byte{'\n'})
 	var j int
-	if i < 0 ***REMOVED***
+	if i < 0 {
 		i = len(data)
 		j = i
-	***REMOVED*** else ***REMOVED***
+	} else {
 		j = i + 1
-		if i > 0 && data[i-1] == '\r' ***REMOVED***
+		if i > 0 && data[i-1] == '\r' {
 			i--
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return data[0:i], data[j:]
-***REMOVED***
+}
 
 // Decode finds the first clearsigned message in data and returns it, as well
 // as the suffix of data which remains after the message.
-func Decode(data []byte) (b *Block, rest []byte) ***REMOVED***
+func Decode(data []byte) (b *Block, rest []byte) {
 	// start begins with a newline. However, at the very beginning of
 	// the byte array, we'll accept the start string without it.
 	rest = data
-	if bytes.HasPrefix(data, start[1:]) ***REMOVED***
+	if bytes.HasPrefix(data, start[1:]) {
 		rest = rest[len(start)-1:]
-	***REMOVED*** else if i := bytes.Index(data, start); i >= 0 ***REMOVED***
+	} else if i := bytes.Index(data, start); i >= 0 {
 		rest = rest[i+len(start):]
-	***REMOVED*** else ***REMOVED***
+	} else {
 		return nil, data
-	***REMOVED***
+	}
 
 	// Consume the start line.
 	_, rest = getLine(rest)
 
 	var line []byte
-	b = &Block***REMOVED***
+	b = &Block{
 		Headers: make(textproto.MIMEHeader),
-	***REMOVED***
+	}
 
 	// Next come a series of header lines.
-	for ***REMOVED***
+	for {
 		// This loop terminates because getLine's second result is
 		// always smaller than its argument.
-		if len(rest) == 0 ***REMOVED***
+		if len(rest) == 0 {
 			return nil, data
-		***REMOVED***
+		}
 		// An empty line marks the end of the headers.
-		if line, rest = getLine(rest); len(line) == 0 ***REMOVED***
+		if line, rest = getLine(rest); len(line) == 0 {
 			break
-		***REMOVED***
+		}
 
-		i := bytes.Index(line, []byte***REMOVED***':'***REMOVED***)
-		if i == -1 ***REMOVED***
+		i := bytes.Index(line, []byte{':'})
+		if i == -1 {
 			return nil, data
-		***REMOVED***
+		}
 
 		key, val := line[0:i], line[i+1:]
 		key = bytes.TrimSpace(key)
 		val = bytes.TrimSpace(val)
 		b.Headers.Add(string(key), string(val))
-	***REMOVED***
+	}
 
 	firstLine := true
-	for ***REMOVED***
+	for {
 		start := rest
 
 		line, rest = getLine(rest)
-		if len(line) == 0 && len(rest) == 0 ***REMOVED***
+		if len(line) == 0 && len(rest) == 0 {
 			// No armored data was found, so this isn't a complete message.
 			return nil, data
-		***REMOVED***
-		if bytes.Equal(line, endText) ***REMOVED***
+		}
+		if bytes.Equal(line, endText) {
 			// Back up to the start of the line because armor expects to see the
 			// header line.
 			rest = start
 			break
-		***REMOVED***
+		}
 
 		// The final CRLF isn't included in the hash so we don't write it until
 		// we've seen the next line.
-		if firstLine ***REMOVED***
+		if firstLine {
 			firstLine = false
-		***REMOVED*** else ***REMOVED***
+		} else {
 			b.Bytes = append(b.Bytes, crlf...)
-		***REMOVED***
+		}
 
-		if bytes.HasPrefix(line, dashEscape) ***REMOVED***
+		if bytes.HasPrefix(line, dashEscape) {
 			line = line[2:]
-		***REMOVED***
+		}
 		line = bytes.TrimRight(line, " \t")
 		b.Bytes = append(b.Bytes, line...)
 
 		b.Plaintext = append(b.Plaintext, line...)
 		b.Plaintext = append(b.Plaintext, lf)
-	***REMOVED***
+	}
 
 	// We want to find the extent of the armored data (including any newlines at
 	// the end).
 	i := bytes.Index(rest, end)
-	if i == -1 ***REMOVED***
+	if i == -1 {
 		return nil, data
-	***REMOVED***
+	}
 	i += len(end)
-	for i < len(rest) && (rest[i] == '\r' || rest[i] == '\n') ***REMOVED***
+	for i < len(rest) && (rest[i] == '\r' || rest[i] == '\n') {
 		i++
-	***REMOVED***
+	}
 	armored := rest[:i]
 	rest = rest[i:]
 
 	var err error
 	b.ArmoredSignature, err = armor.Decode(bytes.NewBuffer(armored))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, data
-	***REMOVED***
+	}
 
 	return b, rest
-***REMOVED***
+}
 
 // A dashEscaper is an io.WriteCloser which processes the body of a clear-signed
 // message. The clear-signed message is written to buffered and a hash, suitable
@@ -175,7 +175,7 @@ func Decode(data []byte) (b *Block, rest []byte) ***REMOVED***
 //
 // When closed, an armored signature is created and written to complete the
 // message.
-type dashEscaper struct ***REMOVED***
+type dashEscaper struct {
 	buffered *bufio.Writer
 	h        hash.Hash
 	hashType crypto.Hash
@@ -188,87 +188,87 @@ type dashEscaper struct ***REMOVED***
 
 	privateKey *packet.PrivateKey
 	config     *packet.Config
-***REMOVED***
+}
 
-func (d *dashEscaper) Write(data []byte) (n int, err error) ***REMOVED***
-	for _, b := range data ***REMOVED***
+func (d *dashEscaper) Write(data []byte) (n int, err error) {
+	for _, b := range data {
 		d.byteBuf[0] = b
 
-		if d.atBeginningOfLine ***REMOVED***
+		if d.atBeginningOfLine {
 			// The final CRLF isn't included in the hash so we have to wait
 			// until this point (the start of the next line) before writing it.
-			if !d.isFirstLine ***REMOVED***
+			if !d.isFirstLine {
 				d.h.Write(crlf)
-			***REMOVED***
+			}
 			d.isFirstLine = false
-		***REMOVED***
+		}
 
 		// Any whitespace at the end of the line has to be removed so we
 		// buffer it until we find out whether there's more on this line.
-		if b == ' ' || b == '\t' || b == '\r' ***REMOVED***
+		if b == ' ' || b == '\t' || b == '\r' {
 			d.whitespace = append(d.whitespace, b)
 			d.atBeginningOfLine = false
 			continue
-		***REMOVED***
+		}
 
-		if d.atBeginningOfLine ***REMOVED***
+		if d.atBeginningOfLine {
 			// At the beginning of a line, hyphens have to be escaped.
-			if b == '-' ***REMOVED***
+			if b == '-' {
 				// The signature isn't calculated over the dash-escaped text so
 				// the escape is only written to buffered.
-				if _, err = d.buffered.Write(dashEscape); err != nil ***REMOVED***
+				if _, err = d.buffered.Write(dashEscape); err != nil {
 					return
-				***REMOVED***
+				}
 				d.h.Write(d.byteBuf)
 				d.atBeginningOfLine = false
-			***REMOVED*** else if b == '\n' ***REMOVED***
+			} else if b == '\n' {
 				// Nothing to do because we delay writing CRLF to the hash.
-			***REMOVED*** else ***REMOVED***
+			} else {
 				d.h.Write(d.byteBuf)
 				d.atBeginningOfLine = false
-			***REMOVED***
-			if err = d.buffered.WriteByte(b); err != nil ***REMOVED***
+			}
+			if err = d.buffered.WriteByte(b); err != nil {
 				return
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
-			if b == '\n' ***REMOVED***
+			}
+		} else {
+			if b == '\n' {
 				// We got a raw \n. Drop any trailing whitespace and write a
 				// CRLF.
 				d.whitespace = d.whitespace[:0]
 				// We delay writing CRLF to the hash until the start of the
 				// next line.
-				if err = d.buffered.WriteByte(b); err != nil ***REMOVED***
+				if err = d.buffered.WriteByte(b); err != nil {
 					return
-				***REMOVED***
+				}
 				d.atBeginningOfLine = true
-			***REMOVED*** else ***REMOVED***
+			} else {
 				// Any buffered whitespace wasn't at the end of the line so
 				// we need to write it out.
-				if len(d.whitespace) > 0 ***REMOVED***
+				if len(d.whitespace) > 0 {
 					d.h.Write(d.whitespace)
-					if _, err = d.buffered.Write(d.whitespace); err != nil ***REMOVED***
+					if _, err = d.buffered.Write(d.whitespace); err != nil {
 						return
-					***REMOVED***
+					}
 					d.whitespace = d.whitespace[:0]
-				***REMOVED***
+				}
 				d.h.Write(d.byteBuf)
-				if err = d.buffered.WriteByte(b); err != nil ***REMOVED***
+				if err = d.buffered.WriteByte(b); err != nil {
 					return
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+				}
+			}
+		}
+	}
 
 	n = len(data)
 	return
-***REMOVED***
+}
 
-func (d *dashEscaper) Close() (err error) ***REMOVED***
-	if !d.atBeginningOfLine ***REMOVED***
-		if err = d.buffered.WriteByte(lf); err != nil ***REMOVED***
+func (d *dashEscaper) Close() (err error) {
+	if !d.atBeginningOfLine {
+		if err = d.buffered.WriteByte(lf); err != nil {
 			return
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	sig := new(packet.Signature)
 	sig.SigType = packet.SigTypeText
 	sig.PubKeyAlgo = d.privateKey.PubKeyAlgo
@@ -276,67 +276,67 @@ func (d *dashEscaper) Close() (err error) ***REMOVED***
 	sig.CreationTime = d.config.Now()
 	sig.IssuerKeyId = &d.privateKey.KeyId
 
-	if err = sig.Sign(d.h, d.privateKey, d.config); err != nil ***REMOVED***
+	if err = sig.Sign(d.h, d.privateKey, d.config); err != nil {
 		return
-	***REMOVED***
+	}
 
 	out, err := armor.Encode(d.buffered, "PGP SIGNATURE", nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
-	if err = sig.Serialize(out); err != nil ***REMOVED***
+	if err = sig.Serialize(out); err != nil {
 		return
-	***REMOVED***
-	if err = out.Close(); err != nil ***REMOVED***
+	}
+	if err = out.Close(); err != nil {
 		return
-	***REMOVED***
-	if err = d.buffered.Flush(); err != nil ***REMOVED***
+	}
+	if err = d.buffered.Flush(); err != nil {
 		return
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // Encode returns a WriteCloser which will clear-sign a message with privateKey
 // and write it to w. If config is nil, sensible defaults are used.
-func Encode(w io.Writer, privateKey *packet.PrivateKey, config *packet.Config) (plaintext io.WriteCloser, err error) ***REMOVED***
-	if privateKey.Encrypted ***REMOVED***
+func Encode(w io.Writer, privateKey *packet.PrivateKey, config *packet.Config) (plaintext io.WriteCloser, err error) {
+	if privateKey.Encrypted {
 		return nil, errors.InvalidArgumentError("signing key is encrypted")
-	***REMOVED***
+	}
 
 	hashType := config.Hash()
 	name := nameOfHash(hashType)
-	if len(name) == 0 ***REMOVED***
+	if len(name) == 0 {
 		return nil, errors.UnsupportedError("unknown hash type: " + strconv.Itoa(int(hashType)))
-	***REMOVED***
+	}
 
-	if !hashType.Available() ***REMOVED***
+	if !hashType.Available() {
 		return nil, errors.UnsupportedError("unsupported hash type: " + strconv.Itoa(int(hashType)))
-	***REMOVED***
+	}
 	h := hashType.New()
 
 	buffered := bufio.NewWriter(w)
 	// start has a \n at the beginning that we don't want here.
-	if _, err = buffered.Write(start[1:]); err != nil ***REMOVED***
+	if _, err = buffered.Write(start[1:]); err != nil {
 		return
-	***REMOVED***
-	if err = buffered.WriteByte(lf); err != nil ***REMOVED***
+	}
+	if err = buffered.WriteByte(lf); err != nil {
 		return
-	***REMOVED***
-	if _, err = buffered.WriteString("Hash: "); err != nil ***REMOVED***
+	}
+	if _, err = buffered.WriteString("Hash: "); err != nil {
 		return
-	***REMOVED***
-	if _, err = buffered.WriteString(name); err != nil ***REMOVED***
+	}
+	if _, err = buffered.WriteString(name); err != nil {
 		return
-	***REMOVED***
-	if err = buffered.WriteByte(lf); err != nil ***REMOVED***
+	}
+	if err = buffered.WriteByte(lf); err != nil {
 		return
-	***REMOVED***
-	if err = buffered.WriteByte(lf); err != nil ***REMOVED***
+	}
+	if err = buffered.WriteByte(lf); err != nil {
 		return
-	***REMOVED***
+	}
 
-	plaintext = &dashEscaper***REMOVED***
+	plaintext = &dashEscaper{
 		buffered: buffered,
 		h:        h,
 		hashType: hashType,
@@ -348,15 +348,15 @@ func Encode(w io.Writer, privateKey *packet.PrivateKey, config *packet.Config) (
 
 		privateKey: privateKey,
 		config:     config,
-	***REMOVED***
+	}
 
 	return
-***REMOVED***
+}
 
 // nameOfHash returns the OpenPGP name for the given hash, or the empty string
 // if the name isn't known. See RFC 4880, section 9.4.
-func nameOfHash(h crypto.Hash) string ***REMOVED***
-	switch h ***REMOVED***
+func nameOfHash(h crypto.Hash) string {
+	switch h {
 	case crypto.MD5:
 		return "MD5"
 	case crypto.SHA1:
@@ -371,6 +371,6 @@ func nameOfHash(h crypto.Hash) string ***REMOVED***
 		return "SHA384"
 	case crypto.SHA512:
 		return "SHA512"
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}

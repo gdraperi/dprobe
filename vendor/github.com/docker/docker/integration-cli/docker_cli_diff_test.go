@@ -10,7 +10,7 @@ import (
 )
 
 // ensure that an added file shows up in docker diff
-func (s *DockerSuite) TestDiffFilenameShownInOutput(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestDiffFilenameShownInOutput(c *check.C) {
 	containerCmd := `mkdir /foo; echo xyzzy > /foo/bar`
 	out := cli.DockerCmd(c, "run", "-d", "busybox", "sh", "-c", containerCmd).Combined()
 
@@ -20,53 +20,53 @@ func (s *DockerSuite) TestDiffFilenameShownInOutput(c *check.C) ***REMOVED***
 	// a "Files/" prefix.
 	containerID := strings.TrimSpace(out)
 	lookingFor := "A /foo/bar"
-	if testEnv.OSType == "windows" ***REMOVED***
+	if testEnv.OSType == "windows" {
 		cli.WaitExited(c, containerID, 60*time.Second)
 		lookingFor = "C Files/foo/bar"
-	***REMOVED***
+	}
 
 	cleanCID := strings.TrimSpace(out)
 	out = cli.DockerCmd(c, "diff", cleanCID).Combined()
 
 	found := false
-	for _, line := range strings.Split(out, "\n") ***REMOVED***
-		if strings.Contains(line, lookingFor) ***REMOVED***
+	for _, line := range strings.Split(out, "\n") {
+		if strings.Contains(line, lookingFor) {
 			found = true
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	c.Assert(found, checker.True)
-***REMOVED***
+}
 
 // test to ensure GH #3840 doesn't occur any more
-func (s *DockerSuite) TestDiffEnsureInitLayerFilesAreIgnored(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestDiffEnsureInitLayerFilesAreIgnored(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	// this is a list of files which shouldn't show up in `docker diff`
-	initLayerFiles := []string***REMOVED***"/etc/resolv.conf", "/etc/hostname", "/etc/hosts", "/.dockerenv"***REMOVED***
+	initLayerFiles := []string{"/etc/resolv.conf", "/etc/hostname", "/etc/hosts", "/.dockerenv"}
 	containerCount := 5
 
 	// we might not run into this problem from the first run, so start a few containers
-	for i := 0; i < containerCount; i++ ***REMOVED***
+	for i := 0; i < containerCount; i++ {
 		containerCmd := `echo foo > /root/bar`
 		out, _ := dockerCmd(c, "run", "-d", "busybox", "sh", "-c", containerCmd)
 
 		cleanCID := strings.TrimSpace(out)
 		out, _ = dockerCmd(c, "diff", cleanCID)
 
-		for _, filename := range initLayerFiles ***REMOVED***
+		for _, filename := range initLayerFiles {
 			c.Assert(out, checker.Not(checker.Contains), filename)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (s *DockerSuite) TestDiffEnsureDefaultDevs(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestDiffEnsureDefaultDevs(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	out, _ := dockerCmd(c, "run", "-d", "busybox", "sleep", "0")
 
 	cleanCID := strings.TrimSpace(out)
 	out, _ = dockerCmd(c, "diff", cleanCID)
 
-	expected := map[string]bool***REMOVED***
+	expected := map[string]bool{
 		"C /dev":         true,
 		"A /dev/full":    true, // busybox
 		"C /dev/ptmx":    true, // libcontainer
@@ -83,16 +83,16 @@ func (s *DockerSuite) TestDiffEnsureDefaultDevs(c *check.C) ***REMOVED***
 		"A /dev/tty":     true,
 		"A /dev/urandom": true,
 		"A /dev/zero":    true,
-	***REMOVED***
+	}
 
-	for _, line := range strings.Split(out, "\n") ***REMOVED***
+	for _, line := range strings.Split(out, "\n") {
 		c.Assert(line == "" || expected[line], checker.True, check.Commentf(line))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // https://github.com/docker/docker/pull/14381#discussion_r33859347
-func (s *DockerSuite) TestDiffEmptyArgClientError(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestDiffEmptyArgClientError(c *check.C) {
 	out, _, err := dockerCmdWithError("diff", "")
 	c.Assert(err, checker.NotNil)
 	c.Assert(strings.TrimSpace(out), checker.Contains, "Container name cannot be empty")
-***REMOVED***
+}

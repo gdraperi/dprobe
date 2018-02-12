@@ -13,25 +13,25 @@ import (
 )
 
 // Condition uses a Comparison to assert a complex condition.
-func Condition(t TestingT, comp assert.Comparison, msgAndArgs ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if !assert.Condition(t, comp, msgAndArgs...) ***REMOVED***
+func Condition(t TestingT, comp assert.Comparison, msgAndArgs ...interface{}) {
+	if !assert.Condition(t, comp, msgAndArgs...) {
 		t.FailNow()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Contains asserts that the specified string, list(array, slice...) or map contains the
 // specified substring or element.
 //
 //    assert.Contains(t, "Hello World", "World", "But 'Hello World' does contain 'World'")
 //    assert.Contains(t, ["Hello", "World"], "World", "But ["Hello", "World"] does contain 'World'")
-//    assert.Contains(t, ***REMOVED***"Hello": "World"***REMOVED***, "Hello", "But ***REMOVED***'Hello': 'World'***REMOVED*** does contain 'Hello'")
+//    assert.Contains(t, {"Hello": "World"}, "Hello", "But {'Hello': 'World'} does contain 'Hello'")
 //
 // Returns whether the assertion was successful (true) or not (false).
-func Contains(t TestingT, s interface***REMOVED******REMOVED***, contains interface***REMOVED******REMOVED***, msgAndArgs ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if !assert.Contains(t, s, contains, msgAndArgs...) ***REMOVED***
+func Contains(t TestingT, s interface{}, contains interface{}, msgAndArgs ...interface{}) {
+	if !assert.Contains(t, s, contains, msgAndArgs...) {
 		t.FailNow()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Empty asserts that the specified object is empty.  I.e. nil, "", false, 0 or either
 // a slice or a channel with len == 0.
@@ -39,11 +39,11 @@ func Contains(t TestingT, s interface***REMOVED******REMOVED***, contains interf
 //  assert.Empty(t, obj)
 //
 // Returns whether the assertion was successful (true) or not (false).
-func Empty(t TestingT, object interface***REMOVED******REMOVED***, msgAndArgs ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if !assert.Empty(t, object, msgAndArgs...) ***REMOVED***
+func Empty(t TestingT, object interface{}, msgAndArgs ...interface{}) {
+	if !assert.Empty(t, object, msgAndArgs...) {
 		t.FailNow()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Equal asserts that two objects are equal.
 //
@@ -53,11 +53,11 @@ func Empty(t TestingT, object interface***REMOVED******REMOVED***, msgAndArgs ..
 //
 // Pointer variable equality is determined based on the equality of the
 // referenced values (as opposed to the memory addresses).
-func Equal(t TestingT, expected interface***REMOVED******REMOVED***, actual interface***REMOVED******REMOVED***, msgAndArgs ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if !assert.Equal(t, expected, actual, msgAndArgs...) ***REMOVED***
+func Equal(t TestingT, expected interface{}, actual interface{}, msgAndArgs ...interface{}) {
+	if !assert.Equal(t, expected, actual, msgAndArgs...) {
 		t.FailNow()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // EqualError asserts that a function returned an error (i.e. not `nil`)
 // and that it is equal to the provided error.
@@ -66,11 +66,11 @@ func Equal(t TestingT, expected interface***REMOVED******REMOVED***, actual inte
 //   assert.EqualError(t, err,  expectedErrorString, "An error was expected")
 //
 // Returns whether the assertion was successful (true) or not (false).
-func EqualError(t TestingT, theError error, errString string, msgAndArgs ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if !assert.EqualError(t, theError, errString, msgAndArgs...) ***REMOVED***
+func EqualError(t TestingT, theError error, errString string, msgAndArgs ...interface{}) {
+	if !assert.EqualError(t, theError, errString, msgAndArgs...) {
 		t.FailNow()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // EqualValues asserts that two objects are equal or convertable to the same types
 // and equal.
@@ -78,61 +78,61 @@ func EqualError(t TestingT, theError error, errString string, msgAndArgs ...inte
 //    assert.EqualValues(t, uint32(123), int32(123), "123 and 123 should be equal")
 //
 // Returns whether the assertion was successful (true) or not (false).
-func EqualValues(t TestingT, expected interface***REMOVED******REMOVED***, actual interface***REMOVED******REMOVED***, msgAndArgs ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if !assert.EqualValues(t, expected, actual, msgAndArgs...) ***REMOVED***
+func EqualValues(t TestingT, expected interface{}, actual interface{}, msgAndArgs ...interface{}) {
+	if !assert.EqualValues(t, expected, actual, msgAndArgs...) {
 		t.FailNow()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Error asserts that a function returned an error (i.e. not `nil`).
 //
 //   actualObj, err := SomeFunction()
-//   if assert.Error(t, err, "An error was expected") ***REMOVED***
+//   if assert.Error(t, err, "An error was expected") {
 // 	   assert.Equal(t, err, expectedError)
-//   ***REMOVED***
+//   }
 //
 // Returns whether the assertion was successful (true) or not (false).
-func Error(t TestingT, err error, msgAndArgs ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if !assert.Error(t, err, msgAndArgs...) ***REMOVED***
+func Error(t TestingT, err error, msgAndArgs ...interface{}) {
+	if !assert.Error(t, err, msgAndArgs...) {
 		t.FailNow()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Exactly asserts that two objects are equal is value and type.
 //
 //    assert.Exactly(t, int32(123), int64(123), "123 and 123 should NOT be equal")
 //
 // Returns whether the assertion was successful (true) or not (false).
-func Exactly(t TestingT, expected interface***REMOVED******REMOVED***, actual interface***REMOVED******REMOVED***, msgAndArgs ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if !assert.Exactly(t, expected, actual, msgAndArgs...) ***REMOVED***
+func Exactly(t TestingT, expected interface{}, actual interface{}, msgAndArgs ...interface{}) {
+	if !assert.Exactly(t, expected, actual, msgAndArgs...) {
 		t.FailNow()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Fail reports a failure through
-func Fail(t TestingT, failureMessage string, msgAndArgs ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if !assert.Fail(t, failureMessage, msgAndArgs...) ***REMOVED***
+func Fail(t TestingT, failureMessage string, msgAndArgs ...interface{}) {
+	if !assert.Fail(t, failureMessage, msgAndArgs...) {
 		t.FailNow()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // FailNow fails test
-func FailNow(t TestingT, failureMessage string, msgAndArgs ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if !assert.FailNow(t, failureMessage, msgAndArgs...) ***REMOVED***
+func FailNow(t TestingT, failureMessage string, msgAndArgs ...interface{}) {
+	if !assert.FailNow(t, failureMessage, msgAndArgs...) {
 		t.FailNow()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // False asserts that the specified value is false.
 //
 //    assert.False(t, myBool, "myBool should be false")
 //
 // Returns whether the assertion was successful (true) or not (false).
-func False(t TestingT, value bool, msgAndArgs ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if !assert.False(t, value, msgAndArgs...) ***REMOVED***
+func False(t TestingT, value bool, msgAndArgs ...interface{}) {
+	if !assert.False(t, value, msgAndArgs...) {
 		t.FailNow()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // HTTPBodyContains asserts that a specified handler returns a
 // body that contains a string.
@@ -140,11 +140,11 @@ func False(t TestingT, value bool, msgAndArgs ...interface***REMOVED******REMOVE
 //  assert.HTTPBodyContains(t, myHandler, "www.google.com", nil, "I'm Feeling Lucky")
 //
 // Returns whether the assertion was successful (true) or not (false).
-func HTTPBodyContains(t TestingT, handler http.HandlerFunc, method string, url string, values url.Values, str interface***REMOVED******REMOVED***) ***REMOVED***
-	if !assert.HTTPBodyContains(t, handler, method, url, values, str) ***REMOVED***
+func HTTPBodyContains(t TestingT, handler http.HandlerFunc, method string, url string, values url.Values, str interface{}) {
+	if !assert.HTTPBodyContains(t, handler, method, url, values, str) {
 		t.FailNow()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // HTTPBodyNotContains asserts that a specified handler returns a
 // body that does not contain a string.
@@ -152,105 +152,105 @@ func HTTPBodyContains(t TestingT, handler http.HandlerFunc, method string, url s
 //  assert.HTTPBodyNotContains(t, myHandler, "www.google.com", nil, "I'm Feeling Lucky")
 //
 // Returns whether the assertion was successful (true) or not (false).
-func HTTPBodyNotContains(t TestingT, handler http.HandlerFunc, method string, url string, values url.Values, str interface***REMOVED******REMOVED***) ***REMOVED***
-	if !assert.HTTPBodyNotContains(t, handler, method, url, values, str) ***REMOVED***
+func HTTPBodyNotContains(t TestingT, handler http.HandlerFunc, method string, url string, values url.Values, str interface{}) {
+	if !assert.HTTPBodyNotContains(t, handler, method, url, values, str) {
 		t.FailNow()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // HTTPError asserts that a specified handler returns an error status code.
 //
-//  assert.HTTPError(t, myHandler, "POST", "/a/b/c", url.Values***REMOVED***"a": []string***REMOVED***"b", "c"***REMOVED******REMOVED***
+//  assert.HTTPError(t, myHandler, "POST", "/a/b/c", url.Values{"a": []string{"b", "c"}}
 //
 // Returns whether the assertion was successful (true) or not (false).
-func HTTPError(t TestingT, handler http.HandlerFunc, method string, url string, values url.Values) ***REMOVED***
-	if !assert.HTTPError(t, handler, method, url, values) ***REMOVED***
+func HTTPError(t TestingT, handler http.HandlerFunc, method string, url string, values url.Values) {
+	if !assert.HTTPError(t, handler, method, url, values) {
 		t.FailNow()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // HTTPRedirect asserts that a specified handler returns a redirect status code.
 //
-//  assert.HTTPRedirect(t, myHandler, "GET", "/a/b/c", url.Values***REMOVED***"a": []string***REMOVED***"b", "c"***REMOVED******REMOVED***
+//  assert.HTTPRedirect(t, myHandler, "GET", "/a/b/c", url.Values{"a": []string{"b", "c"}}
 //
 // Returns whether the assertion was successful (true) or not (false).
-func HTTPRedirect(t TestingT, handler http.HandlerFunc, method string, url string, values url.Values) ***REMOVED***
-	if !assert.HTTPRedirect(t, handler, method, url, values) ***REMOVED***
+func HTTPRedirect(t TestingT, handler http.HandlerFunc, method string, url string, values url.Values) {
+	if !assert.HTTPRedirect(t, handler, method, url, values) {
 		t.FailNow()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // HTTPSuccess asserts that a specified handler returns a success status code.
 //
 //  assert.HTTPSuccess(t, myHandler, "POST", "http://www.google.com", nil)
 //
 // Returns whether the assertion was successful (true) or not (false).
-func HTTPSuccess(t TestingT, handler http.HandlerFunc, method string, url string, values url.Values) ***REMOVED***
-	if !assert.HTTPSuccess(t, handler, method, url, values) ***REMOVED***
+func HTTPSuccess(t TestingT, handler http.HandlerFunc, method string, url string, values url.Values) {
+	if !assert.HTTPSuccess(t, handler, method, url, values) {
 		t.FailNow()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Implements asserts that an object is implemented by the specified interface.
 //
 //    assert.Implements(t, (*MyInterface)(nil), new(MyObject), "MyObject")
-func Implements(t TestingT, interfaceObject interface***REMOVED******REMOVED***, object interface***REMOVED******REMOVED***, msgAndArgs ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if !assert.Implements(t, interfaceObject, object, msgAndArgs...) ***REMOVED***
+func Implements(t TestingT, interfaceObject interface{}, object interface{}, msgAndArgs ...interface{}) {
+	if !assert.Implements(t, interfaceObject, object, msgAndArgs...) {
 		t.FailNow()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // InDelta asserts that the two numerals are within delta of each other.
 //
 // 	 assert.InDelta(t, math.Pi, (22 / 7.0), 0.01)
 //
 // Returns whether the assertion was successful (true) or not (false).
-func InDelta(t TestingT, expected interface***REMOVED******REMOVED***, actual interface***REMOVED******REMOVED***, delta float64, msgAndArgs ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if !assert.InDelta(t, expected, actual, delta, msgAndArgs...) ***REMOVED***
+func InDelta(t TestingT, expected interface{}, actual interface{}, delta float64, msgAndArgs ...interface{}) {
+	if !assert.InDelta(t, expected, actual, delta, msgAndArgs...) {
 		t.FailNow()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // InDeltaSlice is the same as InDelta, except it compares two slices.
-func InDeltaSlice(t TestingT, expected interface***REMOVED******REMOVED***, actual interface***REMOVED******REMOVED***, delta float64, msgAndArgs ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if !assert.InDeltaSlice(t, expected, actual, delta, msgAndArgs...) ***REMOVED***
+func InDeltaSlice(t TestingT, expected interface{}, actual interface{}, delta float64, msgAndArgs ...interface{}) {
+	if !assert.InDeltaSlice(t, expected, actual, delta, msgAndArgs...) {
 		t.FailNow()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // InEpsilon asserts that expected and actual have a relative error less than epsilon
 //
 // Returns whether the assertion was successful (true) or not (false).
-func InEpsilon(t TestingT, expected interface***REMOVED******REMOVED***, actual interface***REMOVED******REMOVED***, epsilon float64, msgAndArgs ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if !assert.InEpsilon(t, expected, actual, epsilon, msgAndArgs...) ***REMOVED***
+func InEpsilon(t TestingT, expected interface{}, actual interface{}, epsilon float64, msgAndArgs ...interface{}) {
+	if !assert.InEpsilon(t, expected, actual, epsilon, msgAndArgs...) {
 		t.FailNow()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // InEpsilonSlice is the same as InEpsilon, except it compares each value from two slices.
-func InEpsilonSlice(t TestingT, expected interface***REMOVED******REMOVED***, actual interface***REMOVED******REMOVED***, epsilon float64, msgAndArgs ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if !assert.InEpsilonSlice(t, expected, actual, epsilon, msgAndArgs...) ***REMOVED***
+func InEpsilonSlice(t TestingT, expected interface{}, actual interface{}, epsilon float64, msgAndArgs ...interface{}) {
+	if !assert.InEpsilonSlice(t, expected, actual, epsilon, msgAndArgs...) {
 		t.FailNow()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // IsType asserts that the specified objects are of the same type.
-func IsType(t TestingT, expectedType interface***REMOVED******REMOVED***, object interface***REMOVED******REMOVED***, msgAndArgs ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if !assert.IsType(t, expectedType, object, msgAndArgs...) ***REMOVED***
+func IsType(t TestingT, expectedType interface{}, object interface{}, msgAndArgs ...interface{}) {
+	if !assert.IsType(t, expectedType, object, msgAndArgs...) {
 		t.FailNow()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // JSONEq asserts that two JSON strings are equivalent.
 //
-//  assert.JSONEq(t, `***REMOVED***"hello": "world", "foo": "bar"***REMOVED***`, `***REMOVED***"foo": "bar", "hello": "world"***REMOVED***`)
+//  assert.JSONEq(t, `{"hello": "world", "foo": "bar"}`, `{"foo": "bar", "hello": "world"}`)
 //
 // Returns whether the assertion was successful (true) or not (false).
-func JSONEq(t TestingT, expected string, actual string, msgAndArgs ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if !assert.JSONEq(t, expected, actual, msgAndArgs...) ***REMOVED***
+func JSONEq(t TestingT, expected string, actual string, msgAndArgs ...interface{}) {
+	if !assert.JSONEq(t, expected, actual, msgAndArgs...) {
 		t.FailNow()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Len asserts that the specified object has specific length.
 // Len also fails if the object has a type that len() not accept.
@@ -258,64 +258,64 @@ func JSONEq(t TestingT, expected string, actual string, msgAndArgs ...interface*
 //    assert.Len(t, mySlice, 3, "The size of slice is not 3")
 //
 // Returns whether the assertion was successful (true) or not (false).
-func Len(t TestingT, object interface***REMOVED******REMOVED***, length int, msgAndArgs ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if !assert.Len(t, object, length, msgAndArgs...) ***REMOVED***
+func Len(t TestingT, object interface{}, length int, msgAndArgs ...interface{}) {
+	if !assert.Len(t, object, length, msgAndArgs...) {
 		t.FailNow()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Nil asserts that the specified object is nil.
 //
 //    assert.Nil(t, err, "err should be nothing")
 //
 // Returns whether the assertion was successful (true) or not (false).
-func Nil(t TestingT, object interface***REMOVED******REMOVED***, msgAndArgs ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if !assert.Nil(t, object, msgAndArgs...) ***REMOVED***
+func Nil(t TestingT, object interface{}, msgAndArgs ...interface{}) {
+	if !assert.Nil(t, object, msgAndArgs...) {
 		t.FailNow()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // NoError asserts that a function returned no error (i.e. `nil`).
 //
 //   actualObj, err := SomeFunction()
-//   if assert.NoError(t, err) ***REMOVED***
+//   if assert.NoError(t, err) {
 // 	   assert.Equal(t, actualObj, expectedObj)
-//   ***REMOVED***
+//   }
 //
 // Returns whether the assertion was successful (true) or not (false).
-func NoError(t TestingT, err error, msgAndArgs ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if !assert.NoError(t, err, msgAndArgs...) ***REMOVED***
+func NoError(t TestingT, err error, msgAndArgs ...interface{}) {
+	if !assert.NoError(t, err, msgAndArgs...) {
 		t.FailNow()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // NotContains asserts that the specified string, list(array, slice...) or map does NOT contain the
 // specified substring or element.
 //
 //    assert.NotContains(t, "Hello World", "Earth", "But 'Hello World' does NOT contain 'Earth'")
 //    assert.NotContains(t, ["Hello", "World"], "Earth", "But ['Hello', 'World'] does NOT contain 'Earth'")
-//    assert.NotContains(t, ***REMOVED***"Hello": "World"***REMOVED***, "Earth", "But ***REMOVED***'Hello': 'World'***REMOVED*** does NOT contain 'Earth'")
+//    assert.NotContains(t, {"Hello": "World"}, "Earth", "But {'Hello': 'World'} does NOT contain 'Earth'")
 //
 // Returns whether the assertion was successful (true) or not (false).
-func NotContains(t TestingT, s interface***REMOVED******REMOVED***, contains interface***REMOVED******REMOVED***, msgAndArgs ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if !assert.NotContains(t, s, contains, msgAndArgs...) ***REMOVED***
+func NotContains(t TestingT, s interface{}, contains interface{}, msgAndArgs ...interface{}) {
+	if !assert.NotContains(t, s, contains, msgAndArgs...) {
 		t.FailNow()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // NotEmpty asserts that the specified object is NOT empty.  I.e. not nil, "", false, 0 or either
 // a slice or a channel with len == 0.
 //
-//  if assert.NotEmpty(t, obj) ***REMOVED***
+//  if assert.NotEmpty(t, obj) {
 //    assert.Equal(t, "two", obj[1])
-//  ***REMOVED***
+//  }
 //
 // Returns whether the assertion was successful (true) or not (false).
-func NotEmpty(t TestingT, object interface***REMOVED******REMOVED***, msgAndArgs ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if !assert.NotEmpty(t, object, msgAndArgs...) ***REMOVED***
+func NotEmpty(t TestingT, object interface{}, msgAndArgs ...interface{}) {
+	if !assert.NotEmpty(t, object, msgAndArgs...) {
 		t.FailNow()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // NotEqual asserts that the specified values are NOT equal.
 //
@@ -325,35 +325,35 @@ func NotEmpty(t TestingT, object interface***REMOVED******REMOVED***, msgAndArgs
 //
 // Pointer variable equality is determined based on the equality of the
 // referenced values (as opposed to the memory addresses).
-func NotEqual(t TestingT, expected interface***REMOVED******REMOVED***, actual interface***REMOVED******REMOVED***, msgAndArgs ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if !assert.NotEqual(t, expected, actual, msgAndArgs...) ***REMOVED***
+func NotEqual(t TestingT, expected interface{}, actual interface{}, msgAndArgs ...interface{}) {
+	if !assert.NotEqual(t, expected, actual, msgAndArgs...) {
 		t.FailNow()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // NotNil asserts that the specified object is not nil.
 //
 //    assert.NotNil(t, err, "err should be something")
 //
 // Returns whether the assertion was successful (true) or not (false).
-func NotNil(t TestingT, object interface***REMOVED******REMOVED***, msgAndArgs ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if !assert.NotNil(t, object, msgAndArgs...) ***REMOVED***
+func NotNil(t TestingT, object interface{}, msgAndArgs ...interface{}) {
+	if !assert.NotNil(t, object, msgAndArgs...) {
 		t.FailNow()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // NotPanics asserts that the code inside the specified PanicTestFunc does NOT panic.
 //
-//   assert.NotPanics(t, func()***REMOVED***
+//   assert.NotPanics(t, func(){
 //     RemainCalm()
-//   ***REMOVED***, "Calling RemainCalm() should NOT panic")
+//   }, "Calling RemainCalm() should NOT panic")
 //
 // Returns whether the assertion was successful (true) or not (false).
-func NotPanics(t TestingT, f assert.PanicTestFunc, msgAndArgs ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if !assert.NotPanics(t, f, msgAndArgs...) ***REMOVED***
+func NotPanics(t TestingT, f assert.PanicTestFunc, msgAndArgs ...interface{}) {
+	if !assert.NotPanics(t, f, msgAndArgs...) {
 		t.FailNow()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // NotRegexp asserts that a specified regexp does not match a string.
 //
@@ -361,31 +361,31 @@ func NotPanics(t TestingT, f assert.PanicTestFunc, msgAndArgs ...interface***REM
 //  assert.NotRegexp(t, "^start", "it's not starting")
 //
 // Returns whether the assertion was successful (true) or not (false).
-func NotRegexp(t TestingT, rx interface***REMOVED******REMOVED***, str interface***REMOVED******REMOVED***, msgAndArgs ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if !assert.NotRegexp(t, rx, str, msgAndArgs...) ***REMOVED***
+func NotRegexp(t TestingT, rx interface{}, str interface{}, msgAndArgs ...interface{}) {
+	if !assert.NotRegexp(t, rx, str, msgAndArgs...) {
 		t.FailNow()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // NotZero asserts that i is not the zero value for its type and returns the truth.
-func NotZero(t TestingT, i interface***REMOVED******REMOVED***, msgAndArgs ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if !assert.NotZero(t, i, msgAndArgs...) ***REMOVED***
+func NotZero(t TestingT, i interface{}, msgAndArgs ...interface{}) {
+	if !assert.NotZero(t, i, msgAndArgs...) {
 		t.FailNow()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Panics asserts that the code inside the specified PanicTestFunc panics.
 //
-//   assert.Panics(t, func()***REMOVED***
+//   assert.Panics(t, func(){
 //     GoCrazy()
-//   ***REMOVED***, "Calling GoCrazy() should panic")
+//   }, "Calling GoCrazy() should panic")
 //
 // Returns whether the assertion was successful (true) or not (false).
-func Panics(t TestingT, f assert.PanicTestFunc, msgAndArgs ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if !assert.Panics(t, f, msgAndArgs...) ***REMOVED***
+func Panics(t TestingT, f assert.PanicTestFunc, msgAndArgs ...interface{}) {
+	if !assert.Panics(t, f, msgAndArgs...) {
 		t.FailNow()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Regexp asserts that a specified regexp matches a string.
 //
@@ -393,37 +393,37 @@ func Panics(t TestingT, f assert.PanicTestFunc, msgAndArgs ...interface***REMOVE
 //  assert.Regexp(t, "start...$", "it's not starting")
 //
 // Returns whether the assertion was successful (true) or not (false).
-func Regexp(t TestingT, rx interface***REMOVED******REMOVED***, str interface***REMOVED******REMOVED***, msgAndArgs ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if !assert.Regexp(t, rx, str, msgAndArgs...) ***REMOVED***
+func Regexp(t TestingT, rx interface{}, str interface{}, msgAndArgs ...interface{}) {
+	if !assert.Regexp(t, rx, str, msgAndArgs...) {
 		t.FailNow()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // True asserts that the specified value is true.
 //
 //    assert.True(t, myBool, "myBool should be true")
 //
 // Returns whether the assertion was successful (true) or not (false).
-func True(t TestingT, value bool, msgAndArgs ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if !assert.True(t, value, msgAndArgs...) ***REMOVED***
+func True(t TestingT, value bool, msgAndArgs ...interface{}) {
+	if !assert.True(t, value, msgAndArgs...) {
 		t.FailNow()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // WithinDuration asserts that the two times are within duration delta of each other.
 //
 //   assert.WithinDuration(t, time.Now(), time.Now(), 10*time.Second, "The difference should not be more than 10s")
 //
 // Returns whether the assertion was successful (true) or not (false).
-func WithinDuration(t TestingT, expected time.Time, actual time.Time, delta time.Duration, msgAndArgs ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if !assert.WithinDuration(t, expected, actual, delta, msgAndArgs...) ***REMOVED***
+func WithinDuration(t TestingT, expected time.Time, actual time.Time, delta time.Duration, msgAndArgs ...interface{}) {
+	if !assert.WithinDuration(t, expected, actual, delta, msgAndArgs...) {
 		t.FailNow()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Zero asserts that i is the zero value for its type and returns the truth.
-func Zero(t TestingT, i interface***REMOVED******REMOVED***, msgAndArgs ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if !assert.Zero(t, i, msgAndArgs...) ***REMOVED***
+func Zero(t TestingT, i interface{}, msgAndArgs ...interface{}) {
+	if !assert.Zero(t, i, msgAndArgs...) {
 		t.FailNow()
-	***REMOVED***
-***REMOVED***
+	}
+}

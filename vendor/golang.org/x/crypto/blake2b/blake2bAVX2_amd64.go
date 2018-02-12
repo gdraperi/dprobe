@@ -6,11 +6,11 @@
 
 package blake2b
 
-func init() ***REMOVED***
+func init() {
 	useAVX2 = supportsAVX2()
 	useAVX = supportsAVX()
 	useSSE4 = supportsSSE4()
-***REMOVED***
+}
 
 //go:noescape
 func supportsSSE4() bool
@@ -30,14 +30,14 @@ func hashBlocksAVX(h *[8]uint64, c *[2]uint64, flag uint64, blocks []byte)
 //go:noescape
 func hashBlocksSSE4(h *[8]uint64, c *[2]uint64, flag uint64, blocks []byte)
 
-func hashBlocks(h *[8]uint64, c *[2]uint64, flag uint64, blocks []byte) ***REMOVED***
-	if useAVX2 ***REMOVED***
+func hashBlocks(h *[8]uint64, c *[2]uint64, flag uint64, blocks []byte) {
+	if useAVX2 {
 		hashBlocksAVX2(h, c, flag, blocks)
-	***REMOVED*** else if useAVX ***REMOVED***
+	} else if useAVX {
 		hashBlocksAVX(h, c, flag, blocks)
-	***REMOVED*** else if useSSE4 ***REMOVED***
+	} else if useSSE4 {
 		hashBlocksSSE4(h, c, flag, blocks)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		hashBlocksGeneric(h, c, flag, blocks)
-	***REMOVED***
-***REMOVED***
+	}
+}

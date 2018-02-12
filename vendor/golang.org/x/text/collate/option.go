@@ -13,47 +13,47 @@ import (
 )
 
 // newCollator creates a new collator with default options configured.
-func newCollator(t colltab.Weighter) *Collator ***REMOVED***
+func newCollator(t colltab.Weighter) *Collator {
 	// Initialize a collator with default options.
-	c := &Collator***REMOVED***
-		options: options***REMOVED***
-			ignore: [colltab.NumLevels]bool***REMOVED***
+	c := &Collator{
+		options: options{
+			ignore: [colltab.NumLevels]bool{
 				colltab.Quaternary: true,
 				colltab.Identity:   true,
-			***REMOVED***,
+			},
 			f: norm.NFD,
 			t: t,
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
 	// TODO: store vt in tags or remove.
 	c.variableTop = t.Top()
 
 	return c
-***REMOVED***
+}
 
 // An Option is used to change the behavior of a Collator. Options override the
 // settings passed through the locale identifier.
-type Option struct ***REMOVED***
+type Option struct {
 	priority int
 	f        func(o *options)
-***REMOVED***
+}
 
 type prioritizedOptions []Option
 
-func (p prioritizedOptions) Len() int ***REMOVED***
+func (p prioritizedOptions) Len() int {
 	return len(p)
-***REMOVED***
+}
 
-func (p prioritizedOptions) Swap(i, j int) ***REMOVED***
+func (p prioritizedOptions) Swap(i, j int) {
 	p[i], p[j] = p[j], p[i]
-***REMOVED***
+}
 
-func (p prioritizedOptions) Less(i, j int) bool ***REMOVED***
+func (p prioritizedOptions) Less(i, j int) bool {
 	return p[i].priority < p[j].priority
-***REMOVED***
+}
 
-type options struct ***REMOVED***
+type options struct {
 	// ignore specifies which levels to ignore.
 	ignore [colltab.NumLevels]bool
 
@@ -81,31 +81,31 @@ type options struct ***REMOVED***
 	t colltab.Weighter
 
 	f norm.Form
-***REMOVED***
+}
 
-func (o *options) setOptions(opts []Option) ***REMOVED***
+func (o *options) setOptions(opts []Option) {
 	sort.Sort(prioritizedOptions(opts))
-	for _, x := range opts ***REMOVED***
+	for _, x := range opts {
 		x.f(o)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // OptionsFromTag extracts the BCP47 collation options from the tag and
 // configures a collator accordingly. These options are set before any other
 // option.
-func OptionsFromTag(t language.Tag) Option ***REMOVED***
-	return Option***REMOVED***0, func(o *options) ***REMOVED***
+func OptionsFromTag(t language.Tag) Option {
+	return Option{0, func(o *options) {
 		o.setFromTag(t)
-	***REMOVED******REMOVED***
-***REMOVED***
+	}}
+}
 
-func (o *options) setFromTag(t language.Tag) ***REMOVED***
+func (o *options) setFromTag(t language.Tag) {
 	o.caseLevel = ldmlBool(t, o.caseLevel, "kc")
 	o.backwards = ldmlBool(t, o.backwards, "kb")
 	o.numeric = ldmlBool(t, o.numeric, "kn")
 
 	// Extract settings from the BCP47 u extension.
-	switch t.TypeForKey("ks") ***REMOVED*** // strength
+	switch t.TypeForKey("ks") { // strength
 	case "level1":
 		o.ignore[colltab.Secondary] = true
 		o.ignore[colltab.Tertiary] = true
@@ -118,9 +118,9 @@ func (o *options) setFromTag(t language.Tag) ***REMOVED***
 	case "identic":
 		o.ignore[colltab.Quaternary] = false
 		o.ignore[colltab.Identity] = false
-	***REMOVED***
+	}
 
-	switch t.TypeForKey("ka") ***REMOVED***
+	switch t.TypeForKey("ka") {
 	case "shifted":
 		o.alternate = altShifted
 	// The following two types are not official BCP47, but we support them to
@@ -131,84 +131,84 @@ func (o *options) setFromTag(t language.Tag) ***REMOVED***
 		o.alternate = altBlanked
 	case "posix":
 		o.alternate = altShiftTrimmed
-	***REMOVED***
+	}
 
 	// TODO: caseFirst ("kf"), reorder ("kr"), and maybe variableTop ("vt").
 
 	// Not used:
 	// - normalization ("kk", not necessary for this implementation)
 	// - hiraganaQuatenary ("kh", obsolete)
-***REMOVED***
+}
 
-func ldmlBool(t language.Tag, old bool, key string) bool ***REMOVED***
-	switch t.TypeForKey(key) ***REMOVED***
+func ldmlBool(t language.Tag, old bool, key string) bool {
+	switch t.TypeForKey(key) {
 	case "true":
 		return true
 	case "false":
 		return false
 	default:
 		return old
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 var (
 	// IgnoreCase sets case-insensitive comparison.
 	IgnoreCase Option = ignoreCase
-	ignoreCase        = Option***REMOVED***3, ignoreCaseF***REMOVED***
+	ignoreCase        = Option{3, ignoreCaseF}
 
 	// IgnoreDiacritics causes diacritical marks to be ignored. ("o" == "ö").
 	IgnoreDiacritics Option = ignoreDiacritics
-	ignoreDiacritics        = Option***REMOVED***3, ignoreDiacriticsF***REMOVED***
+	ignoreDiacritics        = Option{3, ignoreDiacriticsF}
 
 	// IgnoreWidth causes full-width characters to match their half-width
 	// equivalents.
 	IgnoreWidth Option = ignoreWidth
-	ignoreWidth        = Option***REMOVED***2, ignoreWidthF***REMOVED***
+	ignoreWidth        = Option{2, ignoreWidthF}
 
 	// Loose sets the collator to ignore diacritics, case and weight.
 	Loose Option = loose
-	loose        = Option***REMOVED***4, looseF***REMOVED***
+	loose        = Option{4, looseF}
 
 	// Force ordering if strings are equivalent but not equal.
 	Force Option = force
-	force        = Option***REMOVED***5, forceF***REMOVED***
+	force        = Option{5, forceF}
 
 	// Numeric specifies that numbers should sort numerically ("2" < "12").
 	Numeric Option = numeric
-	numeric        = Option***REMOVED***5, numericF***REMOVED***
+	numeric        = Option{5, numericF}
 )
 
-func ignoreWidthF(o *options) ***REMOVED***
+func ignoreWidthF(o *options) {
 	o.ignore[colltab.Tertiary] = true
 	o.caseLevel = true
-***REMOVED***
+}
 
-func ignoreDiacriticsF(o *options) ***REMOVED***
+func ignoreDiacriticsF(o *options) {
 	o.ignore[colltab.Secondary] = true
-***REMOVED***
+}
 
-func ignoreCaseF(o *options) ***REMOVED***
+func ignoreCaseF(o *options) {
 	o.ignore[colltab.Tertiary] = true
 	o.caseLevel = false
-***REMOVED***
+}
 
-func looseF(o *options) ***REMOVED***
+func looseF(o *options) {
 	ignoreWidthF(o)
 	ignoreDiacriticsF(o)
 	ignoreCaseF(o)
-***REMOVED***
+}
 
-func forceF(o *options) ***REMOVED***
+func forceF(o *options) {
 	o.ignore[colltab.Identity] = false
-***REMOVED***
+}
 
-func numericF(o *options) ***REMOVED*** o.numeric = true ***REMOVED***
+func numericF(o *options) { o.numeric = true }
 
 // Reorder overrides the pre-defined ordering of scripts and character sets.
-func Reorder(s ...string) Option ***REMOVED***
+func Reorder(s ...string) Option {
 	// TODO: need fractional weights to implement this.
 	panic("TODO: implement")
-***REMOVED***
+}
 
 // TODO: consider making these public again. These options cannot be fully
 // specified in BCP47, so an API interface seems warranted. Still a higher-level

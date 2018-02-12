@@ -46,20 +46,20 @@ var (
 	// MIB is an index that associates the MIB display name with an Encoding.
 	MIB *Index = mib
 
-	mime = &Index***REMOVED***mimeName, ianaToMIB, ianaAliases, encodings[:]***REMOVED***
-	iana = &Index***REMOVED***ianaName, ianaToMIB, ianaAliases, encodings[:]***REMOVED***
-	mib  = &Index***REMOVED***mibName, ianaToMIB, ianaAliases, encodings[:]***REMOVED***
+	mime = &Index{mimeName, ianaToMIB, ianaAliases, encodings[:]}
+	iana = &Index{ianaName, ianaToMIB, ianaAliases, encodings[:]}
+	mib  = &Index{mibName, ianaToMIB, ianaAliases, encodings[:]}
 )
 
 // Index maps names registered by IANA to Encodings.
 // Currently different Indexes only differ in the names they return for
 // encodings. In the future they may also differ in supported aliases.
-type Index struct ***REMOVED***
+type Index struct {
 	names func(i int) string
 	toMIB []identifier.MIB // Sorted slice of supported MIBs
 	alias map[string]int
 	enc   []encoding.Encoding
-***REMOVED***
+}
 
 var (
 	errInvalidName = errors.New("ianaindex: invalid encoding name")
@@ -69,36 +69,36 @@ var (
 
 // Encoding returns an Encoding for IANA-registered names. Matching is
 // case-insensitive.
-func (x *Index) Encoding(name string) (encoding.Encoding, error) ***REMOVED***
+func (x *Index) Encoding(name string) (encoding.Encoding, error) {
 	name = strings.TrimSpace(name)
 	// First try without lowercasing (possibly creating an allocation).
 	i, ok := x.alias[name]
-	if !ok ***REMOVED***
+	if !ok {
 		i, ok = x.alias[strings.ToLower(name)]
-		if !ok ***REMOVED***
+		if !ok {
 			return nil, errInvalidName
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return x.enc[i], nil
-***REMOVED***
+}
 
 // Name reports the canonical name of the given Encoding. It will return an
 // error if the e is not associated with a known encoding scheme.
-func (x *Index) Name(e encoding.Encoding) (string, error) ***REMOVED***
+func (x *Index) Name(e encoding.Encoding) (string, error) {
 	id, ok := e.(identifier.Interface)
-	if !ok ***REMOVED***
+	if !ok {
 		return "", errUnknown
-	***REMOVED***
+	}
 	mib, _ := id.ID()
-	if mib == 0 ***REMOVED***
+	if mib == 0 {
 		return "", errUnknown
-	***REMOVED***
+	}
 	v := findMIB(x.toMIB, mib)
-	if v == -1 ***REMOVED***
+	if v == -1 {
 		return "", errUnsupported
-	***REMOVED***
+	}
 	return x.names(v), nil
-***REMOVED***
+}
 
 // TODO: the coverage of this index is rather spotty. Allowing users to set
 // encodings would allow:
@@ -113,43 +113,43 @@ func (x *Index) Name(e encoding.Encoding) (string, error) ***REMOVED***
 // // Set sets the e to be used for the encoding scheme identified by name. Only
 // // canonical names may be used. An empty name assigns e to its internally
 // // associated encoding scheme.
-// func (x *Index) Set(name string, e encoding.Encoding) error ***REMOVED***
+// func (x *Index) Set(name string, e encoding.Encoding) error {
 // 	panic("TODO: implement")
-// ***REMOVED***
+// }
 
-func findMIB(x []identifier.MIB, mib identifier.MIB) int ***REMOVED***
-	i := sort.Search(len(x), func(i int) bool ***REMOVED*** return x[i] >= mib ***REMOVED***)
-	if i < len(x) && x[i] == mib ***REMOVED***
+func findMIB(x []identifier.MIB, mib identifier.MIB) int {
+	i := sort.Search(len(x), func(i int) bool { return x[i] >= mib })
+	if i < len(x) && x[i] == mib {
 		return i
-	***REMOVED***
+	}
 	return -1
-***REMOVED***
+}
 
 const maxMIMENameLen = '0' - 1 // officially 40, but we leave some buffer.
 
-func mimeName(x int) string ***REMOVED***
+func mimeName(x int) string {
 	n := ianaNames[x]
 	// See gen.go for a description of the encoding.
-	if n[0] <= maxMIMENameLen ***REMOVED***
+	if n[0] <= maxMIMENameLen {
 		return n[1:n[0]]
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func ianaName(x int) string ***REMOVED***
+func ianaName(x int) string {
 	n := ianaNames[x]
 	// See gen.go for a description of the encoding.
-	if n[0] <= maxMIMENameLen ***REMOVED***
+	if n[0] <= maxMIMENameLen {
 		return n[n[0]:]
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func mibName(x int) string ***REMOVED***
+func mibName(x int) string {
 	return mibNames[x]
-***REMOVED***
+}
 
-var encodings = [numIANA]encoding.Encoding***REMOVED***
+var encodings = [numIANA]encoding.Encoding{
 	enc106:  unicode.UTF8,
 	enc1015: unicode.UTF16(unicode.BigEndian, unicode.UseBOM),
 	enc1013: unicode.UTF16(unicode.BigEndian, unicode.IgnoreBOM),
@@ -206,4 +206,4 @@ var encodings = [numIANA]encoding.Encoding***REMOVED***
 	enc113:  simplifiedchinese.GBK,
 	enc2085: simplifiedchinese.HZGB2312,
 	enc2026: traditionalchinese.Big5,
-***REMOVED***
+}

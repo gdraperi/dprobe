@@ -13,151 +13,151 @@ import (
 // pipe is a goroutine-safe io.Reader/io.Writer pair. It's like
 // io.Pipe except there are no PipeReader/PipeWriter halves, and the
 // underlying buffer is an interface. (io.Pipe is always unbuffered)
-type pipe struct ***REMOVED***
+type pipe struct {
 	mu       sync.Mutex
 	c        sync.Cond     // c.L lazily initialized to &p.mu
 	b        pipeBuffer    // nil when done reading
 	err      error         // read error once empty. non-nil means closed.
 	breakErr error         // immediate read error (caller doesn't see rest of b)
-	donec    chan struct***REMOVED******REMOVED*** // closed on error
+	donec    chan struct{} // closed on error
 	readFn   func()        // optional code to run in Read before error
-***REMOVED***
+}
 
-type pipeBuffer interface ***REMOVED***
+type pipeBuffer interface {
 	Len() int
 	io.Writer
 	io.Reader
-***REMOVED***
+}
 
-func (p *pipe) Len() int ***REMOVED***
+func (p *pipe) Len() int {
 	p.mu.Lock()
 	defer p.mu.Unlock()
-	if p.b == nil ***REMOVED***
+	if p.b == nil {
 		return 0
-	***REMOVED***
+	}
 	return p.b.Len()
-***REMOVED***
+}
 
 // Read waits until data is available and copies bytes
 // from the buffer into p.
-func (p *pipe) Read(d []byte) (n int, err error) ***REMOVED***
+func (p *pipe) Read(d []byte) (n int, err error) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
-	if p.c.L == nil ***REMOVED***
+	if p.c.L == nil {
 		p.c.L = &p.mu
-	***REMOVED***
-	for ***REMOVED***
-		if p.breakErr != nil ***REMOVED***
+	}
+	for {
+		if p.breakErr != nil {
 			return 0, p.breakErr
-		***REMOVED***
-		if p.b.Len() > 0 ***REMOVED***
+		}
+		if p.b.Len() > 0 {
 			return p.b.Read(d)
-		***REMOVED***
-		if p.err != nil ***REMOVED***
-			if p.readFn != nil ***REMOVED***
+		}
+		if p.err != nil {
+			if p.readFn != nil {
 				p.readFn()     // e.g. copy trailers
 				p.readFn = nil // not sticky like p.err
-			***REMOVED***
+			}
 			p.b = nil
 			return 0, p.err
-		***REMOVED***
+		}
 		p.c.Wait()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 var errClosedPipeWrite = errors.New("write on closed buffer")
 
 // Write copies bytes from p into the buffer and wakes a reader.
 // It is an error to write more data than the buffer can hold.
-func (p *pipe) Write(d []byte) (n int, err error) ***REMOVED***
+func (p *pipe) Write(d []byte) (n int, err error) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
-	if p.c.L == nil ***REMOVED***
+	if p.c.L == nil {
 		p.c.L = &p.mu
-	***REMOVED***
+	}
 	defer p.c.Signal()
-	if p.err != nil ***REMOVED***
+	if p.err != nil {
 		return 0, errClosedPipeWrite
-	***REMOVED***
-	if p.breakErr != nil ***REMOVED***
+	}
+	if p.breakErr != nil {
 		return len(d), nil // discard when there is no reader
-	***REMOVED***
+	}
 	return p.b.Write(d)
-***REMOVED***
+}
 
 // CloseWithError causes the next Read (waking up a current blocked
 // Read if needed) to return the provided err after all data has been
 // read.
 //
 // The error must be non-nil.
-func (p *pipe) CloseWithError(err error) ***REMOVED*** p.closeWithError(&p.err, err, nil) ***REMOVED***
+func (p *pipe) CloseWithError(err error) { p.closeWithError(&p.err, err, nil) }
 
 // BreakWithError causes the next Read (waking up a current blocked
 // Read if needed) to return the provided err immediately, without
 // waiting for unread data.
-func (p *pipe) BreakWithError(err error) ***REMOVED*** p.closeWithError(&p.breakErr, err, nil) ***REMOVED***
+func (p *pipe) BreakWithError(err error) { p.closeWithError(&p.breakErr, err, nil) }
 
 // closeWithErrorAndCode is like CloseWithError but also sets some code to run
 // in the caller's goroutine before returning the error.
-func (p *pipe) closeWithErrorAndCode(err error, fn func()) ***REMOVED*** p.closeWithError(&p.err, err, fn) ***REMOVED***
+func (p *pipe) closeWithErrorAndCode(err error, fn func()) { p.closeWithError(&p.err, err, fn) }
 
-func (p *pipe) closeWithError(dst *error, err error, fn func()) ***REMOVED***
-	if err == nil ***REMOVED***
+func (p *pipe) closeWithError(dst *error, err error, fn func()) {
+	if err == nil {
 		panic("err must be non-nil")
-	***REMOVED***
+	}
 	p.mu.Lock()
 	defer p.mu.Unlock()
-	if p.c.L == nil ***REMOVED***
+	if p.c.L == nil {
 		p.c.L = &p.mu
-	***REMOVED***
+	}
 	defer p.c.Signal()
-	if *dst != nil ***REMOVED***
+	if *dst != nil {
 		// Already been done.
 		return
-	***REMOVED***
+	}
 	p.readFn = fn
-	if dst == &p.breakErr ***REMOVED***
+	if dst == &p.breakErr {
 		p.b = nil
-	***REMOVED***
+	}
 	*dst = err
 	p.closeDoneLocked()
-***REMOVED***
+}
 
 // requires p.mu be held.
-func (p *pipe) closeDoneLocked() ***REMOVED***
-	if p.donec == nil ***REMOVED***
+func (p *pipe) closeDoneLocked() {
+	if p.donec == nil {
 		return
-	***REMOVED***
+	}
 	// Close if unclosed. This isn't racy since we always
 	// hold p.mu while closing.
-	select ***REMOVED***
+	select {
 	case <-p.donec:
 	default:
 		close(p.donec)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Err returns the error (if any) first set by BreakWithError or CloseWithError.
-func (p *pipe) Err() error ***REMOVED***
+func (p *pipe) Err() error {
 	p.mu.Lock()
 	defer p.mu.Unlock()
-	if p.breakErr != nil ***REMOVED***
+	if p.breakErr != nil {
 		return p.breakErr
-	***REMOVED***
+	}
 	return p.err
-***REMOVED***
+}
 
 // Done returns a channel which is closed if and when this pipe is closed
 // with CloseWithError.
-func (p *pipe) Done() <-chan struct***REMOVED******REMOVED*** ***REMOVED***
+func (p *pipe) Done() <-chan struct{} {
 	p.mu.Lock()
 	defer p.mu.Unlock()
-	if p.donec == nil ***REMOVED***
-		p.donec = make(chan struct***REMOVED******REMOVED***)
-		if p.err != nil || p.breakErr != nil ***REMOVED***
+	if p.donec == nil {
+		p.donec = make(chan struct{})
+		if p.err != nil || p.breakErr != nil {
 			// Already hit an error.
 			p.closeDoneLocked()
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return p.donec
-***REMOVED***
+}

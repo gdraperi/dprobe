@@ -15,91 +15,91 @@ import (
 	crypt "github.com/xordataexchange/crypt/config"
 )
 
-type remoteConfigProvider struct***REMOVED******REMOVED***
+type remoteConfigProvider struct{}
 
-func (rc remoteConfigProvider) Get(rp viper.RemoteProvider) (io.Reader, error) ***REMOVED***
+func (rc remoteConfigProvider) Get(rp viper.RemoteProvider) (io.Reader, error) {
 	cm, err := getConfigManager(rp)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	b, err := cm.Get(rp.Path())
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return bytes.NewReader(b), nil
-***REMOVED***
+}
 
-func (rc remoteConfigProvider) Watch(rp viper.RemoteProvider) (io.Reader, error) ***REMOVED***
+func (rc remoteConfigProvider) Watch(rp viper.RemoteProvider) (io.Reader, error) {
 	cm, err := getConfigManager(rp)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	resp, err := cm.Get(rp.Path())
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	return bytes.NewReader(resp), nil
-***REMOVED***
+}
 
-func (rc remoteConfigProvider) WatchChannel(rp viper.RemoteProvider) (<-chan *viper.RemoteResponse, chan bool) ***REMOVED***
+func (rc remoteConfigProvider) WatchChannel(rp viper.RemoteProvider) (<-chan *viper.RemoteResponse, chan bool) {
 	cm, err := getConfigManager(rp)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, nil
-	***REMOVED***
+	}
 	quit := make(chan bool)
 	quitwc := make(chan bool)
 	viperResponsCh := make(chan *viper.RemoteResponse)
 	cryptoResponseCh := cm.Watch(rp.Path(), quit)
 	// need this function to convert the Channel response form crypt.Response to viper.Response
-	go func(cr <-chan *crypt.Response, vr chan<- *viper.RemoteResponse, quitwc <-chan bool, quit chan<- bool) ***REMOVED***
-		for ***REMOVED***
-			select ***REMOVED***
+	go func(cr <-chan *crypt.Response, vr chan<- *viper.RemoteResponse, quitwc <-chan bool, quit chan<- bool) {
+		for {
+			select {
 			case <-quitwc:
 				quit <- true
 				return
 			case resp := <-cr:
-				vr <- &viper.RemoteResponse***REMOVED***
+				vr <- &viper.RemoteResponse{
 					Error: resp.Error,
 					Value: resp.Value,
-				***REMOVED***
+				}
 
-			***REMOVED***
+			}
 
-		***REMOVED***
-	***REMOVED***(cryptoResponseCh, viperResponsCh, quitwc, quit)
+		}
+	}(cryptoResponseCh, viperResponsCh, quitwc, quit)
 
 	return viperResponsCh, quitwc
-***REMOVED***
+}
 
-func getConfigManager(rp viper.RemoteProvider) (crypt.ConfigManager, error) ***REMOVED***
+func getConfigManager(rp viper.RemoteProvider) (crypt.ConfigManager, error) {
 	var cm crypt.ConfigManager
 	var err error
 
-	if rp.SecretKeyring() != "" ***REMOVED***
+	if rp.SecretKeyring() != "" {
 		kr, err := os.Open(rp.SecretKeyring())
 		defer kr.Close()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-		if rp.Provider() == "etcd" ***REMOVED***
-			cm, err = crypt.NewEtcdConfigManager([]string***REMOVED***rp.Endpoint()***REMOVED***, kr)
-		***REMOVED*** else ***REMOVED***
-			cm, err = crypt.NewConsulConfigManager([]string***REMOVED***rp.Endpoint()***REMOVED***, kr)
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
-		if rp.Provider() == "etcd" ***REMOVED***
-			cm, err = crypt.NewStandardEtcdConfigManager([]string***REMOVED***rp.Endpoint()***REMOVED***)
-		***REMOVED*** else ***REMOVED***
-			cm, err = crypt.NewStandardConsulConfigManager([]string***REMOVED***rp.Endpoint()***REMOVED***)
-		***REMOVED***
-	***REMOVED***
-	if err != nil ***REMOVED***
+		}
+		if rp.Provider() == "etcd" {
+			cm, err = crypt.NewEtcdConfigManager([]string{rp.Endpoint()}, kr)
+		} else {
+			cm, err = crypt.NewConsulConfigManager([]string{rp.Endpoint()}, kr)
+		}
+	} else {
+		if rp.Provider() == "etcd" {
+			cm, err = crypt.NewStandardEtcdConfigManager([]string{rp.Endpoint()})
+		} else {
+			cm, err = crypt.NewStandardConsulConfigManager([]string{rp.Endpoint()})
+		}
+	}
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return cm, nil
-***REMOVED***
+}
 
-func init() ***REMOVED***
-	viper.RemoteConfig = &remoteConfigProvider***REMOVED******REMOVED***
-***REMOVED***
+func init() {
+	viper.RemoteConfig = &remoteConfigProvider{}
+}

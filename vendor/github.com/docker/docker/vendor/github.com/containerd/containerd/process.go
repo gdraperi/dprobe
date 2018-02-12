@@ -13,7 +13,7 @@ import (
 )
 
 // Process represents a system process
-type Process interface ***REMOVED***
+type Process interface {
 	// Pid is the system specific process id
 	Pid() uint32
 	// Start starts the process executing the user's defined binary
@@ -32,182 +32,182 @@ type Process interface ***REMOVED***
 	IO() cio.IO
 	// Status returns the executing status of the process
 	Status(context.Context) (Status, error)
-***REMOVED***
+}
 
 // ExitStatus encapsulates a process' exit status.
 // It is used by `Wait()` to return either a process exit code or an error
-type ExitStatus struct ***REMOVED***
+type ExitStatus struct {
 	code     uint32
 	exitedAt time.Time
 	err      error
-***REMOVED***
+}
 
 // Result returns the exit code and time of the exit status.
 // An error may be returned here to which indicates there was an error
 //   at some point while waiting for the exit status. It does not signify
 //   an error with the process itself.
 // If an error is returned, the process may still be running.
-func (s ExitStatus) Result() (uint32, time.Time, error) ***REMOVED***
+func (s ExitStatus) Result() (uint32, time.Time, error) {
 	return s.code, s.exitedAt, s.err
-***REMOVED***
+}
 
 // ExitCode returns the exit code of the process.
 // This is only valid is Error() returns nil
-func (s ExitStatus) ExitCode() uint32 ***REMOVED***
+func (s ExitStatus) ExitCode() uint32 {
 	return s.code
-***REMOVED***
+}
 
 // ExitTime returns the exit time of the process
 // This is only valid is Error() returns nil
-func (s ExitStatus) ExitTime() time.Time ***REMOVED***
+func (s ExitStatus) ExitTime() time.Time {
 	return s.exitedAt
-***REMOVED***
+}
 
 // Error returns the error, if any, that occured while waiting for the
 // process.
-func (s ExitStatus) Error() error ***REMOVED***
+func (s ExitStatus) Error() error {
 	return s.err
-***REMOVED***
+}
 
-type process struct ***REMOVED***
+type process struct {
 	id   string
 	task *task
 	pid  uint32
 	io   cio.IO
-***REMOVED***
+}
 
-func (p *process) ID() string ***REMOVED***
+func (p *process) ID() string {
 	return p.id
-***REMOVED***
+}
 
 // Pid returns the pid of the process
 // The pid is not set until start is called and returns
-func (p *process) Pid() uint32 ***REMOVED***
+func (p *process) Pid() uint32 {
 	return p.pid
-***REMOVED***
+}
 
 // Start starts the exec process
-func (p *process) Start(ctx context.Context) error ***REMOVED***
-	r, err := p.task.client.TaskService().Start(ctx, &tasks.StartRequest***REMOVED***
+func (p *process) Start(ctx context.Context) error {
+	r, err := p.task.client.TaskService().Start(ctx, &tasks.StartRequest{
 		ContainerID: p.task.id,
 		ExecID:      p.id,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		p.io.Cancel()
 		p.io.Wait()
 		p.io.Close()
 		return errdefs.FromGRPC(err)
-	***REMOVED***
+	}
 	p.pid = r.Pid
 	return nil
-***REMOVED***
+}
 
-func (p *process) Kill(ctx context.Context, s syscall.Signal, opts ...KillOpts) error ***REMOVED***
+func (p *process) Kill(ctx context.Context, s syscall.Signal, opts ...KillOpts) error {
 	var i KillInfo
-	for _, o := range opts ***REMOVED***
-		if err := o(ctx, &i); err != nil ***REMOVED***
+	for _, o := range opts {
+		if err := o(ctx, &i); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
-	_, err := p.task.client.TaskService().Kill(ctx, &tasks.KillRequest***REMOVED***
+		}
+	}
+	_, err := p.task.client.TaskService().Kill(ctx, &tasks.KillRequest{
 		Signal:      uint32(s),
 		ContainerID: p.task.id,
 		ExecID:      p.id,
 		All:         i.All,
-	***REMOVED***)
+	})
 	return errdefs.FromGRPC(err)
-***REMOVED***
+}
 
-func (p *process) Wait(ctx context.Context) (<-chan ExitStatus, error) ***REMOVED***
+func (p *process) Wait(ctx context.Context) (<-chan ExitStatus, error) {
 	c := make(chan ExitStatus, 1)
-	go func() ***REMOVED***
+	go func() {
 		defer close(c)
-		r, err := p.task.client.TaskService().Wait(ctx, &tasks.WaitRequest***REMOVED***
+		r, err := p.task.client.TaskService().Wait(ctx, &tasks.WaitRequest{
 			ContainerID: p.task.id,
 			ExecID:      p.id,
-		***REMOVED***)
-		if err != nil ***REMOVED***
-			c <- ExitStatus***REMOVED***
+		})
+		if err != nil {
+			c <- ExitStatus{
 				code: UnknownExitStatus,
 				err:  err,
-			***REMOVED***
+			}
 			return
-		***REMOVED***
-		c <- ExitStatus***REMOVED***
+		}
+		c <- ExitStatus{
 			code:     r.ExitStatus,
 			exitedAt: r.ExitedAt,
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 	return c, nil
-***REMOVED***
+}
 
-func (p *process) CloseIO(ctx context.Context, opts ...IOCloserOpts) error ***REMOVED***
-	r := &tasks.CloseIORequest***REMOVED***
+func (p *process) CloseIO(ctx context.Context, opts ...IOCloserOpts) error {
+	r := &tasks.CloseIORequest{
 		ContainerID: p.task.id,
 		ExecID:      p.id,
-	***REMOVED***
+	}
 	var i IOCloseInfo
-	for _, o := range opts ***REMOVED***
+	for _, o := range opts {
 		o(&i)
-	***REMOVED***
+	}
 	r.Stdin = i.Stdin
 	_, err := p.task.client.TaskService().CloseIO(ctx, r)
 	return errdefs.FromGRPC(err)
-***REMOVED***
+}
 
-func (p *process) IO() cio.IO ***REMOVED***
+func (p *process) IO() cio.IO {
 	return p.io
-***REMOVED***
+}
 
-func (p *process) Resize(ctx context.Context, w, h uint32) error ***REMOVED***
-	_, err := p.task.client.TaskService().ResizePty(ctx, &tasks.ResizePtyRequest***REMOVED***
+func (p *process) Resize(ctx context.Context, w, h uint32) error {
+	_, err := p.task.client.TaskService().ResizePty(ctx, &tasks.ResizePtyRequest{
 		ContainerID: p.task.id,
 		Width:       w,
 		Height:      h,
 		ExecID:      p.id,
-	***REMOVED***)
+	})
 	return errdefs.FromGRPC(err)
-***REMOVED***
+}
 
-func (p *process) Delete(ctx context.Context, opts ...ProcessDeleteOpts) (*ExitStatus, error) ***REMOVED***
-	for _, o := range opts ***REMOVED***
-		if err := o(ctx, p); err != nil ***REMOVED***
+func (p *process) Delete(ctx context.Context, opts ...ProcessDeleteOpts) (*ExitStatus, error) {
+	for _, o := range opts {
+		if err := o(ctx, p); err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	status, err := p.Status(ctx)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	switch status.Status ***REMOVED***
+	}
+	switch status.Status {
 	case Running, Paused, Pausing:
 		return nil, errors.Wrapf(errdefs.ErrFailedPrecondition, "process must be stopped before deletion")
-	***REMOVED***
-	r, err := p.task.client.TaskService().DeleteProcess(ctx, &tasks.DeleteProcessRequest***REMOVED***
+	}
+	r, err := p.task.client.TaskService().DeleteProcess(ctx, &tasks.DeleteProcessRequest{
 		ContainerID: p.task.id,
 		ExecID:      p.id,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		return nil, errdefs.FromGRPC(err)
-	***REMOVED***
-	if p.io != nil ***REMOVED***
+	}
+	if p.io != nil {
 		p.io.Cancel()
 		p.io.Wait()
 		p.io.Close()
-	***REMOVED***
-	return &ExitStatus***REMOVED***code: r.ExitStatus, exitedAt: r.ExitedAt***REMOVED***, nil
-***REMOVED***
+	}
+	return &ExitStatus{code: r.ExitStatus, exitedAt: r.ExitedAt}, nil
+}
 
-func (p *process) Status(ctx context.Context) (Status, error) ***REMOVED***
-	r, err := p.task.client.TaskService().Get(ctx, &tasks.GetRequest***REMOVED***
+func (p *process) Status(ctx context.Context) (Status, error) {
+	r, err := p.task.client.TaskService().Get(ctx, &tasks.GetRequest{
 		ContainerID: p.task.id,
 		ExecID:      p.id,
-	***REMOVED***)
-	if err != nil ***REMOVED***
-		return Status***REMOVED******REMOVED***, errdefs.FromGRPC(err)
-	***REMOVED***
-	return Status***REMOVED***
+	})
+	if err != nil {
+		return Status{}, errdefs.FromGRPC(err)
+	}
+	return Status{
 		Status:     ProcessStatus(strings.ToLower(r.Process.Status.String())),
 		ExitStatus: r.Process.ExitStatus,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}

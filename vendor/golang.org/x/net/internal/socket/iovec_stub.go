@@ -6,6 +6,6 @@
 
 package socket
 
-type iovec struct***REMOVED******REMOVED***
+type iovec struct{}
 
-func (v *iovec) set(b []byte) ***REMOVED******REMOVED***
+func (v *iovec) set(b []byte) {}

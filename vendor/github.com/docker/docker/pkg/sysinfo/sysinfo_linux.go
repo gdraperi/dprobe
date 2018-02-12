@@ -12,35 +12,35 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-func findCgroupMountpoints() (map[string]string, error) ***REMOVED***
+func findCgroupMountpoints() (map[string]string, error) {
 	cgMounts, err := cgroups.GetCgroupMounts(false)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("Failed to parse cgroup information: %v", err)
-	***REMOVED***
+	}
 	mps := make(map[string]string)
-	for _, m := range cgMounts ***REMOVED***
-		for _, ss := range m.Subsystems ***REMOVED***
+	for _, m := range cgMounts {
+		for _, ss := range m.Subsystems {
 			mps[ss] = m.Mountpoint
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return mps, nil
-***REMOVED***
+}
 
 // New returns a new SysInfo, using the filesystem to detect which features
 // the kernel supports. If `quiet` is `false` warnings are printed in logs
 // whenever an error occurs or misconfigurations are present.
-func New(quiet bool) *SysInfo ***REMOVED***
-	sysInfo := &SysInfo***REMOVED******REMOVED***
+func New(quiet bool) *SysInfo {
+	sysInfo := &SysInfo{}
 	cgMounts, err := findCgroupMountpoints()
-	if err != nil ***REMOVED***
+	if err != nil {
 		logrus.Warnf("Failed to parse cgroup information: %v", err)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		sysInfo.cgroupMemInfo = checkCgroupMem(cgMounts, quiet)
 		sysInfo.cgroupCPUInfo = checkCgroupCPU(cgMounts, quiet)
 		sysInfo.cgroupBlkioInfo = checkCgroupBlkioInfo(cgMounts, quiet)
 		sysInfo.cgroupCpusetInfo = checkCgroupCpusetInfo(cgMounts, quiet)
 		sysInfo.cgroupPids = checkCgroupPids(quiet)
-	***REMOVED***
+	}
 
 	_, ok := cgMounts["devices"]
 	sysInfo.CgroupDevicesEnabled = ok
@@ -50,205 +50,205 @@ func New(quiet bool) *SysInfo ***REMOVED***
 	sysInfo.BridgeNFCallIP6TablesDisabled = !readProcBool("/proc/sys/net/bridge/bridge-nf-call-ip6tables")
 
 	// Check if AppArmor is supported.
-	if _, err := os.Stat("/sys/kernel/security/apparmor"); !os.IsNotExist(err) ***REMOVED***
+	if _, err := os.Stat("/sys/kernel/security/apparmor"); !os.IsNotExist(err) {
 		sysInfo.AppArmor = true
-	***REMOVED***
+	}
 
 	// Check if Seccomp is supported, via CONFIG_SECCOMP.
-	if err := unix.Prctl(unix.PR_GET_SECCOMP, 0, 0, 0, 0); err != unix.EINVAL ***REMOVED***
+	if err := unix.Prctl(unix.PR_GET_SECCOMP, 0, 0, 0, 0); err != unix.EINVAL {
 		// Make sure the kernel has CONFIG_SECCOMP_FILTER.
-		if err := unix.Prctl(unix.PR_SET_SECCOMP, unix.SECCOMP_MODE_FILTER, 0, 0, 0); err != unix.EINVAL ***REMOVED***
+		if err := unix.Prctl(unix.PR_SET_SECCOMP, unix.SECCOMP_MODE_FILTER, 0, 0, 0); err != unix.EINVAL {
 			sysInfo.Seccomp = true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return sysInfo
-***REMOVED***
+}
 
 // checkCgroupMem reads the memory information from the memory cgroup mount point.
-func checkCgroupMem(cgMounts map[string]string, quiet bool) cgroupMemInfo ***REMOVED***
+func checkCgroupMem(cgMounts map[string]string, quiet bool) cgroupMemInfo {
 	mountPoint, ok := cgMounts["memory"]
-	if !ok ***REMOVED***
-		if !quiet ***REMOVED***
+	if !ok {
+		if !quiet {
 			logrus.Warn("Your kernel does not support cgroup memory limit")
-		***REMOVED***
-		return cgroupMemInfo***REMOVED******REMOVED***
-	***REMOVED***
+		}
+		return cgroupMemInfo{}
+	}
 
 	swapLimit := cgroupEnabled(mountPoint, "memory.memsw.limit_in_bytes")
-	if !quiet && !swapLimit ***REMOVED***
+	if !quiet && !swapLimit {
 		logrus.Warn("Your kernel does not support swap memory limit")
-	***REMOVED***
+	}
 	memoryReservation := cgroupEnabled(mountPoint, "memory.soft_limit_in_bytes")
-	if !quiet && !memoryReservation ***REMOVED***
+	if !quiet && !memoryReservation {
 		logrus.Warn("Your kernel does not support memory reservation")
-	***REMOVED***
+	}
 	oomKillDisable := cgroupEnabled(mountPoint, "memory.oom_control")
-	if !quiet && !oomKillDisable ***REMOVED***
+	if !quiet && !oomKillDisable {
 		logrus.Warn("Your kernel does not support oom control")
-	***REMOVED***
+	}
 	memorySwappiness := cgroupEnabled(mountPoint, "memory.swappiness")
-	if !quiet && !memorySwappiness ***REMOVED***
+	if !quiet && !memorySwappiness {
 		logrus.Warn("Your kernel does not support memory swappiness")
-	***REMOVED***
+	}
 	kernelMemory := cgroupEnabled(mountPoint, "memory.kmem.limit_in_bytes")
-	if !quiet && !kernelMemory ***REMOVED***
+	if !quiet && !kernelMemory {
 		logrus.Warn("Your kernel does not support kernel memory limit")
-	***REMOVED***
+	}
 
-	return cgroupMemInfo***REMOVED***
+	return cgroupMemInfo{
 		MemoryLimit:       true,
 		SwapLimit:         swapLimit,
 		MemoryReservation: memoryReservation,
 		OomKillDisable:    oomKillDisable,
 		MemorySwappiness:  memorySwappiness,
 		KernelMemory:      kernelMemory,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // checkCgroupCPU reads the cpu information from the cpu cgroup mount point.
-func checkCgroupCPU(cgMounts map[string]string, quiet bool) cgroupCPUInfo ***REMOVED***
+func checkCgroupCPU(cgMounts map[string]string, quiet bool) cgroupCPUInfo {
 	mountPoint, ok := cgMounts["cpu"]
-	if !ok ***REMOVED***
-		if !quiet ***REMOVED***
+	if !ok {
+		if !quiet {
 			logrus.Warn("Unable to find cpu cgroup in mounts")
-		***REMOVED***
-		return cgroupCPUInfo***REMOVED******REMOVED***
-	***REMOVED***
+		}
+		return cgroupCPUInfo{}
+	}
 
 	cpuShares := cgroupEnabled(mountPoint, "cpu.shares")
-	if !quiet && !cpuShares ***REMOVED***
+	if !quiet && !cpuShares {
 		logrus.Warn("Your kernel does not support cgroup cpu shares")
-	***REMOVED***
+	}
 
 	cpuCfsPeriod := cgroupEnabled(mountPoint, "cpu.cfs_period_us")
-	if !quiet && !cpuCfsPeriod ***REMOVED***
+	if !quiet && !cpuCfsPeriod {
 		logrus.Warn("Your kernel does not support cgroup cfs period")
-	***REMOVED***
+	}
 
 	cpuCfsQuota := cgroupEnabled(mountPoint, "cpu.cfs_quota_us")
-	if !quiet && !cpuCfsQuota ***REMOVED***
+	if !quiet && !cpuCfsQuota {
 		logrus.Warn("Your kernel does not support cgroup cfs quotas")
-	***REMOVED***
+	}
 
 	cpuRealtimePeriod := cgroupEnabled(mountPoint, "cpu.rt_period_us")
-	if !quiet && !cpuRealtimePeriod ***REMOVED***
+	if !quiet && !cpuRealtimePeriod {
 		logrus.Warn("Your kernel does not support cgroup rt period")
-	***REMOVED***
+	}
 
 	cpuRealtimeRuntime := cgroupEnabled(mountPoint, "cpu.rt_runtime_us")
-	if !quiet && !cpuRealtimeRuntime ***REMOVED***
+	if !quiet && !cpuRealtimeRuntime {
 		logrus.Warn("Your kernel does not support cgroup rt runtime")
-	***REMOVED***
+	}
 
-	return cgroupCPUInfo***REMOVED***
+	return cgroupCPUInfo{
 		CPUShares:          cpuShares,
 		CPUCfsPeriod:       cpuCfsPeriod,
 		CPUCfsQuota:        cpuCfsQuota,
 		CPURealtimePeriod:  cpuRealtimePeriod,
 		CPURealtimeRuntime: cpuRealtimeRuntime,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // checkCgroupBlkioInfo reads the blkio information from the blkio cgroup mount point.
-func checkCgroupBlkioInfo(cgMounts map[string]string, quiet bool) cgroupBlkioInfo ***REMOVED***
+func checkCgroupBlkioInfo(cgMounts map[string]string, quiet bool) cgroupBlkioInfo {
 	mountPoint, ok := cgMounts["blkio"]
-	if !ok ***REMOVED***
-		if !quiet ***REMOVED***
+	if !ok {
+		if !quiet {
 			logrus.Warn("Unable to find blkio cgroup in mounts")
-		***REMOVED***
-		return cgroupBlkioInfo***REMOVED******REMOVED***
-	***REMOVED***
+		}
+		return cgroupBlkioInfo{}
+	}
 
 	weight := cgroupEnabled(mountPoint, "blkio.weight")
-	if !quiet && !weight ***REMOVED***
+	if !quiet && !weight {
 		logrus.Warn("Your kernel does not support cgroup blkio weight")
-	***REMOVED***
+	}
 
 	weightDevice := cgroupEnabled(mountPoint, "blkio.weight_device")
-	if !quiet && !weightDevice ***REMOVED***
+	if !quiet && !weightDevice {
 		logrus.Warn("Your kernel does not support cgroup blkio weight_device")
-	***REMOVED***
+	}
 
 	readBpsDevice := cgroupEnabled(mountPoint, "blkio.throttle.read_bps_device")
-	if !quiet && !readBpsDevice ***REMOVED***
+	if !quiet && !readBpsDevice {
 		logrus.Warn("Your kernel does not support cgroup blkio throttle.read_bps_device")
-	***REMOVED***
+	}
 
 	writeBpsDevice := cgroupEnabled(mountPoint, "blkio.throttle.write_bps_device")
-	if !quiet && !writeBpsDevice ***REMOVED***
+	if !quiet && !writeBpsDevice {
 		logrus.Warn("Your kernel does not support cgroup blkio throttle.write_bps_device")
-	***REMOVED***
+	}
 	readIOpsDevice := cgroupEnabled(mountPoint, "blkio.throttle.read_iops_device")
-	if !quiet && !readIOpsDevice ***REMOVED***
+	if !quiet && !readIOpsDevice {
 		logrus.Warn("Your kernel does not support cgroup blkio throttle.read_iops_device")
-	***REMOVED***
+	}
 
 	writeIOpsDevice := cgroupEnabled(mountPoint, "blkio.throttle.write_iops_device")
-	if !quiet && !writeIOpsDevice ***REMOVED***
+	if !quiet && !writeIOpsDevice {
 		logrus.Warn("Your kernel does not support cgroup blkio throttle.write_iops_device")
-	***REMOVED***
-	return cgroupBlkioInfo***REMOVED***
+	}
+	return cgroupBlkioInfo{
 		BlkioWeight:          weight,
 		BlkioWeightDevice:    weightDevice,
 		BlkioReadBpsDevice:   readBpsDevice,
 		BlkioWriteBpsDevice:  writeBpsDevice,
 		BlkioReadIOpsDevice:  readIOpsDevice,
 		BlkioWriteIOpsDevice: writeIOpsDevice,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // checkCgroupCpusetInfo reads the cpuset information from the cpuset cgroup mount point.
-func checkCgroupCpusetInfo(cgMounts map[string]string, quiet bool) cgroupCpusetInfo ***REMOVED***
+func checkCgroupCpusetInfo(cgMounts map[string]string, quiet bool) cgroupCpusetInfo {
 	mountPoint, ok := cgMounts["cpuset"]
-	if !ok ***REMOVED***
-		if !quiet ***REMOVED***
+	if !ok {
+		if !quiet {
 			logrus.Warn("Unable to find cpuset cgroup in mounts")
-		***REMOVED***
-		return cgroupCpusetInfo***REMOVED******REMOVED***
-	***REMOVED***
+		}
+		return cgroupCpusetInfo{}
+	}
 
 	cpus, err := ioutil.ReadFile(path.Join(mountPoint, "cpuset.cpus"))
-	if err != nil ***REMOVED***
-		return cgroupCpusetInfo***REMOVED******REMOVED***
-	***REMOVED***
+	if err != nil {
+		return cgroupCpusetInfo{}
+	}
 
 	mems, err := ioutil.ReadFile(path.Join(mountPoint, "cpuset.mems"))
-	if err != nil ***REMOVED***
-		return cgroupCpusetInfo***REMOVED******REMOVED***
-	***REMOVED***
+	if err != nil {
+		return cgroupCpusetInfo{}
+	}
 
-	return cgroupCpusetInfo***REMOVED***
+	return cgroupCpusetInfo{
 		Cpuset: true,
 		Cpus:   strings.TrimSpace(string(cpus)),
 		Mems:   strings.TrimSpace(string(mems)),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // checkCgroupPids reads the pids information from the pids cgroup mount point.
-func checkCgroupPids(quiet bool) cgroupPids ***REMOVED***
+func checkCgroupPids(quiet bool) cgroupPids {
 	_, err := cgroups.FindCgroupMountpoint("pids")
-	if err != nil ***REMOVED***
-		if !quiet ***REMOVED***
+	if err != nil {
+		if !quiet {
 			logrus.Warn(err)
-		***REMOVED***
-		return cgroupPids***REMOVED******REMOVED***
-	***REMOVED***
+		}
+		return cgroupPids{}
+	}
 
-	return cgroupPids***REMOVED***
+	return cgroupPids{
 		PidsLimit: true,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func cgroupEnabled(mountPoint, name string) bool ***REMOVED***
+func cgroupEnabled(mountPoint, name string) bool {
 	_, err := os.Stat(path.Join(mountPoint, name))
 	return err == nil
-***REMOVED***
+}
 
-func readProcBool(path string) bool ***REMOVED***
+func readProcBool(path string) bool {
 	val, err := ioutil.ReadFile(path)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return false
-	***REMOVED***
+	}
 	return strings.TrimSpace(string(val)) == "1"
-***REMOVED***
+}

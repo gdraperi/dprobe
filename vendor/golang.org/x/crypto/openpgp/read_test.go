@@ -17,302 +17,302 @@ import (
 	"golang.org/x/crypto/openpgp/errors"
 )
 
-func readerFromHex(s string) io.Reader ***REMOVED***
+func readerFromHex(s string) io.Reader {
 	data, err := hex.DecodeString(s)
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic("readerFromHex: bad input")
-	***REMOVED***
+	}
 	return bytes.NewBuffer(data)
-***REMOVED***
+}
 
-func TestReadKeyRing(t *testing.T) ***REMOVED***
+func TestReadKeyRing(t *testing.T) {
 	kring, err := ReadKeyRing(readerFromHex(testKeys1And2Hex))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Error(err)
 		return
-	***REMOVED***
-	if len(kring) != 2 || uint32(kring[0].PrimaryKey.KeyId) != 0xC20C31BB || uint32(kring[1].PrimaryKey.KeyId) != 0x1E35246B ***REMOVED***
+	}
+	if len(kring) != 2 || uint32(kring[0].PrimaryKey.KeyId) != 0xC20C31BB || uint32(kring[1].PrimaryKey.KeyId) != 0x1E35246B {
 		t.Errorf("bad keyring: %#v", kring)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestRereadKeyRing(t *testing.T) ***REMOVED***
+func TestRereadKeyRing(t *testing.T) {
 	kring, err := ReadKeyRing(readerFromHex(testKeys1And2Hex))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("error in initial parse: %s", err)
 		return
-	***REMOVED***
+	}
 	out := new(bytes.Buffer)
 	err = kring[0].Serialize(out)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("error in serialization: %s", err)
 		return
-	***REMOVED***
+	}
 	kring, err = ReadKeyRing(out)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("error in second parse: %s", err)
 		return
-	***REMOVED***
+	}
 
-	if len(kring) != 1 || uint32(kring[0].PrimaryKey.KeyId) != 0xC20C31BB ***REMOVED***
+	if len(kring) != 1 || uint32(kring[0].PrimaryKey.KeyId) != 0xC20C31BB {
 		t.Errorf("bad keyring: %#v", kring)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestReadPrivateKeyRing(t *testing.T) ***REMOVED***
+func TestReadPrivateKeyRing(t *testing.T) {
 	kring, err := ReadKeyRing(readerFromHex(testKeys1And2PrivateHex))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Error(err)
 		return
-	***REMOVED***
-	if len(kring) != 2 || uint32(kring[0].PrimaryKey.KeyId) != 0xC20C31BB || uint32(kring[1].PrimaryKey.KeyId) != 0x1E35246B || kring[0].PrimaryKey == nil ***REMOVED***
+	}
+	if len(kring) != 2 || uint32(kring[0].PrimaryKey.KeyId) != 0xC20C31BB || uint32(kring[1].PrimaryKey.KeyId) != 0x1E35246B || kring[0].PrimaryKey == nil {
 		t.Errorf("bad keyring: %#v", kring)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestReadDSAKey(t *testing.T) ***REMOVED***
+func TestReadDSAKey(t *testing.T) {
 	kring, err := ReadKeyRing(readerFromHex(dsaTestKeyHex))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Error(err)
 		return
-	***REMOVED***
-	if len(kring) != 1 || uint32(kring[0].PrimaryKey.KeyId) != 0x0CCC0360 ***REMOVED***
+	}
+	if len(kring) != 1 || uint32(kring[0].PrimaryKey.KeyId) != 0x0CCC0360 {
 		t.Errorf("bad parse: %#v", kring)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestReadP256Key(t *testing.T) ***REMOVED***
+func TestReadP256Key(t *testing.T) {
 	kring, err := ReadKeyRing(readerFromHex(p256TestKeyHex))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Error(err)
 		return
-	***REMOVED***
-	if len(kring) != 1 || uint32(kring[0].PrimaryKey.KeyId) != 0x5918513E ***REMOVED***
+	}
+	if len(kring) != 1 || uint32(kring[0].PrimaryKey.KeyId) != 0x5918513E {
 		t.Errorf("bad parse: %#v", kring)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestDSAHashTruncatation(t *testing.T) ***REMOVED***
+func TestDSAHashTruncatation(t *testing.T) {
 	// dsaKeyWithSHA512 was generated with GnuPG and --cert-digest-algo
 	// SHA512 in order to require DSA hash truncation to verify correctly.
 	_, err := ReadKeyRing(readerFromHex(dsaKeyWithSHA512))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Error(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestGetKeyById(t *testing.T) ***REMOVED***
+func TestGetKeyById(t *testing.T) {
 	kring, _ := ReadKeyRing(readerFromHex(testKeys1And2Hex))
 
 	keys := kring.KeysById(0xa34d7e18c20c31bb)
-	if len(keys) != 1 || keys[0].Entity != kring[0] ***REMOVED***
+	if len(keys) != 1 || keys[0].Entity != kring[0] {
 		t.Errorf("bad result for 0xa34d7e18c20c31bb: %#v", keys)
-	***REMOVED***
+	}
 
 	keys = kring.KeysById(0xfd94408d4543314f)
-	if len(keys) != 1 || keys[0].Entity != kring[0] ***REMOVED***
+	if len(keys) != 1 || keys[0].Entity != kring[0] {
 		t.Errorf("bad result for 0xa34d7e18c20c31bb: %#v", keys)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func checkSignedMessage(t *testing.T, signedHex, expected string) ***REMOVED***
+func checkSignedMessage(t *testing.T, signedHex, expected string) {
 	kring, _ := ReadKeyRing(readerFromHex(testKeys1And2Hex))
 
 	md, err := ReadMessage(readerFromHex(signedHex), kring, nil, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Error(err)
 		return
-	***REMOVED***
+	}
 
-	if !md.IsSigned || md.SignedByKeyId != 0xa34d7e18c20c31bb || md.SignedBy == nil || md.IsEncrypted || md.IsSymmetricallyEncrypted || len(md.EncryptedToKeyIds) != 0 || md.IsSymmetricallyEncrypted ***REMOVED***
+	if !md.IsSigned || md.SignedByKeyId != 0xa34d7e18c20c31bb || md.SignedBy == nil || md.IsEncrypted || md.IsSymmetricallyEncrypted || len(md.EncryptedToKeyIds) != 0 || md.IsSymmetricallyEncrypted {
 		t.Errorf("bad MessageDetails: %#v", md)
-	***REMOVED***
+	}
 
 	contents, err := ioutil.ReadAll(md.UnverifiedBody)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("error reading UnverifiedBody: %s", err)
-	***REMOVED***
-	if string(contents) != expected ***REMOVED***
+	}
+	if string(contents) != expected {
 		t.Errorf("bad UnverifiedBody got:%s want:%s", string(contents), expected)
-	***REMOVED***
-	if md.SignatureError != nil || md.Signature == nil ***REMOVED***
+	}
+	if md.SignatureError != nil || md.Signature == nil {
 		t.Errorf("failed to validate: %s", md.SignatureError)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestSignedMessage(t *testing.T) ***REMOVED***
+func TestSignedMessage(t *testing.T) {
 	checkSignedMessage(t, signedMessageHex, signedInput)
-***REMOVED***
+}
 
-func TestTextSignedMessage(t *testing.T) ***REMOVED***
+func TestTextSignedMessage(t *testing.T) {
 	checkSignedMessage(t, signedTextMessageHex, signedTextInput)
-***REMOVED***
+}
 
 // The reader should detect "compressed quines", which are compressed
 // packets that expand into themselves and cause an infinite recursive
 // parsing loop.
 // The packet in this test case comes from Taylor R. Campbell at
 // http://mumble.net/~campbell/misc/pgp-quine/
-func TestCampbellQuine(t *testing.T) ***REMOVED***
+func TestCampbellQuine(t *testing.T) {
 	md, err := ReadMessage(readerFromHex(campbellQuine), nil, nil, nil)
-	if md != nil ***REMOVED***
+	if md != nil {
 		t.Errorf("Reading a compressed quine should not return any data: %#v", md)
-	***REMOVED***
+	}
 	structural, ok := err.(errors.StructuralError)
-	if !ok ***REMOVED***
+	if !ok {
 		t.Fatalf("Unexpected class of error: %T", err)
-	***REMOVED***
-	if !strings.Contains(string(structural), "too many layers of packets") ***REMOVED***
+	}
+	if !strings.Contains(string(structural), "too many layers of packets") {
 		t.Fatalf("Unexpected error: %s", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-var signedEncryptedMessageTests = []struct ***REMOVED***
+var signedEncryptedMessageTests = []struct {
 	keyRingHex       string
 	messageHex       string
 	signedByKeyId    uint64
 	encryptedToKeyId uint64
-***REMOVED******REMOVED***
-	***REMOVED***
+}{
+	{
 		testKeys1And2PrivateHex,
 		signedEncryptedMessageHex,
 		0xa34d7e18c20c31bb,
 		0x2a67d68660df41c7,
-	***REMOVED***,
-	***REMOVED***
+	},
+	{
 		dsaElGamalTestKeysHex,
 		signedEncryptedMessage2Hex,
 		0x33af447ccd759b09,
 		0xcf6a7abcd43e3673,
-	***REMOVED***,
-***REMOVED***
+	},
+}
 
-func TestSignedEncryptedMessage(t *testing.T) ***REMOVED***
-	for i, test := range signedEncryptedMessageTests ***REMOVED***
+func TestSignedEncryptedMessage(t *testing.T) {
+	for i, test := range signedEncryptedMessageTests {
 		expected := "Signed and encrypted message\n"
 		kring, _ := ReadKeyRing(readerFromHex(test.keyRingHex))
-		prompt := func(keys []Key, symmetric bool) ([]byte, error) ***REMOVED***
-			if symmetric ***REMOVED***
+		prompt := func(keys []Key, symmetric bool) ([]byte, error) {
+			if symmetric {
 				t.Errorf("prompt: message was marked as symmetrically encrypted")
 				return nil, errors.ErrKeyIncorrect
-			***REMOVED***
+			}
 
-			if len(keys) == 0 ***REMOVED***
+			if len(keys) == 0 {
 				t.Error("prompt: no keys requested")
 				return nil, errors.ErrKeyIncorrect
-			***REMOVED***
+			}
 
 			err := keys[0].PrivateKey.Decrypt([]byte("passphrase"))
-			if err != nil ***REMOVED***
+			if err != nil {
 				t.Errorf("prompt: error decrypting key: %s", err)
 				return nil, errors.ErrKeyIncorrect
-			***REMOVED***
+			}
 
 			return nil, nil
-		***REMOVED***
+		}
 
 		md, err := ReadMessage(readerFromHex(test.messageHex), kring, prompt, nil)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Errorf("#%d: error reading message: %s", i, err)
 			return
-		***REMOVED***
+		}
 
-		if !md.IsSigned || md.SignedByKeyId != test.signedByKeyId || md.SignedBy == nil || !md.IsEncrypted || md.IsSymmetricallyEncrypted || len(md.EncryptedToKeyIds) == 0 || md.EncryptedToKeyIds[0] != test.encryptedToKeyId ***REMOVED***
+		if !md.IsSigned || md.SignedByKeyId != test.signedByKeyId || md.SignedBy == nil || !md.IsEncrypted || md.IsSymmetricallyEncrypted || len(md.EncryptedToKeyIds) == 0 || md.EncryptedToKeyIds[0] != test.encryptedToKeyId {
 			t.Errorf("#%d: bad MessageDetails: %#v", i, md)
-		***REMOVED***
+		}
 
 		contents, err := ioutil.ReadAll(md.UnverifiedBody)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Errorf("#%d: error reading UnverifiedBody: %s", i, err)
-		***REMOVED***
-		if string(contents) != expected ***REMOVED***
+		}
+		if string(contents) != expected {
 			t.Errorf("#%d: bad UnverifiedBody got:%s want:%s", i, string(contents), expected)
-		***REMOVED***
+		}
 
-		if md.SignatureError != nil || md.Signature == nil ***REMOVED***
+		if md.SignatureError != nil || md.Signature == nil {
 			t.Errorf("#%d: failed to validate: %s", i, md.SignatureError)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestUnspecifiedRecipient(t *testing.T) ***REMOVED***
+func TestUnspecifiedRecipient(t *testing.T) {
 	expected := "Recipient unspecified\n"
 	kring, _ := ReadKeyRing(readerFromHex(testKeys1And2PrivateHex))
 
 	md, err := ReadMessage(readerFromHex(recipientUnspecifiedHex), kring, nil, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("error reading message: %s", err)
 		return
-	***REMOVED***
+	}
 
 	contents, err := ioutil.ReadAll(md.UnverifiedBody)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("error reading UnverifiedBody: %s", err)
-	***REMOVED***
-	if string(contents) != expected ***REMOVED***
+	}
+	if string(contents) != expected {
 		t.Errorf("bad UnverifiedBody got:%s want:%s", string(contents), expected)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestSymmetricallyEncrypted(t *testing.T) ***REMOVED***
+func TestSymmetricallyEncrypted(t *testing.T) {
 	firstTimeCalled := true
 
-	prompt := func(keys []Key, symmetric bool) ([]byte, error) ***REMOVED***
-		if len(keys) != 0 ***REMOVED***
+	prompt := func(keys []Key, symmetric bool) ([]byte, error) {
+		if len(keys) != 0 {
 			t.Errorf("prompt: len(keys) = %d (want 0)", len(keys))
-		***REMOVED***
+		}
 
-		if !symmetric ***REMOVED***
+		if !symmetric {
 			t.Errorf("symmetric is not set")
-		***REMOVED***
+		}
 
-		if firstTimeCalled ***REMOVED***
+		if firstTimeCalled {
 			firstTimeCalled = false
 			return []byte("wrongpassword"), nil
-		***REMOVED***
+		}
 
 		return []byte("password"), nil
-	***REMOVED***
+	}
 
 	md, err := ReadMessage(readerFromHex(symmetricallyEncryptedCompressedHex), nil, prompt, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("ReadMessage: %s", err)
 		return
-	***REMOVED***
+	}
 
 	contents, err := ioutil.ReadAll(md.UnverifiedBody)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("ReadAll: %s", err)
-	***REMOVED***
+	}
 
 	expectedCreationTime := uint32(1295992998)
-	if md.LiteralData.Time != expectedCreationTime ***REMOVED***
+	if md.LiteralData.Time != expectedCreationTime {
 		t.Errorf("LiteralData.Time is %d, want %d", md.LiteralData.Time, expectedCreationTime)
-	***REMOVED***
+	}
 
 	const expected = "Symmetrically encrypted.\n"
-	if string(contents) != expected ***REMOVED***
+	if string(contents) != expected {
 		t.Errorf("contents got: %s want: %s", string(contents), expected)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func testDetachedSignature(t *testing.T, kring KeyRing, signature io.Reader, sigInput, tag string, expectedSignerKeyId uint64) ***REMOVED***
+func testDetachedSignature(t *testing.T, kring KeyRing, signature io.Reader, sigInput, tag string, expectedSignerKeyId uint64) {
 	signed := bytes.NewBufferString(sigInput)
 	signer, err := CheckDetachedSignature(kring, signed, signature)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("%s: signature error: %s", tag, err)
 		return
-	***REMOVED***
-	if signer == nil ***REMOVED***
+	}
+	if signer == nil {
 		t.Errorf("%s: signer is nil", tag)
 		return
-	***REMOVED***
-	if signer.PrimaryKey.KeyId != expectedSignerKeyId ***REMOVED***
+	}
+	if signer.PrimaryKey.KeyId != expectedSignerKeyId {
 		t.Errorf("%s: wrong signer got:%x want:%x", tag, signer.PrimaryKey.KeyId, expectedSignerKeyId)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestDetachedSignature(t *testing.T) ***REMOVED***
+func TestDetachedSignature(t *testing.T) {
 	kring, _ := ReadKeyRing(readerFromHex(testKeys1And2Hex))
 	testDetachedSignature(t, kring, readerFromHex(detachedSignatureHex), signedInput, "binary", testKey1KeyId)
 	testDetachedSignature(t, kring, readerFromHex(detachedSignatureTextHex), signedInput, "text", testKey1KeyId)
@@ -320,163 +320,163 @@ func TestDetachedSignature(t *testing.T) ***REMOVED***
 
 	incorrectSignedInput := signedInput + "X"
 	_, err := CheckDetachedSignature(kring, bytes.NewBufferString(incorrectSignedInput), readerFromHex(detachedSignatureHex))
-	if err == nil ***REMOVED***
+	if err == nil {
 		t.Fatal("CheckDetachedSignature returned without error for bad signature")
-	***REMOVED***
-	if err == errors.ErrUnknownIssuer ***REMOVED***
+	}
+	if err == errors.ErrUnknownIssuer {
 		t.Fatal("CheckDetachedSignature returned ErrUnknownIssuer when the signer was known, but the signature invalid")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestDetachedSignatureDSA(t *testing.T) ***REMOVED***
+func TestDetachedSignatureDSA(t *testing.T) {
 	kring, _ := ReadKeyRing(readerFromHex(dsaTestKeyHex))
 	testDetachedSignature(t, kring, readerFromHex(detachedSignatureDSAHex), signedInput, "binary", testKey3KeyId)
-***REMOVED***
+}
 
-func TestMultipleSignaturePacketsDSA(t *testing.T) ***REMOVED***
+func TestMultipleSignaturePacketsDSA(t *testing.T) {
 	kring, _ := ReadKeyRing(readerFromHex(dsaTestKeyHex))
 	testDetachedSignature(t, kring, readerFromHex(missingHashFunctionHex+detachedSignatureDSAHex), signedInput, "binary", testKey3KeyId)
-***REMOVED***
+}
 
-func TestDetachedSignatureP256(t *testing.T) ***REMOVED***
+func TestDetachedSignatureP256(t *testing.T) {
 	kring, _ := ReadKeyRing(readerFromHex(p256TestKeyHex))
 	testDetachedSignature(t, kring, readerFromHex(detachedSignatureP256Hex), signedInput, "binary", testKeyP256KeyId)
-***REMOVED***
+}
 
-func testHashFunctionError(t *testing.T, signatureHex string) ***REMOVED***
+func testHashFunctionError(t *testing.T, signatureHex string) {
 	kring, _ := ReadKeyRing(readerFromHex(testKeys1And2Hex))
 	_, err := CheckDetachedSignature(kring, nil, readerFromHex(signatureHex))
-	if err == nil ***REMOVED***
+	if err == nil {
 		t.Fatal("Packet with bad hash type was correctly parsed")
-	***REMOVED***
+	}
 	unsupported, ok := err.(errors.UnsupportedError)
-	if !ok ***REMOVED***
+	if !ok {
 		t.Fatalf("Unexpected class of error: %s", err)
-	***REMOVED***
-	if !strings.Contains(string(unsupported), "hash ") ***REMOVED***
+	}
+	if !strings.Contains(string(unsupported), "hash ") {
 		t.Fatalf("Unexpected error: %s", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestUnknownHashFunction(t *testing.T) ***REMOVED***
+func TestUnknownHashFunction(t *testing.T) {
 	// unknownHashFunctionHex contains a signature packet with hash
 	// function type 153 (which isn't a real hash function id).
 	testHashFunctionError(t, unknownHashFunctionHex)
-***REMOVED***
+}
 
-func TestMissingHashFunction(t *testing.T) ***REMOVED***
+func TestMissingHashFunction(t *testing.T) {
 	// missingHashFunctionHex contains a signature packet that uses
 	// RIPEMD160, which isn't compiled in.  Since that's the only signature
 	// packet we don't find any suitable packets and end up with ErrUnknownIssuer
 	kring, _ := ReadKeyRing(readerFromHex(testKeys1And2Hex))
 	_, err := CheckDetachedSignature(kring, nil, readerFromHex(missingHashFunctionHex))
-	if err == nil ***REMOVED***
+	if err == nil {
 		t.Fatal("Packet with missing hash type was correctly parsed")
-	***REMOVED***
-	if err != errors.ErrUnknownIssuer ***REMOVED***
+	}
+	if err != errors.ErrUnknownIssuer {
 		t.Fatalf("Unexpected class of error: %s", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestReadingArmoredPrivateKey(t *testing.T) ***REMOVED***
+func TestReadingArmoredPrivateKey(t *testing.T) {
 	el, err := ReadArmoredKeyRing(bytes.NewBufferString(armoredPrivateKeyBlock))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Error(err)
-	***REMOVED***
-	if len(el) != 1 ***REMOVED***
+	}
+	if len(el) != 1 {
 		t.Errorf("got %d entities, wanted 1\n", len(el))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestReadingArmoredPublicKey(t *testing.T) ***REMOVED***
+func TestReadingArmoredPublicKey(t *testing.T) {
 	el, err := ReadArmoredKeyRing(bytes.NewBufferString(e2ePublicKey))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Error(err)
-	***REMOVED***
-	if len(el) != 1 ***REMOVED***
+	}
+	if len(el) != 1 {
 		t.Errorf("didn't get a valid entity")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestNoArmoredData(t *testing.T) ***REMOVED***
+func TestNoArmoredData(t *testing.T) {
 	_, err := ReadArmoredKeyRing(bytes.NewBufferString("foo"))
-	if _, ok := err.(errors.InvalidArgumentError); !ok ***REMOVED***
+	if _, ok := err.(errors.InvalidArgumentError); !ok {
 		t.Errorf("error was not an InvalidArgumentError: %s", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func testReadMessageError(t *testing.T, messageHex string) ***REMOVED***
+func testReadMessageError(t *testing.T, messageHex string) {
 	buf, err := hex.DecodeString(messageHex)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("hex.DecodeString(): %v", err)
-	***REMOVED***
+	}
 
 	kr, err := ReadKeyRing(new(bytes.Buffer))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("ReadKeyring(): %v", err)
-	***REMOVED***
+	}
 
 	_, err = ReadMessage(bytes.NewBuffer(buf), kr,
-		func([]Key, bool) ([]byte, error) ***REMOVED***
+		func([]Key, bool) ([]byte, error) {
 			return []byte("insecure"), nil
-		***REMOVED***, nil)
+		}, nil)
 
-	if err == nil ***REMOVED***
+	if err == nil {
 		t.Errorf("ReadMessage(): Unexpected nil error")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestIssue11503(t *testing.T) ***REMOVED***
+func TestIssue11503(t *testing.T) {
 	testReadMessageError(t, "8c040402000aa430aa8228b9248b01fc899a91197130303030")
-***REMOVED***
+}
 
-func TestIssue11504(t *testing.T) ***REMOVED***
+func TestIssue11504(t *testing.T) {
 	testReadMessageError(t, "9303000130303030303030303030983002303030303030030000000130")
-***REMOVED***
+}
 
 // TestSignatureV3Message tests the verification of V3 signature, generated
 // with a modern V4-style key.  Some people have their clients set to generate
 // V3 signatures, so it's useful to be able to verify them.
-func TestSignatureV3Message(t *testing.T) ***REMOVED***
+func TestSignatureV3Message(t *testing.T) {
 	sig, err := armor.Decode(strings.NewReader(signedMessageV3))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Error(err)
 		return
-	***REMOVED***
+	}
 	key, err := ReadArmoredKeyRing(strings.NewReader(keyV4forVerifyingSignedMessageV3))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Error(err)
 		return
-	***REMOVED***
+	}
 	md, err := ReadMessage(sig.Body, key, nil, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Error(err)
 		return
-	***REMOVED***
+	}
 
 	_, err = ioutil.ReadAll(md.UnverifiedBody)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Error(err)
 		return
-	***REMOVED***
+	}
 
 	// We'll see a sig error here after reading in the UnverifiedBody above,
 	// if there was one to see.
-	if err = md.SignatureError; err != nil ***REMOVED***
+	if err = md.SignatureError; err != nil {
 		t.Error(err)
 		return
-	***REMOVED***
+	}
 
-	if md.SignatureV3 == nil ***REMOVED***
+	if md.SignatureV3 == nil {
 		t.Errorf("No available signature after checking signature")
 		return
-	***REMOVED***
-	if md.Signature != nil ***REMOVED***
+	}
+	if md.Signature != nil {
 		t.Errorf("Did not expect a signature V4 back")
 		return
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 const testKey1KeyId = 0xA34D7E18C20C31BB
 const testKey3KeyId = 0x338934250CCC0360

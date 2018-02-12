@@ -22,142 +22,142 @@ import (
 
 // Server wraps an Agent and uses it to implement the agent side of
 // the SSH-agent, wire protocol.
-type server struct ***REMOVED***
+type server struct {
 	agent Agent
-***REMOVED***
+}
 
-func (s *server) processRequestBytes(reqData []byte) []byte ***REMOVED***
+func (s *server) processRequestBytes(reqData []byte) []byte {
 	rep, err := s.processRequest(reqData)
-	if err != nil ***REMOVED***
-		if err != errLocked ***REMOVED***
+	if err != nil {
+		if err != errLocked {
 			// TODO(hanwen): provide better logging interface?
 			log.Printf("agent %d: %v", reqData[0], err)
-		***REMOVED***
-		return []byte***REMOVED***agentFailure***REMOVED***
-	***REMOVED***
+		}
+		return []byte{agentFailure}
+	}
 
-	if err == nil && rep == nil ***REMOVED***
-		return []byte***REMOVED***agentSuccess***REMOVED***
-	***REMOVED***
+	if err == nil && rep == nil {
+		return []byte{agentSuccess}
+	}
 
 	return ssh.Marshal(rep)
-***REMOVED***
+}
 
-func marshalKey(k *Key) []byte ***REMOVED***
-	var record struct ***REMOVED***
+func marshalKey(k *Key) []byte {
+	var record struct {
 		Blob    []byte
 		Comment string
-	***REMOVED***
+	}
 	record.Blob = k.Marshal()
 	record.Comment = k.Comment
 
 	return ssh.Marshal(&record)
-***REMOVED***
+}
 
 // See [PROTOCOL.agent], section 2.5.1.
 const agentV1IdentitiesAnswer = 2
 
-type agentV1IdentityMsg struct ***REMOVED***
+type agentV1IdentityMsg struct {
 	Numkeys uint32 `sshtype:"2"`
-***REMOVED***
+}
 
-type agentRemoveIdentityMsg struct ***REMOVED***
+type agentRemoveIdentityMsg struct {
 	KeyBlob []byte `sshtype:"18"`
-***REMOVED***
+}
 
-type agentLockMsg struct ***REMOVED***
+type agentLockMsg struct {
 	Passphrase []byte `sshtype:"22"`
-***REMOVED***
+}
 
-type agentUnlockMsg struct ***REMOVED***
+type agentUnlockMsg struct {
 	Passphrase []byte `sshtype:"23"`
-***REMOVED***
+}
 
-func (s *server) processRequest(data []byte) (interface***REMOVED******REMOVED***, error) ***REMOVED***
-	switch data[0] ***REMOVED***
+func (s *server) processRequest(data []byte) (interface{}, error) {
+	switch data[0] {
 	case agentRequestV1Identities:
-		return &agentV1IdentityMsg***REMOVED***0***REMOVED***, nil
+		return &agentV1IdentityMsg{0}, nil
 
 	case agentRemoveAllV1Identities:
 		return nil, nil
 
 	case agentRemoveIdentity:
 		var req agentRemoveIdentityMsg
-		if err := ssh.Unmarshal(data, &req); err != nil ***REMOVED***
+		if err := ssh.Unmarshal(data, &req); err != nil {
 			return nil, err
-		***REMOVED***
+		}
 
 		var wk wireKey
-		if err := ssh.Unmarshal(req.KeyBlob, &wk); err != nil ***REMOVED***
+		if err := ssh.Unmarshal(req.KeyBlob, &wk); err != nil {
 			return nil, err
-		***REMOVED***
+		}
 
-		return nil, s.agent.Remove(&Key***REMOVED***Format: wk.Format, Blob: req.KeyBlob***REMOVED***)
+		return nil, s.agent.Remove(&Key{Format: wk.Format, Blob: req.KeyBlob})
 
 	case agentRemoveAllIdentities:
 		return nil, s.agent.RemoveAll()
 
 	case agentLock:
 		var req agentLockMsg
-		if err := ssh.Unmarshal(data, &req); err != nil ***REMOVED***
+		if err := ssh.Unmarshal(data, &req); err != nil {
 			return nil, err
-		***REMOVED***
+		}
 
 		return nil, s.agent.Lock(req.Passphrase)
 
 	case agentUnlock:
 		var req agentUnlockMsg
-		if err := ssh.Unmarshal(data, &req); err != nil ***REMOVED***
+		if err := ssh.Unmarshal(data, &req); err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		return nil, s.agent.Unlock(req.Passphrase)
 
 	case agentSignRequest:
 		var req signRequestAgentMsg
-		if err := ssh.Unmarshal(data, &req); err != nil ***REMOVED***
+		if err := ssh.Unmarshal(data, &req); err != nil {
 			return nil, err
-		***REMOVED***
+		}
 
 		var wk wireKey
-		if err := ssh.Unmarshal(req.KeyBlob, &wk); err != nil ***REMOVED***
+		if err := ssh.Unmarshal(req.KeyBlob, &wk); err != nil {
 			return nil, err
-		***REMOVED***
+		}
 
-		k := &Key***REMOVED***
+		k := &Key{
 			Format: wk.Format,
 			Blob:   req.KeyBlob,
-		***REMOVED***
+		}
 
 		sig, err := s.agent.Sign(k, req.Data) //  TODO(hanwen): flags.
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-		return &signResponseAgentMsg***REMOVED***SigBlob: ssh.Marshal(sig)***REMOVED***, nil
+		}
+		return &signResponseAgentMsg{SigBlob: ssh.Marshal(sig)}, nil
 
 	case agentRequestIdentities:
 		keys, err := s.agent.List()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 
-		rep := identitiesAnswerAgentMsg***REMOVED***
+		rep := identitiesAnswerAgentMsg{
 			NumKeys: uint32(len(keys)),
-		***REMOVED***
-		for _, k := range keys ***REMOVED***
+		}
+		for _, k := range keys {
 			rep.Keys = append(rep.Keys, marshalKey(k)...)
-		***REMOVED***
+		}
 		return rep, nil
 
 	case agentAddIDConstrained, agentAddIdentity:
 		return nil, s.insertIdentity(data)
-	***REMOVED***
+	}
 
 	return nil, fmt.Errorf("unknown opcode %d", data[0])
-***REMOVED***
+}
 
-func parseConstraints(constraints []byte) (lifetimeSecs uint32, confirmBeforeUse bool, extensions []ConstraintExtension, err error) ***REMOVED***
-	for len(constraints) != 0 ***REMOVED***
-		switch constraints[0] ***REMOVED***
+func parseConstraints(constraints []byte) (lifetimeSecs uint32, confirmBeforeUse bool, extensions []ConstraintExtension, err error) {
+	for len(constraints) != 0 {
+		switch constraints[0] {
 		case agentConstrainLifetime:
 			lifetimeSecs = binary.BigEndian.Uint32(constraints[1:5])
 			constraints = constraints[5:]
@@ -166,102 +166,102 @@ func parseConstraints(constraints []byte) (lifetimeSecs uint32, confirmBeforeUse
 			constraints = constraints[1:]
 		case agentConstrainExtension:
 			var msg constrainExtensionAgentMsg
-			if err = ssh.Unmarshal(constraints, &msg); err != nil ***REMOVED***
+			if err = ssh.Unmarshal(constraints, &msg); err != nil {
 				return 0, false, nil, err
-			***REMOVED***
-			extensions = append(extensions, ConstraintExtension***REMOVED***
+			}
+			extensions = append(extensions, ConstraintExtension{
 				ExtensionName:    msg.ExtensionName,
 				ExtensionDetails: msg.ExtensionDetails,
-			***REMOVED***)
+			})
 			constraints = msg.Rest
 		default:
 			return 0, false, nil, fmt.Errorf("unknown constraint type: %d", constraints[0])
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}
 
-func setConstraints(key *AddedKey, constraintBytes []byte) error ***REMOVED***
+func setConstraints(key *AddedKey, constraintBytes []byte) error {
 	lifetimeSecs, confirmBeforeUse, constraintExtensions, err := parseConstraints(constraintBytes)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	key.LifetimeSecs = lifetimeSecs
 	key.ConfirmBeforeUse = confirmBeforeUse
 	key.ConstraintExtensions = constraintExtensions
 	return nil
-***REMOVED***
+}
 
-func parseRSAKey(req []byte) (*AddedKey, error) ***REMOVED***
+func parseRSAKey(req []byte) (*AddedKey, error) {
 	var k rsaKeyMsg
-	if err := ssh.Unmarshal(req, &k); err != nil ***REMOVED***
+	if err := ssh.Unmarshal(req, &k); err != nil {
 		return nil, err
-	***REMOVED***
-	if k.E.BitLen() > 30 ***REMOVED***
+	}
+	if k.E.BitLen() > 30 {
 		return nil, errors.New("agent: RSA public exponent too large")
-	***REMOVED***
-	priv := &rsa.PrivateKey***REMOVED***
-		PublicKey: rsa.PublicKey***REMOVED***
+	}
+	priv := &rsa.PrivateKey{
+		PublicKey: rsa.PublicKey{
 			E: int(k.E.Int64()),
 			N: k.N,
-		***REMOVED***,
+		},
 		D:      k.D,
-		Primes: []*big.Int***REMOVED***k.P, k.Q***REMOVED***,
-	***REMOVED***
+		Primes: []*big.Int{k.P, k.Q},
+	}
 	priv.Precompute()
 
-	addedKey := &AddedKey***REMOVED***PrivateKey: priv, Comment: k.Comments***REMOVED***
-	if err := setConstraints(addedKey, k.Constraints); err != nil ***REMOVED***
+	addedKey := &AddedKey{PrivateKey: priv, Comment: k.Comments}
+	if err := setConstraints(addedKey, k.Constraints); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return addedKey, nil
-***REMOVED***
+}
 
-func parseEd25519Key(req []byte) (*AddedKey, error) ***REMOVED***
+func parseEd25519Key(req []byte) (*AddedKey, error) {
 	var k ed25519KeyMsg
-	if err := ssh.Unmarshal(req, &k); err != nil ***REMOVED***
+	if err := ssh.Unmarshal(req, &k); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	priv := ed25519.PrivateKey(k.Priv)
 
-	addedKey := &AddedKey***REMOVED***PrivateKey: &priv, Comment: k.Comments***REMOVED***
-	if err := setConstraints(addedKey, k.Constraints); err != nil ***REMOVED***
+	addedKey := &AddedKey{PrivateKey: &priv, Comment: k.Comments}
+	if err := setConstraints(addedKey, k.Constraints); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return addedKey, nil
-***REMOVED***
+}
 
-func parseDSAKey(req []byte) (*AddedKey, error) ***REMOVED***
+func parseDSAKey(req []byte) (*AddedKey, error) {
 	var k dsaKeyMsg
-	if err := ssh.Unmarshal(req, &k); err != nil ***REMOVED***
+	if err := ssh.Unmarshal(req, &k); err != nil {
 		return nil, err
-	***REMOVED***
-	priv := &dsa.PrivateKey***REMOVED***
-		PublicKey: dsa.PublicKey***REMOVED***
-			Parameters: dsa.Parameters***REMOVED***
+	}
+	priv := &dsa.PrivateKey{
+		PublicKey: dsa.PublicKey{
+			Parameters: dsa.Parameters{
 				P: k.P,
 				Q: k.Q,
 				G: k.G,
-			***REMOVED***,
+			},
 			Y: k.Y,
-		***REMOVED***,
+		},
 		X: k.X,
-	***REMOVED***
+	}
 
-	addedKey := &AddedKey***REMOVED***PrivateKey: priv, Comment: k.Comments***REMOVED***
-	if err := setConstraints(addedKey, k.Constraints); err != nil ***REMOVED***
+	addedKey := &AddedKey{PrivateKey: priv, Comment: k.Comments}
+	if err := setConstraints(addedKey, k.Constraints); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return addedKey, nil
-***REMOVED***
+}
 
-func unmarshalECDSA(curveName string, keyBytes []byte, privScalar *big.Int) (priv *ecdsa.PrivateKey, err error) ***REMOVED***
-	priv = &ecdsa.PrivateKey***REMOVED***
+func unmarshalECDSA(curveName string, keyBytes []byte, privScalar *big.Int) (priv *ecdsa.PrivateKey, err error) {
+	priv = &ecdsa.PrivateKey{
 		D: privScalar,
-	***REMOVED***
+	}
 
-	switch curveName ***REMOVED***
+	switch curveName {
 	case "nistp256":
 		priv.Curve = elliptic.P256()
 	case "nistp384":
@@ -270,196 +270,196 @@ func unmarshalECDSA(curveName string, keyBytes []byte, privScalar *big.Int) (pri
 		priv.Curve = elliptic.P521()
 	default:
 		return nil, fmt.Errorf("agent: unknown curve %q", curveName)
-	***REMOVED***
+	}
 
 	priv.X, priv.Y = elliptic.Unmarshal(priv.Curve, keyBytes)
-	if priv.X == nil || priv.Y == nil ***REMOVED***
+	if priv.X == nil || priv.Y == nil {
 		return nil, errors.New("agent: point not on curve")
-	***REMOVED***
+	}
 
 	return priv, nil
-***REMOVED***
+}
 
-func parseEd25519Cert(req []byte) (*AddedKey, error) ***REMOVED***
+func parseEd25519Cert(req []byte) (*AddedKey, error) {
 	var k ed25519CertMsg
-	if err := ssh.Unmarshal(req, &k); err != nil ***REMOVED***
+	if err := ssh.Unmarshal(req, &k); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	pubKey, err := ssh.ParsePublicKey(k.CertBytes)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	priv := ed25519.PrivateKey(k.Priv)
 	cert, ok := pubKey.(*ssh.Certificate)
-	if !ok ***REMOVED***
+	if !ok {
 		return nil, errors.New("agent: bad ED25519 certificate")
-	***REMOVED***
+	}
 
-	addedKey := &AddedKey***REMOVED***PrivateKey: &priv, Certificate: cert, Comment: k.Comments***REMOVED***
-	if err := setConstraints(addedKey, k.Constraints); err != nil ***REMOVED***
+	addedKey := &AddedKey{PrivateKey: &priv, Certificate: cert, Comment: k.Comments}
+	if err := setConstraints(addedKey, k.Constraints); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return addedKey, nil
-***REMOVED***
+}
 
-func parseECDSAKey(req []byte) (*AddedKey, error) ***REMOVED***
+func parseECDSAKey(req []byte) (*AddedKey, error) {
 	var k ecdsaKeyMsg
-	if err := ssh.Unmarshal(req, &k); err != nil ***REMOVED***
+	if err := ssh.Unmarshal(req, &k); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	priv, err := unmarshalECDSA(k.Curve, k.KeyBytes, k.D)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	addedKey := &AddedKey***REMOVED***PrivateKey: priv, Comment: k.Comments***REMOVED***
-	if err := setConstraints(addedKey, k.Constraints); err != nil ***REMOVED***
+	addedKey := &AddedKey{PrivateKey: priv, Comment: k.Comments}
+	if err := setConstraints(addedKey, k.Constraints); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return addedKey, nil
-***REMOVED***
+}
 
-func parseRSACert(req []byte) (*AddedKey, error) ***REMOVED***
+func parseRSACert(req []byte) (*AddedKey, error) {
 	var k rsaCertMsg
-	if err := ssh.Unmarshal(req, &k); err != nil ***REMOVED***
+	if err := ssh.Unmarshal(req, &k); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	pubKey, err := ssh.ParsePublicKey(k.CertBytes)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	cert, ok := pubKey.(*ssh.Certificate)
-	if !ok ***REMOVED***
+	if !ok {
 		return nil, errors.New("agent: bad RSA certificate")
-	***REMOVED***
+	}
 
 	// An RSA publickey as marshaled by rsaPublicKey.Marshal() in keys.go
-	var rsaPub struct ***REMOVED***
+	var rsaPub struct {
 		Name string
 		E    *big.Int
 		N    *big.Int
-	***REMOVED***
-	if err := ssh.Unmarshal(cert.Key.Marshal(), &rsaPub); err != nil ***REMOVED***
+	}
+	if err := ssh.Unmarshal(cert.Key.Marshal(), &rsaPub); err != nil {
 		return nil, fmt.Errorf("agent: Unmarshal failed to parse public key: %v", err)
-	***REMOVED***
+	}
 
-	if rsaPub.E.BitLen() > 30 ***REMOVED***
+	if rsaPub.E.BitLen() > 30 {
 		return nil, errors.New("agent: RSA public exponent too large")
-	***REMOVED***
+	}
 
-	priv := rsa.PrivateKey***REMOVED***
-		PublicKey: rsa.PublicKey***REMOVED***
+	priv := rsa.PrivateKey{
+		PublicKey: rsa.PublicKey{
 			E: int(rsaPub.E.Int64()),
 			N: rsaPub.N,
-		***REMOVED***,
+		},
 		D:      k.D,
-		Primes: []*big.Int***REMOVED***k.Q, k.P***REMOVED***,
-	***REMOVED***
+		Primes: []*big.Int{k.Q, k.P},
+	}
 	priv.Precompute()
 
-	addedKey := &AddedKey***REMOVED***PrivateKey: &priv, Certificate: cert, Comment: k.Comments***REMOVED***
-	if err := setConstraints(addedKey, k.Constraints); err != nil ***REMOVED***
+	addedKey := &AddedKey{PrivateKey: &priv, Certificate: cert, Comment: k.Comments}
+	if err := setConstraints(addedKey, k.Constraints); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return addedKey, nil
-***REMOVED***
+}
 
-func parseDSACert(req []byte) (*AddedKey, error) ***REMOVED***
+func parseDSACert(req []byte) (*AddedKey, error) {
 	var k dsaCertMsg
-	if err := ssh.Unmarshal(req, &k); err != nil ***REMOVED***
+	if err := ssh.Unmarshal(req, &k); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	pubKey, err := ssh.ParsePublicKey(k.CertBytes)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	cert, ok := pubKey.(*ssh.Certificate)
-	if !ok ***REMOVED***
+	if !ok {
 		return nil, errors.New("agent: bad DSA certificate")
-	***REMOVED***
+	}
 
 	// A DSA publickey as marshaled by dsaPublicKey.Marshal() in keys.go
-	var w struct ***REMOVED***
+	var w struct {
 		Name       string
 		P, Q, G, Y *big.Int
-	***REMOVED***
-	if err := ssh.Unmarshal(cert.Key.Marshal(), &w); err != nil ***REMOVED***
+	}
+	if err := ssh.Unmarshal(cert.Key.Marshal(), &w); err != nil {
 		return nil, fmt.Errorf("agent: Unmarshal failed to parse public key: %v", err)
-	***REMOVED***
+	}
 
-	priv := &dsa.PrivateKey***REMOVED***
-		PublicKey: dsa.PublicKey***REMOVED***
-			Parameters: dsa.Parameters***REMOVED***
+	priv := &dsa.PrivateKey{
+		PublicKey: dsa.PublicKey{
+			Parameters: dsa.Parameters{
 				P: w.P,
 				Q: w.Q,
 				G: w.G,
-			***REMOVED***,
+			},
 			Y: w.Y,
-		***REMOVED***,
+		},
 		X: k.X,
-	***REMOVED***
+	}
 
-	addedKey := &AddedKey***REMOVED***PrivateKey: priv, Certificate: cert, Comment: k.Comments***REMOVED***
-	if err := setConstraints(addedKey, k.Constraints); err != nil ***REMOVED***
+	addedKey := &AddedKey{PrivateKey: priv, Certificate: cert, Comment: k.Comments}
+	if err := setConstraints(addedKey, k.Constraints); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return addedKey, nil
-***REMOVED***
+}
 
-func parseECDSACert(req []byte) (*AddedKey, error) ***REMOVED***
+func parseECDSACert(req []byte) (*AddedKey, error) {
 	var k ecdsaCertMsg
-	if err := ssh.Unmarshal(req, &k); err != nil ***REMOVED***
+	if err := ssh.Unmarshal(req, &k); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	pubKey, err := ssh.ParsePublicKey(k.CertBytes)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	cert, ok := pubKey.(*ssh.Certificate)
-	if !ok ***REMOVED***
+	if !ok {
 		return nil, errors.New("agent: bad ECDSA certificate")
-	***REMOVED***
+	}
 
 	// An ECDSA publickey as marshaled by ecdsaPublicKey.Marshal() in keys.go
-	var ecdsaPub struct ***REMOVED***
+	var ecdsaPub struct {
 		Name string
 		ID   string
 		Key  []byte
-	***REMOVED***
-	if err := ssh.Unmarshal(cert.Key.Marshal(), &ecdsaPub); err != nil ***REMOVED***
+	}
+	if err := ssh.Unmarshal(cert.Key.Marshal(), &ecdsaPub); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	priv, err := unmarshalECDSA(ecdsaPub.ID, ecdsaPub.Key, k.D)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	addedKey := &AddedKey***REMOVED***PrivateKey: priv, Certificate: cert, Comment: k.Comments***REMOVED***
-	if err := setConstraints(addedKey, k.Constraints); err != nil ***REMOVED***
+	addedKey := &AddedKey{PrivateKey: priv, Certificate: cert, Comment: k.Comments}
+	if err := setConstraints(addedKey, k.Constraints); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return addedKey, nil
-***REMOVED***
+}
 
-func (s *server) insertIdentity(req []byte) error ***REMOVED***
-	var record struct ***REMOVED***
+func (s *server) insertIdentity(req []byte) error {
+	var record struct {
 		Type string `sshtype:"17|25"`
 		Rest []byte `ssh:"rest"`
-	***REMOVED***
+	}
 
-	if err := ssh.Unmarshal(req, &record); err != nil ***REMOVED***
+	if err := ssh.Unmarshal(req, &record); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	var addedKey *AddedKey
 	var err error
 
-	switch record.Type ***REMOVED***
+	switch record.Type {
 	case ssh.KeyAlgoRSA:
 		addedKey, err = parseRSAKey(req)
 	case ssh.KeyAlgoDSA:
@@ -478,46 +478,46 @@ func (s *server) insertIdentity(req []byte) error ***REMOVED***
 		addedKey, err = parseEd25519Cert(req)
 	default:
 		return fmt.Errorf("agent: not implemented: %q", record.Type)
-	***REMOVED***
+	}
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return s.agent.Add(*addedKey)
-***REMOVED***
+}
 
 // ServeAgent serves the agent protocol on the given connection. It
 // returns when an I/O error occurs.
-func ServeAgent(agent Agent, c io.ReadWriter) error ***REMOVED***
-	s := &server***REMOVED***agent***REMOVED***
+func ServeAgent(agent Agent, c io.ReadWriter) error {
+	s := &server{agent}
 
 	var length [4]byte
-	for ***REMOVED***
-		if _, err := io.ReadFull(c, length[:]); err != nil ***REMOVED***
+	for {
+		if _, err := io.ReadFull(c, length[:]); err != nil {
 			return err
-		***REMOVED***
+		}
 		l := binary.BigEndian.Uint32(length[:])
-		if l > maxAgentResponseBytes ***REMOVED***
+		if l > maxAgentResponseBytes {
 			// We also cap requests.
 			return fmt.Errorf("agent: request too large: %d", l)
-		***REMOVED***
+		}
 
 		req := make([]byte, l)
-		if _, err := io.ReadFull(c, req); err != nil ***REMOVED***
+		if _, err := io.ReadFull(c, req); err != nil {
 			return err
-		***REMOVED***
+		}
 
 		repData := s.processRequestBytes(req)
-		if len(repData) > maxAgentResponseBytes ***REMOVED***
+		if len(repData) > maxAgentResponseBytes {
 			return fmt.Errorf("agent: reply too large: %d bytes", len(repData))
-		***REMOVED***
+		}
 
 		binary.BigEndian.PutUint32(length[:], uint32(len(repData)))
-		if _, err := c.Write(length[:]); err != nil ***REMOVED***
+		if _, err := c.Write(length[:]); err != nil {
 			return err
-		***REMOVED***
-		if _, err := c.Write(repData); err != nil ***REMOVED***
+		}
+		if _, err := c.Write(repData); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

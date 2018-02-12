@@ -15,7 +15,7 @@ The idea was posted by Brad Fitzpatrick to the go-nuts mailing list:
 	http://groups.google.com/group/golang-nuts/msg/e2d679d303aa5d53
 
 Here's the basic usage: first define the keys that you will need. The key
-type is interface***REMOVED******REMOVED*** so a key can be of any type that supports equality.
+type is interface{} so a key can be of any type that supports equality.
 Here we define a key using a custom int type to avoid name collisions:
 
 	package foo
@@ -35,14 +35,14 @@ need a request instance to set a value:
 
 The application can later access the variable using the same key you provided:
 
-	func MyHandler(w http.ResponseWriter, r *http.Request) ***REMOVED***
+	func MyHandler(w http.ResponseWriter, r *http.Request) {
 		// val is "bar".
 		val := context.Get(r, foo.MyKey)
 
 		// returns ("bar", true)
 		val, ok := context.GetOk(r, foo.MyKey)
 		// ...
-	***REMOVED***
+	}
 
 And that's all about the basic usage. We discuss some other ideas below.
 
@@ -55,17 +55,17 @@ type:
 	const mykey key = 0
 
 	// GetMyKey returns a value for this package from the request values.
-	func GetMyKey(r *http.Request) SomeType ***REMOVED***
-		if rv := context.Get(r, mykey); rv != nil ***REMOVED***
+	func GetMyKey(r *http.Request) SomeType {
+		if rv := context.Get(r, mykey); rv != nil {
 			return rv.(SomeType)
-		***REMOVED***
+		}
 		return nil
-	***REMOVED***
+	}
 
 	// SetMyKey sets a value for this package in the request values.
-	func SetMyKey(r *http.Request, val SomeType) ***REMOVED***
+	func SetMyKey(r *http.Request, val SomeType) {
 		context.Set(r, mykey, val)
-	***REMOVED***
+	}
 
 Variables must be cleared at the end of a request, to remove all values
 that were stored. This can be done in an http.Handler, after a request was

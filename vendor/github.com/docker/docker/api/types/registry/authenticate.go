@@ -9,7 +9,7 @@ package registry
 
 // AuthenticateOKBody authenticate o k body
 // swagger:model AuthenticateOKBody
-type AuthenticateOKBody struct ***REMOVED***
+type AuthenticateOKBody struct {
 
 	// An opaque token used to authenticate a user after a successful login
 	// Required: true
@@ -18,4 +18,4 @@ type AuthenticateOKBody struct ***REMOVED***
 	// The status of the authentication
 	// Required: true
 	Status string `json:"Status"`
-***REMOVED***
+}

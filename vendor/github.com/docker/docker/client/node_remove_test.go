@@ -13,57 +13,57 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestNodeRemoveError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestNodeRemoveError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
-	***REMOVED***
+	}
 
-	err := client.NodeRemove(context.Background(), "node_id", types.NodeRemoveOptions***REMOVED***Force: false***REMOVED***)
-	if err == nil || err.Error() != "Error response from daemon: Server error" ***REMOVED***
+	err := client.NodeRemove(context.Background(), "node_id", types.NodeRemoveOptions{Force: false})
+	if err == nil || err.Error() != "Error response from daemon: Server error" {
 		t.Fatalf("expected a Server Error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestNodeRemove(t *testing.T) ***REMOVED***
+func TestNodeRemove(t *testing.T) {
 	expectedURL := "/nodes/node_id"
 
-	removeCases := []struct ***REMOVED***
+	removeCases := []struct {
 		force         bool
 		expectedForce string
-	***REMOVED******REMOVED***
-		***REMOVED***
+	}{
+		{
 			expectedForce: "",
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			force:         true,
 			expectedForce: "1",
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
-	for _, removeCase := range removeCases ***REMOVED***
-		client := &Client***REMOVED***
-			client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-				if !strings.HasPrefix(req.URL.Path, expectedURL) ***REMOVED***
+	for _, removeCase := range removeCases {
+		client := &Client{
+			client: newMockClient(func(req *http.Request) (*http.Response, error) {
+				if !strings.HasPrefix(req.URL.Path, expectedURL) {
 					return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, req.URL)
-				***REMOVED***
-				if req.Method != "DELETE" ***REMOVED***
+				}
+				if req.Method != "DELETE" {
 					return nil, fmt.Errorf("expected DELETE method, got %s", req.Method)
-				***REMOVED***
+				}
 				force := req.URL.Query().Get("force")
-				if force != removeCase.expectedForce ***REMOVED***
+				if force != removeCase.expectedForce {
 					return nil, fmt.Errorf("force not set in URL query properly. expected '%s', got %s", removeCase.expectedForce, force)
-				***REMOVED***
+				}
 
-				return &http.Response***REMOVED***
+				return &http.Response{
 					StatusCode: http.StatusOK,
 					Body:       ioutil.NopCloser(bytes.NewReader([]byte("body"))),
-				***REMOVED***, nil
-			***REMOVED***),
-		***REMOVED***
+				}, nil
+			}),
+		}
 
-		err := client.NodeRemove(context.Background(), "node_id", types.NodeRemoveOptions***REMOVED***Force: removeCase.force***REMOVED***)
-		if err != nil ***REMOVED***
+		err := client.NodeRemove(context.Background(), "node_id", types.NodeRemoveOptions{Force: removeCase.force})
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

@@ -16,22 +16,22 @@ package client
 
 import "fmt"
 
-type ClusterError struct ***REMOVED***
+type ClusterError struct {
 	Errors []error
-***REMOVED***
+}
 
-func (ce *ClusterError) Error() string ***REMOVED***
+func (ce *ClusterError) Error() string {
 	s := ErrClusterUnavailable.Error()
-	for i, e := range ce.Errors ***REMOVED***
+	for i, e := range ce.Errors {
 		s += fmt.Sprintf("; error #%d: %s\n", i, e)
-	***REMOVED***
+	}
 	return s
-***REMOVED***
+}
 
-func (ce *ClusterError) Detail() string ***REMOVED***
+func (ce *ClusterError) Detail() string {
 	s := ""
-	for i, e := range ce.Errors ***REMOVED***
+	for i, e := range ce.Errors {
 		s += fmt.Sprintf("error #%d: %s\n", i, e)
-	***REMOVED***
+	}
 	return s
-***REMOVED***
+}

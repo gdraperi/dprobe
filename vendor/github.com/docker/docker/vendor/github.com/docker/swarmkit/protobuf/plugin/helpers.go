@@ -6,6 +6,6 @@ import (
 )
 
 // DeepcopyEnabled returns true if deepcopy is enabled for the descriptor.
-func DeepcopyEnabled(options *google_protobuf.MessageOptions) bool ***REMOVED***
+func DeepcopyEnabled(options *google_protobuf.MessageOptions) bool {
 	return proto.GetBoolExtension(options, E_Deepcopy, true)
-***REMOVED***
+}

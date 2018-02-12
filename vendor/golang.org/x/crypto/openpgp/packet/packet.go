@@ -19,261 +19,261 @@ import (
 
 // readFull is the same as io.ReadFull except that reading zero bytes returns
 // ErrUnexpectedEOF rather than EOF.
-func readFull(r io.Reader, buf []byte) (n int, err error) ***REMOVED***
+func readFull(r io.Reader, buf []byte) (n int, err error) {
 	n, err = io.ReadFull(r, buf)
-	if err == io.EOF ***REMOVED***
+	if err == io.EOF {
 		err = io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // readLength reads an OpenPGP length from r. See RFC 4880, section 4.2.2.
-func readLength(r io.Reader) (length int64, isPartial bool, err error) ***REMOVED***
+func readLength(r io.Reader) (length int64, isPartial bool, err error) {
 	var buf [4]byte
 	_, err = readFull(r, buf[:1])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
-	switch ***REMOVED***
+	}
+	switch {
 	case buf[0] < 192:
 		length = int64(buf[0])
 	case buf[0] < 224:
 		length = int64(buf[0]-192) << 8
 		_, err = readFull(r, buf[0:1])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
+		}
 		length += int64(buf[0]) + 192
 	case buf[0] < 255:
 		length = int64(1) << (buf[0] & 0x1f)
 		isPartial = true
 	default:
 		_, err = readFull(r, buf[0:4])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
+		}
 		length = int64(buf[0])<<24 |
 			int64(buf[1])<<16 |
 			int64(buf[2])<<8 |
 			int64(buf[3])
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // partialLengthReader wraps an io.Reader and handles OpenPGP partial lengths.
 // The continuation lengths are parsed and removed from the stream and EOF is
 // returned at the end of the packet. See RFC 4880, section 4.2.2.4.
-type partialLengthReader struct ***REMOVED***
+type partialLengthReader struct {
 	r         io.Reader
 	remaining int64
 	isPartial bool
-***REMOVED***
+}
 
-func (r *partialLengthReader) Read(p []byte) (n int, err error) ***REMOVED***
-	for r.remaining == 0 ***REMOVED***
-		if !r.isPartial ***REMOVED***
+func (r *partialLengthReader) Read(p []byte) (n int, err error) {
+	for r.remaining == 0 {
+		if !r.isPartial {
 			return 0, io.EOF
-		***REMOVED***
+		}
 		r.remaining, r.isPartial, err = readLength(r.r)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	toRead := int64(len(p))
-	if toRead > r.remaining ***REMOVED***
+	if toRead > r.remaining {
 		toRead = r.remaining
-	***REMOVED***
+	}
 
 	n, err = r.r.Read(p[:int(toRead)])
 	r.remaining -= int64(n)
-	if n < int(toRead) && err == io.EOF ***REMOVED***
+	if n < int(toRead) && err == io.EOF {
 		err = io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // partialLengthWriter writes a stream of data using OpenPGP partial lengths.
 // See RFC 4880, section 4.2.2.4.
-type partialLengthWriter struct ***REMOVED***
+type partialLengthWriter struct {
 	w          io.WriteCloser
 	lengthByte [1]byte
-***REMOVED***
+}
 
-func (w *partialLengthWriter) Write(p []byte) (n int, err error) ***REMOVED***
-	for len(p) > 0 ***REMOVED***
-		for power := uint(14); power < 32; power-- ***REMOVED***
+func (w *partialLengthWriter) Write(p []byte) (n int, err error) {
+	for len(p) > 0 {
+		for power := uint(14); power < 32; power-- {
 			l := 1 << power
-			if len(p) >= l ***REMOVED***
+			if len(p) >= l {
 				w.lengthByte[0] = 224 + uint8(power)
 				_, err = w.w.Write(w.lengthByte[:])
-				if err != nil ***REMOVED***
+				if err != nil {
 					return
-				***REMOVED***
+				}
 				var m int
 				m, err = w.w.Write(p[:l])
 				n += m
-				if err != nil ***REMOVED***
+				if err != nil {
 					return
-				***REMOVED***
+				}
 				p = p[l:]
 				break
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return
-***REMOVED***
+}
 
-func (w *partialLengthWriter) Close() error ***REMOVED***
+func (w *partialLengthWriter) Close() error {
 	w.lengthByte[0] = 0
 	_, err := w.w.Write(w.lengthByte[:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return w.w.Close()
-***REMOVED***
+}
 
 // A spanReader is an io.LimitReader, but it returns ErrUnexpectedEOF if the
 // underlying Reader returns EOF before the limit has been reached.
-type spanReader struct ***REMOVED***
+type spanReader struct {
 	r io.Reader
 	n int64
-***REMOVED***
+}
 
-func (l *spanReader) Read(p []byte) (n int, err error) ***REMOVED***
-	if l.n <= 0 ***REMOVED***
+func (l *spanReader) Read(p []byte) (n int, err error) {
+	if l.n <= 0 {
 		return 0, io.EOF
-	***REMOVED***
-	if int64(len(p)) > l.n ***REMOVED***
+	}
+	if int64(len(p)) > l.n {
 		p = p[0:l.n]
-	***REMOVED***
+	}
 	n, err = l.r.Read(p)
 	l.n -= int64(n)
-	if l.n > 0 && err == io.EOF ***REMOVED***
+	if l.n > 0 && err == io.EOF {
 		err = io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // readHeader parses a packet header and returns an io.Reader which will return
 // the contents of the packet. See RFC 4880, section 4.2.
-func readHeader(r io.Reader) (tag packetType, length int64, contents io.Reader, err error) ***REMOVED***
+func readHeader(r io.Reader) (tag packetType, length int64, contents io.Reader, err error) {
 	var buf [4]byte
 	_, err = io.ReadFull(r, buf[:1])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
-	if buf[0]&0x80 == 0 ***REMOVED***
+	}
+	if buf[0]&0x80 == 0 {
 		err = errors.StructuralError("tag byte does not have MSB set")
 		return
-	***REMOVED***
-	if buf[0]&0x40 == 0 ***REMOVED***
+	}
+	if buf[0]&0x40 == 0 {
 		// Old format packet
 		tag = packetType((buf[0] & 0x3f) >> 2)
 		lengthType := buf[0] & 3
-		if lengthType == 3 ***REMOVED***
+		if lengthType == 3 {
 			length = -1
 			contents = r
 			return
-		***REMOVED***
+		}
 		lengthBytes := 1 << lengthType
 		_, err = readFull(r, buf[0:lengthBytes])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
-		for i := 0; i < lengthBytes; i++ ***REMOVED***
+		}
+		for i := 0; i < lengthBytes; i++ {
 			length <<= 8
 			length |= int64(buf[i])
-		***REMOVED***
-		contents = &spanReader***REMOVED***r, length***REMOVED***
+		}
+		contents = &spanReader{r, length}
 		return
-	***REMOVED***
+	}
 
 	// New format packet
 	tag = packetType(buf[0] & 0x3f)
 	length, isPartial, err := readLength(r)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
-	if isPartial ***REMOVED***
-		contents = &partialLengthReader***REMOVED***
+	}
+	if isPartial {
+		contents = &partialLengthReader{
 			remaining: length,
 			isPartial: true,
 			r:         r,
-		***REMOVED***
+		}
 		length = -1
-	***REMOVED*** else ***REMOVED***
-		contents = &spanReader***REMOVED***r, length***REMOVED***
-	***REMOVED***
+	} else {
+		contents = &spanReader{r, length}
+	}
 	return
-***REMOVED***
+}
 
 // serializeHeader writes an OpenPGP packet header to w. See RFC 4880, section
 // 4.2.
-func serializeHeader(w io.Writer, ptype packetType, length int) (err error) ***REMOVED***
+func serializeHeader(w io.Writer, ptype packetType, length int) (err error) {
 	var buf [6]byte
 	var n int
 
 	buf[0] = 0x80 | 0x40 | byte(ptype)
-	if length < 192 ***REMOVED***
+	if length < 192 {
 		buf[1] = byte(length)
 		n = 2
-	***REMOVED*** else if length < 8384 ***REMOVED***
+	} else if length < 8384 {
 		length -= 192
 		buf[1] = 192 + byte(length>>8)
 		buf[2] = byte(length)
 		n = 3
-	***REMOVED*** else ***REMOVED***
+	} else {
 		buf[1] = 255
 		buf[2] = byte(length >> 24)
 		buf[3] = byte(length >> 16)
 		buf[4] = byte(length >> 8)
 		buf[5] = byte(length)
 		n = 6
-	***REMOVED***
+	}
 
 	_, err = w.Write(buf[:n])
 	return
-***REMOVED***
+}
 
 // serializeStreamHeader writes an OpenPGP packet header to w where the
 // length of the packet is unknown. It returns a io.WriteCloser which can be
 // used to write the contents of the packet. See RFC 4880, section 4.2.
-func serializeStreamHeader(w io.WriteCloser, ptype packetType) (out io.WriteCloser, err error) ***REMOVED***
+func serializeStreamHeader(w io.WriteCloser, ptype packetType) (out io.WriteCloser, err error) {
 	var buf [1]byte
 	buf[0] = 0x80 | 0x40 | byte(ptype)
 	_, err = w.Write(buf[:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
-	out = &partialLengthWriter***REMOVED***w: w***REMOVED***
+	}
+	out = &partialLengthWriter{w: w}
 	return
-***REMOVED***
+}
 
 // Packet represents an OpenPGP packet. Users are expected to try casting
 // instances of this interface to specific packet types.
-type Packet interface ***REMOVED***
+type Packet interface {
 	parse(io.Reader) error
-***REMOVED***
+}
 
 // consumeAll reads from the given Reader until error, returning the number of
 // bytes read.
-func consumeAll(r io.Reader) (n int64, err error) ***REMOVED***
+func consumeAll(r io.Reader) (n int64, err error) {
 	var m int
 	var buf [1024]byte
 
-	for ***REMOVED***
+	for {
 		m, err = r.Read(buf[:])
 		n += int64(m)
-		if err == io.EOF ***REMOVED***
+		if err == io.EOF {
 			err = nil
 			return
-		***REMOVED***
-		if err != nil ***REMOVED***
+		}
+		if err != nil {
 			return
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // packetType represents the numeric ids of the different OpenPGP packet types. See
 // http://www.iana.org/assignments/pgp-parameters/pgp-parameters.xhtml#pgp-parameters-2
@@ -299,59 +299,59 @@ const (
 // peekVersion detects the version of a public key packet about to
 // be read. A bufio.Reader at the original position of the io.Reader
 // is returned.
-func peekVersion(r io.Reader) (bufr *bufio.Reader, ver byte, err error) ***REMOVED***
+func peekVersion(r io.Reader) (bufr *bufio.Reader, ver byte, err error) {
 	bufr = bufio.NewReader(r)
 	var verBuf []byte
-	if verBuf, err = bufr.Peek(1); err != nil ***REMOVED***
+	if verBuf, err = bufr.Peek(1); err != nil {
 		return
-	***REMOVED***
+	}
 	ver = verBuf[0]
 	return
-***REMOVED***
+}
 
 // Read reads a single OpenPGP packet from the given io.Reader. If there is an
 // error parsing a packet, the whole packet is consumed from the input.
-func Read(r io.Reader) (p Packet, err error) ***REMOVED***
+func Read(r io.Reader) (p Packet, err error) {
 	tag, _, contents, err := readHeader(r)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
-	switch tag ***REMOVED***
+	switch tag {
 	case packetTypeEncryptedKey:
 		p = new(EncryptedKey)
 	case packetTypeSignature:
 		var version byte
 		// Detect signature version
-		if contents, version, err = peekVersion(contents); err != nil ***REMOVED***
+		if contents, version, err = peekVersion(contents); err != nil {
 			return
-		***REMOVED***
-		if version < 4 ***REMOVED***
+		}
+		if version < 4 {
 			p = new(SignatureV3)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			p = new(Signature)
-		***REMOVED***
+		}
 	case packetTypeSymmetricKeyEncrypted:
 		p = new(SymmetricKeyEncrypted)
 	case packetTypeOnePassSignature:
 		p = new(OnePassSignature)
 	case packetTypePrivateKey, packetTypePrivateSubkey:
 		pk := new(PrivateKey)
-		if tag == packetTypePrivateSubkey ***REMOVED***
+		if tag == packetTypePrivateSubkey {
 			pk.IsSubkey = true
-		***REMOVED***
+		}
 		p = pk
 	case packetTypePublicKey, packetTypePublicSubkey:
 		var version byte
-		if contents, version, err = peekVersion(contents); err != nil ***REMOVED***
+		if contents, version, err = peekVersion(contents); err != nil {
 			return
-		***REMOVED***
+		}
 		isSubkey := tag == packetTypePublicSubkey
-		if version < 4 ***REMOVED***
-			p = &PublicKeyV3***REMOVED***IsSubkey: isSubkey***REMOVED***
-		***REMOVED*** else ***REMOVED***
-			p = &PublicKey***REMOVED***IsSubkey: isSubkey***REMOVED***
-		***REMOVED***
+		if version < 4 {
+			p = &PublicKeyV3{IsSubkey: isSubkey}
+		} else {
+			p = &PublicKey{IsSubkey: isSubkey}
+		}
 	case packetTypeCompressed:
 		p = new(Compressed)
 	case packetTypeSymmetricallyEncrypted:
@@ -368,15 +368,15 @@ func Read(r io.Reader) (p Packet, err error) ***REMOVED***
 		p = se
 	default:
 		err = errors.UnknownPacketTypeError(tag)
-	***REMOVED***
-	if p != nil ***REMOVED***
+	}
+	if p != nil {
 		err = p.parse(contents)
-	***REMOVED***
-	if err != nil ***REMOVED***
+	}
+	if err != nil {
 		consumeAll(contents)
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // SignatureType represents the different semantic meanings of an OpenPGP
 // signature. See RFC 4880, section 5.2.1.
@@ -414,23 +414,23 @@ const (
 
 // CanEncrypt returns true if it's possible to encrypt a message to a public
 // key of the given type.
-func (pka PublicKeyAlgorithm) CanEncrypt() bool ***REMOVED***
-	switch pka ***REMOVED***
+func (pka PublicKeyAlgorithm) CanEncrypt() bool {
+	switch pka {
 	case PubKeyAlgoRSA, PubKeyAlgoRSAEncryptOnly, PubKeyAlgoElGamal:
 		return true
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
 // CanSign returns true if it's possible for a public key of the given type to
 // sign a message.
-func (pka PublicKeyAlgorithm) CanSign() bool ***REMOVED***
-	switch pka ***REMOVED***
+func (pka PublicKeyAlgorithm) CanSign() bool {
+	switch pka {
 	case PubKeyAlgoRSA, PubKeyAlgoRSASignOnly, PubKeyAlgoDSA, PubKeyAlgoECDSA:
 		return true
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
 // CipherFunction represents the different block ciphers specified for OpenPGP. See
 // http://www.iana.org/assignments/pgp-parameters/pgp-parameters.xhtml#pgp-parameters-13
@@ -445,8 +445,8 @@ const (
 )
 
 // KeySize returns the key size, in bytes, of cipher.
-func (cipher CipherFunction) KeySize() int ***REMOVED***
-	switch cipher ***REMOVED***
+func (cipher CipherFunction) KeySize() int {
+	switch cipher {
 	case Cipher3DES:
 		return 24
 	case CipherCAST5:
@@ -457,73 +457,73 @@ func (cipher CipherFunction) KeySize() int ***REMOVED***
 		return 24
 	case CipherAES256:
 		return 32
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
 // blockSize returns the block size, in bytes, of cipher.
-func (cipher CipherFunction) blockSize() int ***REMOVED***
-	switch cipher ***REMOVED***
+func (cipher CipherFunction) blockSize() int {
+	switch cipher {
 	case Cipher3DES:
 		return des.BlockSize
 	case CipherCAST5:
 		return 8
 	case CipherAES128, CipherAES192, CipherAES256:
 		return 16
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
 // new returns a fresh instance of the given cipher.
-func (cipher CipherFunction) new(key []byte) (block cipher.Block) ***REMOVED***
-	switch cipher ***REMOVED***
+func (cipher CipherFunction) new(key []byte) (block cipher.Block) {
+	switch cipher {
 	case Cipher3DES:
 		block, _ = des.NewTripleDESCipher(key)
 	case CipherCAST5:
 		block, _ = cast5.NewCipher(key)
 	case CipherAES128, CipherAES192, CipherAES256:
 		block, _ = aes.NewCipher(key)
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // readMPI reads a big integer from r. The bit length returned is the bit
 // length that was specified in r. This is preserved so that the integer can be
 // reserialized exactly.
-func readMPI(r io.Reader) (mpi []byte, bitLength uint16, err error) ***REMOVED***
+func readMPI(r io.Reader) (mpi []byte, bitLength uint16, err error) {
 	var buf [2]byte
 	_, err = readFull(r, buf[0:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 	bitLength = uint16(buf[0])<<8 | uint16(buf[1])
 	numBytes := (int(bitLength) + 7) / 8
 	mpi = make([]byte, numBytes)
 	_, err = readFull(r, mpi)
 	return
-***REMOVED***
+}
 
 // mpiLength returns the length of the given *big.Int when serialized as an
 // MPI.
-func mpiLength(n *big.Int) (mpiLengthInBytes int) ***REMOVED***
+func mpiLength(n *big.Int) (mpiLengthInBytes int) {
 	mpiLengthInBytes = 2 /* MPI length */
 	mpiLengthInBytes += (n.BitLen() + 7) / 8
 	return
-***REMOVED***
+}
 
 // writeMPI serializes a big integer to w.
-func writeMPI(w io.Writer, bitLength uint16, mpiBytes []byte) (err error) ***REMOVED***
-	_, err = w.Write([]byte***REMOVED***byte(bitLength >> 8), byte(bitLength)***REMOVED***)
-	if err == nil ***REMOVED***
+func writeMPI(w io.Writer, bitLength uint16, mpiBytes []byte) (err error) {
+	_, err = w.Write([]byte{byte(bitLength >> 8), byte(bitLength)})
+	if err == nil {
 		_, err = w.Write(mpiBytes)
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // writeBig serializes a *big.Int to w.
-func writeBig(w io.Writer, i *big.Int) error ***REMOVED***
+func writeBig(w io.Writer, i *big.Int) error {
 	return writeMPI(w, uint16(i.BitLen()), i.Bytes())
-***REMOVED***
+}
 
 // CompressionAlgo Represents the different compression algorithms
 // supported by OpenPGP (except for BZIP2, which is not currently

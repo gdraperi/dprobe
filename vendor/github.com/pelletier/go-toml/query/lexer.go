@@ -17,7 +17,7 @@ import (
 type queryLexStateFn func() queryLexStateFn
 
 // Lexer definition
-type queryLexer struct ***REMOVED***
+type queryLexer struct {
 	input      string
 	start      int
 	pos        int
@@ -27,112 +27,112 @@ type queryLexer struct ***REMOVED***
 	line       int
 	col        int
 	stringTerm string
-***REMOVED***
+}
 
-func (l *queryLexer) run() ***REMOVED***
-	for state := l.lexVoid; state != nil; ***REMOVED***
+func (l *queryLexer) run() {
+	for state := l.lexVoid; state != nil; {
 		state = state()
-	***REMOVED***
+	}
 	close(l.tokens)
-***REMOVED***
+}
 
-func (l *queryLexer) nextStart() ***REMOVED***
+func (l *queryLexer) nextStart() {
 	// iterate by runes (utf8 characters)
 	// search for newlines and advance line/col counts
-	for i := l.start; i < l.pos; ***REMOVED***
+	for i := l.start; i < l.pos; {
 		r, width := utf8.DecodeRuneInString(l.input[i:])
-		if r == '\n' ***REMOVED***
+		if r == '\n' {
 			l.line++
 			l.col = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			l.col++
-		***REMOVED***
+		}
 		i += width
-	***REMOVED***
+	}
 	// advance start position to next token
 	l.start = l.pos
-***REMOVED***
+}
 
-func (l *queryLexer) emit(t tokenType) ***REMOVED***
-	l.tokens <- token***REMOVED***
-		Position: toml.Position***REMOVED***Line: l.line, Col: l.col***REMOVED***,
+func (l *queryLexer) emit(t tokenType) {
+	l.tokens <- token{
+		Position: toml.Position{Line: l.line, Col: l.col},
 		typ:      t,
 		val:      l.input[l.start:l.pos],
-	***REMOVED***
+	}
 	l.nextStart()
-***REMOVED***
+}
 
-func (l *queryLexer) emitWithValue(t tokenType, value string) ***REMOVED***
-	l.tokens <- token***REMOVED***
-		Position: toml.Position***REMOVED***Line: l.line, Col: l.col***REMOVED***,
+func (l *queryLexer) emitWithValue(t tokenType, value string) {
+	l.tokens <- token{
+		Position: toml.Position{Line: l.line, Col: l.col},
 		typ:      t,
 		val:      value,
-	***REMOVED***
+	}
 	l.nextStart()
-***REMOVED***
+}
 
-func (l *queryLexer) next() rune ***REMOVED***
-	if l.pos >= len(l.input) ***REMOVED***
+func (l *queryLexer) next() rune {
+	if l.pos >= len(l.input) {
 		l.width = 0
 		return eof
-	***REMOVED***
+	}
 	var r rune
 	r, l.width = utf8.DecodeRuneInString(l.input[l.pos:])
 	l.pos += l.width
 	return r
-***REMOVED***
+}
 
-func (l *queryLexer) ignore() ***REMOVED***
+func (l *queryLexer) ignore() {
 	l.nextStart()
-***REMOVED***
+}
 
-func (l *queryLexer) backup() ***REMOVED***
+func (l *queryLexer) backup() {
 	l.pos -= l.width
-***REMOVED***
+}
 
-func (l *queryLexer) errorf(format string, args ...interface***REMOVED******REMOVED***) queryLexStateFn ***REMOVED***
-	l.tokens <- token***REMOVED***
-		Position: toml.Position***REMOVED***Line: l.line, Col: l.col***REMOVED***,
+func (l *queryLexer) errorf(format string, args ...interface{}) queryLexStateFn {
+	l.tokens <- token{
+		Position: toml.Position{Line: l.line, Col: l.col},
 		typ:      tokenError,
 		val:      fmt.Sprintf(format, args...),
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (l *queryLexer) peek() rune ***REMOVED***
+func (l *queryLexer) peek() rune {
 	r := l.next()
 	l.backup()
 	return r
-***REMOVED***
+}
 
-func (l *queryLexer) accept(valid string) bool ***REMOVED***
-	if strings.ContainsRune(valid, l.next()) ***REMOVED***
+func (l *queryLexer) accept(valid string) bool {
+	if strings.ContainsRune(valid, l.next()) {
 		return true
-	***REMOVED***
+	}
 	l.backup()
 	return false
-***REMOVED***
+}
 
-func (l *queryLexer) follow(next string) bool ***REMOVED***
+func (l *queryLexer) follow(next string) bool {
 	return strings.HasPrefix(l.input[l.pos:], next)
-***REMOVED***
+}
 
-func (l *queryLexer) lexVoid() queryLexStateFn ***REMOVED***
-	for ***REMOVED***
+func (l *queryLexer) lexVoid() queryLexStateFn {
+	for {
 		next := l.peek()
-		switch next ***REMOVED***
+		switch next {
 		case '$':
 			l.pos++
 			l.emit(tokenDollar)
 			continue
 		case '.':
-			if l.follow("..") ***REMOVED***
+			if l.follow("..") {
 				l.pos += 2
 				l.emit(tokenDotDot)
-			***REMOVED*** else ***REMOVED***
+			} else {
 				l.pos++
 				l.emit(tokenDot)
-			***REMOVED***
+			}
 			continue
 		case '[':
 			l.pos++
@@ -174,184 +174,184 @@ func (l *queryLexer) lexVoid() queryLexStateFn ***REMOVED***
 			l.ignore()
 			l.stringTerm = string(next)
 			return l.lexString
-		***REMOVED***
+		}
 
-		if isSpace(next) ***REMOVED***
+		if isSpace(next) {
 			l.next()
 			l.ignore()
 			continue
-		***REMOVED***
+		}
 
-		if isAlphanumeric(next) ***REMOVED***
+		if isAlphanumeric(next) {
 			return l.lexKey
-		***REMOVED***
+		}
 
-		if next == '+' || next == '-' || isDigit(next) ***REMOVED***
+		if next == '+' || next == '-' || isDigit(next) {
 			return l.lexNumber
-		***REMOVED***
+		}
 
-		if l.next() == eof ***REMOVED***
+		if l.next() == eof {
 			break
-		***REMOVED***
+		}
 
 		return l.errorf("unexpected char: '%v'", next)
-	***REMOVED***
+	}
 	l.emit(tokenEOF)
 	return nil
-***REMOVED***
+}
 
-func (l *queryLexer) lexKey() queryLexStateFn ***REMOVED***
-	for ***REMOVED***
+func (l *queryLexer) lexKey() queryLexStateFn {
+	for {
 		next := l.peek()
-		if !isAlphanumeric(next) ***REMOVED***
+		if !isAlphanumeric(next) {
 			l.emit(tokenKey)
 			return l.lexVoid
-		***REMOVED***
+		}
 
-		if l.next() == eof ***REMOVED***
+		if l.next() == eof {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	l.emit(tokenEOF)
 	return nil
-***REMOVED***
+}
 
-func (l *queryLexer) lexString() queryLexStateFn ***REMOVED***
+func (l *queryLexer) lexString() queryLexStateFn {
 	l.pos++
 	l.ignore()
 	growingString := ""
 
-	for ***REMOVED***
-		if l.follow(l.stringTerm) ***REMOVED***
+	for {
+		if l.follow(l.stringTerm) {
 			l.emitWithValue(tokenString, growingString)
 			l.pos++
 			l.ignore()
 			return l.lexVoid
-		***REMOVED***
+		}
 
-		if l.follow("\\\"") ***REMOVED***
+		if l.follow("\\\"") {
 			l.pos++
 			growingString += "\""
-		***REMOVED*** else if l.follow("\\'") ***REMOVED***
+		} else if l.follow("\\'") {
 			l.pos++
 			growingString += "'"
-		***REMOVED*** else if l.follow("\\n") ***REMOVED***
+		} else if l.follow("\\n") {
 			l.pos++
 			growingString += "\n"
-		***REMOVED*** else if l.follow("\\b") ***REMOVED***
+		} else if l.follow("\\b") {
 			l.pos++
 			growingString += "\b"
-		***REMOVED*** else if l.follow("\\f") ***REMOVED***
+		} else if l.follow("\\f") {
 			l.pos++
 			growingString += "\f"
-		***REMOVED*** else if l.follow("\\/") ***REMOVED***
+		} else if l.follow("\\/") {
 			l.pos++
 			growingString += "/"
-		***REMOVED*** else if l.follow("\\t") ***REMOVED***
+		} else if l.follow("\\t") {
 			l.pos++
 			growingString += "\t"
-		***REMOVED*** else if l.follow("\\r") ***REMOVED***
+		} else if l.follow("\\r") {
 			l.pos++
 			growingString += "\r"
-		***REMOVED*** else if l.follow("\\\\") ***REMOVED***
+		} else if l.follow("\\\\") {
 			l.pos++
 			growingString += "\\"
-		***REMOVED*** else if l.follow("\\u") ***REMOVED***
+		} else if l.follow("\\u") {
 			l.pos += 2
 			code := ""
-			for i := 0; i < 4; i++ ***REMOVED***
+			for i := 0; i < 4; i++ {
 				c := l.peek()
 				l.pos++
-				if !isHexDigit(c) ***REMOVED***
+				if !isHexDigit(c) {
 					return l.errorf("unfinished unicode escape")
-				***REMOVED***
+				}
 				code = code + string(c)
-			***REMOVED***
+			}
 			l.pos--
 			intcode, err := strconv.ParseInt(code, 16, 32)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return l.errorf("invalid unicode escape: \\u" + code)
-			***REMOVED***
+			}
 			growingString += string(rune(intcode))
-		***REMOVED*** else if l.follow("\\U") ***REMOVED***
+		} else if l.follow("\\U") {
 			l.pos += 2
 			code := ""
-			for i := 0; i < 8; i++ ***REMOVED***
+			for i := 0; i < 8; i++ {
 				c := l.peek()
 				l.pos++
-				if !isHexDigit(c) ***REMOVED***
+				if !isHexDigit(c) {
 					return l.errorf("unfinished unicode escape")
-				***REMOVED***
+				}
 				code = code + string(c)
-			***REMOVED***
+			}
 			l.pos--
 			intcode, err := strconv.ParseInt(code, 16, 32)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return l.errorf("invalid unicode escape: \\u" + code)
-			***REMOVED***
+			}
 			growingString += string(rune(intcode))
-		***REMOVED*** else if l.follow("\\") ***REMOVED***
+		} else if l.follow("\\") {
 			l.pos++
 			return l.errorf("invalid escape sequence: \\" + string(l.peek()))
-		***REMOVED*** else ***REMOVED***
+		} else {
 			growingString += string(l.peek())
-		***REMOVED***
+		}
 
-		if l.next() == eof ***REMOVED***
+		if l.next() == eof {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return l.errorf("unclosed string")
-***REMOVED***
+}
 
-func (l *queryLexer) lexNumber() queryLexStateFn ***REMOVED***
+func (l *queryLexer) lexNumber() queryLexStateFn {
 	l.ignore()
-	if !l.accept("+") ***REMOVED***
+	if !l.accept("+") {
 		l.accept("-")
-	***REMOVED***
+	}
 	pointSeen := false
 	digitSeen := false
-	for ***REMOVED***
+	for {
 		next := l.next()
-		if next == '.' ***REMOVED***
-			if pointSeen ***REMOVED***
+		if next == '.' {
+			if pointSeen {
 				return l.errorf("cannot have two dots in one float")
-			***REMOVED***
-			if !isDigit(l.peek()) ***REMOVED***
+			}
+			if !isDigit(l.peek()) {
 				return l.errorf("float cannot end with a dot")
-			***REMOVED***
+			}
 			pointSeen = true
-		***REMOVED*** else if isDigit(next) ***REMOVED***
+		} else if isDigit(next) {
 			digitSeen = true
-		***REMOVED*** else ***REMOVED***
+		} else {
 			l.backup()
 			break
-		***REMOVED***
-		if pointSeen && !digitSeen ***REMOVED***
+		}
+		if pointSeen && !digitSeen {
 			return l.errorf("cannot start float with a dot")
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if !digitSeen ***REMOVED***
+	if !digitSeen {
 		return l.errorf("no digit in that number")
-	***REMOVED***
-	if pointSeen ***REMOVED***
+	}
+	if pointSeen {
 		l.emit(tokenFloat)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		l.emit(tokenInteger)
-	***REMOVED***
+	}
 	return l.lexVoid
-***REMOVED***
+}
 
 // Entry point
-func lexQuery(input string) chan token ***REMOVED***
-	l := &queryLexer***REMOVED***
+func lexQuery(input string) chan token {
+	l := &queryLexer{
 		input:  input,
 		tokens: make(chan token),
 		line:   1,
 		col:    1,
-	***REMOVED***
+	}
 	go l.run()
 	return l.tokens
-***REMOVED***
+}

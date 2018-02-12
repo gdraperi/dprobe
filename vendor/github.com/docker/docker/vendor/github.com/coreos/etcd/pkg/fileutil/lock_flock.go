@@ -21,29 +21,29 @@ import (
 	"syscall"
 )
 
-func flockTryLockFile(path string, flag int, perm os.FileMode) (*LockedFile, error) ***REMOVED***
+func flockTryLockFile(path string, flag int, perm os.FileMode) (*LockedFile, error) {
 	f, err := os.OpenFile(path, flag, perm)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if err = syscall.Flock(int(f.Fd()), syscall.LOCK_EX|syscall.LOCK_NB); err != nil ***REMOVED***
+	}
+	if err = syscall.Flock(int(f.Fd()), syscall.LOCK_EX|syscall.LOCK_NB); err != nil {
 		f.Close()
-		if err == syscall.EWOULDBLOCK ***REMOVED***
+		if err == syscall.EWOULDBLOCK {
 			err = ErrLocked
-		***REMOVED***
+		}
 		return nil, err
-	***REMOVED***
-	return &LockedFile***REMOVED***f***REMOVED***, nil
-***REMOVED***
+	}
+	return &LockedFile{f}, nil
+}
 
-func flockLockFile(path string, flag int, perm os.FileMode) (*LockedFile, error) ***REMOVED***
+func flockLockFile(path string, flag int, perm os.FileMode) (*LockedFile, error) {
 	f, err := os.OpenFile(path, flag, perm)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if err = syscall.Flock(int(f.Fd()), syscall.LOCK_EX); err != nil ***REMOVED***
+	}
+	if err = syscall.Flock(int(f.Fd()), syscall.LOCK_EX); err != nil {
 		f.Close()
 		return nil, err
-	***REMOVED***
-	return &LockedFile***REMOVED***f***REMOVED***, err
-***REMOVED***
+	}
+	return &LockedFile{f}, err
+}

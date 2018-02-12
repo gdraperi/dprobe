@@ -9,30 +9,30 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-func checkRootdirFs(rootdir string) error ***REMOVED***
+func checkRootdirFs(rootdir string) error {
 	var buf unix.Statfs_t
-	if err := unix.Statfs(rootdir, &buf); err != nil ***REMOVED***
+	if err := unix.Statfs(rootdir, &buf); err != nil {
 		return fmt.Errorf("Failed to access '%s': %s", rootdir, err)
-	***REMOVED***
+	}
 
 	// on FreeBSD buf.Fstypename contains ['z', 'f', 's', 0 ... ]
-	if (buf.Fstypename[0] != 122) || (buf.Fstypename[1] != 102) || (buf.Fstypename[2] != 115) || (buf.Fstypename[3] != 0) ***REMOVED***
+	if (buf.Fstypename[0] != 122) || (buf.Fstypename[1] != 102) || (buf.Fstypename[2] != 115) || (buf.Fstypename[3] != 0) {
 		logrus.Debugf("[zfs] no zfs dataset found for rootdir '%s'", rootdir)
 		return graphdriver.ErrPrerequisites
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func getMountpoint(id string) string ***REMOVED***
+func getMountpoint(id string) string {
 	maxlen := 12
 
 	// we need to preserve filesystem suffix
 	suffix := strings.SplitN(id, "-", 2)
 
-	if len(suffix) > 1 ***REMOVED***
+	if len(suffix) > 1 {
 		return id[:maxlen] + "-" + suffix[1]
-	***REMOVED***
+	}
 
 	return id[:maxlen]
-***REMOVED***
+}

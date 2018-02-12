@@ -7,53 +7,53 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestBindFlagValueSet(t *testing.T) ***REMOVED***
+func TestBindFlagValueSet(t *testing.T) {
 	flagSet := pflag.NewFlagSet("test", pflag.ContinueOnError)
 
-	var testValues = map[string]*string***REMOVED***
+	var testValues = map[string]*string{
 		"host":     nil,
 		"port":     nil,
 		"endpoint": nil,
-	***REMOVED***
+	}
 
-	var mutatedTestValues = map[string]string***REMOVED***
+	var mutatedTestValues = map[string]string{
 		"host":     "localhost",
 		"port":     "6060",
 		"endpoint": "/public",
-	***REMOVED***
+	}
 
-	for name := range testValues ***REMOVED***
+	for name := range testValues {
 		testValues[name] = flagSet.String(name, "", "test")
-	***REMOVED***
+	}
 
-	flagValueSet := pflagValueSet***REMOVED***flagSet***REMOVED***
+	flagValueSet := pflagValueSet{flagSet}
 
 	err := BindFlagValues(flagValueSet)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("error binding flag set, %v", err)
-	***REMOVED***
+	}
 
-	flagSet.VisitAll(func(flag *pflag.Flag) ***REMOVED***
+	flagSet.VisitAll(func(flag *pflag.Flag) {
 		flag.Value.Set(mutatedTestValues[flag.Name])
 		flag.Changed = true
-	***REMOVED***)
+	})
 
-	for name, expected := range mutatedTestValues ***REMOVED***
+	for name, expected := range mutatedTestValues {
 		assert.Equal(t, Get(name), expected)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestBindFlagValue(t *testing.T) ***REMOVED***
+func TestBindFlagValue(t *testing.T) {
 	var testString = "testing"
 	var testValue = newStringValue(testString, &testString)
 
-	flag := &pflag.Flag***REMOVED***
+	flag := &pflag.Flag{
 		Name:    "testflag",
 		Value:   testValue,
 		Changed: false,
-	***REMOVED***
+	}
 
-	flagValue := pflagValue***REMOVED***flag***REMOVED***
+	flagValue := pflagValue{flag}
 	BindFlagValue("testvalue", flagValue)
 
 	assert.Equal(t, testString, Get("testvalue"))
@@ -62,4 +62,4 @@ func TestBindFlagValue(t *testing.T) ***REMOVED***
 	flag.Changed = true //hack for pflag usage
 
 	assert.Equal(t, "testing_mutate", Get("testvalue"))
-***REMOVED***
+}

@@ -12,7 +12,7 @@ import "time"
 // API boundaries.
 //
 // Context's methods may be called by multiple goroutines simultaneously.
-type Context interface ***REMOVED***
+type Context interface {
 	// Deadline returns the time when work done on behalf of this context
 	// should be canceled. Deadline returns ok==false when no deadline is
 	// set. Successive calls to Deadline return the same results.
@@ -31,23 +31,23 @@ type Context interface ***REMOVED***
 	//
 	//  // Stream generates values with DoSomething and sends them to out
 	//  // until DoSomething returns an error or ctx.Done is closed.
-	//  func Stream(ctx context.Context, out chan<- Value) error ***REMOVED***
-	//  	for ***REMOVED***
+	//  func Stream(ctx context.Context, out chan<- Value) error {
+	//  	for {
 	//  		v, err := DoSomething(ctx)
-	//  		if err != nil ***REMOVED***
+	//  		if err != nil {
 	//  			return err
-	//  		***REMOVED***
-	//  		select ***REMOVED***
+	//  		}
+	//  		select {
 	//  		case <-ctx.Done():
 	//  			return ctx.Err()
 	//  		case out <- v:
-	//  		***REMOVED***
-	//  	***REMOVED***
-	//  ***REMOVED***
+	//  		}
+	//  	}
+	//  }
 	//
 	// See http://blog.golang.org/pipelines for more examples of how to use
 	// a Done channel for cancelation.
-	Done() <-chan struct***REMOVED******REMOVED***
+	Done() <-chan struct{}
 
 	// Err returns a non-nil error value after Done is closed. Err returns
 	// Canceled if the context was canceled or DeadlineExceeded if the
@@ -79,7 +79,7 @@ type Context interface ***REMOVED***
 	// 	import "golang.org/x/net/context"
 	//
 	// 	// User is the type of value stored in the Contexts.
-	// 	type User struct ***REMOVED***...***REMOVED***
+	// 	type User struct {...}
 	//
 	// 	// key is an unexported type for keys defined in this package.
 	// 	// This prevents collisions with keys defined in other packages.
@@ -91,17 +91,17 @@ type Context interface ***REMOVED***
 	// 	var userKey key = 0
 	//
 	// 	// NewContext returns a new Context that carries value u.
-	// 	func NewContext(ctx context.Context, u *User) context.Context ***REMOVED***
+	// 	func NewContext(ctx context.Context, u *User) context.Context {
 	// 		return context.WithValue(ctx, userKey, u)
-	// 	***REMOVED***
+	// 	}
 	//
 	// 	// FromContext returns the User value stored in ctx, if any.
-	// 	func FromContext(ctx context.Context) (*User, bool) ***REMOVED***
+	// 	func FromContext(ctx context.Context) (*User, bool) {
 	// 		u, ok := ctx.Value(userKey).(*User)
 	// 		return u, ok
-	// 	***REMOVED***
-	Value(key interface***REMOVED******REMOVED***) interface***REMOVED******REMOVED***
-***REMOVED***
+	// 	}
+	Value(key interface{}) interface{}
+}
 
 // A CancelFunc tells an operation to abandon its work.
 // A CancelFunc does not wait for the work to stop.

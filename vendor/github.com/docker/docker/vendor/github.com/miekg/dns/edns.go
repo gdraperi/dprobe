@@ -25,37 +25,37 @@ const (
 
 // OPT is the EDNS0 RR appended to messages to convey extra (meta) information.
 // See RFC 6891.
-type OPT struct ***REMOVED***
+type OPT struct {
 	Hdr    RR_Header
 	Option []EDNS0 `dns:"opt"`
-***REMOVED***
+}
 
-func (rr *OPT) String() string ***REMOVED***
+func (rr *OPT) String() string {
 	s := "\n;; OPT PSEUDOSECTION:\n; EDNS: version " + strconv.Itoa(int(rr.Version())) + "; "
-	if rr.Do() ***REMOVED***
+	if rr.Do() {
 		s += "flags: do; "
-	***REMOVED*** else ***REMOVED***
+	} else {
 		s += "flags: ; "
-	***REMOVED***
+	}
 	s += "udp: " + strconv.Itoa(int(rr.UDPSize()))
 
-	for _, o := range rr.Option ***REMOVED***
-		switch o.(type) ***REMOVED***
+	for _, o := range rr.Option {
+		switch o.(type) {
 		case *EDNS0_NSID:
 			s += "\n; NSID: " + o.String()
 			h, e := o.pack()
 			var r string
-			if e == nil ***REMOVED***
-				for _, c := range h ***REMOVED***
+			if e == nil {
+				for _, c := range h {
 					r += "(" + string(c) + ")"
-				***REMOVED***
+				}
 				s += "  " + r
-			***REMOVED***
+			}
 		case *EDNS0_SUBNET:
 			s += "\n; SUBNET: " + o.String()
-			if o.(*EDNS0_SUBNET).DraftOption ***REMOVED***
+			if o.(*EDNS0_SUBNET).DraftOption {
 				s += " (draft)"
-			***REMOVED***
+			}
 		case *EDNS0_UL:
 			s += "\n; UPDATE LEASE: " + o.String()
 		case *EDNS0_LLQ:
@@ -68,66 +68,66 @@ func (rr *OPT) String() string ***REMOVED***
 			s += "\n; NSEC3 HASH UNDERSTOOD: " + o.String()
 		case *EDNS0_LOCAL:
 			s += "\n; LOCAL OPT: " + o.String()
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return s
-***REMOVED***
+}
 
-func (rr *OPT) len() int ***REMOVED***
+func (rr *OPT) len() int {
 	l := rr.Hdr.len()
-	for i := 0; i < len(rr.Option); i++ ***REMOVED***
+	for i := 0; i < len(rr.Option); i++ {
 		l += 4 // Account for 2-byte option code and 2-byte option length.
 		lo, _ := rr.Option[i].pack()
 		l += len(lo)
-	***REMOVED***
+	}
 	return l
-***REMOVED***
+}
 
 // return the old value -> delete SetVersion?
 
 // Version returns the EDNS version used. Only zero is defined.
-func (rr *OPT) Version() uint8 ***REMOVED***
+func (rr *OPT) Version() uint8 {
 	return uint8((rr.Hdr.Ttl & 0x00FF0000) >> 16)
-***REMOVED***
+}
 
 // SetVersion sets the version of EDNS. This is usually zero.
-func (rr *OPT) SetVersion(v uint8) ***REMOVED***
+func (rr *OPT) SetVersion(v uint8) {
 	rr.Hdr.Ttl = rr.Hdr.Ttl&0xFF00FFFF | (uint32(v) << 16)
-***REMOVED***
+}
 
 // ExtendedRcode returns the EDNS extended RCODE field (the upper 8 bits of the TTL).
-func (rr *OPT) ExtendedRcode() uint8 ***REMOVED***
+func (rr *OPT) ExtendedRcode() uint8 {
 	return uint8((rr.Hdr.Ttl & 0xFF000000) >> 24)
-***REMOVED***
+}
 
 // SetExtendedRcode sets the EDNS extended RCODE field.
-func (rr *OPT) SetExtendedRcode(v uint8) ***REMOVED***
+func (rr *OPT) SetExtendedRcode(v uint8) {
 	rr.Hdr.Ttl = rr.Hdr.Ttl&0x00FFFFFF | (uint32(v) << 24)
-***REMOVED***
+}
 
 // UDPSize returns the UDP buffer size.
-func (rr *OPT) UDPSize() uint16 ***REMOVED***
+func (rr *OPT) UDPSize() uint16 {
 	return rr.Hdr.Class
-***REMOVED***
+}
 
 // SetUDPSize sets the UDP buffer size.
-func (rr *OPT) SetUDPSize(size uint16) ***REMOVED***
+func (rr *OPT) SetUDPSize(size uint16) {
 	rr.Hdr.Class = size
-***REMOVED***
+}
 
 // Do returns the value of the DO (DNSSEC OK) bit.
-func (rr *OPT) Do() bool ***REMOVED***
+func (rr *OPT) Do() bool {
 	return rr.Hdr.Ttl&_DO == _DO
-***REMOVED***
+}
 
 // SetDo sets the DO (DNSSEC OK) bit.
-func (rr *OPT) SetDo() ***REMOVED***
+func (rr *OPT) SetDo() {
 	rr.Hdr.Ttl |= _DO
-***REMOVED***
+}
 
 // EDNS0 defines an EDNS0 Option. An OPT RR can have multiple options appended to
 // it.
-type EDNS0 interface ***REMOVED***
+type EDNS0 interface {
 	// Option returns the option code for the option.
 	Option() uint16
 	// pack returns the bytes of the option data.
@@ -137,7 +137,7 @@ type EDNS0 interface ***REMOVED***
 	unpack([]byte) error
 	// String returns the string representation of the option.
 	String() string
-***REMOVED***
+}
 
 // The nsid EDNS0 option is used to retrieve a nameserver
 // identifier. When sending a request Nsid must be set to the empty string
@@ -151,22 +151,22 @@ type EDNS0 interface ***REMOVED***
 //	e.Code = dns.EDNS0NSID
 //	e.Nsid = "AA"
 //	o.Option = append(o.Option, e)
-type EDNS0_NSID struct ***REMOVED***
+type EDNS0_NSID struct {
 	Code uint16 // Always EDNS0NSID
 	Nsid string // This string needs to be hex encoded
-***REMOVED***
+}
 
-func (e *EDNS0_NSID) pack() ([]byte, error) ***REMOVED***
+func (e *EDNS0_NSID) pack() ([]byte, error) {
 	h, err := hex.DecodeString(e.Nsid)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return h, nil
-***REMOVED***
+}
 
-func (e *EDNS0_NSID) Option() uint16        ***REMOVED*** return EDNS0NSID ***REMOVED***
-func (e *EDNS0_NSID) unpack(b []byte) error ***REMOVED*** e.Nsid = hex.EncodeToString(b); return nil ***REMOVED***
-func (e *EDNS0_NSID) String() string        ***REMOVED*** return string(e.Nsid) ***REMOVED***
+func (e *EDNS0_NSID) Option() uint16        { return EDNS0NSID }
+func (e *EDNS0_NSID) unpack(b []byte) error { e.Nsid = hex.EncodeToString(b); return nil }
+func (e *EDNS0_NSID) String() string        { return string(e.Nsid) }
 
 // EDNS0_SUBNET is the subnet option that is used to give the remote nameserver
 // an idea of where the client lives. It can then give back a different
@@ -189,99 +189,99 @@ func (e *EDNS0_NSID) String() string        ***REMOVED*** return string(e.Nsid) 
 // for which netmask applies to the address. This code will parse all the
 // available bits when unpacking (up to optlen). When packing it will apply
 // SourceNetmask. If you need more advanced logic, patches welcome and good luck.
-type EDNS0_SUBNET struct ***REMOVED***
+type EDNS0_SUBNET struct {
 	Code          uint16 // Always EDNS0SUBNET
 	Family        uint16 // 1 for IP, 2 for IP6
 	SourceNetmask uint8
 	SourceScope   uint8
 	Address       net.IP
 	DraftOption   bool // Set to true if using the old (0x50fa) option code
-***REMOVED***
+}
 
-func (e *EDNS0_SUBNET) Option() uint16 ***REMOVED***
-	if e.DraftOption ***REMOVED***
+func (e *EDNS0_SUBNET) Option() uint16 {
+	if e.DraftOption {
 		return EDNS0SUBNETDRAFT
-	***REMOVED***
+	}
 	return EDNS0SUBNET
-***REMOVED***
+}
 
-func (e *EDNS0_SUBNET) pack() ([]byte, error) ***REMOVED***
+func (e *EDNS0_SUBNET) pack() ([]byte, error) {
 	b := make([]byte, 4)
 	b[0], b[1] = packUint16(e.Family)
 	b[2] = e.SourceNetmask
 	b[3] = e.SourceScope
-	switch e.Family ***REMOVED***
+	switch e.Family {
 	case 1:
-		if e.SourceNetmask > net.IPv4len*8 ***REMOVED***
+		if e.SourceNetmask > net.IPv4len*8 {
 			return nil, errors.New("dns: bad netmask")
-		***REMOVED***
-		if len(e.Address.To4()) != net.IPv4len ***REMOVED***
+		}
+		if len(e.Address.To4()) != net.IPv4len {
 			return nil, errors.New("dns: bad address")
-		***REMOVED***
+		}
 		ip := e.Address.To4().Mask(net.CIDRMask(int(e.SourceNetmask), net.IPv4len*8))
 		needLength := (e.SourceNetmask + 8 - 1) / 8 // division rounding up
 		b = append(b, ip[:needLength]...)
 	case 2:
-		if e.SourceNetmask > net.IPv6len*8 ***REMOVED***
+		if e.SourceNetmask > net.IPv6len*8 {
 			return nil, errors.New("dns: bad netmask")
-		***REMOVED***
-		if len(e.Address) != net.IPv6len ***REMOVED***
+		}
+		if len(e.Address) != net.IPv6len {
 			return nil, errors.New("dns: bad address")
-		***REMOVED***
+		}
 		ip := e.Address.Mask(net.CIDRMask(int(e.SourceNetmask), net.IPv6len*8))
 		needLength := (e.SourceNetmask + 8 - 1) / 8 // division rounding up
 		b = append(b, ip[:needLength]...)
 	default:
 		return nil, errors.New("dns: bad address family")
-	***REMOVED***
+	}
 	return b, nil
-***REMOVED***
+}
 
-func (e *EDNS0_SUBNET) unpack(b []byte) error ***REMOVED***
-	if len(b) < 4 ***REMOVED***
+func (e *EDNS0_SUBNET) unpack(b []byte) error {
+	if len(b) < 4 {
 		return ErrBuf
-	***REMOVED***
+	}
 	e.Family, _ = unpackUint16(b, 0)
 	e.SourceNetmask = b[2]
 	e.SourceScope = b[3]
-	switch e.Family ***REMOVED***
+	switch e.Family {
 	case 1:
-		if e.SourceNetmask > net.IPv4len*8 || e.SourceScope > net.IPv4len*8 ***REMOVED***
+		if e.SourceNetmask > net.IPv4len*8 || e.SourceScope > net.IPv4len*8 {
 			return errors.New("dns: bad netmask")
-		***REMOVED***
+		}
 		addr := make([]byte, net.IPv4len)
-		for i := 0; i < net.IPv4len && 4+i < len(b); i++ ***REMOVED***
+		for i := 0; i < net.IPv4len && 4+i < len(b); i++ {
 			addr[i] = b[4+i]
-		***REMOVED***
+		}
 		e.Address = net.IPv4(addr[0], addr[1], addr[2], addr[3])
 	case 2:
-		if e.SourceNetmask > net.IPv6len*8 || e.SourceScope > net.IPv6len*8 ***REMOVED***
+		if e.SourceNetmask > net.IPv6len*8 || e.SourceScope > net.IPv6len*8 {
 			return errors.New("dns: bad netmask")
-		***REMOVED***
+		}
 		addr := make([]byte, net.IPv6len)
-		for i := 0; i < net.IPv6len && 4+i < len(b); i++ ***REMOVED***
+		for i := 0; i < net.IPv6len && 4+i < len(b); i++ {
 			addr[i] = b[4+i]
-		***REMOVED***
-		e.Address = net.IP***REMOVED***addr[0], addr[1], addr[2], addr[3], addr[4],
+		}
+		e.Address = net.IP{addr[0], addr[1], addr[2], addr[3], addr[4],
 			addr[5], addr[6], addr[7], addr[8], addr[9], addr[10],
-			addr[11], addr[12], addr[13], addr[14], addr[15]***REMOVED***
+			addr[11], addr[12], addr[13], addr[14], addr[15]}
 	default:
 		return errors.New("dns: bad address family")
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (e *EDNS0_SUBNET) String() (s string) ***REMOVED***
-	if e.Address == nil ***REMOVED***
+func (e *EDNS0_SUBNET) String() (s string) {
+	if e.Address == nil {
 		s = "<nil>"
-	***REMOVED*** else if e.Address.To4() != nil ***REMOVED***
+	} else if e.Address.To4() != nil {
 		s = e.Address.String()
-	***REMOVED*** else ***REMOVED***
+	} else {
 		s = "[" + e.Address.String() + "]"
-	***REMOVED***
+	}
 	s += "/" + strconv.Itoa(int(e.SourceNetmask)) + "/" + strconv.Itoa(int(e.SourceScope))
 	return
-***REMOVED***
+}
 
 // The EDNS0_UL (Update Lease) (draft RFC) option is used to tell the server to set
 // an expiration on an update RR. This is helpful for clients that cannot clean
@@ -295,46 +295,46 @@ func (e *EDNS0_SUBNET) String() (s string) ***REMOVED***
 //	e.Code = dns.EDNS0UL
 //	e.Lease = 120 // in seconds
 //	o.Option = append(o.Option, e)
-type EDNS0_UL struct ***REMOVED***
+type EDNS0_UL struct {
 	Code  uint16 // Always EDNS0UL
 	Lease uint32
-***REMOVED***
+}
 
-func (e *EDNS0_UL) Option() uint16 ***REMOVED*** return EDNS0UL ***REMOVED***
-func (e *EDNS0_UL) String() string ***REMOVED*** return strconv.FormatUint(uint64(e.Lease), 10) ***REMOVED***
+func (e *EDNS0_UL) Option() uint16 { return EDNS0UL }
+func (e *EDNS0_UL) String() string { return strconv.FormatUint(uint64(e.Lease), 10) }
 
 // Copied: http://golang.org/src/pkg/net/dnsmsg.go
-func (e *EDNS0_UL) pack() ([]byte, error) ***REMOVED***
+func (e *EDNS0_UL) pack() ([]byte, error) {
 	b := make([]byte, 4)
 	b[0] = byte(e.Lease >> 24)
 	b[1] = byte(e.Lease >> 16)
 	b[2] = byte(e.Lease >> 8)
 	b[3] = byte(e.Lease)
 	return b, nil
-***REMOVED***
+}
 
-func (e *EDNS0_UL) unpack(b []byte) error ***REMOVED***
-	if len(b) < 4 ***REMOVED***
+func (e *EDNS0_UL) unpack(b []byte) error {
+	if len(b) < 4 {
 		return ErrBuf
-	***REMOVED***
+	}
 	e.Lease = uint32(b[0])<<24 | uint32(b[1])<<16 | uint32(b[2])<<8 | uint32(b[3])
 	return nil
-***REMOVED***
+}
 
 // EDNS0_LLQ stands for Long Lived Queries: http://tools.ietf.org/html/draft-sekar-dns-llq-01
 // Implemented for completeness, as the EDNS0 type code is assigned.
-type EDNS0_LLQ struct ***REMOVED***
+type EDNS0_LLQ struct {
 	Code      uint16 // Always EDNS0LLQ
 	Version   uint16
 	Opcode    uint16
 	Error     uint16
 	Id        uint64
 	LeaseLife uint32
-***REMOVED***
+}
 
-func (e *EDNS0_LLQ) Option() uint16 ***REMOVED*** return EDNS0LLQ ***REMOVED***
+func (e *EDNS0_LLQ) Option() uint16 { return EDNS0LLQ }
 
-func (e *EDNS0_LLQ) pack() ([]byte, error) ***REMOVED***
+func (e *EDNS0_LLQ) pack() ([]byte, error) {
 	b := make([]byte, 18)
 	b[0], b[1] = packUint16(e.Version)
 	b[2], b[3] = packUint16(e.Opcode)
@@ -352,12 +352,12 @@ func (e *EDNS0_LLQ) pack() ([]byte, error) ***REMOVED***
 	b[16] = byte(e.LeaseLife >> 8)
 	b[17] = byte(e.LeaseLife)
 	return b, nil
-***REMOVED***
+}
 
-func (e *EDNS0_LLQ) unpack(b []byte) error ***REMOVED***
-	if len(b) < 18 ***REMOVED***
+func (e *EDNS0_LLQ) unpack(b []byte) error {
+	if len(b) < 18 {
 		return ErrBuf
-	***REMOVED***
+	}
 	e.Version, _ = unpackUint16(b, 0)
 	e.Opcode, _ = unpackUint16(b, 2)
 	e.Error, _ = unpackUint16(b, 4)
@@ -365,103 +365,103 @@ func (e *EDNS0_LLQ) unpack(b []byte) error ***REMOVED***
 		uint64(b[6+3])<<32 | uint64(b[6+4])<<24 | uint64(b[6+5])<<16 | uint64(b[6+6])<<8 | uint64(b[6+7])
 	e.LeaseLife = uint32(b[14])<<24 | uint32(b[14+1])<<16 | uint32(b[14+2])<<8 | uint32(b[14+3])
 	return nil
-***REMOVED***
+}
 
-func (e *EDNS0_LLQ) String() string ***REMOVED***
+func (e *EDNS0_LLQ) String() string {
 	s := strconv.FormatUint(uint64(e.Version), 10) + " " + strconv.FormatUint(uint64(e.Opcode), 10) +
 		" " + strconv.FormatUint(uint64(e.Error), 10) + " " + strconv.FormatUint(uint64(e.Id), 10) +
 		" " + strconv.FormatUint(uint64(e.LeaseLife), 10)
 	return s
-***REMOVED***
+}
 
-type EDNS0_DAU struct ***REMOVED***
+type EDNS0_DAU struct {
 	Code    uint16 // Always EDNS0DAU
 	AlgCode []uint8
-***REMOVED***
+}
 
-func (e *EDNS0_DAU) Option() uint16        ***REMOVED*** return EDNS0DAU ***REMOVED***
-func (e *EDNS0_DAU) pack() ([]byte, error) ***REMOVED*** return e.AlgCode, nil ***REMOVED***
-func (e *EDNS0_DAU) unpack(b []byte) error ***REMOVED*** e.AlgCode = b; return nil ***REMOVED***
+func (e *EDNS0_DAU) Option() uint16        { return EDNS0DAU }
+func (e *EDNS0_DAU) pack() ([]byte, error) { return e.AlgCode, nil }
+func (e *EDNS0_DAU) unpack(b []byte) error { e.AlgCode = b; return nil }
 
-func (e *EDNS0_DAU) String() string ***REMOVED***
+func (e *EDNS0_DAU) String() string {
 	s := ""
-	for i := 0; i < len(e.AlgCode); i++ ***REMOVED***
-		if a, ok := AlgorithmToString[e.AlgCode[i]]; ok ***REMOVED***
+	for i := 0; i < len(e.AlgCode); i++ {
+		if a, ok := AlgorithmToString[e.AlgCode[i]]; ok {
 			s += " " + a
-		***REMOVED*** else ***REMOVED***
+		} else {
 			s += " " + strconv.Itoa(int(e.AlgCode[i]))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return s
-***REMOVED***
+}
 
-type EDNS0_DHU struct ***REMOVED***
+type EDNS0_DHU struct {
 	Code    uint16 // Always EDNS0DHU
 	AlgCode []uint8
-***REMOVED***
+}
 
-func (e *EDNS0_DHU) Option() uint16        ***REMOVED*** return EDNS0DHU ***REMOVED***
-func (e *EDNS0_DHU) pack() ([]byte, error) ***REMOVED*** return e.AlgCode, nil ***REMOVED***
-func (e *EDNS0_DHU) unpack(b []byte) error ***REMOVED*** e.AlgCode = b; return nil ***REMOVED***
+func (e *EDNS0_DHU) Option() uint16        { return EDNS0DHU }
+func (e *EDNS0_DHU) pack() ([]byte, error) { return e.AlgCode, nil }
+func (e *EDNS0_DHU) unpack(b []byte) error { e.AlgCode = b; return nil }
 
-func (e *EDNS0_DHU) String() string ***REMOVED***
+func (e *EDNS0_DHU) String() string {
 	s := ""
-	for i := 0; i < len(e.AlgCode); i++ ***REMOVED***
-		if a, ok := HashToString[e.AlgCode[i]]; ok ***REMOVED***
+	for i := 0; i < len(e.AlgCode); i++ {
+		if a, ok := HashToString[e.AlgCode[i]]; ok {
 			s += " " + a
-		***REMOVED*** else ***REMOVED***
+		} else {
 			s += " " + strconv.Itoa(int(e.AlgCode[i]))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return s
-***REMOVED***
+}
 
-type EDNS0_N3U struct ***REMOVED***
+type EDNS0_N3U struct {
 	Code    uint16 // Always EDNS0N3U
 	AlgCode []uint8
-***REMOVED***
+}
 
-func (e *EDNS0_N3U) Option() uint16        ***REMOVED*** return EDNS0N3U ***REMOVED***
-func (e *EDNS0_N3U) pack() ([]byte, error) ***REMOVED*** return e.AlgCode, nil ***REMOVED***
-func (e *EDNS0_N3U) unpack(b []byte) error ***REMOVED*** e.AlgCode = b; return nil ***REMOVED***
+func (e *EDNS0_N3U) Option() uint16        { return EDNS0N3U }
+func (e *EDNS0_N3U) pack() ([]byte, error) { return e.AlgCode, nil }
+func (e *EDNS0_N3U) unpack(b []byte) error { e.AlgCode = b; return nil }
 
-func (e *EDNS0_N3U) String() string ***REMOVED***
+func (e *EDNS0_N3U) String() string {
 	// Re-use the hash map
 	s := ""
-	for i := 0; i < len(e.AlgCode); i++ ***REMOVED***
-		if a, ok := HashToString[e.AlgCode[i]]; ok ***REMOVED***
+	for i := 0; i < len(e.AlgCode); i++ {
+		if a, ok := HashToString[e.AlgCode[i]]; ok {
 			s += " " + a
-		***REMOVED*** else ***REMOVED***
+		} else {
 			s += " " + strconv.Itoa(int(e.AlgCode[i]))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return s
-***REMOVED***
+}
 
-type EDNS0_EXPIRE struct ***REMOVED***
+type EDNS0_EXPIRE struct {
 	Code   uint16 // Always EDNS0EXPIRE
 	Expire uint32
-***REMOVED***
+}
 
-func (e *EDNS0_EXPIRE) Option() uint16 ***REMOVED*** return EDNS0EXPIRE ***REMOVED***
-func (e *EDNS0_EXPIRE) String() string ***REMOVED*** return strconv.FormatUint(uint64(e.Expire), 10) ***REMOVED***
+func (e *EDNS0_EXPIRE) Option() uint16 { return EDNS0EXPIRE }
+func (e *EDNS0_EXPIRE) String() string { return strconv.FormatUint(uint64(e.Expire), 10) }
 
-func (e *EDNS0_EXPIRE) pack() ([]byte, error) ***REMOVED***
+func (e *EDNS0_EXPIRE) pack() ([]byte, error) {
 	b := make([]byte, 4)
 	b[0] = byte(e.Expire >> 24)
 	b[1] = byte(e.Expire >> 16)
 	b[2] = byte(e.Expire >> 8)
 	b[3] = byte(e.Expire)
 	return b, nil
-***REMOVED***
+}
 
-func (e *EDNS0_EXPIRE) unpack(b []byte) error ***REMOVED***
-	if len(b) < 4 ***REMOVED***
+func (e *EDNS0_EXPIRE) unpack(b []byte) error {
+	if len(b) < 4 {
 		return ErrBuf
-	***REMOVED***
+	}
 	e.Expire = uint32(b[0])<<24 | uint32(b[1])<<16 | uint32(b[2])<<8 | uint32(b[3])
 	return nil
-***REMOVED***
+}
 
 // The EDNS0_LOCAL option is used for local/experimental purposes. The option
 // code is recommended to be within the range [EDNS0LOCALSTART, EDNS0LOCALEND]
@@ -474,32 +474,32 @@ func (e *EDNS0_EXPIRE) unpack(b []byte) error ***REMOVED***
 //	o.Hdr.Rrtype = dns.TypeOPT
 //	e := new(dns.EDNS0_LOCAL)
 //	e.Code = dns.EDNS0LOCALSTART
-//	e.Data = []byte***REMOVED***72, 82, 74***REMOVED***
+//	e.Data = []byte{72, 82, 74}
 //	o.Option = append(o.Option, e)
-type EDNS0_LOCAL struct ***REMOVED***
+type EDNS0_LOCAL struct {
 	Code uint16
 	Data []byte
-***REMOVED***
+}
 
-func (e *EDNS0_LOCAL) Option() uint16 ***REMOVED*** return e.Code ***REMOVED***
-func (e *EDNS0_LOCAL) String() string ***REMOVED***
+func (e *EDNS0_LOCAL) Option() uint16 { return e.Code }
+func (e *EDNS0_LOCAL) String() string {
 	return strconv.FormatInt(int64(e.Code), 10) + ":0x" + hex.EncodeToString(e.Data)
-***REMOVED***
+}
 
-func (e *EDNS0_LOCAL) pack() ([]byte, error) ***REMOVED***
+func (e *EDNS0_LOCAL) pack() ([]byte, error) {
 	b := make([]byte, len(e.Data))
 	copied := copy(b, e.Data)
-	if copied != len(e.Data) ***REMOVED***
+	if copied != len(e.Data) {
 		return nil, ErrBuf
-	***REMOVED***
+	}
 	return b, nil
-***REMOVED***
+}
 
-func (e *EDNS0_LOCAL) unpack(b []byte) error ***REMOVED***
+func (e *EDNS0_LOCAL) unpack(b []byte) error {
 	e.Data = make([]byte, len(b))
 	copied := copy(e.Data, b)
-	if copied != len(b) ***REMOVED***
+	if copied != len(b) {
 		return ErrBuf
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

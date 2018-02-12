@@ -13,14 +13,14 @@ var (
 
 // errnoErr returns common boxed Errno values, to prevent allocations
 // at runtime.
-func errnoErr(errno syscall.Errno) error ***REMOVED***
-	switch errno ***REMOVED***
+func errnoErr(errno syscall.Errno) error {
+	switch errno {
 	case 0:
 		return nil
 	case syscall.ERROR_IO_PENDING:
 		return errERROR_IO_PENDING
 	case syscall.EINVAL:
 		return errEINVAL
-	***REMOVED***
+	}
 	return errno
-***REMOVED***
+}

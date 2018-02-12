@@ -17,9 +17,9 @@ const (
 	_ERROR_NO_MORE_ITEMS syscall.Errno = 259
 )
 
-func LoadRegLoadMUIString() error ***REMOVED***
+func LoadRegLoadMUIString() error {
 	return procRegLoadMUIStringW.Find()
-***REMOVED***
+}
 
 //sys	regCreateKeyEx(key syscall.Handle, subkey *uint16, reserved uint32, class *uint16, options uint32, desired uint32, sa *syscall.SecurityAttributes, result *syscall.Handle, disposition *uint32) (regerrno error) = advapi32.RegCreateKeyExW
 //sys	regDeleteKey(key syscall.Handle, subkey *uint16) (regerrno error) = advapi32.RegDeleteKeyW

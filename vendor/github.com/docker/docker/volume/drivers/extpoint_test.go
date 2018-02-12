@@ -6,18 +6,18 @@ import (
 	volumetestutils "github.com/docker/docker/volume/testutils"
 )
 
-func TestGetDriver(t *testing.T) ***REMOVED***
+func TestGetDriver(t *testing.T) {
 	_, err := GetDriver("missing")
-	if err == nil ***REMOVED***
+	if err == nil {
 		t.Fatal("Expected error, was nil")
-	***REMOVED***
+	}
 	Register(volumetestutils.NewFakeDriver("fake"), "fake")
 
 	d, err := GetDriver("fake")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if d.Name() != "fake" ***REMOVED***
+	}
+	if d.Name() != "fake" {
 		t.Fatalf("Expected fake driver, got %s\n", d.Name())
-	***REMOVED***
-***REMOVED***
+	}
+}

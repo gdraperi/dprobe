@@ -13,41 +13,41 @@ import (
 )
 
 // Process implements a linux process
-type Process struct ***REMOVED***
+type Process struct {
 	id string
 	t  *Task
-***REMOVED***
+}
 
 // ID of the process
-func (p *Process) ID() string ***REMOVED***
+func (p *Process) ID() string {
 	return p.id
-***REMOVED***
+}
 
 // Kill sends the provided signal to the underlying process
 //
 // Unable to kill all processes in the task using this method on a process
-func (p *Process) Kill(ctx context.Context, signal uint32, _ bool) error ***REMOVED***
-	_, err := p.t.shim.Kill(ctx, &shim.KillRequest***REMOVED***
+func (p *Process) Kill(ctx context.Context, signal uint32, _ bool) error {
+	_, err := p.t.shim.Kill(ctx, &shim.KillRequest{
 		Signal: signal,
 		ID:     p.id,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		return errdefs.FromGRPC(err)
-	***REMOVED***
+	}
 	return err
-***REMOVED***
+}
 
 // State of process
-func (p *Process) State(ctx context.Context) (runtime.State, error) ***REMOVED***
+func (p *Process) State(ctx context.Context) (runtime.State, error) {
 	// use the container status for the status of the process
-	response, err := p.t.shim.State(ctx, &shim.StateRequest***REMOVED***
+	response, err := p.t.shim.State(ctx, &shim.StateRequest{
 		ID: p.id,
-	***REMOVED***)
-	if err != nil ***REMOVED***
-		return runtime.State***REMOVED******REMOVED***, errdefs.FromGRPC(err)
-	***REMOVED***
+	})
+	if err != nil {
+		return runtime.State{}, errdefs.FromGRPC(err)
+	}
 	var status runtime.Status
-	switch response.Status ***REMOVED***
+	switch response.Status {
 	case task.StatusCreated:
 		status = runtime.CreatedStatus
 	case task.StatusRunning:
@@ -58,8 +58,8 @@ func (p *Process) State(ctx context.Context) (runtime.State, error) ***REMOVED**
 		status = runtime.PausedStatus
 	case task.StatusPausing:
 		status = runtime.PausingStatus
-	***REMOVED***
-	return runtime.State***REMOVED***
+	}
+	return runtime.State{
 		Pid:        response.Pid,
 		Status:     status,
 		Stdin:      response.Stdin,
@@ -67,60 +67,60 @@ func (p *Process) State(ctx context.Context) (runtime.State, error) ***REMOVED**
 		Stderr:     response.Stderr,
 		Terminal:   response.Terminal,
 		ExitStatus: response.ExitStatus,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // ResizePty changes the side of the process's PTY to the provided width and height
-func (p *Process) ResizePty(ctx context.Context, size runtime.ConsoleSize) error ***REMOVED***
-	_, err := p.t.shim.ResizePty(ctx, &shim.ResizePtyRequest***REMOVED***
+func (p *Process) ResizePty(ctx context.Context, size runtime.ConsoleSize) error {
+	_, err := p.t.shim.ResizePty(ctx, &shim.ResizePtyRequest{
 		ID:     p.id,
 		Width:  size.Width,
 		Height: size.Height,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		err = errdefs.FromGRPC(err)
-	***REMOVED***
+	}
 	return err
-***REMOVED***
+}
 
 // CloseIO closes the provided IO pipe for the process
-func (p *Process) CloseIO(ctx context.Context) error ***REMOVED***
-	_, err := p.t.shim.CloseIO(ctx, &shim.CloseIORequest***REMOVED***
+func (p *Process) CloseIO(ctx context.Context) error {
+	_, err := p.t.shim.CloseIO(ctx, &shim.CloseIORequest{
 		ID:    p.id,
 		Stdin: true,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		return errdefs.FromGRPC(err)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // Start the process
-func (p *Process) Start(ctx context.Context) error ***REMOVED***
-	r, err := p.t.shim.Start(ctx, &shim.StartRequest***REMOVED***
+func (p *Process) Start(ctx context.Context) error {
+	r, err := p.t.shim.Start(ctx, &shim.StartRequest{
 		ID: p.id,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		return errdefs.FromGRPC(err)
-	***REMOVED***
-	p.t.events.Publish(ctx, runtime.TaskExecStartedEventTopic, &eventstypes.TaskExecStarted***REMOVED***
+	}
+	p.t.events.Publish(ctx, runtime.TaskExecStartedEventTopic, &eventstypes.TaskExecStarted{
 		ContainerID: p.t.id,
 		Pid:         r.Pid,
 		ExecID:      p.id,
-	***REMOVED***)
+	})
 	return nil
-***REMOVED***
+}
 
 // Wait on the process to exit and return the exit status and timestamp
-func (p *Process) Wait(ctx context.Context) (*runtime.Exit, error) ***REMOVED***
-	r, err := p.t.shim.Wait(ctx, &shim.WaitRequest***REMOVED***
+func (p *Process) Wait(ctx context.Context) (*runtime.Exit, error) {
+	r, err := p.t.shim.Wait(ctx, &shim.WaitRequest{
 		ID: p.id,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	return &runtime.Exit***REMOVED***
+	}
+	return &runtime.Exit{
 		Timestamp: r.ExitedAt,
 		Status:    r.ExitStatus,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}

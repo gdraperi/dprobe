@@ -9,29 +9,29 @@ import (
 )
 
 // Test the behavior of TruncIndex, an index for querying IDs from a non-conflicting prefix.
-func TestTruncIndex(t *testing.T) ***REMOVED***
-	ids := []string***REMOVED******REMOVED***
+func TestTruncIndex(t *testing.T) {
+	ids := []string{}
 	index := NewTruncIndex(ids)
 	// Get on an empty index
-	if _, err := index.Get("foobar"); err == nil ***REMOVED***
+	if _, err := index.Get("foobar"); err == nil {
 		t.Fatal("Get on an empty index should return an error")
-	***REMOVED***
+	}
 
 	// Spaces should be illegal in an id
-	if err := index.Add("I have a space"); err == nil ***REMOVED***
+	if err := index.Add("I have a space"); err == nil {
 		t.Fatalf("Adding an id with ' ' should return an error")
-	***REMOVED***
+	}
 
 	id := "99b36c2c326ccc11e726eee6ee78a0baf166ef96"
 	// Add an id
-	if err := index.Add(id); err != nil ***REMOVED***
+	if err := index.Add(id); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	// Add an empty id (should fail)
-	if err := index.Add(""); err == nil ***REMOVED***
+	if err := index.Add(""); err == nil {
 		t.Fatalf("Adding an empty id should return an error")
-	***REMOVED***
+	}
 
 	// Get a non-existing id
 	assertIndexGet(t, index, "abracadabra", "", true)
@@ -48,9 +48,9 @@ func TestTruncIndex(t *testing.T) ***REMOVED***
 
 	id2 := id[:6] + "blabla"
 	// Add an id
-	if err := index.Add(id2); err != nil ***REMOVED***
+	if err := index.Add(id2); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	// Both exact IDs should work
 	assertIndexGet(t, index, id, id, false)
 	assertIndexGet(t, index, id2, id2, false)
@@ -61,28 +61,28 @@ func TestTruncIndex(t *testing.T) ***REMOVED***
 	assertIndexGet(t, index, id[:1], "", true)
 
 	// An ambiguous id prefix should return an error
-	if _, err := index.Get(id[:4]); err == nil ***REMOVED***
+	if _, err := index.Get(id[:4]); err == nil {
 		t.Fatal("An ambiguous id prefix should return an error")
-	***REMOVED***
+	}
 
 	// 7 characters should NOT conflict
 	assertIndexGet(t, index, id[:7], id, false)
 	assertIndexGet(t, index, id2[:7], id2, false)
 
 	// Deleting a non-existing id should return an error
-	if err := index.Delete("non-existing"); err == nil ***REMOVED***
+	if err := index.Delete("non-existing"); err == nil {
 		t.Fatalf("Deleting a non-existing id should return an error")
-	***REMOVED***
+	}
 
 	// Deleting an empty id should return an error
-	if err := index.Delete(""); err == nil ***REMOVED***
+	if err := index.Delete(""); err == nil {
 		t.Fatal("Deleting an empty id should return an error")
-	***REMOVED***
+	}
 
 	// Deleting id2 should remove conflicts
-	if err := index.Delete(id2); err != nil ***REMOVED***
+	if err := index.Delete(id2); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	// id2 should no longer work
 	assertIndexGet(t, index, id2, "", true)
 	assertIndexGet(t, index, id2[:7], "", true)
@@ -100,354 +100,354 @@ func TestTruncIndex(t *testing.T) ***REMOVED***
 
 	assertIndexIterate(t)
 	assertIndexIterateDoNotPanic(t)
-***REMOVED***
+}
 
-func assertIndexIterate(t *testing.T) ***REMOVED***
-	ids := []string***REMOVED***
+func assertIndexIterate(t *testing.T) {
+	ids := []string{
 		"19b36c2c326ccc11e726eee6ee78a0baf166ef96",
 		"28b36c2c326ccc11e726eee6ee78a0baf166ef96",
 		"37b36c2c326ccc11e726eee6ee78a0baf166ef96",
 		"46b36c2c326ccc11e726eee6ee78a0baf166ef96",
-	***REMOVED***
+	}
 
 	index := NewTruncIndex(ids)
 
-	index.Iterate(func(targetId string) ***REMOVED***
-		for _, id := range ids ***REMOVED***
-			if targetId == id ***REMOVED***
+	index.Iterate(func(targetId string) {
+		for _, id := range ids {
+			if targetId == id {
 				return
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		t.Fatalf("An unknown ID '%s'", targetId)
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func assertIndexIterateDoNotPanic(t *testing.T) ***REMOVED***
-	ids := []string***REMOVED***
+func assertIndexIterateDoNotPanic(t *testing.T) {
+	ids := []string{
 		"19b36c2c326ccc11e726eee6ee78a0baf166ef96",
 		"28b36c2c326ccc11e726eee6ee78a0baf166ef96",
-	***REMOVED***
+	}
 
 	index := NewTruncIndex(ids)
 	iterationStarted := make(chan bool, 1)
 
-	go func() ***REMOVED***
+	go func() {
 		<-iterationStarted
 		index.Delete("19b36c2c326ccc11e726eee6ee78a0baf166ef96")
-	***REMOVED***()
+	}()
 
-	index.Iterate(func(targetId string) ***REMOVED***
-		if targetId == "19b36c2c326ccc11e726eee6ee78a0baf166ef96" ***REMOVED***
+	index.Iterate(func(targetId string) {
+		if targetId == "19b36c2c326ccc11e726eee6ee78a0baf166ef96" {
 			iterationStarted <- true
 			time.Sleep(100 * time.Millisecond)
-		***REMOVED***
-	***REMOVED***)
-***REMOVED***
+		}
+	})
+}
 
-func assertIndexGet(t *testing.T, index *TruncIndex, input, expectedResult string, expectError bool) ***REMOVED***
-	if result, err := index.Get(input); err != nil && !expectError ***REMOVED***
+func assertIndexGet(t *testing.T, index *TruncIndex, input, expectedResult string, expectError bool) {
+	if result, err := index.Get(input); err != nil && !expectError {
 		t.Fatalf("Unexpected error getting '%s': %s", input, err)
-	***REMOVED*** else if err == nil && expectError ***REMOVED***
+	} else if err == nil && expectError {
 		t.Fatalf("Getting '%s' should return an error, not '%s'", input, result)
-	***REMOVED*** else if result != expectedResult ***REMOVED***
+	} else if result != expectedResult {
 		t.Fatalf("Getting '%s' returned '%s' instead of '%s'", input, result, expectedResult)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func BenchmarkTruncIndexAdd100(b *testing.B) ***REMOVED***
+func BenchmarkTruncIndexAdd100(b *testing.B) {
 	var testSet []string
-	for i := 0; i < 100; i++ ***REMOVED***
+	for i := 0; i < 100; i++ {
 		testSet = append(testSet, stringid.GenerateNonCryptoID())
-	***REMOVED***
+	}
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ ***REMOVED***
-		index := NewTruncIndex([]string***REMOVED******REMOVED***)
-		for _, id := range testSet ***REMOVED***
-			if err := index.Add(id); err != nil ***REMOVED***
+	for i := 0; i < b.N; i++ {
+		index := NewTruncIndex([]string{})
+		for _, id := range testSet {
+			if err := index.Add(id); err != nil {
 				b.Fatal(err)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}
 
-func BenchmarkTruncIndexAdd250(b *testing.B) ***REMOVED***
+func BenchmarkTruncIndexAdd250(b *testing.B) {
 	var testSet []string
-	for i := 0; i < 250; i++ ***REMOVED***
+	for i := 0; i < 250; i++ {
 		testSet = append(testSet, stringid.GenerateNonCryptoID())
-	***REMOVED***
+	}
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ ***REMOVED***
-		index := NewTruncIndex([]string***REMOVED******REMOVED***)
-		for _, id := range testSet ***REMOVED***
-			if err := index.Add(id); err != nil ***REMOVED***
+	for i := 0; i < b.N; i++ {
+		index := NewTruncIndex([]string{})
+		for _, id := range testSet {
+			if err := index.Add(id); err != nil {
 				b.Fatal(err)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}
 
-func BenchmarkTruncIndexAdd500(b *testing.B) ***REMOVED***
+func BenchmarkTruncIndexAdd500(b *testing.B) {
 	var testSet []string
-	for i := 0; i < 500; i++ ***REMOVED***
+	for i := 0; i < 500; i++ {
 		testSet = append(testSet, stringid.GenerateNonCryptoID())
-	***REMOVED***
+	}
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ ***REMOVED***
-		index := NewTruncIndex([]string***REMOVED******REMOVED***)
-		for _, id := range testSet ***REMOVED***
-			if err := index.Add(id); err != nil ***REMOVED***
+	for i := 0; i < b.N; i++ {
+		index := NewTruncIndex([]string{})
+		for _, id := range testSet {
+			if err := index.Add(id); err != nil {
 				b.Fatal(err)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}
 
-func BenchmarkTruncIndexGet100(b *testing.B) ***REMOVED***
+func BenchmarkTruncIndexGet100(b *testing.B) {
 	var testSet []string
 	var testKeys []string
-	for i := 0; i < 100; i++ ***REMOVED***
+	for i := 0; i < 100; i++ {
 		testSet = append(testSet, stringid.GenerateNonCryptoID())
-	***REMOVED***
-	index := NewTruncIndex([]string***REMOVED******REMOVED***)
-	for _, id := range testSet ***REMOVED***
-		if err := index.Add(id); err != nil ***REMOVED***
+	}
+	index := NewTruncIndex([]string{})
+	for _, id := range testSet {
+		if err := index.Add(id); err != nil {
 			b.Fatal(err)
-		***REMOVED***
+		}
 		l := rand.Intn(12) + 12
 		testKeys = append(testKeys, id[:l])
-	***REMOVED***
+	}
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ ***REMOVED***
-		for _, id := range testKeys ***REMOVED***
-			if res, err := index.Get(id); err != nil ***REMOVED***
+	for i := 0; i < b.N; i++ {
+		for _, id := range testKeys {
+			if res, err := index.Get(id); err != nil {
 				b.Fatal(res, err)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}
 
-func BenchmarkTruncIndexGet250(b *testing.B) ***REMOVED***
+func BenchmarkTruncIndexGet250(b *testing.B) {
 	var testSet []string
 	var testKeys []string
-	for i := 0; i < 250; i++ ***REMOVED***
+	for i := 0; i < 250; i++ {
 		testSet = append(testSet, stringid.GenerateNonCryptoID())
-	***REMOVED***
-	index := NewTruncIndex([]string***REMOVED******REMOVED***)
-	for _, id := range testSet ***REMOVED***
-		if err := index.Add(id); err != nil ***REMOVED***
+	}
+	index := NewTruncIndex([]string{})
+	for _, id := range testSet {
+		if err := index.Add(id); err != nil {
 			b.Fatal(err)
-		***REMOVED***
+		}
 		l := rand.Intn(12) + 12
 		testKeys = append(testKeys, id[:l])
-	***REMOVED***
+	}
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ ***REMOVED***
-		for _, id := range testKeys ***REMOVED***
-			if res, err := index.Get(id); err != nil ***REMOVED***
+	for i := 0; i < b.N; i++ {
+		for _, id := range testKeys {
+			if res, err := index.Get(id); err != nil {
 				b.Fatal(res, err)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}
 
-func BenchmarkTruncIndexGet500(b *testing.B) ***REMOVED***
+func BenchmarkTruncIndexGet500(b *testing.B) {
 	var testSet []string
 	var testKeys []string
-	for i := 0; i < 500; i++ ***REMOVED***
+	for i := 0; i < 500; i++ {
 		testSet = append(testSet, stringid.GenerateNonCryptoID())
-	***REMOVED***
-	index := NewTruncIndex([]string***REMOVED******REMOVED***)
-	for _, id := range testSet ***REMOVED***
-		if err := index.Add(id); err != nil ***REMOVED***
+	}
+	index := NewTruncIndex([]string{})
+	for _, id := range testSet {
+		if err := index.Add(id); err != nil {
 			b.Fatal(err)
-		***REMOVED***
+		}
 		l := rand.Intn(12) + 12
 		testKeys = append(testKeys, id[:l])
-	***REMOVED***
+	}
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ ***REMOVED***
-		for _, id := range testKeys ***REMOVED***
-			if res, err := index.Get(id); err != nil ***REMOVED***
+	for i := 0; i < b.N; i++ {
+		for _, id := range testKeys {
+			if res, err := index.Get(id); err != nil {
 				b.Fatal(res, err)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}
 
-func BenchmarkTruncIndexDelete100(b *testing.B) ***REMOVED***
+func BenchmarkTruncIndexDelete100(b *testing.B) {
 	var testSet []string
-	for i := 0; i < 100; i++ ***REMOVED***
+	for i := 0; i < 100; i++ {
 		testSet = append(testSet, stringid.GenerateNonCryptoID())
-	***REMOVED***
+	}
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		b.StopTimer()
-		index := NewTruncIndex([]string***REMOVED******REMOVED***)
-		for _, id := range testSet ***REMOVED***
-			if err := index.Add(id); err != nil ***REMOVED***
+		index := NewTruncIndex([]string{})
+		for _, id := range testSet {
+			if err := index.Add(id); err != nil {
 				b.Fatal(err)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		b.StartTimer()
-		for _, id := range testSet ***REMOVED***
-			if err := index.Delete(id); err != nil ***REMOVED***
+		for _, id := range testSet {
+			if err := index.Delete(id); err != nil {
 				b.Fatal(err)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}
 
-func BenchmarkTruncIndexDelete250(b *testing.B) ***REMOVED***
+func BenchmarkTruncIndexDelete250(b *testing.B) {
 	var testSet []string
-	for i := 0; i < 250; i++ ***REMOVED***
+	for i := 0; i < 250; i++ {
 		testSet = append(testSet, stringid.GenerateNonCryptoID())
-	***REMOVED***
+	}
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		b.StopTimer()
-		index := NewTruncIndex([]string***REMOVED******REMOVED***)
-		for _, id := range testSet ***REMOVED***
-			if err := index.Add(id); err != nil ***REMOVED***
+		index := NewTruncIndex([]string{})
+		for _, id := range testSet {
+			if err := index.Add(id); err != nil {
 				b.Fatal(err)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		b.StartTimer()
-		for _, id := range testSet ***REMOVED***
-			if err := index.Delete(id); err != nil ***REMOVED***
+		for _, id := range testSet {
+			if err := index.Delete(id); err != nil {
 				b.Fatal(err)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}
 
-func BenchmarkTruncIndexDelete500(b *testing.B) ***REMOVED***
+func BenchmarkTruncIndexDelete500(b *testing.B) {
 	var testSet []string
-	for i := 0; i < 500; i++ ***REMOVED***
+	for i := 0; i < 500; i++ {
 		testSet = append(testSet, stringid.GenerateNonCryptoID())
-	***REMOVED***
+	}
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		b.StopTimer()
-		index := NewTruncIndex([]string***REMOVED******REMOVED***)
-		for _, id := range testSet ***REMOVED***
-			if err := index.Add(id); err != nil ***REMOVED***
+		index := NewTruncIndex([]string{})
+		for _, id := range testSet {
+			if err := index.Add(id); err != nil {
 				b.Fatal(err)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		b.StartTimer()
-		for _, id := range testSet ***REMOVED***
-			if err := index.Delete(id); err != nil ***REMOVED***
+		for _, id := range testSet {
+			if err := index.Delete(id); err != nil {
 				b.Fatal(err)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}
 
-func BenchmarkTruncIndexNew100(b *testing.B) ***REMOVED***
+func BenchmarkTruncIndexNew100(b *testing.B) {
 	var testSet []string
-	for i := 0; i < 100; i++ ***REMOVED***
+	for i := 0; i < 100; i++ {
 		testSet = append(testSet, stringid.GenerateNonCryptoID())
-	***REMOVED***
+	}
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		NewTruncIndex(testSet)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func BenchmarkTruncIndexNew250(b *testing.B) ***REMOVED***
+func BenchmarkTruncIndexNew250(b *testing.B) {
 	var testSet []string
-	for i := 0; i < 250; i++ ***REMOVED***
+	for i := 0; i < 250; i++ {
 		testSet = append(testSet, stringid.GenerateNonCryptoID())
-	***REMOVED***
+	}
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		NewTruncIndex(testSet)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func BenchmarkTruncIndexNew500(b *testing.B) ***REMOVED***
+func BenchmarkTruncIndexNew500(b *testing.B) {
 	var testSet []string
-	for i := 0; i < 500; i++ ***REMOVED***
+	for i := 0; i < 500; i++ {
 		testSet = append(testSet, stringid.GenerateNonCryptoID())
-	***REMOVED***
+	}
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		NewTruncIndex(testSet)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func BenchmarkTruncIndexAddGet100(b *testing.B) ***REMOVED***
+func BenchmarkTruncIndexAddGet100(b *testing.B) {
 	var testSet []string
 	var testKeys []string
-	for i := 0; i < 500; i++ ***REMOVED***
+	for i := 0; i < 500; i++ {
 		id := stringid.GenerateNonCryptoID()
 		testSet = append(testSet, id)
 		l := rand.Intn(12) + 12
 		testKeys = append(testKeys, id[:l])
-	***REMOVED***
+	}
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ ***REMOVED***
-		index := NewTruncIndex([]string***REMOVED******REMOVED***)
-		for _, id := range testSet ***REMOVED***
-			if err := index.Add(id); err != nil ***REMOVED***
+	for i := 0; i < b.N; i++ {
+		index := NewTruncIndex([]string{})
+		for _, id := range testSet {
+			if err := index.Add(id); err != nil {
 				b.Fatal(err)
-			***REMOVED***
-		***REMOVED***
-		for _, id := range testKeys ***REMOVED***
-			if res, err := index.Get(id); err != nil ***REMOVED***
+			}
+		}
+		for _, id := range testKeys {
+			if res, err := index.Get(id); err != nil {
 				b.Fatal(res, err)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}
 
-func BenchmarkTruncIndexAddGet250(b *testing.B) ***REMOVED***
+func BenchmarkTruncIndexAddGet250(b *testing.B) {
 	var testSet []string
 	var testKeys []string
-	for i := 0; i < 500; i++ ***REMOVED***
+	for i := 0; i < 500; i++ {
 		id := stringid.GenerateNonCryptoID()
 		testSet = append(testSet, id)
 		l := rand.Intn(12) + 12
 		testKeys = append(testKeys, id[:l])
-	***REMOVED***
+	}
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ ***REMOVED***
-		index := NewTruncIndex([]string***REMOVED******REMOVED***)
-		for _, id := range testSet ***REMOVED***
-			if err := index.Add(id); err != nil ***REMOVED***
+	for i := 0; i < b.N; i++ {
+		index := NewTruncIndex([]string{})
+		for _, id := range testSet {
+			if err := index.Add(id); err != nil {
 				b.Fatal(err)
-			***REMOVED***
-		***REMOVED***
-		for _, id := range testKeys ***REMOVED***
-			if res, err := index.Get(id); err != nil ***REMOVED***
+			}
+		}
+		for _, id := range testKeys {
+			if res, err := index.Get(id); err != nil {
 				b.Fatal(res, err)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}
 
-func BenchmarkTruncIndexAddGet500(b *testing.B) ***REMOVED***
+func BenchmarkTruncIndexAddGet500(b *testing.B) {
 	var testSet []string
 	var testKeys []string
-	for i := 0; i < 500; i++ ***REMOVED***
+	for i := 0; i < 500; i++ {
 		id := stringid.GenerateNonCryptoID()
 		testSet = append(testSet, id)
 		l := rand.Intn(12) + 12
 		testKeys = append(testKeys, id[:l])
-	***REMOVED***
+	}
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ ***REMOVED***
-		index := NewTruncIndex([]string***REMOVED******REMOVED***)
-		for _, id := range testSet ***REMOVED***
-			if err := index.Add(id); err != nil ***REMOVED***
+	for i := 0; i < b.N; i++ {
+		index := NewTruncIndex([]string{})
+		for _, id := range testSet {
+			if err := index.Add(id); err != nil {
 				b.Fatal(err)
-			***REMOVED***
-		***REMOVED***
-		for _, id := range testKeys ***REMOVED***
-			if res, err := index.Get(id); err != nil ***REMOVED***
+			}
+		}
+		for _, id := range testKeys {
+			if res, err := index.Get(id); err != nil {
 				b.Fatal(res, err)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}

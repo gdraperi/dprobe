@@ -7,72 +7,72 @@ import (
 	"testing"
 )
 
-func TestEndpointParse(t *testing.T) ***REMOVED***
-	testData := []struct ***REMOVED***
+func TestEndpointParse(t *testing.T) {
+	testData := []struct {
 		str      string
 		expected string
-	***REMOVED******REMOVED***
-		***REMOVED***IndexServer, IndexServer***REMOVED***,
-		***REMOVED***"http://0.0.0.0:5000/v1/", "http://0.0.0.0:5000/v1/"***REMOVED***,
-		***REMOVED***"http://0.0.0.0:5000", "http://0.0.0.0:5000/v1/"***REMOVED***,
-		***REMOVED***"0.0.0.0:5000", "https://0.0.0.0:5000/v1/"***REMOVED***,
-		***REMOVED***"http://0.0.0.0:5000/nonversion/", "http://0.0.0.0:5000/nonversion/v1/"***REMOVED***,
-		***REMOVED***"http://0.0.0.0:5000/v0/", "http://0.0.0.0:5000/v0/v1/"***REMOVED***,
-	***REMOVED***
-	for _, td := range testData ***REMOVED***
+	}{
+		{IndexServer, IndexServer},
+		{"http://0.0.0.0:5000/v1/", "http://0.0.0.0:5000/v1/"},
+		{"http://0.0.0.0:5000", "http://0.0.0.0:5000/v1/"},
+		{"0.0.0.0:5000", "https://0.0.0.0:5000/v1/"},
+		{"http://0.0.0.0:5000/nonversion/", "http://0.0.0.0:5000/nonversion/v1/"},
+		{"http://0.0.0.0:5000/v0/", "http://0.0.0.0:5000/v0/v1/"},
+	}
+	for _, td := range testData {
 		e, err := newV1EndpointFromStr(td.str, nil, "", nil)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Errorf("%q: %s", td.str, err)
-		***REMOVED***
-		if e == nil ***REMOVED***
+		}
+		if e == nil {
 			t.Logf("something's fishy, endpoint for %q is nil", td.str)
 			continue
-		***REMOVED***
-		if e.String() != td.expected ***REMOVED***
+		}
+		if e.String() != td.expected {
 			t.Errorf("expected %q, got %q", td.expected, e.String())
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestEndpointParseInvalid(t *testing.T) ***REMOVED***
-	testData := []string***REMOVED***
+func TestEndpointParseInvalid(t *testing.T) {
+	testData := []string{
 		"http://0.0.0.0:5000/v2/",
-	***REMOVED***
-	for _, td := range testData ***REMOVED***
+	}
+	for _, td := range testData {
 		e, err := newV1EndpointFromStr(td, nil, "", nil)
-		if err == nil ***REMOVED***
+		if err == nil {
 			t.Errorf("expected error parsing %q: parsed as %q", td, e)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // Ensure that a registry endpoint that responds with a 401 only is determined
 // to be a valid v1 registry endpoint
-func TestValidateEndpoint(t *testing.T) ***REMOVED***
-	requireBasicAuthHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) ***REMOVED***
+func TestValidateEndpoint(t *testing.T) {
+	requireBasicAuthHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("WWW-Authenticate", `Basic realm="localhost"`)
 		w.WriteHeader(http.StatusUnauthorized)
-	***REMOVED***)
+	})
 
 	// Make a test server which should validate as a v1 server.
 	testServer := httptest.NewServer(requireBasicAuthHandler)
 	defer testServer.Close()
 
 	testServerURL, err := url.Parse(testServer.URL)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	testEndpoint := V1Endpoint***REMOVED***
+	testEndpoint := V1Endpoint{
 		URL:    testServerURL,
 		client: HTTPClient(NewTransport(nil)),
-	***REMOVED***
+	}
 
-	if err = validateEndpoint(&testEndpoint); err != nil ***REMOVED***
+	if err = validateEndpoint(&testEndpoint); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if testEndpoint.URL.Scheme != "http" ***REMOVED***
+	if testEndpoint.URL.Scheme != "http" {
 		t.Fatalf("expecting to validate endpoint as http, got url %s", testEndpoint.String())
-	***REMOVED***
-***REMOVED***
+	}
+}

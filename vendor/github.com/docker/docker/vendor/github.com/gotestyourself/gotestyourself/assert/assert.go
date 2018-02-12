@@ -21,7 +21,7 @@ The example below shows assert used with some common types.
 	    is "github.com/gotestyourself/gotestyourself/assert/cmp"
 	)
 
-	func TestEverything(t *testing.T) ***REMOVED***
+	func TestEverything(t *testing.T) {
 	    // booleans
 	    assert.Assert(t, isOk)
 	    assert.Assert(t, !missing)
@@ -40,12 +40,12 @@ The example below shows assert used with some common types.
 	    assert.Assert(t, is.Len(items, 3))
 	    assert.Assert(t, len(sequence) != 0) // NotEmpty
 	    assert.Assert(t, is.Contains(mapping, "key"))
-	    assert.Assert(t, is.Compare(result, myStruct***REMOVED***Name: "title"***REMOVED***))
+	    assert.Assert(t, is.Compare(result, myStruct{Name: "title"}))
 
 	    // pointers and interface
 	    assert.Assert(t, is.Nil(ref))
 	    assert.Assert(t, ref != nil) // NotNil
-	***REMOVED***
+	}
 
 Comparisons
 
@@ -55,13 +55,13 @@ values in other ways.
 
 Below is an example of a custom comparison using a regex pattern:
 
-	func RegexP(value string, pattern string) func() (bool, string) ***REMOVED***
-	    return func() (bool, string) ***REMOVED***
+	func RegexP(value string, pattern string) func() (bool, string) {
+	    return func() (bool, string) {
 	        re := regexp.MustCompile(pattern)
 	        msg := fmt.Sprintf("%q did not match pattern %q", value, pattern)
 	        return re.MatchString(value), msg
-	***REMOVED***
-	***REMOVED***
+	    }
+	}
 
 */
 package assert
@@ -75,7 +75,7 @@ import (
 )
 
 // BoolOrComparison can be a bool, or Comparison. Other types will panic.
-type BoolOrComparison interface***REMOVED******REMOVED***
+type BoolOrComparison interface{}
 
 // Comparison is a function which compares values and returns true if the actual
 // value matches the expected value. If the values do not match it returns a message
@@ -86,15 +86,15 @@ type BoolOrComparison interface***REMOVED******REMOVED***
 type Comparison func() (success bool, message string)
 
 // TestingT is the subset of testing.T used by the assert package.
-type TestingT interface ***REMOVED***
+type TestingT interface {
 	FailNow()
 	Fail()
-	Log(args ...interface***REMOVED******REMOVED***)
-***REMOVED***
+	Log(args ...interface{})
+}
 
-type helperT interface ***REMOVED***
+type helperT interface {
 	Helper()
-***REMOVED***
+}
 
 // stackIndex = Assert()/Check(), assert()
 const stackIndex = 2
@@ -106,20 +106,20 @@ func assert(
 	t TestingT,
 	failer func(),
 	comparison BoolOrComparison,
-	msgAndArgs ...interface***REMOVED******REMOVED***,
-) bool ***REMOVED***
-	if ht, ok := t.(helperT); ok ***REMOVED***
+	msgAndArgs ...interface{},
+) bool {
+	if ht, ok := t.(helperT); ok {
 		ht.Helper()
-	***REMOVED***
-	switch check := comparison.(type) ***REMOVED***
+	}
+	switch check := comparison.(type) {
 	case bool:
-		if check ***REMOVED***
+		if check {
 			return true
-		***REMOVED***
+		}
 		source, err := source.GetCondition(stackIndex, comparisonArgPos)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Log(err.Error())
-		***REMOVED***
+		}
 
 		msg := " is false"
 		t.Log(format.WithCustomMessage(failureMessage+source+msg, msgAndArgs...))
@@ -134,53 +134,53 @@ func assert(
 
 	default:
 		panic(fmt.Sprintf("comparison arg must be bool or Comparison, not %T", comparison))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func runCompareFunc(failer func(), t TestingT, f Comparison, msgAndArgs ...interface***REMOVED******REMOVED***) bool ***REMOVED***
-	if ht, ok := t.(helperT); ok ***REMOVED***
+func runCompareFunc(failer func(), t TestingT, f Comparison, msgAndArgs ...interface{}) bool {
+	if ht, ok := t.(helperT); ok {
 		ht.Helper()
-	***REMOVED***
-	if success, message := f(); !success ***REMOVED***
+	}
+	if success, message := f(); !success {
 		t.Log(format.WithCustomMessage(failureMessage+message, msgAndArgs...))
 		failer()
 		return false
-	***REMOVED***
+	}
 	return true
-***REMOVED***
+}
 
 // Assert performs a comparison, marks the test as having failed if the comparison
 // returns false, and stops execution immediately.
-func Assert(t TestingT, comparison BoolOrComparison, msgAndArgs ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if ht, ok := t.(helperT); ok ***REMOVED***
+func Assert(t TestingT, comparison BoolOrComparison, msgAndArgs ...interface{}) {
+	if ht, ok := t.(helperT); ok {
 		ht.Helper()
-	***REMOVED***
+	}
 	assert(t, t.FailNow, comparison, msgAndArgs...)
-***REMOVED***
+}
 
 // Check performs a comparison and marks the test as having failed if the comparison
 // returns false. Returns the result of the comparison.
-func Check(t TestingT, comparison BoolOrComparison, msgAndArgs ...interface***REMOVED******REMOVED***) bool ***REMOVED***
-	if ht, ok := t.(helperT); ok ***REMOVED***
+func Check(t TestingT, comparison BoolOrComparison, msgAndArgs ...interface{}) bool {
+	if ht, ok := t.(helperT); ok {
 		ht.Helper()
-	***REMOVED***
+	}
 	return assert(t, t.Fail, comparison, msgAndArgs...)
-***REMOVED***
+}
 
 // NilError fails the test immediately if the last arg is a non-nil error.
 // This is equivalent to Assert(t, cmp.NilError(err)).
-func NilError(t TestingT, err error, msgAndArgs ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if ht, ok := t.(helperT); ok ***REMOVED***
+func NilError(t TestingT, err error, msgAndArgs ...interface{}) {
+	if ht, ok := t.(helperT); ok {
 		ht.Helper()
-	***REMOVED***
+	}
 	assert(t, t.FailNow, cmp.NilError(err), msgAndArgs...)
-***REMOVED***
+}
 
 // Equal uses the == operator to assert two values are equal and fails the test
 // if they are not equal. This is equivalent to Assert(t, cmp.Equal(x, y)).
-func Equal(t TestingT, x, y interface***REMOVED******REMOVED***, msgAndArgs ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if ht, ok := t.(helperT); ok ***REMOVED***
+func Equal(t TestingT, x, y interface{}, msgAndArgs ...interface{}) {
+	if ht, ok := t.(helperT); ok {
 		ht.Helper()
-	***REMOVED***
+	}
 	assert(t, t.FailNow, cmp.Equal(x, y), msgAndArgs...)
-***REMOVED***
+}

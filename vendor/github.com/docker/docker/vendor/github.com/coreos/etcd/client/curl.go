@@ -26,39 +26,39 @@ var (
 	cURLDebug = false
 )
 
-func EnablecURLDebug() ***REMOVED***
+func EnablecURLDebug() {
 	cURLDebug = true
-***REMOVED***
+}
 
-func DisablecURLDebug() ***REMOVED***
+func DisablecURLDebug() {
 	cURLDebug = false
-***REMOVED***
+}
 
 // printcURL prints the cURL equivalent request to stderr.
 // It returns an error if the body of the request cannot
 // be read.
 // The caller MUST cancel the request if there is an error.
-func printcURL(req *http.Request) error ***REMOVED***
-	if !cURLDebug ***REMOVED***
+func printcURL(req *http.Request) error {
+	if !cURLDebug {
 		return nil
-	***REMOVED***
+	}
 	var (
 		command string
 		b       []byte
 		err     error
 	)
 
-	if req.URL != nil ***REMOVED***
+	if req.URL != nil {
 		command = fmt.Sprintf("curl -X %s %s", req.Method, req.URL.String())
-	***REMOVED***
+	}
 
-	if req.Body != nil ***REMOVED***
+	if req.Body != nil {
 		b, err = ioutil.ReadAll(req.Body)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		command += fmt.Sprintf(" -d %q", string(b))
-	***REMOVED***
+	}
 
 	fmt.Fprintf(os.Stderr, "cURL Command: %s\n", command)
 
@@ -67,4 +67,4 @@ func printcURL(req *http.Request) error ***REMOVED***
 	req.Body = ioutil.NopCloser(body)
 
 	return nil
-***REMOVED***
+}

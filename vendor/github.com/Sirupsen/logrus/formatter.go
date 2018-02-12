@@ -14,9 +14,9 @@ const defaultTimestampFormat = time.RFC3339
 // Any additional fields added with `WithField` or `WithFields` are also in
 // `entry.Data`. Format is expected to return an array of bytes which are then
 // logged to `logger.Out`.
-type Formatter interface ***REMOVED***
+type Formatter interface {
 	Format(*Entry) ([]byte, error)
-***REMOVED***
+}
 
 // This is to not silently overwrite `time`, `msg` and `level` fields when
 // dumping it. If this code wasn't there doing:
@@ -26,20 +26,20 @@ type Formatter interface ***REMOVED***
 // Would just silently drop the user provided level. Instead with this code
 // it'll logged as:
 //
-//  ***REMOVED***"level": "info", "fields.level": 1, "msg": "hello", "time": "..."***REMOVED***
+//  {"level": "info", "fields.level": 1, "msg": "hello", "time": "..."}
 //
 // It's not exported because it's still using Data in an opinionated way. It's to
 // avoid code duplication between the two default formatters.
-func prefixFieldClashes(data Fields) ***REMOVED***
-	if t, ok := data["time"]; ok ***REMOVED***
+func prefixFieldClashes(data Fields) {
+	if t, ok := data["time"]; ok {
 		data["fields.time"] = t
-	***REMOVED***
+	}
 
-	if m, ok := data["msg"]; ok ***REMOVED***
+	if m, ok := data["msg"]; ok {
 		data["fields.msg"] = m
-	***REMOVED***
+	}
 
-	if l, ok := data["level"]; ok ***REMOVED***
+	if l, ok := data["level"]; ok {
 		data["fields.level"] = l
-	***REMOVED***
-***REMOVED***
+	}
+}

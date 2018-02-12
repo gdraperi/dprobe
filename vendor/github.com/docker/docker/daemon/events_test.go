@@ -10,81 +10,81 @@ import (
 	"github.com/docker/docker/daemon/events"
 )
 
-func TestLogContainerEventCopyLabels(t *testing.T) ***REMOVED***
+func TestLogContainerEventCopyLabels(t *testing.T) {
 	e := events.New()
 	_, l, _ := e.Subscribe()
 	defer e.Evict(l)
 
-	container := &container.Container***REMOVED***
+	container := &container.Container{
 		ID:   "container_id",
 		Name: "container_name",
-		Config: &containertypes.Config***REMOVED***
+		Config: &containertypes.Config{
 			Image: "image_name",
-			Labels: map[string]string***REMOVED***
+			Labels: map[string]string{
 				"node": "1",
 				"os":   "alpine",
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
-	daemon := &Daemon***REMOVED***
+			},
+		},
+	}
+	daemon := &Daemon{
 		EventsService: e,
-	***REMOVED***
+	}
 	daemon.LogContainerEvent(container, "create")
 
-	if _, mutated := container.Config.Labels["image"]; mutated ***REMOVED***
+	if _, mutated := container.Config.Labels["image"]; mutated {
 		t.Fatalf("Expected to not mutate the container labels, got %q", container.Config.Labels)
-	***REMOVED***
+	}
 
-	validateTestAttributes(t, l, map[string]string***REMOVED***
+	validateTestAttributes(t, l, map[string]string{
 		"node": "1",
 		"os":   "alpine",
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func TestLogContainerEventWithAttributes(t *testing.T) ***REMOVED***
+func TestLogContainerEventWithAttributes(t *testing.T) {
 	e := events.New()
 	_, l, _ := e.Subscribe()
 	defer e.Evict(l)
 
-	container := &container.Container***REMOVED***
+	container := &container.Container{
 		ID:   "container_id",
 		Name: "container_name",
-		Config: &containertypes.Config***REMOVED***
-			Labels: map[string]string***REMOVED***
+		Config: &containertypes.Config{
+			Labels: map[string]string{
 				"node": "1",
 				"os":   "alpine",
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
-	daemon := &Daemon***REMOVED***
+			},
+		},
+	}
+	daemon := &Daemon{
 		EventsService: e,
-	***REMOVED***
-	attributes := map[string]string***REMOVED***
+	}
+	attributes := map[string]string{
 		"node": "2",
 		"foo":  "bar",
-	***REMOVED***
+	}
 	daemon.LogContainerEventWithAttributes(container, "create", attributes)
 
-	validateTestAttributes(t, l, map[string]string***REMOVED***
+	validateTestAttributes(t, l, map[string]string{
 		"node": "1",
 		"foo":  "bar",
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func validateTestAttributes(t *testing.T, l chan interface***REMOVED******REMOVED***, expectedAttributesToTest map[string]string) ***REMOVED***
-	select ***REMOVED***
+func validateTestAttributes(t *testing.T, l chan interface{}, expectedAttributesToTest map[string]string) {
+	select {
 	case ev := <-l:
 		event, ok := ev.(eventtypes.Message)
-		if !ok ***REMOVED***
+		if !ok {
 			t.Fatalf("Unexpected event message: %q", ev)
-		***REMOVED***
-		for key, expected := range expectedAttributesToTest ***REMOVED***
+		}
+		for key, expected := range expectedAttributesToTest {
 			actual, ok := event.Actor.Attributes[key]
-			if !ok || actual != expected ***REMOVED***
+			if !ok || actual != expected {
 				t.Fatalf("Expected value for key %s to be %s, but was %s (event:%v)", key, expected, actual, event)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 	case <-time.After(10 * time.Second):
 		t.Fatal("LogEvent test timed out")
-	***REMOVED***
-***REMOVED***
+	}
+}

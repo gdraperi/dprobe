@@ -9,24 +9,24 @@ import (
 	"testing"
 )
 
-func connector(t *testing.T, network, addr string, done chan<- bool) ***REMOVED***
-	defer func() ***REMOVED*** done <- true ***REMOVED***()
+func connector(t *testing.T, network, addr string, done chan<- bool) {
+	defer func() { done <- true }()
 
 	c, err := net.Dial(network, addr)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Error(err)
 		return
-	***REMOVED***
+	}
 	c.Close()
-***REMOVED***
+}
 
-func acceptor(t *testing.T, ln net.Listener, done chan<- bool) ***REMOVED***
-	defer func() ***REMOVED*** done <- true ***REMOVED***()
+func acceptor(t *testing.T, ln net.Listener, done chan<- bool) {
+	defer func() { done <- true }()
 
 	c, err := ln.Accept()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Error(err)
 		return
-	***REMOVED***
+	}
 	c.Close()
-***REMOVED***
+}

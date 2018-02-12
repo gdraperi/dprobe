@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-func Example_basic() ***REMOVED***
+func Example_basic() {
 	var log = logrus.New()
 	log.Formatter = new(logrus.JSONFormatter)
 	log.Formatter = new(logrus.TextFormatter)                     //default
@@ -14,50 +14,50 @@ func Example_basic() ***REMOVED***
 	log.Out = os.Stdout
 
 	// file, err := os.OpenFile("logrus.log", os.O_CREATE|os.O_WRONLY, 0666)
-	// if err == nil ***REMOVED***
+	// if err == nil {
 	// 	log.Out = file
-	// ***REMOVED*** else ***REMOVED***
+	// } else {
 	// 	log.Info("Failed to log to file, using default stderr")
-	// ***REMOVED***
+	// }
 
-	defer func() ***REMOVED***
+	defer func() {
 		err := recover()
-		if err != nil ***REMOVED***
+		if err != nil {
 			entry := err.(*logrus.Entry)
-			log.WithFields(logrus.Fields***REMOVED***
+			log.WithFields(logrus.Fields{
 				"omg":         true,
 				"err_animal":  entry.Data["animal"],
 				"err_size":    entry.Data["size"],
 				"err_level":   entry.Level,
 				"err_message": entry.Message,
 				"number":      100,
-			***REMOVED***).Error("The ice breaks!") // or use Fatal() to force the process to exit with a nonzero code
-		***REMOVED***
-	***REMOVED***()
+			}).Error("The ice breaks!") // or use Fatal() to force the process to exit with a nonzero code
+		}
+	}()
 
-	log.WithFields(logrus.Fields***REMOVED***
+	log.WithFields(logrus.Fields{
 		"animal": "walrus",
 		"number": 8,
-	***REMOVED***).Debug("Started observing beach")
+	}).Debug("Started observing beach")
 
-	log.WithFields(logrus.Fields***REMOVED***
+	log.WithFields(logrus.Fields{
 		"animal": "walrus",
 		"size":   10,
-	***REMOVED***).Info("A group of walrus emerges from the ocean")
+	}).Info("A group of walrus emerges from the ocean")
 
-	log.WithFields(logrus.Fields***REMOVED***
+	log.WithFields(logrus.Fields{
 		"omg":    true,
 		"number": 122,
-	***REMOVED***).Warn("The group's number increased tremendously!")
+	}).Warn("The group's number increased tremendously!")
 
-	log.WithFields(logrus.Fields***REMOVED***
+	log.WithFields(logrus.Fields{
 		"temperature": -4,
-	***REMOVED***).Debug("Temperature changes")
+	}).Debug("Temperature changes")
 
-	log.WithFields(logrus.Fields***REMOVED***
+	log.WithFields(logrus.Fields{
 		"animal": "orca",
 		"size":   9009,
-	***REMOVED***).Panic("It's over 9000!")
+	}).Panic("It's over 9000!")
 
 	// Output:
 	// level=debug msg="Started observing beach" animal=walrus number=8
@@ -66,4 +66,4 @@ func Example_basic() ***REMOVED***
 	// level=debug msg="Temperature changes" temperature=-4
 	// level=panic msg="It's over 9000!" animal=orca size=9009
 	// level=error msg="The ice breaks!" err_animal=orca err_level=panic err_message="It's over 9000!" err_size=9009 number=100 omg=true
-***REMOVED***
+}

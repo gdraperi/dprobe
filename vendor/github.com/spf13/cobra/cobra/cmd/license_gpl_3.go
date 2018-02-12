@@ -15,10 +15,10 @@
 
 package cmd
 
-func initGpl3() ***REMOVED***
-	Licenses["gpl3"] = License***REMOVED***
+func initGpl3() {
+	Licenses["gpl3"] = License{
 		Name:            "GNU General Public License 3.0",
-		PossibleMatches: []string***REMOVED***"gpl3", "gplv3", "gpl", "gnu gpl3", "gnu gpl"***REMOVED***,
+		PossibleMatches: []string{"gpl3", "gplv3", "gpl", "gnu gpl3", "gnu gpl"},
 		Header: `
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -707,5 +707,5 @@ the library.  If this is what you want to do, use the GNU Lesser General
 Public License instead of this License.  But first, please read
 <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 `,
-	***REMOVED***
-***REMOVED***
+	}
+}

@@ -1,5 +1,5 @@
-***REMOVED***
-	"foo": ***REMOVED***
+{
+	"foo": {
 		"bar": [1,2]
-	***REMOVED***
-***REMOVED***
+	}
+}

@@ -9,160 +9,160 @@ import (
 )
 
 // Contains checker verifies that obtained value contains a substring.
-var Contains check.Checker = &substringChecker***REMOVED***
-	&check.CheckerInfo***REMOVED***
+var Contains check.Checker = &substringChecker{
+	&check.CheckerInfo{
 		Name:   "Contains",
-		Params: []string***REMOVED***"obtained", "substring"***REMOVED***,
-	***REMOVED***,
+		Params: []string{"obtained", "substring"},
+	},
 	strings.Contains,
-***REMOVED***
+}
 
 // ContainsAny checker verifies that any Unicode code points in chars
 // are in the obtained string.
-var ContainsAny check.Checker = &substringChecker***REMOVED***
-	&check.CheckerInfo***REMOVED***
+var ContainsAny check.Checker = &substringChecker{
+	&check.CheckerInfo{
 		Name:   "ContainsAny",
-		Params: []string***REMOVED***"obtained", "chars"***REMOVED***,
-	***REMOVED***,
+		Params: []string{"obtained", "chars"},
+	},
 	strings.ContainsAny,
-***REMOVED***
+}
 
 // HasPrefix checker verifies that obtained value has the specified substring as prefix
-var HasPrefix check.Checker = &substringChecker***REMOVED***
-	&check.CheckerInfo***REMOVED***
+var HasPrefix check.Checker = &substringChecker{
+	&check.CheckerInfo{
 		Name:   "HasPrefix",
-		Params: []string***REMOVED***"obtained", "prefix"***REMOVED***,
-	***REMOVED***,
+		Params: []string{"obtained", "prefix"},
+	},
 	strings.HasPrefix,
-***REMOVED***
+}
 
 // HasSuffix checker verifies that obtained value has the specified substring as prefix
-var HasSuffix check.Checker = &substringChecker***REMOVED***
-	&check.CheckerInfo***REMOVED***
+var HasSuffix check.Checker = &substringChecker{
+	&check.CheckerInfo{
 		Name:   "HasSuffix",
-		Params: []string***REMOVED***"obtained", "suffix"***REMOVED***,
-	***REMOVED***,
+		Params: []string{"obtained", "suffix"},
+	},
 	strings.HasSuffix,
-***REMOVED***
+}
 
 // EqualFold checker verifies that obtained value is, interpreted as UTF-8 strings, are equal under Unicode case-folding.
-var EqualFold check.Checker = &substringChecker***REMOVED***
-	&check.CheckerInfo***REMOVED***
+var EqualFold check.Checker = &substringChecker{
+	&check.CheckerInfo{
 		Name:   "EqualFold",
-		Params: []string***REMOVED***"obtained", "expected"***REMOVED***,
-	***REMOVED***,
+		Params: []string{"obtained", "expected"},
+	},
 	strings.EqualFold,
-***REMOVED***
+}
 
-type substringChecker struct ***REMOVED***
+type substringChecker struct {
 	*check.CheckerInfo
 	substringFunction func(string, string) bool
-***REMOVED***
+}
 
-func (checker *substringChecker) Check(params []interface***REMOVED******REMOVED***, names []string) (bool, string) ***REMOVED***
+func (checker *substringChecker) Check(params []interface{}, names []string) (bool, string) {
 	obtained := params[0]
 	substring := params[1]
 	substringStr, ok := substring.(string)
-	if !ok ***REMOVED***
+	if !ok {
 		return false, fmt.Sprintf("%s value must be a string.", names[1])
-	***REMOVED***
+	}
 	obtainedString, obtainedIsStr := obtained.(string)
-	if !obtainedIsStr ***REMOVED***
-		if obtainedWithStringer, obtainedHasStringer := obtained.(fmt.Stringer); obtainedHasStringer ***REMOVED***
+	if !obtainedIsStr {
+		if obtainedWithStringer, obtainedHasStringer := obtained.(fmt.Stringer); obtainedHasStringer {
 			obtainedString, obtainedIsStr = obtainedWithStringer.String(), true
-		***REMOVED***
-	***REMOVED***
-	if obtainedIsStr ***REMOVED***
+		}
+	}
+	if obtainedIsStr {
 		return checker.substringFunction(obtainedString, substringStr), ""
-	***REMOVED***
+	}
 	return false, "obtained value is not a string and has no .String()."
-***REMOVED***
+}
 
 // IndexAny checker verifies that the index of the first instance of any Unicode code point from chars in the obtained value is equal to expected
-var IndexAny check.Checker = &substringCountChecker***REMOVED***
-	&check.CheckerInfo***REMOVED***
+var IndexAny check.Checker = &substringCountChecker{
+	&check.CheckerInfo{
 		Name:   "IndexAny",
-		Params: []string***REMOVED***"obtained", "chars", "expected"***REMOVED***,
-	***REMOVED***,
+		Params: []string{"obtained", "chars", "expected"},
+	},
 	strings.IndexAny,
-***REMOVED***
+}
 
 // Index checker verifies that the index of the first instance of sep in the obtained value is equal to expected
-var Index check.Checker = &substringCountChecker***REMOVED***
-	&check.CheckerInfo***REMOVED***
+var Index check.Checker = &substringCountChecker{
+	&check.CheckerInfo{
 		Name:   "Index",
-		Params: []string***REMOVED***"obtained", "sep", "expected"***REMOVED***,
-	***REMOVED***,
+		Params: []string{"obtained", "sep", "expected"},
+	},
 	strings.Index,
-***REMOVED***
+}
 
 // Count checker verifies that obtained value has the specified number of non-overlapping instances of sep
-var Count check.Checker = &substringCountChecker***REMOVED***
-	&check.CheckerInfo***REMOVED***
+var Count check.Checker = &substringCountChecker{
+	&check.CheckerInfo{
 		Name:   "Count",
-		Params: []string***REMOVED***"obtained", "sep", "expected"***REMOVED***,
-	***REMOVED***,
+		Params: []string{"obtained", "sep", "expected"},
+	},
 	strings.Count,
-***REMOVED***
+}
 
-type substringCountChecker struct ***REMOVED***
+type substringCountChecker struct {
 	*check.CheckerInfo
 	substringFunction func(string, string) int
-***REMOVED***
+}
 
-func (checker *substringCountChecker) Check(params []interface***REMOVED******REMOVED***, names []string) (bool, string) ***REMOVED***
+func (checker *substringCountChecker) Check(params []interface{}, names []string) (bool, string) {
 	obtained := params[0]
 	substring := params[1]
 	expected := params[2]
 	substringStr, ok := substring.(string)
-	if !ok ***REMOVED***
+	if !ok {
 		return false, fmt.Sprintf("%s value must be a string.", names[1])
-	***REMOVED***
+	}
 	obtainedString, obtainedIsStr := obtained.(string)
-	if !obtainedIsStr ***REMOVED***
-		if obtainedWithStringer, obtainedHasStringer := obtained.(fmt.Stringer); obtainedHasStringer ***REMOVED***
+	if !obtainedIsStr {
+		if obtainedWithStringer, obtainedHasStringer := obtained.(fmt.Stringer); obtainedHasStringer {
 			obtainedString, obtainedIsStr = obtainedWithStringer.String(), true
-		***REMOVED***
-	***REMOVED***
-	if obtainedIsStr ***REMOVED***
+		}
+	}
+	if obtainedIsStr {
 		return checker.substringFunction(obtainedString, substringStr) == expected, ""
-	***REMOVED***
+	}
 	return false, "obtained value is not a string and has no .String()."
-***REMOVED***
+}
 
 // IsLower checker verifies that the obtained value is in lower case
-var IsLower check.Checker = &stringTransformChecker***REMOVED***
-	&check.CheckerInfo***REMOVED***
+var IsLower check.Checker = &stringTransformChecker{
+	&check.CheckerInfo{
 		Name:   "IsLower",
-		Params: []string***REMOVED***"obtained"***REMOVED***,
-	***REMOVED***,
+		Params: []string{"obtained"},
+	},
 	strings.ToLower,
-***REMOVED***
+}
 
 // IsUpper checker verifies that the obtained value is in lower case
-var IsUpper check.Checker = &stringTransformChecker***REMOVED***
-	&check.CheckerInfo***REMOVED***
+var IsUpper check.Checker = &stringTransformChecker{
+	&check.CheckerInfo{
 		Name:   "IsUpper",
-		Params: []string***REMOVED***"obtained"***REMOVED***,
-	***REMOVED***,
+		Params: []string{"obtained"},
+	},
 	strings.ToUpper,
-***REMOVED***
+}
 
-type stringTransformChecker struct ***REMOVED***
+type stringTransformChecker struct {
 	*check.CheckerInfo
 	stringFunction func(string) string
-***REMOVED***
+}
 
-func (checker *stringTransformChecker) Check(params []interface***REMOVED******REMOVED***, names []string) (bool, string) ***REMOVED***
+func (checker *stringTransformChecker) Check(params []interface{}, names []string) (bool, string) {
 	obtained := params[0]
 	obtainedString, obtainedIsStr := obtained.(string)
-	if !obtainedIsStr ***REMOVED***
-		if obtainedWithStringer, obtainedHasStringer := obtained.(fmt.Stringer); obtainedHasStringer ***REMOVED***
+	if !obtainedIsStr {
+		if obtainedWithStringer, obtainedHasStringer := obtained.(fmt.Stringer); obtainedHasStringer {
 			obtainedString, obtainedIsStr = obtainedWithStringer.String(), true
-		***REMOVED***
-	***REMOVED***
-	if obtainedIsStr ***REMOVED***
+		}
+	}
+	if obtainedIsStr {
 		return checker.stringFunction(obtainedString) == obtainedString, ""
-	***REMOVED***
+	}
 	return false, "obtained value is not a string and has no .String()."
-***REMOVED***
+}

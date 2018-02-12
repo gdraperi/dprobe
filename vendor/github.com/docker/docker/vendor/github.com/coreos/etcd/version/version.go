@@ -33,24 +33,24 @@ var (
 	GitSHA = "Not provided (use ./build instead of go build)"
 )
 
-func init() ***REMOVED***
+func init() {
 	ver, err := semver.NewVersion(Version)
-	if err == nil ***REMOVED***
+	if err == nil {
 		APIVersion = fmt.Sprintf("%d.%d", ver.Major, ver.Minor)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type Versions struct ***REMOVED***
+type Versions struct {
 	Server  string `json:"etcdserver"`
 	Cluster string `json:"etcdcluster"`
 	// TODO: raft state machine version
-***REMOVED***
+}
 
 // Cluster only keeps the major.minor.
-func Cluster(v string) string ***REMOVED***
+func Cluster(v string) string {
 	vs := strings.Split(v, ".")
-	if len(vs) <= 2 ***REMOVED***
+	if len(vs) <= 2 {
 		return v
-	***REMOVED***
+	}
 	return fmt.Sprintf("%s.%s", vs[0], vs[1])
-***REMOVED***
+}

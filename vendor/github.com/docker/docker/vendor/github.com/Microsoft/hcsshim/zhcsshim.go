@@ -24,18 +24,18 @@ var (
 
 // errnoErr returns common boxed Errno values, to prevent
 // allocations at runtime.
-func errnoErr(e syscall.Errno) error ***REMOVED***
-	switch e ***REMOVED***
+func errnoErr(e syscall.Errno) error {
+	switch e {
 	case 0:
 		return nil
 	case errnoERROR_IO_PENDING:
 		return errERROR_IO_PENDING
-	***REMOVED***
+	}
 	// TODO: add more here, after collecting data on the common
 	// error values see on Windows. (perhaps when running
 	// all.bat?)
 	return e
-***REMOVED***
+}
 
 var (
 	modole32     = windows.NewLazySystemDLL("ole32.dll")
@@ -96,947 +96,947 @@ var (
 	procHNSCall                            = modvmcompute.NewProc("HNSCall")
 )
 
-func coTaskMemFree(buffer unsafe.Pointer) ***REMOVED***
+func coTaskMemFree(buffer unsafe.Pointer) {
 	syscall.Syscall(procCoTaskMemFree.Addr(), 1, uintptr(buffer), 0, 0)
 	return
-***REMOVED***
+}
 
-func SetCurrentThreadCompartmentId(compartmentId uint32) (hr error) ***REMOVED***
+func SetCurrentThreadCompartmentId(compartmentId uint32) (hr error) {
 	r0, _, _ := syscall.Syscall(procSetCurrentThreadCompartmentId.Addr(), 1, uintptr(compartmentId), 0, 0)
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func activateLayer(info *driverInfo, id string) (hr error) ***REMOVED***
+func activateLayer(info *driverInfo, id string) (hr error) {
 	var _p0 *uint16
 	_p0, hr = syscall.UTF16PtrFromString(id)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	return _activateLayer(info, _p0)
-***REMOVED***
+}
 
-func _activateLayer(info *driverInfo, id *uint16) (hr error) ***REMOVED***
-	if hr = procActivateLayer.Find(); hr != nil ***REMOVED***
+func _activateLayer(info *driverInfo, id *uint16) (hr error) {
+	if hr = procActivateLayer.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall(procActivateLayer.Addr(), 2, uintptr(unsafe.Pointer(info)), uintptr(unsafe.Pointer(id)), 0)
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func copyLayer(info *driverInfo, srcId string, dstId string, descriptors []WC_LAYER_DESCRIPTOR) (hr error) ***REMOVED***
+func copyLayer(info *driverInfo, srcId string, dstId string, descriptors []WC_LAYER_DESCRIPTOR) (hr error) {
 	var _p0 *uint16
 	_p0, hr = syscall.UTF16PtrFromString(srcId)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	var _p1 *uint16
 	_p1, hr = syscall.UTF16PtrFromString(dstId)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	return _copyLayer(info, _p0, _p1, descriptors)
-***REMOVED***
+}
 
-func _copyLayer(info *driverInfo, srcId *uint16, dstId *uint16, descriptors []WC_LAYER_DESCRIPTOR) (hr error) ***REMOVED***
+func _copyLayer(info *driverInfo, srcId *uint16, dstId *uint16, descriptors []WC_LAYER_DESCRIPTOR) (hr error) {
 	var _p2 *WC_LAYER_DESCRIPTOR
-	if len(descriptors) > 0 ***REMOVED***
+	if len(descriptors) > 0 {
 		_p2 = &descriptors[0]
-	***REMOVED***
-	if hr = procCopyLayer.Find(); hr != nil ***REMOVED***
+	}
+	if hr = procCopyLayer.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall6(procCopyLayer.Addr(), 5, uintptr(unsafe.Pointer(info)), uintptr(unsafe.Pointer(srcId)), uintptr(unsafe.Pointer(dstId)), uintptr(unsafe.Pointer(_p2)), uintptr(len(descriptors)), 0)
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func createLayer(info *driverInfo, id string, parent string) (hr error) ***REMOVED***
+func createLayer(info *driverInfo, id string, parent string) (hr error) {
 	var _p0 *uint16
 	_p0, hr = syscall.UTF16PtrFromString(id)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	var _p1 *uint16
 	_p1, hr = syscall.UTF16PtrFromString(parent)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	return _createLayer(info, _p0, _p1)
-***REMOVED***
+}
 
-func _createLayer(info *driverInfo, id *uint16, parent *uint16) (hr error) ***REMOVED***
-	if hr = procCreateLayer.Find(); hr != nil ***REMOVED***
+func _createLayer(info *driverInfo, id *uint16, parent *uint16) (hr error) {
+	if hr = procCreateLayer.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall(procCreateLayer.Addr(), 3, uintptr(unsafe.Pointer(info)), uintptr(unsafe.Pointer(id)), uintptr(unsafe.Pointer(parent)))
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func createSandboxLayer(info *driverInfo, id string, parent string, descriptors []WC_LAYER_DESCRIPTOR) (hr error) ***REMOVED***
+func createSandboxLayer(info *driverInfo, id string, parent string, descriptors []WC_LAYER_DESCRIPTOR) (hr error) {
 	var _p0 *uint16
 	_p0, hr = syscall.UTF16PtrFromString(id)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	var _p1 *uint16
 	_p1, hr = syscall.UTF16PtrFromString(parent)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	return _createSandboxLayer(info, _p0, _p1, descriptors)
-***REMOVED***
+}
 
-func _createSandboxLayer(info *driverInfo, id *uint16, parent *uint16, descriptors []WC_LAYER_DESCRIPTOR) (hr error) ***REMOVED***
+func _createSandboxLayer(info *driverInfo, id *uint16, parent *uint16, descriptors []WC_LAYER_DESCRIPTOR) (hr error) {
 	var _p2 *WC_LAYER_DESCRIPTOR
-	if len(descriptors) > 0 ***REMOVED***
+	if len(descriptors) > 0 {
 		_p2 = &descriptors[0]
-	***REMOVED***
-	if hr = procCreateSandboxLayer.Find(); hr != nil ***REMOVED***
+	}
+	if hr = procCreateSandboxLayer.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall6(procCreateSandboxLayer.Addr(), 5, uintptr(unsafe.Pointer(info)), uintptr(unsafe.Pointer(id)), uintptr(unsafe.Pointer(parent)), uintptr(unsafe.Pointer(_p2)), uintptr(len(descriptors)), 0)
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func expandSandboxSize(info *driverInfo, id string, size uint64) (hr error) ***REMOVED***
+func expandSandboxSize(info *driverInfo, id string, size uint64) (hr error) {
 	var _p0 *uint16
 	_p0, hr = syscall.UTF16PtrFromString(id)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	return _expandSandboxSize(info, _p0, size)
-***REMOVED***
+}
 
-func _expandSandboxSize(info *driverInfo, id *uint16, size uint64) (hr error) ***REMOVED***
-	if hr = procExpandSandboxSize.Find(); hr != nil ***REMOVED***
+func _expandSandboxSize(info *driverInfo, id *uint16, size uint64) (hr error) {
+	if hr = procExpandSandboxSize.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall(procExpandSandboxSize.Addr(), 3, uintptr(unsafe.Pointer(info)), uintptr(unsafe.Pointer(id)), uintptr(size))
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func deactivateLayer(info *driverInfo, id string) (hr error) ***REMOVED***
+func deactivateLayer(info *driverInfo, id string) (hr error) {
 	var _p0 *uint16
 	_p0, hr = syscall.UTF16PtrFromString(id)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	return _deactivateLayer(info, _p0)
-***REMOVED***
+}
 
-func _deactivateLayer(info *driverInfo, id *uint16) (hr error) ***REMOVED***
-	if hr = procDeactivateLayer.Find(); hr != nil ***REMOVED***
+func _deactivateLayer(info *driverInfo, id *uint16) (hr error) {
+	if hr = procDeactivateLayer.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall(procDeactivateLayer.Addr(), 2, uintptr(unsafe.Pointer(info)), uintptr(unsafe.Pointer(id)), 0)
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func destroyLayer(info *driverInfo, id string) (hr error) ***REMOVED***
+func destroyLayer(info *driverInfo, id string) (hr error) {
 	var _p0 *uint16
 	_p0, hr = syscall.UTF16PtrFromString(id)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	return _destroyLayer(info, _p0)
-***REMOVED***
+}
 
-func _destroyLayer(info *driverInfo, id *uint16) (hr error) ***REMOVED***
-	if hr = procDestroyLayer.Find(); hr != nil ***REMOVED***
+func _destroyLayer(info *driverInfo, id *uint16) (hr error) {
+	if hr = procDestroyLayer.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall(procDestroyLayer.Addr(), 2, uintptr(unsafe.Pointer(info)), uintptr(unsafe.Pointer(id)), 0)
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func exportLayer(info *driverInfo, id string, path string, descriptors []WC_LAYER_DESCRIPTOR) (hr error) ***REMOVED***
+func exportLayer(info *driverInfo, id string, path string, descriptors []WC_LAYER_DESCRIPTOR) (hr error) {
 	var _p0 *uint16
 	_p0, hr = syscall.UTF16PtrFromString(id)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	var _p1 *uint16
 	_p1, hr = syscall.UTF16PtrFromString(path)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	return _exportLayer(info, _p0, _p1, descriptors)
-***REMOVED***
+}
 
-func _exportLayer(info *driverInfo, id *uint16, path *uint16, descriptors []WC_LAYER_DESCRIPTOR) (hr error) ***REMOVED***
+func _exportLayer(info *driverInfo, id *uint16, path *uint16, descriptors []WC_LAYER_DESCRIPTOR) (hr error) {
 	var _p2 *WC_LAYER_DESCRIPTOR
-	if len(descriptors) > 0 ***REMOVED***
+	if len(descriptors) > 0 {
 		_p2 = &descriptors[0]
-	***REMOVED***
-	if hr = procExportLayer.Find(); hr != nil ***REMOVED***
+	}
+	if hr = procExportLayer.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall6(procExportLayer.Addr(), 5, uintptr(unsafe.Pointer(info)), uintptr(unsafe.Pointer(id)), uintptr(unsafe.Pointer(path)), uintptr(unsafe.Pointer(_p2)), uintptr(len(descriptors)), 0)
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func getLayerMountPath(info *driverInfo, id string, length *uintptr, buffer *uint16) (hr error) ***REMOVED***
+func getLayerMountPath(info *driverInfo, id string, length *uintptr, buffer *uint16) (hr error) {
 	var _p0 *uint16
 	_p0, hr = syscall.UTF16PtrFromString(id)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	return _getLayerMountPath(info, _p0, length, buffer)
-***REMOVED***
+}
 
-func _getLayerMountPath(info *driverInfo, id *uint16, length *uintptr, buffer *uint16) (hr error) ***REMOVED***
-	if hr = procGetLayerMountPath.Find(); hr != nil ***REMOVED***
+func _getLayerMountPath(info *driverInfo, id *uint16, length *uintptr, buffer *uint16) (hr error) {
+	if hr = procGetLayerMountPath.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall6(procGetLayerMountPath.Addr(), 4, uintptr(unsafe.Pointer(info)), uintptr(unsafe.Pointer(id)), uintptr(unsafe.Pointer(length)), uintptr(unsafe.Pointer(buffer)), 0, 0)
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func getBaseImages(buffer **uint16) (hr error) ***REMOVED***
-	if hr = procGetBaseImages.Find(); hr != nil ***REMOVED***
+func getBaseImages(buffer **uint16) (hr error) {
+	if hr = procGetBaseImages.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall(procGetBaseImages.Addr(), 1, uintptr(unsafe.Pointer(buffer)), 0, 0)
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func importLayer(info *driverInfo, id string, path string, descriptors []WC_LAYER_DESCRIPTOR) (hr error) ***REMOVED***
+func importLayer(info *driverInfo, id string, path string, descriptors []WC_LAYER_DESCRIPTOR) (hr error) {
 	var _p0 *uint16
 	_p0, hr = syscall.UTF16PtrFromString(id)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	var _p1 *uint16
 	_p1, hr = syscall.UTF16PtrFromString(path)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	return _importLayer(info, _p0, _p1, descriptors)
-***REMOVED***
+}
 
-func _importLayer(info *driverInfo, id *uint16, path *uint16, descriptors []WC_LAYER_DESCRIPTOR) (hr error) ***REMOVED***
+func _importLayer(info *driverInfo, id *uint16, path *uint16, descriptors []WC_LAYER_DESCRIPTOR) (hr error) {
 	var _p2 *WC_LAYER_DESCRIPTOR
-	if len(descriptors) > 0 ***REMOVED***
+	if len(descriptors) > 0 {
 		_p2 = &descriptors[0]
-	***REMOVED***
-	if hr = procImportLayer.Find(); hr != nil ***REMOVED***
+	}
+	if hr = procImportLayer.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall6(procImportLayer.Addr(), 5, uintptr(unsafe.Pointer(info)), uintptr(unsafe.Pointer(id)), uintptr(unsafe.Pointer(path)), uintptr(unsafe.Pointer(_p2)), uintptr(len(descriptors)), 0)
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func layerExists(info *driverInfo, id string, exists *uint32) (hr error) ***REMOVED***
+func layerExists(info *driverInfo, id string, exists *uint32) (hr error) {
 	var _p0 *uint16
 	_p0, hr = syscall.UTF16PtrFromString(id)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	return _layerExists(info, _p0, exists)
-***REMOVED***
+}
 
-func _layerExists(info *driverInfo, id *uint16, exists *uint32) (hr error) ***REMOVED***
-	if hr = procLayerExists.Find(); hr != nil ***REMOVED***
+func _layerExists(info *driverInfo, id *uint16, exists *uint32) (hr error) {
+	if hr = procLayerExists.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall(procLayerExists.Addr(), 3, uintptr(unsafe.Pointer(info)), uintptr(unsafe.Pointer(id)), uintptr(unsafe.Pointer(exists)))
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func nameToGuid(name string, guid *GUID) (hr error) ***REMOVED***
+func nameToGuid(name string, guid *GUID) (hr error) {
 	var _p0 *uint16
 	_p0, hr = syscall.UTF16PtrFromString(name)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	return _nameToGuid(_p0, guid)
-***REMOVED***
+}
 
-func _nameToGuid(name *uint16, guid *GUID) (hr error) ***REMOVED***
-	if hr = procNameToGuid.Find(); hr != nil ***REMOVED***
+func _nameToGuid(name *uint16, guid *GUID) (hr error) {
+	if hr = procNameToGuid.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall(procNameToGuid.Addr(), 2, uintptr(unsafe.Pointer(name)), uintptr(unsafe.Pointer(guid)), 0)
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func prepareLayer(info *driverInfo, id string, descriptors []WC_LAYER_DESCRIPTOR) (hr error) ***REMOVED***
+func prepareLayer(info *driverInfo, id string, descriptors []WC_LAYER_DESCRIPTOR) (hr error) {
 	var _p0 *uint16
 	_p0, hr = syscall.UTF16PtrFromString(id)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	return _prepareLayer(info, _p0, descriptors)
-***REMOVED***
+}
 
-func _prepareLayer(info *driverInfo, id *uint16, descriptors []WC_LAYER_DESCRIPTOR) (hr error) ***REMOVED***
+func _prepareLayer(info *driverInfo, id *uint16, descriptors []WC_LAYER_DESCRIPTOR) (hr error) {
 	var _p1 *WC_LAYER_DESCRIPTOR
-	if len(descriptors) > 0 ***REMOVED***
+	if len(descriptors) > 0 {
 		_p1 = &descriptors[0]
-	***REMOVED***
-	if hr = procPrepareLayer.Find(); hr != nil ***REMOVED***
+	}
+	if hr = procPrepareLayer.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall6(procPrepareLayer.Addr(), 4, uintptr(unsafe.Pointer(info)), uintptr(unsafe.Pointer(id)), uintptr(unsafe.Pointer(_p1)), uintptr(len(descriptors)), 0, 0)
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func unprepareLayer(info *driverInfo, id string) (hr error) ***REMOVED***
+func unprepareLayer(info *driverInfo, id string) (hr error) {
 	var _p0 *uint16
 	_p0, hr = syscall.UTF16PtrFromString(id)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	return _unprepareLayer(info, _p0)
-***REMOVED***
+}
 
-func _unprepareLayer(info *driverInfo, id *uint16) (hr error) ***REMOVED***
-	if hr = procUnprepareLayer.Find(); hr != nil ***REMOVED***
+func _unprepareLayer(info *driverInfo, id *uint16) (hr error) {
+	if hr = procUnprepareLayer.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall(procUnprepareLayer.Addr(), 2, uintptr(unsafe.Pointer(info)), uintptr(unsafe.Pointer(id)), 0)
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func processBaseImage(path string) (hr error) ***REMOVED***
+func processBaseImage(path string) (hr error) {
 	var _p0 *uint16
 	_p0, hr = syscall.UTF16PtrFromString(path)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	return _processBaseImage(_p0)
-***REMOVED***
+}
 
-func _processBaseImage(path *uint16) (hr error) ***REMOVED***
-	if hr = procProcessBaseImage.Find(); hr != nil ***REMOVED***
+func _processBaseImage(path *uint16) (hr error) {
+	if hr = procProcessBaseImage.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall(procProcessBaseImage.Addr(), 1, uintptr(unsafe.Pointer(path)), 0, 0)
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func processUtilityImage(path string) (hr error) ***REMOVED***
+func processUtilityImage(path string) (hr error) {
 	var _p0 *uint16
 	_p0, hr = syscall.UTF16PtrFromString(path)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	return _processUtilityImage(_p0)
-***REMOVED***
+}
 
-func _processUtilityImage(path *uint16) (hr error) ***REMOVED***
-	if hr = procProcessUtilityImage.Find(); hr != nil ***REMOVED***
+func _processUtilityImage(path *uint16) (hr error) {
+	if hr = procProcessUtilityImage.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall(procProcessUtilityImage.Addr(), 1, uintptr(unsafe.Pointer(path)), 0, 0)
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func importLayerBegin(info *driverInfo, id string, descriptors []WC_LAYER_DESCRIPTOR, context *uintptr) (hr error) ***REMOVED***
+func importLayerBegin(info *driverInfo, id string, descriptors []WC_LAYER_DESCRIPTOR, context *uintptr) (hr error) {
 	var _p0 *uint16
 	_p0, hr = syscall.UTF16PtrFromString(id)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	return _importLayerBegin(info, _p0, descriptors, context)
-***REMOVED***
+}
 
-func _importLayerBegin(info *driverInfo, id *uint16, descriptors []WC_LAYER_DESCRIPTOR, context *uintptr) (hr error) ***REMOVED***
+func _importLayerBegin(info *driverInfo, id *uint16, descriptors []WC_LAYER_DESCRIPTOR, context *uintptr) (hr error) {
 	var _p1 *WC_LAYER_DESCRIPTOR
-	if len(descriptors) > 0 ***REMOVED***
+	if len(descriptors) > 0 {
 		_p1 = &descriptors[0]
-	***REMOVED***
-	if hr = procImportLayerBegin.Find(); hr != nil ***REMOVED***
+	}
+	if hr = procImportLayerBegin.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall6(procImportLayerBegin.Addr(), 5, uintptr(unsafe.Pointer(info)), uintptr(unsafe.Pointer(id)), uintptr(unsafe.Pointer(_p1)), uintptr(len(descriptors)), uintptr(unsafe.Pointer(context)), 0)
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func importLayerNext(context uintptr, fileName string, fileInfo *winio.FileBasicInfo) (hr error) ***REMOVED***
+func importLayerNext(context uintptr, fileName string, fileInfo *winio.FileBasicInfo) (hr error) {
 	var _p0 *uint16
 	_p0, hr = syscall.UTF16PtrFromString(fileName)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	return _importLayerNext(context, _p0, fileInfo)
-***REMOVED***
+}
 
-func _importLayerNext(context uintptr, fileName *uint16, fileInfo *winio.FileBasicInfo) (hr error) ***REMOVED***
-	if hr = procImportLayerNext.Find(); hr != nil ***REMOVED***
+func _importLayerNext(context uintptr, fileName *uint16, fileInfo *winio.FileBasicInfo) (hr error) {
+	if hr = procImportLayerNext.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall(procImportLayerNext.Addr(), 3, uintptr(context), uintptr(unsafe.Pointer(fileName)), uintptr(unsafe.Pointer(fileInfo)))
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func importLayerWrite(context uintptr, buffer []byte) (hr error) ***REMOVED***
+func importLayerWrite(context uintptr, buffer []byte) (hr error) {
 	var _p0 *byte
-	if len(buffer) > 0 ***REMOVED***
+	if len(buffer) > 0 {
 		_p0 = &buffer[0]
-	***REMOVED***
-	if hr = procImportLayerWrite.Find(); hr != nil ***REMOVED***
+	}
+	if hr = procImportLayerWrite.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall(procImportLayerWrite.Addr(), 3, uintptr(context), uintptr(unsafe.Pointer(_p0)), uintptr(len(buffer)))
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func importLayerEnd(context uintptr) (hr error) ***REMOVED***
-	if hr = procImportLayerEnd.Find(); hr != nil ***REMOVED***
+func importLayerEnd(context uintptr) (hr error) {
+	if hr = procImportLayerEnd.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall(procImportLayerEnd.Addr(), 1, uintptr(context), 0, 0)
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func exportLayerBegin(info *driverInfo, id string, descriptors []WC_LAYER_DESCRIPTOR, context *uintptr) (hr error) ***REMOVED***
+func exportLayerBegin(info *driverInfo, id string, descriptors []WC_LAYER_DESCRIPTOR, context *uintptr) (hr error) {
 	var _p0 *uint16
 	_p0, hr = syscall.UTF16PtrFromString(id)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	return _exportLayerBegin(info, _p0, descriptors, context)
-***REMOVED***
+}
 
-func _exportLayerBegin(info *driverInfo, id *uint16, descriptors []WC_LAYER_DESCRIPTOR, context *uintptr) (hr error) ***REMOVED***
+func _exportLayerBegin(info *driverInfo, id *uint16, descriptors []WC_LAYER_DESCRIPTOR, context *uintptr) (hr error) {
 	var _p1 *WC_LAYER_DESCRIPTOR
-	if len(descriptors) > 0 ***REMOVED***
+	if len(descriptors) > 0 {
 		_p1 = &descriptors[0]
-	***REMOVED***
-	if hr = procExportLayerBegin.Find(); hr != nil ***REMOVED***
+	}
+	if hr = procExportLayerBegin.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall6(procExportLayerBegin.Addr(), 5, uintptr(unsafe.Pointer(info)), uintptr(unsafe.Pointer(id)), uintptr(unsafe.Pointer(_p1)), uintptr(len(descriptors)), uintptr(unsafe.Pointer(context)), 0)
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func exportLayerNext(context uintptr, fileName **uint16, fileInfo *winio.FileBasicInfo, fileSize *int64, deleted *uint32) (hr error) ***REMOVED***
-	if hr = procExportLayerNext.Find(); hr != nil ***REMOVED***
+func exportLayerNext(context uintptr, fileName **uint16, fileInfo *winio.FileBasicInfo, fileSize *int64, deleted *uint32) (hr error) {
+	if hr = procExportLayerNext.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall6(procExportLayerNext.Addr(), 5, uintptr(context), uintptr(unsafe.Pointer(fileName)), uintptr(unsafe.Pointer(fileInfo)), uintptr(unsafe.Pointer(fileSize)), uintptr(unsafe.Pointer(deleted)), 0)
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func exportLayerRead(context uintptr, buffer []byte, bytesRead *uint32) (hr error) ***REMOVED***
+func exportLayerRead(context uintptr, buffer []byte, bytesRead *uint32) (hr error) {
 	var _p0 *byte
-	if len(buffer) > 0 ***REMOVED***
+	if len(buffer) > 0 {
 		_p0 = &buffer[0]
-	***REMOVED***
-	if hr = procExportLayerRead.Find(); hr != nil ***REMOVED***
+	}
+	if hr = procExportLayerRead.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall6(procExportLayerRead.Addr(), 4, uintptr(context), uintptr(unsafe.Pointer(_p0)), uintptr(len(buffer)), uintptr(unsafe.Pointer(bytesRead)), 0, 0)
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func exportLayerEnd(context uintptr) (hr error) ***REMOVED***
-	if hr = procExportLayerEnd.Find(); hr != nil ***REMOVED***
+func exportLayerEnd(context uintptr) (hr error) {
+	if hr = procExportLayerEnd.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall(procExportLayerEnd.Addr(), 1, uintptr(context), 0, 0)
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func hcsEnumerateComputeSystems(query string, computeSystems **uint16, result **uint16) (hr error) ***REMOVED***
+func hcsEnumerateComputeSystems(query string, computeSystems **uint16, result **uint16) (hr error) {
 	var _p0 *uint16
 	_p0, hr = syscall.UTF16PtrFromString(query)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	return _hcsEnumerateComputeSystems(_p0, computeSystems, result)
-***REMOVED***
+}
 
-func _hcsEnumerateComputeSystems(query *uint16, computeSystems **uint16, result **uint16) (hr error) ***REMOVED***
-	if hr = procHcsEnumerateComputeSystems.Find(); hr != nil ***REMOVED***
+func _hcsEnumerateComputeSystems(query *uint16, computeSystems **uint16, result **uint16) (hr error) {
+	if hr = procHcsEnumerateComputeSystems.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall(procHcsEnumerateComputeSystems.Addr(), 3, uintptr(unsafe.Pointer(query)), uintptr(unsafe.Pointer(computeSystems)), uintptr(unsafe.Pointer(result)))
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func hcsCreateComputeSystem(id string, configuration string, identity syscall.Handle, computeSystem *hcsSystem, result **uint16) (hr error) ***REMOVED***
+func hcsCreateComputeSystem(id string, configuration string, identity syscall.Handle, computeSystem *hcsSystem, result **uint16) (hr error) {
 	var _p0 *uint16
 	_p0, hr = syscall.UTF16PtrFromString(id)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	var _p1 *uint16
 	_p1, hr = syscall.UTF16PtrFromString(configuration)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	return _hcsCreateComputeSystem(_p0, _p1, identity, computeSystem, result)
-***REMOVED***
+}
 
-func _hcsCreateComputeSystem(id *uint16, configuration *uint16, identity syscall.Handle, computeSystem *hcsSystem, result **uint16) (hr error) ***REMOVED***
-	if hr = procHcsCreateComputeSystem.Find(); hr != nil ***REMOVED***
+func _hcsCreateComputeSystem(id *uint16, configuration *uint16, identity syscall.Handle, computeSystem *hcsSystem, result **uint16) (hr error) {
+	if hr = procHcsCreateComputeSystem.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall6(procHcsCreateComputeSystem.Addr(), 5, uintptr(unsafe.Pointer(id)), uintptr(unsafe.Pointer(configuration)), uintptr(identity), uintptr(unsafe.Pointer(computeSystem)), uintptr(unsafe.Pointer(result)), 0)
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func hcsOpenComputeSystem(id string, computeSystem *hcsSystem, result **uint16) (hr error) ***REMOVED***
+func hcsOpenComputeSystem(id string, computeSystem *hcsSystem, result **uint16) (hr error) {
 	var _p0 *uint16
 	_p0, hr = syscall.UTF16PtrFromString(id)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	return _hcsOpenComputeSystem(_p0, computeSystem, result)
-***REMOVED***
+}
 
-func _hcsOpenComputeSystem(id *uint16, computeSystem *hcsSystem, result **uint16) (hr error) ***REMOVED***
-	if hr = procHcsOpenComputeSystem.Find(); hr != nil ***REMOVED***
+func _hcsOpenComputeSystem(id *uint16, computeSystem *hcsSystem, result **uint16) (hr error) {
+	if hr = procHcsOpenComputeSystem.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall(procHcsOpenComputeSystem.Addr(), 3, uintptr(unsafe.Pointer(id)), uintptr(unsafe.Pointer(computeSystem)), uintptr(unsafe.Pointer(result)))
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func hcsCloseComputeSystem(computeSystem hcsSystem) (hr error) ***REMOVED***
-	if hr = procHcsCloseComputeSystem.Find(); hr != nil ***REMOVED***
+func hcsCloseComputeSystem(computeSystem hcsSystem) (hr error) {
+	if hr = procHcsCloseComputeSystem.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall(procHcsCloseComputeSystem.Addr(), 1, uintptr(computeSystem), 0, 0)
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func hcsStartComputeSystem(computeSystem hcsSystem, options string, result **uint16) (hr error) ***REMOVED***
+func hcsStartComputeSystem(computeSystem hcsSystem, options string, result **uint16) (hr error) {
 	var _p0 *uint16
 	_p0, hr = syscall.UTF16PtrFromString(options)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	return _hcsStartComputeSystem(computeSystem, _p0, result)
-***REMOVED***
+}
 
-func _hcsStartComputeSystem(computeSystem hcsSystem, options *uint16, result **uint16) (hr error) ***REMOVED***
-	if hr = procHcsStartComputeSystem.Find(); hr != nil ***REMOVED***
+func _hcsStartComputeSystem(computeSystem hcsSystem, options *uint16, result **uint16) (hr error) {
+	if hr = procHcsStartComputeSystem.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall(procHcsStartComputeSystem.Addr(), 3, uintptr(computeSystem), uintptr(unsafe.Pointer(options)), uintptr(unsafe.Pointer(result)))
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func hcsShutdownComputeSystem(computeSystem hcsSystem, options string, result **uint16) (hr error) ***REMOVED***
+func hcsShutdownComputeSystem(computeSystem hcsSystem, options string, result **uint16) (hr error) {
 	var _p0 *uint16
 	_p0, hr = syscall.UTF16PtrFromString(options)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	return _hcsShutdownComputeSystem(computeSystem, _p0, result)
-***REMOVED***
+}
 
-func _hcsShutdownComputeSystem(computeSystem hcsSystem, options *uint16, result **uint16) (hr error) ***REMOVED***
-	if hr = procHcsShutdownComputeSystem.Find(); hr != nil ***REMOVED***
+func _hcsShutdownComputeSystem(computeSystem hcsSystem, options *uint16, result **uint16) (hr error) {
+	if hr = procHcsShutdownComputeSystem.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall(procHcsShutdownComputeSystem.Addr(), 3, uintptr(computeSystem), uintptr(unsafe.Pointer(options)), uintptr(unsafe.Pointer(result)))
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func hcsTerminateComputeSystem(computeSystem hcsSystem, options string, result **uint16) (hr error) ***REMOVED***
+func hcsTerminateComputeSystem(computeSystem hcsSystem, options string, result **uint16) (hr error) {
 	var _p0 *uint16
 	_p0, hr = syscall.UTF16PtrFromString(options)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	return _hcsTerminateComputeSystem(computeSystem, _p0, result)
-***REMOVED***
+}
 
-func _hcsTerminateComputeSystem(computeSystem hcsSystem, options *uint16, result **uint16) (hr error) ***REMOVED***
-	if hr = procHcsTerminateComputeSystem.Find(); hr != nil ***REMOVED***
+func _hcsTerminateComputeSystem(computeSystem hcsSystem, options *uint16, result **uint16) (hr error) {
+	if hr = procHcsTerminateComputeSystem.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall(procHcsTerminateComputeSystem.Addr(), 3, uintptr(computeSystem), uintptr(unsafe.Pointer(options)), uintptr(unsafe.Pointer(result)))
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func hcsPauseComputeSystem(computeSystem hcsSystem, options string, result **uint16) (hr error) ***REMOVED***
+func hcsPauseComputeSystem(computeSystem hcsSystem, options string, result **uint16) (hr error) {
 	var _p0 *uint16
 	_p0, hr = syscall.UTF16PtrFromString(options)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	return _hcsPauseComputeSystem(computeSystem, _p0, result)
-***REMOVED***
+}
 
-func _hcsPauseComputeSystem(computeSystem hcsSystem, options *uint16, result **uint16) (hr error) ***REMOVED***
-	if hr = procHcsPauseComputeSystem.Find(); hr != nil ***REMOVED***
+func _hcsPauseComputeSystem(computeSystem hcsSystem, options *uint16, result **uint16) (hr error) {
+	if hr = procHcsPauseComputeSystem.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall(procHcsPauseComputeSystem.Addr(), 3, uintptr(computeSystem), uintptr(unsafe.Pointer(options)), uintptr(unsafe.Pointer(result)))
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func hcsResumeComputeSystem(computeSystem hcsSystem, options string, result **uint16) (hr error) ***REMOVED***
+func hcsResumeComputeSystem(computeSystem hcsSystem, options string, result **uint16) (hr error) {
 	var _p0 *uint16
 	_p0, hr = syscall.UTF16PtrFromString(options)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	return _hcsResumeComputeSystem(computeSystem, _p0, result)
-***REMOVED***
+}
 
-func _hcsResumeComputeSystem(computeSystem hcsSystem, options *uint16, result **uint16) (hr error) ***REMOVED***
-	if hr = procHcsResumeComputeSystem.Find(); hr != nil ***REMOVED***
+func _hcsResumeComputeSystem(computeSystem hcsSystem, options *uint16, result **uint16) (hr error) {
+	if hr = procHcsResumeComputeSystem.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall(procHcsResumeComputeSystem.Addr(), 3, uintptr(computeSystem), uintptr(unsafe.Pointer(options)), uintptr(unsafe.Pointer(result)))
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func hcsGetComputeSystemProperties(computeSystem hcsSystem, propertyQuery string, properties **uint16, result **uint16) (hr error) ***REMOVED***
+func hcsGetComputeSystemProperties(computeSystem hcsSystem, propertyQuery string, properties **uint16, result **uint16) (hr error) {
 	var _p0 *uint16
 	_p0, hr = syscall.UTF16PtrFromString(propertyQuery)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	return _hcsGetComputeSystemProperties(computeSystem, _p0, properties, result)
-***REMOVED***
+}
 
-func _hcsGetComputeSystemProperties(computeSystem hcsSystem, propertyQuery *uint16, properties **uint16, result **uint16) (hr error) ***REMOVED***
-	if hr = procHcsGetComputeSystemProperties.Find(); hr != nil ***REMOVED***
+func _hcsGetComputeSystemProperties(computeSystem hcsSystem, propertyQuery *uint16, properties **uint16, result **uint16) (hr error) {
+	if hr = procHcsGetComputeSystemProperties.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall6(procHcsGetComputeSystemProperties.Addr(), 4, uintptr(computeSystem), uintptr(unsafe.Pointer(propertyQuery)), uintptr(unsafe.Pointer(properties)), uintptr(unsafe.Pointer(result)), 0, 0)
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func hcsModifyComputeSystem(computeSystem hcsSystem, configuration string, result **uint16) (hr error) ***REMOVED***
+func hcsModifyComputeSystem(computeSystem hcsSystem, configuration string, result **uint16) (hr error) {
 	var _p0 *uint16
 	_p0, hr = syscall.UTF16PtrFromString(configuration)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	return _hcsModifyComputeSystem(computeSystem, _p0, result)
-***REMOVED***
+}
 
-func _hcsModifyComputeSystem(computeSystem hcsSystem, configuration *uint16, result **uint16) (hr error) ***REMOVED***
-	if hr = procHcsModifyComputeSystem.Find(); hr != nil ***REMOVED***
+func _hcsModifyComputeSystem(computeSystem hcsSystem, configuration *uint16, result **uint16) (hr error) {
+	if hr = procHcsModifyComputeSystem.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall(procHcsModifyComputeSystem.Addr(), 3, uintptr(computeSystem), uintptr(unsafe.Pointer(configuration)), uintptr(unsafe.Pointer(result)))
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func hcsRegisterComputeSystemCallback(computeSystem hcsSystem, callback uintptr, context uintptr, callbackHandle *hcsCallback) (hr error) ***REMOVED***
-	if hr = procHcsRegisterComputeSystemCallback.Find(); hr != nil ***REMOVED***
+func hcsRegisterComputeSystemCallback(computeSystem hcsSystem, callback uintptr, context uintptr, callbackHandle *hcsCallback) (hr error) {
+	if hr = procHcsRegisterComputeSystemCallback.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall6(procHcsRegisterComputeSystemCallback.Addr(), 4, uintptr(computeSystem), uintptr(callback), uintptr(context), uintptr(unsafe.Pointer(callbackHandle)), 0, 0)
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func hcsUnregisterComputeSystemCallback(callbackHandle hcsCallback) (hr error) ***REMOVED***
-	if hr = procHcsUnregisterComputeSystemCallback.Find(); hr != nil ***REMOVED***
+func hcsUnregisterComputeSystemCallback(callbackHandle hcsCallback) (hr error) {
+	if hr = procHcsUnregisterComputeSystemCallback.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall(procHcsUnregisterComputeSystemCallback.Addr(), 1, uintptr(callbackHandle), 0, 0)
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func hcsCreateProcess(computeSystem hcsSystem, processParameters string, processInformation *hcsProcessInformation, process *hcsProcess, result **uint16) (hr error) ***REMOVED***
+func hcsCreateProcess(computeSystem hcsSystem, processParameters string, processInformation *hcsProcessInformation, process *hcsProcess, result **uint16) (hr error) {
 	var _p0 *uint16
 	_p0, hr = syscall.UTF16PtrFromString(processParameters)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	return _hcsCreateProcess(computeSystem, _p0, processInformation, process, result)
-***REMOVED***
+}
 
-func _hcsCreateProcess(computeSystem hcsSystem, processParameters *uint16, processInformation *hcsProcessInformation, process *hcsProcess, result **uint16) (hr error) ***REMOVED***
-	if hr = procHcsCreateProcess.Find(); hr != nil ***REMOVED***
+func _hcsCreateProcess(computeSystem hcsSystem, processParameters *uint16, processInformation *hcsProcessInformation, process *hcsProcess, result **uint16) (hr error) {
+	if hr = procHcsCreateProcess.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall6(procHcsCreateProcess.Addr(), 5, uintptr(computeSystem), uintptr(unsafe.Pointer(processParameters)), uintptr(unsafe.Pointer(processInformation)), uintptr(unsafe.Pointer(process)), uintptr(unsafe.Pointer(result)), 0)
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func hcsOpenProcess(computeSystem hcsSystem, pid uint32, process *hcsProcess, result **uint16) (hr error) ***REMOVED***
-	if hr = procHcsOpenProcess.Find(); hr != nil ***REMOVED***
+func hcsOpenProcess(computeSystem hcsSystem, pid uint32, process *hcsProcess, result **uint16) (hr error) {
+	if hr = procHcsOpenProcess.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall6(procHcsOpenProcess.Addr(), 4, uintptr(computeSystem), uintptr(pid), uintptr(unsafe.Pointer(process)), uintptr(unsafe.Pointer(result)), 0, 0)
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func hcsCloseProcess(process hcsProcess) (hr error) ***REMOVED***
-	if hr = procHcsCloseProcess.Find(); hr != nil ***REMOVED***
+func hcsCloseProcess(process hcsProcess) (hr error) {
+	if hr = procHcsCloseProcess.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall(procHcsCloseProcess.Addr(), 1, uintptr(process), 0, 0)
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func hcsTerminateProcess(process hcsProcess, result **uint16) (hr error) ***REMOVED***
-	if hr = procHcsTerminateProcess.Find(); hr != nil ***REMOVED***
+func hcsTerminateProcess(process hcsProcess, result **uint16) (hr error) {
+	if hr = procHcsTerminateProcess.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall(procHcsTerminateProcess.Addr(), 2, uintptr(process), uintptr(unsafe.Pointer(result)), 0)
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func hcsGetProcessInfo(process hcsProcess, processInformation *hcsProcessInformation, result **uint16) (hr error) ***REMOVED***
-	if hr = procHcsGetProcessInfo.Find(); hr != nil ***REMOVED***
+func hcsGetProcessInfo(process hcsProcess, processInformation *hcsProcessInformation, result **uint16) (hr error) {
+	if hr = procHcsGetProcessInfo.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall(procHcsGetProcessInfo.Addr(), 3, uintptr(process), uintptr(unsafe.Pointer(processInformation)), uintptr(unsafe.Pointer(result)))
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func hcsGetProcessProperties(process hcsProcess, processProperties **uint16, result **uint16) (hr error) ***REMOVED***
-	if hr = procHcsGetProcessProperties.Find(); hr != nil ***REMOVED***
+func hcsGetProcessProperties(process hcsProcess, processProperties **uint16, result **uint16) (hr error) {
+	if hr = procHcsGetProcessProperties.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall(procHcsGetProcessProperties.Addr(), 3, uintptr(process), uintptr(unsafe.Pointer(processProperties)), uintptr(unsafe.Pointer(result)))
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func hcsModifyProcess(process hcsProcess, settings string, result **uint16) (hr error) ***REMOVED***
+func hcsModifyProcess(process hcsProcess, settings string, result **uint16) (hr error) {
 	var _p0 *uint16
 	_p0, hr = syscall.UTF16PtrFromString(settings)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	return _hcsModifyProcess(process, _p0, result)
-***REMOVED***
+}
 
-func _hcsModifyProcess(process hcsProcess, settings *uint16, result **uint16) (hr error) ***REMOVED***
-	if hr = procHcsModifyProcess.Find(); hr != nil ***REMOVED***
+func _hcsModifyProcess(process hcsProcess, settings *uint16, result **uint16) (hr error) {
+	if hr = procHcsModifyProcess.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall(procHcsModifyProcess.Addr(), 3, uintptr(process), uintptr(unsafe.Pointer(settings)), uintptr(unsafe.Pointer(result)))
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func hcsGetServiceProperties(propertyQuery string, properties **uint16, result **uint16) (hr error) ***REMOVED***
+func hcsGetServiceProperties(propertyQuery string, properties **uint16, result **uint16) (hr error) {
 	var _p0 *uint16
 	_p0, hr = syscall.UTF16PtrFromString(propertyQuery)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	return _hcsGetServiceProperties(_p0, properties, result)
-***REMOVED***
+}
 
-func _hcsGetServiceProperties(propertyQuery *uint16, properties **uint16, result **uint16) (hr error) ***REMOVED***
-	if hr = procHcsGetServiceProperties.Find(); hr != nil ***REMOVED***
+func _hcsGetServiceProperties(propertyQuery *uint16, properties **uint16, result **uint16) (hr error) {
+	if hr = procHcsGetServiceProperties.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall(procHcsGetServiceProperties.Addr(), 3, uintptr(unsafe.Pointer(propertyQuery)), uintptr(unsafe.Pointer(properties)), uintptr(unsafe.Pointer(result)))
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func hcsRegisterProcessCallback(process hcsProcess, callback uintptr, context uintptr, callbackHandle *hcsCallback) (hr error) ***REMOVED***
-	if hr = procHcsRegisterProcessCallback.Find(); hr != nil ***REMOVED***
+func hcsRegisterProcessCallback(process hcsProcess, callback uintptr, context uintptr, callbackHandle *hcsCallback) (hr error) {
+	if hr = procHcsRegisterProcessCallback.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall6(procHcsRegisterProcessCallback.Addr(), 4, uintptr(process), uintptr(callback), uintptr(context), uintptr(unsafe.Pointer(callbackHandle)), 0, 0)
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func hcsUnregisterProcessCallback(callbackHandle hcsCallback) (hr error) ***REMOVED***
-	if hr = procHcsUnregisterProcessCallback.Find(); hr != nil ***REMOVED***
+func hcsUnregisterProcessCallback(callbackHandle hcsCallback) (hr error) {
+	if hr = procHcsUnregisterProcessCallback.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall(procHcsUnregisterProcessCallback.Addr(), 1, uintptr(callbackHandle), 0, 0)
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func hcsModifyServiceSettings(settings string, result **uint16) (hr error) ***REMOVED***
+func hcsModifyServiceSettings(settings string, result **uint16) (hr error) {
 	var _p0 *uint16
 	_p0, hr = syscall.UTF16PtrFromString(settings)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	return _hcsModifyServiceSettings(_p0, result)
-***REMOVED***
+}
 
-func _hcsModifyServiceSettings(settings *uint16, result **uint16) (hr error) ***REMOVED***
-	if hr = procHcsModifyServiceSettings.Find(); hr != nil ***REMOVED***
+func _hcsModifyServiceSettings(settings *uint16, result **uint16) (hr error) {
+	if hr = procHcsModifyServiceSettings.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall(procHcsModifyServiceSettings.Addr(), 2, uintptr(unsafe.Pointer(settings)), uintptr(unsafe.Pointer(result)), 0)
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func _hnsCall(method string, path string, object string, response **uint16) (hr error) ***REMOVED***
+func _hnsCall(method string, path string, object string, response **uint16) (hr error) {
 	var _p0 *uint16
 	_p0, hr = syscall.UTF16PtrFromString(method)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	var _p1 *uint16
 	_p1, hr = syscall.UTF16PtrFromString(path)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	var _p2 *uint16
 	_p2, hr = syscall.UTF16PtrFromString(object)
-	if hr != nil ***REMOVED***
+	if hr != nil {
 		return
-	***REMOVED***
+	}
 	return __hnsCall(_p0, _p1, _p2, response)
-***REMOVED***
+}
 
-func __hnsCall(method *uint16, path *uint16, object *uint16, response **uint16) (hr error) ***REMOVED***
-	if hr = procHNSCall.Find(); hr != nil ***REMOVED***
+func __hnsCall(method *uint16, path *uint16, object *uint16, response **uint16) (hr error) {
+	if hr = procHNSCall.Find(); hr != nil {
 		return
-	***REMOVED***
+	}
 	r0, _, _ := syscall.Syscall6(procHNSCall.Addr(), 4, uintptr(unsafe.Pointer(method)), uintptr(unsafe.Pointer(path)), uintptr(unsafe.Pointer(object)), uintptr(unsafe.Pointer(response)), 0, 0)
-	if int32(r0) < 0 ***REMOVED***
+	if int32(r0) < 0 {
 		hr = syscall.Errno(win32FromHresult(r0))
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}

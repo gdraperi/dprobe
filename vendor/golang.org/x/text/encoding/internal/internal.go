@@ -13,51 +13,51 @@ import (
 
 // Encoding is an implementation of the Encoding interface that adds the String
 // and ID methods to an existing encoding.
-type Encoding struct ***REMOVED***
+type Encoding struct {
 	encoding.Encoding
 	Name string
 	MIB  identifier.MIB
-***REMOVED***
+}
 
 // _ verifies that Encoding implements identifier.Interface.
 var _ identifier.Interface = (*Encoding)(nil)
 
-func (e *Encoding) String() string ***REMOVED***
+func (e *Encoding) String() string {
 	return e.Name
-***REMOVED***
+}
 
-func (e *Encoding) ID() (mib identifier.MIB, other string) ***REMOVED***
+func (e *Encoding) ID() (mib identifier.MIB, other string) {
 	return e.MIB, ""
-***REMOVED***
+}
 
 // SimpleEncoding is an Encoding that combines two Transformers.
-type SimpleEncoding struct ***REMOVED***
+type SimpleEncoding struct {
 	Decoder transform.Transformer
 	Encoder transform.Transformer
-***REMOVED***
+}
 
-func (e *SimpleEncoding) NewDecoder() *encoding.Decoder ***REMOVED***
-	return &encoding.Decoder***REMOVED***Transformer: e.Decoder***REMOVED***
-***REMOVED***
+func (e *SimpleEncoding) NewDecoder() *encoding.Decoder {
+	return &encoding.Decoder{Transformer: e.Decoder}
+}
 
-func (e *SimpleEncoding) NewEncoder() *encoding.Encoder ***REMOVED***
-	return &encoding.Encoder***REMOVED***Transformer: e.Encoder***REMOVED***
-***REMOVED***
+func (e *SimpleEncoding) NewEncoder() *encoding.Encoder {
+	return &encoding.Encoder{Transformer: e.Encoder}
+}
 
 // FuncEncoding is an Encoding that combines two functions returning a new
 // Transformer.
-type FuncEncoding struct ***REMOVED***
+type FuncEncoding struct {
 	Decoder func() transform.Transformer
 	Encoder func() transform.Transformer
-***REMOVED***
+}
 
-func (e FuncEncoding) NewDecoder() *encoding.Decoder ***REMOVED***
-	return &encoding.Decoder***REMOVED***Transformer: e.Decoder()***REMOVED***
-***REMOVED***
+func (e FuncEncoding) NewDecoder() *encoding.Decoder {
+	return &encoding.Decoder{Transformer: e.Decoder()}
+}
 
-func (e FuncEncoding) NewEncoder() *encoding.Encoder ***REMOVED***
-	return &encoding.Encoder***REMOVED***Transformer: e.Encoder()***REMOVED***
-***REMOVED***
+func (e FuncEncoding) NewEncoder() *encoding.Encoder {
+	return &encoding.Encoder{Transformer: e.Encoder()}
+}
 
 // A RepertoireError indicates a rune is not in the repertoire of a destination
 // encoding. It is associated with an encoding-specific suggested replacement
@@ -65,11 +65,11 @@ func (e FuncEncoding) NewEncoder() *encoding.Encoder ***REMOVED***
 type RepertoireError byte
 
 // Error implements the error interrface.
-func (r RepertoireError) Error() string ***REMOVED***
+func (r RepertoireError) Error() string {
 	return "encoding: rune not supported by encoding."
-***REMOVED***
+}
 
 // Replacement returns the replacement string associated with this error.
-func (r RepertoireError) Replacement() byte ***REMOVED*** return byte(r) ***REMOVED***
+func (r RepertoireError) Replacement() byte { return byte(r) }
 
 var ErrASCIIReplacement = RepertoireError(encoding.ASCIISub)

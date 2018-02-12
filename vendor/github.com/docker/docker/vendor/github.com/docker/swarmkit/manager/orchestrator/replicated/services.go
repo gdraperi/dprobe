@@ -16,75 +16,75 @@ import (
 // specifications. This is different from task-level orchestration, which
 // responds to changes in individual tasks (or nodes which run them).
 
-func (r *Orchestrator) initCluster(readTx store.ReadTx) error ***REMOVED***
+func (r *Orchestrator) initCluster(readTx store.ReadTx) error {
 	clusters, err := store.FindClusters(readTx, store.ByName(store.DefaultClusterName))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if len(clusters) != 1 ***REMOVED***
+	if len(clusters) != 1 {
 		// we'll just pick it when it is created.
 		return nil
-	***REMOVED***
+	}
 
 	r.cluster = clusters[0]
 	return nil
-***REMOVED***
+}
 
-func (r *Orchestrator) initServices(readTx store.ReadTx) error ***REMOVED***
+func (r *Orchestrator) initServices(readTx store.ReadTx) error {
 	services, err := store.FindServices(readTx, store.All)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	for _, s := range services ***REMOVED***
-		if orchestrator.IsReplicatedService(s) ***REMOVED***
+	}
+	for _, s := range services {
+		if orchestrator.IsReplicatedService(s) {
 			r.reconcileServices[s.ID] = s
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func (r *Orchestrator) handleServiceEvent(ctx context.Context, event events.Event) ***REMOVED***
-	switch v := event.(type) ***REMOVED***
+func (r *Orchestrator) handleServiceEvent(ctx context.Context, event events.Event) {
+	switch v := event.(type) {
 	case api.EventDeleteService:
-		if !orchestrator.IsReplicatedService(v.Service) ***REMOVED***
+		if !orchestrator.IsReplicatedService(v.Service) {
 			return
-		***REMOVED***
+		}
 		orchestrator.SetServiceTasksRemove(ctx, r.store, v.Service)
 		r.restarts.ClearServiceHistory(v.Service.ID)
 		delete(r.reconcileServices, v.Service.ID)
 	case api.EventCreateService:
-		if !orchestrator.IsReplicatedService(v.Service) ***REMOVED***
+		if !orchestrator.IsReplicatedService(v.Service) {
 			return
-		***REMOVED***
+		}
 		r.reconcileServices[v.Service.ID] = v.Service
 	case api.EventUpdateService:
-		if !orchestrator.IsReplicatedService(v.Service) ***REMOVED***
+		if !orchestrator.IsReplicatedService(v.Service) {
 			return
-		***REMOVED***
+		}
 		r.reconcileServices[v.Service.ID] = v.Service
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (r *Orchestrator) tickServices(ctx context.Context) ***REMOVED***
-	if len(r.reconcileServices) > 0 ***REMOVED***
-		for _, s := range r.reconcileServices ***REMOVED***
+func (r *Orchestrator) tickServices(ctx context.Context) {
+	if len(r.reconcileServices) > 0 {
+		for _, s := range r.reconcileServices {
 			r.reconcile(ctx, s)
-		***REMOVED***
+		}
 		r.reconcileServices = make(map[string]*api.Service)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (r *Orchestrator) resolveService(ctx context.Context, task *api.Task) *api.Service ***REMOVED***
-	if task.ServiceID == "" ***REMOVED***
+func (r *Orchestrator) resolveService(ctx context.Context, task *api.Task) *api.Service {
+	if task.ServiceID == "" {
 		return nil
-	***REMOVED***
+	}
 	var service *api.Service
-	r.store.View(func(tx store.ReadTx) ***REMOVED***
+	r.store.View(func(tx store.ReadTx) {
 		service = store.GetService(tx, task.ServiceID)
-	***REMOVED***)
+	})
 	return service
-***REMOVED***
+}
 
 // reconcile decides what actions must be taken depending on the number of
 // specificed slots and actual running slots. If the actual running slots are
@@ -92,36 +92,36 @@ func (r *Orchestrator) resolveService(ctx context.Context, task *api.Task) *api.
 // slots are more than requested, then it decides which slots must be removed
 // and sets desired state of those tasks to REMOVE (the actual removal is handled
 // by the task reaper, after the agent shuts the tasks down).
-func (r *Orchestrator) reconcile(ctx context.Context, service *api.Service) ***REMOVED***
+func (r *Orchestrator) reconcile(ctx context.Context, service *api.Service) {
 	runningSlots, deadSlots, err := r.updatableAndDeadSlots(ctx, service)
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.G(ctx).WithError(err).Errorf("reconcile failed finding tasks")
 		return
-	***REMOVED***
+	}
 
 	numSlots := len(runningSlots)
 
 	slotsSlice := make([]orchestrator.Slot, 0, numSlots)
-	for _, slot := range runningSlots ***REMOVED***
+	for _, slot := range runningSlots {
 		slotsSlice = append(slotsSlice, slot)
-	***REMOVED***
+	}
 
 	deploy := service.Spec.GetMode().(*api.ServiceSpec_Replicated)
 	specifiedSlots := deploy.Replicated.Replicas
 
-	switch ***REMOVED***
+	switch {
 	case specifiedSlots > uint64(numSlots):
 		log.G(ctx).Debugf("Service %s was scaled up from %d to %d instances", service.ID, numSlots, specifiedSlots)
 		// Update all current tasks then add missing tasks
 		r.updater.Update(ctx, r.cluster, service, slotsSlice)
-		err = r.store.Batch(func(batch *store.Batch) error ***REMOVED***
+		err = r.store.Batch(func(batch *store.Batch) error {
 			r.addTasks(ctx, batch, service, runningSlots, deadSlots, specifiedSlots-uint64(numSlots))
 			r.deleteTasksMap(ctx, batch, deadSlots)
 			return nil
-		***REMOVED***)
-		if err != nil ***REMOVED***
+		})
+		if err != nil {
 			log.G(ctx).WithError(err).Errorf("reconcile batch failed")
-		***REMOVED***
+		}
 
 	case specifiedSlots < uint64(numSlots):
 		// Update up to N tasks then remove the extra
@@ -144,24 +144,24 @@ func (r *Orchestrator) reconcile(ctx context.Context, service *api.Service) ***R
 		slotsByNode := make(map[string]int)
 		slotsWithIndices := make(slotsByIndex, 0, numSlots)
 
-		for _, slot := range slotsSlice ***REMOVED***
-			if len(slot) == 1 && slot[0].NodeID != "" ***REMOVED***
+		for _, slot := range slotsSlice {
+			if len(slot) == 1 && slot[0].NodeID != "" {
 				slotsByNode[slot[0].NodeID]++
-				slotsWithIndices = append(slotsWithIndices, slotWithIndex***REMOVED***slot: slot, index: slotsByNode[slot[0].NodeID]***REMOVED***)
-			***REMOVED*** else ***REMOVED***
-				slotsWithIndices = append(slotsWithIndices, slotWithIndex***REMOVED***slot: slot, index: -1***REMOVED***)
-			***REMOVED***
-		***REMOVED***
+				slotsWithIndices = append(slotsWithIndices, slotWithIndex{slot: slot, index: slotsByNode[slot[0].NodeID]})
+			} else {
+				slotsWithIndices = append(slotsWithIndices, slotWithIndex{slot: slot, index: -1})
+			}
+		}
 
 		sort.Sort(slotsWithIndices)
 
 		sortedSlots := make([]orchestrator.Slot, 0, numSlots)
-		for _, slot := range slotsWithIndices ***REMOVED***
+		for _, slot := range slotsWithIndices {
 			sortedSlots = append(sortedSlots, slot.slot)
-		***REMOVED***
+		}
 
 		r.updater.Update(ctx, r.cluster, service, sortedSlots[:specifiedSlots])
-		err = r.store.Batch(func(batch *store.Batch) error ***REMOVED***
+		err = r.store.Batch(func(batch *store.Batch) error {
 			r.deleteTasksMap(ctx, batch, deadSlots)
 			// for all slots that we are removing, we set the desired state of those tasks
 			// to REMOVE. Then, the agent is responsible for shutting them down, and the
@@ -169,55 +169,55 @@ func (r *Orchestrator) reconcile(ctx context.Context, service *api.Service) ***R
 			// shutdown.
 			r.setTasksDesiredState(ctx, batch, sortedSlots[specifiedSlots:], api.TaskStateRemove)
 			return nil
-		***REMOVED***)
-		if err != nil ***REMOVED***
+		})
+		if err != nil {
 			log.G(ctx).WithError(err).Errorf("reconcile batch failed")
-		***REMOVED***
+		}
 
 	case specifiedSlots == uint64(numSlots):
-		err = r.store.Batch(func(batch *store.Batch) error ***REMOVED***
+		err = r.store.Batch(func(batch *store.Batch) error {
 			r.deleteTasksMap(ctx, batch, deadSlots)
 			return nil
-		***REMOVED***)
-		if err != nil ***REMOVED***
+		})
+		if err != nil {
 			log.G(ctx).WithError(err).Errorf("reconcile batch failed")
-		***REMOVED***
+		}
 		// Simple update, no scaling - update all tasks.
 		r.updater.Update(ctx, r.cluster, service, slotsSlice)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (r *Orchestrator) addTasks(ctx context.Context, batch *store.Batch, service *api.Service, runningSlots map[uint64]orchestrator.Slot, deadSlots map[uint64]orchestrator.Slot, count uint64) ***REMOVED***
+func (r *Orchestrator) addTasks(ctx context.Context, batch *store.Batch, service *api.Service, runningSlots map[uint64]orchestrator.Slot, deadSlots map[uint64]orchestrator.Slot, count uint64) {
 	slot := uint64(0)
-	for i := uint64(0); i < count; i++ ***REMOVED***
+	for i := uint64(0); i < count; i++ {
 		// Find a slot number that is missing a running task
-		for ***REMOVED***
+		for {
 			slot++
-			if _, ok := runningSlots[slot]; !ok ***REMOVED***
+			if _, ok := runningSlots[slot]; !ok {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		delete(deadSlots, slot)
-		err := batch.Update(func(tx store.Tx) error ***REMOVED***
+		err := batch.Update(func(tx store.Tx) error {
 			return store.CreateTask(tx, orchestrator.NewTask(r.cluster, service, slot, ""))
-		***REMOVED***)
-		if err != nil ***REMOVED***
+		})
+		if err != nil {
 			log.G(ctx).Errorf("Failed to create task: %v", err)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // setTasksDesiredState sets the desired state for all tasks for the given slots to the
 // requested state
-func (r *Orchestrator) setTasksDesiredState(ctx context.Context, batch *store.Batch, slots []orchestrator.Slot, newDesiredState api.TaskState) ***REMOVED***
-	for _, slot := range slots ***REMOVED***
-		for _, t := range slot ***REMOVED***
-			err := batch.Update(func(tx store.Tx) error ***REMOVED***
+func (r *Orchestrator) setTasksDesiredState(ctx context.Context, batch *store.Batch, slots []orchestrator.Slot, newDesiredState api.TaskState) {
+	for _, slot := range slots {
+		for _, t := range slot {
+			err := batch.Update(func(tx store.Tx) error {
 				// time travel is not allowed. if the current desired state is
 				// above the one we're trying to go to we can't go backwards.
 				// we have nothing to do and we should skip to the next task
-				if t.DesiredState > newDesiredState ***REMOVED***
+				if t.DesiredState > newDesiredState {
 					// log a warning, though. we shouln't be trying to rewrite
 					// a state to an earlier state
 					log.G(ctx).Warnf(
@@ -225,39 +225,39 @@ func (r *Orchestrator) setTasksDesiredState(ctx context.Context, batch *store.Ba
 						t.ID, t.DesiredState, newDesiredState,
 					)
 					return nil
-				***REMOVED***
+				}
 				// update desired state
 				t.DesiredState = newDesiredState
 
 				return store.UpdateTask(tx, t)
-			***REMOVED***)
+			})
 
 			// log an error if we get one
-			if err != nil ***REMOVED***
+			if err != nil {
 				log.G(ctx).WithError(err).Errorf("failed to update task to %v", newDesiredState.String())
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}
 
-func (r *Orchestrator) deleteTasksMap(ctx context.Context, batch *store.Batch, slots map[uint64]orchestrator.Slot) ***REMOVED***
-	for _, slot := range slots ***REMOVED***
-		for _, t := range slot ***REMOVED***
+func (r *Orchestrator) deleteTasksMap(ctx context.Context, batch *store.Batch, slots map[uint64]orchestrator.Slot) {
+	for _, slot := range slots {
+		for _, t := range slot {
 			r.deleteTask(ctx, batch, t)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (r *Orchestrator) deleteTask(ctx context.Context, batch *store.Batch, t *api.Task) ***REMOVED***
-	err := batch.Update(func(tx store.Tx) error ***REMOVED***
+func (r *Orchestrator) deleteTask(ctx context.Context, batch *store.Batch, t *api.Task) {
+	err := batch.Update(func(tx store.Tx) error {
 		return store.DeleteTask(tx, t.ID)
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		log.G(ctx).WithError(err).Errorf("deleting task %s failed", t.ID)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // IsRelatedService returns true if the service should be governed by this orchestrator
-func (r *Orchestrator) IsRelatedService(service *api.Service) bool ***REMOVED***
+func (r *Orchestrator) IsRelatedService(service *api.Service) bool {
 	return orchestrator.IsReplicatedService(service)
-***REMOVED***
+}

@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-type Config struct ***REMOVED***
+type Config struct {
 	// The name of this node. This must be unique in the cluster.
 	Name string
 
@@ -205,7 +205,7 @@ type Config struct ***REMOVED***
 	// This is a legacy name for backward compatibility but should really be
 	// called PacketBufferSize now that we have generalized the transport.
 	UDPBufferSize int
-***REMOVED***
+}
 
 // DefaultLANConfig returns a sane set of configurations for Memberlist.
 // It uses the hostname as the node name, and otherwise sets very conservative
@@ -213,9 +213,9 @@ type Config struct ***REMOVED***
 // errs on the side of caution, choosing values that are optimized
 // for higher convergence at the cost of higher bandwidth usage. Regardless,
 // these values are a good starting point when getting started with memberlist.
-func DefaultLANConfig() *Config ***REMOVED***
+func DefaultLANConfig() *Config {
 	hostname, _ := os.Hostname()
-	return &Config***REMOVED***
+	return &Config{
 		Name:                    hostname,
 		BindAddr:                "0.0.0.0",
 		BindPort:                7946,
@@ -246,13 +246,13 @@ func DefaultLANConfig() *Config ***REMOVED***
 
 		HandoffQueueDepth: 1024,
 		UDPBufferSize:     1400,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // DefaultWANConfig works like DefaultConfig, however it returns a configuration
 // that is optimized for most WAN environments. The default configuration is
 // still very conservative and errs on the side of caution.
-func DefaultWANConfig() *Config ***REMOVED***
+func DefaultWANConfig() *Config {
 	conf := DefaultLANConfig()
 	conf.TCPTimeout = 30 * time.Second
 	conf.SuspicionMult = 6
@@ -263,12 +263,12 @@ func DefaultWANConfig() *Config ***REMOVED***
 	conf.GossipInterval = 500 * time.Millisecond
 	conf.GossipToTheDeadTime = 60 * time.Second
 	return conf
-***REMOVED***
+}
 
 // DefaultLocalConfig works like DefaultConfig, however it returns a configuration
 // that is optimized for a local loopback environments. The default configuration is
 // still very conservative and errs on the side of caution.
-func DefaultLocalConfig() *Config ***REMOVED***
+func DefaultLocalConfig() *Config {
 	conf := DefaultLANConfig()
 	conf.TCPTimeout = time.Second
 	conf.IndirectChecks = 1
@@ -280,9 +280,9 @@ func DefaultLocalConfig() *Config ***REMOVED***
 	conf.GossipInterval = 100 * time.Millisecond
 	conf.GossipToTheDeadTime = 15 * time.Second
 	return conf
-***REMOVED***
+}
 
 // Returns whether or not encryption is enabled
-func (c *Config) EncryptionEnabled() bool ***REMOVED***
+func (c *Config) EncryptionEnabled() bool {
 	return c.Keyring != nil && len(c.Keyring.GetKeys()) > 0
-***REMOVED***
+}

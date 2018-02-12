@@ -7,4 +7,4 @@ import (
 )
 
 // SignalMap is an empty map of signals for unsupported platform.
-var SignalMap = map[string]syscall.Signal***REMOVED******REMOVED***
+var SignalMap = map[string]syscall.Signal{}

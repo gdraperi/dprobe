@@ -27,7 +27,7 @@ const expiryDelta = 10 * time.Second
 // Most users of this package should not access fields of Token
 // directly. They're exported mostly for use by related packages
 // implementing derivative OAuth2 flows.
-type Token struct ***REMOVED***
+type Token struct {
 	// AccessToken is the token that authorizes and authenticates
 	// the requests.
 	AccessToken string `json:"access_token"`
@@ -50,109 +50,109 @@ type Token struct ***REMOVED***
 
 	// raw optionally contains extra metadata from the server
 	// when updating a token.
-	raw interface***REMOVED******REMOVED***
-***REMOVED***
+	raw interface{}
+}
 
 // Type returns t.TokenType if non-empty, else "Bearer".
-func (t *Token) Type() string ***REMOVED***
-	if strings.EqualFold(t.TokenType, "bearer") ***REMOVED***
+func (t *Token) Type() string {
+	if strings.EqualFold(t.TokenType, "bearer") {
 		return "Bearer"
-	***REMOVED***
-	if strings.EqualFold(t.TokenType, "mac") ***REMOVED***
+	}
+	if strings.EqualFold(t.TokenType, "mac") {
 		return "MAC"
-	***REMOVED***
-	if strings.EqualFold(t.TokenType, "basic") ***REMOVED***
+	}
+	if strings.EqualFold(t.TokenType, "basic") {
 		return "Basic"
-	***REMOVED***
-	if t.TokenType != "" ***REMOVED***
+	}
+	if t.TokenType != "" {
 		return t.TokenType
-	***REMOVED***
+	}
 	return "Bearer"
-***REMOVED***
+}
 
 // SetAuthHeader sets the Authorization header to r using the access
 // token in t.
 //
 // This method is unnecessary when using Transport or an HTTP Client
 // returned by this package.
-func (t *Token) SetAuthHeader(r *http.Request) ***REMOVED***
+func (t *Token) SetAuthHeader(r *http.Request) {
 	r.Header.Set("Authorization", t.Type()+" "+t.AccessToken)
-***REMOVED***
+}
 
 // WithExtra returns a new Token that's a clone of t, but using the
 // provided raw extra map. This is only intended for use by packages
 // implementing derivative OAuth2 flows.
-func (t *Token) WithExtra(extra interface***REMOVED******REMOVED***) *Token ***REMOVED***
+func (t *Token) WithExtra(extra interface{}) *Token {
 	t2 := new(Token)
 	*t2 = *t
 	t2.raw = extra
 	return t2
-***REMOVED***
+}
 
 // Extra returns an extra field.
 // Extra fields are key-value pairs returned by the server as a
 // part of the token retrieval response.
-func (t *Token) Extra(key string) interface***REMOVED******REMOVED*** ***REMOVED***
-	if raw, ok := t.raw.(map[string]interface***REMOVED******REMOVED***); ok ***REMOVED***
+func (t *Token) Extra(key string) interface{} {
+	if raw, ok := t.raw.(map[string]interface{}); ok {
 		return raw[key]
-	***REMOVED***
+	}
 
 	vals, ok := t.raw.(url.Values)
-	if !ok ***REMOVED***
+	if !ok {
 		return nil
-	***REMOVED***
+	}
 
 	v := vals.Get(key)
-	switch s := strings.TrimSpace(v); strings.Count(s, ".") ***REMOVED***
+	switch s := strings.TrimSpace(v); strings.Count(s, ".") {
 	case 0: // Contains no "."; try to parse as int
-		if i, err := strconv.ParseInt(s, 10, 64); err == nil ***REMOVED***
+		if i, err := strconv.ParseInt(s, 10, 64); err == nil {
 			return i
-		***REMOVED***
+		}
 	case 1: // Contains a single "."; try to parse as float
-		if f, err := strconv.ParseFloat(s, 64); err == nil ***REMOVED***
+		if f, err := strconv.ParseFloat(s, 64); err == nil {
 			return f
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return v
-***REMOVED***
+}
 
 // expired reports whether the token is expired.
 // t must be non-nil.
-func (t *Token) expired() bool ***REMOVED***
-	if t.Expiry.IsZero() ***REMOVED***
+func (t *Token) expired() bool {
+	if t.Expiry.IsZero() {
 		return false
-	***REMOVED***
+	}
 	return t.Expiry.Add(-expiryDelta).Before(time.Now())
-***REMOVED***
+}
 
 // Valid reports whether t is non-nil, has an AccessToken, and is not expired.
-func (t *Token) Valid() bool ***REMOVED***
+func (t *Token) Valid() bool {
 	return t != nil && t.AccessToken != "" && !t.expired()
-***REMOVED***
+}
 
 // tokenFromInternal maps an *internal.Token struct into
 // a *Token struct.
-func tokenFromInternal(t *internal.Token) *Token ***REMOVED***
-	if t == nil ***REMOVED***
+func tokenFromInternal(t *internal.Token) *Token {
+	if t == nil {
 		return nil
-	***REMOVED***
-	return &Token***REMOVED***
+	}
+	return &Token{
 		AccessToken:  t.AccessToken,
 		TokenType:    t.TokenType,
 		RefreshToken: t.RefreshToken,
 		Expiry:       t.Expiry,
 		raw:          t.Raw,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // retrieveToken takes a *Config and uses that to retrieve an *internal.Token.
 // This token is then mapped from *internal.Token into an *oauth2.Token which is returned along
 // with an error..
-func retrieveToken(ctx context.Context, c *Config, v url.Values) (*Token, error) ***REMOVED***
+func retrieveToken(ctx context.Context, c *Config, v url.Values) (*Token, error) {
 	tk, err := internal.RetrieveToken(ctx, c.ClientID, c.ClientSecret, c.Endpoint.TokenURL, v)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return tokenFromInternal(tk), nil
-***REMOVED***
+}

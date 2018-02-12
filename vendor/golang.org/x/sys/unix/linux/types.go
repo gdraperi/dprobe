@@ -76,7 +76,7 @@ package unix
 //	  struct (like st_atim) for consitancy with the glibc fields.
 //	* The padding fields get different names to not break compatibility.
 //	* st_blocks is signed, again for compatibility.
-struct stat ***REMOVED***
+struct stat {
 	unsigned int		st_dev;
 	unsigned int		st_pad1[3]; // Reserved for st_dev expansion
 
@@ -103,7 +103,7 @@ struct stat ***REMOVED***
 	unsigned int		st_pad4;
 
 	long			st_blocks;
-***REMOVED***;
+};
 
 // These are needed because we do not include fcntl.h or sys/types.h
 #include <linux/fcntl.h>
@@ -139,30 +139,30 @@ typedef struct termios2 termios_t;
 typedef struct termios termios_t;
 #endif
 
-enum ***REMOVED***
+enum {
 	sizeofPtr = sizeof(void*),
-***REMOVED***;
+};
 
-union sockaddr_all ***REMOVED***
+union sockaddr_all {
 	struct sockaddr s1;	// this one gets used for fields
 	struct sockaddr_in s2;	// these pad it out
 	struct sockaddr_in6 s3;
 	struct sockaddr_un s4;
 	struct sockaddr_ll s5;
 	struct sockaddr_nl s6;
-***REMOVED***;
+};
 
-struct sockaddr_any ***REMOVED***
+struct sockaddr_any {
 	struct sockaddr addr;
 	char pad[sizeof(union sockaddr_all) - sizeof(struct sockaddr)];
-***REMOVED***;
+};
 
 // copied from /usr/include/bluetooth/hci.h
-struct sockaddr_hci ***REMOVED***
+struct sockaddr_hci {
         sa_family_t     hci_family;
         unsigned short  hci_dev;
         unsigned short  hci_channel;
-***REMOVED***;
+};
 
 // copied from /usr/include/bluetooth/bluetooth.h
 #define BDADDR_BREDR           0x00
@@ -170,16 +170,16 @@ struct sockaddr_hci ***REMOVED***
 #define BDADDR_LE_RANDOM       0x02
 
 // copied from /usr/include/bluetooth/l2cap.h
-struct sockaddr_l2 ***REMOVED***
+struct sockaddr_l2 {
 	sa_family_t	l2_family;
 	unsigned short	l2_psm;
 	uint8_t		l2_bdaddr[6];
 	unsigned short	l2_cid;
 	uint8_t		l2_bdaddr_type;
-***REMOVED***;
+};
 
 // copied from /usr/include/linux/un.h
-struct my_sockaddr_un ***REMOVED***
+struct my_sockaddr_un {
 	sa_family_t sun_family;
 #if defined(__ARM_EABI__) || defined(__powerpc64__)
 	// on ARM char is by default unsigned
@@ -187,7 +187,7 @@ struct my_sockaddr_un ***REMOVED***
 #else
 	char sun_path[108];
 #endif
-***REMOVED***;
+};
 
 #ifdef __ARM_EABI__
 typedef struct user_regs PtraceRegs;
@@ -209,13 +209,13 @@ typedef struct _user_psw_struct ptracePsw;
 typedef struct _user_fpregs_struct ptraceFpregs;
 typedef struct _user_per_struct ptracePer;
 #else
-typedef struct ***REMOVED******REMOVED*** ptracePsw;
-typedef struct ***REMOVED******REMOVED*** ptraceFpregs;
-typedef struct ***REMOVED******REMOVED*** ptracePer;
+typedef struct {} ptracePsw;
+typedef struct {} ptraceFpregs;
+typedef struct {} ptracePer;
 #endif
 
 // The real epoll_event is a union, and godefs doesn't handle it well.
-struct my_epoll_event ***REMOVED***
+struct my_epoll_event {
 	uint32_t events;
 #if defined(__ARM_EABI__) || defined(__aarch64__) || (defined(__mips__) && _MIPS_SIM == _ABIO32)
 	// padding is not specified in linux/eventpoll.h but added to conform to the
@@ -226,7 +226,7 @@ struct my_epoll_event ***REMOVED***
 #endif
 	int32_t fd;
 	int32_t pad;
-***REMOVED***;
+};
 
 */
 import "C"

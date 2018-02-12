@@ -47,22 +47,22 @@ package unix
 #include <netinet/icmp6.h>
 #include <netinet/tcp.h>
 
-enum ***REMOVED***
+enum {
 	sizeofPtr = sizeof(void*),
-***REMOVED***;
+};
 
-union sockaddr_all ***REMOVED***
+union sockaddr_all {
 	struct sockaddr s1;	// this one gets used for fields
 	struct sockaddr_in s2;	// these pad it out
 	struct sockaddr_in6 s3;
 	struct sockaddr_un s4;
 	struct sockaddr_dl s5;
-***REMOVED***;
+};
 
-struct sockaddr_any ***REMOVED***
+struct sockaddr_any {
 	struct sockaddr addr;
 	char pad[sizeof(union sockaddr_all) - sizeof(struct sockaddr)];
-***REMOVED***;
+};
 
 */
 import "C"

@@ -13,42 +13,42 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestTaskInspectError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestTaskInspectError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
-	***REMOVED***
+	}
 
 	_, _, err := client.TaskInspectWithRaw(context.Background(), "nothing")
-	if err == nil || err.Error() != "Error response from daemon: Server error" ***REMOVED***
+	if err == nil || err.Error() != "Error response from daemon: Server error" {
 		t.Fatalf("expected a Server Error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestTaskInspect(t *testing.T) ***REMOVED***
+func TestTaskInspect(t *testing.T) {
 	expectedURL := "/tasks/task_id"
-	client := &Client***REMOVED***
-		client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-			if !strings.HasPrefix(req.URL.Path, expectedURL) ***REMOVED***
+	client := &Client{
+		client: newMockClient(func(req *http.Request) (*http.Response, error) {
+			if !strings.HasPrefix(req.URL.Path, expectedURL) {
 				return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, req.URL)
-			***REMOVED***
-			content, err := json.Marshal(swarm.Task***REMOVED***
+			}
+			content, err := json.Marshal(swarm.Task{
 				ID: "task_id",
-			***REMOVED***)
-			if err != nil ***REMOVED***
+			})
+			if err != nil {
 				return nil, err
-			***REMOVED***
-			return &http.Response***REMOVED***
+			}
+			return &http.Response{
 				StatusCode: http.StatusOK,
 				Body:       ioutil.NopCloser(bytes.NewReader(content)),
-			***REMOVED***, nil
-		***REMOVED***),
-	***REMOVED***
+			}, nil
+		}),
+	}
 
 	taskInspect, _, err := client.TaskInspectWithRaw(context.Background(), "task_id")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if taskInspect.ID != "task_id" ***REMOVED***
+	}
+	if taskInspect.ID != "task_id" {
 		t.Fatalf("expected `task_id`, got %s", taskInspect.ID)
-	***REMOVED***
-***REMOVED***
+	}
+}

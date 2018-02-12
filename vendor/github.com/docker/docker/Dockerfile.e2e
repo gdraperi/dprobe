@@ -35,7 +35,7 @@ RUN CGO_ENABLED=0 go build -o /output/httpserver github.com/docker/docker/contri
 
 # Build the integration tests and copy the resulting binaries to /output/tests
 RUN hack/make.sh build-integration-test-binary
-RUN mkdir -p /output/tests && find . -name test.main -exec cp --parents '***REMOVED******REMOVED***' /output/tests \;
+RUN mkdir -p /output/tests && find . -name test.main -exec cp --parents '{}' /output/tests \;
 
 ## Step 2: Generate testing image
 FROM alpine:3.6 as runner

@@ -17,10 +17,10 @@ icolor cyan "^[[:space:]]*#.*$"
 color ,green "[[:space:]]+$"
 
 ## Strings, single-quoted
-color brightwhite "'([^']|(\\'))*'" "%[qw]\***REMOVED***[^***REMOVED***]*\***REMOVED***" "%[qw]\([^)]*\)" "%[qw]<[^>]*>" "%[qw]\[[^]]*\]" "%[qw]\$[^$]*\$" "%[qw]\^[^^]*\^" "%[qw]![^!]*!"
+color brightwhite "'([^']|(\\'))*'" "%[qw]\{[^}]*\}" "%[qw]\([^)]*\)" "%[qw]<[^>]*>" "%[qw]\[[^]]*\]" "%[qw]\$[^$]*\$" "%[qw]\^[^^]*\^" "%[qw]![^!]*!"
 
 ## Strings, double-quoted
-color brightwhite ""([^"]|(\\"))*"" "%[QW]?\***REMOVED***[^***REMOVED***]*\***REMOVED***" "%[QW]?\([^)]*\)" "%[QW]?<[^>]*>" "%[QW]?\[[^]]*\]" "%[QW]?\$[^$]*\$" "%[QW]?\^[^^]*\^" "%[QW]?![^!]*!"
+color brightwhite ""([^"]|(\\"))*"" "%[QW]?\{[^}]*\}" "%[QW]?\([^)]*\)" "%[QW]?<[^>]*>" "%[QW]?\[[^]]*\]" "%[QW]?\$[^$]*\$" "%[QW]?\^[^^]*\^" "%[QW]?![^!]*!"
 
 ## Single and double quotes
 color brightyellow "('|\")"

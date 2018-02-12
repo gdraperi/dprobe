@@ -14,97 +14,97 @@ const (
 )
 
 // BFlags contains all flags information for the builder
-type BFlags struct ***REMOVED***
+type BFlags struct {
 	Args  []string // actual flags/args from cmd line
 	flags map[string]*Flag
 	used  map[string]*Flag
 	Err   error
-***REMOVED***
+}
 
 // Flag contains all information for a flag
-type Flag struct ***REMOVED***
+type Flag struct {
 	bf       *BFlags
 	name     string
 	flagType FlagType
 	Value    string
-***REMOVED***
+}
 
 // NewBFlags returns the new BFlags struct
-func NewBFlags() *BFlags ***REMOVED***
-	return &BFlags***REMOVED***
+func NewBFlags() *BFlags {
+	return &BFlags{
 		flags: make(map[string]*Flag),
 		used:  make(map[string]*Flag),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // NewBFlagsWithArgs returns the new BFlags struct with Args set to args
-func NewBFlagsWithArgs(args []string) *BFlags ***REMOVED***
+func NewBFlagsWithArgs(args []string) *BFlags {
 	flags := NewBFlags()
 	flags.Args = args
 	return flags
-***REMOVED***
+}
 
 // AddBool adds a bool flag to BFlags
 // Note, any error will be generated when Parse() is called (see Parse).
-func (bf *BFlags) AddBool(name string, def bool) *Flag ***REMOVED***
+func (bf *BFlags) AddBool(name string, def bool) *Flag {
 	flag := bf.addFlag(name, boolType)
-	if flag == nil ***REMOVED***
+	if flag == nil {
 		return nil
-	***REMOVED***
-	if def ***REMOVED***
+	}
+	if def {
 		flag.Value = "true"
-	***REMOVED*** else ***REMOVED***
+	} else {
 		flag.Value = "false"
-	***REMOVED***
+	}
 	return flag
-***REMOVED***
+}
 
 // AddString adds a string flag to BFlags
 // Note, any error will be generated when Parse() is called (see Parse).
-func (bf *BFlags) AddString(name string, def string) *Flag ***REMOVED***
+func (bf *BFlags) AddString(name string, def string) *Flag {
 	flag := bf.addFlag(name, stringType)
-	if flag == nil ***REMOVED***
+	if flag == nil {
 		return nil
-	***REMOVED***
+	}
 	flag.Value = def
 	return flag
-***REMOVED***
+}
 
 // addFlag is a generic func used by the other AddXXX() func
 // to add a new flag to the BFlags struct.
 // Note, any error will be generated when Parse() is called (see Parse).
-func (bf *BFlags) addFlag(name string, flagType FlagType) *Flag ***REMOVED***
-	if _, ok := bf.flags[name]; ok ***REMOVED***
+func (bf *BFlags) addFlag(name string, flagType FlagType) *Flag {
+	if _, ok := bf.flags[name]; ok {
 		bf.Err = fmt.Errorf("Duplicate flag defined: %s", name)
 		return nil
-	***REMOVED***
+	}
 
-	newFlag := &Flag***REMOVED***
+	newFlag := &Flag{
 		bf:       bf,
 		name:     name,
 		flagType: flagType,
-	***REMOVED***
+	}
 	bf.flags[name] = newFlag
 
 	return newFlag
-***REMOVED***
+}
 
 // IsUsed checks if the flag is used
-func (fl *Flag) IsUsed() bool ***REMOVED***
-	if _, ok := fl.bf.used[fl.name]; ok ***REMOVED***
+func (fl *Flag) IsUsed() bool {
+	if _, ok := fl.bf.used[fl.name]; ok {
 		return true
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
 // IsTrue checks if a bool flag is true
-func (fl *Flag) IsTrue() bool ***REMOVED***
-	if fl.flagType != boolType ***REMOVED***
+func (fl *Flag) IsTrue() bool {
+	if fl.flagType != boolType {
 		// Should never get here
 		panic(fmt.Errorf("Trying to use IsTrue on a non-boolean: %s", fl.name))
-	***REMOVED***
+	}
 	return fl.Value == "true"
-***REMOVED***
+}
 
 // Parse parses and checks if the BFlags is valid.
 // Any error noticed during the AddXXX() funcs will be generated/returned
@@ -114,70 +114,70 @@ func (fl *Flag) IsTrue() bool ***REMOVED***
 // around AddXXX() to be just:
 //     defFlag := AddString("description", "")
 // w/o needing to add an if-statement around each one.
-func (bf *BFlags) Parse() error ***REMOVED***
+func (bf *BFlags) Parse() error {
 	// If there was an error while defining the possible flags
 	// go ahead and bubble it back up here since we didn't do it
 	// earlier in the processing
-	if bf.Err != nil ***REMOVED***
+	if bf.Err != nil {
 		return fmt.Errorf("Error setting up flags: %s", bf.Err)
-	***REMOVED***
+	}
 
-	for _, arg := range bf.Args ***REMOVED***
-		if !strings.HasPrefix(arg, "--") ***REMOVED***
+	for _, arg := range bf.Args {
+		if !strings.HasPrefix(arg, "--") {
 			return fmt.Errorf("Arg should start with -- : %s", arg)
-		***REMOVED***
+		}
 
-		if arg == "--" ***REMOVED***
+		if arg == "--" {
 			return nil
-		***REMOVED***
+		}
 
 		arg = arg[2:]
 		value := ""
 
 		index := strings.Index(arg, "=")
-		if index >= 0 ***REMOVED***
+		if index >= 0 {
 			value = arg[index+1:]
 			arg = arg[:index]
-		***REMOVED***
+		}
 
 		flag, ok := bf.flags[arg]
-		if !ok ***REMOVED***
+		if !ok {
 			return fmt.Errorf("Unknown flag: %s", arg)
-		***REMOVED***
+		}
 
-		if _, ok = bf.used[arg]; ok ***REMOVED***
+		if _, ok = bf.used[arg]; ok {
 			return fmt.Errorf("Duplicate flag specified: %s", arg)
-		***REMOVED***
+		}
 
 		bf.used[arg] = flag
 
-		switch flag.flagType ***REMOVED***
+		switch flag.flagType {
 		case boolType:
 			// value == "" is only ok if no "=" was specified
-			if index >= 0 && value == "" ***REMOVED***
+			if index >= 0 && value == "" {
 				return fmt.Errorf("Missing a value on flag: %s", arg)
-			***REMOVED***
+			}
 
 			lower := strings.ToLower(value)
-			if lower == "" ***REMOVED***
+			if lower == "" {
 				flag.Value = "true"
-			***REMOVED*** else if lower == "true" || lower == "false" ***REMOVED***
+			} else if lower == "true" || lower == "false" {
 				flag.Value = lower
-			***REMOVED*** else ***REMOVED***
+			} else {
 				return fmt.Errorf("Expecting boolean value for flag %s, not: %s", arg, value)
-			***REMOVED***
+			}
 
 		case stringType:
-			if index < 0 ***REMOVED***
+			if index < 0 {
 				return fmt.Errorf("Missing a value on flag: %s", arg)
-			***REMOVED***
+			}
 			flag.Value = value
 
 		default:
 			panic("No idea what kind of flag we have! Should never get here!")
-		***REMOVED***
+		}
 
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}

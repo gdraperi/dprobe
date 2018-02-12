@@ -12,223 +12,223 @@ import (
 	selinux "github.com/opencontainers/selinux/go-selinux"
 )
 
-func TestMount(t *testing.T) ***REMOVED***
-	if os.Getuid() != 0 ***REMOVED***
+func TestMount(t *testing.T) {
+	if os.Getuid() != 0 {
 		t.Skip("not root tests would fail")
-	***REMOVED***
+	}
 
 	source, err := ioutil.TempDir("", "mount-test-source-")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	defer os.RemoveAll(source)
 
 	// Ensure we have a known start point by mounting tmpfs with given options
-	if err := Mount("tmpfs", source, "tmpfs", "private"); err != nil ***REMOVED***
+	if err := Mount("tmpfs", source, "tmpfs", "private"); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	defer ensureUnmount(t, source)
 	validateMount(t, source, "", "", "")
-	if t.Failed() ***REMOVED***
+	if t.Failed() {
 		t.FailNow()
-	***REMOVED***
+	}
 
 	target, err := ioutil.TempDir("", "mount-test-target-")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	defer os.RemoveAll(target)
 
-	tests := []struct ***REMOVED***
+	tests := []struct {
 		source           string
 		ftype            string
 		options          string
 		expectedOpts     string
 		expectedOptional string
 		expectedVFS      string
-	***REMOVED******REMOVED***
+	}{
 		// No options
-		***REMOVED***"tmpfs", "tmpfs", "", "", "", ""***REMOVED***,
+		{"tmpfs", "tmpfs", "", "", "", ""},
 		// Default rw / ro test
-		***REMOVED***source, "", "bind", "", "", ""***REMOVED***,
-		***REMOVED***source, "", "bind,private", "", "", ""***REMOVED***,
-		***REMOVED***source, "", "bind,shared", "", "shared", ""***REMOVED***,
-		***REMOVED***source, "", "bind,slave", "", "master", ""***REMOVED***,
-		***REMOVED***source, "", "bind,unbindable", "", "unbindable", ""***REMOVED***,
+		{source, "", "bind", "", "", ""},
+		{source, "", "bind,private", "", "", ""},
+		{source, "", "bind,shared", "", "shared", ""},
+		{source, "", "bind,slave", "", "master", ""},
+		{source, "", "bind,unbindable", "", "unbindable", ""},
 		// Read Write tests
-		***REMOVED***source, "", "bind,rw", "rw", "", ""***REMOVED***,
-		***REMOVED***source, "", "bind,rw,private", "rw", "", ""***REMOVED***,
-		***REMOVED***source, "", "bind,rw,shared", "rw", "shared", ""***REMOVED***,
-		***REMOVED***source, "", "bind,rw,slave", "rw", "master", ""***REMOVED***,
-		***REMOVED***source, "", "bind,rw,unbindable", "rw", "unbindable", ""***REMOVED***,
+		{source, "", "bind,rw", "rw", "", ""},
+		{source, "", "bind,rw,private", "rw", "", ""},
+		{source, "", "bind,rw,shared", "rw", "shared", ""},
+		{source, "", "bind,rw,slave", "rw", "master", ""},
+		{source, "", "bind,rw,unbindable", "rw", "unbindable", ""},
 		// Read Only tests
-		***REMOVED***source, "", "bind,ro", "ro", "", ""***REMOVED***,
-		***REMOVED***source, "", "bind,ro,private", "ro", "", ""***REMOVED***,
-		***REMOVED***source, "", "bind,ro,shared", "ro", "shared", ""***REMOVED***,
-		***REMOVED***source, "", "bind,ro,slave", "ro", "master", ""***REMOVED***,
-		***REMOVED***source, "", "bind,ro,unbindable", "ro", "unbindable", ""***REMOVED***,
+		{source, "", "bind,ro", "ro", "", ""},
+		{source, "", "bind,ro,private", "ro", "", ""},
+		{source, "", "bind,ro,shared", "ro", "shared", ""},
+		{source, "", "bind,ro,slave", "ro", "master", ""},
+		{source, "", "bind,ro,unbindable", "ro", "unbindable", ""},
 		// Remount tests to change per filesystem options
-		***REMOVED***"", "", "remount,size=128k", "rw", "", "rw,size=128k"***REMOVED***,
-		***REMOVED***"", "", "remount,ro,size=128k", "ro", "", "ro,size=128k"***REMOVED***,
-	***REMOVED***
+		{"", "", "remount,size=128k", "rw", "", "rw,size=128k"},
+		{"", "", "remount,ro,size=128k", "ro", "", "ro,size=128k"},
+	}
 
-	for _, tc := range tests ***REMOVED***
+	for _, tc := range tests {
 		ftype, options := tc.ftype, tc.options
-		if tc.ftype == "" ***REMOVED***
+		if tc.ftype == "" {
 			ftype = "none"
-		***REMOVED***
-		if tc.options == "" ***REMOVED***
+		}
+		if tc.options == "" {
 			options = "none"
-		***REMOVED***
+		}
 
-		t.Run(fmt.Sprintf("%v-%v", ftype, options), func(t *testing.T) ***REMOVED***
-			if strings.Contains(tc.options, "slave") ***REMOVED***
+		t.Run(fmt.Sprintf("%v-%v", ftype, options), func(t *testing.T) {
+			if strings.Contains(tc.options, "slave") {
 				// Slave requires a shared source
-				if err := MakeShared(source); err != nil ***REMOVED***
+				if err := MakeShared(source); err != nil {
 					t.Fatal(err)
-				***REMOVED***
-				defer func() ***REMOVED***
-					if err := MakePrivate(source); err != nil ***REMOVED***
+				}
+				defer func() {
+					if err := MakePrivate(source); err != nil {
 						t.Fatal(err)
-					***REMOVED***
-				***REMOVED***()
-			***REMOVED***
-			if strings.Contains(tc.options, "remount") ***REMOVED***
+					}
+				}()
+			}
+			if strings.Contains(tc.options, "remount") {
 				// create a new mount to remount first
-				if err := Mount("tmpfs", target, "tmpfs", ""); err != nil ***REMOVED***
+				if err := Mount("tmpfs", target, "tmpfs", ""); err != nil {
 					t.Fatal(err)
-				***REMOVED***
-			***REMOVED***
-			if err := Mount(tc.source, target, tc.ftype, tc.options); err != nil ***REMOVED***
+				}
+			}
+			if err := Mount(tc.source, target, tc.ftype, tc.options); err != nil {
 				t.Fatal(err)
-			***REMOVED***
+			}
 			defer ensureUnmount(t, target)
 			expectedVFS := tc.expectedVFS
-			if selinux.GetEnabled() && expectedVFS != "" ***REMOVED***
+			if selinux.GetEnabled() && expectedVFS != "" {
 				expectedVFS = expectedVFS + ",seclabel"
-			***REMOVED***
+			}
 			validateMount(t, target, tc.expectedOpts, tc.expectedOptional, expectedVFS)
-		***REMOVED***)
-	***REMOVED***
-***REMOVED***
+		})
+	}
+}
 
 // ensureUnmount umounts mnt checking for errors
-func ensureUnmount(t *testing.T, mnt string) ***REMOVED***
-	if err := Unmount(mnt); err != nil ***REMOVED***
+func ensureUnmount(t *testing.T, mnt string) {
+	if err := Unmount(mnt); err != nil {
 		t.Error(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // validateMount checks that mnt has the given options
-func validateMount(t *testing.T, mnt string, opts, optional, vfs string) ***REMOVED***
+func validateMount(t *testing.T, mnt string, opts, optional, vfs string) {
 	info, err := GetMounts()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	wantedOpts := make(map[string]struct***REMOVED******REMOVED***)
-	if opts != "" ***REMOVED***
-		for _, opt := range strings.Split(opts, ",") ***REMOVED***
-			wantedOpts[opt] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-		***REMOVED***
-	***REMOVED***
+	wantedOpts := make(map[string]struct{})
+	if opts != "" {
+		for _, opt := range strings.Split(opts, ",") {
+			wantedOpts[opt] = struct{}{}
+		}
+	}
 
-	wantedOptional := make(map[string]struct***REMOVED******REMOVED***)
-	if optional != "" ***REMOVED***
-		for _, opt := range strings.Split(optional, ",") ***REMOVED***
-			wantedOptional[opt] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-		***REMOVED***
-	***REMOVED***
+	wantedOptional := make(map[string]struct{})
+	if optional != "" {
+		for _, opt := range strings.Split(optional, ",") {
+			wantedOptional[opt] = struct{}{}
+		}
+	}
 
-	wantedVFS := make(map[string]struct***REMOVED******REMOVED***)
-	if vfs != "" ***REMOVED***
-		for _, opt := range strings.Split(vfs, ",") ***REMOVED***
-			wantedVFS[opt] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-		***REMOVED***
-	***REMOVED***
+	wantedVFS := make(map[string]struct{})
+	if vfs != "" {
+		for _, opt := range strings.Split(vfs, ",") {
+			wantedVFS[opt] = struct{}{}
+		}
+	}
 
 	mnts := make(map[int]*Info, len(info))
-	for _, mi := range info ***REMOVED***
+	for _, mi := range info {
 		mnts[mi.ID] = mi
-	***REMOVED***
+	}
 
-	for _, mi := range info ***REMOVED***
-		if mi.Mountpoint != mnt ***REMOVED***
+	for _, mi := range info {
+		if mi.Mountpoint != mnt {
 			continue
-		***REMOVED***
+		}
 
 		// Use parent info as the defaults
 		p := mnts[mi.Parent]
-		pOpts := make(map[string]struct***REMOVED******REMOVED***)
-		if p.Opts != "" ***REMOVED***
-			for _, opt := range strings.Split(p.Opts, ",") ***REMOVED***
-				pOpts[clean(opt)] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-			***REMOVED***
-		***REMOVED***
-		pOptional := make(map[string]struct***REMOVED******REMOVED***)
-		if p.Optional != "" ***REMOVED***
-			for _, field := range strings.Split(p.Optional, ",") ***REMOVED***
-				pOptional[clean(field)] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-			***REMOVED***
-		***REMOVED***
+		pOpts := make(map[string]struct{})
+		if p.Opts != "" {
+			for _, opt := range strings.Split(p.Opts, ",") {
+				pOpts[clean(opt)] = struct{}{}
+			}
+		}
+		pOptional := make(map[string]struct{})
+		if p.Optional != "" {
+			for _, field := range strings.Split(p.Optional, ",") {
+				pOptional[clean(field)] = struct{}{}
+			}
+		}
 
 		// Validate Opts
-		if mi.Opts != "" ***REMOVED***
-			for _, opt := range strings.Split(mi.Opts, ",") ***REMOVED***
+		if mi.Opts != "" {
+			for _, opt := range strings.Split(mi.Opts, ",") {
 				opt = clean(opt)
-				if !has(wantedOpts, opt) && !has(pOpts, opt) ***REMOVED***
+				if !has(wantedOpts, opt) && !has(pOpts, opt) {
 					t.Errorf("unexpected mount option %q expected %q", opt, opts)
-				***REMOVED***
+				}
 				delete(wantedOpts, opt)
-			***REMOVED***
-		***REMOVED***
-		for opt := range wantedOpts ***REMOVED***
+			}
+		}
+		for opt := range wantedOpts {
 			t.Errorf("missing mount option %q found %q", opt, mi.Opts)
-		***REMOVED***
+		}
 
 		// Validate Optional
-		if mi.Optional != "" ***REMOVED***
-			for _, field := range strings.Split(mi.Optional, ",") ***REMOVED***
+		if mi.Optional != "" {
+			for _, field := range strings.Split(mi.Optional, ",") {
 				field = clean(field)
-				if !has(wantedOptional, field) && !has(pOptional, field) ***REMOVED***
+				if !has(wantedOptional, field) && !has(pOptional, field) {
 					t.Errorf("unexpected optional failed %q expected %q", field, optional)
-				***REMOVED***
+				}
 				delete(wantedOptional, field)
-			***REMOVED***
-		***REMOVED***
-		for field := range wantedOptional ***REMOVED***
+			}
+		}
+		for field := range wantedOptional {
 			t.Errorf("missing optional field %q found %q", field, mi.Optional)
-		***REMOVED***
+		}
 
 		// Validate VFS if set
-		if vfs != "" ***REMOVED***
-			if mi.VfsOpts != "" ***REMOVED***
-				for _, opt := range strings.Split(mi.VfsOpts, ",") ***REMOVED***
+		if vfs != "" {
+			if mi.VfsOpts != "" {
+				for _, opt := range strings.Split(mi.VfsOpts, ",") {
 					opt = clean(opt)
-					if !has(wantedVFS, opt) ***REMOVED***
+					if !has(wantedVFS, opt) {
 						t.Errorf("unexpected mount option %q expected %q", opt, vfs)
-					***REMOVED***
+					}
 					delete(wantedVFS, opt)
-				***REMOVED***
-			***REMOVED***
-			for opt := range wantedVFS ***REMOVED***
+				}
+			}
+			for opt := range wantedVFS {
 				t.Errorf("missing mount option %q found %q", opt, mi.VfsOpts)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		return
-	***REMOVED***
+	}
 
 	t.Errorf("failed to find mount %q", mnt)
-***REMOVED***
+}
 
 // clean strips off any value param after the colon
-func clean(v string) string ***REMOVED***
+func clean(v string) string {
 	return strings.SplitN(v, ":", 2)[0]
-***REMOVED***
+}
 
 // has returns true if key is a member of m
-func has(m map[string]struct***REMOVED******REMOVED***, key string) bool ***REMOVED***
+func has(m map[string]struct{}, key string) bool {
 	_, ok := m[key]
 	return ok
-***REMOVED***
+}

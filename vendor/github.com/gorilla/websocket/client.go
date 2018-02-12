@@ -34,19 +34,19 @@ var errInvalidCompression = errors.New("websocket: invalid compression negotiati
 // etc.
 //
 // Deprecated: Use Dialer instead.
-func NewClient(netConn net.Conn, u *url.URL, requestHeader http.Header, readBufSize, writeBufSize int) (c *Conn, response *http.Response, err error) ***REMOVED***
-	d := Dialer***REMOVED***
+func NewClient(netConn net.Conn, u *url.URL, requestHeader http.Header, readBufSize, writeBufSize int) (c *Conn, response *http.Response, err error) {
+	d := Dialer{
 		ReadBufferSize:  readBufSize,
 		WriteBufferSize: writeBufSize,
-		NetDial: func(net, addr string) (net.Conn, error) ***REMOVED***
+		NetDial: func(net, addr string) (net.Conn, error) {
 			return netConn, nil
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 	return d.Dial(u.String(), requestHeader)
-***REMOVED***
+}
 
 // A Dialer contains options for connecting to WebSocket server.
-type Dialer struct ***REMOVED***
+type Dialer struct {
 	// NetDial specifies the dial function for creating TCP connections. If
 	// NetDial is nil, net.Dial is used.
 	NetDial func(network, addr string) (net.Conn, error)
@@ -82,32 +82,32 @@ type Dialer struct ***REMOVED***
 	// If Jar is nil, cookies are not sent in requests and ignored
 	// in responses.
 	Jar http.CookieJar
-***REMOVED***
+}
 
 var errMalformedURL = errors.New("malformed ws or wss URL")
 
-func hostPortNoPort(u *url.URL) (hostPort, hostNoPort string) ***REMOVED***
+func hostPortNoPort(u *url.URL) (hostPort, hostNoPort string) {
 	hostPort = u.Host
 	hostNoPort = u.Host
-	if i := strings.LastIndex(u.Host, ":"); i > strings.LastIndex(u.Host, "]") ***REMOVED***
+	if i := strings.LastIndex(u.Host, ":"); i > strings.LastIndex(u.Host, "]") {
 		hostNoPort = hostNoPort[:i]
-	***REMOVED*** else ***REMOVED***
-		switch u.Scheme ***REMOVED***
+	} else {
+		switch u.Scheme {
 		case "wss":
 			hostPort += ":443"
 		case "https":
 			hostPort += ":443"
 		default:
 			hostPort += ":80"
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return hostPort, hostNoPort
-***REMOVED***
+}
 
 // DefaultDialer is a dialer with all fields set to the default values.
-var DefaultDialer = &Dialer***REMOVED***
+var DefaultDialer = &Dialer{
 	Proxy: http.ProxyFromEnvironment,
-***REMOVED***
+}
 
 // Dial creates a new client connection. Use requestHeader to specify the
 // origin (Origin), subprotocols (Sec-WebSocket-Protocol) and cookies (Cookie).
@@ -118,39 +118,39 @@ var DefaultDialer = &Dialer***REMOVED***
 // non-nil *http.Response so that callers can handle redirects, authentication,
 // etcetera. The response body may not contain the entire response and does not
 // need to be closed by the application.
-func (d *Dialer) Dial(urlStr string, requestHeader http.Header) (*Conn, *http.Response, error) ***REMOVED***
+func (d *Dialer) Dial(urlStr string, requestHeader http.Header) (*Conn, *http.Response, error) {
 
-	if d == nil ***REMOVED***
-		d = &Dialer***REMOVED***
+	if d == nil {
+		d = &Dialer{
 			Proxy: http.ProxyFromEnvironment,
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	challengeKey, err := generateChallengeKey()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 
 	u, err := url.Parse(urlStr)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 
-	switch u.Scheme ***REMOVED***
+	switch u.Scheme {
 	case "ws":
 		u.Scheme = "http"
 	case "wss":
 		u.Scheme = "https"
 	default:
 		return nil, nil, errMalformedURL
-	***REMOVED***
+	}
 
-	if u.User != nil ***REMOVED***
+	if u.User != nil {
 		// User name and password are not allowed in websocket URIs.
 		return nil, nil, errMalformedURL
-	***REMOVED***
+	}
 
-	req := &http.Request***REMOVED***
+	req := &http.Request{
 		Method:     "GET",
 		URL:        u,
 		Proto:      "HTTP/1.1",
@@ -158,32 +158,32 @@ func (d *Dialer) Dial(urlStr string, requestHeader http.Header) (*Conn, *http.Re
 		ProtoMinor: 1,
 		Header:     make(http.Header),
 		Host:       u.Host,
-	***REMOVED***
+	}
 
 	// Set the cookies present in the cookie jar of the dialer
-	if d.Jar != nil ***REMOVED***
-		for _, cookie := range d.Jar.Cookies(u) ***REMOVED***
+	if d.Jar != nil {
+		for _, cookie := range d.Jar.Cookies(u) {
 			req.AddCookie(cookie)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Set the request headers using the capitalization for names and values in
 	// RFC examples. Although the capitalization shouldn't matter, there are
 	// servers that depend on it. The Header.Set method is not used because the
 	// method canonicalizes the header names.
-	req.Header["Upgrade"] = []string***REMOVED***"websocket"***REMOVED***
-	req.Header["Connection"] = []string***REMOVED***"Upgrade"***REMOVED***
-	req.Header["Sec-WebSocket-Key"] = []string***REMOVED***challengeKey***REMOVED***
-	req.Header["Sec-WebSocket-Version"] = []string***REMOVED***"13"***REMOVED***
-	if len(d.Subprotocols) > 0 ***REMOVED***
-		req.Header["Sec-WebSocket-Protocol"] = []string***REMOVED***strings.Join(d.Subprotocols, ", ")***REMOVED***
-	***REMOVED***
-	for k, vs := range requestHeader ***REMOVED***
-		switch ***REMOVED***
+	req.Header["Upgrade"] = []string{"websocket"}
+	req.Header["Connection"] = []string{"Upgrade"}
+	req.Header["Sec-WebSocket-Key"] = []string{challengeKey}
+	req.Header["Sec-WebSocket-Version"] = []string{"13"}
+	if len(d.Subprotocols) > 0 {
+		req.Header["Sec-WebSocket-Protocol"] = []string{strings.Join(d.Subprotocols, ", ")}
+	}
+	for k, vs := range requestHeader {
+		switch {
 		case k == "Host":
-			if len(vs) > 0 ***REMOVED***
+			if len(vs) > 0 {
 				req.Host = vs[0]
-			***REMOVED***
+			}
 		case k == "Upgrade" ||
 			k == "Connection" ||
 			k == "Sec-Websocket-Key" ||
@@ -193,107 +193,107 @@ func (d *Dialer) Dial(urlStr string, requestHeader http.Header) (*Conn, *http.Re
 			return nil, nil, errors.New("websocket: duplicate header not allowed: " + k)
 		default:
 			req.Header[k] = vs
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if d.EnableCompression ***REMOVED***
+	if d.EnableCompression {
 		req.Header.Set("Sec-Websocket-Extensions", "permessage-deflate; server_no_context_takeover; client_no_context_takeover")
-	***REMOVED***
+	}
 
 	var deadline time.Time
-	if d.HandshakeTimeout != 0 ***REMOVED***
+	if d.HandshakeTimeout != 0 {
 		deadline = time.Now().Add(d.HandshakeTimeout)
-	***REMOVED***
+	}
 
 	// Get network dial function.
 	netDial := d.NetDial
-	if netDial == nil ***REMOVED***
-		netDialer := &net.Dialer***REMOVED***Deadline: deadline***REMOVED***
+	if netDial == nil {
+		netDialer := &net.Dialer{Deadline: deadline}
 		netDial = netDialer.Dial
-	***REMOVED***
+	}
 
 	// If needed, wrap the dial function to set the connection deadline.
-	if !deadline.Equal(time.Time***REMOVED******REMOVED***) ***REMOVED***
+	if !deadline.Equal(time.Time{}) {
 		forwardDial := netDial
-		netDial = func(network, addr string) (net.Conn, error) ***REMOVED***
+		netDial = func(network, addr string) (net.Conn, error) {
 			c, err := forwardDial(network, addr)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			err = c.SetDeadline(deadline)
-			if err != nil ***REMOVED***
+			if err != nil {
 				c.Close()
 				return nil, err
-			***REMOVED***
+			}
 			return c, nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// If needed, wrap the dial function to connect through a proxy.
-	if d.Proxy != nil ***REMOVED***
+	if d.Proxy != nil {
 		proxyURL, err := d.Proxy(req)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, nil, err
-		***REMOVED***
-		if proxyURL != nil ***REMOVED***
+		}
+		if proxyURL != nil {
 			dialer, err := proxy_FromURL(proxyURL, netDialerFunc(netDial))
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, nil, err
-			***REMOVED***
+			}
 			netDial = dialer.Dial
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	hostPort, hostNoPort := hostPortNoPort(u)
 	netConn, err := netDial("tcp", hostPort)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 
-	defer func() ***REMOVED***
-		if netConn != nil ***REMOVED***
+	defer func() {
+		if netConn != nil {
 			netConn.Close()
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
-	if u.Scheme == "https" ***REMOVED***
+	if u.Scheme == "https" {
 		cfg := cloneTLSConfig(d.TLSClientConfig)
-		if cfg.ServerName == "" ***REMOVED***
+		if cfg.ServerName == "" {
 			cfg.ServerName = hostNoPort
-		***REMOVED***
+		}
 		tlsConn := tls.Client(netConn, cfg)
 		netConn = tlsConn
-		if err := tlsConn.Handshake(); err != nil ***REMOVED***
+		if err := tlsConn.Handshake(); err != nil {
 			return nil, nil, err
-		***REMOVED***
-		if !cfg.InsecureSkipVerify ***REMOVED***
-			if err := tlsConn.VerifyHostname(cfg.ServerName); err != nil ***REMOVED***
+		}
+		if !cfg.InsecureSkipVerify {
+			if err := tlsConn.VerifyHostname(cfg.ServerName); err != nil {
 				return nil, nil, err
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	conn := newConn(netConn, false, d.ReadBufferSize, d.WriteBufferSize)
 
-	if err := req.Write(netConn); err != nil ***REMOVED***
+	if err := req.Write(netConn); err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 
 	resp, err := http.ReadResponse(conn.br, req)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 
-	if d.Jar != nil ***REMOVED***
-		if rc := resp.Cookies(); len(rc) > 0 ***REMOVED***
+	if d.Jar != nil {
+		if rc := resp.Cookies(); len(rc) > 0 {
 			d.Jar.SetCookies(u, rc)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	if resp.StatusCode != 101 ||
 		!strings.EqualFold(resp.Header.Get("Upgrade"), "websocket") ||
 		!strings.EqualFold(resp.Header.Get("Connection"), "upgrade") ||
-		resp.Header.Get("Sec-Websocket-Accept") != computeAcceptKey(challengeKey) ***REMOVED***
+		resp.Header.Get("Sec-Websocket-Accept") != computeAcceptKey(challengeKey) {
 		// Before closing the network connection on return from this
 		// function, slurp up some of the response to aid application
 		// debugging.
@@ -301,26 +301,26 @@ func (d *Dialer) Dial(urlStr string, requestHeader http.Header) (*Conn, *http.Re
 		n, _ := io.ReadFull(resp.Body, buf)
 		resp.Body = ioutil.NopCloser(bytes.NewReader(buf[:n]))
 		return nil, resp, ErrBadHandshake
-	***REMOVED***
+	}
 
-	for _, ext := range parseExtensions(resp.Header) ***REMOVED***
-		if ext[""] != "permessage-deflate" ***REMOVED***
+	for _, ext := range parseExtensions(resp.Header) {
+		if ext[""] != "permessage-deflate" {
 			continue
-		***REMOVED***
+		}
 		_, snct := ext["server_no_context_takeover"]
 		_, cnct := ext["client_no_context_takeover"]
-		if !snct || !cnct ***REMOVED***
+		if !snct || !cnct {
 			return nil, resp, errInvalidCompression
-		***REMOVED***
+		}
 		conn.newCompressionWriter = compressNoContextTakeover
 		conn.newDecompressionReader = decompressNoContextTakeover
 		break
-	***REMOVED***
+	}
 
-	resp.Body = ioutil.NopCloser(bytes.NewReader([]byte***REMOVED******REMOVED***))
+	resp.Body = ioutil.NopCloser(bytes.NewReader([]byte{}))
 	conn.subprotocol = resp.Header.Get("Sec-Websocket-Protocol")
 
-	netConn.SetDeadline(time.Time***REMOVED******REMOVED***)
+	netConn.SetDeadline(time.Time{})
 	netConn = nil // to avoid close in defer.
 	return conn, resp, nil
-***REMOVED***
+}

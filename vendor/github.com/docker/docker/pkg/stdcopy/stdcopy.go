@@ -31,27 +31,27 @@ const (
 	startingBufLen = 32*1024 + stdWriterPrefixLen + 1
 )
 
-var bufPool = &sync.Pool***REMOVED***New: func() interface***REMOVED******REMOVED*** ***REMOVED*** return bytes.NewBuffer(nil) ***REMOVED******REMOVED***
+var bufPool = &sync.Pool{New: func() interface{} { return bytes.NewBuffer(nil) }}
 
 // stdWriter is wrapper of io.Writer with extra customized info.
-type stdWriter struct ***REMOVED***
+type stdWriter struct {
 	io.Writer
 	prefix byte
-***REMOVED***
+}
 
 // Write sends the buffer to the underneath writer.
 // It inserts the prefix header before the buffer,
 // so stdcopy.StdCopy knows where to multiplex the output.
 // It makes stdWriter to implement io.Writer.
-func (w *stdWriter) Write(p []byte) (n int, err error) ***REMOVED***
-	if w == nil || w.Writer == nil ***REMOVED***
+func (w *stdWriter) Write(p []byte) (n int, err error) {
+	if w == nil || w.Writer == nil {
 		return 0, errors.New("Writer not instantiated")
-	***REMOVED***
-	if p == nil ***REMOVED***
+	}
+	if p == nil {
 		return 0, nil
-	***REMOVED***
+	}
 
-	header := [stdWriterPrefixLen]byte***REMOVED***stdWriterFdIndex: w.prefix***REMOVED***
+	header := [stdWriterPrefixLen]byte{stdWriterFdIndex: w.prefix}
 	binary.BigEndian.PutUint32(header[stdWriterSizeIndex:], uint32(len(p)))
 	buf := bufPool.Get().(*bytes.Buffer)
 	buf.Write(header[:])
@@ -59,14 +59,14 @@ func (w *stdWriter) Write(p []byte) (n int, err error) ***REMOVED***
 
 	n, err = w.Writer.Write(buf.Bytes())
 	n -= stdWriterPrefixLen
-	if n < 0 ***REMOVED***
+	if n < 0 {
 		n = 0
-	***REMOVED***
+	}
 
 	buf.Reset()
 	bufPool.Put(buf)
 	return
-***REMOVED***
+}
 
 // NewStdWriter instantiates a new Writer.
 // Everything written to it will be encapsulated using a custom format,
@@ -74,12 +74,12 @@ func (w *stdWriter) Write(p []byte) (n int, err error) ***REMOVED***
 // This allows multiple write streams (e.g. stdout and stderr) to be muxed into a single connection.
 // `t` indicates the id of the stream to encapsulate.
 // It can be stdcopy.Stdin, stdcopy.Stdout, stdcopy.Stderr.
-func NewStdWriter(w io.Writer, t StdType) io.Writer ***REMOVED***
-	return &stdWriter***REMOVED***
+func NewStdWriter(w io.Writer, t StdType) io.Writer {
+	return &stdWriter{
 		Writer: w,
 		prefix: byte(t),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // StdCopy is a modified version of io.Copy.
 //
@@ -91,7 +91,7 @@ func NewStdWriter(w io.Writer, t StdType) io.Writer ***REMOVED***
 // In other words: if `err` is non nil, it indicates a real underlying error.
 //
 // `written` will hold the total number of bytes written to `dstout` and `dsterr`.
-func StdCopy(dstout, dsterr io.Writer, src io.Reader) (written int64, err error) ***REMOVED***
+func StdCopy(dstout, dsterr io.Writer, src io.Reader) (written int64, err error) {
 	var (
 		buf       = make([]byte, startingBufLen)
 		bufLen    = len(buf)
@@ -101,26 +101,26 @@ func StdCopy(dstout, dsterr io.Writer, src io.Reader) (written int64, err error)
 		frameSize int
 	)
 
-	for ***REMOVED***
+	for {
 		// Make sure we have at least a full header
-		for nr < stdWriterPrefixLen ***REMOVED***
+		for nr < stdWriterPrefixLen {
 			var nr2 int
 			nr2, er = src.Read(buf[nr:])
 			nr += nr2
-			if er == io.EOF ***REMOVED***
-				if nr < stdWriterPrefixLen ***REMOVED***
+			if er == io.EOF {
+				if nr < stdWriterPrefixLen {
 					return written, nil
-				***REMOVED***
+				}
 				break
-			***REMOVED***
-			if er != nil ***REMOVED***
+			}
+			if er != nil {
 				return 0, er
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		stream := StdType(buf[stdWriterFdIndex])
 		// Check the first byte to know where to write
-		switch stream ***REMOVED***
+		switch stream {
 		case Stdin:
 			fallthrough
 		case Stdout:
@@ -136,55 +136,55 @@ func StdCopy(dstout, dsterr io.Writer, src io.Reader) (written int64, err error)
 			out = nil
 		default:
 			return 0, fmt.Errorf("Unrecognized input header: %d", buf[stdWriterFdIndex])
-		***REMOVED***
+		}
 
 		// Retrieve the size of the frame
 		frameSize = int(binary.BigEndian.Uint32(buf[stdWriterSizeIndex : stdWriterSizeIndex+4]))
 
 		// Check if the buffer is big enough to read the frame.
 		// Extend it if necessary.
-		if frameSize+stdWriterPrefixLen > bufLen ***REMOVED***
+		if frameSize+stdWriterPrefixLen > bufLen {
 			buf = append(buf, make([]byte, frameSize+stdWriterPrefixLen-bufLen+1)...)
 			bufLen = len(buf)
-		***REMOVED***
+		}
 
 		// While the amount of bytes read is less than the size of the frame + header, we keep reading
-		for nr < frameSize+stdWriterPrefixLen ***REMOVED***
+		for nr < frameSize+stdWriterPrefixLen {
 			var nr2 int
 			nr2, er = src.Read(buf[nr:])
 			nr += nr2
-			if er == io.EOF ***REMOVED***
-				if nr < frameSize+stdWriterPrefixLen ***REMOVED***
+			if er == io.EOF {
+				if nr < frameSize+stdWriterPrefixLen {
 					return written, nil
-				***REMOVED***
+				}
 				break
-			***REMOVED***
-			if er != nil ***REMOVED***
+			}
+			if er != nil {
 				return 0, er
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		// we might have an error from the source mixed up in our multiplexed
 		// stream. if we do, return it.
-		if stream == Systemerr ***REMOVED***
+		if stream == Systemerr {
 			return written, fmt.Errorf("error from daemon in stream: %s", string(buf[stdWriterPrefixLen:frameSize+stdWriterPrefixLen]))
-		***REMOVED***
+		}
 
 		// Write the retrieved frame (without header)
 		nw, ew = out.Write(buf[stdWriterPrefixLen : frameSize+stdWriterPrefixLen])
-		if ew != nil ***REMOVED***
+		if ew != nil {
 			return 0, ew
-		***REMOVED***
+		}
 
 		// If the frame has not been fully written: error
-		if nw != frameSize ***REMOVED***
+		if nw != frameSize {
 			return 0, io.ErrShortWrite
-		***REMOVED***
+		}
 		written += int64(nw)
 
 		// Move the rest of the buffer to the beginning
 		copy(buf, buf[frameSize+stdWriterPrefixLen:])
 		// Move the index
 		nr -= frameSize + stdWriterPrefixLen
-	***REMOVED***
-***REMOVED***
+	}
+}

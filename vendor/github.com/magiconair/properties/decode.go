@@ -91,44 +91,44 @@ import (
 //     // Field is decoded recursively with "myName." as key prefix
 //     // and the next dotted element of the key as map key.
 //     Field map[string]string `properties:"myName"`
-func (p *Properties) Decode(x interface***REMOVED******REMOVED***) error ***REMOVED***
+func (p *Properties) Decode(x interface{}) error {
 	t, v := reflect.TypeOf(x), reflect.ValueOf(x)
-	if t.Kind() != reflect.Ptr || v.Elem().Type().Kind() != reflect.Struct ***REMOVED***
+	if t.Kind() != reflect.Ptr || v.Elem().Type().Kind() != reflect.Struct {
 		return fmt.Errorf("not a pointer to struct: %s", t)
-	***REMOVED***
-	if err := dec(p, "", nil, nil, v); err != nil ***REMOVED***
+	}
+	if err := dec(p, "", nil, nil, v); err != nil {
 		return err
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func dec(p *Properties, key string, def *string, opts map[string]string, v reflect.Value) error ***REMOVED***
+func dec(p *Properties, key string, def *string, opts map[string]string, v reflect.Value) error {
 	t := v.Type()
 
 	// value returns the property value for key or the default if provided.
-	value := func() (string, error) ***REMOVED***
-		if val, ok := p.Get(key); ok ***REMOVED***
+	value := func() (string, error) {
+		if val, ok := p.Get(key); ok {
 			return val, nil
-		***REMOVED***
-		if def != nil ***REMOVED***
+		}
+		if def != nil {
 			return *def, nil
-		***REMOVED***
+		}
 		return "", fmt.Errorf("missing required key %s", key)
-	***REMOVED***
+	}
 
 	// conv converts a string to a value of the given type.
-	conv := func(s string, t reflect.Type) (val reflect.Value, err error) ***REMOVED***
-		var v interface***REMOVED******REMOVED***
+	conv := func(s string, t reflect.Type) (val reflect.Value, err error) {
+		var v interface{}
 
-		switch ***REMOVED***
+		switch {
 		case isDuration(t):
 			v, err = time.ParseDuration(s)
 
 		case isTime(t):
 			layout := opts["layout"]
-			if layout == "" ***REMOVED***
+			if layout == "" {
 				layout = time.RFC3339
-			***REMOVED***
+			}
 			v, err = time.Parse(layout, s)
 
 		case isBool(t):
@@ -148,142 +148,142 @@ func dec(p *Properties, key string, def *string, opts map[string]string, v refle
 
 		default:
 			return reflect.Zero(t), fmt.Errorf("unsupported type %s", t)
-		***REMOVED***
-		if err != nil ***REMOVED***
+		}
+		if err != nil {
 			return reflect.Zero(t), err
-		***REMOVED***
+		}
 		return reflect.ValueOf(v).Convert(t), nil
-	***REMOVED***
+	}
 
 	// keydef returns the property key and the default value based on the
 	// name of the struct field and the options in the tag.
-	keydef := func(f reflect.StructField) (string, *string, map[string]string) ***REMOVED***
+	keydef := func(f reflect.StructField) (string, *string, map[string]string) {
 		_key, _opts := parseTag(f.Tag.Get("properties"))
 
 		var _def *string
-		if d, ok := _opts["default"]; ok ***REMOVED***
+		if d, ok := _opts["default"]; ok {
 			_def = &d
-		***REMOVED***
-		if _key != "" ***REMOVED***
+		}
+		if _key != "" {
 			return _key, _def, _opts
-		***REMOVED***
+		}
 		return f.Name, _def, _opts
-	***REMOVED***
+	}
 
-	switch ***REMOVED***
+	switch {
 	case isDuration(t) || isTime(t) || isBool(t) || isString(t) || isFloat(t) || isInt(t) || isUint(t):
 		s, err := value()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		val, err := conv(s, t)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		v.Set(val)
 
 	case isPtr(t):
 		return dec(p, key, def, opts, v.Elem())
 
 	case isStruct(t):
-		for i := 0; i < v.NumField(); i++ ***REMOVED***
+		for i := 0; i < v.NumField(); i++ {
 			fv := v.Field(i)
 			fk, def, opts := keydef(t.Field(i))
-			if !fv.CanSet() ***REMOVED***
+			if !fv.CanSet() {
 				return fmt.Errorf("cannot set %s", t.Field(i).Name)
-			***REMOVED***
-			if fk == "-" ***REMOVED***
+			}
+			if fk == "-" {
 				continue
-			***REMOVED***
-			if key != "" ***REMOVED***
+			}
+			if key != "" {
 				fk = key + "." + fk
-			***REMOVED***
-			if err := dec(p, fk, def, opts, fv); err != nil ***REMOVED***
+			}
+			if err := dec(p, fk, def, opts, fv); err != nil {
 				return err
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		return nil
 
 	case isArray(t):
 		val, err := value()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		vals := split(val, ";")
 		a := reflect.MakeSlice(t, 0, len(vals))
-		for _, s := range vals ***REMOVED***
+		for _, s := range vals {
 			val, err := conv(s, t.Elem())
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
+			}
 			a = reflect.Append(a, val)
-		***REMOVED***
+		}
 		v.Set(a)
 
 	case isMap(t):
 		valT := t.Elem()
 		m := reflect.MakeMap(t)
-		for postfix := range p.FilterStripPrefix(key + ".").m ***REMOVED***
+		for postfix := range p.FilterStripPrefix(key + ".").m {
 			pp := strings.SplitN(postfix, ".", 2)
 			mk, mv := pp[0], reflect.New(valT)
-			if err := dec(p, key+"."+mk, nil, nil, mv); err != nil ***REMOVED***
+			if err := dec(p, key+"."+mk, nil, nil, mv); err != nil {
 				return err
-			***REMOVED***
+			}
 			m.SetMapIndex(reflect.ValueOf(mk), mv.Elem())
-		***REMOVED***
+		}
 		v.Set(m)
 
 	default:
 		return fmt.Errorf("unsupported type %s", t)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // split splits a string on sep, trims whitespace of elements
 // and omits empty elements
-func split(s string, sep string) []string ***REMOVED***
+func split(s string, sep string) []string {
 	var a []string
-	for _, v := range strings.Split(s, sep) ***REMOVED***
-		if v = strings.TrimSpace(v); v != "" ***REMOVED***
+	for _, v := range strings.Split(s, sep) {
+		if v = strings.TrimSpace(v); v != "" {
 			a = append(a, v)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return a
-***REMOVED***
+}
 
 // parseTag parses a "key,k=v,k=v,..."
-func parseTag(tag string) (key string, opts map[string]string) ***REMOVED***
-	opts = map[string]string***REMOVED******REMOVED***
-	for i, s := range strings.Split(tag, ",") ***REMOVED***
-		if i == 0 ***REMOVED***
+func parseTag(tag string) (key string, opts map[string]string) {
+	opts = map[string]string{}
+	for i, s := range strings.Split(tag, ",") {
+		if i == 0 {
 			key = s
 			continue
-		***REMOVED***
+		}
 
 		pp := strings.SplitN(s, "=", 2)
-		if len(pp) == 1 ***REMOVED***
+		if len(pp) == 1 {
 			opts[pp[0]] = ""
-		***REMOVED*** else ***REMOVED***
+		} else {
 			opts[pp[0]] = pp[1]
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return key, opts
-***REMOVED***
+}
 
-func isArray(t reflect.Type) bool    ***REMOVED*** return t.Kind() == reflect.Array || t.Kind() == reflect.Slice ***REMOVED***
-func isBool(t reflect.Type) bool     ***REMOVED*** return t.Kind() == reflect.Bool ***REMOVED***
-func isDuration(t reflect.Type) bool ***REMOVED*** return t == reflect.TypeOf(time.Second) ***REMOVED***
-func isMap(t reflect.Type) bool      ***REMOVED*** return t.Kind() == reflect.Map ***REMOVED***
-func isPtr(t reflect.Type) bool      ***REMOVED*** return t.Kind() == reflect.Ptr ***REMOVED***
-func isString(t reflect.Type) bool   ***REMOVED*** return t.Kind() == reflect.String ***REMOVED***
-func isStruct(t reflect.Type) bool   ***REMOVED*** return t.Kind() == reflect.Struct ***REMOVED***
-func isTime(t reflect.Type) bool     ***REMOVED*** return t == reflect.TypeOf(time.Time***REMOVED******REMOVED***) ***REMOVED***
-func isFloat(t reflect.Type) bool ***REMOVED***
+func isArray(t reflect.Type) bool    { return t.Kind() == reflect.Array || t.Kind() == reflect.Slice }
+func isBool(t reflect.Type) bool     { return t.Kind() == reflect.Bool }
+func isDuration(t reflect.Type) bool { return t == reflect.TypeOf(time.Second) }
+func isMap(t reflect.Type) bool      { return t.Kind() == reflect.Map }
+func isPtr(t reflect.Type) bool      { return t.Kind() == reflect.Ptr }
+func isString(t reflect.Type) bool   { return t.Kind() == reflect.String }
+func isStruct(t reflect.Type) bool   { return t.Kind() == reflect.Struct }
+func isTime(t reflect.Type) bool     { return t == reflect.TypeOf(time.Time{}) }
+func isFloat(t reflect.Type) bool {
 	return t.Kind() == reflect.Float32 || t.Kind() == reflect.Float64
-***REMOVED***
-func isInt(t reflect.Type) bool ***REMOVED***
+}
+func isInt(t reflect.Type) bool {
 	return t.Kind() == reflect.Int || t.Kind() == reflect.Int8 || t.Kind() == reflect.Int16 || t.Kind() == reflect.Int32 || t.Kind() == reflect.Int64
-***REMOVED***
-func isUint(t reflect.Type) bool ***REMOVED***
+}
+func isUint(t reflect.Type) bool {
 	return t.Kind() == reflect.Uint || t.Kind() == reflect.Uint8 || t.Kind() == reflect.Uint16 || t.Kind() == reflect.Uint32 || t.Kind() == reflect.Uint64
-***REMOVED***
+}

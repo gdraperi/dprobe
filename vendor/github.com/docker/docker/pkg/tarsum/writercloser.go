@@ -4,19 +4,19 @@ import (
 	"io"
 )
 
-type writeCloseFlusher interface ***REMOVED***
+type writeCloseFlusher interface {
 	io.WriteCloser
 	Flush() error
-***REMOVED***
+}
 
-type nopCloseFlusher struct ***REMOVED***
+type nopCloseFlusher struct {
 	io.Writer
-***REMOVED***
+}
 
-func (n *nopCloseFlusher) Close() error ***REMOVED***
+func (n *nopCloseFlusher) Close() error {
 	return nil
-***REMOVED***
+}
 
-func (n *nopCloseFlusher) Flush() error ***REMOVED***
+func (n *nopCloseFlusher) Flush() error {
 	return nil
-***REMOVED***
+}

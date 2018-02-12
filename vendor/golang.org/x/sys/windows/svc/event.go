@@ -14,35 +14,35 @@ import (
 
 // event represents auto-reset, initially non-signaled Windows event.
 // It is used to communicate between go and asm parts of this package.
-type event struct ***REMOVED***
+type event struct {
 	h windows.Handle
-***REMOVED***
+}
 
-func newEvent() (*event, error) ***REMOVED***
+func newEvent() (*event, error) {
 	h, err := windows.CreateEvent(nil, 0, 0, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	return &event***REMOVED***h: h***REMOVED***, nil
-***REMOVED***
+	}
+	return &event{h: h}, nil
+}
 
-func (e *event) Close() error ***REMOVED***
+func (e *event) Close() error {
 	return windows.CloseHandle(e.h)
-***REMOVED***
+}
 
-func (e *event) Set() error ***REMOVED***
+func (e *event) Set() error {
 	return windows.SetEvent(e.h)
-***REMOVED***
+}
 
-func (e *event) Wait() error ***REMOVED***
+func (e *event) Wait() error {
 	s, err := windows.WaitForSingleObject(e.h, windows.INFINITE)
-	switch s ***REMOVED***
+	switch s {
 	case windows.WAIT_OBJECT_0:
 		break
 	case windows.WAIT_FAILED:
 		return err
 	default:
 		return errors.New("unexpected result from WaitForSingleObject")
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

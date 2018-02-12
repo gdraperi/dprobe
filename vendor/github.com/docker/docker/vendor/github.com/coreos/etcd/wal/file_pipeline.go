@@ -23,7 +23,7 @@ import (
 )
 
 // filePipeline pipelines allocating disk space
-type filePipeline struct ***REMOVED***
+type filePipeline struct {
 	// dir to put files
 	dir string
 	// size of files to make, in bytes
@@ -33,65 +33,65 @@ type filePipeline struct ***REMOVED***
 
 	filec chan *fileutil.LockedFile
 	errc  chan error
-	donec chan struct***REMOVED******REMOVED***
-***REMOVED***
+	donec chan struct{}
+}
 
-func newFilePipeline(dir string, fileSize int64) *filePipeline ***REMOVED***
-	fp := &filePipeline***REMOVED***
+func newFilePipeline(dir string, fileSize int64) *filePipeline {
+	fp := &filePipeline{
 		dir:   dir,
 		size:  fileSize,
 		filec: make(chan *fileutil.LockedFile),
 		errc:  make(chan error, 1),
-		donec: make(chan struct***REMOVED******REMOVED***),
-	***REMOVED***
+		donec: make(chan struct{}),
+	}
 	go fp.run()
 	return fp
-***REMOVED***
+}
 
 // Open returns a fresh file for writing. Rename the file before calling
 // Open again or there will be file collisions.
-func (fp *filePipeline) Open() (f *fileutil.LockedFile, err error) ***REMOVED***
-	select ***REMOVED***
+func (fp *filePipeline) Open() (f *fileutil.LockedFile, err error) {
+	select {
 	case f = <-fp.filec:
 	case err = <-fp.errc:
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func (fp *filePipeline) Close() error ***REMOVED***
+func (fp *filePipeline) Close() error {
 	close(fp.donec)
 	return <-fp.errc
-***REMOVED***
+}
 
-func (fp *filePipeline) alloc() (f *fileutil.LockedFile, err error) ***REMOVED***
+func (fp *filePipeline) alloc() (f *fileutil.LockedFile, err error) {
 	// count % 2 so this file isn't the same as the one last published
 	fpath := filepath.Join(fp.dir, fmt.Sprintf("%d.tmp", fp.count%2))
-	if f, err = fileutil.LockFile(fpath, os.O_CREATE|os.O_WRONLY, fileutil.PrivateFileMode); err != nil ***REMOVED***
+	if f, err = fileutil.LockFile(fpath, os.O_CREATE|os.O_WRONLY, fileutil.PrivateFileMode); err != nil {
 		return nil, err
-	***REMOVED***
-	if err = fileutil.Preallocate(f.File, fp.size, true); err != nil ***REMOVED***
+	}
+	if err = fileutil.Preallocate(f.File, fp.size, true); err != nil {
 		plog.Errorf("failed to allocate space when creating new wal file (%v)", err)
 		f.Close()
 		return nil, err
-	***REMOVED***
+	}
 	fp.count++
 	return f, nil
-***REMOVED***
+}
 
-func (fp *filePipeline) run() ***REMOVED***
+func (fp *filePipeline) run() {
 	defer close(fp.errc)
-	for ***REMOVED***
+	for {
 		f, err := fp.alloc()
-		if err != nil ***REMOVED***
+		if err != nil {
 			fp.errc <- err
 			return
-		***REMOVED***
-		select ***REMOVED***
+		}
+		select {
 		case fp.filec <- f:
 		case <-fp.donec:
 			os.Remove(f.Name())
 			f.Close()
 			return
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

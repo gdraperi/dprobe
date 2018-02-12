@@ -11,53 +11,53 @@ import (
 
 // Middleware uses a list of plugins to
 // handle authorization in the API requests.
-type Middleware struct ***REMOVED***
+type Middleware struct {
 	mu      sync.Mutex
 	plugins []Plugin
-***REMOVED***
+}
 
 // NewMiddleware creates a new Middleware
 // with a slice of plugins names.
-func NewMiddleware(names []string, pg plugingetter.PluginGetter) *Middleware ***REMOVED***
+func NewMiddleware(names []string, pg plugingetter.PluginGetter) *Middleware {
 	SetPluginGetter(pg)
-	return &Middleware***REMOVED***
+	return &Middleware{
 		plugins: newPlugins(names),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (m *Middleware) getAuthzPlugins() []Plugin ***REMOVED***
+func (m *Middleware) getAuthzPlugins() []Plugin {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	return m.plugins
-***REMOVED***
+}
 
 // SetPlugins sets the plugin used for authorization
-func (m *Middleware) SetPlugins(names []string) ***REMOVED***
+func (m *Middleware) SetPlugins(names []string) {
 	m.mu.Lock()
 	m.plugins = newPlugins(names)
 	m.mu.Unlock()
-***REMOVED***
+}
 
 // RemovePlugin removes a single plugin from this authz middleware chain
-func (m *Middleware) RemovePlugin(name string) ***REMOVED***
+func (m *Middleware) RemovePlugin(name string) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	plugins := m.plugins[:0]
-	for _, authPlugin := range m.plugins ***REMOVED***
-		if authPlugin.Name() != name ***REMOVED***
+	for _, authPlugin := range m.plugins {
+		if authPlugin.Name() != name {
 			plugins = append(plugins, authPlugin)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	m.plugins = plugins
-***REMOVED***
+}
 
 // WrapHandler returns a new handler function wrapping the previous one in the request chain.
-func (m *Middleware) WrapHandler(handler func(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error) func(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error ***REMOVED***
-	return func(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error ***REMOVED***
+func (m *Middleware) WrapHandler(handler func(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error) func(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error {
+	return func(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error {
 		plugins := m.getAuthzPlugins()
-		if len(plugins) == 0 ***REMOVED***
+		if len(plugins) == 0 {
 			return handler(ctx, w, r, vars)
-		***REMOVED***
+		}
 
 		user := ""
 		userAuthNMethod := ""
@@ -66,45 +66,45 @@ func (m *Middleware) WrapHandler(handler func(ctx context.Context, w http.Respon
 		// FIXME: Non trivial authorization mechanisms (such as advanced certificate validations, kerberos support
 		// and ldap) will be extracted using AuthN feature, which is tracked under:
 		// https://github.com/docker/docker/pull/20883
-		if r.TLS != nil && len(r.TLS.PeerCertificates) > 0 ***REMOVED***
+		if r.TLS != nil && len(r.TLS.PeerCertificates) > 0 {
 			user = r.TLS.PeerCertificates[0].Subject.CommonName
 			userAuthNMethod = "TLS"
-		***REMOVED***
+		}
 
 		authCtx := NewCtx(plugins, user, userAuthNMethod, r.Method, r.RequestURI)
 
-		if err := authCtx.AuthZRequest(w, r); err != nil ***REMOVED***
+		if err := authCtx.AuthZRequest(w, r); err != nil {
 			logrus.Errorf("AuthZRequest for %s %s returned error: %s", r.Method, r.RequestURI, err)
 			return err
-		***REMOVED***
+		}
 
 		rw := NewResponseModifier(w)
 
 		var errD error
 
-		if errD = handler(ctx, rw, r, vars); errD != nil ***REMOVED***
+		if errD = handler(ctx, rw, r, vars); errD != nil {
 			logrus.Errorf("Handler for %s %s returned error: %s", r.Method, r.RequestURI, errD)
-		***REMOVED***
+		}
 
 		// There's a chance that the authCtx.plugins was updated. One of the reasons
 		// this can happen is when an authzplugin is disabled.
 		plugins = m.getAuthzPlugins()
-		if len(plugins) == 0 ***REMOVED***
+		if len(plugins) == 0 {
 			logrus.Debug("There are no authz plugins in the chain")
 			return nil
-		***REMOVED***
+		}
 
 		authCtx.plugins = plugins
 
-		if err := authCtx.AuthZResponse(rw, r); errD == nil && err != nil ***REMOVED***
+		if err := authCtx.AuthZResponse(rw, r); errD == nil && err != nil {
 			logrus.Errorf("AuthZResponse for %s %s returned error: %s", r.Method, r.RequestURI, err)
 			return err
-		***REMOVED***
+		}
 
-		if errD != nil ***REMOVED***
+		if errD != nil {
 			return errD
-		***REMOVED***
+		}
 
 		return nil
-	***REMOVED***
-***REMOVED***
+	}
+}

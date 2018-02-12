@@ -15,10 +15,10 @@
 
 package cmd
 
-func initApache2() ***REMOVED***
-	Licenses["apache"] = License***REMOVED***
+func initApache2() {
+	Licenses["apache"] = License{
 		Name:            "Apache 2.0",
-		PossibleMatches: []string***REMOVED***"apache", "apache20", "apache 2.0", "apache2.0", "apache-2.0"***REMOVED***,
+		PossibleMatches: []string{"apache", "apache20", "apache 2.0", "apache2.0", "apache-2.0"},
 		Header: `
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -234,5 +234,5 @@ limitations under the License.`,
    See the License for the specific language governing permissions and
    limitations under the License.
 `,
-	***REMOVED***
-***REMOVED***
+	}
+}

@@ -46,25 +46,25 @@ const (
 	WatchActionKindRemove  WatchActionKind = 4
 )
 
-var WatchActionKind_name = map[int32]string***REMOVED***
+var WatchActionKind_name = map[int32]string{
 	0: "WATCH_ACTION_UNKNOWN",
 	1: "WATCH_ACTION_CREATE",
 	2: "WATCH_ACTION_UPDATE",
 	4: "WATCH_ACTION_REMOVE",
-***REMOVED***
-var WatchActionKind_value = map[string]int32***REMOVED***
+}
+var WatchActionKind_value = map[string]int32{
 	"WATCH_ACTION_UNKNOWN": 0,
 	"WATCH_ACTION_CREATE":  1,
 	"WATCH_ACTION_UPDATE":  2,
 	"WATCH_ACTION_REMOVE":  4,
-***REMOVED***
+}
 
-func (x WatchActionKind) String() string ***REMOVED***
+func (x WatchActionKind) String() string {
 	return proto.EnumName(WatchActionKind_name, int32(x))
-***REMOVED***
-func (WatchActionKind) EnumDescriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorWatch, []int***REMOVED***0***REMOVED*** ***REMOVED***
+}
+func (WatchActionKind) EnumDescriptor() ([]byte, []int) { return fileDescriptorWatch, []int{0} }
 
-type Object struct ***REMOVED***
+type Object struct {
 	// Types that are valid to be assigned to Object:
 	//	*Object_Node
 	//	*Object_Service
@@ -76,129 +76,129 @@ type Object struct ***REMOVED***
 	//	*Object_Extension
 	//	*Object_Config
 	Object isObject_Object `protobuf_oneof:"Object"`
-***REMOVED***
+}
 
-func (m *Object) Reset()                    ***REMOVED*** *m = Object***REMOVED******REMOVED*** ***REMOVED***
-func (*Object) ProtoMessage()               ***REMOVED******REMOVED***
-func (*Object) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorWatch, []int***REMOVED***0***REMOVED*** ***REMOVED***
+func (m *Object) Reset()                    { *m = Object{} }
+func (*Object) ProtoMessage()               {}
+func (*Object) Descriptor() ([]byte, []int) { return fileDescriptorWatch, []int{0} }
 
-type isObject_Object interface ***REMOVED***
+type isObject_Object interface {
 	isObject_Object()
 	MarshalTo([]byte) (int, error)
 	Size() int
-***REMOVED***
+}
 
-type Object_Node struct ***REMOVED***
+type Object_Node struct {
 	Node *Node `protobuf:"bytes,1,opt,name=node,oneof"`
-***REMOVED***
-type Object_Service struct ***REMOVED***
+}
+type Object_Service struct {
 	Service *Service `protobuf:"bytes,2,opt,name=service,oneof"`
-***REMOVED***
-type Object_Network struct ***REMOVED***
+}
+type Object_Network struct {
 	Network *Network `protobuf:"bytes,3,opt,name=network,oneof"`
-***REMOVED***
-type Object_Task struct ***REMOVED***
+}
+type Object_Task struct {
 	Task *Task `protobuf:"bytes,4,opt,name=task,oneof"`
-***REMOVED***
-type Object_Cluster struct ***REMOVED***
+}
+type Object_Cluster struct {
 	Cluster *Cluster `protobuf:"bytes,5,opt,name=cluster,oneof"`
-***REMOVED***
-type Object_Secret struct ***REMOVED***
+}
+type Object_Secret struct {
 	Secret *Secret `protobuf:"bytes,6,opt,name=secret,oneof"`
-***REMOVED***
-type Object_Resource struct ***REMOVED***
+}
+type Object_Resource struct {
 	Resource *Resource `protobuf:"bytes,7,opt,name=resource,oneof"`
-***REMOVED***
-type Object_Extension struct ***REMOVED***
+}
+type Object_Extension struct {
 	Extension *Extension `protobuf:"bytes,8,opt,name=extension,oneof"`
-***REMOVED***
-type Object_Config struct ***REMOVED***
+}
+type Object_Config struct {
 	Config *Config `protobuf:"bytes,9,opt,name=config,oneof"`
-***REMOVED***
+}
 
-func (*Object_Node) isObject_Object()      ***REMOVED******REMOVED***
-func (*Object_Service) isObject_Object()   ***REMOVED******REMOVED***
-func (*Object_Network) isObject_Object()   ***REMOVED******REMOVED***
-func (*Object_Task) isObject_Object()      ***REMOVED******REMOVED***
-func (*Object_Cluster) isObject_Object()   ***REMOVED******REMOVED***
-func (*Object_Secret) isObject_Object()    ***REMOVED******REMOVED***
-func (*Object_Resource) isObject_Object()  ***REMOVED******REMOVED***
-func (*Object_Extension) isObject_Object() ***REMOVED******REMOVED***
-func (*Object_Config) isObject_Object()    ***REMOVED******REMOVED***
+func (*Object_Node) isObject_Object()      {}
+func (*Object_Service) isObject_Object()   {}
+func (*Object_Network) isObject_Object()   {}
+func (*Object_Task) isObject_Object()      {}
+func (*Object_Cluster) isObject_Object()   {}
+func (*Object_Secret) isObject_Object()    {}
+func (*Object_Resource) isObject_Object()  {}
+func (*Object_Extension) isObject_Object() {}
+func (*Object_Config) isObject_Object()    {}
 
-func (m *Object) GetObject() isObject_Object ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Object) GetObject() isObject_Object {
+	if m != nil {
 		return m.Object
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *Object) GetNode() *Node ***REMOVED***
-	if x, ok := m.GetObject().(*Object_Node); ok ***REMOVED***
+func (m *Object) GetNode() *Node {
+	if x, ok := m.GetObject().(*Object_Node); ok {
 		return x.Node
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *Object) GetService() *Service ***REMOVED***
-	if x, ok := m.GetObject().(*Object_Service); ok ***REMOVED***
+func (m *Object) GetService() *Service {
+	if x, ok := m.GetObject().(*Object_Service); ok {
 		return x.Service
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *Object) GetNetwork() *Network ***REMOVED***
-	if x, ok := m.GetObject().(*Object_Network); ok ***REMOVED***
+func (m *Object) GetNetwork() *Network {
+	if x, ok := m.GetObject().(*Object_Network); ok {
 		return x.Network
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *Object) GetTask() *Task ***REMOVED***
-	if x, ok := m.GetObject().(*Object_Task); ok ***REMOVED***
+func (m *Object) GetTask() *Task {
+	if x, ok := m.GetObject().(*Object_Task); ok {
 		return x.Task
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *Object) GetCluster() *Cluster ***REMOVED***
-	if x, ok := m.GetObject().(*Object_Cluster); ok ***REMOVED***
+func (m *Object) GetCluster() *Cluster {
+	if x, ok := m.GetObject().(*Object_Cluster); ok {
 		return x.Cluster
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *Object) GetSecret() *Secret ***REMOVED***
-	if x, ok := m.GetObject().(*Object_Secret); ok ***REMOVED***
+func (m *Object) GetSecret() *Secret {
+	if x, ok := m.GetObject().(*Object_Secret); ok {
 		return x.Secret
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *Object) GetResource() *Resource ***REMOVED***
-	if x, ok := m.GetObject().(*Object_Resource); ok ***REMOVED***
+func (m *Object) GetResource() *Resource {
+	if x, ok := m.GetObject().(*Object_Resource); ok {
 		return x.Resource
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *Object) GetExtension() *Extension ***REMOVED***
-	if x, ok := m.GetObject().(*Object_Extension); ok ***REMOVED***
+func (m *Object) GetExtension() *Extension {
+	if x, ok := m.GetObject().(*Object_Extension); ok {
 		return x.Extension
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *Object) GetConfig() *Config ***REMOVED***
-	if x, ok := m.GetObject().(*Object_Config); ok ***REMOVED***
+func (m *Object) GetConfig() *Config {
+	if x, ok := m.GetObject().(*Object_Config); ok {
 		return x.Config
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // XXX_OneofFuncs is for the internal use of the proto package.
-func (*Object) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface***REMOVED******REMOVED***) ***REMOVED***
-	return _Object_OneofMarshaler, _Object_OneofUnmarshaler, _Object_OneofSizer, []interface***REMOVED******REMOVED******REMOVED***
+func (*Object) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
+	return _Object_OneofMarshaler, _Object_OneofUnmarshaler, _Object_OneofSizer, []interface{}{
 		(*Object_Node)(nil),
 		(*Object_Service)(nil),
 		(*Object_Network)(nil),
@@ -208,149 +208,149 @@ func (*Object) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error,
 		(*Object_Resource)(nil),
 		(*Object_Extension)(nil),
 		(*Object_Config)(nil),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func _Object_OneofMarshaler(msg proto.Message, b *proto.Buffer) error ***REMOVED***
+func _Object_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
 	m := msg.(*Object)
 	// Object
-	switch x := m.Object.(type) ***REMOVED***
+	switch x := m.Object.(type) {
 	case *Object_Node:
 		_ = b.EncodeVarint(1<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Node); err != nil ***REMOVED***
+		if err := b.EncodeMessage(x.Node); err != nil {
 			return err
-		***REMOVED***
+		}
 	case *Object_Service:
 		_ = b.EncodeVarint(2<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Service); err != nil ***REMOVED***
+		if err := b.EncodeMessage(x.Service); err != nil {
 			return err
-		***REMOVED***
+		}
 	case *Object_Network:
 		_ = b.EncodeVarint(3<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Network); err != nil ***REMOVED***
+		if err := b.EncodeMessage(x.Network); err != nil {
 			return err
-		***REMOVED***
+		}
 	case *Object_Task:
 		_ = b.EncodeVarint(4<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Task); err != nil ***REMOVED***
+		if err := b.EncodeMessage(x.Task); err != nil {
 			return err
-		***REMOVED***
+		}
 	case *Object_Cluster:
 		_ = b.EncodeVarint(5<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Cluster); err != nil ***REMOVED***
+		if err := b.EncodeMessage(x.Cluster); err != nil {
 			return err
-		***REMOVED***
+		}
 	case *Object_Secret:
 		_ = b.EncodeVarint(6<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Secret); err != nil ***REMOVED***
+		if err := b.EncodeMessage(x.Secret); err != nil {
 			return err
-		***REMOVED***
+		}
 	case *Object_Resource:
 		_ = b.EncodeVarint(7<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Resource); err != nil ***REMOVED***
+		if err := b.EncodeMessage(x.Resource); err != nil {
 			return err
-		***REMOVED***
+		}
 	case *Object_Extension:
 		_ = b.EncodeVarint(8<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Extension); err != nil ***REMOVED***
+		if err := b.EncodeMessage(x.Extension); err != nil {
 			return err
-		***REMOVED***
+		}
 	case *Object_Config:
 		_ = b.EncodeVarint(9<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Config); err != nil ***REMOVED***
+		if err := b.EncodeMessage(x.Config); err != nil {
 			return err
-		***REMOVED***
+		}
 	case nil:
 	default:
 		return fmt.Errorf("Object.Object has unexpected type %T", x)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func _Object_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) ***REMOVED***
+func _Object_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
 	m := msg.(*Object)
-	switch tag ***REMOVED***
+	switch tag {
 	case 1: // Object.node
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		msg := new(Node)
 		err := b.DecodeMessage(msg)
-		m.Object = &Object_Node***REMOVED***msg***REMOVED***
+		m.Object = &Object_Node{msg}
 		return true, err
 	case 2: // Object.service
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		msg := new(Service)
 		err := b.DecodeMessage(msg)
-		m.Object = &Object_Service***REMOVED***msg***REMOVED***
+		m.Object = &Object_Service{msg}
 		return true, err
 	case 3: // Object.network
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		msg := new(Network)
 		err := b.DecodeMessage(msg)
-		m.Object = &Object_Network***REMOVED***msg***REMOVED***
+		m.Object = &Object_Network{msg}
 		return true, err
 	case 4: // Object.task
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		msg := new(Task)
 		err := b.DecodeMessage(msg)
-		m.Object = &Object_Task***REMOVED***msg***REMOVED***
+		m.Object = &Object_Task{msg}
 		return true, err
 	case 5: // Object.cluster
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		msg := new(Cluster)
 		err := b.DecodeMessage(msg)
-		m.Object = &Object_Cluster***REMOVED***msg***REMOVED***
+		m.Object = &Object_Cluster{msg}
 		return true, err
 	case 6: // Object.secret
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		msg := new(Secret)
 		err := b.DecodeMessage(msg)
-		m.Object = &Object_Secret***REMOVED***msg***REMOVED***
+		m.Object = &Object_Secret{msg}
 		return true, err
 	case 7: // Object.resource
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		msg := new(Resource)
 		err := b.DecodeMessage(msg)
-		m.Object = &Object_Resource***REMOVED***msg***REMOVED***
+		m.Object = &Object_Resource{msg}
 		return true, err
 	case 8: // Object.extension
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		msg := new(Extension)
 		err := b.DecodeMessage(msg)
-		m.Object = &Object_Extension***REMOVED***msg***REMOVED***
+		m.Object = &Object_Extension{msg}
 		return true, err
 	case 9: // Object.config
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		msg := new(Config)
 		err := b.DecodeMessage(msg)
-		m.Object = &Object_Config***REMOVED***msg***REMOVED***
+		m.Object = &Object_Config{msg}
 		return true, err
 	default:
 		return false, nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func _Object_OneofSizer(msg proto.Message) (n int) ***REMOVED***
+func _Object_OneofSizer(msg proto.Message) (n int) {
 	m := msg.(*Object)
 	// Object
-	switch x := m.Object.(type) ***REMOVED***
+	switch x := m.Object.(type) {
 	case *Object_Node:
 		s := proto.Size(x.Node)
 		n += proto.SizeVarint(1<<3 | proto.WireBytes)
@@ -399,32 +399,32 @@ func _Object_OneofSizer(msg proto.Message) (n int) ***REMOVED***
 	case nil:
 	default:
 		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
 // FIXME(aaronl): These messages should ideally be embedded in SelectBy, but
 // protoc generates bad code for that.
-type SelectBySlot struct ***REMOVED***
+type SelectBySlot struct {
 	ServiceID string `protobuf:"bytes,1,opt,name=service_id,json=serviceId,proto3" json:"service_id,omitempty"`
 	Slot      uint64 `protobuf:"varint,2,opt,name=slot,proto3" json:"slot,omitempty"`
-***REMOVED***
+}
 
-func (m *SelectBySlot) Reset()                    ***REMOVED*** *m = SelectBySlot***REMOVED******REMOVED*** ***REMOVED***
-func (*SelectBySlot) ProtoMessage()               ***REMOVED******REMOVED***
-func (*SelectBySlot) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorWatch, []int***REMOVED***1***REMOVED*** ***REMOVED***
+func (m *SelectBySlot) Reset()                    { *m = SelectBySlot{} }
+func (*SelectBySlot) ProtoMessage()               {}
+func (*SelectBySlot) Descriptor() ([]byte, []int) { return fileDescriptorWatch, []int{1} }
 
-type SelectByCustom struct ***REMOVED***
+type SelectByCustom struct {
 	Kind  string `protobuf:"bytes,1,opt,name=kind,proto3" json:"kind,omitempty"`
 	Index string `protobuf:"bytes,2,opt,name=index,proto3" json:"index,omitempty"`
 	Value string `protobuf:"bytes,3,opt,name=value,proto3" json:"value,omitempty"`
-***REMOVED***
+}
 
-func (m *SelectByCustom) Reset()                    ***REMOVED*** *m = SelectByCustom***REMOVED******REMOVED*** ***REMOVED***
-func (*SelectByCustom) ProtoMessage()               ***REMOVED******REMOVED***
-func (*SelectByCustom) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorWatch, []int***REMOVED***2***REMOVED*** ***REMOVED***
+func (m *SelectByCustom) Reset()                    { *m = SelectByCustom{} }
+func (*SelectByCustom) ProtoMessage()               {}
+func (*SelectByCustom) Descriptor() ([]byte, []int) { return fileDescriptorWatch, []int{2} }
 
-type SelectBy struct ***REMOVED***
+type SelectBy struct {
 	// TODO(aaronl): Are all of these things we want to expose in
 	// the API? Exposing them may commit us to maintaining those
 	// internal indices going forward.
@@ -447,206 +447,206 @@ type SelectBy struct ***REMOVED***
 	//	*SelectBy_ReferencedConfigID
 	//	*SelectBy_Kind
 	By isSelectBy_By `protobuf_oneof:"By"`
-***REMOVED***
+}
 
-func (m *SelectBy) Reset()                    ***REMOVED*** *m = SelectBy***REMOVED******REMOVED*** ***REMOVED***
-func (*SelectBy) ProtoMessage()               ***REMOVED******REMOVED***
-func (*SelectBy) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorWatch, []int***REMOVED***3***REMOVED*** ***REMOVED***
+func (m *SelectBy) Reset()                    { *m = SelectBy{} }
+func (*SelectBy) ProtoMessage()               {}
+func (*SelectBy) Descriptor() ([]byte, []int) { return fileDescriptorWatch, []int{3} }
 
-type isSelectBy_By interface ***REMOVED***
+type isSelectBy_By interface {
 	isSelectBy_By()
 	MarshalTo([]byte) (int, error)
 	Size() int
-***REMOVED***
+}
 
-type SelectBy_ID struct ***REMOVED***
+type SelectBy_ID struct {
 	ID string `protobuf:"bytes,1,opt,name=id,proto3,oneof"`
-***REMOVED***
-type SelectBy_IDPrefix struct ***REMOVED***
+}
+type SelectBy_IDPrefix struct {
 	IDPrefix string `protobuf:"bytes,2,opt,name=id_prefix,json=idPrefix,proto3,oneof"`
-***REMOVED***
-type SelectBy_Name struct ***REMOVED***
+}
+type SelectBy_Name struct {
 	Name string `protobuf:"bytes,3,opt,name=name,proto3,oneof"`
-***REMOVED***
-type SelectBy_NamePrefix struct ***REMOVED***
+}
+type SelectBy_NamePrefix struct {
 	NamePrefix string `protobuf:"bytes,4,opt,name=name_prefix,json=namePrefix,proto3,oneof"`
-***REMOVED***
-type SelectBy_Custom struct ***REMOVED***
+}
+type SelectBy_Custom struct {
 	Custom *SelectByCustom `protobuf:"bytes,5,opt,name=custom,oneof"`
-***REMOVED***
-type SelectBy_CustomPrefix struct ***REMOVED***
+}
+type SelectBy_CustomPrefix struct {
 	CustomPrefix *SelectByCustom `protobuf:"bytes,6,opt,name=custom_prefix,json=customPrefix,oneof"`
-***REMOVED***
-type SelectBy_ServiceID struct ***REMOVED***
+}
+type SelectBy_ServiceID struct {
 	ServiceID string `protobuf:"bytes,7,opt,name=service_id,json=serviceId,proto3,oneof"`
-***REMOVED***
-type SelectBy_NodeID struct ***REMOVED***
+}
+type SelectBy_NodeID struct {
 	NodeID string `protobuf:"bytes,8,opt,name=node_id,json=nodeId,proto3,oneof"`
-***REMOVED***
-type SelectBy_Slot struct ***REMOVED***
+}
+type SelectBy_Slot struct {
 	Slot *SelectBySlot `protobuf:"bytes,9,opt,name=slot,oneof"`
-***REMOVED***
-type SelectBy_DesiredState struct ***REMOVED***
+}
+type SelectBy_DesiredState struct {
 	DesiredState TaskState `protobuf:"varint,10,opt,name=desired_state,json=desiredState,proto3,enum=docker.swarmkit.v1.TaskState,oneof"`
-***REMOVED***
-type SelectBy_Role struct ***REMOVED***
+}
+type SelectBy_Role struct {
 	Role NodeRole `protobuf:"varint,11,opt,name=role,proto3,enum=docker.swarmkit.v1.NodeRole,oneof"`
-***REMOVED***
-type SelectBy_Membership struct ***REMOVED***
+}
+type SelectBy_Membership struct {
 	Membership NodeSpec_Membership `protobuf:"varint,12,opt,name=membership,proto3,enum=docker.swarmkit.v1.NodeSpec_Membership,oneof"`
-***REMOVED***
-type SelectBy_ReferencedNetworkID struct ***REMOVED***
+}
+type SelectBy_ReferencedNetworkID struct {
 	ReferencedNetworkID string `protobuf:"bytes,13,opt,name=referenced_network_id,json=referencedNetworkId,proto3,oneof"`
-***REMOVED***
-type SelectBy_ReferencedSecretID struct ***REMOVED***
+}
+type SelectBy_ReferencedSecretID struct {
 	ReferencedSecretID string `protobuf:"bytes,14,opt,name=referenced_secret_id,json=referencedSecretId,proto3,oneof"`
-***REMOVED***
-type SelectBy_ReferencedConfigID struct ***REMOVED***
+}
+type SelectBy_ReferencedConfigID struct {
 	ReferencedConfigID string `protobuf:"bytes,16,opt,name=referenced_config_id,json=referencedConfigId,proto3,oneof"`
-***REMOVED***
-type SelectBy_Kind struct ***REMOVED***
+}
+type SelectBy_Kind struct {
 	Kind string `protobuf:"bytes,15,opt,name=kind,proto3,oneof"`
-***REMOVED***
+}
 
-func (*SelectBy_ID) isSelectBy_By()                  ***REMOVED******REMOVED***
-func (*SelectBy_IDPrefix) isSelectBy_By()            ***REMOVED******REMOVED***
-func (*SelectBy_Name) isSelectBy_By()                ***REMOVED******REMOVED***
-func (*SelectBy_NamePrefix) isSelectBy_By()          ***REMOVED******REMOVED***
-func (*SelectBy_Custom) isSelectBy_By()              ***REMOVED******REMOVED***
-func (*SelectBy_CustomPrefix) isSelectBy_By()        ***REMOVED******REMOVED***
-func (*SelectBy_ServiceID) isSelectBy_By()           ***REMOVED******REMOVED***
-func (*SelectBy_NodeID) isSelectBy_By()              ***REMOVED******REMOVED***
-func (*SelectBy_Slot) isSelectBy_By()                ***REMOVED******REMOVED***
-func (*SelectBy_DesiredState) isSelectBy_By()        ***REMOVED******REMOVED***
-func (*SelectBy_Role) isSelectBy_By()                ***REMOVED******REMOVED***
-func (*SelectBy_Membership) isSelectBy_By()          ***REMOVED******REMOVED***
-func (*SelectBy_ReferencedNetworkID) isSelectBy_By() ***REMOVED******REMOVED***
-func (*SelectBy_ReferencedSecretID) isSelectBy_By()  ***REMOVED******REMOVED***
-func (*SelectBy_ReferencedConfigID) isSelectBy_By()  ***REMOVED******REMOVED***
-func (*SelectBy_Kind) isSelectBy_By()                ***REMOVED******REMOVED***
+func (*SelectBy_ID) isSelectBy_By()                  {}
+func (*SelectBy_IDPrefix) isSelectBy_By()            {}
+func (*SelectBy_Name) isSelectBy_By()                {}
+func (*SelectBy_NamePrefix) isSelectBy_By()          {}
+func (*SelectBy_Custom) isSelectBy_By()              {}
+func (*SelectBy_CustomPrefix) isSelectBy_By()        {}
+func (*SelectBy_ServiceID) isSelectBy_By()           {}
+func (*SelectBy_NodeID) isSelectBy_By()              {}
+func (*SelectBy_Slot) isSelectBy_By()                {}
+func (*SelectBy_DesiredState) isSelectBy_By()        {}
+func (*SelectBy_Role) isSelectBy_By()                {}
+func (*SelectBy_Membership) isSelectBy_By()          {}
+func (*SelectBy_ReferencedNetworkID) isSelectBy_By() {}
+func (*SelectBy_ReferencedSecretID) isSelectBy_By()  {}
+func (*SelectBy_ReferencedConfigID) isSelectBy_By()  {}
+func (*SelectBy_Kind) isSelectBy_By()                {}
 
-func (m *SelectBy) GetBy() isSelectBy_By ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *SelectBy) GetBy() isSelectBy_By {
+	if m != nil {
 		return m.By
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *SelectBy) GetID() string ***REMOVED***
-	if x, ok := m.GetBy().(*SelectBy_ID); ok ***REMOVED***
+func (m *SelectBy) GetID() string {
+	if x, ok := m.GetBy().(*SelectBy_ID); ok {
 		return x.ID
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *SelectBy) GetIDPrefix() string ***REMOVED***
-	if x, ok := m.GetBy().(*SelectBy_IDPrefix); ok ***REMOVED***
+func (m *SelectBy) GetIDPrefix() string {
+	if x, ok := m.GetBy().(*SelectBy_IDPrefix); ok {
 		return x.IDPrefix
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *SelectBy) GetName() string ***REMOVED***
-	if x, ok := m.GetBy().(*SelectBy_Name); ok ***REMOVED***
+func (m *SelectBy) GetName() string {
+	if x, ok := m.GetBy().(*SelectBy_Name); ok {
 		return x.Name
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *SelectBy) GetNamePrefix() string ***REMOVED***
-	if x, ok := m.GetBy().(*SelectBy_NamePrefix); ok ***REMOVED***
+func (m *SelectBy) GetNamePrefix() string {
+	if x, ok := m.GetBy().(*SelectBy_NamePrefix); ok {
 		return x.NamePrefix
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *SelectBy) GetCustom() *SelectByCustom ***REMOVED***
-	if x, ok := m.GetBy().(*SelectBy_Custom); ok ***REMOVED***
+func (m *SelectBy) GetCustom() *SelectByCustom {
+	if x, ok := m.GetBy().(*SelectBy_Custom); ok {
 		return x.Custom
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *SelectBy) GetCustomPrefix() *SelectByCustom ***REMOVED***
-	if x, ok := m.GetBy().(*SelectBy_CustomPrefix); ok ***REMOVED***
+func (m *SelectBy) GetCustomPrefix() *SelectByCustom {
+	if x, ok := m.GetBy().(*SelectBy_CustomPrefix); ok {
 		return x.CustomPrefix
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *SelectBy) GetServiceID() string ***REMOVED***
-	if x, ok := m.GetBy().(*SelectBy_ServiceID); ok ***REMOVED***
+func (m *SelectBy) GetServiceID() string {
+	if x, ok := m.GetBy().(*SelectBy_ServiceID); ok {
 		return x.ServiceID
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *SelectBy) GetNodeID() string ***REMOVED***
-	if x, ok := m.GetBy().(*SelectBy_NodeID); ok ***REMOVED***
+func (m *SelectBy) GetNodeID() string {
+	if x, ok := m.GetBy().(*SelectBy_NodeID); ok {
 		return x.NodeID
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *SelectBy) GetSlot() *SelectBySlot ***REMOVED***
-	if x, ok := m.GetBy().(*SelectBy_Slot); ok ***REMOVED***
+func (m *SelectBy) GetSlot() *SelectBySlot {
+	if x, ok := m.GetBy().(*SelectBy_Slot); ok {
 		return x.Slot
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *SelectBy) GetDesiredState() TaskState ***REMOVED***
-	if x, ok := m.GetBy().(*SelectBy_DesiredState); ok ***REMOVED***
+func (m *SelectBy) GetDesiredState() TaskState {
+	if x, ok := m.GetBy().(*SelectBy_DesiredState); ok {
 		return x.DesiredState
-	***REMOVED***
+	}
 	return TaskStateNew
-***REMOVED***
+}
 
-func (m *SelectBy) GetRole() NodeRole ***REMOVED***
-	if x, ok := m.GetBy().(*SelectBy_Role); ok ***REMOVED***
+func (m *SelectBy) GetRole() NodeRole {
+	if x, ok := m.GetBy().(*SelectBy_Role); ok {
 		return x.Role
-	***REMOVED***
+	}
 	return NodeRoleWorker
-***REMOVED***
+}
 
-func (m *SelectBy) GetMembership() NodeSpec_Membership ***REMOVED***
-	if x, ok := m.GetBy().(*SelectBy_Membership); ok ***REMOVED***
+func (m *SelectBy) GetMembership() NodeSpec_Membership {
+	if x, ok := m.GetBy().(*SelectBy_Membership); ok {
 		return x.Membership
-	***REMOVED***
+	}
 	return NodeMembershipPending
-***REMOVED***
+}
 
-func (m *SelectBy) GetReferencedNetworkID() string ***REMOVED***
-	if x, ok := m.GetBy().(*SelectBy_ReferencedNetworkID); ok ***REMOVED***
+func (m *SelectBy) GetReferencedNetworkID() string {
+	if x, ok := m.GetBy().(*SelectBy_ReferencedNetworkID); ok {
 		return x.ReferencedNetworkID
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *SelectBy) GetReferencedSecretID() string ***REMOVED***
-	if x, ok := m.GetBy().(*SelectBy_ReferencedSecretID); ok ***REMOVED***
+func (m *SelectBy) GetReferencedSecretID() string {
+	if x, ok := m.GetBy().(*SelectBy_ReferencedSecretID); ok {
 		return x.ReferencedSecretID
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *SelectBy) GetReferencedConfigID() string ***REMOVED***
-	if x, ok := m.GetBy().(*SelectBy_ReferencedConfigID); ok ***REMOVED***
+func (m *SelectBy) GetReferencedConfigID() string {
+	if x, ok := m.GetBy().(*SelectBy_ReferencedConfigID); ok {
 		return x.ReferencedConfigID
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *SelectBy) GetKind() string ***REMOVED***
-	if x, ok := m.GetBy().(*SelectBy_Kind); ok ***REMOVED***
+func (m *SelectBy) GetKind() string {
+	if x, ok := m.GetBy().(*SelectBy_Kind); ok {
 		return x.Kind
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
 // XXX_OneofFuncs is for the internal use of the proto package.
-func (*SelectBy) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface***REMOVED******REMOVED***) ***REMOVED***
-	return _SelectBy_OneofMarshaler, _SelectBy_OneofUnmarshaler, _SelectBy_OneofSizer, []interface***REMOVED******REMOVED******REMOVED***
+func (*SelectBy) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
+	return _SelectBy_OneofMarshaler, _SelectBy_OneofUnmarshaler, _SelectBy_OneofSizer, []interface{}{
 		(*SelectBy_ID)(nil),
 		(*SelectBy_IDPrefix)(nil),
 		(*SelectBy_Name)(nil),
@@ -663,13 +663,13 @@ func (*SelectBy) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) erro
 		(*SelectBy_ReferencedSecretID)(nil),
 		(*SelectBy_ReferencedConfigID)(nil),
 		(*SelectBy_Kind)(nil),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func _SelectBy_OneofMarshaler(msg proto.Message, b *proto.Buffer) error ***REMOVED***
+func _SelectBy_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
 	m := msg.(*SelectBy)
 	// By
-	switch x := m.By.(type) ***REMOVED***
+	switch x := m.By.(type) {
 	case *SelectBy_ID:
 		_ = b.EncodeVarint(1<<3 | proto.WireBytes)
 		_ = b.EncodeStringBytes(x.ID)
@@ -684,14 +684,14 @@ func _SelectBy_OneofMarshaler(msg proto.Message, b *proto.Buffer) error ***REMOV
 		_ = b.EncodeStringBytes(x.NamePrefix)
 	case *SelectBy_Custom:
 		_ = b.EncodeVarint(5<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Custom); err != nil ***REMOVED***
+		if err := b.EncodeMessage(x.Custom); err != nil {
 			return err
-		***REMOVED***
+		}
 	case *SelectBy_CustomPrefix:
 		_ = b.EncodeVarint(6<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.CustomPrefix); err != nil ***REMOVED***
+		if err := b.EncodeMessage(x.CustomPrefix); err != nil {
 			return err
-		***REMOVED***
+		}
 	case *SelectBy_ServiceID:
 		_ = b.EncodeVarint(7<<3 | proto.WireBytes)
 		_ = b.EncodeStringBytes(x.ServiceID)
@@ -700,9 +700,9 @@ func _SelectBy_OneofMarshaler(msg proto.Message, b *proto.Buffer) error ***REMOV
 		_ = b.EncodeStringBytes(x.NodeID)
 	case *SelectBy_Slot:
 		_ = b.EncodeVarint(9<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Slot); err != nil ***REMOVED***
+		if err := b.EncodeMessage(x.Slot); err != nil {
 			return err
-		***REMOVED***
+		}
 	case *SelectBy_DesiredState:
 		_ = b.EncodeVarint(10<<3 | proto.WireVarint)
 		_ = b.EncodeVarint(uint64(x.DesiredState))
@@ -727,137 +727,137 @@ func _SelectBy_OneofMarshaler(msg proto.Message, b *proto.Buffer) error ***REMOV
 	case nil:
 	default:
 		return fmt.Errorf("SelectBy.By has unexpected type %T", x)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func _SelectBy_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) ***REMOVED***
+func _SelectBy_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
 	m := msg.(*SelectBy)
-	switch tag ***REMOVED***
+	switch tag {
 	case 1: // By.id
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		x, err := b.DecodeStringBytes()
-		m.By = &SelectBy_ID***REMOVED***x***REMOVED***
+		m.By = &SelectBy_ID{x}
 		return true, err
 	case 2: // By.id_prefix
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		x, err := b.DecodeStringBytes()
-		m.By = &SelectBy_IDPrefix***REMOVED***x***REMOVED***
+		m.By = &SelectBy_IDPrefix{x}
 		return true, err
 	case 3: // By.name
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		x, err := b.DecodeStringBytes()
-		m.By = &SelectBy_Name***REMOVED***x***REMOVED***
+		m.By = &SelectBy_Name{x}
 		return true, err
 	case 4: // By.name_prefix
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		x, err := b.DecodeStringBytes()
-		m.By = &SelectBy_NamePrefix***REMOVED***x***REMOVED***
+		m.By = &SelectBy_NamePrefix{x}
 		return true, err
 	case 5: // By.custom
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		msg := new(SelectByCustom)
 		err := b.DecodeMessage(msg)
-		m.By = &SelectBy_Custom***REMOVED***msg***REMOVED***
+		m.By = &SelectBy_Custom{msg}
 		return true, err
 	case 6: // By.custom_prefix
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		msg := new(SelectByCustom)
 		err := b.DecodeMessage(msg)
-		m.By = &SelectBy_CustomPrefix***REMOVED***msg***REMOVED***
+		m.By = &SelectBy_CustomPrefix{msg}
 		return true, err
 	case 7: // By.service_id
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		x, err := b.DecodeStringBytes()
-		m.By = &SelectBy_ServiceID***REMOVED***x***REMOVED***
+		m.By = &SelectBy_ServiceID{x}
 		return true, err
 	case 8: // By.node_id
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		x, err := b.DecodeStringBytes()
-		m.By = &SelectBy_NodeID***REMOVED***x***REMOVED***
+		m.By = &SelectBy_NodeID{x}
 		return true, err
 	case 9: // By.slot
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		msg := new(SelectBySlot)
 		err := b.DecodeMessage(msg)
-		m.By = &SelectBy_Slot***REMOVED***msg***REMOVED***
+		m.By = &SelectBy_Slot{msg}
 		return true, err
 	case 10: // By.desired_state
-		if wire != proto.WireVarint ***REMOVED***
+		if wire != proto.WireVarint {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		x, err := b.DecodeVarint()
-		m.By = &SelectBy_DesiredState***REMOVED***TaskState(x)***REMOVED***
+		m.By = &SelectBy_DesiredState{TaskState(x)}
 		return true, err
 	case 11: // By.role
-		if wire != proto.WireVarint ***REMOVED***
+		if wire != proto.WireVarint {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		x, err := b.DecodeVarint()
-		m.By = &SelectBy_Role***REMOVED***NodeRole(x)***REMOVED***
+		m.By = &SelectBy_Role{NodeRole(x)}
 		return true, err
 	case 12: // By.membership
-		if wire != proto.WireVarint ***REMOVED***
+		if wire != proto.WireVarint {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		x, err := b.DecodeVarint()
-		m.By = &SelectBy_Membership***REMOVED***NodeSpec_Membership(x)***REMOVED***
+		m.By = &SelectBy_Membership{NodeSpec_Membership(x)}
 		return true, err
 	case 13: // By.referenced_network_id
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		x, err := b.DecodeStringBytes()
-		m.By = &SelectBy_ReferencedNetworkID***REMOVED***x***REMOVED***
+		m.By = &SelectBy_ReferencedNetworkID{x}
 		return true, err
 	case 14: // By.referenced_secret_id
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		x, err := b.DecodeStringBytes()
-		m.By = &SelectBy_ReferencedSecretID***REMOVED***x***REMOVED***
+		m.By = &SelectBy_ReferencedSecretID{x}
 		return true, err
 	case 16: // By.referenced_config_id
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		x, err := b.DecodeStringBytes()
-		m.By = &SelectBy_ReferencedConfigID***REMOVED***x***REMOVED***
+		m.By = &SelectBy_ReferencedConfigID{x}
 		return true, err
 	case 15: // By.kind
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		x, err := b.DecodeStringBytes()
-		m.By = &SelectBy_Kind***REMOVED***x***REMOVED***
+		m.By = &SelectBy_Kind{x}
 		return true, err
 	default:
 		return false, nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func _SelectBy_OneofSizer(msg proto.Message) (n int) ***REMOVED***
+func _SelectBy_OneofSizer(msg proto.Message) (n int) {
 	m := msg.(*SelectBy)
 	// By
-	switch x := m.By.(type) ***REMOVED***
+	switch x := m.By.(type) {
 	case *SelectBy_ID:
 		n += proto.SizeVarint(1<<3 | proto.WireBytes)
 		n += proto.SizeVarint(uint64(len(x.ID)))
@@ -925,11 +925,11 @@ func _SelectBy_OneofSizer(msg proto.Message) (n int) ***REMOVED***
 	case nil:
 	default:
 		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-type WatchRequest struct ***REMOVED***
+type WatchRequest struct {
 	// Multiple entries are combined using OR logic - i.e. if an event
 	// matches all of the selectors specified in any single watch entry,
 	// the event will be sent to the client.
@@ -945,13 +945,13 @@ type WatchRequest struct ***REMOVED***
 	// changes will include the old object (not historical changes
 	// retrieved using ResumeFrom).
 	IncludeOldObject bool `protobuf:"varint,3,opt,name=include_old_object,json=includeOldObject,proto3" json:"include_old_object,omitempty"`
-***REMOVED***
+}
 
-func (m *WatchRequest) Reset()                    ***REMOVED*** *m = WatchRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*WatchRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*WatchRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorWatch, []int***REMOVED***4***REMOVED*** ***REMOVED***
+func (m *WatchRequest) Reset()                    { *m = WatchRequest{} }
+func (*WatchRequest) ProtoMessage()               {}
+func (*WatchRequest) Descriptor() ([]byte, []int) { return fileDescriptorWatch, []int{4} }
 
-type WatchRequest_WatchEntry struct ***REMOVED***
+type WatchRequest_WatchEntry struct {
 	// Kind can contain a builtin type such as "node", "secret", etc. or
 	// the kind specified by a custom-defined object.
 	Kind string `protobuf:"bytes,1,opt,name=kind,proto3" json:"kind,omitempty"`
@@ -961,27 +961,27 @@ type WatchRequest_WatchEntry struct ***REMOVED***
 	// Filters are combined using AND logic - an event must match
 	// all of them to pass the filter.
 	Filters []*SelectBy `protobuf:"bytes,3,rep,name=filters" json:"filters,omitempty"`
-***REMOVED***
+}
 
-func (m *WatchRequest_WatchEntry) Reset()                    ***REMOVED*** *m = WatchRequest_WatchEntry***REMOVED******REMOVED*** ***REMOVED***
-func (*WatchRequest_WatchEntry) ProtoMessage()               ***REMOVED******REMOVED***
-func (*WatchRequest_WatchEntry) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorWatch, []int***REMOVED***4, 0***REMOVED*** ***REMOVED***
+func (m *WatchRequest_WatchEntry) Reset()                    { *m = WatchRequest_WatchEntry{} }
+func (*WatchRequest_WatchEntry) ProtoMessage()               {}
+func (*WatchRequest_WatchEntry) Descriptor() ([]byte, []int) { return fileDescriptorWatch, []int{4, 0} }
 
 // WatchMessage is the type of the stream that's returned to the client by
 // Watch. Note that the first item of this stream will always be a WatchMessage
 // with a nil Object, to signal that the stream has started.
-type WatchMessage struct ***REMOVED***
+type WatchMessage struct {
 	Events []*WatchMessage_Event `protobuf:"bytes,1,rep,name=events" json:"events,omitempty"`
 	// Index versions this change to the data store. It can be used to
 	// resume the watch from this point.
 	Version *Version `protobuf:"bytes,2,opt,name=version" json:"version,omitempty"`
-***REMOVED***
+}
 
-func (m *WatchMessage) Reset()                    ***REMOVED*** *m = WatchMessage***REMOVED******REMOVED*** ***REMOVED***
-func (*WatchMessage) ProtoMessage()               ***REMOVED******REMOVED***
-func (*WatchMessage) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorWatch, []int***REMOVED***5***REMOVED*** ***REMOVED***
+func (m *WatchMessage) Reset()                    { *m = WatchMessage{} }
+func (*WatchMessage) ProtoMessage()               {}
+func (*WatchMessage) Descriptor() ([]byte, []int) { return fileDescriptorWatch, []int{5} }
 
-type WatchMessage_Event struct ***REMOVED***
+type WatchMessage_Event struct {
 	// Action (create/update/delete)
 	// Note that WatchMessage does not expose "commit" events that
 	// mark transaction boundaries.
@@ -992,13 +992,13 @@ type WatchMessage_Event struct ***REMOVED***
 	// watch message, containing the previous version of the
 	// object, if IncludeOldObject was set in WatchRequest.
 	OldObject *Object `protobuf:"bytes,3,opt,name=old_object,json=oldObject" json:"old_object,omitempty"`
-***REMOVED***
+}
 
-func (m *WatchMessage_Event) Reset()                    ***REMOVED*** *m = WatchMessage_Event***REMOVED******REMOVED*** ***REMOVED***
-func (*WatchMessage_Event) ProtoMessage()               ***REMOVED******REMOVED***
-func (*WatchMessage_Event) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorWatch, []int***REMOVED***5, 0***REMOVED*** ***REMOVED***
+func (m *WatchMessage_Event) Reset()                    { *m = WatchMessage_Event{} }
+func (*WatchMessage_Event) ProtoMessage()               {}
+func (*WatchMessage_Event) Descriptor() ([]byte, []int) { return fileDescriptorWatch, []int{5, 0} }
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*Object)(nil), "docker.swarmkit.v1.Object")
 	proto.RegisterType((*SelectBySlot)(nil), "docker.swarmkit.v1.SelectBySlot")
 	proto.RegisterType((*SelectByCustom)(nil), "docker.swarmkit.v1.SelectByCustom")
@@ -1008,334 +1008,334 @@ func init() ***REMOVED***
 	proto.RegisterType((*WatchMessage)(nil), "docker.swarmkit.v1.WatchMessage")
 	proto.RegisterType((*WatchMessage_Event)(nil), "docker.swarmkit.v1.WatchMessage.Event")
 	proto.RegisterEnum("docker.swarmkit.v1.WatchActionKind", WatchActionKind_name, WatchActionKind_value)
-***REMOVED***
+}
 
-type authenticatedWrapperWatchServer struct ***REMOVED***
+type authenticatedWrapperWatchServer struct {
 	local     WatchServer
 	authorize func(context.Context, []string) error
-***REMOVED***
+}
 
-func NewAuthenticatedWrapperWatchServer(local WatchServer, authorize func(context.Context, []string) error) WatchServer ***REMOVED***
-	return &authenticatedWrapperWatchServer***REMOVED***
+func NewAuthenticatedWrapperWatchServer(local WatchServer, authorize func(context.Context, []string) error) WatchServer {
+	return &authenticatedWrapperWatchServer{
 		local:     local,
 		authorize: authorize,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (p *authenticatedWrapperWatchServer) Watch(r *WatchRequest, stream Watch_WatchServer) error ***REMOVED***
+func (p *authenticatedWrapperWatchServer) Watch(r *WatchRequest, stream Watch_WatchServer) error {
 
-	if err := p.authorize(stream.Context(), []string***REMOVED***"swarm-manager"***REMOVED***); err != nil ***REMOVED***
+	if err := p.authorize(stream.Context(), []string{"swarm-manager"}); err != nil {
 		return err
-	***REMOVED***
+	}
 	return p.local.Watch(r, stream)
-***REMOVED***
+}
 
-func (m *Object) Copy() *Object ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *Object) Copy() *Object {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &Object***REMOVED******REMOVED***
+	}
+	o := &Object{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *Object) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *Object) CopyFrom(src interface{}) {
 
 	o := src.(*Object)
 	*m = *o
-	if o.Object != nil ***REMOVED***
-		switch o.Object.(type) ***REMOVED***
+	if o.Object != nil {
+		switch o.Object.(type) {
 		case *Object_Node:
-			v := Object_Node***REMOVED***
-				Node: &Node***REMOVED******REMOVED***,
-			***REMOVED***
+			v := Object_Node{
+				Node: &Node{},
+			}
 			github_com_docker_swarmkit_api_deepcopy.Copy(v.Node, o.GetNode())
 			m.Object = &v
 		case *Object_Service:
-			v := Object_Service***REMOVED***
-				Service: &Service***REMOVED******REMOVED***,
-			***REMOVED***
+			v := Object_Service{
+				Service: &Service{},
+			}
 			github_com_docker_swarmkit_api_deepcopy.Copy(v.Service, o.GetService())
 			m.Object = &v
 		case *Object_Network:
-			v := Object_Network***REMOVED***
-				Network: &Network***REMOVED******REMOVED***,
-			***REMOVED***
+			v := Object_Network{
+				Network: &Network{},
+			}
 			github_com_docker_swarmkit_api_deepcopy.Copy(v.Network, o.GetNetwork())
 			m.Object = &v
 		case *Object_Task:
-			v := Object_Task***REMOVED***
-				Task: &Task***REMOVED******REMOVED***,
-			***REMOVED***
+			v := Object_Task{
+				Task: &Task{},
+			}
 			github_com_docker_swarmkit_api_deepcopy.Copy(v.Task, o.GetTask())
 			m.Object = &v
 		case *Object_Cluster:
-			v := Object_Cluster***REMOVED***
-				Cluster: &Cluster***REMOVED******REMOVED***,
-			***REMOVED***
+			v := Object_Cluster{
+				Cluster: &Cluster{},
+			}
 			github_com_docker_swarmkit_api_deepcopy.Copy(v.Cluster, o.GetCluster())
 			m.Object = &v
 		case *Object_Secret:
-			v := Object_Secret***REMOVED***
-				Secret: &Secret***REMOVED******REMOVED***,
-			***REMOVED***
+			v := Object_Secret{
+				Secret: &Secret{},
+			}
 			github_com_docker_swarmkit_api_deepcopy.Copy(v.Secret, o.GetSecret())
 			m.Object = &v
 		case *Object_Resource:
-			v := Object_Resource***REMOVED***
-				Resource: &Resource***REMOVED******REMOVED***,
-			***REMOVED***
+			v := Object_Resource{
+				Resource: &Resource{},
+			}
 			github_com_docker_swarmkit_api_deepcopy.Copy(v.Resource, o.GetResource())
 			m.Object = &v
 		case *Object_Extension:
-			v := Object_Extension***REMOVED***
-				Extension: &Extension***REMOVED******REMOVED***,
-			***REMOVED***
+			v := Object_Extension{
+				Extension: &Extension{},
+			}
 			github_com_docker_swarmkit_api_deepcopy.Copy(v.Extension, o.GetExtension())
 			m.Object = &v
 		case *Object_Config:
-			v := Object_Config***REMOVED***
-				Config: &Config***REMOVED******REMOVED***,
-			***REMOVED***
+			v := Object_Config{
+				Config: &Config{},
+			}
 			github_com_docker_swarmkit_api_deepcopy.Copy(v.Config, o.GetConfig())
 			m.Object = &v
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-***REMOVED***
+}
 
-func (m *SelectBySlot) Copy() *SelectBySlot ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *SelectBySlot) Copy() *SelectBySlot {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &SelectBySlot***REMOVED******REMOVED***
+	}
+	o := &SelectBySlot{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *SelectBySlot) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *SelectBySlot) CopyFrom(src interface{}) {
 
 	o := src.(*SelectBySlot)
 	*m = *o
-***REMOVED***
+}
 
-func (m *SelectByCustom) Copy() *SelectByCustom ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *SelectByCustom) Copy() *SelectByCustom {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &SelectByCustom***REMOVED******REMOVED***
+	}
+	o := &SelectByCustom{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *SelectByCustom) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *SelectByCustom) CopyFrom(src interface{}) {
 
 	o := src.(*SelectByCustom)
 	*m = *o
-***REMOVED***
+}
 
-func (m *SelectBy) Copy() *SelectBy ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *SelectBy) Copy() *SelectBy {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &SelectBy***REMOVED******REMOVED***
+	}
+	o := &SelectBy{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *SelectBy) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *SelectBy) CopyFrom(src interface{}) {
 
 	o := src.(*SelectBy)
 	*m = *o
-	if o.By != nil ***REMOVED***
-		switch o.By.(type) ***REMOVED***
+	if o.By != nil {
+		switch o.By.(type) {
 		case *SelectBy_ID:
-			v := SelectBy_ID***REMOVED***
+			v := SelectBy_ID{
 				ID: o.GetID(),
-			***REMOVED***
+			}
 			m.By = &v
 		case *SelectBy_IDPrefix:
-			v := SelectBy_IDPrefix***REMOVED***
+			v := SelectBy_IDPrefix{
 				IDPrefix: o.GetIDPrefix(),
-			***REMOVED***
+			}
 			m.By = &v
 		case *SelectBy_Name:
-			v := SelectBy_Name***REMOVED***
+			v := SelectBy_Name{
 				Name: o.GetName(),
-			***REMOVED***
+			}
 			m.By = &v
 		case *SelectBy_NamePrefix:
-			v := SelectBy_NamePrefix***REMOVED***
+			v := SelectBy_NamePrefix{
 				NamePrefix: o.GetNamePrefix(),
-			***REMOVED***
+			}
 			m.By = &v
 		case *SelectBy_Custom:
-			v := SelectBy_Custom***REMOVED***
-				Custom: &SelectByCustom***REMOVED******REMOVED***,
-			***REMOVED***
+			v := SelectBy_Custom{
+				Custom: &SelectByCustom{},
+			}
 			github_com_docker_swarmkit_api_deepcopy.Copy(v.Custom, o.GetCustom())
 			m.By = &v
 		case *SelectBy_CustomPrefix:
-			v := SelectBy_CustomPrefix***REMOVED***
-				CustomPrefix: &SelectByCustom***REMOVED******REMOVED***,
-			***REMOVED***
+			v := SelectBy_CustomPrefix{
+				CustomPrefix: &SelectByCustom{},
+			}
 			github_com_docker_swarmkit_api_deepcopy.Copy(v.CustomPrefix, o.GetCustomPrefix())
 			m.By = &v
 		case *SelectBy_ServiceID:
-			v := SelectBy_ServiceID***REMOVED***
+			v := SelectBy_ServiceID{
 				ServiceID: o.GetServiceID(),
-			***REMOVED***
+			}
 			m.By = &v
 		case *SelectBy_NodeID:
-			v := SelectBy_NodeID***REMOVED***
+			v := SelectBy_NodeID{
 				NodeID: o.GetNodeID(),
-			***REMOVED***
+			}
 			m.By = &v
 		case *SelectBy_Slot:
-			v := SelectBy_Slot***REMOVED***
-				Slot: &SelectBySlot***REMOVED******REMOVED***,
-			***REMOVED***
+			v := SelectBy_Slot{
+				Slot: &SelectBySlot{},
+			}
 			github_com_docker_swarmkit_api_deepcopy.Copy(v.Slot, o.GetSlot())
 			m.By = &v
 		case *SelectBy_DesiredState:
-			v := SelectBy_DesiredState***REMOVED***
+			v := SelectBy_DesiredState{
 				DesiredState: o.GetDesiredState(),
-			***REMOVED***
+			}
 			m.By = &v
 		case *SelectBy_Role:
-			v := SelectBy_Role***REMOVED***
+			v := SelectBy_Role{
 				Role: o.GetRole(),
-			***REMOVED***
+			}
 			m.By = &v
 		case *SelectBy_Membership:
-			v := SelectBy_Membership***REMOVED***
+			v := SelectBy_Membership{
 				Membership: o.GetMembership(),
-			***REMOVED***
+			}
 			m.By = &v
 		case *SelectBy_ReferencedNetworkID:
-			v := SelectBy_ReferencedNetworkID***REMOVED***
+			v := SelectBy_ReferencedNetworkID{
 				ReferencedNetworkID: o.GetReferencedNetworkID(),
-			***REMOVED***
+			}
 			m.By = &v
 		case *SelectBy_ReferencedSecretID:
-			v := SelectBy_ReferencedSecretID***REMOVED***
+			v := SelectBy_ReferencedSecretID{
 				ReferencedSecretID: o.GetReferencedSecretID(),
-			***REMOVED***
+			}
 			m.By = &v
 		case *SelectBy_ReferencedConfigID:
-			v := SelectBy_ReferencedConfigID***REMOVED***
+			v := SelectBy_ReferencedConfigID{
 				ReferencedConfigID: o.GetReferencedConfigID(),
-			***REMOVED***
+			}
 			m.By = &v
 		case *SelectBy_Kind:
-			v := SelectBy_Kind***REMOVED***
+			v := SelectBy_Kind{
 				Kind: o.GetKind(),
-			***REMOVED***
+			}
 			m.By = &v
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-***REMOVED***
+}
 
-func (m *WatchRequest) Copy() *WatchRequest ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *WatchRequest) Copy() *WatchRequest {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &WatchRequest***REMOVED******REMOVED***
+	}
+	o := &WatchRequest{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *WatchRequest) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *WatchRequest) CopyFrom(src interface{}) {
 
 	o := src.(*WatchRequest)
 	*m = *o
-	if o.Entries != nil ***REMOVED***
+	if o.Entries != nil {
 		m.Entries = make([]*WatchRequest_WatchEntry, len(o.Entries))
-		for i := range m.Entries ***REMOVED***
-			m.Entries[i] = &WatchRequest_WatchEntry***REMOVED******REMOVED***
+		for i := range m.Entries {
+			m.Entries[i] = &WatchRequest_WatchEntry{}
 			github_com_docker_swarmkit_api_deepcopy.Copy(m.Entries[i], o.Entries[i])
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if o.ResumeFrom != nil ***REMOVED***
-		m.ResumeFrom = &Version***REMOVED******REMOVED***
+	if o.ResumeFrom != nil {
+		m.ResumeFrom = &Version{}
 		github_com_docker_swarmkit_api_deepcopy.Copy(m.ResumeFrom, o.ResumeFrom)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (m *WatchRequest_WatchEntry) Copy() *WatchRequest_WatchEntry ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *WatchRequest_WatchEntry) Copy() *WatchRequest_WatchEntry {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &WatchRequest_WatchEntry***REMOVED******REMOVED***
+	}
+	o := &WatchRequest_WatchEntry{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *WatchRequest_WatchEntry) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *WatchRequest_WatchEntry) CopyFrom(src interface{}) {
 
 	o := src.(*WatchRequest_WatchEntry)
 	*m = *o
-	if o.Filters != nil ***REMOVED***
+	if o.Filters != nil {
 		m.Filters = make([]*SelectBy, len(o.Filters))
-		for i := range m.Filters ***REMOVED***
-			m.Filters[i] = &SelectBy***REMOVED******REMOVED***
+		for i := range m.Filters {
+			m.Filters[i] = &SelectBy{}
 			github_com_docker_swarmkit_api_deepcopy.Copy(m.Filters[i], o.Filters[i])
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-***REMOVED***
+}
 
-func (m *WatchMessage) Copy() *WatchMessage ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *WatchMessage) Copy() *WatchMessage {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &WatchMessage***REMOVED******REMOVED***
+	}
+	o := &WatchMessage{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *WatchMessage) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *WatchMessage) CopyFrom(src interface{}) {
 
 	o := src.(*WatchMessage)
 	*m = *o
-	if o.Events != nil ***REMOVED***
+	if o.Events != nil {
 		m.Events = make([]*WatchMessage_Event, len(o.Events))
-		for i := range m.Events ***REMOVED***
-			m.Events[i] = &WatchMessage_Event***REMOVED******REMOVED***
+		for i := range m.Events {
+			m.Events[i] = &WatchMessage_Event{}
 			github_com_docker_swarmkit_api_deepcopy.Copy(m.Events[i], o.Events[i])
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if o.Version != nil ***REMOVED***
-		m.Version = &Version***REMOVED******REMOVED***
+	if o.Version != nil {
+		m.Version = &Version{}
 		github_com_docker_swarmkit_api_deepcopy.Copy(m.Version, o.Version)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (m *WatchMessage_Event) Copy() *WatchMessage_Event ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *WatchMessage_Event) Copy() *WatchMessage_Event {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &WatchMessage_Event***REMOVED******REMOVED***
+	}
+	o := &WatchMessage_Event{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *WatchMessage_Event) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *WatchMessage_Event) CopyFrom(src interface{}) {
 
 	o := src.(*WatchMessage_Event)
 	*m = *o
-	if o.Object != nil ***REMOVED***
-		m.Object = &Object***REMOVED******REMOVED***
+	if o.Object != nil {
+		m.Object = &Object{}
 		github_com_docker_swarmkit_api_deepcopy.Copy(m.Object, o.Object)
-	***REMOVED***
-	if o.OldObject != nil ***REMOVED***
-		m.OldObject = &Object***REMOVED******REMOVED***
+	}
+	if o.OldObject != nil {
+		m.OldObject = &Object{}
 		github_com_docker_swarmkit_api_deepcopy.Copy(m.OldObject, o.OldObject)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
@@ -1347,482 +1347,482 @@ const _ = grpc.SupportPackageIsVersion4
 
 // Client API for Watch service
 
-type WatchClient interface ***REMOVED***
+type WatchClient interface {
 	// Watch starts a stream that returns any changes to objects that match
 	// the specified selectors. When the stream begins, it immediately sends
 	// an empty message back to the client. It is important to wait for
 	// this message before taking any actions that depend on an established
 	// stream of changes for consistency.
 	Watch(ctx context.Context, in *WatchRequest, opts ...grpc.CallOption) (Watch_WatchClient, error)
-***REMOVED***
+}
 
-type watchClient struct ***REMOVED***
+type watchClient struct {
 	cc *grpc.ClientConn
-***REMOVED***
+}
 
-func NewWatchClient(cc *grpc.ClientConn) WatchClient ***REMOVED***
-	return &watchClient***REMOVED***cc***REMOVED***
-***REMOVED***
+func NewWatchClient(cc *grpc.ClientConn) WatchClient {
+	return &watchClient{cc}
+}
 
-func (c *watchClient) Watch(ctx context.Context, in *WatchRequest, opts ...grpc.CallOption) (Watch_WatchClient, error) ***REMOVED***
+func (c *watchClient) Watch(ctx context.Context, in *WatchRequest, opts ...grpc.CallOption) (Watch_WatchClient, error) {
 	stream, err := grpc.NewClientStream(ctx, &_Watch_serviceDesc.Streams[0], c.cc, "/docker.swarmkit.v1.Watch/Watch", opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	x := &watchWatchClient***REMOVED***stream***REMOVED***
-	if err := x.ClientStream.SendMsg(in); err != nil ***REMOVED***
+	}
+	x := &watchWatchClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if err := x.ClientStream.CloseSend(); err != nil ***REMOVED***
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return x, nil
-***REMOVED***
+}
 
-type Watch_WatchClient interface ***REMOVED***
+type Watch_WatchClient interface {
 	Recv() (*WatchMessage, error)
 	grpc.ClientStream
-***REMOVED***
+}
 
-type watchWatchClient struct ***REMOVED***
+type watchWatchClient struct {
 	grpc.ClientStream
-***REMOVED***
+}
 
-func (x *watchWatchClient) Recv() (*WatchMessage, error) ***REMOVED***
+func (x *watchWatchClient) Recv() (*WatchMessage, error) {
 	m := new(WatchMessage)
-	if err := x.ClientStream.RecvMsg(m); err != nil ***REMOVED***
+	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return m, nil
-***REMOVED***
+}
 
 // Server API for Watch service
 
-type WatchServer interface ***REMOVED***
+type WatchServer interface {
 	// Watch starts a stream that returns any changes to objects that match
 	// the specified selectors. When the stream begins, it immediately sends
 	// an empty message back to the client. It is important to wait for
 	// this message before taking any actions that depend on an established
 	// stream of changes for consistency.
 	Watch(*WatchRequest, Watch_WatchServer) error
-***REMOVED***
+}
 
-func RegisterWatchServer(s *grpc.Server, srv WatchServer) ***REMOVED***
+func RegisterWatchServer(s *grpc.Server, srv WatchServer) {
 	s.RegisterService(&_Watch_serviceDesc, srv)
-***REMOVED***
+}
 
-func _Watch_Watch_Handler(srv interface***REMOVED******REMOVED***, stream grpc.ServerStream) error ***REMOVED***
+func _Watch_Watch_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(WatchRequest)
-	if err := stream.RecvMsg(m); err != nil ***REMOVED***
+	if err := stream.RecvMsg(m); err != nil {
 		return err
-	***REMOVED***
-	return srv.(WatchServer).Watch(m, &watchWatchServer***REMOVED***stream***REMOVED***)
-***REMOVED***
+	}
+	return srv.(WatchServer).Watch(m, &watchWatchServer{stream})
+}
 
-type Watch_WatchServer interface ***REMOVED***
+type Watch_WatchServer interface {
 	Send(*WatchMessage) error
 	grpc.ServerStream
-***REMOVED***
+}
 
-type watchWatchServer struct ***REMOVED***
+type watchWatchServer struct {
 	grpc.ServerStream
-***REMOVED***
+}
 
-func (x *watchWatchServer) Send(m *WatchMessage) error ***REMOVED***
+func (x *watchWatchServer) Send(m *WatchMessage) error {
 	return x.ServerStream.SendMsg(m)
-***REMOVED***
+}
 
-var _Watch_serviceDesc = grpc.ServiceDesc***REMOVED***
+var _Watch_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "docker.swarmkit.v1.Watch",
 	HandlerType: (*WatchServer)(nil),
-	Methods:     []grpc.MethodDesc***REMOVED******REMOVED***,
-	Streams: []grpc.StreamDesc***REMOVED***
-		***REMOVED***
+	Methods:     []grpc.MethodDesc{},
+	Streams: []grpc.StreamDesc{
+		{
 			StreamName:    "Watch",
 			Handler:       _Watch_Watch_Handler,
 			ServerStreams: true,
-		***REMOVED***,
-	***REMOVED***,
+		},
+	},
 	Metadata: "github.com/docker/swarmkit/api/watch.proto",
-***REMOVED***
+}
 
-func (m *Object) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *Object) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *Object) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *Object) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.Object != nil ***REMOVED***
+	if m.Object != nil {
 		nn1, err := m.Object.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += nn1
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *Object_Node) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *Object_Node) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
-	if m.Node != nil ***REMOVED***
+	if m.Node != nil {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintWatch(dAtA, i, uint64(m.Node.Size()))
 		n2, err := m.Node.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n2
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
-func (m *Object_Service) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+}
+func (m *Object_Service) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
-	if m.Service != nil ***REMOVED***
+	if m.Service != nil {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintWatch(dAtA, i, uint64(m.Service.Size()))
 		n3, err := m.Service.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n3
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
-func (m *Object_Network) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+}
+func (m *Object_Network) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
-	if m.Network != nil ***REMOVED***
+	if m.Network != nil {
 		dAtA[i] = 0x1a
 		i++
 		i = encodeVarintWatch(dAtA, i, uint64(m.Network.Size()))
 		n4, err := m.Network.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n4
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
-func (m *Object_Task) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+}
+func (m *Object_Task) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
-	if m.Task != nil ***REMOVED***
+	if m.Task != nil {
 		dAtA[i] = 0x22
 		i++
 		i = encodeVarintWatch(dAtA, i, uint64(m.Task.Size()))
 		n5, err := m.Task.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n5
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
-func (m *Object_Cluster) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+}
+func (m *Object_Cluster) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
-	if m.Cluster != nil ***REMOVED***
+	if m.Cluster != nil {
 		dAtA[i] = 0x2a
 		i++
 		i = encodeVarintWatch(dAtA, i, uint64(m.Cluster.Size()))
 		n6, err := m.Cluster.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n6
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
-func (m *Object_Secret) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+}
+func (m *Object_Secret) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
-	if m.Secret != nil ***REMOVED***
+	if m.Secret != nil {
 		dAtA[i] = 0x32
 		i++
 		i = encodeVarintWatch(dAtA, i, uint64(m.Secret.Size()))
 		n7, err := m.Secret.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n7
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
-func (m *Object_Resource) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+}
+func (m *Object_Resource) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
-	if m.Resource != nil ***REMOVED***
+	if m.Resource != nil {
 		dAtA[i] = 0x3a
 		i++
 		i = encodeVarintWatch(dAtA, i, uint64(m.Resource.Size()))
 		n8, err := m.Resource.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n8
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
-func (m *Object_Extension) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+}
+func (m *Object_Extension) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
-	if m.Extension != nil ***REMOVED***
+	if m.Extension != nil {
 		dAtA[i] = 0x42
 		i++
 		i = encodeVarintWatch(dAtA, i, uint64(m.Extension.Size()))
 		n9, err := m.Extension.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n9
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
-func (m *Object_Config) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+}
+func (m *Object_Config) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
-	if m.Config != nil ***REMOVED***
+	if m.Config != nil {
 		dAtA[i] = 0x4a
 		i++
 		i = encodeVarintWatch(dAtA, i, uint64(m.Config.Size()))
 		n10, err := m.Config.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n10
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
-func (m *SelectBySlot) Marshal() (dAtA []byte, err error) ***REMOVED***
+}
+func (m *SelectBySlot) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *SelectBySlot) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *SelectBySlot) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ServiceID) > 0 ***REMOVED***
+	if len(m.ServiceID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintWatch(dAtA, i, uint64(len(m.ServiceID)))
 		i += copy(dAtA[i:], m.ServiceID)
-	***REMOVED***
-	if m.Slot != 0 ***REMOVED***
+	}
+	if m.Slot != 0 {
 		dAtA[i] = 0x10
 		i++
 		i = encodeVarintWatch(dAtA, i, uint64(m.Slot))
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *SelectByCustom) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *SelectByCustom) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *SelectByCustom) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *SelectByCustom) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Kind) > 0 ***REMOVED***
+	if len(m.Kind) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintWatch(dAtA, i, uint64(len(m.Kind)))
 		i += copy(dAtA[i:], m.Kind)
-	***REMOVED***
-	if len(m.Index) > 0 ***REMOVED***
+	}
+	if len(m.Index) > 0 {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintWatch(dAtA, i, uint64(len(m.Index)))
 		i += copy(dAtA[i:], m.Index)
-	***REMOVED***
-	if len(m.Value) > 0 ***REMOVED***
+	}
+	if len(m.Value) > 0 {
 		dAtA[i] = 0x1a
 		i++
 		i = encodeVarintWatch(dAtA, i, uint64(len(m.Value)))
 		i += copy(dAtA[i:], m.Value)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *SelectBy) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *SelectBy) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *SelectBy) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *SelectBy) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.By != nil ***REMOVED***
+	if m.By != nil {
 		nn11, err := m.By.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += nn11
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *SelectBy_ID) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *SelectBy_ID) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintWatch(dAtA, i, uint64(len(m.ID)))
 	i += copy(dAtA[i:], m.ID)
 	return i, nil
-***REMOVED***
-func (m *SelectBy_IDPrefix) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+}
+func (m *SelectBy_IDPrefix) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintWatch(dAtA, i, uint64(len(m.IDPrefix)))
 	i += copy(dAtA[i:], m.IDPrefix)
 	return i, nil
-***REMOVED***
-func (m *SelectBy_Name) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+}
+func (m *SelectBy_Name) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
 	dAtA[i] = 0x1a
 	i++
 	i = encodeVarintWatch(dAtA, i, uint64(len(m.Name)))
 	i += copy(dAtA[i:], m.Name)
 	return i, nil
-***REMOVED***
-func (m *SelectBy_NamePrefix) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+}
+func (m *SelectBy_NamePrefix) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
 	dAtA[i] = 0x22
 	i++
 	i = encodeVarintWatch(dAtA, i, uint64(len(m.NamePrefix)))
 	i += copy(dAtA[i:], m.NamePrefix)
 	return i, nil
-***REMOVED***
-func (m *SelectBy_Custom) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+}
+func (m *SelectBy_Custom) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
-	if m.Custom != nil ***REMOVED***
+	if m.Custom != nil {
 		dAtA[i] = 0x2a
 		i++
 		i = encodeVarintWatch(dAtA, i, uint64(m.Custom.Size()))
 		n12, err := m.Custom.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n12
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
-func (m *SelectBy_CustomPrefix) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+}
+func (m *SelectBy_CustomPrefix) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
-	if m.CustomPrefix != nil ***REMOVED***
+	if m.CustomPrefix != nil {
 		dAtA[i] = 0x32
 		i++
 		i = encodeVarintWatch(dAtA, i, uint64(m.CustomPrefix.Size()))
 		n13, err := m.CustomPrefix.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n13
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
-func (m *SelectBy_ServiceID) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+}
+func (m *SelectBy_ServiceID) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
 	dAtA[i] = 0x3a
 	i++
 	i = encodeVarintWatch(dAtA, i, uint64(len(m.ServiceID)))
 	i += copy(dAtA[i:], m.ServiceID)
 	return i, nil
-***REMOVED***
-func (m *SelectBy_NodeID) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+}
+func (m *SelectBy_NodeID) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
 	dAtA[i] = 0x42
 	i++
 	i = encodeVarintWatch(dAtA, i, uint64(len(m.NodeID)))
 	i += copy(dAtA[i:], m.NodeID)
 	return i, nil
-***REMOVED***
-func (m *SelectBy_Slot) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+}
+func (m *SelectBy_Slot) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
-	if m.Slot != nil ***REMOVED***
+	if m.Slot != nil {
 		dAtA[i] = 0x4a
 		i++
 		i = encodeVarintWatch(dAtA, i, uint64(m.Slot.Size()))
 		n14, err := m.Slot.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n14
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
-func (m *SelectBy_DesiredState) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+}
+func (m *SelectBy_DesiredState) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
 	dAtA[i] = 0x50
 	i++
 	i = encodeVarintWatch(dAtA, i, uint64(m.DesiredState))
 	return i, nil
-***REMOVED***
-func (m *SelectBy_Role) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+}
+func (m *SelectBy_Role) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
 	dAtA[i] = 0x58
 	i++
 	i = encodeVarintWatch(dAtA, i, uint64(m.Role))
 	return i, nil
-***REMOVED***
-func (m *SelectBy_Membership) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+}
+func (m *SelectBy_Membership) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
 	dAtA[i] = 0x60
 	i++
 	i = encodeVarintWatch(dAtA, i, uint64(m.Membership))
 	return i, nil
-***REMOVED***
-func (m *SelectBy_ReferencedNetworkID) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+}
+func (m *SelectBy_ReferencedNetworkID) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
 	dAtA[i] = 0x6a
 	i++
 	i = encodeVarintWatch(dAtA, i, uint64(len(m.ReferencedNetworkID)))
 	i += copy(dAtA[i:], m.ReferencedNetworkID)
 	return i, nil
-***REMOVED***
-func (m *SelectBy_ReferencedSecretID) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+}
+func (m *SelectBy_ReferencedSecretID) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
 	dAtA[i] = 0x72
 	i++
 	i = encodeVarintWatch(dAtA, i, uint64(len(m.ReferencedSecretID)))
 	i += copy(dAtA[i:], m.ReferencedSecretID)
 	return i, nil
-***REMOVED***
-func (m *SelectBy_Kind) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+}
+func (m *SelectBy_Kind) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
 	dAtA[i] = 0x7a
 	i++
 	i = encodeVarintWatch(dAtA, i, uint64(len(m.Kind)))
 	i += copy(dAtA[i:], m.Kind)
 	return i, nil
-***REMOVED***
-func (m *SelectBy_ReferencedConfigID) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+}
+func (m *SelectBy_ReferencedConfigID) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
 	dAtA[i] = 0x82
 	i++
@@ -1831,182 +1831,182 @@ func (m *SelectBy_ReferencedConfigID) MarshalTo(dAtA []byte) (int, error) ***REM
 	i = encodeVarintWatch(dAtA, i, uint64(len(m.ReferencedConfigID)))
 	i += copy(dAtA[i:], m.ReferencedConfigID)
 	return i, nil
-***REMOVED***
-func (m *WatchRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+}
+func (m *WatchRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *WatchRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *WatchRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Entries) > 0 ***REMOVED***
-		for _, msg := range m.Entries ***REMOVED***
+	if len(m.Entries) > 0 {
+		for _, msg := range m.Entries {
 			dAtA[i] = 0xa
 			i++
 			i = encodeVarintWatch(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			i += n
-		***REMOVED***
-	***REMOVED***
-	if m.ResumeFrom != nil ***REMOVED***
+		}
+	}
+	if m.ResumeFrom != nil {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintWatch(dAtA, i, uint64(m.ResumeFrom.Size()))
 		n15, err := m.ResumeFrom.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n15
-	***REMOVED***
-	if m.IncludeOldObject ***REMOVED***
+	}
+	if m.IncludeOldObject {
 		dAtA[i] = 0x18
 		i++
-		if m.IncludeOldObject ***REMOVED***
+		if m.IncludeOldObject {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *WatchRequest_WatchEntry) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *WatchRequest_WatchEntry) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *WatchRequest_WatchEntry) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *WatchRequest_WatchEntry) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Kind) > 0 ***REMOVED***
+	if len(m.Kind) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintWatch(dAtA, i, uint64(len(m.Kind)))
 		i += copy(dAtA[i:], m.Kind)
-	***REMOVED***
-	if m.Action != 0 ***REMOVED***
+	}
+	if m.Action != 0 {
 		dAtA[i] = 0x10
 		i++
 		i = encodeVarintWatch(dAtA, i, uint64(m.Action))
-	***REMOVED***
-	if len(m.Filters) > 0 ***REMOVED***
-		for _, msg := range m.Filters ***REMOVED***
+	}
+	if len(m.Filters) > 0 {
+		for _, msg := range m.Filters {
 			dAtA[i] = 0x1a
 			i++
 			i = encodeVarintWatch(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			i += n
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *WatchMessage) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *WatchMessage) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *WatchMessage) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *WatchMessage) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Events) > 0 ***REMOVED***
-		for _, msg := range m.Events ***REMOVED***
+	if len(m.Events) > 0 {
+		for _, msg := range m.Events {
 			dAtA[i] = 0xa
 			i++
 			i = encodeVarintWatch(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			i += n
-		***REMOVED***
-	***REMOVED***
-	if m.Version != nil ***REMOVED***
+		}
+	}
+	if m.Version != nil {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintWatch(dAtA, i, uint64(m.Version.Size()))
 		n16, err := m.Version.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n16
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *WatchMessage_Event) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *WatchMessage_Event) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *WatchMessage_Event) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *WatchMessage_Event) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.Action != 0 ***REMOVED***
+	if m.Action != 0 {
 		dAtA[i] = 0x8
 		i++
 		i = encodeVarintWatch(dAtA, i, uint64(m.Action))
-	***REMOVED***
-	if m.Object != nil ***REMOVED***
+	}
+	if m.Object != nil {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintWatch(dAtA, i, uint64(m.Object.Size()))
 		n17, err := m.Object.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n17
-	***REMOVED***
-	if m.OldObject != nil ***REMOVED***
+	}
+	if m.OldObject != nil {
 		dAtA[i] = 0x1a
 		i++
 		i = encodeVarintWatch(dAtA, i, uint64(m.OldObject.Size()))
 		n18, err := m.OldObject.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n18
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func encodeFixed64Watch(dAtA []byte, offset int, v uint64) int ***REMOVED***
+func encodeFixed64Watch(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
 	dAtA[offset+2] = uint8(v >> 16)
@@ -2016,2492 +2016,2492 @@ func encodeFixed64Watch(dAtA []byte, offset int, v uint64) int ***REMOVED***
 	dAtA[offset+6] = uint8(v >> 48)
 	dAtA[offset+7] = uint8(v >> 56)
 	return offset + 8
-***REMOVED***
-func encodeFixed32Watch(dAtA []byte, offset int, v uint32) int ***REMOVED***
+}
+func encodeFixed32Watch(dAtA []byte, offset int, v uint32) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
 	dAtA[offset+2] = uint8(v >> 16)
 	dAtA[offset+3] = uint8(v >> 24)
 	return offset + 4
-***REMOVED***
-func encodeVarintWatch(dAtA []byte, offset int, v uint64) int ***REMOVED***
-	for v >= 1<<7 ***REMOVED***
+}
+func encodeVarintWatch(dAtA []byte, offset int, v uint64) int {
+	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
-	***REMOVED***
+	}
 	dAtA[offset] = uint8(v)
 	return offset + 1
-***REMOVED***
+}
 
-type raftProxyWatchServer struct ***REMOVED***
+type raftProxyWatchServer struct {
 	local                       WatchServer
 	connSelector                raftselector.ConnProvider
 	localCtxMods, remoteCtxMods []func(context.Context) (context.Context, error)
-***REMOVED***
+}
 
-func NewRaftProxyWatchServer(local WatchServer, connSelector raftselector.ConnProvider, localCtxMod, remoteCtxMod func(context.Context) (context.Context, error)) WatchServer ***REMOVED***
-	redirectChecker := func(ctx context.Context) (context.Context, error) ***REMOVED***
+func NewRaftProxyWatchServer(local WatchServer, connSelector raftselector.ConnProvider, localCtxMod, remoteCtxMod func(context.Context) (context.Context, error)) WatchServer {
+	redirectChecker := func(ctx context.Context) (context.Context, error) {
 		s, ok := transport.StreamFromContext(ctx)
-		if !ok ***REMOVED***
+		if !ok {
 			return ctx, status.Errorf(codes.InvalidArgument, "remote addr is not found in context")
-		***REMOVED***
+		}
 		addr := s.ServerTransport().RemoteAddr().String()
 		md, ok := metadata.FromContext(ctx)
-		if ok && len(md["redirect"]) != 0 ***REMOVED***
+		if ok && len(md["redirect"]) != 0 {
 			return ctx, status.Errorf(codes.ResourceExhausted, "more than one redirect to leader from: %s", md["redirect"])
-		***REMOVED***
-		if !ok ***REMOVED***
-			md = metadata.New(map[string]string***REMOVED******REMOVED***)
-		***REMOVED***
+		}
+		if !ok {
+			md = metadata.New(map[string]string{})
+		}
 		md["redirect"] = append(md["redirect"], addr)
 		return metadata.NewContext(ctx, md), nil
-	***REMOVED***
-	remoteMods := []func(context.Context) (context.Context, error)***REMOVED***redirectChecker***REMOVED***
+	}
+	remoteMods := []func(context.Context) (context.Context, error){redirectChecker}
 	remoteMods = append(remoteMods, remoteCtxMod)
 
 	var localMods []func(context.Context) (context.Context, error)
-	if localCtxMod != nil ***REMOVED***
-		localMods = []func(context.Context) (context.Context, error)***REMOVED***localCtxMod***REMOVED***
-	***REMOVED***
+	if localCtxMod != nil {
+		localMods = []func(context.Context) (context.Context, error){localCtxMod}
+	}
 
-	return &raftProxyWatchServer***REMOVED***
+	return &raftProxyWatchServer{
 		local:         local,
 		connSelector:  connSelector,
 		localCtxMods:  localMods,
 		remoteCtxMods: remoteMods,
-	***REMOVED***
-***REMOVED***
-func (p *raftProxyWatchServer) runCtxMods(ctx context.Context, ctxMods []func(context.Context) (context.Context, error)) (context.Context, error) ***REMOVED***
+	}
+}
+func (p *raftProxyWatchServer) runCtxMods(ctx context.Context, ctxMods []func(context.Context) (context.Context, error)) (context.Context, error) {
 	var err error
-	for _, mod := range ctxMods ***REMOVED***
+	for _, mod := range ctxMods {
 		ctx, err = mod(ctx)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return ctx, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return ctx, nil
-***REMOVED***
-func (p *raftProxyWatchServer) pollNewLeaderConn(ctx context.Context) (*grpc.ClientConn, error) ***REMOVED***
+}
+func (p *raftProxyWatchServer) pollNewLeaderConn(ctx context.Context) (*grpc.ClientConn, error) {
 	ticker := rafttime.NewTicker(500 * rafttime.Millisecond)
 	defer ticker.Stop()
-	for ***REMOVED***
-		select ***REMOVED***
+	for {
+		select {
 		case <-ticker.C:
 			conn, err := p.connSelector.LeaderConn(ctx)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 
 			client := NewHealthClient(conn)
 
-			resp, err := client.Check(ctx, &HealthCheckRequest***REMOVED***Service: "Raft"***REMOVED***)
-			if err != nil || resp.Status != HealthCheckResponse_SERVING ***REMOVED***
+			resp, err := client.Check(ctx, &HealthCheckRequest{Service: "Raft"})
+			if err != nil || resp.Status != HealthCheckResponse_SERVING {
 				continue
-			***REMOVED***
+			}
 			return conn, nil
 		case <-ctx.Done():
 			return nil, ctx.Err()
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-type Watch_WatchServerWrapper struct ***REMOVED***
+type Watch_WatchServerWrapper struct {
 	Watch_WatchServer
 	ctx context.Context
-***REMOVED***
+}
 
-func (s Watch_WatchServerWrapper) Context() context.Context ***REMOVED***
+func (s Watch_WatchServerWrapper) Context() context.Context {
 	return s.ctx
-***REMOVED***
+}
 
-func (p *raftProxyWatchServer) Watch(r *WatchRequest, stream Watch_WatchServer) error ***REMOVED***
+func (p *raftProxyWatchServer) Watch(r *WatchRequest, stream Watch_WatchServer) error {
 	ctx := stream.Context()
 	conn, err := p.connSelector.LeaderConn(ctx)
-	if err != nil ***REMOVED***
-		if err == raftselector.ErrIsLeader ***REMOVED***
+	if err != nil {
+		if err == raftselector.ErrIsLeader {
 			ctx, err = p.runCtxMods(ctx, p.localCtxMods)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			streamWrapper := Watch_WatchServerWrapper***REMOVED***
+			}
+			streamWrapper := Watch_WatchServerWrapper{
 				Watch_WatchServer: stream,
 				ctx:               ctx,
-			***REMOVED***
+			}
 			return p.local.Watch(r, streamWrapper)
-		***REMOVED***
+		}
 		return err
-	***REMOVED***
+	}
 	ctx, err = p.runCtxMods(ctx, p.remoteCtxMods)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	clientStream, err := NewWatchClient(conn).Watch(ctx, r)
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	for ***REMOVED***
+	for {
 		msg, err := clientStream.Recv()
-		if err == io.EOF ***REMOVED***
+		if err == io.EOF {
 			break
-		***REMOVED***
-		if err != nil ***REMOVED***
+		}
+		if err != nil {
 			return err
-		***REMOVED***
-		if err := stream.Send(msg); err != nil ***REMOVED***
+		}
+		if err := stream.Send(msg); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *Object) Size() (n int) ***REMOVED***
+func (m *Object) Size() (n int) {
 	var l int
 	_ = l
-	if m.Object != nil ***REMOVED***
+	if m.Object != nil {
 		n += m.Object.Size()
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *Object_Node) Size() (n int) ***REMOVED***
+func (m *Object_Node) Size() (n int) {
 	var l int
 	_ = l
-	if m.Node != nil ***REMOVED***
+	if m.Node != nil {
 		l = m.Node.Size()
 		n += 1 + l + sovWatch(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
-func (m *Object_Service) Size() (n int) ***REMOVED***
+}
+func (m *Object_Service) Size() (n int) {
 	var l int
 	_ = l
-	if m.Service != nil ***REMOVED***
+	if m.Service != nil {
 		l = m.Service.Size()
 		n += 1 + l + sovWatch(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
-func (m *Object_Network) Size() (n int) ***REMOVED***
+}
+func (m *Object_Network) Size() (n int) {
 	var l int
 	_ = l
-	if m.Network != nil ***REMOVED***
+	if m.Network != nil {
 		l = m.Network.Size()
 		n += 1 + l + sovWatch(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
-func (m *Object_Task) Size() (n int) ***REMOVED***
+}
+func (m *Object_Task) Size() (n int) {
 	var l int
 	_ = l
-	if m.Task != nil ***REMOVED***
+	if m.Task != nil {
 		l = m.Task.Size()
 		n += 1 + l + sovWatch(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
-func (m *Object_Cluster) Size() (n int) ***REMOVED***
+}
+func (m *Object_Cluster) Size() (n int) {
 	var l int
 	_ = l
-	if m.Cluster != nil ***REMOVED***
+	if m.Cluster != nil {
 		l = m.Cluster.Size()
 		n += 1 + l + sovWatch(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
-func (m *Object_Secret) Size() (n int) ***REMOVED***
+}
+func (m *Object_Secret) Size() (n int) {
 	var l int
 	_ = l
-	if m.Secret != nil ***REMOVED***
+	if m.Secret != nil {
 		l = m.Secret.Size()
 		n += 1 + l + sovWatch(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
-func (m *Object_Resource) Size() (n int) ***REMOVED***
+}
+func (m *Object_Resource) Size() (n int) {
 	var l int
 	_ = l
-	if m.Resource != nil ***REMOVED***
+	if m.Resource != nil {
 		l = m.Resource.Size()
 		n += 1 + l + sovWatch(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
-func (m *Object_Extension) Size() (n int) ***REMOVED***
+}
+func (m *Object_Extension) Size() (n int) {
 	var l int
 	_ = l
-	if m.Extension != nil ***REMOVED***
+	if m.Extension != nil {
 		l = m.Extension.Size()
 		n += 1 + l + sovWatch(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
-func (m *Object_Config) Size() (n int) ***REMOVED***
+}
+func (m *Object_Config) Size() (n int) {
 	var l int
 	_ = l
-	if m.Config != nil ***REMOVED***
+	if m.Config != nil {
 		l = m.Config.Size()
 		n += 1 + l + sovWatch(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
-func (m *SelectBySlot) Size() (n int) ***REMOVED***
+}
+func (m *SelectBySlot) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ServiceID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovWatch(uint64(l))
-	***REMOVED***
-	if m.Slot != 0 ***REMOVED***
+	}
+	if m.Slot != 0 {
 		n += 1 + sovWatch(uint64(m.Slot))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *SelectByCustom) Size() (n int) ***REMOVED***
+func (m *SelectByCustom) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.Kind)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovWatch(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.Index)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovWatch(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.Value)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovWatch(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *SelectBy) Size() (n int) ***REMOVED***
+func (m *SelectBy) Size() (n int) {
 	var l int
 	_ = l
-	if m.By != nil ***REMOVED***
+	if m.By != nil {
 		n += m.By.Size()
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *SelectBy_ID) Size() (n int) ***REMOVED***
+func (m *SelectBy_ID) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ID)
 	n += 1 + l + sovWatch(uint64(l))
 	return n
-***REMOVED***
-func (m *SelectBy_IDPrefix) Size() (n int) ***REMOVED***
+}
+func (m *SelectBy_IDPrefix) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.IDPrefix)
 	n += 1 + l + sovWatch(uint64(l))
 	return n
-***REMOVED***
-func (m *SelectBy_Name) Size() (n int) ***REMOVED***
+}
+func (m *SelectBy_Name) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.Name)
 	n += 1 + l + sovWatch(uint64(l))
 	return n
-***REMOVED***
-func (m *SelectBy_NamePrefix) Size() (n int) ***REMOVED***
+}
+func (m *SelectBy_NamePrefix) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.NamePrefix)
 	n += 1 + l + sovWatch(uint64(l))
 	return n
-***REMOVED***
-func (m *SelectBy_Custom) Size() (n int) ***REMOVED***
+}
+func (m *SelectBy_Custom) Size() (n int) {
 	var l int
 	_ = l
-	if m.Custom != nil ***REMOVED***
+	if m.Custom != nil {
 		l = m.Custom.Size()
 		n += 1 + l + sovWatch(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
-func (m *SelectBy_CustomPrefix) Size() (n int) ***REMOVED***
+}
+func (m *SelectBy_CustomPrefix) Size() (n int) {
 	var l int
 	_ = l
-	if m.CustomPrefix != nil ***REMOVED***
+	if m.CustomPrefix != nil {
 		l = m.CustomPrefix.Size()
 		n += 1 + l + sovWatch(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
-func (m *SelectBy_ServiceID) Size() (n int) ***REMOVED***
+}
+func (m *SelectBy_ServiceID) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ServiceID)
 	n += 1 + l + sovWatch(uint64(l))
 	return n
-***REMOVED***
-func (m *SelectBy_NodeID) Size() (n int) ***REMOVED***
+}
+func (m *SelectBy_NodeID) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.NodeID)
 	n += 1 + l + sovWatch(uint64(l))
 	return n
-***REMOVED***
-func (m *SelectBy_Slot) Size() (n int) ***REMOVED***
+}
+func (m *SelectBy_Slot) Size() (n int) {
 	var l int
 	_ = l
-	if m.Slot != nil ***REMOVED***
+	if m.Slot != nil {
 		l = m.Slot.Size()
 		n += 1 + l + sovWatch(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
-func (m *SelectBy_DesiredState) Size() (n int) ***REMOVED***
+}
+func (m *SelectBy_DesiredState) Size() (n int) {
 	var l int
 	_ = l
 	n += 1 + sovWatch(uint64(m.DesiredState))
 	return n
-***REMOVED***
-func (m *SelectBy_Role) Size() (n int) ***REMOVED***
+}
+func (m *SelectBy_Role) Size() (n int) {
 	var l int
 	_ = l
 	n += 1 + sovWatch(uint64(m.Role))
 	return n
-***REMOVED***
-func (m *SelectBy_Membership) Size() (n int) ***REMOVED***
+}
+func (m *SelectBy_Membership) Size() (n int) {
 	var l int
 	_ = l
 	n += 1 + sovWatch(uint64(m.Membership))
 	return n
-***REMOVED***
-func (m *SelectBy_ReferencedNetworkID) Size() (n int) ***REMOVED***
+}
+func (m *SelectBy_ReferencedNetworkID) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ReferencedNetworkID)
 	n += 1 + l + sovWatch(uint64(l))
 	return n
-***REMOVED***
-func (m *SelectBy_ReferencedSecretID) Size() (n int) ***REMOVED***
+}
+func (m *SelectBy_ReferencedSecretID) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ReferencedSecretID)
 	n += 1 + l + sovWatch(uint64(l))
 	return n
-***REMOVED***
-func (m *SelectBy_Kind) Size() (n int) ***REMOVED***
+}
+func (m *SelectBy_Kind) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.Kind)
 	n += 1 + l + sovWatch(uint64(l))
 	return n
-***REMOVED***
-func (m *SelectBy_ReferencedConfigID) Size() (n int) ***REMOVED***
+}
+func (m *SelectBy_ReferencedConfigID) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ReferencedConfigID)
 	n += 2 + l + sovWatch(uint64(l))
 	return n
-***REMOVED***
-func (m *WatchRequest) Size() (n int) ***REMOVED***
+}
+func (m *WatchRequest) Size() (n int) {
 	var l int
 	_ = l
-	if len(m.Entries) > 0 ***REMOVED***
-		for _, e := range m.Entries ***REMOVED***
+	if len(m.Entries) > 0 {
+		for _, e := range m.Entries {
 			l = e.Size()
 			n += 1 + l + sovWatch(uint64(l))
-		***REMOVED***
-	***REMOVED***
-	if m.ResumeFrom != nil ***REMOVED***
+		}
+	}
+	if m.ResumeFrom != nil {
 		l = m.ResumeFrom.Size()
 		n += 1 + l + sovWatch(uint64(l))
-	***REMOVED***
-	if m.IncludeOldObject ***REMOVED***
+	}
+	if m.IncludeOldObject {
 		n += 2
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *WatchRequest_WatchEntry) Size() (n int) ***REMOVED***
+func (m *WatchRequest_WatchEntry) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.Kind)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovWatch(uint64(l))
-	***REMOVED***
-	if m.Action != 0 ***REMOVED***
+	}
+	if m.Action != 0 {
 		n += 1 + sovWatch(uint64(m.Action))
-	***REMOVED***
-	if len(m.Filters) > 0 ***REMOVED***
-		for _, e := range m.Filters ***REMOVED***
+	}
+	if len(m.Filters) > 0 {
+		for _, e := range m.Filters {
 			l = e.Size()
 			n += 1 + l + sovWatch(uint64(l))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
+}
 
-func (m *WatchMessage) Size() (n int) ***REMOVED***
+func (m *WatchMessage) Size() (n int) {
 	var l int
 	_ = l
-	if len(m.Events) > 0 ***REMOVED***
-		for _, e := range m.Events ***REMOVED***
+	if len(m.Events) > 0 {
+		for _, e := range m.Events {
 			l = e.Size()
 			n += 1 + l + sovWatch(uint64(l))
-		***REMOVED***
-	***REMOVED***
-	if m.Version != nil ***REMOVED***
+		}
+	}
+	if m.Version != nil {
 		l = m.Version.Size()
 		n += 1 + l + sovWatch(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *WatchMessage_Event) Size() (n int) ***REMOVED***
+func (m *WatchMessage_Event) Size() (n int) {
 	var l int
 	_ = l
-	if m.Action != 0 ***REMOVED***
+	if m.Action != 0 {
 		n += 1 + sovWatch(uint64(m.Action))
-	***REMOVED***
-	if m.Object != nil ***REMOVED***
+	}
+	if m.Object != nil {
 		l = m.Object.Size()
 		n += 1 + l + sovWatch(uint64(l))
-	***REMOVED***
-	if m.OldObject != nil ***REMOVED***
+	}
+	if m.OldObject != nil {
 		l = m.OldObject.Size()
 		n += 1 + l + sovWatch(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func sovWatch(x uint64) (n int) ***REMOVED***
-	for ***REMOVED***
+func sovWatch(x uint64) (n int) {
+	for {
 		n++
 		x >>= 7
-		if x == 0 ***REMOVED***
+		if x == 0 {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
-func sozWatch(x uint64) (n int) ***REMOVED***
+}
+func sozWatch(x uint64) (n int) {
 	return sovWatch(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-***REMOVED***
-func (this *Object) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Object) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&Object***REMOVED***`,
+	}
+	s := strings.Join([]string{`&Object{`,
 		`Object:` + fmt.Sprintf("%v", this.Object) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *Object_Node) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Object_Node) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&Object_Node***REMOVED***`,
+	}
+	s := strings.Join([]string{`&Object_Node{`,
 		`Node:` + strings.Replace(fmt.Sprintf("%v", this.Node), "Node", "Node", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *Object_Service) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Object_Service) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&Object_Service***REMOVED***`,
+	}
+	s := strings.Join([]string{`&Object_Service{`,
 		`Service:` + strings.Replace(fmt.Sprintf("%v", this.Service), "Service", "Service", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *Object_Network) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Object_Network) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&Object_Network***REMOVED***`,
+	}
+	s := strings.Join([]string{`&Object_Network{`,
 		`Network:` + strings.Replace(fmt.Sprintf("%v", this.Network), "Network", "Network", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *Object_Task) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Object_Task) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&Object_Task***REMOVED***`,
+	}
+	s := strings.Join([]string{`&Object_Task{`,
 		`Task:` + strings.Replace(fmt.Sprintf("%v", this.Task), "Task", "Task", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *Object_Cluster) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Object_Cluster) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&Object_Cluster***REMOVED***`,
+	}
+	s := strings.Join([]string{`&Object_Cluster{`,
 		`Cluster:` + strings.Replace(fmt.Sprintf("%v", this.Cluster), "Cluster", "Cluster", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *Object_Secret) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Object_Secret) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&Object_Secret***REMOVED***`,
+	}
+	s := strings.Join([]string{`&Object_Secret{`,
 		`Secret:` + strings.Replace(fmt.Sprintf("%v", this.Secret), "Secret", "Secret", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *Object_Resource) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Object_Resource) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&Object_Resource***REMOVED***`,
+	}
+	s := strings.Join([]string{`&Object_Resource{`,
 		`Resource:` + strings.Replace(fmt.Sprintf("%v", this.Resource), "Resource", "Resource", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *Object_Extension) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Object_Extension) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&Object_Extension***REMOVED***`,
+	}
+	s := strings.Join([]string{`&Object_Extension{`,
 		`Extension:` + strings.Replace(fmt.Sprintf("%v", this.Extension), "Extension", "Extension", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *Object_Config) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Object_Config) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&Object_Config***REMOVED***`,
+	}
+	s := strings.Join([]string{`&Object_Config{`,
 		`Config:` + strings.Replace(fmt.Sprintf("%v", this.Config), "Config", "Config", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *SelectBySlot) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *SelectBySlot) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&SelectBySlot***REMOVED***`,
+	}
+	s := strings.Join([]string{`&SelectBySlot{`,
 		`ServiceID:` + fmt.Sprintf("%v", this.ServiceID) + `,`,
 		`Slot:` + fmt.Sprintf("%v", this.Slot) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *SelectByCustom) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *SelectByCustom) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&SelectByCustom***REMOVED***`,
+	}
+	s := strings.Join([]string{`&SelectByCustom{`,
 		`Kind:` + fmt.Sprintf("%v", this.Kind) + `,`,
 		`Index:` + fmt.Sprintf("%v", this.Index) + `,`,
 		`Value:` + fmt.Sprintf("%v", this.Value) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *SelectBy) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *SelectBy) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&SelectBy***REMOVED***`,
+	}
+	s := strings.Join([]string{`&SelectBy{`,
 		`By:` + fmt.Sprintf("%v", this.By) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *SelectBy_ID) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *SelectBy_ID) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&SelectBy_ID***REMOVED***`,
+	}
+	s := strings.Join([]string{`&SelectBy_ID{`,
 		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *SelectBy_IDPrefix) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *SelectBy_IDPrefix) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&SelectBy_IDPrefix***REMOVED***`,
+	}
+	s := strings.Join([]string{`&SelectBy_IDPrefix{`,
 		`IDPrefix:` + fmt.Sprintf("%v", this.IDPrefix) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *SelectBy_Name) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *SelectBy_Name) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&SelectBy_Name***REMOVED***`,
+	}
+	s := strings.Join([]string{`&SelectBy_Name{`,
 		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *SelectBy_NamePrefix) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *SelectBy_NamePrefix) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&SelectBy_NamePrefix***REMOVED***`,
+	}
+	s := strings.Join([]string{`&SelectBy_NamePrefix{`,
 		`NamePrefix:` + fmt.Sprintf("%v", this.NamePrefix) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *SelectBy_Custom) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *SelectBy_Custom) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&SelectBy_Custom***REMOVED***`,
+	}
+	s := strings.Join([]string{`&SelectBy_Custom{`,
 		`Custom:` + strings.Replace(fmt.Sprintf("%v", this.Custom), "SelectByCustom", "SelectByCustom", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *SelectBy_CustomPrefix) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *SelectBy_CustomPrefix) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&SelectBy_CustomPrefix***REMOVED***`,
+	}
+	s := strings.Join([]string{`&SelectBy_CustomPrefix{`,
 		`CustomPrefix:` + strings.Replace(fmt.Sprintf("%v", this.CustomPrefix), "SelectByCustom", "SelectByCustom", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *SelectBy_ServiceID) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *SelectBy_ServiceID) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&SelectBy_ServiceID***REMOVED***`,
+	}
+	s := strings.Join([]string{`&SelectBy_ServiceID{`,
 		`ServiceID:` + fmt.Sprintf("%v", this.ServiceID) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *SelectBy_NodeID) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *SelectBy_NodeID) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&SelectBy_NodeID***REMOVED***`,
+	}
+	s := strings.Join([]string{`&SelectBy_NodeID{`,
 		`NodeID:` + fmt.Sprintf("%v", this.NodeID) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *SelectBy_Slot) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *SelectBy_Slot) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&SelectBy_Slot***REMOVED***`,
+	}
+	s := strings.Join([]string{`&SelectBy_Slot{`,
 		`Slot:` + strings.Replace(fmt.Sprintf("%v", this.Slot), "SelectBySlot", "SelectBySlot", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *SelectBy_DesiredState) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *SelectBy_DesiredState) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&SelectBy_DesiredState***REMOVED***`,
+	}
+	s := strings.Join([]string{`&SelectBy_DesiredState{`,
 		`DesiredState:` + fmt.Sprintf("%v", this.DesiredState) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *SelectBy_Role) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *SelectBy_Role) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&SelectBy_Role***REMOVED***`,
+	}
+	s := strings.Join([]string{`&SelectBy_Role{`,
 		`Role:` + fmt.Sprintf("%v", this.Role) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *SelectBy_Membership) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *SelectBy_Membership) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&SelectBy_Membership***REMOVED***`,
+	}
+	s := strings.Join([]string{`&SelectBy_Membership{`,
 		`Membership:` + fmt.Sprintf("%v", this.Membership) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *SelectBy_ReferencedNetworkID) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *SelectBy_ReferencedNetworkID) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&SelectBy_ReferencedNetworkID***REMOVED***`,
+	}
+	s := strings.Join([]string{`&SelectBy_ReferencedNetworkID{`,
 		`ReferencedNetworkID:` + fmt.Sprintf("%v", this.ReferencedNetworkID) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *SelectBy_ReferencedSecretID) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *SelectBy_ReferencedSecretID) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&SelectBy_ReferencedSecretID***REMOVED***`,
+	}
+	s := strings.Join([]string{`&SelectBy_ReferencedSecretID{`,
 		`ReferencedSecretID:` + fmt.Sprintf("%v", this.ReferencedSecretID) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *SelectBy_Kind) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *SelectBy_Kind) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&SelectBy_Kind***REMOVED***`,
+	}
+	s := strings.Join([]string{`&SelectBy_Kind{`,
 		`Kind:` + fmt.Sprintf("%v", this.Kind) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *SelectBy_ReferencedConfigID) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *SelectBy_ReferencedConfigID) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&SelectBy_ReferencedConfigID***REMOVED***`,
+	}
+	s := strings.Join([]string{`&SelectBy_ReferencedConfigID{`,
 		`ReferencedConfigID:` + fmt.Sprintf("%v", this.ReferencedConfigID) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *WatchRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *WatchRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&WatchRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&WatchRequest{`,
 		`Entries:` + strings.Replace(fmt.Sprintf("%v", this.Entries), "WatchRequest_WatchEntry", "WatchRequest_WatchEntry", 1) + `,`,
 		`ResumeFrom:` + strings.Replace(fmt.Sprintf("%v", this.ResumeFrom), "Version", "Version", 1) + `,`,
 		`IncludeOldObject:` + fmt.Sprintf("%v", this.IncludeOldObject) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *WatchRequest_WatchEntry) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *WatchRequest_WatchEntry) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&WatchRequest_WatchEntry***REMOVED***`,
+	}
+	s := strings.Join([]string{`&WatchRequest_WatchEntry{`,
 		`Kind:` + fmt.Sprintf("%v", this.Kind) + `,`,
 		`Action:` + fmt.Sprintf("%v", this.Action) + `,`,
 		`Filters:` + strings.Replace(fmt.Sprintf("%v", this.Filters), "SelectBy", "SelectBy", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *WatchMessage) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *WatchMessage) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&WatchMessage***REMOVED***`,
+	}
+	s := strings.Join([]string{`&WatchMessage{`,
 		`Events:` + strings.Replace(fmt.Sprintf("%v", this.Events), "WatchMessage_Event", "WatchMessage_Event", 1) + `,`,
 		`Version:` + strings.Replace(fmt.Sprintf("%v", this.Version), "Version", "Version", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *WatchMessage_Event) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *WatchMessage_Event) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&WatchMessage_Event***REMOVED***`,
+	}
+	s := strings.Join([]string{`&WatchMessage_Event{`,
 		`Action:` + fmt.Sprintf("%v", this.Action) + `,`,
 		`Object:` + strings.Replace(fmt.Sprintf("%v", this.Object), "Object", "Object", 1) + `,`,
 		`OldObject:` + strings.Replace(fmt.Sprintf("%v", this.OldObject), "Object", "Object", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func valueToStringWatch(v interface***REMOVED******REMOVED***) string ***REMOVED***
+}
+func valueToStringWatch(v interface{}) string {
 	rv := reflect.ValueOf(v)
-	if rv.IsNil() ***REMOVED***
+	if rv.IsNil() {
 		return "nil"
-	***REMOVED***
+	}
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
-***REMOVED***
-func (m *Object) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *Object) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowWatch
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: Object: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: Object: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Node", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			v := &Node***REMOVED******REMOVED***
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			v := &Node{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
-			m.Object = &Object_Node***REMOVED***v***REMOVED***
+			}
+			m.Object = &Object_Node{v}
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Service", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			v := &Service***REMOVED******REMOVED***
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			v := &Service{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
-			m.Object = &Object_Service***REMOVED***v***REMOVED***
+			}
+			m.Object = &Object_Service{v}
 			iNdEx = postIndex
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Network", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			v := &Network***REMOVED******REMOVED***
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			v := &Network{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
-			m.Object = &Object_Network***REMOVED***v***REMOVED***
+			}
+			m.Object = &Object_Network{v}
 			iNdEx = postIndex
 		case 4:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Task", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			v := &Task***REMOVED******REMOVED***
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			v := &Task{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
-			m.Object = &Object_Task***REMOVED***v***REMOVED***
+			}
+			m.Object = &Object_Task{v}
 			iNdEx = postIndex
 		case 5:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Cluster", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			v := &Cluster***REMOVED******REMOVED***
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			v := &Cluster{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
-			m.Object = &Object_Cluster***REMOVED***v***REMOVED***
+			}
+			m.Object = &Object_Cluster{v}
 			iNdEx = postIndex
 		case 6:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Secret", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			v := &Secret***REMOVED******REMOVED***
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			v := &Secret{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
-			m.Object = &Object_Secret***REMOVED***v***REMOVED***
+			}
+			m.Object = &Object_Secret{v}
 			iNdEx = postIndex
 		case 7:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Resource", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			v := &Resource***REMOVED******REMOVED***
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			v := &Resource{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
-			m.Object = &Object_Resource***REMOVED***v***REMOVED***
+			}
+			m.Object = &Object_Resource{v}
 			iNdEx = postIndex
 		case 8:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Extension", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			v := &Extension***REMOVED******REMOVED***
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			v := &Extension{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
-			m.Object = &Object_Extension***REMOVED***v***REMOVED***
+			}
+			m.Object = &Object_Extension{v}
 			iNdEx = postIndex
 		case 9:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Config", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			v := &Config***REMOVED******REMOVED***
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			v := &Config{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
-			m.Object = &Object_Config***REMOVED***v***REMOVED***
+			}
+			m.Object = &Object_Config{v}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipWatch(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *SelectBySlot) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *SelectBySlot) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowWatch
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: SelectBySlot: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: SelectBySlot: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ServiceID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ServiceID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Slot", wireType)
-			***REMOVED***
+			}
 			m.Slot = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Slot |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipWatch(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *SelectByCustom) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *SelectByCustom) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowWatch
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: SelectByCustom: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: SelectByCustom: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Kind", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Kind = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Index", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Index = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Value", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Value = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipWatch(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *SelectBy) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *SelectBy) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowWatch
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: SelectBy: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: SelectBy: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.By = &SelectBy_ID***REMOVED***string(dAtA[iNdEx:postIndex])***REMOVED***
+			}
+			m.By = &SelectBy_ID{string(dAtA[iNdEx:postIndex])}
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field IDPrefix", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.By = &SelectBy_IDPrefix***REMOVED***string(dAtA[iNdEx:postIndex])***REMOVED***
+			}
+			m.By = &SelectBy_IDPrefix{string(dAtA[iNdEx:postIndex])}
 			iNdEx = postIndex
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.By = &SelectBy_Name***REMOVED***string(dAtA[iNdEx:postIndex])***REMOVED***
+			}
+			m.By = &SelectBy_Name{string(dAtA[iNdEx:postIndex])}
 			iNdEx = postIndex
 		case 4:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field NamePrefix", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.By = &SelectBy_NamePrefix***REMOVED***string(dAtA[iNdEx:postIndex])***REMOVED***
+			}
+			m.By = &SelectBy_NamePrefix{string(dAtA[iNdEx:postIndex])}
 			iNdEx = postIndex
 		case 5:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Custom", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			v := &SelectByCustom***REMOVED******REMOVED***
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			v := &SelectByCustom{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
-			m.By = &SelectBy_Custom***REMOVED***v***REMOVED***
+			}
+			m.By = &SelectBy_Custom{v}
 			iNdEx = postIndex
 		case 6:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CustomPrefix", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			v := &SelectByCustom***REMOVED******REMOVED***
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			v := &SelectByCustom{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
-			m.By = &SelectBy_CustomPrefix***REMOVED***v***REMOVED***
+			}
+			m.By = &SelectBy_CustomPrefix{v}
 			iNdEx = postIndex
 		case 7:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ServiceID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.By = &SelectBy_ServiceID***REMOVED***string(dAtA[iNdEx:postIndex])***REMOVED***
+			}
+			m.By = &SelectBy_ServiceID{string(dAtA[iNdEx:postIndex])}
 			iNdEx = postIndex
 		case 8:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field NodeID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.By = &SelectBy_NodeID***REMOVED***string(dAtA[iNdEx:postIndex])***REMOVED***
+			}
+			m.By = &SelectBy_NodeID{string(dAtA[iNdEx:postIndex])}
 			iNdEx = postIndex
 		case 9:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Slot", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			v := &SelectBySlot***REMOVED******REMOVED***
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			v := &SelectBySlot{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
-			m.By = &SelectBy_Slot***REMOVED***v***REMOVED***
+			}
+			m.By = &SelectBy_Slot{v}
 			iNdEx = postIndex
 		case 10:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field DesiredState", wireType)
-			***REMOVED***
+			}
 			var v TaskState
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (TaskState(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			m.By = &SelectBy_DesiredState***REMOVED***v***REMOVED***
+				}
+			}
+			m.By = &SelectBy_DesiredState{v}
 		case 11:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Role", wireType)
-			***REMOVED***
+			}
 			var v NodeRole
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (NodeRole(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			m.By = &SelectBy_Role***REMOVED***v***REMOVED***
+				}
+			}
+			m.By = &SelectBy_Role{v}
 		case 12:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Membership", wireType)
-			***REMOVED***
+			}
 			var v NodeSpec_Membership
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (NodeSpec_Membership(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			m.By = &SelectBy_Membership***REMOVED***v***REMOVED***
+				}
+			}
+			m.By = &SelectBy_Membership{v}
 		case 13:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ReferencedNetworkID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.By = &SelectBy_ReferencedNetworkID***REMOVED***string(dAtA[iNdEx:postIndex])***REMOVED***
+			}
+			m.By = &SelectBy_ReferencedNetworkID{string(dAtA[iNdEx:postIndex])}
 			iNdEx = postIndex
 		case 14:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ReferencedSecretID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.By = &SelectBy_ReferencedSecretID***REMOVED***string(dAtA[iNdEx:postIndex])***REMOVED***
+			}
+			m.By = &SelectBy_ReferencedSecretID{string(dAtA[iNdEx:postIndex])}
 			iNdEx = postIndex
 		case 15:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Kind", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.By = &SelectBy_Kind***REMOVED***string(dAtA[iNdEx:postIndex])***REMOVED***
+			}
+			m.By = &SelectBy_Kind{string(dAtA[iNdEx:postIndex])}
 			iNdEx = postIndex
 		case 16:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ReferencedConfigID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.By = &SelectBy_ReferencedConfigID***REMOVED***string(dAtA[iNdEx:postIndex])***REMOVED***
+			}
+			m.By = &SelectBy_ReferencedConfigID{string(dAtA[iNdEx:postIndex])}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipWatch(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *WatchRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *WatchRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowWatch
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: WatchRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: WatchRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Entries", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.Entries = append(m.Entries, &WatchRequest_WatchEntry***REMOVED******REMOVED***)
-			if err := m.Entries[len(m.Entries)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			m.Entries = append(m.Entries, &WatchRequest_WatchEntry{})
+			if err := m.Entries[len(m.Entries)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ResumeFrom", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.ResumeFrom == nil ***REMOVED***
-				m.ResumeFrom = &Version***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.ResumeFrom.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.ResumeFrom == nil {
+				m.ResumeFrom = &Version{}
+			}
+			if err := m.ResumeFrom.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 3:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field IncludeOldObject", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			m.IncludeOldObject = bool(v != 0)
 		default:
 			iNdEx = preIndex
 			skippy, err := skipWatch(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *WatchRequest_WatchEntry) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *WatchRequest_WatchEntry) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowWatch
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: WatchEntry: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: WatchEntry: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Kind", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Kind = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Action", wireType)
-			***REMOVED***
+			}
 			m.Action = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Action |= (WatchActionKind(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Filters", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.Filters = append(m.Filters, &SelectBy***REMOVED******REMOVED***)
-			if err := m.Filters[len(m.Filters)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			m.Filters = append(m.Filters, &SelectBy{})
+			if err := m.Filters[len(m.Filters)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipWatch(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *WatchMessage) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *WatchMessage) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowWatch
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: WatchMessage: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: WatchMessage: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Events", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.Events = append(m.Events, &WatchMessage_Event***REMOVED******REMOVED***)
-			if err := m.Events[len(m.Events)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			m.Events = append(m.Events, &WatchMessage_Event{})
+			if err := m.Events[len(m.Events)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Version", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Version == nil ***REMOVED***
-				m.Version = &Version***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.Version.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.Version == nil {
+				m.Version = &Version{}
+			}
+			if err := m.Version.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipWatch(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *WatchMessage_Event) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *WatchMessage_Event) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowWatch
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: Event: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: Event: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Action", wireType)
-			***REMOVED***
+			}
 			m.Action = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Action |= (WatchActionKind(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Object", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Object == nil ***REMOVED***
-				m.Object = &Object***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.Object.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.Object == nil {
+				m.Object = &Object{}
+			}
+			if err := m.Object.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field OldObject", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.OldObject == nil ***REMOVED***
-				m.OldObject = &Object***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.OldObject.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.OldObject == nil {
+				m.OldObject = &Object{}
+			}
+			if err := m.OldObject.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipWatch(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthWatch
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func skipWatch(dAtA []byte) (n int, err error) ***REMOVED***
+}
+func skipWatch(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return 0, ErrIntOverflowWatch
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return 0, io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		wireType := int(wire & 0x7)
-		switch wireType ***REMOVED***
+		switch wireType {
 		case 0:
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				iNdEx++
-				if dAtA[iNdEx-1] < 0x80 ***REMOVED***
+				if dAtA[iNdEx-1] < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return iNdEx, nil
 		case 1:
 			iNdEx += 8
 			return iNdEx, nil
 		case 2:
 			var length int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowWatch
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				length |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			iNdEx += length
-			if length < 0 ***REMOVED***
+			if length < 0 {
 				return 0, ErrInvalidLengthWatch
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 3:
-			for ***REMOVED***
+			for {
 				var innerWire uint64
 				var start int = iNdEx
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return 0, ErrIntOverflowWatch
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return 0, io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					innerWire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				innerWireType := int(innerWire & 0x7)
-				if innerWireType == 4 ***REMOVED***
+				if innerWireType == 4 {
 					break
-				***REMOVED***
+				}
 				next, err := skipWatch(dAtA[start:])
-				if err != nil ***REMOVED***
+				if err != nil {
 					return 0, err
-				***REMOVED***
+				}
 				iNdEx = start + next
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 4:
 			return iNdEx, nil
@@ -4510,19 +4510,19 @@ func skipWatch(dAtA []byte) (n int, err error) ***REMOVED***
 			return iNdEx, nil
 		default:
 			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	panic("unreachable")
-***REMOVED***
+}
 
 var (
 	ErrInvalidLengthWatch = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowWatch   = fmt.Errorf("proto: integer overflow")
 )
 
-func init() ***REMOVED*** proto.RegisterFile("github.com/docker/swarmkit/api/watch.proto", fileDescriptorWatch) ***REMOVED***
+func init() { proto.RegisterFile("github.com/docker/swarmkit/api/watch.proto", fileDescriptorWatch) }
 
-var fileDescriptorWatch = []byte***REMOVED***
+var fileDescriptorWatch = []byte{
 	// 1186 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x96, 0xbd, 0x73, 0x1b, 0xc5,
 	0x1b, 0xc7, 0x75, 0x8a, 0x7c, 0x92, 0x1e, 0xdb, 0x89, 0x67, 0xe3, 0x24, 0xf7, 0xd3, 0x2f, 0xc8,
@@ -4599,4 +4599,4 @@ var fileDescriptorWatch = []byte***REMOVED***
 	0x1a, 0x97, 0x8d, 0xe7, 0xe3, 0xb2, 0xf1, 0xdb, 0xb8, 0x6c, 0xfc, 0x39, 0x2e, 0x1b, 0x7b, 0xa6,
 	0xfc, 0x03, 0xf9, 0xfe, 0xbf, 0x01, 0x00, 0x00, 0xff, 0xff, 0xe6, 0x76, 0x89, 0xef, 0x57, 0x0b,
 	0x00, 0x00,
-***REMOVED***
+}

@@ -13,7 +13,7 @@ option go_package = "github.com/containerd/containerd/api/types;types";
 //
 // The Mount type follows the structure of the mount syscall, including a type,
 // source, target and options.
-message Mount ***REMOVED***
+message Mount {
 	// Type defines the nature of the mount.
 	string type = 1;
 
@@ -26,4 +26,4 @@ message Mount ***REMOVED***
 
 	// Options specifies zero or more fstab style mount options.
 	repeated string options = 4;
-***REMOVED***
+}

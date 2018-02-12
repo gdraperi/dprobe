@@ -11,12 +11,12 @@ import (
 )
 
 // Token defines a single HCL token which can be obtained via the Scanner
-type Token struct ***REMOVED***
+type Token struct {
 	Type Type
 	Pos  Pos
 	Text string
 	JSON bool
-***REMOVED***
+}
 
 // Type is the set of lexical tokens of the HCL (HashiCorp Configuration Language)
 type Type int
@@ -40,12 +40,12 @@ const (
 
 	operator_beg
 	LBRACK // [
-	LBRACE // ***REMOVED***
+	LBRACE // {
 	COMMA  // ,
 	PERIOD // .
 
 	RBRACK // ]
-	RBRACE // ***REMOVED***
+	RBRACE // }
 
 	ASSIGN // =
 	ADD    // +
@@ -53,7 +53,7 @@ const (
 	operator_end
 )
 
-var tokens = [...]string***REMOVED***
+var tokens = [...]string{
 	ILLEGAL: "ILLEGAL",
 
 	EOF:     "EOF",
@@ -77,66 +77,66 @@ var tokens = [...]string***REMOVED***
 	ASSIGN: "ASSIGN",
 	ADD:    "ADD",
 	SUB:    "SUB",
-***REMOVED***
+}
 
 // String returns the string corresponding to the token tok.
-func (t Type) String() string ***REMOVED***
+func (t Type) String() string {
 	s := ""
-	if 0 <= t && t < Type(len(tokens)) ***REMOVED***
+	if 0 <= t && t < Type(len(tokens)) {
 		s = tokens[t]
-	***REMOVED***
-	if s == "" ***REMOVED***
+	}
+	if s == "" {
 		s = "token(" + strconv.Itoa(int(t)) + ")"
-	***REMOVED***
+	}
 	return s
-***REMOVED***
+}
 
 // IsIdentifier returns true for tokens corresponding to identifiers and basic
 // type literals; it returns false otherwise.
-func (t Type) IsIdentifier() bool ***REMOVED*** return identifier_beg < t && t < identifier_end ***REMOVED***
+func (t Type) IsIdentifier() bool { return identifier_beg < t && t < identifier_end }
 
 // IsLiteral returns true for tokens corresponding to basic type literals; it
 // returns false otherwise.
-func (t Type) IsLiteral() bool ***REMOVED*** return literal_beg < t && t < literal_end ***REMOVED***
+func (t Type) IsLiteral() bool { return literal_beg < t && t < literal_end }
 
 // IsOperator returns true for tokens corresponding to operators and
 // delimiters; it returns false otherwise.
-func (t Type) IsOperator() bool ***REMOVED*** return operator_beg < t && t < operator_end ***REMOVED***
+func (t Type) IsOperator() bool { return operator_beg < t && t < operator_end }
 
 // String returns the token's literal text. Note that this is only
 // applicable for certain token types, such as token.IDENT,
 // token.STRING, etc..
-func (t Token) String() string ***REMOVED***
+func (t Token) String() string {
 	return fmt.Sprintf("%s %s %s", t.Pos.String(), t.Type.String(), t.Text)
-***REMOVED***
+}
 
 // Value returns the properly typed value for this token. The type of
-// the returned interface***REMOVED******REMOVED*** is guaranteed based on the Type field.
+// the returned interface{} is guaranteed based on the Type field.
 //
 // This can only be called for literal types. If it is called for any other
 // type, this will panic.
-func (t Token) Value() interface***REMOVED******REMOVED*** ***REMOVED***
-	switch t.Type ***REMOVED***
+func (t Token) Value() interface{} {
+	switch t.Type {
 	case BOOL:
-		if t.Text == "true" ***REMOVED***
+		if t.Text == "true" {
 			return true
-		***REMOVED*** else if t.Text == "false" ***REMOVED***
+		} else if t.Text == "false" {
 			return false
-		***REMOVED***
+		}
 
 		panic("unknown bool value: " + t.Text)
 	case FLOAT:
 		v, err := strconv.ParseFloat(t.Text, 64)
-		if err != nil ***REMOVED***
+		if err != nil {
 			panic(err)
-		***REMOVED***
+		}
 
 		return float64(v)
 	case NUMBER:
 		v, err := strconv.ParseInt(t.Text, 0, 64)
-		if err != nil ***REMOVED***
+		if err != nil {
 			panic(err)
-		***REMOVED***
+		}
 
 		return int64(v)
 	case IDENT:
@@ -148,72 +148,72 @@ func (t Token) Value() interface***REMOVED******REMOVED*** ***REMOVED***
 		// then we need to use the built-in unquote since we have to
 		// escape interpolations there.
 		f := hclstrconv.Unquote
-		if t.JSON ***REMOVED***
+		if t.JSON {
 			f = strconv.Unquote
-		***REMOVED***
+		}
 
 		// This case occurs if json null is used
-		if t.Text == "" ***REMOVED***
+		if t.Text == "" {
 			return ""
-		***REMOVED***
+		}
 
 		v, err := f(t.Text)
-		if err != nil ***REMOVED***
+		if err != nil {
 			panic(fmt.Sprintf("unquote %s err: %s", t.Text, err))
-		***REMOVED***
+		}
 
 		return v
 	default:
 		panic(fmt.Sprintf("unimplemented Value for type: %s", t.Type))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // unindentHeredoc returns the string content of a HEREDOC if it is started with <<
 // and the content of a HEREDOC with the hanging indent removed if it is started with
 // a <<-, and the terminating line is at least as indented as the least indented line.
-func unindentHeredoc(heredoc string) string ***REMOVED***
+func unindentHeredoc(heredoc string) string {
 	// We need to find the end of the marker
 	idx := strings.IndexByte(heredoc, '\n')
-	if idx == -1 ***REMOVED***
+	if idx == -1 {
 		panic("heredoc doesn't contain newline")
-	***REMOVED***
+	}
 
 	unindent := heredoc[2] == '-'
 
 	// We can optimize if the heredoc isn't marked for indentation
-	if !unindent ***REMOVED***
+	if !unindent {
 		return string(heredoc[idx+1 : len(heredoc)-idx+1])
-	***REMOVED***
+	}
 
 	// We need to unindent each line based on the indentation level of the marker
 	lines := strings.Split(string(heredoc[idx+1:len(heredoc)-idx+2]), "\n")
 	whitespacePrefix := lines[len(lines)-1]
 
 	isIndented := true
-	for _, v := range lines ***REMOVED***
-		if strings.HasPrefix(v, whitespacePrefix) ***REMOVED***
+	for _, v := range lines {
+		if strings.HasPrefix(v, whitespacePrefix) {
 			continue
-		***REMOVED***
+		}
 
 		isIndented = false
 		break
-	***REMOVED***
+	}
 
 	// If all lines are not at least as indented as the terminating mark, return the
 	// heredoc as is, but trim the leading space from the marker on the final line.
-	if !isIndented ***REMOVED***
+	if !isIndented {
 		return strings.TrimRight(string(heredoc[idx+1:len(heredoc)-idx+1]), " \t")
-	***REMOVED***
+	}
 
 	unindentedLines := make([]string, len(lines))
-	for k, v := range lines ***REMOVED***
-		if k == len(lines)-1 ***REMOVED***
+	for k, v := range lines {
+		if k == len(lines)-1 {
 			unindentedLines[k] = ""
 			break
-		***REMOVED***
+		}
 
 		unindentedLines[k] = strings.TrimPrefix(v, whitespacePrefix)
-	***REMOVED***
+	}
 
 	return strings.Join(unindentedLines, "\n")
-***REMOVED***
+}

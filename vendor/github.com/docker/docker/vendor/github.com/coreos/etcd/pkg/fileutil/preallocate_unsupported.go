@@ -18,8 +18,8 @@ package fileutil
 
 import "os"
 
-func preallocExtend(f *os.File, sizeInBytes int64) error ***REMOVED***
+func preallocExtend(f *os.File, sizeInBytes int64) error {
 	return preallocExtendTrunc(f, sizeInBytes)
-***REMOVED***
+}
 
-func preallocFixed(f *os.File, sizeInBytes int64) error ***REMOVED*** return nil ***REMOVED***
+func preallocFixed(f *os.File, sizeInBytes int64) error { return nil }

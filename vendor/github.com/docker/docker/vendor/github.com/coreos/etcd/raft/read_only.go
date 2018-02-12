@@ -21,98 +21,98 @@ import pb "github.com/coreos/etcd/raft/raftpb"
 // this state from ready, It's also caller's duty to differentiate if this
 // state is what it requests through RequestCtx, eg. given a unique id as
 // RequestCtx
-type ReadState struct ***REMOVED***
+type ReadState struct {
 	Index      uint64
 	RequestCtx []byte
-***REMOVED***
+}
 
-type readIndexStatus struct ***REMOVED***
+type readIndexStatus struct {
 	req   pb.Message
 	index uint64
-	acks  map[uint64]struct***REMOVED******REMOVED***
-***REMOVED***
+	acks  map[uint64]struct{}
+}
 
-type readOnly struct ***REMOVED***
+type readOnly struct {
 	option           ReadOnlyOption
 	pendingReadIndex map[string]*readIndexStatus
 	readIndexQueue   []string
-***REMOVED***
+}
 
-func newReadOnly(option ReadOnlyOption) *readOnly ***REMOVED***
-	return &readOnly***REMOVED***
+func newReadOnly(option ReadOnlyOption) *readOnly {
+	return &readOnly{
 		option:           option,
 		pendingReadIndex: make(map[string]*readIndexStatus),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // addRequest adds a read only reuqest into readonly struct.
 // `index` is the commit index of the raft state machine when it received
 // the read only request.
 // `m` is the original read only request message from the local or remote node.
-func (ro *readOnly) addRequest(index uint64, m pb.Message) ***REMOVED***
+func (ro *readOnly) addRequest(index uint64, m pb.Message) {
 	ctx := string(m.Entries[0].Data)
-	if _, ok := ro.pendingReadIndex[ctx]; ok ***REMOVED***
+	if _, ok := ro.pendingReadIndex[ctx]; ok {
 		return
-	***REMOVED***
-	ro.pendingReadIndex[ctx] = &readIndexStatus***REMOVED***index: index, req: m, acks: make(map[uint64]struct***REMOVED******REMOVED***)***REMOVED***
+	}
+	ro.pendingReadIndex[ctx] = &readIndexStatus{index: index, req: m, acks: make(map[uint64]struct{})}
 	ro.readIndexQueue = append(ro.readIndexQueue, ctx)
-***REMOVED***
+}
 
 // recvAck notifies the readonly struct that the raft state machine received
 // an acknowledgment of the heartbeat that attached with the read only request
 // context.
-func (ro *readOnly) recvAck(m pb.Message) int ***REMOVED***
+func (ro *readOnly) recvAck(m pb.Message) int {
 	rs, ok := ro.pendingReadIndex[string(m.Context)]
-	if !ok ***REMOVED***
+	if !ok {
 		return 0
-	***REMOVED***
+	}
 
-	rs.acks[m.From] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
+	rs.acks[m.From] = struct{}{}
 	// add one to include an ack from local node
 	return len(rs.acks) + 1
-***REMOVED***
+}
 
 // advance advances the read only request queue kept by the readonly struct.
 // It dequeues the requests until it finds the read only request that has
 // the same context as the given `m`.
-func (ro *readOnly) advance(m pb.Message) []*readIndexStatus ***REMOVED***
+func (ro *readOnly) advance(m pb.Message) []*readIndexStatus {
 	var (
 		i     int
 		found bool
 	)
 
 	ctx := string(m.Context)
-	rss := []*readIndexStatus***REMOVED******REMOVED***
+	rss := []*readIndexStatus{}
 
-	for _, okctx := range ro.readIndexQueue ***REMOVED***
+	for _, okctx := range ro.readIndexQueue {
 		i++
 		rs, ok := ro.pendingReadIndex[okctx]
-		if !ok ***REMOVED***
+		if !ok {
 			panic("cannot find corresponding read state from pending map")
-		***REMOVED***
+		}
 		rss = append(rss, rs)
-		if okctx == ctx ***REMOVED***
+		if okctx == ctx {
 			found = true
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if found ***REMOVED***
+	if found {
 		ro.readIndexQueue = ro.readIndexQueue[i:]
-		for _, rs := range rss ***REMOVED***
+		for _, rs := range rss {
 			delete(ro.pendingReadIndex, string(rs.req.Entries[0].Data))
-		***REMOVED***
+		}
 		return rss
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // lastPendingRequestCtx returns the context of the last pending read only
 // request in readonly struct.
-func (ro *readOnly) lastPendingRequestCtx() string ***REMOVED***
-	if len(ro.readIndexQueue) == 0 ***REMOVED***
+func (ro *readOnly) lastPendingRequestCtx() string {
+	if len(ro.readIndexQueue) == 0 {
 		return ""
-	***REMOVED***
+	}
 	return ro.readIndexQueue[len(ro.readIndexQueue)-1]
-***REMOVED***
+}

@@ -9,9 +9,9 @@ shift
 
 	# effectively: febootstrap-minimize --keep-zoneinfo --keep-rpmdb --keep-services "$target"
 	#  locales
-	rm -rf usr/***REMOVED******REMOVED***lib,share***REMOVED***/locale,***REMOVED***lib,lib64***REMOVED***/gconv,bin/localedef,sbin/build-locale-archive***REMOVED***
+	rm -rf usr/{{lib,share}/locale,{lib,lib64}/gconv,bin/localedef,sbin/build-locale-archive}
 	#  docs and man pages
-	rm -rf usr/share/***REMOVED***man,doc,info,gnome/help***REMOVED***
+	rm -rf usr/share/{man,doc,info,gnome/help}
 	#  cracklib
 	rm -rf usr/share/cracklib
 	#  i18n

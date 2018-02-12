@@ -6,39 +6,39 @@ import (
 )
 
 // networkRouter is a router to talk with the network controller
-type networkRouter struct ***REMOVED***
+type networkRouter struct {
 	backend Backend
 	cluster *cluster.Cluster
 	routes  []router.Route
-***REMOVED***
+}
 
 // NewRouter initializes a new network router
-func NewRouter(b Backend, c *cluster.Cluster) router.Router ***REMOVED***
-	r := &networkRouter***REMOVED***
+func NewRouter(b Backend, c *cluster.Cluster) router.Router {
+	r := &networkRouter{
 		backend: b,
 		cluster: c,
-	***REMOVED***
+	}
 	r.initRoutes()
 	return r
-***REMOVED***
+}
 
 // Routes returns the available routes to the network controller
-func (r *networkRouter) Routes() []router.Route ***REMOVED***
+func (r *networkRouter) Routes() []router.Route {
 	return r.routes
-***REMOVED***
+}
 
-func (r *networkRouter) initRoutes() ***REMOVED***
-	r.routes = []router.Route***REMOVED***
+func (r *networkRouter) initRoutes() {
+	r.routes = []router.Route{
 		// GET
 		router.NewGetRoute("/networks", r.getNetworksList),
 		router.NewGetRoute("/networks/", r.getNetworksList),
-		router.NewGetRoute("/networks/***REMOVED***id:.+***REMOVED***", r.getNetwork),
+		router.NewGetRoute("/networks/{id:.+}", r.getNetwork),
 		// POST
 		router.NewPostRoute("/networks/create", r.postNetworkCreate),
-		router.NewPostRoute("/networks/***REMOVED***id:.****REMOVED***/connect", r.postNetworkConnect),
-		router.NewPostRoute("/networks/***REMOVED***id:.****REMOVED***/disconnect", r.postNetworkDisconnect),
+		router.NewPostRoute("/networks/{id:.*}/connect", r.postNetworkConnect),
+		router.NewPostRoute("/networks/{id:.*}/disconnect", r.postNetworkDisconnect),
 		router.NewPostRoute("/networks/prune", r.postNetworksPrune, router.WithCancel),
 		// DELETE
-		router.NewDeleteRoute("/networks/***REMOVED***id:.****REMOVED***", r.deleteNetwork),
-	***REMOVED***
-***REMOVED***
+		router.NewDeleteRoute("/networks/{id:.*}", r.deleteNetwork),
+	}
+}

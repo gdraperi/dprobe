@@ -8,8 +8,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestStreamWriterStdout(t *testing.T) ***REMOVED***
-	buffer := &bytes.Buffer***REMOVED******REMOVED***
+func TestStreamWriterStdout(t *testing.T) {
+	buffer := &bytes.Buffer{}
 	content := "content"
 	sw := NewStdoutWriter(buffer)
 	size, err := sw.Write([]byte(content))
@@ -17,12 +17,12 @@ func TestStreamWriterStdout(t *testing.T) ***REMOVED***
 	require.NoError(t, err)
 	assert.Equal(t, len(content), size)
 
-	expected := `***REMOVED***"stream":"content"***REMOVED***` + streamNewline
+	expected := `{"stream":"content"}` + streamNewline
 	assert.Equal(t, expected, buffer.String())
-***REMOVED***
+}
 
-func TestStreamWriterStderr(t *testing.T) ***REMOVED***
-	buffer := &bytes.Buffer***REMOVED******REMOVED***
+func TestStreamWriterStderr(t *testing.T) {
+	buffer := &bytes.Buffer{}
 	content := "content"
 	sw := NewStderrWriter(buffer)
 	size, err := sw.Write([]byte(content))
@@ -30,6 +30,6 @@ func TestStreamWriterStderr(t *testing.T) ***REMOVED***
 	require.NoError(t, err)
 	assert.Equal(t, len(content), size)
 
-	expected := `***REMOVED***"stream":"\u001b[91mcontent\u001b[0m"***REMOVED***` + streamNewline
+	expected := `{"stream":"\u001b[91mcontent\u001b[0m"}` + streamNewline
 	assert.Equal(t, expected, buffer.String())
-***REMOVED***
+}

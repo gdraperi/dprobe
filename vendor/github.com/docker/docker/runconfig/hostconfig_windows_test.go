@@ -8,10 +8,10 @@ import (
 	"github.com/docker/docker/api/types/container"
 )
 
-func TestValidatePrivileged(t *testing.T) ***REMOVED***
+func TestValidatePrivileged(t *testing.T) {
 	expected := "Windows does not support privileged mode"
-	err := validatePrivileged(&container.HostConfig***REMOVED***Privileged: true***REMOVED***)
-	if err == nil || err.Error() != expected ***REMOVED***
+	err := validatePrivileged(&container.HostConfig{Privileged: true})
+	if err == nil || err.Error() != expected {
 		t.Fatalf("Expected %s", expected)
-	***REMOVED***
-***REMOVED***
+	}
+}

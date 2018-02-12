@@ -21,16 +21,16 @@ param(
 $ErrorActionPreference = "Stop"
 
 # Utility function to get the build date/time in UTC
-Function Get-BuildDateTime() ***REMOVED***
+Function Get-BuildDateTime() {
     return $(Get-Date).ToUniversalTime()
-***REMOVED***
+}
 
-try ***REMOVED***
+try {
     $buildDateTime=Get-BuildDateTime
 
-    if (Test-Path ".\autogen") ***REMOVED***
+    if (Test-Path ".\autogen") {
         Remove-Item ".\autogen" -Recurse -Force | Out-Null
-***REMOVED***
+    }
 
     $fileContents = '
 // +build autogen
@@ -52,7 +52,7 @@ const (
 
     # Write the file without BOM
     $outputFile="$(pwd)\dockerversion\version_autogen.go"
-    if (Test-Path $outputFile) ***REMOVED*** Remove-Item $outputFile ***REMOVED***
+    if (Test-Path $outputFile) { Remove-Item $outputFile }
     [System.IO.File]::WriteAllText($outputFile, $fileContents, (New-Object System.Text.UTF8Encoding($False)))
 
     New-Item -ItemType Directory -Path "autogen\winresources\tmp" | Out-Null
@@ -66,7 +66,7 @@ const (
 
     # Compile the messages
     windmc hack\make\.resources-windows\event_messages.mc -h autogen\winresources\tmp -r autogen\winresources\tmp
-    if ($LASTEXITCODE -ne 0) ***REMOVED*** Throw "Failed to compile event message resources" ***REMOVED***
+    if ($LASTEXITCODE -ne 0) { Throw "Failed to compile event message resources" }
 
     # If you really want to understand this madness below, search the Internet for powershell variables after verbatim arguments... Needed to get double-quotes passed through to the compiler options.
     # Generate the .syso files containing all the resources and manifest needed to compile the final docker binaries. Both 32 and 64-bit clients.
@@ -74,20 +74,20 @@ const (
     $env:_ag_gitCommit=$CommitString
 
     windres -i hack/make/.resources-windows/docker.rc  -o autogen/winresources/docker/rsrc_amd64.syso  -F pe-x86-64 --use-temp-file -I autogen/winresources/tmp -D DOCKER_VERSION_QUAD=$versionQuad --% -D DOCKER_VERSION=\"%_ag_dockerVersion%\" -D DOCKER_COMMIT=\"%_ag_gitCommit%\"
-    if ($LASTEXITCODE -ne 0) ***REMOVED*** Throw "Failed to compile client 64-bit resources" ***REMOVED***
+    if ($LASTEXITCODE -ne 0) { Throw "Failed to compile client 64-bit resources" }
 
     windres -i hack/make/.resources-windows/docker.rc  -o autogen/winresources/docker/rsrc_386.syso    -F pe-i386   --use-temp-file -I autogen/winresources/tmp -D DOCKER_VERSION_QUAD=$versionQuad --% -D DOCKER_VERSION=\"%_ag_dockerVersion%\" -D DOCKER_COMMIT=\"%_ag_gitCommit%\"
-    if ($LASTEXITCODE -ne 0) ***REMOVED*** Throw "Failed to compile client 32-bit resources" ***REMOVED***
+    if ($LASTEXITCODE -ne 0) { Throw "Failed to compile client 32-bit resources" }
 
     windres -i hack/make/.resources-windows/dockerd.rc -o autogen/winresources/dockerd/rsrc_amd64.syso -F pe-x86-64 --use-temp-file -I autogen/winresources/tmp -D DOCKER_VERSION_QUAD=$versionQuad --% -D DOCKER_VERSION=\"%_ag_dockerVersion%\" -D DOCKER_COMMIT=\"%_ag_gitCommit%\"
-    if ($LASTEXITCODE -ne 0) ***REMOVED*** Throw "Failed to compile daemon resources" ***REMOVED***
-***REMOVED***
-Catch [Exception] ***REMOVED***
+    if ($LASTEXITCODE -ne 0) { Throw "Failed to compile daemon resources" }
+}
+Catch [Exception] {
     # Throw the error onto the caller to display errors. We don't expect this script to be called directly 
     Throw ".go-autogen.ps1 failed with error $_"
-***REMOVED***
-Finally ***REMOVED***
+}
+Finally {
     Remove-Item .\autogen\winresources\tmp -Recurse -Force -ErrorAction SilentlyContinue | Out-Null
     $env:_ag_dockerVersion=""
     $env:_ag_gitCommit=""
-***REMOVED***
+}

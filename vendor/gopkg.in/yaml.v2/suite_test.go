@@ -5,8 +5,8 @@ import (
 	"testing"
 )
 
-func Test(t *testing.T) ***REMOVED*** TestingT(t) ***REMOVED***
+func Test(t *testing.T) { TestingT(t) }
 
-type S struct***REMOVED******REMOVED***
+type S struct{}
 
-var _ = Suite(&S***REMOVED******REMOVED***)
+var _ = Suite(&S{})

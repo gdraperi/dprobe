@@ -45,9 +45,9 @@ var yamlExampleWithExtras = []byte(`Existing: true
 Bogus: true
 `)
 
-type testUnmarshalExtra struct ***REMOVED***
+type testUnmarshalExtra struct {
 	Existing bool
-***REMOVED***
+}
 
 var tomlExample = []byte(`
 title = "TOML Example"
@@ -57,40 +57,40 @@ organization = "MongoDB"
 Bio = "MongoDB Chief Developer Advocate & Hacker at Large"
 dob = 1979-05-27T07:32:00Z # First class dates? Why not?`)
 
-var jsonExample = []byte(`***REMOVED***
+var jsonExample = []byte(`{
 "id": "0001",
 "type": "donut",
 "name": "Cake",
 "ppu": 0.55,
-"batters": ***REMOVED***
+"batters": {
         "batter": [
-                ***REMOVED*** "type": "Regular" ***REMOVED***,
-                ***REMOVED*** "type": "Chocolate" ***REMOVED***,
-                ***REMOVED*** "type": "Blueberry" ***REMOVED***,
-                ***REMOVED*** "type": "Devil's Food" ***REMOVED***
+                { "type": "Regular" },
+                { "type": "Chocolate" },
+                { "type": "Blueberry" },
+                { "type": "Devil's Food" }
             ]
-***REMOVED***
-***REMOVED***`)
+    }
+}`)
 
 var hclExample = []byte(`
 id = "0001"
 type = "donut"
 name = "Cake"
 ppu = 0.55
-foos ***REMOVED***
-	foo ***REMOVED***
+foos {
+	foo {
 		key = 1
-	***REMOVED***
-	foo ***REMOVED***
+	}
+	foo {
 		key = 2
-	***REMOVED***
-	foo ***REMOVED***
+	}
+	foo {
 		key = 3
-	***REMOVED***
-	foo ***REMOVED***
+	}
+	foo {
 		key = 4
-	***REMOVED***
-***REMOVED***`)
+	}
+}`)
 
 var propertiesExample = []byte(`
 p_id: 0001
@@ -100,13 +100,13 @@ p_ppu: 0.55
 p_batters.batter.type: Regular
 `)
 
-var remoteExample = []byte(`***REMOVED***
+var remoteExample = []byte(`{
 "id":"0002",
 "type":"cronut",
 "newkey":"remote"
-***REMOVED***`)
+}`)
 
-func initConfigs() ***REMOVED***
+func initConfigs() {
 	Reset()
 	var r io.Reader
 	SetConfigType("yaml")
@@ -132,78 +132,78 @@ func initConfigs() ***REMOVED***
 	SetConfigType("json")
 	remote := bytes.NewReader(remoteExample)
 	unmarshalReader(remote, v.kvstore)
-***REMOVED***
+}
 
-func initConfig(typ, config string) ***REMOVED***
+func initConfig(typ, config string) {
 	Reset()
 	SetConfigType(typ)
 	r := strings.NewReader(config)
 
-	if err := unmarshalReader(r, v.config); err != nil ***REMOVED***
+	if err := unmarshalReader(r, v.config); err != nil {
 		panic(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func initYAML() ***REMOVED***
+func initYAML() {
 	initConfig("yaml", string(yamlExample))
-***REMOVED***
+}
 
-func initJSON() ***REMOVED***
+func initJSON() {
 	Reset()
 	SetConfigType("json")
 	r := bytes.NewReader(jsonExample)
 
 	unmarshalReader(r, v.config)
-***REMOVED***
+}
 
-func initProperties() ***REMOVED***
+func initProperties() {
 	Reset()
 	SetConfigType("properties")
 	r := bytes.NewReader(propertiesExample)
 
 	unmarshalReader(r, v.config)
-***REMOVED***
+}
 
-func initTOML() ***REMOVED***
+func initTOML() {
 	Reset()
 	SetConfigType("toml")
 	r := bytes.NewReader(tomlExample)
 
 	unmarshalReader(r, v.config)
-***REMOVED***
+}
 
-func initHcl() ***REMOVED***
+func initHcl() {
 	Reset()
 	SetConfigType("hcl")
 	r := bytes.NewReader(hclExample)
 
 	unmarshalReader(r, v.config)
-***REMOVED***
+}
 
 // make directories for testing
-func initDirs(t *testing.T) (string, string, func()) ***REMOVED***
+func initDirs(t *testing.T) (string, string, func()) {
 
 	var (
-		testDirs = []string***REMOVED***`a a`, `b`, `c\c`, `D_`***REMOVED***
+		testDirs = []string{`a a`, `b`, `c\c`, `D_`}
 		config   = `improbable`
 	)
 
 	root, err := ioutil.TempDir("", "")
 
 	cleanup := true
-	defer func() ***REMOVED***
-		if cleanup ***REMOVED***
+	defer func() {
+		if cleanup {
 			os.Chdir("..")
 			os.RemoveAll(root)
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
 	assert.Nil(t, err)
 
 	err = os.Chdir(root)
 	assert.Nil(t, err)
 
-	for _, dir := range testDirs ***REMOVED***
+	for _, dir := range testDirs {
 		err = os.Mkdir(dir, 0750)
 		assert.Nil(t, err)
 
@@ -212,44 +212,44 @@ func initDirs(t *testing.T) (string, string, func()) ***REMOVED***
 			[]byte("key = \"value is "+dir+"\"\n"),
 			0640)
 		assert.Nil(t, err)
-	***REMOVED***
+	}
 
 	cleanup = false
-	return root, config, func() ***REMOVED***
+	return root, config, func() {
 		os.Chdir("..")
 		os.RemoveAll(root)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 //stubs for PFlag Values
 type stringValue string
 
-func newStringValue(val string, p *string) *stringValue ***REMOVED***
+func newStringValue(val string, p *string) *stringValue {
 	*p = val
 	return (*stringValue)(p)
-***REMOVED***
+}
 
-func (s *stringValue) Set(val string) error ***REMOVED***
+func (s *stringValue) Set(val string) error {
 	*s = stringValue(val)
 	return nil
-***REMOVED***
+}
 
-func (s *stringValue) Type() string ***REMOVED***
+func (s *stringValue) Type() string {
 	return "string"
-***REMOVED***
+}
 
-func (s *stringValue) String() string ***REMOVED***
+func (s *stringValue) String() string {
 	return fmt.Sprintf("%s", *s)
-***REMOVED***
+}
 
-func TestBasics(t *testing.T) ***REMOVED***
+func TestBasics(t *testing.T) {
 	SetConfigFile("/tmp/config.yaml")
 	filename, err := v.getConfigFile()
 	assert.Equal(t, "/tmp/config.yaml", filename)
 	assert.NoError(t, err)
-***REMOVED***
+}
 
-func TestDefault(t *testing.T) ***REMOVED***
+func TestDefault(t *testing.T) {
 	SetDefault("age", 45)
 	assert.Equal(t, 45, Get("age"))
 
@@ -261,9 +261,9 @@ func TestDefault(t *testing.T) ***REMOVED***
 
 	assert.NoError(t, err)
 	assert.Equal(t, "leather", Get("clothing.jacket"))
-***REMOVED***
+}
 
-func TestUnmarshaling(t *testing.T) ***REMOVED***
+func TestUnmarshaling(t *testing.T) {
 	SetConfigType("yaml")
 	r := bytes.NewReader(yamlExample)
 
@@ -271,71 +271,71 @@ func TestUnmarshaling(t *testing.T) ***REMOVED***
 	assert.True(t, InConfig("name"))
 	assert.False(t, InConfig("state"))
 	assert.Equal(t, "steve", Get("name"))
-	assert.Equal(t, []interface***REMOVED******REMOVED******REMOVED***"skateboarding", "snowboarding", "go"***REMOVED***, Get("hobbies"))
-	assert.Equal(t, map[string]interface***REMOVED******REMOVED******REMOVED***"jacket": "leather", "trousers": "denim", "pants": map[string]interface***REMOVED******REMOVED******REMOVED***"size": "large"***REMOVED******REMOVED***, Get("clothing"))
+	assert.Equal(t, []interface{}{"skateboarding", "snowboarding", "go"}, Get("hobbies"))
+	assert.Equal(t, map[string]interface{}{"jacket": "leather", "trousers": "denim", "pants": map[string]interface{}{"size": "large"}}, Get("clothing"))
 	assert.Equal(t, 35, Get("age"))
-***REMOVED***
+}
 
-func TestUnmarshalExact(t *testing.T) ***REMOVED***
+func TestUnmarshalExact(t *testing.T) {
 	vip := New()
-	target := &testUnmarshalExtra***REMOVED******REMOVED***
+	target := &testUnmarshalExtra{}
 	vip.SetConfigType("yaml")
 	r := bytes.NewReader(yamlExampleWithExtras)
 	vip.ReadConfig(r)
 	err := vip.UnmarshalExact(target)
-	if err == nil ***REMOVED***
+	if err == nil {
 		t.Fatal("UnmarshalExact should error when populating a struct from a conf that contains unused fields")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestOverrides(t *testing.T) ***REMOVED***
+func TestOverrides(t *testing.T) {
 	Set("age", 40)
 	assert.Equal(t, 40, Get("age"))
-***REMOVED***
+}
 
-func TestDefaultPost(t *testing.T) ***REMOVED***
+func TestDefaultPost(t *testing.T) {
 	assert.NotEqual(t, "NYC", Get("state"))
 	SetDefault("state", "NYC")
 	assert.Equal(t, "NYC", Get("state"))
-***REMOVED***
+}
 
-func TestAliases(t *testing.T) ***REMOVED***
+func TestAliases(t *testing.T) {
 	RegisterAlias("years", "age")
 	assert.Equal(t, 40, Get("years"))
 	Set("years", 45)
 	assert.Equal(t, 45, Get("age"))
-***REMOVED***
+}
 
-func TestAliasInConfigFile(t *testing.T) ***REMOVED***
+func TestAliasInConfigFile(t *testing.T) {
 	// the config file specifies "beard".  If we make this an alias for
 	// "hasbeard", we still want the old config file to work with beard.
 	RegisterAlias("beard", "hasbeard")
 	assert.Equal(t, true, Get("hasbeard"))
 	Set("hasbeard", false)
 	assert.Equal(t, false, Get("beard"))
-***REMOVED***
+}
 
-func TestYML(t *testing.T) ***REMOVED***
+func TestYML(t *testing.T) {
 	initYAML()
 	assert.Equal(t, "steve", Get("name"))
-***REMOVED***
+}
 
-func TestJSON(t *testing.T) ***REMOVED***
+func TestJSON(t *testing.T) {
 	initJSON()
 	assert.Equal(t, "0001", Get("id"))
-***REMOVED***
+}
 
-func TestProperties(t *testing.T) ***REMOVED***
+func TestProperties(t *testing.T) {
 	initProperties()
 	assert.Equal(t, "0001", Get("p_id"))
-***REMOVED***
+}
 
-func TestTOML(t *testing.T) ***REMOVED***
+func TestTOML(t *testing.T) {
 	initTOML()
 	assert.Equal(t, "TOML Example", Get("title"))
-***REMOVED***
+}
 
-func TestHCL(t *testing.T) ***REMOVED***
+func TestHCL(t *testing.T) {
 	initHcl()
 	assert.Equal(t, "0001", Get("id"))
 	assert.Equal(t, 0.55, Get("ppu"))
@@ -344,9 +344,9 @@ func TestHCL(t *testing.T) ***REMOVED***
 	Set("id", "0002")
 	assert.Equal(t, "0002", Get("id"))
 	assert.NotEqual(t, "cronut", Get("type"))
-***REMOVED***
+}
 
-func TestRemotePrecedence(t *testing.T) ***REMOVED***
+func TestRemotePrecedence(t *testing.T) {
 	initJSON()
 
 	remote := bytes.NewReader(remoteExample)
@@ -359,9 +359,9 @@ func TestRemotePrecedence(t *testing.T) ***REMOVED***
 	assert.NotEqual(t, "remote", Get("newkey"))
 	assert.Equal(t, "newvalue", Get("newkey"))
 	Set("newkey", "remote")
-***REMOVED***
+}
 
-func TestEnv(t *testing.T) ***REMOVED***
+func TestEnv(t *testing.T) {
 	initJSON()
 
 	BindEnv("id")
@@ -379,9 +379,9 @@ func TestEnv(t *testing.T) ***REMOVED***
 
 	assert.Equal(t, "crunk", Get("name"))
 
-***REMOVED***
+}
 
-func TestEnvPrefix(t *testing.T) ***REMOVED***
+func TestEnvPrefix(t *testing.T) {
 	initJSON()
 
 	SetEnvPrefix("foo") // will be uppercased automatically
@@ -399,26 +399,26 @@ func TestEnvPrefix(t *testing.T) ***REMOVED***
 	AutomaticEnv()
 
 	assert.Equal(t, "crunk", Get("name"))
-***REMOVED***
+}
 
-func TestAutoEnv(t *testing.T) ***REMOVED***
+func TestAutoEnv(t *testing.T) {
 	Reset()
 
 	AutomaticEnv()
 	os.Setenv("FOO_BAR", "13")
 	assert.Equal(t, "13", Get("foo_bar"))
-***REMOVED***
+}
 
-func TestAutoEnvWithPrefix(t *testing.T) ***REMOVED***
+func TestAutoEnvWithPrefix(t *testing.T) {
 	Reset()
 
 	AutomaticEnv()
 	SetEnvPrefix("Baz")
 	os.Setenv("BAZ_BAR", "13")
 	assert.Equal(t, "13", Get("bar"))
-***REMOVED***
+}
 
-func TestSetEnvKeyReplacer(t *testing.T) ***REMOVED***
+func TestSetEnvKeyReplacer(t *testing.T) {
 	Reset()
 
 	AutomaticEnv()
@@ -428,14 +428,14 @@ func TestSetEnvKeyReplacer(t *testing.T) ***REMOVED***
 	SetEnvKeyReplacer(replacer)
 
 	assert.Equal(t, "30s", Get("refresh-interval"))
-***REMOVED***
+}
 
-func TestAllKeys(t *testing.T) ***REMOVED***
+func TestAllKeys(t *testing.T) {
 	initConfigs()
 
-	ks := sort.StringSlice***REMOVED***"title", "newkey", "owner.organization", "owner.dob", "owner.bio", "name", "beard", "ppu", "batters.batter", "hobbies", "clothing.jacket", "clothing.trousers", "clothing.pants.size", "age", "hacker", "id", "type", "eyes", "p_id", "p_ppu", "p_batters.batter.type", "p_type", "p_name", "foos"***REMOVED***
+	ks := sort.StringSlice{"title", "newkey", "owner.organization", "owner.dob", "owner.bio", "name", "beard", "ppu", "batters.batter", "hobbies", "clothing.jacket", "clothing.trousers", "clothing.pants.size", "age", "hacker", "id", "type", "eyes", "p_id", "p_ppu", "p_batters.batter.type", "p_type", "p_name", "foos"}
 	dob, _ := time.Parse(time.RFC3339, "1979-05-27T07:32:00Z")
-	all := map[string]interface***REMOVED******REMOVED******REMOVED***"owner": map[string]interface***REMOVED******REMOVED******REMOVED***"organization": "MongoDB", "bio": "MongoDB Chief Developer Advocate & Hacker at Large", "dob": dob***REMOVED***, "title": "TOML Example", "ppu": 0.55, "eyes": "brown", "clothing": map[string]interface***REMOVED******REMOVED******REMOVED***"trousers": "denim", "jacket": "leather", "pants": map[string]interface***REMOVED******REMOVED******REMOVED***"size": "large"***REMOVED******REMOVED***, "id": "0001", "batters": map[string]interface***REMOVED******REMOVED******REMOVED***"batter": []interface***REMOVED******REMOVED******REMOVED***map[string]interface***REMOVED******REMOVED******REMOVED***"type": "Regular"***REMOVED***, map[string]interface***REMOVED******REMOVED******REMOVED***"type": "Chocolate"***REMOVED***, map[string]interface***REMOVED******REMOVED******REMOVED***"type": "Blueberry"***REMOVED***, map[string]interface***REMOVED******REMOVED******REMOVED***"type": "Devil's Food"***REMOVED******REMOVED******REMOVED***, "hacker": true, "beard": true, "hobbies": []interface***REMOVED******REMOVED******REMOVED***"skateboarding", "snowboarding", "go"***REMOVED***, "age": 35, "type": "donut", "newkey": "remote", "name": "Cake", "p_id": "0001", "p_ppu": "0.55", "p_name": "Cake", "p_batters": map[string]interface***REMOVED******REMOVED******REMOVED***"batter": map[string]interface***REMOVED******REMOVED******REMOVED***"type": "Regular"***REMOVED******REMOVED***, "p_type": "donut", "foos": []map[string]interface***REMOVED******REMOVED******REMOVED***map[string]interface***REMOVED******REMOVED******REMOVED***"foo": []map[string]interface***REMOVED******REMOVED******REMOVED***map[string]interface***REMOVED******REMOVED******REMOVED***"key": 1***REMOVED***, map[string]interface***REMOVED******REMOVED******REMOVED***"key": 2***REMOVED***, map[string]interface***REMOVED******REMOVED******REMOVED***"key": 3***REMOVED***, map[string]interface***REMOVED******REMOVED******REMOVED***"key": 4***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***
+	all := map[string]interface{}{"owner": map[string]interface{}{"organization": "MongoDB", "bio": "MongoDB Chief Developer Advocate & Hacker at Large", "dob": dob}, "title": "TOML Example", "ppu": 0.55, "eyes": "brown", "clothing": map[string]interface{}{"trousers": "denim", "jacket": "leather", "pants": map[string]interface{}{"size": "large"}}, "id": "0001", "batters": map[string]interface{}{"batter": []interface{}{map[string]interface{}{"type": "Regular"}, map[string]interface{}{"type": "Chocolate"}, map[string]interface{}{"type": "Blueberry"}, map[string]interface{}{"type": "Devil's Food"}}}, "hacker": true, "beard": true, "hobbies": []interface{}{"skateboarding", "snowboarding", "go"}, "age": 35, "type": "donut", "newkey": "remote", "name": "Cake", "p_id": "0001", "p_ppu": "0.55", "p_name": "Cake", "p_batters": map[string]interface{}{"batter": map[string]interface{}{"type": "Regular"}}, "p_type": "donut", "foos": []map[string]interface{}{map[string]interface{}{"foo": []map[string]interface{}{map[string]interface{}{"key": 1}, map[string]interface{}{"key": 2}, map[string]interface{}{"key": 3}, map[string]interface{}{"key": 4}}}}}
 
 	var allkeys sort.StringSlice
 	allkeys = AllKeys()
@@ -444,9 +444,9 @@ func TestAllKeys(t *testing.T) ***REMOVED***
 
 	assert.Equal(t, ks, allkeys)
 	assert.Equal(t, all, AllSettings())
-***REMOVED***
+}
 
-func TestAllKeysWithEnv(t *testing.T) ***REMOVED***
+func TestAllKeysWithEnv(t *testing.T) {
 	v := New()
 
 	// bind and define environment variables (including a nested one)
@@ -456,136 +456,136 @@ func TestAllKeysWithEnv(t *testing.T) ***REMOVED***
 	os.Setenv("ID", "13")
 	os.Setenv("FOO_BAR", "baz")
 
-	expectedKeys := sort.StringSlice***REMOVED***"id", "foo.bar"***REMOVED***
+	expectedKeys := sort.StringSlice{"id", "foo.bar"}
 	expectedKeys.Sort()
 	keys := sort.StringSlice(v.AllKeys())
 	keys.Sort()
 	assert.Equal(t, expectedKeys, keys)
-***REMOVED***
+}
 
-func TestAliasesOfAliases(t *testing.T) ***REMOVED***
+func TestAliasesOfAliases(t *testing.T) {
 	Set("Title", "Checking Case")
 	RegisterAlias("Foo", "Bar")
 	RegisterAlias("Bar", "Title")
 	assert.Equal(t, "Checking Case", Get("FOO"))
-***REMOVED***
+}
 
-func TestRecursiveAliases(t *testing.T) ***REMOVED***
+func TestRecursiveAliases(t *testing.T) {
 	RegisterAlias("Baz", "Roo")
 	RegisterAlias("Roo", "baz")
-***REMOVED***
+}
 
-func TestUnmarshal(t *testing.T) ***REMOVED***
+func TestUnmarshal(t *testing.T) {
 	SetDefault("port", 1313)
 	Set("name", "Steve")
 	Set("duration", "1s1ms")
 
-	type config struct ***REMOVED***
+	type config struct {
 		Port     int
 		Name     string
 		Duration time.Duration
-	***REMOVED***
+	}
 
 	var C config
 
 	err := Unmarshal(&C)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("unable to decode into struct, %v", err)
-	***REMOVED***
+	}
 
-	assert.Equal(t, &config***REMOVED***Name: "Steve", Port: 1313, Duration: time.Second + time.Millisecond***REMOVED***, &C)
+	assert.Equal(t, &config{Name: "Steve", Port: 1313, Duration: time.Second + time.Millisecond}, &C)
 
 	Set("port", 1234)
 	err = Unmarshal(&C)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("unable to decode into struct, %v", err)
-	***REMOVED***
-	assert.Equal(t, &config***REMOVED***Name: "Steve", Port: 1234, Duration: time.Second + time.Millisecond***REMOVED***, &C)
-***REMOVED***
+	}
+	assert.Equal(t, &config{Name: "Steve", Port: 1234, Duration: time.Second + time.Millisecond}, &C)
+}
 
-func TestBindPFlags(t *testing.T) ***REMOVED***
+func TestBindPFlags(t *testing.T) {
 	v := New() // create independent Viper object
 	flagSet := pflag.NewFlagSet("test", pflag.ContinueOnError)
 
-	var testValues = map[string]*string***REMOVED***
+	var testValues = map[string]*string{
 		"host":     nil,
 		"port":     nil,
 		"endpoint": nil,
-	***REMOVED***
+	}
 
-	var mutatedTestValues = map[string]string***REMOVED***
+	var mutatedTestValues = map[string]string{
 		"host":     "localhost",
 		"port":     "6060",
 		"endpoint": "/public",
-	***REMOVED***
+	}
 
-	for name := range testValues ***REMOVED***
+	for name := range testValues {
 		testValues[name] = flagSet.String(name, "", "test")
-	***REMOVED***
+	}
 
 	err := v.BindPFlags(flagSet)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("error binding flag set, %v", err)
-	***REMOVED***
+	}
 
-	flagSet.VisitAll(func(flag *pflag.Flag) ***REMOVED***
+	flagSet.VisitAll(func(flag *pflag.Flag) {
 		flag.Value.Set(mutatedTestValues[flag.Name])
 		flag.Changed = true
-	***REMOVED***)
+	})
 
-	for name, expected := range mutatedTestValues ***REMOVED***
+	for name, expected := range mutatedTestValues {
 		assert.Equal(t, expected, v.Get(name))
-	***REMOVED***
+	}
 
-***REMOVED***
+}
 
-func TestBindPFlagsStringSlice(t *testing.T) ***REMOVED***
-	for _, testValue := range []struct ***REMOVED***
+func TestBindPFlagsStringSlice(t *testing.T) {
+	for _, testValue := range []struct {
 		Expected []string
 		Value    string
-	***REMOVED******REMOVED***
-		***REMOVED***[]string***REMOVED******REMOVED***, ""***REMOVED***,
-		***REMOVED***[]string***REMOVED***"jeden"***REMOVED***, "jeden"***REMOVED***,
-		***REMOVED***[]string***REMOVED***"dwa", "trzy"***REMOVED***, "dwa,trzy"***REMOVED***,
-		***REMOVED***[]string***REMOVED***"cztery", "piec , szesc"***REMOVED***, "cztery,\"piec , szesc\""***REMOVED******REMOVED*** ***REMOVED***
+	}{
+		{[]string{}, ""},
+		{[]string{"jeden"}, "jeden"},
+		{[]string{"dwa", "trzy"}, "dwa,trzy"},
+		{[]string{"cztery", "piec , szesc"}, "cztery,\"piec , szesc\""}} {
 
-		for _, changed := range []bool***REMOVED***true, false***REMOVED*** ***REMOVED***
+		for _, changed := range []bool{true, false} {
 			v := New() // create independent Viper object
 			flagSet := pflag.NewFlagSet("test", pflag.ContinueOnError)
 			flagSet.StringSlice("stringslice", testValue.Expected, "test")
-			flagSet.Visit(func(f *pflag.Flag) ***REMOVED***
-				if len(testValue.Value) > 0 ***REMOVED***
+			flagSet.Visit(func(f *pflag.Flag) {
+				if len(testValue.Value) > 0 {
 					f.Value.Set(testValue.Value)
 					f.Changed = changed
-				***REMOVED***
-			***REMOVED***)
+				}
+			})
 
 			err := v.BindPFlags(flagSet)
-			if err != nil ***REMOVED***
+			if err != nil {
 				t.Fatalf("error binding flag set, %v", err)
-			***REMOVED***
+			}
 
-			type TestStr struct ***REMOVED***
+			type TestStr struct {
 				StringSlice []string
-			***REMOVED***
-			val := &TestStr***REMOVED******REMOVED***
-			if err := v.Unmarshal(val); err != nil ***REMOVED***
+			}
+			val := &TestStr{}
+			if err := v.Unmarshal(val); err != nil {
 				t.Fatalf("%+#v cannot unmarshal: %s", testValue.Value, err)
-			***REMOVED***
+			}
 			assert.Equal(t, testValue.Expected, val.StringSlice)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestBindPFlag(t *testing.T) ***REMOVED***
+func TestBindPFlag(t *testing.T) {
 	var testString = "testing"
 	var testValue = newStringValue(testString, &testString)
 
-	flag := &pflag.Flag***REMOVED***
+	flag := &pflag.Flag{
 		Name:    "testflag",
 		Value:   testValue,
 		Changed: false,
-	***REMOVED***
+	}
 
 	BindPFlag("testvalue", flag)
 
@@ -596,9 +596,9 @@ func TestBindPFlag(t *testing.T) ***REMOVED***
 
 	assert.Equal(t, "testing_mutate", Get("testvalue"))
 
-***REMOVED***
+}
 
-func TestBoundCaseSensitivity(t *testing.T) ***REMOVED***
+func TestBoundCaseSensitivity(t *testing.T) {
 	assert.Equal(t, "brown", Get("eyes"))
 
 	BindEnv("eYEs", "TURTLE_EYES")
@@ -609,19 +609,19 @@ func TestBoundCaseSensitivity(t *testing.T) ***REMOVED***
 	var testString = "green"
 	var testValue = newStringValue(testString, &testString)
 
-	flag := &pflag.Flag***REMOVED***
+	flag := &pflag.Flag{
 		Name:    "eyeballs",
 		Value:   testValue,
 		Changed: true,
-	***REMOVED***
+	}
 
 	BindPFlag("eYEs", flag)
 	assert.Equal(t, "green", Get("eyes"))
 
-***REMOVED***
+}
 
-func TestSizeInBytes(t *testing.T) ***REMOVED***
-	input := map[string]uint***REMOVED***
+func TestSizeInBytes(t *testing.T) {
+	input := map[string]uint{
 		"":               0,
 		"b":              0,
 		"12 bytes":       0,
@@ -630,120 +630,120 @@ func TestSizeInBytes(t *testing.T) ***REMOVED***
 		"43 MB":          43 * (1 << 20),
 		"10mb":           10 * (1 << 20),
 		"1gb":            1 << 30,
-	***REMOVED***
+	}
 
-	for str, expected := range input ***REMOVED***
+	for str, expected := range input {
 		assert.Equal(t, expected, parseSizeInBytes(str), str)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestFindsNestedKeys(t *testing.T) ***REMOVED***
+func TestFindsNestedKeys(t *testing.T) {
 	initConfigs()
 	dob, _ := time.Parse(time.RFC3339, "1979-05-27T07:32:00Z")
 
-	Set("super", map[string]interface***REMOVED******REMOVED******REMOVED***
-		"deep": map[string]interface***REMOVED******REMOVED******REMOVED***
+	Set("super", map[string]interface{}{
+		"deep": map[string]interface{}{
 			"nested": "value",
-		***REMOVED***,
-	***REMOVED***)
+		},
+	})
 
-	expected := map[string]interface***REMOVED******REMOVED******REMOVED***
-		"super": map[string]interface***REMOVED******REMOVED******REMOVED***
-			"deep": map[string]interface***REMOVED******REMOVED******REMOVED***
+	expected := map[string]interface{}{
+		"super": map[string]interface{}{
+			"deep": map[string]interface{}{
 				"nested": "value",
-			***REMOVED***,
-		***REMOVED***,
-		"super.deep": map[string]interface***REMOVED******REMOVED******REMOVED***
+			},
+		},
+		"super.deep": map[string]interface{}{
 			"nested": "value",
-		***REMOVED***,
+		},
 		"super.deep.nested":  "value",
 		"owner.organization": "MongoDB",
-		"batters.batter": []interface***REMOVED******REMOVED******REMOVED***
-			map[string]interface***REMOVED******REMOVED******REMOVED***
+		"batters.batter": []interface{}{
+			map[string]interface{}{
 				"type": "Regular",
-			***REMOVED***,
-			map[string]interface***REMOVED******REMOVED******REMOVED***
+			},
+			map[string]interface{}{
 				"type": "Chocolate",
-			***REMOVED***,
-			map[string]interface***REMOVED******REMOVED******REMOVED***
+			},
+			map[string]interface{}{
 				"type": "Blueberry",
-			***REMOVED***,
-			map[string]interface***REMOVED******REMOVED******REMOVED***
+			},
+			map[string]interface{}{
 				"type": "Devil's Food",
-			***REMOVED***,
-		***REMOVED***,
-		"hobbies": []interface***REMOVED******REMOVED******REMOVED***
+			},
+		},
+		"hobbies": []interface{}{
 			"skateboarding", "snowboarding", "go",
-		***REMOVED***,
+		},
 		"title":  "TOML Example",
 		"newkey": "remote",
-		"batters": map[string]interface***REMOVED******REMOVED******REMOVED***
-			"batter": []interface***REMOVED******REMOVED******REMOVED***
-				map[string]interface***REMOVED******REMOVED******REMOVED***
+		"batters": map[string]interface{}{
+			"batter": []interface{}{
+				map[string]interface{}{
 					"type": "Regular",
-				***REMOVED***,
-				map[string]interface***REMOVED******REMOVED******REMOVED***
+				},
+				map[string]interface{}{
 					"type": "Chocolate",
-				***REMOVED***, map[string]interface***REMOVED******REMOVED******REMOVED***
+				}, map[string]interface{}{
 					"type": "Blueberry",
-				***REMOVED***, map[string]interface***REMOVED******REMOVED******REMOVED***
+				}, map[string]interface{}{
 					"type": "Devil's Food",
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
+				},
+			},
+		},
 		"eyes": "brown",
 		"age":  35,
-		"owner": map[string]interface***REMOVED******REMOVED******REMOVED***
+		"owner": map[string]interface{}{
 			"organization": "MongoDB",
 			"bio":          "MongoDB Chief Developer Advocate & Hacker at Large",
 			"dob":          dob,
-		***REMOVED***,
+		},
 		"owner.bio": "MongoDB Chief Developer Advocate & Hacker at Large",
 		"type":      "donut",
 		"id":        "0001",
 		"name":      "Cake",
 		"hacker":    true,
 		"ppu":       0.55,
-		"clothing": map[string]interface***REMOVED******REMOVED******REMOVED***
+		"clothing": map[string]interface{}{
 			"jacket":   "leather",
 			"trousers": "denim",
-			"pants": map[string]interface***REMOVED******REMOVED******REMOVED***
+			"pants": map[string]interface{}{
 				"size": "large",
-			***REMOVED***,
-		***REMOVED***,
+			},
+		},
 		"clothing.jacket":     "leather",
 		"clothing.pants.size": "large",
 		"clothing.trousers":   "denim",
 		"owner.dob":           dob,
 		"beard":               true,
-		"foos": []map[string]interface***REMOVED******REMOVED******REMOVED***
-			map[string]interface***REMOVED******REMOVED******REMOVED***
-				"foo": []map[string]interface***REMOVED******REMOVED******REMOVED***
-					map[string]interface***REMOVED******REMOVED******REMOVED***
+		"foos": []map[string]interface{}{
+			map[string]interface{}{
+				"foo": []map[string]interface{}{
+					map[string]interface{}{
 						"key": 1,
-					***REMOVED***,
-					map[string]interface***REMOVED******REMOVED******REMOVED***
+					},
+					map[string]interface{}{
 						"key": 2,
-					***REMOVED***,
-					map[string]interface***REMOVED******REMOVED******REMOVED***
+					},
+					map[string]interface{}{
 						"key": 3,
-					***REMOVED***,
-					map[string]interface***REMOVED******REMOVED******REMOVED***
+					},
+					map[string]interface{}{
 						"key": 4,
-					***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+					},
+				},
+			},
+		},
+	}
 
-	for key, expectedValue := range expected ***REMOVED***
+	for key, expectedValue := range expected {
 
 		assert.Equal(t, expectedValue, v.Get(key))
-	***REMOVED***
+	}
 
-***REMOVED***
+}
 
-func TestReadBufConfig(t *testing.T) ***REMOVED***
+func TestReadBufConfig(t *testing.T) {
 	v := New()
 	v.SetConfigType("yaml")
 	v.ReadConfig(bytes.NewBuffer(yamlExample))
@@ -752,12 +752,12 @@ func TestReadBufConfig(t *testing.T) ***REMOVED***
 	assert.True(t, v.InConfig("name"))
 	assert.False(t, v.InConfig("state"))
 	assert.Equal(t, "steve", v.Get("name"))
-	assert.Equal(t, []interface***REMOVED******REMOVED******REMOVED***"skateboarding", "snowboarding", "go"***REMOVED***, v.Get("hobbies"))
-	assert.Equal(t, map[string]interface***REMOVED******REMOVED******REMOVED***"jacket": "leather", "trousers": "denim", "pants": map[string]interface***REMOVED******REMOVED******REMOVED***"size": "large"***REMOVED******REMOVED***, v.Get("clothing"))
+	assert.Equal(t, []interface{}{"skateboarding", "snowboarding", "go"}, v.Get("hobbies"))
+	assert.Equal(t, map[string]interface{}{"jacket": "leather", "trousers": "denim", "pants": map[string]interface{}{"size": "large"}}, v.Get("clothing"))
 	assert.Equal(t, 35, v.Get("age"))
-***REMOVED***
+}
 
-func TestIsSet(t *testing.T) ***REMOVED***
+func TestIsSet(t *testing.T) {
 	v := New()
 	v.SetConfigType("yaml")
 	v.ReadConfig(bytes.NewBuffer(yamlExample))
@@ -766,9 +766,9 @@ func TestIsSet(t *testing.T) ***REMOVED***
 	assert.False(t, v.IsSet("helloworld"))
 	v.Set("helloworld", "fubar")
 	assert.True(t, v.IsSet("helloworld"))
-***REMOVED***
+}
 
-func TestDirsSearch(t *testing.T) ***REMOVED***
+func TestDirsSearch(t *testing.T) {
 
 	root, config, cleanup := initDirs(t)
 	defer cleanup()
@@ -778,19 +778,19 @@ func TestDirsSearch(t *testing.T) ***REMOVED***
 	v.SetDefault(`key`, `default`)
 
 	entries, err := ioutil.ReadDir(root)
-	for _, e := range entries ***REMOVED***
-		if e.IsDir() ***REMOVED***
+	for _, e := range entries {
+		if e.IsDir() {
 			v.AddConfigPath(e.Name())
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	err = v.ReadInConfig()
 	assert.Nil(t, err)
 
 	assert.Equal(t, `value is `+path.Base(v.configPaths[0]), v.GetString(`key`))
-***REMOVED***
+}
 
-func TestWrongDirsSearchNotFound(t *testing.T) ***REMOVED***
+func TestWrongDirsSearchNotFound(t *testing.T) {
 
 	_, config, cleanup := initDirs(t)
 	defer cleanup()
@@ -803,14 +803,14 @@ func TestWrongDirsSearchNotFound(t *testing.T) ***REMOVED***
 	v.AddConfigPath(`thispathaintthere`)
 
 	err := v.ReadInConfig()
-	assert.Equal(t, reflect.TypeOf(ConfigFileNotFoundError***REMOVED***"", ""***REMOVED***), reflect.TypeOf(err))
+	assert.Equal(t, reflect.TypeOf(ConfigFileNotFoundError{"", ""}), reflect.TypeOf(err))
 
 	// Even though config did not load and the error might have
 	// been ignored by the client, the default still loads
 	assert.Equal(t, `default`, v.GetString(`key`))
-***REMOVED***
+}
 
-func TestWrongDirsSearchNotFoundForMerge(t *testing.T) ***REMOVED***
+func TestWrongDirsSearchNotFoundForMerge(t *testing.T) {
 
 	_, config, cleanup := initDirs(t)
 	defer cleanup()
@@ -823,14 +823,14 @@ func TestWrongDirsSearchNotFoundForMerge(t *testing.T) ***REMOVED***
 	v.AddConfigPath(`thispathaintthere`)
 
 	err := v.MergeInConfig()
-	assert.Equal(t, reflect.TypeOf(ConfigFileNotFoundError***REMOVED***"", ""***REMOVED***), reflect.TypeOf(err))
+	assert.Equal(t, reflect.TypeOf(ConfigFileNotFoundError{"", ""}), reflect.TypeOf(err))
 
 	// Even though config did not load and the error might have
 	// been ignored by the client, the default still loads
 	assert.Equal(t, `default`, v.GetString(`key`))
-***REMOVED***
+}
 
-func TestSub(t *testing.T) ***REMOVED***
+func TestSub(t *testing.T) {
 	v := New()
 	v.SetConfigType("yaml")
 	v.ReadConfig(bytes.NewBuffer(yamlExample))
@@ -846,25 +846,25 @@ func TestSub(t *testing.T) ***REMOVED***
 
 	subv = v.Sub("missing.key")
 	assert.Equal(t, (*Viper)(nil), subv)
-***REMOVED***
+}
 
-var hclWriteExpected = []byte(`"foos" = ***REMOVED***
-  "foo" = ***REMOVED***
+var hclWriteExpected = []byte(`"foos" = {
+  "foo" = {
     "key" = 1
-  ***REMOVED***
+  }
 
-  "foo" = ***REMOVED***
+  "foo" = {
     "key" = 2
-  ***REMOVED***
+  }
 
-  "foo" = ***REMOVED***
+  "foo" = {
     "key" = 3
-  ***REMOVED***
+  }
 
-  "foo" = ***REMOVED***
+  "foo" = {
     "key" = 4
-  ***REMOVED***
-***REMOVED***
+  }
+}
 
 "id" = "0001"
 
@@ -874,68 +874,68 @@ var hclWriteExpected = []byte(`"foos" = ***REMOVED***
 
 "type" = "donut"`)
 
-func TestWriteConfigHCL(t *testing.T) ***REMOVED***
+func TestWriteConfigHCL(t *testing.T) {
 	v := New()
 	fs := afero.NewMemMapFs()
 	v.SetFs(fs)
 	v.SetConfigName("c")
 	v.SetConfigType("hcl")
 	err := v.ReadConfig(bytes.NewBuffer(hclExample))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if err := v.WriteConfigAs("c.hcl"); err != nil ***REMOVED***
+	}
+	if err := v.WriteConfigAs("c.hcl"); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	read, err := afero.ReadFile(fs, "c.hcl")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	assert.Equal(t, hclWriteExpected, read)
-***REMOVED***
+}
 
-var jsonWriteExpected = []byte(`***REMOVED***
-  "batters": ***REMOVED***
+var jsonWriteExpected = []byte(`{
+  "batters": {
     "batter": [
-      ***REMOVED***
+      {
         "type": "Regular"
-  ***REMOVED***,
-      ***REMOVED***
+      },
+      {
         "type": "Chocolate"
-  ***REMOVED***,
-      ***REMOVED***
+      },
+      {
         "type": "Blueberry"
-  ***REMOVED***,
-      ***REMOVED***
+      },
+      {
         "type": "Devil's Food"
-  ***REMOVED***
+      }
     ]
-  ***REMOVED***,
+  },
   "id": "0001",
   "name": "Cake",
   "ppu": 0.55,
   "type": "donut"
-***REMOVED***`)
+}`)
 
-func TestWriteConfigJson(t *testing.T) ***REMOVED***
+func TestWriteConfigJson(t *testing.T) {
 	v := New()
 	fs := afero.NewMemMapFs()
 	v.SetFs(fs)
 	v.SetConfigName("c")
 	v.SetConfigType("json")
 	err := v.ReadConfig(bytes.NewBuffer(jsonExample))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if err := v.WriteConfigAs("c.json"); err != nil ***REMOVED***
+	}
+	if err := v.WriteConfigAs("c.json"); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	read, err := afero.ReadFile(fs, "c.json")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	assert.Equal(t, jsonWriteExpected, read)
-***REMOVED***
+}
 
 var propertiesWriteExpected = []byte(`p_id = 0001
 p_type = donut
@@ -944,39 +944,39 @@ p_ppu = 0.55
 p_batters.batter.type = Regular
 `)
 
-func TestWriteConfigProperties(t *testing.T) ***REMOVED***
+func TestWriteConfigProperties(t *testing.T) {
 	v := New()
 	fs := afero.NewMemMapFs()
 	v.SetFs(fs)
 	v.SetConfigName("c")
 	v.SetConfigType("properties")
 	err := v.ReadConfig(bytes.NewBuffer(propertiesExample))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if err := v.WriteConfigAs("c.properties"); err != nil ***REMOVED***
+	}
+	if err := v.WriteConfigAs("c.properties"); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	read, err := afero.ReadFile(fs, "c.properties")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	assert.Equal(t, propertiesWriteExpected, read)
-***REMOVED***
+}
 
-func TestWriteConfigTOML(t *testing.T) ***REMOVED***
+func TestWriteConfigTOML(t *testing.T) {
 	fs := afero.NewMemMapFs()
 	v := New()
 	v.SetFs(fs)
 	v.SetConfigName("c")
 	v.SetConfigType("toml")
 	err := v.ReadConfig(bytes.NewBuffer(tomlExample))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if err := v.WriteConfigAs("c.toml"); err != nil ***REMOVED***
+	}
+	if err := v.WriteConfigAs("c.toml"); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	// The TOML String method does not order the contents.
 	// Therefore, we must read the generated file and compare the data.
@@ -986,15 +986,15 @@ func TestWriteConfigTOML(t *testing.T) ***REMOVED***
 	v2.SetConfigType("toml")
 	v2.SetConfigFile("c.toml")
 	err = v2.ReadInConfig()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	assert.Equal(t, v.GetString("title"), v2.GetString("title"))
 	assert.Equal(t, v.GetString("owner.bio"), v2.GetString("owner.bio"))
 	assert.Equal(t, v.GetString("owner.dob"), v2.GetString("owner.dob"))
 	assert.Equal(t, v.GetString("owner.organization"), v2.GetString("owner.organization"))
-***REMOVED***
+}
 
 var yamlWriteExpected = []byte(`age: 35
 beard: true
@@ -1012,25 +1012,25 @@ hobbies:
 name: steve
 `)
 
-func TestWriteConfigYAML(t *testing.T) ***REMOVED***
+func TestWriteConfigYAML(t *testing.T) {
 	v := New()
 	fs := afero.NewMemMapFs()
 	v.SetFs(fs)
 	v.SetConfigName("c")
 	v.SetConfigType("yaml")
 	err := v.ReadConfig(bytes.NewBuffer(yamlExample))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if err := v.WriteConfigAs("c.yaml"); err != nil ***REMOVED***
+	}
+	if err := v.WriteConfigAs("c.yaml"); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	read, err := afero.ReadFile(fs, "c.yaml")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	assert.Equal(t, yamlWriteExpected, read)
-***REMOVED***
+}
 
 var yamlMergeExampleTgt = []byte(`
 hello:
@@ -1053,103 +1053,103 @@ hello:
 fu: bar
 `)
 
-func TestMergeConfig(t *testing.T) ***REMOVED***
+func TestMergeConfig(t *testing.T) {
 	v := New()
 	v.SetConfigType("yml")
-	if err := v.ReadConfig(bytes.NewBuffer(yamlMergeExampleTgt)); err != nil ***REMOVED***
+	if err := v.ReadConfig(bytes.NewBuffer(yamlMergeExampleTgt)); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if pop := v.GetInt("hello.pop"); pop != 37890 ***REMOVED***
+	if pop := v.GetInt("hello.pop"); pop != 37890 {
 		t.Fatalf("pop != 37890, = %d", pop)
-	***REMOVED***
+	}
 
-	if pop := v.GetInt("hello.lagrenum"); pop != 765432101234567 ***REMOVED***
+	if pop := v.GetInt("hello.lagrenum"); pop != 765432101234567 {
 		t.Fatalf("lagrenum != 765432101234567, = %d", pop)
-	***REMOVED***
+	}
 
-	if pop := v.GetInt64("hello.lagrenum"); pop != int64(765432101234567) ***REMOVED***
+	if pop := v.GetInt64("hello.lagrenum"); pop != int64(765432101234567) {
 		t.Fatalf("int64 lagrenum != 765432101234567, = %d", pop)
-	***REMOVED***
+	}
 
-	if world := v.GetStringSlice("hello.world"); len(world) != 4 ***REMOVED***
+	if world := v.GetStringSlice("hello.world"); len(world) != 4 {
 		t.Fatalf("len(world) != 4, = %d", len(world))
-	***REMOVED***
+	}
 
-	if fu := v.GetString("fu"); fu != "" ***REMOVED***
+	if fu := v.GetString("fu"); fu != "" {
 		t.Fatalf("fu != \"\", = %s", fu)
-	***REMOVED***
+	}
 
-	if err := v.MergeConfig(bytes.NewBuffer(yamlMergeExampleSrc)); err != nil ***REMOVED***
+	if err := v.MergeConfig(bytes.NewBuffer(yamlMergeExampleSrc)); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if pop := v.GetInt("hello.pop"); pop != 45000 ***REMOVED***
+	if pop := v.GetInt("hello.pop"); pop != 45000 {
 		t.Fatalf("pop != 45000, = %d", pop)
-	***REMOVED***
+	}
 
-	if pop := v.GetInt("hello.lagrenum"); pop != 7654321001234567 ***REMOVED***
+	if pop := v.GetInt("hello.lagrenum"); pop != 7654321001234567 {
 		t.Fatalf("lagrenum != 7654321001234567, = %d", pop)
-	***REMOVED***
+	}
 
-	if pop := v.GetInt64("hello.lagrenum"); pop != int64(7654321001234567) ***REMOVED***
+	if pop := v.GetInt64("hello.lagrenum"); pop != int64(7654321001234567) {
 		t.Fatalf("int64 lagrenum != 7654321001234567, = %d", pop)
-	***REMOVED***
+	}
 
-	if world := v.GetStringSlice("hello.world"); len(world) != 4 ***REMOVED***
+	if world := v.GetStringSlice("hello.world"); len(world) != 4 {
 		t.Fatalf("len(world) != 4, = %d", len(world))
-	***REMOVED***
+	}
 
-	if universe := v.GetStringSlice("hello.universe"); len(universe) != 2 ***REMOVED***
+	if universe := v.GetStringSlice("hello.universe"); len(universe) != 2 {
 		t.Fatalf("len(universe) != 2, = %d", len(universe))
-	***REMOVED***
+	}
 
-	if fu := v.GetString("fu"); fu != "bar" ***REMOVED***
+	if fu := v.GetString("fu"); fu != "bar" {
 		t.Fatalf("fu != \"bar\", = %s", fu)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestMergeConfigNoMerge(t *testing.T) ***REMOVED***
+func TestMergeConfigNoMerge(t *testing.T) {
 	v := New()
 	v.SetConfigType("yml")
-	if err := v.ReadConfig(bytes.NewBuffer(yamlMergeExampleTgt)); err != nil ***REMOVED***
+	if err := v.ReadConfig(bytes.NewBuffer(yamlMergeExampleTgt)); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if pop := v.GetInt("hello.pop"); pop != 37890 ***REMOVED***
+	if pop := v.GetInt("hello.pop"); pop != 37890 {
 		t.Fatalf("pop != 37890, = %d", pop)
-	***REMOVED***
+	}
 
-	if world := v.GetStringSlice("hello.world"); len(world) != 4 ***REMOVED***
+	if world := v.GetStringSlice("hello.world"); len(world) != 4 {
 		t.Fatalf("len(world) != 4, = %d", len(world))
-	***REMOVED***
+	}
 
-	if fu := v.GetString("fu"); fu != "" ***REMOVED***
+	if fu := v.GetString("fu"); fu != "" {
 		t.Fatalf("fu != \"\", = %s", fu)
-	***REMOVED***
+	}
 
-	if err := v.ReadConfig(bytes.NewBuffer(yamlMergeExampleSrc)); err != nil ***REMOVED***
+	if err := v.ReadConfig(bytes.NewBuffer(yamlMergeExampleSrc)); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if pop := v.GetInt("hello.pop"); pop != 45000 ***REMOVED***
+	if pop := v.GetInt("hello.pop"); pop != 45000 {
 		t.Fatalf("pop != 45000, = %d", pop)
-	***REMOVED***
+	}
 
-	if world := v.GetStringSlice("hello.world"); len(world) != 0 ***REMOVED***
+	if world := v.GetStringSlice("hello.world"); len(world) != 0 {
 		t.Fatalf("len(world) != 0, = %d", len(world))
-	***REMOVED***
+	}
 
-	if universe := v.GetStringSlice("hello.universe"); len(universe) != 2 ***REMOVED***
+	if universe := v.GetStringSlice("hello.universe"); len(universe) != 2 {
 		t.Fatalf("len(universe) != 2, = %d", len(universe))
-	***REMOVED***
+	}
 
-	if fu := v.GetString("fu"); fu != "bar" ***REMOVED***
+	if fu := v.GetString("fu"); fu != "bar" {
 		t.Fatalf("fu != \"bar\", = %s", fu)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestUnmarshalingWithAliases(t *testing.T) ***REMOVED***
+func TestUnmarshalingWithAliases(t *testing.T) {
 	v := New()
 	v.SetDefault("ID", 1)
 	v.Set("name", "Steve")
@@ -1159,32 +1159,32 @@ func TestUnmarshalingWithAliases(t *testing.T) ***REMOVED***
 	v.RegisterAlias("Firstname", "name")
 	v.RegisterAlias("Surname", "lastname")
 
-	type config struct ***REMOVED***
+	type config struct {
 		ID        int
 		FirstName string
 		Surname   string
-	***REMOVED***
+	}
 
 	var C config
 	err := v.Unmarshal(&C)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("unable to decode into struct, %v", err)
-	***REMOVED***
+	}
 
-	assert.Equal(t, &config***REMOVED***ID: 1, FirstName: "Steve", Surname: "Owen"***REMOVED***, &C)
-***REMOVED***
+	assert.Equal(t, &config{ID: 1, FirstName: "Steve", Surname: "Owen"}, &C)
+}
 
-func TestSetConfigNameClearsFileCache(t *testing.T) ***REMOVED***
+func TestSetConfigNameClearsFileCache(t *testing.T) {
 	SetConfigFile("/tmp/config.yaml")
 	SetConfigName("default")
 	f, err := v.getConfigFile()
-	if err == nil ***REMOVED***
+	if err == nil {
 		t.Fatalf("config file cache should have been cleared")
-	***REMOVED***
+	}
 	assert.Empty(t, f)
-***REMOVED***
+}
 
-func TestShadowedNestedValue(t *testing.T) ***REMOVED***
+func TestShadowedNestedValue(t *testing.T) {
 
 	config := `name: steve
 clothing:
@@ -1205,28 +1205,28 @@ clothing:
 	assert.Nil(t, Get("clothing.jacket.price"))
 	assert.Equal(t, polyester, GetString("clothing.shirt"))
 
-	clothingSettings := AllSettings()["clothing"].(map[string]interface***REMOVED******REMOVED***)
+	clothingSettings := AllSettings()["clothing"].(map[string]interface{})
 	assert.Equal(t, "leather", clothingSettings["jacket"])
 	assert.Equal(t, polyester, clothingSettings["shirt"])
-***REMOVED***
+}
 
-func TestDotParameter(t *testing.T) ***REMOVED***
+func TestDotParameter(t *testing.T) {
 	initJSON()
 	// shoud take precedence over batters defined in jsonExample
-	r := bytes.NewReader([]byte(`***REMOVED*** "batters.batter": [ ***REMOVED*** "type": "Small" ***REMOVED*** ] ***REMOVED***`))
+	r := bytes.NewReader([]byte(`{ "batters.batter": [ { "type": "Small" } ] }`))
 	unmarshalReader(r, v.config)
 
 	actual := Get("batters.batter")
-	expected := []interface***REMOVED******REMOVED******REMOVED***map[string]interface***REMOVED******REMOVED******REMOVED***"type": "Small"***REMOVED******REMOVED***
+	expected := []interface{}{map[string]interface{}{"type": "Small"}}
 	assert.Equal(t, expected, actual)
-***REMOVED***
+}
 
-func TestCaseInsensitive(t *testing.T) ***REMOVED***
-	for _, config := range []struct ***REMOVED***
+func TestCaseInsensitive(t *testing.T) {
+	for _, config := range []struct {
 		typ     string
 		content string
-	***REMOVED******REMOVED***
-		***REMOVED***"yaml", `
+	}{
+		{"yaml", `
 aBcD: 1
 eF:
   gH: 2
@@ -1236,22 +1236,22 @@ eF:
     P:
       Q: 5
       R: 6
-`***REMOVED***,
-		***REMOVED***"json", `***REMOVED***
+`},
+		{"json", `{
   "aBcD": 1,
-  "eF": ***REMOVED***
+  "eF": {
     "iJk": 3,
-    "Lm": ***REMOVED***
-      "P": ***REMOVED***
+    "Lm": {
+      "P": {
         "Q": 5,
         "R": 6
-  ***REMOVED***,
+      },
       "nO": 4
-***REMOVED***,
+    },
     "gH": 2
-  ***REMOVED***
-***REMOVED***`***REMOVED***,
-		***REMOVED***"toml", `aBcD = 1
+  }
+}`},
+		{"toml", `aBcD = 1
 [eF]
 gH = 2
 iJk = 3
@@ -1260,29 +1260,29 @@ nO = 4
 [eF.Lm.P]
 Q = 5
 R = 6
-`***REMOVED***,
-	***REMOVED*** ***REMOVED***
+`},
+	} {
 		doTestCaseInsensitive(t, config.typ, config.content)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestCaseInsensitiveSet(t *testing.T) ***REMOVED***
+func TestCaseInsensitiveSet(t *testing.T) {
 	Reset()
-	m1 := map[string]interface***REMOVED******REMOVED******REMOVED***
+	m1 := map[string]interface{}{
 		"Foo": 32,
-		"Bar": map[interface***REMOVED******REMOVED***]interface ***REMOVED***
-		***REMOVED******REMOVED***
+		"Bar": map[interface{}]interface {
+		}{
 			"ABc": "A",
-			"cDE": "B"***REMOVED***,
-	***REMOVED***
+			"cDE": "B"},
+	}
 
-	m2 := map[string]interface***REMOVED******REMOVED******REMOVED***
+	m2 := map[string]interface{}{
 		"Foo": 52,
-		"Bar": map[interface***REMOVED******REMOVED***]interface ***REMOVED***
-		***REMOVED******REMOVED***
+		"Bar": map[interface{}]interface {
+		}{
 			"bCd": "A",
-			"eFG": "B"***REMOVED***,
-	***REMOVED***
+			"eFG": "B"},
+	}
 
 	Set("Given1", m1)
 	Set("Number1", 42)
@@ -1291,50 +1291,50 @@ func TestCaseInsensitiveSet(t *testing.T) ***REMOVED***
 	SetDefault("Number2", 52)
 
 	// Verify SetDefault
-	if v := Get("number2"); v != 52 ***REMOVED***
+	if v := Get("number2"); v != 52 {
 		t.Fatalf("Expected 52 got %q", v)
-	***REMOVED***
+	}
 
-	if v := Get("given2.foo"); v != 52 ***REMOVED***
+	if v := Get("given2.foo"); v != 52 {
 		t.Fatalf("Expected 52 got %q", v)
-	***REMOVED***
+	}
 
-	if v := Get("given2.bar.bcd"); v != "A" ***REMOVED***
+	if v := Get("given2.bar.bcd"); v != "A" {
 		t.Fatalf("Expected A got %q", v)
-	***REMOVED***
+	}
 
-	if _, ok := m2["Foo"]; !ok ***REMOVED***
+	if _, ok := m2["Foo"]; !ok {
 		t.Fatal("Input map changed")
-	***REMOVED***
+	}
 
 	// Verify Set
-	if v := Get("number1"); v != 42 ***REMOVED***
+	if v := Get("number1"); v != 42 {
 		t.Fatalf("Expected 42 got %q", v)
-	***REMOVED***
+	}
 
-	if v := Get("given1.foo"); v != 32 ***REMOVED***
+	if v := Get("given1.foo"); v != 32 {
 		t.Fatalf("Expected 32 got %q", v)
-	***REMOVED***
+	}
 
-	if v := Get("given1.bar.abc"); v != "A" ***REMOVED***
+	if v := Get("given1.bar.abc"); v != "A" {
 		t.Fatalf("Expected A got %q", v)
-	***REMOVED***
+	}
 
-	if _, ok := m1["Foo"]; !ok ***REMOVED***
+	if _, ok := m1["Foo"]; !ok {
 		t.Fatal("Input map changed")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestParseNested(t *testing.T) ***REMOVED***
-	type duration struct ***REMOVED***
+func TestParseNested(t *testing.T) {
+	type duration struct {
 		Delay time.Duration
-	***REMOVED***
+	}
 
-	type item struct ***REMOVED***
+	type item struct {
 		Name   string
 		Delay  time.Duration
 		Nested duration
-	***REMOVED***
+	}
 
 	config := `[[parent]]
 	delay="100ms"
@@ -1345,16 +1345,16 @@ func TestParseNested(t *testing.T) ***REMOVED***
 
 	var items []item
 	err := v.UnmarshalKey("parent", &items)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("unable to decode into struct, %v", err)
-	***REMOVED***
+	}
 
 	assert.Equal(t, 1, len(items))
 	assert.Equal(t, 100*time.Millisecond, items[0].Delay)
 	assert.Equal(t, 200*time.Millisecond, items[0].Nested.Delay)
-***REMOVED***
+}
 
-func doTestCaseInsensitive(t *testing.T, typ, config string) ***REMOVED***
+func doTestCaseInsensitive(t *testing.T, typ, config string) {
 	initConfig(typ, config)
 	Set("RfD", true)
 	assert.Equal(t, true, Get("rfd"))
@@ -1366,41 +1366,41 @@ func doTestCaseInsensitive(t *testing.T, typ, config string) ***REMOVED***
 	assert.Equal(t, 4, cast.ToInt(Get("ef.lm.no")))
 	assert.Equal(t, 5, cast.ToInt(Get("ef.lm.p.q")))
 
-***REMOVED***
+}
 
-func BenchmarkGetBool(b *testing.B) ***REMOVED***
+func BenchmarkGetBool(b *testing.B) {
 	key := "BenchmarkGetBool"
 	v = New()
 	v.Set(key, true)
 
-	for i := 0; i < b.N; i++ ***REMOVED***
-		if !v.GetBool(key) ***REMOVED***
+	for i := 0; i < b.N; i++ {
+		if !v.GetBool(key) {
 			b.Fatal("GetBool returned false")
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func BenchmarkGet(b *testing.B) ***REMOVED***
+func BenchmarkGet(b *testing.B) {
 	key := "BenchmarkGet"
 	v = New()
 	v.Set(key, true)
 
-	for i := 0; i < b.N; i++ ***REMOVED***
-		if !v.Get(key).(bool) ***REMOVED***
+	for i := 0; i < b.N; i++ {
+		if !v.Get(key).(bool) {
 			b.Fatal("Get returned false")
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // This is the "perfect result" for the above.
-func BenchmarkGetBoolFromMap(b *testing.B) ***REMOVED***
+func BenchmarkGetBoolFromMap(b *testing.B) {
 	m := make(map[string]bool)
 	key := "BenchmarkGetBool"
 	m[key] = true
 
-	for i := 0; i < b.N; i++ ***REMOVED***
-		if !m[key] ***REMOVED***
+	for i := 0; i < b.N; i++ {
+		if !m[key] {
 			b.Fatal("Map value was false")
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

@@ -13,7 +13,7 @@ import (
 	"github.com/gotestyourself/gotestyourself/icmd"
 )
 
-func (s *DockerSuite) TestRmiWithContainerFails(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRmiWithContainerFails(c *check.C) {
 	errSubstr := "is using it"
 
 	// create a container
@@ -32,45 +32,45 @@ func (s *DockerSuite) TestRmiWithContainerFails(c *check.C) ***REMOVED***
 	images, _ := dockerCmd(c, "images")
 	// The name 'busybox' should not have been removed from images
 	c.Assert(images, checker.Contains, "busybox")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRmiTag(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRmiTag(c *check.C) {
 	imagesBefore, _ := dockerCmd(c, "images", "-a")
 	dockerCmd(c, "tag", "busybox", "utest:tag1")
 	dockerCmd(c, "tag", "busybox", "utest/docker:tag2")
 	dockerCmd(c, "tag", "busybox", "utest:5000/docker:tag3")
-	***REMOVED***
+	{
 		imagesAfter, _ := dockerCmd(c, "images", "-a")
 		c.Assert(strings.Count(imagesAfter, "\n"), checker.Equals, strings.Count(imagesBefore, "\n")+3, check.Commentf("before: %q\n\nafter: %q\n", imagesBefore, imagesAfter))
-	***REMOVED***
+	}
 	dockerCmd(c, "rmi", "utest/docker:tag2")
-	***REMOVED***
+	{
 		imagesAfter, _ := dockerCmd(c, "images", "-a")
 		c.Assert(strings.Count(imagesAfter, "\n"), checker.Equals, strings.Count(imagesBefore, "\n")+2, check.Commentf("before: %q\n\nafter: %q\n", imagesBefore, imagesAfter))
-	***REMOVED***
+	}
 	dockerCmd(c, "rmi", "utest:5000/docker:tag3")
-	***REMOVED***
+	{
 		imagesAfter, _ := dockerCmd(c, "images", "-a")
 		c.Assert(strings.Count(imagesAfter, "\n"), checker.Equals, strings.Count(imagesBefore, "\n")+1, check.Commentf("before: %q\n\nafter: %q\n", imagesBefore, imagesAfter))
 
-	***REMOVED***
+	}
 	dockerCmd(c, "rmi", "utest:tag1")
-	***REMOVED***
+	{
 		imagesAfter, _ := dockerCmd(c, "images", "-a")
 		c.Assert(strings.Count(imagesAfter, "\n"), checker.Equals, strings.Count(imagesBefore, "\n"), check.Commentf("before: %q\n\nafter: %q\n", imagesBefore, imagesAfter))
 
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *DockerSuite) TestRmiImgIDMultipleTag(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRmiImgIDMultipleTag(c *check.C) {
 	out := cli.DockerCmd(c, "run", "-d", "busybox", "/bin/sh", "-c", "mkdir '/busybox-one'").Combined()
 	containerID := strings.TrimSpace(out)
 
 	// Wait for it to exit as cannot commit a running container on Windows, and
 	// it will take a few seconds to exit
-	if testEnv.OSType == "windows" ***REMOVED***
+	if testEnv.OSType == "windows" {
 		cli.WaitExited(c, containerID, 60*time.Second)
-	***REMOVED***
+	}
 
 	cli.DockerCmd(c, "commit", containerID, "busybox-one")
 
@@ -90,10 +90,10 @@ func (s *DockerSuite) TestRmiImgIDMultipleTag(c *check.C) ***REMOVED***
 
 	// first checkout without force it fails
 	// rmi tagged in multiple repos should have failed without force
-	cli.Docker(cli.Args("rmi", imgID)).Assert(c, icmd.Expected***REMOVED***
+	cli.Docker(cli.Args("rmi", imgID)).Assert(c, icmd.Expected{
 		ExitCode: 1,
 		Err:      fmt.Sprintf("conflict: unable to delete %s (cannot be forced) - image is being used by running container %s", stringid.TruncateID(imgID), stringid.TruncateID(containerID)),
-	***REMOVED***)
+	})
 
 	cli.DockerCmd(c, "stop", containerID)
 	cli.DockerCmd(c, "rmi", "-f", imgID)
@@ -101,17 +101,17 @@ func (s *DockerSuite) TestRmiImgIDMultipleTag(c *check.C) ***REMOVED***
 	imagesAfter = cli.DockerCmd(c, "images", "-a").Combined()
 	// rmi -f failed, image still exists
 	c.Assert(imagesAfter, checker.Not(checker.Contains), imgID[:12], check.Commentf("ImageID:%q; ImagesAfter: %q", imgID, imagesAfter))
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRmiImgIDForce(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRmiImgIDForce(c *check.C) {
 	out := cli.DockerCmd(c, "run", "-d", "busybox", "/bin/sh", "-c", "mkdir '/busybox-test'").Combined()
 	containerID := strings.TrimSpace(out)
 
 	// Wait for it to exit as cannot commit a running container on Windows, and
 	// it will take a few seconds to exit
-	if testEnv.OSType == "windows" ***REMOVED***
+	if testEnv.OSType == "windows" {
 		cli.WaitExited(c, containerID, 60*time.Second)
-	***REMOVED***
+	}
 
 	cli.DockerCmd(c, "commit", containerID, "busybox-test")
 
@@ -120,28 +120,28 @@ func (s *DockerSuite) TestRmiImgIDForce(c *check.C) ***REMOVED***
 	cli.DockerCmd(c, "tag", "busybox-test", "utest:tag2")
 	cli.DockerCmd(c, "tag", "busybox-test", "utest/docker:tag3")
 	cli.DockerCmd(c, "tag", "busybox-test", "utest:5000/docker:tag4")
-	***REMOVED***
+	{
 		imagesAfter := cli.DockerCmd(c, "images", "-a").Combined()
 		c.Assert(strings.Count(imagesAfter, "\n"), checker.Equals, strings.Count(imagesBefore, "\n")+4, check.Commentf("before: %q\n\nafter: %q\n", imagesBefore, imagesAfter))
-	***REMOVED***
+	}
 	imgID := inspectField(c, "busybox-test", "Id")
 
 	// first checkout without force it fails
-	cli.Docker(cli.Args("rmi", imgID)).Assert(c, icmd.Expected***REMOVED***
+	cli.Docker(cli.Args("rmi", imgID)).Assert(c, icmd.Expected{
 		ExitCode: 1,
 		Err:      "(must be forced) - image is referenced in multiple repositories",
-	***REMOVED***)
+	})
 
 	cli.DockerCmd(c, "rmi", "-f", imgID)
-	***REMOVED***
+	{
 		imagesAfter := cli.DockerCmd(c, "images", "-a").Combined()
 		// rmi failed, image still exists
 		c.Assert(imagesAfter, checker.Not(checker.Contains), imgID[:12])
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // See https://github.com/docker/docker/issues/14116
-func (s *DockerSuite) TestRmiImageIDForceWithRunningContainersAndMultipleTags(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRmiImageIDForceWithRunningContainersAndMultipleTags(c *check.C) {
 	dockerfile := "FROM busybox\nRUN echo test 14116\n"
 	buildImageSuccessfully(c, "test-14116", build.WithDockerfile(dockerfile))
 	imgID := getIDByName(c, "test-14116")
@@ -154,9 +154,9 @@ func (s *DockerSuite) TestRmiImageIDForceWithRunningContainersAndMultipleTags(c 
 	// rmi -f should not delete image with running containers
 	c.Assert(err, checker.NotNil)
 	c.Assert(out, checker.Contains, "(cannot be forced) - image is being used by running container")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRmiTagWithExistingContainers(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRmiTagWithExistingContainers(c *check.C) {
 	container := "test-delete-tag"
 	newtag := "busybox:newtag"
 	bb := "busybox:latest"
@@ -166,23 +166,23 @@ func (s *DockerSuite) TestRmiTagWithExistingContainers(c *check.C) ***REMOVED***
 
 	out, _ := dockerCmd(c, "rmi", newtag)
 	c.Assert(strings.Count(out, "Untagged: "), checker.Equals, 1)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRmiForceWithExistingContainers(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRmiForceWithExistingContainers(c *check.C) {
 	image := "busybox-clone"
 
-	icmd.RunCmd(icmd.Cmd***REMOVED***
-		Command: []string***REMOVED***dockerBinary, "build", "--no-cache", "-t", image, "-"***REMOVED***,
+	icmd.RunCmd(icmd.Cmd{
+		Command: []string{dockerBinary, "build", "--no-cache", "-t", image, "-"},
 		Stdin: strings.NewReader(`FROM busybox
 MAINTAINER foo`),
-	***REMOVED***).Assert(c, icmd.Success)
+	}).Assert(c, icmd.Success)
 
 	dockerCmd(c, "run", "--name", "test-force-rmi", image, "/bin/true")
 
 	dockerCmd(c, "rmi", "-f", image)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRmiWithMultipleRepositories(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRmiWithMultipleRepositories(c *check.C) {
 	newRepo := "127.0.0.1:5000/busybox"
 	oldRepo := "busybox"
 	newTag := "busybox:test"
@@ -194,9 +194,9 @@ func (s *DockerSuite) TestRmiWithMultipleRepositories(c *check.C) ***REMOVED***
 
 	out, _ := dockerCmd(c, "rmi", newTag)
 	c.Assert(out, checker.Contains, "Untagged: "+newTag)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRmiForceWithMultipleRepositories(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRmiForceWithMultipleRepositories(c *check.C) {
 	imageName := "rmiimage"
 	tag1 := imageName + ":tag1"
 	tag2 := imageName + ":tag2"
@@ -212,9 +212,9 @@ func (s *DockerSuite) TestRmiForceWithMultipleRepositories(c *check.C) ***REMOVE
 	// Check built image still exists
 	images, _ := dockerCmd(c, "images", "-a")
 	c.Assert(images, checker.Contains, imageName, check.Commentf("Built image missing %q; Images: %q", imageName, images))
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRmiBlank(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRmiBlank(c *check.C) {
 	out, _, err := dockerCmdWithError("rmi", " ")
 	// Should have failed to delete ' ' image
 	c.Assert(err, checker.NotNil)
@@ -222,18 +222,18 @@ func (s *DockerSuite) TestRmiBlank(c *check.C) ***REMOVED***
 	c.Assert(out, checker.Not(checker.Contains), "no such id", check.Commentf("out: %s", out))
 	// Expected error message not generated
 	c.Assert(out, checker.Contains, "image name cannot be blank", check.Commentf("out: %s", out))
-***REMOVED***
+}
 
-func (s *DockerSuite) TestRmiContainerImageNotFound(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRmiContainerImageNotFound(c *check.C) {
 	// Build 2 images for testing.
-	imageNames := []string***REMOVED***"test1", "test2"***REMOVED***
+	imageNames := []string{"test1", "test2"}
 	imageIds := make([]string, 2)
-	for i, name := range imageNames ***REMOVED***
+	for i, name := range imageNames {
 		dockerfile := fmt.Sprintf("FROM busybox\nMAINTAINER %s\nRUN echo %s\n", name, name)
 		buildImageSuccessfully(c, name, build.WithoutCache, build.WithDockerfile(dockerfile))
 		id := getIDByName(c, name)
 		imageIds[i] = id
-	***REMOVED***
+	}
 
 	// Create a long-running container.
 	runSleepingContainerInImage(c, imageNames[0])
@@ -247,10 +247,10 @@ func (s *DockerSuite) TestRmiContainerImageNotFound(c *check.C) ***REMOVED***
 	// The image of the running container should not be removed.
 	c.Assert(err, checker.NotNil)
 	c.Assert(out, checker.Contains, "image is being used by running container", check.Commentf("out: %s", out))
-***REMOVED***
+}
 
 // #13422
-func (s *DockerSuite) TestRmiUntagHistoryLayer(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRmiUntagHistoryLayer(c *check.C) {
 	image := "tmp1"
 	// Build an image for testing.
 	dockerfile := `FROM busybox
@@ -292,9 +292,9 @@ RUN echo 2 #layer2
 	out, _ = dockerCmd(c, "rmi", "-f", newTag)
 	// should be allowed to untag with the -f flag
 	c.Assert(out, checker.Contains, fmt.Sprintf("Untagged: %s:latest", newTag))
-***REMOVED***
+}
 
-func (*DockerSuite) TestRmiParentImageFail(c *check.C) ***REMOVED***
+func (*DockerSuite) TestRmiParentImageFail(c *check.C) {
 	buildImageSuccessfully(c, "test", build.WithDockerfile(`
 	FROM busybox
 	RUN echo hello`))
@@ -302,12 +302,12 @@ func (*DockerSuite) TestRmiParentImageFail(c *check.C) ***REMOVED***
 	id := inspectField(c, "busybox", "ID")
 	out, _, err := dockerCmdWithError("rmi", id)
 	c.Assert(err, check.NotNil)
-	if !strings.Contains(out, "image has dependent child images") ***REMOVED***
+	if !strings.Contains(out, "image has dependent child images") {
 		c.Fatalf("rmi should have failed because it's a parent image, got %s", out)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *DockerSuite) TestRmiWithParentInUse(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRmiWithParentInUse(c *check.C) {
 	out, _ := dockerCmd(c, "create", "busybox")
 	cID := strings.TrimSpace(out)
 
@@ -321,10 +321,10 @@ func (s *DockerSuite) TestRmiWithParentInUse(c *check.C) ***REMOVED***
 	imageID = strings.TrimSpace(out)
 
 	dockerCmd(c, "rmi", imageID)
-***REMOVED***
+}
 
 // #18873
-func (s *DockerSuite) TestRmiByIDHardConflict(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestRmiByIDHardConflict(c *check.C) {
 	dockerCmd(c, "create", "busybox")
 
 	imgID := inspectField(c, "busybox:latest", "Id")
@@ -335,4 +335,4 @@ func (s *DockerSuite) TestRmiByIDHardConflict(c *check.C) ***REMOVED***
 	// check that tag was not removed
 	imgID2 := inspectField(c, "busybox:latest", "Id")
 	c.Assert(imgID, checker.Equals, imgID2)
-***REMOVED***
+}

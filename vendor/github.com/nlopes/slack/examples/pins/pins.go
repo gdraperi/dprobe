@@ -10,7 +10,7 @@ import (
 /*
    WARNING: This example is destructive in the sense that it create a channel called testpinning
 */
-func main() ***REMOVED***
+func main() {
 	var (
 		apiToken string
 		debug    bool
@@ -21,9 +21,9 @@ func main() ***REMOVED***
 	flag.Parse()
 
 	api := slack.New(apiToken)
-	if debug ***REMOVED***
+	if debug {
 		api.SetDebug(true)
-	***REMOVED***
+	}
 
 	var (
 		postAsUserName  string
@@ -33,10 +33,10 @@ func main() ***REMOVED***
 
 	// Find the user to post as.
 	authTest, err := api.AuthTest()
-	if err != nil ***REMOVED***
+	if err != nil {
 		fmt.Printf("Error getting channels: %s\n", err)
 		return
-	***REMOVED***
+	}
 
 	channelName := "testpinning"
 
@@ -47,77 +47,77 @@ func main() ***REMOVED***
 	// Create a temporary channel
 	channel, err := api.CreateChannel(channelName)
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		// If the channel exists, that means we just need to unarchive it
-		if err.Error() == "name_taken" ***REMOVED***
+		if err.Error() == "name_taken" {
 			err = nil
 			channels, err := api.GetChannels(false)
-			if err != nil ***REMOVED***
+			if err != nil {
 				fmt.Println("Could not retrieve channels")
 				return
-			***REMOVED***
-			for _, archivedChannel := range channels ***REMOVED***
-				if archivedChannel.Name == channelName ***REMOVED***
-					if archivedChannel.IsArchived ***REMOVED***
+			}
+			for _, archivedChannel := range channels {
+				if archivedChannel.Name == channelName {
+					if archivedChannel.IsArchived {
 						err = api.UnarchiveChannel(archivedChannel.ID)
-						if err != nil ***REMOVED***
+						if err != nil {
 							fmt.Printf("Could not unarchive %s: %s\n", archivedChannel.ID, err)
 							return
-						***REMOVED***
-					***REMOVED***
+						}
+					}
 					channel = &archivedChannel
 					break
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-		if err != nil ***REMOVED***
+				}
+			}
+		}
+		if err != nil {
 			fmt.Printf("Error setting test channel for pinning: %s\n", err)
 			return
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	postToChannelID = channel.ID
 
 	fmt.Printf("Posting as %s (%s) in channel %s\n", postAsUserName, postAsUserID, postToChannelID)
 
 	// Post a message.
-	postParams := slack.PostMessageParameters***REMOVED******REMOVED***
+	postParams := slack.PostMessageParameters{}
 	channelID, timestamp, err := api.PostMessage(postToChannelID, "Is this any good?", postParams)
-	if err != nil ***REMOVED***
+	if err != nil {
 		fmt.Printf("Error posting message: %s\n", err)
 		return
-	***REMOVED***
+	}
 
 	// Grab a reference to the message.
 	msgRef := slack.NewRefToMessage(channelID, timestamp)
 
 	// Add message pin to channel
-	if err := api.AddPin(channelID, msgRef); err != nil ***REMOVED***
+	if err := api.AddPin(channelID, msgRef); err != nil {
 		fmt.Printf("Error adding pin: %s\n", err)
 		return
-	***REMOVED***
+	}
 
 	// List all of the users pins.
 	listPins, _, err := api.ListPins(channelID)
-	if err != nil ***REMOVED***
+	if err != nil {
 		fmt.Printf("Error listing pins: %s\n", err)
 		return
-	***REMOVED***
+	}
 	fmt.Printf("\n")
 	fmt.Printf("All pins by %s...\n", authTest.User)
-	for _, item := range listPins ***REMOVED***
+	for _, item := range listPins {
 		fmt.Printf(" > Item type: %s\n", item.Type)
-	***REMOVED***
+	}
 
 	// Remove the pin.
 	err = api.RemovePin(channelID, msgRef)
-	if err != nil ***REMOVED***
+	if err != nil {
 		fmt.Printf("Error remove pin: %s\n", err)
 		return
-	***REMOVED***
+	}
 
-	if err = api.ArchiveChannel(channelID); err != nil ***REMOVED***
+	if err = api.ArchiveChannel(channelID); err != nil {
 		fmt.Printf("Error archiving channel: %s\n", err)
 		return
-	***REMOVED***
+	}
 
-***REMOVED***
+}

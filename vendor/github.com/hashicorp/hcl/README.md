@@ -87,31 +87,31 @@ FOO
     this structure:
 
     ```hcl
-    service ***REMOVED***
+    service {
         key = "value"
-***REMOVED***
+    }
 
-    service ***REMOVED***
+    service {
         key = "value"
-***REMOVED***
+    }
     ```
 
 Objects and nested objects are created using the structure shown below:
 
 ```
-variable "ami" ***REMOVED***
+variable "ami" {
     description = "the AMI to use"
-***REMOVED***
+}
 ```
 This would be equivalent to the following json:
 ``` json
-***REMOVED***
-  "variable": ***REMOVED***
-      "ami": ***REMOVED***
+{
+  "variable": {
+      "ami": {
           "description": "the AMI to use"
-    ***REMOVED***
-***REMOVED***
-***REMOVED***
+        }
+    }
+}
 ```
 
 ## Thanks

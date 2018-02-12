@@ -7,16 +7,16 @@ import (
 )
 
 // StatAtime returns the Atim
-func StatAtime(st *syscall.Stat_t) syscall.Timespec ***REMOVED***
+func StatAtime(st *syscall.Stat_t) syscall.Timespec {
 	return st.Atim
-***REMOVED***
+}
 
 // StatCtime returns the Ctim
-func StatCtime(st *syscall.Stat_t) syscall.Timespec ***REMOVED***
+func StatCtime(st *syscall.Stat_t) syscall.Timespec {
 	return st.Ctim
-***REMOVED***
+}
 
 // StatMtime returns the Mtim
-func StatMtime(st *syscall.Stat_t) syscall.Timespec ***REMOVED***
+func StatMtime(st *syscall.Stat_t) syscall.Timespec {
 	return st.Mtim
-***REMOVED***
+}

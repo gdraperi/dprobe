@@ -21,39 +21,39 @@ const (
 // ModifyRootKeyLimit checks to see if the root key limit is set to
 // at least 1000000 and changes it to that limit along with the maxbytes
 // allocated to the keys at a 25 to 1 multiplier.
-func ModifyRootKeyLimit() error ***REMOVED***
+func ModifyRootKeyLimit() error {
 	value, err := readRootKeyLimit(rootKeyFile)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	if value < rootKeyLimit ***REMOVED***
+	}
+	if value < rootKeyLimit {
 		return setRootKeyLimit(rootKeyLimit)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func setRootKeyLimit(limit int) error ***REMOVED***
+func setRootKeyLimit(limit int) error {
 	keys, err := os.OpenFile(rootKeyFile, os.O_WRONLY, 0)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer keys.Close()
-	if _, err := fmt.Fprintf(keys, "%d", limit); err != nil ***REMOVED***
+	if _, err := fmt.Fprintf(keys, "%d", limit); err != nil {
 		return err
-	***REMOVED***
+	}
 	bytes, err := os.OpenFile(rootBytesFile, os.O_WRONLY, 0)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer bytes.Close()
 	_, err = fmt.Fprintf(bytes, "%d", limit*rootKeyByteMultiplier)
 	return err
-***REMOVED***
+}
 
-func readRootKeyLimit(path string) (int, error) ***REMOVED***
+func readRootKeyLimit(path string) (int, error) {
 	data, err := ioutil.ReadFile(path)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return -1, err
-	***REMOVED***
+	}
 	return strconv.Atoi(strings.Trim(string(data), "\n"))
-***REMOVED***
+}

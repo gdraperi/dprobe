@@ -5,7 +5,7 @@ package types
 
 // Port An open port on a container
 // swagger:model Port
-type Port struct ***REMOVED***
+type Port struct {
 
 	// IP
 	IP string `json:"IP,omitempty"`
@@ -20,4 +20,4 @@ type Port struct ***REMOVED***
 	// type
 	// Required: true
 	Type string `json:"Type"`
-***REMOVED***
+}

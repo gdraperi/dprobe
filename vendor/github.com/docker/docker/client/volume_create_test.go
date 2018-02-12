@@ -14,62 +14,62 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestVolumeCreateError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestVolumeCreateError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
-	***REMOVED***
+	}
 
-	_, err := client.VolumeCreate(context.Background(), volumetypes.VolumesCreateBody***REMOVED******REMOVED***)
-	if err == nil || err.Error() != "Error response from daemon: Server error" ***REMOVED***
+	_, err := client.VolumeCreate(context.Background(), volumetypes.VolumesCreateBody{})
+	if err == nil || err.Error() != "Error response from daemon: Server error" {
 		t.Fatalf("expected a Server Error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestVolumeCreate(t *testing.T) ***REMOVED***
+func TestVolumeCreate(t *testing.T) {
 	expectedURL := "/volumes/create"
 
-	client := &Client***REMOVED***
-		client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-			if !strings.HasPrefix(req.URL.Path, expectedURL) ***REMOVED***
+	client := &Client{
+		client: newMockClient(func(req *http.Request) (*http.Response, error) {
+			if !strings.HasPrefix(req.URL.Path, expectedURL) {
 				return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, req.URL)
-			***REMOVED***
+			}
 
-			if req.Method != "POST" ***REMOVED***
+			if req.Method != "POST" {
 				return nil, fmt.Errorf("expected POST method, got %s", req.Method)
-			***REMOVED***
+			}
 
-			content, err := json.Marshal(types.Volume***REMOVED***
+			content, err := json.Marshal(types.Volume{
 				Name:       "volume",
 				Driver:     "local",
 				Mountpoint: "mountpoint",
-			***REMOVED***)
-			if err != nil ***REMOVED***
+			})
+			if err != nil {
 				return nil, err
-			***REMOVED***
-			return &http.Response***REMOVED***
+			}
+			return &http.Response{
 				StatusCode: http.StatusOK,
 				Body:       ioutil.NopCloser(bytes.NewReader(content)),
-			***REMOVED***, nil
-		***REMOVED***),
-	***REMOVED***
+			}, nil
+		}),
+	}
 
-	volume, err := client.VolumeCreate(context.Background(), volumetypes.VolumesCreateBody***REMOVED***
+	volume, err := client.VolumeCreate(context.Background(), volumetypes.VolumesCreateBody{
 		Name:   "myvolume",
 		Driver: "mydriver",
-		DriverOpts: map[string]string***REMOVED***
+		DriverOpts: map[string]string{
 			"opt-key": "opt-value",
-		***REMOVED***,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+		},
+	})
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if volume.Name != "volume" ***REMOVED***
+	}
+	if volume.Name != "volume" {
 		t.Fatalf("expected volume.Name to be 'volume', got %s", volume.Name)
-	***REMOVED***
-	if volume.Driver != "local" ***REMOVED***
+	}
+	if volume.Driver != "local" {
 		t.Fatalf("expected volume.Driver to be 'local', got %s", volume.Driver)
-	***REMOVED***
-	if volume.Mountpoint != "mountpoint" ***REMOVED***
+	}
+	if volume.Mountpoint != "mountpoint" {
 		t.Fatalf("expected volume.Mountpoint to be 'mountpoint', got %s", volume.Mountpoint)
-	***REMOVED***
-***REMOVED***
+	}
+}

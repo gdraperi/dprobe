@@ -1,5 +1,5 @@
-output ***REMOVED***
-  one = "$***REMOVED***replace(var.sub_domain, ".", "\\.")***REMOVED***"
-  two = "$***REMOVED***replace(var.sub_domain, ".", "\\\\.")***REMOVED***"
-  many = "$***REMOVED***replace(var.sub_domain, ".", "\\\\\\\\.")***REMOVED***"
-***REMOVED***
+output {
+  one = "${replace(var.sub_domain, ".", "\\.")}"
+  two = "${replace(var.sub_domain, ".", "\\\\.")}"
+  many = "${replace(var.sub_domain, ".", "\\\\\\\\.")}"
+}

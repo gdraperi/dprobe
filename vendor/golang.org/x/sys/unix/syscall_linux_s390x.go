@@ -49,87 +49,87 @@ import (
 
 //sysnb	Gettimeofday(tv *Timeval) (err error)
 
-func Time(t *Time_t) (tt Time_t, err error) ***REMOVED***
+func Time(t *Time_t) (tt Time_t, err error) {
 	var tv Timeval
 	err = Gettimeofday(&tv)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
-	if t != nil ***REMOVED***
+	}
+	if t != nil {
 		*t = Time_t(tv.Sec)
-	***REMOVED***
+	}
 	return Time_t(tv.Sec), nil
-***REMOVED***
+}
 
 //sys	Utime(path string, buf *Utimbuf) (err error)
 
-func setTimespec(sec, nsec int64) Timespec ***REMOVED***
-	return Timespec***REMOVED***Sec: sec, Nsec: nsec***REMOVED***
-***REMOVED***
+func setTimespec(sec, nsec int64) Timespec {
+	return Timespec{Sec: sec, Nsec: nsec}
+}
 
-func setTimeval(sec, usec int64) Timeval ***REMOVED***
-	return Timeval***REMOVED***Sec: sec, Usec: usec***REMOVED***
-***REMOVED***
+func setTimeval(sec, usec int64) Timeval {
+	return Timeval{Sec: sec, Usec: usec}
+}
 
 //sysnb pipe2(p *[2]_C_int, flags int) (err error)
 
-func Pipe(p []int) (err error) ***REMOVED***
-	if len(p) != 2 ***REMOVED***
+func Pipe(p []int) (err error) {
+	if len(p) != 2 {
 		return EINVAL
-	***REMOVED***
+	}
 	var pp [2]_C_int
 	err = pipe2(&pp, 0) // pipe2 is the same as pipe when flags are set to 0.
 	p[0] = int(pp[0])
 	p[1] = int(pp[1])
 	return
-***REMOVED***
+}
 
-func Pipe2(p []int, flags int) (err error) ***REMOVED***
-	if len(p) != 2 ***REMOVED***
+func Pipe2(p []int, flags int) (err error) {
+	if len(p) != 2 {
 		return EINVAL
-	***REMOVED***
+	}
 	var pp [2]_C_int
 	err = pipe2(&pp, flags)
 	p[0] = int(pp[0])
 	p[1] = int(pp[1])
 	return
-***REMOVED***
+}
 
-func Ioperm(from int, num int, on int) (err error) ***REMOVED***
+func Ioperm(from int, num int, on int) (err error) {
 	return ENOSYS
-***REMOVED***
+}
 
-func Iopl(level int) (err error) ***REMOVED***
+func Iopl(level int) (err error) {
 	return ENOSYS
-***REMOVED***
+}
 
-func (r *PtraceRegs) PC() uint64 ***REMOVED*** return r.Psw.Addr ***REMOVED***
+func (r *PtraceRegs) PC() uint64 { return r.Psw.Addr }
 
-func (r *PtraceRegs) SetPC(pc uint64) ***REMOVED*** r.Psw.Addr = pc ***REMOVED***
+func (r *PtraceRegs) SetPC(pc uint64) { r.Psw.Addr = pc }
 
-func (iov *Iovec) SetLen(length int) ***REMOVED***
+func (iov *Iovec) SetLen(length int) {
 	iov.Len = uint64(length)
-***REMOVED***
+}
 
-func (msghdr *Msghdr) SetControllen(length int) ***REMOVED***
+func (msghdr *Msghdr) SetControllen(length int) {
 	msghdr.Controllen = uint64(length)
-***REMOVED***
+}
 
-func (cmsg *Cmsghdr) SetLen(length int) ***REMOVED***
+func (cmsg *Cmsghdr) SetLen(length int) {
 	cmsg.Len = uint64(length)
-***REMOVED***
+}
 
 // Linux on s390x uses the old mmap interface, which requires arguments to be passed in a struct.
 // mmap2 also requires arguments to be passed in a struct; it is currently not exposed in <asm/unistd.h>.
-func mmap(addr uintptr, length uintptr, prot int, flags int, fd int, offset int64) (xaddr uintptr, err error) ***REMOVED***
-	mmap_args := [6]uintptr***REMOVED***addr, length, uintptr(prot), uintptr(flags), uintptr(fd), uintptr(offset)***REMOVED***
+func mmap(addr uintptr, length uintptr, prot int, flags int, fd int, offset int64) (xaddr uintptr, err error) {
+	mmap_args := [6]uintptr{addr, length, uintptr(prot), uintptr(flags), uintptr(fd), uintptr(offset)}
 	r0, _, e1 := Syscall(SYS_MMAP, uintptr(unsafe.Pointer(&mmap_args[0])), 0, 0)
 	xaddr = uintptr(r0)
-	if e1 != 0 ***REMOVED***
+	if e1 != 0 {
 		err = errnoErr(e1)
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // On s390x Linux, all the socket calls go through an extra indirection.
 // The arguments to the underlying system call (SYS_SOCKETCALL) are the
@@ -158,163 +158,163 @@ const (
 	netSendMMsg    = 20
 )
 
-func accept(s int, rsa *RawSockaddrAny, addrlen *_Socklen) (int, error) ***REMOVED***
-	args := [3]uintptr***REMOVED***uintptr(s), uintptr(unsafe.Pointer(rsa)), uintptr(unsafe.Pointer(addrlen))***REMOVED***
+func accept(s int, rsa *RawSockaddrAny, addrlen *_Socklen) (int, error) {
+	args := [3]uintptr{uintptr(s), uintptr(unsafe.Pointer(rsa)), uintptr(unsafe.Pointer(addrlen))}
 	fd, _, err := Syscall(SYS_SOCKETCALL, netAccept, uintptr(unsafe.Pointer(&args)), 0)
-	if err != 0 ***REMOVED***
+	if err != 0 {
 		return 0, err
-	***REMOVED***
+	}
 	return int(fd), nil
-***REMOVED***
+}
 
-func accept4(s int, rsa *RawSockaddrAny, addrlen *_Socklen, flags int) (int, error) ***REMOVED***
-	args := [4]uintptr***REMOVED***uintptr(s), uintptr(unsafe.Pointer(rsa)), uintptr(unsafe.Pointer(addrlen)), uintptr(flags)***REMOVED***
+func accept4(s int, rsa *RawSockaddrAny, addrlen *_Socklen, flags int) (int, error) {
+	args := [4]uintptr{uintptr(s), uintptr(unsafe.Pointer(rsa)), uintptr(unsafe.Pointer(addrlen)), uintptr(flags)}
 	fd, _, err := Syscall(SYS_SOCKETCALL, netAccept4, uintptr(unsafe.Pointer(&args)), 0)
-	if err != 0 ***REMOVED***
+	if err != 0 {
 		return 0, err
-	***REMOVED***
+	}
 	return int(fd), nil
-***REMOVED***
+}
 
-func getsockname(s int, rsa *RawSockaddrAny, addrlen *_Socklen) error ***REMOVED***
-	args := [3]uintptr***REMOVED***uintptr(s), uintptr(unsafe.Pointer(rsa)), uintptr(unsafe.Pointer(addrlen))***REMOVED***
+func getsockname(s int, rsa *RawSockaddrAny, addrlen *_Socklen) error {
+	args := [3]uintptr{uintptr(s), uintptr(unsafe.Pointer(rsa)), uintptr(unsafe.Pointer(addrlen))}
 	_, _, err := RawSyscall(SYS_SOCKETCALL, netGetSockName, uintptr(unsafe.Pointer(&args)), 0)
-	if err != 0 ***REMOVED***
+	if err != 0 {
 		return err
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func getpeername(s int, rsa *RawSockaddrAny, addrlen *_Socklen) error ***REMOVED***
-	args := [3]uintptr***REMOVED***uintptr(s), uintptr(unsafe.Pointer(rsa)), uintptr(unsafe.Pointer(addrlen))***REMOVED***
+func getpeername(s int, rsa *RawSockaddrAny, addrlen *_Socklen) error {
+	args := [3]uintptr{uintptr(s), uintptr(unsafe.Pointer(rsa)), uintptr(unsafe.Pointer(addrlen))}
 	_, _, err := RawSyscall(SYS_SOCKETCALL, netGetPeerName, uintptr(unsafe.Pointer(&args)), 0)
-	if err != 0 ***REMOVED***
+	if err != 0 {
 		return err
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func socketpair(domain int, typ int, flags int, fd *[2]int32) error ***REMOVED***
-	args := [4]uintptr***REMOVED***uintptr(domain), uintptr(typ), uintptr(flags), uintptr(unsafe.Pointer(fd))***REMOVED***
+func socketpair(domain int, typ int, flags int, fd *[2]int32) error {
+	args := [4]uintptr{uintptr(domain), uintptr(typ), uintptr(flags), uintptr(unsafe.Pointer(fd))}
 	_, _, err := RawSyscall(SYS_SOCKETCALL, netSocketPair, uintptr(unsafe.Pointer(&args)), 0)
-	if err != 0 ***REMOVED***
+	if err != 0 {
 		return err
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func bind(s int, addr unsafe.Pointer, addrlen _Socklen) error ***REMOVED***
-	args := [3]uintptr***REMOVED***uintptr(s), uintptr(addr), uintptr(addrlen)***REMOVED***
+func bind(s int, addr unsafe.Pointer, addrlen _Socklen) error {
+	args := [3]uintptr{uintptr(s), uintptr(addr), uintptr(addrlen)}
 	_, _, err := Syscall(SYS_SOCKETCALL, netBind, uintptr(unsafe.Pointer(&args)), 0)
-	if err != 0 ***REMOVED***
+	if err != 0 {
 		return err
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func connect(s int, addr unsafe.Pointer, addrlen _Socklen) error ***REMOVED***
-	args := [3]uintptr***REMOVED***uintptr(s), uintptr(addr), uintptr(addrlen)***REMOVED***
+func connect(s int, addr unsafe.Pointer, addrlen _Socklen) error {
+	args := [3]uintptr{uintptr(s), uintptr(addr), uintptr(addrlen)}
 	_, _, err := Syscall(SYS_SOCKETCALL, netConnect, uintptr(unsafe.Pointer(&args)), 0)
-	if err != 0 ***REMOVED***
+	if err != 0 {
 		return err
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func socket(domain int, typ int, proto int) (int, error) ***REMOVED***
-	args := [3]uintptr***REMOVED***uintptr(domain), uintptr(typ), uintptr(proto)***REMOVED***
+func socket(domain int, typ int, proto int) (int, error) {
+	args := [3]uintptr{uintptr(domain), uintptr(typ), uintptr(proto)}
 	fd, _, err := RawSyscall(SYS_SOCKETCALL, netSocket, uintptr(unsafe.Pointer(&args)), 0)
-	if err != 0 ***REMOVED***
+	if err != 0 {
 		return 0, err
-	***REMOVED***
+	}
 	return int(fd), nil
-***REMOVED***
+}
 
-func getsockopt(s int, level int, name int, val unsafe.Pointer, vallen *_Socklen) error ***REMOVED***
-	args := [5]uintptr***REMOVED***uintptr(s), uintptr(level), uintptr(name), uintptr(val), uintptr(unsafe.Pointer(vallen))***REMOVED***
+func getsockopt(s int, level int, name int, val unsafe.Pointer, vallen *_Socklen) error {
+	args := [5]uintptr{uintptr(s), uintptr(level), uintptr(name), uintptr(val), uintptr(unsafe.Pointer(vallen))}
 	_, _, err := Syscall(SYS_SOCKETCALL, netGetSockOpt, uintptr(unsafe.Pointer(&args)), 0)
-	if err != 0 ***REMOVED***
+	if err != 0 {
 		return err
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func setsockopt(s int, level int, name int, val unsafe.Pointer, vallen uintptr) error ***REMOVED***
-	args := [4]uintptr***REMOVED***uintptr(s), uintptr(level), uintptr(name), uintptr(val)***REMOVED***
+func setsockopt(s int, level int, name int, val unsafe.Pointer, vallen uintptr) error {
+	args := [4]uintptr{uintptr(s), uintptr(level), uintptr(name), uintptr(val)}
 	_, _, err := Syscall(SYS_SOCKETCALL, netSetSockOpt, uintptr(unsafe.Pointer(&args)), 0)
-	if err != 0 ***REMOVED***
+	if err != 0 {
 		return err
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func recvfrom(s int, p []byte, flags int, from *RawSockaddrAny, fromlen *_Socklen) (int, error) ***REMOVED***
+func recvfrom(s int, p []byte, flags int, from *RawSockaddrAny, fromlen *_Socklen) (int, error) {
 	var base uintptr
-	if len(p) > 0 ***REMOVED***
+	if len(p) > 0 {
 		base = uintptr(unsafe.Pointer(&p[0]))
-	***REMOVED***
-	args := [6]uintptr***REMOVED***uintptr(s), base, uintptr(len(p)), uintptr(flags), uintptr(unsafe.Pointer(from)), uintptr(unsafe.Pointer(fromlen))***REMOVED***
+	}
+	args := [6]uintptr{uintptr(s), base, uintptr(len(p)), uintptr(flags), uintptr(unsafe.Pointer(from)), uintptr(unsafe.Pointer(fromlen))}
 	n, _, err := Syscall(SYS_SOCKETCALL, netRecvFrom, uintptr(unsafe.Pointer(&args)), 0)
-	if err != 0 ***REMOVED***
+	if err != 0 {
 		return 0, err
-	***REMOVED***
+	}
 	return int(n), nil
-***REMOVED***
+}
 
-func sendto(s int, p []byte, flags int, to unsafe.Pointer, addrlen _Socklen) error ***REMOVED***
+func sendto(s int, p []byte, flags int, to unsafe.Pointer, addrlen _Socklen) error {
 	var base uintptr
-	if len(p) > 0 ***REMOVED***
+	if len(p) > 0 {
 		base = uintptr(unsafe.Pointer(&p[0]))
-	***REMOVED***
-	args := [6]uintptr***REMOVED***uintptr(s), base, uintptr(len(p)), uintptr(flags), uintptr(to), uintptr(addrlen)***REMOVED***
+	}
+	args := [6]uintptr{uintptr(s), base, uintptr(len(p)), uintptr(flags), uintptr(to), uintptr(addrlen)}
 	_, _, err := Syscall(SYS_SOCKETCALL, netSendTo, uintptr(unsafe.Pointer(&args)), 0)
-	if err != 0 ***REMOVED***
+	if err != 0 {
 		return err
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func recvmsg(s int, msg *Msghdr, flags int) (int, error) ***REMOVED***
-	args := [3]uintptr***REMOVED***uintptr(s), uintptr(unsafe.Pointer(msg)), uintptr(flags)***REMOVED***
+func recvmsg(s int, msg *Msghdr, flags int) (int, error) {
+	args := [3]uintptr{uintptr(s), uintptr(unsafe.Pointer(msg)), uintptr(flags)}
 	n, _, err := Syscall(SYS_SOCKETCALL, netRecvMsg, uintptr(unsafe.Pointer(&args)), 0)
-	if err != 0 ***REMOVED***
+	if err != 0 {
 		return 0, err
-	***REMOVED***
+	}
 	return int(n), nil
-***REMOVED***
+}
 
-func sendmsg(s int, msg *Msghdr, flags int) (int, error) ***REMOVED***
-	args := [3]uintptr***REMOVED***uintptr(s), uintptr(unsafe.Pointer(msg)), uintptr(flags)***REMOVED***
+func sendmsg(s int, msg *Msghdr, flags int) (int, error) {
+	args := [3]uintptr{uintptr(s), uintptr(unsafe.Pointer(msg)), uintptr(flags)}
 	n, _, err := Syscall(SYS_SOCKETCALL, netSendMsg, uintptr(unsafe.Pointer(&args)), 0)
-	if err != 0 ***REMOVED***
+	if err != 0 {
 		return 0, err
-	***REMOVED***
+	}
 	return int(n), nil
-***REMOVED***
+}
 
-func Listen(s int, n int) error ***REMOVED***
-	args := [2]uintptr***REMOVED***uintptr(s), uintptr(n)***REMOVED***
+func Listen(s int, n int) error {
+	args := [2]uintptr{uintptr(s), uintptr(n)}
 	_, _, err := Syscall(SYS_SOCKETCALL, netListen, uintptr(unsafe.Pointer(&args)), 0)
-	if err != 0 ***REMOVED***
+	if err != 0 {
 		return err
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func Shutdown(s, how int) error ***REMOVED***
-	args := [2]uintptr***REMOVED***uintptr(s), uintptr(how)***REMOVED***
+func Shutdown(s, how int) error {
+	args := [2]uintptr{uintptr(s), uintptr(how)}
 	_, _, err := Syscall(SYS_SOCKETCALL, netShutdown, uintptr(unsafe.Pointer(&args)), 0)
-	if err != 0 ***REMOVED***
+	if err != 0 {
 		return err
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 //sys	poll(fds *PollFd, nfds int, timeout int) (n int, err error)
 
-func Poll(fds []PollFd, timeout int) (n int, err error) ***REMOVED***
-	if len(fds) == 0 ***REMOVED***
+func Poll(fds []PollFd, timeout int) (n int, err error) {
+	if len(fds) == 0 {
 		return poll(nil, 0, timeout)
-	***REMOVED***
+	}
 	return poll(&fds[0], len(fds), timeout)
-***REMOVED***
+}

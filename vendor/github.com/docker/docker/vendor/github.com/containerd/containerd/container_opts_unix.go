@@ -29,122 +29,122 @@ import (
 // WithCheckpoint allows a container to be created from the checkpointed information
 // provided by the descriptor. The image, snapshot, and runtime specifications are
 // restored on the container
-func WithCheckpoint(im Image, snapshotKey string) NewContainerOpts ***REMOVED***
+func WithCheckpoint(im Image, snapshotKey string) NewContainerOpts {
 	// set image and rw, and spec
-	return func(ctx context.Context, client *Client, c *containers.Container) error ***REMOVED***
+	return func(ctx context.Context, client *Client, c *containers.Container) error {
 		var (
 			desc  = im.Target()
 			id    = desc.Digest
 			store = client.ContentStore()
 		)
 		index, err := decodeIndex(ctx, store, id)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		var rw *v1.Descriptor
-		for _, m := range index.Manifests ***REMOVED***
-			switch m.MediaType ***REMOVED***
+		for _, m := range index.Manifests {
+			switch m.MediaType {
 			case v1.MediaTypeImageLayer:
 				fk := m
 				rw = &fk
 			case images.MediaTypeDockerSchema2Manifest, images.MediaTypeDockerSchema2ManifestList:
 				config, err := images.Config(ctx, store, m, platforms.Default())
-				if err != nil ***REMOVED***
+				if err != nil {
 					return errors.Wrap(err, "unable to resolve image config")
-				***REMOVED***
+				}
 				diffIDs, err := images.RootFS(ctx, store, config)
-				if err != nil ***REMOVED***
+				if err != nil {
 					return errors.Wrap(err, "unable to get rootfs")
-				***REMOVED***
+				}
 				setSnapshotterIfEmpty(c)
-				if _, err := client.SnapshotService(c.Snapshotter).Prepare(ctx, snapshotKey, identity.ChainID(diffIDs).String()); err != nil ***REMOVED***
-					if !errdefs.IsAlreadyExists(err) ***REMOVED***
+				if _, err := client.SnapshotService(c.Snapshotter).Prepare(ctx, snapshotKey, identity.ChainID(diffIDs).String()); err != nil {
+					if !errdefs.IsAlreadyExists(err) {
 						return err
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				c.Image = index.Annotations["image.name"]
 			case images.MediaTypeContainerd1CheckpointConfig:
 				data, err := content.ReadBlob(ctx, store, m.Digest)
-				if err != nil ***REMOVED***
+				if err != nil {
 					return errors.Wrap(err, "unable to read checkpoint config")
-				***REMOVED***
+				}
 				var any protobuf.Any
-				if err := proto.Unmarshal(data, &any); err != nil ***REMOVED***
+				if err := proto.Unmarshal(data, &any); err != nil {
 					return err
-				***REMOVED***
+				}
 				c.Spec = &any
-			***REMOVED***
-		***REMOVED***
-		if rw != nil ***REMOVED***
+			}
+		}
+		if rw != nil {
 			// apply the rw snapshot to the new rw layer
 			mounts, err := client.SnapshotService(c.Snapshotter).Mounts(ctx, snapshotKey)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return errors.Wrapf(err, "unable to get mounts for %s", snapshotKey)
-			***REMOVED***
-			if _, err := client.DiffService().Apply(ctx, *rw, mounts); err != nil ***REMOVED***
+			}
+			if _, err := client.DiffService().Apply(ctx, *rw, mounts); err != nil {
 				return errors.Wrap(err, "unable to apply rw diff")
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		c.SnapshotKey = snapshotKey
 		return nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // WithTaskCheckpoint allows a task to be created with live runtime and memory data from a
 // previous checkpoint. Additional software such as CRIU may be required to
 // restore a task from a checkpoint
-func WithTaskCheckpoint(im Image) NewTaskOpts ***REMOVED***
-	return func(ctx context.Context, c *Client, info *TaskInfo) error ***REMOVED***
+func WithTaskCheckpoint(im Image) NewTaskOpts {
+	return func(ctx context.Context, c *Client, info *TaskInfo) error {
 		desc := im.Target()
 		id := desc.Digest
 		index, err := decodeIndex(ctx, c.ContentStore(), id)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-		for _, m := range index.Manifests ***REMOVED***
-			if m.MediaType == images.MediaTypeContainerd1Checkpoint ***REMOVED***
-				info.Checkpoint = &types.Descriptor***REMOVED***
+		}
+		for _, m := range index.Manifests {
+			if m.MediaType == images.MediaTypeContainerd1Checkpoint {
+				info.Checkpoint = &types.Descriptor{
 					MediaType: m.MediaType,
 					Size_:     m.Size,
 					Digest:    m.Digest,
-				***REMOVED***
+				}
 				return nil
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		return fmt.Errorf("checkpoint not found in index %s", id)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func decodeIndex(ctx context.Context, store content.Store, id digest.Digest) (*v1.Index, error) ***REMOVED***
+func decodeIndex(ctx context.Context, store content.Store, id digest.Digest) (*v1.Index, error) {
 	var index v1.Index
 	p, err := content.ReadBlob(ctx, store, id)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if err := json.Unmarshal(p, &index); err != nil ***REMOVED***
+	}
+	if err := json.Unmarshal(p, &index); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	return &index, nil
-***REMOVED***
+}
 
 // WithRemappedSnapshot creates a new snapshot and remaps the uid/gid for the
 // filesystem to be used by a container with user namespaces
-func WithRemappedSnapshot(id string, i Image, uid, gid uint32) NewContainerOpts ***REMOVED***
+func WithRemappedSnapshot(id string, i Image, uid, gid uint32) NewContainerOpts {
 	return withRemappedSnapshotBase(id, i, uid, gid, false)
-***REMOVED***
+}
 
 // WithRemappedSnapshotView is similar to WithRemappedSnapshot but rootfs is mounted as read-only.
-func WithRemappedSnapshotView(id string, i Image, uid, gid uint32) NewContainerOpts ***REMOVED***
+func WithRemappedSnapshotView(id string, i Image, uid, gid uint32) NewContainerOpts {
 	return withRemappedSnapshotBase(id, i, uid, gid, true)
-***REMOVED***
+}
 
-func withRemappedSnapshotBase(id string, i Image, uid, gid uint32, readonly bool) NewContainerOpts ***REMOVED***
-	return func(ctx context.Context, client *Client, c *containers.Container) error ***REMOVED***
+func withRemappedSnapshotBase(id string, i Image, uid, gid uint32, readonly bool) NewContainerOpts {
+	return func(ctx context.Context, client *Client, c *containers.Container) error {
 		diffIDs, err := i.(*image).i.RootFS(ctx, client.ContentStore(), platforms.Default())
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 
 		setSnapshotterIfEmpty(c)
 
@@ -153,68 +153,68 @@ func withRemappedSnapshotBase(id string, i Image, uid, gid uint32, readonly bool
 			parent      = identity.ChainID(diffIDs).String()
 			usernsID    = fmt.Sprintf("%s-%d-%d", parent, uid, gid)
 		)
-		if _, err := snapshotter.Stat(ctx, usernsID); err == nil ***REMOVED***
-			if _, err := snapshotter.Prepare(ctx, id, usernsID); err == nil ***REMOVED***
+		if _, err := snapshotter.Stat(ctx, usernsID); err == nil {
+			if _, err := snapshotter.Prepare(ctx, id, usernsID); err == nil {
 				c.SnapshotKey = id
 				c.Image = i.Name()
 				return nil
-			***REMOVED*** else if !errdefs.IsNotFound(err) ***REMOVED***
+			} else if !errdefs.IsNotFound(err) {
 				return err
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		mounts, err := snapshotter.Prepare(ctx, usernsID+"-remap", parent)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-		if err := remapRootFS(mounts, uid, gid); err != nil ***REMOVED***
+		}
+		if err := remapRootFS(mounts, uid, gid); err != nil {
 			snapshotter.Remove(ctx, usernsID)
 			return err
-		***REMOVED***
-		if err := snapshotter.Commit(ctx, usernsID, usernsID+"-remap"); err != nil ***REMOVED***
+		}
+		if err := snapshotter.Commit(ctx, usernsID, usernsID+"-remap"); err != nil {
 			return err
-		***REMOVED***
-		if readonly ***REMOVED***
+		}
+		if readonly {
 			_, err = snapshotter.View(ctx, id, usernsID)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			_, err = snapshotter.Prepare(ctx, id, usernsID)
-		***REMOVED***
-		if err != nil ***REMOVED***
+		}
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		c.SnapshotKey = id
 		c.Image = i.Name()
 		return nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func remapRootFS(mounts []mount.Mount, uid, gid uint32) error ***REMOVED***
+func remapRootFS(mounts []mount.Mount, uid, gid uint32) error {
 	root, err := ioutil.TempDir("", "ctd-remap")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer os.Remove(root)
-	for _, m := range mounts ***REMOVED***
-		if err := m.Mount(root); err != nil ***REMOVED***
+	for _, m := range mounts {
+		if err := m.Mount(root); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	err = filepath.Walk(root, incrementFS(root, uid, gid))
-	if uerr := mount.Unmount(root, 0); err == nil ***REMOVED***
+	if uerr := mount.Unmount(root, 0); err == nil {
 		err = uerr
-	***REMOVED***
+	}
 	return err
-***REMOVED***
+}
 
-func incrementFS(root string, uidInc, gidInc uint32) filepath.WalkFunc ***REMOVED***
-	return func(path string, info os.FileInfo, err error) error ***REMOVED***
-		if err != nil ***REMOVED***
+func incrementFS(root string, uidInc, gidInc uint32) filepath.WalkFunc {
+	return func(path string, info os.FileInfo, err error) error {
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		var (
 			stat = info.Sys().(*syscall.Stat_t)
 			u, g = int(stat.Uid + uidInc), int(stat.Gid + gidInc)
 		)
 		// be sure the lchown the path as to not de-reference the symlink to a host file
 		return os.Lchown(path, u, g)
-	***REMOVED***
-***REMOVED***
+	}
+}

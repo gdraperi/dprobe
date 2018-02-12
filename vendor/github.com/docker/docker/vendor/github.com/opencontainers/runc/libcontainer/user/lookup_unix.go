@@ -15,32 +15,32 @@ const (
 	unixGroupPath  = "/etc/group"
 )
 
-func GetPasswdPath() (string, error) ***REMOVED***
+func GetPasswdPath() (string, error) {
 	return unixPasswdPath, nil
-***REMOVED***
+}
 
-func GetPasswd() (io.ReadCloser, error) ***REMOVED***
+func GetPasswd() (io.ReadCloser, error) {
 	return os.Open(unixPasswdPath)
-***REMOVED***
+}
 
-func GetGroupPath() (string, error) ***REMOVED***
+func GetGroupPath() (string, error) {
 	return unixGroupPath, nil
-***REMOVED***
+}
 
-func GetGroup() (io.ReadCloser, error) ***REMOVED***
+func GetGroup() (io.ReadCloser, error) {
 	return os.Open(unixGroupPath)
-***REMOVED***
+}
 
 // CurrentUser looks up the current user by their user id in /etc/passwd. If the
 // user cannot be found (or there is no /etc/passwd file on the filesystem),
 // then CurrentUser returns an error.
-func CurrentUser() (User, error) ***REMOVED***
+func CurrentUser() (User, error) {
 	return LookupUid(unix.Getuid())
-***REMOVED***
+}
 
 // CurrentGroup looks up the current user's group by their primary group id's
 // entry in /etc/passwd. If the group cannot be found (or there is no
 // /etc/group file on the filesystem), then CurrentGroup returns an error.
-func CurrentGroup() (Group, error) ***REMOVED***
+func CurrentGroup() (Group, error) {
 	return LookupGid(unix.Getgid())
-***REMOVED***
+}

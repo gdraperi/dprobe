@@ -7,25 +7,25 @@ import (
 	"testing"
 )
 
-type pinsHandler struct ***REMOVED***
+type pinsHandler struct {
 	gotParams map[string]string
 	response  string
-***REMOVED***
+}
 
-func newPinsHandler() *pinsHandler ***REMOVED***
-	return &pinsHandler***REMOVED***
+func newPinsHandler() *pinsHandler {
+	return &pinsHandler{
 		gotParams: make(map[string]string),
-		response:  `***REMOVED*** "ok": true ***REMOVED***`,
-	***REMOVED***
-***REMOVED***
+		response:  `{ "ok": true }`,
+	}
+}
 
-func (rh *pinsHandler) accumulateFormValue(k string, r *http.Request) ***REMOVED***
-	if v := r.FormValue(k); v != "" ***REMOVED***
+func (rh *pinsHandler) accumulateFormValue(k string, r *http.Request) {
+	if v := r.FormValue(k); v != "" {
 		rh.gotParams[k] = v
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (rh *pinsHandler) handler(w http.ResponseWriter, r *http.Request) ***REMOVED***
+func (rh *pinsHandler) handler(w http.ResponseWriter, r *http.Request) {
 	rh.accumulateFormValue("channel", r)
 	rh.accumulateFormValue("count", r)
 	rh.accumulateFormValue("file", r)
@@ -34,198 +34,198 @@ func (rh *pinsHandler) handler(w http.ResponseWriter, r *http.Request) ***REMOVE
 	rh.accumulateFormValue("timestamp", r)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(rh.response))
-***REMOVED***
+}
 
-func TestSlack_AddPin(t *testing.T) ***REMOVED***
+func TestSlack_AddPin(t *testing.T) {
 	once.Do(startServer)
 	SLACK_API = "http://" + serverAddr + "/"
 	api := New("testing-token")
-	tests := []struct ***REMOVED***
+	tests := []struct {
 		channel    string
 		ref        ItemRef
 		wantParams map[string]string
-	***REMOVED******REMOVED***
-		***REMOVED***
+	}{
+		{
 			"ChannelID",
 			NewRefToMessage("ChannelID", "123"),
-			map[string]string***REMOVED***
+			map[string]string{
 				"channel":   "ChannelID",
 				"timestamp": "123",
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			},
+		},
+		{
 			"ChannelID",
 			NewRefToFile("FileID"),
-			map[string]string***REMOVED***
+			map[string]string{
 				"channel": "ChannelID",
 				"file":    "FileID",
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			},
+		},
+		{
 			"ChannelID",
 			NewRefToComment("FileCommentID"),
-			map[string]string***REMOVED***
+			map[string]string{
 				"channel":      "ChannelID",
 				"file_comment": "FileCommentID",
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+			},
+		},
+	}
 	var rh *pinsHandler
-	http.HandleFunc("/pins.add", func(w http.ResponseWriter, r *http.Request) ***REMOVED*** rh.handler(w, r) ***REMOVED***)
-	for i, test := range tests ***REMOVED***
+	http.HandleFunc("/pins.add", func(w http.ResponseWriter, r *http.Request) { rh.handler(w, r) })
+	for i, test := range tests {
 		rh = newPinsHandler()
 		err := api.AddPin(test.channel, test.ref)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("%d: Unexpected error: %s", i, err)
-		***REMOVED***
-		if !reflect.DeepEqual(rh.gotParams, test.wantParams) ***REMOVED***
+		}
+		if !reflect.DeepEqual(rh.gotParams, test.wantParams) {
 			t.Errorf("%d: Got params %#v, want %#v", i, rh.gotParams, test.wantParams)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestSlack_RemovePin(t *testing.T) ***REMOVED***
+func TestSlack_RemovePin(t *testing.T) {
 	once.Do(startServer)
 	SLACK_API = "http://" + serverAddr + "/"
 	api := New("testing-token")
-	tests := []struct ***REMOVED***
+	tests := []struct {
 		channel    string
 		ref        ItemRef
 		wantParams map[string]string
-	***REMOVED******REMOVED***
-		***REMOVED***
+	}{
+		{
 			"ChannelID",
 			NewRefToMessage("ChannelID", "123"),
-			map[string]string***REMOVED***
+			map[string]string{
 				"channel":   "ChannelID",
 				"timestamp": "123",
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			},
+		},
+		{
 			"ChannelID",
 			NewRefToFile("FileID"),
-			map[string]string***REMOVED***
+			map[string]string{
 				"channel": "ChannelID",
 				"file":    "FileID",
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			},
+		},
+		{
 			"ChannelID",
 			NewRefToComment("FileCommentID"),
-			map[string]string***REMOVED***
+			map[string]string{
 				"channel":      "ChannelID",
 				"file_comment": "FileCommentID",
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+			},
+		},
+	}
 	var rh *pinsHandler
-	http.HandleFunc("/pins.remove", func(w http.ResponseWriter, r *http.Request) ***REMOVED*** rh.handler(w, r) ***REMOVED***)
-	for i, test := range tests ***REMOVED***
+	http.HandleFunc("/pins.remove", func(w http.ResponseWriter, r *http.Request) { rh.handler(w, r) })
+	for i, test := range tests {
 		rh = newPinsHandler()
 		err := api.RemovePin(test.channel, test.ref)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("%d: Unexpected error: %s", i, err)
-		***REMOVED***
-		if !reflect.DeepEqual(rh.gotParams, test.wantParams) ***REMOVED***
+		}
+		if !reflect.DeepEqual(rh.gotParams, test.wantParams) {
 			t.Errorf("%d: Got params %#v, want %#v", i, rh.gotParams, test.wantParams)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestSlack_ListPins(t *testing.T) ***REMOVED***
+func TestSlack_ListPins(t *testing.T) {
 	once.Do(startServer)
 	SLACK_API = "http://" + serverAddr + "/"
 	api := New("testing-token")
 	rh := newPinsHandler()
-	http.HandleFunc("/pins.list", func(w http.ResponseWriter, r *http.Request) ***REMOVED*** rh.handler(w, r) ***REMOVED***)
-	rh.response = `***REMOVED***"ok": true,
+	http.HandleFunc("/pins.list", func(w http.ResponseWriter, r *http.Request) { rh.handler(w, r) })
+	rh.response = `{"ok": true,
     "items": [
-        ***REMOVED***
+        {
             "type": "message",
             "channel": "C1",
-            "message": ***REMOVED***
+            "message": {
                 "text": "hello",
                 "reactions": [
-                    ***REMOVED***
+                    {
                         "name": "astonished",
                         "count": 3,
                         "users": [ "U1", "U2", "U3" ]
-                ***REMOVED***,
-                    ***REMOVED***
+                    },
+                    {
                         "name": "clock1",
                         "count": 3,
                         "users": [ "U1", "U2" ]
-                ***REMOVED***
+                    }
                 ]
-        ***REMOVED***
-    ***REMOVED***,
-        ***REMOVED***
+            }
+        },
+        {
             "type": "file",
-            "file": ***REMOVED***
+            "file": {
                 "name": "toy",
                 "reactions": [
-                    ***REMOVED***
+                    {
                         "name": "clock1",
                         "count": 3,
                         "users": [ "U1", "U2" ]
-                ***REMOVED***
+                    }
                 ]
-        ***REMOVED***
-    ***REMOVED***,
-        ***REMOVED***
+            }
+        },
+        {
             "type": "file_comment",
-            "file": ***REMOVED***
+            "file": {
                 "name": "toy"
-        ***REMOVED***,
-            "comment": ***REMOVED***
+            },
+            "comment": {
                 "comment": "cool toy",
                 "reactions": [
-                    ***REMOVED***
+                    {
                         "name": "astonished",
                         "count": 3,
                         "users": [ "U1", "U2", "U3" ]
-                ***REMOVED***
+                    }
                 ]
-        ***REMOVED***
-    ***REMOVED***
+            }
+        }
     ],
-    "paging": ***REMOVED***
+    "paging": {
         "count": 100,
         "total": 4,
         "page": 1,
         "pages": 1
-***REMOVED******REMOVED***`
-	want := []Item***REMOVED***
-		NewMessageItem("C1", &Message***REMOVED***Msg: Msg***REMOVED***
+    }}`
+	want := []Item{
+		NewMessageItem("C1", &Message{Msg: Msg{
 			Text: "hello",
-			Reactions: []ItemReaction***REMOVED***
-				ItemReaction***REMOVED***Name: "astonished", Count: 3, Users: []string***REMOVED***"U1", "U2", "U3"***REMOVED******REMOVED***,
-				ItemReaction***REMOVED***Name: "clock1", Count: 3, Users: []string***REMOVED***"U1", "U2"***REMOVED******REMOVED***,
-			***REMOVED***,
-		***REMOVED******REMOVED***),
-		NewFileItem(&File***REMOVED***Name: "toy"***REMOVED***),
-		NewFileCommentItem(&File***REMOVED***Name: "toy"***REMOVED***, &Comment***REMOVED***Comment: "cool toy"***REMOVED***),
-	***REMOVED***
-	wantParams := map[string]string***REMOVED***
+			Reactions: []ItemReaction{
+				ItemReaction{Name: "astonished", Count: 3, Users: []string{"U1", "U2", "U3"}},
+				ItemReaction{Name: "clock1", Count: 3, Users: []string{"U1", "U2"}},
+			},
+		}}),
+		NewFileItem(&File{Name: "toy"}),
+		NewFileCommentItem(&File{Name: "toy"}, &Comment{Comment: "cool toy"}),
+	}
+	wantParams := map[string]string{
 		"channel": "ChannelID",
-	***REMOVED***
+	}
 	got, paging, err := api.ListPins("ChannelID")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("Unexpected error: %s", err)
-	***REMOVED***
-	if !reflect.DeepEqual(got, want) ***REMOVED***
+	}
+	if !reflect.DeepEqual(got, want) {
 		t.Errorf("Got Pins %#v, want %#v", got, want)
-		for i, item := range got ***REMOVED***
+		for i, item := range got {
 			fmt.Printf("Item %d, Type: %s\n", i, item.Type)
 			fmt.Printf("Message  %#v\n", item.Message)
 			fmt.Printf("File     %#v\n", item.File)
 			fmt.Printf("Comment  %#v\n", item.Comment)
-		***REMOVED***
-	***REMOVED***
-	if !reflect.DeepEqual(rh.gotParams, wantParams) ***REMOVED***
+		}
+	}
+	if !reflect.DeepEqual(rh.gotParams, wantParams) {
 		t.Errorf("Got params %#v, want %#v", rh.gotParams, wantParams)
-	***REMOVED***
-	if reflect.DeepEqual(paging, Paging***REMOVED******REMOVED***) ***REMOVED***
+	}
+	if reflect.DeepEqual(paging, Paging{}) {
 		t.Errorf("Want paging data, got empty struct")
-	***REMOVED***
-***REMOVED***
+	}
+}

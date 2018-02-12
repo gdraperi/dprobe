@@ -29,65 +29,65 @@ const last5 = 0x1f
 const first3 = 0xe0
 const last7 = 0x7f
 
-func isfixint(b byte) bool ***REMOVED***
+func isfixint(b byte) bool {
 	return b>>7 == 0
-***REMOVED***
+}
 
-func isnfixint(b byte) bool ***REMOVED***
+func isnfixint(b byte) bool {
 	return b&first3 == mnfixint
-***REMOVED***
+}
 
-func isfixmap(b byte) bool ***REMOVED***
+func isfixmap(b byte) bool {
 	return b&first4 == mfixmap
-***REMOVED***
+}
 
-func isfixarray(b byte) bool ***REMOVED***
+func isfixarray(b byte) bool {
 	return b&first4 == mfixarray
-***REMOVED***
+}
 
-func isfixstr(b byte) bool ***REMOVED***
+func isfixstr(b byte) bool {
 	return b&first3 == mfixstr
-***REMOVED***
+}
 
-func wfixint(u uint8) byte ***REMOVED***
+func wfixint(u uint8) byte {
 	return u & last7
-***REMOVED***
+}
 
-func rfixint(b byte) uint8 ***REMOVED***
+func rfixint(b byte) uint8 {
 	return b
-***REMOVED***
+}
 
-func wnfixint(i int8) byte ***REMOVED***
+func wnfixint(i int8) byte {
 	return byte(i) | mnfixint
-***REMOVED***
+}
 
-func rnfixint(b byte) int8 ***REMOVED***
+func rnfixint(b byte) int8 {
 	return int8(b)
-***REMOVED***
+}
 
-func rfixmap(b byte) uint8 ***REMOVED***
+func rfixmap(b byte) uint8 {
 	return b & last4
-***REMOVED***
+}
 
-func wfixmap(u uint8) byte ***REMOVED***
+func wfixmap(u uint8) byte {
 	return mfixmap | (u & last4)
-***REMOVED***
+}
 
-func rfixstr(b byte) uint8 ***REMOVED***
+func rfixstr(b byte) uint8 {
 	return b & last5
-***REMOVED***
+}
 
-func wfixstr(u uint8) byte ***REMOVED***
+func wfixstr(u uint8) byte {
 	return (u & last5) | mfixstr
-***REMOVED***
+}
 
-func rfixarray(b byte) uint8 ***REMOVED***
+func rfixarray(b byte) uint8 {
 	return (b & last4)
-***REMOVED***
+}
 
-func wfixarray(u uint8) byte ***REMOVED***
+func wfixarray(u uint8) byte {
 	return (u & last4) | mfixarray
-***REMOVED***
+}
 
 // These are all the byte
 // prefixes defined by the

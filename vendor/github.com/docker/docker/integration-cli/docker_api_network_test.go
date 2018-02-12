@@ -16,48 +16,48 @@ import (
 	"github.com/go-check/check"
 )
 
-func (s *DockerSuite) TestAPINetworkGetDefaults(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestAPINetworkGetDefaults(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	// By default docker daemon creates 3 networks. check if they are present
-	defaults := []string***REMOVED***"bridge", "host", "none"***REMOVED***
-	for _, nn := range defaults ***REMOVED***
+	defaults := []string{"bridge", "host", "none"}
+	for _, nn := range defaults {
 		c.Assert(isNetworkAvailable(c, nn), checker.Equals, true)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *DockerSuite) TestAPINetworkCreateDelete(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestAPINetworkCreateDelete(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	// Create a network
 	name := "testnetwork"
-	config := types.NetworkCreateRequest***REMOVED***
+	config := types.NetworkCreateRequest{
 		Name: name,
-		NetworkCreate: types.NetworkCreate***REMOVED***
+		NetworkCreate: types.NetworkCreate{
 			CheckDuplicate: true,
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 	id := createNetwork(c, config, http.StatusCreated)
 	c.Assert(isNetworkAvailable(c, name), checker.Equals, true)
 
 	// delete the network and make sure it is deleted
 	deleteNetwork(c, id, true)
 	c.Assert(isNetworkAvailable(c, name), checker.Equals, false)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestAPINetworkCreateCheckDuplicate(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestAPINetworkCreateCheckDuplicate(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	name := "testcheckduplicate"
-	configOnCheck := types.NetworkCreateRequest***REMOVED***
+	configOnCheck := types.NetworkCreateRequest{
 		Name: name,
-		NetworkCreate: types.NetworkCreate***REMOVED***
+		NetworkCreate: types.NetworkCreate{
 			CheckDuplicate: true,
-		***REMOVED***,
-	***REMOVED***
-	configNotCheck := types.NetworkCreateRequest***REMOVED***
+		},
+	}
+	configNotCheck := types.NetworkCreateRequest{
 		Name: name,
-		NetworkCreate: types.NetworkCreate***REMOVED***
+		NetworkCreate: types.NetworkCreate{
 			CheckDuplicate: false,
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
 	// Creating a new network first
 	createNetwork(c, configOnCheck, http.StatusCreated)
@@ -68,15 +68,15 @@ func (s *DockerSuite) TestAPINetworkCreateCheckDuplicate(c *check.C) ***REMOVED*
 
 	// Creating another network with same name and not CheckDuplicate must succeed
 	createNetwork(c, configNotCheck, http.StatusCreated)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestAPINetworkFilter(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestAPINetworkFilter(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	nr := getNetworkResource(c, getNetworkIDByName(c, "bridge"))
 	c.Assert(nr.Name, checker.Equals, "bridge")
-***REMOVED***
+}
 
-func (s *DockerSuite) TestAPINetworkInspectBridge(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestAPINetworkInspectBridge(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	// Inspect default bridge network
 	nr := getNetworkResource(c, "bridge")
@@ -99,23 +99,23 @@ func (s *DockerSuite) TestAPINetworkInspectBridge(c *check.C) ***REMOVED***
 	ip, _, err := net.ParseCIDR(nr.Containers[containerID].IPv4Address)
 	c.Assert(err, checker.IsNil)
 	c.Assert(ip.String(), checker.Equals, containerIP)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestAPINetworkInspectUserDefinedNetwork(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestAPINetworkInspectUserDefinedNetwork(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	// IPAM configuration inspect
-	ipam := &network.IPAM***REMOVED***
+	ipam := &network.IPAM{
 		Driver: "default",
-		Config: []network.IPAMConfig***REMOVED******REMOVED***Subnet: "172.28.0.0/16", IPRange: "172.28.5.0/24", Gateway: "172.28.5.254"***REMOVED******REMOVED***,
-	***REMOVED***
-	config := types.NetworkCreateRequest***REMOVED***
+		Config: []network.IPAMConfig{{Subnet: "172.28.0.0/16", IPRange: "172.28.5.0/24", Gateway: "172.28.5.254"}},
+	}
+	config := types.NetworkCreateRequest{
 		Name: "br0",
-		NetworkCreate: types.NetworkCreate***REMOVED***
+		NetworkCreate: types.NetworkCreate{
 			Driver:  "bridge",
 			IPAM:    ipam,
-			Options: map[string]string***REMOVED***"foo": "bar", "opts": "dopts"***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+			Options: map[string]string{"foo": "bar", "opts": "dopts"},
+		},
+	}
 	id0 := createNetwork(c, config, http.StatusCreated)
 	c.Assert(isNetworkAvailable(c, "br0"), checker.Equals, true)
 
@@ -130,15 +130,15 @@ func (s *DockerSuite) TestAPINetworkInspectUserDefinedNetwork(c *check.C) ***REM
 	// delete the network and make sure it is deleted
 	deleteNetwork(c, id0, true)
 	c.Assert(isNetworkAvailable(c, "br0"), checker.Equals, false)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestAPINetworkConnectDisconnect(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestAPINetworkConnectDisconnect(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	// Create test network
 	name := "testnetwork"
-	config := types.NetworkCreateRequest***REMOVED***
+	config := types.NetworkCreateRequest{
 		Name: name,
-	***REMOVED***
+	}
 	id := createNetwork(c, config, http.StatusCreated)
 	nr := getNetworkResource(c, id)
 	c.Assert(nr.Name, checker.Equals, name)
@@ -171,52 +171,52 @@ func (s *DockerSuite) TestAPINetworkConnectDisconnect(c *check.C) ***REMOVED***
 
 	// delete the network
 	deleteNetwork(c, nr.ID, true)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestAPINetworkIPAMMultipleBridgeNetworks(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestAPINetworkIPAMMultipleBridgeNetworks(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	// test0 bridge network
-	ipam0 := &network.IPAM***REMOVED***
+	ipam0 := &network.IPAM{
 		Driver: "default",
-		Config: []network.IPAMConfig***REMOVED******REMOVED***Subnet: "192.178.0.0/16", IPRange: "192.178.128.0/17", Gateway: "192.178.138.100"***REMOVED******REMOVED***,
-	***REMOVED***
-	config0 := types.NetworkCreateRequest***REMOVED***
+		Config: []network.IPAMConfig{{Subnet: "192.178.0.0/16", IPRange: "192.178.128.0/17", Gateway: "192.178.138.100"}},
+	}
+	config0 := types.NetworkCreateRequest{
 		Name: "test0",
-		NetworkCreate: types.NetworkCreate***REMOVED***
+		NetworkCreate: types.NetworkCreate{
 			Driver: "bridge",
 			IPAM:   ipam0,
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 	id0 := createNetwork(c, config0, http.StatusCreated)
 	c.Assert(isNetworkAvailable(c, "test0"), checker.Equals, true)
 
-	ipam1 := &network.IPAM***REMOVED***
+	ipam1 := &network.IPAM{
 		Driver: "default",
-		Config: []network.IPAMConfig***REMOVED******REMOVED***Subnet: "192.178.128.0/17", Gateway: "192.178.128.1"***REMOVED******REMOVED***,
-	***REMOVED***
+		Config: []network.IPAMConfig{{Subnet: "192.178.128.0/17", Gateway: "192.178.128.1"}},
+	}
 	// test1 bridge network overlaps with test0
-	config1 := types.NetworkCreateRequest***REMOVED***
+	config1 := types.NetworkCreateRequest{
 		Name: "test1",
-		NetworkCreate: types.NetworkCreate***REMOVED***
+		NetworkCreate: types.NetworkCreate{
 			Driver: "bridge",
 			IPAM:   ipam1,
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 	createNetwork(c, config1, http.StatusForbidden)
 	c.Assert(isNetworkAvailable(c, "test1"), checker.Equals, false)
 
-	ipam2 := &network.IPAM***REMOVED***
+	ipam2 := &network.IPAM{
 		Driver: "default",
-		Config: []network.IPAMConfig***REMOVED******REMOVED***Subnet: "192.169.0.0/16", Gateway: "192.169.100.100"***REMOVED******REMOVED***,
-	***REMOVED***
+		Config: []network.IPAMConfig{{Subnet: "192.169.0.0/16", Gateway: "192.169.100.100"}},
+	}
 	// test2 bridge network does not overlap
-	config2 := types.NetworkCreateRequest***REMOVED***
+	config2 := types.NetworkCreateRequest{
 		Name: "test2",
-		NetworkCreate: types.NetworkCreate***REMOVED***
+		NetworkCreate: types.NetworkCreate{
 			Driver: "bridge",
 			IPAM:   ipam2,
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 	createNetwork(c, config2, http.StatusCreated)
 	c.Assert(isNetworkAvailable(c, "test2"), checker.Equals, true)
 
@@ -226,58 +226,58 @@ func (s *DockerSuite) TestAPINetworkIPAMMultipleBridgeNetworks(c *check.C) ***RE
 	c.Assert(isNetworkAvailable(c, "test1"), checker.Equals, true)
 
 	// for networks w/o ipam specified, docker will choose proper non-overlapping subnets
-	createNetwork(c, types.NetworkCreateRequest***REMOVED***Name: "test3"***REMOVED***, http.StatusCreated)
+	createNetwork(c, types.NetworkCreateRequest{Name: "test3"}, http.StatusCreated)
 	c.Assert(isNetworkAvailable(c, "test3"), checker.Equals, true)
-	createNetwork(c, types.NetworkCreateRequest***REMOVED***Name: "test4"***REMOVED***, http.StatusCreated)
+	createNetwork(c, types.NetworkCreateRequest{Name: "test4"}, http.StatusCreated)
 	c.Assert(isNetworkAvailable(c, "test4"), checker.Equals, true)
-	createNetwork(c, types.NetworkCreateRequest***REMOVED***Name: "test5"***REMOVED***, http.StatusCreated)
+	createNetwork(c, types.NetworkCreateRequest{Name: "test5"}, http.StatusCreated)
 	c.Assert(isNetworkAvailable(c, "test5"), checker.Equals, true)
 
-	for i := 1; i < 6; i++ ***REMOVED***
+	for i := 1; i < 6; i++ {
 		deleteNetwork(c, fmt.Sprintf("test%d", i), true)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *DockerSuite) TestAPICreateDeletePredefinedNetworks(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestAPICreateDeletePredefinedNetworks(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	createDeletePredefinedNetwork(c, "bridge")
 	createDeletePredefinedNetwork(c, "none")
 	createDeletePredefinedNetwork(c, "host")
-***REMOVED***
+}
 
-func createDeletePredefinedNetwork(c *check.C, name string) ***REMOVED***
+func createDeletePredefinedNetwork(c *check.C, name string) {
 	// Create pre-defined network
-	config := types.NetworkCreateRequest***REMOVED***
+	config := types.NetworkCreateRequest{
 		Name: name,
-		NetworkCreate: types.NetworkCreate***REMOVED***
+		NetworkCreate: types.NetworkCreate{
 			CheckDuplicate: true,
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 	createNetwork(c, config, http.StatusForbidden)
 	deleteNetwork(c, name, false)
-***REMOVED***
+}
 
-func isNetworkAvailable(c *check.C, name string) bool ***REMOVED***
+func isNetworkAvailable(c *check.C, name string) bool {
 	resp, body, err := request.Get("/networks")
 	c.Assert(err, checker.IsNil)
 	defer resp.Body.Close()
 	c.Assert(resp.StatusCode, checker.Equals, http.StatusOK)
 
-	nJSON := []types.NetworkResource***REMOVED******REMOVED***
+	nJSON := []types.NetworkResource{}
 	err = json.NewDecoder(body).Decode(&nJSON)
 	c.Assert(err, checker.IsNil)
 
-	for _, n := range nJSON ***REMOVED***
-		if n.Name == name ***REMOVED***
+	for _, n := range nJSON {
+		if n.Name == name {
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false
-***REMOVED***
+}
 
-func getNetworkIDByName(c *check.C, name string) string ***REMOVED***
+func getNetworkIDByName(c *check.C, name string) string {
 	var (
-		v          = url.Values***REMOVED******REMOVED***
+		v          = url.Values{}
 		filterArgs = filters.NewArgs()
 	)
 	filterArgs.Add("name", name)
@@ -289,76 +289,76 @@ func getNetworkIDByName(c *check.C, name string) string ***REMOVED***
 	c.Assert(resp.StatusCode, checker.Equals, http.StatusOK)
 	c.Assert(err, checker.IsNil)
 
-	nJSON := []types.NetworkResource***REMOVED******REMOVED***
+	nJSON := []types.NetworkResource{}
 	err = json.NewDecoder(body).Decode(&nJSON)
 	c.Assert(err, checker.IsNil)
 	var res string
-	for _, n := range nJSON ***REMOVED***
+	for _, n := range nJSON {
 		// Find exact match
-		if n.Name == name ***REMOVED***
+		if n.Name == name {
 			res = n.ID
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	c.Assert(res, checker.Not(checker.Equals), "")
 
 	return res
-***REMOVED***
+}
 
-func getNetworkResource(c *check.C, id string) *types.NetworkResource ***REMOVED***
+func getNetworkResource(c *check.C, id string) *types.NetworkResource {
 	_, obj, err := request.Get("/networks/" + id)
 	c.Assert(err, checker.IsNil)
 
-	nr := types.NetworkResource***REMOVED******REMOVED***
+	nr := types.NetworkResource{}
 	err = json.NewDecoder(obj).Decode(&nr)
 	c.Assert(err, checker.IsNil)
 
 	return &nr
-***REMOVED***
+}
 
-func createNetwork(c *check.C, config types.NetworkCreateRequest, expectedStatusCode int) string ***REMOVED***
+func createNetwork(c *check.C, config types.NetworkCreateRequest, expectedStatusCode int) string {
 	resp, body, err := request.Post("/networks/create", request.JSONBody(config))
 	c.Assert(err, checker.IsNil)
 	defer resp.Body.Close()
 
 	c.Assert(resp.StatusCode, checker.Equals, expectedStatusCode)
 
-	if expectedStatusCode == http.StatusCreated ***REMOVED***
+	if expectedStatusCode == http.StatusCreated {
 		var nr types.NetworkCreateResponse
 		err = json.NewDecoder(body).Decode(&nr)
 		c.Assert(err, checker.IsNil)
 
 		return nr.ID
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func connectNetwork(c *check.C, nid, cid string) ***REMOVED***
-	config := types.NetworkConnect***REMOVED***
+func connectNetwork(c *check.C, nid, cid string) {
+	config := types.NetworkConnect{
 		Container: cid,
-	***REMOVED***
+	}
 
 	resp, _, err := request.Post("/networks/"+nid+"/connect", request.JSONBody(config))
 	c.Assert(resp.StatusCode, checker.Equals, http.StatusOK)
 	c.Assert(err, checker.IsNil)
-***REMOVED***
+}
 
-func disconnectNetwork(c *check.C, nid, cid string) ***REMOVED***
-	config := types.NetworkConnect***REMOVED***
+func disconnectNetwork(c *check.C, nid, cid string) {
+	config := types.NetworkConnect{
 		Container: cid,
-	***REMOVED***
+	}
 
 	resp, _, err := request.Post("/networks/"+nid+"/disconnect", request.JSONBody(config))
 	c.Assert(resp.StatusCode, checker.Equals, http.StatusOK)
 	c.Assert(err, checker.IsNil)
-***REMOVED***
+}
 
-func deleteNetwork(c *check.C, id string, shouldSucceed bool) ***REMOVED***
+func deleteNetwork(c *check.C, id string, shouldSucceed bool) {
 	resp, _, err := request.Delete("/networks/" + id)
 	c.Assert(err, checker.IsNil)
 	defer resp.Body.Close()
-	if !shouldSucceed ***REMOVED***
+	if !shouldSucceed {
 		c.Assert(resp.StatusCode, checker.Not(checker.Equals), http.StatusOK)
 		return
-	***REMOVED***
+	}
 	c.Assert(resp.StatusCode, checker.Equals, http.StatusNoContent)
-***REMOVED***
+}

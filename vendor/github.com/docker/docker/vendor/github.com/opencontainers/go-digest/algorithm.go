@@ -31,72 +31,72 @@ var (
 
 	// algorithms maps values to hash.Hash implementations. Other algorithms
 	// may be available but they cannot be calculated by the digest package.
-	algorithms = map[Algorithm]crypto.Hash***REMOVED***
+	algorithms = map[Algorithm]crypto.Hash{
 		SHA256: crypto.SHA256,
 		SHA384: crypto.SHA384,
 		SHA512: crypto.SHA512,
-	***REMOVED***
+	}
 )
 
 // Available returns true if the digest type is available for use. If this
 // returns false, Digester and Hash will return nil.
-func (a Algorithm) Available() bool ***REMOVED***
+func (a Algorithm) Available() bool {
 	h, ok := algorithms[a]
-	if !ok ***REMOVED***
+	if !ok {
 		return false
-	***REMOVED***
+	}
 
 	// check availability of the hash, as well
 	return h.Available()
-***REMOVED***
+}
 
-func (a Algorithm) String() string ***REMOVED***
+func (a Algorithm) String() string {
 	return string(a)
-***REMOVED***
+}
 
 // Size returns number of bytes returned by the hash.
-func (a Algorithm) Size() int ***REMOVED***
+func (a Algorithm) Size() int {
 	h, ok := algorithms[a]
-	if !ok ***REMOVED***
+	if !ok {
 		return 0
-	***REMOVED***
+	}
 	return h.Size()
-***REMOVED***
+}
 
 // Set implemented to allow use of Algorithm as a command line flag.
-func (a *Algorithm) Set(value string) error ***REMOVED***
-	if value == "" ***REMOVED***
+func (a *Algorithm) Set(value string) error {
+	if value == "" {
 		*a = Canonical
-	***REMOVED*** else ***REMOVED***
+	} else {
 		// just do a type conversion, support is queried with Available.
 		*a = Algorithm(value)
-	***REMOVED***
+	}
 
-	if !a.Available() ***REMOVED***
+	if !a.Available() {
 		return ErrDigestUnsupported
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // Digester returns a new digester for the specified algorithm. If the algorithm
 // does not have a digester implementation, nil will be returned. This can be
 // checked by calling Available before calling Digester.
-func (a Algorithm) Digester() Digester ***REMOVED***
-	return &digester***REMOVED***
+func (a Algorithm) Digester() Digester {
+	return &digester{
 		alg:  a,
 		hash: a.Hash(),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Hash returns a new hash as used by the algorithm. If not available, the
 // method will panic. Check Algorithm.Available() before calling.
-func (a Algorithm) Hash() hash.Hash ***REMOVED***
-	if !a.Available() ***REMOVED***
+func (a Algorithm) Hash() hash.Hash {
+	if !a.Available() {
 		// Empty algorithm string is invalid
-		if a == "" ***REMOVED***
+		if a == "" {
 			panic(fmt.Sprintf("empty digest algorithm, validate before calling Algorithm.Hash()"))
-		***REMOVED***
+		}
 
 		// NOTE(stevvooe): A missing hash is usually a programming error that
 		// must be resolved at compile time. We don't import in the digest
@@ -106,39 +106,39 @@ func (a Algorithm) Hash() hash.Hash ***REMOVED***
 		// Applications that may want to resolve the hash at runtime should
 		// call Algorithm.Available before call Algorithm.Hash().
 		panic(fmt.Sprintf("%v not available (make sure it is imported)", a))
-	***REMOVED***
+	}
 
 	return algorithms[a].New()
-***REMOVED***
+}
 
 // FromReader returns the digest of the reader using the algorithm.
-func (a Algorithm) FromReader(rd io.Reader) (Digest, error) ***REMOVED***
+func (a Algorithm) FromReader(rd io.Reader) (Digest, error) {
 	digester := a.Digester()
 
-	if _, err := io.Copy(digester.Hash(), rd); err != nil ***REMOVED***
+	if _, err := io.Copy(digester.Hash(), rd); err != nil {
 		return "", err
-	***REMOVED***
+	}
 
 	return digester.Digest(), nil
-***REMOVED***
+}
 
 // FromBytes digests the input and returns a Digest.
-func (a Algorithm) FromBytes(p []byte) Digest ***REMOVED***
+func (a Algorithm) FromBytes(p []byte) Digest {
 	digester := a.Digester()
 
-	if _, err := digester.Hash().Write(p); err != nil ***REMOVED***
+	if _, err := digester.Hash().Write(p); err != nil {
 		// Writes to a Hash should never fail. None of the existing
 		// hash implementations in the stdlib or hashes vendored
 		// here can return errors from Write. Having a panic in this
 		// condition instead of having FromBytes return an error value
 		// avoids unnecessary error handling paths in all callers.
 		panic("write to hash function returned error: " + err.Error())
-	***REMOVED***
+	}
 
 	return digester.Digest()
-***REMOVED***
+}
 
 // FromString digests the string input and returns a Digest.
-func (a Algorithm) FromString(s string) Digest ***REMOVED***
+func (a Algorithm) FromString(s string) Digest {
 	return a.FromBytes([]byte(s))
-***REMOVED***
+}

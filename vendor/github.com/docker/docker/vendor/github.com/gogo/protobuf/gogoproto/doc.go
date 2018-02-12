@@ -63,19 +63,19 @@ The following message:
 
   import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 
-	message A ***REMOVED***
+	message A {
 		optional string Description = 1 [(gogoproto.nullable) = false];
 		optional int64 Number = 2 [(gogoproto.nullable) = false];
 		optional bytes Id = 3 [(gogoproto.customtype) = "github.com/gogo/protobuf/test/custom.Uuid", (gogoproto.nullable) = false];
-	***REMOVED***
+	}
 
 Will generate a go struct which looks a lot like this:
 
-	type A struct ***REMOVED***
+	type A struct {
 		Description string
 		Number      int64
 		Id          github_com_gogo_protobuf_test_custom.Uuid
-	***REMOVED***
+	}
 
 You will see there are no pointers, since all fields are non-nullable.
 You will also see a custom type which marshals to a string.
@@ -84,17 +84,17 @@ You should think of every possible empty and nil case for your marshaling, unmar
 
 Next we will embed the message A in message B.
 
-	message B ***REMOVED***
+	message B {
 		optional A A = 1 [(gogoproto.nullable) = false, (gogoproto.embed) = true];
 		repeated bytes G = 2 [(gogoproto.customtype) = "github.com/gogo/protobuf/test/custom.Uint128", (gogoproto.nullable) = false];
-	***REMOVED***
+	}
 
 See below that A is embedded in B.
 
-	type B struct ***REMOVED***
+	type B struct {
 		A
 		G []github_com_gogo_protobuf_test_custom.Uint128
-	***REMOVED***
+	}
 
 Also see the repeated custom type.
 
@@ -102,15 +102,15 @@ Also see the repeated custom type.
 
 Next we will create a custom name for one of our fields.
 
-	message C ***REMOVED***
+	message C {
 		optional int64 size = 1 [(gogoproto.customname) = "MySize"];
-	***REMOVED***
+	}
 
 See below that the field's name is MySize and not Size.
 
-	type C struct ***REMOVED***
+	type C struct {
 		MySize		*int64
-	***REMOVED***
+	}
 
 The is useful when having a protocol buffer message with a field name which conflicts with a generated method.
 As an example, having a field name size and using the sizer plugin to generate a Size method will cause a go compiler error.

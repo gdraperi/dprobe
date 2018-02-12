@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/pflag"
 )
 
-func ExampleShorthandLookup() ***REMOVED***
+func ExampleShorthandLookup() {
 	name := "verbose"
 	short := name[:1]
 
@@ -20,9 +20,9 @@ func ExampleShorthandLookup() ***REMOVED***
 	flag := pflag.ShorthandLookup(short)
 
 	fmt.Println(flag.Name)
-***REMOVED***
+}
 
-func ExampleFlagSet_ShorthandLookup() ***REMOVED***
+func ExampleFlagSet_ShorthandLookup() {
 	name := "verbose"
 	short := name[:1]
 
@@ -33,4 +33,4 @@ func ExampleFlagSet_ShorthandLookup() ***REMOVED***
 	flag := fs.ShorthandLookup(short)
 
 	fmt.Println(flag.Name)
-***REMOVED***
+}

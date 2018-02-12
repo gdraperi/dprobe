@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func TestBytesPipeRead(t *testing.T) ***REMOVED***
+func TestBytesPipeRead(t *testing.T) {
 	buf := NewBytesPipe()
 	buf.Write([]byte("12"))
 	buf.Write([]byte("34"))
@@ -17,143 +17,143 @@ func TestBytesPipeRead(t *testing.T) ***REMOVED***
 	buf.Write([]byte("90"))
 	rd := make([]byte, 4)
 	n, err := buf.Read(rd)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if n != 4 ***REMOVED***
+	}
+	if n != 4 {
 		t.Fatalf("Wrong number of bytes read: %d, should be %d", n, 4)
-	***REMOVED***
-	if string(rd) != "1234" ***REMOVED***
+	}
+	if string(rd) != "1234" {
 		t.Fatalf("Read %s, but must be %s", rd, "1234")
-	***REMOVED***
+	}
 	n, err = buf.Read(rd)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if n != 4 ***REMOVED***
+	}
+	if n != 4 {
 		t.Fatalf("Wrong number of bytes read: %d, should be %d", n, 4)
-	***REMOVED***
-	if string(rd) != "5678" ***REMOVED***
+	}
+	if string(rd) != "5678" {
 		t.Fatalf("Read %s, but must be %s", rd, "5679")
-	***REMOVED***
+	}
 	n, err = buf.Read(rd)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if n != 2 ***REMOVED***
+	}
+	if n != 2 {
 		t.Fatalf("Wrong number of bytes read: %d, should be %d", n, 2)
-	***REMOVED***
-	if string(rd[:n]) != "90" ***REMOVED***
+	}
+	if string(rd[:n]) != "90" {
 		t.Fatalf("Read %s, but must be %s", rd, "90")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestBytesPipeWrite(t *testing.T) ***REMOVED***
+func TestBytesPipeWrite(t *testing.T) {
 	buf := NewBytesPipe()
 	buf.Write([]byte("12"))
 	buf.Write([]byte("34"))
 	buf.Write([]byte("56"))
 	buf.Write([]byte("78"))
 	buf.Write([]byte("90"))
-	if buf.buf[0].String() != "1234567890" ***REMOVED***
+	if buf.buf[0].String() != "1234567890" {
 		t.Fatalf("Buffer %q, must be %q", buf.buf[0].String(), "1234567890")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Write and read in different speeds/chunk sizes and check valid data is read.
-func TestBytesPipeWriteRandomChunks(t *testing.T) ***REMOVED***
-	cases := []struct***REMOVED*** iterations, writesPerLoop, readsPerLoop int ***REMOVED******REMOVED***
-		***REMOVED***100, 10, 1***REMOVED***,
-		***REMOVED***1000, 10, 5***REMOVED***,
-		***REMOVED***1000, 100, 0***REMOVED***,
-		***REMOVED***1000, 5, 6***REMOVED***,
-		***REMOVED***10000, 50, 25***REMOVED***,
-	***REMOVED***
+func TestBytesPipeWriteRandomChunks(t *testing.T) {
+	cases := []struct{ iterations, writesPerLoop, readsPerLoop int }{
+		{100, 10, 1},
+		{1000, 10, 5},
+		{1000, 100, 0},
+		{1000, 5, 6},
+		{10000, 50, 25},
+	}
 
 	testMessage := []byte("this is a random string for testing")
 	// random slice sizes to read and write
-	writeChunks := []int***REMOVED***25, 35, 15, 20***REMOVED***
-	readChunks := []int***REMOVED***5, 45, 20, 25***REMOVED***
+	writeChunks := []int{25, 35, 15, 20}
+	readChunks := []int{5, 45, 20, 25}
 
-	for _, c := range cases ***REMOVED***
+	for _, c := range cases {
 		// first pass: write directly to hash
 		hash := sha1.New()
-		for i := 0; i < c.iterations*c.writesPerLoop; i++ ***REMOVED***
-			if _, err := hash.Write(testMessage[:writeChunks[i%len(writeChunks)]]); err != nil ***REMOVED***
+		for i := 0; i < c.iterations*c.writesPerLoop; i++ {
+			if _, err := hash.Write(testMessage[:writeChunks[i%len(writeChunks)]]); err != nil {
 				t.Fatal(err)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		expected := hex.EncodeToString(hash.Sum(nil))
 
 		// write/read through buffer
 		buf := NewBytesPipe()
 		hash.Reset()
 
-		done := make(chan struct***REMOVED******REMOVED***)
+		done := make(chan struct{})
 
-		go func() ***REMOVED***
+		go func() {
 			// random delay before read starts
 			<-time.After(time.Duration(rand.Intn(10)) * time.Millisecond)
-			for i := 0; ; i++ ***REMOVED***
+			for i := 0; ; i++ {
 				p := make([]byte, readChunks[(c.iterations*c.readsPerLoop+i)%len(readChunks)])
 				n, _ := buf.Read(p)
-				if n == 0 ***REMOVED***
+				if n == 0 {
 					break
-				***REMOVED***
+				}
 				hash.Write(p[:n])
-			***REMOVED***
+			}
 
 			close(done)
-		***REMOVED***()
+		}()
 
-		for i := 0; i < c.iterations; i++ ***REMOVED***
-			for w := 0; w < c.writesPerLoop; w++ ***REMOVED***
+		for i := 0; i < c.iterations; i++ {
+			for w := 0; w < c.writesPerLoop; w++ {
 				buf.Write(testMessage[:writeChunks[(i*c.writesPerLoop+w)%len(writeChunks)]])
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		buf.Close()
 		<-done
 
 		actual := hex.EncodeToString(hash.Sum(nil))
 
-		if expected != actual ***REMOVED***
+		if expected != actual {
 			t.Fatalf("BytesPipe returned invalid data. Expected checksum %v, got %v", expected, actual)
-		***REMOVED***
+		}
 
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func BenchmarkBytesPipeWrite(b *testing.B) ***REMOVED***
+func BenchmarkBytesPipeWrite(b *testing.B) {
 	testData := []byte("pretty short line, because why not?")
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		readBuf := make([]byte, 1024)
 		buf := NewBytesPipe()
-		go func() ***REMOVED***
+		go func() {
 			var err error
-			for err == nil ***REMOVED***
+			for err == nil {
 				_, err = buf.Read(readBuf)
-			***REMOVED***
-		***REMOVED***()
-		for j := 0; j < 1000; j++ ***REMOVED***
+			}
+		}()
+		for j := 0; j < 1000; j++ {
 			buf.Write(testData)
-		***REMOVED***
+		}
 		buf.Close()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func BenchmarkBytesPipeRead(b *testing.B) ***REMOVED***
+func BenchmarkBytesPipeRead(b *testing.B) {
 	rd := make([]byte, 512)
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		b.StopTimer()
 		buf := NewBytesPipe()
-		for j := 0; j < 500; j++ ***REMOVED***
+		for j := 0; j < 500; j++ {
 			buf.Write(make([]byte, 1024))
-		***REMOVED***
+		}
 		b.StartTimer()
-		for j := 0; j < 1000; j++ ***REMOVED***
-			if n, _ := buf.Read(rd); n != 512 ***REMOVED***
+		for j := 0; j < 1000; j++ {
+			if n, _ := buf.Read(rd); n != 512 {
 				b.Fatalf("Wrong number of bytes: %d", n)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}

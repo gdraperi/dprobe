@@ -49,15 +49,15 @@ const (
 	NULL_VALUE NullValue = 0
 )
 
-var NullValue_name = map[int32]string***REMOVED***
+var NullValue_name = map[int32]string{
 	0: "NULL_VALUE",
-***REMOVED***
-var NullValue_value = map[string]int32***REMOVED***
+}
+var NullValue_value = map[string]int32{
 	"NULL_VALUE": 0,
-***REMOVED***
+}
 
-func (NullValue) EnumDescriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorStruct, []int***REMOVED***0***REMOVED*** ***REMOVED***
-func (NullValue) XXX_WellKnownType() string       ***REMOVED*** return "NullValue" ***REMOVED***
+func (NullValue) EnumDescriptor() ([]byte, []int) { return fileDescriptorStruct, []int{0} }
+func (NullValue) XXX_WellKnownType() string       { return "NullValue" }
 
 // `Struct` represents a structured data value, consisting of fields
 // which map to dynamically typed values. In some languages, `Struct`
@@ -67,22 +67,22 @@ func (NullValue) XXX_WellKnownType() string       ***REMOVED*** return "NullValu
 // with the proto support for the language.
 //
 // The JSON representation for `Struct` is JSON object.
-type Struct struct ***REMOVED***
+type Struct struct {
 	// Unordered map of dynamically typed values.
 	Fields map[string]*Value `protobuf:"bytes,1,rep,name=fields" json:"fields,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value"`
-***REMOVED***
+}
 
-func (m *Struct) Reset()                    ***REMOVED*** *m = Struct***REMOVED******REMOVED*** ***REMOVED***
-func (*Struct) ProtoMessage()               ***REMOVED******REMOVED***
-func (*Struct) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorStruct, []int***REMOVED***0***REMOVED*** ***REMOVED***
-func (*Struct) XXX_WellKnownType() string   ***REMOVED*** return "Struct" ***REMOVED***
+func (m *Struct) Reset()                    { *m = Struct{} }
+func (*Struct) ProtoMessage()               {}
+func (*Struct) Descriptor() ([]byte, []int) { return fileDescriptorStruct, []int{0} }
+func (*Struct) XXX_WellKnownType() string   { return "Struct" }
 
-func (m *Struct) GetFields() map[string]*Value ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Struct) GetFields() map[string]*Value {
+	if m != nil {
 		return m.Fields
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // `Value` represents a dynamically typed value which can be either
 // null, a number, a string, a boolean, a recursive struct value, or a
@@ -90,7 +90,7 @@ func (m *Struct) GetFields() map[string]*Value ***REMOVED***
 // variants, absence of any variant indicates an error.
 //
 // The JSON representation for `Value` is JSON value.
-type Value struct ***REMOVED***
+type Value struct {
 	// The kind of value.
 	//
 	// Types that are valid to be assigned to Kind:
@@ -101,111 +101,111 @@ type Value struct ***REMOVED***
 	//	*Value_StructValue
 	//	*Value_ListValue
 	Kind isValue_Kind `protobuf_oneof:"kind"`
-***REMOVED***
+}
 
-func (m *Value) Reset()                    ***REMOVED*** *m = Value***REMOVED******REMOVED*** ***REMOVED***
-func (*Value) ProtoMessage()               ***REMOVED******REMOVED***
-func (*Value) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorStruct, []int***REMOVED***1***REMOVED*** ***REMOVED***
-func (*Value) XXX_WellKnownType() string   ***REMOVED*** return "Value" ***REMOVED***
+func (m *Value) Reset()                    { *m = Value{} }
+func (*Value) ProtoMessage()               {}
+func (*Value) Descriptor() ([]byte, []int) { return fileDescriptorStruct, []int{1} }
+func (*Value) XXX_WellKnownType() string   { return "Value" }
 
-type isValue_Kind interface ***REMOVED***
+type isValue_Kind interface {
 	isValue_Kind()
-	Equal(interface***REMOVED******REMOVED***) bool
+	Equal(interface{}) bool
 	MarshalTo([]byte) (int, error)
 	Size() int
-***REMOVED***
+}
 
-type Value_NullValue struct ***REMOVED***
+type Value_NullValue struct {
 	NullValue NullValue `protobuf:"varint,1,opt,name=null_value,json=nullValue,proto3,enum=google.protobuf.NullValue,oneof"`
-***REMOVED***
-type Value_NumberValue struct ***REMOVED***
+}
+type Value_NumberValue struct {
 	NumberValue float64 `protobuf:"fixed64,2,opt,name=number_value,json=numberValue,proto3,oneof"`
-***REMOVED***
-type Value_StringValue struct ***REMOVED***
+}
+type Value_StringValue struct {
 	StringValue string `protobuf:"bytes,3,opt,name=string_value,json=stringValue,proto3,oneof"`
-***REMOVED***
-type Value_BoolValue struct ***REMOVED***
+}
+type Value_BoolValue struct {
 	BoolValue bool `protobuf:"varint,4,opt,name=bool_value,json=boolValue,proto3,oneof"`
-***REMOVED***
-type Value_StructValue struct ***REMOVED***
+}
+type Value_StructValue struct {
 	StructValue *Struct `protobuf:"bytes,5,opt,name=struct_value,json=structValue,oneof"`
-***REMOVED***
-type Value_ListValue struct ***REMOVED***
+}
+type Value_ListValue struct {
 	ListValue *ListValue `protobuf:"bytes,6,opt,name=list_value,json=listValue,oneof"`
-***REMOVED***
+}
 
-func (*Value_NullValue) isValue_Kind()   ***REMOVED******REMOVED***
-func (*Value_NumberValue) isValue_Kind() ***REMOVED******REMOVED***
-func (*Value_StringValue) isValue_Kind() ***REMOVED******REMOVED***
-func (*Value_BoolValue) isValue_Kind()   ***REMOVED******REMOVED***
-func (*Value_StructValue) isValue_Kind() ***REMOVED******REMOVED***
-func (*Value_ListValue) isValue_Kind()   ***REMOVED******REMOVED***
+func (*Value_NullValue) isValue_Kind()   {}
+func (*Value_NumberValue) isValue_Kind() {}
+func (*Value_StringValue) isValue_Kind() {}
+func (*Value_BoolValue) isValue_Kind()   {}
+func (*Value_StructValue) isValue_Kind() {}
+func (*Value_ListValue) isValue_Kind()   {}
 
-func (m *Value) GetKind() isValue_Kind ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Value) GetKind() isValue_Kind {
+	if m != nil {
 		return m.Kind
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *Value) GetNullValue() NullValue ***REMOVED***
-	if x, ok := m.GetKind().(*Value_NullValue); ok ***REMOVED***
+func (m *Value) GetNullValue() NullValue {
+	if x, ok := m.GetKind().(*Value_NullValue); ok {
 		return x.NullValue
-	***REMOVED***
+	}
 	return NULL_VALUE
-***REMOVED***
+}
 
-func (m *Value) GetNumberValue() float64 ***REMOVED***
-	if x, ok := m.GetKind().(*Value_NumberValue); ok ***REMOVED***
+func (m *Value) GetNumberValue() float64 {
+	if x, ok := m.GetKind().(*Value_NumberValue); ok {
 		return x.NumberValue
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *Value) GetStringValue() string ***REMOVED***
-	if x, ok := m.GetKind().(*Value_StringValue); ok ***REMOVED***
+func (m *Value) GetStringValue() string {
+	if x, ok := m.GetKind().(*Value_StringValue); ok {
 		return x.StringValue
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *Value) GetBoolValue() bool ***REMOVED***
-	if x, ok := m.GetKind().(*Value_BoolValue); ok ***REMOVED***
+func (m *Value) GetBoolValue() bool {
+	if x, ok := m.GetKind().(*Value_BoolValue); ok {
 		return x.BoolValue
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
-func (m *Value) GetStructValue() *Struct ***REMOVED***
-	if x, ok := m.GetKind().(*Value_StructValue); ok ***REMOVED***
+func (m *Value) GetStructValue() *Struct {
+	if x, ok := m.GetKind().(*Value_StructValue); ok {
 		return x.StructValue
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *Value) GetListValue() *ListValue ***REMOVED***
-	if x, ok := m.GetKind().(*Value_ListValue); ok ***REMOVED***
+func (m *Value) GetListValue() *ListValue {
+	if x, ok := m.GetKind().(*Value_ListValue); ok {
 		return x.ListValue
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // XXX_OneofFuncs is for the internal use of the proto package.
-func (*Value) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface***REMOVED******REMOVED***) ***REMOVED***
-	return _Value_OneofMarshaler, _Value_OneofUnmarshaler, _Value_OneofSizer, []interface***REMOVED******REMOVED******REMOVED***
+func (*Value) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
+	return _Value_OneofMarshaler, _Value_OneofUnmarshaler, _Value_OneofSizer, []interface{}{
 		(*Value_NullValue)(nil),
 		(*Value_NumberValue)(nil),
 		(*Value_StringValue)(nil),
 		(*Value_BoolValue)(nil),
 		(*Value_StructValue)(nil),
 		(*Value_ListValue)(nil),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func _Value_OneofMarshaler(msg proto.Message, b *proto.Buffer) error ***REMOVED***
+func _Value_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
 	m := msg.(*Value)
 	// kind
-	switch x := m.Kind.(type) ***REMOVED***
+	switch x := m.Kind.(type) {
 	case *Value_NullValue:
 		_ = b.EncodeVarint(1<<3 | proto.WireVarint)
 		_ = b.EncodeVarint(uint64(x.NullValue))
@@ -217,84 +217,84 @@ func _Value_OneofMarshaler(msg proto.Message, b *proto.Buffer) error ***REMOVED*
 		_ = b.EncodeStringBytes(x.StringValue)
 	case *Value_BoolValue:
 		t := uint64(0)
-		if x.BoolValue ***REMOVED***
+		if x.BoolValue {
 			t = 1
-		***REMOVED***
+		}
 		_ = b.EncodeVarint(4<<3 | proto.WireVarint)
 		_ = b.EncodeVarint(t)
 	case *Value_StructValue:
 		_ = b.EncodeVarint(5<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.StructValue); err != nil ***REMOVED***
+		if err := b.EncodeMessage(x.StructValue); err != nil {
 			return err
-		***REMOVED***
+		}
 	case *Value_ListValue:
 		_ = b.EncodeVarint(6<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.ListValue); err != nil ***REMOVED***
+		if err := b.EncodeMessage(x.ListValue); err != nil {
 			return err
-		***REMOVED***
+		}
 	case nil:
 	default:
 		return fmt.Errorf("Value.Kind has unexpected type %T", x)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func _Value_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) ***REMOVED***
+func _Value_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
 	m := msg.(*Value)
-	switch tag ***REMOVED***
+	switch tag {
 	case 1: // kind.null_value
-		if wire != proto.WireVarint ***REMOVED***
+		if wire != proto.WireVarint {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		x, err := b.DecodeVarint()
-		m.Kind = &Value_NullValue***REMOVED***NullValue(x)***REMOVED***
+		m.Kind = &Value_NullValue{NullValue(x)}
 		return true, err
 	case 2: // kind.number_value
-		if wire != proto.WireFixed64 ***REMOVED***
+		if wire != proto.WireFixed64 {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		x, err := b.DecodeFixed64()
-		m.Kind = &Value_NumberValue***REMOVED***math.Float64frombits(x)***REMOVED***
+		m.Kind = &Value_NumberValue{math.Float64frombits(x)}
 		return true, err
 	case 3: // kind.string_value
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		x, err := b.DecodeStringBytes()
-		m.Kind = &Value_StringValue***REMOVED***x***REMOVED***
+		m.Kind = &Value_StringValue{x}
 		return true, err
 	case 4: // kind.bool_value
-		if wire != proto.WireVarint ***REMOVED***
+		if wire != proto.WireVarint {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		x, err := b.DecodeVarint()
-		m.Kind = &Value_BoolValue***REMOVED***x != 0***REMOVED***
+		m.Kind = &Value_BoolValue{x != 0}
 		return true, err
 	case 5: // kind.struct_value
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		msg := new(Struct)
 		err := b.DecodeMessage(msg)
-		m.Kind = &Value_StructValue***REMOVED***msg***REMOVED***
+		m.Kind = &Value_StructValue{msg}
 		return true, err
 	case 6: // kind.list_value
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		msg := new(ListValue)
 		err := b.DecodeMessage(msg)
-		m.Kind = &Value_ListValue***REMOVED***msg***REMOVED***
+		m.Kind = &Value_ListValue{msg}
 		return true, err
 	default:
 		return false, nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func _Value_OneofSizer(msg proto.Message) (n int) ***REMOVED***
+func _Value_OneofSizer(msg proto.Message) (n int) {
 	m := msg.(*Value)
 	// kind
-	switch x := m.Kind.(type) ***REMOVED***
+	switch x := m.Kind.(type) {
 	case *Value_NullValue:
 		n += proto.SizeVarint(1<<3 | proto.WireVarint)
 		n += proto.SizeVarint(uint64(x.NullValue))
@@ -321,595 +321,595 @@ func _Value_OneofSizer(msg proto.Message) (n int) ***REMOVED***
 	case nil:
 	default:
 		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
 // `ListValue` is a wrapper around a repeated field of values.
 //
 // The JSON representation for `ListValue` is JSON array.
-type ListValue struct ***REMOVED***
+type ListValue struct {
 	// Repeated field of dynamically typed values.
 	Values []*Value `protobuf:"bytes,1,rep,name=values" json:"values,omitempty"`
-***REMOVED***
+}
 
-func (m *ListValue) Reset()                    ***REMOVED*** *m = ListValue***REMOVED******REMOVED*** ***REMOVED***
-func (*ListValue) ProtoMessage()               ***REMOVED******REMOVED***
-func (*ListValue) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorStruct, []int***REMOVED***2***REMOVED*** ***REMOVED***
-func (*ListValue) XXX_WellKnownType() string   ***REMOVED*** return "ListValue" ***REMOVED***
+func (m *ListValue) Reset()                    { *m = ListValue{} }
+func (*ListValue) ProtoMessage()               {}
+func (*ListValue) Descriptor() ([]byte, []int) { return fileDescriptorStruct, []int{2} }
+func (*ListValue) XXX_WellKnownType() string   { return "ListValue" }
 
-func (m *ListValue) GetValues() []*Value ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ListValue) GetValues() []*Value {
+	if m != nil {
 		return m.Values
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*Struct)(nil), "google.protobuf.Struct")
 	proto.RegisterType((*Value)(nil), "google.protobuf.Value")
 	proto.RegisterType((*ListValue)(nil), "google.protobuf.ListValue")
 	proto.RegisterEnum("google.protobuf.NullValue", NullValue_name, NullValue_value)
-***REMOVED***
-func (x NullValue) String() string ***REMOVED***
+}
+func (x NullValue) String() string {
 	s, ok := NullValue_name[int32(x)]
-	if ok ***REMOVED***
+	if ok {
 		return s
-	***REMOVED***
+	}
 	return strconv.Itoa(int(x))
-***REMOVED***
-func (this *Struct) Equal(that interface***REMOVED******REMOVED***) bool ***REMOVED***
-	if that == nil ***REMOVED***
-		if this == nil ***REMOVED***
+}
+func (this *Struct) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
 			return true
-		***REMOVED***
+		}
 		return false
-	***REMOVED***
+	}
 
 	that1, ok := that.(*Struct)
-	if !ok ***REMOVED***
+	if !ok {
 		that2, ok := that.(Struct)
-		if ok ***REMOVED***
+		if ok {
 			that1 = &that2
-		***REMOVED*** else ***REMOVED***
+		} else {
 			return false
-		***REMOVED***
-	***REMOVED***
-	if that1 == nil ***REMOVED***
-		if this == nil ***REMOVED***
+		}
+	}
+	if that1 == nil {
+		if this == nil {
 			return true
-		***REMOVED***
+		}
 		return false
-	***REMOVED*** else if this == nil ***REMOVED***
+	} else if this == nil {
 		return false
-	***REMOVED***
-	if len(this.Fields) != len(that1.Fields) ***REMOVED***
+	}
+	if len(this.Fields) != len(that1.Fields) {
 		return false
-	***REMOVED***
-	for i := range this.Fields ***REMOVED***
-		if !this.Fields[i].Equal(that1.Fields[i]) ***REMOVED***
+	}
+	for i := range this.Fields {
+		if !this.Fields[i].Equal(that1.Fields[i]) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
-func (this *Value) Equal(that interface***REMOVED******REMOVED***) bool ***REMOVED***
-	if that == nil ***REMOVED***
-		if this == nil ***REMOVED***
+}
+func (this *Value) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
 			return true
-		***REMOVED***
+		}
 		return false
-	***REMOVED***
+	}
 
 	that1, ok := that.(*Value)
-	if !ok ***REMOVED***
+	if !ok {
 		that2, ok := that.(Value)
-		if ok ***REMOVED***
+		if ok {
 			that1 = &that2
-		***REMOVED*** else ***REMOVED***
+		} else {
 			return false
-		***REMOVED***
-	***REMOVED***
-	if that1 == nil ***REMOVED***
-		if this == nil ***REMOVED***
+		}
+	}
+	if that1 == nil {
+		if this == nil {
 			return true
-		***REMOVED***
+		}
 		return false
-	***REMOVED*** else if this == nil ***REMOVED***
+	} else if this == nil {
 		return false
-	***REMOVED***
-	if that1.Kind == nil ***REMOVED***
-		if this.Kind != nil ***REMOVED***
+	}
+	if that1.Kind == nil {
+		if this.Kind != nil {
 			return false
-		***REMOVED***
-	***REMOVED*** else if this.Kind == nil ***REMOVED***
+		}
+	} else if this.Kind == nil {
 		return false
-	***REMOVED*** else if !this.Kind.Equal(that1.Kind) ***REMOVED***
+	} else if !this.Kind.Equal(that1.Kind) {
 		return false
-	***REMOVED***
+	}
 	return true
-***REMOVED***
-func (this *Value_NullValue) Equal(that interface***REMOVED******REMOVED***) bool ***REMOVED***
-	if that == nil ***REMOVED***
-		if this == nil ***REMOVED***
+}
+func (this *Value_NullValue) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
 			return true
-		***REMOVED***
+		}
 		return false
-	***REMOVED***
+	}
 
 	that1, ok := that.(*Value_NullValue)
-	if !ok ***REMOVED***
+	if !ok {
 		that2, ok := that.(Value_NullValue)
-		if ok ***REMOVED***
+		if ok {
 			that1 = &that2
-		***REMOVED*** else ***REMOVED***
+		} else {
 			return false
-		***REMOVED***
-	***REMOVED***
-	if that1 == nil ***REMOVED***
-		if this == nil ***REMOVED***
+		}
+	}
+	if that1 == nil {
+		if this == nil {
 			return true
-		***REMOVED***
+		}
 		return false
-	***REMOVED*** else if this == nil ***REMOVED***
+	} else if this == nil {
 		return false
-	***REMOVED***
-	if this.NullValue != that1.NullValue ***REMOVED***
+	}
+	if this.NullValue != that1.NullValue {
 		return false
-	***REMOVED***
+	}
 	return true
-***REMOVED***
-func (this *Value_NumberValue) Equal(that interface***REMOVED******REMOVED***) bool ***REMOVED***
-	if that == nil ***REMOVED***
-		if this == nil ***REMOVED***
+}
+func (this *Value_NumberValue) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
 			return true
-		***REMOVED***
+		}
 		return false
-	***REMOVED***
+	}
 
 	that1, ok := that.(*Value_NumberValue)
-	if !ok ***REMOVED***
+	if !ok {
 		that2, ok := that.(Value_NumberValue)
-		if ok ***REMOVED***
+		if ok {
 			that1 = &that2
-		***REMOVED*** else ***REMOVED***
+		} else {
 			return false
-		***REMOVED***
-	***REMOVED***
-	if that1 == nil ***REMOVED***
-		if this == nil ***REMOVED***
+		}
+	}
+	if that1 == nil {
+		if this == nil {
 			return true
-		***REMOVED***
+		}
 		return false
-	***REMOVED*** else if this == nil ***REMOVED***
+	} else if this == nil {
 		return false
-	***REMOVED***
-	if this.NumberValue != that1.NumberValue ***REMOVED***
+	}
+	if this.NumberValue != that1.NumberValue {
 		return false
-	***REMOVED***
+	}
 	return true
-***REMOVED***
-func (this *Value_StringValue) Equal(that interface***REMOVED******REMOVED***) bool ***REMOVED***
-	if that == nil ***REMOVED***
-		if this == nil ***REMOVED***
+}
+func (this *Value_StringValue) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
 			return true
-		***REMOVED***
+		}
 		return false
-	***REMOVED***
+	}
 
 	that1, ok := that.(*Value_StringValue)
-	if !ok ***REMOVED***
+	if !ok {
 		that2, ok := that.(Value_StringValue)
-		if ok ***REMOVED***
+		if ok {
 			that1 = &that2
-		***REMOVED*** else ***REMOVED***
+		} else {
 			return false
-		***REMOVED***
-	***REMOVED***
-	if that1 == nil ***REMOVED***
-		if this == nil ***REMOVED***
+		}
+	}
+	if that1 == nil {
+		if this == nil {
 			return true
-		***REMOVED***
+		}
 		return false
-	***REMOVED*** else if this == nil ***REMOVED***
+	} else if this == nil {
 		return false
-	***REMOVED***
-	if this.StringValue != that1.StringValue ***REMOVED***
+	}
+	if this.StringValue != that1.StringValue {
 		return false
-	***REMOVED***
+	}
 	return true
-***REMOVED***
-func (this *Value_BoolValue) Equal(that interface***REMOVED******REMOVED***) bool ***REMOVED***
-	if that == nil ***REMOVED***
-		if this == nil ***REMOVED***
+}
+func (this *Value_BoolValue) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
 			return true
-		***REMOVED***
+		}
 		return false
-	***REMOVED***
+	}
 
 	that1, ok := that.(*Value_BoolValue)
-	if !ok ***REMOVED***
+	if !ok {
 		that2, ok := that.(Value_BoolValue)
-		if ok ***REMOVED***
+		if ok {
 			that1 = &that2
-		***REMOVED*** else ***REMOVED***
+		} else {
 			return false
-		***REMOVED***
-	***REMOVED***
-	if that1 == nil ***REMOVED***
-		if this == nil ***REMOVED***
+		}
+	}
+	if that1 == nil {
+		if this == nil {
 			return true
-		***REMOVED***
+		}
 		return false
-	***REMOVED*** else if this == nil ***REMOVED***
+	} else if this == nil {
 		return false
-	***REMOVED***
-	if this.BoolValue != that1.BoolValue ***REMOVED***
+	}
+	if this.BoolValue != that1.BoolValue {
 		return false
-	***REMOVED***
+	}
 	return true
-***REMOVED***
-func (this *Value_StructValue) Equal(that interface***REMOVED******REMOVED***) bool ***REMOVED***
-	if that == nil ***REMOVED***
-		if this == nil ***REMOVED***
+}
+func (this *Value_StructValue) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
 			return true
-		***REMOVED***
+		}
 		return false
-	***REMOVED***
+	}
 
 	that1, ok := that.(*Value_StructValue)
-	if !ok ***REMOVED***
+	if !ok {
 		that2, ok := that.(Value_StructValue)
-		if ok ***REMOVED***
+		if ok {
 			that1 = &that2
-		***REMOVED*** else ***REMOVED***
+		} else {
 			return false
-		***REMOVED***
-	***REMOVED***
-	if that1 == nil ***REMOVED***
-		if this == nil ***REMOVED***
+		}
+	}
+	if that1 == nil {
+		if this == nil {
 			return true
-		***REMOVED***
+		}
 		return false
-	***REMOVED*** else if this == nil ***REMOVED***
+	} else if this == nil {
 		return false
-	***REMOVED***
-	if !this.StructValue.Equal(that1.StructValue) ***REMOVED***
+	}
+	if !this.StructValue.Equal(that1.StructValue) {
 		return false
-	***REMOVED***
+	}
 	return true
-***REMOVED***
-func (this *Value_ListValue) Equal(that interface***REMOVED******REMOVED***) bool ***REMOVED***
-	if that == nil ***REMOVED***
-		if this == nil ***REMOVED***
+}
+func (this *Value_ListValue) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
 			return true
-		***REMOVED***
+		}
 		return false
-	***REMOVED***
+	}
 
 	that1, ok := that.(*Value_ListValue)
-	if !ok ***REMOVED***
+	if !ok {
 		that2, ok := that.(Value_ListValue)
-		if ok ***REMOVED***
+		if ok {
 			that1 = &that2
-		***REMOVED*** else ***REMOVED***
+		} else {
 			return false
-		***REMOVED***
-	***REMOVED***
-	if that1 == nil ***REMOVED***
-		if this == nil ***REMOVED***
+		}
+	}
+	if that1 == nil {
+		if this == nil {
 			return true
-		***REMOVED***
+		}
 		return false
-	***REMOVED*** else if this == nil ***REMOVED***
+	} else if this == nil {
 		return false
-	***REMOVED***
-	if !this.ListValue.Equal(that1.ListValue) ***REMOVED***
+	}
+	if !this.ListValue.Equal(that1.ListValue) {
 		return false
-	***REMOVED***
+	}
 	return true
-***REMOVED***
-func (this *ListValue) Equal(that interface***REMOVED******REMOVED***) bool ***REMOVED***
-	if that == nil ***REMOVED***
-		if this == nil ***REMOVED***
+}
+func (this *ListValue) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
 			return true
-		***REMOVED***
+		}
 		return false
-	***REMOVED***
+	}
 
 	that1, ok := that.(*ListValue)
-	if !ok ***REMOVED***
+	if !ok {
 		that2, ok := that.(ListValue)
-		if ok ***REMOVED***
+		if ok {
 			that1 = &that2
-		***REMOVED*** else ***REMOVED***
+		} else {
 			return false
-		***REMOVED***
-	***REMOVED***
-	if that1 == nil ***REMOVED***
-		if this == nil ***REMOVED***
+		}
+	}
+	if that1 == nil {
+		if this == nil {
 			return true
-		***REMOVED***
+		}
 		return false
-	***REMOVED*** else if this == nil ***REMOVED***
+	} else if this == nil {
 		return false
-	***REMOVED***
-	if len(this.Values) != len(that1.Values) ***REMOVED***
+	}
+	if len(this.Values) != len(that1.Values) {
 		return false
-	***REMOVED***
-	for i := range this.Values ***REMOVED***
-		if !this.Values[i].Equal(that1.Values[i]) ***REMOVED***
+	}
+	for i := range this.Values {
+		if !this.Values[i].Equal(that1.Values[i]) {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
-func (this *Struct) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Struct) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 5)
-	s = append(s, "&types.Struct***REMOVED***")
+	s = append(s, "&types.Struct{")
 	keysForFields := make([]string, 0, len(this.Fields))
-	for k := range this.Fields ***REMOVED***
+	for k := range this.Fields {
 		keysForFields = append(keysForFields, k)
-	***REMOVED***
+	}
 	github_com_gogo_protobuf_sortkeys.Strings(keysForFields)
-	mapStringForFields := "map[string]*Value***REMOVED***"
-	for _, k := range keysForFields ***REMOVED***
+	mapStringForFields := "map[string]*Value{"
+	for _, k := range keysForFields {
 		mapStringForFields += fmt.Sprintf("%#v: %#v,", k, this.Fields[k])
-	***REMOVED***
-	mapStringForFields += "***REMOVED***"
-	if this.Fields != nil ***REMOVED***
+	}
+	mapStringForFields += "}"
+	if this.Fields != nil {
 		s = append(s, "Fields: "+mapStringForFields+",\n")
-	***REMOVED***
-	s = append(s, "***REMOVED***")
+	}
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func (this *Value) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Value) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 10)
-	s = append(s, "&types.Value***REMOVED***")
-	if this.Kind != nil ***REMOVED***
+	s = append(s, "&types.Value{")
+	if this.Kind != nil {
 		s = append(s, "Kind: "+fmt.Sprintf("%#v", this.Kind)+",\n")
-	***REMOVED***
-	s = append(s, "***REMOVED***")
+	}
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func (this *Value_NullValue) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Value_NullValue) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&types.Value_NullValue***REMOVED***` +
-		`NullValue:` + fmt.Sprintf("%#v", this.NullValue) + `***REMOVED***`***REMOVED***, ", ")
+	}
+	s := strings.Join([]string{`&types.Value_NullValue{` +
+		`NullValue:` + fmt.Sprintf("%#v", this.NullValue) + `}`}, ", ")
 	return s
-***REMOVED***
-func (this *Value_NumberValue) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Value_NumberValue) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&types.Value_NumberValue***REMOVED***` +
-		`NumberValue:` + fmt.Sprintf("%#v", this.NumberValue) + `***REMOVED***`***REMOVED***, ", ")
+	}
+	s := strings.Join([]string{`&types.Value_NumberValue{` +
+		`NumberValue:` + fmt.Sprintf("%#v", this.NumberValue) + `}`}, ", ")
 	return s
-***REMOVED***
-func (this *Value_StringValue) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Value_StringValue) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&types.Value_StringValue***REMOVED***` +
-		`StringValue:` + fmt.Sprintf("%#v", this.StringValue) + `***REMOVED***`***REMOVED***, ", ")
+	}
+	s := strings.Join([]string{`&types.Value_StringValue{` +
+		`StringValue:` + fmt.Sprintf("%#v", this.StringValue) + `}`}, ", ")
 	return s
-***REMOVED***
-func (this *Value_BoolValue) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Value_BoolValue) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&types.Value_BoolValue***REMOVED***` +
-		`BoolValue:` + fmt.Sprintf("%#v", this.BoolValue) + `***REMOVED***`***REMOVED***, ", ")
+	}
+	s := strings.Join([]string{`&types.Value_BoolValue{` +
+		`BoolValue:` + fmt.Sprintf("%#v", this.BoolValue) + `}`}, ", ")
 	return s
-***REMOVED***
-func (this *Value_StructValue) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Value_StructValue) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&types.Value_StructValue***REMOVED***` +
-		`StructValue:` + fmt.Sprintf("%#v", this.StructValue) + `***REMOVED***`***REMOVED***, ", ")
+	}
+	s := strings.Join([]string{`&types.Value_StructValue{` +
+		`StructValue:` + fmt.Sprintf("%#v", this.StructValue) + `}`}, ", ")
 	return s
-***REMOVED***
-func (this *Value_ListValue) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Value_ListValue) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&types.Value_ListValue***REMOVED***` +
-		`ListValue:` + fmt.Sprintf("%#v", this.ListValue) + `***REMOVED***`***REMOVED***, ", ")
+	}
+	s := strings.Join([]string{`&types.Value_ListValue{` +
+		`ListValue:` + fmt.Sprintf("%#v", this.ListValue) + `}`}, ", ")
 	return s
-***REMOVED***
-func (this *ListValue) GoString() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *ListValue) GoString() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	s := make([]string, 0, 5)
-	s = append(s, "&types.ListValue***REMOVED***")
-	if this.Values != nil ***REMOVED***
+	s = append(s, "&types.ListValue{")
+	if this.Values != nil {
 		s = append(s, "Values: "+fmt.Sprintf("%#v", this.Values)+",\n")
-	***REMOVED***
-	s = append(s, "***REMOVED***")
+	}
+	s = append(s, "}")
 	return strings.Join(s, "")
-***REMOVED***
-func valueToGoStringStruct(v interface***REMOVED******REMOVED***, typ string) string ***REMOVED***
+}
+func valueToGoStringStruct(v interface{}, typ string) string {
 	rv := reflect.ValueOf(v)
-	if rv.IsNil() ***REMOVED***
+	if rv.IsNil() {
 		return "nil"
-	***REMOVED***
+	}
 	pv := reflect.Indirect(rv).Interface()
-	return fmt.Sprintf("func(v %v) *%v ***REMOVED*** return &v ***REMOVED*** ( %#v )", typ, typ, pv)
-***REMOVED***
-func (m *Struct) Marshal() (dAtA []byte, err error) ***REMOVED***
+	return fmt.Sprintf("func(v %v) *%v { return &v } ( %#v )", typ, typ, pv)
+}
+func (m *Struct) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *Struct) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *Struct) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Fields) > 0 ***REMOVED***
-		for k := range m.Fields ***REMOVED***
+	if len(m.Fields) > 0 {
+		for k := range m.Fields {
 			dAtA[i] = 0xa
 			i++
 			v := m.Fields[k]
 			msgSize := 0
-			if v != nil ***REMOVED***
+			if v != nil {
 				msgSize = v.Size()
 				msgSize += 1 + sovStruct(uint64(msgSize))
-			***REMOVED***
+			}
 			mapSize := 1 + len(k) + sovStruct(uint64(len(k))) + msgSize
 			i = encodeVarintStruct(dAtA, i, uint64(mapSize))
 			dAtA[i] = 0xa
 			i++
 			i = encodeVarintStruct(dAtA, i, uint64(len(k)))
 			i += copy(dAtA[i:], k)
-			if v != nil ***REMOVED***
+			if v != nil {
 				dAtA[i] = 0x12
 				i++
 				i = encodeVarintStruct(dAtA, i, uint64(v.Size()))
 				n1, err := v.MarshalTo(dAtA[i:])
-				if err != nil ***REMOVED***
+				if err != nil {
 					return 0, err
-				***REMOVED***
+				}
 				i += n1
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *Value) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *Value) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *Value) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *Value) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.Kind != nil ***REMOVED***
+	if m.Kind != nil {
 		nn2, err := m.Kind.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += nn2
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *Value_NullValue) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *Value_NullValue) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
 	dAtA[i] = 0x8
 	i++
 	i = encodeVarintStruct(dAtA, i, uint64(m.NullValue))
 	return i, nil
-***REMOVED***
-func (m *Value_NumberValue) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+}
+func (m *Value_NumberValue) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
 	dAtA[i] = 0x11
 	i++
 	i = encodeFixed64Struct(dAtA, i, uint64(math.Float64bits(float64(m.NumberValue))))
 	return i, nil
-***REMOVED***
-func (m *Value_StringValue) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+}
+func (m *Value_StringValue) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
 	dAtA[i] = 0x1a
 	i++
 	i = encodeVarintStruct(dAtA, i, uint64(len(m.StringValue)))
 	i += copy(dAtA[i:], m.StringValue)
 	return i, nil
-***REMOVED***
-func (m *Value_BoolValue) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+}
+func (m *Value_BoolValue) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
 	dAtA[i] = 0x20
 	i++
-	if m.BoolValue ***REMOVED***
+	if m.BoolValue {
 		dAtA[i] = 1
-	***REMOVED*** else ***REMOVED***
+	} else {
 		dAtA[i] = 0
-	***REMOVED***
+	}
 	i++
 	return i, nil
-***REMOVED***
-func (m *Value_StructValue) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+}
+func (m *Value_StructValue) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
-	if m.StructValue != nil ***REMOVED***
+	if m.StructValue != nil {
 		dAtA[i] = 0x2a
 		i++
 		i = encodeVarintStruct(dAtA, i, uint64(m.StructValue.Size()))
 		n3, err := m.StructValue.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n3
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
-func (m *Value_ListValue) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+}
+func (m *Value_ListValue) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
-	if m.ListValue != nil ***REMOVED***
+	if m.ListValue != nil {
 		dAtA[i] = 0x32
 		i++
 		i = encodeVarintStruct(dAtA, i, uint64(m.ListValue.Size()))
 		n4, err := m.ListValue.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n4
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
-func (m *ListValue) Marshal() (dAtA []byte, err error) ***REMOVED***
+}
+func (m *ListValue) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *ListValue) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *ListValue) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Values) > 0 ***REMOVED***
-		for _, msg := range m.Values ***REMOVED***
+	if len(m.Values) > 0 {
+		for _, msg := range m.Values {
 			dAtA[i] = 0xa
 			i++
 			i = encodeVarintStruct(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			i += n
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return i, nil
-***REMOVED***
+}
 
-func encodeFixed64Struct(dAtA []byte, offset int, v uint64) int ***REMOVED***
+func encodeFixed64Struct(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
 	dAtA[offset+2] = uint8(v >> 16)
@@ -919,41 +919,41 @@ func encodeFixed64Struct(dAtA []byte, offset int, v uint64) int ***REMOVED***
 	dAtA[offset+6] = uint8(v >> 48)
 	dAtA[offset+7] = uint8(v >> 56)
 	return offset + 8
-***REMOVED***
-func encodeFixed32Struct(dAtA []byte, offset int, v uint32) int ***REMOVED***
+}
+func encodeFixed32Struct(dAtA []byte, offset int, v uint32) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
 	dAtA[offset+2] = uint8(v >> 16)
 	dAtA[offset+3] = uint8(v >> 24)
 	return offset + 4
-***REMOVED***
-func encodeVarintStruct(dAtA []byte, offset int, v uint64) int ***REMOVED***
-	for v >= 1<<7 ***REMOVED***
+}
+func encodeVarintStruct(dAtA []byte, offset int, v uint64) int {
+	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
-	***REMOVED***
+	}
 	dAtA[offset] = uint8(v)
 	return offset + 1
-***REMOVED***
-func NewPopulatedStruct(r randyStruct, easy bool) *Struct ***REMOVED***
-	this := &Struct***REMOVED******REMOVED***
-	if r.Intn(10) == 0 ***REMOVED***
+}
+func NewPopulatedStruct(r randyStruct, easy bool) *Struct {
+	this := &Struct{}
+	if r.Intn(10) == 0 {
 		v1 := r.Intn(10)
 		this.Fields = make(map[string]*Value)
-		for i := 0; i < v1; i++ ***REMOVED***
+		for i := 0; i < v1; i++ {
 			this.Fields[randStringStruct(r)] = NewPopulatedValue(r, easy)
-		***REMOVED***
-	***REMOVED***
-	if !easy && r.Intn(10) != 0 ***REMOVED***
-	***REMOVED***
+		}
+	}
+	if !easy && r.Intn(10) != 0 {
+	}
 	return this
-***REMOVED***
+}
 
-func NewPopulatedValue(r randyStruct, easy bool) *Value ***REMOVED***
-	this := &Value***REMOVED******REMOVED***
-	oneofNumber_Kind := []int32***REMOVED***1, 2, 3, 4, 5, 6***REMOVED***[r.Intn(6)]
-	switch oneofNumber_Kind ***REMOVED***
+func NewPopulatedValue(r randyStruct, easy bool) *Value {
+	this := &Value{}
+	oneofNumber_Kind := []int32{1, 2, 3, 4, 5, 6}[r.Intn(6)]
+	switch oneofNumber_Kind {
 	case 1:
 		this.Kind = NewPopulatedValue_NullValue(r, easy)
 	case 2:
@@ -966,106 +966,106 @@ func NewPopulatedValue(r randyStruct, easy bool) *Value ***REMOVED***
 		this.Kind = NewPopulatedValue_StructValue(r, easy)
 	case 6:
 		this.Kind = NewPopulatedValue_ListValue(r, easy)
-	***REMOVED***
-	if !easy && r.Intn(10) != 0 ***REMOVED***
-	***REMOVED***
+	}
+	if !easy && r.Intn(10) != 0 {
+	}
 	return this
-***REMOVED***
+}
 
-func NewPopulatedValue_NullValue(r randyStruct, easy bool) *Value_NullValue ***REMOVED***
-	this := &Value_NullValue***REMOVED******REMOVED***
-	this.NullValue = NullValue([]int32***REMOVED***0***REMOVED***[r.Intn(1)])
+func NewPopulatedValue_NullValue(r randyStruct, easy bool) *Value_NullValue {
+	this := &Value_NullValue{}
+	this.NullValue = NullValue([]int32{0}[r.Intn(1)])
 	return this
-***REMOVED***
-func NewPopulatedValue_NumberValue(r randyStruct, easy bool) *Value_NumberValue ***REMOVED***
-	this := &Value_NumberValue***REMOVED******REMOVED***
+}
+func NewPopulatedValue_NumberValue(r randyStruct, easy bool) *Value_NumberValue {
+	this := &Value_NumberValue{}
 	this.NumberValue = float64(r.Float64())
-	if r.Intn(2) == 0 ***REMOVED***
+	if r.Intn(2) == 0 {
 		this.NumberValue *= -1
-	***REMOVED***
+	}
 	return this
-***REMOVED***
-func NewPopulatedValue_StringValue(r randyStruct, easy bool) *Value_StringValue ***REMOVED***
-	this := &Value_StringValue***REMOVED******REMOVED***
+}
+func NewPopulatedValue_StringValue(r randyStruct, easy bool) *Value_StringValue {
+	this := &Value_StringValue{}
 	this.StringValue = string(randStringStruct(r))
 	return this
-***REMOVED***
-func NewPopulatedValue_BoolValue(r randyStruct, easy bool) *Value_BoolValue ***REMOVED***
-	this := &Value_BoolValue***REMOVED******REMOVED***
+}
+func NewPopulatedValue_BoolValue(r randyStruct, easy bool) *Value_BoolValue {
+	this := &Value_BoolValue{}
 	this.BoolValue = bool(bool(r.Intn(2) == 0))
 	return this
-***REMOVED***
-func NewPopulatedValue_StructValue(r randyStruct, easy bool) *Value_StructValue ***REMOVED***
-	this := &Value_StructValue***REMOVED******REMOVED***
+}
+func NewPopulatedValue_StructValue(r randyStruct, easy bool) *Value_StructValue {
+	this := &Value_StructValue{}
 	this.StructValue = NewPopulatedStruct(r, easy)
 	return this
-***REMOVED***
-func NewPopulatedValue_ListValue(r randyStruct, easy bool) *Value_ListValue ***REMOVED***
-	this := &Value_ListValue***REMOVED******REMOVED***
+}
+func NewPopulatedValue_ListValue(r randyStruct, easy bool) *Value_ListValue {
+	this := &Value_ListValue{}
 	this.ListValue = NewPopulatedListValue(r, easy)
 	return this
-***REMOVED***
-func NewPopulatedListValue(r randyStruct, easy bool) *ListValue ***REMOVED***
-	this := &ListValue***REMOVED******REMOVED***
-	if r.Intn(10) == 0 ***REMOVED***
+}
+func NewPopulatedListValue(r randyStruct, easy bool) *ListValue {
+	this := &ListValue{}
+	if r.Intn(10) == 0 {
 		v2 := r.Intn(5)
 		this.Values = make([]*Value, v2)
-		for i := 0; i < v2; i++ ***REMOVED***
+		for i := 0; i < v2; i++ {
 			this.Values[i] = NewPopulatedValue(r, easy)
-		***REMOVED***
-	***REMOVED***
-	if !easy && r.Intn(10) != 0 ***REMOVED***
-	***REMOVED***
+		}
+	}
+	if !easy && r.Intn(10) != 0 {
+	}
 	return this
-***REMOVED***
+}
 
-type randyStruct interface ***REMOVED***
+type randyStruct interface {
 	Float32() float32
 	Float64() float64
 	Int63() int64
 	Int31() int32
 	Uint32() uint32
 	Intn(n int) int
-***REMOVED***
+}
 
-func randUTF8RuneStruct(r randyStruct) rune ***REMOVED***
+func randUTF8RuneStruct(r randyStruct) rune {
 	ru := r.Intn(62)
-	if ru < 10 ***REMOVED***
+	if ru < 10 {
 		return rune(ru + 48)
-	***REMOVED*** else if ru < 36 ***REMOVED***
+	} else if ru < 36 {
 		return rune(ru + 55)
-	***REMOVED***
+	}
 	return rune(ru + 61)
-***REMOVED***
-func randStringStruct(r randyStruct) string ***REMOVED***
+}
+func randStringStruct(r randyStruct) string {
 	v3 := r.Intn(100)
 	tmps := make([]rune, v3)
-	for i := 0; i < v3; i++ ***REMOVED***
+	for i := 0; i < v3; i++ {
 		tmps[i] = randUTF8RuneStruct(r)
-	***REMOVED***
+	}
 	return string(tmps)
-***REMOVED***
-func randUnrecognizedStruct(r randyStruct, maxFieldNumber int) (dAtA []byte) ***REMOVED***
+}
+func randUnrecognizedStruct(r randyStruct, maxFieldNumber int) (dAtA []byte) {
 	l := r.Intn(5)
-	for i := 0; i < l; i++ ***REMOVED***
+	for i := 0; i < l; i++ {
 		wire := r.Intn(4)
-		if wire == 3 ***REMOVED***
+		if wire == 3 {
 			wire = 5
-		***REMOVED***
+		}
 		fieldNumber := maxFieldNumber + r.Intn(100)
 		dAtA = randFieldStruct(dAtA, r, fieldNumber, wire)
-	***REMOVED***
+	}
 	return dAtA
-***REMOVED***
-func randFieldStruct(dAtA []byte, r randyStruct, fieldNumber int, wire int) []byte ***REMOVED***
+}
+func randFieldStruct(dAtA []byte, r randyStruct, fieldNumber int, wire int) []byte {
 	key := uint32(fieldNumber)<<3 | uint32(wire)
-	switch wire ***REMOVED***
+	switch wire {
 	case 0:
 		dAtA = encodeVarintPopulateStruct(dAtA, uint64(key))
 		v4 := r.Int63()
-		if r.Intn(2) == 0 ***REMOVED***
+		if r.Intn(2) == 0 {
 			v4 *= -1
-		***REMOVED***
+		}
 		dAtA = encodeVarintPopulateStruct(dAtA, uint64(v4))
 	case 1:
 		dAtA = encodeVarintPopulateStruct(dAtA, uint64(key))
@@ -1074,455 +1074,455 @@ func randFieldStruct(dAtA []byte, r randyStruct, fieldNumber int, wire int) []by
 		dAtA = encodeVarintPopulateStruct(dAtA, uint64(key))
 		ll := r.Intn(100)
 		dAtA = encodeVarintPopulateStruct(dAtA, uint64(ll))
-		for j := 0; j < ll; j++ ***REMOVED***
+		for j := 0; j < ll; j++ {
 			dAtA = append(dAtA, byte(r.Intn(256)))
-		***REMOVED***
+		}
 	default:
 		dAtA = encodeVarintPopulateStruct(dAtA, uint64(key))
 		dAtA = append(dAtA, byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)), byte(r.Intn(256)))
-	***REMOVED***
+	}
 	return dAtA
-***REMOVED***
-func encodeVarintPopulateStruct(dAtA []byte, v uint64) []byte ***REMOVED***
-	for v >= 1<<7 ***REMOVED***
+}
+func encodeVarintPopulateStruct(dAtA []byte, v uint64) []byte {
+	for v >= 1<<7 {
 		dAtA = append(dAtA, uint8(uint64(v)&0x7f|0x80))
 		v >>= 7
-	***REMOVED***
+	}
 	dAtA = append(dAtA, uint8(v))
 	return dAtA
-***REMOVED***
-func (m *Struct) Size() (n int) ***REMOVED***
+}
+func (m *Struct) Size() (n int) {
 	var l int
 	_ = l
-	if len(m.Fields) > 0 ***REMOVED***
-		for k, v := range m.Fields ***REMOVED***
+	if len(m.Fields) > 0 {
+		for k, v := range m.Fields {
 			_ = k
 			_ = v
 			l = 0
-			if v != nil ***REMOVED***
+			if v != nil {
 				l = v.Size()
 				l += 1 + sovStruct(uint64(l))
-			***REMOVED***
+			}
 			mapEntrySize := 1 + len(k) + sovStruct(uint64(len(k))) + l
 			n += mapEntrySize + 1 + sovStruct(uint64(mapEntrySize))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
+}
 
-func (m *Value) Size() (n int) ***REMOVED***
+func (m *Value) Size() (n int) {
 	var l int
 	_ = l
-	if m.Kind != nil ***REMOVED***
+	if m.Kind != nil {
 		n += m.Kind.Size()
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *Value_NullValue) Size() (n int) ***REMOVED***
+func (m *Value_NullValue) Size() (n int) {
 	var l int
 	_ = l
 	n += 1 + sovStruct(uint64(m.NullValue))
 	return n
-***REMOVED***
-func (m *Value_NumberValue) Size() (n int) ***REMOVED***
+}
+func (m *Value_NumberValue) Size() (n int) {
 	var l int
 	_ = l
 	n += 9
 	return n
-***REMOVED***
-func (m *Value_StringValue) Size() (n int) ***REMOVED***
+}
+func (m *Value_StringValue) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.StringValue)
 	n += 1 + l + sovStruct(uint64(l))
 	return n
-***REMOVED***
-func (m *Value_BoolValue) Size() (n int) ***REMOVED***
+}
+func (m *Value_BoolValue) Size() (n int) {
 	var l int
 	_ = l
 	n += 2
 	return n
-***REMOVED***
-func (m *Value_StructValue) Size() (n int) ***REMOVED***
+}
+func (m *Value_StructValue) Size() (n int) {
 	var l int
 	_ = l
-	if m.StructValue != nil ***REMOVED***
+	if m.StructValue != nil {
 		l = m.StructValue.Size()
 		n += 1 + l + sovStruct(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
-func (m *Value_ListValue) Size() (n int) ***REMOVED***
+}
+func (m *Value_ListValue) Size() (n int) {
 	var l int
 	_ = l
-	if m.ListValue != nil ***REMOVED***
+	if m.ListValue != nil {
 		l = m.ListValue.Size()
 		n += 1 + l + sovStruct(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
-func (m *ListValue) Size() (n int) ***REMOVED***
+}
+func (m *ListValue) Size() (n int) {
 	var l int
 	_ = l
-	if len(m.Values) > 0 ***REMOVED***
-		for _, e := range m.Values ***REMOVED***
+	if len(m.Values) > 0 {
+		for _, e := range m.Values {
 			l = e.Size()
 			n += 1 + l + sovStruct(uint64(l))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
+}
 
-func sovStruct(x uint64) (n int) ***REMOVED***
-	for ***REMOVED***
+func sovStruct(x uint64) (n int) {
+	for {
 		n++
 		x >>= 7
-		if x == 0 ***REMOVED***
+		if x == 0 {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
-func sozStruct(x uint64) (n int) ***REMOVED***
+}
+func sozStruct(x uint64) (n int) {
 	return sovStruct(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-***REMOVED***
-func (this *Struct) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Struct) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
+	}
 	keysForFields := make([]string, 0, len(this.Fields))
-	for k := range this.Fields ***REMOVED***
+	for k := range this.Fields {
 		keysForFields = append(keysForFields, k)
-	***REMOVED***
+	}
 	github_com_gogo_protobuf_sortkeys.Strings(keysForFields)
-	mapStringForFields := "map[string]*Value***REMOVED***"
-	for _, k := range keysForFields ***REMOVED***
+	mapStringForFields := "map[string]*Value{"
+	for _, k := range keysForFields {
 		mapStringForFields += fmt.Sprintf("%v: %v,", k, this.Fields[k])
-	***REMOVED***
-	mapStringForFields += "***REMOVED***"
-	s := strings.Join([]string***REMOVED***`&Struct***REMOVED***`,
+	}
+	mapStringForFields += "}"
+	s := strings.Join([]string{`&Struct{`,
 		`Fields:` + mapStringForFields + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *Value) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Value) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&Value***REMOVED***`,
+	}
+	s := strings.Join([]string{`&Value{`,
 		`Kind:` + fmt.Sprintf("%v", this.Kind) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *Value_NullValue) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Value_NullValue) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&Value_NullValue***REMOVED***`,
+	}
+	s := strings.Join([]string{`&Value_NullValue{`,
 		`NullValue:` + fmt.Sprintf("%v", this.NullValue) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *Value_NumberValue) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Value_NumberValue) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&Value_NumberValue***REMOVED***`,
+	}
+	s := strings.Join([]string{`&Value_NumberValue{`,
 		`NumberValue:` + fmt.Sprintf("%v", this.NumberValue) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *Value_StringValue) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Value_StringValue) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&Value_StringValue***REMOVED***`,
+	}
+	s := strings.Join([]string{`&Value_StringValue{`,
 		`StringValue:` + fmt.Sprintf("%v", this.StringValue) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *Value_BoolValue) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Value_BoolValue) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&Value_BoolValue***REMOVED***`,
+	}
+	s := strings.Join([]string{`&Value_BoolValue{`,
 		`BoolValue:` + fmt.Sprintf("%v", this.BoolValue) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *Value_StructValue) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Value_StructValue) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&Value_StructValue***REMOVED***`,
+	}
+	s := strings.Join([]string{`&Value_StructValue{`,
 		`StructValue:` + strings.Replace(fmt.Sprintf("%v", this.StructValue), "Struct", "Struct", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *Value_ListValue) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *Value_ListValue) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&Value_ListValue***REMOVED***`,
+	}
+	s := strings.Join([]string{`&Value_ListValue{`,
 		`ListValue:` + strings.Replace(fmt.Sprintf("%v", this.ListValue), "ListValue", "ListValue", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *ListValue) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *ListValue) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&ListValue***REMOVED***`,
+	}
+	s := strings.Join([]string{`&ListValue{`,
 		`Values:` + strings.Replace(fmt.Sprintf("%v", this.Values), "Value", "Value", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func valueToStringStruct(v interface***REMOVED******REMOVED***) string ***REMOVED***
+}
+func valueToStringStruct(v interface{}) string {
 	rv := reflect.ValueOf(v)
-	if rv.IsNil() ***REMOVED***
+	if rv.IsNil() {
 		return "nil"
-	***REMOVED***
+	}
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
-***REMOVED***
-func (m *Struct) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *Struct) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowStruct
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: Struct: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: Struct: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Fields", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowStruct
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthStruct
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			var keykey uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowStruct
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				keykey |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			var stringLenmapkey uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowStruct
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLenmapkey |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLenmapkey := int(stringLenmapkey)
-			if intStringLenmapkey < 0 ***REMOVED***
+			if intStringLenmapkey < 0 {
 				return ErrInvalidLengthStruct
-			***REMOVED***
+			}
 			postStringIndexmapkey := iNdEx + intStringLenmapkey
-			if postStringIndexmapkey > l ***REMOVED***
+			if postStringIndexmapkey > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			mapkey := string(dAtA[iNdEx:postStringIndexmapkey])
 			iNdEx = postStringIndexmapkey
-			if m.Fields == nil ***REMOVED***
+			if m.Fields == nil {
 				m.Fields = make(map[string]*Value)
-			***REMOVED***
-			if iNdEx < postIndex ***REMOVED***
+			}
+			if iNdEx < postIndex {
 				var valuekey uint64
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return ErrIntOverflowStruct
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					valuekey |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				var mapmsglen int
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return ErrIntOverflowStruct
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					mapmsglen |= (int(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
-				if mapmsglen < 0 ***REMOVED***
+					}
+				}
+				if mapmsglen < 0 {
 					return ErrInvalidLengthStruct
-				***REMOVED***
+				}
 				postmsgIndex := iNdEx + mapmsglen
-				if mapmsglen < 0 ***REMOVED***
+				if mapmsglen < 0 {
 					return ErrInvalidLengthStruct
-				***REMOVED***
-				if postmsgIndex > l ***REMOVED***
+				}
+				if postmsgIndex > l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
-				mapvalue := &Value***REMOVED******REMOVED***
-				if err := mapvalue.Unmarshal(dAtA[iNdEx:postmsgIndex]); err != nil ***REMOVED***
+				}
+				mapvalue := &Value{}
+				if err := mapvalue.Unmarshal(dAtA[iNdEx:postmsgIndex]); err != nil {
 					return err
-				***REMOVED***
+				}
 				iNdEx = postmsgIndex
 				m.Fields[mapkey] = mapvalue
-			***REMOVED*** else ***REMOVED***
+			} else {
 				var mapvalue *Value
 				m.Fields[mapkey] = mapvalue
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipStruct(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthStruct
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *Value) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *Value) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowStruct
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: Value: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: Value: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field NullValue", wireType)
-			***REMOVED***
+			}
 			var v NullValue
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowStruct
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (NullValue(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			m.Kind = &Value_NullValue***REMOVED***v***REMOVED***
+				}
+			}
+			m.Kind = &Value_NullValue{v}
 		case 2:
-			if wireType != 1 ***REMOVED***
+			if wireType != 1 {
 				return fmt.Errorf("proto: wrong wireType = %d for field NumberValue", wireType)
-			***REMOVED***
+			}
 			var v uint64
-			if (iNdEx + 8) > l ***REMOVED***
+			if (iNdEx + 8) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += 8
 			v = uint64(dAtA[iNdEx-8])
 			v |= uint64(dAtA[iNdEx-7]) << 8
@@ -1532,310 +1532,310 @@ func (m *Value) Unmarshal(dAtA []byte) error ***REMOVED***
 			v |= uint64(dAtA[iNdEx-3]) << 40
 			v |= uint64(dAtA[iNdEx-2]) << 48
 			v |= uint64(dAtA[iNdEx-1]) << 56
-			m.Kind = &Value_NumberValue***REMOVED***float64(math.Float64frombits(v))***REMOVED***
+			m.Kind = &Value_NumberValue{float64(math.Float64frombits(v))}
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field StringValue", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowStruct
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthStruct
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.Kind = &Value_StringValue***REMOVED***string(dAtA[iNdEx:postIndex])***REMOVED***
+			}
+			m.Kind = &Value_StringValue{string(dAtA[iNdEx:postIndex])}
 			iNdEx = postIndex
 		case 4:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field BoolValue", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowStruct
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			b := bool(v != 0)
-			m.Kind = &Value_BoolValue***REMOVED***b***REMOVED***
+			m.Kind = &Value_BoolValue{b}
 		case 5:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field StructValue", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowStruct
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthStruct
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			v := &Struct***REMOVED******REMOVED***
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			v := &Struct{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
-			m.Kind = &Value_StructValue***REMOVED***v***REMOVED***
+			}
+			m.Kind = &Value_StructValue{v}
 			iNdEx = postIndex
 		case 6:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ListValue", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowStruct
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthStruct
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			v := &ListValue***REMOVED******REMOVED***
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			v := &ListValue{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
-			m.Kind = &Value_ListValue***REMOVED***v***REMOVED***
+			}
+			m.Kind = &Value_ListValue{v}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipStruct(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthStruct
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *ListValue) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *ListValue) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowStruct
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: ListValue: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: ListValue: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Values", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowStruct
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthStruct
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.Values = append(m.Values, &Value***REMOVED******REMOVED***)
-			if err := m.Values[len(m.Values)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			m.Values = append(m.Values, &Value{})
+			if err := m.Values[len(m.Values)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipStruct(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthStruct
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func skipStruct(dAtA []byte) (n int, err error) ***REMOVED***
+}
+func skipStruct(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return 0, ErrIntOverflowStruct
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return 0, io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		wireType := int(wire & 0x7)
-		switch wireType ***REMOVED***
+		switch wireType {
 		case 0:
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowStruct
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				iNdEx++
-				if dAtA[iNdEx-1] < 0x80 ***REMOVED***
+				if dAtA[iNdEx-1] < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return iNdEx, nil
 		case 1:
 			iNdEx += 8
 			return iNdEx, nil
 		case 2:
 			var length int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowStruct
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				length |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			iNdEx += length
-			if length < 0 ***REMOVED***
+			if length < 0 {
 				return 0, ErrInvalidLengthStruct
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 3:
-			for ***REMOVED***
+			for {
 				var innerWire uint64
 				var start int = iNdEx
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return 0, ErrIntOverflowStruct
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return 0, io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					innerWire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				innerWireType := int(innerWire & 0x7)
-				if innerWireType == 4 ***REMOVED***
+				if innerWireType == 4 {
 					break
-				***REMOVED***
+				}
 				next, err := skipStruct(dAtA[start:])
-				if err != nil ***REMOVED***
+				if err != nil {
 					return 0, err
-				***REMOVED***
+				}
 				iNdEx = start + next
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 4:
 			return iNdEx, nil
@@ -1844,19 +1844,19 @@ func skipStruct(dAtA []byte) (n int, err error) ***REMOVED***
 			return iNdEx, nil
 		default:
 			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	panic("unreachable")
-***REMOVED***
+}
 
 var (
 	ErrInvalidLengthStruct = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowStruct   = fmt.Errorf("proto: integer overflow")
 )
 
-func init() ***REMOVED*** proto.RegisterFile("struct.proto", fileDescriptorStruct) ***REMOVED***
+func init() { proto.RegisterFile("struct.proto", fileDescriptorStruct) }
 
-var fileDescriptorStruct = []byte***REMOVED***
+var fileDescriptorStruct = []byte{
 	// 432 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x74, 0x91, 0xc1, 0x6b, 0xd4, 0x40,
 	0x14, 0xc6, 0xf3, 0xb2, 0xdd, 0xe0, 0xbe, 0x94, 0x5a, 0x46, 0xd0, 0xa5, 0xc2, 0xb8, 0x6c, 0x2f,
@@ -1885,4 +1885,4 @@ var fileDescriptorStruct = []byte***REMOVED***
 	0xe9, 0xcb, 0xe5, 0x45, 0x5a, 0x7c, 0x06, 0xf8, 0x62, 0xf7, 0xf6, 0xa3, 0xe0, 0x9b, 0x4d, 0xf7,
 	0x4d, 0x43, 0xd4, 0xee, 0xf7, 0x3a, 0x65, 0xec, 0x39, 0x17, 0xef, 0xf9, 0x2b, 0x45, 0x26, 0x8e,
 	0x76, 0x7a, 0xf8, 0x37, 0x00, 0x00, 0xff, 0xff, 0x52, 0x64, 0x2c, 0x57, 0xd5, 0x02, 0x00, 0x00,
-***REMOVED***
+}

@@ -6,7 +6,7 @@ set -o pipefail
 # set the path to the present working directory
 export GOPATH=`pwd`
 
-function git_clone() ***REMOVED***
+function git_clone() {
   path=$1
   branch=$2
   version=$3
@@ -18,7 +18,7 @@ function git_clone() ***REMOVED***
   git checkout "$branch"
   git reset --hard "$version"
   popd
-***REMOVED***
+}
 
 # Remove potential previous runs
 rm -rf src test_program_bin toml-test

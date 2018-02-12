@@ -9,22 +9,22 @@ import (
 	winio "github.com/Microsoft/go-winio"
 )
 
-func isNoent(err error) bool ***REMOVED***
-	if err != nil ***REMOVED***
-		if oerr, ok := err.(*os.PathError); ok ***REMOVED***
-			if oerr.Err == syscall.ENOENT ***REMOVED***
+func isNoent(err error) bool {
+	if err != nil {
+		if oerr, ok := err.(*os.PathError); ok {
+			if oerr.Err == syscall.ENOENT {
 				return true
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return false
-***REMOVED***
+}
 
-func dialer(address string, timeout time.Duration) (net.Conn, error) ***REMOVED***
+func dialer(address string, timeout time.Duration) (net.Conn, error) {
 	return winio.DialPipe(address, &timeout)
-***REMOVED***
+}
 
 // DialAddress returns the dial address
-func DialAddress(address string) string ***REMOVED***
+func DialAddress(address string) string {
 	return address
-***REMOVED***
+}

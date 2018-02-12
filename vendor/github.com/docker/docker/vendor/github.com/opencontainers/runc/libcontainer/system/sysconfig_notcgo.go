@@ -2,7 +2,7 @@
 
 package system
 
-func GetClockTicks() int ***REMOVED***
+func GetClockTicks() int {
 	// TODO figure out a better alternative for platforms where we're missing cgo
 	//
 	// TODO Windows. This could be implemented using Win32 QueryPerformanceFrequency().
@@ -12,4 +12,4 @@ func GetClockTicks() int ***REMOVED***
 	// https://msdn.microsoft.com/en-us/library/windows/desktop/dn553408(v=vs.85).aspx
 
 	return 100
-***REMOVED***
+}

@@ -2,7 +2,7 @@ package metrics
 
 // The MetricSink interface is used to transmit metrics information
 // to an external system
-type MetricSink interface ***REMOVED***
+type MetricSink interface {
 	// A Gauge should retain the last value it is set to
 	SetGauge(key []string, val float32)
 
@@ -14,39 +14,39 @@ type MetricSink interface ***REMOVED***
 
 	// Samples are for timing information, where quantiles are used
 	AddSample(key []string, val float32)
-***REMOVED***
+}
 
 // BlackholeSink is used to just blackhole messages
-type BlackholeSink struct***REMOVED******REMOVED***
+type BlackholeSink struct{}
 
-func (*BlackholeSink) SetGauge(key []string, val float32)    ***REMOVED******REMOVED***
-func (*BlackholeSink) EmitKey(key []string, val float32)     ***REMOVED******REMOVED***
-func (*BlackholeSink) IncrCounter(key []string, val float32) ***REMOVED******REMOVED***
-func (*BlackholeSink) AddSample(key []string, val float32)   ***REMOVED******REMOVED***
+func (*BlackholeSink) SetGauge(key []string, val float32)    {}
+func (*BlackholeSink) EmitKey(key []string, val float32)     {}
+func (*BlackholeSink) IncrCounter(key []string, val float32) {}
+func (*BlackholeSink) AddSample(key []string, val float32)   {}
 
 // FanoutSink is used to sink to fanout values to multiple sinks
 type FanoutSink []MetricSink
 
-func (fh FanoutSink) SetGauge(key []string, val float32) ***REMOVED***
-	for _, s := range fh ***REMOVED***
+func (fh FanoutSink) SetGauge(key []string, val float32) {
+	for _, s := range fh {
 		s.SetGauge(key, val)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (fh FanoutSink) EmitKey(key []string, val float32) ***REMOVED***
-	for _, s := range fh ***REMOVED***
+func (fh FanoutSink) EmitKey(key []string, val float32) {
+	for _, s := range fh {
 		s.EmitKey(key, val)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (fh FanoutSink) IncrCounter(key []string, val float32) ***REMOVED***
-	for _, s := range fh ***REMOVED***
+func (fh FanoutSink) IncrCounter(key []string, val float32) {
+	for _, s := range fh {
 		s.IncrCounter(key, val)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (fh FanoutSink) AddSample(key []string, val float32) ***REMOVED***
-	for _, s := range fh ***REMOVED***
+func (fh FanoutSink) AddSample(key []string, val float32) {
+	for _, s := range fh {
 		s.AddSample(key, val)
-	***REMOVED***
-***REMOVED***
+	}
+}

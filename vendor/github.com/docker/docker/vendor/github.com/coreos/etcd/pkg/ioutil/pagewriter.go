@@ -22,7 +22,7 @@ var defaultBufferBytes = 128 * 1024
 
 // PageWriter implements the io.Writer interface so that writes will
 // either be in page chunks or from flushing.
-type PageWriter struct ***REMOVED***
+type PageWriter struct {
 	w io.Writer
 	// pageOffset tracks the page offset of the base of the buffer
 	pageOffset int
@@ -36,71 +36,71 @@ type PageWriter struct ***REMOVED***
 	// to be flushed. It is less than len(buf) so there is space for slack writes
 	// to bring the writer to page alignment.
 	bufWatermarkBytes int
-***REMOVED***
+}
 
 // NewPageWriter creates a new PageWriter. pageBytes is the number of bytes
 // to write per page. pageOffset is the starting offset of io.Writer.
-func NewPageWriter(w io.Writer, pageBytes, pageOffset int) *PageWriter ***REMOVED***
-	return &PageWriter***REMOVED***
+func NewPageWriter(w io.Writer, pageBytes, pageOffset int) *PageWriter {
+	return &PageWriter{
 		w:                 w,
 		pageOffset:        pageOffset,
 		pageBytes:         pageBytes,
 		buf:               make([]byte, defaultBufferBytes+pageBytes),
 		bufWatermarkBytes: defaultBufferBytes,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (pw *PageWriter) Write(p []byte) (n int, err error) ***REMOVED***
-	if len(p)+pw.bufferedBytes <= pw.bufWatermarkBytes ***REMOVED***
+func (pw *PageWriter) Write(p []byte) (n int, err error) {
+	if len(p)+pw.bufferedBytes <= pw.bufWatermarkBytes {
 		// no overflow
 		copy(pw.buf[pw.bufferedBytes:], p)
 		pw.bufferedBytes += len(p)
 		return len(p), nil
-	***REMOVED***
+	}
 	// complete the slack page in the buffer if unaligned
 	slack := pw.pageBytes - ((pw.pageOffset + pw.bufferedBytes) % pw.pageBytes)
-	if slack != pw.pageBytes ***REMOVED***
+	if slack != pw.pageBytes {
 		partial := slack > len(p)
-		if partial ***REMOVED***
+		if partial {
 			// not enough data to complete the slack page
 			slack = len(p)
-		***REMOVED***
+		}
 		// special case: writing to slack page in buffer
 		copy(pw.buf[pw.bufferedBytes:], p[:slack])
 		pw.bufferedBytes += slack
 		n = slack
 		p = p[slack:]
-		if partial ***REMOVED***
+		if partial {
 			// avoid forcing an unaligned flush
 			return n, nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	// buffer contents are now page-aligned; clear out
-	if err = pw.Flush(); err != nil ***REMOVED***
+	if err = pw.Flush(); err != nil {
 		return n, err
-	***REMOVED***
+	}
 	// directly write all complete pages without copying
-	if len(p) > pw.pageBytes ***REMOVED***
+	if len(p) > pw.pageBytes {
 		pages := len(p) / pw.pageBytes
 		c, werr := pw.w.Write(p[:pages*pw.pageBytes])
 		n += c
-		if werr != nil ***REMOVED***
+		if werr != nil {
 			return n, werr
-		***REMOVED***
+		}
 		p = p[pages*pw.pageBytes:]
-	***REMOVED***
+	}
 	// write remaining tail to buffer
 	c, werr := pw.Write(p)
 	n += c
 	return n, werr
-***REMOVED***
+}
 
-func (pw *PageWriter) Flush() error ***REMOVED***
-	if pw.bufferedBytes == 0 ***REMOVED***
+func (pw *PageWriter) Flush() error {
+	if pw.bufferedBytes == 0 {
 		return nil
-	***REMOVED***
+	}
 	_, err := pw.w.Write(pw.buf[:pw.bufferedBytes])
 	pw.pageOffset = (pw.pageOffset + pw.bufferedBytes) % pw.pageBytes
 	pw.bufferedBytes = 0
 	return err
-***REMOVED***
+}

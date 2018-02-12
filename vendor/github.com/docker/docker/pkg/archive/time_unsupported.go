@@ -7,10 +7,10 @@ import (
 	"time"
 )
 
-func timeToTimespec(time time.Time) (ts syscall.Timespec) ***REMOVED***
+func timeToTimespec(time time.Time) (ts syscall.Timespec) {
 	nsec := int64(0)
-	if !time.IsZero() ***REMOVED***
+	if !time.IsZero() {
 		nsec = time.UnixNano()
-	***REMOVED***
+	}
 	return syscall.NsecToTimespec(nsec)
-***REMOVED***
+}

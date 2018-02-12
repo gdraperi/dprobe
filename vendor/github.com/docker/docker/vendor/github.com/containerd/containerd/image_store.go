@@ -11,126 +11,126 @@ import (
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 )
 
-type remoteImages struct ***REMOVED***
+type remoteImages struct {
 	client imagesapi.ImagesClient
-***REMOVED***
+}
 
 // NewImageStoreFromClient returns a new image store client
-func NewImageStoreFromClient(client imagesapi.ImagesClient) images.Store ***REMOVED***
-	return &remoteImages***REMOVED***
+func NewImageStoreFromClient(client imagesapi.ImagesClient) images.Store {
+	return &remoteImages{
 		client: client,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *remoteImages) Get(ctx context.Context, name string) (images.Image, error) ***REMOVED***
-	resp, err := s.client.Get(ctx, &imagesapi.GetImageRequest***REMOVED***
+func (s *remoteImages) Get(ctx context.Context, name string) (images.Image, error) {
+	resp, err := s.client.Get(ctx, &imagesapi.GetImageRequest{
 		Name: name,
-	***REMOVED***)
-	if err != nil ***REMOVED***
-		return images.Image***REMOVED******REMOVED***, errdefs.FromGRPC(err)
-	***REMOVED***
+	})
+	if err != nil {
+		return images.Image{}, errdefs.FromGRPC(err)
+	}
 
 	return imageFromProto(resp.Image), nil
-***REMOVED***
+}
 
-func (s *remoteImages) List(ctx context.Context, filters ...string) ([]images.Image, error) ***REMOVED***
-	resp, err := s.client.List(ctx, &imagesapi.ListImagesRequest***REMOVED***
+func (s *remoteImages) List(ctx context.Context, filters ...string) ([]images.Image, error) {
+	resp, err := s.client.List(ctx, &imagesapi.ListImagesRequest{
 		Filters: filters,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		return nil, errdefs.FromGRPC(err)
-	***REMOVED***
+	}
 
 	return imagesFromProto(resp.Images), nil
-***REMOVED***
+}
 
-func (s *remoteImages) Create(ctx context.Context, image images.Image) (images.Image, error) ***REMOVED***
-	created, err := s.client.Create(ctx, &imagesapi.CreateImageRequest***REMOVED***
+func (s *remoteImages) Create(ctx context.Context, image images.Image) (images.Image, error) {
+	created, err := s.client.Create(ctx, &imagesapi.CreateImageRequest{
 		Image: imageToProto(&image),
-	***REMOVED***)
-	if err != nil ***REMOVED***
-		return images.Image***REMOVED******REMOVED***, errdefs.FromGRPC(err)
-	***REMOVED***
+	})
+	if err != nil {
+		return images.Image{}, errdefs.FromGRPC(err)
+	}
 
 	return imageFromProto(&created.Image), nil
-***REMOVED***
+}
 
-func (s *remoteImages) Update(ctx context.Context, image images.Image, fieldpaths ...string) (images.Image, error) ***REMOVED***
+func (s *remoteImages) Update(ctx context.Context, image images.Image, fieldpaths ...string) (images.Image, error) {
 	var updateMask *ptypes.FieldMask
-	if len(fieldpaths) > 0 ***REMOVED***
-		updateMask = &ptypes.FieldMask***REMOVED***
+	if len(fieldpaths) > 0 {
+		updateMask = &ptypes.FieldMask{
 			Paths: fieldpaths,
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	updated, err := s.client.Update(ctx, &imagesapi.UpdateImageRequest***REMOVED***
+	updated, err := s.client.Update(ctx, &imagesapi.UpdateImageRequest{
 		Image:      imageToProto(&image),
 		UpdateMask: updateMask,
-	***REMOVED***)
-	if err != nil ***REMOVED***
-		return images.Image***REMOVED******REMOVED***, errdefs.FromGRPC(err)
-	***REMOVED***
+	})
+	if err != nil {
+		return images.Image{}, errdefs.FromGRPC(err)
+	}
 
 	return imageFromProto(&updated.Image), nil
-***REMOVED***
+}
 
-func (s *remoteImages) Delete(ctx context.Context, name string, opts ...images.DeleteOpt) error ***REMOVED***
+func (s *remoteImages) Delete(ctx context.Context, name string, opts ...images.DeleteOpt) error {
 	var do images.DeleteOptions
-	for _, opt := range opts ***REMOVED***
-		if err := opt(ctx, &do); err != nil ***REMOVED***
+	for _, opt := range opts {
+		if err := opt(ctx, &do); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
-	_, err := s.client.Delete(ctx, &imagesapi.DeleteImageRequest***REMOVED***
+		}
+	}
+	_, err := s.client.Delete(ctx, &imagesapi.DeleteImageRequest{
 		Name: name,
 		Sync: do.Synchronous,
-	***REMOVED***)
+	})
 
 	return errdefs.FromGRPC(err)
-***REMOVED***
+}
 
-func imageToProto(image *images.Image) imagesapi.Image ***REMOVED***
-	return imagesapi.Image***REMOVED***
+func imageToProto(image *images.Image) imagesapi.Image {
+	return imagesapi.Image{
 		Name:      image.Name,
 		Labels:    image.Labels,
 		Target:    descToProto(&image.Target),
 		CreatedAt: image.CreatedAt,
 		UpdatedAt: image.UpdatedAt,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func imageFromProto(imagepb *imagesapi.Image) images.Image ***REMOVED***
-	return images.Image***REMOVED***
+func imageFromProto(imagepb *imagesapi.Image) images.Image {
+	return images.Image{
 		Name:      imagepb.Name,
 		Labels:    imagepb.Labels,
 		Target:    descFromProto(&imagepb.Target),
 		CreatedAt: imagepb.CreatedAt,
 		UpdatedAt: imagepb.UpdatedAt,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func imagesFromProto(imagespb []imagesapi.Image) []images.Image ***REMOVED***
+func imagesFromProto(imagespb []imagesapi.Image) []images.Image {
 	var images []images.Image
 
-	for _, image := range imagespb ***REMOVED***
+	for _, image := range imagespb {
 		images = append(images, imageFromProto(&image))
-	***REMOVED***
+	}
 
 	return images
-***REMOVED***
+}
 
-func descFromProto(desc *types.Descriptor) ocispec.Descriptor ***REMOVED***
-	return ocispec.Descriptor***REMOVED***
+func descFromProto(desc *types.Descriptor) ocispec.Descriptor {
+	return ocispec.Descriptor{
 		MediaType: desc.MediaType,
 		Size:      desc.Size_,
 		Digest:    desc.Digest,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func descToProto(desc *ocispec.Descriptor) types.Descriptor ***REMOVED***
-	return types.Descriptor***REMOVED***
+func descToProto(desc *ocispec.Descriptor) types.Descriptor {
+	return types.Descriptor{
 		MediaType: desc.MediaType,
 		Size_:     desc.Size,
 		Digest:    desc.Digest,
-	***REMOVED***
-***REMOVED***
+	}
+}

@@ -9,15 +9,15 @@
 // Here is a simple example, opening a registry key and reading a string value from it.
 //
 //	k, err := registry.OpenKey(registry.LOCAL_MACHINE, `SOFTWARE\Microsoft\Windows NT\CurrentVersion`, registry.QUERY_VALUE)
-//	if err != nil ***REMOVED***
+//	if err != nil {
 //		log.Fatal(err)
-//	***REMOVED***
+//	}
 //	defer k.Close()
 //
 //	s, _, err := k.GetStringValue("SystemRoot")
-//	if err != nil ***REMOVED***
+//	if err != nil {
 //		log.Fatal(err)
-//	***REMOVED***
+//	}
 //	fmt.Printf("Windows system root is %q\n", s)
 //
 package registry
@@ -66,135 +66,135 @@ const (
 )
 
 // Close closes open key k.
-func (k Key) Close() error ***REMOVED***
+func (k Key) Close() error {
 	return syscall.RegCloseKey(syscall.Handle(k))
-***REMOVED***
+}
 
 // OpenKey opens a new key with path name relative to key k.
 // It accepts any open key, including CURRENT_USER and others,
 // and returns the new key and an error.
 // The access parameter specifies desired access rights to the
 // key to be opened.
-func OpenKey(k Key, path string, access uint32) (Key, error) ***REMOVED***
+func OpenKey(k Key, path string, access uint32) (Key, error) {
 	p, err := syscall.UTF16PtrFromString(path)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	var subkey syscall.Handle
 	err = syscall.RegOpenKeyEx(syscall.Handle(k), p, 0, access, &subkey)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	return Key(subkey), nil
-***REMOVED***
+}
 
 // OpenRemoteKey opens a predefined registry key on another
 // computer pcname. The key to be opened is specified by k, but
 // can only be one of LOCAL_MACHINE, PERFORMANCE_DATA or USERS.
 // If pcname is "", OpenRemoteKey returns local computer key.
-func OpenRemoteKey(pcname string, k Key) (Key, error) ***REMOVED***
+func OpenRemoteKey(pcname string, k Key) (Key, error) {
 	var err error
 	var p *uint16
-	if pcname != "" ***REMOVED***
+	if pcname != "" {
 		p, err = syscall.UTF16PtrFromString(`\\` + pcname)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	var remoteKey syscall.Handle
 	err = regConnectRegistry(p, syscall.Handle(k), &remoteKey)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	return Key(remoteKey), nil
-***REMOVED***
+}
 
 // ReadSubKeyNames returns the names of subkeys of key k.
 // The parameter n controls the number of returned names,
 // analogous to the way os.File.Readdirnames works.
-func (k Key) ReadSubKeyNames(n int) ([]string, error) ***REMOVED***
+func (k Key) ReadSubKeyNames(n int) ([]string, error) {
 	ki, err := k.Stat()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	names := make([]string, 0, ki.SubKeyCount)
 	buf := make([]uint16, ki.MaxSubKeyLen+1) // extra room for terminating zero byte
 loopItems:
-	for i := uint32(0); ; i++ ***REMOVED***
-		if n > 0 ***REMOVED***
-			if len(names) == n ***REMOVED***
+	for i := uint32(0); ; i++ {
+		if n > 0 {
+			if len(names) == n {
 				return names, nil
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		l := uint32(len(buf))
-		for ***REMOVED***
+		for {
 			err := syscall.RegEnumKeyEx(syscall.Handle(k), i, &buf[0], &l, nil, nil, nil, nil)
-			if err == nil ***REMOVED***
+			if err == nil {
 				break
-			***REMOVED***
-			if err == syscall.ERROR_MORE_DATA ***REMOVED***
+			}
+			if err == syscall.ERROR_MORE_DATA {
 				// Double buffer size and try again.
 				l = uint32(2 * len(buf))
 				buf = make([]uint16, l)
 				continue
-			***REMOVED***
-			if err == _ERROR_NO_MORE_ITEMS ***REMOVED***
+			}
+			if err == _ERROR_NO_MORE_ITEMS {
 				break loopItems
-			***REMOVED***
+			}
 			return names, err
-		***REMOVED***
+		}
 		names = append(names, syscall.UTF16ToString(buf[:l]))
-	***REMOVED***
-	if n > len(names) ***REMOVED***
+	}
+	if n > len(names) {
 		return names, io.EOF
-	***REMOVED***
+	}
 	return names, nil
-***REMOVED***
+}
 
 // CreateKey creates a key named path under open key k.
 // CreateKey returns the new key and a boolean flag that reports
 // whether the key already existed.
 // The access parameter specifies the access rights for the key
 // to be created.
-func CreateKey(k Key, path string, access uint32) (newk Key, openedExisting bool, err error) ***REMOVED***
+func CreateKey(k Key, path string, access uint32) (newk Key, openedExisting bool, err error) {
 	var h syscall.Handle
 	var d uint32
 	err = regCreateKeyEx(syscall.Handle(k), syscall.StringToUTF16Ptr(path),
 		0, nil, _REG_OPTION_NON_VOLATILE, access, nil, &h, &d)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, false, err
-	***REMOVED***
+	}
 	return Key(h), d == _REG_OPENED_EXISTING_KEY, nil
-***REMOVED***
+}
 
 // DeleteKey deletes the subkey path of key k and its values.
-func DeleteKey(k Key, path string) error ***REMOVED***
+func DeleteKey(k Key, path string) error {
 	return regDeleteKey(syscall.Handle(k), syscall.StringToUTF16Ptr(path))
-***REMOVED***
+}
 
 // A KeyInfo describes the statistics of a key. It is returned by Stat.
-type KeyInfo struct ***REMOVED***
+type KeyInfo struct {
 	SubKeyCount     uint32
 	MaxSubKeyLen    uint32 // size of the key's subkey with the longest name, in Unicode characters, not including the terminating zero byte
 	ValueCount      uint32
 	MaxValueNameLen uint32 // size of the key's longest value name, in Unicode characters, not including the terminating zero byte
 	MaxValueLen     uint32 // longest data component among the key's values, in bytes
 	lastWriteTime   syscall.Filetime
-***REMOVED***
+}
 
 // ModTime returns the key's last write time.
-func (ki *KeyInfo) ModTime() time.Time ***REMOVED***
+func (ki *KeyInfo) ModTime() time.Time {
 	return time.Unix(0, ki.lastWriteTime.Nanoseconds())
-***REMOVED***
+}
 
 // Stat retrieves information about the open key k.
-func (k Key) Stat() (*KeyInfo, error) ***REMOVED***
+func (k Key) Stat() (*KeyInfo, error) {
 	var ki KeyInfo
 	err := syscall.RegQueryInfoKey(syscall.Handle(k), nil, nil, nil,
 		&ki.SubKeyCount, &ki.MaxSubKeyLen, nil, &ki.ValueCount,
 		&ki.MaxValueNameLen, &ki.MaxValueLen, nil, &ki.lastWriteTime)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return &ki, nil
-***REMOVED***
+}

@@ -18,7 +18,7 @@ const (
 // Config defines the configuration of a docker daemon.
 // It includes json tags to deserialize configuration from a file
 // using the same names that the flags in the command line uses.
-type Config struct ***REMOVED***
+type Config struct {
 	CommonConfig
 
 	// These fields are common to all unix platforms.
@@ -38,11 +38,11 @@ type Config struct ***REMOVED***
 	ShmSize              opts.MemBytes            `json:"default-shm-size,omitempty"`
 	NoNewPrivileges      bool                     `json:"no-new-privileges,omitempty"`
 	IpcMode              string                   `json:"default-ipc-mode,omitempty"`
-***REMOVED***
+}
 
 // BridgeConfig stores all the bridge driver specific
 // configuration.
-type BridgeConfig struct ***REMOVED***
+type BridgeConfig struct {
 	commonBridgeConfig
 
 	// These fields are common to all unix platforms.
@@ -56,33 +56,33 @@ type BridgeConfig struct ***REMOVED***
 	EnableUserlandProxy bool   `json:"userland-proxy,omitempty"`
 	UserlandProxyPath   string `json:"userland-proxy-path,omitempty"`
 	FixedCIDRv6         string `json:"fixed-cidr-v6,omitempty"`
-***REMOVED***
+}
 
 // IsSwarmCompatible defines if swarm mode can be enabled in this config
-func (conf *Config) IsSwarmCompatible() error ***REMOVED***
-	if conf.ClusterStore != "" || conf.ClusterAdvertise != "" ***REMOVED***
+func (conf *Config) IsSwarmCompatible() error {
+	if conf.ClusterStore != "" || conf.ClusterAdvertise != "" {
 		return fmt.Errorf("--cluster-store and --cluster-advertise daemon configurations are incompatible with swarm mode")
-	***REMOVED***
-	if conf.LiveRestoreEnabled ***REMOVED***
+	}
+	if conf.LiveRestoreEnabled {
 		return fmt.Errorf("--live-restore daemon configuration is incompatible with swarm mode")
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func verifyDefaultIpcMode(mode string) error ***REMOVED***
+func verifyDefaultIpcMode(mode string) error {
 	const hint = "Use \"shareable\" or \"private\"."
 
 	dm := containertypes.IpcMode(mode)
-	if !dm.Valid() ***REMOVED***
+	if !dm.Valid() {
 		return fmt.Errorf("Default IPC mode setting (%v) is invalid. "+hint, dm)
-	***REMOVED***
-	if dm != "" && !dm.IsPrivate() && !dm.IsShareable() ***REMOVED***
+	}
+	if dm != "" && !dm.IsPrivate() && !dm.IsShareable() {
 		return fmt.Errorf("IPC mode \"%v\" is not supported as default value. "+hint, dm)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // ValidatePlatformConfig checks if any platform-specific configuration settings are invalid.
-func (conf *Config) ValidatePlatformConfig() error ***REMOVED***
+func (conf *Config) ValidatePlatformConfig() error {
 	return verifyDefaultIpcMode(conf.IpcMode)
-***REMOVED***
+}

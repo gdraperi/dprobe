@@ -11,7 +11,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestInfo_BinaryCommits(t *testing.T) ***REMOVED***
+func TestInfo_BinaryCommits(t *testing.T) {
 	client := request.NewAPIClient(t)
 
 	info, err := client.Info(context.Background())
@@ -31,4 +31,4 @@ func TestInfo_BinaryCommits(t *testing.T) ***REMOVED***
 	assert.NotEqual(t, "N/A", info.RuncCommit.ID)
 	assert.Equal(t, testEnv.DaemonInfo.RuncCommit.Expected, info.RuncCommit.Expected)
 	assert.Equal(t, info.RuncCommit.Expected, info.RuncCommit.ID)
-***REMOVED***
+}

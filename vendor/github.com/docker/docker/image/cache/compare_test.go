@@ -9,118 +9,118 @@ import (
 )
 
 // Just to make life easier
-func newPortNoError(proto, port string) nat.Port ***REMOVED***
+func newPortNoError(proto, port string) nat.Port {
 	p, _ := nat.NewPort(proto, port)
 	return p
-***REMOVED***
+}
 
-func TestCompare(t *testing.T) ***REMOVED***
+func TestCompare(t *testing.T) {
 	ports1 := make(nat.PortSet)
-	ports1[newPortNoError("tcp", "1111")] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	ports1[newPortNoError("tcp", "2222")] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
+	ports1[newPortNoError("tcp", "1111")] = struct{}{}
+	ports1[newPortNoError("tcp", "2222")] = struct{}{}
 	ports2 := make(nat.PortSet)
-	ports2[newPortNoError("tcp", "3333")] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	ports2[newPortNoError("tcp", "4444")] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
+	ports2[newPortNoError("tcp", "3333")] = struct{}{}
+	ports2[newPortNoError("tcp", "4444")] = struct{}{}
 	ports3 := make(nat.PortSet)
-	ports3[newPortNoError("tcp", "1111")] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	ports3[newPortNoError("tcp", "2222")] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	ports3[newPortNoError("tcp", "5555")] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	volumes1 := make(map[string]struct***REMOVED******REMOVED***)
-	volumes1["/test1"] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	volumes2 := make(map[string]struct***REMOVED******REMOVED***)
-	volumes2["/test2"] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	volumes3 := make(map[string]struct***REMOVED******REMOVED***)
-	volumes3["/test1"] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	volumes3["/test3"] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	envs1 := []string***REMOVED***"ENV1=value1", "ENV2=value2"***REMOVED***
-	envs2 := []string***REMOVED***"ENV1=value1", "ENV3=value3"***REMOVED***
-	entrypoint1 := strslice.StrSlice***REMOVED***"/bin/sh", "-c"***REMOVED***
-	entrypoint2 := strslice.StrSlice***REMOVED***"/bin/sh", "-d"***REMOVED***
-	entrypoint3 := strslice.StrSlice***REMOVED***"/bin/sh", "-c", "echo"***REMOVED***
-	cmd1 := strslice.StrSlice***REMOVED***"/bin/sh", "-c"***REMOVED***
-	cmd2 := strslice.StrSlice***REMOVED***"/bin/sh", "-d"***REMOVED***
-	cmd3 := strslice.StrSlice***REMOVED***"/bin/sh", "-c", "echo"***REMOVED***
-	labels1 := map[string]string***REMOVED***"LABEL1": "value1", "LABEL2": "value2"***REMOVED***
-	labels2 := map[string]string***REMOVED***"LABEL1": "value1", "LABEL2": "value3"***REMOVED***
-	labels3 := map[string]string***REMOVED***"LABEL1": "value1", "LABEL2": "value2", "LABEL3": "value3"***REMOVED***
+	ports3[newPortNoError("tcp", "1111")] = struct{}{}
+	ports3[newPortNoError("tcp", "2222")] = struct{}{}
+	ports3[newPortNoError("tcp", "5555")] = struct{}{}
+	volumes1 := make(map[string]struct{})
+	volumes1["/test1"] = struct{}{}
+	volumes2 := make(map[string]struct{})
+	volumes2["/test2"] = struct{}{}
+	volumes3 := make(map[string]struct{})
+	volumes3["/test1"] = struct{}{}
+	volumes3["/test3"] = struct{}{}
+	envs1 := []string{"ENV1=value1", "ENV2=value2"}
+	envs2 := []string{"ENV1=value1", "ENV3=value3"}
+	entrypoint1 := strslice.StrSlice{"/bin/sh", "-c"}
+	entrypoint2 := strslice.StrSlice{"/bin/sh", "-d"}
+	entrypoint3 := strslice.StrSlice{"/bin/sh", "-c", "echo"}
+	cmd1 := strslice.StrSlice{"/bin/sh", "-c"}
+	cmd2 := strslice.StrSlice{"/bin/sh", "-d"}
+	cmd3 := strslice.StrSlice{"/bin/sh", "-c", "echo"}
+	labels1 := map[string]string{"LABEL1": "value1", "LABEL2": "value2"}
+	labels2 := map[string]string{"LABEL1": "value1", "LABEL2": "value3"}
+	labels3 := map[string]string{"LABEL1": "value1", "LABEL2": "value2", "LABEL3": "value3"}
 
-	sameConfigs := map[*container.Config]*container.Config***REMOVED***
+	sameConfigs := map[*container.Config]*container.Config{
 		// Empty config
-		***REMOVED******REMOVED***: ***REMOVED******REMOVED***,
+		{}: {},
 		// Does not compare hostname, domainname & image
-		***REMOVED***
+		{
 			Hostname:   "host1",
 			Domainname: "domain1",
 			Image:      "image1",
 			User:       "user",
-		***REMOVED***: ***REMOVED***
+		}: {
 			Hostname:   "host2",
 			Domainname: "domain2",
 			Image:      "image2",
 			User:       "user",
-		***REMOVED***,
+		},
 		// only OpenStdin
-		***REMOVED***OpenStdin: false***REMOVED***: ***REMOVED***OpenStdin: false***REMOVED***,
+		{OpenStdin: false}: {OpenStdin: false},
 		// only env
-		***REMOVED***Env: envs1***REMOVED***: ***REMOVED***Env: envs1***REMOVED***,
+		{Env: envs1}: {Env: envs1},
 		// only cmd
-		***REMOVED***Cmd: cmd1***REMOVED***: ***REMOVED***Cmd: cmd1***REMOVED***,
+		{Cmd: cmd1}: {Cmd: cmd1},
 		// only labels
-		***REMOVED***Labels: labels1***REMOVED***: ***REMOVED***Labels: labels1***REMOVED***,
+		{Labels: labels1}: {Labels: labels1},
 		// only exposedPorts
-		***REMOVED***ExposedPorts: ports1***REMOVED***: ***REMOVED***ExposedPorts: ports1***REMOVED***,
+		{ExposedPorts: ports1}: {ExposedPorts: ports1},
 		// only entrypoints
-		***REMOVED***Entrypoint: entrypoint1***REMOVED***: ***REMOVED***Entrypoint: entrypoint1***REMOVED***,
+		{Entrypoint: entrypoint1}: {Entrypoint: entrypoint1},
 		// only volumes
-		***REMOVED***Volumes: volumes1***REMOVED***: ***REMOVED***Volumes: volumes1***REMOVED***,
-	***REMOVED***
-	differentConfigs := map[*container.Config]*container.Config***REMOVED***
+		{Volumes: volumes1}: {Volumes: volumes1},
+	}
+	differentConfigs := map[*container.Config]*container.Config{
 		nil: nil,
-		***REMOVED***
+		{
 			Hostname:   "host1",
 			Domainname: "domain1",
 			Image:      "image1",
 			User:       "user1",
-		***REMOVED***: ***REMOVED***
+		}: {
 			Hostname:   "host1",
 			Domainname: "domain1",
 			Image:      "image1",
 			User:       "user2",
-		***REMOVED***,
+		},
 		// only OpenStdin
-		***REMOVED***OpenStdin: false***REMOVED***: ***REMOVED***OpenStdin: true***REMOVED***,
-		***REMOVED***OpenStdin: true***REMOVED***:  ***REMOVED***OpenStdin: false***REMOVED***,
+		{OpenStdin: false}: {OpenStdin: true},
+		{OpenStdin: true}:  {OpenStdin: false},
 		// only env
-		***REMOVED***Env: envs1***REMOVED***: ***REMOVED***Env: envs2***REMOVED***,
+		{Env: envs1}: {Env: envs2},
 		// only cmd
-		***REMOVED***Cmd: cmd1***REMOVED***: ***REMOVED***Cmd: cmd2***REMOVED***,
+		{Cmd: cmd1}: {Cmd: cmd2},
 		// not the same number of parts
-		***REMOVED***Cmd: cmd1***REMOVED***: ***REMOVED***Cmd: cmd3***REMOVED***,
+		{Cmd: cmd1}: {Cmd: cmd3},
 		// only labels
-		***REMOVED***Labels: labels1***REMOVED***: ***REMOVED***Labels: labels2***REMOVED***,
+		{Labels: labels1}: {Labels: labels2},
 		// not the same number of labels
-		***REMOVED***Labels: labels1***REMOVED***: ***REMOVED***Labels: labels3***REMOVED***,
+		{Labels: labels1}: {Labels: labels3},
 		// only exposedPorts
-		***REMOVED***ExposedPorts: ports1***REMOVED***: ***REMOVED***ExposedPorts: ports2***REMOVED***,
+		{ExposedPorts: ports1}: {ExposedPorts: ports2},
 		// not the same number of ports
-		***REMOVED***ExposedPorts: ports1***REMOVED***: ***REMOVED***ExposedPorts: ports3***REMOVED***,
+		{ExposedPorts: ports1}: {ExposedPorts: ports3},
 		// only entrypoints
-		***REMOVED***Entrypoint: entrypoint1***REMOVED***: ***REMOVED***Entrypoint: entrypoint2***REMOVED***,
+		{Entrypoint: entrypoint1}: {Entrypoint: entrypoint2},
 		// not the same number of parts
-		***REMOVED***Entrypoint: entrypoint1***REMOVED***: ***REMOVED***Entrypoint: entrypoint3***REMOVED***,
+		{Entrypoint: entrypoint1}: {Entrypoint: entrypoint3},
 		// only volumes
-		***REMOVED***Volumes: volumes1***REMOVED***: ***REMOVED***Volumes: volumes2***REMOVED***,
+		{Volumes: volumes1}: {Volumes: volumes2},
 		// not the same number of labels
-		***REMOVED***Volumes: volumes1***REMOVED***: ***REMOVED***Volumes: volumes3***REMOVED***,
-	***REMOVED***
-	for config1, config2 := range sameConfigs ***REMOVED***
-		if !compare(config1, config2) ***REMOVED***
+		{Volumes: volumes1}: {Volumes: volumes3},
+	}
+	for config1, config2 := range sameConfigs {
+		if !compare(config1, config2) {
 			t.Fatalf("Compare should be true for [%v] and [%v]", config1, config2)
-		***REMOVED***
-	***REMOVED***
-	for config1, config2 := range differentConfigs ***REMOVED***
-		if compare(config1, config2) ***REMOVED***
+		}
+	}
+	for config1, config2 := range differentConfigs {
+		if compare(config1, config2) {
 			t.Fatalf("Compare should be false for [%v] and [%v]", config1, config2)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

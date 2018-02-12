@@ -22,101 +22,101 @@ var ErrExtractPointNotDirectory = errors.New("extraction point is not a director
 
 // The daemon will use the following interfaces if the container fs implements
 // these for optimized copies to and from the container.
-type extractor interface ***REMOVED***
+type extractor interface {
 	ExtractArchive(src io.Reader, dst string, opts *archive.TarOptions) error
-***REMOVED***
+}
 
-type archiver interface ***REMOVED***
+type archiver interface {
 	ArchivePath(src string, opts *archive.TarOptions) (io.ReadCloser, error)
-***REMOVED***
+}
 
 // helper functions to extract or archive
-func extractArchive(i interface***REMOVED******REMOVED***, src io.Reader, dst string, opts *archive.TarOptions) error ***REMOVED***
-	if ea, ok := i.(extractor); ok ***REMOVED***
+func extractArchive(i interface{}, src io.Reader, dst string, opts *archive.TarOptions) error {
+	if ea, ok := i.(extractor); ok {
 		return ea.ExtractArchive(src, dst, opts)
-	***REMOVED***
+	}
 	return chrootarchive.Untar(src, dst, opts)
-***REMOVED***
+}
 
-func archivePath(i interface***REMOVED******REMOVED***, src string, opts *archive.TarOptions) (io.ReadCloser, error) ***REMOVED***
-	if ap, ok := i.(archiver); ok ***REMOVED***
+func archivePath(i interface{}, src string, opts *archive.TarOptions) (io.ReadCloser, error) {
+	if ap, ok := i.(archiver); ok {
 		return ap.ArchivePath(src, opts)
-	***REMOVED***
+	}
 	return archive.TarWithOptions(src, opts)
-***REMOVED***
+}
 
 // ContainerCopy performs a deprecated operation of archiving the resource at
 // the specified path in the container identified by the given name.
-func (daemon *Daemon) ContainerCopy(name string, res string) (io.ReadCloser, error) ***REMOVED***
+func (daemon *Daemon) ContainerCopy(name string, res string) (io.ReadCloser, error) {
 	container, err := daemon.GetContainer(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// Make sure an online file-system operation is permitted.
-	if err := daemon.isOnlineFSOperationPermitted(container); err != nil ***REMOVED***
+	if err := daemon.isOnlineFSOperationPermitted(container); err != nil {
 		return nil, errdefs.System(err)
-	***REMOVED***
+	}
 
 	data, err := daemon.containerCopy(container, res)
-	if err == nil ***REMOVED***
+	if err == nil {
 		return data, nil
-	***REMOVED***
+	}
 
-	if os.IsNotExist(err) ***REMOVED***
-		return nil, containerFileNotFound***REMOVED***res, name***REMOVED***
-	***REMOVED***
+	if os.IsNotExist(err) {
+		return nil, containerFileNotFound{res, name}
+	}
 	return nil, errdefs.System(err)
-***REMOVED***
+}
 
 // ContainerStatPath stats the filesystem resource at the specified path in the
 // container identified by the given name.
-func (daemon *Daemon) ContainerStatPath(name string, path string) (stat *types.ContainerPathStat, err error) ***REMOVED***
+func (daemon *Daemon) ContainerStatPath(name string, path string) (stat *types.ContainerPathStat, err error) {
 	container, err := daemon.GetContainer(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// Make sure an online file-system operation is permitted.
-	if err := daemon.isOnlineFSOperationPermitted(container); err != nil ***REMOVED***
+	if err := daemon.isOnlineFSOperationPermitted(container); err != nil {
 		return nil, errdefs.System(err)
-	***REMOVED***
+	}
 
 	stat, err = daemon.containerStatPath(container, path)
-	if err == nil ***REMOVED***
+	if err == nil {
 		return stat, nil
-	***REMOVED***
+	}
 
-	if os.IsNotExist(err) ***REMOVED***
-		return nil, containerFileNotFound***REMOVED***path, name***REMOVED***
-	***REMOVED***
+	if os.IsNotExist(err) {
+		return nil, containerFileNotFound{path, name}
+	}
 	return nil, errdefs.System(err)
-***REMOVED***
+}
 
 // ContainerArchivePath creates an archive of the filesystem resource at the
 // specified path in the container identified by the given name. Returns a
 // tar archive of the resource and whether it was a directory or a single file.
-func (daemon *Daemon) ContainerArchivePath(name string, path string) (content io.ReadCloser, stat *types.ContainerPathStat, err error) ***REMOVED***
+func (daemon *Daemon) ContainerArchivePath(name string, path string) (content io.ReadCloser, stat *types.ContainerPathStat, err error) {
 	container, err := daemon.GetContainer(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 
 	// Make sure an online file-system operation is permitted.
-	if err := daemon.isOnlineFSOperationPermitted(container); err != nil ***REMOVED***
+	if err := daemon.isOnlineFSOperationPermitted(container); err != nil {
 		return nil, nil, errdefs.System(err)
-	***REMOVED***
+	}
 
 	content, stat, err = daemon.containerArchivePath(container, path)
-	if err == nil ***REMOVED***
+	if err == nil {
 		return content, stat, nil
-	***REMOVED***
+	}
 
-	if os.IsNotExist(err) ***REMOVED***
-		return nil, nil, containerFileNotFound***REMOVED***path, name***REMOVED***
-	***REMOVED***
+	if os.IsNotExist(err) {
+		return nil, nil, containerFileNotFound{path, name}
+	}
 	return nil, nil, errdefs.System(err)
-***REMOVED***
+}
 
 // ContainerExtractToDir extracts the given archive to the specified location
 // in the filesystem of the container identified by the given name. The given
@@ -124,105 +124,105 @@ func (daemon *Daemon) ContainerArchivePath(name string, path string) (content io
 // be ErrExtractPointNotDirectory. If noOverwriteDirNonDir is true then it will
 // be an error if unpacking the given content would cause an existing directory
 // to be replaced with a non-directory and vice versa.
-func (daemon *Daemon) ContainerExtractToDir(name, path string, copyUIDGID, noOverwriteDirNonDir bool, content io.Reader) error ***REMOVED***
+func (daemon *Daemon) ContainerExtractToDir(name, path string, copyUIDGID, noOverwriteDirNonDir bool, content io.Reader) error {
 	container, err := daemon.GetContainer(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	// Make sure an online file-system operation is permitted.
-	if err := daemon.isOnlineFSOperationPermitted(container); err != nil ***REMOVED***
+	if err := daemon.isOnlineFSOperationPermitted(container); err != nil {
 		return errdefs.System(err)
-	***REMOVED***
+	}
 
 	err = daemon.containerExtractToDir(container, path, copyUIDGID, noOverwriteDirNonDir, content)
-	if err == nil ***REMOVED***
+	if err == nil {
 		return nil
-	***REMOVED***
+	}
 
-	if os.IsNotExist(err) ***REMOVED***
-		return containerFileNotFound***REMOVED***path, name***REMOVED***
-	***REMOVED***
+	if os.IsNotExist(err) {
+		return containerFileNotFound{path, name}
+	}
 	return errdefs.System(err)
-***REMOVED***
+}
 
 // containerStatPath stats the filesystem resource at the specified path in this
 // container. Returns stat info about the resource.
-func (daemon *Daemon) containerStatPath(container *container.Container, path string) (stat *types.ContainerPathStat, err error) ***REMOVED***
+func (daemon *Daemon) containerStatPath(container *container.Container, path string) (stat *types.ContainerPathStat, err error) {
 	container.Lock()
 	defer container.Unlock()
 
-	if err = daemon.Mount(container); err != nil ***REMOVED***
+	if err = daemon.Mount(container); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	defer daemon.Unmount(container)
 
 	err = daemon.mountVolumes(container)
 	defer container.DetachAndUnmount(daemon.LogVolumeEvent)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// Normalize path before sending to rootfs
 	path = container.BaseFS.FromSlash(path)
 
 	resolvedPath, absPath, err := container.ResolvePath(path)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	return container.StatPath(resolvedPath, absPath)
-***REMOVED***
+}
 
 // containerArchivePath creates an archive of the filesystem resource at the specified
 // path in this container. Returns a tar archive of the resource and stat info
 // about the resource.
-func (daemon *Daemon) containerArchivePath(container *container.Container, path string) (content io.ReadCloser, stat *types.ContainerPathStat, err error) ***REMOVED***
+func (daemon *Daemon) containerArchivePath(container *container.Container, path string) (content io.ReadCloser, stat *types.ContainerPathStat, err error) {
 	container.Lock()
 
-	defer func() ***REMOVED***
-		if err != nil ***REMOVED***
+	defer func() {
+		if err != nil {
 			// Wait to unlock the container until the archive is fully read
 			// (see the ReadCloseWrapper func below) or if there is an error
 			// before that occurs.
 			container.Unlock()
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
-	if err = daemon.Mount(container); err != nil ***REMOVED***
+	if err = daemon.Mount(container); err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 
-	defer func() ***REMOVED***
-		if err != nil ***REMOVED***
+	defer func() {
+		if err != nil {
 			// unmount any volumes
 			container.DetachAndUnmount(daemon.LogVolumeEvent)
 			// unmount the container's rootfs
 			daemon.Unmount(container)
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
-	if err = daemon.mountVolumes(container); err != nil ***REMOVED***
+	if err = daemon.mountVolumes(container); err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 
 	// Normalize path before sending to rootfs
 	path = container.BaseFS.FromSlash(path)
 
 	resolvedPath, absPath, err := container.ResolvePath(path)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 
 	stat, err = container.StatPath(resolvedPath, absPath)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 
 	// We need to rebase the archive entries if the last element of the
 	// resolved path was a symlink that was evaluated and is now different
 	// than the requested path. For example, if the given path was "/foo/bar/",
-	// but it resolved to "/var/lib/docker/containers/***REMOVED***id***REMOVED***/foo/baz/", we want
+	// but it resolved to "/var/lib/docker/containers/{id}/foo/baz/", we want
 	// to ensure that the archive entries start with "bar" and not "baz". This
 	// also catches the case when the root directory of the container is
 	// requested: we want the archive entries to start with "/" and not the
@@ -232,29 +232,29 @@ func (daemon *Daemon) containerArchivePath(container *container.Container, path 
 	// Get the source and the base paths of the container resolved path in order
 	// to get the proper tar options for the rebase tar.
 	resolvedPath = driver.Clean(resolvedPath)
-	if driver.Base(resolvedPath) == "." ***REMOVED***
+	if driver.Base(resolvedPath) == "." {
 		resolvedPath += string(driver.Separator()) + "."
-	***REMOVED***
+	}
 	sourceDir, sourceBase := driver.Dir(resolvedPath), driver.Base(resolvedPath)
 	opts := archive.TarResourceRebaseOpts(sourceBase, driver.Base(absPath))
 
 	data, err := archivePath(driver, sourceDir, opts)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 
-	content = ioutils.NewReadCloserWrapper(data, func() error ***REMOVED***
+	content = ioutils.NewReadCloserWrapper(data, func() error {
 		err := data.Close()
 		container.DetachAndUnmount(daemon.LogVolumeEvent)
 		daemon.Unmount(container)
 		container.Unlock()
 		return err
-	***REMOVED***)
+	})
 
 	daemon.LogContainerEvent(container, "archive-path")
 
 	return content, stat, nil
-***REMOVED***
+}
 
 // containerExtractToDir extracts the given tar archive to the specified location in the
 // filesystem of this container. The given path must be of a directory in the
@@ -262,20 +262,20 @@ func (daemon *Daemon) containerArchivePath(container *container.Container, path 
 // noOverwriteDirNonDir is true then it will be an error if unpacking the
 // given content would cause an existing directory to be replaced with a non-
 // directory and vice versa.
-func (daemon *Daemon) containerExtractToDir(container *container.Container, path string, copyUIDGID, noOverwriteDirNonDir bool, content io.Reader) (err error) ***REMOVED***
+func (daemon *Daemon) containerExtractToDir(container *container.Container, path string, copyUIDGID, noOverwriteDirNonDir bool, content io.Reader) (err error) {
 	container.Lock()
 	defer container.Unlock()
 
-	if err = daemon.Mount(container); err != nil ***REMOVED***
+	if err = daemon.Mount(container); err != nil {
 		return err
-	***REMOVED***
+	}
 	defer daemon.Unmount(container)
 
 	err = daemon.mountVolumes(container)
 	defer container.DetachAndUnmount(daemon.LogVolumeEvent)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	// Normalize path before sending to rootfs'
 	path = container.BaseFS.FromSlash(path)
@@ -283,9 +283,9 @@ func (daemon *Daemon) containerExtractToDir(container *container.Container, path
 
 	// Check if a drive letter supplied, it must be the system drive. No-op except on Windows
 	path, err = system.CheckSystemDriveAndRemoveDriveLetter(path, driver)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	// The destination path needs to be resolved to a host path, with all
 	// symbolic links followed in the scope of the container's rootfs. Note
@@ -301,18 +301,18 @@ func (daemon *Daemon) containerExtractToDir(container *container.Container, path
 
 	// This will evaluate the last path element if it is a symlink.
 	resolvedPath, err := container.GetResourcePath(absPath)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	stat, err := driver.Lstat(resolvedPath)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if !stat.IsDir() ***REMOVED***
+	if !stat.IsDir() {
 		return ErrExtractPointNotDirectory
-	***REMOVED***
+	}
 
 	// Need to check if the path is in a volume. If it is, it cannot be in a
 	// read-only volume. If it is not in a volume, the container cannot be
@@ -327,19 +327,19 @@ func (daemon *Daemon) containerExtractToDir(container *container.Container, path
 	// filter driver, we are guaranteed that the path will always be
 	// a volume file path.
 	var baseRel string
-	if strings.HasPrefix(resolvedPath, `\\?\Volume***REMOVED***`) ***REMOVED***
-		if strings.HasPrefix(resolvedPath, driver.Path()) ***REMOVED***
+	if strings.HasPrefix(resolvedPath, `\\?\Volume{`) {
+		if strings.HasPrefix(resolvedPath, driver.Path()) {
 			baseRel = resolvedPath[len(driver.Path()):]
-			if baseRel[:1] == `\` ***REMOVED***
+			if baseRel[:1] == `\` {
 				baseRel = baseRel[1:]
-			***REMOVED***
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
+			}
+		}
+	} else {
 		baseRel, err = driver.Rel(driver.Path(), resolvedPath)
-	***REMOVED***
-	if err != nil ***REMOVED***
+	}
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	// Make it an absolute path.
 	absPath = driver.Join(string(driver.Separator()), baseRel)
 
@@ -347,103 +347,103 @@ func (daemon *Daemon) containerExtractToDir(container *container.Container, path
 	// on Windows and the file system is local anyway on linux.
 	// But eventually, it should be made driver aware.
 	toVolume, err := checkIfPathIsInAVolume(container, absPath)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if !toVolume && container.HostConfig.ReadonlyRootfs ***REMOVED***
+	if !toVolume && container.HostConfig.ReadonlyRootfs {
 		return ErrRootFSReadOnly
-	***REMOVED***
+	}
 
 	options := daemon.defaultTarCopyOptions(noOverwriteDirNonDir)
 
-	if copyUIDGID ***REMOVED***
+	if copyUIDGID {
 		var err error
 		// tarCopyOptions will appropriately pull in the right uid/gid for the
 		// user/group and will set the options.
 		options, err = daemon.tarCopyOptions(container, noOverwriteDirNonDir)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if err := extractArchive(driver, content, resolvedPath, options); err != nil ***REMOVED***
+	if err := extractArchive(driver, content, resolvedPath, options); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	daemon.LogContainerEvent(container, "extract-to-dir")
 
 	return nil
-***REMOVED***
+}
 
-func (daemon *Daemon) containerCopy(container *container.Container, resource string) (rc io.ReadCloser, err error) ***REMOVED***
-	if resource[0] == '/' || resource[0] == '\\' ***REMOVED***
+func (daemon *Daemon) containerCopy(container *container.Container, resource string) (rc io.ReadCloser, err error) {
+	if resource[0] == '/' || resource[0] == '\\' {
 		resource = resource[1:]
-	***REMOVED***
+	}
 	container.Lock()
 
-	defer func() ***REMOVED***
-		if err != nil ***REMOVED***
+	defer func() {
+		if err != nil {
 			// Wait to unlock the container until the archive is fully read
 			// (see the ReadCloseWrapper func below) or if there is an error
 			// before that occurs.
 			container.Unlock()
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
-	if err := daemon.Mount(container); err != nil ***REMOVED***
+	if err := daemon.Mount(container); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	defer func() ***REMOVED***
-		if err != nil ***REMOVED***
+	defer func() {
+		if err != nil {
 			// unmount any volumes
 			container.DetachAndUnmount(daemon.LogVolumeEvent)
 			// unmount the container's rootfs
 			daemon.Unmount(container)
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
-	if err := daemon.mountVolumes(container); err != nil ***REMOVED***
+	if err := daemon.mountVolumes(container); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// Normalize path before sending to rootfs
 	resource = container.BaseFS.FromSlash(resource)
 	driver := container.BaseFS
 
 	basePath, err := container.GetResourcePath(resource)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	stat, err := driver.Stat(basePath)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	var filter []string
-	if !stat.IsDir() ***REMOVED***
+	if !stat.IsDir() {
 		d, f := driver.Split(basePath)
 		basePath = d
-		filter = []string***REMOVED***f***REMOVED***
-	***REMOVED*** else ***REMOVED***
-		filter = []string***REMOVED***driver.Base(basePath)***REMOVED***
+		filter = []string{f}
+	} else {
+		filter = []string{driver.Base(basePath)}
 		basePath = driver.Dir(basePath)
-	***REMOVED***
-	archive, err := archivePath(driver, basePath, &archive.TarOptions***REMOVED***
+	}
+	archive, err := archivePath(driver, basePath, &archive.TarOptions{
 		Compression:  archive.Uncompressed,
 		IncludeFiles: filter,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	reader := ioutils.NewReadCloserWrapper(archive, func() error ***REMOVED***
+	reader := ioutils.NewReadCloserWrapper(archive, func() error {
 		err := archive.Close()
 		container.DetachAndUnmount(daemon.LogVolumeEvent)
 		daemon.Unmount(container)
 		container.Unlock()
 		return err
-	***REMOVED***)
+	})
 	daemon.LogContainerEvent(container, "copy")
 	return reader, nil
-***REMOVED***
+}

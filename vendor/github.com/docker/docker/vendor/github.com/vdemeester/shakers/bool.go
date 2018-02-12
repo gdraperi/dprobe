@@ -8,39 +8,39 @@ import (
 //
 //    c.Assert(myBool, True)
 //
-var True check.Checker = &boolChecker***REMOVED***
-	&check.CheckerInfo***REMOVED***
+var True check.Checker = &boolChecker{
+	&check.CheckerInfo{
 		Name:   "True",
-		Params: []string***REMOVED***"obtained"***REMOVED***,
-	***REMOVED***,
+		Params: []string{"obtained"},
+	},
 	true,
-***REMOVED***
+}
 
 // False checker verifies the obtained value is false
 //
 //    c.Assert(myBool, False)
 //
-var False check.Checker = &boolChecker***REMOVED***
-	&check.CheckerInfo***REMOVED***
+var False check.Checker = &boolChecker{
+	&check.CheckerInfo{
 		Name:   "False",
-		Params: []string***REMOVED***"obtained"***REMOVED***,
-	***REMOVED***,
+		Params: []string{"obtained"},
+	},
 	false,
-***REMOVED***
+}
 
-type boolChecker struct ***REMOVED***
+type boolChecker struct {
 	*check.CheckerInfo
 	expected bool
-***REMOVED***
+}
 
-func (checker *boolChecker) Check(params []interface***REMOVED******REMOVED***, names []string) (bool, string) ***REMOVED***
+func (checker *boolChecker) Check(params []interface{}, names []string) (bool, string) {
 	return is(checker.expected, params[0])
-***REMOVED***
+}
 
-func is(expected bool, obtained interface***REMOVED******REMOVED***) (bool, string) ***REMOVED***
+func is(expected bool, obtained interface{}) (bool, string) {
 	obtainedBool, ok := obtained.(bool)
-	if !ok ***REMOVED***
+	if !ok {
 		return false, "obtained value must be a bool."
-	***REMOVED***
+	}
 	return obtainedBool == expected, ""
-***REMOVED***
+}

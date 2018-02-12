@@ -6,48 +6,48 @@ package stringset
 
 import "testing"
 
-func TestStringSet(t *testing.T) ***REMOVED***
-	testCases := [][]string***REMOVED***
-		***REMOVED***""***REMOVED***,
-		***REMOVED***"∫"***REMOVED***,
-		***REMOVED***"a", "b", "c"***REMOVED***,
-		***REMOVED***"", "a", "bb", "ccc"***REMOVED***,
-		***REMOVED***"    ", "aaa", "bb", "c"***REMOVED***,
-	***REMOVED***
-	test := func(tc int, b *Builder) ***REMOVED***
+func TestStringSet(t *testing.T) {
+	testCases := [][]string{
+		{""},
+		{"∫"},
+		{"a", "b", "c"},
+		{"", "a", "bb", "ccc"},
+		{"    ", "aaa", "bb", "c"},
+	}
+	test := func(tc int, b *Builder) {
 		set := b.Set()
-		if set.Len() != len(testCases[tc]) ***REMOVED***
+		if set.Len() != len(testCases[tc]) {
 			t.Errorf("%d:Len() = %d; want %d", tc, set.Len(), len(testCases[tc]))
-		***REMOVED***
-		for i, s := range testCases[tc] ***REMOVED***
-			if x := b.Index(s); x != i ***REMOVED***
+		}
+		for i, s := range testCases[tc] {
+			if x := b.Index(s); x != i {
 				t.Errorf("%d:Index(%q) = %d; want %d", tc, s, x, i)
-			***REMOVED***
-			if p := Search(&set, s); p != i ***REMOVED***
+			}
+			if p := Search(&set, s); p != i {
 				t.Errorf("%d:Search(%q) = %d; want %d", tc, s, p, i)
-			***REMOVED***
-			if set.Elem(i) != s ***REMOVED***
+			}
+			if set.Elem(i) != s {
 				t.Errorf("%d:Elem(%d) = %s; want %s", tc, i, set.Elem(i), s)
-			***REMOVED***
-		***REMOVED***
-		if p := Search(&set, "apple"); p != -1 ***REMOVED***
+			}
+		}
+		if p := Search(&set, "apple"); p != -1 {
 			t.Errorf(`%d:Search("apple") = %d; want -1`, tc, p)
-		***REMOVED***
-	***REMOVED***
-	for i, tc := range testCases ***REMOVED***
+		}
+	}
+	for i, tc := range testCases {
 		b := NewBuilder()
-		for _, s := range tc ***REMOVED***
+		for _, s := range tc {
 			b.Add(s)
-		***REMOVED***
+		}
 		b.Add(tc...)
 		test(i, b)
-	***REMOVED***
-	for i, tc := range testCases ***REMOVED***
+	}
+	for i, tc := range testCases {
 		b := NewBuilder()
 		b.Add(tc...)
-		for _, s := range tc ***REMOVED***
+		for _, s := range tc {
 			b.Add(s)
-		***REMOVED***
+		}
 		test(i, b)
-	***REMOVED***
-***REMOVED***
+	}
+}

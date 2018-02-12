@@ -40,63 +40,63 @@ var (
 // ErrNoValidProvidersFoundInChain
 //
 //     creds := credentials.NewChainCredentials(
-//         []credentials.Provider***REMOVED***
-//             &credentials.EnvProvider***REMOVED******REMOVED***,
-//             &ec2rolecreds.EC2RoleProvider***REMOVED***
+//         []credentials.Provider{
+//             &credentials.EnvProvider{},
+//             &ec2rolecreds.EC2RoleProvider{
 //                 Client: ec2metadata.New(sess),
-//         ***REMOVED***,
-//     ***REMOVED***)
+//             },
+//         })
 //
 //     // Usage of ChainCredentials with aws.Config
-//     svc := ec2.New(session.Must(session.NewSession(&aws.Config***REMOVED***
+//     svc := ec2.New(session.Must(session.NewSession(&aws.Config{
 //       Credentials: creds,
-// ***REMOVED***)))
+//     })))
 //
-type ChainProvider struct ***REMOVED***
+type ChainProvider struct {
 	Providers     []Provider
 	curr          Provider
 	VerboseErrors bool
-***REMOVED***
+}
 
 // NewChainCredentials returns a pointer to a new Credentials object
 // wrapping a chain of providers.
-func NewChainCredentials(providers []Provider) *Credentials ***REMOVED***
-	return NewCredentials(&ChainProvider***REMOVED***
-		Providers: append([]Provider***REMOVED******REMOVED***, providers...),
-	***REMOVED***)
-***REMOVED***
+func NewChainCredentials(providers []Provider) *Credentials {
+	return NewCredentials(&ChainProvider{
+		Providers: append([]Provider{}, providers...),
+	})
+}
 
 // Retrieve returns the credentials value or error if no provider returned
 // without error.
 //
 // If a provider is found it will be cached and any calls to IsExpired()
 // will return the expired state of the cached provider.
-func (c *ChainProvider) Retrieve() (Value, error) ***REMOVED***
+func (c *ChainProvider) Retrieve() (Value, error) {
 	var errs []error
-	for _, p := range c.Providers ***REMOVED***
+	for _, p := range c.Providers {
 		creds, err := p.Retrieve()
-		if err == nil ***REMOVED***
+		if err == nil {
 			c.curr = p
 			return creds, nil
-		***REMOVED***
+		}
 		errs = append(errs, err)
-	***REMOVED***
+	}
 	c.curr = nil
 
 	var err error
 	err = ErrNoValidProvidersFoundInChain
-	if c.VerboseErrors ***REMOVED***
+	if c.VerboseErrors {
 		err = awserr.NewBatchError("NoCredentialProviders", "no valid providers in chain", errs)
-	***REMOVED***
-	return Value***REMOVED******REMOVED***, err
-***REMOVED***
+	}
+	return Value{}, err
+}
 
 // IsExpired will returned the expired state of the currently cached provider
 // if there is one.  If there is no current provider, true will be returned.
-func (c *ChainProvider) IsExpired() bool ***REMOVED***
-	if c.curr != nil ***REMOVED***
+func (c *ChainProvider) IsExpired() bool {
+	if c.curr != nil {
 		return c.curr.IsExpired()
-	***REMOVED***
+	}
 
 	return true
-***REMOVED***
+}

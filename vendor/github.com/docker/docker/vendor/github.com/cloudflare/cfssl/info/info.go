@@ -2,14 +2,14 @@
 package info
 
 // Req is the request struct for an info API request.
-type Req struct ***REMOVED***
+type Req struct {
 	Label   string `json:"label"`
 	Profile string `json:"profile"`
-***REMOVED***
+}
 
 // Resp is the response for an Info API request.
-type Resp struct ***REMOVED***
+type Resp struct {
 	Certificate  string   `json:"certificate"`
 	Usage        []string `json:"usages"`
 	ExpiryString string   `json:"expiry"`
-***REMOVED***
+}

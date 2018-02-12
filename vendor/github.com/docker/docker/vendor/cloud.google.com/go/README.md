@@ -63,11 +63,11 @@ New datastore feature: datastore now encodes your nested Go structs as Entity va
 instead of a flattened list of the embedded struct's fields.
 This means that you may now have twice-nested slices, eg.
 ```go
-type State struct ***REMOVED***
-  Cities  []struct***REMOVED***
+type State struct {
+  Cities  []struct{
     Populations []int
-  ***REMOVED***
-***REMOVED***
+  }
+}
 ```
 
 See [the announcement](https://groups.google.com/forum/#!topic/google-api-go-announce/79jtrdeuJAg) for
@@ -86,7 +86,7 @@ and renamed.
 
 * All the fields of Key are exported. That means you can construct any Key with a struct literal:
   ```go
-  k := &Key***REMOVED***Kind: "Kind",  ID: 37, Namespace: "ns"***REMOVED***
+  k := &Key{Kind: "Kind",  ID: 37, Namespace: "ns"}
   ```
 
 * As a result of the above, the Key methods Kind, ID, d.Name, Parent, SetParent and Namespace have been removed.
@@ -218,30 +218,30 @@ First create a `datastore.Client` to use throughout your application:
 
 ```go
 client, err := datastore.NewClient(ctx, "my-project-id")
-if err != nil ***REMOVED***
+if err != nil {
 	log.Fatal(err)
-***REMOVED***
+}
 ```
 
 Then use that client to interact with the API:
 
 ```go
-type Post struct ***REMOVED***
+type Post struct {
 	Title       string
 	Body        string `datastore:",noindex"`
 	PublishedAt time.Time
-***REMOVED***
-keys := []*datastore.Key***REMOVED***
+}
+keys := []*datastore.Key{
 	datastore.NewKey(ctx, "Post", "post1", 0, nil),
 	datastore.NewKey(ctx, "Post", "post2", 0, nil),
-***REMOVED***
-posts := []*Post***REMOVED***
-	***REMOVED***Title: "Post 1", Body: "...", PublishedAt: time.Now()***REMOVED***,
-	***REMOVED***Title: "Post 2", Body: "...", PublishedAt: time.Now()***REMOVED***,
-***REMOVED***
-if _, err := client.PutMulti(ctx, keys, posts); err != nil ***REMOVED***
+}
+posts := []*Post{
+	{Title: "Post 1", Body: "...", PublishedAt: time.Now()},
+	{Title: "Post 2", Body: "...", PublishedAt: time.Now()},
+}
+if _, err := client.PutMulti(ctx, keys, posts); err != nil {
 	log.Fatal(err)
-***REMOVED***
+}
 ```
 
 ## Cloud Storage [![GoDoc](https://godoc.org/cloud.google.com/go/storage?status.svg)](https://godoc.org/cloud.google.com/go/storage)
@@ -257,22 +257,22 @@ First create a `storage.Client` to use throughout your application:
 
 ```go
 client, err := storage.NewClient(ctx)
-if err != nil ***REMOVED***
+if err != nil {
 	log.Fatal(err)
-***REMOVED***
+}
 ```
 
 ```go
 // Read the object1 from bucket.
 rc, err := client.Bucket("bucket").Object("object1").NewReader(ctx)
-if err != nil ***REMOVED***
+if err != nil {
 	log.Fatal(err)
-***REMOVED***
+}
 defer rc.Close()
 body, err := ioutil.ReadAll(rc)
-if err != nil ***REMOVED***
+if err != nil {
 	log.Fatal(err)
-***REMOVED***
+}
 ```
 
 ## Cloud Pub/Sub [![GoDoc](https://godoc.org/cloud.google.com/go/pubsub?status.svg)](https://godoc.org/cloud.google.com/go/pubsub)
@@ -288,41 +288,41 @@ First create a `pubsub.Client` to use throughout your application:
 
 ```go
 client, err := pubsub.NewClient(ctx, "project-id")
-if err != nil ***REMOVED***
+if err != nil {
 	log.Fatal(err)
-***REMOVED***
+}
 ```
 
 ```go
 // Publish "hello world" on topic1.
 topic := client.Topic("topic1")
-msgIDs, err := topic.Publish(ctx, &pubsub.Message***REMOVED***
+msgIDs, err := topic.Publish(ctx, &pubsub.Message{
 	Data: []byte("hello world"),
-***REMOVED***)
-if err != nil ***REMOVED***
+})
+if err != nil {
 	log.Fatal(err)
-***REMOVED***
+}
 
 // Create an iterator to pull messages via subscription1.
 it, err := client.Subscription("subscription1").Pull(ctx)
-if err != nil ***REMOVED***
+if err != nil {
 	log.Println(err)
-***REMOVED***
+}
 defer it.Stop()
 
 // Consume N messages from the iterator.
-for i := 0; i < N; i++ ***REMOVED***
+for i := 0; i < N; i++ {
 	msg, err := it.Next()
-	if err == iterator.Done ***REMOVED***
+	if err == iterator.Done {
 		break
-	***REMOVED***
-	if err != nil ***REMOVED***
+	}
+	if err != nil {
 		log.Fatalf("Failed to retrieve message: %v", err)
-	***REMOVED***
+	}
 
 	fmt.Printf("Message %d: %s\n", i, msg.Data)
 	msg.Done(true) // Acknowledge that we've consumed the message.
-***REMOVED***
+}
 ```
 
 ## Cloud BigQuery [![GoDoc](https://godoc.org/cloud.google.com/go/bigquery?status.svg)](https://godoc.org/cloud.google.com/go/bigquery)
@@ -337,9 +337,9 @@ for i := 0; i < N; i++ ***REMOVED***
 First create a `bigquery.Client` to use throughout your application:
 ```go
 c, err := bigquery.NewClient(ctx, "my-project-ID")
-if err != nil ***REMOVED***
+if err != nil {
     // TODO: Handle error.
-***REMOVED***
+}
 ```
 Then use that client to interact with the API:
 ```go
@@ -353,21 +353,21 @@ q := c.Query(`
 `)
 // Execute the query.
 it, err := q.Read(ctx)
-if err != nil ***REMOVED***
+if err != nil {
     // TODO: Handle error.
-***REMOVED***
+}
 // Iterate through the results.
-for ***REMOVED***
+for {
     var values bigquery.ValueList
     err := it.Next(&values)
-    if err == iterator.Done ***REMOVED***
+    if err == iterator.Done {
         break
-***REMOVED***
-    if err != nil ***REMOVED***
+    }
+    if err != nil {
         // TODO: Handle error.
-***REMOVED***
+    }
     fmt.Println(values)
-***REMOVED***
+}
 ```
 
 
@@ -385,22 +385,22 @@ First create a `logging.Client` to use throughout your application:
 ```go
 ctx := context.Background()
 client, err := logging.NewClient(ctx, "my-project")
-if err != nil ***REMOVED***
+if err != nil {
     // TODO: Handle error.
-***REMOVED***
+}
 ```
 Usually, you'll want to add log entries to a buffer to be periodically flushed
 (automatically and asynchronously) to the Stackdriver Logging service.
 ```go
 logger := client.Logger("my-log")
-logger.Log(logging.Entry***REMOVED***Payload: "something happened!"***REMOVED***)
+logger.Log(logging.Entry{Payload: "something happened!"})
 ```
 Close your client before your program exits, to flush any buffered log entries.
 ```go
 err = client.Close()
-if err != nil ***REMOVED***
+if err != nil {
     // TODO: Handle error.
-***REMOVED***
+}
 ```
 
 ## Contributing

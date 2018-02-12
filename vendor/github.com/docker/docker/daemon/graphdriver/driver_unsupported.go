@@ -8,6 +8,6 @@ var (
 )
 
 // GetFSMagic returns the filesystem id given the path.
-func GetFSMagic(rootpath string) (FsMagic, error) ***REMOVED***
+func GetFSMagic(rootpath string) (FsMagic, error) {
 	return FsMagicUnsupported, nil
-***REMOVED***
+}

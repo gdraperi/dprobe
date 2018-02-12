@@ -7,6 +7,6 @@ import (
 	"google.golang.org/grpc/grpclog"
 )
 
-func init() ***REMOVED***
+func init() {
 	grpclog.SetLogger(log.New(ioutil.Discard, "", log.LstdFlags))
-***REMOVED***
+}

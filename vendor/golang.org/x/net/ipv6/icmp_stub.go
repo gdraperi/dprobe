@@ -6,18 +6,18 @@
 
 package ipv6
 
-type icmpv6Filter struct ***REMOVED***
-***REMOVED***
+type icmpv6Filter struct {
+}
 
-func (f *icmpv6Filter) accept(typ ICMPType) ***REMOVED***
-***REMOVED***
+func (f *icmpv6Filter) accept(typ ICMPType) {
+}
 
-func (f *icmpv6Filter) block(typ ICMPType) ***REMOVED***
-***REMOVED***
+func (f *icmpv6Filter) block(typ ICMPType) {
+}
 
-func (f *icmpv6Filter) setAll(block bool) ***REMOVED***
-***REMOVED***
+func (f *icmpv6Filter) setAll(block bool) {
+}
 
-func (f *icmpv6Filter) willBlock(typ ICMPType) bool ***REMOVED***
+func (f *icmpv6Filter) willBlock(typ ICMPType) bool {
 	return false
-***REMOVED***
+}

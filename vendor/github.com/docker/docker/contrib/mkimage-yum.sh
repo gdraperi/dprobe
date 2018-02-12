@@ -8,7 +8,7 @@
 
 set -e
 
-usage() ***REMOVED***
+usage() {
     cat <<EOOPTS
 $(basename $0) [OPTIONS] <name>
 OPTIONS:
@@ -20,7 +20,7 @@ OPTIONS:
                    default is /etc/yum.conf for Centos/RHEL and /etc/dnf/dnf.conf for Fedora
 EOOPTS
     exit 1
-***REMOVED***
+}
 
 # option defaults
 yum_config=/etc/yum.conf
@@ -99,9 +99,9 @@ EOF
 
 # effectively: febootstrap-minimize --keep-zoneinfo --keep-rpmdb --keep-services "$target".
 #  locales
-rm -rf "$target"/usr/***REMOVED******REMOVED***lib,share***REMOVED***/locale,***REMOVED***lib,lib64***REMOVED***/gconv,bin/localedef,sbin/build-locale-archive***REMOVED***
+rm -rf "$target"/usr/{{lib,share}/locale,{lib,lib64}/gconv,bin/localedef,sbin/build-locale-archive}
 #  docs and man pages
-rm -rf "$target"/usr/share/***REMOVED***man,doc,info,gnome/help***REMOVED***
+rm -rf "$target"/usr/share/{man,doc,info,gnome/help}
 #  cracklib
 rm -rf "$target"/usr/share/cracklib
 #  i18n
@@ -116,7 +116,7 @@ rm -rf "$target"/etc/ld.so.cache "$target"/var/cache/ldconfig
 mkdir -p --mode=0755 "$target"/var/cache/ldconfig
 
 version=
-for file in "$target"/etc/***REMOVED***redhat,system***REMOVED***-release
+for file in "$target"/etc/{redhat,system}-release
 do
     if [ -r "$file" ]; then
         version="$(sed 's/^[^0-9\]*\([0-9.]\+\).*$/\1/' "$file")"

@@ -13,61 +13,61 @@ caller's responsibility to ensure that r provides UTF-8 encoded HTML.
 Given a Tokenizer z, the HTML is tokenized by repeatedly calling z.Next(),
 which parses the next token and returns its type, or an error:
 
-	for ***REMOVED***
+	for {
 		tt := z.Next()
-		if tt == html.ErrorToken ***REMOVED***
+		if tt == html.ErrorToken {
 			// ...
 			return ...
-		***REMOVED***
+		}
 		// Process the current token.
-	***REMOVED***
+	}
 
 There are two APIs for retrieving the current token. The high-level API is to
 call Token; the low-level API is to call Text or TagName / TagAttr. Both APIs
 allow optionally calling Raw after Next but before Token, Text, TagName, or
 TagAttr. In EBNF notation, the valid call sequence per token is:
 
-	Next ***REMOVED***Raw***REMOVED*** [ Token | Text | TagName ***REMOVED***TagAttr***REMOVED*** ]
+	Next {Raw} [ Token | Text | TagName {TagAttr} ]
 
 Token returns an independent data structure that completely describes a token.
 Entities (such as "&lt;") are unescaped, tag names and attribute keys are
 lower-cased, and attributes are collected into a []Attribute. For example:
 
-	for ***REMOVED***
-		if z.Next() == html.ErrorToken ***REMOVED***
+	for {
+		if z.Next() == html.ErrorToken {
 			// Returning io.EOF indicates success.
 			return z.Err()
-		***REMOVED***
+		}
 		emitToken(z.Token())
-	***REMOVED***
+	}
 
 The low-level API performs fewer allocations and copies, but the contents of
 the []byte values returned by Text, TagName and TagAttr may change on the next
 call to Next. For example, to extract an HTML page's anchor text:
 
 	depth := 0
-	for ***REMOVED***
+	for {
 		tt := z.Next()
-		switch tt ***REMOVED***
+		switch tt {
 		case html.ErrorToken:
 			return z.Err()
 		case html.TextToken:
-			if depth > 0 ***REMOVED***
+			if depth > 0 {
 				// emitBytes should copy the []byte it receives,
 				// if it doesn't process it immediately.
 				emitBytes(z.Text())
-			***REMOVED***
+			}
 		case html.StartTagToken, html.EndTagToken:
 			tn, _ := z.TagName()
-			if len(tn) == 1 && tn[0] == 'a' ***REMOVED***
-				if tt == html.StartTagToken ***REMOVED***
+			if len(tn) == 1 && tn[0] == 'a' {
+				if tt == html.StartTagToken {
 					depth++
-				***REMOVED*** else ***REMOVED***
+				} else {
 					depth--
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+				}
+			}
+		}
+	}
 
 Parsing is done by calling Parse with an io.Reader, which returns the root of
 the parse tree (the document element) as a *Node. It is the caller's
@@ -75,18 +75,18 @@ responsibility to ensure that the Reader provides UTF-8 encoded HTML. For
 example, to process each anchor node in depth-first order:
 
 	doc, err := html.Parse(r)
-	if err != nil ***REMOVED***
+	if err != nil {
 		// ...
-	***REMOVED***
+	}
 	var f func(*html.Node)
-	f = func(n *html.Node) ***REMOVED***
-		if n.Type == html.ElementNode && n.Data == "a" ***REMOVED***
+	f = func(n *html.Node) {
+		if n.Type == html.ElementNode && n.Data == "a" {
 			// Do something with n...
-		***REMOVED***
-		for c := n.FirstChild; c != nil; c = c.NextSibling ***REMOVED***
+		}
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
 			f(c)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	f(doc)
 
 The relevant specifications include:

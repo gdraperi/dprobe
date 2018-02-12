@@ -63,100 +63,100 @@ const (
 // The following defines various control items which could flow through
 // the control buffer of transport. They represent different aspects of
 // control tasks, e.g., flow control, settings, streaming resetting, etc.
-type windowUpdate struct ***REMOVED***
+type windowUpdate struct {
 	streamID  uint32
 	increment uint32
-***REMOVED***
+}
 
-func (*windowUpdate) item() ***REMOVED******REMOVED***
+func (*windowUpdate) item() {}
 
-type settings struct ***REMOVED***
+type settings struct {
 	ack bool
 	ss  []http2.Setting
-***REMOVED***
+}
 
-func (*settings) item() ***REMOVED******REMOVED***
+func (*settings) item() {}
 
-type resetStream struct ***REMOVED***
+type resetStream struct {
 	streamID uint32
 	code     http2.ErrCode
-***REMOVED***
+}
 
-func (*resetStream) item() ***REMOVED******REMOVED***
+func (*resetStream) item() {}
 
-type goAway struct ***REMOVED***
+type goAway struct {
 	code      http2.ErrCode
 	debugData []byte
-***REMOVED***
+}
 
-func (*goAway) item() ***REMOVED******REMOVED***
+func (*goAway) item() {}
 
-type flushIO struct ***REMOVED***
-***REMOVED***
+type flushIO struct {
+}
 
-func (*flushIO) item() ***REMOVED******REMOVED***
+func (*flushIO) item() {}
 
-type ping struct ***REMOVED***
+type ping struct {
 	ack  bool
 	data [8]byte
-***REMOVED***
+}
 
-func (*ping) item() ***REMOVED******REMOVED***
+func (*ping) item() {}
 
 // quotaPool is a pool which accumulates the quota and sends it to acquire()
 // when it is available.
-type quotaPool struct ***REMOVED***
+type quotaPool struct {
 	c chan int
 
 	mu    sync.Mutex
 	quota int
-***REMOVED***
+}
 
 // newQuotaPool creates a quotaPool which has quota q available to consume.
-func newQuotaPool(q int) *quotaPool ***REMOVED***
-	qb := &quotaPool***REMOVED***
+func newQuotaPool(q int) *quotaPool {
+	qb := &quotaPool{
 		c: make(chan int, 1),
-	***REMOVED***
-	if q > 0 ***REMOVED***
+	}
+	if q > 0 {
 		qb.c <- q
-	***REMOVED*** else ***REMOVED***
+	} else {
 		qb.quota = q
-	***REMOVED***
+	}
 	return qb
-***REMOVED***
+}
 
 // add cancels the pending quota sent on acquired, incremented by v and sends
 // it back on acquire.
-func (qb *quotaPool) add(v int) ***REMOVED***
+func (qb *quotaPool) add(v int) {
 	qb.mu.Lock()
 	defer qb.mu.Unlock()
-	select ***REMOVED***
+	select {
 	case n := <-qb.c:
 		qb.quota += n
 	default:
-	***REMOVED***
+	}
 	qb.quota += v
-	if qb.quota <= 0 ***REMOVED***
+	if qb.quota <= 0 {
 		return
-	***REMOVED***
+	}
 	// After the pool has been created, this is the only place that sends on
 	// the channel. Since mu is held at this point and any quota that was sent
 	// on the channel has been retrieved, we know that this code will always
 	// place any positive quota value on the channel.
-	select ***REMOVED***
+	select {
 	case qb.c <- qb.quota:
 		qb.quota = 0
 	default:
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // acquire returns the channel on which available quota amounts are sent.
-func (qb *quotaPool) acquire() <-chan int ***REMOVED***
+func (qb *quotaPool) acquire() <-chan int {
 	return qb.c
-***REMOVED***
+}
 
 // inFlow deals with inbound flow control
-type inFlow struct ***REMOVED***
+type inFlow struct {
 	// The inbound flow control limit for pending data.
 	limit uint32
 
@@ -167,41 +167,41 @@ type inFlow struct ***REMOVED***
 	// The amount of data the application has consumed but grpc has not sent
 	// window update for them. Used to reduce window update frequency.
 	pendingUpdate uint32
-***REMOVED***
+}
 
 // onData is invoked when some data frame is received. It updates pendingData.
-func (f *inFlow) onData(n uint32) error ***REMOVED***
+func (f *inFlow) onData(n uint32) error {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	f.pendingData += n
-	if f.pendingData+f.pendingUpdate > f.limit ***REMOVED***
+	if f.pendingData+f.pendingUpdate > f.limit {
 		return fmt.Errorf("received %d-bytes data exceeding the limit %d bytes", f.pendingData+f.pendingUpdate, f.limit)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // onRead is invoked when the application reads the data. It returns the window size
 // to be sent to the peer.
-func (f *inFlow) onRead(n uint32) uint32 ***REMOVED***
+func (f *inFlow) onRead(n uint32) uint32 {
 	f.mu.Lock()
 	defer f.mu.Unlock()
-	if f.pendingData == 0 ***REMOVED***
+	if f.pendingData == 0 {
 		return 0
-	***REMOVED***
+	}
 	f.pendingData -= n
 	f.pendingUpdate += n
-	if f.pendingUpdate >= f.limit/4 ***REMOVED***
+	if f.pendingUpdate >= f.limit/4 {
 		wu := f.pendingUpdate
 		f.pendingUpdate = 0
 		return wu
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (f *inFlow) resetPendingData() uint32 ***REMOVED***
+func (f *inFlow) resetPendingData() uint32 {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	n := f.pendingData
 	f.pendingData = 0
 	return n
-***REMOVED***
+}

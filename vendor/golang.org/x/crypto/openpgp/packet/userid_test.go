@@ -8,80 +8,80 @@ import (
 	"testing"
 )
 
-var userIdTests = []struct ***REMOVED***
+var userIdTests = []struct {
 	id                   string
 	name, comment, email string
-***REMOVED******REMOVED***
-	***REMOVED***"", "", "", ""***REMOVED***,
-	***REMOVED***"John Smith", "John Smith", "", ""***REMOVED***,
-	***REMOVED***"John Smith ()", "John Smith", "", ""***REMOVED***,
-	***REMOVED***"John Smith () <>", "John Smith", "", ""***REMOVED***,
-	***REMOVED***"(comment", "", "comment", ""***REMOVED***,
-	***REMOVED***"(comment)", "", "comment", ""***REMOVED***,
-	***REMOVED***"<email", "", "", "email"***REMOVED***,
-	***REMOVED***"<email>   sdfk", "", "", "email"***REMOVED***,
-	***REMOVED***"  John Smith  (  Comment ) asdkflj < email > lksdfj", "John Smith", "Comment", "email"***REMOVED***,
-	***REMOVED***"  John Smith  < email > lksdfj", "John Smith", "", "email"***REMOVED***,
-	***REMOVED***"(<foo", "", "<foo", ""***REMOVED***,
-	***REMOVED***"René Descartes (العربي)", "René Descartes", "العربي", ""***REMOVED***,
-***REMOVED***
+}{
+	{"", "", "", ""},
+	{"John Smith", "John Smith", "", ""},
+	{"John Smith ()", "John Smith", "", ""},
+	{"John Smith () <>", "John Smith", "", ""},
+	{"(comment", "", "comment", ""},
+	{"(comment)", "", "comment", ""},
+	{"<email", "", "", "email"},
+	{"<email>   sdfk", "", "", "email"},
+	{"  John Smith  (  Comment ) asdkflj < email > lksdfj", "John Smith", "Comment", "email"},
+	{"  John Smith  < email > lksdfj", "John Smith", "", "email"},
+	{"(<foo", "", "<foo", ""},
+	{"René Descartes (العربي)", "René Descartes", "العربي", ""},
+}
 
-func TestParseUserId(t *testing.T) ***REMOVED***
-	for i, test := range userIdTests ***REMOVED***
+func TestParseUserId(t *testing.T) {
+	for i, test := range userIdTests {
 		name, comment, email := parseUserId(test.id)
-		if name != test.name ***REMOVED***
+		if name != test.name {
 			t.Errorf("%d: name mismatch got:%s want:%s", i, name, test.name)
-		***REMOVED***
-		if comment != test.comment ***REMOVED***
+		}
+		if comment != test.comment {
 			t.Errorf("%d: comment mismatch got:%s want:%s", i, comment, test.comment)
-		***REMOVED***
-		if email != test.email ***REMOVED***
+		}
+		if email != test.email {
 			t.Errorf("%d: email mismatch got:%s want:%s", i, email, test.email)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-var newUserIdTests = []struct ***REMOVED***
+var newUserIdTests = []struct {
 	name, comment, email, id string
-***REMOVED******REMOVED***
-	***REMOVED***"foo", "", "", "foo"***REMOVED***,
-	***REMOVED***"", "bar", "", "(bar)"***REMOVED***,
-	***REMOVED***"", "", "baz", "<baz>"***REMOVED***,
-	***REMOVED***"foo", "bar", "", "foo (bar)"***REMOVED***,
-	***REMOVED***"foo", "", "baz", "foo <baz>"***REMOVED***,
-	***REMOVED***"", "bar", "baz", "(bar) <baz>"***REMOVED***,
-	***REMOVED***"foo", "bar", "baz", "foo (bar) <baz>"***REMOVED***,
-***REMOVED***
+}{
+	{"foo", "", "", "foo"},
+	{"", "bar", "", "(bar)"},
+	{"", "", "baz", "<baz>"},
+	{"foo", "bar", "", "foo (bar)"},
+	{"foo", "", "baz", "foo <baz>"},
+	{"", "bar", "baz", "(bar) <baz>"},
+	{"foo", "bar", "baz", "foo (bar) <baz>"},
+}
 
-func TestNewUserId(t *testing.T) ***REMOVED***
-	for i, test := range newUserIdTests ***REMOVED***
+func TestNewUserId(t *testing.T) {
+	for i, test := range newUserIdTests {
 		uid := NewUserId(test.name, test.comment, test.email)
-		if uid == nil ***REMOVED***
+		if uid == nil {
 			t.Errorf("#%d: returned nil", i)
 			continue
-		***REMOVED***
-		if uid.Id != test.id ***REMOVED***
+		}
+		if uid.Id != test.id {
 			t.Errorf("#%d: got '%s', want '%s'", i, uid.Id, test.id)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-var invalidNewUserIdTests = []struct ***REMOVED***
+var invalidNewUserIdTests = []struct {
 	name, comment, email string
-***REMOVED******REMOVED***
-	***REMOVED***"foo(", "", ""***REMOVED***,
-	***REMOVED***"foo<", "", ""***REMOVED***,
-	***REMOVED***"", "bar)", ""***REMOVED***,
-	***REMOVED***"", "bar<", ""***REMOVED***,
-	***REMOVED***"", "", "baz>"***REMOVED***,
-	***REMOVED***"", "", "baz)"***REMOVED***,
-	***REMOVED***"", "", "baz\x00"***REMOVED***,
-***REMOVED***
+}{
+	{"foo(", "", ""},
+	{"foo<", "", ""},
+	{"", "bar)", ""},
+	{"", "bar<", ""},
+	{"", "", "baz>"},
+	{"", "", "baz)"},
+	{"", "", "baz\x00"},
+}
 
-func TestNewUserIdWithInvalidInput(t *testing.T) ***REMOVED***
-	for i, test := range invalidNewUserIdTests ***REMOVED***
-		if uid := NewUserId(test.name, test.comment, test.email); uid != nil ***REMOVED***
+func TestNewUserIdWithInvalidInput(t *testing.T) {
+	for i, test := range invalidNewUserIdTests {
+		if uid := NewUserId(test.name, test.comment, test.email); uid != nil {
 			t.Errorf("#%d: returned non-nil value: %#v", i, uid)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

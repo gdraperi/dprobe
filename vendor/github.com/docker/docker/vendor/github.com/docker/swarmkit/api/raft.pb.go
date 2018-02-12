@@ -47,25 +47,25 @@ const (
 	StoreActionKindRemove  StoreActionKind = 3
 )
 
-var StoreActionKind_name = map[int32]string***REMOVED***
+var StoreActionKind_name = map[int32]string{
 	0: "UNKNOWN",
 	1: "STORE_ACTION_CREATE",
 	2: "STORE_ACTION_UPDATE",
 	3: "STORE_ACTION_REMOVE",
-***REMOVED***
-var StoreActionKind_value = map[string]int32***REMOVED***
+}
+var StoreActionKind_value = map[string]int32{
 	"UNKNOWN":             0,
 	"STORE_ACTION_CREATE": 1,
 	"STORE_ACTION_UPDATE": 2,
 	"STORE_ACTION_REMOVE": 3,
-***REMOVED***
+}
 
-func (x StoreActionKind) String() string ***REMOVED***
+func (x StoreActionKind) String() string {
 	return proto.EnumName(StoreActionKind_name, int32(x))
-***REMOVED***
-func (StoreActionKind) EnumDescriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorRaft, []int***REMOVED***0***REMOVED*** ***REMOVED***
+}
+func (StoreActionKind) EnumDescriptor() ([]byte, []int) { return fileDescriptorRaft, []int{0} }
 
-type RaftMember struct ***REMOVED***
+type RaftMember struct {
 	// RaftID specifies the internal ID used by the manager in a raft context, it can never be modified
 	// and is used only for information purposes
 	RaftID uint64 `protobuf:"varint,1,opt,name=raft_id,json=raftId,proto3" json:"raft_id,omitempty"`
@@ -75,22 +75,22 @@ type RaftMember struct ***REMOVED***
 	Addr string `protobuf:"bytes,3,opt,name=addr,proto3" json:"addr,omitempty"`
 	// Status provides the current status of the manager from the perspective of another manager.
 	Status RaftMemberStatus `protobuf:"bytes,4,opt,name=status" json:"status"`
-***REMOVED***
+}
 
-func (m *RaftMember) Reset()                    ***REMOVED*** *m = RaftMember***REMOVED******REMOVED*** ***REMOVED***
-func (*RaftMember) ProtoMessage()               ***REMOVED******REMOVED***
-func (*RaftMember) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorRaft, []int***REMOVED***0***REMOVED*** ***REMOVED***
+func (m *RaftMember) Reset()                    { *m = RaftMember{} }
+func (*RaftMember) ProtoMessage()               {}
+func (*RaftMember) Descriptor() ([]byte, []int) { return fileDescriptorRaft, []int{0} }
 
-type JoinRequest struct ***REMOVED***
+type JoinRequest struct {
 	// Addr specifies the address of the member
 	Addr string `protobuf:"bytes,1,opt,name=addr,proto3" json:"addr,omitempty"`
-***REMOVED***
+}
 
-func (m *JoinRequest) Reset()                    ***REMOVED*** *m = JoinRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*JoinRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*JoinRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorRaft, []int***REMOVED***1***REMOVED*** ***REMOVED***
+func (m *JoinRequest) Reset()                    { *m = JoinRequest{} }
+func (*JoinRequest) ProtoMessage()               {}
+func (*JoinRequest) Descriptor() ([]byte, []int) { return fileDescriptorRaft, []int{1} }
 
-type JoinResponse struct ***REMOVED***
+type JoinResponse struct {
 	// RaftID is the ID assigned to the new member.
 	RaftID uint64 `protobuf:"varint,1,opt,name=raft_id,json=raftId,proto3" json:"raft_id,omitempty"`
 	// Members is the membership set of the cluster.
@@ -98,91 +98,91 @@ type JoinResponse struct ***REMOVED***
 	// RemovedMembers is a list of members that have been removed from
 	// the cluster, so the new node can avoid communicating with them.
 	RemovedMembers []uint64 `protobuf:"varint,3,rep,name=removed_members,json=removedMembers" json:"removed_members,omitempty"`
-***REMOVED***
+}
 
-func (m *JoinResponse) Reset()                    ***REMOVED*** *m = JoinResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*JoinResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*JoinResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorRaft, []int***REMOVED***2***REMOVED*** ***REMOVED***
+func (m *JoinResponse) Reset()                    { *m = JoinResponse{} }
+func (*JoinResponse) ProtoMessage()               {}
+func (*JoinResponse) Descriptor() ([]byte, []int) { return fileDescriptorRaft, []int{2} }
 
-type LeaveRequest struct ***REMOVED***
+type LeaveRequest struct {
 	Node *RaftMember `protobuf:"bytes,1,opt,name=node" json:"node,omitempty"`
-***REMOVED***
+}
 
-func (m *LeaveRequest) Reset()                    ***REMOVED*** *m = LeaveRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*LeaveRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*LeaveRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorRaft, []int***REMOVED***3***REMOVED*** ***REMOVED***
+func (m *LeaveRequest) Reset()                    { *m = LeaveRequest{} }
+func (*LeaveRequest) ProtoMessage()               {}
+func (*LeaveRequest) Descriptor() ([]byte, []int) { return fileDescriptorRaft, []int{3} }
 
-type LeaveResponse struct ***REMOVED***
-***REMOVED***
+type LeaveResponse struct {
+}
 
-func (m *LeaveResponse) Reset()                    ***REMOVED*** *m = LeaveResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*LeaveResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*LeaveResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorRaft, []int***REMOVED***4***REMOVED*** ***REMOVED***
+func (m *LeaveResponse) Reset()                    { *m = LeaveResponse{} }
+func (*LeaveResponse) ProtoMessage()               {}
+func (*LeaveResponse) Descriptor() ([]byte, []int) { return fileDescriptorRaft, []int{4} }
 
-type ProcessRaftMessageRequest struct ***REMOVED***
+type ProcessRaftMessageRequest struct {
 	Message *raftpb.Message `protobuf:"bytes,1,opt,name=message" json:"message,omitempty"`
-***REMOVED***
+}
 
-func (m *ProcessRaftMessageRequest) Reset()                    ***REMOVED*** *m = ProcessRaftMessageRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*ProcessRaftMessageRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*ProcessRaftMessageRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorRaft, []int***REMOVED***5***REMOVED*** ***REMOVED***
+func (m *ProcessRaftMessageRequest) Reset()                    { *m = ProcessRaftMessageRequest{} }
+func (*ProcessRaftMessageRequest) ProtoMessage()               {}
+func (*ProcessRaftMessageRequest) Descriptor() ([]byte, []int) { return fileDescriptorRaft, []int{5} }
 
-type ProcessRaftMessageResponse struct ***REMOVED***
-***REMOVED***
+type ProcessRaftMessageResponse struct {
+}
 
-func (m *ProcessRaftMessageResponse) Reset()                    ***REMOVED*** *m = ProcessRaftMessageResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*ProcessRaftMessageResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*ProcessRaftMessageResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorRaft, []int***REMOVED***6***REMOVED*** ***REMOVED***
+func (m *ProcessRaftMessageResponse) Reset()                    { *m = ProcessRaftMessageResponse{} }
+func (*ProcessRaftMessageResponse) ProtoMessage()               {}
+func (*ProcessRaftMessageResponse) Descriptor() ([]byte, []int) { return fileDescriptorRaft, []int{6} }
 
 // Raft message streaming request.
-type StreamRaftMessageRequest struct ***REMOVED***
+type StreamRaftMessageRequest struct {
 	Message *raftpb.Message `protobuf:"bytes,1,opt,name=message" json:"message,omitempty"`
-***REMOVED***
+}
 
-func (m *StreamRaftMessageRequest) Reset()                    ***REMOVED*** *m = StreamRaftMessageRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*StreamRaftMessageRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*StreamRaftMessageRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorRaft, []int***REMOVED***7***REMOVED*** ***REMOVED***
+func (m *StreamRaftMessageRequest) Reset()                    { *m = StreamRaftMessageRequest{} }
+func (*StreamRaftMessageRequest) ProtoMessage()               {}
+func (*StreamRaftMessageRequest) Descriptor() ([]byte, []int) { return fileDescriptorRaft, []int{7} }
 
 // Raft message streaming response.
-type StreamRaftMessageResponse struct ***REMOVED***
-***REMOVED***
+type StreamRaftMessageResponse struct {
+}
 
-func (m *StreamRaftMessageResponse) Reset()                    ***REMOVED*** *m = StreamRaftMessageResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*StreamRaftMessageResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*StreamRaftMessageResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorRaft, []int***REMOVED***8***REMOVED*** ***REMOVED***
+func (m *StreamRaftMessageResponse) Reset()                    { *m = StreamRaftMessageResponse{} }
+func (*StreamRaftMessageResponse) ProtoMessage()               {}
+func (*StreamRaftMessageResponse) Descriptor() ([]byte, []int) { return fileDescriptorRaft, []int{8} }
 
-type ResolveAddressRequest struct ***REMOVED***
+type ResolveAddressRequest struct {
 	// raft_id is the ID to resolve to an address.
 	RaftID uint64 `protobuf:"varint,1,opt,name=raft_id,json=raftId,proto3" json:"raft_id,omitempty"`
-***REMOVED***
+}
 
-func (m *ResolveAddressRequest) Reset()                    ***REMOVED*** *m = ResolveAddressRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*ResolveAddressRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*ResolveAddressRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorRaft, []int***REMOVED***9***REMOVED*** ***REMOVED***
+func (m *ResolveAddressRequest) Reset()                    { *m = ResolveAddressRequest{} }
+func (*ResolveAddressRequest) ProtoMessage()               {}
+func (*ResolveAddressRequest) Descriptor() ([]byte, []int) { return fileDescriptorRaft, []int{9} }
 
-type ResolveAddressResponse struct ***REMOVED***
+type ResolveAddressResponse struct {
 	// Addr specifies the address of the member
 	Addr string `protobuf:"bytes,1,opt,name=addr,proto3" json:"addr,omitempty"`
-***REMOVED***
+}
 
-func (m *ResolveAddressResponse) Reset()                    ***REMOVED*** *m = ResolveAddressResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*ResolveAddressResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*ResolveAddressResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorRaft, []int***REMOVED***10***REMOVED*** ***REMOVED***
+func (m *ResolveAddressResponse) Reset()                    { *m = ResolveAddressResponse{} }
+func (*ResolveAddressResponse) ProtoMessage()               {}
+func (*ResolveAddressResponse) Descriptor() ([]byte, []int) { return fileDescriptorRaft, []int{10} }
 
 // Contains one of many protobuf encoded objects to replicate
 // over the raft backend with a request ID to track when the
 // action is effectively applied
-type InternalRaftRequest struct ***REMOVED***
+type InternalRaftRequest struct {
 	ID     uint64        `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Action []StoreAction `protobuf:"bytes,2,rep,name=action" json:"action"`
-***REMOVED***
+}
 
-func (m *InternalRaftRequest) Reset()                    ***REMOVED*** *m = InternalRaftRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*InternalRaftRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*InternalRaftRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorRaft, []int***REMOVED***11***REMOVED*** ***REMOVED***
+func (m *InternalRaftRequest) Reset()                    { *m = InternalRaftRequest{} }
+func (*InternalRaftRequest) ProtoMessage()               {}
+func (*InternalRaftRequest) Descriptor() ([]byte, []int) { return fileDescriptorRaft, []int{11} }
 
 // StoreAction defines a target and operation to apply on the storage system.
-type StoreAction struct ***REMOVED***
+type StoreAction struct {
 	Action StoreActionKind `protobuf:"varint,1,opt,name=action,proto3,enum=docker.swarmkit.v1.StoreActionKind" json:"action,omitempty"`
 	// Types that are valid to be assigned to Target:
 	//	*StoreAction_Node
@@ -195,129 +195,129 @@ type StoreAction struct ***REMOVED***
 	//	*StoreAction_Extension
 	//	*StoreAction_Config
 	Target isStoreAction_Target `protobuf_oneof:"target"`
-***REMOVED***
+}
 
-func (m *StoreAction) Reset()                    ***REMOVED*** *m = StoreAction***REMOVED******REMOVED*** ***REMOVED***
-func (*StoreAction) ProtoMessage()               ***REMOVED******REMOVED***
-func (*StoreAction) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorRaft, []int***REMOVED***12***REMOVED*** ***REMOVED***
+func (m *StoreAction) Reset()                    { *m = StoreAction{} }
+func (*StoreAction) ProtoMessage()               {}
+func (*StoreAction) Descriptor() ([]byte, []int) { return fileDescriptorRaft, []int{12} }
 
-type isStoreAction_Target interface ***REMOVED***
+type isStoreAction_Target interface {
 	isStoreAction_Target()
 	MarshalTo([]byte) (int, error)
 	Size() int
-***REMOVED***
+}
 
-type StoreAction_Node struct ***REMOVED***
+type StoreAction_Node struct {
 	Node *Node `protobuf:"bytes,2,opt,name=node,oneof"`
-***REMOVED***
-type StoreAction_Service struct ***REMOVED***
+}
+type StoreAction_Service struct {
 	Service *Service `protobuf:"bytes,3,opt,name=service,oneof"`
-***REMOVED***
-type StoreAction_Task struct ***REMOVED***
+}
+type StoreAction_Task struct {
 	Task *Task `protobuf:"bytes,4,opt,name=task,oneof"`
-***REMOVED***
-type StoreAction_Network struct ***REMOVED***
+}
+type StoreAction_Network struct {
 	Network *Network `protobuf:"bytes,5,opt,name=network,oneof"`
-***REMOVED***
-type StoreAction_Cluster struct ***REMOVED***
+}
+type StoreAction_Cluster struct {
 	Cluster *Cluster `protobuf:"bytes,6,opt,name=cluster,oneof"`
-***REMOVED***
-type StoreAction_Secret struct ***REMOVED***
+}
+type StoreAction_Secret struct {
 	Secret *Secret `protobuf:"bytes,7,opt,name=secret,oneof"`
-***REMOVED***
-type StoreAction_Resource struct ***REMOVED***
+}
+type StoreAction_Resource struct {
 	Resource *Resource `protobuf:"bytes,8,opt,name=resource,oneof"`
-***REMOVED***
-type StoreAction_Extension struct ***REMOVED***
+}
+type StoreAction_Extension struct {
 	Extension *Extension `protobuf:"bytes,9,opt,name=extension,oneof"`
-***REMOVED***
-type StoreAction_Config struct ***REMOVED***
+}
+type StoreAction_Config struct {
 	Config *Config `protobuf:"bytes,10,opt,name=config,oneof"`
-***REMOVED***
+}
 
-func (*StoreAction_Node) isStoreAction_Target()      ***REMOVED******REMOVED***
-func (*StoreAction_Service) isStoreAction_Target()   ***REMOVED******REMOVED***
-func (*StoreAction_Task) isStoreAction_Target()      ***REMOVED******REMOVED***
-func (*StoreAction_Network) isStoreAction_Target()   ***REMOVED******REMOVED***
-func (*StoreAction_Cluster) isStoreAction_Target()   ***REMOVED******REMOVED***
-func (*StoreAction_Secret) isStoreAction_Target()    ***REMOVED******REMOVED***
-func (*StoreAction_Resource) isStoreAction_Target()  ***REMOVED******REMOVED***
-func (*StoreAction_Extension) isStoreAction_Target() ***REMOVED******REMOVED***
-func (*StoreAction_Config) isStoreAction_Target()    ***REMOVED******REMOVED***
+func (*StoreAction_Node) isStoreAction_Target()      {}
+func (*StoreAction_Service) isStoreAction_Target()   {}
+func (*StoreAction_Task) isStoreAction_Target()      {}
+func (*StoreAction_Network) isStoreAction_Target()   {}
+func (*StoreAction_Cluster) isStoreAction_Target()   {}
+func (*StoreAction_Secret) isStoreAction_Target()    {}
+func (*StoreAction_Resource) isStoreAction_Target()  {}
+func (*StoreAction_Extension) isStoreAction_Target() {}
+func (*StoreAction_Config) isStoreAction_Target()    {}
 
-func (m *StoreAction) GetTarget() isStoreAction_Target ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *StoreAction) GetTarget() isStoreAction_Target {
+	if m != nil {
 		return m.Target
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *StoreAction) GetNode() *Node ***REMOVED***
-	if x, ok := m.GetTarget().(*StoreAction_Node); ok ***REMOVED***
+func (m *StoreAction) GetNode() *Node {
+	if x, ok := m.GetTarget().(*StoreAction_Node); ok {
 		return x.Node
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *StoreAction) GetService() *Service ***REMOVED***
-	if x, ok := m.GetTarget().(*StoreAction_Service); ok ***REMOVED***
+func (m *StoreAction) GetService() *Service {
+	if x, ok := m.GetTarget().(*StoreAction_Service); ok {
 		return x.Service
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *StoreAction) GetTask() *Task ***REMOVED***
-	if x, ok := m.GetTarget().(*StoreAction_Task); ok ***REMOVED***
+func (m *StoreAction) GetTask() *Task {
+	if x, ok := m.GetTarget().(*StoreAction_Task); ok {
 		return x.Task
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *StoreAction) GetNetwork() *Network ***REMOVED***
-	if x, ok := m.GetTarget().(*StoreAction_Network); ok ***REMOVED***
+func (m *StoreAction) GetNetwork() *Network {
+	if x, ok := m.GetTarget().(*StoreAction_Network); ok {
 		return x.Network
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *StoreAction) GetCluster() *Cluster ***REMOVED***
-	if x, ok := m.GetTarget().(*StoreAction_Cluster); ok ***REMOVED***
+func (m *StoreAction) GetCluster() *Cluster {
+	if x, ok := m.GetTarget().(*StoreAction_Cluster); ok {
 		return x.Cluster
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *StoreAction) GetSecret() *Secret ***REMOVED***
-	if x, ok := m.GetTarget().(*StoreAction_Secret); ok ***REMOVED***
+func (m *StoreAction) GetSecret() *Secret {
+	if x, ok := m.GetTarget().(*StoreAction_Secret); ok {
 		return x.Secret
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *StoreAction) GetResource() *Resource ***REMOVED***
-	if x, ok := m.GetTarget().(*StoreAction_Resource); ok ***REMOVED***
+func (m *StoreAction) GetResource() *Resource {
+	if x, ok := m.GetTarget().(*StoreAction_Resource); ok {
 		return x.Resource
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *StoreAction) GetExtension() *Extension ***REMOVED***
-	if x, ok := m.GetTarget().(*StoreAction_Extension); ok ***REMOVED***
+func (m *StoreAction) GetExtension() *Extension {
+	if x, ok := m.GetTarget().(*StoreAction_Extension); ok {
 		return x.Extension
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *StoreAction) GetConfig() *Config ***REMOVED***
-	if x, ok := m.GetTarget().(*StoreAction_Config); ok ***REMOVED***
+func (m *StoreAction) GetConfig() *Config {
+	if x, ok := m.GetTarget().(*StoreAction_Config); ok {
 		return x.Config
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // XXX_OneofFuncs is for the internal use of the proto package.
-func (*StoreAction) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface***REMOVED******REMOVED***) ***REMOVED***
-	return _StoreAction_OneofMarshaler, _StoreAction_OneofUnmarshaler, _StoreAction_OneofSizer, []interface***REMOVED******REMOVED******REMOVED***
+func (*StoreAction) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
+	return _StoreAction_OneofMarshaler, _StoreAction_OneofUnmarshaler, _StoreAction_OneofSizer, []interface{}{
 		(*StoreAction_Node)(nil),
 		(*StoreAction_Service)(nil),
 		(*StoreAction_Task)(nil),
@@ -327,149 +327,149 @@ func (*StoreAction) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) e
 		(*StoreAction_Resource)(nil),
 		(*StoreAction_Extension)(nil),
 		(*StoreAction_Config)(nil),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func _StoreAction_OneofMarshaler(msg proto.Message, b *proto.Buffer) error ***REMOVED***
+func _StoreAction_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
 	m := msg.(*StoreAction)
 	// target
-	switch x := m.Target.(type) ***REMOVED***
+	switch x := m.Target.(type) {
 	case *StoreAction_Node:
 		_ = b.EncodeVarint(2<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Node); err != nil ***REMOVED***
+		if err := b.EncodeMessage(x.Node); err != nil {
 			return err
-		***REMOVED***
+		}
 	case *StoreAction_Service:
 		_ = b.EncodeVarint(3<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Service); err != nil ***REMOVED***
+		if err := b.EncodeMessage(x.Service); err != nil {
 			return err
-		***REMOVED***
+		}
 	case *StoreAction_Task:
 		_ = b.EncodeVarint(4<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Task); err != nil ***REMOVED***
+		if err := b.EncodeMessage(x.Task); err != nil {
 			return err
-		***REMOVED***
+		}
 	case *StoreAction_Network:
 		_ = b.EncodeVarint(5<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Network); err != nil ***REMOVED***
+		if err := b.EncodeMessage(x.Network); err != nil {
 			return err
-		***REMOVED***
+		}
 	case *StoreAction_Cluster:
 		_ = b.EncodeVarint(6<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Cluster); err != nil ***REMOVED***
+		if err := b.EncodeMessage(x.Cluster); err != nil {
 			return err
-		***REMOVED***
+		}
 	case *StoreAction_Secret:
 		_ = b.EncodeVarint(7<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Secret); err != nil ***REMOVED***
+		if err := b.EncodeMessage(x.Secret); err != nil {
 			return err
-		***REMOVED***
+		}
 	case *StoreAction_Resource:
 		_ = b.EncodeVarint(8<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Resource); err != nil ***REMOVED***
+		if err := b.EncodeMessage(x.Resource); err != nil {
 			return err
-		***REMOVED***
+		}
 	case *StoreAction_Extension:
 		_ = b.EncodeVarint(9<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Extension); err != nil ***REMOVED***
+		if err := b.EncodeMessage(x.Extension); err != nil {
 			return err
-		***REMOVED***
+		}
 	case *StoreAction_Config:
 		_ = b.EncodeVarint(10<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Config); err != nil ***REMOVED***
+		if err := b.EncodeMessage(x.Config); err != nil {
 			return err
-		***REMOVED***
+		}
 	case nil:
 	default:
 		return fmt.Errorf("StoreAction.Target has unexpected type %T", x)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func _StoreAction_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) ***REMOVED***
+func _StoreAction_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
 	m := msg.(*StoreAction)
-	switch tag ***REMOVED***
+	switch tag {
 	case 2: // target.node
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		msg := new(Node)
 		err := b.DecodeMessage(msg)
-		m.Target = &StoreAction_Node***REMOVED***msg***REMOVED***
+		m.Target = &StoreAction_Node{msg}
 		return true, err
 	case 3: // target.service
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		msg := new(Service)
 		err := b.DecodeMessage(msg)
-		m.Target = &StoreAction_Service***REMOVED***msg***REMOVED***
+		m.Target = &StoreAction_Service{msg}
 		return true, err
 	case 4: // target.task
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		msg := new(Task)
 		err := b.DecodeMessage(msg)
-		m.Target = &StoreAction_Task***REMOVED***msg***REMOVED***
+		m.Target = &StoreAction_Task{msg}
 		return true, err
 	case 5: // target.network
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		msg := new(Network)
 		err := b.DecodeMessage(msg)
-		m.Target = &StoreAction_Network***REMOVED***msg***REMOVED***
+		m.Target = &StoreAction_Network{msg}
 		return true, err
 	case 6: // target.cluster
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		msg := new(Cluster)
 		err := b.DecodeMessage(msg)
-		m.Target = &StoreAction_Cluster***REMOVED***msg***REMOVED***
+		m.Target = &StoreAction_Cluster{msg}
 		return true, err
 	case 7: // target.secret
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		msg := new(Secret)
 		err := b.DecodeMessage(msg)
-		m.Target = &StoreAction_Secret***REMOVED***msg***REMOVED***
+		m.Target = &StoreAction_Secret{msg}
 		return true, err
 	case 8: // target.resource
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		msg := new(Resource)
 		err := b.DecodeMessage(msg)
-		m.Target = &StoreAction_Resource***REMOVED***msg***REMOVED***
+		m.Target = &StoreAction_Resource{msg}
 		return true, err
 	case 9: // target.extension
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		msg := new(Extension)
 		err := b.DecodeMessage(msg)
-		m.Target = &StoreAction_Extension***REMOVED***msg***REMOVED***
+		m.Target = &StoreAction_Extension{msg}
 		return true, err
 	case 10: // target.config
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		msg := new(Config)
 		err := b.DecodeMessage(msg)
-		m.Target = &StoreAction_Config***REMOVED***msg***REMOVED***
+		m.Target = &StoreAction_Config{msg}
 		return true, err
 	default:
 		return false, nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func _StoreAction_OneofSizer(msg proto.Message) (n int) ***REMOVED***
+func _StoreAction_OneofSizer(msg proto.Message) (n int) {
 	m := msg.(*StoreAction)
 	// target
-	switch x := m.Target.(type) ***REMOVED***
+	switch x := m.Target.(type) {
 	case *StoreAction_Node:
 		s := proto.Size(x.Node)
 		n += proto.SizeVarint(2<<3 | proto.WireBytes)
@@ -518,11 +518,11 @@ func _StoreAction_OneofSizer(msg proto.Message) (n int) ***REMOVED***
 	case nil:
 	default:
 		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*RaftMember)(nil), "docker.swarmkit.v1.RaftMember")
 	proto.RegisterType((*JoinRequest)(nil), "docker.swarmkit.v1.JoinRequest")
 	proto.RegisterType((*JoinResponse)(nil), "docker.swarmkit.v1.JoinResponse")
@@ -537,305 +537,305 @@ func init() ***REMOVED***
 	proto.RegisterType((*InternalRaftRequest)(nil), "docker.swarmkit.v1.InternalRaftRequest")
 	proto.RegisterType((*StoreAction)(nil), "docker.swarmkit.v1.StoreAction")
 	proto.RegisterEnum("docker.swarmkit.v1.StoreActionKind", StoreActionKind_name, StoreActionKind_value)
-***REMOVED***
+}
 
-type authenticatedWrapperRaftServer struct ***REMOVED***
+type authenticatedWrapperRaftServer struct {
 	local     RaftServer
 	authorize func(context.Context, []string) error
-***REMOVED***
+}
 
-func NewAuthenticatedWrapperRaftServer(local RaftServer, authorize func(context.Context, []string) error) RaftServer ***REMOVED***
-	return &authenticatedWrapperRaftServer***REMOVED***
+func NewAuthenticatedWrapperRaftServer(local RaftServer, authorize func(context.Context, []string) error) RaftServer {
+	return &authenticatedWrapperRaftServer{
 		local:     local,
 		authorize: authorize,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (p *authenticatedWrapperRaftServer) ProcessRaftMessage(ctx context.Context, r *ProcessRaftMessageRequest) (*ProcessRaftMessageResponse, error) ***REMOVED***
+func (p *authenticatedWrapperRaftServer) ProcessRaftMessage(ctx context.Context, r *ProcessRaftMessageRequest) (*ProcessRaftMessageResponse, error) {
 
-	if err := p.authorize(ctx, []string***REMOVED***"swarm-manager"***REMOVED***); err != nil ***REMOVED***
+	if err := p.authorize(ctx, []string{"swarm-manager"}); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return p.local.ProcessRaftMessage(ctx, r)
-***REMOVED***
+}
 
-func (p *authenticatedWrapperRaftServer) StreamRaftMessage(stream Raft_StreamRaftMessageServer) error ***REMOVED***
+func (p *authenticatedWrapperRaftServer) StreamRaftMessage(stream Raft_StreamRaftMessageServer) error {
 
-	if err := p.authorize(stream.Context(), []string***REMOVED***"swarm-manager"***REMOVED***); err != nil ***REMOVED***
+	if err := p.authorize(stream.Context(), []string{"swarm-manager"}); err != nil {
 		return err
-	***REMOVED***
+	}
 	return p.local.StreamRaftMessage(stream)
-***REMOVED***
+}
 
-func (p *authenticatedWrapperRaftServer) ResolveAddress(ctx context.Context, r *ResolveAddressRequest) (*ResolveAddressResponse, error) ***REMOVED***
+func (p *authenticatedWrapperRaftServer) ResolveAddress(ctx context.Context, r *ResolveAddressRequest) (*ResolveAddressResponse, error) {
 
-	if err := p.authorize(ctx, []string***REMOVED***"swarm-manager"***REMOVED***); err != nil ***REMOVED***
+	if err := p.authorize(ctx, []string{"swarm-manager"}); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return p.local.ResolveAddress(ctx, r)
-***REMOVED***
+}
 
-type authenticatedWrapperRaftMembershipServer struct ***REMOVED***
+type authenticatedWrapperRaftMembershipServer struct {
 	local     RaftMembershipServer
 	authorize func(context.Context, []string) error
-***REMOVED***
+}
 
-func NewAuthenticatedWrapperRaftMembershipServer(local RaftMembershipServer, authorize func(context.Context, []string) error) RaftMembershipServer ***REMOVED***
-	return &authenticatedWrapperRaftMembershipServer***REMOVED***
+func NewAuthenticatedWrapperRaftMembershipServer(local RaftMembershipServer, authorize func(context.Context, []string) error) RaftMembershipServer {
+	return &authenticatedWrapperRaftMembershipServer{
 		local:     local,
 		authorize: authorize,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (p *authenticatedWrapperRaftMembershipServer) Join(ctx context.Context, r *JoinRequest) (*JoinResponse, error) ***REMOVED***
+func (p *authenticatedWrapperRaftMembershipServer) Join(ctx context.Context, r *JoinRequest) (*JoinResponse, error) {
 
-	if err := p.authorize(ctx, []string***REMOVED***"swarm-manager"***REMOVED***); err != nil ***REMOVED***
+	if err := p.authorize(ctx, []string{"swarm-manager"}); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return p.local.Join(ctx, r)
-***REMOVED***
+}
 
-func (p *authenticatedWrapperRaftMembershipServer) Leave(ctx context.Context, r *LeaveRequest) (*LeaveResponse, error) ***REMOVED***
+func (p *authenticatedWrapperRaftMembershipServer) Leave(ctx context.Context, r *LeaveRequest) (*LeaveResponse, error) {
 
-	if err := p.authorize(ctx, []string***REMOVED***"swarm-manager"***REMOVED***); err != nil ***REMOVED***
+	if err := p.authorize(ctx, []string{"swarm-manager"}); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return p.local.Leave(ctx, r)
-***REMOVED***
+}
 
-func (m *RaftMember) Copy() *RaftMember ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *RaftMember) Copy() *RaftMember {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &RaftMember***REMOVED******REMOVED***
+	}
+	o := &RaftMember{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *RaftMember) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *RaftMember) CopyFrom(src interface{}) {
 
 	o := src.(*RaftMember)
 	*m = *o
 	github_com_docker_swarmkit_api_deepcopy.Copy(&m.Status, &o.Status)
-***REMOVED***
+}
 
-func (m *JoinRequest) Copy() *JoinRequest ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *JoinRequest) Copy() *JoinRequest {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &JoinRequest***REMOVED******REMOVED***
+	}
+	o := &JoinRequest{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *JoinRequest) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *JoinRequest) CopyFrom(src interface{}) {
 
 	o := src.(*JoinRequest)
 	*m = *o
-***REMOVED***
+}
 
-func (m *JoinResponse) Copy() *JoinResponse ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *JoinResponse) Copy() *JoinResponse {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &JoinResponse***REMOVED******REMOVED***
+	}
+	o := &JoinResponse{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *JoinResponse) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *JoinResponse) CopyFrom(src interface{}) {
 
 	o := src.(*JoinResponse)
 	*m = *o
-	if o.Members != nil ***REMOVED***
+	if o.Members != nil {
 		m.Members = make([]*RaftMember, len(o.Members))
-		for i := range m.Members ***REMOVED***
-			m.Members[i] = &RaftMember***REMOVED******REMOVED***
+		for i := range m.Members {
+			m.Members[i] = &RaftMember{}
 			github_com_docker_swarmkit_api_deepcopy.Copy(m.Members[i], o.Members[i])
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if o.RemovedMembers != nil ***REMOVED***
+	if o.RemovedMembers != nil {
 		m.RemovedMembers = make([]uint64, len(o.RemovedMembers))
 		copy(m.RemovedMembers, o.RemovedMembers)
-	***REMOVED***
+	}
 
-***REMOVED***
+}
 
-func (m *LeaveRequest) Copy() *LeaveRequest ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *LeaveRequest) Copy() *LeaveRequest {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &LeaveRequest***REMOVED******REMOVED***
+	}
+	o := &LeaveRequest{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *LeaveRequest) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *LeaveRequest) CopyFrom(src interface{}) {
 
 	o := src.(*LeaveRequest)
 	*m = *o
-	if o.Node != nil ***REMOVED***
-		m.Node = &RaftMember***REMOVED******REMOVED***
+	if o.Node != nil {
+		m.Node = &RaftMember{}
 		github_com_docker_swarmkit_api_deepcopy.Copy(m.Node, o.Node)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (m *LeaveResponse) Copy() *LeaveResponse ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *LeaveResponse) Copy() *LeaveResponse {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &LeaveResponse***REMOVED******REMOVED***
+	}
+	o := &LeaveResponse{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *LeaveResponse) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED******REMOVED***
-func (m *ProcessRaftMessageResponse) Copy() *ProcessRaftMessageResponse ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *LeaveResponse) CopyFrom(src interface{}) {}
+func (m *ProcessRaftMessageResponse) Copy() *ProcessRaftMessageResponse {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &ProcessRaftMessageResponse***REMOVED******REMOVED***
+	}
+	o := &ProcessRaftMessageResponse{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *ProcessRaftMessageResponse) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED******REMOVED***
-func (m *StreamRaftMessageResponse) Copy() *StreamRaftMessageResponse ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *ProcessRaftMessageResponse) CopyFrom(src interface{}) {}
+func (m *StreamRaftMessageResponse) Copy() *StreamRaftMessageResponse {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &StreamRaftMessageResponse***REMOVED******REMOVED***
+	}
+	o := &StreamRaftMessageResponse{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *StreamRaftMessageResponse) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED******REMOVED***
-func (m *ResolveAddressRequest) Copy() *ResolveAddressRequest ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *StreamRaftMessageResponse) CopyFrom(src interface{}) {}
+func (m *ResolveAddressRequest) Copy() *ResolveAddressRequest {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &ResolveAddressRequest***REMOVED******REMOVED***
+	}
+	o := &ResolveAddressRequest{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *ResolveAddressRequest) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *ResolveAddressRequest) CopyFrom(src interface{}) {
 
 	o := src.(*ResolveAddressRequest)
 	*m = *o
-***REMOVED***
+}
 
-func (m *ResolveAddressResponse) Copy() *ResolveAddressResponse ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *ResolveAddressResponse) Copy() *ResolveAddressResponse {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &ResolveAddressResponse***REMOVED******REMOVED***
+	}
+	o := &ResolveAddressResponse{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *ResolveAddressResponse) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *ResolveAddressResponse) CopyFrom(src interface{}) {
 
 	o := src.(*ResolveAddressResponse)
 	*m = *o
-***REMOVED***
+}
 
-func (m *InternalRaftRequest) Copy() *InternalRaftRequest ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *InternalRaftRequest) Copy() *InternalRaftRequest {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &InternalRaftRequest***REMOVED******REMOVED***
+	}
+	o := &InternalRaftRequest{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *InternalRaftRequest) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *InternalRaftRequest) CopyFrom(src interface{}) {
 
 	o := src.(*InternalRaftRequest)
 	*m = *o
-	if o.Action != nil ***REMOVED***
+	if o.Action != nil {
 		m.Action = make([]StoreAction, len(o.Action))
-		for i := range m.Action ***REMOVED***
+		for i := range m.Action {
 			github_com_docker_swarmkit_api_deepcopy.Copy(&m.Action[i], &o.Action[i])
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-***REMOVED***
+}
 
-func (m *StoreAction) Copy() *StoreAction ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *StoreAction) Copy() *StoreAction {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &StoreAction***REMOVED******REMOVED***
+	}
+	o := &StoreAction{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *StoreAction) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *StoreAction) CopyFrom(src interface{}) {
 
 	o := src.(*StoreAction)
 	*m = *o
-	if o.Target != nil ***REMOVED***
-		switch o.Target.(type) ***REMOVED***
+	if o.Target != nil {
+		switch o.Target.(type) {
 		case *StoreAction_Node:
-			v := StoreAction_Node***REMOVED***
-				Node: &Node***REMOVED******REMOVED***,
-			***REMOVED***
+			v := StoreAction_Node{
+				Node: &Node{},
+			}
 			github_com_docker_swarmkit_api_deepcopy.Copy(v.Node, o.GetNode())
 			m.Target = &v
 		case *StoreAction_Service:
-			v := StoreAction_Service***REMOVED***
-				Service: &Service***REMOVED******REMOVED***,
-			***REMOVED***
+			v := StoreAction_Service{
+				Service: &Service{},
+			}
 			github_com_docker_swarmkit_api_deepcopy.Copy(v.Service, o.GetService())
 			m.Target = &v
 		case *StoreAction_Task:
-			v := StoreAction_Task***REMOVED***
-				Task: &Task***REMOVED******REMOVED***,
-			***REMOVED***
+			v := StoreAction_Task{
+				Task: &Task{},
+			}
 			github_com_docker_swarmkit_api_deepcopy.Copy(v.Task, o.GetTask())
 			m.Target = &v
 		case *StoreAction_Network:
-			v := StoreAction_Network***REMOVED***
-				Network: &Network***REMOVED******REMOVED***,
-			***REMOVED***
+			v := StoreAction_Network{
+				Network: &Network{},
+			}
 			github_com_docker_swarmkit_api_deepcopy.Copy(v.Network, o.GetNetwork())
 			m.Target = &v
 		case *StoreAction_Cluster:
-			v := StoreAction_Cluster***REMOVED***
-				Cluster: &Cluster***REMOVED******REMOVED***,
-			***REMOVED***
+			v := StoreAction_Cluster{
+				Cluster: &Cluster{},
+			}
 			github_com_docker_swarmkit_api_deepcopy.Copy(v.Cluster, o.GetCluster())
 			m.Target = &v
 		case *StoreAction_Secret:
-			v := StoreAction_Secret***REMOVED***
-				Secret: &Secret***REMOVED******REMOVED***,
-			***REMOVED***
+			v := StoreAction_Secret{
+				Secret: &Secret{},
+			}
 			github_com_docker_swarmkit_api_deepcopy.Copy(v.Secret, o.GetSecret())
 			m.Target = &v
 		case *StoreAction_Resource:
-			v := StoreAction_Resource***REMOVED***
-				Resource: &Resource***REMOVED******REMOVED***,
-			***REMOVED***
+			v := StoreAction_Resource{
+				Resource: &Resource{},
+			}
 			github_com_docker_swarmkit_api_deepcopy.Copy(v.Resource, o.GetResource())
 			m.Target = &v
 		case *StoreAction_Extension:
-			v := StoreAction_Extension***REMOVED***
-				Extension: &Extension***REMOVED******REMOVED***,
-			***REMOVED***
+			v := StoreAction_Extension{
+				Extension: &Extension{},
+			}
 			github_com_docker_swarmkit_api_deepcopy.Copy(v.Extension, o.GetExtension())
 			m.Target = &v
 		case *StoreAction_Config:
-			v := StoreAction_Config***REMOVED***
-				Config: &Config***REMOVED******REMOVED***,
-			***REMOVED***
+			v := StoreAction_Config{
+				Config: &Config{},
+			}
 			github_com_docker_swarmkit_api_deepcopy.Copy(v.Config, o.GetConfig())
 			m.Target = &v
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-***REMOVED***
+}
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
@@ -847,7 +847,7 @@ const _ = grpc.SupportPackageIsVersion4
 
 // Client API for Raft service
 
-type RaftClient interface ***REMOVED***
+type RaftClient interface {
 	// ProcessRaftMessage sends a raft message to be processed on a raft member, it is
 	// called from the RaftMember willing to send a message to its destination ('To' field)
 	ProcessRaftMessage(ctx context.Context, in *ProcessRaftMessageRequest, opts ...grpc.CallOption) (*ProcessRaftMessageResponse, error)
@@ -859,71 +859,71 @@ type RaftClient interface ***REMOVED***
 	StreamRaftMessage(ctx context.Context, opts ...grpc.CallOption) (Raft_StreamRaftMessageClient, error)
 	// ResolveAddress returns the address where the node with the given ID can be reached.
 	ResolveAddress(ctx context.Context, in *ResolveAddressRequest, opts ...grpc.CallOption) (*ResolveAddressResponse, error)
-***REMOVED***
+}
 
-type raftClient struct ***REMOVED***
+type raftClient struct {
 	cc *grpc.ClientConn
-***REMOVED***
+}
 
-func NewRaftClient(cc *grpc.ClientConn) RaftClient ***REMOVED***
-	return &raftClient***REMOVED***cc***REMOVED***
-***REMOVED***
+func NewRaftClient(cc *grpc.ClientConn) RaftClient {
+	return &raftClient{cc}
+}
 
-func (c *raftClient) ProcessRaftMessage(ctx context.Context, in *ProcessRaftMessageRequest, opts ...grpc.CallOption) (*ProcessRaftMessageResponse, error) ***REMOVED***
+func (c *raftClient) ProcessRaftMessage(ctx context.Context, in *ProcessRaftMessageRequest, opts ...grpc.CallOption) (*ProcessRaftMessageResponse, error) {
 	out := new(ProcessRaftMessageResponse)
 	err := grpc.Invoke(ctx, "/docker.swarmkit.v1.Raft/ProcessRaftMessage", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *raftClient) StreamRaftMessage(ctx context.Context, opts ...grpc.CallOption) (Raft_StreamRaftMessageClient, error) ***REMOVED***
+func (c *raftClient) StreamRaftMessage(ctx context.Context, opts ...grpc.CallOption) (Raft_StreamRaftMessageClient, error) {
 	stream, err := grpc.NewClientStream(ctx, &_Raft_serviceDesc.Streams[0], c.cc, "/docker.swarmkit.v1.Raft/StreamRaftMessage", opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	x := &raftStreamRaftMessageClient***REMOVED***stream***REMOVED***
+	}
+	x := &raftStreamRaftMessageClient{stream}
 	return x, nil
-***REMOVED***
+}
 
-type Raft_StreamRaftMessageClient interface ***REMOVED***
+type Raft_StreamRaftMessageClient interface {
 	Send(*StreamRaftMessageRequest) error
 	CloseAndRecv() (*StreamRaftMessageResponse, error)
 	grpc.ClientStream
-***REMOVED***
+}
 
-type raftStreamRaftMessageClient struct ***REMOVED***
+type raftStreamRaftMessageClient struct {
 	grpc.ClientStream
-***REMOVED***
+}
 
-func (x *raftStreamRaftMessageClient) Send(m *StreamRaftMessageRequest) error ***REMOVED***
+func (x *raftStreamRaftMessageClient) Send(m *StreamRaftMessageRequest) error {
 	return x.ClientStream.SendMsg(m)
-***REMOVED***
+}
 
-func (x *raftStreamRaftMessageClient) CloseAndRecv() (*StreamRaftMessageResponse, error) ***REMOVED***
-	if err := x.ClientStream.CloseSend(); err != nil ***REMOVED***
+func (x *raftStreamRaftMessageClient) CloseAndRecv() (*StreamRaftMessageResponse, error) {
+	if err := x.ClientStream.CloseSend(); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	m := new(StreamRaftMessageResponse)
-	if err := x.ClientStream.RecvMsg(m); err != nil ***REMOVED***
+	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return m, nil
-***REMOVED***
+}
 
-func (c *raftClient) ResolveAddress(ctx context.Context, in *ResolveAddressRequest, opts ...grpc.CallOption) (*ResolveAddressResponse, error) ***REMOVED***
+func (c *raftClient) ResolveAddress(ctx context.Context, in *ResolveAddressRequest, opts ...grpc.CallOption) (*ResolveAddressResponse, error) {
 	out := new(ResolveAddressResponse)
 	err := grpc.Invoke(ctx, "/docker.swarmkit.v1.Raft/ResolveAddress", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
 // Server API for Raft service
 
-type RaftServer interface ***REMOVED***
+type RaftServer interface {
 	// ProcessRaftMessage sends a raft message to be processed on a raft member, it is
 	// called from the RaftMember willing to send a message to its destination ('To' field)
 	ProcessRaftMessage(context.Context, *ProcessRaftMessageRequest) (*ProcessRaftMessageResponse, error)
@@ -935,684 +935,684 @@ type RaftServer interface ***REMOVED***
 	StreamRaftMessage(Raft_StreamRaftMessageServer) error
 	// ResolveAddress returns the address where the node with the given ID can be reached.
 	ResolveAddress(context.Context, *ResolveAddressRequest) (*ResolveAddressResponse, error)
-***REMOVED***
+}
 
-func RegisterRaftServer(s *grpc.Server, srv RaftServer) ***REMOVED***
+func RegisterRaftServer(s *grpc.Server, srv RaftServer) {
 	s.RegisterService(&_Raft_serviceDesc, srv)
-***REMOVED***
+}
 
-func _Raft_ProcessRaftMessage_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _Raft_ProcessRaftMessage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ProcessRaftMessageRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(RaftServer).ProcessRaftMessage(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/docker.swarmkit.v1.Raft/ProcessRaftMessage",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(RaftServer).ProcessRaftMessage(ctx, req.(*ProcessRaftMessageRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _Raft_StreamRaftMessage_Handler(srv interface***REMOVED******REMOVED***, stream grpc.ServerStream) error ***REMOVED***
-	return srv.(RaftServer).StreamRaftMessage(&raftStreamRaftMessageServer***REMOVED***stream***REMOVED***)
-***REMOVED***
+func _Raft_StreamRaftMessage_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(RaftServer).StreamRaftMessage(&raftStreamRaftMessageServer{stream})
+}
 
-type Raft_StreamRaftMessageServer interface ***REMOVED***
+type Raft_StreamRaftMessageServer interface {
 	SendAndClose(*StreamRaftMessageResponse) error
 	Recv() (*StreamRaftMessageRequest, error)
 	grpc.ServerStream
-***REMOVED***
+}
 
-type raftStreamRaftMessageServer struct ***REMOVED***
+type raftStreamRaftMessageServer struct {
 	grpc.ServerStream
-***REMOVED***
+}
 
-func (x *raftStreamRaftMessageServer) SendAndClose(m *StreamRaftMessageResponse) error ***REMOVED***
+func (x *raftStreamRaftMessageServer) SendAndClose(m *StreamRaftMessageResponse) error {
 	return x.ServerStream.SendMsg(m)
-***REMOVED***
+}
 
-func (x *raftStreamRaftMessageServer) Recv() (*StreamRaftMessageRequest, error) ***REMOVED***
+func (x *raftStreamRaftMessageServer) Recv() (*StreamRaftMessageRequest, error) {
 	m := new(StreamRaftMessageRequest)
-	if err := x.ServerStream.RecvMsg(m); err != nil ***REMOVED***
+	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return m, nil
-***REMOVED***
+}
 
-func _Raft_ResolveAddress_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _Raft_ResolveAddress_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ResolveAddressRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(RaftServer).ResolveAddress(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/docker.swarmkit.v1.Raft/ResolveAddress",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(RaftServer).ResolveAddress(ctx, req.(*ResolveAddressRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-var _Raft_serviceDesc = grpc.ServiceDesc***REMOVED***
+var _Raft_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "docker.swarmkit.v1.Raft",
 	HandlerType: (*RaftServer)(nil),
-	Methods: []grpc.MethodDesc***REMOVED***
-		***REMOVED***
+	Methods: []grpc.MethodDesc{
+		{
 			MethodName: "ProcessRaftMessage",
 			Handler:    _Raft_ProcessRaftMessage_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "ResolveAddress",
 			Handler:    _Raft_ResolveAddress_Handler,
-		***REMOVED***,
-	***REMOVED***,
-	Streams: []grpc.StreamDesc***REMOVED***
-		***REMOVED***
+		},
+	},
+	Streams: []grpc.StreamDesc{
+		{
 			StreamName:    "StreamRaftMessage",
 			Handler:       _Raft_StreamRaftMessage_Handler,
 			ClientStreams: true,
-		***REMOVED***,
-	***REMOVED***,
+		},
+	},
 	Metadata: "github.com/docker/swarmkit/api/raft.proto",
-***REMOVED***
+}
 
 // Client API for RaftMembership service
 
-type RaftMembershipClient interface ***REMOVED***
+type RaftMembershipClient interface {
 	// Join adds a RaftMember to the raft cluster.
 	Join(ctx context.Context, in *JoinRequest, opts ...grpc.CallOption) (*JoinResponse, error)
 	// Leave removes a RaftMember from the raft cluster.
 	Leave(ctx context.Context, in *LeaveRequest, opts ...grpc.CallOption) (*LeaveResponse, error)
-***REMOVED***
+}
 
-type raftMembershipClient struct ***REMOVED***
+type raftMembershipClient struct {
 	cc *grpc.ClientConn
-***REMOVED***
+}
 
-func NewRaftMembershipClient(cc *grpc.ClientConn) RaftMembershipClient ***REMOVED***
-	return &raftMembershipClient***REMOVED***cc***REMOVED***
-***REMOVED***
+func NewRaftMembershipClient(cc *grpc.ClientConn) RaftMembershipClient {
+	return &raftMembershipClient{cc}
+}
 
-func (c *raftMembershipClient) Join(ctx context.Context, in *JoinRequest, opts ...grpc.CallOption) (*JoinResponse, error) ***REMOVED***
+func (c *raftMembershipClient) Join(ctx context.Context, in *JoinRequest, opts ...grpc.CallOption) (*JoinResponse, error) {
 	out := new(JoinResponse)
 	err := grpc.Invoke(ctx, "/docker.swarmkit.v1.RaftMembership/Join", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *raftMembershipClient) Leave(ctx context.Context, in *LeaveRequest, opts ...grpc.CallOption) (*LeaveResponse, error) ***REMOVED***
+func (c *raftMembershipClient) Leave(ctx context.Context, in *LeaveRequest, opts ...grpc.CallOption) (*LeaveResponse, error) {
 	out := new(LeaveResponse)
 	err := grpc.Invoke(ctx, "/docker.swarmkit.v1.RaftMembership/Leave", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
 // Server API for RaftMembership service
 
-type RaftMembershipServer interface ***REMOVED***
+type RaftMembershipServer interface {
 	// Join adds a RaftMember to the raft cluster.
 	Join(context.Context, *JoinRequest) (*JoinResponse, error)
 	// Leave removes a RaftMember from the raft cluster.
 	Leave(context.Context, *LeaveRequest) (*LeaveResponse, error)
-***REMOVED***
+}
 
-func RegisterRaftMembershipServer(s *grpc.Server, srv RaftMembershipServer) ***REMOVED***
+func RegisterRaftMembershipServer(s *grpc.Server, srv RaftMembershipServer) {
 	s.RegisterService(&_RaftMembership_serviceDesc, srv)
-***REMOVED***
+}
 
-func _RaftMembership_Join_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _RaftMembership_Join_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(JoinRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(RaftMembershipServer).Join(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/docker.swarmkit.v1.RaftMembership/Join",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(RaftMembershipServer).Join(ctx, req.(*JoinRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _RaftMembership_Leave_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _RaftMembership_Leave_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(LeaveRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(RaftMembershipServer).Leave(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/docker.swarmkit.v1.RaftMembership/Leave",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(RaftMembershipServer).Leave(ctx, req.(*LeaveRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-var _RaftMembership_serviceDesc = grpc.ServiceDesc***REMOVED***
+var _RaftMembership_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "docker.swarmkit.v1.RaftMembership",
 	HandlerType: (*RaftMembershipServer)(nil),
-	Methods: []grpc.MethodDesc***REMOVED***
-		***REMOVED***
+	Methods: []grpc.MethodDesc{
+		{
 			MethodName: "Join",
 			Handler:    _RaftMembership_Join_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "Leave",
 			Handler:    _RaftMembership_Leave_Handler,
-		***REMOVED***,
-	***REMOVED***,
-	Streams:  []grpc.StreamDesc***REMOVED******REMOVED***,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
 	Metadata: "github.com/docker/swarmkit/api/raft.proto",
-***REMOVED***
+}
 
-func (m *RaftMember) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *RaftMember) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *RaftMember) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *RaftMember) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.RaftID != 0 ***REMOVED***
+	if m.RaftID != 0 {
 		dAtA[i] = 0x8
 		i++
 		i = encodeVarintRaft(dAtA, i, uint64(m.RaftID))
-	***REMOVED***
-	if len(m.NodeID) > 0 ***REMOVED***
+	}
+	if len(m.NodeID) > 0 {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintRaft(dAtA, i, uint64(len(m.NodeID)))
 		i += copy(dAtA[i:], m.NodeID)
-	***REMOVED***
-	if len(m.Addr) > 0 ***REMOVED***
+	}
+	if len(m.Addr) > 0 {
 		dAtA[i] = 0x1a
 		i++
 		i = encodeVarintRaft(dAtA, i, uint64(len(m.Addr)))
 		i += copy(dAtA[i:], m.Addr)
-	***REMOVED***
+	}
 	dAtA[i] = 0x22
 	i++
 	i = encodeVarintRaft(dAtA, i, uint64(m.Status.Size()))
 	n1, err := m.Status.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n1
 	return i, nil
-***REMOVED***
+}
 
-func (m *JoinRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *JoinRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *JoinRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *JoinRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Addr) > 0 ***REMOVED***
+	if len(m.Addr) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintRaft(dAtA, i, uint64(len(m.Addr)))
 		i += copy(dAtA[i:], m.Addr)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *JoinResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *JoinResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *JoinResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *JoinResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.RaftID != 0 ***REMOVED***
+	if m.RaftID != 0 {
 		dAtA[i] = 0x8
 		i++
 		i = encodeVarintRaft(dAtA, i, uint64(m.RaftID))
-	***REMOVED***
-	if len(m.Members) > 0 ***REMOVED***
-		for _, msg := range m.Members ***REMOVED***
+	}
+	if len(m.Members) > 0 {
+		for _, msg := range m.Members {
 			dAtA[i] = 0x12
 			i++
 			i = encodeVarintRaft(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			i += n
-		***REMOVED***
-	***REMOVED***
-	if len(m.RemovedMembers) > 0 ***REMOVED***
-		for _, num := range m.RemovedMembers ***REMOVED***
+		}
+	}
+	if len(m.RemovedMembers) > 0 {
+		for _, num := range m.RemovedMembers {
 			dAtA[i] = 0x18
 			i++
 			i = encodeVarintRaft(dAtA, i, uint64(num))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *LeaveRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *LeaveRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *LeaveRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *LeaveRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.Node != nil ***REMOVED***
+	if m.Node != nil {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintRaft(dAtA, i, uint64(m.Node.Size()))
 		n2, err := m.Node.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n2
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *LeaveResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *LeaveResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *LeaveResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *LeaveResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
 	return i, nil
-***REMOVED***
+}
 
-func (m *ProcessRaftMessageRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *ProcessRaftMessageRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *ProcessRaftMessageRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *ProcessRaftMessageRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.Message != nil ***REMOVED***
+	if m.Message != nil {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintRaft(dAtA, i, uint64(m.Message.Size()))
 		n3, err := m.Message.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n3
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *ProcessRaftMessageResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *ProcessRaftMessageResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *ProcessRaftMessageResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *ProcessRaftMessageResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
 	return i, nil
-***REMOVED***
+}
 
-func (m *StreamRaftMessageRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *StreamRaftMessageRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *StreamRaftMessageRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *StreamRaftMessageRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.Message != nil ***REMOVED***
+	if m.Message != nil {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintRaft(dAtA, i, uint64(m.Message.Size()))
 		n4, err := m.Message.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n4
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *StreamRaftMessageResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *StreamRaftMessageResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *StreamRaftMessageResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *StreamRaftMessageResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
 	return i, nil
-***REMOVED***
+}
 
-func (m *ResolveAddressRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *ResolveAddressRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *ResolveAddressRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *ResolveAddressRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.RaftID != 0 ***REMOVED***
+	if m.RaftID != 0 {
 		dAtA[i] = 0x8
 		i++
 		i = encodeVarintRaft(dAtA, i, uint64(m.RaftID))
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *ResolveAddressResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *ResolveAddressResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *ResolveAddressResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *ResolveAddressResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Addr) > 0 ***REMOVED***
+	if len(m.Addr) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintRaft(dAtA, i, uint64(len(m.Addr)))
 		i += copy(dAtA[i:], m.Addr)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *InternalRaftRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *InternalRaftRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *InternalRaftRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *InternalRaftRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.ID != 0 ***REMOVED***
+	if m.ID != 0 {
 		dAtA[i] = 0x8
 		i++
 		i = encodeVarintRaft(dAtA, i, uint64(m.ID))
-	***REMOVED***
-	if len(m.Action) > 0 ***REMOVED***
-		for _, msg := range m.Action ***REMOVED***
+	}
+	if len(m.Action) > 0 {
+		for _, msg := range m.Action {
 			dAtA[i] = 0x12
 			i++
 			i = encodeVarintRaft(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			i += n
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *StoreAction) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *StoreAction) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *StoreAction) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *StoreAction) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.Action != 0 ***REMOVED***
+	if m.Action != 0 {
 		dAtA[i] = 0x8
 		i++
 		i = encodeVarintRaft(dAtA, i, uint64(m.Action))
-	***REMOVED***
-	if m.Target != nil ***REMOVED***
+	}
+	if m.Target != nil {
 		nn5, err := m.Target.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += nn5
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *StoreAction_Node) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *StoreAction_Node) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
-	if m.Node != nil ***REMOVED***
+	if m.Node != nil {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintRaft(dAtA, i, uint64(m.Node.Size()))
 		n6, err := m.Node.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n6
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
-func (m *StoreAction_Service) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+}
+func (m *StoreAction_Service) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
-	if m.Service != nil ***REMOVED***
+	if m.Service != nil {
 		dAtA[i] = 0x1a
 		i++
 		i = encodeVarintRaft(dAtA, i, uint64(m.Service.Size()))
 		n7, err := m.Service.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n7
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
-func (m *StoreAction_Task) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+}
+func (m *StoreAction_Task) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
-	if m.Task != nil ***REMOVED***
+	if m.Task != nil {
 		dAtA[i] = 0x22
 		i++
 		i = encodeVarintRaft(dAtA, i, uint64(m.Task.Size()))
 		n8, err := m.Task.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n8
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
-func (m *StoreAction_Network) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+}
+func (m *StoreAction_Network) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
-	if m.Network != nil ***REMOVED***
+	if m.Network != nil {
 		dAtA[i] = 0x2a
 		i++
 		i = encodeVarintRaft(dAtA, i, uint64(m.Network.Size()))
 		n9, err := m.Network.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n9
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
-func (m *StoreAction_Cluster) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+}
+func (m *StoreAction_Cluster) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
-	if m.Cluster != nil ***REMOVED***
+	if m.Cluster != nil {
 		dAtA[i] = 0x32
 		i++
 		i = encodeVarintRaft(dAtA, i, uint64(m.Cluster.Size()))
 		n10, err := m.Cluster.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n10
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
-func (m *StoreAction_Secret) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+}
+func (m *StoreAction_Secret) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
-	if m.Secret != nil ***REMOVED***
+	if m.Secret != nil {
 		dAtA[i] = 0x3a
 		i++
 		i = encodeVarintRaft(dAtA, i, uint64(m.Secret.Size()))
 		n11, err := m.Secret.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n11
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
-func (m *StoreAction_Resource) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+}
+func (m *StoreAction_Resource) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
-	if m.Resource != nil ***REMOVED***
+	if m.Resource != nil {
 		dAtA[i] = 0x42
 		i++
 		i = encodeVarintRaft(dAtA, i, uint64(m.Resource.Size()))
 		n12, err := m.Resource.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n12
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
-func (m *StoreAction_Extension) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+}
+func (m *StoreAction_Extension) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
-	if m.Extension != nil ***REMOVED***
+	if m.Extension != nil {
 		dAtA[i] = 0x4a
 		i++
 		i = encodeVarintRaft(dAtA, i, uint64(m.Extension.Size()))
 		n13, err := m.Extension.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n13
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
-func (m *StoreAction_Config) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+}
+func (m *StoreAction_Config) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
-	if m.Config != nil ***REMOVED***
+	if m.Config != nil {
 		dAtA[i] = 0x52
 		i++
 		i = encodeVarintRaft(dAtA, i, uint64(m.Config.Size()))
 		n14, err := m.Config.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n14
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
-func encodeFixed64Raft(dAtA []byte, offset int, v uint64) int ***REMOVED***
+}
+func encodeFixed64Raft(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
 	dAtA[offset+2] = uint8(v >> 16)
@@ -1622,2324 +1622,2324 @@ func encodeFixed64Raft(dAtA []byte, offset int, v uint64) int ***REMOVED***
 	dAtA[offset+6] = uint8(v >> 48)
 	dAtA[offset+7] = uint8(v >> 56)
 	return offset + 8
-***REMOVED***
-func encodeFixed32Raft(dAtA []byte, offset int, v uint32) int ***REMOVED***
+}
+func encodeFixed32Raft(dAtA []byte, offset int, v uint32) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
 	dAtA[offset+2] = uint8(v >> 16)
 	dAtA[offset+3] = uint8(v >> 24)
 	return offset + 4
-***REMOVED***
-func encodeVarintRaft(dAtA []byte, offset int, v uint64) int ***REMOVED***
-	for v >= 1<<7 ***REMOVED***
+}
+func encodeVarintRaft(dAtA []byte, offset int, v uint64) int {
+	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
-	***REMOVED***
+	}
 	dAtA[offset] = uint8(v)
 	return offset + 1
-***REMOVED***
+}
 
-type raftProxyRaftServer struct ***REMOVED***
+type raftProxyRaftServer struct {
 	local                       RaftServer
 	connSelector                raftselector.ConnProvider
 	localCtxMods, remoteCtxMods []func(context.Context) (context.Context, error)
-***REMOVED***
+}
 
-func NewRaftProxyRaftServer(local RaftServer, connSelector raftselector.ConnProvider, localCtxMod, remoteCtxMod func(context.Context) (context.Context, error)) RaftServer ***REMOVED***
-	redirectChecker := func(ctx context.Context) (context.Context, error) ***REMOVED***
+func NewRaftProxyRaftServer(local RaftServer, connSelector raftselector.ConnProvider, localCtxMod, remoteCtxMod func(context.Context) (context.Context, error)) RaftServer {
+	redirectChecker := func(ctx context.Context) (context.Context, error) {
 		s, ok := transport.StreamFromContext(ctx)
-		if !ok ***REMOVED***
+		if !ok {
 			return ctx, status.Errorf(codes.InvalidArgument, "remote addr is not found in context")
-		***REMOVED***
+		}
 		addr := s.ServerTransport().RemoteAddr().String()
 		md, ok := metadata.FromContext(ctx)
-		if ok && len(md["redirect"]) != 0 ***REMOVED***
+		if ok && len(md["redirect"]) != 0 {
 			return ctx, status.Errorf(codes.ResourceExhausted, "more than one redirect to leader from: %s", md["redirect"])
-		***REMOVED***
-		if !ok ***REMOVED***
-			md = metadata.New(map[string]string***REMOVED******REMOVED***)
-		***REMOVED***
+		}
+		if !ok {
+			md = metadata.New(map[string]string{})
+		}
 		md["redirect"] = append(md["redirect"], addr)
 		return metadata.NewContext(ctx, md), nil
-	***REMOVED***
-	remoteMods := []func(context.Context) (context.Context, error)***REMOVED***redirectChecker***REMOVED***
+	}
+	remoteMods := []func(context.Context) (context.Context, error){redirectChecker}
 	remoteMods = append(remoteMods, remoteCtxMod)
 
 	var localMods []func(context.Context) (context.Context, error)
-	if localCtxMod != nil ***REMOVED***
-		localMods = []func(context.Context) (context.Context, error)***REMOVED***localCtxMod***REMOVED***
-	***REMOVED***
+	if localCtxMod != nil {
+		localMods = []func(context.Context) (context.Context, error){localCtxMod}
+	}
 
-	return &raftProxyRaftServer***REMOVED***
+	return &raftProxyRaftServer{
 		local:         local,
 		connSelector:  connSelector,
 		localCtxMods:  localMods,
 		remoteCtxMods: remoteMods,
-	***REMOVED***
-***REMOVED***
-func (p *raftProxyRaftServer) runCtxMods(ctx context.Context, ctxMods []func(context.Context) (context.Context, error)) (context.Context, error) ***REMOVED***
+	}
+}
+func (p *raftProxyRaftServer) runCtxMods(ctx context.Context, ctxMods []func(context.Context) (context.Context, error)) (context.Context, error) {
 	var err error
-	for _, mod := range ctxMods ***REMOVED***
+	for _, mod := range ctxMods {
 		ctx, err = mod(ctx)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return ctx, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return ctx, nil
-***REMOVED***
-func (p *raftProxyRaftServer) pollNewLeaderConn(ctx context.Context) (*grpc.ClientConn, error) ***REMOVED***
+}
+func (p *raftProxyRaftServer) pollNewLeaderConn(ctx context.Context) (*grpc.ClientConn, error) {
 	ticker := rafttime.NewTicker(500 * rafttime.Millisecond)
 	defer ticker.Stop()
-	for ***REMOVED***
-		select ***REMOVED***
+	for {
+		select {
 		case <-ticker.C:
 			conn, err := p.connSelector.LeaderConn(ctx)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 
 			client := NewHealthClient(conn)
 
-			resp, err := client.Check(ctx, &HealthCheckRequest***REMOVED***Service: "Raft"***REMOVED***)
-			if err != nil || resp.Status != HealthCheckResponse_SERVING ***REMOVED***
+			resp, err := client.Check(ctx, &HealthCheckRequest{Service: "Raft"})
+			if err != nil || resp.Status != HealthCheckResponse_SERVING {
 				continue
-			***REMOVED***
+			}
 			return conn, nil
 		case <-ctx.Done():
 			return nil, ctx.Err()
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (p *raftProxyRaftServer) ProcessRaftMessage(ctx context.Context, r *ProcessRaftMessageRequest) (*ProcessRaftMessageResponse, error) ***REMOVED***
+func (p *raftProxyRaftServer) ProcessRaftMessage(ctx context.Context, r *ProcessRaftMessageRequest) (*ProcessRaftMessageResponse, error) {
 
 	conn, err := p.connSelector.LeaderConn(ctx)
-	if err != nil ***REMOVED***
-		if err == raftselector.ErrIsLeader ***REMOVED***
+	if err != nil {
+		if err == raftselector.ErrIsLeader {
 			ctx, err = p.runCtxMods(ctx, p.localCtxMods)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			return p.local.ProcessRaftMessage(ctx, r)
-		***REMOVED***
+		}
 		return nil, err
-	***REMOVED***
+	}
 	modCtx, err := p.runCtxMods(ctx, p.remoteCtxMods)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	resp, err := NewRaftClient(conn).ProcessRaftMessage(modCtx, r)
-	if err != nil ***REMOVED***
-		if !strings.Contains(err.Error(), "is closing") && !strings.Contains(err.Error(), "the connection is unavailable") && !strings.Contains(err.Error(), "connection error") ***REMOVED***
+	if err != nil {
+		if !strings.Contains(err.Error(), "is closing") && !strings.Contains(err.Error(), "the connection is unavailable") && !strings.Contains(err.Error(), "connection error") {
 			return resp, err
-		***REMOVED***
+		}
 		conn, err := p.pollNewLeaderConn(ctx)
-		if err != nil ***REMOVED***
-			if err == raftselector.ErrIsLeader ***REMOVED***
+		if err != nil {
+			if err == raftselector.ErrIsLeader {
 				return p.local.ProcessRaftMessage(ctx, r)
-			***REMOVED***
+			}
 			return nil, err
-		***REMOVED***
+		}
 		return NewRaftClient(conn).ProcessRaftMessage(modCtx, r)
-	***REMOVED***
+	}
 	return resp, err
-***REMOVED***
+}
 
-type Raft_StreamRaftMessageServerWrapper struct ***REMOVED***
+type Raft_StreamRaftMessageServerWrapper struct {
 	Raft_StreamRaftMessageServer
 	ctx context.Context
-***REMOVED***
+}
 
-func (s Raft_StreamRaftMessageServerWrapper) Context() context.Context ***REMOVED***
+func (s Raft_StreamRaftMessageServerWrapper) Context() context.Context {
 	return s.ctx
-***REMOVED***
+}
 
-func (p *raftProxyRaftServer) StreamRaftMessage(stream Raft_StreamRaftMessageServer) error ***REMOVED***
+func (p *raftProxyRaftServer) StreamRaftMessage(stream Raft_StreamRaftMessageServer) error {
 	ctx := stream.Context()
 	conn, err := p.connSelector.LeaderConn(ctx)
-	if err != nil ***REMOVED***
-		if err == raftselector.ErrIsLeader ***REMOVED***
+	if err != nil {
+		if err == raftselector.ErrIsLeader {
 			ctx, err = p.runCtxMods(ctx, p.localCtxMods)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			streamWrapper := Raft_StreamRaftMessageServerWrapper***REMOVED***
+			}
+			streamWrapper := Raft_StreamRaftMessageServerWrapper{
 				Raft_StreamRaftMessageServer: stream,
 				ctx: ctx,
-			***REMOVED***
+			}
 			return p.local.StreamRaftMessage(streamWrapper)
-		***REMOVED***
+		}
 		return err
-	***REMOVED***
+	}
 	ctx, err = p.runCtxMods(ctx, p.remoteCtxMods)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	clientStream, err := NewRaftClient(conn).StreamRaftMessage(ctx)
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	for ***REMOVED***
+	for {
 		msg, err := stream.Recv()
-		if err == io.EOF ***REMOVED***
+		if err == io.EOF {
 			break
-		***REMOVED***
-		if err != nil ***REMOVED***
+		}
+		if err != nil {
 			return err
-		***REMOVED***
-		if err := clientStream.Send(msg); err != nil ***REMOVED***
+		}
+		if err := clientStream.Send(msg); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	reply, err := clientStream.CloseAndRecv()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	return stream.SendAndClose(reply)
-***REMOVED***
+}
 
-func (p *raftProxyRaftServer) ResolveAddress(ctx context.Context, r *ResolveAddressRequest) (*ResolveAddressResponse, error) ***REMOVED***
+func (p *raftProxyRaftServer) ResolveAddress(ctx context.Context, r *ResolveAddressRequest) (*ResolveAddressResponse, error) {
 
 	conn, err := p.connSelector.LeaderConn(ctx)
-	if err != nil ***REMOVED***
-		if err == raftselector.ErrIsLeader ***REMOVED***
+	if err != nil {
+		if err == raftselector.ErrIsLeader {
 			ctx, err = p.runCtxMods(ctx, p.localCtxMods)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			return p.local.ResolveAddress(ctx, r)
-		***REMOVED***
+		}
 		return nil, err
-	***REMOVED***
+	}
 	modCtx, err := p.runCtxMods(ctx, p.remoteCtxMods)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	resp, err := NewRaftClient(conn).ResolveAddress(modCtx, r)
-	if err != nil ***REMOVED***
-		if !strings.Contains(err.Error(), "is closing") && !strings.Contains(err.Error(), "the connection is unavailable") && !strings.Contains(err.Error(), "connection error") ***REMOVED***
+	if err != nil {
+		if !strings.Contains(err.Error(), "is closing") && !strings.Contains(err.Error(), "the connection is unavailable") && !strings.Contains(err.Error(), "connection error") {
 			return resp, err
-		***REMOVED***
+		}
 		conn, err := p.pollNewLeaderConn(ctx)
-		if err != nil ***REMOVED***
-			if err == raftselector.ErrIsLeader ***REMOVED***
+		if err != nil {
+			if err == raftselector.ErrIsLeader {
 				return p.local.ResolveAddress(ctx, r)
-			***REMOVED***
+			}
 			return nil, err
-		***REMOVED***
+		}
 		return NewRaftClient(conn).ResolveAddress(modCtx, r)
-	***REMOVED***
+	}
 	return resp, err
-***REMOVED***
+}
 
-type raftProxyRaftMembershipServer struct ***REMOVED***
+type raftProxyRaftMembershipServer struct {
 	local                       RaftMembershipServer
 	connSelector                raftselector.ConnProvider
 	localCtxMods, remoteCtxMods []func(context.Context) (context.Context, error)
-***REMOVED***
+}
 
-func NewRaftProxyRaftMembershipServer(local RaftMembershipServer, connSelector raftselector.ConnProvider, localCtxMod, remoteCtxMod func(context.Context) (context.Context, error)) RaftMembershipServer ***REMOVED***
-	redirectChecker := func(ctx context.Context) (context.Context, error) ***REMOVED***
+func NewRaftProxyRaftMembershipServer(local RaftMembershipServer, connSelector raftselector.ConnProvider, localCtxMod, remoteCtxMod func(context.Context) (context.Context, error)) RaftMembershipServer {
+	redirectChecker := func(ctx context.Context) (context.Context, error) {
 		s, ok := transport.StreamFromContext(ctx)
-		if !ok ***REMOVED***
+		if !ok {
 			return ctx, status.Errorf(codes.InvalidArgument, "remote addr is not found in context")
-		***REMOVED***
+		}
 		addr := s.ServerTransport().RemoteAddr().String()
 		md, ok := metadata.FromContext(ctx)
-		if ok && len(md["redirect"]) != 0 ***REMOVED***
+		if ok && len(md["redirect"]) != 0 {
 			return ctx, status.Errorf(codes.ResourceExhausted, "more than one redirect to leader from: %s", md["redirect"])
-		***REMOVED***
-		if !ok ***REMOVED***
-			md = metadata.New(map[string]string***REMOVED******REMOVED***)
-		***REMOVED***
+		}
+		if !ok {
+			md = metadata.New(map[string]string{})
+		}
 		md["redirect"] = append(md["redirect"], addr)
 		return metadata.NewContext(ctx, md), nil
-	***REMOVED***
-	remoteMods := []func(context.Context) (context.Context, error)***REMOVED***redirectChecker***REMOVED***
+	}
+	remoteMods := []func(context.Context) (context.Context, error){redirectChecker}
 	remoteMods = append(remoteMods, remoteCtxMod)
 
 	var localMods []func(context.Context) (context.Context, error)
-	if localCtxMod != nil ***REMOVED***
-		localMods = []func(context.Context) (context.Context, error)***REMOVED***localCtxMod***REMOVED***
-	***REMOVED***
+	if localCtxMod != nil {
+		localMods = []func(context.Context) (context.Context, error){localCtxMod}
+	}
 
-	return &raftProxyRaftMembershipServer***REMOVED***
+	return &raftProxyRaftMembershipServer{
 		local:         local,
 		connSelector:  connSelector,
 		localCtxMods:  localMods,
 		remoteCtxMods: remoteMods,
-	***REMOVED***
-***REMOVED***
-func (p *raftProxyRaftMembershipServer) runCtxMods(ctx context.Context, ctxMods []func(context.Context) (context.Context, error)) (context.Context, error) ***REMOVED***
+	}
+}
+func (p *raftProxyRaftMembershipServer) runCtxMods(ctx context.Context, ctxMods []func(context.Context) (context.Context, error)) (context.Context, error) {
 	var err error
-	for _, mod := range ctxMods ***REMOVED***
+	for _, mod := range ctxMods {
 		ctx, err = mod(ctx)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return ctx, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return ctx, nil
-***REMOVED***
-func (p *raftProxyRaftMembershipServer) pollNewLeaderConn(ctx context.Context) (*grpc.ClientConn, error) ***REMOVED***
+}
+func (p *raftProxyRaftMembershipServer) pollNewLeaderConn(ctx context.Context) (*grpc.ClientConn, error) {
 	ticker := rafttime.NewTicker(500 * rafttime.Millisecond)
 	defer ticker.Stop()
-	for ***REMOVED***
-		select ***REMOVED***
+	for {
+		select {
 		case <-ticker.C:
 			conn, err := p.connSelector.LeaderConn(ctx)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 
 			client := NewHealthClient(conn)
 
-			resp, err := client.Check(ctx, &HealthCheckRequest***REMOVED***Service: "Raft"***REMOVED***)
-			if err != nil || resp.Status != HealthCheckResponse_SERVING ***REMOVED***
+			resp, err := client.Check(ctx, &HealthCheckRequest{Service: "Raft"})
+			if err != nil || resp.Status != HealthCheckResponse_SERVING {
 				continue
-			***REMOVED***
+			}
 			return conn, nil
 		case <-ctx.Done():
 			return nil, ctx.Err()
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (p *raftProxyRaftMembershipServer) Join(ctx context.Context, r *JoinRequest) (*JoinResponse, error) ***REMOVED***
+func (p *raftProxyRaftMembershipServer) Join(ctx context.Context, r *JoinRequest) (*JoinResponse, error) {
 
 	conn, err := p.connSelector.LeaderConn(ctx)
-	if err != nil ***REMOVED***
-		if err == raftselector.ErrIsLeader ***REMOVED***
+	if err != nil {
+		if err == raftselector.ErrIsLeader {
 			ctx, err = p.runCtxMods(ctx, p.localCtxMods)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			return p.local.Join(ctx, r)
-		***REMOVED***
+		}
 		return nil, err
-	***REMOVED***
+	}
 	modCtx, err := p.runCtxMods(ctx, p.remoteCtxMods)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	resp, err := NewRaftMembershipClient(conn).Join(modCtx, r)
-	if err != nil ***REMOVED***
-		if !strings.Contains(err.Error(), "is closing") && !strings.Contains(err.Error(), "the connection is unavailable") && !strings.Contains(err.Error(), "connection error") ***REMOVED***
+	if err != nil {
+		if !strings.Contains(err.Error(), "is closing") && !strings.Contains(err.Error(), "the connection is unavailable") && !strings.Contains(err.Error(), "connection error") {
 			return resp, err
-		***REMOVED***
+		}
 		conn, err := p.pollNewLeaderConn(ctx)
-		if err != nil ***REMOVED***
-			if err == raftselector.ErrIsLeader ***REMOVED***
+		if err != nil {
+			if err == raftselector.ErrIsLeader {
 				return p.local.Join(ctx, r)
-			***REMOVED***
+			}
 			return nil, err
-		***REMOVED***
+		}
 		return NewRaftMembershipClient(conn).Join(modCtx, r)
-	***REMOVED***
+	}
 	return resp, err
-***REMOVED***
+}
 
-func (p *raftProxyRaftMembershipServer) Leave(ctx context.Context, r *LeaveRequest) (*LeaveResponse, error) ***REMOVED***
+func (p *raftProxyRaftMembershipServer) Leave(ctx context.Context, r *LeaveRequest) (*LeaveResponse, error) {
 
 	conn, err := p.connSelector.LeaderConn(ctx)
-	if err != nil ***REMOVED***
-		if err == raftselector.ErrIsLeader ***REMOVED***
+	if err != nil {
+		if err == raftselector.ErrIsLeader {
 			ctx, err = p.runCtxMods(ctx, p.localCtxMods)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			return p.local.Leave(ctx, r)
-		***REMOVED***
+		}
 		return nil, err
-	***REMOVED***
+	}
 	modCtx, err := p.runCtxMods(ctx, p.remoteCtxMods)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	resp, err := NewRaftMembershipClient(conn).Leave(modCtx, r)
-	if err != nil ***REMOVED***
-		if !strings.Contains(err.Error(), "is closing") && !strings.Contains(err.Error(), "the connection is unavailable") && !strings.Contains(err.Error(), "connection error") ***REMOVED***
+	if err != nil {
+		if !strings.Contains(err.Error(), "is closing") && !strings.Contains(err.Error(), "the connection is unavailable") && !strings.Contains(err.Error(), "connection error") {
 			return resp, err
-		***REMOVED***
+		}
 		conn, err := p.pollNewLeaderConn(ctx)
-		if err != nil ***REMOVED***
-			if err == raftselector.ErrIsLeader ***REMOVED***
+		if err != nil {
+			if err == raftselector.ErrIsLeader {
 				return p.local.Leave(ctx, r)
-			***REMOVED***
+			}
 			return nil, err
-		***REMOVED***
+		}
 		return NewRaftMembershipClient(conn).Leave(modCtx, r)
-	***REMOVED***
+	}
 	return resp, err
-***REMOVED***
+}
 
-func (m *RaftMember) Size() (n int) ***REMOVED***
+func (m *RaftMember) Size() (n int) {
 	var l int
 	_ = l
-	if m.RaftID != 0 ***REMOVED***
+	if m.RaftID != 0 {
 		n += 1 + sovRaft(uint64(m.RaftID))
-	***REMOVED***
+	}
 	l = len(m.NodeID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovRaft(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.Addr)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovRaft(uint64(l))
-	***REMOVED***
+	}
 	l = m.Status.Size()
 	n += 1 + l + sovRaft(uint64(l))
 	return n
-***REMOVED***
+}
 
-func (m *JoinRequest) Size() (n int) ***REMOVED***
+func (m *JoinRequest) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.Addr)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovRaft(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *JoinResponse) Size() (n int) ***REMOVED***
+func (m *JoinResponse) Size() (n int) {
 	var l int
 	_ = l
-	if m.RaftID != 0 ***REMOVED***
+	if m.RaftID != 0 {
 		n += 1 + sovRaft(uint64(m.RaftID))
-	***REMOVED***
-	if len(m.Members) > 0 ***REMOVED***
-		for _, e := range m.Members ***REMOVED***
+	}
+	if len(m.Members) > 0 {
+		for _, e := range m.Members {
 			l = e.Size()
 			n += 1 + l + sovRaft(uint64(l))
-		***REMOVED***
-	***REMOVED***
-	if len(m.RemovedMembers) > 0 ***REMOVED***
-		for _, e := range m.RemovedMembers ***REMOVED***
+		}
+	}
+	if len(m.RemovedMembers) > 0 {
+		for _, e := range m.RemovedMembers {
 			n += 1 + sovRaft(uint64(e))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
+}
 
-func (m *LeaveRequest) Size() (n int) ***REMOVED***
+func (m *LeaveRequest) Size() (n int) {
 	var l int
 	_ = l
-	if m.Node != nil ***REMOVED***
+	if m.Node != nil {
 		l = m.Node.Size()
 		n += 1 + l + sovRaft(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *LeaveResponse) Size() (n int) ***REMOVED***
+func (m *LeaveResponse) Size() (n int) {
 	var l int
 	_ = l
 	return n
-***REMOVED***
+}
 
-func (m *ProcessRaftMessageRequest) Size() (n int) ***REMOVED***
+func (m *ProcessRaftMessageRequest) Size() (n int) {
 	var l int
 	_ = l
-	if m.Message != nil ***REMOVED***
+	if m.Message != nil {
 		l = m.Message.Size()
 		n += 1 + l + sovRaft(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *ProcessRaftMessageResponse) Size() (n int) ***REMOVED***
+func (m *ProcessRaftMessageResponse) Size() (n int) {
 	var l int
 	_ = l
 	return n
-***REMOVED***
+}
 
-func (m *StreamRaftMessageRequest) Size() (n int) ***REMOVED***
+func (m *StreamRaftMessageRequest) Size() (n int) {
 	var l int
 	_ = l
-	if m.Message != nil ***REMOVED***
+	if m.Message != nil {
 		l = m.Message.Size()
 		n += 1 + l + sovRaft(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *StreamRaftMessageResponse) Size() (n int) ***REMOVED***
+func (m *StreamRaftMessageResponse) Size() (n int) {
 	var l int
 	_ = l
 	return n
-***REMOVED***
+}
 
-func (m *ResolveAddressRequest) Size() (n int) ***REMOVED***
+func (m *ResolveAddressRequest) Size() (n int) {
 	var l int
 	_ = l
-	if m.RaftID != 0 ***REMOVED***
+	if m.RaftID != 0 {
 		n += 1 + sovRaft(uint64(m.RaftID))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *ResolveAddressResponse) Size() (n int) ***REMOVED***
+func (m *ResolveAddressResponse) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.Addr)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovRaft(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *InternalRaftRequest) Size() (n int) ***REMOVED***
+func (m *InternalRaftRequest) Size() (n int) {
 	var l int
 	_ = l
-	if m.ID != 0 ***REMOVED***
+	if m.ID != 0 {
 		n += 1 + sovRaft(uint64(m.ID))
-	***REMOVED***
-	if len(m.Action) > 0 ***REMOVED***
-		for _, e := range m.Action ***REMOVED***
+	}
+	if len(m.Action) > 0 {
+		for _, e := range m.Action {
 			l = e.Size()
 			n += 1 + l + sovRaft(uint64(l))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
+}
 
-func (m *StoreAction) Size() (n int) ***REMOVED***
+func (m *StoreAction) Size() (n int) {
 	var l int
 	_ = l
-	if m.Action != 0 ***REMOVED***
+	if m.Action != 0 {
 		n += 1 + sovRaft(uint64(m.Action))
-	***REMOVED***
-	if m.Target != nil ***REMOVED***
+	}
+	if m.Target != nil {
 		n += m.Target.Size()
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *StoreAction_Node) Size() (n int) ***REMOVED***
+func (m *StoreAction_Node) Size() (n int) {
 	var l int
 	_ = l
-	if m.Node != nil ***REMOVED***
+	if m.Node != nil {
 		l = m.Node.Size()
 		n += 1 + l + sovRaft(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
-func (m *StoreAction_Service) Size() (n int) ***REMOVED***
+}
+func (m *StoreAction_Service) Size() (n int) {
 	var l int
 	_ = l
-	if m.Service != nil ***REMOVED***
+	if m.Service != nil {
 		l = m.Service.Size()
 		n += 1 + l + sovRaft(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
-func (m *StoreAction_Task) Size() (n int) ***REMOVED***
+}
+func (m *StoreAction_Task) Size() (n int) {
 	var l int
 	_ = l
-	if m.Task != nil ***REMOVED***
+	if m.Task != nil {
 		l = m.Task.Size()
 		n += 1 + l + sovRaft(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
-func (m *StoreAction_Network) Size() (n int) ***REMOVED***
+}
+func (m *StoreAction_Network) Size() (n int) {
 	var l int
 	_ = l
-	if m.Network != nil ***REMOVED***
+	if m.Network != nil {
 		l = m.Network.Size()
 		n += 1 + l + sovRaft(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
-func (m *StoreAction_Cluster) Size() (n int) ***REMOVED***
+}
+func (m *StoreAction_Cluster) Size() (n int) {
 	var l int
 	_ = l
-	if m.Cluster != nil ***REMOVED***
+	if m.Cluster != nil {
 		l = m.Cluster.Size()
 		n += 1 + l + sovRaft(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
-func (m *StoreAction_Secret) Size() (n int) ***REMOVED***
+}
+func (m *StoreAction_Secret) Size() (n int) {
 	var l int
 	_ = l
-	if m.Secret != nil ***REMOVED***
+	if m.Secret != nil {
 		l = m.Secret.Size()
 		n += 1 + l + sovRaft(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
-func (m *StoreAction_Resource) Size() (n int) ***REMOVED***
+}
+func (m *StoreAction_Resource) Size() (n int) {
 	var l int
 	_ = l
-	if m.Resource != nil ***REMOVED***
+	if m.Resource != nil {
 		l = m.Resource.Size()
 		n += 1 + l + sovRaft(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
-func (m *StoreAction_Extension) Size() (n int) ***REMOVED***
+}
+func (m *StoreAction_Extension) Size() (n int) {
 	var l int
 	_ = l
-	if m.Extension != nil ***REMOVED***
+	if m.Extension != nil {
 		l = m.Extension.Size()
 		n += 1 + l + sovRaft(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
-func (m *StoreAction_Config) Size() (n int) ***REMOVED***
+}
+func (m *StoreAction_Config) Size() (n int) {
 	var l int
 	_ = l
-	if m.Config != nil ***REMOVED***
+	if m.Config != nil {
 		l = m.Config.Size()
 		n += 1 + l + sovRaft(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func sovRaft(x uint64) (n int) ***REMOVED***
-	for ***REMOVED***
+func sovRaft(x uint64) (n int) {
+	for {
 		n++
 		x >>= 7
-		if x == 0 ***REMOVED***
+		if x == 0 {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
-func sozRaft(x uint64) (n int) ***REMOVED***
+}
+func sozRaft(x uint64) (n int) {
 	return sovRaft(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-***REMOVED***
-func (this *RaftMember) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *RaftMember) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&RaftMember***REMOVED***`,
+	}
+	s := strings.Join([]string{`&RaftMember{`,
 		`RaftID:` + fmt.Sprintf("%v", this.RaftID) + `,`,
 		`NodeID:` + fmt.Sprintf("%v", this.NodeID) + `,`,
 		`Addr:` + fmt.Sprintf("%v", this.Addr) + `,`,
 		`Status:` + strings.Replace(strings.Replace(this.Status.String(), "RaftMemberStatus", "RaftMemberStatus", 1), `&`, ``, 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *JoinRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *JoinRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&JoinRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&JoinRequest{`,
 		`Addr:` + fmt.Sprintf("%v", this.Addr) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *JoinResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *JoinResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&JoinResponse***REMOVED***`,
+	}
+	s := strings.Join([]string{`&JoinResponse{`,
 		`RaftID:` + fmt.Sprintf("%v", this.RaftID) + `,`,
 		`Members:` + strings.Replace(fmt.Sprintf("%v", this.Members), "RaftMember", "RaftMember", 1) + `,`,
 		`RemovedMembers:` + fmt.Sprintf("%v", this.RemovedMembers) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *LeaveRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *LeaveRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&LeaveRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&LeaveRequest{`,
 		`Node:` + strings.Replace(fmt.Sprintf("%v", this.Node), "RaftMember", "RaftMember", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *LeaveResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *LeaveResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&LeaveResponse***REMOVED***`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+	}
+	s := strings.Join([]string{`&LeaveResponse{`,
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *ProcessRaftMessageRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *ProcessRaftMessageRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&ProcessRaftMessageRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&ProcessRaftMessageRequest{`,
 		`Message:` + strings.Replace(fmt.Sprintf("%v", this.Message), "Message", "raftpb.Message", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *ProcessRaftMessageResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *ProcessRaftMessageResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&ProcessRaftMessageResponse***REMOVED***`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+	}
+	s := strings.Join([]string{`&ProcessRaftMessageResponse{`,
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *StreamRaftMessageRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *StreamRaftMessageRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&StreamRaftMessageRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&StreamRaftMessageRequest{`,
 		`Message:` + strings.Replace(fmt.Sprintf("%v", this.Message), "Message", "raftpb.Message", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *StreamRaftMessageResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *StreamRaftMessageResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&StreamRaftMessageResponse***REMOVED***`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+	}
+	s := strings.Join([]string{`&StreamRaftMessageResponse{`,
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *ResolveAddressRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *ResolveAddressRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&ResolveAddressRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&ResolveAddressRequest{`,
 		`RaftID:` + fmt.Sprintf("%v", this.RaftID) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *ResolveAddressResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *ResolveAddressResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&ResolveAddressResponse***REMOVED***`,
+	}
+	s := strings.Join([]string{`&ResolveAddressResponse{`,
 		`Addr:` + fmt.Sprintf("%v", this.Addr) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *InternalRaftRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *InternalRaftRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&InternalRaftRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&InternalRaftRequest{`,
 		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
 		`Action:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Action), "StoreAction", "StoreAction", 1), `&`, ``, 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *StoreAction) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *StoreAction) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&StoreAction***REMOVED***`,
+	}
+	s := strings.Join([]string{`&StoreAction{`,
 		`Action:` + fmt.Sprintf("%v", this.Action) + `,`,
 		`Target:` + fmt.Sprintf("%v", this.Target) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *StoreAction_Node) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *StoreAction_Node) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&StoreAction_Node***REMOVED***`,
+	}
+	s := strings.Join([]string{`&StoreAction_Node{`,
 		`Node:` + strings.Replace(fmt.Sprintf("%v", this.Node), "Node", "Node", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *StoreAction_Service) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *StoreAction_Service) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&StoreAction_Service***REMOVED***`,
+	}
+	s := strings.Join([]string{`&StoreAction_Service{`,
 		`Service:` + strings.Replace(fmt.Sprintf("%v", this.Service), "Service", "Service", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *StoreAction_Task) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *StoreAction_Task) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&StoreAction_Task***REMOVED***`,
+	}
+	s := strings.Join([]string{`&StoreAction_Task{`,
 		`Task:` + strings.Replace(fmt.Sprintf("%v", this.Task), "Task", "Task", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *StoreAction_Network) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *StoreAction_Network) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&StoreAction_Network***REMOVED***`,
+	}
+	s := strings.Join([]string{`&StoreAction_Network{`,
 		`Network:` + strings.Replace(fmt.Sprintf("%v", this.Network), "Network", "Network", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *StoreAction_Cluster) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *StoreAction_Cluster) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&StoreAction_Cluster***REMOVED***`,
+	}
+	s := strings.Join([]string{`&StoreAction_Cluster{`,
 		`Cluster:` + strings.Replace(fmt.Sprintf("%v", this.Cluster), "Cluster", "Cluster", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *StoreAction_Secret) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *StoreAction_Secret) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&StoreAction_Secret***REMOVED***`,
+	}
+	s := strings.Join([]string{`&StoreAction_Secret{`,
 		`Secret:` + strings.Replace(fmt.Sprintf("%v", this.Secret), "Secret", "Secret", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *StoreAction_Resource) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *StoreAction_Resource) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&StoreAction_Resource***REMOVED***`,
+	}
+	s := strings.Join([]string{`&StoreAction_Resource{`,
 		`Resource:` + strings.Replace(fmt.Sprintf("%v", this.Resource), "Resource", "Resource", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *StoreAction_Extension) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *StoreAction_Extension) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&StoreAction_Extension***REMOVED***`,
+	}
+	s := strings.Join([]string{`&StoreAction_Extension{`,
 		`Extension:` + strings.Replace(fmt.Sprintf("%v", this.Extension), "Extension", "Extension", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *StoreAction_Config) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *StoreAction_Config) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&StoreAction_Config***REMOVED***`,
+	}
+	s := strings.Join([]string{`&StoreAction_Config{`,
 		`Config:` + strings.Replace(fmt.Sprintf("%v", this.Config), "Config", "Config", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func valueToStringRaft(v interface***REMOVED******REMOVED***) string ***REMOVED***
+}
+func valueToStringRaft(v interface{}) string {
 	rv := reflect.ValueOf(v)
-	if rv.IsNil() ***REMOVED***
+	if rv.IsNil() {
 		return "nil"
-	***REMOVED***
+	}
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
-***REMOVED***
-func (m *RaftMember) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *RaftMember) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowRaft
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: RaftMember: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: RaftMember: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RaftID", wireType)
-			***REMOVED***
+			}
 			m.RaftID = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRaft
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.RaftID |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field NodeID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRaft
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthRaft
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.NodeID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Addr", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRaft
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthRaft
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Addr = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 4:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRaft
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthRaft
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Status.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Status.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipRaft(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthRaft
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *JoinRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *JoinRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowRaft
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: JoinRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: JoinRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Addr", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRaft
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthRaft
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Addr = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipRaft(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthRaft
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *JoinResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *JoinResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowRaft
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: JoinResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: JoinResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RaftID", wireType)
-			***REMOVED***
+			}
 			m.RaftID = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRaft
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.RaftID |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Members", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRaft
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthRaft
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.Members = append(m.Members, &RaftMember***REMOVED******REMOVED***)
-			if err := m.Members[len(m.Members)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			m.Members = append(m.Members, &RaftMember{})
+			if err := m.Members[len(m.Members)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 3:
-			if wireType == 0 ***REMOVED***
+			if wireType == 0 {
 				var v uint64
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return ErrIntOverflowRaft
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					v |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				m.RemovedMembers = append(m.RemovedMembers, v)
-			***REMOVED*** else if wireType == 2 ***REMOVED***
+			} else if wireType == 2 {
 				var packedLen int
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return ErrIntOverflowRaft
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					packedLen |= (int(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
-				if packedLen < 0 ***REMOVED***
+					}
+				}
+				if packedLen < 0 {
 					return ErrInvalidLengthRaft
-				***REMOVED***
+				}
 				postIndex := iNdEx + packedLen
-				if postIndex > l ***REMOVED***
+				if postIndex > l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
-				for iNdEx < postIndex ***REMOVED***
+				}
+				for iNdEx < postIndex {
 					var v uint64
-					for shift := uint(0); ; shift += 7 ***REMOVED***
-						if shift >= 64 ***REMOVED***
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
 							return ErrIntOverflowRaft
-						***REMOVED***
-						if iNdEx >= l ***REMOVED***
+						}
+						if iNdEx >= l {
 							return io.ErrUnexpectedEOF
-						***REMOVED***
+						}
 						b := dAtA[iNdEx]
 						iNdEx++
 						v |= (uint64(b) & 0x7F) << shift
-						if b < 0x80 ***REMOVED***
+						if b < 0x80 {
 							break
-						***REMOVED***
-					***REMOVED***
+						}
+					}
 					m.RemovedMembers = append(m.RemovedMembers, v)
-				***REMOVED***
-			***REMOVED*** else ***REMOVED***
+				}
+			} else {
 				return fmt.Errorf("proto: wrong wireType = %d for field RemovedMembers", wireType)
-			***REMOVED***
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipRaft(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthRaft
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *LeaveRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *LeaveRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowRaft
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: LeaveRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: LeaveRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Node", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRaft
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthRaft
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Node == nil ***REMOVED***
-				m.Node = &RaftMember***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.Node.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.Node == nil {
+				m.Node = &RaftMember{}
+			}
+			if err := m.Node.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipRaft(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthRaft
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *LeaveResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *LeaveResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowRaft
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: LeaveResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: LeaveResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		default:
 			iNdEx = preIndex
 			skippy, err := skipRaft(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthRaft
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *ProcessRaftMessageRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *ProcessRaftMessageRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowRaft
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: ProcessRaftMessageRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: ProcessRaftMessageRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRaft
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthRaft
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Message == nil ***REMOVED***
-				m.Message = &raftpb.Message***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.Message.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.Message == nil {
+				m.Message = &raftpb.Message{}
+			}
+			if err := m.Message.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipRaft(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthRaft
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *ProcessRaftMessageResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *ProcessRaftMessageResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowRaft
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: ProcessRaftMessageResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: ProcessRaftMessageResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		default:
 			iNdEx = preIndex
 			skippy, err := skipRaft(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthRaft
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *StreamRaftMessageRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *StreamRaftMessageRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowRaft
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: StreamRaftMessageRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: StreamRaftMessageRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRaft
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthRaft
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Message == nil ***REMOVED***
-				m.Message = &raftpb.Message***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.Message.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.Message == nil {
+				m.Message = &raftpb.Message{}
+			}
+			if err := m.Message.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipRaft(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthRaft
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *StreamRaftMessageResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *StreamRaftMessageResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowRaft
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: StreamRaftMessageResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: StreamRaftMessageResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		default:
 			iNdEx = preIndex
 			skippy, err := skipRaft(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthRaft
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *ResolveAddressRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *ResolveAddressRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowRaft
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: ResolveAddressRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: ResolveAddressRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RaftID", wireType)
-			***REMOVED***
+			}
 			m.RaftID = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRaft
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.RaftID |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipRaft(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthRaft
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *ResolveAddressResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *ResolveAddressResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowRaft
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: ResolveAddressResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: ResolveAddressResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Addr", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRaft
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthRaft
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Addr = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipRaft(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthRaft
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *InternalRaftRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *InternalRaftRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowRaft
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: InternalRaftRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: InternalRaftRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
-			***REMOVED***
+			}
 			m.ID = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRaft
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.ID |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Action", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRaft
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthRaft
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.Action = append(m.Action, StoreAction***REMOVED******REMOVED***)
-			if err := m.Action[len(m.Action)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			m.Action = append(m.Action, StoreAction{})
+			if err := m.Action[len(m.Action)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipRaft(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthRaft
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *StoreAction) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *StoreAction) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowRaft
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: StoreAction: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: StoreAction: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Action", wireType)
-			***REMOVED***
+			}
 			m.Action = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRaft
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Action |= (StoreActionKind(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Node", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRaft
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthRaft
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			v := &Node***REMOVED******REMOVED***
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			v := &Node{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
-			m.Target = &StoreAction_Node***REMOVED***v***REMOVED***
+			}
+			m.Target = &StoreAction_Node{v}
 			iNdEx = postIndex
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Service", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRaft
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthRaft
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			v := &Service***REMOVED******REMOVED***
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			v := &Service{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
-			m.Target = &StoreAction_Service***REMOVED***v***REMOVED***
+			}
+			m.Target = &StoreAction_Service{v}
 			iNdEx = postIndex
 		case 4:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Task", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRaft
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthRaft
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			v := &Task***REMOVED******REMOVED***
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			v := &Task{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
-			m.Target = &StoreAction_Task***REMOVED***v***REMOVED***
+			}
+			m.Target = &StoreAction_Task{v}
 			iNdEx = postIndex
 		case 5:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Network", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRaft
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthRaft
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			v := &Network***REMOVED******REMOVED***
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			v := &Network{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
-			m.Target = &StoreAction_Network***REMOVED***v***REMOVED***
+			}
+			m.Target = &StoreAction_Network{v}
 			iNdEx = postIndex
 		case 6:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Cluster", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRaft
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthRaft
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			v := &Cluster***REMOVED******REMOVED***
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			v := &Cluster{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
-			m.Target = &StoreAction_Cluster***REMOVED***v***REMOVED***
+			}
+			m.Target = &StoreAction_Cluster{v}
 			iNdEx = postIndex
 		case 7:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Secret", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRaft
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthRaft
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			v := &Secret***REMOVED******REMOVED***
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			v := &Secret{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
-			m.Target = &StoreAction_Secret***REMOVED***v***REMOVED***
+			}
+			m.Target = &StoreAction_Secret{v}
 			iNdEx = postIndex
 		case 8:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Resource", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRaft
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthRaft
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			v := &Resource***REMOVED******REMOVED***
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			v := &Resource{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
-			m.Target = &StoreAction_Resource***REMOVED***v***REMOVED***
+			}
+			m.Target = &StoreAction_Resource{v}
 			iNdEx = postIndex
 		case 9:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Extension", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRaft
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthRaft
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			v := &Extension***REMOVED******REMOVED***
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			v := &Extension{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
-			m.Target = &StoreAction_Extension***REMOVED***v***REMOVED***
+			}
+			m.Target = &StoreAction_Extension{v}
 			iNdEx = postIndex
 		case 10:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Config", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowRaft
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthRaft
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			v := &Config***REMOVED******REMOVED***
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			v := &Config{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
-			m.Target = &StoreAction_Config***REMOVED***v***REMOVED***
+			}
+			m.Target = &StoreAction_Config{v}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipRaft(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthRaft
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func skipRaft(dAtA []byte) (n int, err error) ***REMOVED***
+}
+func skipRaft(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return 0, ErrIntOverflowRaft
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return 0, io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		wireType := int(wire & 0x7)
-		switch wireType ***REMOVED***
+		switch wireType {
 		case 0:
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowRaft
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				iNdEx++
-				if dAtA[iNdEx-1] < 0x80 ***REMOVED***
+				if dAtA[iNdEx-1] < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return iNdEx, nil
 		case 1:
 			iNdEx += 8
 			return iNdEx, nil
 		case 2:
 			var length int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowRaft
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				length |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			iNdEx += length
-			if length < 0 ***REMOVED***
+			if length < 0 {
 				return 0, ErrInvalidLengthRaft
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 3:
-			for ***REMOVED***
+			for {
 				var innerWire uint64
 				var start int = iNdEx
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return 0, ErrIntOverflowRaft
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return 0, io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					innerWire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				innerWireType := int(innerWire & 0x7)
-				if innerWireType == 4 ***REMOVED***
+				if innerWireType == 4 {
 					break
-				***REMOVED***
+				}
 				next, err := skipRaft(dAtA[start:])
-				if err != nil ***REMOVED***
+				if err != nil {
 					return 0, err
-				***REMOVED***
+				}
 				iNdEx = start + next
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 4:
 			return iNdEx, nil
@@ -3948,19 +3948,19 @@ func skipRaft(dAtA []byte) (n int, err error) ***REMOVED***
 			return iNdEx, nil
 		default:
 			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	panic("unreachable")
-***REMOVED***
+}
 
 var (
 	ErrInvalidLengthRaft = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowRaft   = fmt.Errorf("proto: integer overflow")
 )
 
-func init() ***REMOVED*** proto.RegisterFile("github.com/docker/swarmkit/api/raft.proto", fileDescriptorRaft) ***REMOVED***
+func init() { proto.RegisterFile("github.com/docker/swarmkit/api/raft.proto", fileDescriptorRaft) }
 
-var fileDescriptorRaft = []byte***REMOVED***
+var fileDescriptorRaft = []byte{
 	// 1015 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x96, 0xc1, 0x6e, 0x1b, 0x45,
 	0x18, 0xc7, 0x77, 0xed, 0xad, 0xd3, 0x7c, 0x69, 0x93, 0x30, 0x25, 0x61, 0xb3, 0x2d, 0x8e, 0xbb,
@@ -4026,4 +4026,4 @@ var fileDescriptorRaft = []byte***REMOVED***
 	0x79, 0xde, 0xcb, 0xaa, 0xe7, 0xbd, 0xac, 0xfa, 0x7b, 0x2f, 0xab, 0xfe, 0xd5, 0xcb, 0xaa, 0x4f,
 	0xd3, 0x4f, 0xb5, 0x5a, 0x46, 0xfe, 0xa2, 0x7a, 0xef, 0xdf, 0x00, 0x00, 0x00, 0xff, 0xff, 0x3e,
 	0x7a, 0x8b, 0xe7, 0x6a, 0x0a, 0x00, 0x00,
-***REMOVED***
+}

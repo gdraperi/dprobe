@@ -19,153 +19,153 @@ var (
 	zwr = MustParseISO("ZWR")
 )
 
-func TestParseISO(t *testing.T) ***REMOVED***
-	testCases := []struct ***REMOVED***
+func TestParseISO(t *testing.T) {
+	testCases := []struct {
 		in  string
 		out Unit
 		ok  bool
-	***REMOVED******REMOVED***
-		***REMOVED***"USD", USD, true***REMOVED***,
-		***REMOVED***"xxx", XXX, true***REMOVED***,
-		***REMOVED***"xts", XTS, true***REMOVED***,
-		***REMOVED***"XX", XXX, false***REMOVED***,
-		***REMOVED***"XXXX", XXX, false***REMOVED***,
-		***REMOVED***"", XXX, false***REMOVED***,       // not well-formed
-		***REMOVED***"UUU", XXX, false***REMOVED***,    // unknown
-		***REMOVED***"\u22A9", XXX, false***REMOVED***, // non-ASCII, printable
+	}{
+		{"USD", USD, true},
+		{"xxx", XXX, true},
+		{"xts", XTS, true},
+		{"XX", XXX, false},
+		{"XXXX", XXX, false},
+		{"", XXX, false},       // not well-formed
+		{"UUU", XXX, false},    // unknown
+		{"\u22A9", XXX, false}, // non-ASCII, printable
 
-		***REMOVED***"aaa", XXX, false***REMOVED***,
-		***REMOVED***"zzz", XXX, false***REMOVED***,
-		***REMOVED***"000", XXX, false***REMOVED***,
-		***REMOVED***"999", XXX, false***REMOVED***,
-		***REMOVED***"---", XXX, false***REMOVED***,
-		***REMOVED***"\x00\x00\x00", XXX, false***REMOVED***,
-		***REMOVED***"\xff\xff\xff", XXX, false***REMOVED***,
-	***REMOVED***
-	for i, tc := range testCases ***REMOVED***
-		if x, err := ParseISO(tc.in); x != tc.out || err == nil != tc.ok ***REMOVED***
+		{"aaa", XXX, false},
+		{"zzz", XXX, false},
+		{"000", XXX, false},
+		{"999", XXX, false},
+		{"---", XXX, false},
+		{"\x00\x00\x00", XXX, false},
+		{"\xff\xff\xff", XXX, false},
+	}
+	for i, tc := range testCases {
+		if x, err := ParseISO(tc.in); x != tc.out || err == nil != tc.ok {
 			t.Errorf("%d:%s: was %s, %v; want %s, %v", i, tc.in, x, err == nil, tc.out, tc.ok)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestFromRegion(t *testing.T) ***REMOVED***
-	testCases := []struct ***REMOVED***
+func TestFromRegion(t *testing.T) {
+	testCases := []struct {
 		region   string
 		currency Unit
 		ok       bool
-	***REMOVED******REMOVED***
-		***REMOVED***"NL", EUR, true***REMOVED***,
-		***REMOVED***"BE", EUR, true***REMOVED***,
-		***REMOVED***"AG", xcd, true***REMOVED***,
-		***REMOVED***"CH", CHF, true***REMOVED***,
-		***REMOVED***"CU", cup, true***REMOVED***,   // first of multiple
-		***REMOVED***"DG", USD, true***REMOVED***,   // does not have M49 code
-		***REMOVED***"150", XXX, false***REMOVED***, // implicit false
-		***REMOVED***"CP", XXX, false***REMOVED***,  // explicit false in CLDR
-		***REMOVED***"CS", XXX, false***REMOVED***,  // all expired
-		***REMOVED***"ZZ", XXX, false***REMOVED***,  // none match
-	***REMOVED***
-	for _, tc := range testCases ***REMOVED***
+	}{
+		{"NL", EUR, true},
+		{"BE", EUR, true},
+		{"AG", xcd, true},
+		{"CH", CHF, true},
+		{"CU", cup, true},   // first of multiple
+		{"DG", USD, true},   // does not have M49 code
+		{"150", XXX, false}, // implicit false
+		{"CP", XXX, false},  // explicit false in CLDR
+		{"CS", XXX, false},  // all expired
+		{"ZZ", XXX, false},  // none match
+	}
+	for _, tc := range testCases {
 		cur, ok := FromRegion(language.MustParseRegion(tc.region))
-		if cur != tc.currency || ok != tc.ok ***REMOVED***
+		if cur != tc.currency || ok != tc.ok {
 			t.Errorf("%s: got %v, %v; want %v, %v", tc.region, cur, ok, tc.currency, tc.ok)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestFromTag(t *testing.T) ***REMOVED***
-	testCases := []struct ***REMOVED***
+func TestFromTag(t *testing.T) {
+	testCases := []struct {
 		tag      string
 		currency Unit
 		conf     language.Confidence
-	***REMOVED******REMOVED***
-		***REMOVED***"nl", EUR, language.Low***REMOVED***,      // nl also spoken outside Euro land.
-		***REMOVED***"nl-BE", EUR, language.Exact***REMOVED***, // region is known
-		***REMOVED***"pt", BRL, language.Low***REMOVED***,
-		***REMOVED***"en", USD, language.Low***REMOVED***,
-		***REMOVED***"en-u-cu-eur", EUR, language.Exact***REMOVED***,
-		***REMOVED***"tlh", XXX, language.No***REMOVED***, // Klingon has no country.
-		***REMOVED***"es-419", XXX, language.No***REMOVED***,
-		***REMOVED***"und", USD, language.Low***REMOVED***,
-	***REMOVED***
-	for _, tc := range testCases ***REMOVED***
+	}{
+		{"nl", EUR, language.Low},      // nl also spoken outside Euro land.
+		{"nl-BE", EUR, language.Exact}, // region is known
+		{"pt", BRL, language.Low},
+		{"en", USD, language.Low},
+		{"en-u-cu-eur", EUR, language.Exact},
+		{"tlh", XXX, language.No}, // Klingon has no country.
+		{"es-419", XXX, language.No},
+		{"und", USD, language.Low},
+	}
+	for _, tc := range testCases {
 		cur, conf := FromTag(language.MustParse(tc.tag))
-		if cur != tc.currency || conf != tc.conf ***REMOVED***
+		if cur != tc.currency || conf != tc.conf {
 			t.Errorf("%s: got %v, %v; want %v, %v", tc.tag, cur, conf, tc.currency, tc.conf)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestTable(t *testing.T) ***REMOVED***
-	for i := 4; i < len(currency); i += 4 ***REMOVED***
-		if a, b := currency[i-4:i-1], currency[i:i+3]; a >= b ***REMOVED***
+func TestTable(t *testing.T) {
+	for i := 4; i < len(currency); i += 4 {
+		if a, b := currency[i-4:i-1], currency[i:i+3]; a >= b {
 			t.Errorf("currency unordered at element %d: %s >= %s", i, a, b)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	// First currency has index 1, last is numCurrencies.
-	if c := currency.Elem(1)[:3]; c != "ADP" ***REMOVED***
+	if c := currency.Elem(1)[:3]; c != "ADP" {
 		t.Errorf("first was %q; want ADP", c)
-	***REMOVED***
-	if c := currency.Elem(numCurrencies)[:3]; c != "ZWR" ***REMOVED***
+	}
+	if c := currency.Elem(numCurrencies)[:3]; c != "ZWR" {
 		t.Errorf("last was %q; want ZWR", c)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestKindRounding(t *testing.T) ***REMOVED***
-	testCases := []struct ***REMOVED***
+func TestKindRounding(t *testing.T) {
+	testCases := []struct {
 		kind  Kind
 		cur   Unit
 		scale int
 		inc   int
-	***REMOVED******REMOVED***
-		***REMOVED***Standard, USD, 2, 1***REMOVED***,
-		***REMOVED***Standard, CHF, 2, 1***REMOVED***,
-		***REMOVED***Cash, CHF, 2, 5***REMOVED***,
-		***REMOVED***Standard, TWD, 2, 1***REMOVED***,
-		***REMOVED***Cash, TWD, 0, 1***REMOVED***,
-		***REMOVED***Standard, czk, 2, 1***REMOVED***,
-		***REMOVED***Cash, czk, 0, 1***REMOVED***,
-		***REMOVED***Standard, zwr, 2, 1***REMOVED***,
-		***REMOVED***Cash, zwr, 0, 1***REMOVED***,
-		***REMOVED***Standard, KRW, 0, 1***REMOVED***,
-		***REMOVED***Cash, KRW, 0, 1***REMOVED***, // Cash defaults to standard.
-	***REMOVED***
-	for i, tc := range testCases ***REMOVED***
-		if scale, inc := tc.kind.Rounding(tc.cur); scale != tc.scale && inc != tc.inc ***REMOVED***
+	}{
+		{Standard, USD, 2, 1},
+		{Standard, CHF, 2, 1},
+		{Cash, CHF, 2, 5},
+		{Standard, TWD, 2, 1},
+		{Cash, TWD, 0, 1},
+		{Standard, czk, 2, 1},
+		{Cash, czk, 0, 1},
+		{Standard, zwr, 2, 1},
+		{Cash, zwr, 0, 1},
+		{Standard, KRW, 0, 1},
+		{Cash, KRW, 0, 1}, // Cash defaults to standard.
+	}
+	for i, tc := range testCases {
+		if scale, inc := tc.kind.Rounding(tc.cur); scale != tc.scale && inc != tc.inc {
 			t.Errorf("%d: got %d, %d; want %d, %d", i, scale, inc, tc.scale, tc.inc)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 const body = `package main
 import (
 	"fmt"
 	"golang.org/x/text/currency"
 )
-func main() ***REMOVED***
+func main() {
 	%s
-***REMOVED***
+}
 `
 
-func TestLinking(t *testing.T) ***REMOVED***
+func TestLinking(t *testing.T) {
 	base := getSize(t, `fmt.Print(currency.CLDRVersion)`)
 	symbols := getSize(t, `fmt.Print(currency.Symbol(currency.USD))`)
-	if d := symbols - base; d < 2*1024 ***REMOVED***
+	if d := symbols - base; d < 2*1024 {
 		t.Errorf("size(symbols)-size(base) was %d; want > 2K", d)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func getSize(t *testing.T, main string) int ***REMOVED***
+func getSize(t *testing.T, main string) int {
 	size, err := testtext.CodeSize(fmt.Sprintf(body, main))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Skipf("skipping link size test; binary size could not be determined: %v", err)
-	***REMOVED***
+	}
 	return size
-***REMOVED***
+}
 
-func BenchmarkString(b *testing.B) ***REMOVED***
-	for i := 0; i < b.N; i++ ***REMOVED***
+func BenchmarkString(b *testing.B) {
+	for i := 0; i < b.N; i++ {
 		USD.String()
-	***REMOVED***
-***REMOVED***
+	}
+}

@@ -1,23 +1,23 @@
 hello | hello
-hello$***REMOVED***hi***REMOVED***bye | hellobye
+hello${hi}bye | hellobye
 ENV hi=hi
-hello$***REMOVED***hi***REMOVED***bye | hellohibye
+hello${hi}bye | hellohibye
 ENV space=abc  def
-hello$***REMOVED***space***REMOVED***bye | helloabc,defbye
-hello"$***REMOVED***space***REMOVED***"bye | helloabc  defbye
-hello "$***REMOVED***space***REMOVED***"bye | hello,abc  defbye
+hello${space}bye | helloabc,defbye
+hello"${space}"bye | helloabc  defbye
+hello "${space}"bye | hello,abc  defbye
 ENV leading=  ab c
-hello$***REMOVED***leading***REMOVED***def | hello,ab,cdef
-hello"$***REMOVED***leading***REMOVED***" def | hello  ab c,def
-hello"$***REMOVED***leading***REMOVED***" | hello  ab c
-hello$***REMOVED***leading***REMOVED*** | hello,ab,c
+hello${leading}def | hello,ab,cdef
+hello"${leading}" def | hello  ab c,def
+hello"${leading}" | hello  ab c
+hello${leading} | hello,ab,c
 # next line MUST have 3 trailing spaces, don't erase them!
 ENV trailing=ab c   
-hello$***REMOVED***trailing***REMOVED*** | helloab,c
-hello$***REMOVED***trailing***REMOVED***d | helloab,c,d
-hello"$***REMOVED***trailing***REMOVED***"d | helloab c   d
+hello${trailing} | helloab,c
+hello${trailing}d | helloab,c,d
+hello"${trailing}"d | helloab c   d
 # next line MUST have 3 trailing spaces, don't erase them!
-hel"lo$***REMOVED***trailing***REMOVED***" | helloab c   
+hel"lo${trailing}" | helloab c   
 hello" there  " | hello there  
 hello there     | hello,there
 hello\ there | hello there

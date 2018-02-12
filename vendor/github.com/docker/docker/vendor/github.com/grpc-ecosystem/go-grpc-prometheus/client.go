@@ -14,59 +14,59 @@ import (
 )
 
 // UnaryClientInterceptor is a gRPC client-side interceptor that provides Prometheus monitoring for Unary RPCs.
-func UnaryClientInterceptor(ctx context.Context, method string, req, reply interface***REMOVED******REMOVED***, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error ***REMOVED***
+func UnaryClientInterceptor(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
 	monitor := newClientReporter(Unary, method)
 	monitor.SentMessage()
 	err := invoker(ctx, method, req, reply, cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		monitor.ReceivedMessage()
-	***REMOVED***
+	}
 	monitor.Handled(grpc.Code(err))
 	return err
-***REMOVED***
+}
 
 // StreamServerInterceptor is a gRPC client-side interceptor that provides Prometheus monitoring for Streaming RPCs.
-func StreamClientInterceptor(ctx context.Context, desc *grpc.StreamDesc, cc *grpc.ClientConn, method string, streamer grpc.Streamer, opts ...grpc.CallOption) (grpc.ClientStream, error) ***REMOVED***
+func StreamClientInterceptor(ctx context.Context, desc *grpc.StreamDesc, cc *grpc.ClientConn, method string, streamer grpc.Streamer, opts ...grpc.CallOption) (grpc.ClientStream, error) {
 	monitor := newClientReporter(clientStreamType(desc), method)
 	clientStream, err := streamer(ctx, desc, cc, method, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		monitor.Handled(grpc.Code(err))
 		return nil, err
-	***REMOVED***
-	return &monitoredClientStream***REMOVED***clientStream, monitor***REMOVED***, nil
-***REMOVED***
+	}
+	return &monitoredClientStream{clientStream, monitor}, nil
+}
 
-func clientStreamType(desc *grpc.StreamDesc) grpcType ***REMOVED***
-	if desc.ClientStreams && !desc.ServerStreams ***REMOVED***
+func clientStreamType(desc *grpc.StreamDesc) grpcType {
+	if desc.ClientStreams && !desc.ServerStreams {
 		return ClientStream
-	***REMOVED*** else if !desc.ClientStreams && desc.ServerStreams ***REMOVED***
+	} else if !desc.ClientStreams && desc.ServerStreams {
 		return ServerStream
-	***REMOVED***
+	}
 	return BidiStream
-***REMOVED***
+}
 
 // monitoredClientStream wraps grpc.ClientStream allowing each Sent/Recv of message to increment counters.
-type monitoredClientStream struct ***REMOVED***
+type monitoredClientStream struct {
 	grpc.ClientStream
 	monitor *clientReporter
-***REMOVED***
+}
 
-func (s *monitoredClientStream) SendMsg(m interface***REMOVED******REMOVED***) error ***REMOVED***
+func (s *monitoredClientStream) SendMsg(m interface{}) error {
 	err := s.ClientStream.SendMsg(m)
-	if err == nil ***REMOVED***
+	if err == nil {
 		s.monitor.SentMessage()
-	***REMOVED***
+	}
 	return err
-***REMOVED***
+}
 
-func (s *monitoredClientStream) RecvMsg(m interface***REMOVED******REMOVED***) error ***REMOVED***
+func (s *monitoredClientStream) RecvMsg(m interface{}) error {
 	err := s.ClientStream.RecvMsg(m)
-	if err == nil ***REMOVED***
+	if err == nil {
 		s.monitor.ReceivedMessage()
-	***REMOVED*** else if err == io.EOF ***REMOVED***
+	} else if err == io.EOF {
 		s.monitor.Handled(codes.OK)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		s.monitor.Handled(grpc.Code(err))
-	***REMOVED***
+	}
 	return err
-***REMOVED***
+}

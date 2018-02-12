@@ -6,11 +6,11 @@ import (
 	specs "github.com/opencontainers/runtime-spec/specs-go"
 )
 
-func (daemon *Daemon) execSetPlatformOpt(c *container.Container, ec *exec.Config, p *specs.Process) error ***REMOVED***
+func (daemon *Daemon) execSetPlatformOpt(c *container.Container, ec *exec.Config, p *specs.Process) error {
 	// Process arguments need to be escaped before sending to OCI.
-	if c.OS == "windows" ***REMOVED***
+	if c.OS == "windows" {
 		p.Args = escapeArgs(p.Args)
 		p.User.Username = ec.User
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

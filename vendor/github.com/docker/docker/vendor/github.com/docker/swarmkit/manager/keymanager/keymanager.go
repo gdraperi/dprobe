@@ -39,26 +39,26 @@ const (
 
 // map of subsystems and corresponding encryption algorithm. Initially only
 // AES_128 in GCM mode is supported.
-var subsysToAlgo = map[string]api.EncryptionKey_Algorithm***REMOVED***
+var subsysToAlgo = map[string]api.EncryptionKey_Algorithm{
 	SubsystemGossip: api.AES_128_GCM,
 	SubsystemIPSec:  api.AES_128_GCM,
-***REMOVED***
+}
 
-type keyRing struct ***REMOVED***
+type keyRing struct {
 	lClock uint64
 	keys   []*api.EncryptionKey
-***REMOVED***
+}
 
 // Config for the keymanager that can be modified
-type Config struct ***REMOVED***
+type Config struct {
 	ClusterName      string
 	Keylen           int
 	RotationInterval time.Duration
 	Subsystems       []string
-***REMOVED***
+}
 
 // KeyManager handles key allocation, rotation & distribution
-type KeyManager struct ***REMOVED***
+type KeyManager struct {
 	config  *Config
 	store   *store.MemoryStore
 	keyRing *keyRing
@@ -66,141 +66,141 @@ type KeyManager struct ***REMOVED***
 	cancel  context.CancelFunc
 
 	mu sync.Mutex
-***REMOVED***
+}
 
 // DefaultConfig provides the default config for keymanager
-func DefaultConfig() *Config ***REMOVED***
-	return &Config***REMOVED***
+func DefaultConfig() *Config {
+	return &Config{
 		ClusterName:      store.DefaultClusterName,
 		Keylen:           DefaultKeyLen,
 		RotationInterval: DefaultKeyRotationInterval,
-		Subsystems:       []string***REMOVED***SubsystemGossip, SubsystemIPSec***REMOVED***,
-	***REMOVED***
-***REMOVED***
+		Subsystems:       []string{SubsystemGossip, SubsystemIPSec},
+	}
+}
 
 // New creates an instance of keymanager with the given config
-func New(store *store.MemoryStore, config *Config) *KeyManager ***REMOVED***
-	for _, subsys := range config.Subsystems ***REMOVED***
-		if subsys != SubsystemGossip && subsys != SubsystemIPSec ***REMOVED***
+func New(store *store.MemoryStore, config *Config) *KeyManager {
+	for _, subsys := range config.Subsystems {
+		if subsys != SubsystemGossip && subsys != SubsystemIPSec {
 			return nil
-		***REMOVED***
-	***REMOVED***
-	return &KeyManager***REMOVED***
+		}
+	}
+	return &KeyManager{
 		config:  config,
 		store:   store,
-		keyRing: &keyRing***REMOVED***lClock: genSkew()***REMOVED***,
-	***REMOVED***
-***REMOVED***
+		keyRing: &keyRing{lClock: genSkew()},
+	}
+}
 
-func (k *KeyManager) allocateKey(ctx context.Context, subsys string) *api.EncryptionKey ***REMOVED***
+func (k *KeyManager) allocateKey(ctx context.Context, subsys string) *api.EncryptionKey {
 	key := make([]byte, k.config.Keylen)
 
 	_, err := cryptorand.Read(key)
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(errors.Wrap(err, "key generated failed"))
-	***REMOVED***
+	}
 	k.keyRing.lClock++
 
-	return &api.EncryptionKey***REMOVED***
+	return &api.EncryptionKey{
 		Subsystem:   subsys,
 		Algorithm:   subsysToAlgo[subsys],
 		Key:         key,
 		LamportTime: k.keyRing.lClock,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (k *KeyManager) updateKey(cluster *api.Cluster) error ***REMOVED***
-	return k.store.Update(func(tx store.Tx) error ***REMOVED***
+func (k *KeyManager) updateKey(cluster *api.Cluster) error {
+	return k.store.Update(func(tx store.Tx) error {
 		cluster = store.GetCluster(tx, cluster.ID)
-		if cluster == nil ***REMOVED***
+		if cluster == nil {
 			return nil
-		***REMOVED***
+		}
 		cluster.EncryptionKeyLamportClock = k.keyRing.lClock
 		cluster.NetworkBootstrapKeys = k.keyRing.keys
 		return store.UpdateCluster(tx, cluster)
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func (k *KeyManager) rotateKey(ctx context.Context) error ***REMOVED***
+func (k *KeyManager) rotateKey(ctx context.Context) error {
 	var (
 		clusters []*api.Cluster
 		err      error
 	)
-	k.store.View(func(readTx store.ReadTx) ***REMOVED***
+	k.store.View(func(readTx store.ReadTx) {
 		clusters, err = store.FindClusters(readTx, store.ByName(k.config.ClusterName))
-	***REMOVED***)
+	})
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.G(ctx).Errorf("reading cluster config failed, %v", err)
 		return err
-	***REMOVED***
+	}
 
 	cluster := clusters[0]
-	if len(cluster.NetworkBootstrapKeys) == 0 ***REMOVED***
+	if len(cluster.NetworkBootstrapKeys) == 0 {
 		panic(errors.New("no key in the cluster config"))
-	***REMOVED***
+	}
 
-	subsysKeys := map[string][]*api.EncryptionKey***REMOVED******REMOVED***
-	for _, key := range k.keyRing.keys ***REMOVED***
+	subsysKeys := map[string][]*api.EncryptionKey{}
+	for _, key := range k.keyRing.keys {
 		subsysKeys[key.Subsystem] = append(subsysKeys[key.Subsystem], key)
-	***REMOVED***
-	k.keyRing.keys = []*api.EncryptionKey***REMOVED******REMOVED***
+	}
+	k.keyRing.keys = []*api.EncryptionKey{}
 
 	// We maintain the latest key and the one before in the key ring to allow
 	// agents to communicate without disruption on key change.
-	for subsys, keys := range subsysKeys ***REMOVED***
-		if len(keys) == keyringSize ***REMOVED***
+	for subsys, keys := range subsysKeys {
+		if len(keys) == keyringSize {
 			min := 0
-			for i, key := range keys[1:] ***REMOVED***
-				if key.LamportTime < keys[min].LamportTime ***REMOVED***
+			for i, key := range keys[1:] {
+				if key.LamportTime < keys[min].LamportTime {
 					min = i
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			keys = append(keys[0:min], keys[min+1:]...)
-		***REMOVED***
+		}
 		keys = append(keys, k.allocateKey(ctx, subsys))
 		subsysKeys[subsys] = keys
-	***REMOVED***
+	}
 
-	for _, keys := range subsysKeys ***REMOVED***
+	for _, keys := range subsysKeys {
 		k.keyRing.keys = append(k.keyRing.keys, keys...)
-	***REMOVED***
+	}
 
 	return k.updateKey(cluster)
-***REMOVED***
+}
 
 // Run starts the keymanager, it doesn't return
-func (k *KeyManager) Run(ctx context.Context) error ***REMOVED***
+func (k *KeyManager) Run(ctx context.Context) error {
 	k.mu.Lock()
 	ctx = log.WithModule(ctx, "keymanager")
 	var (
 		clusters []*api.Cluster
 		err      error
 	)
-	k.store.View(func(readTx store.ReadTx) ***REMOVED***
+	k.store.View(func(readTx store.ReadTx) {
 		clusters, err = store.FindClusters(readTx, store.ByName(k.config.ClusterName))
-	***REMOVED***)
+	})
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.G(ctx).Errorf("reading cluster config failed, %v", err)
 		k.mu.Unlock()
 		return err
-	***REMOVED***
+	}
 
 	cluster := clusters[0]
-	if len(cluster.NetworkBootstrapKeys) == 0 ***REMOVED***
-		for _, subsys := range k.config.Subsystems ***REMOVED***
-			for i := 0; i < keyringSize; i++ ***REMOVED***
+	if len(cluster.NetworkBootstrapKeys) == 0 {
+		for _, subsys := range k.config.Subsystems {
+			for i := 0; i < keyringSize; i++ {
 				k.keyRing.keys = append(k.keyRing.keys, k.allocateKey(ctx, subsys))
-			***REMOVED***
-		***REMOVED***
-		if err := k.updateKey(cluster); err != nil ***REMOVED***
+			}
+		}
+		if err := k.updateKey(cluster); err != nil {
 			log.G(ctx).Errorf("store update failed %v", err)
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
+		}
+	} else {
 		k.keyRing.lClock = cluster.EncryptionKeyLamportClock
 		k.keyRing.keys = cluster.NetworkBootstrapKeys
-	***REMOVED***
+	}
 
 	ticker := time.NewTicker(k.config.RotationInterval)
 	defer ticker.Stop()
@@ -208,32 +208,32 @@ func (k *KeyManager) Run(ctx context.Context) error ***REMOVED***
 	k.ctx, k.cancel = context.WithCancel(ctx)
 	k.mu.Unlock()
 
-	for ***REMOVED***
-		select ***REMOVED***
+	for {
+		select {
 		case <-ticker.C:
 			k.rotateKey(ctx)
 		case <-k.ctx.Done():
 			return nil
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // Stop stops the running instance of key manager
-func (k *KeyManager) Stop() error ***REMOVED***
+func (k *KeyManager) Stop() error {
 	k.mu.Lock()
 	defer k.mu.Unlock()
-	if k.cancel == nil ***REMOVED***
+	if k.cancel == nil {
 		return errors.New("keymanager is not started")
-	***REMOVED***
+	}
 	k.cancel()
 	return nil
-***REMOVED***
+}
 
 // genSkew generates a random uint64 number between 0 and 65535
-func genSkew() uint64 ***REMOVED***
+func genSkew() uint64 {
 	b := make([]byte, 2)
-	if _, err := cryptorand.Read(b); err != nil ***REMOVED***
+	if _, err := cryptorand.Read(b); err != nil {
 		panic(err)
-	***REMOVED***
+	}
 	return uint64(binary.BigEndian.Uint16(b))
-***REMOVED***
+}

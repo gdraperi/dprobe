@@ -13,7 +13,7 @@ import (
 // An Option configures an Index.
 type Option func(*options)
 
-type options struct ***REMOVED***
+type options struct {
 	parent *Index
 
 	name  string
@@ -21,20 +21,20 @@ type options struct ***REMOVED***
 
 	sharedType  *typeInfo
 	sharedEnums *enum
-***REMOVED***
+}
 
-func (o *options) fill(opt []Option) ***REMOVED***
-	for _, f := range opt ***REMOVED***
+func (o *options) fill(opt []Option) {
+	for _, f := range opt {
 		f(o)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // aliasOpt sets an alias from the given node, if the node defines one.
-func (o *options) setAlias(n Element) ***REMOVED***
-	if n != nil && !reflect.ValueOf(n).IsNil() ***REMOVED***
+func (o *options) setAlias(n Element) {
+	if n != nil && !reflect.ValueOf(n).IsNil() {
 		o.alias = n.GetCommon()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Enum defines a enumeration type. The resulting option may be passed for the
 // construction of multiple Indexes, which they will share the same enum values.
@@ -42,45 +42,45 @@ func (o *options) setAlias(n Element) ***REMOVED***
 // optional values fix the values for the given identifier to the argument
 // position (starting at 0). Other values may still be added and will be
 // assigned to subsequent values.
-func Enum(name string, value ...string) Option ***REMOVED***
+func Enum(name string, value ...string) Option {
 	return EnumFunc(name, nil, value...)
-***REMOVED***
+}
 
 // EnumFunc is like Enum but also takes a function that allows rewriting keys.
-func EnumFunc(name string, rename func(string) string, value ...string) Option ***REMOVED***
-	enum := &enum***REMOVED***name: name, rename: rename, keyMap: map[string]enumIndex***REMOVED******REMOVED******REMOVED***
-	for _, e := range value ***REMOVED***
+func EnumFunc(name string, rename func(string) string, value ...string) Option {
+	enum := &enum{name: name, rename: rename, keyMap: map[string]enumIndex{}}
+	for _, e := range value {
 		enum.lookup(e)
-	***REMOVED***
-	return func(o *options) ***REMOVED***
+	}
+	return func(o *options) {
 		found := false
-		for _, e := range o.parent.meta.b.enums ***REMOVED***
-			if e.name == enum.name ***REMOVED***
+		for _, e := range o.parent.meta.b.enums {
+			if e.name == enum.name {
 				found = true
 				break
-			***REMOVED***
-		***REMOVED***
-		if !found ***REMOVED***
+			}
+		}
+		if !found {
 			o.parent.meta.b.enums = append(o.parent.meta.b.enums, enum)
-		***REMOVED***
+		}
 		o.sharedEnums = enum
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // SharedType returns an option which causes all Indexes to which this option is
 // passed to have the same type.
-func SharedType() Option ***REMOVED***
-	info := &typeInfo***REMOVED******REMOVED***
-	return func(o *options) ***REMOVED*** o.sharedType = info ***REMOVED***
-***REMOVED***
+func SharedType() Option {
+	info := &typeInfo{}
+	return func(o *options) { o.sharedType = info }
+}
 
-func useSharedType() Option ***REMOVED***
-	return func(o *options) ***REMOVED***
+func useSharedType() Option {
+	return func(o *options) {
 		sub := o.parent.meta.typeInfo.keyTypeInfo
-		if sub == nil ***REMOVED***
-			sub = &typeInfo***REMOVED******REMOVED***
+		if sub == nil {
+			sub = &typeInfo{}
 			o.parent.meta.typeInfo.keyTypeInfo = sub
-		***REMOVED***
+		}
 		o.sharedType = sub
-	***REMOVED***
-***REMOVED***
+	}
+}

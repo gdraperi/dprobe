@@ -11,369 +11,369 @@ import (
 	"testing"
 )
 
-func defaultPriorityWriteScheduler() *priorityWriteScheduler ***REMOVED***
+func defaultPriorityWriteScheduler() *priorityWriteScheduler {
 	return NewPriorityWriteScheduler(nil).(*priorityWriteScheduler)
-***REMOVED***
+}
 
-func checkPriorityWellFormed(ws *priorityWriteScheduler) error ***REMOVED***
-	for id, n := range ws.nodes ***REMOVED***
-		if id != n.id ***REMOVED***
+func checkPriorityWellFormed(ws *priorityWriteScheduler) error {
+	for id, n := range ws.nodes {
+		if id != n.id {
 			return fmt.Errorf("bad ws.nodes: ws.nodes[%d] = %d", id, n.id)
-		***REMOVED***
-		if n.parent == nil ***REMOVED***
-			if n.next != nil || n.prev != nil ***REMOVED***
+		}
+		if n.parent == nil {
+			if n.next != nil || n.prev != nil {
 				return fmt.Errorf("bad node %d: nil parent but prev/next not nil", id)
-			***REMOVED***
+			}
 			continue
-		***REMOVED***
+		}
 		found := false
-		for k := n.parent.kids; k != nil; k = k.next ***REMOVED***
-			if k.id == id ***REMOVED***
+		for k := n.parent.kids; k != nil; k = k.next {
+			if k.id == id {
 				found = true
 				break
-			***REMOVED***
-		***REMOVED***
-		if !found ***REMOVED***
+			}
+		}
+		if !found {
 			return fmt.Errorf("bad node %d: not found in parent %d kids list", id, n.parent.id)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func fmtTree(ws *priorityWriteScheduler, fmtNode func(*priorityNode) string) string ***REMOVED***
+func fmtTree(ws *priorityWriteScheduler, fmtNode func(*priorityNode) string) string {
 	var ids []int
-	for _, n := range ws.nodes ***REMOVED***
+	for _, n := range ws.nodes {
 		ids = append(ids, int(n.id))
-	***REMOVED***
+	}
 	sort.Ints(ids)
 
 	var buf bytes.Buffer
-	for _, id := range ids ***REMOVED***
-		if buf.Len() != 0 ***REMOVED***
+	for _, id := range ids {
+		if buf.Len() != 0 {
 			buf.WriteString(" ")
-		***REMOVED***
-		if id == 0 ***REMOVED***
+		}
+		if id == 0 {
 			buf.WriteString(fmtNode(&ws.root))
-		***REMOVED*** else ***REMOVED***
+		} else {
 			buf.WriteString(fmtNode(ws.nodes[uint32(id)]))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return buf.String()
-***REMOVED***
+}
 
-func fmtNodeParentSkipRoot(n *priorityNode) string ***REMOVED***
-	switch ***REMOVED***
+func fmtNodeParentSkipRoot(n *priorityNode) string {
+	switch {
 	case n.id == 0:
 		return ""
 	case n.parent == nil:
-		return fmt.Sprintf("%d***REMOVED***parent:nil***REMOVED***", n.id)
+		return fmt.Sprintf("%d{parent:nil}", n.id)
 	default:
-		return fmt.Sprintf("%d***REMOVED***parent:%d***REMOVED***", n.id, n.parent.id)
-	***REMOVED***
-***REMOVED***
+		return fmt.Sprintf("%d{parent:%d}", n.id, n.parent.id)
+	}
+}
 
-func fmtNodeWeightParentSkipRoot(n *priorityNode) string ***REMOVED***
-	switch ***REMOVED***
+func fmtNodeWeightParentSkipRoot(n *priorityNode) string {
+	switch {
 	case n.id == 0:
 		return ""
 	case n.parent == nil:
-		return fmt.Sprintf("%d***REMOVED***weight:%d,parent:nil***REMOVED***", n.id, n.weight)
+		return fmt.Sprintf("%d{weight:%d,parent:nil}", n.id, n.weight)
 	default:
-		return fmt.Sprintf("%d***REMOVED***weight:%d,parent:%d***REMOVED***", n.id, n.weight, n.parent.id)
-	***REMOVED***
-***REMOVED***
+		return fmt.Sprintf("%d{weight:%d,parent:%d}", n.id, n.weight, n.parent.id)
+	}
+}
 
-func TestPriorityTwoStreams(t *testing.T) ***REMOVED***
+func TestPriorityTwoStreams(t *testing.T) {
 	ws := defaultPriorityWriteScheduler()
-	ws.OpenStream(1, OpenStreamOptions***REMOVED******REMOVED***)
-	ws.OpenStream(2, OpenStreamOptions***REMOVED******REMOVED***)
+	ws.OpenStream(1, OpenStreamOptions{})
+	ws.OpenStream(2, OpenStreamOptions{})
 
-	want := "1***REMOVED***weight:15,parent:0***REMOVED*** 2***REMOVED***weight:15,parent:0***REMOVED***"
-	if got := fmtTree(ws, fmtNodeWeightParentSkipRoot); got != want ***REMOVED***
+	want := "1{weight:15,parent:0} 2{weight:15,parent:0}"
+	if got := fmtTree(ws, fmtNodeWeightParentSkipRoot); got != want {
 		t.Errorf("After open\ngot  %q\nwant %q", got, want)
-	***REMOVED***
+	}
 
 	// Move 1's parent to 2.
-	ws.AdjustStream(1, PriorityParam***REMOVED***
+	ws.AdjustStream(1, PriorityParam{
 		StreamDep: 2,
 		Weight:    32,
 		Exclusive: false,
-	***REMOVED***)
-	want = "1***REMOVED***weight:32,parent:2***REMOVED*** 2***REMOVED***weight:15,parent:0***REMOVED***"
-	if got := fmtTree(ws, fmtNodeWeightParentSkipRoot); got != want ***REMOVED***
+	})
+	want = "1{weight:32,parent:2} 2{weight:15,parent:0}"
+	if got := fmtTree(ws, fmtNodeWeightParentSkipRoot); got != want {
 		t.Errorf("After adjust\ngot  %q\nwant %q", got, want)
-	***REMOVED***
+	}
 
-	if err := checkPriorityWellFormed(ws); err != nil ***REMOVED***
+	if err := checkPriorityWellFormed(ws); err != nil {
 		t.Error(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestPriorityAdjustExclusiveZero(t *testing.T) ***REMOVED***
+func TestPriorityAdjustExclusiveZero(t *testing.T) {
 	// 1, 2, and 3 are all children of the 0 stream.
 	// Exclusive reprioritization to any of the streams should bring
 	// the rest of the streams under the reprioritized stream.
 	ws := defaultPriorityWriteScheduler()
-	ws.OpenStream(1, OpenStreamOptions***REMOVED******REMOVED***)
-	ws.OpenStream(2, OpenStreamOptions***REMOVED******REMOVED***)
-	ws.OpenStream(3, OpenStreamOptions***REMOVED******REMOVED***)
+	ws.OpenStream(1, OpenStreamOptions{})
+	ws.OpenStream(2, OpenStreamOptions{})
+	ws.OpenStream(3, OpenStreamOptions{})
 
-	want := "1***REMOVED***weight:15,parent:0***REMOVED*** 2***REMOVED***weight:15,parent:0***REMOVED*** 3***REMOVED***weight:15,parent:0***REMOVED***"
-	if got := fmtTree(ws, fmtNodeWeightParentSkipRoot); got != want ***REMOVED***
+	want := "1{weight:15,parent:0} 2{weight:15,parent:0} 3{weight:15,parent:0}"
+	if got := fmtTree(ws, fmtNodeWeightParentSkipRoot); got != want {
 		t.Errorf("After open\ngot  %q\nwant %q", got, want)
-	***REMOVED***
+	}
 
-	ws.AdjustStream(2, PriorityParam***REMOVED***
+	ws.AdjustStream(2, PriorityParam{
 		StreamDep: 0,
 		Weight:    20,
 		Exclusive: true,
-	***REMOVED***)
-	want = "1***REMOVED***weight:15,parent:2***REMOVED*** 2***REMOVED***weight:20,parent:0***REMOVED*** 3***REMOVED***weight:15,parent:2***REMOVED***"
-	if got := fmtTree(ws, fmtNodeWeightParentSkipRoot); got != want ***REMOVED***
+	})
+	want = "1{weight:15,parent:2} 2{weight:20,parent:0} 3{weight:15,parent:2}"
+	if got := fmtTree(ws, fmtNodeWeightParentSkipRoot); got != want {
 		t.Errorf("After adjust\ngot  %q\nwant %q", got, want)
-	***REMOVED***
+	}
 
-	if err := checkPriorityWellFormed(ws); err != nil ***REMOVED***
+	if err := checkPriorityWellFormed(ws); err != nil {
 		t.Error(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestPriorityAdjustOwnParent(t *testing.T) ***REMOVED***
+func TestPriorityAdjustOwnParent(t *testing.T) {
 	// Assigning a node as its own parent should have no effect.
 	ws := defaultPriorityWriteScheduler()
-	ws.OpenStream(1, OpenStreamOptions***REMOVED******REMOVED***)
-	ws.OpenStream(2, OpenStreamOptions***REMOVED******REMOVED***)
-	ws.AdjustStream(2, PriorityParam***REMOVED***
+	ws.OpenStream(1, OpenStreamOptions{})
+	ws.OpenStream(2, OpenStreamOptions{})
+	ws.AdjustStream(2, PriorityParam{
 		StreamDep: 2,
 		Weight:    20,
 		Exclusive: true,
-	***REMOVED***)
-	want := "1***REMOVED***weight:15,parent:0***REMOVED*** 2***REMOVED***weight:15,parent:0***REMOVED***"
-	if got := fmtTree(ws, fmtNodeWeightParentSkipRoot); got != want ***REMOVED***
+	})
+	want := "1{weight:15,parent:0} 2{weight:15,parent:0}"
+	if got := fmtTree(ws, fmtNodeWeightParentSkipRoot); got != want {
 		t.Errorf("After adjust\ngot  %q\nwant %q", got, want)
-	***REMOVED***
-	if err := checkPriorityWellFormed(ws); err != nil ***REMOVED***
+	}
+	if err := checkPriorityWellFormed(ws); err != nil {
 		t.Error(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestPriorityClosedStreams(t *testing.T) ***REMOVED***
-	ws := NewPriorityWriteScheduler(&PriorityWriteSchedulerConfig***REMOVED***MaxClosedNodesInTree: 2***REMOVED***).(*priorityWriteScheduler)
-	ws.OpenStream(1, OpenStreamOptions***REMOVED******REMOVED***)
-	ws.OpenStream(2, OpenStreamOptions***REMOVED***PusherID: 1***REMOVED***)
-	ws.OpenStream(3, OpenStreamOptions***REMOVED***PusherID: 2***REMOVED***)
-	ws.OpenStream(4, OpenStreamOptions***REMOVED***PusherID: 3***REMOVED***)
+func TestPriorityClosedStreams(t *testing.T) {
+	ws := NewPriorityWriteScheduler(&PriorityWriteSchedulerConfig{MaxClosedNodesInTree: 2}).(*priorityWriteScheduler)
+	ws.OpenStream(1, OpenStreamOptions{})
+	ws.OpenStream(2, OpenStreamOptions{PusherID: 1})
+	ws.OpenStream(3, OpenStreamOptions{PusherID: 2})
+	ws.OpenStream(4, OpenStreamOptions{PusherID: 3})
 
 	// Close the first three streams. We lose 1, but keep 2 and 3.
 	ws.CloseStream(1)
 	ws.CloseStream(2)
 	ws.CloseStream(3)
 
-	want := "2***REMOVED***weight:15,parent:0***REMOVED*** 3***REMOVED***weight:15,parent:2***REMOVED*** 4***REMOVED***weight:15,parent:3***REMOVED***"
-	if got := fmtTree(ws, fmtNodeWeightParentSkipRoot); got != want ***REMOVED***
+	want := "2{weight:15,parent:0} 3{weight:15,parent:2} 4{weight:15,parent:3}"
+	if got := fmtTree(ws, fmtNodeWeightParentSkipRoot); got != want {
 		t.Errorf("After close\ngot  %q\nwant %q", got, want)
-	***REMOVED***
-	if err := checkPriorityWellFormed(ws); err != nil ***REMOVED***
+	}
+	if err := checkPriorityWellFormed(ws); err != nil {
 		t.Error(err)
-	***REMOVED***
+	}
 
 	// Adding a stream as an exclusive child of 1 gives it default
 	// priorities, since 1 is gone.
-	ws.OpenStream(5, OpenStreamOptions***REMOVED******REMOVED***)
-	ws.AdjustStream(5, PriorityParam***REMOVED***StreamDep: 1, Weight: 15, Exclusive: true***REMOVED***)
+	ws.OpenStream(5, OpenStreamOptions{})
+	ws.AdjustStream(5, PriorityParam{StreamDep: 1, Weight: 15, Exclusive: true})
 
 	// Adding a stream as an exclusive child of 2 should work, since 2 is not gone.
-	ws.OpenStream(6, OpenStreamOptions***REMOVED******REMOVED***)
-	ws.AdjustStream(6, PriorityParam***REMOVED***StreamDep: 2, Weight: 15, Exclusive: true***REMOVED***)
+	ws.OpenStream(6, OpenStreamOptions{})
+	ws.AdjustStream(6, PriorityParam{StreamDep: 2, Weight: 15, Exclusive: true})
 
-	want = "2***REMOVED***weight:15,parent:0***REMOVED*** 3***REMOVED***weight:15,parent:6***REMOVED*** 4***REMOVED***weight:15,parent:3***REMOVED*** 5***REMOVED***weight:15,parent:0***REMOVED*** 6***REMOVED***weight:15,parent:2***REMOVED***"
-	if got := fmtTree(ws, fmtNodeWeightParentSkipRoot); got != want ***REMOVED***
+	want = "2{weight:15,parent:0} 3{weight:15,parent:6} 4{weight:15,parent:3} 5{weight:15,parent:0} 6{weight:15,parent:2}"
+	if got := fmtTree(ws, fmtNodeWeightParentSkipRoot); got != want {
 		t.Errorf("After add streams\ngot  %q\nwant %q", got, want)
-	***REMOVED***
-	if err := checkPriorityWellFormed(ws); err != nil ***REMOVED***
+	}
+	if err := checkPriorityWellFormed(ws); err != nil {
 		t.Error(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestPriorityClosedStreamsDisabled(t *testing.T) ***REMOVED***
-	ws := NewPriorityWriteScheduler(&PriorityWriteSchedulerConfig***REMOVED******REMOVED***).(*priorityWriteScheduler)
-	ws.OpenStream(1, OpenStreamOptions***REMOVED******REMOVED***)
-	ws.OpenStream(2, OpenStreamOptions***REMOVED***PusherID: 1***REMOVED***)
-	ws.OpenStream(3, OpenStreamOptions***REMOVED***PusherID: 2***REMOVED***)
+func TestPriorityClosedStreamsDisabled(t *testing.T) {
+	ws := NewPriorityWriteScheduler(&PriorityWriteSchedulerConfig{}).(*priorityWriteScheduler)
+	ws.OpenStream(1, OpenStreamOptions{})
+	ws.OpenStream(2, OpenStreamOptions{PusherID: 1})
+	ws.OpenStream(3, OpenStreamOptions{PusherID: 2})
 
 	// Close the first two streams. We keep only 3.
 	ws.CloseStream(1)
 	ws.CloseStream(2)
 
-	want := "3***REMOVED***weight:15,parent:0***REMOVED***"
-	if got := fmtTree(ws, fmtNodeWeightParentSkipRoot); got != want ***REMOVED***
+	want := "3{weight:15,parent:0}"
+	if got := fmtTree(ws, fmtNodeWeightParentSkipRoot); got != want {
 		t.Errorf("After close\ngot  %q\nwant %q", got, want)
-	***REMOVED***
-	if err := checkPriorityWellFormed(ws); err != nil ***REMOVED***
+	}
+	if err := checkPriorityWellFormed(ws); err != nil {
 		t.Error(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestPriorityIdleStreams(t *testing.T) ***REMOVED***
-	ws := NewPriorityWriteScheduler(&PriorityWriteSchedulerConfig***REMOVED***MaxIdleNodesInTree: 2***REMOVED***).(*priorityWriteScheduler)
-	ws.AdjustStream(1, PriorityParam***REMOVED***StreamDep: 0, Weight: 15***REMOVED***) // idle
-	ws.AdjustStream(2, PriorityParam***REMOVED***StreamDep: 0, Weight: 15***REMOVED***) // idle
-	ws.AdjustStream(3, PriorityParam***REMOVED***StreamDep: 2, Weight: 20***REMOVED***) // idle
-	ws.OpenStream(4, OpenStreamOptions***REMOVED******REMOVED***)
-	ws.OpenStream(5, OpenStreamOptions***REMOVED******REMOVED***)
-	ws.OpenStream(6, OpenStreamOptions***REMOVED******REMOVED***)
-	ws.AdjustStream(4, PriorityParam***REMOVED***StreamDep: 1, Weight: 15***REMOVED***)
-	ws.AdjustStream(5, PriorityParam***REMOVED***StreamDep: 2, Weight: 15***REMOVED***)
-	ws.AdjustStream(6, PriorityParam***REMOVED***StreamDep: 3, Weight: 15***REMOVED***)
+func TestPriorityIdleStreams(t *testing.T) {
+	ws := NewPriorityWriteScheduler(&PriorityWriteSchedulerConfig{MaxIdleNodesInTree: 2}).(*priorityWriteScheduler)
+	ws.AdjustStream(1, PriorityParam{StreamDep: 0, Weight: 15}) // idle
+	ws.AdjustStream(2, PriorityParam{StreamDep: 0, Weight: 15}) // idle
+	ws.AdjustStream(3, PriorityParam{StreamDep: 2, Weight: 20}) // idle
+	ws.OpenStream(4, OpenStreamOptions{})
+	ws.OpenStream(5, OpenStreamOptions{})
+	ws.OpenStream(6, OpenStreamOptions{})
+	ws.AdjustStream(4, PriorityParam{StreamDep: 1, Weight: 15})
+	ws.AdjustStream(5, PriorityParam{StreamDep: 2, Weight: 15})
+	ws.AdjustStream(6, PriorityParam{StreamDep: 3, Weight: 15})
 
-	want := "2***REMOVED***weight:15,parent:0***REMOVED*** 3***REMOVED***weight:20,parent:2***REMOVED*** 4***REMOVED***weight:15,parent:0***REMOVED*** 5***REMOVED***weight:15,parent:2***REMOVED*** 6***REMOVED***weight:15,parent:3***REMOVED***"
-	if got := fmtTree(ws, fmtNodeWeightParentSkipRoot); got != want ***REMOVED***
+	want := "2{weight:15,parent:0} 3{weight:20,parent:2} 4{weight:15,parent:0} 5{weight:15,parent:2} 6{weight:15,parent:3}"
+	if got := fmtTree(ws, fmtNodeWeightParentSkipRoot); got != want {
 		t.Errorf("After open\ngot  %q\nwant %q", got, want)
-	***REMOVED***
-	if err := checkPriorityWellFormed(ws); err != nil ***REMOVED***
+	}
+	if err := checkPriorityWellFormed(ws); err != nil {
 		t.Error(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestPriorityIdleStreamsDisabled(t *testing.T) ***REMOVED***
-	ws := NewPriorityWriteScheduler(&PriorityWriteSchedulerConfig***REMOVED******REMOVED***).(*priorityWriteScheduler)
-	ws.AdjustStream(1, PriorityParam***REMOVED***StreamDep: 0, Weight: 15***REMOVED***) // idle
-	ws.AdjustStream(2, PriorityParam***REMOVED***StreamDep: 0, Weight: 15***REMOVED***) // idle
-	ws.AdjustStream(3, PriorityParam***REMOVED***StreamDep: 2, Weight: 20***REMOVED***) // idle
-	ws.OpenStream(4, OpenStreamOptions***REMOVED******REMOVED***)
+func TestPriorityIdleStreamsDisabled(t *testing.T) {
+	ws := NewPriorityWriteScheduler(&PriorityWriteSchedulerConfig{}).(*priorityWriteScheduler)
+	ws.AdjustStream(1, PriorityParam{StreamDep: 0, Weight: 15}) // idle
+	ws.AdjustStream(2, PriorityParam{StreamDep: 0, Weight: 15}) // idle
+	ws.AdjustStream(3, PriorityParam{StreamDep: 2, Weight: 20}) // idle
+	ws.OpenStream(4, OpenStreamOptions{})
 
-	want := "4***REMOVED***weight:15,parent:0***REMOVED***"
-	if got := fmtTree(ws, fmtNodeWeightParentSkipRoot); got != want ***REMOVED***
+	want := "4{weight:15,parent:0}"
+	if got := fmtTree(ws, fmtNodeWeightParentSkipRoot); got != want {
 		t.Errorf("After open\ngot  %q\nwant %q", got, want)
-	***REMOVED***
-	if err := checkPriorityWellFormed(ws); err != nil ***REMOVED***
+	}
+	if err := checkPriorityWellFormed(ws); err != nil {
 		t.Error(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestPrioritySection531NonExclusive(t *testing.T) ***REMOVED***
+func TestPrioritySection531NonExclusive(t *testing.T) {
 	// Example from RFC 7540 Section 5.3.1.
 	// A,B,C,D = 1,2,3,4
 	ws := defaultPriorityWriteScheduler()
-	ws.OpenStream(1, OpenStreamOptions***REMOVED******REMOVED***)
-	ws.OpenStream(2, OpenStreamOptions***REMOVED***PusherID: 1***REMOVED***)
-	ws.OpenStream(3, OpenStreamOptions***REMOVED***PusherID: 1***REMOVED***)
-	ws.OpenStream(4, OpenStreamOptions***REMOVED******REMOVED***)
-	ws.AdjustStream(4, PriorityParam***REMOVED***
+	ws.OpenStream(1, OpenStreamOptions{})
+	ws.OpenStream(2, OpenStreamOptions{PusherID: 1})
+	ws.OpenStream(3, OpenStreamOptions{PusherID: 1})
+	ws.OpenStream(4, OpenStreamOptions{})
+	ws.AdjustStream(4, PriorityParam{
 		StreamDep: 1,
 		Weight:    15,
 		Exclusive: false,
-	***REMOVED***)
-	want := "1***REMOVED***parent:0***REMOVED*** 2***REMOVED***parent:1***REMOVED*** 3***REMOVED***parent:1***REMOVED*** 4***REMOVED***parent:1***REMOVED***"
-	if got := fmtTree(ws, fmtNodeParentSkipRoot); got != want ***REMOVED***
+	})
+	want := "1{parent:0} 2{parent:1} 3{parent:1} 4{parent:1}"
+	if got := fmtTree(ws, fmtNodeParentSkipRoot); got != want {
 		t.Errorf("After adjust\ngot  %q\nwant %q", got, want)
-	***REMOVED***
-	if err := checkPriorityWellFormed(ws); err != nil ***REMOVED***
+	}
+	if err := checkPriorityWellFormed(ws); err != nil {
 		t.Error(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestPrioritySection531Exclusive(t *testing.T) ***REMOVED***
+func TestPrioritySection531Exclusive(t *testing.T) {
 	// Example from RFC 7540 Section 5.3.1.
 	// A,B,C,D = 1,2,3,4
 	ws := defaultPriorityWriteScheduler()
-	ws.OpenStream(1, OpenStreamOptions***REMOVED******REMOVED***)
-	ws.OpenStream(2, OpenStreamOptions***REMOVED***PusherID: 1***REMOVED***)
-	ws.OpenStream(3, OpenStreamOptions***REMOVED***PusherID: 1***REMOVED***)
-	ws.OpenStream(4, OpenStreamOptions***REMOVED******REMOVED***)
-	ws.AdjustStream(4, PriorityParam***REMOVED***
+	ws.OpenStream(1, OpenStreamOptions{})
+	ws.OpenStream(2, OpenStreamOptions{PusherID: 1})
+	ws.OpenStream(3, OpenStreamOptions{PusherID: 1})
+	ws.OpenStream(4, OpenStreamOptions{})
+	ws.AdjustStream(4, PriorityParam{
 		StreamDep: 1,
 		Weight:    15,
 		Exclusive: true,
-	***REMOVED***)
-	want := "1***REMOVED***parent:0***REMOVED*** 2***REMOVED***parent:4***REMOVED*** 3***REMOVED***parent:4***REMOVED*** 4***REMOVED***parent:1***REMOVED***"
-	if got := fmtTree(ws, fmtNodeParentSkipRoot); got != want ***REMOVED***
+	})
+	want := "1{parent:0} 2{parent:4} 3{parent:4} 4{parent:1}"
+	if got := fmtTree(ws, fmtNodeParentSkipRoot); got != want {
 		t.Errorf("After adjust\ngot  %q\nwant %q", got, want)
-	***REMOVED***
-	if err := checkPriorityWellFormed(ws); err != nil ***REMOVED***
+	}
+	if err := checkPriorityWellFormed(ws); err != nil {
 		t.Error(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func makeSection533Tree() *priorityWriteScheduler ***REMOVED***
+func makeSection533Tree() *priorityWriteScheduler {
 	// Initial tree from RFC 7540 Section 5.3.3.
 	// A,B,C,D,E,F = 1,2,3,4,5,6
 	ws := defaultPriorityWriteScheduler()
-	ws.OpenStream(1, OpenStreamOptions***REMOVED******REMOVED***)
-	ws.OpenStream(2, OpenStreamOptions***REMOVED***PusherID: 1***REMOVED***)
-	ws.OpenStream(3, OpenStreamOptions***REMOVED***PusherID: 1***REMOVED***)
-	ws.OpenStream(4, OpenStreamOptions***REMOVED***PusherID: 3***REMOVED***)
-	ws.OpenStream(5, OpenStreamOptions***REMOVED***PusherID: 3***REMOVED***)
-	ws.OpenStream(6, OpenStreamOptions***REMOVED***PusherID: 4***REMOVED***)
+	ws.OpenStream(1, OpenStreamOptions{})
+	ws.OpenStream(2, OpenStreamOptions{PusherID: 1})
+	ws.OpenStream(3, OpenStreamOptions{PusherID: 1})
+	ws.OpenStream(4, OpenStreamOptions{PusherID: 3})
+	ws.OpenStream(5, OpenStreamOptions{PusherID: 3})
+	ws.OpenStream(6, OpenStreamOptions{PusherID: 4})
 	return ws
-***REMOVED***
+}
 
-func TestPrioritySection533NonExclusive(t *testing.T) ***REMOVED***
+func TestPrioritySection533NonExclusive(t *testing.T) {
 	// Example from RFC 7540 Section 5.3.3.
 	// A,B,C,D,E,F = 1,2,3,4,5,6
 	ws := defaultPriorityWriteScheduler()
-	ws.OpenStream(1, OpenStreamOptions***REMOVED******REMOVED***)
-	ws.OpenStream(2, OpenStreamOptions***REMOVED***PusherID: 1***REMOVED***)
-	ws.OpenStream(3, OpenStreamOptions***REMOVED***PusherID: 1***REMOVED***)
-	ws.OpenStream(4, OpenStreamOptions***REMOVED***PusherID: 3***REMOVED***)
-	ws.OpenStream(5, OpenStreamOptions***REMOVED***PusherID: 3***REMOVED***)
-	ws.OpenStream(6, OpenStreamOptions***REMOVED***PusherID: 4***REMOVED***)
-	ws.AdjustStream(1, PriorityParam***REMOVED***
+	ws.OpenStream(1, OpenStreamOptions{})
+	ws.OpenStream(2, OpenStreamOptions{PusherID: 1})
+	ws.OpenStream(3, OpenStreamOptions{PusherID: 1})
+	ws.OpenStream(4, OpenStreamOptions{PusherID: 3})
+	ws.OpenStream(5, OpenStreamOptions{PusherID: 3})
+	ws.OpenStream(6, OpenStreamOptions{PusherID: 4})
+	ws.AdjustStream(1, PriorityParam{
 		StreamDep: 4,
 		Weight:    15,
 		Exclusive: false,
-	***REMOVED***)
-	want := "1***REMOVED***parent:4***REMOVED*** 2***REMOVED***parent:1***REMOVED*** 3***REMOVED***parent:1***REMOVED*** 4***REMOVED***parent:0***REMOVED*** 5***REMOVED***parent:3***REMOVED*** 6***REMOVED***parent:4***REMOVED***"
-	if got := fmtTree(ws, fmtNodeParentSkipRoot); got != want ***REMOVED***
+	})
+	want := "1{parent:4} 2{parent:1} 3{parent:1} 4{parent:0} 5{parent:3} 6{parent:4}"
+	if got := fmtTree(ws, fmtNodeParentSkipRoot); got != want {
 		t.Errorf("After adjust\ngot  %q\nwant %q", got, want)
-	***REMOVED***
-	if err := checkPriorityWellFormed(ws); err != nil ***REMOVED***
+	}
+	if err := checkPriorityWellFormed(ws); err != nil {
 		t.Error(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestPrioritySection533Exclusive(t *testing.T) ***REMOVED***
+func TestPrioritySection533Exclusive(t *testing.T) {
 	// Example from RFC 7540 Section 5.3.3.
 	// A,B,C,D,E,F = 1,2,3,4,5,6
 	ws := defaultPriorityWriteScheduler()
-	ws.OpenStream(1, OpenStreamOptions***REMOVED******REMOVED***)
-	ws.OpenStream(2, OpenStreamOptions***REMOVED***PusherID: 1***REMOVED***)
-	ws.OpenStream(3, OpenStreamOptions***REMOVED***PusherID: 1***REMOVED***)
-	ws.OpenStream(4, OpenStreamOptions***REMOVED***PusherID: 3***REMOVED***)
-	ws.OpenStream(5, OpenStreamOptions***REMOVED***PusherID: 3***REMOVED***)
-	ws.OpenStream(6, OpenStreamOptions***REMOVED***PusherID: 4***REMOVED***)
-	ws.AdjustStream(1, PriorityParam***REMOVED***
+	ws.OpenStream(1, OpenStreamOptions{})
+	ws.OpenStream(2, OpenStreamOptions{PusherID: 1})
+	ws.OpenStream(3, OpenStreamOptions{PusherID: 1})
+	ws.OpenStream(4, OpenStreamOptions{PusherID: 3})
+	ws.OpenStream(5, OpenStreamOptions{PusherID: 3})
+	ws.OpenStream(6, OpenStreamOptions{PusherID: 4})
+	ws.AdjustStream(1, PriorityParam{
 		StreamDep: 4,
 		Weight:    15,
 		Exclusive: true,
-	***REMOVED***)
-	want := "1***REMOVED***parent:4***REMOVED*** 2***REMOVED***parent:1***REMOVED*** 3***REMOVED***parent:1***REMOVED*** 4***REMOVED***parent:0***REMOVED*** 5***REMOVED***parent:3***REMOVED*** 6***REMOVED***parent:1***REMOVED***"
-	if got := fmtTree(ws, fmtNodeParentSkipRoot); got != want ***REMOVED***
+	})
+	want := "1{parent:4} 2{parent:1} 3{parent:1} 4{parent:0} 5{parent:3} 6{parent:1}"
+	if got := fmtTree(ws, fmtNodeParentSkipRoot); got != want {
 		t.Errorf("After adjust\ngot  %q\nwant %q", got, want)
-	***REMOVED***
-	if err := checkPriorityWellFormed(ws); err != nil ***REMOVED***
+	}
+	if err := checkPriorityWellFormed(ws); err != nil {
 		t.Error(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func checkPopAll(ws WriteScheduler, order []uint32) error ***REMOVED***
-	for k, id := range order ***REMOVED***
+func checkPopAll(ws WriteScheduler, order []uint32) error {
+	for k, id := range order {
 		wr, ok := ws.Pop()
-		if !ok ***REMOVED***
+		if !ok {
 			return fmt.Errorf("Pop[%d]: got ok=false, want %d (order=%v)", k, id, order)
-		***REMOVED***
-		if got := wr.StreamID(); got != id ***REMOVED***
+		}
+		if got := wr.StreamID(); got != id {
 			return fmt.Errorf("Pop[%d]: got %v, want %d (order=%v)", k, got, id, order)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	wr, ok := ws.Pop()
-	if ok ***REMOVED***
+	if ok {
 		return fmt.Errorf("Pop[%d]: got %v, want ok=false (order=%v)", len(order), wr.StreamID(), order)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func TestPriorityPopFrom533Tree(t *testing.T) ***REMOVED***
+func TestPriorityPopFrom533Tree(t *testing.T) {
 	ws := makeSection533Tree()
 
 	ws.Push(makeWriteHeadersRequest(3 /*C*/))
@@ -382,17 +382,17 @@ func TestPriorityPopFrom533Tree(t *testing.T) ***REMOVED***
 	ws.Push(makeWriteHeadersRequest(1 /*A*/))
 	t.Log("tree:", fmtTree(ws, fmtNodeParentSkipRoot))
 
-	if err := checkPopAll(ws, []uint32***REMOVED***0 /*NonStream*/, 1, 3, 5***REMOVED***); err != nil ***REMOVED***
+	if err := checkPopAll(ws, []uint32{0 /*NonStream*/, 1, 3, 5}); err != nil {
 		t.Error(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestPriorityPopFromLinearTree(t *testing.T) ***REMOVED***
+func TestPriorityPopFromLinearTree(t *testing.T) {
 	ws := defaultPriorityWriteScheduler()
-	ws.OpenStream(1, OpenStreamOptions***REMOVED******REMOVED***)
-	ws.OpenStream(2, OpenStreamOptions***REMOVED***PusherID: 1***REMOVED***)
-	ws.OpenStream(3, OpenStreamOptions***REMOVED***PusherID: 2***REMOVED***)
-	ws.OpenStream(4, OpenStreamOptions***REMOVED***PusherID: 3***REMOVED***)
+	ws.OpenStream(1, OpenStreamOptions{})
+	ws.OpenStream(2, OpenStreamOptions{PusherID: 1})
+	ws.OpenStream(3, OpenStreamOptions{PusherID: 2})
+	ws.OpenStream(4, OpenStreamOptions{PusherID: 3})
 
 	ws.Push(makeWriteHeadersRequest(3))
 	ws.Push(makeWriteHeadersRequest(4))
@@ -402,111 +402,111 @@ func TestPriorityPopFromLinearTree(t *testing.T) ***REMOVED***
 	ws.Push(makeWriteNonStreamRequest())
 	t.Log("tree:", fmtTree(ws, fmtNodeParentSkipRoot))
 
-	if err := checkPopAll(ws, []uint32***REMOVED***0, 0 /*NonStreams*/, 1, 2, 3, 4***REMOVED***); err != nil ***REMOVED***
+	if err := checkPopAll(ws, []uint32{0, 0 /*NonStreams*/, 1, 2, 3, 4}); err != nil {
 		t.Error(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestPriorityFlowControl(t *testing.T) ***REMOVED***
-	ws := NewPriorityWriteScheduler(&PriorityWriteSchedulerConfig***REMOVED***ThrottleOutOfOrderWrites: false***REMOVED***)
-	ws.OpenStream(1, OpenStreamOptions***REMOVED******REMOVED***)
-	ws.OpenStream(2, OpenStreamOptions***REMOVED***PusherID: 1***REMOVED***)
+func TestPriorityFlowControl(t *testing.T) {
+	ws := NewPriorityWriteScheduler(&PriorityWriteSchedulerConfig{ThrottleOutOfOrderWrites: false})
+	ws.OpenStream(1, OpenStreamOptions{})
+	ws.OpenStream(2, OpenStreamOptions{PusherID: 1})
 
-	sc := &serverConn***REMOVED***maxFrameSize: 16***REMOVED***
-	st1 := &stream***REMOVED***id: 1, sc: sc***REMOVED***
-	st2 := &stream***REMOVED***id: 2, sc: sc***REMOVED***
+	sc := &serverConn{maxFrameSize: 16}
+	st1 := &stream{id: 1, sc: sc}
+	st2 := &stream{id: 2, sc: sc}
 
-	ws.Push(FrameWriteRequest***REMOVED***&writeData***REMOVED***1, make([]byte, 16), false***REMOVED***, st1, nil***REMOVED***)
-	ws.Push(FrameWriteRequest***REMOVED***&writeData***REMOVED***2, make([]byte, 16), false***REMOVED***, st2, nil***REMOVED***)
-	ws.AdjustStream(2, PriorityParam***REMOVED***StreamDep: 1***REMOVED***)
+	ws.Push(FrameWriteRequest{&writeData{1, make([]byte, 16), false}, st1, nil})
+	ws.Push(FrameWriteRequest{&writeData{2, make([]byte, 16), false}, st2, nil})
+	ws.AdjustStream(2, PriorityParam{StreamDep: 1})
 
 	// No flow-control bytes available.
-	if wr, ok := ws.Pop(); ok ***REMOVED***
+	if wr, ok := ws.Pop(); ok {
 		t.Fatalf("Pop(limited by flow control)=%v,true, want false", wr)
-	***REMOVED***
+	}
 
 	// Add enough flow-control bytes to write st2 in two Pop calls.
 	// Should write data from st2 even though it's lower priority than st1.
-	for i := 1; i <= 2; i++ ***REMOVED***
+	for i := 1; i <= 2; i++ {
 		st2.flow.add(8)
 		wr, ok := ws.Pop()
-		if !ok ***REMOVED***
+		if !ok {
 			t.Fatalf("Pop(%d)=false, want true", i)
-		***REMOVED***
-		if got, want := wr.DataSize(), 8; got != want ***REMOVED***
+		}
+		if got, want := wr.DataSize(), 8; got != want {
 			t.Fatalf("Pop(%d)=%d bytes, want %d bytes", i, got, want)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestPriorityThrottleOutOfOrderWrites(t *testing.T) ***REMOVED***
-	ws := NewPriorityWriteScheduler(&PriorityWriteSchedulerConfig***REMOVED***ThrottleOutOfOrderWrites: true***REMOVED***)
-	ws.OpenStream(1, OpenStreamOptions***REMOVED******REMOVED***)
-	ws.OpenStream(2, OpenStreamOptions***REMOVED***PusherID: 1***REMOVED***)
+func TestPriorityThrottleOutOfOrderWrites(t *testing.T) {
+	ws := NewPriorityWriteScheduler(&PriorityWriteSchedulerConfig{ThrottleOutOfOrderWrites: true})
+	ws.OpenStream(1, OpenStreamOptions{})
+	ws.OpenStream(2, OpenStreamOptions{PusherID: 1})
 
-	sc := &serverConn***REMOVED***maxFrameSize: 4096***REMOVED***
-	st1 := &stream***REMOVED***id: 1, sc: sc***REMOVED***
-	st2 := &stream***REMOVED***id: 2, sc: sc***REMOVED***
+	sc := &serverConn{maxFrameSize: 4096}
+	st1 := &stream{id: 1, sc: sc}
+	st2 := &stream{id: 2, sc: sc}
 	st1.flow.add(4096)
 	st2.flow.add(4096)
-	ws.Push(FrameWriteRequest***REMOVED***&writeData***REMOVED***2, make([]byte, 4096), false***REMOVED***, st2, nil***REMOVED***)
-	ws.AdjustStream(2, PriorityParam***REMOVED***StreamDep: 1***REMOVED***)
+	ws.Push(FrameWriteRequest{&writeData{2, make([]byte, 4096), false}, st2, nil})
+	ws.AdjustStream(2, PriorityParam{StreamDep: 1})
 
 	// We have enough flow-control bytes to write st2 in a single Pop call.
 	// However, due to out-of-order write throttling, the first call should
 	// only write 1KB.
 	wr, ok := ws.Pop()
-	if !ok ***REMOVED***
+	if !ok {
 		t.Fatalf("Pop(st2.first)=false, want true")
-	***REMOVED***
-	if got, want := wr.StreamID(), uint32(2); got != want ***REMOVED***
+	}
+	if got, want := wr.StreamID(), uint32(2); got != want {
 		t.Fatalf("Pop(st2.first)=stream %d, want stream %d", got, want)
-	***REMOVED***
-	if got, want := wr.DataSize(), 1024; got != want ***REMOVED***
+	}
+	if got, want := wr.DataSize(), 1024; got != want {
 		t.Fatalf("Pop(st2.first)=%d bytes, want %d bytes", got, want)
-	***REMOVED***
+	}
 
 	// Now add data on st1. This should take precedence.
-	ws.Push(FrameWriteRequest***REMOVED***&writeData***REMOVED***1, make([]byte, 4096), false***REMOVED***, st1, nil***REMOVED***)
+	ws.Push(FrameWriteRequest{&writeData{1, make([]byte, 4096), false}, st1, nil})
 	wr, ok = ws.Pop()
-	if !ok ***REMOVED***
+	if !ok {
 		t.Fatalf("Pop(st1)=false, want true")
-	***REMOVED***
-	if got, want := wr.StreamID(), uint32(1); got != want ***REMOVED***
+	}
+	if got, want := wr.StreamID(), uint32(1); got != want {
 		t.Fatalf("Pop(st1)=stream %d, want stream %d", got, want)
-	***REMOVED***
-	if got, want := wr.DataSize(), 4096; got != want ***REMOVED***
+	}
+	if got, want := wr.DataSize(), 4096; got != want {
 		t.Fatalf("Pop(st1)=%d bytes, want %d bytes", got, want)
-	***REMOVED***
+	}
 
 	// Should go back to writing 1KB from st2.
 	wr, ok = ws.Pop()
-	if !ok ***REMOVED***
+	if !ok {
 		t.Fatalf("Pop(st2.last)=false, want true")
-	***REMOVED***
-	if got, want := wr.StreamID(), uint32(2); got != want ***REMOVED***
+	}
+	if got, want := wr.StreamID(), uint32(2); got != want {
 		t.Fatalf("Pop(st2.last)=stream %d, want stream %d", got, want)
-	***REMOVED***
-	if got, want := wr.DataSize(), 1024; got != want ***REMOVED***
+	}
+	if got, want := wr.DataSize(), 1024; got != want {
 		t.Fatalf("Pop(st2.last)=%d bytes, want %d bytes", got, want)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestPriorityWeights(t *testing.T) ***REMOVED***
+func TestPriorityWeights(t *testing.T) {
 	ws := defaultPriorityWriteScheduler()
-	ws.OpenStream(1, OpenStreamOptions***REMOVED******REMOVED***)
-	ws.OpenStream(2, OpenStreamOptions***REMOVED******REMOVED***)
+	ws.OpenStream(1, OpenStreamOptions{})
+	ws.OpenStream(2, OpenStreamOptions{})
 
-	sc := &serverConn***REMOVED***maxFrameSize: 8***REMOVED***
-	st1 := &stream***REMOVED***id: 1, sc: sc***REMOVED***
-	st2 := &stream***REMOVED***id: 2, sc: sc***REMOVED***
+	sc := &serverConn{maxFrameSize: 8}
+	st1 := &stream{id: 1, sc: sc}
+	st2 := &stream{id: 2, sc: sc}
 	st1.flow.add(40)
 	st2.flow.add(40)
 
-	ws.Push(FrameWriteRequest***REMOVED***&writeData***REMOVED***1, make([]byte, 40), false***REMOVED***, st1, nil***REMOVED***)
-	ws.Push(FrameWriteRequest***REMOVED***&writeData***REMOVED***2, make([]byte, 40), false***REMOVED***, st2, nil***REMOVED***)
-	ws.AdjustStream(1, PriorityParam***REMOVED***StreamDep: 0, Weight: 34***REMOVED***)
-	ws.AdjustStream(2, PriorityParam***REMOVED***StreamDep: 0, Weight: 9***REMOVED***)
+	ws.Push(FrameWriteRequest{&writeData{1, make([]byte, 40), false}, st1, nil})
+	ws.Push(FrameWriteRequest{&writeData{2, make([]byte, 40), false}, st2, nil})
+	ws.AdjustStream(1, PriorityParam{StreamDep: 0, Weight: 34})
+	ws.AdjustStream(2, PriorityParam{StreamDep: 0, Weight: 9})
 
 	// st1 gets 3.5x the bandwidth of st2 (3.5 = (34+1)/(9+1)).
 	// The maximum frame size is 8 bytes. The write sequence should be:
@@ -520,22 +520,22 @@ func TestPriorityWeights(t *testing.T) ***REMOVED***
 	//   st2, total bytes so far is (st1=40, st=24)
 	//   st2, total bytes so far is (st1=40, st=32)
 	//   st2, total bytes so far is (st1=40, st=40)
-	if err := checkPopAll(ws, []uint32***REMOVED***1, 2, 1, 1, 1, 2, 1, 2, 2, 2***REMOVED***); err != nil ***REMOVED***
+	if err := checkPopAll(ws, []uint32{1, 2, 1, 1, 1, 2, 1, 2, 2, 2}); err != nil {
 		t.Error(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestPriorityRstStreamOnNonOpenStreams(t *testing.T) ***REMOVED***
-	ws := NewPriorityWriteScheduler(&PriorityWriteSchedulerConfig***REMOVED***
+func TestPriorityRstStreamOnNonOpenStreams(t *testing.T) {
+	ws := NewPriorityWriteScheduler(&PriorityWriteSchedulerConfig{
 		MaxClosedNodesInTree: 0,
 		MaxIdleNodesInTree:   0,
-	***REMOVED***)
-	ws.OpenStream(1, OpenStreamOptions***REMOVED******REMOVED***)
+	})
+	ws.OpenStream(1, OpenStreamOptions{})
 	ws.CloseStream(1)
-	ws.Push(FrameWriteRequest***REMOVED***write: streamError(1, ErrCodeProtocol)***REMOVED***)
-	ws.Push(FrameWriteRequest***REMOVED***write: streamError(2, ErrCodeProtocol)***REMOVED***)
+	ws.Push(FrameWriteRequest{write: streamError(1, ErrCodeProtocol)})
+	ws.Push(FrameWriteRequest{write: streamError(2, ErrCodeProtocol)})
 
-	if err := checkPopAll(ws, []uint32***REMOVED***1, 2***REMOVED***); err != nil ***REMOVED***
+	if err := checkPopAll(ws, []uint32{1, 2}); err != nil {
 		t.Error(err)
-	***REMOVED***
-***REMOVED***
+	}
+}

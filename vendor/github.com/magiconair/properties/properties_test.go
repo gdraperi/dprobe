@@ -20,621 +20,621 @@ import (
 
 var verbose = flag.Bool("verbose", false, "Verbose output")
 
-func init() ***REMOVED***
+func init() {
 	ErrorHandler = PanicHandler
-***REMOVED***
+}
 
 // ----------------------------------------------------------------------------
 
 // define test cases in the form of
-// ***REMOVED***"input", "key1", "value1", "key2", "value2", ...***REMOVED***
-var complexTests = [][]string***REMOVED***
+// {"input", "key1", "value1", "key2", "value2", ...}
+var complexTests = [][]string{
 	// whitespace prefix
-	***REMOVED***" key=value", "key", "value"***REMOVED***,     // SPACE prefix
-	***REMOVED***"\fkey=value", "key", "value"***REMOVED***,    // FF prefix
-	***REMOVED***"\tkey=value", "key", "value"***REMOVED***,    // TAB prefix
-	***REMOVED***" \f\tkey=value", "key", "value"***REMOVED***, // mix prefix
+	{" key=value", "key", "value"},     // SPACE prefix
+	{"\fkey=value", "key", "value"},    // FF prefix
+	{"\tkey=value", "key", "value"},    // TAB prefix
+	{" \f\tkey=value", "key", "value"}, // mix prefix
 
 	// multiple keys
-	***REMOVED***"key1=value1\nkey2=value2\n", "key1", "value1", "key2", "value2"***REMOVED***,
-	***REMOVED***"key1=value1\rkey2=value2\r", "key1", "value1", "key2", "value2"***REMOVED***,
-	***REMOVED***"key1=value1\r\nkey2=value2\r\n", "key1", "value1", "key2", "value2"***REMOVED***,
+	{"key1=value1\nkey2=value2\n", "key1", "value1", "key2", "value2"},
+	{"key1=value1\rkey2=value2\r", "key1", "value1", "key2", "value2"},
+	{"key1=value1\r\nkey2=value2\r\n", "key1", "value1", "key2", "value2"},
 
 	// blank lines
-	***REMOVED***"\nkey=value\n", "key", "value"***REMOVED***,
-	***REMOVED***"\rkey=value\r", "key", "value"***REMOVED***,
-	***REMOVED***"\r\nkey=value\r\n", "key", "value"***REMOVED***,
-	***REMOVED***"\nkey=value\n \nkey2=value2", "key", "value", "key2", "value2"***REMOVED***,
-	***REMOVED***"\nkey=value\n\t\nkey2=value2", "key", "value", "key2", "value2"***REMOVED***,
+	{"\nkey=value\n", "key", "value"},
+	{"\rkey=value\r", "key", "value"},
+	{"\r\nkey=value\r\n", "key", "value"},
+	{"\nkey=value\n \nkey2=value2", "key", "value", "key2", "value2"},
+	{"\nkey=value\n\t\nkey2=value2", "key", "value", "key2", "value2"},
 
 	// escaped chars in key
-	***REMOVED***"k\\ ey = value", "k ey", "value"***REMOVED***,
-	***REMOVED***"k\\:ey = value", "k:ey", "value"***REMOVED***,
-	***REMOVED***"k\\=ey = value", "k=ey", "value"***REMOVED***,
-	***REMOVED***"k\\fey = value", "k\fey", "value"***REMOVED***,
-	***REMOVED***"k\\ney = value", "k\ney", "value"***REMOVED***,
-	***REMOVED***"k\\rey = value", "k\rey", "value"***REMOVED***,
-	***REMOVED***"k\\tey = value", "k\tey", "value"***REMOVED***,
+	{"k\\ ey = value", "k ey", "value"},
+	{"k\\:ey = value", "k:ey", "value"},
+	{"k\\=ey = value", "k=ey", "value"},
+	{"k\\fey = value", "k\fey", "value"},
+	{"k\\ney = value", "k\ney", "value"},
+	{"k\\rey = value", "k\rey", "value"},
+	{"k\\tey = value", "k\tey", "value"},
 
 	// escaped chars in value
-	***REMOVED***"key = v\\ alue", "key", "v alue"***REMOVED***,
-	***REMOVED***"key = v\\:alue", "key", "v:alue"***REMOVED***,
-	***REMOVED***"key = v\\=alue", "key", "v=alue"***REMOVED***,
-	***REMOVED***"key = v\\falue", "key", "v\falue"***REMOVED***,
-	***REMOVED***"key = v\\nalue", "key", "v\nalue"***REMOVED***,
-	***REMOVED***"key = v\\ralue", "key", "v\ralue"***REMOVED***,
-	***REMOVED***"key = v\\talue", "key", "v\talue"***REMOVED***,
+	{"key = v\\ alue", "key", "v alue"},
+	{"key = v\\:alue", "key", "v:alue"},
+	{"key = v\\=alue", "key", "v=alue"},
+	{"key = v\\falue", "key", "v\falue"},
+	{"key = v\\nalue", "key", "v\nalue"},
+	{"key = v\\ralue", "key", "v\ralue"},
+	{"key = v\\talue", "key", "v\talue"},
 
 	// silently dropped escape character
-	***REMOVED***"k\\zey = value", "kzey", "value"***REMOVED***,
-	***REMOVED***"key = v\\zalue", "key", "vzalue"***REMOVED***,
+	{"k\\zey = value", "kzey", "value"},
+	{"key = v\\zalue", "key", "vzalue"},
 
 	// unicode literals
-	***REMOVED***"key\\u2318 = value", "key⌘", "value"***REMOVED***,
-	***REMOVED***"k\\u2318ey = value", "k⌘ey", "value"***REMOVED***,
-	***REMOVED***"key = value\\u2318", "key", "value⌘"***REMOVED***,
-	***REMOVED***"key = valu\\u2318e", "key", "valu⌘e"***REMOVED***,
+	{"key\\u2318 = value", "key⌘", "value"},
+	{"k\\u2318ey = value", "k⌘ey", "value"},
+	{"key = value\\u2318", "key", "value⌘"},
+	{"key = valu\\u2318e", "key", "valu⌘e"},
 
 	// multiline values
-	***REMOVED***"key = valueA,\\\n    valueB", "key", "valueA,valueB"***REMOVED***,   // SPACE indent
-	***REMOVED***"key = valueA,\\\n\f\f\fvalueB", "key", "valueA,valueB"***REMOVED***, // FF indent
-	***REMOVED***"key = valueA,\\\n\t\t\tvalueB", "key", "valueA,valueB"***REMOVED***, // TAB indent
-	***REMOVED***"key = valueA,\\\n \f\tvalueB", "key", "valueA,valueB"***REMOVED***,  // mix indent
+	{"key = valueA,\\\n    valueB", "key", "valueA,valueB"},   // SPACE indent
+	{"key = valueA,\\\n\f\f\fvalueB", "key", "valueA,valueB"}, // FF indent
+	{"key = valueA,\\\n\t\t\tvalueB", "key", "valueA,valueB"}, // TAB indent
+	{"key = valueA,\\\n \f\tvalueB", "key", "valueA,valueB"},  // mix indent
 
 	// comments
-	***REMOVED***"# this is a comment\n! and so is this\nkey1=value1\nkey#2=value#2\n\nkey!3=value!3\n# and another one\n! and the final one", "key1", "value1", "key#2", "value#2", "key!3", "value!3"***REMOVED***,
+	{"# this is a comment\n! and so is this\nkey1=value1\nkey#2=value#2\n\nkey!3=value!3\n# and another one\n! and the final one", "key1", "value1", "key#2", "value#2", "key!3", "value!3"},
 
 	// expansion tests
-	***REMOVED***"key=value\nkey2=$***REMOVED***key***REMOVED***", "key", "value", "key2", "value"***REMOVED***,
-	***REMOVED***"key=value\nkey2=aa$***REMOVED***key***REMOVED***", "key", "value", "key2", "aavalue"***REMOVED***,
-	***REMOVED***"key=value\nkey2=$***REMOVED***key***REMOVED***bb", "key", "value", "key2", "valuebb"***REMOVED***,
-	***REMOVED***"key=value\nkey2=aa$***REMOVED***key***REMOVED***bb", "key", "value", "key2", "aavaluebb"***REMOVED***,
-	***REMOVED***"key=value\nkey2=$***REMOVED***key***REMOVED***\nkey3=$***REMOVED***key2***REMOVED***", "key", "value", "key2", "value", "key3", "value"***REMOVED***,
-	***REMOVED***"key=$***REMOVED***USER***REMOVED***", "key", os.Getenv("USER")***REMOVED***,
-	***REMOVED***"key=$***REMOVED***USER***REMOVED***\nUSER=value", "key", "value", "USER", "value"***REMOVED***,
-***REMOVED***
+	{"key=value\nkey2=${key}", "key", "value", "key2", "value"},
+	{"key=value\nkey2=aa${key}", "key", "value", "key2", "aavalue"},
+	{"key=value\nkey2=${key}bb", "key", "value", "key2", "valuebb"},
+	{"key=value\nkey2=aa${key}bb", "key", "value", "key2", "aavaluebb"},
+	{"key=value\nkey2=${key}\nkey3=${key2}", "key", "value", "key2", "value", "key3", "value"},
+	{"key=${USER}", "key", os.Getenv("USER")},
+	{"key=${USER}\nUSER=value", "key", "value", "USER", "value"},
+}
 
 // ----------------------------------------------------------------------------
 
-var commentTests = []struct ***REMOVED***
+var commentTests = []struct {
 	input, key, value string
 	comments          []string
-***REMOVED******REMOVED***
-	***REMOVED***"key=value", "key", "value", nil***REMOVED***,
-	***REMOVED***"#\nkey=value", "key", "value", []string***REMOVED***""***REMOVED******REMOVED***,
-	***REMOVED***"#comment\nkey=value", "key", "value", []string***REMOVED***"comment"***REMOVED******REMOVED***,
-	***REMOVED***"# comment\nkey=value", "key", "value", []string***REMOVED***"comment"***REMOVED******REMOVED***,
-	***REMOVED***"#  comment\nkey=value", "key", "value", []string***REMOVED***"comment"***REMOVED******REMOVED***,
-	***REMOVED***"# comment\n\nkey=value", "key", "value", []string***REMOVED***"comment"***REMOVED******REMOVED***,
-	***REMOVED***"# comment1\n# comment2\nkey=value", "key", "value", []string***REMOVED***"comment1", "comment2"***REMOVED******REMOVED***,
-	***REMOVED***"# comment1\n\n# comment2\n\nkey=value", "key", "value", []string***REMOVED***"comment1", "comment2"***REMOVED******REMOVED***,
-	***REMOVED***"!comment\nkey=value", "key", "value", []string***REMOVED***"comment"***REMOVED******REMOVED***,
-	***REMOVED***"! comment\nkey=value", "key", "value", []string***REMOVED***"comment"***REMOVED******REMOVED***,
-	***REMOVED***"!  comment\nkey=value", "key", "value", []string***REMOVED***"comment"***REMOVED******REMOVED***,
-	***REMOVED***"! comment\n\nkey=value", "key", "value", []string***REMOVED***"comment"***REMOVED******REMOVED***,
-	***REMOVED***"! comment1\n! comment2\nkey=value", "key", "value", []string***REMOVED***"comment1", "comment2"***REMOVED******REMOVED***,
-	***REMOVED***"! comment1\n\n! comment2\n\nkey=value", "key", "value", []string***REMOVED***"comment1", "comment2"***REMOVED******REMOVED***,
-***REMOVED***
+}{
+	{"key=value", "key", "value", nil},
+	{"#\nkey=value", "key", "value", []string{""}},
+	{"#comment\nkey=value", "key", "value", []string{"comment"}},
+	{"# comment\nkey=value", "key", "value", []string{"comment"}},
+	{"#  comment\nkey=value", "key", "value", []string{"comment"}},
+	{"# comment\n\nkey=value", "key", "value", []string{"comment"}},
+	{"# comment1\n# comment2\nkey=value", "key", "value", []string{"comment1", "comment2"}},
+	{"# comment1\n\n# comment2\n\nkey=value", "key", "value", []string{"comment1", "comment2"}},
+	{"!comment\nkey=value", "key", "value", []string{"comment"}},
+	{"! comment\nkey=value", "key", "value", []string{"comment"}},
+	{"!  comment\nkey=value", "key", "value", []string{"comment"}},
+	{"! comment\n\nkey=value", "key", "value", []string{"comment"}},
+	{"! comment1\n! comment2\nkey=value", "key", "value", []string{"comment1", "comment2"}},
+	{"! comment1\n\n! comment2\n\nkey=value", "key", "value", []string{"comment1", "comment2"}},
+}
 
 // ----------------------------------------------------------------------------
 
-var errorTests = []struct ***REMOVED***
+var errorTests = []struct {
 	input, msg string
-***REMOVED******REMOVED***
+}{
 	// unicode literals
-	***REMOVED***"key\\u1 = value", "invalid unicode literal"***REMOVED***,
-	***REMOVED***"key\\u12 = value", "invalid unicode literal"***REMOVED***,
-	***REMOVED***"key\\u123 = value", "invalid unicode literal"***REMOVED***,
-	***REMOVED***"key\\u123g = value", "invalid unicode literal"***REMOVED***,
-	***REMOVED***"key\\u123", "invalid unicode literal"***REMOVED***,
+	{"key\\u1 = value", "invalid unicode literal"},
+	{"key\\u12 = value", "invalid unicode literal"},
+	{"key\\u123 = value", "invalid unicode literal"},
+	{"key\\u123g = value", "invalid unicode literal"},
+	{"key\\u123", "invalid unicode literal"},
 
 	// circular references
-	***REMOVED***"key=$***REMOVED***key***REMOVED***", "circular reference"***REMOVED***,
-	***REMOVED***"key1=$***REMOVED***key2***REMOVED***\nkey2=$***REMOVED***key1***REMOVED***", "circular reference"***REMOVED***,
+	{"key=${key}", "circular reference"},
+	{"key1=${key2}\nkey2=${key1}", "circular reference"},
 
 	// malformed expressions
-	***REMOVED***"key=$***REMOVED***ke", "malformed expression"***REMOVED***,
-	***REMOVED***"key=valu$***REMOVED***ke", "malformed expression"***REMOVED***,
-***REMOVED***
+	{"key=${ke", "malformed expression"},
+	{"key=valu${ke", "malformed expression"},
+}
 
 // ----------------------------------------------------------------------------
 
-var writeTests = []struct ***REMOVED***
+var writeTests = []struct {
 	input, output, encoding string
-***REMOVED******REMOVED***
+}{
 	// ISO-8859-1 tests
-	***REMOVED***"key = value", "key = value\n", "ISO-8859-1"***REMOVED***,
-	***REMOVED***"key = value \\\n   continued", "key = value continued\n", "ISO-8859-1"***REMOVED***,
-	***REMOVED***"key⌘ = value", "key\\u2318 = value\n", "ISO-8859-1"***REMOVED***,
-	***REMOVED***"ke\\ \\:y = value", "ke\\ \\:y = value\n", "ISO-8859-1"***REMOVED***,
+	{"key = value", "key = value\n", "ISO-8859-1"},
+	{"key = value \\\n   continued", "key = value continued\n", "ISO-8859-1"},
+	{"key⌘ = value", "key\\u2318 = value\n", "ISO-8859-1"},
+	{"ke\\ \\:y = value", "ke\\ \\:y = value\n", "ISO-8859-1"},
 
 	// UTF-8 tests
-	***REMOVED***"key = value", "key = value\n", "UTF-8"***REMOVED***,
-	***REMOVED***"key = value \\\n   continued", "key = value continued\n", "UTF-8"***REMOVED***,
-	***REMOVED***"key⌘ = value⌘", "key⌘ = value⌘\n", "UTF-8"***REMOVED***,
-	***REMOVED***"ke\\ \\:y = value", "ke\\ \\:y = value\n", "UTF-8"***REMOVED***,
-***REMOVED***
+	{"key = value", "key = value\n", "UTF-8"},
+	{"key = value \\\n   continued", "key = value continued\n", "UTF-8"},
+	{"key⌘ = value⌘", "key⌘ = value⌘\n", "UTF-8"},
+	{"ke\\ \\:y = value", "ke\\ \\:y = value\n", "UTF-8"},
+}
 
 // ----------------------------------------------------------------------------
 
-var writeCommentTests = []struct ***REMOVED***
+var writeCommentTests = []struct {
 	input, output, encoding string
-***REMOVED******REMOVED***
+}{
 	// ISO-8859-1 tests
-	***REMOVED***"key = value", "key = value\n", "ISO-8859-1"***REMOVED***,
-	***REMOVED***"#\nkey = value", "key = value\n", "ISO-8859-1"***REMOVED***,
-	***REMOVED***"#\n#\n#\nkey = value", "key = value\n", "ISO-8859-1"***REMOVED***,
-	***REMOVED***"# comment\nkey = value", "# comment\nkey = value\n", "ISO-8859-1"***REMOVED***,
-	***REMOVED***"\n# comment\nkey = value", "# comment\nkey = value\n", "ISO-8859-1"***REMOVED***,
-	***REMOVED***"# comment\n\nkey = value", "# comment\nkey = value\n", "ISO-8859-1"***REMOVED***,
-	***REMOVED***"# comment1\n# comment2\nkey = value", "# comment1\n# comment2\nkey = value\n", "ISO-8859-1"***REMOVED***,
-	***REMOVED***"#comment1\nkey1 = value1\n#comment2\nkey2 = value2", "# comment1\nkey1 = value1\n\n# comment2\nkey2 = value2\n", "ISO-8859-1"***REMOVED***,
+	{"key = value", "key = value\n", "ISO-8859-1"},
+	{"#\nkey = value", "key = value\n", "ISO-8859-1"},
+	{"#\n#\n#\nkey = value", "key = value\n", "ISO-8859-1"},
+	{"# comment\nkey = value", "# comment\nkey = value\n", "ISO-8859-1"},
+	{"\n# comment\nkey = value", "# comment\nkey = value\n", "ISO-8859-1"},
+	{"# comment\n\nkey = value", "# comment\nkey = value\n", "ISO-8859-1"},
+	{"# comment1\n# comment2\nkey = value", "# comment1\n# comment2\nkey = value\n", "ISO-8859-1"},
+	{"#comment1\nkey1 = value1\n#comment2\nkey2 = value2", "# comment1\nkey1 = value1\n\n# comment2\nkey2 = value2\n", "ISO-8859-1"},
 
 	// UTF-8 tests
-	***REMOVED***"key = value", "key = value\n", "UTF-8"***REMOVED***,
-	***REMOVED***"# comment⌘\nkey = value⌘", "# comment⌘\nkey = value⌘\n", "UTF-8"***REMOVED***,
-	***REMOVED***"\n# comment⌘\nkey = value⌘", "# comment⌘\nkey = value⌘\n", "UTF-8"***REMOVED***,
-	***REMOVED***"# comment⌘\n\nkey = value⌘", "# comment⌘\nkey = value⌘\n", "UTF-8"***REMOVED***,
-	***REMOVED***"# comment1⌘\n# comment2⌘\nkey = value⌘", "# comment1⌘\n# comment2⌘\nkey = value⌘\n", "UTF-8"***REMOVED***,
-	***REMOVED***"#comment1⌘\nkey1 = value1⌘\n#comment2⌘\nkey2 = value2⌘", "# comment1⌘\nkey1 = value1⌘\n\n# comment2⌘\nkey2 = value2⌘\n", "UTF-8"***REMOVED***,
-***REMOVED***
+	{"key = value", "key = value\n", "UTF-8"},
+	{"# comment⌘\nkey = value⌘", "# comment⌘\nkey = value⌘\n", "UTF-8"},
+	{"\n# comment⌘\nkey = value⌘", "# comment⌘\nkey = value⌘\n", "UTF-8"},
+	{"# comment⌘\n\nkey = value⌘", "# comment⌘\nkey = value⌘\n", "UTF-8"},
+	{"# comment1⌘\n# comment2⌘\nkey = value⌘", "# comment1⌘\n# comment2⌘\nkey = value⌘\n", "UTF-8"},
+	{"#comment1⌘\nkey1 = value1⌘\n#comment2⌘\nkey2 = value2⌘", "# comment1⌘\nkey1 = value1⌘\n\n# comment2⌘\nkey2 = value2⌘\n", "UTF-8"},
+}
 
 // ----------------------------------------------------------------------------
 
-var boolTests = []struct ***REMOVED***
+var boolTests = []struct {
 	input, key string
 	def, value bool
-***REMOVED******REMOVED***
+}{
 	// valid values for TRUE
-	***REMOVED***"key = 1", "key", false, true***REMOVED***,
-	***REMOVED***"key = on", "key", false, true***REMOVED***,
-	***REMOVED***"key = On", "key", false, true***REMOVED***,
-	***REMOVED***"key = ON", "key", false, true***REMOVED***,
-	***REMOVED***"key = true", "key", false, true***REMOVED***,
-	***REMOVED***"key = True", "key", false, true***REMOVED***,
-	***REMOVED***"key = TRUE", "key", false, true***REMOVED***,
-	***REMOVED***"key = yes", "key", false, true***REMOVED***,
-	***REMOVED***"key = Yes", "key", false, true***REMOVED***,
-	***REMOVED***"key = YES", "key", false, true***REMOVED***,
+	{"key = 1", "key", false, true},
+	{"key = on", "key", false, true},
+	{"key = On", "key", false, true},
+	{"key = ON", "key", false, true},
+	{"key = true", "key", false, true},
+	{"key = True", "key", false, true},
+	{"key = TRUE", "key", false, true},
+	{"key = yes", "key", false, true},
+	{"key = Yes", "key", false, true},
+	{"key = YES", "key", false, true},
 
 	// valid values for FALSE (all other)
-	***REMOVED***"key = 0", "key", true, false***REMOVED***,
-	***REMOVED***"key = off", "key", true, false***REMOVED***,
-	***REMOVED***"key = false", "key", true, false***REMOVED***,
-	***REMOVED***"key = no", "key", true, false***REMOVED***,
+	{"key = 0", "key", true, false},
+	{"key = off", "key", true, false},
+	{"key = false", "key", true, false},
+	{"key = no", "key", true, false},
 
 	// non existent key
-	***REMOVED***"key = true", "key2", false, false***REMOVED***,
-***REMOVED***
+	{"key = true", "key2", false, false},
+}
 
 // ----------------------------------------------------------------------------
 
-var durationTests = []struct ***REMOVED***
+var durationTests = []struct {
 	input, key string
 	def, value time.Duration
-***REMOVED******REMOVED***
+}{
 	// valid values
-	***REMOVED***"key = 1", "key", 999, 1***REMOVED***,
-	***REMOVED***"key = 0", "key", 999, 0***REMOVED***,
-	***REMOVED***"key = -1", "key", 999, -1***REMOVED***,
-	***REMOVED***"key = 0123", "key", 999, 123***REMOVED***,
+	{"key = 1", "key", 999, 1},
+	{"key = 0", "key", 999, 0},
+	{"key = -1", "key", 999, -1},
+	{"key = 0123", "key", 999, 123},
 
 	// invalid values
-	***REMOVED***"key = 0xff", "key", 999, 999***REMOVED***,
-	***REMOVED***"key = 1.0", "key", 999, 999***REMOVED***,
-	***REMOVED***"key = a", "key", 999, 999***REMOVED***,
+	{"key = 0xff", "key", 999, 999},
+	{"key = 1.0", "key", 999, 999},
+	{"key = a", "key", 999, 999},
 
 	// non existent key
-	***REMOVED***"key = 1", "key2", 999, 999***REMOVED***,
-***REMOVED***
+	{"key = 1", "key2", 999, 999},
+}
 
 // ----------------------------------------------------------------------------
 
-var parsedDurationTests = []struct ***REMOVED***
+var parsedDurationTests = []struct {
 	input, key string
 	def, value time.Duration
-***REMOVED******REMOVED***
+}{
 	// valid values
-	***REMOVED***"key = -1ns", "key", 999, -1 * time.Nanosecond***REMOVED***,
-	***REMOVED***"key = 300ms", "key", 999, 300 * time.Millisecond***REMOVED***,
-	***REMOVED***"key = 5s", "key", 999, 5 * time.Second***REMOVED***,
-	***REMOVED***"key = 3h", "key", 999, 3 * time.Hour***REMOVED***,
-	***REMOVED***"key = 2h45m", "key", 999, 2*time.Hour + 45*time.Minute***REMOVED***,
+	{"key = -1ns", "key", 999, -1 * time.Nanosecond},
+	{"key = 300ms", "key", 999, 300 * time.Millisecond},
+	{"key = 5s", "key", 999, 5 * time.Second},
+	{"key = 3h", "key", 999, 3 * time.Hour},
+	{"key = 2h45m", "key", 999, 2*time.Hour + 45*time.Minute},
 
 	// invalid values
-	***REMOVED***"key = 0xff", "key", 999, 999***REMOVED***,
-	***REMOVED***"key = 1.0", "key", 999, 999***REMOVED***,
-	***REMOVED***"key = a", "key", 999, 999***REMOVED***,
-	***REMOVED***"key = 1", "key", 999, 999***REMOVED***,
-	***REMOVED***"key = 0", "key", 999, 0***REMOVED***,
+	{"key = 0xff", "key", 999, 999},
+	{"key = 1.0", "key", 999, 999},
+	{"key = a", "key", 999, 999},
+	{"key = 1", "key", 999, 999},
+	{"key = 0", "key", 999, 0},
 
 	// non existent key
-	***REMOVED***"key = 1", "key2", 999, 999***REMOVED***,
-***REMOVED***
+	{"key = 1", "key2", 999, 999},
+}
 
 // ----------------------------------------------------------------------------
 
-var floatTests = []struct ***REMOVED***
+var floatTests = []struct {
 	input, key string
 	def, value float64
-***REMOVED******REMOVED***
+}{
 	// valid values
-	***REMOVED***"key = 1.0", "key", 999, 1.0***REMOVED***,
-	***REMOVED***"key = 0.0", "key", 999, 0.0***REMOVED***,
-	***REMOVED***"key = -1.0", "key", 999, -1.0***REMOVED***,
-	***REMOVED***"key = 1", "key", 999, 1***REMOVED***,
-	***REMOVED***"key = 0", "key", 999, 0***REMOVED***,
-	***REMOVED***"key = -1", "key", 999, -1***REMOVED***,
-	***REMOVED***"key = 0123", "key", 999, 123***REMOVED***,
+	{"key = 1.0", "key", 999, 1.0},
+	{"key = 0.0", "key", 999, 0.0},
+	{"key = -1.0", "key", 999, -1.0},
+	{"key = 1", "key", 999, 1},
+	{"key = 0", "key", 999, 0},
+	{"key = -1", "key", 999, -1},
+	{"key = 0123", "key", 999, 123},
 
 	// invalid values
-	***REMOVED***"key = 0xff", "key", 999, 999***REMOVED***,
-	***REMOVED***"key = a", "key", 999, 999***REMOVED***,
+	{"key = 0xff", "key", 999, 999},
+	{"key = a", "key", 999, 999},
 
 	// non existent key
-	***REMOVED***"key = 1", "key2", 999, 999***REMOVED***,
-***REMOVED***
+	{"key = 1", "key2", 999, 999},
+}
 
 // ----------------------------------------------------------------------------
 
-var int64Tests = []struct ***REMOVED***
+var int64Tests = []struct {
 	input, key string
 	def, value int64
-***REMOVED******REMOVED***
+}{
 	// valid values
-	***REMOVED***"key = 1", "key", 999, 1***REMOVED***,
-	***REMOVED***"key = 0", "key", 999, 0***REMOVED***,
-	***REMOVED***"key = -1", "key", 999, -1***REMOVED***,
-	***REMOVED***"key = 0123", "key", 999, 123***REMOVED***,
+	{"key = 1", "key", 999, 1},
+	{"key = 0", "key", 999, 0},
+	{"key = -1", "key", 999, -1},
+	{"key = 0123", "key", 999, 123},
 
 	// invalid values
-	***REMOVED***"key = 0xff", "key", 999, 999***REMOVED***,
-	***REMOVED***"key = 1.0", "key", 999, 999***REMOVED***,
-	***REMOVED***"key = a", "key", 999, 999***REMOVED***,
+	{"key = 0xff", "key", 999, 999},
+	{"key = 1.0", "key", 999, 999},
+	{"key = a", "key", 999, 999},
 
 	// non existent key
-	***REMOVED***"key = 1", "key2", 999, 999***REMOVED***,
-***REMOVED***
+	{"key = 1", "key2", 999, 999},
+}
 
 // ----------------------------------------------------------------------------
 
-var uint64Tests = []struct ***REMOVED***
+var uint64Tests = []struct {
 	input, key string
 	def, value uint64
-***REMOVED******REMOVED***
+}{
 	// valid values
-	***REMOVED***"key = 1", "key", 999, 1***REMOVED***,
-	***REMOVED***"key = 0", "key", 999, 0***REMOVED***,
-	***REMOVED***"key = 0123", "key", 999, 123***REMOVED***,
+	{"key = 1", "key", 999, 1},
+	{"key = 0", "key", 999, 0},
+	{"key = 0123", "key", 999, 123},
 
 	// invalid values
-	***REMOVED***"key = -1", "key", 999, 999***REMOVED***,
-	***REMOVED***"key = 0xff", "key", 999, 999***REMOVED***,
-	***REMOVED***"key = 1.0", "key", 999, 999***REMOVED***,
-	***REMOVED***"key = a", "key", 999, 999***REMOVED***,
+	{"key = -1", "key", 999, 999},
+	{"key = 0xff", "key", 999, 999},
+	{"key = 1.0", "key", 999, 999},
+	{"key = a", "key", 999, 999},
 
 	// non existent key
-	***REMOVED***"key = 1", "key2", 999, 999***REMOVED***,
-***REMOVED***
+	{"key = 1", "key2", 999, 999},
+}
 
 // ----------------------------------------------------------------------------
 
-var stringTests = []struct ***REMOVED***
+var stringTests = []struct {
 	input, key string
 	def, value string
-***REMOVED******REMOVED***
+}{
 	// valid values
-	***REMOVED***"key = abc", "key", "def", "abc"***REMOVED***,
+	{"key = abc", "key", "def", "abc"},
 
 	// non existent key
-	***REMOVED***"key = abc", "key2", "def", "def"***REMOVED***,
-***REMOVED***
+	{"key = abc", "key2", "def", "def"},
+}
 
 // ----------------------------------------------------------------------------
 
-var keysTests = []struct ***REMOVED***
+var keysTests = []struct {
 	input string
 	keys  []string
-***REMOVED******REMOVED***
-	***REMOVED***"", []string***REMOVED******REMOVED******REMOVED***,
-	***REMOVED***"key = abc", []string***REMOVED***"key"***REMOVED******REMOVED***,
-	***REMOVED***"key = abc\nkey2=def", []string***REMOVED***"key", "key2"***REMOVED******REMOVED***,
-	***REMOVED***"key2 = abc\nkey=def", []string***REMOVED***"key2", "key"***REMOVED******REMOVED***,
-	***REMOVED***"key = abc\nkey=def", []string***REMOVED***"key"***REMOVED******REMOVED***,
-***REMOVED***
+}{
+	{"", []string{}},
+	{"key = abc", []string{"key"}},
+	{"key = abc\nkey2=def", []string{"key", "key2"}},
+	{"key2 = abc\nkey=def", []string{"key2", "key"}},
+	{"key = abc\nkey=def", []string{"key"}},
+}
 
 // ----------------------------------------------------------------------------
 
-var filterTests = []struct ***REMOVED***
+var filterTests = []struct {
 	input   string
 	pattern string
 	keys    []string
 	err     string
-***REMOVED******REMOVED***
-	***REMOVED***"", "", []string***REMOVED******REMOVED***, ""***REMOVED***,
-	***REMOVED***"", "abc", []string***REMOVED******REMOVED***, ""***REMOVED***,
-	***REMOVED***"key=value", "", []string***REMOVED***"key"***REMOVED***, ""***REMOVED***,
-	***REMOVED***"key=value", "key=", []string***REMOVED******REMOVED***, ""***REMOVED***,
-	***REMOVED***"key=value\nfoo=bar", "", []string***REMOVED***"foo", "key"***REMOVED***, ""***REMOVED***,
-	***REMOVED***"key=value\nfoo=bar", "f", []string***REMOVED***"foo"***REMOVED***, ""***REMOVED***,
-	***REMOVED***"key=value\nfoo=bar", "fo", []string***REMOVED***"foo"***REMOVED***, ""***REMOVED***,
-	***REMOVED***"key=value\nfoo=bar", "foo", []string***REMOVED***"foo"***REMOVED***, ""***REMOVED***,
-	***REMOVED***"key=value\nfoo=bar", "fooo", []string***REMOVED******REMOVED***, ""***REMOVED***,
-	***REMOVED***"key=value\nkey2=value2\nfoo=bar", "ey", []string***REMOVED***"key", "key2"***REMOVED***, ""***REMOVED***,
-	***REMOVED***"key=value\nkey2=value2\nfoo=bar", "key", []string***REMOVED***"key", "key2"***REMOVED***, ""***REMOVED***,
-	***REMOVED***"key=value\nkey2=value2\nfoo=bar", "^key", []string***REMOVED***"key", "key2"***REMOVED***, ""***REMOVED***,
-	***REMOVED***"key=value\nkey2=value2\nfoo=bar", "^(key|foo)", []string***REMOVED***"foo", "key", "key2"***REMOVED***, ""***REMOVED***,
-	***REMOVED***"key=value\nkey2=value2\nfoo=bar", "[ abc", nil, "error parsing regexp.*"***REMOVED***,
-***REMOVED***
+}{
+	{"", "", []string{}, ""},
+	{"", "abc", []string{}, ""},
+	{"key=value", "", []string{"key"}, ""},
+	{"key=value", "key=", []string{}, ""},
+	{"key=value\nfoo=bar", "", []string{"foo", "key"}, ""},
+	{"key=value\nfoo=bar", "f", []string{"foo"}, ""},
+	{"key=value\nfoo=bar", "fo", []string{"foo"}, ""},
+	{"key=value\nfoo=bar", "foo", []string{"foo"}, ""},
+	{"key=value\nfoo=bar", "fooo", []string{}, ""},
+	{"key=value\nkey2=value2\nfoo=bar", "ey", []string{"key", "key2"}, ""},
+	{"key=value\nkey2=value2\nfoo=bar", "key", []string{"key", "key2"}, ""},
+	{"key=value\nkey2=value2\nfoo=bar", "^key", []string{"key", "key2"}, ""},
+	{"key=value\nkey2=value2\nfoo=bar", "^(key|foo)", []string{"foo", "key", "key2"}, ""},
+	{"key=value\nkey2=value2\nfoo=bar", "[ abc", nil, "error parsing regexp.*"},
+}
 
 // ----------------------------------------------------------------------------
 
-var filterPrefixTests = []struct ***REMOVED***
+var filterPrefixTests = []struct {
 	input  string
 	prefix string
 	keys   []string
-***REMOVED******REMOVED***
-	***REMOVED***"", "", []string***REMOVED******REMOVED******REMOVED***,
-	***REMOVED***"", "abc", []string***REMOVED******REMOVED******REMOVED***,
-	***REMOVED***"key=value", "", []string***REMOVED***"key"***REMOVED******REMOVED***,
-	***REMOVED***"key=value", "key=", []string***REMOVED******REMOVED******REMOVED***,
-	***REMOVED***"key=value\nfoo=bar", "", []string***REMOVED***"foo", "key"***REMOVED******REMOVED***,
-	***REMOVED***"key=value\nfoo=bar", "f", []string***REMOVED***"foo"***REMOVED******REMOVED***,
-	***REMOVED***"key=value\nfoo=bar", "fo", []string***REMOVED***"foo"***REMOVED******REMOVED***,
-	***REMOVED***"key=value\nfoo=bar", "foo", []string***REMOVED***"foo"***REMOVED******REMOVED***,
-	***REMOVED***"key=value\nfoo=bar", "fooo", []string***REMOVED******REMOVED******REMOVED***,
-	***REMOVED***"key=value\nkey2=value2\nfoo=bar", "key", []string***REMOVED***"key", "key2"***REMOVED******REMOVED***,
-***REMOVED***
+}{
+	{"", "", []string{}},
+	{"", "abc", []string{}},
+	{"key=value", "", []string{"key"}},
+	{"key=value", "key=", []string{}},
+	{"key=value\nfoo=bar", "", []string{"foo", "key"}},
+	{"key=value\nfoo=bar", "f", []string{"foo"}},
+	{"key=value\nfoo=bar", "fo", []string{"foo"}},
+	{"key=value\nfoo=bar", "foo", []string{"foo"}},
+	{"key=value\nfoo=bar", "fooo", []string{}},
+	{"key=value\nkey2=value2\nfoo=bar", "key", []string{"key", "key2"}},
+}
 
 // ----------------------------------------------------------------------------
 
-var filterStripPrefixTests = []struct ***REMOVED***
+var filterStripPrefixTests = []struct {
 	input  string
 	prefix string
 	keys   []string
-***REMOVED******REMOVED***
-	***REMOVED***"", "", []string***REMOVED******REMOVED******REMOVED***,
-	***REMOVED***"", "abc", []string***REMOVED******REMOVED******REMOVED***,
-	***REMOVED***"key=value", "", []string***REMOVED***"key"***REMOVED******REMOVED***,
-	***REMOVED***"key=value", "key=", []string***REMOVED******REMOVED******REMOVED***,
-	***REMOVED***"key=value\nfoo=bar", "", []string***REMOVED***"foo", "key"***REMOVED******REMOVED***,
-	***REMOVED***"key=value\nfoo=bar", "f", []string***REMOVED***"foo"***REMOVED******REMOVED***,
-	***REMOVED***"key=value\nfoo=bar", "fo", []string***REMOVED***"foo"***REMOVED******REMOVED***,
-	***REMOVED***"key=value\nfoo=bar", "foo", []string***REMOVED***"foo"***REMOVED******REMOVED***,
-	***REMOVED***"key=value\nfoo=bar", "fooo", []string***REMOVED******REMOVED******REMOVED***,
-	***REMOVED***"key=value\nkey2=value2\nfoo=bar", "key", []string***REMOVED***"key", "key2"***REMOVED******REMOVED***,
-***REMOVED***
+}{
+	{"", "", []string{}},
+	{"", "abc", []string{}},
+	{"key=value", "", []string{"key"}},
+	{"key=value", "key=", []string{}},
+	{"key=value\nfoo=bar", "", []string{"foo", "key"}},
+	{"key=value\nfoo=bar", "f", []string{"foo"}},
+	{"key=value\nfoo=bar", "fo", []string{"foo"}},
+	{"key=value\nfoo=bar", "foo", []string{"foo"}},
+	{"key=value\nfoo=bar", "fooo", []string{}},
+	{"key=value\nkey2=value2\nfoo=bar", "key", []string{"key", "key2"}},
+}
 
 // ----------------------------------------------------------------------------
 
-var setTests = []struct ***REMOVED***
+var setTests = []struct {
 	input      string
 	key, value string
 	prev       string
 	ok         bool
 	err        string
 	keys       []string
-***REMOVED******REMOVED***
-	***REMOVED***"", "", "", "", false, "", []string***REMOVED******REMOVED******REMOVED***,
-	***REMOVED***"", "key", "value", "", false, "", []string***REMOVED***"key"***REMOVED******REMOVED***,
-	***REMOVED***"key=value", "key2", "value2", "", false, "", []string***REMOVED***"key", "key2"***REMOVED******REMOVED***,
-	***REMOVED***"key=value", "abc", "value3", "", false, "", []string***REMOVED***"key", "abc"***REMOVED******REMOVED***,
-	***REMOVED***"key=value", "key", "value3", "value", true, "", []string***REMOVED***"key"***REMOVED******REMOVED***,
-***REMOVED***
+}{
+	{"", "", "", "", false, "", []string{}},
+	{"", "key", "value", "", false, "", []string{"key"}},
+	{"key=value", "key2", "value2", "", false, "", []string{"key", "key2"}},
+	{"key=value", "abc", "value3", "", false, "", []string{"key", "abc"}},
+	{"key=value", "key", "value3", "value", true, "", []string{"key"}},
+}
 
 // ----------------------------------------------------------------------------
 
 // TestBasic tests basic single key/value combinations with all possible
 // whitespace, delimiter and newline permutations.
-func TestBasic(t *testing.T) ***REMOVED***
+func TestBasic(t *testing.T) {
 	testWhitespaceAndDelimiterCombinations(t, "key", "")
 	testWhitespaceAndDelimiterCombinations(t, "key", "value")
 	testWhitespaceAndDelimiterCombinations(t, "key", "value   ")
-***REMOVED***
+}
 
-func TestComplex(t *testing.T) ***REMOVED***
-	for _, test := range complexTests ***REMOVED***
+func TestComplex(t *testing.T) {
+	for _, test := range complexTests {
 		testKeyValue(t, test[0], test[1:]...)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestErrors(t *testing.T) ***REMOVED***
-	for _, test := range errorTests ***REMOVED***
+func TestErrors(t *testing.T) {
+	for _, test := range errorTests {
 		_, err := Load([]byte(test.input), ISO_8859_1)
 		assert.Equal(t, err != nil, true, "want error")
 		assert.Equal(t, strings.Contains(err.Error(), test.msg), true)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestDisableExpansion(t *testing.T) ***REMOVED***
-	input := "key=value\nkey2=$***REMOVED***key***REMOVED***"
+func TestDisableExpansion(t *testing.T) {
+	input := "key=value\nkey2=${key}"
 	p := mustParse(t, input)
 	p.DisableExpansion = true
 	assert.Equal(t, p.MustGet("key"), "value")
-	assert.Equal(t, p.MustGet("key2"), "$***REMOVED***key***REMOVED***")
+	assert.Equal(t, p.MustGet("key2"), "${key}")
 
 	// with expansion disabled we can introduce circular references
-	p.MustSet("keyA", "$***REMOVED***keyB***REMOVED***")
-	p.MustSet("keyB", "$***REMOVED***keyA***REMOVED***")
-	assert.Equal(t, p.MustGet("keyA"), "$***REMOVED***keyB***REMOVED***")
-	assert.Equal(t, p.MustGet("keyB"), "$***REMOVED***keyA***REMOVED***")
-***REMOVED***
+	p.MustSet("keyA", "${keyB}")
+	p.MustSet("keyB", "${keyA}")
+	assert.Equal(t, p.MustGet("keyA"), "${keyB}")
+	assert.Equal(t, p.MustGet("keyB"), "${keyA}")
+}
 
-func TestDisableExpansionStillUpdatesKeys(t *testing.T) ***REMOVED***
+func TestDisableExpansionStillUpdatesKeys(t *testing.T) {
 	p := NewProperties()
 	p.MustSet("p1", "a")
-	assert.Equal(t, p.Keys(), []string***REMOVED***"p1"***REMOVED***)
+	assert.Equal(t, p.Keys(), []string{"p1"})
 	assert.Equal(t, p.String(), "p1 = a\n")
 
 	p.DisableExpansion = true
 	p.MustSet("p2", "b")
 
-	assert.Equal(t, p.Keys(), []string***REMOVED***"p1", "p2"***REMOVED***)
+	assert.Equal(t, p.Keys(), []string{"p1", "p2"})
 	assert.Equal(t, p.String(), "p1 = a\np2 = b\n")
-***REMOVED***
+}
 
-func TestMustGet(t *testing.T) ***REMOVED***
+func TestMustGet(t *testing.T) {
 	input := "key = value\nkey2 = ghi"
 	p := mustParse(t, input)
 	assert.Equal(t, p.MustGet("key"), "value")
-	assert.Panic(t, func() ***REMOVED*** p.MustGet("invalid") ***REMOVED***, "unknown property: invalid")
-***REMOVED***
+	assert.Panic(t, func() { p.MustGet("invalid") }, "unknown property: invalid")
+}
 
-func TestGetBool(t *testing.T) ***REMOVED***
-	for _, test := range boolTests ***REMOVED***
+func TestGetBool(t *testing.T) {
+	for _, test := range boolTests {
 		p := mustParse(t, test.input)
 		assert.Equal(t, p.Len(), 1)
 		assert.Equal(t, p.GetBool(test.key, test.def), test.value)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestMustGetBool(t *testing.T) ***REMOVED***
+func TestMustGetBool(t *testing.T) {
 	input := "key = true\nkey2 = ghi"
 	p := mustParse(t, input)
 	assert.Equal(t, p.MustGetBool("key"), true)
-	assert.Panic(t, func() ***REMOVED*** p.MustGetBool("invalid") ***REMOVED***, "unknown property: invalid")
-***REMOVED***
+	assert.Panic(t, func() { p.MustGetBool("invalid") }, "unknown property: invalid")
+}
 
-func TestGetDuration(t *testing.T) ***REMOVED***
-	for _, test := range durationTests ***REMOVED***
+func TestGetDuration(t *testing.T) {
+	for _, test := range durationTests {
 		p := mustParse(t, test.input)
 		assert.Equal(t, p.Len(), 1)
 		assert.Equal(t, p.GetDuration(test.key, test.def), test.value)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestMustGetDuration(t *testing.T) ***REMOVED***
+func TestMustGetDuration(t *testing.T) {
 	input := "key = 123\nkey2 = ghi"
 	p := mustParse(t, input)
 	assert.Equal(t, p.MustGetDuration("key"), time.Duration(123))
-	assert.Panic(t, func() ***REMOVED*** p.MustGetDuration("key2") ***REMOVED***, "strconv.ParseInt: parsing.*")
-	assert.Panic(t, func() ***REMOVED*** p.MustGetDuration("invalid") ***REMOVED***, "unknown property: invalid")
-***REMOVED***
+	assert.Panic(t, func() { p.MustGetDuration("key2") }, "strconv.ParseInt: parsing.*")
+	assert.Panic(t, func() { p.MustGetDuration("invalid") }, "unknown property: invalid")
+}
 
-func TestGetParsedDuration(t *testing.T) ***REMOVED***
-	for _, test := range parsedDurationTests ***REMOVED***
+func TestGetParsedDuration(t *testing.T) {
+	for _, test := range parsedDurationTests {
 		p := mustParse(t, test.input)
 		assert.Equal(t, p.Len(), 1)
 		assert.Equal(t, p.GetParsedDuration(test.key, test.def), test.value)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestMustGetParsedDuration(t *testing.T) ***REMOVED***
+func TestMustGetParsedDuration(t *testing.T) {
 	input := "key = 123ms\nkey2 = ghi"
 	p := mustParse(t, input)
 	assert.Equal(t, p.MustGetParsedDuration("key"), 123*time.Millisecond)
-	assert.Panic(t, func() ***REMOVED*** p.MustGetParsedDuration("key2") ***REMOVED***, "time: invalid duration ghi")
-	assert.Panic(t, func() ***REMOVED*** p.MustGetParsedDuration("invalid") ***REMOVED***, "unknown property: invalid")
-***REMOVED***
+	assert.Panic(t, func() { p.MustGetParsedDuration("key2") }, "time: invalid duration ghi")
+	assert.Panic(t, func() { p.MustGetParsedDuration("invalid") }, "unknown property: invalid")
+}
 
-func TestGetFloat64(t *testing.T) ***REMOVED***
-	for _, test := range floatTests ***REMOVED***
+func TestGetFloat64(t *testing.T) {
+	for _, test := range floatTests {
 		p := mustParse(t, test.input)
 		assert.Equal(t, p.Len(), 1)
 		assert.Equal(t, p.GetFloat64(test.key, test.def), test.value)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestMustGetFloat64(t *testing.T) ***REMOVED***
+func TestMustGetFloat64(t *testing.T) {
 	input := "key = 123\nkey2 = ghi"
 	p := mustParse(t, input)
 	assert.Equal(t, p.MustGetFloat64("key"), float64(123))
-	assert.Panic(t, func() ***REMOVED*** p.MustGetFloat64("key2") ***REMOVED***, "strconv.ParseFloat: parsing.*")
-	assert.Panic(t, func() ***REMOVED*** p.MustGetFloat64("invalid") ***REMOVED***, "unknown property: invalid")
-***REMOVED***
+	assert.Panic(t, func() { p.MustGetFloat64("key2") }, "strconv.ParseFloat: parsing.*")
+	assert.Panic(t, func() { p.MustGetFloat64("invalid") }, "unknown property: invalid")
+}
 
-func TestGetInt(t *testing.T) ***REMOVED***
-	for _, test := range int64Tests ***REMOVED***
+func TestGetInt(t *testing.T) {
+	for _, test := range int64Tests {
 		p := mustParse(t, test.input)
 		assert.Equal(t, p.Len(), 1)
 		assert.Equal(t, p.GetInt(test.key, int(test.def)), int(test.value))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestMustGetInt(t *testing.T) ***REMOVED***
+func TestMustGetInt(t *testing.T) {
 	input := "key = 123\nkey2 = ghi"
 	p := mustParse(t, input)
 	assert.Equal(t, p.MustGetInt("key"), int(123))
-	assert.Panic(t, func() ***REMOVED*** p.MustGetInt("key2") ***REMOVED***, "strconv.ParseInt: parsing.*")
-	assert.Panic(t, func() ***REMOVED*** p.MustGetInt("invalid") ***REMOVED***, "unknown property: invalid")
-***REMOVED***
+	assert.Panic(t, func() { p.MustGetInt("key2") }, "strconv.ParseInt: parsing.*")
+	assert.Panic(t, func() { p.MustGetInt("invalid") }, "unknown property: invalid")
+}
 
-func TestGetInt64(t *testing.T) ***REMOVED***
-	for _, test := range int64Tests ***REMOVED***
+func TestGetInt64(t *testing.T) {
+	for _, test := range int64Tests {
 		p := mustParse(t, test.input)
 		assert.Equal(t, p.Len(), 1)
 		assert.Equal(t, p.GetInt64(test.key, test.def), test.value)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestMustGetInt64(t *testing.T) ***REMOVED***
+func TestMustGetInt64(t *testing.T) {
 	input := "key = 123\nkey2 = ghi"
 	p := mustParse(t, input)
 	assert.Equal(t, p.MustGetInt64("key"), int64(123))
-	assert.Panic(t, func() ***REMOVED*** p.MustGetInt64("key2") ***REMOVED***, "strconv.ParseInt: parsing.*")
-	assert.Panic(t, func() ***REMOVED*** p.MustGetInt64("invalid") ***REMOVED***, "unknown property: invalid")
-***REMOVED***
+	assert.Panic(t, func() { p.MustGetInt64("key2") }, "strconv.ParseInt: parsing.*")
+	assert.Panic(t, func() { p.MustGetInt64("invalid") }, "unknown property: invalid")
+}
 
-func TestGetUint(t *testing.T) ***REMOVED***
-	for _, test := range uint64Tests ***REMOVED***
+func TestGetUint(t *testing.T) {
+	for _, test := range uint64Tests {
 		p := mustParse(t, test.input)
 		assert.Equal(t, p.Len(), 1)
 		assert.Equal(t, p.GetUint(test.key, uint(test.def)), uint(test.value))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestMustGetUint(t *testing.T) ***REMOVED***
+func TestMustGetUint(t *testing.T) {
 	input := "key = 123\nkey2 = ghi"
 	p := mustParse(t, input)
 	assert.Equal(t, p.MustGetUint("key"), uint(123))
-	assert.Panic(t, func() ***REMOVED*** p.MustGetUint64("key2") ***REMOVED***, "strconv.ParseUint: parsing.*")
-	assert.Panic(t, func() ***REMOVED*** p.MustGetUint64("invalid") ***REMOVED***, "unknown property: invalid")
-***REMOVED***
+	assert.Panic(t, func() { p.MustGetUint64("key2") }, "strconv.ParseUint: parsing.*")
+	assert.Panic(t, func() { p.MustGetUint64("invalid") }, "unknown property: invalid")
+}
 
-func TestGetUint64(t *testing.T) ***REMOVED***
-	for _, test := range uint64Tests ***REMOVED***
+func TestGetUint64(t *testing.T) {
+	for _, test := range uint64Tests {
 		p := mustParse(t, test.input)
 		assert.Equal(t, p.Len(), 1)
 		assert.Equal(t, p.GetUint64(test.key, test.def), test.value)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestMustGetUint64(t *testing.T) ***REMOVED***
+func TestMustGetUint64(t *testing.T) {
 	input := "key = 123\nkey2 = ghi"
 	p := mustParse(t, input)
 	assert.Equal(t, p.MustGetUint64("key"), uint64(123))
-	assert.Panic(t, func() ***REMOVED*** p.MustGetUint64("key2") ***REMOVED***, "strconv.ParseUint: parsing.*")
-	assert.Panic(t, func() ***REMOVED*** p.MustGetUint64("invalid") ***REMOVED***, "unknown property: invalid")
-***REMOVED***
+	assert.Panic(t, func() { p.MustGetUint64("key2") }, "strconv.ParseUint: parsing.*")
+	assert.Panic(t, func() { p.MustGetUint64("invalid") }, "unknown property: invalid")
+}
 
-func TestGetString(t *testing.T) ***REMOVED***
-	for _, test := range stringTests ***REMOVED***
+func TestGetString(t *testing.T) {
+	for _, test := range stringTests {
 		p := mustParse(t, test.input)
 		assert.Equal(t, p.Len(), 1)
 		assert.Equal(t, p.GetString(test.key, test.def), test.value)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestMustGetString(t *testing.T) ***REMOVED***
+func TestMustGetString(t *testing.T) {
 	input := `key = value`
 	p := mustParse(t, input)
 	assert.Equal(t, p.MustGetString("key"), "value")
-	assert.Panic(t, func() ***REMOVED*** p.MustGetString("invalid") ***REMOVED***, "unknown property: invalid")
-***REMOVED***
+	assert.Panic(t, func() { p.MustGetString("invalid") }, "unknown property: invalid")
+}
 
-func TestComment(t *testing.T) ***REMOVED***
-	for _, test := range commentTests ***REMOVED***
+func TestComment(t *testing.T) {
+	for _, test := range commentTests {
 		p := mustParse(t, test.input)
 		assert.Equal(t, p.MustGetString(test.key), test.value)
 		assert.Equal(t, p.GetComments(test.key), test.comments)
-		if test.comments != nil ***REMOVED***
+		if test.comments != nil {
 			assert.Equal(t, p.GetComment(test.key), test.comments[len(test.comments)-1])
-		***REMOVED*** else ***REMOVED***
+		} else {
 			assert.Equal(t, p.GetComment(test.key), "")
-		***REMOVED***
+		}
 
 		// test setting comments
-		if len(test.comments) > 0 ***REMOVED***
+		if len(test.comments) > 0 {
 			// set single comment
 			p.ClearComments()
 			assert.Equal(t, len(p.c), 0)
@@ -651,175 +651,175 @@ func TestComment(t *testing.T) ***REMOVED***
 			p.SetComments(test.key, nil)
 			assert.Equal(t, p.GetComment(test.key), "")
 			assert.Equal(t, p.GetComments(test.key), ([]string)(nil))
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestFilter(t *testing.T) ***REMOVED***
-	for _, test := range filterTests ***REMOVED***
+func TestFilter(t *testing.T) {
+	for _, test := range filterTests {
 		p := mustParse(t, test.input)
 		pp, err := p.Filter(test.pattern)
-		if err != nil ***REMOVED***
+		if err != nil {
 			assert.Matches(t, err.Error(), test.err)
 			continue
-		***REMOVED***
+		}
 		assert.Equal(t, pp != nil, true, "want properties")
 		assert.Equal(t, pp.Len(), len(test.keys))
-		for _, key := range test.keys ***REMOVED***
+		for _, key := range test.keys {
 			v1, ok1 := p.Get(key)
 			v2, ok2 := pp.Get(key)
 			assert.Equal(t, ok1, true)
 			assert.Equal(t, ok2, true)
 			assert.Equal(t, v1, v2)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestFilterPrefix(t *testing.T) ***REMOVED***
-	for _, test := range filterPrefixTests ***REMOVED***
+func TestFilterPrefix(t *testing.T) {
+	for _, test := range filterPrefixTests {
 		p := mustParse(t, test.input)
 		pp := p.FilterPrefix(test.prefix)
 		assert.Equal(t, pp != nil, true, "want properties")
 		assert.Equal(t, pp.Len(), len(test.keys))
-		for _, key := range test.keys ***REMOVED***
+		for _, key := range test.keys {
 			v1, ok1 := p.Get(key)
 			v2, ok2 := pp.Get(key)
 			assert.Equal(t, ok1, true)
 			assert.Equal(t, ok2, true)
 			assert.Equal(t, v1, v2)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestFilterStripPrefix(t *testing.T) ***REMOVED***
-	for _, test := range filterStripPrefixTests ***REMOVED***
+func TestFilterStripPrefix(t *testing.T) {
+	for _, test := range filterStripPrefixTests {
 		p := mustParse(t, test.input)
 		pp := p.FilterPrefix(test.prefix)
 		assert.Equal(t, pp != nil, true, "want properties")
 		assert.Equal(t, pp.Len(), len(test.keys))
-		for _, key := range test.keys ***REMOVED***
+		for _, key := range test.keys {
 			v1, ok1 := p.Get(key)
 			v2, ok2 := pp.Get(key)
 			assert.Equal(t, ok1, true)
 			assert.Equal(t, ok2, true)
 			assert.Equal(t, v1, v2)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestKeys(t *testing.T) ***REMOVED***
-	for _, test := range keysTests ***REMOVED***
+func TestKeys(t *testing.T) {
+	for _, test := range keysTests {
 		p := mustParse(t, test.input)
 		assert.Equal(t, p.Len(), len(test.keys))
 		assert.Equal(t, len(p.Keys()), len(test.keys))
 		assert.Equal(t, p.Keys(), test.keys)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestSet(t *testing.T) ***REMOVED***
-	for _, test := range setTests ***REMOVED***
+func TestSet(t *testing.T) {
+	for _, test := range setTests {
 		p := mustParse(t, test.input)
 		prev, ok, err := p.Set(test.key, test.value)
-		if test.err != "" ***REMOVED***
+		if test.err != "" {
 			assert.Matches(t, err.Error(), test.err)
 			continue
-		***REMOVED***
+		}
 
 		assert.Equal(t, err, nil)
 		assert.Equal(t, ok, test.ok)
-		if ok ***REMOVED***
+		if ok {
 			assert.Equal(t, prev, test.prev)
-		***REMOVED***
+		}
 		assert.Equal(t, p.Keys(), test.keys)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestSetValue(t *testing.T) ***REMOVED***
-	tests := []interface***REMOVED******REMOVED******REMOVED***
+func TestSetValue(t *testing.T) {
+	tests := []interface{}{
 		true, false,
 		int8(123), int16(123), int32(123), int64(123), int(123),
 		uint8(123), uint16(123), uint32(123), uint64(123), uint(123),
 		float32(1.23), float64(1.23),
 		"abc",
-	***REMOVED***
+	}
 
-	for _, v := range tests ***REMOVED***
+	for _, v := range tests {
 		p := NewProperties()
 		err := p.SetValue("x", v)
 		assert.Equal(t, err, nil)
 		assert.Equal(t, p.GetString("x", ""), fmt.Sprintf("%v", v))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestMustSet(t *testing.T) ***REMOVED***
-	input := "key=$***REMOVED***key***REMOVED***"
+func TestMustSet(t *testing.T) {
+	input := "key=${key}"
 	p := mustParse(t, input)
-	assert.Panic(t, func() ***REMOVED*** p.MustSet("key", "$***REMOVED***key***REMOVED***") ***REMOVED***, "circular reference .*")
-***REMOVED***
+	assert.Panic(t, func() { p.MustSet("key", "${key}") }, "circular reference .*")
+}
 
-func TestWrite(t *testing.T) ***REMOVED***
-	for _, test := range writeTests ***REMOVED***
+func TestWrite(t *testing.T) {
+	for _, test := range writeTests {
 		p, err := parse(test.input)
 
 		buf := new(bytes.Buffer)
 		var n int
-		switch test.encoding ***REMOVED***
+		switch test.encoding {
 		case "UTF-8":
 			n, err = p.Write(buf, UTF8)
 		case "ISO-8859-1":
 			n, err = p.Write(buf, ISO_8859_1)
-		***REMOVED***
+		}
 		assert.Equal(t, err, nil)
 		s := string(buf.Bytes())
 		assert.Equal(t, n, len(test.output), fmt.Sprintf("input=%q expected=%q obtained=%q", test.input, test.output, s))
 		assert.Equal(t, s, test.output, fmt.Sprintf("input=%q expected=%q obtained=%q", test.input, test.output, s))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestWriteComment(t *testing.T) ***REMOVED***
-	for _, test := range writeCommentTests ***REMOVED***
+func TestWriteComment(t *testing.T) {
+	for _, test := range writeCommentTests {
 		p, err := parse(test.input)
 
 		buf := new(bytes.Buffer)
 		var n int
-		switch test.encoding ***REMOVED***
+		switch test.encoding {
 		case "UTF-8":
 			n, err = p.WriteComment(buf, "# ", UTF8)
 		case "ISO-8859-1":
 			n, err = p.WriteComment(buf, "# ", ISO_8859_1)
-		***REMOVED***
+		}
 		assert.Equal(t, err, nil)
 		s := string(buf.Bytes())
 		assert.Equal(t, n, len(test.output), fmt.Sprintf("input=%q expected=%q obtained=%q", test.input, test.output, s))
 		assert.Equal(t, s, test.output, fmt.Sprintf("input=%q expected=%q obtained=%q", test.input, test.output, s))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestCustomExpansionExpression(t *testing.T) ***REMOVED***
+func TestCustomExpansionExpression(t *testing.T) {
 	testKeyValuePrePostfix(t, "*[", "]*", "key=value\nkey2=*[key]*", "key", "value", "key2", "value")
-***REMOVED***
+}
 
-func TestPanicOn32BitIntOverflow(t *testing.T) ***REMOVED***
+func TestPanicOn32BitIntOverflow(t *testing.T) {
 	is32Bit = true
 	var min, max int64 = math.MinInt32 - 1, math.MaxInt32 + 1
 	input := fmt.Sprintf("min=%d\nmax=%d", min, max)
 	p := mustParse(t, input)
 	assert.Equal(t, p.MustGetInt64("min"), min)
 	assert.Equal(t, p.MustGetInt64("max"), max)
-	assert.Panic(t, func() ***REMOVED*** p.MustGetInt("min") ***REMOVED***, ".* out of range")
-	assert.Panic(t, func() ***REMOVED*** p.MustGetInt("max") ***REMOVED***, ".* out of range")
-***REMOVED***
+	assert.Panic(t, func() { p.MustGetInt("min") }, ".* out of range")
+	assert.Panic(t, func() { p.MustGetInt("max") }, ".* out of range")
+}
 
-func TestPanicOn32BitUintOverflow(t *testing.T) ***REMOVED***
+func TestPanicOn32BitUintOverflow(t *testing.T) {
 	is32Bit = true
 	var max uint64 = math.MaxUint32 + 1
 	input := fmt.Sprintf("max=%d", max)
 	p := mustParse(t, input)
 	assert.Equal(t, p.MustGetUint64("max"), max)
-	assert.Panic(t, func() ***REMOVED*** p.MustGetUint("max") ***REMOVED***, ".* out of range")
-***REMOVED***
+	assert.Panic(t, func() { p.MustGetUint("max") }, ".* out of range")
+}
 
-func TestDeleteKey(t *testing.T) ***REMOVED***
+func TestDeleteKey(t *testing.T) {
 	input := "#comments should also be gone\nkey=to-be-deleted\nsecond=key"
 	p := mustParse(t, input)
 	assert.Equal(t, len(p.m), 2)
@@ -831,9 +831,9 @@ func TestDeleteKey(t *testing.T) ***REMOVED***
 	assert.Equal(t, len(p.k), 1)
 	assert.Equal(t, p.k[0], "second")
 	assert.Equal(t, p.m["second"], "key")
-***REMOVED***
+}
 
-func TestDeleteUnknownKey(t *testing.T) ***REMOVED***
+func TestDeleteUnknownKey(t *testing.T) {
 	input := "#comments should also be gone\nkey=to-be-deleted"
 	p := mustParse(t, input)
 	assert.Equal(t, len(p.m), 1)
@@ -843,9 +843,9 @@ func TestDeleteUnknownKey(t *testing.T) ***REMOVED***
 	assert.Equal(t, len(p.m), 1)
 	assert.Equal(t, len(p.c), 1)
 	assert.Equal(t, len(p.k), 1)
-***REMOVED***
+}
 
-func TestMerge(t *testing.T) ***REMOVED***
+func TestMerge(t *testing.T) {
 	input1 := "#comment\nkey=value\nkey2=value2"
 	input2 := "#another comment\nkey=another value\nkey3=value3"
 	p1 := mustParse(t, input1)
@@ -856,94 +856,94 @@ func TestMerge(t *testing.T) ***REMOVED***
 	assert.Equal(t, len(p1.k), 3)
 	assert.Equal(t, p1.MustGet("key"), "another value")
 	assert.Equal(t, p1.GetComment("key"), "another comment")
-***REMOVED***
+}
 
-func TestMap(t *testing.T) ***REMOVED***
+func TestMap(t *testing.T) {
 	input := "key=value\nabc=def"
 	p := mustParse(t, input)
-	m := map[string]string***REMOVED***"key": "value", "abc": "def"***REMOVED***
+	m := map[string]string{"key": "value", "abc": "def"}
 	assert.Equal(t, p.Map(), m)
-***REMOVED***
+}
 
-func TestFilterFunc(t *testing.T) ***REMOVED***
+func TestFilterFunc(t *testing.T) {
 	input := "key=value\nabc=def"
 	p := mustParse(t, input)
-	pp := p.FilterFunc(func(k, v string) bool ***REMOVED***
+	pp := p.FilterFunc(func(k, v string) bool {
 		return k != "abc"
-	***REMOVED***)
-	m := map[string]string***REMOVED***"key": "value"***REMOVED***
+	})
+	m := map[string]string{"key": "value"}
 	assert.Equal(t, pp.Map(), m)
-***REMOVED***
+}
 
 // ----------------------------------------------------------------------------
 
 // tests all combinations of delimiters, leading and/or trailing whitespace and newlines.
-func testWhitespaceAndDelimiterCombinations(t *testing.T, key, value string) ***REMOVED***
-	whitespace := []string***REMOVED***"", " ", "\f", "\t"***REMOVED***
-	delimiters := []string***REMOVED***"", " ", "=", ":"***REMOVED***
-	newlines := []string***REMOVED***"", "\r", "\n", "\r\n"***REMOVED***
-	for _, dl := range delimiters ***REMOVED***
-		for _, ws1 := range whitespace ***REMOVED***
-			for _, ws2 := range whitespace ***REMOVED***
-				for _, nl := range newlines ***REMOVED***
+func testWhitespaceAndDelimiterCombinations(t *testing.T, key, value string) {
+	whitespace := []string{"", " ", "\f", "\t"}
+	delimiters := []string{"", " ", "=", ":"}
+	newlines := []string{"", "\r", "\n", "\r\n"}
+	for _, dl := range delimiters {
+		for _, ws1 := range whitespace {
+			for _, ws2 := range whitespace {
+				for _, nl := range newlines {
 					// skip the one case where there is nothing between a key and a value
-					if ws1 == "" && dl == "" && ws2 == "" && value != "" ***REMOVED***
+					if ws1 == "" && dl == "" && ws2 == "" && value != "" {
 						continue
-					***REMOVED***
+					}
 
 					input := fmt.Sprintf("%s%s%s%s%s%s", key, ws1, dl, ws2, value, nl)
 					testKeyValue(t, input, key, value)
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+				}
+			}
+		}
+	}
+}
 
 // tests whether key/value pairs exist for a given input.
 // keyvalues is expected to be an even number of strings of "key", "value", ...
-func testKeyValue(t *testing.T, input string, keyvalues ...string) ***REMOVED***
-	testKeyValuePrePostfix(t, "$***REMOVED***", "***REMOVED***", input, keyvalues...)
-***REMOVED***
+func testKeyValue(t *testing.T, input string, keyvalues ...string) {
+	testKeyValuePrePostfix(t, "${", "}", input, keyvalues...)
+}
 
 // tests whether key/value pairs exist for a given input.
 // keyvalues is expected to be an even number of strings of "key", "value", ...
-func testKeyValuePrePostfix(t *testing.T, prefix, postfix, input string, keyvalues ...string) ***REMOVED***
+func testKeyValuePrePostfix(t *testing.T, prefix, postfix, input string, keyvalues ...string) {
 	p, err := Load([]byte(input), ISO_8859_1)
 	assert.Equal(t, err, nil)
 	p.Prefix = prefix
 	p.Postfix = postfix
 	assertKeyValues(t, input, p, keyvalues...)
-***REMOVED***
+}
 
 // tests whether key/value pairs exist for a given input.
 // keyvalues is expected to be an even number of strings of "key", "value", ...
-func assertKeyValues(t *testing.T, input string, p *Properties, keyvalues ...string) ***REMOVED***
+func assertKeyValues(t *testing.T, input string, p *Properties, keyvalues ...string) {
 	assert.Equal(t, p != nil, true, "want properties")
 	assert.Equal(t, 2*p.Len(), len(keyvalues), "Odd number of key/value pairs.")
 
-	for i := 0; i < len(keyvalues); i += 2 ***REMOVED***
+	for i := 0; i < len(keyvalues); i += 2 {
 		key, value := keyvalues[i], keyvalues[i+1]
 		v, ok := p.Get(key)
-		if !ok ***REMOVED***
+		if !ok {
 			t.Errorf("No key %q found (input=%q)", key, input)
-		***REMOVED***
-		if got, want := v, value; !reflect.DeepEqual(got, want) ***REMOVED***
+		}
+		if got, want := v, value; !reflect.DeepEqual(got, want) {
 			t.Errorf("Value %q does not match %q (input=%q)", v, value, input)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func mustParse(t *testing.T, s string) *Properties ***REMOVED***
+func mustParse(t *testing.T, s string) *Properties {
 	p, err := parse(s)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("parse failed with %s", err)
-	***REMOVED***
+	}
 	return p
-***REMOVED***
+}
 
 // prints to stderr if the -verbose flag was given.
-func printf(format string, args ...interface***REMOVED******REMOVED***) ***REMOVED***
-	if *verbose ***REMOVED***
+func printf(format string, args ...interface{}) {
+	if *verbose {
 		fmt.Fprintf(os.Stderr, format, args...)
-	***REMOVED***
-***REMOVED***
+	}
+}

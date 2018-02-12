@@ -6,7 +6,7 @@ package salsa
 
 // Core208 applies the Salsa20/8 core function to the 64-byte array in and puts
 // the result into the 64-byte array out. The input and output may be the same array.
-func Core208(out *[64]byte, in *[64]byte) ***REMOVED***
+func Core208(out *[64]byte, in *[64]byte) {
 	j0 := uint32(in[0]) | uint32(in[1])<<8 | uint32(in[2])<<16 | uint32(in[3])<<24
 	j1 := uint32(in[4]) | uint32(in[5])<<8 | uint32(in[6])<<16 | uint32(in[7])<<24
 	j2 := uint32(in[8]) | uint32(in[9])<<8 | uint32(in[10])<<16 | uint32(in[11])<<24
@@ -27,7 +27,7 @@ func Core208(out *[64]byte, in *[64]byte) ***REMOVED***
 	x0, x1, x2, x3, x4, x5, x6, x7, x8 := j0, j1, j2, j3, j4, j5, j6, j7, j8
 	x9, x10, x11, x12, x13, x14, x15 := j9, j10, j11, j12, j13, j14, j15
 
-	for i := 0; i < 8; i += 2 ***REMOVED***
+	for i := 0; i < 8; i += 2 {
 		u := x0 + x12
 		x4 ^= u<<7 | u>>(32-7)
 		u = x4 + x0
@@ -99,7 +99,7 @@ func Core208(out *[64]byte, in *[64]byte) ***REMOVED***
 		x14 ^= u<<13 | u>>(32-13)
 		u = x14 + x13
 		x15 ^= u<<18 | u>>(32-18)
-	***REMOVED***
+	}
 	x0 += j0
 	x1 += j1
 	x2 += j2
@@ -196,4 +196,4 @@ func Core208(out *[64]byte, in *[64]byte) ***REMOVED***
 	out[61] = byte(x15 >> 8)
 	out[62] = byte(x15 >> 16)
 	out[63] = byte(x15 >> 24)
-***REMOVED***
+}

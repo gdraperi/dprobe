@@ -26,40 +26,40 @@ var stringerIface = reflect.TypeOf((*fmt.Stringer)(nil)).Elem()
 //	* Avoids printing struct fields that are zero
 //	* Prints a nil-slice as being nil, not empty
 //	* Prints map entries in deterministic order
-func Format(v reflect.Value, useStringer bool) string ***REMOVED***
-	return formatAny(v, formatConfig***REMOVED***useStringer, true, true, !formatFakePointers***REMOVED***, nil)
-***REMOVED***
+func Format(v reflect.Value, useStringer bool) string {
+	return formatAny(v, formatConfig{useStringer, true, true, !formatFakePointers}, nil)
+}
 
-type formatConfig struct ***REMOVED***
+type formatConfig struct {
 	useStringer    bool // Should the String method be used if available?
 	printType      bool // Should we print the type before the value?
 	followPointers bool // Should we recursively follow pointers?
 	realPointers   bool // Should we print the real address of pointers?
-***REMOVED***
+}
 
-func formatAny(v reflect.Value, conf formatConfig, visited map[uintptr]bool) string ***REMOVED***
+func formatAny(v reflect.Value, conf formatConfig, visited map[uintptr]bool) string {
 	// TODO: Should this be a multi-line printout in certain situations?
 
-	if !v.IsValid() ***REMOVED***
+	if !v.IsValid() {
 		return "<non-existent>"
-	***REMOVED***
-	if conf.useStringer && v.Type().Implements(stringerIface) && v.CanInterface() ***REMOVED***
-		if (v.Kind() == reflect.Ptr || v.Kind() == reflect.Interface) && v.IsNil() ***REMOVED***
+	}
+	if conf.useStringer && v.Type().Implements(stringerIface) && v.CanInterface() {
+		if (v.Kind() == reflect.Ptr || v.Kind() == reflect.Interface) && v.IsNil() {
 			return "<nil>"
-		***REMOVED***
+		}
 		return fmt.Sprintf("%q", v.Interface().(fmt.Stringer).String())
-	***REMOVED***
+	}
 
-	switch v.Kind() ***REMOVED***
+	switch v.Kind() {
 	case reflect.Bool:
 		return formatPrimitive(v.Type(), v.Bool(), conf)
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		return formatPrimitive(v.Type(), v.Int(), conf)
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-		if v.Type().PkgPath() == "" || v.Kind() == reflect.Uintptr ***REMOVED***
+		if v.Type().PkgPath() == "" || v.Kind() == reflect.Uintptr {
 			// Unnamed uints are usually bytes or words, so use hexadecimal.
 			return formatPrimitive(v.Type(), formatHex(v.Uint()), conf)
-		***REMOVED***
+		}
 		return formatPrimitive(v.Type(), v.Uint(), conf)
 	case reflect.Float32, reflect.Float64:
 		return formatPrimitive(v.Type(), v.Float(), conf)
@@ -70,121 +70,121 @@ func formatAny(v reflect.Value, conf formatConfig, visited map[uintptr]bool) str
 	case reflect.UnsafePointer, reflect.Chan, reflect.Func:
 		return formatPointer(v, conf)
 	case reflect.Ptr:
-		if v.IsNil() ***REMOVED***
-			if conf.printType ***REMOVED***
+		if v.IsNil() {
+			if conf.printType {
 				return fmt.Sprintf("(%v)(nil)", v.Type())
-			***REMOVED***
+			}
 			return "<nil>"
-		***REMOVED***
-		if visited[v.Pointer()] || !conf.followPointers ***REMOVED***
+		}
+		if visited[v.Pointer()] || !conf.followPointers {
 			return formatPointer(v, conf)
-		***REMOVED***
+		}
 		visited = insertPointer(visited, v.Pointer())
 		return "&" + formatAny(v.Elem(), conf, visited)
 	case reflect.Interface:
-		if v.IsNil() ***REMOVED***
-			if conf.printType ***REMOVED***
+		if v.IsNil() {
+			if conf.printType {
 				return fmt.Sprintf("%v(nil)", v.Type())
-			***REMOVED***
+			}
 			return "<nil>"
-		***REMOVED***
+		}
 		return formatAny(v.Elem(), conf, visited)
 	case reflect.Slice:
-		if v.IsNil() ***REMOVED***
-			if conf.printType ***REMOVED***
+		if v.IsNil() {
+			if conf.printType {
 				return fmt.Sprintf("%v(nil)", v.Type())
-			***REMOVED***
+			}
 			return "<nil>"
-		***REMOVED***
-		if visited[v.Pointer()] ***REMOVED***
+		}
+		if visited[v.Pointer()] {
 			return formatPointer(v, conf)
-		***REMOVED***
+		}
 		visited = insertPointer(visited, v.Pointer())
 		fallthrough
 	case reflect.Array:
 		var ss []string
 		subConf := conf
 		subConf.printType = v.Type().Elem().Kind() == reflect.Interface
-		for i := 0; i < v.Len(); i++ ***REMOVED***
+		for i := 0; i < v.Len(); i++ {
 			s := formatAny(v.Index(i), subConf, visited)
 			ss = append(ss, s)
-		***REMOVED***
-		s := fmt.Sprintf("***REMOVED***%s***REMOVED***", strings.Join(ss, ", "))
-		if conf.printType ***REMOVED***
+		}
+		s := fmt.Sprintf("{%s}", strings.Join(ss, ", "))
+		if conf.printType {
 			return v.Type().String() + s
-		***REMOVED***
+		}
 		return s
 	case reflect.Map:
-		if v.IsNil() ***REMOVED***
-			if conf.printType ***REMOVED***
+		if v.IsNil() {
+			if conf.printType {
 				return fmt.Sprintf("%v(nil)", v.Type())
-			***REMOVED***
+			}
 			return "<nil>"
-		***REMOVED***
-		if visited[v.Pointer()] ***REMOVED***
+		}
+		if visited[v.Pointer()] {
 			return formatPointer(v, conf)
-		***REMOVED***
+		}
 		visited = insertPointer(visited, v.Pointer())
 
 		var ss []string
 		subConf := conf
 		subConf.printType = v.Type().Elem().Kind() == reflect.Interface
-		for _, k := range SortKeys(v.MapKeys()) ***REMOVED***
-			sk := formatAny(k, formatConfig***REMOVED***realPointers: conf.realPointers***REMOVED***, visited)
+		for _, k := range SortKeys(v.MapKeys()) {
+			sk := formatAny(k, formatConfig{realPointers: conf.realPointers}, visited)
 			sv := formatAny(v.MapIndex(k), subConf, visited)
 			ss = append(ss, fmt.Sprintf("%s: %s", sk, sv))
-		***REMOVED***
-		s := fmt.Sprintf("***REMOVED***%s***REMOVED***", strings.Join(ss, ", "))
-		if conf.printType ***REMOVED***
+		}
+		s := fmt.Sprintf("{%s}", strings.Join(ss, ", "))
+		if conf.printType {
 			return v.Type().String() + s
-		***REMOVED***
+		}
 		return s
 	case reflect.Struct:
 		var ss []string
 		subConf := conf
 		subConf.printType = true
-		for i := 0; i < v.NumField(); i++ ***REMOVED***
+		for i := 0; i < v.NumField(); i++ {
 			vv := v.Field(i)
-			if isZero(vv) ***REMOVED***
+			if isZero(vv) {
 				continue // Elide zero value fields
-			***REMOVED***
+			}
 			name := v.Type().Field(i).Name
 			subConf.useStringer = conf.useStringer && isExported(name)
 			s := formatAny(vv, subConf, visited)
 			ss = append(ss, fmt.Sprintf("%s: %s", name, s))
-		***REMOVED***
-		s := fmt.Sprintf("***REMOVED***%s***REMOVED***", strings.Join(ss, ", "))
-		if conf.printType ***REMOVED***
+		}
+		s := fmt.Sprintf("{%s}", strings.Join(ss, ", "))
+		if conf.printType {
 			return v.Type().String() + s
-		***REMOVED***
+		}
 		return s
 	default:
 		panic(fmt.Sprintf("%v kind not handled", v.Kind()))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func formatPrimitive(t reflect.Type, v interface***REMOVED******REMOVED***, conf formatConfig) string ***REMOVED***
-	if conf.printType && t.PkgPath() != "" ***REMOVED***
+func formatPrimitive(t reflect.Type, v interface{}, conf formatConfig) string {
+	if conf.printType && t.PkgPath() != "" {
 		return fmt.Sprintf("%v(%v)", t, v)
-	***REMOVED***
+	}
 	return fmt.Sprintf("%v", v)
-***REMOVED***
+}
 
-func formatPointer(v reflect.Value, conf formatConfig) string ***REMOVED***
+func formatPointer(v reflect.Value, conf formatConfig) string {
 	p := v.Pointer()
-	if !conf.realPointers ***REMOVED***
+	if !conf.realPointers {
 		p = 0 // For deterministic printing purposes
-	***REMOVED***
+	}
 	s := formatHex(uint64(p))
-	if conf.printType ***REMOVED***
+	if conf.printType {
 		return fmt.Sprintf("(%v)(%s)", v.Type(), s)
-	***REMOVED***
+	}
 	return s
-***REMOVED***
+}
 
-func formatHex(u uint64) string ***REMOVED***
+func formatHex(u uint64) string {
 	var f string
-	switch ***REMOVED***
+	switch {
 	case u <= 0xff:
 		f = "0x%02x"
 	case u <= 0xffff:
@@ -201,23 +201,23 @@ func formatHex(u uint64) string ***REMOVED***
 		f = "0x%014x"
 	case u <= 0xffffffffffffffff:
 		f = "0x%016x"
-	***REMOVED***
+	}
 	return fmt.Sprintf(f, u)
-***REMOVED***
+}
 
 // insertPointer insert p into m, allocating m if necessary.
-func insertPointer(m map[uintptr]bool, p uintptr) map[uintptr]bool ***REMOVED***
-	if m == nil ***REMOVED***
+func insertPointer(m map[uintptr]bool, p uintptr) map[uintptr]bool {
+	if m == nil {
 		m = make(map[uintptr]bool)
-	***REMOVED***
+	}
 	m[p] = true
 	return m
-***REMOVED***
+}
 
 // isZero reports whether v is the zero value.
 // This does not rely on Interface and so can be used on unexported fields.
-func isZero(v reflect.Value) bool ***REMOVED***
-	switch v.Kind() ***REMOVED***
+func isZero(v reflect.Value) bool {
+	switch v.Kind() {
 	case reflect.Bool:
 		return v.Bool() == false
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
@@ -235,25 +235,25 @@ func isZero(v reflect.Value) bool ***REMOVED***
 	case reflect.Chan, reflect.Func, reflect.Interface, reflect.Ptr, reflect.Map, reflect.Slice:
 		return v.IsNil()
 	case reflect.Array:
-		for i := 0; i < v.Len(); i++ ***REMOVED***
-			if !isZero(v.Index(i)) ***REMOVED***
+		for i := 0; i < v.Len(); i++ {
+			if !isZero(v.Index(i)) {
 				return false
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		return true
 	case reflect.Struct:
-		for i := 0; i < v.NumField(); i++ ***REMOVED***
-			if !isZero(v.Field(i)) ***REMOVED***
+		for i := 0; i < v.NumField(); i++ {
+			if !isZero(v.Field(i)) {
 				return false
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		return true
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
 // isExported reports whether the identifier is exported.
-func isExported(id string) bool ***REMOVED***
+func isExported(id string) bool {
 	r, _ := utf8.DecodeRuneInString(id)
 	return unicode.IsUpper(r)
-***REMOVED***
+}

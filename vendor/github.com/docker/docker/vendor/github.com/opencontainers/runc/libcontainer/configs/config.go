@@ -12,28 +12,28 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type Rlimit struct ***REMOVED***
+type Rlimit struct {
 	Type int    `json:"type"`
 	Hard uint64 `json:"hard"`
 	Soft uint64 `json:"soft"`
-***REMOVED***
+}
 
 // IDMap represents UID/GID Mappings for User Namespaces.
-type IDMap struct ***REMOVED***
+type IDMap struct {
 	ContainerID int `json:"container_id"`
 	HostID      int `json:"host_id"`
 	Size        int `json:"size"`
-***REMOVED***
+}
 
 // Seccomp represents syscall restrictions
 // By default, only the native architecture of the kernel is allowed to be used
 // for syscalls. Additional architectures can be added by specifying them in
 // Architectures.
-type Seccomp struct ***REMOVED***
+type Seccomp struct {
 	DefaultAction Action     `json:"default_action"`
 	Architectures []string   `json:"architectures"`
 	Syscalls      []*Syscall `json:"syscalls"`
-***REMOVED***
+}
 
 // Action is taken upon rule match in Seccomp
 type Action int
@@ -60,25 +60,25 @@ const (
 )
 
 // Arg is a rule to match a specific syscall argument in Seccomp
-type Arg struct ***REMOVED***
+type Arg struct {
 	Index    uint     `json:"index"`
 	Value    uint64   `json:"value"`
 	ValueTwo uint64   `json:"value_two"`
 	Op       Operator `json:"op"`
-***REMOVED***
+}
 
 // Syscall is a rule to match a syscall in Seccomp
-type Syscall struct ***REMOVED***
+type Syscall struct {
 	Name   string `json:"name"`
 	Action Action `json:"action"`
 	Args   []*Arg `json:"args"`
-***REMOVED***
+}
 
 // TODO Windows. Many of these fields should be factored out into those parts
 // which are common across platforms, and those which are platform specific.
 
 // Config defines configuration options for executing a process inside a contained environment.
-type Config struct ***REMOVED***
+type Config struct {
 	// NoPivotRoot will use MS_MOVE and a chroot to jail the process into the container's rootfs
 	// This is a common option when the container is running in ramdisk
 	NoPivotRoot bool `json:"no_pivot_root"`
@@ -191,9 +191,9 @@ type Config struct ***REMOVED***
 	// IntelRdt specifies settings for Intel RDT/CAT group that the container is placed into
 	// to limit the resources (e.g., L3 cache) the container has available
 	IntelRdt *IntelRdt `json:"intel_rdt,omitempty"`
-***REMOVED***
+}
 
-type Hooks struct ***REMOVED***
+type Hooks struct {
 	// Prestart commands are executed after the container namespaces are created,
 	// but before the user supplied command is executed from init.
 	Prestart []Hook
@@ -203,9 +203,9 @@ type Hooks struct ***REMOVED***
 
 	// Poststop commands are executed after the container init process exits.
 	Poststop []Hook
-***REMOVED***
+}
 
-type Capabilities struct ***REMOVED***
+type Capabilities struct {
 	// Bounding is the set of capabilities checked by the kernel.
 	Bounding []string
 	// Effective is the set of capabilities checked by the kernel.
@@ -216,133 +216,133 @@ type Capabilities struct ***REMOVED***
 	Permitted []string
 	// Ambient is the ambient set of capabilities that are kept.
 	Ambient []string
-***REMOVED***
+}
 
-func (hooks *Hooks) UnmarshalJSON(b []byte) error ***REMOVED***
-	var state struct ***REMOVED***
+func (hooks *Hooks) UnmarshalJSON(b []byte) error {
+	var state struct {
 		Prestart  []CommandHook
 		Poststart []CommandHook
 		Poststop  []CommandHook
-	***REMOVED***
+	}
 
-	if err := json.Unmarshal(b, &state); err != nil ***REMOVED***
+	if err := json.Unmarshal(b, &state); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	deserialize := func(shooks []CommandHook) (hooks []Hook) ***REMOVED***
-		for _, shook := range shooks ***REMOVED***
+	deserialize := func(shooks []CommandHook) (hooks []Hook) {
+		for _, shook := range shooks {
 			hooks = append(hooks, shook)
-		***REMOVED***
+		}
 
 		return hooks
-	***REMOVED***
+	}
 
 	hooks.Prestart = deserialize(state.Prestart)
 	hooks.Poststart = deserialize(state.Poststart)
 	hooks.Poststop = deserialize(state.Poststop)
 	return nil
-***REMOVED***
+}
 
-func (hooks Hooks) MarshalJSON() ([]byte, error) ***REMOVED***
-	serialize := func(hooks []Hook) (serializableHooks []CommandHook) ***REMOVED***
-		for _, hook := range hooks ***REMOVED***
-			switch chook := hook.(type) ***REMOVED***
+func (hooks Hooks) MarshalJSON() ([]byte, error) {
+	serialize := func(hooks []Hook) (serializableHooks []CommandHook) {
+		for _, hook := range hooks {
+			switch chook := hook.(type) {
 			case CommandHook:
 				serializableHooks = append(serializableHooks, chook)
 			default:
 				logrus.Warnf("cannot serialize hook of type %T, skipping", hook)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		return serializableHooks
-	***REMOVED***
+	}
 
-	return json.Marshal(map[string]interface***REMOVED******REMOVED******REMOVED***
+	return json.Marshal(map[string]interface{}{
 		"prestart":  serialize(hooks.Prestart),
 		"poststart": serialize(hooks.Poststart),
 		"poststop":  serialize(hooks.Poststop),
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
 // HookState is the payload provided to a hook on execution.
 type HookState specs.State
 
-type Hook interface ***REMOVED***
+type Hook interface {
 	// Run executes the hook with the provided state.
 	Run(HookState) error
-***REMOVED***
+}
 
 // NewFunctionHook will call the provided function when the hook is run.
-func NewFunctionHook(f func(HookState) error) FuncHook ***REMOVED***
-	return FuncHook***REMOVED***
+func NewFunctionHook(f func(HookState) error) FuncHook {
+	return FuncHook{
 		run: f,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type FuncHook struct ***REMOVED***
+type FuncHook struct {
 	run func(HookState) error
-***REMOVED***
+}
 
-func (f FuncHook) Run(s HookState) error ***REMOVED***
+func (f FuncHook) Run(s HookState) error {
 	return f.run(s)
-***REMOVED***
+}
 
-type Command struct ***REMOVED***
+type Command struct {
 	Path    string         `json:"path"`
 	Args    []string       `json:"args"`
 	Env     []string       `json:"env"`
 	Dir     string         `json:"dir"`
 	Timeout *time.Duration `json:"timeout"`
-***REMOVED***
+}
 
 // NewCommandHook will execute the provided command when the hook is run.
-func NewCommandHook(cmd Command) CommandHook ***REMOVED***
-	return CommandHook***REMOVED***
+func NewCommandHook(cmd Command) CommandHook {
+	return CommandHook{
 		Command: cmd,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type CommandHook struct ***REMOVED***
+type CommandHook struct {
 	Command
-***REMOVED***
+}
 
-func (c Command) Run(s HookState) error ***REMOVED***
+func (c Command) Run(s HookState) error {
 	b, err := json.Marshal(s)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	var stdout, stderr bytes.Buffer
-	cmd := exec.Cmd***REMOVED***
+	cmd := exec.Cmd{
 		Path:   c.Path,
 		Args:   c.Args,
 		Env:    c.Env,
 		Stdin:  bytes.NewReader(b),
 		Stdout: &stdout,
 		Stderr: &stderr,
-	***REMOVED***
-	if err := cmd.Start(); err != nil ***REMOVED***
+	}
+	if err := cmd.Start(); err != nil {
 		return err
-	***REMOVED***
+	}
 	errC := make(chan error, 1)
-	go func() ***REMOVED***
+	go func() {
 		err := cmd.Wait()
-		if err != nil ***REMOVED***
+		if err != nil {
 			err = fmt.Errorf("error running hook: %v, stdout: %s, stderr: %s", err, stdout.String(), stderr.String())
-		***REMOVED***
+		}
 		errC <- err
-	***REMOVED***()
+	}()
 	var timerCh <-chan time.Time
-	if c.Timeout != nil ***REMOVED***
+	if c.Timeout != nil {
 		timer := time.NewTimer(*c.Timeout)
 		defer timer.Stop()
 		timerCh = timer.C
-	***REMOVED***
-	select ***REMOVED***
+	}
+	select {
 	case err := <-errC:
 		return err
 	case <-timerCh:
 		cmd.Process.Kill()
 		cmd.Wait()
 		return fmt.Errorf("hook ran past specified timeout of %.1fs", c.Timeout.Seconds())
-	***REMOVED***
-***REMOVED***
+	}
+}

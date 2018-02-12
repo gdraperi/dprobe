@@ -18,6 +18,6 @@ const supportAllowUnexported = true
 //
 // The parent struct, v, must be addressable, while f must be a StructField
 // describing the field to retrieve.
-func unsafeRetrieveField(v reflect.Value, f reflect.StructField) reflect.Value ***REMOVED***
+func unsafeRetrieveField(v reflect.Value, f reflect.StructField) reflect.Value {
 	return reflect.NewAt(f.Type, unsafe.Pointer(v.UnsafeAddr()+f.Offset)).Elem()
-***REMOVED***
+}

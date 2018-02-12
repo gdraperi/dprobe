@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 # Make sure we're not using gos' Testing package any more in integration-cli
 
-export SCRIPTDIR="$( cd "$( dirname "$***REMOVED***BASH_SOURCE[0]***REMOVED***" )" && pwd )"
-source "$***REMOVED***SCRIPTDIR***REMOVED***/.validate"
+export SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source "${SCRIPTDIR}/.validate"
 
 IFS=$'\n'
 files=( $(validate_diff --diff-filter=ACMR --name-only -- 'integration-cli/*.go' || true) )
 unset IFS
 
 badFiles=()
-for f in "$***REMOVED***files[@]***REMOVED***"; do
+for f in "${files[@]}"; do
 	# skip check_test.go since it *does* use the testing package
 	if [ "$f" = "integration-cli/check_test.go" ]; then
 		continue
@@ -24,15 +24,15 @@ for f in "$***REMOVED***files[@]***REMOVED***"; do
 	fi
 done
 
-if [ $***REMOVED***#badFiles[@]***REMOVED*** -eq 0 ]; then
+if [ ${#badFiles[@]} -eq 0 ]; then
 	echo 'Congratulations!  No testing.T found.'
 else
-	***REMOVED***
+	{
 		echo "These files use the wrong testing infrastructure:"
-		for f in "$***REMOVED***badFiles[@]***REMOVED***"; do
+		for f in "${badFiles[@]}"; do
 			echo " - $f"
 		done
 		echo
-	***REMOVED*** >&2
+	} >&2
 	false
 fi

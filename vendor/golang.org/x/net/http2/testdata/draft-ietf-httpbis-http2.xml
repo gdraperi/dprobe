@@ -18,7 +18,7 @@
      docName="draft-ietf-httpbis-http2-latest"
      x:maturity-level="proposed"
      xmlns:x="http://purl.org/net/xml2rfc/ext">
-  <x:feedback template="mailto:ietf-http-wg@w3.org?subject=***REMOVED***docname***REMOVED***,%20%22***REMOVED***section***REMOVED***%22&amp;body=&lt;***REMOVED***ref***REMOVED***&gt;:"/>
+  <x:feedback template="mailto:ietf-http-wg@w3.org?subject={docname},%20%22{section}%22&amp;body=&lt;{ref}&gt;:"/>
   <front>
     <title abbrev="HTTP/2">Hypertext Transfer Protocol version 2</title>
 
@@ -3115,7 +3115,7 @@ HTTP2-Settings    = token68
   Content-Type: image/jpeg           - END_HEADERS
   Content-Length: 123                  :method = POST
                                        :path = /resource
-  ***REMOVED***binary data***REMOVED***                        :scheme = https
+  {binary data}                        :scheme = https
 
                                    CONTINUATION
                                      + END_HEADERS
@@ -3125,7 +3125,7 @@ HTTP2-Settings    = token68
 
                                    DATA
                                      + END_STREAM
-                                   ***REMOVED***binary data***REMOVED***
+                                   {binary data}
 ]]></artwork>
             <postamble>
               Note that data contributing to any given header field could be spread between header
@@ -3147,12 +3147,12 @@ HTTP2-Settings    = token68
   Content-Type: image/jpeg   ==>     - END_STREAM
   Content-Length: 123                + END_HEADERS
                                        :status = 200
-  ***REMOVED***binary data***REMOVED***                        content-type = image/jpeg
+  {binary data}                        content-type = image/jpeg
                                        content-length = 123
 
                                    DATA
                                      + END_STREAM
-                                   ***REMOVED***binary data***REMOVED***
+                                   {binary data}
 ]]></artwork>
           </figure>
 
@@ -3171,11 +3171,11 @@ HTTP2-Settings    = token68
   Trailer: Foo                         :status = 200
                                        content-length = 123
   123                                  content-type = image/jpeg
-  ***REMOVED***binary data***REMOVED***                        trailer = Foo
+  {binary data}                        trailer = Foo
   0
   Foo: bar                         DATA
                                      - END_STREAM
-                                   ***REMOVED***binary data***REMOVED***
+                                   {binary data}
 
                                    HEADERS
                                      + END_STREAM

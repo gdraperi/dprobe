@@ -23,7 +23,7 @@ import (
 	"golang.org/x/sys/windows/svc"
 )
 
-func usage(errmsg string) ***REMOVED***
+func usage(errmsg string) {
 	fmt.Fprintf(os.Stderr,
 		"%s\n\n"+
 			"usage: %s <command>\n"+
@@ -31,26 +31,26 @@ func usage(errmsg string) ***REMOVED***
 			"       install, remove, debug, start, stop, pause or continue.\n",
 		errmsg, os.Args[0])
 	os.Exit(2)
-***REMOVED***
+}
 
-func main() ***REMOVED***
+func main() {
 	const svcName = "myservice"
 
 	isIntSess, err := svc.IsAnInteractiveSession()
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatalf("failed to determine if we are running in an interactive session: %v", err)
-	***REMOVED***
-	if !isIntSess ***REMOVED***
+	}
+	if !isIntSess {
 		runService(svcName, false)
 		return
-	***REMOVED***
+	}
 
-	if len(os.Args) < 2 ***REMOVED***
+	if len(os.Args) < 2 {
 		usage("no command specified")
-	***REMOVED***
+	}
 
 	cmd := strings.ToLower(os.Args[1])
-	switch cmd ***REMOVED***
+	switch cmd {
 	case "debug":
 		runService(svcName, true)
 		return
@@ -68,9 +68,9 @@ func main() ***REMOVED***
 		err = controlService(svcName, svc.Continue, svc.Running)
 	default:
 		usage(fmt.Sprintf("invalid command %s", cmd))
-	***REMOVED***
-	if err != nil ***REMOVED***
+	}
+	if err != nil {
 		log.Fatalf("failed to %s %s: %v", cmd, svcName, err)
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}

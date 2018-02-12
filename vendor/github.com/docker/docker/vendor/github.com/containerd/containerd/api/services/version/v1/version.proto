@@ -8,11 +8,11 @@ import weak "gogoproto/gogo.proto";
 // TODO(stevvooe): Should version service actually be versioned?
 option go_package = "github.com/containerd/containerd/api/services/version/v1;version";
 
-service Version ***REMOVED***
+service Version {
 	rpc Version(google.protobuf.Empty) returns (VersionResponse);
-***REMOVED***
+}
 
-message VersionResponse ***REMOVED***
+message VersionResponse {
 	string version = 1;
 	string revision = 2;
-***REMOVED***
+}

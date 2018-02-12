@@ -4,7 +4,7 @@ package configs
 //
 // The network configuration can be omitted from a container causing the
 // container to be setup with the host's networking stack
-type Network struct ***REMOVED***
+type Network struct {
 	// Type sets the networks type, commonly veth and loopback
 	Type string `json:"type"`
 
@@ -48,7 +48,7 @@ type Network struct ***REMOVED***
 	// Note: This is unsupported on some systems.
 	// Note: This does not apply to loopback interfaces.
 	HairpinMode bool `json:"hairpin_mode"`
-***REMOVED***
+}
 
 // Routes can be specified to create entries in the route table as the container is started
 //
@@ -57,7 +57,7 @@ type Network struct ***REMOVED***
 // IP family default for the route table.  For IPv4 for example, setting the
 // gateway to 1.2.3.4 and the interface to eth0 will set up a standard
 // destination of 0.0.0.0(or *) when viewed in the route table.
-type Route struct ***REMOVED***
+type Route struct {
 	// Sets the destination and mask, should be a CIDR.  Accepts IPv4 and IPv6
 	Destination string `json:"destination"`
 
@@ -69,4 +69,4 @@ type Route struct ***REMOVED***
 
 	// The device to set this route up for, for example: eth0
 	InterfaceName string `json:"interface_name"`
-***REMOVED***
+}

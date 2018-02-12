@@ -41,14 +41,14 @@ import (
 // I think Option 1 is best, but it is quite opinionated.
 
 // ToASCII is a wrapper for Punycode.ToASCII.
-func ToASCII(s string) (string, error) ***REMOVED***
+func ToASCII(s string) (string, error) {
 	return Punycode.process(s, true)
-***REMOVED***
+}
 
 // ToUnicode is a wrapper for Punycode.ToUnicode.
-func ToUnicode(s string) (string, error) ***REMOVED***
+func ToUnicode(s string) (string, error) {
 	return Punycode.process(s, false)
-***REMOVED***
+}
 
 // An Option configures a Profile at creation time.
 type Option func(*options)
@@ -58,40 +58,40 @@ type Option func(*options)
 // transitional mapping provides a compromise between IDNA2003 and IDNA2008
 // compatibility. It is used by most browsers when resolving domain names. This
 // option is only meaningful if combined with MapForLookup.
-func Transitional(transitional bool) Option ***REMOVED***
-	return func(o *options) ***REMOVED*** o.transitional = true ***REMOVED***
-***REMOVED***
+func Transitional(transitional bool) Option {
+	return func(o *options) { o.transitional = true }
+}
 
 // VerifyDNSLength sets whether a Profile should fail if any of the IDN parts
 // are longer than allowed by the RFC.
-func VerifyDNSLength(verify bool) Option ***REMOVED***
-	return func(o *options) ***REMOVED*** o.verifyDNSLength = verify ***REMOVED***
-***REMOVED***
+func VerifyDNSLength(verify bool) Option {
+	return func(o *options) { o.verifyDNSLength = verify }
+}
 
 // RemoveLeadingDots removes leading label separators. Leading runes that map to
 // dots, such as U+3002 IDEOGRAPHIC FULL STOP, are removed as well.
 //
 // This is the behavior suggested by the UTS #46 and is adopted by some
 // browsers.
-func RemoveLeadingDots(remove bool) Option ***REMOVED***
-	return func(o *options) ***REMOVED*** o.removeLeadingDots = remove ***REMOVED***
-***REMOVED***
+func RemoveLeadingDots(remove bool) Option {
+	return func(o *options) { o.removeLeadingDots = remove }
+}
 
 // ValidateLabels sets whether to check the mandatory label validation criteria
 // as defined in Section 5.4 of RFC 5891. This includes testing for correct use
 // of hyphens ('-'), normalization, validity of runes, and the context rules.
-func ValidateLabels(enable bool) Option ***REMOVED***
-	return func(o *options) ***REMOVED***
+func ValidateLabels(enable bool) Option {
+	return func(o *options) {
 		// Don't override existing mappings, but set one that at least checks
 		// normalization if it is not set.
-		if o.mapping == nil && enable ***REMOVED***
+		if o.mapping == nil && enable {
 			o.mapping = normalize
-		***REMOVED***
+		}
 		o.trie = trie
 		o.validateLabels = enable
 		o.fromPuny = validateFromPunycode
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // StrictDomainName limits the set of permissable ASCII characters to those
 // allowed in domain names as defined in RFC 1034 (A-Z, a-z, 0-9 and the
@@ -101,34 +101,34 @@ func ValidateLabels(enable bool) Option ***REMOVED***
 // outside this range, for example a '_' (U+005F LOW LINE). See
 // http://www.rfc-editor.org/std/std3.txt for more details This option
 // corresponds to the UseSTD3ASCIIRules option in UTS #46.
-func StrictDomainName(use bool) Option ***REMOVED***
-	return func(o *options) ***REMOVED***
+func StrictDomainName(use bool) Option {
+	return func(o *options) {
 		o.trie = trie
 		o.useSTD3Rules = use
 		o.fromPuny = validateFromPunycode
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // NOTE: the following options pull in tables. The tables should not be linked
 // in as long as the options are not used.
 
 // BidiRule enables the Bidi rule as defined in RFC 5893. Any application
 // that relies on proper validation of labels should include this rule.
-func BidiRule() Option ***REMOVED***
-	return func(o *options) ***REMOVED*** o.bidirule = bidirule.ValidString ***REMOVED***
-***REMOVED***
+func BidiRule() Option {
+	return func(o *options) { o.bidirule = bidirule.ValidString }
+}
 
 // ValidateForRegistration sets validation options to verify that a given IDN is
 // properly formatted for registration as defined by Section 4 of RFC 5891.
-func ValidateForRegistration() Option ***REMOVED***
-	return func(o *options) ***REMOVED***
+func ValidateForRegistration() Option {
+	return func(o *options) {
 		o.mapping = validateRegistration
 		StrictDomainName(true)(o)
 		ValidateLabels(true)(o)
 		VerifyDNSLength(true)(o)
 		BidiRule()(o)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // MapForLookup sets validation and mapping options such that a given IDN is
 // transformed for domain name lookup according to the requirements set out in
@@ -138,16 +138,16 @@ func ValidateForRegistration() Option ***REMOVED***
 //
 // The mappings include normalization and mapping case, width and other
 // compatibility mappings.
-func MapForLookup() Option ***REMOVED***
-	return func(o *options) ***REMOVED***
+func MapForLookup() Option {
+	return func(o *options) {
 		o.mapping = validateAndMap
 		StrictDomainName(true)(o)
 		ValidateLabels(true)(o)
 		RemoveLeadingDots(true)(o)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type options struct ***REMOVED***
+type options struct {
 	transitional      bool
 	useSTD3Rules      bool
 	validateLabels    bool
@@ -166,18 +166,18 @@ type options struct ***REMOVED***
 	// bidirule, if specified, checks whether s conforms to the Bidi Rule
 	// defined in RFC 5893.
 	bidirule func(s string) bool
-***REMOVED***
+}
 
 // A Profile defines the configuration of a IDNA mapper.
-type Profile struct ***REMOVED***
+type Profile struct {
 	options
-***REMOVED***
+}
 
-func apply(o *options, opts []Option) ***REMOVED***
-	for _, f := range opts ***REMOVED***
+func apply(o *options, opts []Option) {
+	for _, f := range opts {
 		f(o)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // New creates a new Profile.
 //
@@ -187,50 +187,50 @@ func apply(o *options, opts []Option) ***REMOVED***
 // for lookup and registration purposes respectively, which can be tailored by
 // adding more fine-grained options, where later options override earlier
 // options.
-func New(o ...Option) *Profile ***REMOVED***
-	p := &Profile***REMOVED******REMOVED***
+func New(o ...Option) *Profile {
+	p := &Profile{}
 	apply(&p.options, o)
 	return p
-***REMOVED***
+}
 
 // ToASCII converts a domain or domain label to its ASCII form. For example,
 // ToASCII("bücher.example.com") is "xn--bcher-kva.example.com", and
 // ToASCII("golang") is "golang". If an error is encountered it will return
 // an error and a (partially) processed result.
-func (p *Profile) ToASCII(s string) (string, error) ***REMOVED***
+func (p *Profile) ToASCII(s string) (string, error) {
 	return p.process(s, true)
-***REMOVED***
+}
 
 // ToUnicode converts a domain or domain label to its Unicode form. For example,
 // ToUnicode("xn--bcher-kva.example.com") is "bücher.example.com", and
 // ToUnicode("golang") is "golang". If an error is encountered it will return
 // an error and a (partially) processed result.
-func (p *Profile) ToUnicode(s string) (string, error) ***REMOVED***
+func (p *Profile) ToUnicode(s string) (string, error) {
 	pp := *p
 	pp.transitional = false
 	return pp.process(s, false)
-***REMOVED***
+}
 
 // String reports a string with a description of the profile for debugging
 // purposes. The string format may change with different versions.
-func (p *Profile) String() string ***REMOVED***
+func (p *Profile) String() string {
 	s := ""
-	if p.transitional ***REMOVED***
+	if p.transitional {
 		s = "Transitional"
-	***REMOVED*** else ***REMOVED***
+	} else {
 		s = "NonTransitional"
-	***REMOVED***
-	if p.useSTD3Rules ***REMOVED***
+	}
+	if p.useSTD3Rules {
 		s += ":UseSTD3Rules"
-	***REMOVED***
-	if p.validateLabels ***REMOVED***
+	}
+	if p.validateLabels {
 		s += ":ValidateLabels"
-	***REMOVED***
-	if p.verifyDNSLength ***REMOVED***
+	}
+	if p.verifyDNSLength {
 		s += ":VerifyDNSLength"
-	***REMOVED***
+	}
 	return s
-***REMOVED***
+}
 
 var (
 	// Punycode is a Profile that does raw punycode processing with a minimum
@@ -250,8 +250,8 @@ var (
 	// IDN is valid for registration, according to Section 4 of RFC 5891.
 	Registration *Profile = registration
 
-	punycode = &Profile***REMOVED******REMOVED***
-	lookup   = &Profile***REMOVED***options***REMOVED***
+	punycode = &Profile{}
+	lookup   = &Profile{options{
 		transitional:      true,
 		useSTD3Rules:      true,
 		validateLabels:    true,
@@ -260,8 +260,8 @@ var (
 		fromPuny:          validateFromPunycode,
 		mapping:           validateAndMap,
 		bidirule:          bidirule.ValidString,
-	***REMOVED******REMOVED***
-	display = &Profile***REMOVED***options***REMOVED***
+	}}
+	display = &Profile{options{
 		useSTD3Rules:      true,
 		validateLabels:    true,
 		removeLeadingDots: true,
@@ -269,8 +269,8 @@ var (
 		fromPuny:          validateFromPunycode,
 		mapping:           validateAndMap,
 		bidirule:          bidirule.ValidString,
-	***REMOVED******REMOVED***
-	registration = &Profile***REMOVED***options***REMOVED***
+	}}
+	registration = &Profile{options{
 		useSTD3Rules:    true,
 		validateLabels:  true,
 		verifyDNSLength: true,
@@ -278,152 +278,152 @@ var (
 		fromPuny:        validateFromPunycode,
 		mapping:         validateRegistration,
 		bidirule:        bidirule.ValidString,
-	***REMOVED******REMOVED***
+	}}
 
 	// TODO: profiles
 	// Register: recommended for approving domain names: don't do any mappings
 	// but rather reject on invalid input. Bundle or block deviation characters.
 )
 
-type labelError struct***REMOVED*** label, code_ string ***REMOVED***
+type labelError struct{ label, code_ string }
 
-func (e labelError) code() string ***REMOVED*** return e.code_ ***REMOVED***
-func (e labelError) Error() string ***REMOVED***
+func (e labelError) code() string { return e.code_ }
+func (e labelError) Error() string {
 	return fmt.Sprintf("idna: invalid label %q", e.label)
-***REMOVED***
+}
 
 type runeError rune
 
-func (e runeError) code() string ***REMOVED*** return "P1" ***REMOVED***
-func (e runeError) Error() string ***REMOVED***
+func (e runeError) code() string { return "P1" }
+func (e runeError) Error() string {
 	return fmt.Sprintf("idna: disallowed rune %U", e)
-***REMOVED***
+}
 
 // process implements the algorithm described in section 4 of UTS #46,
 // see http://www.unicode.org/reports/tr46.
-func (p *Profile) process(s string, toASCII bool) (string, error) ***REMOVED***
+func (p *Profile) process(s string, toASCII bool) (string, error) {
 	var err error
-	if p.mapping != nil ***REMOVED***
+	if p.mapping != nil {
 		s, err = p.mapping(p, s)
-	***REMOVED***
+	}
 	// Remove leading empty labels.
-	if p.removeLeadingDots ***REMOVED***
-		for ; len(s) > 0 && s[0] == '.'; s = s[1:] ***REMOVED***
-		***REMOVED***
-	***REMOVED***
+	if p.removeLeadingDots {
+		for ; len(s) > 0 && s[0] == '.'; s = s[1:] {
+		}
+	}
 	// It seems like we should only create this error on ToASCII, but the
 	// UTS 46 conformance tests suggests we should always check this.
-	if err == nil && p.verifyDNSLength && s == "" ***REMOVED***
-		err = &labelError***REMOVED***s, "A4"***REMOVED***
-	***REMOVED***
-	labels := labelIter***REMOVED***orig: s***REMOVED***
-	for ; !labels.done(); labels.next() ***REMOVED***
+	if err == nil && p.verifyDNSLength && s == "" {
+		err = &labelError{s, "A4"}
+	}
+	labels := labelIter{orig: s}
+	for ; !labels.done(); labels.next() {
 		label := labels.label()
-		if label == "" ***REMOVED***
+		if label == "" {
 			// Empty labels are not okay. The label iterator skips the last
 			// label if it is empty.
-			if err == nil && p.verifyDNSLength ***REMOVED***
-				err = &labelError***REMOVED***s, "A4"***REMOVED***
-			***REMOVED***
+			if err == nil && p.verifyDNSLength {
+				err = &labelError{s, "A4"}
+			}
 			continue
-		***REMOVED***
-		if strings.HasPrefix(label, acePrefix) ***REMOVED***
+		}
+		if strings.HasPrefix(label, acePrefix) {
 			u, err2 := decode(label[len(acePrefix):])
-			if err2 != nil ***REMOVED***
-				if err == nil ***REMOVED***
+			if err2 != nil {
+				if err == nil {
 					err = err2
-				***REMOVED***
+				}
 				// Spec says keep the old label.
 				continue
-			***REMOVED***
+			}
 			labels.set(u)
-			if err == nil && p.validateLabels ***REMOVED***
+			if err == nil && p.validateLabels {
 				err = p.fromPuny(p, u)
-			***REMOVED***
-			if err == nil ***REMOVED***
+			}
+			if err == nil {
 				// This should be called on NonTransitional, according to the
 				// spec, but that currently does not have any effect. Use the
 				// original profile to preserve options.
 				err = p.validateLabel(u)
-			***REMOVED***
-		***REMOVED*** else if err == nil ***REMOVED***
+			}
+		} else if err == nil {
 			err = p.validateLabel(label)
-		***REMOVED***
-	***REMOVED***
-	if toASCII ***REMOVED***
-		for labels.reset(); !labels.done(); labels.next() ***REMOVED***
+		}
+	}
+	if toASCII {
+		for labels.reset(); !labels.done(); labels.next() {
 			label := labels.label()
-			if !ascii(label) ***REMOVED***
+			if !ascii(label) {
 				a, err2 := encode(acePrefix, label)
-				if err == nil ***REMOVED***
+				if err == nil {
 					err = err2
-				***REMOVED***
+				}
 				label = a
 				labels.set(a)
-			***REMOVED***
+			}
 			n := len(label)
-			if p.verifyDNSLength && err == nil && (n == 0 || n > 63) ***REMOVED***
-				err = &labelError***REMOVED***label, "A4"***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			if p.verifyDNSLength && err == nil && (n == 0 || n > 63) {
+				err = &labelError{label, "A4"}
+			}
+		}
+	}
 	s = labels.result()
-	if toASCII && p.verifyDNSLength && err == nil ***REMOVED***
+	if toASCII && p.verifyDNSLength && err == nil {
 		// Compute the length of the domain name minus the root label and its dot.
 		n := len(s)
-		if n > 0 && s[n-1] == '.' ***REMOVED***
+		if n > 0 && s[n-1] == '.' {
 			n--
-		***REMOVED***
-		if len(s) < 1 || n > 253 ***REMOVED***
-			err = &labelError***REMOVED***s, "A4"***REMOVED***
-		***REMOVED***
-	***REMOVED***
+		}
+		if len(s) < 1 || n > 253 {
+			err = &labelError{s, "A4"}
+		}
+	}
 	return s, err
-***REMOVED***
+}
 
-func normalize(p *Profile, s string) (string, error) ***REMOVED***
+func normalize(p *Profile, s string) (string, error) {
 	return norm.NFC.String(s), nil
-***REMOVED***
+}
 
-func validateRegistration(p *Profile, s string) (string, error) ***REMOVED***
-	if !norm.NFC.IsNormalString(s) ***REMOVED***
-		return s, &labelError***REMOVED***s, "V1"***REMOVED***
-	***REMOVED***
-	for i := 0; i < len(s); ***REMOVED***
+func validateRegistration(p *Profile, s string) (string, error) {
+	if !norm.NFC.IsNormalString(s) {
+		return s, &labelError{s, "V1"}
+	}
+	for i := 0; i < len(s); {
 		v, sz := trie.lookupString(s[i:])
 		// Copy bytes not copied so far.
-		switch p.simplify(info(v).category()) ***REMOVED***
+		switch p.simplify(info(v).category()) {
 		// TODO: handle the NV8 defined in the Unicode idna data set to allow
 		// for strict conformance to IDNA2008.
 		case valid, deviation:
 		case disallowed, mapped, unknown, ignored:
 			r, _ := utf8.DecodeRuneInString(s[i:])
 			return s, runeError(r)
-		***REMOVED***
+		}
 		i += sz
-	***REMOVED***
+	}
 	return s, nil
-***REMOVED***
+}
 
-func validateAndMap(p *Profile, s string) (string, error) ***REMOVED***
+func validateAndMap(p *Profile, s string) (string, error) {
 	var (
 		err error
 		b   []byte
 		k   int
 	)
-	for i := 0; i < len(s); ***REMOVED***
+	for i := 0; i < len(s); {
 		v, sz := trie.lookupString(s[i:])
 		start := i
 		i += sz
 		// Copy bytes not copied so far.
-		switch p.simplify(info(v).category()) ***REMOVED***
+		switch p.simplify(info(v).category()) {
 		case valid:
 			continue
 		case disallowed:
-			if err == nil ***REMOVED***
+			if err == nil {
 				r, _ := utf8.DecodeRuneInString(s[start:])
 				err = runeError(r)
-			***REMOVED***
+			}
 			continue
 		case mapped, deviation:
 			b = append(b, s[k:start]...)
@@ -434,124 +434,124 @@ func validateAndMap(p *Profile, s string) (string, error) ***REMOVED***
 		case unknown:
 			b = append(b, s[k:start]...)
 			b = append(b, "\ufffd"...)
-		***REMOVED***
+		}
 		k = i
-	***REMOVED***
-	if k == 0 ***REMOVED***
+	}
+	if k == 0 {
 		// No changes so far.
 		s = norm.NFC.String(s)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		b = append(b, s[k:]...)
-		if norm.NFC.QuickSpan(b) != len(b) ***REMOVED***
+		if norm.NFC.QuickSpan(b) != len(b) {
 			b = norm.NFC.Bytes(b)
-		***REMOVED***
+		}
 		// TODO: the punycode converters require strings as input.
 		s = string(b)
-	***REMOVED***
+	}
 	return s, err
-***REMOVED***
+}
 
 // A labelIter allows iterating over domain name labels.
-type labelIter struct ***REMOVED***
+type labelIter struct {
 	orig     string
 	slice    []string
 	curStart int
 	curEnd   int
 	i        int
-***REMOVED***
+}
 
-func (l *labelIter) reset() ***REMOVED***
+func (l *labelIter) reset() {
 	l.curStart = 0
 	l.curEnd = 0
 	l.i = 0
-***REMOVED***
+}
 
-func (l *labelIter) done() bool ***REMOVED***
+func (l *labelIter) done() bool {
 	return l.curStart >= len(l.orig)
-***REMOVED***
+}
 
-func (l *labelIter) result() string ***REMOVED***
-	if l.slice != nil ***REMOVED***
+func (l *labelIter) result() string {
+	if l.slice != nil {
 		return strings.Join(l.slice, ".")
-	***REMOVED***
+	}
 	return l.orig
-***REMOVED***
+}
 
-func (l *labelIter) label() string ***REMOVED***
-	if l.slice != nil ***REMOVED***
+func (l *labelIter) label() string {
+	if l.slice != nil {
 		return l.slice[l.i]
-	***REMOVED***
+	}
 	p := strings.IndexByte(l.orig[l.curStart:], '.')
 	l.curEnd = l.curStart + p
-	if p == -1 ***REMOVED***
+	if p == -1 {
 		l.curEnd = len(l.orig)
-	***REMOVED***
+	}
 	return l.orig[l.curStart:l.curEnd]
-***REMOVED***
+}
 
 // next sets the value to the next label. It skips the last label if it is empty.
-func (l *labelIter) next() ***REMOVED***
+func (l *labelIter) next() {
 	l.i++
-	if l.slice != nil ***REMOVED***
-		if l.i >= len(l.slice) || l.i == len(l.slice)-1 && l.slice[l.i] == "" ***REMOVED***
+	if l.slice != nil {
+		if l.i >= len(l.slice) || l.i == len(l.slice)-1 && l.slice[l.i] == "" {
 			l.curStart = len(l.orig)
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
+		}
+	} else {
 		l.curStart = l.curEnd + 1
-		if l.curStart == len(l.orig)-1 && l.orig[l.curStart] == '.' ***REMOVED***
+		if l.curStart == len(l.orig)-1 && l.orig[l.curStart] == '.' {
 			l.curStart = len(l.orig)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (l *labelIter) set(s string) ***REMOVED***
-	if l.slice == nil ***REMOVED***
+func (l *labelIter) set(s string) {
+	if l.slice == nil {
 		l.slice = strings.Split(l.orig, ".")
-	***REMOVED***
+	}
 	l.slice[l.i] = s
-***REMOVED***
+}
 
 // acePrefix is the ASCII Compatible Encoding prefix.
 const acePrefix = "xn--"
 
-func (p *Profile) simplify(cat category) category ***REMOVED***
-	switch cat ***REMOVED***
+func (p *Profile) simplify(cat category) category {
+	switch cat {
 	case disallowedSTD3Mapped:
-		if p.useSTD3Rules ***REMOVED***
+		if p.useSTD3Rules {
 			cat = disallowed
-		***REMOVED*** else ***REMOVED***
+		} else {
 			cat = mapped
-		***REMOVED***
+		}
 	case disallowedSTD3Valid:
-		if p.useSTD3Rules ***REMOVED***
+		if p.useSTD3Rules {
 			cat = disallowed
-		***REMOVED*** else ***REMOVED***
+		} else {
 			cat = valid
-		***REMOVED***
+		}
 	case deviation:
-		if !p.transitional ***REMOVED***
+		if !p.transitional {
 			cat = valid
-		***REMOVED***
+		}
 	case validNV8, validXV8:
 		// TODO: handle V2008
 		cat = valid
-	***REMOVED***
+	}
 	return cat
-***REMOVED***
+}
 
-func validateFromPunycode(p *Profile, s string) error ***REMOVED***
-	if !norm.NFC.IsNormalString(s) ***REMOVED***
-		return &labelError***REMOVED***s, "V1"***REMOVED***
-	***REMOVED***
-	for i := 0; i < len(s); ***REMOVED***
+func validateFromPunycode(p *Profile, s string) error {
+	if !norm.NFC.IsNormalString(s) {
+		return &labelError{s, "V1"}
+	}
+	for i := 0; i < len(s); {
 		v, sz := trie.lookupString(s[i:])
-		if c := p.simplify(info(v).category()); c != valid && c != deviation ***REMOVED***
-			return &labelError***REMOVED***s, "V6"***REMOVED***
-		***REMOVED***
+		if c := p.simplify(info(v).category()); c != valid && c != deviation {
+			return &labelError{s, "V6"}
+		}
 		i += sz
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 const (
 	zwnj = "\u200c"
@@ -569,32 +569,32 @@ const (
 	stateFAIL
 )
 
-var joinStates = [][numJoinTypes]joinState***REMOVED***
-	stateStart: ***REMOVED***
+var joinStates = [][numJoinTypes]joinState{
+	stateStart: {
 		joiningL:   stateBefore,
 		joiningD:   stateBefore,
 		joinZWNJ:   stateFAIL,
 		joinZWJ:    stateFAIL,
 		joinVirama: stateVirama,
-	***REMOVED***,
-	stateVirama: ***REMOVED***
+	},
+	stateVirama: {
 		joiningL: stateBefore,
 		joiningD: stateBefore,
-	***REMOVED***,
-	stateBefore: ***REMOVED***
+	},
+	stateBefore: {
 		joiningL:   stateBefore,
 		joiningD:   stateBefore,
 		joiningT:   stateBefore,
 		joinZWNJ:   stateAfter,
 		joinZWJ:    stateFAIL,
 		joinVirama: stateBeforeVirama,
-	***REMOVED***,
-	stateBeforeVirama: ***REMOVED***
+	},
+	stateBeforeVirama: {
 		joiningL: stateBefore,
 		joiningD: stateBefore,
 		joiningT: stateBefore,
-	***REMOVED***,
-	stateAfter: ***REMOVED***
+	},
+	stateAfter: {
 		joiningL:   stateFAIL,
 		joiningD:   stateBefore,
 		joiningT:   stateAfter,
@@ -602,8 +602,8 @@ var joinStates = [][numJoinTypes]joinState***REMOVED***
 		joinZWNJ:   stateFAIL,
 		joinZWJ:    stateFAIL,
 		joinVirama: stateAfter, // no-op as we can't accept joiners here
-	***REMOVED***,
-	stateFAIL: ***REMOVED***
+	},
+	stateFAIL: {
 		0:          stateFAIL,
 		joiningL:   stateFAIL,
 		joiningD:   stateFAIL,
@@ -612,70 +612,70 @@ var joinStates = [][numJoinTypes]joinState***REMOVED***
 		joinZWNJ:   stateFAIL,
 		joinZWJ:    stateFAIL,
 		joinVirama: stateFAIL,
-	***REMOVED***,
-***REMOVED***
+	},
+}
 
 // validateLabel validates the criteria from Section 4.1. Item 1, 4, and 6 are
 // already implicitly satisfied by the overall implementation.
-func (p *Profile) validateLabel(s string) error ***REMOVED***
-	if s == "" ***REMOVED***
-		if p.verifyDNSLength ***REMOVED***
-			return &labelError***REMOVED***s, "A4"***REMOVED***
-		***REMOVED***
+func (p *Profile) validateLabel(s string) error {
+	if s == "" {
+		if p.verifyDNSLength {
+			return &labelError{s, "A4"}
+		}
 		return nil
-	***REMOVED***
-	if p.bidirule != nil && !p.bidirule(s) ***REMOVED***
-		return &labelError***REMOVED***s, "B"***REMOVED***
-	***REMOVED***
-	if !p.validateLabels ***REMOVED***
+	}
+	if p.bidirule != nil && !p.bidirule(s) {
+		return &labelError{s, "B"}
+	}
+	if !p.validateLabels {
 		return nil
-	***REMOVED***
+	}
 	trie := p.trie // p.validateLabels is only set if trie is set.
-	if len(s) > 4 && s[2] == '-' && s[3] == '-' ***REMOVED***
-		return &labelError***REMOVED***s, "V2"***REMOVED***
-	***REMOVED***
-	if s[0] == '-' || s[len(s)-1] == '-' ***REMOVED***
-		return &labelError***REMOVED***s, "V3"***REMOVED***
-	***REMOVED***
+	if len(s) > 4 && s[2] == '-' && s[3] == '-' {
+		return &labelError{s, "V2"}
+	}
+	if s[0] == '-' || s[len(s)-1] == '-' {
+		return &labelError{s, "V3"}
+	}
 	// TODO: merge the use of this in the trie.
 	v, sz := trie.lookupString(s)
 	x := info(v)
-	if x.isModifier() ***REMOVED***
-		return &labelError***REMOVED***s, "V5"***REMOVED***
-	***REMOVED***
+	if x.isModifier() {
+		return &labelError{s, "V5"}
+	}
 	// Quickly return in the absence of zero-width (non) joiners.
-	if strings.Index(s, zwj) == -1 && strings.Index(s, zwnj) == -1 ***REMOVED***
+	if strings.Index(s, zwj) == -1 && strings.Index(s, zwnj) == -1 {
 		return nil
-	***REMOVED***
+	}
 	st := stateStart
-	for i := 0; ; ***REMOVED***
+	for i := 0; ; {
 		jt := x.joinType()
-		if s[i:i+sz] == zwj ***REMOVED***
+		if s[i:i+sz] == zwj {
 			jt = joinZWJ
-		***REMOVED*** else if s[i:i+sz] == zwnj ***REMOVED***
+		} else if s[i:i+sz] == zwnj {
 			jt = joinZWNJ
-		***REMOVED***
+		}
 		st = joinStates[st][jt]
-		if x.isViramaModifier() ***REMOVED***
+		if x.isViramaModifier() {
 			st = joinStates[st][joinVirama]
-		***REMOVED***
-		if i += sz; i == len(s) ***REMOVED***
+		}
+		if i += sz; i == len(s) {
 			break
-		***REMOVED***
+		}
 		v, sz = trie.lookupString(s[i:])
 		x = info(v)
-	***REMOVED***
-	if st == stateFAIL || st == stateAfter ***REMOVED***
-		return &labelError***REMOVED***s, "C"***REMOVED***
-	***REMOVED***
+	}
+	if st == stateFAIL || st == stateAfter {
+		return &labelError{s, "C"}
+	}
 	return nil
-***REMOVED***
+}
 
-func ascii(s string) bool ***REMOVED***
-	for i := 0; i < len(s); i++ ***REMOVED***
-		if s[i] >= utf8.RuneSelf ***REMOVED***
+func ascii(s string) bool {
+	for i := 0; i < len(s); i++ {
+		if s[i] >= utf8.RuneSelf {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}

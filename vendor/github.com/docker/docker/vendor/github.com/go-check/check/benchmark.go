@@ -38,7 +38,7 @@ var memStats runtime.MemStats
 
 // testingB is a type passed to Benchmark functions to manage benchmark
 // timing and to specify the number of iterations to run.
-type timer struct ***REMOVED***
+type timer struct {
 	start     time.Time // Time test or benchmark started
 	duration  time.Duration
 	N         int
@@ -51,137 +51,137 @@ type timer struct ***REMOVED***
 	// The net total of this test after being run.
 	netAllocs uint64
 	netBytes  uint64
-***REMOVED***
+}
 
 // StartTimer starts timing a test. This function is called automatically
 // before a benchmark starts, but it can also used to resume timing after
 // a call to StopTimer.
-func (c *C) StartTimer() ***REMOVED***
-	if !c.timerOn ***REMOVED***
+func (c *C) StartTimer() {
+	if !c.timerOn {
 		c.start = time.Now()
 		c.timerOn = true
 
 		runtime.ReadMemStats(&memStats)
 		c.startAllocs = memStats.Mallocs
 		c.startBytes = memStats.TotalAlloc
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // StopTimer stops timing a test. This can be used to pause the timer
 // while performing complex initialization that you don't
 // want to measure.
-func (c *C) StopTimer() ***REMOVED***
-	if c.timerOn ***REMOVED***
+func (c *C) StopTimer() {
+	if c.timerOn {
 		c.duration += time.Now().Sub(c.start)
 		c.timerOn = false
 		runtime.ReadMemStats(&memStats)
 		c.netAllocs += memStats.Mallocs - c.startAllocs
 		c.netBytes += memStats.TotalAlloc - c.startBytes
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // ResetTimer sets the elapsed benchmark time to zero.
 // It does not affect whether the timer is running.
-func (c *C) ResetTimer() ***REMOVED***
-	if c.timerOn ***REMOVED***
+func (c *C) ResetTimer() {
+	if c.timerOn {
 		c.start = time.Now()
 		runtime.ReadMemStats(&memStats)
 		c.startAllocs = memStats.Mallocs
 		c.startBytes = memStats.TotalAlloc
-	***REMOVED***
+	}
 	c.duration = 0
 	c.netAllocs = 0
 	c.netBytes = 0
-***REMOVED***
+}
 
 // SetBytes informs the number of bytes that the benchmark processes
 // on each iteration. If this is called in a benchmark it will also
 // report MB/s.
-func (c *C) SetBytes(n int64) ***REMOVED***
+func (c *C) SetBytes(n int64) {
 	c.bytes = n
-***REMOVED***
+}
 
-func (c *C) nsPerOp() int64 ***REMOVED***
-	if c.N <= 0 ***REMOVED***
+func (c *C) nsPerOp() int64 {
+	if c.N <= 0 {
 		return 0
-	***REMOVED***
+	}
 	return c.duration.Nanoseconds() / int64(c.N)
-***REMOVED***
+}
 
-func (c *C) mbPerSec() float64 ***REMOVED***
-	if c.bytes <= 0 || c.duration <= 0 || c.N <= 0 ***REMOVED***
+func (c *C) mbPerSec() float64 {
+	if c.bytes <= 0 || c.duration <= 0 || c.N <= 0 {
 		return 0
-	***REMOVED***
+	}
 	return (float64(c.bytes) * float64(c.N) / 1e6) / c.duration.Seconds()
-***REMOVED***
+}
 
-func (c *C) timerString() string ***REMOVED***
-	if c.N <= 0 ***REMOVED***
+func (c *C) timerString() string {
+	if c.N <= 0 {
 		return fmt.Sprintf("%3.3fs", float64(c.duration.Nanoseconds())/1e9)
-	***REMOVED***
+	}
 	mbs := c.mbPerSec()
 	mb := ""
-	if mbs != 0 ***REMOVED***
+	if mbs != 0 {
 		mb = fmt.Sprintf("\t%7.2f MB/s", mbs)
-	***REMOVED***
+	}
 	nsop := c.nsPerOp()
 	ns := fmt.Sprintf("%10d ns/op", nsop)
-	if c.N > 0 && nsop < 100 ***REMOVED***
+	if c.N > 0 && nsop < 100 {
 		// The format specifiers here make sure that
 		// the ones digits line up for all three possible formats.
-		if nsop < 10 ***REMOVED***
+		if nsop < 10 {
 			ns = fmt.Sprintf("%13.2f ns/op", float64(c.duration.Nanoseconds())/float64(c.N))
-		***REMOVED*** else ***REMOVED***
+		} else {
 			ns = fmt.Sprintf("%12.1f ns/op", float64(c.duration.Nanoseconds())/float64(c.N))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	memStats := ""
-	if c.benchMem ***REMOVED***
+	if c.benchMem {
 		allocedBytes := fmt.Sprintf("%8d B/op", int64(c.netBytes)/int64(c.N))
 		allocs := fmt.Sprintf("%8d allocs/op", int64(c.netAllocs)/int64(c.N))
 		memStats = fmt.Sprintf("\t%s\t%s", allocedBytes, allocs)
-	***REMOVED***
+	}
 	return fmt.Sprintf("%8d\t%s%s%s", c.N, ns, mb, memStats)
-***REMOVED***
+}
 
-func min(x, y int) int ***REMOVED***
-	if x > y ***REMOVED***
+func min(x, y int) int {
+	if x > y {
 		return y
-	***REMOVED***
+	}
 	return x
-***REMOVED***
+}
 
-func max(x, y int) int ***REMOVED***
-	if x < y ***REMOVED***
+func max(x, y int) int {
+	if x < y {
 		return y
-	***REMOVED***
+	}
 	return x
-***REMOVED***
+}
 
 // roundDown10 rounds a number down to the nearest power of 10.
-func roundDown10(n int) int ***REMOVED***
+func roundDown10(n int) int {
 	var tens = 0
 	// tens = floor(log_10(n))
-	for n > 10 ***REMOVED***
+	for n > 10 {
 		n = n / 10
 		tens++
-	***REMOVED***
+	}
 	// result = 10^tens
 	result := 1
-	for i := 0; i < tens; i++ ***REMOVED***
+	for i := 0; i < tens; i++ {
 		result *= 10
-	***REMOVED***
+	}
 	return result
-***REMOVED***
+}
 
 // roundUp rounds x up to a number of the form [1eX, 2eX, 5eX].
-func roundUp(n int) int ***REMOVED***
+func roundUp(n int) int {
 	base := roundDown10(n)
-	if n < (2 * base) ***REMOVED***
+	if n < (2 * base) {
 		return 2 * base
-	***REMOVED***
-	if n < (5 * base) ***REMOVED***
+	}
+	if n < (5 * base) {
 		return 5 * base
-	***REMOVED***
+	}
 	return 10 * base
-***REMOVED***
+}

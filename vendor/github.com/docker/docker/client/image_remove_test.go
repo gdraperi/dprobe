@@ -14,91 +14,91 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestImageRemoveError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestImageRemoveError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
-	***REMOVED***
+	}
 
-	_, err := client.ImageRemove(context.Background(), "image_id", types.ImageRemoveOptions***REMOVED******REMOVED***)
+	_, err := client.ImageRemove(context.Background(), "image_id", types.ImageRemoveOptions{})
 	assert.EqualError(t, err, "Error response from daemon: Server error")
-***REMOVED***
+}
 
-func TestImageRemoveImageNotFound(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestImageRemoveImageNotFound(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusNotFound, "missing")),
-	***REMOVED***
+	}
 
-	_, err := client.ImageRemove(context.Background(), "unknown", types.ImageRemoveOptions***REMOVED******REMOVED***)
+	_, err := client.ImageRemove(context.Background(), "unknown", types.ImageRemoveOptions{})
 	assert.EqualError(t, err, "Error: No such image: unknown")
 	assert.True(t, IsErrNotFound(err))
-***REMOVED***
+}
 
-func TestImageRemove(t *testing.T) ***REMOVED***
+func TestImageRemove(t *testing.T) {
 	expectedURL := "/images/image_id"
-	removeCases := []struct ***REMOVED***
+	removeCases := []struct {
 		force               bool
 		pruneChildren       bool
 		expectedQueryParams map[string]string
-	***REMOVED******REMOVED***
-		***REMOVED***
+	}{
+		{
 			force:         false,
 			pruneChildren: false,
-			expectedQueryParams: map[string]string***REMOVED***
+			expectedQueryParams: map[string]string{
 				"force":   "",
 				"noprune": "1",
-			***REMOVED***,
-		***REMOVED***, ***REMOVED***
+			},
+		}, {
 			force:         true,
 			pruneChildren: true,
-			expectedQueryParams: map[string]string***REMOVED***
+			expectedQueryParams: map[string]string{
 				"force":   "1",
 				"noprune": "",
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
-	for _, removeCase := range removeCases ***REMOVED***
-		client := &Client***REMOVED***
-			client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-				if !strings.HasPrefix(req.URL.Path, expectedURL) ***REMOVED***
+			},
+		},
+	}
+	for _, removeCase := range removeCases {
+		client := &Client{
+			client: newMockClient(func(req *http.Request) (*http.Response, error) {
+				if !strings.HasPrefix(req.URL.Path, expectedURL) {
 					return nil, fmt.Errorf("expected URL '%s', got '%s'", expectedURL, req.URL)
-				***REMOVED***
-				if req.Method != "DELETE" ***REMOVED***
+				}
+				if req.Method != "DELETE" {
 					return nil, fmt.Errorf("expected DELETE method, got %s", req.Method)
-				***REMOVED***
+				}
 				query := req.URL.Query()
-				for key, expected := range removeCase.expectedQueryParams ***REMOVED***
+				for key, expected := range removeCase.expectedQueryParams {
 					actual := query.Get(key)
-					if actual != expected ***REMOVED***
+					if actual != expected {
 						return nil, fmt.Errorf("%s not set in URL query properly. Expected '%s', got %s", key, expected, actual)
-					***REMOVED***
-				***REMOVED***
-				b, err := json.Marshal([]types.ImageDeleteResponseItem***REMOVED***
-					***REMOVED***
+					}
+				}
+				b, err := json.Marshal([]types.ImageDeleteResponseItem{
+					{
 						Untagged: "image_id1",
-					***REMOVED***,
-					***REMOVED***
+					},
+					{
 						Deleted: "image_id",
-					***REMOVED***,
-				***REMOVED***)
-				if err != nil ***REMOVED***
+					},
+				})
+				if err != nil {
 					return nil, err
-				***REMOVED***
+				}
 
-				return &http.Response***REMOVED***
+				return &http.Response{
 					StatusCode: http.StatusOK,
 					Body:       ioutil.NopCloser(bytes.NewReader(b)),
-				***REMOVED***, nil
-			***REMOVED***),
-		***REMOVED***
-		imageDeletes, err := client.ImageRemove(context.Background(), "image_id", types.ImageRemoveOptions***REMOVED***
+				}, nil
+			}),
+		}
+		imageDeletes, err := client.ImageRemove(context.Background(), "image_id", types.ImageRemoveOptions{
 			Force:         removeCase.force,
 			PruneChildren: removeCase.pruneChildren,
-		***REMOVED***)
-		if err != nil ***REMOVED***
+		})
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
-		if len(imageDeletes) != 2 ***REMOVED***
+		}
+		if len(imageDeletes) != 2 {
 			t.Fatalf("expected 2 deleted images, got %v", imageDeletes)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

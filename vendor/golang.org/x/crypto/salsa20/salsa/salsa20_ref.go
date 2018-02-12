@@ -10,7 +10,7 @@ const rounds = 20
 
 // core applies the Salsa20 core function to 16-byte input in, 32-byte key k,
 // and 16-byte constant c, and puts the result into 64-byte array out.
-func core(out *[64]byte, in *[16]byte, k *[32]byte, c *[16]byte) ***REMOVED***
+func core(out *[64]byte, in *[16]byte, k *[32]byte, c *[16]byte) {
 	j0 := uint32(c[0]) | uint32(c[1])<<8 | uint32(c[2])<<16 | uint32(c[3])<<24
 	j1 := uint32(k[0]) | uint32(k[1])<<8 | uint32(k[2])<<16 | uint32(k[3])<<24
 	j2 := uint32(k[4]) | uint32(k[5])<<8 | uint32(k[6])<<16 | uint32(k[7])<<24
@@ -31,7 +31,7 @@ func core(out *[64]byte, in *[16]byte, k *[32]byte, c *[16]byte) ***REMOVED***
 	x0, x1, x2, x3, x4, x5, x6, x7, x8 := j0, j1, j2, j3, j4, j5, j6, j7, j8
 	x9, x10, x11, x12, x13, x14, x15 := j9, j10, j11, j12, j13, j14, j15
 
-	for i := 0; i < rounds; i += 2 ***REMOVED***
+	for i := 0; i < rounds; i += 2 {
 		u := x0 + x12
 		x4 ^= u<<7 | u>>(32-7)
 		u = x4 + x0
@@ -103,7 +103,7 @@ func core(out *[64]byte, in *[16]byte, k *[32]byte, c *[16]byte) ***REMOVED***
 		x14 ^= u<<13 | u>>(32-13)
 		u = x14 + x13
 		x15 ^= u<<18 | u>>(32-18)
-	***REMOVED***
+	}
 	x0 += j0
 	x1 += j1
 	x2 += j2
@@ -200,35 +200,35 @@ func core(out *[64]byte, in *[16]byte, k *[32]byte, c *[16]byte) ***REMOVED***
 	out[61] = byte(x15 >> 8)
 	out[62] = byte(x15 >> 16)
 	out[63] = byte(x15 >> 24)
-***REMOVED***
+}
 
 // XORKeyStream crypts bytes from in to out using the given key and counters.
 // In and out must overlap entirely or not at all. Counter
 // contains the raw salsa20 counter bytes (both nonce and block counter).
-func XORKeyStream(out, in []byte, counter *[16]byte, key *[32]byte) ***REMOVED***
+func XORKeyStream(out, in []byte, counter *[16]byte, key *[32]byte) {
 	var block [64]byte
 	var counterCopy [16]byte
 	copy(counterCopy[:], counter[:])
 
-	for len(in) >= 64 ***REMOVED***
+	for len(in) >= 64 {
 		core(&block, &counterCopy, key, &Sigma)
-		for i, x := range block ***REMOVED***
+		for i, x := range block {
 			out[i] = in[i] ^ x
-		***REMOVED***
+		}
 		u := uint32(1)
-		for i := 8; i < 16; i++ ***REMOVED***
+		for i := 8; i < 16; i++ {
 			u += uint32(counterCopy[i])
 			counterCopy[i] = byte(u)
 			u >>= 8
-		***REMOVED***
+		}
 		in = in[64:]
 		out = out[64:]
-	***REMOVED***
+	}
 
-	if len(in) > 0 ***REMOVED***
+	if len(in) > 0 {
 		core(&block, &counterCopy, key, &Sigma)
-		for i, v := range in ***REMOVED***
+		for i, v := range in {
 			out[i] = v ^ block[i]
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

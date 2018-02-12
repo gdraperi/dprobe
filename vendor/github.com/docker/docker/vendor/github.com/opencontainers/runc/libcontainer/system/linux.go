@@ -28,94 +28,94 @@ const PR_SET_CHILD_SUBREAPER = 36
 
 type ParentDeathSignal int
 
-func (p ParentDeathSignal) Restore() error ***REMOVED***
-	if p == 0 ***REMOVED***
+func (p ParentDeathSignal) Restore() error {
+	if p == 0 {
 		return nil
-	***REMOVED***
+	}
 	current, err := GetParentDeathSignal()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	if p == current ***REMOVED***
+	}
+	if p == current {
 		return nil
-	***REMOVED***
+	}
 	return p.Set()
-***REMOVED***
+}
 
-func (p ParentDeathSignal) Set() error ***REMOVED***
+func (p ParentDeathSignal) Set() error {
 	return SetParentDeathSignal(uintptr(p))
-***REMOVED***
+}
 
-func Execv(cmd string, args []string, env []string) error ***REMOVED***
+func Execv(cmd string, args []string, env []string) error {
 	name, err := exec.LookPath(cmd)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	return syscall.Exec(name, args, env)
-***REMOVED***
+}
 
-func Prlimit(pid, resource int, limit unix.Rlimit) error ***REMOVED***
+func Prlimit(pid, resource int, limit unix.Rlimit) error {
 	_, _, err := unix.RawSyscall6(unix.SYS_PRLIMIT64, uintptr(pid), uintptr(resource), uintptr(unsafe.Pointer(&limit)), uintptr(unsafe.Pointer(&limit)), 0, 0)
-	if err != 0 ***REMOVED***
+	if err != 0 {
 		return err
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func SetParentDeathSignal(sig uintptr) error ***REMOVED***
-	if err := unix.Prctl(unix.PR_SET_PDEATHSIG, sig, 0, 0, 0); err != nil ***REMOVED***
+func SetParentDeathSignal(sig uintptr) error {
+	if err := unix.Prctl(unix.PR_SET_PDEATHSIG, sig, 0, 0, 0); err != nil {
 		return err
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func GetParentDeathSignal() (ParentDeathSignal, error) ***REMOVED***
+func GetParentDeathSignal() (ParentDeathSignal, error) {
 	var sig int
-	if err := unix.Prctl(unix.PR_GET_PDEATHSIG, uintptr(unsafe.Pointer(&sig)), 0, 0, 0); err != nil ***REMOVED***
+	if err := unix.Prctl(unix.PR_GET_PDEATHSIG, uintptr(unsafe.Pointer(&sig)), 0, 0, 0); err != nil {
 		return -1, err
-	***REMOVED***
+	}
 	return ParentDeathSignal(sig), nil
-***REMOVED***
+}
 
-func SetKeepCaps() error ***REMOVED***
-	if err := unix.Prctl(unix.PR_SET_KEEPCAPS, 1, 0, 0, 0); err != nil ***REMOVED***
+func SetKeepCaps() error {
+	if err := unix.Prctl(unix.PR_SET_KEEPCAPS, 1, 0, 0, 0); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func ClearKeepCaps() error ***REMOVED***
-	if err := unix.Prctl(unix.PR_SET_KEEPCAPS, 0, 0, 0, 0); err != nil ***REMOVED***
+func ClearKeepCaps() error {
+	if err := unix.Prctl(unix.PR_SET_KEEPCAPS, 0, 0, 0, 0); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func Setctty() error ***REMOVED***
-	if err := unix.IoctlSetInt(0, unix.TIOCSCTTY, 0); err != nil ***REMOVED***
+func Setctty() error {
+	if err := unix.IoctlSetInt(0, unix.TIOCSCTTY, 0); err != nil {
 		return err
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // RunningInUserNS detects whether we are currently running in a user namespace.
 // Copied from github.com/lxc/lxd/shared/util.go
-func RunningInUserNS() bool ***REMOVED***
+func RunningInUserNS() bool {
 	file, err := os.Open("/proc/self/uid_map")
-	if err != nil ***REMOVED***
+	if err != nil {
 		// This kernel-provided file only exists if user namespaces are supported
 		return false
-	***REMOVED***
+	}
 	defer file.Close()
 
 	buf := bufio.NewReader(file)
 	l, _, err := buf.ReadLine()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return false
-	***REMOVED***
+	}
 
 	line := string(l)
 	var a, b, c int64
@@ -124,24 +124,24 @@ func RunningInUserNS() bool ***REMOVED***
 	 * We assume we are in the initial user namespace if we have a full
 	 * range - 4294967295 uids starting at uid 0.
 	 */
-	if a == 0 && b == 0 && c == 4294967295 ***REMOVED***
+	if a == 0 && b == 0 && c == 4294967295 {
 		return false
-	***REMOVED***
+	}
 	return true
-***REMOVED***
+}
 
 // SetSubreaper sets the value i as the subreaper setting for the calling process
-func SetSubreaper(i int) error ***REMOVED***
+func SetSubreaper(i int) error {
 	return unix.Prctl(PR_SET_CHILD_SUBREAPER, uintptr(i), 0, 0, 0)
-***REMOVED***
+}
 
 // GetSubreaper returns the subreaper setting for the calling process
-func GetSubreaper() (int, error) ***REMOVED***
+func GetSubreaper() (int, error) {
 	var i uintptr
 
-	if err := unix.Prctl(unix.PR_GET_CHILD_SUBREAPER, uintptr(unsafe.Pointer(&i)), 0, 0, 0); err != nil ***REMOVED***
+	if err := unix.Prctl(unix.PR_GET_CHILD_SUBREAPER, uintptr(unsafe.Pointer(&i)), 0, 0, 0); err != nil {
 		return -1, err
-	***REMOVED***
+	}
 
 	return int(i), nil
-***REMOVED***
+}

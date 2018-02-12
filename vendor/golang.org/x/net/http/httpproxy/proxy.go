@@ -24,7 +24,7 @@ import (
 
 // Config holds configuration for HTTP proxy settings. See
 // FromEnvironment for details.
-type Config struct ***REMOVED***
+type Config struct {
 	// HTTPProxy represents the value of the HTTP_PROXY or
 	// http_proxy environment variable. It will be used as the proxy
 	// URL for HTTP requests and HTTPS requests unless overridden by
@@ -53,7 +53,7 @@ type Config struct ***REMOVED***
 	// when HTTPProxy applies, because a client could be
 	// setting HTTP_PROXY maliciously. See https://golang.org/s/cgihttpproxy.
 	CGI bool
-***REMOVED***
+}
 
 // FromEnvironment returns a Config instance populated from the
 // environment variables HTTP_PROXY, HTTPS_PROXY and NO_PROXY (or the
@@ -63,23 +63,23 @@ type Config struct ***REMOVED***
 // The environment values may be either a complete URL or a
 // "host[:port]", in which case the "http" scheme is assumed. An error
 // is returned if the value is a different form.
-func FromEnvironment() *Config ***REMOVED***
-	return &Config***REMOVED***
+func FromEnvironment() *Config {
+	return &Config{
 		HTTPProxy:  getEnvAny("HTTP_PROXY", "http_proxy"),
 		HTTPSProxy: getEnvAny("HTTPS_PROXY", "https_proxy"),
 		NoProxy:    getEnvAny("NO_PROXY", "no_proxy"),
 		CGI:        os.Getenv("REQUEST_METHOD") != "",
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func getEnvAny(names ...string) string ***REMOVED***
-	for _, n := range names ***REMOVED***
-		if val := os.Getenv(n); val != "" ***REMOVED***
+func getEnvAny(names ...string) string {
+	for _, n := range names {
+		if val := os.Getenv(n); val != "" {
 			return val
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return ""
-***REMOVED***
+}
 
 // ProxyFunc returns a function that determines the proxy URL to use for
 // a given request URL. Changing the contents of cfg will not affect
@@ -91,129 +91,129 @@ func getEnvAny(names ...string) string ***REMOVED***
 //
 // As a special case, if req.URL.Host is "localhost" (with or without a
 // port number), then a nil URL and nil error will be returned.
-func (cfg *Config) ProxyFunc() func(reqURL *url.URL) (*url.URL, error) ***REMOVED***
+func (cfg *Config) ProxyFunc() func(reqURL *url.URL) (*url.URL, error) {
 	// Prevent Config changes from affecting the function calculation.
 	// TODO Preprocess proxy settings for more efficient evaluation.
 	cfg1 := *cfg
 	return cfg1.proxyForURL
-***REMOVED***
+}
 
-func (cfg *Config) proxyForURL(reqURL *url.URL) (*url.URL, error) ***REMOVED***
+func (cfg *Config) proxyForURL(reqURL *url.URL) (*url.URL, error) {
 	var proxy string
-	if reqURL.Scheme == "https" ***REMOVED***
+	if reqURL.Scheme == "https" {
 		proxy = cfg.HTTPSProxy
-	***REMOVED***
-	if proxy == "" ***REMOVED***
+	}
+	if proxy == "" {
 		proxy = cfg.HTTPProxy
-		if proxy != "" && cfg.CGI ***REMOVED***
+		if proxy != "" && cfg.CGI {
 			return nil, errors.New("refusing to use HTTP_PROXY value in CGI environment; see golang.org/s/cgihttpproxy")
-		***REMOVED***
-	***REMOVED***
-	if proxy == "" ***REMOVED***
+		}
+	}
+	if proxy == "" {
 		return nil, nil
-	***REMOVED***
-	if !cfg.useProxy(canonicalAddr(reqURL)) ***REMOVED***
+	}
+	if !cfg.useProxy(canonicalAddr(reqURL)) {
 		return nil, nil
-	***REMOVED***
+	}
 	proxyURL, err := url.Parse(proxy)
 	if err != nil ||
 		(proxyURL.Scheme != "http" &&
 			proxyURL.Scheme != "https" &&
-			proxyURL.Scheme != "socks5") ***REMOVED***
+			proxyURL.Scheme != "socks5") {
 		// proxy was bogus. Try prepending "http://" to it and
 		// see if that parses correctly. If not, we fall
 		// through and complain about the original one.
-		if proxyURL, err := url.Parse("http://" + proxy); err == nil ***REMOVED***
+		if proxyURL, err := url.Parse("http://" + proxy); err == nil {
 			return proxyURL, nil
-		***REMOVED***
-	***REMOVED***
-	if err != nil ***REMOVED***
+		}
+	}
+	if err != nil {
 		return nil, fmt.Errorf("invalid proxy address %q: %v", proxy, err)
-	***REMOVED***
+	}
 	return proxyURL, nil
-***REMOVED***
+}
 
 // useProxy reports whether requests to addr should use a proxy,
 // according to the NO_PROXY or no_proxy environment variable.
 // addr is always a canonicalAddr with a host and port.
-func (cfg *Config) useProxy(addr string) bool ***REMOVED***
-	if len(addr) == 0 ***REMOVED***
+func (cfg *Config) useProxy(addr string) bool {
+	if len(addr) == 0 {
 		return true
-	***REMOVED***
+	}
 	host, _, err := net.SplitHostPort(addr)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return false
-	***REMOVED***
-	if host == "localhost" ***REMOVED***
+	}
+	if host == "localhost" {
 		return false
-	***REMOVED***
-	if ip := net.ParseIP(host); ip != nil ***REMOVED***
-		if ip.IsLoopback() ***REMOVED***
+	}
+	if ip := net.ParseIP(host); ip != nil {
+		if ip.IsLoopback() {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	noProxy := cfg.NoProxy
-	if noProxy == "*" ***REMOVED***
+	if noProxy == "*" {
 		return false
-	***REMOVED***
+	}
 
 	addr = strings.ToLower(strings.TrimSpace(addr))
-	if hasPort(addr) ***REMOVED***
+	if hasPort(addr) {
 		addr = addr[:strings.LastIndex(addr, ":")]
-	***REMOVED***
+	}
 
-	for _, p := range strings.Split(noProxy, ",") ***REMOVED***
+	for _, p := range strings.Split(noProxy, ",") {
 		p = strings.ToLower(strings.TrimSpace(p))
-		if len(p) == 0 ***REMOVED***
+		if len(p) == 0 {
 			continue
-		***REMOVED***
-		if hasPort(p) ***REMOVED***
+		}
+		if hasPort(p) {
 			p = p[:strings.LastIndex(p, ":")]
-		***REMOVED***
-		if addr == p ***REMOVED***
+		}
+		if addr == p {
 			return false
-		***REMOVED***
-		if len(p) == 0 ***REMOVED***
+		}
+		if len(p) == 0 {
 			// There is no host part, likely the entry is malformed; ignore.
 			continue
-		***REMOVED***
-		if p[0] == '.' && (strings.HasSuffix(addr, p) || addr == p[1:]) ***REMOVED***
+		}
+		if p[0] == '.' && (strings.HasSuffix(addr, p) || addr == p[1:]) {
 			// no_proxy ".foo.com" matches "bar.foo.com" or "foo.com"
 			return false
-		***REMOVED***
-		if p[0] != '.' && strings.HasSuffix(addr, p) && addr[len(addr)-len(p)-1] == '.' ***REMOVED***
+		}
+		if p[0] != '.' && strings.HasSuffix(addr, p) && addr[len(addr)-len(p)-1] == '.' {
 			// no_proxy "foo.com" matches "bar.foo.com"
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}
 
-var portMap = map[string]string***REMOVED***
+var portMap = map[string]string{
 	"http":   "80",
 	"https":  "443",
 	"socks5": "1080",
-***REMOVED***
+}
 
 // canonicalAddr returns url.Host but always with a ":port" suffix
-func canonicalAddr(url *url.URL) string ***REMOVED***
+func canonicalAddr(url *url.URL) string {
 	addr := url.Hostname()
-	if v, err := idnaASCII(addr); err == nil ***REMOVED***
+	if v, err := idnaASCII(addr); err == nil {
 		addr = v
-	***REMOVED***
+	}
 	port := url.Port()
-	if port == "" ***REMOVED***
+	if port == "" {
 		port = portMap[url.Scheme]
-	***REMOVED***
+	}
 	return net.JoinHostPort(addr, port)
-***REMOVED***
+}
 
 // Given a string of the form "host", "host:port", or "[ipv6::address]:port",
 // return true if the string includes a port.
-func hasPort(s string) bool ***REMOVED*** return strings.LastIndex(s, ":") > strings.LastIndex(s, "]") ***REMOVED***
+func hasPort(s string) bool { return strings.LastIndex(s, ":") > strings.LastIndex(s, "]") }
 
-func idnaASCII(v string) (string, error) ***REMOVED***
+func idnaASCII(v string) (string, error) {
 	// TODO: Consider removing this check after verifying performance is okay.
 	// Right now punycode verification, length checks, context checks, and the
 	// permissible character tests are all omitted. It also prevents the ToASCII
@@ -223,17 +223,17 @@ func idnaASCII(v string) (string, error) ***REMOVED***
 	// version does not.
 	// Note that for correct ASCII IDNs ToASCII will only do considerably more
 	// work, but it will not cause an allocation.
-	if isASCII(v) ***REMOVED***
+	if isASCII(v) {
 		return v, nil
-	***REMOVED***
+	}
 	return idna.Lookup.ToASCII(v)
-***REMOVED***
+}
 
-func isASCII(s string) bool ***REMOVED***
-	for i := 0; i < len(s); i++ ***REMOVED***
-		if s[i] >= utf8.RuneSelf ***REMOVED***
+func isASCII(s string) bool {
+	for i := 0; i < len(s); i++ {
+		if s[i] >= utf8.RuneSelf {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}

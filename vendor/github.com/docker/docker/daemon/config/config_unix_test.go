@@ -13,21 +13,21 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestGetConflictFreeConfiguration(t *testing.T) ***REMOVED***
+func TestGetConflictFreeConfiguration(t *testing.T) {
 	configFileData := `
-		***REMOVED***
+		{
 			"debug": true,
-			"default-ulimits": ***REMOVED***
-				"nofile": ***REMOVED***
+			"default-ulimits": {
+				"nofile": {
 					"Name": "nofile",
 					"Hard": 2048,
 					"Soft": 1024
-				***REMOVED***
-			***REMOVED***,
-			"log-opts": ***REMOVED***
+				}
+			},
+			"log-opts": {
 				"tag": "test_tag"
-			***REMOVED***
-		***REMOVED***`
+			}
+		}`
 
 	file := fs.NewFile(t, "docker-config", fs.WithContent(configFileData))
 	defer file.Remove()
@@ -43,45 +43,45 @@ func TestGetConflictFreeConfiguration(t *testing.T) ***REMOVED***
 
 	assert.True(t, cc.Debug)
 
-	expectedUlimits := map[string]*units.Ulimit***REMOVED***
-		"nofile": ***REMOVED***
+	expectedUlimits := map[string]*units.Ulimit{
+		"nofile": {
 			Name: "nofile",
 			Hard: 2048,
 			Soft: 1024,
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
 	assert.Equal(t, expectedUlimits, cc.Ulimits)
-***REMOVED***
+}
 
-func TestDaemonConfigurationMerge(t *testing.T) ***REMOVED***
+func TestDaemonConfigurationMerge(t *testing.T) {
 	configFileData := `
-		***REMOVED***
+		{
 			"debug": true,
-			"default-ulimits": ***REMOVED***
-				"nofile": ***REMOVED***
+			"default-ulimits": {
+				"nofile": {
 					"Name": "nofile",
 					"Hard": 2048,
 					"Soft": 1024
-				***REMOVED***
-			***REMOVED***,
-			"log-opts": ***REMOVED***
+				}
+			},
+			"log-opts": {
 				"tag": "test_tag"
-			***REMOVED***
-		***REMOVED***`
+			}
+		}`
 
 	file := fs.NewFile(t, "docker-config", fs.WithContent(configFileData))
 	defer file.Remove()
 
-	c := &Config***REMOVED***
-		CommonConfig: CommonConfig***REMOVED***
+	c := &Config{
+		CommonConfig: CommonConfig{
 			AutoRestart: true,
-			LogConfig: LogConfig***REMOVED***
+			LogConfig: LogConfig{
 				Type:   "syslog",
-				Config: map[string]string***REMOVED***"tag": "test"***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+				Config: map[string]string{"tag": "test"},
+			},
+		},
+	}
 
 	flags := pflag.NewFlagSet("test", pflag.ContinueOnError)
 
@@ -96,31 +96,31 @@ func TestDaemonConfigurationMerge(t *testing.T) ***REMOVED***
 	assert.True(t, cc.Debug)
 	assert.True(t, cc.AutoRestart)
 
-	expectedLogConfig := LogConfig***REMOVED***
+	expectedLogConfig := LogConfig{
 		Type:   "syslog",
-		Config: map[string]string***REMOVED***"tag": "test_tag"***REMOVED***,
-	***REMOVED***
+		Config: map[string]string{"tag": "test_tag"},
+	}
 
 	assert.Equal(t, expectedLogConfig, cc.LogConfig)
 
-	expectedUlimits := map[string]*units.Ulimit***REMOVED***
-		"nofile": ***REMOVED***
+	expectedUlimits := map[string]*units.Ulimit{
+		"nofile": {
 			Name: "nofile",
 			Hard: 2048,
 			Soft: 1024,
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
 	assert.Equal(t, expectedUlimits, cc.Ulimits)
-***REMOVED***
+}
 
-func TestDaemonConfigurationMergeShmSize(t *testing.T) ***REMOVED***
-	data := `***REMOVED***"default-shm-size": "1g"***REMOVED***`
+func TestDaemonConfigurationMergeShmSize(t *testing.T) {
+	data := `{"default-shm-size": "1g"}`
 
 	file := fs.NewFile(t, "docker-config", fs.WithContent(data))
 	defer file.Remove()
 
-	c := &Config***REMOVED******REMOVED***
+	c := &Config{}
 
 	flags := pflag.NewFlagSet("test", pflag.ContinueOnError)
 	shmSize := opts.MemBytes(DefaultShmSize)
@@ -131,4 +131,4 @@ func TestDaemonConfigurationMergeShmSize(t *testing.T) ***REMOVED***
 
 	expectedValue := 1 * 1024 * 1024 * 1024
 	assert.Equal(t, int64(expectedValue), cc.ShmSize.Value())
-***REMOVED***
+}

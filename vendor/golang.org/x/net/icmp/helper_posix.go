@@ -12,64 +12,64 @@ import (
 	"syscall"
 )
 
-func sockaddr(family int, address string) (syscall.Sockaddr, error) ***REMOVED***
-	switch family ***REMOVED***
+func sockaddr(family int, address string) (syscall.Sockaddr, error) {
+	switch family {
 	case syscall.AF_INET:
 		a, err := net.ResolveIPAddr("ip4", address)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-		if len(a.IP) == 0 ***REMOVED***
+		}
+		if len(a.IP) == 0 {
 			a.IP = net.IPv4zero
-		***REMOVED***
-		if a.IP = a.IP.To4(); a.IP == nil ***REMOVED***
+		}
+		if a.IP = a.IP.To4(); a.IP == nil {
 			return nil, net.InvalidAddrError("non-ipv4 address")
-		***REMOVED***
-		sa := &syscall.SockaddrInet4***REMOVED******REMOVED***
+		}
+		sa := &syscall.SockaddrInet4{}
 		copy(sa.Addr[:], a.IP)
 		return sa, nil
 	case syscall.AF_INET6:
 		a, err := net.ResolveIPAddr("ip6", address)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-		if len(a.IP) == 0 ***REMOVED***
+		}
+		if len(a.IP) == 0 {
 			a.IP = net.IPv6unspecified
-		***REMOVED***
-		if a.IP.Equal(net.IPv4zero) ***REMOVED***
+		}
+		if a.IP.Equal(net.IPv4zero) {
 			a.IP = net.IPv6unspecified
-		***REMOVED***
-		if a.IP = a.IP.To16(); a.IP == nil || a.IP.To4() != nil ***REMOVED***
+		}
+		if a.IP = a.IP.To16(); a.IP == nil || a.IP.To4() != nil {
 			return nil, net.InvalidAddrError("non-ipv6 address")
-		***REMOVED***
-		sa := &syscall.SockaddrInet6***REMOVED***ZoneId: zoneToUint32(a.Zone)***REMOVED***
+		}
+		sa := &syscall.SockaddrInet6{ZoneId: zoneToUint32(a.Zone)}
 		copy(sa.Addr[:], a.IP)
 		return sa, nil
 	default:
 		return nil, net.InvalidAddrError("unexpected family")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func zoneToUint32(zone string) uint32 ***REMOVED***
-	if zone == "" ***REMOVED***
+func zoneToUint32(zone string) uint32 {
+	if zone == "" {
 		return 0
-	***REMOVED***
-	if ifi, err := net.InterfaceByName(zone); err == nil ***REMOVED***
+	}
+	if ifi, err := net.InterfaceByName(zone); err == nil {
 		return uint32(ifi.Index)
-	***REMOVED***
+	}
 	n, err := strconv.Atoi(zone)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0
-	***REMOVED***
+	}
 	return uint32(n)
-***REMOVED***
+}
 
-func last(s string, b byte) int ***REMOVED***
+func last(s string, b byte) int {
 	i := len(s)
-	for i--; i >= 0; i-- ***REMOVED***
-		if s[i] == b ***REMOVED***
+	for i--; i >= 0; i-- {
+		if s[i] == b {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return i
-***REMOVED***
+}

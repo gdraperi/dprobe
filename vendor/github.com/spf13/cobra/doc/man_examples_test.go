@@ -8,28 +8,28 @@ import (
 	"github.com/spf13/cobra/doc"
 )
 
-func ExampleGenManTree() ***REMOVED***
-	cmd := &cobra.Command***REMOVED***
+func ExampleGenManTree() {
+	cmd := &cobra.Command{
 		Use:   "test",
 		Short: "my test program",
-	***REMOVED***
-	header := &doc.GenManHeader***REMOVED***
+	}
+	header := &doc.GenManHeader{
 		Title:   "MINE",
 		Section: "3",
-	***REMOVED***
+	}
 	doc.GenManTree(cmd, header, "/tmp")
-***REMOVED***
+}
 
-func ExampleGenMan() ***REMOVED***
-	cmd := &cobra.Command***REMOVED***
+func ExampleGenMan() {
+	cmd := &cobra.Command{
 		Use:   "test",
 		Short: "my test program",
-	***REMOVED***
-	header := &doc.GenManHeader***REMOVED***
+	}
+	header := &doc.GenManHeader{
 		Title:   "MINE",
 		Section: "3",
-	***REMOVED***
+	}
 	out := new(bytes.Buffer)
 	doc.GenMan(cmd, header, out)
 	fmt.Print(out.String())
-***REMOVED***
+}

@@ -49,9 +49,9 @@ package main
 
 import "bytes"
 
-func main() ***REMOVED***
+func main() {
         bytes.F#
-***REMOVED***
+}
 -------------------------------------------------------
 Offset: 1
 Number of candidates found: 2

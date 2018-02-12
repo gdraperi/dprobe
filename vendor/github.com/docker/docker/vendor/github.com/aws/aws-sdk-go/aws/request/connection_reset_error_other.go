@@ -6,6 +6,6 @@ import (
 	"strings"
 )
 
-func isErrConnectionReset(err error) bool ***REMOVED***
+func isErrConnectionReset(err error) bool {
 	return strings.Contains(err.Error(), "connection reset")
-***REMOVED***
+}

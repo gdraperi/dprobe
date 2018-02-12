@@ -11,35 +11,35 @@ import (
 
 // This file has unsafe variants of some helper methods.
 
-type unsafeString struct ***REMOVED***
+type unsafeString struct {
 	Data uintptr
 	Len  int
-***REMOVED***
+}
 
-type unsafeBytes struct ***REMOVED***
+type unsafeBytes struct {
 	Data uintptr
 	Len  int
 	Cap  int
-***REMOVED***
+}
 
 // stringView returns a view of the []byte as a string.
 // In unsafe mode, it doesn't incur allocation and copying caused by conversion.
 // In regular safe mode, it is an allocation and copy.
-func stringView(v []byte) string ***REMOVED***
-	if len(v) == 0 ***REMOVED***
+func stringView(v []byte) string {
+	if len(v) == 0 {
 		return ""
-	***REMOVED***
-	x := unsafeString***REMOVED***uintptr(unsafe.Pointer(&v[0])), len(v)***REMOVED***
+	}
+	x := unsafeString{uintptr(unsafe.Pointer(&v[0])), len(v)}
 	return *(*string)(unsafe.Pointer(&x))
-***REMOVED***
+}
 
 // bytesView returns a view of the string as a []byte.
 // In unsafe mode, it doesn't incur allocation and copying caused by conversion.
 // In regular safe mode, it is an allocation and copy.
-func bytesView(v string) []byte ***REMOVED***
-	if len(v) == 0 ***REMOVED***
+func bytesView(v string) []byte {
+	if len(v) == 0 {
 		return zeroByteSlice
-	***REMOVED***
-	x := unsafeBytes***REMOVED***uintptr(unsafe.Pointer(&v)), len(v), len(v)***REMOVED***
+	}
+	x := unsafeBytes{uintptr(unsafe.Pointer(&v)), len(v), len(v)}
 	return *(*[]byte)(unsafe.Pointer(&x))
-***REMOVED***
+}

@@ -12,11 +12,11 @@ import (
 	"github.com/docker/docker/plugin/v2"
 )
 
-func TestManagerWithPluginMounts(t *testing.T) ***REMOVED***
+func TestManagerWithPluginMounts(t *testing.T) {
 	root, err := ioutil.TempDir("", "test-store-with-plugin-mounts")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	defer system.EnsureRemoveAll(root)
 
 	s := NewStore()
@@ -27,53 +27,53 @@ func TestManagerWithPluginMounts(t *testing.T) ***REMOVED***
 	p2.PluginObj.Enabled = true
 
 	m, err := NewManager(
-		ManagerConfig***REMOVED***
+		ManagerConfig{
 			Store:          s,
 			Root:           managerRoot,
 			ExecRoot:       filepath.Join(root, "exec"),
-			CreateExecutor: func(*Manager) (Executor, error) ***REMOVED*** return nil, nil ***REMOVED***,
-			LogPluginEvent: func(_, _, _ string) ***REMOVED******REMOVED***,
-		***REMOVED***)
-	if err != nil ***REMOVED***
+			CreateExecutor: func(*Manager) (Executor, error) { return nil, nil },
+			LogPluginEvent: func(_, _, _ string) {},
+		})
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if err := s.Add(p1); err != nil ***REMOVED***
+	if err := s.Add(p1); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if err := s.Add(p2); err != nil ***REMOVED***
+	}
+	if err := s.Add(p2); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	// Create a mount to simulate a plugin that has created it's own mounts
 	p2Mount := filepath.Join(p2.Rootfs, "testmount")
-	if err := os.MkdirAll(p2Mount, 0755); err != nil ***REMOVED***
+	if err := os.MkdirAll(p2Mount, 0755); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if err := mount.Mount("tmpfs", p2Mount, "tmpfs", ""); err != nil ***REMOVED***
+	}
+	if err := mount.Mount("tmpfs", p2Mount, "tmpfs", ""); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if err := m.Remove(p1.Name(), &types.PluginRmConfig***REMOVED***ForceRemove: true***REMOVED***); err != nil ***REMOVED***
+	if err := m.Remove(p1.Name(), &types.PluginRmConfig{ForceRemove: true}); err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if mounted, err := mount.Mounted(p2Mount); !mounted || err != nil ***REMOVED***
+	}
+	if mounted, err := mount.Mounted(p2Mount); !mounted || err != nil {
 		t.Fatalf("expected %s to be mounted, err: %v", p2Mount, err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func newTestPlugin(t *testing.T, name, cap, root string) *v2.Plugin ***REMOVED***
+func newTestPlugin(t *testing.T, name, cap, root string) *v2.Plugin {
 	rootfs := filepath.Join(root, name)
-	if err := os.MkdirAll(rootfs, 0755); err != nil ***REMOVED***
+	if err := os.MkdirAll(rootfs, 0755); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	p := v2.Plugin***REMOVED***PluginObj: types.Plugin***REMOVED***Name: name***REMOVED******REMOVED***
+	p := v2.Plugin{PluginObj: types.Plugin{Name: name}}
 	p.Rootfs = rootfs
-	iType := types.PluginInterfaceType***REMOVED***Capability: cap, Prefix: "docker", Version: "1.0"***REMOVED***
-	i := types.PluginConfigInterface***REMOVED***Socket: "plugins.sock", Types: []types.PluginInterfaceType***REMOVED***iType***REMOVED******REMOVED***
+	iType := types.PluginInterfaceType{Capability: cap, Prefix: "docker", Version: "1.0"}
+	i := types.PluginConfigInterface{Socket: "plugins.sock", Types: []types.PluginInterfaceType{iType}}
 	p.PluginObj.Config.Interface = i
 	p.PluginObj.ID = name
 
 	return &p
-***REMOVED***
+}

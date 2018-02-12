@@ -15,112 +15,112 @@ import "unsafe"
 // adjacency information and the interface has a only single network
 // address or address pair for tunneling. It's usual that multiple
 // logical network interfaces share the same logical data link.
-type Link struct ***REMOVED***
+type Link struct {
 	Name  string // name, equivalent to IP interface name
 	Index int    // index, equivalent to IP interface index
 	Type  int    // type
 	Flags int    // flags
 	MTU   int    // maximum transmission unit, basically link MTU but may differ between IP address families
 	Addr  []byte // address
-***REMOVED***
+}
 
-func (ll *Link) fetch(s uintptr) ***REMOVED***
+func (ll *Link) fetch(s uintptr) {
 	var lifr lifreq
-	for i := 0; i < len(ll.Name); i++ ***REMOVED***
+	for i := 0; i < len(ll.Name); i++ {
 		lifr.Name[i] = int8(ll.Name[i])
-	***REMOVED***
+	}
 	ioc := int64(sysSIOCGLIFINDEX)
-	if err := ioctl(s, uintptr(ioc), unsafe.Pointer(&lifr)); err == nil ***REMOVED***
+	if err := ioctl(s, uintptr(ioc), unsafe.Pointer(&lifr)); err == nil {
 		ll.Index = int(nativeEndian.Uint32(lifr.Lifru[:4]))
-	***REMOVED***
+	}
 	ioc = int64(sysSIOCGLIFFLAGS)
-	if err := ioctl(s, uintptr(ioc), unsafe.Pointer(&lifr)); err == nil ***REMOVED***
+	if err := ioctl(s, uintptr(ioc), unsafe.Pointer(&lifr)); err == nil {
 		ll.Flags = int(nativeEndian.Uint64(lifr.Lifru[:8]))
-	***REMOVED***
+	}
 	ioc = int64(sysSIOCGLIFMTU)
-	if err := ioctl(s, uintptr(ioc), unsafe.Pointer(&lifr)); err == nil ***REMOVED***
+	if err := ioctl(s, uintptr(ioc), unsafe.Pointer(&lifr)); err == nil {
 		ll.MTU = int(nativeEndian.Uint32(lifr.Lifru[:4]))
-	***REMOVED***
-	switch ll.Type ***REMOVED***
+	}
+	switch ll.Type {
 	case sysIFT_IPV4, sysIFT_IPV6, sysIFT_6TO4:
 	default:
 		ioc = int64(sysSIOCGLIFHWADDR)
-		if err := ioctl(s, uintptr(ioc), unsafe.Pointer(&lifr)); err == nil ***REMOVED***
+		if err := ioctl(s, uintptr(ioc), unsafe.Pointer(&lifr)); err == nil {
 			ll.Addr, _ = parseLinkAddr(lifr.Lifru[4:])
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // Links returns a list of logical data links.
 //
 // The provided af must be an address family and name must be a data
 // link name. The zero value of af or name means a wildcard.
-func Links(af int, name string) ([]Link, error) ***REMOVED***
+func Links(af int, name string) ([]Link, error) {
 	eps, err := newEndpoints(af)
-	if len(eps) == 0 ***REMOVED***
+	if len(eps) == 0 {
 		return nil, err
-	***REMOVED***
-	defer func() ***REMOVED***
-		for _, ep := range eps ***REMOVED***
+	}
+	defer func() {
+		for _, ep := range eps {
 			ep.close()
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 	return links(eps, name)
-***REMOVED***
+}
 
-func links(eps []endpoint, name string) ([]Link, error) ***REMOVED***
+func links(eps []endpoint, name string) ([]Link, error) {
 	var lls []Link
-	lifn := lifnum***REMOVED***Flags: sysLIFC_NOXMIT | sysLIFC_TEMPORARY | sysLIFC_ALLZONES | sysLIFC_UNDER_IPMP***REMOVED***
-	lifc := lifconf***REMOVED***Flags: sysLIFC_NOXMIT | sysLIFC_TEMPORARY | sysLIFC_ALLZONES | sysLIFC_UNDER_IPMP***REMOVED***
-	for _, ep := range eps ***REMOVED***
+	lifn := lifnum{Flags: sysLIFC_NOXMIT | sysLIFC_TEMPORARY | sysLIFC_ALLZONES | sysLIFC_UNDER_IPMP}
+	lifc := lifconf{Flags: sysLIFC_NOXMIT | sysLIFC_TEMPORARY | sysLIFC_ALLZONES | sysLIFC_UNDER_IPMP}
+	for _, ep := range eps {
 		lifn.Family = uint16(ep.af)
 		ioc := int64(sysSIOCGLIFNUM)
-		if err := ioctl(ep.s, uintptr(ioc), unsafe.Pointer(&lifn)); err != nil ***REMOVED***
+		if err := ioctl(ep.s, uintptr(ioc), unsafe.Pointer(&lifn)); err != nil {
 			continue
-		***REMOVED***
-		if lifn.Count == 0 ***REMOVED***
+		}
+		if lifn.Count == 0 {
 			continue
-		***REMOVED***
+		}
 		b := make([]byte, lifn.Count*sizeofLifreq)
 		lifc.Family = uint16(ep.af)
 		lifc.Len = lifn.Count * sizeofLifreq
-		if len(lifc.Lifcu) == 8 ***REMOVED***
+		if len(lifc.Lifcu) == 8 {
 			nativeEndian.PutUint64(lifc.Lifcu[:], uint64(uintptr(unsafe.Pointer(&b[0]))))
-		***REMOVED*** else ***REMOVED***
+		} else {
 			nativeEndian.PutUint32(lifc.Lifcu[:], uint32(uintptr(unsafe.Pointer(&b[0]))))
-		***REMOVED***
+		}
 		ioc = int64(sysSIOCGLIFCONF)
-		if err := ioctl(ep.s, uintptr(ioc), unsafe.Pointer(&lifc)); err != nil ***REMOVED***
+		if err := ioctl(ep.s, uintptr(ioc), unsafe.Pointer(&lifc)); err != nil {
 			continue
-		***REMOVED***
+		}
 		nb := make([]byte, 32) // see LIFNAMSIZ in net/if.h
-		for i := 0; i < int(lifn.Count); i++ ***REMOVED***
+		for i := 0; i < int(lifn.Count); i++ {
 			lifr := (*lifreq)(unsafe.Pointer(&b[i*sizeofLifreq]))
-			for i := 0; i < 32; i++ ***REMOVED***
-				if lifr.Name[i] == 0 ***REMOVED***
+			for i := 0; i < 32; i++ {
+				if lifr.Name[i] == 0 {
 					nb = nb[:i]
 					break
-				***REMOVED***
+				}
 				nb[i] = byte(lifr.Name[i])
-			***REMOVED***
+			}
 			llname := string(nb)
 			nb = nb[:32]
-			if isDupLink(lls, llname) || name != "" && name != llname ***REMOVED***
+			if isDupLink(lls, llname) || name != "" && name != llname {
 				continue
-			***REMOVED***
-			ll := Link***REMOVED***Name: llname, Type: int(lifr.Type)***REMOVED***
+			}
+			ll := Link{Name: llname, Type: int(lifr.Type)}
 			ll.fetch(ep.s)
 			lls = append(lls, ll)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return lls, nil
-***REMOVED***
+}
 
-func isDupLink(lls []Link, name string) bool ***REMOVED***
-	for _, ll := range lls ***REMOVED***
-		if ll.Name == name ***REMOVED***
+func isDupLink(lls []Link, name string) bool {
+	for _, ll := range lls {
+		if ll.Name == name {
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false
-***REMOVED***
+}

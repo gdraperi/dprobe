@@ -11,22 +11,22 @@ import (
 	"hash"
 )
 
-func init() ***REMOVED***
-	newHash256 := func() hash.Hash ***REMOVED***
+func init() {
+	newHash256 := func() hash.Hash {
 		h, _ := New256(nil)
 		return h
-	***REMOVED***
-	newHash384 := func() hash.Hash ***REMOVED***
+	}
+	newHash384 := func() hash.Hash {
 		h, _ := New384(nil)
 		return h
-	***REMOVED***
+	}
 
-	newHash512 := func() hash.Hash ***REMOVED***
+	newHash512 := func() hash.Hash {
 		h, _ := New512(nil)
 		return h
-	***REMOVED***
+	}
 
 	crypto.RegisterHash(crypto.BLAKE2b_256, newHash256)
 	crypto.RegisterHash(crypto.BLAKE2b_384, newHash384)
 	crypto.RegisterHash(crypto.BLAKE2b_512, newHash512)
-***REMOVED***
+}

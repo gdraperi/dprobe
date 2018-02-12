@@ -38,12 +38,12 @@ import (
 )
 
 // UnaryInvoker is called by UnaryClientInterceptor to complete RPCs.
-type UnaryInvoker func(ctx context.Context, method string, req, reply interface***REMOVED******REMOVED***, cc *ClientConn, opts ...CallOption) error
+type UnaryInvoker func(ctx context.Context, method string, req, reply interface{}, cc *ClientConn, opts ...CallOption) error
 
 // UnaryClientInterceptor intercepts the execution of a unary RPC on the client. invoker is the handler to complete the RPC
 // and it is the responsibility of the interceptor to call it.
 // This is the EXPERIMENTAL API.
-type UnaryClientInterceptor func(ctx context.Context, method string, req, reply interface***REMOVED******REMOVED***, cc *ClientConn, invoker UnaryInvoker, opts ...CallOption) error
+type UnaryClientInterceptor func(ctx context.Context, method string, req, reply interface{}, cc *ClientConn, invoker UnaryInvoker, opts ...CallOption) error
 
 // Streamer is called by StreamClientInterceptor to create a ClientStream.
 type Streamer func(ctx context.Context, desc *StreamDesc, cc *ClientConn, method string, opts ...CallOption) (ClientStream, error)
@@ -55,36 +55,36 @@ type StreamClientInterceptor func(ctx context.Context, desc *StreamDesc, cc *Cli
 
 // UnaryServerInfo consists of various information about a unary RPC on
 // server side. All per-rpc information may be mutated by the interceptor.
-type UnaryServerInfo struct ***REMOVED***
+type UnaryServerInfo struct {
 	// Server is the service implementation the user provides. This is read-only.
-	Server interface***REMOVED******REMOVED***
+	Server interface{}
 	// FullMethod is the full RPC method string, i.e., /package.service/method.
 	FullMethod string
-***REMOVED***
+}
 
 // UnaryHandler defines the handler invoked by UnaryServerInterceptor to complete the normal
 // execution of a unary RPC.
-type UnaryHandler func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error)
+type UnaryHandler func(ctx context.Context, req interface{}) (interface{}, error)
 
 // UnaryServerInterceptor provides a hook to intercept the execution of a unary RPC on the server. info
 // contains all the information of this RPC the interceptor can operate on. And handler is the wrapper
 // of the service method implementation. It is the responsibility of the interceptor to invoke handler
 // to complete the RPC.
-type UnaryServerInterceptor func(ctx context.Context, req interface***REMOVED******REMOVED***, info *UnaryServerInfo, handler UnaryHandler) (resp interface***REMOVED******REMOVED***, err error)
+type UnaryServerInterceptor func(ctx context.Context, req interface{}, info *UnaryServerInfo, handler UnaryHandler) (resp interface{}, err error)
 
 // StreamServerInfo consists of various information about a streaming RPC on
 // server side. All per-rpc information may be mutated by the interceptor.
-type StreamServerInfo struct ***REMOVED***
+type StreamServerInfo struct {
 	// FullMethod is the full RPC method string, i.e., /package.service/method.
 	FullMethod string
 	// IsClientStream indicates whether the RPC is a client streaming RPC.
 	IsClientStream bool
 	// IsServerStream indicates whether the RPC is a server streaming RPC.
 	IsServerStream bool
-***REMOVED***
+}
 
 // StreamServerInterceptor provides a hook to intercept the execution of a streaming RPC on the server.
 // info contains all the information of this RPC the interceptor can operate on. And handler is the
 // service method implementation. It is the responsibility of the interceptor to invoke handler to
 // complete the RPC.
-type StreamServerInterceptor func(srv interface***REMOVED******REMOVED***, ss ServerStream, info *StreamServerInfo, handler StreamHandler) error
+type StreamServerInterceptor func(srv interface{}, ss ServerStream, info *StreamServerInfo, handler StreamHandler) error

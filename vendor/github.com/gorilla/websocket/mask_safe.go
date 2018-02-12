@@ -6,10 +6,10 @@
 
 package websocket
 
-func maskBytes(key [4]byte, pos int, b []byte) int ***REMOVED***
-	for i := range b ***REMOVED***
+func maskBytes(key [4]byte, pos int, b []byte) int {
+	for i := range b {
 		b[i] ^= key[pos&3]
 		pos++
-	***REMOVED***
+	}
 	return pos & 3
-***REMOVED***
+}

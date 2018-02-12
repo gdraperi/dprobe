@@ -15,7 +15,7 @@ import (
 )
 
 // writer represents a write transaction against the blob store.
-type writer struct ***REMOVED***
+type writer struct {
 	s         *store
 	fp        *os.File // opened data file
 	path      string   // path to writer dir
@@ -25,57 +25,57 @@ type writer struct ***REMOVED***
 	digester  digest.Digester
 	startedAt time.Time
 	updatedAt time.Time
-***REMOVED***
+}
 
-func (w *writer) Status() (content.Status, error) ***REMOVED***
-	return content.Status***REMOVED***
+func (w *writer) Status() (content.Status, error) {
+	return content.Status{
 		Ref:       w.ref,
 		Offset:    w.offset,
 		Total:     w.total,
 		StartedAt: w.startedAt,
 		UpdatedAt: w.updatedAt,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // Digest returns the current digest of the content, up to the current write.
 //
 // Cannot be called concurrently with `Write`.
-func (w *writer) Digest() digest.Digest ***REMOVED***
+func (w *writer) Digest() digest.Digest {
 	return w.digester.Digest()
-***REMOVED***
+}
 
 // Write p to the transaction.
 //
 // Note that writes are unbuffered to the backing file. When writing, it is
 // recommended to wrap in a bufio.Writer or, preferably, use io.CopyBuffer.
-func (w *writer) Write(p []byte) (n int, err error) ***REMOVED***
+func (w *writer) Write(p []byte) (n int, err error) {
 	n, err = w.fp.Write(p)
 	w.digester.Hash().Write(p[:n])
 	w.offset += int64(len(p))
 	w.updatedAt = time.Now()
 	return n, err
-***REMOVED***
+}
 
-func (w *writer) Commit(ctx context.Context, size int64, expected digest.Digest, opts ...content.Opt) error ***REMOVED***
+func (w *writer) Commit(ctx context.Context, size int64, expected digest.Digest, opts ...content.Opt) error {
 	var base content.Info
-	for _, opt := range opts ***REMOVED***
-		if err := opt(&base); err != nil ***REMOVED***
+	for _, opt := range opts {
+		if err := opt(&base); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if w.fp == nil ***REMOVED***
+	if w.fp == nil {
 		return errors.Wrap(errdefs.ErrFailedPrecondition, "cannot commit on closed writer")
-	***REMOVED***
+	}
 
-	if err := w.fp.Sync(); err != nil ***REMOVED***
+	if err := w.fp.Sync(); err != nil {
 		return errors.Wrap(err, "sync failed")
-	***REMOVED***
+	}
 
 	fi, err := w.fp.Stat()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return errors.Wrap(err, "stat on ingest file failed")
-	***REMOVED***
+	}
 
 	// change to readonly, more important for read, but provides _some_
 	// protection from this point on. We use the existing perms with a mask
@@ -84,24 +84,24 @@ func (w *writer) Commit(ctx context.Context, size int64, expected digest.Digest,
 	// This removes write and exec, only allowing read per the creation umask.
 	//
 	// NOTE: Windows does not support this operation
-	if runtime.GOOS != "windows" ***REMOVED***
-		if err := w.fp.Chmod((fi.Mode() & os.ModePerm) &^ 0333); err != nil ***REMOVED***
+	if runtime.GOOS != "windows" {
+		if err := w.fp.Chmod((fi.Mode() & os.ModePerm) &^ 0333); err != nil {
 			return errors.Wrap(err, "failed to change ingest file permissions")
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if size > 0 && size != fi.Size() ***REMOVED***
+	if size > 0 && size != fi.Size() {
 		return errors.Errorf("unexpected commit size %d, expected %d", fi.Size(), size)
-	***REMOVED***
+	}
 
-	if err := w.fp.Close(); err != nil ***REMOVED***
+	if err := w.fp.Close(); err != nil {
 		return errors.Wrap(err, "failed closing ingest")
-	***REMOVED***
+	}
 
 	dgst := w.digester.Digest()
-	if expected != "" && expected != dgst ***REMOVED***
+	if expected != "" && expected != dgst {
 		return errors.Errorf("unexpected commit digest %s, expected %s", dgst, expected)
-	***REMOVED***
+	}
 
 	var (
 		ingest = filepath.Join(w.path, "data")
@@ -109,36 +109,36 @@ func (w *writer) Commit(ctx context.Context, size int64, expected digest.Digest,
 	)
 
 	// make sure parent directories of blob exist
-	if err := os.MkdirAll(filepath.Dir(target), 0755); err != nil ***REMOVED***
+	if err := os.MkdirAll(filepath.Dir(target), 0755); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	// clean up!!
 	defer os.RemoveAll(w.path)
 
-	if err := os.Rename(ingest, target); err != nil ***REMOVED***
-		if os.IsExist(err) ***REMOVED***
+	if err := os.Rename(ingest, target); err != nil {
+		if os.IsExist(err) {
 			// collision with the target file!
 			return errors.Wrapf(errdefs.ErrAlreadyExists, "content %v", dgst)
-		***REMOVED***
+		}
 		return err
-	***REMOVED***
+	}
 	commitTime := time.Now()
-	if err := os.Chtimes(target, commitTime, commitTime); err != nil ***REMOVED***
+	if err := os.Chtimes(target, commitTime, commitTime); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	w.fp = nil
 	unlock(w.ref)
 
-	if w.s.ls != nil && base.Labels != nil ***REMOVED***
-		if err := w.s.ls.Set(dgst, base.Labels); err != nil ***REMOVED***
+	if w.s.ls != nil && base.Labels != nil {
+		if err := w.s.ls.Set(dgst, base.Labels); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
 // Close the writer, flushing any unwritten data and leaving the progress in
 // tact.
@@ -149,27 +149,27 @@ func (w *writer) Commit(ctx context.Context, size int64, expected digest.Digest,
 //
 // To abandon a transaction completely, first call close then `IngestManager.Abort` to
 // clean up the associated resources.
-func (w *writer) Close() (err error) ***REMOVED***
-	if w.fp != nil ***REMOVED***
+func (w *writer) Close() (err error) {
+	if w.fp != nil {
 		w.fp.Sync()
 		err = w.fp.Close()
 		writeTimestampFile(filepath.Join(w.path, "updatedat"), w.updatedAt)
 		w.fp = nil
 		unlock(w.ref)
 		return
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func (w *writer) Truncate(size int64) error ***REMOVED***
-	if size != 0 ***REMOVED***
+func (w *writer) Truncate(size int64) error {
+	if size != 0 {
 		return errors.New("Truncate: unsupported size")
-	***REMOVED***
+	}
 	w.offset = 0
 	w.digester.Hash().Reset()
-	if _, err := w.fp.Seek(0, io.SeekStart); err != nil ***REMOVED***
+	if _, err := w.fp.Seek(0, io.SeekStart); err != nil {
 		return err
-	***REMOVED***
+	}
 	return w.fp.Truncate(0)
-***REMOVED***
+}

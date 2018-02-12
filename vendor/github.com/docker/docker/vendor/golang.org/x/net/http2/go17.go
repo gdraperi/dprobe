@@ -14,93 +14,93 @@ import (
 	"time"
 )
 
-type contextContext interface ***REMOVED***
+type contextContext interface {
 	context.Context
-***REMOVED***
+}
 
-func serverConnBaseContext(c net.Conn, opts *ServeConnOpts) (ctx contextContext, cancel func()) ***REMOVED***
+func serverConnBaseContext(c net.Conn, opts *ServeConnOpts) (ctx contextContext, cancel func()) {
 	ctx, cancel = context.WithCancel(context.Background())
 	ctx = context.WithValue(ctx, http.LocalAddrContextKey, c.LocalAddr())
-	if hs := opts.baseConfig(); hs != nil ***REMOVED***
+	if hs := opts.baseConfig(); hs != nil {
 		ctx = context.WithValue(ctx, http.ServerContextKey, hs)
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func contextWithCancel(ctx contextContext) (_ contextContext, cancel func()) ***REMOVED***
+func contextWithCancel(ctx contextContext) (_ contextContext, cancel func()) {
 	return context.WithCancel(ctx)
-***REMOVED***
+}
 
-func requestWithContext(req *http.Request, ctx contextContext) *http.Request ***REMOVED***
+func requestWithContext(req *http.Request, ctx contextContext) *http.Request {
 	return req.WithContext(ctx)
-***REMOVED***
+}
 
 type clientTrace httptrace.ClientTrace
 
-func reqContext(r *http.Request) context.Context ***REMOVED*** return r.Context() ***REMOVED***
+func reqContext(r *http.Request) context.Context { return r.Context() }
 
-func (t *Transport) idleConnTimeout() time.Duration ***REMOVED***
-	if t.t1 != nil ***REMOVED***
+func (t *Transport) idleConnTimeout() time.Duration {
+	if t.t1 != nil {
 		return t.t1.IdleConnTimeout
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func setResponseUncompressed(res *http.Response) ***REMOVED*** res.Uncompressed = true ***REMOVED***
+func setResponseUncompressed(res *http.Response) { res.Uncompressed = true }
 
-func traceGotConn(req *http.Request, cc *ClientConn) ***REMOVED***
+func traceGotConn(req *http.Request, cc *ClientConn) {
 	trace := httptrace.ContextClientTrace(req.Context())
-	if trace == nil || trace.GotConn == nil ***REMOVED***
+	if trace == nil || trace.GotConn == nil {
 		return
-	***REMOVED***
-	ci := httptrace.GotConnInfo***REMOVED***Conn: cc.tconn***REMOVED***
+	}
+	ci := httptrace.GotConnInfo{Conn: cc.tconn}
 	cc.mu.Lock()
 	ci.Reused = cc.nextStreamID > 1
 	ci.WasIdle = len(cc.streams) == 0 && ci.Reused
-	if ci.WasIdle && !cc.lastActive.IsZero() ***REMOVED***
+	if ci.WasIdle && !cc.lastActive.IsZero() {
 		ci.IdleTime = time.Now().Sub(cc.lastActive)
-	***REMOVED***
+	}
 	cc.mu.Unlock()
 
 	trace.GotConn(ci)
-***REMOVED***
+}
 
-func traceWroteHeaders(trace *clientTrace) ***REMOVED***
-	if trace != nil && trace.WroteHeaders != nil ***REMOVED***
+func traceWroteHeaders(trace *clientTrace) {
+	if trace != nil && trace.WroteHeaders != nil {
 		trace.WroteHeaders()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func traceGot100Continue(trace *clientTrace) ***REMOVED***
-	if trace != nil && trace.Got100Continue != nil ***REMOVED***
+func traceGot100Continue(trace *clientTrace) {
+	if trace != nil && trace.Got100Continue != nil {
 		trace.Got100Continue()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func traceWait100Continue(trace *clientTrace) ***REMOVED***
-	if trace != nil && trace.Wait100Continue != nil ***REMOVED***
+func traceWait100Continue(trace *clientTrace) {
+	if trace != nil && trace.Wait100Continue != nil {
 		trace.Wait100Continue()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func traceWroteRequest(trace *clientTrace, err error) ***REMOVED***
-	if trace != nil && trace.WroteRequest != nil ***REMOVED***
-		trace.WroteRequest(httptrace.WroteRequestInfo***REMOVED***Err: err***REMOVED***)
-	***REMOVED***
-***REMOVED***
+func traceWroteRequest(trace *clientTrace, err error) {
+	if trace != nil && trace.WroteRequest != nil {
+		trace.WroteRequest(httptrace.WroteRequestInfo{Err: err})
+	}
+}
 
-func traceFirstResponseByte(trace *clientTrace) ***REMOVED***
-	if trace != nil && trace.GotFirstResponseByte != nil ***REMOVED***
+func traceFirstResponseByte(trace *clientTrace) {
+	if trace != nil && trace.GotFirstResponseByte != nil {
 		trace.GotFirstResponseByte()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func requestTrace(req *http.Request) *clientTrace ***REMOVED***
+func requestTrace(req *http.Request) *clientTrace {
 	trace := httptrace.ContextClientTrace(req.Context())
 	return (*clientTrace)(trace)
-***REMOVED***
+}
 
 // Ping sends a PING frame to the server and waits for the ack.
-func (cc *ClientConn) Ping(ctx context.Context) error ***REMOVED***
+func (cc *ClientConn) Ping(ctx context.Context) error {
 	return cc.ping(ctx)
-***REMOVED***
+}

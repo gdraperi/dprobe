@@ -15,147 +15,147 @@ import (
 
 var soTimeout = ns.NetlinkSocketsTimeout
 
-func validateID(nid, eid string) error ***REMOVED***
-	if nid == "" ***REMOVED***
+func validateID(nid, eid string) error {
+	if nid == "" {
 		return fmt.Errorf("invalid network id")
-	***REMOVED***
+	}
 
-	if eid == "" ***REMOVED***
+	if eid == "" {
 		return fmt.Errorf("invalid endpoint id")
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func createVethPair() (string, string, error) ***REMOVED***
+func createVethPair() (string, string, error) {
 	defer osl.InitOSContext()()
 	nlh := ns.NlHandle()
 
 	// Generate a name for what will be the host side pipe interface
 	name1, err := netutils.GenerateIfaceName(nlh, vethPrefix, vethLen)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", "", fmt.Errorf("error generating veth name1: %v", err)
-	***REMOVED***
+	}
 
 	// Generate a name for what will be the sandbox side pipe interface
 	name2, err := netutils.GenerateIfaceName(nlh, vethPrefix, vethLen)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", "", fmt.Errorf("error generating veth name2: %v", err)
-	***REMOVED***
+	}
 
 	// Generate and add the interface pipe host <-> sandbox
-	veth := &netlink.Veth***REMOVED***
-		LinkAttrs: netlink.LinkAttrs***REMOVED***Name: name1, TxQLen: 0***REMOVED***,
-		PeerName:  name2***REMOVED***
-	if err := nlh.LinkAdd(veth); err != nil ***REMOVED***
+	veth := &netlink.Veth{
+		LinkAttrs: netlink.LinkAttrs{Name: name1, TxQLen: 0},
+		PeerName:  name2}
+	if err := nlh.LinkAdd(veth); err != nil {
 		return "", "", fmt.Errorf("error creating veth pair: %v", err)
-	***REMOVED***
+	}
 
 	return name1, name2, nil
-***REMOVED***
+}
 
-func createVxlan(name string, vni uint32, mtu int) error ***REMOVED***
+func createVxlan(name string, vni uint32, mtu int) error {
 	defer osl.InitOSContext()()
 
-	vxlan := &netlink.Vxlan***REMOVED***
-		LinkAttrs: netlink.LinkAttrs***REMOVED***Name: name, MTU: mtu***REMOVED***,
+	vxlan := &netlink.Vxlan{
+		LinkAttrs: netlink.LinkAttrs{Name: name, MTU: mtu},
 		VxlanId:   int(vni),
 		Learning:  true,
 		Port:      vxlanPort,
 		Proxy:     true,
 		L3miss:    true,
 		L2miss:    true,
-	***REMOVED***
+	}
 
-	if err := ns.NlHandle().LinkAdd(vxlan); err != nil ***REMOVED***
+	if err := ns.NlHandle().LinkAdd(vxlan); err != nil {
 		return fmt.Errorf("error creating vxlan interface: %v", err)
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func deleteInterfaceBySubnet(brPrefix string, s *subnet) error ***REMOVED***
+func deleteInterfaceBySubnet(brPrefix string, s *subnet) error {
 	defer osl.InitOSContext()()
 
 	nlh := ns.NlHandle()
 	links, err := nlh.LinkList()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("failed to list interfaces while deleting bridge interface by subnet: %v", err)
-	***REMOVED***
+	}
 
-	for _, l := range links ***REMOVED***
+	for _, l := range links {
 		name := l.Attrs().Name
-		if _, ok := l.(*netlink.Bridge); ok && strings.HasPrefix(name, brPrefix) ***REMOVED***
+		if _, ok := l.(*netlink.Bridge); ok && strings.HasPrefix(name, brPrefix) {
 			addrList, err := nlh.AddrList(l, netlink.FAMILY_V4)
-			if err != nil ***REMOVED***
+			if err != nil {
 				logrus.Errorf("error getting AddressList for bridge %s", name)
 				continue
-			***REMOVED***
-			for _, addr := range addrList ***REMOVED***
-				if netutils.NetworkOverlaps(addr.IPNet, s.subnetIP) ***REMOVED***
+			}
+			for _, addr := range addrList {
+				if netutils.NetworkOverlaps(addr.IPNet, s.subnetIP) {
 					err = nlh.LinkDel(l)
-					if err != nil ***REMOVED***
+					if err != nil {
 						logrus.Errorf("error deleting bridge (%s) with subnet %v: %v", name, addr.IPNet, err)
-					***REMOVED***
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+					}
+				}
+			}
+		}
+	}
 	return nil
 
-***REMOVED***
+}
 
-func deleteInterface(name string) error ***REMOVED***
+func deleteInterface(name string) error {
 	defer osl.InitOSContext()()
 
 	link, err := ns.NlHandle().LinkByName(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("failed to find interface with name %s: %v", name, err)
-	***REMOVED***
+	}
 
-	if err := ns.NlHandle().LinkDel(link); err != nil ***REMOVED***
+	if err := ns.NlHandle().LinkDel(link); err != nil {
 		return fmt.Errorf("error deleting interface with name %s: %v", name, err)
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func deleteVxlanByVNI(path string, vni uint32) error ***REMOVED***
+func deleteVxlanByVNI(path string, vni uint32) error {
 	defer osl.InitOSContext()()
 
 	nlh := ns.NlHandle()
-	if path != "" ***REMOVED***
+	if path != "" {
 		ns, err := netns.GetFromPath(path)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return fmt.Errorf("failed to get ns handle for %s: %v", path, err)
-		***REMOVED***
+		}
 		defer ns.Close()
 
 		nlh, err = netlink.NewHandleAt(ns, syscall.NETLINK_ROUTE)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return fmt.Errorf("failed to get netlink handle for ns %s: %v", path, err)
-		***REMOVED***
+		}
 		defer nlh.Delete()
 		err = nlh.SetSocketTimeout(soTimeout)
-		if err != nil ***REMOVED***
+		if err != nil {
 			logrus.Warnf("Failed to set the timeout on the netlink handle sockets for vxlan deletion: %v", err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	links, err := nlh.LinkList()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("failed to list interfaces while deleting vxlan interface by vni: %v", err)
-	***REMOVED***
+	}
 
-	for _, l := range links ***REMOVED***
-		if l.Type() == "vxlan" && (vni == 0 || l.(*netlink.Vxlan).VxlanId == int(vni)) ***REMOVED***
+	for _, l := range links {
+		if l.Type() == "vxlan" && (vni == 0 || l.(*netlink.Vxlan).VxlanId == int(vni)) {
 			err = nlh.LinkDel(l)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return fmt.Errorf("error deleting vxlan interface with id %d: %v", vni, err)
-			***REMOVED***
+			}
 			return nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return fmt.Errorf("could not find a vxlan interface to delete with id %d", vni)
-***REMOVED***
+}

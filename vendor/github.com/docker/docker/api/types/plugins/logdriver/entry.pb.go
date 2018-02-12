@@ -30,95 +30,95 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
-type LogEntry struct ***REMOVED***
+type LogEntry struct {
 	Source   string `protobuf:"bytes,1,opt,name=source,proto3" json:"source,omitempty"`
 	TimeNano int64  `protobuf:"varint,2,opt,name=time_nano,json=timeNano,proto3" json:"time_nano,omitempty"`
 	Line     []byte `protobuf:"bytes,3,opt,name=line,proto3" json:"line,omitempty"`
 	Partial  bool   `protobuf:"varint,4,opt,name=partial,proto3" json:"partial,omitempty"`
-***REMOVED***
+}
 
-func (m *LogEntry) Reset()                    ***REMOVED*** *m = LogEntry***REMOVED******REMOVED*** ***REMOVED***
-func (m *LogEntry) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*LogEntry) ProtoMessage()               ***REMOVED******REMOVED***
-func (*LogEntry) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorEntry, []int***REMOVED***0***REMOVED*** ***REMOVED***
+func (m *LogEntry) Reset()                    { *m = LogEntry{} }
+func (m *LogEntry) String() string            { return proto.CompactTextString(m) }
+func (*LogEntry) ProtoMessage()               {}
+func (*LogEntry) Descriptor() ([]byte, []int) { return fileDescriptorEntry, []int{0} }
 
-func (m *LogEntry) GetSource() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *LogEntry) GetSource() string {
+	if m != nil {
 		return m.Source
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *LogEntry) GetTimeNano() int64 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *LogEntry) GetTimeNano() int64 {
+	if m != nil {
 		return m.TimeNano
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *LogEntry) GetLine() []byte ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *LogEntry) GetLine() []byte {
+	if m != nil {
 		return m.Line
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *LogEntry) GetPartial() bool ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *LogEntry) GetPartial() bool {
+	if m != nil {
 		return m.Partial
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*LogEntry)(nil), "LogEntry")
-***REMOVED***
-func (m *LogEntry) Marshal() (dAtA []byte, err error) ***REMOVED***
+}
+func (m *LogEntry) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *LogEntry) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *LogEntry) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Source) > 0 ***REMOVED***
+	if len(m.Source) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintEntry(dAtA, i, uint64(len(m.Source)))
 		i += copy(dAtA[i:], m.Source)
-	***REMOVED***
-	if m.TimeNano != 0 ***REMOVED***
+	}
+	if m.TimeNano != 0 {
 		dAtA[i] = 0x10
 		i++
 		i = encodeVarintEntry(dAtA, i, uint64(m.TimeNano))
-	***REMOVED***
-	if len(m.Line) > 0 ***REMOVED***
+	}
+	if len(m.Line) > 0 {
 		dAtA[i] = 0x1a
 		i++
 		i = encodeVarintEntry(dAtA, i, uint64(len(m.Line)))
 		i += copy(dAtA[i:], m.Line)
-	***REMOVED***
-	if m.Partial ***REMOVED***
+	}
+	if m.Partial {
 		dAtA[i] = 0x20
 		i++
-		if m.Partial ***REMOVED***
+		if m.Partial {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func encodeFixed64Entry(dAtA []byte, offset int, v uint64) int ***REMOVED***
+func encodeFixed64Entry(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
 	dAtA[offset+2] = uint8(v >> 16)
@@ -128,292 +128,292 @@ func encodeFixed64Entry(dAtA []byte, offset int, v uint64) int ***REMOVED***
 	dAtA[offset+6] = uint8(v >> 48)
 	dAtA[offset+7] = uint8(v >> 56)
 	return offset + 8
-***REMOVED***
-func encodeFixed32Entry(dAtA []byte, offset int, v uint32) int ***REMOVED***
+}
+func encodeFixed32Entry(dAtA []byte, offset int, v uint32) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
 	dAtA[offset+2] = uint8(v >> 16)
 	dAtA[offset+3] = uint8(v >> 24)
 	return offset + 4
-***REMOVED***
-func encodeVarintEntry(dAtA []byte, offset int, v uint64) int ***REMOVED***
-	for v >= 1<<7 ***REMOVED***
+}
+func encodeVarintEntry(dAtA []byte, offset int, v uint64) int {
+	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
-	***REMOVED***
+	}
 	dAtA[offset] = uint8(v)
 	return offset + 1
-***REMOVED***
-func (m *LogEntry) Size() (n int) ***REMOVED***
+}
+func (m *LogEntry) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.Source)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovEntry(uint64(l))
-	***REMOVED***
-	if m.TimeNano != 0 ***REMOVED***
+	}
+	if m.TimeNano != 0 {
 		n += 1 + sovEntry(uint64(m.TimeNano))
-	***REMOVED***
+	}
 	l = len(m.Line)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovEntry(uint64(l))
-	***REMOVED***
-	if m.Partial ***REMOVED***
+	}
+	if m.Partial {
 		n += 2
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func sovEntry(x uint64) (n int) ***REMOVED***
-	for ***REMOVED***
+func sovEntry(x uint64) (n int) {
+	for {
 		n++
 		x >>= 7
-		if x == 0 ***REMOVED***
+		if x == 0 {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
-func sozEntry(x uint64) (n int) ***REMOVED***
+}
+func sozEntry(x uint64) (n int) {
 	return sovEntry(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-***REMOVED***
-func (m *LogEntry) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *LogEntry) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowEntry
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: LogEntry: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: LogEntry: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Source", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowEntry
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthEntry
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Source = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field TimeNano", wireType)
-			***REMOVED***
+			}
 			m.TimeNano = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowEntry
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.TimeNano |= (int64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Line", wireType)
-			***REMOVED***
+			}
 			var byteLen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowEntry
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				byteLen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if byteLen < 0 ***REMOVED***
+				}
+			}
+			if byteLen < 0 {
 				return ErrInvalidLengthEntry
-			***REMOVED***
+			}
 			postIndex := iNdEx + byteLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Line = append(m.Line[:0], dAtA[iNdEx:postIndex]...)
-			if m.Line == nil ***REMOVED***
-				m.Line = []byte***REMOVED******REMOVED***
-			***REMOVED***
+			if m.Line == nil {
+				m.Line = []byte{}
+			}
 			iNdEx = postIndex
 		case 4:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Partial", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowEntry
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			m.Partial = bool(v != 0)
 		default:
 			iNdEx = preIndex
 			skippy, err := skipEntry(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthEntry
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func skipEntry(dAtA []byte) (n int, err error) ***REMOVED***
+}
+func skipEntry(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return 0, ErrIntOverflowEntry
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return 0, io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		wireType := int(wire & 0x7)
-		switch wireType ***REMOVED***
+		switch wireType {
 		case 0:
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowEntry
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				iNdEx++
-				if dAtA[iNdEx-1] < 0x80 ***REMOVED***
+				if dAtA[iNdEx-1] < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return iNdEx, nil
 		case 1:
 			iNdEx += 8
 			return iNdEx, nil
 		case 2:
 			var length int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowEntry
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				length |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			iNdEx += length
-			if length < 0 ***REMOVED***
+			if length < 0 {
 				return 0, ErrInvalidLengthEntry
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 3:
-			for ***REMOVED***
+			for {
 				var innerWire uint64
 				var start int = iNdEx
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return 0, ErrIntOverflowEntry
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return 0, io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					innerWire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				innerWireType := int(innerWire & 0x7)
-				if innerWireType == 4 ***REMOVED***
+				if innerWireType == 4 {
 					break
-				***REMOVED***
+				}
 				next, err := skipEntry(dAtA[start:])
-				if err != nil ***REMOVED***
+				if err != nil {
 					return 0, err
-				***REMOVED***
+				}
 				iNdEx = start + next
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 4:
 			return iNdEx, nil
@@ -422,19 +422,19 @@ func skipEntry(dAtA []byte) (n int, err error) ***REMOVED***
 			return iNdEx, nil
 		default:
 			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	panic("unreachable")
-***REMOVED***
+}
 
 var (
 	ErrInvalidLengthEntry = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowEntry   = fmt.Errorf("proto: integer overflow")
 )
 
-func init() ***REMOVED*** proto.RegisterFile("entry.proto", fileDescriptorEntry) ***REMOVED***
+func init() { proto.RegisterFile("entry.proto", fileDescriptorEntry) }
 
-var fileDescriptorEntry = []byte***REMOVED***
+var fileDescriptorEntry = []byte{
 	// 149 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xe2, 0xe2, 0x4e, 0xcd, 0x2b, 0x29,
 	0xaa, 0xd4, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x57, 0xca, 0xe5, 0xe2, 0xf0, 0xc9, 0x4f, 0x77, 0x05,
@@ -446,4 +446,4 @@ var fileDescriptorEntry = []byte***REMOVED***
 	0x23, 0x08, 0xc6, 0x75, 0xe2, 0x39, 0xf1, 0x48, 0x8e, 0xf1, 0xc2, 0x23, 0x39, 0xc6, 0x07, 0x8f,
 	0xe4, 0x18, 0x93, 0xd8, 0xc0, 0x6e, 0x30, 0x06, 0x04, 0x00, 0x00, 0xff, 0xff, 0x2d, 0x24, 0x5a,
 	0xd4, 0x92, 0x00, 0x00, 0x00,
-***REMOVED***
+}

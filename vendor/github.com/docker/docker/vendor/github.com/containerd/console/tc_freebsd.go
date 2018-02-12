@@ -15,15 +15,15 @@ const (
 // unlockpt unlocks the slave pseudoterminal device corresponding to the master pseudoterminal referred to by f.
 // unlockpt should be called before opening the slave side of a pty.
 // This does not exist on FreeBSD, it does not allocate controlling terminals on open
-func unlockpt(f *os.File) error ***REMOVED***
+func unlockpt(f *os.File) error {
 	return nil
-***REMOVED***
+}
 
 // ptsname retrieves the name of the first available pts for the given master.
-func ptsname(f *os.File) (string, error) ***REMOVED***
+func ptsname(f *os.File) (string, error) {
 	n, err := unix.IoctlGetInt(int(f.Fd()), unix.TIOCGPTN)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	return fmt.Sprintf("/dev/pts/%d", n), nil
-***REMOVED***
+}

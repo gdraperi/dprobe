@@ -27,7 +27,7 @@ cp "$busybox" "$rootfsDir/bin/busybox"
 	modules=( $(bin/busybox --list-modules) )
 	unset IFS
 
-	for module in "$***REMOVED***modules[@]***REMOVED***"; do
+	for module in "${modules[@]}"; do
 		mkdir -p "$(dirname "$module")"
 		ln -sf /bin/busybox "$module"
 	done

@@ -52,18 +52,18 @@ const (
 
 var conn net.Conn
 
-func init() ***REMOVED***
+func init() {
 	var err error
 	conn, err = net.Dial("unixgram", "/run/systemd/journal/socket")
-	if err != nil ***REMOVED***
+	if err != nil {
 		conn = nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Enabled returns true if the local systemd journal is available for logging
-func Enabled() bool ***REMOVED***
+func Enabled() bool {
 	return conn != nil
-***REMOVED***
+}
 
 // Send a message to the local systemd journal. vars is a map of journald
 // fields to values.  Fields must be composed of uppercase letters, numbers,
@@ -72,54 +72,54 @@ func Enabled() bool ***REMOVED***
 // significance: see the journalctl documentation
 // (http://www.freedesktop.org/software/systemd/man/systemd.journal-fields.html)
 // for more details.  vars may be nil.
-func Send(message string, priority Priority, vars map[string]string) error ***REMOVED***
-	if conn == nil ***REMOVED***
+func Send(message string, priority Priority, vars map[string]string) error {
+	if conn == nil {
 		return journalError("could not connect to journald socket")
-	***REMOVED***
+	}
 
 	data := new(bytes.Buffer)
 	appendVariable(data, "PRIORITY", strconv.Itoa(int(priority)))
 	appendVariable(data, "MESSAGE", message)
-	for k, v := range vars ***REMOVED***
+	for k, v := range vars {
 		appendVariable(data, k, v)
-	***REMOVED***
+	}
 
 	_, err := io.Copy(conn, data)
-	if err != nil && isSocketSpaceError(err) ***REMOVED***
+	if err != nil && isSocketSpaceError(err) {
 		file, err := tempFd()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return journalError(err.Error())
-		***REMOVED***
+		}
 		defer file.Close()
 		_, err = io.Copy(file, data)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return journalError(err.Error())
-		***REMOVED***
+		}
 
 		rights := syscall.UnixRights(int(file.Fd()))
 
 		/* this connection should always be a UnixConn, but better safe than sorry */
 		unixConn, ok := conn.(*net.UnixConn)
-		if !ok ***REMOVED***
+		if !ok {
 			return journalError("can't send file through non-Unix connection")
-		***REMOVED***
-		unixConn.WriteMsgUnix([]byte***REMOVED******REMOVED***, rights, nil)
-	***REMOVED*** else if err != nil ***REMOVED***
+		}
+		unixConn.WriteMsgUnix([]byte{}, rights, nil)
+	} else if err != nil {
 		return journalError(err.Error())
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // Print prints a message to the local systemd journal using Send().
-func Print(priority Priority, format string, a ...interface***REMOVED******REMOVED***) error ***REMOVED***
+func Print(priority Priority, format string, a ...interface{}) error {
 	return Send(fmt.Sprintf(format, a...), priority, nil)
-***REMOVED***
+}
 
-func appendVariable(w io.Writer, name, value string) ***REMOVED***
-	if !validVarName(name) ***REMOVED***
+func appendVariable(w io.Writer, name, value string) {
+	if !validVarName(name) {
 		journalError("variable name contains invalid character, ignoring")
-	***REMOVED***
-	if strings.ContainsRune(value, '\n') ***REMOVED***
+	}
+	if strings.ContainsRune(value, '\n') {
 		/* When the value contains a newline, we write:
 		 * - the variable name, followed by a newline
 		 * - the size (in 64bit little endian format)
@@ -128,52 +128,52 @@ func appendVariable(w io.Writer, name, value string) ***REMOVED***
 		fmt.Fprintln(w, name)
 		binary.Write(w, binary.LittleEndian, uint64(len(value)))
 		fmt.Fprintln(w, value)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		/* just write the variable and value all on one line */
 		fmt.Fprintf(w, "%s=%s\n", name, value)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func validVarName(name string) bool ***REMOVED***
+func validVarName(name string) bool {
 	/* The variable name must be in uppercase and consist only of characters,
 	 * numbers and underscores, and may not begin with an underscore. (from the docs)
 	 */
 
 	valid := name[0] != '_'
-	for _, c := range name ***REMOVED***
+	for _, c := range name {
 		valid = valid && ('A' <= c && c <= 'Z') || ('0' <= c && c <= '9') || c == '_'
-	***REMOVED***
+	}
 	return valid
-***REMOVED***
+}
 
-func isSocketSpaceError(err error) bool ***REMOVED***
+func isSocketSpaceError(err error) bool {
 	opErr, ok := err.(*net.OpError)
-	if !ok ***REMOVED***
+	if !ok {
 		return false
-	***REMOVED***
+	}
 
 	sysErr, ok := opErr.Err.(syscall.Errno)
-	if !ok ***REMOVED***
+	if !ok {
 		return false
-	***REMOVED***
+	}
 
 	return sysErr == syscall.EMSGSIZE || sysErr == syscall.ENOBUFS
-***REMOVED***
+}
 
-func tempFd() (*os.File, error) ***REMOVED***
+func tempFd() (*os.File, error) {
 	file, err := ioutil.TempFile("/dev/shm/", "journal.XXXXX")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	syscall.Unlink(file.Name())
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return file, nil
-***REMOVED***
+}
 
-func journalError(s string) error ***REMOVED***
+func journalError(s string) error {
 	s = "journal error: " + s
 	fmt.Fprintln(os.Stderr, s)
 	return errors.New(s)
-***REMOVED***
+}

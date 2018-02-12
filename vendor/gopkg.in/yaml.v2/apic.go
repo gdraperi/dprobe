@@ -5,165 +5,165 @@ import (
 	"os"
 )
 
-func yaml_insert_token(parser *yaml_parser_t, pos int, token *yaml_token_t) ***REMOVED***
+func yaml_insert_token(parser *yaml_parser_t, pos int, token *yaml_token_t) {
 	//fmt.Println("yaml_insert_token", "pos:", pos, "typ:", token.typ, "head:", parser.tokens_head, "len:", len(parser.tokens))
 
 	// Check if we can move the queue at the beginning of the buffer.
-	if parser.tokens_head > 0 && len(parser.tokens) == cap(parser.tokens) ***REMOVED***
-		if parser.tokens_head != len(parser.tokens) ***REMOVED***
+	if parser.tokens_head > 0 && len(parser.tokens) == cap(parser.tokens) {
+		if parser.tokens_head != len(parser.tokens) {
 			copy(parser.tokens, parser.tokens[parser.tokens_head:])
-		***REMOVED***
+		}
 		parser.tokens = parser.tokens[:len(parser.tokens)-parser.tokens_head]
 		parser.tokens_head = 0
-	***REMOVED***
+	}
 	parser.tokens = append(parser.tokens, *token)
-	if pos < 0 ***REMOVED***
+	if pos < 0 {
 		return
-	***REMOVED***
+	}
 	copy(parser.tokens[parser.tokens_head+pos+1:], parser.tokens[parser.tokens_head+pos:])
 	parser.tokens[parser.tokens_head+pos] = *token
-***REMOVED***
+}
 
 // Create a new parser object.
-func yaml_parser_initialize(parser *yaml_parser_t) bool ***REMOVED***
-	*parser = yaml_parser_t***REMOVED***
+func yaml_parser_initialize(parser *yaml_parser_t) bool {
+	*parser = yaml_parser_t{
 		raw_buffer: make([]byte, 0, input_raw_buffer_size),
 		buffer:     make([]byte, 0, input_buffer_size),
-	***REMOVED***
+	}
 	return true
-***REMOVED***
+}
 
 // Destroy a parser object.
-func yaml_parser_delete(parser *yaml_parser_t) ***REMOVED***
-	*parser = yaml_parser_t***REMOVED******REMOVED***
-***REMOVED***
+func yaml_parser_delete(parser *yaml_parser_t) {
+	*parser = yaml_parser_t{}
+}
 
 // String read handler.
-func yaml_string_read_handler(parser *yaml_parser_t, buffer []byte) (n int, err error) ***REMOVED***
-	if parser.input_pos == len(parser.input) ***REMOVED***
+func yaml_string_read_handler(parser *yaml_parser_t, buffer []byte) (n int, err error) {
+	if parser.input_pos == len(parser.input) {
 		return 0, io.EOF
-	***REMOVED***
+	}
 	n = copy(buffer, parser.input[parser.input_pos:])
 	parser.input_pos += n
 	return n, nil
-***REMOVED***
+}
 
 // File read handler.
-func yaml_file_read_handler(parser *yaml_parser_t, buffer []byte) (n int, err error) ***REMOVED***
+func yaml_file_read_handler(parser *yaml_parser_t, buffer []byte) (n int, err error) {
 	return parser.input_file.Read(buffer)
-***REMOVED***
+}
 
 // Set a string input.
-func yaml_parser_set_input_string(parser *yaml_parser_t, input []byte) ***REMOVED***
-	if parser.read_handler != nil ***REMOVED***
+func yaml_parser_set_input_string(parser *yaml_parser_t, input []byte) {
+	if parser.read_handler != nil {
 		panic("must set the input source only once")
-	***REMOVED***
+	}
 	parser.read_handler = yaml_string_read_handler
 	parser.input = input
 	parser.input_pos = 0
-***REMOVED***
+}
 
 // Set a file input.
-func yaml_parser_set_input_file(parser *yaml_parser_t, file *os.File) ***REMOVED***
-	if parser.read_handler != nil ***REMOVED***
+func yaml_parser_set_input_file(parser *yaml_parser_t, file *os.File) {
+	if parser.read_handler != nil {
 		panic("must set the input source only once")
-	***REMOVED***
+	}
 	parser.read_handler = yaml_file_read_handler
 	parser.input_file = file
-***REMOVED***
+}
 
 // Set the source encoding.
-func yaml_parser_set_encoding(parser *yaml_parser_t, encoding yaml_encoding_t) ***REMOVED***
-	if parser.encoding != yaml_ANY_ENCODING ***REMOVED***
+func yaml_parser_set_encoding(parser *yaml_parser_t, encoding yaml_encoding_t) {
+	if parser.encoding != yaml_ANY_ENCODING {
 		panic("must set the encoding only once")
-	***REMOVED***
+	}
 	parser.encoding = encoding
-***REMOVED***
+}
 
 // Create a new emitter object.
-func yaml_emitter_initialize(emitter *yaml_emitter_t) bool ***REMOVED***
-	*emitter = yaml_emitter_t***REMOVED***
+func yaml_emitter_initialize(emitter *yaml_emitter_t) bool {
+	*emitter = yaml_emitter_t{
 		buffer:     make([]byte, output_buffer_size),
 		raw_buffer: make([]byte, 0, output_raw_buffer_size),
 		states:     make([]yaml_emitter_state_t, 0, initial_stack_size),
 		events:     make([]yaml_event_t, 0, initial_queue_size),
-	***REMOVED***
+	}
 	return true
-***REMOVED***
+}
 
 // Destroy an emitter object.
-func yaml_emitter_delete(emitter *yaml_emitter_t) ***REMOVED***
-	*emitter = yaml_emitter_t***REMOVED******REMOVED***
-***REMOVED***
+func yaml_emitter_delete(emitter *yaml_emitter_t) {
+	*emitter = yaml_emitter_t{}
+}
 
 // String write handler.
-func yaml_string_write_handler(emitter *yaml_emitter_t, buffer []byte) error ***REMOVED***
+func yaml_string_write_handler(emitter *yaml_emitter_t, buffer []byte) error {
 	*emitter.output_buffer = append(*emitter.output_buffer, buffer...)
 	return nil
-***REMOVED***
+}
 
 // File write handler.
-func yaml_file_write_handler(emitter *yaml_emitter_t, buffer []byte) error ***REMOVED***
+func yaml_file_write_handler(emitter *yaml_emitter_t, buffer []byte) error {
 	_, err := emitter.output_file.Write(buffer)
 	return err
-***REMOVED***
+}
 
 // Set a string output.
-func yaml_emitter_set_output_string(emitter *yaml_emitter_t, output_buffer *[]byte) ***REMOVED***
-	if emitter.write_handler != nil ***REMOVED***
+func yaml_emitter_set_output_string(emitter *yaml_emitter_t, output_buffer *[]byte) {
+	if emitter.write_handler != nil {
 		panic("must set the output target only once")
-	***REMOVED***
+	}
 	emitter.write_handler = yaml_string_write_handler
 	emitter.output_buffer = output_buffer
-***REMOVED***
+}
 
 // Set a file output.
-func yaml_emitter_set_output_file(emitter *yaml_emitter_t, file io.Writer) ***REMOVED***
-	if emitter.write_handler != nil ***REMOVED***
+func yaml_emitter_set_output_file(emitter *yaml_emitter_t, file io.Writer) {
+	if emitter.write_handler != nil {
 		panic("must set the output target only once")
-	***REMOVED***
+	}
 	emitter.write_handler = yaml_file_write_handler
 	emitter.output_file = file
-***REMOVED***
+}
 
 // Set the output encoding.
-func yaml_emitter_set_encoding(emitter *yaml_emitter_t, encoding yaml_encoding_t) ***REMOVED***
-	if emitter.encoding != yaml_ANY_ENCODING ***REMOVED***
+func yaml_emitter_set_encoding(emitter *yaml_emitter_t, encoding yaml_encoding_t) {
+	if emitter.encoding != yaml_ANY_ENCODING {
 		panic("must set the output encoding only once")
-	***REMOVED***
+	}
 	emitter.encoding = encoding
-***REMOVED***
+}
 
 // Set the canonical output style.
-func yaml_emitter_set_canonical(emitter *yaml_emitter_t, canonical bool) ***REMOVED***
+func yaml_emitter_set_canonical(emitter *yaml_emitter_t, canonical bool) {
 	emitter.canonical = canonical
-***REMOVED***
+}
 
 //// Set the indentation increment.
-func yaml_emitter_set_indent(emitter *yaml_emitter_t, indent int) ***REMOVED***
-	if indent < 2 || indent > 9 ***REMOVED***
+func yaml_emitter_set_indent(emitter *yaml_emitter_t, indent int) {
+	if indent < 2 || indent > 9 {
 		indent = 2
-	***REMOVED***
+	}
 	emitter.best_indent = indent
-***REMOVED***
+}
 
 // Set the preferred line width.
-func yaml_emitter_set_width(emitter *yaml_emitter_t, width int) ***REMOVED***
-	if width < 0 ***REMOVED***
+func yaml_emitter_set_width(emitter *yaml_emitter_t, width int) {
+	if width < 0 {
 		width = -1
-	***REMOVED***
+	}
 	emitter.best_width = width
-***REMOVED***
+}
 
 // Set if unescaped non-ASCII characters are allowed.
-func yaml_emitter_set_unicode(emitter *yaml_emitter_t, unicode bool) ***REMOVED***
+func yaml_emitter_set_unicode(emitter *yaml_emitter_t, unicode bool) {
 	emitter.unicode = unicode
-***REMOVED***
+}
 
 // Set the preferred line break character.
-func yaml_emitter_set_break(emitter *yaml_emitter_t, line_break yaml_break_t) ***REMOVED***
+func yaml_emitter_set_break(emitter *yaml_emitter_t, line_break yaml_break_t) {
 	emitter.line_break = line_break
-***REMOVED***
+}
 
 ///*
 // * Destroy a token object.
@@ -171,11 +171,11 @@ func yaml_emitter_set_break(emitter *yaml_emitter_t, line_break yaml_break_t) **
 //
 //YAML_DECLARE(void)
 //yaml_token_delete(yaml_token_t *token)
-//***REMOVED***
+//{
 //    assert(token);  // Non-NULL token object expected.
 //
 //    switch (token.type)
-//    ***REMOVED***
+//    {
 //        case YAML_TAG_DIRECTIVE_TOKEN:
 //            yaml_free(token.data.tag_directive.handle);
 //            yaml_free(token.data.tag_directive.prefix);
@@ -200,10 +200,10 @@ func yaml_emitter_set_break(emitter *yaml_emitter_t, line_break yaml_break_t) **
 //
 //        default:
 //            break;
-//***REMOVED***
+//    }
 //
 //    memset(token, 0, sizeof(yaml_token_t));
-//***REMOVED***
+//}
 //
 ///*
 // * Check if a string is a valid UTF-8 sequence.
@@ -213,11 +213,11 @@ func yaml_emitter_set_break(emitter *yaml_emitter_t, line_break yaml_break_t) **
 //
 //static int
 //yaml_check_utf8(yaml_char_t *start, size_t length)
-//***REMOVED***
+//{
 //    yaml_char_t *end = start+length;
 //    yaml_char_t *pointer = start;
 //
-//    while (pointer < end) ***REMOVED***
+//    while (pointer < end) {
 //        unsigned char octet;
 //        unsigned int width;
 //        unsigned int value;
@@ -234,60 +234,60 @@ func yaml_emitter_set_break(emitter *yaml_emitter_t, line_break yaml_break_t) **
 //                (octet & 0xF8) == 0xF0 ? octet & 0x07 : 0;
 //        if (!width) return 0;
 //        if (pointer+width > end) return 0;
-//        for (k = 1; k < width; k ++) ***REMOVED***
+//        for (k = 1; k < width; k ++) {
 //            octet = pointer[k];
 //            if ((octet & 0xC0) != 0x80) return 0;
 //            value = (value << 6) + (octet & 0x3F);
-//    ***REMOVED***
+//        }
 //        if (!((width == 1) ||
 //            (width == 2 && value >= 0x80) ||
 //            (width == 3 && value >= 0x800) ||
 //            (width == 4 && value >= 0x10000))) return 0;
 //
 //        pointer += width;
-//***REMOVED***
+//    }
 //
 //    return 1;
-//***REMOVED***
+//}
 //
 
 // Create STREAM-START.
-func yaml_stream_start_event_initialize(event *yaml_event_t, encoding yaml_encoding_t) bool ***REMOVED***
-	*event = yaml_event_t***REMOVED***
+func yaml_stream_start_event_initialize(event *yaml_event_t, encoding yaml_encoding_t) bool {
+	*event = yaml_event_t{
 		typ:      yaml_STREAM_START_EVENT,
 		encoding: encoding,
-	***REMOVED***
+	}
 	return true
-***REMOVED***
+}
 
 // Create STREAM-END.
-func yaml_stream_end_event_initialize(event *yaml_event_t) bool ***REMOVED***
-	*event = yaml_event_t***REMOVED***
+func yaml_stream_end_event_initialize(event *yaml_event_t) bool {
+	*event = yaml_event_t{
 		typ: yaml_STREAM_END_EVENT,
-	***REMOVED***
+	}
 	return true
-***REMOVED***
+}
 
 // Create DOCUMENT-START.
 func yaml_document_start_event_initialize(event *yaml_event_t, version_directive *yaml_version_directive_t,
-	tag_directives []yaml_tag_directive_t, implicit bool) bool ***REMOVED***
-	*event = yaml_event_t***REMOVED***
+	tag_directives []yaml_tag_directive_t, implicit bool) bool {
+	*event = yaml_event_t{
 		typ:               yaml_DOCUMENT_START_EVENT,
 		version_directive: version_directive,
 		tag_directives:    tag_directives,
 		implicit:          implicit,
-	***REMOVED***
+	}
 	return true
-***REMOVED***
+}
 
 // Create DOCUMENT-END.
-func yaml_document_end_event_initialize(event *yaml_event_t, implicit bool) bool ***REMOVED***
-	*event = yaml_event_t***REMOVED***
+func yaml_document_end_event_initialize(event *yaml_event_t, implicit bool) bool {
+	*event = yaml_event_t{
 		typ:      yaml_DOCUMENT_END_EVENT,
 		implicit: implicit,
-	***REMOVED***
+	}
 	return true
-***REMOVED***
+}
 
 ///*
 // * Create ALIAS.
@@ -295,8 +295,8 @@ func yaml_document_end_event_initialize(event *yaml_event_t, implicit bool) bool
 //
 //YAML_DECLARE(int)
 //yaml_alias_event_initialize(event *yaml_event_t, anchor *yaml_char_t)
-//***REMOVED***
-//    mark yaml_mark_t = ***REMOVED*** 0, 0, 0 ***REMOVED***
+//{
+//    mark yaml_mark_t = { 0, 0, 0 }
 //    anchor_copy *yaml_char_t = NULL
 //
 //    assert(event) // Non-NULL event object is expected.
@@ -311,11 +311,11 @@ func yaml_document_end_event_initialize(event *yaml_event_t, implicit bool) bool
 //    ALIAS_EVENT_INIT(*event, anchor_copy, mark, mark)
 //
 //    return 1
-//***REMOVED***
+//}
 
 // Create SCALAR.
-func yaml_scalar_event_initialize(event *yaml_event_t, anchor, tag, value []byte, plain_implicit, quoted_implicit bool, style yaml_scalar_style_t) bool ***REMOVED***
-	*event = yaml_event_t***REMOVED***
+func yaml_scalar_event_initialize(event *yaml_event_t, anchor, tag, value []byte, plain_implicit, quoted_implicit bool, style yaml_scalar_style_t) bool {
+	*event = yaml_event_t{
 		typ:             yaml_SCALAR_EVENT,
 		anchor:          anchor,
 		tag:             tag,
@@ -323,54 +323,54 @@ func yaml_scalar_event_initialize(event *yaml_event_t, anchor, tag, value []byte
 		implicit:        plain_implicit,
 		quoted_implicit: quoted_implicit,
 		style:           yaml_style_t(style),
-	***REMOVED***
+	}
 	return true
-***REMOVED***
+}
 
 // Create SEQUENCE-START.
-func yaml_sequence_start_event_initialize(event *yaml_event_t, anchor, tag []byte, implicit bool, style yaml_sequence_style_t) bool ***REMOVED***
-	*event = yaml_event_t***REMOVED***
+func yaml_sequence_start_event_initialize(event *yaml_event_t, anchor, tag []byte, implicit bool, style yaml_sequence_style_t) bool {
+	*event = yaml_event_t{
 		typ:      yaml_SEQUENCE_START_EVENT,
 		anchor:   anchor,
 		tag:      tag,
 		implicit: implicit,
 		style:    yaml_style_t(style),
-	***REMOVED***
+	}
 	return true
-***REMOVED***
+}
 
 // Create SEQUENCE-END.
-func yaml_sequence_end_event_initialize(event *yaml_event_t) bool ***REMOVED***
-	*event = yaml_event_t***REMOVED***
+func yaml_sequence_end_event_initialize(event *yaml_event_t) bool {
+	*event = yaml_event_t{
 		typ: yaml_SEQUENCE_END_EVENT,
-	***REMOVED***
+	}
 	return true
-***REMOVED***
+}
 
 // Create MAPPING-START.
-func yaml_mapping_start_event_initialize(event *yaml_event_t, anchor, tag []byte, implicit bool, style yaml_mapping_style_t) bool ***REMOVED***
-	*event = yaml_event_t***REMOVED***
+func yaml_mapping_start_event_initialize(event *yaml_event_t, anchor, tag []byte, implicit bool, style yaml_mapping_style_t) bool {
+	*event = yaml_event_t{
 		typ:      yaml_MAPPING_START_EVENT,
 		anchor:   anchor,
 		tag:      tag,
 		implicit: implicit,
 		style:    yaml_style_t(style),
-	***REMOVED***
+	}
 	return true
-***REMOVED***
+}
 
 // Create MAPPING-END.
-func yaml_mapping_end_event_initialize(event *yaml_event_t) bool ***REMOVED***
-	*event = yaml_event_t***REMOVED***
+func yaml_mapping_end_event_initialize(event *yaml_event_t) bool {
+	*event = yaml_event_t{
 		typ: yaml_MAPPING_END_EVENT,
-	***REMOVED***
+	}
 	return true
-***REMOVED***
+}
 
 // Destroy an event object.
-func yaml_event_delete(event *yaml_event_t) ***REMOVED***
-	*event = yaml_event_t***REMOVED******REMOVED***
-***REMOVED***
+func yaml_event_delete(event *yaml_event_t) {
+	*event = yaml_event_t{}
+}
 
 ///*
 // * Create a document object.
@@ -382,23 +382,23 @@ func yaml_event_delete(event *yaml_event_t) ***REMOVED***
 //        tag_directives_start *yaml_tag_directive_t,
 //        tag_directives_end *yaml_tag_directive_t,
 //        start_implicit int, end_implicit int)
-//***REMOVED***
-//    struct ***REMOVED***
+//{
+//    struct {
 //        error yaml_error_type_t
-//***REMOVED*** context
-//    struct ***REMOVED***
+//    } context
+//    struct {
 //        start *yaml_node_t
 //        end *yaml_node_t
 //        top *yaml_node_t
-//***REMOVED*** nodes = ***REMOVED*** NULL, NULL, NULL ***REMOVED***
+//    } nodes = { NULL, NULL, NULL }
 //    version_directive_copy *yaml_version_directive_t = NULL
-//    struct ***REMOVED***
+//    struct {
 //        start *yaml_tag_directive_t
 //        end *yaml_tag_directive_t
 //        top *yaml_tag_directive_t
-//***REMOVED*** tag_directives_copy = ***REMOVED*** NULL, NULL, NULL ***REMOVED***
-//    value yaml_tag_directive_t = ***REMOVED*** NULL, NULL ***REMOVED***
-//    mark yaml_mark_t = ***REMOVED*** 0, 0, 0 ***REMOVED***
+//    } tag_directives_copy = { NULL, NULL, NULL }
+//    value yaml_tag_directive_t = { NULL, NULL }
+//    mark yaml_mark_t = { 0, 0, 0 }
 //
 //    assert(document) // Non-NULL document object is expected.
 //    assert((tag_directives_start && tag_directives_end) ||
@@ -407,19 +407,19 @@ func yaml_event_delete(event *yaml_event_t) ***REMOVED***
 //
 //    if (!STACK_INIT(&context, nodes, INITIAL_STACK_SIZE)) goto error
 //
-//    if (version_directive) ***REMOVED***
+//    if (version_directive) {
 //        version_directive_copy = yaml_malloc(sizeof(yaml_version_directive_t))
 //        if (!version_directive_copy) goto error
 //        version_directive_copy.major = version_directive.major
 //        version_directive_copy.minor = version_directive.minor
-//***REMOVED***
+//    }
 //
-//    if (tag_directives_start != tag_directives_end) ***REMOVED***
+//    if (tag_directives_start != tag_directives_end) {
 //        tag_directive *yaml_tag_directive_t
 //        if (!STACK_INIT(&context, tag_directives_copy, INITIAL_STACK_SIZE))
 //            goto error
 //        for (tag_directive = tag_directives_start
-//                tag_directive != tag_directives_end; tag_directive ++) ***REMOVED***
+//                tag_directive != tag_directives_end; tag_directive ++) {
 //            assert(tag_directive.handle)
 //            assert(tag_directive.prefix)
 //            if (!yaml_check_utf8(tag_directive.handle,
@@ -435,8 +435,8 @@ func yaml_event_delete(event *yaml_event_t) ***REMOVED***
 //                goto error
 //            value.handle = NULL
 //            value.prefix = NULL
-//    ***REMOVED***
-//***REMOVED***
+//        }
+//    }
 //
 //    DOCUMENT_INIT(*document, nodes.start, nodes.end, version_directive_copy,
 //            tag_directives_copy.start, tag_directives_copy.top,
@@ -447,17 +447,17 @@ func yaml_event_delete(event *yaml_event_t) ***REMOVED***
 //error:
 //    STACK_DEL(&context, nodes)
 //    yaml_free(version_directive_copy)
-//    while (!STACK_EMPTY(&context, tag_directives_copy)) ***REMOVED***
+//    while (!STACK_EMPTY(&context, tag_directives_copy)) {
 //        value yaml_tag_directive_t = POP(&context, tag_directives_copy)
 //        yaml_free(value.handle)
 //        yaml_free(value.prefix)
-//***REMOVED***
+//    }
 //    STACK_DEL(&context, tag_directives_copy)
 //    yaml_free(value.handle)
 //    yaml_free(value.prefix)
 //
 //    return 0
-//***REMOVED***
+//}
 //
 ///*
 // * Destroy a document object.
@@ -465,20 +465,20 @@ func yaml_event_delete(event *yaml_event_t) ***REMOVED***
 //
 //YAML_DECLARE(void)
 //yaml_document_delete(document *yaml_document_t)
-//***REMOVED***
-//    struct ***REMOVED***
+//{
+//    struct {
 //        error yaml_error_type_t
-//***REMOVED*** context
+//    } context
 //    tag_directive *yaml_tag_directive_t
 //
 //    context.error = YAML_NO_ERROR // Eliminate a compliler warning.
 //
 //    assert(document) // Non-NULL document object is expected.
 //
-//    while (!STACK_EMPTY(&context, document.nodes)) ***REMOVED***
+//    while (!STACK_EMPTY(&context, document.nodes)) {
 //        node yaml_node_t = POP(&context, document.nodes)
 //        yaml_free(node.tag)
-//        switch (node.type) ***REMOVED***
+//        switch (node.type) {
 //            case YAML_SCALAR_NODE:
 //                yaml_free(node.data.scalar.value)
 //                break
@@ -490,21 +490,21 @@ func yaml_event_delete(event *yaml_event_t) ***REMOVED***
 //                break
 //            default:
 //                assert(0) // Should not happen.
-//    ***REMOVED***
-//***REMOVED***
+//        }
+//    }
 //    STACK_DEL(&context, document.nodes)
 //
 //    yaml_free(document.version_directive)
 //    for (tag_directive = document.tag_directives.start
 //            tag_directive != document.tag_directives.end
-//            tag_directive++) ***REMOVED***
+//            tag_directive++) {
 //        yaml_free(tag_directive.handle)
 //        yaml_free(tag_directive.prefix)
-//***REMOVED***
+//    }
 //    yaml_free(document.tag_directives.start)
 //
 //    memset(document, 0, sizeof(yaml_document_t))
-//***REMOVED***
+//}
 //
 ///**
 // * Get a document node.
@@ -512,14 +512,14 @@ func yaml_event_delete(event *yaml_event_t) ***REMOVED***
 //
 //YAML_DECLARE(yaml_node_t *)
 //yaml_document_get_node(document *yaml_document_t, index int)
-//***REMOVED***
+//{
 //    assert(document) // Non-NULL document object is expected.
 //
-//    if (index > 0 && document.nodes.start + index <= document.nodes.top) ***REMOVED***
+//    if (index > 0 && document.nodes.start + index <= document.nodes.top) {
 //        return document.nodes.start + index - 1
-//***REMOVED***
+//    }
 //    return NULL
-//***REMOVED***
+//}
 //
 ///**
 // * Get the root object.
@@ -527,14 +527,14 @@ func yaml_event_delete(event *yaml_event_t) ***REMOVED***
 //
 //YAML_DECLARE(yaml_node_t *)
 //yaml_document_get_root_node(document *yaml_document_t)
-//***REMOVED***
+//{
 //    assert(document) // Non-NULL document object is expected.
 //
-//    if (document.nodes.top != document.nodes.start) ***REMOVED***
+//    if (document.nodes.top != document.nodes.start) {
 //        return document.nodes.start
-//***REMOVED***
+//    }
 //    return NULL
-//***REMOVED***
+//}
 //
 ///*
 // * Add a scalar node to a document.
@@ -544,11 +544,11 @@ func yaml_event_delete(event *yaml_event_t) ***REMOVED***
 //yaml_document_add_scalar(document *yaml_document_t,
 //        tag *yaml_char_t, value *yaml_char_t, length int,
 //        style yaml_scalar_style_t)
-//***REMOVED***
-//    struct ***REMOVED***
+//{
+//    struct {
 //        error yaml_error_type_t
-//***REMOVED*** context
-//    mark yaml_mark_t = ***REMOVED*** 0, 0, 0 ***REMOVED***
+//    } context
+//    mark yaml_mark_t = { 0, 0, 0 }
 //    tag_copy *yaml_char_t = NULL
 //    value_copy *yaml_char_t = NULL
 //    node yaml_node_t
@@ -556,17 +556,17 @@ func yaml_event_delete(event *yaml_event_t) ***REMOVED***
 //    assert(document) // Non-NULL document object is expected.
 //    assert(value) // Non-NULL value is expected.
 //
-//    if (!tag) ***REMOVED***
+//    if (!tag) {
 //        tag = (yaml_char_t *)YAML_DEFAULT_SCALAR_TAG
-//***REMOVED***
+//    }
 //
 //    if (!yaml_check_utf8(tag, strlen((char *)tag))) goto error
 //    tag_copy = yaml_strdup(tag)
 //    if (!tag_copy) goto error
 //
-//    if (length < 0) ***REMOVED***
+//    if (length < 0) {
 //        length = strlen((char *)value)
-//***REMOVED***
+//    }
 //
 //    if (!yaml_check_utf8(value, length)) goto error
 //    value_copy = yaml_malloc(length+1)
@@ -584,7 +584,7 @@ func yaml_event_delete(event *yaml_event_t) ***REMOVED***
 //    yaml_free(value_copy)
 //
 //    return 0
-//***REMOVED***
+//}
 //
 ///*
 // * Add a sequence node to a document.
@@ -593,24 +593,24 @@ func yaml_event_delete(event *yaml_event_t) ***REMOVED***
 //YAML_DECLARE(int)
 //yaml_document_add_sequence(document *yaml_document_t,
 //        tag *yaml_char_t, style yaml_sequence_style_t)
-//***REMOVED***
-//    struct ***REMOVED***
+//{
+//    struct {
 //        error yaml_error_type_t
-//***REMOVED*** context
-//    mark yaml_mark_t = ***REMOVED*** 0, 0, 0 ***REMOVED***
+//    } context
+//    mark yaml_mark_t = { 0, 0, 0 }
 //    tag_copy *yaml_char_t = NULL
-//    struct ***REMOVED***
+//    struct {
 //        start *yaml_node_item_t
 //        end *yaml_node_item_t
 //        top *yaml_node_item_t
-//***REMOVED*** items = ***REMOVED*** NULL, NULL, NULL ***REMOVED***
+//    } items = { NULL, NULL, NULL }
 //    node yaml_node_t
 //
 //    assert(document) // Non-NULL document object is expected.
 //
-//    if (!tag) ***REMOVED***
+//    if (!tag) {
 //        tag = (yaml_char_t *)YAML_DEFAULT_SEQUENCE_TAG
-//***REMOVED***
+//    }
 //
 //    if (!yaml_check_utf8(tag, strlen((char *)tag))) goto error
 //    tag_copy = yaml_strdup(tag)
@@ -629,7 +629,7 @@ func yaml_event_delete(event *yaml_event_t) ***REMOVED***
 //    yaml_free(tag_copy)
 //
 //    return 0
-//***REMOVED***
+//}
 //
 ///*
 // * Add a mapping node to a document.
@@ -638,24 +638,24 @@ func yaml_event_delete(event *yaml_event_t) ***REMOVED***
 //YAML_DECLARE(int)
 //yaml_document_add_mapping(document *yaml_document_t,
 //        tag *yaml_char_t, style yaml_mapping_style_t)
-//***REMOVED***
-//    struct ***REMOVED***
+//{
+//    struct {
 //        error yaml_error_type_t
-//***REMOVED*** context
-//    mark yaml_mark_t = ***REMOVED*** 0, 0, 0 ***REMOVED***
+//    } context
+//    mark yaml_mark_t = { 0, 0, 0 }
 //    tag_copy *yaml_char_t = NULL
-//    struct ***REMOVED***
+//    struct {
 //        start *yaml_node_pair_t
 //        end *yaml_node_pair_t
 //        top *yaml_node_pair_t
-//***REMOVED*** pairs = ***REMOVED*** NULL, NULL, NULL ***REMOVED***
+//    } pairs = { NULL, NULL, NULL }
 //    node yaml_node_t
 //
 //    assert(document) // Non-NULL document object is expected.
 //
-//    if (!tag) ***REMOVED***
+//    if (!tag) {
 //        tag = (yaml_char_t *)YAML_DEFAULT_MAPPING_TAG
-//***REMOVED***
+//    }
 //
 //    if (!yaml_check_utf8(tag, strlen((char *)tag))) goto error
 //    tag_copy = yaml_strdup(tag)
@@ -674,7 +674,7 @@ func yaml_event_delete(event *yaml_event_t) ***REMOVED***
 //    yaml_free(tag_copy)
 //
 //    return 0
-//***REMOVED***
+//}
 //
 ///*
 // * Append an item to a sequence node.
@@ -683,10 +683,10 @@ func yaml_event_delete(event *yaml_event_t) ***REMOVED***
 //YAML_DECLARE(int)
 //yaml_document_append_sequence_item(document *yaml_document_t,
 //        sequence int, item int)
-//***REMOVED***
-//    struct ***REMOVED***
+//{
+//    struct {
 //        error yaml_error_type_t
-//***REMOVED*** context
+//    } context
 //
 //    assert(document) // Non-NULL document is required.
 //    assert(sequence > 0
@@ -702,7 +702,7 @@ func yaml_event_delete(event *yaml_event_t) ***REMOVED***
 //        return 0
 //
 //    return 1
-//***REMOVED***
+//}
 //
 ///*
 // * Append a pair of a key and a value to a mapping node.
@@ -711,10 +711,10 @@ func yaml_event_delete(event *yaml_event_t) ***REMOVED***
 //YAML_DECLARE(int)
 //yaml_document_append_mapping_pair(document *yaml_document_t,
 //        mapping int, key int, value int)
-//***REMOVED***
-//    struct ***REMOVED***
+//{
+//    struct {
 //        error yaml_error_type_t
-//***REMOVED*** context
+//    } context
 //
 //    pair yaml_node_pair_t
 //
@@ -737,6 +737,6 @@ func yaml_event_delete(event *yaml_event_t) ***REMOVED***
 //        return 0
 //
 //    return 1
-//***REMOVED***
+//}
 //
 //

@@ -18,34 +18,34 @@ const (
 	defaultTertiary  = 0x2
 )
 
-type Weights struct ***REMOVED***
+type Weights struct {
 	Primary, Secondary, Tertiary, Quaternary int
-***REMOVED***
+}
 
-func W(ce ...int) Weights ***REMOVED***
-	w := Weights***REMOVED***ce[0], defaultSecondary, defaultTertiary, 0***REMOVED***
-	if len(ce) > 1 ***REMOVED***
+func W(ce ...int) Weights {
+	w := Weights{ce[0], defaultSecondary, defaultTertiary, 0}
+	if len(ce) > 1 {
 		w.Secondary = ce[1]
-	***REMOVED***
-	if len(ce) > 2 ***REMOVED***
+	}
+	if len(ce) > 2 {
 		w.Tertiary = ce[2]
-	***REMOVED***
-	if len(ce) > 3 ***REMOVED***
+	}
+	if len(ce) > 3 {
 		w.Quaternary = ce[3]
-	***REMOVED***
+	}
 	return w
-***REMOVED***
-func (w Weights) String() string ***REMOVED***
+}
+func (w Weights) String() string {
 	return fmt.Sprintf("[%X.%X.%X.%X]", w.Primary, w.Secondary, w.Tertiary, w.Quaternary)
-***REMOVED***
+}
 
-func convertFromWeights(ws []Weights) []colltab.Elem ***REMOVED***
+func convertFromWeights(ws []Weights) []colltab.Elem {
 	out := make([]colltab.Elem, len(ws))
-	for i, w := range ws ***REMOVED***
+	for i, w := range ws {
 		out[i], _ = colltab.MakeElem(w.Primary, w.Secondary, w.Tertiary, 0)
-		if out[i] == colltab.Ignore && w.Quaternary > 0 ***REMOVED***
+		if out[i] == colltab.Ignore && w.Quaternary > 0 {
 			out[i] = colltab.MakeQuaternary(w.Quaternary)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return out
-***REMOVED***
+}

@@ -34,7 +34,7 @@
 // functions.
 //
 //    var strPtrs []*string
-//    var strs []string = []string***REMOVED***"Go", "Gophers", "Go"***REMOVED***
+//    var strs []string = []string{"Go", "Gophers", "Go"}
 //
 //    // Convert []string to []*string
 //    strPtrs = aws.StringSlice(strs)

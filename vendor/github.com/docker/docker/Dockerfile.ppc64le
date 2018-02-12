@@ -66,7 +66,7 @@ RUN apt-get update && apt-get install -y \
 # NOTE: official ppc64le go binaries weren't available until go 1.6.4 and 1.7.4
 # IMPORTANT: When updating this please note that stdlib archive/tar pkg is vendored
 ENV GO_VERSION 1.9.3
-RUN curl -fsSL "https://golang.org/dl/go$***REMOVED***GO_VERSION***REMOVED***.linux-ppc64le.tar.gz" \
+RUN curl -fsSL "https://golang.org/dl/go${GO_VERSION}.linux-ppc64le.tar.gz" \
 	| tar -xzC /usr/local
 
 ENV PATH /go/bin:/usr/local/go/bin:$PATH

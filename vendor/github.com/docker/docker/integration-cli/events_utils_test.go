@@ -25,182 +25,182 @@ type eventMatcher func(text string) (map[string]string, bool)
 type eventMatchProcessor func(matches map[string]string)
 
 // eventObserver runs an events commands and observes its output.
-type eventObserver struct ***REMOVED***
+type eventObserver struct {
 	buffer             *bytes.Buffer
 	command            *exec.Cmd
 	scanner            *bufio.Scanner
 	startTime          string
 	disconnectionError error
-***REMOVED***
+}
 
 // newEventObserver creates the observer and initializes the command
 // without running it. Users must call `eventObserver.Start` to start the command.
-func newEventObserver(c *check.C, args ...string) (*eventObserver, error) ***REMOVED***
+func newEventObserver(c *check.C, args ...string) (*eventObserver, error) {
 	since := daemonTime(c).Unix()
 	return newEventObserverWithBacklog(c, since, args...)
-***REMOVED***
+}
 
 // newEventObserverWithBacklog creates a new observer changing the start time of the backlog to return.
-func newEventObserverWithBacklog(c *check.C, since int64, args ...string) (*eventObserver, error) ***REMOVED***
+func newEventObserverWithBacklog(c *check.C, since int64, args ...string) (*eventObserver, error) {
 	startTime := strconv.FormatInt(since, 10)
-	cmdArgs := []string***REMOVED***"events", "--since", startTime***REMOVED***
-	if len(args) > 0 ***REMOVED***
+	cmdArgs := []string{"events", "--since", startTime}
+	if len(args) > 0 {
 		cmdArgs = append(cmdArgs, args...)
-	***REMOVED***
+	}
 	eventsCmd := exec.Command(dockerBinary, cmdArgs...)
 	stdout, err := eventsCmd.StdoutPipe()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	return &eventObserver***REMOVED***
+	return &eventObserver{
 		buffer:    new(bytes.Buffer),
 		command:   eventsCmd,
 		scanner:   bufio.NewScanner(stdout),
 		startTime: startTime,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // Start starts the events command.
-func (e *eventObserver) Start() error ***REMOVED***
+func (e *eventObserver) Start() error {
 	return e.command.Start()
-***REMOVED***
+}
 
 // Stop stops the events command.
-func (e *eventObserver) Stop() ***REMOVED***
+func (e *eventObserver) Stop() {
 	e.command.Process.Kill()
 	e.command.Wait()
-***REMOVED***
+}
 
 // Match tries to match the events output with a given matcher.
-func (e *eventObserver) Match(match eventMatcher, process eventMatchProcessor) ***REMOVED***
-	for e.scanner.Scan() ***REMOVED***
+func (e *eventObserver) Match(match eventMatcher, process eventMatchProcessor) {
+	for e.scanner.Scan() {
 		text := e.scanner.Text()
 		e.buffer.WriteString(text)
 		e.buffer.WriteString("\n")
 
-		if matches, ok := match(text); ok ***REMOVED***
+		if matches, ok := match(text); ok {
 			process(matches)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	err := e.scanner.Err()
-	if err == nil ***REMOVED***
+	if err == nil {
 		err = io.EOF
-	***REMOVED***
+	}
 
 	logrus.Debugf("EventObserver scanner loop finished: %v", err)
 	e.disconnectionError = err
-***REMOVED***
+}
 
-func (e *eventObserver) CheckEventError(c *check.C, id, event string, match eventMatcher) ***REMOVED***
+func (e *eventObserver) CheckEventError(c *check.C, id, event string, match eventMatcher) {
 	var foundEvent bool
 	scannerOut := e.buffer.String()
 
-	if e.disconnectionError != nil ***REMOVED***
+	if e.disconnectionError != nil {
 		until := daemonUnixTime(c)
 		out, _ := dockerCmd(c, "events", "--since", e.startTime, "--until", until)
 		events := strings.Split(strings.TrimSpace(out), "\n")
-		for _, e := range events ***REMOVED***
-			if _, ok := match(e); ok ***REMOVED***
+		for _, e := range events {
+			if _, ok := match(e); ok {
 				foundEvent = true
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		scannerOut = out
-	***REMOVED***
-	if !foundEvent ***REMOVED***
+	}
+	if !foundEvent {
 		c.Fatalf("failed to observe event `%s` for %s. Disconnection error: %v\nout:\n%v", event, id, e.disconnectionError, scannerOut)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // matchEventLine matches a text with the event regular expression.
 // It returns the matches and true if the regular expression matches with the given id and event type.
 // It returns an empty map and false if there is no match.
-func matchEventLine(id, eventType string, actions map[string]chan bool) eventMatcher ***REMOVED***
-	return func(text string) (map[string]string, bool) ***REMOVED***
+func matchEventLine(id, eventType string, actions map[string]chan bool) eventMatcher {
+	return func(text string) (map[string]string, bool) {
 		matches := eventstestutils.ScanMap(text)
-		if len(matches) == 0 ***REMOVED***
+		if len(matches) == 0 {
 			return matches, false
-		***REMOVED***
+		}
 
-		if matchIDAndEventType(matches, id, eventType) ***REMOVED***
-			if _, ok := actions[matches["action"]]; ok ***REMOVED***
+		if matchIDAndEventType(matches, id, eventType) {
+			if _, ok := actions[matches["action"]]; ok {
 				return matches, true
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		return matches, false
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // processEventMatch closes an action channel when an event line matches the expected action.
-func processEventMatch(actions map[string]chan bool) eventMatchProcessor ***REMOVED***
-	return func(matches map[string]string) ***REMOVED***
-		if ch, ok := actions[matches["action"]]; ok ***REMOVED***
+func processEventMatch(actions map[string]chan bool) eventMatchProcessor {
+	return func(matches map[string]string) {
+		if ch, ok := actions[matches["action"]]; ok {
 			ch <- true
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // parseEventAction parses an event text and returns the action.
 // It fails if the text is not in the event format.
-func parseEventAction(c *check.C, text string) string ***REMOVED***
+func parseEventAction(c *check.C, text string) string {
 	matches := eventstestutils.ScanMap(text)
 	return matches["action"]
-***REMOVED***
+}
 
 // eventActionsByIDAndType returns the actions for a given id and type.
 // It fails if the text is not in the event format.
-func eventActionsByIDAndType(c *check.C, events []string, id, eventType string) []string ***REMOVED***
+func eventActionsByIDAndType(c *check.C, events []string, id, eventType string) []string {
 	var filtered []string
-	for _, event := range events ***REMOVED***
+	for _, event := range events {
 		matches := eventstestutils.ScanMap(event)
 		c.Assert(matches, checker.Not(checker.IsNil))
-		if matchIDAndEventType(matches, id, eventType) ***REMOVED***
+		if matchIDAndEventType(matches, id, eventType) {
 			filtered = append(filtered, matches["action"])
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return filtered
-***REMOVED***
+}
 
 // matchIDAndEventType returns true if an event matches a given id and type.
 // It also resolves names in the event attributes if the id doesn't match.
-func matchIDAndEventType(matches map[string]string, id, eventType string) bool ***REMOVED***
+func matchIDAndEventType(matches map[string]string, id, eventType string) bool {
 	return matchEventID(matches, id) && matches["eventType"] == eventType
-***REMOVED***
+}
 
-func matchEventID(matches map[string]string, id string) bool ***REMOVED***
+func matchEventID(matches map[string]string, id string) bool {
 	matchID := matches["id"] == id || strings.HasPrefix(matches["id"], id)
-	if !matchID && matches["attributes"] != "" ***REMOVED***
+	if !matchID && matches["attributes"] != "" {
 		// try matching a name in the attributes
-		attributes := map[string]string***REMOVED******REMOVED***
-		for _, a := range strings.Split(matches["attributes"], ", ") ***REMOVED***
+		attributes := map[string]string{}
+		for _, a := range strings.Split(matches["attributes"], ", ") {
 			kv := strings.Split(a, "=")
 			attributes[kv[0]] = kv[1]
-		***REMOVED***
+		}
 		matchID = attributes["name"] == id
-	***REMOVED***
+	}
 	return matchID
-***REMOVED***
+}
 
-func parseEvents(c *check.C, out, match string) ***REMOVED***
+func parseEvents(c *check.C, out, match string) {
 	events := strings.Split(strings.TrimSpace(out), "\n")
-	for _, event := range events ***REMOVED***
+	for _, event := range events {
 		matches := eventstestutils.ScanMap(event)
 		matched, err := regexp.MatchString(match, matches["action"])
 		c.Assert(err, checker.IsNil)
 		c.Assert(matched, checker.True, check.Commentf("Matcher: %s did not match %s", match, matches["action"]))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func parseEventsWithID(c *check.C, out, match, id string) ***REMOVED***
+func parseEventsWithID(c *check.C, out, match, id string) {
 	events := strings.Split(strings.TrimSpace(out), "\n")
-	for _, event := range events ***REMOVED***
+	for _, event := range events {
 		matches := eventstestutils.ScanMap(event)
 		c.Assert(matchEventID(matches, id), checker.True)
 
 		matched, err := regexp.MatchString(match, matches["action"])
 		c.Assert(err, checker.IsNil)
 		c.Assert(matched, checker.True, check.Commentf("Matcher: %s did not match %s", match, matches["action"]))
-	***REMOVED***
-***REMOVED***
+	}
+}

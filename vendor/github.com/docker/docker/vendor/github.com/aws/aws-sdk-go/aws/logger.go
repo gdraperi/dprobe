@@ -11,34 +11,34 @@ type LogLevelType uint
 
 // LogLevel returns the pointer to a LogLevel. Should be used to workaround
 // not being able to take the address of a non-composite literal.
-func LogLevel(l LogLevelType) *LogLevelType ***REMOVED***
+func LogLevel(l LogLevelType) *LogLevelType {
 	return &l
-***REMOVED***
+}
 
 // Value returns the LogLevel value or the default value LogOff if the LogLevel
 // is nil. Safe to use on nil value LogLevelTypes.
-func (l *LogLevelType) Value() LogLevelType ***REMOVED***
-	if l != nil ***REMOVED***
+func (l *LogLevelType) Value() LogLevelType {
+	if l != nil {
 		return *l
-	***REMOVED***
+	}
 	return LogOff
-***REMOVED***
+}
 
 // Matches returns true if the v LogLevel is enabled by this LogLevel. Should be
 // used with logging sub levels. Is safe to use on nil value LogLevelTypes. If
 // LogLevel is nil, will default to LogOff comparison.
-func (l *LogLevelType) Matches(v LogLevelType) bool ***REMOVED***
+func (l *LogLevelType) Matches(v LogLevelType) bool {
 	c := l.Value()
 	return c&v == v
-***REMOVED***
+}
 
 // AtLeast returns true if this LogLevel is at least high enough to satisfies v.
 // Is safe to use on nil value LogLevelTypes. If LogLevel is nil, will default
 // to LogOff comparison.
-func (l *LogLevelType) AtLeast(v LogLevelType) bool ***REMOVED***
+func (l *LogLevelType) AtLeast(v LogLevelType) bool {
 	c := l.Value()
 	return c >= v
-***REMOVED***
+}
 
 const (
 	// LogOff states that no logging should be performed by the SDK. This is the
@@ -75,38 +75,38 @@ const (
 
 // A Logger is a minimalistic interface for the SDK to log messages to. Should
 // be used to provide custom logging writers for the SDK to use.
-type Logger interface ***REMOVED***
-	Log(...interface***REMOVED******REMOVED***)
-***REMOVED***
+type Logger interface {
+	Log(...interface{})
+}
 
 // A LoggerFunc is a convenience type to convert a function taking a variadic
 // list of arguments and wrap it so the Logger interface can be used.
 //
 // Example:
-//     s3.New(sess, &aws.Config***REMOVED***Logger: aws.LoggerFunc(func(args ...interface***REMOVED******REMOVED***) ***REMOVED***
+//     s3.New(sess, &aws.Config{Logger: aws.LoggerFunc(func(args ...interface{}) {
 //         fmt.Fprintln(os.Stdout, args...)
-// ***REMOVED***)***REMOVED***)
-type LoggerFunc func(...interface***REMOVED******REMOVED***)
+//     })})
+type LoggerFunc func(...interface{})
 
 // Log calls the wrapped function with the arguments provided
-func (f LoggerFunc) Log(args ...interface***REMOVED******REMOVED***) ***REMOVED***
+func (f LoggerFunc) Log(args ...interface{}) {
 	f(args...)
-***REMOVED***
+}
 
 // NewDefaultLogger returns a Logger which will write log messages to stdout, and
 // use same formatting runes as the stdlib log.Logger
-func NewDefaultLogger() Logger ***REMOVED***
-	return &defaultLogger***REMOVED***
+func NewDefaultLogger() Logger {
+	return &defaultLogger{
 		logger: log.New(os.Stdout, "", log.LstdFlags),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // A defaultLogger provides a minimalistic logger satisfying the Logger interface.
-type defaultLogger struct ***REMOVED***
+type defaultLogger struct {
 	logger *log.Logger
-***REMOVED***
+}
 
 // Log logs the parameters to the stdlib logger. See log.Println.
-func (l defaultLogger) Log(args ...interface***REMOVED******REMOVED***) ***REMOVED***
+func (l defaultLogger) Log(args ...interface{}) {
 	l.logger.Println(args...)
-***REMOVED***
+}

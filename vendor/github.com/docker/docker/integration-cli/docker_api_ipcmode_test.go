@@ -26,37 +26,37 @@ import (
  *       ^^^^\
  *            - this is the minor:major we look for
  */
-func testIpcCheckDevExists(mm string) (bool, error) ***REMOVED***
+func testIpcCheckDevExists(mm string) (bool, error) {
 	f, err := os.Open("/proc/self/mountinfo")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return false, err
-	***REMOVED***
+	}
 	defer f.Close()
 
 	s := bufio.NewScanner(f)
-	for s.Scan() ***REMOVED***
+	for s.Scan() {
 		fields := strings.Fields(s.Text())
-		if len(fields) < 7 ***REMOVED***
+		if len(fields) < 7 {
 			continue
-		***REMOVED***
-		if fields[2] == mm ***REMOVED***
+		}
+		if fields[2] == mm {
 			return true, nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return false, s.Err()
-***REMOVED***
+}
 
 // testIpcNonePrivateShareable is a helper function to test "none",
 // "private" and "shareable" modes.
-func testIpcNonePrivateShareable(c *check.C, mode string, mustBeMounted bool, mustBeShared bool) ***REMOVED***
-	cfg := container.Config***REMOVED***
+func testIpcNonePrivateShareable(c *check.C, mode string, mustBeMounted bool, mustBeShared bool) {
+	cfg := container.Config{
 		Image: "busybox",
-		Cmd:   []string***REMOVED***"top"***REMOVED***,
-	***REMOVED***
-	hostCfg := container.HostConfig***REMOVED***
+		Cmd:   []string{"top"},
+	}
+	hostCfg := container.HostConfig{
 		IpcMode: container.IpcMode(mode),
-	***REMOVED***
+	}
 	ctx := context.Background()
 
 	client, err := request.NewClient()
@@ -66,63 +66,63 @@ func testIpcNonePrivateShareable(c *check.C, mode string, mustBeMounted bool, mu
 	c.Assert(err, checker.IsNil)
 	c.Assert(len(resp.Warnings), checker.Equals, 0)
 
-	err = client.ContainerStart(ctx, resp.ID, types.ContainerStartOptions***REMOVED******REMOVED***)
+	err = client.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{})
 	c.Assert(err, checker.IsNil)
 
 	// get major:minor pair for /dev/shm from container's /proc/self/mountinfo
-	cmd := "awk '($5 == \"/dev/shm\") ***REMOVED***printf $3***REMOVED***' /proc/self/mountinfo"
+	cmd := "awk '($5 == \"/dev/shm\") {printf $3}' /proc/self/mountinfo"
 	mm := cli.DockerCmd(c, "exec", "-i", resp.ID, "sh", "-c", cmd).Combined()
-	if !mustBeMounted ***REMOVED***
+	if !mustBeMounted {
 		c.Assert(mm, checker.Equals, "")
 		// no more checks to perform
 		return
-	***REMOVED***
+	}
 	c.Assert(mm, checker.Matches, "^[0-9]+:[0-9]+$")
 
 	shared, err := testIpcCheckDevExists(mm)
 	c.Assert(err, checker.IsNil)
 	c.Logf("[testIpcPrivateShareable] ipcmode: %v, ipcdev: %v, shared: %v, mustBeShared: %v\n", mode, mm, shared, mustBeShared)
 	c.Assert(shared, checker.Equals, mustBeShared)
-***REMOVED***
+}
 
 /* TestAPIIpcModeNone checks the container "none" IPC mode
  * (--ipc none) works as expected. It makes sure there is no
  * /dev/shm mount inside the container.
  */
-func (s *DockerSuite) TestAPIIpcModeNone(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestAPIIpcModeNone(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	testIpcNonePrivateShareable(c, "none", false, false)
-***REMOVED***
+}
 
 /* TestAPIIpcModePrivate checks the container private IPC mode
  * (--ipc private) works as expected. It gets the minor:major pair
  * of /dev/shm mount from the container, and makes sure there is no
  * such pair on the host.
  */
-func (s *DockerSuite) TestAPIIpcModePrivate(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestAPIIpcModePrivate(c *check.C) {
 	testRequires(c, DaemonIsLinux, SameHostDaemon)
 	testIpcNonePrivateShareable(c, "private", true, false)
-***REMOVED***
+}
 
 /* TestAPIIpcModeShareable checks the container shareable IPC mode
  * (--ipc shareable) works as expected. It gets the minor:major pair
  * of /dev/shm mount from the container, and makes sure such pair
  * also exists on the host.
  */
-func (s *DockerSuite) TestAPIIpcModeShareable(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestAPIIpcModeShareable(c *check.C) {
 	testRequires(c, DaemonIsLinux, SameHostDaemon)
 	testIpcNonePrivateShareable(c, "shareable", true, true)
-***REMOVED***
+}
 
 // testIpcContainer is a helper function to test --ipc container:NNN mode in various scenarios
-func testIpcContainer(s *DockerSuite, c *check.C, donorMode string, mustWork bool) ***REMOVED***
-	cfg := container.Config***REMOVED***
+func testIpcContainer(s *DockerSuite, c *check.C, donorMode string, mustWork bool) {
+	cfg := container.Config{
 		Image: "busybox",
-		Cmd:   []string***REMOVED***"top"***REMOVED***,
-	***REMOVED***
-	hostCfg := container.HostConfig***REMOVED***
+		Cmd:   []string{"top"},
+	}
+	hostCfg := container.HostConfig{
 		IpcMode: container.IpcMode(donorMode),
-	***REMOVED***
+	}
 	ctx := context.Background()
 
 	client, err := request.NewClient()
@@ -134,7 +134,7 @@ func testIpcContainer(s *DockerSuite, c *check.C, donorMode string, mustWork boo
 	c.Assert(len(resp.Warnings), checker.Equals, 0)
 	name1 := resp.ID
 
-	err = client.ContainerStart(ctx, name1, types.ContainerStartOptions***REMOVED******REMOVED***)
+	err = client.ContainerStart(ctx, name1, types.ContainerStartOptions{})
 	c.Assert(err, checker.IsNil)
 
 	// create and start the second container
@@ -144,14 +144,14 @@ func testIpcContainer(s *DockerSuite, c *check.C, donorMode string, mustWork boo
 	c.Assert(len(resp.Warnings), checker.Equals, 0)
 	name2 := resp.ID
 
-	err = client.ContainerStart(ctx, name2, types.ContainerStartOptions***REMOVED******REMOVED***)
-	if !mustWork ***REMOVED***
+	err = client.ContainerStart(ctx, name2, types.ContainerStartOptions{})
+	if !mustWork {
 		// start should fail with a specific error
 		c.Assert(err, checker.NotNil)
 		c.Assert(fmt.Sprintf("%v", err), checker.Contains, "non-shareable IPC")
 		// no more checks to perform here
 		return
-	***REMOVED***
+	}
 
 	// start should succeed
 	c.Assert(err, checker.IsNil)
@@ -162,37 +162,37 @@ func testIpcContainer(s *DockerSuite, c *check.C, donorMode string, mustWork boo
 	// 2. check it's the same file in the second one
 	out := cli.DockerCmd(c, "exec", "-i", name2, "cat", "/dev/shm/bar").Combined()
 	c.Assert(out, checker.Matches, "^covfefe$")
-***REMOVED***
+}
 
 /* TestAPIIpcModeShareableAndContainer checks that a container created with
  * --ipc container:ID can use IPC of another shareable container.
  */
-func (s *DockerSuite) TestAPIIpcModeShareableAndContainer(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestAPIIpcModeShareableAndContainer(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	testIpcContainer(s, c, "shareable", true)
-***REMOVED***
+}
 
 /* TestAPIIpcModePrivateAndContainer checks that a container created with
  * --ipc container:ID can NOT use IPC of another private container.
  */
-func (s *DockerSuite) TestAPIIpcModePrivateAndContainer(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestAPIIpcModePrivateAndContainer(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	testIpcContainer(s, c, "private", false)
-***REMOVED***
+}
 
 /* TestAPIIpcModeHost checks that a container created with --ipc host
  * can use IPC of the host system.
  */
-func (s *DockerSuite) TestAPIIpcModeHost(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestAPIIpcModeHost(c *check.C) {
 	testRequires(c, DaemonIsLinux, SameHostDaemon, NotUserNamespace)
 
-	cfg := container.Config***REMOVED***
+	cfg := container.Config{
 		Image: "busybox",
-		Cmd:   []string***REMOVED***"top"***REMOVED***,
-	***REMOVED***
-	hostCfg := container.HostConfig***REMOVED***
+		Cmd:   []string{"top"},
+	}
+	hostCfg := container.HostConfig{
 		IpcMode: container.IpcMode("host"),
-	***REMOVED***
+	}
 	ctx := context.Background()
 
 	client, err := request.NewClient()
@@ -203,7 +203,7 @@ func (s *DockerSuite) TestAPIIpcModeHost(c *check.C) ***REMOVED***
 	c.Assert(len(resp.Warnings), checker.Equals, 0)
 	name := resp.ID
 
-	err = client.ContainerStart(ctx, name, types.ContainerStartOptions***REMOVED******REMOVED***)
+	err = client.ContainerStart(ctx, name, types.ContainerStartOptions{})
 	c.Assert(err, checker.IsNil)
 
 	// check that IPC is shared
@@ -215,4 +215,4 @@ func (s *DockerSuite) TestAPIIpcModeHost(c *check.C) ***REMOVED***
 	c.Assert(string(bytes), checker.Matches, "^covfefe$")
 	// 3. clean up
 	cli.DockerCmd(c, "exec", name, "rm", "-f", "/dev/shm/."+name)
-***REMOVED***
+}

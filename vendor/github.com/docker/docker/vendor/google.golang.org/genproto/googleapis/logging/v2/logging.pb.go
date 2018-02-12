@@ -25,7 +25,7 @@ var _ = fmt.Errorf
 var _ = math.Inf
 
 // The parameters to DeleteLog.
-type DeleteLogRequest struct ***REMOVED***
+type DeleteLogRequest struct {
 	// Required. The resource name of the log to delete:
 	//
 	//     "projects/[PROJECT_ID]/logs/[LOG_ID]"
@@ -39,22 +39,22 @@ type DeleteLogRequest struct ***REMOVED***
 	// For more information about log names, see
 	// [LogEntry][google.logging.v2.LogEntry].
 	LogName string `protobuf:"bytes,1,opt,name=log_name,json=logName" json:"log_name,omitempty"`
-***REMOVED***
+}
 
-func (m *DeleteLogRequest) Reset()                    ***REMOVED*** *m = DeleteLogRequest***REMOVED******REMOVED*** ***REMOVED***
-func (m *DeleteLogRequest) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*DeleteLogRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*DeleteLogRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor1, []int***REMOVED***0***REMOVED*** ***REMOVED***
+func (m *DeleteLogRequest) Reset()                    { *m = DeleteLogRequest{} }
+func (m *DeleteLogRequest) String() string            { return proto.CompactTextString(m) }
+func (*DeleteLogRequest) ProtoMessage()               {}
+func (*DeleteLogRequest) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{0} }
 
-func (m *DeleteLogRequest) GetLogName() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *DeleteLogRequest) GetLogName() string {
+	if m != nil {
 		return m.LogName
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
 // The parameters to WriteLogEntries.
-type WriteLogEntriesRequest struct ***REMOVED***
+type WriteLogEntriesRequest struct {
 	// Optional. A default log resource name that is assigned to all log entries
 	// in `entries` that do not specify a value for `log_name`:
 	//
@@ -72,9 +72,9 @@ type WriteLogEntriesRequest struct ***REMOVED***
 	// Optional. A default monitored resource object that is assigned to all log
 	// entries in `entries` that do not specify a value for `resource`. Example:
 	//
-	//     ***REMOVED*** "type": "gce_instance",
-	//       "labels": ***REMOVED***
-	//         "zone": "us-central1-a", "instance_id": "00000000000000000000" ***REMOVED******REMOVED***
+	//     { "type": "gce_instance",
+	//       "labels": {
+	//         "zone": "us-central1-a", "instance_id": "00000000000000000000" }}
 	//
 	// See [LogEntry][google.logging.v2.LogEntry].
 	Resource *google_api3.MonitoredResource `protobuf:"bytes,2,opt,name=resource" json:"resource,omitempty"`
@@ -105,60 +105,60 @@ type WriteLogEntriesRequest struct ***REMOVED***
 	// with one of the failed entries and the response includes error details
 	// keyed by the entries' zero-based index in the `entries.write` method.
 	PartialSuccess bool `protobuf:"varint,5,opt,name=partial_success,json=partialSuccess" json:"partial_success,omitempty"`
-***REMOVED***
+}
 
-func (m *WriteLogEntriesRequest) Reset()                    ***REMOVED*** *m = WriteLogEntriesRequest***REMOVED******REMOVED*** ***REMOVED***
-func (m *WriteLogEntriesRequest) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*WriteLogEntriesRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*WriteLogEntriesRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor1, []int***REMOVED***1***REMOVED*** ***REMOVED***
+func (m *WriteLogEntriesRequest) Reset()                    { *m = WriteLogEntriesRequest{} }
+func (m *WriteLogEntriesRequest) String() string            { return proto.CompactTextString(m) }
+func (*WriteLogEntriesRequest) ProtoMessage()               {}
+func (*WriteLogEntriesRequest) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{1} }
 
-func (m *WriteLogEntriesRequest) GetLogName() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *WriteLogEntriesRequest) GetLogName() string {
+	if m != nil {
 		return m.LogName
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *WriteLogEntriesRequest) GetResource() *google_api3.MonitoredResource ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *WriteLogEntriesRequest) GetResource() *google_api3.MonitoredResource {
+	if m != nil {
 		return m.Resource
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *WriteLogEntriesRequest) GetLabels() map[string]string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *WriteLogEntriesRequest) GetLabels() map[string]string {
+	if m != nil {
 		return m.Labels
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *WriteLogEntriesRequest) GetEntries() []*LogEntry ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *WriteLogEntriesRequest) GetEntries() []*LogEntry {
+	if m != nil {
 		return m.Entries
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *WriteLogEntriesRequest) GetPartialSuccess() bool ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *WriteLogEntriesRequest) GetPartialSuccess() bool {
+	if m != nil {
 		return m.PartialSuccess
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
 // Result returned from WriteLogEntries.
 // empty
-type WriteLogEntriesResponse struct ***REMOVED***
-***REMOVED***
+type WriteLogEntriesResponse struct {
+}
 
-func (m *WriteLogEntriesResponse) Reset()                    ***REMOVED*** *m = WriteLogEntriesResponse***REMOVED******REMOVED*** ***REMOVED***
-func (m *WriteLogEntriesResponse) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*WriteLogEntriesResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*WriteLogEntriesResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor1, []int***REMOVED***2***REMOVED*** ***REMOVED***
+func (m *WriteLogEntriesResponse) Reset()                    { *m = WriteLogEntriesResponse{} }
+func (m *WriteLogEntriesResponse) String() string            { return proto.CompactTextString(m) }
+func (*WriteLogEntriesResponse) ProtoMessage()               {}
+func (*WriteLogEntriesResponse) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{2} }
 
 // Error details for WriteLogEntries with partial success.
-type WriteLogEntriesPartialErrors struct ***REMOVED***
+type WriteLogEntriesPartialErrors struct {
 	// When `WriteLogEntriesRequest.partial_success` is true, records the error
 	// status for entries that were not written due to a permanent error, keyed
 	// by the entry's zero-based index in `WriteLogEntriesRequest.entries`.
@@ -166,22 +166,22 @@ type WriteLogEntriesPartialErrors struct ***REMOVED***
 	// Failed requests for which no entries are written will not include
 	// per-entry errors.
 	LogEntryErrors map[int32]*google_rpc.Status `protobuf:"bytes,1,rep,name=log_entry_errors,json=logEntryErrors" json:"log_entry_errors,omitempty" protobuf_key:"varint,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-***REMOVED***
+}
 
-func (m *WriteLogEntriesPartialErrors) Reset()                    ***REMOVED*** *m = WriteLogEntriesPartialErrors***REMOVED******REMOVED*** ***REMOVED***
-func (m *WriteLogEntriesPartialErrors) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*WriteLogEntriesPartialErrors) ProtoMessage()               ***REMOVED******REMOVED***
-func (*WriteLogEntriesPartialErrors) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor1, []int***REMOVED***3***REMOVED*** ***REMOVED***
+func (m *WriteLogEntriesPartialErrors) Reset()                    { *m = WriteLogEntriesPartialErrors{} }
+func (m *WriteLogEntriesPartialErrors) String() string            { return proto.CompactTextString(m) }
+func (*WriteLogEntriesPartialErrors) ProtoMessage()               {}
+func (*WriteLogEntriesPartialErrors) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{3} }
 
-func (m *WriteLogEntriesPartialErrors) GetLogEntryErrors() map[int32]*google_rpc.Status ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *WriteLogEntriesPartialErrors) GetLogEntryErrors() map[int32]*google_rpc.Status {
+	if m != nil {
 		return m.LogEntryErrors
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // The parameters to `ListLogEntries`.
-type ListLogEntriesRequest struct ***REMOVED***
+type ListLogEntriesRequest struct {
 	// Deprecated. Use `resource_names` instead.  One or more project identifiers
 	// or project numbers from which to retrieve log entries.  Example:
 	// `"my-project-1A"`. If present, these project identifiers are converted to
@@ -222,57 +222,57 @@ type ListLogEntriesRequest struct ***REMOVED***
 	// `next_page_token` from the previous response.  The values of other method
 	// parameters should be identical to those in the previous call.
 	PageToken string `protobuf:"bytes,5,opt,name=page_token,json=pageToken" json:"page_token,omitempty"`
-***REMOVED***
+}
 
-func (m *ListLogEntriesRequest) Reset()                    ***REMOVED*** *m = ListLogEntriesRequest***REMOVED******REMOVED*** ***REMOVED***
-func (m *ListLogEntriesRequest) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*ListLogEntriesRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*ListLogEntriesRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor1, []int***REMOVED***4***REMOVED*** ***REMOVED***
+func (m *ListLogEntriesRequest) Reset()                    { *m = ListLogEntriesRequest{} }
+func (m *ListLogEntriesRequest) String() string            { return proto.CompactTextString(m) }
+func (*ListLogEntriesRequest) ProtoMessage()               {}
+func (*ListLogEntriesRequest) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{4} }
 
-func (m *ListLogEntriesRequest) GetProjectIds() []string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ListLogEntriesRequest) GetProjectIds() []string {
+	if m != nil {
 		return m.ProjectIds
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *ListLogEntriesRequest) GetResourceNames() []string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ListLogEntriesRequest) GetResourceNames() []string {
+	if m != nil {
 		return m.ResourceNames
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *ListLogEntriesRequest) GetFilter() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ListLogEntriesRequest) GetFilter() string {
+	if m != nil {
 		return m.Filter
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *ListLogEntriesRequest) GetOrderBy() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ListLogEntriesRequest) GetOrderBy() string {
+	if m != nil {
 		return m.OrderBy
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *ListLogEntriesRequest) GetPageSize() int32 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ListLogEntriesRequest) GetPageSize() int32 {
+	if m != nil {
 		return m.PageSize
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *ListLogEntriesRequest) GetPageToken() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ListLogEntriesRequest) GetPageToken() string {
+	if m != nil {
 		return m.PageToken
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
 // Result returned from `ListLogEntries`.
-type ListLogEntriesResponse struct ***REMOVED***
+type ListLogEntriesResponse struct {
 	// A list of log entries.
 	Entries []*LogEntry `protobuf:"bytes,1,rep,name=entries" json:"entries,omitempty"`
 	// If there might be more results than those appearing in this response, then
@@ -286,29 +286,29 @@ type ListLogEntriesResponse struct ***REMOVED***
 	// speeding up the search by changing your filter to specify a single log name
 	// or resource type, or to narrow the time range of the search.
 	NextPageToken string `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken" json:"next_page_token,omitempty"`
-***REMOVED***
+}
 
-func (m *ListLogEntriesResponse) Reset()                    ***REMOVED*** *m = ListLogEntriesResponse***REMOVED******REMOVED*** ***REMOVED***
-func (m *ListLogEntriesResponse) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*ListLogEntriesResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*ListLogEntriesResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor1, []int***REMOVED***5***REMOVED*** ***REMOVED***
+func (m *ListLogEntriesResponse) Reset()                    { *m = ListLogEntriesResponse{} }
+func (m *ListLogEntriesResponse) String() string            { return proto.CompactTextString(m) }
+func (*ListLogEntriesResponse) ProtoMessage()               {}
+func (*ListLogEntriesResponse) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{5} }
 
-func (m *ListLogEntriesResponse) GetEntries() []*LogEntry ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ListLogEntriesResponse) GetEntries() []*LogEntry {
+	if m != nil {
 		return m.Entries
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *ListLogEntriesResponse) GetNextPageToken() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ListLogEntriesResponse) GetNextPageToken() string {
+	if m != nil {
 		return m.NextPageToken
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
 // The parameters to ListMonitoredResourceDescriptors
-type ListMonitoredResourceDescriptorsRequest struct ***REMOVED***
+type ListMonitoredResourceDescriptorsRequest struct {
 	// Optional. The maximum number of results to return from this request.
 	// Non-positive values are ignored.  The presence of `nextPageToken` in the
 	// response indicates that more results might be available.
@@ -318,66 +318,66 @@ type ListMonitoredResourceDescriptorsRequest struct ***REMOVED***
 	// `nextPageToken` from the previous response.  The values of other method
 	// parameters should be identical to those in the previous call.
 	PageToken string `protobuf:"bytes,2,opt,name=page_token,json=pageToken" json:"page_token,omitempty"`
-***REMOVED***
+}
 
-func (m *ListMonitoredResourceDescriptorsRequest) Reset() ***REMOVED***
-	*m = ListMonitoredResourceDescriptorsRequest***REMOVED******REMOVED***
-***REMOVED***
-func (m *ListMonitoredResourceDescriptorsRequest) String() string ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*ListMonitoredResourceDescriptorsRequest) ProtoMessage()    ***REMOVED******REMOVED***
-func (*ListMonitoredResourceDescriptorsRequest) Descriptor() ([]byte, []int) ***REMOVED***
-	return fileDescriptor1, []int***REMOVED***6***REMOVED***
-***REMOVED***
+func (m *ListMonitoredResourceDescriptorsRequest) Reset() {
+	*m = ListMonitoredResourceDescriptorsRequest{}
+}
+func (m *ListMonitoredResourceDescriptorsRequest) String() string { return proto.CompactTextString(m) }
+func (*ListMonitoredResourceDescriptorsRequest) ProtoMessage()    {}
+func (*ListMonitoredResourceDescriptorsRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor1, []int{6}
+}
 
-func (m *ListMonitoredResourceDescriptorsRequest) GetPageSize() int32 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ListMonitoredResourceDescriptorsRequest) GetPageSize() int32 {
+	if m != nil {
 		return m.PageSize
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *ListMonitoredResourceDescriptorsRequest) GetPageToken() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ListMonitoredResourceDescriptorsRequest) GetPageToken() string {
+	if m != nil {
 		return m.PageToken
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
 // Result returned from ListMonitoredResourceDescriptors.
-type ListMonitoredResourceDescriptorsResponse struct ***REMOVED***
+type ListMonitoredResourceDescriptorsResponse struct {
 	// A list of resource descriptors.
 	ResourceDescriptors []*google_api3.MonitoredResourceDescriptor `protobuf:"bytes,1,rep,name=resource_descriptors,json=resourceDescriptors" json:"resource_descriptors,omitempty"`
 	// If there might be more results than those appearing in this response, then
 	// `nextPageToken` is included.  To get the next set of results, call this
 	// method again using the value of `nextPageToken` as `pageToken`.
 	NextPageToken string `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken" json:"next_page_token,omitempty"`
-***REMOVED***
+}
 
-func (m *ListMonitoredResourceDescriptorsResponse) Reset() ***REMOVED***
-	*m = ListMonitoredResourceDescriptorsResponse***REMOVED******REMOVED***
-***REMOVED***
-func (m *ListMonitoredResourceDescriptorsResponse) String() string ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*ListMonitoredResourceDescriptorsResponse) ProtoMessage()    ***REMOVED******REMOVED***
-func (*ListMonitoredResourceDescriptorsResponse) Descriptor() ([]byte, []int) ***REMOVED***
-	return fileDescriptor1, []int***REMOVED***7***REMOVED***
-***REMOVED***
+func (m *ListMonitoredResourceDescriptorsResponse) Reset() {
+	*m = ListMonitoredResourceDescriptorsResponse{}
+}
+func (m *ListMonitoredResourceDescriptorsResponse) String() string { return proto.CompactTextString(m) }
+func (*ListMonitoredResourceDescriptorsResponse) ProtoMessage()    {}
+func (*ListMonitoredResourceDescriptorsResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor1, []int{7}
+}
 
-func (m *ListMonitoredResourceDescriptorsResponse) GetResourceDescriptors() []*google_api3.MonitoredResourceDescriptor ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ListMonitoredResourceDescriptorsResponse) GetResourceDescriptors() []*google_api3.MonitoredResourceDescriptor {
+	if m != nil {
 		return m.ResourceDescriptors
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *ListMonitoredResourceDescriptorsResponse) GetNextPageToken() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ListMonitoredResourceDescriptorsResponse) GetNextPageToken() string {
+	if m != nil {
 		return m.NextPageToken
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
 // The parameters to ListLogs.
-type ListLogsRequest struct ***REMOVED***
+type ListLogsRequest struct {
 	// Required. The resource name that owns the logs:
 	//
 	//     "projects/[PROJECT_ID]"
@@ -394,36 +394,36 @@ type ListLogsRequest struct ***REMOVED***
 	// `nextPageToken` from the previous response.  The values of other method
 	// parameters should be identical to those in the previous call.
 	PageToken string `protobuf:"bytes,3,opt,name=page_token,json=pageToken" json:"page_token,omitempty"`
-***REMOVED***
+}
 
-func (m *ListLogsRequest) Reset()                    ***REMOVED*** *m = ListLogsRequest***REMOVED******REMOVED*** ***REMOVED***
-func (m *ListLogsRequest) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*ListLogsRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*ListLogsRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor1, []int***REMOVED***8***REMOVED*** ***REMOVED***
+func (m *ListLogsRequest) Reset()                    { *m = ListLogsRequest{} }
+func (m *ListLogsRequest) String() string            { return proto.CompactTextString(m) }
+func (*ListLogsRequest) ProtoMessage()               {}
+func (*ListLogsRequest) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{8} }
 
-func (m *ListLogsRequest) GetParent() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ListLogsRequest) GetParent() string {
+	if m != nil {
 		return m.Parent
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *ListLogsRequest) GetPageSize() int32 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ListLogsRequest) GetPageSize() int32 {
+	if m != nil {
 		return m.PageSize
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *ListLogsRequest) GetPageToken() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ListLogsRequest) GetPageToken() string {
+	if m != nil {
 		return m.PageToken
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
 // Result returned from ListLogs.
-type ListLogsResponse struct ***REMOVED***
+type ListLogsResponse struct {
 	// A list of log names. For example,
 	// `"projects/my-project/syslog"` or
 	// `"organizations/123/cloudresourcemanager.googleapis.com%2Factivity"`.
@@ -432,28 +432,28 @@ type ListLogsResponse struct ***REMOVED***
 	// `nextPageToken` is included.  To get the next set of results, call this
 	// method again using the value of `nextPageToken` as `pageToken`.
 	NextPageToken string `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken" json:"next_page_token,omitempty"`
-***REMOVED***
+}
 
-func (m *ListLogsResponse) Reset()                    ***REMOVED*** *m = ListLogsResponse***REMOVED******REMOVED*** ***REMOVED***
-func (m *ListLogsResponse) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*ListLogsResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*ListLogsResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor1, []int***REMOVED***9***REMOVED*** ***REMOVED***
+func (m *ListLogsResponse) Reset()                    { *m = ListLogsResponse{} }
+func (m *ListLogsResponse) String() string            { return proto.CompactTextString(m) }
+func (*ListLogsResponse) ProtoMessage()               {}
+func (*ListLogsResponse) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{9} }
 
-func (m *ListLogsResponse) GetLogNames() []string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ListLogsResponse) GetLogNames() []string {
+	if m != nil {
 		return m.LogNames
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *ListLogsResponse) GetNextPageToken() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ListLogsResponse) GetNextPageToken() string {
+	if m != nil {
 		return m.NextPageToken
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*DeleteLogRequest)(nil), "google.logging.v2.DeleteLogRequest")
 	proto.RegisterType((*WriteLogEntriesRequest)(nil), "google.logging.v2.WriteLogEntriesRequest")
 	proto.RegisterType((*WriteLogEntriesResponse)(nil), "google.logging.v2.WriteLogEntriesResponse")
@@ -464,7 +464,7 @@ func init() ***REMOVED***
 	proto.RegisterType((*ListMonitoredResourceDescriptorsResponse)(nil), "google.logging.v2.ListMonitoredResourceDescriptorsResponse")
 	proto.RegisterType((*ListLogsRequest)(nil), "google.logging.v2.ListLogsRequest")
 	proto.RegisterType((*ListLogsResponse)(nil), "google.logging.v2.ListLogsResponse")
-***REMOVED***
+}
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
@@ -476,7 +476,7 @@ const _ = grpc.SupportPackageIsVersion4
 
 // Client API for LoggingServiceV2 service
 
-type LoggingServiceV2Client interface ***REMOVED***
+type LoggingServiceV2Client interface {
 	// Deletes all the log entries in a log.
 	// The log reappears if it receives new entries.
 	// Log entries written shortly before the delete operation might not be
@@ -494,64 +494,64 @@ type LoggingServiceV2Client interface ***REMOVED***
 	// Lists the logs in projects, organizations, folders, or billing accounts.
 	// Only logs that have entries are listed.
 	ListLogs(ctx context.Context, in *ListLogsRequest, opts ...grpc.CallOption) (*ListLogsResponse, error)
-***REMOVED***
+}
 
-type loggingServiceV2Client struct ***REMOVED***
+type loggingServiceV2Client struct {
 	cc *grpc.ClientConn
-***REMOVED***
+}
 
-func NewLoggingServiceV2Client(cc *grpc.ClientConn) LoggingServiceV2Client ***REMOVED***
-	return &loggingServiceV2Client***REMOVED***cc***REMOVED***
-***REMOVED***
+func NewLoggingServiceV2Client(cc *grpc.ClientConn) LoggingServiceV2Client {
+	return &loggingServiceV2Client{cc}
+}
 
-func (c *loggingServiceV2Client) DeleteLog(ctx context.Context, in *DeleteLogRequest, opts ...grpc.CallOption) (*google_protobuf5.Empty, error) ***REMOVED***
+func (c *loggingServiceV2Client) DeleteLog(ctx context.Context, in *DeleteLogRequest, opts ...grpc.CallOption) (*google_protobuf5.Empty, error) {
 	out := new(google_protobuf5.Empty)
 	err := grpc.Invoke(ctx, "/google.logging.v2.LoggingServiceV2/DeleteLog", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *loggingServiceV2Client) WriteLogEntries(ctx context.Context, in *WriteLogEntriesRequest, opts ...grpc.CallOption) (*WriteLogEntriesResponse, error) ***REMOVED***
+func (c *loggingServiceV2Client) WriteLogEntries(ctx context.Context, in *WriteLogEntriesRequest, opts ...grpc.CallOption) (*WriteLogEntriesResponse, error) {
 	out := new(WriteLogEntriesResponse)
 	err := grpc.Invoke(ctx, "/google.logging.v2.LoggingServiceV2/WriteLogEntries", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *loggingServiceV2Client) ListLogEntries(ctx context.Context, in *ListLogEntriesRequest, opts ...grpc.CallOption) (*ListLogEntriesResponse, error) ***REMOVED***
+func (c *loggingServiceV2Client) ListLogEntries(ctx context.Context, in *ListLogEntriesRequest, opts ...grpc.CallOption) (*ListLogEntriesResponse, error) {
 	out := new(ListLogEntriesResponse)
 	err := grpc.Invoke(ctx, "/google.logging.v2.LoggingServiceV2/ListLogEntries", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *loggingServiceV2Client) ListMonitoredResourceDescriptors(ctx context.Context, in *ListMonitoredResourceDescriptorsRequest, opts ...grpc.CallOption) (*ListMonitoredResourceDescriptorsResponse, error) ***REMOVED***
+func (c *loggingServiceV2Client) ListMonitoredResourceDescriptors(ctx context.Context, in *ListMonitoredResourceDescriptorsRequest, opts ...grpc.CallOption) (*ListMonitoredResourceDescriptorsResponse, error) {
 	out := new(ListMonitoredResourceDescriptorsResponse)
 	err := grpc.Invoke(ctx, "/google.logging.v2.LoggingServiceV2/ListMonitoredResourceDescriptors", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *loggingServiceV2Client) ListLogs(ctx context.Context, in *ListLogsRequest, opts ...grpc.CallOption) (*ListLogsResponse, error) ***REMOVED***
+func (c *loggingServiceV2Client) ListLogs(ctx context.Context, in *ListLogsRequest, opts ...grpc.CallOption) (*ListLogsResponse, error) {
 	out := new(ListLogsResponse)
 	err := grpc.Invoke(ctx, "/google.logging.v2.LoggingServiceV2/ListLogs", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
 // Server API for LoggingServiceV2 service
 
-type LoggingServiceV2Server interface ***REMOVED***
+type LoggingServiceV2Server interface {
 	// Deletes all the log entries in a log.
 	// The log reappears if it receives new entries.
 	// Log entries written shortly before the delete operation might not be
@@ -569,134 +569,134 @@ type LoggingServiceV2Server interface ***REMOVED***
 	// Lists the logs in projects, organizations, folders, or billing accounts.
 	// Only logs that have entries are listed.
 	ListLogs(context.Context, *ListLogsRequest) (*ListLogsResponse, error)
-***REMOVED***
+}
 
-func RegisterLoggingServiceV2Server(s *grpc.Server, srv LoggingServiceV2Server) ***REMOVED***
+func RegisterLoggingServiceV2Server(s *grpc.Server, srv LoggingServiceV2Server) {
 	s.RegisterService(&_LoggingServiceV2_serviceDesc, srv)
-***REMOVED***
+}
 
-func _LoggingServiceV2_DeleteLog_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _LoggingServiceV2_DeleteLog_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteLogRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(LoggingServiceV2Server).DeleteLog(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/google.logging.v2.LoggingServiceV2/DeleteLog",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(LoggingServiceV2Server).DeleteLog(ctx, req.(*DeleteLogRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _LoggingServiceV2_WriteLogEntries_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _LoggingServiceV2_WriteLogEntries_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(WriteLogEntriesRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(LoggingServiceV2Server).WriteLogEntries(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/google.logging.v2.LoggingServiceV2/WriteLogEntries",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(LoggingServiceV2Server).WriteLogEntries(ctx, req.(*WriteLogEntriesRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _LoggingServiceV2_ListLogEntries_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _LoggingServiceV2_ListLogEntries_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListLogEntriesRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(LoggingServiceV2Server).ListLogEntries(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/google.logging.v2.LoggingServiceV2/ListLogEntries",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(LoggingServiceV2Server).ListLogEntries(ctx, req.(*ListLogEntriesRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _LoggingServiceV2_ListMonitoredResourceDescriptors_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _LoggingServiceV2_ListMonitoredResourceDescriptors_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListMonitoredResourceDescriptorsRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(LoggingServiceV2Server).ListMonitoredResourceDescriptors(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/google.logging.v2.LoggingServiceV2/ListMonitoredResourceDescriptors",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(LoggingServiceV2Server).ListMonitoredResourceDescriptors(ctx, req.(*ListMonitoredResourceDescriptorsRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _LoggingServiceV2_ListLogs_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _LoggingServiceV2_ListLogs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListLogsRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(LoggingServiceV2Server).ListLogs(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/google.logging.v2.LoggingServiceV2/ListLogs",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(LoggingServiceV2Server).ListLogs(ctx, req.(*ListLogsRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-var _LoggingServiceV2_serviceDesc = grpc.ServiceDesc***REMOVED***
+var _LoggingServiceV2_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "google.logging.v2.LoggingServiceV2",
 	HandlerType: (*LoggingServiceV2Server)(nil),
-	Methods: []grpc.MethodDesc***REMOVED***
-		***REMOVED***
+	Methods: []grpc.MethodDesc{
+		{
 			MethodName: "DeleteLog",
 			Handler:    _LoggingServiceV2_DeleteLog_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "WriteLogEntries",
 			Handler:    _LoggingServiceV2_WriteLogEntries_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "ListLogEntries",
 			Handler:    _LoggingServiceV2_ListLogEntries_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "ListMonitoredResourceDescriptors",
 			Handler:    _LoggingServiceV2_ListMonitoredResourceDescriptors_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "ListLogs",
 			Handler:    _LoggingServiceV2_ListLogs_Handler,
-		***REMOVED***,
-	***REMOVED***,
-	Streams:  []grpc.StreamDesc***REMOVED******REMOVED***,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
 	Metadata: "google/logging/v2/logging.proto",
-***REMOVED***
+}
 
-func init() ***REMOVED*** proto.RegisterFile("google/logging/v2/logging.proto", fileDescriptor1) ***REMOVED***
+func init() { proto.RegisterFile("google/logging/v2/logging.proto", fileDescriptor1) }
 
-var fileDescriptor1 = []byte***REMOVED***
+var fileDescriptor1 = []byte{
 	// 975 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x56, 0xcd, 0x6e, 0xdb, 0x46,
 	0x10, 0x06, 0xa5, 0xd8, 0x91, 0x46, 0x8d, 0xad, 0x6c, 0x62, 0x59, 0x91, 0x9c, 0x58, 0xa5, 0x9b,
@@ -759,4 +759,4 @@ var fileDescriptor1 = []byte***REMOVED***
 	0xed, 0xf2, 0x63, 0x2a, 0x32, 0x7f, 0xb7, 0x1e, 0x9b, 0x9f, 0xff, 0x5a, 0xd6, 0x6f, 0xb9, 0xed,
 	0xaf, 0xf5, 0xed, 0x27, 0x21, 0x1b, 0xf6, 0x1d, 0x13, 0xda, 0x79, 0xde, 0xee, 0xae, 0xab, 0x08,
 	0x5f, 0xfe, 0x17, 0x00, 0x00, 0xff, 0xff, 0xe2, 0xc4, 0xaa, 0x91, 0x26, 0x0a, 0x00, 0x00,
-***REMOVED***
+}

@@ -26,15 +26,15 @@ var (
 // in progress.  The comparison algorithm assumes that all
 // checks in progress are true when it reencounters them.
 // Visited are stored in a map indexed by 17 * a1 + a2;
-type visit struct ***REMOVED***
+type visit struct {
 	ptr  uintptr
 	typ  reflect.Type
 	next *visit
-***REMOVED***
+}
 
 // From src/pkg/encoding/json.
-func isEmptyValue(v reflect.Value) bool ***REMOVED***
-	switch v.Kind() ***REMOVED***
+func isEmptyValue(v reflect.Value) bool {
+	switch v.Kind() {
 	case reflect.Array, reflect.Map, reflect.Slice, reflect.String:
 		return v.Len() == 0
 	case reflect.Bool:
@@ -47,44 +47,44 @@ func isEmptyValue(v reflect.Value) bool ***REMOVED***
 		return v.Float() == 0
 	case reflect.Interface, reflect.Ptr:
 		return v.IsNil()
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
-func resolveValues(dst, src interface***REMOVED******REMOVED***) (vDst, vSrc reflect.Value, err error) ***REMOVED***
-	if dst == nil || src == nil ***REMOVED***
+func resolveValues(dst, src interface{}) (vDst, vSrc reflect.Value, err error) {
+	if dst == nil || src == nil {
 		err = ErrNilArguments
 		return
-	***REMOVED***
+	}
 	vDst = reflect.ValueOf(dst).Elem()
-	if vDst.Kind() != reflect.Struct && vDst.Kind() != reflect.Map ***REMOVED***
+	if vDst.Kind() != reflect.Struct && vDst.Kind() != reflect.Map {
 		err = ErrNotSupported
 		return
-	***REMOVED***
+	}
 	vSrc = reflect.ValueOf(src)
 	// We check if vSrc is a pointer to dereference it.
-	if vSrc.Kind() == reflect.Ptr ***REMOVED***
+	if vSrc.Kind() == reflect.Ptr {
 		vSrc = vSrc.Elem()
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // Traverses recursively both values, assigning src's fields values to dst.
 // The map argument tracks comparisons that have already been seen, which allows
 // short circuiting on recursive types.
-func deeper(dst, src reflect.Value, visited map[uintptr]*visit, depth int) (err error) ***REMOVED***
-	if dst.CanAddr() ***REMOVED***
+func deeper(dst, src reflect.Value, visited map[uintptr]*visit, depth int) (err error) {
+	if dst.CanAddr() {
 		addr := dst.UnsafeAddr()
 		h := 17 * addr
 		seen := visited[h]
 		typ := dst.Type()
-		for p := seen; p != nil; p = p.next ***REMOVED***
-			if p.ptr == addr && p.typ == typ ***REMOVED***
+		for p := seen; p != nil; p = p.next {
+			if p.ptr == addr && p.typ == typ {
 				return nil
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		// Remember, remember...
-		visited[h] = &visit***REMOVED***addr, typ, seen***REMOVED***
-	***REMOVED***
+		visited[h] = &visit{addr, typ, seen}
+	}
 	return // TODO refactor
-***REMOVED***
+}

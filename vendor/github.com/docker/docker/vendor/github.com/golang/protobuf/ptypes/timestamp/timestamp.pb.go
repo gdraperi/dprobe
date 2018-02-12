@@ -85,9 +85,9 @@ const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 //
 // In JSON format, the Timestamp type is encoded as a string in the
 // [RFC 3339](https://www.ietf.org/rfc/rfc3339.txt) format. That is, the
-// format is "***REMOVED***year***REMOVED***-***REMOVED***month***REMOVED***-***REMOVED***day***REMOVED***T***REMOVED***hour***REMOVED***:***REMOVED***min***REMOVED***:***REMOVED***sec***REMOVED***[.***REMOVED***frac_sec***REMOVED***]Z"
-// where ***REMOVED***year***REMOVED*** is always expressed using four digits while ***REMOVED***month***REMOVED***, ***REMOVED***day***REMOVED***,
-// ***REMOVED***hour***REMOVED***, ***REMOVED***min***REMOVED***, and ***REMOVED***sec***REMOVED*** are zero-padded to two digits each. The fractional
+// format is "{year}-{month}-{day}T{hour}:{min}:{sec}[.{frac_sec}]Z"
+// where {year} is always expressed using four digits while {month}, {day},
+// {hour}, {min}, and {sec} are zero-padded to two digits each. The fractional
 // seconds, which can go up to 9 digits (i.e. up to 1 nanosecond resolution),
 // are optional. The "Z" suffix indicates the timezone ("UTC"); the timezone
 // is required, though only UTC (as indicated by "Z") is presently supported.
@@ -105,7 +105,7 @@ const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 // to obtain a formatter capable of generating timestamps in this format.
 //
 //
-type Timestamp struct ***REMOVED***
+type Timestamp struct {
 	// Represents seconds of UTC time since Unix epoch
 	// 1970-01-01T00:00:00Z. Must be from 0001-01-01T00:00:00Z to
 	// 9999-12-31T23:59:59Z inclusive.
@@ -115,37 +115,37 @@ type Timestamp struct ***REMOVED***
 	// that count forward in time. Must be from 0 to 999,999,999
 	// inclusive.
 	Nanos int32 `protobuf:"varint,2,opt,name=nanos" json:"nanos,omitempty"`
-***REMOVED***
+}
 
-func (m *Timestamp) Reset()                    ***REMOVED*** *m = Timestamp***REMOVED******REMOVED*** ***REMOVED***
-func (m *Timestamp) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*Timestamp) ProtoMessage()               ***REMOVED******REMOVED***
-func (*Timestamp) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***0***REMOVED*** ***REMOVED***
-func (*Timestamp) XXX_WellKnownType() string   ***REMOVED*** return "Timestamp" ***REMOVED***
+func (m *Timestamp) Reset()                    { *m = Timestamp{} }
+func (m *Timestamp) String() string            { return proto.CompactTextString(m) }
+func (*Timestamp) ProtoMessage()               {}
+func (*Timestamp) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
+func (*Timestamp) XXX_WellKnownType() string   { return "Timestamp" }
 
-func (m *Timestamp) GetSeconds() int64 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Timestamp) GetSeconds() int64 {
+	if m != nil {
 		return m.Seconds
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *Timestamp) GetNanos() int32 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Timestamp) GetNanos() int32 {
+	if m != nil {
 		return m.Nanos
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*Timestamp)(nil), "google.protobuf.Timestamp")
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterFile("github.com/golang/protobuf/ptypes/timestamp/timestamp.proto", fileDescriptor0)
-***REMOVED***
+}
 
-var fileDescriptor0 = []byte***REMOVED***
+var fileDescriptor0 = []byte{
 	// 190 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xb2, 0x4e, 0xcf, 0x2c, 0xc9,
 	0x28, 0x4d, 0xd2, 0x4b, 0xce, 0xcf, 0xd5, 0x4f, 0xcf, 0xcf, 0x49, 0xcc, 0x4b, 0xd7, 0x2f, 0x28,
@@ -159,4 +159,4 @@ var fileDescriptor0 = []byte***REMOVED***
 	0x13, 0xb3, 0x7b, 0x80, 0xd3, 0x2a, 0x26, 0x39, 0x77, 0x88, 0xc9, 0x01, 0x50, 0xb5, 0x7a, 0xe1,
 	0xa9, 0x39, 0x39, 0xde, 0x79, 0xf9, 0xe5, 0x79, 0x21, 0x20, 0x3d, 0x49, 0x6c, 0x60, 0x43, 0x8c,
 	0x01, 0x01, 0x00, 0x00, 0xff, 0xff, 0x6b, 0x59, 0x0a, 0x4d, 0x13, 0x01, 0x00, 0x00,
-***REMOVED***
+}

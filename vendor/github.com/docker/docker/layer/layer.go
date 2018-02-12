@@ -61,28 +61,28 @@ var (
 type ChainID digest.Digest
 
 // String returns a string rendition of a layer ID
-func (id ChainID) String() string ***REMOVED***
+func (id ChainID) String() string {
 	return string(id)
-***REMOVED***
+}
 
 // DiffID is the hash of an individual layer tar.
 type DiffID digest.Digest
 
 // String returns a string rendition of a layer DiffID
-func (diffID DiffID) String() string ***REMOVED***
+func (diffID DiffID) String() string {
 	return string(diffID)
-***REMOVED***
+}
 
 // TarStreamer represents an object which may
 // have its contents exported as a tar stream.
-type TarStreamer interface ***REMOVED***
+type TarStreamer interface {
 	// TarStream returns a tar archive stream
 	// for the contents of a layer.
 	TarStream() (io.ReadCloser, error)
-***REMOVED***
+}
 
 // Layer represents a read-only layer
-type Layer interface ***REMOVED***
+type Layer interface {
 	TarStreamer
 
 	// TarStreamFrom returns a tar archive stream for all the layer chain with
@@ -111,11 +111,11 @@ type Layer interface ***REMOVED***
 	// Metadata returns the low level storage metadata associated
 	// with layer.
 	Metadata() (map[string]string, error)
-***REMOVED***
+}
 
 // RWLayer represents a layer which is
 // read and writable
-type RWLayer interface ***REMOVED***
+type RWLayer interface {
 	TarStreamer
 
 	// Name of mounted layer
@@ -145,11 +145,11 @@ type RWLayer interface ***REMOVED***
 
 	// Metadata returns the low level metadata for the mutable layer
 	Metadata() (map[string]string, error)
-***REMOVED***
+}
 
 // Metadata holds information about a
 // read-only layer
-type Metadata struct ***REMOVED***
+type Metadata struct {
 	// ChainID is the content hash of the layer
 	ChainID ChainID
 
@@ -162,7 +162,7 @@ type Metadata struct ***REMOVED***
 
 	// DiffSize is the size of the top layer
 	DiffSize int64
-***REMOVED***
+}
 
 // MountInit is a function to initialize a
 // writable mount. Changes made here will
@@ -171,15 +171,15 @@ type Metadata struct ***REMOVED***
 type MountInit func(root containerfs.ContainerFS) error
 
 // CreateRWLayerOpts contains optional arguments to be passed to CreateRWLayer
-type CreateRWLayerOpts struct ***REMOVED***
+type CreateRWLayerOpts struct {
 	MountLabel string
 	InitFunc   MountInit
 	StorageOpt map[string]string
-***REMOVED***
+}
 
 // Store represents a backend for managing both
 // read-only and read-write layers.
-type Store interface ***REMOVED***
+type Store interface {
 	Register(io.Reader, ChainID) (Layer, error)
 	Get(ChainID) (Layer, error)
 	Map() map[ChainID]Layer
@@ -193,17 +193,17 @@ type Store interface ***REMOVED***
 	Cleanup() error
 	DriverStatus() [][2]string
 	DriverName() string
-***REMOVED***
+}
 
 // DescribableStore represents a layer store capable of storing
 // descriptors for layers.
-type DescribableStore interface ***REMOVED***
+type DescribableStore interface {
 	RegisterWithDescriptor(io.Reader, ChainID, distribution.Descriptor) (Layer, error)
-***REMOVED***
+}
 
 // MetadataTransaction represents functions for setting layer metadata
 // with a single transaction.
-type MetadataTransaction interface ***REMOVED***
+type MetadataTransaction interface {
 	SetSize(int64) error
 	SetParent(parent ChainID) error
 	SetDiffID(DiffID) error
@@ -215,12 +215,12 @@ type MetadataTransaction interface ***REMOVED***
 	Commit(ChainID) error
 	Cancel() error
 	String() string
-***REMOVED***
+}
 
 // MetadataStore represents a backend for persisting
 // metadata about layers and providing the metadata
 // for restoring a Store.
-type MetadataStore interface ***REMOVED***
+type MetadataStore interface {
 	// StartTransaction starts an update for new metadata
 	// which will be used to represent an ID on commit.
 	StartTransaction() (MetadataTransaction, error)
@@ -247,39 +247,39 @@ type MetadataStore interface ***REMOVED***
 
 	Remove(ChainID) error
 	RemoveMount(string) error
-***REMOVED***
+}
 
 // CreateChainID returns ID for a layerDigest slice
-func CreateChainID(dgsts []DiffID) ChainID ***REMOVED***
+func CreateChainID(dgsts []DiffID) ChainID {
 	return createChainIDFromParent("", dgsts...)
-***REMOVED***
+}
 
-func createChainIDFromParent(parent ChainID, dgsts ...DiffID) ChainID ***REMOVED***
-	if len(dgsts) == 0 ***REMOVED***
+func createChainIDFromParent(parent ChainID, dgsts ...DiffID) ChainID {
+	if len(dgsts) == 0 {
 		return parent
-	***REMOVED***
-	if parent == "" ***REMOVED***
+	}
+	if parent == "" {
 		return createChainIDFromParent(ChainID(dgsts[0]), dgsts[1:]...)
-	***REMOVED***
+	}
 	// H = "H(n-1) SHA256(n)"
 	dgst := digest.FromBytes([]byte(string(parent) + " " + string(dgsts[0])))
 	return createChainIDFromParent(ChainID(dgst), dgsts[1:]...)
-***REMOVED***
+}
 
 // ReleaseAndLog releases the provided layer from the given layer
 // store, logging any error and release metadata
-func ReleaseAndLog(ls Store, l Layer) ***REMOVED***
+func ReleaseAndLog(ls Store, l Layer) {
 	metadata, err := ls.Release(l)
-	if err != nil ***REMOVED***
+	if err != nil {
 		logrus.Errorf("Error releasing layer %s: %v", l.ChainID(), err)
-	***REMOVED***
+	}
 	LogReleaseMetadata(metadata)
-***REMOVED***
+}
 
 // LogReleaseMetadata logs a metadata array, uses this to
 // ensure consistent logging for release metadata
-func LogReleaseMetadata(metadatas []Metadata) ***REMOVED***
-	for _, metadata := range metadatas ***REMOVED***
+func LogReleaseMetadata(metadatas []Metadata) {
+	for _, metadata := range metadatas {
 		logrus.Infof("Layer %s cleaned up", metadata.ChainID)
-	***REMOVED***
-***REMOVED***
+	}
+}

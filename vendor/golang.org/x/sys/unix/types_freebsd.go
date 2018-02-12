@@ -46,26 +46,26 @@ package unix
 #include <netinet/icmp6.h>
 #include <netinet/tcp.h>
 
-enum ***REMOVED***
+enum {
 	sizeofPtr = sizeof(void*),
-***REMOVED***;
+};
 
-union sockaddr_all ***REMOVED***
+union sockaddr_all {
 	struct sockaddr s1;	// this one gets used for fields
 	struct sockaddr_in s2;	// these pad it out
 	struct sockaddr_in6 s3;
 	struct sockaddr_un s4;
 	struct sockaddr_dl s5;
-***REMOVED***;
+};
 
-struct sockaddr_any ***REMOVED***
+struct sockaddr_any {
 	struct sockaddr addr;
 	char pad[sizeof(union sockaddr_all) - sizeof(struct sockaddr)];
-***REMOVED***;
+};
 
 // This structure is a duplicate of stat on FreeBSD 8-STABLE.
 // See /usr/include/sys/stat.h.
-struct stat8 ***REMOVED***
+struct stat8 {
 #undef st_atimespec	st_atim
 #undef st_mtimespec	st_mtim
 #undef st_ctimespec	st_ctim
@@ -105,11 +105,11 @@ struct stat8 ***REMOVED***
 	unsigned int :(8 / 2) * (16 - (int)sizeof(struct __timespec));
 	unsigned int :(8 / 2) * (16 - (int)sizeof(struct __timespec));
 #endif
-***REMOVED***;
+};
 
 // This structure is a duplicate of if_data on FreeBSD 8-STABLE.
 // See /usr/include/net/if.h.
-struct if_data8 ***REMOVED***
+struct if_data8 {
 	u_char  ifi_type;
 	u_char  ifi_physical;
 	u_char  ifi_addrlen;
@@ -138,11 +138,11 @@ struct if_data8 ***REMOVED***
 	time_t  ifi_epoch;
 #undef ifi_lastchange
 	struct  timeval ifi_lastchange;
-***REMOVED***;
+};
 
 // This structure is a duplicate of if_msghdr on FreeBSD 8-STABLE.
 // See /usr/include/net/if.h.
-struct if_msghdr8 ***REMOVED***
+struct if_msghdr8 {
 	u_short ifm_msglen;
 	u_char  ifm_version;
 	u_char  ifm_type;
@@ -150,7 +150,7 @@ struct if_msghdr8 ***REMOVED***
 	int     ifm_flags;
 	u_short ifm_index;
 	struct  if_data8 ifm_data;
-***REMOVED***;
+};
 */
 import "C"
 

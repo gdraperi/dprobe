@@ -39,7 +39,7 @@ const (
 )
 
 // A Request is the service request to be made.
-type Request struct ***REMOVED***
+type Request struct {
 	Config     aws.Config
 	ClientInfo metadata.ClientInfo
 	Handlers   Handlers
@@ -51,9 +51,9 @@ type Request struct ***REMOVED***
 	HTTPResponse           *http.Response
 	Body                   io.ReadSeeker
 	BodyStart              int64 // offset from beginning of Body that the request body starts
-	Params                 interface***REMOVED******REMOVED***
+	Params                 interface{}
 	Error                  error
-	Data                   interface***REMOVED******REMOVED***
+	Data                   interface{}
 	RequestID              string
 	RetryCount             int
 	Retryable              *bool
@@ -77,17 +77,17 @@ type Request struct ***REMOVED***
 	// to the HTTP request's body after the client has returned. This value is
 	// safe to use concurrently and wrap the input Body for each HTTP request.
 	safeBody *offsetReader
-***REMOVED***
+}
 
 // An Operation is the service API operation to be made.
-type Operation struct ***REMOVED***
+type Operation struct {
 	Name       string
 	HTTPMethod string
 	HTTPPath   string
 	*Paginator
 
 	BeforePresignFn func(r *Request) error
-***REMOVED***
+}
 
 // New returns a new Request pointer for the service API
 // operation and parameters.
@@ -96,25 +96,25 @@ type Operation struct ***REMOVED***
 // Data is pointer value to an object which the request's response
 // payload will be deserialized to.
 func New(cfg aws.Config, clientInfo metadata.ClientInfo, handlers Handlers,
-	retryer Retryer, operation *Operation, params interface***REMOVED******REMOVED***, data interface***REMOVED******REMOVED***) *Request ***REMOVED***
+	retryer Retryer, operation *Operation, params interface{}, data interface{}) *Request {
 
 	method := operation.HTTPMethod
-	if method == "" ***REMOVED***
+	if method == "" {
 		method = "POST"
-	***REMOVED***
+	}
 
 	httpReq, _ := http.NewRequest(method, "", nil)
 
 	var err error
 	httpReq.URL, err = url.Parse(clientInfo.Endpoint + operation.HTTPPath)
-	if err != nil ***REMOVED***
-		httpReq.URL = &url.URL***REMOVED******REMOVED***
+	if err != nil {
+		httpReq.URL = &url.URL{}
 		err = awserr.New("InvalidEndpointURL", "invalid endpoint uri", err)
-	***REMOVED***
+	}
 
 	SanitizeHostForHeader(httpReq)
 
-	r := &Request***REMOVED***
+	r := &Request{
 		Config:     cfg,
 		ClientInfo: clientInfo,
 		Handlers:   handlers.Copy(),
@@ -128,11 +128,11 @@ func New(cfg aws.Config, clientInfo metadata.ClientInfo, handlers Handlers,
 		Params:      params,
 		Error:       err,
 		Data:        data,
-	***REMOVED***
-	r.SetBufferBody([]byte***REMOVED******REMOVED***)
+	}
+	r.SetBufferBody([]byte{})
 
 	return r
-***REMOVED***
+}
 
 // A Option is a functional option that can augment or modify a request when
 // using a WithContext API operation method.
@@ -150,13 +150,13 @@ type Option func(*Request)
 //        request.WithGetResponseHeader("x-amz-id-2", &id2),
 //        request.WithGetResponseHeader("x-amz-version-id", &versionID),
 //    )
-func WithGetResponseHeader(key string, val *string) Option ***REMOVED***
-	return func(r *Request) ***REMOVED***
-		r.Handlers.Complete.PushBack(func(req *Request) ***REMOVED***
+func WithGetResponseHeader(key string, val *string) Option {
+	return func(r *Request) {
+		r.Handlers.Complete.PushBack(func(req *Request) {
 			*val = req.HTTPResponse.Header.Get(key)
-		***REMOVED***)
-	***REMOVED***
-***REMOVED***
+		})
+	}
+}
 
 // WithGetResponseHeaders builds a request Option which will retrieve the
 // headers from the HTTP response and assign them to the passed in headers
@@ -164,40 +164,40 @@ func WithGetResponseHeader(key string, val *string) Option ***REMOVED***
 //
 //    var headers http.Header
 //    svc.PutObjectWithContext(ctx, params, request.WithGetResponseHeaders(&headers))
-func WithGetResponseHeaders(headers *http.Header) Option ***REMOVED***
-	return func(r *Request) ***REMOVED***
-		r.Handlers.Complete.PushBack(func(req *Request) ***REMOVED***
+func WithGetResponseHeaders(headers *http.Header) Option {
+	return func(r *Request) {
+		r.Handlers.Complete.PushBack(func(req *Request) {
 			*headers = req.HTTPResponse.Header
-		***REMOVED***)
-	***REMOVED***
-***REMOVED***
+		})
+	}
+}
 
 // WithLogLevel is a request option that will set the request to use a specific
 // log level when the request is made.
 //
 //     svc.PutObjectWithContext(ctx, params, request.WithLogLevel(aws.LogDebugWithHTTPBody)
-func WithLogLevel(l aws.LogLevelType) Option ***REMOVED***
-	return func(r *Request) ***REMOVED***
+func WithLogLevel(l aws.LogLevelType) Option {
+	return func(r *Request) {
 		r.Config.LogLevel = aws.LogLevel(l)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // ApplyOptions will apply each option to the request calling them in the order
 // the were provided.
-func (r *Request) ApplyOptions(opts ...Option) ***REMOVED***
-	for _, opt := range opts ***REMOVED***
+func (r *Request) ApplyOptions(opts ...Option) {
+	for _, opt := range opts {
 		opt(r)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Context will always returns a non-nil context. If Request does not have a
 // context aws.BackgroundContext will be returned.
-func (r *Request) Context() aws.Context ***REMOVED***
-	if r.context != nil ***REMOVED***
+func (r *Request) Context() aws.Context {
+	if r.context != nil {
 		return r.context
-	***REMOVED***
+	}
 	return aws.BackgroundContext()
-***REMOVED***
+}
 
 // SetContext adds a Context to the current request that can be used to cancel
 // a in-flight request. The Context value must not be nil, or this method will
@@ -215,55 +215,55 @@ func (r *Request) Context() aws.Context ***REMOVED***
 // The http.Request.WithContext will be used to set the context on the underlying
 // http.Request. This will create a shallow copy of the http.Request. The SDK
 // may create sub contexts in the future for nested requests such as retries.
-func (r *Request) SetContext(ctx aws.Context) ***REMOVED***
-	if ctx == nil ***REMOVED***
+func (r *Request) SetContext(ctx aws.Context) {
+	if ctx == nil {
 		panic("context cannot be nil")
-	***REMOVED***
+	}
 	setRequestContext(r, ctx)
-***REMOVED***
+}
 
 // WillRetry returns if the request's can be retried.
-func (r *Request) WillRetry() bool ***REMOVED***
+func (r *Request) WillRetry() bool {
 	return r.Error != nil && aws.BoolValue(r.Retryable) && r.RetryCount < r.MaxRetries()
-***REMOVED***
+}
 
 // ParamsFilled returns if the request's parameters have been populated
 // and the parameters are valid. False is returned if no parameters are
 // provided or invalid.
-func (r *Request) ParamsFilled() bool ***REMOVED***
+func (r *Request) ParamsFilled() bool {
 	return r.Params != nil && reflect.ValueOf(r.Params).Elem().IsValid()
-***REMOVED***
+}
 
 // DataFilled returns true if the request's data for response deserialization
 // target has been set and is a valid. False is returned if data is not
 // set, or is invalid.
-func (r *Request) DataFilled() bool ***REMOVED***
+func (r *Request) DataFilled() bool {
 	return r.Data != nil && reflect.ValueOf(r.Data).Elem().IsValid()
-***REMOVED***
+}
 
 // SetBufferBody will set the request's body bytes that will be sent to
 // the service API.
-func (r *Request) SetBufferBody(buf []byte) ***REMOVED***
+func (r *Request) SetBufferBody(buf []byte) {
 	r.SetReaderBody(bytes.NewReader(buf))
-***REMOVED***
+}
 
 // SetStringBody sets the body of the request to be backed by a string.
-func (r *Request) SetStringBody(s string) ***REMOVED***
+func (r *Request) SetStringBody(s string) {
 	r.SetReaderBody(strings.NewReader(s))
-***REMOVED***
+}
 
 // SetReaderBody will set the request's body reader.
-func (r *Request) SetReaderBody(reader io.ReadSeeker) ***REMOVED***
+func (r *Request) SetReaderBody(reader io.ReadSeeker) {
 	r.Body = reader
 	r.ResetBody()
-***REMOVED***
+}
 
 // Presign returns the request's signed URL. Error will be returned
 // if the signing fails.
 //
 // It is invalid to create a presigned URL with a expire duration 0 or less. An
 // error is returned if expire duration is 0 or less.
-func (r *Request) Presign(expire time.Duration) (string, error) ***REMOVED***
+func (r *Request) Presign(expire time.Duration) (string, error) {
 	r = r.copy()
 
 	// Presign requires all headers be hoisted. There is no way to retrieve
@@ -273,7 +273,7 @@ func (r *Request) Presign(expire time.Duration) (string, error) ***REMOVED***
 
 	u, _, err := getPresignedURL(r, expire)
 	return u, err
-***REMOVED***
+}
 
 // PresignRequest behaves just like presign, with the addition of returning a
 // set of headers that were signed.
@@ -287,48 +287,48 @@ func (r *Request) Presign(expire time.Duration) (string, error) ***REMOVED***
 //
 // To prevent hoisting any headers to the query string set NotHoist to true on
 // this Request value prior to calling PresignRequest.
-func (r *Request) PresignRequest(expire time.Duration) (string, http.Header, error) ***REMOVED***
+func (r *Request) PresignRequest(expire time.Duration) (string, http.Header, error) {
 	r = r.copy()
 	return getPresignedURL(r, expire)
-***REMOVED***
+}
 
-func getPresignedURL(r *Request, expire time.Duration) (string, http.Header, error) ***REMOVED***
-	if expire <= 0 ***REMOVED***
+func getPresignedURL(r *Request, expire time.Duration) (string, http.Header, error) {
+	if expire <= 0 {
 		return "", nil, awserr.New(
 			ErrCodeInvalidPresignExpire,
 			"presigned URL requires an expire duration greater than 0",
 			nil,
 		)
-	***REMOVED***
+	}
 
 	r.ExpireTime = expire
 
-	if r.Operation.BeforePresignFn != nil ***REMOVED***
-		if err := r.Operation.BeforePresignFn(r); err != nil ***REMOVED***
+	if r.Operation.BeforePresignFn != nil {
+		if err := r.Operation.BeforePresignFn(r); err != nil {
 			return "", nil, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if err := r.Sign(); err != nil ***REMOVED***
+	if err := r.Sign(); err != nil {
 		return "", nil, err
-	***REMOVED***
+	}
 
 	return r.HTTPRequest.URL.String(), r.SignedHeaderVals, nil
-***REMOVED***
+}
 
-func debugLogReqError(r *Request, stage string, retrying bool, err error) ***REMOVED***
-	if !r.Config.LogLevel.Matches(aws.LogDebugWithRequestErrors) ***REMOVED***
+func debugLogReqError(r *Request, stage string, retrying bool, err error) {
+	if !r.Config.LogLevel.Matches(aws.LogDebugWithRequestErrors) {
 		return
-	***REMOVED***
+	}
 
 	retryStr := "not retrying"
-	if retrying ***REMOVED***
+	if retrying {
 		retryStr = "will retry"
-	***REMOVED***
+	}
 
 	r.Config.Logger.Log(fmt.Sprintf("DEBUG: %s %s/%s failed, %s, error %v",
 		stage, r.ClientInfo.ServiceName, r.Operation.Name, retryStr, err))
-***REMOVED***
+}
 
 // Build will build the request's object so it can be signed and sent
 // to the service. Build will also validate all the request's parameters.
@@ -340,43 +340,43 @@ func debugLogReqError(r *Request, stage string, retrying bool, err error) ***REM
 //
 // If any Validate or Build errors occur the build will stop and the error
 // which occurred will be returned.
-func (r *Request) Build() error ***REMOVED***
-	if !r.built ***REMOVED***
+func (r *Request) Build() error {
+	if !r.built {
 		r.Handlers.Validate.Run(r)
-		if r.Error != nil ***REMOVED***
+		if r.Error != nil {
 			debugLogReqError(r, "Validate Request", false, r.Error)
 			return r.Error
-		***REMOVED***
+		}
 		r.Handlers.Build.Run(r)
-		if r.Error != nil ***REMOVED***
+		if r.Error != nil {
 			debugLogReqError(r, "Build Request", false, r.Error)
 			return r.Error
-		***REMOVED***
+		}
 		r.built = true
-	***REMOVED***
+	}
 
 	return r.Error
-***REMOVED***
+}
 
 // Sign will sign the request returning error if errors are encountered.
 //
 // Send will build the request prior to signing. All Sign Handlers will
 // be executed in the order they were set.
-func (r *Request) Sign() error ***REMOVED***
+func (r *Request) Sign() error {
 	r.Build()
-	if r.Error != nil ***REMOVED***
+	if r.Error != nil {
 		debugLogReqError(r, "Build Request", false, r.Error)
 		return r.Error
-	***REMOVED***
+	}
 
 	r.Handlers.Sign.Run(r)
 	return r.Error
-***REMOVED***
+}
 
-func (r *Request) getNextRequestBody() (io.ReadCloser, error) ***REMOVED***
-	if r.safeBody != nil ***REMOVED***
+func (r *Request) getNextRequestBody() (io.ReadCloser, error) {
+	if r.safeBody != nil {
 		r.safeBody.Close()
-	***REMOVED***
+	}
 
 	r.safeBody = newOffsetReader(r.Body, r.BodyStart)
 
@@ -394,16 +394,16 @@ func (r *Request) getNextRequestBody() (io.ReadCloser, error) ***REMOVED***
 	//
 	// Related golang/go#18257
 	l, err := computeBodyLength(r.Body)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, awserr.New(ErrCodeSerialization, "failed to compute request body size", err)
-	***REMOVED***
+	}
 
 	var body io.ReadCloser
-	if l == 0 ***REMOVED***
+	if l == 0 {
 		body = NoBody
-	***REMOVED*** else if l > 0 ***REMOVED***
+	} else if l > 0 {
 		body = r.safeBody
-	***REMOVED*** else ***REMOVED***
+	} else {
 		// Hack to prevent sending bodies for methods where the body
 		// should be ignored by the server. Sending bodies on these
 		// methods without an associated ContentLength will cause the
@@ -412,58 +412,58 @@ func (r *Request) getNextRequestBody() (io.ReadCloser, error) ***REMOVED***
 		//
 		// This would only happen if a aws.ReaderSeekerCloser was used with
 		// a io.Reader that was not also an io.Seeker.
-		switch r.Operation.HTTPMethod ***REMOVED***
+		switch r.Operation.HTTPMethod {
 		case "GET", "HEAD", "DELETE":
 			body = NoBody
 		default:
 			body = r.safeBody
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return body, nil
-***REMOVED***
+}
 
 // Attempts to compute the length of the body of the reader using the
 // io.Seeker interface. If the value is not seekable because of being
 // a ReaderSeekerCloser without an unerlying Seeker -1 will be returned.
 // If no error occurs the length of the body will be returned.
-func computeBodyLength(r io.ReadSeeker) (int64, error) ***REMOVED***
+func computeBodyLength(r io.ReadSeeker) (int64, error) {
 	seekable := true
 	// Determine if the seeker is actually seekable. ReaderSeekerCloser
 	// hides the fact that a io.Readers might not actually be seekable.
-	switch v := r.(type) ***REMOVED***
+	switch v := r.(type) {
 	case aws.ReaderSeekerCloser:
 		seekable = v.IsSeeker()
 	case *aws.ReaderSeekerCloser:
 		seekable = v.IsSeeker()
-	***REMOVED***
-	if !seekable ***REMOVED***
+	}
+	if !seekable {
 		return -1, nil
-	***REMOVED***
+	}
 
 	curOffset, err := r.Seek(0, 1)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 
 	endOffset, err := r.Seek(0, 2)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 
 	_, err = r.Seek(curOffset, 0)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 
 	return endOffset - curOffset, nil
-***REMOVED***
+}
 
 // GetBody will return an io.ReadSeeker of the Request's underlying
 // input body with a concurrency safe wrapper.
-func (r *Request) GetBody() io.ReadSeeker ***REMOVED***
+func (r *Request) GetBody() io.ReadSeeker {
 	return r.safeBody
-***REMOVED***
+}
 
 // Send will send the request returning error if errors are encountered.
 //
@@ -478,19 +478,19 @@ func (r *Request) GetBody() io.ReadSeeker ***REMOVED***
 // https://github.com/golang/go/blob/master/src/net/http/transport.go
 //
 // Send will not close the request.Request's body.
-func (r *Request) Send() error ***REMOVED***
-	defer func() ***REMOVED***
+func (r *Request) Send() error {
+	defer func() {
 		// Regardless of success or failure of the request trigger the Complete
 		// request handlers.
 		r.Handlers.Complete.Run(r)
-	***REMOVED***()
+	}()
 
-	for ***REMOVED***
-		if aws.BoolValue(r.Retryable) ***REMOVED***
-			if r.Config.LogLevel.Matches(aws.LogDebugWithRequestRetries) ***REMOVED***
+	for {
+		if aws.BoolValue(r.Retryable) {
+			if r.Config.LogLevel.Matches(aws.LogDebugWithRequestRetries) {
 				r.Config.Logger.Log(fmt.Sprintf("DEBUG: Retrying Request %s/%s, attempt %d",
 					r.ClientInfo.ServiceName, r.Operation.Name, r.RetryCount))
-			***REMOVED***
+			}
 
 			// The previous http.Request will have a reference to the r.Body
 			// and the HTTP Client's Transport may still be reading from
@@ -500,104 +500,104 @@ func (r *Request) Send() error ***REMOVED***
 
 			// Closing response body to ensure that no response body is leaked
 			// between retry attempts.
-			if r.HTTPResponse != nil && r.HTTPResponse.Body != nil ***REMOVED***
+			if r.HTTPResponse != nil && r.HTTPResponse.Body != nil {
 				r.HTTPResponse.Body.Close()
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		r.Sign()
-		if r.Error != nil ***REMOVED***
+		if r.Error != nil {
 			return r.Error
-		***REMOVED***
+		}
 
 		r.Retryable = nil
 
 		r.Handlers.Send.Run(r)
-		if r.Error != nil ***REMOVED***
-			if !shouldRetryCancel(r) ***REMOVED***
+		if r.Error != nil {
+			if !shouldRetryCancel(r) {
 				return r.Error
-			***REMOVED***
+			}
 
 			err := r.Error
 			r.Handlers.Retry.Run(r)
 			r.Handlers.AfterRetry.Run(r)
-			if r.Error != nil ***REMOVED***
+			if r.Error != nil {
 				debugLogReqError(r, "Send Request", false, err)
 				return r.Error
-			***REMOVED***
+			}
 			debugLogReqError(r, "Send Request", true, err)
 			continue
-		***REMOVED***
+		}
 		r.Handlers.UnmarshalMeta.Run(r)
 		r.Handlers.ValidateResponse.Run(r)
-		if r.Error != nil ***REMOVED***
+		if r.Error != nil {
 			r.Handlers.UnmarshalError.Run(r)
 			err := r.Error
 
 			r.Handlers.Retry.Run(r)
 			r.Handlers.AfterRetry.Run(r)
-			if r.Error != nil ***REMOVED***
+			if r.Error != nil {
 				debugLogReqError(r, "Validate Response", false, err)
 				return r.Error
-			***REMOVED***
+			}
 			debugLogReqError(r, "Validate Response", true, err)
 			continue
-		***REMOVED***
+		}
 
 		r.Handlers.Unmarshal.Run(r)
-		if r.Error != nil ***REMOVED***
+		if r.Error != nil {
 			err := r.Error
 			r.Handlers.Retry.Run(r)
 			r.Handlers.AfterRetry.Run(r)
-			if r.Error != nil ***REMOVED***
+			if r.Error != nil {
 				debugLogReqError(r, "Unmarshal Response", false, err)
 				return r.Error
-			***REMOVED***
+			}
 			debugLogReqError(r, "Unmarshal Response", true, err)
 			continue
-		***REMOVED***
+		}
 
 		break
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // copy will copy a request which will allow for local manipulation of the
 // request.
-func (r *Request) copy() *Request ***REMOVED***
-	req := &Request***REMOVED******REMOVED***
+func (r *Request) copy() *Request {
+	req := &Request{}
 	*req = *r
 	req.Handlers = r.Handlers.Copy()
 	op := *r.Operation
 	req.Operation = &op
 	return req
-***REMOVED***
+}
 
 // AddToUserAgent adds the string to the end of the request's current user agent.
-func AddToUserAgent(r *Request, s string) ***REMOVED***
+func AddToUserAgent(r *Request, s string) {
 	curUA := r.HTTPRequest.Header.Get("User-Agent")
-	if len(curUA) > 0 ***REMOVED***
+	if len(curUA) > 0 {
 		s = curUA + " " + s
-	***REMOVED***
+	}
 	r.HTTPRequest.Header.Set("User-Agent", s)
-***REMOVED***
+}
 
-func shouldRetryCancel(r *Request) bool ***REMOVED***
+func shouldRetryCancel(r *Request) bool {
 	awsErr, ok := r.Error.(awserr.Error)
 	timeoutErr := false
 	errStr := r.Error.Error()
-	if ok ***REMOVED***
-		if awsErr.Code() == CanceledErrorCode ***REMOVED***
+	if ok {
+		if awsErr.Code() == CanceledErrorCode {
 			return false
-		***REMOVED***
+		}
 		err := awsErr.OrigErr()
 		netErr, netOK := err.(net.Error)
 		timeoutErr = netOK && netErr.Temporary()
-		if urlErr, ok := err.(*url.Error); !timeoutErr && ok ***REMOVED***
+		if urlErr, ok := err.(*url.Error); !timeoutErr && ok {
 			errStr = urlErr.Err.Error()
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// There can be two types of canceled errors here.
 	// The first being a net.Error and the other being an error.
@@ -607,25 +607,25 @@ func shouldRetryCancel(r *Request) bool ***REMOVED***
 		(errStr != "net/http: request canceled" &&
 			errStr != "net/http: request canceled while waiting for connection")
 
-***REMOVED***
+}
 
 // SanitizeHostForHeader removes default port from host and updates request.Host
-func SanitizeHostForHeader(r *http.Request) ***REMOVED***
+func SanitizeHostForHeader(r *http.Request) {
 	host := getHost(r)
 	port := portOnly(host)
-	if port != "" && isDefaultPort(r.URL.Scheme, port) ***REMOVED***
+	if port != "" && isDefaultPort(r.URL.Scheme, port) {
 		r.Host = stripPort(host)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Returns host from request
-func getHost(r *http.Request) string ***REMOVED***
-	if r.Host != "" ***REMOVED***
+func getHost(r *http.Request) string {
+	if r.Host != "" {
 		return r.Host
-	***REMOVED***
+	}
 
 	return r.URL.Host
-***REMOVED***
+}
 
 // Hostname returns u.Host, without any port number.
 //
@@ -634,46 +634,46 @@ func getHost(r *http.Request) string ***REMOVED***
 // a zone identifier.
 //
 // Copied from the Go 1.8 standard library (net/url)
-func stripPort(hostport string) string ***REMOVED***
+func stripPort(hostport string) string {
 	colon := strings.IndexByte(hostport, ':')
-	if colon == -1 ***REMOVED***
+	if colon == -1 {
 		return hostport
-	***REMOVED***
-	if i := strings.IndexByte(hostport, ']'); i != -1 ***REMOVED***
+	}
+	if i := strings.IndexByte(hostport, ']'); i != -1 {
 		return strings.TrimPrefix(hostport[:i], "[")
-	***REMOVED***
+	}
 	return hostport[:colon]
-***REMOVED***
+}
 
 // Port returns the port part of u.Host, without the leading colon.
 // If u.Host doesn't contain a port, Port returns an empty string.
 //
 // Copied from the Go 1.8 standard library (net/url)
-func portOnly(hostport string) string ***REMOVED***
+func portOnly(hostport string) string {
 	colon := strings.IndexByte(hostport, ':')
-	if colon == -1 ***REMOVED***
+	if colon == -1 {
 		return ""
-	***REMOVED***
-	if i := strings.Index(hostport, "]:"); i != -1 ***REMOVED***
+	}
+	if i := strings.Index(hostport, "]:"); i != -1 {
 		return hostport[i+len("]:"):]
-	***REMOVED***
-	if strings.Contains(hostport, "]") ***REMOVED***
+	}
+	if strings.Contains(hostport, "]") {
 		return ""
-	***REMOVED***
+	}
 	return hostport[colon+len(":"):]
-***REMOVED***
+}
 
 // Returns true if the specified URI is using the standard port
 // (i.e. port 80 for HTTP URIs or 443 for HTTPS URIs)
-func isDefaultPort(scheme, port string) bool ***REMOVED***
-	if port == "" ***REMOVED***
+func isDefaultPort(scheme, port string) bool {
+	if port == "" {
 		return true
-	***REMOVED***
+	}
 
 	lowerCaseScheme := strings.ToLower(scheme)
-	if (lowerCaseScheme == "http" && port == "80") || (lowerCaseScheme == "https" && port == "443") ***REMOVED***
+	if (lowerCaseScheme == "http" && port == "80") || (lowerCaseScheme == "https" && port == "443") {
 		return true
-	***REMOVED***
+	}
 
 	return false
-***REMOVED***
+}

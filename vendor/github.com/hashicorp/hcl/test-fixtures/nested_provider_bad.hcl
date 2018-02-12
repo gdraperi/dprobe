@@ -1,5 +1,5 @@
-resource "aws" "web" ***REMOVED***
-  provider = "aws" ***REMOVED***
+resource "aws" "web" {
+  provider = "aws" {
     region = "us-west-2"
-  ***REMOVED***
-***REMOVED***
+  }
+}

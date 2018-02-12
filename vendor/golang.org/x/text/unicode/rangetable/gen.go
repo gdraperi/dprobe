@@ -33,83 +33,83 @@ To bootstrap the code generation, run:
 and ensure that the latest versions are included by checking:
 	http://www.unicode.org/Public/`
 
-func getVersions() []string ***REMOVED***
-	if *versionList == "" ***REMOVED***
+func getVersions() []string {
+	if *versionList == "" {
 		log.Fatal(bootstrapMessage)
-	***REMOVED***
+	}
 
 	c := collate.New(language.Und, collate.Numeric)
 	versions := strings.Split(*versionList, ",")
 	c.SortStrings(versions)
 
 	// Ensure that at least the current version is included.
-	for _, v := range versions ***REMOVED***
-		if v == gen.UnicodeVersion() ***REMOVED***
+	for _, v := range versions {
+		if v == gen.UnicodeVersion() {
 			return versions
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	versions = append(versions, gen.UnicodeVersion())
 	c.SortStrings(versions)
 	return versions
-***REMOVED***
+}
 
-func main() ***REMOVED***
+func main() {
 	gen.Init()
 
 	versions := getVersions()
 
-	w := &bytes.Buffer***REMOVED******REMOVED***
+	w := &bytes.Buffer{}
 
 	fmt.Fprintf(w, "//go:generate go run gen.go --versions=%s\n\n", strings.Join(versions, ","))
 	fmt.Fprintf(w, "import \"unicode\"\n\n")
 
-	vstr := func(s string) string ***REMOVED*** return strings.Replace(s, ".", "_", -1) ***REMOVED***
+	vstr := func(s string) string { return strings.Replace(s, ".", "_", -1) }
 
-	fmt.Fprintf(w, "var assigned = map[string]*unicode.RangeTable***REMOVED***\n")
-	for _, v := range versions ***REMOVED***
+	fmt.Fprintf(w, "var assigned = map[string]*unicode.RangeTable{\n")
+	for _, v := range versions {
 		fmt.Fprintf(w, "\t%q: assigned%s,\n", v, vstr(v))
-	***REMOVED***
-	fmt.Fprintf(w, "***REMOVED***\n\n")
+	}
+	fmt.Fprintf(w, "}\n\n")
 
 	var size int
-	for _, v := range versions ***REMOVED***
-		assigned := []rune***REMOVED******REMOVED***
+	for _, v := range versions {
+		assigned := []rune{}
 
 		r := gen.Open("http://www.unicode.org/Public/", "", v+"/ucd/UnicodeData.txt")
-		ucd.Parse(r, func(p *ucd.Parser) ***REMOVED***
+		ucd.Parse(r, func(p *ucd.Parser) {
 			assigned = append(assigned, p.Rune(0))
-		***REMOVED***)
+		})
 
 		rt := rangetable.New(assigned...)
-		sz := int(reflect.TypeOf(unicode.RangeTable***REMOVED******REMOVED***).Size())
-		sz += int(reflect.TypeOf(unicode.Range16***REMOVED******REMOVED***).Size()) * len(rt.R16)
-		sz += int(reflect.TypeOf(unicode.Range32***REMOVED******REMOVED***).Size()) * len(rt.R32)
+		sz := int(reflect.TypeOf(unicode.RangeTable{}).Size())
+		sz += int(reflect.TypeOf(unicode.Range16{}).Size()) * len(rt.R16)
+		sz += int(reflect.TypeOf(unicode.Range32{}).Size()) * len(rt.R32)
 
 		fmt.Fprintf(w, "// size %d bytes (%d KiB)\n", sz, sz/1024)
 		fmt.Fprintf(w, "var assigned%s = ", vstr(v))
 		print(w, rt)
 
 		size += sz
-	***REMOVED***
+	}
 
 	fmt.Fprintf(w, "// Total size %d bytes (%d KiB)\n", size, size/1024)
 
 	gen.WriteVersionedGoFile("tables.go", "rangetable", w.Bytes())
-***REMOVED***
+}
 
-func print(w io.Writer, rt *unicode.RangeTable) ***REMOVED***
-	fmt.Fprintln(w, "&unicode.RangeTable***REMOVED***")
-	fmt.Fprintln(w, "\tR16: []unicode.Range16***REMOVED***")
-	for _, r := range rt.R16 ***REMOVED***
-		fmt.Fprintf(w, "\t\t***REMOVED***%#04x, %#04x, %d***REMOVED***,\n", r.Lo, r.Hi, r.Stride)
-	***REMOVED***
-	fmt.Fprintln(w, "\t***REMOVED***,")
-	fmt.Fprintln(w, "\tR32: []unicode.Range32***REMOVED***")
-	for _, r := range rt.R32 ***REMOVED***
-		fmt.Fprintf(w, "\t\t***REMOVED***%#08x, %#08x, %d***REMOVED***,\n", r.Lo, r.Hi, r.Stride)
-	***REMOVED***
-	fmt.Fprintln(w, "\t***REMOVED***,")
+func print(w io.Writer, rt *unicode.RangeTable) {
+	fmt.Fprintln(w, "&unicode.RangeTable{")
+	fmt.Fprintln(w, "\tR16: []unicode.Range16{")
+	for _, r := range rt.R16 {
+		fmt.Fprintf(w, "\t\t{%#04x, %#04x, %d},\n", r.Lo, r.Hi, r.Stride)
+	}
+	fmt.Fprintln(w, "\t},")
+	fmt.Fprintln(w, "\tR32: []unicode.Range32{")
+	for _, r := range rt.R32 {
+		fmt.Fprintf(w, "\t\t{%#08x, %#08x, %d},\n", r.Lo, r.Hi, r.Stride)
+	}
+	fmt.Fprintln(w, "\t},")
 	fmt.Fprintf(w, "\tLatinOffset: %d,\n", rt.LatinOffset)
-	fmt.Fprintf(w, "***REMOVED***\n\n")
-***REMOVED***
+	fmt.Fprintf(w, "}\n\n")
+}

@@ -13,10 +13,10 @@ import "unsafe"
 var fcntl64Syscall uintptr = SYS_FCNTL
 
 // FcntlFlock performs a fcntl syscall for the F_GETLK, F_SETLK or F_SETLKW command.
-func FcntlFlock(fd uintptr, cmd int, lk *Flock_t) error ***REMOVED***
+func FcntlFlock(fd uintptr, cmd int, lk *Flock_t) error {
 	_, _, errno := Syscall(fcntl64Syscall, fd, uintptr(cmd), uintptr(unsafe.Pointer(lk)))
-	if errno == 0 ***REMOVED***
+	if errno == 0 {
 		return nil
-	***REMOVED***
+	}
 	return errno
-***REMOVED***
+}

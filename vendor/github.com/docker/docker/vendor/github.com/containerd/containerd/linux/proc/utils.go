@@ -16,70 +16,70 @@ import (
 )
 
 // TODO(mlaventure): move to runc package?
-func getLastRuntimeError(r *runc.Runc) (string, error) ***REMOVED***
-	if r.Log == "" ***REMOVED***
+func getLastRuntimeError(r *runc.Runc) (string, error) {
+	if r.Log == "" {
 		return "", nil
-	***REMOVED***
+	}
 
 	f, err := os.OpenFile(r.Log, os.O_RDONLY, 0400)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 
 	var (
 		errMsg string
-		log    struct ***REMOVED***
+		log    struct {
 			Level string
 			Msg   string
 			Time  time.Time
-		***REMOVED***
+		}
 	)
 
 	dec := json.NewDecoder(f)
-	for err = nil; err == nil; ***REMOVED***
-		if err = dec.Decode(&log); err != nil && err != io.EOF ***REMOVED***
+	for err = nil; err == nil; {
+		if err = dec.Decode(&log); err != nil && err != io.EOF {
 			return "", err
-		***REMOVED***
-		if log.Level == "error" ***REMOVED***
+		}
+		if log.Level == "error" {
 			errMsg = strings.TrimSpace(log.Msg)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return errMsg, nil
-***REMOVED***
+}
 
 // criuError returns only the first line of the error message from criu
 // it tries to add an invalid dump log location when returning the message
-func criuError(err error) string ***REMOVED***
+func criuError(err error) string {
 	parts := strings.Split(err.Error(), "\n")
 	return parts[0]
-***REMOVED***
+}
 
-func copyFile(to, from string) error ***REMOVED***
+func copyFile(to, from string) error {
 	ff, err := os.Open(from)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer ff.Close()
 	tt, err := os.Create(to)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer tt.Close()
 	_, err = io.Copy(tt, ff)
 	return err
-***REMOVED***
+}
 
-func checkKillError(err error) error ***REMOVED***
-	if err == nil ***REMOVED***
+func checkKillError(err error) error {
+	if err == nil {
 		return nil
-	***REMOVED***
-	if strings.Contains(err.Error(), "os: process already finished") || err == unix.ESRCH ***REMOVED***
+	}
+	if strings.Contains(err.Error(), "os: process already finished") || err == unix.ESRCH {
 		return errors.Wrapf(errdefs.ErrNotFound, "process already finished")
-	***REMOVED***
+	}
 	return errors.Wrapf(err, "unknown error after kill")
-***REMOVED***
+}
 
-func hasNoIO(r *CreateConfig) bool ***REMOVED***
+func hasNoIO(r *CreateConfig) bool {
 	return r.Stdin == "" && r.Stdout == "" && r.Stderr == ""
-***REMOVED***
+}

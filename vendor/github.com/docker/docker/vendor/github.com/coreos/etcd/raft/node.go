@@ -29,7 +29,7 @@ const (
 )
 
 var (
-	emptyState = pb.HardState***REMOVED******REMOVED***
+	emptyState = pb.HardState{}
 
 	// ErrStopped is returned by methods on Nodes that have been stopped.
 	ErrStopped = errors.New("raft: stopped")
@@ -37,19 +37,19 @@ var (
 
 // SoftState provides state that is useful for logging and debugging.
 // The state is volatile and does not need to be persisted to the WAL.
-type SoftState struct ***REMOVED***
+type SoftState struct {
 	Lead      uint64 // must use atomic operations to access; keep 64-bit aligned.
 	RaftState StateType
-***REMOVED***
+}
 
-func (a *SoftState) equal(b *SoftState) bool ***REMOVED***
+func (a *SoftState) equal(b *SoftState) bool {
 	return a.Lead == b.Lead && a.RaftState == b.RaftState
-***REMOVED***
+}
 
 // Ready encapsulates the entries and messages that are ready to read,
 // be saved to stable storage, committed or sent to other peers.
 // All fields in Ready are read-only.
-type Ready struct ***REMOVED***
+type Ready struct {
 	// The current volatile state of a Node.
 	// SoftState will be nil if there is no update.
 	// It is not required to consume or store SoftState.
@@ -87,30 +87,30 @@ type Ready struct ***REMOVED***
 	// MustSync indicates whether the HardState and Entries must be synchronously
 	// written to disk or if an asynchronous write is permissible.
 	MustSync bool
-***REMOVED***
+}
 
-func isHardStateEqual(a, b pb.HardState) bool ***REMOVED***
+func isHardStateEqual(a, b pb.HardState) bool {
 	return a.Term == b.Term && a.Vote == b.Vote && a.Commit == b.Commit
-***REMOVED***
+}
 
 // IsEmptyHardState returns true if the given HardState is empty.
-func IsEmptyHardState(st pb.HardState) bool ***REMOVED***
+func IsEmptyHardState(st pb.HardState) bool {
 	return isHardStateEqual(st, emptyState)
-***REMOVED***
+}
 
 // IsEmptySnap returns true if the given Snapshot is empty.
-func IsEmptySnap(sp pb.Snapshot) bool ***REMOVED***
+func IsEmptySnap(sp pb.Snapshot) bool {
 	return sp.Metadata.Index == 0
-***REMOVED***
+}
 
-func (rd Ready) containsUpdates() bool ***REMOVED***
+func (rd Ready) containsUpdates() bool {
 	return rd.SoftState != nil || !IsEmptyHardState(rd.HardState) ||
 		!IsEmptySnap(rd.Snapshot) || len(rd.Entries) > 0 ||
 		len(rd.CommittedEntries) > 0 || len(rd.Messages) > 0 || len(rd.ReadStates) != 0
-***REMOVED***
+}
 
 // Node represents a node in a raft cluster.
-type Node interface ***REMOVED***
+type Node interface {
 	// Tick increments the internal logical clock for the Node by a single tick. Election
 	// timeouts and heartbeat timeouts are in units of ticks.
 	Tick()
@@ -165,29 +165,29 @@ type Node interface ***REMOVED***
 	ReportSnapshot(id uint64, status SnapshotStatus)
 	// Stop performs any necessary termination of the Node.
 	Stop()
-***REMOVED***
+}
 
-type Peer struct ***REMOVED***
+type Peer struct {
 	ID      uint64
 	Context []byte
-***REMOVED***
+}
 
 // StartNode returns a new Node given configuration and a list of raft peers.
 // It appends a ConfChangeAddNode entry for each given peer to the initial log.
-func StartNode(c *Config, peers []Peer) Node ***REMOVED***
+func StartNode(c *Config, peers []Peer) Node {
 	r := newRaft(c)
 	// become the follower at term 1 and apply initial configuration
 	// entries of term 1
 	r.becomeFollower(1, None)
-	for _, peer := range peers ***REMOVED***
-		cc := pb.ConfChange***REMOVED***Type: pb.ConfChangeAddNode, NodeID: peer.ID, Context: peer.Context***REMOVED***
+	for _, peer := range peers {
+		cc := pb.ConfChange{Type: pb.ConfChangeAddNode, NodeID: peer.ID, Context: peer.Context}
 		d, err := cc.Marshal()
-		if err != nil ***REMOVED***
+		if err != nil {
 			panic("unexpected marshal error")
-		***REMOVED***
-		e := pb.Entry***REMOVED***Type: pb.EntryConfChange, Term: 1, Index: r.raftLog.lastIndex() + 1, Data: d***REMOVED***
+		}
+		e := pb.Entry{Type: pb.EntryConfChange, Term: 1, Index: r.raftLog.lastIndex() + 1, Data: d}
 		r.raftLog.append(e)
-	***REMOVED***
+	}
 	// Mark these initial entries as committed.
 	// TODO(bdarnell): These entries are still unstable; do we need to preserve
 	// the invariant that committed < unstable?
@@ -201,79 +201,79 @@ func StartNode(c *Config, peers []Peer) Node ***REMOVED***
 	// entries since they have already been committed).
 	// We do not set raftLog.applied so the application will be able
 	// to observe all conf changes via Ready.CommittedEntries.
-	for _, peer := range peers ***REMOVED***
+	for _, peer := range peers {
 		r.addNode(peer.ID)
-	***REMOVED***
+	}
 
 	n := newNode()
 	n.logger = c.Logger
 	go n.run(r)
 	return &n
-***REMOVED***
+}
 
 // RestartNode is similar to StartNode but does not take a list of peers.
 // The current membership of the cluster will be restored from the Storage.
 // If the caller has an existing state machine, pass in the last log index that
 // has been applied to it; otherwise use zero.
-func RestartNode(c *Config) Node ***REMOVED***
+func RestartNode(c *Config) Node {
 	r := newRaft(c)
 
 	n := newNode()
 	n.logger = c.Logger
 	go n.run(r)
 	return &n
-***REMOVED***
+}
 
 // node is the canonical implementation of the Node interface
-type node struct ***REMOVED***
+type node struct {
 	propc      chan pb.Message
 	recvc      chan pb.Message
 	confc      chan pb.ConfChange
 	confstatec chan pb.ConfState
 	readyc     chan Ready
-	advancec   chan struct***REMOVED******REMOVED***
-	tickc      chan struct***REMOVED******REMOVED***
-	done       chan struct***REMOVED******REMOVED***
-	stop       chan struct***REMOVED******REMOVED***
+	advancec   chan struct{}
+	tickc      chan struct{}
+	done       chan struct{}
+	stop       chan struct{}
 	status     chan chan Status
 
 	logger Logger
-***REMOVED***
+}
 
-func newNode() node ***REMOVED***
-	return node***REMOVED***
+func newNode() node {
+	return node{
 		propc:      make(chan pb.Message),
 		recvc:      make(chan pb.Message),
 		confc:      make(chan pb.ConfChange),
 		confstatec: make(chan pb.ConfState),
 		readyc:     make(chan Ready),
-		advancec:   make(chan struct***REMOVED******REMOVED***),
+		advancec:   make(chan struct{}),
 		// make tickc a buffered chan, so raft node can buffer some ticks when the node
 		// is busy processing raft messages. Raft node will resume process buffered
 		// ticks when it becomes idle.
-		tickc:  make(chan struct***REMOVED******REMOVED***, 128),
-		done:   make(chan struct***REMOVED******REMOVED***),
-		stop:   make(chan struct***REMOVED******REMOVED***),
+		tickc:  make(chan struct{}, 128),
+		done:   make(chan struct{}),
+		stop:   make(chan struct{}),
 		status: make(chan chan Status),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (n *node) Stop() ***REMOVED***
-	select ***REMOVED***
-	case n.stop <- struct***REMOVED******REMOVED******REMOVED******REMOVED***:
+func (n *node) Stop() {
+	select {
+	case n.stop <- struct{}{}:
 		// Not already stopped, so trigger it
 	case <-n.done:
 		// Node has already been stopped - no need to do anything
 		return
-	***REMOVED***
+	}
 	// Block until the stop has been acknowledged by run()
 	<-n.done
-***REMOVED***
+}
 
-func (n *node) run(r *raft) ***REMOVED***
+func (n *node) run(r *raft) {
 	var propc chan pb.Message
 	var readyc chan Ready
-	var advancec chan struct***REMOVED******REMOVED***
+	var advancec chan struct{}
 	var prevLastUnstablei, prevLastUnstablet uint64
 	var havePrevLastUnstablei bool
 	var prevSnapi uint64
@@ -283,34 +283,34 @@ func (n *node) run(r *raft) ***REMOVED***
 	prevSoftSt := r.softState()
 	prevHardSt := emptyState
 
-	for ***REMOVED***
-		if advancec != nil ***REMOVED***
+	for {
+		if advancec != nil {
 			readyc = nil
-		***REMOVED*** else ***REMOVED***
+		} else {
 			rd = newReady(r, prevSoftSt, prevHardSt)
-			if rd.containsUpdates() ***REMOVED***
+			if rd.containsUpdates() {
 				readyc = n.readyc
-			***REMOVED*** else ***REMOVED***
+			} else {
 				readyc = nil
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
-		if lead != r.lead ***REMOVED***
-			if r.hasLeader() ***REMOVED***
-				if lead == None ***REMOVED***
+		if lead != r.lead {
+			if r.hasLeader() {
+				if lead == None {
 					r.logger.Infof("raft.node: %x elected leader %x at term %d", r.id, r.lead, r.Term)
-				***REMOVED*** else ***REMOVED***
+				} else {
 					r.logger.Infof("raft.node: %x changed leader from %x to %x at term %d", r.id, lead, r.lead, r.Term)
-				***REMOVED***
+				}
 				propc = n.propc
-			***REMOVED*** else ***REMOVED***
+			} else {
 				r.logger.Infof("raft.node: %x lost leader %x at term %d", r.id, lead, r.Term)
 				propc = nil
-			***REMOVED***
+			}
 			lead = r.lead
-		***REMOVED***
+		}
 
-		select ***REMOVED***
+		select {
 		// TODO: maybe buffer the config propose if there exists one (the way
 		// described in raft dissertation)
 		// Currently it is dropped in Step silently.
@@ -319,66 +319,66 @@ func (n *node) run(r *raft) ***REMOVED***
 			r.Step(m)
 		case m := <-n.recvc:
 			// filter out response message from unknown From.
-			if _, ok := r.prs[m.From]; ok || !IsResponseMsg(m.Type) ***REMOVED***
+			if _, ok := r.prs[m.From]; ok || !IsResponseMsg(m.Type) {
 				r.Step(m) // raft never returns an error
-			***REMOVED***
+			}
 		case cc := <-n.confc:
-			if cc.NodeID == None ***REMOVED***
+			if cc.NodeID == None {
 				r.resetPendingConf()
-				select ***REMOVED***
-				case n.confstatec <- pb.ConfState***REMOVED***Nodes: r.nodes()***REMOVED***:
+				select {
+				case n.confstatec <- pb.ConfState{Nodes: r.nodes()}:
 				case <-n.done:
-				***REMOVED***
+				}
 				break
-			***REMOVED***
-			switch cc.Type ***REMOVED***
+			}
+			switch cc.Type {
 			case pb.ConfChangeAddNode:
 				r.addNode(cc.NodeID)
 			case pb.ConfChangeRemoveNode:
 				// block incoming proposal when local node is
 				// removed
-				if cc.NodeID == r.id ***REMOVED***
+				if cc.NodeID == r.id {
 					propc = nil
-				***REMOVED***
+				}
 				r.removeNode(cc.NodeID)
 			case pb.ConfChangeUpdateNode:
 				r.resetPendingConf()
 			default:
 				panic("unexpected conf type")
-			***REMOVED***
-			select ***REMOVED***
-			case n.confstatec <- pb.ConfState***REMOVED***Nodes: r.nodes()***REMOVED***:
+			}
+			select {
+			case n.confstatec <- pb.ConfState{Nodes: r.nodes()}:
 			case <-n.done:
-			***REMOVED***
+			}
 		case <-n.tickc:
 			r.tick()
 		case readyc <- rd:
-			if rd.SoftState != nil ***REMOVED***
+			if rd.SoftState != nil {
 				prevSoftSt = rd.SoftState
-			***REMOVED***
-			if len(rd.Entries) > 0 ***REMOVED***
+			}
+			if len(rd.Entries) > 0 {
 				prevLastUnstablei = rd.Entries[len(rd.Entries)-1].Index
 				prevLastUnstablet = rd.Entries[len(rd.Entries)-1].Term
 				havePrevLastUnstablei = true
-			***REMOVED***
-			if !IsEmptyHardState(rd.HardState) ***REMOVED***
+			}
+			if !IsEmptyHardState(rd.HardState) {
 				prevHardSt = rd.HardState
-			***REMOVED***
-			if !IsEmptySnap(rd.Snapshot) ***REMOVED***
+			}
+			if !IsEmptySnap(rd.Snapshot) {
 				prevSnapi = rd.Snapshot.Metadata.Index
-			***REMOVED***
+			}
 
 			r.msgs = nil
 			r.readStates = nil
 			advancec = n.advancec
 		case <-advancec:
-			if prevHardSt.Commit != 0 ***REMOVED***
+			if prevHardSt.Commit != 0 {
 				r.raftLog.appliedTo(prevHardSt.Commit)
-			***REMOVED***
-			if havePrevLastUnstablei ***REMOVED***
+			}
+			if havePrevLastUnstablei {
 				r.raftLog.stableTo(prevLastUnstablei, prevLastUnstablet)
 				havePrevLastUnstablei = false
-			***REMOVED***
+			}
 			r.raftLog.stableSnapTo(prevSnapi)
 			advancec = nil
 		case c := <-n.status:
@@ -386,152 +386,152 @@ func (n *node) run(r *raft) ***REMOVED***
 		case <-n.stop:
 			close(n.done)
 			return
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // Tick increments the internal logical clock for this Node. Election timeouts
 // and heartbeat timeouts are in units of ticks.
-func (n *node) Tick() ***REMOVED***
-	select ***REMOVED***
-	case n.tickc <- struct***REMOVED******REMOVED******REMOVED******REMOVED***:
+func (n *node) Tick() {
+	select {
+	case n.tickc <- struct{}{}:
 	case <-n.done:
 	default:
 		n.logger.Warningf("A tick missed to fire. Node blocks too long!")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (n *node) Campaign(ctx context.Context) error ***REMOVED*** return n.step(ctx, pb.Message***REMOVED***Type: pb.MsgHup***REMOVED***) ***REMOVED***
+func (n *node) Campaign(ctx context.Context) error { return n.step(ctx, pb.Message{Type: pb.MsgHup}) }
 
-func (n *node) Propose(ctx context.Context, data []byte) error ***REMOVED***
-	return n.step(ctx, pb.Message***REMOVED***Type: pb.MsgProp, Entries: []pb.Entry***REMOVED******REMOVED***Data: data***REMOVED******REMOVED******REMOVED***)
-***REMOVED***
+func (n *node) Propose(ctx context.Context, data []byte) error {
+	return n.step(ctx, pb.Message{Type: pb.MsgProp, Entries: []pb.Entry{{Data: data}}})
+}
 
-func (n *node) Step(ctx context.Context, m pb.Message) error ***REMOVED***
+func (n *node) Step(ctx context.Context, m pb.Message) error {
 	// ignore unexpected local messages receiving over network
-	if IsLocalMsg(m.Type) ***REMOVED***
+	if IsLocalMsg(m.Type) {
 		// TODO: return an error?
 		return nil
-	***REMOVED***
+	}
 	return n.step(ctx, m)
-***REMOVED***
+}
 
-func (n *node) ProposeConfChange(ctx context.Context, cc pb.ConfChange) error ***REMOVED***
+func (n *node) ProposeConfChange(ctx context.Context, cc pb.ConfChange) error {
 	data, err := cc.Marshal()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	return n.Step(ctx, pb.Message***REMOVED***Type: pb.MsgProp, Entries: []pb.Entry***REMOVED******REMOVED***Type: pb.EntryConfChange, Data: data***REMOVED******REMOVED******REMOVED***)
-***REMOVED***
+	}
+	return n.Step(ctx, pb.Message{Type: pb.MsgProp, Entries: []pb.Entry{{Type: pb.EntryConfChange, Data: data}}})
+}
 
 // Step advances the state machine using msgs. The ctx.Err() will be returned,
 // if any.
-func (n *node) step(ctx context.Context, m pb.Message) error ***REMOVED***
+func (n *node) step(ctx context.Context, m pb.Message) error {
 	ch := n.recvc
-	if m.Type == pb.MsgProp ***REMOVED***
+	if m.Type == pb.MsgProp {
 		ch = n.propc
-	***REMOVED***
+	}
 
-	select ***REMOVED***
+	select {
 	case ch <- m:
 		return nil
 	case <-ctx.Done():
 		return ctx.Err()
 	case <-n.done:
 		return ErrStopped
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (n *node) Ready() <-chan Ready ***REMOVED*** return n.readyc ***REMOVED***
+func (n *node) Ready() <-chan Ready { return n.readyc }
 
-func (n *node) Advance() ***REMOVED***
-	select ***REMOVED***
-	case n.advancec <- struct***REMOVED******REMOVED******REMOVED******REMOVED***:
+func (n *node) Advance() {
+	select {
+	case n.advancec <- struct{}{}:
 	case <-n.done:
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (n *node) ApplyConfChange(cc pb.ConfChange) *pb.ConfState ***REMOVED***
+func (n *node) ApplyConfChange(cc pb.ConfChange) *pb.ConfState {
 	var cs pb.ConfState
-	select ***REMOVED***
+	select {
 	case n.confc <- cc:
 	case <-n.done:
-	***REMOVED***
-	select ***REMOVED***
+	}
+	select {
 	case cs = <-n.confstatec:
 	case <-n.done:
-	***REMOVED***
+	}
 	return &cs
-***REMOVED***
+}
 
-func (n *node) Status() Status ***REMOVED***
+func (n *node) Status() Status {
 	c := make(chan Status)
-	select ***REMOVED***
+	select {
 	case n.status <- c:
 		return <-c
 	case <-n.done:
-		return Status***REMOVED******REMOVED***
-	***REMOVED***
-***REMOVED***
+		return Status{}
+	}
+}
 
-func (n *node) ReportUnreachable(id uint64) ***REMOVED***
-	select ***REMOVED***
-	case n.recvc <- pb.Message***REMOVED***Type: pb.MsgUnreachable, From: id***REMOVED***:
+func (n *node) ReportUnreachable(id uint64) {
+	select {
+	case n.recvc <- pb.Message{Type: pb.MsgUnreachable, From: id}:
 	case <-n.done:
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (n *node) ReportSnapshot(id uint64, status SnapshotStatus) ***REMOVED***
+func (n *node) ReportSnapshot(id uint64, status SnapshotStatus) {
 	rej := status == SnapshotFailure
 
-	select ***REMOVED***
-	case n.recvc <- pb.Message***REMOVED***Type: pb.MsgSnapStatus, From: id, Reject: rej***REMOVED***:
+	select {
+	case n.recvc <- pb.Message{Type: pb.MsgSnapStatus, From: id, Reject: rej}:
 	case <-n.done:
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (n *node) TransferLeadership(ctx context.Context, lead, transferee uint64) ***REMOVED***
-	select ***REMOVED***
+func (n *node) TransferLeadership(ctx context.Context, lead, transferee uint64) {
+	select {
 	// manually set 'from' and 'to', so that leader can voluntarily transfers its leadership
-	case n.recvc <- pb.Message***REMOVED***Type: pb.MsgTransferLeader, From: transferee, To: lead***REMOVED***:
+	case n.recvc <- pb.Message{Type: pb.MsgTransferLeader, From: transferee, To: lead}:
 	case <-n.done:
 	case <-ctx.Done():
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (n *node) ReadIndex(ctx context.Context, rctx []byte) error ***REMOVED***
-	return n.step(ctx, pb.Message***REMOVED***Type: pb.MsgReadIndex, Entries: []pb.Entry***REMOVED******REMOVED***Data: rctx***REMOVED******REMOVED******REMOVED***)
-***REMOVED***
+func (n *node) ReadIndex(ctx context.Context, rctx []byte) error {
+	return n.step(ctx, pb.Message{Type: pb.MsgReadIndex, Entries: []pb.Entry{{Data: rctx}}})
+}
 
-func newReady(r *raft, prevSoftSt *SoftState, prevHardSt pb.HardState) Ready ***REMOVED***
-	rd := Ready***REMOVED***
+func newReady(r *raft, prevSoftSt *SoftState, prevHardSt pb.HardState) Ready {
+	rd := Ready{
 		Entries:          r.raftLog.unstableEntries(),
 		CommittedEntries: r.raftLog.nextEnts(),
 		Messages:         r.msgs,
-	***REMOVED***
-	if softSt := r.softState(); !softSt.equal(prevSoftSt) ***REMOVED***
+	}
+	if softSt := r.softState(); !softSt.equal(prevSoftSt) {
 		rd.SoftState = softSt
-	***REMOVED***
-	if hardSt := r.hardState(); !isHardStateEqual(hardSt, prevHardSt) ***REMOVED***
+	}
+	if hardSt := r.hardState(); !isHardStateEqual(hardSt, prevHardSt) {
 		rd.HardState = hardSt
-	***REMOVED***
-	if r.raftLog.unstable.snapshot != nil ***REMOVED***
+	}
+	if r.raftLog.unstable.snapshot != nil {
 		rd.Snapshot = *r.raftLog.unstable.snapshot
-	***REMOVED***
-	if len(r.readStates) != 0 ***REMOVED***
+	}
+	if len(r.readStates) != 0 {
 		rd.ReadStates = r.readStates
-	***REMOVED***
+	}
 	rd.MustSync = MustSync(rd.HardState, prevHardSt, len(rd.Entries))
 	return rd
-***REMOVED***
+}
 
 // MustSync returns true if the hard state and count of Raft entries indicate
 // that a synchronous write to persistent storage is required.
-func MustSync(st, prevst pb.HardState, entsnum int) bool ***REMOVED***
+func MustSync(st, prevst pb.HardState, entsnum int) bool {
 	// Persistent state on all servers:
 	// (Updated on stable storage before responding to RPCs)
 	// currentTerm
 	// votedFor
 	// log entries[]
 	return entsnum != 0 || st.Vote != prevst.Vote || st.Term != prevst.Term
-***REMOVED***
+}

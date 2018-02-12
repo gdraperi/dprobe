@@ -25,9 +25,9 @@ var (
 
 // Equaler is an interface implemented if the type has a Equal method.
 // This is used to compare struct using shakers.Equals.
-type Equaler interface ***REMOVED***
+type Equaler interface {
 	Equal(Equaler) bool
-***REMOVED***
+}
 
 // Equals checker verifies the obtained value is equal to the specified one.
 // It's is smart in a wait that it supports several *types* (built-in, Equaler,
@@ -36,46 +36,46 @@ type Equaler interface ***REMOVED***
 //    c.Assert(myStruct, Equals, aStruct, check.Commentf("bouuuhh"))
 //    c.Assert(myTime, Equals, aTime, check.Commentf("bouuuhh"))
 //
-var Equals check.Checker = &equalChecker***REMOVED***
-	&check.CheckerInfo***REMOVED***
+var Equals check.Checker = &equalChecker{
+	&check.CheckerInfo{
 		Name:   "Equals",
-		Params: []string***REMOVED***"obtained", "expected"***REMOVED***,
-	***REMOVED***,
-***REMOVED***
+		Params: []string{"obtained", "expected"},
+	},
+}
 
-type equalChecker struct ***REMOVED***
+type equalChecker struct {
 	*check.CheckerInfo
-***REMOVED***
+}
 
-func (checker *equalChecker) Check(params []interface***REMOVED******REMOVED***, names []string) (bool, string) ***REMOVED***
+func (checker *equalChecker) Check(params []interface{}, names []string) (bool, string) {
 	return isEqual(params[0], params[1])
-***REMOVED***
+}
 
-func isEqual(obtained, expected interface***REMOVED******REMOVED***) (bool, string) ***REMOVED***
-	switch obtained.(type) ***REMOVED***
+func isEqual(obtained, expected interface{}) (bool, string) {
+	switch obtained.(type) {
 	case time.Time:
 		return timeEquals(obtained, expected)
 	case Equaler:
 		return equalerEquals(obtained, expected)
 	default:
-		if reflect.TypeOf(obtained) != reflect.TypeOf(expected) ***REMOVED***
+		if reflect.TypeOf(obtained) != reflect.TypeOf(expected) {
 			return false, "obtained value and expected value have not the same type."
-		***REMOVED***
+		}
 		return obtained == expected, ""
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func equalerEquals(obtained, expected interface***REMOVED******REMOVED***) (bool, string) ***REMOVED***
+func equalerEquals(obtained, expected interface{}) (bool, string) {
 	expectedEqualer, ok := expected.(Equaler)
-	if !ok ***REMOVED***
+	if !ok {
 		return false, "expected value must be an Equaler - implementing Equal(Equaler)."
-	***REMOVED***
+	}
 	obtainedEqualer, ok := obtained.(Equaler)
-	if !ok ***REMOVED***
+	if !ok {
 		return false, "obtained value must be an Equaler - implementing Equal(Equaler)."
-	***REMOVED***
+	}
 	return obtainedEqualer.Equal(expectedEqualer), ""
-***REMOVED***
+}
 
 // GreaterThan checker verifies the obtained value is greater than the specified one.
 // It's is smart in a wait that it supports several *types* (built-in, time.Time)
@@ -83,29 +83,29 @@ func equalerEquals(obtained, expected interface***REMOVED******REMOVED***) (bool
 //    c.Assert(myTime, GreaterThan, aTime, check.Commentf("bouuuhh"))
 //    c.Assert(myInt, GreaterThan, 2, check.Commentf("bouuuhh"))
 //
-var GreaterThan check.Checker = &greaterThanChecker***REMOVED***
-	&check.CheckerInfo***REMOVED***
+var GreaterThan check.Checker = &greaterThanChecker{
+	&check.CheckerInfo{
 		Name:   "GreaterThan",
-		Params: []string***REMOVED***"obtained", "expected"***REMOVED***,
-	***REMOVED***,
-***REMOVED***
+		Params: []string{"obtained", "expected"},
+	},
+}
 
-type greaterThanChecker struct ***REMOVED***
+type greaterThanChecker struct {
 	*check.CheckerInfo
-***REMOVED***
+}
 
-func (checker *greaterThanChecker) Check(params []interface***REMOVED******REMOVED***, names []string) (bool, string) ***REMOVED***
+func (checker *greaterThanChecker) Check(params []interface{}, names []string) (bool, string) {
 	return greaterThan(params[0], params[1])
-***REMOVED***
+}
 
-func greaterThan(obtained, expected interface***REMOVED******REMOVED***) (bool, string) ***REMOVED***
-	if _, ok := obtained.(time.Time); ok ***REMOVED***
+func greaterThan(obtained, expected interface{}) (bool, string) {
+	if _, ok := obtained.(time.Time); ok {
 		return isAfter(obtained, expected)
-	***REMOVED***
-	if reflect.TypeOf(obtained) != reflect.TypeOf(expected) ***REMOVED***
+	}
+	if reflect.TypeOf(obtained) != reflect.TypeOf(expected) {
 		return false, "obtained value and expected value have not the same type."
-	***REMOVED***
-	switch v := obtained.(type) ***REMOVED***
+	}
+	switch v := obtained.(type) {
 	case float32:
 		return v > expected.(float32), ""
 	case float64:
@@ -132,8 +132,8 @@ func greaterThan(obtained, expected interface***REMOVED******REMOVED***) (bool, 
 		return v > expected.(uint64), ""
 	default:
 		return false, "obtained value type not supported."
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // GreaterOrEqualThan checker verifies the obtained value is greater or equal than the specified one.
 // It's is smart in a wait that it supports several *types* (built-in, time.Time)
@@ -141,29 +141,29 @@ func greaterThan(obtained, expected interface***REMOVED******REMOVED***) (bool, 
 //    c.Assert(myTime, GreaterOrEqualThan, aTime, check.Commentf("bouuuhh"))
 //    c.Assert(myInt, GreaterOrEqualThan, 2, check.Commentf("bouuuhh"))
 //
-var GreaterOrEqualThan check.Checker = &greaterOrEqualThanChecker***REMOVED***
-	&check.CheckerInfo***REMOVED***
+var GreaterOrEqualThan check.Checker = &greaterOrEqualThanChecker{
+	&check.CheckerInfo{
 		Name:   "GreaterOrEqualThan",
-		Params: []string***REMOVED***"obtained", "expected"***REMOVED***,
-	***REMOVED***,
-***REMOVED***
+		Params: []string{"obtained", "expected"},
+	},
+}
 
-type greaterOrEqualThanChecker struct ***REMOVED***
+type greaterOrEqualThanChecker struct {
 	*check.CheckerInfo
-***REMOVED***
+}
 
-func (checker *greaterOrEqualThanChecker) Check(params []interface***REMOVED******REMOVED***, names []string) (bool, string) ***REMOVED***
+func (checker *greaterOrEqualThanChecker) Check(params []interface{}, names []string) (bool, string) {
 	return greaterOrEqualThan(params[0], params[1])
-***REMOVED***
+}
 
-func greaterOrEqualThan(obtained, expected interface***REMOVED******REMOVED***) (bool, string) ***REMOVED***
-	if _, ok := obtained.(time.Time); ok ***REMOVED***
+func greaterOrEqualThan(obtained, expected interface{}) (bool, string) {
+	if _, ok := obtained.(time.Time); ok {
 		return isAfter(obtained, expected)
-	***REMOVED***
-	if reflect.TypeOf(obtained) != reflect.TypeOf(expected) ***REMOVED***
+	}
+	if reflect.TypeOf(obtained) != reflect.TypeOf(expected) {
 		return false, "obtained value and expected value have not the same type."
-	***REMOVED***
-	switch v := obtained.(type) ***REMOVED***
+	}
+	switch v := obtained.(type) {
 	case float32:
 		return v >= expected.(float32), ""
 	case float64:
@@ -190,8 +190,8 @@ func greaterOrEqualThan(obtained, expected interface***REMOVED******REMOVED***) 
 		return v >= expected.(uint64), ""
 	default:
 		return false, "obtained value type not supported."
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // LessThan checker verifies the obtained value is less than the specified one.
 // It's is smart in a wait that it supports several *types* (built-in, time.Time)
@@ -199,29 +199,29 @@ func greaterOrEqualThan(obtained, expected interface***REMOVED******REMOVED***) 
 //    c.Assert(myTime, LessThan, aTime, check.Commentf("bouuuhh"))
 //    c.Assert(myInt, LessThan, 2, check.Commentf("bouuuhh"))
 //
-var LessThan check.Checker = &lessThanChecker***REMOVED***
-	&check.CheckerInfo***REMOVED***
+var LessThan check.Checker = &lessThanChecker{
+	&check.CheckerInfo{
 		Name:   "LessThan",
-		Params: []string***REMOVED***"obtained", "expected"***REMOVED***,
-	***REMOVED***,
-***REMOVED***
+		Params: []string{"obtained", "expected"},
+	},
+}
 
-type lessThanChecker struct ***REMOVED***
+type lessThanChecker struct {
 	*check.CheckerInfo
-***REMOVED***
+}
 
-func (checker *lessThanChecker) Check(params []interface***REMOVED******REMOVED***, names []string) (bool, string) ***REMOVED***
+func (checker *lessThanChecker) Check(params []interface{}, names []string) (bool, string) {
 	return lessThan(params[0], params[1])
-***REMOVED***
+}
 
-func lessThan(obtained, expected interface***REMOVED******REMOVED***) (bool, string) ***REMOVED***
-	if _, ok := obtained.(time.Time); ok ***REMOVED***
+func lessThan(obtained, expected interface{}) (bool, string) {
+	if _, ok := obtained.(time.Time); ok {
 		return isBefore(obtained, expected)
-	***REMOVED***
-	if reflect.TypeOf(obtained) != reflect.TypeOf(expected) ***REMOVED***
+	}
+	if reflect.TypeOf(obtained) != reflect.TypeOf(expected) {
 		return false, "obtained value and expected value have not the same type."
-	***REMOVED***
-	switch v := obtained.(type) ***REMOVED***
+	}
+	switch v := obtained.(type) {
 	case float32:
 		return v < expected.(float32), ""
 	case float64:
@@ -248,8 +248,8 @@ func lessThan(obtained, expected interface***REMOVED******REMOVED***) (bool, str
 		return v < expected.(uint64), ""
 	default:
 		return false, "obtained value type not supported."
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // LessOrEqualThan checker verifies the obtained value is less or equal than the specified one.
 // It's is smart in a wait that it supports several *types* (built-in, time.Time)
@@ -257,29 +257,29 @@ func lessThan(obtained, expected interface***REMOVED******REMOVED***) (bool, str
 //    c.Assert(myTime, LessThan, aTime, check.Commentf("bouuuhh"))
 //    c.Assert(myInt, LessThan, 2, check.Commentf("bouuuhh"))
 //
-var LessOrEqualThan check.Checker = &lessOrEqualThanChecker***REMOVED***
-	&check.CheckerInfo***REMOVED***
+var LessOrEqualThan check.Checker = &lessOrEqualThanChecker{
+	&check.CheckerInfo{
 		Name:   "LessOrEqualThan",
-		Params: []string***REMOVED***"obtained", "expected"***REMOVED***,
-	***REMOVED***,
-***REMOVED***
+		Params: []string{"obtained", "expected"},
+	},
+}
 
-type lessOrEqualThanChecker struct ***REMOVED***
+type lessOrEqualThanChecker struct {
 	*check.CheckerInfo
-***REMOVED***
+}
 
-func (checker *lessOrEqualThanChecker) Check(params []interface***REMOVED******REMOVED***, names []string) (bool, string) ***REMOVED***
+func (checker *lessOrEqualThanChecker) Check(params []interface{}, names []string) (bool, string) {
 	return lessOrEqualThan(params[0], params[1])
-***REMOVED***
+}
 
-func lessOrEqualThan(obtained, expected interface***REMOVED******REMOVED***) (bool, string) ***REMOVED***
-	if _, ok := obtained.(time.Time); ok ***REMOVED***
+func lessOrEqualThan(obtained, expected interface{}) (bool, string) {
+	if _, ok := obtained.(time.Time); ok {
 		return isBefore(obtained, expected)
-	***REMOVED***
-	if reflect.TypeOf(obtained) != reflect.TypeOf(expected) ***REMOVED***
+	}
+	if reflect.TypeOf(obtained) != reflect.TypeOf(expected) {
 		return false, "obtained value and expected value have not the same type."
-	***REMOVED***
-	switch v := obtained.(type) ***REMOVED***
+	}
+	switch v := obtained.(type) {
 	case float32:
 		return v <= expected.(float32), ""
 	case float64:
@@ -306,5 +306,5 @@ func lessOrEqualThan(obtained, expected interface***REMOVED******REMOVED***) (bo
 		return v <= expected.(uint64), ""
 	default:
 		return false, "obtained value type not supported."
-	***REMOVED***
-***REMOVED***
+	}
+}

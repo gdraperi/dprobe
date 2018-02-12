@@ -42,7 +42,7 @@ package identifier
 
 // Interface can be implemented by Encodings to define the CCS or CES for which
 // it implements conversions.
-type Interface interface ***REMOVED***
+type Interface interface {
 	// ID returns an encoding identifier. Exactly one of the mib and other
 	// values should be non-zero.
 	//
@@ -55,7 +55,7 @@ type Interface interface ***REMOVED***
 
 	// NOTE: the restrictions on the encoding are to allow extending the syntax
 	// with additional information such as versions, vendors and other variants.
-***REMOVED***
+}
 
 // A MIB identifies an encoding. It is derived from the IANA MIB codes and adds
 // some identifiers for some encodings that are not covered by the IANA

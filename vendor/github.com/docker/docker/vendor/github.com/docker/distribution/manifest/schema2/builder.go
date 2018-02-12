@@ -7,7 +7,7 @@ import (
 )
 
 // builder is a type for constructing manifests.
-type builder struct ***REMOVED***
+type builder struct {
 	// bs is a BlobService used to publish the configuration blob.
 	bs distribution.BlobService
 
@@ -20,35 +20,35 @@ type builder struct ***REMOVED***
 	// dependencies is a list of descriptors that gets built by successive
 	// calls to AppendReference. In case of image configuration these are layers.
 	dependencies []distribution.Descriptor
-***REMOVED***
+}
 
 // NewManifestBuilder is used to build new manifests for the current schema
 // version. It takes a BlobService so it can publish the configuration blob
 // as part of the Build process.
-func NewManifestBuilder(bs distribution.BlobService, configMediaType string, configJSON []byte) distribution.ManifestBuilder ***REMOVED***
-	mb := &builder***REMOVED***
+func NewManifestBuilder(bs distribution.BlobService, configMediaType string, configJSON []byte) distribution.ManifestBuilder {
+	mb := &builder{
 		bs:              bs,
 		configMediaType: configMediaType,
 		configJSON:      make([]byte, len(configJSON)),
-	***REMOVED***
+	}
 	copy(mb.configJSON, configJSON)
 
 	return mb
-***REMOVED***
+}
 
 // Build produces a final manifest from the given references.
-func (mb *builder) Build(ctx context.Context) (distribution.Manifest, error) ***REMOVED***
-	m := Manifest***REMOVED***
+func (mb *builder) Build(ctx context.Context) (distribution.Manifest, error) {
+	m := Manifest{
 		Versioned: SchemaVersion,
 		Layers:    make([]distribution.Descriptor, len(mb.dependencies)),
-	***REMOVED***
+	}
 	copy(m.Layers, mb.dependencies)
 
 	configDigest := digest.FromBytes(mb.configJSON)
 
 	var err error
 	m.Config, err = mb.bs.Stat(ctx, configDigest)
-	switch err ***REMOVED***
+	switch err {
 	case nil:
 		// Override MediaType, since Put always replaces the specified media
 		// type with application/octet-stream in the descriptor it returns.
@@ -58,27 +58,27 @@ func (mb *builder) Build(ctx context.Context) (distribution.Manifest, error) ***
 		// nop
 	default:
 		return nil, err
-	***REMOVED***
+	}
 
 	// Add config to the blob store
 	m.Config, err = mb.bs.Put(ctx, mb.configMediaType, mb.configJSON)
 	// Override MediaType, since Put always replaces the specified media
 	// type with application/octet-stream in the descriptor it returns.
 	m.Config.MediaType = mb.configMediaType
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	return FromStruct(m)
-***REMOVED***
+}
 
 // AppendReference adds a reference to the current ManifestBuilder.
-func (mb *builder) AppendReference(d distribution.Describable) error ***REMOVED***
+func (mb *builder) AppendReference(d distribution.Describable) error {
 	mb.dependencies = append(mb.dependencies, d.Descriptor())
 	return nil
-***REMOVED***
+}
 
 // References returns the current references added to this builder.
-func (mb *builder) References() []distribution.Descriptor ***REMOVED***
+func (mb *builder) References() []distribution.Descriptor {
 	return mb.dependencies
-***REMOVED***
+}

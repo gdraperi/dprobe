@@ -14,49 +14,49 @@ import (
 	"golang.org/x/sys/windows/svc/mgr"
 )
 
-func startService(name string) error ***REMOVED***
+func startService(name string) error {
 	m, err := mgr.Connect()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer m.Disconnect()
 	s, err := m.OpenService(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("could not access service: %v", err)
-	***REMOVED***
+	}
 	defer s.Close()
 	err = s.Start("is", "manual-started")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("could not start service: %v", err)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func controlService(name string, c svc.Cmd, to svc.State) error ***REMOVED***
+func controlService(name string, c svc.Cmd, to svc.State) error {
 	m, err := mgr.Connect()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	defer m.Disconnect()
 	s, err := m.OpenService(name)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("could not access service: %v", err)
-	***REMOVED***
+	}
 	defer s.Close()
 	status, err := s.Control(c)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("could not send control=%d: %v", c, err)
-	***REMOVED***
+	}
 	timeout := time.Now().Add(10 * time.Second)
-	for status.State != to ***REMOVED***
-		if timeout.Before(time.Now()) ***REMOVED***
+	for status.State != to {
+		if timeout.Before(time.Now()) {
 			return fmt.Errorf("timeout waiting for service to go to state=%d", to)
-		***REMOVED***
+		}
 		time.Sleep(300 * time.Millisecond)
 		status, err = s.Query()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return fmt.Errorf("could not retrieve service status: %v", err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}

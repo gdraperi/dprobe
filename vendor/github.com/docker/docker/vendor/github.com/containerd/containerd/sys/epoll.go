@@ -5,16 +5,16 @@ package sys
 import "golang.org/x/sys/unix"
 
 // EpollCreate1 directly calls unix.EpollCreate1
-func EpollCreate1(flag int) (int, error) ***REMOVED***
+func EpollCreate1(flag int) (int, error) {
 	return unix.EpollCreate1(flag)
-***REMOVED***
+}
 
 // EpollCtl directly calls unix.EpollCtl
-func EpollCtl(epfd int, op int, fd int, event *unix.EpollEvent) error ***REMOVED***
+func EpollCtl(epfd int, op int, fd int, event *unix.EpollEvent) error {
 	return unix.EpollCtl(epfd, op, fd, event)
-***REMOVED***
+}
 
 // EpollWait directly calls unix.EpollWait
-func EpollWait(epfd int, events []unix.EpollEvent, msec int) (int, error) ***REMOVED***
+func EpollWait(epfd int, events []unix.EpollEvent, msec int) (int, error) {
 	return unix.EpollWait(epfd, events, msec)
-***REMOVED***
+}

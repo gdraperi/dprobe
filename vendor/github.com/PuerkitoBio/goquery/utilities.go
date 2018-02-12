@@ -11,12 +11,12 @@ import (
 // is slower than slice iteration for small N.
 const minNodesForSet = 1000
 
-var nodeNames = []string***REMOVED***
+var nodeNames = []string{
 	html.ErrorNode:    "#error",
 	html.TextNode:     "#text",
 	html.DocumentNode: "#document",
 	html.CommentNode:  "#comment",
-***REMOVED***
+}
 
 // NodeName returns the node name of the first element in the selection.
 // It tries to behave in a similar way as the DOM's nodeName property
@@ -32,20 +32,20 @@ var nodeNames = []string***REMOVED***
 //     CommentNode : #comment
 //     DoctypeNode : the name of the document type
 //
-func NodeName(s *Selection) string ***REMOVED***
-	if s.Length() == 0 ***REMOVED***
+func NodeName(s *Selection) string {
+	if s.Length() == 0 {
 		return ""
-	***REMOVED***
-	switch n := s.Get(0); n.Type ***REMOVED***
+	}
+	switch n := s.Get(0); n.Type {
 	case html.ElementNode, html.DoctypeNode:
 		return n.Data
 	default:
-		if n.Type >= 0 && int(n.Type) < len(nodeNames) ***REMOVED***
+		if n.Type >= 0 && int(n.Type) < len(nodeNames) {
 			return nodeNames[n.Type]
-		***REMOVED***
+		}
 		return ""
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // OuterHtml returns the outer HTML rendering of the first item in
 // the selection - that is, the HTML including the first element's
@@ -54,108 +54,108 @@ func NodeName(s *Selection) string ***REMOVED***
 // Unlike InnerHtml, this is a function and not a method on the Selection,
 // because this is not a jQuery method (in javascript-land, this is
 // a property provided by the DOM).
-func OuterHtml(s *Selection) (string, error) ***REMOVED***
+func OuterHtml(s *Selection) (string, error) {
 	var buf bytes.Buffer
 
-	if s.Length() == 0 ***REMOVED***
+	if s.Length() == 0 {
 		return "", nil
-	***REMOVED***
+	}
 	n := s.Get(0)
-	if err := html.Render(&buf, n); err != nil ***REMOVED***
+	if err := html.Render(&buf, n); err != nil {
 		return "", err
-	***REMOVED***
+	}
 	return buf.String(), nil
-***REMOVED***
+}
 
 // Loop through all container nodes to search for the target node.
-func sliceContains(container []*html.Node, contained *html.Node) bool ***REMOVED***
-	for _, n := range container ***REMOVED***
-		if nodeContains(n, contained) ***REMOVED***
+func sliceContains(container []*html.Node, contained *html.Node) bool {
+	for _, n := range container {
+		if nodeContains(n, contained) {
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return false
-***REMOVED***
+}
 
 // Checks if the contained node is within the container node.
-func nodeContains(container *html.Node, contained *html.Node) bool ***REMOVED***
+func nodeContains(container *html.Node, contained *html.Node) bool {
 	// Check if the parent of the contained node is the container node, traversing
 	// upward until the top is reached, or the container is found.
-	for contained = contained.Parent; contained != nil; contained = contained.Parent ***REMOVED***
-		if container == contained ***REMOVED***
+	for contained = contained.Parent; contained != nil; contained = contained.Parent {
+		if container == contained {
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false
-***REMOVED***
+}
 
 // Checks if the target node is in the slice of nodes.
-func isInSlice(slice []*html.Node, node *html.Node) bool ***REMOVED***
+func isInSlice(slice []*html.Node, node *html.Node) bool {
 	return indexInSlice(slice, node) > -1
-***REMOVED***
+}
 
 // Returns the index of the target node in the slice, or -1.
-func indexInSlice(slice []*html.Node, node *html.Node) int ***REMOVED***
-	if node != nil ***REMOVED***
-		for i, n := range slice ***REMOVED***
-			if n == node ***REMOVED***
+func indexInSlice(slice []*html.Node, node *html.Node) int {
+	if node != nil {
+		for i, n := range slice {
+			if n == node {
 				return i
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return -1
-***REMOVED***
+}
 
 // Appends the new nodes to the target slice, making sure no duplicate is added.
 // There is no check to the original state of the target slice, so it may still
 // contain duplicates. The target slice is returned because append() may create
 // a new underlying array. If targetSet is nil, a local set is created with the
 // target if len(target) + len(nodes) is greater than minNodesForSet.
-func appendWithoutDuplicates(target []*html.Node, nodes []*html.Node, targetSet map[*html.Node]bool) []*html.Node ***REMOVED***
+func appendWithoutDuplicates(target []*html.Node, nodes []*html.Node, targetSet map[*html.Node]bool) []*html.Node {
 	// if there are not that many nodes, don't use the map, faster to just use nested loops
 	// (unless a non-nil targetSet is passed, in which case the caller knows better).
-	if targetSet == nil && len(target)+len(nodes) < minNodesForSet ***REMOVED***
-		for _, n := range nodes ***REMOVED***
-			if !isInSlice(target, n) ***REMOVED***
+	if targetSet == nil && len(target)+len(nodes) < minNodesForSet {
+		for _, n := range nodes {
+			if !isInSlice(target, n) {
 				target = append(target, n)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		return target
-	***REMOVED***
+	}
 
 	// if a targetSet is passed, then assume it is reliable, otherwise create one
 	// and initialize it with the current target contents.
-	if targetSet == nil ***REMOVED***
+	if targetSet == nil {
 		targetSet = make(map[*html.Node]bool, len(target))
-		for _, n := range target ***REMOVED***
+		for _, n := range target {
 			targetSet[n] = true
-		***REMOVED***
-	***REMOVED***
-	for _, n := range nodes ***REMOVED***
-		if !targetSet[n] ***REMOVED***
+		}
+	}
+	for _, n := range nodes {
+		if !targetSet[n] {
 			target = append(target, n)
 			targetSet[n] = true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return target
-***REMOVED***
+}
 
 // Loop through a selection, returning only those nodes that pass the predicate
 // function.
-func grep(sel *Selection, predicate func(i int, s *Selection) bool) (result []*html.Node) ***REMOVED***
-	for i, n := range sel.Nodes ***REMOVED***
-		if predicate(i, newSingleSelection(n, sel.document)) ***REMOVED***
+func grep(sel *Selection, predicate func(i int, s *Selection) bool) (result []*html.Node) {
+	for i, n := range sel.Nodes {
+		if predicate(i, newSingleSelection(n, sel.document)) {
 			result = append(result, n)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return result
-***REMOVED***
+}
 
 // Creates a new Selection object based on the specified nodes, and keeps the
 // source Selection object on the stack (linked list).
-func pushStack(fromSel *Selection, nodes []*html.Node) *Selection ***REMOVED***
-	result := &Selection***REMOVED***nodes, fromSel.document, fromSel***REMOVED***
+func pushStack(fromSel *Selection, nodes []*html.Node) *Selection {
+	result := &Selection{nodes, fromSel.document, fromSel}
 	return result
-***REMOVED***
+}

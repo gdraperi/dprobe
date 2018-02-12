@@ -12,12 +12,12 @@ import (
 
 // ChannelSinkGenerator is a constructor of sinks that eventually lead to a
 // channel.
-type ChannelSinkGenerator interface ***REMOVED***
+type ChannelSinkGenerator interface {
 	NewChannelSink() (events.Sink, *events.Channel)
-***REMOVED***
+}
 
 // Queue is the structure used to publish events and watch for them.
-type Queue struct ***REMOVED***
+type Queue struct {
 	sinkGen ChannelSinkGenerator
 	// limit is the max number of items to be held in memory for a watcher
 	limit       uint64
@@ -29,100 +29,100 @@ type Queue struct ***REMOVED***
 	// when a watcher queue reaches its limit or when the Close method of the
 	// sink is called.
 	closeOutChan bool
-***REMOVED***
+}
 
 // NewQueue creates a new publish/subscribe queue which supports watchers.
 // The channels that it will create for subscriptions will have the buffer
 // size specified by buffer.
-func NewQueue(options ...func(*Queue) error) *Queue ***REMOVED***
+func NewQueue(options ...func(*Queue) error) *Queue {
 	// Create a queue with the default values
-	q := &Queue***REMOVED***
-		sinkGen:      &dropErrClosedChanGen***REMOVED******REMOVED***,
+	q := &Queue{
+		sinkGen:      &dropErrClosedChanGen{},
 		broadcast:    events.NewBroadcaster(),
 		cancelFuncs:  make(map[events.Sink]func()),
 		limit:        0,
 		closeOutChan: false,
-	***REMOVED***
+	}
 
-	for _, option := range options ***REMOVED***
+	for _, option := range options {
 		err := option(q)
-		if err != nil ***REMOVED***
+		if err != nil {
 			panic(fmt.Sprintf("Failed to apply options to queue: %s", err))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return q
-***REMOVED***
+}
 
 // WithTimeout returns a functional option for a queue that sets a write timeout
-func WithTimeout(timeout time.Duration) func(*Queue) error ***REMOVED***
-	return func(q *Queue) error ***REMOVED***
+func WithTimeout(timeout time.Duration) func(*Queue) error {
+	return func(q *Queue) error {
 		q.sinkGen = NewTimeoutDropErrSinkGen(timeout)
 		return nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // WithCloseOutChan returns a functional option for a queue whose watcher
 // channel is closed when no more events are expected to be sent to the watcher.
-func WithCloseOutChan() func(*Queue) error ***REMOVED***
-	return func(q *Queue) error ***REMOVED***
+func WithCloseOutChan() func(*Queue) error {
+	return func(q *Queue) error {
 		q.closeOutChan = true
 		return nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // WithLimit returns a functional option for a queue with a max size limit.
-func WithLimit(limit uint64) func(*Queue) error ***REMOVED***
-	return func(q *Queue) error ***REMOVED***
+func WithLimit(limit uint64) func(*Queue) error {
+	return func(q *Queue) error {
 		q.limit = limit
 		return nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Watch returns a channel which will receive all items published to the
 // queue from this point, until cancel is called.
-func (q *Queue) Watch() (eventq chan events.Event, cancel func()) ***REMOVED***
+func (q *Queue) Watch() (eventq chan events.Event, cancel func()) {
 	return q.CallbackWatch(nil)
-***REMOVED***
+}
 
 // WatchContext returns a channel where all items published to the queue will
 // be received. The channel will be closed when the provided context is
 // cancelled.
-func (q *Queue) WatchContext(ctx context.Context) (eventq chan events.Event) ***REMOVED***
+func (q *Queue) WatchContext(ctx context.Context) (eventq chan events.Event) {
 	return q.CallbackWatchContext(ctx, nil)
-***REMOVED***
+}
 
 // CallbackWatch returns a channel which will receive all events published to
 // the queue from this point that pass the check in the provided callback
 // function. The returned cancel function will stop the flow of events and
 // close the channel.
-func (q *Queue) CallbackWatch(matcher events.Matcher) (eventq chan events.Event, cancel func()) ***REMOVED***
+func (q *Queue) CallbackWatch(matcher events.Matcher) (eventq chan events.Event, cancel func()) {
 	chanSink, ch := q.sinkGen.NewChannelSink()
 	lq := queue.NewLimitQueue(chanSink, q.limit)
 	sink := events.Sink(lq)
 
-	if matcher != nil ***REMOVED***
+	if matcher != nil {
 		sink = events.NewFilter(sink, matcher)
-	***REMOVED***
+	}
 
 	q.broadcast.Add(sink)
 
-	cancelFunc := func() ***REMOVED***
+	cancelFunc := func() {
 		q.broadcast.Remove(sink)
 		ch.Close()
 		sink.Close()
-	***REMOVED***
+	}
 
-	externalCancelFunc := func() ***REMOVED***
+	externalCancelFunc := func() {
 		q.mu.Lock()
 		cancelFunc := q.cancelFuncs[sink]
 		delete(q.cancelFuncs, sink)
 		q.mu.Unlock()
 
-		if cancelFunc != nil ***REMOVED***
+		if cancelFunc != nil {
 			cancelFunc()
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	q.mu.Lock()
 	q.cancelFuncs[sink] = cancelFunc
@@ -130,68 +130,68 @@ func (q *Queue) CallbackWatch(matcher events.Matcher) (eventq chan events.Event,
 
 	// If the output channel shouldn't be closed and the queue is limitless,
 	// there's no need for an additional goroutine.
-	if !q.closeOutChan && q.limit == 0 ***REMOVED***
+	if !q.closeOutChan && q.limit == 0 {
 		return ch.C, externalCancelFunc
-	***REMOVED***
+	}
 
 	outChan := make(chan events.Event)
-	go func() ***REMOVED***
-		for ***REMOVED***
-			select ***REMOVED***
+	go func() {
+		for {
+			select {
 			case <-ch.Done():
 				// Close the output channel if the ChannelSink is Done for any
 				// reason. This can happen if the cancelFunc is called
 				// externally or if it has been closed by a wrapper sink, such
 				// as the TimeoutSink.
-				if q.closeOutChan ***REMOVED***
+				if q.closeOutChan {
 					close(outChan)
-				***REMOVED***
+				}
 				externalCancelFunc()
 				return
 			case <-lq.Full():
 				// Close the output channel and tear down the Queue if the
 				// LimitQueue becomes full.
-				if q.closeOutChan ***REMOVED***
+				if q.closeOutChan {
 					close(outChan)
-				***REMOVED***
+				}
 				externalCancelFunc()
 				return
 			case event := <-ch.C:
 				outChan <- event
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***()
+			}
+		}
+	}()
 
 	return outChan, externalCancelFunc
-***REMOVED***
+}
 
 // CallbackWatchContext returns a channel where all items published to the queue will
 // be received. The channel will be closed when the provided context is
 // cancelled.
-func (q *Queue) CallbackWatchContext(ctx context.Context, matcher events.Matcher) (eventq chan events.Event) ***REMOVED***
+func (q *Queue) CallbackWatchContext(ctx context.Context, matcher events.Matcher) (eventq chan events.Event) {
 	c, cancel := q.CallbackWatch(matcher)
-	go func() ***REMOVED***
+	go func() {
 		<-ctx.Done()
 		cancel()
-	***REMOVED***()
+	}()
 	return c
-***REMOVED***
+}
 
 // Publish adds an item to the queue.
-func (q *Queue) Publish(item events.Event) ***REMOVED***
+func (q *Queue) Publish(item events.Event) {
 	q.broadcast.Write(item)
-***REMOVED***
+}
 
 // Close closes the queue and frees the associated resources.
-func (q *Queue) Close() error ***REMOVED***
+func (q *Queue) Close() error {
 	// Make sure all watchers have been closed to avoid a deadlock when
 	// closing the broadcaster.
 	q.mu.Lock()
-	for _, cancelFunc := range q.cancelFuncs ***REMOVED***
+	for _, cancelFunc := range q.cancelFuncs {
 		cancelFunc()
-	***REMOVED***
+	}
 	q.cancelFuncs = make(map[events.Sink]func())
 	q.mu.Unlock()
 
 	return q.broadcast.Close()
-***REMOVED***
+}

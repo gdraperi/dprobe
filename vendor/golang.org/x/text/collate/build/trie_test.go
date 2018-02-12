@@ -12,42 +12,42 @@ import (
 
 // We take the smallest, largest and an arbitrary value for each
 // of the UTF-8 sequence lengths.
-var testRunes = []rune***REMOVED***
+var testRunes = []rune{
 	0x01, 0x0C, 0x7F, // 1-byte sequences
 	0x80, 0x100, 0x7FF, // 2-byte sequences
 	0x800, 0x999, 0xFFFF, // 3-byte sequences
 	0x10000, 0x10101, 0x10FFFF, // 4-byte sequences
 	0x200, 0x201, 0x202, 0x210, 0x215, // five entries in one sparse block
-***REMOVED***
+}
 
-func makeTestTrie(t *testing.T) trie ***REMOVED***
+func makeTestTrie(t *testing.T) trie {
 	n := newNode()
-	for i, r := range testRunes ***REMOVED***
+	for i, r := range testRunes {
 		n.insert(r, uint32(i))
-	***REMOVED***
+	}
 	idx := newTrieBuilder()
 	idx.addTrie(n)
 	tr, err := idx.generate()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf(err.Error())
-	***REMOVED***
+	}
 	return *tr
-***REMOVED***
+}
 
-func TestGenerateTrie(t *testing.T) ***REMOVED***
+func TestGenerateTrie(t *testing.T) {
 	testdata := makeTestTrie(t)
-	buf := &bytes.Buffer***REMOVED******REMOVED***
+	buf := &bytes.Buffer{}
 	testdata.printArrays(buf, "test")
 	fmt.Fprintf(buf, "var testTrie = ")
-	testdata.printStruct(buf, &trieHandle***REMOVED***19, 0***REMOVED***, "test")
-	if output != buf.String() ***REMOVED***
+	testdata.printStruct(buf, &trieHandle{19, 0}, "test")
+	if output != buf.String() {
 		t.Error("output differs")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 var output = `// testValues: 832 entries, 3328 bytes
 // Block 2 is the null block.
-var testValues = [832]uint32 ***REMOVED***
+var testValues = [832]uint32 {
 	// Block 0x0, offset 0x0
 	0x000c:0x00000001, 
 	// Block 0x1, offset 0x40
@@ -75,11 +75,11 @@ var testValues = [832]uint32 ***REMOVED***
 	0x02c1:0x0000000a, 
 	// Block 0xc, offset 0x300
 	0x033f:0x0000000b, 
-***REMOVED***
+}
 
 // testLookup: 640 entries, 1280 bytes
 // Block 0 is the null block.
-var testLookup = [640]uint16 ***REMOVED***
+var testLookup = [640]uint16 {
 	// Block 0x0, offset 0x0
 	// Block 0x1, offset 0x40
 	// Block 0x2, offset 0x80
@@ -102,6 +102,6 @@ var testLookup = [640]uint16 ***REMOVED***
 	0x260:0x01, 
 	0x26f:0x02, 
 	0x270:0x04, 0x274:0x06, 
-***REMOVED***
+}
 
-var testTrie = trie***REMOVED*** testLookup[1216:], testValues[0:], testLookup[:], testValues[:]***REMOVED***`
+var testTrie = trie{ testLookup[1216:], testValues[0:], testLookup[:], testValues[:]}`

@@ -25,27 +25,27 @@ import (
 
 var outputFile = flag.String("output", "xml.go", "output file name")
 
-func main() ***REMOVED***
+func main() {
 	flag.Parse()
 
 	r := gen.OpenCLDRCoreZip()
 	buffer, err := ioutil.ReadAll(r)
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatal("Could not read zip file")
-	***REMOVED***
+	}
 	r.Close()
 	z, err := zip.NewReader(bytes.NewReader(buffer), int64(len(buffer)))
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Fatalf("Could not read zip archive: %v", err)
-	***REMOVED***
+	}
 
 	var buf bytes.Buffer
 
 	version := gen.CLDRVersion()
 
-	for _, dtd := range files ***REMOVED***
-		for _, f := range z.File ***REMOVED***
-			if strings.HasSuffix(f.Name, dtd.file+".dtd") ***REMOVED***
+	for _, dtd := range files {
+		for _, f := range z.File {
+			if strings.HasSuffix(f.Name, dtd.file+".dtd") {
 				r, err := f.Open()
 				failOnError(err)
 
@@ -53,29 +53,29 @@ func main() ***REMOVED***
 				b.parseDTD(r)
 				b.resolve(b.index[dtd.top[0]])
 				b.write()
-				if b.version != "" && version != b.version ***REMOVED***
+				if b.version != "" && version != b.version {
 					println(f.Name)
 					log.Fatalf("main: inconsistent versions: found %s; want %s", b.version, version)
-				***REMOVED***
+				}
 				break
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	fmt.Fprintln(&buf, "// Version is the version of CLDR from which the XML definitions are generated.")
 	fmt.Fprintf(&buf, "const Version = %q\n", version)
 
 	gen.WriteGoFile(*outputFile, "cldr", buf.Bytes())
-***REMOVED***
+}
 
-func failOnError(err error) ***REMOVED***
-	if err != nil ***REMOVED***
+func failOnError(err error) {
+	if err != nil {
 		log.New(os.Stderr, "", log.Lshortfile).Output(2, err.Error())
 		os.Exit(1)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // configuration data per DTD type
-type dtd struct ***REMOVED***
+type dtd struct {
 	file string   // base file name
 	root string   // Go name of the root XML element
 	top  []string // create a different type for this section
@@ -84,49 +84,49 @@ type dtd struct ***REMOVED***
 	skipAttr    []string // attributes to exclude
 	predefined  []string // hard-coded elements exist of the form <name>Elem
 	forceRepeat []string // elements to make slices despite DTD
-***REMOVED***
+}
 
-var files = []dtd***REMOVED***
-	***REMOVED***
+var files = []dtd{
+	{
 		file: "ldmlBCP47",
 		root: "LDMLBCP47",
-		top:  []string***REMOVED***"ldmlBCP47"***REMOVED***,
-		skipElem: []string***REMOVED***
+		top:  []string{"ldmlBCP47"},
+		skipElem: []string{
 			"cldrVersion", // deprecated, not used
-		***REMOVED***,
-	***REMOVED***,
-	***REMOVED***
+		},
+	},
+	{
 		file: "ldmlSupplemental",
 		root: "SupplementalData",
-		top:  []string***REMOVED***"supplementalData"***REMOVED***,
-		skipElem: []string***REMOVED***
+		top:  []string{"supplementalData"},
+		skipElem: []string{
 			"cldrVersion", // deprecated, not used
-		***REMOVED***,
-		forceRepeat: []string***REMOVED***
+		},
+		forceRepeat: []string{
 			"plurals", // data defined in plurals.xml and ordinals.xml
-		***REMOVED***,
-	***REMOVED***,
-	***REMOVED***
+		},
+	},
+	{
 		file: "ldml",
 		root: "LDML",
-		top: []string***REMOVED***
+		top: []string{
 			"ldml", "collation", "calendar", "timeZoneNames", "localeDisplayNames", "numbers",
-		***REMOVED***,
-		skipElem: []string***REMOVED***
+		},
+		skipElem: []string{
 			"cp",       // not used anywhere
 			"special",  // not used anywhere
 			"fallback", // deprecated, not used
 			"alias",    // in Common
 			"default",  // in Common
-		***REMOVED***,
-		skipAttr: []string***REMOVED***
+		},
+		skipAttr: []string{
 			"hiraganaQuarternary", // typo in DTD, correct version included as well
-		***REMOVED***,
-		predefined: []string***REMOVED***"rules"***REMOVED***,
-	***REMOVED***,
-***REMOVED***
+		},
+		predefined: []string{"rules"},
+	},
+}
 
-var comments = map[string]string***REMOVED***
+var comments = map[string]string{
 	"ldmlBCP47": `
 // LDMLBCP47 holds information on allowable values for various variables in LDML.
 `,
@@ -159,29 +159,29 @@ var comments = map[string]string***REMOVED***
 	"numbers": `
 // Numbers supplies information for formatting and parsing numbers and currencies.
 `,
-***REMOVED***
+}
 
-type element struct ***REMOVED***
+type element struct {
 	name      string // XML element name
 	category  string // elements contained by this element
 	signature string // category + attrKey*
 
 	attr []*attribute // attributes supported by this element.
-	sub  []struct ***REMOVED***   // parsed and evaluated sub elements of this element.
+	sub  []struct {   // parsed and evaluated sub elements of this element.
 		e      *element
 		repeat bool // true if the element needs to be a slice
-	***REMOVED***
+	}
 
 	resolved bool // prevent multiple resolutions of this element.
-***REMOVED***
+}
 
-type attribute struct ***REMOVED***
+type attribute struct {
 	name string
 	key  string
 	list []string
 
 	tag string // Go tag
-***REMOVED***
+}
 
 var (
 	reHead  = regexp.MustCompile(` *(\w+) +([\w\-]+)`)
@@ -192,209 +192,209 @@ var (
 
 // builder is used to read in the DTD files from CLDR and generate Go code
 // to be used with the encoding/xml package.
-type builder struct ***REMOVED***
+type builder struct {
 	w       io.Writer
 	index   map[string]*element
 	elem    []*element
 	info    dtd
 	version string
-***REMOVED***
+}
 
-func makeBuilder(w io.Writer, d dtd) builder ***REMOVED***
-	return builder***REMOVED***
+func makeBuilder(w io.Writer, d dtd) builder {
+	return builder{
 		w:     w,
 		index: make(map[string]*element),
-		elem:  []*element***REMOVED******REMOVED***,
+		elem:  []*element{},
 		info:  d,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // parseDTD parses a DTD file.
-func (b *builder) parseDTD(r io.Reader) ***REMOVED***
-	for d := xml.NewDecoder(r); ; ***REMOVED***
+func (b *builder) parseDTD(r io.Reader) {
+	for d := xml.NewDecoder(r); ; {
 		t, err := d.Token()
-		if t == nil ***REMOVED***
+		if t == nil {
 			break
-		***REMOVED***
+		}
 		failOnError(err)
 		dir, ok := t.(xml.Directive)
-		if !ok ***REMOVED***
+		if !ok {
 			continue
-		***REMOVED***
+		}
 		m := reHead.FindSubmatch(dir)
 		dir = dir[len(m[0]):]
 		ename := string(m[2])
 		el, elementFound := b.index[ename]
-		switch string(m[1]) ***REMOVED***
+		switch string(m[1]) {
 		case "ELEMENT":
-			if elementFound ***REMOVED***
+			if elementFound {
 				log.Fatal("parseDTD: duplicate entry for element %q", ename)
-			***REMOVED***
+			}
 			m := reElem.FindSubmatch(dir)
-			if m == nil ***REMOVED***
+			if m == nil {
 				log.Fatalf("parseDTD: invalid element %q", string(dir))
-			***REMOVED***
-			if len(m[0]) != len(dir) ***REMOVED***
+			}
+			if len(m[0]) != len(dir) {
 				log.Fatal("parseDTD: invalid element %q", string(dir), len(dir), len(m[0]), string(m[0]))
-			***REMOVED***
+			}
 			s := string(m[1])
-			el = &element***REMOVED***
+			el = &element{
 				name:     ename,
 				category: s,
-			***REMOVED***
+			}
 			b.index[ename] = el
 		case "ATTLIST":
-			if !elementFound ***REMOVED***
+			if !elementFound {
 				log.Fatalf("parseDTD: unknown element %q", ename)
-			***REMOVED***
+			}
 			s := string(dir)
 			m := reAttr.FindStringSubmatch(s)
-			if m == nil ***REMOVED***
+			if m == nil {
 				log.Fatal(fmt.Errorf("parseDTD: invalid attribute %q", string(dir)))
-			***REMOVED***
-			if m[4] == "FIXED" ***REMOVED***
+			}
+			if m[4] == "FIXED" {
 				b.version = m[5]
-			***REMOVED*** else ***REMOVED***
-				switch m[1] ***REMOVED***
+			} else {
+				switch m[1] {
 				case "draft", "references", "alt", "validSubLocales", "standard" /* in Common */ :
 				case "type", "choice":
 				default:
-					el.attr = append(el.attr, &attribute***REMOVED***
+					el.attr = append(el.attr, &attribute{
 						name: m[1],
 						key:  s,
 						list: reToken.FindAllString(m[3], -1),
-					***REMOVED***)
+					})
 					el.signature = fmt.Sprintf("%s=%s+%s", el.signature, m[1], m[2])
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+				}
+			}
+		}
+	}
+}
 
 var reCat = regexp.MustCompile(`[ ,\|]*(?:(\(|\)|\#?[\w_-]+)([\*\+\?]?))?`)
 
 // resolve takes a parsed element and converts it into structured data
 // that can be used to generate the XML code.
-func (b *builder) resolve(e *element) ***REMOVED***
-	if e.resolved ***REMOVED***
+func (b *builder) resolve(e *element) {
+	if e.resolved {
 		return
-	***REMOVED***
+	}
 	b.elem = append(b.elem, e)
 	e.resolved = true
 	s := e.category
 	found := make(map[string]bool)
-	sequenceStart := []int***REMOVED******REMOVED***
-	for len(s) > 0 ***REMOVED***
+	sequenceStart := []int{}
+	for len(s) > 0 {
 		m := reCat.FindStringSubmatch(s)
-		if m == nil ***REMOVED***
+		if m == nil {
 			log.Fatalf("%s: invalid category string %q", e.name, s)
-		***REMOVED***
+		}
 		repeat := m[2] == "*" || m[2] == "+" || in(b.info.forceRepeat, m[1])
-		switch m[1] ***REMOVED***
+		switch m[1] {
 		case "":
 		case "(":
 			sequenceStart = append(sequenceStart, len(e.sub))
 		case ")":
-			if len(sequenceStart) == 0 ***REMOVED***
+			if len(sequenceStart) == 0 {
 				log.Fatalf("%s: unmatched closing parenthesis", e.name)
-			***REMOVED***
-			for i := sequenceStart[len(sequenceStart)-1]; i < len(e.sub); i++ ***REMOVED***
+			}
+			for i := sequenceStart[len(sequenceStart)-1]; i < len(e.sub); i++ {
 				e.sub[i].repeat = e.sub[i].repeat || repeat
-			***REMOVED***
+			}
 			sequenceStart = sequenceStart[:len(sequenceStart)-1]
 		default:
-			if in(b.info.skipElem, m[1]) ***REMOVED***
-			***REMOVED*** else if sub, ok := b.index[m[1]]; ok ***REMOVED***
-				if !found[sub.name] ***REMOVED***
-					e.sub = append(e.sub, struct ***REMOVED***
+			if in(b.info.skipElem, m[1]) {
+			} else if sub, ok := b.index[m[1]]; ok {
+				if !found[sub.name] {
+					e.sub = append(e.sub, struct {
 						e      *element
 						repeat bool
-					***REMOVED******REMOVED***sub, repeat***REMOVED***)
+					}{sub, repeat})
 					found[sub.name] = true
 					b.resolve(sub)
-				***REMOVED***
-			***REMOVED*** else if m[1] == "#PCDATA" || m[1] == "ANY" ***REMOVED***
-			***REMOVED*** else if m[1] != "EMPTY" ***REMOVED***
+				}
+			} else if m[1] == "#PCDATA" || m[1] == "ANY" {
+			} else if m[1] != "EMPTY" {
 				log.Fatalf("resolve:%s: element %q not found", e.name, m[1])
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		s = s[len(m[0]):]
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // return true if s is contained in set.
-func in(set []string, s string) bool ***REMOVED***
-	for _, v := range set ***REMOVED***
-		if v == s ***REMOVED***
+func in(set []string, s string) bool {
+	for _, v := range set {
+		if v == s {
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false
-***REMOVED***
+}
 
 var repl = strings.NewReplacer("-", " ", "_", " ")
 
 // title puts the first character or each character following '_' in title case and
 // removes all occurrences of '_'.
-func title(s string) string ***REMOVED***
+func title(s string) string {
 	return strings.Replace(strings.Title(repl.Replace(s)), " ", "", -1)
-***REMOVED***
+}
 
 // writeElem generates Go code for a single element, recursively.
-func (b *builder) writeElem(tab int, e *element) ***REMOVED***
-	p := func(f string, x ...interface***REMOVED******REMOVED***) ***REMOVED***
+func (b *builder) writeElem(tab int, e *element) {
+	p := func(f string, x ...interface{}) {
 		f = strings.Replace(f, "\n", "\n"+strings.Repeat("\t", tab), -1)
 		fmt.Fprintf(b.w, f, x...)
-	***REMOVED***
-	if len(e.sub) == 0 && len(e.attr) == 0 ***REMOVED***
+	}
+	if len(e.sub) == 0 && len(e.attr) == 0 {
 		p("Common")
 		return
-	***REMOVED***
-	p("struct ***REMOVED***")
+	}
+	p("struct {")
 	tab++
 	p("\nCommon")
-	for _, attr := range e.attr ***REMOVED***
-		if !in(b.info.skipAttr, attr.name) ***REMOVED***
+	for _, attr := range e.attr {
+		if !in(b.info.skipAttr, attr.name) {
 			p("\n%s string `xml:\"%s,attr\"`", title(attr.name), attr.name)
-		***REMOVED***
-	***REMOVED***
-	for _, sub := range e.sub ***REMOVED***
-		if in(b.info.predefined, sub.e.name) ***REMOVED***
+		}
+	}
+	for _, sub := range e.sub {
+		if in(b.info.predefined, sub.e.name) {
 			p("\n%sElem", sub.e.name)
 			continue
-		***REMOVED***
-		if in(b.info.skipElem, sub.e.name) ***REMOVED***
+		}
+		if in(b.info.skipElem, sub.e.name) {
 			continue
-		***REMOVED***
+		}
 		p("\n%s ", title(sub.e.name))
-		if sub.repeat ***REMOVED***
+		if sub.repeat {
 			p("[]")
-		***REMOVED***
+		}
 		p("*")
-		if in(b.info.top, sub.e.name) ***REMOVED***
+		if in(b.info.top, sub.e.name) {
 			p(title(sub.e.name))
-		***REMOVED*** else ***REMOVED***
+		} else {
 			b.writeElem(tab, sub.e)
-		***REMOVED***
+		}
 		p(" `xml:\"%s\"`", sub.e.name)
-	***REMOVED***
+	}
 	tab--
-	p("\n***REMOVED***")
-***REMOVED***
+	p("\n}")
+}
 
 // write generates the Go XML code.
-func (b *builder) write() ***REMOVED***
-	for i, name := range b.info.top ***REMOVED***
+func (b *builder) write() {
+	for i, name := range b.info.top {
 		e := b.index[name]
-		if e != nil ***REMOVED***
+		if e != nil {
 			fmt.Fprintf(b.w, comments[name])
 			name := title(e.name)
-			if i == 0 ***REMOVED***
+			if i == 0 {
 				name = b.info.root
-			***REMOVED***
+			}
 			fmt.Fprintf(b.w, "type %s ", name)
 			b.writeElem(0, e)
 			fmt.Fprint(b.w, "\n")
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

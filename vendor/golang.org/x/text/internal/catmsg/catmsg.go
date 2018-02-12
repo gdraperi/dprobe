@@ -40,7 +40,7 @@
 //
 //   message.Set(language.English, "You are %d minute(s) late.",
 //       catalog.Var("minutes", plural.Select(1, "one", "minute")),
-//       catalog.String("You are %[1]d $***REMOVED***minutes***REMOVED*** late."))
+//       catalog.String("You are %[1]d ${minutes} late."))
 //
 //   p := message.NewPrinter(language.English)
 //   p.Printf("You are %d minute(s) late.", 5) // always 5 minutes late.
@@ -85,18 +85,18 @@ type Handler func(d *Decoder) bool
 // messages. The prefix of the name should be the package path followed by
 // an optional disambiguating string.
 // Register will panic if a handle for the same name was already registered.
-func Register(name string, handler Handler) Handle ***REMOVED***
+func Register(name string, handler Handler) Handle {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	if _, ok := names[name]; ok ***REMOVED***
+	if _, ok := names[name]; ok {
 		panic(fmt.Errorf("catmsg: handler for %q already exists", name))
-	***REMOVED***
+	}
 	h := Handle(len(handlers))
 	names[name] = h
 	handlers = append(handlers, handler)
 	return h
-***REMOVED***
+}
 
 // These handlers require fixed positions in the handlers slice.
 const (
@@ -114,72 +114,72 @@ const prefix = "golang.org/x/text/internal/catmsg."
 var (
 	// TODO: find a more stable way to link handles to message types.
 	mutex sync.Mutex
-	names = map[string]Handle***REMOVED***
+	names = map[string]Handle{
 		prefix + "Vars":   msgVars,
 		prefix + "First":  msgFirst,
 		prefix + "Raw":    msgRaw,
 		prefix + "String": msgString,
 		prefix + "Affix":  msgAffix,
-	***REMOVED***
+	}
 	handlers = make([]Handler, numInternal)
 )
 
-func init() ***REMOVED***
+func init() {
 	// This handler is a message type wrapper that initializes a decoder
 	// with a variable block. This message type, if present, is always at the
 	// start of an encoded message.
-	handlers[msgVars] = func(d *Decoder) bool ***REMOVED***
+	handlers[msgVars] = func(d *Decoder) bool {
 		blockSize := int(d.DecodeUint())
 		d.vars = d.data[:blockSize]
 		d.data = d.data[blockSize:]
 		return d.executeMessage()
-	***REMOVED***
+	}
 
 	// First takes the first message in a sequence that results in a match for
 	// the given substitution arguments.
-	handlers[msgFirst] = func(d *Decoder) bool ***REMOVED***
-		for !d.Done() ***REMOVED***
-			if d.ExecuteMessage() ***REMOVED***
+	handlers[msgFirst] = func(d *Decoder) bool {
+		for !d.Done() {
+			if d.ExecuteMessage() {
 				return true
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		return false
-	***REMOVED***
+	}
 
-	handlers[msgRaw] = func(d *Decoder) bool ***REMOVED***
+	handlers[msgRaw] = func(d *Decoder) bool {
 		d.Render(d.data)
 		return true
-	***REMOVED***
+	}
 
 	// A String message alternates between a string constant and a variable
 	// substitution.
-	handlers[msgString] = func(d *Decoder) bool ***REMOVED***
-		for !d.Done() ***REMOVED***
-			if str := d.DecodeString(); str != "" ***REMOVED***
+	handlers[msgString] = func(d *Decoder) bool {
+		for !d.Done() {
+			if str := d.DecodeString(); str != "" {
 				d.Render(str)
-			***REMOVED***
-			if d.Done() ***REMOVED***
+			}
+			if d.Done() {
 				break
-			***REMOVED***
+			}
 			d.ExecuteSubstitution()
-		***REMOVED***
+		}
 		return true
-	***REMOVED***
+	}
 
-	handlers[msgAffix] = func(d *Decoder) bool ***REMOVED***
+	handlers[msgAffix] = func(d *Decoder) bool {
 		// TODO: use an alternative method for common cases.
 		prefix := d.DecodeString()
 		suffix := d.DecodeString()
-		if prefix != "" ***REMOVED***
+		if prefix != "" {
 			d.Render(prefix)
-		***REMOVED***
+		}
 		ret := d.ExecuteMessage()
-		if suffix != "" ***REMOVED***
+		if suffix != "" {
 			d.Render(suffix)
-		***REMOVED***
+		}
 		return ret
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 var (
 	// ErrIncomplete indicates a compiled message does not define translations
@@ -194,7 +194,7 @@ var (
 
 // A Message holds a collection of translations for the same phrase that may
 // vary based on the values of substitution arguments.
-type Message interface ***REMOVED***
+type Message interface {
 	// Compile encodes the format string(s) of the message as a string for later
 	// evaluation.
 	//
@@ -213,16 +213,16 @@ type Message interface ***REMOVED***
 	// checking of format strings ahead of time, Compile should still make an
 	// effort to have some sensible fallback in case of an error.
 	Compile(e *Encoder) error
-***REMOVED***
+}
 
 // Compile converts a Message to a data string that can be stored in a Catalog.
 // The resulting string can subsequently be decoded by passing to the Execute
 // method of a Decoder.
-func Compile(tag language.Tag, macros Dictionary, m Message) (data string, err error) ***REMOVED***
+func Compile(tag language.Tag, macros Dictionary, m Message) (data string, err error) {
 	// TODO: pass macros so they can be used for validation.
-	v := &Encoder***REMOVED***inBody: true***REMOVED*** // encoder for variables
+	v := &Encoder{inBody: true} // encoder for variables
 	v.root = v
-	e := &Encoder***REMOVED***root: v, parent: v, tag: tag***REMOVED*** // encoder for messages
+	e := &Encoder{root: v, parent: v, tag: tag} // encoder for messages
 	err = m.Compile(e)
 	// This package serves te message package, which in turn is meant to be a
 	// drop-in replacement for fmt.  With the fmt package, format strings are
@@ -232,7 +232,7 @@ func Compile(tag language.Tag, macros Dictionary, m Message) (data string, err e
 	// consistent and compatible and allow graceful degradation in case of
 	// errors.
 	buf := e.buf[stripPrefix(e.buf):]
-	if len(v.buf) > 0 ***REMOVED***
+	if len(v.buf) > 0 {
 		// Prepend variable block.
 		b := make([]byte, 1+maxVarintBytes+len(v.buf)+len(buf))
 		b[0] = byte(msgVars)
@@ -240,42 +240,42 @@ func Compile(tag language.Tag, macros Dictionary, m Message) (data string, err e
 		b = append(b, v.buf...)
 		b = append(b, buf...)
 		buf = b
-	***REMOVED***
-	if err == nil ***REMOVED***
+	}
+	if err == nil {
 		err = v.err
-	***REMOVED***
+	}
 	return string(buf), err
-***REMOVED***
+}
 
 // FirstOf is a message type that prints the first message in the sequence that
 // resolves to a match for the given substitution arguments.
 type FirstOf []Message
 
 // Compile implements Message.
-func (s FirstOf) Compile(e *Encoder) error ***REMOVED***
+func (s FirstOf) Compile(e *Encoder) error {
 	e.EncodeMessageType(msgFirst)
 	err := ErrIncomplete
-	for i, m := range s ***REMOVED***
-		if err == nil ***REMOVED***
+	for i, m := range s {
+		if err == nil {
 			return fmt.Errorf("catalog: message argument %d is complete and blocks subsequent messages", i-1)
-		***REMOVED***
+		}
 		err = e.EncodeMessage(m)
-	***REMOVED***
+	}
 	return err
-***REMOVED***
+}
 
 // Var defines a message that can be substituted for a placeholder of the same
 // name. If an expression does not result in a string after evaluation, Name is
 // used as the substitution. For example:
-//    Var***REMOVED***
+//    Var{
 //      Name:    "minutes",
 //      Message: plural.Select(1, "one", "minute"),
-//***REMOVED***
+//    }
 // will resolve to minute for singular and minutes for plural forms.
-type Var struct ***REMOVED***
+type Var struct {
 	Name    string
 	Message Message
-***REMOVED***
+}
 
 var errIsVar = errors.New("catmsg: variable used as message")
 
@@ -283,14 +283,14 @@ var errIsVar = errors.New("catmsg: variable used as message")
 //
 // Note that this method merely registers a variable; it does not create an
 // encoded message.
-func (v *Var) Compile(e *Encoder) error ***REMOVED***
-	if err := e.addVar(v.Name, v.Message); err != nil ***REMOVED***
+func (v *Var) Compile(e *Encoder) error {
+	if err := e.addVar(v.Name, v.Message); err != nil {
 		return err
-	***REMOVED***
+	}
 	// Using a Var by itself is an error. If it is in a sequence followed by
 	// other messages referring to it, this error will be ignored.
 	return errIsVar
-***REMOVED***
+}
 
 // Raw is a message consisting of a single format string that is passed as is
 // to the Renderer.
@@ -299,24 +299,24 @@ func (v *Var) Compile(e *Encoder) error ***REMOVED***
 type Raw string
 
 // Compile implements Message.
-func (r Raw) Compile(e *Encoder) (err error) ***REMOVED***
+func (r Raw) Compile(e *Encoder) (err error) {
 	e.EncodeMessageType(msgRaw)
 	// Special case: raw strings don't have a size encoding and so don't use
 	// EncodeString.
 	e.buf = append(e.buf, r...)
 	return nil
-***REMOVED***
+}
 
 // String is a message consisting of a single format string which contains
 // placeholders that may be substituted with variables.
 //
 // Variable substitutions are marked with placeholders and a variable name of
-// the form $***REMOVED***name***REMOVED***. Any other substitutions such as Go templates or
+// the form ${name}. Any other substitutions such as Go templates or
 // printf-style substitutions are left to be done by the Renderer.
 //
 // When evaluation a string interpolation, a Renderer will receive separate
 // calls for each placeholder and interstitial string. For example, for the
-// message: "%[1]v $***REMOVED***invites***REMOVED*** %[2]v to $***REMOVED***their***REMOVED*** party." The sequence of calls
+// message: "%[1]v ${invites} %[2]v to ${their} party." The sequence of calls
 // is:
 //   d.Render("%[1]v ")
 //   d.Arg(1)
@@ -336,74 +336,74 @@ type String string
 
 // Compile implements Message. It parses the placeholder formats and returns
 // any error.
-func (s String) Compile(e *Encoder) (err error) ***REMOVED***
+func (s String) Compile(e *Encoder) (err error) {
 	msg := string(s)
-	const subStart = "$***REMOVED***"
+	const subStart = "${"
 	hasHeader := false
 	p := 0
-	b := []byte***REMOVED******REMOVED***
-	for ***REMOVED***
+	b := []byte{}
+	for {
 		i := strings.Index(msg[p:], subStart)
-		if i == -1 ***REMOVED***
+		if i == -1 {
 			break
-		***REMOVED***
+		}
 		b = append(b, msg[p:p+i]...)
 		p += i + len(subStart)
-		if i = strings.IndexByte(msg[p:], '***REMOVED***'); i == -1 ***REMOVED***
+		if i = strings.IndexByte(msg[p:], '}'); i == -1 {
 			b = append(b, "$!(MISSINGBRACE)"...)
-			err = fmt.Errorf("catmsg: missing '***REMOVED***'")
+			err = fmt.Errorf("catmsg: missing '}'")
 			p = len(msg)
 			break
-		***REMOVED***
+		}
 		name := strings.TrimSpace(msg[p : p+i])
-		if q := strings.IndexByte(name, '('); q == -1 ***REMOVED***
-			if !hasHeader ***REMOVED***
+		if q := strings.IndexByte(name, '('); q == -1 {
+			if !hasHeader {
 				hasHeader = true
 				e.EncodeMessageType(msgString)
-			***REMOVED***
+			}
 			e.EncodeString(string(b))
 			e.EncodeSubstitution(name)
 			b = b[:0]
-		***REMOVED*** else if j := strings.IndexByte(name[q:], ')'); j == -1 ***REMOVED***
+		} else if j := strings.IndexByte(name[q:], ')'); j == -1 {
 			// TODO: what should the error be?
 			b = append(b, "$!(MISSINGPAREN)"...)
 			err = fmt.Errorf("catmsg: missing ')'")
-		***REMOVED*** else if x, sErr := strconv.ParseUint(strings.TrimSpace(name[q+1:q+j]), 10, 32); sErr != nil ***REMOVED***
+		} else if x, sErr := strconv.ParseUint(strings.TrimSpace(name[q+1:q+j]), 10, 32); sErr != nil {
 			// TODO: handle more than one argument
 			b = append(b, "$!(BADNUM)"...)
 			err = fmt.Errorf("catmsg: invalid number %q", strings.TrimSpace(name[q+1:q+j]))
-		***REMOVED*** else ***REMOVED***
-			if !hasHeader ***REMOVED***
+		} else {
+			if !hasHeader {
 				hasHeader = true
 				e.EncodeMessageType(msgString)
-			***REMOVED***
+			}
 			e.EncodeString(string(b))
 			e.EncodeSubstitution(name[:q], int(x))
 			b = b[:0]
-		***REMOVED***
+		}
 		p += i + 1
-	***REMOVED***
+	}
 	b = append(b, msg[p:]...)
-	if !hasHeader ***REMOVED***
+	if !hasHeader {
 		// Simplify string to a raw string.
 		Raw(string(b)).Compile(e)
-	***REMOVED*** else if len(b) > 0 ***REMOVED***
+	} else if len(b) > 0 {
 		e.EncodeString(string(b))
-	***REMOVED***
+	}
 	return err
-***REMOVED***
+}
 
 // Affix is a message that adds a prefix and suffix to another message.
 // This is mostly used add back whitespace to a translation that was stripped
 // before sending it out.
-type Affix struct ***REMOVED***
+type Affix struct {
 	Message Message
 	Prefix  string
 	Suffix  string
-***REMOVED***
+}
 
 // Compile implements Message.
-func (a Affix) Compile(e *Encoder) (err error) ***REMOVED***
+func (a Affix) Compile(e *Encoder) (err error) {
 	// TODO: consider adding a special message type that just adds a single
 	// return. This is probably common enough to handle the majority of cases.
 	// Get some stats first, though.
@@ -412,4 +412,4 @@ func (a Affix) Compile(e *Encoder) (err error) ***REMOVED***
 	e.EncodeString(a.Suffix)
 	e.EncodeMessage(a.Message)
 	return nil
-***REMOVED***
+}

@@ -14,30 +14,30 @@ import (
 	"golang.org/x/text/width"
 )
 
-func ExampleRemove() ***REMOVED***
+func ExampleRemove() {
 	t := transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
 	s, _, _ := transform.String(t, "résumé")
 	fmt.Println(s)
 
 	// Output:
 	// resume
-***REMOVED***
+}
 
-func ExampleMap() ***REMOVED***
-	replaceHyphens := runes.Map(func(r rune) rune ***REMOVED***
-		if unicode.Is(unicode.Hyphen, r) ***REMOVED***
+func ExampleMap() {
+	replaceHyphens := runes.Map(func(r rune) rune {
+		if unicode.Is(unicode.Hyphen, r) {
 			return '|'
-		***REMOVED***
+		}
 		return r
-	***REMOVED***)
+	})
 	s, _, _ := transform.String(replaceHyphens, "a-b‐c⸗d﹣e")
 	fmt.Println(s)
 
 	// Output:
 	// a|b|c|d|e
-***REMOVED***
+}
 
-func ExampleIn() ***REMOVED***
+func ExampleIn() {
 	// Convert Latin characters to their canonical form, while keeping other
 	// width distinctions.
 	t := runes.If(runes.In(unicode.Latin), width.Fold, nil)
@@ -46,15 +46,15 @@ func ExampleIn() ***REMOVED***
 
 	// Output:
 	// ｱﾙｱﾉﾘｳ tech / アルアノリウ tech
-***REMOVED***
+}
 
-func ExampleIf() ***REMOVED***
+func ExampleIf() {
 	// Widen everything but ASCII.
-	isASCII := func(r rune) bool ***REMOVED*** return r <= unicode.MaxASCII ***REMOVED***
+	isASCII := func(r rune) bool { return r <= unicode.MaxASCII }
 	t := runes.If(runes.Predicate(isASCII), nil, width.Widen)
 	s, _, _ := transform.String(t, "ｱﾙｱﾉﾘｳ tech / 中國 / 5₩")
 	fmt.Println(s)
 
 	// Output:
 	// アルアノリウ tech / 中國 / 5￦
-***REMOVED***
+}

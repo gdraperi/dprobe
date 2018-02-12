@@ -44,23 +44,23 @@ const (
 	LogStreamStderr  LogStream = 2
 )
 
-var LogStream_name = map[int32]string***REMOVED***
+var LogStream_name = map[int32]string{
 	0: "LOG_STREAM_UNKNOWN",
 	1: "LOG_STREAM_STDOUT",
 	2: "LOG_STREAM_STDERR",
-***REMOVED***
-var LogStream_value = map[string]int32***REMOVED***
+}
+var LogStream_value = map[string]int32{
 	"LOG_STREAM_UNKNOWN": 0,
 	"LOG_STREAM_STDOUT":  1,
 	"LOG_STREAM_STDERR":  2,
-***REMOVED***
+}
 
-func (x LogStream) String() string ***REMOVED***
+func (x LogStream) String() string {
 	return proto.EnumName(LogStream_name, int32(x))
-***REMOVED***
-func (LogStream) EnumDescriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorLogbroker, []int***REMOVED***0***REMOVED*** ***REMOVED***
+}
+func (LogStream) EnumDescriptor() ([]byte, []int) { return fileDescriptorLogbroker, []int{0} }
 
-type LogSubscriptionOptions struct ***REMOVED***
+type LogSubscriptionOptions struct {
 	// Streams defines which log streams should be sent from the task source.
 	// Empty means send all the messages.
 	Streams []LogStream `protobuf:"varint,1,rep,name=streams,enum=docker.swarmkit.v1.LogStream" json:"streams,omitempty"`
@@ -87,50 +87,50 @@ type LogSubscriptionOptions struct ***REMOVED***
 	// should be sent.
 	// Note: can't use stdtime because this field is nullable.
 	Since *google_protobuf.Timestamp `protobuf:"bytes,4,opt,name=since" json:"since,omitempty"`
-***REMOVED***
+}
 
-func (m *LogSubscriptionOptions) Reset()                    ***REMOVED*** *m = LogSubscriptionOptions***REMOVED******REMOVED*** ***REMOVED***
-func (*LogSubscriptionOptions) ProtoMessage()               ***REMOVED******REMOVED***
-func (*LogSubscriptionOptions) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorLogbroker, []int***REMOVED***0***REMOVED*** ***REMOVED***
+func (m *LogSubscriptionOptions) Reset()                    { *m = LogSubscriptionOptions{} }
+func (*LogSubscriptionOptions) ProtoMessage()               {}
+func (*LogSubscriptionOptions) Descriptor() ([]byte, []int) { return fileDescriptorLogbroker, []int{0} }
 
 // LogSelector will match logs from ANY of the defined parameters.
 //
 // For the best effect, the client should use the least specific parameter
 // possible. For example, if they want to listen to all the tasks of a service,
 // they should use the service id, rather than specifying the individual tasks.
-type LogSelector struct ***REMOVED***
+type LogSelector struct {
 	ServiceIDs []string `protobuf:"bytes,1,rep,name=service_ids,json=serviceIds" json:"service_ids,omitempty"`
 	NodeIDs    []string `protobuf:"bytes,2,rep,name=node_ids,json=nodeIds" json:"node_ids,omitempty"`
 	TaskIDs    []string `protobuf:"bytes,3,rep,name=task_ids,json=taskIds" json:"task_ids,omitempty"`
-***REMOVED***
+}
 
-func (m *LogSelector) Reset()                    ***REMOVED*** *m = LogSelector***REMOVED******REMOVED*** ***REMOVED***
-func (*LogSelector) ProtoMessage()               ***REMOVED******REMOVED***
-func (*LogSelector) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorLogbroker, []int***REMOVED***1***REMOVED*** ***REMOVED***
+func (m *LogSelector) Reset()                    { *m = LogSelector{} }
+func (*LogSelector) ProtoMessage()               {}
+func (*LogSelector) Descriptor() ([]byte, []int) { return fileDescriptorLogbroker, []int{1} }
 
 // LogContext marks the context from which a log message was generated.
-type LogContext struct ***REMOVED***
+type LogContext struct {
 	ServiceID string `protobuf:"bytes,1,opt,name=service_id,json=serviceId,proto3" json:"service_id,omitempty"`
 	NodeID    string `protobuf:"bytes,2,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
 	TaskID    string `protobuf:"bytes,3,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
-***REMOVED***
+}
 
-func (m *LogContext) Reset()                    ***REMOVED*** *m = LogContext***REMOVED******REMOVED*** ***REMOVED***
-func (*LogContext) ProtoMessage()               ***REMOVED******REMOVED***
-func (*LogContext) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorLogbroker, []int***REMOVED***2***REMOVED*** ***REMOVED***
+func (m *LogContext) Reset()                    { *m = LogContext{} }
+func (*LogContext) ProtoMessage()               {}
+func (*LogContext) Descriptor() ([]byte, []int) { return fileDescriptorLogbroker, []int{2} }
 
 // LogAttr is an extra key/value pair that may be have been set by users
-type LogAttr struct ***REMOVED***
+type LogAttr struct {
 	Key   string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 	Value string `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
-***REMOVED***
+}
 
-func (m *LogAttr) Reset()                    ***REMOVED*** *m = LogAttr***REMOVED******REMOVED*** ***REMOVED***
-func (*LogAttr) ProtoMessage()               ***REMOVED******REMOVED***
-func (*LogAttr) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorLogbroker, []int***REMOVED***3***REMOVED*** ***REMOVED***
+func (m *LogAttr) Reset()                    { *m = LogAttr{} }
+func (*LogAttr) ProtoMessage()               {}
+func (*LogAttr) Descriptor() ([]byte, []int) { return fileDescriptorLogbroker, []int{3} }
 
 // LogMessage
-type LogMessage struct ***REMOVED***
+type LogMessage struct {
 	// Context identifies the source of the log message.
 	Context LogContext `protobuf:"bytes,1,opt,name=context" json:"context"`
 	// Timestamp is the time at which the message was generated.
@@ -143,46 +143,46 @@ type LogMessage struct ***REMOVED***
 	// Attrs is a list of key value pairs representing additional log details
 	// that may have been returned from the logger
 	Attrs []LogAttr `protobuf:"bytes,5,rep,name=attrs" json:"attrs"`
-***REMOVED***
+}
 
-func (m *LogMessage) Reset()                    ***REMOVED*** *m = LogMessage***REMOVED******REMOVED*** ***REMOVED***
-func (*LogMessage) ProtoMessage()               ***REMOVED******REMOVED***
-func (*LogMessage) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorLogbroker, []int***REMOVED***4***REMOVED*** ***REMOVED***
+func (m *LogMessage) Reset()                    { *m = LogMessage{} }
+func (*LogMessage) ProtoMessage()               {}
+func (*LogMessage) Descriptor() ([]byte, []int) { return fileDescriptorLogbroker, []int{4} }
 
-type SubscribeLogsRequest struct ***REMOVED***
+type SubscribeLogsRequest struct {
 	// LogSelector describes the logs to which the subscriber is
 	Selector *LogSelector            `protobuf:"bytes,1,opt,name=selector" json:"selector,omitempty"`
 	Options  *LogSubscriptionOptions `protobuf:"bytes,2,opt,name=options" json:"options,omitempty"`
-***REMOVED***
+}
 
-func (m *SubscribeLogsRequest) Reset()                    ***REMOVED*** *m = SubscribeLogsRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*SubscribeLogsRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*SubscribeLogsRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorLogbroker, []int***REMOVED***5***REMOVED*** ***REMOVED***
+func (m *SubscribeLogsRequest) Reset()                    { *m = SubscribeLogsRequest{} }
+func (*SubscribeLogsRequest) ProtoMessage()               {}
+func (*SubscribeLogsRequest) Descriptor() ([]byte, []int) { return fileDescriptorLogbroker, []int{5} }
 
-type SubscribeLogsMessage struct ***REMOVED***
+type SubscribeLogsMessage struct {
 	Messages []LogMessage `protobuf:"bytes,1,rep,name=messages" json:"messages"`
-***REMOVED***
+}
 
-func (m *SubscribeLogsMessage) Reset()                    ***REMOVED*** *m = SubscribeLogsMessage***REMOVED******REMOVED*** ***REMOVED***
-func (*SubscribeLogsMessage) ProtoMessage()               ***REMOVED******REMOVED***
-func (*SubscribeLogsMessage) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorLogbroker, []int***REMOVED***6***REMOVED*** ***REMOVED***
+func (m *SubscribeLogsMessage) Reset()                    { *m = SubscribeLogsMessage{} }
+func (*SubscribeLogsMessage) ProtoMessage()               {}
+func (*SubscribeLogsMessage) Descriptor() ([]byte, []int) { return fileDescriptorLogbroker, []int{6} }
 
 // ListenSubscriptionsRequest is a placeholder to begin listening for
 // subscriptions.
-type ListenSubscriptionsRequest struct ***REMOVED***
-***REMOVED***
+type ListenSubscriptionsRequest struct {
+}
 
-func (m *ListenSubscriptionsRequest) Reset()      ***REMOVED*** *m = ListenSubscriptionsRequest***REMOVED******REMOVED*** ***REMOVED***
-func (*ListenSubscriptionsRequest) ProtoMessage() ***REMOVED******REMOVED***
-func (*ListenSubscriptionsRequest) Descriptor() ([]byte, []int) ***REMOVED***
-	return fileDescriptorLogbroker, []int***REMOVED***7***REMOVED***
-***REMOVED***
+func (m *ListenSubscriptionsRequest) Reset()      { *m = ListenSubscriptionsRequest{} }
+func (*ListenSubscriptionsRequest) ProtoMessage() {}
+func (*ListenSubscriptionsRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorLogbroker, []int{7}
+}
 
 // SubscriptionMessage instructs the listener to start publishing messages for
 // the stream or end a subscription.
 //
 // If Options.Follow == false, the worker should end the subscription on its own.
-type SubscriptionMessage struct ***REMOVED***
+type SubscriptionMessage struct {
 	// ID identifies the subscription.
 	ID string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// Selector defines which sources should be sent for the subscription.
@@ -192,13 +192,13 @@ type SubscriptionMessage struct ***REMOVED***
 	// Close will be true if the node should shutdown the subscription with the
 	// provided identifier.
 	Close bool `protobuf:"varint,4,opt,name=close,proto3" json:"close,omitempty"`
-***REMOVED***
+}
 
-func (m *SubscriptionMessage) Reset()                    ***REMOVED*** *m = SubscriptionMessage***REMOVED******REMOVED*** ***REMOVED***
-func (*SubscriptionMessage) ProtoMessage()               ***REMOVED******REMOVED***
-func (*SubscriptionMessage) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorLogbroker, []int***REMOVED***8***REMOVED*** ***REMOVED***
+func (m *SubscriptionMessage) Reset()                    { *m = SubscriptionMessage{} }
+func (*SubscriptionMessage) ProtoMessage()               {}
+func (*SubscriptionMessage) Descriptor() ([]byte, []int) { return fileDescriptorLogbroker, []int{8} }
 
-type PublishLogsMessage struct ***REMOVED***
+type PublishLogsMessage struct {
 	// SubscriptionID identifies which subscription the set of messages should
 	// be sent to. We can think of this as a "mail box" for the subscription.
 	SubscriptionID string `protobuf:"bytes,1,opt,name=subscription_id,json=subscriptionId,proto3" json:"subscription_id,omitempty"`
@@ -209,20 +209,20 @@ type PublishLogsMessage struct ***REMOVED***
 	// Any further logs from this subscription are an error condition. Any
 	// messages included when close is set can be discarded
 	Close bool `protobuf:"varint,3,opt,name=close,proto3" json:"close,omitempty"`
-***REMOVED***
+}
 
-func (m *PublishLogsMessage) Reset()                    ***REMOVED*** *m = PublishLogsMessage***REMOVED******REMOVED*** ***REMOVED***
-func (*PublishLogsMessage) ProtoMessage()               ***REMOVED******REMOVED***
-func (*PublishLogsMessage) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorLogbroker, []int***REMOVED***9***REMOVED*** ***REMOVED***
+func (m *PublishLogsMessage) Reset()                    { *m = PublishLogsMessage{} }
+func (*PublishLogsMessage) ProtoMessage()               {}
+func (*PublishLogsMessage) Descriptor() ([]byte, []int) { return fileDescriptorLogbroker, []int{9} }
 
-type PublishLogsResponse struct ***REMOVED***
-***REMOVED***
+type PublishLogsResponse struct {
+}
 
-func (m *PublishLogsResponse) Reset()                    ***REMOVED*** *m = PublishLogsResponse***REMOVED******REMOVED*** ***REMOVED***
-func (*PublishLogsResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*PublishLogsResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptorLogbroker, []int***REMOVED***10***REMOVED*** ***REMOVED***
+func (m *PublishLogsResponse) Reset()                    { *m = PublishLogsResponse{} }
+func (*PublishLogsResponse) ProtoMessage()               {}
+func (*PublishLogsResponse) Descriptor() ([]byte, []int) { return fileDescriptorLogbroker, []int{10} }
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*LogSubscriptionOptions)(nil), "docker.swarmkit.v1.LogSubscriptionOptions")
 	proto.RegisterType((*LogSelector)(nil), "docker.swarmkit.v1.LogSelector")
 	proto.RegisterType((*LogContext)(nil), "docker.swarmkit.v1.LogContext")
@@ -235,281 +235,281 @@ func init() ***REMOVED***
 	proto.RegisterType((*PublishLogsMessage)(nil), "docker.swarmkit.v1.PublishLogsMessage")
 	proto.RegisterType((*PublishLogsResponse)(nil), "docker.swarmkit.v1.PublishLogsResponse")
 	proto.RegisterEnum("docker.swarmkit.v1.LogStream", LogStream_name, LogStream_value)
-***REMOVED***
+}
 
-type authenticatedWrapperLogsServer struct ***REMOVED***
+type authenticatedWrapperLogsServer struct {
 	local     LogsServer
 	authorize func(context.Context, []string) error
-***REMOVED***
+}
 
-func NewAuthenticatedWrapperLogsServer(local LogsServer, authorize func(context.Context, []string) error) LogsServer ***REMOVED***
-	return &authenticatedWrapperLogsServer***REMOVED***
+func NewAuthenticatedWrapperLogsServer(local LogsServer, authorize func(context.Context, []string) error) LogsServer {
+	return &authenticatedWrapperLogsServer{
 		local:     local,
 		authorize: authorize,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (p *authenticatedWrapperLogsServer) SubscribeLogs(r *SubscribeLogsRequest, stream Logs_SubscribeLogsServer) error ***REMOVED***
+func (p *authenticatedWrapperLogsServer) SubscribeLogs(r *SubscribeLogsRequest, stream Logs_SubscribeLogsServer) error {
 
-	if err := p.authorize(stream.Context(), []string***REMOVED***"swarm-manager"***REMOVED***); err != nil ***REMOVED***
+	if err := p.authorize(stream.Context(), []string{"swarm-manager"}); err != nil {
 		return err
-	***REMOVED***
+	}
 	return p.local.SubscribeLogs(r, stream)
-***REMOVED***
+}
 
-type authenticatedWrapperLogBrokerServer struct ***REMOVED***
+type authenticatedWrapperLogBrokerServer struct {
 	local     LogBrokerServer
 	authorize func(context.Context, []string) error
-***REMOVED***
+}
 
-func NewAuthenticatedWrapperLogBrokerServer(local LogBrokerServer, authorize func(context.Context, []string) error) LogBrokerServer ***REMOVED***
-	return &authenticatedWrapperLogBrokerServer***REMOVED***
+func NewAuthenticatedWrapperLogBrokerServer(local LogBrokerServer, authorize func(context.Context, []string) error) LogBrokerServer {
+	return &authenticatedWrapperLogBrokerServer{
 		local:     local,
 		authorize: authorize,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (p *authenticatedWrapperLogBrokerServer) ListenSubscriptions(r *ListenSubscriptionsRequest, stream LogBroker_ListenSubscriptionsServer) error ***REMOVED***
+func (p *authenticatedWrapperLogBrokerServer) ListenSubscriptions(r *ListenSubscriptionsRequest, stream LogBroker_ListenSubscriptionsServer) error {
 
-	if err := p.authorize(stream.Context(), []string***REMOVED***"swarm-worker", "swarm-manager"***REMOVED***); err != nil ***REMOVED***
+	if err := p.authorize(stream.Context(), []string{"swarm-worker", "swarm-manager"}); err != nil {
 		return err
-	***REMOVED***
+	}
 	return p.local.ListenSubscriptions(r, stream)
-***REMOVED***
+}
 
-func (p *authenticatedWrapperLogBrokerServer) PublishLogs(stream LogBroker_PublishLogsServer) error ***REMOVED***
+func (p *authenticatedWrapperLogBrokerServer) PublishLogs(stream LogBroker_PublishLogsServer) error {
 
-	if err := p.authorize(stream.Context(), []string***REMOVED***"swarm-worker", "swarm-manager"***REMOVED***); err != nil ***REMOVED***
+	if err := p.authorize(stream.Context(), []string{"swarm-worker", "swarm-manager"}); err != nil {
 		return err
-	***REMOVED***
+	}
 	return p.local.PublishLogs(stream)
-***REMOVED***
+}
 
-func (m *LogSubscriptionOptions) Copy() *LogSubscriptionOptions ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *LogSubscriptionOptions) Copy() *LogSubscriptionOptions {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &LogSubscriptionOptions***REMOVED******REMOVED***
+	}
+	o := &LogSubscriptionOptions{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *LogSubscriptionOptions) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *LogSubscriptionOptions) CopyFrom(src interface{}) {
 
 	o := src.(*LogSubscriptionOptions)
 	*m = *o
-	if o.Streams != nil ***REMOVED***
+	if o.Streams != nil {
 		m.Streams = make([]LogStream, len(o.Streams))
 		copy(m.Streams, o.Streams)
-	***REMOVED***
+	}
 
-	if o.Since != nil ***REMOVED***
-		m.Since = &google_protobuf.Timestamp***REMOVED******REMOVED***
+	if o.Since != nil {
+		m.Since = &google_protobuf.Timestamp{}
 		github_com_docker_swarmkit_api_deepcopy.Copy(m.Since, o.Since)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (m *LogSelector) Copy() *LogSelector ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *LogSelector) Copy() *LogSelector {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &LogSelector***REMOVED******REMOVED***
+	}
+	o := &LogSelector{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *LogSelector) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *LogSelector) CopyFrom(src interface{}) {
 
 	o := src.(*LogSelector)
 	*m = *o
-	if o.ServiceIDs != nil ***REMOVED***
+	if o.ServiceIDs != nil {
 		m.ServiceIDs = make([]string, len(o.ServiceIDs))
 		copy(m.ServiceIDs, o.ServiceIDs)
-	***REMOVED***
+	}
 
-	if o.NodeIDs != nil ***REMOVED***
+	if o.NodeIDs != nil {
 		m.NodeIDs = make([]string, len(o.NodeIDs))
 		copy(m.NodeIDs, o.NodeIDs)
-	***REMOVED***
+	}
 
-	if o.TaskIDs != nil ***REMOVED***
+	if o.TaskIDs != nil {
 		m.TaskIDs = make([]string, len(o.TaskIDs))
 		copy(m.TaskIDs, o.TaskIDs)
-	***REMOVED***
+	}
 
-***REMOVED***
+}
 
-func (m *LogContext) Copy() *LogContext ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *LogContext) Copy() *LogContext {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &LogContext***REMOVED******REMOVED***
+	}
+	o := &LogContext{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *LogContext) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *LogContext) CopyFrom(src interface{}) {
 
 	o := src.(*LogContext)
 	*m = *o
-***REMOVED***
+}
 
-func (m *LogAttr) Copy() *LogAttr ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *LogAttr) Copy() *LogAttr {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &LogAttr***REMOVED******REMOVED***
+	}
+	o := &LogAttr{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *LogAttr) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *LogAttr) CopyFrom(src interface{}) {
 
 	o := src.(*LogAttr)
 	*m = *o
-***REMOVED***
+}
 
-func (m *LogMessage) Copy() *LogMessage ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *LogMessage) Copy() *LogMessage {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &LogMessage***REMOVED******REMOVED***
+	}
+	o := &LogMessage{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *LogMessage) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *LogMessage) CopyFrom(src interface{}) {
 
 	o := src.(*LogMessage)
 	*m = *o
 	github_com_docker_swarmkit_api_deepcopy.Copy(&m.Context, &o.Context)
-	if o.Timestamp != nil ***REMOVED***
-		m.Timestamp = &google_protobuf.Timestamp***REMOVED******REMOVED***
+	if o.Timestamp != nil {
+		m.Timestamp = &google_protobuf.Timestamp{}
 		github_com_docker_swarmkit_api_deepcopy.Copy(m.Timestamp, o.Timestamp)
-	***REMOVED***
-	if o.Data != nil ***REMOVED***
+	}
+	if o.Data != nil {
 		m.Data = make([]byte, len(o.Data))
 		copy(m.Data, o.Data)
-	***REMOVED***
-	if o.Attrs != nil ***REMOVED***
+	}
+	if o.Attrs != nil {
 		m.Attrs = make([]LogAttr, len(o.Attrs))
-		for i := range m.Attrs ***REMOVED***
+		for i := range m.Attrs {
 			github_com_docker_swarmkit_api_deepcopy.Copy(&m.Attrs[i], &o.Attrs[i])
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-***REMOVED***
+}
 
-func (m *SubscribeLogsRequest) Copy() *SubscribeLogsRequest ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *SubscribeLogsRequest) Copy() *SubscribeLogsRequest {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &SubscribeLogsRequest***REMOVED******REMOVED***
+	}
+	o := &SubscribeLogsRequest{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *SubscribeLogsRequest) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *SubscribeLogsRequest) CopyFrom(src interface{}) {
 
 	o := src.(*SubscribeLogsRequest)
 	*m = *o
-	if o.Selector != nil ***REMOVED***
-		m.Selector = &LogSelector***REMOVED******REMOVED***
+	if o.Selector != nil {
+		m.Selector = &LogSelector{}
 		github_com_docker_swarmkit_api_deepcopy.Copy(m.Selector, o.Selector)
-	***REMOVED***
-	if o.Options != nil ***REMOVED***
-		m.Options = &LogSubscriptionOptions***REMOVED******REMOVED***
+	}
+	if o.Options != nil {
+		m.Options = &LogSubscriptionOptions{}
 		github_com_docker_swarmkit_api_deepcopy.Copy(m.Options, o.Options)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (m *SubscribeLogsMessage) Copy() *SubscribeLogsMessage ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *SubscribeLogsMessage) Copy() *SubscribeLogsMessage {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &SubscribeLogsMessage***REMOVED******REMOVED***
+	}
+	o := &SubscribeLogsMessage{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *SubscribeLogsMessage) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *SubscribeLogsMessage) CopyFrom(src interface{}) {
 
 	o := src.(*SubscribeLogsMessage)
 	*m = *o
-	if o.Messages != nil ***REMOVED***
+	if o.Messages != nil {
 		m.Messages = make([]LogMessage, len(o.Messages))
-		for i := range m.Messages ***REMOVED***
+		for i := range m.Messages {
 			github_com_docker_swarmkit_api_deepcopy.Copy(&m.Messages[i], &o.Messages[i])
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-***REMOVED***
+}
 
-func (m *ListenSubscriptionsRequest) Copy() *ListenSubscriptionsRequest ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *ListenSubscriptionsRequest) Copy() *ListenSubscriptionsRequest {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &ListenSubscriptionsRequest***REMOVED******REMOVED***
+	}
+	o := &ListenSubscriptionsRequest{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *ListenSubscriptionsRequest) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED******REMOVED***
-func (m *SubscriptionMessage) Copy() *SubscriptionMessage ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *ListenSubscriptionsRequest) CopyFrom(src interface{}) {}
+func (m *SubscriptionMessage) Copy() *SubscriptionMessage {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &SubscriptionMessage***REMOVED******REMOVED***
+	}
+	o := &SubscriptionMessage{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *SubscriptionMessage) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *SubscriptionMessage) CopyFrom(src interface{}) {
 
 	o := src.(*SubscriptionMessage)
 	*m = *o
-	if o.Selector != nil ***REMOVED***
-		m.Selector = &LogSelector***REMOVED******REMOVED***
+	if o.Selector != nil {
+		m.Selector = &LogSelector{}
 		github_com_docker_swarmkit_api_deepcopy.Copy(m.Selector, o.Selector)
-	***REMOVED***
-	if o.Options != nil ***REMOVED***
-		m.Options = &LogSubscriptionOptions***REMOVED******REMOVED***
+	}
+	if o.Options != nil {
+		m.Options = &LogSubscriptionOptions{}
 		github_com_docker_swarmkit_api_deepcopy.Copy(m.Options, o.Options)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (m *PublishLogsMessage) Copy() *PublishLogsMessage ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *PublishLogsMessage) Copy() *PublishLogsMessage {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &PublishLogsMessage***REMOVED******REMOVED***
+	}
+	o := &PublishLogsMessage{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *PublishLogsMessage) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED***
+func (m *PublishLogsMessage) CopyFrom(src interface{}) {
 
 	o := src.(*PublishLogsMessage)
 	*m = *o
-	if o.Messages != nil ***REMOVED***
+	if o.Messages != nil {
 		m.Messages = make([]LogMessage, len(o.Messages))
-		for i := range m.Messages ***REMOVED***
+		for i := range m.Messages {
 			github_com_docker_swarmkit_api_deepcopy.Copy(&m.Messages[i], &o.Messages[i])
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-***REMOVED***
+}
 
-func (m *PublishLogsResponse) Copy() *PublishLogsResponse ***REMOVED***
-	if m == nil ***REMOVED***
+func (m *PublishLogsResponse) Copy() *PublishLogsResponse {
+	if m == nil {
 		return nil
-	***REMOVED***
-	o := &PublishLogsResponse***REMOVED******REMOVED***
+	}
+	o := &PublishLogsResponse{}
 	o.CopyFrom(m)
 	return o
-***REMOVED***
+}
 
-func (m *PublishLogsResponse) CopyFrom(src interface***REMOVED******REMOVED***) ***REMOVED******REMOVED***
+func (m *PublishLogsResponse) CopyFrom(src interface{}) {}
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
@@ -521,7 +521,7 @@ const _ = grpc.SupportPackageIsVersion4
 
 // Client API for Logs service
 
-type LogsClient interface ***REMOVED***
+type LogsClient interface {
 	// SubscribeLogs starts a subscription with the specified selector and options.
 	//
 	// The subscription will be distributed to relevant nodes and messages will
@@ -529,51 +529,51 @@ type LogsClient interface ***REMOVED***
 	//
 	// The subscription will end with an EOF.
 	SubscribeLogs(ctx context.Context, in *SubscribeLogsRequest, opts ...grpc.CallOption) (Logs_SubscribeLogsClient, error)
-***REMOVED***
+}
 
-type logsClient struct ***REMOVED***
+type logsClient struct {
 	cc *grpc.ClientConn
-***REMOVED***
+}
 
-func NewLogsClient(cc *grpc.ClientConn) LogsClient ***REMOVED***
-	return &logsClient***REMOVED***cc***REMOVED***
-***REMOVED***
+func NewLogsClient(cc *grpc.ClientConn) LogsClient {
+	return &logsClient{cc}
+}
 
-func (c *logsClient) SubscribeLogs(ctx context.Context, in *SubscribeLogsRequest, opts ...grpc.CallOption) (Logs_SubscribeLogsClient, error) ***REMOVED***
+func (c *logsClient) SubscribeLogs(ctx context.Context, in *SubscribeLogsRequest, opts ...grpc.CallOption) (Logs_SubscribeLogsClient, error) {
 	stream, err := grpc.NewClientStream(ctx, &_Logs_serviceDesc.Streams[0], c.cc, "/docker.swarmkit.v1.Logs/SubscribeLogs", opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	x := &logsSubscribeLogsClient***REMOVED***stream***REMOVED***
-	if err := x.ClientStream.SendMsg(in); err != nil ***REMOVED***
+	}
+	x := &logsSubscribeLogsClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if err := x.ClientStream.CloseSend(); err != nil ***REMOVED***
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return x, nil
-***REMOVED***
+}
 
-type Logs_SubscribeLogsClient interface ***REMOVED***
+type Logs_SubscribeLogsClient interface {
 	Recv() (*SubscribeLogsMessage, error)
 	grpc.ClientStream
-***REMOVED***
+}
 
-type logsSubscribeLogsClient struct ***REMOVED***
+type logsSubscribeLogsClient struct {
 	grpc.ClientStream
-***REMOVED***
+}
 
-func (x *logsSubscribeLogsClient) Recv() (*SubscribeLogsMessage, error) ***REMOVED***
+func (x *logsSubscribeLogsClient) Recv() (*SubscribeLogsMessage, error) {
 	m := new(SubscribeLogsMessage)
-	if err := x.ClientStream.RecvMsg(m); err != nil ***REMOVED***
+	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return m, nil
-***REMOVED***
+}
 
 // Server API for Logs service
 
-type LogsServer interface ***REMOVED***
+type LogsServer interface {
 	// SubscribeLogs starts a subscription with the specified selector and options.
 	//
 	// The subscription will be distributed to relevant nodes and messages will
@@ -581,50 +581,50 @@ type LogsServer interface ***REMOVED***
 	//
 	// The subscription will end with an EOF.
 	SubscribeLogs(*SubscribeLogsRequest, Logs_SubscribeLogsServer) error
-***REMOVED***
+}
 
-func RegisterLogsServer(s *grpc.Server, srv LogsServer) ***REMOVED***
+func RegisterLogsServer(s *grpc.Server, srv LogsServer) {
 	s.RegisterService(&_Logs_serviceDesc, srv)
-***REMOVED***
+}
 
-func _Logs_SubscribeLogs_Handler(srv interface***REMOVED******REMOVED***, stream grpc.ServerStream) error ***REMOVED***
+func _Logs_SubscribeLogs_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(SubscribeLogsRequest)
-	if err := stream.RecvMsg(m); err != nil ***REMOVED***
+	if err := stream.RecvMsg(m); err != nil {
 		return err
-	***REMOVED***
-	return srv.(LogsServer).SubscribeLogs(m, &logsSubscribeLogsServer***REMOVED***stream***REMOVED***)
-***REMOVED***
+	}
+	return srv.(LogsServer).SubscribeLogs(m, &logsSubscribeLogsServer{stream})
+}
 
-type Logs_SubscribeLogsServer interface ***REMOVED***
+type Logs_SubscribeLogsServer interface {
 	Send(*SubscribeLogsMessage) error
 	grpc.ServerStream
-***REMOVED***
+}
 
-type logsSubscribeLogsServer struct ***REMOVED***
+type logsSubscribeLogsServer struct {
 	grpc.ServerStream
-***REMOVED***
+}
 
-func (x *logsSubscribeLogsServer) Send(m *SubscribeLogsMessage) error ***REMOVED***
+func (x *logsSubscribeLogsServer) Send(m *SubscribeLogsMessage) error {
 	return x.ServerStream.SendMsg(m)
-***REMOVED***
+}
 
-var _Logs_serviceDesc = grpc.ServiceDesc***REMOVED***
+var _Logs_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "docker.swarmkit.v1.Logs",
 	HandlerType: (*LogsServer)(nil),
-	Methods:     []grpc.MethodDesc***REMOVED******REMOVED***,
-	Streams: []grpc.StreamDesc***REMOVED***
-		***REMOVED***
+	Methods:     []grpc.MethodDesc{},
+	Streams: []grpc.StreamDesc{
+		{
 			StreamName:    "SubscribeLogs",
 			Handler:       _Logs_SubscribeLogs_Handler,
 			ServerStreams: true,
-		***REMOVED***,
-	***REMOVED***,
+		},
+	},
 	Metadata: "github.com/docker/swarmkit/api/logbroker.proto",
-***REMOVED***
+}
 
 // Client API for LogBroker service
 
-type LogBrokerClient interface ***REMOVED***
+type LogBrokerClient interface {
 	// ListenSubscriptions starts a subscription stream for the node. For each
 	// message received, the node should attempt to satisfy the subscription.
 	//
@@ -634,85 +634,85 @@ type LogBrokerClient interface ***REMOVED***
 	// PublishLogs receives sets of log messages destined for a single
 	// subscription identifier.
 	PublishLogs(ctx context.Context, opts ...grpc.CallOption) (LogBroker_PublishLogsClient, error)
-***REMOVED***
+}
 
-type logBrokerClient struct ***REMOVED***
+type logBrokerClient struct {
 	cc *grpc.ClientConn
-***REMOVED***
+}
 
-func NewLogBrokerClient(cc *grpc.ClientConn) LogBrokerClient ***REMOVED***
-	return &logBrokerClient***REMOVED***cc***REMOVED***
-***REMOVED***
+func NewLogBrokerClient(cc *grpc.ClientConn) LogBrokerClient {
+	return &logBrokerClient{cc}
+}
 
-func (c *logBrokerClient) ListenSubscriptions(ctx context.Context, in *ListenSubscriptionsRequest, opts ...grpc.CallOption) (LogBroker_ListenSubscriptionsClient, error) ***REMOVED***
+func (c *logBrokerClient) ListenSubscriptions(ctx context.Context, in *ListenSubscriptionsRequest, opts ...grpc.CallOption) (LogBroker_ListenSubscriptionsClient, error) {
 	stream, err := grpc.NewClientStream(ctx, &_LogBroker_serviceDesc.Streams[0], c.cc, "/docker.swarmkit.v1.LogBroker/ListenSubscriptions", opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	x := &logBrokerListenSubscriptionsClient***REMOVED***stream***REMOVED***
-	if err := x.ClientStream.SendMsg(in); err != nil ***REMOVED***
+	}
+	x := &logBrokerListenSubscriptionsClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if err := x.ClientStream.CloseSend(); err != nil ***REMOVED***
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return x, nil
-***REMOVED***
+}
 
-type LogBroker_ListenSubscriptionsClient interface ***REMOVED***
+type LogBroker_ListenSubscriptionsClient interface {
 	Recv() (*SubscriptionMessage, error)
 	grpc.ClientStream
-***REMOVED***
+}
 
-type logBrokerListenSubscriptionsClient struct ***REMOVED***
+type logBrokerListenSubscriptionsClient struct {
 	grpc.ClientStream
-***REMOVED***
+}
 
-func (x *logBrokerListenSubscriptionsClient) Recv() (*SubscriptionMessage, error) ***REMOVED***
+func (x *logBrokerListenSubscriptionsClient) Recv() (*SubscriptionMessage, error) {
 	m := new(SubscriptionMessage)
-	if err := x.ClientStream.RecvMsg(m); err != nil ***REMOVED***
+	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return m, nil
-***REMOVED***
+}
 
-func (c *logBrokerClient) PublishLogs(ctx context.Context, opts ...grpc.CallOption) (LogBroker_PublishLogsClient, error) ***REMOVED***
+func (c *logBrokerClient) PublishLogs(ctx context.Context, opts ...grpc.CallOption) (LogBroker_PublishLogsClient, error) {
 	stream, err := grpc.NewClientStream(ctx, &_LogBroker_serviceDesc.Streams[1], c.cc, "/docker.swarmkit.v1.LogBroker/PublishLogs", opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	x := &logBrokerPublishLogsClient***REMOVED***stream***REMOVED***
+	}
+	x := &logBrokerPublishLogsClient{stream}
 	return x, nil
-***REMOVED***
+}
 
-type LogBroker_PublishLogsClient interface ***REMOVED***
+type LogBroker_PublishLogsClient interface {
 	Send(*PublishLogsMessage) error
 	CloseAndRecv() (*PublishLogsResponse, error)
 	grpc.ClientStream
-***REMOVED***
+}
 
-type logBrokerPublishLogsClient struct ***REMOVED***
+type logBrokerPublishLogsClient struct {
 	grpc.ClientStream
-***REMOVED***
+}
 
-func (x *logBrokerPublishLogsClient) Send(m *PublishLogsMessage) error ***REMOVED***
+func (x *logBrokerPublishLogsClient) Send(m *PublishLogsMessage) error {
 	return x.ClientStream.SendMsg(m)
-***REMOVED***
+}
 
-func (x *logBrokerPublishLogsClient) CloseAndRecv() (*PublishLogsResponse, error) ***REMOVED***
-	if err := x.ClientStream.CloseSend(); err != nil ***REMOVED***
+func (x *logBrokerPublishLogsClient) CloseAndRecv() (*PublishLogsResponse, error) {
+	if err := x.ClientStream.CloseSend(); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	m := new(PublishLogsResponse)
-	if err := x.ClientStream.RecvMsg(m); err != nil ***REMOVED***
+	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return m, nil
-***REMOVED***
+}
 
 // Server API for LogBroker service
 
-type LogBrokerServer interface ***REMOVED***
+type LogBrokerServer interface {
 	// ListenSubscriptions starts a subscription stream for the node. For each
 	// message received, the node should attempt to satisfy the subscription.
 	//
@@ -722,268 +722,268 @@ type LogBrokerServer interface ***REMOVED***
 	// PublishLogs receives sets of log messages destined for a single
 	// subscription identifier.
 	PublishLogs(LogBroker_PublishLogsServer) error
-***REMOVED***
+}
 
-func RegisterLogBrokerServer(s *grpc.Server, srv LogBrokerServer) ***REMOVED***
+func RegisterLogBrokerServer(s *grpc.Server, srv LogBrokerServer) {
 	s.RegisterService(&_LogBroker_serviceDesc, srv)
-***REMOVED***
+}
 
-func _LogBroker_ListenSubscriptions_Handler(srv interface***REMOVED******REMOVED***, stream grpc.ServerStream) error ***REMOVED***
+func _LogBroker_ListenSubscriptions_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(ListenSubscriptionsRequest)
-	if err := stream.RecvMsg(m); err != nil ***REMOVED***
+	if err := stream.RecvMsg(m); err != nil {
 		return err
-	***REMOVED***
-	return srv.(LogBrokerServer).ListenSubscriptions(m, &logBrokerListenSubscriptionsServer***REMOVED***stream***REMOVED***)
-***REMOVED***
+	}
+	return srv.(LogBrokerServer).ListenSubscriptions(m, &logBrokerListenSubscriptionsServer{stream})
+}
 
-type LogBroker_ListenSubscriptionsServer interface ***REMOVED***
+type LogBroker_ListenSubscriptionsServer interface {
 	Send(*SubscriptionMessage) error
 	grpc.ServerStream
-***REMOVED***
+}
 
-type logBrokerListenSubscriptionsServer struct ***REMOVED***
+type logBrokerListenSubscriptionsServer struct {
 	grpc.ServerStream
-***REMOVED***
+}
 
-func (x *logBrokerListenSubscriptionsServer) Send(m *SubscriptionMessage) error ***REMOVED***
+func (x *logBrokerListenSubscriptionsServer) Send(m *SubscriptionMessage) error {
 	return x.ServerStream.SendMsg(m)
-***REMOVED***
+}
 
-func _LogBroker_PublishLogs_Handler(srv interface***REMOVED******REMOVED***, stream grpc.ServerStream) error ***REMOVED***
-	return srv.(LogBrokerServer).PublishLogs(&logBrokerPublishLogsServer***REMOVED***stream***REMOVED***)
-***REMOVED***
+func _LogBroker_PublishLogs_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(LogBrokerServer).PublishLogs(&logBrokerPublishLogsServer{stream})
+}
 
-type LogBroker_PublishLogsServer interface ***REMOVED***
+type LogBroker_PublishLogsServer interface {
 	SendAndClose(*PublishLogsResponse) error
 	Recv() (*PublishLogsMessage, error)
 	grpc.ServerStream
-***REMOVED***
+}
 
-type logBrokerPublishLogsServer struct ***REMOVED***
+type logBrokerPublishLogsServer struct {
 	grpc.ServerStream
-***REMOVED***
+}
 
-func (x *logBrokerPublishLogsServer) SendAndClose(m *PublishLogsResponse) error ***REMOVED***
+func (x *logBrokerPublishLogsServer) SendAndClose(m *PublishLogsResponse) error {
 	return x.ServerStream.SendMsg(m)
-***REMOVED***
+}
 
-func (x *logBrokerPublishLogsServer) Recv() (*PublishLogsMessage, error) ***REMOVED***
+func (x *logBrokerPublishLogsServer) Recv() (*PublishLogsMessage, error) {
 	m := new(PublishLogsMessage)
-	if err := x.ServerStream.RecvMsg(m); err != nil ***REMOVED***
+	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return m, nil
-***REMOVED***
+}
 
-var _LogBroker_serviceDesc = grpc.ServiceDesc***REMOVED***
+var _LogBroker_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "docker.swarmkit.v1.LogBroker",
 	HandlerType: (*LogBrokerServer)(nil),
-	Methods:     []grpc.MethodDesc***REMOVED******REMOVED***,
-	Streams: []grpc.StreamDesc***REMOVED***
-		***REMOVED***
+	Methods:     []grpc.MethodDesc{},
+	Streams: []grpc.StreamDesc{
+		{
 			StreamName:    "ListenSubscriptions",
 			Handler:       _LogBroker_ListenSubscriptions_Handler,
 			ServerStreams: true,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			StreamName:    "PublishLogs",
 			Handler:       _LogBroker_PublishLogs_Handler,
 			ClientStreams: true,
-		***REMOVED***,
-	***REMOVED***,
+		},
+	},
 	Metadata: "github.com/docker/swarmkit/api/logbroker.proto",
-***REMOVED***
+}
 
-func (m *LogSubscriptionOptions) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *LogSubscriptionOptions) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *LogSubscriptionOptions) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *LogSubscriptionOptions) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Streams) > 0 ***REMOVED***
-		for _, num := range m.Streams ***REMOVED***
+	if len(m.Streams) > 0 {
+		for _, num := range m.Streams {
 			dAtA[i] = 0x8
 			i++
 			i = encodeVarintLogbroker(dAtA, i, uint64(num))
-		***REMOVED***
-	***REMOVED***
-	if m.Follow ***REMOVED***
+		}
+	}
+	if m.Follow {
 		dAtA[i] = 0x10
 		i++
-		if m.Follow ***REMOVED***
+		if m.Follow {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
-	if m.Tail != 0 ***REMOVED***
+	}
+	if m.Tail != 0 {
 		dAtA[i] = 0x18
 		i++
 		i = encodeVarintLogbroker(dAtA, i, uint64(m.Tail))
-	***REMOVED***
-	if m.Since != nil ***REMOVED***
+	}
+	if m.Since != nil {
 		dAtA[i] = 0x22
 		i++
 		i = encodeVarintLogbroker(dAtA, i, uint64(m.Since.Size()))
 		n1, err := m.Since.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n1
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *LogSelector) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *LogSelector) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *LogSelector) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *LogSelector) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ServiceIDs) > 0 ***REMOVED***
-		for _, s := range m.ServiceIDs ***REMOVED***
+	if len(m.ServiceIDs) > 0 {
+		for _, s := range m.ServiceIDs {
 			dAtA[i] = 0xa
 			i++
 			l = len(s)
-			for l >= 1<<7 ***REMOVED***
+			for l >= 1<<7 {
 				dAtA[i] = uint8(uint64(l)&0x7f | 0x80)
 				l >>= 7
 				i++
-			***REMOVED***
+			}
 			dAtA[i] = uint8(l)
 			i++
 			i += copy(dAtA[i:], s)
-		***REMOVED***
-	***REMOVED***
-	if len(m.NodeIDs) > 0 ***REMOVED***
-		for _, s := range m.NodeIDs ***REMOVED***
+		}
+	}
+	if len(m.NodeIDs) > 0 {
+		for _, s := range m.NodeIDs {
 			dAtA[i] = 0x12
 			i++
 			l = len(s)
-			for l >= 1<<7 ***REMOVED***
+			for l >= 1<<7 {
 				dAtA[i] = uint8(uint64(l)&0x7f | 0x80)
 				l >>= 7
 				i++
-			***REMOVED***
+			}
 			dAtA[i] = uint8(l)
 			i++
 			i += copy(dAtA[i:], s)
-		***REMOVED***
-	***REMOVED***
-	if len(m.TaskIDs) > 0 ***REMOVED***
-		for _, s := range m.TaskIDs ***REMOVED***
+		}
+	}
+	if len(m.TaskIDs) > 0 {
+		for _, s := range m.TaskIDs {
 			dAtA[i] = 0x1a
 			i++
 			l = len(s)
-			for l >= 1<<7 ***REMOVED***
+			for l >= 1<<7 {
 				dAtA[i] = uint8(uint64(l)&0x7f | 0x80)
 				l >>= 7
 				i++
-			***REMOVED***
+			}
 			dAtA[i] = uint8(l)
 			i++
 			i += copy(dAtA[i:], s)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *LogContext) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *LogContext) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *LogContext) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *LogContext) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ServiceID) > 0 ***REMOVED***
+	if len(m.ServiceID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintLogbroker(dAtA, i, uint64(len(m.ServiceID)))
 		i += copy(dAtA[i:], m.ServiceID)
-	***REMOVED***
-	if len(m.NodeID) > 0 ***REMOVED***
+	}
+	if len(m.NodeID) > 0 {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintLogbroker(dAtA, i, uint64(len(m.NodeID)))
 		i += copy(dAtA[i:], m.NodeID)
-	***REMOVED***
-	if len(m.TaskID) > 0 ***REMOVED***
+	}
+	if len(m.TaskID) > 0 {
 		dAtA[i] = 0x1a
 		i++
 		i = encodeVarintLogbroker(dAtA, i, uint64(len(m.TaskID)))
 		i += copy(dAtA[i:], m.TaskID)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *LogAttr) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *LogAttr) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *LogAttr) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *LogAttr) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Key) > 0 ***REMOVED***
+	if len(m.Key) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintLogbroker(dAtA, i, uint64(len(m.Key)))
 		i += copy(dAtA[i:], m.Key)
-	***REMOVED***
-	if len(m.Value) > 0 ***REMOVED***
+	}
+	if len(m.Value) > 0 {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintLogbroker(dAtA, i, uint64(len(m.Value)))
 		i += copy(dAtA[i:], m.Value)
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *LogMessage) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *LogMessage) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *LogMessage) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *LogMessage) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -992,251 +992,251 @@ func (m *LogMessage) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
 	i++
 	i = encodeVarintLogbroker(dAtA, i, uint64(m.Context.Size()))
 	n2, err := m.Context.MarshalTo(dAtA[i:])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	i += n2
-	if m.Timestamp != nil ***REMOVED***
+	if m.Timestamp != nil {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintLogbroker(dAtA, i, uint64(m.Timestamp.Size()))
 		n3, err := m.Timestamp.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n3
-	***REMOVED***
-	if m.Stream != 0 ***REMOVED***
+	}
+	if m.Stream != 0 {
 		dAtA[i] = 0x18
 		i++
 		i = encodeVarintLogbroker(dAtA, i, uint64(m.Stream))
-	***REMOVED***
-	if len(m.Data) > 0 ***REMOVED***
+	}
+	if len(m.Data) > 0 {
 		dAtA[i] = 0x22
 		i++
 		i = encodeVarintLogbroker(dAtA, i, uint64(len(m.Data)))
 		i += copy(dAtA[i:], m.Data)
-	***REMOVED***
-	if len(m.Attrs) > 0 ***REMOVED***
-		for _, msg := range m.Attrs ***REMOVED***
+	}
+	if len(m.Attrs) > 0 {
+		for _, msg := range m.Attrs {
 			dAtA[i] = 0x2a
 			i++
 			i = encodeVarintLogbroker(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			i += n
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *SubscribeLogsRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *SubscribeLogsRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *SubscribeLogsRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *SubscribeLogsRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.Selector != nil ***REMOVED***
+	if m.Selector != nil {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintLogbroker(dAtA, i, uint64(m.Selector.Size()))
 		n4, err := m.Selector.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n4
-	***REMOVED***
-	if m.Options != nil ***REMOVED***
+	}
+	if m.Options != nil {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintLogbroker(dAtA, i, uint64(m.Options.Size()))
 		n5, err := m.Options.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n5
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *SubscribeLogsMessage) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *SubscribeLogsMessage) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *SubscribeLogsMessage) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *SubscribeLogsMessage) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Messages) > 0 ***REMOVED***
-		for _, msg := range m.Messages ***REMOVED***
+	if len(m.Messages) > 0 {
+		for _, msg := range m.Messages {
 			dAtA[i] = 0xa
 			i++
 			i = encodeVarintLogbroker(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			i += n
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *ListenSubscriptionsRequest) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *ListenSubscriptionsRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *ListenSubscriptionsRequest) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *ListenSubscriptionsRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
 	return i, nil
-***REMOVED***
+}
 
-func (m *SubscriptionMessage) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *SubscriptionMessage) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *SubscriptionMessage) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *SubscriptionMessage) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.ID) > 0 ***REMOVED***
+	if len(m.ID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintLogbroker(dAtA, i, uint64(len(m.ID)))
 		i += copy(dAtA[i:], m.ID)
-	***REMOVED***
-	if m.Selector != nil ***REMOVED***
+	}
+	if m.Selector != nil {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintLogbroker(dAtA, i, uint64(m.Selector.Size()))
 		n6, err := m.Selector.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n6
-	***REMOVED***
-	if m.Options != nil ***REMOVED***
+	}
+	if m.Options != nil {
 		dAtA[i] = 0x1a
 		i++
 		i = encodeVarintLogbroker(dAtA, i, uint64(m.Options.Size()))
 		n7, err := m.Options.MarshalTo(dAtA[i:])
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		i += n7
-	***REMOVED***
-	if m.Close ***REMOVED***
+	}
+	if m.Close {
 		dAtA[i] = 0x20
 		i++
-		if m.Close ***REMOVED***
+		if m.Close {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *PublishLogsMessage) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *PublishLogsMessage) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *PublishLogsMessage) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *PublishLogsMessage) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.SubscriptionID) > 0 ***REMOVED***
+	if len(m.SubscriptionID) > 0 {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintLogbroker(dAtA, i, uint64(len(m.SubscriptionID)))
 		i += copy(dAtA[i:], m.SubscriptionID)
-	***REMOVED***
-	if len(m.Messages) > 0 ***REMOVED***
-		for _, msg := range m.Messages ***REMOVED***
+	}
+	if len(m.Messages) > 0 {
+		for _, msg := range m.Messages {
 			dAtA[i] = 0x12
 			i++
 			i = encodeVarintLogbroker(dAtA, i, uint64(msg.Size()))
 			n, err := msg.MarshalTo(dAtA[i:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			i += n
-		***REMOVED***
-	***REMOVED***
-	if m.Close ***REMOVED***
+		}
+	}
+	if m.Close {
 		dAtA[i] = 0x18
 		i++
-		if m.Close ***REMOVED***
+		if m.Close {
 			dAtA[i] = 1
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dAtA[i] = 0
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
+	}
 	return i, nil
-***REMOVED***
+}
 
-func (m *PublishLogsResponse) Marshal() (dAtA []byte, err error) ***REMOVED***
+func (m *PublishLogsResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return dAtA[:n], nil
-***REMOVED***
+}
 
-func (m *PublishLogsResponse) MarshalTo(dAtA []byte) (int, error) ***REMOVED***
+func (m *PublishLogsResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
 	return i, nil
-***REMOVED***
+}
 
-func encodeFixed64Logbroker(dAtA []byte, offset int, v uint64) int ***REMOVED***
+func encodeFixed64Logbroker(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
 	dAtA[offset+2] = uint8(v >> 16)
@@ -1246,2093 +1246,2093 @@ func encodeFixed64Logbroker(dAtA []byte, offset int, v uint64) int ***REMOVED***
 	dAtA[offset+6] = uint8(v >> 48)
 	dAtA[offset+7] = uint8(v >> 56)
 	return offset + 8
-***REMOVED***
-func encodeFixed32Logbroker(dAtA []byte, offset int, v uint32) int ***REMOVED***
+}
+func encodeFixed32Logbroker(dAtA []byte, offset int, v uint32) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
 	dAtA[offset+2] = uint8(v >> 16)
 	dAtA[offset+3] = uint8(v >> 24)
 	return offset + 4
-***REMOVED***
-func encodeVarintLogbroker(dAtA []byte, offset int, v uint64) int ***REMOVED***
-	for v >= 1<<7 ***REMOVED***
+}
+func encodeVarintLogbroker(dAtA []byte, offset int, v uint64) int {
+	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
-	***REMOVED***
+	}
 	dAtA[offset] = uint8(v)
 	return offset + 1
-***REMOVED***
+}
 
-type raftProxyLogsServer struct ***REMOVED***
+type raftProxyLogsServer struct {
 	local                       LogsServer
 	connSelector                raftselector.ConnProvider
 	localCtxMods, remoteCtxMods []func(context.Context) (context.Context, error)
-***REMOVED***
+}
 
-func NewRaftProxyLogsServer(local LogsServer, connSelector raftselector.ConnProvider, localCtxMod, remoteCtxMod func(context.Context) (context.Context, error)) LogsServer ***REMOVED***
-	redirectChecker := func(ctx context.Context) (context.Context, error) ***REMOVED***
+func NewRaftProxyLogsServer(local LogsServer, connSelector raftselector.ConnProvider, localCtxMod, remoteCtxMod func(context.Context) (context.Context, error)) LogsServer {
+	redirectChecker := func(ctx context.Context) (context.Context, error) {
 		s, ok := transport.StreamFromContext(ctx)
-		if !ok ***REMOVED***
+		if !ok {
 			return ctx, status.Errorf(codes.InvalidArgument, "remote addr is not found in context")
-		***REMOVED***
+		}
 		addr := s.ServerTransport().RemoteAddr().String()
 		md, ok := metadata.FromContext(ctx)
-		if ok && len(md["redirect"]) != 0 ***REMOVED***
+		if ok && len(md["redirect"]) != 0 {
 			return ctx, status.Errorf(codes.ResourceExhausted, "more than one redirect to leader from: %s", md["redirect"])
-		***REMOVED***
-		if !ok ***REMOVED***
-			md = metadata.New(map[string]string***REMOVED******REMOVED***)
-		***REMOVED***
+		}
+		if !ok {
+			md = metadata.New(map[string]string{})
+		}
 		md["redirect"] = append(md["redirect"], addr)
 		return metadata.NewContext(ctx, md), nil
-	***REMOVED***
-	remoteMods := []func(context.Context) (context.Context, error)***REMOVED***redirectChecker***REMOVED***
+	}
+	remoteMods := []func(context.Context) (context.Context, error){redirectChecker}
 	remoteMods = append(remoteMods, remoteCtxMod)
 
 	var localMods []func(context.Context) (context.Context, error)
-	if localCtxMod != nil ***REMOVED***
-		localMods = []func(context.Context) (context.Context, error)***REMOVED***localCtxMod***REMOVED***
-	***REMOVED***
+	if localCtxMod != nil {
+		localMods = []func(context.Context) (context.Context, error){localCtxMod}
+	}
 
-	return &raftProxyLogsServer***REMOVED***
+	return &raftProxyLogsServer{
 		local:         local,
 		connSelector:  connSelector,
 		localCtxMods:  localMods,
 		remoteCtxMods: remoteMods,
-	***REMOVED***
-***REMOVED***
-func (p *raftProxyLogsServer) runCtxMods(ctx context.Context, ctxMods []func(context.Context) (context.Context, error)) (context.Context, error) ***REMOVED***
+	}
+}
+func (p *raftProxyLogsServer) runCtxMods(ctx context.Context, ctxMods []func(context.Context) (context.Context, error)) (context.Context, error) {
 	var err error
-	for _, mod := range ctxMods ***REMOVED***
+	for _, mod := range ctxMods {
 		ctx, err = mod(ctx)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return ctx, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return ctx, nil
-***REMOVED***
-func (p *raftProxyLogsServer) pollNewLeaderConn(ctx context.Context) (*grpc.ClientConn, error) ***REMOVED***
+}
+func (p *raftProxyLogsServer) pollNewLeaderConn(ctx context.Context) (*grpc.ClientConn, error) {
 	ticker := rafttime.NewTicker(500 * rafttime.Millisecond)
 	defer ticker.Stop()
-	for ***REMOVED***
-		select ***REMOVED***
+	for {
+		select {
 		case <-ticker.C:
 			conn, err := p.connSelector.LeaderConn(ctx)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 
 			client := NewHealthClient(conn)
 
-			resp, err := client.Check(ctx, &HealthCheckRequest***REMOVED***Service: "Raft"***REMOVED***)
-			if err != nil || resp.Status != HealthCheckResponse_SERVING ***REMOVED***
+			resp, err := client.Check(ctx, &HealthCheckRequest{Service: "Raft"})
+			if err != nil || resp.Status != HealthCheckResponse_SERVING {
 				continue
-			***REMOVED***
+			}
 			return conn, nil
 		case <-ctx.Done():
 			return nil, ctx.Err()
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-type Logs_SubscribeLogsServerWrapper struct ***REMOVED***
+type Logs_SubscribeLogsServerWrapper struct {
 	Logs_SubscribeLogsServer
 	ctx context.Context
-***REMOVED***
+}
 
-func (s Logs_SubscribeLogsServerWrapper) Context() context.Context ***REMOVED***
+func (s Logs_SubscribeLogsServerWrapper) Context() context.Context {
 	return s.ctx
-***REMOVED***
+}
 
-func (p *raftProxyLogsServer) SubscribeLogs(r *SubscribeLogsRequest, stream Logs_SubscribeLogsServer) error ***REMOVED***
+func (p *raftProxyLogsServer) SubscribeLogs(r *SubscribeLogsRequest, stream Logs_SubscribeLogsServer) error {
 	ctx := stream.Context()
 	conn, err := p.connSelector.LeaderConn(ctx)
-	if err != nil ***REMOVED***
-		if err == raftselector.ErrIsLeader ***REMOVED***
+	if err != nil {
+		if err == raftselector.ErrIsLeader {
 			ctx, err = p.runCtxMods(ctx, p.localCtxMods)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			streamWrapper := Logs_SubscribeLogsServerWrapper***REMOVED***
+			}
+			streamWrapper := Logs_SubscribeLogsServerWrapper{
 				Logs_SubscribeLogsServer: stream,
 				ctx: ctx,
-			***REMOVED***
+			}
 			return p.local.SubscribeLogs(r, streamWrapper)
-		***REMOVED***
+		}
 		return err
-	***REMOVED***
+	}
 	ctx, err = p.runCtxMods(ctx, p.remoteCtxMods)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	clientStream, err := NewLogsClient(conn).SubscribeLogs(ctx, r)
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	for ***REMOVED***
+	for {
 		msg, err := clientStream.Recv()
-		if err == io.EOF ***REMOVED***
+		if err == io.EOF {
 			break
-		***REMOVED***
-		if err != nil ***REMOVED***
+		}
+		if err != nil {
 			return err
-		***REMOVED***
-		if err := stream.Send(msg); err != nil ***REMOVED***
+		}
+		if err := stream.Send(msg); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-type raftProxyLogBrokerServer struct ***REMOVED***
+type raftProxyLogBrokerServer struct {
 	local                       LogBrokerServer
 	connSelector                raftselector.ConnProvider
 	localCtxMods, remoteCtxMods []func(context.Context) (context.Context, error)
-***REMOVED***
+}
 
-func NewRaftProxyLogBrokerServer(local LogBrokerServer, connSelector raftselector.ConnProvider, localCtxMod, remoteCtxMod func(context.Context) (context.Context, error)) LogBrokerServer ***REMOVED***
-	redirectChecker := func(ctx context.Context) (context.Context, error) ***REMOVED***
+func NewRaftProxyLogBrokerServer(local LogBrokerServer, connSelector raftselector.ConnProvider, localCtxMod, remoteCtxMod func(context.Context) (context.Context, error)) LogBrokerServer {
+	redirectChecker := func(ctx context.Context) (context.Context, error) {
 		s, ok := transport.StreamFromContext(ctx)
-		if !ok ***REMOVED***
+		if !ok {
 			return ctx, status.Errorf(codes.InvalidArgument, "remote addr is not found in context")
-		***REMOVED***
+		}
 		addr := s.ServerTransport().RemoteAddr().String()
 		md, ok := metadata.FromContext(ctx)
-		if ok && len(md["redirect"]) != 0 ***REMOVED***
+		if ok && len(md["redirect"]) != 0 {
 			return ctx, status.Errorf(codes.ResourceExhausted, "more than one redirect to leader from: %s", md["redirect"])
-		***REMOVED***
-		if !ok ***REMOVED***
-			md = metadata.New(map[string]string***REMOVED******REMOVED***)
-		***REMOVED***
+		}
+		if !ok {
+			md = metadata.New(map[string]string{})
+		}
 		md["redirect"] = append(md["redirect"], addr)
 		return metadata.NewContext(ctx, md), nil
-	***REMOVED***
-	remoteMods := []func(context.Context) (context.Context, error)***REMOVED***redirectChecker***REMOVED***
+	}
+	remoteMods := []func(context.Context) (context.Context, error){redirectChecker}
 	remoteMods = append(remoteMods, remoteCtxMod)
 
 	var localMods []func(context.Context) (context.Context, error)
-	if localCtxMod != nil ***REMOVED***
-		localMods = []func(context.Context) (context.Context, error)***REMOVED***localCtxMod***REMOVED***
-	***REMOVED***
+	if localCtxMod != nil {
+		localMods = []func(context.Context) (context.Context, error){localCtxMod}
+	}
 
-	return &raftProxyLogBrokerServer***REMOVED***
+	return &raftProxyLogBrokerServer{
 		local:         local,
 		connSelector:  connSelector,
 		localCtxMods:  localMods,
 		remoteCtxMods: remoteMods,
-	***REMOVED***
-***REMOVED***
-func (p *raftProxyLogBrokerServer) runCtxMods(ctx context.Context, ctxMods []func(context.Context) (context.Context, error)) (context.Context, error) ***REMOVED***
+	}
+}
+func (p *raftProxyLogBrokerServer) runCtxMods(ctx context.Context, ctxMods []func(context.Context) (context.Context, error)) (context.Context, error) {
 	var err error
-	for _, mod := range ctxMods ***REMOVED***
+	for _, mod := range ctxMods {
 		ctx, err = mod(ctx)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return ctx, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return ctx, nil
-***REMOVED***
-func (p *raftProxyLogBrokerServer) pollNewLeaderConn(ctx context.Context) (*grpc.ClientConn, error) ***REMOVED***
+}
+func (p *raftProxyLogBrokerServer) pollNewLeaderConn(ctx context.Context) (*grpc.ClientConn, error) {
 	ticker := rafttime.NewTicker(500 * rafttime.Millisecond)
 	defer ticker.Stop()
-	for ***REMOVED***
-		select ***REMOVED***
+	for {
+		select {
 		case <-ticker.C:
 			conn, err := p.connSelector.LeaderConn(ctx)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 
 			client := NewHealthClient(conn)
 
-			resp, err := client.Check(ctx, &HealthCheckRequest***REMOVED***Service: "Raft"***REMOVED***)
-			if err != nil || resp.Status != HealthCheckResponse_SERVING ***REMOVED***
+			resp, err := client.Check(ctx, &HealthCheckRequest{Service: "Raft"})
+			if err != nil || resp.Status != HealthCheckResponse_SERVING {
 				continue
-			***REMOVED***
+			}
 			return conn, nil
 		case <-ctx.Done():
 			return nil, ctx.Err()
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-type LogBroker_ListenSubscriptionsServerWrapper struct ***REMOVED***
+type LogBroker_ListenSubscriptionsServerWrapper struct {
 	LogBroker_ListenSubscriptionsServer
 	ctx context.Context
-***REMOVED***
+}
 
-func (s LogBroker_ListenSubscriptionsServerWrapper) Context() context.Context ***REMOVED***
+func (s LogBroker_ListenSubscriptionsServerWrapper) Context() context.Context {
 	return s.ctx
-***REMOVED***
+}
 
-func (p *raftProxyLogBrokerServer) ListenSubscriptions(r *ListenSubscriptionsRequest, stream LogBroker_ListenSubscriptionsServer) error ***REMOVED***
+func (p *raftProxyLogBrokerServer) ListenSubscriptions(r *ListenSubscriptionsRequest, stream LogBroker_ListenSubscriptionsServer) error {
 	ctx := stream.Context()
 	conn, err := p.connSelector.LeaderConn(ctx)
-	if err != nil ***REMOVED***
-		if err == raftselector.ErrIsLeader ***REMOVED***
+	if err != nil {
+		if err == raftselector.ErrIsLeader {
 			ctx, err = p.runCtxMods(ctx, p.localCtxMods)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			streamWrapper := LogBroker_ListenSubscriptionsServerWrapper***REMOVED***
+			}
+			streamWrapper := LogBroker_ListenSubscriptionsServerWrapper{
 				LogBroker_ListenSubscriptionsServer: stream,
 				ctx: ctx,
-			***REMOVED***
+			}
 			return p.local.ListenSubscriptions(r, streamWrapper)
-		***REMOVED***
+		}
 		return err
-	***REMOVED***
+	}
 	ctx, err = p.runCtxMods(ctx, p.remoteCtxMods)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	clientStream, err := NewLogBrokerClient(conn).ListenSubscriptions(ctx, r)
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	for ***REMOVED***
+	for {
 		msg, err := clientStream.Recv()
-		if err == io.EOF ***REMOVED***
+		if err == io.EOF {
 			break
-		***REMOVED***
-		if err != nil ***REMOVED***
+		}
+		if err != nil {
 			return err
-		***REMOVED***
-		if err := stream.Send(msg); err != nil ***REMOVED***
+		}
+		if err := stream.Send(msg); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-type LogBroker_PublishLogsServerWrapper struct ***REMOVED***
+type LogBroker_PublishLogsServerWrapper struct {
 	LogBroker_PublishLogsServer
 	ctx context.Context
-***REMOVED***
+}
 
-func (s LogBroker_PublishLogsServerWrapper) Context() context.Context ***REMOVED***
+func (s LogBroker_PublishLogsServerWrapper) Context() context.Context {
 	return s.ctx
-***REMOVED***
+}
 
-func (p *raftProxyLogBrokerServer) PublishLogs(stream LogBroker_PublishLogsServer) error ***REMOVED***
+func (p *raftProxyLogBrokerServer) PublishLogs(stream LogBroker_PublishLogsServer) error {
 	ctx := stream.Context()
 	conn, err := p.connSelector.LeaderConn(ctx)
-	if err != nil ***REMOVED***
-		if err == raftselector.ErrIsLeader ***REMOVED***
+	if err != nil {
+		if err == raftselector.ErrIsLeader {
 			ctx, err = p.runCtxMods(ctx, p.localCtxMods)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			streamWrapper := LogBroker_PublishLogsServerWrapper***REMOVED***
+			}
+			streamWrapper := LogBroker_PublishLogsServerWrapper{
 				LogBroker_PublishLogsServer: stream,
 				ctx: ctx,
-			***REMOVED***
+			}
 			return p.local.PublishLogs(streamWrapper)
-		***REMOVED***
+		}
 		return err
-	***REMOVED***
+	}
 	ctx, err = p.runCtxMods(ctx, p.remoteCtxMods)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	clientStream, err := NewLogBrokerClient(conn).PublishLogs(ctx)
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	for ***REMOVED***
+	for {
 		msg, err := stream.Recv()
-		if err == io.EOF ***REMOVED***
+		if err == io.EOF {
 			break
-		***REMOVED***
-		if err != nil ***REMOVED***
+		}
+		if err != nil {
 			return err
-		***REMOVED***
-		if err := clientStream.Send(msg); err != nil ***REMOVED***
+		}
+		if err := clientStream.Send(msg); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	reply, err := clientStream.CloseAndRecv()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	return stream.SendAndClose(reply)
-***REMOVED***
+}
 
-func (m *LogSubscriptionOptions) Size() (n int) ***REMOVED***
+func (m *LogSubscriptionOptions) Size() (n int) {
 	var l int
 	_ = l
-	if len(m.Streams) > 0 ***REMOVED***
-		for _, e := range m.Streams ***REMOVED***
+	if len(m.Streams) > 0 {
+		for _, e := range m.Streams {
 			n += 1 + sovLogbroker(uint64(e))
-		***REMOVED***
-	***REMOVED***
-	if m.Follow ***REMOVED***
+		}
+	}
+	if m.Follow {
 		n += 2
-	***REMOVED***
-	if m.Tail != 0 ***REMOVED***
+	}
+	if m.Tail != 0 {
 		n += 1 + sovLogbroker(uint64(m.Tail))
-	***REMOVED***
-	if m.Since != nil ***REMOVED***
+	}
+	if m.Since != nil {
 		l = m.Since.Size()
 		n += 1 + l + sovLogbroker(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *LogSelector) Size() (n int) ***REMOVED***
+func (m *LogSelector) Size() (n int) {
 	var l int
 	_ = l
-	if len(m.ServiceIDs) > 0 ***REMOVED***
-		for _, s := range m.ServiceIDs ***REMOVED***
+	if len(m.ServiceIDs) > 0 {
+		for _, s := range m.ServiceIDs {
 			l = len(s)
 			n += 1 + l + sovLogbroker(uint64(l))
-		***REMOVED***
-	***REMOVED***
-	if len(m.NodeIDs) > 0 ***REMOVED***
-		for _, s := range m.NodeIDs ***REMOVED***
+		}
+	}
+	if len(m.NodeIDs) > 0 {
+		for _, s := range m.NodeIDs {
 			l = len(s)
 			n += 1 + l + sovLogbroker(uint64(l))
-		***REMOVED***
-	***REMOVED***
-	if len(m.TaskIDs) > 0 ***REMOVED***
-		for _, s := range m.TaskIDs ***REMOVED***
+		}
+	}
+	if len(m.TaskIDs) > 0 {
+		for _, s := range m.TaskIDs {
 			l = len(s)
 			n += 1 + l + sovLogbroker(uint64(l))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
+}
 
-func (m *LogContext) Size() (n int) ***REMOVED***
+func (m *LogContext) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ServiceID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovLogbroker(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.NodeID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovLogbroker(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.TaskID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovLogbroker(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *LogAttr) Size() (n int) ***REMOVED***
+func (m *LogAttr) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.Key)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovLogbroker(uint64(l))
-	***REMOVED***
+	}
 	l = len(m.Value)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovLogbroker(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *LogMessage) Size() (n int) ***REMOVED***
+func (m *LogMessage) Size() (n int) {
 	var l int
 	_ = l
 	l = m.Context.Size()
 	n += 1 + l + sovLogbroker(uint64(l))
-	if m.Timestamp != nil ***REMOVED***
+	if m.Timestamp != nil {
 		l = m.Timestamp.Size()
 		n += 1 + l + sovLogbroker(uint64(l))
-	***REMOVED***
-	if m.Stream != 0 ***REMOVED***
+	}
+	if m.Stream != 0 {
 		n += 1 + sovLogbroker(uint64(m.Stream))
-	***REMOVED***
+	}
 	l = len(m.Data)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovLogbroker(uint64(l))
-	***REMOVED***
-	if len(m.Attrs) > 0 ***REMOVED***
-		for _, e := range m.Attrs ***REMOVED***
+	}
+	if len(m.Attrs) > 0 {
+		for _, e := range m.Attrs {
 			l = e.Size()
 			n += 1 + l + sovLogbroker(uint64(l))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
+}
 
-func (m *SubscribeLogsRequest) Size() (n int) ***REMOVED***
+func (m *SubscribeLogsRequest) Size() (n int) {
 	var l int
 	_ = l
-	if m.Selector != nil ***REMOVED***
+	if m.Selector != nil {
 		l = m.Selector.Size()
 		n += 1 + l + sovLogbroker(uint64(l))
-	***REMOVED***
-	if m.Options != nil ***REMOVED***
+	}
+	if m.Options != nil {
 		l = m.Options.Size()
 		n += 1 + l + sovLogbroker(uint64(l))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *SubscribeLogsMessage) Size() (n int) ***REMOVED***
+func (m *SubscribeLogsMessage) Size() (n int) {
 	var l int
 	_ = l
-	if len(m.Messages) > 0 ***REMOVED***
-		for _, e := range m.Messages ***REMOVED***
+	if len(m.Messages) > 0 {
+		for _, e := range m.Messages {
 			l = e.Size()
 			n += 1 + l + sovLogbroker(uint64(l))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
+}
 
-func (m *ListenSubscriptionsRequest) Size() (n int) ***REMOVED***
+func (m *ListenSubscriptionsRequest) Size() (n int) {
 	var l int
 	_ = l
 	return n
-***REMOVED***
+}
 
-func (m *SubscriptionMessage) Size() (n int) ***REMOVED***
+func (m *SubscriptionMessage) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovLogbroker(uint64(l))
-	***REMOVED***
-	if m.Selector != nil ***REMOVED***
+	}
+	if m.Selector != nil {
 		l = m.Selector.Size()
 		n += 1 + l + sovLogbroker(uint64(l))
-	***REMOVED***
-	if m.Options != nil ***REMOVED***
+	}
+	if m.Options != nil {
 		l = m.Options.Size()
 		n += 1 + l + sovLogbroker(uint64(l))
-	***REMOVED***
-	if m.Close ***REMOVED***
+	}
+	if m.Close {
 		n += 2
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *PublishLogsMessage) Size() (n int) ***REMOVED***
+func (m *PublishLogsMessage) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.SubscriptionID)
-	if l > 0 ***REMOVED***
+	if l > 0 {
 		n += 1 + l + sovLogbroker(uint64(l))
-	***REMOVED***
-	if len(m.Messages) > 0 ***REMOVED***
-		for _, e := range m.Messages ***REMOVED***
+	}
+	if len(m.Messages) > 0 {
+		for _, e := range m.Messages {
 			l = e.Size()
 			n += 1 + l + sovLogbroker(uint64(l))
-		***REMOVED***
-	***REMOVED***
-	if m.Close ***REMOVED***
+		}
+	}
+	if m.Close {
 		n += 2
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (m *PublishLogsResponse) Size() (n int) ***REMOVED***
+func (m *PublishLogsResponse) Size() (n int) {
 	var l int
 	_ = l
 	return n
-***REMOVED***
+}
 
-func sovLogbroker(x uint64) (n int) ***REMOVED***
-	for ***REMOVED***
+func sovLogbroker(x uint64) (n int) {
+	for {
 		n++
 		x >>= 7
-		if x == 0 ***REMOVED***
+		if x == 0 {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return n
-***REMOVED***
-func sozLogbroker(x uint64) (n int) ***REMOVED***
+}
+func sozLogbroker(x uint64) (n int) {
 	return sovLogbroker(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-***REMOVED***
-func (this *LogSubscriptionOptions) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *LogSubscriptionOptions) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&LogSubscriptionOptions***REMOVED***`,
+	}
+	s := strings.Join([]string{`&LogSubscriptionOptions{`,
 		`Streams:` + fmt.Sprintf("%v", this.Streams) + `,`,
 		`Follow:` + fmt.Sprintf("%v", this.Follow) + `,`,
 		`Tail:` + fmt.Sprintf("%v", this.Tail) + `,`,
 		`Since:` + strings.Replace(fmt.Sprintf("%v", this.Since), "Timestamp", "google_protobuf.Timestamp", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *LogSelector) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *LogSelector) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&LogSelector***REMOVED***`,
+	}
+	s := strings.Join([]string{`&LogSelector{`,
 		`ServiceIDs:` + fmt.Sprintf("%v", this.ServiceIDs) + `,`,
 		`NodeIDs:` + fmt.Sprintf("%v", this.NodeIDs) + `,`,
 		`TaskIDs:` + fmt.Sprintf("%v", this.TaskIDs) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *LogContext) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *LogContext) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&LogContext***REMOVED***`,
+	}
+	s := strings.Join([]string{`&LogContext{`,
 		`ServiceID:` + fmt.Sprintf("%v", this.ServiceID) + `,`,
 		`NodeID:` + fmt.Sprintf("%v", this.NodeID) + `,`,
 		`TaskID:` + fmt.Sprintf("%v", this.TaskID) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *LogAttr) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *LogAttr) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&LogAttr***REMOVED***`,
+	}
+	s := strings.Join([]string{`&LogAttr{`,
 		`Key:` + fmt.Sprintf("%v", this.Key) + `,`,
 		`Value:` + fmt.Sprintf("%v", this.Value) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *LogMessage) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *LogMessage) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&LogMessage***REMOVED***`,
+	}
+	s := strings.Join([]string{`&LogMessage{`,
 		`Context:` + strings.Replace(strings.Replace(this.Context.String(), "LogContext", "LogContext", 1), `&`, ``, 1) + `,`,
 		`Timestamp:` + strings.Replace(fmt.Sprintf("%v", this.Timestamp), "Timestamp", "google_protobuf.Timestamp", 1) + `,`,
 		`Stream:` + fmt.Sprintf("%v", this.Stream) + `,`,
 		`Data:` + fmt.Sprintf("%v", this.Data) + `,`,
 		`Attrs:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Attrs), "LogAttr", "LogAttr", 1), `&`, ``, 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *SubscribeLogsRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *SubscribeLogsRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&SubscribeLogsRequest***REMOVED***`,
+	}
+	s := strings.Join([]string{`&SubscribeLogsRequest{`,
 		`Selector:` + strings.Replace(fmt.Sprintf("%v", this.Selector), "LogSelector", "LogSelector", 1) + `,`,
 		`Options:` + strings.Replace(fmt.Sprintf("%v", this.Options), "LogSubscriptionOptions", "LogSubscriptionOptions", 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *SubscribeLogsMessage) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *SubscribeLogsMessage) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&SubscribeLogsMessage***REMOVED***`,
+	}
+	s := strings.Join([]string{`&SubscribeLogsMessage{`,
 		`Messages:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Messages), "LogMessage", "LogMessage", 1), `&`, ``, 1) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *ListenSubscriptionsRequest) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *ListenSubscriptionsRequest) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&ListenSubscriptionsRequest***REMOVED***`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+	}
+	s := strings.Join([]string{`&ListenSubscriptionsRequest{`,
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *SubscriptionMessage) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *SubscriptionMessage) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&SubscriptionMessage***REMOVED***`,
+	}
+	s := strings.Join([]string{`&SubscriptionMessage{`,
 		`ID:` + fmt.Sprintf("%v", this.ID) + `,`,
 		`Selector:` + strings.Replace(fmt.Sprintf("%v", this.Selector), "LogSelector", "LogSelector", 1) + `,`,
 		`Options:` + strings.Replace(fmt.Sprintf("%v", this.Options), "LogSubscriptionOptions", "LogSubscriptionOptions", 1) + `,`,
 		`Close:` + fmt.Sprintf("%v", this.Close) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *PublishLogsMessage) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *PublishLogsMessage) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&PublishLogsMessage***REMOVED***`,
+	}
+	s := strings.Join([]string{`&PublishLogsMessage{`,
 		`SubscriptionID:` + fmt.Sprintf("%v", this.SubscriptionID) + `,`,
 		`Messages:` + strings.Replace(strings.Replace(fmt.Sprintf("%v", this.Messages), "LogMessage", "LogMessage", 1), `&`, ``, 1) + `,`,
 		`Close:` + fmt.Sprintf("%v", this.Close) + `,`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func (this *PublishLogsResponse) String() string ***REMOVED***
-	if this == nil ***REMOVED***
+}
+func (this *PublishLogsResponse) String() string {
+	if this == nil {
 		return "nil"
-	***REMOVED***
-	s := strings.Join([]string***REMOVED***`&PublishLogsResponse***REMOVED***`,
-		`***REMOVED***`,
-	***REMOVED***, "")
+	}
+	s := strings.Join([]string{`&PublishLogsResponse{`,
+		`}`,
+	}, "")
 	return s
-***REMOVED***
-func valueToStringLogbroker(v interface***REMOVED******REMOVED***) string ***REMOVED***
+}
+func valueToStringLogbroker(v interface{}) string {
 	rv := reflect.ValueOf(v)
-	if rv.IsNil() ***REMOVED***
+	if rv.IsNil() {
 		return "nil"
-	***REMOVED***
+	}
 	pv := reflect.Indirect(rv).Interface()
 	return fmt.Sprintf("*%v", pv)
-***REMOVED***
-func (m *LogSubscriptionOptions) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *LogSubscriptionOptions) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowLogbroker
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: LogSubscriptionOptions: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: LogSubscriptionOptions: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType == 0 ***REMOVED***
+			if wireType == 0 {
 				var v LogStream
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return ErrIntOverflowLogbroker
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					v |= (LogStream(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				m.Streams = append(m.Streams, v)
-			***REMOVED*** else if wireType == 2 ***REMOVED***
+			} else if wireType == 2 {
 				var packedLen int
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return ErrIntOverflowLogbroker
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					packedLen |= (int(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
-				if packedLen < 0 ***REMOVED***
+					}
+				}
+				if packedLen < 0 {
 					return ErrInvalidLengthLogbroker
-				***REMOVED***
+				}
 				postIndex := iNdEx + packedLen
-				if postIndex > l ***REMOVED***
+				if postIndex > l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
-				for iNdEx < postIndex ***REMOVED***
+				}
+				for iNdEx < postIndex {
 					var v LogStream
-					for shift := uint(0); ; shift += 7 ***REMOVED***
-						if shift >= 64 ***REMOVED***
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
 							return ErrIntOverflowLogbroker
-						***REMOVED***
-						if iNdEx >= l ***REMOVED***
+						}
+						if iNdEx >= l {
 							return io.ErrUnexpectedEOF
-						***REMOVED***
+						}
 						b := dAtA[iNdEx]
 						iNdEx++
 						v |= (LogStream(b) & 0x7F) << shift
-						if b < 0x80 ***REMOVED***
+						if b < 0x80 {
 							break
-						***REMOVED***
-					***REMOVED***
+						}
+					}
 					m.Streams = append(m.Streams, v)
-				***REMOVED***
-			***REMOVED*** else ***REMOVED***
+				}
+			} else {
 				return fmt.Errorf("proto: wrong wireType = %d for field Streams", wireType)
-			***REMOVED***
+			}
 		case 2:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Follow", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowLogbroker
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			m.Follow = bool(v != 0)
 		case 3:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Tail", wireType)
-			***REMOVED***
+			}
 			m.Tail = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowLogbroker
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Tail |= (int64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 4:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Since", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowLogbroker
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthLogbroker
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Since == nil ***REMOVED***
-				m.Since = &google_protobuf.Timestamp***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.Since.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.Since == nil {
+				m.Since = &google_protobuf.Timestamp{}
+			}
+			if err := m.Since.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipLogbroker(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthLogbroker
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *LogSelector) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *LogSelector) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowLogbroker
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: LogSelector: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: LogSelector: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ServiceIDs", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowLogbroker
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthLogbroker
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ServiceIDs = append(m.ServiceIDs, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field NodeIDs", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowLogbroker
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthLogbroker
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.NodeIDs = append(m.NodeIDs, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field TaskIDs", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowLogbroker
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthLogbroker
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.TaskIDs = append(m.TaskIDs, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipLogbroker(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthLogbroker
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *LogContext) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *LogContext) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowLogbroker
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: LogContext: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: LogContext: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ServiceID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowLogbroker
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthLogbroker
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ServiceID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field NodeID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowLogbroker
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthLogbroker
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.NodeID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field TaskID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowLogbroker
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthLogbroker
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.TaskID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipLogbroker(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthLogbroker
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *LogAttr) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *LogAttr) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowLogbroker
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: LogAttr: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: LogAttr: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Key", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowLogbroker
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthLogbroker
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Key = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Value", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowLogbroker
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthLogbroker
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Value = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipLogbroker(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthLogbroker
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *LogMessage) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *LogMessage) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowLogbroker
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: LogMessage: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: LogMessage: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Context", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowLogbroker
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthLogbroker
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if err := m.Context.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if err := m.Context.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Timestamp", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowLogbroker
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthLogbroker
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Timestamp == nil ***REMOVED***
-				m.Timestamp = &google_protobuf.Timestamp***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.Timestamp.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.Timestamp == nil {
+				m.Timestamp = &google_protobuf.Timestamp{}
+			}
+			if err := m.Timestamp.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 3:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Stream", wireType)
-			***REMOVED***
+			}
 			m.Stream = 0
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowLogbroker
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Stream |= (LogStream(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case 4:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Data", wireType)
-			***REMOVED***
+			}
 			var byteLen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowLogbroker
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				byteLen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if byteLen < 0 ***REMOVED***
+				}
+			}
+			if byteLen < 0 {
 				return ErrInvalidLengthLogbroker
-			***REMOVED***
+			}
 			postIndex := iNdEx + byteLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.Data = append(m.Data[:0], dAtA[iNdEx:postIndex]...)
-			if m.Data == nil ***REMOVED***
-				m.Data = []byte***REMOVED******REMOVED***
-			***REMOVED***
+			if m.Data == nil {
+				m.Data = []byte{}
+			}
 			iNdEx = postIndex
 		case 5:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Attrs", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowLogbroker
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthLogbroker
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.Attrs = append(m.Attrs, LogAttr***REMOVED******REMOVED***)
-			if err := m.Attrs[len(m.Attrs)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			m.Attrs = append(m.Attrs, LogAttr{})
+			if err := m.Attrs[len(m.Attrs)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipLogbroker(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthLogbroker
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *SubscribeLogsRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *SubscribeLogsRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowLogbroker
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: SubscribeLogsRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: SubscribeLogsRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Selector", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowLogbroker
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthLogbroker
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Selector == nil ***REMOVED***
-				m.Selector = &LogSelector***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.Selector.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.Selector == nil {
+				m.Selector = &LogSelector{}
+			}
+			if err := m.Selector.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Options", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowLogbroker
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthLogbroker
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Options == nil ***REMOVED***
-				m.Options = &LogSubscriptionOptions***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.Options.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.Options == nil {
+				m.Options = &LogSubscriptionOptions{}
+			}
+			if err := m.Options.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipLogbroker(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthLogbroker
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *SubscribeLogsMessage) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *SubscribeLogsMessage) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowLogbroker
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: SubscribeLogsMessage: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: SubscribeLogsMessage: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Messages", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowLogbroker
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthLogbroker
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.Messages = append(m.Messages, LogMessage***REMOVED******REMOVED***)
-			if err := m.Messages[len(m.Messages)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			m.Messages = append(m.Messages, LogMessage{})
+			if err := m.Messages[len(m.Messages)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipLogbroker(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthLogbroker
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *ListenSubscriptionsRequest) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *ListenSubscriptionsRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowLogbroker
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: ListenSubscriptionsRequest: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: ListenSubscriptionsRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		default:
 			iNdEx = preIndex
 			skippy, err := skipLogbroker(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthLogbroker
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *SubscriptionMessage) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *SubscriptionMessage) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowLogbroker
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: SubscriptionMessage: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: SubscriptionMessage: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowLogbroker
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthLogbroker
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.ID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Selector", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowLogbroker
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthLogbroker
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Selector == nil ***REMOVED***
-				m.Selector = &LogSelector***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.Selector.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.Selector == nil {
+				m.Selector = &LogSelector{}
+			}
+			if err := m.Selector.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 3:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Options", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowLogbroker
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthLogbroker
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			if m.Options == nil ***REMOVED***
-				m.Options = &LogSubscriptionOptions***REMOVED******REMOVED***
-			***REMOVED***
-			if err := m.Options.Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			if m.Options == nil {
+				m.Options = &LogSubscriptionOptions{}
+			}
+			if err := m.Options.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 4:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Close", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowLogbroker
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			m.Close = bool(v != 0)
 		default:
 			iNdEx = preIndex
 			skippy, err := skipLogbroker(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthLogbroker
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *PublishLogsMessage) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *PublishLogsMessage) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowLogbroker
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: PublishLogsMessage: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: PublishLogsMessage: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		case 1:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field SubscriptionID", wireType)
-			***REMOVED***
+			}
 			var stringLen uint64
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowLogbroker
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			intStringLen := int(stringLen)
-			if intStringLen < 0 ***REMOVED***
+			if intStringLen < 0 {
 				return ErrInvalidLengthLogbroker
-			***REMOVED***
+			}
 			postIndex := iNdEx + intStringLen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			m.SubscriptionID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 ***REMOVED***
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Messages", wireType)
-			***REMOVED***
+			}
 			var msglen int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowLogbroker
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
-			if msglen < 0 ***REMOVED***
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthLogbroker
-			***REMOVED***
+			}
 			postIndex := iNdEx + msglen
-			if postIndex > l ***REMOVED***
+			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
-			m.Messages = append(m.Messages, LogMessage***REMOVED******REMOVED***)
-			if err := m.Messages[len(m.Messages)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil ***REMOVED***
+			}
+			m.Messages = append(m.Messages, LogMessage{})
+			if err := m.Messages[len(m.Messages)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
-			***REMOVED***
+			}
 			iNdEx = postIndex
 		case 3:
-			if wireType != 0 ***REMOVED***
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Close", wireType)
-			***REMOVED***
+			}
 			var v int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return ErrIntOverflowLogbroker
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			m.Close = bool(v != 0)
 		default:
 			iNdEx = preIndex
 			skippy, err := skipLogbroker(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthLogbroker
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func (m *PublishLogsResponse) Unmarshal(dAtA []byte) error ***REMOVED***
+}
+func (m *PublishLogsResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		preIndex := iNdEx
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return ErrIntOverflowLogbroker
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
-		if wireType == 4 ***REMOVED***
+		if wireType == 4 {
 			return fmt.Errorf("proto: PublishLogsResponse: wiretype end group for non-group")
-		***REMOVED***
-		if fieldNum <= 0 ***REMOVED***
+		}
+		if fieldNum <= 0 {
 			return fmt.Errorf("proto: PublishLogsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		***REMOVED***
-		switch fieldNum ***REMOVED***
+		}
+		switch fieldNum {
 		default:
 			iNdEx = preIndex
 			skippy, err := skipLogbroker(dAtA[iNdEx:])
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-			if skippy < 0 ***REMOVED***
+			}
+			if skippy < 0 {
 				return ErrInvalidLengthLogbroker
-			***REMOVED***
-			if (iNdEx + skippy) > l ***REMOVED***
+			}
+			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			iNdEx += skippy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if iNdEx > l ***REMOVED***
+	if iNdEx > l {
 		return io.ErrUnexpectedEOF
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
-func skipLogbroker(dAtA []byte) (n int, err error) ***REMOVED***
+}
+func skipLogbroker(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
-	for iNdEx < l ***REMOVED***
+	for iNdEx < l {
 		var wire uint64
-		for shift := uint(0); ; shift += 7 ***REMOVED***
-			if shift >= 64 ***REMOVED***
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
 				return 0, ErrIntOverflowLogbroker
-			***REMOVED***
-			if iNdEx >= l ***REMOVED***
+			}
+			if iNdEx >= l {
 				return 0, io.ErrUnexpectedEOF
-			***REMOVED***
+			}
 			b := dAtA[iNdEx]
 			iNdEx++
 			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 ***REMOVED***
+			if b < 0x80 {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		wireType := int(wire & 0x7)
-		switch wireType ***REMOVED***
+		switch wireType {
 		case 0:
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowLogbroker
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				iNdEx++
-				if dAtA[iNdEx-1] < 0x80 ***REMOVED***
+				if dAtA[iNdEx-1] < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return iNdEx, nil
 		case 1:
 			iNdEx += 8
 			return iNdEx, nil
 		case 2:
 			var length int
-			for shift := uint(0); ; shift += 7 ***REMOVED***
-				if shift >= 64 ***REMOVED***
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
 					return 0, ErrIntOverflowLogbroker
-				***REMOVED***
-				if iNdEx >= l ***REMOVED***
+				}
+				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
-				***REMOVED***
+				}
 				b := dAtA[iNdEx]
 				iNdEx++
 				length |= (int(b) & 0x7F) << shift
-				if b < 0x80 ***REMOVED***
+				if b < 0x80 {
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			iNdEx += length
-			if length < 0 ***REMOVED***
+			if length < 0 {
 				return 0, ErrInvalidLengthLogbroker
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 3:
-			for ***REMOVED***
+			for {
 				var innerWire uint64
 				var start int = iNdEx
-				for shift := uint(0); ; shift += 7 ***REMOVED***
-					if shift >= 64 ***REMOVED***
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
 						return 0, ErrIntOverflowLogbroker
-					***REMOVED***
-					if iNdEx >= l ***REMOVED***
+					}
+					if iNdEx >= l {
 						return 0, io.ErrUnexpectedEOF
-					***REMOVED***
+					}
 					b := dAtA[iNdEx]
 					iNdEx++
 					innerWire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 ***REMOVED***
+					if b < 0x80 {
 						break
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				innerWireType := int(innerWire & 0x7)
-				if innerWireType == 4 ***REMOVED***
+				if innerWireType == 4 {
 					break
-				***REMOVED***
+				}
 				next, err := skipLogbroker(dAtA[start:])
-				if err != nil ***REMOVED***
+				if err != nil {
 					return 0, err
-				***REMOVED***
+				}
 				iNdEx = start + next
-			***REMOVED***
+			}
 			return iNdEx, nil
 		case 4:
 			return iNdEx, nil
@@ -3341,21 +3341,21 @@ func skipLogbroker(dAtA []byte) (n int, err error) ***REMOVED***
 			return iNdEx, nil
 		default:
 			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	panic("unreachable")
-***REMOVED***
+}
 
 var (
 	ErrInvalidLengthLogbroker = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowLogbroker   = fmt.Errorf("proto: integer overflow")
 )
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterFile("github.com/docker/swarmkit/api/logbroker.proto", fileDescriptorLogbroker)
-***REMOVED***
+}
 
-var fileDescriptorLogbroker = []byte***REMOVED***
+var fileDescriptorLogbroker = []byte{
 	// 966 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x95, 0x41, 0x6f, 0x1b, 0x45,
 	0x14, 0xc7, 0x3d, 0xeb, 0xc4, 0x8e, 0x9f, 0x9b, 0xc4, 0x9d, 0xa4, 0x91, 0x65, 0xa8, 0x6d, 0x6d,
@@ -3418,4 +3418,4 @@ var fileDescriptorLogbroker = []byte***REMOVED***
 	0xea, 0xcf, 0x17, 0xe5, 0xd4, 0x97, 0x41, 0x19, 0x5d, 0x04, 0x65, 0xf4, 0x47, 0x50, 0x46, 0x7f,
 	0x05, 0x65, 0xd4, 0xcf, 0xc8, 0x17, 0xf7, 0x5b, 0xff, 0x04, 0x00, 0x00, 0xff, 0xff, 0x95, 0x7b,
 	0x3c, 0x04, 0xe0, 0x08, 0x00, 0x00,
-***REMOVED***
+}

@@ -36,16 +36,16 @@ const finalShift = 10
 
 var errContext = errors.New("precis: contextual rule violated")
 
-func init() ***REMOVED***
+func init() {
 	// Programmatically set these required bits as, manually setting them seems
 	// too error prone.
-	for i, ct := range categoryTransitions ***REMOVED***
+	for i, ct := range categoryTransitions {
 		categoryTransitions[i].keep |= permanent
 		categoryTransitions[i].accept |= ct.term
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-var categoryTransitions = []struct ***REMOVED***
+var categoryTransitions = []struct {
 	keep catBitmap // mask selecting which bits to keep from the previous state
 	set  catBitmap // mask for which bits to set for this transition
 
@@ -57,83 +57,83 @@ var categoryTransitions = []struct ***REMOVED***
 	// The rule function cannot take a *context as an argument, as it would
 	// cause the context to escape, adding significant overhead.
 	rule func(beforeBits catBitmap) (doLookahead bool, err error)
-***REMOVED******REMOVED***
-	joiningL:          ***REMOVED***set: bJoinStart***REMOVED***,
-	joiningD:          ***REMOVED***set: bJoinStart | bJoinEnd***REMOVED***,
-	joiningT:          ***REMOVED***keep: bJoinStart, set: bJoinMid***REMOVED***,
-	joiningR:          ***REMOVED***set: bJoinEnd***REMOVED***,
-	viramaModifier:    ***REMOVED***set: bVirama***REMOVED***,
-	viramaJoinT:       ***REMOVED***set: bVirama | bJoinMid***REMOVED***,
-	latinSmallL:       ***REMOVED***set: bLatinSmallL***REMOVED***,
-	greek:             ***REMOVED***set: bGreek***REMOVED***,
-	greekJoinT:        ***REMOVED***set: bGreek | bJoinMid***REMOVED***,
-	hebrew:            ***REMOVED***set: bHebrew***REMOVED***,
-	hebrewJoinT:       ***REMOVED***set: bHebrew | bJoinMid***REMOVED***,
-	japanese:          ***REMOVED***set: bJapanese***REMOVED***,
-	katakanaMiddleDot: ***REMOVED***set: bMustHaveJapn***REMOVED***,
+}{
+	joiningL:          {set: bJoinStart},
+	joiningD:          {set: bJoinStart | bJoinEnd},
+	joiningT:          {keep: bJoinStart, set: bJoinMid},
+	joiningR:          {set: bJoinEnd},
+	viramaModifier:    {set: bVirama},
+	viramaJoinT:       {set: bVirama | bJoinMid},
+	latinSmallL:       {set: bLatinSmallL},
+	greek:             {set: bGreek},
+	greekJoinT:        {set: bGreek | bJoinMid},
+	hebrew:            {set: bHebrew},
+	hebrewJoinT:       {set: bHebrew | bJoinMid},
+	japanese:          {set: bJapanese},
+	katakanaMiddleDot: {set: bMustHaveJapn},
 
-	zeroWidthNonJoiner: ***REMOVED***
+	zeroWidthNonJoiner: {
 		term:   bJoinEnd,
 		accept: bJoinMid,
-		rule: func(before catBitmap) (doLookAhead bool, err error) ***REMOVED***
-			if before&bVirama != 0 ***REMOVED***
+		rule: func(before catBitmap) (doLookAhead bool, err error) {
+			if before&bVirama != 0 {
 				return false, nil
-			***REMOVED***
-			if before&bJoinStart == 0 ***REMOVED***
+			}
+			if before&bJoinStart == 0 {
 				return false, errContext
-			***REMOVED***
+			}
 			return true, nil
-		***REMOVED***,
-	***REMOVED***,
-	zeroWidthJoiner: ***REMOVED***
-		rule: func(before catBitmap) (doLookAhead bool, err error) ***REMOVED***
-			if before&bVirama == 0 ***REMOVED***
+		},
+	},
+	zeroWidthJoiner: {
+		rule: func(before catBitmap) (doLookAhead bool, err error) {
+			if before&bVirama == 0 {
 				err = errContext
-			***REMOVED***
+			}
 			return false, err
-		***REMOVED***,
-	***REMOVED***,
-	middleDot: ***REMOVED***
+		},
+	},
+	middleDot: {
 		term: bLatinSmallL,
-		rule: func(before catBitmap) (doLookAhead bool, err error) ***REMOVED***
-			if before&bLatinSmallL == 0 ***REMOVED***
+		rule: func(before catBitmap) (doLookAhead bool, err error) {
+			if before&bLatinSmallL == 0 {
 				return false, errContext
-			***REMOVED***
+			}
 			return true, nil
-		***REMOVED***,
-	***REMOVED***,
-	greekLowerNumeralSign: ***REMOVED***
+		},
+	},
+	greekLowerNumeralSign: {
 		set:  bGreek,
 		term: bGreek,
-		rule: func(before catBitmap) (doLookAhead bool, err error) ***REMOVED***
+		rule: func(before catBitmap) (doLookAhead bool, err error) {
 			return true, nil
-		***REMOVED***,
-	***REMOVED***,
-	hebrewPreceding: ***REMOVED***
+		},
+	},
+	hebrewPreceding: {
 		set: bHebrew,
-		rule: func(before catBitmap) (doLookAhead bool, err error) ***REMOVED***
-			if before&bHebrew == 0 ***REMOVED***
+		rule: func(before catBitmap) (doLookAhead bool, err error) {
+			if before&bHebrew == 0 {
 				err = errContext
-			***REMOVED***
+			}
 			return false, err
-		***REMOVED***,
-	***REMOVED***,
-	arabicIndicDigit: ***REMOVED***
+		},
+	},
+	arabicIndicDigit: {
 		set: bArabicIndicDigit,
-		rule: func(before catBitmap) (doLookAhead bool, err error) ***REMOVED***
-			if before&bExtendedArabicIndicDigit != 0 ***REMOVED***
+		rule: func(before catBitmap) (doLookAhead bool, err error) {
+			if before&bExtendedArabicIndicDigit != 0 {
 				err = errContext
-			***REMOVED***
+			}
 			return false, err
-		***REMOVED***,
-	***REMOVED***,
-	extendedArabicIndicDigit: ***REMOVED***
+		},
+	},
+	extendedArabicIndicDigit: {
 		set: bExtendedArabicIndicDigit,
-		rule: func(before catBitmap) (doLookAhead bool, err error) ***REMOVED***
-			if before&bArabicIndicDigit != 0 ***REMOVED***
+		rule: func(before catBitmap) (doLookAhead bool, err error) {
+			if before&bArabicIndicDigit != 0 {
 				err = errContext
-			***REMOVED***
+			}
 			return false, err
-		***REMOVED***,
-	***REMOVED***,
-***REMOVED***
+		},
+	},
+}

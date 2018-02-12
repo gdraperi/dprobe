@@ -10,10 +10,10 @@ package capability
 
 import "errors"
 
-func newPid(pid int) (Capabilities, error) ***REMOVED***
+func newPid(pid int) (Capabilities, error) {
 	return nil, errors.New("not supported")
-***REMOVED***
+}
 
-func newFile(path string) (Capabilities, error) ***REMOVED***
+func newFile(path string) (Capabilities, error) {
 	return nil, errors.New("not supported")
-***REMOVED***
+}

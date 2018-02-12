@@ -23,4 +23,4 @@ var (
 	ErrLocked = errors.New("fileutil: file already locked")
 )
 
-type LockedFile struct***REMOVED*** *os.File ***REMOVED***
+type LockedFile struct{ *os.File }

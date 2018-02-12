@@ -20,12 +20,12 @@ const (
 
 var (
 	flateWriterPools [maxCompressionLevel - minCompressionLevel + 1]sync.Pool
-	flateReaderPool  = sync.Pool***REMOVED***New: func() interface***REMOVED******REMOVED*** ***REMOVED***
+	flateReaderPool  = sync.Pool{New: func() interface{} {
 		return flate.NewReader(nil)
-	***REMOVED******REMOVED***
+	}}
 )
 
-func decompressNoContextTakeover(r io.Reader) io.ReadCloser ***REMOVED***
+func decompressNoContextTakeover(r io.Reader) io.ReadCloser {
 	const tail =
 	// Add four bytes as specified in RFC
 	"\x00\x00\xff\xff" +
@@ -34,115 +34,115 @@ func decompressNoContextTakeover(r io.Reader) io.ReadCloser ***REMOVED***
 
 	fr, _ := flateReaderPool.Get().(io.ReadCloser)
 	fr.(flate.Resetter).Reset(io.MultiReader(r, strings.NewReader(tail)), nil)
-	return &flateReadWrapper***REMOVED***fr***REMOVED***
-***REMOVED***
+	return &flateReadWrapper{fr}
+}
 
-func isValidCompressionLevel(level int) bool ***REMOVED***
+func isValidCompressionLevel(level int) bool {
 	return minCompressionLevel <= level && level <= maxCompressionLevel
-***REMOVED***
+}
 
-func compressNoContextTakeover(w io.WriteCloser, level int) io.WriteCloser ***REMOVED***
+func compressNoContextTakeover(w io.WriteCloser, level int) io.WriteCloser {
 	p := &flateWriterPools[level-minCompressionLevel]
-	tw := &truncWriter***REMOVED***w: w***REMOVED***
+	tw := &truncWriter{w: w}
 	fw, _ := p.Get().(*flate.Writer)
-	if fw == nil ***REMOVED***
+	if fw == nil {
 		fw, _ = flate.NewWriter(tw, level)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		fw.Reset(tw)
-	***REMOVED***
-	return &flateWriteWrapper***REMOVED***fw: fw, tw: tw, p: p***REMOVED***
-***REMOVED***
+	}
+	return &flateWriteWrapper{fw: fw, tw: tw, p: p}
+}
 
 // truncWriter is an io.Writer that writes all but the last four bytes of the
 // stream to another io.Writer.
-type truncWriter struct ***REMOVED***
+type truncWriter struct {
 	w io.WriteCloser
 	n int
 	p [4]byte
-***REMOVED***
+}
 
-func (w *truncWriter) Write(p []byte) (int, error) ***REMOVED***
+func (w *truncWriter) Write(p []byte) (int, error) {
 	n := 0
 
 	// fill buffer first for simplicity.
-	if w.n < len(w.p) ***REMOVED***
+	if w.n < len(w.p) {
 		n = copy(w.p[w.n:], p)
 		p = p[n:]
 		w.n += n
-		if len(p) == 0 ***REMOVED***
+		if len(p) == 0 {
 			return n, nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	m := len(p)
-	if m > len(w.p) ***REMOVED***
+	if m > len(w.p) {
 		m = len(w.p)
-	***REMOVED***
+	}
 
-	if nn, err := w.w.Write(w.p[:m]); err != nil ***REMOVED***
+	if nn, err := w.w.Write(w.p[:m]); err != nil {
 		return n + nn, err
-	***REMOVED***
+	}
 
 	copy(w.p[:], w.p[m:])
 	copy(w.p[len(w.p)-m:], p[len(p)-m:])
 	nn, err := w.w.Write(p[:len(p)-m])
 	return n + nn, err
-***REMOVED***
+}
 
-type flateWriteWrapper struct ***REMOVED***
+type flateWriteWrapper struct {
 	fw *flate.Writer
 	tw *truncWriter
 	p  *sync.Pool
-***REMOVED***
+}
 
-func (w *flateWriteWrapper) Write(p []byte) (int, error) ***REMOVED***
-	if w.fw == nil ***REMOVED***
+func (w *flateWriteWrapper) Write(p []byte) (int, error) {
+	if w.fw == nil {
 		return 0, errWriteClosed
-	***REMOVED***
+	}
 	return w.fw.Write(p)
-***REMOVED***
+}
 
-func (w *flateWriteWrapper) Close() error ***REMOVED***
-	if w.fw == nil ***REMOVED***
+func (w *flateWriteWrapper) Close() error {
+	if w.fw == nil {
 		return errWriteClosed
-	***REMOVED***
+	}
 	err1 := w.fw.Flush()
 	w.p.Put(w.fw)
 	w.fw = nil
-	if w.tw.p != [4]byte***REMOVED***0, 0, 0xff, 0xff***REMOVED*** ***REMOVED***
+	if w.tw.p != [4]byte{0, 0, 0xff, 0xff} {
 		return errors.New("websocket: internal error, unexpected bytes at end of flate stream")
-	***REMOVED***
+	}
 	err2 := w.tw.w.Close()
-	if err1 != nil ***REMOVED***
+	if err1 != nil {
 		return err1
-	***REMOVED***
+	}
 	return err2
-***REMOVED***
+}
 
-type flateReadWrapper struct ***REMOVED***
+type flateReadWrapper struct {
 	fr io.ReadCloser
-***REMOVED***
+}
 
-func (r *flateReadWrapper) Read(p []byte) (int, error) ***REMOVED***
-	if r.fr == nil ***REMOVED***
+func (r *flateReadWrapper) Read(p []byte) (int, error) {
+	if r.fr == nil {
 		return 0, io.ErrClosedPipe
-	***REMOVED***
+	}
 	n, err := r.fr.Read(p)
-	if err == io.EOF ***REMOVED***
+	if err == io.EOF {
 		// Preemptively place the reader back in the pool. This helps with
 		// scenarios where the application does not call NextReader() soon after
 		// this final read.
 		r.Close()
-	***REMOVED***
+	}
 	return n, err
-***REMOVED***
+}
 
-func (r *flateReadWrapper) Close() error ***REMOVED***
-	if r.fr == nil ***REMOVED***
+func (r *flateReadWrapper) Close() error {
+	if r.fr == nil {
 		return io.ErrClosedPipe
-	***REMOVED***
+	}
 	err := r.fr.Close()
 	flateReaderPool.Put(r.fr)
 	r.fr = nil
 	return err
-***REMOVED***
+}

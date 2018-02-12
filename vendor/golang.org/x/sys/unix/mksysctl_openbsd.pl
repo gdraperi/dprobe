@@ -14,10 +14,10 @@
 
 use strict;
 
-if($ENV***REMOVED***'GOARCH'***REMOVED*** eq "" || $ENV***REMOVED***'GOOS'***REMOVED*** eq "") ***REMOVED***
+if($ENV{'GOARCH'} eq "" || $ENV{'GOOS'} eq "") {
 	print STDERR "GOARCH or GOOS not defined in environment\n";
 	exit 1;
-***REMOVED***
+}
 
 my $debug = 0;
 my %ctls = ();
@@ -144,97 +144,97 @@ my %mib = ();
 my %sysctl = ();
 my $node;
 
-sub debug() ***REMOVED***
+sub debug() {
 	print STDERR "$_[0]\n" if $debug;
-***REMOVED***
+}
 
 # Walk the MIB and build a sysctl name to OID mapping.
-sub build_sysctl() ***REMOVED***
+sub build_sysctl() {
 	my ($node, $name, $oid) = @_;
-	my %node = %***REMOVED***$node***REMOVED***;
-	my @oid = @***REMOVED***$oid***REMOVED***;
+	my %node = %{$node};
+	my @oid = @{$oid};
 
-	foreach my $key (sort keys %node) ***REMOVED***
-		my @node = @***REMOVED***$node***REMOVED***$key***REMOVED******REMOVED***;
+	foreach my $key (sort keys %node) {
+		my @node = @{$node{$key}};
 		my $nodename = $name.($name ne '' ? '.' : '').$key;
 		my @nodeoid = (@oid, $node[0]);
-		if ($node[1] eq 'CTLTYPE_NODE') ***REMOVED***
-			if (exists $node_map***REMOVED***$nodename***REMOVED***) ***REMOVED***
+		if ($node[1] eq 'CTLTYPE_NODE') {
+			if (exists $node_map{$nodename}) {
 				$node = \%mib;
-				$ctlname = $node_map***REMOVED***$nodename***REMOVED***;
-				foreach my $part (split /\./, $ctlname) ***REMOVED***
-					$node = \%***REMOVED***@***REMOVED***$$node***REMOVED***$part***REMOVED******REMOVED***[2]***REMOVED***;
-				***REMOVED***
-			***REMOVED*** else ***REMOVED***
+				$ctlname = $node_map{$nodename};
+				foreach my $part (split /\./, $ctlname) {
+					$node = \%{@{$$node{$part}}[2]};
+				}
+			} else {
 				$node = $node[2];
-			***REMOVED***
+			}
 			&build_sysctl($node, $nodename, \@nodeoid);
-		***REMOVED*** elsif ($node[1] ne '') ***REMOVED***
-			$sysctl***REMOVED***$nodename***REMOVED*** = \@nodeoid;
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		} elsif ($node[1] ne '') {
+			$sysctl{$nodename} = \@nodeoid;
+		}
+	}
+}
 
-foreach my $ctl (@ctls) ***REMOVED***
-	$ctls***REMOVED***$ctl***REMOVED*** = $ctl;
-***REMOVED***
+foreach my $ctl (@ctls) {
+	$ctls{$ctl} = $ctl;
+}
 
 # Build MIB
-foreach my $header (@headers) ***REMOVED***
+foreach my $header (@headers) {
 	&debug("Processing $header...");
 	open HEADER, "/usr/include/$header" ||
 	    print STDERR "Failed to open $header\n";
-	while (<HEADER>) ***REMOVED***
-		if ($_ =~ /^#define\s+(CTL_NAMES)\s+***REMOVED***/ ||
-		    $_ =~ /^#define\s+(CTL_(.*)_NAMES)\s+***REMOVED***/ ||
-		    $_ =~ /^#define\s+((.*)CTL_NAMES)\s+***REMOVED***/) ***REMOVED***
-			if ($1 eq 'CTL_NAMES') ***REMOVED***
+	while (<HEADER>) {
+		if ($_ =~ /^#define\s+(CTL_NAMES)\s+{/ ||
+		    $_ =~ /^#define\s+(CTL_(.*)_NAMES)\s+{/ ||
+		    $_ =~ /^#define\s+((.*)CTL_NAMES)\s+{/) {
+			if ($1 eq 'CTL_NAMES') {
 				# Top level.
 				$node = \%mib;
-			***REMOVED*** else ***REMOVED***
+			} else {
 				# Node.
 				my $nodename = lc($2);
-				if ($header =~ /^netinet\//) ***REMOVED***
+				if ($header =~ /^netinet\//) {
 					$ctlname = "net.inet.$nodename";
-				***REMOVED*** elsif ($header =~ /^netinet6\//) ***REMOVED***
+				} elsif ($header =~ /^netinet6\//) {
 					$ctlname = "net.inet6.$nodename";
-				***REMOVED*** elsif ($header =~ /^net\//) ***REMOVED***
+				} elsif ($header =~ /^net\//) {
 					$ctlname = "net.$nodename";
-				***REMOVED*** else ***REMOVED***
+				} else {
 					$ctlname = "$nodename";
 					$ctlname =~ s/^(fs|net|kern)_/$1\./;
-				***REMOVED***
-				if (exists $ctl_map***REMOVED***$ctlname***REMOVED***) ***REMOVED***
-					$ctlname = $ctl_map***REMOVED***$ctlname***REMOVED***;
-				***REMOVED***
-				if (not exists $ctls***REMOVED***$ctlname***REMOVED***) ***REMOVED***
+				}
+				if (exists $ctl_map{$ctlname}) {
+					$ctlname = $ctl_map{$ctlname};
+				}
+				if (not exists $ctls{$ctlname}) {
 					&debug("Ignoring $ctlname...");
 					next;
-				***REMOVED***
+				}
 
 				# Walk down from the top of the MIB.
 				$node = \%mib;
-				foreach my $part (split /\./, $ctlname) ***REMOVED***
-					if (not exists $$node***REMOVED***$part***REMOVED***) ***REMOVED***
+				foreach my $part (split /\./, $ctlname) {
+					if (not exists $$node{$part}) {
 						&debug("Missing node $part");
-						$$node***REMOVED***$part***REMOVED*** = [ 0, '', ***REMOVED******REMOVED*** ];
-					***REMOVED***
-					$node = \%***REMOVED***@***REMOVED***$$node***REMOVED***$part***REMOVED******REMOVED***[2]***REMOVED***;
-				***REMOVED***
-			***REMOVED***
+						$$node{$part} = [ 0, '', {} ];
+					}
+					$node = \%{@{$$node{$part}}[2]};
+				}
+			}
 
 			# Populate current node with entries.
 			my $i = -1;
-			while (defined($_) && $_ !~ /^***REMOVED***/) ***REMOVED***
+			while (defined($_) && $_ !~ /^}/) {
 				$_ = <HEADER>;
-				$i++ if $_ =~ /***REMOVED***.****REMOVED***/;
-				next if $_ !~ /***REMOVED***\s+"(\w+)",\s+(CTLTYPE_[A-Z]+)\s+***REMOVED***/;
-				$$node***REMOVED***$1***REMOVED*** = [ $i, $2, ***REMOVED******REMOVED*** ];
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+				$i++ if $_ =~ /{.*}/;
+				next if $_ !~ /{\s+"(\w+)",\s+(CTLTYPE_[A-Z]+)\s+}/;
+				$$node{$1} = [ $i, $2, {} ];
+			}
+		}
+	}
 	close HEADER;
-***REMOVED***
+}
 
 &build_sysctl(\%mib, "", []);
 
@@ -242,23 +242,23 @@ print <<EOF;
 // mksysctl_openbsd.pl
 // MACHINE GENERATED BY THE ABOVE COMMAND; DO NOT EDIT
 
-// +build $ENV***REMOVED***'GOARCH'***REMOVED***,$ENV***REMOVED***'GOOS'***REMOVED***
+// +build $ENV{'GOARCH'},$ENV{'GOOS'}
 
 package unix;
 
-type mibentry struct ***REMOVED***
+type mibentry struct {
 	ctlname string
 	ctloid []_C_int
-***REMOVED***
+}
 
-var sysctlMib = []mibentry ***REMOVED***
+var sysctlMib = []mibentry {
 EOF
 
-foreach my $name (sort keys %sysctl) ***REMOVED***
-	my @oid = @***REMOVED***$sysctl***REMOVED***$name***REMOVED******REMOVED***;
-	print "\t***REMOVED*** \"$name\", []_C_int***REMOVED*** ", join(', ', @oid), " ***REMOVED*** ***REMOVED***, \n";
-***REMOVED***
+foreach my $name (sort keys %sysctl) {
+	my @oid = @{$sysctl{$name}};
+	print "\t{ \"$name\", []_C_int{ ", join(', ', @oid), " } }, \n";
+}
 
 print <<EOF;
-***REMOVED***
+}
 EOF

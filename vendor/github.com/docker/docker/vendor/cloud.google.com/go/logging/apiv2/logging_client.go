@@ -36,20 +36,20 @@ import (
 )
 
 var (
-	loggingParentPathTemplate = gax.MustCompilePathTemplate("projects/***REMOVED***project***REMOVED***")
-	loggingLogPathTemplate    = gax.MustCompilePathTemplate("projects/***REMOVED***project***REMOVED***/logs/***REMOVED***log***REMOVED***")
+	loggingParentPathTemplate = gax.MustCompilePathTemplate("projects/{project}")
+	loggingLogPathTemplate    = gax.MustCompilePathTemplate("projects/{project}/logs/{log}")
 )
 
 // CallOptions contains the retry settings for each method of Client.
-type CallOptions struct ***REMOVED***
+type CallOptions struct {
 	DeleteLog                        []gax.CallOption
 	WriteLogEntries                  []gax.CallOption
 	ListLogEntries                   []gax.CallOption
 	ListMonitoredResourceDescriptors []gax.CallOption
-***REMOVED***
+}
 
-func defaultClientOptions() []option.ClientOption ***REMOVED***
-	return []option.ClientOption***REMOVED***
+func defaultClientOptions() []option.ClientOption {
+	return []option.ClientOption{
 		option.WithEndpoint("logging.googleapis.com:443"),
 		option.WithScopes(
 			"https://www.googleapis.com/auth/cloud-platform",
@@ -58,46 +58,46 @@ func defaultClientOptions() []option.ClientOption ***REMOVED***
 			"https://www.googleapis.com/auth/logging.read",
 			"https://www.googleapis.com/auth/logging.write",
 		),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func defaultCallOptions() *CallOptions ***REMOVED***
-	retry := map[[2]string][]gax.CallOption***REMOVED***
-		***REMOVED***"default", "idempotent"***REMOVED***: ***REMOVED***
-			gax.WithRetry(func() gax.Retryer ***REMOVED***
-				return gax.OnCodes([]codes.Code***REMOVED***
+func defaultCallOptions() *CallOptions {
+	retry := map[[2]string][]gax.CallOption{
+		{"default", "idempotent"}: {
+			gax.WithRetry(func() gax.Retryer {
+				return gax.OnCodes([]codes.Code{
 					codes.DeadlineExceeded,
 					codes.Unavailable,
-				***REMOVED***, gax.Backoff***REMOVED***
+				}, gax.Backoff{
 					Initial:    100 * time.Millisecond,
 					Max:        1000 * time.Millisecond,
 					Multiplier: 1.2,
-				***REMOVED***)
-			***REMOVED***),
-		***REMOVED***,
-		***REMOVED***"list", "idempotent"***REMOVED***: ***REMOVED***
-			gax.WithRetry(func() gax.Retryer ***REMOVED***
-				return gax.OnCodes([]codes.Code***REMOVED***
+				})
+			}),
+		},
+		{"list", "idempotent"}: {
+			gax.WithRetry(func() gax.Retryer {
+				return gax.OnCodes([]codes.Code{
 					codes.DeadlineExceeded,
 					codes.Unavailable,
-				***REMOVED***, gax.Backoff***REMOVED***
+				}, gax.Backoff{
 					Initial:    100 * time.Millisecond,
 					Max:        1000 * time.Millisecond,
 					Multiplier: 1.2,
-				***REMOVED***)
-			***REMOVED***),
-		***REMOVED***,
-	***REMOVED***
-	return &CallOptions***REMOVED***
-		DeleteLog:                        retry[[2]string***REMOVED***"default", "idempotent"***REMOVED***],
-		WriteLogEntries:                  retry[[2]string***REMOVED***"default", "non_idempotent"***REMOVED***],
-		ListLogEntries:                   retry[[2]string***REMOVED***"list", "idempotent"***REMOVED***],
-		ListMonitoredResourceDescriptors: retry[[2]string***REMOVED***"default", "idempotent"***REMOVED***],
-	***REMOVED***
-***REMOVED***
+				})
+			}),
+		},
+	}
+	return &CallOptions{
+		DeleteLog:                        retry[[2]string{"default", "idempotent"}],
+		WriteLogEntries:                  retry[[2]string{"default", "non_idempotent"}],
+		ListLogEntries:                   retry[[2]string{"list", "idempotent"}],
+		ListMonitoredResourceDescriptors: retry[[2]string{"default", "idempotent"}],
+	}
+}
 
 // Client is a client for interacting with Stackdriver Logging API.
-type Client struct ***REMOVED***
+type Client struct {
 	// The connection to the service.
 	conn *grpc.ClientConn
 
@@ -109,173 +109,173 @@ type Client struct ***REMOVED***
 
 	// The metadata to be sent with each request.
 	metadata metadata.MD
-***REMOVED***
+}
 
 // NewClient creates a new logging service v2 client.
 //
 // Service for ingesting and querying logs.
-func NewClient(ctx context.Context, opts ...option.ClientOption) (*Client, error) ***REMOVED***
+func NewClient(ctx context.Context, opts ...option.ClientOption) (*Client, error) {
 	conn, err := transport.DialGRPC(ctx, append(defaultClientOptions(), opts...)...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	c := &Client***REMOVED***
+	}
+	c := &Client{
 		conn:        conn,
 		CallOptions: defaultCallOptions(),
 
 		client: loggingpb.NewLoggingServiceV2Client(conn),
-	***REMOVED***
+	}
 	c.SetGoogleClientInfo("gax", gax.Version)
 	return c, nil
-***REMOVED***
+}
 
 // Connection returns the client's connection to the API service.
-func (c *Client) Connection() *grpc.ClientConn ***REMOVED***
+func (c *Client) Connection() *grpc.ClientConn {
 	return c.conn
-***REMOVED***
+}
 
 // Close closes the connection to the API service. The user should invoke this when
 // the client is no longer required.
-func (c *Client) Close() error ***REMOVED***
+func (c *Client) Close() error {
 	return c.conn.Close()
-***REMOVED***
+}
 
 // SetGoogleClientInfo sets the name and version of the application in
 // the `x-goog-api-client` header passed on each request. Intended for
 // use by Google-written clients.
-func (c *Client) SetGoogleClientInfo(name, version string) ***REMOVED***
+func (c *Client) SetGoogleClientInfo(name, version string) {
 	goVersion := strings.Replace(runtime.Version(), " ", "_", -1)
 	v := fmt.Sprintf("%s/%s %s gax/%s go/%s", name, version, gapicNameVersion, gax.Version, goVersion)
 	c.metadata = metadata.Pairs("x-goog-api-client", v)
-***REMOVED***
+}
 
 // LoggingParentPath returns the path for the parent resource.
-func LoggingParentPath(project string) string ***REMOVED***
-	path, err := loggingParentPathTemplate.Render(map[string]string***REMOVED***
+func LoggingParentPath(project string) string {
+	path, err := loggingParentPathTemplate.Render(map[string]string{
 		"project": project,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 	return path
-***REMOVED***
+}
 
 // LoggingLogPath returns the path for the log resource.
-func LoggingLogPath(project, log string) string ***REMOVED***
-	path, err := loggingLogPathTemplate.Render(map[string]string***REMOVED***
+func LoggingLogPath(project, log string) string {
+	path, err := loggingLogPathTemplate.Render(map[string]string{
 		"project": project,
 		"log":     log,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 	return path
-***REMOVED***
+}
 
 // DeleteLog deletes all the log entries in a log.
 // The log reappears if it receives new entries.
-func (c *Client) DeleteLog(ctx context.Context, req *loggingpb.DeleteLogRequest) error ***REMOVED***
+func (c *Client) DeleteLog(ctx context.Context, req *loggingpb.DeleteLogRequest) error {
 	md, _ := metadata.FromContext(ctx)
 	ctx = metadata.NewContext(ctx, metadata.Join(md, c.metadata))
-	err := gax.Invoke(ctx, func(ctx context.Context) error ***REMOVED***
+	err := gax.Invoke(ctx, func(ctx context.Context) error {
 		var err error
 		_, err = c.client.DeleteLog(ctx, req)
 		return err
-	***REMOVED***, c.CallOptions.DeleteLog...)
+	}, c.CallOptions.DeleteLog...)
 	return err
-***REMOVED***
+}
 
 // WriteLogEntries writes log entries to Stackdriver Logging.  All log entries are
 // written by this method.
-func (c *Client) WriteLogEntries(ctx context.Context, req *loggingpb.WriteLogEntriesRequest) (*loggingpb.WriteLogEntriesResponse, error) ***REMOVED***
+func (c *Client) WriteLogEntries(ctx context.Context, req *loggingpb.WriteLogEntriesRequest) (*loggingpb.WriteLogEntriesResponse, error) {
 	md, _ := metadata.FromContext(ctx)
 	ctx = metadata.NewContext(ctx, metadata.Join(md, c.metadata))
 	var resp *loggingpb.WriteLogEntriesResponse
-	err := gax.Invoke(ctx, func(ctx context.Context) error ***REMOVED***
+	err := gax.Invoke(ctx, func(ctx context.Context) error {
 		var err error
 		resp, err = c.client.WriteLogEntries(ctx, req)
 		return err
-	***REMOVED***, c.CallOptions.WriteLogEntries...)
-	if err != nil ***REMOVED***
+	}, c.CallOptions.WriteLogEntries...)
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return resp, nil
-***REMOVED***
+}
 
 // ListLogEntries lists log entries.  Use this method to retrieve log entries from Cloud
 // Logging.  For ways to export log entries, see
 // [Exporting Logs](/logging/docs/export).
-func (c *Client) ListLogEntries(ctx context.Context, req *loggingpb.ListLogEntriesRequest) *LogEntryIterator ***REMOVED***
+func (c *Client) ListLogEntries(ctx context.Context, req *loggingpb.ListLogEntriesRequest) *LogEntryIterator {
 	md, _ := metadata.FromContext(ctx)
 	ctx = metadata.NewContext(ctx, metadata.Join(md, c.metadata))
-	it := &LogEntryIterator***REMOVED******REMOVED***
-	it.InternalFetch = func(pageSize int, pageToken string) ([]*loggingpb.LogEntry, string, error) ***REMOVED***
+	it := &LogEntryIterator{}
+	it.InternalFetch = func(pageSize int, pageToken string) ([]*loggingpb.LogEntry, string, error) {
 		var resp *loggingpb.ListLogEntriesResponse
 		req.PageToken = pageToken
-		if pageSize > math.MaxInt32 ***REMOVED***
+		if pageSize > math.MaxInt32 {
 			req.PageSize = math.MaxInt32
-		***REMOVED*** else ***REMOVED***
+		} else {
 			req.PageSize = int32(pageSize)
-		***REMOVED***
-		err := gax.Invoke(ctx, func(ctx context.Context) error ***REMOVED***
+		}
+		err := gax.Invoke(ctx, func(ctx context.Context) error {
 			var err error
 			resp, err = c.client.ListLogEntries(ctx, req)
 			return err
-		***REMOVED***, c.CallOptions.ListLogEntries...)
-		if err != nil ***REMOVED***
+		}, c.CallOptions.ListLogEntries...)
+		if err != nil {
 			return nil, "", err
-		***REMOVED***
+		}
 		return resp.Entries, resp.NextPageToken, nil
-	***REMOVED***
-	fetch := func(pageSize int, pageToken string) (string, error) ***REMOVED***
+	}
+	fetch := func(pageSize int, pageToken string) (string, error) {
 		items, nextPageToken, err := it.InternalFetch(pageSize, pageToken)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return "", err
-		***REMOVED***
+		}
 		it.items = append(it.items, items...)
 		return nextPageToken, nil
-	***REMOVED***
+	}
 	it.pageInfo, it.nextFunc = iterator.NewPageInfo(fetch, it.bufLen, it.takeBuf)
 	return it
-***REMOVED***
+}
 
 // ListMonitoredResourceDescriptors lists the monitored resource descriptors used by Stackdriver Logging.
-func (c *Client) ListMonitoredResourceDescriptors(ctx context.Context, req *loggingpb.ListMonitoredResourceDescriptorsRequest) *MonitoredResourceDescriptorIterator ***REMOVED***
+func (c *Client) ListMonitoredResourceDescriptors(ctx context.Context, req *loggingpb.ListMonitoredResourceDescriptorsRequest) *MonitoredResourceDescriptorIterator {
 	md, _ := metadata.FromContext(ctx)
 	ctx = metadata.NewContext(ctx, metadata.Join(md, c.metadata))
-	it := &MonitoredResourceDescriptorIterator***REMOVED******REMOVED***
-	it.InternalFetch = func(pageSize int, pageToken string) ([]*monitoredrespb.MonitoredResourceDescriptor, string, error) ***REMOVED***
+	it := &MonitoredResourceDescriptorIterator{}
+	it.InternalFetch = func(pageSize int, pageToken string) ([]*monitoredrespb.MonitoredResourceDescriptor, string, error) {
 		var resp *loggingpb.ListMonitoredResourceDescriptorsResponse
 		req.PageToken = pageToken
-		if pageSize > math.MaxInt32 ***REMOVED***
+		if pageSize > math.MaxInt32 {
 			req.PageSize = math.MaxInt32
-		***REMOVED*** else ***REMOVED***
+		} else {
 			req.PageSize = int32(pageSize)
-		***REMOVED***
-		err := gax.Invoke(ctx, func(ctx context.Context) error ***REMOVED***
+		}
+		err := gax.Invoke(ctx, func(ctx context.Context) error {
 			var err error
 			resp, err = c.client.ListMonitoredResourceDescriptors(ctx, req)
 			return err
-		***REMOVED***, c.CallOptions.ListMonitoredResourceDescriptors...)
-		if err != nil ***REMOVED***
+		}, c.CallOptions.ListMonitoredResourceDescriptors...)
+		if err != nil {
 			return nil, "", err
-		***REMOVED***
+		}
 		return resp.ResourceDescriptors, resp.NextPageToken, nil
-	***REMOVED***
-	fetch := func(pageSize int, pageToken string) (string, error) ***REMOVED***
+	}
+	fetch := func(pageSize int, pageToken string) (string, error) {
 		items, nextPageToken, err := it.InternalFetch(pageSize, pageToken)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return "", err
-		***REMOVED***
+		}
 		it.items = append(it.items, items...)
 		return nextPageToken, nil
-	***REMOVED***
+	}
 	it.pageInfo, it.nextFunc = iterator.NewPageInfo(fetch, it.bufLen, it.takeBuf)
 	return it
-***REMOVED***
+}
 
 // LogEntryIterator manages a stream of *loggingpb.LogEntry.
-type LogEntryIterator struct ***REMOVED***
+type LogEntryIterator struct {
 	items    []*loggingpb.LogEntry
 	pageInfo *iterator.PageInfo
 	nextFunc func() error
@@ -287,37 +287,37 @@ type LogEntryIterator struct ***REMOVED***
 	// The number of results is no greater than pageSize.
 	// If there are no more results, nextPageToken is empty and err is nil.
 	InternalFetch func(pageSize int, pageToken string) (results []*loggingpb.LogEntry, nextPageToken string, err error)
-***REMOVED***
+}
 
 // PageInfo supports pagination. See the google.golang.org/api/iterator package for details.
-func (it *LogEntryIterator) PageInfo() *iterator.PageInfo ***REMOVED***
+func (it *LogEntryIterator) PageInfo() *iterator.PageInfo {
 	return it.pageInfo
-***REMOVED***
+}
 
 // Next returns the next result. Its second return value is iterator.Done if there are no more
 // results. Once Next returns Done, all subsequent calls will return Done.
-func (it *LogEntryIterator) Next() (*loggingpb.LogEntry, error) ***REMOVED***
+func (it *LogEntryIterator) Next() (*loggingpb.LogEntry, error) {
 	var item *loggingpb.LogEntry
-	if err := it.nextFunc(); err != nil ***REMOVED***
+	if err := it.nextFunc(); err != nil {
 		return item, err
-	***REMOVED***
+	}
 	item = it.items[0]
 	it.items = it.items[1:]
 	return item, nil
-***REMOVED***
+}
 
-func (it *LogEntryIterator) bufLen() int ***REMOVED***
+func (it *LogEntryIterator) bufLen() int {
 	return len(it.items)
-***REMOVED***
+}
 
-func (it *LogEntryIterator) takeBuf() interface***REMOVED******REMOVED*** ***REMOVED***
+func (it *LogEntryIterator) takeBuf() interface{} {
 	b := it.items
 	it.items = nil
 	return b
-***REMOVED***
+}
 
 // MonitoredResourceDescriptorIterator manages a stream of *monitoredrespb.MonitoredResourceDescriptor.
-type MonitoredResourceDescriptorIterator struct ***REMOVED***
+type MonitoredResourceDescriptorIterator struct {
 	items    []*monitoredrespb.MonitoredResourceDescriptor
 	pageInfo *iterator.PageInfo
 	nextFunc func() error
@@ -329,31 +329,31 @@ type MonitoredResourceDescriptorIterator struct ***REMOVED***
 	// The number of results is no greater than pageSize.
 	// If there are no more results, nextPageToken is empty and err is nil.
 	InternalFetch func(pageSize int, pageToken string) (results []*monitoredrespb.MonitoredResourceDescriptor, nextPageToken string, err error)
-***REMOVED***
+}
 
 // PageInfo supports pagination. See the google.golang.org/api/iterator package for details.
-func (it *MonitoredResourceDescriptorIterator) PageInfo() *iterator.PageInfo ***REMOVED***
+func (it *MonitoredResourceDescriptorIterator) PageInfo() *iterator.PageInfo {
 	return it.pageInfo
-***REMOVED***
+}
 
 // Next returns the next result. Its second return value is iterator.Done if there are no more
 // results. Once Next returns Done, all subsequent calls will return Done.
-func (it *MonitoredResourceDescriptorIterator) Next() (*monitoredrespb.MonitoredResourceDescriptor, error) ***REMOVED***
+func (it *MonitoredResourceDescriptorIterator) Next() (*monitoredrespb.MonitoredResourceDescriptor, error) {
 	var item *monitoredrespb.MonitoredResourceDescriptor
-	if err := it.nextFunc(); err != nil ***REMOVED***
+	if err := it.nextFunc(); err != nil {
 		return item, err
-	***REMOVED***
+	}
 	item = it.items[0]
 	it.items = it.items[1:]
 	return item, nil
-***REMOVED***
+}
 
-func (it *MonitoredResourceDescriptorIterator) bufLen() int ***REMOVED***
+func (it *MonitoredResourceDescriptorIterator) bufLen() int {
 	return len(it.items)
-***REMOVED***
+}
 
-func (it *MonitoredResourceDescriptorIterator) takeBuf() interface***REMOVED******REMOVED*** ***REMOVED***
+func (it *MonitoredResourceDescriptorIterator) takeBuf() interface{} {
 	b := it.items
 	it.items = nil
 	return b
-***REMOVED***
+}

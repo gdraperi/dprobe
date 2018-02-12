@@ -2,6 +2,6 @@ package main
 
 import "compress/zlib"
 
-func main() ***REMOVED***
+func main() {
 	var b map[int]zlib.
-***REMOVED***
+}

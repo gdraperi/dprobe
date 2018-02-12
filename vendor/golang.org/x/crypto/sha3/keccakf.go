@@ -7,7 +7,7 @@
 package sha3
 
 // rc stores the round constants for use in the ι step.
-var rc = [24]uint64***REMOVED***
+var rc = [24]uint64{
 	0x0000000000000001,
 	0x0000000000008082,
 	0x800000000000808A,
@@ -32,16 +32,16 @@ var rc = [24]uint64***REMOVED***
 	0x8000000000008080,
 	0x0000000080000001,
 	0x8000000080008008,
-***REMOVED***
+}
 
 // keccakF1600 applies the Keccak permutation to a 1600b-wide
 // state represented as a slice of 25 uint64s.
-func keccakF1600(a *[25]uint64) ***REMOVED***
+func keccakF1600(a *[25]uint64) {
 	// Implementation translated from Keccak-inplace.c
 	// in the keccak reference code.
 	var t, bc0, bc1, bc2, bc3, bc4, d0, d1, d2, d3, d4 uint64
 
-	for i := 0; i < 24; i += 4 ***REMOVED***
+	for i := 0; i < 24; i += 4 {
 		// Combines the 5 steps in each round into 2 steps.
 		// Unrolls 4 rounds per loop and spreads some steps across rounds.
 
@@ -408,5 +408,5 @@ func keccakF1600(a *[25]uint64) ***REMOVED***
 		a[22] = bc2 ^ (bc4 &^ bc3)
 		a[23] = bc3 ^ (bc0 &^ bc4)
 		a[24] = bc4 ^ (bc1 &^ bc0)
-	***REMOVED***
-***REMOVED***
+	}
+}

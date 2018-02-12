@@ -6,7 +6,7 @@ import (
 )
 
 // ASCII list the possible supported ASCII key sequence
-var ASCII = []string***REMOVED***
+var ASCII = []string{
 	"ctrl-@",
 	"ctrl-a",
 	"ctrl-b",
@@ -39,28 +39,28 @@ var ASCII = []string***REMOVED***
 	"ctrl-]",
 	"ctrl-^",
 	"ctrl-_",
-***REMOVED***
+}
 
 // ToBytes converts a string representing a suite of key-sequence to the corresponding ASCII code.
-func ToBytes(keys string) ([]byte, error) ***REMOVED***
-	codes := []byte***REMOVED******REMOVED***
+func ToBytes(keys string) ([]byte, error) {
+	codes := []byte{}
 next:
-	for _, key := range strings.Split(keys, ",") ***REMOVED***
-		if len(key) != 1 ***REMOVED***
-			for code, ctrl := range ASCII ***REMOVED***
-				if ctrl == key ***REMOVED***
+	for _, key := range strings.Split(keys, ",") {
+		if len(key) != 1 {
+			for code, ctrl := range ASCII {
+				if ctrl == key {
 					codes = append(codes, byte(code))
 					continue next
-				***REMOVED***
-			***REMOVED***
-			if key == "DEL" ***REMOVED***
+				}
+			}
+			if key == "DEL" {
 				codes = append(codes, 127)
-			***REMOVED*** else ***REMOVED***
+			} else {
 				return nil, fmt.Errorf("Unknown character: '%s'", key)
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
+			}
+		} else {
 			codes = append(codes, key[0])
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return codes, nil
-***REMOVED***
+}

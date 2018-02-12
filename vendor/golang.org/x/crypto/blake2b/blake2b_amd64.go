@@ -6,9 +6,9 @@
 
 package blake2b
 
-func init() ***REMOVED***
+func init() {
 	useSSE4 = supportsSSE4()
-***REMOVED***
+}
 
 //go:noescape
 func supportsSSE4() bool
@@ -16,10 +16,10 @@ func supportsSSE4() bool
 //go:noescape
 func hashBlocksSSE4(h *[8]uint64, c *[2]uint64, flag uint64, blocks []byte)
 
-func hashBlocks(h *[8]uint64, c *[2]uint64, flag uint64, blocks []byte) ***REMOVED***
-	if useSSE4 ***REMOVED***
+func hashBlocks(h *[8]uint64, c *[2]uint64, flag uint64, blocks []byte) {
+	if useSSE4 {
 		hashBlocksSSE4(h, c, flag, blocks)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		hashBlocksGeneric(h, c, flag, blocks)
-	***REMOVED***
-***REMOVED***
+	}
+}

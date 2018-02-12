@@ -24,23 +24,23 @@ const (
 )
 
 // Commands is list of all Dockerfile commands
-var Commands = map[string]struct***REMOVED******REMOVED******REMOVED***
-	Add:         ***REMOVED******REMOVED***,
-	Arg:         ***REMOVED******REMOVED***,
-	Cmd:         ***REMOVED******REMOVED***,
-	Copy:        ***REMOVED******REMOVED***,
-	Entrypoint:  ***REMOVED******REMOVED***,
-	Env:         ***REMOVED******REMOVED***,
-	Expose:      ***REMOVED******REMOVED***,
-	From:        ***REMOVED******REMOVED***,
-	Healthcheck: ***REMOVED******REMOVED***,
-	Label:       ***REMOVED******REMOVED***,
-	Maintainer:  ***REMOVED******REMOVED***,
-	Onbuild:     ***REMOVED******REMOVED***,
-	Run:         ***REMOVED******REMOVED***,
-	Shell:       ***REMOVED******REMOVED***,
-	StopSignal:  ***REMOVED******REMOVED***,
-	User:        ***REMOVED******REMOVED***,
-	Volume:      ***REMOVED******REMOVED***,
-	Workdir:     ***REMOVED******REMOVED***,
-***REMOVED***
+var Commands = map[string]struct{}{
+	Add:         {},
+	Arg:         {},
+	Cmd:         {},
+	Copy:        {},
+	Entrypoint:  {},
+	Env:         {},
+	Expose:      {},
+	From:        {},
+	Healthcheck: {},
+	Label:       {},
+	Maintainer:  {},
+	Onbuild:     {},
+	Run:         {},
+	Shell:       {},
+	StopSignal:  {},
+	User:        {},
+	Volume:      {},
+	Workdir:     {},
+}

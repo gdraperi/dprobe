@@ -20,7 +20,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-func (s *DockerSuite) TestContainersAPINetworkMountsNoChown(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestContainersAPINetworkMountsNoChown(c *check.C) {
 	// chown only applies to Linux bind mounted volumes; must be same host to verify
 	testRequires(c, DaemonIsLinux, SameHostDaemon)
 
@@ -37,41 +37,41 @@ func (s *DockerSuite) TestContainersAPINetworkMountsNoChown(c *check.C) ***REMOV
 	err = ioutil.WriteFile(tmpNWFileMount, []byte("network file bind mount"), 0644)
 	c.Assert(err, checker.IsNil)
 
-	config := containertypes.Config***REMOVED***
+	config := containertypes.Config{
 		Image: "busybox",
-	***REMOVED***
-	hostConfig := containertypes.HostConfig***REMOVED***
-		Mounts: []mounttypes.Mount***REMOVED***
-			***REMOVED***
+	}
+	hostConfig := containertypes.HostConfig{
+		Mounts: []mounttypes.Mount{
+			{
 				Type:   "bind",
 				Source: tmpNWFileMount,
 				Target: "/etc/resolv.conf",
-			***REMOVED***,
-			***REMOVED***
+			},
+			{
 				Type:   "bind",
 				Source: tmpNWFileMount,
 				Target: "/etc/hostname",
-			***REMOVED***,
-			***REMOVED***
+			},
+			{
 				Type:   "bind",
 				Source: tmpNWFileMount,
 				Target: "/etc/hosts",
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+			},
+		},
+	}
 
 	cli, err := client.NewEnvClient()
 	c.Assert(err, checker.IsNil)
 	defer cli.Close()
 
-	ctrCreate, err := cli.ContainerCreate(context.Background(), &config, &hostConfig, &networktypes.NetworkingConfig***REMOVED******REMOVED***, "")
+	ctrCreate, err := cli.ContainerCreate(context.Background(), &config, &hostConfig, &networktypes.NetworkingConfig{}, "")
 	c.Assert(err, checker.IsNil)
 	// container will exit immediately because of no tty, but we only need the start sequence to test the condition
-	err = cli.ContainerStart(context.Background(), ctrCreate.ID, types.ContainerStartOptions***REMOVED******REMOVED***)
+	err = cli.ContainerStart(context.Background(), ctrCreate.ID, types.ContainerStartOptions{})
 	c.Assert(err, checker.IsNil)
 
 	// check that host-located bind mount network file did not change ownership when the container was started
 	statT, err := system.Stat(tmpNWFileMount)
 	c.Assert(err, checker.IsNil)
 	assert.Equal(c, uint32(0), statT.UID(), "bind mounted network file should not change ownership from root")
-***REMOVED***
+}

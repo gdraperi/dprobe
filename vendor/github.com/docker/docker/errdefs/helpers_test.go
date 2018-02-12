@@ -7,126 +7,126 @@ import (
 
 var errTest = errors.New("this is a test")
 
-type causal interface ***REMOVED***
+type causal interface {
 	Cause() error
-***REMOVED***
+}
 
-func TestNotFound(t *testing.T) ***REMOVED***
+func TestNotFound(t *testing.T) {
 	e := NotFound(errTest)
-	if !IsNotFound(e) ***REMOVED***
+	if !IsNotFound(e) {
 		t.Fatalf("expected not found error, got: %T", e)
-	***REMOVED***
-	if cause := e.(causal).Cause(); cause != errTest ***REMOVED***
+	}
+	if cause := e.(causal).Cause(); cause != errTest {
 		t.Fatalf("causual should be errTest, got: %v", cause)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestConflict(t *testing.T) ***REMOVED***
+func TestConflict(t *testing.T) {
 	e := Conflict(errTest)
-	if !IsConflict(e) ***REMOVED***
+	if !IsConflict(e) {
 		t.Fatalf("expected conflcit error, got: %T", e)
-	***REMOVED***
-	if cause := e.(causal).Cause(); cause != errTest ***REMOVED***
+	}
+	if cause := e.(causal).Cause(); cause != errTest {
 		t.Fatalf("causual should be errTest, got: %v", cause)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestForbidden(t *testing.T) ***REMOVED***
+func TestForbidden(t *testing.T) {
 	e := Forbidden(errTest)
-	if !IsForbidden(e) ***REMOVED***
+	if !IsForbidden(e) {
 		t.Fatalf("expected forbidden error, got: %T", e)
-	***REMOVED***
-	if cause := e.(causal).Cause(); cause != errTest ***REMOVED***
+	}
+	if cause := e.(causal).Cause(); cause != errTest {
 		t.Fatalf("causual should be errTest, got: %v", cause)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestInvalidParameter(t *testing.T) ***REMOVED***
+func TestInvalidParameter(t *testing.T) {
 	e := InvalidParameter(errTest)
-	if !IsInvalidParameter(e) ***REMOVED***
+	if !IsInvalidParameter(e) {
 		t.Fatalf("expected invalid argument error, got %T", e)
-	***REMOVED***
-	if cause := e.(causal).Cause(); cause != errTest ***REMOVED***
+	}
+	if cause := e.(causal).Cause(); cause != errTest {
 		t.Fatalf("causual should be errTest, got: %v", cause)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestNotImplemented(t *testing.T) ***REMOVED***
+func TestNotImplemented(t *testing.T) {
 	e := NotImplemented(errTest)
-	if !IsNotImplemented(e) ***REMOVED***
+	if !IsNotImplemented(e) {
 		t.Fatalf("expected not implemented error, got %T", e)
-	***REMOVED***
-	if cause := e.(causal).Cause(); cause != errTest ***REMOVED***
+	}
+	if cause := e.(causal).Cause(); cause != errTest {
 		t.Fatalf("causual should be errTest, got: %v", cause)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestNotModified(t *testing.T) ***REMOVED***
+func TestNotModified(t *testing.T) {
 	e := NotModified(errTest)
-	if !IsNotModified(e) ***REMOVED***
+	if !IsNotModified(e) {
 		t.Fatalf("expected not modified error, got %T", e)
-	***REMOVED***
-	if cause := e.(causal).Cause(); cause != errTest ***REMOVED***
+	}
+	if cause := e.(causal).Cause(); cause != errTest {
 		t.Fatalf("causual should be errTest, got: %v", cause)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestAlreadyExists(t *testing.T) ***REMOVED***
+func TestAlreadyExists(t *testing.T) {
 	e := AlreadyExists(errTest)
-	if !IsAlreadyExists(e) ***REMOVED***
+	if !IsAlreadyExists(e) {
 		t.Fatalf("expected already exists error, got %T", e)
-	***REMOVED***
-	if cause := e.(causal).Cause(); cause != errTest ***REMOVED***
+	}
+	if cause := e.(causal).Cause(); cause != errTest {
 		t.Fatalf("causual should be errTest, got: %v", cause)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestUnauthorized(t *testing.T) ***REMOVED***
+func TestUnauthorized(t *testing.T) {
 	e := Unauthorized(errTest)
-	if !IsUnauthorized(e) ***REMOVED***
+	if !IsUnauthorized(e) {
 		t.Fatalf("expected unauthorized error, got %T", e)
-	***REMOVED***
-	if cause := e.(causal).Cause(); cause != errTest ***REMOVED***
+	}
+	if cause := e.(causal).Cause(); cause != errTest {
 		t.Fatalf("causual should be errTest, got: %v", cause)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestUnknown(t *testing.T) ***REMOVED***
+func TestUnknown(t *testing.T) {
 	e := Unknown(errTest)
-	if !IsUnknown(e) ***REMOVED***
+	if !IsUnknown(e) {
 		t.Fatalf("expected unknown error, got %T", e)
-	***REMOVED***
-	if cause := e.(causal).Cause(); cause != errTest ***REMOVED***
+	}
+	if cause := e.(causal).Cause(); cause != errTest {
 		t.Fatalf("causual should be errTest, got: %v", cause)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestCancelled(t *testing.T) ***REMOVED***
+func TestCancelled(t *testing.T) {
 	e := Cancelled(errTest)
-	if !IsCancelled(e) ***REMOVED***
+	if !IsCancelled(e) {
 		t.Fatalf("expected canclled error, got %T", e)
-	***REMOVED***
-	if cause := e.(causal).Cause(); cause != errTest ***REMOVED***
+	}
+	if cause := e.(causal).Cause(); cause != errTest {
 		t.Fatalf("causual should be errTest, got: %v", cause)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestDeadline(t *testing.T) ***REMOVED***
+func TestDeadline(t *testing.T) {
 	e := Deadline(errTest)
-	if !IsDeadline(e) ***REMOVED***
+	if !IsDeadline(e) {
 		t.Fatalf("expected deadline error, got %T", e)
-	***REMOVED***
-	if cause := e.(causal).Cause(); cause != errTest ***REMOVED***
+	}
+	if cause := e.(causal).Cause(); cause != errTest {
 		t.Fatalf("causual should be errTest, got: %v", cause)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestIsDataLoss(t *testing.T) ***REMOVED***
+func TestIsDataLoss(t *testing.T) {
 	e := DataLoss(errTest)
-	if !IsDataLoss(e) ***REMOVED***
+	if !IsDataLoss(e) {
 		t.Fatalf("expected data loss error, got %T", e)
-	***REMOVED***
-	if cause := e.(causal).Cause(); cause != errTest ***REMOVED***
+	}
+	if cause := e.(causal).Cause(); cause != errTest {
 		t.Fatalf("causual should be errTest, got: %v", cause)
-	***REMOVED***
-***REMOVED***
+	}
+}

@@ -14,117 +14,117 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-func tarName(p string) (string, error) ***REMOVED***
+func tarName(p string) (string, error) {
 	return p, nil
-***REMOVED***
+}
 
-func chmodTarEntry(perm os.FileMode) os.FileMode ***REMOVED***
+func chmodTarEntry(perm os.FileMode) os.FileMode {
 	return perm
-***REMOVED***
+}
 
-func setHeaderForSpecialDevice(hdr *tar.Header, name string, fi os.FileInfo) error ***REMOVED***
+func setHeaderForSpecialDevice(hdr *tar.Header, name string, fi os.FileInfo) error {
 	s, ok := fi.Sys().(*syscall.Stat_t)
-	if !ok ***REMOVED***
+	if !ok {
 		return errors.New("unsupported stat type")
-	***REMOVED***
+	}
 
 	// Currently go does not fill in the major/minors
 	if s.Mode&syscall.S_IFBLK != 0 ||
-		s.Mode&syscall.S_IFCHR != 0 ***REMOVED***
+		s.Mode&syscall.S_IFCHR != 0 {
 		hdr.Devmajor = int64(unix.Major(uint64(s.Rdev)))
 		hdr.Devminor = int64(unix.Minor(uint64(s.Rdev)))
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func open(p string) (*os.File, error) ***REMOVED***
+func open(p string) (*os.File, error) {
 	return os.Open(p)
-***REMOVED***
+}
 
-func openFile(name string, flag int, perm os.FileMode) (*os.File, error) ***REMOVED***
+func openFile(name string, flag int, perm os.FileMode) (*os.File, error) {
 	f, err := os.OpenFile(name, flag, perm)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	// Call chmod to avoid permission mask
-	if err := os.Chmod(name, perm); err != nil ***REMOVED***
+	if err := os.Chmod(name, perm); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return f, err
-***REMOVED***
+}
 
-func mkdirAll(path string, perm os.FileMode) error ***REMOVED***
+func mkdirAll(path string, perm os.FileMode) error {
 	return os.MkdirAll(path, perm)
-***REMOVED***
+}
 
-func mkdir(path string, perm os.FileMode) error ***REMOVED***
-	if err := os.Mkdir(path, perm); err != nil ***REMOVED***
+func mkdir(path string, perm os.FileMode) error {
+	if err := os.Mkdir(path, perm); err != nil {
 		return err
-	***REMOVED***
+	}
 	// Only final created directory gets explicit permission
 	// call to avoid permission mask
 	return os.Chmod(path, perm)
-***REMOVED***
+}
 
-func skipFile(*tar.Header) bool ***REMOVED***
+func skipFile(*tar.Header) bool {
 	return false
-***REMOVED***
+}
 
 var (
 	inUserNS bool
 	nsOnce   sync.Once
 )
 
-func setInUserNS() ***REMOVED***
+func setInUserNS() {
 	inUserNS = system.RunningInUserNS()
-***REMOVED***
+}
 
 // handleTarTypeBlockCharFifo is an OS-specific helper function used by
 // createTarFile to handle the following types of header: Block; Char; Fifo
-func handleTarTypeBlockCharFifo(hdr *tar.Header, path string) error ***REMOVED***
+func handleTarTypeBlockCharFifo(hdr *tar.Header, path string) error {
 	nsOnce.Do(setInUserNS)
-	if inUserNS ***REMOVED***
+	if inUserNS {
 		// cannot create a device if running in user namespace
 		return nil
-	***REMOVED***
+	}
 
 	mode := uint32(hdr.Mode & 07777)
-	switch hdr.Typeflag ***REMOVED***
+	switch hdr.Typeflag {
 	case tar.TypeBlock:
 		mode |= unix.S_IFBLK
 	case tar.TypeChar:
 		mode |= unix.S_IFCHR
 	case tar.TypeFifo:
 		mode |= unix.S_IFIFO
-	***REMOVED***
+	}
 
 	return unix.Mknod(path, mode, int(unix.Mkdev(uint32(hdr.Devmajor), uint32(hdr.Devminor))))
-***REMOVED***
+}
 
-func handleLChmod(hdr *tar.Header, path string, hdrInfo os.FileInfo) error ***REMOVED***
-	if hdr.Typeflag == tar.TypeLink ***REMOVED***
-		if fi, err := os.Lstat(hdr.Linkname); err == nil && (fi.Mode()&os.ModeSymlink == 0) ***REMOVED***
-			if err := os.Chmod(path, hdrInfo.Mode()); err != nil ***REMOVED***
+func handleLChmod(hdr *tar.Header, path string, hdrInfo os.FileInfo) error {
+	if hdr.Typeflag == tar.TypeLink {
+		if fi, err := os.Lstat(hdr.Linkname); err == nil && (fi.Mode()&os.ModeSymlink == 0) {
+			if err := os.Chmod(path, hdrInfo.Mode()); err != nil {
 				return err
-			***REMOVED***
-		***REMOVED***
-	***REMOVED*** else if hdr.Typeflag != tar.TypeSymlink ***REMOVED***
-		if err := os.Chmod(path, hdrInfo.Mode()); err != nil ***REMOVED***
+			}
+		}
+	} else if hdr.Typeflag != tar.TypeSymlink {
+		if err := os.Chmod(path, hdrInfo.Mode()); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func getxattr(path, attr string) ([]byte, error) ***REMOVED***
+func getxattr(path, attr string) ([]byte, error) {
 	b, err := sysx.LGetxattr(path, attr)
-	if err == unix.ENOTSUP || err == sysx.ENODATA ***REMOVED***
+	if err == unix.ENOTSUP || err == sysx.ENODATA {
 		return nil, nil
-	***REMOVED***
+	}
 	return b, err
-***REMOVED***
+}
 
-func setxattr(path, key, value string) error ***REMOVED***
+func setxattr(path, key, value string) error {
 	return sysx.LSetxattr(path, key, []byte(value), 0)
-***REMOVED***
+}

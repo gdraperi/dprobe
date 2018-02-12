@@ -9,41 +9,41 @@ import (
 	"golang.org/x/net/context"
 )
 
-func (s *DockerSwarmSuite) TestAPISwarmConfigsEmptyList(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestAPISwarmConfigsEmptyList(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 
 	configs := d.ListConfigs(c)
 	c.Assert(configs, checker.NotNil)
 	c.Assert(len(configs), checker.Equals, 0, check.Commentf("configs: %#v", configs))
-***REMOVED***
+}
 
-func (s *DockerSwarmSuite) TestAPISwarmConfigsCreate(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestAPISwarmConfigsCreate(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 
 	testName := "test_config"
-	id := d.CreateConfig(c, swarm.ConfigSpec***REMOVED***
-		Annotations: swarm.Annotations***REMOVED***
+	id := d.CreateConfig(c, swarm.ConfigSpec{
+		Annotations: swarm.Annotations{
 			Name: testName,
-		***REMOVED***,
+		},
 		Data: []byte("TESTINGDATA"),
-	***REMOVED***)
+	})
 	c.Assert(id, checker.Not(checker.Equals), "", check.Commentf("configs: %s", id))
 
 	configs := d.ListConfigs(c)
 	c.Assert(len(configs), checker.Equals, 1, check.Commentf("configs: %#v", configs))
 	name := configs[0].Spec.Annotations.Name
 	c.Assert(name, checker.Equals, testName, check.Commentf("configs: %s", name))
-***REMOVED***
+}
 
-func (s *DockerSwarmSuite) TestAPISwarmConfigsDelete(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestAPISwarmConfigsDelete(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 
 	testName := "test_config"
-	id := d.CreateConfig(c, swarm.ConfigSpec***REMOVED***Annotations: swarm.Annotations***REMOVED***
+	id := d.CreateConfig(c, swarm.ConfigSpec{Annotations: swarm.Annotations{
 		Name: testName,
-	***REMOVED***,
+	},
 		Data: []byte("TESTINGDATA"),
-	***REMOVED***)
+	})
 	c.Assert(id, checker.Not(checker.Equals), "", check.Commentf("configs: %s", id))
 
 	config := d.GetConfig(c, id)
@@ -57,52 +57,52 @@ func (s *DockerSwarmSuite) TestAPISwarmConfigsDelete(c *check.C) ***REMOVED***
 
 	_, _, err = cli.ConfigInspectWithRaw(context.Background(), id)
 	c.Assert(err.Error(), checker.Contains, "No such config")
-***REMOVED***
+}
 
-func (s *DockerSwarmSuite) TestAPISwarmConfigsUpdate(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestAPISwarmConfigsUpdate(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 
 	testName := "test_config"
-	id := d.CreateConfig(c, swarm.ConfigSpec***REMOVED***
-		Annotations: swarm.Annotations***REMOVED***
+	id := d.CreateConfig(c, swarm.ConfigSpec{
+		Annotations: swarm.Annotations{
 			Name: testName,
-			Labels: map[string]string***REMOVED***
+			Labels: map[string]string{
 				"test": "test1",
-			***REMOVED***,
-		***REMOVED***,
+			},
+		},
 		Data: []byte("TESTINGDATA"),
-	***REMOVED***)
+	})
 	c.Assert(id, checker.Not(checker.Equals), "", check.Commentf("configs: %s", id))
 
 	config := d.GetConfig(c, id)
 	c.Assert(config.ID, checker.Equals, id, check.Commentf("config: %v", config))
 
 	// test UpdateConfig with full ID
-	d.UpdateConfig(c, id, func(s *swarm.Config) ***REMOVED***
-		s.Spec.Labels = map[string]string***REMOVED***
+	d.UpdateConfig(c, id, func(s *swarm.Config) {
+		s.Spec.Labels = map[string]string{
 			"test": "test1",
-		***REMOVED***
-	***REMOVED***)
+		}
+	})
 
 	config = d.GetConfig(c, id)
 	c.Assert(config.Spec.Labels["test"], checker.Equals, "test1", check.Commentf("config: %v", config))
 
 	// test UpdateConfig with full name
-	d.UpdateConfig(c, config.Spec.Name, func(s *swarm.Config) ***REMOVED***
-		s.Spec.Labels = map[string]string***REMOVED***
+	d.UpdateConfig(c, config.Spec.Name, func(s *swarm.Config) {
+		s.Spec.Labels = map[string]string{
 			"test": "test2",
-		***REMOVED***
-	***REMOVED***)
+		}
+	})
 
 	config = d.GetConfig(c, id)
 	c.Assert(config.Spec.Labels["test"], checker.Equals, "test2", check.Commentf("config: %v", config))
 
 	// test UpdateConfig with prefix ID
-	d.UpdateConfig(c, id[:1], func(s *swarm.Config) ***REMOVED***
-		s.Spec.Labels = map[string]string***REMOVED***
+	d.UpdateConfig(c, id[:1], func(s *swarm.Config) {
+		s.Spec.Labels = map[string]string{
 			"test": "test3",
-		***REMOVED***
-	***REMOVED***)
+		}
+	})
 
 	config = d.GetConfig(c, id)
 	c.Assert(config.Spec.Labels["test"], checker.Equals, "test3", check.Commentf("config: %v", config))
@@ -120,4 +120,4 @@ func (s *DockerSwarmSuite) TestAPISwarmConfigsUpdate(c *check.C) ***REMOVED***
 
 	err = cli.ConfigUpdate(context.Background(), config.ID, config.Version, config.Spec)
 	c.Assert(err.Error(), checker.Contains, expected)
-***REMOVED***
+}

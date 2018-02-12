@@ -10,196 +10,196 @@ import (
 )
 
 // KeyValuePair represent an arbitrary named value (useful in slice insted of map[string] string to preserve ordering)
-type KeyValuePair struct ***REMOVED***
+type KeyValuePair struct {
 	Key   string
 	Value string
-***REMOVED***
+}
 
-func (kvp *KeyValuePair) String() string ***REMOVED***
+func (kvp *KeyValuePair) String() string {
 	return kvp.Key + "=" + kvp.Value
-***REMOVED***
+}
 
 // Command is implemented by every command present in a dockerfile
-type Command interface ***REMOVED***
+type Command interface {
 	Name() string
-***REMOVED***
+}
 
 // KeyValuePairs is a slice of KeyValuePair
 type KeyValuePairs []KeyValuePair
 
 // withNameAndCode is the base of every command in a Dockerfile (String() returns its source code)
-type withNameAndCode struct ***REMOVED***
+type withNameAndCode struct {
 	code string
 	name string
-***REMOVED***
+}
 
-func (c *withNameAndCode) String() string ***REMOVED***
+func (c *withNameAndCode) String() string {
 	return c.code
-***REMOVED***
+}
 
 // Name of the command
-func (c *withNameAndCode) Name() string ***REMOVED***
+func (c *withNameAndCode) Name() string {
 	return c.name
-***REMOVED***
+}
 
-func newWithNameAndCode(req parseRequest) withNameAndCode ***REMOVED***
-	return withNameAndCode***REMOVED***code: strings.TrimSpace(req.original), name: req.command***REMOVED***
-***REMOVED***
+func newWithNameAndCode(req parseRequest) withNameAndCode {
+	return withNameAndCode{code: strings.TrimSpace(req.original), name: req.command}
+}
 
 // SingleWordExpander is a provider for variable expansion where 1 word => 1 output
 type SingleWordExpander func(word string) (string, error)
 
 // SupportsSingleWordExpansion interface marks a command as supporting variable expansion
-type SupportsSingleWordExpansion interface ***REMOVED***
+type SupportsSingleWordExpansion interface {
 	Expand(expander SingleWordExpander) error
-***REMOVED***
+}
 
 // PlatformSpecific adds platform checks to a command
-type PlatformSpecific interface ***REMOVED***
+type PlatformSpecific interface {
 	CheckPlatform(platform string) error
-***REMOVED***
+}
 
-func expandKvp(kvp KeyValuePair, expander SingleWordExpander) (KeyValuePair, error) ***REMOVED***
+func expandKvp(kvp KeyValuePair, expander SingleWordExpander) (KeyValuePair, error) {
 	key, err := expander(kvp.Key)
-	if err != nil ***REMOVED***
-		return KeyValuePair***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return KeyValuePair{}, err
+	}
 	value, err := expander(kvp.Value)
-	if err != nil ***REMOVED***
-		return KeyValuePair***REMOVED******REMOVED***, err
-	***REMOVED***
-	return KeyValuePair***REMOVED***Key: key, Value: value***REMOVED***, nil
-***REMOVED***
-func expandKvpsInPlace(kvps KeyValuePairs, expander SingleWordExpander) error ***REMOVED***
-	for i, kvp := range kvps ***REMOVED***
+	if err != nil {
+		return KeyValuePair{}, err
+	}
+	return KeyValuePair{Key: key, Value: value}, nil
+}
+func expandKvpsInPlace(kvps KeyValuePairs, expander SingleWordExpander) error {
+	for i, kvp := range kvps {
 		newKvp, err := expandKvp(kvp, expander)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		kvps[i] = newKvp
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func expandSliceInPlace(values []string, expander SingleWordExpander) error ***REMOVED***
-	for i, v := range values ***REMOVED***
+func expandSliceInPlace(values []string, expander SingleWordExpander) error {
+	for i, v := range values {
 		newValue, err := expander(v)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		values[i] = newValue
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // EnvCommand : ENV key1 value1 [keyN valueN...]
-type EnvCommand struct ***REMOVED***
+type EnvCommand struct {
 	withNameAndCode
 	Env KeyValuePairs // kvp slice instead of map to preserve ordering
-***REMOVED***
+}
 
 // Expand variables
-func (c *EnvCommand) Expand(expander SingleWordExpander) error ***REMOVED***
+func (c *EnvCommand) Expand(expander SingleWordExpander) error {
 	return expandKvpsInPlace(c.Env, expander)
-***REMOVED***
+}
 
 // MaintainerCommand : MAINTAINER maintainer_name
-type MaintainerCommand struct ***REMOVED***
+type MaintainerCommand struct {
 	withNameAndCode
 	Maintainer string
-***REMOVED***
+}
 
 // LabelCommand : LABEL some json data describing the image
 //
 // Sets the Label variable foo to bar,
 //
-type LabelCommand struct ***REMOVED***
+type LabelCommand struct {
 	withNameAndCode
 	Labels KeyValuePairs // kvp slice instead of map to preserve ordering
-***REMOVED***
+}
 
 // Expand variables
-func (c *LabelCommand) Expand(expander SingleWordExpander) error ***REMOVED***
+func (c *LabelCommand) Expand(expander SingleWordExpander) error {
 	return expandKvpsInPlace(c.Labels, expander)
-***REMOVED***
+}
 
 // SourcesAndDest represent a list of source files and a destination
 type SourcesAndDest []string
 
 // Sources list the source paths
-func (s SourcesAndDest) Sources() []string ***REMOVED***
+func (s SourcesAndDest) Sources() []string {
 	res := make([]string, len(s)-1)
 	copy(res, s[:len(s)-1])
 	return res
-***REMOVED***
+}
 
 // Dest path of the operation
-func (s SourcesAndDest) Dest() string ***REMOVED***
+func (s SourcesAndDest) Dest() string {
 	return s[len(s)-1]
-***REMOVED***
+}
 
 // AddCommand : ADD foo /path
 //
 // Add the file 'foo' to '/path'. Tarball and Remote URL (git, http) handling
 // exist here. If you do not wish to have this automatic handling, use COPY.
 //
-type AddCommand struct ***REMOVED***
+type AddCommand struct {
 	withNameAndCode
 	SourcesAndDest
 	Chown string
-***REMOVED***
+}
 
 // Expand variables
-func (c *AddCommand) Expand(expander SingleWordExpander) error ***REMOVED***
+func (c *AddCommand) Expand(expander SingleWordExpander) error {
 	return expandSliceInPlace(c.SourcesAndDest, expander)
-***REMOVED***
+}
 
 // CopyCommand : COPY foo /path
 //
 // Same as 'ADD' but without the tar and remote url handling.
 //
-type CopyCommand struct ***REMOVED***
+type CopyCommand struct {
 	withNameAndCode
 	SourcesAndDest
 	From  string
 	Chown string
-***REMOVED***
+}
 
 // Expand variables
-func (c *CopyCommand) Expand(expander SingleWordExpander) error ***REMOVED***
+func (c *CopyCommand) Expand(expander SingleWordExpander) error {
 	return expandSliceInPlace(c.SourcesAndDest, expander)
-***REMOVED***
+}
 
 // OnbuildCommand : ONBUILD <some other command>
-type OnbuildCommand struct ***REMOVED***
+type OnbuildCommand struct {
 	withNameAndCode
 	Expression string
-***REMOVED***
+}
 
 // WorkdirCommand : WORKDIR /tmp
 //
 // Set the working directory for future RUN/CMD/etc statements.
 //
-type WorkdirCommand struct ***REMOVED***
+type WorkdirCommand struct {
 	withNameAndCode
 	Path string
-***REMOVED***
+}
 
 // Expand variables
-func (c *WorkdirCommand) Expand(expander SingleWordExpander) error ***REMOVED***
+func (c *WorkdirCommand) Expand(expander SingleWordExpander) error {
 	p, err := expander(c.Path)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	c.Path = p
 	return nil
-***REMOVED***
+}
 
 // ShellDependantCmdLine represents a cmdline optionaly prepended with the shell
-type ShellDependantCmdLine struct ***REMOVED***
+type ShellDependantCmdLine struct {
 	CmdLine      strslice.StrSlice
 	PrependShell bool
-***REMOVED***
+}
 
 // RunCommand : RUN some command yo
 //
@@ -211,30 +211,30 @@ type ShellDependantCmdLine struct ***REMOVED***
 // RUN echo hi          # cmd /S /C echo hi   (Windows)
 // RUN [ "echo", "hi" ] # echo hi
 //
-type RunCommand struct ***REMOVED***
+type RunCommand struct {
 	withNameAndCode
 	ShellDependantCmdLine
-***REMOVED***
+}
 
 // CmdCommand : CMD foo
 //
 // Set the default command to run in the container (which may be empty).
 // Argument handling is the same as RUN.
 //
-type CmdCommand struct ***REMOVED***
+type CmdCommand struct {
 	withNameAndCode
 	ShellDependantCmdLine
-***REMOVED***
+}
 
 // HealthCheckCommand : HEALTHCHECK foo
 //
 // Set the default healthcheck command to run in the container (which may be empty).
 // Argument handling is the same as RUN.
 //
-type HealthCheckCommand struct ***REMOVED***
+type HealthCheckCommand struct {
 	withNameAndCode
 	Health *container.HealthConfig
-***REMOVED***
+}
 
 // EntrypointCommand : ENTRYPOINT /usr/sbin/nginx
 //
@@ -244,153 +244,153 @@ type HealthCheckCommand struct ***REMOVED***
 // Handles command processing similar to CMD and RUN, only req.runConfig.Entrypoint
 // is initialized at newBuilder time instead of through argument parsing.
 //
-type EntrypointCommand struct ***REMOVED***
+type EntrypointCommand struct {
 	withNameAndCode
 	ShellDependantCmdLine
-***REMOVED***
+}
 
 // ExposeCommand : EXPOSE 6667/tcp 7000/tcp
 //
 // Expose ports for links and port mappings. This all ends up in
 // req.runConfig.ExposedPorts for runconfig.
 //
-type ExposeCommand struct ***REMOVED***
+type ExposeCommand struct {
 	withNameAndCode
 	Ports []string
-***REMOVED***
+}
 
 // UserCommand : USER foo
 //
 // Set the user to 'foo' for future commands and when running the
 // ENTRYPOINT/CMD at container run time.
 //
-type UserCommand struct ***REMOVED***
+type UserCommand struct {
 	withNameAndCode
 	User string
-***REMOVED***
+}
 
 // Expand variables
-func (c *UserCommand) Expand(expander SingleWordExpander) error ***REMOVED***
+func (c *UserCommand) Expand(expander SingleWordExpander) error {
 	p, err := expander(c.User)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	c.User = p
 	return nil
-***REMOVED***
+}
 
 // VolumeCommand : VOLUME /foo
 //
 // Expose the volume /foo for use. Will also accept the JSON array form.
 //
-type VolumeCommand struct ***REMOVED***
+type VolumeCommand struct {
 	withNameAndCode
 	Volumes []string
-***REMOVED***
+}
 
 // Expand variables
-func (c *VolumeCommand) Expand(expander SingleWordExpander) error ***REMOVED***
+func (c *VolumeCommand) Expand(expander SingleWordExpander) error {
 	return expandSliceInPlace(c.Volumes, expander)
-***REMOVED***
+}
 
 // StopSignalCommand : STOPSIGNAL signal
 //
 // Set the signal that will be used to kill the container.
-type StopSignalCommand struct ***REMOVED***
+type StopSignalCommand struct {
 	withNameAndCode
 	Signal string
-***REMOVED***
+}
 
 // Expand variables
-func (c *StopSignalCommand) Expand(expander SingleWordExpander) error ***REMOVED***
+func (c *StopSignalCommand) Expand(expander SingleWordExpander) error {
 	p, err := expander(c.Signal)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	c.Signal = p
 	return nil
-***REMOVED***
+}
 
 // CheckPlatform checks that the command is supported in the target platform
-func (c *StopSignalCommand) CheckPlatform(platform string) error ***REMOVED***
-	if platform == "windows" ***REMOVED***
+func (c *StopSignalCommand) CheckPlatform(platform string) error {
+	if platform == "windows" {
 		return errors.New("The daemon on this platform does not support the command stopsignal")
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // ArgCommand : ARG name[=value]
 //
 // Adds the variable foo to the trusted list of variables that can be passed
 // to builder using the --build-arg flag for expansion/substitution or passing to 'run'.
 // Dockerfile author may optionally set a default value of this variable.
-type ArgCommand struct ***REMOVED***
+type ArgCommand struct {
 	withNameAndCode
 	Key   string
 	Value *string
-***REMOVED***
+}
 
 // Expand variables
-func (c *ArgCommand) Expand(expander SingleWordExpander) error ***REMOVED***
+func (c *ArgCommand) Expand(expander SingleWordExpander) error {
 	p, err := expander(c.Key)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	c.Key = p
-	if c.Value != nil ***REMOVED***
+	if c.Value != nil {
 		p, err = expander(*c.Value)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		c.Value = &p
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // ShellCommand : SHELL powershell -command
 //
 // Set the non-default shell to use.
-type ShellCommand struct ***REMOVED***
+type ShellCommand struct {
 	withNameAndCode
 	Shell strslice.StrSlice
-***REMOVED***
+}
 
 // Stage represents a single stage in a multi-stage build
-type Stage struct ***REMOVED***
+type Stage struct {
 	Name       string
 	Commands   []Command
 	BaseName   string
 	SourceCode string
-***REMOVED***
+}
 
 // AddCommand to the stage
-func (s *Stage) AddCommand(cmd Command) ***REMOVED***
+func (s *Stage) AddCommand(cmd Command) {
 	// todo: validate cmd type
 	s.Commands = append(s.Commands, cmd)
-***REMOVED***
+}
 
 // IsCurrentStage check if the stage name is the current stage
-func IsCurrentStage(s []Stage, name string) bool ***REMOVED***
-	if len(s) == 0 ***REMOVED***
+func IsCurrentStage(s []Stage, name string) bool {
+	if len(s) == 0 {
 		return false
-	***REMOVED***
+	}
 	return s[len(s)-1].Name == name
-***REMOVED***
+}
 
 // CurrentStage return the last stage in a slice
-func CurrentStage(s []Stage) (*Stage, error) ***REMOVED***
-	if len(s) == 0 ***REMOVED***
+func CurrentStage(s []Stage) (*Stage, error) {
+	if len(s) == 0 {
 		return nil, errors.New("No build stage in current context")
-	***REMOVED***
+	}
 	return &s[len(s)-1], nil
-***REMOVED***
+}
 
 // HasStage looks for the presence of a given stage name
-func HasStage(s []Stage, name string) (int, bool) ***REMOVED***
-	for i, stage := range s ***REMOVED***
-		if stage.Name == name ***REMOVED***
+func HasStage(s []Stage, name string) (int, bool) {
+	for i, stage := range s {
+		if stage.Name == name {
 			return i, true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return -1, false
-***REMOVED***
+}

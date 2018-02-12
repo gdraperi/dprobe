@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	left = [...]string***REMOVED***
+	left = [...]string{
 		"admiring",
 		"adoring",
 		"affectionate",
@@ -100,11 +100,11 @@ var (
 		"youthful",
 		"zealous",
 		"zen",
-	***REMOVED***
+	}
 
 	// Docker, starting from 0.7.x, generates names from notable scientists and hackers.
 	// Please, for any amazing man that you add to the list, consider adding an equally amazing woman to it, and vice versa.
-	right = [...]string***REMOVED***
+	right = [...]string{
 		// Muhammad ibn Jābir al-Ḥarrānī al-Battānī was a founding father of astronomy. https://en.wikipedia.org/wiki/Mu%E1%B8%A5ammad_ibn_J%C4%81bir_al-%E1%B8%A4arr%C4%81n%C4%AB_al-Batt%C4%81n%C4%AB
 		"albattani",
 
@@ -598,21 +598,21 @@ var (
 
 		// Ada Yonath - an Israeli crystallographer, the first woman from the Middle East to win a Nobel prize in the sciences. https://en.wikipedia.org/wiki/Ada_Yonath
 		"yonath",
-	***REMOVED***
+	}
 )
 
 // GetRandomName generates a random name from the list of adjectives and surnames in this package
 // formatted as "adjective_surname". For example 'focused_turing'. If retry is non-zero, a random
 // integer between 0 and 10 will be added to the end of the name, e.g `focused_turing3`
-func GetRandomName(retry int) string ***REMOVED***
+func GetRandomName(retry int) string {
 begin:
 	name := fmt.Sprintf("%s_%s", left[rand.Intn(len(left))], right[rand.Intn(len(right))])
-	if name == "boring_wozniak" /* Steve Wozniak is not boring */ ***REMOVED***
+	if name == "boring_wozniak" /* Steve Wozniak is not boring */ {
 		goto begin
-	***REMOVED***
+	}
 
-	if retry > 0 ***REMOVED***
+	if retry > 0 {
 		name = fmt.Sprintf("%s%d", name, rand.Intn(10))
-	***REMOVED***
+	}
 	return name
-***REMOVED***
+}

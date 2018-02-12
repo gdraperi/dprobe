@@ -9,15 +9,15 @@ import (
 )
 
 // ContainerDiff shows differences in a container filesystem since it was started.
-func (cli *Client) ContainerDiff(ctx context.Context, containerID string) ([]container.ContainerChangeResponseItem, error) ***REMOVED***
+func (cli *Client) ContainerDiff(ctx context.Context, containerID string) ([]container.ContainerChangeResponseItem, error) {
 	var changes []container.ContainerChangeResponseItem
 
-	serverResp, err := cli.get(ctx, "/containers/"+containerID+"/changes", url.Values***REMOVED******REMOVED***, nil)
-	if err != nil ***REMOVED***
+	serverResp, err := cli.get(ctx, "/containers/"+containerID+"/changes", url.Values{}, nil)
+	if err != nil {
 		return changes, err
-	***REMOVED***
+	}
 
 	err = json.NewDecoder(serverResp.body).Decode(&changes)
 	ensureReaderClosed(serverResp)
 	return changes, err
-***REMOVED***
+}

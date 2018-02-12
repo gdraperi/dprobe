@@ -6,26 +6,26 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-func tcget(fd uintptr, p *unix.Termios) error ***REMOVED***
+func tcget(fd uintptr, p *unix.Termios) error {
 	termios, err := unix.IoctlGetTermios(int(fd), cmdTcGet)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	*p = *termios
 	return nil
-***REMOVED***
+}
 
-func tcset(fd uintptr, p *unix.Termios) error ***REMOVED***
+func tcset(fd uintptr, p *unix.Termios) error {
 	return unix.IoctlSetTermios(int(fd), cmdTcSet, p)
-***REMOVED***
+}
 
-func tcgwinsz(fd uintptr) (WinSize, error) ***REMOVED***
+func tcgwinsz(fd uintptr) (WinSize, error) {
 	var ws WinSize
 
 	uws, err := unix.IoctlGetWinsize(int(fd), unix.TIOCGWINSZ)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return ws, err
-	***REMOVED***
+	}
 
 	// Translate from unix.Winsize to console.WinSize
 	ws.Height = uws.Row
@@ -33,9 +33,9 @@ func tcgwinsz(fd uintptr) (WinSize, error) ***REMOVED***
 	ws.x = uws.Xpixel
 	ws.y = uws.Ypixel
 	return ws, nil
-***REMOVED***
+}
 
-func tcswinsz(fd uintptr, ws WinSize) error ***REMOVED***
+func tcswinsz(fd uintptr, ws WinSize) error {
 	// Translate from console.WinSize to unix.Winsize
 
 	var uws unix.Winsize
@@ -45,24 +45,24 @@ func tcswinsz(fd uintptr, ws WinSize) error ***REMOVED***
 	uws.Ypixel = ws.y
 
 	return unix.IoctlSetWinsize(int(fd), unix.TIOCSWINSZ, &uws)
-***REMOVED***
+}
 
-func setONLCR(fd uintptr, enable bool) error ***REMOVED***
+func setONLCR(fd uintptr, enable bool) error {
 	var termios unix.Termios
-	if err := tcget(fd, &termios); err != nil ***REMOVED***
+	if err := tcget(fd, &termios); err != nil {
 		return err
-	***REMOVED***
-	if enable ***REMOVED***
+	}
+	if enable {
 		// Set +onlcr so we can act like a real terminal
 		termios.Oflag |= unix.ONLCR
-	***REMOVED*** else ***REMOVED***
+	} else {
 		// Set -onlcr so we don't have to deal with \r.
 		termios.Oflag &^= unix.ONLCR
-	***REMOVED***
+	}
 	return tcset(fd, &termios)
-***REMOVED***
+}
 
-func cfmakeraw(t unix.Termios) unix.Termios ***REMOVED***
+func cfmakeraw(t unix.Termios) unix.Termios {
 	t.Iflag &^= (unix.IGNBRK | unix.BRKINT | unix.PARMRK | unix.ISTRIP | unix.INLCR | unix.IGNCR | unix.ICRNL | unix.IXON)
 	t.Oflag &^= unix.OPOST
 	t.Lflag &^= (unix.ECHO | unix.ECHONL | unix.ICANON | unix.ISIG | unix.IEXTEN)
@@ -72,4 +72,4 @@ func cfmakeraw(t unix.Termios) unix.Termios ***REMOVED***
 	t.Cc[unix.VTIME] = 0
 
 	return t
-***REMOVED***
+}

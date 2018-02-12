@@ -14,90 +14,90 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestLocalSocket(t *testing.T) ***REMOVED***
+func TestLocalSocket(t *testing.T) {
 	// TODO Windows: Enable a similar version for Windows named pipes
 	tmpdir, unregister := Setup(t)
 	defer unregister()
 
-	cases := []string***REMOVED***
+	cases := []string{
 		filepath.Join(tmpdir, "echo.sock"),
 		filepath.Join(tmpdir, "echo", "echo.sock"),
-	***REMOVED***
+	}
 
-	for _, c := range cases ***REMOVED***
-		if err := os.MkdirAll(filepath.Dir(c), 0755); err != nil ***REMOVED***
+	for _, c := range cases {
+		if err := os.MkdirAll(filepath.Dir(c), 0755); err != nil {
 			t.Fatal(err)
-		***REMOVED***
+		}
 
 		l, err := net.Listen("unix", c)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
+		}
 
 		r := newLocalRegistry()
 		p, err := r.Plugin("echo")
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
+		}
 
 		pp, err := r.Plugin("echo")
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
-		if !reflect.DeepEqual(p, pp) ***REMOVED***
+		}
+		if !reflect.DeepEqual(p, pp) {
 			t.Fatalf("Expected %v, was %v\n", p, pp)
-		***REMOVED***
+		}
 
-		if p.name != "echo" ***REMOVED***
+		if p.name != "echo" {
 			t.Fatalf("Expected plugin `echo`, got %s\n", p.name)
-		***REMOVED***
+		}
 
 		addr := fmt.Sprintf("unix://%s", c)
-		if p.Addr != addr ***REMOVED***
+		if p.Addr != addr {
 			t.Fatalf("Expected plugin addr `%s`, got %s\n", addr, p.Addr)
-		***REMOVED***
-		if !p.TLSConfig.InsecureSkipVerify ***REMOVED***
+		}
+		if !p.TLSConfig.InsecureSkipVerify {
 			t.Fatalf("Expected TLS verification to be skipped")
-		***REMOVED***
+		}
 		l.Close()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestScan(t *testing.T) ***REMOVED***
+func TestScan(t *testing.T) {
 	tmpdir, unregister := Setup(t)
 	defer unregister()
 
 	pluginNames, err := Scan()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if pluginNames != nil ***REMOVED***
+	}
+	if pluginNames != nil {
 		t.Fatal("Plugin names should be empty.")
-	***REMOVED***
+	}
 
 	path := filepath.Join(tmpdir, "echo.spec")
 	addr := "unix://var/lib/docker/plugins/echo.sock"
 	name := "echo"
 
 	err = os.MkdirAll(filepath.Dir(path), 0755)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	err = ioutil.WriteFile(path, []byte(addr), 0644)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	r := newLocalRegistry()
 	p, err := r.Plugin(name)
 	require.NoError(t, err)
 
 	pluginNamesNotEmpty, err := Scan()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if p.Name() != pluginNamesNotEmpty[0] ***REMOVED***
+	}
+	if p.Name() != pluginNamesNotEmpty[0] {
 		t.Fatalf("Unable to scan plugin with name %s", p.name)
-	***REMOVED***
-***REMOVED***
+	}
+}

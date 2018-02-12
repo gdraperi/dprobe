@@ -14,7 +14,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-func (s *DockerSuite) TestVolumesAPIList(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestVolumesAPIList(c *check.C) {
 	prefix, _ := getPrefixAndSlashFromDaemonPlatform()
 	cid, _ := dockerCmd(c, "run", "-d", "-v", prefix+"/foo", "busybox")
 
@@ -26,23 +26,23 @@ func (s *DockerSuite) TestVolumesAPIList(c *check.C) ***REMOVED***
 	c.Assert(err, checker.IsNil)
 	vname := container.Mounts[0].Name
 
-	volumes, err := cli.VolumeList(context.Background(), filters.Args***REMOVED******REMOVED***)
+	volumes, err := cli.VolumeList(context.Background(), filters.Args{})
 	c.Assert(err, checker.IsNil)
 
 	found := false
-	for _, vol := range volumes.Volumes ***REMOVED***
-		if vol.Name == vname ***REMOVED***
+	for _, vol := range volumes.Volumes {
+		if vol.Name == vname {
 			found = true
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	c.Assert(found, checker.Equals, true)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestVolumesAPICreate(c *check.C) ***REMOVED***
-	config := volumetypes.VolumesCreateBody***REMOVED***
+func (s *DockerSuite) TestVolumesAPICreate(c *check.C) {
+	config := volumetypes.VolumesCreateBody{
 		Name: "test",
-	***REMOVED***
+	}
 
 	cli, err := client.NewEnvClient()
 	c.Assert(err, checker.IsNil)
@@ -52,9 +52,9 @@ func (s *DockerSuite) TestVolumesAPICreate(c *check.C) ***REMOVED***
 	c.Assert(err, check.IsNil)
 
 	c.Assert(filepath.Base(filepath.Dir(vol.Mountpoint)), checker.Equals, config.Name)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestVolumesAPIRemove(c *check.C) ***REMOVED***
+func (s *DockerSuite) TestVolumesAPIRemove(c *check.C) {
 	prefix, _ := getPrefixAndSlashFromDaemonPlatform()
 	cid, _ := dockerCmd(c, "run", "-d", "-v", prefix+"/foo", "--name=test", "busybox")
 
@@ -72,12 +72,12 @@ func (s *DockerSuite) TestVolumesAPIRemove(c *check.C) ***REMOVED***
 	dockerCmd(c, "rm", "-f", "test")
 	err = cli.VolumeRemove(context.Background(), vname, false)
 	c.Assert(err, checker.IsNil)
-***REMOVED***
+}
 
-func (s *DockerSuite) TestVolumesAPIInspect(c *check.C) ***REMOVED***
-	config := volumetypes.VolumesCreateBody***REMOVED***
+func (s *DockerSuite) TestVolumesAPIInspect(c *check.C) {
+	config := volumetypes.VolumesCreateBody{
 		Name: "test",
-	***REMOVED***
+	}
 
 	// sampling current time minus a minute so to now have false positive in case of delays
 	now := time.Now().Truncate(time.Minute)
@@ -97,7 +97,7 @@ func (s *DockerSuite) TestVolumesAPIInspect(c *check.C) ***REMOVED***
 	testCreatedAt, err := time.Parse(time.RFC3339, strings.TrimSpace(vol.CreatedAt))
 	c.Assert(err, check.IsNil)
 	testCreatedAt = testCreatedAt.Truncate(time.Minute)
-	if !testCreatedAt.Equal(now) ***REMOVED***
+	if !testCreatedAt.Equal(now) {
 		c.Assert(fmt.Errorf("Time Volume is CreatedAt not equal to current time"), check.NotNil)
-	***REMOVED***
-***REMOVED***
+	}
+}

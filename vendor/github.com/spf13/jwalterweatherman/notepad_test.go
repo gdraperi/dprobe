@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestNotepad(t *testing.T) ***REMOVED***
+func TestNotepad(t *testing.T) {
 	var logHandle, outHandle bytes.Buffer
 
 	n := NewNotepad(LevelCritical, LevelError, &outHandle, &logHandle, "TestNotePad", 0)
@@ -32,19 +32,19 @@ func TestNotepad(t *testing.T) ***REMOVED***
 	require.Equal(t, n.LogCountForLevel(LevelError), uint64(1))
 	require.Equal(t, n.LogCountForLevel(LevelDebug), uint64(1))
 	require.Equal(t, n.LogCountForLevel(LevelTrace), uint64(0))
-***REMOVED***
+}
 
-func TestThresholdString(t *testing.T) ***REMOVED***
+func TestThresholdString(t *testing.T) {
 	require.Equal(t, LevelError.String(), "ERROR")
 	require.Equal(t, LevelTrace.String(), "TRACE")
-***REMOVED***
+}
 
-func BenchmarkLogPrintOnlyToCounter(b *testing.B) ***REMOVED***
+func BenchmarkLogPrintOnlyToCounter(b *testing.B) {
 	var logHandle, outHandle bytes.Buffer
 	n := NewNotepad(LevelCritical, LevelCritical, &outHandle, &logHandle, "TestNotePad", 0)
 
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		n.INFO.Print("Test")
-	***REMOVED***
-***REMOVED***
+	}
+}

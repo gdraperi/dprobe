@@ -10,7 +10,7 @@
 <meta name='flags' content='http'>
 <meta name="assert" content="A page with a UTF-8 BOM will be recognized as UTF-8 even if the meta charset attribute declares a different encoding.">
 <style type='text/css'>
-.test div ***REMOVED*** width: 50px; ***REMOVED***.test div ***REMOVED*** width: 90px; ***REMOVED***
+.test div { width: 50px; }.test div { width: 90px; }
 </style>
 <link rel="stylesheet" type="text/css" href="the-input-byte-stream/support/encodingtests-utf8.css">
 </head>
@@ -38,9 +38,9 @@
 				<li>The test is read from a server that supports HTTP.</li></ul></div>
 </div>
 <script>
-test(function() ***REMOVED***
+test(function() {
 assert_equals(document.getElementById('box').offsetWidth, 100);
-***REMOVED***, " ");
+}, " ");
 </script>
 
 </body>

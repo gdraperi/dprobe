@@ -7,120 +7,120 @@ import (
 )
 
 // -- uintSlice Value
-type uintSliceValue struct ***REMOVED***
+type uintSliceValue struct {
 	value   *[]uint
 	changed bool
-***REMOVED***
+}
 
-func newUintSliceValue(val []uint, p *[]uint) *uintSliceValue ***REMOVED***
+func newUintSliceValue(val []uint, p *[]uint) *uintSliceValue {
 	uisv := new(uintSliceValue)
 	uisv.value = p
 	*uisv.value = val
 	return uisv
-***REMOVED***
+}
 
-func (s *uintSliceValue) Set(val string) error ***REMOVED***
+func (s *uintSliceValue) Set(val string) error {
 	ss := strings.Split(val, ",")
 	out := make([]uint, len(ss))
-	for i, d := range ss ***REMOVED***
+	for i, d := range ss {
 		u, err := strconv.ParseUint(d, 10, 0)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		out[i] = uint(u)
-	***REMOVED***
-	if !s.changed ***REMOVED***
+	}
+	if !s.changed {
 		*s.value = out
-	***REMOVED*** else ***REMOVED***
+	} else {
 		*s.value = append(*s.value, out...)
-	***REMOVED***
+	}
 	s.changed = true
 	return nil
-***REMOVED***
+}
 
-func (s *uintSliceValue) Type() string ***REMOVED***
+func (s *uintSliceValue) Type() string {
 	return "uintSlice"
-***REMOVED***
+}
 
-func (s *uintSliceValue) String() string ***REMOVED***
+func (s *uintSliceValue) String() string {
 	out := make([]string, len(*s.value))
-	for i, d := range *s.value ***REMOVED***
+	for i, d := range *s.value {
 		out[i] = fmt.Sprintf("%d", d)
-	***REMOVED***
+	}
 	return "[" + strings.Join(out, ",") + "]"
-***REMOVED***
+}
 
-func uintSliceConv(val string) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func uintSliceConv(val string) (interface{}, error) {
 	val = strings.Trim(val, "[]")
 	// Empty string would cause a slice with one (empty) entry
-	if len(val) == 0 ***REMOVED***
-		return []uint***REMOVED******REMOVED***, nil
-	***REMOVED***
+	if len(val) == 0 {
+		return []uint{}, nil
+	}
 	ss := strings.Split(val, ",")
 	out := make([]uint, len(ss))
-	for i, d := range ss ***REMOVED***
+	for i, d := range ss {
 		u, err := strconv.ParseUint(d, 10, 0)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		out[i] = uint(u)
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
 // GetUintSlice returns the []uint value of a flag with the given name.
-func (f *FlagSet) GetUintSlice(name string) ([]uint, error) ***REMOVED***
+func (f *FlagSet) GetUintSlice(name string) ([]uint, error) {
 	val, err := f.getFlagType(name, "uintSlice", uintSliceConv)
-	if err != nil ***REMOVED***
-		return []uint***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return []uint{}, err
+	}
 	return val.([]uint), nil
-***REMOVED***
+}
 
 // UintSliceVar defines a uintSlice flag with specified name, default value, and usage string.
 // The argument p points to a []uint variable in which to store the value of the flag.
-func (f *FlagSet) UintSliceVar(p *[]uint, name string, value []uint, usage string) ***REMOVED***
+func (f *FlagSet) UintSliceVar(p *[]uint, name string, value []uint, usage string) {
 	f.VarP(newUintSliceValue(value, p), name, "", usage)
-***REMOVED***
+}
 
 // UintSliceVarP is like UintSliceVar, but accepts a shorthand letter that can be used after a single dash.
-func (f *FlagSet) UintSliceVarP(p *[]uint, name, shorthand string, value []uint, usage string) ***REMOVED***
+func (f *FlagSet) UintSliceVarP(p *[]uint, name, shorthand string, value []uint, usage string) {
 	f.VarP(newUintSliceValue(value, p), name, shorthand, usage)
-***REMOVED***
+}
 
 // UintSliceVar defines a uint[] flag with specified name, default value, and usage string.
 // The argument p points to a uint[] variable in which to store the value of the flag.
-func UintSliceVar(p *[]uint, name string, value []uint, usage string) ***REMOVED***
+func UintSliceVar(p *[]uint, name string, value []uint, usage string) {
 	CommandLine.VarP(newUintSliceValue(value, p), name, "", usage)
-***REMOVED***
+}
 
 // UintSliceVarP is like the UintSliceVar, but accepts a shorthand letter that can be used after a single dash.
-func UintSliceVarP(p *[]uint, name, shorthand string, value []uint, usage string) ***REMOVED***
+func UintSliceVarP(p *[]uint, name, shorthand string, value []uint, usage string) {
 	CommandLine.VarP(newUintSliceValue(value, p), name, shorthand, usage)
-***REMOVED***
+}
 
 // UintSlice defines a []uint flag with specified name, default value, and usage string.
 // The return value is the address of a []uint variable that stores the value of the flag.
-func (f *FlagSet) UintSlice(name string, value []uint, usage string) *[]uint ***REMOVED***
-	p := []uint***REMOVED******REMOVED***
+func (f *FlagSet) UintSlice(name string, value []uint, usage string) *[]uint {
+	p := []uint{}
 	f.UintSliceVarP(&p, name, "", value, usage)
 	return &p
-***REMOVED***
+}
 
 // UintSliceP is like UintSlice, but accepts a shorthand letter that can be used after a single dash.
-func (f *FlagSet) UintSliceP(name, shorthand string, value []uint, usage string) *[]uint ***REMOVED***
-	p := []uint***REMOVED******REMOVED***
+func (f *FlagSet) UintSliceP(name, shorthand string, value []uint, usage string) *[]uint {
+	p := []uint{}
 	f.UintSliceVarP(&p, name, shorthand, value, usage)
 	return &p
-***REMOVED***
+}
 
 // UintSlice defines a []uint flag with specified name, default value, and usage string.
 // The return value is the address of a []uint variable that stores the value of the flag.
-func UintSlice(name string, value []uint, usage string) *[]uint ***REMOVED***
+func UintSlice(name string, value []uint, usage string) *[]uint {
 	return CommandLine.UintSliceP(name, "", value, usage)
-***REMOVED***
+}
 
 // UintSliceP is like UintSlice, but accepts a shorthand letter that can be used after a single dash.
-func UintSliceP(name, shorthand string, value []uint, usage string) *[]uint ***REMOVED***
+func UintSliceP(name, shorthand string, value []uint, usage string) *[]uint {
 	return CommandLine.UintSliceP(name, shorthand, value, usage)
-***REMOVED***
+}

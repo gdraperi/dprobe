@@ -14,18 +14,18 @@ const defaultUnixPathEnv = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/s
 // DefaultPathEnv is unix style list of directories to search for
 // executables. Each directory is separated from the next by a colon
 // ':' character .
-func DefaultPathEnv(os string) string ***REMOVED***
-	if runtime.GOOS == "windows" ***REMOVED***
-		if os != runtime.GOOS ***REMOVED***
+func DefaultPathEnv(os string) string {
+	if runtime.GOOS == "windows" {
+		if os != runtime.GOOS {
 			return defaultUnixPathEnv
-		***REMOVED***
+		}
 		// Deliberately empty on Windows containers on Windows as the default path will be set by
 		// the container. Docker has no context of what the default path should be.
 		return ""
-	***REMOVED***
+	}
 	return defaultUnixPathEnv
 
-***REMOVED***
+}
 
 // CheckSystemDriveAndRemoveDriveLetter verifies that a path, if it includes a drive letter,
 // is the system drive.
@@ -42,19 +42,19 @@ func DefaultPathEnv(os string) string ***REMOVED***
 // a			--> a
 // /a			--> \a
 // d:\			--> Fail
-func CheckSystemDriveAndRemoveDriveLetter(path string, driver pathdriver.PathDriver) (string, error) ***REMOVED***
-	if runtime.GOOS != "windows" || LCOWSupported() ***REMOVED***
+func CheckSystemDriveAndRemoveDriveLetter(path string, driver pathdriver.PathDriver) (string, error) {
+	if runtime.GOOS != "windows" || LCOWSupported() {
 		return path, nil
-	***REMOVED***
+	}
 
-	if len(path) == 2 && string(path[1]) == ":" ***REMOVED***
+	if len(path) == 2 && string(path[1]) == ":" {
 		return "", fmt.Errorf("No relative path specified in %q", path)
-	***REMOVED***
-	if !driver.IsAbs(path) || len(path) < 2 ***REMOVED***
+	}
+	if !driver.IsAbs(path) || len(path) < 2 {
 		return filepath.FromSlash(path), nil
-	***REMOVED***
-	if string(path[1]) == ":" && !strings.EqualFold(string(path[0]), "c") ***REMOVED***
+	}
+	if string(path[1]) == ":" && !strings.EqualFold(string(path[0]), "c") {
 		return "", fmt.Errorf("The specified path is not on the system drive (C:)")
-	***REMOVED***
+	}
 	return filepath.FromSlash(path[2:]), nil
-***REMOVED***
+}

@@ -7,7 +7,7 @@
 # the Architecture/OS specified by the GOARCH and GOOS environment variables.
 # See README.md for more information about how the build system works.
 
-GOOSARCH="$***REMOVED***GOOS***REMOVED***_$***REMOVED***GOARCH***REMOVED***"
+GOOSARCH="${GOOS}_${GOARCH}"
 
 # defaults
 mksyscall="./mksyscall.pl"

@@ -8,13 +8,13 @@ import "C"
 // LibraryDeferredRemovalSupport tells if the feature is enabled in the build
 const LibraryDeferredRemovalSupport = true
 
-func dmTaskDeferredRemoveFct(task *cdmTask) int ***REMOVED***
+func dmTaskDeferredRemoveFct(task *cdmTask) int {
 	return int(C.dm_task_deferred_remove((*C.struct_dm_task)(task)))
-***REMOVED***
+}
 
-func dmTaskGetInfoWithDeferredFct(task *cdmTask, info *Info) int ***REMOVED***
-	Cinfo := C.struct_dm_info***REMOVED******REMOVED***
-	defer func() ***REMOVED***
+func dmTaskGetInfoWithDeferredFct(task *cdmTask, info *Info) int {
+	Cinfo := C.struct_dm_info{}
+	defer func() {
 		info.Exists = int(Cinfo.exists)
 		info.Suspended = int(Cinfo.suspended)
 		info.LiveTable = int(Cinfo.live_table)
@@ -26,6 +26,6 @@ func dmTaskGetInfoWithDeferredFct(task *cdmTask, info *Info) int ***REMOVED***
 		info.ReadOnly = int(Cinfo.read_only)
 		info.TargetCount = int32(Cinfo.target_count)
 		info.DeferredRemove = int(Cinfo.deferred_remove)
-	***REMOVED***()
+	}()
 	return int(C.dm_task_get_info((*C.struct_dm_task)(task), &Cinfo))
-***REMOVED***
+}

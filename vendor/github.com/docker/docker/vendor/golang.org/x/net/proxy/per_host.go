@@ -11,130 +11,130 @@ import (
 
 // A PerHost directs connections to a default Dialer unless the hostname
 // requested matches one of a number of exceptions.
-type PerHost struct ***REMOVED***
+type PerHost struct {
 	def, bypass Dialer
 
 	bypassNetworks []*net.IPNet
 	bypassIPs      []net.IP
 	bypassZones    []string
 	bypassHosts    []string
-***REMOVED***
+}
 
 // NewPerHost returns a PerHost Dialer that directs connections to either
 // defaultDialer or bypass, depending on whether the connection matches one of
 // the configured rules.
-func NewPerHost(defaultDialer, bypass Dialer) *PerHost ***REMOVED***
-	return &PerHost***REMOVED***
+func NewPerHost(defaultDialer, bypass Dialer) *PerHost {
+	return &PerHost{
 		def:    defaultDialer,
 		bypass: bypass,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Dial connects to the address addr on the given network through either
 // defaultDialer or bypass.
-func (p *PerHost) Dial(network, addr string) (c net.Conn, err error) ***REMOVED***
+func (p *PerHost) Dial(network, addr string) (c net.Conn, err error) {
 	host, _, err := net.SplitHostPort(addr)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	return p.dialerForRequest(host).Dial(network, addr)
-***REMOVED***
+}
 
-func (p *PerHost) dialerForRequest(host string) Dialer ***REMOVED***
-	if ip := net.ParseIP(host); ip != nil ***REMOVED***
-		for _, net := range p.bypassNetworks ***REMOVED***
-			if net.Contains(ip) ***REMOVED***
+func (p *PerHost) dialerForRequest(host string) Dialer {
+	if ip := net.ParseIP(host); ip != nil {
+		for _, net := range p.bypassNetworks {
+			if net.Contains(ip) {
 				return p.bypass
-			***REMOVED***
-		***REMOVED***
-		for _, bypassIP := range p.bypassIPs ***REMOVED***
-			if bypassIP.Equal(ip) ***REMOVED***
+			}
+		}
+		for _, bypassIP := range p.bypassIPs {
+			if bypassIP.Equal(ip) {
 				return p.bypass
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		return p.def
-	***REMOVED***
+	}
 
-	for _, zone := range p.bypassZones ***REMOVED***
-		if strings.HasSuffix(host, zone) ***REMOVED***
+	for _, zone := range p.bypassZones {
+		if strings.HasSuffix(host, zone) {
 			return p.bypass
-		***REMOVED***
-		if host == zone[1:] ***REMOVED***
+		}
+		if host == zone[1:] {
 			// For a zone "example.com", we match "example.com"
 			// too.
 			return p.bypass
-		***REMOVED***
-	***REMOVED***
-	for _, bypassHost := range p.bypassHosts ***REMOVED***
-		if bypassHost == host ***REMOVED***
+		}
+	}
+	for _, bypassHost := range p.bypassHosts {
+		if bypassHost == host {
 			return p.bypass
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return p.def
-***REMOVED***
+}
 
 // AddFromString parses a string that contains comma-separated values
 // specifying hosts that should use the bypass proxy. Each value is either an
 // IP address, a CIDR range, a zone (*.example.com) or a hostname
 // (localhost). A best effort is made to parse the string and errors are
 // ignored.
-func (p *PerHost) AddFromString(s string) ***REMOVED***
+func (p *PerHost) AddFromString(s string) {
 	hosts := strings.Split(s, ",")
-	for _, host := range hosts ***REMOVED***
+	for _, host := range hosts {
 		host = strings.TrimSpace(host)
-		if len(host) == 0 ***REMOVED***
+		if len(host) == 0 {
 			continue
-		***REMOVED***
-		if strings.Contains(host, "/") ***REMOVED***
+		}
+		if strings.Contains(host, "/") {
 			// We assume that it's a CIDR address like 127.0.0.0/8
-			if _, net, err := net.ParseCIDR(host); err == nil ***REMOVED***
+			if _, net, err := net.ParseCIDR(host); err == nil {
 				p.AddNetwork(net)
-			***REMOVED***
+			}
 			continue
-		***REMOVED***
-		if ip := net.ParseIP(host); ip != nil ***REMOVED***
+		}
+		if ip := net.ParseIP(host); ip != nil {
 			p.AddIP(ip)
 			continue
-		***REMOVED***
-		if strings.HasPrefix(host, "*.") ***REMOVED***
+		}
+		if strings.HasPrefix(host, "*.") {
 			p.AddZone(host[1:])
 			continue
-		***REMOVED***
+		}
 		p.AddHost(host)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // AddIP specifies an IP address that will use the bypass proxy. Note that
 // this will only take effect if a literal IP address is dialed. A connection
 // to a named host will never match an IP.
-func (p *PerHost) AddIP(ip net.IP) ***REMOVED***
+func (p *PerHost) AddIP(ip net.IP) {
 	p.bypassIPs = append(p.bypassIPs, ip)
-***REMOVED***
+}
 
 // AddNetwork specifies an IP range that will use the bypass proxy. Note that
 // this will only take effect if a literal IP address is dialed. A connection
 // to a named host will never match.
-func (p *PerHost) AddNetwork(net *net.IPNet) ***REMOVED***
+func (p *PerHost) AddNetwork(net *net.IPNet) {
 	p.bypassNetworks = append(p.bypassNetworks, net)
-***REMOVED***
+}
 
 // AddZone specifies a DNS suffix that will use the bypass proxy. A zone of
 // "example.com" matches "example.com" and all of its subdomains.
-func (p *PerHost) AddZone(zone string) ***REMOVED***
-	if strings.HasSuffix(zone, ".") ***REMOVED***
+func (p *PerHost) AddZone(zone string) {
+	if strings.HasSuffix(zone, ".") {
 		zone = zone[:len(zone)-1]
-	***REMOVED***
-	if !strings.HasPrefix(zone, ".") ***REMOVED***
+	}
+	if !strings.HasPrefix(zone, ".") {
 		zone = "." + zone
-	***REMOVED***
+	}
 	p.bypassZones = append(p.bypassZones, zone)
-***REMOVED***
+}
 
 // AddHost specifies a hostname that will use the bypass proxy.
-func (p *PerHost) AddHost(host string) ***REMOVED***
-	if strings.HasSuffix(host, ".") ***REMOVED***
+func (p *PerHost) AddHost(host string) {
+	if strings.HasSuffix(host, ".") {
 		host = host[:len(host)-1]
-	***REMOVED***
+	}
 	p.bypassHosts = append(p.bypassHosts, host)
-***REMOVED***
+}

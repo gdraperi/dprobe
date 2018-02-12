@@ -14,10 +14,10 @@ import (
 // methods of PacketConn is not implemented.
 
 // A payloadHandler represents the IPv4 datagram payload handler.
-type payloadHandler struct ***REMOVED***
+type payloadHandler struct {
 	net.PacketConn
 	*socket.Conn
 	rawOpt
-***REMOVED***
+}
 
-func (c *payloadHandler) ok() bool ***REMOVED*** return c != nil && c.PacketConn != nil && c.Conn != nil ***REMOVED***
+func (c *payloadHandler) ok() bool { return c != nil && c.PacketConn != nil && c.Conn != nil }

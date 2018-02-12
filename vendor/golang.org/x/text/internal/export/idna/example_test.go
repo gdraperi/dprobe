@@ -10,7 +10,7 @@ import (
 	"golang.org/x/text/internal/export/idna"
 )
 
-func ExampleProfile() ***REMOVED***
+func ExampleProfile() {
 	// Raw Punycode has no restrictions and does no mappings.
 	fmt.Println(idna.ToASCII(""))
 	fmt.Println(idna.ToASCII("*.faß.com"))
@@ -34,9 +34,9 @@ func ExampleProfile() ***REMOVED***
 	// www.fass.com <nil>
 	//  idna: invalid label ""
 	// www.xn--fa-hia.com <nil>
-***REMOVED***
+}
 
-func ExampleNew() ***REMOVED***
+func ExampleNew() {
 	var p *idna.Profile
 
 	// Raw Punycode has no restrictions and does no mappings.
@@ -65,4 +65,4 @@ func ExampleNew() ***REMOVED***
 	// *.fass.com idna: disallowed rune U+002A
 	// *.faß.com idna: disallowed rune U+002A
 	// *.fass.com <nil>
-***REMOVED***
+}

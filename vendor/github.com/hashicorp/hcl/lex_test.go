@@ -4,34 +4,34 @@ import (
 	"testing"
 )
 
-func TestLexMode(t *testing.T) ***REMOVED***
-	cases := []struct ***REMOVED***
+func TestLexMode(t *testing.T) {
+	cases := []struct {
 		Input string
 		Mode  lexModeValue
-	***REMOVED******REMOVED***
-		***REMOVED***
+	}{
+		{
 			"",
 			lexModeHcl,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			"foo",
 			lexModeHcl,
-		***REMOVED***,
-		***REMOVED***
-			"***REMOVED******REMOVED***",
+		},
+		{
+			"{}",
 			lexModeJson,
-		***REMOVED***,
-		***REMOVED***
-			"  ***REMOVED******REMOVED***",
+		},
+		{
+			"  {}",
 			lexModeJson,
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
-	for i, tc := range cases ***REMOVED***
+	for i, tc := range cases {
 		actual := lexMode([]byte(tc.Input))
 
-		if actual != tc.Mode ***REMOVED***
+		if actual != tc.Mode {
 			t.Fatalf("%d: %#v", i, actual)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

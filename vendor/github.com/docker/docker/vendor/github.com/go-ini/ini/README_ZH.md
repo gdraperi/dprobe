@@ -94,7 +94,7 @@ skip-name-resolve
 默认情况下这被认为是缺失值而无法完成解析，但可以通过高级的加载选项对它们进行处理：
 
 ```go
-cfg, err := LoadSources(LoadOptions***REMOVED***AllowBooleanKeys: true***REMOVED***, "my.cnf"))
+cfg, err := LoadSources(LoadOptions{AllowBooleanKeys: true}, "my.cnf"))
 ```
 
 这些键的值永远为 `true`，且在保存到文件时也只会输出键名。
@@ -200,12 +200,12 @@ val := cfg.Section("").Key("key name").String()
 获取值的同时通过自定义函数进行处理验证：
 
 ```go
-val := cfg.Section("").Key("key name").Validate(func(in string) string ***REMOVED***
-	if len(in) == 0 ***REMOVED***
+val := cfg.Section("").Key("key name").Validate(func(in string) string {
+	if len(in) == 0 {
 		return "default"
-	***REMOVED***
+	}
 	return in
-***REMOVED***)
+})
 ```
 
 如果您不需要任何对值的自动转变功能（例如递归读取），可以直接获取原值（这种方式性能最佳）：
@@ -302,9 +302,9 @@ cfg.Section("advance").Key("lots_of_lines").String() // 1 2 3 4
 可是我有时候觉得两行连在一起特别没劲，怎么才能不自动连接两行呢？
 
 ```go
-cfg, err := ini.LoadSources(ini.LoadOptions***REMOVED***
+cfg, err := ini.LoadSources(ini.LoadOptions{
 	IgnoreContinuation: true,
-***REMOVED***, "filename")
+}, "filename")
 ```
 
 哇靠给力啊！
@@ -323,14 +323,14 @@ bar = 'some value' // bar: some value
 获取键值时设定候选值：
 
 ```go
-v = cfg.Section("").Key("STRING").In("default", []string***REMOVED***"str", "arr", "types"***REMOVED***)
-v = cfg.Section("").Key("FLOAT64").InFloat64(1.1, []float64***REMOVED***1.25, 2.5, 3.75***REMOVED***)
-v = cfg.Section("").Key("INT").InInt(5, []int***REMOVED***10, 20, 30***REMOVED***)
-v = cfg.Section("").Key("INT64").InInt64(10, []int64***REMOVED***10, 20, 30***REMOVED***)
-v = cfg.Section("").Key("UINT").InUint(4, []int***REMOVED***3, 6, 9***REMOVED***)
-v = cfg.Section("").Key("UINT64").InUint64(8, []int64***REMOVED***3, 6, 9***REMOVED***)
-v = cfg.Section("").Key("TIME").InTimeFormat(time.RFC3339, time.Now(), []time.Time***REMOVED***time1, time2, time3***REMOVED***)
-v = cfg.Section("").Key("TIME").InTime(time.Now(), []time.Time***REMOVED***time1, time2, time3***REMOVED***) // RFC3339
+v = cfg.Section("").Key("STRING").In("default", []string{"str", "arr", "types"})
+v = cfg.Section("").Key("FLOAT64").InFloat64(1.1, []float64{1.25, 2.5, 3.75})
+v = cfg.Section("").Key("INT").InInt(5, []int{10, 20, 30})
+v = cfg.Section("").Key("INT64").InInt64(10, []int64{10, 20, 30})
+v = cfg.Section("").Key("UINT").InUint(4, []int{3, 6, 9})
+v = cfg.Section("").Key("UINT64").InUint64(8, []int64{3, 6, 9})
+v = cfg.Section("").Key("TIME").InTimeFormat(time.RFC3339, time.Now(), []time.Time{time1, time2, time3})
+v = cfg.Section("").Key("TIME").InTime(time.Now(), []time.Time{time1, time2, time3}) // RFC3339
 ```
 
 如果获取到的值不是候选值的任意一个，则会返回默认值，而默认值不需要是候选值中的一员。
@@ -467,7 +467,7 @@ cfg.Section("package.sub").ParentKeys() // ["CLONE_URL"]
 如果遇到一些比较特殊的分区，它们不包含常见的键值对，而是没有固定格式的纯文本，则可以使用 `LoadOptions.UnparsableSections` 进行处理：
 
 ```go
-cfg, err := LoadSources(LoadOptions***REMOVED***UnparseableSections: []string***REMOVED***"COMMENTS"***REMOVED******REMOVED***, `[COMMENTS]
+cfg, err := LoadSources(LoadOptions{UnparseableSections: []string{"COMMENTS"}}, `[COMMENTS]
 <1><L.Slide#2> This slide has the fuel listed in the wrong units <e.1>`))
 
 body := cfg.Section("COMMENTS").Body()
@@ -489,7 +489,7 @@ body := cfg.Section("COMMENTS").Body()
 ```
 
 ```go
-cfg.Section("features").KeyStrings()	// []***REMOVED***"#1", "#2", "#3"***REMOVED***
+cfg.Section("features").KeyStrings()	// []{"#1", "#2", "#3"}
 ```
 
 ### 映射到结构
@@ -508,21 +508,21 @@ Cities = HangZhou, Boston
 ```
 
 ```go
-type Note struct ***REMOVED***
+type Note struct {
 	Content string
 	Cities  []string
-***REMOVED***
+}
 
-type Person struct ***REMOVED***
+type Person struct {
 	Name string
 	Age  int `ini:"age"`
 	Male bool
 	Born time.Time
 	Note
 	Created time.Time `ini:"-"`
-***REMOVED***
+}
 
-func main() ***REMOVED***
+func main() {
 	cfg, err := ini.Load("path/to/ini")
 	// ...
 	p := new(Person)
@@ -537,16 +537,16 @@ func main() ***REMOVED***
 	n := new(Note)
 	err = cfg.Section("Note").MapTo(n)
 	// ...
-***REMOVED***
+}
 ```
 
 结构的字段怎么设置默认值呢？很简单，只要在映射之前对指定字段进行赋值就可以了。如果键未找到或者类型错误，该值不会发生改变。
 
 ```go
 // ...
-p := &Person***REMOVED***
+p := &Person{
 	Name: "Joe",
-***REMOVED***
+}
 // ...
 ```
 
@@ -557,32 +557,32 @@ p := &Person***REMOVED***
 可是，我有说不能吗？
 
 ```go
-type Embeded struct ***REMOVED***
+type Embeded struct {
 	Dates  []time.Time `delim:"|"`
 	Places []string    `ini:"places,omitempty"`
 	None   []int       `ini:",omitempty"`
-***REMOVED***
+}
 
-type Author struct ***REMOVED***
+type Author struct {
 	Name      string `ini:"NAME"`
 	Male      bool
 	Age       int
 	GPA       float64
 	NeverMind string `ini:"-"`
 	*Embeded
-***REMOVED***
+}
 
-func main() ***REMOVED***
-	a := &Author***REMOVED***"Unknwon", true, 21, 2.8, "",
-		&Embeded***REMOVED***
-			[]time.Time***REMOVED***time.Now(), time.Now()***REMOVED***,
-			[]string***REMOVED***"HangZhou", "Boston"***REMOVED***,
-			[]int***REMOVED******REMOVED***,
-		***REMOVED******REMOVED***
+func main() {
+	a := &Author{"Unknwon", true, 21, 2.8, "",
+		&Embeded{
+			[]time.Time{time.Now(), time.Now()},
+			[]string{"HangZhou", "Boston"},
+			[]int{},
+		}}
 	cfg := ini.Empty()
 	err = ini.ReflectFrom(cfg, a)
 	// ...
-***REMOVED***
+}
 ```
 
 瞧瞧，奇迹发生了。
@@ -610,12 +610,12 @@ places = HangZhou,Boston
 使用方法：
 
 ```go
-type Info struct***REMOVED***
+type Info struct{
 	PackageName string
-***REMOVED***
+}
 
-func main() ***REMOVED***
-	err = ini.MapToWithMapper(&Info***REMOVED******REMOVED***, ini.TitleUnderscore, []byte("package_name=ini"))
+func main() {
+	err = ini.MapToWithMapper(&Info{}, ini.TitleUnderscore, []byte("package_name=ini"))
 	// ...
 
 	cfg, err := ini.Load([]byte("PACKAGE_NAME=ini"))
@@ -624,7 +624,7 @@ func main() ***REMOVED***
 	cfg.NameMapper = ini.AllCapsUnderscore
 	err = cfg.MapTo(info)
 	// ...
-***REMOVED***
+}
 ```
 
 使用函数 `ini.ReflectFromWithMapper` 时也可应用相同的规则。
@@ -634,17 +634,17 @@ func main() ***REMOVED***
 值映射器允许使用一个自定义函数自动展开值的具体内容，例如：运行时获取环境变量：
 
 ```go
-type Env struct ***REMOVED***
+type Env struct {
 	Foo string `ini:"foo"`
-***REMOVED***
+}
 
-func main() ***REMOVED***
-	cfg, err := ini.Load([]byte("[env]\nfoo = $***REMOVED***MY_VAR***REMOVED***\n")
+func main() {
+	cfg, err := ini.Load([]byte("[env]\nfoo = ${MY_VAR}\n")
 	cfg.ValueMapper = os.ExpandEnv
 	// ...
-	env := &Env***REMOVED******REMOVED***
+	env := &Env{}
 	err = cfg.Section("env").MapTo(env)
-***REMOVED***
+}
 ```
 
 本例中，`env.Foo` 将会是运行时所获取到环境变量 `MY_VAR` 的值。
@@ -654,19 +654,19 @@ func main() ***REMOVED***
 任何嵌入的结构都会被默认认作一个不同的分区，并且不会自动产生所谓的父子分区关联：
 
 ```go
-type Child struct ***REMOVED***
+type Child struct {
 	Age string
-***REMOVED***
+}
 
-type Parent struct ***REMOVED***
+type Parent struct {
 	Name string
 	Child
-***REMOVED***
+}
 
-type Config struct ***REMOVED***
+type Config struct {
 	City string
 	Parent
-***REMOVED***
+}
 ```
 
 示例配置文件：
@@ -684,19 +684,19 @@ Age = 21
 很好，但是，我就是要嵌入结构也在同一个分区。好吧，你爹是李刚！
 
 ```go
-type Child struct ***REMOVED***
+type Child struct {
 	Age string
-***REMOVED***
+}
 
-type Parent struct ***REMOVED***
+type Parent struct {
 	Name string
 	Child `ini:"Parent"`
-***REMOVED***
+}
 
-type Config struct ***REMOVED***
+type Config struct {
 	City string
 	Parent
-***REMOVED***
+}
 ```
 
 示例配置文件：

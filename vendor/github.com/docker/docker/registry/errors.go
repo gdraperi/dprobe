@@ -9,23 +9,23 @@ import (
 
 type notFoundError string
 
-func (e notFoundError) Error() string ***REMOVED***
+func (e notFoundError) Error() string {
 	return string(e)
-***REMOVED***
+}
 
-func (notFoundError) NotFound() ***REMOVED******REMOVED***
+func (notFoundError) NotFound() {}
 
-func translateV2AuthError(err error) error ***REMOVED***
-	switch e := err.(type) ***REMOVED***
+func translateV2AuthError(err error) error {
+	switch e := err.(type) {
 	case *url.Error:
-		switch e2 := e.Err.(type) ***REMOVED***
+		switch e2 := e.Err.(type) {
 		case errcode.Error:
-			switch e2.Code ***REMOVED***
+			switch e2.Code {
 			case errcode.ErrorCodeUnauthorized:
 				return errdefs.Unauthorized(err)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	return err
-***REMOVED***
+}

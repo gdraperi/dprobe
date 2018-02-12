@@ -34,8 +34,8 @@ r, _, _ = r.Insert([]byte("foobar"), 2)
 
 // Find the longest prefix match
 m, _, _ := r.Root().LongestPrefix([]byte("foozip"))
-if string(m) != "foo" ***REMOVED***
+if string(m) != "foo" {
     panic("should be foo")
-***REMOVED***
+}
 ```
 

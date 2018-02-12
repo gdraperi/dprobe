@@ -8,7 +8,7 @@ import (
 
 // ProcessConfig is used as both the input of Container.CreateProcess
 // and to convert the parameters to JSON for passing onto the HCS
-type ProcessConfig struct ***REMOVED***
+type ProcessConfig struct {
 	ApplicationName   string            `json:",omitempty"`
 	CommandLine       string            `json:",omitempty"`
 	CommandArgs       []string          `json:",omitempty"` // Used by Linux Containers on Windows
@@ -22,28 +22,28 @@ type ProcessConfig struct ***REMOVED***
 	ConsoleSize       [2]uint           `json:",omitempty"`
 	CreateInUtilityVm bool              `json:",omitempty"` // Used by Linux Containers on Windows
 	OCISpecification  *json.RawMessage  `json:",omitempty"` // Used by Linux Containers on Windows
-***REMOVED***
+}
 
-type Layer struct ***REMOVED***
+type Layer struct {
 	ID   string
 	Path string
-***REMOVED***
+}
 
-type MappedDir struct ***REMOVED***
+type MappedDir struct {
 	HostPath          string
 	ContainerPath     string
 	ReadOnly          bool
 	BandwidthMaximum  uint64
 	IOPSMaximum       uint64
 	CreateInUtilityVM bool
-***REMOVED***
+}
 
-type MappedPipe struct ***REMOVED***
+type MappedPipe struct {
 	HostPath          string
 	ContainerPipeName string
-***REMOVED***
+}
 
-type HvRuntime struct ***REMOVED***
+type HvRuntime struct {
 	ImagePath           string `json:",omitempty"`
 	SkipTemplate        bool   `json:",omitempty"`
 	LinuxInitrdFile     string `json:",omitempty"` // File under ImagePath on host containing an initrd image for starting a Linux utility VM
@@ -51,24 +51,24 @@ type HvRuntime struct ***REMOVED***
 	LinuxBootParameters string `json:",omitempty"` // Additional boot parameters for starting a Linux Utility VM in initrd mode
 	BootSource          string `json:",omitempty"` // "Vhd" for Linux Utility VM booting from VHD
 	WritableBootSource  bool   `json:",omitempty"` // Linux Utility VM booting from VHD
-***REMOVED***
+}
 
-type MappedVirtualDisk struct ***REMOVED***
+type MappedVirtualDisk struct {
 	HostPath          string `json:",omitempty"` // Path to VHD on the host
 	ContainerPath     string // Platform-specific mount point path in the container
 	CreateInUtilityVM bool   `json:",omitempty"`
 	ReadOnly          bool   `json:",omitempty"`
 	Cache             string `json:",omitempty"` // "" (Unspecified); "Disabled"; "Enabled"; "Private"; "PrivateAllowSharing"
 	AttachOnly        bool   `json:",omitempty:`
-***REMOVED***
+}
 
 // ContainerConfig is used as both the input of CreateContainer
 // and to convert the parameters to JSON for passing onto the HCS
-type ContainerConfig struct ***REMOVED***
+type ContainerConfig struct {
 	SystemType                  string              // HCS requires this to be hard-coded to "Container"
 	Name                        string              // Name of the container. We use the docker ID.
 	Owner                       string              `json:",omitempty"` // The management platform that created this container
-	VolumePath                  string              `json:",omitempty"` // Windows volume path for scratch space. Used by Windows Server Containers only. Format \\?\\Volume***REMOVED***GUID***REMOVED***
+	VolumePath                  string              `json:",omitempty"` // Windows volume path for scratch space. Used by Windows Server Containers only. Format \\?\\Volume{GUID}
 	IgnoreFlushesDuringBoot     bool                `json:",omitempty"` // Optimization hint for container startup in Windows
 	LayerFolderPath             string              `json:",omitempty"` // Where the layer folders are located. Used by Windows Server Containers only. Format  %root%\windowsfilter\containerID
 	Layers                      []Layer             // List of storage layers. Required for Windows Server and Hyper-V Containers. Format ID=GUID;Path=%root%\windowsfilter\layerID
@@ -93,17 +93,17 @@ type ContainerConfig struct ***REMOVED***
 	ContainerType               string              `json:",omitempty"` // "Linux" for Linux containers on Windows. Omitted otherwise.
 	TerminateOnLastHandleClosed bool                `json:",omitempty"` // Should HCS terminate the container once all handles have been closed
 	MappedVirtualDisks          []MappedVirtualDisk `json:",omitempty"` // Array of virtual disks to mount at start
-***REMOVED***
+}
 
-type ComputeSystemQuery struct ***REMOVED***
+type ComputeSystemQuery struct {
 	IDs    []string `json:"Ids,omitempty"`
 	Types  []string `json:",omitempty"`
 	Names  []string `json:",omitempty"`
 	Owners []string `json:",omitempty"`
-***REMOVED***
+}
 
 // Container represents a created (but not necessarily running) container.
-type Container interface ***REMOVED***
+type Container interface {
 	// Start synchronously starts the container.
 	Start() error
 
@@ -149,10 +149,10 @@ type Container interface ***REMOVED***
 
 	// Modify the System
 	Modify(config *ResourceModificationRequestResponse) error
-***REMOVED***
+}
 
 // Process represents a running or exited process.
-type Process interface ***REMOVED***
+type Process interface {
 	// Pid returns the process ID of the process within the container.
 	Pid() int
 
@@ -185,4 +185,4 @@ type Process interface ***REMOVED***
 	// Close cleans up any state associated with the process but does not kill
 	// or wait on it.
 	Close() error
-***REMOVED***
+}

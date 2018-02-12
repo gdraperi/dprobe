@@ -4,63 +4,63 @@ import "fmt"
 
 type errNotFound string
 
-func (name errNotFound) Error() string ***REMOVED***
+func (name errNotFound) Error() string {
 	return fmt.Sprintf("plugin %q not found", string(name))
-***REMOVED***
+}
 
-func (errNotFound) NotFound() ***REMOVED******REMOVED***
+func (errNotFound) NotFound() {}
 
 type errAmbiguous string
 
-func (name errAmbiguous) Error() string ***REMOVED***
+func (name errAmbiguous) Error() string {
 	return fmt.Sprintf("multiple plugins found for %q", string(name))
-***REMOVED***
+}
 
-func (name errAmbiguous) InvalidParameter() ***REMOVED******REMOVED***
+func (name errAmbiguous) InvalidParameter() {}
 
 type errDisabled string
 
-func (name errDisabled) Error() string ***REMOVED***
+func (name errDisabled) Error() string {
 	return fmt.Sprintf("plugin %s found but disabled", string(name))
-***REMOVED***
+}
 
-func (name errDisabled) Conflict() ***REMOVED******REMOVED***
+func (name errDisabled) Conflict() {}
 
-type invalidFilter struct ***REMOVED***
+type invalidFilter struct {
 	filter string
 	value  []string
-***REMOVED***
+}
 
-func (e invalidFilter) Error() string ***REMOVED***
+func (e invalidFilter) Error() string {
 	msg := "Invalid filter '" + e.filter
-	if len(e.value) > 0 ***REMOVED***
+	if len(e.value) > 0 {
 		msg += fmt.Sprintf("=%s", e.value)
-	***REMOVED***
+	}
 	return msg + "'"
-***REMOVED***
+}
 
-func (invalidFilter) InvalidParameter() ***REMOVED******REMOVED***
+func (invalidFilter) InvalidParameter() {}
 
 type inUseError string
 
-func (e inUseError) Error() string ***REMOVED***
+func (e inUseError) Error() string {
 	return "plugin " + string(e) + " is in use"
-***REMOVED***
+}
 
-func (inUseError) Conflict() ***REMOVED******REMOVED***
+func (inUseError) Conflict() {}
 
 type enabledError string
 
-func (e enabledError) Error() string ***REMOVED***
+func (e enabledError) Error() string {
 	return "plugin " + string(e) + " is enabled"
-***REMOVED***
+}
 
-func (enabledError) Conflict() ***REMOVED******REMOVED***
+func (enabledError) Conflict() {}
 
 type alreadyExistsError string
 
-func (e alreadyExistsError) Error() string ***REMOVED***
+func (e alreadyExistsError) Error() string {
 	return "plugin " + string(e) + " already exists"
-***REMOVED***
+}
 
-func (alreadyExistsError) Conflict() ***REMOVED******REMOVED***
+func (alreadyExistsError) Conflict() {}

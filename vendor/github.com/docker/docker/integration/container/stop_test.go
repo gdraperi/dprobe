@@ -18,7 +18,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestDeleteDevicemapper(t *testing.T) ***REMOVED***
+func TestDeleteDevicemapper(t *testing.T) {
 	skip.IfCondition(t, testEnv.DaemonInfo.Driver != "devicemapper")
 
 	defer setupTest(t)()
@@ -26,17 +26,17 @@ func TestDeleteDevicemapper(t *testing.T) ***REMOVED***
 	ctx := context.Background()
 
 	foo, err := client.ContainerCreate(ctx,
-		&container.Config***REMOVED***
-			Cmd:   []string***REMOVED***"echo"***REMOVED***,
+		&container.Config{
+			Cmd:   []string{"echo"},
 			Image: "busybox",
-		***REMOVED***,
-		&container.HostConfig***REMOVED******REMOVED***,
-		&network.NetworkingConfig***REMOVED******REMOVED***,
+		},
+		&container.HostConfig{},
+		&network.NetworkingConfig{},
 		"foo",
 	)
 	require.NoError(t, err)
 
-	err = client.ContainerStart(ctx, foo.ID, types.ContainerStartOptions***REMOVED******REMOVED***)
+	err = client.ContainerStart(ctx, foo.ID, types.ContainerStartOptions{})
 	require.NoError(t, err)
 
 	inspect, err := client.ContainerInspect(ctx, foo.ID)
@@ -54,21 +54,21 @@ func TestDeleteDevicemapper(t *testing.T) ***REMOVED***
 	result := icmd.RunCommand("dmsetup", "message", devicePool, "0", fmt.Sprintf("delete %s", deviceID))
 	result.Assert(t, icmd.Success)
 
-	err = client.ContainerRemove(ctx, foo.ID, types.ContainerRemoveOptions***REMOVED******REMOVED***)
+	err = client.ContainerRemove(ctx, foo.ID, types.ContainerRemoveOptions{})
 	require.NoError(t, err)
-***REMOVED***
+}
 
-func containerIsStopped(ctx context.Context, client client.APIClient, containerID string) func(log poll.LogT) poll.Result ***REMOVED***
-	return func(log poll.LogT) poll.Result ***REMOVED***
+func containerIsStopped(ctx context.Context, client client.APIClient, containerID string) func(log poll.LogT) poll.Result {
+	return func(log poll.LogT) poll.Result {
 		inspect, err := client.ContainerInspect(ctx, containerID)
 
-		switch ***REMOVED***
+		switch {
 		case err != nil:
 			return poll.Error(err)
 		case !inspect.State.Running:
 			return poll.Success()
 		default:
 			return poll.Continue("waiting for container to be stopped")
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

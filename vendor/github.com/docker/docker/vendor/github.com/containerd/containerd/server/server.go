@@ -38,42 +38,42 @@ import (
 )
 
 // New creates and initializes a new containerd server
-func New(ctx context.Context, config *Config) (*Server, error) ***REMOVED***
-	switch ***REMOVED***
+func New(ctx context.Context, config *Config) (*Server, error) {
+	switch {
 	case config.Root == "":
 		return nil, errors.New("root must be specified")
 	case config.State == "":
 		return nil, errors.New("state must be specified")
 	case config.Root == config.State:
 		return nil, errors.New("root and state must be different paths")
-	***REMOVED***
+	}
 
-	if err := os.MkdirAll(config.Root, 0711); err != nil ***REMOVED***
+	if err := os.MkdirAll(config.Root, 0711); err != nil {
 		return nil, err
-	***REMOVED***
-	if err := os.MkdirAll(config.State, 0711); err != nil ***REMOVED***
+	}
+	if err := os.MkdirAll(config.State, 0711); err != nil {
 		return nil, err
-	***REMOVED***
-	if err := apply(ctx, config); err != nil ***REMOVED***
+	}
+	if err := apply(ctx, config); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	plugins, err := loadPlugins(config)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	rpc := grpc.NewServer(
 		grpc.UnaryInterceptor(interceptor),
 		grpc.StreamInterceptor(grpc_prometheus.StreamServerInterceptor),
 	)
 	var (
 		services []plugin.Service
-		s        = &Server***REMOVED***
+		s        = &Server{
 			rpc:    rpc,
 			events: exchange.NewExchange(),
-		***REMOVED***
+		}
 		initialized = plugin.NewPluginSet()
 	)
-	for _, p := range plugins ***REMOVED***
+	for _, p := range plugins {
 		id := p.URI()
 		log.G(ctx).WithField("type", p.Type).Infof("loading plugin %q...", id)
 
@@ -88,65 +88,65 @@ func New(ctx context.Context, config *Config) (*Server, error) ***REMOVED***
 		initContext.Address = config.GRPC.Address
 
 		// load the plugin specific configuration if it is provided
-		if p.Config != nil ***REMOVED***
+		if p.Config != nil {
 			pluginConfig, err := config.Decode(p.ID, p.Config)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			initContext.Config = pluginConfig
-		***REMOVED***
+		}
 		result := p.Init(initContext)
-		if err := initialized.Add(result); err != nil ***REMOVED***
+		if err := initialized.Add(result); err != nil {
 			return nil, errors.Wrapf(err, "could not add plugin result to plugin set")
-		***REMOVED***
+		}
 
 		instance, err := result.Instance()
-		if err != nil ***REMOVED***
-			if plugin.IsSkipPlugin(err) ***REMOVED***
+		if err != nil {
+			if plugin.IsSkipPlugin(err) {
 				log.G(ctx).WithField("type", p.Type).Infof("skip loading plugin %q...", id)
-			***REMOVED*** else ***REMOVED***
+			} else {
 				log.G(ctx).WithError(err).Warnf("failed to load plugin %s", id)
-			***REMOVED***
+			}
 			continue
-		***REMOVED***
+		}
 		// check for grpc services that should be registered with the server
-		if service, ok := instance.(plugin.Service); ok ***REMOVED***
+		if service, ok := instance.(plugin.Service); ok {
 			services = append(services, service)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	// register services after all plugins have been initialized
-	for _, service := range services ***REMOVED***
-		if err := service.Register(rpc); err != nil ***REMOVED***
+	for _, service := range services {
+		if err := service.Register(rpc); err != nil {
 			return nil, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return s, nil
-***REMOVED***
+}
 
 // Server is the containerd main daemon
-type Server struct ***REMOVED***
+type Server struct {
 	rpc    *grpc.Server
 	events *exchange.Exchange
-***REMOVED***
+}
 
 // ServeGRPC provides the containerd grpc APIs on the provided listener
-func (s *Server) ServeGRPC(l net.Listener) error ***REMOVED***
+func (s *Server) ServeGRPC(l net.Listener) error {
 	// before we start serving the grpc API regster the grpc_prometheus metrics
 	// handler.  This needs to be the last service registered so that it can collect
 	// metrics for every other service
 	grpc_prometheus.Register(s.rpc)
 	return trapClosedConnErr(s.rpc.Serve(l))
-***REMOVED***
+}
 
 // ServeMetrics provides a prometheus endpoint for exposing metrics
-func (s *Server) ServeMetrics(l net.Listener) error ***REMOVED***
+func (s *Server) ServeMetrics(l net.Listener) error {
 	m := http.NewServeMux()
 	m.Handle("/v1/metrics", metrics.Handler())
 	return trapClosedConnErr(http.Serve(l, m))
-***REMOVED***
+}
 
 // ServeDebug provides a debug endpoint
-func (s *Server) ServeDebug(l net.Listener) error ***REMOVED***
+func (s *Server) ServeDebug(l net.Listener) error {
 	// don't use the default http server mux to make sure nothing gets registered
 	// that we don't want to expose via containerd
 	m := http.NewServeMux()
@@ -157,86 +157,86 @@ func (s *Server) ServeDebug(l net.Listener) error ***REMOVED***
 	m.Handle("/debug/pprof/symbol", http.HandlerFunc(pprof.Symbol))
 	m.Handle("/debug/pprof/trace", http.HandlerFunc(pprof.Trace))
 	return trapClosedConnErr(http.Serve(l, m))
-***REMOVED***
+}
 
 // Stop the containerd server canceling any open connections
-func (s *Server) Stop() ***REMOVED***
+func (s *Server) Stop() {
 	s.rpc.Stop()
-***REMOVED***
+}
 
-func loadPlugins(config *Config) ([]*plugin.Registration, error) ***REMOVED***
+func loadPlugins(config *Config) ([]*plugin.Registration, error) {
 	// load all plugins into containerd
-	if err := plugin.Load(filepath.Join(config.Root, "plugins")); err != nil ***REMOVED***
+	if err := plugin.Load(filepath.Join(config.Root, "plugins")); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	// load additional plugins that don't automatically register themselves
-	plugin.Register(&plugin.Registration***REMOVED***
+	plugin.Register(&plugin.Registration{
 		Type: plugin.ContentPlugin,
 		ID:   "content",
-		InitFn: func(ic *plugin.InitContext) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+		InitFn: func(ic *plugin.InitContext) (interface{}, error) {
 			ic.Meta.Exports["root"] = ic.Root
 			return local.NewStore(ic.Root)
-		***REMOVED***,
-	***REMOVED***)
-	plugin.Register(&plugin.Registration***REMOVED***
+		},
+	})
+	plugin.Register(&plugin.Registration{
 		Type: plugin.MetadataPlugin,
 		ID:   "bolt",
-		Requires: []plugin.Type***REMOVED***
+		Requires: []plugin.Type{
 			plugin.ContentPlugin,
 			plugin.SnapshotPlugin,
-		***REMOVED***,
-		InitFn: func(ic *plugin.InitContext) (interface***REMOVED******REMOVED***, error) ***REMOVED***
-			if err := os.MkdirAll(ic.Root, 0711); err != nil ***REMOVED***
+		},
+		InitFn: func(ic *plugin.InitContext) (interface{}, error) {
+			if err := os.MkdirAll(ic.Root, 0711); err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			cs, err := ic.Get(plugin.ContentPlugin)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 
 			snapshottersRaw, err := ic.GetByType(plugin.SnapshotPlugin)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 
 			snapshotters := make(map[string]snapshots.Snapshotter)
-			for name, sn := range snapshottersRaw ***REMOVED***
+			for name, sn := range snapshottersRaw {
 				sn, err := sn.Instance()
-				if err != nil ***REMOVED***
+				if err != nil {
 					log.G(ic.Context).WithError(err).
 						Warnf("could not use snapshotter %v in metadata plugin", name)
 					continue
-				***REMOVED***
+				}
 				snapshotters[name] = sn.(snapshots.Snapshotter)
-			***REMOVED***
+			}
 
 			path := filepath.Join(ic.Root, "meta.db")
 			ic.Meta.Exports["path"] = path
 
 			db, err := bolt.Open(path, 0644, nil)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			mdb := metadata.NewDB(db, cs.(content.Store), snapshotters)
-			if err := mdb.Init(ic.Context); err != nil ***REMOVED***
+			if err := mdb.Init(ic.Context); err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			return mdb, nil
-		***REMOVED***,
-	***REMOVED***)
+		},
+	})
 
 	// return the ordered graph for plugins
 	return plugin.Graph(), nil
-***REMOVED***
+}
 
 func interceptor(
 	ctx context.Context,
-	req interface***REMOVED******REMOVED***,
+	req interface{},
 	info *grpc.UnaryServerInfo,
 	handler grpc.UnaryHandler,
-) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+) (interface{}, error) {
 	ctx = log.WithModule(ctx, "containerd")
-	switch info.Server.(type) ***REMOVED***
+	switch info.Server.(type) {
 	case tasks.TasksServer:
 		ctx = log.WithModule(ctx, "tasks")
 	case containers.ContainersServer:
@@ -263,16 +263,16 @@ func interceptor(
 		ctx = log.WithModule(ctx, "leases")
 	default:
 		log.G(ctx).Warnf("unknown GRPC server type: %#v\n", info.Server)
-	***REMOVED***
+	}
 	return grpc_prometheus.UnaryServerInterceptor(ctx, req, info, handler)
-***REMOVED***
+}
 
-func trapClosedConnErr(err error) error ***REMOVED***
-	if err == nil ***REMOVED***
+func trapClosedConnErr(err error) error {
+	if err == nil {
 		return nil
-	***REMOVED***
-	if strings.Contains(err.Error(), "use of closed network connection") ***REMOVED***
+	}
+	if strings.Contains(err.Error(), "use of closed network connection") {
 		return nil
-	***REMOVED***
+	}
 	return err
-***REMOVED***
+}

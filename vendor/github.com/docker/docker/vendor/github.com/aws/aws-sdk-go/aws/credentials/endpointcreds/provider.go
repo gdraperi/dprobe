@@ -7,26 +7,26 @@
 //
 // Static credentials will never expire once they have been retrieved. The format
 // of the static credentials response:
-//    ***REMOVED***
+//    {
 //        "AccessKeyId" : "MUA...",
 //        "SecretAccessKey" : "/7PC5om....",
-//***REMOVED***
+//    }
 //
 // Refreshable credentials will expire within the "ExpiryWindow" of the Expiration
 // value in the response. The format of the refreshable credentials response:
-//    ***REMOVED***
+//    {
 //        "AccessKeyId" : "MUA...",
 //        "SecretAccessKey" : "/7PC5om....",
 //        "Token" : "AQoDY....=",
 //        "Expiration" : "2016-02-25T06:03:31Z"
-//***REMOVED***
+//    }
 //
 // Errors should be returned in the following format and only returned with 400
 // or 500 HTTP status codes.
-//    ***REMOVED***
+//    {
 //        "code": "ErrorCode",
 //        "message": "Helpful error message."
-//***REMOVED***
+//    }
 package endpointcreds
 
 import (
@@ -46,7 +46,7 @@ const ProviderName = `CredentialsEndpointProvider`
 
 // Provider satisfies the credentials.Provider interface, and is a client to
 // retrieve credentials from an arbitrary endpoint.
-type Provider struct ***REMOVED***
+type Provider struct {
 	staticCreds bool
 	credentials.Expiry
 
@@ -65,127 +65,127 @@ type Provider struct ***REMOVED***
 	//
 	// If ExpiryWindow is 0 or less it will be ignored.
 	ExpiryWindow time.Duration
-***REMOVED***
+}
 
 // NewProviderClient returns a credentials Provider for retrieving AWS credentials
 // from arbitrary endpoint.
-func NewProviderClient(cfg aws.Config, handlers request.Handlers, endpoint string, options ...func(*Provider)) credentials.Provider ***REMOVED***
-	p := &Provider***REMOVED***
+func NewProviderClient(cfg aws.Config, handlers request.Handlers, endpoint string, options ...func(*Provider)) credentials.Provider {
+	p := &Provider{
 		Client: client.New(
 			cfg,
-			metadata.ClientInfo***REMOVED***
+			metadata.ClientInfo{
 				ServiceName: "CredentialsEndpoint",
 				Endpoint:    endpoint,
-			***REMOVED***,
+			},
 			handlers,
 		),
-	***REMOVED***
+	}
 
 	p.Client.Handlers.Unmarshal.PushBack(unmarshalHandler)
 	p.Client.Handlers.UnmarshalError.PushBack(unmarshalError)
 	p.Client.Handlers.Validate.Clear()
 	p.Client.Handlers.Validate.PushBack(validateEndpointHandler)
 
-	for _, option := range options ***REMOVED***
+	for _, option := range options {
 		option(p)
-	***REMOVED***
+	}
 
 	return p
-***REMOVED***
+}
 
 // NewCredentialsClient returns a Credentials wrapper for retrieving credentials
 // from an arbitrary endpoint concurrently. The client will request the
-func NewCredentialsClient(cfg aws.Config, handlers request.Handlers, endpoint string, options ...func(*Provider)) *credentials.Credentials ***REMOVED***
+func NewCredentialsClient(cfg aws.Config, handlers request.Handlers, endpoint string, options ...func(*Provider)) *credentials.Credentials {
 	return credentials.NewCredentials(NewProviderClient(cfg, handlers, endpoint, options...))
-***REMOVED***
+}
 
 // IsExpired returns true if the credentials retrieved are expired, or not yet
 // retrieved.
-func (p *Provider) IsExpired() bool ***REMOVED***
-	if p.staticCreds ***REMOVED***
+func (p *Provider) IsExpired() bool {
+	if p.staticCreds {
 		return false
-	***REMOVED***
+	}
 	return p.Expiry.IsExpired()
-***REMOVED***
+}
 
 // Retrieve will attempt to request the credentials from the endpoint the Provider
 // was configured for. And error will be returned if the retrieval fails.
-func (p *Provider) Retrieve() (credentials.Value, error) ***REMOVED***
+func (p *Provider) Retrieve() (credentials.Value, error) {
 	resp, err := p.getCredentials()
-	if err != nil ***REMOVED***
-		return credentials.Value***REMOVED***ProviderName: ProviderName***REMOVED***,
+	if err != nil {
+		return credentials.Value{ProviderName: ProviderName},
 			awserr.New("CredentialsEndpointError", "failed to load credentials", err)
-	***REMOVED***
+	}
 
-	if resp.Expiration != nil ***REMOVED***
+	if resp.Expiration != nil {
 		p.SetExpiration(*resp.Expiration, p.ExpiryWindow)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		p.staticCreds = true
-	***REMOVED***
+	}
 
-	return credentials.Value***REMOVED***
+	return credentials.Value{
 		AccessKeyID:     resp.AccessKeyID,
 		SecretAccessKey: resp.SecretAccessKey,
 		SessionToken:    resp.Token,
 		ProviderName:    ProviderName,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-type getCredentialsOutput struct ***REMOVED***
+type getCredentialsOutput struct {
 	Expiration      *time.Time
 	AccessKeyID     string
 	SecretAccessKey string
 	Token           string
-***REMOVED***
+}
 
-type errorOutput struct ***REMOVED***
+type errorOutput struct {
 	Code    string `json:"code"`
 	Message string `json:"message"`
-***REMOVED***
+}
 
-func (p *Provider) getCredentials() (*getCredentialsOutput, error) ***REMOVED***
-	op := &request.Operation***REMOVED***
+func (p *Provider) getCredentials() (*getCredentialsOutput, error) {
+	op := &request.Operation{
 		Name:       "GetCredentials",
 		HTTPMethod: "GET",
-	***REMOVED***
+	}
 
-	out := &getCredentialsOutput***REMOVED******REMOVED***
+	out := &getCredentialsOutput{}
 	req := p.Client.NewRequest(op, nil, out)
 	req.HTTPRequest.Header.Set("Accept", "application/json")
 
 	return out, req.Send()
-***REMOVED***
+}
 
-func validateEndpointHandler(r *request.Request) ***REMOVED***
-	if len(r.ClientInfo.Endpoint) == 0 ***REMOVED***
+func validateEndpointHandler(r *request.Request) {
+	if len(r.ClientInfo.Endpoint) == 0 {
 		r.Error = aws.ErrMissingEndpoint
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func unmarshalHandler(r *request.Request) ***REMOVED***
+func unmarshalHandler(r *request.Request) {
 	defer r.HTTPResponse.Body.Close()
 
 	out := r.Data.(*getCredentialsOutput)
-	if err := json.NewDecoder(r.HTTPResponse.Body).Decode(&out); err != nil ***REMOVED***
+	if err := json.NewDecoder(r.HTTPResponse.Body).Decode(&out); err != nil {
 		r.Error = awserr.New("SerializationError",
 			"failed to decode endpoint credentials",
 			err,
 		)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func unmarshalError(r *request.Request) ***REMOVED***
+func unmarshalError(r *request.Request) {
 	defer r.HTTPResponse.Body.Close()
 
 	var errOut errorOutput
-	if err := json.NewDecoder(r.HTTPResponse.Body).Decode(&errOut); err != nil ***REMOVED***
+	if err := json.NewDecoder(r.HTTPResponse.Body).Decode(&errOut); err != nil {
 		r.Error = awserr.New("SerializationError",
 			"failed to decode endpoint credentials",
 			err,
 		)
-	***REMOVED***
+	}
 
 	// Response body format is not consistent between metadata endpoints.
 	// Grab the error message as a string and include that as the source error
 	r.Error = awserr.New(errOut.Code, errOut.Message, nil)
-***REMOVED***
+}

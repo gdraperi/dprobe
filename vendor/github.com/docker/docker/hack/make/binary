@@ -4,7 +4,7 @@ rm -rf "$DEST"
 
 # This script exists as backwards compatibility for CI
 (
-	DEST="$***REMOVED***DEST***REMOVED***-daemon"
-	ABS_DEST="$***REMOVED***ABS_DEST***REMOVED***-daemon"
+	DEST="${DEST}-daemon"
+	ABS_DEST="${ABS_DEST}-daemon"
 	. hack/make/binary-daemon
 )

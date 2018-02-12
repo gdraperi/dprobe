@@ -3,68 +3,68 @@
 <head>
 <title>Command Example</title>
 <script type="text/javascript">
-window.onload = function () ***REMOVED***
+window.onload = function () {
     var conn;
     var msg = document.getElementById("msg");
     var log = document.getElementById("log");
 
-    function appendLog(item) ***REMOVED***
+    function appendLog(item) {
         var doScroll = log.scrollTop > log.scrollHeight - log.clientHeight - 1;
         log.appendChild(item);
-        if (doScroll) ***REMOVED***
+        if (doScroll) {
             log.scrollTop = log.scrollHeight - log.clientHeight;
-    ***REMOVED***
-***REMOVED***
+        }
+    }
 
-    document.getElementById("form").onsubmit = function () ***REMOVED***
-        if (!conn) ***REMOVED***
+    document.getElementById("form").onsubmit = function () {
+        if (!conn) {
             return false;
-    ***REMOVED***
-        if (!msg.value) ***REMOVED***
+        }
+        if (!msg.value) {
             return false;
-    ***REMOVED***
+        }
         conn.send(msg.value);
         msg.value = "";
         return false;
-***REMOVED***;
+    };
 
-    if (window["WebSocket"]) ***REMOVED***
+    if (window["WebSocket"]) {
         conn = new WebSocket("ws://" + document.location.host + "/ws");
-        conn.onclose = function (evt) ***REMOVED***
+        conn.onclose = function (evt) {
             var item = document.createElement("div");
             item.innerHTML = "<b>Connection closed.</b>";
             appendLog(item);
-    ***REMOVED***;
-        conn.onmessage = function (evt) ***REMOVED***
+        };
+        conn.onmessage = function (evt) {
             var messages = evt.data.split('\n');
-            for (var i = 0; i < messages.length; i++) ***REMOVED***
+            for (var i = 0; i < messages.length; i++) {
                 var item = document.createElement("div");
                 item.innerText = messages[i];
                 appendLog(item);
-        ***REMOVED***
-    ***REMOVED***;
-***REMOVED*** else ***REMOVED***
+            }
+        };
+    } else {
         var item = document.createElement("div");
         item.innerHTML = "<b>Your browser does not support WebSockets.</b>";
         appendLog(item);
-***REMOVED***
-***REMOVED***;
+    }
+};
 </script>
 <style type="text/css">
-html ***REMOVED***
+html {
     overflow: hidden;
-***REMOVED***
+}
 
-body ***REMOVED***
+body {
     overflow: hidden;
     padding: 0;
     margin: 0;
     width: 100%;
     height: 100%;
     background: gray;
-***REMOVED***
+}
 
-#log ***REMOVED***
+#log {
     background: white;
     margin: 0;
     padding: 0.5em 0.5em 0.5em 0.5em;
@@ -74,13 +74,13 @@ body ***REMOVED***
     right: 0.5em;
     bottom: 3em;
     overflow: auto;
-***REMOVED***
+}
 
-#log pre ***REMOVED***
+#log pre {
   margin: 0;
-***REMOVED***
+}
 
-#form ***REMOVED***
+#form {
     padding: 0 0.5em 0 0.5em;
     margin: 0;
     position: absolute;
@@ -88,7 +88,7 @@ body ***REMOVED***
     left: 0px;
     width: 100%;
     overflow: hidden;
-***REMOVED***
+}
 
 </style>
 </head>

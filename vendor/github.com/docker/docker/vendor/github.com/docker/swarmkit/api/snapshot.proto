@@ -7,7 +7,7 @@ import "github.com/docker/swarmkit/api/raft.proto";
 import weak "gogoproto/gogo.proto";
 
 // StoreSnapshot is used to store snapshots of the store.
-message StoreSnapshot ***REMOVED***
+message StoreSnapshot {
 	// TODO(aaronl): The current method of assembling a StoreSnapshot
 	// structure and marshalling it is not optimal. It may be better to
 	// write out nodes, networks, tasks, etc. one at a time to an io.Writer
@@ -23,22 +23,22 @@ message StoreSnapshot ***REMOVED***
 	repeated Resource resources = 7;
 	repeated Extension extensions = 8;
 	repeated Config configs = 9;
-***REMOVED***
+}
 
 // ClusterSnapshot stores cluster membership information in snapshots.
-message ClusterSnapshot ***REMOVED***
+message ClusterSnapshot {
 	repeated RaftMember members = 1;
 	repeated uint64 removed = 2 [packed=false];
-***REMOVED***
+}
 
-message Snapshot ***REMOVED***
-	enum Version ***REMOVED***
+message Snapshot {
+	enum Version {
 		// V0 is the initial version of the StoreSnapshot message.
 		V0 = 0;
-	***REMOVED***
+	}
 
 	Version version = 1;
 
 	ClusterSnapshot membership = 2 [(gogoproto.nullable) = false];
 	StoreSnapshot store = 3 [(gogoproto.nullable) = false];
-***REMOVED***
+}

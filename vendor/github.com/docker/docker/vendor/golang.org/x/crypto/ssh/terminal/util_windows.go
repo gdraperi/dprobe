@@ -10,9 +10,9 @@
 // Putting a terminal into raw mode is the most common requirement:
 //
 // 	oldState, err := terminal.MakeRaw(0)
-// 	if err != nil ***REMOVED***
+// 	if err != nil {
 // 	        panic(err)
-// 	***REMOVED***
+// 	}
 // 	defer terminal.Restore(0, oldState)
 package terminal
 
@@ -47,109 +47,109 @@ type (
 	short int16
 	word  uint16
 
-	coord struct ***REMOVED***
+	coord struct {
 		x short
 		y short
-	***REMOVED***
-	smallRect struct ***REMOVED***
+	}
+	smallRect struct {
 		left   short
 		top    short
 		right  short
 		bottom short
-	***REMOVED***
-	consoleScreenBufferInfo struct ***REMOVED***
+	}
+	consoleScreenBufferInfo struct {
 		size              coord
 		cursorPosition    coord
 		attributes        word
 		window            smallRect
 		maximumWindowSize coord
-	***REMOVED***
+	}
 )
 
-type State struct ***REMOVED***
+type State struct {
 	mode uint32
-***REMOVED***
+}
 
 // IsTerminal returns true if the given file descriptor is a terminal.
-func IsTerminal(fd int) bool ***REMOVED***
+func IsTerminal(fd int) bool {
 	var st uint32
 	r, _, e := syscall.Syscall(procGetConsoleMode.Addr(), 2, uintptr(fd), uintptr(unsafe.Pointer(&st)), 0)
 	return r != 0 && e == 0
-***REMOVED***
+}
 
 // MakeRaw put the terminal connected to the given file descriptor into raw
 // mode and returns the previous state of the terminal so that it can be
 // restored.
-func MakeRaw(fd int) (*State, error) ***REMOVED***
+func MakeRaw(fd int) (*State, error) {
 	var st uint32
 	_, _, e := syscall.Syscall(procGetConsoleMode.Addr(), 2, uintptr(fd), uintptr(unsafe.Pointer(&st)), 0)
-	if e != 0 ***REMOVED***
+	if e != 0 {
 		return nil, error(e)
-	***REMOVED***
+	}
 	raw := st &^ (enableEchoInput | enableProcessedInput | enableLineInput | enableProcessedOutput)
 	_, _, e = syscall.Syscall(procSetConsoleMode.Addr(), 2, uintptr(fd), uintptr(raw), 0)
-	if e != 0 ***REMOVED***
+	if e != 0 {
 		return nil, error(e)
-	***REMOVED***
-	return &State***REMOVED***st***REMOVED***, nil
-***REMOVED***
+	}
+	return &State{st}, nil
+}
 
 // GetState returns the current state of a terminal which may be useful to
 // restore the terminal after a signal.
-func GetState(fd int) (*State, error) ***REMOVED***
+func GetState(fd int) (*State, error) {
 	var st uint32
 	_, _, e := syscall.Syscall(procGetConsoleMode.Addr(), 2, uintptr(fd), uintptr(unsafe.Pointer(&st)), 0)
-	if e != 0 ***REMOVED***
+	if e != 0 {
 		return nil, error(e)
-	***REMOVED***
-	return &State***REMOVED***st***REMOVED***, nil
-***REMOVED***
+	}
+	return &State{st}, nil
+}
 
 // Restore restores the terminal connected to the given file descriptor to a
 // previous state.
-func Restore(fd int, state *State) error ***REMOVED***
+func Restore(fd int, state *State) error {
 	_, _, err := syscall.Syscall(procSetConsoleMode.Addr(), 2, uintptr(fd), uintptr(state.mode), 0)
 	return err
-***REMOVED***
+}
 
 // GetSize returns the dimensions of the given terminal.
-func GetSize(fd int) (width, height int, err error) ***REMOVED***
+func GetSize(fd int) (width, height int, err error) {
 	var info consoleScreenBufferInfo
 	_, _, e := syscall.Syscall(procGetConsoleScreenBufferInfo.Addr(), 2, uintptr(fd), uintptr(unsafe.Pointer(&info)), 0)
-	if e != 0 ***REMOVED***
+	if e != 0 {
 		return 0, 0, error(e)
-	***REMOVED***
+	}
 	return int(info.size.x), int(info.size.y), nil
-***REMOVED***
+}
 
 // passwordReader is an io.Reader that reads from a specific Windows HANDLE.
 type passwordReader int
 
-func (r passwordReader) Read(buf []byte) (int, error) ***REMOVED***
+func (r passwordReader) Read(buf []byte) (int, error) {
 	return syscall.Read(syscall.Handle(r), buf)
-***REMOVED***
+}
 
 // ReadPassword reads a line of input from a terminal without local echo.  This
 // is commonly used for inputting passwords and other sensitive data. The slice
 // returned does not include the \n.
-func ReadPassword(fd int) ([]byte, error) ***REMOVED***
+func ReadPassword(fd int) ([]byte, error) {
 	var st uint32
 	_, _, e := syscall.Syscall(procGetConsoleMode.Addr(), 2, uintptr(fd), uintptr(unsafe.Pointer(&st)), 0)
-	if e != 0 ***REMOVED***
+	if e != 0 {
 		return nil, error(e)
-	***REMOVED***
+	}
 	old := st
 
 	st &^= (enableEchoInput)
 	st |= (enableProcessedInput | enableLineInput | enableProcessedOutput)
 	_, _, e = syscall.Syscall(procSetConsoleMode.Addr(), 2, uintptr(fd), uintptr(st), 0)
-	if e != 0 ***REMOVED***
+	if e != 0 {
 		return nil, error(e)
-	***REMOVED***
+	}
 
-	defer func() ***REMOVED***
+	defer func() {
 		syscall.Syscall(procSetConsoleMode.Addr(), 2, uintptr(fd), uintptr(old), 0)
-	***REMOVED***()
+	}()
 
 	return readPasswordLine(passwordReader(fd))
-***REMOVED***
+}

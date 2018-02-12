@@ -29,7 +29,7 @@ const (
 	ErrCodeHTTP11Required     ErrCode = 0xd
 )
 
-var errCodeName = map[ErrCode]string***REMOVED***
+var errCodeName = map[ErrCode]string{
 	ErrCodeNo:                 "NO_ERROR",
 	ErrCodeProtocol:           "PROTOCOL_ERROR",
 	ErrCodeInternal:           "INTERNAL_ERROR",
@@ -44,85 +44,85 @@ var errCodeName = map[ErrCode]string***REMOVED***
 	ErrCodeEnhanceYourCalm:    "ENHANCE_YOUR_CALM",
 	ErrCodeInadequateSecurity: "INADEQUATE_SECURITY",
 	ErrCodeHTTP11Required:     "HTTP_1_1_REQUIRED",
-***REMOVED***
+}
 
-func (e ErrCode) String() string ***REMOVED***
-	if s, ok := errCodeName[e]; ok ***REMOVED***
+func (e ErrCode) String() string {
+	if s, ok := errCodeName[e]; ok {
 		return s
-	***REMOVED***
+	}
 	return fmt.Sprintf("unknown error code 0x%x", uint32(e))
-***REMOVED***
+}
 
 // ConnectionError is an error that results in the termination of the
 // entire connection.
 type ConnectionError ErrCode
 
-func (e ConnectionError) Error() string ***REMOVED*** return fmt.Sprintf("connection error: %s", ErrCode(e)) ***REMOVED***
+func (e ConnectionError) Error() string { return fmt.Sprintf("connection error: %s", ErrCode(e)) }
 
 // StreamError is an error that only affects one stream within an
 // HTTP/2 connection.
-type StreamError struct ***REMOVED***
+type StreamError struct {
 	StreamID uint32
 	Code     ErrCode
 	Cause    error // optional additional detail
-***REMOVED***
+}
 
-func streamError(id uint32, code ErrCode) StreamError ***REMOVED***
-	return StreamError***REMOVED***StreamID: id, Code: code***REMOVED***
-***REMOVED***
+func streamError(id uint32, code ErrCode) StreamError {
+	return StreamError{StreamID: id, Code: code}
+}
 
-func (e StreamError) Error() string ***REMOVED***
-	if e.Cause != nil ***REMOVED***
+func (e StreamError) Error() string {
+	if e.Cause != nil {
 		return fmt.Sprintf("stream error: stream ID %d; %v; %v", e.StreamID, e.Code, e.Cause)
-	***REMOVED***
+	}
 	return fmt.Sprintf("stream error: stream ID %d; %v", e.StreamID, e.Code)
-***REMOVED***
+}
 
 // 6.9.1 The Flow Control Window
 // "If a sender receives a WINDOW_UPDATE that causes a flow control
 // window to exceed this maximum it MUST terminate either the stream
 // or the connection, as appropriate. For streams, [...]; for the
 // connection, a GOAWAY frame with a FLOW_CONTROL_ERROR code."
-type goAwayFlowError struct***REMOVED******REMOVED***
+type goAwayFlowError struct{}
 
-func (goAwayFlowError) Error() string ***REMOVED*** return "connection exceeded flow control window size" ***REMOVED***
+func (goAwayFlowError) Error() string { return "connection exceeded flow control window size" }
 
 // connErrorReason wraps a ConnectionError with an informative error about why it occurs.
 
 // Errors of this type are only returned by the frame parser functions
 // and converted into ConnectionError(ErrCodeProtocol).
-type connError struct ***REMOVED***
+type connError struct {
 	Code   ErrCode
 	Reason string
-***REMOVED***
+}
 
-func (e connError) Error() string ***REMOVED***
+func (e connError) Error() string {
 	return fmt.Sprintf("http2: connection error: %v: %v", e.Code, e.Reason)
-***REMOVED***
+}
 
 type pseudoHeaderError string
 
-func (e pseudoHeaderError) Error() string ***REMOVED***
+func (e pseudoHeaderError) Error() string {
 	return fmt.Sprintf("invalid pseudo-header %q", string(e))
-***REMOVED***
+}
 
 type duplicatePseudoHeaderError string
 
-func (e duplicatePseudoHeaderError) Error() string ***REMOVED***
+func (e duplicatePseudoHeaderError) Error() string {
 	return fmt.Sprintf("duplicate pseudo-header %q", string(e))
-***REMOVED***
+}
 
 type headerFieldNameError string
 
-func (e headerFieldNameError) Error() string ***REMOVED***
+func (e headerFieldNameError) Error() string {
 	return fmt.Sprintf("invalid header field name %q", string(e))
-***REMOVED***
+}
 
 type headerFieldValueError string
 
-func (e headerFieldValueError) Error() string ***REMOVED***
+func (e headerFieldValueError) Error() string {
 	return fmt.Sprintf("invalid header field value %q", string(e))
-***REMOVED***
+}
 
 var (
 	errMixPseudoHeaderTypes = errors.New("mix of request and response pseudo headers")

@@ -53,93 +53,93 @@ var (
 	httpProxyFromEnvironment = http.ProxyFromEnvironment
 )
 
-func mapAddress(ctx context.Context, address string) (string, error) ***REMOVED***
-	req := &http.Request***REMOVED***
-		URL: &url.URL***REMOVED***
+func mapAddress(ctx context.Context, address string) (string, error) {
+	req := &http.Request{
+		URL: &url.URL{
 			Scheme: "https",
 			Host:   address,
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 	url, err := httpProxyFromEnvironment(req)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
-	if url == nil ***REMOVED***
+	}
+	if url == nil {
 		return "", errDisabled
-	***REMOVED***
+	}
 	return url.Host, nil
-***REMOVED***
+}
 
 // To read a response from a net.Conn, http.ReadResponse() takes a bufio.Reader.
 // It's possible that this reader reads more than what's need for the response and stores
 // those bytes in the buffer.
 // bufConn wraps the original net.Conn and the bufio.Reader to make sure we don't lose the
 // bytes in the buffer.
-type bufConn struct ***REMOVED***
+type bufConn struct {
 	net.Conn
 	r io.Reader
-***REMOVED***
+}
 
-func (c *bufConn) Read(b []byte) (int, error) ***REMOVED***
+func (c *bufConn) Read(b []byte) (int, error) {
 	return c.r.Read(b)
-***REMOVED***
+}
 
-func doHTTPConnectHandshake(ctx context.Context, conn net.Conn, addr string) (_ net.Conn, err error) ***REMOVED***
-	defer func() ***REMOVED***
-		if err != nil ***REMOVED***
+func doHTTPConnectHandshake(ctx context.Context, conn net.Conn, addr string) (_ net.Conn, err error) {
+	defer func() {
+		if err != nil {
 			conn.Close()
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
-	req := (&http.Request***REMOVED***
+	req := (&http.Request{
 		Method: http.MethodConnect,
-		URL:    &url.URL***REMOVED***Host: addr***REMOVED***,
-		Header: map[string][]string***REMOVED***"User-Agent": ***REMOVED***grpcUA***REMOVED******REMOVED***,
-	***REMOVED***)
+		URL:    &url.URL{Host: addr},
+		Header: map[string][]string{"User-Agent": {grpcUA}},
+	})
 
-	if err := sendHTTPRequest(ctx, req, conn); err != nil ***REMOVED***
+	if err := sendHTTPRequest(ctx, req, conn); err != nil {
 		return nil, fmt.Errorf("failed to write the HTTP request: %v", err)
-	***REMOVED***
+	}
 
 	r := bufio.NewReader(conn)
 	resp, err := http.ReadResponse(r, req)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("reading server HTTP response: %v", err)
-	***REMOVED***
+	}
 	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK ***REMOVED***
+	if resp.StatusCode != http.StatusOK {
 		dump, err := httputil.DumpResponse(resp, true)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, fmt.Errorf("failed to do connect handshake, status code: %s", resp.Status)
-		***REMOVED***
+		}
 		return nil, fmt.Errorf("failed to do connect handshake, response: %q", dump)
-	***REMOVED***
+	}
 
-	return &bufConn***REMOVED***Conn: conn, r: r***REMOVED***, nil
-***REMOVED***
+	return &bufConn{Conn: conn, r: r}, nil
+}
 
 // newProxyDialer returns a dialer that connects to proxy first if necessary.
 // The returned dialer checks if a proxy is necessary, dial to the proxy with the
 // provided dialer, does HTTP CONNECT handshake and returns the connection.
-func newProxyDialer(dialer func(context.Context, string) (net.Conn, error)) func(context.Context, string) (net.Conn, error) ***REMOVED***
-	return func(ctx context.Context, addr string) (conn net.Conn, err error) ***REMOVED***
+func newProxyDialer(dialer func(context.Context, string) (net.Conn, error)) func(context.Context, string) (net.Conn, error) {
+	return func(ctx context.Context, addr string) (conn net.Conn, err error) {
 		var skipHandshake bool
 		newAddr, err := mapAddress(ctx, addr)
-		if err != nil ***REMOVED***
-			if err != errDisabled ***REMOVED***
+		if err != nil {
+			if err != errDisabled {
 				return nil, err
-			***REMOVED***
+			}
 			skipHandshake = true
 			newAddr = addr
-		***REMOVED***
+		}
 
 		conn, err = dialer(ctx, newAddr)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
-		if !skipHandshake ***REMOVED***
+		}
+		if !skipHandshake {
 			conn, err = doHTTPConnectHandshake(ctx, conn, addr)
-		***REMOVED***
+		}
 		return
-	***REMOVED***
-***REMOVED***
+	}
+}

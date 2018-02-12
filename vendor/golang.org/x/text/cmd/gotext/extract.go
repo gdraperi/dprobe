@@ -14,27 +14,27 @@ import (
 // - handle features (gender, plural)
 // - message rewriting
 
-func init() ***REMOVED***
+func init() {
 	lang = cmdExtract.Flag.String("lang", "en-US", "comma-separated list of languages to process")
-***REMOVED***
+}
 
-var cmdExtract = &Command***REMOVED***
+var cmdExtract = &Command{
 	Run:       runExtract,
 	UsageLine: "extract <package>*",
 	Short:     "extracts strings to be translated from code",
-***REMOVED***
+}
 
-func runExtract(cmd *Command, config *pipeline.Config, args []string) error ***REMOVED***
+func runExtract(cmd *Command, config *pipeline.Config, args []string) error {
 	config.Packages = args
 	state, err := pipeline.Extract(config)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return wrap(err, "extract failed")
-	***REMOVED***
-	if err := state.Import(); err != nil ***REMOVED***
+	}
+	if err := state.Import(); err != nil {
 		return wrap(err, "import failed")
-	***REMOVED***
-	if err := state.Merge(); err != nil ***REMOVED***
+	}
+	if err := state.Merge(); err != nil {
 		return wrap(err, "merge failed")
-	***REMOVED***
+	}
 	return wrap(state.Export(), "export failed")
-***REMOVED***
+}

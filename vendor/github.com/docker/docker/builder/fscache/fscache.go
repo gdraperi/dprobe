@@ -31,404 +31,404 @@ const cacheKey = "cache"
 const metaKey = "meta"
 
 // Backend is a backing implementation for FSCache
-type Backend interface ***REMOVED***
+type Backend interface {
 	Get(id string) (string, error)
 	Remove(id string) error
-***REMOVED***
+}
 
 // FSCache allows syncing remote resources to cached snapshots
-type FSCache struct ***REMOVED***
+type FSCache struct {
 	opt        Opt
 	transports map[string]Transport
 	mu         sync.Mutex
 	g          singleflight.Group
 	store      *fsCacheStore
-***REMOVED***
+}
 
 // Opt defines options for initializing FSCache
-type Opt struct ***REMOVED***
+type Opt struct {
 	Backend  Backend
 	Root     string // for storing local metadata
 	GCPolicy GCPolicy
-***REMOVED***
+}
 
 // GCPolicy defines policy for garbage collection
-type GCPolicy struct ***REMOVED***
+type GCPolicy struct {
 	MaxSize         uint64
 	MaxKeepDuration time.Duration
-***REMOVED***
+}
 
 // NewFSCache returns new FSCache object
-func NewFSCache(opt Opt) (*FSCache, error) ***REMOVED***
+func NewFSCache(opt Opt) (*FSCache, error) {
 	store, err := newFSCacheStore(opt)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	return &FSCache***REMOVED***
+	}
+	return &FSCache{
 		store:      store,
 		opt:        opt,
 		transports: make(map[string]Transport),
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // Transport defines a method for syncing remote data to FSCache
-type Transport interface ***REMOVED***
+type Transport interface {
 	Copy(ctx context.Context, id RemoteIdentifier, dest string, cs filesync.CacheUpdater) error
-***REMOVED***
+}
 
 // RemoteIdentifier identifies a transfer request
-type RemoteIdentifier interface ***REMOVED***
+type RemoteIdentifier interface {
 	Key() string
 	SharedKey() string
 	Transport() string
-***REMOVED***
+}
 
 // RegisterTransport registers a new transport method
-func (fsc *FSCache) RegisterTransport(id string, transport Transport) error ***REMOVED***
+func (fsc *FSCache) RegisterTransport(id string, transport Transport) error {
 	fsc.mu.Lock()
 	defer fsc.mu.Unlock()
-	if _, ok := fsc.transports[id]; ok ***REMOVED***
+	if _, ok := fsc.transports[id]; ok {
 		return errors.Errorf("transport %v already exists", id)
-	***REMOVED***
+	}
 	fsc.transports[id] = transport
 	return nil
-***REMOVED***
+}
 
 // SyncFrom returns a source based on a remote identifier
-func (fsc *FSCache) SyncFrom(ctx context.Context, id RemoteIdentifier) (builder.Source, error) ***REMOVED*** // cacheOpt
+func (fsc *FSCache) SyncFrom(ctx context.Context, id RemoteIdentifier) (builder.Source, error) { // cacheOpt
 	trasportID := id.Transport()
 	fsc.mu.Lock()
 	transport, ok := fsc.transports[id.Transport()]
-	if !ok ***REMOVED***
+	if !ok {
 		fsc.mu.Unlock()
 		return nil, errors.Errorf("invalid transport %s", trasportID)
-	***REMOVED***
+	}
 
 	logrus.Debugf("SyncFrom %s %s", id.Key(), id.SharedKey())
 	fsc.mu.Unlock()
-	sourceRef, err, _ := fsc.g.Do(id.Key(), func() (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	sourceRef, err, _ := fsc.g.Do(id.Key(), func() (interface{}, error) {
 		var sourceRef *cachedSourceRef
 		sourceRef, err := fsc.store.Get(id.Key())
-		if err == nil ***REMOVED***
+		if err == nil {
 			return sourceRef, nil
-		***REMOVED***
+		}
 
 		// check for unused shared cache
 		sharedKey := id.SharedKey()
-		if sharedKey != "" ***REMOVED***
+		if sharedKey != "" {
 			r, err := fsc.store.Rebase(sharedKey, id.Key())
-			if err == nil ***REMOVED***
+			if err == nil {
 				sourceRef = r
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
-		if sourceRef == nil ***REMOVED***
+		if sourceRef == nil {
 			var err error
 			sourceRef, err = fsc.store.New(id.Key(), sharedKey)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return nil, errors.Wrap(err, "failed to create remote context")
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
-		if err := syncFrom(ctx, sourceRef, transport, id); err != nil ***REMOVED***
+		if err := syncFrom(ctx, sourceRef, transport, id); err != nil {
 			sourceRef.Release()
 			return nil, err
-		***REMOVED***
-		if err := sourceRef.resetSize(-1); err != nil ***REMOVED***
+		}
+		if err := sourceRef.resetSize(-1); err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		return sourceRef, nil
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	ref := sourceRef.(*cachedSourceRef)
-	if ref.src == nil ***REMOVED*** // failsafe
+	if ref.src == nil { // failsafe
 		return nil, errors.Errorf("invalid empty pull")
-	***REMOVED***
-	wc := &wrappedContext***REMOVED***Source: ref.src, closer: func() error ***REMOVED***
+	}
+	wc := &wrappedContext{Source: ref.src, closer: func() error {
 		ref.Release()
 		return nil
-	***REMOVED******REMOVED***
+	}}
 	return wc, nil
-***REMOVED***
+}
 
 // DiskUsage reports how much data is allocated by the cache
-func (fsc *FSCache) DiskUsage() (int64, error) ***REMOVED***
+func (fsc *FSCache) DiskUsage() (int64, error) {
 	return fsc.store.DiskUsage()
-***REMOVED***
+}
 
 // Prune allows manually cleaning up the cache
-func (fsc *FSCache) Prune(ctx context.Context) (uint64, error) ***REMOVED***
+func (fsc *FSCache) Prune(ctx context.Context) (uint64, error) {
 	return fsc.store.Prune(ctx)
-***REMOVED***
+}
 
 // Close stops the gc and closes the persistent db
-func (fsc *FSCache) Close() error ***REMOVED***
+func (fsc *FSCache) Close() error {
 	return fsc.store.Close()
-***REMOVED***
+}
 
-func syncFrom(ctx context.Context, cs *cachedSourceRef, transport Transport, id RemoteIdentifier) (retErr error) ***REMOVED***
+func syncFrom(ctx context.Context, cs *cachedSourceRef, transport Transport, id RemoteIdentifier) (retErr error) {
 	src := cs.src
-	if src == nil ***REMOVED***
+	if src == nil {
 		src = remotecontext.NewCachableSource(cs.Dir())
-	***REMOVED***
+	}
 
-	if !cs.cached ***REMOVED***
-		if err := cs.storage.db.View(func(tx *bolt.Tx) error ***REMOVED***
+	if !cs.cached {
+		if err := cs.storage.db.View(func(tx *bolt.Tx) error {
 			b := tx.Bucket([]byte(id.Key()))
 			dt := b.Get([]byte(cacheKey))
-			if dt != nil ***REMOVED***
-				if err := src.UnmarshalBinary(dt); err != nil ***REMOVED***
+			if dt != nil {
+				if err := src.UnmarshalBinary(dt); err != nil {
 					return err
-				***REMOVED***
-			***REMOVED*** else ***REMOVED***
+				}
+			} else {
 				return errors.Wrap(src.Scan(), "failed to scan cache records")
-			***REMOVED***
+			}
 			return nil
-		***REMOVED***); err != nil ***REMOVED***
+		}); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	dc := &detectChanges***REMOVED***f: src.HandleChange***REMOVED***
+	dc := &detectChanges{f: src.HandleChange}
 
 	// todo: probably send a bucket to `Copy` and let it return source
 	// but need to make sure that tx is safe
-	if err := transport.Copy(ctx, id, cs.Dir(), dc); err != nil ***REMOVED***
+	if err := transport.Copy(ctx, id, cs.Dir(), dc); err != nil {
 		return errors.Wrapf(err, "failed to copy to %s", cs.Dir())
-	***REMOVED***
+	}
 
-	if !dc.supported ***REMOVED***
-		if err := src.Scan(); err != nil ***REMOVED***
+	if !dc.supported {
+		if err := src.Scan(); err != nil {
 			return errors.Wrap(err, "failed to scan cache records after transfer")
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	cs.cached = true
 	cs.src = src
-	return cs.storage.db.Update(func(tx *bolt.Tx) error ***REMOVED***
+	return cs.storage.db.Update(func(tx *bolt.Tx) error {
 		dt, err := src.MarshalBinary()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		b := tx.Bucket([]byte(id.Key()))
 		return b.Put([]byte(cacheKey), dt)
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-type fsCacheStore struct ***REMOVED***
+type fsCacheStore struct {
 	mu       sync.Mutex
 	sources  map[string]*cachedSource
 	db       *bolt.DB
 	fs       Backend
 	gcTimer  *time.Timer
 	gcPolicy GCPolicy
-***REMOVED***
+}
 
 // CachePolicy defines policy for keeping a resource in cache
-type CachePolicy struct ***REMOVED***
+type CachePolicy struct {
 	Priority int
 	LastUsed time.Time
-***REMOVED***
+}
 
-func defaultCachePolicy() CachePolicy ***REMOVED***
-	return CachePolicy***REMOVED***Priority: 10, LastUsed: time.Now()***REMOVED***
-***REMOVED***
+func defaultCachePolicy() CachePolicy {
+	return CachePolicy{Priority: 10, LastUsed: time.Now()}
+}
 
-func newFSCacheStore(opt Opt) (*fsCacheStore, error) ***REMOVED***
-	if err := os.MkdirAll(opt.Root, 0700); err != nil ***REMOVED***
+func newFSCacheStore(opt Opt) (*fsCacheStore, error) {
+	if err := os.MkdirAll(opt.Root, 0700); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	p := filepath.Join(opt.Root, dbFile)
 	db, err := bolt.Open(p, 0600, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, errors.Wrap(err, "failed to open database file %s")
-	***REMOVED***
-	s := &fsCacheStore***REMOVED***db: db, sources: make(map[string]*cachedSource), fs: opt.Backend, gcPolicy: opt.GCPolicy***REMOVED***
-	db.View(func(tx *bolt.Tx) error ***REMOVED***
-		return tx.ForEach(func(name []byte, b *bolt.Bucket) error ***REMOVED***
+	}
+	s := &fsCacheStore{db: db, sources: make(map[string]*cachedSource), fs: opt.Backend, gcPolicy: opt.GCPolicy}
+	db.View(func(tx *bolt.Tx) error {
+		return tx.ForEach(func(name []byte, b *bolt.Bucket) error {
 			dt := b.Get([]byte(metaKey))
-			if dt == nil ***REMOVED***
+			if dt == nil {
 				return nil
-			***REMOVED***
+			}
 			var sm sourceMeta
-			if err := json.Unmarshal(dt, &sm); err != nil ***REMOVED***
+			if err := json.Unmarshal(dt, &sm); err != nil {
 				return err
-			***REMOVED***
+			}
 			dir, err := s.fs.Get(sm.BackendID)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err // TODO: handle gracefully
-			***REMOVED***
-			source := &cachedSource***REMOVED***
-				refs:       make(map[*cachedSourceRef]struct***REMOVED******REMOVED***),
+			}
+			source := &cachedSource{
+				refs:       make(map[*cachedSourceRef]struct{}),
 				id:         string(name),
 				dir:        dir,
 				sourceMeta: sm,
 				storage:    s,
-			***REMOVED***
+			}
 			s.sources[string(name)] = source
 			return nil
-		***REMOVED***)
-	***REMOVED***)
+		})
+	})
 
 	s.gcTimer = s.startPeriodicGC(5 * time.Minute)
 	return s, nil
-***REMOVED***
+}
 
-func (s *fsCacheStore) startPeriodicGC(interval time.Duration) *time.Timer ***REMOVED***
+func (s *fsCacheStore) startPeriodicGC(interval time.Duration) *time.Timer {
 	var t *time.Timer
-	t = time.AfterFunc(interval, func() ***REMOVED***
-		if err := s.GC(); err != nil ***REMOVED***
+	t = time.AfterFunc(interval, func() {
+		if err := s.GC(); err != nil {
 			logrus.Errorf("build gc error: %v", err)
-		***REMOVED***
+		}
 		t.Reset(interval)
-	***REMOVED***)
+	})
 	return t
-***REMOVED***
+}
 
-func (s *fsCacheStore) Close() error ***REMOVED***
+func (s *fsCacheStore) Close() error {
 	s.gcTimer.Stop()
 	return s.db.Close()
-***REMOVED***
+}
 
-func (s *fsCacheStore) New(id, sharedKey string) (*cachedSourceRef, error) ***REMOVED***
+func (s *fsCacheStore) New(id, sharedKey string) (*cachedSourceRef, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	var ret *cachedSource
-	if err := s.db.Update(func(tx *bolt.Tx) error ***REMOVED***
+	if err := s.db.Update(func(tx *bolt.Tx) error {
 		b, err := tx.CreateBucket([]byte(id))
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		backendID := stringid.GenerateRandomID()
 		dir, err := s.fs.Get(backendID)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-		source := &cachedSource***REMOVED***
-			refs: make(map[*cachedSourceRef]struct***REMOVED******REMOVED***),
+		}
+		source := &cachedSource{
+			refs: make(map[*cachedSourceRef]struct{}),
 			id:   id,
 			dir:  dir,
-			sourceMeta: sourceMeta***REMOVED***
+			sourceMeta: sourceMeta{
 				BackendID:   backendID,
 				SharedKey:   sharedKey,
 				CachePolicy: defaultCachePolicy(),
-			***REMOVED***,
+			},
 			storage: s,
-		***REMOVED***
+		}
 		dt, err := json.Marshal(source.sourceMeta)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-		if err := b.Put([]byte(metaKey), dt); err != nil ***REMOVED***
+		}
+		if err := b.Put([]byte(metaKey), dt); err != nil {
 			return err
-		***REMOVED***
+		}
 		s.sources[id] = source
 		ret = source
 		return nil
-	***REMOVED***); err != nil ***REMOVED***
+	}); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return ret.getRef(), nil
-***REMOVED***
+}
 
-func (s *fsCacheStore) Rebase(sharedKey, newid string) (*cachedSourceRef, error) ***REMOVED***
+func (s *fsCacheStore) Rebase(sharedKey, newid string) (*cachedSourceRef, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	var ret *cachedSource
-	for id, snap := range s.sources ***REMOVED***
-		if snap.SharedKey == sharedKey && len(snap.refs) == 0 ***REMOVED***
-			if err := s.db.Update(func(tx *bolt.Tx) error ***REMOVED***
-				if err := tx.DeleteBucket([]byte(id)); err != nil ***REMOVED***
+	for id, snap := range s.sources {
+		if snap.SharedKey == sharedKey && len(snap.refs) == 0 {
+			if err := s.db.Update(func(tx *bolt.Tx) error {
+				if err := tx.DeleteBucket([]byte(id)); err != nil {
 					return err
-				***REMOVED***
+				}
 				b, err := tx.CreateBucket([]byte(newid))
-				if err != nil ***REMOVED***
+				if err != nil {
 					return err
-				***REMOVED***
+				}
 				snap.id = newid
 				snap.CachePolicy = defaultCachePolicy()
 				dt, err := json.Marshal(snap.sourceMeta)
-				if err != nil ***REMOVED***
+				if err != nil {
 					return err
-				***REMOVED***
-				if err := b.Put([]byte(metaKey), dt); err != nil ***REMOVED***
+				}
+				if err := b.Put([]byte(metaKey), dt); err != nil {
 					return err
-				***REMOVED***
+				}
 				delete(s.sources, id)
 				s.sources[newid] = snap
 				return nil
-			***REMOVED***); err != nil ***REMOVED***
+			}); err != nil {
 				return nil, err
-			***REMOVED***
+			}
 			ret = snap
 			break
-		***REMOVED***
-	***REMOVED***
-	if ret == nil ***REMOVED***
+		}
+	}
+	if ret == nil {
 		return nil, errors.Errorf("no candidate for rebase")
-	***REMOVED***
+	}
 	return ret.getRef(), nil
-***REMOVED***
+}
 
-func (s *fsCacheStore) Get(id string) (*cachedSourceRef, error) ***REMOVED***
+func (s *fsCacheStore) Get(id string) (*cachedSourceRef, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	src, ok := s.sources[id]
-	if !ok ***REMOVED***
+	if !ok {
 		return nil, errors.Errorf("not found")
-	***REMOVED***
+	}
 	return src.getRef(), nil
-***REMOVED***
+}
 
 // DiskUsage reports how much data is allocated by the cache
-func (s *fsCacheStore) DiskUsage() (int64, error) ***REMOVED***
+func (s *fsCacheStore) DiskUsage() (int64, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	var size int64
 
-	for _, snap := range s.sources ***REMOVED***
-		if len(snap.refs) == 0 ***REMOVED***
+	for _, snap := range s.sources {
+		if len(snap.refs) == 0 {
 			ss, err := snap.getSize()
-			if err != nil ***REMOVED***
+			if err != nil {
 				return 0, err
-			***REMOVED***
+			}
 			size += ss
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return size, nil
-***REMOVED***
+}
 
 // Prune allows manually cleaning up the cache
-func (s *fsCacheStore) Prune(ctx context.Context) (uint64, error) ***REMOVED***
+func (s *fsCacheStore) Prune(ctx context.Context) (uint64, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	var size uint64
 
-	for id, snap := range s.sources ***REMOVED***
-		select ***REMOVED***
+	for id, snap := range s.sources {
+		select {
 		case <-ctx.Done():
 			logrus.Debugf("Cache prune operation cancelled, pruned size: %d", size)
 			// when the context is cancelled, only return current size and nil
 			return size, nil
 		default:
-		***REMOVED***
-		if len(snap.refs) == 0 ***REMOVED***
+		}
+		if len(snap.refs) == 0 {
 			ss, err := snap.getSize()
-			if err != nil ***REMOVED***
+			if err != nil {
 				return size, err
-			***REMOVED***
-			if err := s.delete(id); err != nil ***REMOVED***
+			}
+			if err := s.delete(id); err != nil {
 				return size, errors.Wrapf(err, "failed to delete %s", id)
-			***REMOVED***
+			}
 			size += uint64(ss)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return size, nil
-***REMOVED***
+}
 
 // GC runs a garbage collector on FSCache
-func (s *fsCacheStore) GC() error ***REMOVED***
+func (s *fsCacheStore) GC() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	var size uint64
@@ -436,216 +436,216 @@ func (s *fsCacheStore) GC() error ***REMOVED***
 	cutoff := time.Now().Add(-s.gcPolicy.MaxKeepDuration)
 	var blacklist []*cachedSource
 
-	for id, snap := range s.sources ***REMOVED***
-		if len(snap.refs) == 0 ***REMOVED***
-			if cutoff.After(snap.CachePolicy.LastUsed) ***REMOVED***
-				if err := s.delete(id); err != nil ***REMOVED***
+	for id, snap := range s.sources {
+		if len(snap.refs) == 0 {
+			if cutoff.After(snap.CachePolicy.LastUsed) {
+				if err := s.delete(id); err != nil {
 					return errors.Wrapf(err, "failed to delete %s", id)
-				***REMOVED***
-			***REMOVED*** else ***REMOVED***
+				}
+			} else {
 				ss, err := snap.getSize()
-				if err != nil ***REMOVED***
+				if err != nil {
 					return err
-				***REMOVED***
+				}
 				size += uint64(ss)
 				blacklist = append(blacklist, snap)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	sort.Sort(sortableCacheSources(blacklist))
-	for _, snap := range blacklist ***REMOVED***
-		if size <= s.gcPolicy.MaxSize ***REMOVED***
+	for _, snap := range blacklist {
+		if size <= s.gcPolicy.MaxSize {
 			break
-		***REMOVED***
+		}
 		ss, err := snap.getSize()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-		if err := s.delete(snap.id); err != nil ***REMOVED***
+		}
+		if err := s.delete(snap.id); err != nil {
 			return errors.Wrapf(err, "failed to delete %s", snap.id)
-		***REMOVED***
+		}
 		size -= uint64(ss)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // keep mu while calling this
-func (s *fsCacheStore) delete(id string) error ***REMOVED***
+func (s *fsCacheStore) delete(id string) error {
 	src, ok := s.sources[id]
-	if !ok ***REMOVED***
+	if !ok {
 		return nil
-	***REMOVED***
-	if len(src.refs) > 0 ***REMOVED***
+	}
+	if len(src.refs) > 0 {
 		return errors.Errorf("can't delete %s because it has active references", id)
-	***REMOVED***
+	}
 	delete(s.sources, id)
-	if err := s.db.Update(func(tx *bolt.Tx) error ***REMOVED***
+	if err := s.db.Update(func(tx *bolt.Tx) error {
 		return tx.DeleteBucket([]byte(id))
-	***REMOVED***); err != nil ***REMOVED***
+	}); err != nil {
 		return err
-	***REMOVED***
+	}
 	return s.fs.Remove(src.BackendID)
-***REMOVED***
+}
 
-type sourceMeta struct ***REMOVED***
+type sourceMeta struct {
 	SharedKey   string
 	BackendID   string
 	CachePolicy CachePolicy
 	Size        int64
-***REMOVED***
+}
 
-type cachedSource struct ***REMOVED***
+type cachedSource struct {
 	sourceMeta
-	refs    map[*cachedSourceRef]struct***REMOVED******REMOVED***
+	refs    map[*cachedSourceRef]struct{}
 	id      string
 	dir     string
 	src     *remotecontext.CachableSource
 	storage *fsCacheStore
 	cached  bool // keep track if cache is up to date
-***REMOVED***
+}
 
-type cachedSourceRef struct ***REMOVED***
+type cachedSourceRef struct {
 	*cachedSource
-***REMOVED***
+}
 
-func (cs *cachedSource) Dir() string ***REMOVED***
+func (cs *cachedSource) Dir() string {
 	return cs.dir
-***REMOVED***
+}
 
 // hold storage lock before calling
-func (cs *cachedSource) getRef() *cachedSourceRef ***REMOVED***
-	ref := &cachedSourceRef***REMOVED***cachedSource: cs***REMOVED***
-	cs.refs[ref] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
+func (cs *cachedSource) getRef() *cachedSourceRef {
+	ref := &cachedSourceRef{cachedSource: cs}
+	cs.refs[ref] = struct{}{}
 	return ref
-***REMOVED***
+}
 
 // hold storage lock before calling
-func (cs *cachedSource) getSize() (int64, error) ***REMOVED***
-	if cs.sourceMeta.Size < 0 ***REMOVED***
+func (cs *cachedSource) getSize() (int64, error) {
+	if cs.sourceMeta.Size < 0 {
 		ss, err := directory.Size(cs.dir)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return 0, err
-		***REMOVED***
-		if err := cs.resetSize(ss); err != nil ***REMOVED***
+		}
+		if err := cs.resetSize(ss); err != nil {
 			return 0, err
-		***REMOVED***
+		}
 		return ss, nil
-	***REMOVED***
+	}
 	return cs.sourceMeta.Size, nil
-***REMOVED***
+}
 
-func (cs *cachedSource) resetSize(val int64) error ***REMOVED***
+func (cs *cachedSource) resetSize(val int64) error {
 	cs.sourceMeta.Size = val
 	return cs.saveMeta()
-***REMOVED***
-func (cs *cachedSource) saveMeta() error ***REMOVED***
-	return cs.storage.db.Update(func(tx *bolt.Tx) error ***REMOVED***
+}
+func (cs *cachedSource) saveMeta() error {
+	return cs.storage.db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(cs.id))
 		dt, err := json.Marshal(cs.sourceMeta)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		return b.Put([]byte(metaKey), dt)
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func (csr *cachedSourceRef) Release() error ***REMOVED***
+func (csr *cachedSourceRef) Release() error {
 	csr.cachedSource.storage.mu.Lock()
 	defer csr.cachedSource.storage.mu.Unlock()
 	delete(csr.cachedSource.refs, csr)
-	if len(csr.cachedSource.refs) == 0 ***REMOVED***
+	if len(csr.cachedSource.refs) == 0 {
 		go csr.cachedSource.storage.GC()
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-type detectChanges struct ***REMOVED***
+type detectChanges struct {
 	f         fsutil.ChangeFunc
 	supported bool
-***REMOVED***
+}
 
-func (dc *detectChanges) HandleChange(kind fsutil.ChangeKind, path string, fi os.FileInfo, err error) error ***REMOVED***
-	if dc == nil ***REMOVED***
+func (dc *detectChanges) HandleChange(kind fsutil.ChangeKind, path string, fi os.FileInfo, err error) error {
+	if dc == nil {
 		return nil
-	***REMOVED***
+	}
 	return dc.f(kind, path, fi, err)
-***REMOVED***
+}
 
-func (dc *detectChanges) MarkSupported(v bool) ***REMOVED***
-	if dc == nil ***REMOVED***
+func (dc *detectChanges) MarkSupported(v bool) {
+	if dc == nil {
 		return
-	***REMOVED***
+	}
 	dc.supported = v
-***REMOVED***
+}
 
-func (dc *detectChanges) ContentHasher() fsutil.ContentHasher ***REMOVED***
+func (dc *detectChanges) ContentHasher() fsutil.ContentHasher {
 	return newTarsumHash
-***REMOVED***
+}
 
-type wrappedContext struct ***REMOVED***
+type wrappedContext struct {
 	builder.Source
 	closer func() error
-***REMOVED***
+}
 
-func (wc *wrappedContext) Close() error ***REMOVED***
-	if err := wc.Source.Close(); err != nil ***REMOVED***
+func (wc *wrappedContext) Close() error {
+	if err := wc.Source.Close(); err != nil {
 		return err
-	***REMOVED***
+	}
 	return wc.closer()
-***REMOVED***
+}
 
 type sortableCacheSources []*cachedSource
 
 // Len is the number of elements in the collection.
-func (s sortableCacheSources) Len() int ***REMOVED***
+func (s sortableCacheSources) Len() int {
 	return len(s)
-***REMOVED***
+}
 
 // Less reports whether the element with
 // index i should sort before the element with index j.
-func (s sortableCacheSources) Less(i, j int) bool ***REMOVED***
+func (s sortableCacheSources) Less(i, j int) bool {
 	return s[i].CachePolicy.LastUsed.Before(s[j].CachePolicy.LastUsed)
-***REMOVED***
+}
 
 // Swap swaps the elements with indexes i and j.
-func (s sortableCacheSources) Swap(i, j int) ***REMOVED***
+func (s sortableCacheSources) Swap(i, j int) {
 	s[i], s[j] = s[j], s[i]
-***REMOVED***
+}
 
-func newTarsumHash(stat *fsutil.Stat) (hash.Hash, error) ***REMOVED***
-	fi := &fsutil.StatInfo***REMOVED***stat***REMOVED***
+func newTarsumHash(stat *fsutil.Stat) (hash.Hash, error) {
+	fi := &fsutil.StatInfo{stat}
 	p := stat.Path
-	if fi.IsDir() ***REMOVED***
+	if fi.IsDir() {
 		p += string(os.PathSeparator)
-	***REMOVED***
+	}
 	h, err := archive.FileInfoHeader(p, fi, stat.Linkname)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	h.Name = p
 	h.Uid = int(stat.Uid)
 	h.Gid = int(stat.Gid)
 	h.Linkname = stat.Linkname
-	if stat.Xattrs != nil ***REMOVED***
+	if stat.Xattrs != nil {
 		h.Xattrs = make(map[string]string)
-		for k, v := range stat.Xattrs ***REMOVED***
+		for k, v := range stat.Xattrs {
 			h.Xattrs[k] = string(v)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	tsh := &tarsumHash***REMOVED***h: h, Hash: sha256.New()***REMOVED***
+	tsh := &tarsumHash{h: h, Hash: sha256.New()}
 	tsh.Reset()
 	return tsh, nil
-***REMOVED***
+}
 
 // Reset resets the Hash to its initial state.
-func (tsh *tarsumHash) Reset() ***REMOVED***
+func (tsh *tarsumHash) Reset() {
 	tsh.Hash.Reset()
 	tarsum.WriteV1Header(tsh.h, tsh.Hash)
-***REMOVED***
+}
 
-type tarsumHash struct ***REMOVED***
+type tarsumHash struct {
 	hash.Hash
 	h *tar.Header
-***REMOVED***
+}

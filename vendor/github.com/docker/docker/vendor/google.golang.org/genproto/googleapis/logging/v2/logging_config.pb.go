@@ -35,28 +35,28 @@ const (
 	LogSink_V1 LogSink_VersionFormat = 2
 )
 
-var LogSink_VersionFormat_name = map[int32]string***REMOVED***
+var LogSink_VersionFormat_name = map[int32]string{
 	0: "VERSION_FORMAT_UNSPECIFIED",
 	1: "V2",
 	2: "V1",
-***REMOVED***
-var LogSink_VersionFormat_value = map[string]int32***REMOVED***
+}
+var LogSink_VersionFormat_value = map[string]int32{
 	"VERSION_FORMAT_UNSPECIFIED": 0,
 	"V2": 1,
 	"V1": 2,
-***REMOVED***
+}
 
-func (x LogSink_VersionFormat) String() string ***REMOVED***
+func (x LogSink_VersionFormat) String() string {
 	return proto.EnumName(LogSink_VersionFormat_name, int32(x))
-***REMOVED***
-func (LogSink_VersionFormat) EnumDescriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor2, []int***REMOVED***0, 0***REMOVED*** ***REMOVED***
+}
+func (LogSink_VersionFormat) EnumDescriptor() ([]byte, []int) { return fileDescriptor2, []int{0, 0} }
 
 // Describes a sink used to export log entries to one of the following
 // destinations in any project: a Cloud Storage bucket, a BigQuery dataset, or a
 // Cloud Pub/Sub topic.  A logs filter controls which log entries are
 // exported. The sink must be created within a project, organization, billing
 // account, or folder.
-type LogSink struct ***REMOVED***
+type LogSink struct {
 	// Required. The client-assigned sink identifier, unique within the
 	// project. Example: `"my-syslog-errors-to-pubsub"`.  Sink identifiers are
 	// limited to 100 characters and can include only the following characters:
@@ -128,71 +128,71 @@ type LogSink struct ***REMOVED***
 	// and an end time are provided, then the end time must be later than the
 	// start time.
 	EndTime *google_protobuf4.Timestamp `protobuf:"bytes,11,opt,name=end_time,json=endTime" json:"end_time,omitempty"`
-***REMOVED***
+}
 
-func (m *LogSink) Reset()                    ***REMOVED*** *m = LogSink***REMOVED******REMOVED*** ***REMOVED***
-func (m *LogSink) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*LogSink) ProtoMessage()               ***REMOVED******REMOVED***
-func (*LogSink) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor2, []int***REMOVED***0***REMOVED*** ***REMOVED***
+func (m *LogSink) Reset()                    { *m = LogSink{} }
+func (m *LogSink) String() string            { return proto.CompactTextString(m) }
+func (*LogSink) ProtoMessage()               {}
+func (*LogSink) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{0} }
 
-func (m *LogSink) GetName() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *LogSink) GetName() string {
+	if m != nil {
 		return m.Name
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *LogSink) GetDestination() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *LogSink) GetDestination() string {
+	if m != nil {
 		return m.Destination
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *LogSink) GetFilter() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *LogSink) GetFilter() string {
+	if m != nil {
 		return m.Filter
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *LogSink) GetOutputVersionFormat() LogSink_VersionFormat ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *LogSink) GetOutputVersionFormat() LogSink_VersionFormat {
+	if m != nil {
 		return m.OutputVersionFormat
-	***REMOVED***
+	}
 	return LogSink_VERSION_FORMAT_UNSPECIFIED
-***REMOVED***
+}
 
-func (m *LogSink) GetWriterIdentity() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *LogSink) GetWriterIdentity() string {
+	if m != nil {
 		return m.WriterIdentity
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *LogSink) GetIncludeChildren() bool ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *LogSink) GetIncludeChildren() bool {
+	if m != nil {
 		return m.IncludeChildren
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
-func (m *LogSink) GetStartTime() *google_protobuf4.Timestamp ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *LogSink) GetStartTime() *google_protobuf4.Timestamp {
+	if m != nil {
 		return m.StartTime
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *LogSink) GetEndTime() *google_protobuf4.Timestamp ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *LogSink) GetEndTime() *google_protobuf4.Timestamp {
+	if m != nil {
 		return m.EndTime
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // The parameters to `ListSinks`.
-type ListSinksRequest struct ***REMOVED***
+type ListSinksRequest struct {
 	// Required. The parent resource whose sinks are to be listed:
 	//
 	//     "projects/[PROJECT_ID]"
@@ -209,65 +209,65 @@ type ListSinksRequest struct ***REMOVED***
 	// Non-positive values are ignored.  The presence of `nextPageToken` in the
 	// response indicates that more results might be available.
 	PageSize int32 `protobuf:"varint,3,opt,name=page_size,json=pageSize" json:"page_size,omitempty"`
-***REMOVED***
+}
 
-func (m *ListSinksRequest) Reset()                    ***REMOVED*** *m = ListSinksRequest***REMOVED******REMOVED*** ***REMOVED***
-func (m *ListSinksRequest) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*ListSinksRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*ListSinksRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor2, []int***REMOVED***1***REMOVED*** ***REMOVED***
+func (m *ListSinksRequest) Reset()                    { *m = ListSinksRequest{} }
+func (m *ListSinksRequest) String() string            { return proto.CompactTextString(m) }
+func (*ListSinksRequest) ProtoMessage()               {}
+func (*ListSinksRequest) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{1} }
 
-func (m *ListSinksRequest) GetParent() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ListSinksRequest) GetParent() string {
+	if m != nil {
 		return m.Parent
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *ListSinksRequest) GetPageToken() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ListSinksRequest) GetPageToken() string {
+	if m != nil {
 		return m.PageToken
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *ListSinksRequest) GetPageSize() int32 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ListSinksRequest) GetPageSize() int32 {
+	if m != nil {
 		return m.PageSize
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
 // Result returned from `ListSinks`.
-type ListSinksResponse struct ***REMOVED***
+type ListSinksResponse struct {
 	// A list of sinks.
 	Sinks []*LogSink `protobuf:"bytes,1,rep,name=sinks" json:"sinks,omitempty"`
 	// If there might be more results than appear in this response, then
 	// `nextPageToken` is included.  To get the next set of results, call the same
 	// method again using the value of `nextPageToken` as `pageToken`.
 	NextPageToken string `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken" json:"next_page_token,omitempty"`
-***REMOVED***
+}
 
-func (m *ListSinksResponse) Reset()                    ***REMOVED*** *m = ListSinksResponse***REMOVED******REMOVED*** ***REMOVED***
-func (m *ListSinksResponse) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*ListSinksResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*ListSinksResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor2, []int***REMOVED***2***REMOVED*** ***REMOVED***
+func (m *ListSinksResponse) Reset()                    { *m = ListSinksResponse{} }
+func (m *ListSinksResponse) String() string            { return proto.CompactTextString(m) }
+func (*ListSinksResponse) ProtoMessage()               {}
+func (*ListSinksResponse) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{2} }
 
-func (m *ListSinksResponse) GetSinks() []*LogSink ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ListSinksResponse) GetSinks() []*LogSink {
+	if m != nil {
 		return m.Sinks
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *ListSinksResponse) GetNextPageToken() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ListSinksResponse) GetNextPageToken() string {
+	if m != nil {
 		return m.NextPageToken
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
 // The parameters to `GetSink`.
-type GetSinkRequest struct ***REMOVED***
+type GetSinkRequest struct {
 	// Required. The resource name of the sink:
 	//
 	//     "projects/[PROJECT_ID]/sinks/[SINK_ID]"
@@ -277,22 +277,22 @@ type GetSinkRequest struct ***REMOVED***
 	//
 	// Example: `"projects/my-project-id/sinks/my-sink-id"`.
 	SinkName string `protobuf:"bytes,1,opt,name=sink_name,json=sinkName" json:"sink_name,omitempty"`
-***REMOVED***
+}
 
-func (m *GetSinkRequest) Reset()                    ***REMOVED*** *m = GetSinkRequest***REMOVED******REMOVED*** ***REMOVED***
-func (m *GetSinkRequest) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*GetSinkRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*GetSinkRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor2, []int***REMOVED***3***REMOVED*** ***REMOVED***
+func (m *GetSinkRequest) Reset()                    { *m = GetSinkRequest{} }
+func (m *GetSinkRequest) String() string            { return proto.CompactTextString(m) }
+func (*GetSinkRequest) ProtoMessage()               {}
+func (*GetSinkRequest) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{3} }
 
-func (m *GetSinkRequest) GetSinkName() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *GetSinkRequest) GetSinkName() string {
+	if m != nil {
 		return m.SinkName
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
 // The parameters to `CreateSink`.
-type CreateSinkRequest struct ***REMOVED***
+type CreateSinkRequest struct {
 	// Required. The resource in which to create the sink:
 	//
 	//     "projects/[PROJECT_ID]"
@@ -317,36 +317,36 @@ type CreateSinkRequest struct ***REMOVED***
 	// be a unique service account used only for exports from the new sink.  For
 	// more information, see `writer_identity` in [LogSink][google.logging.v2.LogSink].
 	UniqueWriterIdentity bool `protobuf:"varint,3,opt,name=unique_writer_identity,json=uniqueWriterIdentity" json:"unique_writer_identity,omitempty"`
-***REMOVED***
+}
 
-func (m *CreateSinkRequest) Reset()                    ***REMOVED*** *m = CreateSinkRequest***REMOVED******REMOVED*** ***REMOVED***
-func (m *CreateSinkRequest) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*CreateSinkRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*CreateSinkRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor2, []int***REMOVED***4***REMOVED*** ***REMOVED***
+func (m *CreateSinkRequest) Reset()                    { *m = CreateSinkRequest{} }
+func (m *CreateSinkRequest) String() string            { return proto.CompactTextString(m) }
+func (*CreateSinkRequest) ProtoMessage()               {}
+func (*CreateSinkRequest) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{4} }
 
-func (m *CreateSinkRequest) GetParent() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *CreateSinkRequest) GetParent() string {
+	if m != nil {
 		return m.Parent
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *CreateSinkRequest) GetSink() *LogSink ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *CreateSinkRequest) GetSink() *LogSink {
+	if m != nil {
 		return m.Sink
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *CreateSinkRequest) GetUniqueWriterIdentity() bool ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *CreateSinkRequest) GetUniqueWriterIdentity() bool {
+	if m != nil {
 		return m.UniqueWriterIdentity
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
 // The parameters to `UpdateSink`.
-type UpdateSinkRequest struct ***REMOVED***
+type UpdateSinkRequest struct {
 	// Required. The full resource name of the sink to update, including the
 	// parent resource and the sink identifier:
 	//
@@ -373,36 +373,36 @@ type UpdateSinkRequest struct ***REMOVED***
 	//     `writer_identity` is changed to a unique service account.
 	// +   It is an error if the old value is true and the new value is false.
 	UniqueWriterIdentity bool `protobuf:"varint,3,opt,name=unique_writer_identity,json=uniqueWriterIdentity" json:"unique_writer_identity,omitempty"`
-***REMOVED***
+}
 
-func (m *UpdateSinkRequest) Reset()                    ***REMOVED*** *m = UpdateSinkRequest***REMOVED******REMOVED*** ***REMOVED***
-func (m *UpdateSinkRequest) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*UpdateSinkRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*UpdateSinkRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor2, []int***REMOVED***5***REMOVED*** ***REMOVED***
+func (m *UpdateSinkRequest) Reset()                    { *m = UpdateSinkRequest{} }
+func (m *UpdateSinkRequest) String() string            { return proto.CompactTextString(m) }
+func (*UpdateSinkRequest) ProtoMessage()               {}
+func (*UpdateSinkRequest) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{5} }
 
-func (m *UpdateSinkRequest) GetSinkName() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *UpdateSinkRequest) GetSinkName() string {
+	if m != nil {
 		return m.SinkName
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *UpdateSinkRequest) GetSink() *LogSink ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *UpdateSinkRequest) GetSink() *LogSink {
+	if m != nil {
 		return m.Sink
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *UpdateSinkRequest) GetUniqueWriterIdentity() bool ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *UpdateSinkRequest) GetUniqueWriterIdentity() bool {
+	if m != nil {
 		return m.UniqueWriterIdentity
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
 // The parameters to `DeleteSink`.
-type DeleteSinkRequest struct ***REMOVED***
+type DeleteSinkRequest struct {
 	// Required. The full resource name of the sink to delete, including the
 	// parent resource and the sink identifier:
 	//
@@ -413,21 +413,21 @@ type DeleteSinkRequest struct ***REMOVED***
 	//
 	// Example: `"projects/my-project-id/sinks/my-sink-id"`.
 	SinkName string `protobuf:"bytes,1,opt,name=sink_name,json=sinkName" json:"sink_name,omitempty"`
-***REMOVED***
+}
 
-func (m *DeleteSinkRequest) Reset()                    ***REMOVED*** *m = DeleteSinkRequest***REMOVED******REMOVED*** ***REMOVED***
-func (m *DeleteSinkRequest) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*DeleteSinkRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*DeleteSinkRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor2, []int***REMOVED***6***REMOVED*** ***REMOVED***
+func (m *DeleteSinkRequest) Reset()                    { *m = DeleteSinkRequest{} }
+func (m *DeleteSinkRequest) String() string            { return proto.CompactTextString(m) }
+func (*DeleteSinkRequest) ProtoMessage()               {}
+func (*DeleteSinkRequest) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{6} }
 
-func (m *DeleteSinkRequest) GetSinkName() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *DeleteSinkRequest) GetSinkName() string {
+	if m != nil {
 		return m.SinkName
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*LogSink)(nil), "google.logging.v2.LogSink")
 	proto.RegisterType((*ListSinksRequest)(nil), "google.logging.v2.ListSinksRequest")
 	proto.RegisterType((*ListSinksResponse)(nil), "google.logging.v2.ListSinksResponse")
@@ -436,7 +436,7 @@ func init() ***REMOVED***
 	proto.RegisterType((*UpdateSinkRequest)(nil), "google.logging.v2.UpdateSinkRequest")
 	proto.RegisterType((*DeleteSinkRequest)(nil), "google.logging.v2.DeleteSinkRequest")
 	proto.RegisterEnum("google.logging.v2.LogSink_VersionFormat", LogSink_VersionFormat_name, LogSink_VersionFormat_value)
-***REMOVED***
+}
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
@@ -448,7 +448,7 @@ const _ = grpc.SupportPackageIsVersion4
 
 // Client API for ConfigServiceV2 service
 
-type ConfigServiceV2Client interface ***REMOVED***
+type ConfigServiceV2Client interface {
 	// Lists sinks.
 	ListSinks(ctx context.Context, in *ListSinksRequest, opts ...grpc.CallOption) (*ListSinksResponse, error)
 	// Gets a sink.
@@ -471,64 +471,64 @@ type ConfigServiceV2Client interface ***REMOVED***
 	// Deletes a sink. If the sink has a unique `writer_identity`, then that
 	// service account is also deleted.
 	DeleteSink(ctx context.Context, in *DeleteSinkRequest, opts ...grpc.CallOption) (*google_protobuf5.Empty, error)
-***REMOVED***
+}
 
-type configServiceV2Client struct ***REMOVED***
+type configServiceV2Client struct {
 	cc *grpc.ClientConn
-***REMOVED***
+}
 
-func NewConfigServiceV2Client(cc *grpc.ClientConn) ConfigServiceV2Client ***REMOVED***
-	return &configServiceV2Client***REMOVED***cc***REMOVED***
-***REMOVED***
+func NewConfigServiceV2Client(cc *grpc.ClientConn) ConfigServiceV2Client {
+	return &configServiceV2Client{cc}
+}
 
-func (c *configServiceV2Client) ListSinks(ctx context.Context, in *ListSinksRequest, opts ...grpc.CallOption) (*ListSinksResponse, error) ***REMOVED***
+func (c *configServiceV2Client) ListSinks(ctx context.Context, in *ListSinksRequest, opts ...grpc.CallOption) (*ListSinksResponse, error) {
 	out := new(ListSinksResponse)
 	err := grpc.Invoke(ctx, "/google.logging.v2.ConfigServiceV2/ListSinks", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *configServiceV2Client) GetSink(ctx context.Context, in *GetSinkRequest, opts ...grpc.CallOption) (*LogSink, error) ***REMOVED***
+func (c *configServiceV2Client) GetSink(ctx context.Context, in *GetSinkRequest, opts ...grpc.CallOption) (*LogSink, error) {
 	out := new(LogSink)
 	err := grpc.Invoke(ctx, "/google.logging.v2.ConfigServiceV2/GetSink", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *configServiceV2Client) CreateSink(ctx context.Context, in *CreateSinkRequest, opts ...grpc.CallOption) (*LogSink, error) ***REMOVED***
+func (c *configServiceV2Client) CreateSink(ctx context.Context, in *CreateSinkRequest, opts ...grpc.CallOption) (*LogSink, error) {
 	out := new(LogSink)
 	err := grpc.Invoke(ctx, "/google.logging.v2.ConfigServiceV2/CreateSink", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *configServiceV2Client) UpdateSink(ctx context.Context, in *UpdateSinkRequest, opts ...grpc.CallOption) (*LogSink, error) ***REMOVED***
+func (c *configServiceV2Client) UpdateSink(ctx context.Context, in *UpdateSinkRequest, opts ...grpc.CallOption) (*LogSink, error) {
 	out := new(LogSink)
 	err := grpc.Invoke(ctx, "/google.logging.v2.ConfigServiceV2/UpdateSink", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
-func (c *configServiceV2Client) DeleteSink(ctx context.Context, in *DeleteSinkRequest, opts ...grpc.CallOption) (*google_protobuf5.Empty, error) ***REMOVED***
+func (c *configServiceV2Client) DeleteSink(ctx context.Context, in *DeleteSinkRequest, opts ...grpc.CallOption) (*google_protobuf5.Empty, error) {
 	out := new(google_protobuf5.Empty)
 	err := grpc.Invoke(ctx, "/google.logging.v2.ConfigServiceV2/DeleteSink", in, out, c.cc, opts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return out, nil
-***REMOVED***
+}
 
 // Server API for ConfigServiceV2 service
 
-type ConfigServiceV2Server interface ***REMOVED***
+type ConfigServiceV2Server interface {
 	// Lists sinks.
 	ListSinks(context.Context, *ListSinksRequest) (*ListSinksResponse, error)
 	// Gets a sink.
@@ -551,134 +551,134 @@ type ConfigServiceV2Server interface ***REMOVED***
 	// Deletes a sink. If the sink has a unique `writer_identity`, then that
 	// service account is also deleted.
 	DeleteSink(context.Context, *DeleteSinkRequest) (*google_protobuf5.Empty, error)
-***REMOVED***
+}
 
-func RegisterConfigServiceV2Server(s *grpc.Server, srv ConfigServiceV2Server) ***REMOVED***
+func RegisterConfigServiceV2Server(s *grpc.Server, srv ConfigServiceV2Server) {
 	s.RegisterService(&_ConfigServiceV2_serviceDesc, srv)
-***REMOVED***
+}
 
-func _ConfigServiceV2_ListSinks_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _ConfigServiceV2_ListSinks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListSinksRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(ConfigServiceV2Server).ListSinks(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/google.logging.v2.ConfigServiceV2/ListSinks",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ConfigServiceV2Server).ListSinks(ctx, req.(*ListSinksRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _ConfigServiceV2_GetSink_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _ConfigServiceV2_GetSink_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetSinkRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(ConfigServiceV2Server).GetSink(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/google.logging.v2.ConfigServiceV2/GetSink",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ConfigServiceV2Server).GetSink(ctx, req.(*GetSinkRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _ConfigServiceV2_CreateSink_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _ConfigServiceV2_CreateSink_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateSinkRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(ConfigServiceV2Server).CreateSink(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/google.logging.v2.ConfigServiceV2/CreateSink",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ConfigServiceV2Server).CreateSink(ctx, req.(*CreateSinkRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _ConfigServiceV2_UpdateSink_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _ConfigServiceV2_UpdateSink_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateSinkRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(ConfigServiceV2Server).UpdateSink(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/google.logging.v2.ConfigServiceV2/UpdateSink",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ConfigServiceV2Server).UpdateSink(ctx, req.(*UpdateSinkRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-func _ConfigServiceV2_DeleteSink_Handler(srv interface***REMOVED******REMOVED***, ctx context.Context, dec func(interface***REMOVED******REMOVED***) error, interceptor grpc.UnaryServerInterceptor) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+func _ConfigServiceV2_DeleteSink_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteSinkRequest)
-	if err := dec(in); err != nil ***REMOVED***
+	if err := dec(in); err != nil {
 		return nil, err
-	***REMOVED***
-	if interceptor == nil ***REMOVED***
+	}
+	if interceptor == nil {
 		return srv.(ConfigServiceV2Server).DeleteSink(ctx, in)
-	***REMOVED***
-	info := &grpc.UnaryServerInfo***REMOVED***
+	}
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/google.logging.v2.ConfigServiceV2/DeleteSink",
-	***REMOVED***
-	handler := func(ctx context.Context, req interface***REMOVED******REMOVED***) (interface***REMOVED******REMOVED***, error) ***REMOVED***
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ConfigServiceV2Server).DeleteSink(ctx, req.(*DeleteSinkRequest))
-	***REMOVED***
+	}
 	return interceptor(ctx, in, info, handler)
-***REMOVED***
+}
 
-var _ConfigServiceV2_serviceDesc = grpc.ServiceDesc***REMOVED***
+var _ConfigServiceV2_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "google.logging.v2.ConfigServiceV2",
 	HandlerType: (*ConfigServiceV2Server)(nil),
-	Methods: []grpc.MethodDesc***REMOVED***
-		***REMOVED***
+	Methods: []grpc.MethodDesc{
+		{
 			MethodName: "ListSinks",
 			Handler:    _ConfigServiceV2_ListSinks_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "GetSink",
 			Handler:    _ConfigServiceV2_GetSink_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "CreateSink",
 			Handler:    _ConfigServiceV2_CreateSink_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "UpdateSink",
 			Handler:    _ConfigServiceV2_UpdateSink_Handler,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			MethodName: "DeleteSink",
 			Handler:    _ConfigServiceV2_DeleteSink_Handler,
-		***REMOVED***,
-	***REMOVED***,
-	Streams:  []grpc.StreamDesc***REMOVED******REMOVED***,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
 	Metadata: "google/logging/v2/logging_config.proto",
-***REMOVED***
+}
 
-func init() ***REMOVED*** proto.RegisterFile("google/logging/v2/logging_config.proto", fileDescriptor2) ***REMOVED***
+func init() { proto.RegisterFile("google/logging/v2/logging_config.proto", fileDescriptor2) }
 
-var fileDescriptor2 = []byte***REMOVED***
+var fileDescriptor2 = []byte{
 	// 818 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x55, 0xff, 0x6e, 0xdb, 0x54,
 	0x14, 0xc6, 0xe9, 0xaf, 0xe4, 0x54, 0x6b, 0x93, 0x0b, 0x2b, 0x56, 0xca, 0x58, 0x30, 0xdb, 0x08,
@@ -732,4 +732,4 @@ var fileDescriptor2 = []byte***REMOVED***
 	0xdf, 0x6b, 0xaf, 0xde, 0xd7, 0xa5, 0x83, 0x84, 0x97, 0x91, 0x6b, 0x5e, 0x77, 0x47, 0xfd, 0x47,
 	0xeb, 0xaa, 0xfc, 0xfd, 0x7f, 0x02, 0x00, 0x00, 0xff, 0xff, 0xda, 0xa4, 0xe3, 0x1e, 0xc8, 0x07,
 	0x00, 0x00,
-***REMOVED***
+}

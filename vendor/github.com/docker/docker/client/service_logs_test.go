@@ -17,117 +17,117 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestServiceLogsError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestServiceLogsError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
-	***REMOVED***
-	_, err := client.ServiceLogs(context.Background(), "service_id", types.ContainerLogsOptions***REMOVED******REMOVED***)
-	if err == nil || err.Error() != "Error response from daemon: Server error" ***REMOVED***
+	}
+	_, err := client.ServiceLogs(context.Background(), "service_id", types.ContainerLogsOptions{})
+	if err == nil || err.Error() != "Error response from daemon: Server error" {
 		t.Fatalf("expected a Server Error, got %v", err)
-	***REMOVED***
-	_, err = client.ServiceLogs(context.Background(), "service_id", types.ContainerLogsOptions***REMOVED***
+	}
+	_, err = client.ServiceLogs(context.Background(), "service_id", types.ContainerLogsOptions{
 		Since: "2006-01-02TZ",
-	***REMOVED***)
-	if err == nil || !strings.Contains(err.Error(), `parsing time "2006-01-02TZ"`) ***REMOVED***
+	})
+	if err == nil || !strings.Contains(err.Error(), `parsing time "2006-01-02TZ"`) {
 		t.Fatalf("expected a 'parsing time' error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestServiceLogs(t *testing.T) ***REMOVED***
+func TestServiceLogs(t *testing.T) {
 	expectedURL := "/services/service_id/logs"
-	cases := []struct ***REMOVED***
+	cases := []struct {
 		options             types.ContainerLogsOptions
 		expectedQueryParams map[string]string
-	***REMOVED******REMOVED***
-		***REMOVED***
-			expectedQueryParams: map[string]string***REMOVED***
+	}{
+		{
+			expectedQueryParams: map[string]string{
 				"tail": "",
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			options: types.ContainerLogsOptions***REMOVED***
+			},
+		},
+		{
+			options: types.ContainerLogsOptions{
 				Tail: "any",
-			***REMOVED***,
-			expectedQueryParams: map[string]string***REMOVED***
+			},
+			expectedQueryParams: map[string]string{
 				"tail": "any",
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			options: types.ContainerLogsOptions***REMOVED***
+			},
+		},
+		{
+			options: types.ContainerLogsOptions{
 				ShowStdout: true,
 				ShowStderr: true,
 				Timestamps: true,
 				Details:    true,
 				Follow:     true,
-			***REMOVED***,
-			expectedQueryParams: map[string]string***REMOVED***
+			},
+			expectedQueryParams: map[string]string{
 				"tail":       "",
 				"stdout":     "1",
 				"stderr":     "1",
 				"timestamps": "1",
 				"details":    "1",
 				"follow":     "1",
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
-			options: types.ContainerLogsOptions***REMOVED***
+			},
+		},
+		{
+			options: types.ContainerLogsOptions{
 				// An complete invalid date, timestamp or go duration will be
 				// passed as is
 				Since: "invalid but valid",
-			***REMOVED***,
-			expectedQueryParams: map[string]string***REMOVED***
+			},
+			expectedQueryParams: map[string]string{
 				"tail":  "",
 				"since": "invalid but valid",
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
-	for _, logCase := range cases ***REMOVED***
-		client := &Client***REMOVED***
-			client: newMockClient(func(r *http.Request) (*http.Response, error) ***REMOVED***
-				if !strings.HasPrefix(r.URL.Path, expectedURL) ***REMOVED***
+			},
+		},
+	}
+	for _, logCase := range cases {
+		client := &Client{
+			client: newMockClient(func(r *http.Request) (*http.Response, error) {
+				if !strings.HasPrefix(r.URL.Path, expectedURL) {
 					return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, r.URL)
-				***REMOVED***
+				}
 				// Check query parameters
 				query := r.URL.Query()
-				for key, expected := range logCase.expectedQueryParams ***REMOVED***
+				for key, expected := range logCase.expectedQueryParams {
 					actual := query.Get(key)
-					if actual != expected ***REMOVED***
+					if actual != expected {
 						return nil, fmt.Errorf("%s not set in URL query properly. Expected '%s', got %s", key, expected, actual)
-					***REMOVED***
-				***REMOVED***
-				return &http.Response***REMOVED***
+					}
+				}
+				return &http.Response{
 					StatusCode: http.StatusOK,
 					Body:       ioutil.NopCloser(bytes.NewReader([]byte("response"))),
-				***REMOVED***, nil
-			***REMOVED***),
-		***REMOVED***
+				}, nil
+			}),
+		}
 		body, err := client.ServiceLogs(context.Background(), "service_id", logCase.options)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
+		}
 		defer body.Close()
 		content, err := ioutil.ReadAll(body)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
-		if string(content) != "response" ***REMOVED***
+		}
+		if string(content) != "response" {
 			t.Fatalf("expected response to contain 'response', got %s", string(content))
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func ExampleClient_ServiceLogs_withTimeout() ***REMOVED***
+func ExampleClient_ServiceLogs_withTimeout() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	client, _ := NewEnvClient()
-	reader, err := client.ServiceLogs(ctx, "service_id", types.ContainerLogsOptions***REMOVED******REMOVED***)
-	if err != nil ***REMOVED***
+	reader, err := client.ServiceLogs(ctx, "service_id", types.ContainerLogsOptions{})
+	if err != nil {
 		log.Fatal(err)
-	***REMOVED***
+	}
 
 	_, err = io.Copy(os.Stdout, reader)
-	if err != nil && err != io.EOF ***REMOVED***
+	if err != nil && err != io.EOF {
 		log.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}

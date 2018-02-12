@@ -19,22 +19,22 @@ import "io"
 
 // NewLimitedBufferReader returns a reader that reads from the given reader
 // but limits the amount of data returned to at most n bytes.
-func NewLimitedBufferReader(r io.Reader, n int) io.Reader ***REMOVED***
-	return &limitedBufferReader***REMOVED***
+func NewLimitedBufferReader(r io.Reader, n int) io.Reader {
+	return &limitedBufferReader{
 		r: r,
 		n: n,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type limitedBufferReader struct ***REMOVED***
+type limitedBufferReader struct {
 	r io.Reader
 	n int
-***REMOVED***
+}
 
-func (r *limitedBufferReader) Read(p []byte) (n int, err error) ***REMOVED***
+func (r *limitedBufferReader) Read(p []byte) (n int, err error) {
 	np := p
-	if len(np) > r.n ***REMOVED***
+	if len(np) > r.n {
 		np = np[:r.n]
-	***REMOVED***
+	}
 	return r.r.Read(np)
-***REMOVED***
+}

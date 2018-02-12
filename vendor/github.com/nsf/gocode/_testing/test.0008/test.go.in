@@ -2,14 +2,14 @@ package main
 
 import "sync"
 
-var hosts struct ***REMOVED***
+var hosts struct {
 	sync.Mutex
 	data map[string][]string
 	time int64
 	path string
-***REMOVED***
+}
 
 hosts.
 
-func main() ***REMOVED***
-***REMOVED***
+func main() {
+}

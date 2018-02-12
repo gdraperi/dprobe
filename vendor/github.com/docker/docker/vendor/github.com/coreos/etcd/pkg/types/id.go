@@ -23,19 +23,19 @@ import (
 // base-16 string for input/output
 type ID uint64
 
-func (i ID) String() string ***REMOVED***
+func (i ID) String() string {
 	return strconv.FormatUint(uint64(i), 16)
-***REMOVED***
+}
 
 // IDFromString attempts to create an ID from a base-16 string.
-func IDFromString(s string) (ID, error) ***REMOVED***
+func IDFromString(s string) (ID, error) {
 	i, err := strconv.ParseUint(s, 16, 64)
 	return ID(i), err
-***REMOVED***
+}
 
 // IDSlice implements the sort interface
 type IDSlice []ID
 
-func (p IDSlice) Len() int           ***REMOVED*** return len(p) ***REMOVED***
-func (p IDSlice) Less(i, j int) bool ***REMOVED*** return uint64(p[i]) < uint64(p[j]) ***REMOVED***
-func (p IDSlice) Swap(i, j int)      ***REMOVED*** p[i], p[j] = p[j], p[i] ***REMOVED***
+func (p IDSlice) Len() int           { return len(p) }
+func (p IDSlice) Less(i, j int) bool { return uint64(p[i]) < uint64(p[j]) }
+func (p IDSlice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }

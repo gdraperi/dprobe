@@ -9,20 +9,20 @@ import (
 	"github.com/vishvananda/netlink/nl"
 )
 
-type XfrmMsg interface ***REMOVED***
+type XfrmMsg interface {
 	Type() nl.XfrmMsgType
-***REMOVED***
+}
 
-type XfrmMsgExpire struct ***REMOVED***
+type XfrmMsgExpire struct {
 	XfrmState *XfrmState
 	Hard      bool
-***REMOVED***
+}
 
-func (ue *XfrmMsgExpire) Type() nl.XfrmMsgType ***REMOVED***
+func (ue *XfrmMsgExpire) Type() nl.XfrmMsgType {
 	return nl.XFRM_MSG_EXPIRE
-***REMOVED***
+}
 
-func parseXfrmMsgExpire(b []byte) *XfrmMsgExpire ***REMOVED***
+func parseXfrmMsgExpire(b []byte) *XfrmMsgExpire {
 	var e XfrmMsgExpire
 
 	msg := nl.DeserializeXfrmUserExpire(b)
@@ -30,69 +30,69 @@ func parseXfrmMsgExpire(b []byte) *XfrmMsgExpire ***REMOVED***
 	e.Hard = msg.Hard == 1
 
 	return &e
-***REMOVED***
+}
 
-func XfrmMonitor(ch chan<- XfrmMsg, done <-chan struct***REMOVED******REMOVED***, errorChan chan<- error,
-	types ...nl.XfrmMsgType) error ***REMOVED***
+func XfrmMonitor(ch chan<- XfrmMsg, done <-chan struct{}, errorChan chan<- error,
+	types ...nl.XfrmMsgType) error {
 
 	groups, err := xfrmMcastGroups(types)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil
-	***REMOVED***
+	}
 	s, err := nl.SubscribeAt(netns.None(), netns.None(), syscall.NETLINK_XFRM, groups...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if done != nil ***REMOVED***
-		go func() ***REMOVED***
+	if done != nil {
+		go func() {
 			<-done
 			s.Close()
-		***REMOVED***()
+		}()
 
-	***REMOVED***
+	}
 
-	go func() ***REMOVED***
+	go func() {
 		defer close(ch)
-		for ***REMOVED***
+		for {
 			msgs, err := s.Receive()
-			if err != nil ***REMOVED***
+			if err != nil {
 				errorChan <- err
 				return
-			***REMOVED***
-			for _, m := range msgs ***REMOVED***
-				switch m.Header.Type ***REMOVED***
+			}
+			for _, m := range msgs {
+				switch m.Header.Type {
 				case nl.XFRM_MSG_EXPIRE:
 					ch <- parseXfrmMsgExpire(m.Data)
 				default:
 					errorChan <- fmt.Errorf("unsupported msg type: %x", m.Header.Type)
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***()
+				}
+			}
+		}
+	}()
 
 	return nil
-***REMOVED***
+}
 
-func xfrmMcastGroups(types []nl.XfrmMsgType) ([]uint, error) ***REMOVED***
+func xfrmMcastGroups(types []nl.XfrmMsgType) ([]uint, error) {
 	groups := make([]uint, 0)
 
-	if len(types) == 0 ***REMOVED***
+	if len(types) == 0 {
 		return nil, fmt.Errorf("no xfrm msg type specified")
-	***REMOVED***
+	}
 
-	for _, t := range types ***REMOVED***
+	for _, t := range types {
 		var group uint
 
-		switch t ***REMOVED***
+		switch t {
 		case nl.XFRM_MSG_EXPIRE:
 			group = nl.XFRMNLGRP_EXPIRE
 		default:
 			return nil, fmt.Errorf("unsupported group: %x", t)
-		***REMOVED***
+		}
 
 		groups = append(groups, group)
-	***REMOVED***
+	}
 
 	return groups, nil
-***REMOVED***
+}

@@ -39,7 +39,7 @@ var (
 // remote may use the digest portion directly or resolve it against a prefix.
 // If the object does not include the `@` symbol, the return value for `Digest`
 // will be empty.
-type Spec struct ***REMOVED***
+type Spec struct {
 	// Locator is the host and path portion of the specification. The host
 	// portion may refer to an actual host or just a namespace of related
 	// images.
@@ -63,84 +63,84 @@ type Spec struct ***REMOVED***
 	// be a full valid digest or shortened version, possibly with elided
 	// algorithm.
 	Object string
-***REMOVED***
+}
 
 var splitRe = regexp.MustCompile(`[:@]`)
 
 // Parse parses the string into a structured ref.
-func Parse(s string) (Spec, error) ***REMOVED***
+func Parse(s string) (Spec, error) {
 	u, err := url.Parse("dummy://" + s)
-	if err != nil ***REMOVED***
-		return Spec***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return Spec{}, err
+	}
 
-	if u.Scheme != "dummy" ***REMOVED***
-		return Spec***REMOVED******REMOVED***, ErrInvalid
-	***REMOVED***
+	if u.Scheme != "dummy" {
+		return Spec{}, ErrInvalid
+	}
 
-	if u.Host == "" ***REMOVED***
-		return Spec***REMOVED******REMOVED***, ErrHostnameRequired
-	***REMOVED***
+	if u.Host == "" {
+		return Spec{}, ErrHostnameRequired
+	}
 
 	var object string
 
-	if idx := splitRe.FindStringIndex(u.Path); idx != nil ***REMOVED***
+	if idx := splitRe.FindStringIndex(u.Path); idx != nil {
 		// This allows us to retain the @ to signify digests or shortened digests in
 		// the object.
 		object = u.Path[idx[0]:]
-		if object[:1] == ":" ***REMOVED***
+		if object[:1] == ":" {
 			object = object[1:]
-		***REMOVED***
+		}
 		u.Path = u.Path[:idx[0]]
-	***REMOVED***
+	}
 
-	return Spec***REMOVED***
+	return Spec{
 		Locator: path.Join(u.Host, u.Path),
 		Object:  object,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // Hostname returns the hostname portion of the locator.
 //
 // Remotes are not required to directly access the resources at this host. This
 // method is provided for convenience.
-func (r Spec) Hostname() string ***REMOVED***
+func (r Spec) Hostname() string {
 	i := strings.Index(r.Locator, "/")
 
-	if i < 0 ***REMOVED***
+	if i < 0 {
 		i = len(r.Locator) + 1
-	***REMOVED***
+	}
 	return r.Locator[:i]
-***REMOVED***
+}
 
 // Digest returns the digest portion of the reference spec. This may be a
 // partial or invalid digest, which may be used to lookup a complete digest.
-func (r Spec) Digest() digest.Digest ***REMOVED***
+func (r Spec) Digest() digest.Digest {
 	_, dgst := SplitObject(r.Object)
 	return dgst
-***REMOVED***
+}
 
 // String returns the normalized string for the ref.
-func (r Spec) String() string ***REMOVED***
-	if r.Object == "" ***REMOVED***
+func (r Spec) String() string {
+	if r.Object == "" {
 		return r.Locator
-	***REMOVED***
-	if r.Object[:1] == "@" ***REMOVED***
+	}
+	if r.Object[:1] == "@" {
 		return fmt.Sprintf("%v%v", r.Locator, r.Object)
-	***REMOVED***
+	}
 
 	return fmt.Sprintf("%v:%v", r.Locator, r.Object)
-***REMOVED***
+}
 
 // SplitObject provides two parts of the object spec, delimited by an `@`
 // symbol.
 //
 // Either may be empty and it is the callers job to validate them
 // appropriately.
-func SplitObject(obj string) (tag string, dgst digest.Digest) ***REMOVED***
+func SplitObject(obj string) (tag string, dgst digest.Digest) {
 	parts := strings.SplitAfterN(obj, "@", 2)
-	if len(parts) < 2 ***REMOVED***
+	if len(parts) < 2 {
 		return parts[0], ""
-	***REMOVED***
+	}
 	return parts[0], digest.Digest(parts[1])
-***REMOVED***
+}

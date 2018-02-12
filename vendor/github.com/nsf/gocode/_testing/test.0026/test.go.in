@@ -1,13 +1,13 @@
 package main
 
-var A = struct ***REMOVED*** a, b, c int ***REMOVED******REMOVED***1,2,3***REMOVED***
-var B struct ***REMOVED*** d, e, f int ***REMOVED***
+var A = struct { a, b, c int }{1,2,3}
+var B struct { d, e, f int }
 
-func main() ***REMOVED***
-	C := struct ***REMOVED*** g, h, i int ***REMOVED******REMOVED***1,2,3***REMOVED***
+func main() {
+	C := struct { g, h, i int }{1,2,3}
 
 	a := A.a
 	d := B.d
 	g := C.g
 	
-***REMOVED***
+}

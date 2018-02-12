@@ -6,227 +6,227 @@ import (
 )
 
 // base match
-type matchBase struct ***REMOVED***
+type matchBase struct {
 	next pathFn
-***REMOVED***
+}
 
-func (f *matchBase) setNext(next pathFn) ***REMOVED***
+func (f *matchBase) setNext(next pathFn) {
 	f.next = next
-***REMOVED***
+}
 
 // terminating functor - gathers results
-type terminatingFn struct ***REMOVED***
+type terminatingFn struct {
 	// empty
-***REMOVED***
+}
 
-func newTerminatingFn() *terminatingFn ***REMOVED***
-	return &terminatingFn***REMOVED******REMOVED***
-***REMOVED***
+func newTerminatingFn() *terminatingFn {
+	return &terminatingFn{}
+}
 
-func (f *terminatingFn) setNext(next pathFn) ***REMOVED***
+func (f *terminatingFn) setNext(next pathFn) {
 	// do nothing
-***REMOVED***
+}
 
-func (f *terminatingFn) call(node interface***REMOVED******REMOVED***, ctx *queryContext) ***REMOVED***
+func (f *terminatingFn) call(node interface{}, ctx *queryContext) {
 	ctx.result.appendResult(node, ctx.lastPosition)
-***REMOVED***
+}
 
 // match single key
-type matchKeyFn struct ***REMOVED***
+type matchKeyFn struct {
 	matchBase
 	Name string
-***REMOVED***
+}
 
-func newMatchKeyFn(name string) *matchKeyFn ***REMOVED***
-	return &matchKeyFn***REMOVED***Name: name***REMOVED***
-***REMOVED***
+func newMatchKeyFn(name string) *matchKeyFn {
+	return &matchKeyFn{Name: name}
+}
 
-func (f *matchKeyFn) call(node interface***REMOVED******REMOVED***, ctx *queryContext) ***REMOVED***
-	if array, ok := node.([]*toml.Tree); ok ***REMOVED***
-		for _, tree := range array ***REMOVED***
+func (f *matchKeyFn) call(node interface{}, ctx *queryContext) {
+	if array, ok := node.([]*toml.Tree); ok {
+		for _, tree := range array {
 			item := tree.Get(f.Name)
-			if item != nil ***REMOVED***
+			if item != nil {
 				ctx.lastPosition = tree.GetPosition(f.Name)
 				f.next.call(item, ctx)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED*** else if tree, ok := node.(*toml.Tree); ok ***REMOVED***
+			}
+		}
+	} else if tree, ok := node.(*toml.Tree); ok {
 		item := tree.Get(f.Name)
-		if item != nil ***REMOVED***
+		if item != nil {
 			ctx.lastPosition = tree.GetPosition(f.Name)
 			f.next.call(item, ctx)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // match single index
-type matchIndexFn struct ***REMOVED***
+type matchIndexFn struct {
 	matchBase
 	Idx int
-***REMOVED***
+}
 
-func newMatchIndexFn(idx int) *matchIndexFn ***REMOVED***
-	return &matchIndexFn***REMOVED***Idx: idx***REMOVED***
-***REMOVED***
+func newMatchIndexFn(idx int) *matchIndexFn {
+	return &matchIndexFn{Idx: idx}
+}
 
-func (f *matchIndexFn) call(node interface***REMOVED******REMOVED***, ctx *queryContext) ***REMOVED***
-	if arr, ok := node.([]interface***REMOVED******REMOVED***); ok ***REMOVED***
-		if f.Idx < len(arr) && f.Idx >= 0 ***REMOVED***
-			if treesArray, ok := node.([]*toml.Tree); ok ***REMOVED***
-				if len(treesArray) > 0 ***REMOVED***
+func (f *matchIndexFn) call(node interface{}, ctx *queryContext) {
+	if arr, ok := node.([]interface{}); ok {
+		if f.Idx < len(arr) && f.Idx >= 0 {
+			if treesArray, ok := node.([]*toml.Tree); ok {
+				if len(treesArray) > 0 {
 					ctx.lastPosition = treesArray[0].Position()
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			f.next.call(arr[f.Idx], ctx)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // filter by slicing
-type matchSliceFn struct ***REMOVED***
+type matchSliceFn struct {
 	matchBase
 	Start, End, Step int
-***REMOVED***
+}
 
-func newMatchSliceFn(start, end, step int) *matchSliceFn ***REMOVED***
-	return &matchSliceFn***REMOVED***Start: start, End: end, Step: step***REMOVED***
-***REMOVED***
+func newMatchSliceFn(start, end, step int) *matchSliceFn {
+	return &matchSliceFn{Start: start, End: end, Step: step}
+}
 
-func (f *matchSliceFn) call(node interface***REMOVED******REMOVED***, ctx *queryContext) ***REMOVED***
-	if arr, ok := node.([]interface***REMOVED******REMOVED***); ok ***REMOVED***
+func (f *matchSliceFn) call(node interface{}, ctx *queryContext) {
+	if arr, ok := node.([]interface{}); ok {
 		// adjust indexes for negative values, reverse ordering
 		realStart, realEnd := f.Start, f.End
-		if realStart < 0 ***REMOVED***
+		if realStart < 0 {
 			realStart = len(arr) + realStart
-		***REMOVED***
-		if realEnd < 0 ***REMOVED***
+		}
+		if realEnd < 0 {
 			realEnd = len(arr) + realEnd
-		***REMOVED***
-		if realEnd < realStart ***REMOVED***
+		}
+		if realEnd < realStart {
 			realEnd, realStart = realStart, realEnd // swap
-		***REMOVED***
+		}
 		// loop and gather
-		for idx := realStart; idx < realEnd; idx += f.Step ***REMOVED***
-			if treesArray, ok := node.([]*toml.Tree); ok ***REMOVED***
-				if len(treesArray) > 0 ***REMOVED***
+		for idx := realStart; idx < realEnd; idx += f.Step {
+			if treesArray, ok := node.([]*toml.Tree); ok {
+				if len(treesArray) > 0 {
 					ctx.lastPosition = treesArray[0].Position()
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			f.next.call(arr[idx], ctx)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // match anything
-type matchAnyFn struct ***REMOVED***
+type matchAnyFn struct {
 	matchBase
-***REMOVED***
+}
 
-func newMatchAnyFn() *matchAnyFn ***REMOVED***
-	return &matchAnyFn***REMOVED******REMOVED***
-***REMOVED***
+func newMatchAnyFn() *matchAnyFn {
+	return &matchAnyFn{}
+}
 
-func (f *matchAnyFn) call(node interface***REMOVED******REMOVED***, ctx *queryContext) ***REMOVED***
-	if tree, ok := node.(*toml.Tree); ok ***REMOVED***
-		for _, k := range tree.Keys() ***REMOVED***
+func (f *matchAnyFn) call(node interface{}, ctx *queryContext) {
+	if tree, ok := node.(*toml.Tree); ok {
+		for _, k := range tree.Keys() {
 			v := tree.Get(k)
 			ctx.lastPosition = tree.GetPosition(k)
 			f.next.call(v, ctx)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // filter through union
-type matchUnionFn struct ***REMOVED***
+type matchUnionFn struct {
 	Union []pathFn
-***REMOVED***
+}
 
-func (f *matchUnionFn) setNext(next pathFn) ***REMOVED***
-	for _, fn := range f.Union ***REMOVED***
+func (f *matchUnionFn) setNext(next pathFn) {
+	for _, fn := range f.Union {
 		fn.setNext(next)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (f *matchUnionFn) call(node interface***REMOVED******REMOVED***, ctx *queryContext) ***REMOVED***
-	for _, fn := range f.Union ***REMOVED***
+func (f *matchUnionFn) call(node interface{}, ctx *queryContext) {
+	for _, fn := range f.Union {
 		fn.call(node, ctx)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // match every single last node in the tree
-type matchRecursiveFn struct ***REMOVED***
+type matchRecursiveFn struct {
 	matchBase
-***REMOVED***
+}
 
-func newMatchRecursiveFn() *matchRecursiveFn ***REMOVED***
-	return &matchRecursiveFn***REMOVED******REMOVED***
-***REMOVED***
+func newMatchRecursiveFn() *matchRecursiveFn {
+	return &matchRecursiveFn{}
+}
 
-func (f *matchRecursiveFn) call(node interface***REMOVED******REMOVED***, ctx *queryContext) ***REMOVED***
+func (f *matchRecursiveFn) call(node interface{}, ctx *queryContext) {
 	originalPosition := ctx.lastPosition
-	if tree, ok := node.(*toml.Tree); ok ***REMOVED***
+	if tree, ok := node.(*toml.Tree); ok {
 		var visit func(tree *toml.Tree)
-		visit = func(tree *toml.Tree) ***REMOVED***
-			for _, k := range tree.Keys() ***REMOVED***
+		visit = func(tree *toml.Tree) {
+			for _, k := range tree.Keys() {
 				v := tree.Get(k)
 				ctx.lastPosition = tree.GetPosition(k)
 				f.next.call(v, ctx)
-				switch node := v.(type) ***REMOVED***
+				switch node := v.(type) {
 				case *toml.Tree:
 					visit(node)
 				case []*toml.Tree:
-					for _, subtree := range node ***REMOVED***
+					for _, subtree := range node {
 						visit(subtree)
-					***REMOVED***
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
+					}
+				}
+			}
+		}
 		ctx.lastPosition = originalPosition
 		f.next.call(tree, ctx)
 		visit(tree)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // match based on an externally provided functional filter
-type matchFilterFn struct ***REMOVED***
+type matchFilterFn struct {
 	matchBase
 	Pos  toml.Position
 	Name string
-***REMOVED***
+}
 
-func newMatchFilterFn(name string, pos toml.Position) *matchFilterFn ***REMOVED***
-	return &matchFilterFn***REMOVED***Name: name, Pos: pos***REMOVED***
-***REMOVED***
+func newMatchFilterFn(name string, pos toml.Position) *matchFilterFn {
+	return &matchFilterFn{Name: name, Pos: pos}
+}
 
-func (f *matchFilterFn) call(node interface***REMOVED******REMOVED***, ctx *queryContext) ***REMOVED***
+func (f *matchFilterFn) call(node interface{}, ctx *queryContext) {
 	fn, ok := (*ctx.filters)[f.Name]
-	if !ok ***REMOVED***
+	if !ok {
 		panic(fmt.Sprintf("%s: query context does not have filter '%s'",
 			f.Pos.String(), f.Name))
-	***REMOVED***
-	switch castNode := node.(type) ***REMOVED***
+	}
+	switch castNode := node.(type) {
 	case *toml.Tree:
-		for _, k := range castNode.Keys() ***REMOVED***
+		for _, k := range castNode.Keys() {
 			v := castNode.Get(k)
-			if fn(v) ***REMOVED***
+			if fn(v) {
 				ctx.lastPosition = castNode.GetPosition(k)
 				f.next.call(v, ctx)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 	case []*toml.Tree:
-		for _, v := range castNode ***REMOVED***
-			if fn(v) ***REMOVED***
-				if len(castNode) > 0 ***REMOVED***
+		for _, v := range castNode {
+			if fn(v) {
+				if len(castNode) > 0 {
 					ctx.lastPosition = castNode[0].Position()
-				***REMOVED***
+				}
 				f.next.call(v, ctx)
-			***REMOVED***
-		***REMOVED***
-	case []interface***REMOVED******REMOVED***:
-		for _, v := range castNode ***REMOVED***
-			if fn(v) ***REMOVED***
+			}
+		}
+	case []interface{}:
+		for _, v := range castNode {
+			if fn(v) {
 				f.next.call(v, ctx)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}

@@ -8,33 +8,33 @@ import (
 )
 
 // ContainerJSON is a backcompatibility struct for the API 1.20
-type ContainerJSON struct ***REMOVED***
+type ContainerJSON struct {
 	*types.ContainerJSONBase
 	Mounts          []types.MountPoint
 	Config          *ContainerConfig
 	NetworkSettings *NetworkSettings
-***REMOVED***
+}
 
 // ContainerConfig is a backcompatibility struct used in ContainerJSON for the API 1.20
-type ContainerConfig struct ***REMOVED***
+type ContainerConfig struct {
 	*container.Config
 
 	MacAddress      string
 	NetworkDisabled bool
-	ExposedPorts    map[nat.Port]struct***REMOVED******REMOVED***
+	ExposedPorts    map[nat.Port]struct{}
 
 	// backward compatibility, they now live in HostConfig
 	VolumeDriver string
-***REMOVED***
+}
 
 // StatsJSON is a backcompatibility struct used in Stats for APIs prior to 1.21
-type StatsJSON struct ***REMOVED***
+type StatsJSON struct {
 	types.Stats
 	Network types.NetworkStats `json:"network,omitempty"`
-***REMOVED***
+}
 
 // NetworkSettings is a backward compatible struct for APIs prior to 1.21
-type NetworkSettings struct ***REMOVED***
+type NetworkSettings struct {
 	types.NetworkSettingsBase
 	types.DefaultNetworkSettings
-***REMOVED***
+}

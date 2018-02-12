@@ -68,24 +68,24 @@ import (
   "os"
 )
 
-func main() ***REMOVED***
+func main() {
   var graylogAddr string
 
   flag.StringVar(&graylogAddr, "graylog", "", "graylog server addr")
   flag.Parse()
 
-  if graylogAddr != "" ***REMOVED***
+  if graylogAddr != "" {
           // If using UDP
     gelfWriter, err := gelf.NewUDPWriter(graylogAddr)
           // If using TCP
           //gelfWriter, err := gelf.NewTCPWriter(graylogAddr)
-    if err != nil ***REMOVED***
+    if err != nil {
       log.Fatalf("gelf.NewWriter: %s", err)
-***REMOVED***
+    }
     // log to both stderr and graylog2
     log.SetOutput(io.MultiWriter(os.Stderr, gelfWriter))
     log.Printf("logging to stderr & graylog2@'%s'", graylogAddr)
-  ***REMOVED***
+  }
 
   // From here on out, any calls to log.Print* functions
   // will appear on stdout, and be sent over UDP or TCP to the
@@ -94,7 +94,7 @@ func main() ***REMOVED***
   log.Printf("Hello gray World")
 
   // ...
-***REMOVED***
+}
 ```
 The above program can be invoked as:
 

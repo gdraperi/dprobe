@@ -116,18 +116,18 @@ should be used in place of the information from the CSR. It should be
 a JSON file with the type:
 
 ```json
-***REMOVED***
+{
     "CN": "example.com",
     "names": [
-        ***REMOVED***
+        {
             "C": "US",
             "L": "San Francisco",
             "O": "Internet Widgets, Inc.",
             "OU": "WWW",
             "ST": "California"
-    ***REMOVED***
+        }
     ]
-***REMOVED***
+}
 ```
 
 #### Bundling
@@ -171,7 +171,7 @@ cfssl bundle [-ca-bundle bundle] [-int-bundle bundle] \
 The bundle output form should follow the example
 
 ```json
-***REMOVED***
+{
     "bundle": "CERT_BUNDLE_IN_PEM",
     "crt": "LEAF_CERT_IN_PEM",
     "crl_support": true,
@@ -186,14 +186,14 @@ The bundle output form should follow the example
     "root": "ROOT_CA_CERT_IN_PEM",
     "signature": "SHA1WithRSA",
     "subject": "LEAF CERT SUBJECT",
-    "status": ***REMOVED***
+    "status": {
         "rebundled": false,
         "expiring_SKIs": [],
         "untrusted_root_stores": [],
         "messages": [],
         "code": 0
-***REMOVED***
-***REMOVED***
+    }
+}
 ```
 
 
@@ -207,25 +207,25 @@ To generate a private key and corresponding certificate request, specify
 the key request as a JSON file. This file should follow the form
 
 ```json
-***REMOVED***
+{
     "hosts": [
         "example.com",
         "www.example.com"
     ],
-    "key": ***REMOVED***
+    "key": {
         "algo": "rsa",
         "size": 2048
-***REMOVED***,
+    },
     "names": [
-        ***REMOVED***
+        {
             "C": "US",
             "L": "San Francisco",
             "O": "Internet Widgets, Inc.",
             "OU": "WWW",
             "ST": "California"
-    ***REMOVED***
+        }
     ]
-***REMOVED***
+}
 ```
 
 #### Generating self-signed root CA certificate and private key

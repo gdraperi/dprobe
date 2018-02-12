@@ -7,7 +7,7 @@
 package http2
 
 // flow is the flow control window's size.
-type flow struct ***REMOVED***
+type flow struct {
 	// n is the number of DATA bytes we're allowed to send.
 	// A flow is kept both on a conn and a per-stream.
 	n int32
@@ -16,35 +16,35 @@ type flow struct ***REMOVED***
 	// shared by all streams on that conn. It is nil for the flow
 	// that's on the conn directly.
 	conn *flow
-***REMOVED***
+}
 
-func (f *flow) setConnFlow(cf *flow) ***REMOVED*** f.conn = cf ***REMOVED***
+func (f *flow) setConnFlow(cf *flow) { f.conn = cf }
 
-func (f *flow) available() int32 ***REMOVED***
+func (f *flow) available() int32 {
 	n := f.n
-	if f.conn != nil && f.conn.n < n ***REMOVED***
+	if f.conn != nil && f.conn.n < n {
 		n = f.conn.n
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-func (f *flow) take(n int32) ***REMOVED***
-	if n > f.available() ***REMOVED***
+func (f *flow) take(n int32) {
+	if n > f.available() {
 		panic("internal error: took too much")
-	***REMOVED***
+	}
 	f.n -= n
-	if f.conn != nil ***REMOVED***
+	if f.conn != nil {
 		f.conn.n -= n
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // add adds n bytes (positive or negative) to the flow control window.
 // It returns false if the sum would exceed 2^31-1.
-func (f *flow) add(n int32) bool ***REMOVED***
+func (f *flow) add(n int32) bool {
 	remain := (1<<31 - 1) - f.n
-	if n > remain ***REMOVED***
+	if n > remain {
 		return false
-	***REMOVED***
+	}
 	f.n += n
 	return true
-***REMOVED***
+}

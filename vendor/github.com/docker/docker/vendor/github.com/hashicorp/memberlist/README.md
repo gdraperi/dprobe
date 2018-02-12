@@ -33,20 +33,20 @@ Memberlist is surprisingly simple to use. An example is shown below:
    http://godoc.org/github.com/hashicorp/memberlist#Config
 */
 list, err := memberlist.Create(memberlist.DefaultLocalConfig())
-if err != nil ***REMOVED***
+if err != nil {
 	panic("Failed to create memberlist: " + err.Error())
-***REMOVED***
+}
 
 // Join an existing cluster by specifying at least one known member.
-n, err := list.Join([]string***REMOVED***"1.2.3.4"***REMOVED***)
-if err != nil ***REMOVED***
+n, err := list.Join([]string{"1.2.3.4"})
+if err != nil {
 	panic("Failed to join cluster: " + err.Error())
-***REMOVED***
+}
 
 // Ask for members of the cluster
-for _, member := range list.Members() ***REMOVED***
+for _, member := range list.Members() {
 	fmt.Printf("Member: %s %s\n", member.Name, member.Addr)
-***REMOVED***
+}
 
 // Continue doing whatever you need, memberlist will maintain membership
 // information in the background. Delegates can be used for receiving

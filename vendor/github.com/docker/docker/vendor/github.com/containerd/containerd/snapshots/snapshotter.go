@@ -23,79 +23,79 @@ const (
 // ParseKind parses the provided string into a Kind
 //
 // If the string cannot be parsed KindUnknown is returned
-func ParseKind(s string) Kind ***REMOVED***
+func ParseKind(s string) Kind {
 	s = strings.ToLower(s)
-	switch s ***REMOVED***
+	switch s {
 	case "view":
 		return KindView
 	case "active":
 		return KindActive
 	case "committed":
 		return KindCommitted
-	***REMOVED***
+	}
 
 	return KindUnknown
-***REMOVED***
+}
 
 // String returns the string representation of the Kind
-func (k Kind) String() string ***REMOVED***
-	switch k ***REMOVED***
+func (k Kind) String() string {
+	switch k {
 	case KindView:
 		return "View"
 	case KindActive:
 		return "Active"
 	case KindCommitted:
 		return "Committed"
-	***REMOVED***
+	}
 
 	return "Unknown"
-***REMOVED***
+}
 
 // MarshalJSON the Kind to JSON
-func (k Kind) MarshalJSON() ([]byte, error) ***REMOVED***
+func (k Kind) MarshalJSON() ([]byte, error) {
 	return json.Marshal(k.String())
-***REMOVED***
+}
 
 // UnmarshalJSON the Kind from JSON
-func (k *Kind) UnmarshalJSON(b []byte) error ***REMOVED***
+func (k *Kind) UnmarshalJSON(b []byte) error {
 	var s string
-	if err := json.Unmarshal(b, &s); err != nil ***REMOVED***
+	if err := json.Unmarshal(b, &s); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	*k = ParseKind(s)
 	return nil
-***REMOVED***
+}
 
 // Info provides information about a particular snapshot.
 // JSON marshallability is supported for interactive with tools like ctr,
-type Info struct ***REMOVED***
+type Info struct {
 	Kind    Kind              // active or committed snapshot
 	Name    string            // name or key of snapshot
 	Parent  string            `json:",omitempty"` // name of parent snapshot
 	Labels  map[string]string `json:",omitempty"` // Labels for snapshot
 	Created time.Time         `json:",omitempty"` // Created time
 	Updated time.Time         `json:",omitempty"` // Last update time
-***REMOVED***
+}
 
 // Usage defines statistics for disk resources consumed by the snapshot.
 //
 // These resources only include the resources consumed by the snapshot itself
 // and does not include resources usage by the parent.
-type Usage struct ***REMOVED***
+type Usage struct {
 	Inodes int64 // number of inodes in use.
 	Size   int64 // provides usage, in bytes, of snapshot
-***REMOVED***
+}
 
 // Add the provided usage to the current usage
-func (u *Usage) Add(other Usage) ***REMOVED***
+func (u *Usage) Add(other Usage) {
 	u.Size += other.Size
 
 	// TODO(stevvooe): assumes independent inodes, but provides and upper
 	// bound. This should be pretty close, assuming the inodes for a
 	// snapshot are roughly unique to it. Don't trust this assumption.
 	u.Inodes += other.Inodes
-***REMOVED***
+}
 
 // Snapshotter defines the methods required to implement a snapshot snapshotter for
 // allocating, snapshotting and mounting filesystem changesets. The model works
@@ -147,13 +147,13 @@ func (u *Usage) Add(other Usage) ***REMOVED***
 // key and descending from the empty parent "":
 //
 //	mounts, err := snapshotter.Prepare(ctx, key, "")
-// 	if err != nil ***REMOVED*** ... ***REMOVED***
+// 	if err != nil { ... }
 //
 // We get back a list of mounts from Snapshotter.Prepare, with the key identifying
 // the active snapshot. Mount this to the temporary location with the
 // following:
 //
-//	if err := mount.All(mounts, tmpDir); err != nil ***REMOVED*** ... ***REMOVED***
+//	if err := mount.All(mounts, tmpDir); err != nil { ... }
 //
 // Once the mounts are performed, our temporary location is ready to capture
 // a diff. In practice, this works similar to a filesystem transaction. The
@@ -163,9 +163,9 @@ func (u *Usage) Add(other Usage) ***REMOVED***
 // implementation):
 //
 //	layer, err := os.Open(layerPath)
-//	if err != nil ***REMOVED*** ... ***REMOVED***
+//	if err != nil { ... }
 // 	digest, err := unpackLayer(tmpLocation, layer) // unpack into layer location
-// 	if err != nil ***REMOVED*** ... ***REMOVED***
+// 	if err != nil { ... }
 //
 // When the above completes, we should have a filesystem the represents the
 // contents of the layer. Careful implementations should verify that digest
@@ -177,7 +177,7 @@ func (u *Usage) Add(other Usage) ***REMOVED***
 // snapshot to a name. For this example, we are just going to use the layer
 // digest, but in practice, this will probably be the ChainID:
 //
-//	if err := snapshotter.Commit(ctx, digest.String(), key); err != nil ***REMOVED*** ... ***REMOVED***
+//	if err := snapshotter.Commit(ctx, digest.String(), key); err != nil { ... }
 //
 // Now, we have a layer in the Snapshotter that can be accessed with the digest
 // provided during commit. Once you have committed the snapshot, the active
@@ -208,11 +208,11 @@ func (u *Usage) Add(other Usage) ***REMOVED***
 // one would like to create a new image from the filesystem, Manager.Commit is
 // called:
 //
-// 	if err := snapshotter.Commit(ctx, newImageSnapshot, containerKey); err != nil ***REMOVED*** ... ***REMOVED***
+// 	if err := snapshotter.Commit(ctx, newImageSnapshot, containerKey); err != nil { ... }
 //
 // Alternatively, for most container runs, Snapshotter.Remove will be called to
 // signal the Snapshotter to abandon the changes.
-type Snapshotter interface ***REMOVED***
+type Snapshotter interface {
 	// Stat returns the info for an active or committed snapshot by name or
 	// key.
 	//
@@ -302,15 +302,15 @@ type Snapshotter interface ***REMOVED***
 	//
 	// Close returns nil when it is already closed.
 	Close() error
-***REMOVED***
+}
 
 // Opt allows setting mutable snapshot properties on creation
 type Opt func(info *Info) error
 
 // WithLabels adds labels to a created snapshot
-func WithLabels(labels map[string]string) Opt ***REMOVED***
-	return func(info *Info) error ***REMOVED***
+func WithLabels(labels map[string]string) Opt {
+	return func(info *Info) error {
 		info.Labels = labels
 		return nil
-	***REMOVED***
-***REMOVED***
+	}
+}

@@ -4,11 +4,11 @@ set -e
 mkimgdeb="$(basename "$0")"
 mkimg="$(dirname "$0").sh"
 
-usage() ***REMOVED***
+usage() {
 	echo >&2 "usage: $mkimgdeb rootfsDir suite [debootstrap-args]"
 	echo >&2 " note: $mkimgdeb meant to be used from $mkimg"
 	exit 1
-***REMOVED***
+}
 
 rootfsDir="$1"
 if [ -z "$rootfsDir" ]; then
@@ -42,20 +42,20 @@ if [ -z "$chrootPath" ]; then
 	usage
 fi
 
-rootfs_chroot() ***REMOVED***
+rootfs_chroot() {
 	# "chroot" doesn't set PATH, so we need to set it explicitly to something our new debootstrap chroot can use appropriately!
 
 	# set PATH and chroot away!
 	PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin' \
 		"$chrootPath" "$rootfsDir" "$@"
-***REMOVED***
+}
 
 # allow for DEBOOTSTRAP=qemu-debootstrap ./mkimage.sh ...
-: $***REMOVED***DEBOOTSTRAP:=debootstrap***REMOVED***
+: ${DEBOOTSTRAP:=debootstrap}
 
 (
 	set -x
-	$DEBOOTSTRAP "$***REMOVED***before[@]***REMOVED***" "$suite" "$rootfsDir" "$@"
+	$DEBOOTSTRAP "${before[@]}" "$suite" "$rootfsDir" "$@"
 )
 
 # now for some Docker-specific tweaks
@@ -119,8 +119,8 @@ if [ -d "$rootfsDir/etc/apt/apt.conf.d" ]; then
 		# Ideally, these would just be invoking "apt-get clean", but in our testing,
 		# that ended up being cyclic and we got stuck on APT's lock, so we get this fun
 		# creation that's essentially just "apt-get clean".
-		DPkg::Post-Invoke ***REMOVED*** $***REMOVED***aptGetClean***REMOVED*** ***REMOVED***;
-		APT::Update::Post-Invoke ***REMOVED*** $***REMOVED***aptGetClean***REMOVED*** ***REMOVED***;
+		DPkg::Post-Invoke { ${aptGetClean} };
+		APT::Update::Post-Invoke { ${aptGetClean} };
 
 		Dir::Cache::pkgcache "";
 		Dir::Cache::srcpkgcache "";
@@ -198,7 +198,7 @@ if [ -z "$DONT_TOUCH_SOURCES_LIST" ]; then
 					set -x
 					sed -i "
 						p;
-						s/ $suite / $***REMOVED***suite***REMOVED***-updates /
+						s/ $suite / ${suite}-updates /
 					" "$rootfsDir/etc/apt/sources.list"
 					echo "deb http://security.debian.org $suite/updates main" >> "$rootfsDir/etc/apt/sources.list"
 				)
@@ -210,8 +210,8 @@ if [ -z "$DONT_TOUCH_SOURCES_LIST" ]; then
 				set -x
 				sed -i "
 					p;
-					s/ $suite / $***REMOVED***suite***REMOVED***-updates /; p;
-					s/ $suite-updates / $***REMOVED***suite***REMOVED***-security /
+					s/ $suite / ${suite}-updates /; p;
+					s/ $suite-updates / ${suite}-security /
 				" "$rootfsDir/etc/apt/sources.list"
 			)
 			;;
@@ -222,7 +222,7 @@ if [ -z "$DONT_TOUCH_SOURCES_LIST" ]; then
 					set -x
 					sed -i "
 						p;
-						s/ $suite / $***REMOVED***suite***REMOVED***-updates /
+						s/ $suite / ${suite}-updates /
 					" "$rootfsDir/etc/apt/sources.list"
 				)
 			fi

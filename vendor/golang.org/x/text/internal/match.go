@@ -29,39 +29,39 @@ import (
 //
 // A Match will indicate an Exact match if the language matches after
 // canonicalization and High if the matched tag is a parent.
-func NewInheritanceMatcher(t []language.Tag) *InheritanceMatcher ***REMOVED***
-	tags := &InheritanceMatcher***REMOVED***make(map[language.Tag]int)***REMOVED***
-	for i, tag := range t ***REMOVED***
+func NewInheritanceMatcher(t []language.Tag) *InheritanceMatcher {
+	tags := &InheritanceMatcher{make(map[language.Tag]int)}
+	for i, tag := range t {
 		ct, err := language.All.Canonicalize(tag)
-		if err != nil ***REMOVED***
+		if err != nil {
 			ct = tag
-		***REMOVED***
+		}
 		tags.index[ct] = i
-	***REMOVED***
+	}
 	return tags
-***REMOVED***
+}
 
-type InheritanceMatcher struct ***REMOVED***
+type InheritanceMatcher struct {
 	index map[language.Tag]int
-***REMOVED***
+}
 
-func (m InheritanceMatcher) Match(want ...language.Tag) (language.Tag, int, language.Confidence) ***REMOVED***
-	for _, t := range want ***REMOVED***
+func (m InheritanceMatcher) Match(want ...language.Tag) (language.Tag, int, language.Confidence) {
+	for _, t := range want {
 		ct, err := language.All.Canonicalize(t)
-		if err != nil ***REMOVED***
+		if err != nil {
 			ct = t
-		***REMOVED***
+		}
 		conf := language.Exact
-		for ***REMOVED***
-			if index, ok := m.index[ct]; ok ***REMOVED***
+		for {
+			if index, ok := m.index[ct]; ok {
 				return ct, index, conf
-			***REMOVED***
-			if ct == language.Und ***REMOVED***
+			}
+			if ct == language.Und {
 				break
-			***REMOVED***
+			}
 			ct = ct.Parent()
 			conf = language.High
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return language.Und, 0, language.No
-***REMOVED***
+}

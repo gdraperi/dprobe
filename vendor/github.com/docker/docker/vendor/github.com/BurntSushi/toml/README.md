@@ -54,22 +54,22 @@ DOB = 1987-07-05T05:45:00Z
 Which could be defined in Go as:
 
 ```go
-type Config struct ***REMOVED***
+type Config struct {
   Age int
   Cats []string
   Pi float64
   Perfection []int
   DOB time.Time // requires `import time`
-***REMOVED***
+}
 ```
 
 And then decoded with:
 
 ```go
 var conf Config
-if _, err := toml.Decode(tomlData, &conf); err != nil ***REMOVED***
+if _, err := toml.Decode(tomlData, &conf); err != nil {
   // handle error
-***REMOVED***
+}
 ```
 
 You can also use struct tags if your struct field name doesn't map to a TOML
@@ -80,9 +80,9 @@ some_key_NAME = "wat"
 ```
 
 ```go
-type TOML struct ***REMOVED***
+type TOML struct {
   ObscureKey string `toml:"some_key_NAME"`
-***REMOVED***
+}
 ```
 
 ### Using the `encoding.TextUnmarshaler` interface
@@ -103,36 +103,36 @@ duration = "8m03s"
 Which can be decoded with:
 
 ```go
-type song struct ***REMOVED***
+type song struct {
   Name     string
   Duration duration
-***REMOVED***
-type songs struct ***REMOVED***
+}
+type songs struct {
   Song []song
-***REMOVED***
+}
 var favorites songs
-if _, err := toml.Decode(blob, &favorites); err != nil ***REMOVED***
+if _, err := toml.Decode(blob, &favorites); err != nil {
   log.Fatal(err)
-***REMOVED***
+}
 
-for _, s := range favorites.Song ***REMOVED***
+for _, s := range favorites.Song {
   fmt.Printf("%s (%s)\n", s.Name, s.Duration)
-***REMOVED***
+}
 ```
 
 And you'll also need a `duration` type that satisfies the 
 `encoding.TextUnmarshaler` interface:
 
 ```go
-type duration struct ***REMOVED***
+type duration struct {
 	time.Duration
-***REMOVED***
+}
 
-func (d *duration) UnmarshalText(text []byte) error ***REMOVED***
+func (d *duration) UnmarshalText(text []byte) error {
 	var err error
 	d.Duration, err = time.ParseDuration(string(text))
 	return err
-***REMOVED***
+}
 ```
 
 ### More complex usage
@@ -180,41 +180,41 @@ hosts = [
 And the corresponding Go types are:
 
 ```go
-type tomlConfig struct ***REMOVED***
+type tomlConfig struct {
 	Title string
 	Owner ownerInfo
 	DB database `toml:"database"`
 	Servers map[string]server
 	Clients clients
-***REMOVED***
+}
 
-type ownerInfo struct ***REMOVED***
+type ownerInfo struct {
 	Name string
 	Org string `toml:"organization"`
 	Bio string
 	DOB time.Time
-***REMOVED***
+}
 
-type database struct ***REMOVED***
+type database struct {
 	Server string
 	Ports []int
 	ConnMax int `toml:"connection_max"`
 	Enabled bool
-***REMOVED***
+}
 
-type server struct ***REMOVED***
+type server struct {
 	IP string
 	DC string
-***REMOVED***
+}
 
-type clients struct ***REMOVED***
-	Data [][]interface***REMOVED******REMOVED***
+type clients struct {
+	Data [][]interface{}
 	Hosts []string
-***REMOVED***
+}
 ```
 
 Note that a case insensitive match will be tried if an exact match can't be
 found.
 
-A working example of the above can be found in `_examples/example.***REMOVED***go,toml***REMOVED***`.
+A working example of the above can be found in `_examples/example.{go,toml}`.
 

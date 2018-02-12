@@ -4,6 +4,6 @@ import (
 	"path/filepath"
 )
 
-func normalizePath(path string) string ***REMOVED***
+func normalizePath(path string) string {
 	return filepath.FromSlash(path)
-***REMOVED***
+}

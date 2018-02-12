@@ -12,6 +12,6 @@ import (
 	"golang.org/x/net/context"
 )
 
-func getContext(r *http.Request) context.Context ***REMOVED***
+func getContext(r *http.Request) context.Context {
 	return context.Background()
-***REMOVED***
+}

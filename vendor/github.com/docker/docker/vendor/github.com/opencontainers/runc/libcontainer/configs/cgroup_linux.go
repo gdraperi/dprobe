@@ -8,7 +8,7 @@ const (
 	Thawed    FreezerState = "THAWED"
 )
 
-type Cgroup struct ***REMOVED***
+type Cgroup struct {
 	// Deprecated, use Path instead
 	Name string `json:"name,omitempty"`
 
@@ -29,9 +29,9 @@ type Cgroup struct ***REMOVED***
 
 	// Resources contains various cgroups settings to apply
 	*Resources
-***REMOVED***
+}
 
-type Resources struct ***REMOVED***
+type Resources struct {
 	// If this is true allow access to any kind of device within the container.  If false, allow access only to devices explicitly listed in the allowed_devices list.
 	// Deprecated
 	AllowAllDevices *bool `json:"allow_all_devices,omitempty"`
@@ -119,4 +119,4 @@ type Resources struct ***REMOVED***
 
 	// Set class identifier for container's network packets
 	NetClsClassid uint32 `json:"net_cls_classid_u"`
-***REMOVED***
+}

@@ -5,17 +5,17 @@ package tarsum
 // so instead it is being added just to "BuilderContext" which will then
 // only be used during the .dockerignore file processing
 // - see builder/evaluator.go
-type BuilderContext interface ***REMOVED***
+type BuilderContext interface {
 	TarSum
 	Remove(string)
-***REMOVED***
+}
 
-func (bc *tarSum) Remove(filename string) ***REMOVED***
-	for i, fis := range bc.sums ***REMOVED***
-		if fis.Name() == filename ***REMOVED***
+func (bc *tarSum) Remove(filename string) {
+	for i, fis := range bc.sums {
+		if fis.Name() == filename {
 			bc.sums = append(bc.sums[:i], bc.sums[i+1:]...)
 			// Note, we don't just return because there could be
 			// more than one with this name
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

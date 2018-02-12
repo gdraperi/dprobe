@@ -10,15 +10,15 @@
 //
 // This is an example of making an update to a MemoryStore:
 //
-//	err := store.Update(func(tx store.Tx) ***REMOVED***
-//		if err := tx.Nodes().Update(newNode); err != nil ***REMOVED***
+//	err := store.Update(func(tx store.Tx) {
+//		if err := tx.Nodes().Update(newNode); err != nil {
 //			return err
-//		***REMOVED***
+//		}
 //		return nil
-//	***REMOVED***)
-//	if err != nil ***REMOVED***
+//	})
+//	if err != nil {
 //		return fmt.Errorf("transaction failed: %v", err)
-//	***REMOVED***
+//	}
 //
 // MemoryStore exposes watch functionality.
 // It exposes a publish/subscribe queue where code can subscribe to

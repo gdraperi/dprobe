@@ -9,132 +9,132 @@ const (
 )
 
 // ACLEntry is used to represent an ACL entry
-type ACLEntry struct ***REMOVED***
+type ACLEntry struct {
 	CreateIndex uint64
 	ModifyIndex uint64
 	ID          string
 	Name        string
 	Type        string
 	Rules       string
-***REMOVED***
+}
 
 // ACL can be used to query the ACL endpoints
-type ACL struct ***REMOVED***
+type ACL struct {
 	c *Client
-***REMOVED***
+}
 
 // ACL returns a handle to the ACL endpoints
-func (c *Client) ACL() *ACL ***REMOVED***
-	return &ACL***REMOVED***c***REMOVED***
-***REMOVED***
+func (c *Client) ACL() *ACL {
+	return &ACL{c}
+}
 
 // Create is used to generate a new token with the given parameters
-func (a *ACL) Create(acl *ACLEntry, q *WriteOptions) (string, *WriteMeta, error) ***REMOVED***
+func (a *ACL) Create(acl *ACLEntry, q *WriteOptions) (string, *WriteMeta, error) {
 	r := a.c.newRequest("PUT", "/v1/acl/create")
 	r.setWriteOptions(q)
 	r.obj = acl
 	rtt, resp, err := requireOK(a.c.doRequest(r))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", nil, err
-	***REMOVED***
+	}
 	defer resp.Body.Close()
 
-	wm := &WriteMeta***REMOVED***RequestTime: rtt***REMOVED***
-	var out struct***REMOVED*** ID string ***REMOVED***
-	if err := decodeBody(resp, &out); err != nil ***REMOVED***
+	wm := &WriteMeta{RequestTime: rtt}
+	var out struct{ ID string }
+	if err := decodeBody(resp, &out); err != nil {
 		return "", nil, err
-	***REMOVED***
+	}
 	return out.ID, wm, nil
-***REMOVED***
+}
 
 // Update is used to update the rules of an existing token
-func (a *ACL) Update(acl *ACLEntry, q *WriteOptions) (*WriteMeta, error) ***REMOVED***
+func (a *ACL) Update(acl *ACLEntry, q *WriteOptions) (*WriteMeta, error) {
 	r := a.c.newRequest("PUT", "/v1/acl/update")
 	r.setWriteOptions(q)
 	r.obj = acl
 	rtt, resp, err := requireOK(a.c.doRequest(r))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	defer resp.Body.Close()
 
-	wm := &WriteMeta***REMOVED***RequestTime: rtt***REMOVED***
+	wm := &WriteMeta{RequestTime: rtt}
 	return wm, nil
-***REMOVED***
+}
 
 // Destroy is used to destroy a given ACL token ID
-func (a *ACL) Destroy(id string, q *WriteOptions) (*WriteMeta, error) ***REMOVED***
+func (a *ACL) Destroy(id string, q *WriteOptions) (*WriteMeta, error) {
 	r := a.c.newRequest("PUT", "/v1/acl/destroy/"+id)
 	r.setWriteOptions(q)
 	rtt, resp, err := requireOK(a.c.doRequest(r))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	resp.Body.Close()
 
-	wm := &WriteMeta***REMOVED***RequestTime: rtt***REMOVED***
+	wm := &WriteMeta{RequestTime: rtt}
 	return wm, nil
-***REMOVED***
+}
 
 // Clone is used to return a new token cloned from an existing one
-func (a *ACL) Clone(id string, q *WriteOptions) (string, *WriteMeta, error) ***REMOVED***
+func (a *ACL) Clone(id string, q *WriteOptions) (string, *WriteMeta, error) {
 	r := a.c.newRequest("PUT", "/v1/acl/clone/"+id)
 	r.setWriteOptions(q)
 	rtt, resp, err := requireOK(a.c.doRequest(r))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", nil, err
-	***REMOVED***
+	}
 	defer resp.Body.Close()
 
-	wm := &WriteMeta***REMOVED***RequestTime: rtt***REMOVED***
-	var out struct***REMOVED*** ID string ***REMOVED***
-	if err := decodeBody(resp, &out); err != nil ***REMOVED***
+	wm := &WriteMeta{RequestTime: rtt}
+	var out struct{ ID string }
+	if err := decodeBody(resp, &out); err != nil {
 		return "", nil, err
-	***REMOVED***
+	}
 	return out.ID, wm, nil
-***REMOVED***
+}
 
 // Info is used to query for information about an ACL token
-func (a *ACL) Info(id string, q *QueryOptions) (*ACLEntry, *QueryMeta, error) ***REMOVED***
+func (a *ACL) Info(id string, q *QueryOptions) (*ACLEntry, *QueryMeta, error) {
 	r := a.c.newRequest("GET", "/v1/acl/info/"+id)
 	r.setQueryOptions(q)
 	rtt, resp, err := requireOK(a.c.doRequest(r))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 	defer resp.Body.Close()
 
-	qm := &QueryMeta***REMOVED******REMOVED***
+	qm := &QueryMeta{}
 	parseQueryMeta(resp, qm)
 	qm.RequestTime = rtt
 
 	var entries []*ACLEntry
-	if err := decodeBody(resp, &entries); err != nil ***REMOVED***
+	if err := decodeBody(resp, &entries); err != nil {
 		return nil, nil, err
-	***REMOVED***
-	if len(entries) > 0 ***REMOVED***
+	}
+	if len(entries) > 0 {
 		return entries[0], qm, nil
-	***REMOVED***
+	}
 	return nil, qm, nil
-***REMOVED***
+}
 
 // List is used to get all the ACL tokens
-func (a *ACL) List(q *QueryOptions) ([]*ACLEntry, *QueryMeta, error) ***REMOVED***
+func (a *ACL) List(q *QueryOptions) ([]*ACLEntry, *QueryMeta, error) {
 	r := a.c.newRequest("GET", "/v1/acl/list")
 	r.setQueryOptions(q)
 	rtt, resp, err := requireOK(a.c.doRequest(r))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 	defer resp.Body.Close()
 
-	qm := &QueryMeta***REMOVED******REMOVED***
+	qm := &QueryMeta{}
 	parseQueryMeta(resp, qm)
 	qm.RequestTime = rtt
 
 	var entries []*ACLEntry
-	if err := decodeBody(resp, &entries); err != nil ***REMOVED***
+	if err := decodeBody(resp, &entries); err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 	return entries, qm, nil
-***REMOVED***
+}

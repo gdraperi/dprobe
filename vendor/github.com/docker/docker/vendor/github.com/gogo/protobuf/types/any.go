@@ -49,22 +49,22 @@ const googleApis = "type.googleapis.com/"
 // Note that regular type assertions should be done using the Is
 // function. AnyMessageName is provided for less common use cases like filtering a
 // sequence of Any messages based on a set of allowed message type names.
-func AnyMessageName(any *Any) (string, error) ***REMOVED***
+func AnyMessageName(any *Any) (string, error) {
 	slash := strings.LastIndex(any.TypeUrl, "/")
-	if slash < 0 ***REMOVED***
+	if slash < 0 {
 		return "", fmt.Errorf("message type url %q is invalid", any.TypeUrl)
-	***REMOVED***
+	}
 	return any.TypeUrl[slash+1:], nil
-***REMOVED***
+}
 
 // MarshalAny takes the protocol buffer and encodes it into google.protobuf.Any.
-func MarshalAny(pb proto.Message) (*Any, error) ***REMOVED***
+func MarshalAny(pb proto.Message) (*Any, error) {
 	value, err := proto.Marshal(pb)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	return &Any***REMOVED***TypeUrl: googleApis + proto.MessageName(pb), Value: value***REMOVED***, nil
-***REMOVED***
+	}
+	return &Any{TypeUrl: googleApis + proto.MessageName(pb), Value: value}, nil
+}
 
 // DynamicAny is a value that can be passed to UnmarshalAny to automatically
 // allocate a proto.Message for the type specified in a google.protobuf.Any
@@ -73,63 +73,63 @@ func MarshalAny(pb proto.Message) (*Any, error) ***REMOVED***
 // Example:
 //
 //   var x ptypes.DynamicAny
-//   if err := ptypes.UnmarshalAny(a, &x); err != nil ***REMOVED*** ... ***REMOVED***
+//   if err := ptypes.UnmarshalAny(a, &x); err != nil { ... }
 //   fmt.Printf("unmarshaled message: %v", x.Message)
-type DynamicAny struct ***REMOVED***
+type DynamicAny struct {
 	proto.Message
-***REMOVED***
+}
 
 // Empty returns a new proto.Message of the type specified in a
 // google.protobuf.Any message. It returns an error if corresponding message
 // type isn't linked in.
-func EmptyAny(any *Any) (proto.Message, error) ***REMOVED***
+func EmptyAny(any *Any) (proto.Message, error) {
 	aname, err := AnyMessageName(any)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	t := proto.MessageType(aname)
-	if t == nil ***REMOVED***
+	if t == nil {
 		return nil, fmt.Errorf("any: message type %q isn't linked in", aname)
-	***REMOVED***
+	}
 	return reflect.New(t.Elem()).Interface().(proto.Message), nil
-***REMOVED***
+}
 
 // UnmarshalAny parses the protocol buffer representation in a google.protobuf.Any
 // message and places the decoded result in pb. It returns an error if type of
 // contents of Any message does not match type of pb message.
 //
 // pb can be a proto.Message, or a *DynamicAny.
-func UnmarshalAny(any *Any, pb proto.Message) error ***REMOVED***
-	if d, ok := pb.(*DynamicAny); ok ***REMOVED***
-		if d.Message == nil ***REMOVED***
+func UnmarshalAny(any *Any, pb proto.Message) error {
+	if d, ok := pb.(*DynamicAny); ok {
+		if d.Message == nil {
 			var err error
 			d.Message, err = EmptyAny(any)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return err
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		return UnmarshalAny(any, d.Message)
-	***REMOVED***
+	}
 
 	aname, err := AnyMessageName(any)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	mname := proto.MessageName(pb)
-	if aname != mname ***REMOVED***
+	if aname != mname {
 		return fmt.Errorf("mismatched message type: got %q want %q", aname, mname)
-	***REMOVED***
+	}
 	return proto.Unmarshal(any.Value, pb)
-***REMOVED***
+}
 
 // Is returns true if any value contains a given message type.
-func Is(any *Any, pb proto.Message) bool ***REMOVED***
+func Is(any *Any, pb proto.Message) bool {
 	aname, err := AnyMessageName(any)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return false
-	***REMOVED***
+	}
 
 	return aname == proto.MessageName(pb)
-***REMOVED***
+}

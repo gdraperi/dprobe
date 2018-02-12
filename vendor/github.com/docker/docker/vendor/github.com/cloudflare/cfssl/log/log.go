@@ -27,14 +27,14 @@ const (
 	LevelFatal
 )
 
-var levelPrefix = [...]string***REMOVED***
+var levelPrefix = [...]string{
 	LevelDebug:    "DEBUG",
 	LevelInfo:     "INFO",
 	LevelWarning:  "WARNING",
 	LevelError:    "ERROR",
 	LevelCritical: "CRITICAL",
 	LevelFatal:    "FATAL",
-***REMOVED***
+}
 
 // Level stores the current logging level.
 var Level = LevelInfo
@@ -43,14 +43,14 @@ var Level = LevelInfo
 // destination passed in via SetLogger.
 //
 // SyslogWriter is satisfied by *syslog.Writer.
-type SyslogWriter interface ***REMOVED***
+type SyslogWriter interface {
 	Debug(string)
 	Info(string)
 	Warning(string)
 	Err(string)
 	Crit(string)
 	Emerg(string)
-***REMOVED***
+}
 
 // syslogWriter stores the SetLogger() parameter.
 var syslogWriter SyslogWriter
@@ -58,14 +58,14 @@ var syslogWriter SyslogWriter
 // SetLogger sets the output used for output by this package.
 // A *syslog.Writer is a good choice for the logger parameter.
 // Call with a nil parameter to revert to default behavior.
-func SetLogger(logger SyslogWriter) ***REMOVED***
+func SetLogger(logger SyslogWriter) {
 	syslogWriter = logger
-***REMOVED***
+}
 
-func print(l int, msg string) ***REMOVED***
-	if l >= Level ***REMOVED***
-		if syslogWriter != nil ***REMOVED***
-			switch l ***REMOVED***
+func print(l int, msg string) {
+	if l >= Level {
+		if syslogWriter != nil {
+			switch l {
 			case LevelDebug:
 				syslogWriter.Debug(msg)
 			case LevelInfo:
@@ -78,85 +78,85 @@ func print(l int, msg string) ***REMOVED***
 				syslogWriter.Crit(msg)
 			case LevelFatal:
 				syslogWriter.Emerg(msg)
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
+			}
+		} else {
 			log.Printf("[%s] %s", levelPrefix[l], msg)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func outputf(l int, format string, v []interface***REMOVED******REMOVED***) ***REMOVED***
+func outputf(l int, format string, v []interface{}) {
 	print(l, fmt.Sprintf(format, v...))
-***REMOVED***
+}
 
-func output(l int, v []interface***REMOVED******REMOVED***) ***REMOVED***
+func output(l int, v []interface{}) {
 	print(l, fmt.Sprint(v...))
-***REMOVED***
+}
 
 // Fatalf logs a formatted message at the "fatal" level and then exits. The
 // arguments are handled in the same manner as fmt.Printf.
-func Fatalf(format string, v ...interface***REMOVED******REMOVED***) ***REMOVED***
+func Fatalf(format string, v ...interface{}) {
 	outputf(LevelFatal, format, v)
 	os.Exit(1)
-***REMOVED***
+}
 
 // Fatal logs its arguments at the "fatal" level and then exits.
-func Fatal(v ...interface***REMOVED******REMOVED***) ***REMOVED***
+func Fatal(v ...interface{}) {
 	output(LevelFatal, v)
 	os.Exit(1)
-***REMOVED***
+}
 
 // Criticalf logs a formatted message at the "critical" level. The
 // arguments are handled in the same manner as fmt.Printf.
-func Criticalf(format string, v ...interface***REMOVED******REMOVED***) ***REMOVED***
+func Criticalf(format string, v ...interface{}) {
 	outputf(LevelCritical, format, v)
-***REMOVED***
+}
 
 // Critical logs its arguments at the "critical" level.
-func Critical(v ...interface***REMOVED******REMOVED***) ***REMOVED***
+func Critical(v ...interface{}) {
 	output(LevelCritical, v)
-***REMOVED***
+}
 
 // Errorf logs a formatted message at the "error" level. The arguments
 // are handled in the same manner as fmt.Printf.
-func Errorf(format string, v ...interface***REMOVED******REMOVED***) ***REMOVED***
+func Errorf(format string, v ...interface{}) {
 	outputf(LevelError, format, v)
-***REMOVED***
+}
 
 // Error logs its arguments at the "error" level.
-func Error(v ...interface***REMOVED******REMOVED***) ***REMOVED***
+func Error(v ...interface{}) {
 	output(LevelError, v)
-***REMOVED***
+}
 
 // Warningf logs a formatted message at the "warning" level. The
 // arguments are handled in the same manner as fmt.Printf.
-func Warningf(format string, v ...interface***REMOVED******REMOVED***) ***REMOVED***
+func Warningf(format string, v ...interface{}) {
 	outputf(LevelWarning, format, v)
-***REMOVED***
+}
 
 // Warning logs its arguments at the "warning" level.
-func Warning(v ...interface***REMOVED******REMOVED***) ***REMOVED***
+func Warning(v ...interface{}) {
 	output(LevelWarning, v)
-***REMOVED***
+}
 
 // Infof logs a formatted message at the "info" level. The arguments
 // are handled in the same manner as fmt.Printf.
-func Infof(format string, v ...interface***REMOVED******REMOVED***) ***REMOVED***
+func Infof(format string, v ...interface{}) {
 	outputf(LevelInfo, format, v)
-***REMOVED***
+}
 
 // Info logs its arguments at the "info" level.
-func Info(v ...interface***REMOVED******REMOVED***) ***REMOVED***
+func Info(v ...interface{}) {
 	output(LevelInfo, v)
-***REMOVED***
+}
 
 // Debugf logs a formatted message at the "debug" level. The arguments
 // are handled in the same manner as fmt.Printf.
-func Debugf(format string, v ...interface***REMOVED******REMOVED***) ***REMOVED***
+func Debugf(format string, v ...interface{}) {
 	outputf(LevelDebug, format, v)
-***REMOVED***
+}
 
 // Debug logs its arguments at the "debug" level.
-func Debug(v ...interface***REMOVED******REMOVED***) ***REMOVED***
+func Debug(v ...interface{}) {
 	output(LevelDebug, v)
-***REMOVED***
+}

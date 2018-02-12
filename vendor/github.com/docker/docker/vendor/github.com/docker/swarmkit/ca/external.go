@@ -44,64 +44,64 @@ var ErrNoExternalCAURLs = errors.New("no external CA URLs")
 
 // ExternalCA is able to make certificate signing requests to one of a list
 // remote CFSSL API endpoints.
-type ExternalCA struct ***REMOVED***
+type ExternalCA struct {
 	ExternalRequestTimeout time.Duration
 
 	mu            sync.Mutex
 	intermediates []byte
 	urls          []string
 	client        *http.Client
-***REMOVED***
+}
 
 // NewExternalCATLSConfig takes a TLS certificate and root pool and returns a TLS config that can be updated
 // without killing existing connections
-func NewExternalCATLSConfig(certs []tls.Certificate, rootPool *x509.CertPool) *tls.Config ***REMOVED***
-	return &tls.Config***REMOVED***
+func NewExternalCATLSConfig(certs []tls.Certificate, rootPool *x509.CertPool) *tls.Config {
+	return &tls.Config{
 		Certificates: certs,
 		RootCAs:      rootPool,
 		MinVersion:   tls.VersionTLS12,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // NewExternalCA creates a new ExternalCA which uses the given tlsConfig to
 // authenticate to any of the given URLS of CFSSL API endpoints.
-func NewExternalCA(intermediates []byte, tlsConfig *tls.Config, urls ...string) *ExternalCA ***REMOVED***
-	return &ExternalCA***REMOVED***
+func NewExternalCA(intermediates []byte, tlsConfig *tls.Config, urls ...string) *ExternalCA {
+	return &ExternalCA{
 		ExternalRequestTimeout: 5 * time.Second,
 		intermediates:          intermediates,
 		urls:                   urls,
-		client: &http.Client***REMOVED***
-			Transport: &http.Transport***REMOVED***
+		client: &http.Client{
+			Transport: &http.Transport{
 				TLSClientConfig: tlsConfig,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
-***REMOVED***
+			},
+		},
+	}
+}
 
 // UpdateTLSConfig updates the HTTP Client for this ExternalCA by creating
 // a new client which uses the given tlsConfig.
-func (eca *ExternalCA) UpdateTLSConfig(tlsConfig *tls.Config) ***REMOVED***
+func (eca *ExternalCA) UpdateTLSConfig(tlsConfig *tls.Config) {
 	eca.mu.Lock()
 	defer eca.mu.Unlock()
 
-	eca.client = &http.Client***REMOVED***
-		Transport: &http.Transport***REMOVED***
+	eca.client = &http.Client{
+		Transport: &http.Transport{
 			TLSClientConfig: tlsConfig,
-		***REMOVED***,
-	***REMOVED***
-***REMOVED***
+		},
+	}
+}
 
 // UpdateURLs updates the list of CSR API endpoints by setting it to the given urls.
-func (eca *ExternalCA) UpdateURLs(urls ...string) ***REMOVED***
+func (eca *ExternalCA) UpdateURLs(urls ...string) {
 	eca.mu.Lock()
 	defer eca.mu.Unlock()
 
 	eca.urls = urls
-***REMOVED***
+}
 
 // Sign signs a new certificate by proxying the given certificate signing
 // request to an external CFSSL API server.
-func (eca *ExternalCA) Sign(ctx context.Context, req signer.SignRequest) (cert []byte, err error) ***REMOVED***
+func (eca *ExternalCA) Sign(ctx context.Context, req signer.SignRequest) (cert []byte, err error) {
 	// Get the current HTTP client and list of URLs in a small critical
 	// section. We will use these to make certificate signing requests.
 	eca.mu.Lock()
@@ -110,44 +110,44 @@ func (eca *ExternalCA) Sign(ctx context.Context, req signer.SignRequest) (cert [
 	intermediates := eca.intermediates
 	eca.mu.Unlock()
 
-	if len(urls) == 0 ***REMOVED***
+	if len(urls) == 0 {
 		return nil, ErrNoExternalCAURLs
-	***REMOVED***
+	}
 
 	csrJSON, err := json.Marshal(req)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, errors.Wrap(err, "unable to JSON-encode CFSSL signing request")
-	***REMOVED***
+	}
 
 	// Try each configured proxy URL. Return after the first success. If
 	// all fail then the last error will be returned.
-	for _, url := range urls ***REMOVED***
+	for _, url := range urls {
 		requestCtx, cancel := context.WithTimeout(ctx, eca.ExternalRequestTimeout)
 		cert, err = makeExternalSignRequest(requestCtx, client, url, csrJSON)
 		cancel()
-		if err == nil ***REMOVED***
+		if err == nil {
 			return append(cert, intermediates...), err
-		***REMOVED***
+		}
 		log.G(ctx).Debugf("unable to proxy certificate signing request to %s: %s", url, err)
-	***REMOVED***
+	}
 
 	return nil, err
-***REMOVED***
+}
 
 // CrossSignRootCA takes a RootCA object, generates a CA CSR, sends a signing request with the CA CSR to the external
 // CFSSL API server in order to obtain a cross-signed root
-func (eca *ExternalCA) CrossSignRootCA(ctx context.Context, rca RootCA) ([]byte, error) ***REMOVED***
+func (eca *ExternalCA) CrossSignRootCA(ctx context.Context, rca RootCA) ([]byte, error) {
 	// ExtractCertificateRequest generates a new key request, and we want to continue to use the old
 	// key.  However, ExtractCertificateRequest will also convert the pkix.Name to csr.Name, which we
 	// need in order to generate a signing request
 	rcaSigner, err := rca.Signer()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	rootCert := rcaSigner.parsedCert
 	cfCSRObj := csr.ExtractCertificateRequest(rootCert)
 
-	der, err := x509.CreateCertificateRequest(cryptorand.Reader, &x509.CertificateRequest***REMOVED***
+	der, err := x509.CreateCertificateRequest(cryptorand.Reader, &x509.CertificateRequest{
 		RawSubjectPublicKeyInfo: rootCert.RawSubjectPublicKeyInfo,
 		RawSubject:              rootCert.RawSubject,
 		PublicKeyAlgorithm:      rootCert.PublicKeyAlgorithm,
@@ -156,75 +156,75 @@ func (eca *ExternalCA) CrossSignRootCA(ctx context.Context, rca RootCA) ([]byte,
 		DNSNames:                rootCert.DNSNames,
 		EmailAddresses:          rootCert.EmailAddresses,
 		IPAddresses:             rootCert.IPAddresses,
-	***REMOVED***, rcaSigner.cryptoSigner)
-	if err != nil ***REMOVED***
+	}, rcaSigner.cryptoSigner)
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	req := signer.SignRequest***REMOVED***
-		Request: string(pem.EncodeToMemory(&pem.Block***REMOVED***
+	}
+	req := signer.SignRequest{
+		Request: string(pem.EncodeToMemory(&pem.Block{
 			Type:  "CERTIFICATE REQUEST",
 			Bytes: der,
-		***REMOVED***)),
-		Subject: &signer.Subject***REMOVED***
+		})),
+		Subject: &signer.Subject{
 			CN:    rootCert.Subject.CommonName,
 			Names: cfCSRObj.Names,
-		***REMOVED***,
+		},
 		Profile: ExternalCrossSignProfile,
-	***REMOVED***
+	}
 	// cfssl actually ignores non subject alt name extensions in the CSR, so we have to add the CA extension in the signing
 	// request as well
-	for _, ext := range rootCert.Extensions ***REMOVED***
-		if ext.Id.Equal(BasicConstraintsOID) ***REMOVED***
-			req.Extensions = append(req.Extensions, signer.Extension***REMOVED***
+	for _, ext := range rootCert.Extensions {
+		if ext.Id.Equal(BasicConstraintsOID) {
+			req.Extensions = append(req.Extensions, signer.Extension{
 				ID:       config.OID(ext.Id),
 				Critical: ext.Critical,
 				Value:    hex.EncodeToString(ext.Value),
-			***REMOVED***)
-		***REMOVED***
-	***REMOVED***
+			})
+		}
+	}
 	return eca.Sign(ctx, req)
-***REMOVED***
+}
 
-func makeExternalSignRequest(ctx context.Context, client *http.Client, url string, csrJSON []byte) (cert []byte, err error) ***REMOVED***
+func makeExternalSignRequest(ctx context.Context, client *http.Client, url string, csrJSON []byte) (cert []byte, err error) {
 	resp, err := ctxhttp.Post(ctx, client, url, "application/json", bytes.NewReader(csrJSON))
-	if err != nil ***REMOVED***
-		return nil, recoverableErr***REMOVED***err: errors.Wrap(err, "unable to perform certificate signing request")***REMOVED***
-	***REMOVED***
+	if err != nil {
+		return nil, recoverableErr{err: errors.Wrap(err, "unable to perform certificate signing request")}
+	}
 	defer resp.Body.Close()
 
 	b := io.LimitReader(resp.Body, CertificateMaxSize)
 	body, err := ioutil.ReadAll(b)
-	if err != nil ***REMOVED***
-		return nil, recoverableErr***REMOVED***err: errors.Wrap(err, "unable to read CSR response body")***REMOVED***
-	***REMOVED***
+	if err != nil {
+		return nil, recoverableErr{err: errors.Wrap(err, "unable to read CSR response body")}
+	}
 
-	if resp.StatusCode != http.StatusOK ***REMOVED***
-		return nil, recoverableErr***REMOVED***err: errors.Errorf("unexpected status code in CSR response: %d - %s", resp.StatusCode, string(body))***REMOVED***
-	***REMOVED***
+	if resp.StatusCode != http.StatusOK {
+		return nil, recoverableErr{err: errors.Errorf("unexpected status code in CSR response: %d - %s", resp.StatusCode, string(body))}
+	}
 
 	var apiResponse api.Response
-	if err := json.Unmarshal(body, &apiResponse); err != nil ***REMOVED***
+	if err := json.Unmarshal(body, &apiResponse); err != nil {
 		logrus.Debugf("unable to JSON-parse CFSSL API response body: %s", string(body))
-		return nil, recoverableErr***REMOVED***err: errors.Wrap(err, "unable to parse JSON response")***REMOVED***
-	***REMOVED***
+		return nil, recoverableErr{err: errors.Wrap(err, "unable to parse JSON response")}
+	}
 
-	if !apiResponse.Success || apiResponse.Result == nil ***REMOVED***
-		if len(apiResponse.Errors) > 0 ***REMOVED***
+	if !apiResponse.Success || apiResponse.Result == nil {
+		if len(apiResponse.Errors) > 0 {
 			return nil, errors.Errorf("response errors: %v", apiResponse.Errors)
-		***REMOVED***
+		}
 
 		return nil, errors.New("certificate signing request failed")
-	***REMOVED***
+	}
 
-	result, ok := apiResponse.Result.(map[string]interface***REMOVED******REMOVED***)
-	if !ok ***REMOVED***
+	result, ok := apiResponse.Result.(map[string]interface{})
+	if !ok {
 		return nil, errors.Errorf("invalid result type: %T", apiResponse.Result)
-	***REMOVED***
+	}
 
 	certPEM, ok := result["certificate"].(string)
-	if !ok ***REMOVED***
+	if !ok {
 		return nil, errors.Errorf("invalid result certificate field type: %T", result["certificate"])
-	***REMOVED***
+	}
 
 	return []byte(certPEM), nil
-***REMOVED***
+}

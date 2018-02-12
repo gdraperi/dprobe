@@ -27,12 +27,12 @@ import (
 
 const sshdConfig = `
 Protocol 2
-Banner ***REMOVED******REMOVED***.Dir***REMOVED******REMOVED***/banner
-HostKey ***REMOVED******REMOVED***.Dir***REMOVED******REMOVED***/id_rsa
-HostKey ***REMOVED******REMOVED***.Dir***REMOVED******REMOVED***/id_dsa
-HostKey ***REMOVED******REMOVED***.Dir***REMOVED******REMOVED***/id_ecdsa
-HostCertificate ***REMOVED******REMOVED***.Dir***REMOVED******REMOVED***/id_rsa-cert.pub
-Pidfile ***REMOVED******REMOVED***.Dir***REMOVED******REMOVED***/sshd.pid
+Banner {{.Dir}}/banner
+HostKey {{.Dir}}/id_rsa
+HostKey {{.Dir}}/id_dsa
+HostKey {{.Dir}}/id_ecdsa
+HostCertificate {{.Dir}}/id_rsa-cert.pub
+Pidfile {{.Dir}}/sshd.pid
 #UsePrivilegeSeparation no
 KeyRegenerationInterval 3600
 ServerKeyBits 768
@@ -43,8 +43,8 @@ PermitRootLogin no
 StrictModes no
 RSAAuthentication yes
 PubkeyAuthentication yes
-AuthorizedKeysFile	***REMOVED******REMOVED***.Dir***REMOVED******REMOVED***/authorized_keys
-TrustedUserCAKeys ***REMOVED******REMOVED***.Dir***REMOVED******REMOVED***/id_ecdsa.pub
+AuthorizedKeysFile	{{.Dir}}/authorized_keys
+TrustedUserCAKeys {{.Dir}}/id_ecdsa.pub
 IgnoreRhosts yes
 RhostsRSAAuthentication no
 HostbasedAuthentication no
@@ -53,7 +53,7 @@ PubkeyAcceptedKeyTypes=*
 
 var configTmpl = template.Must(template.New("").Parse(sshdConfig))
 
-type server struct ***REMOVED***
+type server struct {
 	t          *testing.T
 	cleanup    func() // executed during Shutdown
 	configfile string
@@ -62,237 +62,237 @@ type server struct ***REMOVED***
 
 	// Client half of the network connection.
 	clientConn net.Conn
-***REMOVED***
+}
 
-func username() string ***REMOVED***
+func username() string {
 	var username string
-	if user, err := user.Current(); err == nil ***REMOVED***
+	if user, err := user.Current(); err == nil {
 		username = user.Username
-	***REMOVED*** else ***REMOVED***
+	} else {
 		// user.Current() currently requires cgo. If an error is
 		// returned attempt to get the username from the environment.
 		log.Printf("user.Current: %v; falling back on $USER", err)
 		username = os.Getenv("USER")
-	***REMOVED***
-	if username == "" ***REMOVED***
+	}
+	if username == "" {
 		panic("Unable to get username")
-	***REMOVED***
+	}
 	return username
-***REMOVED***
+}
 
-type storedHostKey struct ***REMOVED***
+type storedHostKey struct {
 	// keys map from an algorithm string to binary key data.
 	keys map[string][]byte
 
 	// checkCount counts the Check calls. Used for testing
 	// rekeying.
 	checkCount int
-***REMOVED***
+}
 
-func (k *storedHostKey) Add(key ssh.PublicKey) ***REMOVED***
-	if k.keys == nil ***REMOVED***
-		k.keys = map[string][]byte***REMOVED******REMOVED***
-	***REMOVED***
+func (k *storedHostKey) Add(key ssh.PublicKey) {
+	if k.keys == nil {
+		k.keys = map[string][]byte{}
+	}
 	k.keys[key.Type()] = key.Marshal()
-***REMOVED***
+}
 
-func (k *storedHostKey) Check(addr string, remote net.Addr, key ssh.PublicKey) error ***REMOVED***
+func (k *storedHostKey) Check(addr string, remote net.Addr, key ssh.PublicKey) error {
 	k.checkCount++
 	algo := key.Type()
 
-	if k.keys == nil || bytes.Compare(key.Marshal(), k.keys[algo]) != 0 ***REMOVED***
+	if k.keys == nil || bytes.Compare(key.Marshal(), k.keys[algo]) != 0 {
 		return fmt.Errorf("host key mismatch. Got %q, want %q", key, k.keys[algo])
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func hostKeyDB() *storedHostKey ***REMOVED***
-	keyChecker := &storedHostKey***REMOVED******REMOVED***
+func hostKeyDB() *storedHostKey {
+	keyChecker := &storedHostKey{}
 	keyChecker.Add(testPublicKeys["ecdsa"])
 	keyChecker.Add(testPublicKeys["rsa"])
 	keyChecker.Add(testPublicKeys["dsa"])
 	return keyChecker
-***REMOVED***
+}
 
-func clientConfig() *ssh.ClientConfig ***REMOVED***
-	config := &ssh.ClientConfig***REMOVED***
+func clientConfig() *ssh.ClientConfig {
+	config := &ssh.ClientConfig{
 		User: username(),
-		Auth: []ssh.AuthMethod***REMOVED***
+		Auth: []ssh.AuthMethod{
 			ssh.PublicKeys(testSigners["user"]),
-		***REMOVED***,
+		},
 		HostKeyCallback: hostKeyDB().Check,
-		HostKeyAlgorithms: []string***REMOVED*** // by default, don't allow certs as this affects the hostKeyDB checker
+		HostKeyAlgorithms: []string{ // by default, don't allow certs as this affects the hostKeyDB checker
 			ssh.KeyAlgoECDSA256, ssh.KeyAlgoECDSA384, ssh.KeyAlgoECDSA521,
 			ssh.KeyAlgoRSA, ssh.KeyAlgoDSA,
 			ssh.KeyAlgoED25519,
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 	return config
-***REMOVED***
+}
 
 // unixConnection creates two halves of a connected net.UnixConn.  It
 // is used for connecting the Go SSH client with sshd without opening
 // ports.
-func unixConnection() (*net.UnixConn, *net.UnixConn, error) ***REMOVED***
+func unixConnection() (*net.UnixConn, *net.UnixConn, error) {
 	dir, err := ioutil.TempDir("", "unixConnection")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 	defer os.Remove(dir)
 
 	addr := filepath.Join(dir, "ssh")
 	listener, err := net.Listen("unix", addr)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 	defer listener.Close()
 	c1, err := net.Dial("unix", addr)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 
 	c2, err := listener.Accept()
-	if err != nil ***REMOVED***
+	if err != nil {
 		c1.Close()
 		return nil, nil, err
-	***REMOVED***
+	}
 
 	return c1.(*net.UnixConn), c2.(*net.UnixConn), nil
-***REMOVED***
+}
 
-func (s *server) TryDial(config *ssh.ClientConfig) (*ssh.Client, error) ***REMOVED***
+func (s *server) TryDial(config *ssh.ClientConfig) (*ssh.Client, error) {
 	return s.TryDialWithAddr(config, "")
-***REMOVED***
+}
 
 // addr is the user specified host:port. While we don't actually dial it,
 // we need to know this for host key matching
-func (s *server) TryDialWithAddr(config *ssh.ClientConfig, addr string) (*ssh.Client, error) ***REMOVED***
+func (s *server) TryDialWithAddr(config *ssh.ClientConfig, addr string) (*ssh.Client, error) {
 	sshd, err := exec.LookPath("sshd")
-	if err != nil ***REMOVED***
+	if err != nil {
 		s.t.Skipf("skipping test: %v", err)
-	***REMOVED***
+	}
 
 	c1, c2, err := unixConnection()
-	if err != nil ***REMOVED***
+	if err != nil {
 		s.t.Fatalf("unixConnection: %v", err)
-	***REMOVED***
+	}
 
 	s.cmd = exec.Command(sshd, "-f", s.configfile, "-i", "-e")
 	f, err := c2.File()
-	if err != nil ***REMOVED***
+	if err != nil {
 		s.t.Fatalf("UnixConn.File: %v", err)
-	***REMOVED***
+	}
 	defer f.Close()
 	s.cmd.Stdin = f
 	s.cmd.Stdout = f
 	s.cmd.Stderr = &s.output
-	if err := s.cmd.Start(); err != nil ***REMOVED***
+	if err := s.cmd.Start(); err != nil {
 		s.t.Fail()
 		s.Shutdown()
 		s.t.Fatalf("s.cmd.Start: %v", err)
-	***REMOVED***
+	}
 	s.clientConn = c1
 	conn, chans, reqs, err := ssh.NewClientConn(c1, addr, config)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return ssh.NewClient(conn, chans, reqs), nil
-***REMOVED***
+}
 
-func (s *server) Dial(config *ssh.ClientConfig) *ssh.Client ***REMOVED***
+func (s *server) Dial(config *ssh.ClientConfig) *ssh.Client {
 	conn, err := s.TryDial(config)
-	if err != nil ***REMOVED***
+	if err != nil {
 		s.t.Fail()
 		s.Shutdown()
 		s.t.Fatalf("ssh.Client: %v", err)
-	***REMOVED***
+	}
 	return conn
-***REMOVED***
+}
 
-func (s *server) Shutdown() ***REMOVED***
-	if s.cmd != nil && s.cmd.Process != nil ***REMOVED***
+func (s *server) Shutdown() {
+	if s.cmd != nil && s.cmd.Process != nil {
 		// Don't check for errors; if it fails it's most
 		// likely "os: process already finished", and we don't
 		// care about that. Use os.Interrupt, so child
 		// processes are killed too.
 		s.cmd.Process.Signal(os.Interrupt)
 		s.cmd.Wait()
-	***REMOVED***
-	if s.t.Failed() ***REMOVED***
+	}
+	if s.t.Failed() {
 		// log any output from sshd process
 		s.t.Logf("sshd: %s", s.output.String())
-	***REMOVED***
+	}
 	s.cleanup()
-***REMOVED***
+}
 
-func writeFile(path string, contents []byte) ***REMOVED***
+func writeFile(path string, contents []byte) {
 	f, err := os.OpenFile(path, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0600)
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 	defer f.Close()
-	if _, err := f.Write(contents); err != nil ***REMOVED***
+	if _, err := f.Write(contents); err != nil {
 		panic(err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // newServer returns a new mock ssh server.
-func newServer(t *testing.T) *server ***REMOVED***
-	if testing.Short() ***REMOVED***
+func newServer(t *testing.T) *server {
+	if testing.Short() {
 		t.Skip("skipping test due to -short")
-	***REMOVED***
+	}
 	dir, err := ioutil.TempDir("", "sshtest")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	f, err := os.Create(filepath.Join(dir, "sshd_config"))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	err = configTmpl.Execute(f, map[string]string***REMOVED***
+	}
+	err = configTmpl.Execute(f, map[string]string{
 		"Dir": dir,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	f.Close()
 
 	writeFile(filepath.Join(dir, "banner"), []byte("Server Banner"))
 
-	for k, v := range testdata.PEMBytes ***REMOVED***
+	for k, v := range testdata.PEMBytes {
 		filename := "id_" + k
 		writeFile(filepath.Join(dir, filename), v)
 		writeFile(filepath.Join(dir, filename+".pub"), ssh.MarshalAuthorizedKey(testPublicKeys[k]))
-	***REMOVED***
+	}
 
-	for k, v := range testdata.SSHCertificates ***REMOVED***
+	for k, v := range testdata.SSHCertificates {
 		filename := "id_" + k + "-cert.pub"
 		writeFile(filepath.Join(dir, filename), v)
-	***REMOVED***
+	}
 
 	var authkeys bytes.Buffer
-	for k := range testdata.PEMBytes ***REMOVED***
+	for k := range testdata.PEMBytes {
 		authkeys.Write(ssh.MarshalAuthorizedKey(testPublicKeys[k]))
-	***REMOVED***
+	}
 	writeFile(filepath.Join(dir, "authorized_keys"), authkeys.Bytes())
 
-	return &server***REMOVED***
+	return &server{
 		t:          t,
 		configfile: f.Name(),
-		cleanup: func() ***REMOVED***
-			if err := os.RemoveAll(dir); err != nil ***REMOVED***
+		cleanup: func() {
+			if err := os.RemoveAll(dir); err != nil {
 				t.Error(err)
-			***REMOVED***
-		***REMOVED***,
-	***REMOVED***
-***REMOVED***
+			}
+		},
+	}
+}
 
-func newTempSocket(t *testing.T) (string, func()) ***REMOVED***
+func newTempSocket(t *testing.T) (string, func()) {
 	dir, err := ioutil.TempDir("", "socket")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	deferFunc := func() ***REMOVED*** os.RemoveAll(dir) ***REMOVED***
+	}
+	deferFunc := func() { os.RemoveAll(dir) }
 	addr := filepath.Join(dir, "sock")
 	return addr, deferFunc
-***REMOVED***
+}

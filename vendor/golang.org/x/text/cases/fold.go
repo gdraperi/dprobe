@@ -6,29 +6,29 @@ package cases
 
 import "golang.org/x/text/transform"
 
-type caseFolder struct***REMOVED*** transform.NopResetter ***REMOVED***
+type caseFolder struct{ transform.NopResetter }
 
 // caseFolder implements the Transformer interface for doing case folding.
-func (t *caseFolder) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) ***REMOVED***
-	c := context***REMOVED***dst: dst, src: src, atEOF: atEOF***REMOVED***
-	for c.next() ***REMOVED***
+func (t *caseFolder) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) {
+	c := context{dst: dst, src: src, atEOF: atEOF}
+	for c.next() {
 		foldFull(&c)
 		c.checkpoint()
-	***REMOVED***
+	}
 	return c.ret()
-***REMOVED***
+}
 
-func (t *caseFolder) Span(src []byte, atEOF bool) (n int, err error) ***REMOVED***
-	c := context***REMOVED***src: src, atEOF: atEOF***REMOVED***
-	for c.next() && isFoldFull(&c) ***REMOVED***
+func (t *caseFolder) Span(src []byte, atEOF bool) (n int, err error) {
+	c := context{src: src, atEOF: atEOF}
+	for c.next() && isFoldFull(&c) {
 		c.checkpoint()
-	***REMOVED***
+	}
 	return c.retSpan()
-***REMOVED***
+}
 
-func makeFold(o options) transform.SpanningTransformer ***REMOVED***
+func makeFold(o options) transform.SpanningTransformer {
 	// TODO: Special case folding, through option Language, Special/Turkic, or
 	// both.
 	// TODO: Implement Compact options.
-	return &caseFolder***REMOVED******REMOVED***
-***REMOVED***
+	return &caseFolder{}
+}

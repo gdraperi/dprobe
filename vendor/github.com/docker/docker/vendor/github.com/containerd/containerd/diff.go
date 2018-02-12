@@ -11,73 +11,73 @@ import (
 
 // NewDiffServiceFromClient returns a new diff service which communicates
 // over a GRPC connection.
-func NewDiffServiceFromClient(client diffapi.DiffClient) diff.Differ ***REMOVED***
-	return &diffRemote***REMOVED***
+func NewDiffServiceFromClient(client diffapi.DiffClient) diff.Differ {
+	return &diffRemote{
 		client: client,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type diffRemote struct ***REMOVED***
+type diffRemote struct {
 	client diffapi.DiffClient
-***REMOVED***
+}
 
-func (r *diffRemote) Apply(ctx context.Context, diff ocispec.Descriptor, mounts []mount.Mount) (ocispec.Descriptor, error) ***REMOVED***
-	req := &diffapi.ApplyRequest***REMOVED***
+func (r *diffRemote) Apply(ctx context.Context, diff ocispec.Descriptor, mounts []mount.Mount) (ocispec.Descriptor, error) {
+	req := &diffapi.ApplyRequest{
 		Diff:   fromDescriptor(diff),
 		Mounts: fromMounts(mounts),
-	***REMOVED***
+	}
 	resp, err := r.client.Apply(ctx, req)
-	if err != nil ***REMOVED***
-		return ocispec.Descriptor***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return ocispec.Descriptor{}, err
+	}
 	return toDescriptor(resp.Applied), nil
-***REMOVED***
+}
 
-func (r *diffRemote) DiffMounts(ctx context.Context, a, b []mount.Mount, opts ...diff.Opt) (ocispec.Descriptor, error) ***REMOVED***
+func (r *diffRemote) DiffMounts(ctx context.Context, a, b []mount.Mount, opts ...diff.Opt) (ocispec.Descriptor, error) {
 	var config diff.Config
-	for _, opt := range opts ***REMOVED***
-		if err := opt(&config); err != nil ***REMOVED***
-			return ocispec.Descriptor***REMOVED******REMOVED***, err
-		***REMOVED***
-	***REMOVED***
-	req := &diffapi.DiffRequest***REMOVED***
+	for _, opt := range opts {
+		if err := opt(&config); err != nil {
+			return ocispec.Descriptor{}, err
+		}
+	}
+	req := &diffapi.DiffRequest{
 		Left:      fromMounts(a),
 		Right:     fromMounts(b),
 		MediaType: config.MediaType,
 		Ref:       config.Reference,
 		Labels:    config.Labels,
-	***REMOVED***
+	}
 	resp, err := r.client.Diff(ctx, req)
-	if err != nil ***REMOVED***
-		return ocispec.Descriptor***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return ocispec.Descriptor{}, err
+	}
 	return toDescriptor(resp.Diff), nil
-***REMOVED***
+}
 
-func toDescriptor(d *types.Descriptor) ocispec.Descriptor ***REMOVED***
-	return ocispec.Descriptor***REMOVED***
+func toDescriptor(d *types.Descriptor) ocispec.Descriptor {
+	return ocispec.Descriptor{
 		MediaType: d.MediaType,
 		Digest:    d.Digest,
 		Size:      d.Size_,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func fromDescriptor(d ocispec.Descriptor) *types.Descriptor ***REMOVED***
-	return &types.Descriptor***REMOVED***
+func fromDescriptor(d ocispec.Descriptor) *types.Descriptor {
+	return &types.Descriptor{
 		MediaType: d.MediaType,
 		Digest:    d.Digest,
 		Size_:     d.Size,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func fromMounts(mounts []mount.Mount) []*types.Mount ***REMOVED***
+func fromMounts(mounts []mount.Mount) []*types.Mount {
 	apiMounts := make([]*types.Mount, len(mounts))
-	for i, m := range mounts ***REMOVED***
-		apiMounts[i] = &types.Mount***REMOVED***
+	for i, m := range mounts {
+		apiMounts[i] = &types.Mount{
 			Type:    m.Type,
 			Source:  m.Source,
 			Options: m.Options,
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return apiMounts
-***REMOVED***
+}

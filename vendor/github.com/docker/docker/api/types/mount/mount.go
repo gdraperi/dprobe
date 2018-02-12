@@ -20,7 +20,7 @@ const (
 )
 
 // Mount represents a mount (volume).
-type Mount struct ***REMOVED***
+type Mount struct {
 	Type Type `json:",omitempty"`
 	// Source specifies the name of the mount. Depending on mount type, this
 	// may be a volume name or a host path, or even ignored.
@@ -33,7 +33,7 @@ type Mount struct ***REMOVED***
 	BindOptions   *BindOptions   `json:",omitempty"`
 	VolumeOptions *VolumeOptions `json:",omitempty"`
 	TmpfsOptions  *TmpfsOptions  `json:",omitempty"`
-***REMOVED***
+}
 
 // Propagation represents the propagation of a mount.
 type Propagation string
@@ -54,14 +54,14 @@ const (
 )
 
 // Propagations is the list of all valid mount propagations
-var Propagations = []Propagation***REMOVED***
+var Propagations = []Propagation{
 	PropagationRPrivate,
 	PropagationPrivate,
 	PropagationRShared,
 	PropagationShared,
 	PropagationRSlave,
 	PropagationSlave,
-***REMOVED***
+}
 
 // Consistency represents the consistency requirements of a mount.
 type Consistency string
@@ -78,25 +78,25 @@ const (
 )
 
 // BindOptions defines options specific to mounts of type "bind".
-type BindOptions struct ***REMOVED***
+type BindOptions struct {
 	Propagation Propagation `json:",omitempty"`
-***REMOVED***
+}
 
 // VolumeOptions represents the options for a mount of type volume.
-type VolumeOptions struct ***REMOVED***
+type VolumeOptions struct {
 	NoCopy       bool              `json:",omitempty"`
 	Labels       map[string]string `json:",omitempty"`
 	DriverConfig *Driver           `json:",omitempty"`
-***REMOVED***
+}
 
 // Driver represents a volume driver.
-type Driver struct ***REMOVED***
+type Driver struct {
 	Name    string            `json:",omitempty"`
 	Options map[string]string `json:",omitempty"`
-***REMOVED***
+}
 
 // TmpfsOptions defines options specific to mounts of type "tmpfs".
-type TmpfsOptions struct ***REMOVED***
+type TmpfsOptions struct {
 	// Size sets the size of the tmpfs, in bytes.
 	//
 	// This will be converted to an operating system specific value
@@ -114,7 +114,7 @@ type TmpfsOptions struct ***REMOVED***
 	//
 	// From docker/docker/pkg/mount/flags.go:
 	//
-	// var validFlags = map[string]bool***REMOVED***
+	// var validFlags = map[string]bool{
 	// 	"":          true,
 	// 	"size":      true, X
 	// 	"mode":      true, X
@@ -123,8 +123,8 @@ type TmpfsOptions struct ***REMOVED***
 	// 	"nr_inodes": true,
 	// 	"nr_blocks": true,
 	// 	"mpol":      true,
-	// ***REMOVED***
+	// }
 	//
 	// Some of these may be straightforward to add, but others, such as
 	// uid/gid have implications in a clustered system.
-***REMOVED***
+}

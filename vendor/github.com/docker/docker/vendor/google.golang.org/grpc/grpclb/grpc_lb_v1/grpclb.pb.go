@@ -36,7 +36,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
-type Duration struct ***REMOVED***
+type Duration struct {
 	// Signed seconds of the span of time. Must be from -315,576,000,000
 	// to +315,576,000,000 inclusive.
 	Seconds int64 `protobuf:"varint,1,opt,name=seconds" json:"seconds,omitempty"`
@@ -47,28 +47,28 @@ type Duration struct ***REMOVED***
 	// of the same sign as the `seconds` field. Must be from -999,999,999
 	// to +999,999,999 inclusive.
 	Nanos int32 `protobuf:"varint,2,opt,name=nanos" json:"nanos,omitempty"`
-***REMOVED***
+}
 
-func (m *Duration) Reset()                    ***REMOVED*** *m = Duration***REMOVED******REMOVED*** ***REMOVED***
-func (m *Duration) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*Duration) ProtoMessage()               ***REMOVED******REMOVED***
-func (*Duration) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***0***REMOVED*** ***REMOVED***
+func (m *Duration) Reset()                    { *m = Duration{} }
+func (m *Duration) String() string            { return proto.CompactTextString(m) }
+func (*Duration) ProtoMessage()               {}
+func (*Duration) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
-func (m *Duration) GetSeconds() int64 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Duration) GetSeconds() int64 {
+	if m != nil {
 		return m.Seconds
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *Duration) GetNanos() int32 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Duration) GetNanos() int32 {
+	if m != nil {
 		return m.Nanos
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-type Timestamp struct ***REMOVED***
+type Timestamp struct {
 	// Represents seconds of UTC time since Unix epoch
 	// 1970-01-01T00:00:00Z. Must be from 0001-01-01T00:00:00Z to
 	// 9999-12-31T23:59:59Z inclusive.
@@ -78,131 +78,131 @@ type Timestamp struct ***REMOVED***
 	// that count forward in time. Must be from 0 to 999,999,999
 	// inclusive.
 	Nanos int32 `protobuf:"varint,2,opt,name=nanos" json:"nanos,omitempty"`
-***REMOVED***
+}
 
-func (m *Timestamp) Reset()                    ***REMOVED*** *m = Timestamp***REMOVED******REMOVED*** ***REMOVED***
-func (m *Timestamp) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*Timestamp) ProtoMessage()               ***REMOVED******REMOVED***
-func (*Timestamp) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***1***REMOVED*** ***REMOVED***
+func (m *Timestamp) Reset()                    { *m = Timestamp{} }
+func (m *Timestamp) String() string            { return proto.CompactTextString(m) }
+func (*Timestamp) ProtoMessage()               {}
+func (*Timestamp) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
 
-func (m *Timestamp) GetSeconds() int64 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Timestamp) GetSeconds() int64 {
+	if m != nil {
 		return m.Seconds
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *Timestamp) GetNanos() int32 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Timestamp) GetNanos() int32 {
+	if m != nil {
 		return m.Nanos
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-type LoadBalanceRequest struct ***REMOVED***
+type LoadBalanceRequest struct {
 	// Types that are valid to be assigned to LoadBalanceRequestType:
 	//	*LoadBalanceRequest_InitialRequest
 	//	*LoadBalanceRequest_ClientStats
 	LoadBalanceRequestType isLoadBalanceRequest_LoadBalanceRequestType `protobuf_oneof:"load_balance_request_type"`
-***REMOVED***
+}
 
-func (m *LoadBalanceRequest) Reset()                    ***REMOVED*** *m = LoadBalanceRequest***REMOVED******REMOVED*** ***REMOVED***
-func (m *LoadBalanceRequest) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*LoadBalanceRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*LoadBalanceRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***2***REMOVED*** ***REMOVED***
+func (m *LoadBalanceRequest) Reset()                    { *m = LoadBalanceRequest{} }
+func (m *LoadBalanceRequest) String() string            { return proto.CompactTextString(m) }
+func (*LoadBalanceRequest) ProtoMessage()               {}
+func (*LoadBalanceRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
 
-type isLoadBalanceRequest_LoadBalanceRequestType interface ***REMOVED***
+type isLoadBalanceRequest_LoadBalanceRequestType interface {
 	isLoadBalanceRequest_LoadBalanceRequestType()
-***REMOVED***
+}
 
-type LoadBalanceRequest_InitialRequest struct ***REMOVED***
+type LoadBalanceRequest_InitialRequest struct {
 	InitialRequest *InitialLoadBalanceRequest `protobuf:"bytes,1,opt,name=initial_request,json=initialRequest,oneof"`
-***REMOVED***
-type LoadBalanceRequest_ClientStats struct ***REMOVED***
+}
+type LoadBalanceRequest_ClientStats struct {
 	ClientStats *ClientStats `protobuf:"bytes,2,opt,name=client_stats,json=clientStats,oneof"`
-***REMOVED***
+}
 
-func (*LoadBalanceRequest_InitialRequest) isLoadBalanceRequest_LoadBalanceRequestType() ***REMOVED******REMOVED***
-func (*LoadBalanceRequest_ClientStats) isLoadBalanceRequest_LoadBalanceRequestType()    ***REMOVED******REMOVED***
+func (*LoadBalanceRequest_InitialRequest) isLoadBalanceRequest_LoadBalanceRequestType() {}
+func (*LoadBalanceRequest_ClientStats) isLoadBalanceRequest_LoadBalanceRequestType()    {}
 
-func (m *LoadBalanceRequest) GetLoadBalanceRequestType() isLoadBalanceRequest_LoadBalanceRequestType ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *LoadBalanceRequest) GetLoadBalanceRequestType() isLoadBalanceRequest_LoadBalanceRequestType {
+	if m != nil {
 		return m.LoadBalanceRequestType
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *LoadBalanceRequest) GetInitialRequest() *InitialLoadBalanceRequest ***REMOVED***
-	if x, ok := m.GetLoadBalanceRequestType().(*LoadBalanceRequest_InitialRequest); ok ***REMOVED***
+func (m *LoadBalanceRequest) GetInitialRequest() *InitialLoadBalanceRequest {
+	if x, ok := m.GetLoadBalanceRequestType().(*LoadBalanceRequest_InitialRequest); ok {
 		return x.InitialRequest
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *LoadBalanceRequest) GetClientStats() *ClientStats ***REMOVED***
-	if x, ok := m.GetLoadBalanceRequestType().(*LoadBalanceRequest_ClientStats); ok ***REMOVED***
+func (m *LoadBalanceRequest) GetClientStats() *ClientStats {
+	if x, ok := m.GetLoadBalanceRequestType().(*LoadBalanceRequest_ClientStats); ok {
 		return x.ClientStats
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // XXX_OneofFuncs is for the internal use of the proto package.
-func (*LoadBalanceRequest) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface***REMOVED******REMOVED***) ***REMOVED***
-	return _LoadBalanceRequest_OneofMarshaler, _LoadBalanceRequest_OneofUnmarshaler, _LoadBalanceRequest_OneofSizer, []interface***REMOVED******REMOVED******REMOVED***
+func (*LoadBalanceRequest) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
+	return _LoadBalanceRequest_OneofMarshaler, _LoadBalanceRequest_OneofUnmarshaler, _LoadBalanceRequest_OneofSizer, []interface{}{
 		(*LoadBalanceRequest_InitialRequest)(nil),
 		(*LoadBalanceRequest_ClientStats)(nil),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func _LoadBalanceRequest_OneofMarshaler(msg proto.Message, b *proto.Buffer) error ***REMOVED***
+func _LoadBalanceRequest_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
 	m := msg.(*LoadBalanceRequest)
 	// load_balance_request_type
-	switch x := m.LoadBalanceRequestType.(type) ***REMOVED***
+	switch x := m.LoadBalanceRequestType.(type) {
 	case *LoadBalanceRequest_InitialRequest:
 		b.EncodeVarint(1<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.InitialRequest); err != nil ***REMOVED***
+		if err := b.EncodeMessage(x.InitialRequest); err != nil {
 			return err
-		***REMOVED***
+		}
 	case *LoadBalanceRequest_ClientStats:
 		b.EncodeVarint(2<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.ClientStats); err != nil ***REMOVED***
+		if err := b.EncodeMessage(x.ClientStats); err != nil {
 			return err
-		***REMOVED***
+		}
 	case nil:
 	default:
 		return fmt.Errorf("LoadBalanceRequest.LoadBalanceRequestType has unexpected type %T", x)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func _LoadBalanceRequest_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) ***REMOVED***
+func _LoadBalanceRequest_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
 	m := msg.(*LoadBalanceRequest)
-	switch tag ***REMOVED***
+	switch tag {
 	case 1: // load_balance_request_type.initial_request
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		msg := new(InitialLoadBalanceRequest)
 		err := b.DecodeMessage(msg)
-		m.LoadBalanceRequestType = &LoadBalanceRequest_InitialRequest***REMOVED***msg***REMOVED***
+		m.LoadBalanceRequestType = &LoadBalanceRequest_InitialRequest{msg}
 		return true, err
 	case 2: // load_balance_request_type.client_stats
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		msg := new(ClientStats)
 		err := b.DecodeMessage(msg)
-		m.LoadBalanceRequestType = &LoadBalanceRequest_ClientStats***REMOVED***msg***REMOVED***
+		m.LoadBalanceRequestType = &LoadBalanceRequest_ClientStats{msg}
 		return true, err
 	default:
 		return false, nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func _LoadBalanceRequest_OneofSizer(msg proto.Message) (n int) ***REMOVED***
+func _LoadBalanceRequest_OneofSizer(msg proto.Message) (n int) {
 	m := msg.(*LoadBalanceRequest)
 	// load_balance_request_type
-	switch x := m.LoadBalanceRequestType.(type) ***REMOVED***
+	switch x := m.LoadBalanceRequestType.(type) {
 	case *LoadBalanceRequest_InitialRequest:
 		s := proto.Size(x.InitialRequest)
 		n += proto.SizeVarint(1<<3 | proto.WireBytes)
@@ -216,31 +216,31 @@ func _LoadBalanceRequest_OneofSizer(msg proto.Message) (n int) ***REMOVED***
 	case nil:
 	default:
 		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-type InitialLoadBalanceRequest struct ***REMOVED***
+type InitialLoadBalanceRequest struct {
 	// Name of load balanced service (IE, balancer.service.com)
 	// length should be less than 256 bytes.
 	Name string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
-***REMOVED***
+}
 
-func (m *InitialLoadBalanceRequest) Reset()                    ***REMOVED*** *m = InitialLoadBalanceRequest***REMOVED******REMOVED*** ***REMOVED***
-func (m *InitialLoadBalanceRequest) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*InitialLoadBalanceRequest) ProtoMessage()               ***REMOVED******REMOVED***
-func (*InitialLoadBalanceRequest) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***3***REMOVED*** ***REMOVED***
+func (m *InitialLoadBalanceRequest) Reset()                    { *m = InitialLoadBalanceRequest{} }
+func (m *InitialLoadBalanceRequest) String() string            { return proto.CompactTextString(m) }
+func (*InitialLoadBalanceRequest) ProtoMessage()               {}
+func (*InitialLoadBalanceRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
 
-func (m *InitialLoadBalanceRequest) GetName() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *InitialLoadBalanceRequest) GetName() string {
+	if m != nil {
 		return m.Name
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
 // Contains client level statistics that are useful to load balancing. Each
 // count except the timestamp should be reset to zero after reporting the stats.
-type ClientStats struct ***REMOVED***
+type ClientStats struct {
 	// The timestamp of generating the report.
 	Timestamp *Timestamp `protobuf:"bytes,1,opt,name=timestamp" json:"timestamp,omitempty"`
 	// The total number of RPCs that started.
@@ -258,166 +258,166 @@ type ClientStats struct ***REMOVED***
 	// The total number of RPCs that finished and are known to have been received
 	// by a server.
 	NumCallsFinishedKnownReceived int64 `protobuf:"varint,7,opt,name=num_calls_finished_known_received,json=numCallsFinishedKnownReceived" json:"num_calls_finished_known_received,omitempty"`
-***REMOVED***
+}
 
-func (m *ClientStats) Reset()                    ***REMOVED*** *m = ClientStats***REMOVED******REMOVED*** ***REMOVED***
-func (m *ClientStats) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*ClientStats) ProtoMessage()               ***REMOVED******REMOVED***
-func (*ClientStats) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***4***REMOVED*** ***REMOVED***
+func (m *ClientStats) Reset()                    { *m = ClientStats{} }
+func (m *ClientStats) String() string            { return proto.CompactTextString(m) }
+func (*ClientStats) ProtoMessage()               {}
+func (*ClientStats) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
 
-func (m *ClientStats) GetTimestamp() *Timestamp ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ClientStats) GetTimestamp() *Timestamp {
+	if m != nil {
 		return m.Timestamp
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *ClientStats) GetNumCallsStarted() int64 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ClientStats) GetNumCallsStarted() int64 {
+	if m != nil {
 		return m.NumCallsStarted
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *ClientStats) GetNumCallsFinished() int64 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ClientStats) GetNumCallsFinished() int64 {
+	if m != nil {
 		return m.NumCallsFinished
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *ClientStats) GetNumCallsFinishedWithDropForRateLimiting() int64 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ClientStats) GetNumCallsFinishedWithDropForRateLimiting() int64 {
+	if m != nil {
 		return m.NumCallsFinishedWithDropForRateLimiting
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *ClientStats) GetNumCallsFinishedWithDropForLoadBalancing() int64 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ClientStats) GetNumCallsFinishedWithDropForLoadBalancing() int64 {
+	if m != nil {
 		return m.NumCallsFinishedWithDropForLoadBalancing
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *ClientStats) GetNumCallsFinishedWithClientFailedToSend() int64 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ClientStats) GetNumCallsFinishedWithClientFailedToSend() int64 {
+	if m != nil {
 		return m.NumCallsFinishedWithClientFailedToSend
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *ClientStats) GetNumCallsFinishedKnownReceived() int64 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ClientStats) GetNumCallsFinishedKnownReceived() int64 {
+	if m != nil {
 		return m.NumCallsFinishedKnownReceived
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-type LoadBalanceResponse struct ***REMOVED***
+type LoadBalanceResponse struct {
 	// Types that are valid to be assigned to LoadBalanceResponseType:
 	//	*LoadBalanceResponse_InitialResponse
 	//	*LoadBalanceResponse_ServerList
 	LoadBalanceResponseType isLoadBalanceResponse_LoadBalanceResponseType `protobuf_oneof:"load_balance_response_type"`
-***REMOVED***
+}
 
-func (m *LoadBalanceResponse) Reset()                    ***REMOVED*** *m = LoadBalanceResponse***REMOVED******REMOVED*** ***REMOVED***
-func (m *LoadBalanceResponse) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*LoadBalanceResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*LoadBalanceResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***5***REMOVED*** ***REMOVED***
+func (m *LoadBalanceResponse) Reset()                    { *m = LoadBalanceResponse{} }
+func (m *LoadBalanceResponse) String() string            { return proto.CompactTextString(m) }
+func (*LoadBalanceResponse) ProtoMessage()               {}
+func (*LoadBalanceResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{5} }
 
-type isLoadBalanceResponse_LoadBalanceResponseType interface ***REMOVED***
+type isLoadBalanceResponse_LoadBalanceResponseType interface {
 	isLoadBalanceResponse_LoadBalanceResponseType()
-***REMOVED***
+}
 
-type LoadBalanceResponse_InitialResponse struct ***REMOVED***
+type LoadBalanceResponse_InitialResponse struct {
 	InitialResponse *InitialLoadBalanceResponse `protobuf:"bytes,1,opt,name=initial_response,json=initialResponse,oneof"`
-***REMOVED***
-type LoadBalanceResponse_ServerList struct ***REMOVED***
+}
+type LoadBalanceResponse_ServerList struct {
 	ServerList *ServerList `protobuf:"bytes,2,opt,name=server_list,json=serverList,oneof"`
-***REMOVED***
+}
 
-func (*LoadBalanceResponse_InitialResponse) isLoadBalanceResponse_LoadBalanceResponseType() ***REMOVED******REMOVED***
-func (*LoadBalanceResponse_ServerList) isLoadBalanceResponse_LoadBalanceResponseType()      ***REMOVED******REMOVED***
+func (*LoadBalanceResponse_InitialResponse) isLoadBalanceResponse_LoadBalanceResponseType() {}
+func (*LoadBalanceResponse_ServerList) isLoadBalanceResponse_LoadBalanceResponseType()      {}
 
-func (m *LoadBalanceResponse) GetLoadBalanceResponseType() isLoadBalanceResponse_LoadBalanceResponseType ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *LoadBalanceResponse) GetLoadBalanceResponseType() isLoadBalanceResponse_LoadBalanceResponseType {
+	if m != nil {
 		return m.LoadBalanceResponseType
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *LoadBalanceResponse) GetInitialResponse() *InitialLoadBalanceResponse ***REMOVED***
-	if x, ok := m.GetLoadBalanceResponseType().(*LoadBalanceResponse_InitialResponse); ok ***REMOVED***
+func (m *LoadBalanceResponse) GetInitialResponse() *InitialLoadBalanceResponse {
+	if x, ok := m.GetLoadBalanceResponseType().(*LoadBalanceResponse_InitialResponse); ok {
 		return x.InitialResponse
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *LoadBalanceResponse) GetServerList() *ServerList ***REMOVED***
-	if x, ok := m.GetLoadBalanceResponseType().(*LoadBalanceResponse_ServerList); ok ***REMOVED***
+func (m *LoadBalanceResponse) GetServerList() *ServerList {
+	if x, ok := m.GetLoadBalanceResponseType().(*LoadBalanceResponse_ServerList); ok {
 		return x.ServerList
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // XXX_OneofFuncs is for the internal use of the proto package.
-func (*LoadBalanceResponse) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface***REMOVED******REMOVED***) ***REMOVED***
-	return _LoadBalanceResponse_OneofMarshaler, _LoadBalanceResponse_OneofUnmarshaler, _LoadBalanceResponse_OneofSizer, []interface***REMOVED******REMOVED******REMOVED***
+func (*LoadBalanceResponse) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
+	return _LoadBalanceResponse_OneofMarshaler, _LoadBalanceResponse_OneofUnmarshaler, _LoadBalanceResponse_OneofSizer, []interface{}{
 		(*LoadBalanceResponse_InitialResponse)(nil),
 		(*LoadBalanceResponse_ServerList)(nil),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func _LoadBalanceResponse_OneofMarshaler(msg proto.Message, b *proto.Buffer) error ***REMOVED***
+func _LoadBalanceResponse_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
 	m := msg.(*LoadBalanceResponse)
 	// load_balance_response_type
-	switch x := m.LoadBalanceResponseType.(type) ***REMOVED***
+	switch x := m.LoadBalanceResponseType.(type) {
 	case *LoadBalanceResponse_InitialResponse:
 		b.EncodeVarint(1<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.InitialResponse); err != nil ***REMOVED***
+		if err := b.EncodeMessage(x.InitialResponse); err != nil {
 			return err
-		***REMOVED***
+		}
 	case *LoadBalanceResponse_ServerList:
 		b.EncodeVarint(2<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.ServerList); err != nil ***REMOVED***
+		if err := b.EncodeMessage(x.ServerList); err != nil {
 			return err
-		***REMOVED***
+		}
 	case nil:
 	default:
 		return fmt.Errorf("LoadBalanceResponse.LoadBalanceResponseType has unexpected type %T", x)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func _LoadBalanceResponse_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) ***REMOVED***
+func _LoadBalanceResponse_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
 	m := msg.(*LoadBalanceResponse)
-	switch tag ***REMOVED***
+	switch tag {
 	case 1: // load_balance_response_type.initial_response
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		msg := new(InitialLoadBalanceResponse)
 		err := b.DecodeMessage(msg)
-		m.LoadBalanceResponseType = &LoadBalanceResponse_InitialResponse***REMOVED***msg***REMOVED***
+		m.LoadBalanceResponseType = &LoadBalanceResponse_InitialResponse{msg}
 		return true, err
 	case 2: // load_balance_response_type.server_list
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		msg := new(ServerList)
 		err := b.DecodeMessage(msg)
-		m.LoadBalanceResponseType = &LoadBalanceResponse_ServerList***REMOVED***msg***REMOVED***
+		m.LoadBalanceResponseType = &LoadBalanceResponse_ServerList{msg}
 		return true, err
 	default:
 		return false, nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func _LoadBalanceResponse_OneofSizer(msg proto.Message) (n int) ***REMOVED***
+func _LoadBalanceResponse_OneofSizer(msg proto.Message) (n int) {
 	m := msg.(*LoadBalanceResponse)
 	// load_balance_response_type
-	switch x := m.LoadBalanceResponseType.(type) ***REMOVED***
+	switch x := m.LoadBalanceResponseType.(type) {
 	case *LoadBalanceResponse_InitialResponse:
 		s := proto.Size(x.InitialResponse)
 		n += proto.SizeVarint(1<<3 | proto.WireBytes)
@@ -431,11 +431,11 @@ func _LoadBalanceResponse_OneofSizer(msg proto.Message) (n int) ***REMOVED***
 	case nil:
 	default:
 		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
-type InitialLoadBalanceResponse struct ***REMOVED***
+type InitialLoadBalanceResponse struct {
 	// This is an application layer redirect that indicates the client should use
 	// the specified server for load balancing. When this field is non-empty in
 	// the response, the client should open a separate connection to the
@@ -446,28 +446,28 @@ type InitialLoadBalanceResponse struct ***REMOVED***
 	// to the load balancer. Stats should only be reported when the duration is
 	// positive.
 	ClientStatsReportInterval *Duration `protobuf:"bytes,2,opt,name=client_stats_report_interval,json=clientStatsReportInterval" json:"client_stats_report_interval,omitempty"`
-***REMOVED***
+}
 
-func (m *InitialLoadBalanceResponse) Reset()                    ***REMOVED*** *m = InitialLoadBalanceResponse***REMOVED******REMOVED*** ***REMOVED***
-func (m *InitialLoadBalanceResponse) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*InitialLoadBalanceResponse) ProtoMessage()               ***REMOVED******REMOVED***
-func (*InitialLoadBalanceResponse) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***6***REMOVED*** ***REMOVED***
+func (m *InitialLoadBalanceResponse) Reset()                    { *m = InitialLoadBalanceResponse{} }
+func (m *InitialLoadBalanceResponse) String() string            { return proto.CompactTextString(m) }
+func (*InitialLoadBalanceResponse) ProtoMessage()               {}
+func (*InitialLoadBalanceResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{6} }
 
-func (m *InitialLoadBalanceResponse) GetLoadBalancerDelegate() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *InitialLoadBalanceResponse) GetLoadBalancerDelegate() string {
+	if m != nil {
 		return m.LoadBalancerDelegate
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *InitialLoadBalanceResponse) GetClientStatsReportInterval() *Duration ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *InitialLoadBalanceResponse) GetClientStatsReportInterval() *Duration {
+	if m != nil {
 		return m.ClientStatsReportInterval
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-type ServerList struct ***REMOVED***
+type ServerList struct {
 	// Contains a list of servers selected by the load balancer. The list will
 	// be updated when server resolutions change or as needed to balance load
 	// across more servers. The client should consume the server list in order
@@ -478,32 +478,32 @@ type ServerList struct ***REMOVED***
 	// time after receiving the list. If the interval is not positive, the
 	// client can assume the list is valid until the next list is received.
 	ExpirationInterval *Duration `protobuf:"bytes,3,opt,name=expiration_interval,json=expirationInterval" json:"expiration_interval,omitempty"`
-***REMOVED***
+}
 
-func (m *ServerList) Reset()                    ***REMOVED*** *m = ServerList***REMOVED******REMOVED*** ***REMOVED***
-func (m *ServerList) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*ServerList) ProtoMessage()               ***REMOVED******REMOVED***
-func (*ServerList) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***7***REMOVED*** ***REMOVED***
+func (m *ServerList) Reset()                    { *m = ServerList{} }
+func (m *ServerList) String() string            { return proto.CompactTextString(m) }
+func (*ServerList) ProtoMessage()               {}
+func (*ServerList) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{7} }
 
-func (m *ServerList) GetServers() []*Server ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ServerList) GetServers() []*Server {
+	if m != nil {
 		return m.Servers
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *ServerList) GetExpirationInterval() *Duration ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *ServerList) GetExpirationInterval() *Duration {
+	if m != nil {
 		return m.ExpirationInterval
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // Contains server information. When none of the [drop_for_*] fields are true,
 // use the other fields. When drop_for_rate_limiting is true, ignore all other
 // fields. Use drop_for_load_balancing only when it is true and
 // drop_for_rate_limiting is false.
-type Server struct ***REMOVED***
+type Server struct {
 	// A resolved address for the server, serialized in network-byte-order. It may
 	// either be an IPv4 or IPv6 address.
 	IpAddress []byte `protobuf:"bytes,1,opt,name=ip_address,json=ipAddress,proto3" json:"ip_address,omitempty"`
@@ -522,49 +522,49 @@ type Server struct ***REMOVED***
 	// Indicates whether this particular request should be dropped by the client
 	// for load balancing.
 	DropForLoadBalancing bool `protobuf:"varint,5,opt,name=drop_for_load_balancing,json=dropForLoadBalancing" json:"drop_for_load_balancing,omitempty"`
-***REMOVED***
+}
 
-func (m *Server) Reset()                    ***REMOVED*** *m = Server***REMOVED******REMOVED*** ***REMOVED***
-func (m *Server) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*Server) ProtoMessage()               ***REMOVED******REMOVED***
-func (*Server) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***8***REMOVED*** ***REMOVED***
+func (m *Server) Reset()                    { *m = Server{} }
+func (m *Server) String() string            { return proto.CompactTextString(m) }
+func (*Server) ProtoMessage()               {}
+func (*Server) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{8} }
 
-func (m *Server) GetIpAddress() []byte ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Server) GetIpAddress() []byte {
+	if m != nil {
 		return m.IpAddress
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *Server) GetPort() int32 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Server) GetPort() int32 {
+	if m != nil {
 		return m.Port
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *Server) GetLoadBalanceToken() string ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Server) GetLoadBalanceToken() string {
+	if m != nil {
 		return m.LoadBalanceToken
-	***REMOVED***
+	}
 	return ""
-***REMOVED***
+}
 
-func (m *Server) GetDropForRateLimiting() bool ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Server) GetDropForRateLimiting() bool {
+	if m != nil {
 		return m.DropForRateLimiting
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
-func (m *Server) GetDropForLoadBalancing() bool ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Server) GetDropForLoadBalancing() bool {
+	if m != nil {
 		return m.DropForLoadBalancing
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*Duration)(nil), "grpc.lb.v1.Duration")
 	proto.RegisterType((*Timestamp)(nil), "grpc.lb.v1.Timestamp")
 	proto.RegisterType((*LoadBalanceRequest)(nil), "grpc.lb.v1.LoadBalanceRequest")
@@ -574,11 +574,11 @@ func init() ***REMOVED***
 	proto.RegisterType((*InitialLoadBalanceResponse)(nil), "grpc.lb.v1.InitialLoadBalanceResponse")
 	proto.RegisterType((*ServerList)(nil), "grpc.lb.v1.ServerList")
 	proto.RegisterType((*Server)(nil), "grpc.lb.v1.Server")
-***REMOVED***
+}
 
-func init() ***REMOVED*** proto.RegisterFile("grpclb.proto", fileDescriptor0) ***REMOVED***
+func init() { proto.RegisterFile("grpclb.proto", fileDescriptor0) }
 
-var fileDescriptor0 = []byte***REMOVED***
+var fileDescriptor0 = []byte{
 	// 733 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x55, 0xdd, 0x4e, 0x1b, 0x39,
 	0x14, 0x66, 0x36, 0xfc, 0xe5, 0x24, 0x5a, 0x58, 0x93, 0x85, 0xc0, 0xc2, 0x2e, 0x1b, 0xa9, 0x34,
@@ -626,4 +626,4 @@ var fileDescriptor0 = []byte***REMOVED***
 	0x73, 0xf7, 0xaf, 0x10, 0x86, 0x52, 0xf2, 0x6d, 0xc3, 0xe8, 0xdf, 0x7c, 0x83, 0x46, 0x87, 0xe5,
 	0xc6, 0x7f, 0x13, 0xf7, 0xfd, 0x43, 0xaa, 0x07, 0x8f, 0x82, 0xce, 0xbc, 0xfb, 0x7d, 0xed, 0xff,
 	0x0a, 0x00, 0x00, 0xff, 0xff, 0x64, 0xbf, 0xda, 0x5e, 0xce, 0x06, 0x00, 0x00,
-***REMOVED***
+}

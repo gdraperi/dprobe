@@ -11,12 +11,12 @@ var (
 
 // NewSandbox provides a new sandbox instance created in an os specific way
 // provided a key which uniquely identifies the sandbox
-func NewSandbox(key string, osCreate, isRestore bool) (Sandbox, error) ***REMOVED***
+func NewSandbox(key string, osCreate, isRestore bool) (Sandbox, error) {
 	return nil, ErrNotImplemented
-***REMOVED***
+}
 
 // GenerateKey generates a sandbox key based on the passed
 // container id.
-func GenerateKey(containerID string) string ***REMOVED***
+func GenerateKey(containerID string) string {
 	return ""
-***REMOVED***
+}

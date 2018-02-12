@@ -5,4 +5,4 @@ import (
 	"path/filepath"
 )
 
-var specsPaths = []string***REMOVED***filepath.Join(os.Getenv("programdata"), "docker", "plugins")***REMOVED***
+var specsPaths = []string{filepath.Join(os.Getenv("programdata"), "docker", "plugins")}

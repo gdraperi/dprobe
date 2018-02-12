@@ -13,23 +13,23 @@ and then:
 ```
 // Load the URL
 res, err := http.Get(url)
-if err != nil ***REMOVED***
+if err != nil {
     // handle error
-***REMOVED***
+}
 defer res.Body.Close()
 
 // Convert the designated charset HTML to utf-8 encoded HTML.
 // `charset` being one of the charsets known by the iconv package.
 utfBody, err := iconv.NewReader(res.Body, charset, "utf-8")
-if err != nil ***REMOVED***
+if err != nil {
     // handler error
-***REMOVED***
+}
 
 // use utfBody using goquery
 doc, err := goquery.NewDocumentFromReader(utfBody)
-if err != nil ***REMOVED***
+if err != nil {
     // handler error
-***REMOVED***
+}
 // use doc...
 ```
 
@@ -53,10 +53,10 @@ If all you need is a normal `for` loop over all nodes in the current selection, 
 
 ```
 sel := Doc().Find(".selector")
-for i := range sel.Nodes ***REMOVED***
+for i := range sel.Nodes {
 	single := sel.Eq(i)
     // use `single` as a selection of 1 node
-***REMOVED***
+}
 ```
 
 Thanks to github user @jmoiron.

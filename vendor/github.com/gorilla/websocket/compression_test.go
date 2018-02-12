@@ -8,73 +8,73 @@ import (
 	"testing"
 )
 
-type nopCloser struct***REMOVED*** io.Writer ***REMOVED***
+type nopCloser struct{ io.Writer }
 
-func (nopCloser) Close() error ***REMOVED*** return nil ***REMOVED***
+func (nopCloser) Close() error { return nil }
 
-func TestTruncWriter(t *testing.T) ***REMOVED***
+func TestTruncWriter(t *testing.T) {
 	const data = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijlkmnopqrstuvwxyz987654321"
-	for n := 1; n <= 10; n++ ***REMOVED***
+	for n := 1; n <= 10; n++ {
 		var b bytes.Buffer
-		w := &truncWriter***REMOVED***w: nopCloser***REMOVED***&b***REMOVED******REMOVED***
+		w := &truncWriter{w: nopCloser{&b}}
 		p := []byte(data)
-		for len(p) > 0 ***REMOVED***
+		for len(p) > 0 {
 			m := len(p)
-			if m > n ***REMOVED***
+			if m > n {
 				m = n
-			***REMOVED***
+			}
 			w.Write(p[:m])
 			p = p[m:]
-		***REMOVED***
-		if b.String() != data[:len(data)-len(w.p)] ***REMOVED***
+		}
+		if b.String() != data[:len(data)-len(w.p)] {
 			t.Errorf("%d: %q", n, b.String())
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func textMessages(num int) [][]byte ***REMOVED***
+func textMessages(num int) [][]byte {
 	messages := make([][]byte, num)
-	for i := 0; i < num; i++ ***REMOVED***
+	for i := 0; i < num; i++ {
 		msg := fmt.Sprintf("planet: %d, country: %d, city: %d, street: %d", i, i, i, i)
 		messages[i] = []byte(msg)
-	***REMOVED***
+	}
 	return messages
-***REMOVED***
+}
 
-func BenchmarkWriteNoCompression(b *testing.B) ***REMOVED***
+func BenchmarkWriteNoCompression(b *testing.B) {
 	w := ioutil.Discard
-	c := newConn(fakeNetConn***REMOVED***Reader: nil, Writer: w***REMOVED***, false, 1024, 1024)
+	c := newConn(fakeNetConn{Reader: nil, Writer: w}, false, 1024, 1024)
 	messages := textMessages(100)
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		c.WriteMessage(TextMessage, messages[i%len(messages)])
-	***REMOVED***
+	}
 	b.ReportAllocs()
-***REMOVED***
+}
 
-func BenchmarkWriteWithCompression(b *testing.B) ***REMOVED***
+func BenchmarkWriteWithCompression(b *testing.B) {
 	w := ioutil.Discard
-	c := newConn(fakeNetConn***REMOVED***Reader: nil, Writer: w***REMOVED***, false, 1024, 1024)
+	c := newConn(fakeNetConn{Reader: nil, Writer: w}, false, 1024, 1024)
 	messages := textMessages(100)
 	c.enableWriteCompression = true
 	c.newCompressionWriter = compressNoContextTakeover
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ ***REMOVED***
+	for i := 0; i < b.N; i++ {
 		c.WriteMessage(TextMessage, messages[i%len(messages)])
-	***REMOVED***
+	}
 	b.ReportAllocs()
-***REMOVED***
+}
 
-func TestValidCompressionLevel(t *testing.T) ***REMOVED***
-	c := newConn(fakeNetConn***REMOVED******REMOVED***, false, 1024, 1024)
-	for _, level := range []int***REMOVED***minCompressionLevel - 1, maxCompressionLevel + 1***REMOVED*** ***REMOVED***
-		if err := c.SetCompressionLevel(level); err == nil ***REMOVED***
+func TestValidCompressionLevel(t *testing.T) {
+	c := newConn(fakeNetConn{}, false, 1024, 1024)
+	for _, level := range []int{minCompressionLevel - 1, maxCompressionLevel + 1} {
+		if err := c.SetCompressionLevel(level); err == nil {
 			t.Errorf("no error for level %d", level)
-		***REMOVED***
-	***REMOVED***
-	for _, level := range []int***REMOVED***minCompressionLevel, maxCompressionLevel***REMOVED*** ***REMOVED***
-		if err := c.SetCompressionLevel(level); err != nil ***REMOVED***
+		}
+	}
+	for _, level := range []int{minCompressionLevel, maxCompressionLevel} {
+		if err := c.SetCompressionLevel(level); err != nil {
 			t.Errorf("error for level %d", level)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

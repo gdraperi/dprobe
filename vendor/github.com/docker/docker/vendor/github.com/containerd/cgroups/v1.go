@@ -9,38 +9,38 @@ import (
 )
 
 // V1 returns all the groups in the default cgroups mountpoint in a single hierarchy
-func V1() ([]Subsystem, error) ***REMOVED***
+func V1() ([]Subsystem, error) {
 	root, err := v1MountPoint()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	subsystems, err := defaults(root)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	var enabled []Subsystem
-	for _, s := range pathers(subsystems) ***REMOVED***
+	for _, s := range pathers(subsystems) {
 		// check and remove the default groups that do not exist
-		if _, err := os.Lstat(s.Path("/")); err == nil ***REMOVED***
+		if _, err := os.Lstat(s.Path("/")); err == nil {
 			enabled = append(enabled, s)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return enabled, nil
-***REMOVED***
+}
 
 // v1MountPoint returns the mount point where the cgroup
 // mountpoints are mounted in a single hiearchy
-func v1MountPoint() (string, error) ***REMOVED***
+func v1MountPoint() (string, error) {
 	f, err := os.Open("/proc/self/mountinfo")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	defer f.Close()
 	scanner := bufio.NewScanner(f)
-	for scanner.Scan() ***REMOVED***
-		if err := scanner.Err(); err != nil ***REMOVED***
+	for scanner.Scan() {
+		if err := scanner.Err(); err != nil {
 			return "", err
-		***REMOVED***
+		}
 		var (
 			text   = scanner.Text()
 			fields = strings.Split(text, " ")
@@ -50,16 +50,16 @@ func v1MountPoint() (string, error) ***REMOVED***
 			numPostFields       = len(postSeparatorFields)
 		)
 		// this is an error as we can't detect if the mount is for "cgroup"
-		if numPostFields == 0 ***REMOVED***
+		if numPostFields == 0 {
 			return "", fmt.Errorf("Found no fields post '-' in %q", text)
-		***REMOVED***
-		if postSeparatorFields[0] == "cgroup" ***REMOVED***
+		}
+		if postSeparatorFields[0] == "cgroup" {
 			// check that the mount is properly formated.
-			if numPostFields < 3 ***REMOVED***
+			if numPostFields < 3 {
 				return "", fmt.Errorf("Error found less than 3 fields post '-' in %q", text)
-			***REMOVED***
+			}
 			return filepath.Dir(fields[4]), nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return "", ErrMountPointNotExist
-***REMOVED***
+}

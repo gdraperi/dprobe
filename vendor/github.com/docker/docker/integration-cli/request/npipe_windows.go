@@ -7,6 +7,6 @@ import (
 	"github.com/Microsoft/go-winio"
 )
 
-func npipeDial(path string, timeout time.Duration) (net.Conn, error) ***REMOVED***
+func npipeDial(path string, timeout time.Duration) (net.Conn, error) {
 	return winio.DialPipe(path, &timeout)
-***REMOVED***
+}

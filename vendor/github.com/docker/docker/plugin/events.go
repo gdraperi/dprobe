@@ -8,9 +8,9 @@ import (
 )
 
 // Event is emitted for actions performed on the plugin manager
-type Event interface ***REMOVED***
+type Event interface {
 	matches(Event) bool
-***REMOVED***
+}
 
 // EventCreate is an event which is emitted when a plugin is created
 // This is either by pull or create from context.
@@ -19,93 +19,93 @@ type Event interface ***REMOVED***
 // interface.
 // These are matched against using "or" logic.
 // If no interfaces are listed, all are matched.
-type EventCreate struct ***REMOVED***
+type EventCreate struct {
 	Interfaces map[string]bool
 	Plugin     types.Plugin
-***REMOVED***
+}
 
-func (e EventCreate) matches(observed Event) bool ***REMOVED***
+func (e EventCreate) matches(observed Event) bool {
 	oe, ok := observed.(EventCreate)
-	if !ok ***REMOVED***
+	if !ok {
 		return false
-	***REMOVED***
-	if len(e.Interfaces) == 0 ***REMOVED***
+	}
+	if len(e.Interfaces) == 0 {
 		return true
-	***REMOVED***
+	}
 
 	var ifaceMatch bool
-	for _, in := range oe.Plugin.Config.Interface.Types ***REMOVED***
-		if e.Interfaces[in.Capability] ***REMOVED***
+	for _, in := range oe.Plugin.Config.Interface.Types {
+		if e.Interfaces[in.Capability] {
 			ifaceMatch = true
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return ifaceMatch
-***REMOVED***
+}
 
 // EventRemove is an event which is emitted when a plugin is removed
 // It maches on the passed in plugin's ID only.
-type EventRemove struct ***REMOVED***
+type EventRemove struct {
 	Plugin types.Plugin
-***REMOVED***
+}
 
-func (e EventRemove) matches(observed Event) bool ***REMOVED***
+func (e EventRemove) matches(observed Event) bool {
 	oe, ok := observed.(EventRemove)
-	if !ok ***REMOVED***
+	if !ok {
 		return false
-	***REMOVED***
+	}
 	return e.Plugin.ID == oe.Plugin.ID
-***REMOVED***
+}
 
 // EventDisable is an event that is emitted when a plugin is disabled
 // It maches on the passed in plugin's ID only.
-type EventDisable struct ***REMOVED***
+type EventDisable struct {
 	Plugin types.Plugin
-***REMOVED***
+}
 
-func (e EventDisable) matches(observed Event) bool ***REMOVED***
+func (e EventDisable) matches(observed Event) bool {
 	oe, ok := observed.(EventDisable)
-	if !ok ***REMOVED***
+	if !ok {
 		return false
-	***REMOVED***
+	}
 	return e.Plugin.ID == oe.Plugin.ID
-***REMOVED***
+}
 
 // EventEnable is an event that is emitted when a plugin is disabled
 // It maches on the passed in plugin's ID only.
-type EventEnable struct ***REMOVED***
+type EventEnable struct {
 	Plugin types.Plugin
-***REMOVED***
+}
 
-func (e EventEnable) matches(observed Event) bool ***REMOVED***
+func (e EventEnable) matches(observed Event) bool {
 	oe, ok := observed.(EventEnable)
-	if !ok ***REMOVED***
+	if !ok {
 		return false
-	***REMOVED***
+	}
 	return e.Plugin.ID == oe.Plugin.ID
-***REMOVED***
+}
 
 // SubscribeEvents provides an event channel to listen for structured events from
 // the plugin manager actions, CRUD operations.
 // The caller must call the returned `cancel()` function once done with the channel
 // or this will leak resources.
-func (pm *Manager) SubscribeEvents(buffer int, watchEvents ...Event) (eventCh <-chan interface***REMOVED******REMOVED***, cancel func()) ***REMOVED***
-	topic := func(i interface***REMOVED******REMOVED***) bool ***REMOVED***
+func (pm *Manager) SubscribeEvents(buffer int, watchEvents ...Event) (eventCh <-chan interface{}, cancel func()) {
+	topic := func(i interface{}) bool {
 		observed, ok := i.(Event)
-		if !ok ***REMOVED***
+		if !ok {
 			panic(fmt.Sprintf("unexpected type passed to event channel: %v", reflect.TypeOf(i)))
-		***REMOVED***
-		for _, e := range watchEvents ***REMOVED***
-			if e.matches(observed) ***REMOVED***
+		}
+		for _, e := range watchEvents {
+			if e.matches(observed) {
 				return true
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		// If no specific events are specified always assume a matched event
 		// If some events were specified and none matched above, then the event
 		// doesn't match
 		return watchEvents == nil
-	***REMOVED***
+	}
 	ch := pm.publisher.SubscribeTopicWithBuffer(topic, buffer)
-	cancelFunc := func() ***REMOVED*** pm.publisher.Evict(ch) ***REMOVED***
+	cancelFunc := func() { pm.publisher.Evict(ch) }
 	return ch, cancelFunc
-***REMOVED***
+}

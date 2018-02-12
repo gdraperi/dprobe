@@ -36,13 +36,13 @@ const (
 
 // CertificateInvalidError results when an odd error occurs. Users of this
 // library probably want to handle all these errors uniformly.
-type CertificateInvalidError struct ***REMOVED***
+type CertificateInvalidError struct {
 	Cert   *Certificate
 	Reason InvalidReason
-***REMOVED***
+}
 
-func (e CertificateInvalidError) Error() string ***REMOVED***
-	switch e.Reason ***REMOVED***
+func (e CertificateInvalidError) Error() string {
+	switch e.Reason {
 	case NotAuthorizedToSign:
 		return "x509: certificate is not authorized to sign other certificates"
 	case Expired:
@@ -53,44 +53,44 @@ func (e CertificateInvalidError) Error() string ***REMOVED***
 		return "x509: too many intermediates for path length constraint"
 	case IncompatibleUsage:
 		return "x509: certificate specifies an incompatible key usage"
-	***REMOVED***
+	}
 	return "x509: unknown error"
-***REMOVED***
+}
 
 // HostnameError results when the set of authorized names doesn't match the
 // requested name.
-type HostnameError struct ***REMOVED***
+type HostnameError struct {
 	Certificate *Certificate
 	Host        string
-***REMOVED***
+}
 
-func (h HostnameError) Error() string ***REMOVED***
+func (h HostnameError) Error() string {
 	c := h.Certificate
 
 	var valid string
-	if ip := net.ParseIP(h.Host); ip != nil ***REMOVED***
+	if ip := net.ParseIP(h.Host); ip != nil {
 		// Trying to validate an IP
-		if len(c.IPAddresses) == 0 ***REMOVED***
+		if len(c.IPAddresses) == 0 {
 			return "x509: cannot validate certificate for " + h.Host + " because it doesn't contain any IP SANs"
-		***REMOVED***
-		for _, san := range c.IPAddresses ***REMOVED***
-			if len(valid) > 0 ***REMOVED***
+		}
+		for _, san := range c.IPAddresses {
+			if len(valid) > 0 {
 				valid += ", "
-			***REMOVED***
+			}
 			valid += san.String()
-		***REMOVED***
-	***REMOVED*** else ***REMOVED***
-		if len(c.DNSNames) > 0 ***REMOVED***
+		}
+	} else {
+		if len(c.DNSNames) > 0 {
 			valid = strings.Join(c.DNSNames, ", ")
-		***REMOVED*** else ***REMOVED***
+		} else {
 			valid = c.Subject.CommonName
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return "x509: certificate is valid for " + valid + ", not " + h.Host
-***REMOVED***
+}
 
 // UnknownAuthorityError results when the certificate issuer is unknown
-type UnknownAuthorityError struct ***REMOVED***
+type UnknownAuthorityError struct {
 	cert *Certificate
 	// hintErr contains an error that may be helpful in determining why an
 	// authority wasn't found.
@@ -98,34 +98,34 @@ type UnknownAuthorityError struct ***REMOVED***
 	// hintCert contains a possible authority certificate that was rejected
 	// because of the error in hintErr.
 	hintCert *Certificate
-***REMOVED***
+}
 
-func (e UnknownAuthorityError) Error() string ***REMOVED***
+func (e UnknownAuthorityError) Error() string {
 	s := "x509: certificate signed by unknown authority"
-	if e.hintErr != nil ***REMOVED***
+	if e.hintErr != nil {
 		certName := e.hintCert.Subject.CommonName
-		if len(certName) == 0 ***REMOVED***
-			if len(e.hintCert.Subject.Organization) > 0 ***REMOVED***
+		if len(certName) == 0 {
+			if len(e.hintCert.Subject.Organization) > 0 {
 				certName = e.hintCert.Subject.Organization[0]
-			***REMOVED***
+			}
 			certName = "serial:" + e.hintCert.SerialNumber.String()
-		***REMOVED***
+		}
 		s += fmt.Sprintf(" (possibly because of %q while trying to verify candidate authority certificate %q)", e.hintErr, certName)
-	***REMOVED***
+	}
 	return s
-***REMOVED***
+}
 
 // SystemRootsError results when we fail to load the system root certificates.
-type SystemRootsError struct ***REMOVED***
-***REMOVED***
+type SystemRootsError struct {
+}
 
-func (e SystemRootsError) Error() string ***REMOVED***
+func (e SystemRootsError) Error() string {
 	return "x509: failed to load system roots and no roots provided"
-***REMOVED***
+}
 
 // VerifyOptions contains parameters for Certificate.Verify. It's a structure
 // because other PKIX verification APIs have ended up needing many options.
-type VerifyOptions struct ***REMOVED***
+type VerifyOptions struct {
 	DNSName           string
 	Intermediates     *CertPool
 	Roots             *CertPool // if nil, the system roots are used
@@ -136,7 +136,7 @@ type VerifyOptions struct ***REMOVED***
 	// constraint down the chain which mirrors Windows CryptoAPI behaviour,
 	// but not the spec. To accept any key usage, include ExtKeyUsageAny.
 	KeyUsages []ExtKeyUsage
-***REMOVED***
+}
 
 const (
 	leafCertificate = iota
@@ -145,33 +145,33 @@ const (
 )
 
 // isValid performs validity checks on the c.
-func (c *Certificate) isValid(certType int, currentChain []*Certificate, opts *VerifyOptions) error ***REMOVED***
-	if !opts.DisableTimeChecks ***REMOVED***
+func (c *Certificate) isValid(certType int, currentChain []*Certificate, opts *VerifyOptions) error {
+	if !opts.DisableTimeChecks {
 		now := opts.CurrentTime
-		if now.IsZero() ***REMOVED***
+		if now.IsZero() {
 			now = time.Now()
-		***REMOVED***
-		if now.Before(c.NotBefore) || now.After(c.NotAfter) ***REMOVED***
-			return CertificateInvalidError***REMOVED***c, Expired***REMOVED***
-		***REMOVED***
-	***REMOVED***
+		}
+		if now.Before(c.NotBefore) || now.After(c.NotAfter) {
+			return CertificateInvalidError{c, Expired}
+		}
+	}
 
-	if len(c.PermittedDNSDomains) > 0 ***REMOVED***
+	if len(c.PermittedDNSDomains) > 0 {
 		ok := false
-		for _, domain := range c.PermittedDNSDomains ***REMOVED***
+		for _, domain := range c.PermittedDNSDomains {
 			if opts.DNSName == domain ||
 				(strings.HasSuffix(opts.DNSName, domain) &&
 					len(opts.DNSName) >= 1+len(domain) &&
-					opts.DNSName[len(opts.DNSName)-len(domain)-1] == '.') ***REMOVED***
+					opts.DNSName[len(opts.DNSName)-len(domain)-1] == '.') {
 				ok = true
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
-		if !ok ***REMOVED***
-			return CertificateInvalidError***REMOVED***c, CANotAuthorizedForThisName***REMOVED***
-		***REMOVED***
-	***REMOVED***
+		if !ok {
+			return CertificateInvalidError{c, CANotAuthorizedForThisName}
+		}
+	}
 
 	// KeyUsage status flags are ignored. From Engineering Security, Peter
 	// Gutmann: A European government CA marked its signing certificates as
@@ -190,19 +190,19 @@ func (c *Certificate) isValid(certType int, currentChain []*Certificate, opts *V
 	// keyUsage, and a keyUsage containing a flag indicating that the RSA
 	// encryption key could only be used for Diffie-Hellman key agreement.
 
-	if certType == intermediateCertificate && (!c.BasicConstraintsValid || !c.IsCA) ***REMOVED***
-		return CertificateInvalidError***REMOVED***c, NotAuthorizedToSign***REMOVED***
-	***REMOVED***
+	if certType == intermediateCertificate && (!c.BasicConstraintsValid || !c.IsCA) {
+		return CertificateInvalidError{c, NotAuthorizedToSign}
+	}
 
-	if c.BasicConstraintsValid && c.MaxPathLen >= 0 ***REMOVED***
+	if c.BasicConstraintsValid && c.MaxPathLen >= 0 {
 		numIntermediates := len(currentChain) - 1
-		if numIntermediates > c.MaxPathLen ***REMOVED***
-			return CertificateInvalidError***REMOVED***c, TooManyIntermediates***REMOVED***
-		***REMOVED***
-	***REMOVED***
+		if numIntermediates > c.MaxPathLen {
+			return CertificateInvalidError{c, TooManyIntermediates}
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
 // Verify attempts to verify c by building one or more chains from c to a
 // certificate in opts.Roots, using certificates in opts.Intermediates if
@@ -210,217 +210,217 @@ func (c *Certificate) isValid(certType int, currentChain []*Certificate, opts *V
 // element of the chain is c and the last element is from opts.Roots.
 //
 // WARNING: this doesn't do any revocation checking.
-func (c *Certificate) Verify(opts VerifyOptions) (chains [][]*Certificate, err error) ***REMOVED***
+func (c *Certificate) Verify(opts VerifyOptions) (chains [][]*Certificate, err error) {
 	// Use Windows's own verification and chain building.
-	if opts.Roots == nil && runtime.GOOS == "windows" ***REMOVED***
+	if opts.Roots == nil && runtime.GOOS == "windows" {
 		return c.systemVerify(&opts)
-	***REMOVED***
+	}
 
-	if opts.Roots == nil ***REMOVED***
+	if opts.Roots == nil {
 		opts.Roots = systemRootsPool()
-		if opts.Roots == nil ***REMOVED***
-			return nil, SystemRootsError***REMOVED******REMOVED***
-		***REMOVED***
-	***REMOVED***
+		if opts.Roots == nil {
+			return nil, SystemRootsError{}
+		}
+	}
 
 	err = c.isValid(leafCertificate, nil, &opts)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
-	if len(opts.DNSName) > 0 ***REMOVED***
+	if len(opts.DNSName) > 0 {
 		err = c.VerifyHostname(opts.DNSName)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	candidateChains, err := c.buildChains(make(map[int][][]*Certificate), []*Certificate***REMOVED***c***REMOVED***, &opts)
-	if err != nil ***REMOVED***
+	candidateChains, err := c.buildChains(make(map[int][][]*Certificate), []*Certificate{c}, &opts)
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
 	keyUsages := opts.KeyUsages
-	if len(keyUsages) == 0 ***REMOVED***
-		keyUsages = []ExtKeyUsage***REMOVED***ExtKeyUsageServerAuth***REMOVED***
-	***REMOVED***
+	if len(keyUsages) == 0 {
+		keyUsages = []ExtKeyUsage{ExtKeyUsageServerAuth}
+	}
 
 	// If any key usage is acceptable then we're done.
-	for _, usage := range keyUsages ***REMOVED***
-		if usage == ExtKeyUsageAny ***REMOVED***
+	for _, usage := range keyUsages {
+		if usage == ExtKeyUsageAny {
 			chains = candidateChains
 			return
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	for _, candidate := range candidateChains ***REMOVED***
-		if checkChainForKeyUsage(candidate, keyUsages) ***REMOVED***
+	for _, candidate := range candidateChains {
+		if checkChainForKeyUsage(candidate, keyUsages) {
 			chains = append(chains, candidate)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if len(chains) == 0 ***REMOVED***
-		err = CertificateInvalidError***REMOVED***c, IncompatibleUsage***REMOVED***
-	***REMOVED***
+	if len(chains) == 0 {
+		err = CertificateInvalidError{c, IncompatibleUsage}
+	}
 
 	return
-***REMOVED***
+}
 
-func appendToFreshChain(chain []*Certificate, cert *Certificate) []*Certificate ***REMOVED***
+func appendToFreshChain(chain []*Certificate, cert *Certificate) []*Certificate {
 	n := make([]*Certificate, len(chain)+1)
 	copy(n, chain)
 	n[len(chain)] = cert
 	return n
-***REMOVED***
+}
 
-func (c *Certificate) buildChains(cache map[int][][]*Certificate, currentChain []*Certificate, opts *VerifyOptions) (chains [][]*Certificate, err error) ***REMOVED***
+func (c *Certificate) buildChains(cache map[int][][]*Certificate, currentChain []*Certificate, opts *VerifyOptions) (chains [][]*Certificate, err error) {
 	possibleRoots, failedRoot, rootErr := opts.Roots.findVerifiedParents(c)
-	for _, rootNum := range possibleRoots ***REMOVED***
+	for _, rootNum := range possibleRoots {
 		root := opts.Roots.certs[rootNum]
 		err = root.isValid(rootCertificate, currentChain, opts)
-		if err != nil ***REMOVED***
+		if err != nil {
 			continue
-		***REMOVED***
+		}
 		chains = append(chains, appendToFreshChain(currentChain, root))
-	***REMOVED***
+	}
 
 	possibleIntermediates, failedIntermediate, intermediateErr := opts.Intermediates.findVerifiedParents(c)
 nextIntermediate:
-	for _, intermediateNum := range possibleIntermediates ***REMOVED***
+	for _, intermediateNum := range possibleIntermediates {
 		intermediate := opts.Intermediates.certs[intermediateNum]
-		for _, cert := range currentChain ***REMOVED***
-			if cert == intermediate ***REMOVED***
+		for _, cert := range currentChain {
+			if cert == intermediate {
 				continue nextIntermediate
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		err = intermediate.isValid(intermediateCertificate, currentChain, opts)
-		if err != nil ***REMOVED***
+		if err != nil {
 			continue
-		***REMOVED***
+		}
 		var childChains [][]*Certificate
 		childChains, ok := cache[intermediateNum]
-		if !ok ***REMOVED***
+		if !ok {
 			childChains, err = intermediate.buildChains(cache, appendToFreshChain(currentChain, intermediate), opts)
 			cache[intermediateNum] = childChains
-		***REMOVED***
+		}
 		chains = append(chains, childChains...)
-	***REMOVED***
+	}
 
-	if len(chains) > 0 ***REMOVED***
+	if len(chains) > 0 {
 		err = nil
-	***REMOVED***
+	}
 
-	if len(chains) == 0 && err == nil ***REMOVED***
+	if len(chains) == 0 && err == nil {
 		hintErr := rootErr
 		hintCert := failedRoot
-		if hintErr == nil ***REMOVED***
+		if hintErr == nil {
 			hintErr = intermediateErr
 			hintCert = failedIntermediate
-		***REMOVED***
-		err = UnknownAuthorityError***REMOVED***c, hintErr, hintCert***REMOVED***
-	***REMOVED***
+		}
+		err = UnknownAuthorityError{c, hintErr, hintCert}
+	}
 
 	return
-***REMOVED***
+}
 
-func matchHostnames(pattern, host string) bool ***REMOVED***
-	if len(pattern) == 0 || len(host) == 0 ***REMOVED***
+func matchHostnames(pattern, host string) bool {
+	if len(pattern) == 0 || len(host) == 0 {
 		return false
-	***REMOVED***
+	}
 
 	patternParts := strings.Split(pattern, ".")
 	hostParts := strings.Split(host, ".")
 
-	if len(patternParts) != len(hostParts) ***REMOVED***
+	if len(patternParts) != len(hostParts) {
 		return false
-	***REMOVED***
+	}
 
-	for i, patternPart := range patternParts ***REMOVED***
-		if patternPart == "*" ***REMOVED***
+	for i, patternPart := range patternParts {
+		if patternPart == "*" {
 			continue
-		***REMOVED***
-		if patternPart != hostParts[i] ***REMOVED***
+		}
+		if patternPart != hostParts[i] {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return true
-***REMOVED***
+}
 
 // toLowerCaseASCII returns a lower-case version of in. See RFC 6125 6.4.1. We use
 // an explicitly ASCII function to avoid any sharp corners resulting from
 // performing Unicode operations on DNS labels.
-func toLowerCaseASCII(in string) string ***REMOVED***
+func toLowerCaseASCII(in string) string {
 	// If the string is already lower-case then there's nothing to do.
 	isAlreadyLowerCase := true
-	for _, c := range in ***REMOVED***
-		if c == utf8.RuneError ***REMOVED***
+	for _, c := range in {
+		if c == utf8.RuneError {
 			// If we get a UTF-8 error then there might be
 			// upper-case ASCII bytes in the invalid sequence.
 			isAlreadyLowerCase = false
 			break
-		***REMOVED***
-		if 'A' <= c && c <= 'Z' ***REMOVED***
+		}
+		if 'A' <= c && c <= 'Z' {
 			isAlreadyLowerCase = false
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if isAlreadyLowerCase ***REMOVED***
+	if isAlreadyLowerCase {
 		return in
-	***REMOVED***
+	}
 
 	out := []byte(in)
-	for i, c := range out ***REMOVED***
-		if 'A' <= c && c <= 'Z' ***REMOVED***
+	for i, c := range out {
+		if 'A' <= c && c <= 'Z' {
 			out[i] += 'a' - 'A'
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return string(out)
-***REMOVED***
+}
 
 // VerifyHostname returns nil if c is a valid certificate for the named host.
 // Otherwise it returns an error describing the mismatch.
-func (c *Certificate) VerifyHostname(h string) error ***REMOVED***
+func (c *Certificate) VerifyHostname(h string) error {
 	// IP addresses may be written in [ ].
 	candidateIP := h
-	if len(h) >= 3 && h[0] == '[' && h[len(h)-1] == ']' ***REMOVED***
+	if len(h) >= 3 && h[0] == '[' && h[len(h)-1] == ']' {
 		candidateIP = h[1 : len(h)-1]
-	***REMOVED***
-	if ip := net.ParseIP(candidateIP); ip != nil ***REMOVED***
+	}
+	if ip := net.ParseIP(candidateIP); ip != nil {
 		// We only match IP addresses against IP SANs.
 		// https://tools.ietf.org/html/rfc6125#appendix-B.2
-		for _, candidate := range c.IPAddresses ***REMOVED***
-			if ip.Equal(candidate) ***REMOVED***
+		for _, candidate := range c.IPAddresses {
+			if ip.Equal(candidate) {
 				return nil
-			***REMOVED***
-		***REMOVED***
-		return HostnameError***REMOVED***c, candidateIP***REMOVED***
-	***REMOVED***
+			}
+		}
+		return HostnameError{c, candidateIP}
+	}
 
 	lowered := toLowerCaseASCII(h)
 
-	if len(c.DNSNames) > 0 ***REMOVED***
-		for _, match := range c.DNSNames ***REMOVED***
-			if matchHostnames(toLowerCaseASCII(match), lowered) ***REMOVED***
+	if len(c.DNSNames) > 0 {
+		for _, match := range c.DNSNames {
+			if matchHostnames(toLowerCaseASCII(match), lowered) {
 				return nil
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		// If Subject Alt Name is given, we ignore the common name.
-	***REMOVED*** else if matchHostnames(toLowerCaseASCII(c.Subject.CommonName), lowered) ***REMOVED***
+	} else if matchHostnames(toLowerCaseASCII(c.Subject.CommonName), lowered) {
 		return nil
-	***REMOVED***
+	}
 
-	return HostnameError***REMOVED***c, h***REMOVED***
-***REMOVED***
+	return HostnameError{c, h}
+}
 
-func checkChainForKeyUsage(chain []*Certificate, keyUsages []ExtKeyUsage) bool ***REMOVED***
+func checkChainForKeyUsage(chain []*Certificate, keyUsages []ExtKeyUsage) bool {
 	usages := make([]ExtKeyUsage, len(keyUsages))
 	copy(usages, keyUsages)
 
-	if len(chain) == 0 ***REMOVED***
+	if len(chain) == 0 {
 		return false
-	***REMOVED***
+	}
 
 	usagesRemaining := len(usages)
 
@@ -428,49 +428,49 @@ func checkChainForKeyUsage(chain []*Certificate, keyUsages []ExtKeyUsage) bool *
 	// by each certificate. If we cross out all the usages, then the chain
 	// is unacceptable.
 
-	for i := len(chain) - 1; i >= 0; i-- ***REMOVED***
+	for i := len(chain) - 1; i >= 0; i-- {
 		cert := chain[i]
-		if len(cert.ExtKeyUsage) == 0 && len(cert.UnknownExtKeyUsage) == 0 ***REMOVED***
+		if len(cert.ExtKeyUsage) == 0 && len(cert.UnknownExtKeyUsage) == 0 {
 			// The certificate doesn't have any extended key usage specified.
 			continue
-		***REMOVED***
+		}
 
-		for _, usage := range cert.ExtKeyUsage ***REMOVED***
-			if usage == ExtKeyUsageAny ***REMOVED***
+		for _, usage := range cert.ExtKeyUsage {
+			if usage == ExtKeyUsageAny {
 				// The certificate is explicitly good for any usage.
 				continue
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		const invalidUsage ExtKeyUsage = -1
 
 	NextRequestedUsage:
-		for i, requestedUsage := range usages ***REMOVED***
-			if requestedUsage == invalidUsage ***REMOVED***
+		for i, requestedUsage := range usages {
+			if requestedUsage == invalidUsage {
 				continue
-			***REMOVED***
+			}
 
-			for _, usage := range cert.ExtKeyUsage ***REMOVED***
-				if requestedUsage == usage ***REMOVED***
+			for _, usage := range cert.ExtKeyUsage {
+				if requestedUsage == usage {
 					continue NextRequestedUsage
-				***REMOVED*** else if requestedUsage == ExtKeyUsageServerAuth &&
+				} else if requestedUsage == ExtKeyUsageServerAuth &&
 					(usage == ExtKeyUsageNetscapeServerGatedCrypto ||
-						usage == ExtKeyUsageMicrosoftServerGatedCrypto) ***REMOVED***
+						usage == ExtKeyUsageMicrosoftServerGatedCrypto) {
 					// In order to support COMODO
 					// certificate chains, we have to
 					// accept Netscape or Microsoft SGC
 					// usages as equal to ServerAuth.
 					continue NextRequestedUsage
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 
 			usages[i] = invalidUsage
 			usagesRemaining--
-			if usagesRemaining == 0 ***REMOVED***
+			if usagesRemaining == 0 {
 				return false
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	return true
-***REMOVED***
+}

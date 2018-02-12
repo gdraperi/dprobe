@@ -12,7 +12,7 @@ import (
 	"golang.org/x/text/internal/ucd"
 )
 
-var labels = []string***REMOVED***
+var labels = []string{
 	AL:  "AL",
 	AN:  "AN",
 	B:   "B",
@@ -37,46 +37,46 @@ var labels = []string***REMOVED***
 	RLI: "RLI",
 	FSI: "FSI",
 	PDI: "PDI",
-***REMOVED***
+}
 
-func TestTables(t *testing.T) ***REMOVED***
+func TestTables(t *testing.T) {
 	testtext.SkipIfNotLong(t)
 
-	ucd.Parse(gen.OpenUCDFile("BidiBrackets.txt"), func(p *ucd.Parser) ***REMOVED***
+	ucd.Parse(gen.OpenUCDFile("BidiBrackets.txt"), func(p *ucd.Parser) {
 		r1 := p.Rune(0)
 		want := p.Rune(1)
 
 		e, _ := LookupRune(r1)
-		if got := e.reverseBracket(r1); got != want ***REMOVED***
+		if got := e.reverseBracket(r1); got != want {
 			t.Errorf("Reverse(%U) = %U; want %U", r1, got, want)
-		***REMOVED***
-	***REMOVED***)
+		}
+	})
 
-	done := map[rune]bool***REMOVED******REMOVED***
-	test := func(name string, r rune, want string) ***REMOVED***
+	done := map[rune]bool{}
+	test := func(name string, r rune, want string) {
 		str := string(r)
 		e, _ := LookupString(str)
-		if got := labels[e.Class()]; got != want ***REMOVED***
+		if got := labels[e.Class()]; got != want {
 			t.Errorf("%s:%U: got %s; want %s", name, r, got, want)
-		***REMOVED***
-		if e2, sz := LookupRune(r); e != e2 || sz != len(str) ***REMOVED***
+		}
+		if e2, sz := LookupRune(r); e != e2 || sz != len(str) {
 			t.Errorf("LookupRune(%U) = %v, %d; want %v, %d", r, e2, e, sz, len(str))
-		***REMOVED***
-		if e2, sz := Lookup([]byte(str)); e != e2 || sz != len(str) ***REMOVED***
+		}
+		if e2, sz := Lookup([]byte(str)); e != e2 || sz != len(str) {
 			t.Errorf("Lookup(%U) = %v, %d; want %v, %d", r, e2, e, sz, len(str))
-		***REMOVED***
+		}
 		done[r] = true
-	***REMOVED***
+	}
 
 	// Insert the derived BiDi properties.
-	ucd.Parse(gen.OpenUCDFile("extracted/DerivedBidiClass.txt"), func(p *ucd.Parser) ***REMOVED***
+	ucd.Parse(gen.OpenUCDFile("extracted/DerivedBidiClass.txt"), func(p *ucd.Parser) {
 		r := p.Rune(0)
 		test("derived", r, p.String(1))
-	***REMOVED***)
-	visitDefaults(func(r rune, c Class) ***REMOVED***
-		if !done[r] ***REMOVED***
+	})
+	visitDefaults(func(r rune, c Class) {
+		if !done[r] {
 			test("default", r, labels[c])
-		***REMOVED***
-	***REMOVED***)
+		}
+	})
 
-***REMOVED***
+}

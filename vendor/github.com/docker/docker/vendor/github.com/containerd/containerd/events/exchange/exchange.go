@@ -19,51 +19,51 @@ import (
 )
 
 // Exchange broadcasts events
-type Exchange struct ***REMOVED***
+type Exchange struct {
 	broadcaster *goevents.Broadcaster
-***REMOVED***
+}
 
 // NewExchange returns a new event Exchange
-func NewExchange() *Exchange ***REMOVED***
-	return &Exchange***REMOVED***
+func NewExchange() *Exchange {
+	return &Exchange{
 		broadcaster: goevents.NewBroadcaster(),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-var _ events.Publisher = &Exchange***REMOVED******REMOVED***
-var _ events.Forwarder = &Exchange***REMOVED******REMOVED***
-var _ events.Subscriber = &Exchange***REMOVED******REMOVED***
+var _ events.Publisher = &Exchange{}
+var _ events.Forwarder = &Exchange{}
+var _ events.Subscriber = &Exchange{}
 
 // Forward accepts an envelope to be direcly distributed on the exchange.
 //
 // This is useful when an event is forwaded on behalf of another namespace or
 // when the event is propagated on behalf of another publisher.
-func (e *Exchange) Forward(ctx context.Context, envelope *events.Envelope) (err error) ***REMOVED***
-	if err := validateEnvelope(envelope); err != nil ***REMOVED***
+func (e *Exchange) Forward(ctx context.Context, envelope *events.Envelope) (err error) {
+	if err := validateEnvelope(envelope); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	defer func() ***REMOVED***
-		logger := log.G(ctx).WithFields(logrus.Fields***REMOVED***
+	defer func() {
+		logger := log.G(ctx).WithFields(logrus.Fields{
 			"topic": envelope.Topic,
 			"ns":    envelope.Namespace,
 			"type":  envelope.Event.TypeUrl,
-		***REMOVED***)
+		})
 
-		if err != nil ***REMOVED***
+		if err != nil {
 			logger.WithError(err).Error("error forwarding event")
-		***REMOVED*** else ***REMOVED***
+		} else {
 			logger.Debug("event forwarded")
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
 	return e.broadcaster.Write(envelope)
-***REMOVED***
+}
 
 // Publish packages and sends an event. The caller will be considered the
 // initial publisher of the event. This means the timestamp will be calculated
 // at this point and this method may read from the calling context.
-func (e *Exchange) Publish(ctx context.Context, topic string, event events.Event) (err error) ***REMOVED***
+func (e *Exchange) Publish(ctx context.Context, topic string, event events.Event) (err error) {
 	var (
 		namespace string
 		encoded   *types.Any
@@ -71,39 +71,39 @@ func (e *Exchange) Publish(ctx context.Context, topic string, event events.Event
 	)
 
 	namespace, err = namespaces.NamespaceRequired(ctx)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return errors.Wrapf(err, "failed publishing event")
-	***REMOVED***
-	if err := validateTopic(topic); err != nil ***REMOVED***
+	}
+	if err := validateTopic(topic); err != nil {
 		return errors.Wrapf(err, "envelope topic %q", topic)
-	***REMOVED***
+	}
 
 	encoded, err = typeurl.MarshalAny(event)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	envelope.Timestamp = time.Now().UTC()
 	envelope.Namespace = namespace
 	envelope.Topic = topic
 	envelope.Event = encoded
 
-	defer func() ***REMOVED***
-		logger := log.G(ctx).WithFields(logrus.Fields***REMOVED***
+	defer func() {
+		logger := log.G(ctx).WithFields(logrus.Fields{
 			"topic": envelope.Topic,
 			"ns":    envelope.Namespace,
 			"type":  envelope.Event.TypeUrl,
-		***REMOVED***)
+		})
 
-		if err != nil ***REMOVED***
+		if err != nil {
 			logger.WithError(err).Error("error publishing event")
-		***REMOVED*** else ***REMOVED***
+		} else {
 			logger.Debug("event published")
-		***REMOVED***
-	***REMOVED***()
+		}
+	}()
 
 	return e.broadcaster.Write(&envelope)
-***REMOVED***
+}
 
 // Subscribe to events on the exchange. Events are sent through the returned
 // channel ch. If an error is encountered, it will be sent on channel errs and
@@ -112,7 +112,7 @@ func (e *Exchange) Publish(ctx context.Context, topic string, event events.Event
 // Zero or more filters may be provided as strings. Only events that match
 // *any* of the provided filters will be sent on the channel. The filters use
 // the standard containerd filters package syntax.
-func (e *Exchange) Subscribe(ctx context.Context, fs ...string) (ch <-chan *events.Envelope, errs <-chan error) ***REMOVED***
+func (e *Exchange) Subscribe(ctx context.Context, fs ...string) (ch <-chan *events.Envelope, errs <-chan error) {
 	var (
 		evch                  = make(chan *events.Envelope)
 		errq                  = make(chan error, 1)
@@ -121,115 +121,115 @@ func (e *Exchange) Subscribe(ctx context.Context, fs ...string) (ch <-chan *even
 		dst     goevents.Sink = queue
 	)
 
-	closeAll := func() ***REMOVED***
+	closeAll := func() {
 		defer close(errq)
 		defer e.broadcaster.Remove(dst)
 		defer queue.Close()
 		defer channel.Close()
-	***REMOVED***
+	}
 
 	ch = evch
 	errs = errq
 
-	if len(fs) > 0 ***REMOVED***
+	if len(fs) > 0 {
 		filter, err := filters.ParseAll(fs...)
-		if err != nil ***REMOVED***
+		if err != nil {
 			errq <- errors.Wrapf(err, "failed parsing subscription filters")
 			closeAll()
 			return
-		***REMOVED***
+		}
 
-		dst = goevents.NewFilter(queue, goevents.MatcherFunc(func(gev goevents.Event) bool ***REMOVED***
+		dst = goevents.NewFilter(queue, goevents.MatcherFunc(func(gev goevents.Event) bool {
 			return filter.Match(adapt(gev))
-		***REMOVED***))
-	***REMOVED***
+		}))
+	}
 
 	e.broadcaster.Add(dst)
 
-	go func() ***REMOVED***
+	go func() {
 		defer closeAll()
 
 		var err error
 	loop:
-		for ***REMOVED***
-			select ***REMOVED***
+		for {
+			select {
 			case ev := <-channel.C:
 				env, ok := ev.(*events.Envelope)
-				if !ok ***REMOVED***
+				if !ok {
 					// TODO(stevvooe): For the most part, we are well protected
 					// from this condition. Both Forward and Publish protect
 					// from this.
 					err = errors.Errorf("invalid envelope encountered %#v; please file a bug", ev)
 					break
-				***REMOVED***
+				}
 
-				select ***REMOVED***
+				select {
 				case evch <- env:
 				case <-ctx.Done():
 					break loop
-				***REMOVED***
+				}
 			case <-ctx.Done():
 				break loop
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
-		if err == nil ***REMOVED***
-			if cerr := ctx.Err(); cerr != context.Canceled ***REMOVED***
+		if err == nil {
+			if cerr := ctx.Err(); cerr != context.Canceled {
 				err = cerr
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 
 		errq <- err
-	***REMOVED***()
+	}()
 
 	return
-***REMOVED***
+}
 
-func validateTopic(topic string) error ***REMOVED***
-	if topic == "" ***REMOVED***
+func validateTopic(topic string) error {
+	if topic == "" {
 		return errors.Wrap(errdefs.ErrInvalidArgument, "must not be empty")
-	***REMOVED***
+	}
 
-	if topic[0] != '/' ***REMOVED***
+	if topic[0] != '/' {
 		return errors.Wrapf(errdefs.ErrInvalidArgument, "must start with '/'")
-	***REMOVED***
+	}
 
-	if len(topic) == 1 ***REMOVED***
+	if len(topic) == 1 {
 		return errors.Wrapf(errdefs.ErrInvalidArgument, "must have at least one component")
-	***REMOVED***
+	}
 
 	components := strings.Split(topic[1:], "/")
-	for _, component := range components ***REMOVED***
-		if err := identifiers.Validate(component); err != nil ***REMOVED***
+	for _, component := range components {
+		if err := identifiers.Validate(component); err != nil {
 			return errors.Wrapf(err, "failed validation on component %q", component)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
-func validateEnvelope(envelope *events.Envelope) error ***REMOVED***
-	if err := namespaces.Validate(envelope.Namespace); err != nil ***REMOVED***
+func validateEnvelope(envelope *events.Envelope) error {
+	if err := namespaces.Validate(envelope.Namespace); err != nil {
 		return errors.Wrapf(err, "event envelope has invalid namespace")
-	***REMOVED***
+	}
 
-	if err := validateTopic(envelope.Topic); err != nil ***REMOVED***
+	if err := validateTopic(envelope.Topic); err != nil {
 		return errors.Wrapf(err, "envelope topic %q", envelope.Topic)
-	***REMOVED***
+	}
 
-	if envelope.Timestamp.IsZero() ***REMOVED***
+	if envelope.Timestamp.IsZero() {
 		return errors.Wrapf(errdefs.ErrInvalidArgument, "timestamp must be set on forwarded event")
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
-func adapt(ev interface***REMOVED******REMOVED***) filters.Adaptor ***REMOVED***
-	if adaptor, ok := ev.(filters.Adaptor); ok ***REMOVED***
+func adapt(ev interface{}) filters.Adaptor {
+	if adaptor, ok := ev.(filters.Adaptor); ok {
 		return adaptor
-	***REMOVED***
+	}
 
-	return filters.AdapterFunc(func(fieldpath []string) (string, bool) ***REMOVED***
+	return filters.AdapterFunc(func(fieldpath []string) (string, bool) {
 		return "", false
-	***REMOVED***)
-***REMOVED***
+	})
+}

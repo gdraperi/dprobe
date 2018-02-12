@@ -82,48 +82,48 @@ var (
 )
 
 // MakeKVProvider returns the kvprovider label for the scope
-func MakeKVProvider(scope string) string ***REMOVED***
+func MakeKVProvider(scope string) string {
 	return DriverPrivatePrefix + scope + "kv_provider"
-***REMOVED***
+}
 
 // MakeKVProviderURL returns the kvprovider url label for the scope
-func MakeKVProviderURL(scope string) string ***REMOVED***
+func MakeKVProviderURL(scope string) string {
 	return DriverPrivatePrefix + scope + "kv_provider_url"
-***REMOVED***
+}
 
 // MakeKVProviderConfig returns the kvprovider config label for the scope
-func MakeKVProviderConfig(scope string) string ***REMOVED***
+func MakeKVProviderConfig(scope string) string {
 	return DriverPrivatePrefix + scope + "kv_provider_config"
-***REMOVED***
+}
 
 // MakeKVClient returns the kv client label for the scope
-func MakeKVClient(scope string) string ***REMOVED***
+func MakeKVClient(scope string) string {
 	return DriverPrivatePrefix + scope + "kv_client"
-***REMOVED***
+}
 
 // Key extracts the key portion of the label
-func Key(label string) (key string) ***REMOVED***
-	if kv := strings.SplitN(label, "=", 2); len(kv) > 0 ***REMOVED***
+func Key(label string) (key string) {
+	if kv := strings.SplitN(label, "=", 2); len(kv) > 0 {
 		key = kv[0]
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // Value extracts the value portion of the label
-func Value(label string) (value string) ***REMOVED***
-	if kv := strings.SplitN(label, "=", 2); len(kv) > 1 ***REMOVED***
+func Value(label string) (value string) {
+	if kv := strings.SplitN(label, "=", 2); len(kv) > 1 {
 		value = kv[1]
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // KeyValue decomposes the label in the (key,value) pair
-func KeyValue(label string) (key string, value string) ***REMOVED***
-	if kv := strings.SplitN(label, "=", 2); len(kv) > 0 ***REMOVED***
+func KeyValue(label string) (key string, value string) {
+	if kv := strings.SplitN(label, "=", 2); len(kv) > 0 {
 		key = kv[0]
-		if len(kv) > 1 ***REMOVED***
+		if len(kv) > 1 {
 			value = kv[1]
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}

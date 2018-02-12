@@ -24,7 +24,7 @@ package prometheus
 // already implemented in this library are the metric vectors (i.e. collection
 // of multiple instances of the same Metric but with different label values)
 // like GaugeVec or SummaryVec, and the ExpvarCollector.
-type Collector interface ***REMOVED***
+type Collector interface {
 	// Describe sends the super-set of all possible descriptors of metrics
 	// collected by this Collector to the provided channel and returns once
 	// the last descriptor has been sent. The sent descriptors fulfill the
@@ -48,28 +48,28 @@ type Collector interface ***REMOVED***
 	// metrics. Ideally, Collector implementations support concurrent
 	// readers.
 	Collect(chan<- Metric)
-***REMOVED***
+}
 
 // SelfCollector implements Collector for a single Metric so that that the
 // Metric collects itself. Add it as an anonymous field to a struct that
 // implements Metric, and call Init with the Metric itself as an argument.
-type SelfCollector struct ***REMOVED***
+type SelfCollector struct {
 	self Metric
-***REMOVED***
+}
 
 // Init provides the SelfCollector with a reference to the metric it is supposed
 // to collect. It is usually called within the factory function to create a
 // metric. See example.
-func (c *SelfCollector) Init(self Metric) ***REMOVED***
+func (c *SelfCollector) Init(self Metric) {
 	c.self = self
-***REMOVED***
+}
 
 // Describe implements Collector.
-func (c *SelfCollector) Describe(ch chan<- *Desc) ***REMOVED***
+func (c *SelfCollector) Describe(ch chan<- *Desc) {
 	ch <- c.self.Desc()
-***REMOVED***
+}
 
 // Collect implements Collector.
-func (c *SelfCollector) Collect(ch chan<- Metric) ***REMOVED***
+func (c *SelfCollector) Collect(ch chan<- Metric) {
 	ch <- c.self
-***REMOVED***
+}

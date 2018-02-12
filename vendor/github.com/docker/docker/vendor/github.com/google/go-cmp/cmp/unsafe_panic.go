@@ -10,6 +10,6 @@ import "reflect"
 
 const supportAllowUnexported = false
 
-func unsafeRetrieveField(reflect.Value, reflect.StructField) reflect.Value ***REMOVED***
+func unsafeRetrieveField(reflect.Value, reflect.StructField) reflect.Value {
 	panic("unsafeRetrieveField is not implemented")
-***REMOVED***
+}

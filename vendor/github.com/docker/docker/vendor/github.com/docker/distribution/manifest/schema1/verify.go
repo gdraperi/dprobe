@@ -9,24 +9,24 @@ import (
 
 // Verify verifies the signature of the signed manifest returning the public
 // keys used during signing.
-func Verify(sm *SignedManifest) ([]libtrust.PublicKey, error) ***REMOVED***
+func Verify(sm *SignedManifest) ([]libtrust.PublicKey, error) {
 	js, err := libtrust.ParsePrettySignature(sm.all, "signatures")
-	if err != nil ***REMOVED***
+	if err != nil {
 		logrus.WithField("err", err).Debugf("(*SignedManifest).Verify")
 		return nil, err
-	***REMOVED***
+	}
 
 	return js.Verify()
-***REMOVED***
+}
 
 // VerifyChains verifies the signature of the signed manifest against the
 // certificate pool returning the list of verified chains. Signatures without
 // an x509 chain are not checked.
-func VerifyChains(sm *SignedManifest, ca *x509.CertPool) ([][]*x509.Certificate, error) ***REMOVED***
+func VerifyChains(sm *SignedManifest, ca *x509.CertPool) ([][]*x509.Certificate, error) {
 	js, err := libtrust.ParsePrettySignature(sm.all, "signatures")
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	return js.VerifyChains(ca)
-***REMOVED***
+}

@@ -1,11 +1,11 @@
 package slack
 
-type starEvent struct ***REMOVED***
+type starEvent struct {
 	Type           string      `json:"type"`
 	User           string      `json:"user"`
 	Item           StarredItem `json:"item"`
 	EventTimestamp string      `json:"event_ts"`
-***REMOVED***
+}
 
 // StarAddedEvent represents the Star added event
 type StarAddedEvent starEvent

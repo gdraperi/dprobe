@@ -8,11 +8,11 @@ import (
 )
 
 // Self retrieves a list of mounts for the current running process.
-func Self() ([]Info, error) ***REMOVED***
+func Self() ([]Info, error) {
 	return nil, fmt.Errorf("mountinfo.Self is not implemented on %s/%s", runtime.GOOS, runtime.GOARCH)
-***REMOVED***
+}
 
 // PID collects the mounts for a specific process ID.
-func PID(pid int) ([]Info, error) ***REMOVED***
+func PID(pid int) ([]Info, error) {
 	return nil, fmt.Errorf("mountinfo.PID is not implemented on %s/%s", runtime.GOOS, runtime.GOARCH)
-***REMOVED***
+}

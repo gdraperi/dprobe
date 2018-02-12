@@ -12,10 +12,10 @@ import (
 	"golang.org/x/net/internal/socket"
 )
 
-func (so *sockOpt) setGroupReq(c *socket.Conn, ifi *net.Interface, grp net.IP) error ***REMOVED***
+func (so *sockOpt) setGroupReq(c *socket.Conn, ifi *net.Interface, grp net.IP) error {
 	return errOpNoSupport
-***REMOVED***
+}
 
-func (so *sockOpt) setGroupSourceReq(c *socket.Conn, ifi *net.Interface, grp, src net.IP) error ***REMOVED***
+func (so *sockOpt) setGroupSourceReq(c *socket.Conn, ifi *net.Interface, grp, src net.IP) error {
 	return errOpNoSupport
-***REMOVED***
+}

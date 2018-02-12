@@ -10,43 +10,43 @@ import (
 )
 
 // VersionInfo holds information about the kernel.
-type VersionInfo struct ***REMOVED***
+type VersionInfo struct {
 	Kernel int    // Version of the kernel (e.g. 4.1.2-generic -> 4)
 	Major  int    // Major part of the kernel version (e.g. 4.1.2-generic -> 1)
 	Minor  int    // Minor part of the kernel version (e.g. 4.1.2-generic -> 2)
 	Flavor string // Flavor of the kernel version (e.g. 4.1.2-generic -> generic)
-***REMOVED***
+}
 
-func (k *VersionInfo) String() string ***REMOVED***
+func (k *VersionInfo) String() string {
 	return fmt.Sprintf("%d.%d.%d%s", k.Kernel, k.Major, k.Minor, k.Flavor)
-***REMOVED***
+}
 
 // CompareKernelVersion compares two kernel.VersionInfo structs.
 // Returns -1 if a < b, 0 if a == b, 1 it a > b
-func CompareKernelVersion(a, b VersionInfo) int ***REMOVED***
-	if a.Kernel < b.Kernel ***REMOVED***
+func CompareKernelVersion(a, b VersionInfo) int {
+	if a.Kernel < b.Kernel {
 		return -1
-	***REMOVED*** else if a.Kernel > b.Kernel ***REMOVED***
+	} else if a.Kernel > b.Kernel {
 		return 1
-	***REMOVED***
+	}
 
-	if a.Major < b.Major ***REMOVED***
+	if a.Major < b.Major {
 		return -1
-	***REMOVED*** else if a.Major > b.Major ***REMOVED***
+	} else if a.Major > b.Major {
 		return 1
-	***REMOVED***
+	}
 
-	if a.Minor < b.Minor ***REMOVED***
+	if a.Minor < b.Minor {
 		return -1
-	***REMOVED*** else if a.Minor > b.Minor ***REMOVED***
+	} else if a.Minor > b.Minor {
 		return 1
-	***REMOVED***
+	}
 
 	return 0
-***REMOVED***
+}
 
 // ParseRelease parses a string and creates a VersionInfo based on it.
-func ParseRelease(release string) (*VersionInfo, error) ***REMOVED***
+func ParseRelease(release string) (*VersionInfo, error) {
 	var (
 		kernel, major, minor, parsed int
 		flavor, partial              string
@@ -55,20 +55,20 @@ func ParseRelease(release string) (*VersionInfo, error) ***REMOVED***
 	// Ignore error from Sscanf to allow an empty flavor.  Instead, just
 	// make sure we got all the version numbers.
 	parsed, _ = fmt.Sscanf(release, "%d.%d%s", &kernel, &major, &partial)
-	if parsed < 2 ***REMOVED***
+	if parsed < 2 {
 		return nil, errors.New("Can't parse kernel version " + release)
-	***REMOVED***
+	}
 
 	// sometimes we have 3.12.25-gentoo, but sometimes we just have 3.12-1-amd64
 	parsed, _ = fmt.Sscanf(partial, ".%d%s", &minor, &flavor)
-	if parsed < 1 ***REMOVED***
+	if parsed < 1 {
 		flavor = partial
-	***REMOVED***
+	}
 
-	return &VersionInfo***REMOVED***
+	return &VersionInfo{
 		Kernel: kernel,
 		Major:  major,
 		Minor:  minor,
 		Flavor: flavor,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}

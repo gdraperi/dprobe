@@ -5,91 +5,91 @@ import (
 )
 
 // memoryStore implements a Store in memory.
-type memoryStore struct ***REMOVED***
+type memoryStore struct {
 	s map[string]*Container
 	sync.RWMutex
-***REMOVED***
+}
 
 // NewMemoryStore initializes a new memory store.
-func NewMemoryStore() Store ***REMOVED***
-	return &memoryStore***REMOVED***
+func NewMemoryStore() Store {
+	return &memoryStore{
 		s: make(map[string]*Container),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Add appends a new container to the memory store.
 // It overrides the id if it existed before.
-func (c *memoryStore) Add(id string, cont *Container) ***REMOVED***
+func (c *memoryStore) Add(id string, cont *Container) {
 	c.Lock()
 	c.s[id] = cont
 	c.Unlock()
-***REMOVED***
+}
 
 // Get returns a container from the store by id.
-func (c *memoryStore) Get(id string) *Container ***REMOVED***
+func (c *memoryStore) Get(id string) *Container {
 	var res *Container
 	c.RLock()
 	res = c.s[id]
 	c.RUnlock()
 	return res
-***REMOVED***
+}
 
 // Delete removes a container from the store by id.
-func (c *memoryStore) Delete(id string) ***REMOVED***
+func (c *memoryStore) Delete(id string) {
 	c.Lock()
 	delete(c.s, id)
 	c.Unlock()
-***REMOVED***
+}
 
 // List returns a sorted list of containers from the store.
 // The containers are ordered by creation date.
-func (c *memoryStore) List() []*Container ***REMOVED***
+func (c *memoryStore) List() []*Container {
 	containers := History(c.all())
 	containers.sort()
 	return containers
-***REMOVED***
+}
 
 // Size returns the number of containers in the store.
-func (c *memoryStore) Size() int ***REMOVED***
+func (c *memoryStore) Size() int {
 	c.RLock()
 	defer c.RUnlock()
 	return len(c.s)
-***REMOVED***
+}
 
 // First returns the first container found in the store by a given filter.
-func (c *memoryStore) First(filter StoreFilter) *Container ***REMOVED***
-	for _, cont := range c.all() ***REMOVED***
-		if filter(cont) ***REMOVED***
+func (c *memoryStore) First(filter StoreFilter) *Container {
+	for _, cont := range c.all() {
+		if filter(cont) {
 			return cont
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
 // ApplyAll calls the reducer function with every container in the store.
 // This operation is asynchronous in the memory store.
 // NOTE: Modifications to the store MUST NOT be done by the StoreReducer.
-func (c *memoryStore) ApplyAll(apply StoreReducer) ***REMOVED***
+func (c *memoryStore) ApplyAll(apply StoreReducer) {
 	wg := new(sync.WaitGroup)
-	for _, cont := range c.all() ***REMOVED***
+	for _, cont := range c.all() {
 		wg.Add(1)
-		go func(container *Container) ***REMOVED***
+		go func(container *Container) {
 			apply(container)
 			wg.Done()
-		***REMOVED***(cont)
-	***REMOVED***
+		}(cont)
+	}
 
 	wg.Wait()
-***REMOVED***
+}
 
-func (c *memoryStore) all() []*Container ***REMOVED***
+func (c *memoryStore) all() []*Container {
 	c.RLock()
 	containers := make([]*Container, 0, len(c.s))
-	for _, cont := range c.s ***REMOVED***
+	for _, cont := range c.s {
 		containers = append(containers, cont)
-	***REMOVED***
+	}
 	c.RUnlock()
 	return containers
-***REMOVED***
+}
 
-var _ Store = &memoryStore***REMOVED******REMOVED***
+var _ Store = &memoryStore{}

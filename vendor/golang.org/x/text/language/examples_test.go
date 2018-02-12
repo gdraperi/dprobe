@@ -11,13 +11,13 @@ import (
 	"golang.org/x/text/language"
 )
 
-func ExampleCanonType() ***REMOVED***
-	p := func(id string) ***REMOVED***
+func ExampleCanonType() {
+	p := func(id string) {
 		fmt.Printf("Default(%s) -> %s\n", id, language.Make(id))
 		fmt.Printf("BCP47(%s) -> %s\n", id, language.BCP47.Make(id))
 		fmt.Printf("Macro(%s) -> %s\n", id, language.Macro.Make(id))
 		fmt.Printf("All(%s) -> %s\n", id, language.All.Make(id))
-	***REMOVED***
+	}
 	p("en-Latn")
 	p("sh")
 	p("zh-cmn")
@@ -44,9 +44,9 @@ func ExampleCanonType() ***REMOVED***
 	// BCP47(iw-Latn-fonipa-u-cu-usd) -> he-Latn-fonipa-u-cu-usd
 	// Macro(iw-Latn-fonipa-u-cu-usd) -> iw-Latn-fonipa-u-cu-usd
 	// All(iw-Latn-fonipa-u-cu-usd) -> he-Latn-fonipa-u-cu-usd
-***REMOVED***
+}
 
-func ExampleTag_Base() ***REMOVED***
+func ExampleTag_Base() {
 	fmt.Println(language.Make("und").Base())
 	fmt.Println(language.Make("und-US").Base())
 	fmt.Println(language.Make("und-NL").Base())
@@ -58,9 +58,9 @@ func ExampleTag_Base() ***REMOVED***
 	// nl High
 	// es Low
 	// en Low
-***REMOVED***
+}
 
-func ExampleTag_Script() ***REMOVED***
+func ExampleTag_Script() {
 	en := language.Make("en")
 	sr := language.Make("sr")
 	sr_Latn := language.Make("sr_Latn")
@@ -76,9 +76,9 @@ func ExampleTag_Script() ***REMOVED***
 	// Cyrl Low
 	// false
 	// true
-***REMOVED***
+}
 
-func ExampleTag_Region() ***REMOVED***
+func ExampleTag_Region() {
 	ru := language.Make("ru")
 	en := language.Make("en")
 	fmt.Println(ru.Region())
@@ -86,9 +86,9 @@ func ExampleTag_Region() ***REMOVED***
 	// Output:
 	// RU Low
 	// US Low
-***REMOVED***
+}
 
-func ExampleRegion_TLD() ***REMOVED***
+func ExampleRegion_TLD() {
 	us := language.MustParseRegion("US")
 	gb := language.MustParseRegion("GB")
 	uk := language.MustParseRegion("UK")
@@ -112,9 +112,9 @@ func ExampleRegion_TLD() ***REMOVED***
 	// UK <nil>
 	// UK <nil>
 	// MM <nil>
-***REMOVED***
+}
 
-func ExampleCompose() ***REMOVED***
+func ExampleCompose() {
 	nl, _ := language.ParseBase("nl")
 	us, _ := language.ParseRegion("US")
 	de := language.Make("de-1901-u-co-phonebk")
@@ -137,12 +137,12 @@ func ExampleCompose() ***REMOVED***
 	fmt.Println(language.Compose(de, nl))
 	fmt.Println(language.Compose(de, nl, u))
 	// Remove the base language.
-	fmt.Println(language.Compose(de, language.Base***REMOVED******REMOVED***))
+	fmt.Println(language.Compose(de, language.Base{}))
 	// Remove all variants.
-	fmt.Println(language.Compose(de, []language.Variant***REMOVED******REMOVED***))
+	fmt.Println(language.Compose(de, []language.Variant{}))
 	// Remove all extensions.
-	fmt.Println(language.Compose(de, []language.Extension***REMOVED******REMOVED***))
-	fmt.Println(language.Compose(fi, []language.Extension***REMOVED******REMOVED***))
+	fmt.Println(language.Compose(de, []language.Extension{}))
+	fmt.Println(language.Compose(fi, []language.Extension{}))
 	// Remove all variants and extensions.
 	fmt.Println(language.Compose(de.Raw()))
 
@@ -172,22 +172,22 @@ func ExampleCompose() ***REMOVED***
 	// und language: subtag "HH" is well-formed but unknown
 	// en-Latn-GB <nil>
 	// en-GB <nil>
-***REMOVED***
+}
 
-func ExampleParse_errors() ***REMOVED***
-	for _, s := range []string***REMOVED***"Foo", "Bar", "Foobar"***REMOVED*** ***REMOVED***
+func ExampleParse_errors() {
+	for _, s := range []string{"Foo", "Bar", "Foobar"} {
 		_, err := language.Parse(s)
-		if err != nil ***REMOVED***
-			if inv, ok := err.(language.ValueError); ok ***REMOVED***
+		if err != nil {
+			if inv, ok := err.(language.ValueError); ok {
 				fmt.Println(inv.Subtag())
-			***REMOVED*** else ***REMOVED***
+			} else {
 				fmt.Println(s)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-	for _, s := range []string***REMOVED***"en", "aa-Uuuu", "AC", "ac-u"***REMOVED*** ***REMOVED***
+			}
+		}
+	}
+	for _, s := range []string{"en", "aa-Uuuu", "AC", "ac-u"} {
 		_, err := language.Parse(s)
-		switch e := err.(type) ***REMOVED***
+		switch e := err.(type) {
 		case language.ValueError:
 			fmt.Printf("%s: culprit %q\n", s, e.Subtag())
 		case nil:
@@ -195,20 +195,20 @@ func ExampleParse_errors() ***REMOVED***
 		default:
 			// A syntax error.
 			fmt.Printf("%s: ill-formed\n", s)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	// Output:
 	// foo
 	// Foobar
 	// aa-Uuuu: culprit "Uuuu"
 	// AC: culprit "ac"
 	// ac-u: ill-formed
-***REMOVED***
+}
 
-func ExampleParent() ***REMOVED***
-	p := func(tag string) ***REMOVED***
+func ExampleParent() {
+	p := func(tag string) {
 		fmt.Printf("parent(%v): %v\n", tag, language.Make(tag).Parent())
-	***REMOVED***
+	}
 	p("zh-CN")
 
 	// Australian English inherits from World English.
@@ -239,14 +239,14 @@ func ExampleParent() ***REMOVED***
 	// parent(zh-Hant): und
 	// parent(de-1994-u-co-phonebk): de
 	// parent(de-Latn-LU): de
-***REMOVED***
+}
 
 // ExampleMatcher_bestMatch gives some examples of getting the best match of
 // a set of tags to any of the tags of given set.
-func ExampleMatcher() ***REMOVED***
+func ExampleMatcher() {
 	// This is the set of tags from which we want to pick the best match. These
 	// can be, for example, the supported languages for some package.
-	tags := []language.Tag***REMOVED***
+	tags := []language.Tag{
 		language.English,
 		language.BritishEnglish,
 		language.French,
@@ -258,7 +258,7 @@ func ExampleMatcher() ***REMOVED***
 		language.Raw.Make("iw-IL"),
 		language.Raw.Make("iw"),
 		language.Raw.Make("he"),
-	***REMOVED***
+	}
 	m := language.NewMatcher(tags)
 
 	// A simple match.
@@ -339,23 +339,23 @@ func ExampleMatcher() ***REMOVED***
 	// en-u-co-phonebk 0 No
 
 	// TODO: "he" should be "he-u-rg-IL High"
-***REMOVED***
+}
 
-func ExampleMatchStrings() ***REMOVED***
+func ExampleMatchStrings() {
 	// languages supported by this service:
-	matcher := language.NewMatcher([]language.Tag***REMOVED***
+	matcher := language.NewMatcher([]language.Tag{
 		language.English, language.Dutch, language.German,
-	***REMOVED***)
+	})
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) ***REMOVED***
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		lang, _ := r.Cookie("lang")
 		tag, _ := language.MatchStrings(matcher, lang.String(), r.Header.Get("Accept-Language"))
 
 		fmt.Println("User language:", tag)
-	***REMOVED***)
-***REMOVED***
+	})
+}
 
-func ExampleComprehends() ***REMOVED***
+func ExampleComprehends() {
 	// Various levels of comprehensibility.
 	fmt.Println(language.Comprehends(language.English, language.English))
 	fmt.Println(language.Comprehends(language.AmericanEnglish, language.BritishEnglish))
@@ -390,9 +390,9 @@ func ExampleComprehends() ***REMOVED***
 	// ----
 	// High
 	// No
-***REMOVED***
+}
 
-func ExampleTag_values() ***REMOVED***
+func ExampleTag_values() {
 	us := language.MustParseRegion("US")
 	en := language.MustParseBase("en")
 
@@ -410,4 +410,4 @@ func ExampleTag_values() ***REMOVED***
 	// true true
 	// true false
 	// true
-***REMOVED***
+}

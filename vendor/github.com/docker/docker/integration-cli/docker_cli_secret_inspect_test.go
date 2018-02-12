@@ -10,16 +10,16 @@ import (
 	"github.com/go-check/check"
 )
 
-func (s *DockerSwarmSuite) TestSecretInspect(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestSecretInspect(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 
 	testName := "test_secret"
-	id := d.CreateSecret(c, swarm.SecretSpec***REMOVED***
-		Annotations: swarm.Annotations***REMOVED***
+	id := d.CreateSecret(c, swarm.SecretSpec{
+		Annotations: swarm.Annotations{
 			Name: testName,
-		***REMOVED***,
+		},
 		Data: []byte("TESTINGDATA"),
-	***REMOVED***)
+	})
 	c.Assert(id, checker.Not(checker.Equals), "", check.Commentf("secrets: %s", id))
 
 	secret := d.GetSecret(c, id)
@@ -31,33 +31,33 @@ func (s *DockerSwarmSuite) TestSecretInspect(c *check.C) ***REMOVED***
 	var secrets []swarm.Secret
 	c.Assert(json.Unmarshal([]byte(out), &secrets), checker.IsNil)
 	c.Assert(secrets, checker.HasLen, 1)
-***REMOVED***
+}
 
-func (s *DockerSwarmSuite) TestSecretInspectMultiple(c *check.C) ***REMOVED***
+func (s *DockerSwarmSuite) TestSecretInspectMultiple(c *check.C) {
 	d := s.AddDaemon(c, true, true)
 
-	testNames := []string***REMOVED***
+	testNames := []string{
 		"test0",
 		"test1",
-	***REMOVED***
-	for _, n := range testNames ***REMOVED***
-		id := d.CreateSecret(c, swarm.SecretSpec***REMOVED***
-			Annotations: swarm.Annotations***REMOVED***
+	}
+	for _, n := range testNames {
+		id := d.CreateSecret(c, swarm.SecretSpec{
+			Annotations: swarm.Annotations{
 				Name: n,
-			***REMOVED***,
+			},
 			Data: []byte("TESTINGDATA"),
-		***REMOVED***)
+		})
 		c.Assert(id, checker.Not(checker.Equals), "", check.Commentf("secrets: %s", id))
 
 		secret := d.GetSecret(c, id)
 		c.Assert(secret.Spec.Name, checker.Equals, n)
 
-	***REMOVED***
+	}
 
-	args := []string***REMOVED***
+	args := []string{
 		"secret",
 		"inspect",
-	***REMOVED***
+	}
 	args = append(args, testNames...)
 	out, err := d.Cmd(args...)
 	c.Assert(err, checker.IsNil, check.Commentf(out))
@@ -65,4 +65,4 @@ func (s *DockerSwarmSuite) TestSecretInspectMultiple(c *check.C) ***REMOVED***
 	var secrets []swarm.Secret
 	c.Assert(json.Unmarshal([]byte(out), &secrets), checker.IsNil)
 	c.Assert(secrets, checker.HasLen, 2)
-***REMOVED***
+}

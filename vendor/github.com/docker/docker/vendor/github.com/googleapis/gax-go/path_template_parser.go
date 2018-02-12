@@ -42,186 +42,186 @@ import (
 // https://tools.ietf.org/html/rfc6570 about the characters in identifiers and
 // literals.
 
-type pathTemplateParser struct ***REMOVED***
+type pathTemplateParser struct {
 	r                *strings.Reader
 	runeCount        int             // the number of the current rune in the original string
 	nextVar          int             // the number to use for the next unnamed variable
 	seenName         map[string]bool // names we've seen already
 	seenPathWildcard bool            // have we seen "**" already?
-***REMOVED***
+}
 
-func parsePathTemplate(template string) (pt *PathTemplate, err error) ***REMOVED***
-	p := &pathTemplateParser***REMOVED***
+func parsePathTemplate(template string) (pt *PathTemplate, err error) {
+	p := &pathTemplateParser{
 		r:        strings.NewReader(template),
-		seenName: map[string]bool***REMOVED******REMOVED***,
-	***REMOVED***
+		seenName: map[string]bool{},
+	}
 
 	// Handle panics with strings like errors.
 	// See pathTemplateParser.error, below.
-	defer func() ***REMOVED***
-		if x := recover(); x != nil ***REMOVED***
+	defer func() {
+		if x := recover(); x != nil {
 			errmsg, ok := x.(errString)
-			if !ok ***REMOVED***
+			if !ok {
 				panic(x)
-			***REMOVED***
+			}
 			pt = nil
-			err = ParseError***REMOVED***p.runeCount, template, string(errmsg)***REMOVED***
-		***REMOVED***
-	***REMOVED***()
+			err = ParseError{p.runeCount, template, string(errmsg)}
+		}
+	}()
 
 	segs := p.template()
 	// If there is a path wildcard, set its length. We can't do this
 	// until we know how many segments we've got all together.
-	for i, seg := range segs ***REMOVED***
-		if _, ok := seg.matcher.(pathWildcardMatcher); ok ***REMOVED***
+	for i, seg := range segs {
+		if _, ok := seg.matcher.(pathWildcardMatcher); ok {
 			segs[i].matcher = pathWildcardMatcher(len(segs) - i - 1)
 			break
-		***REMOVED***
-	***REMOVED***
-	return &PathTemplate***REMOVED***segments: segs***REMOVED***, nil
+		}
+	}
+	return &PathTemplate{segments: segs}, nil
 
-***REMOVED***
+}
 
 // Used to indicate errors "thrown" by this parser. We don't use string because
 // many parts of the standard library panic with strings.
 type errString string
 
 // Terminates parsing immediately with an error.
-func (p *pathTemplateParser) error(msg string) ***REMOVED***
+func (p *pathTemplateParser) error(msg string) {
 	panic(errString(msg))
-***REMOVED***
+}
 
 // Template = [ "/" ] Segments
-func (p *pathTemplateParser) template() []segment ***REMOVED***
+func (p *pathTemplateParser) template() []segment {
 	var segs []segment
-	if p.consume('/') ***REMOVED***
+	if p.consume('/') {
 		// Initial '/' needs an initial empty matcher.
-		segs = append(segs, segment***REMOVED***matcher: labelMatcher("")***REMOVED***)
-	***REMOVED***
+		segs = append(segs, segment{matcher: labelMatcher("")})
+	}
 	return append(segs, p.segments("")...)
-***REMOVED***
+}
 
-// Segments = Segment ***REMOVED*** "/" Segment ***REMOVED***
-func (p *pathTemplateParser) segments(name string) []segment ***REMOVED***
+// Segments = Segment { "/" Segment }
+func (p *pathTemplateParser) segments(name string) []segment {
 	var segs []segment
-	for ***REMOVED***
+	for {
 		subsegs := p.segment(name)
 		segs = append(segs, subsegs...)
-		if !p.consume('/') ***REMOVED***
+		if !p.consume('/') {
 			break
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return segs
-***REMOVED***
+}
 
 // Segment  = "*" | "**" | LITERAL | Variable
-func (p *pathTemplateParser) segment(name string) []segment ***REMOVED***
-	if p.consume('*') ***REMOVED***
-		if name == "" ***REMOVED***
+func (p *pathTemplateParser) segment(name string) []segment {
+	if p.consume('*') {
+		if name == "" {
 			name = fmt.Sprintf("$%d", p.nextVar)
 			p.nextVar++
-		***REMOVED***
-		if p.consume('*') ***REMOVED***
-			if p.seenPathWildcard ***REMOVED***
+		}
+		if p.consume('*') {
+			if p.seenPathWildcard {
 				p.error("multiple '**' disallowed")
-			***REMOVED***
+			}
 			p.seenPathWildcard = true
 			// We'll change 0 to the right number at the end.
-			return []segment***REMOVED******REMOVED***name: name, matcher: pathWildcardMatcher(0)***REMOVED******REMOVED***
-		***REMOVED***
-		return []segment***REMOVED******REMOVED***name: name, matcher: wildcardMatcher(0)***REMOVED******REMOVED***
-	***REMOVED***
-	if p.consume('***REMOVED***') ***REMOVED***
-		if name != "" ***REMOVED***
+			return []segment{{name: name, matcher: pathWildcardMatcher(0)}}
+		}
+		return []segment{{name: name, matcher: wildcardMatcher(0)}}
+	}
+	if p.consume('{') {
+		if name != "" {
 			p.error("recursive named bindings are not allowed")
-		***REMOVED***
+		}
 		return p.variable()
-	***REMOVED***
-	return []segment***REMOVED******REMOVED***name: name, matcher: labelMatcher(p.literal())***REMOVED******REMOVED***
-***REMOVED***
+	}
+	return []segment{{name: name, matcher: labelMatcher(p.literal())}}
+}
 
-// Variable = "***REMOVED***" FieldPath [ "=" Segments ] "***REMOVED***"
-// "***REMOVED***" is already consumed.
-func (p *pathTemplateParser) variable() []segment ***REMOVED***
-	// Simplification: treat FieldPath as LITERAL, instead of IDENT ***REMOVED*** '.' IDENT ***REMOVED***
+// Variable = "{" FieldPath [ "=" Segments ] "}"
+// "{" is already consumed.
+func (p *pathTemplateParser) variable() []segment {
+	// Simplification: treat FieldPath as LITERAL, instead of IDENT { '.' IDENT }
 	name := p.literal()
-	if p.seenName[name] ***REMOVED***
+	if p.seenName[name] {
 		p.error(name + " appears multiple times")
-	***REMOVED***
+	}
 	p.seenName[name] = true
 	var segs []segment
-	if p.consume('=') ***REMOVED***
+	if p.consume('=') {
 		segs = p.segments(name)
-	***REMOVED*** else ***REMOVED***
-		// "***REMOVED***var***REMOVED***" is equivalent to "***REMOVED***var=****REMOVED***"
-		segs = []segment***REMOVED******REMOVED***name: name, matcher: wildcardMatcher(0)***REMOVED******REMOVED***
-	***REMOVED***
-	if !p.consume('***REMOVED***') ***REMOVED***
-		p.error("expected '***REMOVED***'")
-	***REMOVED***
+	} else {
+		// "{var}" is equivalent to "{var=*}"
+		segs = []segment{{name: name, matcher: wildcardMatcher(0)}}
+	}
+	if !p.consume('}') {
+		p.error("expected '}'")
+	}
 	return segs
-***REMOVED***
+}
 
 // A literal is any sequence of characters other than a few special ones.
 // The list of stop characters is not quite the same as in the template RFC.
-func (p *pathTemplateParser) literal() string ***REMOVED***
-	lit := p.consumeUntil("/****REMOVED******REMOVED***=")
-	if lit == "" ***REMOVED***
+func (p *pathTemplateParser) literal() string {
+	lit := p.consumeUntil("/*}{=")
+	if lit == "" {
 		p.error("empty literal")
-	***REMOVED***
+	}
 	return lit
-***REMOVED***
+}
 
 // Read runes until EOF or one of the runes in stopRunes is encountered.
 // If the latter, unread the stop rune. Return the accumulated runes as a string.
-func (p *pathTemplateParser) consumeUntil(stopRunes string) string ***REMOVED***
+func (p *pathTemplateParser) consumeUntil(stopRunes string) string {
 	var runes []rune
-	for ***REMOVED***
+	for {
 		r, ok := p.readRune()
-		if !ok ***REMOVED***
+		if !ok {
 			break
-		***REMOVED***
-		if strings.IndexRune(stopRunes, r) >= 0 ***REMOVED***
+		}
+		if strings.IndexRune(stopRunes, r) >= 0 {
 			p.unreadRune()
 			break
-		***REMOVED***
+		}
 		runes = append(runes, r)
-	***REMOVED***
+	}
 	return string(runes)
-***REMOVED***
+}
 
 // If the next rune is r, consume it and return true.
 // Otherwise, leave the input unchanged and return false.
-func (p *pathTemplateParser) consume(r rune) bool ***REMOVED***
+func (p *pathTemplateParser) consume(r rune) bool {
 	rr, ok := p.readRune()
-	if !ok ***REMOVED***
+	if !ok {
 		return false
-	***REMOVED***
-	if r == rr ***REMOVED***
+	}
+	if r == rr {
 		return true
-	***REMOVED***
+	}
 	p.unreadRune()
 	return false
-***REMOVED***
+}
 
 // Read the next rune from the input. Return it.
 // The second return value is false at EOF.
-func (p *pathTemplateParser) readRune() (rune, bool) ***REMOVED***
+func (p *pathTemplateParser) readRune() (rune, bool) {
 	r, _, err := p.r.ReadRune()
-	if err == io.EOF ***REMOVED***
+	if err == io.EOF {
 		return r, false
-	***REMOVED***
-	if err != nil ***REMOVED***
+	}
+	if err != nil {
 		p.error(err.Error())
-	***REMOVED***
+	}
 	p.runeCount++
 	return r, true
-***REMOVED***
+}
 
 // Put the last rune that was read back on the input.
-func (p *pathTemplateParser) unreadRune() ***REMOVED***
-	if err := p.r.UnreadRune(); err != nil ***REMOVED***
+func (p *pathTemplateParser) unreadRune() {
+	if err := p.r.UnreadRune(); err != nil {
 		p.error(err.Error())
-	***REMOVED***
+	}
 	p.runeCount--
-***REMOVED***
+}

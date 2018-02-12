@@ -21,22 +21,22 @@ const (
 	Many
 )
 
-var countMap = map[string]Form***REMOVED***
+var countMap = map[string]Form{
 	"other": Other,
 	"zero":  Zero,
 	"one":   One,
 	"two":   Two,
 	"few":   Few,
 	"many":  Many,
-***REMOVED***
+}
 
-type pluralCheck struct ***REMOVED***
+type pluralCheck struct {
 	// category:
 	// 3..7: opID
 	// 0..2: category
 	cat   byte
 	setID byte
-***REMOVED***
+}
 
 // opID identifies the type of operand in the plural rule, being i, n or f.
 // (v, w, and t are treated as filters in our implementation.)

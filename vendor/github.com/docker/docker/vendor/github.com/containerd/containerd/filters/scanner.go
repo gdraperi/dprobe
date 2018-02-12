@@ -18,8 +18,8 @@ const (
 
 type token rune
 
-func (t token) String() string ***REMOVED***
-	switch t ***REMOVED***
+func (t token) String() string {
+	switch t {
 	case tokenEOF:
 		return "EOF"
 	case tokenQuoted:
@@ -34,67 +34,67 @@ func (t token) String() string ***REMOVED***
 		return "Operator"
 	case tokenIllegal:
 		return "Illegal"
-	***REMOVED***
+	}
 
 	return string(t)
-***REMOVED***
+}
 
-func (t token) GoString() string ***REMOVED***
+func (t token) GoString() string {
 	return "token" + t.String()
-***REMOVED***
+}
 
-type scanner struct ***REMOVED***
+type scanner struct {
 	input string
 	pos   int
 	ppos  int // bounds the current rune in the string
 	value bool
-***REMOVED***
+}
 
-func (s *scanner) init(input string) ***REMOVED***
+func (s *scanner) init(input string) {
 	s.input = input
 	s.pos = 0
 	s.ppos = 0
-***REMOVED***
+}
 
-func (s *scanner) next() rune ***REMOVED***
-	if s.pos >= len(s.input) ***REMOVED***
+func (s *scanner) next() rune {
+	if s.pos >= len(s.input) {
 		return tokenEOF
-	***REMOVED***
+	}
 	s.pos = s.ppos
 
 	r, w := utf8.DecodeRuneInString(s.input[s.ppos:])
 	s.ppos += w
-	if r == utf8.RuneError ***REMOVED***
-		if w > 0 ***REMOVED***
+	if r == utf8.RuneError {
+		if w > 0 {
 			return tokenIllegal
-		***REMOVED***
+		}
 		return tokenEOF
-	***REMOVED***
+	}
 
-	if r == 0 ***REMOVED***
+	if r == 0 {
 		return tokenIllegal
-	***REMOVED***
+	}
 
 	return r
-***REMOVED***
+}
 
-func (s *scanner) peek() rune ***REMOVED***
+func (s *scanner) peek() rune {
 	pos := s.pos
 	ppos := s.ppos
 	ch := s.next()
 	s.pos = pos
 	s.ppos = ppos
 	return ch
-***REMOVED***
+}
 
-func (s *scanner) scan() (nextp int, tk token, text string) ***REMOVED***
+func (s *scanner) scan() (nextp int, tk token, text string) {
 	var (
 		ch  = s.next()
 		pos = s.pos
 	)
 
 chomp:
-	switch ***REMOVED***
+	switch {
 	case ch == tokenEOF:
 	case ch == tokenIllegal:
 	case isQuoteRune(ch):
@@ -119,62 +119,62 @@ chomp:
 	case isFieldRune(ch):
 		s.scanField()
 		return pos, tokenField, s.input[pos:s.ppos]
-	***REMOVED***
+	}
 
 	return s.pos, token(ch), ""
-***REMOVED***
+}
 
-func (s *scanner) scanField() ***REMOVED***
-	for ***REMOVED***
+func (s *scanner) scanField() {
+	for {
 		ch := s.peek()
-		if !isFieldRune(ch) ***REMOVED***
+		if !isFieldRune(ch) {
 			break
-		***REMOVED***
+		}
 		s.next()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *scanner) scanOperator() ***REMOVED***
-	for ***REMOVED***
+func (s *scanner) scanOperator() {
+	for {
 		ch := s.peek()
-		switch ch ***REMOVED***
+		switch ch {
 		case '=', '!', '~':
 			s.next()
 		default:
 			return
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func (s *scanner) scanValue() ***REMOVED***
-	for ***REMOVED***
+func (s *scanner) scanValue() {
+	for {
 		ch := s.peek()
-		if !isValueRune(ch) ***REMOVED***
+		if !isValueRune(ch) {
 			break
-		***REMOVED***
+		}
 		s.next()
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (s *scanner) scanQuoted(quote rune) ***REMOVED***
+func (s *scanner) scanQuoted(quote rune) {
 	ch := s.next() // read character after quote
-	for ch != quote ***REMOVED***
-		if ch == '\n' || ch < 0 ***REMOVED***
+	for ch != quote {
+		if ch == '\n' || ch < 0 {
 			s.error("literal not terminated")
 			return
-		***REMOVED***
-		if ch == '\\' ***REMOVED***
+		}
+		if ch == '\\' {
 			ch = s.scanEscape(quote)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			ch = s.next()
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return
-***REMOVED***
+}
 
-func (s *scanner) scanEscape(quote rune) rune ***REMOVED***
+func (s *scanner) scanEscape(quote rune) rune {
 	ch := s.next() // read character after '/'
-	switch ch ***REMOVED***
+	switch ch {
 	case 'a', 'b', 'f', 'n', 'r', 't', 'v', '\\', quote:
 		// nothing to do
 		ch = s.next()
@@ -188,81 +188,81 @@ func (s *scanner) scanEscape(quote rune) rune ***REMOVED***
 		ch = s.scanDigits(s.next(), 16, 8)
 	default:
 		s.error("illegal char escape")
-	***REMOVED***
+	}
 	return ch
-***REMOVED***
+}
 
-func (s *scanner) scanDigits(ch rune, base, n int) rune ***REMOVED***
-	for n > 0 && digitVal(ch) < base ***REMOVED***
+func (s *scanner) scanDigits(ch rune, base, n int) rune {
+	for n > 0 && digitVal(ch) < base {
 		ch = s.next()
 		n--
-	***REMOVED***
-	if n > 0 ***REMOVED***
+	}
+	if n > 0 {
 		s.error("illegal char escape")
-	***REMOVED***
+	}
 	return ch
-***REMOVED***
+}
 
-func (s *scanner) error(msg string) ***REMOVED***
+func (s *scanner) error(msg string) {
 	fmt.Println("error fixme", msg)
-***REMOVED***
+}
 
-func digitVal(ch rune) int ***REMOVED***
-	switch ***REMOVED***
+func digitVal(ch rune) int {
+	switch {
 	case '0' <= ch && ch <= '9':
 		return int(ch - '0')
 	case 'a' <= ch && ch <= 'f':
 		return int(ch - 'a' + 10)
 	case 'A' <= ch && ch <= 'F':
 		return int(ch - 'A' + 10)
-	***REMOVED***
+	}
 	return 16 // larger than any legal digit val
-***REMOVED***
+}
 
-func isFieldRune(r rune) bool ***REMOVED***
+func isFieldRune(r rune) bool {
 	return (r == '_' || isAlphaRune(r) || isDigitRune(r))
-***REMOVED***
+}
 
-func isAlphaRune(r rune) bool ***REMOVED***
+func isAlphaRune(r rune) bool {
 	return r >= 'A' && r <= 'Z' || r >= 'a' && r <= 'z'
-***REMOVED***
+}
 
-func isDigitRune(r rune) bool ***REMOVED***
+func isDigitRune(r rune) bool {
 	return r >= '0' && r <= '9'
-***REMOVED***
+}
 
-func isOperatorRune(r rune) bool ***REMOVED***
-	switch r ***REMOVED***
+func isOperatorRune(r rune) bool {
+	switch r {
 	case '=', '!', '~':
 		return true
-	***REMOVED***
+	}
 
 	return false
-***REMOVED***
+}
 
-func isQuoteRune(r rune) bool ***REMOVED***
-	switch r ***REMOVED***
+func isQuoteRune(r rune) bool {
+	switch r {
 	case '/', '|', '"': // maybe add single quoting?
 		return true
-	***REMOVED***
+	}
 
 	return false
-***REMOVED***
+}
 
-func isSeparatorRune(r rune) bool ***REMOVED***
-	switch r ***REMOVED***
+func isSeparatorRune(r rune) bool {
+	switch r {
 	case ',', '.':
 		return true
-	***REMOVED***
+	}
 
 	return false
-***REMOVED***
+}
 
-func isValueRune(r rune) bool ***REMOVED***
+func isValueRune(r rune) bool {
 	return r != ',' && !unicode.IsSpace(r) &&
 		(unicode.IsLetter(r) ||
 			unicode.IsDigit(r) ||
 			unicode.IsNumber(r) ||
 			unicode.IsGraphic(r) ||
 			unicode.IsPunct(r))
-***REMOVED***
+}

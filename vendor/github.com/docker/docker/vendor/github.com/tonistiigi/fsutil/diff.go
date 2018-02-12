@@ -9,36 +9,36 @@ import (
 
 type walkerFn func(ctx context.Context, pathC chan<- *currentPath) error
 
-func Changes(ctx context.Context, a, b walkerFn, changeFn ChangeFunc) error ***REMOVED***
+func Changes(ctx context.Context, a, b walkerFn, changeFn ChangeFunc) error {
 	return nil
-***REMOVED***
+}
 
 type HandleChangeFn func(ChangeKind, string, os.FileInfo, error) error
 
 type ContentHasher func(*Stat) (hash.Hash, error)
 
-func GetWalkerFn(root string) walkerFn ***REMOVED***
-	return func(ctx context.Context, pathC chan<- *currentPath) error ***REMOVED***
-		return Walk(ctx, root, nil, func(path string, f os.FileInfo, err error) error ***REMOVED***
-			if err != nil ***REMOVED***
+func GetWalkerFn(root string) walkerFn {
+	return func(ctx context.Context, pathC chan<- *currentPath) error {
+		return Walk(ctx, root, nil, func(path string, f os.FileInfo, err error) error {
+			if err != nil {
 				return err
-			***REMOVED***
+			}
 
-			p := &currentPath***REMOVED***
+			p := &currentPath{
 				path: path,
 				f:    f,
-			***REMOVED***
+			}
 
-			select ***REMOVED***
+			select {
 			case <-ctx.Done():
 				return ctx.Err()
 			case pathC <- p:
 				return nil
-			***REMOVED***
-		***REMOVED***)
-	***REMOVED***
-***REMOVED***
+			}
+		})
+	}
+}
 
-func emptyWalker(ctx context.Context, pathC chan<- *currentPath) error ***REMOVED***
+func emptyWalker(ctx context.Context, pathC chan<- *currentPath) error {
 	return nil
-***REMOVED***
+}

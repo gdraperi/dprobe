@@ -13,41 +13,41 @@ import (
 // here so we can detect the tlsconfig and return nil for only this type.
 type transportFunc func(*http.Request) (*http.Response, error)
 
-func (tf transportFunc) RoundTrip(req *http.Request) (*http.Response, error) ***REMOVED***
+func (tf transportFunc) RoundTrip(req *http.Request) (*http.Response, error) {
 	return tf(req)
-***REMOVED***
+}
 
-func newMockClient(doer func(*http.Request) (*http.Response, error)) *http.Client ***REMOVED***
-	return &http.Client***REMOVED***
+func newMockClient(doer func(*http.Request) (*http.Response, error)) *http.Client {
+	return &http.Client{
 		Transport: transportFunc(doer),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func errorMock(statusCode int, message string) func(req *http.Request) (*http.Response, error) ***REMOVED***
-	return func(req *http.Request) (*http.Response, error) ***REMOVED***
-		header := http.Header***REMOVED******REMOVED***
+func errorMock(statusCode int, message string) func(req *http.Request) (*http.Response, error) {
+	return func(req *http.Request) (*http.Response, error) {
+		header := http.Header{}
 		header.Set("Content-Type", "application/json")
 
-		body, err := json.Marshal(&types.ErrorResponse***REMOVED***
+		body, err := json.Marshal(&types.ErrorResponse{
 			Message: message,
-		***REMOVED***)
-		if err != nil ***REMOVED***
+		})
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 
-		return &http.Response***REMOVED***
+		return &http.Response{
 			StatusCode: statusCode,
 			Body:       ioutil.NopCloser(bytes.NewReader(body)),
 			Header:     header,
-		***REMOVED***, nil
-	***REMOVED***
-***REMOVED***
+		}, nil
+	}
+}
 
-func plainTextErrorMock(statusCode int, message string) func(req *http.Request) (*http.Response, error) ***REMOVED***
-	return func(req *http.Request) (*http.Response, error) ***REMOVED***
-		return &http.Response***REMOVED***
+func plainTextErrorMock(statusCode int, message string) func(req *http.Request) (*http.Response, error) {
+	return func(req *http.Request) (*http.Response, error) {
+		return &http.Response{
 			StatusCode: statusCode,
 			Body:       ioutil.NopCloser(bytes.NewReader([]byte(message))),
-		***REMOVED***, nil
-	***REMOVED***
-***REMOVED***
+		}, nil
+	}
+}

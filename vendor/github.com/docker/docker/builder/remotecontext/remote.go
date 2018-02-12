@@ -24,47 +24,47 @@ const acceptableRemoteMIME = `(?:application/(?:(?:x\-)?tar|octet\-stream|((?:x\
 var mimeRe = regexp.MustCompile(acceptableRemoteMIME)
 
 // downloadRemote context from a url and returns it, along with the parsed content type
-func downloadRemote(remoteURL string) (string, io.ReadCloser, error) ***REMOVED***
+func downloadRemote(remoteURL string) (string, io.ReadCloser, error) {
 	response, err := GetWithStatusError(remoteURL)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", nil, errors.Wrapf(err, "error downloading remote context %s", remoteURL)
-	***REMOVED***
+	}
 
 	contentType, contextReader, err := inspectResponse(
 		response.Header.Get("Content-Type"),
 		response.Body,
 		response.ContentLength)
-	if err != nil ***REMOVED***
+	if err != nil {
 		response.Body.Close()
 		return "", nil, errors.Wrapf(err, "error detecting content type for remote %s", remoteURL)
-	***REMOVED***
+	}
 
 	return contentType, ioutils.NewReadCloserWrapper(contextReader, response.Body.Close), nil
-***REMOVED***
+}
 
 // GetWithStatusError does an http.Get() and returns an error if the
 // status code is 4xx or 5xx.
-func GetWithStatusError(address string) (resp *http.Response, err error) ***REMOVED***
-	if resp, err = http.Get(address); err != nil ***REMOVED***
-		if uerr, ok := err.(*url.Error); ok ***REMOVED***
-			if derr, ok := uerr.Err.(*net.DNSError); ok && !derr.IsTimeout ***REMOVED***
+func GetWithStatusError(address string) (resp *http.Response, err error) {
+	if resp, err = http.Get(address); err != nil {
+		if uerr, ok := err.(*url.Error); ok {
+			if derr, ok := uerr.Err.(*net.DNSError); ok && !derr.IsTimeout {
 				return nil, errdefs.NotFound(err)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		return nil, errdefs.System(err)
-	***REMOVED***
-	if resp.StatusCode < 400 ***REMOVED***
+	}
+	if resp.StatusCode < 400 {
 		return resp, nil
-	***REMOVED***
+	}
 	msg := fmt.Sprintf("failed to GET %s with status %s", address, resp.Status)
 	body, err := ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, errdefs.System(errors.New(msg + ": error reading body"))
-	***REMOVED***
+	}
 
 	msg += ": " + string(bytes.TrimSpace(body))
-	switch resp.StatusCode ***REMOVED***
+	switch resp.StatusCode {
 	case http.StatusNotFound:
 		return nil, errdefs.NotFound(errors.New(msg))
 	case http.StatusBadRequest:
@@ -73,9 +73,9 @@ func GetWithStatusError(address string) (resp *http.Response, err error) ***REMO
 		return nil, errdefs.Unauthorized(errors.New(msg))
 	case http.StatusForbidden:
 		return nil, errdefs.Forbidden(errors.New(msg))
-	***REMOVED***
+	}
 	return nil, errdefs.Unknown(errors.New(msg))
-***REMOVED***
+}
 
 // inspectResponse looks into the http response data at r to determine whether its
 // content-type is on the list of acceptable content types for remote build contexts.
@@ -84,20 +84,20 @@ func GetWithStatusError(address string) (resp *http.Response, err error) ***REMO
 //    - an io.Reader for the response body
 //    - an error value which will be non-nil either when something goes wrong while
 //      reading bytes from r or when the detected content-type is not acceptable.
-func inspectResponse(ct string, r io.Reader, clen int64) (string, io.Reader, error) ***REMOVED***
+func inspectResponse(ct string, r io.Reader, clen int64) (string, io.Reader, error) {
 	plen := clen
-	if plen <= 0 || plen > maxPreambleLength ***REMOVED***
+	if plen <= 0 || plen > maxPreambleLength {
 		plen = maxPreambleLength
-	***REMOVED***
+	}
 
 	preamble := make([]byte, plen)
 	rlen, err := r.Read(preamble)
-	if rlen == 0 ***REMOVED***
+	if rlen == 0 {
 		return ct, r, errors.New("empty response")
-	***REMOVED***
-	if err != nil && err != io.EOF ***REMOVED***
+	}
+	if err != nil && err != io.EOF {
 		return ct, r, err
-	***REMOVED***
+	}
 
 	preambleR := bytes.NewReader(preamble[:rlen])
 	bodyReader := io.MultiReader(preambleR, r)
@@ -105,23 +105,23 @@ func inspectResponse(ct string, r io.Reader, clen int64) (string, io.Reader, err
 	// content type for files without an extension (e.g. 'Dockerfile')
 	// so if we receive this value we better check for text content
 	contentType := ct
-	if len(ct) == 0 || ct == mimeTypes.OctetStream ***REMOVED***
+	if len(ct) == 0 || ct == mimeTypes.OctetStream {
 		contentType, _, err = detectContentType(preamble)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return contentType, bodyReader, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	contentType = selectAcceptableMIME(contentType)
 	var cterr error
-	if len(contentType) == 0 ***REMOVED***
+	if len(contentType) == 0 {
 		cterr = fmt.Errorf("unsupported Content-Type %q", ct)
 		contentType = ct
-	***REMOVED***
+	}
 
 	return contentType, bodyReader, cterr
-***REMOVED***
+}
 
-func selectAcceptableMIME(ct string) string ***REMOVED***
+func selectAcceptableMIME(ct string) string {
 	return mimeRe.FindString(ct)
-***REMOVED***
+}

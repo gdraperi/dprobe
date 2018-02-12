@@ -155,12 +155,12 @@ import (
   "fmt"
   "os"
 
-  "***REMOVED***pathToYourApp***REMOVED***/cmd"
+  "{pathToYourApp}/cmd"
 )
 
-func main() ***REMOVED***
+func main() {
   cmd.Execute()
-***REMOVED***
+}
 ```
 
 ## Using the Cobra Generator
@@ -182,16 +182,16 @@ Cobra doesn't require any special constructors. Simply create your commands.
 Ideally you place this in app/cmd/root.go:
 
 ```go
-var rootCmd = &cobra.Command***REMOVED***
+var rootCmd = &cobra.Command{
   Use:   "hugo",
   Short: "Hugo is a very fast static site generator",
   Long: `A Fast and Flexible Static Site Generator built with
                 love by spf13 and friends in Go.
                 Complete documentation is available at http://hugo.spf13.com`,
-  Run: func(cmd *cobra.Command, args []string) ***REMOVED***
+  Run: func(cmd *cobra.Command, args []string) {
     // Do Stuff Here
-  ***REMOVED***,
-***REMOVED***
+  },
+}
 ```
 
 You will additionally define flags and handle configuration in your init() function.
@@ -208,7 +208,7 @@ import (
   "github.com/spf13/viper"
 )
 
-func init() ***REMOVED***
+func init() {
   cobra.OnInitialize(initConfig)
   rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cobra.yaml)")
   rootCmd.PersistentFlags().StringVarP(&projectBase, "projectbase", "b", "", "base project directory eg. github.com/spf13/")
@@ -220,31 +220,31 @@ func init() ***REMOVED***
   viper.BindPFlag("useViper", rootCmd.PersistentFlags().Lookup("viper"))
   viper.SetDefault("author", "NAME HERE <EMAIL ADDRESS>")
   viper.SetDefault("license", "apache")
-***REMOVED***
+}
 
-func initConfig() ***REMOVED***
+func initConfig() {
   // Don't forget to read config either from cfgFile or from home directory!
-  if cfgFile != "" ***REMOVED***
+  if cfgFile != "" {
     // Use config file from the flag.
     viper.SetConfigFile(cfgFile)
-  ***REMOVED*** else ***REMOVED***
+  } else {
     // Find home directory.
     home, err := homedir.Dir()
-    if err != nil ***REMOVED***
+    if err != nil {
       fmt.Println(err)
       os.Exit(1)
-***REMOVED***
+    }
 
     // Search config in home directory with name ".cobra" (without extension).
     viper.AddConfigPath(home)
     viper.SetConfigName(".cobra")
-  ***REMOVED***
+  }
 
-  if err := viper.ReadInConfig(); err != nil ***REMOVED***
+  if err := viper.ReadInConfig(); err != nil {
     fmt.Println("Can't read config:", err)
     os.Exit(1)
-  ***REMOVED***
-***REMOVED***
+  }
+}
 ```
 
 ### Create your main.go
@@ -261,12 +261,12 @@ import (
   "fmt"
   "os"
 
-  "***REMOVED***pathToYourApp***REMOVED***/cmd"
+  "{pathToYourApp}/cmd"
 )
 
-func main() ***REMOVED***
+func main() {
   cmd.Execute()
-***REMOVED***
+}
 ```
 
 ### Create additional commands
@@ -286,18 +286,18 @@ import (
   "github.com/spf13/cobra"
 )
 
-func init() ***REMOVED***
+func init() {
   rootCmd.AddCommand(versionCmd)
-***REMOVED***
+}
 
-var versionCmd = &cobra.Command***REMOVED***
+var versionCmd = &cobra.Command{
   Use:   "version",
   Short: "Print the version number of Hugo",
   Long:  `All software has versions. This is Hugo's`,
-  Run: func(cmd *cobra.Command, args []string) ***REMOVED***
+  Run: func(cmd *cobra.Command, args []string) {
     fmt.Println("Hugo Static Site Generator v0.9 -- HEAD")
-  ***REMOVED***,
-***REMOVED***
+  },
+}
 ```
 
 ## Working with Flags
@@ -342,10 +342,10 @@ parent commands are ignored. By enabling `Command.TraverseChildren` Cobra will
 parse local flags on each command before executing the target command.
 
 ```go
-command := cobra.Command***REMOVED***
+command := cobra.Command{
   Use: "print [OPTIONS] [COMMANDS]",
   TraverseChildren: true,
-***REMOVED***
+}
 ```
 
 ### Bind Flags with Config
@@ -354,10 +354,10 @@ You can also bind your flags with [viper](https://github.com/spf13/viper):
 ```go
 var author string
 
-func init() ***REMOVED***
+func init() {
   rootCmd.PersistentFlags().StringVar(&author, "author", "YOUR NAME", "Author name for copyright attribution")
   viper.BindPFlag("author", rootCmd.PersistentFlags().Lookup("author"))
-***REMOVED***
+}
 ```
 
 In this example the persistent flag `author` is bound with `viper`.
@@ -384,21 +384,21 @@ The following validators are built in:
 An example of setting the custom validator:
 
 ```go
-var cmd = &cobra.Command***REMOVED***
+var cmd = &cobra.Command{
   Short: "hello",
-  Args: func(cmd *cobra.Command, args []string) error ***REMOVED***
-    if len(args) < 1 ***REMOVED***
+  Args: func(cmd *cobra.Command, args []string) error {
+    if len(args) < 1 {
       return errors.New("requires at least one arg")
-***REMOVED***
-    if myapp.IsValidColor(args[0]) ***REMOVED***
+    }
+    if myapp.IsValidColor(args[0]) {
       return nil
-***REMOVED***
+    }
     return fmt.Errorf("invalid color specified: %s", args[0])
-  ***REMOVED***,
-  Run: func(cmd *cobra.Command, args []string) ***REMOVED***
+  },
+  Run: func(cmd *cobra.Command, args []string) {
     fmt.Println("Hello, World!")
-  ***REMOVED***,
-***REMOVED***
+  },
+}
 ```
 
 ## Example
@@ -422,51 +422,51 @@ import (
   "github.com/spf13/cobra"
 )
 
-func main() ***REMOVED***
+func main() {
   var echoTimes int
 
-  var cmdPrint = &cobra.Command***REMOVED***
+  var cmdPrint = &cobra.Command{
     Use:   "print [string to print]",
     Short: "Print anything to the screen",
     Long: `print is for printing anything back to the screen.
 For many years people have printed back to the screen.`,
     Args: cobra.MinimumNArgs(1),
-    Run: func(cmd *cobra.Command, args []string) ***REMOVED***
+    Run: func(cmd *cobra.Command, args []string) {
       fmt.Println("Print: " + strings.Join(args, " "))
-***REMOVED***,
-  ***REMOVED***
+    },
+  }
 
-  var cmdEcho = &cobra.Command***REMOVED***
+  var cmdEcho = &cobra.Command{
     Use:   "echo [string to echo]",
     Short: "Echo anything to the screen",
     Long: `echo is for echoing anything back.
 Echo works a lot like print, except it has a child command.`,
     Args: cobra.MinimumNArgs(1),
-    Run: func(cmd *cobra.Command, args []string) ***REMOVED***
+    Run: func(cmd *cobra.Command, args []string) {
       fmt.Println("Print: " + strings.Join(args, " "))
-***REMOVED***,
-  ***REMOVED***
+    },
+  }
 
-  var cmdTimes = &cobra.Command***REMOVED***
+  var cmdTimes = &cobra.Command{
     Use:   "times [# times] [string to echo]",
     Short: "Echo anything to the screen more times",
     Long: `echo things multiple times back to the user by providing
 a count and a string.`,
     Args: cobra.MinimumNArgs(1),
-    Run: func(cmd *cobra.Command, args []string) ***REMOVED***
-      for i := 0; i < echoTimes; i++ ***REMOVED***
+    Run: func(cmd *cobra.Command, args []string) {
+      for i := 0; i < echoTimes; i++ {
         fmt.Println("Echo: " + strings.Join(args, " "))
-  ***REMOVED***
-***REMOVED***,
-  ***REMOVED***
+      }
+    },
+  }
 
   cmdTimes.Flags().IntVarP(&echoTimes, "times", "t", 1, "times to echo the input")
 
-  var rootCmd = &cobra.Command***REMOVED***Use: "app"***REMOVED***
+  var rootCmd = &cobra.Command{Use: "app"}
   rootCmd.AddCommand(cmdPrint, cmdEcho)
   cmdEcho.AddCommand(cmdTimes)
   rootCmd.Execute()
-***REMOVED***
+}
 ```
 
 For a more complete example of a larger application, please checkout [Hugo](http://gohugo.io/).
@@ -589,53 +589,53 @@ import (
   "github.com/spf13/cobra"
 )
 
-func main() ***REMOVED***
+func main() {
 
-  var rootCmd = &cobra.Command***REMOVED***
+  var rootCmd = &cobra.Command{
     Use:   "root [sub]",
     Short: "My root command",
-    PersistentPreRun: func(cmd *cobra.Command, args []string) ***REMOVED***
+    PersistentPreRun: func(cmd *cobra.Command, args []string) {
       fmt.Printf("Inside rootCmd PersistentPreRun with args: %v\n", args)
-***REMOVED***,
-    PreRun: func(cmd *cobra.Command, args []string) ***REMOVED***
+    },
+    PreRun: func(cmd *cobra.Command, args []string) {
       fmt.Printf("Inside rootCmd PreRun with args: %v\n", args)
-***REMOVED***,
-    Run: func(cmd *cobra.Command, args []string) ***REMOVED***
+    },
+    Run: func(cmd *cobra.Command, args []string) {
       fmt.Printf("Inside rootCmd Run with args: %v\n", args)
-***REMOVED***,
-    PostRun: func(cmd *cobra.Command, args []string) ***REMOVED***
+    },
+    PostRun: func(cmd *cobra.Command, args []string) {
       fmt.Printf("Inside rootCmd PostRun with args: %v\n", args)
-***REMOVED***,
-    PersistentPostRun: func(cmd *cobra.Command, args []string) ***REMOVED***
+    },
+    PersistentPostRun: func(cmd *cobra.Command, args []string) {
       fmt.Printf("Inside rootCmd PersistentPostRun with args: %v\n", args)
-***REMOVED***,
-  ***REMOVED***
+    },
+  }
 
-  var subCmd = &cobra.Command***REMOVED***
+  var subCmd = &cobra.Command{
     Use:   "sub [no options!]",
     Short: "My subcommand",
-    PreRun: func(cmd *cobra.Command, args []string) ***REMOVED***
+    PreRun: func(cmd *cobra.Command, args []string) {
       fmt.Printf("Inside subCmd PreRun with args: %v\n", args)
-***REMOVED***,
-    Run: func(cmd *cobra.Command, args []string) ***REMOVED***
+    },
+    Run: func(cmd *cobra.Command, args []string) {
       fmt.Printf("Inside subCmd Run with args: %v\n", args)
-***REMOVED***,
-    PostRun: func(cmd *cobra.Command, args []string) ***REMOVED***
+    },
+    PostRun: func(cmd *cobra.Command, args []string) {
       fmt.Printf("Inside subCmd PostRun with args: %v\n", args)
-***REMOVED***,
-    PersistentPostRun: func(cmd *cobra.Command, args []string) ***REMOVED***
+    },
+    PersistentPostRun: func(cmd *cobra.Command, args []string) {
       fmt.Printf("Inside subCmd PersistentPostRun with args: %v\n", args)
-***REMOVED***,
-  ***REMOVED***
+    },
+  }
 
   rootCmd.AddCommand(subCmd)
 
-  rootCmd.SetArgs([]string***REMOVED***""***REMOVED***)
+  rootCmd.SetArgs([]string{""})
   rootCmd.Execute()
   fmt.Println()
-  rootCmd.SetArgs([]string***REMOVED***"sub", "arg1", "arg2"***REMOVED***)
+  rootCmd.SetArgs([]string{"sub", "arg1", "arg2"})
   rootCmd.Execute()
-***REMOVED***
+}
 ```
 
 Output:

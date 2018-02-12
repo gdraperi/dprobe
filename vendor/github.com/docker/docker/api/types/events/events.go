@@ -28,13 +28,13 @@ const (
 // It has a defined name and a set or attributes.
 // The container attributes are its labels, other actors
 // can generate these attributes from other properties.
-type Actor struct ***REMOVED***
+type Actor struct {
 	ID         string
 	Attributes map[string]string
-***REMOVED***
+}
 
 // Message represents the information an event contains
-type Message struct ***REMOVED***
+type Message struct {
 	// Deprecated information from JSONMessage.
 	// With data only in container events.
 	Status string `json:"status,omitempty"`
@@ -49,4 +49,4 @@ type Message struct ***REMOVED***
 
 	Time     int64 `json:"time,omitempty"`
 	TimeNano int64 `json:"timeNano,omitempty"`
-***REMOVED***
+}

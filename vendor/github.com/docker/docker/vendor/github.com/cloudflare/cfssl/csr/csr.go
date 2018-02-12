@@ -28,60 +28,60 @@ const (
 )
 
 // A Name contains the SubjectInfo fields.
-type Name struct ***REMOVED***
+type Name struct {
 	C            string // Country
 	ST           string // State
 	L            string // Locality
 	O            string // OrganisationName
 	OU           string // OrganisationalUnitName
 	SerialNumber string
-***REMOVED***
+}
 
 // A KeyRequest is a generic request for a new key.
-type KeyRequest interface ***REMOVED***
+type KeyRequest interface {
 	Algo() string
 	Size() int
 	Generate() (crypto.PrivateKey, error)
 	SigAlgo() x509.SignatureAlgorithm
-***REMOVED***
+}
 
 // A BasicKeyRequest contains the algorithm and key size for a new private key.
-type BasicKeyRequest struct ***REMOVED***
+type BasicKeyRequest struct {
 	A string `json:"algo"`
 	S int    `json:"size"`
-***REMOVED***
+}
 
 // NewBasicKeyRequest returns a default BasicKeyRequest.
-func NewBasicKeyRequest() *BasicKeyRequest ***REMOVED***
-	return &BasicKeyRequest***REMOVED***"ecdsa", curveP256***REMOVED***
-***REMOVED***
+func NewBasicKeyRequest() *BasicKeyRequest {
+	return &BasicKeyRequest{"ecdsa", curveP256}
+}
 
 // Algo returns the requested key algorithm represented as a string.
-func (kr *BasicKeyRequest) Algo() string ***REMOVED***
+func (kr *BasicKeyRequest) Algo() string {
 	return kr.A
-***REMOVED***
+}
 
 // Size returns the requested key size.
-func (kr *BasicKeyRequest) Size() int ***REMOVED***
+func (kr *BasicKeyRequest) Size() int {
 	return kr.S
-***REMOVED***
+}
 
 // Generate generates a key as specified in the request. Currently,
 // only ECDSA and RSA are supported.
-func (kr *BasicKeyRequest) Generate() (crypto.PrivateKey, error) ***REMOVED***
+func (kr *BasicKeyRequest) Generate() (crypto.PrivateKey, error) {
 	log.Debugf("generate key from request: algo=%s, size=%d", kr.Algo(), kr.Size())
-	switch kr.Algo() ***REMOVED***
+	switch kr.Algo() {
 	case "rsa":
-		if kr.Size() < 2048 ***REMOVED***
+		if kr.Size() < 2048 {
 			return nil, errors.New("RSA key is too weak")
-		***REMOVED***
-		if kr.Size() > 8192 ***REMOVED***
+		}
+		if kr.Size() > 8192 {
 			return nil, errors.New("RSA key size too large")
-		***REMOVED***
+		}
 		return rsa.GenerateKey(rand.Reader, kr.Size())
 	case "ecdsa":
 		var curve elliptic.Curve
-		switch kr.Size() ***REMOVED***
+		switch kr.Size() {
 		case curveP256:
 			curve = elliptic.P256()
 		case curveP384:
@@ -90,19 +90,19 @@ func (kr *BasicKeyRequest) Generate() (crypto.PrivateKey, error) ***REMOVED***
 			curve = elliptic.P521()
 		default:
 			return nil, errors.New("invalid curve")
-		***REMOVED***
+		}
 		return ecdsa.GenerateKey(curve, rand.Reader)
 	default:
 		return nil, errors.New("invalid algorithm")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // SigAlgo returns an appropriate X.509 signature algorithm given the
 // key request's type and size.
-func (kr *BasicKeyRequest) SigAlgo() x509.SignatureAlgorithm ***REMOVED***
-	switch kr.Algo() ***REMOVED***
+func (kr *BasicKeyRequest) SigAlgo() x509.SignatureAlgorithm {
+	switch kr.Algo() {
 	case "rsa":
-		switch ***REMOVED***
+		switch {
 		case kr.Size() >= 4096:
 			return x509.SHA512WithRSA
 		case kr.Size() >= 3072:
@@ -111,9 +111,9 @@ func (kr *BasicKeyRequest) SigAlgo() x509.SignatureAlgorithm ***REMOVED***
 			return x509.SHA256WithRSA
 		default:
 			return x509.SHA1WithRSA
-		***REMOVED***
+		}
 	case "ecdsa":
-		switch kr.Size() ***REMOVED***
+		switch kr.Size() {
 		case curveP521:
 			return x509.ECDSAWithSHA512
 		case curveP384:
@@ -122,66 +122,66 @@ func (kr *BasicKeyRequest) SigAlgo() x509.SignatureAlgorithm ***REMOVED***
 			return x509.ECDSAWithSHA256
 		default:
 			return x509.ECDSAWithSHA1
-		***REMOVED***
+		}
 	default:
 		return x509.UnknownSignatureAlgorithm
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // CAConfig is a section used in the requests initialising a new CA.
-type CAConfig struct ***REMOVED***
+type CAConfig struct {
 	PathLength  int    `json:"pathlen"`
 	PathLenZero bool   `json:"pathlenzero"`
 	Expiry      string `json:"expiry"`
-***REMOVED***
+}
 
 // A CertificateRequest encapsulates the API interface to the
 // certificate request functionality.
-type CertificateRequest struct ***REMOVED***
+type CertificateRequest struct {
 	CN           string
 	Names        []Name     `json:"names"`
 	Hosts        []string   `json:"hosts"`
 	KeyRequest   KeyRequest `json:"key,omitempty"`
 	CA           *CAConfig  `json:"ca,omitempty"`
 	SerialNumber string     `json:"serialnumber,omitempty"`
-***REMOVED***
+}
 
 // New returns a new, empty CertificateRequest with a
 // BasicKeyRequest.
-func New() *CertificateRequest ***REMOVED***
-	return &CertificateRequest***REMOVED***
+func New() *CertificateRequest {
+	return &CertificateRequest{
 		KeyRequest: NewBasicKeyRequest(),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // appendIf appends to a if s is not an empty string.
-func appendIf(s string, a *[]string) ***REMOVED***
-	if s != "" ***REMOVED***
+func appendIf(s string, a *[]string) {
+	if s != "" {
 		*a = append(*a, s)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Name returns the PKIX name for the request.
-func (cr *CertificateRequest) Name() pkix.Name ***REMOVED***
+func (cr *CertificateRequest) Name() pkix.Name {
 	var name pkix.Name
 	name.CommonName = cr.CN
 
-	for _, n := range cr.Names ***REMOVED***
+	for _, n := range cr.Names {
 		appendIf(n.C, &name.Country)
 		appendIf(n.ST, &name.Province)
 		appendIf(n.L, &name.Locality)
 		appendIf(n.O, &name.Organization)
 		appendIf(n.OU, &name.OrganizationalUnit)
-	***REMOVED***
+	}
 	name.SerialNumber = cr.SerialNumber
 	return name
-***REMOVED***
+}
 
 // BasicConstraints CSR information RFC 5280, 4.2.1.9
-type BasicConstraints struct ***REMOVED***
+type BasicConstraints struct {
 	IsCA       bool `asn1:"optional"`
 	MaxPathLen int  `asn1:"optional,default:-1"`
-***REMOVED***
+}
 
 // ParseRequest takes a certificate request and generates a key and
 // CSR from it. It does no validation -- caveat emptor. It will,
@@ -189,101 +189,101 @@ type BasicConstraints struct ***REMOVED***
 // curve or RSA key size). The lack of validation was specifically
 // chosen to allow the end user to define a policy and validate the
 // request appropriately before calling this function.
-func ParseRequest(req *CertificateRequest) (csr, key []byte, err error) ***REMOVED***
+func ParseRequest(req *CertificateRequest) (csr, key []byte, err error) {
 	log.Info("received CSR")
-	if req.KeyRequest == nil ***REMOVED***
+	if req.KeyRequest == nil {
 		req.KeyRequest = NewBasicKeyRequest()
-	***REMOVED***
+	}
 
 	log.Infof("generating key: %s-%d", req.KeyRequest.Algo(), req.KeyRequest.Size())
 	priv, err := req.KeyRequest.Generate()
-	if err != nil ***REMOVED***
+	if err != nil {
 		err = cferr.Wrap(cferr.PrivateKeyError, cferr.GenerationFailed, err)
 		return
-	***REMOVED***
+	}
 
-	switch priv := priv.(type) ***REMOVED***
+	switch priv := priv.(type) {
 	case *rsa.PrivateKey:
 		key = x509.MarshalPKCS1PrivateKey(priv)
-		block := pem.Block***REMOVED***
+		block := pem.Block{
 			Type:  "RSA PRIVATE KEY",
 			Bytes: key,
-		***REMOVED***
+		}
 		key = pem.EncodeToMemory(&block)
 	case *ecdsa.PrivateKey:
 		key, err = x509.MarshalECPrivateKey(priv)
-		if err != nil ***REMOVED***
+		if err != nil {
 			err = cferr.Wrap(cferr.PrivateKeyError, cferr.Unknown, err)
 			return
-		***REMOVED***
-		block := pem.Block***REMOVED***
+		}
+		block := pem.Block{
 			Type:  "EC PRIVATE KEY",
 			Bytes: key,
-		***REMOVED***
+		}
 		key = pem.EncodeToMemory(&block)
 	default:
 		panic("Generate should have failed to produce a valid key.")
-	***REMOVED***
+	}
 
 	csr, err = Generate(priv.(crypto.Signer), req)
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Errorf("failed to generate a CSR: %v", err)
 		err = cferr.Wrap(cferr.CSRError, cferr.BadRequest, err)
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // ExtractCertificateRequest extracts a CertificateRequest from
 // x509.Certificate. It is aimed to used for generating a new certificate
 // from an existing certificate. For a root certificate, the CA expiry
 // length is calculated as the duration between cert.NotAfter and cert.NotBefore.
-func ExtractCertificateRequest(cert *x509.Certificate) *CertificateRequest ***REMOVED***
+func ExtractCertificateRequest(cert *x509.Certificate) *CertificateRequest {
 	req := New()
 	req.CN = cert.Subject.CommonName
 	req.Names = getNames(cert.Subject)
 	req.Hosts = getHosts(cert)
 	req.SerialNumber = cert.Subject.SerialNumber
 
-	if cert.IsCA ***REMOVED***
+	if cert.IsCA {
 		req.CA = new(CAConfig)
 		// CA expiry length is calculated based on the input cert
 		// issue date and expiry date.
 		req.CA.Expiry = cert.NotAfter.Sub(cert.NotBefore).String()
 		req.CA.PathLength = cert.MaxPathLen
 		req.CA.PathLenZero = cert.MaxPathLenZero
-	***REMOVED***
+	}
 
 	return req
-***REMOVED***
+}
 
-func getHosts(cert *x509.Certificate) []string ***REMOVED***
+func getHosts(cert *x509.Certificate) []string {
 	var hosts []string
-	for _, ip := range cert.IPAddresses ***REMOVED***
+	for _, ip := range cert.IPAddresses {
 		hosts = append(hosts, ip.String())
-	***REMOVED***
-	for _, dns := range cert.DNSNames ***REMOVED***
+	}
+	for _, dns := range cert.DNSNames {
 		hosts = append(hosts, dns)
-	***REMOVED***
-	for _, email := range cert.EmailAddresses ***REMOVED***
+	}
+	for _, email := range cert.EmailAddresses {
 		hosts = append(hosts, email)
-	***REMOVED***
+	}
 
 	return hosts
-***REMOVED***
+}
 
 // getNames returns an array of Names from the certificate
 // It onnly cares about Country, Organization, OrganizationalUnit, Locality, Province
-func getNames(sub pkix.Name) []Name ***REMOVED***
+func getNames(sub pkix.Name) []Name {
 	// anonymous func for finding the max of a list of interger
-	max := func(v1 int, vn ...int) (max int) ***REMOVED***
+	max := func(v1 int, vn ...int) (max int) {
 		max = v1
-		for i := 0; i < len(vn); i++ ***REMOVED***
-			if vn[i] > max ***REMOVED***
+		for i := 0; i < len(vn); i++ {
+			if vn[i] > max {
 				max = vn[i]
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		return max
-	***REMOVED***
+	}
 
 	nc := len(sub.Country)
 	norg := len(sub.Organization)
@@ -294,138 +294,138 @@ func getNames(sub pkix.Name) []Name ***REMOVED***
 	n := max(nc, norg, nou, nl, np)
 
 	names := make([]Name, n)
-	for i := range names ***REMOVED***
-		if i < nc ***REMOVED***
+	for i := range names {
+		if i < nc {
 			names[i].C = sub.Country[i]
-		***REMOVED***
-		if i < norg ***REMOVED***
+		}
+		if i < norg {
 			names[i].O = sub.Organization[i]
-		***REMOVED***
-		if i < nou ***REMOVED***
+		}
+		if i < nou {
 			names[i].OU = sub.OrganizationalUnit[i]
-		***REMOVED***
-		if i < nl ***REMOVED***
+		}
+		if i < nl {
 			names[i].L = sub.Locality[i]
-		***REMOVED***
-		if i < np ***REMOVED***
+		}
+		if i < np {
 			names[i].ST = sub.Province[i]
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return names
-***REMOVED***
+}
 
 // A Generator is responsible for validating certificate requests.
-type Generator struct ***REMOVED***
+type Generator struct {
 	Validator func(*CertificateRequest) error
-***REMOVED***
+}
 
 // ProcessRequest validates and processes the incoming request. It is
 // a wrapper around a validator and the ParseRequest function.
-func (g *Generator) ProcessRequest(req *CertificateRequest) (csr, key []byte, err error) ***REMOVED***
+func (g *Generator) ProcessRequest(req *CertificateRequest) (csr, key []byte, err error) {
 
 	log.Info("generate received request")
 	err = g.Validator(req)
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Warningf("invalid request: %v", err)
 		return
-	***REMOVED***
+	}
 
 	csr, key, err = ParseRequest(req)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, nil, err
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
 // IsNameEmpty returns true if the name has no identifying information in it.
-func IsNameEmpty(n Name) bool ***REMOVED***
-	empty := func(s string) bool ***REMOVED*** return strings.TrimSpace(s) == "" ***REMOVED***
+func IsNameEmpty(n Name) bool {
+	empty := func(s string) bool { return strings.TrimSpace(s) == "" }
 
-	if empty(n.C) && empty(n.ST) && empty(n.L) && empty(n.O) && empty(n.OU) ***REMOVED***
+	if empty(n.C) && empty(n.ST) && empty(n.L) && empty(n.O) && empty(n.OU) {
 		return true
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
 // Regenerate uses the provided CSR as a template for signing a new
 // CSR using priv.
-func Regenerate(priv crypto.Signer, csr []byte) ([]byte, error) ***REMOVED***
+func Regenerate(priv crypto.Signer, csr []byte) ([]byte, error) {
 	req, extra, err := helpers.ParseCSR(csr)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED*** else if len(extra) > 0 ***REMOVED***
+	} else if len(extra) > 0 {
 		return nil, errors.New("csr: trailing data in certificate request")
-	***REMOVED***
+	}
 
 	return x509.CreateCertificateRequest(rand.Reader, req, priv)
-***REMOVED***
+}
 
 // Generate creates a new CSR from a CertificateRequest structure and
 // an existing key. The KeyRequest field is ignored.
-func Generate(priv crypto.Signer, req *CertificateRequest) (csr []byte, err error) ***REMOVED***
+func Generate(priv crypto.Signer, req *CertificateRequest) (csr []byte, err error) {
 	sigAlgo := helpers.SignerAlgo(priv)
-	if sigAlgo == x509.UnknownSignatureAlgorithm ***REMOVED***
+	if sigAlgo == x509.UnknownSignatureAlgorithm {
 		return nil, cferr.New(cferr.PrivateKeyError, cferr.Unavailable)
-	***REMOVED***
+	}
 
-	var tpl = x509.CertificateRequest***REMOVED***
+	var tpl = x509.CertificateRequest{
 		Subject:            req.Name(),
 		SignatureAlgorithm: sigAlgo,
-	***REMOVED***
+	}
 
-	for i := range req.Hosts ***REMOVED***
-		if ip := net.ParseIP(req.Hosts[i]); ip != nil ***REMOVED***
+	for i := range req.Hosts {
+		if ip := net.ParseIP(req.Hosts[i]); ip != nil {
 			tpl.IPAddresses = append(tpl.IPAddresses, ip)
-		***REMOVED*** else if email, err := mail.ParseAddress(req.Hosts[i]); err == nil && email != nil ***REMOVED***
+		} else if email, err := mail.ParseAddress(req.Hosts[i]); err == nil && email != nil {
 			tpl.EmailAddresses = append(tpl.EmailAddresses, email.Address)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			tpl.DNSNames = append(tpl.DNSNames, req.Hosts[i])
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if req.CA != nil ***REMOVED***
+	if req.CA != nil {
 		err = appendCAInfoToCSR(req.CA, &tpl)
-		if err != nil ***REMOVED***
+		if err != nil {
 			err = cferr.Wrap(cferr.CSRError, cferr.GenerationFailed, err)
 			return
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	csr, err = x509.CreateCertificateRequest(rand.Reader, &tpl, priv)
-	if err != nil ***REMOVED***
+	if err != nil {
 		log.Errorf("failed to generate a CSR: %v", err)
 		err = cferr.Wrap(cferr.CSRError, cferr.BadRequest, err)
 		return
-	***REMOVED***
-	block := pem.Block***REMOVED***
+	}
+	block := pem.Block{
 		Type:  "CERTIFICATE REQUEST",
 		Bytes: csr,
-	***REMOVED***
+	}
 
 	log.Info("encoded CSR")
 	csr = pem.EncodeToMemory(&block)
 	return
-***REMOVED***
+}
 
 // appendCAInfoToCSR appends CAConfig BasicConstraint extension to a CSR
-func appendCAInfoToCSR(reqConf *CAConfig, csr *x509.CertificateRequest) error ***REMOVED***
+func appendCAInfoToCSR(reqConf *CAConfig, csr *x509.CertificateRequest) error {
 	pathlen := reqConf.PathLength
-	if pathlen == 0 && !reqConf.PathLenZero ***REMOVED***
+	if pathlen == 0 && !reqConf.PathLenZero {
 		pathlen = -1
-	***REMOVED***
-	val, err := asn1.Marshal(BasicConstraints***REMOVED***true, pathlen***REMOVED***)
+	}
+	val, err := asn1.Marshal(BasicConstraints{true, pathlen})
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	csr.ExtraExtensions = []pkix.Extension***REMOVED***
-		***REMOVED***
-			Id:       asn1.ObjectIdentifier***REMOVED***2, 5, 29, 19***REMOVED***,
+	csr.ExtraExtensions = []pkix.Extension{
+		{
+			Id:       asn1.ObjectIdentifier{2, 5, 29, 19},
 			Value:    val,
 			Critical: true,
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 
 	return nil
-***REMOVED***
+}

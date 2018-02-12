@@ -15,49 +15,49 @@ import (
 	"golang.org/x/text/internal/ucd"
 )
 
-func TestAllocToUnicode(t *testing.T) ***REMOVED***
-	avg := testtext.AllocsPerRun(1000, func() ***REMOVED***
+func TestAllocToUnicode(t *testing.T) {
+	avg := testtext.AllocsPerRun(1000, func() {
 		ToUnicode("www.golang.org")
-	***REMOVED***)
-	if avg > 0 ***REMOVED***
+	})
+	if avg > 0 {
 		t.Errorf("got %f; want 0", avg)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestAllocToASCII(t *testing.T) ***REMOVED***
-	avg := testtext.AllocsPerRun(1000, func() ***REMOVED***
+func TestAllocToASCII(t *testing.T) {
+	avg := testtext.AllocsPerRun(1000, func() {
 		ToASCII("www.golang.org")
-	***REMOVED***)
-	if avg > 0 ***REMOVED***
+	})
+	if avg > 0 {
 		t.Errorf("got %f; want 0", avg)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestProfiles(t *testing.T) ***REMOVED***
-	testCases := []struct ***REMOVED***
+func TestProfiles(t *testing.T) {
+	testCases := []struct {
 		name      string
 		want, got *Profile
-	***REMOVED******REMOVED***
-		***REMOVED***"Punycode", punycode, New()***REMOVED***,
-		***REMOVED***"Registration", registration, New(ValidateForRegistration())***REMOVED***,
-		***REMOVED***"Registration", registration, New(
+	}{
+		{"Punycode", punycode, New()},
+		{"Registration", registration, New(ValidateForRegistration())},
+		{"Registration", registration, New(
 			ValidateForRegistration(),
 			VerifyDNSLength(true),
 			BidiRule(),
-		)***REMOVED***,
-		***REMOVED***"Lookup", lookup, New(MapForLookup(), BidiRule(), Transitional(true))***REMOVED***,
-		***REMOVED***"Display", display, New(MapForLookup(), BidiRule())***REMOVED***,
-	***REMOVED***
-	for _, tc := range testCases ***REMOVED***
+		)},
+		{"Lookup", lookup, New(MapForLookup(), BidiRule(), Transitional(true))},
+		{"Display", display, New(MapForLookup(), BidiRule())},
+	}
+	for _, tc := range testCases {
 		// Functions are not comparable, but the printed version will include
 		// their pointers.
 		got := fmt.Sprintf("%#v", tc.got)
 		want := fmt.Sprintf("%#v", tc.want)
-		if got != want ***REMOVED***
+		if got != want {
 			t.Errorf("%s: \ngot  %#v,\nwant %#v", tc.name, got, want)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // doTest performs a single test f(input) and verifies that the output matches
 // out and that the returned error is expected. The errors string contains
@@ -68,12 +68,12 @@ func TestProfiles(t *testing.T) ***REMOVED***
 // A: to ASCII
 // B: Bidi
 // C: Context J
-func doTest(t *testing.T, f func(string) (string, error), name, input, want, errors string) ***REMOVED***
+func doTest(t *testing.T, f func(string) (string, error), name, input, want, errors string) {
 	errors = strings.Trim(errors, "[]")
 	test := "ok"
-	if errors != "" ***REMOVED***
+	if errors != "" {
 		test = "err:" + errors
-	***REMOVED***
+	}
 	// Replace some of the escape sequences to make it easier to single out
 	// tests on the command name.
 	in := strings.Trim(strconv.QuoteToASCII(input), `"`)
@@ -81,27 +81,27 @@ func doTest(t *testing.T, f func(string) (string, error), name, input, want, err
 	in = strings.Replace(in, `\U`, "#", -1)
 	name = fmt.Sprintf("%s/%s/%s", name, in, test)
 
-	testtext.Run(t, name, func(t *testing.T) ***REMOVED***
+	testtext.Run(t, name, func(t *testing.T) {
 		got, err := f(input)
 
-		if err != nil ***REMOVED***
-			code := err.(interface ***REMOVED***
+		if err != nil {
+			code := err.(interface {
 				code() string
-			***REMOVED***).code()
-			if strings.Index(errors, code) == -1 ***REMOVED***
-				t.Errorf("error %q not in set of expected errors ***REMOVED***%v***REMOVED***", code, errors)
-			***REMOVED***
-		***REMOVED*** else if errors != "" ***REMOVED***
-			t.Errorf("no errors; want error in ***REMOVED***%v***REMOVED***", errors)
-		***REMOVED***
+			}).code()
+			if strings.Index(errors, code) == -1 {
+				t.Errorf("error %q not in set of expected errors {%v}", code, errors)
+			}
+		} else if errors != "" {
+			t.Errorf("no errors; want error in {%v}", errors)
+		}
 
-		if want != "" && got != want ***REMOVED***
+		if want != "" && got != want {
 			t.Errorf(`string: got %+q; want %+q`, got, want)
-		***REMOVED***
-	***REMOVED***)
-***REMOVED***
+		}
+	})
+}
 
-func TestConformance(t *testing.T) ***REMOVED***
+func TestConformance(t *testing.T) {
 	testtext.SkipIfNotLong(t)
 
 	r := gen.OpenUnicodeFile("idna", "", "IdnaTest.txt")
@@ -109,19 +109,19 @@ func TestConformance(t *testing.T) ***REMOVED***
 
 	section := "main"
 	started := false
-	p := ucd.New(r, ucd.CommentHandler(func(s string) ***REMOVED***
-		if started ***REMOVED***
+	p := ucd.New(r, ucd.CommentHandler(func(s string) {
+		if started {
 			section = strings.ToLower(strings.Split(s, " ")[0])
-		***REMOVED***
-	***REMOVED***))
+		}
+	}))
 	transitional := New(Transitional(true), VerifyDNSLength(true), BidiRule(), MapForLookup())
 	nonTransitional := New(VerifyDNSLength(true), BidiRule(), MapForLookup())
-	for p.Next() ***REMOVED***
+	for p.Next() {
 		started = true
 
 		// What to test
-		profiles := []*Profile***REMOVED******REMOVED***
-		switch p.String(0) ***REMOVED***
+		profiles := []*Profile{}
+		switch p.String(0) {
 		case "T":
 			profiles = append(profiles, transitional)
 		case "N":
@@ -129,50 +129,50 @@ func TestConformance(t *testing.T) ***REMOVED***
 		case "B":
 			profiles = append(profiles, transitional)
 			profiles = append(profiles, nonTransitional)
-		***REMOVED***
+		}
 
 		src := unescape(p.String(1))
 
 		wantToUnicode := unescape(p.String(2))
-		if wantToUnicode == "" ***REMOVED***
+		if wantToUnicode == "" {
 			wantToUnicode = src
-		***REMOVED***
+		}
 		wantToASCII := unescape(p.String(3))
-		if wantToASCII == "" ***REMOVED***
+		if wantToASCII == "" {
 			wantToASCII = wantToUnicode
-		***REMOVED***
+		}
 		wantErrToUnicode := ""
-		if strings.HasPrefix(wantToUnicode, "[") ***REMOVED***
+		if strings.HasPrefix(wantToUnicode, "[") {
 			wantErrToUnicode = wantToUnicode
 			wantToUnicode = ""
-		***REMOVED***
+		}
 		wantErrToASCII := ""
-		if strings.HasPrefix(wantToASCII, "[") ***REMOVED***
+		if strings.HasPrefix(wantToASCII, "[") {
 			wantErrToASCII = wantToASCII
 			wantToASCII = ""
-		***REMOVED***
+		}
 
 		// TODO: also do IDNA tests.
 		// invalidInIDNA2008 := p.String(4) == "NV8"
 
-		for _, p := range profiles ***REMOVED***
+		for _, p := range profiles {
 			name := fmt.Sprintf("%s:%s", section, p)
 			doTest(t, p.ToUnicode, name+":ToUnicode", src, wantToUnicode, wantErrToUnicode)
 			doTest(t, p.ToASCII, name+":ToASCII", src, wantToASCII, wantErrToASCII)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func unescape(s string) string ***REMOVED***
+func unescape(s string) string {
 	s, err := strconv.Unquote(`"` + s + `"`)
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 	return s
-***REMOVED***
+}
 
-func BenchmarkProfile(b *testing.B) ***REMOVED***
-	for i := 0; i < b.N; i++ ***REMOVED***
+func BenchmarkProfile(b *testing.B) {
+	for i := 0; i < b.N; i++ {
 		Lookup.ToASCII("www.yahoogle.com")
-	***REMOVED***
-***REMOVED***
+	}
+}

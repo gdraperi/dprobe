@@ -8,7 +8,7 @@ package socket
 
 import "unsafe"
 
-func probeProtocolStack() int ***REMOVED***
+func probeProtocolStack() int {
 	var p uintptr
 	return int(unsafe.Sizeof(p))
-***REMOVED***
+}

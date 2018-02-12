@@ -14,16 +14,16 @@ import (
 )
 
 // A Conn represents a raw connection.
-type Conn struct ***REMOVED***
+type Conn struct {
 	network string
 	c       syscall.RawConn
-***REMOVED***
+}
 
 // NewConn returns a new raw connection.
-func NewConn(c net.Conn) (*Conn, error) ***REMOVED***
+func NewConn(c net.Conn) (*Conn, error) {
 	var err error
 	var cc Conn
-	switch c := c.(type) ***REMOVED***
+	switch c := c.(type) {
 	case *net.TCPConn:
 		cc.network = "tcp"
 		cc.c, err = c.SyscallConn()
@@ -35,32 +35,32 @@ func NewConn(c net.Conn) (*Conn, error) ***REMOVED***
 		cc.c, err = c.SyscallConn()
 	default:
 		return nil, errors.New("unknown connection type")
-	***REMOVED***
-	if err != nil ***REMOVED***
+	}
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return &cc, nil
-***REMOVED***
+}
 
-func (o *Option) get(c *Conn, b []byte) (int, error) ***REMOVED***
+func (o *Option) get(c *Conn, b []byte) (int, error) {
 	var operr error
 	var n int
-	fn := func(s uintptr) ***REMOVED***
+	fn := func(s uintptr) {
 		n, operr = getsockopt(s, o.Level, o.Name, b)
-	***REMOVED***
-	if err := c.c.Control(fn); err != nil ***REMOVED***
+	}
+	if err := c.c.Control(fn); err != nil {
 		return 0, err
-	***REMOVED***
+	}
 	return n, os.NewSyscallError("getsockopt", operr)
-***REMOVED***
+}
 
-func (o *Option) set(c *Conn, b []byte) error ***REMOVED***
+func (o *Option) set(c *Conn, b []byte) error {
 	var operr error
-	fn := func(s uintptr) ***REMOVED***
+	fn := func(s uintptr) {
 		operr = setsockopt(s, o.Level, o.Name, b)
-	***REMOVED***
-	if err := c.c.Control(fn); err != nil ***REMOVED***
+	}
+	if err := c.c.Control(fn); err != nil {
 		return err
-	***REMOVED***
+	}
 	return os.NewSyscallError("setsockopt", operr)
-***REMOVED***
+}

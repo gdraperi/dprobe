@@ -7,6 +7,6 @@ import (
 )
 
 // DefaultProfile returns a nil pointer on unsupported systems.
-func DefaultProfile() *types.Seccomp ***REMOVED***
+func DefaultProfile() *types.Seccomp {
 	return nil
-***REMOVED***
+}

@@ -29,56 +29,56 @@ const (
 //
 // For a given domain/id pair the same token may be returned for up to
 // 7 minutes and 10 seconds.
-func NewDCESecurity(domain Domain, id uint32) UUID ***REMOVED***
+func NewDCESecurity(domain Domain, id uint32) UUID {
 	uuid := NewUUID()
-	if uuid != nil ***REMOVED***
+	if uuid != nil {
 		uuid[6] = (uuid[6] & 0x0f) | 0x20 // Version 2
 		uuid[9] = byte(domain)
 		binary.BigEndian.PutUint32(uuid[0:], id)
-	***REMOVED***
+	}
 	return uuid
-***REMOVED***
+}
 
 // NewDCEPerson returns a DCE Security (Version 2) UUID in the person
 // domain with the id returned by os.Getuid.
 //
 //  NewDCEPerson(Person, uint32(os.Getuid()))
-func NewDCEPerson() UUID ***REMOVED***
+func NewDCEPerson() UUID {
 	return NewDCESecurity(Person, uint32(os.Getuid()))
-***REMOVED***
+}
 
 // NewDCEGroup returns a DCE Security (Version 2) UUID in the group
 // domain with the id returned by os.Getgid.
 //
 //  NewDCEGroup(Group, uint32(os.Getgid()))
-func NewDCEGroup() UUID ***REMOVED***
+func NewDCEGroup() UUID {
 	return NewDCESecurity(Group, uint32(os.Getgid()))
-***REMOVED***
+}
 
 // Domain returns the domain for a Version 2 UUID or false.
-func (uuid UUID) Domain() (Domain, bool) ***REMOVED***
-	if v, _ := uuid.Version(); v != 2 ***REMOVED***
+func (uuid UUID) Domain() (Domain, bool) {
+	if v, _ := uuid.Version(); v != 2 {
 		return 0, false
-	***REMOVED***
+	}
 	return Domain(uuid[9]), true
-***REMOVED***
+}
 
 // Id returns the id for a Version 2 UUID or false.
-func (uuid UUID) Id() (uint32, bool) ***REMOVED***
-	if v, _ := uuid.Version(); v != 2 ***REMOVED***
+func (uuid UUID) Id() (uint32, bool) {
+	if v, _ := uuid.Version(); v != 2 {
 		return 0, false
-	***REMOVED***
+	}
 	return binary.BigEndian.Uint32(uuid[0:4]), true
-***REMOVED***
+}
 
-func (d Domain) String() string ***REMOVED***
-	switch d ***REMOVED***
+func (d Domain) String() string {
+	switch d {
 	case Person:
 		return "Person"
 	case Group:
 		return "Group"
 	case Org:
 		return "Org"
-	***REMOVED***
+	}
 	return fmt.Sprintf("Domain%d", int(d))
-***REMOVED***
+}

@@ -13,16 +13,16 @@ import (
 // our own protocol version.
 var ProtocolVersionMap map[uint8]uint8
 
-func init() ***REMOVED***
-	ProtocolVersionMap = map[uint8]uint8***REMOVED***
+func init() {
+	ProtocolVersionMap = map[uint8]uint8{
 		4: 2,
 		3: 2,
 		2: 2,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Config is the configuration for creating a Serf instance.
-type Config struct ***REMOVED***
+type Config struct {
 	// The name of this node. This must be unique in the cluster. If this
 	// is not set, Serf will set it to the hostname of the running machine.
 	NodeName string
@@ -210,24 +210,24 @@ type Config struct ***REMOVED***
 	// Merge can be optionally provided to intercept a cluster merge
 	// and conditionally abort the merge.
 	Merge MergeDelegate
-***REMOVED***
+}
 
 // Init allocates the subdata structures
-func (c *Config) Init() ***REMOVED***
-	if c.Tags == nil ***REMOVED***
+func (c *Config) Init() {
+	if c.Tags == nil {
 		c.Tags = make(map[string]string)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // DefaultConfig returns a Config struct that contains reasonable defaults
 // for most of the configurations.
-func DefaultConfig() *Config ***REMOVED***
+func DefaultConfig() *Config {
 	hostname, err := os.Hostname()
-	if err != nil ***REMOVED***
+	if err != nil {
 		panic(err)
-	***REMOVED***
+	}
 
-	return &Config***REMOVED***
+	return &Config{
 		NodeName:                     hostname,
 		BroadcastTimeout:             5 * time.Second,
 		EventBuffer:                  512,
@@ -247,5 +247,5 @@ func DefaultConfig() *Config ***REMOVED***
 		QuerySizeLimit:               1024,
 		EnableNameConflictResolution: true,
 		DisableCoordinates:           false,
-	***REMOVED***
-***REMOVED***
+	}
+}

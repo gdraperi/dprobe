@@ -97,11 +97,11 @@ the -test.bench flag is provided.
 <p>
 A sample benchmark function looks like this:
 </p>
-<pre>func BenchmarkHello(b *testing.B) ***REMOVED***
-    for i := 0; i &lt; b.N; i++ ***REMOVED***
+<pre>func BenchmarkHello(b *testing.B) {
+    for i := 0; i &lt; b.N; i++ {
         fmt.Sprintf(&#34;hello&#34;)
-***REMOVED***
-***REMOVED***
+    }
+}
 </pre>
 <p>
 The benchmark package will vary b.N until the benchmark function lasts
@@ -116,14 +116,14 @@ means that the loop ran 10000000 times at a speed of 282 ns per loop.
 If a benchmark needs some expensive setup before running, the timer
 may be stopped:
 </p>
-<pre>func BenchmarkBigLen(b *testing.B) ***REMOVED***
+<pre>func BenchmarkBigLen(b *testing.B) {
     b.StopTimer()
     big := NewBig()
     b.StartTimer()
-    for i := 0; i &lt; b.N; i++ ***REMOVED***
+    for i := 0; i &lt; b.N; i++ {
         big.Len()
-***REMOVED***
-***REMOVED***
+    }
+}
 </pre>
 <p>
 The package also runs and verifies example code. Example functions may
@@ -131,18 +131,18 @@ include a concluding comment that begins with &#34;Output:&#34; and is compared 
 the standard output of the function when the tests are run, as in these
 examples of an example:
 </p>
-<pre>func ExampleHello() ***REMOVED***
+<pre>func ExampleHello() {
         fmt.Println(&#34;hello&#34;)
         // Output: hello
-***REMOVED***
+}
 
-func ExampleSalutations() ***REMOVED***
+func ExampleSalutations() {
         fmt.Println(&#34;hello, and&#34;)
         fmt.Println(&#34;goodbye&#34;)
         // Output:
         // hello, and
         // goodbye
-***REMOVED***
+}
 </pre>
 <p>
 Example functions without output comments are compiled but not executed.
@@ -151,18 +151,18 @@ Example functions without output comments are compiled but not executed.
 The naming convention to declare examples for a function F, a type T and
 method M on type T are:
 </p>
-<pre>func ExampleF() ***REMOVED*** ... ***REMOVED***
-func ExampleT() ***REMOVED*** ... ***REMOVED***
-func ExampleT_M() ***REMOVED*** ... ***REMOVED***
+<pre>func ExampleF() { ... }
+func ExampleT() { ... }
+func ExampleT_M() { ... }
 </pre>
 <p>
 Multiple example functions for a type/function/method may be provided by
 appending a distinct suffix to the name. The suffix must start with a
 lower-case letter.
 </p>
-<pre>func ExampleF_suffix() ***REMOVED*** ... ***REMOVED***
-func ExampleT_suffix() ***REMOVED*** ... ***REMOVED***
-func ExampleT_M_suffix() ***REMOVED*** ... ***REMOVED***
+<pre>func ExampleF_suffix() { ... }
+func ExampleT_suffix() { ... }
+func ExampleT_M_suffix() { ... }
 </pre>
 <p>
 The entire test file is presented as the example when it contains a single
@@ -202,10 +202,10 @@ declaration, and no test or benchmark functions.
 				
 				
 					
-					<dd>&nbsp; &nbsp; <a href="#B.Error">func (c *B) Error(args ...interface***REMOVED******REMOVED***)</a></dd>
+					<dd>&nbsp; &nbsp; <a href="#B.Error">func (c *B) Error(args ...interface{})</a></dd>
 				
 					
-					<dd>&nbsp; &nbsp; <a href="#B.Errorf">func (c *B) Errorf(format string, args ...interface***REMOVED******REMOVED***)</a></dd>
+					<dd>&nbsp; &nbsp; <a href="#B.Errorf">func (c *B) Errorf(format string, args ...interface{})</a></dd>
 				
 					
 					<dd>&nbsp; &nbsp; <a href="#B.Fail">func (c *B) Fail()</a></dd>
@@ -217,16 +217,16 @@ declaration, and no test or benchmark functions.
 					<dd>&nbsp; &nbsp; <a href="#B.Failed">func (c *B) Failed() bool</a></dd>
 				
 					
-					<dd>&nbsp; &nbsp; <a href="#B.Fatal">func (c *B) Fatal(args ...interface***REMOVED******REMOVED***)</a></dd>
+					<dd>&nbsp; &nbsp; <a href="#B.Fatal">func (c *B) Fatal(args ...interface{})</a></dd>
 				
 					
-					<dd>&nbsp; &nbsp; <a href="#B.Fatalf">func (c *B) Fatalf(format string, args ...interface***REMOVED******REMOVED***)</a></dd>
+					<dd>&nbsp; &nbsp; <a href="#B.Fatalf">func (c *B) Fatalf(format string, args ...interface{})</a></dd>
 				
 					
-					<dd>&nbsp; &nbsp; <a href="#B.Log">func (c *B) Log(args ...interface***REMOVED******REMOVED***)</a></dd>
+					<dd>&nbsp; &nbsp; <a href="#B.Log">func (c *B) Log(args ...interface{})</a></dd>
 				
 					
-					<dd>&nbsp; &nbsp; <a href="#B.Logf">func (c *B) Logf(format string, args ...interface***REMOVED******REMOVED***)</a></dd>
+					<dd>&nbsp; &nbsp; <a href="#B.Logf">func (c *B) Logf(format string, args ...interface{})</a></dd>
 				
 					
 					<dd>&nbsp; &nbsp; <a href="#B.ResetTimer">func (b *B) ResetTimer()</a></dd>
@@ -275,10 +275,10 @@ declaration, and no test or benchmark functions.
 				
 				
 					
-					<dd>&nbsp; &nbsp; <a href="#T.Error">func (c *T) Error(args ...interface***REMOVED******REMOVED***)</a></dd>
+					<dd>&nbsp; &nbsp; <a href="#T.Error">func (c *T) Error(args ...interface{})</a></dd>
 				
 					
-					<dd>&nbsp; &nbsp; <a href="#T.Errorf">func (c *T) Errorf(format string, args ...interface***REMOVED******REMOVED***)</a></dd>
+					<dd>&nbsp; &nbsp; <a href="#T.Errorf">func (c *T) Errorf(format string, args ...interface{})</a></dd>
 				
 					
 					<dd>&nbsp; &nbsp; <a href="#T.Fail">func (c *T) Fail()</a></dd>
@@ -290,16 +290,16 @@ declaration, and no test or benchmark functions.
 					<dd>&nbsp; &nbsp; <a href="#T.Failed">func (c *T) Failed() bool</a></dd>
 				
 					
-					<dd>&nbsp; &nbsp; <a href="#T.Fatal">func (c *T) Fatal(args ...interface***REMOVED******REMOVED***)</a></dd>
+					<dd>&nbsp; &nbsp; <a href="#T.Fatal">func (c *T) Fatal(args ...interface{})</a></dd>
 				
 					
-					<dd>&nbsp; &nbsp; <a href="#T.Fatalf">func (c *T) Fatalf(format string, args ...interface***REMOVED******REMOVED***)</a></dd>
+					<dd>&nbsp; &nbsp; <a href="#T.Fatalf">func (c *T) Fatalf(format string, args ...interface{})</a></dd>
 				
 					
-					<dd>&nbsp; &nbsp; <a href="#T.Log">func (c *T) Log(args ...interface***REMOVED******REMOVED***)</a></dd>
+					<dd>&nbsp; &nbsp; <a href="#T.Log">func (c *T) Log(args ...interface{})</a></dd>
 				
 					
-					<dd>&nbsp; &nbsp; <a href="#T.Logf">func (c *T) Logf(format string, args ...interface***REMOVED******REMOVED***)</a></dd>
+					<dd>&nbsp; &nbsp; <a href="#T.Logf">func (c *T) Logf(format string, args ...interface{})</a></dd>
 				
 					
 					<dd>&nbsp; &nbsp; <a href="#T.Parallel">func (t *T) Parallel()</a></dd>
@@ -378,10 +378,10 @@ Short reports whether the -test.short flag is set.
 			
 			
 			<h2 id="B">type <a href="/src/pkg/testing/benchmark.go?s=743:872#L17">B</a></h2>
-			<pre>type B struct ***REMOVED***
+			<pre>type B struct {
     N int
     <span class="comment">// contains filtered or unexported fields</span>
-***REMOVED***</pre>
+}</pre>
 			<p>
 B is a type passed to Benchmark functions to manage benchmark
 timing and to specify the number of iterations to run.
@@ -399,7 +399,7 @@ timing and to specify the number of iterations to run.
 			
 				
 				<h3 id="B.Error">func (*B) <a href="/src/pkg/testing/testing.go?s=8110:8153#L209">Error</a></h3>
-				<pre>func (c *B) Error(args ...interface***REMOVED******REMOVED***)</pre>
+				<pre>func (c *B) Error(args ...interface{})</pre>
 				<p>
 Error is equivalent to Log() followed by Fail().
 </p>
@@ -409,7 +409,7 @@ Error is equivalent to Log() followed by Fail().
 			
 				
 				<h3 id="B.Errorf">func (*B) <a href="/src/pkg/testing/testing.go?s=8253:8312#L215">Errorf</a></h3>
-				<pre>func (c *B) Errorf(format string, args ...interface***REMOVED******REMOVED***)</pre>
+				<pre>func (c *B) Errorf(format string, args ...interface{})</pre>
 				<p>
 Errorf is equivalent to Logf() followed by Fail().
 </p>
@@ -450,7 +450,7 @@ Failed returns whether the function has failed.
 			
 				
 				<h3 id="B.Fatal">func (*B) <a href="/src/pkg/testing/testing.go?s=8420:8463#L221">Fatal</a></h3>
-				<pre>func (c *B) Fatal(args ...interface***REMOVED******REMOVED***)</pre>
+				<pre>func (c *B) Fatal(args ...interface{})</pre>
 				<p>
 Fatal is equivalent to Log() followed by FailNow().
 </p>
@@ -460,7 +460,7 @@ Fatal is equivalent to Log() followed by FailNow().
 			
 				
 				<h3 id="B.Fatalf">func (*B) <a href="/src/pkg/testing/testing.go?s=8569:8628#L227">Fatalf</a></h3>
-				<pre>func (c *B) Fatalf(format string, args ...interface***REMOVED******REMOVED***)</pre>
+				<pre>func (c *B) Fatalf(format string, args ...interface{})</pre>
 				<p>
 Fatalf is equivalent to Logf() followed by FailNow().
 </p>
@@ -470,7 +470,7 @@ Fatalf is equivalent to Logf() followed by FailNow().
 			
 				
 				<h3 id="B.Log">func (*B) <a href="/src/pkg/testing/testing.go?s=7763:7804#L202">Log</a></h3>
-				<pre>func (c *B) Log(args ...interface***REMOVED******REMOVED***)</pre>
+				<pre>func (c *B) Log(args ...interface{})</pre>
 				<p>
 Log formats its arguments using default formatting, analogous to Println(),
 and records the text in the error log.
@@ -481,7 +481,7 @@ and records the text in the error log.
 			
 				
 				<h3 id="B.Logf">func (*B) <a href="/src/pkg/testing/testing.go?s=7959:8016#L206">Logf</a></h3>
-				<pre>func (c *B) Logf(format string, args ...interface***REMOVED******REMOVED***)</pre>
+				<pre>func (c *B) Logf(format string, args ...interface{})</pre>
 				<p>
 Logf formats its arguments according to the format, analogous to Printf(),
 and records the text in the error log.
@@ -540,11 +540,11 @@ want to measure.
 			
 			
 			<h2 id="BenchmarkResult">type <a href="/src/pkg/testing/benchmark.go?s=4206:4391#L165">BenchmarkResult</a></h2>
-			<pre>type BenchmarkResult struct ***REMOVED***
+			<pre>type BenchmarkResult struct {
     N     int           <span class="comment">// The number of iterations.</span>
     T     time.Duration <span class="comment">// The total time taken.</span>
     Bytes int64         <span class="comment">// Bytes processed in one iteration.</span>
-***REMOVED***</pre>
+}</pre>
 			<p>
 The results of a benchmark run.
 </p>
@@ -587,10 +587,10 @@ custom benchmarks that do not use the &#34;go test&#34; command.
 			
 			
 			<h2 id="InternalBenchmark">type <a href="/src/pkg/testing/benchmark.go?s=555:618#L10">InternalBenchmark</a></h2>
-			<pre>type InternalBenchmark struct ***REMOVED***
+			<pre>type InternalBenchmark struct {
     Name string
     F    func(b *B)
-***REMOVED***</pre>
+}</pre>
 			<p>
 An internal type but exported because it is cross-package; part of the implementation
 of the &#34;go test&#34; command.
@@ -610,11 +610,11 @@ of the &#34;go test&#34; command.
 			
 			
 			<h2 id="InternalExample">type <a href="/src/pkg/testing/example.go?s=236:312#L6">InternalExample</a></h2>
-			<pre>type InternalExample struct ***REMOVED***
+			<pre>type InternalExample struct {
     Name   string
     F      func()
     Output string
-***REMOVED***</pre>
+}</pre>
 			
 
 			
@@ -630,10 +630,10 @@ of the &#34;go test&#34; command.
 			
 			
 			<h2 id="InternalTest">type <a href="/src/pkg/testing/testing.go?s=9065:9121#L241">InternalTest</a></h2>
-			<pre>type InternalTest struct ***REMOVED***
+			<pre>type InternalTest struct {
     Name string
     F    func(*T)
-***REMOVED***</pre>
+}</pre>
 			<p>
 An internal type but exported because it is cross-package; part of the implementation
 of the &#34;go test&#34; command.
@@ -653,9 +653,9 @@ of the &#34;go test&#34; command.
 			
 			
 			<h2 id="T">type <a href="/src/pkg/testing/testing.go?s=6070:6199#L156">T</a></h2>
-			<pre>type T struct ***REMOVED***
+			<pre>type T struct {
     <span class="comment">// contains filtered or unexported fields</span>
-***REMOVED***</pre>
+}</pre>
 			<p>
 T is a type passed to Test functions to manage test state and support formatted test logs.
 Logs are accumulated during execution and dumped to standard error when done.
@@ -673,7 +673,7 @@ Logs are accumulated during execution and dumped to standard error when done.
 			
 				
 				<h3 id="T.Error">func (*T) <a href="/src/pkg/testing/testing.go?s=8110:8153#L209">Error</a></h3>
-				<pre>func (c *T) Error(args ...interface***REMOVED******REMOVED***)</pre>
+				<pre>func (c *T) Error(args ...interface{})</pre>
 				<p>
 Error is equivalent to Log() followed by Fail().
 </p>
@@ -683,7 +683,7 @@ Error is equivalent to Log() followed by Fail().
 			
 				
 				<h3 id="T.Errorf">func (*T) <a href="/src/pkg/testing/testing.go?s=8253:8312#L215">Errorf</a></h3>
-				<pre>func (c *T) Errorf(format string, args ...interface***REMOVED******REMOVED***)</pre>
+				<pre>func (c *T) Errorf(format string, args ...interface{})</pre>
 				<p>
 Errorf is equivalent to Logf() followed by Fail().
 </p>
@@ -724,7 +724,7 @@ Failed returns whether the function has failed.
 			
 				
 				<h3 id="T.Fatal">func (*T) <a href="/src/pkg/testing/testing.go?s=8420:8463#L221">Fatal</a></h3>
-				<pre>func (c *T) Fatal(args ...interface***REMOVED******REMOVED***)</pre>
+				<pre>func (c *T) Fatal(args ...interface{})</pre>
 				<p>
 Fatal is equivalent to Log() followed by FailNow().
 </p>
@@ -734,7 +734,7 @@ Fatal is equivalent to Log() followed by FailNow().
 			
 				
 				<h3 id="T.Fatalf">func (*T) <a href="/src/pkg/testing/testing.go?s=8569:8628#L227">Fatalf</a></h3>
-				<pre>func (c *T) Fatalf(format string, args ...interface***REMOVED******REMOVED***)</pre>
+				<pre>func (c *T) Fatalf(format string, args ...interface{})</pre>
 				<p>
 Fatalf is equivalent to Logf() followed by FailNow().
 </p>
@@ -744,7 +744,7 @@ Fatalf is equivalent to Logf() followed by FailNow().
 			
 				
 				<h3 id="T.Log">func (*T) <a href="/src/pkg/testing/testing.go?s=7763:7804#L202">Log</a></h3>
-				<pre>func (c *T) Log(args ...interface***REMOVED******REMOVED***)</pre>
+				<pre>func (c *T) Log(args ...interface{})</pre>
 				<p>
 Log formats its arguments using default formatting, analogous to Println(),
 and records the text in the error log.
@@ -755,7 +755,7 @@ and records the text in the error log.
 			
 				
 				<h3 id="T.Logf">func (*T) <a href="/src/pkg/testing/testing.go?s=7959:8016#L206">Logf</a></h3>
-				<pre>func (c *T) Logf(format string, args ...interface***REMOVED******REMOVED***)</pre>
+				<pre>func (c *T) Logf(format string, args ...interface{})</pre>
 				<p>
 Logf formats its arguments according to the format, analogous to Printf(),
 and records the text in the error log.
@@ -837,19 +837,19 @@ and code is licensed under a <a href="/LICENSE">BSD license</a>.<br>
 </div>
 
 <script type="text/javascript">
-(function() ***REMOVED***
+(function() {
   var ga = document.createElement("script"); ga.type = "text/javascript"; ga.async = true;
   ga.src = ("https:" == document.location.protocol ? "https://ssl" : "http://www") + ".google-analytics.com/ga.js";
   var s = document.getElementsByTagName("script")[0]; s.parentNode.insertBefore(ga, s);
-***REMOVED***)();
+})();
 </script>
 </body>
 <script type="text/javascript">
-  (function() ***REMOVED***
+  (function() {
     var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
     po.src = 'https://apis.google.com/js/plusone.js';
     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
-  ***REMOVED***)();
+  })();
 </script>
 </html>
 

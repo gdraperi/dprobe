@@ -13,48 +13,48 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestConfigUpdateUnsupported(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestConfigUpdateUnsupported(t *testing.T) {
+	client := &Client{
 		version: "1.29",
-		client:  &http.Client***REMOVED******REMOVED***,
-	***REMOVED***
-	err := client.ConfigUpdate(context.Background(), "config_id", swarm.Version***REMOVED******REMOVED***, swarm.ConfigSpec***REMOVED******REMOVED***)
+		client:  &http.Client{},
+	}
+	err := client.ConfigUpdate(context.Background(), "config_id", swarm.Version{}, swarm.ConfigSpec{})
 	assert.EqualError(t, err, `"config update" requires API version 1.30, but the Docker daemon API version is 1.29`)
-***REMOVED***
+}
 
-func TestConfigUpdateError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestConfigUpdateError(t *testing.T) {
+	client := &Client{
 		version: "1.30",
 		client:  newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
-	***REMOVED***
+	}
 
-	err := client.ConfigUpdate(context.Background(), "config_id", swarm.Version***REMOVED******REMOVED***, swarm.ConfigSpec***REMOVED******REMOVED***)
-	if err == nil || err.Error() != "Error response from daemon: Server error" ***REMOVED***
+	err := client.ConfigUpdate(context.Background(), "config_id", swarm.Version{}, swarm.ConfigSpec{})
+	if err == nil || err.Error() != "Error response from daemon: Server error" {
 		t.Fatalf("expected a Server Error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestConfigUpdate(t *testing.T) ***REMOVED***
+func TestConfigUpdate(t *testing.T) {
 	expectedURL := "/v1.30/configs/config_id/update"
 
-	client := &Client***REMOVED***
+	client := &Client{
 		version: "1.30",
-		client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-			if !strings.HasPrefix(req.URL.Path, expectedURL) ***REMOVED***
+		client: newMockClient(func(req *http.Request) (*http.Response, error) {
+			if !strings.HasPrefix(req.URL.Path, expectedURL) {
 				return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, req.URL)
-			***REMOVED***
-			if req.Method != "POST" ***REMOVED***
+			}
+			if req.Method != "POST" {
 				return nil, fmt.Errorf("expected POST method, got %s", req.Method)
-			***REMOVED***
-			return &http.Response***REMOVED***
+			}
+			return &http.Response{
 				StatusCode: http.StatusOK,
 				Body:       ioutil.NopCloser(bytes.NewReader([]byte("body"))),
-			***REMOVED***, nil
-		***REMOVED***),
-	***REMOVED***
+			}, nil
+		}),
+	}
 
-	err := client.ConfigUpdate(context.Background(), "config_id", swarm.Version***REMOVED******REMOVED***, swarm.ConfigSpec***REMOVED******REMOVED***)
-	if err != nil ***REMOVED***
+	err := client.ConfigUpdate(context.Background(), "config_id", swarm.Version{}, swarm.ConfigSpec{})
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}

@@ -10,11 +10,11 @@ import (
 	"crypto/cipher"
 )
 
-type ocfbEncrypter struct ***REMOVED***
+type ocfbEncrypter struct {
 	b       cipher.Block
 	fre     []byte
 	outUsed int
-***REMOVED***
+}
 
 // An OCFBResyncOption determines if the "resynchronization step" of OCFB is
 // performed.
@@ -31,56 +31,56 @@ const (
 // cipher.Block's block size. Resync determines if the "resynchronization step"
 // from RFC 4880, 13.9 step 7 is performed. Different parts of OpenPGP vary on
 // this point.
-func NewOCFBEncrypter(block cipher.Block, randData []byte, resync OCFBResyncOption) (cipher.Stream, []byte) ***REMOVED***
+func NewOCFBEncrypter(block cipher.Block, randData []byte, resync OCFBResyncOption) (cipher.Stream, []byte) {
 	blockSize := block.BlockSize()
-	if len(randData) != blockSize ***REMOVED***
+	if len(randData) != blockSize {
 		return nil, nil
-	***REMOVED***
+	}
 
-	x := &ocfbEncrypter***REMOVED***
+	x := &ocfbEncrypter{
 		b:       block,
 		fre:     make([]byte, blockSize),
 		outUsed: 0,
-	***REMOVED***
+	}
 	prefix := make([]byte, blockSize+2)
 
 	block.Encrypt(x.fre, x.fre)
-	for i := 0; i < blockSize; i++ ***REMOVED***
+	for i := 0; i < blockSize; i++ {
 		prefix[i] = randData[i] ^ x.fre[i]
-	***REMOVED***
+	}
 
 	block.Encrypt(x.fre, prefix[:blockSize])
 	prefix[blockSize] = x.fre[0] ^ randData[blockSize-2]
 	prefix[blockSize+1] = x.fre[1] ^ randData[blockSize-1]
 
-	if resync ***REMOVED***
+	if resync {
 		block.Encrypt(x.fre, prefix[2:])
-	***REMOVED*** else ***REMOVED***
+	} else {
 		x.fre[0] = prefix[blockSize]
 		x.fre[1] = prefix[blockSize+1]
 		x.outUsed = 2
-	***REMOVED***
+	}
 	return x, prefix
-***REMOVED***
+}
 
-func (x *ocfbEncrypter) XORKeyStream(dst, src []byte) ***REMOVED***
-	for i := 0; i < len(src); i++ ***REMOVED***
-		if x.outUsed == len(x.fre) ***REMOVED***
+func (x *ocfbEncrypter) XORKeyStream(dst, src []byte) {
+	for i := 0; i < len(src); i++ {
+		if x.outUsed == len(x.fre) {
 			x.b.Encrypt(x.fre, x.fre)
 			x.outUsed = 0
-		***REMOVED***
+		}
 
 		x.fre[x.outUsed] ^= src[i]
 		dst[i] = x.fre[x.outUsed]
 		x.outUsed++
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type ocfbDecrypter struct ***REMOVED***
+type ocfbDecrypter struct {
 	b       cipher.Block
 	fre     []byte
 	outUsed int
-***REMOVED***
+}
 
 // NewOCFBDecrypter returns a cipher.Stream which decrypts data with OpenPGP's
 // cipher feedback mode using the given cipher.Block. Prefix must be the first
@@ -89,55 +89,55 @@ type ocfbDecrypter struct ***REMOVED***
 // successful exit, blockSize+2 bytes of decrypted data are written into
 // prefix. Resync determines if the "resynchronization step" from RFC 4880,
 // 13.9 step 7 is performed. Different parts of OpenPGP vary on this point.
-func NewOCFBDecrypter(block cipher.Block, prefix []byte, resync OCFBResyncOption) cipher.Stream ***REMOVED***
+func NewOCFBDecrypter(block cipher.Block, prefix []byte, resync OCFBResyncOption) cipher.Stream {
 	blockSize := block.BlockSize()
-	if len(prefix) != blockSize+2 ***REMOVED***
+	if len(prefix) != blockSize+2 {
 		return nil
-	***REMOVED***
+	}
 
-	x := &ocfbDecrypter***REMOVED***
+	x := &ocfbDecrypter{
 		b:       block,
 		fre:     make([]byte, blockSize),
 		outUsed: 0,
-	***REMOVED***
+	}
 	prefixCopy := make([]byte, len(prefix))
 	copy(prefixCopy, prefix)
 
 	block.Encrypt(x.fre, x.fre)
-	for i := 0; i < blockSize; i++ ***REMOVED***
+	for i := 0; i < blockSize; i++ {
 		prefixCopy[i] ^= x.fre[i]
-	***REMOVED***
+	}
 
 	block.Encrypt(x.fre, prefix[:blockSize])
 	prefixCopy[blockSize] ^= x.fre[0]
 	prefixCopy[blockSize+1] ^= x.fre[1]
 
 	if prefixCopy[blockSize-2] != prefixCopy[blockSize] ||
-		prefixCopy[blockSize-1] != prefixCopy[blockSize+1] ***REMOVED***
+		prefixCopy[blockSize-1] != prefixCopy[blockSize+1] {
 		return nil
-	***REMOVED***
+	}
 
-	if resync ***REMOVED***
+	if resync {
 		block.Encrypt(x.fre, prefix[2:])
-	***REMOVED*** else ***REMOVED***
+	} else {
 		x.fre[0] = prefix[blockSize]
 		x.fre[1] = prefix[blockSize+1]
 		x.outUsed = 2
-	***REMOVED***
+	}
 	copy(prefix, prefixCopy)
 	return x
-***REMOVED***
+}
 
-func (x *ocfbDecrypter) XORKeyStream(dst, src []byte) ***REMOVED***
-	for i := 0; i < len(src); i++ ***REMOVED***
-		if x.outUsed == len(x.fre) ***REMOVED***
+func (x *ocfbDecrypter) XORKeyStream(dst, src []byte) {
+	for i := 0; i < len(src); i++ {
+		if x.outUsed == len(x.fre) {
 			x.b.Encrypt(x.fre, x.fre)
 			x.outUsed = 0
-		***REMOVED***
+		}
 
 		c := src[i]
 		dst[i] = x.fre[x.outUsed] ^ src[i]
 		x.fre[x.outUsed] = c
 		x.outUsed++
-	***REMOVED***
-***REMOVED***
+	}
+}

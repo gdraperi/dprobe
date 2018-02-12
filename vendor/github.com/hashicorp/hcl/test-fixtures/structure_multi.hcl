@@ -1,7 +1,7 @@
-foo "baz" ***REMOVED***
+foo "baz" {
 	key = 7
-***REMOVED***
+}
 
-foo "bar" ***REMOVED***
+foo "bar" {
 	key = 12
-***REMOVED***
+}

@@ -1,7 +1,7 @@
-service "my-service-0" ***REMOVED***
+service "my-service-0" {
   key = "value"
-***REMOVED***
+}
 
-service "my-service-1" ***REMOVED***
+service "my-service-1" {
   key = "value"
-***REMOVED***
+}

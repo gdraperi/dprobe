@@ -5,11 +5,11 @@ package devicemapper
 // LibraryDeferredRemovalSupport tells if the feature is enabled in the build
 const LibraryDeferredRemovalSupport = false
 
-func dmTaskDeferredRemoveFct(task *cdmTask) int ***REMOVED***
+func dmTaskDeferredRemoveFct(task *cdmTask) int {
 	// Error. Nobody should be calling it.
 	return -1
-***REMOVED***
+}
 
-func dmTaskGetInfoWithDeferredFct(task *cdmTask, info *Info) int ***REMOVED***
+func dmTaskGetInfoWithDeferredFct(task *cdmTask, info *Info) int {
 	return -1
-***REMOVED***
+}

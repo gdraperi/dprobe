@@ -25,21 +25,21 @@
 //    	"github.com/prometheus/procfs"
 //    )
 //
-//    func main() ***REMOVED***
+//    func main() {
 //    	p, err := procfs.Self()
-//    	if err != nil ***REMOVED***
+//    	if err != nil {
 //    		log.Fatalf("could not get process: %s", err)
-//    	***REMOVED***
+//    	}
 //
 //    	stat, err := p.NewStat()
-//    	if err != nil ***REMOVED***
+//    	if err != nil {
 //    		log.Fatalf("could not get process stat: %s", err)
-//    	***REMOVED***
+//    	}
 //
 //    	fmt.Printf("command:  %s\n", stat.Comm)
 //    	fmt.Printf("cpu time: %fs\n", stat.CPUTime())
 //    	fmt.Printf("vsize:    %dB\n", stat.VirtualMemory())
 //    	fmt.Printf("rss:      %dB\n", stat.ResidentMemory())
-//***REMOVED***
+//    }
 //
 package procfs

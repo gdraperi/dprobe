@@ -7,7 +7,7 @@ const (
 	_C_SPECNAMELEN = 0x3f
 )
 
-type fiodgnameArg struct ***REMOVED***
+type fiodgnameArg struct {
 	Len int32
 	Buf *byte
-***REMOVED***
+}

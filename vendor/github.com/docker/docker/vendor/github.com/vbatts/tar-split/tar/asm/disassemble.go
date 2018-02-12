@@ -17,7 +17,7 @@ import (
 // stashed. If this stashing is not needed, you can provide a nil
 // storage.FilePutter. Since the checksumming is still needed, then a default
 // of NewDiscardFilePutter will be used internally
-func NewInputTarStream(r io.Reader, p storage.Packer, fp storage.FilePutter) (io.Reader, error) ***REMOVED***
+func NewInputTarStream(r io.Reader, p storage.Packer, fp storage.FilePutter) (io.Reader, error) {
 	// What to do here... folks will want their own access to the Reader that is
 	// their tar archive stream, but we'll need that same stream to use our
 	// forked 'archive/tar'.
@@ -38,85 +38,85 @@ func NewInputTarStream(r io.Reader, p storage.Packer, fp storage.FilePutter) (io
 	outputRdr := io.TeeReader(r, pW)
 
 	// we need a putter that will generate the crc64 sums of file payloads
-	if fp == nil ***REMOVED***
+	if fp == nil {
 		fp = storage.NewDiscardFilePutter()
-	***REMOVED***
+	}
 
-	go func() ***REMOVED***
+	go func() {
 		tr := tar.NewReader(outputRdr)
 		tr.RawAccounting = true
-		for ***REMOVED***
+		for {
 			hdr, err := tr.Next()
-			if err != nil ***REMOVED***
-				if err != io.EOF ***REMOVED***
+			if err != nil {
+				if err != io.EOF {
 					pW.CloseWithError(err)
 					return
-				***REMOVED***
+				}
 				// even when an EOF is reached, there is often 1024 null bytes on
 				// the end of an archive. Collect them too.
-				if b := tr.RawBytes(); len(b) > 0 ***REMOVED***
-					_, err := p.AddEntry(storage.Entry***REMOVED***
+				if b := tr.RawBytes(); len(b) > 0 {
+					_, err := p.AddEntry(storage.Entry{
 						Type:    storage.SegmentType,
 						Payload: b,
-					***REMOVED***)
-					if err != nil ***REMOVED***
+					})
+					if err != nil {
 						pW.CloseWithError(err)
 						return
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				break // not return. We need the end of the reader.
-			***REMOVED***
-			if hdr == nil ***REMOVED***
+			}
+			if hdr == nil {
 				break // not return. We need the end of the reader.
-			***REMOVED***
+			}
 
-			if b := tr.RawBytes(); len(b) > 0 ***REMOVED***
-				_, err := p.AddEntry(storage.Entry***REMOVED***
+			if b := tr.RawBytes(); len(b) > 0 {
+				_, err := p.AddEntry(storage.Entry{
 					Type:    storage.SegmentType,
 					Payload: b,
-				***REMOVED***)
-				if err != nil ***REMOVED***
+				})
+				if err != nil {
 					pW.CloseWithError(err)
 					return
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 
 			var csum []byte
-			if hdr.Size > 0 ***REMOVED***
+			if hdr.Size > 0 {
 				var err error
 				_, csum, err = fp.Put(hdr.Name, tr)
-				if err != nil ***REMOVED***
+				if err != nil {
 					pW.CloseWithError(err)
 					return
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 
-			entry := storage.Entry***REMOVED***
+			entry := storage.Entry{
 				Type:    storage.FileType,
 				Size:    hdr.Size,
 				Payload: csum,
-			***REMOVED***
+			}
 			// For proper marshalling of non-utf8 characters
 			entry.SetName(hdr.Name)
 
 			// File entries added, regardless of size
 			_, err = p.AddEntry(entry)
-			if err != nil ***REMOVED***
+			if err != nil {
 				pW.CloseWithError(err)
 				return
-			***REMOVED***
+			}
 
-			if b := tr.RawBytes(); len(b) > 0 ***REMOVED***
-				_, err = p.AddEntry(storage.Entry***REMOVED***
+			if b := tr.RawBytes(); len(b) > 0 {
+				_, err = p.AddEntry(storage.Entry{
 					Type:    storage.SegmentType,
 					Payload: b,
-				***REMOVED***)
-				if err != nil ***REMOVED***
+				})
+				if err != nil {
 					pW.CloseWithError(err)
 					return
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
+				}
+			}
+		}
 
 		// It is allowable, and not uncommon that there is further padding on
 		// the end of an archive, apart from the expected 1024 null bytes. We
@@ -125,30 +125,30 @@ func NewInputTarStream(r io.Reader, p storage.Packer, fp storage.FilePutter) (io
 		// into memory.
 		const paddingChunkSize = 1024 * 1024
 		var paddingChunk [paddingChunkSize]byte
-		for ***REMOVED***
+		for {
 			var isEOF bool
 			n, err := outputRdr.Read(paddingChunk[:])
-			if err != nil ***REMOVED***
-				if err != io.EOF ***REMOVED***
+			if err != nil {
+				if err != io.EOF {
 					pW.CloseWithError(err)
 					return
-				***REMOVED***
+				}
 				isEOF = true
-			***REMOVED***
-			_, err = p.AddEntry(storage.Entry***REMOVED***
+			}
+			_, err = p.AddEntry(storage.Entry{
 				Type:    storage.SegmentType,
 				Payload: paddingChunk[:n],
-			***REMOVED***)
-			if err != nil ***REMOVED***
+			})
+			if err != nil {
 				pW.CloseWithError(err)
 				return
-			***REMOVED***
-			if isEOF ***REMOVED***
+			}
+			if isEOF {
 				break
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		pW.Close()
-	***REMOVED***()
+	}()
 
 	return pR, nil
-***REMOVED***
+}

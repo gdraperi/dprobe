@@ -10,26 +10,26 @@ import (
 
 // This avoids creating a new driver for each test if all tests are run
 // Make sure to put new tests between TestZfsSetup and TestZfsTeardown
-func TestZfsSetup(t *testing.T) ***REMOVED***
+func TestZfsSetup(t *testing.T) {
 	graphtest.GetDriver(t, "zfs")
-***REMOVED***
+}
 
-func TestZfsCreateEmpty(t *testing.T) ***REMOVED***
+func TestZfsCreateEmpty(t *testing.T) {
 	graphtest.DriverTestCreateEmpty(t, "zfs")
-***REMOVED***
+}
 
-func TestZfsCreateBase(t *testing.T) ***REMOVED***
+func TestZfsCreateBase(t *testing.T) {
 	graphtest.DriverTestCreateBase(t, "zfs")
-***REMOVED***
+}
 
-func TestZfsCreateSnap(t *testing.T) ***REMOVED***
+func TestZfsCreateSnap(t *testing.T) {
 	graphtest.DriverTestCreateSnap(t, "zfs")
-***REMOVED***
+}
 
-func TestZfsSetQuota(t *testing.T) ***REMOVED***
+func TestZfsSetQuota(t *testing.T) {
 	graphtest.DriverTestSetQuota(t, "zfs", true)
-***REMOVED***
+}
 
-func TestZfsTeardown(t *testing.T) ***REMOVED***
+func TestZfsTeardown(t *testing.T) {
 	graphtest.PutDriver(t)
-***REMOVED***
+}

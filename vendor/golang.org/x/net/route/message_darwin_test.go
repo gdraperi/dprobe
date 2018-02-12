@@ -6,29 +6,29 @@ package route
 
 import "testing"
 
-func TestFetchAndParseRIBOnDarwin(t *testing.T) ***REMOVED***
-	for _, typ := range []RIBType***REMOVED***sysNET_RT_FLAGS, sysNET_RT_DUMP2, sysNET_RT_IFLIST2***REMOVED*** ***REMOVED***
+func TestFetchAndParseRIBOnDarwin(t *testing.T) {
+	for _, typ := range []RIBType{sysNET_RT_FLAGS, sysNET_RT_DUMP2, sysNET_RT_IFLIST2} {
 		var lastErr error
 		var ms []Message
-		for _, af := range []int***REMOVED***sysAF_UNSPEC, sysAF_INET, sysAF_INET6***REMOVED*** ***REMOVED***
+		for _, af := range []int{sysAF_UNSPEC, sysAF_INET, sysAF_INET6} {
 			rs, err := fetchAndParseRIB(af, typ)
-			if err != nil ***REMOVED***
+			if err != nil {
 				lastErr = err
 				continue
-			***REMOVED***
+			}
 			ms = append(ms, rs...)
-		***REMOVED***
-		if len(ms) == 0 && lastErr != nil ***REMOVED***
+		}
+		if len(ms) == 0 && lastErr != nil {
 			t.Error(typ, lastErr)
 			continue
-		***REMOVED***
+		}
 		ss, err := msgs(ms).validate()
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Error(typ, err)
 			continue
-		***REMOVED***
-		for _, s := range ss ***REMOVED***
+		}
+		for _, s := range ss {
 			t.Log(s)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

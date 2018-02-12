@@ -16,55 +16,55 @@ import (
 )
 
 var (
-	ctlOpts = [ctlMax]ctlOpt***REMOVED***
-		ctlTTL:       ***REMOVED***sysIP_RECVTTL, 1, marshalTTL, parseTTL***REMOVED***,
-		ctlDst:       ***REMOVED***sysIP_RECVDSTADDR, net.IPv4len, marshalDst, parseDst***REMOVED***,
-		ctlInterface: ***REMOVED***sysIP_RECVIF, syscall.SizeofSockaddrDatalink, marshalInterface, parseInterface***REMOVED***,
-	***REMOVED***
+	ctlOpts = [ctlMax]ctlOpt{
+		ctlTTL:       {sysIP_RECVTTL, 1, marshalTTL, parseTTL},
+		ctlDst:       {sysIP_RECVDSTADDR, net.IPv4len, marshalDst, parseDst},
+		ctlInterface: {sysIP_RECVIF, syscall.SizeofSockaddrDatalink, marshalInterface, parseInterface},
+	}
 
-	sockOpts = map[int]*sockOpt***REMOVED***
-		ssoTOS:                ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIP, Name: sysIP_TOS, Len: 4***REMOVED******REMOVED***,
-		ssoTTL:                ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIP, Name: sysIP_TTL, Len: 4***REMOVED******REMOVED***,
-		ssoMulticastTTL:       ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIP, Name: sysIP_MULTICAST_TTL, Len: 1***REMOVED******REMOVED***,
-		ssoMulticastInterface: ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIP, Name: sysIP_MULTICAST_IF, Len: 4***REMOVED******REMOVED***,
-		ssoMulticastLoopback:  ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIP, Name: sysIP_MULTICAST_LOOP, Len: 4***REMOVED******REMOVED***,
-		ssoReceiveTTL:         ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIP, Name: sysIP_RECVTTL, Len: 4***REMOVED******REMOVED***,
-		ssoReceiveDst:         ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIP, Name: sysIP_RECVDSTADDR, Len: 4***REMOVED******REMOVED***,
-		ssoReceiveInterface:   ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIP, Name: sysIP_RECVIF, Len: 4***REMOVED******REMOVED***,
-		ssoHeaderPrepend:      ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIP, Name: sysIP_HDRINCL, Len: 4***REMOVED******REMOVED***,
-		ssoJoinGroup:          ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIP, Name: sysMCAST_JOIN_GROUP, Len: sizeofGroupReq***REMOVED***, typ: ssoTypeGroupReq***REMOVED***,
-		ssoLeaveGroup:         ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIP, Name: sysMCAST_LEAVE_GROUP, Len: sizeofGroupReq***REMOVED***, typ: ssoTypeGroupReq***REMOVED***,
-		ssoJoinSourceGroup:    ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIP, Name: sysMCAST_JOIN_SOURCE_GROUP, Len: sizeofGroupSourceReq***REMOVED***, typ: ssoTypeGroupSourceReq***REMOVED***,
-		ssoLeaveSourceGroup:   ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIP, Name: sysMCAST_LEAVE_SOURCE_GROUP, Len: sizeofGroupSourceReq***REMOVED***, typ: ssoTypeGroupSourceReq***REMOVED***,
-		ssoBlockSourceGroup:   ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIP, Name: sysMCAST_BLOCK_SOURCE, Len: sizeofGroupSourceReq***REMOVED***, typ: ssoTypeGroupSourceReq***REMOVED***,
-		ssoUnblockSourceGroup: ***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIP, Name: sysMCAST_UNBLOCK_SOURCE, Len: sizeofGroupSourceReq***REMOVED***, typ: ssoTypeGroupSourceReq***REMOVED***,
-	***REMOVED***
+	sockOpts = map[int]*sockOpt{
+		ssoTOS:                {Option: socket.Option{Level: iana.ProtocolIP, Name: sysIP_TOS, Len: 4}},
+		ssoTTL:                {Option: socket.Option{Level: iana.ProtocolIP, Name: sysIP_TTL, Len: 4}},
+		ssoMulticastTTL:       {Option: socket.Option{Level: iana.ProtocolIP, Name: sysIP_MULTICAST_TTL, Len: 1}},
+		ssoMulticastInterface: {Option: socket.Option{Level: iana.ProtocolIP, Name: sysIP_MULTICAST_IF, Len: 4}},
+		ssoMulticastLoopback:  {Option: socket.Option{Level: iana.ProtocolIP, Name: sysIP_MULTICAST_LOOP, Len: 4}},
+		ssoReceiveTTL:         {Option: socket.Option{Level: iana.ProtocolIP, Name: sysIP_RECVTTL, Len: 4}},
+		ssoReceiveDst:         {Option: socket.Option{Level: iana.ProtocolIP, Name: sysIP_RECVDSTADDR, Len: 4}},
+		ssoReceiveInterface:   {Option: socket.Option{Level: iana.ProtocolIP, Name: sysIP_RECVIF, Len: 4}},
+		ssoHeaderPrepend:      {Option: socket.Option{Level: iana.ProtocolIP, Name: sysIP_HDRINCL, Len: 4}},
+		ssoJoinGroup:          {Option: socket.Option{Level: iana.ProtocolIP, Name: sysMCAST_JOIN_GROUP, Len: sizeofGroupReq}, typ: ssoTypeGroupReq},
+		ssoLeaveGroup:         {Option: socket.Option{Level: iana.ProtocolIP, Name: sysMCAST_LEAVE_GROUP, Len: sizeofGroupReq}, typ: ssoTypeGroupReq},
+		ssoJoinSourceGroup:    {Option: socket.Option{Level: iana.ProtocolIP, Name: sysMCAST_JOIN_SOURCE_GROUP, Len: sizeofGroupSourceReq}, typ: ssoTypeGroupSourceReq},
+		ssoLeaveSourceGroup:   {Option: socket.Option{Level: iana.ProtocolIP, Name: sysMCAST_LEAVE_SOURCE_GROUP, Len: sizeofGroupSourceReq}, typ: ssoTypeGroupSourceReq},
+		ssoBlockSourceGroup:   {Option: socket.Option{Level: iana.ProtocolIP, Name: sysMCAST_BLOCK_SOURCE, Len: sizeofGroupSourceReq}, typ: ssoTypeGroupSourceReq},
+		ssoUnblockSourceGroup: {Option: socket.Option{Level: iana.ProtocolIP, Name: sysMCAST_UNBLOCK_SOURCE, Len: sizeofGroupSourceReq}, typ: ssoTypeGroupSourceReq},
+	}
 )
 
-func init() ***REMOVED***
+func init() {
 	freebsdVersion, _ = syscall.SysctlUint32("kern.osreldate")
-	if freebsdVersion >= 1000000 ***REMOVED***
-		sockOpts[ssoMulticastInterface] = &sockOpt***REMOVED***Option: socket.Option***REMOVED***Level: iana.ProtocolIP, Name: sysIP_MULTICAST_IF, Len: sizeofIPMreqn***REMOVED***, typ: ssoTypeIPMreqn***REMOVED***
-	***REMOVED***
-	if runtime.GOOS == "freebsd" && runtime.GOARCH == "386" ***REMOVED***
+	if freebsdVersion >= 1000000 {
+		sockOpts[ssoMulticastInterface] = &sockOpt{Option: socket.Option{Level: iana.ProtocolIP, Name: sysIP_MULTICAST_IF, Len: sizeofIPMreqn}, typ: ssoTypeIPMreqn}
+	}
+	if runtime.GOOS == "freebsd" && runtime.GOARCH == "386" {
 		archs, _ := syscall.Sysctl("kern.supported_archs")
-		for _, s := range strings.Fields(archs) ***REMOVED***
-			if s == "amd64" ***REMOVED***
+		for _, s := range strings.Fields(archs) {
+			if s == "amd64" {
 				freebsd32o64 = true
 				break
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}
 
-func (gr *groupReq) setGroup(grp net.IP) ***REMOVED***
+func (gr *groupReq) setGroup(grp net.IP) {
 	sa := (*sockaddrInet)(unsafe.Pointer(&gr.Group))
 	sa.Len = sizeofSockaddrInet
 	sa.Family = syscall.AF_INET
 	copy(sa.Addr[:], grp)
-***REMOVED***
+}
 
-func (gsr *groupSourceReq) setSourceGroup(grp, src net.IP) ***REMOVED***
+func (gsr *groupSourceReq) setSourceGroup(grp, src net.IP) {
 	sa := (*sockaddrInet)(unsafe.Pointer(&gsr.Group))
 	sa.Len = sizeofSockaddrInet
 	sa.Family = syscall.AF_INET
@@ -73,4 +73,4 @@ func (gsr *groupSourceReq) setSourceGroup(grp, src net.IP) ***REMOVED***
 	sa.Len = sizeofSockaddrInet
 	sa.Family = syscall.AF_INET
 	copy(sa.Addr[:], src)
-***REMOVED***
+}

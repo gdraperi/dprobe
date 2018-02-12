@@ -4,25 +4,25 @@ import (
 	"fmt"
 )
 
-type Filter interface ***REMOVED***
+type Filter interface {
 	Attrs() *FilterAttrs
 	Type() string
-***REMOVED***
+}
 
 // FilterAttrs represents a netlink filter. A filter is associated with a link,
 // has a handle and a parent. The root filter of a device should have a
 // parent == HANDLE_ROOT.
-type FilterAttrs struct ***REMOVED***
+type FilterAttrs struct {
 	LinkIndex int
 	Handle    uint32
 	Parent    uint32
 	Priority  uint16 // lower is higher priority
 	Protocol  uint16 // syscall.ETH_P_*
-***REMOVED***
+}
 
-func (q FilterAttrs) String() string ***REMOVED***
-	return fmt.Sprintf("***REMOVED***LinkIndex: %d, Handle: %s, Parent: %s, Priority: %d, Protocol: %d***REMOVED***", q.LinkIndex, HandleStr(q.Handle), HandleStr(q.Parent), q.Priority, q.Protocol)
-***REMOVED***
+func (q FilterAttrs) String() string {
+	return fmt.Sprintf("{LinkIndex: %d, Handle: %s, Parent: %s, Priority: %d, Protocol: %d}", q.LinkIndex, HandleStr(q.Handle), HandleStr(q.Parent), q.Priority, q.Protocol)
+}
 
 type TcAct int32
 
@@ -39,8 +39,8 @@ const (
 	TC_ACT_JUMP       TcAct = 0x10000000
 )
 
-func (a TcAct) String() string ***REMOVED***
-	switch a ***REMOVED***
+func (a TcAct) String() string {
+	switch a {
 	case TC_ACT_UNSPEC:
 		return "unspec"
 	case TC_ACT_OK:
@@ -61,9 +61,9 @@ func (a TcAct) String() string ***REMOVED***
 		return "redirect"
 	case TC_ACT_JUMP:
 		return "jump"
-	***REMOVED***
+	}
 	return fmt.Sprintf("0x%x", int32(a))
-***REMOVED***
+}
 
 type TcPolAct int32
 
@@ -75,8 +75,8 @@ const (
 	TC_POLICE_PIPE       TcPolAct = TcPolAct(TC_ACT_PIPE)
 )
 
-func (a TcPolAct) String() string ***REMOVED***
-	switch a ***REMOVED***
+func (a TcPolAct) String() string {
+	switch a {
 	case TC_POLICE_UNSPEC:
 		return "unspec"
 	case TC_POLICE_OK:
@@ -87,58 +87,58 @@ func (a TcPolAct) String() string ***REMOVED***
 		return "shot"
 	case TC_POLICE_PIPE:
 		return "pipe"
-	***REMOVED***
+	}
 	return fmt.Sprintf("0x%x", int32(a))
-***REMOVED***
+}
 
-type ActionAttrs struct ***REMOVED***
+type ActionAttrs struct {
 	Index   int
 	Capab   int
 	Action  TcAct
 	Refcnt  int
 	Bindcnt int
-***REMOVED***
+}
 
-func (q ActionAttrs) String() string ***REMOVED***
-	return fmt.Sprintf("***REMOVED***Index: %d, Capab: %x, Action: %s, Refcnt: %d, Bindcnt: %d***REMOVED***", q.Index, q.Capab, q.Action.String(), q.Refcnt, q.Bindcnt)
-***REMOVED***
+func (q ActionAttrs) String() string {
+	return fmt.Sprintf("{Index: %d, Capab: %x, Action: %s, Refcnt: %d, Bindcnt: %d}", q.Index, q.Capab, q.Action.String(), q.Refcnt, q.Bindcnt)
+}
 
 // Action represents an action in any supported filter.
-type Action interface ***REMOVED***
+type Action interface {
 	Attrs() *ActionAttrs
 	Type() string
-***REMOVED***
+}
 
-type GenericAction struct ***REMOVED***
+type GenericAction struct {
 	ActionAttrs
-***REMOVED***
+}
 
-func (action *GenericAction) Type() string ***REMOVED***
+func (action *GenericAction) Type() string {
 	return "generic"
-***REMOVED***
+}
 
-func (action *GenericAction) Attrs() *ActionAttrs ***REMOVED***
+func (action *GenericAction) Attrs() *ActionAttrs {
 	return &action.ActionAttrs
-***REMOVED***
+}
 
-type BpfAction struct ***REMOVED***
+type BpfAction struct {
 	ActionAttrs
 	Fd   int
 	Name string
-***REMOVED***
+}
 
-func (action *BpfAction) Type() string ***REMOVED***
+func (action *BpfAction) Type() string {
 	return "bpf"
-***REMOVED***
+}
 
-func (action *BpfAction) Attrs() *ActionAttrs ***REMOVED***
+func (action *BpfAction) Attrs() *ActionAttrs {
 	return &action.ActionAttrs
-***REMOVED***
+}
 
 type MirredAct uint8
 
-func (a MirredAct) String() string ***REMOVED***
-	switch a ***REMOVED***
+func (a MirredAct) String() string {
+	switch a {
 	case TCA_EGRESS_REDIR:
 		return "egress redir"
 	case TCA_EGRESS_MIRROR:
@@ -147,9 +147,9 @@ func (a MirredAct) String() string ***REMOVED***
 		return "ingress redir"
 	case TCA_INGRESS_MIRROR:
 		return "ingress mirror"
-	***REMOVED***
+	}
 	return "unknown"
-***REMOVED***
+}
 
 const (
 	TCA_EGRESS_REDIR   MirredAct = 1 /* packet redirect to EGRESS*/
@@ -158,34 +158,34 @@ const (
 	TCA_INGRESS_MIRROR MirredAct = 4 /* mirror packet to INGRESS */
 )
 
-type MirredAction struct ***REMOVED***
+type MirredAction struct {
 	ActionAttrs
 	MirredAction MirredAct
 	Ifindex      int
-***REMOVED***
+}
 
-func (action *MirredAction) Type() string ***REMOVED***
+func (action *MirredAction) Type() string {
 	return "mirred"
-***REMOVED***
+}
 
-func (action *MirredAction) Attrs() *ActionAttrs ***REMOVED***
+func (action *MirredAction) Attrs() *ActionAttrs {
 	return &action.ActionAttrs
-***REMOVED***
+}
 
-func NewMirredAction(redirIndex int) *MirredAction ***REMOVED***
-	return &MirredAction***REMOVED***
-		ActionAttrs: ActionAttrs***REMOVED***
+func NewMirredAction(redirIndex int) *MirredAction {
+	return &MirredAction{
+		ActionAttrs: ActionAttrs{
 			Action: TC_ACT_STOLEN,
-		***REMOVED***,
+		},
 		MirredAction: TCA_EGRESS_REDIR,
 		Ifindex:      redirIndex,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Sel of the U32 filters that contains multiple TcU32Key. This is the copy
 // and the frontend representation of nl.TcU32Sel. It is serialized into canonical
 // nl.TcU32Sel with the appropriate endianness.
-type TcU32Sel struct ***REMOVED***
+type TcU32Sel struct {
 	Flags    uint8
 	Offshift uint8
 	Nkeys    uint8
@@ -196,36 +196,36 @@ type TcU32Sel struct ***REMOVED***
 	Hoff     int16
 	Hmask    uint32
 	Keys     []TcU32Key
-***REMOVED***
+}
 
 // TcU32Key contained of Sel in the U32 filters. This is the copy and the frontend
 // representation of nl.TcU32Key. It is serialized into chanonical nl.TcU32Sel
 // with the appropriate endianness.
-type TcU32Key struct ***REMOVED***
+type TcU32Key struct {
 	Mask    uint32
 	Val     uint32
 	Off     int32
 	OffMask int32
-***REMOVED***
+}
 
 // U32 filters on many packet related properties
-type U32 struct ***REMOVED***
+type U32 struct {
 	FilterAttrs
 	ClassId    uint32
 	RedirIndex int
 	Sel        *TcU32Sel
 	Actions    []Action
-***REMOVED***
+}
 
-func (filter *U32) Attrs() *FilterAttrs ***REMOVED***
+func (filter *U32) Attrs() *FilterAttrs {
 	return &filter.FilterAttrs
-***REMOVED***
+}
 
-func (filter *U32) Type() string ***REMOVED***
+func (filter *U32) Type() string {
 	return "u32"
-***REMOVED***
+}
 
-type FilterFwAttrs struct ***REMOVED***
+type FilterFwAttrs struct {
 	ClassId   uint32
 	InDev     string
 	Mask      uint32
@@ -239,35 +239,35 @@ type FilterFwAttrs struct ***REMOVED***
 	Action    TcPolAct
 	Overhead  uint16
 	LinkLayer int
-***REMOVED***
+}
 
-type BpfFilter struct ***REMOVED***
+type BpfFilter struct {
 	FilterAttrs
 	ClassId      uint32
 	Fd           int
 	Name         string
 	DirectAction bool
-***REMOVED***
+}
 
-func (filter *BpfFilter) Type() string ***REMOVED***
+func (filter *BpfFilter) Type() string {
 	return "bpf"
-***REMOVED***
+}
 
-func (filter *BpfFilter) Attrs() *FilterAttrs ***REMOVED***
+func (filter *BpfFilter) Attrs() *FilterAttrs {
 	return &filter.FilterAttrs
-***REMOVED***
+}
 
 // GenericFilter filters represent types that are not currently understood
 // by this netlink library.
-type GenericFilter struct ***REMOVED***
+type GenericFilter struct {
 	FilterAttrs
 	FilterType string
-***REMOVED***
+}
 
-func (filter *GenericFilter) Attrs() *FilterAttrs ***REMOVED***
+func (filter *GenericFilter) Attrs() *FilterAttrs {
 	return &filter.FilterAttrs
-***REMOVED***
+}
 
-func (filter *GenericFilter) Type() string ***REMOVED***
+func (filter *GenericFilter) Type() string {
 	return filter.FilterType
-***REMOVED***
+}

@@ -46,7 +46,7 @@ const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 // Although it is not forbidden, it is generally a bad idea to include
 // non-finite values (infinities or NaNs) in the population of values, as this
 // will render the `mean` and `sum_of_squared_deviation` fields meaningless.
-type Distribution struct ***REMOVED***
+type Distribution struct {
 	// The number of values in the population. Must be non-negative.
 	Count int64 `protobuf:"varint,1,opt,name=count" json:"count,omitempty"`
 	// The arithmetic mean of the values in the population. If `count` is zero
@@ -80,81 +80,81 @@ type Distribution struct ***REMOVED***
 	//
 	// Any suffix of trailing zero bucket_count fields may be omitted.
 	BucketCounts []int64 `protobuf:"varint,7,rep,packed,name=bucket_counts,json=bucketCounts" json:"bucket_counts,omitempty"`
-***REMOVED***
+}
 
-func (m *Distribution) Reset()                    ***REMOVED*** *m = Distribution***REMOVED******REMOVED*** ***REMOVED***
-func (m *Distribution) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*Distribution) ProtoMessage()               ***REMOVED******REMOVED***
-func (*Distribution) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***0***REMOVED*** ***REMOVED***
+func (m *Distribution) Reset()                    { *m = Distribution{} }
+func (m *Distribution) String() string            { return proto.CompactTextString(m) }
+func (*Distribution) ProtoMessage()               {}
+func (*Distribution) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
-func (m *Distribution) GetCount() int64 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Distribution) GetCount() int64 {
+	if m != nil {
 		return m.Count
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *Distribution) GetMean() float64 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Distribution) GetMean() float64 {
+	if m != nil {
 		return m.Mean
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *Distribution) GetSumOfSquaredDeviation() float64 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Distribution) GetSumOfSquaredDeviation() float64 {
+	if m != nil {
 		return m.SumOfSquaredDeviation
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *Distribution) GetRange() *Distribution_Range ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Distribution) GetRange() *Distribution_Range {
+	if m != nil {
 		return m.Range
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *Distribution) GetBucketOptions() *Distribution_BucketOptions ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Distribution) GetBucketOptions() *Distribution_BucketOptions {
+	if m != nil {
 		return m.BucketOptions
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *Distribution) GetBucketCounts() []int64 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Distribution) GetBucketCounts() []int64 {
+	if m != nil {
 		return m.BucketCounts
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // The range of the population values.
-type Distribution_Range struct ***REMOVED***
+type Distribution_Range struct {
 	// The minimum of the population values.
 	Min float64 `protobuf:"fixed64,1,opt,name=min" json:"min,omitempty"`
 	// The maximum of the population values.
 	Max float64 `protobuf:"fixed64,2,opt,name=max" json:"max,omitempty"`
-***REMOVED***
+}
 
-func (m *Distribution_Range) Reset()                    ***REMOVED*** *m = Distribution_Range***REMOVED******REMOVED*** ***REMOVED***
-func (m *Distribution_Range) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*Distribution_Range) ProtoMessage()               ***REMOVED******REMOVED***
-func (*Distribution_Range) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***0, 0***REMOVED*** ***REMOVED***
+func (m *Distribution_Range) Reset()                    { *m = Distribution_Range{} }
+func (m *Distribution_Range) String() string            { return proto.CompactTextString(m) }
+func (*Distribution_Range) ProtoMessage()               {}
+func (*Distribution_Range) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0, 0} }
 
-func (m *Distribution_Range) GetMin() float64 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Distribution_Range) GetMin() float64 {
+	if m != nil {
 		return m.Min
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *Distribution_Range) GetMax() float64 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Distribution_Range) GetMax() float64 {
+	if m != nil {
 		return m.Max
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
 // A Distribution may optionally contain a histogram of the values in the
 // population.  The histogram is given in `bucket_counts` as counts of values
@@ -179,7 +179,7 @@ func (m *Distribution_Range) GetMax() float64 ***REMOVED***
 // boundaries and one gives the bucket boundaries explicitly.
 //
 // If `bucket_boundaries` is not given, then no `bucket_counts` may be given.
-type Distribution_BucketOptions struct ***REMOVED***
+type Distribution_BucketOptions struct {
 	// Exactly one of these three fields must be set.
 	//
 	// Types that are valid to be assigned to Options:
@@ -187,130 +187,130 @@ type Distribution_BucketOptions struct ***REMOVED***
 	//	*Distribution_BucketOptions_ExponentialBuckets
 	//	*Distribution_BucketOptions_ExplicitBuckets
 	Options isDistribution_BucketOptions_Options `protobuf_oneof:"options"`
-***REMOVED***
+}
 
-func (m *Distribution_BucketOptions) Reset()                    ***REMOVED*** *m = Distribution_BucketOptions***REMOVED******REMOVED*** ***REMOVED***
-func (m *Distribution_BucketOptions) String() string            ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*Distribution_BucketOptions) ProtoMessage()               ***REMOVED******REMOVED***
-func (*Distribution_BucketOptions) Descriptor() ([]byte, []int) ***REMOVED*** return fileDescriptor0, []int***REMOVED***0, 1***REMOVED*** ***REMOVED***
+func (m *Distribution_BucketOptions) Reset()                    { *m = Distribution_BucketOptions{} }
+func (m *Distribution_BucketOptions) String() string            { return proto.CompactTextString(m) }
+func (*Distribution_BucketOptions) ProtoMessage()               {}
+func (*Distribution_BucketOptions) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0, 1} }
 
-type isDistribution_BucketOptions_Options interface ***REMOVED***
+type isDistribution_BucketOptions_Options interface {
 	isDistribution_BucketOptions_Options()
-***REMOVED***
+}
 
-type Distribution_BucketOptions_LinearBuckets struct ***REMOVED***
+type Distribution_BucketOptions_LinearBuckets struct {
 	LinearBuckets *Distribution_BucketOptions_Linear `protobuf:"bytes,1,opt,name=linear_buckets,json=linearBuckets,oneof"`
-***REMOVED***
-type Distribution_BucketOptions_ExponentialBuckets struct ***REMOVED***
+}
+type Distribution_BucketOptions_ExponentialBuckets struct {
 	ExponentialBuckets *Distribution_BucketOptions_Exponential `protobuf:"bytes,2,opt,name=exponential_buckets,json=exponentialBuckets,oneof"`
-***REMOVED***
-type Distribution_BucketOptions_ExplicitBuckets struct ***REMOVED***
+}
+type Distribution_BucketOptions_ExplicitBuckets struct {
 	ExplicitBuckets *Distribution_BucketOptions_Explicit `protobuf:"bytes,3,opt,name=explicit_buckets,json=explicitBuckets,oneof"`
-***REMOVED***
+}
 
-func (*Distribution_BucketOptions_LinearBuckets) isDistribution_BucketOptions_Options()      ***REMOVED******REMOVED***
-func (*Distribution_BucketOptions_ExponentialBuckets) isDistribution_BucketOptions_Options() ***REMOVED******REMOVED***
-func (*Distribution_BucketOptions_ExplicitBuckets) isDistribution_BucketOptions_Options()    ***REMOVED******REMOVED***
+func (*Distribution_BucketOptions_LinearBuckets) isDistribution_BucketOptions_Options()      {}
+func (*Distribution_BucketOptions_ExponentialBuckets) isDistribution_BucketOptions_Options() {}
+func (*Distribution_BucketOptions_ExplicitBuckets) isDistribution_BucketOptions_Options()    {}
 
-func (m *Distribution_BucketOptions) GetOptions() isDistribution_BucketOptions_Options ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Distribution_BucketOptions) GetOptions() isDistribution_BucketOptions_Options {
+	if m != nil {
 		return m.Options
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *Distribution_BucketOptions) GetLinearBuckets() *Distribution_BucketOptions_Linear ***REMOVED***
-	if x, ok := m.GetOptions().(*Distribution_BucketOptions_LinearBuckets); ok ***REMOVED***
+func (m *Distribution_BucketOptions) GetLinearBuckets() *Distribution_BucketOptions_Linear {
+	if x, ok := m.GetOptions().(*Distribution_BucketOptions_LinearBuckets); ok {
 		return x.LinearBuckets
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *Distribution_BucketOptions) GetExponentialBuckets() *Distribution_BucketOptions_Exponential ***REMOVED***
-	if x, ok := m.GetOptions().(*Distribution_BucketOptions_ExponentialBuckets); ok ***REMOVED***
+func (m *Distribution_BucketOptions) GetExponentialBuckets() *Distribution_BucketOptions_Exponential {
+	if x, ok := m.GetOptions().(*Distribution_BucketOptions_ExponentialBuckets); ok {
 		return x.ExponentialBuckets
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func (m *Distribution_BucketOptions) GetExplicitBuckets() *Distribution_BucketOptions_Explicit ***REMOVED***
-	if x, ok := m.GetOptions().(*Distribution_BucketOptions_ExplicitBuckets); ok ***REMOVED***
+func (m *Distribution_BucketOptions) GetExplicitBuckets() *Distribution_BucketOptions_Explicit {
+	if x, ok := m.GetOptions().(*Distribution_BucketOptions_ExplicitBuckets); ok {
 		return x.ExplicitBuckets
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // XXX_OneofFuncs is for the internal use of the proto package.
-func (*Distribution_BucketOptions) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface***REMOVED******REMOVED***) ***REMOVED***
-	return _Distribution_BucketOptions_OneofMarshaler, _Distribution_BucketOptions_OneofUnmarshaler, _Distribution_BucketOptions_OneofSizer, []interface***REMOVED******REMOVED******REMOVED***
+func (*Distribution_BucketOptions) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
+	return _Distribution_BucketOptions_OneofMarshaler, _Distribution_BucketOptions_OneofUnmarshaler, _Distribution_BucketOptions_OneofSizer, []interface{}{
 		(*Distribution_BucketOptions_LinearBuckets)(nil),
 		(*Distribution_BucketOptions_ExponentialBuckets)(nil),
 		(*Distribution_BucketOptions_ExplicitBuckets)(nil),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func _Distribution_BucketOptions_OneofMarshaler(msg proto.Message, b *proto.Buffer) error ***REMOVED***
+func _Distribution_BucketOptions_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
 	m := msg.(*Distribution_BucketOptions)
 	// options
-	switch x := m.Options.(type) ***REMOVED***
+	switch x := m.Options.(type) {
 	case *Distribution_BucketOptions_LinearBuckets:
 		b.EncodeVarint(1<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.LinearBuckets); err != nil ***REMOVED***
+		if err := b.EncodeMessage(x.LinearBuckets); err != nil {
 			return err
-		***REMOVED***
+		}
 	case *Distribution_BucketOptions_ExponentialBuckets:
 		b.EncodeVarint(2<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.ExponentialBuckets); err != nil ***REMOVED***
+		if err := b.EncodeMessage(x.ExponentialBuckets); err != nil {
 			return err
-		***REMOVED***
+		}
 	case *Distribution_BucketOptions_ExplicitBuckets:
 		b.EncodeVarint(3<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.ExplicitBuckets); err != nil ***REMOVED***
+		if err := b.EncodeMessage(x.ExplicitBuckets); err != nil {
 			return err
-		***REMOVED***
+		}
 	case nil:
 	default:
 		return fmt.Errorf("Distribution_BucketOptions.Options has unexpected type %T", x)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func _Distribution_BucketOptions_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) ***REMOVED***
+func _Distribution_BucketOptions_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
 	m := msg.(*Distribution_BucketOptions)
-	switch tag ***REMOVED***
+	switch tag {
 	case 1: // options.linear_buckets
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		msg := new(Distribution_BucketOptions_Linear)
 		err := b.DecodeMessage(msg)
-		m.Options = &Distribution_BucketOptions_LinearBuckets***REMOVED***msg***REMOVED***
+		m.Options = &Distribution_BucketOptions_LinearBuckets{msg}
 		return true, err
 	case 2: // options.exponential_buckets
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		msg := new(Distribution_BucketOptions_Exponential)
 		err := b.DecodeMessage(msg)
-		m.Options = &Distribution_BucketOptions_ExponentialBuckets***REMOVED***msg***REMOVED***
+		m.Options = &Distribution_BucketOptions_ExponentialBuckets{msg}
 		return true, err
 	case 3: // options.explicit_buckets
-		if wire != proto.WireBytes ***REMOVED***
+		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
-		***REMOVED***
+		}
 		msg := new(Distribution_BucketOptions_Explicit)
 		err := b.DecodeMessage(msg)
-		m.Options = &Distribution_BucketOptions_ExplicitBuckets***REMOVED***msg***REMOVED***
+		m.Options = &Distribution_BucketOptions_ExplicitBuckets{msg}
 		return true, err
 	default:
 		return false, nil
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func _Distribution_BucketOptions_OneofSizer(msg proto.Message) (n int) ***REMOVED***
+func _Distribution_BucketOptions_OneofSizer(msg proto.Message) (n int) {
 	m := msg.(*Distribution_BucketOptions)
 	// options
-	switch x := m.Options.(type) ***REMOVED***
+	switch x := m.Options.(type) {
 	case *Distribution_BucketOptions_LinearBuckets:
 		s := proto.Size(x.LinearBuckets)
 		n += proto.SizeVarint(1<<3 | proto.WireBytes)
@@ -329,9 +329,9 @@ func _Distribution_BucketOptions_OneofSizer(msg proto.Message) (n int) ***REMOVE
 	case nil:
 	default:
 		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	***REMOVED***
+	}
 	return n
-***REMOVED***
+}
 
 // Specify a sequence of buckets that all have the same width (except
 // overflow and underflow).  Each bucket represents a constant absolute
@@ -342,42 +342,42 @@ func _Distribution_BucketOptions_OneofSizer(msg proto.Message) (n int) ***REMOVE
 //
 //    Upper bound (0 <= i < N-1):     offset + (width * i).
 //    Lower bound (1 <= i < N):       offset + (width * (i - 1)).
-type Distribution_BucketOptions_Linear struct ***REMOVED***
+type Distribution_BucketOptions_Linear struct {
 	// Must be greater than 0.
 	NumFiniteBuckets int32 `protobuf:"varint,1,opt,name=num_finite_buckets,json=numFiniteBuckets" json:"num_finite_buckets,omitempty"`
 	// Must be greater than 0.
 	Width float64 `protobuf:"fixed64,2,opt,name=width" json:"width,omitempty"`
 	// Lower bound of the first bucket.
 	Offset float64 `protobuf:"fixed64,3,opt,name=offset" json:"offset,omitempty"`
-***REMOVED***
+}
 
-func (m *Distribution_BucketOptions_Linear) Reset()         ***REMOVED*** *m = Distribution_BucketOptions_Linear***REMOVED******REMOVED*** ***REMOVED***
-func (m *Distribution_BucketOptions_Linear) String() string ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*Distribution_BucketOptions_Linear) ProtoMessage()    ***REMOVED******REMOVED***
-func (*Distribution_BucketOptions_Linear) Descriptor() ([]byte, []int) ***REMOVED***
-	return fileDescriptor0, []int***REMOVED***0, 1, 0***REMOVED***
-***REMOVED***
+func (m *Distribution_BucketOptions_Linear) Reset()         { *m = Distribution_BucketOptions_Linear{} }
+func (m *Distribution_BucketOptions_Linear) String() string { return proto.CompactTextString(m) }
+func (*Distribution_BucketOptions_Linear) ProtoMessage()    {}
+func (*Distribution_BucketOptions_Linear) Descriptor() ([]byte, []int) {
+	return fileDescriptor0, []int{0, 1, 0}
+}
 
-func (m *Distribution_BucketOptions_Linear) GetNumFiniteBuckets() int32 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Distribution_BucketOptions_Linear) GetNumFiniteBuckets() int32 {
+	if m != nil {
 		return m.NumFiniteBuckets
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *Distribution_BucketOptions_Linear) GetWidth() float64 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Distribution_BucketOptions_Linear) GetWidth() float64 {
+	if m != nil {
 		return m.Width
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *Distribution_BucketOptions_Linear) GetOffset() float64 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Distribution_BucketOptions_Linear) GetOffset() float64 {
+	if m != nil {
 		return m.Offset
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
 // Specify a sequence of buckets that have a width that is proportional to
 // the value of the lower bound.  Each bucket represents a constant relative
@@ -388,44 +388,44 @@ func (m *Distribution_BucketOptions_Linear) GetOffset() float64 ***REMOVED***
 //
 //    Upper bound (0 <= i < N-1):     scale * (growth_factor ^ i).
 //    Lower bound (1 <= i < N):       scale * (growth_factor ^ (i - 1)).
-type Distribution_BucketOptions_Exponential struct ***REMOVED***
+type Distribution_BucketOptions_Exponential struct {
 	// Must be greater than 0.
 	NumFiniteBuckets int32 `protobuf:"varint,1,opt,name=num_finite_buckets,json=numFiniteBuckets" json:"num_finite_buckets,omitempty"`
 	// Must be greater than 1.
 	GrowthFactor float64 `protobuf:"fixed64,2,opt,name=growth_factor,json=growthFactor" json:"growth_factor,omitempty"`
 	// Must be greater than 0.
 	Scale float64 `protobuf:"fixed64,3,opt,name=scale" json:"scale,omitempty"`
-***REMOVED***
+}
 
-func (m *Distribution_BucketOptions_Exponential) Reset() ***REMOVED***
-	*m = Distribution_BucketOptions_Exponential***REMOVED******REMOVED***
-***REMOVED***
-func (m *Distribution_BucketOptions_Exponential) String() string ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*Distribution_BucketOptions_Exponential) ProtoMessage()    ***REMOVED******REMOVED***
-func (*Distribution_BucketOptions_Exponential) Descriptor() ([]byte, []int) ***REMOVED***
-	return fileDescriptor0, []int***REMOVED***0, 1, 1***REMOVED***
-***REMOVED***
+func (m *Distribution_BucketOptions_Exponential) Reset() {
+	*m = Distribution_BucketOptions_Exponential{}
+}
+func (m *Distribution_BucketOptions_Exponential) String() string { return proto.CompactTextString(m) }
+func (*Distribution_BucketOptions_Exponential) ProtoMessage()    {}
+func (*Distribution_BucketOptions_Exponential) Descriptor() ([]byte, []int) {
+	return fileDescriptor0, []int{0, 1, 1}
+}
 
-func (m *Distribution_BucketOptions_Exponential) GetNumFiniteBuckets() int32 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Distribution_BucketOptions_Exponential) GetNumFiniteBuckets() int32 {
+	if m != nil {
 		return m.NumFiniteBuckets
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *Distribution_BucketOptions_Exponential) GetGrowthFactor() float64 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Distribution_BucketOptions_Exponential) GetGrowthFactor() float64 {
+	if m != nil {
 		return m.GrowthFactor
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
-func (m *Distribution_BucketOptions_Exponential) GetScale() float64 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Distribution_BucketOptions_Exponential) GetScale() float64 {
+	if m != nil {
 		return m.Scale
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 
 // A set of buckets with arbitrary widths.
 //
@@ -438,37 +438,37 @@ func (m *Distribution_BucketOptions_Exponential) GetScale() float64 ***REMOVED**
 // There must be at least one element in `bounds`.  If `bounds` has only one
 // element, there are no finite buckets, and that single element is the
 // common boundary of the overflow and underflow buckets.
-type Distribution_BucketOptions_Explicit struct ***REMOVED***
+type Distribution_BucketOptions_Explicit struct {
 	// The values must be monotonically increasing.
 	Bounds []float64 `protobuf:"fixed64,1,rep,packed,name=bounds" json:"bounds,omitempty"`
-***REMOVED***
+}
 
-func (m *Distribution_BucketOptions_Explicit) Reset()         ***REMOVED*** *m = Distribution_BucketOptions_Explicit***REMOVED******REMOVED*** ***REMOVED***
-func (m *Distribution_BucketOptions_Explicit) String() string ***REMOVED*** return proto.CompactTextString(m) ***REMOVED***
-func (*Distribution_BucketOptions_Explicit) ProtoMessage()    ***REMOVED******REMOVED***
-func (*Distribution_BucketOptions_Explicit) Descriptor() ([]byte, []int) ***REMOVED***
-	return fileDescriptor0, []int***REMOVED***0, 1, 2***REMOVED***
-***REMOVED***
+func (m *Distribution_BucketOptions_Explicit) Reset()         { *m = Distribution_BucketOptions_Explicit{} }
+func (m *Distribution_BucketOptions_Explicit) String() string { return proto.CompactTextString(m) }
+func (*Distribution_BucketOptions_Explicit) ProtoMessage()    {}
+func (*Distribution_BucketOptions_Explicit) Descriptor() ([]byte, []int) {
+	return fileDescriptor0, []int{0, 1, 2}
+}
 
-func (m *Distribution_BucketOptions_Explicit) GetBounds() []float64 ***REMOVED***
-	if m != nil ***REMOVED***
+func (m *Distribution_BucketOptions_Explicit) GetBounds() []float64 {
+	if m != nil {
 		return m.Bounds
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func init() ***REMOVED***
+func init() {
 	proto.RegisterType((*Distribution)(nil), "google.api.Distribution")
 	proto.RegisterType((*Distribution_Range)(nil), "google.api.Distribution.Range")
 	proto.RegisterType((*Distribution_BucketOptions)(nil), "google.api.Distribution.BucketOptions")
 	proto.RegisterType((*Distribution_BucketOptions_Linear)(nil), "google.api.Distribution.BucketOptions.Linear")
 	proto.RegisterType((*Distribution_BucketOptions_Exponential)(nil), "google.api.Distribution.BucketOptions.Exponential")
 	proto.RegisterType((*Distribution_BucketOptions_Explicit)(nil), "google.api.Distribution.BucketOptions.Explicit")
-***REMOVED***
+}
 
-func init() ***REMOVED*** proto.RegisterFile("google/api/distribution.proto", fileDescriptor0) ***REMOVED***
+func init() { proto.RegisterFile("google/api/distribution.proto", fileDescriptor0) }
 
-var fileDescriptor0 = []byte***REMOVED***
+var fileDescriptor0 = []byte{
 	// 544 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x54, 0x5d, 0x6f, 0xd3, 0x30,
 	0x14, 0x5d, 0x96, 0xb5, 0x85, 0xdb, 0x0f, 0x8a, 0x19, 0x28, 0x44, 0x7c, 0x54, 0x9b, 0x84, 0x2a,
@@ -504,4 +504,4 @@ var fileDescriptor0 = []byte***REMOVED***
 	0xf6, 0xad, 0x9e, 0x39, 0x9f, 0x8f, 0x2c, 0x21, 0x17, 0x05, 0xe1, 0x79, 0x20, 0xea, 0x3c, 0xcc,
 	0x29, 0xd7, 0x2f, 0x39, 0x34, 0x10, 0xa9, 0x98, 0xfc, 0xeb, 0x8f, 0xf2, 0xb6, 0x5b, 0xc4, 0x7d,
 	0xcd, 0x7f, 0xf5, 0x3b, 0x00, 0x00, 0xff, 0xff, 0x88, 0x8e, 0xc5, 0x4b, 0x80, 0x04, 0x00, 0x00,
-***REMOVED***
+}

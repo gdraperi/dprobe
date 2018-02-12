@@ -8,31 +8,31 @@ package language
 
 import "sort"
 
-func sortStable(s sort.Interface) ***REMOVED***
-	ss := stableSort***REMOVED***
+func sortStable(s sort.Interface) {
+	ss := stableSort{
 		s:   s,
 		pos: make([]int, s.Len()),
-	***REMOVED***
-	for i := range ss.pos ***REMOVED***
+	}
+	for i := range ss.pos {
 		ss.pos[i] = i
-	***REMOVED***
+	}
 	sort.Sort(&ss)
-***REMOVED***
+}
 
-type stableSort struct ***REMOVED***
+type stableSort struct {
 	s   sort.Interface
 	pos []int
-***REMOVED***
+}
 
-func (s *stableSort) Len() int ***REMOVED***
+func (s *stableSort) Len() int {
 	return len(s.pos)
-***REMOVED***
+}
 
-func (s *stableSort) Less(i, j int) bool ***REMOVED***
+func (s *stableSort) Less(i, j int) bool {
 	return s.s.Less(i, j) || !s.s.Less(j, i) && s.pos[i] < s.pos[j]
-***REMOVED***
+}
 
-func (s *stableSort) Swap(i, j int) ***REMOVED***
+func (s *stableSort) Swap(i, j int) {
 	s.s.Swap(i, j)
 	s.pos[i], s.pos[j] = s.pos[j], s.pos[i]
-***REMOVED***
+}

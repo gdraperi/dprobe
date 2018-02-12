@@ -7,51 +7,51 @@ package ipv4
 import "syscall"
 
 // TOS returns the type-of-service field value for outgoing packets.
-func (c *genericOpt) TOS() (int, error) ***REMOVED***
-	if !c.ok() ***REMOVED***
+func (c *genericOpt) TOS() (int, error) {
+	if !c.ok() {
 		return 0, syscall.EINVAL
-	***REMOVED***
+	}
 	so, ok := sockOpts[ssoTOS]
-	if !ok ***REMOVED***
+	if !ok {
 		return 0, errOpNoSupport
-	***REMOVED***
+	}
 	return so.GetInt(c.Conn)
-***REMOVED***
+}
 
 // SetTOS sets the type-of-service field value for future outgoing
 // packets.
-func (c *genericOpt) SetTOS(tos int) error ***REMOVED***
-	if !c.ok() ***REMOVED***
+func (c *genericOpt) SetTOS(tos int) error {
+	if !c.ok() {
 		return syscall.EINVAL
-	***REMOVED***
+	}
 	so, ok := sockOpts[ssoTOS]
-	if !ok ***REMOVED***
+	if !ok {
 		return errOpNoSupport
-	***REMOVED***
+	}
 	return so.SetInt(c.Conn, tos)
-***REMOVED***
+}
 
 // TTL returns the time-to-live field value for outgoing packets.
-func (c *genericOpt) TTL() (int, error) ***REMOVED***
-	if !c.ok() ***REMOVED***
+func (c *genericOpt) TTL() (int, error) {
+	if !c.ok() {
 		return 0, syscall.EINVAL
-	***REMOVED***
+	}
 	so, ok := sockOpts[ssoTTL]
-	if !ok ***REMOVED***
+	if !ok {
 		return 0, errOpNoSupport
-	***REMOVED***
+	}
 	return so.GetInt(c.Conn)
-***REMOVED***
+}
 
 // SetTTL sets the time-to-live field value for future outgoing
 // packets.
-func (c *genericOpt) SetTTL(ttl int) error ***REMOVED***
-	if !c.ok() ***REMOVED***
+func (c *genericOpt) SetTTL(ttl int) error {
+	if !c.ok() {
 		return syscall.EINVAL
-	***REMOVED***
+	}
 	so, ok := sockOpts[ssoTTL]
-	if !ok ***REMOVED***
+	if !ok {
 		return errOpNoSupport
-	***REMOVED***
+	}
 	return so.SetInt(c.Conn, ttl)
-***REMOVED***
+}

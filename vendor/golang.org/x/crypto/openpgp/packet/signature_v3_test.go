@@ -15,54 +15,54 @@ import (
 	"golang.org/x/crypto/openpgp/armor"
 )
 
-func TestSignatureV3Read(t *testing.T) ***REMOVED***
+func TestSignatureV3Read(t *testing.T) {
 	r := v3KeyReader(t)
 	Read(r)                // Skip public key
 	Read(r)                // Skip uid
 	packet, err := Read(r) // Signature
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Error(err)
 		return
-	***REMOVED***
+	}
 	sig, ok := packet.(*SignatureV3)
-	if !ok || sig.SigType != SigTypeGenericCert || sig.PubKeyAlgo != PubKeyAlgoRSA || sig.Hash != crypto.MD5 ***REMOVED***
+	if !ok || sig.SigType != SigTypeGenericCert || sig.PubKeyAlgo != PubKeyAlgoRSA || sig.Hash != crypto.MD5 {
 		t.Errorf("failed to parse, got: %#v", packet)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestSignatureV3Reserialize(t *testing.T) ***REMOVED***
+func TestSignatureV3Reserialize(t *testing.T) {
 	r := v3KeyReader(t)
 	Read(r) // Skip public key
 	Read(r) // Skip uid
 	packet, err := Read(r)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Error(err)
 		return
-	***REMOVED***
+	}
 	sig := packet.(*SignatureV3)
 	out := new(bytes.Buffer)
-	if err = sig.Serialize(out); err != nil ***REMOVED***
+	if err = sig.Serialize(out); err != nil {
 		t.Errorf("error reserializing: %s", err)
 		return
-	***REMOVED***
+	}
 	expected, err := ioutil.ReadAll(v3KeyReader(t))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Error(err)
 		return
-	***REMOVED***
+	}
 	expected = expected[4+141+4+39:] // See pgpdump offsets below, this is where the sig starts
-	if !bytes.Equal(expected, out.Bytes()) ***REMOVED***
+	if !bytes.Equal(expected, out.Bytes()) {
 		t.Errorf("output doesn't match input (got vs expected):\n%s\n%s", hex.Dump(out.Bytes()), hex.Dump(expected))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func v3KeyReader(t *testing.T) io.Reader ***REMOVED***
+func v3KeyReader(t *testing.T) io.Reader {
 	armorBlock, err := armor.Decode(bytes.NewBufferString(keySigV3Armor))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("armor Decode failed: %v", err)
-	***REMOVED***
+	}
 	return armorBlock.Body
-***REMOVED***
+}
 
 // keySigV3Armor is some V3 public key I found in an SKS dump.
 // Old: Public Key Packet(tag 6)(141 bytes)

@@ -10,10 +10,10 @@ import (
 	"github.com/pkg/errors"
 )
 
-func summaryFromInterface(i interface***REMOVED******REMOVED***) (*Summary, error) ***REMOVED***
-	switch pd := i.(type) ***REMOVED***
+func summaryFromInterface(i interface{}) (*Summary, error) {
+	switch pd := i.(type) {
 	case *hcsshimtypes.ProcessDetails:
-		return &Summary***REMOVED***
+		return &Summary{
 			CreateTimestamp:              pd.CreatedAt,
 			ImageName:                    pd.ImageName,
 			KernelTime100ns:              pd.KernelTime_100Ns,
@@ -22,34 +22,34 @@ func summaryFromInterface(i interface***REMOVED******REMOVED***) (*Summary, erro
 			MemoryWorkingSetSharedBytes:  pd.MemoryWorkingSetSharedBytes,
 			ProcessId:                    pd.ProcessID,
 			UserTime100ns:                pd.UserTime_100Ns,
-		***REMOVED***, nil
+		}, nil
 	default:
 		return nil, errors.Errorf("Unknown process details type %T", pd)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func prepareBundleDir(bundleDir string, ociSpec *specs.Spec) (string, error) ***REMOVED***
+func prepareBundleDir(bundleDir string, ociSpec *specs.Spec) (string, error) {
 	return bundleDir, nil
-***REMOVED***
+}
 
-func pipeName(containerID, processID, name string) string ***REMOVED***
+func pipeName(containerID, processID, name string) string {
 	return fmt.Sprintf(`\\.\pipe\containerd-%s-%s-%s`, containerID, processID, name)
-***REMOVED***
+}
 
-func newFIFOSet(bundleDir, processID string, withStdin, withTerminal bool) *cio.FIFOSet ***REMOVED***
+func newFIFOSet(bundleDir, processID string, withStdin, withTerminal bool) *cio.FIFOSet {
 	containerID := filepath.Base(bundleDir)
-	config := cio.Config***REMOVED***
+	config := cio.Config{
 		Terminal: withTerminal,
 		Stdout:   pipeName(containerID, processID, "stdout"),
-	***REMOVED***
+	}
 
-	if withStdin ***REMOVED***
+	if withStdin {
 		config.Stdin = pipeName(containerID, processID, "stdin")
-	***REMOVED***
+	}
 
-	if !config.Terminal ***REMOVED***
+	if !config.Terminal {
 		config.Stderr = pipeName(containerID, processID, "stderr")
-	***REMOVED***
+	}
 
 	return cio.NewFIFOSet(config, nil)
-***REMOVED***
+}

@@ -22,8 +22,8 @@ import (
 	"golang.org/x/crypto/ssh/testdata"
 )
 
-func rawKey(pub PublicKey) interface***REMOVED******REMOVED*** ***REMOVED***
-	switch k := pub.(type) ***REMOVED***
+func rawKey(pub PublicKey) interface{} {
+	switch k := pub.(type) {
 	case *rsaPublicKey:
 		return (*rsa.PublicKey)(k)
 	case *dsaPublicKey:
@@ -34,218 +34,218 @@ func rawKey(pub PublicKey) interface***REMOVED******REMOVED*** ***REMOVED***
 		return (ed25519.PublicKey)(k)
 	case *Certificate:
 		return k
-	***REMOVED***
+	}
 	panic("unknown key type")
-***REMOVED***
+}
 
-func TestKeyMarshalParse(t *testing.T) ***REMOVED***
-	for _, priv := range testSigners ***REMOVED***
+func TestKeyMarshalParse(t *testing.T) {
+	for _, priv := range testSigners {
 		pub := priv.PublicKey()
 		roundtrip, err := ParsePublicKey(pub.Marshal())
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Errorf("ParsePublicKey(%T): %v", pub, err)
-		***REMOVED***
+		}
 
 		k1 := rawKey(pub)
 		k2 := rawKey(roundtrip)
 
-		if !reflect.DeepEqual(k1, k2) ***REMOVED***
+		if !reflect.DeepEqual(k1, k2) {
 			t.Errorf("got %#v in roundtrip, want %#v", k2, k1)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestUnsupportedCurves(t *testing.T) ***REMOVED***
+func TestUnsupportedCurves(t *testing.T) {
 	raw, err := ecdsa.GenerateKey(elliptic.P224(), rand.Reader)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("GenerateKey: %v", err)
-	***REMOVED***
+	}
 
-	if _, err = NewSignerFromKey(raw); err == nil || !strings.Contains(err.Error(), "only P-256") ***REMOVED***
+	if _, err = NewSignerFromKey(raw); err == nil || !strings.Contains(err.Error(), "only P-256") {
 		t.Fatalf("NewPrivateKey should not succeed with P-224, got: %v", err)
-	***REMOVED***
+	}
 
-	if _, err = NewPublicKey(&raw.PublicKey); err == nil || !strings.Contains(err.Error(), "only P-256") ***REMOVED***
+	if _, err = NewPublicKey(&raw.PublicKey); err == nil || !strings.Contains(err.Error(), "only P-256") {
 		t.Fatalf("NewPublicKey should not succeed with P-224, got: %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestNewPublicKey(t *testing.T) ***REMOVED***
-	for _, k := range testSigners ***REMOVED***
+func TestNewPublicKey(t *testing.T) {
+	for _, k := range testSigners {
 		raw := rawKey(k.PublicKey())
 		// Skip certificates, as NewPublicKey does not support them.
-		if _, ok := raw.(*Certificate); ok ***REMOVED***
+		if _, ok := raw.(*Certificate); ok {
 			continue
-		***REMOVED***
+		}
 		pub, err := NewPublicKey(raw)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Errorf("NewPublicKey(%#v): %v", raw, err)
-		***REMOVED***
-		if !reflect.DeepEqual(k.PublicKey(), pub) ***REMOVED***
+		}
+		if !reflect.DeepEqual(k.PublicKey(), pub) {
 			t.Errorf("NewPublicKey(%#v) = %#v, want %#v", raw, pub, k.PublicKey())
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestKeySignVerify(t *testing.T) ***REMOVED***
-	for _, priv := range testSigners ***REMOVED***
+func TestKeySignVerify(t *testing.T) {
+	for _, priv := range testSigners {
 		pub := priv.PublicKey()
 
 		data := []byte("sign me")
 		sig, err := priv.Sign(rand.Reader, data)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("Sign(%T): %v", priv, err)
-		***REMOVED***
+		}
 
-		if err := pub.Verify(data, sig); err != nil ***REMOVED***
+		if err := pub.Verify(data, sig); err != nil {
 			t.Errorf("publicKey.Verify(%T): %v", priv, err)
-		***REMOVED***
+		}
 		sig.Blob[5]++
-		if err := pub.Verify(data, sig); err == nil ***REMOVED***
+		if err := pub.Verify(data, sig); err == nil {
 			t.Errorf("publicKey.Verify on broken sig did not fail")
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestParseRSAPrivateKey(t *testing.T) ***REMOVED***
+func TestParseRSAPrivateKey(t *testing.T) {
 	key := testPrivateKeys["rsa"]
 
 	rsa, ok := key.(*rsa.PrivateKey)
-	if !ok ***REMOVED***
+	if !ok {
 		t.Fatalf("got %T, want *rsa.PrivateKey", rsa)
-	***REMOVED***
+	}
 
-	if err := rsa.Validate(); err != nil ***REMOVED***
+	if err := rsa.Validate(); err != nil {
 		t.Errorf("Validate: %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestParseECPrivateKey(t *testing.T) ***REMOVED***
+func TestParseECPrivateKey(t *testing.T) {
 	key := testPrivateKeys["ecdsa"]
 
 	ecKey, ok := key.(*ecdsa.PrivateKey)
-	if !ok ***REMOVED***
+	if !ok {
 		t.Fatalf("got %T, want *ecdsa.PrivateKey", ecKey)
-	***REMOVED***
+	}
 
-	if !validateECPublicKey(ecKey.Curve, ecKey.X, ecKey.Y) ***REMOVED***
+	if !validateECPublicKey(ecKey.Curve, ecKey.X, ecKey.Y) {
 		t.Fatalf("public key does not validate.")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // See Issue https://github.com/golang/go/issues/6650.
-func TestParseEncryptedPrivateKeysFails(t *testing.T) ***REMOVED***
+func TestParseEncryptedPrivateKeysFails(t *testing.T) {
 	const wantSubstring = "encrypted"
-	for i, tt := range testdata.PEMEncryptedKeys ***REMOVED***
+	for i, tt := range testdata.PEMEncryptedKeys {
 		_, err := ParsePrivateKey(tt.PEMBytes)
-		if err == nil ***REMOVED***
+		if err == nil {
 			t.Errorf("#%d key %s: ParsePrivateKey successfully parsed, expected an error", i, tt.Name)
 			continue
-		***REMOVED***
+		}
 
-		if !strings.Contains(err.Error(), wantSubstring) ***REMOVED***
+		if !strings.Contains(err.Error(), wantSubstring) {
 			t.Errorf("#%d key %s: got error %q, want substring %q", i, tt.Name, err, wantSubstring)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // Parse encrypted private keys with passphrase
-func TestParseEncryptedPrivateKeysWithPassphrase(t *testing.T) ***REMOVED***
+func TestParseEncryptedPrivateKeysWithPassphrase(t *testing.T) {
 	data := []byte("sign me")
-	for _, tt := range testdata.PEMEncryptedKeys ***REMOVED***
+	for _, tt := range testdata.PEMEncryptedKeys {
 		s, err := ParsePrivateKeyWithPassphrase(tt.PEMBytes, []byte(tt.EncryptionKey))
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("ParsePrivateKeyWithPassphrase returned error: %s", err)
 			continue
-		***REMOVED***
+		}
 		sig, err := s.Sign(rand.Reader, data)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("dsa.Sign: %v", err)
-		***REMOVED***
-		if err := s.PublicKey().Verify(data, sig); err != nil ***REMOVED***
+		}
+		if err := s.PublicKey().Verify(data, sig); err != nil {
 			t.Errorf("Verify failed: %v", err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	tt := testdata.PEMEncryptedKeys[0]
 	_, err := ParsePrivateKeyWithPassphrase(tt.PEMBytes, []byte("incorrect"))
-	if err != x509.IncorrectPasswordError ***REMOVED***
+	if err != x509.IncorrectPasswordError {
 		t.Fatalf("got %v want IncorrectPasswordError", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestParseDSA(t *testing.T) ***REMOVED***
+func TestParseDSA(t *testing.T) {
 	// We actually exercise the ParsePrivateKey codepath here, as opposed to
 	// using the ParseRawPrivateKey+NewSignerFromKey path that testdata_test.go
 	// uses.
 	s, err := ParsePrivateKey(testdata.PEMBytes["dsa"])
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("ParsePrivateKey returned error: %s", err)
-	***REMOVED***
+	}
 
 	data := []byte("sign me")
 	sig, err := s.Sign(rand.Reader, data)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("dsa.Sign: %v", err)
-	***REMOVED***
+	}
 
-	if err := s.PublicKey().Verify(data, sig); err != nil ***REMOVED***
+	if err := s.PublicKey().Verify(data, sig); err != nil {
 		t.Errorf("Verify failed: %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Tests for authorized_keys parsing.
 
 // getTestKey returns a public key, and its base64 encoding.
-func getTestKey() (PublicKey, string) ***REMOVED***
+func getTestKey() (PublicKey, string) {
 	k := testPublicKeys["rsa"]
 
-	b := &bytes.Buffer***REMOVED******REMOVED***
+	b := &bytes.Buffer{}
 	e := base64.NewEncoder(base64.StdEncoding, b)
 	e.Write(k.Marshal())
 	e.Close()
 
 	return k, b.String()
-***REMOVED***
+}
 
-func TestMarshalParsePublicKey(t *testing.T) ***REMOVED***
+func TestMarshalParsePublicKey(t *testing.T) {
 	pub, pubSerialized := getTestKey()
 	line := fmt.Sprintf("%s %s user@host", pub.Type(), pubSerialized)
 
 	authKeys := MarshalAuthorizedKey(pub)
 	actualFields := strings.Fields(string(authKeys))
-	if len(actualFields) == 0 ***REMOVED***
+	if len(actualFields) == 0 {
 		t.Fatalf("failed authKeys: %v", authKeys)
-	***REMOVED***
+	}
 
 	// drop the comment
 	expectedFields := strings.Fields(line)[0:2]
 
-	if !reflect.DeepEqual(actualFields, expectedFields) ***REMOVED***
+	if !reflect.DeepEqual(actualFields, expectedFields) {
 		t.Errorf("got %v, expected %v", actualFields, expectedFields)
-	***REMOVED***
+	}
 
 	actPub, _, _, _, err := ParseAuthorizedKey([]byte(line))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("cannot parse %v: %v", line, err)
-	***REMOVED***
-	if !reflect.DeepEqual(actPub, pub) ***REMOVED***
+	}
+	if !reflect.DeepEqual(actPub, pub) {
 		t.Errorf("got %v, expected %v", actPub, pub)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type authResult struct ***REMOVED***
+type authResult struct {
 	pubKey   PublicKey
 	options  []string
 	comments string
 	rest     string
 	ok       bool
-***REMOVED***
+}
 
-func testAuthorizedKeys(t *testing.T, authKeys []byte, expected []authResult) ***REMOVED***
+func testAuthorizedKeys(t *testing.T, authKeys []byte, expected []authResult) {
 	rest := authKeys
 	var values []authResult
-	for len(rest) > 0 ***REMOVED***
+	for len(rest) > 0 {
 		var r authResult
 		var err error
 		r.pubKey, r.comments, r.options, rest, err = ParseAuthorizedKey(rest)
@@ -253,25 +253,25 @@ func testAuthorizedKeys(t *testing.T, authKeys []byte, expected []authResult) **
 		t.Log(err)
 		r.rest = string(rest)
 		values = append(values, r)
-	***REMOVED***
+	}
 
-	if !reflect.DeepEqual(values, expected) ***REMOVED***
+	if !reflect.DeepEqual(values, expected) {
 		t.Errorf("got %#v, expected %#v", values, expected)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestAuthorizedKeyBasic(t *testing.T) ***REMOVED***
+func TestAuthorizedKeyBasic(t *testing.T) {
 	pub, pubSerialized := getTestKey()
 	line := "ssh-rsa " + pubSerialized + " user@host"
 	testAuthorizedKeys(t, []byte(line),
-		[]authResult***REMOVED***
-			***REMOVED***pub, nil, "user@host", "", true***REMOVED***,
-		***REMOVED***)
-***REMOVED***
+		[]authResult{
+			{pub, nil, "user@host", "", true},
+		})
+}
 
-func TestAuth(t *testing.T) ***REMOVED***
+func TestAuth(t *testing.T) {
 	pub, pubSerialized := getTestKey()
-	authWithOptions := []string***REMOVED***
+	authWithOptions := []string{
 		`# comments to ignore before any keys...`,
 		``,
 		`env="HOME=/home/root",no-port-forwarding ssh-rsa ` + pubSerialized + ` user@host`,
@@ -281,76 +281,76 @@ func TestAuth(t *testing.T) ***REMOVED***
 		``,
 		`# more comments, plus a invalid entry`,
 		`ssh-rsa data-that-will-not-parse user@host3`,
-	***REMOVED***
-	for _, eol := range []string***REMOVED***"\n", "\r\n"***REMOVED*** ***REMOVED***
+	}
+	for _, eol := range []string{"\n", "\r\n"} {
 		authOptions := strings.Join(authWithOptions, eol)
 		rest2 := strings.Join(authWithOptions[3:], eol)
 		rest3 := strings.Join(authWithOptions[6:], eol)
-		testAuthorizedKeys(t, []byte(authOptions), []authResult***REMOVED***
-			***REMOVED***pub, []string***REMOVED***`env="HOME=/home/root"`, "no-port-forwarding"***REMOVED***, "user@host", rest2, true***REMOVED***,
-			***REMOVED***pub, []string***REMOVED***`env="HOME=/home/root2"`***REMOVED***, "user2@host2", rest3, true***REMOVED***,
-			***REMOVED***nil, nil, "", "", false***REMOVED***,
-		***REMOVED***)
-	***REMOVED***
-***REMOVED***
+		testAuthorizedKeys(t, []byte(authOptions), []authResult{
+			{pub, []string{`env="HOME=/home/root"`, "no-port-forwarding"}, "user@host", rest2, true},
+			{pub, []string{`env="HOME=/home/root2"`}, "user2@host2", rest3, true},
+			{nil, nil, "", "", false},
+		})
+	}
+}
 
-func TestAuthWithQuotedSpaceInEnv(t *testing.T) ***REMOVED***
+func TestAuthWithQuotedSpaceInEnv(t *testing.T) {
 	pub, pubSerialized := getTestKey()
 	authWithQuotedSpaceInEnv := []byte(`env="HOME=/home/root dir",no-port-forwarding ssh-rsa ` + pubSerialized + ` user@host`)
-	testAuthorizedKeys(t, []byte(authWithQuotedSpaceInEnv), []authResult***REMOVED***
-		***REMOVED***pub, []string***REMOVED***`env="HOME=/home/root dir"`, "no-port-forwarding"***REMOVED***, "user@host", "", true***REMOVED***,
-	***REMOVED***)
-***REMOVED***
+	testAuthorizedKeys(t, []byte(authWithQuotedSpaceInEnv), []authResult{
+		{pub, []string{`env="HOME=/home/root dir"`, "no-port-forwarding"}, "user@host", "", true},
+	})
+}
 
-func TestAuthWithQuotedCommaInEnv(t *testing.T) ***REMOVED***
+func TestAuthWithQuotedCommaInEnv(t *testing.T) {
 	pub, pubSerialized := getTestKey()
 	authWithQuotedCommaInEnv := []byte(`env="HOME=/home/root,dir",no-port-forwarding ssh-rsa ` + pubSerialized + `   user@host`)
-	testAuthorizedKeys(t, []byte(authWithQuotedCommaInEnv), []authResult***REMOVED***
-		***REMOVED***pub, []string***REMOVED***`env="HOME=/home/root,dir"`, "no-port-forwarding"***REMOVED***, "user@host", "", true***REMOVED***,
-	***REMOVED***)
-***REMOVED***
+	testAuthorizedKeys(t, []byte(authWithQuotedCommaInEnv), []authResult{
+		{pub, []string{`env="HOME=/home/root,dir"`, "no-port-forwarding"}, "user@host", "", true},
+	})
+}
 
-func TestAuthWithQuotedQuoteInEnv(t *testing.T) ***REMOVED***
+func TestAuthWithQuotedQuoteInEnv(t *testing.T) {
 	pub, pubSerialized := getTestKey()
 	authWithQuotedQuoteInEnv := []byte(`env="HOME=/home/\"root dir",no-port-forwarding` + "\t" + `ssh-rsa` + "\t" + pubSerialized + `   user@host`)
 	authWithDoubleQuotedQuote := []byte(`no-port-forwarding,env="HOME=/home/ \"root dir\"" ssh-rsa ` + pubSerialized + "\t" + `user@host`)
-	testAuthorizedKeys(t, []byte(authWithQuotedQuoteInEnv), []authResult***REMOVED***
-		***REMOVED***pub, []string***REMOVED***`env="HOME=/home/\"root dir"`, "no-port-forwarding"***REMOVED***, "user@host", "", true***REMOVED***,
-	***REMOVED***)
+	testAuthorizedKeys(t, []byte(authWithQuotedQuoteInEnv), []authResult{
+		{pub, []string{`env="HOME=/home/\"root dir"`, "no-port-forwarding"}, "user@host", "", true},
+	})
 
-	testAuthorizedKeys(t, []byte(authWithDoubleQuotedQuote), []authResult***REMOVED***
-		***REMOVED***pub, []string***REMOVED***"no-port-forwarding", `env="HOME=/home/ \"root dir\""`***REMOVED***, "user@host", "", true***REMOVED***,
-	***REMOVED***)
-***REMOVED***
+	testAuthorizedKeys(t, []byte(authWithDoubleQuotedQuote), []authResult{
+		{pub, []string{"no-port-forwarding", `env="HOME=/home/ \"root dir\""`}, "user@host", "", true},
+	})
+}
 
-func TestAuthWithInvalidSpace(t *testing.T) ***REMOVED***
+func TestAuthWithInvalidSpace(t *testing.T) {
 	_, pubSerialized := getTestKey()
 	authWithInvalidSpace := []byte(`env="HOME=/home/root dir", no-port-forwarding ssh-rsa ` + pubSerialized + ` user@host
 #more to follow but still no valid keys`)
-	testAuthorizedKeys(t, []byte(authWithInvalidSpace), []authResult***REMOVED***
-		***REMOVED***nil, nil, "", "", false***REMOVED***,
-	***REMOVED***)
-***REMOVED***
+	testAuthorizedKeys(t, []byte(authWithInvalidSpace), []authResult{
+		{nil, nil, "", "", false},
+	})
+}
 
-func TestAuthWithMissingQuote(t *testing.T) ***REMOVED***
+func TestAuthWithMissingQuote(t *testing.T) {
 	pub, pubSerialized := getTestKey()
 	authWithMissingQuote := []byte(`env="HOME=/home/root,no-port-forwarding ssh-rsa ` + pubSerialized + ` user@host
 env="HOME=/home/root",shared-control ssh-rsa ` + pubSerialized + ` user@host`)
 
-	testAuthorizedKeys(t, []byte(authWithMissingQuote), []authResult***REMOVED***
-		***REMOVED***pub, []string***REMOVED***`env="HOME=/home/root"`, `shared-control`***REMOVED***, "user@host", "", true***REMOVED***,
-	***REMOVED***)
-***REMOVED***
+	testAuthorizedKeys(t, []byte(authWithMissingQuote), []authResult{
+		{pub, []string{`env="HOME=/home/root"`, `shared-control`}, "user@host", "", true},
+	})
+}
 
-func TestInvalidEntry(t *testing.T) ***REMOVED***
+func TestInvalidEntry(t *testing.T) {
 	authInvalid := []byte(`ssh-rsa`)
 	_, _, _, _, err := ParseAuthorizedKey(authInvalid)
-	if err == nil ***REMOVED***
+	if err == nil {
 		t.Errorf("got valid entry for %q", authInvalid)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-var knownHostsParseTests = []struct ***REMOVED***
+var knownHostsParseTests = []struct {
 	input string
 	err   string
 
@@ -358,143 +358,143 @@ var knownHostsParseTests = []struct ***REMOVED***
 	comment string
 	hosts   []string
 	rest    string
-***REMOVED******REMOVED***
-	***REMOVED***
+}{
+	{
 		"",
 		"EOF",
 
 		"", "", nil, "",
-	***REMOVED***,
-	***REMOVED***
+	},
+	{
 		"# Just a comment",
 		"EOF",
 
 		"", "", nil, "",
-	***REMOVED***,
-	***REMOVED***
+	},
+	{
 		"   \t   ",
 		"EOF",
 
 		"", "", nil, "",
-	***REMOVED***,
-	***REMOVED***
-		"localhost ssh-rsa ***REMOVED***RSAPUB***REMOVED***",
+	},
+	{
+		"localhost ssh-rsa {RSAPUB}",
 		"",
 
-		"", "", []string***REMOVED***"localhost"***REMOVED***, "",
-	***REMOVED***,
-	***REMOVED***
-		"localhost\tssh-rsa ***REMOVED***RSAPUB***REMOVED***",
+		"", "", []string{"localhost"}, "",
+	},
+	{
+		"localhost\tssh-rsa {RSAPUB}",
 		"",
 
-		"", "", []string***REMOVED***"localhost"***REMOVED***, "",
-	***REMOVED***,
-	***REMOVED***
-		"localhost\tssh-rsa ***REMOVED***RSAPUB***REMOVED***\tcomment comment",
+		"", "", []string{"localhost"}, "",
+	},
+	{
+		"localhost\tssh-rsa {RSAPUB}\tcomment comment",
 		"",
 
-		"", "comment comment", []string***REMOVED***"localhost"***REMOVED***, "",
-	***REMOVED***,
-	***REMOVED***
-		"localhost\tssh-rsa ***REMOVED***RSAPUB***REMOVED***\tcomment comment\n",
+		"", "comment comment", []string{"localhost"}, "",
+	},
+	{
+		"localhost\tssh-rsa {RSAPUB}\tcomment comment\n",
 		"",
 
-		"", "comment comment", []string***REMOVED***"localhost"***REMOVED***, "",
-	***REMOVED***,
-	***REMOVED***
-		"localhost\tssh-rsa ***REMOVED***RSAPUB***REMOVED***\tcomment comment\r\n",
+		"", "comment comment", []string{"localhost"}, "",
+	},
+	{
+		"localhost\tssh-rsa {RSAPUB}\tcomment comment\r\n",
 		"",
 
-		"", "comment comment", []string***REMOVED***"localhost"***REMOVED***, "",
-	***REMOVED***,
-	***REMOVED***
-		"localhost\tssh-rsa ***REMOVED***RSAPUB***REMOVED***\tcomment comment\r\nnext line",
+		"", "comment comment", []string{"localhost"}, "",
+	},
+	{
+		"localhost\tssh-rsa {RSAPUB}\tcomment comment\r\nnext line",
 		"",
 
-		"", "comment comment", []string***REMOVED***"localhost"***REMOVED***, "next line",
-	***REMOVED***,
-	***REMOVED***
-		"localhost,[host2:123]\tssh-rsa ***REMOVED***RSAPUB***REMOVED***\tcomment comment",
+		"", "comment comment", []string{"localhost"}, "next line",
+	},
+	{
+		"localhost,[host2:123]\tssh-rsa {RSAPUB}\tcomment comment",
 		"",
 
-		"", "comment comment", []string***REMOVED***"localhost", "[host2:123]"***REMOVED***, "",
-	***REMOVED***,
-	***REMOVED***
-		"@marker \tlocalhost,[host2:123]\tssh-rsa ***REMOVED***RSAPUB***REMOVED***",
+		"", "comment comment", []string{"localhost", "[host2:123]"}, "",
+	},
+	{
+		"@marker \tlocalhost,[host2:123]\tssh-rsa {RSAPUB}",
 		"",
 
-		"marker", "", []string***REMOVED***"localhost", "[host2:123]"***REMOVED***, "",
-	***REMOVED***,
-	***REMOVED***
+		"marker", "", []string{"localhost", "[host2:123]"}, "",
+	},
+	{
 		"@marker \tlocalhost,[host2:123]\tssh-rsa aabbccdd",
 		"short read",
 
 		"", "", nil, "",
-	***REMOVED***,
-***REMOVED***
+	},
+}
 
-func TestKnownHostsParsing(t *testing.T) ***REMOVED***
+func TestKnownHostsParsing(t *testing.T) {
 	rsaPub, rsaPubSerialized := getTestKey()
 
-	for i, test := range knownHostsParseTests ***REMOVED***
+	for i, test := range knownHostsParseTests {
 		var expectedKey PublicKey
-		const rsaKeyToken = "***REMOVED***RSAPUB***REMOVED***"
+		const rsaKeyToken = "{RSAPUB}"
 
 		input := test.input
-		if strings.Contains(input, rsaKeyToken) ***REMOVED***
+		if strings.Contains(input, rsaKeyToken) {
 			expectedKey = rsaPub
 			input = strings.Replace(test.input, rsaKeyToken, rsaPubSerialized, -1)
-		***REMOVED***
+		}
 
 		marker, hosts, pubKey, comment, rest, err := ParseKnownHosts([]byte(input))
-		if err != nil ***REMOVED***
-			if len(test.err) == 0 ***REMOVED***
+		if err != nil {
+			if len(test.err) == 0 {
 				t.Errorf("#%d: unexpectedly failed with %q", i, err)
-			***REMOVED*** else if !strings.Contains(err.Error(), test.err) ***REMOVED***
+			} else if !strings.Contains(err.Error(), test.err) {
 				t.Errorf("#%d: expected error containing %q, but got %q", i, test.err, err)
-			***REMOVED***
+			}
 			continue
-		***REMOVED*** else if len(test.err) != 0 ***REMOVED***
+		} else if len(test.err) != 0 {
 			t.Errorf("#%d: succeeded but expected error including %q", i, test.err)
 			continue
-		***REMOVED***
+		}
 
-		if !reflect.DeepEqual(expectedKey, pubKey) ***REMOVED***
+		if !reflect.DeepEqual(expectedKey, pubKey) {
 			t.Errorf("#%d: expected key %#v, but got %#v", i, expectedKey, pubKey)
-		***REMOVED***
+		}
 
-		if marker != test.marker ***REMOVED***
+		if marker != test.marker {
 			t.Errorf("#%d: expected marker %q, but got %q", i, test.marker, marker)
-		***REMOVED***
+		}
 
-		if comment != test.comment ***REMOVED***
+		if comment != test.comment {
 			t.Errorf("#%d: expected comment %q, but got %q", i, test.comment, comment)
-		***REMOVED***
+		}
 
-		if !reflect.DeepEqual(test.hosts, hosts) ***REMOVED***
+		if !reflect.DeepEqual(test.hosts, hosts) {
 			t.Errorf("#%d: expected hosts %#v, but got %#v", i, test.hosts, hosts)
-		***REMOVED***
+		}
 
-		if rest := string(rest); rest != test.rest ***REMOVED***
+		if rest := string(rest); rest != test.rest {
 			t.Errorf("#%d: expected remaining input to be %q, but got %q", i, test.rest, rest)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestFingerprintLegacyMD5(t *testing.T) ***REMOVED***
+func TestFingerprintLegacyMD5(t *testing.T) {
 	pub, _ := getTestKey()
 	fingerprint := FingerprintLegacyMD5(pub)
 	want := "fb:61:6d:1a:e3:f0:95:45:3c:a0:79:be:4a:93:63:66" // ssh-keygen -lf -E md5 rsa
-	if fingerprint != want ***REMOVED***
+	if fingerprint != want {
 		t.Errorf("got fingerprint %q want %q", fingerprint, want)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestFingerprintSHA256(t *testing.T) ***REMOVED***
+func TestFingerprintSHA256(t *testing.T) {
 	pub, _ := getTestKey()
 	fingerprint := FingerprintSHA256(pub)
 	want := "SHA256:Anr3LjZK8YVpjrxu79myrW9Hrb/wpcMNpVvTq/RcBm8" // ssh-keygen -lf rsa
-	if fingerprint != want ***REMOVED***
+	if fingerprint != want {
 		t.Errorf("got fingerprint %q want %q", fingerprint, want)
-	***REMOVED***
-***REMOVED***
+	}
+}

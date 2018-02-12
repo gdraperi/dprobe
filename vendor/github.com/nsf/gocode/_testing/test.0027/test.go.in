@@ -1,14 +1,14 @@
 package main
 
-type file struct ***REMOVED***
+type file struct {
 	name string
-***REMOVED***
+}
 
-func (file *file) String() ***REMOVED***
+func (file *file) String() {
 	file.
 	return file.name
-***REMOVED***
+}
 
-func main() ***REMOVED***
+func main() {
 	
-***REMOVED***
+}

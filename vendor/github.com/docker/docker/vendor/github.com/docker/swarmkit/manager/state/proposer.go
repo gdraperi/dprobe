@@ -7,13 +7,13 @@ import (
 
 // A Change includes a version number and a set of store actions from a
 // particular log entry.
-type Change struct ***REMOVED***
+type Change struct {
 	StoreActions []api.StoreAction
 	Version      api.Version
-***REMOVED***
+}
 
 // A Proposer can propose actions to a cluster.
-type Proposer interface ***REMOVED***
+type Proposer interface {
 	// ProposeValue adds storeAction to the distributed log. If this
 	// completes successfully, ProposeValue calls cb to commit the
 	// proposed changes. The callback is necessary for the Proposer to make
@@ -27,4 +27,4 @@ type Proposer interface ***REMOVED***
 	// including "to". If these changes are not available because the log
 	// has been compacted, an error will be returned.
 	ChangesBetween(from, to api.Version) ([]Change, error)
-***REMOVED***
+}

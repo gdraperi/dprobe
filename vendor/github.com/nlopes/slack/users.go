@@ -14,7 +14,7 @@ const (
 )
 
 // UserProfile contains all the information details of a given user
-type UserProfile struct ***REMOVED***
+type UserProfile struct {
 	FirstName             string `json:"first_name"`
 	LastName              string `json:"last_name"`
 	RealName              string `json:"real_name"`
@@ -36,10 +36,10 @@ type UserProfile struct ***REMOVED***
 	StatusText            string `json:"status_text,omitempty"`
 	StatusEmoji           string `json:"status_emoji,omitempty"`
 	Team                  string `json:"team"`
-***REMOVED***
+}
 
 // User contains all the information of a user
-type User struct ***REMOVED***
+type User struct {
 	ID                string      `json:"id"`
 	TeamID            string      `json:"team_id"`
 	Name              string      `json:"name"`
@@ -62,25 +62,25 @@ type User struct ***REMOVED***
 	HasFiles          bool        `json:"has_files"`
 	Presence          string      `json:"presence"`
 	Locale            string      `json:"locale"`
-***REMOVED***
+}
 
 // UserPresence contains details about a user online status
-type UserPresence struct ***REMOVED***
+type UserPresence struct {
 	Presence        string   `json:"presence,omitempty"`
 	Online          bool     `json:"online,omitempty"`
 	AutoAway        bool     `json:"auto_away,omitempty"`
 	ManualAway      bool     `json:"manual_away,omitempty"`
 	ConnectionCount int      `json:"connection_count,omitempty"`
 	LastActivity    JSONTime `json:"last_activity,omitempty"`
-***REMOVED***
+}
 
-type UserIdentityResponse struct ***REMOVED***
+type UserIdentityResponse struct {
 	User UserIdentity `json:"user"`
 	Team TeamIdentity `json:"team"`
 	SlackResponse
-***REMOVED***
+}
 
-type UserIdentity struct ***REMOVED***
+type UserIdentity struct {
 	ID       string `json:"id"`
 	Name     string `json:"name"`
 	Email    string `json:"email"`
@@ -90,9 +90,9 @@ type UserIdentity struct ***REMOVED***
 	Image72  string `json:"image_72"`
 	Image192 string `json:"image_192"`
 	Image512 string `json:"image_512"`
-***REMOVED***
+}
 
-type TeamIdentity struct ***REMOVED***
+type TeamIdentity struct {
 	ID            string `json:"id"`
 	Name          string `json:"name"`
 	Domain        string `json:"domain"`
@@ -105,241 +105,241 @@ type TeamIdentity struct ***REMOVED***
 	Image230      string `json:"image_230"`
 	ImageDefault  bool   `json:"image_default"`
 	ImageOriginal string `json:"image_original"`
-***REMOVED***
+}
 
-type userResponseFull struct ***REMOVED***
+type userResponseFull struct {
 	Members      []User                  `json:"members,omitempty"` // ListUsers
 	User         `json:"user,omitempty"` // GetUserInfo
 	UserPresence                         // GetUserPresence
 	SlackResponse
-***REMOVED***
+}
 
-type UserSetPhotoParams struct ***REMOVED***
+type UserSetPhotoParams struct {
 	CropX int
 	CropY int
 	CropW int
-***REMOVED***
+}
 
-func NewUserSetPhotoParams() UserSetPhotoParams ***REMOVED***
-	return UserSetPhotoParams***REMOVED***
+func NewUserSetPhotoParams() UserSetPhotoParams {
+	return UserSetPhotoParams{
 		CropX: DEFAULT_USER_PHOTO_CROP_X,
 		CropY: DEFAULT_USER_PHOTO_CROP_Y,
 		CropW: DEFAULT_USER_PHOTO_CROP_W,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func userRequest(ctx context.Context, client HTTPRequester, path string, values url.Values, debug bool) (*userResponseFull, error) ***REMOVED***
-	response := &userResponseFull***REMOVED******REMOVED***
+func userRequest(ctx context.Context, client HTTPRequester, path string, values url.Values, debug bool) (*userResponseFull, error) {
+	response := &userResponseFull{}
 	err := postForm(ctx, client, SLACK_API+path, values, response, debug)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if !response.Ok ***REMOVED***
+	}
+	if !response.Ok {
 		return nil, errors.New(response.Error)
-	***REMOVED***
+	}
 	return response, nil
-***REMOVED***
+}
 
 // GetUserPresence will retrieve the current presence status of given user.
-func (api *Client) GetUserPresence(user string) (*UserPresence, error) ***REMOVED***
+func (api *Client) GetUserPresence(user string) (*UserPresence, error) {
 	return api.GetUserPresenceContext(context.Background(), user)
-***REMOVED***
+}
 
 // GetUserPresenceContext will retrieve the current presence status of given user with a custom context.
-func (api *Client) GetUserPresenceContext(ctx context.Context, user string) (*UserPresence, error) ***REMOVED***
-	values := url.Values***REMOVED***
-		"token": ***REMOVED***api.token***REMOVED***,
-		"user":  ***REMOVED***user***REMOVED***,
-	***REMOVED***
+func (api *Client) GetUserPresenceContext(ctx context.Context, user string) (*UserPresence, error) {
+	values := url.Values{
+		"token": {api.token},
+		"user":  {user},
+	}
 
 	response, err := userRequest(ctx, api.httpclient, "users.getPresence", values, api.debug)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return &response.UserPresence, nil
-***REMOVED***
+}
 
 // GetUserInfo will retrieve the complete user information
-func (api *Client) GetUserInfo(user string) (*User, error) ***REMOVED***
+func (api *Client) GetUserInfo(user string) (*User, error) {
 	return api.GetUserInfoContext(context.Background(), user)
-***REMOVED***
+}
 
 // GetUserInfoContext will retrieve the complete user information with a custom context
-func (api *Client) GetUserInfoContext(ctx context.Context, user string) (*User, error) ***REMOVED***
-	values := url.Values***REMOVED***
-		"token": ***REMOVED***api.token***REMOVED***,
-		"user":  ***REMOVED***user***REMOVED***,
-	***REMOVED***
+func (api *Client) GetUserInfoContext(ctx context.Context, user string) (*User, error) {
+	values := url.Values{
+		"token": {api.token},
+		"user":  {user},
+	}
 
 	response, err := userRequest(ctx, api.httpclient, "users.info", values, api.debug)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return &response.User, nil
-***REMOVED***
+}
 
 // GetUsers returns the list of users (with their detailed information)
-func (api *Client) GetUsers() ([]User, error) ***REMOVED***
+func (api *Client) GetUsers() ([]User, error) {
 	return api.GetUsersContext(context.Background())
-***REMOVED***
+}
 
 // GetUsersContext returns the list of users (with their detailed information) with a custom context
-func (api *Client) GetUsersContext(ctx context.Context) ([]User, error) ***REMOVED***
-	values := url.Values***REMOVED***
-		"token":    ***REMOVED***api.token***REMOVED***,
-		"presence": ***REMOVED***"1"***REMOVED***,
-	***REMOVED***
+func (api *Client) GetUsersContext(ctx context.Context) ([]User, error) {
+	values := url.Values{
+		"token":    {api.token},
+		"presence": {"1"},
+	}
 
 	response, err := userRequest(ctx, api.httpclient, "users.list", values, api.debug)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return response.Members, nil
-***REMOVED***
+}
 
 // GetUserByEmail will retrieve the complete user information by email
-func (api *Client) GetUserByEmail(email string) (*User, error) ***REMOVED***
+func (api *Client) GetUserByEmail(email string) (*User, error) {
 	return api.GetUserByEmailContext(context.Background(), email)
-***REMOVED***
+}
 
 // GetUserByEmailContext will retrieve the complete user information by email with a custom context
-func (api *Client) GetUserByEmailContext(ctx context.Context, email string) (*User, error) ***REMOVED***
-	values := url.Values***REMOVED***
-		"token": ***REMOVED***api.token***REMOVED***,
-		"email": ***REMOVED***email***REMOVED***,
-	***REMOVED***
+func (api *Client) GetUserByEmailContext(ctx context.Context, email string) (*User, error) {
+	values := url.Values{
+		"token": {api.token},
+		"email": {email},
+	}
 	response, err := userRequest(ctx, api.httpclient, "users.lookupByEmail", values, api.debug)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return &response.User, nil
-***REMOVED***
+}
 
 // SetUserAsActive marks the currently authenticated user as active
-func (api *Client) SetUserAsActive() error ***REMOVED***
+func (api *Client) SetUserAsActive() error {
 	return api.SetUserAsActiveContext(context.Background())
-***REMOVED***
+}
 
 // SetUserAsActiveContext marks the currently authenticated user as active with a custom context
-func (api *Client) SetUserAsActiveContext(ctx context.Context) (err error) ***REMOVED***
-	values := url.Values***REMOVED***
-		"token": ***REMOVED***api.token***REMOVED***,
-	***REMOVED***
+func (api *Client) SetUserAsActiveContext(ctx context.Context) (err error) {
+	values := url.Values{
+		"token": {api.token},
+	}
 
-	if _, err := userRequest(ctx, api.httpclient, "users.setActive", values, api.debug); err != nil ***REMOVED***
+	if _, err := userRequest(ctx, api.httpclient, "users.setActive", values, api.debug); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // SetUserPresence changes the currently authenticated user presence
-func (api *Client) SetUserPresence(presence string) error ***REMOVED***
+func (api *Client) SetUserPresence(presence string) error {
 	return api.SetUserPresenceContext(context.Background(), presence)
-***REMOVED***
+}
 
 // SetUserPresenceContext changes the currently authenticated user presence with a custom context
-func (api *Client) SetUserPresenceContext(ctx context.Context, presence string) error ***REMOVED***
-	values := url.Values***REMOVED***
-		"token":    ***REMOVED***api.token***REMOVED***,
-		"presence": ***REMOVED***presence***REMOVED***,
-	***REMOVED***
+func (api *Client) SetUserPresenceContext(ctx context.Context, presence string) error {
+	values := url.Values{
+		"token":    {api.token},
+		"presence": {presence},
+	}
 
 	_, err := userRequest(ctx, api.httpclient, "users.setPresence", values, api.debug)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 	return nil
 
-***REMOVED***
+}
 
 // GetUserIdentity will retrieve user info available per identity scopes
-func (api *Client) GetUserIdentity() (*UserIdentityResponse, error) ***REMOVED***
+func (api *Client) GetUserIdentity() (*UserIdentityResponse, error) {
 	return api.GetUserIdentityContext(context.Background())
-***REMOVED***
+}
 
 // GetUserIdentityContext will retrieve user info available per identity scopes with a custom context
-func (api *Client) GetUserIdentityContext(ctx context.Context) (*UserIdentityResponse, error) ***REMOVED***
-	values := url.Values***REMOVED***
-		"token": ***REMOVED***api.token***REMOVED***,
-	***REMOVED***
-	response := &UserIdentityResponse***REMOVED******REMOVED***
+func (api *Client) GetUserIdentityContext(ctx context.Context) (*UserIdentityResponse, error) {
+	values := url.Values{
+		"token": {api.token},
+	}
+	response := &UserIdentityResponse{}
 
 	err := postForm(ctx, api.httpclient, SLACK_API+"users.identity", values, response, api.debug)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	if !response.Ok ***REMOVED***
+	}
+	if !response.Ok {
 		return nil, errors.New(response.Error)
-	***REMOVED***
+	}
 	return response, nil
-***REMOVED***
+}
 
 // SetUserPhoto changes the currently authenticated user's profile image
-func (api *Client) SetUserPhoto(image string, params UserSetPhotoParams) error ***REMOVED***
+func (api *Client) SetUserPhoto(image string, params UserSetPhotoParams) error {
 	return api.SetUserPhotoContext(context.Background(), image, params)
-***REMOVED***
+}
 
 // SetUserPhotoContext changes the currently authenticated user's profile image using a custom context
-func (api *Client) SetUserPhotoContext(ctx context.Context, image string, params UserSetPhotoParams) error ***REMOVED***
-	response := &SlackResponse***REMOVED******REMOVED***
-	values := url.Values***REMOVED***
-		"token": ***REMOVED***api.token***REMOVED***,
-	***REMOVED***
-	if params.CropX != DEFAULT_USER_PHOTO_CROP_X ***REMOVED***
+func (api *Client) SetUserPhotoContext(ctx context.Context, image string, params UserSetPhotoParams) error {
+	response := &SlackResponse{}
+	values := url.Values{
+		"token": {api.token},
+	}
+	if params.CropX != DEFAULT_USER_PHOTO_CROP_X {
 		values.Add("crop_x", string(params.CropX))
-	***REMOVED***
-	if params.CropY != DEFAULT_USER_PHOTO_CROP_Y ***REMOVED***
+	}
+	if params.CropY != DEFAULT_USER_PHOTO_CROP_Y {
 		values.Add("crop_y", string(params.CropY))
-	***REMOVED***
-	if params.CropW != DEFAULT_USER_PHOTO_CROP_W ***REMOVED***
+	}
+	if params.CropW != DEFAULT_USER_PHOTO_CROP_W {
 		values.Add("crop_w", string(params.CropW))
-	***REMOVED***
+	}
 
 	err := postLocalWithMultipartResponse(ctx, api.httpclient, SLACK_API+"users.setPhoto", image, "image", values, response, api.debug)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	if !response.Ok ***REMOVED***
+	}
+	if !response.Ok {
 		return errors.New(response.Error)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // DeleteUserPhoto deletes the current authenticated user's profile image
-func (api *Client) DeleteUserPhoto() error ***REMOVED***
+func (api *Client) DeleteUserPhoto() error {
 	return api.DeleteUserPhotoContext(context.Background())
-***REMOVED***
+}
 
 // DeleteUserPhotoContext deletes the current authenticated user's profile image with a custom context
-func (api *Client) DeleteUserPhotoContext(ctx context.Context) error ***REMOVED***
-	response := &SlackResponse***REMOVED******REMOVED***
-	values := url.Values***REMOVED***
-		"token": ***REMOVED***api.token***REMOVED***,
-	***REMOVED***
+func (api *Client) DeleteUserPhotoContext(ctx context.Context) error {
+	response := &SlackResponse{}
+	values := url.Values{
+		"token": {api.token},
+	}
 
 	err := postForm(ctx, api.httpclient, SLACK_API+"users.deletePhoto", values, response, api.debug)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	if !response.Ok ***REMOVED***
+	}
+	if !response.Ok {
 		return errors.New(response.Error)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // SetUserCustomStatus will set a custom status and emoji for the currently
 // authenticated user. If statusEmoji is "" and statusText is not, the Slack API
 // will automatically set it to ":speech_balloon:". Otherwise, if both are ""
 // the Slack API will unset the custom status/emoji.
-func (api *Client) SetUserCustomStatus(statusText, statusEmoji string) error ***REMOVED***
+func (api *Client) SetUserCustomStatus(statusText, statusEmoji string) error {
 	return api.SetUserCustomStatusContext(context.Background(), statusText, statusEmoji)
-***REMOVED***
+}
 
 // SetUserCustomStatusContext will set a custom status and emoji for the currently authenticated user with a custom context
 //
 // For more information see SetUserCustomStatus
-func (api *Client) SetUserCustomStatusContext(ctx context.Context, statusText, statusEmoji string) error ***REMOVED***
+func (api *Client) SetUserCustomStatusContext(ctx context.Context, statusText, statusEmoji string) error {
 	// XXX(theckman): this anonymous struct is for making requests to the Slack
 	// API for setting and unsetting a User's Custom Status/Emoji. To change
 	// these values we must provide a JSON document as the profile POST field.
@@ -351,44 +351,44 @@ func (api *Client) SetUserCustomStatusContext(ctx context.Context, statusText, s
 	//
 	// - https://api.slack.com/docs/presence-and-status#custom_status
 	profile, err := json.Marshal(
-		&struct ***REMOVED***
+		&struct {
 			StatusText  string `json:"status_text"`
 			StatusEmoji string `json:"status_emoji"`
-		***REMOVED******REMOVED***
+		}{
 			StatusText:  statusText,
 			StatusEmoji: statusEmoji,
-		***REMOVED***,
+		},
 	)
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	values := url.Values***REMOVED***
-		"token":   ***REMOVED***api.token***REMOVED***,
-		"profile": ***REMOVED***string(profile)***REMOVED***,
-	***REMOVED***
+	values := url.Values{
+		"token":   {api.token},
+		"profile": {string(profile)},
+	}
 
-	response := &userResponseFull***REMOVED******REMOVED***
-	if err = postForm(ctx, api.httpclient, SLACK_API+"users.profile.set", values, response, api.debug); err != nil ***REMOVED***
+	response := &userResponseFull{}
+	if err = postForm(ctx, api.httpclient, SLACK_API+"users.profile.set", values, response, api.debug); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if !response.Ok ***REMOVED***
+	if !response.Ok {
 		return errors.New(response.Error)
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // UnsetUserCustomStatus removes the custom status message for the currently
 // authenticated user. This is a convenience method that wraps (*Client).SetUserCustomStatus().
-func (api *Client) UnsetUserCustomStatus() error ***REMOVED***
+func (api *Client) UnsetUserCustomStatus() error {
 	return api.UnsetUserCustomStatusContext(context.Background())
-***REMOVED***
+}
 
 // UnsetUserCustomStatusContext removes the custom status message for the currently authenticated user
 // with a custom context. This is a convenience method that wraps (*Client).SetUserCustomStatus().
-func (api *Client) UnsetUserCustomStatusContext(ctx context.Context) error ***REMOVED***
+func (api *Client) UnsetUserCustomStatusContext(ctx context.Context) error {
 	return api.SetUserCustomStatusContext(ctx, "", "")
-***REMOVED***
+}

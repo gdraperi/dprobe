@@ -5,7 +5,7 @@ import (
 	"github.com/docker/docker/libcontainerd"
 )
 
-func toContainerdResources(resources container.Resources) *libcontainerd.Resources ***REMOVED***
+func toContainerdResources(resources container.Resources) *libcontainerd.Resources {
 	// We don't support update, so do nothing
 	return nil
-***REMOVED***
+}

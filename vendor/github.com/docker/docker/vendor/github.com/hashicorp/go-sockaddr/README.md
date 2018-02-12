@@ -83,7 +83,7 @@ interfaces will be helpful:
 |                                                       |
 | +--------------+ +----------------------------------+ |
 | | sockaddr_un  | |                                  | |
-| | SockAddrUnix | |           sockaddr_in***REMOVED***,6***REMOVED***        | |
+| | SockAddrUnix | |           sockaddr_in{,6}        | |
 | +--------------+ |                IPAddr            | |
 |                  |                                  | |
 |                  | +-------------+ +--------------+ | |

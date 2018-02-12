@@ -8,7 +8,7 @@ import (
 
 var ErrNotAConsole = errors.New("provided file is not a console")
 
-type Console interface ***REMOVED***
+type Console interface {
 	io.Reader
 	io.Writer
 	io.Closer
@@ -30,33 +30,33 @@ type Console interface ***REMOVED***
 	Fd() uintptr
 	// Name returns the console's file name
 	Name() string
-***REMOVED***
+}
 
 // WinSize specifies the window size of the console
-type WinSize struct ***REMOVED***
+type WinSize struct {
 	// Height of the console
 	Height uint16
 	// Width of the console
 	Width uint16
 	x     uint16
 	y     uint16
-***REMOVED***
+}
 
 // Current returns the current processes console
-func Current() Console ***REMOVED***
+func Current() Console {
 	c, err := ConsoleFromFile(os.Stdin)
-	if err != nil ***REMOVED***
+	if err != nil {
 		// stdin should always be a console for the design
 		// of this function
 		panic(err)
-	***REMOVED***
+	}
 	return c
-***REMOVED***
+}
 
 // ConsoleFromFile returns a console using the provided file
-func ConsoleFromFile(f *os.File) (Console, error) ***REMOVED***
-	if err := checkConsole(f); err != nil ***REMOVED***
+func ConsoleFromFile(f *os.File) (Console, error) {
+	if err := checkConsole(f); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return newMaster(f)
-***REMOVED***
+}

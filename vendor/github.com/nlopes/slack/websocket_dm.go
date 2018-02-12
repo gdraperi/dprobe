@@ -1,11 +1,11 @@
 package slack
 
 // IMCreatedEvent represents the IM created event
-type IMCreatedEvent struct ***REMOVED***
+type IMCreatedEvent struct {
 	Type    string             `json:"type"`
 	User    string             `json:"user"`
 	Channel ChannelCreatedInfo `json:"channel"`
-***REMOVED***
+}
 
 // IMHistoryChangedEvent represents the IM history changed event
 type IMHistoryChangedEvent ChannelHistoryChangedEvent

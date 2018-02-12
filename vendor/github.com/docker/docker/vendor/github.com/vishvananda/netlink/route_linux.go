@@ -38,355 +38,355 @@ const (
 	FLAG_PERVASIVE NextHopFlag = syscall.RTNH_F_PERVASIVE
 )
 
-var testFlags = []flagString***REMOVED***
-	***REMOVED***f: FLAG_ONLINK, s: "onlink"***REMOVED***,
-	***REMOVED***f: FLAG_PERVASIVE, s: "pervasive"***REMOVED***,
-***REMOVED***
+var testFlags = []flagString{
+	{f: FLAG_ONLINK, s: "onlink"},
+	{f: FLAG_PERVASIVE, s: "pervasive"},
+}
 
-func listFlags(flag int) []string ***REMOVED***
+func listFlags(flag int) []string {
 	var flags []string
-	for _, tf := range testFlags ***REMOVED***
-		if flag&int(tf.f) != 0 ***REMOVED***
+	for _, tf := range testFlags {
+		if flag&int(tf.f) != 0 {
 			flags = append(flags, tf.s)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return flags
-***REMOVED***
+}
 
-func (r *Route) ListFlags() []string ***REMOVED***
+func (r *Route) ListFlags() []string {
 	return listFlags(r.Flags)
-***REMOVED***
+}
 
-func (n *NexthopInfo) ListFlags() []string ***REMOVED***
+func (n *NexthopInfo) ListFlags() []string {
 	return listFlags(n.Flags)
-***REMOVED***
+}
 
-type MPLSDestination struct ***REMOVED***
+type MPLSDestination struct {
 	Labels []int
-***REMOVED***
+}
 
-func (d *MPLSDestination) Family() int ***REMOVED***
+func (d *MPLSDestination) Family() int {
 	return nl.FAMILY_MPLS
-***REMOVED***
+}
 
-func (d *MPLSDestination) Decode(buf []byte) error ***REMOVED***
+func (d *MPLSDestination) Decode(buf []byte) error {
 	d.Labels = nl.DecodeMPLSStack(buf)
 	return nil
-***REMOVED***
+}
 
-func (d *MPLSDestination) Encode() ([]byte, error) ***REMOVED***
+func (d *MPLSDestination) Encode() ([]byte, error) {
 	return nl.EncodeMPLSStack(d.Labels...), nil
-***REMOVED***
+}
 
-func (d *MPLSDestination) String() string ***REMOVED***
+func (d *MPLSDestination) String() string {
 	s := make([]string, 0, len(d.Labels))
-	for _, l := range d.Labels ***REMOVED***
+	for _, l := range d.Labels {
 		s = append(s, fmt.Sprintf("%d", l))
-	***REMOVED***
+	}
 	return strings.Join(s, "/")
-***REMOVED***
+}
 
-func (d *MPLSDestination) Equal(x Destination) bool ***REMOVED***
+func (d *MPLSDestination) Equal(x Destination) bool {
 	o, ok := x.(*MPLSDestination)
-	if !ok ***REMOVED***
+	if !ok {
 		return false
-	***REMOVED***
-	if d == nil && o == nil ***REMOVED***
+	}
+	if d == nil && o == nil {
 		return true
-	***REMOVED***
-	if d == nil || o == nil ***REMOVED***
+	}
+	if d == nil || o == nil {
 		return false
-	***REMOVED***
-	if d.Labels == nil && o.Labels == nil ***REMOVED***
+	}
+	if d.Labels == nil && o.Labels == nil {
 		return true
-	***REMOVED***
-	if d.Labels == nil || o.Labels == nil ***REMOVED***
+	}
+	if d.Labels == nil || o.Labels == nil {
 		return false
-	***REMOVED***
-	if len(d.Labels) != len(o.Labels) ***REMOVED***
+	}
+	if len(d.Labels) != len(o.Labels) {
 		return false
-	***REMOVED***
-	for i := range d.Labels ***REMOVED***
-		if d.Labels[i] != o.Labels[i] ***REMOVED***
+	}
+	for i := range d.Labels {
+		if d.Labels[i] != o.Labels[i] {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}
 
-type MPLSEncap struct ***REMOVED***
+type MPLSEncap struct {
 	Labels []int
-***REMOVED***
+}
 
-func (e *MPLSEncap) Type() int ***REMOVED***
+func (e *MPLSEncap) Type() int {
 	return nl.LWTUNNEL_ENCAP_MPLS
-***REMOVED***
+}
 
-func (e *MPLSEncap) Decode(buf []byte) error ***REMOVED***
-	if len(buf) < 4 ***REMOVED***
+func (e *MPLSEncap) Decode(buf []byte) error {
+	if len(buf) < 4 {
 		return fmt.Errorf("Lack of bytes")
-	***REMOVED***
+	}
 	native := nl.NativeEndian()
 	l := native.Uint16(buf)
-	if len(buf) < int(l) ***REMOVED***
+	if len(buf) < int(l) {
 		return fmt.Errorf("Lack of bytes")
-	***REMOVED***
+	}
 	buf = buf[:l]
 	typ := native.Uint16(buf[2:])
-	if typ != nl.MPLS_IPTUNNEL_DST ***REMOVED***
+	if typ != nl.MPLS_IPTUNNEL_DST {
 		return fmt.Errorf("Unknown MPLS Encap Type: %d", typ)
-	***REMOVED***
+	}
 	e.Labels = nl.DecodeMPLSStack(buf[4:])
 	return nil
-***REMOVED***
+}
 
-func (e *MPLSEncap) Encode() ([]byte, error) ***REMOVED***
+func (e *MPLSEncap) Encode() ([]byte, error) {
 	s := nl.EncodeMPLSStack(e.Labels...)
 	native := nl.NativeEndian()
 	hdr := make([]byte, 4)
 	native.PutUint16(hdr, uint16(len(s)+4))
 	native.PutUint16(hdr[2:], nl.MPLS_IPTUNNEL_DST)
 	return append(hdr, s...), nil
-***REMOVED***
+}
 
-func (e *MPLSEncap) String() string ***REMOVED***
+func (e *MPLSEncap) String() string {
 	s := make([]string, 0, len(e.Labels))
-	for _, l := range e.Labels ***REMOVED***
+	for _, l := range e.Labels {
 		s = append(s, fmt.Sprintf("%d", l))
-	***REMOVED***
+	}
 	return strings.Join(s, "/")
-***REMOVED***
+}
 
-func (e *MPLSEncap) Equal(x Encap) bool ***REMOVED***
+func (e *MPLSEncap) Equal(x Encap) bool {
 	o, ok := x.(*MPLSEncap)
-	if !ok ***REMOVED***
+	if !ok {
 		return false
-	***REMOVED***
-	if e == nil && o == nil ***REMOVED***
+	}
+	if e == nil && o == nil {
 		return true
-	***REMOVED***
-	if e == nil || o == nil ***REMOVED***
+	}
+	if e == nil || o == nil {
 		return false
-	***REMOVED***
-	if e.Labels == nil && o.Labels == nil ***REMOVED***
+	}
+	if e.Labels == nil && o.Labels == nil {
 		return true
-	***REMOVED***
-	if e.Labels == nil || o.Labels == nil ***REMOVED***
+	}
+	if e.Labels == nil || o.Labels == nil {
 		return false
-	***REMOVED***
-	if len(e.Labels) != len(o.Labels) ***REMOVED***
+	}
+	if len(e.Labels) != len(o.Labels) {
 		return false
-	***REMOVED***
-	for i := range e.Labels ***REMOVED***
-		if e.Labels[i] != o.Labels[i] ***REMOVED***
+	}
+	for i := range e.Labels {
+		if e.Labels[i] != o.Labels[i] {
 			return false
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return true
-***REMOVED***
+}
 
 // RouteAdd will add a route to the system.
 // Equivalent to: `ip route add $route`
-func RouteAdd(route *Route) error ***REMOVED***
+func RouteAdd(route *Route) error {
 	return pkgHandle.RouteAdd(route)
-***REMOVED***
+}
 
 // RouteAdd will add a route to the system.
 // Equivalent to: `ip route add $route`
-func (h *Handle) RouteAdd(route *Route) error ***REMOVED***
+func (h *Handle) RouteAdd(route *Route) error {
 	flags := syscall.NLM_F_CREATE | syscall.NLM_F_EXCL | syscall.NLM_F_ACK
 	req := h.newNetlinkRequest(syscall.RTM_NEWROUTE, flags)
 	return h.routeHandle(route, req, nl.NewRtMsg())
-***REMOVED***
+}
 
 // RouteReplace will add a route to the system.
 // Equivalent to: `ip route replace $route`
-func RouteReplace(route *Route) error ***REMOVED***
+func RouteReplace(route *Route) error {
 	return pkgHandle.RouteReplace(route)
-***REMOVED***
+}
 
 // RouteReplace will add a route to the system.
 // Equivalent to: `ip route replace $route`
-func (h *Handle) RouteReplace(route *Route) error ***REMOVED***
+func (h *Handle) RouteReplace(route *Route) error {
 	flags := syscall.NLM_F_CREATE | syscall.NLM_F_REPLACE | syscall.NLM_F_ACK
 	req := h.newNetlinkRequest(syscall.RTM_NEWROUTE, flags)
 	return h.routeHandle(route, req, nl.NewRtMsg())
-***REMOVED***
+}
 
 // RouteDel will delete a route from the system.
 // Equivalent to: `ip route del $route`
-func RouteDel(route *Route) error ***REMOVED***
+func RouteDel(route *Route) error {
 	return pkgHandle.RouteDel(route)
-***REMOVED***
+}
 
 // RouteDel will delete a route from the system.
 // Equivalent to: `ip route del $route`
-func (h *Handle) RouteDel(route *Route) error ***REMOVED***
+func (h *Handle) RouteDel(route *Route) error {
 	req := h.newNetlinkRequest(syscall.RTM_DELROUTE, syscall.NLM_F_ACK)
 	return h.routeHandle(route, req, nl.NewRtDelMsg())
-***REMOVED***
+}
 
-func (h *Handle) routeHandle(route *Route, req *nl.NetlinkRequest, msg *nl.RtMsg) error ***REMOVED***
-	if (route.Dst == nil || route.Dst.IP == nil) && route.Src == nil && route.Gw == nil && route.MPLSDst == nil ***REMOVED***
+func (h *Handle) routeHandle(route *Route, req *nl.NetlinkRequest, msg *nl.RtMsg) error {
+	if (route.Dst == nil || route.Dst.IP == nil) && route.Src == nil && route.Gw == nil && route.MPLSDst == nil {
 		return fmt.Errorf("one of Dst.IP, Src, or Gw must not be nil")
-	***REMOVED***
+	}
 
 	family := -1
 	var rtAttrs []*nl.RtAttr
 
-	if route.Dst != nil && route.Dst.IP != nil ***REMOVED***
+	if route.Dst != nil && route.Dst.IP != nil {
 		dstLen, _ := route.Dst.Mask.Size()
 		msg.Dst_len = uint8(dstLen)
 		dstFamily := nl.GetIPFamily(route.Dst.IP)
 		family = dstFamily
 		var dstData []byte
-		if dstFamily == FAMILY_V4 ***REMOVED***
+		if dstFamily == FAMILY_V4 {
 			dstData = route.Dst.IP.To4()
-		***REMOVED*** else ***REMOVED***
+		} else {
 			dstData = route.Dst.IP.To16()
-		***REMOVED***
+		}
 		rtAttrs = append(rtAttrs, nl.NewRtAttr(syscall.RTA_DST, dstData))
-	***REMOVED*** else if route.MPLSDst != nil ***REMOVED***
+	} else if route.MPLSDst != nil {
 		family = nl.FAMILY_MPLS
 		msg.Dst_len = uint8(20)
 		msg.Type = syscall.RTN_UNICAST
 		rtAttrs = append(rtAttrs, nl.NewRtAttr(syscall.RTA_DST, nl.EncodeMPLSStack(*route.MPLSDst)))
-	***REMOVED***
+	}
 
-	if route.NewDst != nil ***REMOVED***
-		if family != -1 && family != route.NewDst.Family() ***REMOVED***
+	if route.NewDst != nil {
+		if family != -1 && family != route.NewDst.Family() {
 			return fmt.Errorf("new destination and destination are not the same address family")
-		***REMOVED***
+		}
 		buf, err := route.NewDst.Encode()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		rtAttrs = append(rtAttrs, nl.NewRtAttr(nl.RTA_NEWDST, buf))
-	***REMOVED***
+	}
 
-	if route.Encap != nil ***REMOVED***
+	if route.Encap != nil {
 		buf := make([]byte, 2)
 		native.PutUint16(buf, uint16(route.Encap.Type()))
 		rtAttrs = append(rtAttrs, nl.NewRtAttr(nl.RTA_ENCAP_TYPE, buf))
 		buf, err := route.Encap.Encode()
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
+		}
 		rtAttrs = append(rtAttrs, nl.NewRtAttr(nl.RTA_ENCAP, buf))
-	***REMOVED***
+	}
 
-	if route.Src != nil ***REMOVED***
+	if route.Src != nil {
 		srcFamily := nl.GetIPFamily(route.Src)
-		if family != -1 && family != srcFamily ***REMOVED***
+		if family != -1 && family != srcFamily {
 			return fmt.Errorf("source and destination ip are not the same IP family")
-		***REMOVED***
+		}
 		family = srcFamily
 		var srcData []byte
-		if srcFamily == FAMILY_V4 ***REMOVED***
+		if srcFamily == FAMILY_V4 {
 			srcData = route.Src.To4()
-		***REMOVED*** else ***REMOVED***
+		} else {
 			srcData = route.Src.To16()
-		***REMOVED***
+		}
 		// The commonly used src ip for routes is actually PREFSRC
 		rtAttrs = append(rtAttrs, nl.NewRtAttr(syscall.RTA_PREFSRC, srcData))
-	***REMOVED***
+	}
 
-	if route.Gw != nil ***REMOVED***
+	if route.Gw != nil {
 		gwFamily := nl.GetIPFamily(route.Gw)
-		if family != -1 && family != gwFamily ***REMOVED***
+		if family != -1 && family != gwFamily {
 			return fmt.Errorf("gateway, source, and destination ip are not the same IP family")
-		***REMOVED***
+		}
 		family = gwFamily
 		var gwData []byte
-		if gwFamily == FAMILY_V4 ***REMOVED***
+		if gwFamily == FAMILY_V4 {
 			gwData = route.Gw.To4()
-		***REMOVED*** else ***REMOVED***
+		} else {
 			gwData = route.Gw.To16()
-		***REMOVED***
+		}
 		rtAttrs = append(rtAttrs, nl.NewRtAttr(syscall.RTA_GATEWAY, gwData))
-	***REMOVED***
+	}
 
-	if len(route.MultiPath) > 0 ***REMOVED***
-		buf := []byte***REMOVED******REMOVED***
-		for _, nh := range route.MultiPath ***REMOVED***
-			rtnh := &nl.RtNexthop***REMOVED***
-				RtNexthop: syscall.RtNexthop***REMOVED***
+	if len(route.MultiPath) > 0 {
+		buf := []byte{}
+		for _, nh := range route.MultiPath {
+			rtnh := &nl.RtNexthop{
+				RtNexthop: syscall.RtNexthop{
 					Hops:    uint8(nh.Hops),
 					Ifindex: int32(nh.LinkIndex),
 					Flags:   uint8(nh.Flags),
-				***REMOVED***,
-			***REMOVED***
-			children := []nl.NetlinkRequestData***REMOVED******REMOVED***
-			if nh.Gw != nil ***REMOVED***
+				},
+			}
+			children := []nl.NetlinkRequestData{}
+			if nh.Gw != nil {
 				gwFamily := nl.GetIPFamily(nh.Gw)
-				if family != -1 && family != gwFamily ***REMOVED***
+				if family != -1 && family != gwFamily {
 					return fmt.Errorf("gateway, source, and destination ip are not the same IP family")
-				***REMOVED***
-				if gwFamily == FAMILY_V4 ***REMOVED***
+				}
+				if gwFamily == FAMILY_V4 {
 					children = append(children, nl.NewRtAttr(syscall.RTA_GATEWAY, []byte(nh.Gw.To4())))
-				***REMOVED*** else ***REMOVED***
+				} else {
 					children = append(children, nl.NewRtAttr(syscall.RTA_GATEWAY, []byte(nh.Gw.To16())))
-				***REMOVED***
-			***REMOVED***
-			if nh.NewDst != nil ***REMOVED***
-				if family != -1 && family != nh.NewDst.Family() ***REMOVED***
+				}
+			}
+			if nh.NewDst != nil {
+				if family != -1 && family != nh.NewDst.Family() {
 					return fmt.Errorf("new destination and destination are not the same address family")
-				***REMOVED***
+				}
 				buf, err := nh.NewDst.Encode()
-				if err != nil ***REMOVED***
+				if err != nil {
 					return err
-				***REMOVED***
+				}
 				children = append(children, nl.NewRtAttr(nl.RTA_NEWDST, buf))
-			***REMOVED***
-			if nh.Encap != nil ***REMOVED***
+			}
+			if nh.Encap != nil {
 				buf := make([]byte, 2)
 				native.PutUint16(buf, uint16(nh.Encap.Type()))
 				rtAttrs = append(rtAttrs, nl.NewRtAttr(nl.RTA_ENCAP_TYPE, buf))
 				buf, err := nh.Encap.Encode()
-				if err != nil ***REMOVED***
+				if err != nil {
 					return err
-				***REMOVED***
+				}
 				children = append(children, nl.NewRtAttr(nl.RTA_ENCAP, buf))
-			***REMOVED***
+			}
 			rtnh.Children = children
 			buf = append(buf, rtnh.Serialize()...)
-		***REMOVED***
+		}
 		rtAttrs = append(rtAttrs, nl.NewRtAttr(syscall.RTA_MULTIPATH, buf))
-	***REMOVED***
+	}
 
-	if route.Table > 0 ***REMOVED***
-		if route.Table >= 256 ***REMOVED***
+	if route.Table > 0 {
+		if route.Table >= 256 {
 			msg.Table = syscall.RT_TABLE_UNSPEC
 			b := make([]byte, 4)
 			native.PutUint32(b, uint32(route.Table))
 			rtAttrs = append(rtAttrs, nl.NewRtAttr(syscall.RTA_TABLE, b))
-		***REMOVED*** else ***REMOVED***
+		} else {
 			msg.Table = uint8(route.Table)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if route.Priority > 0 ***REMOVED***
+	if route.Priority > 0 {
 		b := make([]byte, 4)
 		native.PutUint32(b, uint32(route.Priority))
 		rtAttrs = append(rtAttrs, nl.NewRtAttr(syscall.RTA_PRIORITY, b))
-	***REMOVED***
-	if route.Tos > 0 ***REMOVED***
+	}
+	if route.Tos > 0 {
 		msg.Tos = uint8(route.Tos)
-	***REMOVED***
-	if route.Protocol > 0 ***REMOVED***
+	}
+	if route.Protocol > 0 {
 		msg.Protocol = uint8(route.Protocol)
-	***REMOVED***
-	if route.Type > 0 ***REMOVED***
+	}
+	if route.Type > 0 {
 		msg.Type = uint8(route.Type)
-	***REMOVED***
+	}
 
 	msg.Flags = uint32(route.Flags)
 	msg.Scope = uint8(route.Scope)
 	msg.Family = uint8(family)
 	req.AddData(msg)
-	for _, attr := range rtAttrs ***REMOVED***
+	for _, attr := range rtAttrs {
 		req.AddData(attr)
-	***REMOVED***
+	}
 
 	var (
 		b      = make([]byte, 4)
@@ -398,65 +398,65 @@ func (h *Handle) routeHandle(route *Route, req *nl.NetlinkRequest, msg *nl.RtMsg
 
 	_, err := req.Execute(syscall.NETLINK_ROUTE, 0)
 	return err
-***REMOVED***
+}
 
 // RouteList gets a list of routes in the system.
 // Equivalent to: `ip route show`.
 // The list can be filtered by link and ip family.
-func RouteList(link Link, family int) ([]Route, error) ***REMOVED***
+func RouteList(link Link, family int) ([]Route, error) {
 	return pkgHandle.RouteList(link, family)
-***REMOVED***
+}
 
 // RouteList gets a list of routes in the system.
 // Equivalent to: `ip route show`.
 // The list can be filtered by link and ip family.
-func (h *Handle) RouteList(link Link, family int) ([]Route, error) ***REMOVED***
+func (h *Handle) RouteList(link Link, family int) ([]Route, error) {
 	var routeFilter *Route
-	if link != nil ***REMOVED***
-		routeFilter = &Route***REMOVED***
+	if link != nil {
+		routeFilter = &Route{
 			LinkIndex: link.Attrs().Index,
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return h.RouteListFiltered(family, routeFilter, RT_FILTER_OIF)
-***REMOVED***
+}
 
 // RouteListFiltered gets a list of routes in the system filtered with specified rules.
 // All rules must be defined in RouteFilter struct
-func RouteListFiltered(family int, filter *Route, filterMask uint64) ([]Route, error) ***REMOVED***
+func RouteListFiltered(family int, filter *Route, filterMask uint64) ([]Route, error) {
 	return pkgHandle.RouteListFiltered(family, filter, filterMask)
-***REMOVED***
+}
 
 // RouteListFiltered gets a list of routes in the system filtered with specified rules.
 // All rules must be defined in RouteFilter struct
-func (h *Handle) RouteListFiltered(family int, filter *Route, filterMask uint64) ([]Route, error) ***REMOVED***
+func (h *Handle) RouteListFiltered(family int, filter *Route, filterMask uint64) ([]Route, error) {
 	req := h.newNetlinkRequest(syscall.RTM_GETROUTE, syscall.NLM_F_DUMP)
 	infmsg := nl.NewIfInfomsg(family)
 	req.AddData(infmsg)
 
 	msgs, err := req.Execute(syscall.NETLINK_ROUTE, syscall.RTM_NEWROUTE)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	var res []Route
-	for _, m := range msgs ***REMOVED***
+	for _, m := range msgs {
 		msg := nl.DeserializeRtMsg(m)
-		if msg.Flags&syscall.RTM_F_CLONED != 0 ***REMOVED***
+		if msg.Flags&syscall.RTM_F_CLONED != 0 {
 			// Ignore cloned routes
 			continue
-		***REMOVED***
-		if msg.Table != syscall.RT_TABLE_MAIN ***REMOVED***
-			if filter == nil || filter != nil && filterMask&RT_FILTER_TABLE == 0 ***REMOVED***
+		}
+		if msg.Table != syscall.RT_TABLE_MAIN {
+			if filter == nil || filter != nil && filterMask&RT_FILTER_TABLE == 0 {
 				// Ignore non-main tables
 				continue
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		route, err := deserializeRoute(m)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
-		if filter != nil ***REMOVED***
-			switch ***REMOVED***
+		}
+		if filter != nil {
+			switch {
 			case filterMask&RT_FILTER_TABLE != 0 && filter.Table != syscall.RT_TABLE_UNSPEC && route.Table != filter.Table:
 				continue
 			case filterMask&RT_FILTER_PROTOCOL != 0 && route.Protocol != filter.Protocol:
@@ -476,55 +476,55 @@ func (h *Handle) RouteListFiltered(family int, filter *Route, filterMask uint64)
 			case filterMask&RT_FILTER_SRC != 0 && !route.Src.Equal(filter.Src):
 				continue
 			case filterMask&RT_FILTER_DST != 0:
-				if filter.MPLSDst == nil || route.MPLSDst == nil || (*filter.MPLSDst) != (*route.MPLSDst) ***REMOVED***
-					if !ipNetEqual(route.Dst, filter.Dst) ***REMOVED***
+				if filter.MPLSDst == nil || route.MPLSDst == nil || (*filter.MPLSDst) != (*route.MPLSDst) {
+					if !ipNetEqual(route.Dst, filter.Dst) {
 						continue
-					***REMOVED***
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
+					}
+				}
+			}
+		}
 		res = append(res, route)
-	***REMOVED***
+	}
 	return res, nil
-***REMOVED***
+}
 
 // deserializeRoute decodes a binary netlink message into a Route struct
-func deserializeRoute(m []byte) (Route, error) ***REMOVED***
+func deserializeRoute(m []byte) (Route, error) {
 	msg := nl.DeserializeRtMsg(m)
 	attrs, err := nl.ParseRouteAttr(m[msg.Len():])
-	if err != nil ***REMOVED***
-		return Route***REMOVED******REMOVED***, err
-	***REMOVED***
-	route := Route***REMOVED***
+	if err != nil {
+		return Route{}, err
+	}
+	route := Route{
 		Scope:    Scope(msg.Scope),
 		Protocol: int(msg.Protocol),
 		Table:    int(msg.Table),
 		Type:     int(msg.Type),
 		Tos:      int(msg.Tos),
 		Flags:    int(msg.Flags),
-	***REMOVED***
+	}
 
 	native := nl.NativeEndian()
 	var encap, encapType syscall.NetlinkRouteAttr
-	for _, attr := range attrs ***REMOVED***
-		switch attr.Attr.Type ***REMOVED***
+	for _, attr := range attrs {
+		switch attr.Attr.Type {
 		case syscall.RTA_GATEWAY:
 			route.Gw = net.IP(attr.Value)
 		case syscall.RTA_PREFSRC:
 			route.Src = net.IP(attr.Value)
 		case syscall.RTA_DST:
-			if msg.Family == nl.FAMILY_MPLS ***REMOVED***
+			if msg.Family == nl.FAMILY_MPLS {
 				stack := nl.DecodeMPLSStack(attr.Value)
-				if len(stack) == 0 || len(stack) > 1 ***REMOVED***
+				if len(stack) == 0 || len(stack) > 1 {
 					return route, fmt.Errorf("invalid MPLS RTA_DST")
-				***REMOVED***
+				}
 				route.MPLSDst = &stack[0]
-			***REMOVED*** else ***REMOVED***
-				route.Dst = &net.IPNet***REMOVED***
+			} else {
+				route.Dst = &net.IPNet{
 					IP:   attr.Value,
 					Mask: net.CIDRMask(int(msg.Dst_len), 8*len(attr.Value)),
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 		case syscall.RTA_OIF:
 			route.LinkIndex = int(native.Uint32(attr.Value[0:4]))
 		case syscall.RTA_IIF:
@@ -534,123 +534,123 @@ func deserializeRoute(m []byte) (Route, error) ***REMOVED***
 		case syscall.RTA_TABLE:
 			route.Table = int(native.Uint32(attr.Value[0:4]))
 		case syscall.RTA_MULTIPATH:
-			parseRtNexthop := func(value []byte) (*NexthopInfo, []byte, error) ***REMOVED***
-				if len(value) < syscall.SizeofRtNexthop ***REMOVED***
+			parseRtNexthop := func(value []byte) (*NexthopInfo, []byte, error) {
+				if len(value) < syscall.SizeofRtNexthop {
 					return nil, nil, fmt.Errorf("Lack of bytes")
-				***REMOVED***
+				}
 				nh := nl.DeserializeRtNexthop(value)
-				if len(value) < int(nh.RtNexthop.Len) ***REMOVED***
+				if len(value) < int(nh.RtNexthop.Len) {
 					return nil, nil, fmt.Errorf("Lack of bytes")
-				***REMOVED***
-				info := &NexthopInfo***REMOVED***
+				}
+				info := &NexthopInfo{
 					LinkIndex: int(nh.RtNexthop.Ifindex),
 					Hops:      int(nh.RtNexthop.Hops),
 					Flags:     int(nh.RtNexthop.Flags),
-				***REMOVED***
+				}
 				attrs, err := nl.ParseRouteAttr(value[syscall.SizeofRtNexthop:int(nh.RtNexthop.Len)])
-				if err != nil ***REMOVED***
+				if err != nil {
 					return nil, nil, err
-				***REMOVED***
+				}
 				var encap, encapType syscall.NetlinkRouteAttr
-				for _, attr := range attrs ***REMOVED***
-					switch attr.Attr.Type ***REMOVED***
+				for _, attr := range attrs {
+					switch attr.Attr.Type {
 					case syscall.RTA_GATEWAY:
 						info.Gw = net.IP(attr.Value)
 					case nl.RTA_NEWDST:
 						var d Destination
-						switch msg.Family ***REMOVED***
+						switch msg.Family {
 						case nl.FAMILY_MPLS:
-							d = &MPLSDestination***REMOVED******REMOVED***
-						***REMOVED***
-						if err := d.Decode(attr.Value); err != nil ***REMOVED***
+							d = &MPLSDestination{}
+						}
+						if err := d.Decode(attr.Value); err != nil {
 							return nil, nil, err
-						***REMOVED***
+						}
 						info.NewDst = d
 					case nl.RTA_ENCAP_TYPE:
 						encapType = attr
 					case nl.RTA_ENCAP:
 						encap = attr
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 
-				if len(encap.Value) != 0 && len(encapType.Value) != 0 ***REMOVED***
+				if len(encap.Value) != 0 && len(encapType.Value) != 0 {
 					typ := int(native.Uint16(encapType.Value[0:2]))
 					var e Encap
-					switch typ ***REMOVED***
+					switch typ {
 					case nl.LWTUNNEL_ENCAP_MPLS:
-						e = &MPLSEncap***REMOVED******REMOVED***
-						if err := e.Decode(encap.Value); err != nil ***REMOVED***
+						e = &MPLSEncap{}
+						if err := e.Decode(encap.Value); err != nil {
 							return nil, nil, err
-						***REMOVED***
-					***REMOVED***
+						}
+					}
 					info.Encap = e
-				***REMOVED***
+				}
 
 				return info, value[int(nh.RtNexthop.Len):], nil
-			***REMOVED***
+			}
 			rest := attr.Value
-			for len(rest) > 0 ***REMOVED***
+			for len(rest) > 0 {
 				info, buf, err := parseRtNexthop(rest)
-				if err != nil ***REMOVED***
+				if err != nil {
 					return route, err
-				***REMOVED***
+				}
 				route.MultiPath = append(route.MultiPath, info)
 				rest = buf
-			***REMOVED***
+			}
 		case nl.RTA_NEWDST:
 			var d Destination
-			switch msg.Family ***REMOVED***
+			switch msg.Family {
 			case nl.FAMILY_MPLS:
-				d = &MPLSDestination***REMOVED******REMOVED***
-			***REMOVED***
-			if err := d.Decode(attr.Value); err != nil ***REMOVED***
+				d = &MPLSDestination{}
+			}
+			if err := d.Decode(attr.Value); err != nil {
 				return route, err
-			***REMOVED***
+			}
 			route.NewDst = d
 		case nl.RTA_ENCAP_TYPE:
 			encapType = attr
 		case nl.RTA_ENCAP:
 			encap = attr
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if len(encap.Value) != 0 && len(encapType.Value) != 0 ***REMOVED***
+	if len(encap.Value) != 0 && len(encapType.Value) != 0 {
 		typ := int(native.Uint16(encapType.Value[0:2]))
 		var e Encap
-		switch typ ***REMOVED***
+		switch typ {
 		case nl.LWTUNNEL_ENCAP_MPLS:
-			e = &MPLSEncap***REMOVED******REMOVED***
-			if err := e.Decode(encap.Value); err != nil ***REMOVED***
+			e = &MPLSEncap{}
+			if err := e.Decode(encap.Value); err != nil {
 				return route, err
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		route.Encap = e
-	***REMOVED***
+	}
 
 	return route, nil
-***REMOVED***
+}
 
 // RouteGet gets a route to a specific destination from the host system.
 // Equivalent to: 'ip route get'.
-func RouteGet(destination net.IP) ([]Route, error) ***REMOVED***
+func RouteGet(destination net.IP) ([]Route, error) {
 	return pkgHandle.RouteGet(destination)
-***REMOVED***
+}
 
 // RouteGet gets a route to a specific destination from the host system.
 // Equivalent to: 'ip route get'.
-func (h *Handle) RouteGet(destination net.IP) ([]Route, error) ***REMOVED***
+func (h *Handle) RouteGet(destination net.IP) ([]Route, error) {
 	req := h.newNetlinkRequest(syscall.RTM_GETROUTE, syscall.NLM_F_REQUEST)
 	family := nl.GetIPFamily(destination)
 	var destinationData []byte
 	var bitlen uint8
-	if family == FAMILY_V4 ***REMOVED***
+	if family == FAMILY_V4 {
 		destinationData = destination.To4()
 		bitlen = 32
-	***REMOVED*** else ***REMOVED***
+	} else {
 		destinationData = destination.To16()
 		bitlen = 128
-	***REMOVED***
-	msg := &nl.RtMsg***REMOVED******REMOVED***
+	}
+	msg := &nl.RtMsg{}
 	msg.Family = uint8(family)
 	msg.Dst_len = bitlen
 	req.AddData(msg)
@@ -659,85 +659,85 @@ func (h *Handle) RouteGet(destination net.IP) ([]Route, error) ***REMOVED***
 	req.AddData(rtaDst)
 
 	msgs, err := req.Execute(syscall.NETLINK_ROUTE, syscall.RTM_NEWROUTE)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	var res []Route
-	for _, m := range msgs ***REMOVED***
+	for _, m := range msgs {
 		route, err := deserializeRoute(m)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 		res = append(res, route)
-	***REMOVED***
+	}
 	return res, nil
 
-***REMOVED***
+}
 
 // RouteSubscribe takes a chan down which notifications will be sent
 // when routes are added or deleted. Close the 'done' chan to stop subscription.
-func RouteSubscribe(ch chan<- RouteUpdate, done <-chan struct***REMOVED******REMOVED***) error ***REMOVED***
+func RouteSubscribe(ch chan<- RouteUpdate, done <-chan struct{}) error {
 	return routeSubscribeAt(netns.None(), netns.None(), ch, done, nil)
-***REMOVED***
+}
 
 // RouteSubscribeAt works like RouteSubscribe plus it allows the caller
 // to choose the network namespace in which to subscribe (ns).
-func RouteSubscribeAt(ns netns.NsHandle, ch chan<- RouteUpdate, done <-chan struct***REMOVED******REMOVED***) error ***REMOVED***
+func RouteSubscribeAt(ns netns.NsHandle, ch chan<- RouteUpdate, done <-chan struct{}) error {
 	return routeSubscribeAt(ns, netns.None(), ch, done, nil)
-***REMOVED***
+}
 
 // RouteSubscribeOptions contains a set of options to use with
 // RouteSubscribeWithOptions.
-type RouteSubscribeOptions struct ***REMOVED***
+type RouteSubscribeOptions struct {
 	Namespace     *netns.NsHandle
 	ErrorCallback func(error)
-***REMOVED***
+}
 
 // RouteSubscribeWithOptions work like RouteSubscribe but enable to
 // provide additional options to modify the behavior. Currently, the
 // namespace can be provided as well as an error callback.
-func RouteSubscribeWithOptions(ch chan<- RouteUpdate, done <-chan struct***REMOVED******REMOVED***, options RouteSubscribeOptions) error ***REMOVED***
-	if options.Namespace == nil ***REMOVED***
+func RouteSubscribeWithOptions(ch chan<- RouteUpdate, done <-chan struct{}, options RouteSubscribeOptions) error {
+	if options.Namespace == nil {
 		none := netns.None()
 		options.Namespace = &none
-	***REMOVED***
+	}
 	return routeSubscribeAt(*options.Namespace, netns.None(), ch, done, options.ErrorCallback)
-***REMOVED***
+}
 
-func routeSubscribeAt(newNs, curNs netns.NsHandle, ch chan<- RouteUpdate, done <-chan struct***REMOVED******REMOVED***, cberr func(error)) error ***REMOVED***
+func routeSubscribeAt(newNs, curNs netns.NsHandle, ch chan<- RouteUpdate, done <-chan struct{}, cberr func(error)) error {
 	s, err := nl.SubscribeAt(newNs, curNs, syscall.NETLINK_ROUTE, syscall.RTNLGRP_IPV4_ROUTE, syscall.RTNLGRP_IPV6_ROUTE)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
-	if done != nil ***REMOVED***
-		go func() ***REMOVED***
+	}
+	if done != nil {
+		go func() {
 			<-done
 			s.Close()
-		***REMOVED***()
-	***REMOVED***
-	go func() ***REMOVED***
+		}()
+	}
+	go func() {
 		defer close(ch)
-		for ***REMOVED***
+		for {
 			msgs, err := s.Receive()
-			if err != nil ***REMOVED***
-				if cberr != nil ***REMOVED***
+			if err != nil {
+				if cberr != nil {
 					cberr(err)
-				***REMOVED***
+				}
 				return
-			***REMOVED***
-			for _, m := range msgs ***REMOVED***
+			}
+			for _, m := range msgs {
 				route, err := deserializeRoute(m.Data)
-				if err != nil ***REMOVED***
-					if cberr != nil ***REMOVED***
+				if err != nil {
+					if cberr != nil {
 						cberr(err)
-					***REMOVED***
+					}
 					return
-				***REMOVED***
-				ch <- RouteUpdate***REMOVED***Type: m.Header.Type, Route: route***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***()
+				}
+				ch <- RouteUpdate{Type: m.Header.Type, Route: route}
+			}
+		}
+	}()
 
 	return nil
-***REMOVED***
+}

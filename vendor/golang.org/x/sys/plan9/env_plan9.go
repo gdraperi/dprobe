@@ -10,22 +10,22 @@ import (
 	"syscall"
 )
 
-func Getenv(key string) (value string, found bool) ***REMOVED***
+func Getenv(key string) (value string, found bool) {
 	return syscall.Getenv(key)
-***REMOVED***
+}
 
-func Setenv(key, value string) error ***REMOVED***
+func Setenv(key, value string) error {
 	return syscall.Setenv(key, value)
-***REMOVED***
+}
 
-func Clearenv() ***REMOVED***
+func Clearenv() {
 	syscall.Clearenv()
-***REMOVED***
+}
 
-func Environ() []string ***REMOVED***
+func Environ() []string {
 	return syscall.Environ()
-***REMOVED***
+}
 
-func Unsetenv(key string) error ***REMOVED***
+func Unsetenv(key string) error {
 	return syscall.Unsetenv(key)
-***REMOVED***
+}

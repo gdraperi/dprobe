@@ -33,12 +33,12 @@ var (
 	iBytes                = []byte("i")
 	trueBytes             = []byte("true")
 	falseBytes            = []byte("false")
-	interfaceBytes        = []byte("(interface ***REMOVED******REMOVED***)")
+	interfaceBytes        = []byte("(interface {})")
 	commaNewlineBytes     = []byte(",\n")
 	newlineBytes          = []byte("\n")
-	openBraceBytes        = []byte("***REMOVED***")
-	openBraceNewlineBytes = []byte("***REMOVED***\n")
-	closeBraceBytes       = []byte("***REMOVED***")
+	openBraceBytes        = []byte("{")
+	openBraceNewlineBytes = []byte("{\n")
+	closeBraceBytes       = []byte("}")
 	asteriskBytes         = []byte("*")
 	colonBytes            = []byte(":")
 	colonSpaceBytes       = []byte(": ")
@@ -69,33 +69,33 @@ var hexDigits = "0123456789abcdef"
 
 // catchPanic handles any panics that might occur during the handleMethods
 // calls.
-func catchPanic(w io.Writer, v reflect.Value) ***REMOVED***
-	if err := recover(); err != nil ***REMOVED***
+func catchPanic(w io.Writer, v reflect.Value) {
+	if err := recover(); err != nil {
 		w.Write(panicBytes)
 		fmt.Fprintf(w, "%v", err)
 		w.Write(closeParenBytes)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // handleMethods attempts to call the Error and String methods on the underlying
 // type the passed reflect.Value represents and outputes the result to Writer w.
 //
 // It handles panics in any called methods by catching and displaying the error
 // as the formatted value.
-func handleMethods(cs *ConfigState, w io.Writer, v reflect.Value) (handled bool) ***REMOVED***
+func handleMethods(cs *ConfigState, w io.Writer, v reflect.Value) (handled bool) {
 	// We need an interface to check if the type implements the error or
 	// Stringer interface.  However, the reflect package won't give us an
 	// interface on certain things like unexported struct fields in order
 	// to enforce visibility rules.  We use unsafe, when it's available,
 	// to bypass these restrictions since this package does not mutate the
 	// values.
-	if !v.CanInterface() ***REMOVED***
-		if UnsafeDisabled ***REMOVED***
+	if !v.CanInterface() {
+		if UnsafeDisabled {
 			return false
-		***REMOVED***
+		}
 
 		v = unsafeReflectValue(v)
-	***REMOVED***
+	}
 
 	// Choose whether or not to do error and Stringer interface lookups against
 	// the base type or a pointer to the base type depending on settings.
@@ -103,92 +103,92 @@ func handleMethods(cs *ConfigState, w io.Writer, v reflect.Value) (handled bool)
 	// mutate the value, however, types which choose to satisify an error or
 	// Stringer interface with a pointer receiver should not be mutating their
 	// state inside these interface methods.
-	if !cs.DisablePointerMethods && !UnsafeDisabled && !v.CanAddr() ***REMOVED***
+	if !cs.DisablePointerMethods && !UnsafeDisabled && !v.CanAddr() {
 		v = unsafeReflectValue(v)
-	***REMOVED***
-	if v.CanAddr() ***REMOVED***
+	}
+	if v.CanAddr() {
 		v = v.Addr()
-	***REMOVED***
+	}
 
 	// Is it an error or Stringer?
-	switch iface := v.Interface().(type) ***REMOVED***
+	switch iface := v.Interface().(type) {
 	case error:
 		defer catchPanic(w, v)
-		if cs.ContinueOnMethod ***REMOVED***
+		if cs.ContinueOnMethod {
 			w.Write(openParenBytes)
 			w.Write([]byte(iface.Error()))
 			w.Write(closeParenBytes)
 			w.Write(spaceBytes)
 			return false
-		***REMOVED***
+		}
 
 		w.Write([]byte(iface.Error()))
 		return true
 
 	case fmt.Stringer:
 		defer catchPanic(w, v)
-		if cs.ContinueOnMethod ***REMOVED***
+		if cs.ContinueOnMethod {
 			w.Write(openParenBytes)
 			w.Write([]byte(iface.String()))
 			w.Write(closeParenBytes)
 			w.Write(spaceBytes)
 			return false
-		***REMOVED***
+		}
 		w.Write([]byte(iface.String()))
 		return true
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
 // printBool outputs a boolean value as true or false to Writer w.
-func printBool(w io.Writer, val bool) ***REMOVED***
-	if val ***REMOVED***
+func printBool(w io.Writer, val bool) {
+	if val {
 		w.Write(trueBytes)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		w.Write(falseBytes)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // printInt outputs a signed integer value to Writer w.
-func printInt(w io.Writer, val int64, base int) ***REMOVED***
+func printInt(w io.Writer, val int64, base int) {
 	w.Write([]byte(strconv.FormatInt(val, base)))
-***REMOVED***
+}
 
 // printUint outputs an unsigned integer value to Writer w.
-func printUint(w io.Writer, val uint64, base int) ***REMOVED***
+func printUint(w io.Writer, val uint64, base int) {
 	w.Write([]byte(strconv.FormatUint(val, base)))
-***REMOVED***
+}
 
 // printFloat outputs a floating point value using the specified precision,
 // which is expected to be 32 or 64bit, to Writer w.
-func printFloat(w io.Writer, val float64, precision int) ***REMOVED***
+func printFloat(w io.Writer, val float64, precision int) {
 	w.Write([]byte(strconv.FormatFloat(val, 'g', -1, precision)))
-***REMOVED***
+}
 
 // printComplex outputs a complex value using the specified float precision
 // for the real and imaginary parts to Writer w.
-func printComplex(w io.Writer, c complex128, floatPrecision int) ***REMOVED***
+func printComplex(w io.Writer, c complex128, floatPrecision int) {
 	r := real(c)
 	w.Write(openParenBytes)
 	w.Write([]byte(strconv.FormatFloat(r, 'g', -1, floatPrecision)))
 	i := imag(c)
-	if i >= 0 ***REMOVED***
+	if i >= 0 {
 		w.Write(plusBytes)
-	***REMOVED***
+	}
 	w.Write([]byte(strconv.FormatFloat(i, 'g', -1, floatPrecision)))
 	w.Write(iBytes)
 	w.Write(closeParenBytes)
-***REMOVED***
+}
 
 // printHexPtr outputs a uintptr formatted as hexidecimal with a leading '0x'
 // prefix to Writer w.
-func printHexPtr(w io.Writer, p uintptr) ***REMOVED***
+func printHexPtr(w io.Writer, p uintptr) {
 	// Null pointer.
 	num := uint64(p)
-	if num == 0 ***REMOVED***
+	if num == 0 {
 		w.Write(nilAngleBytes)
 		return
-	***REMOVED***
+	}
 
 	// Max uint64 is 16 bytes in hex + 2 bytes for '0x' prefix
 	buf := make([]byte, 18)
@@ -196,11 +196,11 @@ func printHexPtr(w io.Writer, p uintptr) ***REMOVED***
 	// It's simpler to construct the hex string right to left.
 	base := uint64(16)
 	i := len(buf) - 1
-	for num >= base ***REMOVED***
+	for num >= base {
 		buf[i] = hexDigits[num%base]
 		num /= base
 		i--
-	***REMOVED***
+	}
 	buf[i] = hexDigits[num]
 
 	// Add '0x' prefix.
@@ -212,50 +212,50 @@ func printHexPtr(w io.Writer, p uintptr) ***REMOVED***
 	// Strip unused leading bytes.
 	buf = buf[i:]
 	w.Write(buf)
-***REMOVED***
+}
 
 // valuesSorter implements sort.Interface to allow a slice of reflect.Value
 // elements to be sorted.
-type valuesSorter struct ***REMOVED***
+type valuesSorter struct {
 	values  []reflect.Value
 	strings []string // either nil or same len and values
 	cs      *ConfigState
-***REMOVED***
+}
 
 // newValuesSorter initializes a valuesSorter instance, which holds a set of
 // surrogate keys on which the data should be sorted.  It uses flags in
 // ConfigState to decide if and how to populate those surrogate keys.
-func newValuesSorter(values []reflect.Value, cs *ConfigState) sort.Interface ***REMOVED***
-	vs := &valuesSorter***REMOVED***values: values, cs: cs***REMOVED***
-	if canSortSimply(vs.values[0].Kind()) ***REMOVED***
+func newValuesSorter(values []reflect.Value, cs *ConfigState) sort.Interface {
+	vs := &valuesSorter{values: values, cs: cs}
+	if canSortSimply(vs.values[0].Kind()) {
 		return vs
-	***REMOVED***
-	if !cs.DisableMethods ***REMOVED***
+	}
+	if !cs.DisableMethods {
 		vs.strings = make([]string, len(values))
-		for i := range vs.values ***REMOVED***
-			b := bytes.Buffer***REMOVED******REMOVED***
-			if !handleMethods(cs, &b, vs.values[i]) ***REMOVED***
+		for i := range vs.values {
+			b := bytes.Buffer{}
+			if !handleMethods(cs, &b, vs.values[i]) {
 				vs.strings = nil
 				break
-			***REMOVED***
+			}
 			vs.strings[i] = b.String()
-		***REMOVED***
-	***REMOVED***
-	if vs.strings == nil && cs.SpewKeys ***REMOVED***
+		}
+	}
+	if vs.strings == nil && cs.SpewKeys {
 		vs.strings = make([]string, len(values))
-		for i := range vs.values ***REMOVED***
+		for i := range vs.values {
 			vs.strings[i] = Sprintf("%#v", vs.values[i].Interface())
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return vs
-***REMOVED***
+}
 
 // canSortSimply tests whether a reflect.Kind is a primitive that can be sorted
 // directly, or whether it should be considered for sorting by surrogate keys
 // (if the ConfigState allows it).
-func canSortSimply(kind reflect.Kind) bool ***REMOVED***
+func canSortSimply(kind reflect.Kind) bool {
 	// This switch parallels valueSortLess, except for the default case.
-	switch kind ***REMOVED***
+	switch kind {
 	case reflect.Bool:
 		return true
 	case reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Int:
@@ -270,30 +270,30 @@ func canSortSimply(kind reflect.Kind) bool ***REMOVED***
 		return true
 	case reflect.Array:
 		return true
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}
 
 // Len returns the number of values in the slice.  It is part of the
 // sort.Interface implementation.
-func (s *valuesSorter) Len() int ***REMOVED***
+func (s *valuesSorter) Len() int {
 	return len(s.values)
-***REMOVED***
+}
 
 // Swap swaps the values at the passed indices.  It is part of the
 // sort.Interface implementation.
-func (s *valuesSorter) Swap(i, j int) ***REMOVED***
+func (s *valuesSorter) Swap(i, j int) {
 	s.values[i], s.values[j] = s.values[j], s.values[i]
-	if s.strings != nil ***REMOVED***
+	if s.strings != nil {
 		s.strings[i], s.strings[j] = s.strings[j], s.strings[i]
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // valueSortLess returns whether the first value should sort before the second
 // value.  It is used by valueSorter.Less as part of the sort.Interface
 // implementation.
-func valueSortLess(a, b reflect.Value) bool ***REMOVED***
-	switch a.Kind() ***REMOVED***
+func valueSortLess(a, b reflect.Value) bool {
+	switch a.Kind() {
 	case reflect.Bool:
 		return !a.Bool() && b.Bool()
 	case reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Int:
@@ -309,33 +309,33 @@ func valueSortLess(a, b reflect.Value) bool ***REMOVED***
 	case reflect.Array:
 		// Compare the contents of both arrays.
 		l := a.Len()
-		for i := 0; i < l; i++ ***REMOVED***
+		for i := 0; i < l; i++ {
 			av := a.Index(i)
 			bv := b.Index(i)
-			if av.Interface() == bv.Interface() ***REMOVED***
+			if av.Interface() == bv.Interface() {
 				continue
-			***REMOVED***
+			}
 			return valueSortLess(av, bv)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return a.String() < b.String()
-***REMOVED***
+}
 
 // Less returns whether the value at index i should sort before the
 // value at index j.  It is part of the sort.Interface implementation.
-func (s *valuesSorter) Less(i, j int) bool ***REMOVED***
-	if s.strings == nil ***REMOVED***
+func (s *valuesSorter) Less(i, j int) bool {
+	if s.strings == nil {
 		return valueSortLess(s.values[i], s.values[j])
-	***REMOVED***
+	}
 	return s.strings[i] < s.strings[j]
-***REMOVED***
+}
 
 // sortValues is a sort function that handles both native types and any type that
 // can be converted to error or Stringer.  Other inputs are sorted according to
 // their Value.String() value to ensure display stability.
-func sortValues(values []reflect.Value, cs *ConfigState) ***REMOVED***
-	if len(values) == 0 ***REMOVED***
+func sortValues(values []reflect.Value, cs *ConfigState) {
+	if len(values) == 0 {
 		return
-	***REMOVED***
+	}
 	sort.Sort(newValuesSorter(values, cs))
-***REMOVED***
+}

@@ -23,19 +23,19 @@ const (
 	ftSymlink
 )
 
-type fileData struct ***REMOVED***
+type fileData struct {
 	filetype fileType
 	path     string
 	contents string
 	uid      int
 	gid      int
 	mode     int
-***REMOVED***
+}
 
-func (fd fileData) creationCommand() string ***REMOVED***
+func (fd fileData) creationCommand() string {
 	var command string
 
-	switch fd.filetype ***REMOVED***
+	switch fd.filetype {
 	case ftRegular:
 		// Don't overwrite the file if it already exists!
 		command = fmt.Sprintf("if [ ! -f %s ]; then echo %q > %s; fi", fd.path, fd.contents, fd.path)
@@ -43,108 +43,108 @@ func (fd fileData) creationCommand() string ***REMOVED***
 		command = fmt.Sprintf("mkdir -p %s", fd.path)
 	case ftSymlink:
 		command = fmt.Sprintf("ln -fs %s %s", fd.contents, fd.path)
-	***REMOVED***
+	}
 
 	return command
-***REMOVED***
+}
 
-func mkFilesCommand(fds []fileData) string ***REMOVED***
+func mkFilesCommand(fds []fileData) string {
 	commands := make([]string, len(fds))
 
-	for i, fd := range fds ***REMOVED***
+	for i, fd := range fds {
 		commands[i] = fd.creationCommand()
-	***REMOVED***
+	}
 
 	return strings.Join(commands, " && ")
-***REMOVED***
+}
 
-var defaultFileData = []fileData***REMOVED***
-	***REMOVED***ftRegular, "file1", "file1", 0, 0, 0666***REMOVED***,
-	***REMOVED***ftRegular, "file2", "file2", 0, 0, 0666***REMOVED***,
-	***REMOVED***ftRegular, "file3", "file3", 0, 0, 0666***REMOVED***,
-	***REMOVED***ftRegular, "file4", "file4", 0, 0, 0666***REMOVED***,
-	***REMOVED***ftRegular, "file5", "file5", 0, 0, 0666***REMOVED***,
-	***REMOVED***ftRegular, "file6", "file6", 0, 0, 0666***REMOVED***,
-	***REMOVED***ftRegular, "file7", "file7", 0, 0, 0666***REMOVED***,
-	***REMOVED***ftDir, "dir1", "", 0, 0, 0777***REMOVED***,
-	***REMOVED***ftRegular, "dir1/file1-1", "file1-1", 0, 0, 0666***REMOVED***,
-	***REMOVED***ftRegular, "dir1/file1-2", "file1-2", 0, 0, 0666***REMOVED***,
-	***REMOVED***ftDir, "dir2", "", 0, 0, 0666***REMOVED***,
-	***REMOVED***ftRegular, "dir2/file2-1", "file2-1", 0, 0, 0666***REMOVED***,
-	***REMOVED***ftRegular, "dir2/file2-2", "file2-2", 0, 0, 0666***REMOVED***,
-	***REMOVED***ftDir, "dir3", "", 0, 0, 0666***REMOVED***,
-	***REMOVED***ftRegular, "dir3/file3-1", "file3-1", 0, 0, 0666***REMOVED***,
-	***REMOVED***ftRegular, "dir3/file3-2", "file3-2", 0, 0, 0666***REMOVED***,
-	***REMOVED***ftDir, "dir4", "", 0, 0, 0666***REMOVED***,
-	***REMOVED***ftRegular, "dir4/file3-1", "file4-1", 0, 0, 0666***REMOVED***,
-	***REMOVED***ftRegular, "dir4/file3-2", "file4-2", 0, 0, 0666***REMOVED***,
-	***REMOVED***ftDir, "dir5", "", 0, 0, 0666***REMOVED***,
-	***REMOVED***ftSymlink, "symlinkToFile1", "file1", 0, 0, 0666***REMOVED***,
-	***REMOVED***ftSymlink, "symlinkToDir1", "dir1", 0, 0, 0666***REMOVED***,
-	***REMOVED***ftSymlink, "brokenSymlinkToFileX", "fileX", 0, 0, 0666***REMOVED***,
-	***REMOVED***ftSymlink, "brokenSymlinkToDirX", "dirX", 0, 0, 0666***REMOVED***,
-	***REMOVED***ftSymlink, "symlinkToAbsDir", "/root", 0, 0, 0666***REMOVED***,
-	***REMOVED***ftDir, "permdirtest", "", 2, 2, 0700***REMOVED***,
-	***REMOVED***ftRegular, "permdirtest/permtest", "perm_test", 65534, 65534, 0400***REMOVED***,
-***REMOVED***
+var defaultFileData = []fileData{
+	{ftRegular, "file1", "file1", 0, 0, 0666},
+	{ftRegular, "file2", "file2", 0, 0, 0666},
+	{ftRegular, "file3", "file3", 0, 0, 0666},
+	{ftRegular, "file4", "file4", 0, 0, 0666},
+	{ftRegular, "file5", "file5", 0, 0, 0666},
+	{ftRegular, "file6", "file6", 0, 0, 0666},
+	{ftRegular, "file7", "file7", 0, 0, 0666},
+	{ftDir, "dir1", "", 0, 0, 0777},
+	{ftRegular, "dir1/file1-1", "file1-1", 0, 0, 0666},
+	{ftRegular, "dir1/file1-2", "file1-2", 0, 0, 0666},
+	{ftDir, "dir2", "", 0, 0, 0666},
+	{ftRegular, "dir2/file2-1", "file2-1", 0, 0, 0666},
+	{ftRegular, "dir2/file2-2", "file2-2", 0, 0, 0666},
+	{ftDir, "dir3", "", 0, 0, 0666},
+	{ftRegular, "dir3/file3-1", "file3-1", 0, 0, 0666},
+	{ftRegular, "dir3/file3-2", "file3-2", 0, 0, 0666},
+	{ftDir, "dir4", "", 0, 0, 0666},
+	{ftRegular, "dir4/file3-1", "file4-1", 0, 0, 0666},
+	{ftRegular, "dir4/file3-2", "file4-2", 0, 0, 0666},
+	{ftDir, "dir5", "", 0, 0, 0666},
+	{ftSymlink, "symlinkToFile1", "file1", 0, 0, 0666},
+	{ftSymlink, "symlinkToDir1", "dir1", 0, 0, 0666},
+	{ftSymlink, "brokenSymlinkToFileX", "fileX", 0, 0, 0666},
+	{ftSymlink, "brokenSymlinkToDirX", "dirX", 0, 0, 0666},
+	{ftSymlink, "symlinkToAbsDir", "/root", 0, 0, 0666},
+	{ftDir, "permdirtest", "", 2, 2, 0700},
+	{ftRegular, "permdirtest/permtest", "perm_test", 65534, 65534, 0400},
+}
 
-func defaultMkContentCommand() string ***REMOVED***
+func defaultMkContentCommand() string {
 	return mkFilesCommand(defaultFileData)
-***REMOVED***
+}
 
-func makeTestContentInDir(c *check.C, dir string) ***REMOVED***
-	for _, fd := range defaultFileData ***REMOVED***
+func makeTestContentInDir(c *check.C, dir string) {
+	for _, fd := range defaultFileData {
 		path := filepath.Join(dir, filepath.FromSlash(fd.path))
-		switch fd.filetype ***REMOVED***
+		switch fd.filetype {
 		case ftRegular:
 			c.Assert(ioutil.WriteFile(path, []byte(fd.contents+"\n"), os.FileMode(fd.mode)), checker.IsNil)
 		case ftDir:
 			c.Assert(os.Mkdir(path, os.FileMode(fd.mode)), checker.IsNil)
 		case ftSymlink:
 			c.Assert(os.Symlink(fd.contents, path), checker.IsNil)
-		***REMOVED***
+		}
 
-		if fd.filetype != ftSymlink && runtime.GOOS != "windows" ***REMOVED***
+		if fd.filetype != ftSymlink && runtime.GOOS != "windows" {
 			c.Assert(os.Chown(path, fd.uid, fd.gid), checker.IsNil)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-type testContainerOptions struct ***REMOVED***
+type testContainerOptions struct {
 	addContent bool
 	readOnly   bool
 	volumes    []string
 	workDir    string
 	command    string
-***REMOVED***
+}
 
-func makeTestContainer(c *check.C, options testContainerOptions) (containerID string) ***REMOVED***
-	if options.addContent ***REMOVED***
+func makeTestContainer(c *check.C, options testContainerOptions) (containerID string) {
+	if options.addContent {
 		mkContentCmd := defaultMkContentCommand()
-		if options.command == "" ***REMOVED***
+		if options.command == "" {
 			options.command = mkContentCmd
-		***REMOVED*** else ***REMOVED***
+		} else {
 			options.command = fmt.Sprintf("%s && %s", defaultMkContentCommand(), options.command)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	if options.command == "" ***REMOVED***
+	if options.command == "" {
 		options.command = "#(nop)"
-	***REMOVED***
+	}
 
-	args := []string***REMOVED***"run", "-d"***REMOVED***
+	args := []string{"run", "-d"}
 
-	for _, volume := range options.volumes ***REMOVED***
+	for _, volume := range options.volumes {
 		args = append(args, "-v", volume)
-	***REMOVED***
+	}
 
-	if options.workDir != "" ***REMOVED***
+	if options.workDir != "" {
 		args = append(args, "-w", options.workDir)
-	***REMOVED***
+	}
 
-	if options.readOnly ***REMOVED***
+	if options.readOnly {
 		args = append(args, "--read-only")
-	***REMOVED***
+	}
 
 	args = append(args, "busybox", "/bin/sh", "-c", options.command)
 
@@ -155,70 +155,70 @@ func makeTestContainer(c *check.C, options testContainerOptions) (containerID st
 	out, _ = dockerCmd(c, "wait", containerID)
 
 	exitCode := strings.TrimSpace(out)
-	if exitCode != "0" ***REMOVED***
+	if exitCode != "0" {
 		out, _ = dockerCmd(c, "logs", containerID)
-	***REMOVED***
+	}
 	c.Assert(exitCode, checker.Equals, "0", check.Commentf("failed to make test container: %s", out))
 
 	return
-***REMOVED***
+}
 
-func makeCatFileCommand(path string) string ***REMOVED***
+func makeCatFileCommand(path string) string {
 	return fmt.Sprintf("if [ -f %s ]; then cat %s; fi", path, path)
-***REMOVED***
+}
 
-func cpPath(pathElements ...string) string ***REMOVED***
+func cpPath(pathElements ...string) string {
 	localizedPathElements := make([]string, len(pathElements))
-	for i, path := range pathElements ***REMOVED***
+	for i, path := range pathElements {
 		localizedPathElements[i] = filepath.FromSlash(path)
-	***REMOVED***
+	}
 	return strings.Join(localizedPathElements, string(filepath.Separator))
-***REMOVED***
+}
 
-func cpPathTrailingSep(pathElements ...string) string ***REMOVED***
+func cpPathTrailingSep(pathElements ...string) string {
 	return fmt.Sprintf("%s%c", cpPath(pathElements...), filepath.Separator)
-***REMOVED***
+}
 
-func containerCpPath(containerID string, pathElements ...string) string ***REMOVED***
+func containerCpPath(containerID string, pathElements ...string) string {
 	joined := strings.Join(pathElements, "/")
 	return fmt.Sprintf("%s:%s", containerID, joined)
-***REMOVED***
+}
 
-func containerCpPathTrailingSep(containerID string, pathElements ...string) string ***REMOVED***
+func containerCpPathTrailingSep(containerID string, pathElements ...string) string {
 	return fmt.Sprintf("%s/", containerCpPath(containerID, pathElements...))
-***REMOVED***
+}
 
-func runDockerCp(c *check.C, src, dst string, params []string) (err error) ***REMOVED***
+func runDockerCp(c *check.C, src, dst string, params []string) (err error) {
 	c.Logf("running `docker cp %s %s %s`", strings.Join(params, " "), src, dst)
 
-	args := []string***REMOVED***"cp"***REMOVED***
+	args := []string{"cp"}
 
 	args = append(args, params...)
 
 	args = append(args, src, dst)
 
 	out, _, err := runCommandWithOutput(exec.Command(dockerBinary, args...))
-	if err != nil ***REMOVED***
+	if err != nil {
 		err = fmt.Errorf("error executing `docker cp` command: %s: %s", err, out)
-	***REMOVED***
+	}
 
 	return
-***REMOVED***
+}
 
-func startContainerGetOutput(c *check.C, containerID string) (out string, err error) ***REMOVED***
+func startContainerGetOutput(c *check.C, containerID string) (out string, err error) {
 	c.Logf("running `docker start -a %s`", containerID)
 
-	args := []string***REMOVED***"start", "-a", containerID***REMOVED***
+	args := []string{"start", "-a", containerID}
 
 	out, _, err = runCommandWithOutput(exec.Command(dockerBinary, args...))
-	if err != nil ***REMOVED***
+	if err != nil {
 		err = fmt.Errorf("error executing `docker start` command: %s: %s", err, out)
-	***REMOVED***
+	}
 
 	return
-***REMOVED***
+}
 
-func getTestDir(c *check.C, label string) (tmpDir string) ***REMOVED***
+func getTestDir(c *check.C, label string) (tmpDir string) {
 	var err error
 
 	tmpDir, err = ioutil.TempDir("", label)
@@ -226,92 +226,92 @@ func getTestDir(c *check.C, label string) (tmpDir string) ***REMOVED***
 	c.Assert(err, checker.IsNil)
 
 	return
-***REMOVED***
+}
 
-func isCpNotExist(err error) bool ***REMOVED***
+func isCpNotExist(err error) bool {
 	return strings.Contains(strings.ToLower(err.Error()), "could not find the file")
-***REMOVED***
+}
 
-func isCpDirNotExist(err error) bool ***REMOVED***
+func isCpDirNotExist(err error) bool {
 	return strings.Contains(err.Error(), archive.ErrDirNotExists.Error())
-***REMOVED***
+}
 
-func isCpNotDir(err error) bool ***REMOVED***
+func isCpNotDir(err error) bool {
 	return strings.Contains(err.Error(), archive.ErrNotDirectory.Error()) || strings.Contains(err.Error(), "filename, directory name, or volume label syntax is incorrect")
-***REMOVED***
+}
 
-func isCpCannotCopyDir(err error) bool ***REMOVED***
+func isCpCannotCopyDir(err error) bool {
 	return strings.Contains(err.Error(), archive.ErrCannotCopyDir.Error())
-***REMOVED***
+}
 
-func isCpCannotCopyReadOnly(err error) bool ***REMOVED***
+func isCpCannotCopyReadOnly(err error) bool {
 	return strings.Contains(err.Error(), "marked read-only")
-***REMOVED***
+}
 
-func isCannotOverwriteNonDirWithDir(err error) bool ***REMOVED***
+func isCannotOverwriteNonDirWithDir(err error) bool {
 	return strings.Contains(err.Error(), "cannot overwrite non-directory")
-***REMOVED***
+}
 
-func fileContentEquals(c *check.C, filename, contents string) (err error) ***REMOVED***
+func fileContentEquals(c *check.C, filename, contents string) (err error) {
 	c.Logf("checking that file %q contains %q\n", filename, contents)
 
 	fileBytes, err := ioutil.ReadFile(filename)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
 	expectedBytes, err := ioutil.ReadAll(strings.NewReader(contents))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
-	if !bytes.Equal(fileBytes, expectedBytes) ***REMOVED***
+	if !bytes.Equal(fileBytes, expectedBytes) {
 		err = fmt.Errorf("file content not equal - expected %q, got %q", string(expectedBytes), string(fileBytes))
-	***REMOVED***
+	}
 
 	return
-***REMOVED***
+}
 
-func symlinkTargetEquals(c *check.C, symlink, expectedTarget string) (err error) ***REMOVED***
+func symlinkTargetEquals(c *check.C, symlink, expectedTarget string) (err error) {
 	c.Logf("checking that the symlink %q points to %q\n", symlink, expectedTarget)
 
 	actualTarget, err := os.Readlink(symlink)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
-	if actualTarget != expectedTarget ***REMOVED***
+	if actualTarget != expectedTarget {
 		err = fmt.Errorf("symlink target points to %q not %q", actualTarget, expectedTarget)
-	***REMOVED***
+	}
 
 	return
-***REMOVED***
+}
 
-func containerStartOutputEquals(c *check.C, containerID, contents string) (err error) ***REMOVED***
+func containerStartOutputEquals(c *check.C, containerID, contents string) (err error) {
 	c.Logf("checking that container %q start output contains %q\n", containerID, contents)
 
 	out, err := startContainerGetOutput(c, containerID)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
+	}
 
-	if out != contents ***REMOVED***
+	if out != contents {
 		err = fmt.Errorf("output contents not equal - expected %q, got %q", contents, out)
-	***REMOVED***
+	}
 
 	return
-***REMOVED***
+}
 
-func defaultVolumes(tmpDir string) []string ***REMOVED***
-	if SameHostDaemon() ***REMOVED***
-		return []string***REMOVED***
+func defaultVolumes(tmpDir string) []string {
+	if SameHostDaemon() {
+		return []string{
 			"/vol1",
 			fmt.Sprintf("%s:/vol2", tmpDir),
 			fmt.Sprintf("%s:/vol3", filepath.Join(tmpDir, "vol3")),
 			fmt.Sprintf("%s:/vol_ro:ro", filepath.Join(tmpDir, "vol_ro")),
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Can't bind-mount volumes with separate host daemon.
-	return []string***REMOVED***"/vol1", "/vol2", "/vol3", "/vol_ro:/vol_ro:ro"***REMOVED***
-***REMOVED***
+	return []string{"/vol1", "/vol2", "/vol3", "/vol_ro:/vol_ro:ro"}
+}

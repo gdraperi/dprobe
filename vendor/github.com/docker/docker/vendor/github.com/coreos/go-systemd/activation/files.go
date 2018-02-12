@@ -26,27 +26,27 @@ const (
 	listenFdsStart = 3
 )
 
-func Files(unsetEnv bool) []*os.File ***REMOVED***
-	if unsetEnv ***REMOVED***
+func Files(unsetEnv bool) []*os.File {
+	if unsetEnv {
 		defer os.Unsetenv("LISTEN_PID")
 		defer os.Unsetenv("LISTEN_FDS")
-	***REMOVED***
+	}
 
 	pid, err := strconv.Atoi(os.Getenv("LISTEN_PID"))
-	if err != nil || pid != os.Getpid() ***REMOVED***
+	if err != nil || pid != os.Getpid() {
 		return nil
-	***REMOVED***
+	}
 
 	nfds, err := strconv.Atoi(os.Getenv("LISTEN_FDS"))
-	if err != nil || nfds == 0 ***REMOVED***
+	if err != nil || nfds == 0 {
 		return nil
-	***REMOVED***
+	}
 
 	files := make([]*os.File, 0, nfds)
-	for fd := listenFdsStart; fd < listenFdsStart+nfds; fd++ ***REMOVED***
+	for fd := listenFdsStart; fd < listenFdsStart+nfds; fd++ {
 		syscall.CloseOnExec(fd)
 		files = append(files, os.NewFile(uintptr(fd), "LISTEN_FD_"+strconv.Itoa(fd)))
-	***REMOVED***
+	}
 
 	return files
-***REMOVED***
+}

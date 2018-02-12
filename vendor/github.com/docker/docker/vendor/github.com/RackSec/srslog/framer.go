@@ -13,12 +13,12 @@ type Framer func(in string) string
 // DefaultFramer does nothing, since there is no framing to apply. This is
 // the original behavior of the Go syslog package, and is also typically used
 // for UDP syslog.
-func DefaultFramer(in string) string ***REMOVED***
+func DefaultFramer(in string) string {
 	return in
-***REMOVED***
+}
 
 // RFC5425MessageLengthFramer prepends the message length to the front of the
 // provided message, as defined in RFC 5425.
-func RFC5425MessageLengthFramer(in string) string ***REMOVED***
+func RFC5425MessageLengthFramer(in string) string {
 	return fmt.Sprintf("%d %s", len(in), in)
-***REMOVED***
+}

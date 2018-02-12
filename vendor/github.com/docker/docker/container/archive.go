@@ -12,12 +12,12 @@ import (
 // host. Returns a resolved path (absolute path to the resource on the host),
 // the absolute path to the resource relative to the container's rootfs, and
 // an error if the path points to outside the container's rootfs.
-func (container *Container) ResolvePath(path string) (resolvedPath, absPath string, err error) ***REMOVED***
+func (container *Container) ResolvePath(path string) (resolvedPath, absPath string, err error) {
 	// Check if a drive letter supplied, it must be the system drive. No-op except on Windows
 	path, err = system.CheckSystemDriveAndRemoveDriveLetter(path, container.BaseFS)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", "", err
-	***REMOVED***
+	}
 
 	// Consider the given path as an absolute path in the container.
 	absPath = archive.PreserveTrailingDotOrSeparator(
@@ -30,50 +30,50 @@ func (container *Container) ResolvePath(path string) (resolvedPath, absPath stri
 	dirPath, basePath := container.BaseFS.Split(absPath)
 
 	resolvedDirPath, err := container.GetResourcePath(dirPath)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", "", err
-	***REMOVED***
+	}
 
 	// resolvedDirPath will have been cleaned (no trailing path separators) so
 	// we can manually join it with the base path element.
 	resolvedPath = resolvedDirPath + string(container.BaseFS.Separator()) + basePath
 	return resolvedPath, absPath, nil
-***REMOVED***
+}
 
 // StatPath is the unexported version of StatPath. Locks and mounts should
 // be acquired before calling this method and the given path should be fully
 // resolved to a path on the host corresponding to the given absolute path
 // inside the container.
-func (container *Container) StatPath(resolvedPath, absPath string) (stat *types.ContainerPathStat, err error) ***REMOVED***
+func (container *Container) StatPath(resolvedPath, absPath string) (stat *types.ContainerPathStat, err error) {
 	driver := container.BaseFS
 
 	lstat, err := driver.Lstat(resolvedPath)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	var linkTarget string
-	if lstat.Mode()&os.ModeSymlink != 0 ***REMOVED***
+	if lstat.Mode()&os.ModeSymlink != 0 {
 		// Fully evaluate the symlink in the scope of the container rootfs.
 		hostPath, err := container.GetResourcePath(absPath)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 
 		linkTarget, err = driver.Rel(driver.Path(), hostPath)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return nil, err
-		***REMOVED***
+		}
 
 		// Make it an absolute path.
 		linkTarget = driver.Join(string(driver.Separator()), linkTarget)
-	***REMOVED***
+	}
 
-	return &types.ContainerPathStat***REMOVED***
+	return &types.ContainerPathStat{
 		Name:       driver.Base(absPath),
 		Size:       lstat.Size(),
 		Mode:       lstat.Mode(),
 		Mtime:      lstat.ModTime(),
 		LinkTarget: linkTarget,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}

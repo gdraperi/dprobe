@@ -5,137 +5,137 @@ package libcontainerd
 import "fmt"
 
 // WithRemoteAddr sets the external containerd socket to connect to.
-func WithRemoteAddr(addr string) RemoteOption ***REMOVED***
+func WithRemoteAddr(addr string) RemoteOption {
 	return rpcAddr(addr)
-***REMOVED***
+}
 
 type rpcAddr string
 
-func (a rpcAddr) Apply(r Remote) error ***REMOVED***
-	if remote, ok := r.(*remote); ok ***REMOVED***
+func (a rpcAddr) Apply(r Remote) error {
+	if remote, ok := r.(*remote); ok {
 		remote.GRPC.Address = string(a)
 		return nil
-	***REMOVED***
+	}
 	return fmt.Errorf("WithRemoteAddr option not supported for this remote")
-***REMOVED***
+}
 
 // WithRemoteAddrUser sets the uid and gid to create the RPC address with
-func WithRemoteAddrUser(uid, gid int) RemoteOption ***REMOVED***
-	return rpcUser***REMOVED***uid, gid***REMOVED***
-***REMOVED***
+func WithRemoteAddrUser(uid, gid int) RemoteOption {
+	return rpcUser{uid, gid}
+}
 
-type rpcUser struct ***REMOVED***
+type rpcUser struct {
 	uid int
 	gid int
-***REMOVED***
+}
 
-func (u rpcUser) Apply(r Remote) error ***REMOVED***
-	if remote, ok := r.(*remote); ok ***REMOVED***
+func (u rpcUser) Apply(r Remote) error {
+	if remote, ok := r.(*remote); ok {
 		remote.GRPC.UID = u.uid
 		remote.GRPC.GID = u.gid
 		return nil
-	***REMOVED***
+	}
 	return fmt.Errorf("WithRemoteAddr option not supported for this remote")
-***REMOVED***
+}
 
 // WithStartDaemon defines if libcontainerd should also run containerd daemon.
-func WithStartDaemon(start bool) RemoteOption ***REMOVED***
+func WithStartDaemon(start bool) RemoteOption {
 	return startDaemon(start)
-***REMOVED***
+}
 
 type startDaemon bool
 
-func (s startDaemon) Apply(r Remote) error ***REMOVED***
-	if remote, ok := r.(*remote); ok ***REMOVED***
+func (s startDaemon) Apply(r Remote) error {
+	if remote, ok := r.(*remote); ok {
 		remote.startDaemon = bool(s)
 		return nil
-	***REMOVED***
+	}
 	return fmt.Errorf("WithStartDaemon option not supported for this remote")
-***REMOVED***
+}
 
 // WithLogLevel defines which log level to starts containerd with.
 // This only makes sense if WithStartDaemon() was set to true.
-func WithLogLevel(lvl string) RemoteOption ***REMOVED***
+func WithLogLevel(lvl string) RemoteOption {
 	return logLevel(lvl)
-***REMOVED***
+}
 
 type logLevel string
 
-func (l logLevel) Apply(r Remote) error ***REMOVED***
-	if remote, ok := r.(*remote); ok ***REMOVED***
+func (l logLevel) Apply(r Remote) error {
+	if remote, ok := r.(*remote); ok {
 		remote.Debug.Level = string(l)
 		return nil
-	***REMOVED***
+	}
 	return fmt.Errorf("WithDebugLog option not supported for this remote")
-***REMOVED***
+}
 
 // WithDebugAddress defines at which location the debug GRPC connection
 // should be made
-func WithDebugAddress(addr string) RemoteOption ***REMOVED***
+func WithDebugAddress(addr string) RemoteOption {
 	return debugAddress(addr)
-***REMOVED***
+}
 
 type debugAddress string
 
-func (d debugAddress) Apply(r Remote) error ***REMOVED***
-	if remote, ok := r.(*remote); ok ***REMOVED***
+func (d debugAddress) Apply(r Remote) error {
+	if remote, ok := r.(*remote); ok {
 		remote.Debug.Address = string(d)
 		return nil
-	***REMOVED***
+	}
 	return fmt.Errorf("WithDebugAddress option not supported for this remote")
-***REMOVED***
+}
 
 // WithMetricsAddress defines at which location the debug GRPC connection
 // should be made
-func WithMetricsAddress(addr string) RemoteOption ***REMOVED***
+func WithMetricsAddress(addr string) RemoteOption {
 	return metricsAddress(addr)
-***REMOVED***
+}
 
 type metricsAddress string
 
-func (m metricsAddress) Apply(r Remote) error ***REMOVED***
-	if remote, ok := r.(*remote); ok ***REMOVED***
+func (m metricsAddress) Apply(r Remote) error {
+	if remote, ok := r.(*remote); ok {
 		remote.Metrics.Address = string(m)
 		return nil
-	***REMOVED***
+	}
 	return fmt.Errorf("WithMetricsAddress option not supported for this remote")
-***REMOVED***
+}
 
 // WithSnapshotter defines snapshotter driver should be used
-func WithSnapshotter(name string) RemoteOption ***REMOVED***
+func WithSnapshotter(name string) RemoteOption {
 	return snapshotter(name)
-***REMOVED***
+}
 
 type snapshotter string
 
-func (s snapshotter) Apply(r Remote) error ***REMOVED***
-	if remote, ok := r.(*remote); ok ***REMOVED***
+func (s snapshotter) Apply(r Remote) error {
+	if remote, ok := r.(*remote); ok {
 		remote.snapshotter = string(s)
 		return nil
-	***REMOVED***
+	}
 	return fmt.Errorf("WithSnapshotter option not supported for this remote")
-***REMOVED***
+}
 
 // WithPlugin allow configuring a containerd plugin
 // configuration values passed needs to be quoted if quotes are needed in
 // the toml format.
-func WithPlugin(name string, conf interface***REMOVED******REMOVED***) RemoteOption ***REMOVED***
-	return pluginConf***REMOVED***
+func WithPlugin(name string, conf interface{}) RemoteOption {
+	return pluginConf{
 		name: name,
 		conf: conf,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type pluginConf struct ***REMOVED***
+type pluginConf struct {
 	// Name is the name of the plugin
 	name string
-	conf interface***REMOVED******REMOVED***
-***REMOVED***
+	conf interface{}
+}
 
-func (p pluginConf) Apply(r Remote) error ***REMOVED***
-	if remote, ok := r.(*remote); ok ***REMOVED***
+func (p pluginConf) Apply(r Remote) error {
+	if remote, ok := r.(*remote); ok {
 		remote.pluginConfs.Plugins[p.name] = p.conf
 		return nil
-	***REMOVED***
+	}
 	return fmt.Errorf("WithPlugin option not supported for this remote")
-***REMOVED***
+}

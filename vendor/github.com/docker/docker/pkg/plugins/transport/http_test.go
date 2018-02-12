@@ -8,13 +8,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestHTTPTransport(t *testing.T) ***REMOVED***
+func TestHTTPTransport(t *testing.T) {
 	var r io.Reader
-	roundTripper := &http.Transport***REMOVED******REMOVED***
+	roundTripper := &http.Transport{}
 	newTransport := NewHTTPTransport(roundTripper, "http", "0.0.0.0")
 	request, err := newTransport.NewRequest("", r)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	assert.Equal(t, "POST", request.Method)
-***REMOVED***
+}

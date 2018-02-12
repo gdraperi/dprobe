@@ -5,7 +5,7 @@
 package gotty
 
 // Boolean capabilities
-var BoolAttr = [...]string***REMOVED***
+var BoolAttr = [...]string{
 	"auto_left_margin", "bw",
 	"auto_right_margin", "am",
 	"no_esc_ctlc", "xsb",
@@ -50,10 +50,10 @@ var BoolAttr = [...]string***REMOVED***
 	"linefeed_is_newline", "",
 	"has_hardware_tabs", "",
 	"return_does_clr_eol", "",
-***REMOVED***
+}
 
 // Numerical capabilities
-var NumAttr = [...]string***REMOVED***
+var NumAttr = [...]string{
 	"columns", "cols",
 	"init_tabs", "it",
 	"lines", "lines",
@@ -93,10 +93,10 @@ var NumAttr = [...]string***REMOVED***
 	"backspace_delay", "",
 	"horizontal_tab_delay", "",
 	"number_of_function_keys", "",
-***REMOVED***
+}
 
 // String capabilities
-var StrAttr = [...]string***REMOVED***
+var StrAttr = [...]string{
 	"back_tab", "cbt",
 	"bell", "bel",
 	"carriage_return", "cr",
@@ -511,4 +511,4 @@ var StrAttr = [...]string***REMOVED***
 	"memory_lock", "",
 	"memory_unlock", "",
 	"box_chars_1", "",
-***REMOVED***
+}

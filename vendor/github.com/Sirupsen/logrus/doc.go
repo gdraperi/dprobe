@@ -10,13 +10,13 @@ The simplest way to use Logrus is simply the package-level exported logger:
     log "github.com/sirupsen/logrus"
   )
 
-  func main() ***REMOVED***
-    log.WithFields(log.Fields***REMOVED***
+  func main() {
+    log.WithFields(log.Fields{
       "animal": "walrus",
       "number": 1,
       "size":   10,
-***REMOVED***).Info("A walrus appears")
-  ***REMOVED***
+    }).Info("A walrus appears")
+  }
 
 Output:
   time="2015-09-07T08:48:33Z" level=info msg="A walrus appears" animal=walrus number=1 size=10

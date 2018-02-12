@@ -4,7 +4,7 @@ Package errors provides error types returned in CF SSL.
 1. Type Error is intended for errors produced by CF SSL packages.
 It formats to a json object that consists of an error message and a 4-digit code for error reasoning.
 
-Example: ***REMOVED***"code":1002, "message": "Failed to decode certificate"***REMOVED***
+Example: {"code":1002, "message": "Failed to decode certificate"}
 
 The index of codes are listed below:
 	1XXX: CertificateError

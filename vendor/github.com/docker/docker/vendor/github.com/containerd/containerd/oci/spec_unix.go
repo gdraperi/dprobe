@@ -16,13 +16,13 @@ const (
 )
 
 var (
-	defaultEnv = []string***REMOVED***
+	defaultEnv = []string{
 		"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
-	***REMOVED***
+	}
 )
 
-func defaultCaps() []string ***REMOVED***
-	return []string***REMOVED***
+func defaultCaps() []string {
+	return []string{
 		"CAP_CHOWN",
 		"CAP_DAC_OVERRIDE",
 		"CAP_FSETID",
@@ -37,106 +37,106 @@ func defaultCaps() []string ***REMOVED***
 		"CAP_SYS_CHROOT",
 		"CAP_KILL",
 		"CAP_AUDIT_WRITE",
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func defaultNamespaces() []specs.LinuxNamespace ***REMOVED***
-	return []specs.LinuxNamespace***REMOVED***
-		***REMOVED***
+func defaultNamespaces() []specs.LinuxNamespace {
+	return []specs.LinuxNamespace{
+		{
 			Type: specs.PIDNamespace,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			Type: specs.IPCNamespace,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			Type: specs.UTSNamespace,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			Type: specs.MountNamespace,
-		***REMOVED***,
-		***REMOVED***
+		},
+		{
 			Type: specs.NetworkNamespace,
-		***REMOVED***,
-	***REMOVED***
-***REMOVED***
+		},
+	}
+}
 
-func createDefaultSpec(ctx context.Context, id string) (*specs.Spec, error) ***REMOVED***
+func createDefaultSpec(ctx context.Context, id string) (*specs.Spec, error) {
 	ns, err := namespaces.NamespaceRequired(ctx)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
-	s := &specs.Spec***REMOVED***
+	}
+	s := &specs.Spec{
 		Version: specs.Version,
-		Root: &specs.Root***REMOVED***
+		Root: &specs.Root{
 			Path: defaultRootfsPath,
-		***REMOVED***,
-		Process: &specs.Process***REMOVED***
+		},
+		Process: &specs.Process{
 			Env:             defaultEnv,
 			Cwd:             "/",
 			NoNewPrivileges: true,
-			User: specs.User***REMOVED***
+			User: specs.User{
 				UID: 0,
 				GID: 0,
-			***REMOVED***,
-			Capabilities: &specs.LinuxCapabilities***REMOVED***
+			},
+			Capabilities: &specs.LinuxCapabilities{
 				Bounding:    defaultCaps(),
 				Permitted:   defaultCaps(),
 				Inheritable: defaultCaps(),
 				Effective:   defaultCaps(),
-			***REMOVED***,
-			Rlimits: []specs.POSIXRlimit***REMOVED***
-				***REMOVED***
+			},
+			Rlimits: []specs.POSIXRlimit{
+				{
 					Type: "RLIMIT_NOFILE",
 					Hard: uint64(1024),
 					Soft: uint64(1024),
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		Mounts: []specs.Mount***REMOVED***
-			***REMOVED***
+				},
+			},
+		},
+		Mounts: []specs.Mount{
+			{
 				Destination: "/proc",
 				Type:        "proc",
 				Source:      "proc",
-			***REMOVED***,
-			***REMOVED***
+			},
+			{
 				Destination: "/dev",
 				Type:        "tmpfs",
 				Source:      "tmpfs",
-				Options:     []string***REMOVED***"nosuid", "strictatime", "mode=755", "size=65536k"***REMOVED***,
-			***REMOVED***,
-			***REMOVED***
+				Options:     []string{"nosuid", "strictatime", "mode=755", "size=65536k"},
+			},
+			{
 				Destination: "/dev/pts",
 				Type:        "devpts",
 				Source:      "devpts",
-				Options:     []string***REMOVED***"nosuid", "noexec", "newinstance", "ptmxmode=0666", "mode=0620", "gid=5"***REMOVED***,
-			***REMOVED***,
-			***REMOVED***
+				Options:     []string{"nosuid", "noexec", "newinstance", "ptmxmode=0666", "mode=0620", "gid=5"},
+			},
+			{
 				Destination: "/dev/shm",
 				Type:        "tmpfs",
 				Source:      "shm",
-				Options:     []string***REMOVED***"nosuid", "noexec", "nodev", "mode=1777", "size=65536k"***REMOVED***,
-			***REMOVED***,
-			***REMOVED***
+				Options:     []string{"nosuid", "noexec", "nodev", "mode=1777", "size=65536k"},
+			},
+			{
 				Destination: "/dev/mqueue",
 				Type:        "mqueue",
 				Source:      "mqueue",
-				Options:     []string***REMOVED***"nosuid", "noexec", "nodev"***REMOVED***,
-			***REMOVED***,
-			***REMOVED***
+				Options:     []string{"nosuid", "noexec", "nodev"},
+			},
+			{
 				Destination: "/sys",
 				Type:        "sysfs",
 				Source:      "sysfs",
-				Options:     []string***REMOVED***"nosuid", "noexec", "nodev", "ro"***REMOVED***,
-			***REMOVED***,
-			***REMOVED***
+				Options:     []string{"nosuid", "noexec", "nodev", "ro"},
+			},
+			{
 				Destination: "/run",
 				Type:        "tmpfs",
 				Source:      "tmpfs",
-				Options:     []string***REMOVED***"nosuid", "strictatime", "mode=755", "size=65536k"***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		Linux: &specs.Linux***REMOVED***
-			MaskedPaths: []string***REMOVED***
+				Options:     []string{"nosuid", "strictatime", "mode=755", "size=65536k"},
+			},
+		},
+		Linux: &specs.Linux{
+			MaskedPaths: []string{
 				"/proc/kcore",
 				"/proc/latency_stats",
 				"/proc/timer_list",
@@ -144,26 +144,26 @@ func createDefaultSpec(ctx context.Context, id string) (*specs.Spec, error) ***R
 				"/proc/sched_debug",
 				"/sys/firmware",
 				"/proc/scsi",
-			***REMOVED***,
-			ReadonlyPaths: []string***REMOVED***
+			},
+			ReadonlyPaths: []string{
 				"/proc/asound",
 				"/proc/bus",
 				"/proc/fs",
 				"/proc/irq",
 				"/proc/sys",
 				"/proc/sysrq-trigger",
-			***REMOVED***,
+			},
 			CgroupsPath: filepath.Join("/", ns, id),
-			Resources: &specs.LinuxResources***REMOVED***
-				Devices: []specs.LinuxDeviceCgroup***REMOVED***
-					***REMOVED***
+			Resources: &specs.LinuxResources{
+				Devices: []specs.LinuxDeviceCgroup{
+					{
 						Allow:  false,
 						Access: rwm,
-					***REMOVED***,
-				***REMOVED***,
-			***REMOVED***,
+					},
+				},
+			},
 			Namespaces: defaultNamespaces(),
-		***REMOVED***,
-	***REMOVED***
+		},
+	}
 	return s, nil
-***REMOVED***
+}

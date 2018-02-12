@@ -14,7 +14,7 @@ import (
 
 // print writes all the data structures as well as the code necessary to use the
 // trie to w.
-func (b *builder) print(w io.Writer) error ***REMOVED***
+func (b *builder) print(w io.Writer) error {
 	b.Stats.NValueEntries = len(b.ValueBlocks) * blockSize
 	b.Stats.NValueBytes = len(b.ValueBlocks) * blockSize * b.ValueSize
 	b.Stats.NIndexEntries = len(b.IndexBlocks) * blockSize
@@ -23,229 +23,229 @@ func (b *builder) print(w io.Writer) error ***REMOVED***
 
 	// If we only have one root trie, all starter blocks are at position 0 and
 	// we can access the arrays directly.
-	if len(b.Trie) == 1 ***REMOVED***
+	if len(b.Trie) == 1 {
 		// At this point we cannot refer to the generated tables directly.
 		b.ASCIIBlock = b.Name + "Values"
 		b.StarterBlock = b.Name + "Index"
-	***REMOVED*** else ***REMOVED***
+	} else {
 		// Otherwise we need to have explicit starter indexes in the trie
 		// structure.
 		b.ASCIIBlock = "t.ascii"
 		b.StarterBlock = "t.utf8Start"
-	***REMOVED***
+	}
 
 	b.SourceType = "[]byte"
-	if err := lookupGen.Execute(w, b); err != nil ***REMOVED***
+	if err := lookupGen.Execute(w, b); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	b.SourceType = "string"
-	if err := lookupGen.Execute(w, b); err != nil ***REMOVED***
+	if err := lookupGen.Execute(w, b); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if err := trieGen.Execute(w, b); err != nil ***REMOVED***
+	if err := trieGen.Execute(w, b); err != nil {
 		return err
-	***REMOVED***
+	}
 
-	for _, c := range b.Compactions ***REMOVED***
-		if err := c.c.Print(w); err != nil ***REMOVED***
+	for _, c := range b.Compactions {
+		if err := c.c.Print(w); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return nil
-***REMOVED***
+}
 
-func printValues(n int, values []uint64) string ***REMOVED***
-	w := &bytes.Buffer***REMOVED******REMOVED***
+func printValues(n int, values []uint64) string {
+	w := &bytes.Buffer{}
 	boff := n * blockSize
 	fmt.Fprintf(w, "\t// Block %#x, offset %#x", n, boff)
 	var newline bool
-	for i, v := range values ***REMOVED***
-		if i%6 == 0 ***REMOVED***
+	for i, v := range values {
+		if i%6 == 0 {
 			newline = true
-		***REMOVED***
-		if v != 0 ***REMOVED***
-			if newline ***REMOVED***
+		}
+		if v != 0 {
+			if newline {
 				fmt.Fprintf(w, "\n")
 				newline = false
-			***REMOVED***
+			}
 			fmt.Fprintf(w, "\t%#02x:%#04x, ", boff+i, v)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return w.String()
-***REMOVED***
+}
 
-func printIndex(b *builder, nr int, n *node) string ***REMOVED***
-	w := &bytes.Buffer***REMOVED******REMOVED***
+func printIndex(b *builder, nr int, n *node) string {
+	w := &bytes.Buffer{}
 	boff := nr * blockSize
 	fmt.Fprintf(w, "\t// Block %#x, offset %#x", nr, boff)
 	var newline bool
-	for i, c := range n.children ***REMOVED***
-		if i%8 == 0 ***REMOVED***
+	for i, c := range n.children {
+		if i%8 == 0 {
 			newline = true
-		***REMOVED***
-		if c != nil ***REMOVED***
+		}
+		if c != nil {
 			v := b.Compactions[c.index.compaction].Offset + uint32(c.index.index)
-			if v != 0 ***REMOVED***
-				if newline ***REMOVED***
+			if v != 0 {
+				if newline {
 					fmt.Fprintf(w, "\n")
 					newline = false
-				***REMOVED***
+				}
 				fmt.Fprintf(w, "\t%#02x:%#02x, ", boff+i, v)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 	return w.String()
-***REMOVED***
+}
 
 var (
-	trieGen = template.Must(template.New("trie").Funcs(template.FuncMap***REMOVED***
+	trieGen = template.Must(template.New("trie").Funcs(template.FuncMap{
 		"printValues": printValues,
 		"printIndex":  printIndex,
 		"title":       strings.Title,
-		"dec":         func(x int) int ***REMOVED*** return x - 1 ***REMOVED***,
-		"psize": func(n int) string ***REMOVED***
+		"dec":         func(x int) int { return x - 1 },
+		"psize": func(n int) string {
 			return fmt.Sprintf("%d bytes (%.2f KiB)", n, float64(n)/1024)
-		***REMOVED***,
-	***REMOVED***).Parse(trieTemplate))
+		},
+	}).Parse(trieTemplate))
 	lookupGen = template.Must(template.New("lookup").Parse(lookupTemplate))
 )
 
 // TODO: consider the return type of lookup. It could be uint64, even if the
 // internal value type is smaller. We will have to verify this with the
 // performance of unicode/norm, which is very sensitive to such changes.
-const trieTemplate = `***REMOVED******REMOVED***$b := .***REMOVED******REMOVED******REMOVED******REMOVED***$multi := gt (len .Trie) 1***REMOVED******REMOVED***
-// ***REMOVED******REMOVED***.Name***REMOVED******REMOVED***Trie. Total size: ***REMOVED******REMOVED***psize .Size***REMOVED******REMOVED***. Checksum: ***REMOVED******REMOVED***printf "%08x" .Checksum***REMOVED******REMOVED***.
-type ***REMOVED******REMOVED***.Name***REMOVED******REMOVED***Trie struct ***REMOVED*** ***REMOVED******REMOVED***if $multi***REMOVED******REMOVED***
-	ascii []***REMOVED******REMOVED***.ValueType***REMOVED******REMOVED*** // index for ASCII bytes
-	utf8Start  []***REMOVED******REMOVED***.IndexType***REMOVED******REMOVED*** // index for UTF-8 bytes >= 0xC0
-***REMOVED******REMOVED***end***REMOVED******REMOVED******REMOVED***
+const trieTemplate = `{{$b := .}}{{$multi := gt (len .Trie) 1}}
+// {{.Name}}Trie. Total size: {{psize .Size}}. Checksum: {{printf "%08x" .Checksum}}.
+type {{.Name}}Trie struct { {{if $multi}}
+	ascii []{{.ValueType}} // index for ASCII bytes
+	utf8Start  []{{.IndexType}} // index for UTF-8 bytes >= 0xC0
+{{end}}}
 
-func new***REMOVED******REMOVED***title .Name***REMOVED******REMOVED***Trie(i int) ****REMOVED******REMOVED***.Name***REMOVED******REMOVED***Trie ***REMOVED*** ***REMOVED******REMOVED***if $multi***REMOVED******REMOVED***
-	h := ***REMOVED******REMOVED***.Name***REMOVED******REMOVED***TrieHandles[i]
-	return &***REMOVED******REMOVED***.Name***REMOVED******REMOVED***Trie***REMOVED*** ***REMOVED******REMOVED***.Name***REMOVED******REMOVED***Values[uint32(h.ascii)<<6:], ***REMOVED******REMOVED***.Name***REMOVED******REMOVED***Index[uint32(h.multi)<<6:] ***REMOVED***
-***REMOVED***
+func new{{title .Name}}Trie(i int) *{{.Name}}Trie { {{if $multi}}
+	h := {{.Name}}TrieHandles[i]
+	return &{{.Name}}Trie{ {{.Name}}Values[uint32(h.ascii)<<6:], {{.Name}}Index[uint32(h.multi)<<6:] }
+}
 
-type ***REMOVED******REMOVED***.Name***REMOVED******REMOVED***TrieHandle struct ***REMOVED***
-	ascii, multi ***REMOVED******REMOVED***.IndexType***REMOVED******REMOVED***
-***REMOVED***
+type {{.Name}}TrieHandle struct {
+	ascii, multi {{.IndexType}}
+}
 
-// ***REMOVED******REMOVED***.Name***REMOVED******REMOVED***TrieHandles: ***REMOVED******REMOVED***len .Trie***REMOVED******REMOVED*** handles, ***REMOVED******REMOVED***.Stats.NHandleBytes***REMOVED******REMOVED*** bytes
-var ***REMOVED******REMOVED***.Name***REMOVED******REMOVED***TrieHandles = [***REMOVED******REMOVED***len .Trie***REMOVED******REMOVED***]***REMOVED******REMOVED***.Name***REMOVED******REMOVED***TrieHandle***REMOVED***
-***REMOVED******REMOVED***range .Trie***REMOVED******REMOVED***	***REMOVED*** ***REMOVED******REMOVED***.ASCIIIndex***REMOVED******REMOVED***, ***REMOVED******REMOVED***.StarterIndex***REMOVED******REMOVED*** ***REMOVED***, // ***REMOVED******REMOVED***printf "%08x" .Checksum***REMOVED******REMOVED***: ***REMOVED******REMOVED***.Name***REMOVED******REMOVED***
-***REMOVED******REMOVED***end***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***else***REMOVED******REMOVED***
-	return &***REMOVED******REMOVED***.Name***REMOVED******REMOVED***Trie***REMOVED******REMOVED***
-***REMOVED***
-***REMOVED******REMOVED***end***REMOVED******REMOVED***
+// {{.Name}}TrieHandles: {{len .Trie}} handles, {{.Stats.NHandleBytes}} bytes
+var {{.Name}}TrieHandles = [{{len .Trie}}]{{.Name}}TrieHandle{
+{{range .Trie}}	{ {{.ASCIIIndex}}, {{.StarterIndex}} }, // {{printf "%08x" .Checksum}}: {{.Name}}
+{{end}}}{{else}}
+	return &{{.Name}}Trie{}
+}
+{{end}}
 // lookupValue determines the type of block n and looks up the value for b.
-func (t ****REMOVED******REMOVED***.Name***REMOVED******REMOVED***Trie) lookupValue(n uint32, b byte) ***REMOVED******REMOVED***.ValueType***REMOVED******REMOVED******REMOVED******REMOVED***$last := dec (len .Compactions)***REMOVED******REMOVED*** ***REMOVED***
-	switch ***REMOVED*** ***REMOVED******REMOVED***range $i, $c := .Compactions***REMOVED******REMOVED***
-		***REMOVED******REMOVED***if eq $i $last***REMOVED******REMOVED***default***REMOVED******REMOVED***else***REMOVED******REMOVED***case n < ***REMOVED******REMOVED***$c.Cutoff***REMOVED******REMOVED******REMOVED******REMOVED***end***REMOVED******REMOVED***:***REMOVED******REMOVED***if ne $i 0***REMOVED******REMOVED***
-			n -= ***REMOVED******REMOVED***$c.Offset***REMOVED******REMOVED******REMOVED******REMOVED***end***REMOVED******REMOVED***
-			return ***REMOVED******REMOVED***print $b.ValueType***REMOVED******REMOVED***(***REMOVED******REMOVED***$c.Handler***REMOVED******REMOVED***)***REMOVED******REMOVED***end***REMOVED******REMOVED***
-	***REMOVED***
-***REMOVED***
+func (t *{{.Name}}Trie) lookupValue(n uint32, b byte) {{.ValueType}}{{$last := dec (len .Compactions)}} {
+	switch { {{range $i, $c := .Compactions}}
+		{{if eq $i $last}}default{{else}}case n < {{$c.Cutoff}}{{end}}:{{if ne $i 0}}
+			n -= {{$c.Offset}}{{end}}
+			return {{print $b.ValueType}}({{$c.Handler}}){{end}}
+	}
+}
 
-// ***REMOVED******REMOVED***.Name***REMOVED******REMOVED***Values: ***REMOVED******REMOVED***len .ValueBlocks***REMOVED******REMOVED*** blocks, ***REMOVED******REMOVED***.Stats.NValueEntries***REMOVED******REMOVED*** entries, ***REMOVED******REMOVED***.Stats.NValueBytes***REMOVED******REMOVED*** bytes
+// {{.Name}}Values: {{len .ValueBlocks}} blocks, {{.Stats.NValueEntries}} entries, {{.Stats.NValueBytes}} bytes
 // The third block is the zero block.
-var ***REMOVED******REMOVED***.Name***REMOVED******REMOVED***Values = [***REMOVED******REMOVED***.Stats.NValueEntries***REMOVED******REMOVED***]***REMOVED******REMOVED***.ValueType***REMOVED******REMOVED*** ***REMOVED***
-***REMOVED******REMOVED***range $i, $v := .ValueBlocks***REMOVED******REMOVED******REMOVED******REMOVED***printValues $i $v***REMOVED******REMOVED***
-***REMOVED******REMOVED***end***REMOVED******REMOVED******REMOVED***
+var {{.Name}}Values = [{{.Stats.NValueEntries}}]{{.ValueType}} {
+{{range $i, $v := .ValueBlocks}}{{printValues $i $v}}
+{{end}}}
 
-// ***REMOVED******REMOVED***.Name***REMOVED******REMOVED***Index: ***REMOVED******REMOVED***len .IndexBlocks***REMOVED******REMOVED*** blocks, ***REMOVED******REMOVED***.Stats.NIndexEntries***REMOVED******REMOVED*** entries, ***REMOVED******REMOVED***.Stats.NIndexBytes***REMOVED******REMOVED*** bytes
+// {{.Name}}Index: {{len .IndexBlocks}} blocks, {{.Stats.NIndexEntries}} entries, {{.Stats.NIndexBytes}} bytes
 // Block 0 is the zero block.
-var ***REMOVED******REMOVED***.Name***REMOVED******REMOVED***Index = [***REMOVED******REMOVED***.Stats.NIndexEntries***REMOVED******REMOVED***]***REMOVED******REMOVED***.IndexType***REMOVED******REMOVED*** ***REMOVED***
-***REMOVED******REMOVED***range $i, $v := .IndexBlocks***REMOVED******REMOVED******REMOVED******REMOVED***printIndex $b $i $v***REMOVED******REMOVED***
-***REMOVED******REMOVED***end***REMOVED******REMOVED******REMOVED***
+var {{.Name}}Index = [{{.Stats.NIndexEntries}}]{{.IndexType}} {
+{{range $i, $v := .IndexBlocks}}{{printIndex $b $i $v}}
+{{end}}}
 `
 
 // TODO: consider allowing zero-length strings after evaluating performance with
 // unicode/norm.
 const lookupTemplate = `
-// lookup***REMOVED******REMOVED***if eq .SourceType "string"***REMOVED******REMOVED***String***REMOVED******REMOVED***end***REMOVED******REMOVED*** returns the trie value for the first UTF-8 encoding in s and
+// lookup{{if eq .SourceType "string"}}String{{end}} returns the trie value for the first UTF-8 encoding in s and
 // the width in bytes of this encoding. The size will be 0 if s does not
 // hold enough bytes to complete the encoding. len(s) must be greater than 0.
-func (t ****REMOVED******REMOVED***.Name***REMOVED******REMOVED***Trie) lookup***REMOVED******REMOVED***if eq .SourceType "string"***REMOVED******REMOVED***String***REMOVED******REMOVED***end***REMOVED******REMOVED***(s ***REMOVED******REMOVED***.SourceType***REMOVED******REMOVED***) (v ***REMOVED******REMOVED***.ValueType***REMOVED******REMOVED***, sz int) ***REMOVED***
+func (t *{{.Name}}Trie) lookup{{if eq .SourceType "string"}}String{{end}}(s {{.SourceType}}) (v {{.ValueType}}, sz int) {
 	c0 := s[0]
-	switch ***REMOVED***
+	switch {
 	case c0 < 0x80: // is ASCII
-		return ***REMOVED******REMOVED***.ASCIIBlock***REMOVED******REMOVED***[c0], 1
+		return {{.ASCIIBlock}}[c0], 1
 	case c0 < 0xC2:
 		return 0, 1  // Illegal UTF-8: not a starter, not ASCII.
 	case c0 < 0xE0: // 2-byte UTF-8
-		if len(s) < 2 ***REMOVED***
+		if len(s) < 2 {
 			return 0, 0
-		***REMOVED***
-		i := ***REMOVED******REMOVED***.StarterBlock***REMOVED******REMOVED***[c0]
+		}
+		i := {{.StarterBlock}}[c0]
 		c1 := s[1]
-		if c1 < 0x80 || 0xC0 <= c1 ***REMOVED***
+		if c1 < 0x80 || 0xC0 <= c1 {
 			return 0, 1 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		return t.lookupValue(uint32(i), c1), 2
 	case c0 < 0xF0: // 3-byte UTF-8
-		if len(s) < 3 ***REMOVED***
+		if len(s) < 3 {
 			return 0, 0
-		***REMOVED***
-		i := ***REMOVED******REMOVED***.StarterBlock***REMOVED******REMOVED***[c0]
+		}
+		i := {{.StarterBlock}}[c0]
 		c1 := s[1]
-		if c1 < 0x80 || 0xC0 <= c1 ***REMOVED***
+		if c1 < 0x80 || 0xC0 <= c1 {
 			return 0, 1 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		o := uint32(i)<<6 + uint32(c1)
-		i = ***REMOVED******REMOVED***.Name***REMOVED******REMOVED***Index[o]
+		i = {{.Name}}Index[o]
 		c2 := s[2]
-		if c2 < 0x80 || 0xC0 <= c2 ***REMOVED***
+		if c2 < 0x80 || 0xC0 <= c2 {
 			return 0, 2 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		return t.lookupValue(uint32(i), c2), 3
 	case c0 < 0xF8: // 4-byte UTF-8
-		if len(s) < 4 ***REMOVED***
+		if len(s) < 4 {
 			return 0, 0
-		***REMOVED***
-		i := ***REMOVED******REMOVED***.StarterBlock***REMOVED******REMOVED***[c0]
+		}
+		i := {{.StarterBlock}}[c0]
 		c1 := s[1]
-		if c1 < 0x80 || 0xC0 <= c1 ***REMOVED***
+		if c1 < 0x80 || 0xC0 <= c1 {
 			return 0, 1 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		o := uint32(i)<<6 + uint32(c1)
-		i = ***REMOVED******REMOVED***.Name***REMOVED******REMOVED***Index[o]
+		i = {{.Name}}Index[o]
 		c2 := s[2]
-		if c2 < 0x80 || 0xC0 <= c2 ***REMOVED***
+		if c2 < 0x80 || 0xC0 <= c2 {
 			return 0, 2 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		o = uint32(i)<<6 + uint32(c2)
-		i = ***REMOVED******REMOVED***.Name***REMOVED******REMOVED***Index[o]
+		i = {{.Name}}Index[o]
 		c3 := s[3]
-		if c3 < 0x80 || 0xC0 <= c3 ***REMOVED***
+		if c3 < 0x80 || 0xC0 <= c3 {
 			return 0, 3 // Illegal UTF-8: not a continuation byte.
-		***REMOVED***
+		}
 		return t.lookupValue(uint32(i), c3), 4
-	***REMOVED***
+	}
 	// Illegal rune
 	return 0, 1
-***REMOVED***
+}
 
-// lookup***REMOVED******REMOVED***if eq .SourceType "string"***REMOVED******REMOVED***String***REMOVED******REMOVED***end***REMOVED******REMOVED***Unsafe returns the trie value for the first UTF-8 encoding in s.
+// lookup{{if eq .SourceType "string"}}String{{end}}Unsafe returns the trie value for the first UTF-8 encoding in s.
 // s must start with a full and valid UTF-8 encoded rune.
-func (t ****REMOVED******REMOVED***.Name***REMOVED******REMOVED***Trie) lookup***REMOVED******REMOVED***if eq .SourceType "string"***REMOVED******REMOVED***String***REMOVED******REMOVED***end***REMOVED******REMOVED***Unsafe(s ***REMOVED******REMOVED***.SourceType***REMOVED******REMOVED***) ***REMOVED******REMOVED***.ValueType***REMOVED******REMOVED*** ***REMOVED***
+func (t *{{.Name}}Trie) lookup{{if eq .SourceType "string"}}String{{end}}Unsafe(s {{.SourceType}}) {{.ValueType}} {
 	c0 := s[0]
-	if c0 < 0x80 ***REMOVED*** // is ASCII
-		return ***REMOVED******REMOVED***.ASCIIBlock***REMOVED******REMOVED***[c0]
-	***REMOVED***
-	i := ***REMOVED******REMOVED***.StarterBlock***REMOVED******REMOVED***[c0]
-	if c0 < 0xE0 ***REMOVED*** // 2-byte UTF-8
+	if c0 < 0x80 { // is ASCII
+		return {{.ASCIIBlock}}[c0]
+	}
+	i := {{.StarterBlock}}[c0]
+	if c0 < 0xE0 { // 2-byte UTF-8
 		return t.lookupValue(uint32(i), s[1])
-	***REMOVED***
-	i = ***REMOVED******REMOVED***.Name***REMOVED******REMOVED***Index[uint32(i)<<6+uint32(s[1])]
-	if c0 < 0xF0 ***REMOVED*** // 3-byte UTF-8
+	}
+	i = {{.Name}}Index[uint32(i)<<6+uint32(s[1])]
+	if c0 < 0xF0 { // 3-byte UTF-8
 		return t.lookupValue(uint32(i), s[2])
-	***REMOVED***
-	i = ***REMOVED******REMOVED***.Name***REMOVED******REMOVED***Index[uint32(i)<<6+uint32(s[2])]
-	if c0 < 0xF8 ***REMOVED*** // 4-byte UTF-8
+	}
+	i = {{.Name}}Index[uint32(i)<<6+uint32(s[2])]
+	if c0 < 0xF8 { // 4-byte UTF-8
 		return t.lookupValue(uint32(i), s[3])
-	***REMOVED***
+	}
 	return 0
-***REMOVED***
+}
 `

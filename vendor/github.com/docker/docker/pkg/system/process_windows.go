@@ -3,16 +3,16 @@ package system
 import "os"
 
 // IsProcessAlive returns true if process with a given pid is running.
-func IsProcessAlive(pid int) bool ***REMOVED***
+func IsProcessAlive(pid int) bool {
 	_, err := os.FindProcess(pid)
 
 	return err == nil
-***REMOVED***
+}
 
 // KillProcess force-stops a process.
-func KillProcess(pid int) ***REMOVED***
+func KillProcess(pid int) {
 	p, err := os.FindProcess(pid)
-	if err == nil ***REMOVED***
+	if err == nil {
 		p.Kill()
-	***REMOVED***
-***REMOVED***
+	}
+}

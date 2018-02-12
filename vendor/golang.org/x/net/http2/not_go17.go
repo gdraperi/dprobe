@@ -13,51 +13,51 @@ import (
 	"time"
 )
 
-type contextContext interface ***REMOVED***
-	Done() <-chan struct***REMOVED******REMOVED***
+type contextContext interface {
+	Done() <-chan struct{}
 	Err() error
-***REMOVED***
+}
 
-type fakeContext struct***REMOVED******REMOVED***
+type fakeContext struct{}
 
-func (fakeContext) Done() <-chan struct***REMOVED******REMOVED*** ***REMOVED*** return nil ***REMOVED***
-func (fakeContext) Err() error            ***REMOVED*** panic("should not be called") ***REMOVED***
+func (fakeContext) Done() <-chan struct{} { return nil }
+func (fakeContext) Err() error            { panic("should not be called") }
 
-func reqContext(r *http.Request) fakeContext ***REMOVED***
-	return fakeContext***REMOVED******REMOVED***
-***REMOVED***
+func reqContext(r *http.Request) fakeContext {
+	return fakeContext{}
+}
 
-func setResponseUncompressed(res *http.Response) ***REMOVED***
+func setResponseUncompressed(res *http.Response) {
 	// Nothing.
-***REMOVED***
+}
 
-type clientTrace struct***REMOVED******REMOVED***
+type clientTrace struct{}
 
-func requestTrace(*http.Request) *clientTrace ***REMOVED*** return nil ***REMOVED***
-func traceGotConn(*http.Request, *ClientConn) ***REMOVED******REMOVED***
-func traceFirstResponseByte(*clientTrace)     ***REMOVED******REMOVED***
-func traceWroteHeaders(*clientTrace)          ***REMOVED******REMOVED***
-func traceWroteRequest(*clientTrace, error)   ***REMOVED******REMOVED***
-func traceGot100Continue(trace *clientTrace)  ***REMOVED******REMOVED***
-func traceWait100Continue(trace *clientTrace) ***REMOVED******REMOVED***
+func requestTrace(*http.Request) *clientTrace { return nil }
+func traceGotConn(*http.Request, *ClientConn) {}
+func traceFirstResponseByte(*clientTrace)     {}
+func traceWroteHeaders(*clientTrace)          {}
+func traceWroteRequest(*clientTrace, error)   {}
+func traceGot100Continue(trace *clientTrace)  {}
+func traceWait100Continue(trace *clientTrace) {}
 
-func nop() ***REMOVED******REMOVED***
+func nop() {}
 
-func serverConnBaseContext(c net.Conn, opts *ServeConnOpts) (ctx contextContext, cancel func()) ***REMOVED***
+func serverConnBaseContext(c net.Conn, opts *ServeConnOpts) (ctx contextContext, cancel func()) {
 	return nil, nop
-***REMOVED***
+}
 
-func contextWithCancel(ctx contextContext) (_ contextContext, cancel func()) ***REMOVED***
+func contextWithCancel(ctx contextContext) (_ contextContext, cancel func()) {
 	return ctx, nop
-***REMOVED***
+}
 
-func requestWithContext(req *http.Request, ctx contextContext) *http.Request ***REMOVED***
+func requestWithContext(req *http.Request, ctx contextContext) *http.Request {
 	return req
-***REMOVED***
+}
 
 // temporary copy of Go 1.6's private tls.Config.clone:
-func cloneTLSConfig(c *tls.Config) *tls.Config ***REMOVED***
-	return &tls.Config***REMOVED***
+func cloneTLSConfig(c *tls.Config) *tls.Config {
+	return &tls.Config{
 		Rand:                     c.Rand,
 		Time:                     c.Time,
 		Certificates:             c.Certificates,
@@ -77,11 +77,11 @@ func cloneTLSConfig(c *tls.Config) *tls.Config ***REMOVED***
 		MinVersion:               c.MinVersion,
 		MaxVersion:               c.MaxVersion,
 		CurvePreferences:         c.CurvePreferences,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (cc *ClientConn) Ping(ctx contextContext) error ***REMOVED***
+func (cc *ClientConn) Ping(ctx contextContext) error {
 	return cc.ping(ctx)
-***REMOVED***
+}
 
-func (t *Transport) idleConnTimeout() time.Duration ***REMOVED*** return 0 ***REMOVED***
+func (t *Transport) idleConnTimeout() time.Duration { return 0 }

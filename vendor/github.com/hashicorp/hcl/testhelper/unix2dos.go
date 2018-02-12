@@ -6,10 +6,10 @@ import (
 )
 
 // Converts the line endings when on Windows
-func Unix2dos(unix string) string ***REMOVED***
-	if runtime.GOOS != "windows" ***REMOVED***
+func Unix2dos(unix string) string {
+	if runtime.GOOS != "windows" {
 		return unix
-	***REMOVED***
+	}
 
 	return strings.Replace(unix, "\n", "\r\n", -1)
-***REMOVED***
+}

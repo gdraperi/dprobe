@@ -2,9 +2,9 @@
 //
 // The traditional error handling idiom in Go is roughly akin to
 //
-//     if err != nil ***REMOVED***
+//     if err != nil {
 //             return err
-// ***REMOVED***
+//     }
 //
 // which applied recursively up the call stack results in error reports
 // without context or debugging information. The errors package allows
@@ -18,9 +18,9 @@
 // and the supplied message. For example
 //
 //     _, err := ioutil.ReadAll(r)
-//     if err != nil ***REMOVED***
+//     if err != nil {
 //             return errors.Wrap(err, "read failed")
-// ***REMOVED***
+//     }
 //
 // If additional control is required the errors.WithStack and errors.WithMessage
 // functions destructure errors.Wrap into its component operations of annotating
@@ -33,20 +33,20 @@
 // to reverse the operation of errors.Wrap to retrieve the original error
 // for inspection. Any error value which implements this interface
 //
-//     type causer interface ***REMOVED***
+//     type causer interface {
 //             Cause() error
-// ***REMOVED***
+//     }
 //
 // can be inspected by errors.Cause. errors.Cause will recursively retrieve
 // the topmost error which does not implement causer, which is assumed to be
 // the original cause. For example:
 //
-//     switch err := errors.Cause(err).(type) ***REMOVED***
+//     switch err := errors.Cause(err).(type) {
 //     case *MyError:
 //             // handle specifically
 //     default:
 //             // unknown error
-// ***REMOVED***
+//     }
 //
 // causer interface is not exported by this package, but is considered a part
 // of stable public API.
@@ -67,9 +67,9 @@
 // New, Errorf, Wrap, and Wrapf record a stack trace at the point they are
 // invoked. This information can be retrieved with the following interface.
 //
-//     type stackTracer interface ***REMOVED***
+//     type stackTracer interface {
 //             StackTrace() errors.StackTrace
-// ***REMOVED***
+//     }
 //
 // Where errors.StackTrace is defined as
 //
@@ -79,11 +79,11 @@
 // the fmt.Formatter interface that can be used for printing information about
 // the stack trace of this error. For example:
 //
-//     if err, ok := err.(stackTracer); ok ***REMOVED***
-//             for _, f := range err.StackTrace() ***REMOVED***
+//     if err, ok := err.(stackTracer); ok {
+//             for _, f := range err.StackTrace() {
 //                     fmt.Printf("%+s:%d", f)
-//         ***REMOVED***
-// ***REMOVED***
+//             }
+//     }
 //
 // stackTracer interface is not exported by this package, but is considered a part
 // of stable public API.
@@ -98,172 +98,172 @@ import (
 
 // New returns an error with the supplied message.
 // New also records the stack trace at the point it was called.
-func New(message string) error ***REMOVED***
-	return &fundamental***REMOVED***
+func New(message string) error {
+	return &fundamental{
 		msg:   message,
 		stack: callers(),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Errorf formats according to a format specifier and returns the string
 // as a value that satisfies error.
 // Errorf also records the stack trace at the point it was called.
-func Errorf(format string, args ...interface***REMOVED******REMOVED***) error ***REMOVED***
-	return &fundamental***REMOVED***
+func Errorf(format string, args ...interface{}) error {
+	return &fundamental{
 		msg:   fmt.Sprintf(format, args...),
 		stack: callers(),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // fundamental is an error that has a message and a stack, but no caller.
-type fundamental struct ***REMOVED***
+type fundamental struct {
 	msg string
 	*stack
-***REMOVED***
+}
 
-func (f *fundamental) Error() string ***REMOVED*** return f.msg ***REMOVED***
+func (f *fundamental) Error() string { return f.msg }
 
-func (f *fundamental) Format(s fmt.State, verb rune) ***REMOVED***
-	switch verb ***REMOVED***
+func (f *fundamental) Format(s fmt.State, verb rune) {
+	switch verb {
 	case 'v':
-		if s.Flag('+') ***REMOVED***
+		if s.Flag('+') {
 			io.WriteString(s, f.msg)
 			f.stack.Format(s, verb)
 			return
-		***REMOVED***
+		}
 		fallthrough
 	case 's':
 		io.WriteString(s, f.msg)
 	case 'q':
 		fmt.Fprintf(s, "%q", f.msg)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // WithStack annotates err with a stack trace at the point WithStack was called.
 // If err is nil, WithStack returns nil.
-func WithStack(err error) error ***REMOVED***
-	if err == nil ***REMOVED***
+func WithStack(err error) error {
+	if err == nil {
 		return nil
-	***REMOVED***
-	return &withStack***REMOVED***
+	}
+	return &withStack{
 		err,
 		callers(),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type withStack struct ***REMOVED***
+type withStack struct {
 	error
 	*stack
-***REMOVED***
+}
 
-func (w *withStack) Cause() error ***REMOVED*** return w.error ***REMOVED***
+func (w *withStack) Cause() error { return w.error }
 
-func (w *withStack) Format(s fmt.State, verb rune) ***REMOVED***
-	switch verb ***REMOVED***
+func (w *withStack) Format(s fmt.State, verb rune) {
+	switch verb {
 	case 'v':
-		if s.Flag('+') ***REMOVED***
+		if s.Flag('+') {
 			fmt.Fprintf(s, "%+v", w.Cause())
 			w.stack.Format(s, verb)
 			return
-		***REMOVED***
+		}
 		fallthrough
 	case 's':
 		io.WriteString(s, w.Error())
 	case 'q':
 		fmt.Fprintf(s, "%q", w.Error())
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Wrap returns an error annotating err with a stack trace
 // at the point Wrap is called, and the supplied message.
 // If err is nil, Wrap returns nil.
-func Wrap(err error, message string) error ***REMOVED***
-	if err == nil ***REMOVED***
+func Wrap(err error, message string) error {
+	if err == nil {
 		return nil
-	***REMOVED***
-	err = &withMessage***REMOVED***
+	}
+	err = &withMessage{
 		cause: err,
 		msg:   message,
-	***REMOVED***
-	return &withStack***REMOVED***
+	}
+	return &withStack{
 		err,
 		callers(),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Wrapf returns an error annotating err with a stack trace
 // at the point Wrapf is call, and the format specifier.
 // If err is nil, Wrapf returns nil.
-func Wrapf(err error, format string, args ...interface***REMOVED******REMOVED***) error ***REMOVED***
-	if err == nil ***REMOVED***
+func Wrapf(err error, format string, args ...interface{}) error {
+	if err == nil {
 		return nil
-	***REMOVED***
-	err = &withMessage***REMOVED***
+	}
+	err = &withMessage{
 		cause: err,
 		msg:   fmt.Sprintf(format, args...),
-	***REMOVED***
-	return &withStack***REMOVED***
+	}
+	return &withStack{
 		err,
 		callers(),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // WithMessage annotates err with a new message.
 // If err is nil, WithMessage returns nil.
-func WithMessage(err error, message string) error ***REMOVED***
-	if err == nil ***REMOVED***
+func WithMessage(err error, message string) error {
+	if err == nil {
 		return nil
-	***REMOVED***
-	return &withMessage***REMOVED***
+	}
+	return &withMessage{
 		cause: err,
 		msg:   message,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type withMessage struct ***REMOVED***
+type withMessage struct {
 	cause error
 	msg   string
-***REMOVED***
+}
 
-func (w *withMessage) Error() string ***REMOVED*** return w.msg + ": " + w.cause.Error() ***REMOVED***
-func (w *withMessage) Cause() error  ***REMOVED*** return w.cause ***REMOVED***
+func (w *withMessage) Error() string { return w.msg + ": " + w.cause.Error() }
+func (w *withMessage) Cause() error  { return w.cause }
 
-func (w *withMessage) Format(s fmt.State, verb rune) ***REMOVED***
-	switch verb ***REMOVED***
+func (w *withMessage) Format(s fmt.State, verb rune) {
+	switch verb {
 	case 'v':
-		if s.Flag('+') ***REMOVED***
+		if s.Flag('+') {
 			fmt.Fprintf(s, "%+v\n", w.Cause())
 			io.WriteString(s, w.msg)
 			return
-		***REMOVED***
+		}
 		fallthrough
 	case 's', 'q':
 		io.WriteString(s, w.Error())
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Cause returns the underlying cause of the error, if possible.
 // An error value has a cause if it implements the following
 // interface:
 //
-//     type causer interface ***REMOVED***
+//     type causer interface {
 //            Cause() error
-// ***REMOVED***
+//     }
 //
 // If the error does not implement Cause, the original error will
 // be returned. If the error is nil, nil will be returned without further
 // investigation.
-func Cause(err error) error ***REMOVED***
-	type causer interface ***REMOVED***
+func Cause(err error) error {
+	type causer interface {
 		Cause() error
-	***REMOVED***
+	}
 
-	for err != nil ***REMOVED***
+	for err != nil {
 		cause, ok := err.(causer)
-		if !ok ***REMOVED***
+		if !ok {
 			break
-		***REMOVED***
+		}
 		err = cause.Cause()
-	***REMOVED***
+	}
 	return err
-***REMOVED***
+}

@@ -1,10 +1,10 @@
-***REMOVED***
-	"foo": [***REMOVED***
-		"baz": ***REMOVED***
+{
+	"foo": [{
+		"baz": {
 			"key": 7,
 			"foo": "bar"
-		***REMOVED***
-***REMOVED***, ***REMOVED***
+		}
+    }, {
 		"key": 7
-	***REMOVED***]
-***REMOVED***
+	}]
+}

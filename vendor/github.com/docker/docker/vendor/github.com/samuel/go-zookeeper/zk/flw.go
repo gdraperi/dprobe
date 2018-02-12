@@ -20,7 +20,7 @@ import (
 // then the error happened before we started to obtain 'srvr' values. Otherwise, one of the
 // servers had an issue and the "Error" value in the struct should be inspected to determine
 // which server had the issue.
-func FLWSrvr(servers []string, timeout time.Duration) ([]*ServerStats, bool) ***REMOVED***
+func FLWSrvr(servers []string, timeout time.Duration) ([]*ServerStats, bool) {
 	// different parts of the regular expression that are required to parse the srvr output
 	var (
 		zrVer   = `^Zookeeper version: ([A-Za-z0-9\.\-]+), built on (\d\d/\d\d/\d\d\d\d \d\d:\d\d [A-Za-z0-9:\+\-]+)`
@@ -32,35 +32,35 @@ func FLWSrvr(servers []string, timeout time.Duration) ([]*ServerStats, bool) ***
 	// build the regex from the pieces above
 	re, err := regexp.Compile(fmt.Sprintf(`(?m:\A%v.*\n%v.*\n%v.*\n%v)`, zrVer, zrLat, zrNet, zrState))
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, false
-	***REMOVED***
+	}
 
 	imOk := true
 	servers = FormatServers(servers)
 	ss := make([]*ServerStats, len(servers))
 
-	for i := range ss ***REMOVED***
+	for i := range ss {
 		response, err := fourLetterWord(servers[i], "srvr", timeout)
 
-		if err != nil ***REMOVED***
-			ss[i] = &ServerStats***REMOVED***Error: err***REMOVED***
+		if err != nil {
+			ss[i] = &ServerStats{Error: err}
 			imOk = false
 			continue
-		***REMOVED***
+		}
 
 		match := re.FindAllStringSubmatch(string(response), -1)[0][1:]
 
-		if match == nil ***REMOVED***
+		if match == nil {
 			err := fmt.Errorf("unable to parse fields from zookeeper response (no regex matches)")
-			ss[i] = &ServerStats***REMOVED***Error: err***REMOVED***
+			ss[i] = &ServerStats{Error: err}
 			imOk = false
 			continue
-		***REMOVED***
+		}
 
 		// determine current server
 		var srvrMode Mode
-		switch match[10] ***REMOVED***
+		switch match[10] {
 		case "leader":
 			srvrMode = ModeLeader
 		case "follower":
@@ -69,23 +69,23 @@ func FLWSrvr(servers []string, timeout time.Duration) ([]*ServerStats, bool) ***
 			srvrMode = ModeStandalone
 		default:
 			srvrMode = ModeUnknown
-		***REMOVED***
+		}
 
 		buildTime, err := time.Parse("01/02/2006 15:04 MST", match[1])
 
-		if err != nil ***REMOVED***
-			ss[i] = &ServerStats***REMOVED***Error: err***REMOVED***
+		if err != nil {
+			ss[i] = &ServerStats{Error: err}
 			imOk = false
 			continue
-		***REMOVED***
+		}
 
 		parsedInt, err := strconv.ParseInt(match[9], 0, 64)
 
-		if err != nil ***REMOVED***
-			ss[i] = &ServerStats***REMOVED***Error: err***REMOVED***
+		if err != nil {
+			ss[i] = &ServerStats{Error: err}
 			imOk = false
 			continue
-		***REMOVED***
+		}
 
 		// the ZxID value is an int64 with two int32s packed inside
 		// the high int32 is the epoch (i.e., number of leader elections)
@@ -104,7 +104,7 @@ func FLWSrvr(servers []string, timeout time.Duration) ([]*ServerStats, bool) ***
 		outs, _ := strconv.ParseInt(match[8], 0, 64)
 		ncnt, _ := strconv.ParseInt(match[11], 0, 64)
 
-		ss[i] = &ServerStats***REMOVED***
+		ss[i] = &ServerStats{
 			Sent:        sent,
 			Received:    recv,
 			NodeCount:   ncnt,
@@ -118,82 +118,82 @@ func FLWSrvr(servers []string, timeout time.Duration) ([]*ServerStats, bool) ***
 			BuildTime:   buildTime,
 			Mode:        srvrMode,
 			Version:     match[0],
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return ss, imOk
-***REMOVED***
+}
 
 // FLWRuok is a FourLetterWord helper function. In particular, this function
 // pulls the ruok output from each server.
-func FLWRuok(servers []string, timeout time.Duration) []bool ***REMOVED***
+func FLWRuok(servers []string, timeout time.Duration) []bool {
 	servers = FormatServers(servers)
 	oks := make([]bool, len(servers))
 
-	for i := range oks ***REMOVED***
+	for i := range oks {
 		response, err := fourLetterWord(servers[i], "ruok", timeout)
 
-		if err != nil ***REMOVED***
+		if err != nil {
 			continue
-		***REMOVED***
+		}
 
-		if bytes.Equal(response[:4], []byte("imok")) ***REMOVED***
+		if bytes.Equal(response[:4], []byte("imok")) {
 			oks[i] = true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return oks
-***REMOVED***
+}
 
 // FLWCons is a FourLetterWord helper function. In particular, this function
 // pulls the ruok output from each server.
 //
 // As with FLWSrvr, the boolean value indicates whether one of the requests had
 // an issue. The Clients struct has an Error value that can be checked.
-func FLWCons(servers []string, timeout time.Duration) ([]*ServerClients, bool) ***REMOVED***
+func FLWCons(servers []string, timeout time.Duration) ([]*ServerClients, bool) {
 	var (
-		zrAddr = `^ /((?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.)***REMOVED***3***REMOVED***(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?):(?:\d+))\[\d+\]`
+		zrAddr = `^ /((?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?):(?:\d+))\[\d+\]`
 		zrPac  = `\(queued=(\d+),recved=(\d+),sent=(\d+),sid=(0x[A-Za-z0-9]+),lop=(\w+),est=(\d+),to=(\d+),`
 		zrSesh = `lcxid=(0x[A-Za-z0-9]+),lzxid=(0x[A-Za-z0-9]+),lresp=(\d+),llat=(\d+),minlat=(\d+),avglat=(\d+),maxlat=(\d+)\)`
 	)
 
 	re, err := regexp.Compile(fmt.Sprintf("%v%v%v", zrAddr, zrPac, zrSesh))
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, false
-	***REMOVED***
+	}
 
 	servers = FormatServers(servers)
 	sc := make([]*ServerClients, len(servers))
 	imOk := true
 
-	for i := range sc ***REMOVED***
+	for i := range sc {
 		response, err := fourLetterWord(servers[i], "cons", timeout)
 
-		if err != nil ***REMOVED***
-			sc[i] = &ServerClients***REMOVED***Error: err***REMOVED***
+		if err != nil {
+			sc[i] = &ServerClients{Error: err}
 			imOk = false
 			continue
-		***REMOVED***
+		}
 
 		scan := bufio.NewScanner(bytes.NewReader(response))
 
 		var clients []*ServerClient
 
-		for scan.Scan() ***REMOVED***
+		for scan.Scan() {
 			line := scan.Bytes()
 
-			if len(line) == 0 ***REMOVED***
+			if len(line) == 0 {
 				continue
-			***REMOVED***
+			}
 
 			m := re.FindAllStringSubmatch(string(line), -1)
 
-			if m == nil ***REMOVED***
+			if m == nil {
 				err := fmt.Errorf("unable to parse fields from zookeeper response (no regex matches)")
-				sc[i] = &ServerClients***REMOVED***Error: err***REMOVED***
+				sc[i] = &ServerClients{Error: err}
 				imOk = false
 				continue
-			***REMOVED***
+			}
 
 			match := m[0][1:]
 
@@ -219,19 +219,19 @@ func FLWCons(servers []string, timeout time.Duration) ([]*ServerClients, bool) *
 
 			var errVal error
 
-			if !ok ***REMOVED***
+			if !ok {
 				errVal = fmt.Errorf("failed to convert lzxid value to big.Int")
 				imOk = false
-			***REMOVED***
+			}
 
 			lcxid, ok := new(big.Int).SetString(match[8], 0)
 
-			if !ok && errVal == nil ***REMOVED***
+			if !ok && errVal == nil {
 				errVal = fmt.Errorf("failed to convert lcxid value to big.Int")
 				imOk = false
-			***REMOVED***
+			}
 
-			clients = append(clients, &ServerClient***REMOVED***
+			clients = append(clients, &ServerClient{
 				Queued:        queued,
 				Received:      recvd,
 				Sent:          sent,
@@ -248,21 +248,21 @@ func FLWCons(servers []string, timeout time.Duration) ([]*ServerClients, bool) *
 				Addr:          match[0],
 				LastOperation: match[5],
 				Error:         errVal,
-			***REMOVED***)
-		***REMOVED***
+			})
+		}
 
-		sc[i] = &ServerClients***REMOVED***Clients: clients***REMOVED***
-	***REMOVED***
+		sc[i] = &ServerClients{Clients: clients}
+	}
 
 	return sc, imOk
-***REMOVED***
+}
 
-func fourLetterWord(server, command string, timeout time.Duration) ([]byte, error) ***REMOVED***
+func fourLetterWord(server, command string, timeout time.Duration) ([]byte, error) {
 	conn, err := net.DialTimeout("tcp", server, timeout)
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// the zookeeper server should automatically close this socket
 	// once the command has been processed, but better safe than sorry
@@ -272,17 +272,17 @@ func fourLetterWord(server, command string, timeout time.Duration) ([]byte, erro
 
 	_, err = conn.Write([]byte(command))
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	conn.SetReadDeadline(time.Now().Add(timeout))
 
 	resp, err := ioutil.ReadAll(conn)
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	return resp, nil
-***REMOVED***
+}

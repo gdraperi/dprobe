@@ -23,88 +23,88 @@ import (
 	"time"
 )
 
-type httpDir struct ***REMOVED***
+type httpDir struct {
 	basePath string
 	fs       HttpFs
-***REMOVED***
+}
 
-func (d httpDir) Open(name string) (http.File, error) ***REMOVED***
+func (d httpDir) Open(name string) (http.File, error) {
 	if filepath.Separator != '/' && strings.IndexRune(name, filepath.Separator) >= 0 ||
-		strings.Contains(name, "\x00") ***REMOVED***
+		strings.Contains(name, "\x00") {
 		return nil, errors.New("http: invalid character in file path")
-	***REMOVED***
+	}
 	dir := string(d.basePath)
-	if dir == "" ***REMOVED***
+	if dir == "" {
 		dir = "."
-	***REMOVED***
+	}
 
 	f, err := d.fs.Open(filepath.Join(dir, filepath.FromSlash(path.Clean("/"+name))))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return f, nil
-***REMOVED***
+}
 
-type HttpFs struct ***REMOVED***
+type HttpFs struct {
 	source Fs
-***REMOVED***
+}
 
-func NewHttpFs(source Fs) *HttpFs ***REMOVED***
-	return &HttpFs***REMOVED***source: source***REMOVED***
-***REMOVED***
+func NewHttpFs(source Fs) *HttpFs {
+	return &HttpFs{source: source}
+}
 
-func (h HttpFs) Dir(s string) *httpDir ***REMOVED***
-	return &httpDir***REMOVED***basePath: s, fs: h***REMOVED***
-***REMOVED***
+func (h HttpFs) Dir(s string) *httpDir {
+	return &httpDir{basePath: s, fs: h}
+}
 
-func (h HttpFs) Name() string ***REMOVED*** return "h HttpFs" ***REMOVED***
+func (h HttpFs) Name() string { return "h HttpFs" }
 
-func (h HttpFs) Create(name string) (File, error) ***REMOVED***
+func (h HttpFs) Create(name string) (File, error) {
 	return h.source.Create(name)
-***REMOVED***
+}
 
-func (h HttpFs) Chmod(name string, mode os.FileMode) error ***REMOVED***
+func (h HttpFs) Chmod(name string, mode os.FileMode) error {
 	return h.source.Chmod(name, mode)
-***REMOVED***
+}
 
-func (h HttpFs) Chtimes(name string, atime time.Time, mtime time.Time) error ***REMOVED***
+func (h HttpFs) Chtimes(name string, atime time.Time, mtime time.Time) error {
 	return h.source.Chtimes(name, atime, mtime)
-***REMOVED***
+}
 
-func (h HttpFs) Mkdir(name string, perm os.FileMode) error ***REMOVED***
+func (h HttpFs) Mkdir(name string, perm os.FileMode) error {
 	return h.source.Mkdir(name, perm)
-***REMOVED***
+}
 
-func (h HttpFs) MkdirAll(path string, perm os.FileMode) error ***REMOVED***
+func (h HttpFs) MkdirAll(path string, perm os.FileMode) error {
 	return h.source.MkdirAll(path, perm)
-***REMOVED***
+}
 
-func (h HttpFs) Open(name string) (http.File, error) ***REMOVED***
+func (h HttpFs) Open(name string) (http.File, error) {
 	f, err := h.source.Open(name)
-	if err == nil ***REMOVED***
-		if httpfile, ok := f.(http.File); ok ***REMOVED***
+	if err == nil {
+		if httpfile, ok := f.(http.File); ok {
 			return httpfile, nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil, err
-***REMOVED***
+}
 
-func (h HttpFs) OpenFile(name string, flag int, perm os.FileMode) (File, error) ***REMOVED***
+func (h HttpFs) OpenFile(name string, flag int, perm os.FileMode) (File, error) {
 	return h.source.OpenFile(name, flag, perm)
-***REMOVED***
+}
 
-func (h HttpFs) Remove(name string) error ***REMOVED***
+func (h HttpFs) Remove(name string) error {
 	return h.source.Remove(name)
-***REMOVED***
+}
 
-func (h HttpFs) RemoveAll(path string) error ***REMOVED***
+func (h HttpFs) RemoveAll(path string) error {
 	return h.source.RemoveAll(path)
-***REMOVED***
+}
 
-func (h HttpFs) Rename(oldname, newname string) error ***REMOVED***
+func (h HttpFs) Rename(oldname, newname string) error {
 	return h.source.Rename(oldname, newname)
-***REMOVED***
+}
 
-func (h HttpFs) Stat(name string) (os.FileInfo, error) ***REMOVED***
+func (h HttpFs) Stat(name string) (os.FileInfo, error) {
 	return h.source.Stat(name)
-***REMOVED***
+}

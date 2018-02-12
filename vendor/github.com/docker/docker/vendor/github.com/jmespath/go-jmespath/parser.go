@@ -37,47 +37,47 @@ const (
 )
 
 // ASTNode represents the abstract syntax tree of a JMESPath expression.
-type ASTNode struct ***REMOVED***
+type ASTNode struct {
 	nodeType astNodeType
-	value    interface***REMOVED******REMOVED***
+	value    interface{}
 	children []ASTNode
-***REMOVED***
+}
 
-func (node ASTNode) String() string ***REMOVED***
+func (node ASTNode) String() string {
 	return node.PrettyPrint(0)
-***REMOVED***
+}
 
 // PrettyPrint will pretty print the parsed AST.
 // The AST is an implementation detail and this pretty print
 // function is provided as a convenience method to help with
 // debugging.  You should not rely on its output as the internal
 // structure of the AST may change at any time.
-func (node ASTNode) PrettyPrint(indent int) string ***REMOVED***
+func (node ASTNode) PrettyPrint(indent int) string {
 	spaces := strings.Repeat(" ", indent)
-	output := fmt.Sprintf("%s%s ***REMOVED***\n", spaces, node.nodeType)
+	output := fmt.Sprintf("%s%s {\n", spaces, node.nodeType)
 	nextIndent := indent + 2
-	if node.value != nil ***REMOVED***
-		if converted, ok := node.value.(fmt.Stringer); ok ***REMOVED***
+	if node.value != nil {
+		if converted, ok := node.value.(fmt.Stringer); ok {
 			// Account for things like comparator nodes
 			// that are enums with a String() method.
 			output += fmt.Sprintf("%svalue: %s\n", strings.Repeat(" ", nextIndent), converted.String())
-		***REMOVED*** else ***REMOVED***
+		} else {
 			output += fmt.Sprintf("%svalue: %#v\n", strings.Repeat(" ", nextIndent), node.value)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	lastIndex := len(node.children)
-	if lastIndex > 0 ***REMOVED***
-		output += fmt.Sprintf("%schildren: ***REMOVED***\n", strings.Repeat(" ", nextIndent))
+	if lastIndex > 0 {
+		output += fmt.Sprintf("%schildren: {\n", strings.Repeat(" ", nextIndent))
 		childIndent := nextIndent + 2
-		for _, elem := range node.children ***REMOVED***
+		for _, elem := range node.children {
 			output += elem.PrettyPrint(childIndent)
-		***REMOVED***
-	***REMOVED***
-	output += fmt.Sprintf("%s***REMOVED***\n", spaces)
+		}
+	}
+	output += fmt.Sprintf("%s}\n", spaces)
 	return output
-***REMOVED***
+}
 
-var bindingPowers = map[tokType]int***REMOVED***
+var bindingPowers = map[tokType]int{
 	tEOF:                0,
 	tUnquotedIdentifier: 0,
 	tQuotedIdentifier:   0,
@@ -106,498 +106,498 @@ var bindingPowers = map[tokType]int***REMOVED***
 	tLbrace:             50,
 	tLbracket:           55,
 	tLparen:             60,
-***REMOVED***
+}
 
 // Parser holds state about the current expression being parsed.
-type Parser struct ***REMOVED***
+type Parser struct {
 	expression string
 	tokens     []token
 	index      int
-***REMOVED***
+}
 
 // NewParser creates a new JMESPath parser.
-func NewParser() *Parser ***REMOVED***
-	p := Parser***REMOVED******REMOVED***
+func NewParser() *Parser {
+	p := Parser{}
 	return &p
-***REMOVED***
+}
 
 // Parse will compile a JMESPath expression.
-func (p *Parser) Parse(expression string) (ASTNode, error) ***REMOVED***
+func (p *Parser) Parse(expression string) (ASTNode, error) {
 	lexer := NewLexer()
 	p.expression = expression
 	p.index = 0
 	tokens, err := lexer.tokenize(expression)
-	if err != nil ***REMOVED***
-		return ASTNode***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return ASTNode{}, err
+	}
 	p.tokens = tokens
 	parsed, err := p.parseExpression(0)
-	if err != nil ***REMOVED***
-		return ASTNode***REMOVED******REMOVED***, err
-	***REMOVED***
-	if p.current() != tEOF ***REMOVED***
-		return ASTNode***REMOVED******REMOVED***, p.syntaxError(fmt.Sprintf(
+	if err != nil {
+		return ASTNode{}, err
+	}
+	if p.current() != tEOF {
+		return ASTNode{}, p.syntaxError(fmt.Sprintf(
 			"Unexpected token at the end of the expresssion: %s", p.current()))
-	***REMOVED***
+	}
 	return parsed, nil
-***REMOVED***
+}
 
-func (p *Parser) parseExpression(bindingPower int) (ASTNode, error) ***REMOVED***
+func (p *Parser) parseExpression(bindingPower int) (ASTNode, error) {
 	var err error
 	leftToken := p.lookaheadToken(0)
 	p.advance()
 	leftNode, err := p.nud(leftToken)
-	if err != nil ***REMOVED***
-		return ASTNode***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err != nil {
+		return ASTNode{}, err
+	}
 	currentToken := p.current()
-	for bindingPower < bindingPowers[currentToken] ***REMOVED***
+	for bindingPower < bindingPowers[currentToken] {
 		p.advance()
 		leftNode, err = p.led(currentToken, leftNode)
-		if err != nil ***REMOVED***
-			return ASTNode***REMOVED******REMOVED***, err
-		***REMOVED***
+		if err != nil {
+			return ASTNode{}, err
+		}
 		currentToken = p.current()
-	***REMOVED***
+	}
 	return leftNode, nil
-***REMOVED***
+}
 
-func (p *Parser) parseIndexExpression() (ASTNode, error) ***REMOVED***
-	if p.lookahead(0) == tColon || p.lookahead(1) == tColon ***REMOVED***
+func (p *Parser) parseIndexExpression() (ASTNode, error) {
+	if p.lookahead(0) == tColon || p.lookahead(1) == tColon {
 		return p.parseSliceExpression()
-	***REMOVED***
+	}
 	indexStr := p.lookaheadToken(0).value
 	parsedInt, err := strconv.Atoi(indexStr)
-	if err != nil ***REMOVED***
-		return ASTNode***REMOVED******REMOVED***, err
-	***REMOVED***
-	indexNode := ASTNode***REMOVED***nodeType: ASTIndex, value: parsedInt***REMOVED***
+	if err != nil {
+		return ASTNode{}, err
+	}
+	indexNode := ASTNode{nodeType: ASTIndex, value: parsedInt}
 	p.advance()
-	if err := p.match(tRbracket); err != nil ***REMOVED***
-		return ASTNode***REMOVED******REMOVED***, err
-	***REMOVED***
+	if err := p.match(tRbracket); err != nil {
+		return ASTNode{}, err
+	}
 	return indexNode, nil
-***REMOVED***
+}
 
-func (p *Parser) parseSliceExpression() (ASTNode, error) ***REMOVED***
-	parts := []*int***REMOVED***nil, nil, nil***REMOVED***
+func (p *Parser) parseSliceExpression() (ASTNode, error) {
+	parts := []*int{nil, nil, nil}
 	index := 0
 	current := p.current()
-	for current != tRbracket && index < 3 ***REMOVED***
-		if current == tColon ***REMOVED***
+	for current != tRbracket && index < 3 {
+		if current == tColon {
 			index++
 			p.advance()
-		***REMOVED*** else if current == tNumber ***REMOVED***
+		} else if current == tNumber {
 			parsedInt, err := strconv.Atoi(p.lookaheadToken(0).value)
-			if err != nil ***REMOVED***
-				return ASTNode***REMOVED******REMOVED***, err
-			***REMOVED***
+			if err != nil {
+				return ASTNode{}, err
+			}
 			parts[index] = &parsedInt
 			p.advance()
-		***REMOVED*** else ***REMOVED***
-			return ASTNode***REMOVED******REMOVED***, p.syntaxError(
+		} else {
+			return ASTNode{}, p.syntaxError(
 				"Expected tColon or tNumber" + ", received: " + p.current().String())
-		***REMOVED***
+		}
 		current = p.current()
-	***REMOVED***
-	if err := p.match(tRbracket); err != nil ***REMOVED***
-		return ASTNode***REMOVED******REMOVED***, err
-	***REMOVED***
-	return ASTNode***REMOVED***
+	}
+	if err := p.match(tRbracket); err != nil {
+		return ASTNode{}, err
+	}
+	return ASTNode{
 		nodeType: ASTSlice,
 		value:    parts,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-func (p *Parser) match(tokenType tokType) error ***REMOVED***
-	if p.current() == tokenType ***REMOVED***
+func (p *Parser) match(tokenType tokType) error {
+	if p.current() == tokenType {
 		p.advance()
 		return nil
-	***REMOVED***
+	}
 	return p.syntaxError("Expected " + tokenType.String() + ", received: " + p.current().String())
-***REMOVED***
+}
 
-func (p *Parser) led(tokenType tokType, node ASTNode) (ASTNode, error) ***REMOVED***
-	switch tokenType ***REMOVED***
+func (p *Parser) led(tokenType tokType, node ASTNode) (ASTNode, error) {
+	switch tokenType {
 	case tDot:
-		if p.current() != tStar ***REMOVED***
+		if p.current() != tStar {
 			right, err := p.parseDotRHS(bindingPowers[tDot])
-			return ASTNode***REMOVED***
+			return ASTNode{
 				nodeType: ASTSubexpression,
-				children: []ASTNode***REMOVED***node, right***REMOVED***,
-			***REMOVED***, err
-		***REMOVED***
+				children: []ASTNode{node, right},
+			}, err
+		}
 		p.advance()
 		right, err := p.parseProjectionRHS(bindingPowers[tDot])
-		return ASTNode***REMOVED***
+		return ASTNode{
 			nodeType: ASTValueProjection,
-			children: []ASTNode***REMOVED***node, right***REMOVED***,
-		***REMOVED***, err
+			children: []ASTNode{node, right},
+		}, err
 	case tPipe:
 		right, err := p.parseExpression(bindingPowers[tPipe])
-		return ASTNode***REMOVED***nodeType: ASTPipe, children: []ASTNode***REMOVED***node, right***REMOVED******REMOVED***, err
+		return ASTNode{nodeType: ASTPipe, children: []ASTNode{node, right}}, err
 	case tOr:
 		right, err := p.parseExpression(bindingPowers[tOr])
-		return ASTNode***REMOVED***nodeType: ASTOrExpression, children: []ASTNode***REMOVED***node, right***REMOVED******REMOVED***, err
+		return ASTNode{nodeType: ASTOrExpression, children: []ASTNode{node, right}}, err
 	case tAnd:
 		right, err := p.parseExpression(bindingPowers[tAnd])
-		return ASTNode***REMOVED***nodeType: ASTAndExpression, children: []ASTNode***REMOVED***node, right***REMOVED******REMOVED***, err
+		return ASTNode{nodeType: ASTAndExpression, children: []ASTNode{node, right}}, err
 	case tLparen:
 		name := node.value
 		var args []ASTNode
-		for p.current() != tRparen ***REMOVED***
+		for p.current() != tRparen {
 			expression, err := p.parseExpression(0)
-			if err != nil ***REMOVED***
-				return ASTNode***REMOVED******REMOVED***, err
-			***REMOVED***
-			if p.current() == tComma ***REMOVED***
-				if err := p.match(tComma); err != nil ***REMOVED***
-					return ASTNode***REMOVED******REMOVED***, err
-				***REMOVED***
-			***REMOVED***
+			if err != nil {
+				return ASTNode{}, err
+			}
+			if p.current() == tComma {
+				if err := p.match(tComma); err != nil {
+					return ASTNode{}, err
+				}
+			}
 			args = append(args, expression)
-		***REMOVED***
-		if err := p.match(tRparen); err != nil ***REMOVED***
-			return ASTNode***REMOVED******REMOVED***, err
-		***REMOVED***
-		return ASTNode***REMOVED***
+		}
+		if err := p.match(tRparen); err != nil {
+			return ASTNode{}, err
+		}
+		return ASTNode{
 			nodeType: ASTFunctionExpression,
 			value:    name,
 			children: args,
-		***REMOVED***, nil
+		}, nil
 	case tFilter:
 		return p.parseFilter(node)
 	case tFlatten:
-		left := ASTNode***REMOVED***nodeType: ASTFlatten, children: []ASTNode***REMOVED***node***REMOVED******REMOVED***
+		left := ASTNode{nodeType: ASTFlatten, children: []ASTNode{node}}
 		right, err := p.parseProjectionRHS(bindingPowers[tFlatten])
-		return ASTNode***REMOVED***
+		return ASTNode{
 			nodeType: ASTProjection,
-			children: []ASTNode***REMOVED***left, right***REMOVED***,
-		***REMOVED***, err
+			children: []ASTNode{left, right},
+		}, err
 	case tEQ, tNE, tGT, tGTE, tLT, tLTE:
 		right, err := p.parseExpression(bindingPowers[tokenType])
-		if err != nil ***REMOVED***
-			return ASTNode***REMOVED******REMOVED***, err
-		***REMOVED***
-		return ASTNode***REMOVED***
+		if err != nil {
+			return ASTNode{}, err
+		}
+		return ASTNode{
 			nodeType: ASTComparator,
 			value:    tokenType,
-			children: []ASTNode***REMOVED***node, right***REMOVED***,
-		***REMOVED***, nil
+			children: []ASTNode{node, right},
+		}, nil
 	case tLbracket:
 		tokenType := p.current()
 		var right ASTNode
 		var err error
-		if tokenType == tNumber || tokenType == tColon ***REMOVED***
+		if tokenType == tNumber || tokenType == tColon {
 			right, err = p.parseIndexExpression()
-			if err != nil ***REMOVED***
-				return ASTNode***REMOVED******REMOVED***, err
-			***REMOVED***
+			if err != nil {
+				return ASTNode{}, err
+			}
 			return p.projectIfSlice(node, right)
-		***REMOVED***
+		}
 		// Otherwise this is a projection.
-		if err := p.match(tStar); err != nil ***REMOVED***
-			return ASTNode***REMOVED******REMOVED***, err
-		***REMOVED***
-		if err := p.match(tRbracket); err != nil ***REMOVED***
-			return ASTNode***REMOVED******REMOVED***, err
-		***REMOVED***
+		if err := p.match(tStar); err != nil {
+			return ASTNode{}, err
+		}
+		if err := p.match(tRbracket); err != nil {
+			return ASTNode{}, err
+		}
 		right, err = p.parseProjectionRHS(bindingPowers[tStar])
-		if err != nil ***REMOVED***
-			return ASTNode***REMOVED******REMOVED***, err
-		***REMOVED***
-		return ASTNode***REMOVED***
+		if err != nil {
+			return ASTNode{}, err
+		}
+		return ASTNode{
 			nodeType: ASTProjection,
-			children: []ASTNode***REMOVED***node, right***REMOVED***,
-		***REMOVED***, nil
-	***REMOVED***
-	return ASTNode***REMOVED******REMOVED***, p.syntaxError("Unexpected token: " + tokenType.String())
-***REMOVED***
+			children: []ASTNode{node, right},
+		}, nil
+	}
+	return ASTNode{}, p.syntaxError("Unexpected token: " + tokenType.String())
+}
 
-func (p *Parser) nud(token token) (ASTNode, error) ***REMOVED***
-	switch token.tokenType ***REMOVED***
+func (p *Parser) nud(token token) (ASTNode, error) {
+	switch token.tokenType {
 	case tJSONLiteral:
-		var parsed interface***REMOVED******REMOVED***
+		var parsed interface{}
 		err := json.Unmarshal([]byte(token.value), &parsed)
-		if err != nil ***REMOVED***
-			return ASTNode***REMOVED******REMOVED***, err
-		***REMOVED***
-		return ASTNode***REMOVED***nodeType: ASTLiteral, value: parsed***REMOVED***, nil
+		if err != nil {
+			return ASTNode{}, err
+		}
+		return ASTNode{nodeType: ASTLiteral, value: parsed}, nil
 	case tStringLiteral:
-		return ASTNode***REMOVED***nodeType: ASTLiteral, value: token.value***REMOVED***, nil
+		return ASTNode{nodeType: ASTLiteral, value: token.value}, nil
 	case tUnquotedIdentifier:
-		return ASTNode***REMOVED***
+		return ASTNode{
 			nodeType: ASTField,
 			value:    token.value,
-		***REMOVED***, nil
+		}, nil
 	case tQuotedIdentifier:
-		node := ASTNode***REMOVED***nodeType: ASTField, value: token.value***REMOVED***
-		if p.current() == tLparen ***REMOVED***
-			return ASTNode***REMOVED******REMOVED***, p.syntaxErrorToken("Can't have quoted identifier as function name.", token)
-		***REMOVED***
+		node := ASTNode{nodeType: ASTField, value: token.value}
+		if p.current() == tLparen {
+			return ASTNode{}, p.syntaxErrorToken("Can't have quoted identifier as function name.", token)
+		}
 		return node, nil
 	case tStar:
-		left := ASTNode***REMOVED***nodeType: ASTIdentity***REMOVED***
+		left := ASTNode{nodeType: ASTIdentity}
 		var right ASTNode
 		var err error
-		if p.current() == tRbracket ***REMOVED***
-			right = ASTNode***REMOVED***nodeType: ASTIdentity***REMOVED***
-		***REMOVED*** else ***REMOVED***
+		if p.current() == tRbracket {
+			right = ASTNode{nodeType: ASTIdentity}
+		} else {
 			right, err = p.parseProjectionRHS(bindingPowers[tStar])
-		***REMOVED***
-		return ASTNode***REMOVED***nodeType: ASTValueProjection, children: []ASTNode***REMOVED***left, right***REMOVED******REMOVED***, err
+		}
+		return ASTNode{nodeType: ASTValueProjection, children: []ASTNode{left, right}}, err
 	case tFilter:
-		return p.parseFilter(ASTNode***REMOVED***nodeType: ASTIdentity***REMOVED***)
+		return p.parseFilter(ASTNode{nodeType: ASTIdentity})
 	case tLbrace:
 		return p.parseMultiSelectHash()
 	case tFlatten:
-		left := ASTNode***REMOVED***
+		left := ASTNode{
 			nodeType: ASTFlatten,
-			children: []ASTNode***REMOVED******REMOVED***nodeType: ASTIdentity***REMOVED******REMOVED***,
-		***REMOVED***
+			children: []ASTNode{{nodeType: ASTIdentity}},
+		}
 		right, err := p.parseProjectionRHS(bindingPowers[tFlatten])
-		if err != nil ***REMOVED***
-			return ASTNode***REMOVED******REMOVED***, err
-		***REMOVED***
-		return ASTNode***REMOVED***nodeType: ASTProjection, children: []ASTNode***REMOVED***left, right***REMOVED******REMOVED***, nil
+		if err != nil {
+			return ASTNode{}, err
+		}
+		return ASTNode{nodeType: ASTProjection, children: []ASTNode{left, right}}, nil
 	case tLbracket:
 		tokenType := p.current()
 		//var right ASTNode
-		if tokenType == tNumber || tokenType == tColon ***REMOVED***
+		if tokenType == tNumber || tokenType == tColon {
 			right, err := p.parseIndexExpression()
-			if err != nil ***REMOVED***
-				return ASTNode***REMOVED******REMOVED***, nil
-			***REMOVED***
-			return p.projectIfSlice(ASTNode***REMOVED***nodeType: ASTIdentity***REMOVED***, right)
-		***REMOVED*** else if tokenType == tStar && p.lookahead(1) == tRbracket ***REMOVED***
+			if err != nil {
+				return ASTNode{}, nil
+			}
+			return p.projectIfSlice(ASTNode{nodeType: ASTIdentity}, right)
+		} else if tokenType == tStar && p.lookahead(1) == tRbracket {
 			p.advance()
 			p.advance()
 			right, err := p.parseProjectionRHS(bindingPowers[tStar])
-			if err != nil ***REMOVED***
-				return ASTNode***REMOVED******REMOVED***, err
-			***REMOVED***
-			return ASTNode***REMOVED***
+			if err != nil {
+				return ASTNode{}, err
+			}
+			return ASTNode{
 				nodeType: ASTProjection,
-				children: []ASTNode***REMOVED******REMOVED***nodeType: ASTIdentity***REMOVED***, right***REMOVED***,
-			***REMOVED***, nil
-		***REMOVED*** else ***REMOVED***
+				children: []ASTNode{{nodeType: ASTIdentity}, right},
+			}, nil
+		} else {
 			return p.parseMultiSelectList()
-		***REMOVED***
+		}
 	case tCurrent:
-		return ASTNode***REMOVED***nodeType: ASTCurrentNode***REMOVED***, nil
+		return ASTNode{nodeType: ASTCurrentNode}, nil
 	case tExpref:
 		expression, err := p.parseExpression(bindingPowers[tExpref])
-		if err != nil ***REMOVED***
-			return ASTNode***REMOVED******REMOVED***, err
-		***REMOVED***
-		return ASTNode***REMOVED***nodeType: ASTExpRef, children: []ASTNode***REMOVED***expression***REMOVED******REMOVED***, nil
+		if err != nil {
+			return ASTNode{}, err
+		}
+		return ASTNode{nodeType: ASTExpRef, children: []ASTNode{expression}}, nil
 	case tNot:
 		expression, err := p.parseExpression(bindingPowers[tNot])
-		if err != nil ***REMOVED***
-			return ASTNode***REMOVED******REMOVED***, err
-		***REMOVED***
-		return ASTNode***REMOVED***nodeType: ASTNotExpression, children: []ASTNode***REMOVED***expression***REMOVED******REMOVED***, nil
+		if err != nil {
+			return ASTNode{}, err
+		}
+		return ASTNode{nodeType: ASTNotExpression, children: []ASTNode{expression}}, nil
 	case tLparen:
 		expression, err := p.parseExpression(0)
-		if err != nil ***REMOVED***
-			return ASTNode***REMOVED******REMOVED***, err
-		***REMOVED***
-		if err := p.match(tRparen); err != nil ***REMOVED***
-			return ASTNode***REMOVED******REMOVED***, err
-		***REMOVED***
+		if err != nil {
+			return ASTNode{}, err
+		}
+		if err := p.match(tRparen); err != nil {
+			return ASTNode{}, err
+		}
 		return expression, nil
 	case tEOF:
-		return ASTNode***REMOVED******REMOVED***, p.syntaxErrorToken("Incomplete expression", token)
-	***REMOVED***
+		return ASTNode{}, p.syntaxErrorToken("Incomplete expression", token)
+	}
 
-	return ASTNode***REMOVED******REMOVED***, p.syntaxErrorToken("Invalid token: "+token.tokenType.String(), token)
-***REMOVED***
+	return ASTNode{}, p.syntaxErrorToken("Invalid token: "+token.tokenType.String(), token)
+}
 
-func (p *Parser) parseMultiSelectList() (ASTNode, error) ***REMOVED***
+func (p *Parser) parseMultiSelectList() (ASTNode, error) {
 	var expressions []ASTNode
-	for ***REMOVED***
+	for {
 		expression, err := p.parseExpression(0)
-		if err != nil ***REMOVED***
-			return ASTNode***REMOVED******REMOVED***, err
-		***REMOVED***
+		if err != nil {
+			return ASTNode{}, err
+		}
 		expressions = append(expressions, expression)
-		if p.current() == tRbracket ***REMOVED***
+		if p.current() == tRbracket {
 			break
-		***REMOVED***
+		}
 		err = p.match(tComma)
-		if err != nil ***REMOVED***
-			return ASTNode***REMOVED******REMOVED***, err
-		***REMOVED***
-	***REMOVED***
+		if err != nil {
+			return ASTNode{}, err
+		}
+	}
 	err := p.match(tRbracket)
-	if err != nil ***REMOVED***
-		return ASTNode***REMOVED******REMOVED***, err
-	***REMOVED***
-	return ASTNode***REMOVED***
+	if err != nil {
+		return ASTNode{}, err
+	}
+	return ASTNode{
 		nodeType: ASTMultiSelectList,
 		children: expressions,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-func (p *Parser) parseMultiSelectHash() (ASTNode, error) ***REMOVED***
+func (p *Parser) parseMultiSelectHash() (ASTNode, error) {
 	var children []ASTNode
-	for ***REMOVED***
+	for {
 		keyToken := p.lookaheadToken(0)
-		if err := p.match(tUnquotedIdentifier); err != nil ***REMOVED***
-			if err := p.match(tQuotedIdentifier); err != nil ***REMOVED***
-				return ASTNode***REMOVED******REMOVED***, p.syntaxError("Expected tQuotedIdentifier or tUnquotedIdentifier")
-			***REMOVED***
-		***REMOVED***
+		if err := p.match(tUnquotedIdentifier); err != nil {
+			if err := p.match(tQuotedIdentifier); err != nil {
+				return ASTNode{}, p.syntaxError("Expected tQuotedIdentifier or tUnquotedIdentifier")
+			}
+		}
 		keyName := keyToken.value
 		err := p.match(tColon)
-		if err != nil ***REMOVED***
-			return ASTNode***REMOVED******REMOVED***, err
-		***REMOVED***
+		if err != nil {
+			return ASTNode{}, err
+		}
 		value, err := p.parseExpression(0)
-		if err != nil ***REMOVED***
-			return ASTNode***REMOVED******REMOVED***, err
-		***REMOVED***
-		node := ASTNode***REMOVED***
+		if err != nil {
+			return ASTNode{}, err
+		}
+		node := ASTNode{
 			nodeType: ASTKeyValPair,
 			value:    keyName,
-			children: []ASTNode***REMOVED***value***REMOVED***,
-		***REMOVED***
+			children: []ASTNode{value},
+		}
 		children = append(children, node)
-		if p.current() == tComma ***REMOVED***
+		if p.current() == tComma {
 			err := p.match(tComma)
-			if err != nil ***REMOVED***
-				return ASTNode***REMOVED******REMOVED***, nil
-			***REMOVED***
-		***REMOVED*** else if p.current() == tRbrace ***REMOVED***
+			if err != nil {
+				return ASTNode{}, nil
+			}
+		} else if p.current() == tRbrace {
 			err := p.match(tRbrace)
-			if err != nil ***REMOVED***
-				return ASTNode***REMOVED******REMOVED***, nil
-			***REMOVED***
+			if err != nil {
+				return ASTNode{}, nil
+			}
 			break
-		***REMOVED***
-	***REMOVED***
-	return ASTNode***REMOVED***
+		}
+	}
+	return ASTNode{
 		nodeType: ASTMultiSelectHash,
 		children: children,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
-func (p *Parser) projectIfSlice(left ASTNode, right ASTNode) (ASTNode, error) ***REMOVED***
-	indexExpr := ASTNode***REMOVED***
+func (p *Parser) projectIfSlice(left ASTNode, right ASTNode) (ASTNode, error) {
+	indexExpr := ASTNode{
 		nodeType: ASTIndexExpression,
-		children: []ASTNode***REMOVED***left, right***REMOVED***,
-	***REMOVED***
-	if right.nodeType == ASTSlice ***REMOVED***
+		children: []ASTNode{left, right},
+	}
+	if right.nodeType == ASTSlice {
 		right, err := p.parseProjectionRHS(bindingPowers[tStar])
-		return ASTNode***REMOVED***
+		return ASTNode{
 			nodeType: ASTProjection,
-			children: []ASTNode***REMOVED***indexExpr, right***REMOVED***,
-		***REMOVED***, err
-	***REMOVED***
+			children: []ASTNode{indexExpr, right},
+		}, err
+	}
 	return indexExpr, nil
-***REMOVED***
-func (p *Parser) parseFilter(node ASTNode) (ASTNode, error) ***REMOVED***
+}
+func (p *Parser) parseFilter(node ASTNode) (ASTNode, error) {
 	var right, condition ASTNode
 	var err error
 	condition, err = p.parseExpression(0)
-	if err != nil ***REMOVED***
-		return ASTNode***REMOVED******REMOVED***, err
-	***REMOVED***
-	if err := p.match(tRbracket); err != nil ***REMOVED***
-		return ASTNode***REMOVED******REMOVED***, err
-	***REMOVED***
-	if p.current() == tFlatten ***REMOVED***
-		right = ASTNode***REMOVED***nodeType: ASTIdentity***REMOVED***
-	***REMOVED*** else ***REMOVED***
+	if err != nil {
+		return ASTNode{}, err
+	}
+	if err := p.match(tRbracket); err != nil {
+		return ASTNode{}, err
+	}
+	if p.current() == tFlatten {
+		right = ASTNode{nodeType: ASTIdentity}
+	} else {
 		right, err = p.parseProjectionRHS(bindingPowers[tFilter])
-		if err != nil ***REMOVED***
-			return ASTNode***REMOVED******REMOVED***, err
-		***REMOVED***
-	***REMOVED***
+		if err != nil {
+			return ASTNode{}, err
+		}
+	}
 
-	return ASTNode***REMOVED***
+	return ASTNode{
 		nodeType: ASTFilterProjection,
-		children: []ASTNode***REMOVED***node, right, condition***REMOVED***,
-	***REMOVED***, nil
-***REMOVED***
+		children: []ASTNode{node, right, condition},
+	}, nil
+}
 
-func (p *Parser) parseDotRHS(bindingPower int) (ASTNode, error) ***REMOVED***
+func (p *Parser) parseDotRHS(bindingPower int) (ASTNode, error) {
 	lookahead := p.current()
-	if tokensOneOf([]tokType***REMOVED***tQuotedIdentifier, tUnquotedIdentifier, tStar***REMOVED***, lookahead) ***REMOVED***
+	if tokensOneOf([]tokType{tQuotedIdentifier, tUnquotedIdentifier, tStar}, lookahead) {
 		return p.parseExpression(bindingPower)
-	***REMOVED*** else if lookahead == tLbracket ***REMOVED***
-		if err := p.match(tLbracket); err != nil ***REMOVED***
-			return ASTNode***REMOVED******REMOVED***, err
-		***REMOVED***
+	} else if lookahead == tLbracket {
+		if err := p.match(tLbracket); err != nil {
+			return ASTNode{}, err
+		}
 		return p.parseMultiSelectList()
-	***REMOVED*** else if lookahead == tLbrace ***REMOVED***
-		if err := p.match(tLbrace); err != nil ***REMOVED***
-			return ASTNode***REMOVED******REMOVED***, err
-		***REMOVED***
+	} else if lookahead == tLbrace {
+		if err := p.match(tLbrace); err != nil {
+			return ASTNode{}, err
+		}
 		return p.parseMultiSelectHash()
-	***REMOVED***
-	return ASTNode***REMOVED******REMOVED***, p.syntaxError("Expected identifier, lbracket, or lbrace")
-***REMOVED***
+	}
+	return ASTNode{}, p.syntaxError("Expected identifier, lbracket, or lbrace")
+}
 
-func (p *Parser) parseProjectionRHS(bindingPower int) (ASTNode, error) ***REMOVED***
+func (p *Parser) parseProjectionRHS(bindingPower int) (ASTNode, error) {
 	current := p.current()
-	if bindingPowers[current] < 10 ***REMOVED***
-		return ASTNode***REMOVED***nodeType: ASTIdentity***REMOVED***, nil
-	***REMOVED*** else if current == tLbracket ***REMOVED***
+	if bindingPowers[current] < 10 {
+		return ASTNode{nodeType: ASTIdentity}, nil
+	} else if current == tLbracket {
 		return p.parseExpression(bindingPower)
-	***REMOVED*** else if current == tFilter ***REMOVED***
+	} else if current == tFilter {
 		return p.parseExpression(bindingPower)
-	***REMOVED*** else if current == tDot ***REMOVED***
+	} else if current == tDot {
 		err := p.match(tDot)
-		if err != nil ***REMOVED***
-			return ASTNode***REMOVED******REMOVED***, err
-		***REMOVED***
+		if err != nil {
+			return ASTNode{}, err
+		}
 		return p.parseDotRHS(bindingPower)
-	***REMOVED*** else ***REMOVED***
-		return ASTNode***REMOVED******REMOVED***, p.syntaxError("Error")
-	***REMOVED***
-***REMOVED***
+	} else {
+		return ASTNode{}, p.syntaxError("Error")
+	}
+}
 
-func (p *Parser) lookahead(number int) tokType ***REMOVED***
+func (p *Parser) lookahead(number int) tokType {
 	return p.lookaheadToken(number).tokenType
-***REMOVED***
+}
 
-func (p *Parser) current() tokType ***REMOVED***
+func (p *Parser) current() tokType {
 	return p.lookahead(0)
-***REMOVED***
+}
 
-func (p *Parser) lookaheadToken(number int) token ***REMOVED***
+func (p *Parser) lookaheadToken(number int) token {
 	return p.tokens[p.index+number]
-***REMOVED***
+}
 
-func (p *Parser) advance() ***REMOVED***
+func (p *Parser) advance() {
 	p.index++
-***REMOVED***
+}
 
-func tokensOneOf(elements []tokType, token tokType) bool ***REMOVED***
-	for _, elem := range elements ***REMOVED***
-		if elem == token ***REMOVED***
+func tokensOneOf(elements []tokType, token tokType) bool {
+	for _, elem := range elements {
+		if elem == token {
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return false
-***REMOVED***
+}
 
-func (p *Parser) syntaxError(msg string) SyntaxError ***REMOVED***
-	return SyntaxError***REMOVED***
+func (p *Parser) syntaxError(msg string) SyntaxError {
+	return SyntaxError{
 		msg:        msg,
 		Expression: p.expression,
 		Offset:     p.lookaheadToken(0).position,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Create a SyntaxError based on the provided token.
 // This differs from syntaxError() which creates a SyntaxError
 // based on the current lookahead token.
-func (p *Parser) syntaxErrorToken(msg string, t token) SyntaxError ***REMOVED***
-	return SyntaxError***REMOVED***
+func (p *Parser) syntaxErrorToken(msg string, t token) SyntaxError {
+	return SyntaxError{
 		msg:        msg,
 		Expression: p.expression,
 		Offset:     t.position,
-	***REMOVED***
-***REMOVED***
+	}
+}

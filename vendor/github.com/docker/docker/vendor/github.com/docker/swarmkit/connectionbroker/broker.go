@@ -17,101 +17,101 @@ import (
 // Broker is a simple connection broker. It can either return a fresh
 // connection to a remote manager selected with weighted randomization, or a
 // local gRPC connection to the local manager.
-type Broker struct ***REMOVED***
+type Broker struct {
 	mu        sync.Mutex
 	remotes   remotes.Remotes
 	localConn *grpc.ClientConn
-***REMOVED***
+}
 
 // New creates a new connection broker.
-func New(remotes remotes.Remotes) *Broker ***REMOVED***
-	return &Broker***REMOVED***
+func New(remotes remotes.Remotes) *Broker {
+	return &Broker{
 		remotes: remotes,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // SetLocalConn changes the local gRPC connection used by the connection broker.
-func (b *Broker) SetLocalConn(localConn *grpc.ClientConn) ***REMOVED***
+func (b *Broker) SetLocalConn(localConn *grpc.ClientConn) {
 	b.mu.Lock()
 	defer b.mu.Unlock()
 
 	b.localConn = localConn
-***REMOVED***
+}
 
 // Select a manager from the set of available managers, and return a connection.
-func (b *Broker) Select(dialOpts ...grpc.DialOption) (*Conn, error) ***REMOVED***
+func (b *Broker) Select(dialOpts ...grpc.DialOption) (*Conn, error) {
 	b.mu.Lock()
 	localConn := b.localConn
 	b.mu.Unlock()
 
-	if localConn != nil ***REMOVED***
-		return &Conn***REMOVED***
+	if localConn != nil {
+		return &Conn{
 			ClientConn: localConn,
 			isLocal:    true,
-		***REMOVED***, nil
-	***REMOVED***
+		}, nil
+	}
 
 	return b.SelectRemote(dialOpts...)
-***REMOVED***
+}
 
 // SelectRemote chooses a manager from the remotes, and returns a TCP
 // connection.
-func (b *Broker) SelectRemote(dialOpts ...grpc.DialOption) (*Conn, error) ***REMOVED***
+func (b *Broker) SelectRemote(dialOpts ...grpc.DialOption) (*Conn, error) {
 	peer, err := b.remotes.Select()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// gRPC dialer connects to proxy first. Provide a custom dialer here avoid that.
 	// TODO(anshul) Add an option to configure this.
 	dialOpts = append(dialOpts,
 		grpc.WithUnaryInterceptor(grpc_prometheus.UnaryClientInterceptor),
 		grpc.WithStreamInterceptor(grpc_prometheus.StreamClientInterceptor),
-		grpc.WithDialer(func(addr string, timeout time.Duration) (net.Conn, error) ***REMOVED***
+		grpc.WithDialer(func(addr string, timeout time.Duration) (net.Conn, error) {
 			return net.DialTimeout("tcp", addr, timeout)
-		***REMOVED***))
+		}))
 
 	cc, err := grpc.Dial(peer.Addr, dialOpts...)
-	if err != nil ***REMOVED***
+	if err != nil {
 		b.remotes.ObserveIfExists(peer, -remotes.DefaultObservationWeight)
 		return nil, err
-	***REMOVED***
+	}
 
-	return &Conn***REMOVED***
+	return &Conn{
 		ClientConn: cc,
 		remotes:    b.remotes,
 		peer:       peer,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // Remotes returns the remotes interface used by the broker, so the caller
 // can make observations or see weights directly.
-func (b *Broker) Remotes() remotes.Remotes ***REMOVED***
+func (b *Broker) Remotes() remotes.Remotes {
 	return b.remotes
-***REMOVED***
+}
 
 // Conn is a wrapper around a gRPC client connection.
-type Conn struct ***REMOVED***
+type Conn struct {
 	*grpc.ClientConn
 	isLocal bool
 	remotes remotes.Remotes
 	peer    api.Peer
-***REMOVED***
+}
 
 // Close closes the client connection if it is a remote connection. It also
 // records a positive experience with the remote peer if success is true,
 // otherwise it records a negative experience. If a local connection is in use,
 // Close is a noop.
-func (c *Conn) Close(success bool) error ***REMOVED***
-	if c.isLocal ***REMOVED***
+func (c *Conn) Close(success bool) error {
+	if c.isLocal {
 		return nil
-	***REMOVED***
+	}
 
-	if success ***REMOVED***
+	if success {
 		c.remotes.ObserveIfExists(c.peer, remotes.DefaultObservationWeight)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		c.remotes.ObserveIfExists(c.peer, -remotes.DefaultObservationWeight)
-	***REMOVED***
+	}
 
 	return c.ClientConn.Close()
-***REMOVED***
+}

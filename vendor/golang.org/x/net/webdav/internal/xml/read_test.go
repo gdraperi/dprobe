@@ -16,15 +16,15 @@ import (
 
 // Stripped down Atom feed data structures.
 
-func TestUnmarshalFeed(t *testing.T) ***REMOVED***
+func TestUnmarshalFeed(t *testing.T) {
 	var f Feed
-	if err := Unmarshal([]byte(atomFeedString), &f); err != nil ***REMOVED***
+	if err := Unmarshal([]byte(atomFeedString), &f); err != nil {
 		t.Fatalf("Unmarshal: %s", err)
-	***REMOVED***
-	if !reflect.DeepEqual(f, atomFeed) ***REMOVED***
+	}
+	if !reflect.DeepEqual(f, atomFeed) {
 		t.Fatalf("have %#v\nwant %#v", f, atomFeed)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // hget http://codereview.appspot.com/rss/mine/rsc
 const atomFeedString = `
@@ -82,7 +82,7 @@ not being used from outside intra_region_diff.py.
 
 </summary></entry></feed> 	   `
 
-type Feed struct ***REMOVED***
+type Feed struct {
 	XMLName Name      `xml:"http://www.w3.org/2005/Atom feed"`
 	Title   string    `xml:"title"`
 	Id      string    `xml:"id"`
@@ -90,60 +90,60 @@ type Feed struct ***REMOVED***
 	Updated time.Time `xml:"updated,attr"`
 	Author  Person    `xml:"author"`
 	Entry   []Entry   `xml:"entry"`
-***REMOVED***
+}
 
-type Entry struct ***REMOVED***
+type Entry struct {
 	Title   string    `xml:"title"`
 	Id      string    `xml:"id"`
 	Link    []Link    `xml:"link"`
 	Updated time.Time `xml:"updated"`
 	Author  Person    `xml:"author"`
 	Summary Text      `xml:"summary"`
-***REMOVED***
+}
 
-type Link struct ***REMOVED***
+type Link struct {
 	Rel  string `xml:"rel,attr,omitempty"`
 	Href string `xml:"href,attr"`
-***REMOVED***
+}
 
-type Person struct ***REMOVED***
+type Person struct {
 	Name     string `xml:"name"`
 	URI      string `xml:"uri"`
 	Email    string `xml:"email"`
 	InnerXML string `xml:",innerxml"`
-***REMOVED***
+}
 
-type Text struct ***REMOVED***
+type Text struct {
 	Type string `xml:"type,attr,omitempty"`
 	Body string `xml:",chardata"`
-***REMOVED***
+}
 
-var atomFeed = Feed***REMOVED***
-	XMLName: Name***REMOVED***"http://www.w3.org/2005/Atom", "feed"***REMOVED***,
+var atomFeed = Feed{
+	XMLName: Name{"http://www.w3.org/2005/Atom", "feed"},
 	Title:   "Code Review - My issues",
-	Link: []Link***REMOVED***
-		***REMOVED***Rel: "alternate", Href: "http://codereview.appspot.com/"***REMOVED***,
-		***REMOVED***Rel: "self", Href: "http://codereview.appspot.com/rss/mine/rsc"***REMOVED***,
-	***REMOVED***,
+	Link: []Link{
+		{Rel: "alternate", Href: "http://codereview.appspot.com/"},
+		{Rel: "self", Href: "http://codereview.appspot.com/rss/mine/rsc"},
+	},
 	Id:      "http://codereview.appspot.com/",
 	Updated: ParseTime("2009-10-04T01:35:58+00:00"),
-	Author: Person***REMOVED***
+	Author: Person{
 		Name:     "rietveld<>",
 		InnerXML: "<name>rietveld&lt;&gt;</name>",
-	***REMOVED***,
-	Entry: []Entry***REMOVED***
-		***REMOVED***
+	},
+	Entry: []Entry{
+		{
 			Title: "rietveld: an attempt at pubsubhubbub\n",
-			Link: []Link***REMOVED***
-				***REMOVED***Rel: "alternate", Href: "http://codereview.appspot.com/126085"***REMOVED***,
-			***REMOVED***,
+			Link: []Link{
+				{Rel: "alternate", Href: "http://codereview.appspot.com/126085"},
+			},
 			Updated: ParseTime("2009-10-04T01:35:58+00:00"),
-			Author: Person***REMOVED***
+			Author: Person{
 				Name:     "email-address-removed",
 				InnerXML: "<name>email-address-removed</name>",
-			***REMOVED***,
+			},
 			Id: "urn:md5:134d9179c41f806be79b3a5f7877d19a",
-			Summary: Text***REMOVED***
+			Summary: Text{
 				Type: "html",
 				Body: `
   An attempt at adding pubsubhubbub support to Rietveld.
@@ -177,20 +177,20 @@ the top of feeds.py marked NOTE(rsc).
 
 
 `,
-			***REMOVED***,
-		***REMOVED***,
-		***REMOVED***
+			},
+		},
+		{
 			Title: "rietveld: correct tab handling\n",
-			Link: []Link***REMOVED***
-				***REMOVED***Rel: "alternate", Href: "http://codereview.appspot.com/124106"***REMOVED***,
-			***REMOVED***,
+			Link: []Link{
+				{Rel: "alternate", Href: "http://codereview.appspot.com/124106"},
+			},
 			Updated: ParseTime("2009-10-03T23:02:17+00:00"),
-			Author: Person***REMOVED***
+			Author: Person{
 				Name:     "email-address-removed",
 				InnerXML: "<name>email-address-removed</name>",
-			***REMOVED***,
+			},
 			Id: "urn:md5:0a2a4f19bb815101f0ba2904aed7c35a",
-			Summary: Text***REMOVED***
+			Summary: Text{
 				Type: "html",
 				Body: `
   This fixes the buggy tab rendering that can be seen at
@@ -211,10 +211,10 @@ not being used from outside intra_region_diff.py.
 
 
 `,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***,
-***REMOVED***
+			},
+		},
+	},
+}
 
 const pathTestString = `
 <Result>
@@ -238,300 +238,300 @@ const pathTestString = `
 </Result>
 `
 
-type PathTestItem struct ***REMOVED***
+type PathTestItem struct {
 	Value string
-***REMOVED***
+}
 
-type PathTestA struct ***REMOVED***
+type PathTestA struct {
 	Items         []PathTestItem `xml:">Item1"`
 	Before, After string
-***REMOVED***
+}
 
-type PathTestB struct ***REMOVED***
+type PathTestB struct {
 	Other         []PathTestItem `xml:"Items>Item1"`
 	Before, After string
-***REMOVED***
+}
 
-type PathTestC struct ***REMOVED***
+type PathTestC struct {
 	Values1       []string `xml:"Items>Item1>Value"`
 	Values2       []string `xml:"Items>Item2>Value"`
 	Before, After string
-***REMOVED***
+}
 
-type PathTestSet struct ***REMOVED***
+type PathTestSet struct {
 	Item1 []PathTestItem
-***REMOVED***
+}
 
-type PathTestD struct ***REMOVED***
+type PathTestD struct {
 	Other         PathTestSet `xml:"Items"`
 	Before, After string
-***REMOVED***
+}
 
-type PathTestE struct ***REMOVED***
+type PathTestE struct {
 	Underline     string `xml:"Items>_>Value"`
 	Before, After string
-***REMOVED***
+}
 
-var pathTests = []interface***REMOVED******REMOVED******REMOVED***
-	&PathTestA***REMOVED***Items: []PathTestItem***REMOVED******REMOVED***"A"***REMOVED***, ***REMOVED***"D"***REMOVED******REMOVED***, Before: "1", After: "2"***REMOVED***,
-	&PathTestB***REMOVED***Other: []PathTestItem***REMOVED******REMOVED***"A"***REMOVED***, ***REMOVED***"D"***REMOVED******REMOVED***, Before: "1", After: "2"***REMOVED***,
-	&PathTestC***REMOVED***Values1: []string***REMOVED***"A", "C", "D"***REMOVED***, Values2: []string***REMOVED***"B"***REMOVED***, Before: "1", After: "2"***REMOVED***,
-	&PathTestD***REMOVED***Other: PathTestSet***REMOVED***Item1: []PathTestItem***REMOVED******REMOVED***"A"***REMOVED***, ***REMOVED***"D"***REMOVED******REMOVED******REMOVED***, Before: "1", After: "2"***REMOVED***,
-	&PathTestE***REMOVED***Underline: "E", Before: "1", After: "2"***REMOVED***,
-***REMOVED***
+var pathTests = []interface{}{
+	&PathTestA{Items: []PathTestItem{{"A"}, {"D"}}, Before: "1", After: "2"},
+	&PathTestB{Other: []PathTestItem{{"A"}, {"D"}}, Before: "1", After: "2"},
+	&PathTestC{Values1: []string{"A", "C", "D"}, Values2: []string{"B"}, Before: "1", After: "2"},
+	&PathTestD{Other: PathTestSet{Item1: []PathTestItem{{"A"}, {"D"}}}, Before: "1", After: "2"},
+	&PathTestE{Underline: "E", Before: "1", After: "2"},
+}
 
-func TestUnmarshalPaths(t *testing.T) ***REMOVED***
-	for _, pt := range pathTests ***REMOVED***
+func TestUnmarshalPaths(t *testing.T) {
+	for _, pt := range pathTests {
 		v := reflect.New(reflect.TypeOf(pt).Elem()).Interface()
-		if err := Unmarshal([]byte(pathTestString), v); err != nil ***REMOVED***
+		if err := Unmarshal([]byte(pathTestString), v); err != nil {
 			t.Fatalf("Unmarshal: %s", err)
-		***REMOVED***
-		if !reflect.DeepEqual(v, pt) ***REMOVED***
+		}
+		if !reflect.DeepEqual(v, pt) {
 			t.Fatalf("have %#v\nwant %#v", v, pt)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-type BadPathTestA struct ***REMOVED***
+type BadPathTestA struct {
 	First  string `xml:"items>item1"`
 	Other  string `xml:"items>item2"`
 	Second string `xml:"items"`
-***REMOVED***
+}
 
-type BadPathTestB struct ***REMOVED***
+type BadPathTestB struct {
 	Other  string `xml:"items>item2>value"`
 	First  string `xml:"items>item1"`
 	Second string `xml:"items>item1>value"`
-***REMOVED***
+}
 
-type BadPathTestC struct ***REMOVED***
+type BadPathTestC struct {
 	First  string
 	Second string `xml:"First"`
-***REMOVED***
+}
 
-type BadPathTestD struct ***REMOVED***
+type BadPathTestD struct {
 	BadPathEmbeddedA
 	BadPathEmbeddedB
-***REMOVED***
+}
 
-type BadPathEmbeddedA struct ***REMOVED***
+type BadPathEmbeddedA struct {
 	First string
-***REMOVED***
+}
 
-type BadPathEmbeddedB struct ***REMOVED***
+type BadPathEmbeddedB struct {
 	Second string `xml:"First"`
-***REMOVED***
+}
 
-var badPathTests = []struct ***REMOVED***
-	v, e interface***REMOVED******REMOVED***
-***REMOVED******REMOVED***
-	***REMOVED***&BadPathTestA***REMOVED******REMOVED***, &TagPathError***REMOVED***reflect.TypeOf(BadPathTestA***REMOVED******REMOVED***), "First", "items>item1", "Second", "items"***REMOVED******REMOVED***,
-	***REMOVED***&BadPathTestB***REMOVED******REMOVED***, &TagPathError***REMOVED***reflect.TypeOf(BadPathTestB***REMOVED******REMOVED***), "First", "items>item1", "Second", "items>item1>value"***REMOVED******REMOVED***,
-	***REMOVED***&BadPathTestC***REMOVED******REMOVED***, &TagPathError***REMOVED***reflect.TypeOf(BadPathTestC***REMOVED******REMOVED***), "First", "", "Second", "First"***REMOVED******REMOVED***,
-	***REMOVED***&BadPathTestD***REMOVED******REMOVED***, &TagPathError***REMOVED***reflect.TypeOf(BadPathTestD***REMOVED******REMOVED***), "First", "", "Second", "First"***REMOVED******REMOVED***,
-***REMOVED***
+var badPathTests = []struct {
+	v, e interface{}
+}{
+	{&BadPathTestA{}, &TagPathError{reflect.TypeOf(BadPathTestA{}), "First", "items>item1", "Second", "items"}},
+	{&BadPathTestB{}, &TagPathError{reflect.TypeOf(BadPathTestB{}), "First", "items>item1", "Second", "items>item1>value"}},
+	{&BadPathTestC{}, &TagPathError{reflect.TypeOf(BadPathTestC{}), "First", "", "Second", "First"}},
+	{&BadPathTestD{}, &TagPathError{reflect.TypeOf(BadPathTestD{}), "First", "", "Second", "First"}},
+}
 
-func TestUnmarshalBadPaths(t *testing.T) ***REMOVED***
-	for _, tt := range badPathTests ***REMOVED***
+func TestUnmarshalBadPaths(t *testing.T) {
+	for _, tt := range badPathTests {
 		err := Unmarshal([]byte(pathTestString), tt.v)
-		if !reflect.DeepEqual(err, tt.e) ***REMOVED***
+		if !reflect.DeepEqual(err, tt.e) {
 			t.Fatalf("Unmarshal with %#v didn't fail properly:\nhave %#v,\nwant %#v", tt.v, err, tt.e)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 const OK = "OK"
 const withoutNameTypeData = `
 <?xml version="1.0" charset="utf-8"?>
 <Test3 Attr="OK" />`
 
-type TestThree struct ***REMOVED***
+type TestThree struct {
 	XMLName Name   `xml:"Test3"`
 	Attr    string `xml:",attr"`
-***REMOVED***
+}
 
-func TestUnmarshalWithoutNameType(t *testing.T) ***REMOVED***
+func TestUnmarshalWithoutNameType(t *testing.T) {
 	var x TestThree
-	if err := Unmarshal([]byte(withoutNameTypeData), &x); err != nil ***REMOVED***
+	if err := Unmarshal([]byte(withoutNameTypeData), &x); err != nil {
 		t.Fatalf("Unmarshal: %s", err)
-	***REMOVED***
-	if x.Attr != OK ***REMOVED***
+	}
+	if x.Attr != OK {
 		t.Fatalf("have %v\nwant %v", x.Attr, OK)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestUnmarshalAttr(t *testing.T) ***REMOVED***
-	type ParamVal struct ***REMOVED***
+func TestUnmarshalAttr(t *testing.T) {
+	type ParamVal struct {
 		Int int `xml:"int,attr"`
-	***REMOVED***
+	}
 
-	type ParamPtr struct ***REMOVED***
+	type ParamPtr struct {
 		Int *int `xml:"int,attr"`
-	***REMOVED***
+	}
 
-	type ParamStringPtr struct ***REMOVED***
+	type ParamStringPtr struct {
 		Int *string `xml:"int,attr"`
-	***REMOVED***
+	}
 
 	x := []byte(`<Param int="1" />`)
 
-	p1 := &ParamPtr***REMOVED******REMOVED***
-	if err := Unmarshal(x, p1); err != nil ***REMOVED***
+	p1 := &ParamPtr{}
+	if err := Unmarshal(x, p1); err != nil {
 		t.Fatalf("Unmarshal: %s", err)
-	***REMOVED***
-	if p1.Int == nil ***REMOVED***
+	}
+	if p1.Int == nil {
 		t.Fatalf("Unmarshal failed in to *int field")
-	***REMOVED*** else if *p1.Int != 1 ***REMOVED***
+	} else if *p1.Int != 1 {
 		t.Fatalf("Unmarshal with %s failed:\nhave %#v,\n want %#v", x, p1.Int, 1)
-	***REMOVED***
+	}
 
-	p2 := &ParamVal***REMOVED******REMOVED***
-	if err := Unmarshal(x, p2); err != nil ***REMOVED***
+	p2 := &ParamVal{}
+	if err := Unmarshal(x, p2); err != nil {
 		t.Fatalf("Unmarshal: %s", err)
-	***REMOVED***
-	if p2.Int != 1 ***REMOVED***
+	}
+	if p2.Int != 1 {
 		t.Fatalf("Unmarshal with %s failed:\nhave %#v,\n want %#v", x, p2.Int, 1)
-	***REMOVED***
+	}
 
-	p3 := &ParamStringPtr***REMOVED******REMOVED***
-	if err := Unmarshal(x, p3); err != nil ***REMOVED***
+	p3 := &ParamStringPtr{}
+	if err := Unmarshal(x, p3); err != nil {
 		t.Fatalf("Unmarshal: %s", err)
-	***REMOVED***
-	if p3.Int == nil ***REMOVED***
+	}
+	if p3.Int == nil {
 		t.Fatalf("Unmarshal failed in to *string field")
-	***REMOVED*** else if *p3.Int != "1" ***REMOVED***
+	} else if *p3.Int != "1" {
 		t.Fatalf("Unmarshal with %s failed:\nhave %#v,\n want %#v", x, p3.Int, 1)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type Tables struct ***REMOVED***
+type Tables struct {
 	HTable string `xml:"http://www.w3.org/TR/html4/ table"`
 	FTable string `xml:"http://www.w3schools.com/furniture table"`
-***REMOVED***
+}
 
-var tables = []struct ***REMOVED***
+var tables = []struct {
 	xml string
 	tab Tables
 	ns  string
-***REMOVED******REMOVED***
-	***REMOVED***
+}{
+	{
 		xml: `<Tables>` +
 			`<table xmlns="http://www.w3.org/TR/html4/">hello</table>` +
 			`<table xmlns="http://www.w3schools.com/furniture">world</table>` +
 			`</Tables>`,
-		tab: Tables***REMOVED***"hello", "world"***REMOVED***,
-	***REMOVED***,
-	***REMOVED***
+		tab: Tables{"hello", "world"},
+	},
+	{
 		xml: `<Tables>` +
 			`<table xmlns="http://www.w3schools.com/furniture">world</table>` +
 			`<table xmlns="http://www.w3.org/TR/html4/">hello</table>` +
 			`</Tables>`,
-		tab: Tables***REMOVED***"hello", "world"***REMOVED***,
-	***REMOVED***,
-	***REMOVED***
+		tab: Tables{"hello", "world"},
+	},
+	{
 		xml: `<Tables xmlns:f="http://www.w3schools.com/furniture" xmlns:h="http://www.w3.org/TR/html4/">` +
 			`<f:table>world</f:table>` +
 			`<h:table>hello</h:table>` +
 			`</Tables>`,
-		tab: Tables***REMOVED***"hello", "world"***REMOVED***,
-	***REMOVED***,
-	***REMOVED***
+		tab: Tables{"hello", "world"},
+	},
+	{
 		xml: `<Tables>` +
 			`<table>bogus</table>` +
 			`</Tables>`,
-		tab: Tables***REMOVED******REMOVED***,
-	***REMOVED***,
-	***REMOVED***
+		tab: Tables{},
+	},
+	{
 		xml: `<Tables>` +
 			`<table>only</table>` +
 			`</Tables>`,
-		tab: Tables***REMOVED***HTable: "only"***REMOVED***,
+		tab: Tables{HTable: "only"},
 		ns:  "http://www.w3.org/TR/html4/",
-	***REMOVED***,
-	***REMOVED***
+	},
+	{
 		xml: `<Tables>` +
 			`<table>only</table>` +
 			`</Tables>`,
-		tab: Tables***REMOVED***FTable: "only"***REMOVED***,
+		tab: Tables{FTable: "only"},
 		ns:  "http://www.w3schools.com/furniture",
-	***REMOVED***,
-	***REMOVED***
+	},
+	{
 		xml: `<Tables>` +
 			`<table>only</table>` +
 			`</Tables>`,
-		tab: Tables***REMOVED******REMOVED***,
+		tab: Tables{},
 		ns:  "something else entirely",
-	***REMOVED***,
-***REMOVED***
+	},
+}
 
-func TestUnmarshalNS(t *testing.T) ***REMOVED***
-	for i, tt := range tables ***REMOVED***
+func TestUnmarshalNS(t *testing.T) {
+	for i, tt := range tables {
 		var dst Tables
 		var err error
-		if tt.ns != "" ***REMOVED***
+		if tt.ns != "" {
 			d := NewDecoder(strings.NewReader(tt.xml))
 			d.DefaultSpace = tt.ns
 			err = d.Decode(&dst)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			err = Unmarshal([]byte(tt.xml), &dst)
-		***REMOVED***
-		if err != nil ***REMOVED***
+		}
+		if err != nil {
 			t.Errorf("#%d: Unmarshal: %v", i, err)
 			continue
-		***REMOVED***
+		}
 		want := tt.tab
-		if dst != want ***REMOVED***
+		if dst != want {
 			t.Errorf("#%d: dst=%+v, want %+v", i, dst, want)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestRoundTrip(t *testing.T) ***REMOVED***
+func TestRoundTrip(t *testing.T) {
 	// From issue 7535
 	const s = `<ex:element xmlns:ex="http://example.com/schema"></ex:element>`
 	in := bytes.NewBufferString(s)
-	for i := 0; i < 10; i++ ***REMOVED***
-		out := &bytes.Buffer***REMOVED******REMOVED***
+	for i := 0; i < 10; i++ {
+		out := &bytes.Buffer{}
 		d := NewDecoder(in)
 		e := NewEncoder(out)
 
-		for ***REMOVED***
+		for {
 			t, err := d.Token()
-			if err == io.EOF ***REMOVED***
+			if err == io.EOF {
 				break
-			***REMOVED***
-			if err != nil ***REMOVED***
+			}
+			if err != nil {
 				fmt.Println("failed:", err)
 				return
-			***REMOVED***
+			}
 			e.EncodeToken(t)
-		***REMOVED***
+		}
 		e.Flush()
 		in = out
-	***REMOVED***
-	if got := in.String(); got != s ***REMOVED***
+	}
+	if got := in.String(); got != s {
 		t.Errorf("have: %q\nwant: %q\n", got, s)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestMarshalNS(t *testing.T) ***REMOVED***
-	dst := Tables***REMOVED***"hello", "world"***REMOVED***
+func TestMarshalNS(t *testing.T) {
+	dst := Tables{"hello", "world"}
 	data, err := Marshal(&dst)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("Marshal: %v", err)
-	***REMOVED***
+	}
 	want := `<Tables><table xmlns="http://www.w3.org/TR/html4/">hello</table><table xmlns="http://www.w3schools.com/furniture">world</table></Tables>`
 	str := string(data)
-	if str != want ***REMOVED***
+	if str != want {
 		t.Errorf("have: %q\nwant: %q\n", str, want)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type TableAttrs struct ***REMOVED***
+type TableAttrs struct {
 	TAttr TAttr
-***REMOVED***
+}
 
-type TAttr struct ***REMOVED***
+type TAttr struct {
 	HTable string `xml:"http://www.w3.org/TR/html4/ table,attr"`
 	FTable string `xml:"http://www.w3schools.com/furniture table,attr"`
 	Lang   string `xml:"http://www.w3.org/XML/1998/namespace lang,attr,omitempty"`
@@ -539,166 +539,166 @@ type TAttr struct ***REMOVED***
 	Other2 string `xml:"http://golang.org/xmlfoo/ other,attr,omitempty"`
 	Other3 string `xml:"http://golang.org/json/ other,attr,omitempty"`
 	Other4 string `xml:"http://golang.org/2/json/ other,attr,omitempty"`
-***REMOVED***
+}
 
-var tableAttrs = []struct ***REMOVED***
+var tableAttrs = []struct {
 	xml string
 	tab TableAttrs
 	ns  string
-***REMOVED******REMOVED***
-	***REMOVED***
+}{
+	{
 		xml: `<TableAttrs xmlns:f="http://www.w3schools.com/furniture" xmlns:h="http://www.w3.org/TR/html4/"><TAttr ` +
 			`h:table="hello" f:table="world" ` +
 			`/></TableAttrs>`,
-		tab: TableAttrs***REMOVED***TAttr***REMOVED***HTable: "hello", FTable: "world"***REMOVED******REMOVED***,
-	***REMOVED***,
-	***REMOVED***
+		tab: TableAttrs{TAttr{HTable: "hello", FTable: "world"}},
+	},
+	{
 		xml: `<TableAttrs><TAttr xmlns:f="http://www.w3schools.com/furniture" xmlns:h="http://www.w3.org/TR/html4/" ` +
 			`h:table="hello" f:table="world" ` +
 			`/></TableAttrs>`,
-		tab: TableAttrs***REMOVED***TAttr***REMOVED***HTable: "hello", FTable: "world"***REMOVED******REMOVED***,
-	***REMOVED***,
-	***REMOVED***
+		tab: TableAttrs{TAttr{HTable: "hello", FTable: "world"}},
+	},
+	{
 		xml: `<TableAttrs><TAttr ` +
 			`h:table="hello" f:table="world" xmlns:f="http://www.w3schools.com/furniture" xmlns:h="http://www.w3.org/TR/html4/" ` +
 			`/></TableAttrs>`,
-		tab: TableAttrs***REMOVED***TAttr***REMOVED***HTable: "hello", FTable: "world"***REMOVED******REMOVED***,
-	***REMOVED***,
-	***REMOVED***
+		tab: TableAttrs{TAttr{HTable: "hello", FTable: "world"}},
+	},
+	{
 		// Default space does not apply to attribute names.
 		xml: `<TableAttrs xmlns="http://www.w3schools.com/furniture" xmlns:h="http://www.w3.org/TR/html4/"><TAttr ` +
 			`h:table="hello" table="world" ` +
 			`/></TableAttrs>`,
-		tab: TableAttrs***REMOVED***TAttr***REMOVED***HTable: "hello", FTable: ""***REMOVED******REMOVED***,
-	***REMOVED***,
-	***REMOVED***
+		tab: TableAttrs{TAttr{HTable: "hello", FTable: ""}},
+	},
+	{
 		// Default space does not apply to attribute names.
 		xml: `<TableAttrs xmlns:f="http://www.w3schools.com/furniture"><TAttr xmlns="http://www.w3.org/TR/html4/" ` +
 			`table="hello" f:table="world" ` +
 			`/></TableAttrs>`,
-		tab: TableAttrs***REMOVED***TAttr***REMOVED***HTable: "", FTable: "world"***REMOVED******REMOVED***,
-	***REMOVED***,
-	***REMOVED***
+		tab: TableAttrs{TAttr{HTable: "", FTable: "world"}},
+	},
+	{
 		xml: `<TableAttrs><TAttr ` +
 			`table="bogus" ` +
 			`/></TableAttrs>`,
-		tab: TableAttrs***REMOVED******REMOVED***,
-	***REMOVED***,
-	***REMOVED***
+		tab: TableAttrs{},
+	},
+	{
 		// Default space does not apply to attribute names.
 		xml: `<TableAttrs xmlns:h="http://www.w3.org/TR/html4/"><TAttr ` +
 			`h:table="hello" table="world" ` +
 			`/></TableAttrs>`,
-		tab: TableAttrs***REMOVED***TAttr***REMOVED***HTable: "hello", FTable: ""***REMOVED******REMOVED***,
+		tab: TableAttrs{TAttr{HTable: "hello", FTable: ""}},
 		ns:  "http://www.w3schools.com/furniture",
-	***REMOVED***,
-	***REMOVED***
+	},
+	{
 		// Default space does not apply to attribute names.
 		xml: `<TableAttrs xmlns:f="http://www.w3schools.com/furniture"><TAttr ` +
 			`table="hello" f:table="world" ` +
 			`/></TableAttrs>`,
-		tab: TableAttrs***REMOVED***TAttr***REMOVED***HTable: "", FTable: "world"***REMOVED******REMOVED***,
+		tab: TableAttrs{TAttr{HTable: "", FTable: "world"}},
 		ns:  "http://www.w3.org/TR/html4/",
-	***REMOVED***,
-	***REMOVED***
+	},
+	{
 		xml: `<TableAttrs><TAttr ` +
 			`table="bogus" ` +
 			`/></TableAttrs>`,
-		tab: TableAttrs***REMOVED******REMOVED***,
+		tab: TableAttrs{},
 		ns:  "something else entirely",
-	***REMOVED***,
-***REMOVED***
+	},
+}
 
-func TestUnmarshalNSAttr(t *testing.T) ***REMOVED***
-	for i, tt := range tableAttrs ***REMOVED***
+func TestUnmarshalNSAttr(t *testing.T) {
+	for i, tt := range tableAttrs {
 		var dst TableAttrs
 		var err error
-		if tt.ns != "" ***REMOVED***
+		if tt.ns != "" {
 			d := NewDecoder(strings.NewReader(tt.xml))
 			d.DefaultSpace = tt.ns
 			err = d.Decode(&dst)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			err = Unmarshal([]byte(tt.xml), &dst)
-		***REMOVED***
-		if err != nil ***REMOVED***
+		}
+		if err != nil {
 			t.Errorf("#%d: Unmarshal: %v", i, err)
 			continue
-		***REMOVED***
+		}
 		want := tt.tab
-		if dst != want ***REMOVED***
+		if dst != want {
 			t.Errorf("#%d: dst=%+v, want %+v", i, dst, want)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestMarshalNSAttr(t *testing.T) ***REMOVED***
-	src := TableAttrs***REMOVED***TAttr***REMOVED***"hello", "world", "en_US", "other1", "other2", "other3", "other4"***REMOVED******REMOVED***
+func TestMarshalNSAttr(t *testing.T) {
+	src := TableAttrs{TAttr{"hello", "world", "en_US", "other1", "other2", "other3", "other4"}}
 	data, err := Marshal(&src)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("Marshal: %v", err)
-	***REMOVED***
+	}
 	want := `<TableAttrs><TAttr xmlns:json_1="http://golang.org/2/json/" xmlns:json="http://golang.org/json/" xmlns:_xmlfoo="http://golang.org/xmlfoo/" xmlns:_xml="http://golang.org/xml/" xmlns:furniture="http://www.w3schools.com/furniture" xmlns:html4="http://www.w3.org/TR/html4/" html4:table="hello" furniture:table="world" xml:lang="en_US" _xml:other="other1" _xmlfoo:other="other2" json:other="other3" json_1:other="other4"></TAttr></TableAttrs>`
 	str := string(data)
-	if str != want ***REMOVED***
+	if str != want {
 		t.Errorf("Marshal:\nhave: %#q\nwant: %#q\n", str, want)
-	***REMOVED***
+	}
 
 	var dst TableAttrs
-	if err := Unmarshal(data, &dst); err != nil ***REMOVED***
+	if err := Unmarshal(data, &dst); err != nil {
 		t.Errorf("Unmarshal: %v", err)
-	***REMOVED***
+	}
 
-	if dst != src ***REMOVED***
+	if dst != src {
 		t.Errorf("Unmarshal = %q, want %q", dst, src)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type MyCharData struct ***REMOVED***
+type MyCharData struct {
 	body string
-***REMOVED***
+}
 
-func (m *MyCharData) UnmarshalXML(d *Decoder, start StartElement) error ***REMOVED***
-	for ***REMOVED***
+func (m *MyCharData) UnmarshalXML(d *Decoder, start StartElement) error {
+	for {
 		t, err := d.Token()
-		if err == io.EOF ***REMOVED*** // found end of element
+		if err == io.EOF { // found end of element
 			break
-		***REMOVED***
-		if err != nil ***REMOVED***
+		}
+		if err != nil {
 			return err
-		***REMOVED***
-		if char, ok := t.(CharData); ok ***REMOVED***
+		}
+		if char, ok := t.(CharData); ok {
 			m.body += string(char)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
 var _ Unmarshaler = (*MyCharData)(nil)
 
-func (m *MyCharData) UnmarshalXMLAttr(attr Attr) error ***REMOVED***
+func (m *MyCharData) UnmarshalXMLAttr(attr Attr) error {
 	panic("must not call")
-***REMOVED***
+}
 
-type MyAttr struct ***REMOVED***
+type MyAttr struct {
 	attr string
-***REMOVED***
+}
 
-func (m *MyAttr) UnmarshalXMLAttr(attr Attr) error ***REMOVED***
+func (m *MyAttr) UnmarshalXMLAttr(attr Attr) error {
 	m.attr = attr.Value
 	return nil
-***REMOVED***
+}
 
 var _ UnmarshalerAttr = (*MyAttr)(nil)
 
-type MyStruct struct ***REMOVED***
+type MyStruct struct {
 	Data *MyCharData
 	Attr *MyAttr `xml:",attr"`
 
 	Data2 MyCharData
 	Attr2 MyAttr `xml:",attr"`
-***REMOVED***
+}
 
-func TestUnmarshaler(t *testing.T) ***REMOVED***
+func TestUnmarshaler(t *testing.T) {
 	xml := `<?xml version="1.0" encoding="utf-8"?>
 		<MyStruct Attr="attr1" Attr2="attr2">
 		<Data>hello <!-- comment -->world</Data>
@@ -707,38 +707,38 @@ func TestUnmarshaler(t *testing.T) ***REMOVED***
 	`
 
 	var m MyStruct
-	if err := Unmarshal([]byte(xml), &m); err != nil ***REMOVED***
+	if err := Unmarshal([]byte(xml), &m); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if m.Data == nil || m.Attr == nil || m.Data.body != "hello world" || m.Attr.attr != "attr1" || m.Data2.body != "howdy world" || m.Attr2.attr != "attr2" ***REMOVED***
+	if m.Data == nil || m.Attr == nil || m.Data.body != "hello world" || m.Attr.attr != "attr1" || m.Data2.body != "howdy world" || m.Attr2.attr != "attr2" {
 		t.Errorf("m=%#+v\n", m)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type Pea struct ***REMOVED***
+type Pea struct {
 	Cotelydon string
-***REMOVED***
+}
 
-type Pod struct ***REMOVED***
-	Pea interface***REMOVED******REMOVED*** `xml:"Pea"`
-***REMOVED***
+type Pod struct {
+	Pea interface{} `xml:"Pea"`
+}
 
 // https://golang.org/issue/6836
-func TestUnmarshalIntoInterface(t *testing.T) ***REMOVED***
+func TestUnmarshalIntoInterface(t *testing.T) {
 	pod := new(Pod)
 	pod.Pea = new(Pea)
 	xml := `<Pod><Pea><Cotelydon>Green stuff</Cotelydon></Pea></Pod>`
 	err := Unmarshal([]byte(xml), pod)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatalf("failed to unmarshal %q: %v", xml, err)
-	***REMOVED***
+	}
 	pea, ok := pod.Pea.(*Pea)
-	if !ok ***REMOVED***
+	if !ok {
 		t.Fatalf("unmarshalled into wrong type: have %T want *Pea", pod.Pea)
-	***REMOVED***
+	}
 	have, want := pea.Cotelydon, "Green stuff"
-	if have != want ***REMOVED***
+	if have != want {
 		t.Errorf("failed to unmarshal into interface, have %q want %q", have, want)
-	***REMOVED***
-***REMOVED***
+	}
+}

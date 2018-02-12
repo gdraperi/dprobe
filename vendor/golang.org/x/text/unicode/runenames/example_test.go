@@ -10,8 +10,8 @@ import (
 	"golang.org/x/text/unicode/runenames"
 )
 
-func Example() ***REMOVED***
-	runes := []rune***REMOVED***
+func Example() {
+	runes := []rune{
 		-1,
 		'\U00000000',
 		'\U0000001f',
@@ -62,11 +62,11 @@ func Example() ***REMOVED***
 		'\U0010fffd',
 		'\U0010fffe',
 		'\U0010ffff',
-	***REMOVED***
+	}
 
-	for _, r := range runes ***REMOVED***
+	for _, r := range runes {
 		fmt.Printf("%08x %q\n", r, runenames.Name(r))
-	***REMOVED***
+	}
 
 	// Output:
 	// -0000001 ""
@@ -115,4 +115,4 @@ func Example() ***REMOVED***
 	// 0010fffd "<Plane 16 Private Use>"
 	// 0010fffe ""
 	// 0010ffff ""
-***REMOVED***
+}

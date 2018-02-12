@@ -20,13 +20,13 @@ import (
 // sufficient and practical.
 
 // Interface is used for types that can determine their own plural form.
-type Interface interface ***REMOVED***
+type Interface interface {
 	// PluralForm reports the plural form for the given language of the
 	// underlying value. It also returns the integer value. If the integer value
 	// is larger than fits in n, PluralForm may return a value modulo
 	// 10,000,000.
 	PluralForm(t language.Tag, scale int) (f Form, n int)
-***REMOVED***
+}
 
 // Selectf returns the first case for which its selector is a match for the
 // arg-th substitution argument to a formatting call, formatting it as indicated
@@ -53,12 +53,12 @@ type Interface interface ***REMOVED***
 //   - %.2f   decimal with scale 2
 //   - %.2e   scientific notation with precision 3 (scale + 1)
 //   - %d     integer
-func Selectf(arg int, format string, cases ...interface***REMOVED******REMOVED***) catalog.Message ***REMOVED***
+func Selectf(arg int, format string, cases ...interface{}) catalog.Message {
 	var p parser
 	// Intercept the formatting parameters of format by doing a dummy print.
 	fmt.Fprintf(ioutil.Discard, format, &p)
-	m := &message***REMOVED***arg, kindDefault, 0, cases***REMOVED***
-	switch p.verb ***REMOVED***
+	m := &message{arg, kindDefault, 0, cases}
+	switch p.verb {
 	case 'g':
 		m.kind = kindPrecision
 		m.scale = p.scale
@@ -73,29 +73,29 @@ func Selectf(arg int, format string, cases ...interface***REMOVED******REMOVED**
 		m.scale = 0
 	default:
 		// TODO: do we need to handle errors?
-	***REMOVED***
+	}
 	return m
-***REMOVED***
+}
 
-type parser struct ***REMOVED***
+type parser struct {
 	verb  rune
 	scale int
-***REMOVED***
+}
 
-func (p *parser) Format(s fmt.State, verb rune) ***REMOVED***
+func (p *parser) Format(s fmt.State, verb rune) {
 	p.verb = verb
 	p.scale = -1
-	if prec, ok := s.Precision(); ok ***REMOVED***
+	if prec, ok := s.Precision(); ok {
 		p.scale = prec
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type message struct ***REMOVED***
+type message struct {
 	arg   int
 	kind  int
 	scale int
-	cases []interface***REMOVED******REMOVED***
-***REMOVED***
+	cases []interface{}
+}
 
 const (
 	// Start with non-ASCII to allow skipping values.
@@ -107,104 +107,104 @@ const (
 
 var handle = catmsg.Register("golang.org/x/text/feature/plural:plural", execute)
 
-func (m *message) Compile(e *catmsg.Encoder) error ***REMOVED***
+func (m *message) Compile(e *catmsg.Encoder) error {
 	e.EncodeMessageType(handle)
 
 	e.EncodeUint(uint64(m.arg))
 
 	e.EncodeUint(uint64(m.kind))
-	if m.kind > kindDefault ***REMOVED***
+	if m.kind > kindDefault {
 		e.EncodeUint(uint64(m.scale))
-	***REMOVED***
+	}
 
 	forms := validForms(cardinal, e.Language())
 
-	for i := 0; i < len(m.cases); ***REMOVED***
-		if err := compileSelector(e, forms, m.cases[i]); err != nil ***REMOVED***
+	for i := 0; i < len(m.cases); {
+		if err := compileSelector(e, forms, m.cases[i]); err != nil {
 			return err
-		***REMOVED***
-		if i++; i >= len(m.cases) ***REMOVED***
+		}
+		if i++; i >= len(m.cases) {
 			return fmt.Errorf("plural: no message defined for selector %v", m.cases[i-1])
-		***REMOVED***
+		}
 		var msg catalog.Message
-		switch x := m.cases[i].(type) ***REMOVED***
+		switch x := m.cases[i].(type) {
 		case string:
 			msg = catalog.String(x)
 		case catalog.Message:
 			msg = x
 		default:
 			return fmt.Errorf("plural: message of type %T; must be string or catalog.Message", x)
-		***REMOVED***
-		if err := e.EncodeMessage(msg); err != nil ***REMOVED***
+		}
+		if err := e.EncodeMessage(msg); err != nil {
 			return err
-		***REMOVED***
+		}
 		i++
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func compileSelector(e *catmsg.Encoder, valid []Form, selector interface***REMOVED******REMOVED***) error ***REMOVED***
+func compileSelector(e *catmsg.Encoder, valid []Form, selector interface{}) error {
 	form := Other
-	switch x := selector.(type) ***REMOVED***
+	switch x := selector.(type) {
 	case string:
-		if x == "" ***REMOVED***
+		if x == "" {
 			return fmt.Errorf("plural: empty selector")
-		***REMOVED***
-		if c := x[0]; c == '=' || c == '<' ***REMOVED***
+		}
+		if c := x[0]; c == '=' || c == '<' {
 			val, err := strconv.ParseUint(x[1:], 10, 16)
-			if err != nil ***REMOVED***
+			if err != nil {
 				return fmt.Errorf("plural: invalid number in selector %q: %v", selector, err)
-			***REMOVED***
+			}
 			e.EncodeUint(uint64(c))
 			e.EncodeUint(val)
 			return nil
-		***REMOVED***
+		}
 		var ok bool
 		form, ok = countMap[x]
-		if !ok ***REMOVED***
+		if !ok {
 			return fmt.Errorf("plural: invalid plural form %q", selector)
-		***REMOVED***
+		}
 	case Form:
 		form = x
 	default:
 		return fmt.Errorf("plural: selector of type %T; want string or Form", selector)
-	***REMOVED***
+	}
 
 	ok := false
-	for _, f := range valid ***REMOVED***
-		if f == form ***REMOVED***
+	for _, f := range valid {
+		if f == form {
 			ok = true
 			break
-		***REMOVED***
-	***REMOVED***
-	if !ok ***REMOVED***
+		}
+	}
+	if !ok {
 		return fmt.Errorf("plural: form %q not supported for language %q", selector, e.Language())
-	***REMOVED***
+	}
 	e.EncodeUint(uint64(form))
 	return nil
-***REMOVED***
+}
 
-func execute(d *catmsg.Decoder) bool ***REMOVED***
+func execute(d *catmsg.Decoder) bool {
 	lang := d.Language()
 	argN := int(d.DecodeUint())
 	kind := int(d.DecodeUint())
 	scale := -1 // default
-	if kind > kindDefault ***REMOVED***
+	if kind > kindDefault {
 		scale = int(d.DecodeUint())
-	***REMOVED***
+	}
 	form := Other
 	n := -1
-	if arg := d.Arg(argN); arg == nil ***REMOVED***
+	if arg := d.Arg(argN); arg == nil {
 		// Default to Other.
-	***REMOVED*** else if x, ok := arg.(number.VisibleDigits); ok ***REMOVED***
+	} else if x, ok := arg.(number.VisibleDigits); ok {
 		d := x.Digits(nil, lang, scale)
 		form, n = cardinal.matchDisplayDigits(lang, &d)
-	***REMOVED*** else if x, ok := arg.(Interface); ok ***REMOVED***
+	} else if x, ok := arg.(Interface); ok {
 		// This covers lists and formatters from the number package.
 		form, n = x.PluralForm(lang, scale)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		var f number.Formatter
-		switch kind ***REMOVED***
+		switch kind {
 		case kindScale:
 			f.InitDecimal(lang)
 			f.SetScale(scale)
@@ -217,28 +217,28 @@ func execute(d *catmsg.Decoder) bool ***REMOVED***
 		case kindDefault:
 			// sensible default
 			f.InitDecimal(lang)
-			if k := reflect.TypeOf(arg).Kind(); reflect.Int <= k && k <= reflect.Uintptr ***REMOVED***
+			if k := reflect.TypeOf(arg).Kind(); reflect.Int <= k && k <= reflect.Uintptr {
 				f.SetScale(0)
-			***REMOVED*** else ***REMOVED***
+			} else {
 				f.SetScale(2)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		var dec number.Decimal // TODO: buffer in Printer
 		dec.Convert(f.RoundingContext, arg)
 		v := number.FormatDigits(&dec, f.RoundingContext)
-		if !v.NaN && !v.Inf ***REMOVED***
+		if !v.NaN && !v.Inf {
 			form, n = cardinal.matchDisplayDigits(d.Language(), &v)
-		***REMOVED***
-	***REMOVED***
-	for !d.Done() ***REMOVED***
+		}
+	}
+	for !d.Done() {
 		f := d.DecodeUint()
 		if (f == '=' && n == int(d.DecodeUint())) ||
 			(f == '<' && 0 <= n && n < int(d.DecodeUint())) ||
 			form == Form(f) ||
-			Other == Form(f) ***REMOVED***
+			Other == Form(f) {
 			return d.ExecuteMessage()
-		***REMOVED***
+		}
 		d.SkipMessage()
-	***REMOVED***
+	}
 	return false
-***REMOVED***
+}

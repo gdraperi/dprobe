@@ -8,18 +8,18 @@ import (
 )
 
 // GetOperatingSystem gets the name of the current operating system.
-func GetOperatingSystem() (string, error) ***REMOVED***
+func GetOperatingSystem() (string, error) {
 	cmd := exec.Command("uname", "-s")
 	osName, err := cmd.Output()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	return string(osName), nil
-***REMOVED***
+}
 
 // IsContainerized returns true if we are running inside a container.
 // No-op on FreeBSD and Darwin, always returns false.
-func IsContainerized() (bool, error) ***REMOVED***
+func IsContainerized() (bool, error) {
 	// TODO: Implement jail detection for freeBSD
 	return false, errors.New("Cannot detect if we are in container")
-***REMOVED***
+}

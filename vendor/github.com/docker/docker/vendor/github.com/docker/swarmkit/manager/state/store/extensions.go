@@ -10,179 +10,179 @@ import (
 
 const tableExtension = "extension"
 
-func init() ***REMOVED***
-	register(ObjectStoreConfig***REMOVED***
-		Table: &memdb.TableSchema***REMOVED***
+func init() {
+	register(ObjectStoreConfig{
+		Table: &memdb.TableSchema{
 			Name: tableExtension,
-			Indexes: map[string]*memdb.IndexSchema***REMOVED***
-				indexID: ***REMOVED***
+			Indexes: map[string]*memdb.IndexSchema{
+				indexID: {
 					Name:    indexID,
 					Unique:  true,
-					Indexer: extensionIndexerByID***REMOVED******REMOVED***,
-				***REMOVED***,
-				indexName: ***REMOVED***
+					Indexer: extensionIndexerByID{},
+				},
+				indexName: {
 					Name:    indexName,
 					Unique:  true,
-					Indexer: extensionIndexerByName***REMOVED******REMOVED***,
-				***REMOVED***,
-				indexCustom: ***REMOVED***
+					Indexer: extensionIndexerByName{},
+				},
+				indexCustom: {
 					Name:         indexCustom,
-					Indexer:      extensionCustomIndexer***REMOVED******REMOVED***,
+					Indexer:      extensionCustomIndexer{},
 					AllowMissing: true,
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-		Save: func(tx ReadTx, snapshot *api.StoreSnapshot) error ***REMOVED***
+				},
+			},
+		},
+		Save: func(tx ReadTx, snapshot *api.StoreSnapshot) error {
 			var err error
 			snapshot.Extensions, err = FindExtensions(tx, All)
 			return err
-		***REMOVED***,
-		Restore: func(tx Tx, snapshot *api.StoreSnapshot) error ***REMOVED***
+		},
+		Restore: func(tx Tx, snapshot *api.StoreSnapshot) error {
 			toStoreObj := make([]api.StoreObject, len(snapshot.Extensions))
-			for i, x := range snapshot.Extensions ***REMOVED***
-				toStoreObj[i] = extensionEntry***REMOVED***x***REMOVED***
-			***REMOVED***
+			for i, x := range snapshot.Extensions {
+				toStoreObj[i] = extensionEntry{x}
+			}
 			return RestoreTable(tx, tableExtension, toStoreObj)
-		***REMOVED***,
-		ApplyStoreAction: func(tx Tx, sa api.StoreAction) error ***REMOVED***
-			switch v := sa.Target.(type) ***REMOVED***
+		},
+		ApplyStoreAction: func(tx Tx, sa api.StoreAction) error {
+			switch v := sa.Target.(type) {
 			case *api.StoreAction_Extension:
 				obj := v.Extension
-				switch sa.Action ***REMOVED***
+				switch sa.Action {
 				case api.StoreActionKindCreate:
 					return CreateExtension(tx, obj)
 				case api.StoreActionKindUpdate:
 					return UpdateExtension(tx, obj)
 				case api.StoreActionKindRemove:
 					return DeleteExtension(tx, obj.ID)
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			return errUnknownStoreAction
-		***REMOVED***,
-	***REMOVED***)
-***REMOVED***
+		},
+	})
+}
 
-type extensionEntry struct ***REMOVED***
+type extensionEntry struct {
 	*api.Extension
-***REMOVED***
+}
 
-func (e extensionEntry) CopyStoreObject() api.StoreObject ***REMOVED***
-	return extensionEntry***REMOVED***Extension: e.Extension.Copy()***REMOVED***
-***REMOVED***
+func (e extensionEntry) CopyStoreObject() api.StoreObject {
+	return extensionEntry{Extension: e.Extension.Copy()}
+}
 
 // ensure that when update events are emitted, we unwrap extensionEntry
-func (e extensionEntry) EventUpdate(oldObject api.StoreObject) api.Event ***REMOVED***
-	if oldObject != nil ***REMOVED***
-		return api.EventUpdateExtension***REMOVED***Extension: e.Extension, OldExtension: oldObject.(extensionEntry).Extension***REMOVED***
-	***REMOVED***
-	return api.EventUpdateExtension***REMOVED***Extension: e.Extension***REMOVED***
-***REMOVED***
+func (e extensionEntry) EventUpdate(oldObject api.StoreObject) api.Event {
+	if oldObject != nil {
+		return api.EventUpdateExtension{Extension: e.Extension, OldExtension: oldObject.(extensionEntry).Extension}
+	}
+	return api.EventUpdateExtension{Extension: e.Extension}
+}
 
 // CreateExtension adds a new extension to the store.
 // Returns ErrExist if the ID is already taken.
-func CreateExtension(tx Tx, e *api.Extension) error ***REMOVED***
+func CreateExtension(tx Tx, e *api.Extension) error {
 	// Ensure the name is not already in use.
-	if tx.lookup(tableExtension, indexName, strings.ToLower(e.Annotations.Name)) != nil ***REMOVED***
+	if tx.lookup(tableExtension, indexName, strings.ToLower(e.Annotations.Name)) != nil {
 		return ErrNameConflict
-	***REMOVED***
+	}
 
 	// It can't conflict with built-in kinds either.
-	if _, ok := schema.Tables[e.Annotations.Name]; ok ***REMOVED***
+	if _, ok := schema.Tables[e.Annotations.Name]; ok {
 		return ErrNameConflict
-	***REMOVED***
+	}
 
-	return tx.create(tableExtension, extensionEntry***REMOVED***e***REMOVED***)
-***REMOVED***
+	return tx.create(tableExtension, extensionEntry{e})
+}
 
 // UpdateExtension updates an existing extension in the store.
 // Returns ErrNotExist if the object doesn't exist.
-func UpdateExtension(tx Tx, e *api.Extension) error ***REMOVED***
+func UpdateExtension(tx Tx, e *api.Extension) error {
 	// TODO(aaronl): For the moment, extensions are immutable
 	return errors.New("extensions are immutable")
-***REMOVED***
+}
 
 // DeleteExtension removes an extension from the store.
 // Returns ErrNotExist if the object doesn't exist.
-func DeleteExtension(tx Tx, id string) error ***REMOVED***
+func DeleteExtension(tx Tx, id string) error {
 	e := tx.get(tableExtension, id)
-	if e == nil ***REMOVED***
+	if e == nil {
 		return ErrNotExist
-	***REMOVED***
+	}
 
 	resources, err := FindResources(tx, ByKind(e.(extensionEntry).Annotations.Name))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
-	if len(resources) != 0 ***REMOVED***
+	if len(resources) != 0 {
 		return errors.New("cannot delete extension because objects of this type exist in the data store")
-	***REMOVED***
+	}
 
 	return tx.delete(tableExtension, id)
-***REMOVED***
+}
 
 // GetExtension looks up an extension by ID.
 // Returns nil if the object doesn't exist.
-func GetExtension(tx ReadTx, id string) *api.Extension ***REMOVED***
+func GetExtension(tx ReadTx, id string) *api.Extension {
 	e := tx.get(tableExtension, id)
-	if e == nil ***REMOVED***
+	if e == nil {
 		return nil
-	***REMOVED***
+	}
 	return e.(extensionEntry).Extension
-***REMOVED***
+}
 
 // FindExtensions selects a set of extensions and returns them.
-func FindExtensions(tx ReadTx, by By) ([]*api.Extension, error) ***REMOVED***
-	checkType := func(by By) error ***REMOVED***
-		switch by.(type) ***REMOVED***
+func FindExtensions(tx ReadTx, by By) ([]*api.Extension, error) {
+	checkType := func(by By) error {
+		switch by.(type) {
 		case byIDPrefix, byName, byCustom, byCustomPrefix:
 			return nil
 		default:
 			return ErrInvalidFindBy
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	extensionList := []*api.Extension***REMOVED******REMOVED***
-	appendResult := func(o api.StoreObject) ***REMOVED***
+	extensionList := []*api.Extension{}
+	appendResult := func(o api.StoreObject) {
 		extensionList = append(extensionList, o.(extensionEntry).Extension)
-	***REMOVED***
+	}
 
 	err := tx.find(tableExtension, by, checkType, appendResult)
 	return extensionList, err
-***REMOVED***
+}
 
-type extensionIndexerByID struct***REMOVED******REMOVED***
+type extensionIndexerByID struct{}
 
-func (indexer extensionIndexerByID) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
-	return api.ExtensionIndexerByID***REMOVED******REMOVED***.FromArgs(args...)
-***REMOVED***
-func (indexer extensionIndexerByID) PrefixFromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
-	return api.ExtensionIndexerByID***REMOVED******REMOVED***.PrefixFromArgs(args...)
-***REMOVED***
-func (indexer extensionIndexerByID) FromObject(obj interface***REMOVED******REMOVED***) (bool, []byte, error) ***REMOVED***
-	return api.ExtensionIndexerByID***REMOVED******REMOVED***.FromObject(obj.(extensionEntry).Extension)
-***REMOVED***
+func (indexer extensionIndexerByID) FromArgs(args ...interface{}) ([]byte, error) {
+	return api.ExtensionIndexerByID{}.FromArgs(args...)
+}
+func (indexer extensionIndexerByID) PrefixFromArgs(args ...interface{}) ([]byte, error) {
+	return api.ExtensionIndexerByID{}.PrefixFromArgs(args...)
+}
+func (indexer extensionIndexerByID) FromObject(obj interface{}) (bool, []byte, error) {
+	return api.ExtensionIndexerByID{}.FromObject(obj.(extensionEntry).Extension)
+}
 
-type extensionIndexerByName struct***REMOVED******REMOVED***
+type extensionIndexerByName struct{}
 
-func (indexer extensionIndexerByName) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
-	return api.ExtensionIndexerByName***REMOVED******REMOVED***.FromArgs(args...)
-***REMOVED***
-func (indexer extensionIndexerByName) PrefixFromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
-	return api.ExtensionIndexerByName***REMOVED******REMOVED***.PrefixFromArgs(args...)
-***REMOVED***
-func (indexer extensionIndexerByName) FromObject(obj interface***REMOVED******REMOVED***) (bool, []byte, error) ***REMOVED***
-	return api.ExtensionIndexerByName***REMOVED******REMOVED***.FromObject(obj.(extensionEntry).Extension)
-***REMOVED***
+func (indexer extensionIndexerByName) FromArgs(args ...interface{}) ([]byte, error) {
+	return api.ExtensionIndexerByName{}.FromArgs(args...)
+}
+func (indexer extensionIndexerByName) PrefixFromArgs(args ...interface{}) ([]byte, error) {
+	return api.ExtensionIndexerByName{}.PrefixFromArgs(args...)
+}
+func (indexer extensionIndexerByName) FromObject(obj interface{}) (bool, []byte, error) {
+	return api.ExtensionIndexerByName{}.FromObject(obj.(extensionEntry).Extension)
+}
 
-type extensionCustomIndexer struct***REMOVED******REMOVED***
+type extensionCustomIndexer struct{}
 
-func (indexer extensionCustomIndexer) FromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
-	return api.ExtensionCustomIndexer***REMOVED******REMOVED***.FromArgs(args...)
-***REMOVED***
-func (indexer extensionCustomIndexer) PrefixFromArgs(args ...interface***REMOVED******REMOVED***) ([]byte, error) ***REMOVED***
-	return api.ExtensionCustomIndexer***REMOVED******REMOVED***.PrefixFromArgs(args...)
-***REMOVED***
-func (indexer extensionCustomIndexer) FromObject(obj interface***REMOVED******REMOVED***) (bool, [][]byte, error) ***REMOVED***
-	return api.ExtensionCustomIndexer***REMOVED******REMOVED***.FromObject(obj.(extensionEntry).Extension)
-***REMOVED***
+func (indexer extensionCustomIndexer) FromArgs(args ...interface{}) ([]byte, error) {
+	return api.ExtensionCustomIndexer{}.FromArgs(args...)
+}
+func (indexer extensionCustomIndexer) PrefixFromArgs(args ...interface{}) ([]byte, error) {
+	return api.ExtensionCustomIndexer{}.PrefixFromArgs(args...)
+}
+func (indexer extensionCustomIndexer) FromObject(obj interface{}) (bool, [][]byte, error) {
+	return api.ExtensionCustomIndexer{}.FromObject(obj.(extensionEntry).Extension)
+}

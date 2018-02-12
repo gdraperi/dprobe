@@ -19,20 +19,20 @@ import (
 	ixml "golang.org/x/net/webdav/internal/xml"
 )
 
-func TestReadLockInfo(t *testing.T) ***REMOVED***
+func TestReadLockInfo(t *testing.T) {
 	// The "section x.y.z" test cases come from section x.y.z of the spec at
 	// http://www.webdav.org/specs/rfc4918.html
-	testCases := []struct ***REMOVED***
+	testCases := []struct {
 		desc       string
 		input      string
 		wantLI     lockInfo
 		wantStatus int
-	***REMOVED******REMOVED******REMOVED***
+	}{{
 		"bad: junk",
 		"xxx",
-		lockInfo***REMOVED******REMOVED***,
+		lockInfo{},
 		http.StatusBadRequest,
-	***REMOVED***, ***REMOVED***
+	}, {
 		"bad: invalid owner XML",
 		"" +
 			"<D:lockinfo xmlns:D='DAV:'>\n" +
@@ -42,9 +42,9 @@ func TestReadLockInfo(t *testing.T) ***REMOVED***
 			"    <D:href>   no end tag   \n" +
 			"  </D:owner>\n" +
 			"</D:lockinfo>",
-		lockInfo***REMOVED******REMOVED***,
+		lockInfo{},
 		http.StatusBadRequest,
-	***REMOVED***, ***REMOVED***
+	}, {
 		"bad: invalid UTF-8",
 		"" +
 			"<D:lockinfo xmlns:D='DAV:'>\n" +
@@ -54,31 +54,31 @@ func TestReadLockInfo(t *testing.T) ***REMOVED***
 			"    <D:href>   \xff   </D:href>\n" +
 			"  </D:owner>\n" +
 			"</D:lockinfo>",
-		lockInfo***REMOVED******REMOVED***,
+		lockInfo{},
 		http.StatusBadRequest,
-	***REMOVED***, ***REMOVED***
+	}, {
 		"bad: unfinished XML #1",
 		"" +
 			"<D:lockinfo xmlns:D='DAV:'>\n" +
 			"  <D:lockscope><D:exclusive/></D:lockscope>\n" +
 			"  <D:locktype><D:write/></D:locktype>\n",
-		lockInfo***REMOVED******REMOVED***,
+		lockInfo{},
 		http.StatusBadRequest,
-	***REMOVED***, ***REMOVED***
+	}, {
 		"bad: unfinished XML #2",
 		"" +
 			"<D:lockinfo xmlns:D='DAV:'>\n" +
 			"  <D:lockscope><D:exclusive/></D:lockscope>\n" +
 			"  <D:locktype><D:write/></D:locktype>\n" +
 			"  <D:owner>\n",
-		lockInfo***REMOVED******REMOVED***,
+		lockInfo{},
 		http.StatusBadRequest,
-	***REMOVED***, ***REMOVED***
+	}, {
 		"good: empty",
 		"",
-		lockInfo***REMOVED******REMOVED***,
+		lockInfo{},
 		0,
-	***REMOVED***, ***REMOVED***
+	}, {
 		"good: plain-text owner",
 		"" +
 			"<D:lockinfo xmlns:D='DAV:'>\n" +
@@ -86,16 +86,16 @@ func TestReadLockInfo(t *testing.T) ***REMOVED***
 			"  <D:locktype><D:write/></D:locktype>\n" +
 			"  <D:owner>gopher</D:owner>\n" +
 			"</D:lockinfo>",
-		lockInfo***REMOVED***
-			XMLName:   ixml.Name***REMOVED***Space: "DAV:", Local: "lockinfo"***REMOVED***,
-			Exclusive: new(struct***REMOVED******REMOVED***),
-			Write:     new(struct***REMOVED******REMOVED***),
-			Owner: owner***REMOVED***
+		lockInfo{
+			XMLName:   ixml.Name{Space: "DAV:", Local: "lockinfo"},
+			Exclusive: new(struct{}),
+			Write:     new(struct{}),
+			Owner: owner{
 				InnerXML: "gopher",
-			***REMOVED***,
-		***REMOVED***,
+			},
+		},
 		0,
-	***REMOVED***, ***REMOVED***
+	}, {
 		"section 9.10.7",
 		"" +
 			"<D:lockinfo xmlns:D='DAV:'>\n" +
@@ -105,103 +105,103 @@ func TestReadLockInfo(t *testing.T) ***REMOVED***
 			"    <D:href>http://example.org/~ejw/contact.html</D:href>\n" +
 			"  </D:owner>\n" +
 			"</D:lockinfo>",
-		lockInfo***REMOVED***
-			XMLName:   ixml.Name***REMOVED***Space: "DAV:", Local: "lockinfo"***REMOVED***,
-			Exclusive: new(struct***REMOVED******REMOVED***),
-			Write:     new(struct***REMOVED******REMOVED***),
-			Owner: owner***REMOVED***
+		lockInfo{
+			XMLName:   ixml.Name{Space: "DAV:", Local: "lockinfo"},
+			Exclusive: new(struct{}),
+			Write:     new(struct{}),
+			Owner: owner{
 				InnerXML: "\n    <D:href>http://example.org/~ejw/contact.html</D:href>\n  ",
-			***REMOVED***,
-		***REMOVED***,
+			},
+		},
 		0,
-	***REMOVED******REMOVED***
+	}}
 
-	for _, tc := range testCases ***REMOVED***
+	for _, tc := range testCases {
 		li, status, err := readLockInfo(strings.NewReader(tc.input))
-		if tc.wantStatus != 0 ***REMOVED***
-			if err == nil ***REMOVED***
+		if tc.wantStatus != 0 {
+			if err == nil {
 				t.Errorf("%s: got nil error, want non-nil", tc.desc)
 				continue
-			***REMOVED***
-		***REMOVED*** else if err != nil ***REMOVED***
+			}
+		} else if err != nil {
 			t.Errorf("%s: %v", tc.desc, err)
 			continue
-		***REMOVED***
-		if !reflect.DeepEqual(li, tc.wantLI) || status != tc.wantStatus ***REMOVED***
+		}
+		if !reflect.DeepEqual(li, tc.wantLI) || status != tc.wantStatus {
 			t.Errorf("%s:\ngot  lockInfo=%v, status=%v\nwant lockInfo=%v, status=%v",
 				tc.desc, li, status, tc.wantLI, tc.wantStatus)
 			continue
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestReadPropfind(t *testing.T) ***REMOVED***
-	testCases := []struct ***REMOVED***
+func TestReadPropfind(t *testing.T) {
+	testCases := []struct {
 		desc       string
 		input      string
 		wantPF     propfind
 		wantStatus int
-	***REMOVED******REMOVED******REMOVED***
+	}{{
 		desc: "propfind: propname",
 		input: "" +
 			"<A:propfind xmlns:A='DAV:'>\n" +
 			"  <A:propname/>\n" +
 			"</A:propfind>",
-		wantPF: propfind***REMOVED***
-			XMLName:  ixml.Name***REMOVED***Space: "DAV:", Local: "propfind"***REMOVED***,
-			Propname: new(struct***REMOVED******REMOVED***),
-		***REMOVED***,
-	***REMOVED***, ***REMOVED***
+		wantPF: propfind{
+			XMLName:  ixml.Name{Space: "DAV:", Local: "propfind"},
+			Propname: new(struct{}),
+		},
+	}, {
 		desc:  "propfind: empty body means allprop",
 		input: "",
-		wantPF: propfind***REMOVED***
-			Allprop: new(struct***REMOVED******REMOVED***),
-		***REMOVED***,
-	***REMOVED***, ***REMOVED***
+		wantPF: propfind{
+			Allprop: new(struct{}),
+		},
+	}, {
 		desc: "propfind: allprop",
 		input: "" +
 			"<A:propfind xmlns:A='DAV:'>\n" +
 			"   <A:allprop/>\n" +
 			"</A:propfind>",
-		wantPF: propfind***REMOVED***
-			XMLName: ixml.Name***REMOVED***Space: "DAV:", Local: "propfind"***REMOVED***,
-			Allprop: new(struct***REMOVED******REMOVED***),
-		***REMOVED***,
-	***REMOVED***, ***REMOVED***
+		wantPF: propfind{
+			XMLName: ixml.Name{Space: "DAV:", Local: "propfind"},
+			Allprop: new(struct{}),
+		},
+	}, {
 		desc: "propfind: allprop followed by include",
 		input: "" +
 			"<A:propfind xmlns:A='DAV:'>\n" +
 			"  <A:allprop/>\n" +
 			"  <A:include><A:displayname/></A:include>\n" +
 			"</A:propfind>",
-		wantPF: propfind***REMOVED***
-			XMLName: ixml.Name***REMOVED***Space: "DAV:", Local: "propfind"***REMOVED***,
-			Allprop: new(struct***REMOVED******REMOVED***),
-			Include: propfindProps***REMOVED***xml.Name***REMOVED***Space: "DAV:", Local: "displayname"***REMOVED******REMOVED***,
-		***REMOVED***,
-	***REMOVED***, ***REMOVED***
+		wantPF: propfind{
+			XMLName: ixml.Name{Space: "DAV:", Local: "propfind"},
+			Allprop: new(struct{}),
+			Include: propfindProps{xml.Name{Space: "DAV:", Local: "displayname"}},
+		},
+	}, {
 		desc: "propfind: include followed by allprop",
 		input: "" +
 			"<A:propfind xmlns:A='DAV:'>\n" +
 			"  <A:include><A:displayname/></A:include>\n" +
 			"  <A:allprop/>\n" +
 			"</A:propfind>",
-		wantPF: propfind***REMOVED***
-			XMLName: ixml.Name***REMOVED***Space: "DAV:", Local: "propfind"***REMOVED***,
-			Allprop: new(struct***REMOVED******REMOVED***),
-			Include: propfindProps***REMOVED***xml.Name***REMOVED***Space: "DAV:", Local: "displayname"***REMOVED******REMOVED***,
-		***REMOVED***,
-	***REMOVED***, ***REMOVED***
+		wantPF: propfind{
+			XMLName: ixml.Name{Space: "DAV:", Local: "propfind"},
+			Allprop: new(struct{}),
+			Include: propfindProps{xml.Name{Space: "DAV:", Local: "displayname"}},
+		},
+	}, {
 		desc: "propfind: propfind",
 		input: "" +
 			"<A:propfind xmlns:A='DAV:'>\n" +
 			"  <A:prop><A:displayname/></A:prop>\n" +
 			"</A:propfind>",
-		wantPF: propfind***REMOVED***
-			XMLName: ixml.Name***REMOVED***Space: "DAV:", Local: "propfind"***REMOVED***,
-			Prop:    propfindProps***REMOVED***xml.Name***REMOVED***Space: "DAV:", Local: "displayname"***REMOVED******REMOVED***,
-		***REMOVED***,
-	***REMOVED***, ***REMOVED***
+		wantPF: propfind{
+			XMLName: ixml.Name{Space: "DAV:", Local: "propfind"},
+			Prop:    propfindProps{xml.Name{Space: "DAV:", Local: "displayname"}},
+		},
+	}, {
 		desc: "propfind: prop with ignored comments",
 		input: "" +
 			"<A:propfind xmlns:A='DAV:'>\n" +
@@ -210,46 +210,46 @@ func TestReadPropfind(t *testing.T) ***REMOVED***
 			"    <A:displayname><!-- ignore --></A:displayname>\n" +
 			"  </A:prop>\n" +
 			"</A:propfind>",
-		wantPF: propfind***REMOVED***
-			XMLName: ixml.Name***REMOVED***Space: "DAV:", Local: "propfind"***REMOVED***,
-			Prop:    propfindProps***REMOVED***xml.Name***REMOVED***Space: "DAV:", Local: "displayname"***REMOVED******REMOVED***,
-		***REMOVED***,
-	***REMOVED***, ***REMOVED***
+		wantPF: propfind{
+			XMLName: ixml.Name{Space: "DAV:", Local: "propfind"},
+			Prop:    propfindProps{xml.Name{Space: "DAV:", Local: "displayname"}},
+		},
+	}, {
 		desc: "propfind: propfind with ignored whitespace",
 		input: "" +
 			"<A:propfind xmlns:A='DAV:'>\n" +
 			"  <A:prop>   <A:displayname/></A:prop>\n" +
 			"</A:propfind>",
-		wantPF: propfind***REMOVED***
-			XMLName: ixml.Name***REMOVED***Space: "DAV:", Local: "propfind"***REMOVED***,
-			Prop:    propfindProps***REMOVED***xml.Name***REMOVED***Space: "DAV:", Local: "displayname"***REMOVED******REMOVED***,
-		***REMOVED***,
-	***REMOVED***, ***REMOVED***
+		wantPF: propfind{
+			XMLName: ixml.Name{Space: "DAV:", Local: "propfind"},
+			Prop:    propfindProps{xml.Name{Space: "DAV:", Local: "displayname"}},
+		},
+	}, {
 		desc: "propfind: propfind with ignored mixed-content",
 		input: "" +
 			"<A:propfind xmlns:A='DAV:'>\n" +
 			"  <A:prop>foo<A:displayname/>bar</A:prop>\n" +
 			"</A:propfind>",
-		wantPF: propfind***REMOVED***
-			XMLName: ixml.Name***REMOVED***Space: "DAV:", Local: "propfind"***REMOVED***,
-			Prop:    propfindProps***REMOVED***xml.Name***REMOVED***Space: "DAV:", Local: "displayname"***REMOVED******REMOVED***,
-		***REMOVED***,
-	***REMOVED***, ***REMOVED***
+		wantPF: propfind{
+			XMLName: ixml.Name{Space: "DAV:", Local: "propfind"},
+			Prop:    propfindProps{xml.Name{Space: "DAV:", Local: "displayname"}},
+		},
+	}, {
 		desc: "propfind: propname with ignored element (section A.4)",
 		input: "" +
 			"<A:propfind xmlns:A='DAV:'>\n" +
 			"  <A:propname/>\n" +
 			"  <E:leave-out xmlns:E='E:'>*boss*</E:leave-out>\n" +
 			"</A:propfind>",
-		wantPF: propfind***REMOVED***
-			XMLName:  ixml.Name***REMOVED***Space: "DAV:", Local: "propfind"***REMOVED***,
-			Propname: new(struct***REMOVED******REMOVED***),
-		***REMOVED***,
-	***REMOVED***, ***REMOVED***
+		wantPF: propfind{
+			XMLName:  ixml.Name{Space: "DAV:", Local: "propfind"},
+			Propname: new(struct{}),
+		},
+	}, {
 		desc:       "propfind: bad: junk",
 		input:      "xxx",
 		wantStatus: http.StatusBadRequest,
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc: "propfind: bad: propname and allprop (section A.3)",
 		input: "" +
 			"<A:propfind xmlns:A='DAV:'>\n" +
@@ -257,7 +257,7 @@ func TestReadPropfind(t *testing.T) ***REMOVED***
 			"  <A:allprop/>" +
 			"</A:propfind>",
 		wantStatus: http.StatusBadRequest,
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc: "propfind: bad: propname and prop",
 		input: "" +
 			"<A:propfind xmlns:A='DAV:'>\n" +
@@ -265,7 +265,7 @@ func TestReadPropfind(t *testing.T) ***REMOVED***
 			"  <A:propname/>\n" +
 			"</A:propfind>",
 		wantStatus: http.StatusBadRequest,
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc: "propfind: bad: allprop and prop",
 		input: "" +
 			"<A:propfind xmlns:A='DAV:'>\n" +
@@ -273,85 +273,85 @@ func TestReadPropfind(t *testing.T) ***REMOVED***
 			"  <A:prop><A:foo/><A:/prop>\n" +
 			"</A:propfind>",
 		wantStatus: http.StatusBadRequest,
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc: "propfind: bad: empty propfind with ignored element (section A.4)",
 		input: "" +
 			"<A:propfind xmlns:A='DAV:'>\n" +
 			"  <E:expired-props/>\n" +
 			"</A:propfind>",
 		wantStatus: http.StatusBadRequest,
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc: "propfind: bad: empty prop",
 		input: "" +
 			"<A:propfind xmlns:A='DAV:'>\n" +
 			"  <A:prop/>\n" +
 			"</A:propfind>",
 		wantStatus: http.StatusBadRequest,
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc: "propfind: bad: prop with just chardata",
 		input: "" +
 			"<A:propfind xmlns:A='DAV:'>\n" +
 			"  <A:prop>foo</A:prop>\n" +
 			"</A:propfind>",
 		wantStatus: http.StatusBadRequest,
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc: "bad: interrupted prop",
 		input: "" +
 			"<A:propfind xmlns:A='DAV:'>\n" +
 			"  <A:prop><A:foo></A:prop>\n",
 		wantStatus: http.StatusBadRequest,
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc: "bad: malformed end element prop",
 		input: "" +
 			"<A:propfind xmlns:A='DAV:'>\n" +
 			"  <A:prop><A:foo/></A:bar></A:prop>\n",
 		wantStatus: http.StatusBadRequest,
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc: "propfind: bad: property with chardata value",
 		input: "" +
 			"<A:propfind xmlns:A='DAV:'>\n" +
 			"  <A:prop><A:foo>bar</A:foo></A:prop>\n" +
 			"</A:propfind>",
 		wantStatus: http.StatusBadRequest,
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc: "propfind: bad: property with whitespace value",
 		input: "" +
 			"<A:propfind xmlns:A='DAV:'>\n" +
 			"  <A:prop><A:foo> </A:foo></A:prop>\n" +
 			"</A:propfind>",
 		wantStatus: http.StatusBadRequest,
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc: "propfind: bad: include without allprop",
 		input: "" +
 			"<A:propfind xmlns:A='DAV:'>\n" +
 			"  <A:include><A:foo/></A:include>\n" +
 			"</A:propfind>",
 		wantStatus: http.StatusBadRequest,
-	***REMOVED******REMOVED***
+	}}
 
-	for _, tc := range testCases ***REMOVED***
+	for _, tc := range testCases {
 		pf, status, err := readPropfind(strings.NewReader(tc.input))
-		if tc.wantStatus != 0 ***REMOVED***
-			if err == nil ***REMOVED***
+		if tc.wantStatus != 0 {
+			if err == nil {
 				t.Errorf("%s: got nil error, want non-nil", tc.desc)
 				continue
-			***REMOVED***
-		***REMOVED*** else if err != nil ***REMOVED***
+			}
+		} else if err != nil {
 			t.Errorf("%s: %v", tc.desc, err)
 			continue
-		***REMOVED***
-		if !reflect.DeepEqual(pf, tc.wantPF) || status != tc.wantStatus ***REMOVED***
+		}
+		if !reflect.DeepEqual(pf, tc.wantPF) || status != tc.wantStatus {
 			t.Errorf("%s:\ngot  propfind=%v, status=%v\nwant propfind=%v, status=%v",
 				tc.desc, pf, status, tc.wantPF, tc.wantStatus)
 			continue
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestMultistatusWriter(t *testing.T) ***REMOVED***
+func TestMultistatusWriter(t *testing.T) {
 	///The "section x.y.z" test cases come from section x.y.z of the spec at
 	// http://www.webdav.org/specs/rfc4918.html
-	testCases := []struct ***REMOVED***
+	testCases := []struct {
 		desc        string
 		responses   []response
 		respdesc    string
@@ -359,29 +359,29 @@ func TestMultistatusWriter(t *testing.T) ***REMOVED***
 		wantXML     string
 		wantCode    int
 		wantErr     error
-	***REMOVED******REMOVED******REMOVED***
+	}{{
 		desc: "section 9.2.2 (failed dependency)",
-		responses: []response***REMOVED******REMOVED***
-			Href: []string***REMOVED***"http://example.com/foo"***REMOVED***,
-			Propstat: []propstat***REMOVED******REMOVED***
-				Prop: []Property***REMOVED******REMOVED***
-					XMLName: xml.Name***REMOVED***
+		responses: []response{{
+			Href: []string{"http://example.com/foo"},
+			Propstat: []propstat{{
+				Prop: []Property{{
+					XMLName: xml.Name{
 						Space: "http://ns.example.com/",
 						Local: "Authors",
-					***REMOVED***,
-				***REMOVED******REMOVED***,
+					},
+				}},
 				Status: "HTTP/1.1 424 Failed Dependency",
-			***REMOVED***, ***REMOVED***
-				Prop: []Property***REMOVED******REMOVED***
-					XMLName: xml.Name***REMOVED***
+			}, {
+				Prop: []Property{{
+					XMLName: xml.Name{
 						Space: "http://ns.example.com/",
 						Local: "Copyright-Owner",
-					***REMOVED***,
-				***REMOVED******REMOVED***,
+					},
+				}},
 				Status: "HTTP/1.1 409 Conflict",
-			***REMOVED******REMOVED***,
+			}},
 			ResponseDescription: "Copyright Owner cannot be deleted or altered.",
-		***REMOVED******REMOVED***,
+		}},
 		wantXML: `` +
 			`<?xml version="1.0" encoding="UTF-8"?>` +
 			`<multistatus xmlns="DAV:">` +
@@ -403,15 +403,15 @@ func TestMultistatusWriter(t *testing.T) ***REMOVED***
 			`</response>` +
 			`</multistatus>`,
 		wantCode: StatusMulti,
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc: "section 9.6.2 (lock-token-submitted)",
-		responses: []response***REMOVED******REMOVED***
-			Href:   []string***REMOVED***"http://example.com/foo"***REMOVED***,
+		responses: []response{{
+			Href:   []string{"http://example.com/foo"},
 			Status: "HTTP/1.1 423 Locked",
-			Error: &xmlError***REMOVED***
+			Error: &xmlError{
 				InnerXML: []byte(`<lock-token-submitted xmlns="DAV:"/>`),
-			***REMOVED***,
-		***REMOVED******REMOVED***,
+			},
+		}},
 		wantXML: `` +
 			`<?xml version="1.0" encoding="UTF-8"?>` +
 			`<multistatus xmlns="DAV:">` +
@@ -422,35 +422,35 @@ func TestMultistatusWriter(t *testing.T) ***REMOVED***
 			`  </response>` +
 			`</multistatus>`,
 		wantCode: StatusMulti,
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc: "section 9.1.3",
-		responses: []response***REMOVED******REMOVED***
-			Href: []string***REMOVED***"http://example.com/foo"***REMOVED***,
-			Propstat: []propstat***REMOVED******REMOVED***
-				Prop: []Property***REMOVED******REMOVED***
-					XMLName: xml.Name***REMOVED***Space: "http://ns.example.com/boxschema/", Local: "bigbox"***REMOVED***,
+		responses: []response{{
+			Href: []string{"http://example.com/foo"},
+			Propstat: []propstat{{
+				Prop: []Property{{
+					XMLName: xml.Name{Space: "http://ns.example.com/boxschema/", Local: "bigbox"},
 					InnerXML: []byte(`` +
 						`<BoxType xmlns="http://ns.example.com/boxschema/">` +
 						`Box type A` +
 						`</BoxType>`),
-				***REMOVED***, ***REMOVED***
-					XMLName: xml.Name***REMOVED***Space: "http://ns.example.com/boxschema/", Local: "author"***REMOVED***,
+				}, {
+					XMLName: xml.Name{Space: "http://ns.example.com/boxschema/", Local: "author"},
 					InnerXML: []byte(`` +
 						`<Name xmlns="http://ns.example.com/boxschema/">` +
 						`J.J. Johnson` +
 						`</Name>`),
-				***REMOVED******REMOVED***,
+				}},
 				Status: "HTTP/1.1 200 OK",
-			***REMOVED***, ***REMOVED***
-				Prop: []Property***REMOVED******REMOVED***
-					XMLName: xml.Name***REMOVED***Space: "http://ns.example.com/boxschema/", Local: "DingALing"***REMOVED***,
-				***REMOVED***, ***REMOVED***
-					XMLName: xml.Name***REMOVED***Space: "http://ns.example.com/boxschema/", Local: "Random"***REMOVED***,
-				***REMOVED******REMOVED***,
+			}, {
+				Prop: []Property{{
+					XMLName: xml.Name{Space: "http://ns.example.com/boxschema/", Local: "DingALing"},
+				}, {
+					XMLName: xml.Name{Space: "http://ns.example.com/boxschema/", Local: "Random"},
+				}},
 				Status:              "HTTP/1.1 403 Forbidden",
 				ResponseDescription: "The user does not have access to the DingALing property.",
-			***REMOVED******REMOVED***,
-		***REMOVED******REMOVED***,
+			}},
+		}},
 		respdesc: "There has been an access violation error.",
 		wantXML: `` +
 			`<?xml version="1.0" encoding="UTF-8"?>` +
@@ -476,155 +476,155 @@ func TestMultistatusWriter(t *testing.T) ***REMOVED***
 			`  <responsedescription>There has been an access violation error.</responsedescription>` +
 			`</multistatus>`,
 		wantCode: StatusMulti,
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc: "no response written",
 		// default of http.responseWriter
 		wantCode: http.StatusOK,
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:     "no response written (with description)",
 		respdesc: "too bad",
 		// default of http.responseWriter
 		wantCode: http.StatusOK,
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:        "empty multistatus with header",
 		writeHeader: true,
 		wantXML:     `<multistatus xmlns="DAV:"></multistatus>`,
 		wantCode:    StatusMulti,
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc: "bad: no href",
-		responses: []response***REMOVED******REMOVED***
-			Propstat: []propstat***REMOVED******REMOVED***
-				Prop: []Property***REMOVED******REMOVED***
-					XMLName: xml.Name***REMOVED***
+		responses: []response{{
+			Propstat: []propstat{{
+				Prop: []Property{{
+					XMLName: xml.Name{
 						Space: "http://example.com/",
 						Local: "foo",
-					***REMOVED***,
-				***REMOVED******REMOVED***,
+					},
+				}},
 				Status: "HTTP/1.1 200 OK",
-			***REMOVED******REMOVED***,
-		***REMOVED******REMOVED***,
+			}},
+		}},
 		wantErr: errInvalidResponse,
 		// default of http.responseWriter
 		wantCode: http.StatusOK,
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc: "bad: multiple hrefs and no status",
-		responses: []response***REMOVED******REMOVED***
-			Href: []string***REMOVED***"http://example.com/foo", "http://example.com/bar"***REMOVED***,
-		***REMOVED******REMOVED***,
+		responses: []response{{
+			Href: []string{"http://example.com/foo", "http://example.com/bar"},
+		}},
 		wantErr: errInvalidResponse,
 		// default of http.responseWriter
 		wantCode: http.StatusOK,
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc: "bad: one href and no propstat",
-		responses: []response***REMOVED******REMOVED***
-			Href: []string***REMOVED***"http://example.com/foo"***REMOVED***,
-		***REMOVED******REMOVED***,
+		responses: []response{{
+			Href: []string{"http://example.com/foo"},
+		}},
 		wantErr: errInvalidResponse,
 		// default of http.responseWriter
 		wantCode: http.StatusOK,
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc: "bad: status with one href and propstat",
-		responses: []response***REMOVED******REMOVED***
-			Href: []string***REMOVED***"http://example.com/foo"***REMOVED***,
-			Propstat: []propstat***REMOVED******REMOVED***
-				Prop: []Property***REMOVED******REMOVED***
-					XMLName: xml.Name***REMOVED***
+		responses: []response{{
+			Href: []string{"http://example.com/foo"},
+			Propstat: []propstat{{
+				Prop: []Property{{
+					XMLName: xml.Name{
 						Space: "http://example.com/",
 						Local: "foo",
-					***REMOVED***,
-				***REMOVED******REMOVED***,
+					},
+				}},
 				Status: "HTTP/1.1 200 OK",
-			***REMOVED******REMOVED***,
+			}},
 			Status: "HTTP/1.1 200 OK",
-		***REMOVED******REMOVED***,
+		}},
 		wantErr: errInvalidResponse,
 		// default of http.responseWriter
 		wantCode: http.StatusOK,
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc: "bad: multiple hrefs and propstat",
-		responses: []response***REMOVED******REMOVED***
-			Href: []string***REMOVED***
+		responses: []response{{
+			Href: []string{
 				"http://example.com/foo",
 				"http://example.com/bar",
-			***REMOVED***,
-			Propstat: []propstat***REMOVED******REMOVED***
-				Prop: []Property***REMOVED******REMOVED***
-					XMLName: xml.Name***REMOVED***
+			},
+			Propstat: []propstat{{
+				Prop: []Property{{
+					XMLName: xml.Name{
 						Space: "http://example.com/",
 						Local: "foo",
-					***REMOVED***,
-				***REMOVED******REMOVED***,
+					},
+				}},
 				Status: "HTTP/1.1 200 OK",
-			***REMOVED******REMOVED***,
-		***REMOVED******REMOVED***,
+			}},
+		}},
 		wantErr: errInvalidResponse,
 		// default of http.responseWriter
 		wantCode: http.StatusOK,
-	***REMOVED******REMOVED***
+	}}
 
-	n := xmlNormalizer***REMOVED***omitWhitespace: true***REMOVED***
+	n := xmlNormalizer{omitWhitespace: true}
 loop:
-	for _, tc := range testCases ***REMOVED***
+	for _, tc := range testCases {
 		rec := httptest.NewRecorder()
-		w := multistatusWriter***REMOVED***w: rec, responseDescription: tc.respdesc***REMOVED***
-		if tc.writeHeader ***REMOVED***
-			if err := w.writeHeader(); err != nil ***REMOVED***
+		w := multistatusWriter{w: rec, responseDescription: tc.respdesc}
+		if tc.writeHeader {
+			if err := w.writeHeader(); err != nil {
 				t.Errorf("%s: got writeHeader error %v, want nil", tc.desc, err)
 				continue
-			***REMOVED***
-		***REMOVED***
-		for _, r := range tc.responses ***REMOVED***
-			if err := w.write(&r); err != nil ***REMOVED***
-				if err != tc.wantErr ***REMOVED***
+			}
+		}
+		for _, r := range tc.responses {
+			if err := w.write(&r); err != nil {
+				if err != tc.wantErr {
 					t.Errorf("%s: got write error %v, want %v",
 						tc.desc, err, tc.wantErr)
-				***REMOVED***
+				}
 				continue loop
-			***REMOVED***
-		***REMOVED***
-		if err := w.close(); err != tc.wantErr ***REMOVED***
+			}
+		}
+		if err := w.close(); err != tc.wantErr {
 			t.Errorf("%s: got close error %v, want %v",
 				tc.desc, err, tc.wantErr)
 			continue
-		***REMOVED***
-		if rec.Code != tc.wantCode ***REMOVED***
+		}
+		if rec.Code != tc.wantCode {
 			t.Errorf("%s: got HTTP status code %d, want %d\n",
 				tc.desc, rec.Code, tc.wantCode)
 			continue
-		***REMOVED***
+		}
 		gotXML := rec.Body.String()
 		eq, err := n.equalXML(strings.NewReader(gotXML), strings.NewReader(tc.wantXML))
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Errorf("%s: equalXML: %v", tc.desc, err)
 			continue
-		***REMOVED***
-		if !eq ***REMOVED***
+		}
+		if !eq {
 			t.Errorf("%s: XML body\ngot  %s\nwant %s", tc.desc, gotXML, tc.wantXML)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestReadProppatch(t *testing.T) ***REMOVED***
-	ppStr := func(pps []Proppatch) string ***REMOVED***
+func TestReadProppatch(t *testing.T) {
+	ppStr := func(pps []Proppatch) string {
 		var outer []string
-		for _, pp := range pps ***REMOVED***
+		for _, pp := range pps {
 			var inner []string
-			for _, p := range pp.Props ***REMOVED***
-				inner = append(inner, fmt.Sprintf("***REMOVED***XMLName: %q, Lang: %q, InnerXML: %q***REMOVED***",
+			for _, p := range pp.Props {
+				inner = append(inner, fmt.Sprintf("{XMLName: %q, Lang: %q, InnerXML: %q}",
 					p.XMLName, p.Lang, p.InnerXML))
-			***REMOVED***
-			outer = append(outer, fmt.Sprintf("***REMOVED***Remove: %t, Props: [%s]***REMOVED***",
+			}
+			outer = append(outer, fmt.Sprintf("{Remove: %t, Props: [%s]}",
 				pp.Remove, strings.Join(inner, ", ")))
-		***REMOVED***
+		}
 		return "[" + strings.Join(outer, ", ") + "]"
-	***REMOVED***
+	}
 
-	testCases := []struct ***REMOVED***
+	testCases := []struct {
 		desc       string
 		input      string
 		wantPP     []Proppatch
 		wantStatus int
-	***REMOVED******REMOVED******REMOVED***
+	}{{
 		desc: "proppatch: section 9.2 (with simple property value)",
 		input: `` +
 			`<?xml version="1.0" encoding="utf-8" ?>` +
@@ -637,21 +637,21 @@ func TestReadProppatch(t *testing.T) ***REMOVED***
 			`         <D:prop><Z:Copyright-Owner/></D:prop>` +
 			`    </D:remove>` +
 			`</D:propertyupdate>`,
-		wantPP: []Proppatch***REMOVED******REMOVED***
-			Props: []Property***REMOVED******REMOVED***
-				xml.Name***REMOVED***Space: "http://ns.example.com/z/", Local: "Authors"***REMOVED***,
+		wantPP: []Proppatch{{
+			Props: []Property{{
+				xml.Name{Space: "http://ns.example.com/z/", Local: "Authors"},
 				"",
 				[]byte(`somevalue`),
-			***REMOVED******REMOVED***,
-		***REMOVED***, ***REMOVED***
+			}},
+		}, {
 			Remove: true,
-			Props: []Property***REMOVED******REMOVED***
-				xml.Name***REMOVED***Space: "http://ns.example.com/z/", Local: "Copyright-Owner"***REMOVED***,
+			Props: []Property{{
+				xml.Name{Space: "http://ns.example.com/z/", Local: "Copyright-Owner"},
 				"",
 				nil,
-			***REMOVED******REMOVED***,
-		***REMOVED******REMOVED***,
-	***REMOVED***, ***REMOVED***
+			}},
+		}},
+	}, {
 		desc: "proppatch: lang attribute on prop",
 		input: `` +
 			`<?xml version="1.0" encoding="utf-8" ?>` +
@@ -662,14 +662,14 @@ func TestReadProppatch(t *testing.T) ***REMOVED***
 			`         </D:prop>` +
 			`    </D:set>` +
 			`</D:propertyupdate>`,
-		wantPP: []Proppatch***REMOVED******REMOVED***
-			Props: []Property***REMOVED******REMOVED***
-				xml.Name***REMOVED***Space: "http://example.com/ns", Local: "foo"***REMOVED***,
+		wantPP: []Proppatch{{
+			Props: []Property{{
+				xml.Name{Space: "http://example.com/ns", Local: "foo"},
 				"en",
 				nil,
-			***REMOVED******REMOVED***,
-		***REMOVED******REMOVED***,
-	***REMOVED***, ***REMOVED***
+			}},
+		}},
+	}, {
 		desc: "bad: remove with value",
 		input: `` +
 			`<?xml version="1.0" encoding="utf-8" ?>` +
@@ -684,14 +684,14 @@ func TestReadProppatch(t *testing.T) ***REMOVED***
 			`    </D:remove>` +
 			`</D:propertyupdate>`,
 		wantStatus: http.StatusBadRequest,
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc: "bad: empty propertyupdate",
 		input: `` +
 			`<?xml version="1.0" encoding="utf-8" ?>` +
 			`<D:propertyupdate xmlns:D="DAV:"` +
 			`</D:propertyupdate>`,
 		wantStatus: http.StatusBadRequest,
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc: "bad: empty prop",
 		input: `` +
 			`<?xml version="1.0" encoding="utf-8" ?>` +
@@ -702,59 +702,59 @@ func TestReadProppatch(t *testing.T) ***REMOVED***
 			`    </D:remove>` +
 			`</D:propertyupdate>`,
 		wantStatus: http.StatusBadRequest,
-	***REMOVED******REMOVED***
+	}}
 
-	for _, tc := range testCases ***REMOVED***
+	for _, tc := range testCases {
 		pp, status, err := readProppatch(strings.NewReader(tc.input))
-		if tc.wantStatus != 0 ***REMOVED***
-			if err == nil ***REMOVED***
+		if tc.wantStatus != 0 {
+			if err == nil {
 				t.Errorf("%s: got nil error, want non-nil", tc.desc)
 				continue
-			***REMOVED***
-		***REMOVED*** else if err != nil ***REMOVED***
+			}
+		} else if err != nil {
 			t.Errorf("%s: %v", tc.desc, err)
 			continue
-		***REMOVED***
-		if status != tc.wantStatus ***REMOVED***
+		}
+		if status != tc.wantStatus {
 			t.Errorf("%s: got status %d, want %d", tc.desc, status, tc.wantStatus)
 			continue
-		***REMOVED***
-		if !reflect.DeepEqual(pp, tc.wantPP) || status != tc.wantStatus ***REMOVED***
+		}
+		if !reflect.DeepEqual(pp, tc.wantPP) || status != tc.wantStatus {
 			t.Errorf("%s: proppatch\ngot  %v\nwant %v", tc.desc, ppStr(pp), ppStr(tc.wantPP))
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestUnmarshalXMLValue(t *testing.T) ***REMOVED***
-	testCases := []struct ***REMOVED***
+func TestUnmarshalXMLValue(t *testing.T) {
+	testCases := []struct {
 		desc    string
 		input   string
 		wantVal string
-	***REMOVED******REMOVED******REMOVED***
+	}{{
 		desc:    "simple char data",
 		input:   "<root>foo</root>",
 		wantVal: "foo",
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:    "empty element",
 		input:   "<root><foo/></root>",
 		wantVal: "<foo/>",
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:    "preserve namespace",
 		input:   `<root><foo xmlns="bar"/></root>`,
 		wantVal: `<foo xmlns="bar"/>`,
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:    "preserve root element namespace",
 		input:   `<root xmlns:bar="bar"><bar:foo/></root>`,
 		wantVal: `<foo xmlns="bar"/>`,
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:    "preserve whitespace",
 		input:   "<root>  \t </root>",
 		wantVal: "  \t ",
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc:    "preserve mixed content",
 		input:   `<root xmlns="bar">  <foo>a<bam xmlns="baz"/> </foo> </root>`,
 		wantVal: `  <foo xmlns="bar">a<bam xmlns="baz"/> </foo> `,
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc: "section 9.2",
 		input: `` +
 			`<Z:Authors xmlns:Z="http://ns.example.com/z/">` +
@@ -764,7 +764,7 @@ func TestUnmarshalXMLValue(t *testing.T) ***REMOVED***
 		wantVal: `` +
 			`  <Author xmlns="http://ns.example.com/z/">Jim Whitehead</Author>` +
 			`  <Author xmlns="http://ns.example.com/z/">Roy Fielding</Author>`,
-	***REMOVED***, ***REMOVED***
+	}, {
 		desc: "section 4.3.1 (mixed content)",
 		input: `` +
 			`<x:author ` +
@@ -795,34 +795,34 @@ func TestUnmarshalXMLValue(t *testing.T) ***REMOVED***
 			`    Jane has been working way <h:em>too</h:em> long on the` +
 			`    long-awaited revision of &lt;RFC2518&gt;.` +
 			`  </notes>`,
-	***REMOVED******REMOVED***
+	}}
 
 	var n xmlNormalizer
-	for _, tc := range testCases ***REMOVED***
+	for _, tc := range testCases {
 		d := ixml.NewDecoder(strings.NewReader(tc.input))
 		var v xmlValue
-		if err := d.Decode(&v); err != nil ***REMOVED***
+		if err := d.Decode(&v); err != nil {
 			t.Errorf("%s: got error %v, want nil", tc.desc, err)
 			continue
-		***REMOVED***
+		}
 		eq, err := n.equalXML(bytes.NewReader(v), strings.NewReader(tc.wantVal))
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Errorf("%s: equalXML: %v", tc.desc, err)
 			continue
-		***REMOVED***
-		if !eq ***REMOVED***
+		}
+		if !eq {
 			t.Errorf("%s:\ngot  %s\nwant %s", tc.desc, string(v), tc.wantVal)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // xmlNormalizer normalizes XML.
-type xmlNormalizer struct ***REMOVED***
+type xmlNormalizer struct {
 	// omitWhitespace instructs to ignore whitespace between element tags.
 	omitWhitespace bool
 	// omitComments instructs to ignore XML comments.
 	omitComments bool
-***REMOVED***
+}
 
 // normalize writes the normalized XML content of r to w. It applies the
 // following rules
@@ -836,71 +836,71 @@ type xmlNormalizer struct ***REMOVED***
 //       instructed to do so.
 //     * Remove comments, if instructed to do so.
 //
-func (n *xmlNormalizer) normalize(w io.Writer, r io.Reader) error ***REMOVED***
+func (n *xmlNormalizer) normalize(w io.Writer, r io.Reader) error {
 	d := ixml.NewDecoder(r)
 	e := ixml.NewEncoder(w)
-	for ***REMOVED***
+	for {
 		t, err := d.Token()
-		if err != nil ***REMOVED***
-			if t == nil && err == io.EOF ***REMOVED***
+		if err != nil {
+			if t == nil && err == io.EOF {
 				break
-			***REMOVED***
+			}
 			return err
-		***REMOVED***
-		switch val := t.(type) ***REMOVED***
+		}
+		switch val := t.(type) {
 		case ixml.Directive, ixml.ProcInst:
 			continue
 		case ixml.Comment:
-			if n.omitComments ***REMOVED***
+			if n.omitComments {
 				continue
-			***REMOVED***
+			}
 		case ixml.CharData:
-			if n.omitWhitespace && len(bytes.TrimSpace(val)) == 0 ***REMOVED***
+			if n.omitWhitespace && len(bytes.TrimSpace(val)) == 0 {
 				continue
-			***REMOVED***
+			}
 		case ixml.StartElement:
 			start, _ := ixml.CopyToken(val).(ixml.StartElement)
 			attr := start.Attr[:0]
-			for _, a := range start.Attr ***REMOVED***
-				if a.Name.Space == "xmlns" || a.Name.Local == "xmlns" ***REMOVED***
+			for _, a := range start.Attr {
+				if a.Name.Space == "xmlns" || a.Name.Local == "xmlns" {
 					continue
-				***REMOVED***
+				}
 				attr = append(attr, a)
-			***REMOVED***
+			}
 			sort.Sort(byName(attr))
 			start.Attr = attr
 			t = start
-		***REMOVED***
+		}
 		err = e.EncodeToken(t)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return e.Flush()
-***REMOVED***
+}
 
 // equalXML tests for equality of the normalized XML contents of a and b.
-func (n *xmlNormalizer) equalXML(a, b io.Reader) (bool, error) ***REMOVED***
+func (n *xmlNormalizer) equalXML(a, b io.Reader) (bool, error) {
 	var buf bytes.Buffer
-	if err := n.normalize(&buf, a); err != nil ***REMOVED***
+	if err := n.normalize(&buf, a); err != nil {
 		return false, err
-	***REMOVED***
+	}
 	normA := buf.String()
 	buf.Reset()
-	if err := n.normalize(&buf, b); err != nil ***REMOVED***
+	if err := n.normalize(&buf, b); err != nil {
 		return false, err
-	***REMOVED***
+	}
 	normB := buf.String()
 	return normA == normB, nil
-***REMOVED***
+}
 
 type byName []ixml.Attr
 
-func (a byName) Len() int      ***REMOVED*** return len(a) ***REMOVED***
-func (a byName) Swap(i, j int) ***REMOVED*** a[i], a[j] = a[j], a[i] ***REMOVED***
-func (a byName) Less(i, j int) bool ***REMOVED***
-	if a[i].Name.Space != a[j].Name.Space ***REMOVED***
+func (a byName) Len() int      { return len(a) }
+func (a byName) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+func (a byName) Less(i, j int) bool {
+	if a[i].Name.Space != a[j].Name.Space {
 		return a[i].Name.Space < a[j].Name.Space
-	***REMOVED***
+	}
 	return a[i].Name.Local < a[j].Name.Local
-***REMOVED***
+}

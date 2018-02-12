@@ -43,214 +43,214 @@ const (
 	NTF_ROUTER = 0x80
 )
 
-type Ndmsg struct ***REMOVED***
+type Ndmsg struct {
 	Family uint8
 	Index  uint32
 	State  uint16
 	Flags  uint8
 	Type   uint8
-***REMOVED***
+}
 
-func deserializeNdmsg(b []byte) *Ndmsg ***REMOVED***
+func deserializeNdmsg(b []byte) *Ndmsg {
 	var dummy Ndmsg
 	return (*Ndmsg)(unsafe.Pointer(&b[0:unsafe.Sizeof(dummy)][0]))
-***REMOVED***
+}
 
-func (msg *Ndmsg) Serialize() []byte ***REMOVED***
+func (msg *Ndmsg) Serialize() []byte {
 	return (*(*[unsafe.Sizeof(*msg)]byte)(unsafe.Pointer(msg)))[:]
-***REMOVED***
+}
 
-func (msg *Ndmsg) Len() int ***REMOVED***
+func (msg *Ndmsg) Len() int {
 	return int(unsafe.Sizeof(*msg))
-***REMOVED***
+}
 
 // NeighAdd will add an IP to MAC mapping to the ARP table
 // Equivalent to: `ip neigh add ....`
-func NeighAdd(neigh *Neigh) error ***REMOVED***
+func NeighAdd(neigh *Neigh) error {
 	return pkgHandle.NeighAdd(neigh)
-***REMOVED***
+}
 
 // NeighAdd will add an IP to MAC mapping to the ARP table
 // Equivalent to: `ip neigh add ....`
-func (h *Handle) NeighAdd(neigh *Neigh) error ***REMOVED***
+func (h *Handle) NeighAdd(neigh *Neigh) error {
 	return h.neighAdd(neigh, syscall.NLM_F_CREATE|syscall.NLM_F_EXCL)
-***REMOVED***
+}
 
 // NeighSet will add or replace an IP to MAC mapping to the ARP table
 // Equivalent to: `ip neigh replace....`
-func NeighSet(neigh *Neigh) error ***REMOVED***
+func NeighSet(neigh *Neigh) error {
 	return pkgHandle.NeighSet(neigh)
-***REMOVED***
+}
 
 // NeighSet will add or replace an IP to MAC mapping to the ARP table
 // Equivalent to: `ip neigh replace....`
-func (h *Handle) NeighSet(neigh *Neigh) error ***REMOVED***
+func (h *Handle) NeighSet(neigh *Neigh) error {
 	return h.neighAdd(neigh, syscall.NLM_F_CREATE|syscall.NLM_F_REPLACE)
-***REMOVED***
+}
 
 // NeighAppend will append an entry to FDB
 // Equivalent to: `bridge fdb append...`
-func NeighAppend(neigh *Neigh) error ***REMOVED***
+func NeighAppend(neigh *Neigh) error {
 	return pkgHandle.NeighAppend(neigh)
-***REMOVED***
+}
 
 // NeighAppend will append an entry to FDB
 // Equivalent to: `bridge fdb append...`
-func (h *Handle) NeighAppend(neigh *Neigh) error ***REMOVED***
+func (h *Handle) NeighAppend(neigh *Neigh) error {
 	return h.neighAdd(neigh, syscall.NLM_F_CREATE|syscall.NLM_F_APPEND)
-***REMOVED***
+}
 
 // NeighAppend will append an entry to FDB
 // Equivalent to: `bridge fdb append...`
-func neighAdd(neigh *Neigh, mode int) error ***REMOVED***
+func neighAdd(neigh *Neigh, mode int) error {
 	return pkgHandle.neighAdd(neigh, mode)
-***REMOVED***
+}
 
 // NeighAppend will append an entry to FDB
 // Equivalent to: `bridge fdb append...`
-func (h *Handle) neighAdd(neigh *Neigh, mode int) error ***REMOVED***
+func (h *Handle) neighAdd(neigh *Neigh, mode int) error {
 	req := h.newNetlinkRequest(syscall.RTM_NEWNEIGH, mode|syscall.NLM_F_ACK)
 	return neighHandle(neigh, req)
-***REMOVED***
+}
 
 // NeighDel will delete an IP address from a link device.
 // Equivalent to: `ip addr del $addr dev $link`
-func NeighDel(neigh *Neigh) error ***REMOVED***
+func NeighDel(neigh *Neigh) error {
 	return pkgHandle.NeighDel(neigh)
-***REMOVED***
+}
 
 // NeighDel will delete an IP address from a link device.
 // Equivalent to: `ip addr del $addr dev $link`
-func (h *Handle) NeighDel(neigh *Neigh) error ***REMOVED***
+func (h *Handle) NeighDel(neigh *Neigh) error {
 	req := h.newNetlinkRequest(syscall.RTM_DELNEIGH, syscall.NLM_F_ACK)
 	return neighHandle(neigh, req)
-***REMOVED***
+}
 
-func neighHandle(neigh *Neigh, req *nl.NetlinkRequest) error ***REMOVED***
+func neighHandle(neigh *Neigh, req *nl.NetlinkRequest) error {
 	var family int
 
-	if neigh.Family > 0 ***REMOVED***
+	if neigh.Family > 0 {
 		family = neigh.Family
-	***REMOVED*** else ***REMOVED***
+	} else {
 		family = nl.GetIPFamily(neigh.IP)
-	***REMOVED***
+	}
 
-	msg := Ndmsg***REMOVED***
+	msg := Ndmsg{
 		Family: uint8(family),
 		Index:  uint32(neigh.LinkIndex),
 		State:  uint16(neigh.State),
 		Type:   uint8(neigh.Type),
 		Flags:  uint8(neigh.Flags),
-	***REMOVED***
+	}
 	req.AddData(&msg)
 
 	ipData := neigh.IP.To4()
-	if ipData == nil ***REMOVED***
+	if ipData == nil {
 		ipData = neigh.IP.To16()
-	***REMOVED***
+	}
 
 	dstData := nl.NewRtAttr(NDA_DST, ipData)
 	req.AddData(dstData)
 
-	if neigh.LLIPAddr != nil ***REMOVED***
+	if neigh.LLIPAddr != nil {
 		llIPData := nl.NewRtAttr(NDA_LLADDR, neigh.LLIPAddr.To4())
 		req.AddData(llIPData)
-	***REMOVED*** else if neigh.Flags != NTF_PROXY || neigh.HardwareAddr != nil ***REMOVED***
+	} else if neigh.Flags != NTF_PROXY || neigh.HardwareAddr != nil {
 		hwData := nl.NewRtAttr(NDA_LLADDR, []byte(neigh.HardwareAddr))
 		req.AddData(hwData)
-	***REMOVED***
+	}
 
 	_, err := req.Execute(syscall.NETLINK_ROUTE, 0)
 	return err
-***REMOVED***
+}
 
 // NeighList gets a list of IP-MAC mappings in the system (ARP table).
 // Equivalent to: `ip neighbor show`.
 // The list can be filtered by link and ip family.
-func NeighList(linkIndex, family int) ([]Neigh, error) ***REMOVED***
+func NeighList(linkIndex, family int) ([]Neigh, error) {
 	return pkgHandle.NeighList(linkIndex, family)
-***REMOVED***
+}
 
 // NeighProxyList gets a list of neighbor proxies in the system.
 // Equivalent to: `ip neighbor show proxy`.
 // The list can be filtered by link and ip family.
-func NeighProxyList(linkIndex, family int) ([]Neigh, error) ***REMOVED***
+func NeighProxyList(linkIndex, family int) ([]Neigh, error) {
 	return pkgHandle.NeighProxyList(linkIndex, family)
-***REMOVED***
+}
 
 // NeighList gets a list of IP-MAC mappings in the system (ARP table).
 // Equivalent to: `ip neighbor show`.
 // The list can be filtered by link and ip family.
-func (h *Handle) NeighList(linkIndex, family int) ([]Neigh, error) ***REMOVED***
+func (h *Handle) NeighList(linkIndex, family int) ([]Neigh, error) {
 	return h.neighList(linkIndex, family, 0)
-***REMOVED***
+}
 
 // NeighProxyList gets a list of neighbor proxies in the system.
 // Equivalent to: `ip neighbor show proxy`.
 // The list can be filtered by link, ip family.
-func (h *Handle) NeighProxyList(linkIndex, family int) ([]Neigh, error) ***REMOVED***
+func (h *Handle) NeighProxyList(linkIndex, family int) ([]Neigh, error) {
 	return h.neighList(linkIndex, family, NTF_PROXY)
-***REMOVED***
+}
 
-func (h *Handle) neighList(linkIndex, family, flags int) ([]Neigh, error) ***REMOVED***
+func (h *Handle) neighList(linkIndex, family, flags int) ([]Neigh, error) {
 	req := h.newNetlinkRequest(syscall.RTM_GETNEIGH, syscall.NLM_F_DUMP)
-	msg := Ndmsg***REMOVED***
+	msg := Ndmsg{
 		Family: uint8(family),
 		Index:  uint32(linkIndex),
 		Flags:  uint8(flags),
-	***REMOVED***
+	}
 	req.AddData(&msg)
 
 	msgs, err := req.Execute(syscall.NETLINK_ROUTE, syscall.RTM_NEWNEIGH)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	var res []Neigh
-	for _, m := range msgs ***REMOVED***
+	for _, m := range msgs {
 		ndm := deserializeNdmsg(m)
-		if linkIndex != 0 && int(ndm.Index) != linkIndex ***REMOVED***
+		if linkIndex != 0 && int(ndm.Index) != linkIndex {
 			// Ignore messages from other interfaces
 			continue
-		***REMOVED***
+		}
 
 		neigh, err := NeighDeserialize(m)
-		if err != nil ***REMOVED***
+		if err != nil {
 			continue
-		***REMOVED***
+		}
 
 		res = append(res, *neigh)
-	***REMOVED***
+	}
 
 	return res, nil
-***REMOVED***
+}
 
-func NeighDeserialize(m []byte) (*Neigh, error) ***REMOVED***
+func NeighDeserialize(m []byte) (*Neigh, error) {
 	msg := deserializeNdmsg(m)
 
-	neigh := Neigh***REMOVED***
+	neigh := Neigh{
 		LinkIndex: int(msg.Index),
 		Family:    int(msg.Family),
 		State:     int(msg.State),
 		Type:      int(msg.Type),
 		Flags:     int(msg.Flags),
-	***REMOVED***
+	}
 
 	attrs, err := nl.ParseRouteAttr(m[msg.Len():])
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// This should be cached for perfomance
 	// once per table dump
 	link, err := LinkByIndex(neigh.LinkIndex)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	encapType := link.Attrs().EncapType
 
-	for _, attr := range attrs ***REMOVED***
-		switch attr.Attr.Type ***REMOVED***
+	for _, attr := range attrs {
+		switch attr.Attr.Type {
 		case NDA_DST:
 			neigh.IP = net.IP(attr.Value)
 		case NDA_LLADDR:
@@ -260,16 +260,16 @@ func NeighDeserialize(m []byte) (*Neigh, error) ***REMOVED***
 			attrLen := attr.Attr.Len - syscall.SizeofRtAttr
 			if attrLen == 4 && (encapType == "ipip" ||
 				encapType == "sit" ||
-				encapType == "gre") ***REMOVED***
+				encapType == "gre") {
 				neigh.LLIPAddr = net.IP(attr.Value)
-			***REMOVED*** else if attrLen == 16 &&
-				encapType == "tunnel6" ***REMOVED***
+			} else if attrLen == 16 &&
+				encapType == "tunnel6" {
 				neigh.IP = net.IP(attr.Value)
-			***REMOVED*** else ***REMOVED***
+			} else {
 				neigh.HardwareAddr = net.HardwareAddr(attr.Value)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	return &neigh, nil
-***REMOVED***
+}

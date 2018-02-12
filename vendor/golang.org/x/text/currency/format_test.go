@@ -20,51 +20,51 @@ var (
 	und   = language.Und
 )
 
-func TestFormatting(t *testing.T) ***REMOVED***
-	testCases := []struct ***REMOVED***
+func TestFormatting(t *testing.T) {
+	testCases := []struct {
 		tag    language.Tag
-		value  interface***REMOVED******REMOVED***
+		value  interface{}
 		format Formatter
 		want   string
-	***REMOVED******REMOVED***
-		0: ***REMOVED***en, USD.Amount(0.1), nil, "USD 0.10"***REMOVED***,
-		1: ***REMOVED***en, XPT.Amount(1.0), Symbol, "XPT 1.00"***REMOVED***,
+	}{
+		0: {en, USD.Amount(0.1), nil, "USD 0.10"},
+		1: {en, XPT.Amount(1.0), Symbol, "XPT 1.00"},
 
-		2: ***REMOVED***en, USD.Amount(2.0), ISO, "USD 2.00"***REMOVED***,
-		3: ***REMOVED***und, USD.Amount(3.0), Symbol, "US$ 3.00"***REMOVED***,
-		4: ***REMOVED***en, USD.Amount(4.0), Symbol, "$ 4.00"***REMOVED***,
+		2: {en, USD.Amount(2.0), ISO, "USD 2.00"},
+		3: {und, USD.Amount(3.0), Symbol, "US$ 3.00"},
+		4: {en, USD.Amount(4.0), Symbol, "$ 4.00"},
 
-		5: ***REMOVED***en, USD.Amount(5.20), NarrowSymbol, "$ 5.20"***REMOVED***,
-		6: ***REMOVED***en, AUD.Amount(6.20), Symbol, "A$ 6.20"***REMOVED***,
+		5: {en, USD.Amount(5.20), NarrowSymbol, "$ 5.20"},
+		6: {en, AUD.Amount(6.20), Symbol, "A$ 6.20"},
 
-		7: ***REMOVED***en_AU, AUD.Amount(7.20), Symbol, "$ 7.20"***REMOVED***,
-		8: ***REMOVED***en_GB, USD.Amount(8.20), Symbol, "US$ 8.20"***REMOVED***,
+		7: {en_AU, AUD.Amount(7.20), Symbol, "$ 7.20"},
+		8: {en_GB, USD.Amount(8.20), Symbol, "US$ 8.20"},
 
-		9:  ***REMOVED***en, 9.0, Symbol.Default(EUR), "€ 9.00"***REMOVED***,
-		10: ***REMOVED***en, 10.123, Symbol.Default(KRW), "₩ 10"***REMOVED***,
-		11: ***REMOVED***fr, 11.52, Symbol.Default(TWD), "TWD 11.52"***REMOVED***,
-		12: ***REMOVED***en, 12.123, Symbol.Default(czk), "CZK 12.12"***REMOVED***,
-		13: ***REMOVED***en, 13.123, Symbol.Default(czk).Kind(Cash), "CZK 13"***REMOVED***,
-		14: ***REMOVED***en, 14.12345, ISO.Default(MustParseISO("CLF")), "CLF 14.1235"***REMOVED***,
-		15: ***REMOVED***en, USD.Amount(15.00), ISO.Default(TWD), "USD 15.00"***REMOVED***,
-		16: ***REMOVED***en, KRW.Amount(16.00), ISO.Kind(Cash), "KRW 16"***REMOVED***,
+		9:  {en, 9.0, Symbol.Default(EUR), "€ 9.00"},
+		10: {en, 10.123, Symbol.Default(KRW), "₩ 10"},
+		11: {fr, 11.52, Symbol.Default(TWD), "TWD 11.52"},
+		12: {en, 12.123, Symbol.Default(czk), "CZK 12.12"},
+		13: {en, 13.123, Symbol.Default(czk).Kind(Cash), "CZK 13"},
+		14: {en, 14.12345, ISO.Default(MustParseISO("CLF")), "CLF 14.1235"},
+		15: {en, USD.Amount(15.00), ISO.Default(TWD), "USD 15.00"},
+		16: {en, KRW.Amount(16.00), ISO.Kind(Cash), "KRW 16"},
 
 		// TODO: support integers as well.
 
-		17: ***REMOVED***en, USD, nil, "USD"***REMOVED***,
-		18: ***REMOVED***en, USD, ISO, "USD"***REMOVED***,
-		19: ***REMOVED***en, USD, Symbol, "$"***REMOVED***,
-		20: ***REMOVED***en_GB, USD, Symbol, "US$"***REMOVED***,
-		21: ***REMOVED***en_AU, USD, NarrowSymbol, "$"***REMOVED***,
-	***REMOVED***
-	for i, tc := range testCases ***REMOVED***
+		17: {en, USD, nil, "USD"},
+		18: {en, USD, ISO, "USD"},
+		19: {en, USD, Symbol, "$"},
+		20: {en_GB, USD, Symbol, "US$"},
+		21: {en_AU, USD, NarrowSymbol, "$"},
+	}
+	for i, tc := range testCases {
 		p := message.NewPrinter(tc.tag)
 		v := tc.value
-		if tc.format != nil ***REMOVED***
+		if tc.format != nil {
 			v = tc.format(v)
-		***REMOVED***
-		if got := p.Sprint(v); got != tc.want ***REMOVED***
+		}
+		if got := p.Sprint(v); got != tc.want {
 			t.Errorf("%d: got %q; want %q", i, got, tc.want)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}

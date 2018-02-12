@@ -8,34 +8,34 @@ package unix
 import "unsafe"
 
 // PtraceRegsArm is the registers used by arm binaries.
-type PtraceRegsArm struct ***REMOVED***
+type PtraceRegsArm struct {
 	Uregs [18]uint32
-***REMOVED***
+}
 
 // PtraceGetRegsArm fetches the registers used by arm binaries.
-func PtraceGetRegsArm(pid int, regsout *PtraceRegsArm) error ***REMOVED***
+func PtraceGetRegsArm(pid int, regsout *PtraceRegsArm) error {
 	return ptrace(PTRACE_GETREGS, pid, 0, uintptr(unsafe.Pointer(regsout)))
-***REMOVED***
+}
 
 // PtraceSetRegsArm sets the registers used by arm binaries.
-func PtraceSetRegsArm(pid int, regs *PtraceRegsArm) error ***REMOVED***
+func PtraceSetRegsArm(pid int, regs *PtraceRegsArm) error {
 	return ptrace(PTRACE_SETREGS, pid, 0, uintptr(unsafe.Pointer(regs)))
-***REMOVED***
+}
 
 // PtraceRegsArm64 is the registers used by arm64 binaries.
-type PtraceRegsArm64 struct ***REMOVED***
+type PtraceRegsArm64 struct {
 	Regs   [31]uint64
 	Sp     uint64
 	Pc     uint64
 	Pstate uint64
-***REMOVED***
+}
 
 // PtraceGetRegsArm64 fetches the registers used by arm64 binaries.
-func PtraceGetRegsArm64(pid int, regsout *PtraceRegsArm64) error ***REMOVED***
+func PtraceGetRegsArm64(pid int, regsout *PtraceRegsArm64) error {
 	return ptrace(PTRACE_GETREGS, pid, 0, uintptr(unsafe.Pointer(regsout)))
-***REMOVED***
+}
 
 // PtraceSetRegsArm64 sets the registers used by arm64 binaries.
-func PtraceSetRegsArm64(pid int, regs *PtraceRegsArm64) error ***REMOVED***
+func PtraceSetRegsArm64(pid int, regs *PtraceRegsArm64) error {
 	return ptrace(PTRACE_SETREGS, pid, 0, uintptr(unsafe.Pointer(regs)))
-***REMOVED***
+}

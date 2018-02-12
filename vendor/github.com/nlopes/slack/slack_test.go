@@ -15,8 +15,8 @@ var (
 	once       sync.Once
 )
 
-func startServer() ***REMOVED***
+func startServer() {
 	server := httptest.NewServer(nil)
 	serverAddr = server.Listener.Addr().String()
 	log.Print("Test WebSocket server listening on ", serverAddr)
-***REMOVED***
+}

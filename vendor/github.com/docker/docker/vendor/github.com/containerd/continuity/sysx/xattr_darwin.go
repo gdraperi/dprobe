@@ -14,58 +14,58 @@ const (
 	xattrNoFollow = 0x01
 )
 
-func listxattrFollow(path string, dest []byte) (sz int, err error) ***REMOVED***
+func listxattrFollow(path string, dest []byte) (sz int, err error) {
 	return listxattr(path, dest, 0)
-***REMOVED***
+}
 
 // Listxattr calls syscall getxattr
-func Listxattr(path string) ([]string, error) ***REMOVED***
+func Listxattr(path string) ([]string, error) {
 	return listxattrAll(path, listxattrFollow)
-***REMOVED***
+}
 
 // Removexattr calls syscall getxattr
-func Removexattr(path string, attr string) (err error) ***REMOVED***
+func Removexattr(path string, attr string) (err error) {
 	return removexattr(path, attr, 0)
-***REMOVED***
+}
 
 // Setxattr calls syscall setxattr
-func Setxattr(path string, attr string, data []byte, flags int) (err error) ***REMOVED***
+func Setxattr(path string, attr string, data []byte, flags int) (err error) {
 	return setxattr(path, attr, data, flags)
-***REMOVED***
+}
 
-func getxattrFollow(path, attr string, dest []byte) (sz int, err error) ***REMOVED***
+func getxattrFollow(path, attr string, dest []byte) (sz int, err error) {
 	return getxattr(path, attr, dest, 0, 0)
-***REMOVED***
+}
 
 // Getxattr calls syscall getxattr
-func Getxattr(path, attr string) ([]byte, error) ***REMOVED***
+func Getxattr(path, attr string) ([]byte, error) {
 	return getxattrAll(path, attr, getxattrFollow)
-***REMOVED***
+}
 
-func listxattrNoFollow(path string, dest []byte) (sz int, err error) ***REMOVED***
+func listxattrNoFollow(path string, dest []byte) (sz int, err error) {
 	return listxattr(path, dest, xattrNoFollow)
-***REMOVED***
+}
 
 // LListxattr calls syscall listxattr with XATTR_NOFOLLOW
-func LListxattr(path string) ([]string, error) ***REMOVED***
+func LListxattr(path string) ([]string, error) {
 	return listxattrAll(path, listxattrNoFollow)
-***REMOVED***
+}
 
 // LRemovexattr calls syscall removexattr with XATTR_NOFOLLOW
-func LRemovexattr(path string, attr string) (err error) ***REMOVED***
+func LRemovexattr(path string, attr string) (err error) {
 	return removexattr(path, attr, xattrNoFollow)
-***REMOVED***
+}
 
 // Setxattr calls syscall setxattr with XATTR_NOFOLLOW
-func LSetxattr(path string, attr string, data []byte, flags int) (err error) ***REMOVED***
+func LSetxattr(path string, attr string, data []byte, flags int) (err error) {
 	return setxattr(path, attr, data, flags|xattrNoFollow)
-***REMOVED***
+}
 
-func getxattrNoFollow(path, attr string, dest []byte) (sz int, err error) ***REMOVED***
+func getxattrNoFollow(path, attr string, dest []byte) (sz int, err error) {
 	return getxattr(path, attr, dest, 0, xattrNoFollow)
-***REMOVED***
+}
 
 // LGetxattr calls syscall getxattr with XATTR_NOFOLLOW
-func LGetxattr(path, attr string) ([]byte, error) ***REMOVED***
+func LGetxattr(path, attr string) ([]byte, error) {
 	return getxattrAll(path, attr, getxattrNoFollow)
-***REMOVED***
+}

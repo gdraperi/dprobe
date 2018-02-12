@@ -21,278 +21,278 @@ const (
 )
 
 // Config encapsulates configurations of various Libnetwork components
-type Config struct ***REMOVED***
+type Config struct {
 	Daemon          DaemonCfg
 	Cluster         ClusterCfg
 	Scopes          map[string]*datastore.ScopeCfg
-	ActiveSandboxes map[string]interface***REMOVED******REMOVED***
+	ActiveSandboxes map[string]interface{}
 	PluginGetter    plugingetter.PluginGetter
-***REMOVED***
+}
 
 // DaemonCfg represents libnetwork core configuration
-type DaemonCfg struct ***REMOVED***
+type DaemonCfg struct {
 	Debug                  bool
 	Experimental           bool
 	DataDir                string
 	DefaultNetwork         string
 	DefaultDriver          string
 	Labels                 []string
-	DriverCfg              map[string]interface***REMOVED******REMOVED***
+	DriverCfg              map[string]interface{}
 	ClusterProvider        cluster.Provider
 	NetworkControlPlaneMTU int
-***REMOVED***
+}
 
 // ClusterCfg represents cluster configuration
-type ClusterCfg struct ***REMOVED***
+type ClusterCfg struct {
 	Watcher   discovery.Watcher
 	Address   string
 	Discovery string
 	Heartbeat uint64
-***REMOVED***
+}
 
 // LoadDefaultScopes loads default scope configs for scopes which
 // doesn't have explicit user specified configs.
-func (c *Config) LoadDefaultScopes(dataDir string) ***REMOVED***
-	for k, v := range datastore.DefaultScopes(dataDir) ***REMOVED***
-		if _, ok := c.Scopes[k]; !ok ***REMOVED***
+func (c *Config) LoadDefaultScopes(dataDir string) {
+	for k, v := range datastore.DefaultScopes(dataDir) {
+		if _, ok := c.Scopes[k]; !ok {
 			c.Scopes[k] = v
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // ParseConfig parses the libnetwork configuration file
-func ParseConfig(tomlCfgFile string) (*Config, error) ***REMOVED***
-	cfg := &Config***REMOVED***
-		Scopes: map[string]*datastore.ScopeCfg***REMOVED******REMOVED***,
-	***REMOVED***
+func ParseConfig(tomlCfgFile string) (*Config, error) {
+	cfg := &Config{
+		Scopes: map[string]*datastore.ScopeCfg{},
+	}
 
-	if _, err := toml.DecodeFile(tomlCfgFile, cfg); err != nil ***REMOVED***
+	if _, err := toml.DecodeFile(tomlCfgFile, cfg); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	cfg.LoadDefaultScopes(cfg.Daemon.DataDir)
 	return cfg, nil
-***REMOVED***
+}
 
 // ParseConfigOptions parses the configuration options and returns
 // a reference to the corresponding Config structure
-func ParseConfigOptions(cfgOptions ...Option) *Config ***REMOVED***
-	cfg := &Config***REMOVED***
-		Daemon: DaemonCfg***REMOVED***
-			DriverCfg: make(map[string]interface***REMOVED******REMOVED***),
-		***REMOVED***,
+func ParseConfigOptions(cfgOptions ...Option) *Config {
+	cfg := &Config{
+		Daemon: DaemonCfg{
+			DriverCfg: make(map[string]interface{}),
+		},
 		Scopes: make(map[string]*datastore.ScopeCfg),
-	***REMOVED***
+	}
 
 	cfg.ProcessOptions(cfgOptions...)
 	cfg.LoadDefaultScopes(cfg.Daemon.DataDir)
 
 	return cfg
-***REMOVED***
+}
 
 // Option is an option setter function type used to pass various configurations
 // to the controller
 type Option func(c *Config)
 
 // OptionDefaultNetwork function returns an option setter for a default network
-func OptionDefaultNetwork(dn string) Option ***REMOVED***
-	return func(c *Config) ***REMOVED***
+func OptionDefaultNetwork(dn string) Option {
+	return func(c *Config) {
 		logrus.Debugf("Option DefaultNetwork: %s", dn)
 		c.Daemon.DefaultNetwork = strings.TrimSpace(dn)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // OptionDefaultDriver function returns an option setter for default driver
-func OptionDefaultDriver(dd string) Option ***REMOVED***
-	return func(c *Config) ***REMOVED***
+func OptionDefaultDriver(dd string) Option {
+	return func(c *Config) {
 		logrus.Debugf("Option DefaultDriver: %s", dd)
 		c.Daemon.DefaultDriver = strings.TrimSpace(dd)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // OptionDriverConfig returns an option setter for driver configuration.
-func OptionDriverConfig(networkType string, config map[string]interface***REMOVED******REMOVED***) Option ***REMOVED***
-	return func(c *Config) ***REMOVED***
+func OptionDriverConfig(networkType string, config map[string]interface{}) Option {
+	return func(c *Config) {
 		c.Daemon.DriverCfg[networkType] = config
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // OptionLabels function returns an option setter for labels
-func OptionLabels(labels []string) Option ***REMOVED***
-	return func(c *Config) ***REMOVED***
-		for _, label := range labels ***REMOVED***
-			if strings.HasPrefix(label, netlabel.Prefix) ***REMOVED***
+func OptionLabels(labels []string) Option {
+	return func(c *Config) {
+		for _, label := range labels {
+			if strings.HasPrefix(label, netlabel.Prefix) {
 				c.Daemon.Labels = append(c.Daemon.Labels, label)
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+			}
+		}
+	}
+}
 
 // OptionKVProvider function returns an option setter for kvstore provider
-func OptionKVProvider(provider string) Option ***REMOVED***
-	return func(c *Config) ***REMOVED***
+func OptionKVProvider(provider string) Option {
+	return func(c *Config) {
 		logrus.Debugf("Option OptionKVProvider: %s", provider)
-		if _, ok := c.Scopes[datastore.GlobalScope]; !ok ***REMOVED***
-			c.Scopes[datastore.GlobalScope] = &datastore.ScopeCfg***REMOVED******REMOVED***
-		***REMOVED***
+		if _, ok := c.Scopes[datastore.GlobalScope]; !ok {
+			c.Scopes[datastore.GlobalScope] = &datastore.ScopeCfg{}
+		}
 		c.Scopes[datastore.GlobalScope].Client.Provider = strings.TrimSpace(provider)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // OptionKVProviderURL function returns an option setter for kvstore url
-func OptionKVProviderURL(url string) Option ***REMOVED***
-	return func(c *Config) ***REMOVED***
+func OptionKVProviderURL(url string) Option {
+	return func(c *Config) {
 		logrus.Debugf("Option OptionKVProviderURL: %s", url)
-		if _, ok := c.Scopes[datastore.GlobalScope]; !ok ***REMOVED***
-			c.Scopes[datastore.GlobalScope] = &datastore.ScopeCfg***REMOVED******REMOVED***
-		***REMOVED***
+		if _, ok := c.Scopes[datastore.GlobalScope]; !ok {
+			c.Scopes[datastore.GlobalScope] = &datastore.ScopeCfg{}
+		}
 		c.Scopes[datastore.GlobalScope].Client.Address = strings.TrimSpace(url)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // OptionKVOpts function returns an option setter for kvstore options
-func OptionKVOpts(opts map[string]string) Option ***REMOVED***
-	return func(c *Config) ***REMOVED***
-		if opts["kv.cacertfile"] != "" && opts["kv.certfile"] != "" && opts["kv.keyfile"] != "" ***REMOVED***
+func OptionKVOpts(opts map[string]string) Option {
+	return func(c *Config) {
+		if opts["kv.cacertfile"] != "" && opts["kv.certfile"] != "" && opts["kv.keyfile"] != "" {
 			logrus.Info("Option Initializing KV with TLS")
-			tlsConfig, err := tlsconfig.Client(tlsconfig.Options***REMOVED***
+			tlsConfig, err := tlsconfig.Client(tlsconfig.Options{
 				CAFile:   opts["kv.cacertfile"],
 				CertFile: opts["kv.certfile"],
 				KeyFile:  opts["kv.keyfile"],
-			***REMOVED***)
-			if err != nil ***REMOVED***
+			})
+			if err != nil {
 				logrus.Errorf("Unable to set up TLS: %s", err)
 				return
-			***REMOVED***
-			if _, ok := c.Scopes[datastore.GlobalScope]; !ok ***REMOVED***
-				c.Scopes[datastore.GlobalScope] = &datastore.ScopeCfg***REMOVED******REMOVED***
-			***REMOVED***
-			if c.Scopes[datastore.GlobalScope].Client.Config == nil ***REMOVED***
-				c.Scopes[datastore.GlobalScope].Client.Config = &store.Config***REMOVED***TLS: tlsConfig***REMOVED***
-			***REMOVED*** else ***REMOVED***
+			}
+			if _, ok := c.Scopes[datastore.GlobalScope]; !ok {
+				c.Scopes[datastore.GlobalScope] = &datastore.ScopeCfg{}
+			}
+			if c.Scopes[datastore.GlobalScope].Client.Config == nil {
+				c.Scopes[datastore.GlobalScope].Client.Config = &store.Config{TLS: tlsConfig}
+			} else {
 				c.Scopes[datastore.GlobalScope].Client.Config.TLS = tlsConfig
-			***REMOVED***
+			}
 			// Workaround libkv/etcd bug for https
-			c.Scopes[datastore.GlobalScope].Client.Config.ClientTLS = &store.ClientTLSConfig***REMOVED***
+			c.Scopes[datastore.GlobalScope].Client.Config.ClientTLS = &store.ClientTLSConfig{
 				CACertFile: opts["kv.cacertfile"],
 				CertFile:   opts["kv.certfile"],
 				KeyFile:    opts["kv.keyfile"],
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
+			}
+		} else {
 			logrus.Info("Option Initializing KV without TLS")
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // OptionDiscoveryWatcher function returns an option setter for discovery watcher
-func OptionDiscoveryWatcher(watcher discovery.Watcher) Option ***REMOVED***
-	return func(c *Config) ***REMOVED***
+func OptionDiscoveryWatcher(watcher discovery.Watcher) Option {
+	return func(c *Config) {
 		c.Cluster.Watcher = watcher
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // OptionDiscoveryAddress function returns an option setter for self discovery address
-func OptionDiscoveryAddress(address string) Option ***REMOVED***
-	return func(c *Config) ***REMOVED***
+func OptionDiscoveryAddress(address string) Option {
+	return func(c *Config) {
 		c.Cluster.Address = address
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // OptionDataDir function returns an option setter for data folder
-func OptionDataDir(dataDir string) Option ***REMOVED***
-	return func(c *Config) ***REMOVED***
+func OptionDataDir(dataDir string) Option {
+	return func(c *Config) {
 		c.Daemon.DataDir = dataDir
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // OptionExecRoot function returns an option setter for exec root folder
-func OptionExecRoot(execRoot string) Option ***REMOVED***
-	return func(c *Config) ***REMOVED***
+func OptionExecRoot(execRoot string) Option {
+	return func(c *Config) {
 		osl.SetBasePath(execRoot)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // OptionPluginGetter returns a plugingetter for remote drivers.
-func OptionPluginGetter(pg plugingetter.PluginGetter) Option ***REMOVED***
-	return func(c *Config) ***REMOVED***
+func OptionPluginGetter(pg plugingetter.PluginGetter) Option {
+	return func(c *Config) {
 		c.PluginGetter = pg
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // OptionExperimental function returns an option setter for experimental daemon
-func OptionExperimental(exp bool) Option ***REMOVED***
-	return func(c *Config) ***REMOVED***
+func OptionExperimental(exp bool) Option {
+	return func(c *Config) {
 		logrus.Debugf("Option Experimental: %v", exp)
 		c.Daemon.Experimental = exp
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // OptionNetworkControlPlaneMTU function returns an option setter for control plane MTU
-func OptionNetworkControlPlaneMTU(exp int) Option ***REMOVED***
-	return func(c *Config) ***REMOVED***
+func OptionNetworkControlPlaneMTU(exp int) Option {
+	return func(c *Config) {
 		logrus.Debugf("Network Control Plane MTU: %d", exp)
-		if exp < warningThNetworkControlPlaneMTU ***REMOVED***
+		if exp < warningThNetworkControlPlaneMTU {
 			logrus.Warnf("Received a MTU of %d, this value is very low, the network control plane can misbehave,"+
 				" defaulting to minimum value (%d)", exp, minimumNetworkControlPlaneMTU)
-			if exp < minimumNetworkControlPlaneMTU ***REMOVED***
+			if exp < minimumNetworkControlPlaneMTU {
 				exp = minimumNetworkControlPlaneMTU
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		c.Daemon.NetworkControlPlaneMTU = exp
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // ProcessOptions processes options and stores it in config
-func (c *Config) ProcessOptions(options ...Option) ***REMOVED***
-	for _, opt := range options ***REMOVED***
-		if opt != nil ***REMOVED***
+func (c *Config) ProcessOptions(options ...Option) {
+	for _, opt := range options {
+		if opt != nil {
 			opt(c)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // IsValidName validates configuration objects supported by libnetwork
-func IsValidName(name string) bool ***REMOVED***
+func IsValidName(name string) bool {
 	return strings.TrimSpace(name) != ""
-***REMOVED***
+}
 
 // OptionLocalKVProvider function returns an option setter for kvstore provider
-func OptionLocalKVProvider(provider string) Option ***REMOVED***
-	return func(c *Config) ***REMOVED***
+func OptionLocalKVProvider(provider string) Option {
+	return func(c *Config) {
 		logrus.Debugf("Option OptionLocalKVProvider: %s", provider)
-		if _, ok := c.Scopes[datastore.LocalScope]; !ok ***REMOVED***
-			c.Scopes[datastore.LocalScope] = &datastore.ScopeCfg***REMOVED******REMOVED***
-		***REMOVED***
+		if _, ok := c.Scopes[datastore.LocalScope]; !ok {
+			c.Scopes[datastore.LocalScope] = &datastore.ScopeCfg{}
+		}
 		c.Scopes[datastore.LocalScope].Client.Provider = strings.TrimSpace(provider)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // OptionLocalKVProviderURL function returns an option setter for kvstore url
-func OptionLocalKVProviderURL(url string) Option ***REMOVED***
-	return func(c *Config) ***REMOVED***
+func OptionLocalKVProviderURL(url string) Option {
+	return func(c *Config) {
 		logrus.Debugf("Option OptionLocalKVProviderURL: %s", url)
-		if _, ok := c.Scopes[datastore.LocalScope]; !ok ***REMOVED***
-			c.Scopes[datastore.LocalScope] = &datastore.ScopeCfg***REMOVED******REMOVED***
-		***REMOVED***
+		if _, ok := c.Scopes[datastore.LocalScope]; !ok {
+			c.Scopes[datastore.LocalScope] = &datastore.ScopeCfg{}
+		}
 		c.Scopes[datastore.LocalScope].Client.Address = strings.TrimSpace(url)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // OptionLocalKVProviderConfig function returns an option setter for kvstore config
-func OptionLocalKVProviderConfig(config *store.Config) Option ***REMOVED***
-	return func(c *Config) ***REMOVED***
+func OptionLocalKVProviderConfig(config *store.Config) Option {
+	return func(c *Config) {
 		logrus.Debugf("Option OptionLocalKVProviderConfig: %v", config)
-		if _, ok := c.Scopes[datastore.LocalScope]; !ok ***REMOVED***
-			c.Scopes[datastore.LocalScope] = &datastore.ScopeCfg***REMOVED******REMOVED***
-		***REMOVED***
+		if _, ok := c.Scopes[datastore.LocalScope]; !ok {
+			c.Scopes[datastore.LocalScope] = &datastore.ScopeCfg{}
+		}
 		c.Scopes[datastore.LocalScope].Client.Config = config
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // OptionActiveSandboxes function returns an option setter for passing the sandboxes
 // which were active during previous daemon life
-func OptionActiveSandboxes(sandboxes map[string]interface***REMOVED******REMOVED***) Option ***REMOVED***
-	return func(c *Config) ***REMOVED***
+func OptionActiveSandboxes(sandboxes map[string]interface{}) Option {
+	return func(c *Config) {
 		c.ActiveSandboxes = sandboxes
-	***REMOVED***
-***REMOVED***
+	}
+}

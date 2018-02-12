@@ -7,146 +7,146 @@ import (
 	"testing"
 )
 
-func Setup(t *testing.T) (string, func()) ***REMOVED***
+func Setup(t *testing.T) (string, func()) {
 	tmpdir, err := ioutil.TempDir("", "docker-test")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	backup := socketsPath
 	socketsPath = tmpdir
-	specsPaths = []string***REMOVED***tmpdir***REMOVED***
+	specsPaths = []string{tmpdir}
 
-	return tmpdir, func() ***REMOVED***
+	return tmpdir, func() {
 		socketsPath = backup
 		os.RemoveAll(tmpdir)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestFileSpecPlugin(t *testing.T) ***REMOVED***
+func TestFileSpecPlugin(t *testing.T) {
 	tmpdir, unregister := Setup(t)
 	defer unregister()
 
-	cases := []struct ***REMOVED***
+	cases := []struct {
 		path string
 		name string
 		addr string
 		fail bool
-	***REMOVED******REMOVED***
+	}{
 		// TODO Windows: Factor out the unix:// variants.
-		***REMOVED***filepath.Join(tmpdir, "echo.spec"), "echo", "unix://var/lib/docker/plugins/echo.sock", false***REMOVED***,
-		***REMOVED***filepath.Join(tmpdir, "echo", "echo.spec"), "echo", "unix://var/lib/docker/plugins/echo.sock", false***REMOVED***,
-		***REMOVED***filepath.Join(tmpdir, "foo.spec"), "foo", "tcp://localhost:8080", false***REMOVED***,
-		***REMOVED***filepath.Join(tmpdir, "foo", "foo.spec"), "foo", "tcp://localhost:8080", false***REMOVED***,
-		***REMOVED***filepath.Join(tmpdir, "bar.spec"), "bar", "localhost:8080", true***REMOVED***, // unknown transport
-	***REMOVED***
+		{filepath.Join(tmpdir, "echo.spec"), "echo", "unix://var/lib/docker/plugins/echo.sock", false},
+		{filepath.Join(tmpdir, "echo", "echo.spec"), "echo", "unix://var/lib/docker/plugins/echo.sock", false},
+		{filepath.Join(tmpdir, "foo.spec"), "foo", "tcp://localhost:8080", false},
+		{filepath.Join(tmpdir, "foo", "foo.spec"), "foo", "tcp://localhost:8080", false},
+		{filepath.Join(tmpdir, "bar.spec"), "bar", "localhost:8080", true}, // unknown transport
+	}
 
-	for _, c := range cases ***REMOVED***
-		if err := os.MkdirAll(filepath.Dir(c.path), 0755); err != nil ***REMOVED***
+	for _, c := range cases {
+		if err := os.MkdirAll(filepath.Dir(c.path), 0755); err != nil {
 			t.Fatal(err)
-		***REMOVED***
-		if err := ioutil.WriteFile(c.path, []byte(c.addr), 0644); err != nil ***REMOVED***
+		}
+		if err := ioutil.WriteFile(c.path, []byte(c.addr), 0644); err != nil {
 			t.Fatal(err)
-		***REMOVED***
+		}
 
 		r := newLocalRegistry()
 		p, err := r.Plugin(c.name)
-		if c.fail && err == nil ***REMOVED***
+		if c.fail && err == nil {
 			continue
-		***REMOVED***
+		}
 
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatal(err)
-		***REMOVED***
+		}
 
-		if p.name != c.name ***REMOVED***
+		if p.name != c.name {
 			t.Fatalf("Expected plugin `%s`, got %s\n", c.name, p.name)
-		***REMOVED***
+		}
 
-		if p.Addr != c.addr ***REMOVED***
+		if p.Addr != c.addr {
 			t.Fatalf("Expected plugin addr `%s`, got %s\n", c.addr, p.Addr)
-		***REMOVED***
+		}
 
-		if !p.TLSConfig.InsecureSkipVerify ***REMOVED***
+		if !p.TLSConfig.InsecureSkipVerify {
 			t.Fatalf("Expected TLS verification to be skipped")
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestFileJSONSpecPlugin(t *testing.T) ***REMOVED***
+func TestFileJSONSpecPlugin(t *testing.T) {
 	tmpdir, unregister := Setup(t)
 	defer unregister()
 
 	p := filepath.Join(tmpdir, "example.json")
-	spec := `***REMOVED***
+	spec := `{
   "Name": "plugin-example",
   "Addr": "https://example.com/docker/plugin",
-  "TLSConfig": ***REMOVED***
+  "TLSConfig": {
     "CAFile": "/usr/shared/docker/certs/example-ca.pem",
     "CertFile": "/usr/shared/docker/certs/example-cert.pem",
     "KeyFile": "/usr/shared/docker/certs/example-key.pem"
-	***REMOVED***
-***REMOVED***`
+	}
+}`
 
-	if err := ioutil.WriteFile(p, []byte(spec), 0644); err != nil ***REMOVED***
+	if err := ioutil.WriteFile(p, []byte(spec), 0644); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	r := newLocalRegistry()
 	plugin, err := r.Plugin("example")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if expected, actual := "example", plugin.name; expected != actual ***REMOVED***
+	if expected, actual := "example", plugin.name; expected != actual {
 		t.Fatalf("Expected plugin %q, got %s\n", expected, actual)
-	***REMOVED***
+	}
 
-	if plugin.Addr != "https://example.com/docker/plugin" ***REMOVED***
+	if plugin.Addr != "https://example.com/docker/plugin" {
 		t.Fatalf("Expected plugin addr `https://example.com/docker/plugin`, got %s\n", plugin.Addr)
-	***REMOVED***
+	}
 
-	if plugin.TLSConfig.CAFile != "/usr/shared/docker/certs/example-ca.pem" ***REMOVED***
+	if plugin.TLSConfig.CAFile != "/usr/shared/docker/certs/example-ca.pem" {
 		t.Fatalf("Expected plugin CA `/usr/shared/docker/certs/example-ca.pem`, got %s\n", plugin.TLSConfig.CAFile)
-	***REMOVED***
+	}
 
-	if plugin.TLSConfig.CertFile != "/usr/shared/docker/certs/example-cert.pem" ***REMOVED***
+	if plugin.TLSConfig.CertFile != "/usr/shared/docker/certs/example-cert.pem" {
 		t.Fatalf("Expected plugin Certificate `/usr/shared/docker/certs/example-cert.pem`, got %s\n", plugin.TLSConfig.CertFile)
-	***REMOVED***
+	}
 
-	if plugin.TLSConfig.KeyFile != "/usr/shared/docker/certs/example-key.pem" ***REMOVED***
+	if plugin.TLSConfig.KeyFile != "/usr/shared/docker/certs/example-key.pem" {
 		t.Fatalf("Expected plugin Key `/usr/shared/docker/certs/example-key.pem`, got %s\n", plugin.TLSConfig.KeyFile)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestFileJSONSpecPluginWithoutTLSConfig(t *testing.T) ***REMOVED***
+func TestFileJSONSpecPluginWithoutTLSConfig(t *testing.T) {
 	tmpdir, unregister := Setup(t)
 	defer unregister()
 
 	p := filepath.Join(tmpdir, "example.json")
-	spec := `***REMOVED***
+	spec := `{
   "Name": "plugin-example",
   "Addr": "https://example.com/docker/plugin"
-***REMOVED***`
+}`
 
-	if err := ioutil.WriteFile(p, []byte(spec), 0644); err != nil ***REMOVED***
+	if err := ioutil.WriteFile(p, []byte(spec), 0644); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	r := newLocalRegistry()
 	plugin, err := r.Plugin("example")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	if expected, actual := "example", plugin.name; expected != actual ***REMOVED***
+	if expected, actual := "example", plugin.name; expected != actual {
 		t.Fatalf("Expected plugin %q, got %s\n", expected, actual)
-	***REMOVED***
+	}
 
-	if plugin.Addr != "https://example.com/docker/plugin" ***REMOVED***
+	if plugin.Addr != "https://example.com/docker/plugin" {
 		t.Fatalf("Expected plugin addr `https://example.com/docker/plugin`, got %s\n", plugin.Addr)
-	***REMOVED***
+	}
 
-	if plugin.TLSConfig != nil ***REMOVED***
+	if plugin.TLSConfig != nil {
 		t.Fatalf("Expected plugin TLSConfig nil, got %v\n", plugin.TLSConfig)
-	***REMOVED***
-***REMOVED***
+	}
+}

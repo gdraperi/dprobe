@@ -24,13 +24,13 @@ import "bytes"
 //     go-fuzz -bin expfmt-fuzz.zip -workdir fuzz
 //
 // Further input samples should go in the folder fuzz/corpus.
-func Fuzz(in []byte) int ***REMOVED***
-	parser := TextParser***REMOVED******REMOVED***
+func Fuzz(in []byte) int {
+	parser := TextParser{}
 	_, err := parser.TextToMetricFamilies(bytes.NewReader(in))
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 0
-	***REMOVED***
+	}
 
 	return 1
-***REMOVED***
+}

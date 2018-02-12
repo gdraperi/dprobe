@@ -1,12 +1,12 @@
 package main
 
-type A struct ***REMOVED***
+type A struct {
 	F1, F2, F3 int
-***REMOVED***
+}
 
 type B A
 
-func main() ***REMOVED***
+func main() {
 	var b B
 	b.
-***REMOVED***
+}

@@ -34,7 +34,7 @@ const tmpExt = ".compact"
 
 // Snapshotter is responsible for ingesting events and persisting
 // them to disk, and providing a recovery mechanism at start time.
-type Snapshotter struct ***REMOVED***
+type Snapshotter struct {
 	aliveNodes       map[string]string
 	clock            *LamportClock
 	coordClient      *coordinate.Client
@@ -45,7 +45,7 @@ type Snapshotter struct ***REMOVED***
 	lastClock        LamportTime
 	lastEventClock   LamportTime
 	lastQueryClock   LamportTime
-	leaveCh          chan struct***REMOVED******REMOVED***
+	leaveCh          chan struct{}
 	leaving          bool
 	logger           *log.Logger
 	maxSize          int64
@@ -53,19 +53,19 @@ type Snapshotter struct ***REMOVED***
 	offset           int64
 	outCh            chan<- Event
 	rejoinAfterLeave bool
-	shutdownCh       <-chan struct***REMOVED******REMOVED***
-	waitCh           chan struct***REMOVED******REMOVED***
-***REMOVED***
+	shutdownCh       <-chan struct{}
+	waitCh           chan struct{}
+}
 
 // PreviousNode is used to represent the previously known alive nodes
-type PreviousNode struct ***REMOVED***
+type PreviousNode struct {
 	Name string
 	Addr string
-***REMOVED***
+}
 
-func (p PreviousNode) String() string ***REMOVED***
+func (p PreviousNode) String() string {
 	return fmt.Sprintf("%s: %s", p.Name, p.Addr)
-***REMOVED***
+}
 
 // NewSnapshotter creates a new Snapshotter that records events up to a
 // max byte size before rotating the file. It can also be used to
@@ -80,25 +80,25 @@ func NewSnapshotter(path string,
 	clock *LamportClock,
 	coordClient *coordinate.Client,
 	outCh chan<- Event,
-	shutdownCh <-chan struct***REMOVED******REMOVED***) (chan<- Event, *Snapshotter, error) ***REMOVED***
+	shutdownCh <-chan struct{}) (chan<- Event, *Snapshotter, error) {
 	inCh := make(chan Event, 1024)
 
 	// Try to open the file
 	fh, err := os.OpenFile(path, os.O_RDWR|os.O_APPEND|os.O_CREATE, 0755)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, nil, fmt.Errorf("failed to open snapshot: %v", err)
-	***REMOVED***
+	}
 
 	// Determine the offset
 	info, err := fh.Stat()
-	if err != nil ***REMOVED***
+	if err != nil {
 		fh.Close()
 		return nil, nil, fmt.Errorf("failed to stat snapshot: %v", err)
-	***REMOVED***
+	}
 	offset := info.Size()
 
 	// Create the snapshotter
-	snap := &Snapshotter***REMOVED***
+	snap := &Snapshotter{
 		aliveNodes:       make(map[string]string),
 		clock:            clock,
 		coordClient:      coordClient,
@@ -108,7 +108,7 @@ func NewSnapshotter(path string,
 		lastClock:        0,
 		lastEventClock:   0,
 		lastQueryClock:   0,
-		leaveCh:          make(chan struct***REMOVED******REMOVED***),
+		leaveCh:          make(chan struct{}),
 		logger:           logger,
 		maxSize:          int64(maxSize),
 		path:             path,
@@ -116,101 +116,101 @@ func NewSnapshotter(path string,
 		outCh:            outCh,
 		rejoinAfterLeave: rejoinAfterLeave,
 		shutdownCh:       shutdownCh,
-		waitCh:           make(chan struct***REMOVED******REMOVED***),
-	***REMOVED***
+		waitCh:           make(chan struct{}),
+	}
 
 	// Recover the last known state
-	if err := snap.replay(); err != nil ***REMOVED***
+	if err := snap.replay(); err != nil {
 		fh.Close()
 		return nil, nil, err
-	***REMOVED***
+	}
 
 	// Start handling new commands
 	go snap.stream()
 	return inCh, snap, nil
-***REMOVED***
+}
 
 // LastClock returns the last known clock time
-func (s *Snapshotter) LastClock() LamportTime ***REMOVED***
+func (s *Snapshotter) LastClock() LamportTime {
 	return s.lastClock
-***REMOVED***
+}
 
 // LastEventClock returns the last known event clock time
-func (s *Snapshotter) LastEventClock() LamportTime ***REMOVED***
+func (s *Snapshotter) LastEventClock() LamportTime {
 	return s.lastEventClock
-***REMOVED***
+}
 
 // LastQueryClock returns the last known query clock time
-func (s *Snapshotter) LastQueryClock() LamportTime ***REMOVED***
+func (s *Snapshotter) LastQueryClock() LamportTime {
 	return s.lastQueryClock
-***REMOVED***
+}
 
 // AliveNodes returns the last known alive nodes
-func (s *Snapshotter) AliveNodes() []*PreviousNode ***REMOVED***
+func (s *Snapshotter) AliveNodes() []*PreviousNode {
 	// Copy the previously known
 	previous := make([]*PreviousNode, 0, len(s.aliveNodes))
-	for name, addr := range s.aliveNodes ***REMOVED***
-		previous = append(previous, &PreviousNode***REMOVED***name, addr***REMOVED***)
-	***REMOVED***
+	for name, addr := range s.aliveNodes {
+		previous = append(previous, &PreviousNode{name, addr})
+	}
 
 	// Randomize the order, prevents hot shards
-	for i := range previous ***REMOVED***
+	for i := range previous {
 		j := rand.Intn(i + 1)
 		previous[i], previous[j] = previous[j], previous[i]
-	***REMOVED***
+	}
 	return previous
-***REMOVED***
+}
 
 // Wait is used to wait until the snapshotter finishes shut down
-func (s *Snapshotter) Wait() ***REMOVED***
+func (s *Snapshotter) Wait() {
 	<-s.waitCh
-***REMOVED***
+}
 
 // Leave is used to remove known nodes to prevent a restart from
 // causing a join. Otherwise nodes will re-join after leaving!
-func (s *Snapshotter) Leave() ***REMOVED***
-	select ***REMOVED***
-	case s.leaveCh <- struct***REMOVED******REMOVED******REMOVED******REMOVED***:
+func (s *Snapshotter) Leave() {
+	select {
+	case s.leaveCh <- struct{}{}:
 	case <-s.shutdownCh:
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // stream is a long running routine that is used to handle events
-func (s *Snapshotter) stream() ***REMOVED***
+func (s *Snapshotter) stream() {
 	clockTicker := time.NewTicker(clockUpdateInterval)
 	defer clockTicker.Stop()
 
 	coordinateTicker := time.NewTicker(coordinateUpdateInterval)
 	defer coordinateTicker.Stop()
 
-	for ***REMOVED***
-		select ***REMOVED***
+	for {
+		select {
 		case <-s.leaveCh:
 			s.leaving = true
 
 			// If we plan to re-join, keep our state
-			if !s.rejoinAfterLeave ***REMOVED***
+			if !s.rejoinAfterLeave {
 				s.aliveNodes = make(map[string]string)
-			***REMOVED***
+			}
 			s.tryAppend("leave\n")
-			if err := s.buffered.Flush(); err != nil ***REMOVED***
+			if err := s.buffered.Flush(); err != nil {
 				s.logger.Printf("[ERR] serf: failed to flush leave to snapshot: %v", err)
-			***REMOVED***
-			if err := s.fh.Sync(); err != nil ***REMOVED***
+			}
+			if err := s.fh.Sync(); err != nil {
 				s.logger.Printf("[ERR] serf: failed to sync leave to snapshot: %v", err)
-			***REMOVED***
+			}
 
 		case e := <-s.inCh:
 			// Forward the event immediately
-			if s.outCh != nil ***REMOVED***
+			if s.outCh != nil {
 				s.outCh <- e
-			***REMOVED***
+			}
 
 			// Stop recording events after a leave is issued
-			if s.leaving ***REMOVED***
+			if s.leaving {
 				continue
-			***REMOVED***
-			switch typed := e.(type) ***REMOVED***
+			}
+			switch typed := e.(type) {
 			case MemberEvent:
 				s.processMemberEvent(typed)
 			case UserEvent:
@@ -219,7 +219,7 @@ func (s *Snapshotter) stream() ***REMOVED***
 				s.processQuery(typed)
 			default:
 				s.logger.Printf("[ERR] serf: Unknown event to snapshot: %#v", e)
-			***REMOVED***
+			}
 
 		case <-clockTicker.C:
 			s.updateClock()
@@ -228,192 +228,192 @@ func (s *Snapshotter) stream() ***REMOVED***
 			s.updateCoordinate()
 
 		case <-s.shutdownCh:
-			if err := s.buffered.Flush(); err != nil ***REMOVED***
+			if err := s.buffered.Flush(); err != nil {
 				s.logger.Printf("[ERR] serf: failed to flush snapshot: %v", err)
-			***REMOVED***
-			if err := s.fh.Sync(); err != nil ***REMOVED***
+			}
+			if err := s.fh.Sync(); err != nil {
 				s.logger.Printf("[ERR] serf: failed to sync snapshot: %v", err)
-			***REMOVED***
+			}
 			s.fh.Close()
 			close(s.waitCh)
 			return
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // processMemberEvent is used to handle a single member event
-func (s *Snapshotter) processMemberEvent(e MemberEvent) ***REMOVED***
-	switch e.Type ***REMOVED***
+func (s *Snapshotter) processMemberEvent(e MemberEvent) {
+	switch e.Type {
 	case EventMemberJoin:
-		for _, mem := range e.Members ***REMOVED***
-			addr := net.TCPAddr***REMOVED***IP: mem.Addr, Port: int(mem.Port)***REMOVED***
+		for _, mem := range e.Members {
+			addr := net.TCPAddr{IP: mem.Addr, Port: int(mem.Port)}
 			s.aliveNodes[mem.Name] = addr.String()
 			s.tryAppend(fmt.Sprintf("alive: %s %s\n", mem.Name, addr.String()))
-		***REMOVED***
+		}
 
 	case EventMemberLeave:
 		fallthrough
 	case EventMemberFailed:
-		for _, mem := range e.Members ***REMOVED***
+		for _, mem := range e.Members {
 			delete(s.aliveNodes, mem.Name)
 			s.tryAppend(fmt.Sprintf("not-alive: %s\n", mem.Name))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	s.updateClock()
-***REMOVED***
+}
 
 // updateClock is called periodically to check if we should udpate our
 // clock value. This is done after member events but should also be done
 // periodically due to race conditions with join and leave intents
-func (s *Snapshotter) updateClock() ***REMOVED***
+func (s *Snapshotter) updateClock() {
 	lastSeen := s.clock.Time() - 1
-	if lastSeen > s.lastClock ***REMOVED***
+	if lastSeen > s.lastClock {
 		s.lastClock = lastSeen
 		s.tryAppend(fmt.Sprintf("clock: %d\n", s.lastClock))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // updateCoordinate is called periodically to write out the current local
 // coordinate. It's safe to call this if coordinates aren't enabled (nil
 // client) and it will be a no-op.
-func (s *Snapshotter) updateCoordinate() ***REMOVED***
-	if s.coordClient != nil ***REMOVED***
+func (s *Snapshotter) updateCoordinate() {
+	if s.coordClient != nil {
 		encoded, err := json.Marshal(s.coordClient.GetCoordinate())
-		if err != nil ***REMOVED***
+		if err != nil {
 			s.logger.Printf("[ERR] serf: Failed to encode coordinate: %v", err)
-		***REMOVED*** else ***REMOVED***
+		} else {
 			s.tryAppend(fmt.Sprintf("coordinate: %s\n", encoded))
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // processUserEvent is used to handle a single user event
-func (s *Snapshotter) processUserEvent(e UserEvent) ***REMOVED***
+func (s *Snapshotter) processUserEvent(e UserEvent) {
 	// Ignore old clocks
-	if e.LTime <= s.lastEventClock ***REMOVED***
+	if e.LTime <= s.lastEventClock {
 		return
-	***REMOVED***
+	}
 	s.lastEventClock = e.LTime
 	s.tryAppend(fmt.Sprintf("event-clock: %d\n", e.LTime))
-***REMOVED***
+}
 
 // processQuery is used to handle a single query event
-func (s *Snapshotter) processQuery(q *Query) ***REMOVED***
+func (s *Snapshotter) processQuery(q *Query) {
 	// Ignore old clocks
-	if q.LTime <= s.lastQueryClock ***REMOVED***
+	if q.LTime <= s.lastQueryClock {
 		return
-	***REMOVED***
+	}
 	s.lastQueryClock = q.LTime
 	s.tryAppend(fmt.Sprintf("query-clock: %d\n", q.LTime))
-***REMOVED***
+}
 
 // tryAppend will invoke append line but will not return an error
-func (s *Snapshotter) tryAppend(l string) ***REMOVED***
-	if err := s.appendLine(l); err != nil ***REMOVED***
+func (s *Snapshotter) tryAppend(l string) {
+	if err := s.appendLine(l); err != nil {
 		s.logger.Printf("[ERR] serf: Failed to update snapshot: %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // appendLine is used to append a line to the existing log
-func (s *Snapshotter) appendLine(l string) error ***REMOVED***
-	defer metrics.MeasureSince([]string***REMOVED***"serf", "snapshot", "appendLine"***REMOVED***, time.Now())
+func (s *Snapshotter) appendLine(l string) error {
+	defer metrics.MeasureSince([]string{"serf", "snapshot", "appendLine"}, time.Now())
 
 	n, err := s.buffered.WriteString(l)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	// Check if we should flush
 	now := time.Now()
-	if now.Sub(s.lastFlush) > flushInterval ***REMOVED***
+	if now.Sub(s.lastFlush) > flushInterval {
 		s.lastFlush = now
-		if err := s.buffered.Flush(); err != nil ***REMOVED***
+		if err := s.buffered.Flush(); err != nil {
 			return err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Check if a compaction is necessary
 	s.offset += int64(n)
-	if s.offset > s.maxSize ***REMOVED***
+	if s.offset > s.maxSize {
 		return s.compact()
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // Compact is used to compact the snapshot once it is too large
-func (s *Snapshotter) compact() error ***REMOVED***
-	defer metrics.MeasureSince([]string***REMOVED***"serf", "snapshot", "compact"***REMOVED***, time.Now())
+func (s *Snapshotter) compact() error {
+	defer metrics.MeasureSince([]string{"serf", "snapshot", "compact"}, time.Now())
 
 	// Try to open the file to new fiel
 	newPath := s.path + tmpExt
 	fh, err := os.OpenFile(newPath, os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0755)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("failed to open new snapshot: %v", err)
-	***REMOVED***
+	}
 
 	// Create a buffered writer
 	buf := bufio.NewWriter(fh)
 
 	// Write out the live nodes
 	var offset int64
-	for name, addr := range s.aliveNodes ***REMOVED***
+	for name, addr := range s.aliveNodes {
 		line := fmt.Sprintf("alive: %s %s\n", name, addr)
 		n, err := buf.WriteString(line)
-		if err != nil ***REMOVED***
+		if err != nil {
 			fh.Close()
 			return err
-		***REMOVED***
+		}
 		offset += int64(n)
-	***REMOVED***
+	}
 
 	// Write out the clocks
 	line := fmt.Sprintf("clock: %d\n", s.lastClock)
 	n, err := buf.WriteString(line)
-	if err != nil ***REMOVED***
+	if err != nil {
 		fh.Close()
 		return err
-	***REMOVED***
+	}
 	offset += int64(n)
 
 	line = fmt.Sprintf("event-clock: %d\n", s.lastEventClock)
 	n, err = buf.WriteString(line)
-	if err != nil ***REMOVED***
+	if err != nil {
 		fh.Close()
 		return err
-	***REMOVED***
+	}
 	offset += int64(n)
 
 	line = fmt.Sprintf("query-clock: %d\n", s.lastQueryClock)
 	n, err = buf.WriteString(line)
-	if err != nil ***REMOVED***
+	if err != nil {
 		fh.Close()
 		return err
-	***REMOVED***
+	}
 	offset += int64(n)
 
 	// Write out the coordinate.
-	if s.coordClient != nil ***REMOVED***
+	if s.coordClient != nil {
 		encoded, err := json.Marshal(s.coordClient.GetCoordinate())
-		if err != nil ***REMOVED***
+		if err != nil {
 			fh.Close()
 			return err
-		***REMOVED***
+		}
 
 		line = fmt.Sprintf("coordinate: %s\n", encoded)
 		n, err = buf.WriteString(line)
-		if err != nil ***REMOVED***
+		if err != nil {
 			fh.Close()
 			return err
-		***REMOVED***
+		}
 		offset += int64(n)
-	***REMOVED***
+	}
 
 	// Flush the new snapshot
 	err = buf.Flush()
 	fh.Close()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("failed to flush new snapshot: %v", err)
-	***REMOVED***
+	}
 
 	// We now need to swap the old snapshot file with the new snapshot.
 	// Turns out, Windows won't let us rename the files if we have
@@ -432,20 +432,20 @@ func (s *Snapshotter) compact() error ***REMOVED***
 	s.fh = nil
 
 	// Delete the old file
-	if err := os.Remove(s.path); err != nil ***REMOVED***
+	if err := os.Remove(s.path); err != nil {
 		return fmt.Errorf("failed to remove old snapshot: %v", err)
-	***REMOVED***
+	}
 
 	// Move the new file into place
-	if err := os.Rename(newPath, s.path); err != nil ***REMOVED***
+	if err := os.Rename(newPath, s.path); err != nil {
 		return fmt.Errorf("failed to install new snapshot: %v", err)
-	***REMOVED***
+	}
 
 	// Open the new snapshot
 	fh, err = os.OpenFile(s.path, os.O_RDWR|os.O_APPEND|os.O_CREATE, 0755)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("failed to open snapshot: %v", err)
-	***REMOVED***
+	}
 	buf = bufio.NewWriter(fh)
 
 	// Rotate our handles
@@ -454,107 +454,107 @@ func (s *Snapshotter) compact() error ***REMOVED***
 	s.offset = offset
 	s.lastFlush = time.Now()
 	return nil
-***REMOVED***
+}
 
 // replay is used to seek to reset our internal state by replaying
 // the snapshot file. It is used at initialization time to read old
 // state
-func (s *Snapshotter) replay() error ***REMOVED***
+func (s *Snapshotter) replay() error {
 	// Seek to the beginning
-	if _, err := s.fh.Seek(0, os.SEEK_SET); err != nil ***REMOVED***
+	if _, err := s.fh.Seek(0, os.SEEK_SET); err != nil {
 		return err
-	***REMOVED***
+	}
 
 	// Read each line
 	reader := bufio.NewReader(s.fh)
-	for ***REMOVED***
+	for {
 		line, err := reader.ReadString('\n')
-		if err != nil ***REMOVED***
+		if err != nil {
 			break
-		***REMOVED***
+		}
 
 		// Skip the newline
 		line = line[:len(line)-1]
 
 		// Switch on the prefix
-		if strings.HasPrefix(line, "alive: ") ***REMOVED***
+		if strings.HasPrefix(line, "alive: ") {
 			info := strings.TrimPrefix(line, "alive: ")
 			addrIdx := strings.LastIndex(info, " ")
-			if addrIdx == -1 ***REMOVED***
+			if addrIdx == -1 {
 				s.logger.Printf("[WARN] serf: Failed to parse address: %v", line)
 				continue
-			***REMOVED***
+			}
 			addr := info[addrIdx+1:]
 			name := info[:addrIdx]
 			s.aliveNodes[name] = addr
 
-		***REMOVED*** else if strings.HasPrefix(line, "not-alive: ") ***REMOVED***
+		} else if strings.HasPrefix(line, "not-alive: ") {
 			name := strings.TrimPrefix(line, "not-alive: ")
 			delete(s.aliveNodes, name)
 
-		***REMOVED*** else if strings.HasPrefix(line, "clock: ") ***REMOVED***
+		} else if strings.HasPrefix(line, "clock: ") {
 			timeStr := strings.TrimPrefix(line, "clock: ")
 			timeInt, err := strconv.ParseUint(timeStr, 10, 64)
-			if err != nil ***REMOVED***
+			if err != nil {
 				s.logger.Printf("[WARN] serf: Failed to convert clock time: %v", err)
 				continue
-			***REMOVED***
+			}
 			s.lastClock = LamportTime(timeInt)
 
-		***REMOVED*** else if strings.HasPrefix(line, "event-clock: ") ***REMOVED***
+		} else if strings.HasPrefix(line, "event-clock: ") {
 			timeStr := strings.TrimPrefix(line, "event-clock: ")
 			timeInt, err := strconv.ParseUint(timeStr, 10, 64)
-			if err != nil ***REMOVED***
+			if err != nil {
 				s.logger.Printf("[WARN] serf: Failed to convert event clock time: %v", err)
 				continue
-			***REMOVED***
+			}
 			s.lastEventClock = LamportTime(timeInt)
 
-		***REMOVED*** else if strings.HasPrefix(line, "query-clock: ") ***REMOVED***
+		} else if strings.HasPrefix(line, "query-clock: ") {
 			timeStr := strings.TrimPrefix(line, "query-clock: ")
 			timeInt, err := strconv.ParseUint(timeStr, 10, 64)
-			if err != nil ***REMOVED***
+			if err != nil {
 				s.logger.Printf("[WARN] serf: Failed to convert query clock time: %v", err)
 				continue
-			***REMOVED***
+			}
 			s.lastQueryClock = LamportTime(timeInt)
 
-		***REMOVED*** else if strings.HasPrefix(line, "coordinate: ") ***REMOVED***
-			if s.coordClient == nil ***REMOVED***
+		} else if strings.HasPrefix(line, "coordinate: ") {
+			if s.coordClient == nil {
 				s.logger.Printf("[WARN] serf: Ignoring snapshot coordinates since they are disabled")
 				continue
-			***REMOVED***
+			}
 
 			coordStr := strings.TrimPrefix(line, "coordinate: ")
 			var coord coordinate.Coordinate
 			err := json.Unmarshal([]byte(coordStr), &coord)
-			if err != nil ***REMOVED***
+			if err != nil {
 				s.logger.Printf("[WARN] serf: Failed to decode coordinate: %v", err)
 				continue
-			***REMOVED***
+			}
 			s.coordClient.SetCoordinate(&coord)
-		***REMOVED*** else if line == "leave" ***REMOVED***
+		} else if line == "leave" {
 			// Ignore a leave if we plan on re-joining
-			if s.rejoinAfterLeave ***REMOVED***
+			if s.rejoinAfterLeave {
 				s.logger.Printf("[INFO] serf: Ignoring previous leave in snapshot")
 				continue
-			***REMOVED***
+			}
 			s.aliveNodes = make(map[string]string)
 			s.lastClock = 0
 			s.lastEventClock = 0
 			s.lastQueryClock = 0
 
-		***REMOVED*** else if strings.HasPrefix(line, "#") ***REMOVED***
+		} else if strings.HasPrefix(line, "#") {
 			// Skip comment lines
 
-		***REMOVED*** else ***REMOVED***
+		} else {
 			s.logger.Printf("[WARN] serf: Unrecognized snapshot line: %v", line)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	// Seek to the end
-	if _, err := s.fh.Seek(0, os.SEEK_END); err != nil ***REMOVED***
+	if _, err := s.fh.Seek(0, os.SEEK_END); err != nil {
 		return err
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}

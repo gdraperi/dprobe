@@ -29,31 +29,31 @@ import (
 
 var port = flag.Int("port", 9999, "server port")
 
-func main() ***REMOVED***
+func main() {
 	flag.Parse()
 	log.SetFlags(0)
-	h := &webdav.Handler***REMOVED***
+	h := &webdav.Handler{
 		FileSystem: webdav.NewMemFS(),
 		LockSystem: webdav.NewMemLS(),
-		Logger: func(r *http.Request, err error) ***REMOVED***
+		Logger: func(r *http.Request, err error) {
 			litmus := r.Header.Get("X-Litmus")
-			if len(litmus) > 19 ***REMOVED***
+			if len(litmus) > 19 {
 				litmus = litmus[:16] + "..."
-			***REMOVED***
+			}
 
-			switch r.Method ***REMOVED***
+			switch r.Method {
 			case "COPY", "MOVE":
 				dst := ""
-				if u, err := url.Parse(r.Header.Get("Destination")); err == nil ***REMOVED***
+				if u, err := url.Parse(r.Header.Get("Destination")); err == nil {
 					dst = u.Path
-				***REMOVED***
+				}
 				o := r.Header.Get("Overwrite")
 				log.Printf("%-20s%-10s%-30s%-30so=%-2s%v", litmus, r.Method, r.URL.Path, dst, o, err)
 			default:
 				log.Printf("%-20s%-10s%-30s%v", litmus, r.Method, r.URL.Path, err)
-			***REMOVED***
-		***REMOVED***,
-	***REMOVED***
+			}
+		},
+	}
 
 	// The next line would normally be:
 	//	http.Handle("/", h)
@@ -80,15 +80,15 @@ func main() ***REMOVED***
 	//
 	// Thus, we assume that the propfind_invalid2 test is obsolete, and
 	// hard-code the 400 Bad Request response that the test expects.
-	http.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) ***REMOVED***
-		if r.Header.Get("X-Litmus") == "props: 3 (propfind_invalid2)" ***REMOVED***
+	http.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("X-Litmus") == "props: 3 (propfind_invalid2)" {
 			http.Error(w, "400 Bad Request", http.StatusBadRequest)
 			return
-		***REMOVED***
+		}
 		h.ServeHTTP(w, r)
-	***REMOVED***))
+	}))
 
 	addr := fmt.Sprintf(":%d", *port)
 	log.Printf("Serving %v", addr)
 	log.Fatal(http.ListenAndServe(addr, nil))
-***REMOVED***
+}

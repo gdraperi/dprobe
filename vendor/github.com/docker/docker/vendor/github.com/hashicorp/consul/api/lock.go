@@ -50,58 +50,58 @@ var (
 
 // Lock is used to implement client-side leader election. It is follows the
 // algorithm as described here: https://consul.io/docs/guides/leader-election.html.
-type Lock struct ***REMOVED***
+type Lock struct {
 	c    *Client
 	opts *LockOptions
 
 	isHeld       bool
-	sessionRenew chan struct***REMOVED******REMOVED***
+	sessionRenew chan struct{}
 	lockSession  string
 	l            sync.Mutex
-***REMOVED***
+}
 
 // LockOptions is used to parameterize the Lock behavior.
-type LockOptions struct ***REMOVED***
+type LockOptions struct {
 	Key         string // Must be set and have write permissions
 	Value       []byte // Optional, value to associate with the lock
 	Session     string // Optional, created if not specified
 	SessionName string // Optional, defaults to DefaultLockSessionName
 	SessionTTL  string // Optional, defaults to DefaultLockSessionTTL
-***REMOVED***
+}
 
 // LockKey returns a handle to a lock struct which can be used
 // to acquire and release the mutex. The key used must have
 // write permissions.
-func (c *Client) LockKey(key string) (*Lock, error) ***REMOVED***
-	opts := &LockOptions***REMOVED***
+func (c *Client) LockKey(key string) (*Lock, error) {
+	opts := &LockOptions{
 		Key: key,
-	***REMOVED***
+	}
 	return c.LockOpts(opts)
-***REMOVED***
+}
 
 // LockOpts returns a handle to a lock struct which can be used
 // to acquire and release the mutex. The key used must have
 // write permissions.
-func (c *Client) LockOpts(opts *LockOptions) (*Lock, error) ***REMOVED***
-	if opts.Key == "" ***REMOVED***
+func (c *Client) LockOpts(opts *LockOptions) (*Lock, error) {
+	if opts.Key == "" {
 		return nil, fmt.Errorf("missing key")
-	***REMOVED***
-	if opts.SessionName == "" ***REMOVED***
+	}
+	if opts.SessionName == "" {
 		opts.SessionName = DefaultLockSessionName
-	***REMOVED***
-	if opts.SessionTTL == "" ***REMOVED***
+	}
+	if opts.SessionTTL == "" {
 		opts.SessionTTL = DefaultLockSessionTTL
-	***REMOVED*** else ***REMOVED***
-		if _, err := time.ParseDuration(opts.SessionTTL); err != nil ***REMOVED***
+	} else {
+		if _, err := time.ParseDuration(opts.SessionTTL); err != nil {
 			return nil, fmt.Errorf("invalid SessionTTL: %v", err)
-		***REMOVED***
-	***REMOVED***
-	l := &Lock***REMOVED***
+		}
+	}
+	l := &Lock{
 		c:    c,
 		opts: opts,
-	***REMOVED***
+	}
 	return l, nil
-***REMOVED***
+}
 
 // Lock attempts to acquire the lock and blocks while doing so.
 // Providing a non-nil stopCh can be used to abort the lock attempt.
@@ -112,88 +112,88 @@ func (c *Client) LockOpts(opts *LockOptions) (*Lock, error) ***REMOVED***
 // created without any associated health checks. By default Consul sessions
 // prefer liveness over safety and an application must be able to handle
 // the lock being lost.
-func (l *Lock) Lock(stopCh <-chan struct***REMOVED******REMOVED***) (<-chan struct***REMOVED******REMOVED***, error) ***REMOVED***
+func (l *Lock) Lock(stopCh <-chan struct{}) (<-chan struct{}, error) {
 	// Hold the lock as we try to acquire
 	l.l.Lock()
 	defer l.l.Unlock()
 
 	// Check if we already hold the lock
-	if l.isHeld ***REMOVED***
+	if l.isHeld {
 		return nil, ErrLockHeld
-	***REMOVED***
+	}
 
 	// Check if we need to create a session first
 	l.lockSession = l.opts.Session
-	if l.lockSession == "" ***REMOVED***
-		if s, err := l.createSession(); err != nil ***REMOVED***
+	if l.lockSession == "" {
+		if s, err := l.createSession(); err != nil {
 			return nil, fmt.Errorf("failed to create session: %v", err)
-		***REMOVED*** else ***REMOVED***
-			l.sessionRenew = make(chan struct***REMOVED******REMOVED***)
+		} else {
+			l.sessionRenew = make(chan struct{})
 			l.lockSession = s
 			session := l.c.Session()
 			go session.RenewPeriodic(l.opts.SessionTTL, s, nil, l.sessionRenew)
 
 			// If we fail to acquire the lock, cleanup the session
-			defer func() ***REMOVED***
-				if !l.isHeld ***REMOVED***
+			defer func() {
+				if !l.isHeld {
 					close(l.sessionRenew)
 					l.sessionRenew = nil
-				***REMOVED***
-			***REMOVED***()
-		***REMOVED***
-	***REMOVED***
+				}
+			}()
+		}
+	}
 
 	// Setup the query options
 	kv := l.c.KV()
-	qOpts := &QueryOptions***REMOVED***
+	qOpts := &QueryOptions{
 		WaitTime: DefaultLockWaitTime,
-	***REMOVED***
+	}
 
 WAIT:
 	// Check if we should quit
-	select ***REMOVED***
+	select {
 	case <-stopCh:
 		return nil, nil
 	default:
-	***REMOVED***
+	}
 
 	// Look for an existing lock, blocking until not taken
 	pair, meta, err := kv.Get(l.opts.Key, qOpts)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("failed to read lock: %v", err)
-	***REMOVED***
-	if pair != nil && pair.Flags != LockFlagValue ***REMOVED***
+	}
+	if pair != nil && pair.Flags != LockFlagValue {
 		return nil, ErrLockConflict
-	***REMOVED***
+	}
 	locked := false
-	if pair != nil && pair.Session == l.lockSession ***REMOVED***
+	if pair != nil && pair.Session == l.lockSession {
 		goto HELD
-	***REMOVED***
-	if pair != nil && pair.Session != "" ***REMOVED***
+	}
+	if pair != nil && pair.Session != "" {
 		qOpts.WaitIndex = meta.LastIndex
 		goto WAIT
-	***REMOVED***
+	}
 
 	// Try to acquire the lock
 	pair = l.lockEntry(l.lockSession)
 	locked, _, err = kv.Acquire(pair, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, fmt.Errorf("failed to acquire lock: %v", err)
-	***REMOVED***
+	}
 
 	// Handle the case of not getting the lock
-	if !locked ***REMOVED***
-		select ***REMOVED***
+	if !locked {
+		select {
 		case <-time.After(DefaultLockRetryTime):
 			goto WAIT
 		case <-stopCh:
 			return nil, nil
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 HELD:
 	// Watch to ensure we maintain leadership
-	leaderCh := make(chan struct***REMOVED******REMOVED***)
+	leaderCh := make(chan struct{})
 	go l.monitorLock(l.lockSession, leaderCh)
 
 	// Set that we own the lock
@@ -201,30 +201,30 @@ HELD:
 
 	// Locked! All done
 	return leaderCh, nil
-***REMOVED***
+}
 
 // Unlock released the lock. It is an error to call this
 // if the lock is not currently held.
-func (l *Lock) Unlock() error ***REMOVED***
+func (l *Lock) Unlock() error {
 	// Hold the lock as we try to release
 	l.l.Lock()
 	defer l.l.Unlock()
 
 	// Ensure the lock is actually held
-	if !l.isHeld ***REMOVED***
+	if !l.isHeld {
 		return ErrLockNotHeld
-	***REMOVED***
+	}
 
 	// Set that we no longer own the lock
 	l.isHeld = false
 
 	// Stop the session renew
-	if l.sessionRenew != nil ***REMOVED***
-		defer func() ***REMOVED***
+	if l.sessionRenew != nil {
+		defer func() {
 			close(l.sessionRenew)
 			l.sessionRenew = nil
-		***REMOVED***()
-	***REMOVED***
+		}()
+	}
 
 	// Get the lock entry, and clear the lock session
 	lockEnt := l.lockEntry(l.lockSession)
@@ -233,94 +233,94 @@ func (l *Lock) Unlock() error ***REMOVED***
 	// Release the lock explicitly
 	kv := l.c.KV()
 	_, _, err := kv.Release(lockEnt, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("failed to release lock: %v", err)
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // Destroy is used to cleanup the lock entry. It is not necessary
 // to invoke. It will fail if the lock is in use.
-func (l *Lock) Destroy() error ***REMOVED***
+func (l *Lock) Destroy() error {
 	// Hold the lock as we try to release
 	l.l.Lock()
 	defer l.l.Unlock()
 
 	// Check if we already hold the lock
-	if l.isHeld ***REMOVED***
+	if l.isHeld {
 		return ErrLockHeld
-	***REMOVED***
+	}
 
 	// Look for an existing lock
 	kv := l.c.KV()
 	pair, _, err := kv.Get(l.opts.Key, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("failed to read lock: %v", err)
-	***REMOVED***
+	}
 
 	// Nothing to do if the lock does not exist
-	if pair == nil ***REMOVED***
+	if pair == nil {
 		return nil
-	***REMOVED***
+	}
 
 	// Check for possible flag conflict
-	if pair.Flags != LockFlagValue ***REMOVED***
+	if pair.Flags != LockFlagValue {
 		return ErrLockConflict
-	***REMOVED***
+	}
 
 	// Check if it is in use
-	if pair.Session != "" ***REMOVED***
+	if pair.Session != "" {
 		return ErrLockInUse
-	***REMOVED***
+	}
 
 	// Attempt the delete
 	didRemove, _, err := kv.DeleteCAS(pair, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return fmt.Errorf("failed to remove lock: %v", err)
-	***REMOVED***
-	if !didRemove ***REMOVED***
+	}
+	if !didRemove {
 		return ErrLockInUse
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
 // createSession is used to create a new managed session
-func (l *Lock) createSession() (string, error) ***REMOVED***
+func (l *Lock) createSession() (string, error) {
 	session := l.c.Session()
-	se := &SessionEntry***REMOVED***
+	se := &SessionEntry{
 		Name: l.opts.SessionName,
 		TTL:  l.opts.SessionTTL,
-	***REMOVED***
+	}
 	id, _, err := session.Create(se, nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", err
-	***REMOVED***
+	}
 	return id, nil
-***REMOVED***
+}
 
 // lockEntry returns a formatted KVPair for the lock
-func (l *Lock) lockEntry(session string) *KVPair ***REMOVED***
-	return &KVPair***REMOVED***
+func (l *Lock) lockEntry(session string) *KVPair {
+	return &KVPair{
 		Key:     l.opts.Key,
 		Value:   l.opts.Value,
 		Session: session,
 		Flags:   LockFlagValue,
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // monitorLock is a long running routine to monitor a lock ownership
 // It closes the stopCh if we lose our leadership.
-func (l *Lock) monitorLock(session string, stopCh chan struct***REMOVED******REMOVED***) ***REMOVED***
+func (l *Lock) monitorLock(session string, stopCh chan struct{}) {
 	defer close(stopCh)
 	kv := l.c.KV()
-	opts := &QueryOptions***REMOVED***RequireConsistent: true***REMOVED***
+	opts := &QueryOptions{RequireConsistent: true}
 WAIT:
 	pair, meta, err := kv.Get(l.opts.Key, opts)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return
-	***REMOVED***
-	if pair != nil && pair.Session == session ***REMOVED***
+	}
+	if pair != nil && pair.Session == session {
 		opts.WaitIndex = meta.LastIndex
 		goto WAIT
-	***REMOVED***
-***REMOVED***
+	}
+}

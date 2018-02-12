@@ -24,15 +24,15 @@ const (
 	defaultWorkerImageName = "integration-cli-worker"
 )
 
-func main() ***REMOVED***
+func main() {
 	rc, err := xmain()
-	if err != nil ***REMOVED***
+	if err != nil {
 		logrus.Fatalf("fatal error: %v", err)
-	***REMOVED***
+	}
 	os.Exit(rc)
-***REMOVED***
+}
 
-func xmain() (int, error) ***REMOVED***
+func xmain() (int, error) {
 	// Should we use cobra maybe?
 	replicas := flag.Int("replicas", 1, "Number of worker service replica")
 	chunks := flag.Int("chunks", 0, "Number of test chunks executed in batch (0 == replicas)")
@@ -44,36 +44,36 @@ func xmain() (int, error) ***REMOVED***
 	dryRun := flag.Bool("dry-run", false, "Dry run")
 	keepExecutor := flag.Bool("keep-executor", false, "Do not auto-remove executor containers, which is used for running privileged programs on Swarm")
 	flag.Parse()
-	if *chunks == 0 ***REMOVED***
+	if *chunks == 0 {
 		*chunks = *replicas
-	***REMOVED***
-	if *randSeed == int64(0) ***REMOVED***
+	}
+	if *randSeed == int64(0) {
 		*randSeed = time.Now().UnixNano()
-	***REMOVED***
+	}
 	cli, err := client.NewEnvClient()
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 1, err
-	***REMOVED***
-	if hasStack(cli, defaultStackName) ***REMOVED***
+	}
+	if hasStack(cli, defaultStackName) {
 		logrus.Infof("Removing stack %s", defaultStackName)
 		removeStack(cli, defaultStackName)
-	***REMOVED***
-	if hasVolume(cli, defaultVolumeName) ***REMOVED***
+	}
+	if hasVolume(cli, defaultVolumeName) {
 		logrus.Infof("Removing volume %s", defaultVolumeName)
 		removeVolume(cli, defaultVolumeName)
-	***REMOVED***
-	if err = ensureImages(cli, []string***REMOVED***defaultWorkerImageName, defaultMasterImageName***REMOVED***); err != nil ***REMOVED***
+	}
+	if err = ensureImages(cli, []string{defaultWorkerImageName, defaultMasterImageName}); err != nil {
 		return 1, err
-	***REMOVED***
+	}
 	workerImageForStack := defaultWorkerImageName
-	if *pushWorkerImage != "" ***REMOVED***
+	if *pushWorkerImage != "" {
 		logrus.Infof("Pushing %s to %s", defaultWorkerImageName, *pushWorkerImage)
-		if err = pushImage(cli, *pushWorkerImage, defaultWorkerImageName); err != nil ***REMOVED***
+		if err = pushImage(cli, *pushWorkerImage, defaultWorkerImageName); err != nil {
 			return 1, err
-		***REMOVED***
+		}
 		workerImageForStack = *pushWorkerImage
-	***REMOVED***
-	compose, err := createCompose("", cli, composeOptions***REMOVED***
+	}
+	compose, err := createCompose("", cli, composeOptions{
 		Replicas:     *replicas,
 		Chunks:       *chunks,
 		MasterImage:  defaultMasterImageName,
@@ -83,78 +83,78 @@ func xmain() (int, error) ***REMOVED***
 		RandSeed:     *randSeed,
 		DryRun:       *dryRun,
 		KeepExecutor: *keepExecutor,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		return 1, err
-	***REMOVED***
+	}
 	filters, err := filtersBytes(*filtersFile)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 1, err
-	***REMOVED***
+	}
 	logrus.Infof("Creating volume %s with input data", defaultVolumeName)
 	if err = createVolumeWithData(cli,
 		defaultVolumeName,
-		map[string][]byte***REMOVED***"/input": filters***REMOVED***,
-		defaultMasterImageName); err != nil ***REMOVED***
+		map[string][]byte{"/input": filters},
+		defaultMasterImageName); err != nil {
 		return 1, err
-	***REMOVED***
+	}
 	logrus.Infof("Deploying stack %s from %s", defaultStackName, compose)
-	defer func() ***REMOVED***
+	defer func() {
 		logrus.Infof("NOTE: You may want to inspect or clean up following resources:")
 		logrus.Infof(" - Stack: %s", defaultStackName)
 		logrus.Infof(" - Volume: %s", defaultVolumeName)
 		logrus.Infof(" - Compose file: %s", compose)
 		logrus.Infof(" - Master image: %s", defaultMasterImageName)
 		logrus.Infof(" - Worker image: %s", workerImageForStack)
-	***REMOVED***()
-	if err = deployStack(cli, defaultStackName, compose); err != nil ***REMOVED***
+	}()
+	if err = deployStack(cli, defaultStackName, compose); err != nil {
 		return 1, err
-	***REMOVED***
+	}
 	logrus.Infof("The log will be displayed here after some duration."+
 		"You can watch the live status via `docker service logs %s_worker`",
 		defaultStackName)
 	masterContainerID, err := waitForMasterUp(cli, defaultStackName)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 1, err
-	***REMOVED***
+	}
 	rc, err := waitForContainerCompletion(cli, os.Stdout, os.Stderr, masterContainerID)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return 1, err
-	***REMOVED***
+	}
 	logrus.Infof("Exit status: %d", rc)
 	return int(rc), nil
-***REMOVED***
+}
 
-func ensureImages(cli *client.Client, images []string) error ***REMOVED***
-	for _, image := range images ***REMOVED***
+func ensureImages(cli *client.Client, images []string) error {
+	for _, image := range images {
 		_, _, err := cli.ImageInspectWithRaw(context.Background(), image)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return fmt.Errorf("could not find image %s, please run `make build-integration-cli-on-swarm`: %v",
 				image, err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
-func filtersBytes(optionalFiltersFile string) ([]byte, error) ***REMOVED***
+func filtersBytes(optionalFiltersFile string) ([]byte, error) {
 	var b []byte
-	if optionalFiltersFile == "" ***REMOVED***
+	if optionalFiltersFile == "" {
 		tests, err := enumerateTests(".")
-		if err != nil ***REMOVED***
+		if err != nil {
 			return b, err
-		***REMOVED***
+		}
 		b = []byte(strings.Join(tests, "\n") + "\n")
-	***REMOVED*** else ***REMOVED***
+	} else {
 		var err error
 		b, err = ioutil.ReadFile(optionalFiltersFile)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return b, err
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return b, nil
-***REMOVED***
+}
 
-func waitForMasterUp(cli *client.Client, stackName string) (string, error) ***REMOVED***
+func waitForMasterUp(cli *client.Client, stackName string) (string, error) {
 	// FIXME(AkihiroSuda): it should retry until master is up, rather than pre-sleeping
 	time.Sleep(10 * time.Second)
 
@@ -162,37 +162,37 @@ func waitForMasterUp(cli *client.Client, stackName string) (string, error) ***RE
 	fil.Add("label", "com.docker.stack.namespace="+stackName)
 	// FIXME(AkihiroSuda): we should not rely on internal service naming convention
 	fil.Add("label", "com.docker.swarm.service.name="+stackName+"_master")
-	masters, err := cli.ContainerList(context.Background(), types.ContainerListOptions***REMOVED***
+	masters, err := cli.ContainerList(context.Background(), types.ContainerListOptions{
 		All:     true,
 		Filters: fil,
-	***REMOVED***)
-	if err != nil ***REMOVED***
+	})
+	if err != nil {
 		return "", err
-	***REMOVED***
-	if len(masters) == 0 ***REMOVED***
+	}
+	if len(masters) == 0 {
 		return "", fmt.Errorf("master not running in stack %s?", stackName)
-	***REMOVED***
+	}
 	return masters[0].ID, nil
-***REMOVED***
+}
 
-func waitForContainerCompletion(cli *client.Client, stdout, stderr io.Writer, containerID string) (int64, error) ***REMOVED***
+func waitForContainerCompletion(cli *client.Client, stdout, stderr io.Writer, containerID string) (int64, error) {
 	stream, err := cli.ContainerLogs(context.Background(),
 		containerID,
-		types.ContainerLogsOptions***REMOVED***
+		types.ContainerLogsOptions{
 			ShowStdout: true,
 			ShowStderr: true,
 			Follow:     true,
-		***REMOVED***)
-	if err != nil ***REMOVED***
+		})
+	if err != nil {
 		return 1, err
-	***REMOVED***
+	}
 	stdcopy.StdCopy(stdout, stderr, stream)
 	stream.Close()
 	resultC, errC := cli.ContainerWait(context.Background(), containerID, "")
-	select ***REMOVED***
+	select {
 	case err := <-errC:
 		return 1, err
 	case result := <-resultC:
 		return result.StatusCode, nil
-	***REMOVED***
-***REMOVED***
+	}
+}

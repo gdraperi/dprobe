@@ -12,48 +12,48 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestSecretRemoveUnsupported(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestSecretRemoveUnsupported(t *testing.T) {
+	client := &Client{
 		version: "1.24",
-		client:  &http.Client***REMOVED******REMOVED***,
-	***REMOVED***
+		client:  &http.Client{},
+	}
 	err := client.SecretRemove(context.Background(), "secret_id")
 	assert.EqualError(t, err, `"secret remove" requires API version 1.25, but the Docker daemon API version is 1.24`)
-***REMOVED***
+}
 
-func TestSecretRemoveError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestSecretRemoveError(t *testing.T) {
+	client := &Client{
 		version: "1.25",
 		client:  newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
-	***REMOVED***
+	}
 
 	err := client.SecretRemove(context.Background(), "secret_id")
-	if err == nil || err.Error() != "Error response from daemon: Server error" ***REMOVED***
+	if err == nil || err.Error() != "Error response from daemon: Server error" {
 		t.Fatalf("expected a Server Error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestSecretRemove(t *testing.T) ***REMOVED***
+func TestSecretRemove(t *testing.T) {
 	expectedURL := "/v1.25/secrets/secret_id"
 
-	client := &Client***REMOVED***
+	client := &Client{
 		version: "1.25",
-		client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-			if !strings.HasPrefix(req.URL.Path, expectedURL) ***REMOVED***
+		client: newMockClient(func(req *http.Request) (*http.Response, error) {
+			if !strings.HasPrefix(req.URL.Path, expectedURL) {
 				return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, req.URL)
-			***REMOVED***
-			if req.Method != "DELETE" ***REMOVED***
+			}
+			if req.Method != "DELETE" {
 				return nil, fmt.Errorf("expected DELETE method, got %s", req.Method)
-			***REMOVED***
-			return &http.Response***REMOVED***
+			}
+			return &http.Response{
 				StatusCode: http.StatusOK,
 				Body:       ioutil.NopCloser(bytes.NewReader([]byte("body"))),
-			***REMOVED***, nil
-		***REMOVED***),
-	***REMOVED***
+			}, nil
+		}),
+	}
 
 	err := client.SecretRemove(context.Background(), "secret_id")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}

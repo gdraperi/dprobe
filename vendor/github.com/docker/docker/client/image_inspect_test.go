@@ -14,58 +14,58 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestImageInspectError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestImageInspectError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
-	***REMOVED***
+	}
 
 	_, _, err := client.ImageInspectWithRaw(context.Background(), "nothing")
-	if err == nil || err.Error() != "Error response from daemon: Server error" ***REMOVED***
+	if err == nil || err.Error() != "Error response from daemon: Server error" {
 		t.Fatalf("expected a Server Error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestImageInspectImageNotFound(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestImageInspectImageNotFound(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusNotFound, "Server error")),
-	***REMOVED***
+	}
 
 	_, _, err := client.ImageInspectWithRaw(context.Background(), "unknown")
-	if err == nil || !IsErrNotFound(err) ***REMOVED***
+	if err == nil || !IsErrNotFound(err) {
 		t.Fatalf("expected an imageNotFound error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestImageInspect(t *testing.T) ***REMOVED***
+func TestImageInspect(t *testing.T) {
 	expectedURL := "/images/image_id/json"
-	expectedTags := []string***REMOVED***"tag1", "tag2"***REMOVED***
-	client := &Client***REMOVED***
-		client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-			if !strings.HasPrefix(req.URL.Path, expectedURL) ***REMOVED***
+	expectedTags := []string{"tag1", "tag2"}
+	client := &Client{
+		client: newMockClient(func(req *http.Request) (*http.Response, error) {
+			if !strings.HasPrefix(req.URL.Path, expectedURL) {
 				return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, req.URL)
-			***REMOVED***
-			content, err := json.Marshal(types.ImageInspect***REMOVED***
+			}
+			content, err := json.Marshal(types.ImageInspect{
 				ID:       "image_id",
 				RepoTags: expectedTags,
-			***REMOVED***)
-			if err != nil ***REMOVED***
+			})
+			if err != nil {
 				return nil, err
-			***REMOVED***
-			return &http.Response***REMOVED***
+			}
+			return &http.Response{
 				StatusCode: http.StatusOK,
 				Body:       ioutil.NopCloser(bytes.NewReader(content)),
-			***REMOVED***, nil
-		***REMOVED***),
-	***REMOVED***
+			}, nil
+		}),
+	}
 
 	imageInspect, _, err := client.ImageInspectWithRaw(context.Background(), "image_id")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if imageInspect.ID != "image_id" ***REMOVED***
+	}
+	if imageInspect.ID != "image_id" {
 		t.Fatalf("expected `image_id`, got %s", imageInspect.ID)
-	***REMOVED***
-	if !reflect.DeepEqual(imageInspect.RepoTags, expectedTags) ***REMOVED***
+	}
+	if !reflect.DeepEqual(imageInspect.RepoTags, expectedTags) {
 		t.Fatalf("expected `%v`, got %v", expectedTags, imageInspect.RepoTags)
-	***REMOVED***
-***REMOVED***
+	}
+}

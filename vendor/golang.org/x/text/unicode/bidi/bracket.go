@@ -48,21 +48,21 @@ const (
 
 // bracketPair holds a pair of index values for opening and closing bracket
 // location of a bracket pair.
-type bracketPair struct ***REMOVED***
+type bracketPair struct {
 	opener int
 	closer int
-***REMOVED***
+}
 
-func (b *bracketPair) String() string ***REMOVED***
+func (b *bracketPair) String() string {
 	return fmt.Sprintf("(%v, %v)", b.opener, b.closer)
-***REMOVED***
+}
 
 // bracketPairs is a slice of bracketPairs with a sort.Interface implementation.
 type bracketPairs []bracketPair
 
-func (b bracketPairs) Len() int           ***REMOVED*** return len(b) ***REMOVED***
-func (b bracketPairs) Swap(i, j int)      ***REMOVED*** b[i], b[j] = b[j], b[i] ***REMOVED***
-func (b bracketPairs) Less(i, j int) bool ***REMOVED*** return b[i].opener < b[j].opener ***REMOVED***
+func (b bracketPairs) Len() int           { return len(b) }
+func (b bracketPairs) Swap(i, j int)      { b[i], b[j] = b[j], b[i] }
+func (b bracketPairs) Less(i, j int) bool { return b[i].opener < b[j].opener }
 
 // resolvePairedBrackets runs the paired bracket part of the UBA algorithm.
 //
@@ -72,22 +72,22 @@ func (b bracketPairs) Less(i, j int) bool ***REMOVED*** return b[i].opener < b[j
 //
 // The identifiers for bracket types are the rune of the canonicalized opening
 // bracket for brackets (open or close) or 0 for runes that are not brackets.
-func resolvePairedBrackets(s *isolatingRunSequence) ***REMOVED***
-	p := bracketPairer***REMOVED***
+func resolvePairedBrackets(s *isolatingRunSequence) {
+	p := bracketPairer{
 		sos:              s.sos,
 		openers:          list.New(),
 		codesIsolatedRun: s.types,
 		indexes:          s.indexes,
-	***REMOVED***
+	}
 	dirEmbed := L
-	if s.level&1 != 0 ***REMOVED***
+	if s.level&1 != 0 {
 		dirEmbed = R
-	***REMOVED***
+	}
 	p.locateBrackets(s.p.pairTypes, s.p.pairValues)
 	p.resolveBrackets(dirEmbed, s.p.initialTypes)
-***REMOVED***
+}
 
-type bracketPairer struct ***REMOVED***
+type bracketPairer struct {
 	sos Class // direction corresponding to start of sequence
 
 	// The following is a restatement of BD 16 using non-algorithmic language.
@@ -117,13 +117,13 @@ type bracketPairer struct ***REMOVED***
 	codesIsolatedRun []Class // directional bidi codes for an isolated run
 	indexes          []int   // array of index values into the original string
 
-***REMOVED***
+}
 
 // matchOpener reports whether characters at given positions form a matching
 // bracket pair.
-func (p *bracketPairer) matchOpener(pairValues []rune, opener, closer int) bool ***REMOVED***
+func (p *bracketPairer) matchOpener(pairValues []rune, opener, closer int) bool {
 	return pairValues[p.indexes[opener]] == pairValues[p.indexes[closer]]
-***REMOVED***
+}
 
 const maxPairingDepth = 63
 
@@ -132,48 +132,48 @@ const maxPairingDepth = 63
 // This implementation uses a linked list instead of a stack, because, while
 // elements are added at the front (like a push) they are not generally removed
 // in atomic 'pop' operations, reducing the benefit of the stack archetype.
-func (p *bracketPairer) locateBrackets(pairTypes []bracketType, pairValues []rune) ***REMOVED***
+func (p *bracketPairer) locateBrackets(pairTypes []bracketType, pairValues []rune) {
 	// traverse the run
 	// do that explicitly (not in a for-each) so we can record position
-	for i, index := range p.indexes ***REMOVED***
+	for i, index := range p.indexes {
 
 		// look at the bracket type for each character
-		if pairTypes[index] == bpNone || p.codesIsolatedRun[i] != ON ***REMOVED***
+		if pairTypes[index] == bpNone || p.codesIsolatedRun[i] != ON {
 			// continue scanning
 			continue
-		***REMOVED***
-		switch pairTypes[index] ***REMOVED***
+		}
+		switch pairTypes[index] {
 		case bpOpen:
 			// check if maximum pairing depth reached
-			if p.openers.Len() == maxPairingDepth ***REMOVED***
+			if p.openers.Len() == maxPairingDepth {
 				p.openers.Init()
 				return
-			***REMOVED***
+			}
 			// remember opener location, most recent first
 			p.openers.PushFront(i)
 
 		case bpClose:
 			// see if there is a match
 			count := 0
-			for elem := p.openers.Front(); elem != nil; elem = elem.Next() ***REMOVED***
+			for elem := p.openers.Front(); elem != nil; elem = elem.Next() {
 				count++
 				opener := elem.Value.(int)
-				if p.matchOpener(pairValues, opener, i) ***REMOVED***
+				if p.matchOpener(pairValues, opener, i) {
 					// if the opener matches, add nested pair to the ordered list
-					p.pairPositions = append(p.pairPositions, bracketPair***REMOVED***opener, i***REMOVED***)
+					p.pairPositions = append(p.pairPositions, bracketPair{opener, i})
 					// remove up to and including matched opener
-					for ; count > 0; count-- ***REMOVED***
+					for ; count > 0; count-- {
 						p.openers.Remove(p.openers.Front())
-					***REMOVED***
+					}
 					break
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			sort.Sort(p.pairPositions)
 			// if we get here, the closing bracket matched no openers
 			// and gets ignored
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // Bracket pairs within an isolating run sequence are processed as units so
 // that both the opening and the closing paired bracket in a pair resolve to
@@ -230,8 +230,8 @@ func (p *bracketPairer) locateBrackets(pairTypes []bracketType, pairValues []run
 // by rule N0.
 //
 // TODO: have separate type for "strong" directionality.
-func (p *bracketPairer) getStrongTypeN0(index int) Class ***REMOVED***
-	switch p.codesIsolatedRun[index] ***REMOVED***
+func (p *bracketPairer) getStrongTypeN0(index int) Class {
+	switch p.codesIsolatedRun[index] {
 	// in the scope of N0, number types are treated as R
 	case EN, AN, AL, R:
 		return R
@@ -239,8 +239,8 @@ func (p *bracketPairer) getStrongTypeN0(index int) Class ***REMOVED***
 		return L
 	default:
 		return ON
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // classifyPairContent reports the strong types contained inside a Bracket Pair,
 // assuming the given embedding direction.
@@ -249,36 +249,36 @@ func (p *bracketPairer) getStrongTypeN0(index int) Class ***REMOVED***
 // it returns this this type. Otherwise it returns the embedding direction.
 //
 // TODO: use separate type for "strong" directionality.
-func (p *bracketPairer) classifyPairContent(loc bracketPair, dirEmbed Class) Class ***REMOVED***
+func (p *bracketPairer) classifyPairContent(loc bracketPair, dirEmbed Class) Class {
 	dirOpposite := ON
-	for i := loc.opener + 1; i < loc.closer; i++ ***REMOVED***
+	for i := loc.opener + 1; i < loc.closer; i++ {
 		dir := p.getStrongTypeN0(i)
-		if dir == ON ***REMOVED***
+		if dir == ON {
 			continue
-		***REMOVED***
-		if dir == dirEmbed ***REMOVED***
+		}
+		if dir == dirEmbed {
 			return dir // type matching embedding direction found
-		***REMOVED***
+		}
 		dirOpposite = dir
-	***REMOVED***
+	}
 	// return ON if no strong type found, or class opposite to dirEmbed
 	return dirOpposite
-***REMOVED***
+}
 
 // classBeforePair determines which strong types are present before a Bracket
 // Pair. Return R or L if strong type found, otherwise ON.
-func (p *bracketPairer) classBeforePair(loc bracketPair) Class ***REMOVED***
-	for i := loc.opener - 1; i >= 0; i-- ***REMOVED***
-		if dir := p.getStrongTypeN0(i); dir != ON ***REMOVED***
+func (p *bracketPairer) classBeforePair(loc bracketPair) Class {
+	for i := loc.opener - 1; i >= 0; i-- {
+		if dir := p.getStrongTypeN0(i); dir != ON {
 			return dir
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	// no strong types found, return sos
 	return p.sos
-***REMOVED***
+}
 
 // assignBracketType implements rule N0 for a single bracket pair.
-func (p *bracketPairer) assignBracketType(loc bracketPair, dirEmbed Class, initialTypes []Class) ***REMOVED***
+func (p *bracketPairer) assignBracketType(loc bracketPair, dirEmbed Class, initialTypes []Class) {
 	// rule "N0, a", inspect contents of pair
 	dirPair := p.classifyPairContent(loc, dirEmbed)
 
@@ -286,50 +286,50 @@ func (p *bracketPairer) assignBracketType(loc bracketPair, dirEmbed Class, initi
 
 	// the following logical tests are performed out of order compared to
 	// the statement of the rules but yield the same results
-	if dirPair == ON ***REMOVED***
+	if dirPair == ON {
 		return // case "d" - nothing to do
-	***REMOVED***
+	}
 
-	if dirPair != dirEmbed ***REMOVED***
+	if dirPair != dirEmbed {
 		// case "c": strong type found, opposite - check before (c.1)
 		dirPair = p.classBeforePair(loc)
-		if dirPair == dirEmbed || dirPair == ON ***REMOVED***
+		if dirPair == dirEmbed || dirPair == ON {
 			// no strong opposite type found before - use embedding (c.2)
 			dirPair = dirEmbed
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	// else: case "b", strong type found matching embedding,
 	// no explicit action needed, as dirPair is already set to embedding
 	// direction
 
 	// set the bracket types to the type found
 	p.setBracketsToType(loc, dirPair, initialTypes)
-***REMOVED***
+}
 
-func (p *bracketPairer) setBracketsToType(loc bracketPair, dirPair Class, initialTypes []Class) ***REMOVED***
+func (p *bracketPairer) setBracketsToType(loc bracketPair, dirPair Class, initialTypes []Class) {
 	p.codesIsolatedRun[loc.opener] = dirPair
 	p.codesIsolatedRun[loc.closer] = dirPair
 
-	for i := loc.opener + 1; i < loc.closer; i++ ***REMOVED***
+	for i := loc.opener + 1; i < loc.closer; i++ {
 		index := p.indexes[i]
-		if initialTypes[index] != NSM ***REMOVED***
+		if initialTypes[index] != NSM {
 			break
-		***REMOVED***
+		}
 		p.codesIsolatedRun[i] = dirPair
-	***REMOVED***
+	}
 
-	for i := loc.closer + 1; i < len(p.indexes); i++ ***REMOVED***
+	for i := loc.closer + 1; i < len(p.indexes); i++ {
 		index := p.indexes[i]
-		if initialTypes[index] != NSM ***REMOVED***
+		if initialTypes[index] != NSM {
 			break
-		***REMOVED***
+		}
 		p.codesIsolatedRun[i] = dirPair
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // resolveBrackets implements rule N0 for a list of pairs.
-func (p *bracketPairer) resolveBrackets(dirEmbed Class, initialTypes []Class) ***REMOVED***
-	for _, loc := range p.pairPositions ***REMOVED***
+func (p *bracketPairer) resolveBrackets(dirEmbed Class, initialTypes []Class) {
+	for _, loc := range p.pairPositions {
 		p.assignBracketType(loc, dirEmbed, initialTypes)
-	***REMOVED***
-***REMOVED***
+	}
+}

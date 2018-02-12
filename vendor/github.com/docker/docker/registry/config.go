@@ -15,7 +15,7 @@ import (
 )
 
 // ServiceOptions holds command line options.
-type ServiceOptions struct ***REMOVED***
+type ServiceOptions struct {
 	AllowNondistributableArtifacts []string `json:"allow-nondistributable-artifacts,omitempty"`
 	Mirrors                        []string `json:"registry-mirrors,omitempty"`
 	InsecureRegistries             []string `json:"insecure-registries,omitempty"`
@@ -23,13 +23,13 @@ type ServiceOptions struct ***REMOVED***
 	// V2Only controls access to legacy registries.  If it is set to true via the
 	// command line flag the daemon will not attempt to contact v1 legacy registries
 	V2Only bool `json:"disable-legacy-registry,omitempty"`
-***REMOVED***
+}
 
 // serviceConfig holds daemon configuration for the registry service.
-type serviceConfig struct ***REMOVED***
+type serviceConfig struct {
 	registrytypes.ServiceConfig
 	V2Only bool
-***REMOVED***
+}
 
 var (
 	// DefaultNamespace is the default namespace
@@ -49,10 +49,10 @@ var (
 	NotaryServer = "https://notary.docker.io"
 
 	// DefaultV2Registry is the URI of the default v2 registry
-	DefaultV2Registry = &url.URL***REMOVED***
+	DefaultV2Registry = &url.URL{
 		Scheme: "https",
 		Host:   "registry-1.docker.io",
-	***REMOVED***
+	}
 )
 
 var (
@@ -60,7 +60,7 @@ var (
 	// not have the correct form
 	ErrInvalidRepositoryName = errors.New("Invalid repository name (ex: \"registry.domain.tld/myrepos\")")
 
-	emptyServiceConfig, _ = newServiceConfig(ServiceOptions***REMOVED******REMOVED***)
+	emptyServiceConfig, _ = newServiceConfig(ServiceOptions{})
 )
 
 var (
@@ -71,98 +71,98 @@ var (
 var lookupIP = net.LookupIP
 
 // newServiceConfig returns a new instance of ServiceConfig
-func newServiceConfig(options ServiceOptions) (*serviceConfig, error) ***REMOVED***
-	config := &serviceConfig***REMOVED***
-		ServiceConfig: registrytypes.ServiceConfig***REMOVED***
+func newServiceConfig(options ServiceOptions) (*serviceConfig, error) {
+	config := &serviceConfig{
+		ServiceConfig: registrytypes.ServiceConfig{
 			InsecureRegistryCIDRs: make([]*registrytypes.NetIPNet, 0),
 			IndexConfigs:          make(map[string]*registrytypes.IndexInfo),
 			// Hack: Bypass setting the mirrors to IndexConfigs since they are going away
 			// and Mirrors are only for the official registry anyways.
-		***REMOVED***,
+		},
 		V2Only: options.V2Only,
-	***REMOVED***
-	if err := config.LoadAllowNondistributableArtifacts(options.AllowNondistributableArtifacts); err != nil ***REMOVED***
+	}
+	if err := config.LoadAllowNondistributableArtifacts(options.AllowNondistributableArtifacts); err != nil {
 		return nil, err
-	***REMOVED***
-	if err := config.LoadMirrors(options.Mirrors); err != nil ***REMOVED***
+	}
+	if err := config.LoadMirrors(options.Mirrors); err != nil {
 		return nil, err
-	***REMOVED***
-	if err := config.LoadInsecureRegistries(options.InsecureRegistries); err != nil ***REMOVED***
+	}
+	if err := config.LoadInsecureRegistries(options.InsecureRegistries); err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	return config, nil
-***REMOVED***
+}
 
 // LoadAllowNondistributableArtifacts loads allow-nondistributable-artifacts registries into config.
-func (config *serviceConfig) LoadAllowNondistributableArtifacts(registries []string) error ***REMOVED***
-	cidrs := map[string]*registrytypes.NetIPNet***REMOVED******REMOVED***
-	hostnames := map[string]bool***REMOVED******REMOVED***
+func (config *serviceConfig) LoadAllowNondistributableArtifacts(registries []string) error {
+	cidrs := map[string]*registrytypes.NetIPNet{}
+	hostnames := map[string]bool{}
 
-	for _, r := range registries ***REMOVED***
-		if _, err := ValidateIndexName(r); err != nil ***REMOVED***
+	for _, r := range registries {
+		if _, err := ValidateIndexName(r); err != nil {
 			return err
-		***REMOVED***
-		if validateNoScheme(r) != nil ***REMOVED***
+		}
+		if validateNoScheme(r) != nil {
 			return fmt.Errorf("allow-nondistributable-artifacts registry %s should not contain '://'", r)
-		***REMOVED***
+		}
 
-		if _, ipnet, err := net.ParseCIDR(r); err == nil ***REMOVED***
+		if _, ipnet, err := net.ParseCIDR(r); err == nil {
 			// Valid CIDR.
 			cidrs[ipnet.String()] = (*registrytypes.NetIPNet)(ipnet)
-		***REMOVED*** else if err := validateHostPort(r); err == nil ***REMOVED***
+		} else if err := validateHostPort(r); err == nil {
 			// Must be `host:port` if not CIDR.
 			hostnames[r] = true
-		***REMOVED*** else ***REMOVED***
+		} else {
 			return fmt.Errorf("allow-nondistributable-artifacts registry %s is not valid: %v", r, err)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	config.AllowNondistributableArtifactsCIDRs = make([]*(registrytypes.NetIPNet), 0)
-	for _, c := range cidrs ***REMOVED***
+	for _, c := range cidrs {
 		config.AllowNondistributableArtifactsCIDRs = append(config.AllowNondistributableArtifactsCIDRs, c)
-	***REMOVED***
+	}
 
 	config.AllowNondistributableArtifactsHostnames = make([]string, 0)
-	for h := range hostnames ***REMOVED***
+	for h := range hostnames {
 		config.AllowNondistributableArtifactsHostnames = append(config.AllowNondistributableArtifactsHostnames, h)
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // LoadMirrors loads mirrors to config, after removing duplicates.
 // Returns an error if mirrors contains an invalid mirror.
-func (config *serviceConfig) LoadMirrors(mirrors []string) error ***REMOVED***
-	mMap := map[string]struct***REMOVED******REMOVED******REMOVED******REMOVED***
-	unique := []string***REMOVED******REMOVED***
+func (config *serviceConfig) LoadMirrors(mirrors []string) error {
+	mMap := map[string]struct{}{}
+	unique := []string{}
 
-	for _, mirror := range mirrors ***REMOVED***
+	for _, mirror := range mirrors {
 		m, err := ValidateMirror(mirror)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-		if _, exist := mMap[m]; !exist ***REMOVED***
-			mMap[m] = struct***REMOVED******REMOVED******REMOVED******REMOVED***
+		}
+		if _, exist := mMap[m]; !exist {
+			mMap[m] = struct{}{}
 			unique = append(unique, m)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	config.Mirrors = unique
 
 	// Configure public registry since mirrors may have changed.
-	config.IndexConfigs[IndexName] = &registrytypes.IndexInfo***REMOVED***
+	config.IndexConfigs[IndexName] = &registrytypes.IndexInfo{
 		Name:     IndexName,
 		Mirrors:  config.Mirrors,
 		Secure:   true,
 		Official: true,
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // LoadInsecureRegistries loads insecure registries to config
-func (config *serviceConfig) LoadInsecureRegistries(registries []string) error ***REMOVED***
+func (config *serviceConfig) LoadInsecureRegistries(registries []string) error {
 	// Localhost is by default considered as an insecure registry
 	// This is a stop-gap for people who are running a private registry on localhost (especially on Boot2docker).
 	//
@@ -179,67 +179,67 @@ func (config *serviceConfig) LoadInsecureRegistries(registries []string) error *
 	config.ServiceConfig.IndexConfigs = make(map[string]*registrytypes.IndexInfo)
 
 skip:
-	for _, r := range registries ***REMOVED***
+	for _, r := range registries {
 		// validate insecure registry
-		if _, err := ValidateIndexName(r); err != nil ***REMOVED***
+		if _, err := ValidateIndexName(r); err != nil {
 			// before returning err, roll back to original data
 			config.ServiceConfig.InsecureRegistryCIDRs = originalCIDRs
 			config.ServiceConfig.IndexConfigs = originalIndexInfos
 			return err
-		***REMOVED***
-		if strings.HasPrefix(strings.ToLower(r), "http://") ***REMOVED***
+		}
+		if strings.HasPrefix(strings.ToLower(r), "http://") {
 			logrus.Warnf("insecure registry %s should not contain 'http://' and 'http://' has been removed from the insecure registry config", r)
 			r = r[7:]
-		***REMOVED*** else if strings.HasPrefix(strings.ToLower(r), "https://") ***REMOVED***
+		} else if strings.HasPrefix(strings.ToLower(r), "https://") {
 			logrus.Warnf("insecure registry %s should not contain 'https://' and 'https://' has been removed from the insecure registry config", r)
 			r = r[8:]
-		***REMOVED*** else if validateNoScheme(r) != nil ***REMOVED***
+		} else if validateNoScheme(r) != nil {
 			// Insecure registry should not contain '://'
 			// before returning err, roll back to original data
 			config.ServiceConfig.InsecureRegistryCIDRs = originalCIDRs
 			config.ServiceConfig.IndexConfigs = originalIndexInfos
 			return fmt.Errorf("insecure registry %s should not contain '://'", r)
-		***REMOVED***
+		}
 		// Check if CIDR was passed to --insecure-registry
 		_, ipnet, err := net.ParseCIDR(r)
-		if err == nil ***REMOVED***
+		if err == nil {
 			// Valid CIDR. If ipnet is already in config.InsecureRegistryCIDRs, skip.
 			data := (*registrytypes.NetIPNet)(ipnet)
-			for _, value := range config.InsecureRegistryCIDRs ***REMOVED***
-				if value.IP.String() == data.IP.String() && value.Mask.String() == data.Mask.String() ***REMOVED***
+			for _, value := range config.InsecureRegistryCIDRs {
+				if value.IP.String() == data.IP.String() && value.Mask.String() == data.Mask.String() {
 					continue skip
-				***REMOVED***
-			***REMOVED***
+				}
+			}
 			// ipnet is not found, add it in config.InsecureRegistryCIDRs
 			config.InsecureRegistryCIDRs = append(config.InsecureRegistryCIDRs, data)
 
-		***REMOVED*** else ***REMOVED***
-			if err := validateHostPort(r); err != nil ***REMOVED***
+		} else {
+			if err := validateHostPort(r); err != nil {
 				config.ServiceConfig.InsecureRegistryCIDRs = originalCIDRs
 				config.ServiceConfig.IndexConfigs = originalIndexInfos
 				return fmt.Errorf("insecure registry %s is not valid: %v", r, err)
 
-			***REMOVED***
+			}
 			// Assume `host:port` if not CIDR.
-			config.IndexConfigs[r] = &registrytypes.IndexInfo***REMOVED***
+			config.IndexConfigs[r] = &registrytypes.IndexInfo{
 				Name:     r,
 				Mirrors:  make([]string, 0),
 				Secure:   false,
 				Official: false,
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	// Configure public registry.
-	config.IndexConfigs[IndexName] = &registrytypes.IndexInfo***REMOVED***
+	config.IndexConfigs[IndexName] = &registrytypes.IndexInfo{
 		Name:     IndexName,
 		Mirrors:  config.Mirrors,
 		Secure:   true,
 		Official: true,
-	***REMOVED***
+	}
 
 	return nil
-***REMOVED***
+}
 
 // allowNondistributableArtifacts returns true if the provided hostname is part of the list of registries
 // that allow push of nondistributable artifacts.
@@ -250,15 +250,15 @@ skip:
 // hostname should be a URL.Host (`host:port` or `host`) where the `host` part can be either a domain name
 // or an IP address. If it is a domain name, then it will be resolved to IP addresses for matching. If
 // resolution fails, CIDR matching is not performed.
-func allowNondistributableArtifacts(config *serviceConfig, hostname string) bool ***REMOVED***
-	for _, h := range config.AllowNondistributableArtifactsHostnames ***REMOVED***
-		if h == hostname ***REMOVED***
+func allowNondistributableArtifacts(config *serviceConfig, hostname string) bool {
+	for _, h := range config.AllowNondistributableArtifactsHostnames {
+		if h == hostname {
 			return true
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return isCIDRMatch(config.AllowNondistributableArtifactsCIDRs, hostname)
-***REMOVED***
+}
 
 // isSecureIndex returns false if the provided indexName is part of the list of insecure registries
 // Insecure registries accept HTTP and/or accept HTTPS with certificates from unknown CAs.
@@ -271,175 +271,175 @@ func allowNondistributableArtifacts(config *serviceConfig, hostname string) bool
 // or an IP address. If it is a domain name, then it will be resolved in order to check if the IP is contained
 // in a subnet. If the resolving is not successful, isSecureIndex will only try to match hostname to any element
 // of insecureRegistries.
-func isSecureIndex(config *serviceConfig, indexName string) bool ***REMOVED***
+func isSecureIndex(config *serviceConfig, indexName string) bool {
 	// Check for configured index, first.  This is needed in case isSecureIndex
 	// is called from anything besides newIndexInfo, in order to honor per-index configurations.
-	if index, ok := config.IndexConfigs[indexName]; ok ***REMOVED***
+	if index, ok := config.IndexConfigs[indexName]; ok {
 		return index.Secure
-	***REMOVED***
+	}
 
 	return !isCIDRMatch(config.InsecureRegistryCIDRs, indexName)
-***REMOVED***
+}
 
 // isCIDRMatch returns true if URLHost matches an element of cidrs. URLHost is a URL.Host (`host:port` or `host`)
 // where the `host` part can be either a domain name or an IP address. If it is a domain name, then it will be
 // resolved to IP addresses for matching. If resolution fails, false is returned.
-func isCIDRMatch(cidrs []*registrytypes.NetIPNet, URLHost string) bool ***REMOVED***
+func isCIDRMatch(cidrs []*registrytypes.NetIPNet, URLHost string) bool {
 	host, _, err := net.SplitHostPort(URLHost)
-	if err != nil ***REMOVED***
+	if err != nil {
 		// Assume URLHost is of the form `host` without the port and go on.
 		host = URLHost
-	***REMOVED***
+	}
 
 	addrs, err := lookupIP(host)
-	if err != nil ***REMOVED***
+	if err != nil {
 		ip := net.ParseIP(host)
-		if ip != nil ***REMOVED***
-			addrs = []net.IP***REMOVED***ip***REMOVED***
-		***REMOVED***
+		if ip != nil {
+			addrs = []net.IP{ip}
+		}
 
 		// if ip == nil, then `host` is neither an IP nor it could be looked up,
 		// either because the index is unreachable, or because the index is behind an HTTP proxy.
 		// So, len(addrs) == 0 and we're not aborting.
-	***REMOVED***
+	}
 
 	// Try CIDR notation only if addrs has any elements, i.e. if `host`'s IP could be determined.
-	for _, addr := range addrs ***REMOVED***
-		for _, ipnet := range cidrs ***REMOVED***
+	for _, addr := range addrs {
+		for _, ipnet := range cidrs {
 			// check if the addr falls in the subnet
-			if (*net.IPNet)(ipnet).Contains(addr) ***REMOVED***
+			if (*net.IPNet)(ipnet).Contains(addr) {
 				return true
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	return false
-***REMOVED***
+}
 
 // ValidateMirror validates an HTTP(S) registry mirror
-func ValidateMirror(val string) (string, error) ***REMOVED***
+func ValidateMirror(val string) (string, error) {
 	uri, err := url.Parse(val)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return "", fmt.Errorf("invalid mirror: %q is not a valid URI", val)
-	***REMOVED***
-	if uri.Scheme != "http" && uri.Scheme != "https" ***REMOVED***
+	}
+	if uri.Scheme != "http" && uri.Scheme != "https" {
 		return "", fmt.Errorf("invalid mirror: unsupported scheme %q in %q", uri.Scheme, uri)
-	***REMOVED***
-	if (uri.Path != "" && uri.Path != "/") || uri.RawQuery != "" || uri.Fragment != "" ***REMOVED***
+	}
+	if (uri.Path != "" && uri.Path != "/") || uri.RawQuery != "" || uri.Fragment != "" {
 		return "", fmt.Errorf("invalid mirror: path, query, or fragment at end of the URI %q", uri)
-	***REMOVED***
-	if uri.User != nil ***REMOVED***
+	}
+	if uri.User != nil {
 		// strip password from output
 		uri.User = url.UserPassword(uri.User.Username(), "xxxxx")
 		return "", fmt.Errorf("invalid mirror: username/password not allowed in URI %q", uri)
-	***REMOVED***
+	}
 	return strings.TrimSuffix(val, "/") + "/", nil
-***REMOVED***
+}
 
 // ValidateIndexName validates an index name.
-func ValidateIndexName(val string) (string, error) ***REMOVED***
+func ValidateIndexName(val string) (string, error) {
 	// TODO: upstream this to check to reference package
-	if val == "index.docker.io" ***REMOVED***
+	if val == "index.docker.io" {
 		val = "docker.io"
-	***REMOVED***
-	if strings.HasPrefix(val, "-") || strings.HasSuffix(val, "-") ***REMOVED***
+	}
+	if strings.HasPrefix(val, "-") || strings.HasSuffix(val, "-") {
 		return "", fmt.Errorf("invalid index name (%s). Cannot begin or end with a hyphen", val)
-	***REMOVED***
+	}
 	return val, nil
-***REMOVED***
+}
 
-func validateNoScheme(reposName string) error ***REMOVED***
-	if strings.Contains(reposName, "://") ***REMOVED***
+func validateNoScheme(reposName string) error {
+	if strings.Contains(reposName, "://") {
 		// It cannot contain a scheme!
 		return ErrInvalidRepositoryName
-	***REMOVED***
+	}
 	return nil
-***REMOVED***
+}
 
-func validateHostPort(s string) error ***REMOVED***
+func validateHostPort(s string) error {
 	// Split host and port, and in case s can not be splitted, assume host only
 	host, port, err := net.SplitHostPort(s)
-	if err != nil ***REMOVED***
+	if err != nil {
 		host = s
 		port = ""
-	***REMOVED***
+	}
 	// If match against the `host:port` pattern fails,
 	// it might be `IPv6:port`, which will be captured by net.ParseIP(host)
-	if !validHostPortRegex.MatchString(s) && net.ParseIP(host) == nil ***REMOVED***
+	if !validHostPortRegex.MatchString(s) && net.ParseIP(host) == nil {
 		return fmt.Errorf("invalid host %q", host)
-	***REMOVED***
-	if port != "" ***REMOVED***
+	}
+	if port != "" {
 		v, err := strconv.Atoi(port)
-		if err != nil ***REMOVED***
+		if err != nil {
 			return err
-		***REMOVED***
-		if v < 0 || v > 65535 ***REMOVED***
+		}
+		if v < 0 || v > 65535 {
 			return fmt.Errorf("invalid port %q", port)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
 // newIndexInfo returns IndexInfo configuration from indexName
-func newIndexInfo(config *serviceConfig, indexName string) (*registrytypes.IndexInfo, error) ***REMOVED***
+func newIndexInfo(config *serviceConfig, indexName string) (*registrytypes.IndexInfo, error) {
 	var err error
 	indexName, err = ValidateIndexName(indexName)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// Return any configured index info, first.
-	if index, ok := config.IndexConfigs[indexName]; ok ***REMOVED***
+	if index, ok := config.IndexConfigs[indexName]; ok {
 		return index, nil
-	***REMOVED***
+	}
 
 	// Construct a non-configured index info.
-	index := &registrytypes.IndexInfo***REMOVED***
+	index := &registrytypes.IndexInfo{
 		Name:     indexName,
 		Mirrors:  make([]string, 0),
 		Official: false,
-	***REMOVED***
+	}
 	index.Secure = isSecureIndex(config, indexName)
 	return index, nil
-***REMOVED***
+}
 
 // GetAuthConfigKey special-cases using the full index address of the official
 // index as the AuthConfig key, and uses the (host)name[:port] for private indexes.
-func GetAuthConfigKey(index *registrytypes.IndexInfo) string ***REMOVED***
-	if index.Official ***REMOVED***
+func GetAuthConfigKey(index *registrytypes.IndexInfo) string {
+	if index.Official {
 		return IndexServer
-	***REMOVED***
+	}
 	return index.Name
-***REMOVED***
+}
 
 // newRepositoryInfo validates and breaks down a repository name into a RepositoryInfo
-func newRepositoryInfo(config *serviceConfig, name reference.Named) (*RepositoryInfo, error) ***REMOVED***
+func newRepositoryInfo(config *serviceConfig, name reference.Named) (*RepositoryInfo, error) {
 	index, err := newIndexInfo(config, reference.Domain(name))
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	official := !strings.ContainsRune(reference.FamiliarName(name), '/')
 
-	return &RepositoryInfo***REMOVED***
+	return &RepositoryInfo{
 		Name:     reference.TrimNamed(name),
 		Index:    index,
 		Official: official,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // ParseRepositoryInfo performs the breakdown of a repository name into a RepositoryInfo, but
 // lacks registry configuration.
-func ParseRepositoryInfo(reposName reference.Named) (*RepositoryInfo, error) ***REMOVED***
+func ParseRepositoryInfo(reposName reference.Named) (*RepositoryInfo, error) {
 	return newRepositoryInfo(emptyServiceConfig, reposName)
-***REMOVED***
+}
 
 // ParseSearchIndexInfo will use repository name to get back an indexInfo.
-func ParseSearchIndexInfo(reposName string) (*registrytypes.IndexInfo, error) ***REMOVED***
+func ParseSearchIndexInfo(reposName string) (*registrytypes.IndexInfo, error) {
 	indexName, _ := splitReposSearchTerm(reposName)
 
 	indexInfo, err := newIndexInfo(emptyServiceConfig, indexName)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	return indexInfo, nil
-***REMOVED***
+}

@@ -11,11 +11,11 @@ import (
 	"golang.org/x/crypto/openpgp/packet"
 )
 
-func TestKeyExpiry(t *testing.T) ***REMOVED***
+func TestKeyExpiry(t *testing.T) {
 	kring, err := ReadKeyRing(readerFromHex(expiringKeyHex))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	entity := kring[0]
 
 	const timeFormat = "2006-01-02"
@@ -29,88 +29,88 @@ func TestKeyExpiry(t *testing.T) ***REMOVED***
 	//
 	// So this should select the newest, non-expired encryption key.
 	key, _ := entity.encryptionKey(time1)
-	if id := key.PublicKey.KeyIdShortString(); id != "96A672F5" ***REMOVED***
+	if id := key.PublicKey.KeyIdShortString(); id != "96A672F5" {
 		t.Errorf("Expected key 1ABB25A0 at time %s, but got key %s", time1.Format(timeFormat), id)
-	***REMOVED***
+	}
 
 	// Once the first encryption subkey has expired, the second should be
 	// selected.
 	time2, _ := time.Parse(timeFormat, "2013-07-09")
 	key, _ = entity.encryptionKey(time2)
-	if id := key.PublicKey.KeyIdShortString(); id != "96A672F5" ***REMOVED***
+	if id := key.PublicKey.KeyIdShortString(); id != "96A672F5" {
 		t.Errorf("Expected key 96A672F5 at time %s, but got key %s", time2.Format(timeFormat), id)
-	***REMOVED***
+	}
 
 	// Once all the keys have expired, nothing should be returned.
 	time3, _ := time.Parse(timeFormat, "2013-08-01")
-	if key, ok := entity.encryptionKey(time3); ok ***REMOVED***
+	if key, ok := entity.encryptionKey(time3); ok {
 		t.Errorf("Expected no key at time %s, but got key %s", time3.Format(timeFormat), key.PublicKey.KeyIdShortString())
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestMissingCrossSignature(t *testing.T) ***REMOVED***
+func TestMissingCrossSignature(t *testing.T) {
 	// This public key has a signing subkey, but the subkey does not
 	// contain a cross-signature.
 	keys, err := ReadArmoredKeyRing(bytes.NewBufferString(missingCrossSignatureKey))
-	if len(keys) != 0 ***REMOVED***
+	if len(keys) != 0 {
 		t.Errorf("Accepted key with missing cross signature")
-	***REMOVED***
-	if err == nil ***REMOVED***
+	}
+	if err == nil {
 		t.Fatal("Failed to detect error in keyring with missing cross signature")
-	***REMOVED***
+	}
 	structural, ok := err.(errors.StructuralError)
-	if !ok ***REMOVED***
+	if !ok {
 		t.Fatalf("Unexpected class of error: %T. Wanted StructuralError", err)
-	***REMOVED***
+	}
 	const expectedMsg = "signing subkey is missing cross-signature"
-	if !strings.Contains(string(structural), expectedMsg) ***REMOVED***
+	if !strings.Contains(string(structural), expectedMsg) {
 		t.Fatalf("Unexpected error: %q. Expected it to contain %q", err, expectedMsg)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestInvalidCrossSignature(t *testing.T) ***REMOVED***
+func TestInvalidCrossSignature(t *testing.T) {
 	// This public key has a signing subkey, and the subkey has an
 	// embedded cross-signature. However, the cross-signature does
 	// not correctly validate over the primary and subkey.
 	keys, err := ReadArmoredKeyRing(bytes.NewBufferString(invalidCrossSignatureKey))
-	if len(keys) != 0 ***REMOVED***
+	if len(keys) != 0 {
 		t.Errorf("Accepted key with invalid cross signature")
-	***REMOVED***
-	if err == nil ***REMOVED***
+	}
+	if err == nil {
 		t.Fatal("Failed to detect error in keyring with an invalid cross signature")
-	***REMOVED***
+	}
 	structural, ok := err.(errors.StructuralError)
-	if !ok ***REMOVED***
+	if !ok {
 		t.Fatalf("Unexpected class of error: %T. Wanted StructuralError", err)
-	***REMOVED***
+	}
 	const expectedMsg = "subkey signature invalid"
-	if !strings.Contains(string(structural), expectedMsg) ***REMOVED***
+	if !strings.Contains(string(structural), expectedMsg) {
 		t.Fatalf("Unexpected error: %q. Expected it to contain %q", err, expectedMsg)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestGoodCrossSignature(t *testing.T) ***REMOVED***
+func TestGoodCrossSignature(t *testing.T) {
 	// This public key has a signing subkey, and the subkey has an
 	// embedded cross-signature which correctly validates over the
 	// primary and subkey.
 	keys, err := ReadArmoredKeyRing(bytes.NewBufferString(goodCrossSignatureKey))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if len(keys) != 1 ***REMOVED***
+	}
+	if len(keys) != 1 {
 		t.Errorf("Failed to accept key with good cross signature, %d", len(keys))
-	***REMOVED***
-	if len(keys[0].Subkeys) != 1 ***REMOVED***
+	}
+	if len(keys[0].Subkeys) != 1 {
 		t.Errorf("Failed to accept good subkey, %d", len(keys[0].Subkeys))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // TestExternallyRevokableKey attempts to load and parse a key with a third party revocation permission.
-func TestExternallyRevocableKey(t *testing.T) ***REMOVED***
+func TestExternallyRevocableKey(t *testing.T) {
 	kring, err := ReadKeyRing(readerFromHex(subkeyUsageHex))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	// The 0xA42704B92866382A key can be revoked by 0xBE3893CB843D0FE70C
 	// according to this signature that appears within the key:
@@ -125,200 +125,200 @@ func TestExternallyRevocableKey(t *testing.T) ***REMOVED***
 
 	id := uint64(0xA42704B92866382A)
 	keys := kring.KeysById(id)
-	if len(keys) != 1 ***REMOVED***
+	if len(keys) != 1 {
 		t.Errorf("Expected to find key id %X, but got %d matches", id, len(keys))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestKeyRevocation(t *testing.T) ***REMOVED***
+func TestKeyRevocation(t *testing.T) {
 	kring, err := ReadKeyRing(readerFromHex(revokedKeyHex))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	// revokedKeyHex contains these keys:
 	// pub   1024R/9A34F7C0 2014-03-25 [revoked: 2014-03-25]
 	// sub   1024R/1BA3CD60 2014-03-25 [revoked: 2014-03-25]
-	ids := []uint64***REMOVED***0xA401D9F09A34F7C0, 0x5CD3BE0A1BA3CD60***REMOVED***
+	ids := []uint64{0xA401D9F09A34F7C0, 0x5CD3BE0A1BA3CD60}
 
-	for _, id := range ids ***REMOVED***
+	for _, id := range ids {
 		keys := kring.KeysById(id)
-		if len(keys) != 1 ***REMOVED***
+		if len(keys) != 1 {
 			t.Errorf("Expected KeysById to find revoked key %X, but got %d matches", id, len(keys))
-		***REMOVED***
+		}
 		keys = kring.KeysByIdUsage(id, 0)
-		if len(keys) != 0 ***REMOVED***
+		if len(keys) != 0 {
 			t.Errorf("Expected KeysByIdUsage to filter out revoked key %X, but got %d matches", id, len(keys))
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestSubkeyRevocation(t *testing.T) ***REMOVED***
+func TestSubkeyRevocation(t *testing.T) {
 	kring, err := ReadKeyRing(readerFromHex(revokedSubkeyHex))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	// revokedSubkeyHex contains these keys:
 	// pub   1024R/4EF7E4BECCDE97F0 2014-03-25
 	// sub   1024R/D63636E2B96AE423 2014-03-25
 	// sub   1024D/DBCE4EE19529437F 2014-03-25
 	// sub   1024R/677815E371C2FD23 2014-03-25 [revoked: 2014-03-25]
-	validKeys := []uint64***REMOVED***0x4EF7E4BECCDE97F0, 0xD63636E2B96AE423, 0xDBCE4EE19529437F***REMOVED***
+	validKeys := []uint64{0x4EF7E4BECCDE97F0, 0xD63636E2B96AE423, 0xDBCE4EE19529437F}
 	revokedKey := uint64(0x677815E371C2FD23)
 
-	for _, id := range validKeys ***REMOVED***
+	for _, id := range validKeys {
 		keys := kring.KeysById(id)
-		if len(keys) != 1 ***REMOVED***
+		if len(keys) != 1 {
 			t.Errorf("Expected KeysById to find key %X, but got %d matches", id, len(keys))
-		***REMOVED***
+		}
 		keys = kring.KeysByIdUsage(id, 0)
-		if len(keys) != 1 ***REMOVED***
+		if len(keys) != 1 {
 			t.Errorf("Expected KeysByIdUsage to find key %X, but got %d matches", id, len(keys))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	keys := kring.KeysById(revokedKey)
-	if len(keys) != 1 ***REMOVED***
+	if len(keys) != 1 {
 		t.Errorf("Expected KeysById to find key %X, but got %d matches", revokedKey, len(keys))
-	***REMOVED***
+	}
 
 	keys = kring.KeysByIdUsage(revokedKey, 0)
-	if len(keys) != 0 ***REMOVED***
+	if len(keys) != 0 {
 		t.Errorf("Expected KeysByIdUsage to filter out revoked key %X, but got %d matches", revokedKey, len(keys))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestKeyUsage(t *testing.T) ***REMOVED***
+func TestKeyUsage(t *testing.T) {
 	kring, err := ReadKeyRing(readerFromHex(subkeyUsageHex))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	// subkeyUsageHex contains these keys:
 	// pub  1024R/2866382A  created: 2014-04-01  expires: never       usage: SC
 	// sub  1024R/936C9153  created: 2014-04-01  expires: never       usage: E
 	// sub  1024R/64D5F5BB  created: 2014-04-02  expires: never       usage: E
 	// sub  1024D/BC0BA992  created: 2014-04-02  expires: never       usage: S
-	certifiers := []uint64***REMOVED***0xA42704B92866382A***REMOVED***
-	signers := []uint64***REMOVED***0xA42704B92866382A, 0x42CE2C64BC0BA992***REMOVED***
-	encrypters := []uint64***REMOVED***0x09C0C7D9936C9153, 0xC104E98664D5F5BB***REMOVED***
+	certifiers := []uint64{0xA42704B92866382A}
+	signers := []uint64{0xA42704B92866382A, 0x42CE2C64BC0BA992}
+	encrypters := []uint64{0x09C0C7D9936C9153, 0xC104E98664D5F5BB}
 
-	for _, id := range certifiers ***REMOVED***
+	for _, id := range certifiers {
 		keys := kring.KeysByIdUsage(id, packet.KeyFlagCertify)
-		if len(keys) == 1 ***REMOVED***
-			if keys[0].PublicKey.KeyId != id ***REMOVED***
+		if len(keys) == 1 {
+			if keys[0].PublicKey.KeyId != id {
 				t.Errorf("Expected to find certifier key id %X, but got %X", id, keys[0].PublicKey.KeyId)
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
+			}
+		} else {
 			t.Errorf("Expected one match for certifier key id %X, but got %d matches", id, len(keys))
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	for _, id := range signers ***REMOVED***
+	for _, id := range signers {
 		keys := kring.KeysByIdUsage(id, packet.KeyFlagSign)
-		if len(keys) == 1 ***REMOVED***
-			if keys[0].PublicKey.KeyId != id ***REMOVED***
+		if len(keys) == 1 {
+			if keys[0].PublicKey.KeyId != id {
 				t.Errorf("Expected to find signing key id %X, but got %X", id, keys[0].PublicKey.KeyId)
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
+			}
+		} else {
 			t.Errorf("Expected one match for signing key id %X, but got %d matches", id, len(keys))
-		***REMOVED***
+		}
 
 		// This keyring contains no encryption keys that are also good for signing.
 		keys = kring.KeysByIdUsage(id, packet.KeyFlagEncryptStorage|packet.KeyFlagEncryptCommunications)
-		if len(keys) != 0 ***REMOVED***
+		if len(keys) != 0 {
 			t.Errorf("Unexpected match for encryption key id %X", id)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
-	for _, id := range encrypters ***REMOVED***
+	for _, id := range encrypters {
 		keys := kring.KeysByIdUsage(id, packet.KeyFlagEncryptStorage|packet.KeyFlagEncryptCommunications)
-		if len(keys) == 1 ***REMOVED***
-			if keys[0].PublicKey.KeyId != id ***REMOVED***
+		if len(keys) == 1 {
+			if keys[0].PublicKey.KeyId != id {
 				t.Errorf("Expected to find encryption key id %X, but got %X", id, keys[0].PublicKey.KeyId)
-			***REMOVED***
-		***REMOVED*** else ***REMOVED***
+			}
+		} else {
 			t.Errorf("Expected one match for encryption key id %X, but got %d matches", id, len(keys))
-		***REMOVED***
+		}
 
 		// This keyring contains no encryption keys that are also good for signing.
 		keys = kring.KeysByIdUsage(id, packet.KeyFlagSign)
-		if len(keys) != 0 ***REMOVED***
+		if len(keys) != 0 {
 			t.Errorf("Unexpected match for signing key id %X", id)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestIdVerification(t *testing.T) ***REMOVED***
+func TestIdVerification(t *testing.T) {
 	kring, err := ReadKeyRing(readerFromHex(testKeys1And2PrivateHex))
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if err := kring[1].PrivateKey.Decrypt([]byte("passphrase")); err != nil ***REMOVED***
+	}
+	if err := kring[1].PrivateKey.Decrypt([]byte("passphrase")); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	const identity = "Test Key 1 (RSA)"
-	if err := kring[0].SignIdentity(identity, kring[1], nil); err != nil ***REMOVED***
+	if err := kring[0].SignIdentity(identity, kring[1], nil); err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	ident, ok := kring[0].Identities[identity]
-	if !ok ***REMOVED***
+	if !ok {
 		t.Fatal("identity missing from key after signing")
-	***REMOVED***
+	}
 
 	checked := false
-	for _, sig := range ident.Signatures ***REMOVED***
-		if sig.IssuerKeyId == nil || *sig.IssuerKeyId != kring[1].PrimaryKey.KeyId ***REMOVED***
+	for _, sig := range ident.Signatures {
+		if sig.IssuerKeyId == nil || *sig.IssuerKeyId != kring[1].PrimaryKey.KeyId {
 			continue
-		***REMOVED***
+		}
 
-		if err := kring[1].PrimaryKey.VerifyUserIdSignature(identity, kring[0].PrimaryKey, sig); err != nil ***REMOVED***
+		if err := kring[1].PrimaryKey.VerifyUserIdSignature(identity, kring[0].PrimaryKey, sig); err != nil {
 			t.Fatalf("error verifying new identity signature: %s", err)
-		***REMOVED***
+		}
 		checked = true
 		break
-	***REMOVED***
+	}
 
-	if !checked ***REMOVED***
+	if !checked {
 		t.Fatal("didn't find identity signature in Entity")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestNewEntityWithPreferredHash(t *testing.T) ***REMOVED***
-	c := &packet.Config***REMOVED***
+func TestNewEntityWithPreferredHash(t *testing.T) {
+	c := &packet.Config{
 		DefaultHash: crypto.SHA256,
-	***REMOVED***
+	}
 	entity, err := NewEntity("Golang Gopher", "Test Key", "no-reply@golang.com", c)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	for _, identity := range entity.Identities ***REMOVED***
-		if len(identity.SelfSignature.PreferredHash) == 0 ***REMOVED***
+	for _, identity := range entity.Identities {
+		if len(identity.SelfSignature.PreferredHash) == 0 {
 			t.Fatal("didn't find a preferred hash in self signature")
-		***REMOVED***
+		}
 		ph := hashToHashId(c.DefaultHash)
-		if identity.SelfSignature.PreferredHash[0] != ph ***REMOVED***
+		if identity.SelfSignature.PreferredHash[0] != ph {
 			t.Fatalf("Expected preferred hash to be %d, got %d", ph, identity.SelfSignature.PreferredHash[0])
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestNewEntityWithoutPreferredHash(t *testing.T) ***REMOVED***
+func TestNewEntityWithoutPreferredHash(t *testing.T) {
 	entity, err := NewEntity("Golang Gopher", "Test Key", "no-reply@golang.com", nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
-	for _, identity := range entity.Identities ***REMOVED***
-		if len(identity.SelfSignature.PreferredHash) != 0 ***REMOVED***
+	for _, identity := range entity.Identities {
+		if len(identity.SelfSignature.PreferredHash) != 0 {
 			t.Fatalf("Expected preferred hash to be empty but got length %d", len(identity.SelfSignature.PreferredHash))
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 const expiringKeyHex = "988d0451d1ec5d010400ba3385721f2dc3f4ab096b2ee867ab77213f0a27a8538441c35d2fa225b08798a1439a66a5150e6bdc3f40f5d28d588c712394c632b6299f77db8c0d48d37903fb72ebd794d61be6aa774688839e5fdecfe06b2684cc115d240c98c66cb1ef22ae84e3aa0c2b0c28665c1e7d4d044e7f270706193f5223c8d44e0d70b7b8da830011010001b40f4578706972792074657374206b657988be041301020028050251d1ec5d021b03050900278d00060b090807030206150802090a0b0416020301021e01021780000a091072589ad75e237d8c033503fd10506d72837834eb7f994117740723adc39227104b0d326a1161871c0b415d25b4aedef946ca77ea4c05af9c22b32cf98be86ab890111fced1ee3f75e87b7cc3c00dc63bbc85dfab91c0dc2ad9de2c4d13a34659333a85c6acc1a669c5e1d6cecb0cf1e56c10e72d855ae177ddc9e766f9b2dda57ccbb75f57156438bbdb4e42b88d0451d1ec5d0104009c64906559866c5cb61578f5846a94fcee142a489c9b41e67b12bb54cfe86eb9bc8566460f9a720cb00d6526fbccfd4f552071a8e3f7744b1882d01036d811ee5a3fb91a1c568055758f43ba5d2c6a9676b012f3a1a89e47bbf624f1ad571b208f3cc6224eb378f1645dd3d47584463f9eadeacfd1ce6f813064fbfdcc4b5a53001101000188a504180102000f021b0c050251d1f06b050900093e89000a091072589ad75e237d8c20e00400ab8310a41461425b37889c4da28129b5fae6084fafbc0a47dd1adc74a264c6e9c9cc125f40462ee1433072a58384daef88c961c390ed06426a81b464a53194c4e291ddd7e2e2ba3efced01537d713bd111f48437bde2363446200995e8e0d4e528dda377fd1e8f8ede9c8e2198b393bd86852ce7457a7e3daf74d510461a5b77b88d0451d1ece8010400b3a519f83ab0010307e83bca895170acce8964a044190a2b368892f7a244758d9fc193482648acb1fb9780d28cc22d171931f38bb40279389fc9bf2110876d4f3db4fcfb13f22f7083877fe56592b3b65251312c36f83ffcb6d313c6a17f197dd471f0712aad15a8537b435a92471ba2e5b0c72a6c72536c3b567c558d7b6051001101000188a504180102000f021b0c050251d1f07b050900279091000a091072589ad75e237d8ce69e03fe286026afacf7c97ee20673864d4459a2240b5655219950643c7dba0ac384b1d4359c67805b21d98211f7b09c2a0ccf6410c8c04d4ff4a51293725d8d6570d9d8bb0e10c07d22357caeb49626df99c180be02d77d1fe8ed25e7a54481237646083a9f89a11566cd20b9e995b1487c5f9e02aeb434f3a1897cd416dd0a87861838da3e9e"
 const subkeyUsageHex = "988d04533a52bc010400d26af43085558f65b9e7dbc90cb9238015259aed5e954637adcfa2181548b2d0b60c65f1f42ec5081cbf1bc0a8aa4900acfb77070837c58f26012fbce297d70afe96e759ad63531f0037538e70dbf8e384569b9720d99d8eb39d8d0a2947233ed242436cb6ac7dfe74123354b3d0119b5c235d3dd9c9d6c004f8ffaf67ad8583001101000188b7041f010200210502533b8552170c8001ce094aa433f7040bb2ddf0be3893cb843d0fe70c020700000a0910a42704b92866382aa98404009d63d916a27543da4221c60087c33f1c44bec9998c5438018ed370cca4962876c748e94b73eb39c58eb698063f3fd6346d58dd2a11c0247934c4a9d71f24754f7468f96fb24c3e791dd2392b62f626148ad724189498cbf993db2df7c0cdc2d677c35da0f16cb16c9ce7c33b4de65a4a91b1d21a130ae9cc26067718910ef8e2b417556d627261203c756d627261407379642e65642e61753e88b80413010200220502533a52bc021b03060b090807030206150802090a0b0416020301021e01021780000a0910a42704b92866382a47840400c0c2bd04f5fca586de408b395b3c280a278259c93eaaa8b79a53b97003f8ed502a8a00446dd9947fb462677e4fcac0dac2f0701847d15130aadb6cd9e0705ea0cf5f92f129136c7be21a718d46c8e641eb7f044f2adae573e11ae423a0a9ca51324f03a8a2f34b91fa40c3cc764bee4dccadedb54c768ba0469b683ea53f1c29b88d04533a52bc01040099c92a5d6f8b744224da27bc2369127c35269b58bec179de6bbc038f749344222f85a31933224f26b70243c4e4b2d242f0c4777eaef7b5502f9dad6d8bf3aaeb471210674b74de2d7078af497d55f5cdad97c7bedfbc1b41e8065a97c9c3d344b21fc81d27723af8e374bc595da26ea242dccb6ae497be26eea57e563ed517e90011010001889f0418010200090502533a52bc021b0c000a0910a42704b92866382afa1403ff70284c2de8a043ff51d8d29772602fa98009b7861c540535f874f2c230af8caf5638151a636b21f8255003997ccd29747fdd06777bb24f9593bd7d98a3e887689bf902f999915fcc94625ae487e5d13e6616f89090ebc4fdc7eb5cad8943e4056995bb61c6af37f8043016876a958ec7ebf39c43d20d53b7f546cfa83e8d2604b88d04533b8283010400c0b529316dbdf58b4c54461e7e669dc11c09eb7f73819f178ccd4177b9182b91d138605fcf1e463262fabefa73f94a52b5e15d1904635541c7ea540f07050ce0fb51b73e6f88644cec86e91107c957a114f69554548a85295d2b70bd0b203992f76eb5d493d86d9eabcaa7ef3fc7db7e458438db3fcdb0ca1cc97c638439a9170011010001889f0418010200090502533b8283021b0c000a0910a42704b92866382adc6d0400cfff6258485a21675adb7a811c3e19ebca18851533f75a7ba317950b9997fda8d1a4c8c76505c08c04b6c2cc31dc704d33da36a21273f2b388a1a706f7c3378b66d887197a525936ed9a69acb57fe7f718133da85ec742001c5d1864e9c6c8ea1b94f1c3759cebfd93b18606066c063a63be86085b7e37bdbc65f9a915bf084bb901a204533b85cd110400aed3d2c52af2b38b5b67904b0ef73d6dd7aef86adb770e2b153cd22489654dcc91730892087bb9856ae2d9f7ed1eb48f214243fe86bfe87b349ebd7c30e630e49c07b21fdabf78b7a95c8b7f969e97e3d33f2e074c63552ba64a2ded7badc05ce0ea2be6d53485f6900c7860c7aa76560376ce963d7271b9b54638a4028b573f00a0d8854bfcdb04986141568046202192263b9b67350400aaa1049dbc7943141ef590a70dcb028d730371d92ea4863de715f7f0f16d168bd3dc266c2450457d46dcbbf0b071547e5fbee7700a820c3750b236335d8d5848adb3c0da010e998908dfd93d961480084f3aea20b247034f8988eccb5546efaa35a92d0451df3aaf1aee5aa36a4c4d462c760ecd9cebcabfbe1412b1f21450f203fd126687cd486496e971a87fd9e1a8a765fe654baa219a6871ab97768596ab05c26c1aeea8f1a2c72395a58dbc12ef9640d2b95784e974a4d2d5a9b17c25fedacfe551bda52602de8f6d2e48443f5dd1a2a2a8e6a5e70ecdb88cd6e766ad9745c7ee91d78cc55c3d06536b49c3fee6c3d0b6ff0fb2bf13a314f57c953b8f4d93bf88e70418010200090502533b85cd021b0200520910a42704b92866382a47200419110200060502533b85cd000a091042ce2c64bc0ba99214b2009e26b26852c8b13b10c35768e40e78fbbb48bd084100a0c79d9ea0844fa5853dd3c85ff3ecae6f2c9dd6c557aa04008bbbc964cd65b9b8299d4ebf31f41cc7264b8cf33a00e82c5af022331fac79efc9563a822497ba012953cefe2629f1242fcdcb911dbb2315985bab060bfd58261ace3c654bdbbe2e8ed27a46e836490145c86dc7bae15c011f7e1ffc33730109b9338cd9f483e7cef3d2f396aab5bd80efb6646d7e778270ee99d934d187dd98"

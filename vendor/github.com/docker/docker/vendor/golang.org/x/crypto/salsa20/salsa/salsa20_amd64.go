@@ -15,9 +15,9 @@ func salsa2020XORKeyStream(out, in *byte, n uint64, nonce, key *byte)
 // XORKeyStream crypts bytes from in to out using the given key and counters.
 // In and out may be the same slice but otherwise should not overlap. Counter
 // contains the raw salsa20 counter bytes (both nonce and block counter).
-func XORKeyStream(out, in []byte, counter *[16]byte, key *[32]byte) ***REMOVED***
-	if len(in) == 0 ***REMOVED***
+func XORKeyStream(out, in []byte, counter *[16]byte, key *[32]byte) {
+	if len(in) == 0 {
 		return
-	***REMOVED***
+	}
 	salsa2020XORKeyStream(&out[0], &in[0], uint64(len(in)), &counter[0], &key[0])
-***REMOVED***
+}

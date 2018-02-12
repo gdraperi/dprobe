@@ -12,37 +12,37 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestPluginEnableError(t *testing.T) ***REMOVED***
-	client := &Client***REMOVED***
+func TestPluginEnableError(t *testing.T) {
+	client := &Client{
 		client: newMockClient(errorMock(http.StatusInternalServerError, "Server error")),
-	***REMOVED***
+	}
 
-	err := client.PluginEnable(context.Background(), "plugin_name", types.PluginEnableOptions***REMOVED******REMOVED***)
-	if err == nil || err.Error() != "Error response from daemon: Server error" ***REMOVED***
+	err := client.PluginEnable(context.Background(), "plugin_name", types.PluginEnableOptions{})
+	if err == nil || err.Error() != "Error response from daemon: Server error" {
 		t.Fatalf("expected a Server Error, got %v", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestPluginEnable(t *testing.T) ***REMOVED***
+func TestPluginEnable(t *testing.T) {
 	expectedURL := "/plugins/plugin_name/enable"
 
-	client := &Client***REMOVED***
-		client: newMockClient(func(req *http.Request) (*http.Response, error) ***REMOVED***
-			if !strings.HasPrefix(req.URL.Path, expectedURL) ***REMOVED***
+	client := &Client{
+		client: newMockClient(func(req *http.Request) (*http.Response, error) {
+			if !strings.HasPrefix(req.URL.Path, expectedURL) {
 				return nil, fmt.Errorf("Expected URL '%s', got '%s'", expectedURL, req.URL)
-			***REMOVED***
-			if req.Method != "POST" ***REMOVED***
+			}
+			if req.Method != "POST" {
 				return nil, fmt.Errorf("expected POST method, got %s", req.Method)
-			***REMOVED***
-			return &http.Response***REMOVED***
+			}
+			return &http.Response{
 				StatusCode: http.StatusOK,
 				Body:       ioutil.NopCloser(bytes.NewReader([]byte(""))),
-			***REMOVED***, nil
-		***REMOVED***),
-	***REMOVED***
+			}, nil
+		}),
+	}
 
-	err := client.PluginEnable(context.Background(), "plugin_name", types.PluginEnableOptions***REMOVED******REMOVED***)
-	if err != nil ***REMOVED***
+	err := client.PluginEnable(context.Background(), "plugin_name", types.PluginEnableOptions{})
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-***REMOVED***
+	}
+}

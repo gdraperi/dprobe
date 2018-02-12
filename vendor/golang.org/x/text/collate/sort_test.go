@@ -12,44 +12,44 @@ import (
 	"golang.org/x/text/language"
 )
 
-func ExampleCollator_Strings() ***REMOVED***
+func ExampleCollator_Strings() {
 	c := collate.New(language.Und)
-	strings := []string***REMOVED***
+	strings := []string{
 		"ad",
 		"ab",
 		"äb",
 		"ac",
-	***REMOVED***
+	}
 	c.SortStrings(strings)
 	fmt.Println(strings)
 	// Output: [ab äb ac ad]
-***REMOVED***
+}
 
 type sorter []string
 
-func (s sorter) Len() int ***REMOVED***
+func (s sorter) Len() int {
 	return len(s)
-***REMOVED***
+}
 
-func (s sorter) Swap(i, j int) ***REMOVED***
+func (s sorter) Swap(i, j int) {
 	s[j], s[i] = s[i], s[j]
-***REMOVED***
+}
 
-func (s sorter) Bytes(i int) []byte ***REMOVED***
+func (s sorter) Bytes(i int) []byte {
 	return []byte(s[i])
-***REMOVED***
+}
 
-func TestSort(t *testing.T) ***REMOVED***
+func TestSort(t *testing.T) {
 	c := collate.New(language.English)
-	strings := []string***REMOVED***
+	strings := []string{
 		"bcd",
 		"abc",
 		"ddd",
-	***REMOVED***
+	}
 	c.Sort(sorter(strings))
 	res := fmt.Sprint(strings)
 	want := "[abc bcd ddd]"
-	if res != want ***REMOVED***
+	if res != want {
 		t.Errorf("found %s; want %s", res, want)
-	***REMOVED***
-***REMOVED***
+	}
+}

@@ -1,6 +1,6 @@
 package main
 
-func main() ***REMOVED***
+func main() {
 	var a int
 	var b bool
 	var c chan bool
@@ -10,4 +10,4 @@ func main() ***REMOVED***
 	uxor := ^b
 	arro := <-c
 	
-***REMOVED***
+}

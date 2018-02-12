@@ -14,212 +14,212 @@ import (
 )
 
 // NoopVolume is a volume that doesn't perform any operation
-type NoopVolume struct***REMOVED******REMOVED***
+type NoopVolume struct{}
 
 // Name is the name of the volume
-func (NoopVolume) Name() string ***REMOVED*** return "noop" ***REMOVED***
+func (NoopVolume) Name() string { return "noop" }
 
 // DriverName is the name of the driver
-func (NoopVolume) DriverName() string ***REMOVED*** return "noop" ***REMOVED***
+func (NoopVolume) DriverName() string { return "noop" }
 
 // Path is the filesystem path to the volume
-func (NoopVolume) Path() string ***REMOVED*** return "noop" ***REMOVED***
+func (NoopVolume) Path() string { return "noop" }
 
 // Mount mounts the volume in the container
-func (NoopVolume) Mount(_ string) (string, error) ***REMOVED*** return "noop", nil ***REMOVED***
+func (NoopVolume) Mount(_ string) (string, error) { return "noop", nil }
 
 // Unmount unmounts the volume from the container
-func (NoopVolume) Unmount(_ string) error ***REMOVED*** return nil ***REMOVED***
+func (NoopVolume) Unmount(_ string) error { return nil }
 
 // Status provides low-level details about the volume
-func (NoopVolume) Status() map[string]interface***REMOVED******REMOVED*** ***REMOVED*** return nil ***REMOVED***
+func (NoopVolume) Status() map[string]interface{} { return nil }
 
 // CreatedAt provides the time the volume (directory) was created at
-func (NoopVolume) CreatedAt() (time.Time, error) ***REMOVED*** return time.Now(), nil ***REMOVED***
+func (NoopVolume) CreatedAt() (time.Time, error) { return time.Now(), nil }
 
 // FakeVolume is a fake volume with a random name
-type FakeVolume struct ***REMOVED***
+type FakeVolume struct {
 	name       string
 	driverName string
-***REMOVED***
+}
 
 // NewFakeVolume creates a new fake volume for testing
-func NewFakeVolume(name string, driverName string) volume.Volume ***REMOVED***
-	return FakeVolume***REMOVED***name: name, driverName: driverName***REMOVED***
-***REMOVED***
+func NewFakeVolume(name string, driverName string) volume.Volume {
+	return FakeVolume{name: name, driverName: driverName}
+}
 
 // Name is the name of the volume
-func (f FakeVolume) Name() string ***REMOVED*** return f.name ***REMOVED***
+func (f FakeVolume) Name() string { return f.name }
 
 // DriverName is the name of the driver
-func (f FakeVolume) DriverName() string ***REMOVED*** return f.driverName ***REMOVED***
+func (f FakeVolume) DriverName() string { return f.driverName }
 
 // Path is the filesystem path to the volume
-func (FakeVolume) Path() string ***REMOVED*** return "fake" ***REMOVED***
+func (FakeVolume) Path() string { return "fake" }
 
 // Mount mounts the volume in the container
-func (FakeVolume) Mount(_ string) (string, error) ***REMOVED*** return "fake", nil ***REMOVED***
+func (FakeVolume) Mount(_ string) (string, error) { return "fake", nil }
 
 // Unmount unmounts the volume from the container
-func (FakeVolume) Unmount(_ string) error ***REMOVED*** return nil ***REMOVED***
+func (FakeVolume) Unmount(_ string) error { return nil }
 
 // Status provides low-level details about the volume
-func (FakeVolume) Status() map[string]interface***REMOVED******REMOVED*** ***REMOVED*** return nil ***REMOVED***
+func (FakeVolume) Status() map[string]interface{} { return nil }
 
 // CreatedAt provides the time the volume (directory) was created at
-func (FakeVolume) CreatedAt() (time.Time, error) ***REMOVED*** return time.Now(), nil ***REMOVED***
+func (FakeVolume) CreatedAt() (time.Time, error) { return time.Now(), nil }
 
 // FakeDriver is a driver that generates fake volumes
-type FakeDriver struct ***REMOVED***
+type FakeDriver struct {
 	name string
 	vols map[string]volume.Volume
-***REMOVED***
+}
 
 // NewFakeDriver creates a new FakeDriver with the specified name
-func NewFakeDriver(name string) volume.Driver ***REMOVED***
-	return &FakeDriver***REMOVED***
+func NewFakeDriver(name string) volume.Driver {
+	return &FakeDriver{
 		name: name,
 		vols: make(map[string]volume.Volume),
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Name is the name of the driver
-func (d *FakeDriver) Name() string ***REMOVED*** return d.name ***REMOVED***
+func (d *FakeDriver) Name() string { return d.name }
 
 // Create initializes a fake volume.
 // It returns an error if the options include an "error" key with a message
-func (d *FakeDriver) Create(name string, opts map[string]string) (volume.Volume, error) ***REMOVED***
-	if opts != nil && opts["error"] != "" ***REMOVED***
+func (d *FakeDriver) Create(name string, opts map[string]string) (volume.Volume, error) {
+	if opts != nil && opts["error"] != "" {
 		return nil, fmt.Errorf(opts["error"])
-	***REMOVED***
+	}
 	v := NewFakeVolume(name, d.name)
 	d.vols[name] = v
 	return v, nil
-***REMOVED***
+}
 
 // Remove deletes a volume.
-func (d *FakeDriver) Remove(v volume.Volume) error ***REMOVED***
-	if _, exists := d.vols[v.Name()]; !exists ***REMOVED***
+func (d *FakeDriver) Remove(v volume.Volume) error {
+	if _, exists := d.vols[v.Name()]; !exists {
 		return fmt.Errorf("no such volume")
-	***REMOVED***
+	}
 	delete(d.vols, v.Name())
 	return nil
-***REMOVED***
+}
 
 // List lists the volumes
-func (d *FakeDriver) List() ([]volume.Volume, error) ***REMOVED***
+func (d *FakeDriver) List() ([]volume.Volume, error) {
 	var vols []volume.Volume
-	for _, v := range d.vols ***REMOVED***
+	for _, v := range d.vols {
 		vols = append(vols, v)
-	***REMOVED***
+	}
 	return vols, nil
-***REMOVED***
+}
 
 // Get gets the volume
-func (d *FakeDriver) Get(name string) (volume.Volume, error) ***REMOVED***
-	if v, exists := d.vols[name]; exists ***REMOVED***
+func (d *FakeDriver) Get(name string) (volume.Volume, error) {
+	if v, exists := d.vols[name]; exists {
 		return v, nil
-	***REMOVED***
+	}
 	return nil, fmt.Errorf("no such volume")
-***REMOVED***
+}
 
 // Scope returns the local scope
-func (*FakeDriver) Scope() string ***REMOVED***
+func (*FakeDriver) Scope() string {
 	return "local"
-***REMOVED***
+}
 
-type fakePlugin struct ***REMOVED***
+type fakePlugin struct {
 	client *plugins.Client
 	name   string
 	refs   int
-***REMOVED***
+}
 
 // MakeFakePlugin creates a fake plugin from the passed in driver
 // Note: currently only "Create" is implemented because that's all that's needed
 // so far. If you need it to test something else, add it here, but probably you
 // shouldn't need to use this except for very specific cases with v2 plugin handling.
-func MakeFakePlugin(d volume.Driver, l net.Listener) (plugingetter.CompatPlugin, error) ***REMOVED***
+func MakeFakePlugin(d volume.Driver, l net.Listener) (plugingetter.CompatPlugin, error) {
 	c, err := plugins.NewClient(l.Addr().Network()+"://"+l.Addr().String(), nil)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/VolumeDriver.Create", func(w http.ResponseWriter, r *http.Request) ***REMOVED***
-		createReq := struct ***REMOVED***
+	mux.HandleFunc("/VolumeDriver.Create", func(w http.ResponseWriter, r *http.Request) {
+		createReq := struct {
 			Name string
 			Opts map[string]string
-		***REMOVED******REMOVED******REMOVED***
-		if err := json.NewDecoder(r.Body).Decode(&createReq); err != nil ***REMOVED***
-			fmt.Fprintf(w, `***REMOVED***"Err": "%s"***REMOVED***`, err.Error())
+		}{}
+		if err := json.NewDecoder(r.Body).Decode(&createReq); err != nil {
+			fmt.Fprintf(w, `{"Err": "%s"}`, err.Error())
 			return
-		***REMOVED***
+		}
 		_, err := d.Create(createReq.Name, createReq.Opts)
-		if err != nil ***REMOVED***
-			fmt.Fprintf(w, `***REMOVED***"Err": "%s"***REMOVED***`, err.Error())
+		if err != nil {
+			fmt.Fprintf(w, `{"Err": "%s"}`, err.Error())
 			return
-		***REMOVED***
-		w.Write([]byte("***REMOVED******REMOVED***"))
-	***REMOVED***)
+		}
+		w.Write([]byte("{}"))
+	})
 
 	go http.Serve(l, mux)
-	return &fakePlugin***REMOVED***client: c, name: d.Name()***REMOVED***, nil
-***REMOVED***
+	return &fakePlugin{client: c, name: d.Name()}, nil
+}
 
-func (p *fakePlugin) Client() *plugins.Client ***REMOVED***
+func (p *fakePlugin) Client() *plugins.Client {
 	return p.client
-***REMOVED***
+}
 
-func (p *fakePlugin) Name() string ***REMOVED***
+func (p *fakePlugin) Name() string {
 	return p.name
-***REMOVED***
+}
 
-func (p *fakePlugin) IsV1() bool ***REMOVED***
+func (p *fakePlugin) IsV1() bool {
 	return false
-***REMOVED***
+}
 
-func (p *fakePlugin) BasePath() string ***REMOVED***
+func (p *fakePlugin) BasePath() string {
 	return ""
-***REMOVED***
+}
 
-type fakePluginGetter struct ***REMOVED***
+type fakePluginGetter struct {
 	plugins map[string]plugingetter.CompatPlugin
-***REMOVED***
+}
 
 // NewFakePluginGetter returns a plugin getter for fake plugins
-func NewFakePluginGetter(pls ...plugingetter.CompatPlugin) plugingetter.PluginGetter ***REMOVED***
+func NewFakePluginGetter(pls ...plugingetter.CompatPlugin) plugingetter.PluginGetter {
 	idx := make(map[string]plugingetter.CompatPlugin, len(pls))
-	for _, p := range pls ***REMOVED***
+	for _, p := range pls {
 		idx[p.Name()] = p
-	***REMOVED***
-	return &fakePluginGetter***REMOVED***plugins: idx***REMOVED***
-***REMOVED***
+	}
+	return &fakePluginGetter{plugins: idx}
+}
 
 // This ignores the second argument since we only care about volume drivers here,
 // there shouldn't be any other kind of plugin in here
-func (g *fakePluginGetter) Get(name, _ string, mode int) (plugingetter.CompatPlugin, error) ***REMOVED***
+func (g *fakePluginGetter) Get(name, _ string, mode int) (plugingetter.CompatPlugin, error) {
 	p, ok := g.plugins[name]
-	if !ok ***REMOVED***
+	if !ok {
 		return nil, errors.New("not found")
-	***REMOVED***
+	}
 	p.(*fakePlugin).refs += mode
 	return p, nil
-***REMOVED***
+}
 
-func (g *fakePluginGetter) GetAllByCap(capability string) ([]plugingetter.CompatPlugin, error) ***REMOVED***
+func (g *fakePluginGetter) GetAllByCap(capability string) ([]plugingetter.CompatPlugin, error) {
 	panic("GetAllByCap shouldn't be called")
-***REMOVED***
+}
 
-func (g *fakePluginGetter) GetAllManagedPluginsByCap(capability string) []plugingetter.CompatPlugin ***REMOVED***
+func (g *fakePluginGetter) GetAllManagedPluginsByCap(capability string) []plugingetter.CompatPlugin {
 	panic("GetAllManagedPluginsByCap should not be called")
-***REMOVED***
+}
 
-func (g *fakePluginGetter) Handle(capability string, callback func(string, *plugins.Client)) ***REMOVED***
+func (g *fakePluginGetter) Handle(capability string, callback func(string, *plugins.Client)) {
 	panic("Handle should not be called")
-***REMOVED***
+}
 
 // FakeRefs checks ref count on a fake plugin.
-func FakeRefs(p plugingetter.CompatPlugin) int ***REMOVED***
+func FakeRefs(p plugingetter.CompatPlugin) int {
 	// this should panic if something other than a `*fakePlugin` is passed in
 	return p.(*fakePlugin).refs
-***REMOVED***
+}

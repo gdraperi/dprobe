@@ -15,31 +15,31 @@ import (
 // are not implemented.
 
 // A packetHandler represents the IPv4 datagram handler.
-type packetHandler struct ***REMOVED***
+type packetHandler struct {
 	*net.IPConn
 	*socket.Conn
 	rawOpt
-***REMOVED***
+}
 
-func (c *packetHandler) ok() bool ***REMOVED*** return c != nil && c.IPConn != nil && c.Conn != nil ***REMOVED***
+func (c *packetHandler) ok() bool { return c != nil && c.IPConn != nil && c.Conn != nil }
 
 // ReadFrom reads an IPv4 datagram from the endpoint c, copying the
 // datagram into b. It returns the received datagram as the IPv4
 // header h, the payload p and the control message cm.
-func (c *packetHandler) ReadFrom(b []byte) (h *Header, p []byte, cm *ControlMessage, err error) ***REMOVED***
-	if !c.ok() ***REMOVED***
+func (c *packetHandler) ReadFrom(b []byte) (h *Header, p []byte, cm *ControlMessage, err error) {
+	if !c.ok() {
 		return nil, nil, nil, syscall.EINVAL
-	***REMOVED***
+	}
 	return c.readFrom(b)
-***REMOVED***
+}
 
-func slicePacket(b []byte) (h, p []byte, err error) ***REMOVED***
-	if len(b) < HeaderLen ***REMOVED***
+func slicePacket(b []byte) (h, p []byte, err error) {
+	if len(b) < HeaderLen {
 		return nil, nil, errHeaderTooShort
-	***REMOVED***
+	}
 	hdrlen := int(b[0]&0x0f) << 2
 	return b[:hdrlen], b[hdrlen:], nil
-***REMOVED***
+}
 
 // WriteTo writes an IPv4 datagram through the endpoint c, copying the
 // datagram from the IPv4 header h and the payload p. The control
@@ -61,9 +61,9 @@ func slicePacket(b []byte) (h, p []byte, err error) ***REMOVED***
 //	Src           = platform sets an appropriate value if Src is nil
 //	Dst           = <must be specified>
 //	Options       = optional
-func (c *packetHandler) WriteTo(h *Header, p []byte, cm *ControlMessage) error ***REMOVED***
-	if !c.ok() ***REMOVED***
+func (c *packetHandler) WriteTo(h *Header, p []byte, cm *ControlMessage) error {
+	if !c.ok() {
 		return syscall.EINVAL
-	***REMOVED***
+	}
 	return c.writeTo(h, p, cm)
-***REMOVED***
+}

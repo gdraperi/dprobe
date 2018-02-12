@@ -8,7 +8,7 @@ package unix
 import "unsafe"
 
 // PtraceRegsMips is the registers used by mips binaries.
-type PtraceRegsMips struct ***REMOVED***
+type PtraceRegsMips struct {
 	Regs     [32]uint64
 	Lo       uint64
 	Hi       uint64
@@ -16,20 +16,20 @@ type PtraceRegsMips struct ***REMOVED***
 	Badvaddr uint64
 	Status   uint64
 	Cause    uint64
-***REMOVED***
+}
 
 // PtraceGetRegsMips fetches the registers used by mips binaries.
-func PtraceGetRegsMips(pid int, regsout *PtraceRegsMips) error ***REMOVED***
+func PtraceGetRegsMips(pid int, regsout *PtraceRegsMips) error {
 	return ptrace(PTRACE_GETREGS, pid, 0, uintptr(unsafe.Pointer(regsout)))
-***REMOVED***
+}
 
 // PtraceSetRegsMips sets the registers used by mips binaries.
-func PtraceSetRegsMips(pid int, regs *PtraceRegsMips) error ***REMOVED***
+func PtraceSetRegsMips(pid int, regs *PtraceRegsMips) error {
 	return ptrace(PTRACE_SETREGS, pid, 0, uintptr(unsafe.Pointer(regs)))
-***REMOVED***
+}
 
 // PtraceRegsMips64 is the registers used by mips64 binaries.
-type PtraceRegsMips64 struct ***REMOVED***
+type PtraceRegsMips64 struct {
 	Regs     [32]uint64
 	Lo       uint64
 	Hi       uint64
@@ -37,14 +37,14 @@ type PtraceRegsMips64 struct ***REMOVED***
 	Badvaddr uint64
 	Status   uint64
 	Cause    uint64
-***REMOVED***
+}
 
 // PtraceGetRegsMips64 fetches the registers used by mips64 binaries.
-func PtraceGetRegsMips64(pid int, regsout *PtraceRegsMips64) error ***REMOVED***
+func PtraceGetRegsMips64(pid int, regsout *PtraceRegsMips64) error {
 	return ptrace(PTRACE_GETREGS, pid, 0, uintptr(unsafe.Pointer(regsout)))
-***REMOVED***
+}
 
 // PtraceSetRegsMips64 sets the registers used by mips64 binaries.
-func PtraceSetRegsMips64(pid int, regs *PtraceRegsMips64) error ***REMOVED***
+func PtraceSetRegsMips64(pid int, regs *PtraceRegsMips64) error {
 	return ptrace(PTRACE_SETREGS, pid, 0, uintptr(unsafe.Pointer(regs)))
-***REMOVED***
+}

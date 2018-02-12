@@ -1,7 +1,7 @@
 package metadata
 
 // ClientInfo wraps immutable data from the client.Client structure.
-type ClientInfo struct ***REMOVED***
+type ClientInfo struct {
 	ServiceName   string
 	APIVersion    string
 	Endpoint      string
@@ -9,4 +9,4 @@ type ClientInfo struct ***REMOVED***
 	SigningRegion string
 	JSONVersion   string
 	TargetPrefix  string
-***REMOVED***
+}

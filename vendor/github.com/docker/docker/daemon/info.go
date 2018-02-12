@@ -25,71 +25,71 @@ import (
 )
 
 // SystemInfo returns information about the host server the daemon is running on.
-func (daemon *Daemon) SystemInfo() (*types.Info, error) ***REMOVED***
+func (daemon *Daemon) SystemInfo() (*types.Info, error) {
 	kernelVersion := "<unknown>"
-	if kv, err := kernel.GetKernelVersion(); err != nil ***REMOVED***
+	if kv, err := kernel.GetKernelVersion(); err != nil {
 		logrus.Warnf("Could not get kernel version: %v", err)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		kernelVersion = kv.String()
-	***REMOVED***
+	}
 
 	operatingSystem := "<unknown>"
-	if s, err := operatingsystem.GetOperatingSystem(); err != nil ***REMOVED***
+	if s, err := operatingsystem.GetOperatingSystem(); err != nil {
 		logrus.Warnf("Could not get operating system name: %v", err)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		operatingSystem = s
-	***REMOVED***
+	}
 
 	// Don't do containerized check on Windows
-	if runtime.GOOS != "windows" ***REMOVED***
-		if inContainer, err := operatingsystem.IsContainerized(); err != nil ***REMOVED***
+	if runtime.GOOS != "windows" {
+		if inContainer, err := operatingsystem.IsContainerized(); err != nil {
 			logrus.Errorf("Could not determine if daemon is containerized: %v", err)
 			operatingSystem += " (error determining if containerized)"
-		***REMOVED*** else if inContainer ***REMOVED***
+		} else if inContainer {
 			operatingSystem += " (containerized)"
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	meminfo, err := system.ReadMemInfo()
-	if err != nil ***REMOVED***
+	if err != nil {
 		logrus.Errorf("Could not read system memory info: %v", err)
-		meminfo = &system.MemInfo***REMOVED******REMOVED***
-	***REMOVED***
+		meminfo = &system.MemInfo{}
+	}
 
 	sysInfo := sysinfo.New(true)
 	cRunning, cPaused, cStopped := stateCtr.get()
 
-	securityOptions := []string***REMOVED******REMOVED***
-	if sysInfo.AppArmor ***REMOVED***
+	securityOptions := []string{}
+	if sysInfo.AppArmor {
 		securityOptions = append(securityOptions, "name=apparmor")
-	***REMOVED***
-	if sysInfo.Seccomp && supportsSeccomp ***REMOVED***
+	}
+	if sysInfo.Seccomp && supportsSeccomp {
 		profile := daemon.seccompProfilePath
-		if profile == "" ***REMOVED***
+		if profile == "" {
 			profile = "default"
-		***REMOVED***
+		}
 		securityOptions = append(securityOptions, fmt.Sprintf("name=seccomp,profile=%s", profile))
-	***REMOVED***
-	if selinuxEnabled() ***REMOVED***
+	}
+	if selinuxEnabled() {
 		securityOptions = append(securityOptions, "name=selinux")
-	***REMOVED***
+	}
 	rootIDs := daemon.idMappings.RootPair()
-	if rootIDs.UID != 0 || rootIDs.GID != 0 ***REMOVED***
+	if rootIDs.UID != 0 || rootIDs.GID != 0 {
 		securityOptions = append(securityOptions, "name=userns")
-	***REMOVED***
+	}
 
 	var ds [][2]string
 	drivers := ""
-	for os, gd := range daemon.graphDrivers ***REMOVED***
+	for os, gd := range daemon.graphDrivers {
 		ds = append(ds, daemon.layerStores[os].DriverStatus()...)
 		drivers += gd
-		if len(daemon.graphDrivers) > 1 ***REMOVED***
+		if len(daemon.graphDrivers) > 1 {
 			drivers += fmt.Sprintf(" (%s) ", os)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	drivers = strings.TrimSpace(drivers)
 
-	v := &types.Info***REMOVED***
+	v := &types.Info{
 		ID:                 daemon.ID,
 		Containers:         cRunning + cPaused + cStopped,
 		ContainersRunning:  cRunning,
@@ -130,37 +130,37 @@ func (daemon *Daemon) SystemInfo() (*types.Info, error) ***REMOVED***
 		LiveRestoreEnabled: daemon.configStore.LiveRestoreEnabled,
 		SecurityOptions:    securityOptions,
 		Isolation:          daemon.defaultIsolation,
-	***REMOVED***
+	}
 
 	// Retrieve platform specific info
 	daemon.FillPlatformInfo(v, sysInfo)
 
 	hostname := ""
-	if hn, err := os.Hostname(); err != nil ***REMOVED***
+	if hn, err := os.Hostname(); err != nil {
 		logrus.Warnf("Could not get hostname: %v", err)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		hostname = hn
-	***REMOVED***
+	}
 	v.Name = hostname
 
 	return v, nil
-***REMOVED***
+}
 
 // SystemVersion returns version information about the daemon.
-func (daemon *Daemon) SystemVersion() types.Version ***REMOVED***
+func (daemon *Daemon) SystemVersion() types.Version {
 	kernelVersion := "<unknown>"
-	if kv, err := kernel.GetKernelVersion(); err != nil ***REMOVED***
+	if kv, err := kernel.GetKernelVersion(); err != nil {
 		logrus.Warnf("Could not get kernel version: %v", err)
-	***REMOVED*** else ***REMOVED***
+	} else {
 		kernelVersion = kv.String()
-	***REMOVED***
+	}
 
-	v := types.Version***REMOVED***
-		Components: []types.ComponentVersion***REMOVED***
-			***REMOVED***
+	v := types.Version{
+		Components: []types.ComponentVersion{
+			{
 				Name:    "Engine",
 				Version: dockerversion.Version,
-				Details: map[string]string***REMOVED***
+				Details: map[string]string{
 					"GitCommit":     dockerversion.GitCommit,
 					"ApiVersion":    api.DefaultVersion,
 					"MinAPIVersion": api.MinVersion,
@@ -170,9 +170,9 @@ func (daemon *Daemon) SystemVersion() types.Version ***REMOVED***
 					"BuildTime":     dockerversion.BuildTime,
 					"KernelVersion": kernelVersion,
 					"Experimental":  fmt.Sprintf("%t", daemon.configStore.Experimental),
-				***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
+				},
+			},
+		},
 
 		// Populate deprecated fields for older clients
 		Version:       dockerversion.Version,
@@ -185,14 +185,14 @@ func (daemon *Daemon) SystemVersion() types.Version ***REMOVED***
 		BuildTime:     dockerversion.BuildTime,
 		KernelVersion: kernelVersion,
 		Experimental:  daemon.configStore.Experimental,
-	***REMOVED***
+	}
 
 	v.Platform.Name = dockerversion.PlatformName
 
 	return v
-***REMOVED***
+}
 
-func (daemon *Daemon) showPluginsInfo() types.PluginsInfo ***REMOVED***
+func (daemon *Daemon) showPluginsInfo() types.PluginsInfo {
 	var pluginsInfo types.PluginsInfo
 
 	pluginsInfo.Volume = volumedrivers.GetDriverList()
@@ -203,4 +203,4 @@ func (daemon *Daemon) showPluginsInfo() types.PluginsInfo ***REMOVED***
 	pluginsInfo.Log = logger.ListDrivers()
 
 	return pluginsInfo
-***REMOVED***
+}

@@ -7,18 +7,18 @@ import (
 	"strings"
 )
 
-func getURIPath(u *url.URL) string ***REMOVED***
+func getURIPath(u *url.URL) string {
 	var uri string
 
-	if len(u.Opaque) > 0 ***REMOVED***
+	if len(u.Opaque) > 0 {
 		uri = "/" + strings.Join(strings.Split(u.Opaque, "/")[3:], "/")
-	***REMOVED*** else ***REMOVED***
+	} else {
 		uri = u.EscapedPath()
-	***REMOVED***
+	}
 
-	if len(uri) == 0 ***REMOVED***
+	if len(uri) == 0 {
 		uri = "/"
-	***REMOVED***
+	}
 
 	return uri
-***REMOVED***
+}

@@ -12,33 +12,33 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestDaemonConfigurationMerge(t *testing.T) ***REMOVED***
+func TestDaemonConfigurationMerge(t *testing.T) {
 	f, err := ioutil.TempFile("", "docker-config-")
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 
 	configFile := f.Name()
 
 	f.Write([]byte(`
-		***REMOVED***
+		{
 			"debug": true,
-			"log-opts": ***REMOVED***
+			"log-opts": {
 				"tag": "test_tag"
-			***REMOVED***
-		***REMOVED***`))
+			}
+		}`))
 
 	f.Close()
 
-	c := &Config***REMOVED***
-		CommonConfig: CommonConfig***REMOVED***
+	c := &Config{
+		CommonConfig: CommonConfig{
 			AutoRestart: true,
-			LogConfig: LogConfig***REMOVED***
+			LogConfig: LogConfig{
 				Type:   "syslog",
-				Config: map[string]string***REMOVED***"tag": "test"***REMOVED***,
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+				Config: map[string]string{"tag": "test"},
+			},
+		},
+	}
 
 	flags := pflag.NewFlagSet("test", pflag.ContinueOnError)
 	var debug bool
@@ -51,10 +51,10 @@ func TestDaemonConfigurationMerge(t *testing.T) ***REMOVED***
 	assert.True(t, cc.Debug)
 	assert.True(t, cc.AutoRestart)
 
-	expectedLogConfig := LogConfig***REMOVED***
+	expectedLogConfig := LogConfig{
 		Type:   "syslog",
-		Config: map[string]string***REMOVED***"tag": "test_tag"***REMOVED***,
-	***REMOVED***
+		Config: map[string]string{"tag": "test_tag"},
+	}
 
 	assert.Equal(t, expectedLogConfig, cc.LogConfig)
-***REMOVED***
+}

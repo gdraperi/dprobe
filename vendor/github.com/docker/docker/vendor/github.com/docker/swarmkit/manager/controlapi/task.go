@@ -13,72 +13,72 @@ import (
 // GetTask returns a Task given a TaskID.
 // - Returns `InvalidArgument` if TaskID is not provided.
 // - Returns `NotFound` if the Task is not found.
-func (s *Server) GetTask(ctx context.Context, request *api.GetTaskRequest) (*api.GetTaskResponse, error) ***REMOVED***
-	if request.TaskID == "" ***REMOVED***
+func (s *Server) GetTask(ctx context.Context, request *api.GetTaskRequest) (*api.GetTaskResponse, error) {
+	if request.TaskID == "" {
 		return nil, status.Errorf(codes.InvalidArgument, errInvalidArgument.Error())
-	***REMOVED***
+	}
 
 	var task *api.Task
-	s.store.View(func(tx store.ReadTx) ***REMOVED***
+	s.store.View(func(tx store.ReadTx) {
 		task = store.GetTask(tx, request.TaskID)
-	***REMOVED***)
-	if task == nil ***REMOVED***
+	})
+	if task == nil {
 		return nil, status.Errorf(codes.NotFound, "task %s not found", request.TaskID)
-	***REMOVED***
-	return &api.GetTaskResponse***REMOVED***
+	}
+	return &api.GetTaskResponse{
 		Task: task,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}
 
 // RemoveTask removes a Task referenced by TaskID.
 // - Returns `InvalidArgument` if TaskID is not provided.
 // - Returns `NotFound` if the Task is not found.
 // - Returns an error if the deletion fails.
-func (s *Server) RemoveTask(ctx context.Context, request *api.RemoveTaskRequest) (*api.RemoveTaskResponse, error) ***REMOVED***
-	if request.TaskID == "" ***REMOVED***
+func (s *Server) RemoveTask(ctx context.Context, request *api.RemoveTaskRequest) (*api.RemoveTaskResponse, error) {
+	if request.TaskID == "" {
 		return nil, status.Errorf(codes.InvalidArgument, errInvalidArgument.Error())
-	***REMOVED***
+	}
 
-	err := s.store.Update(func(tx store.Tx) error ***REMOVED***
+	err := s.store.Update(func(tx store.Tx) error {
 		return store.DeleteTask(tx, request.TaskID)
-	***REMOVED***)
-	if err != nil ***REMOVED***
-		if err == store.ErrNotExist ***REMOVED***
+	})
+	if err != nil {
+		if err == store.ErrNotExist {
 			return nil, status.Errorf(codes.NotFound, "task %s not found", request.TaskID)
-		***REMOVED***
+		}
 		return nil, err
-	***REMOVED***
-	return &api.RemoveTaskResponse***REMOVED******REMOVED***, nil
-***REMOVED***
+	}
+	return &api.RemoveTaskResponse{}, nil
+}
 
-func filterTasks(candidates []*api.Task, filters ...func(*api.Task) bool) []*api.Task ***REMOVED***
-	result := []*api.Task***REMOVED******REMOVED***
+func filterTasks(candidates []*api.Task, filters ...func(*api.Task) bool) []*api.Task {
+	result := []*api.Task{}
 
-	for _, c := range candidates ***REMOVED***
+	for _, c := range candidates {
 		match := true
-		for _, f := range filters ***REMOVED***
-			if !f(c) ***REMOVED***
+		for _, f := range filters {
+			if !f(c) {
 				match = false
 				break
-			***REMOVED***
-		***REMOVED***
-		if match ***REMOVED***
+			}
+		}
+		if match {
 			result = append(result, c)
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 
 	return result
-***REMOVED***
+}
 
 // ListTasks returns a list of all tasks.
-func (s *Server) ListTasks(ctx context.Context, request *api.ListTasksRequest) (*api.ListTasksResponse, error) ***REMOVED***
+func (s *Server) ListTasks(ctx context.Context, request *api.ListTasksRequest) (*api.ListTasksResponse, error) {
 	var (
 		tasks []*api.Task
 		err   error
 	)
 
-	s.store.View(func(tx store.ReadTx) ***REMOVED***
-		switch ***REMOVED***
+	s.store.View(func(tx store.ReadTx) {
+		switch {
 		case request.Filters != nil && len(request.Filters.Names) > 0:
 			tasks, err = store.FindTasks(tx, buildFilters(store.ByName, request.Filters.Names))
 		case request.Filters != nil && len(request.Filters.NamePrefixes) > 0:
@@ -93,78 +93,78 @@ func (s *Server) ListTasks(ctx context.Context, request *api.ListTasksRequest) (
 			tasks, err = store.FindTasks(tx, buildFilters(store.ByNodeID, request.Filters.NodeIDs))
 		case request.Filters != nil && len(request.Filters.DesiredStates) > 0:
 			filters := make([]store.By, 0, len(request.Filters.DesiredStates))
-			for _, v := range request.Filters.DesiredStates ***REMOVED***
+			for _, v := range request.Filters.DesiredStates {
 				filters = append(filters, store.ByDesiredState(v))
-			***REMOVED***
+			}
 			tasks, err = store.FindTasks(tx, store.Or(filters...))
 		default:
 			tasks, err = store.FindTasks(tx, store.All)
-		***REMOVED***
+		}
 
-		if err != nil || request.Filters == nil ***REMOVED***
+		if err != nil || request.Filters == nil {
 			return
-		***REMOVED***
+		}
 
 		tasks = filterTasks(tasks,
-			func(e *api.Task) bool ***REMOVED***
+			func(e *api.Task) bool {
 				return filterContains(naming.Task(e), request.Filters.Names)
-			***REMOVED***,
-			func(e *api.Task) bool ***REMOVED***
+			},
+			func(e *api.Task) bool {
 				return filterContainsPrefix(naming.Task(e), request.Filters.NamePrefixes)
-			***REMOVED***,
-			func(e *api.Task) bool ***REMOVED***
+			},
+			func(e *api.Task) bool {
 				return filterContainsPrefix(e.ID, request.Filters.IDPrefixes)
-			***REMOVED***,
-			func(e *api.Task) bool ***REMOVED***
+			},
+			func(e *api.Task) bool {
 				return filterMatchLabels(e.ServiceAnnotations.Labels, request.Filters.Labels)
-			***REMOVED***,
-			func(e *api.Task) bool ***REMOVED***
+			},
+			func(e *api.Task) bool {
 				return filterContains(e.ServiceID, request.Filters.ServiceIDs)
-			***REMOVED***,
-			func(e *api.Task) bool ***REMOVED***
+			},
+			func(e *api.Task) bool {
 				return filterContains(e.NodeID, request.Filters.NodeIDs)
-			***REMOVED***,
-			func(e *api.Task) bool ***REMOVED***
-				if len(request.Filters.Runtimes) == 0 ***REMOVED***
+			},
+			func(e *api.Task) bool {
+				if len(request.Filters.Runtimes) == 0 {
 					return true
-				***REMOVED***
+				}
 				r, err := naming.Runtime(e.Spec)
-				if err != nil ***REMOVED***
+				if err != nil {
 					return false
-				***REMOVED***
+				}
 				return filterContains(r, request.Filters.Runtimes)
-			***REMOVED***,
-			func(e *api.Task) bool ***REMOVED***
-				if len(request.Filters.DesiredStates) == 0 ***REMOVED***
+			},
+			func(e *api.Task) bool {
+				if len(request.Filters.DesiredStates) == 0 {
 					return true
-				***REMOVED***
-				for _, c := range request.Filters.DesiredStates ***REMOVED***
-					if c == e.DesiredState ***REMOVED***
+				}
+				for _, c := range request.Filters.DesiredStates {
+					if c == e.DesiredState {
 						return true
-					***REMOVED***
-				***REMOVED***
+					}
+				}
 				return false
-			***REMOVED***,
-			func(e *api.Task) bool ***REMOVED***
-				if !request.Filters.UpToDate ***REMOVED***
+			},
+			func(e *api.Task) bool {
+				if !request.Filters.UpToDate {
 					return true
-				***REMOVED***
+				}
 
 				service := store.GetService(tx, e.ServiceID)
-				if service == nil ***REMOVED***
+				if service == nil {
 					return false
-				***REMOVED***
+				}
 
 				return !orchestrator.IsTaskDirty(service, e)
-			***REMOVED***,
+			},
 		)
-	***REMOVED***)
+	})
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
-	return &api.ListTasksResponse***REMOVED***
+	return &api.ListTasksResponse{
 		Tasks: tasks,
-	***REMOVED***, nil
-***REMOVED***
+	}, nil
+}

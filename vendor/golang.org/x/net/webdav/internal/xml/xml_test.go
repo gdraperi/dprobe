@@ -31,96 +31,96 @@ const testInput = `
   </tag:name>
 </body><!-- missing final newline -->`
 
-var testEntity = map[string]string***REMOVED***"何": "What", "is-it": "is it?"***REMOVED***
+var testEntity = map[string]string{"何": "What", "is-it": "is it?"}
 
-var rawTokens = []Token***REMOVED***
+var rawTokens = []Token{
 	CharData("\n"),
-	ProcInst***REMOVED***"xml", []byte(`version="1.0" encoding="UTF-8"`)***REMOVED***,
+	ProcInst{"xml", []byte(`version="1.0" encoding="UTF-8"`)},
 	CharData("\n"),
 	Directive(`DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"`),
 	CharData("\n"),
-	StartElement***REMOVED***Name***REMOVED***"", "body"***REMOVED***, []Attr***REMOVED******REMOVED***Name***REMOVED***"xmlns", "foo"***REMOVED***, "ns1"***REMOVED***, ***REMOVED***Name***REMOVED***"", "xmlns"***REMOVED***, "ns2"***REMOVED***, ***REMOVED***Name***REMOVED***"xmlns", "tag"***REMOVED***, "ns3"***REMOVED******REMOVED******REMOVED***,
+	StartElement{Name{"", "body"}, []Attr{{Name{"xmlns", "foo"}, "ns1"}, {Name{"", "xmlns"}, "ns2"}, {Name{"xmlns", "tag"}, "ns3"}}},
 	CharData("\n  "),
-	StartElement***REMOVED***Name***REMOVED***"", "hello"***REMOVED***, []Attr***REMOVED******REMOVED***Name***REMOVED***"", "lang"***REMOVED***, "en"***REMOVED******REMOVED******REMOVED***,
+	StartElement{Name{"", "hello"}, []Attr{{Name{"", "lang"}, "en"}}},
 	CharData("World <>'\" 白鵬翔"),
-	EndElement***REMOVED***Name***REMOVED***"", "hello"***REMOVED******REMOVED***,
+	EndElement{Name{"", "hello"}},
 	CharData("\n  "),
-	StartElement***REMOVED***Name***REMOVED***"", "query"***REMOVED***, []Attr***REMOVED******REMOVED******REMOVED***,
+	StartElement{Name{"", "query"}, []Attr{}},
 	CharData("What is it?"),
-	EndElement***REMOVED***Name***REMOVED***"", "query"***REMOVED******REMOVED***,
+	EndElement{Name{"", "query"}},
 	CharData("\n  "),
-	StartElement***REMOVED***Name***REMOVED***"", "goodbye"***REMOVED***, []Attr***REMOVED******REMOVED******REMOVED***,
-	EndElement***REMOVED***Name***REMOVED***"", "goodbye"***REMOVED******REMOVED***,
+	StartElement{Name{"", "goodbye"}, []Attr{}},
+	EndElement{Name{"", "goodbye"}},
 	CharData("\n  "),
-	StartElement***REMOVED***Name***REMOVED***"", "outer"***REMOVED***, []Attr***REMOVED******REMOVED***Name***REMOVED***"foo", "attr"***REMOVED***, "value"***REMOVED***, ***REMOVED***Name***REMOVED***"xmlns", "tag"***REMOVED***, "ns4"***REMOVED******REMOVED******REMOVED***,
+	StartElement{Name{"", "outer"}, []Attr{{Name{"foo", "attr"}, "value"}, {Name{"xmlns", "tag"}, "ns4"}}},
 	CharData("\n    "),
-	StartElement***REMOVED***Name***REMOVED***"", "inner"***REMOVED***, []Attr***REMOVED******REMOVED******REMOVED***,
-	EndElement***REMOVED***Name***REMOVED***"", "inner"***REMOVED******REMOVED***,
+	StartElement{Name{"", "inner"}, []Attr{}},
+	EndElement{Name{"", "inner"}},
 	CharData("\n  "),
-	EndElement***REMOVED***Name***REMOVED***"", "outer"***REMOVED******REMOVED***,
+	EndElement{Name{"", "outer"}},
 	CharData("\n  "),
-	StartElement***REMOVED***Name***REMOVED***"tag", "name"***REMOVED***, []Attr***REMOVED******REMOVED******REMOVED***,
+	StartElement{Name{"tag", "name"}, []Attr{}},
 	CharData("\n    "),
 	CharData("Some text here."),
 	CharData("\n  "),
-	EndElement***REMOVED***Name***REMOVED***"tag", "name"***REMOVED******REMOVED***,
+	EndElement{Name{"tag", "name"}},
 	CharData("\n"),
-	EndElement***REMOVED***Name***REMOVED***"", "body"***REMOVED******REMOVED***,
+	EndElement{Name{"", "body"}},
 	Comment(" missing final newline "),
-***REMOVED***
+}
 
-var cookedTokens = []Token***REMOVED***
+var cookedTokens = []Token{
 	CharData("\n"),
-	ProcInst***REMOVED***"xml", []byte(`version="1.0" encoding="UTF-8"`)***REMOVED***,
+	ProcInst{"xml", []byte(`version="1.0" encoding="UTF-8"`)},
 	CharData("\n"),
 	Directive(`DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"`),
 	CharData("\n"),
-	StartElement***REMOVED***Name***REMOVED***"ns2", "body"***REMOVED***, []Attr***REMOVED******REMOVED***Name***REMOVED***"xmlns", "foo"***REMOVED***, "ns1"***REMOVED***, ***REMOVED***Name***REMOVED***"", "xmlns"***REMOVED***, "ns2"***REMOVED***, ***REMOVED***Name***REMOVED***"xmlns", "tag"***REMOVED***, "ns3"***REMOVED******REMOVED******REMOVED***,
+	StartElement{Name{"ns2", "body"}, []Attr{{Name{"xmlns", "foo"}, "ns1"}, {Name{"", "xmlns"}, "ns2"}, {Name{"xmlns", "tag"}, "ns3"}}},
 	CharData("\n  "),
-	StartElement***REMOVED***Name***REMOVED***"ns2", "hello"***REMOVED***, []Attr***REMOVED******REMOVED***Name***REMOVED***"", "lang"***REMOVED***, "en"***REMOVED******REMOVED******REMOVED***,
+	StartElement{Name{"ns2", "hello"}, []Attr{{Name{"", "lang"}, "en"}}},
 	CharData("World <>'\" 白鵬翔"),
-	EndElement***REMOVED***Name***REMOVED***"ns2", "hello"***REMOVED******REMOVED***,
+	EndElement{Name{"ns2", "hello"}},
 	CharData("\n  "),
-	StartElement***REMOVED***Name***REMOVED***"ns2", "query"***REMOVED***, []Attr***REMOVED******REMOVED******REMOVED***,
+	StartElement{Name{"ns2", "query"}, []Attr{}},
 	CharData("What is it?"),
-	EndElement***REMOVED***Name***REMOVED***"ns2", "query"***REMOVED******REMOVED***,
+	EndElement{Name{"ns2", "query"}},
 	CharData("\n  "),
-	StartElement***REMOVED***Name***REMOVED***"ns2", "goodbye"***REMOVED***, []Attr***REMOVED******REMOVED******REMOVED***,
-	EndElement***REMOVED***Name***REMOVED***"ns2", "goodbye"***REMOVED******REMOVED***,
+	StartElement{Name{"ns2", "goodbye"}, []Attr{}},
+	EndElement{Name{"ns2", "goodbye"}},
 	CharData("\n  "),
-	StartElement***REMOVED***Name***REMOVED***"ns2", "outer"***REMOVED***, []Attr***REMOVED******REMOVED***Name***REMOVED***"ns1", "attr"***REMOVED***, "value"***REMOVED***, ***REMOVED***Name***REMOVED***"xmlns", "tag"***REMOVED***, "ns4"***REMOVED******REMOVED******REMOVED***,
+	StartElement{Name{"ns2", "outer"}, []Attr{{Name{"ns1", "attr"}, "value"}, {Name{"xmlns", "tag"}, "ns4"}}},
 	CharData("\n    "),
-	StartElement***REMOVED***Name***REMOVED***"ns2", "inner"***REMOVED***, []Attr***REMOVED******REMOVED******REMOVED***,
-	EndElement***REMOVED***Name***REMOVED***"ns2", "inner"***REMOVED******REMOVED***,
+	StartElement{Name{"ns2", "inner"}, []Attr{}},
+	EndElement{Name{"ns2", "inner"}},
 	CharData("\n  "),
-	EndElement***REMOVED***Name***REMOVED***"ns2", "outer"***REMOVED******REMOVED***,
+	EndElement{Name{"ns2", "outer"}},
 	CharData("\n  "),
-	StartElement***REMOVED***Name***REMOVED***"ns3", "name"***REMOVED***, []Attr***REMOVED******REMOVED******REMOVED***,
+	StartElement{Name{"ns3", "name"}, []Attr{}},
 	CharData("\n    "),
 	CharData("Some text here."),
 	CharData("\n  "),
-	EndElement***REMOVED***Name***REMOVED***"ns3", "name"***REMOVED******REMOVED***,
+	EndElement{Name{"ns3", "name"}},
 	CharData("\n"),
-	EndElement***REMOVED***Name***REMOVED***"ns2", "body"***REMOVED******REMOVED***,
+	EndElement{Name{"ns2", "body"}},
 	Comment(" missing final newline "),
-***REMOVED***
+}
 
 const testInputAltEncoding = `
 <?xml version="1.0" encoding="x-testing-uppercase"?>
 <TAG>VALUE</TAG>`
 
-var rawTokensAltEncoding = []Token***REMOVED***
+var rawTokensAltEncoding = []Token{
 	CharData("\n"),
-	ProcInst***REMOVED***"xml", []byte(`version="1.0" encoding="x-testing-uppercase"`)***REMOVED***,
+	ProcInst{"xml", []byte(`version="1.0" encoding="x-testing-uppercase"`)},
 	CharData("\n"),
-	StartElement***REMOVED***Name***REMOVED***"", "tag"***REMOVED***, []Attr***REMOVED******REMOVED******REMOVED***,
+	StartElement{Name{"", "tag"}, []Attr{}},
 	CharData("value"),
-	EndElement***REMOVED***Name***REMOVED***"", "tag"***REMOVED******REMOVED***,
-***REMOVED***
+	EndElement{Name{"", "tag"}},
+}
 
-var xmlInput = []string***REMOVED***
+var xmlInput = []string{
 	// unexpected EOF cases
 	"<",
 	"<t",
@@ -165,13 +165,13 @@ var xmlInput = []string***REMOVED***
 	"<t></>",
 	"<t></t!",
 	"<t>cdata]]></t>",
-***REMOVED***
+}
 
-func TestRawToken(t *testing.T) ***REMOVED***
+func TestRawToken(t *testing.T) {
 	d := NewDecoder(strings.NewReader(testInput))
 	d.Entity = testEntity
 	testRawToken(t, d, testInput, rawTokens)
-***REMOVED***
+}
 
 const nonStrictInput = `
 <tag>non&entity</tag>
@@ -184,147 +184,147 @@ const nonStrictInput = `
 <tag>&0a;</tag>
 `
 
-var nonStringEntity = map[string]string***REMOVED***"": "oops!", "0a": "oops!"***REMOVED***
+var nonStringEntity = map[string]string{"": "oops!", "0a": "oops!"}
 
-var nonStrictTokens = []Token***REMOVED***
+var nonStrictTokens = []Token{
 	CharData("\n"),
-	StartElement***REMOVED***Name***REMOVED***"", "tag"***REMOVED***, []Attr***REMOVED******REMOVED******REMOVED***,
+	StartElement{Name{"", "tag"}, []Attr{}},
 	CharData("non&entity"),
-	EndElement***REMOVED***Name***REMOVED***"", "tag"***REMOVED******REMOVED***,
+	EndElement{Name{"", "tag"}},
 	CharData("\n"),
-	StartElement***REMOVED***Name***REMOVED***"", "tag"***REMOVED***, []Attr***REMOVED******REMOVED******REMOVED***,
+	StartElement{Name{"", "tag"}, []Attr{}},
 	CharData("&unknown;entity"),
-	EndElement***REMOVED***Name***REMOVED***"", "tag"***REMOVED******REMOVED***,
+	EndElement{Name{"", "tag"}},
 	CharData("\n"),
-	StartElement***REMOVED***Name***REMOVED***"", "tag"***REMOVED***, []Attr***REMOVED******REMOVED******REMOVED***,
+	StartElement{Name{"", "tag"}, []Attr{}},
 	CharData("&#123"),
-	EndElement***REMOVED***Name***REMOVED***"", "tag"***REMOVED******REMOVED***,
+	EndElement{Name{"", "tag"}},
 	CharData("\n"),
-	StartElement***REMOVED***Name***REMOVED***"", "tag"***REMOVED***, []Attr***REMOVED******REMOVED******REMOVED***,
+	StartElement{Name{"", "tag"}, []Attr{}},
 	CharData("&#zzz;"),
-	EndElement***REMOVED***Name***REMOVED***"", "tag"***REMOVED******REMOVED***,
+	EndElement{Name{"", "tag"}},
 	CharData("\n"),
-	StartElement***REMOVED***Name***REMOVED***"", "tag"***REMOVED***, []Attr***REMOVED******REMOVED******REMOVED***,
+	StartElement{Name{"", "tag"}, []Attr{}},
 	CharData("&なまえ3;"),
-	EndElement***REMOVED***Name***REMOVED***"", "tag"***REMOVED******REMOVED***,
+	EndElement{Name{"", "tag"}},
 	CharData("\n"),
-	StartElement***REMOVED***Name***REMOVED***"", "tag"***REMOVED***, []Attr***REMOVED******REMOVED******REMOVED***,
+	StartElement{Name{"", "tag"}, []Attr{}},
 	CharData("&lt-gt;"),
-	EndElement***REMOVED***Name***REMOVED***"", "tag"***REMOVED******REMOVED***,
+	EndElement{Name{"", "tag"}},
 	CharData("\n"),
-	StartElement***REMOVED***Name***REMOVED***"", "tag"***REMOVED***, []Attr***REMOVED******REMOVED******REMOVED***,
+	StartElement{Name{"", "tag"}, []Attr{}},
 	CharData("&;"),
-	EndElement***REMOVED***Name***REMOVED***"", "tag"***REMOVED******REMOVED***,
+	EndElement{Name{"", "tag"}},
 	CharData("\n"),
-	StartElement***REMOVED***Name***REMOVED***"", "tag"***REMOVED***, []Attr***REMOVED******REMOVED******REMOVED***,
+	StartElement{Name{"", "tag"}, []Attr{}},
 	CharData("&0a;"),
-	EndElement***REMOVED***Name***REMOVED***"", "tag"***REMOVED******REMOVED***,
+	EndElement{Name{"", "tag"}},
 	CharData("\n"),
-***REMOVED***
+}
 
-func TestNonStrictRawToken(t *testing.T) ***REMOVED***
+func TestNonStrictRawToken(t *testing.T) {
 	d := NewDecoder(strings.NewReader(nonStrictInput))
 	d.Strict = false
 	testRawToken(t, d, nonStrictInput, nonStrictTokens)
-***REMOVED***
+}
 
-type downCaser struct ***REMOVED***
+type downCaser struct {
 	t *testing.T
 	r io.ByteReader
-***REMOVED***
+}
 
-func (d *downCaser) ReadByte() (c byte, err error) ***REMOVED***
+func (d *downCaser) ReadByte() (c byte, err error) {
 	c, err = d.r.ReadByte()
-	if c >= 'A' && c <= 'Z' ***REMOVED***
+	if c >= 'A' && c <= 'Z' {
 		c += 'a' - 'A'
-	***REMOVED***
+	}
 	return
-***REMOVED***
+}
 
-func (d *downCaser) Read(p []byte) (int, error) ***REMOVED***
+func (d *downCaser) Read(p []byte) (int, error) {
 	d.t.Fatalf("unexpected Read call on downCaser reader")
 	panic("unreachable")
-***REMOVED***
+}
 
-func TestRawTokenAltEncoding(t *testing.T) ***REMOVED***
+func TestRawTokenAltEncoding(t *testing.T) {
 	d := NewDecoder(strings.NewReader(testInputAltEncoding))
-	d.CharsetReader = func(charset string, input io.Reader) (io.Reader, error) ***REMOVED***
-		if charset != "x-testing-uppercase" ***REMOVED***
+	d.CharsetReader = func(charset string, input io.Reader) (io.Reader, error) {
+		if charset != "x-testing-uppercase" {
 			t.Fatalf("unexpected charset %q", charset)
-		***REMOVED***
-		return &downCaser***REMOVED***t, input.(io.ByteReader)***REMOVED***, nil
-	***REMOVED***
+		}
+		return &downCaser{t, input.(io.ByteReader)}, nil
+	}
 	testRawToken(t, d, testInputAltEncoding, rawTokensAltEncoding)
-***REMOVED***
+}
 
-func TestRawTokenAltEncodingNoConverter(t *testing.T) ***REMOVED***
+func TestRawTokenAltEncodingNoConverter(t *testing.T) {
 	d := NewDecoder(strings.NewReader(testInputAltEncoding))
 	token, err := d.RawToken()
-	if token == nil ***REMOVED***
+	if token == nil {
 		t.Fatalf("expected a token on first RawToken call")
-	***REMOVED***
-	if err != nil ***REMOVED***
+	}
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
+	}
 	token, err = d.RawToken()
-	if token != nil ***REMOVED***
+	if token != nil {
 		t.Errorf("expected a nil token; got %#v", token)
-	***REMOVED***
-	if err == nil ***REMOVED***
+	}
+	if err == nil {
 		t.Fatalf("expected an error on second RawToken call")
-	***REMOVED***
+	}
 	const encoding = "x-testing-uppercase"
-	if !strings.Contains(err.Error(), encoding) ***REMOVED***
+	if !strings.Contains(err.Error(), encoding) {
 		t.Errorf("expected error to contain %q; got error: %v",
 			encoding, err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func testRawToken(t *testing.T, d *Decoder, raw string, rawTokens []Token) ***REMOVED***
+func testRawToken(t *testing.T, d *Decoder, raw string, rawTokens []Token) {
 	lastEnd := int64(0)
-	for i, want := range rawTokens ***REMOVED***
+	for i, want := range rawTokens {
 		start := d.InputOffset()
 		have, err := d.RawToken()
 		end := d.InputOffset()
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("token %d: unexpected error: %s", i, err)
-		***REMOVED***
-		if !reflect.DeepEqual(have, want) ***REMOVED***
+		}
+		if !reflect.DeepEqual(have, want) {
 			var shave, swant string
-			if _, ok := have.(CharData); ok ***REMOVED***
+			if _, ok := have.(CharData); ok {
 				shave = fmt.Sprintf("CharData(%q)", have)
-			***REMOVED*** else ***REMOVED***
+			} else {
 				shave = fmt.Sprintf("%#v", have)
-			***REMOVED***
-			if _, ok := want.(CharData); ok ***REMOVED***
+			}
+			if _, ok := want.(CharData); ok {
 				swant = fmt.Sprintf("CharData(%q)", want)
-			***REMOVED*** else ***REMOVED***
+			} else {
 				swant = fmt.Sprintf("%#v", want)
-			***REMOVED***
+			}
 			t.Errorf("token %d = %s, want %s", i, shave, swant)
-		***REMOVED***
+		}
 
 		// Check that InputOffset returned actual token.
-		switch ***REMOVED***
+		switch {
 		case start < lastEnd:
 			t.Errorf("token %d: position [%d,%d) for %T is before previous token", i, start, end, have)
 		case start >= end:
 			// Special case: EndElement can be synthesized.
-			if start == end && end == lastEnd ***REMOVED***
+			if start == end && end == lastEnd {
 				break
-			***REMOVED***
+			}
 			t.Errorf("token %d: position [%d,%d) for %T is empty", i, start, end, have)
 		case end > int64(len(raw)):
 			t.Errorf("token %d: position [%d,%d) for %T extends beyond input", i, start, end, have)
 		default:
 			text := raw[start:end]
-			if strings.ContainsAny(text, "<>") && (!strings.HasPrefix(text, "<") || !strings.HasSuffix(text, ">")) ***REMOVED***
+			if strings.ContainsAny(text, "<>") && (!strings.HasPrefix(text, "<") || !strings.HasSuffix(text, ">")) {
 				t.Errorf("token %d: misaligned raw token %#q for %T", i, text, have)
-			***REMOVED***
-		***REMOVED***
+			}
+		}
 		lastEnd = end
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // Ensure that directives (specifically !DOCTYPE) include the complete
 // text of any nested directives, noting that < and > do not change
@@ -340,7 +340,7 @@ var nestedDirectivesInput = `
 <!DOCTYPE [<!ENTITY xlt "'<">]>
 `
 
-var nestedDirectivesTokens = []Token***REMOVED***
+var nestedDirectivesTokens = []Token{
 	CharData("\n"),
 	Directive(`DOCTYPE [<!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#">]`),
 	CharData("\n"),
@@ -356,50 +356,50 @@ var nestedDirectivesTokens = []Token***REMOVED***
 	CharData("\n"),
 	Directive(`DOCTYPE [<!ENTITY xlt "'<">]`),
 	CharData("\n"),
-***REMOVED***
+}
 
-func TestNestedDirectives(t *testing.T) ***REMOVED***
+func TestNestedDirectives(t *testing.T) {
 	d := NewDecoder(strings.NewReader(nestedDirectivesInput))
 
-	for i, want := range nestedDirectivesTokens ***REMOVED***
+	for i, want := range nestedDirectivesTokens {
 		have, err := d.Token()
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("token %d: unexpected error: %s", i, err)
-		***REMOVED***
-		if !reflect.DeepEqual(have, want) ***REMOVED***
+		}
+		if !reflect.DeepEqual(have, want) {
 			t.Errorf("token %d = %#v want %#v", i, have, want)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestToken(t *testing.T) ***REMOVED***
+func TestToken(t *testing.T) {
 	d := NewDecoder(strings.NewReader(testInput))
 	d.Entity = testEntity
 
-	for i, want := range cookedTokens ***REMOVED***
+	for i, want := range cookedTokens {
 		have, err := d.Token()
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("token %d: unexpected error: %s", i, err)
-		***REMOVED***
-		if !reflect.DeepEqual(have, want) ***REMOVED***
+		}
+		if !reflect.DeepEqual(have, want) {
 			t.Errorf("token %d = %#v want %#v", i, have, want)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestSyntax(t *testing.T) ***REMOVED***
-	for i := range xmlInput ***REMOVED***
+func TestSyntax(t *testing.T) {
+	for i := range xmlInput {
 		d := NewDecoder(strings.NewReader(xmlInput[i]))
 		var err error
-		for _, err = d.Token(); err == nil; _, err = d.Token() ***REMOVED***
-		***REMOVED***
-		if _, ok := err.(*SyntaxError); !ok ***REMOVED***
+		for _, err = d.Token(); err == nil; _, err = d.Token() {
+		}
+		if _, ok := err.(*SyntaxError); !ok {
 			t.Fatalf(`xmlInput "%s": expected SyntaxError not received`, xmlInput[i])
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-type allScalars struct ***REMOVED***
+type allScalars struct {
 	True1     bool
 	True2     bool
 	False1    bool
@@ -419,9 +419,9 @@ type allScalars struct ***REMOVED***
 	Float64   float64
 	String    string
 	PtrString *string
-***REMOVED***
+}
 
-var all = allScalars***REMOVED***
+var all = allScalars{
 	True1:     true,
 	True2:     true,
 	False1:    false,
@@ -441,7 +441,7 @@ var all = allScalars***REMOVED***
 	Float64:   14.0,
 	String:    "15",
 	PtrString: &sixteen,
-***REMOVED***
+}
 
 var sixteen = "16"
 
@@ -468,215 +468,215 @@ const testScalarsInput = `<allscalars>
 	<PtrString>16</PtrString>
 </allscalars>`
 
-func TestAllScalars(t *testing.T) ***REMOVED***
+func TestAllScalars(t *testing.T) {
 	var a allScalars
 	err := Unmarshal([]byte(testScalarsInput), &a)
 
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Fatal(err)
-	***REMOVED***
-	if !reflect.DeepEqual(a, all) ***REMOVED***
+	}
+	if !reflect.DeepEqual(a, all) {
 		t.Errorf("have %+v want %+v", a, all)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-type item struct ***REMOVED***
+type item struct {
 	Field_a string
-***REMOVED***
+}
 
-func TestIssue569(t *testing.T) ***REMOVED***
+func TestIssue569(t *testing.T) {
 	data := `<item><Field_a>abcd</Field_a></item>`
 	var i item
 	err := Unmarshal([]byte(data), &i)
 
-	if err != nil || i.Field_a != "abcd" ***REMOVED***
+	if err != nil || i.Field_a != "abcd" {
 		t.Fatal("Expecting abcd")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestUnquotedAttrs(t *testing.T) ***REMOVED***
+func TestUnquotedAttrs(t *testing.T) {
 	data := "<tag attr=azAZ09:-_\t>"
 	d := NewDecoder(strings.NewReader(data))
 	d.Strict = false
 	token, err := d.Token()
-	if _, ok := err.(*SyntaxError); ok ***REMOVED***
+	if _, ok := err.(*SyntaxError); ok {
 		t.Errorf("Unexpected error: %v", err)
-	***REMOVED***
-	if token.(StartElement).Name.Local != "tag" ***REMOVED***
+	}
+	if token.(StartElement).Name.Local != "tag" {
 		t.Errorf("Unexpected tag name: %v", token.(StartElement).Name.Local)
-	***REMOVED***
+	}
 	attr := token.(StartElement).Attr[0]
-	if attr.Value != "azAZ09:-_" ***REMOVED***
+	if attr.Value != "azAZ09:-_" {
 		t.Errorf("Unexpected attribute value: %v", attr.Value)
-	***REMOVED***
-	if attr.Name.Local != "attr" ***REMOVED***
+	}
+	if attr.Name.Local != "attr" {
 		t.Errorf("Unexpected attribute name: %v", attr.Name.Local)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestValuelessAttrs(t *testing.T) ***REMOVED***
-	tests := [][3]string***REMOVED***
-		***REMOVED***"<p nowrap>", "p", "nowrap"***REMOVED***,
-		***REMOVED***"<p nowrap >", "p", "nowrap"***REMOVED***,
-		***REMOVED***"<input checked/>", "input", "checked"***REMOVED***,
-		***REMOVED***"<input checked />", "input", "checked"***REMOVED***,
-	***REMOVED***
-	for _, test := range tests ***REMOVED***
+func TestValuelessAttrs(t *testing.T) {
+	tests := [][3]string{
+		{"<p nowrap>", "p", "nowrap"},
+		{"<p nowrap >", "p", "nowrap"},
+		{"<input checked/>", "input", "checked"},
+		{"<input checked />", "input", "checked"},
+	}
+	for _, test := range tests {
 		d := NewDecoder(strings.NewReader(test[0]))
 		d.Strict = false
 		token, err := d.Token()
-		if _, ok := err.(*SyntaxError); ok ***REMOVED***
+		if _, ok := err.(*SyntaxError); ok {
 			t.Errorf("Unexpected error: %v", err)
-		***REMOVED***
-		if token.(StartElement).Name.Local != test[1] ***REMOVED***
+		}
+		if token.(StartElement).Name.Local != test[1] {
 			t.Errorf("Unexpected tag name: %v", token.(StartElement).Name.Local)
-		***REMOVED***
+		}
 		attr := token.(StartElement).Attr[0]
-		if attr.Value != test[2] ***REMOVED***
+		if attr.Value != test[2] {
 			t.Errorf("Unexpected attribute value: %v", attr.Value)
-		***REMOVED***
-		if attr.Name.Local != test[2] ***REMOVED***
+		}
+		if attr.Name.Local != test[2] {
 			t.Errorf("Unexpected attribute name: %v", attr.Name.Local)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func TestCopyTokenCharData(t *testing.T) ***REMOVED***
+func TestCopyTokenCharData(t *testing.T) {
 	data := []byte("same data")
 	var tok1 Token = CharData(data)
 	tok2 := CopyToken(tok1)
-	if !reflect.DeepEqual(tok1, tok2) ***REMOVED***
+	if !reflect.DeepEqual(tok1, tok2) {
 		t.Error("CopyToken(CharData) != CharData")
-	***REMOVED***
+	}
 	data[1] = 'o'
-	if reflect.DeepEqual(tok1, tok2) ***REMOVED***
+	if reflect.DeepEqual(tok1, tok2) {
 		t.Error("CopyToken(CharData) uses same buffer.")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestCopyTokenStartElement(t *testing.T) ***REMOVED***
-	elt := StartElement***REMOVED***Name***REMOVED***"", "hello"***REMOVED***, []Attr***REMOVED******REMOVED***Name***REMOVED***"", "lang"***REMOVED***, "en"***REMOVED******REMOVED******REMOVED***
+func TestCopyTokenStartElement(t *testing.T) {
+	elt := StartElement{Name{"", "hello"}, []Attr{{Name{"", "lang"}, "en"}}}
 	var tok1 Token = elt
 	tok2 := CopyToken(tok1)
-	if tok1.(StartElement).Attr[0].Value != "en" ***REMOVED***
+	if tok1.(StartElement).Attr[0].Value != "en" {
 		t.Error("CopyToken overwrote Attr[0]")
-	***REMOVED***
-	if !reflect.DeepEqual(tok1, tok2) ***REMOVED***
+	}
+	if !reflect.DeepEqual(tok1, tok2) {
 		t.Error("CopyToken(StartElement) != StartElement")
-	***REMOVED***
-	tok1.(StartElement).Attr[0] = Attr***REMOVED***Name***REMOVED***"", "lang"***REMOVED***, "de"***REMOVED***
-	if reflect.DeepEqual(tok1, tok2) ***REMOVED***
+	}
+	tok1.(StartElement).Attr[0] = Attr{Name{"", "lang"}, "de"}
+	if reflect.DeepEqual(tok1, tok2) {
 		t.Error("CopyToken(CharData) uses same buffer.")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestSyntaxErrorLineNum(t *testing.T) ***REMOVED***
+func TestSyntaxErrorLineNum(t *testing.T) {
 	testInput := "<P>Foo<P>\n\n<P>Bar</>\n"
 	d := NewDecoder(strings.NewReader(testInput))
 	var err error
-	for _, err = d.Token(); err == nil; _, err = d.Token() ***REMOVED***
-	***REMOVED***
+	for _, err = d.Token(); err == nil; _, err = d.Token() {
+	}
 	synerr, ok := err.(*SyntaxError)
-	if !ok ***REMOVED***
+	if !ok {
 		t.Error("Expected SyntaxError.")
-	***REMOVED***
-	if synerr.Line != 3 ***REMOVED***
+	}
+	if synerr.Line != 3 {
 		t.Error("SyntaxError didn't have correct line number.")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestTrailingRawToken(t *testing.T) ***REMOVED***
+func TestTrailingRawToken(t *testing.T) {
 	input := `<FOO></FOO>  `
 	d := NewDecoder(strings.NewReader(input))
 	var err error
-	for _, err = d.RawToken(); err == nil; _, err = d.RawToken() ***REMOVED***
-	***REMOVED***
-	if err != io.EOF ***REMOVED***
+	for _, err = d.RawToken(); err == nil; _, err = d.RawToken() {
+	}
+	if err != io.EOF {
 		t.Fatalf("d.RawToken() = _, %v, want _, io.EOF", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestTrailingToken(t *testing.T) ***REMOVED***
+func TestTrailingToken(t *testing.T) {
 	input := `<FOO></FOO>  `
 	d := NewDecoder(strings.NewReader(input))
 	var err error
-	for _, err = d.Token(); err == nil; _, err = d.Token() ***REMOVED***
-	***REMOVED***
-	if err != io.EOF ***REMOVED***
+	for _, err = d.Token(); err == nil; _, err = d.Token() {
+	}
+	if err != io.EOF {
 		t.Fatalf("d.Token() = _, %v, want _, io.EOF", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestEntityInsideCDATA(t *testing.T) ***REMOVED***
+func TestEntityInsideCDATA(t *testing.T) {
 	input := `<test><![CDATA[ &val=foo ]]></test>`
 	d := NewDecoder(strings.NewReader(input))
 	var err error
-	for _, err = d.Token(); err == nil; _, err = d.Token() ***REMOVED***
-	***REMOVED***
-	if err != io.EOF ***REMOVED***
+	for _, err = d.Token(); err == nil; _, err = d.Token() {
+	}
+	if err != io.EOF {
 		t.Fatalf("d.Token() = _, %v, want _, io.EOF", err)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-var characterTests = []struct ***REMOVED***
+var characterTests = []struct {
 	in  string
 	err string
-***REMOVED******REMOVED***
-	***REMOVED***"\x12<doc/>", "illegal character code U+0012"***REMOVED***,
-	***REMOVED***"<?xml version=\"1.0\"?>\x0b<doc/>", "illegal character code U+000B"***REMOVED***,
-	***REMOVED***"\xef\xbf\xbe<doc/>", "illegal character code U+FFFE"***REMOVED***,
-	***REMOVED***"<?xml version=\"1.0\"?><doc>\r\n<hiya/>\x07<toots/></doc>", "illegal character code U+0007"***REMOVED***,
-	***REMOVED***"<?xml version=\"1.0\"?><doc \x12='value'>what's up</doc>", "expected attribute name in element"***REMOVED***,
-	***REMOVED***"<doc>&abc\x01;</doc>", "invalid character entity &abc (no semicolon)"***REMOVED***,
-	***REMOVED***"<doc>&\x01;</doc>", "invalid character entity & (no semicolon)"***REMOVED***,
-	***REMOVED***"<doc>&\xef\xbf\xbe;</doc>", "invalid character entity &\uFFFE;"***REMOVED***,
-	***REMOVED***"<doc>&hello;</doc>", "invalid character entity &hello;"***REMOVED***,
-***REMOVED***
+}{
+	{"\x12<doc/>", "illegal character code U+0012"},
+	{"<?xml version=\"1.0\"?>\x0b<doc/>", "illegal character code U+000B"},
+	{"\xef\xbf\xbe<doc/>", "illegal character code U+FFFE"},
+	{"<?xml version=\"1.0\"?><doc>\r\n<hiya/>\x07<toots/></doc>", "illegal character code U+0007"},
+	{"<?xml version=\"1.0\"?><doc \x12='value'>what's up</doc>", "expected attribute name in element"},
+	{"<doc>&abc\x01;</doc>", "invalid character entity &abc (no semicolon)"},
+	{"<doc>&\x01;</doc>", "invalid character entity & (no semicolon)"},
+	{"<doc>&\xef\xbf\xbe;</doc>", "invalid character entity &\uFFFE;"},
+	{"<doc>&hello;</doc>", "invalid character entity &hello;"},
+}
 
-func TestDisallowedCharacters(t *testing.T) ***REMOVED***
+func TestDisallowedCharacters(t *testing.T) {
 
-	for i, tt := range characterTests ***REMOVED***
+	for i, tt := range characterTests {
 		d := NewDecoder(strings.NewReader(tt.in))
 		var err error
 
-		for err == nil ***REMOVED***
+		for err == nil {
 			_, err = d.Token()
-		***REMOVED***
+		}
 		synerr, ok := err.(*SyntaxError)
-		if !ok ***REMOVED***
+		if !ok {
 			t.Fatalf("input %d d.Token() = _, %v, want _, *SyntaxError", i, err)
-		***REMOVED***
-		if synerr.Msg != tt.err ***REMOVED***
+		}
+		if synerr.Msg != tt.err {
 			t.Fatalf("input %d synerr.Msg wrong: want %q, got %q", i, tt.err, synerr.Msg)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-type procInstEncodingTest struct ***REMOVED***
+type procInstEncodingTest struct {
 	expect, got string
-***REMOVED***
+}
 
-var procInstTests = []struct ***REMOVED***
+var procInstTests = []struct {
 	input  string
 	expect [2]string
-***REMOVED******REMOVED***
-	***REMOVED***`version="1.0" encoding="utf-8"`, [2]string***REMOVED***"1.0", "utf-8"***REMOVED******REMOVED***,
-	***REMOVED***`version="1.0" encoding='utf-8'`, [2]string***REMOVED***"1.0", "utf-8"***REMOVED******REMOVED***,
-	***REMOVED***`version="1.0" encoding='utf-8' `, [2]string***REMOVED***"1.0", "utf-8"***REMOVED******REMOVED***,
-	***REMOVED***`version="1.0" encoding=utf-8`, [2]string***REMOVED***"1.0", ""***REMOVED******REMOVED***,
-	***REMOVED***`encoding="FOO" `, [2]string***REMOVED***"", "FOO"***REMOVED******REMOVED***,
-***REMOVED***
+}{
+	{`version="1.0" encoding="utf-8"`, [2]string{"1.0", "utf-8"}},
+	{`version="1.0" encoding='utf-8'`, [2]string{"1.0", "utf-8"}},
+	{`version="1.0" encoding='utf-8' `, [2]string{"1.0", "utf-8"}},
+	{`version="1.0" encoding=utf-8`, [2]string{"1.0", ""}},
+	{`encoding="FOO" `, [2]string{"", "FOO"}},
+}
 
-func TestProcInstEncoding(t *testing.T) ***REMOVED***
-	for _, test := range procInstTests ***REMOVED***
-		if got := procInst("version", test.input); got != test.expect[0] ***REMOVED***
+func TestProcInstEncoding(t *testing.T) {
+	for _, test := range procInstTests {
+		if got := procInst("version", test.input); got != test.expect[0] {
 			t.Errorf("procInst(version, %q) = %q; want %q", test.input, got, test.expect[0])
-		***REMOVED***
-		if got := procInst("encoding", test.input); got != test.expect[1] ***REMOVED***
+		}
+		if got := procInst("encoding", test.input); got != test.expect[1] {
 			t.Errorf("procInst(encoding, %q) = %q; want %q", test.input, got, test.expect[1])
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // Ensure that directives with comments include the complete
 // text of any nested directives.
@@ -687,7 +687,7 @@ var directivesWithCommentsInput = `
 <!DOCTYPE <!-> <!> <!----> <!-->--> <!--->--> [<!ENTITY go "Golang"><!-- a comment-->]>
 `
 
-var directivesWithCommentsTokens = []Token***REMOVED***
+var directivesWithCommentsTokens = []Token{
 	CharData("\n"),
 	Directive(`DOCTYPE [<!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#">]`),
 	CharData("\n"),
@@ -695,58 +695,58 @@ var directivesWithCommentsTokens = []Token***REMOVED***
 	CharData("\n"),
 	Directive(`DOCTYPE <!-> <!>    [<!ENTITY go "Golang">]`),
 	CharData("\n"),
-***REMOVED***
+}
 
-func TestDirectivesWithComments(t *testing.T) ***REMOVED***
+func TestDirectivesWithComments(t *testing.T) {
 	d := NewDecoder(strings.NewReader(directivesWithCommentsInput))
 
-	for i, want := range directivesWithCommentsTokens ***REMOVED***
+	for i, want := range directivesWithCommentsTokens {
 		have, err := d.Token()
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("token %d: unexpected error: %s", i, err)
-		***REMOVED***
-		if !reflect.DeepEqual(have, want) ***REMOVED***
+		}
+		if !reflect.DeepEqual(have, want) {
 			t.Errorf("token %d = %#v want %#v", i, have, want)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
 // Writer whose Write method always returns an error.
-type errWriter struct***REMOVED******REMOVED***
+type errWriter struct{}
 
-func (errWriter) Write(p []byte) (n int, err error) ***REMOVED*** return 0, fmt.Errorf("unwritable") ***REMOVED***
+func (errWriter) Write(p []byte) (n int, err error) { return 0, fmt.Errorf("unwritable") }
 
-func TestEscapeTextIOErrors(t *testing.T) ***REMOVED***
+func TestEscapeTextIOErrors(t *testing.T) {
 	expectErr := "unwritable"
-	err := EscapeText(errWriter***REMOVED******REMOVED***, []byte***REMOVED***'A'***REMOVED***)
+	err := EscapeText(errWriter{}, []byte{'A'})
 
-	if err == nil || err.Error() != expectErr ***REMOVED***
+	if err == nil || err.Error() != expectErr {
 		t.Errorf("have %v, want %v", err, expectErr)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestEscapeTextInvalidChar(t *testing.T) ***REMOVED***
+func TestEscapeTextInvalidChar(t *testing.T) {
 	input := []byte("A \x00 terminated string.")
 	expected := "A \uFFFD terminated string."
 
 	buff := new(bytes.Buffer)
-	if err := EscapeText(buff, input); err != nil ***REMOVED***
+	if err := EscapeText(buff, input); err != nil {
 		t.Fatalf("have %v, want nil", err)
-	***REMOVED***
+	}
 	text := buff.String()
 
-	if text != expected ***REMOVED***
+	if text != expected {
 		t.Errorf("have %v, want %v", text, expected)
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func TestIssue5880(t *testing.T) ***REMOVED***
+func TestIssue5880(t *testing.T) {
 	type T []byte
-	data, err := Marshal(T***REMOVED***192, 168, 0, 1***REMOVED***)
-	if err != nil ***REMOVED***
+	data, err := Marshal(T{192, 168, 0, 1})
+	if err != nil {
 		t.Errorf("Marshal error: %v", err)
-	***REMOVED***
-	if !utf8.Valid(data) ***REMOVED***
+	}
+	if !utf8.Valid(data) {
 		t.Errorf("Marshal generated invalid UTF-8: %x", data)
-	***REMOVED***
-***REMOVED***
+	}
+}

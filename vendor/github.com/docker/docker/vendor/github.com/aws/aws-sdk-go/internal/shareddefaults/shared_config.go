@@ -13,9 +13,9 @@ import (
 //
 //   - Linux/Unix: $HOME/.aws/credentials
 //   - Windows: %USERPROFILE%\.aws\credentials
-func SharedCredentialsFilename() string ***REMOVED***
+func SharedCredentialsFilename() string {
 	return filepath.Join(UserHomeDir(), ".aws", "credentials")
-***REMOVED***
+}
 
 // SharedConfigFilename returns the SDK's default file path for
 // the shared config file.
@@ -24,17 +24,17 @@ func SharedCredentialsFilename() string ***REMOVED***
 //
 //   - Linux/Unix: $HOME/.aws/config
 //   - Windows: %USERPROFILE%\.aws\config
-func SharedConfigFilename() string ***REMOVED***
+func SharedConfigFilename() string {
 	return filepath.Join(UserHomeDir(), ".aws", "config")
-***REMOVED***
+}
 
 // UserHomeDir returns the home directory for the user the process is
 // running under.
-func UserHomeDir() string ***REMOVED***
-	if runtime.GOOS == "windows" ***REMOVED*** // Windows
+func UserHomeDir() string {
+	if runtime.GOOS == "windows" { // Windows
 		return os.Getenv("USERPROFILE")
-	***REMOVED***
+	}
 
 	// *nix
 	return os.Getenv("HOME")
-***REMOVED***
+}

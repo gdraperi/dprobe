@@ -6,12 +6,12 @@ package language
 // NumCompactTags-1.
 const NumCompactTags = 768
 
-var specialTags = []Tag***REMOVED*** // 2 elements
-	0: ***REMOVED***lang: 0xd7, region: 0x6e, script: 0x0, pVariant: 0x5, pExt: 0xe, str: "ca-ES-valencia"***REMOVED***,
-	1: ***REMOVED***lang: 0x139, region: 0x135, script: 0x0, pVariant: 0x5, pExt: 0x5, str: "en-US-u-va-posix"***REMOVED***,
-***REMOVED*** // Size: 72 bytes
+var specialTags = []Tag{ // 2 elements
+	0: {lang: 0xd7, region: 0x6e, script: 0x0, pVariant: 0x5, pExt: 0xe, str: "ca-ES-valencia"},
+	1: {lang: 0x139, region: 0x135, script: 0x0, pVariant: 0x5, pExt: 0x5, str: "en-US-u-va-posix"},
+} // Size: 72 bytes
 
-var coreTags = map[uint32]uint16***REMOVED***
+var coreTags = map[uint32]uint16{
 	0x0:        0,   // und
 	0x01600000: 3,   // af
 	0x016000d2: 4,   // af-NA
@@ -778,6 +778,6 @@ var coreTags = map[uint32]uint16***REMOVED***
 	0x5293912e: 765, // zh-Hant-TW
 	0x52f00000: 766, // zu
 	0x52f00161: 767, // zu-ZA
-***REMOVED***
+}
 
 // Total table size 4676 bytes (4KiB); checksum: 17BE3673

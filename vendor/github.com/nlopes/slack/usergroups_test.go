@@ -6,17 +6,17 @@ import (
 	"testing"
 )
 
-type userGroupsHandler struct ***REMOVED***
+type userGroupsHandler struct {
 	gotParams map[string]string
 	response  string
-***REMOVED***
+}
 
-func newUserGroupsHandler() *userGroupsHandler ***REMOVED***
-	return &userGroupsHandler***REMOVED***
+func newUserGroupsHandler() *userGroupsHandler {
+	return &userGroupsHandler{
 		gotParams: make(map[string]string),
-		response: `***REMOVED***
+		response: `{
     "ok": true,
-    "usergroup": ***REMOVED***
+    "usergroup": {
         "id": "S0615G0KT",
         "team_id": "T060RNRCH",
         "is_usergroup": true,
@@ -31,77 +31,77 @@ func newUserGroupsHandler() *userGroupsHandler ***REMOVED***
         "created_by": "U060RNRCZ",
         "updated_by": "U060RNRCZ",
         "deleted_by": null,
-        "prefs": ***REMOVED***
+        "prefs": {
             "channels": [
 
             ],
             "groups": [
 
             ]
-    ***REMOVED***,
+        },
         "user_count": 0
-***REMOVED***
-***REMOVED***`,
-	***REMOVED***
-***REMOVED***
+    }
+}`,
+	}
+}
 
-func (ugh *userGroupsHandler) accumulateFormValue(k string, r *http.Request) ***REMOVED***
-	if v := r.FormValue(k); v != "" ***REMOVED***
+func (ugh *userGroupsHandler) accumulateFormValue(k string, r *http.Request) {
+	if v := r.FormValue(k); v != "" {
 		ugh.gotParams[k] = v
-	***REMOVED***
-***REMOVED***
+	}
+}
 
-func (ugh *userGroupsHandler) handler(w http.ResponseWriter, r *http.Request) ***REMOVED***
+func (ugh *userGroupsHandler) handler(w http.ResponseWriter, r *http.Request) {
 	ugh.accumulateFormValue("name", r)
 	ugh.accumulateFormValue("description", r)
 	ugh.accumulateFormValue("handle", r)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(ugh.response))
-***REMOVED***
+}
 
-func TestCreateUserGroup(t *testing.T) ***REMOVED***
+func TestCreateUserGroup(t *testing.T) {
 	once.Do(startServer)
 	SLACK_API = "http://" + serverAddr + "/"
 	api := New("testing-token")
 
-	tests := []struct ***REMOVED***
+	tests := []struct {
 		userGroup  UserGroup
 		wantParams map[string]string
-	***REMOVED******REMOVED***
-		***REMOVED***
-			UserGroup***REMOVED***
+	}{
+		{
+			UserGroup{
 				Name:        "Marketing Team",
 				Description: "Marketing gurus, PR experts and product advocates.",
-				Handle:      "marketing-team"***REMOVED***,
-			map[string]string***REMOVED***
+				Handle:      "marketing-team"},
+			map[string]string{
 				"name":        "Marketing Team",
 				"description": "Marketing gurus, PR experts and product advocates.",
 				"handle":      "marketing-team",
-			***REMOVED***,
-		***REMOVED***,
-	***REMOVED***
+			},
+		},
+	}
 
 	var rh *userGroupsHandler
-	http.HandleFunc("/usergroups.create", func(w http.ResponseWriter, r *http.Request) ***REMOVED*** rh.handler(w, r) ***REMOVED***)
+	http.HandleFunc("/usergroups.create", func(w http.ResponseWriter, r *http.Request) { rh.handler(w, r) })
 
-	for i, test := range tests ***REMOVED***
+	for i, test := range tests {
 		rh = newUserGroupsHandler()
 		_, err := api.CreateUserGroup(test.userGroup)
-		if err != nil ***REMOVED***
+		if err != nil {
 			t.Fatalf("%d: Unexpected error: %s", i, err)
-		***REMOVED***
-		if !reflect.DeepEqual(rh.gotParams, test.wantParams) ***REMOVED***
+		}
+		if !reflect.DeepEqual(rh.gotParams, test.wantParams) {
 			t.Errorf("%d: Got params %#v, want %#v", i, rh.gotParams, test.wantParams)
-		***REMOVED***
-	***REMOVED***
-***REMOVED***
+		}
+	}
+}
 
-func getUserGroups(rw http.ResponseWriter, r *http.Request) ***REMOVED***
+func getUserGroups(rw http.ResponseWriter, r *http.Request) {
 	rw.Header().Set("Content-Type", "application/json")
-	response := []byte(`***REMOVED***
+	response := []byte(`{
     "ok": true,
     "usergroups": [
-        ***REMOVED***
+        {
             "id": "S0614TZR7",
             "team_id": "T060RNRCH",
             "is_usergroup": true,
@@ -116,7 +116,7 @@ func getUserGroups(rw http.ResponseWriter, r *http.Request) ***REMOVED***
             "created_by": "USLACKBOT",
             "updated_by": "U060RNRCZ",
             "deleted_by": null,
-            "prefs": ***REMOVED***
+            "prefs": {
                 "channels": [
                   "channel1",
                   "channel2"
@@ -126,15 +126,15 @@ func getUserGroups(rw http.ResponseWriter, r *http.Request) ***REMOVED***
                   "group2",
                   "group3"
                 ]
-        ***REMOVED***,
+            },
             "user_count": 2
-    ***REMOVED***
+        }
     ]
-***REMOVED***`)
+}`)
 	rw.Write(response)
-***REMOVED***
+}
 
-func TestGetUserGroups(t *testing.T) ***REMOVED***
+func TestGetUserGroups(t *testing.T) {
 	http.HandleFunc("/usergroups.list", getUserGroups)
 
 	once.Do(startServer)
@@ -142,17 +142,17 @@ func TestGetUserGroups(t *testing.T) ***REMOVED***
 	api := New("testing-token")
 
 	userGroups, err := api.GetUserGroups()
-	if err != nil ***REMOVED***
+	if err != nil {
 		t.Errorf("Unexpected error: %s", err)
 		return
-	***REMOVED***
+	}
 
 	// t.Fatal refers to -> t.Errorf & return
-	if len(userGroups) != 1 ***REMOVED***
+	if len(userGroups) != 1 {
 		t.Fatal(ErrIncorrectResponse)
-	***REMOVED***
+	}
 
-	S0614TZR7 := UserGroup***REMOVED***
+	S0614TZR7 := UserGroup{
 		ID:          "S0614TZR7",
 		TeamID:      "T060RNRCH",
 		IsUserGroup: true,
@@ -167,14 +167,14 @@ func TestGetUserGroups(t *testing.T) ***REMOVED***
 		CreatedBy:   "USLACKBOT",
 		UpdatedBy:   "U060RNRCZ",
 		DeletedBy:   "",
-		Prefs: UserGroupPrefs***REMOVED***
-			Channels: []string***REMOVED***"channel1", "channel2"***REMOVED***,
-			Groups:   []string***REMOVED***"group1", "group2", "group3"***REMOVED***,
-		***REMOVED***,
+		Prefs: UserGroupPrefs{
+			Channels: []string{"channel1", "channel2"},
+			Groups:   []string{"group1", "group2", "group3"},
+		},
 		UserCount: 2,
-	***REMOVED***
+	}
 
-	if !reflect.DeepEqual(userGroups[0], S0614TZR7) ***REMOVED***
+	if !reflect.DeepEqual(userGroups[0], S0614TZR7) {
 		t.Errorf("Got %#v, want %#v", userGroups[0], S0614TZR7)
-	***REMOVED***
-***REMOVED***
+	}
+}

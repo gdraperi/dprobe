@@ -77,8 +77,8 @@ def hint_and_subj(cls, name, type):
 		if args:
 			sargs = []
 			for i, a in enumerate(args):
-				ea = a.replace("***REMOVED***", "\\***REMOVED***").replace("***REMOVED***", "\\***REMOVED***")
-				sargs.append("$***REMOVED******REMOVED******REMOVED***0***REMOVED***:***REMOVED***1***REMOVED******REMOVED******REMOVED***".format(i+1, ea))
+				ea = a.replace("{", "\\{").replace("}", "\\}")
+				sargs.append("${{{0}:{1}}}".format(i+1, ea))
 			subj += "(" + ", ".join(sargs) + ")"
 		else:
 			subj += "()"
@@ -127,7 +127,7 @@ class Gocode(sublime_plugin.EventListener):
 
 		src = view.substr(sublime.Region(0, view.size()))
 		filename = view.file_name()
-		cloc = "c***REMOVED***0***REMOVED***".format(loc)
+		cloc = "c{0}".format(loc)
 		gocode = subprocess.Popen(["gocode", "-f=csv", "autocomplete", filename, cloc],
 			stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 		out = gocode.communicate(src.encode())[0].decode()

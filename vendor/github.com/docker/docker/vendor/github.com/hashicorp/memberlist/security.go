@@ -36,67 +36,67 @@ const (
 
 // pkcs7encode is used to pad a byte buffer to a specific block size using
 // the PKCS7 algorithm. "Ignores" some bytes to compensate for IV
-func pkcs7encode(buf *bytes.Buffer, ignore, blockSize int) ***REMOVED***
+func pkcs7encode(buf *bytes.Buffer, ignore, blockSize int) {
 	n := buf.Len() - ignore
 	more := blockSize - (n % blockSize)
-	for i := 0; i < more; i++ ***REMOVED***
+	for i := 0; i < more; i++ {
 		buf.WriteByte(byte(more))
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // pkcs7decode is used to decode a buffer that has been padded
-func pkcs7decode(buf []byte, blockSize int) []byte ***REMOVED***
-	if len(buf) == 0 ***REMOVED***
+func pkcs7decode(buf []byte, blockSize int) []byte {
+	if len(buf) == 0 {
 		panic("Cannot decode a PKCS7 buffer of zero length")
-	***REMOVED***
+	}
 	n := len(buf)
 	last := buf[n-1]
 	n -= int(last)
 	return buf[:n]
-***REMOVED***
+}
 
 // encryptOverhead returns the maximum possible overhead of encryption by version
-func encryptOverhead(vsn encryptionVersion) int ***REMOVED***
-	switch vsn ***REMOVED***
+func encryptOverhead(vsn encryptionVersion) int {
+	switch vsn {
 	case 0:
 		return 45 // Version: 1, IV: 12, Padding: 16, Tag: 16
 	case 1:
 		return 29 // Version: 1, IV: 12, Tag: 16
 	default:
 		panic("unsupported version")
-	***REMOVED***
-***REMOVED***
+	}
+}
 
 // encryptedLength is used to compute the buffer size needed
 // for a message of given length
-func encryptedLength(vsn encryptionVersion, inp int) int ***REMOVED***
+func encryptedLength(vsn encryptionVersion, inp int) int {
 	// If we are on version 1, there is no padding
-	if vsn >= 1 ***REMOVED***
+	if vsn >= 1 {
 		return versionSize + nonceSize + inp + tagSize
-	***REMOVED***
+	}
 
 	// Determine the padding size
 	padding := blockSize - (inp % blockSize)
 
 	// Sum the extra parts to get total size
 	return versionSize + nonceSize + inp + padding + tagSize
-***REMOVED***
+}
 
 // encryptPayload is used to encrypt a message with a given key.
 // We make use of AES-128 in GCM mode. New byte buffer is the version,
 // nonce, ciphertext and tag
-func encryptPayload(vsn encryptionVersion, key []byte, msg []byte, data []byte, dst *bytes.Buffer) error ***REMOVED***
+func encryptPayload(vsn encryptionVersion, key []byte, msg []byte, data []byte, dst *bytes.Buffer) error {
 	// Get the AES block cipher
 	aesBlock, err := aes.NewCipher(key)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	// Get the GCM cipher mode
 	gcm, err := cipher.NewGCM(aesBlock)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return err
-	***REMOVED***
+	}
 
 	// Grow the buffer to make room for everything
 	offset := dst.Len()
@@ -110,10 +110,10 @@ func encryptPayload(vsn encryptionVersion, key []byte, msg []byte, data []byte, 
 	afterNonce := dst.Len()
 
 	// Ensure we are correctly padded (only version 0)
-	if vsn == 0 ***REMOVED***
+	if vsn == 0 {
 		io.Copy(dst, bytes.NewReader(msg))
 		pkcs7encode(dst, offset+versionSize+nonceSize, aes.BlockSize)
-	***REMOVED***
+	}
 
 	// Encrypt message using GCM
 	slice := dst.Bytes()[offset:]
@@ -122,77 +122,77 @@ func encryptPayload(vsn encryptionVersion, key []byte, msg []byte, data []byte, 
 	// Message source depends on the encryption version.
 	// Version 0 uses padding, version 1 does not
 	var src []byte
-	if vsn == 0 ***REMOVED***
+	if vsn == 0 {
 		src = slice[versionSize+nonceSize:]
-	***REMOVED*** else ***REMOVED***
+	} else {
 		src = msg
-	***REMOVED***
+	}
 	out := gcm.Seal(nil, nonce, src, data)
 
 	// Truncate the plaintext, and write the cipher text
 	dst.Truncate(afterNonce)
 	dst.Write(out)
 	return nil
-***REMOVED***
+}
 
 // decryptMessage performs the actual decryption of ciphertext. This is in its
 // own function to allow it to be called on all keys easily.
-func decryptMessage(key, msg []byte, data []byte) ([]byte, error) ***REMOVED***
+func decryptMessage(key, msg []byte, data []byte) ([]byte, error) {
 	// Get the AES block cipher
 	aesBlock, err := aes.NewCipher(key)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// Get the GCM cipher mode
 	gcm, err := cipher.NewGCM(aesBlock)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// Decrypt the message
 	nonce := msg[versionSize : versionSize+nonceSize]
 	ciphertext := msg[versionSize+nonceSize:]
 	plain, err := gcm.Open(nil, nonce, ciphertext, data)
-	if err != nil ***REMOVED***
+	if err != nil {
 		return nil, err
-	***REMOVED***
+	}
 
 	// Success!
 	return plain, nil
-***REMOVED***
+}
 
 // decryptPayload is used to decrypt a message with a given key,
 // and verify it's contents. Any padding will be removed, and a
 // slice to the plaintext is returned. Decryption is done IN PLACE!
-func decryptPayload(keys [][]byte, msg []byte, data []byte) ([]byte, error) ***REMOVED***
+func decryptPayload(keys [][]byte, msg []byte, data []byte) ([]byte, error) {
 	// Ensure we have at least one byte
-	if len(msg) == 0 ***REMOVED***
+	if len(msg) == 0 {
 		return nil, fmt.Errorf("Cannot decrypt empty payload")
-	***REMOVED***
+	}
 
 	// Verify the version
 	vsn := encryptionVersion(msg[0])
-	if vsn > maxEncryptionVersion ***REMOVED***
+	if vsn > maxEncryptionVersion {
 		return nil, fmt.Errorf("Unsupported encryption version %d", msg[0])
-	***REMOVED***
+	}
 
 	// Ensure the length is sane
-	if len(msg) < encryptedLength(vsn, 0) ***REMOVED***
+	if len(msg) < encryptedLength(vsn, 0) {
 		return nil, fmt.Errorf("Payload is too small to decrypt: %d", len(msg))
-	***REMOVED***
+	}
 
-	for _, key := range keys ***REMOVED***
+	for _, key := range keys {
 		plain, err := decryptMessage(key, msg, data)
-		if err == nil ***REMOVED***
+		if err == nil {
 			// Remove the PKCS7 padding for vsn 0
-			if vsn == 0 ***REMOVED***
+			if vsn == 0 {
 				return pkcs7decode(plain, aes.BlockSize), nil
-			***REMOVED*** else ***REMOVED***
+			} else {
 				return plain, nil
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+			}
+		}
+	}
 
 	return nil, fmt.Errorf("No installed keys could decrypt the message")
-***REMOVED***
+}

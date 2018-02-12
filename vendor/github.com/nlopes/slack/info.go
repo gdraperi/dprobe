@@ -6,7 +6,7 @@ import (
 )
 
 // UserPrefs needs to be implemented
-type UserPrefs struct ***REMOVED***
+type UserPrefs struct {
 	// "highlight_words":"",
 	// "user_colors":"",
 	// "color_names_in_list":true,
@@ -102,48 +102,48 @@ type UserPrefs struct ***REMOVED***
 	// "privacy_policy_seen":true,
 	// "search_exclude_bots":false,
 	// "fuzzy_matching":false
-***REMOVED***
+}
 
 // UserDetails contains user details coming in the initial response from StartRTM
-type UserDetails struct ***REMOVED***
+type UserDetails struct {
 	ID             string    `json:"id"`
 	Name           string    `json:"name"`
 	Created        JSONTime  `json:"created"`
 	ManualPresence string    `json:"manual_presence"`
 	Prefs          UserPrefs `json:"prefs"`
-***REMOVED***
+}
 
 // JSONTime exists so that we can have a String method converting the date
 type JSONTime int64
 
 // String converts the unix timestamp into a string
-func (t JSONTime) String() string ***REMOVED***
+func (t JSONTime) String() string {
 	tm := t.Time()
 	return fmt.Sprintf("\"%s\"", tm.Format("Mon Jan _2"))
-***REMOVED***
+}
 
 // Time returns a `time.Time` representation of this value.
-func (t JSONTime) Time() time.Time ***REMOVED***
+func (t JSONTime) Time() time.Time {
 	return time.Unix(int64(t), 0)
-***REMOVED***
+}
 
 // Team contains details about a team
-type Team struct ***REMOVED***
+type Team struct {
 	ID     string `json:"id"`
 	Name   string `json:"name"`
 	Domain string `json:"domain"`
-***REMOVED***
+}
 
 // Icons XXX: needs further investigation
-type Icons struct ***REMOVED***
+type Icons struct {
 	Image36 string `json:"image_36,omitempty"`
 	Image48 string `json:"image_48,omitempty"`
 	Image72 string `json:"image_72,omitempty"`
-***REMOVED***
+}
 
 // Info contains various details about Users, Channels, Bots and the authenticated user.
 // It is returned by StartRTM or included in the "ConnectedEvent" RTM event.
-type Info struct ***REMOVED***
+type Info struct {
 	URL      string       `json:"url,omitempty"`
 	User     *UserDetails `json:"self,omitempty"`
 	Team     *Team        `json:"team,omitempty"`
@@ -152,59 +152,59 @@ type Info struct ***REMOVED***
 	Groups   []Group      `json:"groups,omitempty"`
 	Bots     []Bot        `json:"bots,omitempty"`
 	IMs      []IM         `json:"ims,omitempty"`
-***REMOVED***
+}
 
-type infoResponseFull struct ***REMOVED***
+type infoResponseFull struct {
 	Info
 	WebResponse
-***REMOVED***
+}
 
 // GetBotByID returns a bot given a bot id
-func (info Info) GetBotByID(botID string) *Bot ***REMOVED***
-	for _, bot := range info.Bots ***REMOVED***
-		if bot.ID == botID ***REMOVED***
+func (info Info) GetBotByID(botID string) *Bot {
+	for _, bot := range info.Bots {
+		if bot.ID == botID {
 			return &bot
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
 // GetUserByID returns a user given a user id
-func (info Info) GetUserByID(userID string) *User ***REMOVED***
-	for _, user := range info.Users ***REMOVED***
-		if user.ID == userID ***REMOVED***
+func (info Info) GetUserByID(userID string) *User {
+	for _, user := range info.Users {
+		if user.ID == userID {
 			return &user
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
 // GetChannelByID returns a channel given a channel id
-func (info Info) GetChannelByID(channelID string) *Channel ***REMOVED***
-	for _, channel := range info.Channels ***REMOVED***
-		if channel.ID == channelID ***REMOVED***
+func (info Info) GetChannelByID(channelID string) *Channel {
+	for _, channel := range info.Channels {
+		if channel.ID == channelID {
 			return &channel
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
 // GetGroupByID returns a group given a group id
-func (info Info) GetGroupByID(groupID string) *Group ***REMOVED***
-	for _, group := range info.Groups ***REMOVED***
-		if group.ID == groupID ***REMOVED***
+func (info Info) GetGroupByID(groupID string) *Group {
+	for _, group := range info.Groups {
+		if group.ID == groupID {
 			return &group
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
 
 // GetIMByID returns an IM given an IM id
-func (info Info) GetIMByID(imID string) *IM ***REMOVED***
-	for _, im := range info.IMs ***REMOVED***
-		if im.ID == imID ***REMOVED***
+func (info Info) GetIMByID(imID string) *IM {
+	for _, im := range info.IMs {
+		if im.ID == imID {
 			return &im
-		***REMOVED***
-	***REMOVED***
+		}
+	}
 	return nil
-***REMOVED***
+}
